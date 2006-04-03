@@ -1,43 +1,45 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: center.lib,v 1.17 2006-03-13 14:31:42 motsak Exp $"
+version="$Id: center.lib,v 1.18 2006-04-03 13:16:53 motsak Exp $"
 category="Noncommutative"
 info="
 LIBRARY:  center.lib      computation of central elements of GR-algebras
 AUTHOR:  Oleksandr Motsak,        motsak@mathematik.uni-kl.de.
-OVERVIEW:
-This is a library for computing the central elements and centralizers of elements in various non-commutative algebras.
-Implementation is based on algorithms written in the frame of the diploma thesis by O. Motsak (adviser: Prof. S.A. Ovsienko, support: V. Levandovskyy), at Kyiv Taras Shevchenko University (Ukraine) with the title 'An algorithm for the computation of the center of a non-commutative polynomial algebra'.
+OVERVIEW: A library for computing elements of the center and centralizers of elements in various non-commutative algebras.
 
 SUPPORT: Forschungsschwerpunkt 'Mathematik und Praxis', University of Kaiserslautern
 
 MAIN PROCEDURES:
-CENTRALIZE_SET(F, V); computes a VS basis of the centralizer of F within V,
-CENTRALIZER_VECTORSPACE(F, d); computes a VS basis of the centralizer of F up to degree D,
-CENTRALIZER_SUBALGEBRA(F, D[, N]); computes a SA base of the centralizer of F up to degree D,
-CENTER_VECTORSPACE(D); computes a VS basis of the center up to degree D,
-CENTER_SUBALGEBRA(D[, k]); computes a SA base of the center up to degree D,
+@format
+centralizeSet(F, V):           computes a V.S. basis of the centralizer of set F within V,
+centralizerVS(F, d):           computes a V.S. basis of the centralizer of set F,
+centralizerRed(F, D[, N]):     computes reduced elements of the centralizer of set F,
+centerVS(D):                   computes a V.S. basis of the center up to degree D,
+centerRed(D[, k]):             computes reduced elements of the center up to degree D,
 
-center(D[,k]); computes a SA generators of the center,
-centralizer(S, D[, k]); computes a SA generators of the centralizer of S,
+center(D[, k]):                computes reduced elements of the center,
+centralizer(F, D[, k]):        computes reduced elements of the centralizer of set F,
 
-sa_reduce(V); 'subalgebra reduction' of a set of pairwise commuting polynomials,
-sa_poly_reduce(p,V); 'subalgebra reduction' of a polynomial p wrt a set of pairwise commuting polynomials.
+sa_reduce(V):                  'subalgebra reduction' of a set of pairwise commuting polynomials V,
+sa_poly_reduce(p, V):          'subalgebra reduction' of a polynomial p wrt a set of pairwise commuting polynomials V.
+
+inCenter(T):                   checks the centrality of polynomials of a list/ideal/poly T,
+inCentralizer(T, S):           checks whether polynomials of list/ideal/poly T commute with polynomials of S,
+isCartan(p):                   checks whether polynomial p is a Cartan element,
+@end format
 
 AUXILIARY PROCEDURES:
-ApplyAd( Basis, f); Computes images of basis elements under the linear map Ad_{f},
-KER(Images); Computes the kernel of a linear map given by its images on certain basis vectors,
-LinearCombinations(Basis, C); computes linear combinations of Basis vectors with the coefficients from C,
+@format
+applyAdF(Basis, f):            computes images of basis elements under the linear map Ad_{f},
+linearMapKernel(Images):       computes the kernel of a linear map given by image of basis,
+linearCombinations(Basis, C):  computes linear combinations of Basis vectors with the coefficients from C,
 
-inCenter(T); checks the centrality of polynomials of a list/ideal/poly T,
-inCentralizer(T, S); checks whether polynomials of list/ideal/poly T commute with polynomials of S,
-isCartan(p); checks whether polynomial p is a Cartan element,
+variablesStandard():           computes the set of algebra generators in their natural order,
+variablesSorted():             computes the sorted set of algebra generators,
 
-standard_variables(); computes the set of algebra generators in their natural order,
-sorted_variables(); computes the sorted set of algebra generators,
-
-PBW_basis_byDeg( Deg ); computes monomials of a given degree Deg,
-PBW_basis_byMaxDeg( MaxDeg ); computes monomials up to a given degree MaxDeg,
-PBW_basis_byMaxMonom( MaxMonom ); computes monomials up to a given maximal monomial MaxMonom.
+PBW_eqDeg(Deg):                computes PBW monomials of a given degree Deg,
+PBW_maxDeg(MaxDeg):            computes PBW monomials up to a given degree MaxDeg,
+PBW_maxMonom(MaxMonom):        computes PBW monomials up to a given maximal monomial MaxMonom.
+@end format
 
 KEYWORDS:  center; centralizer; cartan; reduce; centralize; PBW
 "
@@ -313,14 +315,14 @@ PURPOSE: smooths the ideal in a current QUOTIENT(!) ring.
 
 
 /******************************************************/
-proc PBW_basis_byMaxDeg( int MaxDeg )
-"USAGE: PBW_basis_byMaxDeg(MaxDeg); int MaxDeg
+proc PBW_maxDeg( int MaxDeg )
+"USAGE: PBW_maxDeg(MaxDeg); int MaxDeg
 PURPOSE: Compute the PBW basis (up to a given maximal degree) of a current algebra.
 RETURN: ideal consisting of PBW elements.
 NOTE: unit is omitted. Weights are ignored!
 "
 {
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "PBW_basis_byMaxDeg", MaxDeg ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "PBW_maxDeg", MaxDeg ); }; /*4DEBUG*/
     
     ideal Basis = ideal();
     
@@ -331,7 +333,7 @@ NOTE: unit is omitted. Weights are ignored!
     
     ideal T = smoothQideal( Basis ); kill Basis;
     
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "PBW_basis_byMaxDeg", T ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "PBW_maxDeg", T ); }; /*4DEBUG*/
     return( T );
 }
 example
@@ -343,23 +345,23 @@ D[1,2]=-h;  D[1,3]=2*e;  D[2,3]=-2*f;
 ncalgebra(1,D); // this algebra is U(sl_2)
 
 // PBW Basis of A_2 - monomials of degree <= 2, without unit:
-PBW_basis_byMaxDeg( 2 ); 
+PBW_maxDeg( 2 ); 
 }
 
 
 /******************************************************/
-proc PBW_basis_byDeg( int Deg )
-"USAGE: PBW_basis_byDeg(Deg); int Deg
+proc PBW_eqDeg( int Deg )
+"USAGE: PBW_eqDeg(Deg); int Deg
 PURPOSE: Compute the PBW basis (of a given degree) of a current algebra.
 RETURN: ideal consisting of PBW elements.
 NOTE: Unit is omitted. Weights are ignored!
 "
 {
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "PBW_basis_byDeg", Deg ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "PBW_eqDeg", Deg ); }; /*4DEBUG*/
     
     ideal Basis = smoothQideal( maxideal( Deg ) );
     
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "PBW_basis_byDeg", Basis ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "PBW_eqDeg", Basis ); }; /*4DEBUG*/
     return( Basis );
 }
 example
@@ -371,20 +373,20 @@ D[1,2]=-h;  D[1,3]=2*e;  D[2,3]=-2*f;
 ncalgebra(1,D); // this algebra is U(sl_2)
 
 // PBW Basis of A_2 \ A_1 - monomials of degree == 2:
-PBW_basis_byDeg( 2 ); 
+PBW_eqDeg( 2 ); 
 }
 
 
 /******************************************************/
-proc PBW_basis_byMaxMonom( poly MaxMonom )
-"USAGE: PBW_basis_byMaxMonom(m); poly m
+proc PBW_maxMonom( poly MaxMonom )
+"USAGE: PBW_maxMonom(m); poly m
 PURPOSE: Compute the PBW basis, up to a given maximal exponent, of a current algebra.
 INPUT: Maximal exponent is given by the corresponding monomial.
 RETURN: ideal consisting of PBW elements.
 NOTE: Unit is omitted. Weights are ignored!
 "
 {
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "PBW_basis_byMaxMonom", MaxMonom ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "PBW_maxMonom", MaxMonom ); }; /*4DEBUG*/
     
     ideal K = ideal();
     
@@ -407,7 +409,7 @@ NOTE: Unit is omitted. Weights are ignored!
     
     ideal T = smoothQideal( K ); kill K;
 
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "PBW_basis_byMaxMonom", T ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "PBW_maxMonom", T ); }; /*4DEBUG*/
     
     return( T );
 }
@@ -420,7 +422,7 @@ D[1,2]=-h;  D[1,3]=2*e;  D[2,3]=-2*f;
 ncalgebra(1,D); // this algebra is U(sl_2)
 
 // At most 1st degree in e, h and at most 2nd degree in f, unit is omitted:
-PBW_basis_byMaxMonom( e*(f^2)* h ); 
+PBW_maxMonom( e*(f^2)* h ); 
 }
 
 
@@ -433,15 +435,15 @@ PBW_basis_byMaxMonom( e*(f^2)* h );
 
 
 /******************************************************/
-proc ApplyAd( ideal I, poly p )
+proc applyAdF( ideal I, poly p )
 "
-USAGE: ApplyAd( Basis, f); ideal Basis, poly f
+USAGE: applyAdF( Basis, f); ideal Basis, poly f
 PURPOSE: Apply Ad_{f} to every element of Basis
 RETURN: ideal, Ad_{f}(Basis)
-SEE ALSO:   KER; LinearCombinations
+SEE ALSO:   linearMapKernel; linearMapKernel
 "
 {
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "ApplyAd", I, p ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "applyAdF", I, p ); }; /*4DEBUG*/
 
     poly t;
 
@@ -457,7 +459,7 @@ SEE ALSO:   KER; LinearCombinations
     
     kill II;
     
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "ApplyAd", J ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "applyAdF", J ); }; /*4DEBUG*/
     return( J );
 }
 example
@@ -471,33 +473,33 @@ ncalgebra(1,D); // this algebra is U(sl_2)
 // Let us consider the linear map Ad_{e} from A_2 into A.
 
 // Compute the PBW basis of A_2:
-ideal Basis = PBW_basis_byMaxDeg( 2 ); Basis;
+ideal Basis = PBW_maxDeg( 2 ); Basis;
 
 // Compute images of basis elements under the linear map Ad_e:
-ideal Image = ApplyAd( Basis, e ); Image;
+ideal Image = applyAdF( Basis, e ); Image;
 
 // Now we have a linear map given by: Basis_i --> Image_i
 // Let's compute its kernel:
-module C = KER( Image ); C;
+module C = linearMapKernel( Image ); C;
 
 // Now we can compute the kernel of Ad_e by means of basis vectors:
-ideal K = LinearCombinations(Basis, C); K;
+ideal K = linearCombinations(Basis, C); K;
 
 // Let's check that Ad_e(K) is zero:
-ApplyAd( K, e );
+applyAdF( K, e );
 }
 
 
 
 /******************************************************/
-proc KER( ideal Images )
-"USAGE: KER( Images ); ideal Images
+proc linearMapKernel( ideal Images )
+"USAGE: linearMapKernel( Images ); ideal Images
 PURPOSE: Computes the kernel of a linear map given by its images on certain basis vectors
 RETURN: syzygy module, or 0 if all images are zeroes
-SEE ALSO:   ApplyAd; LinearCombinations
+SEE ALSO:   applyAdF; linearMapKernel
 "
 {
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "KER", Images ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "linearMapKernel", Images ); }; /*4DEBUG*/
 
     // This must be a list of monomials in a form of polynomial (sum with coeffs == 1)    
     poly Monomials = monomialForm( Images ); 
@@ -508,7 +510,7 @@ SEE ALSO:   ApplyAd; LinearCombinations
     {
         int result = 0;
         
-/*4DEBUG*/        if( defined( @@@DEBUG ) ){ ECall( "KER", result ); }; /*4DEBUG*/
+/*4DEBUG*/        if( defined( @@@DEBUG ) ){ ECall( "linearMapKernel", result ); }; /*4DEBUG*/
         return( result );
     }
 
@@ -569,7 +571,7 @@ SEE ALSO:   ApplyAd; LinearCombinations
     option( redTail );
     
     // compute everything in a right form
-    module KER = simplify( std( syz(MD) ), 1 + 2 + 8 ); 
+    module linearMapKernel = simplify( std( syz(MD) ), 1 + 2 + 8 ); 
     // note that MD is a matrix of numbers - no polynomials... 
     
     // restore options
@@ -578,9 +580,9 @@ SEE ALSO:   ApplyAd; LinearCombinations
     // kill used structure       
     kill MD; 
     
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "KER", KER ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "linearMapKernel", linearMapKernel ); }; /*4DEBUG*/
 
-    return( KER );
+    return( linearMapKernel );
 }
 example
 {
@@ -593,37 +595,37 @@ ncalgebra(1,D); // this algebra is U(sl_2)
 // Let us consider the linear map Ad_{e} from A_2 into A.
 
 // Compute the PBW basis of A_2:
-ideal Basis = PBW_basis_byMaxDeg( 2 ); Basis;
+ideal Basis = PBW_maxDeg( 2 ); Basis;
 
 // Compute images of basis elements under the linear map Ad_e:
-ideal Image = ApplyAd( Basis, e ); Image;
+ideal Image = applyAdF( Basis, e ); Image;
 
 // Now we have a linear map given by: Basis_i --> Image_i
 // Let's compute its kernel:
-module C = KER( Image ); C;
+module C = linearMapKernel( Image ); C;
 
 // Now we can compute the kernel of Ad_e by means of basis vectors:
-ideal K = LinearCombinations(Basis, C); K;
+ideal K = linearCombinations(Basis, C); K;
 
 // Let's check that Ad_e(K) is zero:
-ideal Z = ApplyAd( K, e ); Z;
+ideal Z = applyAdF( K, e ); Z;
 
-// Now KER will return a single integer 0:
-def CC  = KER(Z); typeof(CC); CC;
+// Now linearMapKernel will return a single integer 0:
+def CC  = linearMapKernel(Z); typeof(CC); CC;
 }
 
 
 /******************************************************/
-proc LinearCombinations( ideal Basis, module KER )
+proc linearCombinations( ideal Basis, module KER )
 "
-USAGE:  LinearCombinations( Basis, C ); ideal Basis, module C
+USAGE:  linearCombinations( Basis, C ); ideal Basis, module C
 PURPOSE: computes linear combinations of Basis vectors with the coefficients from C.
 RETURN: ideal of linear combinations of Basis vectors with the coefficients from C.
-SEE ALSO:   KER; ApplyAd
+SEE ALSO:   linearMapKernel; applyAdF
 "
 {
     
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "LinearCombinations", Basis, KER ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "linearCombinations", Basis, KER ); }; /*4DEBUG*/
 
 
     number c;    
@@ -658,7 +660,7 @@ SEE ALSO:   KER; ApplyAd
     // no reduction in quotient algebras is needed. No multiplications were done!
     
     
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "LinearCombinations", result ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "linearCombinations", result ); }; /*4DEBUG*/
     
     return( result );
 }
@@ -673,20 +675,20 @@ ncalgebra(1,D); // this algebra is U(sl_2)
 // Let us consider the linear map Ad_{e} from A_2 into A.
 
 // Compute the PBW basis of A_2:
-ideal Basis = PBW_basis_byMaxDeg( 2 ); Basis;
+ideal Basis = PBW_maxDeg( 2 ); Basis;
 
 // Compute images of basis elements under the linear map Ad_e:
-ideal Image = ApplyAd( Basis, e ); Image;
+ideal Image = applyAdF( Basis, e ); Image;
 
 // Now we have a linear map given by: Basis_i --> Image_i
 // Let's compute its kernel:
-module C = KER( Image ); C;
+module C = linearMapKernel( Image ); C;
 
 // Now we can compute the kernel of Ad_e by means of basis vectors:
-ideal K = LinearCombinations(Basis, C); K;
+ideal K = linearCombinations(Basis, C); K;
 
 // Let's check that Ad_e(K) is zero:
-ApplyAd( K, e );
+applyAdF( K, e );
 }
 
 
@@ -708,10 +710,10 @@ PURPOSE: Computation of the kernel basis of the linear map given by the list @gi
     }
     
     // compute fundamental solutions system
-    def T = KER( Images );
+    def T = linearMapKernel( Images );
     
     
-    // check result of KER
+    // check result of linearMapKernel
     if( (typeof(T) == "int") and (T == 0) )
     {
         // All zeroes! Return Basis:
@@ -722,17 +724,19 @@ PURPOSE: Computation of the kernel basis of the linear map given by the list @gi
     {
         if( typeof(T) != "module" )
         {
-            ERROR( "Wrong output from the 'KER' function!" );
+            ERROR( "Wrong output from the 'linearMapKernel' function!" );
         }    
     }
     
-    result = LinearCombinations( Basis, T );
+    result = linearCombinations( Basis, T );
     
     kill T;
 
 /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "LINEAR_MAP_KERNEL", result ); }; /*4DEBUG*/
     return( result );
 }
+
+
 
 
 /******************************************************/
@@ -768,19 +772,19 @@ NOTE: the result is a set of all basis vectors having a zero image
 
 
 /******************************************************/
-proc standard_variables() // Returns an ideal of variables in a current base ring.
-"USAGE:      standard_variables();
+proc variablesStandard() // Returns an ideal of variables in a current base ring.
+"USAGE:      variablesStandard();
 RETURN:     ideal, generated by algebra variables
 PURPOSE:    computes the ideal generated by algebra variables taken in their natural order
-SEE ALSO:   sorted_variables
-EXAMPLE:    example standard_variables; shows an example
+SEE ALSO:   variablesSorted
+EXAMPLE:    example variablesStandard; shows an example
 "
 {
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "standard_variables" ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "variablesStandard" ); }; /*4DEBUG*/
 
     ideal result = maxideal(1);
 
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "standard_variables", result ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "variablesStandard", result ); }; /*4DEBUG*/
     return( result );
 }
 example
@@ -791,21 +795,21 @@ matrix D[3][3]=0;
 D[1,2]=-z;  D[1,3]=2*x;  D[2,3]=-2*y;
 ncalgebra(1,D); // this algebra is U(sl_2)
 // Variables in their natural order:
-standard_variables(); 
+variablesStandard(); 
 }
 
 /******************************************************/
-proc sorted_variables() // Sorts variables into an ideal. This is a kind of heuristics!
-"USAGE:      sorted_variables();
+proc variablesSorted() // Sorts variables into an ideal. This is a kind of heuristics!
+"USAGE:      variablesSorted();
 RETURN:     ideal, generated by sorted algebra variables
 PURPOSE:    computes the ideal generated by algebra variables sorted so that Cartan variables are first and all other variables are behind.
 NOTE:       This is a heuristics for the computation of center: it is better to compute centralizers of Cartan variables first since we can omit solving the system of equations. 
-SEE ALSO:   standard_variables
-EXAMPLE:    example sorted_variables; shows an example
+SEE ALSO:   variablesStandard
+EXAMPLE:    example variablesSorted; shows an example
 "{
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "sorted_variables" ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "variablesSorted" ); }; /*4DEBUG*/
 
-    ideal V   = standard_variables();
+    ideal V   = variablesStandard();
     int  N    = size( V ); // == nvars( basering )
 
     ideal result;
@@ -830,7 +834,7 @@ EXAMPLE:    example sorted_variables; shows an example
         }
     }
 
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "sorted_variables", result ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "variablesSorted", result ); }; /*4DEBUG*/
     return( result );
 }
 example
@@ -842,7 +846,7 @@ D[1,2]=-z;  D[1,3]=2*x;  D[2,3]=-2*y;
 ncalgebra(1,D); // this algebra is U(sl_2)
 // There is only one Cartan variable - z in U(sl_2), 
 // it must go 1st:
-sorted_variables(); 
+variablesSorted(); 
 }
 
 
@@ -860,16 +864,16 @@ sorted_variables();
 
 
 /******************************************************/
-proc CENTRALIZE_SET( ideal F, ideal V ) // HL 'core' function
-"USAGE:      CENTRALIZE_SET( F, V ); ideal F, ideal V
+proc centralizeSet( ideal F, ideal V ) // HL 'core' function
+"USAGE:      centralizeSet( F, V ); ideal F, ideal V
 INPUT:       a finite set of elements F, vector space basis V
 RETURN:     ideal, generated by base elements
 PURPOSE:    computes the vector space basis of the centralizer of F in the vector space spanned by V, that is, Cen(F[N],Cen(F[N-1],...,Cen(F[1],V)...))
-SEE ALSO:   CENTRALIZER_VECTORSPACE; centralizer; inCentralizer
-EXAMPLE:    example CENTRALIZER_VECTORSPACE; shows an example
+SEE ALSO:   centralizerVS; centralizer; inCentralizer
+EXAMPLE:    example centralizeSet; shows an example
 "
 {
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "CENTRALIZE_SET", F, V ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "centralizeSet", F, V ); }; /*4DEBUG*/
 
     int  N = size(F);
 
@@ -885,7 +889,7 @@ EXAMPLE:    example CENTRALIZER_VECTORSPACE; shows an example
         DBPrint(1, "Centralizing " + string(F[v]) );
         
         //
-        ideal Images = ApplyAd( V, F[v] ); 
+        ideal Images = applyAdF( V, F[v] ); 
         
         ideal K;        
         if( (isCartan(F[v]) == 1) or (size(V) == 1) ) 
@@ -906,7 +910,7 @@ EXAMPLE:    example CENTRALIZER_VECTORSPACE; shows an example
     
     ideal result = makeNice(V); kill V;
     
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "CENTRALIZE_SET", result ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "centralizeSet", result ); }; /*4DEBUG*/
     
     return( result );
 }
@@ -920,19 +924,19 @@ example
  // This is $A_{41}$ - the first real Lie algebra of dimension $4$.
  ncalgebra(1,D); 
   
- ideal F = sorted_variables(); F;
+ ideal F = variablesSorted(); F;
  
- // if we know that the center of $A_{41}$ is generated by 
+ // the center of $A_{41}$ is generated by 
  // $e(1)$ and $-1/2*e(2)^2+e(1)*e(3)$ 
  // therefore one may consider computing it in the following way:
  
  // 1. Compute PBW basis consisting of 
  //    monomials of exponent <= (1,2,1,0)
- ideal V = PBW_basis_byMaxMonom( e(1) * e(2)^ 2 * e(3) ); 
+ ideal V = PBW_maxMonom( e(1) * e(2)^ 2 * e(3) ); 
  
  // 2. Compute the centralizer of F within vector space 
  //    spanned by these monomials:
- ideal C = CENTRALIZE_SET( F, V ); C;
+ ideal C = centralizeSet( F, V ); C;
  
  inCenter(C);
 }
@@ -940,29 +944,29 @@ example
 
 
 /******************************************************/
-proc CENTRALIZER_VECTORSPACE( ideal F, int d )
-"USAGE:      CENTRALIZER_VECTORSPACE( F, D ); ideal F, int D
+proc centralizerVS( ideal F, int d )
+"USAGE:      centralizerVS( F, D ); ideal F, int D
 RETURN:     ideal, generated by elements of degree <= D
 PURPOSE:    computes a vector space basis of the centralizer of F up to degree D.
 NOTE:       D must be non-negative
-SEE ALSO:   CENTER_VECTORSPACE; centralizer; inCentralizer
-EXAMPLE:    example CENTER_VECTORSPACE; shows an example
+SEE ALSO:   centerVS; centralizer; inCentralizer
+EXAMPLE:    example centralizerVS; shows an example
 "
 {
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "CENTRALIZER_VECTORSPACE", F, d ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "centralizerVS", F, d ); }; /*4DEBUG*/
     
     if( size(F) == 0)
     {
         ERROR( "F MUST be non-empty!!!" );
     } 
 
-    ideal V = PBW_basis_byMaxDeg( d ); // PBW basis
+    ideal V = PBW_maxDeg( d ); // PBW basis
     
-    ideal result = CENTRALIZE_SET( F, V ); // basis of the Centralizer of S in VS <V>
+    ideal result = centralizeSet( F, V ); // basis of the Centralizer of S in VS <V>
     
     kill V;
 
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "CENTRALIZER_VECTORSPACE", result ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "centralizerVS", result ); }; /*4DEBUG*/
     
     return( result );
 }
@@ -975,7 +979,7 @@ D[1,2]=-z;  D[1,3]=2*x;  D[2,3]=-2*y;
 ncalgebra(1,D); // this algebra is U(sl_2)
 ideal F = x, y;
 // find all elements commuting with x and y of degree <= 4:
-ideal C = CENTRALIZER_VECTORSPACE(F, 4); 
+ideal C = centralizerVS(F, 4); 
 C; 
 inCentralizer(C, F);
 }
@@ -991,16 +995,16 @@ inCentralizer(C, F);
 
 
 /******************************************************/
-proc CENTER_VECTORSPACE( int D )
-"USAGE:      CENTER_VECTORSPACE( D ); int D
+proc centerVS( int D )
+"USAGE:      centerVS( D ); int D
 RETURN:     ideal, generated by elements of degree <= D
 PURPOSE:    computes a vector space basis of the center of the current algebra up to degree D.
 NOTE:       D must be non-negative
-SEE ALSO:   CENTRALIZER_VECTORSPACE; center; inCenter
-EXAMPLE:    example CENTER_VECTORSPACE; shows an example
+SEE ALSO:   centralizerVS; center; inCenter
+EXAMPLE:    example centerVS; shows an example
 "
 {
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "CENTER_VECTORSPACE", D ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "centerVS", D ); }; /*4DEBUG*/
 
 
     if( nameof( basering ) == "basering" )
@@ -1013,9 +1017,9 @@ EXAMPLE:    example CENTER_VECTORSPACE; shows an example
         ERROR( "Degree D must be non-negative!" );
     }
     
-    ideal result = CENTRALIZER_VECTORSPACE( sorted_variables(), D );
+    ideal result = centralizerVS( variablesSorted(), D );
      
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "CENTER_VECTORSPACE", result ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "centerVS", result ); }; /*4DEBUG*/
 
     return( result );
 }
@@ -1027,7 +1031,7 @@ matrix D[3][3]=0;
 D[1,2]=-z;  D[1,3]=2*x;  D[2,3]=-2*y;
 ncalgebra(1,D); // this algebra is U(sl_2)
 // find all central elements of degree <= 4
-ideal Z = CENTER_VECTORSPACE(4); 
+ideal Z = centerVS(4); 
 Z; 
 // note that the second element is the square of the first 
 // plus the multiple of the first:
@@ -1037,16 +1041,16 @@ inCenter(Z);
 
 
 /******************************************************/
-proc CENTRALIZER_SUBALGEBRA( ideal F, int D, list # )
-"USAGE:      CENTRALIZER_SUBALGEBRA( F, D[, N] ); ideal F, int D[, int N]
+proc centralizerRed( ideal F, int D, list # )
+"USAGE:      centralizerRed( F, D[, N] ); ideal F, int D[, int N]
 RETURN:     ideal, generated by computed generators
 PURPOSE:    if N is absent and D >= 0 computes a subalgebra generators of the centralizer of F up to degree D, otherwise if N is present computes N(at least) first generators of the centralizer, if moreover D > 0 it will be used as the first maximal degree estimation.
 NOTE:       Current ordering must be a degree compatible well-ordering.
-SEE ALSO:   CENTRALIZER_VECTORSPACE; CENTER_SUBALGEBRA; centralizer; inCentralizer
-EXAMPLE:    example CENTRALIZER_SUBALGEBRA; shows an example
+SEE ALSO:   centralizerVS; centerRed; centralizer; inCentralizer
+EXAMPLE:    example centralizerRed; shows an example
 "
 {
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "CENTRALIZER_SUBALGEBRA", F, D, # ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "centralizerRed", F, D, # ); }; /*4DEBUG*/
     
     if( nameof( basering ) == "basering" )
     {
@@ -1127,13 +1131,13 @@ EXAMPLE:    example CENTRALIZER_SUBALGEBRA; shows an example
         setring NCRING;
         
         
-        // just to avoid "no standard basis" warning.
+        
         ideal FLM = imap(COMMRING, FLM);
-        attrib(FLM, "isSB", 1);
+        attrib(FLM, "isSB", 1); // just to avoid "no standard basis" warning.
 
-        // degrees should not change
+        // degrees should not change,
         // no monomials should be multiplied here
-        ideal T = reduce( PBW_basis_byDeg( i ), FLM, 1 ); 
+        ideal T = reduce( PBW_eqDeg( i ), FLM, 1 ); 
 
         kill FLM;
                         
@@ -1141,7 +1145,7 @@ EXAMPLE:    example CENTRALIZER_SUBALGEBRA; shows an example
         ideal P = PBW + T; // here we simplify T        
         
         // Compute current centralizer
-        NEW = CENTRALIZE_SET( F, P ); 
+        NEW = centralizeSet( F, P ); 
         
         if( size(NEW) > 0 )
         {
@@ -1211,9 +1215,9 @@ EXAMPLE:    example CENTRALIZER_SUBALGEBRA; shows an example
                 
             // And refine T one more:
         
-            // just to avoid "no standard basis" warning.
+            
             ideal FLM = imap(COMMRING, FLM);
-            attrib(FLM, "isSB", 1);
+            attrib(FLM, "isSB", 1);// just to avoid "no standard basis" warning.
     
             // we simply kill in T monomials occurring in FOUND_LEADING_MONOMIALS[i]
             kill P; ideal P = PBW + reduce( T, FLM, 1 );
@@ -1299,7 +1303,7 @@ EXAMPLE:    example CENTRALIZER_SUBALGEBRA; shows an example
     
     result = makeNice(result);
 
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "CENTRALIZER_SUBALGEBRA", result ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "centralizerRed", result ); }; /*4DEBUG*/
     
     return( result );
 }
@@ -1313,32 +1317,32 @@ example
  ideal F = x, y;
  // find subalgebra generators degree <= 4 of an algebra of
  // all elements commuting with x and y:
- ideal C = CENTRALIZER_SUBALGEBRA(F, 4); 
+ ideal C = centralizerRed(F, 4); 
  C; 
  inCentralizer(C, F);
 }
 
 
 /******************************************************/
-proc CENTER_SUBALGEBRA( int D, list # )
-"USAGE:      CENTER_SUBALGEBRA( D[, k] ); int D[, int k]
+proc centerRed( int D, list # )
+"USAGE:      centerRed( D[, k] ); int D[, int k]
 RETURN:     ideal, generated by computed generators
 PURPOSE:    if N is absent and D >= 0 computes a subalgebra generators of the center up to degree D, otherwise if N is present computes N(at least) first generators of the center, if moreover D > 0 it will be used as the first maximal degree estimation.
 NOTE:       Current ordering must be a degree compatible well-ordering.
-SEE ALSO:   CENTRALIZER_SUBALGEBRA; CENTER_VECTORSPACE; center; inCenter
-EXAMPLE:    example CENTER_SUBALGEBRA; shows an example
+SEE ALSO:   centralizerRed; centerVS; center; inCenter
+EXAMPLE:    example centerRed; shows an example
 "
 {
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "CENTER_SUBALGEBRA", D ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "centerRed", D ); }; /*4DEBUG*/
 
     if( nameof( basering ) == "basering" )
     {
         ERROR( "No current ring!" );
     }
     
-    ideal result = CENTRALIZER_SUBALGEBRA( sorted_variables(), D, # );
+    ideal result = centralizerRed( variablesSorted(), D, # );
      
-/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "CENTER_SUBALGEBRA", result ); }; /*4DEBUG*/
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "centerRed", result ); }; /*4DEBUG*/
 
     return( result );
 }
@@ -1350,12 +1354,12 @@ matrix D[3][3]=0;
 D[1,2]=z;
 ncalgebra(1,D); // it is a Heisenberg algebra
 // find vector space basis of center of degree <= 3
-ideal VSZ = CENTER_VECTORSPACE(3); 
+ideal VSZ = centerVS(3); 
 // There should be 3 degrees of z.
 VSZ;
 inCenter(VSZ);
 // find "minimal" central elements of degree <= 3
-ideal SAZ = CENTER_SUBALGEBRA(3); 
+ideal SAZ = centerRed(3); 
 // Only 'z' must be computed
 SAZ; 
 inCenter(SAZ);
@@ -1842,7 +1846,7 @@ list  l = list(1, a);
 inCentralizer(l, f);
 ideal I = a, b;
 inCentralizer(I, f);
-printlevel = 1;
+printlevel = 2;
 inCentralizer(a, f); // yes
 inCentralizer(b, f); // no
 }
@@ -1862,7 +1866,7 @@ EXAMPLE: example inCenter; shows examples
         ERROR( "No current ring!" );
     }
         
-    int result = inCentralizer( a, standard_variables() );
+    int result = inCentralizer( a, variablesStandard() );
 
 /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "inCenter", result ); }; /*4DEBUG*/
 
@@ -1905,7 +1909,7 @@ iff for all variables v_i of A there exist C in K such that [f, v_i] = C * v_i.
     }
     
 
-    ideal V = standard_variables();
+    ideal V = variablesStandard();
 
     int r = 1; poly v, g;
 
@@ -1986,12 +1990,12 @@ EXAMPLE:    example center; shows an example
     
     if( DefaultInt( # ) > 0 )
     {
-        return( CENTER_SUBALGEBRA( D, # ) );
+        return( centerRed( D, # ) );
     }
     
     if( D >= 0 )
     {
-        return( sa_reduce( CENTER_VECTORSPACE(D) ) ); // Experimental! May be wrong!!!
+        return( sa_reduce( centerVS(D) ) ); // Experimental! May be wrong!!!
     }
     
     ERROR( "Wrong arguments!" );
@@ -2033,12 +2037,12 @@ EXAMPLE:    example centralizer; shows an example
     
     if( DefaultInt( # ) > 0 )
     {
-        return( CENTRALIZER_SUBALGEBRA( S, D, # ) );
+        return( centralizerRed( S, D, # ) );
     }
     
     if( D >= 0 )
     {
-        return( sa_reduce( CENTRALIZER_VECTORSPACE(S, D), 1) ); // Experimental! May be wrong!!!
+        return( sa_reduce( centralizerVS(S, D) ) ); // Experimental! May be wrong!!!
     }
     
     ERROR( "Wrong arguments!" );
@@ -2097,7 +2101,7 @@ basering;
 // easy example(few seconds), must compute one polynomial of degree 2.
 center(2);
 
-// hard example(some minutes), must compute two polynomials of degrees 2 and 6.
+// hard example (~hours), must compute two polynomials of degrees 2 and 6.
 center(6);
 
 quit;
