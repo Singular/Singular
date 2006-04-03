@@ -243,7 +243,7 @@ SLIB0 = COPYING      absfact.lib \
 	zeroset.lib  help.cnf
  
 
-PLIBS = center.lib gkdim.lib involut.lib ncall.lib ncalg.lib ncdecomp.lib nctools.lib qmatrix.lib
+PLIBS = center.lib dmod.lib gkdim.lib involut.lib ncall.lib ncalg.lib ncdecomp.lib nctools.lib perron.lib qmatrix.lib
 
 ifdef HAVE_PLURAL
 SLIBS = ${SLIB0} ${PLIBS}
