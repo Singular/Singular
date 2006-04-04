@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.43 2006-04-03 08:10:32 pohl Exp $ */
+/* $Id: cf_gcd.cc,v 1.44 2006-04-04 07:36:39 Singular Exp $ */
 
 #include <config.h>
 
@@ -592,7 +592,7 @@ pp ( const CanonicalForm & f )
 }
 //}}}
 
-static CanonicalForm
+CanonicalForm
 gcd ( const CanonicalForm & f, const CanonicalForm & g )
 {
     bool b = f.isZero();
