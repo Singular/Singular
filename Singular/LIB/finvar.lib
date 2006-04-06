@@ -1,6 +1,6 @@
 // last change: 98/11/05
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.43 2006-03-27 12:56:27 bricken Exp $"
+version="$Id: finvar.lib,v 1.44 2006-04-06 13:25:58 Singular Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -2163,7 +2163,7 @@ EXAMPLE: example primary_char0; shows an example
       { P,sP,CI,dB=search(n,d,B,cd,P,sP,i,dif,dB,CI); // searching for dif invariants
       }                                // i.e. we can take all of B
       else
-      { for(j=i+1;j>i+dif;j++)
+      { for(j=i+1;j<=i+dif;j++)
         { CI=CI+ideal(var(j)^d);
         }
         dB=dB+dif*(d-1);
