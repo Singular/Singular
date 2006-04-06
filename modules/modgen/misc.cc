@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.24 2005-05-24 11:35:18 Singular Exp $ */
+/* $Id: misc.cc,v 1.25 2006-04-06 19:37:00 anne Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -557,12 +557,23 @@ void enter_id(
   char *file
   )
 {
+  unsigned int i;
   char tname[32];
   
   if(lineno)
     fprintf(fp, "#line %d \"%s\"\n", lineno, file);
+  if(strcmp(decl2str(t, tname),"STRING_CMD")==0) {
+    fprintf(fp, "  enter_id(\"%s\",\"",name);
+    for(i=0;i<strlen(value);i++) {
+       if(value[i]=='\n') fprintf(fp,"\\n");
+       else fprintf(fp,"%c",value[i]);
+    }
+    fprintf(fp,"\", %s);\n",decl2str(t,tname));
+  }
+  else {
   fprintf(fp, "  enter_id(\"%s\",\"%s\", %s);\n",name, value,
           decl2str(t, tname));
+  }
 }
 
 /*========================================================================*/
