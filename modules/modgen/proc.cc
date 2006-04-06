@@ -1,5 +1,5 @@
 /*
- * $Id: proc.cc,v 1.23 2003-06-11 21:33:18 krueger Exp $
+ * $Id: proc.cc,v 1.24 2006-04-06 19:46:13 anne Exp $
  */
 
 #include <stdio.h>
@@ -522,11 +522,17 @@ void write_help(
   procdefv pi
   )
 {
+  unsigned int i;
   if(pi->help_string!=NULL) {
     fprintf(module->fmtfp2, "#line %d \"%s\"\n", pi->lineno_other,
             module->filename);
     fprintf(module->fmtfp2, "  enter_id(\"%s_help\",", pi->procname);
-    fprintf(module->fmtfp2, " \"%s\", STRING_CMD);\n\n", pi->help_string);
+    fprintf(module->fmtfp2, " \"");
+    for(i=0; i<strlen(pi->help_string); i++) {
+	if(pi->help_string[i]=='\n') fprintf(module->fmtfp2,"\\n");
+	else fprintf(module->fmtfp2,"%c", pi->help_string[i]);
+    }
+    fprintf(module->fmtfp2, "\", STRING_CMD);\n\n", pi->help_string);
   }
 }
 
@@ -536,6 +542,7 @@ void write_example(
   procdefv pi
   )
 {
+  unsigned int i;
   /* if proc is NULL, just return */
   if( pi == NULL ) return;
 
@@ -543,7 +550,12 @@ void write_example(
     fprintf(module->fmtfp3, "#line %d \"%s\"\n", pi->lineno_other,
             module->filename);
     fprintf(module->fmtfp3, "  enter_id(\"%s_example\",\n", pi->procname);
-    fprintf(module->fmtfp3, " \"%s\", STRING_CMD);\n\n", pi->example_string);
+    fprintf(module->fmtfp3, " \"");
+    for(i=0; i<strlen(pi->example_string); i++) {
+        if(pi->example_string[i]=='\n') fprintf(module->fmtfp3,"\\n");
+        else fprintf(module->fmtfp3,"%c", pi->example_string[i]);
+    }
+    fprintf(module->fmtfp3, "\", STRING_CMD);\n\n", pi->example_string);
   }
 }
 
