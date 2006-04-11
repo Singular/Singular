@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: creat_top.cc,v 1.22 2005-05-20 14:49:59 Singular Exp $ */
+/* $Id: creat_top.cc,v 1.23 2006-04-11 19:47:32 anne Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -129,13 +129,15 @@ void write_mod_init(
   fprintf(fp, ")\n  )\n{\n");
   fprintf(fp, "  idhdl h;\n");
   fprintf(fp, "  char * tempstr;\n");
+  fprintf(fp, "  char * tailstr;\n");
   fprintf(fp, "  FILE * binfp; \n"); 
   fprintf(fp, "  int ret;\n");
   fprintf(fp, "  struct stat sb; \n\n");
   fprintf(fp, "  tempstr = (char *)omAlloc(strlen(currPack->libname)+5);\n");
-  fprintf(fp, "  memset(tempstr,0,strlen(currPack->libname)+1);\n");
-  fprintf(fp, "  memcpy(tempstr,currPack->libname,strlen(currPack->libname));\n");
-  fprintf(fp, "  memcpy(tempstr+strlen(currPack->libname)-3,\".bin\",4);\n");
+  fprintf(fp, "  memset(tempstr,0,strlen(currPack->libname)+5);\n");
+  fprintf(fp, "  tailstr = strchr(currPack->libname,'.');\n");
+  fprintf(fp, "  memcpy(tempstr,currPack->libname,strlen(currPack->libname)-strlen(tailstr));\n");
+  fprintf(fp, "  memcpy(tempstr+strlen(tempstr),\".bin\",4);\n");
   fprintf(fp, "  ret=stat(tempstr,&sb);\n");
   fprintf(fp, "  if(ret==0) { \n");
   fprintf(fp, "    if ((sb.st_mode & S_IFMT) == S_IFREG) { \n");
