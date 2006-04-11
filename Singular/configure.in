@@ -668,12 +668,8 @@ fi
   
 NEED_LIBS=$LIBS
 
-# gmp, smallgmp, MP, MPT, factory, libfac
+# gmp, MP, MPT, factory, libfac
 AC_CHECK_LIB(gmp, main)
-if test "ac_cv_lib_gmp_main" = yes && test "$with-apint" = smallgmp; then
-  LIBS=${NEED_LIBS}
-fi
-AC_CHECK_LIB(smallgmp, main)
 SAVE_LIBS=$LIBS
 AC_CHECK_LIB(MP, IMP_PutGmpInt,,,$MP_LIBS)
 AC_CHECK_LIB(MPT, MPT_GetTree,,,$MP_LIBS)
@@ -684,18 +680,12 @@ AC_CHECK_LIB(omalloc, omTestAddr)
 AC_CHECK_LIB(omalloc_ndebug, main)
 AC_CHECK_LIB(ntl,main)
 
-AC_CHECK_HEADERS(gmp.h smallgmp.h MP.h  MPT.h factory.h factor.h omalloc.h \
+AC_CHECK_HEADERS(gmp.h MP.h  MPT.h factory.h factor.h omalloc.h \
  omalloc.c)
 
 if test "$ac_cv_lib_gmp_main" = yes && \
  test "$ac_cv_header_gmp_h" = yes; then
     ac_gmp_ok=yes
-fi
-
-if test "$ac_cv_lib_smallgmp_main" = yes && \
- test "$ac_cv_header_smallgmp_h" = yes && \
- test "$ac_cv_header_gmp_h" = yes; then
-    ac_smallgmp_ok=yes
 fi
 
 if test "$ac_cv_lib_MP_IMP_PutGmpInt" = yes && \
@@ -735,20 +725,16 @@ if test "$ac_cv_omalloc_ok" != yes && test "$enable_omalloc" != yes; then
 fi
 
 AC_MSG_CHECKING(which apint package to use)
-if test "${with_apint}" != gmp && test "${with_apint}" != smallgmp; then
+if test "${with_apint}" != gmp; then
   if test "$ac_gmp_ok" = yes || test "$enable_gmp" = yes; then
     AC_MSG_RESULT(gmp)
     will_have_gmp=yes
     NEED_LIBS="-lgmp ${NEED_LIBS}"
-  elif test "ac_gmp_smallgmp_ok" = yes || test "$enable_smallgmp" = "yes"; then
-    AC_MSG_RESULT(smallgmp)
-    AC_DEFINE(HAVE_SMALLGMP)
-    NEED_LIBS="-lsmallgmp ${NEED_LIBS}"
   else
     AC_MSG_RESULT(none)
-    AC_MSG_ERROR(can not build without gmp or smallgmp)
+    AC_MSG_ERROR(can not build without gmp)
   fi
-elif test "${with_apint}" = gmp; then
+else
   if test "$ac_gmp_ok" = yes || test "$enable_gmp" = yes; then
     AC_MSG_RESULT(gmp)
     will_have_gmp=yes
@@ -756,15 +742,6 @@ elif test "${with_apint}" = gmp; then
   else
     AC_MSG_RESULT(none)
     AC_MSG_ERROR(can not build with gmp)
-  fi
-else
-  if test "ac_gmp_smallgmp_ok" = yes || test "$enable_smallgmp" = "yes"; then
-    AC_MSG_RESULT(smallgmp)
-    AC_DEFINE(HAVE_SMALLGMP)
-    NEED_LIBS="-lsmallgmp ${NEED_LIBS}"
-  else
-    AC_MSG_RESULT(none)
-    AC_MSG_ERROR(can not build with smallgmp)
   fi
 fi
 
