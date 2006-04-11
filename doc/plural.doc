@@ -212,6 +212,7 @@ Use the @code{LIB} command for loading of single libraries.
 * ncalg_lib::
 * ncdecomp_lib::               
 * nctools_lib::
+* perron_lib::
 * qmatrix_lib::
 @end menu
 
@@ -273,15 +274,23 @@ LIB "ncall.lib";
 @c lib ncdecomp.lib
 
 @c ----------------------------------------------------------
-@node nctools_lib, qmatrix_lib, ncdecomp_lib, PLURAL libraries
+@node nctools_lib, perron_lib, ncdecomp_lib, PLURAL libraries
 @section nctools_lib
 @cindex nctools_lib
 @cindex nctools.lib
 
 @c lib nctools.lib
 
+@c ----------------------------------------------------------
+@node perron_lib, qmatrix_lib, nctools_lib, PLURAL libraries
+@section perron_lib
+@cindex perron_lib
+@cindex perron.lib
+
+@c lib perron.lib
+
 @c ---------------------------------------------------------
-@node qmatrix_lib,  , nctools_lib, PLURAL libraries
+@node qmatrix_lib,  , perron_lib, PLURAL libraries
 @section qmatrix_lib
 @cindex qmatrix_lib
 @cindex qmatrix.lib
