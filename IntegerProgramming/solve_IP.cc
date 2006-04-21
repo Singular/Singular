@@ -67,8 +67,8 @@ int main(int argc, char *argv[])
         }
 
         // When reaching this line, the version argument was invalid.
-        cerr<<"ERROR: invalid version argument"<<endl
-            <<"Type `solve_IP --help' for help on options."<<endl;
+        cerr<<"ERROR: invalid version argument\n"
+            <<"Type `solve_IP --help' for help on options.\n";
         return 1;
       }
 
@@ -141,8 +141,8 @@ int main(int argc, char *argv[])
         if(!(strcmp(argv[i],*rest)))
           // argument was no float
         {
-          cerr<<"ERROR: invalid argument for interreduction percentage"<<endl
-              <<"Type `solve_IP --help' for help on options."<<endl;
+          cerr<<"ERROR: invalid argument for interreduction percentage\n"
+              <<"Type `solve_IP --help' for help on options.\n";
           return 1;
         }
 
@@ -164,14 +164,14 @@ int main(int argc, char *argv[])
         }
 
         // When reaching this line, the algorithm argument was invalid.
-        cerr<<"ERROR: unkwon algorithm"<<endl
-            <<"Type `solve_IP --help' for help on options."<<endl;
+        cerr<<"ERROR: unkwon algorithm\n"
+            <<"Type `solve_IP --help' for help on options.\n";
         return 1;
       }
 
       // When reaching this line, the argument is no legal option.
-      cerr<<"ERROR: invalid option "<<argv[i]<<endl
-          <<"Type `solve_IP --help' for help on options."<<endl;
+      cerr<<"ERROR: invalid option "<<argv[i]
+          <<"\nType `solve_IP --help' for help on options.\n";
       return 1;
     }
 
@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
 
     if(!first_input)
     {
-      cerr<<"ERROR: cannot open first input file, possibly not found"<<endl;
+      cerr<<"ERROR: cannot open first input file, possibly not found\n";
       return 1;
     }
 
@@ -192,7 +192,7 @@ int main(int argc, char *argv[])
 
     if(!second_input)
     {
-      cerr<<"ERROR: cannot open second input file, possibly not found"<<endl;
+      cerr<<"ERROR: cannot open second input file, possibly not found\n";
       return 1;
     }
 
@@ -206,7 +206,7 @@ int main(int argc, char *argv[])
       if(alg_option==0)
       {
         cerr<<"ERROR: first input file is a MATRIX file;\n"
-          "algorithm has to be specified"<<endl;
+          "algorithm has to be specified\n";
         return 1;
       }
 
@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
       if(!success)
       {
         cerr<<"ERROR: could not perform required IP-algorithm,\n"
-          "no GROEBNER file created"<<endl;
+          "no GROEBNER file created\n";
         return 1;
       }
 
@@ -271,7 +271,7 @@ int main(int argc, char *argv[])
         // input options are ignored when program is called with a
         // GROEBNER file
         cerr<<"WARNING: program called with a GROEBNER file,\n"
-          "specified options will not have any effect"<<endl;
+          "specified options will not have any effect\n";
           return(!solve(argv[argc-1],argv[argc-2]));
     }
   }
@@ -290,8 +290,8 @@ int main(int argc, char *argv[])
 
   else
     // invalid arguments
-    cerr<<"USAGE: solve_IP [options] toric_file problem_file"<<endl
-        <<"Type `solve_IP --help' for help on options."<<endl;
+    cerr<<"USAGE: solve_IP [options] toric_file problem_file\n"
+        <<"Type `solve_IP --help' for help on options.\n";
 
   return 1;
 
