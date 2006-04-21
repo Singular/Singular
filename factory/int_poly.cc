@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.cc,v 1.16 2005-01-13 15:10:22 Singular Exp $ */
+/* $Id: int_poly.cc,v 1.17 2006-04-21 15:37:10 Singular Exp $ */
 
 #include <config.h>
 
@@ -581,7 +581,7 @@ InternalPoly::divremsamet( InternalCF* acoeff, InternalCF*& quot, InternalCF*& r
     coeff = aPoly->firstTerm->coeff;
     exp = aPoly->firstTerm->exp;
     while (first && ( first->exp >= exp ) && divideok ) {
-        divideok = ::divremt( first->coeff, coeff, newcoeff, dummycoeff );
+        divideok = divremt( first->coeff, coeff, newcoeff, dummycoeff );
         if ( divideok && dummycoeff.isZero() ) {
             newexp = first->exp - exp;
             dummy = first;
@@ -1102,7 +1102,7 @@ InternalPoly::divremcoefft( InternalCF* cc, InternalCF*& quot, InternalCF*& rem,
     quotcursor = quotfirst = new term;
 
     while ( cursor && divideok ) {
-        divideok = ::divremt( cursor->coeff, c, cquot, crem );
+        divideok = divremt( cursor->coeff, c, cquot, crem );
         divideok = divideok && crem.isZero();
         if ( divideok ) {
             if ( ! cquot.isZero() ) {

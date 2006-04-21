@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: variable.h,v 1.4 2005-04-13 15:01:53 Singular Exp $ */
+/* $Id: variable.h,v 1.5 2006-04-21 15:37:10 Singular Exp $ */
 
 #ifndef INCL_VARIABLE_H
 #define INCL_VARIABLE_H
@@ -65,8 +65,9 @@ public:
     friend ostream & operator << ( ostream & os, const Variable & v );
 #endif /* NOSTREAMIO */
     friend void swap_levels();
-    friend Variable rootOf( const CanonicalForm &, char name = '@' );
+    friend Variable rootOf( const CanonicalForm &, char name );
 };
+Variable rootOf( const CanonicalForm &, char name = '@' );
 
 inline int level( const Variable & v ) { return v.level(); }
 inline char name( const Variable & v ) { return v.name(); }
