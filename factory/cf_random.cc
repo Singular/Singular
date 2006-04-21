@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_random.cc,v 1.7 2005-08-22 17:24:01 Singular Exp $ */
+/* $Id: cf_random.cc,v 1.8 2006-04-21 16:59:47 Singular Exp $ */
 
 #include <config.h>
 
@@ -15,33 +15,33 @@
 
 class RandomGenerator {
 private:
-    const long int ia, im, iq, ir, deflt;
-    long s;
+    const int ia, im, iq, ir, deflt;
+    int s;
 
     // s must not equal zero!
-    void seedInit( long ss ) { s = ((ss == 0) ? deflt : ss); }
+    void seedInit( int ss ) { s = ((ss == 0) ? deflt : ss); }
 public:
     RandomGenerator();
-    RandomGenerator( long ss );
+    RandomGenerator( int ss );
     ~RandomGenerator() {}
-    long generate();
-    void seed( long ss ) { seedInit( ss ); }
+    int generate();
+    void seed( int ss ) { seedInit( ss ); }
 };
 
 RandomGenerator::RandomGenerator() : ia(16807), im(2147483647), iq(127773), ir(2836), deflt(123459876)
 {
-  seedInit( (long)time( 0 ) );
+  seedInit( (int)time( 0 ) );
 }
 
-RandomGenerator::RandomGenerator( long ss ) : ia(16807), im(2147483647), iq(127773), ir(2836), deflt(123459876)
+RandomGenerator::RandomGenerator( int ss ) : ia(16807), im(2147483647), iq(127773), ir(2836), deflt(123459876)
 {
   seedInit( ss );
 }
 
-long
+int
 RandomGenerator::generate()
 {
-    long k;
+    int k;
 
     k = s/iq;
     s = ia*(s-k*iq)-ir*k;
