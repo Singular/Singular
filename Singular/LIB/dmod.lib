@@ -1,10 +1,10 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.1 2006-04-03 20:44:02 levandov Exp $";
+version="$Id: dmod.lib,v 1.2 2006-04-24 16:00:14 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
 AUTHORS: Viktor Levandovskyy,     levandov@mathematik.uni-kl.de
-         Jorge Martin Morales,      jorge@unizar.es
+@*         Jorge Martin Morales,      jorge@unizar.es
 
 THEORY: Given a polynomial ring R = K[x_1,...,x_n] and a polynomial F in R, one is interested in the ring R[1/F^s] for a natural number s. 
 @* In fact, the ring R[1/F^s] has a structure of a D(R)-module, where D(R) is a Weyl algebra K<x_1,...,x_n,d_1,...,d_n | d_j x_j = x_j d_j +1>.
@@ -60,7 +60,7 @@ NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the ideal BS is the list of roots of a Bernstein polynomial of f.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise (and by default) @code{slimgb} is used. 
-@*       If printlevel=1, pogress debug messages will be printed,
+@*       If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example annfsBM; shows examples
 " 
@@ -336,7 +336,7 @@ NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the ideal BS is the list of roots of a Bernstein polynomial of f.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise (and by default) @code{slimgb} is used. 
-@*       If printlevel=1, pogress debug messages will be printed,
+@*       If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example annfsOT; shows examples
 " 
@@ -696,7 +696,7 @@ NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the ideal BS is the list of roots of a Bernstein polynomial of f.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise (and by default) @code{slimgb} is used. 
-@*       If printlevel=1, pogress debug messages will be printed,
+@*       If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example annfsgms; shows examples
 "
@@ -1102,8 +1102,9 @@ ground ring
 EXAMPLE: example isHolonomic; shows examples
 " 
 {
-  if ( (typeof(M) != "ideal") || (typeof(M) != "module") || (typeof(M) != "matrix"))
+  if ( (typeof(M) != "ideal") && (typeof(M) != "module") && (typeof(M) != "matrix") )
   {
+  //  print(typeof(M));
     ERROR("an argument of type ideal/module/matrix expected");
   }
   if (attrib(M,"isSB")!=1)
@@ -1119,7 +1120,7 @@ example
   "EXAMPLE:"; echo = 2;
   ring R = 0,(x,y),dp;
   poly F = x*y*(x+y);
-  def A = annfs(F,0);
+  def A = annfsBM(F,0);
   setring A;
   LD;
   isHolonomic(LD);
