@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.202 2005-05-18 09:13:25 anne Exp $
+@comment $Id: general.doc,v 1.203 2006-04-25 15:25:06 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1439,6 +1439,7 @@ the field of complex numbers represented by (pairs of) floating point
 numbers of a user defined precision.
 @end enumerate
 
+@cindex basering
 Throughout this manual, the current active ring in @sc{Singular} is
 called basering.  The reserved name @code{basering} in @sc{Singular} is
 an alias for the current active ring.  The basering can be set by
