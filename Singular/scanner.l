@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.31 2001-10-23 14:04:26 Singular Exp $ */
+/* $Id: scanner.l,v 1.32 2006-04-27 11:37:35 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -309,7 +309,9 @@ newline                  {
                            mmStat(-500);
                            #endif
                            #ifdef OM_TRACK
+			   #ifndef NDEBUG
                              omPrintUsedTrackAddrs(stdout, 1);
+                           #endif
                            #endif
                            m2_end(0);
                          }
