@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.5 2006-02-01 13:38:45 Singular Exp $ */
+/* $Id: febase.h,v 1.6 2006-04-27 12:52:43 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -94,7 +94,7 @@ extern const char feNotImplemented[];
 extern BOOLEAN tclmode;
 #endif
 extern BOOLEAN errorreported;
-extern BOOLEAN feProt;
+extern int     feProt;
 extern BOOLEAN feWarn;
 extern BOOLEAN feOut;
 
