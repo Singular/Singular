@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.84 2006-04-27 14:04:20 bricken Exp $ */
+/* $Id: tgb.cc,v 1.85 2006-04-27 14:19:31 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -3106,26 +3106,7 @@ static void multi_reduction_find(red_object* los, int losl,slimgb_alg* c,int sta
   canonicalize_region(los,erg.to_reduce_u+1,startf,c);
   return;
       }
-      if((!(c->is_homog)) &&(!(c->doubleSugar)))
-      {
 
-  for (i2=i+1;i2<losl;i2++){
-    if (p_LmShortDivisibleBy(los[i].p,los[i].sev,los[i2].p,~los[i2].sev,
-           c->r)){
-      int i3=i2;
-      while((i3+1<losl) && (pLmEqual(los[i2].p, los[i3+1].p)))
-        i3++;
-      erg.to_reduce_u=i3;
-      erg.to_reduce_l=i2;
-      erg.reduce_by=i;
-      erg.fromS=FALSE;
-      assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)==-1));
-      canonicalize_region(los,erg.to_reduce_u+1,startf,c);
-      return;
-    }
-    //  else {assume(!p_LmDivisibleBy(los[i].p, los[i2].p,c->r));}
-  }
-      }
       i--;
     }
   }
