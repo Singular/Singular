@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.9 2006-02-01 13:38:45 Singular Exp $ */
+/* $Id: febase.cc,v 1.10 2006-04-27 12:37:03 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -64,7 +64,7 @@ BOOLEAN feOut = TRUE;
 
 const char feNotImplemented[]="not implemented";
 
-BOOLEAN feProt = FALSE;
+int feProt = FALSE;
 FILE*   feProtFile;
 BOOLEAN tclmode=FALSE;
 /* TCL-Protocoll (Singular -x): <char type>:<int length>:<string> \n
@@ -1153,7 +1153,7 @@ void monitor(char* s, int mode)
       feProt=0;
     }
     else
-      feProt = (BOOLEAN)mode;
+      feProt = mode;
   }
 }
 
