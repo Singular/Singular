@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.83 2006-03-28 05:25:03 bricken Exp $ */
+/* $Id: tgb.cc,v 1.84 2006-04-27 14:04:20 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2124,7 +2124,7 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
   //not fully correct
   //(rChar()==0);
   F4_mode=F4;
-
+  this->doubleSugar=TRUE;
   if ((!F4_mode)&&(!is_homog) &&(pLexOrder)){
     this->doubleSugar=TRUE;
   }
@@ -2403,7 +2403,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   if (idIs0(I)) return I;
   for(i=0;i<IDELEMS(I);i++)
   {
-    assume(I->m[i]==NULL);
+    assume(I->m[i]!=NULL);
     simplify_poly(I->m[i],currRing);
   }
   
