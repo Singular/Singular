@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.44 2006-04-04 07:36:39 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.45 2006-04-27 14:32:57 Singular Exp $ */
 
 #include <config.h>
 
@@ -14,9 +14,6 @@
 #include "cf_algorithm.h"
 #include "fac_util.h"
 #include "ftmpl_functions.h"
-#ifdef HAVE_NTL
-#undef HAVE_NTL
-#endif
 
 #ifdef HAVE_NTL
 #include <NTL/ZZX.h>
