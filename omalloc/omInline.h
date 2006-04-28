@@ -4,7 +4,7 @@
  *           be inlined
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omInline.h,v 1.8 2001-04-30 09:02:07 Singular Exp $
+ *  Version: $Id: omInline.h,v 1.9 2006-04-28 15:17:26 Singular Exp $
  *******************************************************************/
 #if defined(OM_INLINE) || defined(OM_ALLOC_C)
 
@@ -33,7 +33,7 @@ OM_INLINE_IMPL int _omIsBinPageAddr(const void* addr)
   if (index >= om_MinBinPageIndex && index <= om_MaxBinPageIndex)
   {
     unsigned long shift = omGetPageShiftOfAddr(addr);
-    return ((om_BinPageIndicies[index - om_MinBinPageIndex] & (((unsigned long) 1) << shift)) != 0);
+    return ((om_BinPageIndicies[index - om_MinBinPageIndex] & (((unsigned long) 1) << shift)) != 0L);
   }
   return 0;
 }
@@ -153,7 +153,7 @@ OM_INLINE_IMPL void* _omMemDupAligned(void* addr)
 OM_INLINE_IMPL char* _omStrDup(const char* s)
 {
   void* r;
-  size_t i=0;
+  size_t i=(size_t)0;
 
   while (s[i]) i++;
   i++;
@@ -183,7 +183,7 @@ OM_INLINE_IMPL void* _omMemDup(void* addr)
 OM_INLINE_IMPL void* _omalloc(size_t size)
 {
   void* addr;
-  if (! size) size = 1;
+  if (! size) size = (size_t)1;
   __omTypeAllocAligned(void*, addr,size);
   return addr;
 }
@@ -191,7 +191,7 @@ OM_INLINE_IMPL void* _omalloc(size_t size)
 OM_INLINE_IMPL void* _omalloc0(size_t size)
 {
   void* addr;
-  if (! size) size = 1;
+  if (! size) size = (size_t)1;
   __omTypeAlloc0Aligned(void*,addr, size);
   return addr;
 }
@@ -200,7 +200,7 @@ OM_INLINE_IMPL void* _omreallocSize(void* addr, size_t old_size, size_t new_size
 {
   void* new_addr;
 
-  if (!new_size) new_size = 1;
+  if (!new_size) new_size = (size_t)1;
   if (addr != NULL)
   {
     __omTypeReallocAlignedSize(addr, old_size, void* , new_addr, new_size);
@@ -216,8 +216,8 @@ OM_INLINE_IMPL void* _omrealloc0Size(void* addr, size_t old_size, size_t new_siz
 {
   void* new_addr;
 
-  if (!new_size) new_size = 1;
-  if (addr != NULL && old_size > 0)
+  if (!new_size) new_size = (size_t)1;
+  if (addr != NULL && old_size > ((size_t)0))
   {
     __omTypeRealloc0AlignedSize(addr, old_size, void* , new_addr, new_size);
   }
@@ -232,7 +232,7 @@ OM_INLINE_IMPL void* _omrealloc(void* addr, size_t size)
 {
   void* new_addr;
 
-  if (!size) size = 1;
+  if (!size) size = (size_t)1;
   if (addr != NULL)
   {
     __omTypeReallocAligned(addr, void* , new_addr, size);
@@ -248,7 +248,7 @@ OM_INLINE_IMPL void* _omrealloc0(void* addr, size_t size)
 {
   void* new_addr;
 
-  if (!size) size = 1;
+  if (!size) size = (size_t)1;
   if (addr != NULL)
   {
     __omTypeRealloc0Aligned(addr, void* , new_addr, size);
