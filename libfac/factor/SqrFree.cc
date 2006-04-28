@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: SqrFree.cc,v 1.8 2002-08-19 11:11:33 Singular Exp $";
+static char * rcsid = "$Id: SqrFree.cc,v 1.9 2006-04-28 13:46:29 Singular Exp $";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de .\n Please include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -386,7 +386,7 @@ SqrFree(const CanonicalForm & r ){
     for ( i = sqrfreelist; i.hasItem() ; i++ ){
       if ( i.getItem().exp() == j ) elem *= i.getItem().factor();
     }
-    if ( elem != 1 ) outputlist.append(CFFactor(elem,j));
+    if ( !(elem.isOne()) ) outputlist.append(CFFactor(elem,j));
   }
   elem=1;
   for ( i=outputlist; i.hasItem(); i++ )
@@ -402,6 +402,9 @@ SqrFree(const CanonicalForm & r ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.8  2002/08/19 11:11:33  Singular
+* hannes/pfister: alg_gcd etc.
+
 Revision 1.7  2001/08/08 14:27:38  Singular
 *hannes: Dan's HAVE_SINGULAR_ERROR
 

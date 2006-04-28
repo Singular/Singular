@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.21 2005-12-12 18:02:03 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.22 2006-04-28 13:46:29 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -651,7 +651,7 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar){
     TIMING_START(discr_time);
     ffuni = mygcd(f,ff);
     TIMING_END(discr_time);
-    if ( ffuni != 1 ){ //discriminante nonzero: split poly
+    if ( !(ffuni.isOne()) ){ //discriminante nonzero: split poly
       DEBOUTLN(cout,"Nontrivial GCD of f= ", f);
       DEBOUTLN(cout,"             and @f= ", ff);
       DEBOUTLN(cout,"          GCD(f,@f)= ", ffuni);
@@ -1123,6 +1123,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.21  2005/12/12 18:02:03  Singular
+*hannes: use sorting option in Factorize
+
 Revision 1.20  2005/12/05 15:47:32  Singular
 *hannes: is_homogeneous -> factory: isHomogeneous
 

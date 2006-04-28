@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: csutil.cc,v 1.9 2003-05-28 11:52:52 Singular Exp $";
+static char * rcsid = "$Id: csutil.cc,v 1.10 2006-04-28 13:45:29 Singular Exp $";
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -226,7 +226,7 @@ static CanonicalForm
 myfitting( const CanonicalForm &f ){
  CanonicalForm rem=f;
 
- if ( rem!=0 ){
+ if ( !(rem.isZero()) ){
    if ( getCharacteristic() > 0 )
      return num((rem/lc(rem)));
    else{
@@ -311,7 +311,7 @@ nopower( const CanonicalForm & init ){
   int count=0;
 
   for ( CFIterator j=init; j.hasTerms(); j++ )
-    if (j.coeff() != 1 ) count += 1;
+    if (!(j.coeff().isOne()) ) count += 1;
   //  if ( init != 1 ){
   //  cout << "nopower: f is " << init << endl;
   //  cout << "nopower: count is " << count << endl;}
@@ -872,6 +872,9 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.9  2003/05/28 11:52:52  Singular
+*pfister/hannes: newfactoras, alg_gcd, divide (see bug_33)
+
 Revision 1.8  2002/10/24 17:22:22  Singular
 * hannes: factoring in alg.ext., alg_gcd, NTL stuff
 
