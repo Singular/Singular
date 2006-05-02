@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.cc,v 1.14 2005-12-09 08:35:37 Singular Exp $ */
+/* $Id: NTLconvert.cc,v 1.15 2006-05-02 08:50:43 Singular Exp $ */
 #include <config.h>
 
 #include "cf_gmp.h"
@@ -583,7 +583,7 @@ CanonicalForm convertZZ2CF(ZZ coefficient)
   coeff_long=to_long(coefficient);
 
   //Test whether coefficient can be represented as an immediate integer in Factory
-  if ( (NumBits(coefficient)<=NTL_ZZ_NBITS)
+  if ( (NumBits(coefficient)<NTL_ZZ_NBITS)
   && (coeff_long>MINIMMEDIATE)
   && (coeff_long<MAXIMMEDIATE))
   {
