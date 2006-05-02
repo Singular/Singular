@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.h,v 1.3 2006-01-16 14:03:43 Singular Exp $ */
+/* $Id: modulop.h,v 1.4 2006-05-02 16:24:22 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -52,6 +52,7 @@ void    npInitChar(int c, ring r);
 
 nMapFunc npSetMap(ring src, ring dst);
 number  npMapP(number from);
+number  npMap0(number from);
 /*-------specials for spolys, do NOT use otherwise--------------------------*/
 /* for npMultM, npSubM, npNegM, npEqualM : */
 #ifdef HAVE_DIV_MOD

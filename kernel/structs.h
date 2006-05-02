@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.21 2006-05-02 12:36:19 Singular Exp $ */
+/* $Id: structs.h,v 1.22 2006-05-02 16:24:22 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -791,6 +791,7 @@ class idrec
 #define IDRING(a)   ((a)->data.uring)
 #define IDINTVEC(a) ((a)->data.iv)
 #define IDPOLY(a)   ((a)->data.p)
+#define IDBIGINT(a) ((a)->data.n)
 #define IDNUMBER(a) ((a)->data.n)
 #define IDIDEAL(a)  (((a)->data).uideal)
 #define IDMATRIX(a) (((a)->data).umatrix)
