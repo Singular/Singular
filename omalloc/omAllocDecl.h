@@ -3,12 +3,12 @@
  *  Purpose: declaration of Alloc routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAllocDecl.h,v 1.10 2006-05-02 13:03:15 Singular Exp $
+ *  Version: $Id: omAllocDecl.h,v 1.11 2006-05-02 13:23:08 Singular Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_DECL_H
 #define OM_ALLOC_DECL_H
 
-#ifdef OM_NDEBUG
+#if defined(OM_NDEBUG) && defined(OM_ALLOC_H)
 #if (SIZEOF_LONG == 8)
 #define OM_T_FREE1
 #define OM_T_FREE3
