@@ -74,7 +74,7 @@ omBin ip_sring_bin = omGetSpecBin(sizeof(ip_sring));
 * the global exit routine of Singular
 */
 extern "C" {
-void m2_end(short i)
+void m2_end(int i)
 {
   fe_reset_input_mode();
   #ifdef PAGE_TEST
