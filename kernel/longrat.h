@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.2 2005-07-27 15:48:29 Singular Exp $ */
+/* $Id: longrat.h,v 1.3 2006-05-02 16:25:17 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
@@ -93,6 +93,13 @@ void nlInpGcd(number &a, number b, ring r);
 void nlInpIntDiv(number &a, number b, ring r);
 void nlInpAdd(number &a, number b, ring r);
 void nlInpMult(number &a, number b, ring r);
+
+#ifdef LDEBUG
+#define nlTest(a) nlDBTest(a,__FILE__,__LINE__)
+BOOLEAN nlDBTest(number a, char *f,int l);
+#else
+#define nlTest(a) ((void)0)
+#endif
 
 #endif
 
