@@ -3,7 +3,7 @@
  *  Purpose: declaration of Alloc routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAllocDecl.h,v 1.9 2006-05-02 11:38:43 Singular Exp $
+ *  Version: $Id: omAllocDecl.h,v 1.10 2006-05-02 13:03:15 Singular Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_DECL_H
 #define OM_ALLOC_DECL_H
@@ -15,6 +15,7 @@
 #define OM_T_STR
 #define OM_T_ALLOC
 #define OM_T_REALLOC
+#undef OM_NDEBUG
 #endif
 #endif
 
