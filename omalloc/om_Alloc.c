@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omalloc functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: om_Alloc.c,v 1.2 2001-04-30 09:02:12 Singular Exp $
+ *  Version: $Id: om_Alloc.c,v 1.3 2006-05-02 11:39:03 Singular Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_C
 #define OM_ALLOC_C
@@ -166,10 +166,10 @@ void* omAllocBinFromFullPage(omBin bin)
 void  omFreeToPageFault(omBinPage page, void* addr)
 {
   omBin bin;
-  omAssume(page->used_blocks <= 0);
+  omAssume(page->used_blocks <= 0L);
 
 #ifdef OM_HAVE_TRACK
-  if (page->used_blocks < 0)
+  if (page->used_blocks < 0L)
   {
     omFreeTrackAddr(addr);
     return;
@@ -177,7 +177,7 @@ void  omFreeToPageFault(omBinPage page, void* addr)
 #endif
 
   bin = omGetBinOfPage(page);
-  if (page->current != NULL || bin->max_blocks <= 1)
+  if ((page->current != NULL) || (bin->max_blocks <= 1))
   {
     // all blocks of page are now collected
     omTakeOutBinPage(page, bin);

@@ -4,7 +4,7 @@
  *           routines for omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAllocPrivate.h,v 1.7 2003-06-20 16:40:58 Singular Exp $
+ *  Version: $Id: omAllocPrivate.h,v 1.8 2006-05-02 11:39:02 Singular Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_PRIVATE_H
 #define OM_ALLOC_PRIVATE_H
@@ -122,7 +122,7 @@ while (0)
 #define __omFreeToPage(addr, page)              \
 do                                              \
 {                                               \
-  if ((page)->used_blocks > 0)                  \
+  if ((page)->used_blocks > 0L)                 \
   {                                             \
     *((void**) (addr)) = (page)->current;       \
     ((page)->used_blocks)--;                    \
@@ -282,9 +282,9 @@ while (0)
 #define __omFreeSize(addr, size)                            \
 do                                                          \
 {                                                           \
-  if (size <= OM_MAX_BLOCK_SIZE || omIsBinPageAddr(addr))   \
+  if ((size <= OM_MAX_BLOCK_SIZE) || omIsBinPageAddr(addr)) \
   {                                                         \
-    __omFreeBinAddr(addr);                                     \
+    __omFreeBinAddr(addr);                                  \
   }                                                         \
   else                                                      \
   {                                                         \
