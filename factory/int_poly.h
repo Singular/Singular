@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.h,v 1.7 2000-09-04 13:31:31 obachman Exp $ */
+/* $Id: int_poly.h,v 1.8 2006-05-02 12:21:07 Singular Exp $ */
 
 #ifndef INCL_INT_POLY_H
 #define INCL_INT_POLY_H
@@ -14,6 +14,12 @@
 #include "int_cf.h"
 #include "variable.h"
 #include "canonicalform.h"
+
+#ifdef HAVE_SINGULAR
+#ifndef OM_NDEBUG
+#define OM_NDEBUG
+#endif
+#endif
 
 #ifdef HAVE_OMALLOC
 #include <omalloc.h>

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_int.h,v 1.11 2003-10-15 17:19:41 Singular Exp $ */
+/* $Id: int_int.h,v 1.12 2006-05-02 12:21:07 Singular Exp $ */
 
 #ifndef INCL_INT_INT_H
 #define INCL_INT_INT_H
@@ -16,6 +16,11 @@
 #include "cf_gmp.h"
 #include "gmpext.h"
 
+#ifdef HAVE_SINGULAR
+#ifndef OM_NDEBUG
+#define OM_NDEBUG
+#endif
+#endif
 
 #ifdef HAVE_OMALLOC
 #include <omalloc.h>
@@ -54,7 +59,7 @@ public:
     InternalInteger();
     InternalInteger( const InternalCF& )
     {
-	ASSERT( 0, "ups there is something wrong in your code" );
+        ASSERT( 0, "ups there is something wrong in your code" );
     }
     InternalInteger( const int i );
     InternalInteger( const char * str, const int base=10 );
@@ -112,7 +117,7 @@ public:
     InternalCF* sqrt();
 
     int ilog2();
-    
+
     friend class InternalRational;
 #ifdef SINGULAR
     friend MP_INT gmp_numerator ( const CanonicalForm & f );
@@ -144,11 +149,11 @@ InternalInteger::normalizeMyself ()
     ASSERT( getRefCount() == 1, "internal error: must not delete CO" );
 
     if ( mpz_is_imm( &thempi ) ) {
-	InternalCF * result = int2imm( mpz_get_si( &thempi ) );
-	delete this;
-	return result;
+        InternalCF * result = int2imm( mpz_get_si( &thempi ) );
+        delete this;
+        return result;
     } else
-	return this;
+        return this;
 }
 
 inline InternalCF *
@@ -157,11 +162,11 @@ InternalInteger::uiNormalizeMyself ()
     ASSERT( getRefCount() == 1, "internal error: must not delete CO" );
 
     if ( mpz_is_imm( &thempi ) ) {
-	InternalCF * result = int2imm( mpz_get_ui( &thempi ) );
-	delete this;
-	return result;
+        InternalCF * result = int2imm( mpz_get_ui( &thempi ) );
+        delete this;
+        return result;
     } else
-	return this;
+        return this;
 }
 //}}}
 
@@ -184,22 +189,22 @@ inline InternalCF *
 InternalInteger::normalizeMPI ( MP_INT & aMpi )
 {
     if ( mpz_is_imm( &aMpi ) ) {
-	InternalCF * result = int2imm( mpz_get_si( &aMpi ) );
-	mpz_clear( &aMpi );
-	return result;
+        InternalCF * result = int2imm( mpz_get_si( &aMpi ) );
+        mpz_clear( &aMpi );
+        return result;
     } else
-	return new InternalInteger( aMpi );
+        return new InternalInteger( aMpi );
 }
 
 inline InternalCF *
 InternalInteger::uiNormalizeMPI ( MP_INT & aMpi )
 {
     if ( mpz_is_imm( &aMpi ) ) {
-	InternalCF * result = int2imm( mpz_get_ui( &aMpi ) );
-	mpz_clear( &aMpi );
-	return result;
+        InternalCF * result = int2imm( mpz_get_ui( &aMpi ) );
+        mpz_clear( &aMpi );
+        return result;
     } else
-	return new InternalInteger( aMpi );
+        return new InternalInteger( aMpi );
 }
 //}}}
 

@@ -1,5 +1,11 @@
-/* $Id: NTLconvert.cc,v 1.16 2006-05-02 11:35:15 Singular Exp $ */
+/* $Id: NTLconvert.cc,v 1.17 2006-05-02 12:21:07 Singular Exp $ */
 #include <config.h>
+
+#ifdef HAVE_SINGULAR
+#ifndef OM_NDEBUG
+#define OM_NDEBUG
+#endif
+#endif
 
 #include "cf_gmp.h"
 
