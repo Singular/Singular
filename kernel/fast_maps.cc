@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.4 2005-07-27 15:48:28 Singular Exp $
+ *  Version: $Id: fast_maps.cc,v 1.5 2006-05-02 14:15:46 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -370,7 +370,7 @@ ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
   if (TEST_OPT_PROT)
   {
     maPoly_GetLength(mp, length);
-    Print("map[%d:%d]{%d:", dest_r->bitmask, dest_r->ExpL_Size, length);
+    Print("map[%ld:%ld]{%d:", dest_r->bitmask, dest_r->ExpL_Size, length);
   }
 
   // do the optimization step
