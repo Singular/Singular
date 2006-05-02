@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.20 2006-02-28 11:10:42 bricken Exp $ */
+/* $Id: structs.h,v 1.21 2006-05-02 12:36:19 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -11,9 +11,16 @@
 #include <string.h> /* for memset */
 
 /* standard types */
-typedef unsigned char  uchar ;
+typedef unsigned char  uchar;
 typedef unsigned short CARDINAL;
+#if (SIZEOF_LONG == 8)
+typedef int BOOLEAN;
+/* testet on x86_64, gcc 3.4.6: 2 % */
+/* testet on IA64, gcc 3.4.6: 1 % */
+#else
+/* testet on athlon, gcc 2.95.4: 1 % */
 typedef short BOOLEAN;
+#endif
 
 typedef void * Sy_reference;
 #define ADDRESS Sy_reference
@@ -572,7 +579,7 @@ struct sideal_list
 #ifdef __cplusplus
 extern "C" {
 #endif
-void  m2_end(short i);
+void  m2_end(int i);
 #ifdef __cplusplus
 }
 #endif
