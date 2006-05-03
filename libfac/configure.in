@@ -14,9 +14,9 @@ dnl Change libfac variables here:
 AC_SUBST(libfac_name)
 libfac_name="\"Factorization and characteristic sets library\""
 AC_SUBST(libfac_version)
-libfac_version="3.0.1"
+libfac_version="3.0.2"
 AC_SUBST(libfac_date)
-libfac_date="\"Feb 2006\""
+libfac_date="\"May 2006\""
 AC_SUBST(libfac_author)
 libfac_author="\"M. Messollen\""
 
