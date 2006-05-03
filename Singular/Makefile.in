@@ -90,7 +90,7 @@ STATIC_LDFLAGS	= @STATIC_LDFLAGS@
 ifneq ($(SINGUNAME),ix86-Win)
 LIBS		= -lm @NEED_LIBS@
 else
-LIBS		= -lsingfac -lsingcf -lntl  -static -lreadline -lhtmlhelp -Xlinker -Bdynamic -lgmp -lcygncurses6 
+LIBS		= -lsingfac -lsingcf -lntl  -static -lreadline -lhtmlhelp -Xlinker -Bdynamic -lgmp -lomalloc_ndebug -lcygncurses6 
 ## -lpython_module -lpython2.4 /usr/local/lib/libboost_python-gcc-d-1_32.dll
 endif
 MP_LIBS		= @MP_LIBS@
@@ -297,7 +297,7 @@ Singular${S_EXT}: mod2.h Makefile version.h $(WIN_LIBS) scanner.cc  ${OBJS} \
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
 	  -o Singular${S_EXT} \
 	  tesths.cc iparith.o mpsr_Tok.o claptmpl.o\
-	  ${OBJS} ${LDFLAGS} ${LIBS} -lomalloc_ndebug ../kernel/mmalloc.o
+	  ${OBJS} ${LDFLAGS} ${LIBS} ../kernel/mmalloc.o
 
 ../modules/python/libpython_module.a:
 	cd ../modules/python; scons
@@ -316,7 +316,7 @@ iparith.inc mpsr_Tok.inc: claptmpl.o iparith.cc \
                           ipconv.cc tok.h mpsr_Tok.cc grammar.h mod2.h
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -DGENTABLE \
 	     -o gentable claptmpl.o iparith.cc tesths.cc mpsr_Tok.cc \
-	     ${OBJS} ${LDFLAGS} ${LIBS} -lomalloc_ndebug ../kernel/mmalloc.o
+	     ${OBJS} ${LDFLAGS} ${LIBS} ../kernel/mmalloc.o
 	./gentable
 	/bin/rm -f gentable gentable.exe
 

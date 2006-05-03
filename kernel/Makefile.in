@@ -64,7 +64,7 @@ ifneq ($(SINGUNAME),ix86-Win)
 LIBS		= -lm @NEED_LIBS@ 
 else
 # for the 2-0-* versions under Windows, we don't need gdbm, readline and ncurses
-LIBS		= -lsingfac -lsingcf -lntl -lgmp -lreadline -lncurses
+LIBS		= -lsingfac -lsingcf -lntl -lgmp -lreadline -lncurses -lomalloc_ndebug
 #LIBS		= -lsingfac -lsingcf -lgmp
 endif
 MP_LIBS		= @MP_LIBS@
