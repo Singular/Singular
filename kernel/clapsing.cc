@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.12 2006-03-21 15:27:20 Singular Exp $
+// $Id: clapsing.cc,v 1.13 2006-05-03 12:12:51 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -208,13 +208,13 @@ poly singclap_gcd ( poly f, poly g )
 
   // for now there is only the possibility to handle polynomials over
   // Q and Fp ...
+  Off(SW_RATIONAL);
   if (( nGetChar() == 0 || nGetChar() > 1 )
   && (currRing->parameter==NULL))
   {
     setCharacteristic( nGetChar() );
     CanonicalForm F( convSingPClapP( f ) ), G( convSingPClapP( g ) );
     res=convClapPSingP( gcd( F, G ) );
-    Off(SW_RATIONAL);
   }
   // and over Q(a) / Fp(a)
   else if (( nGetChar()==1 ) /* Q(a) */
@@ -253,7 +253,6 @@ poly singclap_gcd ( poly f, poly g )
       CanonicalForm F( convSingTrPClapP( f ) ), G( convSingTrPClapP( g ) );
       res= convClapPSingTrP( gcd( F, G ) );
     }
-    Off(SW_RATIONAL);
   }
   #if 0
   else if (( nGetChar()>1 )&&(currRing->parameter!=NULL)) /* GF(q) */
@@ -270,6 +269,7 @@ poly singclap_gcd ( poly f, poly g )
   else
     WerrorS( feNotImplemented );
 
+  Off(SW_RATIONAL);
   pDelete(&f);
   pDelete(&g);
   pTest(res);
