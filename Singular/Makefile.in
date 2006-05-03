@@ -346,12 +346,12 @@ libparse.cc: libparse.l
 ESingular: fegetopt.o mod2.h feOpt.cc version.h emacs.cc \
            feOptES.inc
 	${CXX} -O2 ${CPPFLAGS} ${DEFS} -DESINGULAR -DPROTO -o ESingular emacs.cc fegetopt.o \
-	${LDFLAGS} -lomalloc_ndebug ../kernel/mmalloc.o
+	${LDFLAGS} ${LIBS} ../kernel/mmalloc.o
 
 TSingular: fegetopt.o mod2.h feOpt.cc version.h emacs.cc \
            feOptTS.inc
 	${CXX} -O2 ${CPPFLAGS} ${DEFS} -DTSINGULAR -DPROTO -o TSingular emacs.cc fegetopt.o \
-	${LDFLAGS} -lomalloc_ndebug ../kernel/mmalloc.o
+	${LDFLAGS} ${LIBS} ../kernel/mmalloc.o
 
 feOpt.o: feOpt.inc feOptES.inc feOptTS.inc
 extra.o: feOpt.inc
