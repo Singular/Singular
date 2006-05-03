@@ -3,7 +3,7 @@
 ### Purpose: Makefile for omalloc
 ### Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 ### Created: 11/99
-### Version: $Id: Makefile.in,v 1.17 2005-07-28 15:02:28 Singular Exp $
+### Version: $Id: Makefile.in,v 1.18 2006-05-03 14:44:44 Singular Exp $
 #################################################################
 
 SHELL		= /bin/sh
@@ -187,7 +187,7 @@ configure: configure.in
 ##
 ## install targets
 ##
-install_all: all libomalloc_p.a
+install: all libomalloc_p.a
 	$(MKINSTALLDIRS) $(libdir)
 	$(MKINSTALLDIRS) $(includedir)
 	$(INSTALL_DATA) libomalloc.a $(libdir)
@@ -200,7 +200,7 @@ install_all: all libomalloc_p.a
 	$(INSTALL_DATA) omalloc.h omalloc.c $(includedir)
 	$(INSTALL_DATA) omlimits.h mylimits.h omalloc.c $(includedir)
 
-install: libomalloc_ndebug.a omalloc.o
+install_min: libomalloc_ndebug.a omalloc.o
 	$(MKINSTALLDIRS) $(libdir)
 	$(MKINSTALLDIRS) $(includedir)
 	$(INSTALL_DATA) libomalloc_ndebug.a $(libdir)
