@@ -639,7 +639,7 @@ $(OBJG2) : %.og: %.c
 Singularg${S_EXT}: scanner.cc  $(OBJG)  $(DL_LIBSG)\
            iparith.og mpsr_Tok.og claptmpl.og tesths.cc version.h 
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -o Singularg${S_EXT} \
-	tesths.cc iparith.og mpsr_Tok.og claptmpl.og $(OBJG) ${LDFLAGSG} ${LIBS} -lomalloc ../kernel/mmalloc.og \
+	tesths.cc iparith.og mpsr_Tok.og claptmpl.og $(OBJG) ${LDFLAGSG} ${LIBSG} -lomalloc ../kernel/mmalloc.og \
 	${LD_DYN_FLAGS} ${LD_LIBC}
 
 iparith.og: iparith.inc iparith.cc
