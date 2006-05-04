@@ -4876,6 +4876,7 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
+NEED_LIBSG="${NEED_LIBS}"
 if test "$ac_cv_sizeof_voidp" != 4; then
   NEED_LIBS="${NEED_LIBS} -lomalloc"
 else
@@ -4885,8 +4886,9 @@ fi
 
 
 
+
 echo $ac_n "checking whether to have dbm links""... $ac_c" 1>&6
-echo "configure:4890: checking whether to have dbm links" >&5
+echo "configure:4892: checking whether to have dbm links" >&5
 if test "$with_dbm" != no; then
   cat >> confdefs.h <<\EOF
 #define HAVE_DBM 1
@@ -4898,7 +4900,7 @@ else
 fi
 
 echo $ac_n "checking whether to have namespaces""... $ac_c" 1>&6
-echo "configure:4902: checking whether to have namespaces" >&5
+echo "configure:4904: checking whether to have namespaces" >&5
 if test "$with_namespaces" != no; then
   echo "$ac_t""yes" 1>&6
   cat >> confdefs.h <<\EOF
@@ -4910,7 +4912,7 @@ else
 fi
 
 echo $ac_n "checking whether to have dynamic modules""... $ac_c" 1>&6
-echo "configure:4914: checking whether to have dynamic modules" >&5
+echo "configure:4916: checking whether to have dynamic modules" >&5
 if test "$with_dynamic_modules" = no || test "$ac_have_dl" != yes; then
   echo "$ac_t""no" 1>&6
 else
@@ -4922,7 +4924,7 @@ EOF
 fi
 
 echo $ac_n "checking whether to have dynamic kernel""... $ac_c" 1>&6
-echo "configure:4926: checking whether to have dynamic kernel" >&5
+echo "configure:4928: checking whether to have dynamic kernel" >&5
 if test "$with_dynamic_kernel" != no && test "$ac_lib_dl" = yes; then
   DL_KERNEL=1
   
@@ -4932,7 +4934,7 @@ else
 fi
 
 echo $ac_n "checking whether to have Plural""... $ac_c" 1>&6
-echo "configure:4936: checking whether to have Plural" >&5
+echo "configure:4938: checking whether to have Plural" >&5
 if test "$with_Plural" != yes && test "$enable_Plural" != yes; then
   echo "$ac_t""no" 1>&6
 else
@@ -5118,6 +5120,7 @@ s%@CXXCPP@%$CXXCPP%g
 s%@HAVE_MPSR@%$HAVE_MPSR%g
 s%@MP_LIBS@%$MP_LIBS%g
 s%@NEED_LIBS@%$NEED_LIBS%g
+s%@NEED_LIBSG@%$NEED_LIBSG%g
 s%@DL_KERNEL@%$DL_KERNEL%g
 s%@PLURAL@%$PLURAL%g
 

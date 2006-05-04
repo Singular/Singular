@@ -830,6 +830,7 @@ else
   AC_MSG_RESULT(no)
 fi
 
+NEED_LIBSG="${NEED_LIBS}"
 if test "$ac_cv_sizeof_voidp" != 4; then
   NEED_LIBS="${NEED_LIBS} -lomalloc"
 else
@@ -838,6 +839,7 @@ fi
 
 
 AC_SUBST(NEED_LIBS)
+AC_SUBST(NEED_LIBSG)
 
 AC_MSG_CHECKING(whether to have dbm links)
 if test "$with_dbm" != no; then

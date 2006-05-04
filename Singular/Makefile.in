@@ -89,9 +89,11 @@ STATIC_LDFLAGS	= @STATIC_LDFLAGS@
 # arguments to link
 ifneq ($(SINGUNAME),ix86-Win)
 LIBS		= -lm @NEED_LIBS@
+LIBSG		= -lm @NEED_LIBSG@
 else
 LIBS		= -lsingfac -lsingcf -lntl  -static -lreadline -lhtmlhelp -Xlinker -Bdynamic -lgmp -lomalloc_ndebug -lcygncurses6 
 ## -lpython_module -lpython2.4 /usr/local/lib/libboost_python-gcc-d-1_32.dll
+LIBSG		= -lsingfac -lsingcf -lntl  -static -lreadline -lhtmlhelp -Xlinker -Bdynamic -lgmp -lcygncurses6 
 endif
 MP_LIBS		= @MP_LIBS@
 DL_KERNEL	= @DL_KERNEL@
