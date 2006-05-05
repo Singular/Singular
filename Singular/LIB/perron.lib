@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: perron.lib,v 1.2 2006-04-03 13:14:05 motsak Exp $";
+version="$Id: perron.lib,v 1.3 2006-05-05 14:37:36 motsak Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  perron.lib         computation of algebraic dependences
 AUTHORS:  Oleksandr Motsak,        motsak@mathematik.uni-kl.de.
 
 PROCEDURES:
-perron(L[, d]);    computes relations between pairwise commuting polynomials of L[, up to a given degree bound D]
+perron(L[, D]);  relations between pairwise commuting polynomials
 
 KEYWORDS:  algebraic dependence; relations
 ";
@@ -15,205 +15,175 @@ LIB "center.lib";
 
 //////////////////////////////////////////////////////////////////////////////
 proc perron( ideal L, list # )
-"USAGE:     perron( L [, D] )
-RETURN:     a commutative ring, containing an exported ideal `Relations` with found polynomial relations.
-PURPOSE:    computes relations between pairwise commuting polynomials of L[, up to a given degree bound D]
-NOTE:       the implementation was partially inspired by the Perron's theorem. 
-EXAMPLE:    example perron; shows an example
+"USAGE:  perron( L [, D] )
+RETURN:  commutative ring with ideal `Relations`
+PURPOSE: computes polynomial relations ('Relations') between pairwise 
+         commuting polynomials of L [, up to a given degree bound D]
+NOTE:    the implementation was partially inspired by the Perron's theorem. 
+EXAMPLE: example perron; shows an example
 "
 {
-    int N, D, i;
+  int N, D, i;
     
-    if( nameof( basering ) == "basering" )
+  N = size(L);
+
+  if( N == 0 )
     {
-        ERROR( "No current ring!" );
-    }
-
-
-    N = size(L);
-
-    if( N == 0 )
-    {
-        ERROR( "Zero ideal!" );
+      ERROR( "Input ideal must be non-zero!" );
     }
     
-    intvec W; // weights
+  intvec W; // weights
     
-    for ( i = N; i > 0; i-- )
+  for ( i = N; i > 0; i-- )
     {
-        W[i] = deg(L[i]);
+      W[i] = deg(L[i]);
     }
 
-////////////////////////////////////////////////////////////////////////
-    D = -1;
+  ////////////////////////////////////////////////////////////////////////
+  D = -1;
     
-    // Check whether the bound degree D is given:
-    if( size(#)>0 )
+  // Check whether the degree bound 'D' is given:
+  if( size(#)>0 )
     {
-        if ( typeof(#[1]) == typeof(D) )
+      if ( typeof(#[1]) == typeof(D) )
         {
-            D = #[1];
+	  D = #[1];
             
-            if( D <= 0 )
+	  if( D <= 0 )
             {
-                ERROR( "An optional parameter D must be positive!" );
+	      ERROR( "An optional parameter D must be positive!" );
             }
         }    
     }
     
-    // , otherwise we try to estimate it after Perron Th:
-    if( D < 0 )
+  // , otherwise we try to estimate it according to Perron's Th:
+  if( D < 0 )
     {
-        D = 1; 
-        int d, min;
+      D = 1; 
+      int d, min;
         
-        min = -1;
+      min = -1;
         
-        for ( i = size(L); i > 0 ; i-- )
+      for ( i = size(L); i > 0 ; i-- )
         {
-            d = W[i];
+	  d = W[i];
             
-            D = D * d;
-            if( min == -1)
+	  D = D * d;
+	  if( min == -1)
             {
-                min = d;
+	      min = d;
             } else
-            {
+	      {
                 if( min > d )
-                {
+		  {
                     min = d;                
-                }
-            }            
+		  }
+	      }            
         }
         
-        if( (D == 0) or (min <= 0) )
+      if( (D == 0) or (min <= 0) )
         {
-            ERROR( "Wrong set of polynomials!" );
+	  ERROR( "Wrong set of polynomials!" );
         }
         
-        D = D / min;        
-        
-        kill d;
+      D = D / min;        
+      
     }
     
-////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////
     
-    def NCRING = basering;
+  def NCRING = basering;
     
-    def CurrentField = ringlist( NCRING )[1]; 
+  def CurrentField = ringlist( NCRING )[1]; 
     
-    // We are going to construct a commutative ring in N variables:
+  // We are going to construct a commutative ring in N variables F(i), 
+  // with the field specified by 'CurrentField': 
     
-    ring TEMPRING = 0, ( F(1..N) ), dp;
+  ring TEMPRING = 0, ( F(1..N) ), dp;
     
-    list RingList = ringlist( TEMPRING );
+  list RingList = ringlist( TEMPRING );
+  RingList[1] = CurrentField; 
     
-    RingList[1] = CurrentField; // Take the Field from NC Ring!
-    
-    kill CurrentField; // !
-    
-    // New Commutative Ring with correct field!
-    
-    def COMMUTATIVERING = ring( RingList );
-    
-    setring COMMUTATIVERING;
-    
-    kill TEMPRING;
+  // New Commutative Ring with correct field!
+  def COMMUTATIVERING = ring( RingList );
+  
+  ////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////
+  setring COMMUTATIVERING; // we are in COMMUTATIVERING now
+    
+  ideal PBWBasis = PBW_maxDeg( D ); // All monomials of degree(!) <= D.
 
-    // we are in COMMUTATIVERING now:   
+  // TODO: it would be better to compute weighted monomials of weight 
+  // <= W[1] \cdots W[N].
     
-    ideal PBWBasis = PBW_maxDeg( D ); // All monomials of degree(!) <= D.
-    // TODO: it would be better to compute weighted monomials of weight <= W[1] \cdot ... W[N].
+  setring NCRING; // and back to NCRING
     
-//    PBWBasis;
+  map Psi = COMMUTATIVERING, L; // F(i) \mapsto L[i]
+    
+  ideal Images = Psi( PBWBasis ); // Corresponding products of polynomials 
+                                  // from L
+    
+  // ::MAIN STEP:: // Compute relations in NC ring:
+  def T = linearMapKernel( Images ); 
         
-    setring NCRING;
-    
-//    kill CurrentField; // we cleanup every bit of it.
-    
-    map Psi = COMMUTATIVERING, L; // F(i) \mapsto L[i]
-    
-    ideal Images = Psi( PBWBasis ); // Corresponding products of polynomials from L
-    
-//    Images;
-    
-    def T = linearMapKernel( Images ); // Compute relations in NC ring
-    
-//    T;
+  ////////////////////////////////////////////////////////////////////////
 
+  // check the output of 'linearMapKernel':
+  int t = 0;
     
-    // We check the output:
-    
-    if( (typeof(T) != "module") and (typeof(T) != "int" ) )
+  if( (typeof(T) != "module") and (typeof(T) != "int" ) )
     {
-        ERROR( "Wrong output from the 'linearMapKernel' function!" );
+      ERROR( "Wrong output from function 'linearMapKernel'!" );
     }
     
-    if( typeof(T) == "int" )
+  if( typeof(T) == "int" )
     {
-        if( T != 0 )
+      t = 1;
+      if( T != 0 )
         {
-            ERROR( "Wrong output from the 'linearMapKernel' function!" );
+          ERROR( "Wrong output from function 'linearMapKernel'!" );
         }
     }        
+
+  ////////////////////////////////////////////////////////////////////////
+        
+  // Go back to commutative case in both cases:        
+  setring COMMUTATIVERING;        
     
-        
-    // , and go back to commutative case in both cases:        
-    if( typeof(T) == "module" )
+  ideal Relations; // And generate Relations:
+
+  if( t == 0 ) // T is a module
     {
-        // Back to 
-        setring COMMUTATIVERING;        
-        module KER = imap( NCRING, T );
-        
-        // some clean up:
-        setring NCRING;
-        kill T;
-        kill Psi;
-        
-        setring COMMUTATIVERING;
-        ideal result = linearCombinations( PBWBasis, KER );
-        
-        kill KER;
-        
-            
+      module KER = imap( NCRING, T );
+      Relations = linearCombinations( PBWBasis, KER );
+       
     } else
-    {
-        // If all images are zero...        
-        kill T;
-        kill Psi;
-        setring COMMUTATIVERING;
-        ideal result = PBWBasis;        
-    }
+      { // T == int(0) => all images are zero =>
+        Relations = PBWBasis;        
+      }
+      
     
-    // now we must be in COMMUTATIVERING and there must be an ideal result.
-    kill PBWBasis;
+  ////////////////////////////////////////////////////////////////////////
 
-//    listvar(all);        
-
-////////////////////////////////////////////////////////////////////////
-    // we compute an std basis of the relations:    
+  // we compute an std basis of the relations:    
     
-    // save options
-    intvec v = option( get );
+  // save options
+  intvec v = option( get );
     
-    // set right options
-    option( redSB );
-    option( redTail );
+  // set right options
+  option( redSB );
+  option( redTail );
     
-    // compute everything in a right form
-    ideal Relations = simplify( std( result ), 1 + 2 + 8 ); 
+  // reduce everything in as far as possible
+  Relations = simplify( std( Relations ), 1 + 2 + 8 ); 
     
-    // restore options
-    option( set, v ); 
+  // restore options
+  option( set, v ); 
     
-    kill result;
+  //    Relations;
+  export Relations;
     
-//    Relations;
-    export Relations;
-    
-    return( COMMUTATIVERING );    
+  return( COMMUTATIVERING );    
 }
 example
 {
@@ -223,17 +193,17 @@ ring A = p,(x,y,z),dp;
 matrix D[3][3]=0;
 D[1,2]=-z; D[1,3]=2*x; D[2,3]=-2*y;
 ncalgebra(1,D); // this algebra is U(sl_2)
-ideal L = x^p, y^p, z^p-z, 4*x*y+z^2-2*z; // the center
-def R = perron( L, p );
-setring R; 
-R;
+ideal I = x^p, y^p, z^p-z, 4*x*y+z^2-2*z; // the center
+def RA = perron( I, p );
+setring RA; 
+RA;
 Relations; // it was exported from perron to be in the returned ring.
-kill R;
+
 // perron can be also used in a commutative case, for example:
-ring r=0,(x,y,z),dp;
+ring B = 0,(x,y,z),dp;
 ideal J = xy+z2, z2+y2, x2y2-2xy3+y4;
-def R = perron(J);
-setring R; 
+def RB = perron(J);
+setring RB; 
 Relations;
 }
 
