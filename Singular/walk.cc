@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: walk.cc,v 1.10 2006-01-31 15:23:38 Singular Exp $ */
+/* $Id: walk.cc,v 1.11 2006-05-05 13:08:30 Singular Exp $ */
 /*
 * ABSTRACT: Implementation of the Groebner walk
 */
@@ -1813,7 +1813,6 @@ static void VMrDefault(intvec* va)
 
   {
     sLastPrinted.CleanUp();
-    memset(&sLastPrinted,0,sizeof(sleftv));
   }
 
   ring r = IDRING(tmp);
@@ -1888,7 +1887,6 @@ static void VMrDefaultlp(void)
 
   {
     sLastPrinted.CleanUp();
-    memset(&sLastPrinted,0,sizeof(sleftv));
   }
 
   ring r = IDRING(tmp);
@@ -2014,7 +2012,6 @@ static void DefRingPar(intvec* va)
   if (sLastPrinted.RingDependend())
   {
     sLastPrinted.CleanUp();
-    memset(&sLastPrinted,0,sizeof(sleftv));
   }
 
 
@@ -2101,7 +2098,6 @@ static void DefRingParlp(void)
   if (sLastPrinted.RingDependend())
   {
     sLastPrinted.CleanUp();
-    memset(&sLastPrinted,0,sizeof(sleftv));
   }
 
   /* execute the created ring */
