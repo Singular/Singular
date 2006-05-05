@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.85 2006-04-27 14:19:31 bricken Exp $ */
+/* $Id: tgb.cc,v 1.86 2006-05-05 14:08:48 Singular Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2626,8 +2626,8 @@ static int tgb_pair_better_gen(const void* ap,const void* bp){
 
   sorted_pair_node* a=*((sorted_pair_node**)ap);
   sorted_pair_node* b=*((sorted_pair_node**)bp);
-  assume(a->i>a->j);
-  assume(b->i>b->j);
+  assume((a->i>a->j) || (a->i < 0));
+  assume((b->i>b->j) || (b->i < 0));
   if (a->deg<b->deg) return -1;
   if (a->deg>b->deg) return 1;
 
