@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.86 2006-05-05 14:08:48 Singular Exp $ */
+/* $Id: tgb.cc,v 1.87 2006-05-07 06:16:01 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1827,8 +1827,13 @@ static void go_on (slimgb_alg* c){
     kBucketClear(buf[j].bucket,&p, &len);
     kBucketDestroy(&buf[j].bucket);
 
-    if (!c->nc)
+    if (!c->nc) {
+      if (TEST_OPT_REDTAIL){
+      p=redNFTail(p,c->strat->sl,c->strat, 0);
+      } else {
       p=redTailShort(p, c->strat);
+      }
+      }
     sbuf[j]=add_to_basis_ideal_quotient(p,c,ibuf+j);
     //sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
   }
@@ -2610,11 +2615,12 @@ static BOOLEAN pair_better(sorted_pair_node* a,sorted_pair_node* b, slimgb_alg* 
   if (a->deg<b->deg) return TRUE;
   if (a->deg>b->deg) return FALSE;
 
-//  if (a->expected_length<b->expected_length) return TRUE;
-  //  if (a->expected_length>b->expected_length) return FALSE;
+
   int comp=pLmCmp(a->lcm_of_lm, b->lcm_of_lm);
   if (comp==1) return FALSE;
   if (-1==comp) return TRUE;
+  if (a->expected_length<b->expected_length) return TRUE;
+  if (a->expected_length>b->expected_length) return FALSE;
   if (a->i+a->j<b->i+b->j) return TRUE;
    if (a->i+a->j>b->i+b->j) return FALSE;
   if (a->i<b->i) return TRUE;
@@ -2632,12 +2638,13 @@ static int tgb_pair_better_gen(const void* ap,const void* bp){
   if (a->deg>b->deg) return 1;
 
 
-//  if (a->expected_length<b->expected_length) return -1;
-  // if (a->expected_length>b->expected_length) return 1;
+ 
  int comp=pLmCmp(a->lcm_of_lm, b->lcm_of_lm);
 
   if (comp==1) return 1;
   if (-1==comp) return -1;
+   if (a->expected_length<b->expected_length) return -1;
+  if (a->expected_length>b->expected_length) return 1;
   if (a->i+a->j<b->i+b->j) return -1;
    if (a->i+a->j>b->i+b->j) return 1;
   if (a->i<b->i) return -1;

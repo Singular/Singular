@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.36 2006-03-28 05:25:04 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.37 2006-05-07 06:18:00 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -175,6 +175,7 @@ enum calc_state
     //UNIMPORTANT,
     //SOONTREP
   };
+static BOOLEAN pair_cmp(sorted_pair_node* a,sorted_pair_node* b);
 template <class len_type, class set_type>  int pos_helper(kStrategy strat, poly p, len_type len, set_type setL, polyset set);
 static int add_to_reductors(slimgb_alg* c, poly h, int len, BOOLEAN simplified=FALSE);
 static int bucket_guess(kBucket* bucket);
@@ -200,7 +201,7 @@ static BOOLEAN no_pairs(slimgb_alg* c);
 void clean_top_of_pair_list(slimgb_alg* c);
 static void super_clean_top_of_pair_list(slimgb_alg* c);
 static BOOLEAN state_is(calc_state state, const int & i, const int & j, slimgb_alg* c);
-static BOOLEAN pair_better(sorted_pair_node* a,sorted_pair_node* b, slimgb_alg* c);
+static BOOLEAN pair_better(sorted_pair_node* a,sorted_pair_node* b, slimgb_alg* c=NULL);
 static int tgb_pair_better_gen(const void* ap,const void* bp);
 static poly redTailShort(poly h, kStrategy strat);
 static poly gcd_of_terms(poly p, ring r);
