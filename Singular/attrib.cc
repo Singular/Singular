@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.24 2005-07-27 15:47:52 Singular Exp $ */
+/* $Id: attrib.cc,v 1.25 2006-05-08 15:37:15 Singular Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -142,7 +142,11 @@ void * atGet(idhdl root,char * name)
 
 void * atGet(leftv root,char * name)
 {
-  attr temp = root->attribute->get(name);
+  attr temp;
+  if (e==NULL)
+    temp = root->attribute->get(name);
+  else
+    temp = (root->LData())->attribute->get(name);
   if ((temp==NULL) && (root->rtyp==IDHDL))
   {
     idhdl h=(idhdl)root->data;
