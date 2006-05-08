@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.45 2006-04-27 14:32:57 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.46 2006-05-08 12:24:04 pohl Exp $ */
 
 #include <config.h>
 
@@ -285,6 +285,7 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
 {
     CanonicalForm pi, pi1;
     CanonicalForm C, Ci, Ci1, Hi, bi, pi2;
+    bool bpure;
     int delta = degree( f ) - degree( g );
 
     if ( delta >= 0 )
@@ -300,16 +301,19 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
     C = gcd( Ci, Ci1 );
     if ( !( pi.isUnivariate() && pi1.isUnivariate() ) )
     {
-      if ( gcd_test_one( pi1, pi, true ) )
-        return C;
+        if ( gcd_test_one( pi1, pi, true ) )
+            return C;
+        bpure = false;
+      
     }
-#ifdef HAVE_NTL
     else
     {
-      if ( isOn(SW_USE_NTL_GCD_P) && isPurePoly(pi) && isPurePoly(pi1) )
-        return gcd_univar_ntlp(pi, pi1 ) * C;
-    }
+        bpure = isPurePoly(pi) && isPurePoly(pi1);
+#ifdef HAVE_NTL
+        if ( isOn(SW_USE_NTL_GCD_P) && bpure )
+            return gcd_univar_ntlp(pi, pi1 ) * C;
 #endif
+    }
     Variable v = f.mvar();
     Hi = power( LC( pi1, v ), delta );
     if ( (delta+1) % 2 )
@@ -331,8 +335,10 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
     }
     if ( degree( pi1, v ) == 0 )
         return C;
-    else
-        return C * pp( pi );
+    pi /= content( pi );
+    if ( bpure )
+        pi /= pi.lc();
+    return C * pi;
 }
 
 static CanonicalForm
