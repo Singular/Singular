@@ -73,6 +73,10 @@ then
             echo ${prefix}
         fi
         exit 0
+    elif (echo $uname_a | $egrep "Darwin" >$devnull)
+    then
+        echo i386Mac-darwin
+        exit 0
     else
         echo ${prefix}-Unknown
         exit 1
