@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.21 2006-03-20 20:33:56 wienand Exp $ */
+/* $Id: kutil.cc,v 1.22 2006-05-08 12:55:11 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2040,6 +2040,13 @@ void enterExtendedSpoly(poly h,kStrategy strat)
           posx = strat->posInL(strat->L,strat->Ll,&h,strat);
         h.sev = pGetShortExpVector(h.p);
         h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
+        if (pNext(p) != NULL)
+        {
+          pShallowCopyDeleteProc p_shallow_copy_delete
+               = pGetShallowCopyDeleteProc(strat->tailRing, new_tailRing);
+          pNext(p) = p_shallow_copy_delete(pNext(p),
+                       currRing, strat->tailRing, strat->tailRing->PolyBin);
+        }
         enterL(&strat->L,&strat->Ll,&strat->Lmax,h,posx);
       }
     }

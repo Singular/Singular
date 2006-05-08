@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.2 2004-08-03 17:33:55 Singular Exp $
+ *  Version: $Id: kInline.cc,v 1.3 2006-05-08 12:55:10 Singular Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -313,7 +313,7 @@ KINLINE void sTObject::Mult_nn(number n)
 KINLINE void sLObject::Normalize()
 {
   if (t_p != NULL)
-  { 
+  {
     pNormalize(t_p);
     if (p != NULL) pSetCoeff0(p, pGetCoeff(t_p));
   }
@@ -326,7 +326,7 @@ KINLINE void sLObject::Normalize()
 KINLINE void sLObject::HeadNormalize()
 {
   if (t_p != NULL)
-  { 
+  {
     nNormalize(pGetCoeff(t_p));
     if (p != NULL) pSetCoeff0(p, pGetCoeff(t_p));
   }
