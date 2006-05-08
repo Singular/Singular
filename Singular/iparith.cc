@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.393 2006-05-08 15:00:38 Singular Exp $ */
+/* $Id: iparith.cc,v 1.394 2006-05-08 17:45:31 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2057,8 +2057,8 @@ static BOOLEAN jjMODULO(leftv res, leftv u, leftv v)
      }
      else
      {
-       if ((!idHomModule(u_id,currQuotient,&w_v))
-       || (!idHomModule(v_id,currQuotient,&w_v)))
+       if ((!idTestHomModule(u_id,currQuotient,w_v))
+       || (!idTestHomModule(v_id,currQuotient,w_v)))
        {
          WarnS("wrong weights");
          delete w_u; w_u=NULL;
@@ -2618,16 +2618,16 @@ static BOOLEAN jjSTD_HILB(leftv res, leftv u, leftv v)
   ideal u_id=(ideal)(u->Data());
   if (w!=NULL)
   {
-     //if (!idHomModule(u_id,currQuotient,&w))
-     //{
-     //  WarnS("wrong weights");
-     //  w=NULL;
-     //}
-     //else
-     {
-       w=ivCopy(w);
-       hom=isHomog;
-     }
+    if (!idTestHomModule(u_id,currQuotient,w))
+    {
+      WarnS("wrong weights");
+      w=NULL;
+    }
+    else
+    {
+      w=ivCopy(w);
+      hom=isHomog;
+    }
   }
   result=kStd(u_id,currQuotient,hom,&w,(intvec *)v->Data());
   idSkipZeroes(result);
@@ -2638,34 +2638,35 @@ static BOOLEAN jjSTD_HILB(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
 {
-  assumeStdFlag(u);
   ideal result;
-  ideal u_id=(ideal)(u->Data());
+  assumeStdFlag(u);
+  ideal i1=(ideal)(u->Data());
+  ideal i0=idInit(1,i1->rank);
+  i0->m[0]=(poly)v->Data();
+  i1=idSimpleAdd(i1,i0);
+  i0->m[0]=NULL;
+  idDelete(&i0);
   intvec *w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   tHomog hom=testHomog;
   if (w!=NULL)
   {
-     if (!idHomModule(u_id,currQuotient,&w))
-     {
-       WarnS("wrong weights");
-       w=NULL;
-     }
-     else
-     {
-       w=ivCopy(w);
-       hom=isHomog;
-     }
+    if (!idTestHomModule(i1,currQuotient,w))
+    {
+      // no warnung: this is legal, if i in std(i,p)
+      // is homogeneous, but p not
+      w=NULL;
+    }
+    else
+    {
+      w=ivCopy(w);
+      hom=isHomog;
+    }
   }
-  ideal i0=idInit(1,u_id->rank);
-  i0->m[0]=(poly)v->Data();
-  u_id=idSimpleAdd(u_id,i0);
-  i0->m[0]=NULL;
-  idDelete(&i0);
   BITSET save_test=test;
   test|=Sy_bit(OPT_SB_1);
-  result=kStd(u_id,currQuotient,hom,&w,NULL,0,IDELEMS(u_id)-1);
+  result=kStd(i1,currQuotient,hom,&w,NULL,0,IDELEMS(i1)-1);
   test=save_test;
-  idDelete(&u_id);
+  idDelete(&i1);
   idSkipZeroes(result);
   res->data = (char *)result;
   setFlag(res,FLAG_STD);
@@ -3762,21 +3763,21 @@ static BOOLEAN jjPRUNE(leftv res, leftv v)
   ideal v_id=(ideal)v->Data();
   if (w!=NULL)
   {
-     if (!idHomModule(v_id,currQuotient,&w))
-     {
-       WarnS("wrong weights");
-       w=NULL;
-     }
-     else
-     {
-       w=ivCopy(w);
-       intvec **ww=&w;
-       res->data = (char *)idMinEmbedding(v_id,FALSE,ww);
-       atSet(res,omStrDup("isHomog"),*ww,INTVEC_CMD);
-       return FALSE;
-     }
+    if (!idTestHomModule(v_id,currQuotient,w))
+    {
+      WarnS("wrong weights");
+      w=NULL;
+      // and continue at the non-homog case below
+    }
+    else
+    {
+      w=ivCopy(w);
+      intvec **ww=&w;
+      res->data = (char *)idMinEmbedding(v_id,FALSE,ww);
+      atSet(res,omStrDup("isHomog"),*ww,INTVEC_CMD);
+      return FALSE;
+    }
   }
-  //else // both else branches
   res->data = (char *)idMinEmbedding(v_id);
   return FALSE;
 }
@@ -3867,7 +3868,7 @@ static BOOLEAN jjSLIM_GB(leftv res, leftv u)
   ideal u_id=(ideal)u->Data();
   if (w!=NULL)
   {
-    if (!idHomModule(u_id,currQuotient,&w))
+    if (!idTestHomModule(u_id,currQuotient,w))
     {
       WarnS("wrong weights");
       w=NULL;
@@ -3891,15 +3892,15 @@ static BOOLEAN jjSTD(leftv res, leftv v)
   tHomog hom=testHomog;
   if (w!=NULL)
   {
-    if (!idHomModule(v_id,currQuotient,&w))
+    if (!idTestHomModule(v_id,currQuotient,w))
     {
       WarnS("wrong weights");
       w=NULL;
     }
     else
     {
-      w=ivCopy(w);
       hom=isHomog;
+      w=ivCopy(w);
     }
   }
   result=kStd(v_id,currQuotient,hom,&w);
@@ -3935,7 +3936,7 @@ static BOOLEAN jjSYZYGY(leftv res, leftv v)
     w=ivCopy(w);
     add_row_shift=w->min_in();
     (*w)-=add_row_shift;
-    if (idHomModule(v_id,currQuotient,&w))
+    if (idTestHomModule(v_id,currQuotient,w))
       hom=isHomog;
     else
     {
@@ -5338,7 +5339,7 @@ static BOOLEAN jjRES3(leftv res, leftv u, leftv v, leftv w)
     intvec * iv=(intvec*)atGet(u,"isHomog",INTVEC_CMD);
     if (iv!=NULL)
     {
-      if (!idHomModule(u_id,currQuotient,&iv))
+      if (!idTestHomModule(u_id,currQuotient,iv))
       {
         WarnS("wrong weights");
         iv=NULL;
@@ -5382,7 +5383,7 @@ static BOOLEAN jjSTD_HILB_W(leftv res, leftv u, leftv v, leftv w)
   ideal u_id=(ideal)(u->Data());
   if (ww!=NULL)
   {
-    if (!idHomModule(u_id,currQuotient,&ww))
+    if (!idTestHomModule(u_id,currQuotient,ww))
     {
       WarnS("wrong weights");
       ww=NULL;
