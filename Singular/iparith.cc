@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.391 2006-05-08 13:28:10 Singular Exp $ */
+/* $Id: iparith.cc,v 1.392 2006-05-08 14:43:02 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2618,12 +2618,12 @@ static BOOLEAN jjSTD_HILB(leftv res, leftv u, leftv v)
   ideal u_id=(ideal)(u->Data());
   if (w!=NULL)
   {
-     if (!idHomModule(u_id,currQuotient,&w))
-     {
-       WarnS("wrong weights");
-       w=NULL;
-     }
-     else
+     //if (!idHomModule(u_id,currQuotient,&w))
+     //{
+     //  WarnS("wrong weights");
+     //  w=NULL;
+     //}
+     //else
      {
        w=ivCopy(w);
        hom=isHomog;
@@ -3424,7 +3424,7 @@ static BOOLEAN jjHOMOG1(leftv res, leftv v)
   res->data=(void *)idHomModule((ideal)v->Data(),currQuotient,&w);
   if ((res->data!=NULL) && (v->rtyp==IDHDL))
   {
-    atSet((idhdl)v->data,omStrDup("isHomog"),w,INTVEC_CMD);
+    atSet((idhdl)(v->LData()),omStrDup("isHomog"),w,INTVEC_CMD);
   }
   else if (w!=NULL) delete w;
   return FALSE;
