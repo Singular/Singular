@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.390 2006-03-06 14:11:19 Singular Exp $ */
+/* $Id: iparith.cc,v 1.391 2006-05-08 13:28:10 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2615,12 +2615,21 @@ static BOOLEAN jjSTD_HILB(leftv res, leftv u, leftv v)
   ideal result;
   intvec *w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   tHomog hom=testHomog;
+  ideal u_id=(ideal)(u->Data());
   if (w!=NULL)
   {
-    w=ivCopy(w);
-    hom=isHomog;
+     if (!idHomModule(u_id,currQuotient,&w))
+     {
+       WarnS("wrong weights");
+       w=NULL;
+     }
+     else
+     {
+       w=ivCopy(w);
+       hom=isHomog;
+     }
   }
-  result=kStd((ideal)(u->Data()),currQuotient,hom,&w,(intvec *)v->Data());
+  result=kStd(u_id,currQuotient,hom,&w,(intvec *)v->Data());
   idSkipZeroes(result);
   res->data = (char *)result;
   setFlag(res,FLAG_STD);
@@ -2631,24 +2640,32 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
 {
   assumeStdFlag(u);
   ideal result;
+  ideal u_id=(ideal)(u->Data());
   intvec *w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   tHomog hom=testHomog;
   if (w!=NULL)
   {
-    w=ivCopy(w);
-    hom=isHomog;
+     if (!idHomModule(u_id,currQuotient,&w))
+     {
+       WarnS("wrong weights");
+       w=NULL;
+     }
+     else
+     {
+       w=ivCopy(w);
+       hom=isHomog;
+     }
   }
-  ideal i1=(ideal)u->Data();
-  ideal i0=idInit(1,i1->rank);
+  ideal i0=idInit(1,u_id->rank);
   i0->m[0]=(poly)v->Data();
-  i1=idSimpleAdd(i1,i0);
+  u_id=idSimpleAdd(u_id,i0);
   i0->m[0]=NULL;
   idDelete(&i0);
   BITSET save_test=test;
   test|=Sy_bit(OPT_SB_1);
-  result=kStd(i1,currQuotient,hom,&w,NULL,0,IDELEMS(i1)-1);
+  result=kStd(u_id,currQuotient,hom,&w,NULL,0,IDELEMS(u_id)-1);
   test=save_test;
-  idDelete(&i1);
+  idDelete(&u_id);
   idSkipZeroes(result);
   res->data = (char *)result;
   setFlag(res,FLAG_STD);
@@ -3639,7 +3656,7 @@ static BOOLEAN jjMINRES_R(leftv res, leftv v)
 {
   intvec *weights=(intvec*)atGet(v,"isHomog",INTVEC_CMD);
   res->data=(char *)syMinimize((syStrategy)v->Data());
-  if (weights!=NULL) 
+  if (weights!=NULL)
     atSet(res, omStrDup("isHomog"),ivCopy(weights),INTVEC_CMD);
   return FALSE;
 }
@@ -3741,13 +3758,22 @@ static BOOLEAN jjPRUNE(leftv res, leftv v)
   ideal v_id=(ideal)v->Data();
   if (w!=NULL)
   {
-    w=ivCopy(w);
-    intvec **ww=&w;
-    res->data = (char *)idMinEmbedding(v_id,FALSE,ww);
-    atSet(res,omStrDup("isHomog"),*ww,INTVEC_CMD);
+     if (!idHomModule(v_id,currQuotient,&w))
+     {
+       WarnS("wrong weights");
+       w=NULL;
+     }
+     else
+     {
+       w=ivCopy(w);
+       intvec **ww=&w;
+       res->data = (char *)idMinEmbedding(v_id,FALSE,ww);
+       atSet(res,omStrDup("isHomog"),*ww,INTVEC_CMD);
+       return FALSE;
+     }
   }
-  else
-    res->data = (char *)idMinEmbedding(v_id);
+  //else // both else branches
+  res->data = (char *)idMinEmbedding(v_id);
   return FALSE;
 }
 static BOOLEAN jjP2N(leftv res, leftv v)
@@ -3834,12 +3860,21 @@ static BOOLEAN jjSLIM_GB(leftv res, leftv u)
   }
   intvec *w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   tHomog hom=testHomog;
+  ideal u_id=(ideal)u->Data();
   if (w!=NULL)
   {
-    w=ivCopy(w);
-    hom=isHomog;
+    if (!idHomModule(u_id,currQuotient,&w))
+    {
+      WarnS("wrong weights");
+      w=NULL;
+    }
+    else
+    {
+      w=ivCopy(w);
+      hom=isHomog;
+    }
   }
-  res->data=(char *)t_rep_gb(currRing, (ideal)u->Data());
+  res->data=(char *)t_rep_gb(currRing, u_id);
   setFlag(res,FLAG_STD);
   if (w!=NULL) atSet(res,omStrDup("isHomog"),w,INTVEC_CMD);
   return FALSE;
@@ -3847,14 +3882,23 @@ static BOOLEAN jjSLIM_GB(leftv res, leftv u)
 static BOOLEAN jjSTD(leftv res, leftv v)
 {
   ideal result;
+  ideal v_id=(ideal)v->Data();
   intvec *w=(intvec *)atGet(v,"isHomog",INTVEC_CMD);
   tHomog hom=testHomog;
   if (w!=NULL)
   {
-    w=ivCopy(w);
-    hom=isHomog;
+    if (!idHomModule(v_id,currQuotient,&w))
+    {
+      WarnS("wrong weights");
+      w=NULL;
+    }
+    else
+    {
+      w=ivCopy(w);
+      hom=isHomog;
+    }
   }
-  result=kStd((ideal)(v->Data()),currQuotient,hom,&w);
+  result=kStd(v_id,currQuotient,hom,&w);
   idSkipZeroes(result);
   res->data = (char *)result;
   setFlag(res,FLAG_STD);
@@ -5277,6 +5321,7 @@ static BOOLEAN jjREDUCE3_ID(leftv res, leftv u, leftv v, leftv w)
 static BOOLEAN jjRES3(leftv res, leftv u, leftv v, leftv w)
 {
   int maxl=(int)v->Data();
+  ideal u_id=(ideal)u->Data();
   int l=0;
   resolvente r;
   intvec **weights=NULL;
@@ -5289,11 +5334,19 @@ static BOOLEAN jjRES3(leftv res, leftv u, leftv v, leftv w)
     intvec * iv=(intvec*)atGet(u,"isHomog",INTVEC_CMD);
     if (iv!=NULL)
     {
-      weights = (intvec**)omAlloc0Bin(void_ptr_bin);
-      weights[0] = ivCopy(iv);
-      l=1;
+      if (!idHomModule(u_id,currQuotient,&iv))
+      {
+        WarnS("wrong weights");
+        iv=NULL;
+      }
+      else
+      {
+        weights = (intvec**)omAlloc0Bin(void_ptr_bin);
+        weights[0] = ivCopy(iv);
+        l=1;
+      }
     }
-    r=syResolvente((ideal)u->Data(),maxl,&l, &weights, iiOp==MRES_CMD);
+    r=syResolvente(u_id,maxl,&l, &weights, iiOp==MRES_CMD);
   }
   else
     r=sySchreyerResolvente((ideal)u->Data(),maxl+1,&l);
@@ -5301,7 +5354,6 @@ static BOOLEAN jjRES3(leftv res, leftv u, leftv v, leftv w)
   int t3=u->Typ();
   iiMakeResolv(r,l,wmaxl,w->name,t3,weights);
   return FALSE;
-  return TRUE;
 }
 #endif
 static BOOLEAN jjRING3(leftv res, leftv u, leftv v, leftv w)
@@ -5323,12 +5375,21 @@ static BOOLEAN jjSTD_HILB_W(leftv res, leftv u, leftv v, leftv w)
   ideal result;
   intvec *ww=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   tHomog hom=testHomog;
+  ideal u_id=(ideal)(u->Data());
   if (ww!=NULL)
   {
-    ww=ivCopy(ww);
-    hom=isHomog;
+    if (!idHomModule(u_id,currQuotient,&ww))
+    {
+      WarnS("wrong weights");
+      ww=NULL;
+    }
+    else
+    {
+      ww=ivCopy(ww);
+      hom=isHomog;
+    }
   }
-  result=kStd((ideal)(u->Data()),
+  result=kStd(u_id,
               currQuotient,
               hom,
               &ww,                  // module weights
