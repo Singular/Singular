@@ -25,4 +25,15 @@ attrib(l);
 attrib(l[1]);
 attrib(l[2]);
 
+// attrib for ideals: should be cancelled when the ideal changes
+
+i=x,y;
+homog(i);
+attrib(i);
+homog(i);
+attrib(i);
+
+i[2]=x+1;
+attrib(i);
+
 tst_status(1);$

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.394 2006-05-08 17:45:31 Singular Exp $ */
+/* $Id: iparith.cc,v 1.395 2006-05-09 11:50:48 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1243,6 +1243,7 @@ static BOOLEAN jjINDEX_I(leftv res, leftv u, leftv v)
   res->rtyp=u->rtyp; u->rtyp=0;
   res->data=u->data; u->data=NULL;
   res->name=u->name; u->name=NULL;
+  res->attribute=u->attribute; u->attribute=NULL;
   res->e=u->e;       u->e=NULL;
   if (res->e==NULL) res->e=jjMakeSub(v);
   else
@@ -1282,7 +1283,8 @@ static BOOLEAN jjINDEX_IV(leftv res, leftv u, leftv v)
     p->rtyp=IDHDL;
     p->data=u->data;
     p->name=u->name;
-    p->flag|=u->flag;
+    p->flag=u->flag;
+    p->attribute=u->attribute;
     p->e=jjMakeSub(&t);
   }
   u->rtyp=0;
@@ -3421,17 +3423,23 @@ static BOOLEAN jjHILBERT_IV(leftv res, leftv v)
 }
 static BOOLEAN jjHOMOG1(leftv res, leftv v)
 {
-  intvec *w;
-  res->data=(void *)idHomModule((ideal)v->Data(),currQuotient,&w);
-  if ((res->data!=NULL) && (v->rtyp==IDHDL))
+  intvec *w=(intvec*)atGet(v,"isHomog",INTVEC_CMD);
+  ideal v_id=(ideal)v->Data();
+  if (w==NULL)
   {
-    char *isHomog=omStrDup("isHomog");
-    if (v->e==NULL)
-      atSet((idhdl)(v->data),isHomog,w,INTVEC_CMD);
-    else
-      atSet((idhdl)(v->LData()),isHomog,w,INTVEC_CMD);
+    res->data=(void *)idHomModule(v_id,currQuotient,&w);
+    if ((res->data!=NULL) && (v->rtyp==IDHDL))
+    {
+      char *isHomog=omStrDup("isHomog");
+      if (v->e==NULL)
+        atSet((idhdl)(v->data),isHomog,w,INTVEC_CMD);
+      else
+        atSet((idhdl)(v->LData()),isHomog,w,INTVEC_CMD);
+    }
+    else if (w!=NULL) delete w;
   }
-  else if (w!=NULL) delete w;
+  else
+    res->data=(void *)idTestHomModule(v_id,currQuotient,w);
   return FALSE;
 }
 static BOOLEAN jjIDEAL_Ma(leftv res, leftv v)
@@ -4633,12 +4641,10 @@ static BOOLEAN jjBRACK_Im(leftv res, leftv u, leftv v,leftv w)
            r,c,u->Fullname(),iv->rows(),iv->cols());
     return TRUE;
   }
-  res->data=u->data;
-  u->data=NULL;
-  res->rtyp=u->rtyp;
-  u->rtyp=0;
-  res->name=u->name;
-  u->name=NULL;
+  res->data=u->data; u->data=NULL;
+  res->rtyp=u->rtyp; u->rtyp=0;
+  res->name=u->name; u->name=NULL;
+  res->attribute=u->attribute; u->attribute=NULL;
   Subexpr e=jjMakeSub(v);
           e->next=jjMakeSub(w);
   if (u->e==NULL) res->e=e;
@@ -4664,12 +4670,10 @@ static BOOLEAN jjBRACK_Ma(leftv res, leftv u, leftv v,leftv w)
       MATROWS(m),MATCOLS(m));
     return TRUE;
   }
-  res->data=u->data;
-  u->data=NULL;
-  res->rtyp=u->rtyp;
-  u->rtyp=0;
-  res->name=u->name;
-  u->name=NULL;
+  res->data=u->data; u->data=NULL;
+  res->rtyp=u->rtyp; u->rtyp=0;
+  res->name=u->name; u->name=NULL;
+  res->attribute=u->attribute; u->attribute=NULL;
   Subexpr e=jjMakeSub(v);
           e->next=jjMakeSub(w);
   if (u->e==NULL)
