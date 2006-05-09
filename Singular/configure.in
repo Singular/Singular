@@ -370,6 +370,16 @@ case "$ac_cv_singuname" in
 	        ac_lib_dl=yes
 	  fi
 	;;
+	i386Mac-darwin)
+	  AC_CHECK_LIB(dl, dlopen)
+          if test "$ac_cv_lib_dl_dlopen" = yes; then
+	  	LD_DYN_FLAGS="-ldl -dynamic"
+	  	SFLAGS="-fpic -DPIC"
+	  	SLDFLAGS="-dynamic -twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup"
+		LD=libtool
+	        ac_lib_dl=yes
+	  fi
+	;;
 	ix86-freebsd)
 	  AC_CHECK_LIB(c, dlopen)
           if test "$ac_cv_lib_c_dlopen" = yes; then
