@@ -226,7 +226,7 @@ Use the @code{LIB} command for loading of single libraries.
 @c lib center.lib
 
 @c ----------------------------------------------------------
-@node dmod_lib, involut_lib, PLURAL libraries, PLURAL libraries
+@node dmod_lib, involut_lib, center_lib, PLURAL libraries
 @section dmod_lib
 @cindex dmod_lib
 @cindex dmod.lib
