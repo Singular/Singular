@@ -229,7 +229,7 @@ endif
 # MAKE SURE THAT THIS IS UP_TO_DATE
 #
 
-SLIB0 = COPYING      absfact.lib \
+SLIB0 = COPYING      absfact.lib   arcAtPoint.lib\
 	ainvar.lib   alexpoly.lib  algebra.lib   all.lib       brnoeth.lib \
 	classify.lib control.lib   deform.lib    elim.lib      equising.lib \
 	finvar.lib   gmspoly.lib   gmssing.lib   general.lib   graphics.lib \
