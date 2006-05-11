@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.35 2005-05-06 14:38:14 hannes Exp $
+// $Id: deform.lib,v 1.36 2006-05-11 16:21:15 Singular Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.35 2005-05-06 14:38:14 hannes Exp $";
+version="$Id: deform.lib,v 1.36 2006-05-11 16:21:15 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  deform.lib    Miniversal Deformation of Singularities and Modules
@@ -277,6 +277,10 @@ setring  Po;
 //   as matrix Rs: syzygies of Fs mod Js.
 // To access these data, type
      def Px=L[1]; setring Px; print(Fs); print(Js); print(Rs);
+
+// L[2] = L[1]/Fo extending Qo=Po/Fo,
+// L[3] = the embedding ring of the versal base space,
+// L[4] = L[1]/Js extending L[3]/Js.
 ");
    return(list(`myPx`,`myQx`,`mySo`,`myOx`));
 }
