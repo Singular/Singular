@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: center.lib,v 1.20 2006-05-11 18:53:25 motsak Exp $"
+version="$Id: center.lib,v 1.21 2006-05-11 19:16:21 motsak Exp $"
 category="Noncommutative"
 info="
 LIBRARY:  center.lib      computation of central elements of GR-algebras
@@ -1566,6 +1566,8 @@ EXAMPLE:    example sa_reduce; shows an example
 
   while( size(FLM) > 0 )
     {
+//    FLM;
+    
       // Take the 1st element of FLM...
       p = FLM[1]; // SANF( FLM[1], FOUND_LEADING_MONOMIALS );
         
@@ -1573,6 +1575,11 @@ EXAMPLE:    example sa_reduce; shows an example
         
       d = maxdegInt( p );
       T = ideal(p); 
+      
+//      d; size(FOUND_LEADING_MONOMIALS);
+
+    if( d > 0 )
+    {
         
       FOUND_LEADING_MONOMIALS[d] = FOUND_LEADING_MONOMIALS[d] + T;
         
@@ -1590,6 +1597,7 @@ EXAMPLE:    example sa_reduce; shows an example
                 }   
             }
         }
+    }
         
       if( size(FLM) > 0 )
         {
@@ -1600,9 +1608,11 @@ EXAMPLE:    example sa_reduce; shows an example
 	  FLM = INTERRED( FLM );            
         } 
         
-      DBPrint(1, "Found: " + string(T) );
-        
-      result = result + T;
+        if( size(T) > 0 )
+        {
+          DBPrint(1, "Found: " + string(T) );
+          result = result + T;
+        }
         
     }
     
