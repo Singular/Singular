@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.112 2006-03-17 14:22:16 Singular Exp $";
+version="$Id: primdec.lib,v 1.113 2006-05-11 11:05:10 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -574,10 +574,12 @@ static proc splitPrimary(list l,ideal ser,int @wr,list sact)
             continue;
          }
          j=0;
+/*
          if(i<=sl/2)
          {
             j=1;
          }
+*/
          while(j<size(l[2*i-1]))
          {
             j++;
@@ -970,7 +972,10 @@ EXAMPLE: example zero_decomp; shows an example
         act[2]=1;
         primary[1]=std(primary[1],act[1][1]);
      }
-
+     if(@wr!=0)
+     {
+        primary[1]=std(j,act[1][1]);
+     }
      if((act[2][1]==1)&&(vdim(primary[1])==deg(act[1][1])))
      {
         primary[2]=primary[1];
@@ -1645,7 +1650,7 @@ EXAMPLE: example clearSB; shows an example
  int c=size(i);
  w=leadexp(0);
  v[size(i)]=0;
- 
+
  j=0;
  while(j<c-1)
  {
@@ -3014,7 +3019,7 @@ EXAMPLE: example decomp; shows an example
 
      ideal @jj=lead(@j);               //!! vorn vereinbaren
      execute(quotring);
-   
+
      ideal @jj=imap(gnir1,@jj);
      @vv=clearSBNeu(@jj,fett);  //!! vorn vereinbaren
      setring gnir1;
