@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: center.lib,v 1.19 2006-05-05 14:36:12 motsak Exp $"
+version="$Id: center.lib,v 1.20 2006-05-11 18:53:25 motsak Exp $"
 category="Noncommutative"
 info="
 LIBRARY:  center.lib      computation of central elements of GR-algebras
@@ -1057,13 +1057,13 @@ EXAMPLE:    example centralizerRed; shows an example
     
   int m = (k > 0);
         
-  int MinDeg = 6; // starting guess for Maximal Bounding Degree, 6
-  int Delta  = 4; // increment of it, 4
+  int @MinDeg = 1; // starting guess for Maximal Bounding Degree, 6
+  int @Delta  = 1; // increment of it, 4
         
   if( m and (D <= 0) )
     {
       // minimal guess
-      D = MinDeg;
+      D = @MinDeg;
     }
     
   if( !m and D < 0)
@@ -1206,7 +1206,7 @@ EXAMPLE:    example centralizerRed; shows an example
 	  setring COMMRING;
 
 	  // Init new grades:
-	  for( j = D + 1; j <= (D + Delta); j++ )
+	  for( j = D + 1; j <= (D + @Delta); j++ )
             {
 	      FOUND_LEADING_MONOMIALS[j] = ideal();
             }
@@ -1224,7 +1224,7 @@ EXAMPLE:    example centralizerRed; shows an example
 	  while( size(FLM) > 0 )
             {
 	      // minimal degree:
-	      d = mindeg(FLM);  
+	      d = mindegInt(FLM);  /// ### ///
                 
 	      // take all of minimal degree:               
 	      T = jet( FLM, d ); 
@@ -1232,9 +1232,9 @@ EXAMPLE:    example centralizerRed; shows an example
 	      // there are size(T) elements of smallest degree (deg(FLM[1])) in FLM!
                 
 	      // Add them in the same way:
-	      for( j = 1; j <= (D + Delta); j = j + d ) // For every degree (j*d) of T, do:
+	      for( j = 1; j <= (D + @Delta); j = j + d ) // For every degree (j*d) of T, do:
                 {            
-		  for( l = j; (l + d) <= (D + Delta); l++ )
+		  for( l = j; (l + d) <= (D + @Delta); l++ )
                     {
 		      if( (l + d) > D ) // Only new should be updated!
                         {
@@ -1258,8 +1258,15 @@ EXAMPLE:    example centralizerRed; shows an example
 	  // Go back...
 	  setring NCRING;
 
+/*
+    if(toprint())
+    {
+      typeof(@Delta); @Delta; 
+      typeof(D); D; 
+    };
+*/    
 	  // And set new Bound
-	  D = D + Delta;
+	  D = D + @Delta;
         }
                 
       i++;
@@ -1420,7 +1427,7 @@ static proc SANF( poly p, list FOUND_LEADING_MONOMIALS )
     
   while( size(q) > 0 )
     {
-      d = maxdeg(p);
+      d = maxdegInt(p); /// ### /// 
         
       if( (0 < d) and (d <= N) )
         {
@@ -1481,6 +1488,31 @@ static proc maxdegInt( ideal I )
   return( max );    
 }
 
+
+/******************************************************/
+static proc mindegInt( ideal I )
+{    
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "mindegInt", I ); }; /*4DEBUG*/
+
+  intmat D = mindeg(I);
+    
+  int min = D[1, 1]; int m;
+    
+  for( int c = 2; c <= ncols(D); c++ )
+    {
+      m = D[1, c];
+        
+      if( m < min )
+        {
+	  min = m;
+        }
+    }
+    
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "mindegInt", min ); }; /*4DEBUG*/
+
+  return( min );    
+}
+
 /******************************************************/
 proc sa_reduce( ideal V ) // 'subalgebra basis' computation
 "USAGE:     sa_reduce(V); ideal V
@@ -1539,7 +1571,7 @@ EXAMPLE:    example sa_reduce; shows an example
         
       FLM[1] = 0; // ...and kill it from FLM
         
-      d = maxdeg( p );
+      d = maxdegInt( p );
       T = ideal(p); 
         
       FOUND_LEADING_MONOMIALS[d] = FOUND_LEADING_MONOMIALS[d] + T;
@@ -1651,7 +1683,7 @@ EXAMPLE:    example sa_poly_reduce; shows an example
         
       FLM[1] = 0; // ...and kill it from FLM
         
-      d = maxdeg(q);
+      d = maxdegInt(q);
       T = ideal(q); 
         
       FOUND_LEADING_MONOMIALS[d] = FOUND_LEADING_MONOMIALS[d] + T;
