@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.113 2006-05-11 11:05:10 Singular Exp $";
+version="$Id: primdec.lib,v 1.114 2006-05-12 12:12:05 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -3507,6 +3507,7 @@ EXAMPLE: example decomp; shows an example
            // here we collect now both results primary(sat(j,gh))
            // and primary(j,gh^n)
            @n=size(quprimary);
+           if (deg(quprimary[1][1])<=0) { @n=0; }
            for (@k=1;@k<=size(htprimary);@k++)
            {
               quprimary[@n+@k]=htprimary[@k];
