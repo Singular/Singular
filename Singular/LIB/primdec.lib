@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.114 2006-05-12 12:12:05 Singular Exp $";
+version="$Id: primdec.lib,v 1.115 2006-05-15 10:59:17 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -5508,14 +5508,23 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-proc radical(ideal i,list #)
-"USAGE:   radical(i); i ideal.
+proc radical(ideal i, list #)
+"USAGE:           radical(i); i ideal.
+                        Optional parameters in list #: (can be entered in any order)
+                        1, "equiRad" -> equiRadical is computed
+                        0, "fullRad" -> full radical is computed  (default)
+                        "SL" ->                 the new algorithm is used (default)
+                        "KL" ->                 the old algorithm is used
+                        "KLdp" ->                 the old algorithm, with modifications
+                        "facstd" ->                uses facstd to first decompose the ideal (default for non homogeneous ideals)
+                        "noFacstd" ->        does not use facstd (default for homogeneous ideals)
 RETURN:  ideal, the radical of i.
 NOTE:    A combination of the algorithms of Krick/Logar and Kemper is used.
          Works also in positive characteristic (Kempers algorithm).
 EXAMPLE: example radical; shows an example
 "
 {
+   dbprint(printlevel - voice, "Radical, version 2006.05.08");
    if(ord_test(basering)!=1)
    {
       ERROR(
@@ -5523,44 +5532,116 @@ EXAMPLE: example radical; shows an example
       );
    }
    def @P=basering;
-   int j,il;
-   if(size(#)>0){il=#[1];}
-   if(size(i)==0){return(ideal(0));}
-   ideal re=1;
+   int j;
+   int il;
+   string algorithm;
+   int useFac;
+
+   // Set input parameters
+   algorithm = "SL";                                 // Default: SL algorithm
+   il = 0;                                                        // Default: Full radical (not only equidim part)
+   if (homog(i) == 1) {                                // Default: facStd is used, except if the ideal is homogeneous.
+      useFac = 0;
+   } else {
+             useFac = 1;
+   };
+   if(size(#) > 0){
+           int valid;
+           for(j = 1; j <= size(#); j++){
+                   valid = 0;
+                   if((typeof(#[j]) == "int") or (typeof(#[j]) == "number")) {
+                           il = #[j];                        // If il == 1, equiRadical is computed
+                           valid = 1;
+                   };
+                   if(typeof(#[j]) == "string"){
+                           if(#[j] == "KL") {
+                                   algorithm = "KL";
+                                   valid = 1};
+                           if(#[j] == "KLdp") {
+                                   algorithm = "KLdp";
+                                   valid = 1};
+                           if(#[j] == "SL") {
+                                   algorithm = "SL";
+                                   valid = 1};
+                           if(#[j] == "noFacstd") {
+                                   useFac = 0;
+                                   valid = 1};
+                           if(#[j] == "facstd") {
+                                   useFac = 1;
+                                      valid = 1};
+                           if(#[j] == "equiRad") {
+                                   il = 1;
+                                   valid = 1};
+                           if(#[j] == "fullRad") {
+                                   il = 0;
+                                   valid = 1};
+                   };
+                   if(valid == 0) {
+                           dbprint(1, "Warning! The following input parameter was not recognized:", #[j]);
+                   };
+           };
+   };
+
+   if(size(i) == 0){return(ideal(0));}
+   ideal rad = 1;
    intvec op = option(get);
-   list qr=simplifyIdeal(i);
-   ideal isave=i;
-   map phi=@P,qr[2];
+   list qr = simplifyIdeal(i);
+   // SL - Line removed. The ideal isave was never used.
+   //ideal isave=i;
+   map phi = @P, qr[2];
 
    option(redSB);
-   i=groebner(qr[1]);
-   option(set,op);
-   int di=dim(i);
+   i = groebner(qr[1]);
+   option(set, op);
+   int di = dim(i);
 
-   if(di==0)
+   if(di == 0)
    {
-     i=zeroRad(i,qr[1]);
+     i = zeroRad(i, qr[1]);
      return(interred(phi(i)));
    }
 
    option(redSB);
-   list pr=i;
-   if (!homog(i))
+   list pr;
+   if(useFac == 1)
    {
-     pr=facstd(i);
-   }
-   option(set,op);
-   int s=size(pr);
-
-   for(j=1;j<=s;j++)
+     pr = facstd(i);
+   } else {
+         pr = i
+   };
+   option(set, op);
+   int s = size(pr);
+   if(useFac == 1) {
+      dbprint(printlevel - voice, "Number of components returned by facstd: ", s);
+   };
+   for(j = 1; j <= s; j++)
    {
-      attrib(pr[s+1-j],"isSB",1);
-      if((size(reduce(re,pr[s+1-j],1))!=0)&&((dim(pr[s+1-j])==di)||!il))
+      attrib(pr[s + 1 - j], "isSB", 1);
+      if((size(reduce(rad, pr[s + 1 - j], 1)) != 0) && ((dim(pr[s + 1 - j]) == di) || !il))
       {
-         re=intersect(re,radicalKL(pr[s+1-j],re,il));
-      }
+         // SL Debug messages
+         dbprint(printlevel-voice, "We shall compute the radical of ", pr[s + 1 - j]);
+         dbprint(printlevel-voice, "The dimension is: ", dim(pr[s+1-j]));
+
+             if(algorithm == "KL") {
+                  rad = intersect(rad, radicalKL(pr[s + 1 - j], rad, il));
+              }
+             if(algorithm == "KLdp") {
+                  rad = intersect(rad, newRadicalKL(pr[s + 1 - j], rad, il));
+              }
+              if(algorithm == "SL") {
+                      rad = intersect(rad, newRadicalSL(pr[s + 1 - j], il));
+              };
+      } else
+      {
+              // SL Debug
+          dbprint(printlevel-voice, "The radical of this component is not needed.");
+          dbprint(printlevel-voice, "size(reduce(rad, pr[s + 1 - j], 1))", size(reduce(rad, pr[s + 1 - j], 1)));
+          dbprint(printlevel-voice, "dim(pr[s + 1 - j])", dim(pr[s + 1 - j]));
+          dbprint(printlevel-voice, "il", il);
+      };
    }
-   return(interred(phi(re)));
+   return(interred(phi(rad)));
 }
 example
 { "EXAMPLE:";  echo = 2;
@@ -5568,9 +5649,581 @@ example
    poly  p = z2+1;
    poly  q = z3+2;
    ideal i = p*q^2,y-z2;
-   ideal pr= radical(i);
+   ideal pr = radical(i);
    pr;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Computes the radical of I using KL algorithm.
+// The only difference with the the previous implementation of KL algorithm is
+// that now it uses block dp instead of lp ordering for the reduction to the
+// zerodimensional case.
+// The reduction step has been moved to the new routine newRadicalReduction, so that it can be
+// used also by the new algorithm.
+// This algorithm should be left in the final version of the library,
+// and radicalKL removed.
+//
+static proc newRadicalKL(ideal I, ideal ser, list #) {
+// I                                The ideal for which the radical is computed
+// ideal ser                Same as in radicalKL (used to reduce components already obtained)
+// list #                        If #[1] = 1, equiradical is computed.
+
+        // I needs to be a Groebner basis.
+        if (attrib(I, "isSB") != 1) {
+                I = groebner(I);
+        };
+
+        ideal rad;                                // The radical
+        int allIndep = 1;                // All max independent sets are used
+
+        list result = newRadicalReduction(I, ser, allIndep, #);
+        int done = result[3];
+        rad = result[1];
+        if (done == 0) {
+                rad = intersect(rad, newRadicalKL(result[2], ideal(1), #));
+        };
+        return(rad);
+};
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Computes the radical of I via the new algorithm, using zerodimensional radical in
+// the zero dimensional case.
+// For the reduction to the zerodimensional case, it uses the procedure
+// radical of primdec.lib, with some modifications to avoid the recursion.
+//
+static proc newRadicalSL(ideal I, list #)
+// Input = I, ideal
+//         #, list. If #[1] = 1, then computes only the equiradical.
+// Output = (P, primaryDec) where P = rad(I) and primaryDec is the list of the radicals
+// obtained in intermediate steps.
+{
+        ideal rad = 1;
+        ideal equiRad = 1;
+        list primes;
+        int k;                        // Counter
+        int il;                 // If il = 1, only the equiradical is required.
+        int iDim;                // The dimension of I
+        int stop = 0;   // Checks if the radical has been obtained
+
+        if (attrib(I, "isSB") != 1) {
+                I = groebner(I);
+        };
+        iDim = dim(I);
+
+    // Checks if only equiradical is required
+    if (size(#) > 0) {
+       il = #[1];
+    };
+
+        while(stop == 0) {
+                dbprint (printlevel-voice, "// We call radLoopR to find new prime ideals.");
+                primes = newRadicalSLIteration(I, rad);                         // A list of primes or intersections of primes, not included in P
+                dbprint (printlevel - voice, "// Output of Iteration Step:");
+                dbprint (printlevel - voice, primes);
+                if (size(primes) > 0) {
+                        dbprint (printlevel - voice, "// We intersect P with the ideal just obtained.");
+                        for(k = 1; k <= size(primes); k++) {
+                                rad = intersect(rad, primes[k]);
+                                if (il == 1){
+                                        if (attrib(primes[k], "isSB") != 1) {
+                                                primes[k] = groebner(primes[k]);
+                                        };
+                                        if (iDim == dim(primes[k])) {
+                                                equiRad = intersect(equiRad, primes[k]);
+                                        };
+                                };
+                        };
+                } else {
+                        stop = 1
+                };
+        };
+        if (il == 0) {
+                return(rad);
+        } else {
+                return(equiRad);
+        };
+};
+
+//////////////////////////////////////////////////////////////////////////
+// Based on radicalKL.
+// It contains all of proc radicalKL except the recursion call.
+
+// Output:
+// #1 -> output ideal, the part of the radical that has been computed
+// #2 -> complementary ideal, the part of the ideal I whose radical remains to be computed
+//       = (I, h) in KL algorithm
+//       This is not used in the new algorithm. It is part of KL algorithm
+// #3 -> done, 1: output = radical, there is no need to continue
+//                   0: radical = output \cap \sqrt{complementary ideal}
+//       This is not used in the new algorithm. It is part of KL algorithm
+
+static proc newRadicalReduction(ideal I, ideal ser, int allIndep, list #) {
+// allMaximal                1 -> Indicates that the reduction to the zerodim case
+//                       must be done for all indep set of the leading terms ideal
+//                                        0 -> Otherwise
+// ideal ser                Only for radicalKL. (Same as in radicalKL)
+// list #                        Only for radicalKL (If #[1] = 1, only equiradical is required.
+//                  It is used to set the value of done.)
+
+   attrib(I, "isSB", 1);   // I needs to be a reduced standard basis
+   list indep, fett;
+   intvec @w, @hilb, op;
+   int @wr, @n, @m, lauf, di;
+   ideal fac, @h, collectrad, lsau;
+   poly @q;
+   string @va, quotring;
+
+   def @P = basering;
+   int jdim = dim(I);               // Computes the dimension of I
+   int  homo = homog(I);            // Finds out if I is homogeneous
+   ideal rad = ideal(1);            // The unit ideal
+   ideal te = ser;
+   if(size(#) > 0)
+   {
+      @wr = #[1];
+   }
+   if(homo == 1)
+   {
+      for(@n = 1; @n <= nvars(basering); @n++)
+      {
+         @w[@n] = ord(var(@n));
+      }
+      @hilb = hilb(I, 1, @w);
+   }
+
+   // SL 2006.04.11 1 Debug messages
+   dbprint(printlevel-voice, "//Computes the radical of the ideal:", I);
+   // SL 2006.04.11 2 Debug messages
+
+  //---------------------------------------------------------------------------
+  //j is the ring
+  //---------------------------------------------------------------------------
+
+   if (jdim==-1)
+   {
+      return(ideal(1), ideal(1), 1);
+   }
+
+  //---------------------------------------------------------------------------
+  //the zero-dimensional case
+  //---------------------------------------------------------------------------
+
+   if (jdim==0)
+   {
+      return(zeroRad(I), ideal(1), 1);
+   }
+
+   //-------------------------------------------------------------------------
+   //search for a maximal independent set indep,i.e.
+   //look for subring such that the intersection with the ideal is zero
+   //j intersected with K[var(indep[3]+1),...,var(nvar)] is zero,
+   //indep[1] is the new varstring, indep[2] the string for the block-ordering
+   //-------------------------------------------------------------------------
+
+   // SL 2006-04-24 1         If allIndep = 0, then it only computes one maximal
+   //                                        independent set.
+   //                                        This looks better for the new algorithm but not for KL
+   //                                        algorithm
+   list parameters = allIndep;
+   indep = newMaxIndependSet(I, parameters);
+   // SL 2006-04-24 2
+
+   for(@m = 1; @m <= size(indep); @m++)
+   {
+      if((indep[@m][1] == varstr(basering)) && (@m == 1))
+      //this is the good case, nothing to do, just to have the same notations
+      //change the ring
+      {
+         execute("ring gnir1 = ("+charstr(basering)+"),("+varstr(basering)+"),("
+                              +ordstr(basering)+");");
+         ideal @j = fetch(@P, I);
+         attrib(@j, "isSB", 1);
+      }
+      else
+      {
+         @va = string(maxideal(1));
+
+         execute("ring gnir1 = (" + charstr(basering) + "), (" + indep[@m][1] + "),("
+                              + indep[@m][2] + ");");
+         execute("map phi = @P," + @va + ";");
+         if(homo == 1)
+         {
+            ideal @j = std(phi(I), @hilb, @w);
+         }
+         else
+         {
+            ideal @j = groebner(phi(I));
+         }
+      }
+      if((deg(@j[1]) == 0) || (dim(@j) < jdim))
+      {
+         setring @P;
+         break;
+      }
+      for (lauf = 1; lauf <= size(@j); lauf++)
+      {
+         fett[lauf] = size(@j[lauf]);
+      }
+      //------------------------------------------------------------------------
+      // We have now the following situation:
+      // j intersected with K[var(nnp+1),..,var(nva)] is zero so we may pass
+      // to this quotientring, j is there still a standardbasis, the
+      // leading coefficients of the polynomials there (polynomials in
+      // K[var(nnp+1),..,var(nva)]) are collected in the list h,
+      // we need their LCM, gh, because of the following:
+      // let (j:gh^n)=(j:gh^infinity) then j*K(var(nnp+1),..,var(nva))[..rest..]
+      // intersected with K[var(1),...,var(nva)] is (j:gh^n)
+      // on the other hand j = ((j, gh^n) intersected with (j : gh^n))
+
+      //------------------------------------------------------------------------
+      // The arrangement for the quotientring K(var(nnp+1),..,var(nva))[..rest..]
+      // and the map phi:K[var(1),...,var(nva)] ----->
+      // K(var(nnpr+1),..,var(nva))[..the rest..]
+      //------------------------------------------------------------------------
+      quotring = newPrepareQuotientRing(nvars(basering) - indep[@m][3]);
+      //------------------------------------------------------------------------
+      // We pass to the quotientring   K(var(nnp+1),..,var(nva))[..the rest..]
+      //------------------------------------------------------------------------
+
+      execute(quotring);
+
+      // @j considered in the quotientring
+      ideal @j = imap(gnir1, @j);
+
+      kill gnir1;
+
+      // j is a standardbasis in the quotientring but usually not minimal
+      // here it becomes minimal
+
+      @j = clearSB(@j, fett);
+
+      // We need later LCM(h[1],...) = gh for saturation
+      ideal @h;
+      if(deg(@j[1]) > 0)
+      {
+         for(@n = 1; @n <= size(@j); @n++)
+         {
+            @h[@n] = leadcoef(@j[@n]);
+         }
+         op = option(get);
+         option(redSB);
+         @j = interred(@j);  //to obtain a reduced standardbasis
+         attrib(@j, "isSB", 1);
+         option(set, op);
+
+         // SL 1 Debug messages
+         dbprint(printlevel - voice, "zero_rad", basering, @j, dim(groebner(@j)));
+         ideal zero_rad = zeroRad(@j);
+         dbprint(printlevel - voice, "zero_rad passed");
+         // SL 2
+      }
+      else
+      {
+         ideal zero_rad = ideal(1);
+      }
+
+      // We need the intersection of the ideals in the list quprimary with the
+      // polynomialring, i.e. let q=(f1,...,fr) in the quotientring such an ideal
+      // but fi polynomials, then the intersection of q with the polynomialring
+      // is the saturation of the ideal generated by f1,...,fr with respect to
+      // h which is the lcm of the leading coefficients of the fi considered in
+      // the quotientring: this is coded in saturn
+
+      zero_rad = std(zero_rad);
+
+      ideal hpl;
+
+      for(@n = 1; @n <= size(zero_rad); @n++)
+      {
+         hpl = hpl, leadcoef(zero_rad[@n]);
+      }
+
+      //------------------------------------------------------------------------
+      // We leave  the quotientring   K(var(nnp+1),..,var(nva))[..the rest..]
+      // back to the polynomialring
+      //------------------------------------------------------------------------
+      setring @P;
+
+      collectrad = imap(quring, zero_rad);
+      lsau = simplify(imap(quring, hpl), 2);
+      @h = imap(quring, @h);
+
+      kill quring;
+
+      // Here the intersection with the polynomialring
+      // mentioned above is really computed
+
+      collectrad = sat2(collectrad, lsau)[1];
+      if(deg(@h[1])>=0)
+      {
+         fac = ideal(0);
+         for(lauf = 1; lauf <= ncols(@h); lauf++)
+         {
+            if(deg(@h[lauf]) > 0)
+            {
+                fac = fac + factorize(@h[lauf], 1);
+            }
+         }
+         fac = simplify(fac, 4);
+         @q = 1;
+         for(lauf = 1; lauf <= size(fac); lauf++)
+         {
+            @q = @q * fac[lauf];
+         }
+         op = option(get);
+         option(returnSB);
+         option(redSB);
+         I = quotient(I + ideal(@q), rad);
+         attrib(I, "isSB", 1);
+         option(set, op);
+      }
+      if((deg(rad[1]) > 0) && (deg(collectrad[1]) > 0))
+      {
+         rad = intersect(rad, collectrad);
+         te = intersect(te, collectrad);
+         te = simplify(reduce(te, I, 1), 2);
+      }
+      else
+      {
+         if(deg(collectrad[1]) > 0)
+         {
+            rad = collectrad;
+            te = intersect(te, collectrad);
+            te = simplify(reduce(te, I, 1), 2);
+         }
+      }
+
+      if((dim(I) < jdim)||(size(te) == 0))
+      {
+         break;
+      }
+      if(homo==1)
+      {
+         @hilb = hilb(I, 1, @w);
+      }
+   }
+
+   // SL 2006.04.11 1 Debug messages
+   dbprint (printlevel-voice, "// Part of the Radical already computed:", rad);
+   dbprint (printlevel-voice, "// Dimension:", dim(groebner(rad)));
+   // SL 2006.04.11 2 Debug messages
+
+   // SL 2006.04.21 1         New variable "done".
+   //                                        It tells if the radical is already computed or
+   //                                        if it still has to be computed the radical of the new ideal I
+   int done;
+   if(((@wr == 1) && (dim(I)<jdim)) || (deg(I[1])==0) || (size(te) == 0))
+   {
+      done = 1;
+   } else {
+      done = 0;
+   };
+   // SL 2006.04.21 2
+
+   // SL 2006.04.21 1         See details of the output at the beggining of this proc.
+   list result = rad, I, done;
+   return(result);
+   // SL 2006.04.21 2
+};
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Given an ideal I and an ideal P (intersection of some minimal prime ideals
+// associated to I), it calculates the intersection of new minimal prime ideals
+// associated to I which where not used to calculate P.
+// This version uses ZD Radical in the zerodimensional case.
+static proc newRadicalSLIteration (ideal I, ideal P);
+// Input: I, ideal. The ideal from which new prime components will be obtained.
+//        P, ideal. Intersection of some prime ideals of I.
+// Output: ideal. Intersection of some primes of I different from the ones in P.
+{
+        int k = 1;                                // Counter
+        int good  = 0;                        // Checks if an element of P is in rad(I)
+
+        dbprint (printlevel-voice, "// We search for an element in P - sqrt(I).");
+        while ((k <= size(P)) and (good == 0)) {
+                dbprint (printlevel-voice, "// We try with:", P[k]);
+                good = 1 - rad_con(P[k], I);
+                k++;
+        };
+        k--;
+        if (good == 0) {
+                dbprint (printlevel-voice, "// No element was found, P = sqrt(I).");
+                list emptyList = list();
+                return (emptyList);
+        };
+        dbprint(printlevel - voice, "// That one was good!");
+        dbprint(printlevel - voice, "// We saturate I with respect to this element.");
+        if (P[k] != 1) {
+                ideal J = sat(I, P[k])[1];
+        } else {
+                dbprint(printlevel - voice, "// The polynomial is 1, the saturation in not actually computed.");
+                ideal J = I;
+        };
+
+        // We now call proc radicalNew;
+        dbprint(printlevel - voice, "// We do the reduction to the zerodimensional case, via radical.");
+        dbprint(printlevel - voice, "// The ideal is ", J);
+        dbprint(printlevel - voice, "// The dimension is ", dim(groebner(J)));
+
+    int allMaximal = 0;                   // Compute the zerodim reduction for only one indep set.
+    ideal re = 1;                           // No reduction is need, there are not redundant components.
+    list emptyList = list();   // Look for primes of any dimension, not only of max dimension.
+    list result = newRadicalReduction(J, re, allMaximal, emptyList);
+
+        return(result[1]);
+};
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
+// Based on maxIndependSet
+// Added list # as parameter
+// If the first element of # is 0, the output is only 1 max indep set.
+// If no list is specified or #[1] = 1, the output is all the max indep set of the
+// leading terms ideal. This is the original output of maxIndependSet
+
+// The ordering given in the output has been changed to block dp instead of lp.
+
+static proc newMaxIndependSet(ideal j, list #)
+// #[1]=0 -->                 computes only one max indep set
+"USAGE:   maxIndependentSet(i); i ideal
+RETURN:  list = #1. new varstring with the maximal independent set at the end,
+                #2. ordstring with the corresponding block ordering,
+                #3. the number of independent variables
+                // SL #3 explanation modified,
+                // it was: integer where the independent set starts in the varstring
+NOTE:
+EXAMPLE: example maxIndependentSet; shows an example
+"
+{
+   int n, k, di;
+   list resu, hilf;
+   string var1, var2;
+   list v = indepSet(j, 0);
+
+   // SL 2006.04.21 1 Lines modified to use only one independent Set
+   int allMaximal;
+   if (size(#) > 0) {
+           allMaximal = #[1];
+   } else {
+           allMaximal = 1;
+   };
+
+   int nMax;
+   if (allMaximal == 1) {
+      nMax = size(v);
+   } else {
+          nMax = 1;
+   };
+
+   for(n = 1; n <= nMax; n++)
+   // SL 2006.04.21 2
+   {
+      di = 0;
+      var1 = "";
+      var2 = "";
+      for(k = 1; k <= size(v[n]); k++)
+      {
+         if(v[n][k] != 0)
+         {
+            di++;
+            var2 = var2 + "var(" + string(k) + "), ";
+         }
+         else
+         {
+            var1 = var1 + "var(" + string(k) + "), ";
+         }
+      }
+      if(di > 0)
+      {
+         var1 = var1 + var2;
+         var1 = var1[1..size(var1) - 2];                         // The "- 2" removes the trailer comma
+         hilf[1] = var1;
+         // SL 2006.21.04 1 The order is now block dp instead of lp
+         hilf[2] = "dp(" + string(nvars(basering) - di) + "), dp(" + string(di) + ")";
+         // SL 2006.21.04 2
+         hilf[3] = di;
+         resu[n] = hilf;
+      }
+      else
+      {
+         resu[n] = varstr(basering), ordstr(basering), 0;
+      }
+   }
+   return(resu);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring s1 = (0, x, y), (a, b, c, d, e, f, g), lp;
+   ideal i = ea - fbg, fa + be, ec - fdg, fc + de;
+   i = std(i);
+   list l = newMaxIndependSet(i);
+   l;
+   i = i, g;
+   l = newMaxIndependSet(i);
+   l;
+
+   ring s = 0, (x, y, z), lp;
+   ideal i = z, yx;
+   list l = newMaxIndependSet(i);
+   l;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// based on prepareQuotientring
+// The order returned is now (C, dp) instead of (C, lp)
+
+static proc newPrepareQuotientRing (int nnp)
+"USAGE:   newPrepareQuotientRing(nnp); nnp int
+RETURN:  string = to define Kvar(nnp+1),...,var(nvars)[..rest ]
+NOTE:
+EXAMPLE: example newPrepareQuotientRing; shows an example
+"
+{
+  ideal @ih,@jh;
+  int npar=npars(basering);
+  int @n;
+
+  string quotring= "ring quring = ("+charstr(basering);
+  for(@n = nnp + 1; @n <= nvars(basering); @n++)
+  {
+     quotring = quotring + ", var(" + string(@n) + ")";
+     @ih = @ih + var(@n);
+  }
+
+  quotring = quotring+"),(var(1)";
+  @jh = @jh + var(1);
+  for(@n = 2; @n <= nnp; @n++)
+  {
+    quotring = quotring + ", var(" + string(@n) + ")";
+    @jh = @jh + var(@n);
+  }
+  // SL 2006-04-21 1 The order returned is now (C, dp) instead of (C, lp)
+  quotring = quotring + "), (C, dp);";
+  // SL 2006-04-21 2
+
+  return(quotring);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring s1=(0,x),(a,b,c,d,e,f,g),lp;
+   def @Q=basering;
+   list l= newPrepareQuotientRing(3);
+   l;
+   execute(l[1]);
+   execute(l[2]);
+   basering;
+   phi;
+   setring @Q;
+
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 proc prepareAss(ideal i)
 "USAGE:   prepareAss(i); i ideal
