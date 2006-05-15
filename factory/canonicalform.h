@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.30 2005-12-09 08:35:37 Singular Exp $ */
+/* $Id: canonicalform.h,v 1.31 2006-05-15 08:17:49 Singular Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -7,7 +7,11 @@
 #include <config.h>
 
 #ifndef NOSTREAMIO
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#endif
 #endif /* NOSTREAMIO */
 
 #include "cf_defs.h"

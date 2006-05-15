@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: debug.h,v 1.5 1997-06-19 12:23:48 schmidt Exp $ */
+/* $Id: debug.h,v 1.6 2006-05-15 08:17:52 Singular Exp $ */
 
 /* It should be possible to include this file multiple times for different */
 /* settings of DEBUGOUTPUT */
@@ -12,7 +12,11 @@
 #undef DEBOUTLN
 
 #ifdef DEBUGOUTPUT
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#endif
 void deb_inc_level();
 void deb_dec_level();
 extern char * deb_level_msg;

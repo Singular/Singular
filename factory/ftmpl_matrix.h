@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_matrix.h,v 1.2 2005-06-13 09:46:35 Singular Exp $ */
+/* $Id: ftmpl_matrix.h,v 1.3 2006-05-15 08:17:53 Singular Exp $ */
 
 #ifndef INCL_MATRIX_H
 #define INCL_MATRIX_H
@@ -7,7 +7,11 @@
 #include <factoryconf.h>
 
 #ifndef NOSTREAMIO
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#endif
 #endif /* NOSTREAMIO */
 
 template <class T>

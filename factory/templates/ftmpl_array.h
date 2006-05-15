@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_array.h,v 1.5 1997-06-19 13:11:13 schmidt Exp $ */
+/* $Id: ftmpl_array.h,v 1.6 2006-05-15 08:17:56 Singular Exp $ */
 
 #ifndef INCL_ARRAY_H
 #define INCL_ARRAY_H
@@ -7,7 +7,11 @@
 #include <factoryconf.h>
 
 #ifndef NOSTREAMIO
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#endif
 #endif /* NOSTREAMIO */
 
 template <class T>

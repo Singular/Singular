@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gengftables.cc,v 1.2 1997-10-23 13:25:52 schmidt Exp $ */
+/* $Id: gengftables.cc,v 1.3 2006-05-15 08:17:53 Singular Exp $ */
 
 //{{{ docu
 //
@@ -10,9 +10,15 @@
 //
 //}}}
 
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#include <fstream>
+#include <strstream>
+#elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
 #include <fstream.h>
 #include <strstream.h>
+#endif
 
 #include <factory.h>
 

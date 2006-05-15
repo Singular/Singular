@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: variable.h,v 1.5 2006-04-21 15:37:10 Singular Exp $ */
+/* $Id: variable.h,v 1.6 2006-05-15 08:17:55 Singular Exp $ */
 
 #ifndef INCL_VARIABLE_H
 #define INCL_VARIABLE_H
@@ -7,7 +7,11 @@
 #include <config.h>
 
 #ifndef NOSTREAMIO
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#endif
 #endif /* NOSTREAMIO */
 
 #include "cf_defs.h"

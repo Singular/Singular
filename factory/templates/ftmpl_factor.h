@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_factor.h,v 1.5 1998-06-03 14:51:33 pohl Exp $ */
+/* $Id: ftmpl_factor.h,v 1.6 2006-05-15 08:17:56 Singular Exp $ */
 
 #ifndef INCL_FACTOR_H
 #define INCL_FACTOR_H
@@ -7,7 +7,11 @@
 #include <factoryconf.h>
 
 #ifndef NOSTREAMIO
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#endif
 #endif /* NOSTREAMIO */
 
 

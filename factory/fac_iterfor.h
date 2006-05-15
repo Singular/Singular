@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_iterfor.h,v 1.4 1997-06-19 12:23:29 schmidt Exp $ */
+/* $Id: fac_iterfor.h,v 1.5 2006-05-15 08:17:52 Singular Exp $ */
 
 #ifndef INCL_FAC_ITERFOR_H
 #define INCL_FAC_ITERFOR_H
@@ -7,7 +7,11 @@
 #include <config.h>
 
 #ifndef NOSTREAMIO
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#endif
 #endif /* NOSTREAMIO */
 
 class IteratedFor

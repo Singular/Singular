@@ -21,8 +21,13 @@
 // === IO-Streams ===
 #ifndef NOSTREAMIO
 #include <stdio.h>
+#ifdef HAVE_IOSTREAM
+#include <fstream>
+#include <iostream>
+#elif defined(HAVE_IOSTREAM_H)
 #include <fstream.h>
 #include <iostream.h>
+#endif
 #include <iomanip.h>
 #endif
 

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: imm.h,v 1.20 2005-11-08 18:08:58 Singular Exp $ */
+/* $Id: imm.h,v 1.21 2006-05-15 08:17:53 Singular Exp $ */
 
 #ifndef INCL_IMM_H
 #define INCL_IMM_H
@@ -7,7 +7,11 @@
 #include <config.h>
 
 #ifndef NOSTREAMIO
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#endif
 #endif /* NOSTREAMIO */
 
 #include "assert.h"

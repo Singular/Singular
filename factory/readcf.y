@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: readcf.y,v 1.8 1998-06-12 14:33:57 schmidt Exp $ */
+/* $Id: readcf.y,v 1.9 2006-05-15 08:17:55 Singular Exp $ */
 
 %{
 
@@ -12,7 +12,12 @@
 #include <config.h>
 
 #include <ctype.h>
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#endif
+
 
 #include "assert.h"
 

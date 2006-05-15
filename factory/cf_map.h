@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_map.h,v 1.12 2000-05-29 15:05:21 Singular Exp $ */
+/* $Id: cf_map.h,v 1.13 2006-05-15 08:17:50 Singular Exp $ */
 
 #ifndef INCL_CF_MAP_H
 #define INCL_CF_MAP_H
@@ -13,7 +13,11 @@
 #include <config.h>
 
 #ifndef NOSTREAMIO
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#endif
 #endif /* NOSTREAMIO */
 
 #include "variable.h"

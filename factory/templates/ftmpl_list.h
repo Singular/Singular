@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_list.h,v 1.8 2005-01-13 15:10:23 Singular Exp $ */
+/* $Id: ftmpl_list.h,v 1.9 2006-05-15 08:17:56 Singular Exp $ */
 
 #ifndef INCL_LIST_H
 #define INCL_LIST_H
@@ -7,7 +7,11 @@
 #include <factoryconf.h>
 
 #ifndef NOSTREAMIO
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#endif
 #endif /* NOSTREAMIO */
 
 template <class T>

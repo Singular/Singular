@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_pp.h,v 1.4 2003-10-15 17:19:41 Singular Exp $ */
+/* $Id: int_pp.h,v 1.5 2006-05-15 08:17:54 Singular Exp $ */
 
 #ifndef INCL_INT_PP_H
 #define INCL_INT_PP_H
@@ -9,7 +9,11 @@
 #include "cf_gmp.h"
 
 #ifndef NOSTREAMIO
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#endif
 #endif /* NOSTREAMIO */
 
 #include "assert.h"

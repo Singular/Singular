@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gfops.h,v 1.6 1997-11-19 11:43:24 schmidt Exp $ */
+/* $Id: gfops.h,v 1.7 2006-05-15 08:17:53 Singular Exp $ */
 
 #ifndef INCL_GFOPS_H
 #define INCL_GFOPS_H
@@ -7,7 +7,11 @@
 #include <config.h>
 
 #ifndef NOSTREAMIO
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#endif
 #endif /* NOSTREAMIO */
 
 #include "assert.h"
