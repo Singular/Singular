@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.h,v 1.12 2005-12-09 08:35:37 Singular Exp $ */
+/* $Id: cf_algorithm.h,v 1.13 2006-05-15 08:17:36 Singular Exp $ */
 
 #ifndef INCL_CF_ALGORITHM_H
 #define INCL_CF_ALGORITHM_H
@@ -53,6 +53,8 @@ void chineseRemainder ( const CFArray & x, const CFArray & q, CanonicalForm & xn
 //}}}
 
 //{{{ function declarations from cf_factor.cc
+bool isPurePoly(const CanonicalForm & f);
+
 CFFList factorize ( const CanonicalForm & f, bool issqrfree = false );
 
 CFFList factorize ( const CanonicalForm & f, const Variable & alpha );
