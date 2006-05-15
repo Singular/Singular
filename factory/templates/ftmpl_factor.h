@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_factor.h,v 1.6 2006-05-15 08:17:56 Singular Exp $ */
+/* $Id: ftmpl_factor.h,v 1.7 2006-05-15 09:03:07 Singular Exp $ */
 
 #ifndef INCL_FACTOR_H
 #define INCL_FACTOR_H
@@ -9,8 +9,10 @@
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM
 #include <iostream>
+#define OSTREAM std::ostream
 #elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#define OSTREAM ostream
 #endif
 #endif /* NOSTREAMIO */
 
@@ -35,7 +37,7 @@ public:
     Factor<T>& operator*= ( int i ) { _exp *= i; return *this; }
     Factor<T>& operator*= ( const T & f ) { _factor *= f; return *this; }
 #ifndef NOSTREAMIO
-    void print ( ostream& ) const;
+    void print ( OSTREAM& ) const;
 #endif /* NOSTREAMIO */
 };
 
@@ -44,7 +46,7 @@ operator== ( const Factor<T>&, const Factor<T>& );
 
 #ifndef NOSTREAMIO
 template <class T>
-ostream& operator<< ( ostream & os, const Factor<T> & f );
+OSTREAM& operator<< ( OSTREAM & os, const Factor<T> & f );
 #endif /* NOSTREAMIO */
 
 #endif /* ! INCL_FACTOR_H */

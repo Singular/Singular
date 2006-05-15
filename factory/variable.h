@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: variable.h,v 1.6 2006-05-15 08:17:55 Singular Exp $ */
+/* $Id: variable.h,v 1.7 2006-05-15 09:03:07 Singular Exp $ */
 
 #ifndef INCL_VARIABLE_H
 #define INCL_VARIABLE_H
@@ -9,8 +9,10 @@
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM
 #include <iostream>
+#define OSTREAM std::ostream
 #elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#define OSTREAM ostream
 #endif
 #endif /* NOSTREAMIO */
 
@@ -66,7 +68,7 @@ public:
 	return lhs._level <= rhs._level;
     }
 #ifndef NOSTREAMIO
-    friend ostream & operator << ( ostream & os, const Variable & v );
+    friend OSTREAM & operator << ( OSTREAM & os, const Variable & v );
 #endif /* NOSTREAMIO */
     friend void swap_levels();
     friend Variable rootOf( const CanonicalForm &, char name );

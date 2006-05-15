@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: readcf.y,v 1.9 2006-05-15 08:17:55 Singular Exp $ */
+/* $Id: readcf.y,v 1.10 2006-05-15 09:03:07 Singular Exp $ */
 
 %{
 
@@ -14,8 +14,12 @@
 #include <ctype.h>
 #ifdef HAVE_IOSTREAM
 #include <iostream>
+#define ISTREAM std::istream
+#define CERR std::cerr
 #elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#define ISTREAM istream
+#define CERR cerr
 #endif
 
 
@@ -34,14 +38,14 @@
 #define YY_parse_STYPE ParseUtil
 #endif
 
-static char* readString( istream& );
+static char* readString( ISTREAM& );
 
 #ifndef BISONPP
 void yyerror( char * s );
 int yylex();
 #endif
 
-static istream * defaultin = 0;
+static ISTREAM * defaultin = 0;
 
 static CanonicalForm * retvalue = 0;
 
@@ -85,7 +89,7 @@ void YY_parse_CLASS::yyerror( char * s )
 void yyerror( char * s )
 #endif
 {
-    cerr << s << endl;
+    CERR << s << "\n";
 }
 
 #ifdef BISONPP
@@ -143,7 +147,7 @@ int yylex()
     return c;
 }
 
-CanonicalForm readCF( istream& str )
+CanonicalForm readCF( ISTREAM& str )
 {
     CanonicalForm theRetvalue;
     retvalue = new CanonicalForm();
@@ -173,7 +177,7 @@ CanonicalForm readCF( istream& str )
 #endif
 }
 
-char* readString( istream& s )
+char* readString( ISTREAM& s )
 {
     static char * buffer = 0;
     static int bufsize = 0;

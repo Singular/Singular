@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.31 2006-05-15 08:17:49 Singular Exp $ */
+/* $Id: canonicalform.h,v 1.32 2006-05-15 09:03:04 Singular Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -9,8 +9,12 @@
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM
 #include <iostream>
+#define OSTREAM std::ostream
+#define ISTREAM std::istream
 #elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#define OSTREAM ostream
+#define ISTREAM istream
 #endif
 #endif /* NOSTREAMIO */
 
@@ -157,10 +161,10 @@ public:
 
     // input/output
 #ifndef NOSTREAMIO
-    void print( ostream&, char * ) const;
-    void print( ostream& ) const;
-    friend ostream& operator << ( ostream&, const CanonicalForm& );
-    friend istream& operator >> ( istream&, CanonicalForm& );
+    void print( OSTREAM&, char * ) const;
+    void print( OSTREAM& ) const;
+    friend OSTREAM& operator << ( OSTREAM&, const CanonicalForm& );
+    friend ISTREAM& operator >> ( ISTREAM&, CanonicalForm& );
 #endif /* NOSTREAMIO */
 
     // obsolete methods

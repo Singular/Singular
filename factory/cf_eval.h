@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_eval.h,v 1.4 2006-05-15 08:17:50 Singular Exp $ */
+/* $Id: cf_eval.h,v 1.5 2006-05-15 09:03:04 Singular Exp $ */
 
 #ifndef INCL_CF_EVAL_H
 #define INCL_CF_EVAL_H
@@ -9,8 +9,10 @@
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM
 #include <iostream>
+#define OSTREAM std::ostream
 #elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#define OSTREAM ostream
 #endif
 #endif /* NOSTREAMIO */
 
@@ -36,7 +38,7 @@ public:
     CanonicalForm operator() ( const CanonicalForm & f, int i, int j ) const;
     virtual void nextpoint();
 #ifndef NOSTREAMIO
-    friend ostream& operator<< ( ostream& s, const Evaluation &e );
+    friend OSTREAM& operator<< ( OSTREAM& s, const Evaluation &e );
 #endif /* NOSTREAMIO */
 };
 

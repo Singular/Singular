@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_int.cc,v 1.17 2003-10-15 17:19:40 Singular Exp $ */
+/* $Id: int_int.cc,v 1.18 2006-05-15 09:03:06 Singular Exp $ */
 
 #include <config.h>
 
@@ -44,7 +44,7 @@ InternalCF* InternalInteger::deepCopyObject() const
 }
 
 #ifndef NOSTREAMIO
-void InternalInteger::print( ostream & os, char * c )
+void InternalInteger::print( OSTREAM & os, char * c )
 {
     if ( *c == '*' && mpz_cmp_si( &thempi, 1 ) == 0 )
         os << c+1;

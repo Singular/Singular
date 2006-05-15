@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: variable.cc,v 1.5 2005-04-13 15:01:53 Singular Exp $ */
+/* $Id: variable.cc,v 1.6 2006-05-15 09:03:07 Singular Exp $ */
 
 #include <config.h>
 
@@ -129,7 +129,7 @@ Variable::name() const
 }
 
 #ifndef NOSTREAMIO
-ostream & operator << ( ostream & os, const Variable & v )
+OSTREAM & operator << ( OSTREAM & os, const Variable & v )
 {
     if ( v._level == LEVELBASE )
 	os << "1";

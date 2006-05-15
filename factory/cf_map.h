@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_map.h,v 1.13 2006-05-15 08:17:50 Singular Exp $ */
+/* $Id: cf_map.h,v 1.14 2006-05-15 09:03:04 Singular Exp $ */
 
 #ifndef INCL_CF_MAP_H
 #define INCL_CF_MAP_H
@@ -15,8 +15,10 @@
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM
 #include <iostream>
+#define OSTREAM std::ostream
 #elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#define OSTREAM ostream
 #endif
 #endif /* NOSTREAMIO */
 
@@ -59,8 +61,8 @@ public:
     Variable var () const { return V; }
     CanonicalForm subst () const { return S; }
 #ifndef NOSTREAMIO
-    void print( ostream&) const;
-    friend ostream & operator << ( ostream & s, const MapPair & p );
+    void print( OSTREAM&) const;
+    friend OSTREAM & operator << ( OSTREAM & s, const MapPair & p );
 #endif /* NOSTREAMIO */
 };
 //}}}
@@ -98,7 +100,7 @@ public:
   void newpair ( const Variable & v, const CanonicalForm & s );
   CanonicalForm operator () ( const CanonicalForm & f ) const;
 #ifndef NOSTREAMIO
-  friend ostream & operator << ( ostream & s, const CFMap & m );
+  friend OSTREAM & operator << ( OSTREAM & s, const CFMap & m );
 #endif /* NOSTREAMIO */
 };
 //}}}

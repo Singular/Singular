@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.cc,v 1.17 2006-04-21 15:37:10 Singular Exp $ */
+/* $Id: int_poly.cc,v 1.18 2006-05-15 09:03:06 Singular Exp $ */
 
 #include <config.h>
 
@@ -168,7 +168,7 @@ InternalPoly::coeff ( int i )
 
 #ifndef NOSTREAMIO
 void
-InternalPoly::print(ostream &aStream, char * aString )
+InternalPoly::print(OSTREAM &aStream, char * aString )
 {
     if ( ! firstTerm )
         aStream << 0 << aString;

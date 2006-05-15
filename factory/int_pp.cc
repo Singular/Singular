@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_pp.cc,v 1.10 2003-10-15 17:19:41 Singular Exp $ */
+/* $Id: int_pp.cc,v 1.11 2006-05-15 09:03:06 Singular Exp $ */
 
 #include <config.h>
 
@@ -109,7 +109,7 @@ InternalPrimePower::getk()
 }
 
 #ifndef NOSTREAMIO
-void InternalPrimePower::print( ostream & os, char * c )
+void InternalPrimePower::print( OSTREAM & os, char * c )
 {
     if ( *c == '*' && mpz_cmp_si( &thempi, 1 ) == 0 )
 	os << c+1;

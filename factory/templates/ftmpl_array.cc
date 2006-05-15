@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_array.cc,v 1.8 1998-03-10 14:51:21 schmidt Exp $ */
+/* $Id: ftmpl_array.cc,v 1.9 2006-05-15 09:03:07 Singular Exp $ */
 
 #include <factoryconf.h>
 
@@ -142,7 +142,7 @@ Array<T>& Array<T>::operator+= ( const Array<T> & a )
 
 #ifndef NOSTREAMIO
 template <class T>
-void Array<T>::print ( ostream & os ) const
+void Array<T>::print ( OSTREAM & os ) const
 {
     if ( _size == 0 )
 	os << "( )";
@@ -155,7 +155,7 @@ void Array<T>::print ( ostream & os ) const
 }
 
 template <class T>
-ostream& operator<< ( ostream & os, const Array<T> & a )
+OSTREAM& operator<< ( OSTREAM & os, const Array<T> & a )
 {
     a.print( os );
     return os;

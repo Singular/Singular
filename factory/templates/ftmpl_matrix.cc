@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_matrix.cc,v 1.10 2001-06-27 13:20:39 Singular Exp $ */
+/* $Id: ftmpl_matrix.cc,v 1.11 2006-05-15 09:03:07 Singular Exp $ */
 
 #include <factoryconf.h>
 
@@ -142,7 +142,7 @@ void Matrix<T>::swapColumn ( int i, int j )
 
 #ifndef NOSTREAMIO
 template <class T>
-void Matrix<T>::printrow ( ostream & s, int i ) const
+void Matrix<T>::printrow ( OSTREAM & s, int i ) const
 {
     s << "( " << elems[i][0];
     for ( int j = 1; j < NC; j++ )
@@ -151,7 +151,7 @@ void Matrix<T>::printrow ( ostream & s, int i ) const
 }
 
 template <class T>
-void Matrix<T>::print( ostream& s ) const
+void Matrix<T>::print( OSTREAM& s ) const
 {
     if ( NR == 0 )
 	s << "( )";
@@ -318,7 +318,7 @@ T& SubMatrix<T>::operator[] ( int i )
 
 #ifndef NOSTREAMIO
 template <class T>
-ostream & operator<< ( ostream & s, const Matrix<T>& M )
+OSTREAM & operator<< ( OSTREAM & s, const Matrix<T>& M )
 {
    M.print( s );
    return s;

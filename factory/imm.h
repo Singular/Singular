@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: imm.h,v 1.21 2006-05-15 08:17:53 Singular Exp $ */
+/* $Id: imm.h,v 1.22 2006-05-15 09:03:05 Singular Exp $ */
 
 #ifndef INCL_IMM_H
 #define INCL_IMM_H
@@ -9,8 +9,10 @@
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM
 #include <iostream>
+#define OSTREAM std::ostream
 #elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#define OSTREAM ostream
 #endif
 #endif /* NOSTREAMIO */
 
@@ -423,7 +425,7 @@ imm_neg_gf ( const InternalCF * const op )
 
 //{{{ input/output
 #ifndef NOSTREAMIO
-inline void imm_print ( ostream & os, const InternalCF * const op, const char * const str )
+inline void imm_print ( OSTREAM & os, const InternalCF * const op, const char * const str )
 {
     if ( is_imm( op ) == FFMARK )
         if ( cf_glob_switches.isOn( SW_SYMMETRIC_FF ) )

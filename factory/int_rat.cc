@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_rat.cc,v 1.12 1999-09-24 08:43:29 Singular Exp $ */
+/* $Id: int_rat.cc,v 1.13 2006-05-15 09:03:06 Singular Exp $ */
 
 #include <config.h>
 
@@ -94,7 +94,7 @@ InternalCF* InternalRational::deepCopyObject() const
 }
 
 #ifndef NOSTREAMIO
-void InternalRational::print( ostream & os, char * c )
+void InternalRational::print( OSTREAM & os, char * c )
 {
     char * str = new char[mpz_sizeinbase( &_num, 10 ) + 2];
     str = mpz_get_str( str, 10, &_num );

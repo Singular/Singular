@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_matrix.h,v 1.3 2006-05-15 08:17:53 Singular Exp $ */
+/* $Id: ftmpl_matrix.h,v 1.4 2006-05-15 09:03:05 Singular Exp $ */
 
 #ifndef INCL_MATRIX_H
 #define INCL_MATRIX_H
@@ -9,8 +9,10 @@
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM
 #include <iostream>
+#define OSTREAM std::ostream
 #elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#define OSTREAM ostream
 #endif
 #endif /* NOSTREAMIO */
 
@@ -22,7 +24,7 @@ class Matrix;
 
 #ifndef NOSTREAMIO
 template <class T>
-ostream& operator<< (ostream &, const Matrix<T> &);
+OSTREAM& operator<< (OSTREAM &, const Matrix<T> &);
 #endif
 
 template <class T>
@@ -32,7 +34,7 @@ private:
     int NR, NC;
     T ** elems;
 #ifndef NOSTREAMIO
-    void printrow ( ostream & s, int i ) const;
+    void printrow ( OSTREAM & s, int i ) const;
 #endif /* NOSTREAMIO */
     typedef T* T_ptr;
 public:
@@ -52,8 +54,8 @@ public:
     void swapRow( int i, int j );
     void swapColumn( int i, int j );
 #ifndef NOSTREAMIO
-    void print( ostream& s ) const;
-    friend ostream & operator<< <T>( ostream & s, const Matrix<T>& M );
+    void print( OSTREAM& s ) const;
+    friend OSTREAM & operator<< <T>( OSTREAM & s, const Matrix<T>& M );
 #endif /* NOSTREAMIO */
     friend class SubMatrix<T>;
 };
@@ -88,7 +90,7 @@ public:
 
 #ifndef NOSTREAMIO
 template <class T>
-ostream & operator<< ( ostream & s, const Matrix<T>& M );
+OSTREAM & operator<< ( OSTREAM & s, const Matrix<T>& M );
 #endif /* NOSTREAMIO */
 
 #endif /* ! INCL_MATRIX_H */

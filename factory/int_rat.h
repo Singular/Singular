@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_rat.h,v 1.7 2006-05-15 08:17:55 Singular Exp $ */
+/* $Id: int_rat.h,v 1.8 2006-05-15 09:03:06 Singular Exp $ */
 
 #ifndef INCL_INT_RAT_H
 #define INCL_INT_RAT_H
@@ -9,8 +9,10 @@
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM
 #include <iostream>
+#define OSTREAM std::ostream
 #elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#define OSTREAM ostream
 #endif
 #endif /* NOSTREAMIO */
 
@@ -46,7 +48,7 @@ public:
     InternalCF* deepCopyObject() const;
     const char * const classname() const { return "InternalRational"; }
 #ifndef NOSTREAMIO
-    void print( ostream&, char* );
+    void print( OSTREAM&, char* );
 #endif /* NOSTREAMIO */
     InternalCF* genZero();
     InternalCF* genOne();

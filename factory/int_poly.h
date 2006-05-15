@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.h,v 1.9 2006-05-15 08:17:54 Singular Exp $ */
+/* $Id: int_poly.h,v 1.10 2006-05-15 09:03:06 Singular Exp $ */
 
 #ifndef INCL_INT_POLY_H
 #define INCL_INT_POLY_H
@@ -9,8 +9,10 @@
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM
 #include <iostream>
+#define OSTREAM std::ostream
 #elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#define OSTREAM ostream
 #endif
 #endif /* NOSTREAMIO */
 
@@ -94,7 +96,7 @@ public:
     CanonicalForm tailcoeff();
     CanonicalForm coeff( int i );
 #ifndef NOSTREAMIO
-    void print( ostream&, char* );
+    void print( OSTREAM&, char* );
 #endif /* NOSTREAMIO */
     bool inBaseDomain() const { return false; }
     bool inExtension() const { return var.level() < 0; }

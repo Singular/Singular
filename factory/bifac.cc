@@ -78,7 +78,7 @@ public:
       return 0;
   }
 #ifndef NOSTREAMIO
-  friend ostream & operator<< ( ostream & s, const PolyVector& V ){
+  friend OSTREAM & operator<< ( OSTREAM & s, const PolyVector& V ){
     for (int i=0;i<=V.m;i++)
     {
       s << "[";

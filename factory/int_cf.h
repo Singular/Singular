@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_cf.h,v 1.11 2006-05-15 08:17:54 Singular Exp $ */
+/* $Id: int_cf.h,v 1.12 2006-05-15 09:03:05 Singular Exp $ */
 
 #ifndef INCL_INT_CF_H
 #define INCL_INT_CF_H
@@ -9,8 +9,10 @@
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM
 #include <iostream>
+#define OSTREAM std::ostream
 #elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#define OSTREAM ostream
 #endif
 #endif /* NOSTREAMIO */
 
@@ -46,7 +48,7 @@ public:
     virtual int type() const { return UndefinedDomain; }
     virtual Variable variable() const { return Variable(); }
 #ifndef NOSTREAMIO
-    virtual void print( ostream&, char* ) PVIRT_VOID("print");
+    virtual void print( OSTREAM&, char* ) PVIRT_VOID("print");
 #endif /* NOSTREAMIO */
     virtual bool inBaseDomain() const { return true; }
     virtual bool inExtension() const { return false; }

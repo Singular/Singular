@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.39 2005-12-12 12:17:35 Singular Exp $ */
+/* $Id: canonicalform.cc,v 1.40 2006-05-15 09:03:04 Singular Exp $ */
 
 #include <config.h>
 
@@ -20,7 +20,7 @@
 #endif
 
 #ifndef NOSTREAMIO
-CanonicalForm readCF( istream& );
+CanonicalForm readCF( ISTREAM& );
 #endif /* NOSTREAMIO */
 
 //{{{ initialization
@@ -1614,7 +1614,7 @@ blcm ( const CanonicalForm & f, const CanonicalForm & g )
 //{{{ input/output
 #ifndef NOSTREAMIO
 void
-CanonicalForm::print( ostream & os, char * str ) const
+CanonicalForm::print( OSTREAM & os, char * str ) const
 {
     if ( is_imm( value ) )
         imm_print( os, value, str );
@@ -1623,7 +1623,7 @@ CanonicalForm::print( ostream & os, char * str ) const
 }
 
 void
-CanonicalForm::print( ostream & os ) const
+CanonicalForm::print( OSTREAM & os ) const
 {
     if ( is_imm( value ) )
         imm_print( os, value, "" );
@@ -1631,15 +1631,15 @@ CanonicalForm::print( ostream & os ) const
         value->print( os, "" );
 }
 
-ostream&
-operator << ( ostream & os, const CanonicalForm & cf )
+OSTREAM&
+operator << ( OSTREAM & os, const CanonicalForm & cf )
 {
     cf.print( os, "" );
     return os;
 }
 
-istream&
-operator >> ( istream & is, CanonicalForm & cf )
+ISTREAM&
+operator >> ( ISTREAM & is, CanonicalForm & cf )
 {
 #ifndef SINGULAR
     cf = readCF( is );

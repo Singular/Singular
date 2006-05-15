@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gfops.h,v 1.7 2006-05-15 08:17:53 Singular Exp $ */
+/* $Id: gfops.h,v 1.8 2006-05-15 09:03:05 Singular Exp $ */
 
 #ifndef INCL_GFOPS_H
 #define INCL_GFOPS_H
@@ -9,8 +9,10 @@
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM
 #include <iostream>
+#define OSTREAM std::ostream
 #elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#define OSTREAM ostream
 #endif
 #endif /* NOSTREAMIO */
 
@@ -158,7 +160,7 @@ inline int gf_inv ( int a )
 
 //{{{ input/output
 #ifndef NOSTREAMIO
-inline void gf_print ( ostream & os, int a )
+inline void gf_print ( OSTREAM & os, int a )
 {
     if ( a == gf_q )
 	os << "0";

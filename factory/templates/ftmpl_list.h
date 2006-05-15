@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_list.h,v 1.9 2006-05-15 08:17:56 Singular Exp $ */
+/* $Id: ftmpl_list.h,v 1.10 2006-05-15 09:03:07 Singular Exp $ */
 
 #ifndef INCL_LIST_H
 #define INCL_LIST_H
@@ -9,8 +9,10 @@
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM
 #include <iostream>
+#define OSTREAM std::ostream
 #elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#define OSTREAM ostream
 #endif
 #endif /* NOSTREAMIO */
 
@@ -22,7 +24,7 @@ class List;
 
 #ifndef NOSTREAMIO
 template <class T>
-std::ostream& operator<< ( std::ostream &, const List<T> &);
+OSTREAM& operator<< ( OSTREAM &, const List<T> &);
 #endif
 
 template <class T>
@@ -42,7 +44,7 @@ public:
     ListItem<T>* getPrev();
     T& getItem();
 #ifndef NOSTREAMIO
-    void print ( ostream& );
+    void print ( OSTREAM& );
 #endif /* NOSTREAMIO */
     friend class ListIterator<T>;
     friend class List<T>;
@@ -73,15 +75,15 @@ public:
     void removeLast();
     void sort ( int (*) ( const T&, const T& ) );
 #ifndef NOSTREAMIO
-    void print ( ostream & ) const;
-    friend ostream& operator<< <T>( ostream & os, const List<T> & l );
+    void print ( OSTREAM & ) const;
+    friend OSTREAM& operator<< <T>( OSTREAM & os, const List<T> & l );
 #endif /* NOSTREAMIO */
     friend class ListIterator<T>;
 };
 
 #ifndef NOSTREAMIO
 template <class T>
-ostream& operator<< ( ostream & os, const List<T> & l );
+OSTREAM& operator<< ( OSTREAM & os, const List<T> & l );
 #endif /* NOSTREAMIO */
 
 template <class T>

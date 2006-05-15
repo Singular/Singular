@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_map.cc,v 1.13 2006-01-31 09:40:48 pohl Exp $ */
+/* $Id: cf_map.cc,v 1.14 2006-05-15 09:03:04 Singular Exp $ */
 
 //{{{ docu
 //
@@ -34,21 +34,21 @@ MapPair::operator = ( const MapPair & p )
 //}}}
 
 #ifndef NOSTREAMIO
-//{{{ ostream & operator << ( ostream & s, const MapPair & p )
+//{{{ OSTREAM & operator << ( OSTREAM & s, const MapPair & p )
 //{{{ docu
 //
 // operator << - print a map pair ("V -> S").
 //
 //}}}
-ostream &
-operator << ( ostream & s, const MapPair & p )
+OSTREAM &
+operator << ( OSTREAM & s, const MapPair & p )
 {
     s << p.var() << " -> " << p.subst();
     return s;
 }
 //}}}
 
-void MapPair::print( ostream&) const
+void MapPair::print( OSTREAM&) const
 {
 }
 #endif /* NOSTREAMIO */
@@ -197,14 +197,14 @@ CFMap::operator () ( const CanonicalForm & f ) const
 //}}}
 
 #ifndef NOSTREAMIO
-//{{{ ostream & operator << ( ostream & s, const CFMap & m )
+//{{{ OSTREAM & operator << ( OSTREAM & s, const CFMap & m )
 //{{{ docu
 //
 // operator << - print a CFMap ("( V[1] -> S[1], ..., V[n] -> // S[n] )".
 //
 //}}}
-ostream &
-operator << ( ostream & s, const CFMap & m )
+OSTREAM &
+operator << ( OSTREAM & s, const CFMap & m )
 {
     m.P.print(s);
     return s;

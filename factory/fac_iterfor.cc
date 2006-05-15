@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_iterfor.cc,v 1.5 1997-12-08 18:24:31 schmidt Exp $ */
+/* $Id: fac_iterfor.cc,v 1.6 2006-05-15 09:03:04 Singular Exp $ */
 
 #include <config.h>
 
@@ -97,7 +97,7 @@ IteratedFor::operator[] ( int i ) const
 }
 
 #ifndef NOSTREAMIO
-ostream& operator<< ( ostream& os, const IteratedFor & I )
+OSTREAM& operator<< ( OSTREAM& os, const IteratedFor & I )
 {
     os << "( " << I[I.from()];
     for ( int i = I.from()+1; i <= I.to(); i++ )

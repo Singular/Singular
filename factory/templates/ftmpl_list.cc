@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_list.cc,v 1.8 2003-02-11 16:28:51 Singular Exp $ */
+/* $Id: ftmpl_list.cc,v 1.9 2006-05-15 09:03:07 Singular Exp $ */
 
 #include <factoryconf.h>
 
@@ -77,7 +77,7 @@ T& ListItem<T>::getItem()
 
 #ifndef NOSTREAMIO
 template <class T>
-void ListItem<T>::print( ostream & os )
+void ListItem<T>::print( OSTREAM & os )
 {
     if ( item )
 	os << *item;
@@ -330,7 +330,7 @@ void List<T>::sort( int (*swapit) ( const T&, const T& ) )
 
 #ifndef NOSTREAMIO
 template <class T>
-void List<T>::print ( ostream & os ) const
+void List<T>::print ( OSTREAM & os ) const
 {
     ListItem<T> *cur = first;
     os << "( ";
@@ -509,7 +509,7 @@ void ListIterator<T>::remove ( int moveright )
 
 #ifndef NOSTREAMIO
 template <class T>
-ostream& operator<<( ostream & os, const List<T> & l )
+OSTREAM& operator<<( OSTREAM & os, const List<T> & l )
 {
     l.print( os );
     return os;
