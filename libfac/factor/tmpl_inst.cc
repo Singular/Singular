@@ -1,7 +1,7 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: tmpl_inst.cc,v 1.6 2003-04-09 13:39:12 Singular Exp $
+// $Id: tmpl_inst.cc,v 1.7 2006-05-16 14:58:54 hannes Exp $
 ////////////////////////////////////////////////////////////
 
 
@@ -25,12 +25,12 @@ template class Matrix<CanonicalForm>;
 template class SubMatrix<CanonicalForm>;
 
 #ifndef NOSTREAMIO
-template ostream & operator << ( ostream &, const List<CanonicalForm> & );
-template ostream & operator << ( ostream &, const List<CFFactor> & );
-template ostream & operator << ( ostream &, const List<MapPair> & );
-template ostream & operator << ( ostream &, const Array<CanonicalForm> & );
-template ostream & operator << ( ostream &, const Factor<CanonicalForm> & );
-//template ostream & operator << ( ostream &, const Matrix<CanonicalForm> & );
+template OSTREAM & operator << ( OSTREAM &, const List<CanonicalForm> & );
+template OSTREAM & operator << ( OSTREAM &, const List<CFFactor> & );
+template OSTREAM & operator << ( OSTREAM &, const List<MapPair> & );
+template OSTREAM & operator << ( OSTREAM &, const Array<CanonicalForm> & );
+template OSTREAM & operator << ( OSTREAM &, const Factor<CanonicalForm> & );
+//template OSTREAM & operator << ( OSTREAM &, const Matrix<CanonicalForm> & );
 #endif
 
 template List<CFFactor> Union ( const List<CFFactor>&, const List<CFFactor>& );
@@ -64,8 +64,8 @@ template List<CanonicalForm> Union ( const List<CanonicalForm>&, const List<Cano
 template List<CanonicalForm> Difference ( const List<CanonicalForm>&, const List<CanonicalForm>& );
 
 #ifndef NOSTREAMIO
-template ostream & operator << ( ostream &, const List<int> & );
-template ostream & operator << ( ostream &, const List<IntList> & );
+template OSTREAM & operator << ( OSTREAM &, const List<int> & );
+template OSTREAM & operator << ( OSTREAM &, const List<IntList> & );
 #endif
 
 // for charsets:
@@ -78,9 +78,9 @@ template List<Variable> Union ( const List<Variable>&, const List<Variable>& );
 template List<Variable> Difference ( const List<Variable>&, const List<Variable>& );
 
 #ifndef NOSTREAMIO
-template ostream & operator << ( ostream &, const List<CFList> & );
-template ostream & operator << ( ostream &, const List<Variable> & );
-template ostream & operator << ( ostream &, const Array<int> & );
+template OSTREAM & operator << ( OSTREAM &, const List<CFList> & );
+template OSTREAM & operator << ( OSTREAM &, const List<Variable> & );
+template OSTREAM & operator << ( OSTREAM &, const Array<int> & );
 #endif
 
 template class Array<int>;
@@ -95,6 +95,9 @@ template class ListIterator<CFFList>;
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.6  2003/04/09 13:39:12  Singular
+* hannes/Cornelsen: integrated stand-allone fixes
+
 Revision 1.5  2001/08/08 11:59:13  Singular
 *hannes: Dan's NOSTREAMIO changes
 
