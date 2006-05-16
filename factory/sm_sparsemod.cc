@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: sm_sparsemod.cc,v 1.8 2000-04-05 10:03:09 Singular Exp $ */
+/* $Id: sm_sparsemod.cc,v 1.9 2006-05-16 13:43:19 Singular Exp $ */
 
 //{{{ docu
 //
@@ -453,7 +453,7 @@ internalSparsemod( const CanonicalForm & F, const CanonicalForm & G )
       q     *= p[ length ];  //G[levU] = ( 1/lc(G[levU] ))* G[levU];// sinnig?
       //cout << " lcggt = " << lcggt << endl;
       //bool ja;
-      //ja = divides( lcggt, lc( G[levU] ) );
+      //ja = fdivides( lcggt, lc( G[levU] ) );
       //cout << " ja = " << ja << endl;
       //cout << " vor Verlassen " << endl;
     }
@@ -536,7 +536,7 @@ internalSparsemod( const CanonicalForm & F, const CanonicalForm & G )
       else
         res = result;
 
-      if ( divides( res, primif ) && divides( res, primig ) )
+      if ( fdivides( res, primif ) && fdivides( res, primig ) )
         return  N(NN(res))*N(ggt) ;     /// compress rueckgaengig machen!
       else
       {
@@ -586,7 +586,7 @@ internalSparsemod( const CanonicalForm & F, const CanonicalForm & G )
         else
           res = result;
 
-        if ( ( divides( res, primif )) && ( divides ( res, primig ) ))
+        if ( ( fdivides( res, primif )) && ( fdivides ( res, primig ) ))
         {
           // make monic ////
           res = (1/lc(res)) * res;

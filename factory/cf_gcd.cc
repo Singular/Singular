@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.46 2006-05-08 12:24:04 pohl Exp $ */
+/* $Id: cf_gcd.cc,v 1.47 2006-05-16 13:43:18 Singular Exp $ */
 
 #include <config.h>
 
@@ -269,7 +269,7 @@ gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primiti
     {
       // now balance D mod q
       D = pp( balance( D, q ) );
-      if ( divides( D, f ) && divides( D, g ) )
+      if ( fdivides( D, f ) && fdivides( D, g ) )
         return D * c;
       else
         q = 0;
@@ -619,15 +619,15 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
             return 1;
         else
         {
-            if ( divides( f, g ) )
+            if ( fdivides( f, g ) )
                 return abs( f );
-            else  if ( divides( g, f ) )
+            else  if ( fdivides( g, f ) )
                 return abs( g );
             if ( !( getCharacteristic() == 0 && isOn( SW_RATIONAL ) ) )
             {
                 CanonicalForm d;
                 do{ d = gcd_poly( f, g ); }
-                while ((!divides(d,f)) || (!divides(d,g)));
+                while ((!fdivides(d,f)) || (!fdivides(d,g)));
                 return abs( d );
             }
             else
@@ -640,7 +640,7 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
                 CanonicalForm F = f * l, G = g * l;
                 Off( SW_RATIONAL );
                 do { l = gcd_poly( F, G ); }
-                while ((!divides(l,F)) || (!divides(l,G)));
+                while ((!fdivides(l,F)) || (!fdivides(l,G)));
                 On( SW_RATIONAL );
                 return abs( l );
             }

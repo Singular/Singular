@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.h,v 1.13 2006-05-15 08:17:36 Singular Exp $ */
+/* $Id: cf_algorithm.h,v 1.14 2006-05-16 13:43:18 Singular Exp $ */
 
 #ifndef INCL_CF_ALGORITHM_H
 #define INCL_CF_ALGORITHM_H
@@ -39,7 +39,7 @@ void psqr ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q,
 
 CanonicalForm bCommonDen ( const CanonicalForm & f );
 
-bool divides ( const CanonicalForm & f, const CanonicalForm & g );
+bool fdivides ( const CanonicalForm & f, const CanonicalForm & g );
 
 CanonicalForm maxNorm ( const CanonicalForm & f );
 

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_ezgcd.cc,v 1.26 2006-01-30 09:06:18 pohl Exp $ */
+/* $Id: fac_ezgcd.cc,v 1.27 2006-05-16 13:43:18 Singular Exp $ */
 
 #include <config.h>
 
@@ -109,12 +109,12 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
         }
         DEBOUTLN( cerr, "now after A4, delta = " << delta );
         /// ---> A5
-        if ( degF <= degG && delta == degF && divides( F, G ) )
+        if ( degF <= degG && delta == degF && fdivides( F, G ) )
         {
             DEBDECLEVEL( cerr, "ezgcd" );
             return d*F;
         }
-        if ( degG < degF && delta == degG && divides( G, F ) )
+        if ( degG < degF && delta == degG && fdivides( G, F ) )
         {
             DEBDECLEVEL( cerr, "ezgcd" );
             return d*G;
@@ -182,17 +182,17 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
               CanonicalForm xxx=content(DD[2],Variable(1));
               CanonicalForm cand=DD[2] / xxx; //content(DD[2],Variable(1));
 #if 0
-              gcdfound= divides(cand,G) &&  divides(cand,F);
+              gcdfound= fdivides(cand,G) &&  fdivides(cand,F);
 #else
               if (B_is_F /*B==F*lcF*/)
               {
                 DEBOUTLN( cerr, "(test) G: "<<G<<" % gcd:"<<cand<<" -> " << G%cand );
-                gcdfound= divides(cand,G);
+                gcdfound= fdivides(cand,G);
               }
               else
               {
                 DEBOUTLN( cerr, "(test) F: "<<F<<" % gcd:"<<cand<<" -> " << F%cand);
-                gcdfound= divides(cand,F);
+                gcdfound= fdivides(cand,F);
               }
 #endif
             }

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.cc,v 1.10 2005-12-09 08:35:37 Singular Exp $ */
+/* $Id: cf_algorithm.cc,v 1.11 2006-05-16 13:43:18 Singular Exp $ */
 
 //{{{ docu
 //
@@ -292,10 +292,10 @@ bCommonDen ( const CanonicalForm & f )
 }
 //}}}
 
-//{{{ bool divides ( const CanonicalForm & f, const CanonicalForm & g )
+//{{{ bool fdivides ( const CanonicalForm & f, const CanonicalForm & g )
 //{{{ docu
 //
-// divides() - check whether `f' divides `g'.
+// fdivides() - check whether `f' divides `g'.
 //
 // Returns true iff `f' divides `g'.  Uses some extra heuristic
 // to avoid polynomial division.  Without the heuristic, the test
@@ -314,18 +314,18 @@ bCommonDen ( const CanonicalForm & f )
 //
 // Developers note:
 // ----------------
-// One may consider the the test `divides( f.LC(), g.LC() )' in
+// One may consider the the test `fdivides( f.LC(), g.LC() )' in
 // the main `if'-test superfluous since `divremt()' in the
 // `if'-body repeats the test.  However, `divremt()' does not use
 // any heuristic to do so.
 //
-// It seems not reasonable to call `divides()' from `divremt()'
-// to check divisibility of leading coefficients.  `divides()' is
+// It seems not reasonable to call `fdivides()' from `divremt()'
+// to check divisibility of leading coefficients.  `fdivides()' is
 // on a relatively high level compared to `divremt()'.
 //
 //}}}
 bool
-divides ( const CanonicalForm & f, const CanonicalForm & g )
+fdivides ( const CanonicalForm & f, const CanonicalForm & g )
 {
     // trivial cases
     if ( g.isZero() )
@@ -350,8 +350,8 @@ divides ( const CanonicalForm & f, const CanonicalForm & g )
     if ( gLevel > 0 && fLevel == gLevel )
 	// f and g are polynomials in the same main variable
 	if ( degree( f ) <= degree( g )
-	     && divides( f.tailcoeff(), g.tailcoeff() )
-	     && divides( f.LC(), g.LC() ) ) {
+	     && fdivides( f.tailcoeff(), g.tailcoeff() )
+	     && fdivides( f.LC(), g.LC() ) ) {
 	    CanonicalForm q, r;
 	    return divremt( g, f, q, r ) && r.isZero();
 	}

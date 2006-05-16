@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_distrib.cc,v 1.7 2002-10-10 17:43:40 Singular Exp $ */
+/* $Id: fac_distrib.cc,v 1.8 2006-05-16 13:43:18 Singular Exp $ */
 
 #include <config.h>
 
@@ -78,7 +78,7 @@ distributeLeadingCoeffs ( CanonicalForm & U, CFArray & G, CFArray & lcG, const C
         while ( m > 0 && j <= r ) {
             ut = lc( G[j] );
             DEBOUTLN( cerr, "checking with " << ut );
-            while ( m > 0 && divides( D[i], ut ) ) {
+            while ( m > 0 && fdivides( D[i], ut ) ) {
                 DEBOUTLN( cerr, "match found" );
                 m--; ut /= D[i];
                 lcG[j] *= ft;
@@ -128,7 +128,7 @@ gfbAdjoin ( const CanonicalForm & F, CFList & L )
             i++;
             continue;
         }
-        while ( divides( h, f ) )
+        while ( fdivides( h, f ) )
             f /= h;
         CFList D( h );
         gfbAdjoin( i.getItem() / h, D );
