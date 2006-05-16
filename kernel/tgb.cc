@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.87 2006-05-07 06:16:01 bricken Exp $ */
+/* $Id: tgb.cc,v 1.88 2006-05-16 08:38:39 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1229,6 +1229,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
   c->short_Exps[i]=p_GetShortExpVector(h,c->r);
 
 #undef ENLARGE
+  if (p_GetComp(h,currRing)<=c->syz_comp){
   for (j=0;j<i;j++){
 
 
@@ -1345,7 +1346,11 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
         //c->states[i][j]=HASTREP;
   //}
   }
-
+  }//if syz_comp end
+  
+  
+  
+  
   assume(spc<=i);
   //now ideal quotient crit
   qsort(nodes,spc,sizeof(sorted_pair_node*),iq_crit);
@@ -2090,9 +2095,9 @@ static int poly_crit(const void* ap1, const void* ap2){
   if (l1>l2) return 1;
   return 0;
 }
-slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
+slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
 
-
+  this->syz_comp=syz_comp;
   r=currRing;
   nc=rIsPluralRing(r);
 
@@ -2359,6 +2364,7 @@ slimgb_alg::~slimgb_alg(){
   for(i=0;i<c->n;i++)
   {
     assume(c->S->m[i]!=NULL);
+    if (p_GetComp(c->S->m[i],currRing)>this->syz_comp) continue;
     for(j=0;j<c->n;j++)
     {
       if((c->S->m[j]==NULL)||(i==j))
@@ -2392,10 +2398,10 @@ slimgb_alg::~slimgb_alg(){
   omUnGetSpecBin(&lm_bin);
   delete c->strat;
 }
-ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
+ideal t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode){
 
   //  Print("QlogSize(0) %d, QlogSize(1) %d,QlogSize(-2) %d, QlogSize(5) %d\n", QlogSize(nlInit(0)),QlogSize(nlInit(1)),QlogSize(nlInit(-2)),QlogSize(nlInit(5)));
-
+  
   if (TEST_OPT_PROT)
     if (F4_mode)
       PrintS("F4 Modus \n");
@@ -2416,7 +2422,8 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   qsort(I->m,IDELEMS(I),sizeof(poly),poly_crit);
   //Print("Idelems %i \n----------\n",IDELEMS(I));
   //slimgb_alg* c=(slimgb_alg*) omalloc(sizeof(slimgb_alg));
-  slimgb_alg* c=new slimgb_alg(I, F4_mode);
+  //int syz_comp=arg_I->rank;
+  slimgb_alg* c=new slimgb_alg(I, syz_comp,F4_mode);
 
 
   while(c->pair_top>=0)

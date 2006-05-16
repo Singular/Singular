@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.37 2006-05-07 06:18:00 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.38 2006-05-16 08:38:39 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -93,7 +93,7 @@ struct poly_array_list{
 class slimgb_alg
 {
   public:
-    slimgb_alg(ideal I, BOOLEAN F4);
+    slimgb_alg(ideal I, int syz_comp,BOOLEAN F4);
     virtual ~slimgb_alg();
   #ifndef HAVE_BOOST
   char** states;
@@ -134,6 +134,7 @@ class slimgb_alg
   unsigned int reduction_steps;
   int n;
   //! array_lengths should be greater equal n;
+  int syz_comp;
   int array_lengths; 
   int normal_forms;
   int current_degree;

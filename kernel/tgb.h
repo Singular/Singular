@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.h,v 1.8 2005-10-19 16:10:19 Singular Exp $ */
+/* $Id: tgb.h,v 1.9 2006-05-16 08:38:39 bricken Exp $ */
 /*
 * ABSTRACT: trepgb interface
 */
@@ -18,5 +18,5 @@
 
 
 
-ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode=FALSE);
+ideal t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode=FALSE);
 #endif
