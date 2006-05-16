@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: csutil.cc,v 1.10 2006-04-28 13:45:29 Singular Exp $";
+static char * rcsid = "$Id: csutil.cc,v 1.11 2006-05-16 13:48:13 Singular Exp $";
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -191,7 +191,7 @@ Sprem ( const CanonicalForm &f, const CanonicalForm &g, CanonicalForm & m, Canon
      retvalue= ff;
     }
     m= power(l,n);
-    if ( divides(g,m*f-retvalue) )
+    if ( fdivides(g,m*f-retvalue) )
       q= (m*f-retvalue)/g;
     else {
       q= CanonicalForm(0);
@@ -872,6 +872,9 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.10  2006/04/28 13:45:29  Singular
+*hannes: better tests for 0, 1
+
 Revision 1.9  2003/05/28 11:52:52  Singular
 *pfister/hannes: newfactoras, alg_gcd, divide (see bug_33)
 
