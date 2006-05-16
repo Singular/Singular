@@ -1,12 +1,24 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.9 2001-08-08 14:26:56 Singular Exp $";
+//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.10 2006-05-16 14:46:50 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // Factory - Includes
 #include <factory.h>
 #ifndef NOSTREAMIO
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#define OSTREAM std::ostream
+#define ISTREAM std::istream
+#define CERR std::cerr
+#define CIN std::cin
+#elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#define OSTREAM ostream
+#define ISTREAM istream
+#define CERR cerr
+#define CIN cin
+#endif
 #endif
 // Factor - Includes
 #include "tmpl_inst.h"
@@ -77,7 +89,7 @@ int hasAlgVar(const CanonicalForm &f)
   {
     if (f.level()!=0)
     {
-      //cout << "hasAlgVar:" << f.mvar() <<endl;
+      //CERR << "hasAlgVar:" << f.mvar() <<"\n";
       return 1;
     }
     return hasAlgVar(f.LC());
@@ -161,8 +173,8 @@ static CFFList
 Remove_from_List( const CFFList & L, const CanonicalForm & elem ){
   CFFList Returnlist;
 
-  DEBOUTLN(cout, "Remove_from_List called with L= ",L);
-  DEBOUTLN(cout, "                     and  elem= ",elem);
+  DEBOUTLN(CERR, "Remove_from_List called with L= ",L);
+  DEBOUTLN(CERR, "                     and  elem= ",elem);
   for ( ListIterator<CFFactor> i = L ; i.hasItem(); i++)
     if ( i.getItem().factor() != elem )
       Returnlist.append( i.getItem() );
@@ -219,29 +231,29 @@ Truefactors( const CanonicalForm Ua, int levelU, const SFormList & SubstitutionL
   int c,r = PiList.length(),degU, onemore,M, h = subvardegree(Ua,levelU) + 1;
   ListIterator<CFFactor> i;
 
-  //cout << "SubstitutionList="<< SubstitutionList<<endl;
+  //CERR << "SubstitutionList="<< SubstitutionList<<"\n";
 // step 1: simply test the generated factors alone
   for ( i= PiList; i.hasItem();i++){
     factor = i.getItem();
     //CanonicalForm test_f=change_poly(factor.factor(),SubstitutionList,0);
     CanonicalForm test_f=factor.factor();
-    //cout <<"f:" << factor.factor() << " -> test_f:"<<test_f <<endl;
-    //cout << "           1:" << change_poly(factor.factor(),SubstitutionList,1) <<endl;
+    //CERR <<"f:" << factor.factor() << " -> test_f:"<<test_f <<"\n";
+    //CERR << "           1:" << change_poly(factor.factor(),SubstitutionList,1) <<"\n";
     c= mydivremt(U,test_f,a,b);
     if (  c  && b == U.genZero() && !hasAlgVar(test_f))
     // factor.getFactor() divides U
     {
-      //cout << " teilt:" << test_f <<endl;
+      //CERR << " teilt:" << test_f <<"\n";
       U= a;
       FAC.append(factor);
     }
     else{
-      //cout << " teilt nicht:" << test_f <<endl;
+      //CERR << " teilt nicht:" << test_f <<"\n";
       L.append(factor);
     }
   }
-  DEBOUTLN(cout,"Truefactors: (step1) L  = ", L);
-  DEBOUTLN(cout,"                     FAC= ", FAC);
+  DEBOUTLN(CERR,"Truefactors: (step1) L  = ", L);
+  DEBOUTLN(CERR,"                     FAC= ", FAC);
 
 // step 2: Do we have to check combinations?
   degU = L.length();
@@ -256,9 +268,9 @@ Truefactors( const CanonicalForm Ua, int levelU, const SFormList & SubstitutionL
       M = 1; r = r - FAC.length(); degU = degree(U, levelU)/2;
     }
 
-  DEBOUTLN(cout,"Truefactors: (step2) M   = ", M);
-  DEBOUTLN(cout,"                     r   = ", r);
-  DEBOUTLN(cout,"                     degU= ", degU);
+  DEBOUTLN(CERR,"Truefactors: (step2) M   = ", M);
+  DEBOUTLN(CERR,"                     r   = ", r);
+  DEBOUTLN(CERR,"                     degU= ", degU);
 
 // Now do the real work!
 // Test all the combinations of possible factors.
@@ -276,10 +288,10 @@ Truefactors( const CanonicalForm Ua, int levelU, const SFormList & SubstitutionL
     }
     // step 5
     E_all = combine(M, L); // generate all combinations of M elements from L
-    DEBOUTLN(cout,"Truefactors: (step5) E_all= ", E_all);
+    DEBOUTLN(CERR,"Truefactors: (step5) E_all= ", E_all);
     // select combinations with the degree not to exceed degU:
     E_all = Rightdegree( E_all, degU, levelU );
-    DEBOUTLN(cout,"Truefactors: (step5) E_all(Rightdegree)= ", E_all);
+    DEBOUTLN(CERR,"Truefactors: (step5) E_all(Rightdegree)= ", E_all);
     if ( E_all.length() == 0 ){
       FAC.append( CFFactor(U,1) );
       break; // Return FAC union {U}
@@ -287,12 +299,12 @@ Truefactors( const CanonicalForm Ua, int levelU, const SFormList & SubstitutionL
     for ( i=E_all; i.hasItem(); i++){
       factor = i.getItem();
       Y = Multmod_power( factor.factor(), SubstitutionList, h, levelU);
-      DEBOUTLN(cout, "Truefactors: (step6) Testing Y  = ", Y);
+      DEBOUTLN(CERR, "Truefactors: (step6) Testing Y  = ", Y);
       c = mydivremt(U,Y,a,b);
       //      if (  c  && b == U.genZero()) { // Y divides U
       if ( c && b.isZero() ){
-        DEBOUT(cout,"Truefactors: (step6): ",Y );
-        DEBOUTLN(cout, "  divides  ",U);
+        DEBOUT(CERR,"Truefactors: (step6): ",Y );
+        DEBOUTLN(CERR, "  divides  ",U);
         U = a;
         FAC.append(Y); // Y is a real factor
         onemore = 0;
@@ -362,8 +374,8 @@ TakeNorms(const CFFList & PiList){
       WerrorS("libfac: ERROR: TakeNorms less then two items remaining!");
 #else
 #ifndef NOSTREAMIO
-      cerr << "libfac: ERROR: TakeNorms less then two items remaining! "
-           << endl;
+      CERR << "libfac: ERROR: TakeNorms less then two items remaining! "
+           << "\n";
 #else
       ;
 #endif
@@ -387,10 +399,10 @@ TakeNorms(const CFFList & PiList){
           break;
         }
         else {
-          //cout << "Schade!" << endl;
+          //CERR << "Schade!" << "\n";
         }
-        DEBOUT(cout, "Truefactor: Combined ", n);
-        DEBOUTLN(cout, " factors to: ", intermediate);
+        DEBOUT(CERR, "Truefactor: Combined ", n);
+        DEBOUTLN(CERR, " factors to: ", intermediate);
       }
       n += 1;
     }
@@ -408,8 +420,8 @@ TakeNorms(const CFFList & PiList){
         WerrorS("libfac: TakeNorms: somethings wrong with remaining factors!");
 #else
 #ifndef NOSTREAMIO
-        cerr << "libfac: TakeNorms: somethings wrong with remaining factors!"
-             << endl;
+        CERR << "libfac: TakeNorms: somethings wrong with remaining factors!"
+             << "\n";
 #endif
 #endif
       }
@@ -421,6 +433,9 @@ TakeNorms(const CFFList & PiList){
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.9  2001/08/08 14:26:56  Singular
+*hannes: Dan's HAVE_SINGULAR_ERROR
+
 Revision 1.8  2001/08/08 11:59:13  Singular
 *hannes: Dan's NOSTREAMIO changes
 

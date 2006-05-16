@@ -1,7 +1,19 @@
-//static char rcsid[] = "$Id: test.cc,v 1.3 1997-09-12 07:19:34 Singular Exp $";
+//static char rcsid[] = "$Id: test.cc,v 1.4 2006-05-16 14:46:48 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // Factor - Includes
 #include "factor.h"
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#define CERR std::cerr
+#define COUT std::cout
+#define CIN std::cin
+#elif defined(HAVE_IOSTREAM_H)
+#include <iostream.h>
+#define CERR cerr
+#define COUT cout
+#define CIN cin
+#endif
+
 
 
 void
@@ -20,9 +32,9 @@ main()
     CFFList Factorlist;
     CFFactor copy;
 
-cout << libfac_name  <<", Version " << libfac_version << endl;
-//    cout << " Characteristic = "; 
-    cin >> charac;
+COUT << libfac_name  <<", Version " << libfac_version << "\n";
+//    COUT << " Characteristic = "; 
+    CIN >> charac;
     setCharacteristic(charac);
     On(SW_SYMMETRIC_FF);
     On(SW_USE_EZGCD);
@@ -34,11 +46,11 @@ cout << libfac_name  <<", Version " << libfac_version << endl;
 //  setVarNames( vnames );
 //
 //////////////////////////////////////////////////////////////
-//    cout << " f = "; 
-    cin >> f;
-    cout << f  << " mod " << charac << " = " ;
+//    COUT << " f = "; 
+    CIN >> f;
+    COUT << f  << " mod " << charac << " = " ;
     Factorlist= Factorize( f,0 );
-     cout << Factorlist ;//<< endl;
+     COUT << Factorlist ;//<< "\n";
 // Ueberpruefen:
     g=1;
     for ( CFFListIterator i=Factorlist ; i.hasItem(); i++){
@@ -49,6 +61,6 @@ cout << libfac_name  <<", Version " << libfac_version << endl;
 	else g *= copy.factor();
     }
     if ( (f-g) != f.genZero() ){
-	cerr << "\nList and f differ: f= " << f << "  g= " << g << endl;
+	CERR << "\nList and f differ: f= " << f << "  g= " << g << "\n";
     }
 }

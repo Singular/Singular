@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
-// static char * rcsid = "$Id: debug.h,v 1.3 1997-09-12 07:19:55 Singular Exp $" ;
+// static char * rcsid = "$Id: debug.h,v 1.4 2006-05-16 14:46:50 Singular Exp $" ;
 ////////////////////////////////////////////////////////////
 // It is possible to include this file multiple times for different 
 // settings of FACDEBUG and/or DEBUGOUTPUT
@@ -38,19 +38,19 @@ void deb_inc_level();
 void deb_dec_level();
 extern char * deb_level_msg;
 #define DEBINCLEVEL(stream,msg) \
-(stream << "\n" << deb_level_msg << "entering << " << msg << " >>" << endl, deb_inc_level())
+(stream << "\n" << deb_level_msg << "entering << " << msg << " >>" << "\n", deb_inc_level())
 #define DEBDECLEVEL(stream,msg) \
-(deb_dec_level(), stream << deb_level_msg << "leaving << " << msg << " >>" << endl)
+(deb_dec_level(), stream << deb_level_msg << "leaving << " << msg << " >>" << "\n")
 #define DEBOUTSL(stream) \
 (stream << deb_level_msg, stream.flush())
 #define DEBOUT(stream,msg,object) \
 (stream << deb_level_msg << msg << object, stream.flush())
 #define DEBOUTLN(stream,msg,object) \
-(stream << deb_level_msg << msg << object << endl)
+(stream << deb_level_msg << msg << object << "\n")
 #define DEBOUTMSG(stream,msg) \
-(stream << deb_level_msg << msg << endl)
+(stream << deb_level_msg << msg << "\n")
 #define DEBOUTNL(stream) \
-(stream << endl)
+(stream << "\n")
 #else
 #define DEBINCLEVEL(stream,msg)
 #define DEBDECLEVEL(stream,msg)
@@ -63,6 +63,9 @@ extern char * deb_level_msg;
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1997/09/12 07:19:55  Singular
+* hannes/michael: libfac-0.3.0
+
 Revision 1.2  1997/04/25 22:15:33  michael
 Version for libfac-0.2.1
 

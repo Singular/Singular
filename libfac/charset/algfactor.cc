@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: algfactor.cc,v 1.6 2002-08-19 11:11:30 Singular Exp $";
+static char * rcsid = "$Id: algfactor.cc,v 1.7 2006-05-16 14:46:48 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -79,41 +79,41 @@ charsetnA(const CFList & AS, const CFList &PS, PremForm & Remembern, const Varia
   CFList QS = PS, RS = PS, CS;
   int nas= AS.length() +1;
 
-  DEBOUTLN(cout, "charsetnA: called with ps= ", PS);
+  DEBOUTLN(CERR, "charsetnA: called with ps= ", PS);
   while ( ! RS.isEmpty() ) {
     CS = BasicSet( QS );
-    DEBOUTLN(cout, "charsetnA: CS= ", CS);
+    DEBOUTLN(CERR, "charsetnA: CS= ", CS);
     CS=Union(CS,AS);
-    DEBOUTLN(cout, "charsetnA: CS= ", CS);
+    DEBOUTLN(CERR, "charsetnA: CS= ", CS);
     Remembern.FS1 = Union(Remembern.FS1, initalset1(CS));
-    DEBOUTLN(cout, "charsetnA: Remembern.FS1= ", Remembern.FS1);
-    DEBOUTLN(cout, "charsetnA: Remembern.FS2= ", Remembern.FS2);
+    DEBOUTLN(CERR, "charsetnA: Remembern.FS1= ", Remembern.FS1);
+    DEBOUTLN(CERR, "charsetnA: Remembern.FS2= ", Remembern.FS2);
     RS = CFList();
     if ( CS.length() == nas && degree(CS.getLast(),vf) > 0 ) {
       CFList D = Difference( QS, CS );
-      DEBOUT(cout, "charsetnA: Difference( ", QS);
-      DEBOUT(cout, " , ", CS);
-      DEBOUTLN(cout, " ) = ", D);
+      DEBOUT(CERR, "charsetnA: Difference( ", QS);
+      DEBOUT(CERR, " , ", CS);
+      DEBOUTLN(CERR, " ) = ", D);
       for ( CFListIterator i = D; i.hasItem(); ++i ) {
         CanonicalForm r = Prem( i.getItem(), CS );
-        DEBOUT(cout,"charsetnA: Prem(", i.getItem()  );
-        DEBOUT(cout, ",", CS);
-        DEBOUTLN(cout,") = ", r);
+        DEBOUT(CERR,"charsetnA: Prem(", i.getItem()  );
+        DEBOUT(CERR, ",", CS);
+        DEBOUTLN(CERR,") = ", r);
         if ( r != 0 ){
           //removefactor( r, Remembern );
             RS=Union(RS,CFList(r));
         }
       }
       if ( ! checkok(RS,Remembern.FS2)) return CFList(CanonicalForm(1));
-      DEBOUTLN(cout, "charsetnA: RS= ", RS);
+      DEBOUTLN(CERR, "charsetnA: RS= ", RS);
       //QS = Union( QS, RS );
       QS=Union(AS,RS); QS.append(CS.getLast());
-      DEBOUTLN(cout, "charsetnA: QS= Union(QS,RS)= ", QS);
+      DEBOUTLN(CERR, "charsetnA: QS= Union(QS,RS)= ", QS);
     }
     else{ return CFList(CanonicalForm(1)); }
   }
-  DEBOUTLN(cout, "charsetnA: Removed factors: ", Remembern.FS2);
-  DEBOUTLN(cout, "charsetnA: Remembern.FS1: ", Remembern.FS1);
+  DEBOUTLN(CERR, "charsetnA: Removed factors: ", Remembern.FS2);
+  DEBOUTLN(CERR, "charsetnA: Remembern.FS1: ", Remembern.FS1);
 
   return CS;
 }
@@ -139,27 +139,27 @@ algcd(const CanonicalForm & F, const CanonicalForm & g, const CFList & as, const
 //   }
 //   nas= as.length()+1;
 
-  DEBOUTLN(cout, "algcd called with f= ", f);
-  DEBOUTLN(cout, "                  g= ", g);
-  DEBOUTLN(cout, "                 as= ", as);
-  DEBOUTLN(cout, "              order= ", order);
-  DEBOUTLN(cout, "         choosen vf= ", vf);
+  DEBOUTLN(CERR, "algcd called with f= ", f);
+  DEBOUTLN(CERR, "                  g= ", g);
+  DEBOUTLN(CERR, "                 as= ", as);
+  DEBOUTLN(CERR, "              order= ", order);
+  DEBOUTLN(CERR, "         choosen vf= ", vf);
 
   // check trivial case:
   if ( degree(f, order.getLast())==0 || degree(g, order.getLast())==0)
   {
-    DEBOUTLN(cout, "algcd Result= ", 1);
+    DEBOUTLN(CERR, "algcd Result= ", 1);
     return CanonicalForm(1);
   }
 
   CFList bs; bs.append(f); bs.append(g);
   PremForm Remembern;
   CFList cs=charsetnA(as,bs,Remembern,vf);
-  DEBOUTLN(cout, "CharSetA((as,bs))= ", cs);
+  DEBOUTLN(CERR, "CharSetA((as,bs))= ", cs);
 
 //    for ( VarlistIterator i=order; i.hasItem() ; i++ ){
-//      DEBOUTLN(cout, "vf= ", i.getItem());
-//      DEBOUTLN(cout, "CharSetA((as,bs))= " , charsetnA(as,bs,Remembern,i.getItem()));
+//      DEBOUTLN(CERR, "vf= ", i.getItem());
+//      DEBOUTLN(CERR, "CharSetA((as,bs))= " , charsetnA(as,bs,Remembern,i.getItem()));
 //    }
 
   CanonicalForm result;
@@ -179,7 +179,7 @@ algcd(const CanonicalForm & F, const CanonicalForm & g, const CFList & as, const
     }
   }
   else result= CanonicalForm(1);
-  DEBOUTLN(cout, "algcd Result= ", result);
+  DEBOUTLN(CERR, "algcd Result= ", result);
   return result;
 }
 
@@ -191,14 +191,14 @@ factoras( const CanonicalForm & f, const CFList & as, int & success ){
   CFList reduceresult;
   CFFList result;
 
-  DEBINCLEVEL(cout, "factoras");
-  DEBOUTMSG(cerr, rcsid);
-  DEBOUTLN(cout, "factoras called with f= ", f);
-  DEBOUTLN(cout, "               content(f)= ", content(f));
-  DEBOUTLN(cout, "                       as= ", as);
-  DEBOUTLN(cout, "factoras: cls(vf)= ", cls(vf));
-  DEBOUTLN(cout, "factoras: cls(as.getLast())= ", cls(as.getLast()));
-  DEBOUTLN(cout, "factoras: degree(f,vf)= ", degree(f,vf));
+  DEBINCLEVEL(CERR, "factoras");
+  DEBOUTMSG(CERR, rcsid);
+  DEBOUTLN(CERR, "factoras called with f= ", f);
+  DEBOUTLN(CERR, "               content(f)= ", content(f));
+  DEBOUTLN(CERR, "                       as= ", as);
+  DEBOUTLN(CERR, "factoras: cls(vf)= ", cls(vf));
+  DEBOUTLN(CERR, "factoras: cls(as.getLast())= ", cls(as.getLast()));
+  DEBOUTLN(CERR, "factoras: degree(f,vf)= ", degree(f,vf));
 
 // F1: [Test trivial cases]
 // 1) first trivial cases:
@@ -207,7 +207,7 @@ factoras( const CanonicalForm & f, const CFList & as, int & success ){
 // ||( (as.length()==1) && (degree(f,vf)==3) && (degree(as.getFirst()==2)) )
        ){
     success=1;
-    DEBDECLEVEL(cout,"factoras");
+    DEBDECLEVEL(CERR,"factoras");
     return CFFList(CFFactor(f,1));
   }
 
@@ -233,14 +233,14 @@ factoras( const CanonicalForm & f, const CFList & as, int & success ){
     }
   }
   uord= Difference(uord,ord);
-  DEBOUTLN(cout, "Astar is: ", Astar);
-  DEBOUTLN(cout, "ord is: ", ord);
-  DEBOUTLN(cout, "uord is: ", uord);
+  DEBOUTLN(CERR, "Astar is: ", Astar);
+  DEBOUTLN(CERR, "ord is: ", ord);
+  DEBOUTLN(CERR, "uord is: ", uord);
 
 // 3) second trivial cases
   if ( Astar.length() == 0 ){
     success=1;
-    DEBDECLEVEL(cout,"factoras");
+    DEBDECLEVEL(CERR,"factoras");
     return CFFList(CFFactor(f,1));
   }
 
@@ -257,8 +257,8 @@ F2: //[Characteristic set computation]
 // 6) Compute f^* (<- fstar)
   CanonicalForm substhin=CanonicalForm(vf), substback=CanonicalForm(vf);
   CanonicalForm monom;
-  DEBOUTLN(cout, "substhin= ", substhin);
-  DEBOUTLN(cout, "substback= ", substback);
+  DEBOUTLN(CERR, "substhin= ", substhin);
+  DEBOUTLN(CERR, "substback= ", substback);
   int j=1;
   for ( VarlistIterator jjj=ord; jjj.hasItem(); jjj++){
     if ( getCharacteristic() > 0 ) monom= jjj.getItem()*D[j];
@@ -266,36 +266,36 @@ F2: //[Characteristic set computation]
     j++;
     substhin-= monom; substback+= monom;
   }
-  DEBOUTLN(cout, "substhin= ", substhin);
-  DEBOUTLN(cout, "substback= ", substback);
+  DEBOUTLN(CERR, "substhin= ", substhin);
+  DEBOUTLN(CERR, "substback= ", substback);
   CanonicalForm fstar=f(substhin,vf);
-  DEBOUTLN(cout, "fstar= ", fstar);
+  DEBOUTLN(CERR, "fstar= ", fstar);
 
 // 7) Set up Variable ordering from ord,vf to vf,ord ! i.e. vf is the variable
 //    with lowest level.
   Varlist nord=uord;
   nord.append(vf); nord= Union(ord,nord);
-  DEBOUTLN(cout, "          nord= ", nord);
+  DEBOUTLN(CERR, "          nord= ", nord);
   CFList Astarnord= Astar; Astarnord.insert(fstar);
-  DEBOUTLN(cout, "     Astarnord= ", Astarnord);
+  DEBOUTLN(CERR, "     Astarnord= ", Astarnord);
   Astarnord= reorder(nord,Astarnord);
-  DEBOUTLN(cout, "original Astar= ", Astar);
-  DEBOUTLN(cout, "reorderd Astar= ", Astarnord);
-  DEBOUTLN(cout, "             f= ", f);
-  DEBOUTLN(cout, "         fstar= ", fstar);
+  DEBOUTLN(CERR, "original Astar= ", Astar);
+  DEBOUTLN(CERR, "reorderd Astar= ", Astarnord);
+  DEBOUTLN(CERR, "             f= ", f);
+  DEBOUTLN(CERR, "         fstar= ", fstar);
 
 // 8) Compute Charset Cstar of Astar \cup { fstar } wrt. ordering {vf, ord}
   PremForm Remembern;
   CFList Cstar= MCharSetN(Astarnord, Remembern);
-  DEBOUTLN(cout, " Cstar= ", Cstar );
-  DEBOUTLN(cout, " Factors removed= ", Remembern.FS2 );
-  DEBOUTLN(cout, " Possible Factors considered:= ", Remembern.FS1 );
-  DEBOUTLN(cout, " Reorderd Cstar= ", reorder(nord,Cstar));
+  DEBOUTLN(CERR, " Cstar= ", Cstar );
+  DEBOUTLN(CERR, " Factors removed= ", Remembern.FS2 );
+  DEBOUTLN(CERR, " Possible Factors considered:= ", Remembern.FS1 );
+  DEBOUTLN(CERR, " Reorderd Cstar= ", reorder(nord,Cstar));
 
 // 9) Compute Delta: the set of all irr. factors (over K_0) of initials of
 //    Cstar
   CFList iniset= initalset1(Cstar);
-  DEBOUTLN(cout, "Set of initials: ", iniset);
+  DEBOUTLN(CERR, "Set of initials: ", iniset);
   CFFList Delta;
   CFFList temp;
   for ( i=iniset; i.hasItem(); i++){
@@ -305,7 +305,7 @@ F2: //[Characteristic set computation]
     temp.removeFirst();
     Delta= Union(temp,Delta);
   }
-  DEBOUTLN(cout, "Delta= ", Delta);
+  DEBOUTLN(CERR, "Delta= ", Delta);
 
 // 10) Compute Psi: the irreduzible factors (over K_0) of the first polynomial
 //     in Cstar, which are not factors of any polynomial in Delta
@@ -314,25 +314,25 @@ F2: //[Characteristic set computation]
   On(SW_RATIONAL);
   Psi.removeFirst();
   Psi= myDifference(Psi,Delta);
-  DEBOUTLN(cout, "Psi= ", Psi);
+  DEBOUTLN(CERR, "Psi= ", Psi);
 
 // F3: [Test quasilinearity]
 // If Cstar is quasilinear -> F4
 // else if Psi.length() > 1 then Delta<- Delta \cup Psi; Psi<- \emptyset -> F4
 // else D.nextpoint() -> F2
   if ( isquasilinear(Cstar) ) {
-    DEBOUTLN(cout, "Cstar is quasilinear; going to F4, Cstar= ", Cstar);
+    DEBOUTLN(CERR, "Cstar is quasilinear; going to F4, Cstar= ", Cstar);
     goto F4;
   }
   else if ( Psi.length() > 1 ){
     Delta= Union(Psi,Delta);
     Psi= CFFList();
-    DEBOUTMSG(cout, "Psi.length() == 1; going to F4");
+    DEBOUTMSG(CERR, "Psi.length() == 1; going to F4");
     goto F4;
   }
   else{
     D.nextpoint();
-    DEBOUTMSG(cout, "Choosing next evaluation point. going to F2");
+    DEBOUTMSG(CERR, "Choosing next evaluation point. going to F2");
     goto F2;
   }
 
@@ -340,44 +340,44 @@ F4: //[GCD Computation]
   CanonicalForm g=f;
   Delta= reorder(nord,Delta);
   Psi= reorder(nord,Psi);
-  DEBOUTLN(cout, "Reordered: Delta= ", Delta);
-  DEBOUTLN(cout, "             Psi= ", Psi);
+  DEBOUTLN(CERR, "Reordered: Delta= ", Delta);
+  DEBOUTLN(CERR, "             Psi= ", Psi);
   CanonicalForm fp;
 
-  DEBOUTMSG(cout, "Testing Psi: this gives irreducible Factors!");
+  DEBOUTMSG(CERR, "Testing Psi: this gives irreducible Factors!");
   for (jj=Psi; jj.hasItem(); jj++){
     if ( degree(g,vf) == 1 ) { // g is linear
       break;
     }
     fp= jj.getItem().factor();
-    DEBOUT(cout, "Calculating fp= gcd(", g);
-    DEBOUT(cout, ",", fp(substback,vf));
-    DEBOUT(cout, ") over K_r wrt ", vf);
+    DEBOUT(CERR, "Calculating fp= gcd(", g);
+    DEBOUT(CERR, ",", fp(substback,vf));
+    DEBOUT(CERR, ") over K_r wrt ", vf);
     fp=alg_gcd(g,fp(substback,vf), as);
     //fp= algcd(g,fp(substback,vf), as, oldord);
-    DEBOUTLN(cout, " = ", fp);
+    DEBOUTLN(CERR, " = ", fp);
     if ( degree(fp,vf) > 0 ){ //otherwise it's a constant
       g= divide(g, fp,as);
-      DEBOUTLN(cout, "f/fp= ", g);
+      DEBOUTLN(CERR, "f/fp= ", g);
       result.append(CFFactor(fp,1));
     }
   }
 
-  DEBOUTMSG(cout, "Testing Delta: this gives Factors (not nec. irreduzible!)");
+  DEBOUTMSG(CERR, "Testing Delta: this gives Factors (not nec. irreduzible!)");
   for (jj=Delta; jj.hasItem(); jj++){
     if ( degree(g,vf) <= 1 ) { // g is linear (or a constant..)
       break;
     }
     fp= jj.getItem().factor();
-    DEBOUT(cout, "Calculating fp= gcd(", g);
-    DEBOUT(cout, ",", fp(substback,vf));
-    DEBOUT(cout, ") over K_r wrt ", vf);
+    DEBOUT(CERR, "Calculating fp= gcd(", g);
+    DEBOUT(CERR, ",", fp(substback,vf));
+    DEBOUT(CERR, ") over K_r wrt ", vf);
     fp= alg_gcd(g,fp(substback,vf), as);
     //fp= algcd(g,fp(substback,vf), as, oldord);
-    DEBOUTLN(cout, " = ", fp);
+    DEBOUTLN(CERR, " = ", fp);
     if ( degree(fp,vf) > 0 ){ //otherwise it's a constant
       g= divide(g, fp,as);
-      DEBOUTLN(cout, "f/fp= ", g);
+      DEBOUTLN(CERR, "f/fp= ", g);
 //      reduceresult.append(fp); // a facctor but not nec. irreduzible
       result.append(CFFactor(fp,1));
       success=0;
@@ -395,11 +395,11 @@ F4: //[GCD Computation]
   if ( result.length()==0 ){
     if ( isquasilinear(Cstar) ){ // Cstar quasilinear => f is irreduzible
       success=1;
-      DEBDECLEVEL(cout,"factoras");
+      DEBDECLEVEL(CERR,"factoras");
       return CFFList(CFFactor(f,1));
     }
     else {
-      DEBOUTMSG(cout, "Going to F2!");
+      DEBOUTMSG(CERR, "Going to F2!");
       D.nextpoint(); // choose a new set of int's.
       goto F2;
     }
@@ -407,7 +407,7 @@ F4: //[GCD Computation]
   // result.length() > 0 ==> we have factors!
   success=1;
   result.append(CFFactor(g,1)); //append the rest
-  DEBDECLEVEL(cout,"factoras");
+  DEBDECLEVEL(CERR,"factoras");
   return result;
 }
 
@@ -425,9 +425,9 @@ cfactor(const CanonicalForm & f, const CFList & as, int success ){
 
   success=1;
   for ( CFFListIterator i=Factors; i.hasItem(); i++ ){
-    CFFList coutput=factoras(i.getItem().factor(),as,csuccess);
+    CFFList CERR=factoras(i.getItem().factor(),as,csuccess);
     success= min(success,csuccess);
-    for ( CFFListIterator j=coutput; j.hasItem(); j++)
+    for ( CFFListIterator j=CERR; j.hasItem(); j++)
       Output = myappend(Output,CFFactor(j.getItem().factor(),j.getItem().exp()*i.getItem().exp()));
   }
   return Output;
@@ -449,6 +449,9 @@ cfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.6  2002/08/19 11:11:30  Singular
+* hannes/pfister: alg_gcd etc.
+
 Revision 1.5  2001/06/27 13:58:05  Singular
 *hannes/GP: debug newfactoras, char_series, ...
 

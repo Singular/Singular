@@ -1,12 +1,20 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.22 2006-04-28 13:46:29 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.23 2006-05-16 14:46:49 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
 #ifndef NOSTREAMIO
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#define CERR std::cerr
+#define CIN std::cin
+#elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#define CERR cerr
+#define CIN cin
+#endif
 #endif
 // Factor - Includes
 #include "tmpl_inst.h"
@@ -105,11 +113,11 @@ choose_main_variable( const CanonicalForm & f, int Mainvar=0){
   if (mainvar != 0) return mainvar ; // We force use of the wished mainvar
   remlc= LC(f,n); mainvar = n;
   if ( totaldegree(remlc)==0 ){ remlc=f.genOne() ; }
-  DEBOUTLN(cout, "remlc= " , remlc);
+  DEBOUTLN(CERR, "remlc= " , remlc);
   for ( int i=n-1; i>=1; i-- ){
     newlc= LC(f,i);
     if ( totaldegree(newlc)==0 ){ newlc=f.genOne() ; }
-    DEBOUTLN(cout, "newlc= " , newlc);
+    DEBOUTLN(CERR, "newlc= " , newlc);
     if ( (remlc.isOne()) && (newlc.isOne()) ){ // take care of the degrees
       if ( degree(f,i) < degree(f,mainvar) ){
         remlc= newlc;
@@ -226,7 +234,7 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
     }
     else{ // lt is a) a product or b) a sum of terms
       if ( lt_is_product(lt) ){ // case a)
-        DEBOUTLN(cout, "lt_is_product: ", lt);
+        DEBOUTLN(CERR, "lt_is_product: ", lt);
         savelc= content(lt) ; // can we simplify to savelc= lc(lt); ?
         while ( getNumVars(savelc) != 0 )
           savelc= content(savelc);
@@ -254,7 +262,7 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
         else { Returnlist= IntermediateList; }
       }
       else{ // case b)
-        DEBOUTLN(cout, "lt_is_sum: ", lt);
+        DEBOUTLN(CERR, "lt_is_sum: ", lt);
         CanonicalForm save_denumerator= 1;
         for ( i=TheList; i.hasItem(); i++ ){
           numerator= i.getItem().factor();
@@ -271,8 +279,8 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
             WerrorS("libfac: ERROR: not_monic1: case lt is a sum.");
 #else
 #ifndef NOSTREAMIO
-            cerr << "libfac: ERROR: not_monic1: case lt is a sum.\n"
-                 << rcsid << errmsg << endl;
+            CERR << "libfac: ERROR: not_monic1: case lt is a sum.\n"
+                 << rcsid << errmsg << "\n";
 #endif
 #endif
           }
@@ -290,15 +298,15 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
           WerrorS("libfac: ERROR: not_monic2: case lt is a sum.");
 #else
 #ifndef NOSTREAMIO
-          cerr << "libfac: ERROR: not_monic2: case lt is a sum.\n"
-               << rcsid << errmsg << endl;
+          CERR << "libfac: ERROR: not_monic2: case lt is a sum.\n"
+               << rcsid << errmsg << "\n";
 #endif
 #endif
         }
       }
     }
   }
-  DEBOUTLN(cout,"Returnlist: ", Returnlist);
+  DEBOUTLN(CERR,"Returnlist: ", Returnlist);
   return Returnlist;
 }
 
@@ -353,11 +361,11 @@ specialize_variable( CanonicalForm & f, int deg, SFormList & Substitutionlist, i
   CanonicalForm g;
   Variable x(nr_of_variable);
 
-  DEBOUTLN(cout, "specialize_variable: called with: ", f);
+  DEBOUTLN(CERR, "specialize_variable: called with: ", f);
   for ( Extgenerator.reset(); Extgenerator.hasItems(); Extgenerator.next() ){
-    DEBOUTLN(cout, "  specialize_variable: trying:  ", Extgenerator.item());
+    DEBOUTLN(CERR, "  specialize_variable: trying:  ", Extgenerator.item());
     g= f( Extgenerator.item(), x );
-    DEBOUTLN(cout, "  specialize_variable: resulting g= ", g);
+    DEBOUTLN(CERR, "  specialize_variable: resulting g= ", g);
     if ( various_tests(g,deg,former_nr_of_variables - nr_of_variable ) ){
       Substitutionlist.insert(SForm(x,Extgenerator.item())); // append (Var,value) pair
       f= g;
@@ -372,11 +380,11 @@ specialize_agvariable( CanonicalForm & f, int deg, SFormList & Substitutionlist,
   CanonicalForm g;
   Variable x(nr_of_variable);
 
-  DEBOUTLN(cout, "specialize_variable: called with: ", f);
+  DEBOUTLN(CERR, "specialize_variable: called with: ", f);
   for ( Extgenerator.reset(); Extgenerator.hasItems(); Extgenerator.next() ){
-    DEBOUTLN(cout, "  specialize_variable: trying:  ", Extgenerator.item());
+    DEBOUTLN(CERR, "  specialize_variable: trying:  ", Extgenerator.item());
     g= f( Extgenerator.item(), x );
-    DEBOUTLN(cout, "  specialize_variable: resulting g= ", g);
+    DEBOUTLN(CERR, "  specialize_variable: resulting g= ", g);
     if ( various_tests(g,deg,former_nr_of_variables - nr_of_variable ) ){
       Substitutionlist.insert(SForm(x,Extgenerator.item())); // append (Var,value) pair
       f= g;
@@ -401,8 +409,8 @@ generate_mipo( int degree_of_Extension , const Variable & Extension ){
     WerrorS("libfac: evaluate: Extension not inFF() or inGF() !");
 #else
 #ifndef NOSTREAMIO
-    cerr << "libfac: evaluate: " << Extension << " not inFF() or inGF() !"
-         << endl;
+    CERR << "libfac: evaluate: " << Extension << " not inFF() or inGF() !"
+         << "\n";
 #endif
 #endif
     FFRandom gen;
@@ -432,7 +440,7 @@ try_specializePoly(const CanonicalForm & f, const Variable & Extension, int deg,
   }
 
   if ( degree(Extension) > 0 ){ // working over Extensions
-    DEBOUTLN(cout, "try_specializePoly: working over Extensions: ", Extension);
+    DEBOUTLN(CERR, "try_specializePoly: working over Extensions: ", Extension);
     AlgExtGenerator g(Extension);
     for ( int k=i ; k<j ; k++ ){ // try to find specialization for all
                                  // variables (# = k ) beginning with the
@@ -443,7 +451,7 @@ try_specializePoly(const CanonicalForm & f, const Variable & Extension, int deg,
   }
   else{ // working over the ground-field
     FFGenerator g;
-    DEBOUTMSG(cout, "try_specializePoly: working over the ground-field.");
+    DEBOUTMSG(CERR, "try_specializePoly: working over the ground-field.");
     for ( int k=i ; k<j ; k++ ){
       ok= specialize_variable( ff, deg, Substitutionlist, k, j, g );
       if ( ! ok ) return 0; // we failed
@@ -474,8 +482,8 @@ specializePoly(const CanonicalForm & f, Variable & Extension, int deg, SFormList
       WerrorS("libfac: spezializePoly ERROR: Working over given extension-field not yet implemented!");
 #else
 #ifndef NOSTREAMIO
-      cerr << "libfac: spezializePoly ERROR: Working over given extension-field not yet implemented!\n"
-           << rcsid << errmsg << endl;
+      CERR << "libfac: spezializePoly ERROR: Working over given extension-field not yet implemented!\n"
+           << rcsid << errmsg << "\n";
 #endif
 #endif
       return 0;
@@ -510,8 +518,8 @@ evaluate( int maxtries, int sametries, int failtries, const CanonicalForm &f , c
     WerrorS("libfac: evaluate: Extension not inFF() or inGF() !");
 #else
 #ifndef NOSTREAMIO
-    cerr << "libfac: evaluate: " << Extension << " not inFF() or inGF() !"
-         << endl;
+    CERR << "libfac: evaluate: " << Extension << " not inFF() or inGF() !"
+         << "\n";
 #endif
 #endif
     FFRandom gen; }}
@@ -609,10 +617,10 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar){
     }
     else{
       if (Extension.level()<0)
-      DEBOUTLN(cout, "Univ. Factorization over extension of degree ",
+      DEBOUTLN(CERR, "Univ. Factorization over extension of degree ",
                degree(getMipo(Extension,'x')) );
       else
-      DEBOUTLN(cout, "Univ. Factorization over extension of level ??",
+      DEBOUTLN(CERR, "Univ. Factorization over extension of level ??",
                 Extension.level());
       TIMING_START(evaluate_time);
      #if 1
@@ -642,32 +650,32 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar){
   // INTERRUPTHANDLER
 
   if ( oldmainvar != mainvar ){
-    DEBOUTSL(cout); DEBOUT(cout,"Swapped poly ", F);
-    DEBOUT(cout, " in ", f); DEBOUTNL(cout);
-    DEBOUTSL(cout); DEBOUT(cout,"Swapped  ", oldmainvar );
-    DEBOUT(cout, " <-- ", mainvar ); DEBOUT(cout, "  Mainvar= ", f.mvar());
-    DEBOUTNL(cout);
+    DEBOUTSL(CERR); DEBOUT(CERR,"Swapped poly ", F);
+    DEBOUT(CERR, " in ", f); DEBOUTNL(CERR);
+    DEBOUTSL(CERR); DEBOUT(CERR,"Swapped  ", oldmainvar );
+    DEBOUT(CERR, " <-- ", mainvar ); DEBOUT(CERR, "  Mainvar= ", f.mvar());
+    DEBOUTNL(CERR);
     ff = f.deriv();
     TIMING_START(discr_time);
     ffuni = mygcd(f,ff);
     TIMING_END(discr_time);
     if ( !(ffuni.isOne()) ){ //discriminante nonzero: split poly
-      DEBOUTLN(cout,"Nontrivial GCD of f= ", f);
-      DEBOUTLN(cout,"             and @f= ", ff);
-      DEBOUTLN(cout,"          GCD(f,@f)= ", ffuni);
+      DEBOUTLN(CERR,"Nontrivial GCD of f= ", f);
+      DEBOUTLN(CERR,"             and @f= ", ff);
+      DEBOUTLN(CERR,"          GCD(f,@f)= ", ffuni);
       ff=f/ffuni;
       CFFList Outputlist_a, Outputlist_b;
       Outputlist_a = Factorized(ff,alpha);
-      DEBOUTLN(cout, "Outputlist_a = ", Outputlist_a);
+      DEBOUTLN(CERR, "Outputlist_a = ", Outputlist_a);
       Outputlist_b = Factorized(ffuni,alpha);
-      DEBOUTLN(cout, "Outputlist_b = ", Outputlist_b);
+      DEBOUTLN(CERR, "Outputlist_b = ", Outputlist_b);
       Outputlist = myUnion(Outputlist_a, Outputlist_b);
       // have to back-swapvar the factors....
       for ( CFFListIterator i=Outputlist; i.hasItem(); i++ ){
         copy=i.getItem();
         Outputlist2.append(CFFactor(swapvar(copy.factor(),oldmainvar,mainvar),copy.exp()));
       }
-      DEBOUTLN(cout, "Outputlist2 (a+b swapped) (to return) = ", Outputlist2);
+      DEBOUTLN(CERR, "Outputlist2 (a+b swapped) (to return) = ", Outputlist2);
       return Outputlist2;
     }
   }
@@ -675,39 +683,39 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar){
   // Check special cases
   for ( int i=1; i<=level(F); i++)
     if ( degree(f,Variable(i) ) == 1 ) { //test trivial case; only true iff F is primitiv w.r.t every variable; else check (if F=ax+b) gcd(a,b)=1 ?
-      DEBOUTLN(cout, "Trivial case: ", F);
+      DEBOUTLN(CERR, "Trivial case: ", F);
       Outputlist.append(CFFactor(F,1));
       return Outputlist;
     }
 
   // Look at the leading term:
   lt = LC(f);
-  DEBOUTLN(cout, "Leading term: ", lt);
+  DEBOUTLN(CERR, "Leading term: ", lt);
   if ( lt != f.genOne() ){
     // make the polynomial monic in the main variable
     ff = make_monic(f,lt); ffuni = ff;
-    DEBOUTLN(cout, "make_monic returned: ", ff);
+    DEBOUTLN(CERR, "make_monic returned: ", ff);
   }
   else{ ff= f; ffuni= ff; }
 
   TIMING_START(evaluate_time);
   success=evaluate(min(10,max(degree(ff), 5)), min(degree(ff),3), min(degree(ff),3), ff, Extension, alpha, Substitutionlist,UnivariateFactorlist);
-  DEBOUTLN(cout,  "Returned from evaluate: success: ", success);
+  DEBOUTLN(CERR,  "Returned from evaluate: success: ", success);
   for ( SFormListIterator ii=Substitutionlist; ii.hasItem(); ii++ ){
-    DEBOUTLN(cout, "Substituting ", ii.getItem().factor());
-    DEBOUTLN(cout, "       with value: ", ii.getItem().exp());
+    DEBOUTLN(CERR, "Substituting ", ii.getItem().factor());
+    DEBOUTLN(CERR, "       with value: ", ii.getItem().exp());
   }
 
   if ( success==0 ){ // evalute wasn't successfull
     success= specializePoly(ffuni,Extension,degree(ff),Substitutionlist,1,getNumVars(compress(ff,m)));
-    DEBOUTLN(cout,  "Returned from specializePoly: success: ", success);
+    DEBOUTLN(CERR,  "Returned from specializePoly: success: ", success);
     if (success == 0 ){ // No spezialisation could be found
 #ifdef HAVE_SINGULAR_ERROR
       WarnS("libfac: Factorize: ERROR: Not able to find a valid specialization!");
 #else
 #ifndef NOSTREAMIO
-      cerr << "libfac: Factorize: ERROR: Not able to find a valid specialization!\n"
-           << rcsid << errmsg << endl;
+      CERR << "libfac: Factorize: ERROR: Not able to find a valid specialization!\n"
+           << rcsid << errmsg << "\n";
 #else
        ;
 #endif
@@ -723,11 +731,11 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar){
     ffuni = substitutePoly(ff,Substitutionlist);
     // We now have an univariat poly; factorize that
     if ( degree(Extension) == 0   ){
-      DEBOUTMSG(cout, "Univ. Factorization over the ground field");
+      DEBOUTMSG(CERR, "Univ. Factorization over the ground field");
       UnivariateFactorlist = factorize(ffuni,1); // univ. poly is sqr-free!
     }
     else{
-      DEBOUTLN(cout, "Univ. Factorization over extension of degree ",
+      DEBOUTLN(CERR, "Univ. Factorization over extension of degree ",
                degree(getMipo(Extension,'x')) );
      #if 1
       UnivariateFactorlist = factorize2(ffuni,Extension,alpha);
@@ -744,15 +752,15 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar){
   }
     TIMING_END(evaluate_time);
   if (UnivariateFactorlist.length() == 1){ // poly is irreduzibel
-    DEBOUTLN(cout, "Univ. poly is irreduzible: ", UnivariateFactorlist);
+    DEBOUTLN(CERR, "Univ. poly is irreduzible: ", UnivariateFactorlist);
     Outputlist.append(CFFactor(F,1));
     return Outputlist;
   }
   else{ // we have factors
-    DEBOUTSL(cout);
-    DEBOUT(cout, "Univariate poly has " , UnivariateFactorlist.length());
-    DEBOUT(cout, " factors:  ", ffuni);
-    DEBOUT(cout, " = ", UnivariateFactorlist); DEBOUTNL(cout);
+    DEBOUTSL(CERR);
+    DEBOUT(CERR, "Univariate poly has " , UnivariateFactorlist.length());
+    DEBOUT(CERR, " factors:  ", ffuni);
+    DEBOUT(CERR, " = ", UnivariateFactorlist); DEBOUTNL(CERR);
 
     // INTERRUPTHANDLER
     if ( interrupt_handle() ) return CFFList() ;
@@ -760,7 +768,7 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar){
 
     TIMING_START(hensel_time);
     Outputlist = MultiHensel(ff,UnivariateFactorlist,Substitutionlist);
-    DEBOUTLN(cout, "Outputlist after MultiHensel: ", Outputlist);
+    DEBOUTLN(CERR, "Outputlist after MultiHensel: ", Outputlist);
     TIMING_END(hensel_time);
 
     // INTERRUPTHANDLER
@@ -769,7 +777,7 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar){
 
     TIMING_START(truefactor_time);
     Outputlist = Truefactors(ff, level(ff), Substitutionlist, Outputlist);
-    DEBOUTLN(cout, "Outputlist after Truefactors: ", Outputlist);
+    DEBOUTLN(CERR, "Outputlist after Truefactors: ", Outputlist);
     TIMING_END(truefactor_time);
 
     // INTERRUPTHANDLER
@@ -778,7 +786,7 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar){
 
     if ( lt != f.genOne() ){
       Outputlist = not_monic(Outputlist,lt,ff,level(ff));
-      DEBOUTLN(cout, "not_monic returned: ", Outputlist);
+      DEBOUTLN(CERR, "not_monic returned: ", Outputlist);
     }
 
     // have to back-swapvar the factors....
@@ -816,19 +824,19 @@ Factorize(const CanonicalForm & F, int is_SqrFree ){
   if ( interrupt_handle() ) return CFFList() ;
   // INTERRUPTHANDLER
 
-  DEBINCLEVEL(cout, "Factorize");
-  DEBOUTMSG(cout, rcsid);
-  DEBOUTLN(cout, "Called with F= ", F);
+  DEBINCLEVEL(CERR, "Factorize");
+  DEBOUTMSG(CERR, rcsid);
+  DEBOUTLN(CERR, "Called with F= ", F);
   if ( getCharacteristic() == 0 ) { // char == 0
     TIMING_START(factorize_time);
-    //cout << "Factoring in char=0 of " << F << " = " << Outputlist << endl;
+    //CERR << "Factoring in char=0 of " << F << " = " << Outputlist << "\n";
     Outputlist= factorize(F);
     // Factorization in char=0 doesn't sometimes return at least two elements!!!
     if ( getNumVars(Outputlist.getFirst().factor()) != 0 )
       Outputlist.insert(CFFactor(1,1));
-    //cout << "  Factorize in char=0: returning with: " << Outputlist << endl;
+    //CERR << "  Factorize in char=0: returning with: " << Outputlist << "\n";
     TIMING_END(factorize_time);
-    DEBDECLEVEL(cout, "Factorize");
+    DEBDECLEVEL(CERR, "Factorize");
     TIMING_PRINT(factorize_time, "\ntime used for factorization   : ");
     return Outputlist;
   }
@@ -864,9 +872,9 @@ Factorize(const CanonicalForm & F, int is_SqrFree ){
   }
   else
     SqrFreeList.append(CFFactor(F,1));
-  DEBOUTLN(cout, "InternalSqrFreeList= ", SqrFreeList);
+  DEBOUTLN(CERR, "InternalSqrFreeList= ", SqrFreeList);
   for ( i=SqrFreeList; i.hasItem(); i++ ){
-    DEBOUTLN(cout, "Factor under consideration: ", i.getItem().factor());
+    DEBOUTLN(CERR, "Factor under consideration: ", i.getItem().factor());
     // We need a compress on each list item ! Maybe we have less variables!
     g =compress(i.getItem().factor(),m);
     exp = i.getItem().exp();
@@ -881,7 +889,7 @@ Factorize(const CanonicalForm & F, int is_SqrFree ){
       }
       else{ // multivariate polynomial
         if ( g.isHomogeneous() ){
-          DEBOUTLN(cout, "Poly is homogeneous! : ", g);
+          DEBOUTLN(CERR, "Poly is homogeneous! : ", g);
           // Now we can substitute one variable to 1, factorize and then
           // look on the resulting factors and their monomials for
           // backsubstitution of the substituted variable.
@@ -900,7 +908,7 @@ Factorize(const CanonicalForm & F, int is_SqrFree ){
       }
   }
   g=1; unit=1;
-  DEBOUTLN(cout, "Outputlist is ", Outputlist);
+  DEBOUTLN(CERR, "Outputlist is ", Outputlist);
   for ( i=Outputlist; i.hasItem(); i++ )
     if ( level(i.getItem().factor()) > 0 ){
       unit = lc(i.getItem().factor());
@@ -927,7 +935,7 @@ Factorize(const CanonicalForm & F, int is_SqrFree ){
     swapvar(F,Variable(mv),F.mvar());
   }
 
-  DEBDECLEVEL(cout, "Factorize");
+  DEBDECLEVEL(CERR, "Factorize");
   TIMING_END(factorize_time);
 
   TIMING_PRINT(sqrfree_time, "\ntime used for sqrfree   : ");
@@ -962,13 +970,13 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
   if ( interrupt_handle() ) return CFFList() ;
   // INTERRUPTHANDLER
 
-  DEBINCLEVEL(cout, "Factorize");
-  DEBOUTMSG(cout, rcsid);
-  DEBOUTLN(cout, "Called with F= ", F);
+  DEBINCLEVEL(CERR, "Factorize");
+  DEBOUTMSG(CERR, rcsid);
+  DEBOUTLN(CERR, "Called with F= ", F);
   if ( getCharacteristic() == 0 )
   { // char == 0
     TIMING_START(factorize_time);
-    //cout << "Factoring in char=0 of " << F << " = " << Outputlist << endl;
+    //CERR << "Factoring in char=0 of " << F << " = " << Outputlist << "\n";
     #if 0
     // SHOULD: Outputlist= factorize(F,minpoly);
     Outputlist= factorize(F);
@@ -1002,9 +1010,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
     // Factorization in char=0 doesn't sometimes return at least two elements!!!
     if ( getNumVars(Outputlist.getFirst().factor()) != 0 )
       Outputlist.insert(CFFactor(1,1));
-    //cout << "  Factorize in char=0: returning with: " << Outputlist << endl;
+    //CERR << "  Factorize in char=0: returning with: " << Outputlist << "\n";
     TIMING_END(factorize_time);
-    DEBDECLEVEL(cout, "Factorize");
+    DEBDECLEVEL(CERR, "Factorize");
     TIMING_PRINT(factorize_time, "\ntime used for factorization   : ");
     return Outputlist;
   }
@@ -1040,9 +1048,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
   }
   else
     SqrFreeList.append(CFFactor(F,1));
-  DEBOUTLN(cout, "InternalSqrFreeList= ", SqrFreeList);
+  DEBOUTLN(CERR, "InternalSqrFreeList= ", SqrFreeList);
   for ( i=SqrFreeList; i.hasItem(); i++ ){
-    DEBOUTLN(cout, "Factor under consideration: ", i.getItem().factor());
+    DEBOUTLN(CERR, "Factor under consideration: ", i.getItem().factor());
     // We need a compress on each list item ! Maybe we have less variables!
     g =compress(i.getItem().factor(),m);
     exp = i.getItem().exp();
@@ -1060,7 +1068,7 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
       }
       else{ // multivariate polynomial
         if ( g.isHomogeneous() ){
-          DEBOUTLN(cout, "Poly is homogeneous! : ", g);
+          DEBOUTLN(CERR, "Poly is homogeneous! : ", g);
           // Now we can substitute one variable to 1, factorize and then
           // look on the resulting factors and their monomials for
           // backsubstitution of the substituted variable.
@@ -1079,7 +1087,7 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
       }
   }
   g=1; unit=1;
-  DEBOUTLN(cout, "Outputlist is ", Outputlist);
+  DEBOUTLN(CERR, "Outputlist is ", Outputlist);
   for ( i=Outputlist; i.hasItem(); i++ )
     if ( level(i.getItem().factor()) > 0 ){
       unit = lc(i.getItem().factor());
@@ -1106,7 +1114,7 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
     swapvar(F,Variable(mv),F.mvar());
   }
 
-  DEBDECLEVEL(cout, "Factorize");
+  DEBDECLEVEL(CERR, "Factorize");
   TIMING_END(factorize_time);
 
   TIMING_PRINT(sqrfree_time, "\ntime used for sqrfree   : ");
@@ -1123,6 +1131,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.22  2006/04/28 13:46:29  Singular
+*hannes: better tests for 0, 1
+
 Revision 1.21  2005/12/12 18:02:03  Singular
 *hannes: use sorting option in Factorize
 

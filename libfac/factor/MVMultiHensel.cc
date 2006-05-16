@@ -1,12 +1,24 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.8 2002-07-30 15:11:19 Singular Exp $";
+// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.9 2006-05-16 14:46:49 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
 #ifndef NOSTREAMIO
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#define OSTREAM std::ostream
+#define ISTREAM std::istream
+#define CERR std::cerr
+#define CIN std::cin
+#elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#define OSTREAM ostream
+#define ISTREAM istream
+#define CERR cerr
+#define CIN cin
+#endif
 #endif
 // Factor - Includes
 #include "tmpl_inst.h"
@@ -103,8 +115,8 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
   CanonicalForm s,t,q,r;
   Variable x(levelU);
 
-  DEBOUT(cout, "diophant: called with: ", F1);
-  DEBOUT(cout, "  ", F2); DEBOUTLN(cout, "  ", i);
+  DEBOUT(CERR, "diophant: called with: ", F1);
+  DEBOUT(CERR, "  ", F2); DEBOUTLN(CERR, "  ", i);
 
   // Did we solve the diophantine equation yet?
   // If so, return the calculated values
@@ -120,8 +132,8 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
     WerrorS("libfac: diophant ERROR: degree too large!  ");
 #else
 #ifndef NOSTREAMIO
-    cerr << "libfac: diophant ERROR: degree too large!  "
-         << (degree(F1,levelU) + degree(F2,levelU) ) <<endl;
+    CERR << "libfac: diophant ERROR: degree too large!  "
+         << (degree(F1,levelU) + degree(F2,levelU) ) <<"\n";
 #else
     ;
 #endif
@@ -138,8 +150,8 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
       WerrorS("libfac: diophant ERROR: F1 and F2 are not relatively prime! ");
 #else
 #ifndef NOSTREAMIO
-      cerr << "libfac: diophant ERROR: " << F1 << "  and  " << F2
-           << "  are not relatively prime!" << endl;
+      CERR << "libfac: diophant ERROR: " << F1 << "  and  " << F2
+           << "  are not relatively prime!" << "\n";
 #else
      ;
 #endif
@@ -175,8 +187,8 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
     B[i].poly = Retvalue.Two ;
     A[i].calculated = true ; B[i].calculated = true ;
   }
-  DEBOUT(cout, "diophant: Returnvalue is: ", Retvalue.One);
-  DEBOUTLN(cout, "  ", Retvalue.Two);
+  DEBOUT(CERR, "diophant: Returnvalue is: ", Retvalue.One);
+  DEBOUTLN(CERR, "  ", Retvalue.Two);
 
   return  Retvalue;
 }
@@ -192,8 +204,8 @@ make_delta( int levelU, const CanonicalForm & W,
   CanonicalForm Retvalue;
   DiophantForm intermediate;
 
-  DEBOUT(cout, "make_delta: W= ", W);
-  DEBOUTLN(cout, "  degree(W,levelU)= ", degree(W,levelU) );
+  DEBOUT(CERR, "make_delta: W= ", W);
+  DEBOUTLN(CERR, "  degree(W,levelU)= ", degree(W,levelU) );
 
   if ( levelU == level(W) ){ // same level, good
     for ( CFIterator i=W; i.hasTerms(); i++){
@@ -205,7 +217,7 @@ make_delta( int levelU, const CanonicalForm & W,
     intermediate=diophant(levelU,F1,F2,0,A,B);
     Retvalue = W * intermediate.One;
   }
-  DEBOUTLN(cout, "make_delta: Returnvalue= ", Retvalue);
+  DEBOUTLN(CERR, "make_delta: Returnvalue= ", Retvalue);
   return Retvalue;
 }
 
@@ -216,8 +228,8 @@ make_square( int levelU, const CanonicalForm & W,
   CanonicalForm Retvalue;
   DiophantForm intermediate;
 
-  DEBOUT(cout, "make_square: W= ", W );
-  DEBOUTLN(cout, "  degree(W,levelU)= ", degree(W,levelU));
+  DEBOUT(CERR, "make_square: W= ", W );
+  DEBOUTLN(CERR, "  degree(W,levelU)= ", degree(W,levelU));
 
   if ( levelU == level(W) ){ // same level, good
     for ( CFIterator i=W; i.hasTerms(); i++){
@@ -229,7 +241,7 @@ make_square( int levelU, const CanonicalForm & W,
     intermediate=diophant(levelU,F1,F2,0,A,B);
     Retvalue = W * intermediate.Two;
   }
-  DEBOUTLN(cout, "make_square: Returnvalue= ", Retvalue);
+  DEBOUTLN(CERR, "make_square: Returnvalue= ", Retvalue);
 
   return Retvalue;
 }
@@ -251,52 +263,52 @@ mvhensel( const CanonicalForm & U , const CanonicalForm & F ,
   RememberArray A(degree(F,levelU)+degree(G,levelU)+1);
   RememberArray B(degree(F,levelU)+degree(G,levelU)+1);
 
-  DEBOUTLN(cout, "mvhensel called with: U= ", U);
-  DEBOUTLN(cout, "                      F= ", F);
-  DEBOUTLN(cout, "                      G= ", G);
-  DEBOUTLN(cout, "                   degU= ", degU);
+  DEBOUTLN(CERR, "mvhensel called with: U= ", U);
+  DEBOUTLN(CERR, "                      F= ", F);
+  DEBOUTLN(CERR, "                      G= ", G);
+  DEBOUTLN(CERR, "                   degU= ", degU);
 
   V=change_poly(U,Substitutionlist,0); // change x_i <- x_i + a_i for all i
   Rk = F*G-V;
 #ifdef HENSELDEBUG2
-  cout << "mvhensel: V = " << V << endl
-       << "          Fk= " << F << endl
-       << "          Gk= " << G << endl
-       << "          Rk= " << Rk << endl;
+  CERR << "mvhensel: V = " << V << "\n"
+       << "          Fk= " << F << "\n"
+       << "          Gk= " << G << "\n"
+       << "          Rk= " << Rk << "\n";
 #endif
   for ( int k=2; k<=degU+1; k++){//2; k++){//degU+1; k++){
     W = mod_power(Rk,k,levelU);
 #ifdef HENSELDEBUG2
-    cout << "mvhensel: Iteration: " << k << endl;
-    cout << "mvhensel: W= " << W << endl;
+    CERR << "mvhensel: Iteration: " << k << "\n";
+    CERR << "mvhensel: W= " << W << "\n";
 #endif
     D = make_delta(levelU,W,F,G,A,B);
 #ifdef HENSELDEBUG2
-    cout << "mvhensel: D= " << D << endl;
+    CERR << "mvhensel: D= " << D << "\n";
 #endif
     S = make_square(levelU,W,F,G,A,B);
 #ifdef HENSELDEBUG2
-    cout << "mvhensel: S= " << S << endl;
+    CERR << "mvhensel: S= " << S << "\n";
 #endif
     Rk += S*D - D*Fk - S*Gk;
 #ifdef HENSELDEBUG2
-    cout << "mvhensel: Rk= " << Rk << endl;
+    CERR << "mvhensel: Rk= " << Rk << "\n";
 #endif
     Fk -= S;
 #ifdef HENSELDEBUG2
-    cout << "mvhensel: Fk= " << Fk << endl;
+    CERR << "mvhensel: Fk= " << Fk << "\n";
 #endif
     Gk -= D;
 #ifdef HENSELDEBUG2
-    cout << "mvhensel: Gk= " << Gk << endl;
+    CERR << "mvhensel: Gk= " << Gk << "\n";
 #endif
     if ( Rk.isZero() ) break;
   }
   Retvalue.One = change_poly(Fk,Substitutionlist,1);
   Retvalue.Two = change_poly(Gk,Substitutionlist,1);
 
-  DEBOUTLN(cout, "mvhensel: Retvalue: ", Retvalue.One);
-  DEBOUTLN(cout, "                    ", Retvalue.Two);
+  DEBOUTLN(CERR, "mvhensel: Retvalue: ", Retvalue.One);
+  DEBOUTLN(CERR, "                    ", Retvalue.Two);
 
   return Retvalue ;
 }
@@ -312,8 +324,8 @@ multihensel( const CanonicalForm & mF, const CFFList & Factorlist,
   CanonicalForm Pl,Pr;
   int n = factorlist.length();
 
-  DEBOUT(cout, "multihensel: called with ", mF);
-  DEBOUTLN(cout, "  ", factorlist);
+  DEBOUT(CERR, "multihensel: called with ", mF);
+  DEBOUTLN(CERR, "  ", factorlist);
 
   if ( n == 1 ) {
     Returnlist.append(CFFactor(mF,1));
@@ -328,15 +340,15 @@ multihensel( const CanonicalForm & mF, const CFFList & Factorlist,
     }
     else { // more then two factors
 #ifdef HENSELDEBUG2
-      cout << "multihensel: more than two factors!" << endl;
+      CERR << "multihensel: more than two factors!" << "\n";
 #endif
       Pl=factorlist.getFirst().factor(); factorlist.removeFirst();
       Pr=Pl.genOne();
       for ( ListIterator<CFFactor> i=factorlist; i.hasItem(); i++ )
         Pr *=  i.getItem().factor() ;
 #ifdef HENSELDEBUG2
-      cout << "multihensel: Pl,Pr, factorlist: " << Pl << "  " << Pr
-           << "  " << factorlist << endl;
+      CERR << "multihensel: Pl,Pr, factorlist: " << Pl << "  " << Pr
+           << "  " << factorlist << "\n";
 #endif
       intermediat= mvhensel(mF,Pl,Pr,Substitutionlist);
       Returnlist.append(CFFactor(intermediat.One,1));
@@ -363,10 +375,10 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
   CanonicalForm Pl,Pr;
   int n = factorlist.length(),h=n/2, k;
 
-  DEBOUT(cout, "MultiHensel: called with ", mF);
-  DEBOUTLN(cout, "  ", factorlist);
-  DEBOUT(cout,"           : n,h = ", n);
-  DEBOUTLN(cout,"  ", h);
+  DEBOUT(CERR, "MultiHensel: called with ", mF);
+  DEBOUTLN(CERR, "  ", factorlist);
+  DEBOUT(CERR,"           : n,h = ", n);
+  DEBOUTLN(CERR,"  ", h);
 
   if ( n == 1 ) {
     Returnlist.append(CFFactor(mF,1));
@@ -385,16 +397,16 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
         factorlist.removeFirst();
       }
 
-      DEBOUTLN(cout, "MultiHensel: Ll= ", Ll);
-      DEBOUTLN(cout, "     factorlist= ", factorlist);
+      DEBOUTLN(CERR, "MultiHensel: Ll= ", Ll);
+      DEBOUTLN(CERR, "     factorlist= ", factorlist);
 
       Pl = 1; Pr = 1;
       for ( i = Ll; i.hasItem(); i++)
         Pl *= i.getItem().factor();
-      DEBOUTLN(cout, "MultiHensel: Pl= ", Pl);
+      DEBOUTLN(CERR, "MultiHensel: Pl= ", Pl);
       for ( i = factorlist; i.hasItem(); i++)
         Pr *= i.getItem().factor();
-      DEBOUTLN(cout, "MultiHensel: Pr= ", Pr);
+      DEBOUTLN(CERR, "MultiHensel: Pr= ", Pr);
       intermediat = mvhensel(mF,Pl,Pr,Substitutionlist);
       // divison test for intermediat.One and intermediat.Two ?
       CanonicalForm a,b;
@@ -417,6 +429,9 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.8  2002/07/30 15:11:19  Singular
+*hannes: minor cleanups
+
 Revision 1.7  2001/08/22 14:21:17  Singular
 *hannes: added search for main var to Factorize
 

@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: class.h,v 1.5 2000-05-29 08:06:47 pohl Exp $
+// $Id: class.h,v 1.6 2006-05-16 14:46:50 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef INCL_CLASS_H
 #define INCL_CLASS_H
@@ -9,7 +9,15 @@
 // #pragma interface
 
 #ifndef NOSTREAMIO
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#define OSTREAM std::ostream
+#define ISTREAM std::istream
+#elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#define OSTREAM ostream
+#define ISTREAM istream
+#endif
 #endif
 
 template <class T>
@@ -32,8 +40,8 @@ public:
 //     Factor<T>& operator*= ( int i ) { _exp *= i; return *this; }
 //     Substitution<T>& operator*= ( const T & f ) { _factor *= f; _exp *= f; return *this; }
 #ifndef NOSTREAMIO
-    void print ( ostream& ) const;
-    friend ostream& operator<< ( ostream & os, const Substitution<T> & f )
+    void print ( OSTREAM& ) const;
+    friend OSTREAM& operator<< ( OSTREAM & os, const Substitution<T> & f )
     {
 	f.print( os );
 	return os;
@@ -52,6 +60,9 @@ int operator== ( const Substitution<T>&, const Substitution<T>& );
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.5  2000/05/29 08:06:47  pohl
+no artificial friend
+
 Revision 1.4  1997/09/12 07:19:54  Singular
 * hannes/michael: libfac-0.3.0
 

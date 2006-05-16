@@ -1,13 +1,25 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: SqrFree.cc,v 1.9 2006-04-28 13:46:29 Singular Exp $";
+static char * rcsid = "$Id: SqrFree.cc,v 1.10 2006-05-16 14:46:50 Singular Exp $";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de .\n Please include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include<factory.h>
 #ifndef NOSTREAMIO
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#define OSTREAM std::ostream
+#define ISTREAM std::istream
+#define CERR std::cerr
+#define CIN std::cin
+#elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#define OSTREAM ostream
+#define ISTREAM istream
+#define CERR cerr
+#define CIN cin
+#endif
 #endif
 // Factor - Includes
 #include "tmpl_inst.h"
@@ -177,8 +189,8 @@ SqrFreeTest( const CanonicalForm & r, int opt){
   WerrorS("libfac: ERROR: SqrFreeTest: we should never fall trough here!");
 #else
 #ifndef NOSTREAMIO
-  cerr << "\nlibfac: ERROR: SqrFreeTest: we should never fall trough here!\n"
-       << rcsid << errmsg << endl;
+  CERR << "\nlibfac: ERROR: SqrFreeTest: we should never fall trough here!\n"
+       << rcsid << errmsg << "\n";
 #endif
 #endif
   return 0;
@@ -197,8 +209,8 @@ SqrFreed( const CanonicalForm & r , const CanonicalForm &mipo=0){
   CFFList Outputlist;
   int n = level(f);
 
-  DEBINCLEVEL(cout, "SqrFreed");
-  DEBOUTLN(cout, "Called with r= ", r);
+  DEBINCLEVEL(CERR, "SqrFreed");
+  DEBOUTLN(CERR, "Called with r= ", r);
   if (getNumVars(f)==0 ) { // just a constant; return it
     Outputlist= myappend(Outputlist,CFFactor(f,1));
     return Outputlist ;
@@ -212,34 +224,34 @@ SqrFreed( const CanonicalForm & r , const CanonicalForm &mipo=0){
       g = swapvar(f,k,n); g = content(g);
       if ( ! (g.isOne() || (-g).isOne() || degree(g)==0 )) {
         g = swapvar(g,k,n);
-        DEBOUTLN(cout, "We have a content: ", g);
+        DEBOUTLN(CERR, "We have a content: ", g);
         Outputlist = myUnion(InternalSqrFree(g,mipo),Outputlist); // should we add a
                                                 // SqrFreeTest(g) first ?
-        DEBOUTLN(cout, "Outputlist is now: ", Outputlist);
+        DEBOUTLN(CERR, "Outputlist is now: ", Outputlist);
         f /=g;
-        DEBOUTLN(cout, "f is now: ", f);
+        DEBOUTLN(CERR, "f is now: ", f);
       }
     }  
   }
 
 // Now f is primitive; Let`s look if f is univariate
   if ( f.isUnivariate() ) {
-    DEBOUTLN(cout, "f is univariate: ", f);
+    DEBOUTLN(CERR, "f is univariate: ", f);
     g = content(g);
     if ( ! (g.isOne() || (-g).isOne() ) ){
       Outputlist= myappend(Outputlist,CFFactor(g,1)) ;
       f /= g;
     }
     Outputlist = Union(sqrFree(f),Outputlist) ;
-    DEBOUTLN(cout, "Outputlist after univ. sqrFree(f) = ", Outputlist);
-    DEBDECLEVEL(cout, "SqrFreed");
+    DEBOUTLN(CERR, "Outputlist after univ. sqrFree(f) = ", Outputlist);
+    DEBDECLEVEL(CERR, "SqrFreed");
     return Outputlist ;
   }
 
 // Linear?
   if ( totaldegree(f) <= 1 ) {
     Outputlist= myappend(Outputlist,CFFactor(f,1)) ;
-    DEBDECLEVEL(cout, "SqrFreed");
+    DEBDECLEVEL(CERR, "SqrFreed");
     return Outputlist ;
   }
 
@@ -265,30 +277,30 @@ SqrFreed( const CanonicalForm & r , const CanonicalForm &mipo=0){
       }	
       if ( k==n )
       { // really is Pth power
-        DEBOUTLN(cout, "f is a p'th root: ", f);
+        DEBOUTLN(CERR, "f is a p'th root: ", f);
         CFMap m;
         g = compress(f,m);
 	if (mipo==0)
           f = m(PthRoot(g));
 	else
           f = m(PthRoot(g,mipo));
-        DEBOUTLN(cout, "  that is       : ", f);
+        DEBOUTLN(CERR, "  that is       : ", f);
         // now : Outputlist union ( SqrFreed(f) )^getCharacteristic()
         Outputlist=myUnion(Powerup(InternalSqrFree(f),getCharacteristic()),Outputlist);
-        DEBDECLEVEL(cout, "SqrFreed");
+        DEBDECLEVEL(CERR, "SqrFreed");
         return Outputlist ;
       }
     }
   }
   g = f.deriv();
-  DEBOUTLN(cout, "calculating mygcd of ", f);
-  DEBOUTLN(cout, "               and ", g);
+  DEBOUTLN(CERR, "calculating mygcd of ", f);
+  DEBOUTLN(CERR, "               and ", g);
   h = mygcd(f,pp(g));  h /= lc(h);
-  DEBOUTLN(cout,"mygcd(f,g)= ",h);
+  DEBOUTLN(CERR,"mygcd(f,g)= ",h);
   if ( (h.isOne()) || ( h==f) || ((-h).isOne()) || getNumVars(h)==0 ) { // no common factor
     Outputlist= myappend(Outputlist,CFFactor(f,1)) ;
-    DEBOUTLN(cout, "Outputlist= ", Outputlist);
-    DEBDECLEVEL(cout, "SqrFreed");
+    DEBOUTLN(CERR, "Outputlist= ", Outputlist);
+    DEBDECLEVEL(CERR, "SqrFreed");
     return Outputlist ;
   }
   else { // we can split into two nontrivial pieces
@@ -298,8 +310,8 @@ SqrFreed( const CanonicalForm & r , const CanonicalForm &mipo=0){
        Outputlist= myappend(Outputlist,CFFactor(g,1)) ;
        f /= g;
     }
-    DEBOUTLN(cout, "Split into f= ", f);
-    DEBOUTLN(cout, "       and h= ", h);
+    DEBOUTLN(CERR, "Split into f= ", f);
+    DEBOUTLN(CERR, "       and h= ", h);
     // For char > 0 the polys f and h can have Pth roots; so we need a test
     // Test is disabled because timing is the same
     
@@ -311,19 +323,19 @@ SqrFreed( const CanonicalForm & r , const CanonicalForm &mipo=0){
 //      Outputlist= myappend(Outputlist,CFFactor(h,1)) ;
 //    else
     Outputlist=myUnion(Outputlist,InternalSqrFree(h));
-    DEBOUTLN(cout, "Returning list ", Outputlist);
-    DEBDECLEVEL(cout, "SqrFreed");
+    DEBOUTLN(CERR, "Returning list ", Outputlist);
+    DEBDECLEVEL(CERR, "SqrFreed");
     return Outputlist ;
   }
 #ifdef HAVE_SINGULAR_ERROR
   WerrorS("libfac: ERROR: SqrFreed: we should never fall trough here!");
 #else
 #ifndef NOSTREAMIO
-  cerr << "\nlibfac: ERROR: SqrFreed: we should never fall trough here!\n"
-       << rcsid << errmsg << endl;
+  CERR << "\nlibfac: ERROR: SqrFreed: we should never fall trough here!\n"
+       << rcsid << errmsg << "\n";
 #endif
 #endif
-  DEBDECLEVEL(cout, "SqrFreed");
+  DEBDECLEVEL(CERR, "SqrFreed");
   return Outputlist; // for safety purpose
 }
 
@@ -336,9 +348,9 @@ InternalSqrFree( const CanonicalForm & r , const CanonicalForm & mipo ){
   CanonicalForm g=icontent(r), f = r;
   CFFList Outputlist, Outputlist2;
 
-  DEBINCLEVEL(cout, "InternalSqrFree");
-  DEBOUTMSG(cout, rcsid);
-  DEBOUTLN(cout,"Called with f= ", f);
+  DEBINCLEVEL(CERR, "InternalSqrFree");
+  DEBOUTMSG(CERR, rcsid);
+  DEBOUTLN(CERR,"Called with f= ", f);
 
   // Take care of stupid users giving us constants
   if ( getNumVars(f) == 0 ) { // a constant ; Exp==1 even if f==0
@@ -358,13 +370,13 @@ InternalSqrFree( const CanonicalForm & r , const CanonicalForm & mipo ){
           Outputlist=myUnion(SqrFreed(f),Outputlist) ;
       }
   }
-  DEBOUTLN(cout,"Outputlist = ", Outputlist);
+  DEBOUTLN(CERR,"Outputlist = ", Outputlist);
   for ( CFFListIterator i=Outputlist; i.hasItem(); i++ )
     if ( getNumVars(i.getItem().factor()) > 0 )
       Outputlist2.append(i.getItem());
 
-  DEBOUTLN(cout,"Outputlist2 = ", Outputlist2);
-  DEBDECLEVEL(cout, "InternalSqrFree");
+  DEBOUTLN(CERR,"Outputlist2 = ", Outputlist2);
+  DEBDECLEVEL(CERR, "InternalSqrFree");
   return Outputlist2 ;
 }
 
@@ -375,10 +387,10 @@ SqrFree(const CanonicalForm & r ){
   CanonicalForm elem;
   int n=totaldegree(r);
 
-  DEBINCLEVEL(cout, "SqrFree");
+  DEBINCLEVEL(CERR, "SqrFree");
 
   if ( sqrfreelist.length() < 2 ){
-    DEBDECLEVEL(cout, "SqrFree");
+    DEBDECLEVEL(CERR, "SqrFree");
     return sqrfreelist;
   }
   for ( int j=1; j<=n; j++ ){
@@ -395,13 +407,16 @@ SqrFree(const CanonicalForm & r ){
   elem= r/elem;
   outputlist.insert(CFFactor(elem,1));
 
-  DEBOUTLN(cout, "SqrFree returns list:", outputlist);
-  DEBDECLEVEL(cout, "SqrFree");
+  DEBOUTLN(CERR, "SqrFree returns list:", outputlist);
+  DEBDECLEVEL(CERR, "SqrFree");
   return outputlist;
 }
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.9  2006/04/28 13:46:29  Singular
+*hannes: better tests for 0, 1
+
 Revision 1.8  2002/08/19 11:11:33  Singular
 * hannes/pfister: alg_gcd etc.
 

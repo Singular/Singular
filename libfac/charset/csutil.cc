@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: csutil.cc,v 1.11 2006-05-16 13:48:13 Singular Exp $";
+static char * rcsid = "$Id: csutil.cc,v 1.12 2006-05-16 14:46:49 Singular Exp $";
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -47,16 +47,16 @@ lowestRank( const CFList & F )
   if ( ! i.hasItem() )        return f;
   f = i.getItem(); ++i;
   while ( i.hasItem() ) {
-    //cout << "comparing " << f << "  and " << i.getItem()
-    // << " == " << lowerRank( i.getItem(), f, ind ) << endl;
+    //CERR << "comparing " << f << "  and " << i.getItem()
+    // << " == " << lowerRank( i.getItem(), f, ind ) << "\n";
     if ( lowerRank( i.getItem(), f, ind ) ) {
       if ( ind ){
         CFList Itemlist= get_Terms(i.getItem());
         CFList Flist= get_Terms(f);
 
         // Have to further compare number of terms!
-        //cout << "compare terms! f= " << Flist.length() << "  item= "
-        //     << Itemlist.length() <<endl;
+        //CERR << "compare terms! f= " << Flist.length() << "  item= "
+        //     << Itemlist.length() <<"\n";
         if ( Itemlist.length() < Flist.length()) f = i.getItem();
         ind=0;
       }
@@ -128,9 +128,9 @@ Prem ( const CanonicalForm &f, const CanonicalForm &g ){
     if (dg <= df) {l=LC(gg); gg = gg -LC(gg)*power(v,dg);}
     else { l = 1; }
     while ( ( dg <= df  ) && ( ff != ff.genZero()) ){
-      // cout << "Start gcd..." << endl;
+      // CERR << "Start gcd..." << "\n";
       test = gcd(l,LC(ff));
-      //cout << "gcd(" << l << "," << LC(ff) << ")= " << test << endl;
+      //CERR << "gcd(" << l << "," << LC(ff) << ")= " << test << "\n";
       lu = l/test; lv = LC(ff)/test;
       t = power(v,df-dg) * gg * lv;
       if ( df == 0 ){ ff = ff.genZero(); }
@@ -215,9 +215,9 @@ divide( const CanonicalForm & ff, const CanonicalForm & f, const CFList & as){
   }  
   else
     r= Sprem(ff,f,m,q); //result in q, ignore r,m
-  //cout << "r= " << r << "  , m= " << m << "  , q= " << q << endl;
+  //CERR << "r= " << r << "  , m= " << m << "  , q= " << q << "\n";
   r= Prem(q,as);
-  //cout << "r= " << r << endl;
+  //CERR << "r= " << r << "\n";
   //out_cf(" ->",r,"\n");
   return r;
 }
@@ -232,10 +232,10 @@ myfitting( const CanonicalForm &f ){
    else{
      On(SW_RATIONAL);
      CanonicalForm temp= mapinto(rem);
-//      cout << "temp= " << temp << endl;
-//      cout << "lc(temp)= " << lc(temp) << endl;
-//      cout << "temp/lc(temp)= " << temp/lc(temp) << endl;
-//      cout << "num(rem/lc(rem))= " << num(rem/lc(rem)) << endl;
+//      CERR << "temp= " << temp << "\n";
+//      CERR << "lc(temp)= " << lc(temp) << "\n";
+//      CERR << "temp/lc(temp)= " << temp/lc(temp) << "\n";
+//      CERR << "num(rem/lc(rem))= " << num(rem/lc(rem)) << "\n";
      temp= bCommonDen(temp/lc(temp))*(temp/lc(temp));
      Off(SW_RATIONAL);
      rem= mapinto(temp);
@@ -251,9 +251,9 @@ Prem( const CanonicalForm &f, const CFList &L ){
   CanonicalForm rem = f;
   CFListIterator i = L;
   for ( i.lastItem(); i.hasItem(); i-- ){
-//cout << "   PREM: Prem(" << rem << "," ;
+//CERR << "   PREM: Prem(" << rem << "," ;
     rem = Prem( rem, i.getItem() );
-//cout << "   PREM: Prem(" << rem << "," << i.getItem() << ")  = " << rem << endl;
+//CERR << "   PREM: Prem(" << rem << "," << i.getItem() << ")  = " << rem << "\n";
   }
   return myfitting(rem);
 }
@@ -313,8 +313,8 @@ nopower( const CanonicalForm & init ){
   for ( CFIterator j=init; j.hasTerms(); j++ )
     if (!(j.coeff().isOne()) ) count += 1;
   //  if ( init != 1 ){
-  //  cout << "nopower: f is " << init << endl;
-  //  cout << "nopower: count is " << count << endl;}
+  //  CERR << "nopower: f is " << init << "\n";
+  //  CERR << "nopower: count is " << count << "\n";}
   if ( count > 1 ) sqrfreelist = CFFList( CFFactor(init,1));
   else {
     sqrfreelist = Factorize(init);
@@ -394,10 +394,10 @@ removefactor( CanonicalForm & r , PremForm & Remembern){
       }
     }
   }
-  //  cout << "Remembern.FS1 = " << Remembern.FS1 << endl;
-  //  cout << "Remembern.FS2 = " << Remembern.FS2 << endl;
+  //  CERR << "Remembern.FS1 = " << Remembern.FS1 << "\n";
+  //  CERR << "Remembern.FS2 = " << Remembern.FS2 << "\n";
   //  Remembern.FS1 = Difference(Remembern.FS1, Remembern.FS2);
-  //  cout << "  New Remembern.FS1 = " << Remembern.FS1 << endl;
+  //  CERR << "  New Remembern.FS1 = " << Remembern.FS1 << "\n";
 }
 
 
@@ -528,7 +528,7 @@ int
 irreducible( const CFList & AS){
 // AS is given by AS = { A1, A2, .. Ar }, d_i = degree(Ai)
 
-  DEBOUTMSG(cout, rcsid);
+  DEBOUTMSG(CERR, rcsid);
 // 1) we test: if d_i > 1, d_j =1 for all j<>i, then AS is irreducible.
   bool deg1=1;
   for ( CFListIterator i = AS ; i.hasItem(); i++ ){
@@ -603,10 +603,10 @@ member( const CFList & cs, const ListCFList & pi ){
 bool
 subset( const CFList &PS, const CFList &CS ){
 
-  //  cout << "subset: called with: " << PS << "   " << CS << endl;
+  //  CERR << "subset: called with: " << PS << "   " << CS << "\n";
   for ( CFListIterator i=PS; i.hasItem(); i++ )
     if ( ! member(i.getItem(), CS) ) {
-      //      cout << "subset: " << i.getItem() << "  is not a member of " << CS << endl;
+      //      CERR << "subset: " << i.getItem() << "  is not a member of " << CS << "\n";
       return 0;
     }
   return 1;
@@ -872,6 +872,9 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.11  2006/05/16 13:48:13  Singular
+*hannes: gcc 4.1 fix: factory changes
+
 Revision 1.10  2006/04/28 13:45:29  Singular
 *hannes: better tests for 0, 1
 

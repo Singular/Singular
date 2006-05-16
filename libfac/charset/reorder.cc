@@ -11,7 +11,7 @@
 // computing time for your example!
 /////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: reorder.cc,v 1.3 1997-09-12 07:19:44 Singular Exp $";
+static char * rcsid = "$Id: reorder.cc,v 1.4 2006-05-16 14:46:49 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -240,7 +240,7 @@ reorderb(const Varlist & difference, const CFList & PS,
   
   while ( gap <= n) gap = __INIT_GAP__ * gap+1;
   gap /= __INIT_GAP__;
-  DEBOUTLN(cout, "gap is ", gap);
+  DEBOUTLN(CERR, "gap is ", gap);
   
   while ( gap > 0 ){
     for ( i=gap; i<= n-1; i++){
@@ -248,20 +248,20 @@ reorderb(const Varlist & difference, const CFList & PS,
       for ( j= i-gap; j >=0 ; j-=gap){
 	if (degord(v[j],temp, PS, A,B,C,D,E,F,G))  break;
 	v[j+gap] = v[j];
-	//cout << "v[" << j+gap << "]= " << v[j+gap] << endl;
+	//CERR << "v[" << j+gap << "]= " << v[j+gap] << "\n";
       }
       v[j+gap] = temp;
-      //cout << "v[" << j+gap << "]= " << v[j+gap] << endl;
+      //CERR << "v[" << j+gap << "]= " << v[j+gap] << "\n";
     }
     gap /= __INIT_GAP__;
   }
   Varlist output;
   for (i=0; i<= n-1; i++)
     output.append(v[i]);
-  DEBOUTLN(cout, "A= ", A);  DEBOUTLN(cout, "B= ", B);  
-  DEBOUTLN(cout, "C= ", C);  DEBOUTLN(cout, "D= ", D);
-  DEBOUTLN(cout, "E= ", E);  DEBOUTLN(cout, "F= ", F);
-  DEBOUTLN(cout, "G= ", G);
+  DEBOUTLN(CERR, "A= ", A);  DEBOUTLN(CERR, "B= ", B);  
+  DEBOUTLN(CERR, "C= ", C);  DEBOUTLN(CERR, "D= ", D);
+  DEBOUTLN(CERR, "E= ", E);  DEBOUTLN(CERR, "F= ", F);
+  DEBOUTLN(CERR, "G= ", G);
   return output;
 }
 
@@ -272,43 +272,43 @@ neworder( const CFList & PolyList ){
   CFList PS= PolyList, PS1=PolyList;
   Varlist oldorder, reorder, difference;
 
-  DEBINCLEVEL(cout, "neworder");
-  DEBOUTMSG(cout, rcsid);
+  DEBINCLEVEL(CERR, "neworder");
+  DEBOUTMSG(CERR, rcsid);
   TIMING_START(neworder_time);
 
   int highest_level= level(get_max_var(PS));
-  DEBOUTLN(cout, "neworder: highest_level=   ", highest_level);
-  DEBOUTLN(cout, "neworder: that is variable ", Variable(highest_level));
+  DEBOUTLN(CERR, "neworder: highest_level=   ", highest_level);
+  DEBOUTLN(CERR, "neworder: that is variable ", Variable(highest_level));
 
   // set up oldorder and first criterion: only_in_one
   for (int i=highest_level; i>=1; i--){
     oldorder.insert(Variable(i));
     CFList is_one= only_in_one(PS1, Variable(i)); 
     if ( is_one.length() == 1 ){
-      DEBOUTLN(cout, "Found a variable which is in only one Polynomial: ", 
+      DEBOUTLN(CERR, "Found a variable which is in only one Polynomial: ", 
 	       Variable(i));
-      DEBOUTLN(cout, ".... in the Polynomial: ", is_one.getFirst());
+      DEBOUTLN(CERR, ".... in the Polynomial: ", is_one.getFirst());
       reorder.insert(Variable(i));
       PS1 = Difference(PS1, is_one);
-      DEBOUTLN(cout, "New cutted list is: ", PS1);
+      DEBOUTLN(CERR, "New cutted list is: ", PS1);
     }
     else if ( is_one.length() == 0 ){
-      DEBOUTLN(cout, "Found a variable which is in no polynomial: ", 
+      DEBOUTLN(CERR, "Found a variable which is in no polynomial: ", 
 	       Variable(i));
-      DEBOUTMSG(cout, "... assigning it the highest level.");
+      DEBOUTMSG(CERR, "... assigning it the highest level.");
       reorder.append(Variable(i)); // assigne it the highest level
       PS1 = Difference(PS1, is_one); 
     }
   }
   difference = Difference(oldorder,reorder);
-  DEBOUTLN(cout, "Missing variables are: ", difference);
+  DEBOUTLN(CERR, "Missing variables are: ", difference);
   // rearrange the ordering of the variables!
   difference = reorderb(difference, PS, highest_level);
-  DEBOUTLN(cout, "second criterion gives: ", difference);
+  DEBOUTLN(CERR, "second criterion gives: ", difference);
   reorder = Union(reorder, difference);
-  DEBOUTLN(cout, "old order was:     ", oldorder);
-  DEBOUTLN(cout, "New order will be: ", Union(reorder, Difference(oldorder,reorder)));
-  DEBDECLEVEL(cout, "neworder");
+  DEBOUTLN(CERR, "old order was:     ", oldorder);
+  DEBOUTLN(CERR, "New order will be: ", Union(reorder, Difference(oldorder,reorder)));
+  DEBDECLEVEL(CERR, "neworder");
   TIMING_END(neworder_time);
 
   TIMING_PRINT(neworder_time, "\ntime used for neworder   : ");
@@ -371,11 +371,11 @@ reorder( const Varlist & betterorder, const CFList & PS){
   for (VarlistIterator j = betterorder; j.hasItem(); j++){
     v[i]= level(j.getItem()); i++;
   }
-  DEBOUTLN(cout, "reorder: Original ps=  ", ps);
+  DEBOUTLN(CERR, "reorder: Original ps=  ", ps);
   // reorder:
   for (i=1; i <= n; i++)
     ps=swapvar(ps,Variable(v[i]),Variable(n+i));
-  DEBOUTLN(cout, "reorder: Reorganized ps= ", ps); 
+  DEBOUTLN(CERR, "reorder: Reorganized ps= ", ps); 
   return ps;
 }
 
@@ -389,11 +389,11 @@ reorder( const Varlist & betterorder, const CFFList & PS){
   for (VarlistIterator j = betterorder; j.hasItem(); j++){
     v[i]= level(j.getItem()); i++;
   }
-  DEBOUTLN(cout, "reorder: Original ps=  ", ps);
+  DEBOUTLN(CERR, "reorder: Original ps=  ", ps);
   // reorder:
   for (i=1; i <= n; i++)
     ps=swapvar(ps,Variable(v[i]),Variable(n+i));
-  DEBOUTLN(cout, "reorder: Reorganized ps= ", ps); 
+  DEBOUTLN(CERR, "reorder: Reorganized ps= ", ps); 
   return ps;
 }
 
@@ -407,6 +407,9 @@ reorder(const Varlist & betterorder, const ListCFList & Q){
 }
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1997/09/12 07:19:44  Singular
+* hannes/michael: libfac-0.3.0
+
 Revision 1.2  1997/04/25 22:53:25  michael
 changed cerr and cout messages for use with Singular
 Version for libfac-0.2.1

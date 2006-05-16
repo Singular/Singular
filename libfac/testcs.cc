@@ -1,7 +1,17 @@
-// $Id: testcs.cc,v 1.2 1997-09-12 07:19:35 Singular Exp $
+// $Id: testcs.cc,v 1.3 2006-05-16 14:46:48 Singular Exp $
 
 #include <factory.h>
 #include <factor.h>
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#define COUT std::cout
+#define CIN std::cin
+#elif defined(HAVE_IOSTREAM_H)
+#include <iostream.h>
+#define COUT cout
+#define CIN cin
+#endif
+
 
 // testing: Characteristic Sets
 void
@@ -17,11 +27,11 @@ main()
 {
   int reord=0; // use strategy for reordering?
   int charac;
-  cout << " Characteristic = "; cin >> charac;
+  COUT << " Characteristic = "; CIN >> charac;
   setCharacteristic(charac);
   On(SW_SYMMETRIC_FF);
   char vnames[30];
-  cout << " vnames = "; cin >> vnames;
+  COUT << " vnames = "; CIN >> vnames;
 
   setVarNames( vnames );
 
@@ -33,34 +43,34 @@ main()
   PremForm Remembern;
   Varlist betterorder;
 
-  cout << " f[" << i << "] = "; cin >> f;
+  COUT << " f[" << i << "] = "; cin >> f;
   while ( f != 0 ) {
     F1.append( f ); i++;
-    cout << " f[" << i << "] = "; cin >> f;
+    COUT << " f[" << i << "] = "; cin >> f;
   }
   F2=F1;
-  cout << endl;
+  COUT << "\n";
 
-  cout << "F = " << F1 << endl;
+  COUT << "F = " << F1 << "\n";
   if (reord){
     betterorder= neworder(F1);
-    cout << "new orderd vars: " << betterorder << endl;
+    COUT << "new orderd vars: " << betterorder << "\n";
     F1=reorder(betterorder,F1);
-    cout << "new F= " << F1 << endl;
+    COUT << "new F= " << F1 << "\n";
   }
-//   cout << "\nUsing Modified CharSet:" << endl;
+//   COUT << "\nUsing Modified CharSet:" << "\n";
 //   F2 = MCharSetN( F1, Remembern );
-//   cout << "MCsN(F) = " << F2 << endl;
-//   cout << "Factors removed: " << Remembern.FS2 << endl;
-//   cout << "Possible Factors considered: " << Remembern.FS1 << endl;
+//   COUT << "MCsN(F) = " << F2 << "\n";
+//   COUT << "Factors removed: " << Remembern.FS2 << "\n";
+//   COUT << "Possible Factors considered: " << Remembern.FS1 << "\n";
 //   for ( I = F2; I.hasItem(); I++ )
-//     cout << "  vars: " << getVars( I.getItem() ) << endl;
-  cout << "\nUsing IrrCharSeries:" << endl;
+//     COUT << "  vars: " << getVars( I.getItem() ) << "\n";
+  COUT << "\nUsing IrrCharSeries:" << "\n";
   Q= IrrCharSeries( F1 );
-  cout << "ics(F) = " << Q << endl;
+  COUT << "ics(F) = " << Q << "\n";
   if (reord){
     Q=reorder(betterorder,Q);
-    cout << "reorderd ics(F) = " << Q << endl;
+    COUT << "reorderd ics(F) = " << Q << "\n";
   }
 }
 

@@ -1,10 +1,15 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: charset.cc,v 1.10 2002-08-19 11:11:31 Singular Exp $";
+static char * rcsid = "$Id: charset.cc,v 1.11 2006-05-16 14:46:49 Singular Exp $";
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
+#ifdef HAVE_IOSTREAM
+#define CIN std::cin
+#else
+#define CIN cin
+#endif
 // Factor - Includes
 #include <SqrFree.h>
 #include <Factor.h>
@@ -54,13 +59,13 @@ BasicSet( const CFList &PS )
     CanonicalForm b;
     int cb;
 
-    DEBOUTLN(cout, "BasicSet: called with ps= ", PS);
+    DEBOUTLN(CERR, "BasicSet: called with ps= ", PS);
     if ( PS.length() < 2 ) return PS;
     while ( ! QS.isEmpty() ) {
         b = lowestRank( QS );
         cb = rank( b );
-        DEBOUTLN(cout, "BasicSet: choose b  = ", b);
-        DEBOUTLN(cout, "BasicSet: it's rank = ", cb);
+        DEBOUTLN(CERR, "BasicSet: choose b  = ", b);
+        DEBOUTLN(CERR, "BasicSet: it's rank = ", cb);
         BS=Union(CFList(b),BS);//BS.append( b );
         if ( rank( b ) == 0 )
             return Union(PS, CFList(b)) ; // b should be the first elem!
@@ -75,7 +80,7 @@ BasicSet( const CFList &PS )
             QS = RS;
         }
     }
-    DEBOUTLN(cout, "BasicSet: returning bs= ", BS);
+    DEBOUTLN(CERR, "BasicSet: returning bs= ", BS);
     return BS;
 }
 
@@ -108,35 +113,35 @@ CFList
 MCharSetN( const CFList &PS, PremForm & Remembern ){
   CFList QS = PS, RS = PS, CS, OLDCS;
 
-  DEBOUTLN(cout, "MCharSetN: called with ps= ", PS);
+  DEBOUTLN(CERR, "MCharSetN: called with ps= ", PS);
   while ( ! RS.isEmpty() ) {
     CS = BasicSet( QS );
     OLDCS=CS;
-    DEBOUTLN(cout, "MCharSetN: CS= ", CS);
+    DEBOUTLN(CERR, "MCharSetN: CS= ", CS);
 //     if ( getNumVars(CS.getFirst()) > 1 ){
 //       //CS = removecontent(CS, Remembern);
 // #ifdef MCHARSETNDEBUG
-//       cout << "MCharSetN: CS= " << CS << endl;
+//       CERR << "MCharSetN: CS= " << CS << "\n";
 // #endif
 //     }
     Remembern.FS1 = Union(Remembern.FS1, initalset1(CS));
-    DEBOUTLN(cout, "MCharSetN: Remembern.FS1= ", Remembern.FS1);
-    DEBOUTLN(cout, "MCharSetN: Remembern.FS2= ", Remembern.FS2);
+    DEBOUTLN(CERR, "MCharSetN: Remembern.FS1= ", Remembern.FS1);
+    DEBOUTLN(CERR, "MCharSetN: Remembern.FS2= ", Remembern.FS2);
     RS = CFList();
     if ( rank( CS.getFirst() ) != 0 ) {
       CFList D = Difference( QS, CS );
-      DEBOUT(cout, "MCharSetN: Difference( ", QS);
-      DEBOUT(cout, " , ", CS);
-      DEBOUTLN(cout, " ) = ", D);
-//cout << "MCharSetN: Difference( " << QS << " , " << CS << " ) = " << D << endl;
+      DEBOUT(CERR, "MCharSetN: Difference( ", QS);
+      DEBOUT(CERR, " , ", CS);
+      DEBOUTLN(CERR, " ) = ", D);
+//CERR << "MCharSetN: Difference( " << QS << " , " << CS << " ) = " << D << "\n";
       //PremForm Oldremember=Remembern;
       //PremForm Newremember=Remembern;
       for ( CFListIterator i = D; i.hasItem(); ++i ) {
         CanonicalForm r = Prem( i.getItem(), CS );
-        DEBOUT(cout,"MCharSetN: Prem(", i.getItem()  );
-        DEBOUT(cout, ",", CS);
-        DEBOUTLN(cout,") = ", r);
-//cout << "MCharSetN: Prem("<< i.getItem() << "," << CS << ") = " << r << endl;
+        DEBOUT(CERR,"MCharSetN: Prem(", i.getItem()  );
+        DEBOUT(CERR, ",", CS);
+        DEBOUTLN(CERR,") = ", r);
+//CERR << "MCharSetN: Prem("<< i.getItem() << "," << CS << ") = " << r << "\n";
         if ( r != 0 ){
           //removefactor( r, Newremember );
           removefactor( r, Remembern );
@@ -148,15 +153,15 @@ MCharSetN( const CFList &PS, PremForm & Remembern ){
         }
       }
       if ( ! checkok(RS,Remembern.FS2)) return CFList(CanonicalForm(1));
-      DEBOUTLN(cout, "MCharSetN: RS= ", RS);
+      DEBOUTLN(CERR, "MCharSetN: RS= ", RS);
       //QS = Union( QS, RS );
       QS = Union(OLDCS,RS);
-      DEBOUTLN(cout, "MCharSetN: QS= Union(QS,RS)= ", QS);
+      DEBOUTLN(CERR, "MCharSetN: QS= Union(QS,RS)= ", QS);
     }
     else{ return CFList(CanonicalForm(1)); }
   }
-  DEBOUTLN(cout, "MCharSetN: Removed factors: ", Remembern.FS2);
-  DEBOUTLN(cout, "MCharSetN: Remembern.FS1: ", Remembern.FS1);
+  DEBOUTLN(CERR, "MCharSetN: Removed factors: ", Remembern.FS2);
+  DEBOUTLN(CERR, "MCharSetN: Remembern.FS1: ", Remembern.FS1);
 
   return CS;
 }
@@ -167,8 +172,8 @@ mcharset( const CFList &PS, PremForm & Remembern ){
   CFList cs= MCharSetN(PS, Remembern );
   CFList rs= remsetb(Difference(PS,cs),cs);
 
-  DEBOUTLN(cout, "mcharset: cs= ", cs);
-  DEBOUTLN(cout, "mcharset: rs= ", rs);
+  DEBOUTLN(CERR, "mcharset: cs= ", cs);
+  DEBOUTLN(CERR, "mcharset: rs= ", rs);
   if ( rs.length() > 0 )
     cs= mcharset(Union(PS,Union(cs,rs)), Remembern);
   return cs;
@@ -181,7 +186,7 @@ CharSet( const CFList &PS ){
 
   while ( ! RS.isEmpty() ) {
     CS = BasicSet( QS );
-    DEBOUTLN(cout, "CharSet: CS= ", CS);
+    DEBOUTLN(CERR, "CharSet: CS= ", CS);
     RS = CFList();
     if ( rank( CS.getFirst() ) != 0 ) {
       CFList D = Difference( QS, CS );
@@ -342,8 +347,8 @@ getItemNr( int nr, const ListCFList & copy){
 static int
 choosefrom(){
 int choice;
-    cout << "choose from qhi! ->";
-    cin >> choice;
+    CERR << "choose from qhi! ->";
+    CIN >> choice;
 return choice;
 }
 
@@ -352,9 +357,9 @@ msort( const ListCFList & list_to_sort ){
   int nr, number = list_to_sort.length();
   ListCFList output;
 
-  cout << "Sort: list to sort is: " <<  list_to_sort << endl;
+  CERR << "Sort: list to sort is: " <<  list_to_sort << "\n";
   for (int i=1; i<= number; i++){
-    cout << " Next elem = "; cin >> nr;
+    CERR << " Next elem = "; CIN >> nr;
     output.append(getItemNr(nr,list_to_sort));
   }
   return output;
@@ -378,45 +383,45 @@ IrrCharSeries( const CFList &PS, int opt ){
   int choice=1;;
 #endif
 
-  DEBOUTMSG(cout, rcsid);
-//  cout << getCharacteristic() << endl;
+  DEBOUTMSG(CERR, rcsid);
+//  CERR << getCharacteristic() << "\n";
   for ( CFListIterator Ps=PS; Ps.hasItem(); Ps++ )
     if ( level(Ps.getItem() ) > highestlevel ) highestlevel = level(Ps.getItem()) ;
 //  for ( int xx=1; xx <= highestlevel; xx++)
-//   cout << Variable(xx) ;
-//  cout << endl;
+//   CERR << Variable(xx) ;
+//  CERR << "\n";
 //  for ( CFListIterator Ps=PS; Ps.hasItem(); Ps++ )
-//    cout << Ps.getItem() << ", " ;//<< endl;
-//  cout <<  endl;
+//    CERR << Ps.getItem() << ", " ;//<< "\n";
+//  CERR <<  "\n";
   while ( ! qhi.isEmpty() ) {
     qhi=sort(qhi);
-    DEBOUTLN(cout, "qhi is: ", qhi);
+    DEBOUTLN(CERR, "qhi is: ", qhi);
 #ifdef EXPERIMENTAL
     choice=choosefrom();
-    cout <<"/n Choose " << choice << endl;
+    CERR <<"/n Choose " << choice << "\n";
     qs= getItemNr(choice, qhi);
 #else
     qs=qhi.getFirst();
 #endif
-    DEBOUTLN(cout, "qs  is: ", qs);
-    DEBOUTLN(cout, "ppi is: ", ppi);
+    DEBOUTLN(CERR, "qs  is: ", qs);
+    DEBOUTLN(CERR, "ppi is: ", ppi);
     ListCFList ppi1,ppi2;
     select(ppi,qs.length(),ppi1,ppi2);
-    DEBOUTLN(cout, "ppi1 is: ", ppi1);
-    DEBOUTLN(cout, "ppi2 is: ", ppi2);
+    DEBOUTLN(CERR, "ppi1 is: ", ppi1);
+    DEBOUTLN(CERR, "ppi2 is: ", ppi2);
     qqi = MyUnion(ppi2,qqi);
-    DEBOUTLN(cout, "qqi is: ", qqi);
+    DEBOUTLN(CERR, "qqi is: ", qqi);
     if ( nr_of_iteration == 0 ){ nr_of_iteration += 1; ppi = ListCFList(); }
     else{ nr_of_iteration += 1; ppi = MyUnion(ListCFList(qs),ppi1); }
-    DEBOUTLN(cout,"ppi is: ", ppi);
+    DEBOUTLN(CERR,"ppi is: ", ppi);
     PremForm Remembern;
     cs = MCharSetN(qs,Remembern);
-    DEBOUTLN(cout, "cs is: ", cs);
-    DEBOUTLN(cout, "factorset is: ", Remembern.FS2);
+    DEBOUTLN(CERR, "cs is: ", cs);
+    DEBOUTLN(CERR, "factorset is: ", Remembern.FS2);
     cs = removecontent(cs,Remembern);
     factorset=Remembern.FS2;
-    DEBOUTLN(cout, "cs (after removecontent) is: ", cs);
-    DEBOUTLN(cout, "factorset is: ", factorset);
+    DEBOUTLN(CERR, "cs (after removecontent) is: ", cs);
+    DEBOUTLN(CERR, "factorset is: ", factorset);
     // Hier: removecontent einfuegen!!!!
     if ( cls(cs.getFirst()) > 0 ){
       ts = irras(cs,ts2, reducible);
@@ -425,19 +430,19 @@ IrrCharSeries( const CFList &PS, int opt ){
       if ( interrupt_handle() ) return ListCFList() ;
       // INTERRUPTHANDLER
 
-      DEBOUTLN(cout, "ts is: ", ts);
-      DEBOUTLN(cout, "ts2 is: ", ts2);
+      DEBOUTLN(CERR, "ts is: ", ts);
+      DEBOUTLN(CERR, "ts2 is: ", ts2);
       // next is preliminary: should be ==0
       if ( ts2 <= 0 ){ //irreducible
         if ( ! subset(cs,qs) ){
-          DEBOUTMSG(cout, "cs is not a subset of qs");
+          DEBOUTMSG(CERR, "cs is not a subset of qs");
           cs = charseta(Union(qs,cs));
-          DEBOUTLN(cout, "new cs is: ", cs);
+          DEBOUTLN(CERR, "new cs is: ", cs);
         }
         if ( ! member(cs,pi) ){
           pi = MyUnion(pi, ListCFList(cs));
-          DEBOUTMSG(cout, "cs is not a member of pi");
-          DEBOUTLN(cout, "pi is: ", pi);
+          DEBOUTMSG(CERR, "cs is not a member of pi");
+          DEBOUTLN(CERR, "pi is: ", pi);
           if ( cls(cs.getFirst()) > 0 ){
             ts = irras(cs,ts2,reducible);
 
@@ -445,40 +450,40 @@ IrrCharSeries( const CFList &PS, int opt ){
             if ( interrupt_handle() ) return ListCFList() ;
             // INTERRUPTHANDLER
 
-            DEBOUTLN(cout, "ts is: ", ts);
-            DEBOUTLN(cout, "ts2 is: ", ts2);
+            DEBOUTLN(CERR, "ts is: ", ts);
+            DEBOUTLN(CERR, "ts2 is: ", ts2);
             // next is preliminary: should be ==0
             if ( ts2 <= 0 ){ //irreducible
               qsi = MyUnion(qsi,ListCFList(cs));
-              DEBOUTLN(cout, "qsi is: ", qsi);
+              DEBOUTLN(CERR, "qsi is: ", qsi);
               if ( cs.length() == highestlevel ){
-                DEBOUTLN(cout, "cs.length() == nops(ord) :", cs.length());
+                DEBOUTLN(CERR, "cs.length() == nops(ord) :", cs.length());
                 is = factorps(factorset);
               }
               else{
-                DEBOUT(cout,"cs.length() != nops(ord) :", cs.length());
-                DEBOUTLN(cout, "  nops(ord)= ", highestlevel);
+                DEBOUT(CERR,"cs.length() != nops(ord) :", cs.length());
+                DEBOUTLN(CERR, "  nops(ord)= ", highestlevel);
                 is = Union(initalset1(cs),factorps(factorset));
               }
-              DEBOUTLN(cout, "is is: ", is);
+              DEBOUTLN(CERR, "is is: ", is);
               iss = adjoin(is,qs,qqi);
-              DEBOUTLN(cout, "iss is: ", iss);
+              DEBOUTLN(CERR, "iss is: ", iss);
             }
           }
           else{ iss = adjoin(factorps(factorset),qs,qqi); }
         }
         else{
-          DEBOUTMSG(cout, "cs is a member of pi");
+          DEBOUTMSG(CERR, "cs is a member of pi");
           iss = adjoin(factorps(factorset),qs,qqi); }
-        DEBOUTLN(cout, "iss is: ", iss);
-        DEBOUTLN(cout, "   factorps(factorset)= ", factorps(factorset));
-        DEBOUTLN(cout, "   qs= ", qs);
-        DEBOUTLN(cout, "   qqi= ", qqi);
+        DEBOUTLN(CERR, "iss is: ", iss);
+        DEBOUTLN(CERR, "   factorps(factorset)= ", factorps(factorset));
+        DEBOUTLN(CERR, "   qs= ", qs);
+        DEBOUTLN(CERR, "   qqi= ", qqi);
       }
       // next is preliminary: should be !=0
       if ( ts2 > 0 ){
         is = factorps(factorset);
-        DEBOUTLN(cout, "is is: ", is);
+        DEBOUTLN(CERR, "is is: ", is);
         if ( ts2 > 1 ){
           // setup cst: need it later for adjoinb
           CFList cst;
@@ -490,22 +495,22 @@ IrrCharSeries( const CFList &PS, int opt ){
           iss = MyUnion(adjoin(is,qs,qqi), adjoinb(ts,qs,qqi,cst));
         }
         else{ iss = adjoin(Union(is,ts),qs,qqi); }
-        DEBOUTLN(cout, "iss is: ", iss);
+        DEBOUTLN(CERR, "iss is: ", iss);
       }
     }
     else{
       iss = adjoin(factorps(factorset),qs,qqi);
-      DEBOUTMSG(cout, "case: cs is a constant.");
-      DEBOUTLN(cout, "  qs = ", qs);
-      DEBOUTLN(cout, "  qqi = ", qqi);
-      DEBOUTLN(cout, "  iss = adjoin(factorps(factorset),qs,qqi) = ",iss);
+      DEBOUTMSG(CERR, "case: cs is a constant.");
+      DEBOUTLN(CERR, "  qs = ", qs);
+      DEBOUTLN(CERR, "  qqi = ", qqi);
+      DEBOUTLN(CERR, "  iss = adjoin(factorps(factorset),qs,qqi) = ",iss);
     }
     if ( qhi.length() > 1 ){ qhi.removeFirst(); qhi = MyUnion(qhi,iss); }
     else{ qhi = iss; }
-    DEBOUTLN(cout, "iss is: ", iss);
+    DEBOUTLN(CERR, "iss is: ", iss);
   }
   if ( ! qsi.isEmpty() ){
-    DEBOUTLN(cout, "qsi before contract= ", qsi);
+    DEBOUTLN(CERR, "qsi before contract= ", qsi);
     if ( opt == 0 ){
        return contract( qsi );
     }
@@ -533,11 +538,11 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
   CFListIterator i;
 
   ja = 0;
-  DEBOUTLN(cout, "irras: called with: AS= ", AS);
+  DEBOUTLN(CERR, "irras: called with: AS= ", AS);
   for ( i=AS; i.hasItem(); i++ ){
     elem = i.getItem();
     nr += 1;
-    DEBOUT(cout, "irras: factoring: ", elem);
+    DEBOUT(CERR, "irras: factoring: ", elem);
     if ( degree(elem) > 1 ) // linear poly's are irreduzible
     {
       qs = Factorize(elem);
@@ -546,23 +551,23 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
       qs=(CFFactor(elem,1));
       qs.insert(CFFactor(CanonicalForm(1),1));
     }
-    DEBOUTLN(cout, "  = ", qs);
+    DEBOUTLN(CERR, "  = ", qs);
     // INTERRUPTHANDLER
     if ( interrupt_handle() ) return CFList() ;
     // INTERRUPTHANDLER
     qs.removeFirst();
     if ( (qs.length() >= 2 ) || (qs.getFirst().exp() > 1)){
-      DEBOUTLN(cout, "irras: Setting ind=0, ja= ", nr);
+      DEBOUTLN(CERR, "irras: Setting ind=0, ja= ", nr);
       ja=nr; ind=0; reducible= elem;
       break;
     }
     //    else{ as.append(elem) ; }
   }
-  //  cout << "ind= " << ind << endl;
+  //  CERR << "ind= " << ind << "\n";
   if ( (ind == 1) ){ //&& ( as.length() > 1) ){
     if ( irreducible(AS) ){ // as quasilinear? => irreducible!
       ja = 0;
-      DEBOUTLN(cout, "as is irreducible. as= ", AS);
+      DEBOUTLN(CERR, "as is irreducible. as= ", AS);
     }
     else {
       i=AS;
@@ -571,12 +576,12 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
         i++;
         if ( degree(i.getItem()) > 1 ){// search for a non linear elem
           elem=i.getItem();
-//          cout << "f=  " << elem << endl;
-//        cout << "as= " << as << endl;
+//          CERR << "f=  " << elem << "\n";
+//        CERR << "as= " << as << "\n";
           qs= newfactoras(elem,as,success);
-//          cout << "irras:newfactoras    qs= " << qs << endl;
+//          CERR << "irras:newfactoras    qs= " << qs << "\n";
 //          qs= factoras(elem,as,success);
-//          cout << "irras:factoras qs= " << qs << endl;
+//          CERR << "irras:factoras qs= " << qs << "\n";
           if ( qs.length() > 1 || qs.getFirst().exp() > 1 ){ //found elem is reducible
             reducible=elem;
             ja=nr+1;
@@ -593,6 +598,9 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
 ///////////////////////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.10  2002/08/19 11:11:31  Singular
+* hannes/pfister: alg_gcd etc.
+
 Revision 1.9  2001/08/08 14:26:54  Singular
 *hannes: Dan's HAVE_SINGULAR_ERROR
 

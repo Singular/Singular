@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: timing.h,v 1.3 1997-09-12 07:19:59 Singular Exp $";
+// static char * rcsid = "$Id: timing.h,v 1.4 2006-05-16 14:46:50 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // It is possible to include this file multiple times for different 
 // settings of TIMING (but now this isn't used)
@@ -15,14 +15,22 @@
 #ifdef TIMING
 #include <time.h>
 #include <sys/times.h>
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#define OSTREAM std::ostream
+#define ISTREAM std::istream
+#elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#define OSTREAM ostream
+#define ISTREAM istream
+#endif
 #define TIMING_START(t) { struct tms timing_ ## t ## _start, timing_ ## t ## _end; \
   times( &timing_ ## t ## _start );
 #define TIMING_END(t) times( &timing_ ## t ## _end ); \
   timing_ ## t ## _time += timing_ ## t ## _end.tms_utime - timing_ ## t ## _start.tms_utime; }
 #define TIMING_DEFINE_PRINT(t) long timing_ ## t ## _time; \
-void timing_print_ ## t ( char * msg ) { cout.setf( ios::fixed, ios::floatfield); cout.precision(2); \
-  cout << msg << float(timing_ ## t ## _time) / 60 << " sec" << endl; }
+void timing_print_ ## t ( char * msg ) { CERR.setf( ios::fixed, ios::floatfield); CERR.precision(2); \
+  CERR << msg << float(timing_ ## t ## _time) / 60 << " sec" << "\n"; }
 #define TIMING_PRINT(t,msg) timing_print_ ## t ( msg );
 #define TIMING_DEFINE_PRINTPROTO(t) void timing_print_ ## t ( char * );
 #else
@@ -35,6 +43,9 @@ void timing_print_ ## t ( char * msg ) { cout.setf( ios::fixed, ios::floatfield)
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1997/09/12 07:19:59  Singular
+* hannes/michael: libfac-0.3.0
+
 Revision 1.2  1997/04/25 22:13:56  michael
 Version for libfac-0.2.1
 

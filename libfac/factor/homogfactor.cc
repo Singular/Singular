@@ -1,9 +1,23 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
-// static char * rcsid = "$Id: homogfactor.cc,v 1.6 2005-12-09 08:36:11 Singular Exp $ ";
+// static char * rcsid = "$Id: homogfactor.cc,v 1.7 2006-05-16 14:46:50 Singular Exp $ ";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#define OSTREAM std::ostream
+#define ISTREAM std::istream
+#define CERR std::cerr
+#define CIN std::cin
+#elif defined(HAVE_IOSTREAM_H)
+#include <iostream.h>
+#define OSTREAM ostream
+#define ISTREAM istream
+#define CERR cerr
+#define CIN cin
+#endif
+
 // Factor - Includes
 #include "tmpl_inst.h"
 #include "Factor.h"
@@ -120,15 +134,15 @@ homogenize( const CanonicalForm & f, const Variable & x){
 // we assume g is square-free
 CFFList
 HomogFactor( const CanonicalForm & g, const CanonicalForm  & minpoly, const int Mainvar ){
-  DEBINCLEVEL(cout, "HomogFactor");
+  DEBINCLEVEL(CERR, "HomogFactor");
   Variable xn = get_max_degree_Variable(g);
   int d_xn = degree(g,xn);
   CFMap n;
   CanonicalForm F = compress(g(1,xn),n); // must compress F! 
 
-  DEBOUTLN(cout, "xn= ", xn);
-  DEBOUTLN(cout, "d_xn=   ", d_xn);
-  DEBOUTLN(cout, "F= ", F);  
+  DEBOUTLN(CERR, "xn= ", xn);
+  DEBOUTLN(CERR, "d_xn=   ", d_xn);
+  DEBOUTLN(CERR, "F= ", F);  
 
   // should we do this for low degree polys g ? e.g. quadratic?
   // 
@@ -142,26 +156,29 @@ HomogFactor( const CanonicalForm & g, const CanonicalForm  & minpoly, const int 
   for ( j=Intermediatelist; j.hasItem(); j++ )
     Homoglist.append(CFFactor( n(j.getItem().factor()), j.getItem().exp()) );
   // Now we have uncompressed factors in Homoglist
-  DEBOUTLN(cout, "F factors as: ", Homoglist);
+  DEBOUTLN(CERR, "F factors as: ", Homoglist);
   CFFList Unhomoglist;
   CanonicalForm unhomogelem;
   for ( j=Homoglist; j.hasItem(); j++ ){
-    DEBOUTLN(cout, "Homogenizing ",j.getItem().factor()); 
+    DEBOUTLN(CERR, "Homogenizing ",j.getItem().factor()); 
     unhomogelem= homogenize(j.getItem().factor(),xn);
-    DEBOUTLN(cout, "      that is ", unhomogelem);
+    DEBOUTLN(CERR, "      that is ", unhomogelem);
     Unhomoglist.append(CFFactor(unhomogelem,j.getItem().exp()));
     d_xn -= degree(unhomogelem,xn)*j.getItem().exp();
   }
-  DEBOUTLN(cout, "Power of xn to append is ", d_xn);
+  DEBOUTLN(CERR, "Power of xn to append is ", d_xn);
   if ( d_xn != 0 ) // have to append xn^(d_xn)
     Unhomoglist.append(CFFactor(CanonicalForm(xn),d_xn));
 
-  DEBDECLEVEL(cout, "HomogFactor");
+  DEBDECLEVEL(CERR, "HomogFactor");
   return Unhomoglist;
 }
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.6  2005/12/09 08:36:11  Singular
+*hannes: stuff for homog. polys ->factory
+
 Revision 1.5  2005/12/05 15:47:32  Singular
 *hannes: is_homogeneous -> factory: isHomogeneous
 
