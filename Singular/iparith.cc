@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.395 2006-05-09 11:50:48 Singular Exp $ */
+/* $Id: iparith.cc,v 1.396 2006-05-16 08:47:37 bricken Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3887,7 +3887,11 @@ static BOOLEAN jjSLIM_GB(leftv res, leftv u)
       hom=isHomog;
     }
   }
-  res->data=(char *)t_rep_gb(currRing, u_id);
+   
+  assume(u_id->rank>=idRankFreeModule(u_id));
+  res->data=(char *)t_rep_gb(currRing, 
+    u_id,u_id->rank);
+  //res->data=(char *)t_rep_gb(currRing, u_id);
   setFlag(res,FLAG_STD);
   if (w!=NULL) atSet(res,omStrDup("isHomog"),w,INTVEC_CMD);
   return FALSE;
