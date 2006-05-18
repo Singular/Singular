@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.88 2006-05-16 08:38:39 bricken Exp $ */
+/* $Id: tgb.cc,v 1.89 2006-05-18 14:40:39 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -390,8 +390,8 @@ static inline wlen_type pQuality(poly p, slimgb_alg* c, int l=-1){
 
   if(l<0)
     l=pLength(p);
-  if(c->is_char0) {
-    if((pLexOrder) &&(!c->is_homog)){
+  if(c->isDifficultField) {
+    if(c->eliminationProblem){
       int cs;
       number coef=pGetCoeff(p);
       if (rField_is_Q(currRing)){
@@ -411,7 +411,7 @@ static inline wlen_type pQuality(poly p, slimgb_alg* c, int l=-1){
     assume(r>=0);
     return r;
   }
-  if((pLexOrder) &&(!c->is_homog)) return pELength(p,c,l);
+  if(c->eliminationProblem) return pELength(p,c,l);
   return l;
 }
 
@@ -429,9 +429,9 @@ wlen_type red_object::guess_quality(slimgb_alg* c){
     //works at the moment only for lenvar 1, because in different
     //case, you have to look on coefs
     wlen_type s=0;
-    if (c->is_char0){
+    if (c->isDifficultField){
       //s=kSBucketLength(bucket,this->p);
-      if((pLexOrder) &&(!c->is_homog)){
+      if(c->eliminationProblem){
     int cs;
     number coef;
 
@@ -466,7 +466,7 @@ wlen_type red_object::guess_quality(slimgb_alg* c){
     }
     else
     {
-      if((pLexOrder) &&(!c->is_homog))
+      if(c->eliminationProblem)
   //if (false)
   s=kEBucketLength(this->bucket,this->p,c);
       else s=bucket_guess(bucket);
@@ -758,10 +758,10 @@ static int add_to_reductors(slimgb_alg* c, poly h, int len, BOOLEAN simplified){
   assume(lenS_correct(c->strat));
   assume(len==pLength(h));
   int i;
-//   if (c->is_char0)
-//        i=simple_posInS(c->strat,h,pSLength(h,len),c->is_char0);
+//   if (c->isDifficultField)
+//        i=simple_posInS(c->strat,h,pSLength(h,len),c->isDifficultField);
 //   else
-//     i=simple_posInS(c->strat,h,len,c->is_char0);
+//     i=simple_posInS(c->strat,h,len,c->isDifficultField);
 
   LObject P; memset(&P,0,sizeof(P));
   P.tailRing=c->r;
@@ -1088,7 +1088,7 @@ static wlen_type coeff_mult_size_estimate(int s1, int s2, ring r){
     else return s1*s2;
 }
 static wlen_type pair_weighted_length(int i, int j, slimgb_alg* c){
-    if ((c->is_char0) && (pLexOrder) &&(!c->is_homog))  {
+    if ((c->isDifficultField) && (c->eliminationProblem))  {
         int c1=slim_nsize(p_GetCoeff(c->S->m[i],c->r),c->r);
         int c2=slim_nsize(p_GetCoeff(c->S->m[j],c->r),c->r);
         wlen_type el1=c->weighted_lengths[i]/c1;
@@ -1104,7 +1104,7 @@ static wlen_type pair_weighted_length(int i, int j, slimgb_alg* c){
         return res;
 
     }
-    if (c->is_char0) {
+    if (c->isDifficultField) {
         //int cs=slim_nsize(p_GetCoeff(c->S->m[i],c->r),c->r)+
         //    slim_nsize(p_GetCoeff(c->S->m[j],c->r),c->r);
         if(!(TEST_V_COEFSTRAT)){
@@ -1125,7 +1125,7 @@ static wlen_type pair_weighted_length(int i, int j, slimgb_alg* c){
             (wlen_type)cs;
             }
     }
-    if ((pLexOrder) &&(!c->is_homog)) {
+    if (c->eliminationProblem) {
 
         return (c->weighted_lengths[i]+c->weighted_lengths[j]-2);
     }
@@ -1833,7 +1833,7 @@ static void go_on (slimgb_alg* c){
     kBucketDestroy(&buf[j].bucket);
 
     if (!c->nc) {
-      if (TEST_OPT_REDTAIL){
+      if ((TEST_OPT_REDTAIL)&&(c->S->rank<=1)){
       p=redNFTail(p,c->strat->sl,c->strat, 0);
       } else {
       p=redTailShort(p, c->strat);
@@ -2120,6 +2120,7 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
       if(!(is_homog)) break;
     }
   }
+  eliminationProblem=((!(is_homog))&&((pLexOrder)));
   //  Print("is homog:%d",c->is_homog);
   void* h;
   poly hp;
@@ -2128,17 +2129,13 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
   easy_product_crit=0;
   extended_product_crit=0;
   if (rField_is_Zp(r))
-    is_char0=FALSE;
+    isDifficultField=FALSE;
   else
-    is_char0=TRUE;
+    isDifficultField=TRUE;
   //not fully correct
   //(rChar()==0);
   F4_mode=F4;
-  this->doubleSugar=TRUE;
-  if ((!F4_mode)&&(!is_homog) &&(pLexOrder)){
-    this->doubleSugar=TRUE;
-  }
-  else this->doubleSugar=FALSE;
+
   reduction_steps=0;
   last_index=-1;
 
@@ -2166,7 +2163,7 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
   i=0;
   this->n=0;
   T_deg=(int*) omalloc(n*sizeof(int));
-  if((!(is_homog)) &&(pLexOrder))
+  if(eliminationProblem)
     T_deg_full=(int*) omalloc(n*sizeof(int));
   else
     T_deg_full=NULL;
@@ -2213,7 +2210,7 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
   strat->Shdl=idInit(1,1);
   strat->S=strat->Shdl->m;
   strat->lenS=(int*)omAlloc0(i*sizeof(int));
-  if((is_char0)||((pLexOrder) &&(!is_homog)))
+  if((isDifficultField)||(eliminationProblem))
     strat->lenSw=(wlen_type*)omAlloc0(i*sizeof(wlen_type));
   else
     strat->lenSw=NULL;
