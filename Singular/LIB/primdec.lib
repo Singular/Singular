@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.115 2006-05-15 10:59:17 Singular Exp $";
+version="$Id: primdec.lib,v 1.116 2006-05-18 13:49:11 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -2946,6 +2946,7 @@ EXAMPLE: example decomp; shows an example
   list hquprimary;
   poly @p,@q;
   ideal @h,fac,ser;
+  ideal @Ptest=1;
   di=dim(jwork);
   keepdi=di;
 
@@ -2968,6 +2969,10 @@ EXAMPLE: example decomp; shows an example
      else
      {
         @va=string(maxideal(1));
+        if(@m==1)
+        {
+           @j=fetch(@P,i);
+        }
         execute("ring gnir1 = ("+charstr(basering)+"),("+indep[@m][1]+"),("
                               +indep[@m][2]+");");
         execute("map phi=gnir,"+@va+";");
@@ -3173,7 +3178,10 @@ EXAMPLE: example decomp; shows an example
         @h=imap(gnir,@h);
         if(@wr!=1)
         {
-          @q=minSat(jwork,@h)[2];
+          if(defined(@LL)){kill @LL;}
+          list @LL=minSat(jwork,@h);
+          @Ptest=intersect(@Ptest,@LL[1]);
+          @q=@LL[2];
         }
         else
         {
@@ -3235,11 +3243,8 @@ EXAMPLE: example decomp; shows an example
         hquprimary=imap(gnir,quprimary);
         if(@wr==0)
         {
-           ideal htest=hquprimary[1];
-           for (@n1=2;@n1<=size(hquprimary)/2;@n1++)
-           {
-              htest=intersect(htest,hquprimary[2*@n1-1]);
-           }
+           //HIER STATT DURCHSCHNITT SATURIEREN!
+           ideal htest=@Ptest;
         }
         else
         {
@@ -3507,7 +3512,6 @@ EXAMPLE: example decomp; shows an example
            // here we collect now both results primary(sat(j,gh))
            // and primary(j,gh^n)
            @n=size(quprimary);
-           if (deg(quprimary[1][1])<=0) { @n=0; }
            for (@k=1;@k<=size(htprimary);@k++)
            {
               quprimary[@n+@k]=htprimary[@k];
@@ -3537,6 +3541,7 @@ EXAMPLE: example decomp; shows an example
 
   setring @P;
   primary=imap(gnir,quprimary);
+  primary=cleanPrimary(primary);
   return(primary);
 }
 
