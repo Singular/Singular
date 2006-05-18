@@ -1,6 +1,6 @@
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: inout.lib,v 1.25 2005-05-10 17:48:26 Singular Exp $";
+version="$Id: inout.lib,v 1.26 2006-05-18 13:48:29 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  inout.lib     Printing and Manipulating In- and Output
@@ -658,7 +658,7 @@ EXAMPLE: example writelist; shows an example
    if( fil[1]==">" ) { fil=fil[2..size(fil)]; }
    for( i=1;i<=size(L);i=i+1 )
    {
-     write(fil,"   "+nam+"["+string(i)+"]=",string(L[i])+";");
+     write(fil,"   "+nam+"["+string(i)+"]=",typeof(L[i]),"(",string(L[i])+");");
    }
    return();
 }
