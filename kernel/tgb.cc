@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.90 2006-05-19 10:30:47 bricken Exp $ */
+/* $Id: tgb.cc,v 1.91 2006-05-19 12:21:12 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2253,18 +2253,37 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
   memset(add_later->m,0,ADD_LATER_SIZE*sizeof(poly));
 }
 slimgb_alg::~slimgb_alg(){
+  
   if (!(completed)){
+      poly* add=(poly*) omalloc((pair_top+2)*sizeof(poly));
       int piter;
+      int pos=0;
       for(piter=0;piter<=pair_top;piter++){
         sorted_pair_node* s=apairs[piter];
         if (s->i<0){
             //delayed element
-            add_to_basis_ideal_quotient(s->lcm_of_lm, this, NULL);
-            
+            if (s->lcm_of_lm!=NULL){
+                add[pos]=s->lcm_of_lm;
+                pos++;
+
+            }
         }
+    
         free_sorted_pair_node(s,r);
         apairs[piter]=NULL;
       }
+      pair_top=-1;
+      add[pos]=NULL;
+      while(add[pos]!=NULL){
+        add_to_basis_ideal_quotient(add[pos],this,NULL);
+      }
+      for(piter=0;piter<=pair_top;piter++){
+        sorted_pair_node* s=apairs[piter];
+        assume(s->i>=0);
+        free_sorted_pair_node(s,r);
+        apairs[piter]=NULL;
+      }
+      pair_top=-1;
   }
   id_Delete(&add_later,r);
   int i,j;
