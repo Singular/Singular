@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: digimult.lib,v 1.4 2005-11-08 07:07:16 bricken Exp $";
+version="$Id: digimult.lib,v 1.5 2006-05-19 11:42:31 bricken Exp $";
 category="Logic";
 info="
 LIBRARY: digimult.lib   Satisfiability of prop. logical expressions
@@ -139,10 +139,12 @@ proc satisfiable(ideal i)
 }
 
 static proc simple_gps(ideal i, list var_order, int step){
+  if ((size(i)==0)){~;}
   step=step+1;
   degBound=step+1;
   ideal j;
   if (size(var_order)==0){
+    ~;
     degBound=0;
     j=std(i);
     if (reduce(1,j)==0){
@@ -160,20 +162,23 @@ static proc simple_gps(ideal i, list var_order, int step){
     return(0);
   }
   j=simplify(j,2);
-  j=simplify(j,8);
+  //j=simplify(j,8);
 
   poly v=var(var_order[1]);
   var_order=delete(var_order,1);
   ideal j0=subst(j,v,0);
+  "setting", v, "to",0;
   j0=simplify(j0,2);
+ 
   j0=simplify(j0,8);
   if (simple_gps(j0,var_order,step)==1){
     return(1);
   } else{
-    j0=subst(j,v,1);
-    j0=simplify(j0,2);
-    j0=simplify(j0,8);
-    return(simple_gps(j0,var_order, step));
+    "setting", v, "to",1;
+    ideal j1=subst(j,v,1);
+    j1=simplify(j1,2);
+    //j0=simplify(j1,8);
+    return(simple_gps(j1,var_order, step));
   }
 
 }
