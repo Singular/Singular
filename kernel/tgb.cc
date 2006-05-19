@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.92 2006-05-19 12:48:24 bricken Exp $ */
+/* $Id: tgb.cc,v 1.93 2006-05-19 12:50:50 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2277,6 +2277,7 @@ slimgb_alg::~slimgb_alg(){
       pos=0;
       while(add[pos]!=NULL){
         add_to_basis_ideal_quotient(add[pos],this,NULL);
+        pos++;
       }
       for(piter=0;piter<=pair_top;piter++){
         sorted_pair_node* s=apairs[piter];
