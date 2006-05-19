@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.15 2006-03-20 20:33:57 wienand Exp $ */
+/* $Id: kutil.h,v 1.16 2006-05-19 10:22:36 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -278,6 +278,7 @@ public:
   KINLINE poly    kNoetherTail();
   poly    t_kNoether;
   BOOLEAN * NotUsedAxis;
+  BOOLEAN * pairtest;/*used for enterOnePair*/
   poly tail;
   leftv kIdeal;
   intvec * kModW;
@@ -316,7 +317,6 @@ public:
   BOOLEAN posInLOldFlag;
   BOOLEAN use_buckets;
   BOOLEAN interred_flag;
-  BOOLEAN *pairtest;/*used for enterOnePair*/
   // if set, pLDeg(p, l) == (pFDeg(pLast(p), pLength)
   BOOLEAN LDegLast;
   // if set, then L.length == L.pLength
@@ -327,6 +327,7 @@ public:
   char    redTailChange;
   char    news;
   char    newt;/*used for messageSets*/
+  char    noClearS;
 
   skStrategy();
   ~skStrategy();

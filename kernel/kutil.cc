@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.22 2006-05-08 12:55:11 Singular Exp $ */
+/* $Id: kutil.cc,v 1.23 2006-05-19 10:22:36 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -899,6 +899,7 @@ static inline void clearS (poly p, unsigned long p_sev, int* at, int* k,
                     kStrategy strat)
 {
   assume(p_sev == pGetShortExpVector(p));
+  if (strat->noClearS) return;
   if (!pLmShortDivisibleBy(p,p_sev, strat->S[*at], ~ strat->sevS[*at])) return;
   deleteInS((*at),strat);
   (*at)--;
