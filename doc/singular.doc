@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.140 2006-05-10 11:47:39 Singular Exp $
+@comment $Id: singular.doc,v 1.141 2006-05-19 16:43:58 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -223,6 +223,7 @@ command @code{LIB "all.lib";} for loading all libraries.
 * Visualization::
 * Coding theory::
 * System and Control theory::
+* Teaching::
 @end menu
 @c ----------------------------------------------------------
 @node standard_lib, General purpose, SINGULAR libraries, SINGULAR libraries
@@ -578,7 +579,7 @@ LIB "all.lib";
 
 
 @c ----------------------------------------------------------------------------
-@node System and Control theory, , Coding theory, SINGULAR libraries
+@node System and Control theory, Teaching, Coding theory, SINGULAR libraries
 @section System and Control theory
 @cindex System and Control theory
 @cindex Control theory
@@ -640,6 +641,28 @@ of autonomy degrees.
 @subsection control_lib
 @c lib control.lib
 
+
+@c ----------------------------------------------------------------------------
+@node Teaching, ,System and Control theory, SINGULAR libraries
+@section Teaching
+@cindex Teaching
+
+The libraries in this section demonstrate some aspects
+of algorithms. Normal users will fimnd bettter solutions elsewhere.
+
+@menu
+* teachstd_lib:: Procedures for teaching standard bases
+* weierstr_lib:: Procedures for the Weierstrass Theorems
+@end menu
+@c ---------------------------------------------------------
+@node teachstd_lib, weierstr_lib, Teaching, Teaching
+@subsection teachstd_lib
+@c lib teachstd.lib
+
+@c ---------------------------------------------------------
+@node weierstr_lib,, teachstd_lib, Teaching
+@subsection weierstr_lib
+@c lib weierstr.lib
 
 @c ----------------------------------------------------------
 @node Release Notes, Index, SINGULAR libraries, Top
