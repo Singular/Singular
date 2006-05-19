@@ -1,11 +1,12 @@
 //GMG, last modified 28.10.2001
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: weierstr.lib,v 1.1 2006-05-19 10:27:07 Singular Exp $";
+version="$Id: weierstr.lib,v 1.2 2006-05-19 11:50:35 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY:  weierstr.lib   Procedures for the Weierstrass Theorems
 AUTHOR:                  G.-M. Greuel, greuel@mathematik.uni-kl.de
 
+PROCEDURES:
  weierstrDiv(g,f,d);   perform Weierstrass division of g by f up to gegree d
  weierstrPrep(f,d);    perform Weierstrass preparation of f up to gegree d
  lastvarGeneral(f);    make f general of finite order w.r.t. last variable 
