@@ -1,0 +1,838 @@
+// $Id: 
+//GMG, last modified 28.9.01
+///////////////////////////////////////////////////////////////////////////////
+version="$Id: teachstd.lib,v 1.2 2006-05-19 10:27:07 Singular Exp $";
+category="Teaching";
+info="
+LIBRARY:  teachstd.lib   Procedures for teaching standard bases
+AUTHOR:                  G.-M. Greuel, greuel@mathematik.uni-kl.de
+
+ ecart(f);              ecart of f
+ tail(f);               tail of f
+ sameComponent(f,g);    test for same module component of lead(f) and lead(g)
+ leadmonomial(f);       leading monomial as poly (also for vectors)
+ monomialLcm(m,n);      lcm of monomials m and n as poly (also for vectors)
+ spoly(f[,1]);          s-polynomial of f [symmetric form]
+ minEcart(T,h);         element g from T of minimal ecart s.t. LM(g)|LM(h)
+ NFMora(i);             normal form of i w.r.t Mora algorithm
+ prodcrit(f,g);         test for product criterion
+ chaincrit(f,g,h);      test for chain criterion
+ pairset(G);            pairs form G neither satifying prodcrit nor chaincrit
+ updatePairs(P,S,h);    pairset P enlarded by not useless pairs (h,f), f in S 
+ standard(id);          standard basis of ideal/module
+ localstd(id);          local standard basis of id using Lazard's method
+              [parameters in square brackets are optional]
+
+ NOTE: The library is intended to be used for teaching purposes but not
+       for serious computations. Sufficiently high printlevel allows to 
+       control each step, thus illustrating the algorithms at work.
+       The procedures are implemented exatly as described in the book 
+       'A SINGULAR Introduction to Commutative Algebra' by G.-M. Greuel and
+       G. Pfister (Springer 2002).
+";
+
+LIB "poly.lib";
+
+///////////////////////////////////////////////////////////////////////////////
+proc ecart(f)
+"USAGE:   ecart(f); f poly or vector
+RETURN:  the ecart e of f of type int
+EXAMPLE: example ecart; shows an example
+"
+{
+  int e = maxdeg1(f)-maxdeg1(lead(f));
+  return(e);
+}   
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),ls;
+   ecart((y+z+x+xyz)**2);
+   ring s=0,(x,y,z),dp;
+   ecart((y+z+x+xyz)**2);  
+}  
+///////////////////////////////////////////////////////////////////////////////
+proc leadmonomial(f)
+"USAGE:   leadmonomial(f); f poly or vector
+RETURN:  the leading monomial of f of type poly
+NOTE:    if f is of type poly, leadmonomial(f)=leadmonom(f), if f is of type
+         vector and if leadmonom(f)=m*gen(i) then leadmonomial(f)=m
+EXAMPLE: example leadmonomial; shows an example
+"
+{
+  int e;
+  poly m;
+  if(typeof(f) == "vector")
+  {
+    e=leadexp(f)[nvars(basering)+1];
+    m=leadmonom(f)[e,1];
+  }
+  if(typeof(f) == "poly")
+  {
+    m=leadmonom(f);
+  }  
+  return(m);
+}   
+example
+{ "EXAMPLE:"; echo = 2;
+   ring s=0,(x,y,z),(c,dp);
+   leadmonomial((y+z+x+xyz)**2); 
+   leadmonomial([(y+z+x+xyz)**2,xyz5]);
+} 
+///////////////////////////////////////////////////////////////////////////////
+proc tail(f)
+"USAGE:   tail(f); f poly or vector
+RETURN:  f-lead(f), the tail of f of type poly
+EXAMPLE: example tail; shows an example
+"
+{
+  def t = f-lead(f);
+  return(t);
+}   
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),ls;
+   tail((y+z+x+xyz)**2);
+   ring s=0,(x,y,z),dp;
+   tail((y+z+x+xyz)**2);  
+}  
+///////////////////////////////////////////////////////////////////////////////
+proc sameComponent(f,g)
+"USAGE:   sameComponent(f,g); f,g poly or vector
+RETURN:  1 if f and g are of type poly or if f and g are of type vector and
+         their leading monomials involve the same module component, 
+         0 if not
+EXAMPLE: example sameComponent; shows an example
+"
+{
+  if(typeof(f) != typeof(g))
+  {
+    ERROR("** arguments must be of same type");
+  }
+  if(typeof(f) == "vector")
+  {    
+     if( leadexp(f)[nvars(basering)+1] !=  leadexp(g)[nvars(basering)+1] )
+     {
+       return(0);
+     }
+  }
+  return(1);
+}   
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),dp;
+   sameComponent([y+z+x,xyz],[z2,xyz]);
+   sameComponent([y+z+x,xyz],[z4,xyz]);
+   sameComponent(y+z+x+xyz, xy+z5);  
+}  
+///////////////////////////////////////////////////////////////////////////////
+proc monomialLcm(m,n)
+"USAGE:   monomialLcm(m,n); m,n of type poly or vector
+RETURN:  least common multiple of leading monomials of m and n, of type poly
+NOTE:    if m = (x1...xr)^(a1,...,ar)*gen(i) (gen(i)=1 if m is of type poly)
+         and n = (x1...xr)^(b1,...,br)*gen(j), then the proc returns 
+         (x1,...,xr)^(max(a1,b1),...,max(ar,br)) if i=j and 0 if i!=j.
+EXAMPLE: example monomialLcm; shows an example
+"
+{
+  if(typeof(n) != typeof(m))
+  {
+    ERROR("** arguments must be of same type");
+  }
+
+  poly u ;
+  if(sameComponent(m,n) == 0)   //leading term of vectors involve 
+  {                             //different module components
+     return(u);
+  }
+   
+  intvec v = leadexp(m);        //now start to compute lcm
+  intvec w = leadexp(n); 
+  u=1;
+  int i;
+  for (i=1; i<=nvars(basering); i++)
+  {
+      if(v[i]>=w[i]) 
+      {
+         u = u*var(i)**v[i];
+      }
+      else
+      {
+         u = u*var(i)**w[i];
+      }
+   }
+   return(u);       
+}   
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),ds;
+   monomialLcm(xy2,yz3);
+   monomialLcm([xy2,xz],[yz3]);
+   monomialLcm([xy2,xz3],[yz3]);
+}  
+///////////////////////////////////////////////////////////////////////////////
+proc spoly(f,g,list #)
+"USAGE:   spoly(f,g[,s]); f,g poly or vector, s int
+RETURN:  the s-polynomial of f and g, of type poly or vector
+         if s!=0 the symmetric s-polynomial (without division) is returned
+EXAMPLE: example spoly; shows an example
+"
+{
+  if(typeof(f) != typeof(g))
+  {
+    ERROR("** arguments must be of same type");
+  }  
+  if(size(#) == 0)
+  {
+     #[1]=0;
+  }
+
+  int e;
+  poly o = monomialLcm(f,g);  
+  if( o == 0)                    //can only happen, if vectors f and g involve
+  {                              //different module components
+    vector sp;
+    return(sp);
+  }
+  
+  poly m=leadmonomial(f);         //compute the leading monomial as poly
+  poly n=leadmonomial(g);
+
+  if (#[1]==0)                    //the asymmetric s-poly
+  {
+    def sp = (o/m)*f - (leadcoef(f)/leadcoef(g))*(o/n)*g;
+  }
+  else                            //the symmetric s-poly, avoiding division
+  {
+    def sp = leadcoef(g)*(o/m)*f - leadcoef(f)*(o/n)*g;
+  }   
+  return(sp);
+}   
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),ls;
+   spoly(2x2+x2y,3y3+xyz);
+   ring s=0,(x,y,z),(c,dp);
+   spoly(2x2+x2y,3y3+xyz);
+   spoly(2x2+x2y,3y3+xyz,1);             //symmetric s-poly without division
+   spoly([5x2+x2y,z5],[x2,y3,y4]);       //s-poly for vectors
+}  
+///////////////////////////////////////////////////////////////////////////////
+proc minEcart(T,h)
+"USAGE:   minEcart(T,h); T ideal or module, h poly or vector
+RETURN:  element g from T such that leadmonom(g) divides leadmonom(h)
+         ecart(g) is minimal with this property (if T != 0);
+         return 0 if T is 0 or h = 0
+EXAMPLE: example minEcart; shows an example
+"
+{
+  int i,k,e;
+  if (size(T)==0 or h==0 )       //trivial cases
+  { 
+     h = 0;
+     return(h);
+  }
+//---- check whether some element in T has the same module component as h ----
+  int v;
+  intvec w;
+  T = simplify(T,2);
+  
+  if (typeof(h) == "vector")    
+  {
+     e=1;
+     v = leadexp(h)[nvars(basering)+1];
+     for( i=1; i<=size(T); i++)
+     {
+       w[i]=leadexp(T[i])[nvars(basering)+1];
+       if(v == w[i])
+       {
+         e=0;         //some element in T involves the same component as h
+       }
+     }
+  }
+  if ( e == 1 )       //no element in T involves the same component as h
+  { 
+     h = 0;
+     return(h);
+  }
+
+  if (typeof(h) == "poly")   //for polys v=w[i] for all i 
+  {
+    v = 1;
+    w[size(T)]=0;
+    w=w+1;
+  }
+  
+//------ check whether for some g in T leadmonom(g) divides leadmonom(h) -----
+  def g = T[1];
+  poly f = leadmonomial(h);
+
+  for( i=1; i<=size(T); i++)
+  {
+    if( f/leadmonomial(T[i]) != 0 and v==w[i] )
+    {
+       g=T[i];
+       k=i;
+       break;
+    }
+  }
+  if (k == 0)        //no leadmonom(g) divides leadmonom(h)   
+  { 
+     g = 0;
+     return(g);
+  }
+//--look for T[i] with minimal ecart s.t.leadmonom(T[i]) divides leadmonom(h)--
+
+  for( i=k+1; i<=size(T); i++)
+  {
+    if( f/leadmonomial(T[i]) != 0 and v==w[i] )
+    {
+       if (ecart(T[i]) < ecart(g))
+       {
+         g=T[i];
+        }
+     }
+  }
+  return(g);
+}   
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R=0,(x,y,z),dp;
+   ideal T = x2y+x2,y3+xyz,xyz2+z4;
+   poly h = x2y2z2+x5+yx3+z6;
+   minEcart(T,h);"";
+   ring S=0,(x,y,z),(c,ds);
+   module T = [x2+x2y,y2],[y3+xyz,x3-z3],[x3y+z4,0,x2];
+   vector h = [x3y+x5+x2y2z2+z6,x3];
+   minEcart(T,h);
+}  
+///////////////////////////////////////////////////////////////////////////////
+proc NFMora(f,G,list #)
+"USAGE:   NFMora(f,G[,s]); f poly or vector,G ideal or module, s int
+RETURN:  the Mora normal form of f w.r.t. G, same type as f
+         if s!=0 the symmetric s-polynomial (without division) is used
+NOTE:    Show comments if printlevel > 0, pauses computation if printlevel > 1
+EXAMPLE: example NFMora; shows an example
+"
+{
+  if(size(#) == 0)
+  {
+     #[1]=0;
+  }
+
+  int y = printlevel - voice + 2;
+  if( f==0 or size(G) ==0 )
+  {
+     if (y>0) 
+     {
+        "// 1st or 2nd argument 0";
+     }
+     return(f);
+  }
+
+  int i,e;
+  def h = f;
+  def T = G;
+// -------------------- start with f to be reduced by G --------------------
+  if (y>0) 
+  {"";
+   "// Input for NFMora is (f,T):";
+   "// f:"; f;
+   "// T:"; T;
+   "// Reduce f with T, eventually enlarging T for local ordering";
+  }
+
+// ----------------------- enter the reduction loop ------------------------
+  def g = minEcart(T,h);
+  while (h!=0 and g!=0)
+  {
+     if (y>0) 
+     {  "";
+        "//                Reduction-step in NFMora:",i;
+        "// h = (f after",i,"reductions) reduction with g from T:";
+        "// g = element of minimal ecart in T s.t. LM(g)|LM(h):"; 
+        "// h:";h;
+        "// g:";g;      
+     }
+     if (y>1) 
+     { 
+        pause("press <return> to continue");
+        "// T, set used for reduction:"; T;
+        pause("press <return> to continue");
+     }
+     e=0;
+     if( ecart(g) > ecart(h) )
+     {
+        T=T,h;  e=1;
+     }
+     if (y>0 ) 
+     { 
+        "// T-set enlarged for next reduction? (yes/no = 1/0):  ", e;
+        if( e==1 )
+        {
+          "// T-set for next reduction got enlarged by h:";
+          "// h:";h;
+          if (y>1) 
+          { 
+             pause("press <return> to continue");
+          }
+        }
+     }
+     h = spoly(h,g,#[1]);
+     g = minEcart(T,h);
+     i=i+1;
+  }
+  if(y>0)
+  { "";
+    "// normal form is:";
+  }
+  return(h);
+}   
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),dp;
+   poly f = x2y2z2+x5+yx3+z6-3y3;
+   ideal G = x2y+x2,y3+xyz,xyz2+z6;
+   NFMora(f,G);"";
+   ring s=0,(x,y,z),ds;
+   poly f = x3y+x5+x2y2z2+z6;
+   ideal G = x2+x2y,y3+xyz,x3y2+z4;
+   NFMora(f,G);"";
+   vector v = [f,x2+x2y];
+   module M = [x2+x2y,f],[y3+xyz,y3],[x3y2+z4,z2];
+   NFMora(v,M);
+}  
+///////////////////////////////////////////////////////////////////////////////
+proc prodcrit(f,g)
+"USAGE:   prodcrit(f,g); f,g poly or vector
+RETURN:  1 if product criterion applies in the same module component,
+         2 if lead(f) and lead(g) involve different components, 0 else
+NOTE:    if product criterion applies we can delete (f,g) from pairset
+EXAMPLE: example prodcrit; shows an example
+"
+{
+  if(typeof(f)=="poly")    //product criterion for polynomials
+  {
+    if( monomialLcm(f,g)==leadmonom(f)*leadmonom(g))
+    {
+      return(1);
+    }
+    return(0);
+  }
+// ------------------- product criterion for modules ---------------------  
+  if(sameComponent(f,g)==1)
+  {
+     if( monomialLcm(f,g)==leadmonomial(f)*leadmonomial(g) )
+     {
+         int c = leadexp(f)[nvars(basering)+1];  //component involving lead(f)
+         if((f-f[c]*gen(c))-(g-g[c]*gen(c))==0)  //other components are 0
+         {
+           return(1);
+         }
+     }
+     return(0);
+  }
+  return(2);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),dp;
+   poly f = y3z3+x5+yx3+z6;
+   poly g = x5+yx3;
+   prodcrit(f,g);
+   vector v = x3z2*gen(1)+x3y*gen(1)+x2y*gen(2);
+   vector w = y4*gen(1)+y3*gen(2)+xyz*gen(1);
+   prodcrit(v,w);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc chaincrit(f,g,h)
+"USAGE:   chaincrit(f,g,h); f,g,h poly or module
+RETURN:  1 if chain criterion applies, 0 else
+NOTE:    if chain criterion applies to f,g,h we can delete (g,h) from pairset
+EXAMPLE: example chaincrit; shows an example
+"
+{
+  if(sameComponent(f,g) and sameComponent(f,h))
+  {
+    if( monomialLcm(g,h)/leadmonomial(f) !=0 )
+    {
+      return(1);
+    }
+  }
+  return(0);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),dp;
+   poly f = x2y2z2+x5+yx3+z6;
+   poly g = x5+yx3;
+   poly h = y2z5+x5+yx3;
+   chaincrit(f,g,h);
+   vector u = [x2y3-z2,x2y];
+   vector v = [x2y2+z2,x2-y2];
+   vector w = [x2y4+z3,x2+y2];
+   chaincrit(u,v,w);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc pairset(G)
+"USAGE:   pairset(G); G ideal or module
+RETURN:  list L, 
+         L[1] = the pairset of G as list (not containing pairs for 
+         which the product or the chain criterion applies)
+         L[2] = intvec v, v[1]= # product criterion, v[2]= # chain criterion
+EXAMPLE: example pairset; shows an example
+"
+{
+   int i,j,k,s,c,ccrit,pcrit,pr;
+   int y = printlevel - voice + 2;
+   G = simplify(G,10);
+   def g = G;
+   ideal pair;
+   list P,I;      //P=pairlist of G, I=list of corresponding indices of pairs
+   for (i=1; i<=size(G); i++)
+   {
+      for(j = i+1; j<=size(G); j++)
+      {
+         pr = prodcrit(G[i],G[j]);       //check first product criterion
+         if( pr != 0 )
+         { 
+            pcrit=pcrit+(pr==1); 
+         }
+         else
+         {
+            s = size(P);                //now check chain criterion
+            for(k=1; k<=s; k++)
+            {
+              if( i==I[k][2] )
+              {
+                if ( chaincrit(P[k][1],P[k][2],G[j]) )
+                {                     //need not include (G[i],G[j]) in P
+                  c=1; ccrit=ccrit+1;  
+                  break;
+                }
+              }
+              if( j==I[k][1] and c==0 )
+              {
+                "########### enter pairset2 #############";
+                if ( chaincrit(G[i],P[k][1],P[k][2]) )
+                {                     //can delete P[k]=(P[k][1],P[k][2])
+                  ccrit=ccrit+1; 
+                  P = delete(P,k);
+                  s = s-1;
+                }
+              }
+            }
+            if ( c==0 )
+            {
+               g = G[i],G[j];
+               P[s+1]=g;
+               I[s+1]=intvec(i,j);
+            }
+            c=0;
+         }
+      }
+   }
+   if (y>0) 
+   {  "";
+      "// product criterion:",pcrit," chain criterion:",ccrit;
+   }
+   intvec v = pcrit,ccrit;
+   P=P,v;
+   return(P);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),dp;
+   ideal G = x2y+x2,y3+xyz,xyz2+z4;
+   pairset(G);"";
+   module T = [x2y3-z2,x2y],[x2y2+z2,x2-y2],[x2y4+z3,x2+y2];
+   pairset(T);
+}  
+///////////////////////////////////////////////////////////////////////////////
+proc updatePairs(P,S,h)
+"USAGE:   updatePairs(P,S,h); P list, S ideal or module, h poly or vector
+         P a list of pairs of polys or vectors (obtained from pairset)
+RETURN:  list Q, 
+         Q[1] = the pairset P enlarged  by all pairs (f,h), f from S,
+         without pairs for which the product or the chain criterion applies
+         Q[2] = intvec v, v[1]= # product criterion, v[2]= # chain criterion
+EXAMPLE: example updatePairs; shows an example
+"
+{
+   int i,j,k,s,r,c,ccrit,pcrit,pr;
+   int y = printlevel - voice + 2;
+   ideal pair;
+   list Q = P;           //Q will become enlarged pairset
+   s = size(P);
+   r = size(Q);          //r will grow with Q
+   list R;
+   def g = S;            //give g the correct type ideal/module
+   for (i=1; i<=size(S); i++)
+   {
+      pr =  prodcrit(h,S[i]);
+      if( pr != 0 )     //check product criterion
+      { 
+        pcrit=pcrit+(pr==1);       //count product criterion in same component
+      }
+      else
+      {                 //prodcrit did not apply, check for chaincrit
+         r=size(Q);
+         for(k=1; k<=r; k++)
+         {
+           if( Q[k][2]==S[i] )    //S[i]=Q[k][2]
+           {
+             if( chaincrit(Q[k][1],S[i],h) )
+             {                   //can forget (S[i],h)
+                c=1; ccrit=ccrit+1;
+                break;
+             }
+           }
+         }
+         if ( c==0 )
+         {
+            g = S[i],h;        //add pair (S[i],h)
+            Q[r+1] = g;
+         }
+         c=0;
+      }
+   }
+   if (y>0) 
+   {  "";;
+      "// product criterion:",pcrit," chain criterion:",ccrit;
+   }
+   intvec v = pcrit,ccrit;
+   Q = Q,v;
+   return(Q);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R1=0,(x,y,z),(c,dp);
+   ideal S = x2y+x2,y3+xyz;
+   poly h = x2y+xyz;
+   list P = pairset(S)[1];
+   P;"";
+   updatePairs(P,S,h);"";
+   module T = [x2y3-z2,x2y],[x2y4+z3,x2+y2];
+   P = pairset(T)[1];
+   P;"";
+   updatePairs(P,T,[x2+x2y,y3+xyz]);
+}  
+///////////////////////////////////////////////////////////////////////////////
+proc standard(id, list #)
+"USAGE:   standard(i[,s]); id ideal or module, s int
+RETURN:  a standard basis of id, using generalized Mora's algorithm
+         which is Buchberger's algorithm for global monomial orderings.
+         If s!=0 the symmetric s-polynomial (without division) is used
+NOTE:    Show comments if printlevel > 0, pauses computation if printlevel > 1
+EXAMPLE: example standard; shows an example
+"
+{
+  if(size(#) == 0)
+  {
+     #[1]=0;
+  }
+
+   def S = id;                 //S will become the standard basis of id
+   def h = S[1];
+   int i,z;
+   int y = printlevel - voice + 2;
+   if(y>0)
+   {  "";
+      "// the set S, to become a standard basis:"; S;
+      if(y>1)
+      {
+         "// create pairset, i.e. pairs from S,";
+         "// after application of product and chain criterion";
+      }
+   }   
+   list P = pairset(S);        //create pairset of S=id
+   intvec v = P[2];
+   P = P[1];
+//-------------------------- Main loop in SB lgorithm ----------------------
+   while (size(P) !=0)
+   {  z=z+1;
+      if(y>0)
+      {  "";
+         "//              Enter NFMora for next pair, count",z;
+         "// size of partial standard basis S:    (",size(S),")";
+         "// number of pairs of S after updating: (",size(P),")";
+         if(y>1)
+         {
+            "// 1st pair of new pairset:"; P[1];
+            "// set T=S used for reduction:";S;
+            "// apply NFMora to (spoly,S), spoly = spoly(1st pair)";
+         }
+      }
+      //-------------------- apply NFMora = Mora's normal form -------------
+      h = spoly(P[1][1],P[1][2],#[1]);
+      if(y>1)
+      {  
+         "// spoly:";h;
+      }
+      h = NFMora(h,S,#[1]); 
+      if(h==0)           //normal form is 0
+      {
+         if(y==1)
+         {
+            "// pair has reduced to 0";
+         }
+          if(y>1) 
+         { h;"";
+           pause("press <return> to continue");
+         }            
+     }
+      P = delete(P,1);   //spoly of pair reduced to 0, pair can be deleted
+      //--- spoly of pair did not reduce to 0, update S and paiset of S ----
+      if( h != 0)       
+      {
+         if(y==1)
+         {
+            "// ** new spoly in degree **:", deg(h);
+         }
+         if(y>1) 
+         { h;"";
+           pause("press <return> to continue");
+           "// update pairset";
+         }            
+        P=updatePairs(P,S,h);    //update P (=paisert of S)
+        v=v+P[2];                //with useful pairs (g,h), g from S
+         P=P[1];
+         S=S,h;                  //update S, will become the standard basis
+      }
+   } 
+//------------------------------ finished ---------------------------------
+   if( find(option(),"prot") or y>0 )
+   {  "";                //show how often prodcrit and chaincrit applied
+      "// product criterion:",v[1]," chain criterion:",v[2];
+      "";
+      "// Final standard basis:";
+   }        
+   return(S);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),dp;
+   ideal G = x2y+x2,y3+xyz,xyz2+z4;
+   standard(G);"";
+   ring s=0,(x,y,z),(c,ds);
+   ideal G = 2x2+x2y,y3+xyz,3x3y+z4;
+   standard(G);"";
+   standard(G,1);"";           //use symmetric s-poly without division
+   module M = [2x2,x3y+z4],[3y3+xyz,y3],[5z4,z2];
+   standard(M);
+}  
+///////////////////////////////////////////////////////////////////////////////
+proc localstd (id)
+"USAGE:   localstd (id); id = ideal
+RETURN:  A standard basis for a local degree ordering, using Lazard's method.
+NOTE:    The procedure homogenizes id w.r.t. a new 1st variable local@t, 
+         computes a SB wrt (dp(1),dp) and substitutes local@t by 1.
+         Hence the result is a SB with respect to an ordering which sorts
+         first w.r.t. the subdegree of the original variables and then refines
+         it with dp. This is the local degree ordering ds.
+         localstd may be used in order to avoid cancellation of units and thus
+         to be able to use option(contentSB) also for local orderings.
+EXAMPLE: example localstd; shows an example
+"
+{
+  int ii;
+  def bas = basering;
+  execute("ring  @r_locstd 
+     =("+charstr(bas)+"),(local@t,"+varstr(bas)+"),(dp(1),dp);");
+  ideal id = imap(bas,id);
+  ideal hid = homog(id,local@t);
+  hid = std(hid);
+  hid = subst(hid,local@t,1);
+  setring bas;
+  def hid = imap(@r_locstd,hid);
+  attrib(hid,"isSB",1);
+  kill @r_locstd;
+  return(hid);  
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,(x,y,z),ds;
+   ideal i  = xyz+z5,2x2+y3+z7,3z5+y5;
+   localstd(i);
+}   
+///////////////////////////////////////////////////////////////////////////////
+
+/*
+// some examples:
+LIB"teachstd.lib";
+option(prot); printlevel=3;
+ring r0 = 0,(t,x,y),lp;
+ideal i = x-t2,y-t3;
+standard(i);
+
+printlevel=1;
+standard(i);
+
+option(prot); printlevel =1;
+ring r1 = (0,a,b),(x,y,z),(c,ds);
+module M = [ax2,bx3y+z4],[a3y3+xyz,by3],[5az4,(a+b)*z2];
+module N1= std(M);
+module N2 = standard(M,1);
+NF(lead(N2),lead(N1));
+NF(lead(N1),lead(N2));rom T
+ring r2 = 0,(x,y,z),dp;
+ideal I = x2y+x2,y3+xyz,xyz2+z4;
+option(prot);
+int tt = timer;
+ideal J = standard(I);
+timer -tt;                 //4sec, product criterion: 9  chain criterion: 6
+ideal J1 = std(I);
+NF(lead(J),lead(J1));
+NF(lead(J1),lead(J));
+
+ring r3 = 0,(x,y,z),ds;
+poly f = x3*y4+z5+xyz;
+ideal I = f,jacob(f);
+option(prot);
+int tt = timer;
+ideal J = standard(I);
+timer -tt;                 //3sec, product criterion: 1  chain criterion: 3
+ideal J1 = std(I);
+NF(lead(J),lead(J1));
+NF(lead(J1),lead(J));
+ 
+//Becker:
+ring r4 = 32003,(x,y,z),lp;
+ideal I = x3-1, y3-1,
+-27x3-243x2y+27x2z-729xy2+162xyz-9xz2-729y3+243y2z-27yz2+z3-27; 
+option(prot);
+int tt = timer;
+ideal J = standard(I);
+timer -tt;                 //201sec, product criterion: 42  chain criterion: 33
+ideal J1 = std(I);
+NF(lead(J),lead(J1));
+NF(lead(J1),lead(J));
+ 
+//Alex
+ring r5 = 32003,(x,y,z,t),dp;
+ideal I = 
+2t3xy2z+x2ty+2x2y,
+2tz+y3x2t+z2t3y2x;
+option(prot); printlevel =1;
+ideal J1 = std(I);
+int tt = timer;
+ideal J = standard(I);
+timer -tt;                 //15sec product criterion: 0  chain criterion: 12
+NF(lead(J),lead(J1));
+NF(lead(J1),lead(J));
+
+ring r6 = 32003,(x,y,z,t),dp; //is already SB for ds, for dp too long
+ideal I=
+9x8+y7t3z4+5x4y2t2+2xy2z3t2,
+9y8+7xy6t+2x5y4t2+2x2yz3t2,
+9z8+3x2y3z2t4;
+option(prot);
+int tt = timer;
+ideal J = standard(I);
+timer -tt;                 //0sec, product criterion: 3  chain criterion: 0
+ideal J1 = std(I);
+NF(lead(J),lead(J1));
+NF(lead(J1),lead(J));
+
+
+*/
+

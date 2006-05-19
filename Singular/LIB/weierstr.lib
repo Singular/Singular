@@ -1,0 +1,241 @@
+//GMG, last modified 28.10.2001
+///////////////////////////////////////////////////////////////////////////////
+version="$Id: weierstr.lib,v 1.1 2006-05-19 10:27:07 Singular Exp $";
+category="Teaching";
+info="
+LIBRARY:  weierstr.lib   Procedures for the Weierstrass Theorems
+AUTHOR:                  G.-M. Greuel, greuel@mathematik.uni-kl.de
+
+ weierstrDiv(g,f,d);   perform Weierstrass division of g by f up to gegree d
+ weierstrPrep(f,d);    perform Weierstrass preparation of f up to gegree d
+ lastvarGeneral(f);    make f general of finite order w.r.t. last variable 
+ generalOrder(f);      compute integer b s.t. f is x_n-general of order b 
+           (parameters in square brackets [] are optional)
+";
+
+LIB "mondromy.lib";
+LIB "poly.lib";
+///////////////////////////////////////////////////////////////////////////////
+
+proc generalOrder (poly f)
+"USAGE:   generalOrder(f); f=poly
+RETURN:  integer b if f is general of order b w.r.t. the last variable, say T,
+         resp. -1 if not 
+         (i.e. f(0,...,0,T) is of order b, resp. f(0,...,0,T)==0)
+NOTE:    the procedure works for any monomial ordering
+EXAMPLE: example generalOrder; shows an example
+"
+{ int ii;
+  int n = nvars(basering);
+  for (ii=1; ii<n; ii++)
+  {
+    f = subst(f,var(ii),0);
+  }   
+  return(mindeg(f));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,(x,y),ds;
+   poly f = x2-4xy+4y2-2xy2+4y3+y4;
+   generalOrder(f);
+}  
+///////////////////////////////////////////////////////////////////////////////
+
+proc weierstrDiv ( poly g, poly f, int d )
+"USAGE:   weierstrDiv(g,f,d); g,f=poly, d=integer
+ASSUME:  f must be general of finite order, say b, in the last ring variable,
+         say T; if not use the procedure lastvarGeneral first
+PURPOSE: perform the Weierstrass division of g by f up to order d
+RETURN:  a list, say l, of two polynomials and an interer, such that 
+                   g = l[1]*f + l[2],  deg_T(l[2]) < b
+         up to (including) total degree d
+         l[3] is the number of iterations used
+         if f is not T-general, return (0,g)
+NOTE:    the procedure works for any monomial ordering
+THEORY:  the proof of Grauert-Remmert (Analytische Stellenalgebren) is used 
+         for the algorithm
+EXAMPLE: example weierstrDiv; shows an example
+"
+{ 
+//------------- initialisation and check T - general -------------------------
+  int a,b,ii,D;
+  poly r,h;
+  list result;
+  int y = printlevel - voice + 2;
+  int n = nvars(basering);
+  intvec v;
+  v[n]=1;
+  b = generalOrder(f);
+  if (y>0) 
+  {
+     "//",f;"// is "+string(var(n))+"-general of order", b;
+     pause("press <return> to continue");
+  }
+  if ( b==-1 )
+  {
+     "// second poly is not general w.r.t. last variable";
+     "// use the procedure lastvarGeneral first";
+     result=h,g;
+     return(result);
+  }
+//------------------------- start computation --------------------------------
+  D = d+b;
+  poly fhat = jet(f,b-1,v);
+  poly ftilde = (f-fhat)/var(n)^b;
+  poly u = invunit(ftilde,D);
+  if (y>0) 
+  {
+     "// fhat (up to order", d,"):";
+     "//", fhat;
+     "// ftilde:";
+     "//", ftilde;
+     "// ftilde-inverse:";
+     "//", u;
+     pause("press <return> to continue");
+  }
+  poly khat, ktilde;
+  poly k=g;
+  khat = jet(k,b-1,v);
+  ktilde = (k-r)/var(n)^b;
+  r = khat;
+  h = ktilde;
+  ii=0;
+  while (size(k) > 0)
+  {
+  if (y>0) 
+    {  
+     "// loop",ii+1;
+     "// khat:";
+     "//", khat;
+     "// ktilde:";
+     "//", ktilde;
+     "// remainder:";
+     "//", r;
+     "// multiplier:";
+     "//", h;
+     pause("press <return> to continue");
+    }
+    k = jet(-fhat*u*ktilde,D);
+    khat = jet(k,b-1,v);
+    ktilde = (k-khat)/var(n)^b;
+    r = r + khat;
+    h = h + ktilde;
+    ii=ii+1;
+  }  
+  result = jet(u*h,d),jet(r,d),ii;
+  return(result);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,(x,y),ds;
+   poly f = y - xy2 + x2;
+   poly g = y;
+   list l = weierstrDiv(g,f,10); l;"";
+   l[1]*f + l[2];               //g = l[1]*f+l[2] up to degree 10
+}  
+///////////////////////////////////////////////////////////////////////////////
+
+proc weierstrPrep (poly f, int d)
+"USAGE:   weierstrPrep(f,d); f=poly, d=integer
+ASSUME:  f must be general of finite order, say b, in the last ring variable,
+         say T; if not apply the procedure lastvarGeneral first
+PURPOSE: perform the Weierstrass preparation of f up to order d
+RETURN:  a list, say l, of two polynomials and one integer, 
+         l[1] a unit, l[2] a Weierstrass polynomial, l[3] an integer 
+         such that l[1]*f = l[2], where l[2] is a Weierstrass polynomial, 
+         (i.e. l[2] = T^b + lower terms in T) up to (including) total degree d
+         l[3] is the number of iterations used
+         if f is not T-general, return (0,0)
+NOTE:    the procedure works for any monomial ordering
+THEORY:  the proof of Grauert-Remmert (Analytische Stellenalgebren) is used
+         for the algorithm
+EXAMPLE: example weierstrPrep; shows an example
+"
+{
+  int n = nvars(basering);
+  int b = generalOrder(f);
+  if ( b==-1 )
+  {
+     "// second poly is not general w.r.t. last variable";
+     "// use the procedure lastvarGeneral first";
+     poly h,g;
+     list result=h,g;
+     return(result);
+  }
+  list L = weierstrDiv(var(n)^b,f,d);
+  list result = L[1], var(n)^b - L[2],L[3];
+  return(result);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,(x,y),ds;
+   poly f = xy+y2+y4;
+   list l = weierstrPrep(f,5); l; "";
+   f*l[1]-l[2];                      // = 0 up to degree 5
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc lastvarGeneral (poly f)
+"USAGE:   lastvarGeneral(f,d); f=poly
+RETURN:  poly, say g, obtained from f by a generic change of variables, s.t. 
+         g is general of finite order b w.r.t. the last ring variable, say T
+         (i.e. g(0,...,0,T)= c*T^b + higher terms, c!=0)
+NOTE:    the procedure works for any monomial ordering
+EXAMPLE: example lastvarGeneral; shows an example
+"
+{
+  int n = nvars(basering);
+  int b = generalOrder(f);
+  if ( b >=0 )  { return(f); }
+  else
+  { 
+    def B = basering;
+    int ii;
+    map phi;
+    ideal m=maxideal(1);
+    int d = mindeg1(f);
+    poly g = jet(f,d);
+    for (ii=1; ii<=n-1; ii++)
+    {
+       if (size(g)>size(subst(g,var(ii),0)) )
+       { 
+          m[ii]= var(ii)+ random(1-(voice-2)*10,1+(voice-2)*10)*var(n);
+          phi = B,m;
+          g = phi(f);
+          break;
+       }
+    }
+    if ( voice <=5 ) 
+    { 
+       return(lastvarGeneral(g));
+    }
+    if ( voice ==6 ) 
+    { 
+       for (ii=1; ii<=n-1; ii++)
+      { 
+         m[ii]= var(ii)+ var(n)*random(1,1000);
+      }
+      phi = basering,m;
+      g = phi(f);
+      return(lastvarGeneral(g));
+    }
+    else
+    {
+      for (ii=1; ii<=n-1; ii++)
+      {
+         m[ii]= var(ii)+ var(n)^random(2,voice*d);
+      }
+      phi = basering,m;
+      g = phi(f);
+      return(lastvarGeneral(g));
+    }   
+  }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 2,(x,y,z),ls;
+   poly f = xyz;
+   lastvarGeneral(f);
+}   
+///////////////////////////////////////////////////////////////////////////////
+
