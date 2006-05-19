@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.10 2006-03-10 12:53:19 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.11 2006-05-19 13:33:25 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1189,6 +1189,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         //}
       }
       if (strat->Ll<0) break;
+      else strat->noClearS=TRUE;
     }
     strat->P = strat->L[strat->Ll];/*- picks the last element from the lazyset L -*/
     if (strat->Ll==0) strat->interpt=TRUE;

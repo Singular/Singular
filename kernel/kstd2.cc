@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.15 2006-05-19 08:24:08 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.16 2006-05-19 13:33:26 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -888,6 +888,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 	)
         deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
       if (strat->Ll<0) break;
+      else strat->noClearS=TRUE;
     }
     /* picks the last element from the lazyset L */
     strat->P = strat->L[strat->Ll];
