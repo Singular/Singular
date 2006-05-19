@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.39 2006-05-18 14:40:40 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.40 2006-05-19 10:30:47 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -146,6 +146,7 @@ class slimgb_alg
   int extended_product_crit;
   int average_length;
   BOOLEAN isDifficultField;
+  BOOLEAN completed;
   BOOLEAN is_homog;
   
   BOOLEAN eliminationProblem;

@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.89 2006-05-18 14:40:39 bricken Exp $ */
+/* $Id: tgb.cc,v 1.90 2006-05-19 10:30:47 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2096,7 +2096,7 @@ static int poly_crit(const void* ap1, const void* ap2){
   return 0;
 }
 slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
-
+  completed=FALSE;
   this->syz_comp=syz_comp;
   r=currRing;
   nc=rIsPluralRing(r);
@@ -2253,6 +2253,19 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
   memset(add_later->m,0,ADD_LATER_SIZE*sizeof(poly));
 }
 slimgb_alg::~slimgb_alg(){
+  if (!(completed)){
+      int piter;
+      for(piter=0;piter<=pair_top;piter++){
+        sorted_pair_node* s=apairs[piter];
+        if (s->i<0){
+            //delayed element
+            add_to_basis_ideal_quotient(s->lcm_of_lm, this, NULL);
+            
+        }
+        free_sorted_pair_node(s,r);
+        apairs[piter]=NULL;
+      }
+  }
   id_Delete(&add_later,r);
   int i,j;
   slimgb_alg* c=this;
@@ -2357,7 +2370,7 @@ slimgb_alg::~slimgb_alg(){
 //     }
 //   }
 
-
+  if (completed){
   for(i=0;i<c->n;i++)
   {
     assume(c->S->m[i]!=NULL);
@@ -2379,6 +2392,7 @@ slimgb_alg::~slimgb_alg(){
         break;
       }
     }
+  }
   }
   omfree(c->short_Exps);
 
@@ -2423,13 +2437,15 @@ ideal t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode){
   slimgb_alg* c=new slimgb_alg(I, syz_comp,F4_mode);
 
 
-  while(c->pair_top>=0)
+  while ((c->pair_top>=0) && ((!(TEST_OPT_DEGBOUND)) || (c->apairs[c->pair_top]->deg<=Kstd1_deg)))
   {
     if(F4_mode)
       go_on_F4(c);
     else
       go_on(c);
   }
+  if (c->pair_top<0)
+    c->completed=TRUE;
   I=c->S;
   delete c;
   if (TEST_OPT_REDSB){
