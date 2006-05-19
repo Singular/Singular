@@ -241,8 +241,8 @@ SLIB0 = COPYING      absfact.lib   arcAtPoint.lib\
 	random.lib   reesclos.lib  resolve.lib   resgraph.lib   reszeta.lib \
 	ring.lib     rinvar.lib    sagbi.lib     sheafcoh.lib   sing.lib \
 	solve.lib    signcond.lib  spcurve.lib   spectrum.lib   standard.lib \
-	stratify.lib surf.lib      toric.lib     triang.lib     rootsur.lib \
-	zeroset.lib  help.cnf
+	stratify.lib surf.lib      teachstd.lib  toric.lib      triang.lib \
+	rootsur.lib Weierst.lib    zeroset.lib   help.cnf
  
 
 PLIBS = center.lib dmod.lib gkdim.lib involut.lib ncall.lib ncalg.lib ncdecomp.lib nctools.lib perron.lib qmatrix.lib
