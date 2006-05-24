@@ -1,6 +1,6 @@
 //GMG, last modified 28.10.2001
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: weierstr.lib,v 1.2 2006-05-19 11:50:35 Singular Exp $";
+version="$Id: weierstr.lib,v 1.3 2006-05-24 16:36:06 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY:  weierstr.lib   Procedures for the Weierstrass Theorems
@@ -11,6 +11,7 @@ PROCEDURES:
  weierstrPrep(f,d);    perform Weierstrass preparation of f up to gegree d
  lastvarGeneral(f);    make f general of finite order w.r.t. last variable 
  generalOrder(f);      compute integer b s.t. f is x_n-general of order b 
+
            (parameters in square brackets [] are optional)
 ";
 

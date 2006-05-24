@@ -1,11 +1,18 @@
 // $Id: 
 //GMG, last modified 28.9.01
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: teachstd.lib,v 1.3 2006-05-19 11:50:35 Singular Exp $";
+version="$Id: teachstd.lib,v 1.4 2006-05-24 16:36:06 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY:  teachstd.lib   Procedures for teaching standard bases
 AUTHOR:                  G.-M. Greuel, greuel@mathematik.uni-kl.de
+
+NOTE: The library is intended to be used for teaching purposes but not
+      for serious computations. Sufficiently high printlevel allows to 
+      control each step, thus illustrating the algorithms at work.
+      The procedures are implemented exatly as described in the book 
+      'A SINGULAR Introduction to Commutative Algebra' by G.-M. Greuel and
+      G. Pfister (Springer 2002).
 
 PROCEDURES:
  ecart(f);              ecart of f
@@ -22,14 +29,8 @@ PROCEDURES:
  updatePairs(P,S,h);    pairset P enlarded by not useless pairs (h,f), f in S 
  standard(id);          standard basis of ideal/module
  localstd(id);          local standard basis of id using Lazard's method
-              [parameters in square brackets are optional]
 
- NOTE: The library is intended to be used for teaching purposes but not
-       for serious computations. Sufficiently high printlevel allows to 
-       control each step, thus illustrating the algorithms at work.
-       The procedures are implemented exatly as described in the book 
-       'A SINGULAR Introduction to Commutative Algebra' by G.-M. Greuel and
-       G. Pfister (Springer 2002).
+              [parameters in square brackets are optional]
 ";
 
 LIB "poly.lib";
