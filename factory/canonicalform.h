@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.32 2006-05-15 09:03:04 Singular Exp $ */
+/* $Id: canonicalform.h,v 1.33 2006-05-26 11:50:37 Singular Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -49,7 +49,7 @@ class InternalCF;
 inline int is_imm ( const InternalCF * const ptr )
 {
     // returns 0 if ptr is not immediate       
-    return ( (long)ptr & 3 );
+    return ( ((int)((long)ptr)) & 3 );
 }
 
 

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: imm.h,v 1.22 2006-05-15 09:03:05 Singular Exp $ */
+/* $Id: imm.h,v 1.23 2006-05-26 11:49:58 Singular Exp $ */
 
 #ifndef INCL_IMM_H
 #define INCL_IMM_H
@@ -45,7 +45,7 @@ const INT64 MAXIMMEDIATELL = 268435454LL;
 
 inline int imm2int ( const InternalCF * const imm )
 {
-    return (long)imm >> 2;
+    return ((int)((long)imm)) >> 2;
 }
 
 inline InternalCF * int2imm ( int i )
@@ -58,7 +58,7 @@ inline InternalCF * int2imm ( int i )
 inline int imm2int ( const InternalCF * const imm )
 {
     // this could be better done by masking the sign bit
-    if ( (long)imm < 0 )
+    if ( ((int)((long)imm)) < 0 )
         return -((-(long)imm) >> 2);
     else
         return (long)imm >> 2;
