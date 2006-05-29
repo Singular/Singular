@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.105 2006-05-29 14:22:06 Singular Exp $ */
+/* $Id: tesths.cc,v 1.106 2006-05-29 15:29:47 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -36,7 +36,7 @@
 #include <factory.h>
 #endif
 
-char *singular_date=__DATE__ " " __TIME__;
+const char *singular_date=__DATE__ " " __TIME__;
 
 /*0 implementation*/
 int main(          /* main entry to Singular */
