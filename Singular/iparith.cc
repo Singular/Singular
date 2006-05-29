@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.398 2006-05-19 10:38:53 bricken Exp $ */
+/* $Id: iparith.cc,v 1.399 2006-05-29 12:34:41 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -163,6 +163,7 @@ cmdnames cmds[] =
   { "attrib",      0, ATTRIB_CMD ,        CMD_123},
   { "bareiss",     0, BAREISS_CMD ,       CMD_123},
   { "betti",       0, BETTI_CMD ,         CMD_12},
+  { "bigint",      0, BIGINT_CMD ,        ROOT_DECL},
   #ifdef HAVE_PLURAL
   { "bracket",     0, BRACKET_CMD ,       CMD_2},
   #endif
@@ -789,6 +790,11 @@ static BOOLEAN jjPLUS_I(leftv res, leftv u, leftv v)
   }
   return jjPLUSMINUS_Gen(res,u,v);
 }
+static BOOLEAN jjPLUS_BI(leftv res, leftv u, leftv v)
+{
+  res->data = (char *)(nlAdd((number)u->Data(), (number)v->Data()));
+  return jjPLUSMINUS_Gen(res,u,v);
+}
 static BOOLEAN jjPLUS_N(leftv res, leftv u, leftv v)
 {
   res->data = (char *)(nAdd((number)u->Data(), (number)v->Data()));
@@ -862,6 +868,11 @@ static BOOLEAN jjMINUS_I(leftv res, leftv u, leftv v)
   res->data = (char *)c;
   return jjPLUSMINUS_Gen(res,u,v);
 }
+static BOOLEAN jjMINUS_BI(leftv res, leftv u, leftv v)
+{
+  res->data = (char *)(nlSub((number)u->Data(), (number)v->Data()));
+  return jjPLUSMINUS_Gen(res,u,v);
+}
 static BOOLEAN jjMINUS_N(leftv res, leftv u, leftv v)
 {
   res->data = (char *)(nSub((number)u->Data(), (number)v->Data()));
@@ -902,6 +913,13 @@ static BOOLEAN jjTIMES_I(leftv res, leftv u, leftv v)
     WarnS("int overflow(*), result may be wrong");
   res->data = (char *)c;
   if ((u->Next()!=NULL) || (v->Next()!=NULL))
+    return jjOP_REST(res,u,v);
+  return FALSE;
+}
+static BOOLEAN jjTIMES_BI(leftv res, leftv u, leftv v)
+{
+  res->data = (char *)(nlMult( (number)u->Data(), (number)v->Data()));
+  if ((v->next!=NULL) || (u->next!=NULL))
     return jjOP_REST(res,u,v);
   return FALSE;
 }
@@ -1075,6 +1093,19 @@ static BOOLEAN jjDIVMOD_I(leftv res, leftv u, leftv v)
         r= (a / b);     break;
   }
   res->data=(void *)r;
+  return FALSE;
+}
+static BOOLEAN jjDIV_BI(leftv res, leftv u, leftv v)
+{
+  number q=(number)v->Data();
+  if (nlIsZero(q))
+  {
+    WerrorS(ii_div_by_0);
+    return TRUE;
+  }
+  q = nlIntDiv((number)u->Data(),q);
+  nlNormalize(q);
+  res->data = (char *)q;
   return FALSE;
 }
 static BOOLEAN jjDIV_N(leftv res, leftv u, leftv v)
@@ -2643,10 +2674,19 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   ideal result;
   assumeStdFlag(u);
   ideal i1=(ideal)(u->Data());
-  ideal i0=idInit(1,i1->rank);
-  i0->m[0]=(poly)v->Data();
+  ideal i0;
+  int r=v->Typ();
+  if ((/*v->Typ()*/r==POLY_CMD) ||(r==VECTOR_CMD))
+  {
+    i0=idInit(1,i1->rank);
+    i0->m[0]=(poly)v->Data();
+  }
+  else /*IDEAL*/
+  {
+    i0=(ideal)v->Data();
+  }
   i1=idSimpleAdd(i1,i0);
-  i0->m[0]=NULL;
+  memset(i0->m,0,sizeof(poly)*IDELEMS(i0));
   idDelete(&i0);
   intvec *w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   tHomog hom=testHomog;
@@ -2718,6 +2758,7 @@ struct sValCmd2 dArith2[]=
 // proc        cmd              res             arg1        arg2   plural
  {jjCOLCOL,    COLONCOLON,     ANY_TYPE,       DEF_CMD,    DEF_CMD ALLOW_PLURAL}
 ,{jjPLUS_I,    '+',            INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
+,{jjPLUS_BI,   '+',           BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjPLUS_N,    '+',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD ALLOW_PLURAL}
 ,{jjPLUS_P,    '+',            POLY_CMD,       POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjPLUS_P,    '+',            VECTOR_CMD,     VECTOR_CMD, VECTOR_CMD ALLOW_PLURAL}
@@ -2739,6 +2780,7 @@ struct sValCmd2 dArith2[]=
 ,{jjRSUM,      '+',            QRING_CMD,      RING_CMD,   QRING_CMD ALLOW_PLURAL}
 ,{jjRSUM,      '+',            QRING_CMD,      QRING_CMD,  QRING_CMD ALLOW_PLURAL}
 ,{jjMINUS_I,   '-',            INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
+,{jjMINUS_BI,  '-',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjMINUS_N,   '-',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD ALLOW_PLURAL}
 ,{jjMINUS_P,   '-',            POLY_CMD,       POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjMINUS_P,   '-',            VECTOR_CMD,     VECTOR_CMD, VECTOR_CMD ALLOW_PLURAL}
@@ -2749,6 +2791,7 @@ struct sValCmd2 dArith2[]=
 ,{jjMINUS_IV,  '-',            INTVEC_CMD,     INTVEC_CMD, INTVEC_CMD ALLOW_PLURAL}
 ,{jjMINUS_IV,  '-',            INTMAT_CMD,     INTMAT_CMD, INTMAT_CMD ALLOW_PLURAL}
 ,{jjTIMES_I,   '*',            INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
+,{jjTIMES_BI,  '*',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjTIMES_N,   '*',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD ALLOW_PLURAL}
 ,{jjTIMES_P,   '*',            POLY_CMD,       POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjTIMES_P,   '*',            VECTOR_CMD,     POLY_CMD,   VECTOR_CMD ALLOW_PLURAL}
@@ -2782,6 +2825,7 @@ struct sValCmd2 dArith2[]=
 ,{jjOP_IV_I,   '/',            INTVEC_CMD,     INTVEC_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjOP_IV_I,   '/',            INTMAT_CMD,     INTMAT_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjDIVMOD_I,  INTDIV_CMD,     INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
+,{jjDIV_BI,    INTDIV_CMD,     BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjOP_IV_I,   INTDIV_CMD,     INTVEC_CMD,     INTVEC_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjOP_IV_I,   INTDIV_CMD,     INTMAT_CMD,     INTMAT_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjDIVMOD_I,  '%',            INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
@@ -3018,6 +3062,8 @@ struct sValCmd2 dArith2[]=
 ,{jjCALL2MANY, SYSTEM_CMD,     ANY_TYPE/*set by p*/,STRING_CMD, DEF_CMD ALLOW_PLURAL}
 ,{jjSTD_1,     STD_CMD,        IDEAL_CMD,      IDEAL_CMD,  POLY_CMD ALLOW_PLURAL}
 ,{jjSTD_1,     STD_CMD,        MODUL_CMD,      MODUL_CMD,  VECTOR_CMD ALLOW_PLURAL}
+,{jjSTD_1,     STD_CMD,        IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD ALLOW_PLURAL}
+,{jjSTD_1,     STD_CMD,        MODUL_CMD,      MODUL_CMD,  MODUL_CMD ALLOW_PLURAL}
 ,{jjSTD_HILB,  STD_CMD,        IDEAL_CMD,      IDEAL_CMD,  INTVEC_CMD NO_PLURAL}
 ,{jjSTD_HILB,  STD_CMD,        MODUL_CMD,      MODUL_CMD,  INTVEC_CMD NO_PLURAL}
 ,{jjVARSTR2,   VARSTR_CMD,     STRING_CMD,     RING_CMD,   INT_CMD ALLOW_PLURAL}
@@ -4042,6 +4088,7 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
     case QRING_CMD:   res->data=omStrDup("qring"); break;
     case INTMAT_CMD:  res->data=omStrDup("intmat"); break;
     case NUMBER_CMD:  res->data=omStrDup("number"); break;
+    case BIGINT_CMD:  res->data=omStrDup("bigint"); break;
     case LIST_CMD:   res->data=omStrDup("list"); break;
     case PACKAGE_CMD: res->data=omStrDup("package"); break;
     case LINK_CMD:   res->data=omStrDup("link"); break;

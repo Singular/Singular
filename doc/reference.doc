@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.264 2005-10-28 14:05:47 Singular Exp $
+@comment $Id: reference.doc,v 1.265 2006-05-29 12:34:39 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5892,6 +5892,8 @@ See
 @*@code{std (} module_expression@code{,} intvec_expression@code{,} intvec_expression @code{)}
 @*@code{std (} ideal_expression@code{,} poly_expression @code{)}
 @*@code{std (} module_expression@code{,} vector_expression @code{)}
+@*@code{std (} ideal_expression@code{,} ideal_expression @code{)}
+@*@code{std (} module_expression@code{,} module_expression @code{)}
 @item @strong{Type:}
 ideal or module
 @item @strong{Purpose:}
@@ -5906,9 +5908,9 @@ if the ideal, resp.@: module, is homogeneous
 (Hilbert driven standard basis computation, @ref{stdhilb}).
 If the ideal is quasihomogeneous with some weights w and if the Hilbert series
 is computed w.r.t.@: to these weights, then use w as third argument.
-@*Use an optional second argument of type poly, resp.@: vector,
+@*Use an optional second argument of type poly/vector/ideal, resp.@: module,
 to construct the standard basis from an already computed one (given as the
-first argument) and one additional generator (the second argument).
+first argument) and additional generator(s) (the second argument).
 @item @strong{Note:}
 The
 standard basis is computed with a (more or less) straight-forward
