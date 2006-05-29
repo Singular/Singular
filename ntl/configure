@@ -1,5 +1,5 @@
 #!/bin/sh
-# version $Id: configure,v 1.23 2006-01-05 13:36:14 Singular Exp $
+# version $Id: configure,v 1.24 2006-05-29 16:14:45 Singular Exp $
 
 while [ $# -ne 0 ]; do
    case $1 in 
@@ -70,11 +70,19 @@ then
     CXXFLAGS="-O2 -fomit-frame-pointer -fno-rtti"
   fi
 fi
+
+if test ac_cv_header_iostream = yes
+then
+  NTL_STD_CXX=on
+else
+  NTL_STD_CXX=off
+fi
+
 CFLAGS="$CPPFLAGS $CFLAGS"
 CXXFLAGS="$CPPFLAGS $CXXFLAGS"
 echo "#!/bin/sh" >config.status
 echo "cd src" >>config.status
-echo ./configure CC=\"$SING_CC\" CXX=\"$SING_CXX\" LIBDIR=$libdir INCLUDEDIR=$includedir PREFIX=$prefix NTL_GMP_LIP=on GMP_PREFIX=$prefix/${ac_cv_singuname} CFLAGS=\"$CFLAGS\" CXXFLAGS=\"$CXXFLAGS\" LDFLAGS=\"$LDFLAGS\" NTL_STD_CXX=off >>config.status
+echo ./configure CC=\"$SING_CC\" CXX=\"$SING_CXX\" LIBDIR=$libdir INCLUDEDIR=$includedir PREFIX=$prefix NTL_GMP_LIP=on GMP_PREFIX=$prefix/${ac_cv_singuname} CFLAGS=\"$CFLAGS\" CXXFLAGS=\"$CXXFLAGS\" LDFLAGS=\"$LDFLAGS\" NTL_STD_CXX=$NTL_STD_CXX >>config.status
 echo "cd .." >>config.status
 
 chmod +rx config.status

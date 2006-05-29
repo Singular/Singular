@@ -444,6 +444,9 @@ if test "$enable_NTL" != yes && test "$enable_NTL" != no; then
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS ntl"
     BUILD1_SUBDIRS="$BUILD1_SUBDIRS ntl"
     ac_configure_args="$ac_configure_args --enable-NTL"
+    AC_LANG_CPLUSPLUS
+    AC_CHECK_HEADERS(iostream.h iostream)
+    AC_LANG_RESTORE
   else
     enable_NTL=no
     AC_MSG_RESULT(no)
