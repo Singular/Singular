@@ -1,5 +1,5 @@
 #!/bin/sh
-# version $Id: configure,v 1.24 2006-05-29 16:14:45 Singular Exp $
+# version $Id: configure,v 1.25 2006-05-29 16:49:47 Singular Exp $
 
 while [ $# -ne 0 ]; do
    case $1 in 
@@ -63,7 +63,7 @@ fi
 
 if test "x$CXXFLAGS" = x
 then
-  if test ac_cv_cxx_have_exception = yes
+  if test x$ac_cv_cxx_have_exception = xyes
   then
     CXXFLAGS="-O2 -fomit-frame-pointer -fno-rtti -fno-exceptions"
   else
@@ -71,7 +71,7 @@ then
   fi
 fi
 
-if test ac_cv_header_iostream = yes
+if test x$ac_cv_header_iostream = xyes
 then
   NTL_STD_CXX=on
 else
