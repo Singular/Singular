@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.93 2006-02-10 13:12:38 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.94 2006-05-29 15:14:30 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -28,6 +28,7 @@
 #include "ring.h"
 #include "ffields.h"
 #include "numbers.h"
+#include "longrat.h"
 #include "ipshell.h"
 #include "lists.h"
 #include "attrib.h"
@@ -183,6 +184,7 @@ void sleftv::Print(leftv store, int spaces)
           break;
           }
         case NUMBER_CMD:
+        case BIGINT_CMD:
           s=String(d);
           if (s==NULL) return;
           ::Print("%-*.*s",spaces,spaces," ");
@@ -299,6 +301,9 @@ void sleftv::CleanUp(ring r)
         break;
       case NUMBER_CMD:
         if (r!=NULL) n_Delete((number *)(&data),r);
+        break;
+      case BIGINT_CMD:
+        nlDelete((number *)(&data),r);
         break;
       case LIST_CMD:
         ((lists)data)->Clean(r); // may contain ring-dep data
@@ -456,6 +461,8 @@ static inline void * s_internalCopy(const int t,  void *d)
       return  d;
     case NUMBER_CMD:
       return  (void *)nCopy((number)d);
+    case BIGINT_CMD:
+      return  (void *)nlCopy((number)d);
     case MAP_CMD:
       return  (void *)maCopy((map)d);
     case LIST_CMD:
@@ -597,7 +604,8 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
     const char *n;
     if (name!=NULL) n=name;
     else n=sNoName;
-    switch (Typ())
+    int t=Typ();
+    switch (t /*Typ()*/)
     {
         case INT_CMD:
           if (typed)
@@ -635,7 +643,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           {
             char* ps = pString((poly) d);
             s = (char*) omAlloc(strlen(ps) + 10);
-            sprintf(s,"%s(%s)", (Typ() == POLY_CMD ? "poly" : "vector"), ps);
+            sprintf(s,"%s(%s)", (t /*Typ()*/ == POLY_CMD ? "poly" : "vector"), ps);
             return s;
           }
           else
@@ -666,6 +674,15 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           s = StringAppendS((char*) (typed ? ")" : ""));
           return omStrDup(s);
 
+        case BIGINT_CMD:
+          {
+          StringSetS((char*) (typed ? "bigint(" : ""));
+          number nl=(number)d;
+          nlWrite(nl);
+          s = StringAppendS((char*) (typed ? ")" : ""));
+          return omStrDup(s);
+          }
+
         case MATRIX_CMD:
           s= iiStringMatrix((matrix)d,dim);
           if (typed)
@@ -688,7 +705,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           if (typed)
           {
             char* ns = (char*) omAlloc(strlen(s) + 10);
-            sprintf(ns, "%s(%s)", (Typ()==MODUL_CMD ? "module" : "ideal"), s);
+            sprintf(ns, "%s(%s)", (t/*Typ()*/==MODUL_CMD ? "module" : "ideal"), s);
             omCheckAddr(ns);
             return ns;
           }
@@ -702,7 +719,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           if (typed)
           {
             char* ns;
-            if (Typ() == INTMAT_CMD)
+            if (t/*Typ()*/ == INTMAT_CMD)
             {
               ns = (char*) omAlloc(strlen(s) + 40);
               sprintf(ns, "intmat(intvec(%s),%d,%d)", s, v->rows(), v->cols());
@@ -727,7 +744,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           if (typed)
           {
             char* ns;
-            if (Typ() == QRING_CMD)
+            if (t/*Typ()*/ == QRING_CMD)
             {
               char* id = iiStringMatrix((matrix) ((ring) d)->qideal, dim);
               ns = (char*) omAlloc(strlen(s) + strlen(id) + 20);
@@ -1566,6 +1583,11 @@ int sleftv::Eval()
     case NUMBER_CMD:
 #ifdef LDEBUG
       nTest((number)Data());
+#endif
+      break;
+    case BIGINT_CMD:
+#ifdef LDEBUG
+      nlTest((number)Data());
 #endif
       break;
     case POLY_CMD:

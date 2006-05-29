@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.73 2005-12-16 08:58:56 Singular Exp $ */
+/* $Id: ipid.cc,v 1.74 2006-05-29 15:14:29 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -17,6 +17,7 @@
 #include "intvec.h"
 #include "febase.h"
 #include "numbers.h"
+#include "longrat.h"
 #include "polys.h"
 #include "ring.h"
 #include "ideals.h"
@@ -247,6 +248,9 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
       case NUMBER_CMD:
         IDNUMBER(h) = nInit(0);
         break;
+      case BIGINT_CMD:
+        IDNUMBER(h) = nlInit(0);
+	break;
       case IDEAL_CMD:
       case MODUL_CMD:
         IDFLAG(h) = Sy_bit(FLAG_STD);
@@ -613,6 +617,11 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
   {
     assume(r!=NULL);
     n_Delete(&IDNUMBER(h),r);
+  }
+  // bigint -------------------------------------------------------------
+  else if (IDTYP(h) == BIGINT_CMD)
+  {
+    nlDelete(&IDNUMBER(h),NULL);
   }
   // intvec / intmat  ---------------------------------------------------
   else if ((IDTYP(h) == INTVEC_CMD)||(IDTYP(h) == INTMAT_CMD))
