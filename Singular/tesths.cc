@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.104 2006-05-05 13:12:44 Singular Exp $ */
+/* $Id: tesths.cc,v 1.105 2006-05-29 14:22:06 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -46,9 +46,9 @@ int main(          /* main entry to Singular */
 #ifdef HAVE_FACTORY
   On(SW_USE_NTL);
   Off(SW_USE_NTL_GCD_0); // On -> seg11 in Old/algnorm, Old/factor...
-  Off(SW_USE_NTL_GCD_P); // On -> cyle in Short/brnoeth_s
+  On(SW_USE_NTL_GCD_P); // On -> cyle in Short/brnoeth_s: fixed
   On(SW_USE_EZGCD);
-  Off(SW_USE_NTL_SORT);
+  Off(SW_USE_NTL_SORT); // may be changed by an command line option
 #endif
 
 #ifdef INIT_BUG
