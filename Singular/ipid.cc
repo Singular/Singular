@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.74 2006-05-29 15:14:29 Singular Exp $ */
+/* $Id: ipid.cc,v 1.75 2006-05-29 16:10:50 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -250,7 +250,7 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
         break;
       case BIGINT_CMD:
         IDNUMBER(h) = nlInit(0);
-	break;
+        break;
       case IDEAL_CMD:
       case MODUL_CMD:
         IDFLAG(h) = Sy_bit(FLAG_STD);
@@ -341,7 +341,7 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
       && (strcmp(s,"Top")==0))
       {
         goto errlabel;
-      }	
+      }
       if (BVERBOSE(V_REDEFINE))
         Warn("redefining %s **",s);
       if (s==IDID(h)) IDID(h)=NULL;
@@ -716,19 +716,19 @@ idhdl ggetid(const char *n, BOOLEAN local)
   }
   if (h2!=NULL) return h2;
   if (h!=NULL) return h;
-#ifdef HAVE_NS  
+#ifdef HAVE_NS
   if (basePack!=currPack)
     return basePack->idroot->get(n,myynest);
-#endif      
-  return NULL; 
+#endif
+  return NULL;
 }
 
 void ipListFlag(idhdl h)
 {
   if (hasFlag(h,FLAG_STD)) PrintS(" (SB)");
-#ifdef HAVE_PLURAL  
+#ifdef HAVE_PLURAL
   if (hasFlag(h,FLAG_TWOSTD)) PrintS(" (2SB)");
-#endif  
+#endif
 }
 
 lists ipNameList(idhdl root)

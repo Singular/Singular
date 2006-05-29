@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.28 2005-07-27 15:47:57 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.29 2006-05-29 16:10:50 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -16,6 +16,8 @@
 #include "ideals.h"
 #include "subexpr.h"
 #include "numbers.h"
+#include "modulop.h"
+#include "longalg.h"
 #include "matpol.h"
 #include "silink.h"
 #include "syz.h"
@@ -95,6 +97,40 @@ static void * iiV2Ma(void *data)
   pDelete((poly *)&data);
   return (void *)m;
 }
+static void * iiBI2N(void *d)
+{
+  void *r=NULL;
+  if (rField_is_Q())
+    r=d;
+  else
+  {
+    number n=(number)d;
+    if (rField_is_Zp())
+    {
+      r=(void *)npMap0(n);
+    }
+    else if (rField_is_Q_a())
+    {
+      r=(void *)naMap00(n);
+    }
+    else if (rField_is_Zp_a())
+    {
+      r=(void *)naMap0P(n);
+    }
+    else
+      WerrorS("cannot convert bigint to this field");
+    nlDelete(&n,NULL);
+  }
+  return r;
+}
+
+static void * iiN2P(void *data);
+static void * iiBI2P(void *d)
+{
+  void *r=iiBI2N(d);
+  if(errorreported) return NULL;
+  else              return iiN2P(r);
+}
 
 static void * iiDummy(void *data)
 {
@@ -123,6 +159,12 @@ static void * iiI2Iv(void *data)
 static void * iiI2N(void *data)
 {
   number n=nInit((int)(long)data);
+  return (void *)n;
+}
+
+static void * iiI2BI(void *data)
+{
+  number n=nlInit((int)(long)data);
   return (void *)n;
 }
 
@@ -210,6 +252,8 @@ static void * iiL2R(void * data)
 struct sConvertTypes dConvertTypes[] =
 {
 //   input type       output type     convert procedure
+//  int -> bigint
+   { INT_CMD,         BIGINT_CMD,     iiI2BI , NULL },
 //  int -> number
    { INT_CMD,         NUMBER_CMD,     iiI2N , NULL },
 //  int -> poly
@@ -228,6 +272,10 @@ struct sConvertTypes dConvertTypes[] =
    { INTVEC_CMD,      MATRIX_CMD,     iiIm2Ma , NULL },
 //  intmat -> matrix
    { INTMAT_CMD,      MATRIX_CMD,     iiIm2Ma , NULL },
+//  bigint -> number
+   { BIGINT_CMD,      NUMBER_CMD,     iiBI2N , NULL },
+//  bigint -> poly
+   { BIGINT_CMD,      NUMBER_CMD,     iiBI2P , NULL },
 //  number -> poly
    { NUMBER_CMD,      POLY_CMD,       iiN2P  , NULL },
 //  number -> matrix
