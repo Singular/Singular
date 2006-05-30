@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.399 2006-05-29 12:34:41 Singular Exp $ */
+/* $Id: iparith.cc,v 1.400 2006-05-30 07:28:20 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -638,19 +638,35 @@ static BOOLEAN jjPOWER_I(leftv res, leftv u, leftv v)
     return TRUE;
   }
 }
+static BOOLEAN jjPOWER_BI(leftv res, leftv u, leftv v)
+{
+  int e=(int)(long)v->Data();
+  number n=(number)u->Data();
+  if (e>=0)
+  {
+    nlPower(n,e,(number*)&res->data);
+  }
+  else
+  {
+    WerrorS("exponent must be non-negative");
+    return TRUE;
+  }
+  if (u!=NULL) return jjOP_REST(res,u,v);
+  return FALSE;
+}
 static BOOLEAN jjPOWER_N(leftv res, leftv u, leftv v)
 {
   int e=(int)(long)v->Data();
-  number n=(number)u->CopyD(NUMBER_CMD);
+  number n=(number)u->Data();
+  int d=0;
   if (e<0)
   {
-    number m=nInvers(n);
-    nDelete(&n);
-    n=m;
+    n=nInvers(n);
     e=-e;
+    d=1;
   }
   nPower(n,e,(number*)&res->data);
-  nDelete(&n);
+  if (d) nDelete(&n);
   if (u!=NULL) return jjOP_REST(res,u,v);
   return FALSE;
 }
@@ -2837,6 +2853,7 @@ struct sValCmd2 dArith2[]=
 ,{jjOP_IV_I,   INTMOD_CMD,     INTMAT_CMD,     INTMAT_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjMOD_N,     INTMOD_CMD,     NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD ALLOW_PLURAL}
 ,{jjPOWER_I,   '^',            INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
+,{jjPOWER_BI,   '^',           BIGINT_CMD,     BIGINT_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjPOWER_N,   '^',            NUMBER_CMD,     NUMBER_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjPOWER_P,   '^',            POLY_CMD,       POLY_CMD,   INT_CMD ALLOW_PLURAL}
 ,{jjPOWER_ID,  '^',            IDEAL_CMD,      IDEAL_CMD,  INT_CMD ALLOW_PLURAL}
@@ -4412,9 +4429,14 @@ static BOOLEAN jjidTransp(leftv res, leftv v)
 #endif
 static BOOLEAN jjnInt(leftv res, leftv u)
 {
-  number n=(number)u->CopyD(NUMBER_CMD);
+  number n=(number)u->Data();
   res->data=(char *)nInt(n);
-  nDelete(&n);
+  return FALSE;
+}
+static BOOLEAN jjnlInt(leftv res, leftv u)
+{
+  number n=(number)u->Data();
+  res->data=(char *)nlInt(n);
   return FALSE;
 }
 #define s short
@@ -4443,6 +4465,7 @@ struct sValCmd1 dArith1[]=
 ,{syBetti1,     BETTI_CMD,       INTMAT_CMD,     RESOLUTION_CMD ALLOW_PLURAL}
 ,{jjBETTI,      BETTI_CMD,       INTMAT_CMD,     IDEAL_CMD      ALLOW_PLURAL}
 ,{jjBETTI,      BETTI_CMD,       INTMAT_CMD,     MODUL_CMD      ALLOW_PLURAL}
+,{jjDUMMY,      BIGINT_CMD,      BIGINT_CMD,     BIGINT_CMD     ALLOW_PLURAL}
 ,{jjCHAR,       CHARACTERISTIC_CMD, INT_CMD,     RING_CMD       ALLOW_PLURAL}
 ,{jjCHAR,       CHARACTERISTIC_CMD, INT_CMD,     QRING_CMD      ALLOW_PLURAL}
 #ifdef HAVE_FACTORY
@@ -4529,6 +4552,7 @@ struct sValCmd1 dArith1[]=
 ,{jjIMPART,     IMPART_CMD,      NUMBER_CMD,     NUMBER_CMD     ALLOW_PLURAL}
 ,{jjINDEPSET,   INDEPSET_CMD,    INTVEC_CMD,     IDEAL_CMD      NO_PLURAL}
 ,{jjDUMMY,      INT_CMD,         INT_CMD,        INT_CMD        ALLOW_PLURAL}
+,{jjnlInt,      INT_CMD,         INT_CMD,        BIGINT_CMD     ALLOW_PLURAL}
 ,{jjnInt,       INT_CMD,         INT_CMD,        NUMBER_CMD     ALLOW_PLURAL}
 ,{jjP2I,        INT_CMD,         INT_CMD,        POLY_CMD       ALLOW_PLURAL}
 ,{jjINTERRED,   INTERRED_CMD,    IDEAL_CMD,      IDEAL_CMD      NO_PLURAL}

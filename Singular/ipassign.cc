@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.81 2005-10-24 12:21:41 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.82 2006-05-30 07:28:21 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -25,8 +25,9 @@
 #include "timer.h"
 #include "ring.h"
 #include "subexpr.h"
-#include "numbers.h"
 #include "lists.h"
+#include "numbers.h"
+//#include "modulop.h"
 #include "longalg.h"
 #include "stairc.h"
 #include "maps.h"
@@ -282,6 +283,14 @@ static BOOLEAN jiA_NUMBER(leftv res, leftv a, Subexpr e)
   number p=(number)a->CopyD(NUMBER_CMD);
   if (res->data!=NULL) nDelete((number *)&res->data);
   nNormalize(p);
+  res->data=(void *)p;
+  jiAssignAttr(res,a);
+  return FALSE;
+}
+static BOOLEAN jiA_BIGINT(leftv res, leftv a, Subexpr e)
+{
+  number p=(number)a->CopyD(BIGINT_CMD);
+  if (res->data!=NULL) nlDelete((number *)&res->data,NULL);
   res->data=(void *)p;
   jiAssignAttr(res,a);
   return FALSE;
@@ -601,6 +610,7 @@ struct sValAssign dAssign[]=
 ,{jiA_INTVEC,   INTVEC_CMD,     INTVEC_CMD }
 ,{jiA_INTVEC,   INTMAT_CMD,     INTMAT_CMD }
 ,{jiA_NUMBER,   NUMBER_CMD,     NUMBER_CMD }
+,{jiA_BIGINT,   BIGINT_CMD,     BIGINT_CMD }
 ,{jiA_LIST_RES, LIST_CMD,       RESOLUTION_CMD }
 ,{jiA_LIST,     LIST_CMD,       LIST_CMD }
 ,{jiA_LINK,     LINK_CMD,       STRING_CMD }
