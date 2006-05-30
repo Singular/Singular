@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.cc,v 1.17 2006-05-02 12:21:07 Singular Exp $ */
+/* $Id: NTLconvert.cc,v 1.18 2006-05-30 14:51:42 Singular Exp $ */
 #include <config.h>
 
 #ifdef HAVE_SINGULAR
@@ -126,10 +126,11 @@ ZZ_pX convertFacCF2NTLZZpX(CanonicalForm f)
        #ifndef NOSTREAMIO
        cout<<"convertFacCF2NTLZZ_pX: coefficient not immediate! : "<<f<<"\n";
        #else
+       NTL_SNS
        printf("convertFacCF2NTLZZ_pX: coefficient not immediate!, char=%d\n",
               getCharacteristic());
        #endif
-       exit(1);
+       NTL_SNS exit(1);
     }
     else
     {
@@ -184,10 +185,11 @@ zz_pX convertFacCF2NTLzzpX(CanonicalForm f)
        #ifndef NOSTREAMIO
        cout<<"convertFacCF2NTLzz_pX: coefficient not immediate! : "<<f<<"\n";
        #else
+       NTL_SNS
        printf("convertFacCF2NTLzz_pX: coefficient not immediate!, char=%d\n",
               getCharacteristic());
        #endif
-       exit(1);
+       NTL_SNS exit(1);
     }
     else
     {
@@ -261,9 +263,10 @@ GF2X convertFacCF2NTLGF2X(CanonicalForm f)
       #ifndef NOSTREAMIO
       cout<<"convertFacCF2NTLGF2X: coefficient not immidiate! : " << f << "\n";
       #else
+      NTL_SNS
       printf("convertFacCF2NTLGF2X: coefficient not immidiate!");
       #endif
-      exit(1);
+      NTL_SNS exit(1);
     }
     else
     {
@@ -624,7 +627,7 @@ CanonicalForm convertZZ2CF(ZZ coefficient)
       {
         Free(cf_stringtemp2,cf_stringtemp_l);
         char *p=(char *)Alloc(cf_stringtemp_l*2);
-        memcpy(p,cf_stringtemp,cf_stringtemp_l);
+        NTL_SNS memcpy(p,cf_stringtemp,cf_stringtemp_l);
         Free(cf_stringtemp,cf_stringtemp_l);
         cf_stringtemp_l*=2;
         cf_stringtemp=p;
@@ -638,7 +641,7 @@ CanonicalForm convertZZ2CF(ZZ coefficient)
     }
     //built up the string in dummy[0]
     dummy[0]=numbers[to_long(coefficient)];
-    strcat(cf_stringtemp,dummy);
+    NTL_SNS strcat(cf_stringtemp,dummy);
     //tmp*=10; tmp+=to_long(coefficient);
 
     if (minusremainder==1)
@@ -649,7 +652,7 @@ CanonicalForm convertZZ2CF(ZZ coefficient)
     }
 
     //reverse the list to obtain the correct string
-    int len=strlen(cf_stringtemp);
+    int len=NTL_SNS strlen(cf_stringtemp);
     for (int i=len-1;i>=0;i--)
     {
       cf_stringtemp2[len-i-1+minusremainder]=cf_stringtemp[i];
