@@ -82,7 +82,7 @@ class SingularGlobalsProxy(object):
     def __setattr__(self,name,value):
         id=_Singular.get_idhdl(name)
         if id.is_zero():
-            raise Expception
+            raise Exception
         else:
             if isinstance(value,list):
                 value=list2arg_list(value)
