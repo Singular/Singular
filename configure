@@ -2329,8 +2329,54 @@ if test "$ac_gmp_ok" != yes && test "$enable_gmp" != yes; then
   ac_configure_args="$ac_configure_args --enable-gmp"
 fi
 
+#AC_MSG_CHECKING(whether to configure and build MP lib)
+# requires: sizeof(long)==4
+echo $ac_n "checking size of long""... $ac_c" 1>&6
+echo "configure:2336: checking size of long" >&5
+if eval "test \"`echo '$''{'ac_cv_sizeof_long'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  if test "$cross_compiling" = yes; then
+  ac_cv_sizeof_long=4
+else
+  cat > conftest.$ac_ext <<EOF
+#line 2344 "configure"
+#include "confdefs.h"
+#include <stdio.h>
+main()
+{
+  FILE *f=fopen("conftestval", "w");
+  if (!f) exit(1);
+  fprintf(f, "%d\n", sizeof(long));
+  exit(0);
+}
+EOF
+if { (eval echo configure:2355: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+then
+  ac_cv_sizeof_long=`cat conftestval`
+else
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+  rm -fr conftest*
+  ac_cv_sizeof_long=0
+fi
+rm -fr conftest*
+fi
+
+fi
+echo "$ac_t""$ac_cv_sizeof_long" 1>&6
+cat >> confdefs.h <<EOF
+#define SIZEOF_LONG $ac_cv_sizeof_long
+EOF
+
+
+if test "$ac_cv_sizeof_long" != 4; then
+  with_MP=no
+fi
+
 echo $ac_n "checking whether to configure and build MP lib""... $ac_c" 1>&6
-echo "configure:2334: checking whether to configure and build MP lib" >&5
+echo "configure:2379: checking whether to configure and build MP lib" >&5
+
 if test "$enable_MP" != yes && test "$enable_MP" != no; then
   if test "$with_MP" != no && test "$ac_MP_ok" != yes && test -d MP && \
      (test "$enable_gmp" = yes || test "$ac_gmp_ok" = yes); then
@@ -2366,7 +2412,7 @@ ac_configure_args="$ac_configure_args --with-extra_cflags=-fPIC"
 fi
 
 echo $ac_n "checking whether to configure and build NTL lib""... $ac_c" 1>&6
-echo "configure:2370: checking whether to configure and build NTL lib" >&5
+echo "configure:2416: checking whether to configure and build NTL lib" >&5
 if test "$enable_NTL" != yes && test "$enable_NTL" != no; then
   if test "$with_NTL" != no && test "$ac_NTL_ok" != yes && \
      test -d ntl; then
@@ -2383,7 +2429,7 @@ ac_link='${CXX-g++} -o conftest${ac_exeext} $CXXFLAGS $CPPFLAGS $LDFLAGS conftes
 cross_compiling=$ac_cv_prog_cxx_cross
 
     echo $ac_n "checking how to run the C++ preprocessor""... $ac_c" 1>&6
-echo "configure:2387: checking how to run the C++ preprocessor" >&5
+echo "configure:2433: checking how to run the C++ preprocessor" >&5
 if test -z "$CXXCPP"; then
 if eval "test \"`echo '$''{'ac_cv_prog_CXXCPP'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -2396,12 +2442,12 @@ ac_link='${CXX-g++} -o conftest${ac_exeext} $CXXFLAGS $CPPFLAGS $LDFLAGS conftes
 cross_compiling=$ac_cv_prog_cxx_cross
   CXXCPP="${CXX-g++} -E"
   cat > conftest.$ac_ext <<EOF
-#line 2400 "configure"
+#line 2446 "configure"
 #include "confdefs.h"
 #include <stdlib.h>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:2405: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:2451: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   :
@@ -2429,17 +2475,17 @@ for ac_hdr in iostream.h iostream
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:2433: checking for $ac_hdr" >&5
+echo "configure:2479: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 2438 "configure"
+#line 2484 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:2443: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:2489: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -2484,7 +2530,7 @@ else
 fi
 
 echo $ac_n "checking whether to configure and build factory lib""... $ac_c" 1>&6
-echo "configure:2488: checking whether to configure and build factory lib" >&5
+echo "configure:2534: checking whether to configure and build factory lib" >&5
 if test "$enable_factory" != yes && test "$enable_factory" != no; then
   if test "$with_factory" != no && test "$ac_factory_ok" != yes && \
      test -d factory; then
@@ -2511,7 +2557,7 @@ else
 fi
 
 echo $ac_n "checking whether to configure and build libfac lib""... $ac_c" 1>&6
-echo "configure:2515: checking whether to configure and build libfac lib" >&5
+echo "configure:2561: checking whether to configure and build libfac lib" >&5
 if test "$enable_libfac" != yes && test "$enable_libfac" != no; then
   if test "$with_libfac" != no && test "$ac_libfac_ok" != yes && \
      test -d libfac && \
@@ -2543,7 +2589,7 @@ else
 fi
 
 echo $ac_n "checking whether to configure and build sgroup lib""... $ac_c" 1>&6
-echo "configure:2547: checking whether to configure and build sgroup lib" >&5
+echo "configure:2593: checking whether to configure and build sgroup lib" >&5
 if test "$enable_sgroup" = yes; then
   if test ! -d sgroup; then
     echo "$ac_t""no" 1>&6
@@ -2564,7 +2610,7 @@ fi
 BUILD_SUBDIRS="$CONFIG_SUBDIRS"
 
 echo $ac_n "checking whether to configure and build Singular""... $ac_c" 1>&6
-echo "configure:2568: checking whether to configure and build Singular" >&5
+echo "configure:2614: checking whether to configure and build Singular" >&5
 if test "$enable_Singular" != yes && test "$enable_Singular" != no; then
   if test "$with_Singular" != no && test -d Singular; then
     enable_Singular=yes
@@ -2595,7 +2641,7 @@ fi
 # test if IntegerProgramming should be built:
 
 echo $ac_n "checking whether to build IntegerProgramming""... $ac_c" 1>&6
-echo "configure:2599: checking whether to build IntegerProgramming" >&5
+echo "configure:2645: checking whether to build IntegerProgramming" >&5
 if test "$enable_IntegerProgramming" != no && test -d "IntegerProgramming"; then
    BUILD_SUBDIRS="$BUILD_SUBDIRS IntegerProgramming"
    BUILD1_SUBDIRS="$BUILD1_SUBDIRS IntegerProgramming"
@@ -2608,7 +2654,7 @@ else
 fi
 
 echo $ac_n "checking whether to build Plural""... $ac_c" 1>&6
-echo "configure:2612: checking whether to build Plural" >&5
+echo "configure:2658: checking whether to build Plural" >&5
 if test "$enable_Plural" != no || test "$with_Plural" != no; then
    echo "$ac_t""yes" 1>&6
    if test "$enable_Plural" != yes; then
@@ -2620,7 +2666,7 @@ fi
 
 
 echo $ac_n "checking whether to configure and build Texinfo""... $ac_c" 1>&6
-echo "configure:2624: checking whether to configure and build Texinfo" >&5
+echo "configure:2670: checking whether to configure and build Texinfo" >&5
 if test "$enable_Texinfo" != no && test -d Texinfo; then
   echo "$ac_t""yes" 1>&6
   enable_texinfo=yes
@@ -2644,7 +2690,7 @@ else
   # Extract the first word of "makeinfo", so it can be a program name with args.
 set dummy makeinfo; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2648: checking for $ac_word" >&5
+echo "configure:2694: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_MAKEINFO'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2674,7 +2720,7 @@ fi
   # Extract the first word of "texi2dvi", so it can be a program name with args.
 set dummy texi2dvi; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2678: checking for $ac_word" >&5
+echo "configure:2724: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_TEXI2DVI'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2704,7 +2750,7 @@ fi
   # Extract the first word of "texindex", so it can be a program name with args.
 set dummy texindex; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2708: checking for $ac_word" >&5
+echo "configure:2754: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_TEXINDEX'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2734,7 +2780,7 @@ fi
   # Extract the first word of "texi2pdf", so it can be a program name with args.
 set dummy texi2pdf; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2738: checking for $ac_word" >&5
+echo "configure:2784: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_TEXI2PDF'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2764,7 +2810,7 @@ fi
 fi  
 
 echo $ac_n "checking whether to configure and build Texi2html""... $ac_c" 1>&6
-echo "configure:2768: checking whether to configure and build Texi2html" >&5
+echo "configure:2814: checking whether to configure and build Texi2html" >&5
 if test "$enable_Texi2html" != no && test -d Texi2html; then
  echo "$ac_t""yes" 1>&6
  CONFIG_SUBDIRS="$CONFIG_SUBDIRS Texi2html"
@@ -2779,7 +2825,7 @@ else
  # Extract the first word of "texi2html", so it can be a program name with args.
 set dummy texi2html; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2783: checking for $ac_word" >&5
+echo "configure:2829: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_TEXI2HTML'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2817,7 +2863,7 @@ fi
 
 
 echo $ac_n "checking whether to build doc""... $ac_c" 1>&6
-echo "configure:2821: checking whether to build doc" >&5
+echo "configure:2867: checking whether to build doc" >&5
 if test "$enable_doc" != no && test -d doc; then
  echo "$ac_t""yes" 1>&6
  BUILD_SUBDIRS="$BUILD_SUBDIRS doc"
@@ -2831,7 +2877,7 @@ else
 fi
 
 echo $ac_n "checking whether to build emacs""... $ac_c" 1>&6
-echo "configure:2835: checking whether to build emacs" >&5
+echo "configure:2881: checking whether to build emacs" >&5
 if test "$enable_doc" = yes && test "$enable_emacs" != no && test -d emacs; then
  echo "$ac_t""yes" 1>&6
  BUILD_SUBDIRS="$BUILD_SUBDIRS emacs"
@@ -2843,7 +2889,7 @@ else
 fi
 
 echo $ac_n "checking which apint package to use""... $ac_c" 1>&6
-echo "configure:2847: checking which apint package to use" >&5
+echo "configure:2893: checking which apint package to use" >&5
 if test "$with_apint" = gmp; then
   if test "$ac_gmp_ok" = yes || test "$enable_gmp" = yes; then
     echo "$ac_t""gmp" 1>&6
@@ -2859,7 +2905,7 @@ else
 fi
 
 echo $ac_n "checking whether to use with MP""... $ac_c" 1>&6
-echo "configure:2863: checking whether to use with MP" >&5
+echo "configure:2909: checking whether to use with MP" >&5
 if test "$with_MP" = yes; then
   if test "$ac_MP_ok" = yes || test "$enable_MP" = yes; then
     echo "$ac_t""yes" 1>&6
@@ -2879,7 +2925,7 @@ else
 fi
 
 echo $ac_n "checking whether to use with factory""... $ac_c" 1>&6
-echo "configure:2883: checking whether to use with factory" >&5
+echo "configure:2929: checking whether to use with factory" >&5
 if test "$with_factory" = yes; then
   if test "$ac_factory_ok" = yes || test "$enable_factory" = yes; then
     echo "$ac_t""yes" 1>&6
@@ -2898,7 +2944,7 @@ else
 fi
   
 echo $ac_n "checking whether to use with libfac""... $ac_c" 1>&6
-echo "configure:2902: checking whether to use with libfac" >&5
+echo "configure:2948: checking whether to use with libfac" >&5
 if test "$with_libfac" = yes; then
   if test "$ac_libfac_ok" = yes || test "$enable_libfac" = yes; then
     echo "$ac_t""yes" 1>&6
@@ -2919,7 +2965,7 @@ fi
 
 
 echo $ac_n "checking whether to use with Singular""... $ac_c" 1>&6
-echo "configure:2923: checking whether to use with Singular" >&5
+echo "configure:2969: checking whether to use with Singular" >&5
 if test "$with_Singular" != no && test "$with_Singular" != yes; then
   if test "$enable_Singular" = yes; then
     with_Singular=yes
@@ -2982,7 +3028,7 @@ if test -d "modules"; then
 fi
   
 echo $ac_n "checking whether ${MAKE-make} sets \${MAKE}""... $ac_c" 1>&6
-echo "configure:2986: checking whether ${MAKE-make} sets \${MAKE}" >&5
+echo "configure:3032: checking whether ${MAKE-make} sets \${MAKE}" >&5
 set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_prog_make_${ac_make}_set'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6

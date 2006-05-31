@@ -400,7 +400,15 @@ if test "$ac_gmp_ok" != yes && test "$enable_gmp" != yes; then
   ac_configure_args="$ac_configure_args --enable-gmp"
 fi
 
+#AC_MSG_CHECKING(whether to configure and build MP lib)
+# requires: sizeof(long)==4
+AC_CHECK_SIZEOF(long,4)
+if test "$ac_cv_sizeof_long" != 4; then
+  with_MP=no
+fi
+
 AC_MSG_CHECKING(whether to configure and build MP lib)
+
 if test "$enable_MP" != yes && test "$enable_MP" != no; then
   if test "$with_MP" != no && test "$ac_MP_ok" != yes && test -d MP && \
      (test "$enable_gmp" = yes || test "$ac_gmp_ok" = yes); then
