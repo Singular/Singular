@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.136 2006-02-02 10:11:18 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.137 2006-06-06 17:17:06 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -725,10 +725,17 @@ leftv iiMap(map theMap, char * what)
     }
     else if ((w=IDRING(r)->idroot->get(what,myynest))!=NULL)
     {
+      char *save_r=NULL;
       v=(leftv)omAlloc0Bin(sleftv_bin);
       sleftv tmpW;
       memset(&tmpW,0,sizeof(sleftv));
       tmpW.rtyp=IDTYP(w);
+      if (tmpW.rtyp==MAP_CMD) 
+      { 
+        tmpW.rtyp=IDEAL_CMD;
+        save_r=IDMAP(w)->preimage;
+        IDMAP(w)->preimage=0;
+      }
       tmpW.data=IDDATA(w);
       #ifdef FAST_MAP
       if ((tmpW.rtyp==IDEAL_CMD) && (nMap==nCopy)
@@ -746,7 +753,14 @@ leftv iiMap(map theMap, char * what)
       {
         Werror("cannot map %s(%d)",Tok2Cmdname(w->typ),w->typ);
         omFreeBin((ADDRESS)v, sleftv_bin);
+        if (save_r!=NULL) IDMAP(w)->preimage=save_r;
         return NULL;
+      }
+      if (save_r!=NULL)
+      { 
+        IDMAP(w)->preimage=save_r;
+        IDMAP((idhdl)v)->preimage=omStrDup(save_r);
+        v->rtyp=MAP_CMD;
       }
       return v;
     }
