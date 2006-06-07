@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.16 2006-05-19 13:33:26 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.17 2006-06-07 18:44:23 wienand Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -342,7 +342,7 @@ int redRing2toM (LObject* h,kStrategy strat)
   h->SetShortExpVector();
   loop
   {
-    zeroPoly = kFindDivisibleByZeroPoly(h);
+    zeroPoly = NULL; //kFindDivisibleByZeroPoly(h);
     if (zeroPoly != NULL)
     {
       if (TEST_OPT_PROT)

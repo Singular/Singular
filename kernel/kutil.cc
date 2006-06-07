@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.23 2006-05-19 10:22:36 Singular Exp $ */
+/* $Id: kutil.cc,v 1.24 2006-06-07 18:44:23 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1642,13 +1642,20 @@ void chainCrit (poly p,int ecart,kStrategy strat)
         loop
         {
           if (i < 0)  break;
-          if ((strat->L[i].p2 == p) && pLmEqual(strat->L[j].lcm,strat->L[i].lcm))
+          if ((strat->L[i].p2 == p) && pLmEqual(strat->L[j].lcm,strat->L[i].lcm)
+#ifdef HAVE_RING2TOM
+            && pDivisibleBy(strat->L[j].lcm, strat->L[i].lcm)
+#endif
+          )
           {
             /*L[i] could be canceled but we search for a better one to cancel*/
             strat->c3++;
             if (isInPairsetL(i-1,strat->L[j].p1,strat->L[i].p1,&l,strat)
             && (pNext(strat->L[l].p) == strat->tail)
             && (!pLmEqual(strat->L[i].p,strat->L[l].p))
+#ifdef HAVE_RING2TOM
+            && 1 == 0
+#endif
             && pDivisibleBy(p,strat->L[l].lcm))
             {
               /*
@@ -1951,7 +1958,7 @@ void initenterpairsRing (poly h,int k,int ecart,int isFromQ,kStrategy strat, int
           {
             new_pair=TRUE;
             enterOnePairRing(j,h,ecart,isFromQ,strat, atR);
-            //Print("j:%d, Ll:%d\n",j,strat->Ll);
+            Print("j:%d, Ll:%d\n",j,strat->Ll);
           }
         }
       }
@@ -1961,7 +1968,7 @@ void initenterpairsRing (poly h,int k,int ecart,int isFromQ,kStrategy strat, int
         for (j=0; j<=k; j++)
         {
           enterOnePairRing(j,h,ecart,isFromQ,strat, atR);
-          //Print("j:%d, Ll:%d\n",j,strat->Ll);
+          // Print("j:%d, Ll:%d\n",j,strat->Ll);
         }
       }
     }
@@ -1973,7 +1980,7 @@ void initenterpairsRing (poly h,int k,int ecart,int isFromQ,kStrategy strat, int
         {
           new_pair=TRUE;
           enterOnePairRing(j,h,ecart,isFromQ,strat, atR);
-          //Print("j:%d, Ll:%d\n",j,strat->Ll);
+          Print("j:%d, Ll:%d\n",j,strat->Ll);
         }
       }
     }
@@ -2043,10 +2050,11 @@ void enterExtendedSpoly(poly h,kStrategy strat)
         h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
         if (pNext(p) != NULL)
         {
-          pShallowCopyDeleteProc p_shallow_copy_delete
-               = pGetShallowCopyDeleteProc(strat->tailRing, new_tailRing);
-          pNext(p) = p_shallow_copy_delete(pNext(p),
-                       currRing, strat->tailRing, strat->tailRing->PolyBin);
+          // What does this? (Oliver)
+          // pShallowCopyDeleteProc p_shallow_copy_delete
+          //      = pGetShallowCopyDeleteProc(strat->tailRing, new_tailRing);
+          // pNext(p) = p_shallow_copy_delete(pNext(p),
+          //              currRing, strat->tailRing, strat->tailRing->PolyBin);
         }
         enterL(&strat->L,&strat->Ll,&strat->Lmax,h,posx);
       }
@@ -2085,7 +2093,7 @@ void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
     enterExtendedSpoly(h, strat);
     initenterpairsRing(h, k, ecart, 0, strat, atR);
   }
-  else 
+  else
   {
     initenterpairs(h, k, ecart, 0, strat, atR);
   }
