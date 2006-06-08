@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.95 2006-06-08 08:01:51 bricken Exp $ */
+/* $Id: tgb.cc,v 1.96 2006-06-08 08:12:51 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -319,9 +319,9 @@ int kSBucketLength(kBucket* b)
   return s*c;
 }
 #endif
-static int do_pELength(poly p, slimgb_alg* c, int dlm=-1){
+static wlen_type do_pELength(poly p, slimgb_alg* c, int dlm=-1){
   if(p==NULL) return 0;
-  int s=0;
+  wlen_type s=0;
   poly pi=p;
   if(dlm<0){
     dlm=pTotaldegree(p,c->r);
@@ -342,7 +342,7 @@ static int do_pELength(poly p, slimgb_alg* c, int dlm=-1){
 
 wlen_type pELength(poly p, ring r){
   if(p==NULL) return 0;
-  int s=0;
+  wlen_type s=0;
   poly pi=p;
   int dlm;
     dlm=pTotaldegree(p,r);
@@ -361,9 +361,9 @@ wlen_type pELength(poly p, ring r){
   return s;
 }
 
-int kEBucketLength(kBucket* b, poly lm,slimgb_alg* ca)
+wlen_type kEBucketLength(kBucket* b, poly lm,slimgb_alg* ca)
 {
-  int s=0;
+  wlen_type s=0;
   if(lm==NULL){
     lm=kBucketGetLm(b);
   }
