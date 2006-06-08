@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ringgb.cc,v 1.8 2006-06-08 21:56:54 wienand Exp $ */
+/* $Id: ringgb.cc,v 1.9 2006-06-08 22:33:36 wienand Exp $ */
 /*
 * ABSTRACT: ringgb interface
 */
@@ -126,7 +126,10 @@ poly plain_spoly(poly f, poly g) {
   k_GetLeadTerms(f, g, currRing, fm, gm, currRing);
   pSetCoeff0(fm, cg);
   pSetCoeff0(gm, cf);  // and now, m1 * LT(p1) == m2 * LT(p2)
-  return(pSub(pMult_mm(f, fm), pMult_mm(g, gm)));
+  poly sp = pSub(pMult_mm(f, fm), pMult_mm(g, gm));
+  pDelete(&fm);
+  pDelete(&gm);
+  return(sp);
 }
 
 
@@ -137,7 +140,10 @@ poly spolyRing2toM(poly f, poly g, ring r) {
   // printPolyMsg("spoly: m1=", m1, " | ");
   // printPolyMsg("m2=", m2, "");
   // PrintLn();
-  return pSub(p_Mult_mm(f, m1, r), p_Mult_mm(g, m2, r));
+  poly sp = pSub(p_Mult_mm(f, m1, r), pp_Mult_mm(g, m2, r));
+  pDelete(&m1);
+  pDelete(&m2);
+  return(sp);
 }
 
 poly ringNF(poly f, ideal G, ring r) {
@@ -153,7 +159,7 @@ poly ringNF(poly f, ideal G, ring r) {
     // PrintS("G->m[i]:");
     // wrp(G->m[i]);
     // PrintLn();
-    h = spolyRing2toM(h, pCopy(G->m[i]), r);
+    h = spolyRing2toM(h, G->m[i], r);
     // PrintS("=> h=");
     // wrp(h);
     // PrintLn();
