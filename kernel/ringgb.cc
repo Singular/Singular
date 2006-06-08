@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ringgb.cc,v 1.7 2006-06-08 18:00:35 wienand Exp $ */
+/* $Id: ringgb.cc,v 1.8 2006-06-08 21:56:54 wienand Exp $ */
 /*
 * ABSTRACT: ringgb interface
 */
@@ -119,6 +119,17 @@ void printPolyMsg(const char * start, poly f, const char * end)
   PrintS(end);
 }
 
+poly plain_spoly(poly f, poly g) {
+  number cf = pGetCoeff(f), cg = pGetCoeff(g);
+  int ct = ksCheckCoeff(&cf, &cg); // gcd and zero divisors
+  poly fm, gm;
+  k_GetLeadTerms(f, g, currRing, fm, gm, currRing);
+  pSetCoeff0(fm, cg);
+  pSetCoeff0(gm, cf);  // and now, m1 * LT(p1) == m2 * LT(p2)
+  return(pSub(pMult_mm(f, fm), pMult_mm(g, gm)));
+}
+
+
 poly spolyRing2toM(poly f, poly g, ring r) {
   poly m1 = NULL;
   poly m2 = NULL;
@@ -126,7 +137,7 @@ poly spolyRing2toM(poly f, poly g, ring r) {
   // printPolyMsg("spoly: m1=", m1, " | ");
   // printPolyMsg("m2=", m2, "");
   // PrintLn();
-  return pSub(pp_Mult_mm(f, m1, r), pp_Mult_mm(g, m2, r));
+  return pSub(p_Mult_mm(f, m1, r), p_Mult_mm(g, m2, r));
 }
 
 poly ringNF(poly f, ideal G, ring r) {
@@ -142,7 +153,7 @@ poly ringNF(poly f, ideal G, ring r) {
     // PrintS("G->m[i]:");
     // wrp(G->m[i]);
     // PrintLn();
-    h = spolyRing2toM(h, G->m[i], r);
+    h = spolyRing2toM(h, pCopy(G->m[i]), r);
     // PrintS("=> h=");
     // wrp(h);
     // PrintLn();
@@ -173,4 +184,31 @@ poly ringRedNF (poly f, ideal G, ring r) {
   }
   return h;
 }
+
+int testGB(ideal GI) {
+  poly f, g, h;
+  int i = 0;
+  int j = 0;
+  for (i = 0; i < IDELEMS(GI) - 1; i++) {
+    for (j = i + 1; j < IDELEMS(GI); j++) {
+      f = pCopy(GI->m[i]);
+      g = pCopy(GI->m[j]);
+      h = plain_spoly(f, g);
+      if (ringNF(h, GI, currRing) != NULL) {
+        wrp(GI->m[i]);
+        PrintLn();
+        wrp(GI->m[j]);
+        PrintLn();
+        wrp(h);
+        PrintLn();
+        wrp(ringNF(h, GI, currRing));
+        PrintLn();
+        return(0);
+      }
+      pDelete(&h);
+    }
+  }
+  return(1);
+}
+
 #endif
