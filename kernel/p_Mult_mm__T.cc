@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Mult_mm__T.cc,v 1.3 2006-01-16 14:02:51 Singular Exp $
+ *  Version: $Id: p_Mult_mm__T.cc,v 1.4 2006-06-08 18:00:34 wienand Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -57,7 +57,7 @@ LINKAGE poly p_Mult_mm(poly p, const poly m, const ring ri)
       n_Delete(&pn, ri);
       p_MemAdd(p->exp, m_e, length);
       p_MemAddAdjust(p, ri);
-#ifdef HAVE_RING_2TOM
+#ifdef HAVE_RING2TOM
       before = p;
 #endif
       p = pNext(p);

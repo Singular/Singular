@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ringgb.cc,v 1.6 2006-02-14 13:45:48 Singular Exp $ */
+/* $Id: ringgb.cc,v 1.7 2006-06-08 18:00:35 wienand Exp $ */
 /*
 * ABSTRACT: ringgb interface
 */
@@ -123,9 +123,9 @@ poly spolyRing2toM(poly f, poly g, ring r) {
   poly m1 = NULL;
   poly m2 = NULL;
   ring2toM_GetLeadTerms(f, g, r, m1, m2, r);
-  printPolyMsg("spoly: m1=", m1, " | ");
-  printPolyMsg("m2=", m2, "");
-  PrintLn();
+  // printPolyMsg("spoly: m1=", m1, " | ");
+  // printPolyMsg("m2=", m2, "");
+  // PrintLn();
   return pSub(pp_Mult_mm(f, m1, r), pp_Mult_mm(g, m2, r));
 }
 
@@ -135,17 +135,17 @@ poly ringNF(poly f, ideal G, ring r) {
   poly h = pCopy(f);
   int i = findRing2toMsolver(h, G, r);
   int c = 1;
-  while (h != NULL && i >= 0 && c < 20) {
-    Print("%d-step NF - h:", c);
-    wrp(h);
-    PrintS(" ");
-    PrintS("G->m[i]:");
-    wrp(G->m[i]);
-    PrintLn();
+  while (h != NULL && i >= 0) {
+    // Print("%d-step NF - h:", c);
+    // wrp(h);
+    // PrintS(" ");
+    // PrintS("G->m[i]:");
+    // wrp(G->m[i]);
+    // PrintLn();
     h = spolyRing2toM(h, G->m[i], r);
-    PrintS("=> h=");
-    wrp(h);
-    PrintLn();
+    // PrintS("=> h=");
+    // wrp(h);
+    // PrintLn();
     i = findRing2toMsolver(h, G, r);
     c++;
   }
@@ -158,7 +158,7 @@ poly ringRedNF (poly f, ideal G, ring r) {
   poly h = NULL;
   poly g = pCopy(f);
   int c = 0;
-  while (g != NULL && c < 20) {
+  while (g != NULL) {
     Print("%d-step RedNF - g=", c);
     wrp(g);
     PrintS(" | h=");
