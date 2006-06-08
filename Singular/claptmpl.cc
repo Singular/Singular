@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.32 2006-02-23 12:39:35 bricken Exp $
+// $Id: claptmpl.cc,v 1.33 2006-06-08 06:07:06 bricken Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -209,6 +209,11 @@ using std::vector;
 using boost::dynamic_bitset;
 template class dynamic_bitset<>;
 template class vector<dynamic_bitset<> >;
+#else
+#include <vector>
+using std::vector;
+template class vector<bool>;
+template class vector<vector<bool> >;
 #endif
 
 template int pos_helper(kStrategy strat, poly p, int len, intset  setL, polyset set);

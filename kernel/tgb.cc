@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.93 2006-05-19 12:50:50 bricken Exp $ */
+/* $Id: tgb.cc,v 1.94 2006-06-08 06:06:51 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1176,7 +1176,10 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
     ENLARGE(c->short_Exps,long);
     ENLARGE(c->lengths,int);
     #ifndef HAVE_BOOST
+    #ifndef USE_STDVECBOOL
+    
     ENLARGE(c->states, char*);
+    #endif
     #endif
     ENLARGE(c->gcd_of_terms,poly);
     //if (c->weighted_lengths!=NULL) {
@@ -1219,10 +1222,17 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
     c->states.push_back(dynamic_bitset<>(i));
 
   #else
+  #ifdef USE_STDVECBOOL
+    
+    c->states.push_back(vector<bool>(i));
+   
+  
+  #else
   if (i>0)
     c->states[i]=(char*)  omalloc(i*sizeof(char));
   else
     c->states[i]=NULL;
+  #endif
   #endif
 
   c->S->m[i]=h;
@@ -2175,9 +2185,12 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
 #endif
   /* omUnGetSpecBin(&(c->HeadBin)); */
   #ifndef HAVE_BOOST
+  #ifdef USE_STDVECBOOL
+  #else
   h=omalloc(n*sizeof(char*));
 
   states=(char**) h;
+  #endif
   #endif
   h=omalloc(n*sizeof(int));
   lengths=(int*) h;
@@ -2320,10 +2333,12 @@ slimgb_alg::~slimgb_alg(){
     omfree(old);
   }
   #ifndef HAVE_BOOST
+  #ifndef USE_STDVECBOOL
   for(int z=1 /* zero length at 0 */;z<c->n;z++){
     omfree(c->states[z]);
   }
   omfree(c->states);
+  #endif
   #endif
 
   omfree(c->lengths);
