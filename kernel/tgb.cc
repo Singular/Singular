@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.94 2006-06-08 06:06:51 bricken Exp $ */
+/* $Id: tgb.cc,v 1.95 2006-06-08 08:01:51 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -179,7 +179,7 @@ inline wlen_type pSLength(poly p,int l)
   else
     c=nSize(coef);
   if (!(TEST_V_COEFSTRAT))
-      return c*l /*pLength(p)*/;
+      return (wlen_type)c*(wlen_type)l /*pLength(p)*/;
   else {
     wlen_type res=l;
     res*=c;
