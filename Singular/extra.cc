@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.238 2006-01-16 03:28:10 wienand Exp $ */
+/* $Id: extra.cc,v 1.239 2006-06-08 21:56:25 wienand Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2732,6 +2732,28 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else return TRUE;
     }
     else
+#ifdef HAVE_RING2TOM
+/*==================== Testing groebner basis =================*/
+    if (strcmp(sys_cmd, "spoly")==0)
+    {
+      poly f = pCopy((poly) h->Data());
+      h = h->next;
+      poly g = pCopy((poly) h->Data());
+
+      res->rtyp=POLY_CMD;
+      res->data=(poly) plain_spoly(f,g);
+      return(FALSE);
+    }
+    else
+    if (strcmp(sys_cmd, "testGB")==0)
+    {
+      ideal GI = (ideal) h->Data();
+      res->rtyp = INT_CMD;
+      res->data = (void *) testGB(GI);
+      return(FALSE);
+    }
+    else
+#endif
 #ifdef ix86_Win
 /*==================== Python Singular =================*/
     if (strcmp(sys_cmd, "python") == 0)
