@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ringgb.cc,v 1.9 2006-06-08 22:33:36 wienand Exp $ */
+/* $Id: ringgb.cc,v 1.10 2006-06-09 23:17:04 wienand Exp $ */
 /*
 * ABSTRACT: ringgb interface
 */
@@ -196,6 +196,7 @@ int testGB(ideal GI) {
   int i = 0;
   int j = 0;
   for (i = 0; i < IDELEMS(GI) - 1; i++) {
+    Print("-");
     for (j = i + 1; j < IDELEMS(GI); j++) {
       f = pCopy(GI->m[i]);
       g = pCopy(GI->m[j]);

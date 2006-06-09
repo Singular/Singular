@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.4 2006-03-20 20:33:56 wienand Exp $ */
+/* $Id: kspoly.cc,v 1.5 2006-06-09 23:17:04 wienand Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -495,7 +495,7 @@ x1:
 #ifdef HAVE_RING2TOM
     if (currRing->cring == 1)
     {
-      t1 = nAdd(t1, t2);
+      t1 = nSub(t1, t2);
       equal = nIsZero(t1);
       nDelete(&t2);
     }
