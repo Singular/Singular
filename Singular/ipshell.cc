@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.137 2006-06-06 17:17:06 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.138 2006-06-09 16:24:40 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -577,9 +577,10 @@ int exprlist_length(leftv v)
 }
 
 #ifdef HAVE_RING2TOM
+// avoid to test the "special" char: -1, 0, 1, 2
 int Is2toM(int p)  /* brute force !!!! */
 {
-  if (p <= 0) return 0;
+  if (p <= 2) return 0;
   int test = p;
   int i = 0;
   while (p%2 == 0) {
