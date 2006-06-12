@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ringgb.cc,v 1.11 2006-06-12 00:07:12 wienand Exp $ */
+/* $Id: ringgb.cc,v 1.12 2006-06-12 00:35:13 wienand Exp $ */
 /*
 * ABSTRACT: ringgb interface
 */
@@ -204,7 +204,6 @@ int testGB(ideal I, ideal GI) {
       PrintLn();
       return(0);
     }
-    pDelete(&h);
   }
   Print("I");
   for (i = 0; i < IDELEMS(GI); i++) {

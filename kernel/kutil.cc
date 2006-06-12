@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.25 2006-06-12 00:07:11 wienand Exp $ */
+/* $Id: kutil.cc,v 1.26 2006-06-12 00:35:13 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1672,20 +1672,13 @@ void chainCrit (poly p,int ecart,kStrategy strat)
         loop
         {
           if (i < 0)  break;
-          if ((strat->L[i].p2 == p) && pLmEqual(strat->L[j].lcm,strat->L[i].lcm)
-#ifdef HAVE_RING2TOM
-            && pDivisibleBy(strat->L[j].lcm, strat->L[i].lcm)
-#endif
-          )
+          if ((strat->L[i].p2 == p) && pLmEqual(strat->L[j].lcm,strat->L[i].lcm))
           {
             /*L[i] could be canceled but we search for a better one to cancel*/
             strat->c3++;
             if (isInPairsetL(i-1,strat->L[j].p1,strat->L[i].p1,&l,strat)
             && (pNext(strat->L[l].p) == strat->tail)
             && (!pLmEqual(strat->L[i].p,strat->L[l].p))
-#ifdef HAVE_RING2TOM
-            && 1 == 0
-#endif
             && pDivisibleBy(p,strat->L[l].lcm))
             {
               /*
@@ -1814,7 +1807,7 @@ void chainCritRing (poly p,int ecart,kStrategy strat)
   assume(!(strat->Gebauer || strat->fromT));
   for (j=strat->Ll; j>=0; j--)
   {
-    if (nGreater(pGetCoeff(strat->L[j].lcm), pGetCoeff(p)))
+    if (strat->L[j].lcm != NULL && nGreater(pGetCoeff(strat->L[j].lcm), pGetCoeff(p)))
     {
       if (pCompareChain(p,strat->L[j].p1,strat->L[j].p2,strat->L[j].lcm))
       {

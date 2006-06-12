@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.9 2006-06-12 00:07:11 wienand Exp $ */
+/* $Id: polys.cc,v 1.10 2006-06-12 00:35:13 wienand Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -934,10 +934,6 @@ BOOLEAN pCompareChain (poly p,poly p1,poly p2,poly lcm)
   int k, j;
 
   if (lcm==NULL) return FALSE;
-  #ifdef HAVE_RING2TOM
-  // In coefficient rings, the coefficient plays a role in chain crit TODO
-  if (currRing->cring == 1 && !pLmDivisibleByNoComp(p, lcm)) return FALSE;
-  #endif
 
   for (j=pVariables; j; j--)
     if ( pGetExp(p,j) >  pGetExp(lcm,j)) return FALSE;
