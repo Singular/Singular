@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.16 2006-05-19 10:22:36 Singular Exp $ */
+/* $Id: kutil.h,v 1.17 2006-06-12 17:40:10 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -279,6 +279,9 @@ public:
   poly    t_kNoether;
   BOOLEAN * NotUsedAxis;
   BOOLEAN * pairtest;/*used for enterOnePair*/
+#ifdef HAVE_RING2TOM
+//  unsigned int * lmcomp;/*used for enterOnePairRing and chainCritRing*/
+#endif
   poly tail;
   leftv kIdeal;
   intvec * kModW;

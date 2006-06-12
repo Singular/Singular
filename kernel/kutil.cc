@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.27 2006-06-12 14:27:23 Singular Exp $ */
+/* $Id: kutil.cc,v 1.28 2006-06-12 17:40:09 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1853,7 +1853,7 @@ void chainCritRing (poly p,int ecart,kStrategy strat)
         {
           deleteInL(strat->L,&strat->Ll,j,strat);
           strat->c3++;
-          Print("|UL|");
+          // Print("|UL|");
         }
       }
     }
@@ -1894,21 +1894,15 @@ void chainCritRing (poly p,int ecart,kStrategy strat)
       {
         if (i < 0)  break;
         // Element is from B and has the same lcm as L[j]
-        if ((strat->L[i].p2 == p) && pLmEqual(strat->L[j].lcm,strat->L[i].lcm)
-#ifdef HAVE_RING2TOM
-          && nGreater(pGetCoeff(strat->L[j].lcm), pGetCoeff(strat->L[i].lcm))
-#endif
-        )
+        if ((strat->L[i].p2 == p) && nGreater(pGetCoeff(strat->L[j].lcm), pGetCoeff(strat->L[i].lcm))
+             && pLmEqual(strat->L[j].lcm,strat->L[i].lcm))
         {
           /*L[i] could be canceled but we search for a better one to cancel*/
           strat->c3++;
-          Print("|EP|");
+          // Print("|EP|");
           if (isInPairsetL(i-1,strat->L[j].p1,strat->L[i].p1,&l,strat)
           && (pNext(strat->L[l].p) == strat->tail)
           && (!pLmEqual(strat->L[i].p,strat->L[l].p))
-#ifdef HAVE_RING2TOM
-//        && 1 == 0
-#endif
           && pDivisibleBy(p,strat->L[l].lcm))
           {
             /*
