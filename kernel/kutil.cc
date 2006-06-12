@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.26 2006-06-12 00:35:13 wienand Exp $ */
+/* $Id: kutil.cc,v 1.27 2006-06-12 14:27:23 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -51,10 +51,6 @@
 #undef KDEBUG
 #define KDEBUG 2
 #endif
-#define pDivComp_EQUAL 2
-#define pDivComp_LESS 1
-#define pDivComp_GREATER -1
-#define pDivComp_INCOMP 0
 
 
 #ifdef ENTER_USE_MYMEMMOVE
@@ -104,12 +100,17 @@ inline void _my_memmove(void* d, void* s, long l)
 static poly redMora (poly h,int maxIndex,kStrategy strat);
 static poly redBba (poly h,int maxIndex,kStrategy strat);
 
+#ifdef HAVE_RING2TOM
+#define pDivComp_EQUAL 2
+#define pDivComp_LESS 1
+#define pDivComp_GREATER -1
+#define pDivComp_INCOMP 0
 /* Checks the relation of LM(p) and LM(q)
      LM(p) = LM(q) => return pDivComp_EQUAL
      LM(p) | LM(q) => return pDivComp_LESS
      LM(q) | LM(p) => return pDivComp_GREATER
      else return pDivComp_INCOMP */
-static inline int pDivComp(poly p, poly q)
+static inline int pDivCompRing(poly p, poly q)
 {
   if (pGetComp(p) == pGetComp(q))
   {
@@ -142,6 +143,43 @@ static inline int pDivComp(poly p, poly q)
     if (a) return 1;
     if (b) return -1;
     if (!a & !b) return pDivComp_EQUAL;
+  }
+  return 0;
+}
+#endif
+
+static inline int pDivComp(poly p, poly q)
+{
+  if (pGetComp(p) == pGetComp(q))
+  {
+    BOOLEAN a=FALSE, b=FALSE;
+    int i;
+    unsigned long la, lb;
+    unsigned long divmask = currRing->divmask;
+    for (i=0; i<currRing->VarL_Size; i++)
+    {
+      la = p->exp[currRing->VarL_Offset[i]];
+      lb = q->exp[currRing->VarL_Offset[i]];
+      if (la != lb)
+      {
+        if (la < lb)
+        {
+          if (b) return 0;
+          if (((la & divmask) ^ (lb & divmask)) != ((lb - la) & divmask))
+            return 0;
+          a = TRUE;
+        }
+        else
+        {
+          if (a) return 0;
+          if (((la & divmask) ^ (lb & divmask)) != ((la - lb) & divmask))
+            return 0;
+          b = TRUE;
+        }
+      }
+    }
+    if (a) return 1;
+    if (b) return -1;
   }
   return 0;
 }
@@ -1061,7 +1099,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   */
   for(j = strat->Bl;j>=0;j--)
   {
-    compare=pDivComp(strat->B[j].lcm,Lp.lcm);
+    compare=pDivCompRing(strat->B[j].lcm,Lp.lcm);
     compareCoeff = nComp((long) pGetCoeff(strat->B[j].lcm), (long) pGetCoeff(Lp.lcm));
     if (compareCoeff == 0 || compare == compareCoeff)
     {
