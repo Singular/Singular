@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.41 2006-06-08 06:06:51 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.42 2006-06-12 12:34:02 Singular Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -17,8 +17,11 @@
 #include "structs.h"
 #include "polys.h"
 #include "stdlib.h"
+#ifdef HAVE_BOOST_DYNAMIC_BITSET_HPP
+#define  HAVE_BOOST 1
+#endif
 //#define HAVE_BOOST 1
-#define USE_STDVECBOOL 1
+//#define USE_STDVECBOOL 1
 #ifdef HAVE_BOOST
 #include "boost/dynamic_bitset.hpp"
 #include <vector>

@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.8 2005-10-31 17:23:23 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.9 2006-06-12 12:34:02 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -105,6 +105,10 @@
 #undef HAVE_GETPWNAM
 /* Define if you have popen */
 #undef HAVE_POPEN
+/* Define if you have siginterrupt (BSD4.3) */
+#undef HAVE_SIGINTERRUPT
+/* define for boost includes and lib */
+#undef HAVE_BOOST_DYNAMIC_BITSET_HPP
 /* Define sizeof(char) */
 #define SIZEOF_CHAR 1
 /* Define sizeof(short) */
@@ -547,6 +551,10 @@ int hpux9_system(const char* system);
 
 #endif /* not NDEBUG */
 
+#ifdef HAVE_NAMESPACES
+#  undef USE_IILOCALRING
+#endif
+
 /*******************************************************************
  *
  * assume(x) -- a handy macro for assumptions
@@ -605,5 +613,12 @@ while (0)
 #define RDEBUG 
 #endif
 #endif
+
+#if SIZEOF_VOIDP == 8
+#ifndef OM_CHECK
+#define OM_CHECK 0
+#endif
+#endif
+
 
 #endif /* MOD2_H  */

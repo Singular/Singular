@@ -108,7 +108,7 @@ AC_MSG_RESULT($ac_cv_c_cpp)
 # not overwrite it explicitely
 if test "${GXX}" = yes && test "${ac_cxx_set}" = no; then
   if test "${ac_cv_c_cpp}" = gcc2; then
-    CXX=gcc
+    CXX=g++
   elif test "${ac_cv_c_cpp}" = gcc3; then
     CXX=g++
   fi
@@ -692,6 +692,11 @@ AC_CHECK_LIB(ntl,main)
 
 AC_CHECK_HEADERS(gmp.h MP.h  MPT.h factory.h factor.h omalloc.h \
  omalloc.c)
+
+AC_LANG_SAVE
+AC_LANG_CPLUSPLUS
+AC_CHECK_HEADERS(boost/dynamic_bitset.hpp)
+AC_LANG_RESTORE
 
 if test "$ac_cv_lib_gmp_main" = yes && \
  test "$ac_cv_header_gmp_h" = yes; then
