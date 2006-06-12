@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.8 2006-03-20 20:33:57 wienand Exp $ */
+/* $Id: polys.cc,v 1.9 2006-06-12 00:07:11 wienand Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -920,12 +920,21 @@ poly pSubst(poly p, int n, poly e)
   return res;
 }
 
+/* Returns TRUE if
+     * LM(p) | LM(lcm)
+     * LC(p) | LC(lcm) only if ring
+     * Exists i, j:
+         * LE(p, i)  != LE(lcm, i)
+         * LE(p1, i) != LE(lcm, i)   ==> LCM(p1, p) != lcm
+         * LE(p, j)  != LE(lcm, j)
+         * LE(p2, j) != LE(lcm, j)   ==> LCM(p2, p) != lcm
+*/
 BOOLEAN pCompareChain (poly p,poly p1,poly p2,poly lcm)
 {
   int k, j;
 
   if (lcm==NULL) return FALSE;
-  #ifdef HAVE_RING2TOM 
+  #ifdef HAVE_RING2TOM
   // In coefficient rings, the coefficient plays a role in chain crit TODO
   if (currRing->cring == 1 && !pLmDivisibleByNoComp(p, lcm)) return FALSE;
   #endif

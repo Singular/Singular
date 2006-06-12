@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.24 2006-06-07 18:44:23 wienand Exp $ */
+/* $Id: kutil.cc,v 1.25 2006-06-12 00:07:11 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -51,6 +51,11 @@
 #undef KDEBUG
 #define KDEBUG 2
 #endif
+#define pDivComp_EQUAL 2
+#define pDivComp_LESS 1
+#define pDivComp_GREATER -1
+#define pDivComp_INCOMP 0
+
 
 #ifdef ENTER_USE_MYMEMMOVE
 inline void _my_memmove_d_gt_s(unsigned long* d, unsigned long* s, long l)
@@ -99,6 +104,11 @@ inline void _my_memmove(void* d, void* s, long l)
 static poly redMora (poly h,int maxIndex,kStrategy strat);
 static poly redBba (poly h,int maxIndex,kStrategy strat);
 
+/* Checks the relation of LM(p) and LM(q)
+     LM(p) = LM(q) => return pDivComp_EQUAL
+     LM(p) | LM(q) => return pDivComp_LESS
+     LM(q) | LM(p) => return pDivComp_GREATER
+     else return pDivComp_INCOMP */
 static inline int pDivComp(poly p, poly q)
 {
   if (pGetComp(p) == pGetComp(q))
@@ -131,6 +141,7 @@ static inline int pDivComp(poly p, poly q)
     }
     if (a) return 1;
     if (b) return -1;
+    if (!a & !b) return pDivComp_EQUAL;
   }
   return 0;
 }
@@ -436,6 +447,13 @@ void initPairtest(kStrategy strat)
 {
   strat->pairtest = (BOOLEAN *)omAlloc0((strat->sl+2)*sizeof(BOOLEAN));
 }
+
+#ifdef HAVE_RING2TOM
+//void initLMtest(kStrategy strat)
+//{
+//  strat->lmtest = (unsigned int *)omAlloc0((strat->sl*strat->sl/2+2)*sizeof(BOOLEAN));
+//}
+#endif
 
 /*2
 *test whether (p1,p2) or (p2,p1) is in L up position length
@@ -995,7 +1013,7 @@ inline int nComp(long a, long b)
   }
   else
   {
-    if (b % 2 == 1) 
+    if (b % 2 == 1)
     {
       return 0;
     }
@@ -1025,55 +1043,66 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   pLcm(p,strat->S[i],Lp.lcm);
   pSetm(Lp.lcm);
   pSetCoeff(Lp.lcm, nLcm(pGetCoeff(p), pGetCoeff(strat->S[i]), currRing));
-  if (strat->sugarCrit)
+  assume(!strat->sugarCrit);
+  // basic product criterion
+  if (pHasNotCF(p,strat->S[i]) && (long) pGetCoeff(p) % 2 == 1 && (long) pGetCoeff(strat->S[i]) % 2 == 1)
   {
-  	WarnS("Sugar Criterion not yet available on in the ring case");
+      strat->cp++;
+      pLmFree(Lp.lcm);
+      Lp.lcm=NULL;
+      return;
   }
-  else /*sugarcrit*/
+  assume(!strat->fromT);
+  /*
+  *the set B collects the pairs of type (S[j],p)
+  *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p) != lcm(r,p)
+  *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
+  *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
+  */
+  for(j = strat->Bl;j>=0;j--)
   {
-      // basic product criterion
-      if (pHasNotCF(p,strat->S[i]) && (long) pGetCoeff(p) % 2 == 1 && (long) pGetCoeff(strat->S[i]) % 2 == 1)
+    compare=pDivComp(strat->B[j].lcm,Lp.lcm);
+    compareCoeff = nComp((long) pGetCoeff(strat->B[j].lcm), (long) pGetCoeff(Lp.lcm));
+    if (compareCoeff == 0 || compare == compareCoeff)
+    {
+      if (compare == 1)
       {
-          strat->cp++;
-          pLmFree(Lp.lcm);
-          Lp.lcm=NULL;
-          return;
-      }
-      if (strat->fromT) // && (strat->ecartS[i]>ecart))
-      {
-          WarnS("Sugar Criterion not yet available on in the ring case");
-      }
-      /*
-      *the set B collects the pairs of type (S[j],p)
-      *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p)#lcm(r,p)
-      *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
-      *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
-      */
-      for(j = strat->Bl;j>=0;j--)
-      {
-        compare=pDivComp(strat->B[j].lcm,Lp.lcm);
-        compareCoeff = nComp((long) pGetCoeff(strat->B[j].lcm), (long) pGetCoeff(Lp.lcm));
-        if (compareCoeff == 0 || compare == compareCoeff)
+        strat->c3++;
+        if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
         {
-          if (compare==1)
-          {
-            strat->c3++;
-            if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
-            {
-              pLmFree(Lp.lcm);
-              return;
-            }
-            break;
-          }
-          else
-          if (compare ==-1)
-          {
-            deleteInL(strat->B,&strat->Bl,j,strat);
-            strat->c3++;
-          }
+          pLmFree(Lp.lcm);
+          return;
         }
+        break;
+      }
+      else
+      if (compare == -1)
+      {
+        deleteInL(strat->B,&strat->Bl,j,strat);
+        strat->c3++;
       }
     }
+    if (compare == pDivComp_EQUAL)
+    {
+      // Add hint for same LM and direction of LC (later) (TODO Oliver)
+      if (compareCoeff == 1)
+      {
+        strat->c3++;
+        if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
+        {
+          pLmFree(Lp.lcm);
+          return;
+        }
+        break;
+      }
+      else
+      if (compareCoeff == -1)
+      {
+        deleteInL(strat->B,&strat->Bl,j,strat);
+        strat->c3++;
+      }
+    }
+  }
   /*
   *the pair (S[i],p) enters B if the spoly != 0
   */
@@ -1082,7 +1111,8 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   pNorm(p);
   if ((strat->fromQ!=NULL) && (isFromQ!=0) && (strat->fromQ[i]!=0))
   {
-    WarnS("Oliver weiss nicht, was dieses genau macht.");
+    // Is from a previous computed GB, therefore we know that spoly will
+    // reduce to zero. Oliver.
     Lp.p=NULL;
   }
   else
@@ -1754,7 +1784,6 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
 void chainCritRing (poly p,int ecart,kStrategy strat)
 {
   int i,j,l;
-
   /*
   *pairtest[i] is TRUE if spoly(S[i],p) == 0.
   *In this case all elements in B such
@@ -1782,152 +1811,103 @@ void chainCritRing (poly p,int ecart,kStrategy strat)
     omFreeSize(strat->pairtest,(strat->sl+2)*sizeof(BOOLEAN));
     strat->pairtest=NULL;
   }
-  if (strat->Gebauer || strat->fromT)
+  assume(!(strat->Gebauer || strat->fromT));
+  for (j=strat->Ll; j>=0; j--)
   {
-    WarnS("Gebauer or fromT not tested yet in chainCritRing.");
-    if (strat->sugarCrit)
-    {
-        WarnS("Sugar Criterion not yet available for coefficient rings.");
-    }
-    else /*sugarCrit*/
-    {
-      /*
-      *suppose L[j] == (s,r) and p/lcm(s,r)
-      *and lcm(s,r)#lcm(s,p) and lcm(s,r)#lcm(r,p)
-      *and in case the sugar is o.k. then L[j] can be canceled
-      */
-      for (j=strat->Ll; j>=0; j--)
-      {
-        if (pCompareChain(p,strat->L[j].p1,strat->L[j].p2,strat->L[j].lcm))
-        {
-          if ((pNext(strat->L[j].p) == strat->tail)||(pOrdSgn==1))
-          {
-            deleteInL(strat->L,&strat->Ll,j,strat);
-            strat->c3++;
-          }
-        }
-      }
-      /*
-      *this is GEBAUER-MOELLER:
-      *in B all elements with the same lcm except the "best"
-      *(i.e. the last one in B with this property) will be canceled
-      */
-      j = strat->Bl;
-      loop   /*cannot be changed into a for !!! */
-      {
-        if (j <= 0) break;
-        for(i=j-1; i>=0; i--)
-        {
-          if (pLmEqual(strat->B[j].lcm,strat->B[i].lcm))
-          {
-            strat->c3++;
-            deleteInL(strat->B,&strat->Bl,i,strat);
-            j--;
-          }
-        }
-        j--;
-      }
-    }
-    /*
-    *the elements of B enter L/their order with respect to B is kept
-    *j = posInL(L,j,B[i]) would permutate the order
-    *if once B is ordered different from L
-    *then one should use j = posInL(L,Ll,B[i])
-    */
-    j = strat->Ll+1;
-    for (i=strat->Bl; i>=0; i--)
-    {
-      j = strat->posInL(strat->L,j-1,&(strat->B[i]),strat);
-      enterL(&strat->L,&strat->Ll,&strat->Lmax,strat->B[i],j);
-    }
-    strat->Bl = -1;
-  }
-  else /* Gebauer or fromT */
-  {
-    for (j=strat->Ll; j>=0; j--)
+    if (nGreater(pGetCoeff(strat->L[j].lcm), pGetCoeff(p)))
     {
       if (pCompareChain(p,strat->L[j].p1,strat->L[j].p2,strat->L[j].lcm))
       {
-        if ((pNext(strat->L[j].p) == strat->tail)||(pOrdSgn==1))
+        if ((pNext(strat->L[j].p) == strat->tail) || (pOrdSgn==1))
         {
           deleteInL(strat->L,&strat->Ll,j,strat);
           strat->c3++;
+          Print("|UL|");
         }
       }
     }
-    /*
-    *this is our MODIFICATION of GEBAUER-MOELLER:
-    *First the elements of B enter L,
-    *then we fix a lcm and the "best" element in L
-    *(i.e the last in L with this lcm and of type (s,p))
-    *and cancel all the other elements of type (r,p) with this lcm
-    *except the case the element (s,r) has also the same lcm
-    *and is on the worst position with respect to (s,p) and (r,p)
-    */
-    /*
-    *B enters to L/their order with respect to B is permutated for elements
-    *B[i].p with the same leading term
-    */
-    j = strat->Ll;
-    for (i=strat->Bl; i>=0; i--)
+  }
+  /*
+  *this is our MODIFICATION of GEBAUER-MOELLER:
+  *First the elements of B enter L,
+  *then we fix a lcm and the "best" element in L
+  *(i.e the last in L with this lcm and of type (s,p))
+  *and cancel all the other elements of type (r,p) with this lcm
+  *except the case the element (s,r) has also the same lcm
+  *and is on the worst position with respect to (s,p) and (r,p)
+  */
+  /*
+  *B enters to L/their order with respect to B is permutated for elements
+  *B[i].p with the same leading term
+  */
+  j = strat->Ll;
+  for (i=strat->Bl; i>=0; i--)
+  {
+    j = strat->posInL(strat->L,j,&(strat->B[i]),strat);
+    enterL(&strat->L,&strat->Ll,&strat->Lmax,strat->B[i],j);
+  }
+  strat->Bl = -1;
+  j = strat->Ll;
+  loop  /*cannot be changed into a for !!! */
+  {
+    if (j <= 0)
     {
-      j = strat->posInL(strat->L,j,&(strat->B[i]),strat);
-      enterL(&strat->L,&strat->Ll,&strat->Lmax,strat->B[i],j);
+      /*now L[0] cannot be canceled any more and the tail can be removed*/
+      if (strat->L[0].p2 == strat->tail) strat->L[0].p2 = p;
+      break;
     }
-    strat->Bl = -1;
-    j = strat->Ll;
-    loop  /*cannot be changed into a for !!! */
+    if (strat->L[j].p2 == p) // Was the element added from B?
     {
-      if (j <= 0)
+      i = j-1;
+      loop
       {
-        /*now L[0] cannot be canceled any more and the tail can be removed*/
-        if (strat->L[0].p2 == strat->tail) strat->L[0].p2 = p;
-        break;
-      }
-      if (strat->L[j].p2 == p)
-      {
-        i = j-1;
-        loop
+        if (i < 0)  break;
+        // Element is from B and has the same lcm as L[j]
+        if ((strat->L[i].p2 == p) && pLmEqual(strat->L[j].lcm,strat->L[i].lcm)
+#ifdef HAVE_RING2TOM
+          && nGreater(pGetCoeff(strat->L[j].lcm), pGetCoeff(strat->L[i].lcm))
+#endif
+        )
         {
-          if (i < 0)  break;
-          if ((strat->L[i].p2 == p) && pLmEqual(strat->L[j].lcm,strat->L[i].lcm))
+          /*L[i] could be canceled but we search for a better one to cancel*/
+          strat->c3++;
+          Print("|EP|");
+          if (isInPairsetL(i-1,strat->L[j].p1,strat->L[i].p1,&l,strat)
+          && (pNext(strat->L[l].p) == strat->tail)
+          && (!pLmEqual(strat->L[i].p,strat->L[l].p))
+#ifdef HAVE_RING2TOM
+//        && 1 == 0
+#endif
+          && pDivisibleBy(p,strat->L[l].lcm))
           {
-            /*L[i] could be canceled but we search for a better one to cancel*/
-            strat->c3++;
-            if (isInPairsetL(i-1,strat->L[j].p1,strat->L[i].p1,&l,strat)
-            && (pNext(strat->L[l].p) == strat->tail)
-            && (!pLmEqual(strat->L[i].p,strat->L[l].p))
-            && pDivisibleBy(p,strat->L[l].lcm))
-            {
-              /*
-              *"NOT equal(...)" because in case of "equal" the element L[l]
-              *is "older" and has to be from theoretical point of view behind
-              *L[i], but we do not want to reorder L
-              */
-              strat->L[i].p2 = strat->tail;
-              /*
-              *L[l] will be canceled, we cannot cancel L[i] later on,
-              *so we mark it with "tail"
-              */
-              deleteInL(strat->L,&strat->Ll,l,strat);
-              i--;
-            }
-            else
-            {
-              deleteInL(strat->L,&strat->Ll,i,strat);
-            }
-            j--;
+            /*
+            *"NOT equal(...)" because in case of "equal" the element L[l]
+            *is "older" and has to be from theoretical point of view behind
+            *L[i], but we do not want to reorder L
+            */
+            strat->L[i].p2 = strat->tail;
+            /*
+            *L[l] will be canceled, we cannot cancel L[i] later on,
+            *so we mark it with "tail"
+            */
+            deleteInL(strat->L,&strat->Ll,l,strat);
+            i--;
           }
-          i--;
+          else
+          {
+            deleteInL(strat->L,&strat->Ll,i,strat);
+          }
+          j--;
         }
+        i--;
       }
-      else if (strat->L[j].p2 == strat->tail)
-      {
-        /*now L[j] cannot be canceled any more and the tail can be removed*/
-        strat->L[j].p2 = p;
-      }
-      j--;
     }
+    else if (strat->L[j].p2 == strat->tail)
+    {
+      /*now L[j] cannot be canceled any more and the tail can be removed*/
+      strat->L[j].p2 = p;
+    }
+    j--;
   }
 }
 
@@ -1985,7 +1965,7 @@ void initenterpairsRing (poly h,int k,int ecart,int isFromQ,kStrategy strat, int
       }
     }
 
-    if (new_pair) chainCrit(h,ecart,strat);
+    if (new_pair) chainCritRing(h,ecart,strat);
 
   }
 /*
@@ -4533,6 +4513,15 @@ void initBuchMoraCrit(kStrategy strat)
   // and r is plural_ring
   if (currRing->nc!=NULL)
     //or it has non-quasi-comm type... later
+  {
+    strat->sugarCrit = FALSE;
+    strat->Gebauer = FALSE ;
+    strat->honey = FALSE;
+  }
+#endif
+#ifdef HAVE_RING2TOM
+  // Coefficient ring?
+  if (currRing->cring == 1)
   {
     strat->sugarCrit = FALSE;
     strat->Gebauer = FALSE ;

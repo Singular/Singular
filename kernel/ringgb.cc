@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ringgb.cc,v 1.10 2006-06-09 23:17:04 wienand Exp $ */
+/* $Id: ringgb.cc,v 1.11 2006-06-12 00:07:12 wienand Exp $ */
 /*
 * ABSTRACT: ringgb interface
 */
@@ -191,23 +191,36 @@ poly ringRedNF (poly f, ideal G, ring r) {
   return h;
 }
 
-int testGB(ideal GI) {
+int testGB(ideal I, ideal GI) {
   poly f, g, h;
   int i = 0;
   int j = 0;
-  for (i = 0; i < IDELEMS(GI) - 1; i++) {
+  for (i = 0; i < IDELEMS(I); i++) {
+    if (ringNF(I->m[i], GI, currRing) != NULL) {
+      Print("Not reduced to zero from I: ");
+      wrp(I->m[i]);
+      Print(" --> ");
+      wrp(ringNF(I->m[i], GI, currRing));
+      PrintLn();
+      return(0);
+    }
+    pDelete(&h);
+  }
+  Print("I");
+  for (i = 0; i < IDELEMS(GI); i++) {
     Print("-");
     for (j = i + 1; j < IDELEMS(GI); j++) {
       f = pCopy(GI->m[i]);
       g = pCopy(GI->m[j]);
       h = plain_spoly(f, g);
       if (ringNF(h, GI, currRing) != NULL) {
+        Print("spoly(");
         wrp(GI->m[i]);
-        PrintLn();
+        Print(", ");
         wrp(GI->m[j]);
-        PrintLn();
+        Print(") = ");
         wrp(h);
-        PrintLn();
+        Print(" --> ");
         wrp(ringNF(h, GI, currRing));
         PrintLn();
         return(0);
