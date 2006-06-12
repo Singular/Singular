@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.239 2006-06-08 21:56:25 wienand Exp $ */
+/* $Id: extra.cc,v 1.240 2006-06-12 00:08:15 wienand Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2747,9 +2747,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     else
     if (strcmp(sys_cmd, "testGB")==0)
     {
+      ideal I = (ideal) h->Data();
+      h = h->next;
       ideal GI = (ideal) h->Data();
       res->rtyp = INT_CMD;
-      res->data = (void *) testGB(GI);
+      res->data = (void *) testGB(I, GI);
       return(FALSE);
     }
     else
