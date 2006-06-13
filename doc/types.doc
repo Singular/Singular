@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.129 2005-10-06 17:03:11 levandov Exp $
+@comment $Id: types.doc,v 1.130 2006-06-13 14:28:17 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -34,6 +34,7 @@ list of expressions.
 For the general syntax of a declaration see @ref{General command syntax}.
 
 @menu
+* bigint::
 * def::
 * ideal::
 * int::
@@ -56,7 +57,125 @@ For the general syntax of a declaration see @ref{General command syntax}.
 @end menu
 
 @c ---------------------------------------
-@node def, ideal, Data types, Data types
+@node bigint, def, Data types, Data types
+@section bigint
+@cindex bigint
+
+Variables of type bigint represent the arbitrary long integers.
+They can only be contructed from other types (int, number).
+
+@menu
+* bigint declarations::
+* bigint expressions::
+* bigint operations::
+* bigint related functions::
+@end menu
+
+@c ---------------------------------------
+@node bigint declarations, bigint expressions, bigint, bigint
+@subsection bigint declarations
+@cindex bigint declarations
+
+@table @strong
+@item Syntax:
+@code{bigint} name @code{=} int_expression @code{;}
+
+@item Purpose:
+defines a large integer variable.
+
+@item Default:
+0
+
+@item Example:
+@smallexample
+@c example
+  bigint i = 42;
+  ring r=0,x,dp;
+  number n=2;
+  bigint j = i + bigint(n)^50; j;
+@c example
+@end smallexample
+@end table
+
+@c ------------------------------
+@node bigint expressions, bigint operations, bigint declarations, bigint
+@subsection bigint expressions
+@cindex bigint expressions
+
+A bigint expression is:
+@enumerate
+@item
+an identifier of type bigint
+@item
+a function returning bigint
+@item
+bigint expressions combined by the arithmetic operations
+@code{+}, @code{-}, @code{*}, @code{div},
+@code{%} (@code{mod}), or @code{^}
+@item
+a type cast to bigint
+@end enumerate
+
+@*@strong{Example:}
+@smallexample
+@c example
+// Note: 11*13*17*100*200*2000*503*1111*222222
+// returns a machine integer:
+11*13*17*100*200*2000*503*1111*222222;
+// using the type cast number for a greater allowed range
+bigint(11)*13*17*100*200*2000*503*1111*222222;
+@c example
+@end smallexample
+
+@c ref
+See
+@ref{int};
+@ref{number};
+@ref{Type conversion and casting}.
+@c ref
+
+@c ------------------------------
+@node bigint operations, bigint related functions, bigint expressions, bigint
+@subsection bigint operations
+@cindex bigint operations
+@cindex mod
+@cindex div
+
+@c remark: the following table should have style @asis, since the
+@c   commas below should not by set in style @code.
+@table @asis
+@item @code{+}
+addition
+@item @code{-}
+negation or subtraction
+@item @code{*}
+multiplication
+@item @code{div}
+integer division (omitting the remainder >= 0)
+@item @code{mod}
+integer modulo (the remainder of the division @code{div}), always non-negative
+@item @code{^}, @code{**}
+exponentiation (exponent must be non-negative)
+@item @code{<}, @code{>}, @code{<=}, @code{>=}, @code{==}, @code{<>}
+comparison
+@end table
+
+@*@strong{Example:}
+@smallexample
+@c example
+bigint(5)*2, bigint(2)^100-10;
+bigint(-5) div 2, bigint(-5) mod 2;
+@c example
+@end smallexample
+
+@c ------------------------------
+@node bigint related functions, ,bigint operations, bigint
+@subsection bigint related functions
+@cindex bigint related functions
+
+currently none.
+@c ---------------------------------------
+@node def, ideal, bigint, Data types
 @section def
 @cindex def
 @cindex untyped definitions

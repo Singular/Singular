@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.55 2006-02-20 16:11:57 Singular Exp $
+@comment $Id: NEWS.texi,v 1.56 2006-06-13 14:28:17 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -23,6 +23,26 @@
 @heading Updates for version @value{VERSION}
 
 The current version @value{VERSION} is mainly a bug fix release,
+but it contains also some new features:
+@itemize @bullet
+@item
+factory, libfac updated for gcc 4.1.x
+@item
+configure/speed improved for 64bit architectures
+@item
+new library: dmod.lib @nref{dmod_lib}
+@item
+new algorithms in primdec.lib: radical et al.
+@item
+improved version of @nref{slimgb}, incorporated into @nref{groebner}
+@item
+experimental: new type @nref{bigint}
+@item
+experimental: @code{python} / @code{ipython} interface
+@end itemize
+
+@heading NEWS in version 3-0-1
+The version  3-0-1 is mainly a bug fix release,
 but it contains also some new features:
 @itemize @bullet
 @item
