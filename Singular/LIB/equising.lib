@@ -1,4 +1,4 @@
-version="$Id: equising.lib,v 1.15 2006-06-12 12:12:27 lossen Exp $";
+version="$Id: equising.lib,v 1.16 2006-06-13 14:29:48 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  equising.lib  Equisingularity Stratum of a Family of Plane Curves
@@ -1040,6 +1040,7 @@ static proc esComputation (int typ, poly p_F, list #)
               bl_Map(counter)=maxideal(1);
               bl_Map(counter)[nvars(basering)]=xy;
             }
+            bNodes[counter]=0;
           }
           upper_bound[counter]=counter+M[2][blowup+1,counter]-1;
           counter=counter+M[2][blowup+1,counter];
