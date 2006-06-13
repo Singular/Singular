@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.402 2006-06-13 13:49:14 Singular Exp $ */
+/* $Id: iparith.cc,v 1.403 2006-06-13 14:29:11 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2123,6 +2123,17 @@ static BOOLEAN jjMODULO(leftv res, leftv u, leftv v)
   delete w_v;
   return FALSE;
 }
+static BOOLEAN jjMOD_BI(leftv res, leftv u, leftv v)
+{
+  number q=(number)v->Data();
+  if (nlIsZero(q))
+  {
+    WerrorS(ii_div_by_0);
+    return TRUE;
+  }
+  res->data =(char *) nlIntMod((number)u->Data(),q);
+  return FALSE;
+}
 static BOOLEAN jjMOD_N(leftv res, leftv u, leftv v)
 {
   number q=(number)v->Data();
@@ -2774,7 +2785,7 @@ struct sValCmd2 dArith2[]=
 // proc        cmd              res             arg1        arg2   plural
  {jjCOLCOL,    COLONCOLON,     ANY_TYPE,       DEF_CMD,    DEF_CMD ALLOW_PLURAL}
 ,{jjPLUS_I,    '+',            INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
-,{jjPLUS_BI,   '+',           BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
+,{jjPLUS_BI,   '+',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjPLUS_N,    '+',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD ALLOW_PLURAL}
 ,{jjPLUS_P,    '+',            POLY_CMD,       POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjPLUS_P,    '+',            VECTOR_CMD,     VECTOR_CMD, VECTOR_CMD ALLOW_PLURAL}
@@ -2838,6 +2849,7 @@ struct sValCmd2 dArith2[]=
 ,{jjDIV_P,     '/',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD ALLOW_PLURAL}
 ,{jjDIV_Ma,    '/',            MATRIX_CMD,     MATRIX_CMD, POLY_CMD ALLOW_PLURAL}
 ,{jjDIVMOD_I,  '/',            INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
+,{jjDIV_BI,    '/',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjOP_IV_I,   '/',            INTVEC_CMD,     INTVEC_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjOP_IV_I,   '/',            INTMAT_CMD,     INTMAT_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjDIVMOD_I,  INTDIV_CMD,     INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
@@ -2845,10 +2857,12 @@ struct sValCmd2 dArith2[]=
 ,{jjOP_IV_I,   INTDIV_CMD,     INTVEC_CMD,     INTVEC_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjOP_IV_I,   INTDIV_CMD,     INTMAT_CMD,     INTMAT_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjDIVMOD_I,  '%',            INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
+,{jjMOD_BI,    '%',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjOP_IV_I,   '%',            INTVEC_CMD,     INTVEC_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjOP_IV_I,   '%',            INTMAT_CMD,     INTMAT_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjMOD_N,     '%',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD ALLOW_PLURAL}
 ,{jjDIVMOD_I,  INTMOD_CMD,     INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
+,{jjMOD_BI,    INTMOD_CMD,     BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjOP_IV_I,   INTMOD_CMD,     INTVEC_CMD,     INTVEC_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjOP_IV_I,   INTMOD_CMD,     INTMAT_CMD,     INTMAT_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjMOD_N,     INTMOD_CMD,     NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD ALLOW_PLURAL}
