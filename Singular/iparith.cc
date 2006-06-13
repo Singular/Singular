@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.400 2006-05-30 07:28:20 Singular Exp $ */
+/* $Id: iparith.cc,v 1.401 2006-06-13 13:39:00 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3736,6 +3736,22 @@ static BOOLEAN jjMINRES_R(leftv res, leftv v)
     atSet(res, omStrDup("isHomog"),ivCopy(weights),INTVEC_CMD);
   return FALSE;
 }
+static BOOLEAN jjN2BI(leftv res, leftv v)
+{
+  number n,i; i=(number)v->Data();
+  if (rField_is_Zp())     n=nlInit((int)(long)i);
+  else if (rField_is_Q())
+  {
+    if ((SR_HDL(i)&SR_INT)==SR_INT) n=nlInit((int)SR_TO_INT(i));
+    else if (i->s==3)               n=nlCopy(i);
+    else goto err;
+  }
+  else goto err;
+  res->data=(void *)n;
+  return FALSE;
+err:
+  WerrorS("cannot convert to bigint"); return TRUE;
+}
 static BOOLEAN jjNAMEOF(leftv res, leftv v)
 {
   res->data = (char *)v->name;
@@ -4465,6 +4481,7 @@ struct sValCmd1 dArith1[]=
 ,{syBetti1,     BETTI_CMD,       INTMAT_CMD,     RESOLUTION_CMD ALLOW_PLURAL}
 ,{jjBETTI,      BETTI_CMD,       INTMAT_CMD,     IDEAL_CMD      ALLOW_PLURAL}
 ,{jjBETTI,      BETTI_CMD,       INTMAT_CMD,     MODUL_CMD      ALLOW_PLURAL}
+,{jjN2BI,       BIGINT_CMD,      NUMBER_CMD,     BIGINT_CMD     ALLOW_PLURAL}
 ,{jjDUMMY,      BIGINT_CMD,      BIGINT_CMD,     BIGINT_CMD     ALLOW_PLURAL}
 ,{jjCHAR,       CHARACTERISTIC_CMD, INT_CMD,     RING_CMD       ALLOW_PLURAL}
 ,{jjCHAR,       CHARACTERISTIC_CMD, INT_CMD,     QRING_CMD      ALLOW_PLURAL}
