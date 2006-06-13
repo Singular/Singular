@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.29 2006-05-29 16:10:50 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.30 2006-06-13 10:21:00 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -17,6 +17,7 @@
 #include "subexpr.h"
 #include "numbers.h"
 #include "modulop.h"
+#include "longrat.h"
 #include "longalg.h"
 #include "matpol.h"
 #include "silink.h"
@@ -185,6 +186,19 @@ static void * iiIm2Ma(void *data)
   return (void *)m;
 }
 
+static void * iiN2BI(void *data)
+{
+  number n,i; i=(number)data;
+  if (rField_is_Zp())     n=nlInit((int)(long)data);
+  else if (rField_is_Q())
+  {
+    if ((SR_HDL(i)&SR_INT)==SR_INT) n=nlInit((int)SR_TO_INT(i));
+    else if (i->s==3)               n=nlCopy(i);
+    else { WerrorS("cannot convert to bigint"); n=nlInit(0); }
+  }
+  else { WerrorS("cannot convert to bigint"); n=nInit(0); }
+  return (void *)n;
+}
 static void * iiN2P(void *data)
 {
   poly p=NULL;
@@ -280,6 +294,8 @@ struct sConvertTypes dConvertTypes[] =
    { NUMBER_CMD,      POLY_CMD,       iiN2P  , NULL },
 //  number -> matrix
    { NUMBER_CMD,      MATRIX_CMD,     iiN2Ma  , NULL },
+//  number -> bigint
+   { NUMBER_CMD,      BIGINT_CMD,     iiN2P  , NULL },
 //  number -> ideal
 //  number -> vector
 //  number -> module

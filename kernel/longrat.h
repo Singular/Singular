@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.3 2006-05-02 16:25:17 Singular Exp $ */
+/* $Id: longrat.h,v 1.4 2006-06-13 10:21:01 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
@@ -12,6 +12,8 @@
 #include "si_gmp.h"
 
 typedef MP_INT lint;
+
+#define SR_HDL(A) ((long)(A))
 
 #define SR_INT    1L
 #define INT_TO_SR(INT)  ((number) (((long)INT << 2) + SR_INT))

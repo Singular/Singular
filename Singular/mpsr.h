@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr.h,v 1.21 2005-07-28 17:25:25 Singular Exp $ */
+/* $Id: mpsr.h,v 1.22 2006-06-13 10:21:01 Singular Exp $ */
 /***************************************************************
  *
  * File:       mpsr.h
@@ -254,14 +254,6 @@ while (0)
 #define mpsr_assume(cond) ((void) 0)
 
 #endif // MPSR_DEBUG
-
-// those defines are from longrat.cc
-// It would be nice if we could include them, but they are not defined
-// in a header file
-
-#define SR_HDL(A) ((long)(A))
-#define INT_TO_SR(INT)  ((number) (((long)INT << 2) + SR_INT))
-#define SR_TO_INT(SR)   (((long)SR) >> 2)
 
 union nf
 {
