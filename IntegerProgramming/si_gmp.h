@@ -1,4 +1,5 @@
-/* $Id: si_gmp.h,v 1.3 2006-01-31 16:31:52 Singular Exp $ */
+/* $Id: si_gmp.h,v 1.4 2006-06-13 16:10:10 Singular Exp $ */
+/* $Id: si_gmp.h,v 1.4 2006-06-13 16:10:10 Singular Exp $ */
 
 #ifndef INCL_CF_GMP_H
 #define INCL_CF_GMP_H
@@ -7,8 +8,6 @@
 extern "C" {
 #undef __cplusplus
 #include <gmp.h>
-#define __cplusplus 1
-}
 #else
 #include <gmp.h>
 #endif

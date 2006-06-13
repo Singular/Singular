@@ -1,16 +1,13 @@
-/* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: si_gmp.h,v 1.4 2006-05-02 16:50:05 Singular Exp $ */
+/* $Id: si_gmp.h,v 1.5 2006-06-13 16:09:54 Singular Exp $ */
+/* $Id: si_gmp.h,v 1.5 2006-06-13 16:09:54 Singular Exp $ */
 
 #ifndef INCL_CF_GMP_H
 #define INCL_CF_GMP_H
 
-#ifdef __cplusplus
+#if defined(__cplusplus) && defined(__GNUC__)
 extern "C" {
 #undef __cplusplus
-#define _WCHAR_T_DECLARED
 #include <gmp.h>
-#define __cplusplus 1
-}
 #else
 #include <gmp.h>
 #endif
