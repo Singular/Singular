@@ -125,7 +125,7 @@ if test "${GXX}" = yes && test "${ac_cxx_set}" = no; then
   if test "${ac_cv_cxx_have_rtti}" != yes; then
   CXXFLAGS=$temp_flags
   else
-  CXX="${CXX} --no-rtti"
+  CXXFLAGS="${temp_flags} --no-rtti"
   fi
 
 # check whether gcc accepts --no-exceptions
@@ -138,7 +138,7 @@ if test "${GXX}" = yes && test "${ac_cxx_set}" = no; then
   if test "${ac_cv_cxx_have_exceptions}" != yes; then
   CXXFLAGS=$temp_flags
   else
-  CXX="${CXX} --no-exceptions"
+  CXXFLAGS="${temp_flags} --no-exceptions"
   fi
 
   AC_LANG_RESTORE
