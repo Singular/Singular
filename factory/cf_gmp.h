@@ -1,10 +1,10 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gmp.h,v 1.6 2006-05-02 16:49:54 Singular Exp $ */
+/* $Id: cf_gmp.h,v 1.7 2006-06-14 15:28:06 Singular Exp $ */
 
 #ifndef INCL_CF_GMP_H
 #define INCL_CF_GMP_H
 
-#ifdef __cplusplus
+#if defined(__cplusplus) && defined(__GNUC__)
 extern "C" {
 #undef __cplusplus
 #define _WCHAR_T_DECLARED
