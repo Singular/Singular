@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: csutil.h,v 1.4 2002-08-19 11:11:32 Singular Exp $
+// $Id: csutil.h,v 1.5 2006-06-14 15:35:08 Singular Exp $
 ////////////////////////////////////////////////////////////
 
 #ifndef INCL_CSUTIL_H
@@ -62,16 +62,16 @@ CanonicalForm  lowestRank( const CFList & F );
 CFList         removecontent ( const CFList & PS, PremForm & Remembern );
 void           removefactor( CanonicalForm & r , PremForm & Remembern);
 CFList         factorps( const CFList &ps );
-//CFList         initalset(const CFList & CS);
-CFList         initalset1(const CFList & CS);
-CFList         initalset2(const CFList & CS, const CanonicalForm & reducible);
-int            irreducible( const CFList & AS);
-CFList         select( const ListCFList & PS);
+//CFList         initalset(const CFList & CSet);
+CFList         initalset1(const CFList & CSet);
+CFList         initalset2(const CFList & CSet, const CanonicalForm & reducible);
+int            irreducible( const CFList & ASet);
+CFList         select( const ListCFList & PSet);
 void           select( const ListCFList & ppi, int length, ListCFList & ppi1, 
 		       ListCFList & ppi2);
 bool           same( const CFList &A, const CFList &B );
 bool           member( const CFList & cs, const ListCFList & pi );
-bool           subset( const CFList &PS, const CFList &CS );
+bool           subset( const CFList &PSet, const CFList &CSet );
 ListCFList     MyUnion( const ListCFList & a, const ListCFList &b );
 ListCFList     MyDifference( const ListCFList & a, const CFList &b);
 ListCFList     Minus( const ListCFList & a, const ListCFList &b);
@@ -80,6 +80,9 @@ ListCFList     Minus( const ListCFList & a, const ListCFList &b);
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  2002/08/19 11:11:32  Singular
+* hannes/pfister: alg_gcd etc.
+
 Revision 1.3  1997/09/12 07:19:42  Singular
 * hannes/michael: libfac-0.3.0
 

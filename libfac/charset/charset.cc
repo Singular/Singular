@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: charset.cc,v 1.11 2006-05-16 14:46:49 Singular Exp $";
+static char * rcsid = "$Id: charset.cc,v 1.12 2006-06-14 15:35:08 Singular Exp $";
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -111,37 +111,37 @@ checkok( const CFList & PS, CFList & FS2){
 // canceled; this is a characteristic set in Wang's sense)
 CFList
 MCharSetN( const CFList &PS, PremForm & Remembern ){
-  CFList QS = PS, RS = PS, CS, OLDCS;
+  CFList QS = PS, RS = PS, CSet, OLDCS;
 
   DEBOUTLN(CERR, "MCharSetN: called with ps= ", PS);
   while ( ! RS.isEmpty() ) {
-    CS = BasicSet( QS );
-    OLDCS=CS;
-    DEBOUTLN(CERR, "MCharSetN: CS= ", CS);
-//     if ( getNumVars(CS.getFirst()) > 1 ){
-//       //CS = removecontent(CS, Remembern);
+    CSet = BasicSet( QS );
+    OLDCS=CSet;
+    DEBOUTLN(CERR, "MCharSetN: CS= ", CSet);
+//     if ( getNumVars(CSet.getFirst()) > 1 ){
+//       //CSet = removecontent(CSet, Remembern);
 // #ifdef MCHARSETNDEBUG
-//       CERR << "MCharSetN: CS= " << CS << "\n";
+//       CERR << "MCharSetN: CSet= " << CSet << "\n";
 // #endif
 //     }
-    Remembern.FS1 = Union(Remembern.FS1, initalset1(CS));
+    Remembern.FS1 = Union(Remembern.FS1, initalset1(CSet));
     DEBOUTLN(CERR, "MCharSetN: Remembern.FS1= ", Remembern.FS1);
     DEBOUTLN(CERR, "MCharSetN: Remembern.FS2= ", Remembern.FS2);
     RS = CFList();
-    if ( rank( CS.getFirst() ) != 0 ) {
-      CFList D = Difference( QS, CS );
+    if ( rank( CSet.getFirst() ) != 0 ) {
+      CFList D = Difference( QS, CSet );
       DEBOUT(CERR, "MCharSetN: Difference( ", QS);
-      DEBOUT(CERR, " , ", CS);
+      DEBOUT(CERR, " , ", CSet);
       DEBOUTLN(CERR, " ) = ", D);
-//CERR << "MCharSetN: Difference( " << QS << " , " << CS << " ) = " << D << "\n";
+//CERR << "MCharSetN: Difference( " << QS << " , " << CSet << " ) = " << D << "\n";
       //PremForm Oldremember=Remembern;
       //PremForm Newremember=Remembern;
       for ( CFListIterator i = D; i.hasItem(); ++i ) {
-        CanonicalForm r = Prem( i.getItem(), CS );
+        CanonicalForm r = Prem( i.getItem(), CSet );
         DEBOUT(CERR,"MCharSetN: Prem(", i.getItem()  );
-        DEBOUT(CERR, ",", CS);
+        DEBOUT(CERR, ",", CSet);
         DEBOUTLN(CERR,") = ", r);
-//CERR << "MCharSetN: Prem("<< i.getItem() << "," << CS << ") = " << r << "\n";
+//CERR << "MCharSetN: Prem("<< i.getItem() << "," << CSet << ") = " << r << "\n";
         if ( r != 0 ){
           //removefactor( r, Newremember );
           removefactor( r, Remembern );
@@ -163,7 +163,7 @@ MCharSetN( const CFList &PS, PremForm & Remembern ){
   DEBOUTLN(CERR, "MCharSetN: Removed factors: ", Remembern.FS2);
   DEBOUTLN(CERR, "MCharSetN: Remembern.FS1: ", Remembern.FS1);
 
-  return CS;
+  return CSet;
 }
 
 
@@ -182,42 +182,42 @@ mcharset( const CFList &PS, PremForm & Remembern ){
 // the "original" extended characteristic set
 CFList
 CharSet( const CFList &PS ){
-  CFList QS = PS, RS = PS, CS;
+  CFList QS = PS, RS = PS, CSet;
 
   while ( ! RS.isEmpty() ) {
-    CS = BasicSet( QS );
-    DEBOUTLN(CERR, "CharSet: CS= ", CS);
+    CSet = BasicSet( QS );
+    DEBOUTLN(CERR, "CharSet: CSet= ", CSet);
     RS = CFList();
-    if ( rank( CS.getFirst() ) != 0 ) {
-      CFList D = Difference( QS, CS );
+    if ( rank( CSet.getFirst() ) != 0 ) {
+      CFList D = Difference( QS, CSet );
       for ( CFListIterator i = D; i.hasItem(); ++i ) {
-        CanonicalForm r = Prem( i.getItem(), CS );
+        CanonicalForm r = Prem( i.getItem(), CSet );
         if ( r != 0 )  RS=Union(CFList(r),RS);//RS.append( r );
       }
       QS = Union( QS, RS );
     }
   }
-  return CS;
+  return CSet;
 }
 
 static CFList
 charseta( const CFList & PS ){
-  CFList QS = PS, RS = PS, CS;
+  CFList QS = PS, RS = PS, CSet;
 
   while ( ! RS.isEmpty() ) {
-    CS = CharSet( QS );
+    CSet = CharSet( QS );
     RS = CFList();
-    if ( rank( CS.getFirst() ) != 0 ) {
-      CFList D = Difference( QS, CS );
+    if ( rank( CSet.getFirst() ) != 0 ) {
+      CFList D = Difference( QS, CSet );
       for ( CFListIterator i = D; i.hasItem(); ++i ) {
-        CanonicalForm r = Prem( i.getItem(), CS );
+        CanonicalForm r = Prem( i.getItem(), CSet );
         if ( r != 0 )  RS=Union(CFList(r),RS);//RS.append( r );
       }
-      QS = Union(CS,Union( QS, RS ));
+      QS = Union(CSet,Union( QS, RS ));
     }
     else return CFList(CanonicalForm(1));
   }
-  return CS;
+  return CSet;
 }
 
 static bool
@@ -598,6 +598,9 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
 ///////////////////////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.11  2006/05/16 14:46:49  Singular
+*hannes: gcc 4.1 fixes
+
 Revision 1.10  2002/08/19 11:11:31  Singular
 * hannes/pfister: alg_gcd etc.
 
