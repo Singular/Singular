@@ -4,13 +4,12 @@
  *           be inlined
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omInline.h,v 1.9 2006-04-28 15:17:26 Singular Exp $
+ *  Version: $Id: omInline.h,v 1.10 2006-06-14 07:54:08 Singular Exp $
  *******************************************************************/
 #if defined(OM_INLINE) || defined(OM_ALLOC_C)
 
 #ifndef OM_INLINE_H
 #define OM_INLINE_H
-#include <string.h>
 
 OM_INLINE_IMPL omBin omGetBinOfPage(omBinPage page)
 {
