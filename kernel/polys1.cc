@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.19 2006-03-28 12:56:06 Singular Exp $ */
+/* $Id: polys1.cc,v 1.20 2006-06-14 09:25:15 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -27,7 +27,6 @@
 #include "clapsing.h"
 #endif
 
-#define SR_HDL(A) ((long)A)
 /*-------- several access procedures to monomials -------------------- */
 /*
 * the module weights for std
