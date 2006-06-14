@@ -3,13 +3,14 @@
  *  Purpose: declaration of public routines for omalloc
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: om_Alloc.h,v 1.4 2005-07-28 14:37:16 Singular Exp $
+ *  Version: $Id: om_Alloc.h,v 1.5 2006-06-14 14:28:19 Singular Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_H
 #define OM_ALLOC_H
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #ifdef __cplusplus
 extern "C" {
