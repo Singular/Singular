@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.141 2006-05-19 16:43:58 Singular Exp $
+@comment $Id: singular.doc,v 1.142 2006-06-14 15:34:13 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -647,8 +647,8 @@ of autonomy degrees.
 @section Teaching
 @cindex Teaching
 
-The libraries in this section demonstrate some aspects
-of algorithms. Normal users will fimnd bettter solutions elsewhere.
+The libraries in this section are intended to be used for teaching purposes
+but not for serious computations.
 
 @menu
 * teachstd_lib:: Procedures for teaching standard bases
