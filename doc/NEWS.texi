@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.56 2006-06-13 14:28:17 Singular Exp $
+@comment $Id: NEWS.texi,v 1.57 2006-06-15 17:17:56 motsak Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -31,6 +31,12 @@ factory, libfac updated for gcc 4.1.x
 configure/speed improved for 64bit architectures
 @item
 new library: dmod.lib @nref{dmod_lib}
+@item
+new library: perron.lib @nref{perron_lib}
+@item
+improved center.lib: revised implementation, new functions (sa_reduce etc.)
+@item
+revised ncalg.lib: new algebras, U(sl_n) and U(g_2) changed to conform GAP.
 @item
 new algorithms in primdec.lib: radical et al.
 @item
