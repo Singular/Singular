@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: center.lib,v 1.21 2006-05-11 19:16:21 motsak Exp $"
+version="$Id: center.lib,v 1.22 2006-06-15 17:56:29 motsak Exp $"
 category="Noncommutative"
 info="
 LIBRARY:  center.lib      computation of central elements of GR-algebras
@@ -162,7 +162,7 @@ PURPOSE: make 'nice' polynomials, kill scalars
     {
       // "normal" polynomial form == no denominators, gcd of coeffs is a unit
       l = cleardenom( l );
-      if ( deg(p) > 0 )
+      if ( maxdegInt(l) > 0 )
         {
 	  l = cleardenom( l / leadcoef(l) );
         }
@@ -176,7 +176,7 @@ PURPOSE: make 'nice' polynomials, kill scalars
            	p = cleardenom( p );
         
                 // Now make polynomials look nice:
-                if ( deg(p) > 0 ) // throw away scalars!
+                if ( maxdegInt(p) > 0 ) // throw away scalars!
 		  {
             	    // "normal" polynomial form == no denominators, gcd of coeffs is a unit
             	    p = cleardenom( p / leadcoef(p) );
@@ -1057,8 +1057,8 @@ EXAMPLE:    example centralizerRed; shows an example
     
   int m = (k > 0);
         
-  int @MinDeg = 1; // starting guess for Maximal Bounding Degree, 6
-  int @Delta  = 1; // increment of it, 4
+  int @MinDeg = 6; // starting guess for Maximal Bounding Degree, 6
+  int @Delta  = 4; // increment of it, 4
         
   if( m and (D <= 0) )
     {
