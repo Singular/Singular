@@ -127,7 +127,7 @@ ideal& ideal::Conti_Traverso_ideal(matrix& A,const term_ordering& _w)
   // extend term ordering into an elimination ordering of the appropriate
   // size
 
-  Integer generator[A.columns+A.rows+1];
+  Integer *generator=new Integer[A.columns+A.rows+1];
   // A.columns + A.rows +1 is the number of variables for the Conti-Traverso
   // algorithm with "inversion variable".
 
@@ -164,6 +164,7 @@ ideal& ideal::Conti_Traverso_ideal(matrix& A,const term_ordering& _w)
   binomial* bin=new binomial(A.rows+1+A.columns,generator,w);
   add_generator(*bin);
 
+  delete[] generator;
   return *this;
 }
 
@@ -180,7 +181,7 @@ ideal& ideal::Positive_Conti_Traverso_ideal(matrix& A,const term_ordering& _w)
   // extend term ordering into an elimination ordering of the appropriate
   // size
 
-  Integer generator[A.columns+A.rows];
+  Integer *generator=new Integer[A.columns+A.rows];
   // A.columns + A.rows is the number of variables for the Conti-Traverso
   // algorithm without "inversion variable".
 
@@ -205,7 +206,7 @@ ideal& ideal::Positive_Conti_Traverso_ideal(matrix& A,const term_ordering& _w)
     binomial* bin=new binomial(A.rows+A.columns,generator,w);
     add_generator(*bin);
   }
-
+  delete[] generator;
   return *this;
 }
 
@@ -231,7 +232,7 @@ ideal& ideal::Pottier_ideal(matrix& A, const term_ordering& _w)
     return *this;
   }
 
-  Integer generator[A.columns+1];
+  Integer *generator=new Integer[A.columns+1];
   // This is the number of variables needed for Pottier's algorithm.
 
 
@@ -256,6 +257,7 @@ ideal& ideal::Pottier_ideal(matrix& A, const term_ordering& _w)
           "LLL-reduced kernel basis does not fit into the used "
           "basic data type short."<<endl;
         size=-3;
+        delete[] generator;
         return *this;
       }
 
@@ -270,6 +272,7 @@ ideal& ideal::Pottier_ideal(matrix& A, const term_ordering& _w)
           "LLL-reduced kernel basis does not fit into the used "
           "basic data type int."<<endl;
         size=-3;
+        delete[] generator;
         return *this;
       }
 
@@ -284,6 +287,7 @@ ideal& ideal::Pottier_ideal(matrix& A, const term_ordering& _w)
           "LLL-reduced kernel basis does not fit into the used "
           "basic data type long."<<endl;
         size=-3;
+        delete[] generator;
         return *this;
       }
 
@@ -325,6 +329,7 @@ ideal& ideal::Pottier_ideal(matrix& A, const term_ordering& _w)
   // as a binomial with tail 1 by the designed data structures.
 
   delete[] sat_var;
+  delete[] generator;
 
   return *this;
 }
@@ -354,7 +359,7 @@ ideal& ideal::Hosten_Sturmfels_ideal(matrix& A, const term_ordering& _w)
     return *this;
   }
 
-  Integer generator[A.columns];
+  Integer * generator=new Integer[A.columns];
   // The algorithm of Hosten and Sturmfels does not need supplementary
   // variables.
 
@@ -379,6 +384,7 @@ ideal& ideal::Hosten_Sturmfels_ideal(matrix& A, const term_ordering& _w)
           "term_ordering&):\nLLL-reduced kernel basis does not fit "
           "into the used basic data type short."<<endl;
         size=-3;
+        delete[] generator;
         return *this;
       }
 
@@ -392,6 +398,7 @@ ideal& ideal::Hosten_Sturmfels_ideal(matrix& A, const term_ordering& _w)
           "term_ordering&):\nLLL-reduced kernel basis does not fit "
           "into the used basic data type int."<<endl;
         size=-3;
+        delete[] generator;
         return *this;
       }
 
@@ -405,6 +412,7 @@ ideal& ideal::Hosten_Sturmfels_ideal(matrix& A, const term_ordering& _w)
           "term_ordering&):\nLLL-reduced kernel basis does not fit "
           "into the used basic data type long."<<endl;
         size=-3;
+        delete[] generator;
         return *this;
       }
 
@@ -423,6 +431,7 @@ ideal& ideal::Hosten_Sturmfels_ideal(matrix& A, const term_ordering& _w)
     add_generator(*bin);
   }
 
+  delete[] generator;
   return *this;
 }
 
@@ -477,7 +486,7 @@ ideal& ideal::DiBiase_Urbanke_ideal(matrix& A, const term_ordering& _w)
     cerr<<"\nWARNING: ideal& ideal::DiBiase_Urbanke_ideal(matrix&, const "
       "term_ordering&):\nargument term ordering might be inappropriate"<<endl;
 
-  Integer generator[A.columns];
+  Integer *generator=new Integer[A.columns];
   // The algorithm of DiBiase and Urbanke does not need supplementary
   // variables.
 
@@ -501,6 +510,7 @@ ideal& ideal::DiBiase_Urbanke_ideal(matrix& A, const term_ordering& _w)
           "term_ordering&):\nLLL-reduced kernel basis does not fit "
           "into the used basic data type short."<<endl;
         size=-3;
+        delete[] generator;
         return *this;
       }
 
@@ -514,6 +524,7 @@ ideal& ideal::DiBiase_Urbanke_ideal(matrix& A, const term_ordering& _w)
           "term_ordering&):\nLLL-reduced kernel basis does not fit "
           "into the used basic data type int."<<endl;
         size=-3;
+        delete[] generator;
         return *this;
       }
 
@@ -527,6 +538,7 @@ ideal& ideal::DiBiase_Urbanke_ideal(matrix& A, const term_ordering& _w)
           "term_ordering&):\nLLL-reduced kernel basis does not fit "
           "into the used basic data type long."<<endl;
         size=-3;
+        delete[] generator;
         return *this;
       }
 
@@ -542,6 +554,7 @@ ideal& ideal::DiBiase_Urbanke_ideal(matrix& A, const term_ordering& _w)
     add_generator(*bin);
   }
   delete[] F;
+  delete[] generator;
   return *this;
 }
 
@@ -588,7 +601,7 @@ ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix& A,const term_ordering& _w)
   w.append_weighted_variable(weight);
   // one supplementary variable used to saturate the ideal
 
-  Integer generator[A.columns+1];
+  Integer *generator=new Integer[A.columns+1];
   // The algorithm of Bigatti, LaScala and Robbiano needs one supplementary
   // weighted variable.
 
@@ -622,6 +635,7 @@ ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix& A,const term_ordering& _w)
           "(matrix&, const term_ordering&):\nLLL-reduced kernel basis does "
           "not fit into the used basic data type short."<<endl;
         size=-3;
+        delete[] generator;
         return *this;
       }
 
@@ -635,6 +649,7 @@ ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix& A,const term_ordering& _w)
           "(matrix&, const term_ordering&):\nLLL-reduced kernel basis does "
           "not fit into the used basic data type int."<<endl;
         size=-3;
+        delete[] generator;
         return *this;
       }
 
@@ -668,6 +683,7 @@ ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix& A,const term_ordering& _w)
     add_generator(*bin);
     // insert generator
   }
+  delete[] generator;
   return *this;
 }
 
@@ -873,7 +889,7 @@ ideal::ideal(ifstream& input, const term_ordering& _w, const short&
 
   short number_of_variables=
     w.number_of_elimination_variables()+w.number_of_weighted_variables();
-  Integer generator[number_of_variables];
+  Integer* generator=new Integer[number_of_variables];
 
   for(long i=0;i<number_of_generators;i++)
   {
@@ -887,6 +903,7 @@ ideal::ideal(ifstream& input, const term_ordering& _w, const short&
         cerr<<"\nWARNING: ideal::ideal(ifstream&, const term_ordering&, "
           "const short&): \ninput failure when reading generator "<<i<<endl;
         size=-2;
+        delete[] generator;
         return;
       }
     }
@@ -895,6 +912,7 @@ ideal::ideal(ifstream& input, const term_ordering& _w, const short&
   }
   size=number_of_generators;
   number_of_new_binomials=size;
+  delete[] generator;
 }
 
 ideal::~ideal()
