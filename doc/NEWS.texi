@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.57 2006-06-15 17:17:56 motsak Exp $
+@comment $Id: NEWS.texi,v 1.58 2006-06-16 17:16:54 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -30,17 +30,19 @@ factory, libfac updated for gcc 4.1.x
 @item
 configure/speed improved for 64bit architectures
 @item
-new library: dmod.lib @nref{dmod_lib}
+new library: dmod.lib (@nref{dmod_lib})
 @item
-new library: perron.lib @nref{perron_lib}
+new library: perron.lib (@nref{perron_lib})
 @item
-improved center.lib: revised implementation, new functions (sa_reduce etc.)
+improved center.lib (@nref{center_lib}): revised implementation, new functions (sa_reduce etc.)
 @item
-revised ncalg.lib: new algebras, U(sl_n) and U(g_2) changed to conform GAP.
+revised ncalg.lib (@nref{ncalg_lib}): new algebras, U(sl_n) and U(g_2) changed to conform GAP.
 @item
-new algorithms in primdec.lib: radical et al.
+new algorithms in primdec.lib (@nref{primdec_lib}): radical et al.
 @item
 improved version of @nref{slimgb}, incorporated into @nref{groebner}
+@item
+improved module generator (@code{modgen})
 @item
 experimental: new type @nref{bigint}
 @item
