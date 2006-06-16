@@ -1,4 +1,4 @@
-                       SINGULAR version 3-0-0
+                       SINGULAR version 3-0
                     Package name:   Singular-MP
 
                       University of Kaiserslautern
@@ -8,7 +8,7 @@
             Author of this package: S. Gray, N. Kajler, P. Wang
                adopted to Singular by: O. Bachmann, S. Gray
 
-                        Copyright (C) 1999-2005
+                        Copyright (C) 1999-2006
 
 
                                *NOTICE*

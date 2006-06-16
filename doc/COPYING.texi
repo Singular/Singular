@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.25 2005-05-20 12:35:55 levandov Exp $
+@comment $Id: COPYING.texi,v 1.26 2006-06-16 16:55:45 Singular Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -17,7 +17,7 @@
 @center @uref{http://www.mathematik.uni-kl.de/,,Department of Mathematics} and  @uref{http://www.mathematik.uni-kl.de/~zca/,,Centre for Computer Algebra}
 @center Authors: @uref{http://www.mathematik.uni-kl.de/~greuel,,G.-M. Greuel}, @uref{http://www.mathematik.uni-kl.de/~pfister,,G. Pfister}, @uref{http://www.mathematik.uni-kl.de/~hannes,,H. Schoenemann}
 
-@center Copyright @copyright{} 1986-2005
+@center Copyright @copyright{} 1986-2006
 @sp 2
 @center @strong{NOTICE}
 

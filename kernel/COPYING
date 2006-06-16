@@ -1,4 +1,4 @@
-                        SINGULAR version 3-0-0
+                        SINGULAR version 3-0-2
 			    Singular-kernel
 
                      University of Kaiserslautern
@@ -59,13 +59,13 @@ Acknowledgements
 The development of SINGULAR is directed and coordinated by Gert-Martin
 Greuel, Gerhard Pfister, and Hans Scho"nemann.
 
-Currently, the SINGULAR team has the following members: Olaf Bachmann,
-Anne Fru"bis-Kru"ger, Thomas Keilen, Kai Kru"ger, Christoph Lossen,
-Victor Levandovskyy, Wilfred Pohl, Mathias Schulze, Eric Westenberger,
-and Tim Wichmann.
+Currently, the SINGULAR team has the following members:
+Anne Fru"bis-Kru"ger, Kai Kru"ger, Christoph Lossen,
+Victor Levandovskyy, Thomas Markwig, Wilfred Pohl, Mathias Schulze,
+Eric Westenberger and Oliver Wienand.
 
-Past members of the SINGULAR team are: Hubert Grassmann, Wolfgang
-Neumann, Jens Schmidt, Ru"diger Stobbe.
+Past members of the SINGULAR team are: Olaf Bachmann, Hubert Grassmann, Wolfgang
+Neumann, Jens Schmidt, Ru"diger Stobbe and Tim Wichmann.
 
 Further contributions to SINGULAR were made by: Thomas Bayer, Isabelle
 Bermejo, Stephan Endrass, Jose Ignacio Farran Martin, Wolfram Decker,
