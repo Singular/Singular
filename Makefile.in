@@ -573,7 +573,7 @@ cygwin-pfw-%:
 	@echo "Description=A Computer Algebra System For Polynomial Computations" >> ${TMPDIR}/Singular.pfw
 	@echo "Comments=Authors: G.-M. Greuel, G. Pfister, H. Schoenemann" >> ${TMPDIR}/Singular.pfw
 	@echo "Notice=Distributed under General Public License (GPL)" >> ${TMPDIR}/Singular.pfw
-	@echo "Version=3-0-1" >> ${TMPDIR}/Singular.pfw
+	@echo "Version=@SINGULAR_VERSION@" >> ${TMPDIR}/Singular.pfw
 	@echo -n "OutputSpec=" >> ${TMPDIR}/Singular.pfw
 	@echo -n "`cygpath -a -w .`" >> ${TMPDIR}/Singular.pfw
 	@echo "\Singular-${S_VERSION}-$*.exe" >> ${TMPDIR}/Singular.pfw
