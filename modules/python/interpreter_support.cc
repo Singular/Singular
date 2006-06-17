@@ -1,4 +1,4 @@
-//$Id: interpreter_support.cc,v 1.19 2006-03-22 13:12:32 bricken Exp $
+//$Id: interpreter_support.cc,v 1.20 2006-06-17 13:47:17 bricken Exp $
 
 #include <sstream>
 #include <boost/python.hpp>
@@ -442,11 +442,12 @@ boost::python::object call_builtin_method_general(const char* name, arg_list& l)
 	leftv arg1=l.pop_front();
 	leftv arg2=l.pop_front();
 	leftv arg3=l.pop_front();
+	
+	
+	iiExprArith3(res,cmd_n,arg1,arg2,arg3);
 	free_leftv(arg1);
 	free_leftv(arg2);
 	free_leftv(arg3);
-	
-	iiExprArith3(res,cmd_n,arg1,arg2,arg3);
 	break;
       }
     default:
