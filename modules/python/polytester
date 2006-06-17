@@ -35,6 +35,8 @@ import util
 r=util.create_ring(char=0,nvars=3, ordering='lp')
 r.set()
 z2=Polynomial('z')
+r=util.create_ring(char=0,nvars=3, varNames=['u','v','w'], ordering='lp', register=locals())
+print u+v*w
 #the following should fail
 #print z+z2
 ");

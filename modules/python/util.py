@@ -2,7 +2,7 @@ from Singular import *
 from interpreter import *
 singular=SingularGlobalsProxy()
 
-def create_ring(char=0, nvars=1, varNames=None, ordering="dp", degvec=None):
+def create_ring(char=0, nvars=1, varNames=None, ordering="dp", degvec=None, register=None):
   if not varNames:
     varNames=["x("+str(i)+")" for i in xrange(1,nvars+1)]
   else:
@@ -14,7 +14,18 @@ def create_ring(char=0, nvars=1, varNames=None, ordering="dp", degvec=None):
   modulweights=IntVector()
   modulweights.append(0)
   l=[char,varNames,[[ordering,degvec],["C",modulweights]], Ideal()]
-  return singular.ring(l)
+  res=singular.ring(l)
+  if register is None:
+    return res
+  else:
+    old_ring=Ring()
+    res.set()
+    for i in range(nvars):
+        v=singular.var(i+1)
+        register[str(v)]=v
+        
+    old_ring.set()
+    return res
 
 
 class EquivalenceRelation(object):
