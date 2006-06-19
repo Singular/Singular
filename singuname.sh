@@ -77,6 +77,34 @@ then
     then
         echo i386Mac-darwin
         exit 0
+    elif (echo $uname_a | $egrep "SunOS" >$devnull)
+    then
+        echo i386-SunOS
+        exit 0
+    else
+        echo ${prefix}-Unknown
+        exit 1
+    fi
+# AMD-Opteron ########################################################
+elif (echo $uname_a | $egrep "x86_64" > $devnull)
+then
+    prefix=x86_64
+    if (echo $uname_a | $egrep "Linux" > $devnull)
+    then
+        echo ${prefix}-Linux
+        exit 0
+    else
+        echo ${prefix}-Unknown
+        exit 1
+    fi
+# HPPA ################################################################
+elif (echo $uname_a | $egrep "hppa" > $devnull)
+then
+    prefix=hppa
+    if (echo $uname_a | $egrep "Linux" > $devnull)
+    then
+        echo ${prefix}-Linux
+        exit 0
     else
         echo ${prefix}-Unknown
         exit 1
@@ -176,29 +204,6 @@ elif (echo $uname_a | $egrep "ia64" > $devnull)
 then
     # IA64-HPUX: see HPUX
     prefix=IA64
-    if (echo $uname_a | $egrep "Linux" > $devnull)
-    then
-        echo ${prefix}-Linux
-        exit 0
-    else
-        echo ${prefix}-Unknown
-        exit 1
-    fi
-# AMD-Opteron ########################################################
-elif (echo $uname_a | $egrep "x86_64" > $devnull)
-then
-    prefix=x86_64
-    if (echo $uname_a | $egrep "Linux" > $devnull)
-    then
-        echo ${prefix}-Linux
-        exit 0
-    else
-        echo ${prefix}-Unknown
-        exit 1
-    fi
-elif (echo $uname_a | $egrep "hppa" > $devnull)
-then
-    prefix=hppa
     if (echo $uname_a | $egrep "Linux" > $devnull)
     then
         echo ${prefix}-Linux
