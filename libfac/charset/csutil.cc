@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: csutil.cc,v 1.12 2006-05-16 14:46:49 Singular Exp $";
+static char * rcsid = "$Id: csutil.cc,v 1.13 2006-06-19 13:37:47 Singular Exp $";
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -453,15 +453,15 @@ inital( const CanonicalForm &f ){
 //   return iniset;
 // }
 
-// the set of nonconstant initials of CS
+// the set of nonconstant initials of Cset
 // with certain repeated factors cancelled
 CFList
-initalset1(const CFList & CS){
+initalset1(const CFList & Cset){
   CFList temp;
   CFList initals;
   CanonicalForm init;
 
-  for ( CFListIterator i = CS ; i.hasItem(); i++ ){
+  for ( CFListIterator i = Cset ; i.hasItem(); i++ ){
     initals= nopower( inital(i.getItem()) );
     //    init= inital(i.getItem());
     for ( CFListIterator j = initals; j.hasItem(); j++){
@@ -473,17 +473,17 @@ initalset1(const CFList & CS){
   return temp;
 }
 
-// the set of nonconstant initials of CS of those polys
+// the set of nonconstant initials of Cset of those polys
 // not having their cls higher than reducible
 // with certain repeated factors cancelled
 CFList
-initalset2(const CFList & CS, const CanonicalForm & reducible){
+initalset2(const CFList & Cset, const CanonicalForm & reducible){
   CFList temp;
   CFList initals;
   CanonicalForm init;
   int clsred = cls(reducible);
 
-  for ( CFListIterator i = CS ; i.hasItem(); i++ ){
+  for ( CFListIterator i = Cset ; i.hasItem(); i++ ){
     init = i.getItem();
     if ( cls(init) < clsred ){
       initals= nopower( inital(init) );
@@ -599,14 +599,14 @@ member( const CFList & cs, const ListCFList & pi ){
   return 0;
 }
 
-// is PS a subset of CS ?
+// is PS a subset of Cset ?
 bool
-subset( const CFList &PS, const CFList &CS ){
+subset( const CFList &PS, const CFList &Cset ){
 
-  //  CERR << "subset: called with: " << PS << "   " << CS << "\n";
+  //  CERR << "subset: called with: " << PS << "   " << Cset << "\n";
   for ( CFListIterator i=PS; i.hasItem(); i++ )
-    if ( ! member(i.getItem(), CS) ) {
-      //      CERR << "subset: " << i.getItem() << "  is not a member of " << CS << "\n";
+    if ( ! member(i.getItem(), Cset) ) {
+      //      CERR << "subset: " << i.getItem() << "  is not a member of " << Cset << "\n";
       return 0;
     }
   return 1;
@@ -872,6 +872,9 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.12  2006/05/16 14:46:49  Singular
+*hannes: gcc 4.1 fixes
+
 Revision 1.11  2006/05/16 13:48:13  Singular
 *hannes: gcc 4.1 fix: factory changes
 

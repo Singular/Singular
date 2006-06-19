@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: algfactor.cc,v 1.7 2006-05-16 14:46:48 Singular Exp $";
+static char * rcsid = "$Id: algfactor.cc,v 1.8 2006-06-19 13:37:46 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -76,28 +76,28 @@ return 1;
 #include "debug.h"
 static CFList
 charsetnA(const CFList & AS, const CFList &PS, PremForm & Remembern, const Variable & vf ){
-  CFList QS = PS, RS = PS, CS;
+  CFList QS = PS, RS = PS, Cset;
   int nas= AS.length() +1;
 
   DEBOUTLN(CERR, "charsetnA: called with ps= ", PS);
   while ( ! RS.isEmpty() ) {
-    CS = BasicSet( QS );
-    DEBOUTLN(CERR, "charsetnA: CS= ", CS);
-    CS=Union(CS,AS);
-    DEBOUTLN(CERR, "charsetnA: CS= ", CS);
-    Remembern.FS1 = Union(Remembern.FS1, initalset1(CS));
+    Cset = BasicSet( QS );
+    DEBOUTLN(CERR, "charsetnA: Cset= ", Cset);
+    Cset=Union(Cset,AS);
+    DEBOUTLN(CERR, "charsetnA: Cset= ", Cset);
+    Remembern.FS1 = Union(Remembern.FS1, initalset1(Cset));
     DEBOUTLN(CERR, "charsetnA: Remembern.FS1= ", Remembern.FS1);
     DEBOUTLN(CERR, "charsetnA: Remembern.FS2= ", Remembern.FS2);
     RS = CFList();
-    if ( CS.length() == nas && degree(CS.getLast(),vf) > 0 ) {
-      CFList D = Difference( QS, CS );
+    if ( Cset.length() == nas && degree(Cset.getLast(),vf) > 0 ) {
+      CFList D = Difference( QS, Cset );
       DEBOUT(CERR, "charsetnA: Difference( ", QS);
-      DEBOUT(CERR, " , ", CS);
+      DEBOUT(CERR, " , ", Cset);
       DEBOUTLN(CERR, " ) = ", D);
       for ( CFListIterator i = D; i.hasItem(); ++i ) {
-        CanonicalForm r = Prem( i.getItem(), CS );
+        CanonicalForm r = Prem( i.getItem(), Cset );
         DEBOUT(CERR,"charsetnA: Prem(", i.getItem()  );
-        DEBOUT(CERR, ",", CS);
+        DEBOUT(CERR, ",", Cset);
         DEBOUTLN(CERR,") = ", r);
         if ( r != 0 ){
           //removefactor( r, Remembern );
@@ -107,7 +107,7 @@ charsetnA(const CFList & AS, const CFList &PS, PremForm & Remembern, const Varia
       if ( ! checkok(RS,Remembern.FS2)) return CFList(CanonicalForm(1));
       DEBOUTLN(CERR, "charsetnA: RS= ", RS);
       //QS = Union( QS, RS );
-      QS=Union(AS,RS); QS.append(CS.getLast());
+      QS=Union(AS,RS); QS.append(Cset.getLast());
       DEBOUTLN(CERR, "charsetnA: QS= Union(QS,RS)= ", QS);
     }
     else{ return CFList(CanonicalForm(1)); }
@@ -115,7 +115,7 @@ charsetnA(const CFList & AS, const CFList &PS, PremForm & Remembern, const Varia
   DEBOUTLN(CERR, "charsetnA: Removed factors: ", Remembern.FS2);
   DEBOUTLN(CERR, "charsetnA: Remembern.FS1: ", Remembern.FS1);
 
-  return CS;
+  return Cset;
 }
 
 #ifdef ALGFACTORDEBUG
@@ -449,6 +449,9 @@ cfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.7  2006/05/16 14:46:48  Singular
+*hannes: gcc 4.1 fixes
+
 Revision 1.6  2002/08/19 11:11:30  Singular
 * hannes/pfister: alg_gcd etc.
 
