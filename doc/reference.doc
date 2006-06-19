@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.265 2006-05-29 12:34:39 Singular Exp $
+@comment $Id: reference.doc,v 1.266 2006-06-19 13:29:22 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1018,7 +1018,9 @@ returns the maximal (weighted) degree of
 the terms of a polynomial or a vector;
 @*deg(0) is -1.
 @*The optional second argument gives the weight vector,
-the default weights of the base ring will be used otherwise.
+otherwise weight 1 is used for lex orderings and block ordering,
+the default weights of the base ring will for ordering consisting of one block.
+
 @item @strong{Example:}
 @smallexample
 @c example
