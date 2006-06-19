@@ -3080,7 +3080,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
       return 0;
     }
 
-    Integer *right_hand=new Integer[weighted_variables+elimination_variables];
+    Integer right_hand[weighted_variables+elimination_variables];
 
     for(short k=0;k<instances;k++)
     {
@@ -3101,7 +3101,6 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
             "input failure when reading right hand vector "<<k+1<<" from "
             "first input \nfile, "
             "this and all following right hand vectors will be ignored"<<endl;
-          delete[] right_hand;
           return 0;
         }
       }
@@ -3170,7 +3169,6 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
 
       output<<"computation time"<<endl;
       output<<setw(6)<<setprecision(2)<<elapsed<<" sec"<<endl<<endl;
-      delete[] right_hand;
     }
   }
 
@@ -3188,7 +3186,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
         return 0;
       }
 
-      Integer *right_hand=new Integer[weighted_variables+elimination_variables];
+      Integer right_hand[weighted_variables+elimination_variables];
       BOOLEAN error=FALSE;    // to test legality of right hand vectors
 
       for(short k=0;k<instances;k++)
@@ -3210,7 +3208,6 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
               "input failure when reading right hand vector "<<k+1<<" from "
               "first input \nfile, this and all following right hand vectors "
               "will be ignored"<<endl;
-            delete[] right_hand;
             return 0;
           }
 
@@ -3279,7 +3276,6 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
 
         output<<"computation time"<<endl;
         output<<setw(6)<<setprecision(2)<<elapsed<<" sec"<<endl<<endl;
-        delete[] right_hand;
       }
     }
 
@@ -3296,7 +3292,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
         return 0;
       }
 
-      Integer *initial_solution=new Integer[weighted_variables];
+      Integer initial_solution[weighted_variables];
 
       for(short k=0;k<instances;k++)
       {
@@ -3312,7 +3308,6 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
               "input failure when reading right hand vector "<<k+1<<" from "
               "first input \nfile, this and all following right hand vectors "
               "will be ignored"<<endl;
-            delete[] initial_solution;
             return 0;
           }
 
@@ -3351,7 +3346,6 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
         output<<"computation time"<<endl;
         output<<setw(6)<<setprecision(2)<<elapsed<<" sec"<<endl<<endl;
       }
-      delete[] initial_solution;
     }
 
   return 1;
