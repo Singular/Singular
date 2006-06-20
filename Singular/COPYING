@@ -59,19 +59,25 @@ Acknowledgements
 The development of SINGULAR is directed and coordinated by Gert-Martin
 Greuel, Gerhard Pfister, and Hans Scho"nemann.
 
-Currently, the SINGULAR team has the following members:
-Anne Fru"bis-Kru"ger, Kai Kru"ger, Christoph Lossen,
-Victor Levandovskyy, Thomas Markwig, Wilfred Pohl, Mathias Schulze,
-Eric Westenberger and Oliver Wienand.
+Currently, the SINGULAR team has the following members: Michael
+Brickenstein, Wolfram Decker, Anne Fru"hbis-Kru"ger, Kai Kru"ger,
+Christoph Lossen, Viktor Levandovskyy, Wilfred Pohl and Oliver Wienand.  
 
-Past members of the SINGULAR team are: Olaf Bachmann, Hubert Grassmann, Wolfgang
-Neumann, Jens Schmidt, Ru"diger Stobbe and Tim Wichmann.
+Former members of the SINGULAR team are: Olaf Bachmann, Wolfgang
+Neumann, Jens Schmidt, Mathias Schulze, Thomas Siebert, Ru"diger Stobbe,
+Eric Westenberger and Tim Wichmann.  
 
 Further contributions to SINGULAR were made by: Thomas Bayer, Isabelle
-Bermejo, Stephan Endrass, Jose Ignacio Farran Martin, Wolfram Decker,
-Philippe Gimenez, Christian Gorzel, Agnes Heydtmann, Dietmar Hillebrand,
-Tobias Hirsch, Martin Lamm, Bernd Martin, Michael Messollen, Thomas
-Nu"ssler, Moritz Wenk.
+Bermejo, Markus Becker, Kai Dehmann, Alexander Dreyer, Stephan Endrass,
+Jose Ignacio Farran, Vladimir Gerdt, Philippe Gimenez, Christian Gorzel,
+Hubert Grassmann, Fernando Hernando, Agnes Heydtmann, Dietmar
+Hillebrand, Tobias Hirsch, Thomas Keilen, Simon King, Anen Lakhal,
+Martin Lamm, Santiago Laplagne, Francisco Javier Lobillo, Bernd Martin,
+Michael Messollen, Andrea Mindnich, Jorge Martin Morales, Oleksandr
+Motsak, Thomas Nu"ssler, Carlos Rabelo, Alfredo Sanchez-Navarro, Henrik
+Strohmayer, Christian Stussak, Imade Sulandra, Christine Theis, Enrique
+Tobis, Alberto Vigneron-Tenorio, Moritz Wenk, Denis Yanovich, Oleksandr
+Yena.  
 
 We should like to acknowledge the financial support given by the
 Volkswagen-Stiftung, the Deutsche Forschungsgemeinschaft and the

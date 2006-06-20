@@ -1,4 +1,4 @@
-                        SINGULAR version 3-0-0
+                        SINGULAR version 3-0-2
 			    Singular-libraries
 
                      University of Kaiserslautern
@@ -7,7 +7,7 @@
 
            Authors: see the header of the libraries or the list below
 
-                        Copyright (C) 1986-2005
+                        Copyright (C) 1986-2006
 
 
 
@@ -59,11 +59,14 @@ brnoeth.lib	Jose Ignacio Farran Martin, 	ignfar@eis.uva.es
 		Christoph Lossen,           	lossen@mathematik.uni-kl.de
 classify.lib	Kai Krueger, 			krueger@mathematik.uni-kl.de
 deform.lib	Bernd Martin, 			martin@math.tu-cottbus.de
+dmod.lib        Viktor Levandovskyy,            levandov@risc.uni-linz.ac.at
+		Jorge Martin Morales,           jorge@unizar.es
 elim.lib	Gert-Martin Greuel,     	greuel@mathematik.uni-kl.de,
 		Gerhard Pfister,        	pfister@mathematik.uni-kl.de
 		Hans Schoenemann,		hannes@mathematik.uni-kl.de
 equising.lib	Andrea Mindnich, 		mindnich@mathematik.uni-kl.de
 finvar.lib	Agnes E. Heydtmann,		agnes@math.uni-sb.de
+                Simon King                      king@mfo.de
 gaussman.lib	Mathias Schulze,		mschulze@mathematik.uni-kl.de
 general.lib	Gert-Martin Greuel,		greuel@mathematik.uni-kl.de,
 		Anne Fruehbis-Krueger,		anne@mathematik.uni-kl.de
@@ -97,6 +100,7 @@ presolve.lib	Gert-Martin Greuel, 		greuel@mathematik.uni-kl.de,
 primdec.lib	Gerhard Pfister, 		pfister@mathematik.uni-kl.de
 		Wolfram Decker, 		decker@math.uni-sb.de
 		Hans Schoenemann, 		hannes@mathematik.uni-kl.de
+		Santiago Laplagne               slaplagn@dm.uba.ar
 primitiv.lib	Martin Lamm,			lamm@mathematik.uni-kl.de
 qhmoduli.lib	Thomas Bayer,			bayert@in.tum.de
 random.lib	Gert-Martin Greuel, 		greuel@mathematik.uni-kl.de,
