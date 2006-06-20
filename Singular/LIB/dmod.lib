@@ -1,39 +1,46 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.4 2006-06-07 20:21:40 levandov Exp $";
+version="$Id: dmod.lib,v 1.5 2006-06-20 11:27:36 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
 AUTHORS: Viktor Levandovskyy,     levandov@risc.uni-linz.ac.at
 @*       Jorge Martin Morales,    jorge@unizar.es
 
-THEORY: Given a polynomial ring R = K[x_1,...,x_n] and a polynomial F in R, one is interested in the ring R[1/F^s] for a natural number s. 
-@* In fact, the ring R[1/F^s] has a structure of a D(R)-module, where D(R) is a Weyl algebra K<x_1,...,x_n,d_1,...,d_n | d_j x_j = x_j d_j +1>.
-@* Constructively, one needs to find a left ideal I = I(F^s) in D(R), such
-that K[x_1,...,x_n,1/F^s] is isomorphic to D(R)/I as a D(R)-module.
-@* We provide two implementations: 
-@* 1) the classical Ann F^s algorithm from Oaku and Takayama (J. Pure Applied Math., 1999) and
-@* 2) the newer Ann F^s algorithm by Briancon and Maisonobe (Remarques sur l ideal de Bernstein associe a des polynomes, preprint, 2002).
+THEORY: Given a polynomial ring R = K[x_1,...,x_n] and a polynomial F in R, one is interested in the ring R[1/F^s] for a natural number s.
+@* In fact, the ring R[1/F^s] has a structure of a D(R)-module,
+where D(R) is a Weyl algebra K<x_1,...,x_n,d_1,...,d_n | d_j x_j = x_j d_j +1>.
+@* Constructively, one needs to find a left ideal I = I(F^s) in D(R),
+such that K[x_1,...,x_n,1/F^s] is isomorphic to D(R)/I as a D(R)-module.
+@* We provide two implementations:
+@* 1) the classical Ann F^s algorithm from Oaku and Takayama
+(J. Pure Applied Math., 1999) and
+@* 2) the newer Ann F^s algorithm by Briancon and Maisonobe
+(Remarques sur l ideal de Bernstein associe a des polynomes, preprint, 2002).
 
 PROCEDURES:
-annfsOT(F[,eng]);    compute Ann F^s for a poly F with the algorithm of Oaku-Takayama
-annfsBM(F[,eng]);    compute Ann F^s for a poly F with the algorithm of Briancon-Maisonobe
-reiffen(p,q);      create the polynomial, describing a Reiffen curve
-arrange(p);        create the polynomial, describing a generic hyperplane arrangement
-isHolonomic(M);    check whether a module is holonomic
-convloc(L);        replace global orderings with local in the ringlist L
-";
+annfsOT(F[,eng]); compute Ann F^s for a poly F (algorithm of Oaku-Takayama)
+annfsBM(F[,eng]); compute Ann F^s for a poly F (algorithm of Briancon-Maisonobe)
+minIntRoot(P,fact); minimal integer root of a maximal ideal P
+reiffen(p,q);     create a polynomial, describing a Reiffen curve
+arrange(p);       create a poly, describing a generic hyperplane arrangement
+isHolonomic(M);   check whether a module is holonomic
+convloc(L);       replace global orderings with local in the ringlist L
+
+EXPERIMENTAL PROCEDURE:
+annfsgms(F[,eng]); compute Ann F^s for a poly F (modified Oaku-Takayama)
+
 // very experimental:
-// annfsgms(F[,eng]); compute Ann F^s for a poly F with the modified Oaku-Takayama
-// a new algorithm, based on the computation of a Bernstein polynomial
+// a new algorithm (by JMM), based on the computation of a Bernstein polynomial
 // first (with the help of algorithms by Mathias Schulze, see gmssing.lib) and
 // consequent eliminations like in Oaku and Takayama.
+";
 
 LIB "nctools.lib";
 LIB "elim.lib";
-LIB "qhmoduli.lib"; // for Max 
+LIB "qhmoduli.lib"; // for Max
 LIB "gkdim.lib";
 
-proc engine(ideal I, int i)
+static proc engine(ideal I, int i)
 {
   /* std - slimgb mix */
   ideal J;
@@ -60,20 +67,20 @@ NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the ideal LD is the needed D-mod structure,
 @*       - the ideal BS is the list of roots of a Bernstein polynomial of f.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
-@*       otherwise (and by default) @code{slimgb} is used. 
+@*       otherwise (and by default) @code{slimgb} is used.
 @*       If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example annfsBM; shows examples
-" 
+"
 {
   int eng = 0;
-  if ( size(#)>0 ) 
+  if ( size(#)>0 )
   {
     if ( typeof(#[1]) == "int" )
     {
       eng = int(#[1]);
-    }     
-  }            
+    }
+  }
   // returns a list with a ring and an ideal LD in it
   int ppl = printlevel-voice+2;
   //  printf("plevel :%s, voice: %s",printlevel,voice);
@@ -99,8 +106,7 @@ EXAMPLE: example annfsBM; shows examples
     {
       if (Name[i] == RName[j])
       {
-	"Variable names should not include t,s";
-	return(0);
+        ERROR("Variable names should not include t,s");
       }
     }
   }
@@ -123,7 +129,7 @@ EXAMPLE: example annfsBM; shows examples
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1]  = "dp"; // string
-  s       = "iv="; 
+  s       = "iv=";
   for(i=1;i<=Nnew;i++)
   {
     s = s+"1,";
@@ -337,20 +343,20 @@ NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the ideal LD is the needed D-mod structure,
 @*       - the ideal BS is the list of roots of a Bernstein polynomial of f.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
-@*       otherwise (and by default) @code{slimgb} is used. 
+@*       otherwise (and by default) @code{slimgb} is used.
 @*       If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example annfsOT; shows examples
-" 
+"
 {
   int eng = 0;
-  if ( size(#)>0 ) 
+  if ( size(#)>0 )
   {
     if ( typeof(#[1]) == "int" )
     {
       eng = int(#[1]);
-    }     
-  }             
+    }
+  }
   // returns a list with a ring and an ideal LD in it
   int ppl = printlevel-voice+2;
   //  printf("plevel :%s, voice: %s",printlevel,voice);
@@ -378,8 +384,7 @@ EXAMPLE: example annfsOT; shows examples
     {
       if (Name[i] == RName[j])
       {
-	"Variable names should not include u,v,t,Dt";
-	return(0);
+        ERROR("Variable names should not include u,v,t,Dt");
       }
     }
   }
@@ -394,12 +399,12 @@ EXAMPLE: example annfsOT; shows examples
   }
   tmp    =  0;
   tmp[1] = "t";
-  tmp[2] = "Dt";  
+  tmp[2] = "Dt";
   list NName = UName +  tmp + Name + DName;
   L[2]   = NName;
   tmp    = 0;
   // Name, Dname will be used further
-  kill UName; 
+  kill UName;
   kill NName;
   // block ord (a(1,1),dp);
   tmp[1]  = "a"; // string
@@ -408,7 +413,7 @@ EXAMPLE: example annfsOT; shows examples
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1]  = "dp"; // string
-  s       = "iv="; 
+  s       = "iv=";
   for(i=1;i<=Nnew;i++)
   {
     s = s+"1,";
@@ -482,7 +487,7 @@ EXAMPLE: example annfsOT; shows examples
   tmp[1]  = "a";  iv = 1,1; tmp[2]  = iv; //intvec
   Lord[1] = tmp;
   // continue with a(1,1,1,1)...
-  tmp[1]  = "dp"; s  = "iv="; 
+  tmp[1]  = "dp"; s  = "iv=";
   for(i=1; i<= Nnew; i++)
   {
     s = s+"1,";
@@ -548,7 +553,7 @@ EXAMPLE: example annfsOT; shows examples
   L[2]   = NName;
   tmp    = 0;
   // block ord (a(1,1...),dp);
-  string  s = "iv="; 
+  string  s = "iv=";
   for(i=1; i<=Nnew-1; i++)
   {
     s = s+"1,";
@@ -630,7 +635,7 @@ EXAMPLE: example annfsOT; shows examples
   list NName = Name + DName;
   L[2]   = NName;
   // dp ordering;
-  string   s       = "iv="; 
+  string   s       = "iv=";
   for(i=1;i<=Nnew;i++)
   {
     s = s+"1,";
@@ -673,7 +678,7 @@ EXAMPLE: example annfsOT; shows examples
   kill @R4;
   ideal LD = K5;
   export LD;
-  return(@R5); 
+  return(@R5);
 }
 example
 {
@@ -697,7 +702,7 @@ NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the ideal LD is the needed D-mod structure,
 @*       - the ideal BS is the list of roots of a Bernstein polynomial of f.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
-@*       otherwise (and by default) @code{slimgb} is used. 
+@*       otherwise (and by default) @code{slimgb} is used.
 @*       If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example annfsgms; shows examples
@@ -705,13 +710,13 @@ EXAMPLE: example annfsgms; shows examples
 {
   LIB "gmssing.lib";
   int eng = 0;
-  if ( size(#)>0 ) 
+  if ( size(#)>0 )
   {
     if ( typeof(#[1]) == "int" )
     {
       eng = int(#[1]);
-    }     
-  }   
+    }
+  }
   int ppl = printlevel-voice+2;
   // returns a ring with the ideal LD in it
   def save = basering;
@@ -726,7 +731,7 @@ EXAMPLE: example annfsgms; shows examples
   ideal B = bernstein(F)[1];
   // since B may not contain (s+1) [following gmssing.lib]
   // add it!
-  B = B,-1; 
+  B = B,-1;
   B = simplify(B,2+4); // erase zero and repeated entries
   // find the minimal integer value
   int   S = minIntRoot(B,0);
@@ -756,8 +761,7 @@ EXAMPLE: example annfsgms; shows examples
     {
       if (Name[i] == RName[j])
       {
-	"Variable names should not include u,v,t,Dt";
-	return(0);
+        ERROR("Variable names should not include u,v,t,Dt");
       }
     }
   }
@@ -773,7 +777,7 @@ EXAMPLE: example annfsgms; shows examples
   L[2]       = NName;
   tmp        = 0;
   // Name, Dname will be used further
-  kill UName; 
+  kill UName;
   kill NName;
   // block ord (a(1,1),dp);
   tmp[1]  = "a"; // string
@@ -782,7 +786,7 @@ EXAMPLE: example annfsgms; shows examples
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1]  = "dp"; // string
-  s       = "iv="; 
+  s       = "iv=";
   for(i=1; i<=Nnew; i++) // need really all vars!
   {
     s = s+"1,";
@@ -858,7 +862,7 @@ EXAMPLE: example annfsgms; shows examples
   Lord[1] = tmp;
   // continue with dp 1,1,1,1...
   tmp[1]  = "dp"; // string
-  s       = "iv="; 
+  s       = "iv=";
   for(i=1;i<=Nnew;i++)
   {
     s = s+"1,";
@@ -894,7 +898,7 @@ EXAMPLE: example annfsgms; shows examples
   ideal K2 = R01(K);
   // add the relations between t,Dt and s
   //  K2       = K2, t*Dt+1+S;
-  poly G = t*Dt+S+1; 
+  poly G = t*Dt+S+1;
   K2 = NF(K2,std(G)),G;
   dbprint(ppl,"// -2-2- starting elimination for t,Dt in @R2");
   ideal J  = engine(K2,eng);
@@ -922,7 +926,7 @@ EXAMPLE: example annfsgms; shows examples
   list NName = Name + DName;
   L[2]   = NName;
   // dp ordering;
-  string   s       = "iv="; 
+  string   s       = "iv=";
   for(i=1;i<=2*N;i++)
   {
     s = s+"1,";
@@ -964,7 +968,7 @@ EXAMPLE: example annfsgms; shows examples
   kill @LR;
   export BS;
   export LD;
-  return(@R5); 
+  return(@R5);
 }
 example
 {
@@ -984,10 +988,10 @@ PURPOSE: convert a ringlist L into another ringlist,
 where all the 'p' orderings are replaced with the 's' orderings.
 ASSUME: L is a result of a ringlist command
 EXAMPLE: example minIntRoot; shows examples
-" 
+"
 {
   list NL = @NL;
-  // given a ringlist, returns a new ringlist, 
+  // given a ringlist, returns a new ringlist,
   // where all the p-orderings are replaced with s-ord's
   int i,j,k,found;
   int nblocks = size(NL[3]);
@@ -1004,7 +1008,7 @@ EXAMPLE: example minIntRoot; shows examples
           {
             NL[3][i][j][k]="s";
             found = 1;
-            //	    printf("replaced at %s,%s,%s",i,j,k); 
+            //    printf("replaced at %s,%s,%s",i,j,k);
           }
         }
       }
@@ -1032,9 +1036,9 @@ NOTE:    if fact==1, P is the result of some 'factorize' call,
 @*       else P is treated as the result of bernstein::gmssing.lib
 @*       in both cases without constants and multiplicities
 EXAMPLE: example minIntRoot; shows examples
-" 
+"
 {
-  //    ideal P = factorize(p,1); 
+  //    ideal P = factorize(p,1);
   // or ideal P = bernstein(F)[1];
   intvec vP;
   number nP;
@@ -1052,7 +1056,7 @@ EXAMPLE: example minIntRoot; shows examples
     P = P, -1;
   }
   // for both situations:
-  // now we have an ideal of fractions of type "number"  
+  // now we have an ideal of fractions of type "number"
   int sP = size(P);
   for(i=1; i<=sP; i++)
   {
@@ -1067,7 +1071,7 @@ EXAMPLE: example minIntRoot; shows examples
     vP = vP[2..size(vP)];
   }
   sP = -Max(-vP);
-  if (sP == 0) 
+  if (sP == 0)
   {
     "Warning: zero root!";
   }
@@ -1102,7 +1106,7 @@ PURPOSE: check the modules for the property of holonomy
 NOTE:    M is holonomic, if 2*dim(M) = dim(R), where R is a
 ground ring; dim stays for Gelfand-Kirillov dimension
 EXAMPLE: example isHolonomic; shows examples
-" 
+"
 {
   if ( (typeof(M) != "ideal") && (typeof(M) != "module") && (typeof(M) != "matrix") )
   {
@@ -1118,7 +1122,7 @@ EXAMPLE: example isHolonomic; shows examples
   return( (dimR==2*dimM) );
 }
 example
-{  
+{
   "EXAMPLE:"; echo = 2;
   ring R = 0,(x,y),dp;
   poly F = x*y*(x+y);
@@ -1128,26 +1132,26 @@ example
   isHolonomic(LD);
   ideal I = std(LD[1]);
   I;
-  isHolonomic(I);  
+  isHolonomic(I);
 }
 
 proc reiffen(int p, int q)
 "USAGE:  reiffen(p, q);  int p, int q
 RETURN:  ring
 PURPOSE: set up the polynomial, describing a Reiffen curve
-NOTE:    activate this ring with the @code{setring} command and find the curve as a polynomial RC
+NOTE:    activate this ring with the @code{setring} command and find the
+         curve as a polynomial RC
 @*   a Reiffen curve is defined as F = x^p + y^q + xy^{q-1}, q >= p+1 >= 5
 ASSUME: q >= p+1 >= 5. Otherwise an error message is returned
 EXAMPLE: example reiffen; shows examples
-" 
+"
 {
-// a Reiffen curve is defined as 
+// a Reiffen curve is defined as
 // F = x^p + y^q +x*y^{q-1}, q \geq p+1 \geq 5
 
   if ( (p<4) || (q<5) || (q-p<1) )
   {
-    "Some of conditions p>=4, q>=5 or q>=p+1 is not satisfied!";
-    return(0);
+    ERROR("Some of conditions p>=4, q>=5 or q>=p+1 is not satisfied!");
   }
   ring @r = 0,(x,y),dp;
   poly RC = y^q +x^p + x*y^(q-1);
@@ -1155,7 +1159,7 @@ EXAMPLE: example reiffen; shows examples
   return(@r);
 }
 example
-{  
+{
   "EXAMPLE:"; echo = 2;
   def r = reiffen(4,5);
   setring r;
@@ -1169,7 +1173,7 @@ PURPOSE: set up the polynomial, describing a generic hyperplane arrangement
 NOTE:   must be executed in a ring
 ASSUME: basering is present
 EXAMPLE: example arrange; shows examples
-" 
+"
 {
   int UseBasering = 0 ;
   if (p<2)
@@ -1221,7 +1225,7 @@ EXAMPLE: example arrange; shows examples
   //  return(@r);
 }
 example
-{  
+{
   "EXAMPLE:"; echo = 2;
   ring X = 0,(x,y,z,t),dp;
   poly q = arrange(3);
@@ -1235,7 +1239,7 @@ PURPOSE: computes arrangement inductively, using L and varn(n) as the
 next variable
 ASSUME: L has a structure of an arrangement
 EXAMPLE: example indAR; shows examples
-" 
+"
 {
   if ( (n<2) || (n>nvars(basering)) )
   {
@@ -1265,7 +1269,7 @@ EXAMPLE: example indAR; shows examples
   return(K);
 }
 example
-{  
+{
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z,t,v),dp;
   list L;
