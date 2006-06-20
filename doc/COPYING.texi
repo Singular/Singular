@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.26 2006-06-16 16:55:45 Singular Exp $
+@comment $Id: COPYING.texi,v 1.27 2006-06-20 08:15:27 Singular Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -169,12 +169,15 @@ Agnes Heydtmann,
 Dietmar Hillebrand,
 Tobias Hirsch,
 Thomas Keilen,
+Simon King,
 Anen Lakhal,
 Martin Lamm,
+Santiago Laplagne,
 Francisco Javier Lobillo,
 Bernd Martin,
 Michael Me@ss{}ollen,
 Andrea Mindnich,
+Jorge Martin Morales,
 Oleksandr Motsak,
 Thomas N@"u@ss{}ler,
 Carlos Rabelo,
@@ -204,12 +207,15 @@ Oleksandr Yena.
 @cindex Hillebrand, Dietmar
 @cindex Hirsch, Tobias
 @cindex Keilen, Thomas
+@cindex King, Simon
 @cindex Lakhal, Anen
 @cindex Lamm, Martin
+@cindex Laplagne, Santiago
 @cindex Lobillo, Javier
 @cindex Martin, Bernd
 @cindex Me@ss{}ollen, Michael
 @cindex Mindnich, Andrea
+@cindex Morales, Jorge Martin
 @cindex Motsak, Oleksandr 
 @cindex N@"u@ss{}ler, Thomas
 @cindex Rabelo, Carlos
