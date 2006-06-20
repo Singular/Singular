@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.28 2006-06-12 17:40:09 wienand Exp $ */
+/* $Id: kutil.cc,v 1.29 2006-06-20 21:44:18 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2276,8 +2276,8 @@ int posInS (kStrategy strat, int length,poly p, int ecart_p)
   polyset set=strat->S;
   int i;
   int an = 0;
-  int en= length;
-  int cmp_int=pOrdSgn;
+  int en = length;
+  int cmp_int = pOrdSgn;
   if (currRing->MixedOrder)
   {
     int o=pWTotaldegree(p);
@@ -2310,36 +2310,25 @@ int posInS (kStrategy strat, int length,poly p, int ecart_p)
     {
       if (pLmCmp(set[length],p)== -cmp_int)
         return length+1;
-
+      int cmp;
       loop
       {
         if (an >= en-1)
         {
-          if (pLmCmp(set[an],p) == cmp_int)  return an;
-          if (pLmCmp(set[an],p) == -cmp_int) return en;
-          if (currRing->cring == 1) {
-              if (nGreater(pGetCoeff(p), pGetCoeff(set[an]))) return en;
-              return an;
-          }
-          if ((cmp_int!=1) && ((strat->ecartS[an])>ecart_p)) return an;
-          return en;
+          cmp = pLmCmp(set[an],p);
+          if (cmp == cmp_int)  return an;
+          if (cmp == -cmp_int) return en;
+          if (nGreater(pGetCoeff(p), pGetCoeff(set[an]))) return en;
+          return an;
         }
-        i=(an+en) / 2;
-        if (pLmCmp(set[i],p) == cmp_int)         en=i;
-        else if (pLmCmp(set[i],p) == -cmp_int)   an=i;
+        i = (an+en) / 2;
+        cmp = pLmCmp(set[i],p);
+        if (cmp == cmp_int)         en = i;
+        else if (cmp == -cmp_int)   an = i;
         else
         {
-          if (currRing->cring == 1) {
-              if (nGreater(pGetCoeff(p), pGetCoeff(set[i]))) an = i;
-              else en = i;
-          }
-          else
-          {
-            if ((cmp_int!=1) && ((strat->ecartS[i])<ecart_p))
-              en=i;
-            else
-              an=i;
-          }
+          if (nGreater(pGetCoeff(p), pGetCoeff(set[i]))) an = i;
+          else en = i;
         }
       }
     }
@@ -2499,6 +2488,82 @@ int posInT11 (const TSet set,const int length,LObject &p)
   }
 }
 
+/*2 Pos for rings T: Here I am
+* looks up the position of p in T
+* set[0] is the smallest with respect to the ordering-procedure
+* totaldegree,pComp
+*/
+int posInTrg0 (const TSet set,const int length,LObject &p)
+{
+  if (length==-1) return 0;
+  int o = p.GetpFDeg();
+  int op = set[length].GetpFDeg();
+  int i;
+  int an = 0;
+  int en = length;
+  int cmp_int = pOrdSgn;
+  if ((op < o) || (pLmCmp(set[length].p,p.p)== -cmp_int))
+    return length+1;
+  int cmp;
+  loop
+  {
+    if (an >= en-1)
+    {
+      op = set[an].GetpFDeg();
+      if (op > o) return an;
+      if (op < 0) return en;
+      cmp = pLmCmp(set[an].p,p.p);
+      if (cmp == cmp_int)  return an;
+      if (cmp == -cmp_int) return en;
+      if (nGreater(pGetCoeff(p.p), pGetCoeff(set[an].p))) return en;
+      return an;
+    }
+    i = (an + en) / 2;
+    op = set[i].GetpFDeg();
+    if (op > o)       en = i;
+    else if (op < o)  an = i;
+    else
+    {
+      cmp = pLmCmp(set[i].p,p.p);
+      if (cmp == cmp_int)                                     en = i;
+      else if (cmp == -cmp_int)                               an = i;
+      else if (nGreater(pGetCoeff(p.p), pGetCoeff(set[i].p))) an = i;
+      else                                                    en = i;
+    }
+  }
+}
+/*
+  int o = p.GetpFDeg();
+  int op = set[length].GetpFDeg();
+
+  if ((op < o)
+  || ((op == o) && (pLmCmp(set[length].p,p.p) != pOrdSgn)))
+    return length+1;
+
+  int i;
+  int an = 0;
+  int en= length;
+
+  loop
+  {
+    if (an >= en-1)
+    {
+      op= set[an].GetpFDeg();
+      if ((op > o)
+      || (( op == o) && (pLmCmp(set[an].p,p.p) == pOrdSgn)))
+        return an;
+      return en;
+    }
+    i=(an+en) / 2;
+    op = set[i].GetpFDeg();
+    if (( op > o)
+    || (( op == o) && (pLmCmp(set[i].p,p.p) == pOrdSgn)))
+      en=i;
+    else
+      an=i;
+  }
+}
+  */
 /*2
 * looks up the position of p in T
 * set[0] is the smallest with respect to the ordering-procedure
@@ -2984,6 +3049,103 @@ int posInL11 (const LSet set, const int length,
       en=i;
   }
 }
+
+/*2 Position for rings L: Here I am
+* looks up the position of polynomial p in set
+* e is the ecart of p
+* set[length] is the smallest element in set with respect
+* to the ordering-procedure totaldegree,pComp
+*/
+inline int getIndexRng(long coeff)
+{
+  if (coeff == 0) return -1;
+  long tmp = coeff;
+  int ind = 0;
+  while (tmp % 2 == 0) {
+    tmp = tmp / 2;
+    ind++;
+  }
+  return ind;
+}
+
+int posInLrg0 (const LSet set, const int length,
+              LObject* p,const kStrategy strat)
+/*          if (nGreater(pGetCoeff(p), pGetCoeff(set[an]))) return en;
+        if (pLmCmp(set[i],p) == cmp_int)         en = i;
+        else if (pLmCmp(set[i],p) == -cmp_int)   an = i;
+        else
+        {
+          if (nGreater(pGetCoeff(p), pGetCoeff(set[i]))) an = i;
+          else en = i;
+        }*/
+{
+  if (length < 0) return 0;
+
+  int o = p->GetpFDeg();
+  int op = set[length].GetpFDeg();
+
+  if ((op > o) || ((op == o) && (pLmCmp(set[length].p,p->p) != -pOrdSgn)))
+    return length + 1;
+  int i;
+  int an = 0;
+  int en = length;
+  loop
+  {
+    if (an >= en - 1)
+    {
+      op = set[an].GetpFDeg();
+      if ((op > o) || ((op == o) && (pLmCmp(set[an].p,p->p) != -pOrdSgn)))
+        return en;
+      return an;
+    }
+    i = (an+en) / 2;
+    op = set[i].GetpFDeg();
+    if ((op > o) || ((op == o) && (pLmCmp(set[i].p,p->p) != -pOrdSgn)))
+      an = i;
+    else
+      en = i;
+  }
+}
+
+/*{
+  if (length < 0) return 0;
+
+  int o = p->GetpFDeg();
+  int op = set[length].GetpFDeg();
+
+  int inde = getIndexRng((unsigned long) pGetCoeff(set[length].p));
+  int indp = getIndexRng((unsigned long) pGetCoeff(p->p));
+  int inda;
+  int indi;
+
+  if ((inda > indp) || ((inda == inde) && ((op > o) || ((op == o) && (pLmCmp(set[length].p,p->p) != -pOrdSgn)))))
+    return length + 1;
+  int i;
+  int an = 0;
+  inda = getIndexRng((unsigned long) pGetCoeff(set[an].p));
+  int en = length;
+  loop
+  {
+    if (an >= en-1)
+    {
+      op = set[an].GetpFDeg();
+      if ((indp > inda) || ((indp == inda) && ((op > o) || ((op == o) && (pLmCmp(set[an].p,p->p) != -pOrdSgn)))))
+        return en;
+      return an;
+    }
+    i = (an + en) / 2;
+    indi = getIndexRng((unsigned long) pGetCoeff(set[i].p));
+    op = set[i].GetpFDeg();
+    if ((indi > indp) || ((indi == indp) && ((op > o) || ((op == o) && (pLmCmp(set[i].p,p->p) != -pOrdSgn)))))
+    // if ((op > o) || ((op == o) && (pLmCmp(set[i].p,p->p) != -pOrdSgn)))
+    {
+      an = i;
+      inda = getIndexRng((unsigned long) pGetCoeff(set[an].p));
+    }
+    else
+      en = i;
+  }
+} */
 
 /*2
 * looks up the position of polynomial p in set
@@ -4653,6 +4815,13 @@ void initBuchMoraPos (kStrategy strat)
     strat->posInT = posInT19;
   else if (BTEST1(12) || BTEST1(14) || BTEST1(16) || BTEST1(18))
     strat->posInT = posInT1;
+#ifdef HAVE_RING2TOM
+  if (currRing->cring == 1)
+  {
+    strat->posInL = posInL11;
+    strat->posInT = posInT11;
+  }
+#endif
   strat->posInLDependsOnLength = kPosInLDependsOnLength(strat->posInL);
 }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.5 2006-06-09 23:17:04 wienand Exp $ */
+/* $Id: kspoly.cc,v 1.6 2006-06-20 21:44:18 wienand Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -482,13 +482,23 @@ x1:
       if(cm==1)
       {
         p_LmFree(m2,currRing);
-        nNew(&(pGetCoeff(m1)));
+#ifdef HAVE_RING2TOM
+        if (currRing->cring == 1)
+          pSetCoeff(m1, t2);
+        else
+#endif
+          nNew(&(pGetCoeff(m1)));
         return m1;
       }
       else
       {
         p_LmFree(m1,currRing);
-        nNew(&(pGetCoeff(m2)));
+#ifdef HAVE_RING2TOM
+        if (currRing->cring == 1)
+            pSetCoeff(m2, t1);
+        else
+#endif
+          nNew(&(pGetCoeff(m2)));
         return m2;
       }
     }
