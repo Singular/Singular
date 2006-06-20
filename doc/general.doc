@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.203 2006-04-25 15:25:06 Singular Exp $
+@comment $Id: general.doc,v 1.204 2006-06-20 07:42:21 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -2986,6 +2986,8 @@ defined procedures can be displayed by the command @code{listvar(proc);}.
 * Parameter list::
 * Procedure commands::
 @end menu
+
+@xref{Procedures in a library}.
 @c -------------------------------------------------
 @node Procedure definition, Names in procedures, Procedures, Procedures
 @subsection Procedure definition
