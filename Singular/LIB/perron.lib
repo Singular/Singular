@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: perron.lib,v 1.3 2006-05-05 14:37:36 motsak Exp $";
+version="$Id: perron.lib,v 1.4 2006-06-20 14:37:45 motsak Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  perron.lib         computation of algebraic dependences
@@ -95,6 +95,8 @@ EXAMPLE: example perron; shows an example
   def NCRING = basering;
     
   def CurrentField = ringlist( NCRING )[1]; 
+  
+//  CurrentField;
     
   // We are going to construct a commutative ring in N variables F(i), 
   // with the field specified by 'CurrentField': 
@@ -102,7 +104,19 @@ EXAMPLE: example perron; shows an example
   ring TEMPRING = 0, ( F(1..N) ), dp;
     
   list RingList = ringlist( TEMPRING );
-  RingList[1] = CurrentField; 
+  
+  setring NCRING;
+  
+  
+  if( !defined(RingList) )
+  {
+    list RingList = imap( TEMPRING, RingList );   
+  }
+  
+
+  RingList[1] = CurrentField;   
+  
+//  RingList;
     
   // New Commutative Ring with correct field!
   def COMMUTATIVERING = ring( RingList );
