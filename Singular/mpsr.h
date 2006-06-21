@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr.h,v 1.22 2006-06-13 10:21:01 Singular Exp $ */
+/* $Id: mpsr.h,v 1.23 2006-06-21 17:23:34 Singular Exp $ */
 /***************************************************************
  *
  * File:       mpsr.h
@@ -17,10 +17,7 @@
 #define __MPSR__
 
 // now the MP include stuff (is surrounded by ifndef there)
-extern "C"
-{
 #include"MP.h"
-}
 
 #include"MPT.h"
 #include"structs.h"
