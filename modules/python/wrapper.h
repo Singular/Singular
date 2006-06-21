@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.33 2006-03-24 17:36:58 bricken Exp $
+//$Id: wrapper.h,v 1.34 2006-06-21 06:27:12 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -60,6 +60,7 @@ BOOST_PYTHON_MODULE(Singular){
   export_vector();
   export_playground();
   export_ideal();
+  export_module();
   //export_interpreter();
   export_ring();
   export_intvec();

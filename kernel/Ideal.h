@@ -1,6 +1,6 @@
 #ifndef IDEAL_CPP_HEADER
 #define IDEAL_CPP_HEADER
-//$Id: Ideal.h,v 1.7 2005-09-21 09:51:10 bricken Exp $
+//$Id: Ideal.h,v 1.8 2006-06-21 06:26:58 bricken Exp $
 #include <vector>
 #include "Poly.h"
 #include "ideals.h"
@@ -105,7 +105,42 @@ public IdealBase<Poly>{
    return result;
  }
 };
-class Modul:
+class Module:
 public IdealBase<Vector>{
+public:
+ Module(ideal i, ring r){
+    for(int j=0;j<IDELEMS(i);j++){
+      storage.push_back(Vector(i->m[j],r));
+    }
+  }
+  ideal as_module() const{
+    
+   //no checks for rings
+        int s=size();
+   
+        if (s==0)
+        s=1;
+   
+        ideal result=idInit(s,1);
+        result->m[0]=NULL;
+        s=size();
+        for(int i=0;i<s;i++){
+            result->m[i]=storage[i].as_poly();
+
+        }
+    if (size()==0)
+            result->rank=0;
+        else
+            result->rank=idRankFreeModule(result,storage[0].getRing());
+   return result;
+    
+  }
+  Module(iterator first, 
+	iterator last,
+	const allocator_type& __a = allocator_type()):
+    IdealBase<Vector>(first,last,__a){
+  }
+  Module(){
+  }
 };
 #endif

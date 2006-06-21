@@ -5,4 +5,5 @@
 #include "Poly.h"
 void export_poly();
 boost::python::str Poly_as_str(const Poly& p);
+boost::python::str Vector_as_str(const Vector& p);
 #endif

@@ -1,33 +1,45 @@
 ring r=0,(x,y,z),lp;
 timer=1;
-python_module::python("from Singular import number,  polynomial, ideal
-i=ideal()
-zero=number(0)
-one=number(1)
-zerop=polynomial(0)
+LIB("python_module.so");
+Python_module::python("from Singular import Number,  Polynomial, Ideal, gen, Module
+i=Ideal()
+zero=Number(0)
+one=Number(1)
+zerop=Polynomial(0)
 i.append(zerop)
 print len(i)
-onep=polynomial(1)
+onep=Polynomial(1)
 i.append(onep)
 print len(i)
 for p in i:
   print p
 print i
-xy=polynomial('xy')
+xy=Polynomial('xy')
 print xy
-comp=polynomial('xy+1')
+comp=Polynomial('xy+1')
 print comp
 #the same as only monomials are build
 
-z=polynomial(xy);
-z*=number(3);
+z=Polynomial(xy);
+z*=Number(3);
 print z,xy
-print xy+number(1)
+print xy+Number(1)
 print z+xy
 print z,xy
 print xy*xy
 print xy
-for t in ((xy+number(1))*(xy+number(-1))):
+for t in ((xy+Number(1))*(xy+Number(-1))):
   print t,-t,t
+import util
+r=util.create_ring(char=0,nvars=3, varNames=['t','u','v','w'], ordering='lp', register=locals())
+r.set()
+m=Module()
+m.append(t*u*gen(1)+v*gen(2))
+m.append(w*gen(4))
+m.append(v*u*gen(3))
+print m
+print m[1:]
+del m[1]
+print m
 ");
 $

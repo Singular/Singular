@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.33 2006-03-22 14:14:29 bricken Exp $
+//$Id: Poly.h,v 1.34 2006-06-21 06:26:58 bricken Exp $
 
 
 
@@ -59,6 +59,7 @@ class PolyImpl{
     return r.get();
   }
   friend inline bool operator==(const Poly& p1, const Poly& p2);
+  friend inline bool operator==(const Vector& p1, const Vector& p2);
   friend PolyImpl operator+(const PolyImpl& p1, const PolyImpl& n2);
   friend PolyImpl operator-(const PolyImpl& p1, const PolyImpl& n2);
   friend PolyImpl operator/(const PolyImpl& p1, const PolyImpl& n2);
@@ -524,7 +525,7 @@ class Vector: public PolyBase<POLY_VARIANT_MODUL, Vector, MyErrorHandler>{
     ((Base&)*this)+=p;
     return *this;
   }
-
+  friend inline bool operator==(const Vector& p1, const Vector& p2);
 };
 
 //typedef Poly PolyBase<POLY_VARIANT_RING>::create_type;
@@ -577,6 +578,12 @@ inline Poly operator+(const Poly& p1, const Number& n){
   return f;
   }
 inline bool operator==(const Poly& p1, const Poly& p2){
+  ring r1=p1.getRing();
+  ring r2=p2.getRing();
+  if (r1!=r2) return false;
+  return p_EqualPolys(p1.ptr->p,p2.ptr->p,r1);
+}
+inline bool operator==(const Vector& p1, const Vector& p2){
   ring r1=p1.getRing();
   ring r2=p2.getRing();
   if (r1!=r2) return false;

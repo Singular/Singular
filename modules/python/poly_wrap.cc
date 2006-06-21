@@ -14,6 +14,14 @@ boost::python::str Poly_as_str(const Poly& p)
   char* out=p.c_string();
   return boost::python::str(out,strlen(out));
 }
+boost::python::str Vector_as_str(const Vector& p)
+{
+  using boost::python::str;
+  //ring r=p.getRing();
+ 
+  char* out=p.c_string();
+  return boost::python::str(out,strlen(out));
+}
 static Ring Poly_get_Ring(const Poly & p){
   return p.getRing();
 }
@@ -33,6 +41,7 @@ void export_poly()
     
     .def("leadCoef",&Poly::leadCoef)
     .def("leadExp", &Poly::leadExp)
+   
     .def(-self)
     .def(self*=self)
     .def(self+=self)
@@ -45,7 +54,9 @@ void export_poly()
     .def(self+Number())
     .def(self+=Number())
     .def(self*=Number())
+    
     .def(self*self);
+  
 }
 
 

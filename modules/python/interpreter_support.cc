@@ -1,4 +1,4 @@
-//$Id: interpreter_support.cc,v 1.20 2006-06-17 13:47:17 bricken Exp $
+//$Id: interpreter_support.cc,v 1.21 2006-06-21 06:27:11 bricken Exp $
 
 #include <sstream>
 #include <boost/python.hpp>
@@ -93,6 +93,12 @@ class arg_list{
     leftv v=initArg();
     v->data=p.as_ideal();
     v->rtyp=IDEAL_CMD;
+    internal_append(v);
+  }
+  void appendModule(const Module& p){
+    leftv v=initArg();
+    v->data=p.as_module();
+    v->rtyp=MODUL_CMD;
     internal_append(v);
   }
   void appendint(int p){
@@ -217,6 +223,13 @@ class idhdl_wrap{
       id->data.uideal=p.as_ideal();
     }
   }
+  void writeModule(const Module& p){
+    if (id->typ==MODUL_CMD){
+      id_Delete(&id->data.uideal, currRing);
+      
+      id->data.uideal=p.as_module();
+    }
+  }
   void writeint(int p){
     if (id->typ==INT_CMD){
       id->data.i=p;
@@ -330,6 +343,8 @@ boost::python::object buildPyObjectFromLeftv(leftv v){
     return object( Vector((poly) v->data, currRing));
   case IDEAL_CMD:
     return object(Ideal((ideal) v->data, currRing));
+  case MODUL_CMD:
+    return object(Module((ideal) v->data, currRing));
   case  NUMBER_CMD:
   
     return object(Number((number) v->data, currRing));
@@ -367,6 +382,10 @@ boost::python::object buildPyObjectFromIdhdl(const idhdl_wrap&  id){
     //object res;
 
     return object(Ideal((ideal) id.id->data.uideal, currRing));
+  case MODUL_CMD:
+    //object res;
+
+    return object(Module((ideal) id.id->data.uideal, currRing));
   case  NUMBER_CMD:
   
     return object(Number((number) id.id->data.n, currRing));
@@ -484,6 +503,7 @@ void export_interpreter()
     .def("append", &arg_list::appendNumber)
     .def("append", &arg_list::appendint)
     .def("append", &arg_list::appendIdeal)
+    .def("append", &arg_list::appendModule)
     .def("append", &arg_list::appendPrelist)
     .def("append", &arg_list::appendVector)
     .def("append", &arg_list::appendRing)
@@ -498,6 +518,7 @@ void export_interpreter()
     .def("write", &idhdl_wrap::writeNumber)
     .def("write", &idhdl_wrap::writeint)
     .def("write", &idhdl_wrap::writeIdeal)
+    .def("write", &idhdl_wrap::writeModule)
     .def("write", &idhdl_wrap::writeVector)
     .def("write", &idhdl_wrap::writeList)
     .def("write", &idhdl_wrap::writeString)
