@@ -75,11 +75,11 @@ then
         exit 0
     elif (echo $uname_a | $egrep "Darwin" >$devnull)
     then
-        echo i386Mac-darwin
+        echo ix86Mac-darwin
         exit 0
     elif (echo $uname_a | $egrep "SunOS" >$devnull)
     then
-        echo i386-SunOS
+        echo ix86-SunOS
         exit 0
     else
         echo ${prefix}-Unknown
