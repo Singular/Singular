@@ -311,15 +311,18 @@ dnl
 if test "$ac_cv_singuname" != ix86-Win; then
 AC_CHECK_LIB(m, atof)
 fi
+AC_CHECK_LIB(nsl)
+AC_CHECK_LIB(socket)
 SAVE_LIBS=${LIBS}
 LIBS=
 
 dnl I'm not sure what they are for
 AC_CHECK_LIB(bsd, setenv)
-dnl AC_CHECK_LIB(socket, listen)
-dnl AC_CHECK_LIB(nsl, gethostbyname)
+dnl i386-SunOS needs nsl and socket
+AC_CHECK_LIB(socket, listen)
+AC_CHECK_LIB(nsl, gethostbyname)
 dnl AC_CHECK_LIB(ucb, index)
-dnl MP_LIBS=${LIBS}
+MP_LIBS=${LIBS}
 # check for dl lib
 case "$ac_cv_singuname" in
 	HPUX*)
