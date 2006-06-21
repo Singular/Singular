@@ -965,7 +965,7 @@ fi
 
 
 
-if test ${GXX} = yes; then
+if test x${GXX} = xyes; then
 
   if test "$ac_cxxflags_set" = no; then
     if test "$with_debug" = yes; then
