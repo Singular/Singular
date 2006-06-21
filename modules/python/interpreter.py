@@ -12,17 +12,36 @@ def debug_out(s):
   pass
   #print s
 #def build_arg_list(*args)
+def is_int_tuple(a):
+    if isinstance(a,tuple):
+        for e in a:
+            if not isinstance(e, int):
+                False
+        return True
+    else:
+        return False
+def int_tuple2iv(a):
+    res=IntVector()
+    for e in a:
+        res.append(e)
+    return res
+    
+    
 def list2arg_list(args):
     l=_Singular.i_arg_list()
     for a in args:
         if isinstance(a,list):
             l.append(list2arg_list(a))
+            continue
+        if is_int_tuple(a):
+            l.append(int_tuple2iv(a))
+            continue
 #            at=i_arg_list()
 #            for a2 in a:
 #                at.append(a2)
 #            l.append(at)
-        else:
-            l.append(a)
+        
+        l.append(a)
     return l
 class SingularGlobalsProxy(object):
     """The Most important class

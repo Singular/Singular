@@ -61,6 +61,11 @@ print("Hallo Welt ihr Modules");
 print(p);
 return(p);
 }
+proc testproc8(intvec iv){
+    print("Hallo Welt ihr Intvecs");
+    print(iv);
+    return(iv);
+}
 
 list mylist=1,2,3;
 LIB("python_module.so");
@@ -104,6 +109,7 @@ print functions.testproc4(Number(3243287))
 print functions.testproc5(325)
 print functions.testproc6(x,y)
 print functions.testproc7(functions.m)
+print functions.testproc8(tuple(range(10)))
 from Singular import foo2;
 m=functions.testproc6(x,y)
 functions.myprintmat(m)
