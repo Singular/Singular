@@ -1,16 +1,17 @@
-/* $Id: mp_gmp.h,v 1.2 2005-07-29 10:57:05 Singular Exp $ */
+/* $Id: mp_gmp.h,v 1.3 2006-06-21 15:56:05 Singular Exp $ */
+/* $Id: mp_gmp.h,v 1.3 2006-06-21 15:56:05 Singular Exp $ */
 
-#ifndef MP_GMP_H
-#define MP_GMP_H
+#ifndef INCL_CF_GMP_H
+#define INCL_CF_GMP_H
 
-#ifdef __cplusplus
+#if defined(__cplusplus) && defined(__GNUC__)
 extern "C" {
 #undef __cplusplus
 #include <gmp.h>
-#define __cplusplus 1
 }
+#define __cplusplus 1
 #else
 #include <gmp.h>
 #endif
 
-#endif
+#endif /* ! INCL_CF_GMP_H */
