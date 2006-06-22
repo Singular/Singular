@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.28 2005-07-26 07:00:11 bricken Exp $
+ *  Version: $Id: gring.cc,v 1.29 2006-06-22 12:08:57 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -53,6 +53,10 @@ poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, poly q, const ring r)
   return(p);
 }
 
+poly nc_p_Minus_mm_Mult_qq_ign(poly p, const poly m, poly q, int & d1, poly d2, const ring r, poly &d3)
+{
+  return nc_p_Minus_mm_Mult_qq(p,m,q,r);
+}
 //----------- auxiliary routines--------------------------
 poly _nc_p_Mult_q(poly p, poly q, const int copy, const ring r)
   /* destroy p,q unless copy=1 */

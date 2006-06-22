@@ -11,7 +11,7 @@
  *           have to be defined before this file is included
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Set.h,v 1.2 2005-07-05 16:12:52 Singular Exp $
+ *  Version: $Id: p_Procs_Set.h,v 1.3 2006-06-22 12:08:58 Singular Exp $
  *******************************************************************/
 #include "modulop.h"
 
@@ -156,11 +156,22 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
   CheckProc(p_ShallowCopyDelete);
   CheckProc(p_Mult_nn);
   CheckProc(pp_Mult_nn);
-  CheckProc(pp_Mult_mm);
+  #ifdef HAVE_PLURAL
+  if (rIsPluralRing(r))
+  {
+      p_Procs->pp_Mult_mm=nc_pp_Mult_mm;
+      p_Procs->p_Mult_mm=nc_p_Mult_mm;
+      p_Procs->p_Minus_mm_Mult_qq=nc_p_Minus_mm_Mult_qq_ign;
+  }
+  else
+  #endif
+  {
+    CheckProc(pp_Mult_mm);
+    CheckProc(p_Mult_mm);
+    CheckProc(p_Minus_mm_Mult_qq);
+  }
   CheckProc(pp_Mult_mm_Noether);
-  CheckProc(p_Mult_mm);
   CheckProc(p_Add_q);
-  CheckProc(p_Minus_mm_Mult_qq);
   CheckProc(p_Neg);
   CheckProc(pp_Mult_Coeff_mm_DivSelect);
   CheckProc(pp_Mult_Coeff_mm_DivSelectMult);

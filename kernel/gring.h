@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.13 2006-01-05 14:54:24 Singular Exp $ */
+/* $Id: gring.h,v 1.14 2006-06-22 12:08:58 Singular Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -30,6 +30,7 @@ void ncCleanUp(ring r); /* smaller than kill */
 poly nc_pp_Mult_mm(poly p, poly m, const ring r, poly &last);
 poly nc_p_Mult_mm(poly p, const poly m, const ring r);
 poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, poly q, const ring r);
+poly nc_p_Minus_mm_Mult_qq_ign(poly p, const poly m, poly q, int & d1, poly d2, const ring ri, poly &d3);
 /* other routines we need in addition : */
 poly nc_p_Mult_mm_Common(poly p, const poly m, int side, const ring r);
 poly nc_mm_Mult_p(const poly m, poly p, const ring r);
