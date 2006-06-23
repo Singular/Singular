@@ -1,11 +1,10 @@
-// last change: 98/11/05
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.44 2006-04-06 13:25:58 Singular Exp $"
+version="$Id: finvar.lib,v 1.45 2006-06-23 12:18:23 Singular Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
-AUTHOR: Agnes E. Heydtmann, email: agnes@math.uni-sb.de
-
+AUTHOR: Agnes E. Heydtmann, email: agnes@math.uni-sb.de;
+        Simon A. King, email: king@mfo.de
 OVERVIEW:
  A library for computing polynomial invariants of finite matrix groups and
  generators of related varieties. The algorithms are based on B. Sturmfels,
@@ -26,8 +25,8 @@ AUXILIARY PROCEDURES:
  evaluate_reynolds()               image under the Reynolds operator
  invariant_basis()                 basis of homogeneous invariants of a degree
  invariant_basis_reynolds()        as invariant_basis(), with R.o.
- primary_char0()                   primary invariants in char 0
- primary_charp()                   primary invariant in char p
+ primary_char0()                   primary invariants (p.i.) in char 0
+ primary_charp()                   primary invariants in char p
  primary_char0_no_molien()         p.i., char 0, without Molien series
  primary_charp_no_molien()         p.i., char p, without Molien series
  primary_charp_without()           p.i., char p, without R.o. or Molien series
@@ -37,13 +36,15 @@ AUXILIARY PROCEDURES:
  primary_charp_no_molien_random()  p.i., char p, without M.s., randomized
  primary_charp_without_random()    p.i., char p, without R.o. or M.s., random.
  power_products()                  exponents for power products
- secondary_char0()                 secondary (s.i.) invariants in char 0
+ secondary_char0()                 secondary invariants (s.i.) in char 0
+ irred_secondary_char0()           irreducible secondary invariants in char 0
  secondary_charp()                 secondary invariants in char p
  secondary_no_molien()             secondary invariants, without Molien series
  secondary_and_irreducibles_no_molien() s.i. & irreducible s.i., without M.s.
  secondary_not_cohen_macaulay()    s.i. when invariant ring not Cohen-Macaulay
  orbit_variety()                   ideal of the orbit variety
- relative_orbit_variety()          ideal of a relative orbit variety
+ rel_orbit_variety()               ideal of a relative orbit variety (new version)
+ relative_orbit_variety()          ideal of a relative orbit variety (old version)
  image_of_variety()                ideal of the image of a variety
 ";
 ///////////////////////////////////////////////////////////////////////////////
@@ -4219,11 +4220,12 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc secondary_char0 (matrix P, matrix REY, matrix M, list #)
+static proc old_secondary_char0 (matrix P, matrix REY, matrix M, list #)
 "USAGE:   secondary_char0(P,REY,M[,v]);
-         P: a 1xn <matrix> with primary invariants, REY: a gxn <matrix>
-         representing the Reynolds operator, M: a 1x2 <matrix> giving numerator
-         and denominator of the Molien series, v: an optional <int>
+         P: a 1xn <matrix> with primary invariants,
+         REY: a gxn <matrix> representing the Reynolds operator,
+         M: a 1x2 <matrix> giving numerator and denominator of the Molien series,
+         v: an optional <int>
 ASSUME:  n is the number of variables of the basering, g the size of the group,
          REY is the 1st return value of group_reynolds(), reynolds_molien() or
          the second one of primary_invariants(), M the return value of molien()
@@ -4238,7 +4240,6 @@ THEORY:  The secondary invariants are calculated by finding a basis (in terms
          or their power products such that they are linearly independent modulo
          the primary invariants (see paper \"Some Algorithms in Invariant
          Theory of Finite Groups\" by Kemper and Steel (1997)).
-EXAMPLE: example secondary_char0; shows an example
 "
 { def br=basering;
   degBound=0;
@@ -4416,16 +4417,725 @@ EXAMPLE: example secondary_char0; shows an example
   }
   return(matrix(S),matrix(IS));
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+proc secondary_char0 (matrix P, matrix REY, matrix M, list #)
+"
+USAGE:    secondary_char0(P,REY,M[,v][,\"AH\"]);
+@*          P: a 1xn <matrix> with homogeneous primary invariants, where
+               n is the number of variables of the basering;
+@*          REY: a gxn <matrix> representing the Reynolds operator, where
+               g the size of the corresponding group;
+@*          M: a 1x2 <matrix> giving numerator and denominator of the Molien
+               series;
+@*          v: an optional <int>;
+@*          \"AH\": if this string occurs as (optional) parameter, then an
+               old version
+               of secondary_char0 is used (for downward compatibility)
+ASSUME:   REY is the 1st return value of group_reynolds(), reynolds_molien() or
+          the second one of primary_invariants();
+@*        M is the return value of molien()
+          or the second one of reynolds_molien() or the third one of
+          primary_invariants()
+RETURN:   Homogeneous secondary invariants and irreducible secondary
+          invariants of the invariant ring (both type <matrix>)
+DISPLAY:  Information on the progress of the computations if v is an integer
+          different from 0.
+THEORY:   The secondary invariants are calculated by finding a basis (in terms
+          of monomials) of the basering modulo the primary invariants, mapping
+          those to invariants with the Reynolds operator. Among these images
+          or their power products we pick a maximal subset that is linearly
+          independent modulo the primary invariants (see paper \"Some
+          Algorithms in Invariant Theory of Finite Groups\" by Kemper and
+          Steel (1997)). The size of this set can be read off from the
+          Molien series.
+NOTE:     Secondary invariants are not uniquely determined by the given data.
+          Specifically, the output of secondary_char0(P,REY,M,"AH") will
+          differ from the output of secondary_char0(P,REY,M). However, the
+          ideal generated by the irreducible homogeneous
+          secondary invariants will be the same in both cases.
+@*        There is an internal parameter \"pieces\" that, by default, equals 15.
+          Setting \"pieces\" to a smaller value might decrease the memory consumption,
+          but increase the running time.
+SEE ALSO: irred_secondary_char0;
+EXAMPLE:  example secondary_char0; shows an example
+"
+{ def br=basering;
+
+ //----------------- checking input and setting verbose mode ------------------
+  if (char(br)<>0)
+  { "ERROR:   secondary_char0 should only be used with rings of characteristic 0.";
+    return();
+  }
+  int i;
+  if (size(#)>0)
+  { if (typeof(#[1])=="int")
+    { int v=#[1];
+    }
+    else
+    { int v=0;
+    }
+  }
+  else
+  { int v=0;
+  }
+  if (size(#)>0)
+  { if (typeof(#[size(#)])=="string")
+    { if (#[size(#)]=="AH")
+      { if (typeof(#[1])=="int")
+        { matrix S,IS = old_secondary_char0(P,REY,M,#[1]);
+          return(S,IS);
+        }
+        else
+        { matrix S,IS = old_secondary_char0(P,REY,M);
+          return(S,IS);
+        }
+      }
+      else
+      { "ERROR:   If the last optional parameter is a string, it should be \"AH\".";
+        return(matrix(ideal()),matrix(ideal()));
+      }
+    }
+  }
+  int n=nvars(br);                // n is the number of variables, as well
+                                  // as the size of the matrices, as well
+                                  // as the number of primary invariants,
+                                  // we should get
+  if (ncols(P)<>n)
+  { "ERROR:   The first parameter ought to be the matrix of the primary";
+    "         invariants."
+    return();
+  }
+  if (ncols(REY)<>n)
+  { "ERROR:   The second parameter ought to be the Reynolds operator."
+    return();
+  }
+  if (ncols(M)<>2 or nrows(M)<>1)
+  { "ERROR:   The third parameter ought to be the Molien series."
+    return();
+  }
+  if (v && voice==2)
+  { "";
+  }
+  int j, m, counter, irrcounter;
+ //- finding the polynomial giving number and degrees of secondary invariants -
+  poly p=1;
+  for (j=1;j<=n;j++)                   // calculating the denominator of the
+  { p=p*(1-var(1)^deg(P[j]));          // Hilbert series of the ring generated
+  }                                    // by the primary invariants -
+  matrix s[1][2]=M[1,1]*p,M[1,2];      // s is used for canceling
+  s=matrix(syz(ideal(s)));
+  p=s[2,1];                            // the polynomial telling us where to
+                                       // search for secondary invariants
+  map slead=br,ideal(0);
+  p=1/slead(p)*p;                      // smallest [constant] term of
+                                       // p needs to be 1
+//  if (v)
+//  { "  Polynomial telling us where to look for secondary invariants:";
+//    "   "+string(p);
+//    "";
+//  }
+  matrix dimmat=coeffs(p,var(1));      // dimmat will contain the number of
+                                       // secondary invariants, we need to find
+                                       // of a certain degree -
+  m=nrows(dimmat);                     // m-1 is the highest degree
+  if (v)
+  { "We need to find";
+    for (j=1;j<=m;j++)
+     { if (int(dimmat[j,1])<>1)
+       { int(dimmat[j,1]), "secondary invariants in degree",j-1;
+       }
+       else
+       { "1 secondary invariant in degree",j-1;
+       }
+     }
+  }
+  if (v)
+  { "  In degree 0 we have: 1";
+    "";
+  }
+ //-------------------------- initializing variables --------------------------
+  ideal ProdCand;
+  ideal Mul1,Mul2;
+  ideal Reductor,SaveRed;
+  list ISSort;
+  poly helpP;
+  ideal helpI;
+  ideal Indicator;
+  ideal ReducedCandidates;
+  int helpint;
+  int k,k2,k3,minD;
+  int ii;
+  int saveAttr;
+  ideal B,IS;
+
+  int pieces = 15;
+
+  int dgb=degBound;
+  degBound = 0;
+  option(redSB);
+  ideal sP = slimgb(ideal(P));
+
+  list SSort;         // sec. inv. first sorted by degree and then sorted by the
+                      // minimal degree of a non-constant invariant factor.
+  for (i=1;i<m;i++)
+  { SSort[i] = list();
+    for (k=1;k<=i;k++)
+    { SSort[i][k]=ideal();
+      attrib(SSort[i][k],"size",0);
+    }
+   }
+//--------------------- generating secondary invariants ----------------------
+  for (i=2;i<=m;i++)                   // going through dimmat -
+  { if (int(dimmat[i,1])<>0)           // when it is == 0 we need to find no
+    {                                  // elements in the current degree (i-1)
+      if (v)
+      { "  Searching in degree "+string(i-1)+", we need to find "+string(int(dimmat[i,1]))+" invariant(s)...";
+        "  Looking for Power Products...";
+      }
+      counter = 0;                       // we'll count up to dimmat[i,1]
+      Reductor = ideal(0);
+      helpint = 0;
+      SaveRed = Reductor;
+      attrib(Reductor,"isSB",1);
+      attrib(SaveRed,"isSB",1);
+      for (k=1;k<i-1;k++)
+      { if (int(dimmat[i,1])==counter)
+        { break; }
+        if (typeof(ISSort[k])<>"none")
+        { Mul1 = ISSort[k];
+        }
+        else
+        { Mul1 = ideal(0);
+        }
+        if ((int(dimmat[i-k,1])>0) && (Mul1[1]<>0))
+        { for (minD=k;minD<i-k;minD++)
+          { if (int(dimmat[i,1])==counter)
+            { break;
+            }
+            for (k2=1;k2 <= ((attrib(SSort[i-k-1][minD],"size")-1) div pieces)+1; k2++)
+            { if (int(dimmat[i,1])==counter)
+              { break;
+              }
+              Mul2=ideal(0);
+              if (attrib(SSort[i-k-1][minD],"size")>=k2*pieces)
+              { for (k3=1;k3<=pieces;k3++)
+                { Mul2[k3] = SSort[i-k-1][minD][((k2-1)*pieces)+k3];
+                }
+              }
+              else
+              { for (k3=1;k3<=(attrib(SSort[i-k-1][minD],"size") mod pieces);k3++)
+                { Mul2[k3] = SSort[i-k-1][minD][((k2-1)*pieces)+k3];
+                }
+              }
+              ProdCand = Mul1*Mul2;
+              ReducedCandidates = reduce(ProdCand,sP);
+              Indicator = reduce(ReducedCandidates,SaveRed);
+              if (size(Indicator)<>0)
+              { for (ii=1;ii<=ncols(ProdCand);ii++)     // going through all the power products
+                { helpP = reduce(Indicator[ii],Reductor);
+                  if (helpP <> 0)
+                  { counter++;
+                    saveAttr = attrib(SSort[i-1][k],"size")+1;
+                    SSort[i-1][k][saveAttr] = ProdCand[ii];
+                        // By construction, this is a _reducible_ s.i.
+                    attrib(SSort[i-1][k],"size",saveAttr);
+                    if (v)
+                    { "We found",counter, " of", int(dimmat[i,1])," secondaries in degree",i-1;
+                    }
+                    if (int(dimmat[i,1])<>counter)
+                    { helpint++;
+                      Reductor[helpint] = helpP;
+                      attrib(Reductor, "isSB",1);
+                      if (size(Reductor)>100)
+                      { Indicator=reduce(Indicator,Reductor);
+                        SaveRed = SaveRed + Reductor;
+                        Reductor = ideal(0);
+                        helpint = 0;
+                        attrib(SaveRed, "isSB",1);
+                        attrib(Reductor, "isSB",1);
+                      }
+                    }
+                    else
+                    { break;
+                    }
+                  }
+                }
+              }
+              SaveRed = SaveRed + Reductor;
+              attrib(SaveRed, "isSB",1);
+            }
+          }
+        }
+      }
+
+      if (int(dimmat[i,1])<>counter)   // need more than all the power products
+      { if (v)
+        { "There are irreducible secondary invariants in degree ", i-1," !!";
+        }
+        B=sort_of_invariant_basis(sP,REY,i-1,int(dimmat[i,1])*6);
+                                       // B contains
+                                       // images of kbase(sP,i-1) under the
+                                       // Reynolds operator that are linearly
+                                       // independent and that don't reduce to
+                                       // 0 modulo sP -
+        if (v)
+        { "Study", size(B), " candidates for irreducibles in degree",i-1;
+        }
+        if (counter==0 && ncols(B)==int(dimmat[i,1])) // then we can take all of B
+        { IS=IS+B;
+          saveAttr = attrib(SSort[i-1][i-1],"size")+int(dimmat[i,1]);
+          SSort[i-1][i-1] = SSort[i-1][i-1] + B;
+          attrib(SSort[i-1][i-1],"size", saveAttr);
+          if (typeof(ISSort[i-1]) <> "none")
+          { ISSort[i-1] = ISSort[i-1] + B;
+          }
+          else
+          { ISSort[i-1] = B;
+          }
+          if (v) {"  We found: "; print(B);}
+        }
+        else
+        { irrcounter=0;
+          j=0;                         // j goes through all of B -
+          ReducedCandidates = reduce(B,sP);
+          Indicator = reduce(ReducedCandidates,SaveRed);
+          while (int(dimmat[i,1])<>counter) // need to find dimmat[i,1]
+          {                                 // invariants that are linearly independent
+            j++;
+            helpP = reduce(Indicator[j],Reductor);
+            if (helpP <>0)                  // B[j] should be added
+            { counter++; irrcounter++;
+              IS=IS,B[j];
+              saveAttr = attrib(SSort[i-1][i-1],"size")+1;
+              SSort[i-1][i-1][saveAttr] = B[j];
+              attrib(SSort[i-1][i-1],"size",saveAttr);
+                 if (typeof(ISSort[i-1]) <> "none")
+              { ISSort[i-1][irrcounter] = B[j];
+              }
+              else
+              { ISSort[i-1] = ideal(B[j]);
+              }
+              if (v)
+              { "  We found the irreducible sec. inv. "+string(B[j]);
+              }
+              Reductor = Reductor, helpP;
+              attrib(Reductor, "isSB",1);
+              if (size(Reductor)>100)
+              { Indicator=reduce(Indicator,Reductor);
+                SaveRed = SaveRed + Reductor;
+                Reductor = ideal(0);
+                attrib(SaveRed, "isSB",1);
+                attrib(Reductor, "isSB",1);
+              }
+            }
+          }
+        }
+      }
+      if (v)
+      { "";
+      }
+    }
+  }
+  if (v)
+  { "  We're done!";
+    "";
+  }
+  degBound = dgb;
+
+  ideal S;
+  for (k=1;k<m;k++)
+  { for (k2=1;k2<=k;k2++)
+    { S = S+SSort[k][k2];
+      SSort[k][k2]=ideal(0);
+    }
+  }
+  S=1,S;
+  return(matrix(S),matrix(compress(IS)));
+}
+
+
 example
 { "EXAMPLE: Sturmfels: Algorithms in Invariant Theory 2.3.7:"; echo=2;
          ring R=0,(x,y,z),dp;
          matrix A[3][3]=0,1,0,-1,0,0,0,0,-1;
          list L=primary_invariants(A);
-         matrix S,IS=secondary_char0(L[1..3]);
+         matrix S,IS=secondary_char0(L[1..3],1);
          print(S);
          print(IS);
 }
+//example
+//{ "EXAMPLE: S. King"; echo=2;
+//ring r= 0, (V1,V2,V3,V4,V5,V6),dp;
+//matrix A1[6][6] = 0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0;
+//matrix A2[6][6] = 0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0;
+//list L = primary_invariants(A1,A2); // sorry, this takes a while...
+//matrix S, IS = secondary_char0(L[1],L[2],L[3],1);
+//S;
+//IS;
+//}
 ///////////////////////////////////////////////////////////////////////////////
+
+
+proc irred_secondary_char0 (matrix P, matrix REY, matrix M, list #)
+"
+USAGE:    irred_secondary_char0(P,REY,M[,v]);
+@*          P: a 1xn <matrix> with homogeneous primary invariants, where
+               n is the number of variables of the basering;
+@*          REY: a gxn <matrix> representing the Reynolds operator, where
+               g the size of the corresponding group;
+@*          M: a 1x2 <matrix> giving numerator and denominator of the
+               Molien series;
+@*          v: an optional <int>;
+RETURN:   Irreducible homogeneous secondary invariants of the invariant ring
+          (type <matrix>)
+ASSUME:   REY is the 1st return value of group_reynolds(), reynolds_molien() or
+          the second one of primary_invariants();
+          M is the return value of molien() or the second one of
+          reynolds_molien() or the third one of primary_invariants()
+DISPLAY:  Information on the progress of computations if v does not equal 0
+THEORY:   The secondary invariants are calculated by finding a basis (in terms
+          of monomials) of the basering modulo the primary invariants, mapping
+          those to invariants with the Reynolds operator. Among these images
+          or their power products we pick a maximal subset that is linearly
+          independent modulo the primary invariants (see paper \"Some
+          Algorithms in Invariant Theory of Finite Groups\" by Kemper and
+          Steel (1997)). The size of this set can be read off from the
+          Molien series. Here, only irreducible secondary
+          invariants are explicitly computed, which saves time and memory.
+NOTE:     There is an internal parameter \"pieces\" that, by default, equals 15.
+          Setting \"pieces\" to a smaller value might decrease the memory consumption,
+          but increase the running time.
+SEE ALSO: secondary_char0
+KEYWORDS: irreducible secondary invariant
+EXAMPLE:  example irred_secondary_char0; shows an example
+"
+{ def br=basering;
+
+ //----------------- checking input and setting verbose mode ------------------
+  if (char(br)<>0)
+  { "ERROR:   irred_secondary_char0 should only be used with rings of characteristic 0.";
+    return();
+  }
+  int i;
+  if (size(#)>0)
+  { if (typeof(#[size(#)])=="int")
+    { int v=#[size(#)];
+    }
+    else
+    { int v=0;
+    }
+  }
+  else
+  { int v=0;
+  }
+  int n=nvars(br);                // n is the number of variables, as well
+                                  // as the size of the matrices, as well
+                                  // as the number of primary invariants,
+                                  // we should get
+  if (ncols(P)<>n)
+  { "ERROR:   The first parameter ought to be the matrix of the primary";
+    "         invariants."
+    return();
+  }
+  if (ncols(REY)<>n)
+  { "ERROR:   The second parameter ought to be the Reynolds operator."
+    return();
+  }
+  if (ncols(M)<>2 or nrows(M)<>1)
+  { "ERROR:   The third parameter ought to be the Molien series."
+    return();
+  }
+  if (v && voice==2)
+  { "";
+  }
+  int j, m, counter, irrcounter;
+ //- finding the polynomial giving number and degrees of secondary invariants -
+  poly p=1;
+  for (j=1;j<=n;j++)                   // calculating the denominator of the
+  { p=p*(1-var(1)^deg(P[j]));          // Hilbert series of the ring generated
+  }                                    // by the primary invariants -
+  matrix s[1][2]=M[1,1]*p,M[1,2];      // s is used for canceling
+  s=matrix(syz(ideal(s)));
+  p=s[2,1];                            // the polynomial telling us where to
+                                       // search for secondary invariants
+  map slead=br,ideal(0);
+  p=1/slead(p)*p;                      // smallest [constant] term of
+                                       // p needs to be 1
+//  if (v)
+//  { "  Polynomial telling us where to look for secondary invariants:";
+//    "   "+string(p);
+//    "";
+//  }
+  matrix dimmat=coeffs(p,var(1));      // dimmat will contain the number of
+                                       // secondary invariants, we need to find
+                                       // of a certain degree -
+  m=nrows(dimmat);                     // m-1 is the highest degree
+  if (v)
+  { "We need to find";
+    for (j=1;j<=m;j++)
+     { if (int(dimmat[j,1])<>1)
+       { int(dimmat[j,1]), "secondary invariants in degree",j-1;
+       }
+       else
+       { "1 secondary invariant in degree",j-1;
+       }
+     }
+  }
+  if (v)
+  { "  In degree 0 we have: 1";
+    "";
+  }
+ //-------------------------- initializing variables --------------------------
+  ideal ProdCand;          // contains products of secondary invariants,
+                           // i.e., candidates for reducible sec. inv.
+
+  ideal Mul1,Mul2;
+
+  int dgb=degBound;
+  degBound = 0;
+  option(redSB);
+  ideal sP = slimgb(ideal(P));
+  ideal Reductor,SaveRed;  // sP union Reductor is a Groebner basis up to a degree i-1
+  list RedSSort;           // sec. Inv. reduced by sP, sorted first by degree and then
+                           // by the minimal degree of a non-constant invariant factor
+  list RedISSort;          // irr. sec. Inv. reduced by sP, sorted by degree
+  poly helpP;
+  ideal helpI;
+  ideal Indicator;        // tells us which candidates for sec. inv. we can choose
+  ideal ReducedCandidates;
+  int helpint;
+  int k,k2,k3,minD;
+  int ii;
+  int saveAttr;
+  ideal B,IS;              // IS will contain all irr. sec. inv.
+
+  int pieces = 15;   // If this parameter is small, the memory consumption will decrease.
+                     // In some cases, a careful choice will speed up computations
+
+  for (i=1;i<m;i++)
+  { RedSSort[i] = list();
+    for (k=1;k<=i;k++)
+    { RedSSort[i][k]=ideal();
+      attrib(RedSSort[i][k],"size",0);
+    }
+   }
+//--------------------- generating secondary invariants ----------------------
+  for (i=2;i<=m;i++)                   // going through dimmat -
+  { if (int(dimmat[i,1])<>0)           // when it is == 0 we need to find no
+    {                                  // elements in the current degree (i-1)
+      if (v)
+      { "  Searching in degree "+string(i-1)+", we need to find "+string(int(dimmat[i,1]))+" invariant(s)...";
+        "  Looking for Power Products...";
+      }
+      counter = 0;                       // we'll count up to dimmat[i,1]
+      Reductor = ideal(0);
+      helpint = 0;
+      SaveRed = Reductor;
+      attrib(Reductor,"isSB",1);
+      attrib(SaveRed,"isSB",1);
+
+// We start searching for reducible secondary invariants in degree i-1, i.e., those
+// that are power products of irreducible secondary invariants.
+// It suffices to restrict the search at products of one _irreducible_ sec. inv. (Mul1)
+// with some sec. inv. (Mul2).
+// Moreover, we avoid to consider power products twice since we take a product
+// into account only if the minimal degree of a non-constant invariant factor in "Mul2" is not
+// smaller than the degree of "Mul1".
+// Finally, as we are not interested in the reducible sec. inv., we will only
+// work with their reduction modulo sP --- this allows to detect a secondary invariant
+// without to actually compute it!
+      for (k=1;k<i-1;k++)
+      { if (int(dimmat[i,1])==counter)
+        { break;
+        }
+        if (typeof(RedISSort[k])<>"none")
+        { Mul1 = RedISSort[k];
+        }
+        else
+        { Mul1 = ideal(0);
+        }
+        if ((int(dimmat[i-k,1])>0) && (Mul1[1]<>0))
+        { for (minD=k;minD<i-k;minD++)
+          { if (int(dimmat[i,1])==counter)
+            { break;
+            }
+            for (k2=1;k2 <= ((attrib(RedSSort[i-k-1][minD],"size")-1) div pieces)+1; k2++)
+            { if (int(dimmat[i,1])==counter)
+              { break;
+              }
+              Mul2=ideal(0);
+              if (attrib(RedSSort[i-k-1][minD],"size")>=k2*pieces)
+              { for (k3=1;k3<=pieces;k3++)
+                { Mul2[k3] = RedSSort[i-k-1][minD][((k2-1)*pieces)+k3];
+                }
+              }
+              else
+              { for (k3=1;k3<=(attrib(RedSSort[i-k-1][minD],"size") mod pieces);k3++)
+                { Mul2[k3] = RedSSort[i-k-1][minD][((k2-1)*pieces)+k3];
+                }
+              }
+              ProdCand = Mul1*Mul2;
+              ReducedCandidates = reduce(ProdCand,sP);
+                  // sP union SaveRed union Reductor is a homogeneous Groebner basis
+                  // up to degree i-1.
+                  // We first reduce by sP (which is fixed, so we can do it once for all),
+                  // then by SaveRed resp. by Reductor (which is modified during
+                  // the computations).
+              Indicator = reduce(ReducedCandidates,SaveRed);
+                             // If Indicator[ii]==0 then ReducedCandidates it the reduction
+                             // of an invariant that is in the algebra generated by primary
+                             // invariants and previously computed secondary invariants.
+                             // Otherwise ReducedCandidates[ii] is the reduction of an invariant
+                             // that we can take as secondary invariant.
+              if (size(Indicator)<>0)
+              { for (ii=1;ii<=ncols(ProdCand);ii++)     // going through all the power products
+                { helpP = reduce(Indicator[ii],Reductor);
+                  if (helpP <> 0)
+                  { counter++;
+                    saveAttr = attrib(RedSSort[i-1][k],"size")+1;
+                    RedSSort[i-1][k][saveAttr] = ReducedCandidates[ii];
+                        // By construction, this is the reduction of a reducible s.i.
+                        // of degree i-1.
+                    attrib(RedSSort[i-1][k],"size",saveAttr);
+                    if (v)
+                    { "We found",counter, " of", int(dimmat[i,1])," secondaries in degree",i-1;
+                    }
+                    if (int(dimmat[i,1])<>counter)
+                    { helpint++;
+                      Reductor[helpint] = helpP;
+                          // Lemma: If G is a homogeneous Groebner basis up to degree i-1 and p is a
+                        // homogeneous polynomial of degree i-1 then G union NF(p,G) is
+                        // a homogeneous Groebner basis up to degree i-1.
+                      attrib(Reductor, "isSB",1);
+                        // if Reductor becomes too large, we reduce the whole of Indicator by
+                        // it, save it in SaveRed, and work with a smaller Reductor. This turns
+                        // out to save a little time.
+                      if (size(Reductor)>100)
+                      { Indicator=reduce(Indicator,Reductor);
+                        SaveRed = SaveRed + Reductor;
+                        Reductor = ideal(0);
+                        helpint = 0;
+                        attrib(SaveRed, "isSB",1);
+                        attrib(Reductor, "isSB",1);
+                      }
+                    }
+                    else
+                    { break;
+                    }
+                  }
+                }
+              }
+              SaveRed = SaveRed + Reductor;
+              attrib(SaveRed, "isSB",1);
+            }
+          }
+        }
+      }
+
+      // The remaining sec. inv. are irreducible!
+      if (int(dimmat[i,1])<>counter)   // need more than all the power products
+      { if (v)
+        { "There are irreducible secondary invariants in degree ", i-1," !!";
+        }
+        B=sort_of_invariant_basis(sP,REY,i-1,int(dimmat[i,1])*6);
+                                       // B is a set of
+                                       // images of kbase(sP,i-1) under the
+                                       // Reynolds operator that are linearly
+                                       // independent and that do not reduce to
+                                       // 0 modulo sP
+        if (v)
+        { "Study", size(B), " candidates for irreducibles in degree",i-1;
+        }
+        if (counter==0 && ncols(B)==int(dimmat[i,1])) // then we can take all of B
+        { IS=IS+B;
+          saveAttr = attrib(RedSSort[i-1][i-1],"size")+int(dimmat[i,1]);
+          RedSSort[i-1][i-1] = RedSSort[i-1][i-1] + B;
+          attrib(RedSSort[i-1][i-1],"size", saveAttr);
+          if (typeof(RedISSort[i-1]) <> "none")
+          { RedISSort[i-1] = RedISSort[i-1] + B;
+          }
+          else
+          { RedISSort[i-1] = B;
+          }
+          if (v) {"  We found: ";print(B);}
+        }
+        else
+        { irrcounter=0;
+          j=0;                         // j goes through all of B -
+                      // Compare the comments on the computation of reducible sec. inv.!
+          ReducedCandidates = reduce(B,sP);
+          Indicator = reduce(ReducedCandidates,SaveRed);
+          while (int(dimmat[i,1])<>counter)    // need to find dimmat[i,1]
+          {                                    // invariants that are linearly independent
+            j++;
+            helpP = reduce(Indicator[j],Reductor);
+            if (helpP <>0)                     // B[j] should be added
+            { counter++; irrcounter++;
+              IS=IS,B[j];
+              saveAttr = attrib(RedSSort[i-1][i-1],"size")+1;
+              RedSSort[i-1][i-1][saveAttr] = ReducedCandidates[j];
+              attrib(RedSSort[i-1][i-1],"size",saveAttr);
+                 if (typeof(RedISSort[i-1]) <> "none")
+              { RedISSort[i-1][irrcounter] = ReducedCandidates[j];
+              }
+              else
+              { RedISSort[i-1] = ideal(ReducedCandidates[j]);
+              }
+              if (v)
+              { "  We found the irreducible sec. inv. "+string(B[j]);
+              }
+              Reductor = Reductor, helpP;
+              attrib(Reductor, "isSB",1);
+              if (size(Reductor)>100)
+              { Indicator=reduce(Indicator,Reductor);
+                SaveRed = SaveRed + Reductor;
+                Reductor = ideal(0);
+                attrib(SaveRed, "isSB",1);
+                attrib(Reductor, "isSB",1);
+              }
+            }
+          }
+        }
+      }
+      if (v)
+      { "";
+      }
+    }
+  }
+  if (v)
+  { "  We're done!";
+    "";
+  }
+  degBound = dgb;
+
+  return(matrix(compress(IS)));
+}
+
+
+//example
+//{ "EXAMPLE: Sturmfels: Algorithms in Invariant Theory 2.3.7:"; echo=2;
+//         ring R=0,(x,y,z),dp;
+//         matrix A[3][3]=0,1,0,-1,0,0,0,0,-1;
+//         list L=primary_invariants(A);
+//         matrix IS=irred_secondary_char0(L[1..3],1);
+//         print(IS);
+//}
+example
+{ "EXAMPLE: S. King"; echo=2;
+ring r= 0, (a,b,c,d,e,f),dp;
+matrix A1[6][6] = 0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0;
+matrix A2[6][6] = 0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0;
+list L = primary_invariants(A1,A2); // sorry, this takes a while...
+matrix IS = irred_secondary_char0(L[1],L[2],L[3],0);
+IS;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
 
 proc secondary_charp (matrix P, matrix REY, string ring_name, list #)
 "USAGE:   secondary_charp(P,REY,ringname[,v]);
@@ -5679,6 +6389,7 @@ example
          basering;
 }
 ///////////////////////////////////////////////////////////////////////////////
+
 static proc degvec(ideal I)
 "USAGE:  degvec(I);
          I an <ideal>.
@@ -5691,18 +6402,175 @@ RETURN:  the <intvec> of degrees of the generators of I.
   return(v);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+proc rel_orbit_variety(ideal I,matrix F,list #)
+"USAGE:    rel_orbit_variety(I,F[,s]);
+@*          I: an <ideal> invariant under the action of a group,
+@*          F: a 1xm <matrix> defining the invariant ring of this group.
+@*          s: optional <string>; if s is present then (for downward
+               compatibility) the old procedure <relative_orbit_variety>
+               is called, and in this case s gives the name of a new <ring>.
+RETURN:   Without optional s, a list L of two rings is returned.
+@*        The ring L[1] carries a weighted degree order with variables
+            y(1..m), the weight of y(k) equal to the degree of the
+            k-th generators F[1,k] of the invariant ring.
+            L[1] contains a Groebner basis (type <ideal>, named G) of the
+            ideal defining the relative orbit variety with  respect to I.
+@*        The ring L[2] has the variables of the basering together with y(1..m)
+            and carries a block order: The first block is the order of the
+            basering, the second is the weighted degree order occuring in L[1].
+            L[2] contains G and a Groebner basis (type <ideal>, named Conv)
+            such that if p is any invariant polynomial expressed in the
+            variables of the basering then reduce(p,Conv) is a polynomial in
+            the new variables y(1..m) such that evaluation at the generators
+            of the invariant ring yields p. This can be used to avoid the
+            application of <algebra_containment>
+            (see @ref{algebra_containment}).
+@*        For the case of optional s, see @ref{relative_orbit_variety}.
+THEORY:   A Groebner basis of the ideal of algebraic relations of the invariant
+          ring generators is calculated, then one of the basis elements plus
+          the ideal generators. The variables of the original ring are
+          eliminated and the polynomials that are left define the relative
+          orbit variety with respect to I. The elimination is done by a
+          weighted blockorder that has the advantage of dealing with
+          quasi-homogeneous ideals.
+NOTE:     We provide the ring L[1] for the sake of downward compatibility,
+          since it is closer to the ring returned by relative_orbit_variety
+          than L[2]. However, L[1] carries a weighted degree order, whereas
+          the ring returned by relative_orbit_variety is lexicographically
+          ordered.
+SEE ALSO: relative_orbit_variety
+EXAMPLE:  example rel_orbit_variety; shows an example.
+"
+{ if (size(#)>0)
+  { if (typeof(#[1])=="string")
+    { relative_orbit_variety(I,F,#[1]);
+      keepring basering;
+      return();
+    }
+    else
+    { "ERROR:    the third parameter may either be empty or a <string>.";
+      return();
+    }
+  }
+  degBound=0;
+  if (nrows(F)==1)
+  { option(redSB);
+    def br=basering;
+    int n=nvars(br);
+    int m=ncols(F);
+    // In the following ring definition, any elimination order would work.
+    list rlist = ringlist(br);
+    int i;
+    for (i=1;i<=m;i++)
+    { rlist[2][n+i]="y("+string(i)+")";
+    }
+    rlist[3][size(rlist[3])+1] = rlist[3][size(rlist[3])];
+    rlist[3][size(rlist[3])-1][1] = "wp";
+    rlist[3][size(rlist[3])-1][2] = degvec(ideal(F));
+    def newring = ring(rlist);
+
+    list smallrlist;
+    smallrlist[1]=rlist[1];
+    smallrlist[2]=list();
+    for (i=1;i<=m;i++)
+    { smallrlist[2][i]="y("+string(i)+")";
+    }
+    smallrlist[3]=list();
+    smallrlist[3][1]=list();
+    smallrlist[3][1][1] = "wp";
+    smallrlist[3][1][2] = degvec(ideal(F));
+    smallrlist[3][2] = rlist[3][size(rlist[3])];
+    smallrlist[4] = rlist[4];
+    def smallring = ring(smallrlist);
+
+    setring(newring);
+    ideal J=ideal(imap(br,F));
+    ideal I=imap(br,I);
+    for (i=1;i<=m;i++)
+    { J[i]=J[i]-y(i);
+    }
+    // We chose the weighted block order since this makes J quasi-homogeneous!
+    ideal Conv=slimgb(J);
+    J=Conv,I;
+    J=slimgb(J); //or J=std(J); or J=groebner(J); etc.
+    ideal vars;
+    vars[n]=0;
+    vars=vars,y(1..m);
+    map emb=newring,vars;
+    ideal G=emb(J);
+    J=J-G;
+    for (i=1;i<=ncols(G);i++)
+    { if (J[i]<>0)
+      { G[i]=0;
+      }
+    }
+    G=compress(G);
+    vars=ideal();
+    for (i=2;i<=n;i++)
+    { vars[i]=0;
+    }
+    vars=vars,y(1..m);
+    emb=newring,vars;
+    G=compress(emb(G));
+    export(G);
+    export(Conv);
+
+    setring(smallring);
+    ideal G = compress(imap(newring,G));
+    export(G);
+
+    list L;
+    L[1]=smallring;
+    L[2]=newring;
+
+    dbprint( printlevel-voice+3,"
+// 'rel_orbit_variety' created a list of two rings.
+// If L is the name of that list, you can access
+// the first ring by
+//   def R = L[1]; setring R;
+// (similarly for the second ring)");
+    return(L);
+  }
+  else
+  { "ERROR:   the <matrix> may only have one row";
+    return();
+  }
+}
+example
+{ "EXAMPLE: Sturmfels: Algorithms in Invariant Theory 2.6.3:"; echo=2;
+         ring R=0,(x,y,z),dp;
+         matrix F[1][3]=x+y+z,xy+xz+yz,xyz;
+         ideal I=x2+y2+z2-1,x2y+y2z+z2x-2x-2y-2z,xy2+yz2+zx2-2x-2y-2z;
+         list L = rel_orbit_variety(I,F);
+         def AllR = L[2];
+         setring(AllR);
+         print(G);
+         print(Conv);
+         basering;
+}
+///////////////////////////////////////////////////////////////////////////////
+
 proc relative_orbit_variety(ideal I,matrix F,string newring)
-"USAGE:   relative_orbit_variety(I,F,s);
-         I: an <ideal> invariant under the action of a group, F: a 1xm
-         <matrix> defining the invariant ring of this group, s: a <string>
-         giving a name for a new ring
-RETURN:  a Groebner basis (type <ideal>, named G) for the ideal defining the
-         relative orbit variety with respect to I in the new ring (named s)
+"
+USAGE:   relative_orbit_variety(I,F,s);
+         I: an <ideal> invariant under the action of a group,
+@*       F: a 1xm  <matrix> defining the invariant ring of this group,
+@*       s: a <string> giving a name for a new ring
+RETURN:  The procedure ends with a new ring named s.
+         It contains a Groebner basis
+         (type <ideal>, named G) for the ideal defining the
+         relative orbit variety with respect to I in the new ring.
 THEORY:  A Groebner basis of the ideal of algebraic relations of the invariant
          ring generators is calculated, then one of the basis elements plus the
          ideal generators. The variables of the original ring are eliminated
          and the polynomials that are left define the relative orbit variety
          with respect to I.
+NOTE:    This procedure is now replaced by rel_orbit_variety
+         (see @ref{rel_orbit_variety}), which uses a different elemination
+         order that should usually allow faster computations.
+SEE ALSO: rel_orbit_variety
 EXAMPLE: example relative_orbit_variety; shows an example
 "
 { if (newring=="")
@@ -5744,7 +6612,7 @@ EXAMPLE: example relative_orbit_variety; shows an example
     }
     G=compress(G);
     //better return wp ordering, then the last GB calculation is not needed
-    
+
     //execute("ring "+newring+"=("+charstr(br)+"),(y(1..m)),wp(v);");
     execute("ring "+newring+"=("+charstr(br)+"),(y(1..m)),lp;");
     execute("minpoly=number("+mp+");");
@@ -5776,33 +6644,35 @@ example
          print(G);
          basering;
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 
 proc image_of_variety(ideal I,matrix F)
 "USAGE:   image_of_variety(I,F);
-         I: an arbitray <ideal>, F: a 1xm <matrix> defining an invariant ring
-         of a some matrix group
-RETURN:  the <ideal> defining the image under that group of the variety defined
+@*         I: an arbitray <ideal>,
+@*       F: a 1xm <matrix> defining an invariant ring of some matrix group
+RETURN:  The <ideal> defining the image under that group of the variety defined
          by I
-THEORY:  relative_orbit_variety(I,F,s) is called and the newly introduced
-         variables in the output are replaced by the generators of the
-         invariant ring. This ideal in the original variables defines the image
-         of the variety defined by I
+THEORY:  rel_orbit_variety(I,F) is called and the newly introduced
+@*       variables in the output are replaced by the generators of the
+@*       invariant ring. This ideal in the original variables defines the image
+@*       of the variety defined by I
 EXAMPLE: example image_of_variety; shows an example
 "
 { if (nrows(F)==1)
   { def br=basering;
     int n=nvars(br);
-    string newring="E";
-    relative_orbit_variety(I,F,newring);
-    execute("ring R=("+charstr(br)+"),("+varstr(br)+","+varstr(E)+"),lp;");
+    list L = rel_orbit_variety(I,F);
+    def newring=L[2];
+    setring(newring);
     ideal F=imap(br,F);
     for (int i=1;i<=n;i++)
     { F=0,F;
     }
+    map emb2=newring,F;
+    ideal trafo = compress(emb2(G));
     setring br;
-    map emb2=E,F;
-    return(compress(emb2(G)));
+    return(imap(newring,trafo));
   }
   else
   { "ERROR:   the <matrix> may only have one row";
@@ -5817,3 +6687,7 @@ example
          print(image_of_variety(I,F));
 }
 ///////////////////////////////////////////////////////////////////////////////
+
+
+
+
