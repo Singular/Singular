@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.142 2006-06-14 15:34:13 Singular Exp $
+@comment $Id: singular.doc,v 1.143 2006-06-23 13:26:51 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -45,7 +45,7 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @center A Computer Algebra System for Polynomial Computations
 @sp 5
 @center @titlefont{Manual}
-@center Version @value{VERSION}
+@center Version @value{VERSION}, @value{VERSION_DATE}
 @sp 2
 @center Singular is created and its development is directed and coordinated by
 @center G.-M. Greuel, G. Pfister, and H. Sch@"onemann

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.130 2006-06-13 14:28:17 Singular Exp $
+@comment $Id: types.doc,v 1.131 2006-06-23 13:26:52 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -173,7 +173,11 @@ bigint(-5) div 2, bigint(-5) mod 2;
 @subsection bigint related functions
 @cindex bigint related functions
 
-currently none.
+@table @code
+@item gcd
+greatest common divisor (see @ref{gcd})
+@end table
+
 @c ---------------------------------------
 @node def, ideal, bigint, Data types
 @section def
