@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.5 2006-06-20 11:27:36 Singular Exp $";
+version="$Id: dmod.lib,v 1.6 2006-06-23 12:24:36 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -39,6 +39,7 @@ LIB "nctools.lib";
 LIB "elim.lib";
 LIB "qhmoduli.lib"; // for Max
 LIB "gkdim.lib";
+LIB "gmssing.lib";
 
 static proc engine(ideal I, int i)
 {
