@@ -1,5 +1,5 @@
 /*
- * $Id: proc.cc,v 1.24 2006-04-06 19:46:13 anne Exp $
+ * $Id: proc.cc,v 1.25 2006-06-25 16:19:16 motsak Exp $
  */
 
 #include <stdio.h>
@@ -350,7 +350,27 @@ void  write_procedure_typecheck(
             pi->procname);
 
     fprintf(fmtfp, "\n");
+
+            if(trace)printf("\n\t\terror handling..."); fflush(stdout);
+            
+            fprintf(module->fmtfp, "  goto mod_%s_ok;\n", pi->procname);            
+            
+            
+            fprintf(module->fmtfp, "  mod_%s_error:\n", pi->procname);
+            fprintf(module->fmtfp, "    Werror(\"%s(`%%s`) is not supported\", Tok2Cmdname(__tok));\n",
+                    pi->procname);
+            fprintf(module->fmtfp, "    Werror(\"expected %s(", pi->procname);
+            for (i=0;i<pi->paramcnt; i++) {
+              fprintf(module->fmtfp, "'%s'", pi->param[i].name);
+              if(i!=pi->paramcnt-1) fprintf(module->fmtfp, ",");
+            }
+            fprintf(module->fmtfp, ")\");\n");
+            fprintf(module->fmtfp, "    return TRUE;\n");            
+            
+            fprintf(module->fmtfp, "  mod_%s_ok:\n", pi->procname);                        
+           
   }
+  
 }
 
 /*========================================================================*/
@@ -493,21 +513,6 @@ void write_function_errorhandling(
   
   switch(pi->language) {
       case LANG_C:
-        if(pi->paramcnt>0) {
-          if(pi->flags.typecheck_done) {
-            if(trace)printf("\n\t\terror handling..."); fflush(stdout);
-            fprintf(module->fmtfp, "  mod_%s_error:\n", pi->procname);
-            fprintf(module->fmtfp, "    Werror(\"%s(`%%s`) is not supported\", Tok2Cmdname(__tok));\n",
-                    pi->procname);
-            fprintf(module->fmtfp, "    Werror(\"expected %s(", pi->procname);
-            for (i=0;i<pi->paramcnt; i++) {
-              fprintf(module->fmtfp, "'%s'", pi->param[i].name);
-              if(i!=pi->paramcnt-1) fprintf(module->fmtfp, ",");
-            }
-            fprintf(module->fmtfp, ")\");\n");
-            fprintf(module->fmtfp, "    return TRUE;\n");
-          } 
-        }
         fprintf(module->fmtfp, "}\n\n");
         break;
       case LANG_SINGULAR:
