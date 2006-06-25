@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: creat_top.cc,v 1.23 2006-04-11 19:47:32 anne Exp $ */
+/* $Id: creat_top.cc,v 1.24 2006-06-25 16:06:19 motsak Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -135,7 +135,7 @@ void write_mod_init(
   fprintf(fp, "  struct stat sb; \n\n");
   fprintf(fp, "  tempstr = (char *)omAlloc(strlen(currPack->libname)+5);\n");
   fprintf(fp, "  memset(tempstr,0,strlen(currPack->libname)+5);\n");
-  fprintf(fp, "  tailstr = strchr(currPack->libname,'.');\n");
+  fprintf(fp, "  tailstr = strrchr(currPack->libname,'.');\n");
   fprintf(fp, "  memcpy(tempstr,currPack->libname,strlen(currPack->libname)-strlen(tailstr));\n");
   fprintf(fp, "  memcpy(tempstr+strlen(tempstr),\".bin\",4);\n");
   fprintf(fp, "  ret=stat(tempstr,&sb);\n");
