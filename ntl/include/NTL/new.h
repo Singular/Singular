@@ -12,7 +12,7 @@
 
 #include <new>
 
-#define NTL_NEW_OP new (std::nothrow)
+#define NTL_NEW_OP ::new //(std::nothrow)
 
 
 #else
