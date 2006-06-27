@@ -356,6 +356,27 @@ case "$ac_cv_singuname" in
 	        ac_lib_dl=yes
 	  fi
 	;;
+	#use export MACOSX_DEPLOYMENT_TARGET=10.3
+	ppcMac-darwin)
+	  AC_CHECK_LIB(dl, dlopen)
+          if test "$ac_cv_lib_dl_dlopen" = yes; then
+	  	LD_DYN_FLAGS="-ldl -dynamic"
+	  	SFLAGS="-fpic -DPIC"
+	  	SLDFLAGS="-dynamic -twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup"
+		LD=libtool
+	        ac_lib_dl=yes
+	  fi
+	;;
+	i386Mac-darwin)
+	  AC_CHECK_LIB(dl, dlopen)
+          if test "$ac_cv_lib_dl_dlopen" = yes; then
+	  	LD_DYN_FLAGS="-ldl -dynamic"
+	  	SFLAGS="-fpic -DPIC"
+	  	SLDFLAGS="-dynamic -twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup"
+		LD=libtool
+	        ac_lib_dl=yes
+	  fi
+	;;
 esac
 AC_SUBST(LD_DYN_FLAGS)
 AC_SUBST(SFLAGS)
