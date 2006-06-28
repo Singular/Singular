@@ -17,7 +17,7 @@ int main() {
 #ifdef __GNUC__
 char *p=__VERSION__;
 if (p[0]=='2') printf("gcc2\n");
-else if (p[0]=='3') printf("gcc3\n");
+else if ((p[0]=='3')||(p[0]=='4')) printf("gcc3\n");
 else printf("gcc_unknown\n");
 #else
 printf("unknown\n");
