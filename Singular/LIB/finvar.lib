@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.46 2006-06-27 17:33:01 Singular Exp $"
+version="$Id: finvar.lib,v 1.47 2006-06-28 14:49:29 Singular Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -73,7 +73,9 @@ LIB "algebra.lib";
 proc unique (list #)
 { int s=size(#); def m=#[s];
   for (int i=1;i<s;i++)
-  { if (#[i]==m) { return(0); } }
+  { if (#[i]==m)
+    { return(0); }
+  }
   return(1);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -4558,7 +4560,6 @@ EXAMPLE:  example secondary_char0; shows an example
   ideal ProdCand;
   ideal Mul1,Mul2;
   ideal Reductor,SaveRed;
-  int SizeSave;
   list ISSort;
   poly helpP;
   ideal helpI;
@@ -4598,7 +4599,6 @@ EXAMPLE:  example secondary_char0; shows an example
       Reductor = ideal(0);
       helpint = 0;
       SaveRed = Reductor;
-      SizeSave = 0;
       attrib(Reductor,"isSB",1);
       attrib(SaveRed,"isSB",1);
       for (k=1;k<i-1;k++)
@@ -4651,10 +4651,7 @@ EXAMPLE:  example secondary_char0; shows an example
                       attrib(Reductor, "isSB",1);
                       if (ncols(Reductor)>100)
                       { Indicator=reduce(Indicator,Reductor);
-                        for (k3=ncols(Reductor);k3>=1;k3--)
-                        { SaveRed[SizeSave+k3] = Reductor[k3];
-                        }
-                        SizeSave=SizeSave+ncols(Reductor);
+                        SaveRed = SaveRed + Reductor;
                         Reductor = ideal(0);
                         helpint = 0;
                         attrib(SaveRed, "isSB",1);
@@ -4667,10 +4664,7 @@ EXAMPLE:  example secondary_char0; shows an example
                   }
                 }
               }
-              for (k3=size(Reductor);k3>=1;k3--)
-              { SaveRed[SizeSave+k3] = Reductor[k3];
-              }
-              SizeSave=SizeSave+size(Reductor);
+              SaveRed = SaveRed + Reductor;
               attrib(SaveRed, "isSB",1);
             }
           }
@@ -4731,10 +4725,7 @@ EXAMPLE:  example secondary_char0; shows an example
               attrib(Reductor, "isSB",1);
               if (ncols(Reductor)>100)
               { Indicator=reduce(Indicator,Reductor);
-                for (k3=ncols(Reductor);k3>=1;k3--)
-                { SaveRed[SizeSave+k3] = Reductor[k3];
-                }
-                SizeSave=SizeSave+ncols(Reductor);
+                SaveRed = SaveRed + Reductor;
                 Reductor = ideal(0);
                 attrib(SaveRed, "isSB",1);
                 attrib(Reductor, "isSB",1);
@@ -4754,20 +4745,23 @@ EXAMPLE:  example secondary_char0; shows an example
   }
   degBound = dgb;
 
-  ideal S=1;
+  int TotalNumber;
+  for (k=1;k<=m;k++){ TotalNumber = TotalNumber + int(dimmat[k,1]);}
+  matrix S[1][TotalNumber];
+  S[1,1]=1;
   j=1;
   for (k=1;k<m;k++)
   { for (k2=1;k2<=k;k2++)
     { if (typeof(attrib(SSort[k][k2],"size"))=="int")
      {for (i=1;i<=attrib(SSort[k][k2],"size");i++)
       { j++;
-        S[j] = SSort[k][k2][i];
+        S[1,j] = SSort[k][k2][i];
       }
       SSort[k][k2]=ideal();
      }
     }
   }
-  return(matrix(S),matrix(compress(IS)));
+  return(S,matrix(compress(IS)));
 }
 
 
@@ -5027,7 +5021,7 @@ EXAMPLE:  example irred_secondary_char0; shows an example
                         // if Reductor becomes too large, we reduce the whole of Indicator by
                         // it, save it in SaveRed, and work with a smaller Reductor. This turns
                         // out to save a little time.
-                      if (size(Reductor)>100)
+                      if (ncols(Reductor)>100)
                       { Indicator=reduce(Indicator,Reductor);
                         SaveRed = SaveRed + Reductor;
                         Reductor = ideal(0);
@@ -5103,7 +5097,7 @@ EXAMPLE:  example irred_secondary_char0; shows an example
               }
               Reductor = Reductor, helpP;
               attrib(Reductor, "isSB",1);
-              if (size(Reductor)>100)
+              if (ncols(Reductor)>100)
               { Indicator=reduce(Indicator,Reductor);
                 SaveRed = SaveRed + Reductor;
                 Reductor = ideal(0);
@@ -6701,6 +6695,7 @@ example
          print(image_of_variety(I,F));
 }
 ///////////////////////////////////////////////////////////////////////////////
+
 
 
 
