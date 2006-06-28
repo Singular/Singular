@@ -1323,7 +1323,7 @@ cross_compiling=$ac_cv_prog_cc_cross
 fi
 
 # check whether the compiler accepts -pipe
-if test x$ac_cv_c_cpp == xgcc2 -o  x$ac_cv_c_cpp == xgcc3
+if test x$ac_cv_c_cpp = xgcc2 -o  x$ac_cv_c_cpp = xgcc3
 then
   echo $ac_n "checking whether compiler accepts -pipe""... $ac_c" 1>&6
 echo "configure:1330: checking whether compiler accepts -pipe" >&5

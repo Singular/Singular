@@ -149,7 +149,7 @@ if test "${GXX}" = yes && test "${ac_cxx_set}" = no; then
 fi
 
 # check whether the compiler accepts -pipe
-if test x$ac_cv_c_cpp == xgcc2 -o  x$ac_cv_c_cpp == xgcc3
+if test x$ac_cv_c_cpp = xgcc2 -o  x$ac_cv_c_cpp = xgcc3
 then
   AC_MSG_CHECKING(whether compiler accepts -pipe)
   temp_cflags=${CFLAGS}
