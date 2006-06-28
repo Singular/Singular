@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.19 2006-04-06 12:42:56 Singular Exp $ */
+/* $Id: ideals.cc,v 1.20 2006-06-28 15:06:49 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -3319,14 +3319,14 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
   return s_temp1;
 }
 
-int idElem(ideal F)
+int idElem(const ideal F)
 {
-  int i=0,j=0;
+  int i=0,j=IDELEMS(F)-1;
 
-  while(j<IDELEMS(F))
+  while(j>=0)
   {
-   if ((F->m)[j]!=NULL) i++;
-   j++;
+    if ((F->m)[j]!=NULL) i++;
+    j--;
   }
   return i;
 }

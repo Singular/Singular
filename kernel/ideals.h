@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.4 2005-05-13 15:18:52 Singular Exp $ */
+/* $Id: ideals.h,v 1.5 2006-06-28 15:06:49 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -143,7 +143,7 @@ matrix  idDiffOp(ideal I, ideal J,BOOLEAN multiply=TRUE);
 
 intvec *idSort(ideal id,BOOLEAN nolex=TRUE);
 ideal   idModulo (ideal h1,ideal h2, tHomog h=testHomog, intvec ** w=NULL);
-int     idElem(ideal F);
+int     idElem(const ideal F);
 matrix  idCoeffOfKBase(ideal arg, ideal kbase, poly how);
 ideal   idTransp(ideal a);
 
