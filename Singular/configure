@@ -1230,7 +1230,7 @@ if test "${GXX}" = yes && test "${ac_cxx_set}" = no; then
   elif test "${ac_cv_c_cpp}" = gcc3; then
     CXX=g++
   fi
-  temp_cflags=${CXXFLAGS}
+  temp_flags=${CXXFLAGS}
   
   ac_ext=C
 # CXXFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
@@ -1316,7 +1316,7 @@ ac_compile='${CC-cc} -c $CFLAGS $CPPFLAGS conftest.$ac_ext 1>&5'
 ac_link='${CC-cc} -o conftest${ac_exeext} $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
 cross_compiling=$ac_cv_prog_cc_cross
 
-  #CXXFLAGS=$temp_flags
+  CXXFLAGS=$temp_flags
   #here is broking something
   #uncommented breaks CXXFLAGS variable set
   #only pipes would remain then in CXXFLAGS

@@ -112,7 +112,7 @@ if test "${GXX}" = yes && test "${ac_cxx_set}" = no; then
   elif test "${ac_cv_c_cpp}" = gcc3; then
     CXX=g++
   fi
-  temp_cflags=${CXXFLAGS}
+  temp_flags=${CXXFLAGS}
   AC_LANG_SAVE
   AC_LANG_CPLUSPLUS
   # check whether gcc accepts --no-rtti
@@ -142,7 +142,7 @@ if test "${GXX}" = yes && test "${ac_cxx_set}" = no; then
   fi
 
   AC_LANG_RESTORE
-  #CXXFLAGS=$temp_flags
+  CXXFLAGS=$temp_flags
   #here is broking something
   #uncommented breaks CXXFLAGS variable set
   #only pipes would remain then in CXXFLAGS
