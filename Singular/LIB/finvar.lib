@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.47 2006-06-28 14:49:29 Singular Exp $"
+version="$Id: finvar.lib,v 1.48 2006-06-29 11:47:54 Singular Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -6417,146 +6417,151 @@ proc rel_orbit_variety(ideal I,matrix F,list #)
 @*          I: an <ideal> invariant under the action of a group,
 @*          F: a 1xm <matrix> defining the invariant ring of this group.
 @*          s: optional <string>; if s is present then (for downward
-               compatibility) the old procedure <relative_orbit_variety>
-               is called, and in this case s gives the name of a new <ring>.
+                compatibility) the old procedure <relative_orbit_variety>
+                is called, and in this case s gives the name of a new
+<ring>.
 RETURN:   Without optional s, a list L of two rings is returned.
 @*        The ring L[1] carries a weighted degree order with variables
-            y(1..m), the weight of y(k) equal to the degree of the
-            k-th generators F[1,k] of the invariant ring.
-            L[1] contains a Groebner basis (type <ideal>, named G) of the
-            ideal defining the relative orbit variety with  respect to I.
-@*        The ring L[2] has the variables of the basering together with y(1..m)
-            and carries a block order: The first block is the order of the
-            basering, the second is the weighted degree order occuring in L[1].
-            L[2] contains G and a Groebner basis (type <ideal>, named Conv)
-            such that if p is any invariant polynomial expressed in the
-            variables of the basering then reduce(p,Conv) is a polynomial in
-            the new variables y(1..m) such that evaluation at the generators
-            of the invariant ring yields p. This can be used to avoid the
-            application of <algebra_containment>
-            (see @ref{algebra_containment}).
+             y(1..m), the weight of y(k) equal to the degree of the
+             k-th generators F[1,k] of the invariant ring.
+             L[1] contains a Groebner basis (type <ideal>, named G) of
+             the ideal defining the relative orbit variety with
+             respect to I.
+@*        The ring L[2] has the variables of the basering together with
+             y(1..m)and carries a block order: The first block is the
+             order of the basering, the second is the weighted degree
+             order occuring in L[1].
+             L[2] contains G and a Groebner basis (type <ideal>, named
+             Conv) such that if p is any invariant polynomial expressed
+             in the variables of the basering then reduce(p,Conv) is a
+             polynomial in the new variables y(1..m) such that evaluation
+             at the generators of the invariant ring yields p. This can
+             be used to avoid the application of <algebra_containment>
+             (see @ref{algebra_containment}).
 @*        For the case of optional s, see @ref{relative_orbit_variety}.
-THEORY:   A Groebner basis of the ideal of algebraic relations of the invariant
-          ring generators is calculated, then one of the basis elements plus
-          the ideal generators. The variables of the original ring are
-          eliminated and the polynomials that are left define the relative
-          orbit variety with respect to I. The elimination is done by a
-          weighted blockorder that has the advantage of dealing with
-          quasi-homogeneous ideals.
-NOTE:     We provide the ring L[1] for the sake of downward compatibility,
-          since it is closer to the ring returned by relative_orbit_variety
-          than L[2]. However, L[1] carries a weighted degree order, whereas
-          the ring returned by relative_orbit_variety is lexicographically
-          ordered.
+THEORY:   A Groebner basis of the ideal of algebraic relations of the
+             invariant ring generators is calculated, then one of the
+             basis elements plus the ideal generators. The variables of
+             the original ring are eliminated and the polynomials that
+             are left define the relative orbit variety with respect to
+             I. The elimination is done by a weighted blockorder that has
+             the advantage of dealing with quasi-homogeneous ideals.
+NOTE:     We provide the ring L[1] for the sake of downward
+             compatibility, since it is closer to the ring returned by
+             relative_orbit_variety than L[2]. However, L[1] carries a
+             weighted degree order, whereas the ring returned by
+             relative_orbit_variety is lexicographically ordered.
 SEE ALSO: relative_orbit_variety
 EXAMPLE:  example rel_orbit_variety; shows an example.
 "
 { if (size(#)>0)
-  { if (typeof(#[1])=="string")
-    { relative_orbit_variety(I,F,#[1]);
-      keepring basering;
-      return();
-    }
-    else
-    { "ERROR:    the third parameter may either be empty or a <string>.";
-      return();
-    }
-  }
-  degBound=0;
-  if (nrows(F)==1)
-  { option(redSB);
-    def br=basering;
-    int n=nvars(br);
-    int m=ncols(F);
-    // In the following ring definition, any elimination order would work.
-    list rlist = ringlist(br);
-    int i;
-    for (i=1;i<=m;i++)
-    { rlist[2][n+i]="y("+string(i)+")";
-    }
-    rlist[3][size(rlist[3])+1] = rlist[3][size(rlist[3])];
-    rlist[3][size(rlist[3])-1][1] = "wp";
-    rlist[3][size(rlist[3])-1][2] = degvec(ideal(F));
-    def newring = ring(rlist);
+   { if (typeof(#[1])=="string")
+     { relative_orbit_variety(I,F,#[1]);
+       keepring basering;
+       return();
+     }
+     else
+     { "ERROR:    the third parameter may either be empty or a string>.";
+       return();
+     }
+   }
+   degBound=0;
+   if (nrows(F)==1)
+   { option(redSB);
+     def br=basering;
+     int n=nvars(br);
+     int m=ncols(F);
+     // In the following ring definition, any elimination order
+     // would work.
+     list rlist = ringlist(br);
+     int i;
+     for (i=1;i<=m;i++)
+     { rlist[2][n+i]="y("+string(i)+")";
+     }
+     rlist[3][size(rlist[3])+1] = rlist[3][size(rlist[3])];
+     rlist[3][size(rlist[3])-1][1] = "wp";
+     rlist[3][size(rlist[3])-1][2] = degvec(ideal(F));
+     def newring = ring(rlist);
 
-    list smallrlist;
-    smallrlist[1]=rlist[1];
-    smallrlist[2]=list();
-    for (i=1;i<=m;i++)
-    { smallrlist[2][i]="y("+string(i)+")";
-    }
-    smallrlist[3]=list();
-    smallrlist[3][1]=list();
-    smallrlist[3][1][1] = "wp";
-    smallrlist[3][1][2] = degvec(ideal(F));
-    smallrlist[3][2] = rlist[3][size(rlist[3])];
-    smallrlist[4] = rlist[4];
-    def smallring = ring(smallrlist);
+     list smallrlist;
+     smallrlist[1]=rlist[1];
+     smallrlist[2]=list();
+     for (i=1;i<=m;i++)
+     { smallrlist[2][i]="y("+string(i)+")";
+     }
+     smallrlist[3]=list();
+     smallrlist[3][1]=list();
+     smallrlist[3][1][1] = "wp";
+     smallrlist[3][1][2] = degvec(ideal(F));
+     smallrlist[3][2] = rlist[3][size(rlist[3])];
+     smallrlist[4] = rlist[4];
+     def smallring = ring(smallrlist);
 
-    setring(newring);
-    ideal J=ideal(imap(br,F));
-    ideal I=imap(br,I);
-    for (i=1;i<=m;i++)
-    { J[i]=J[i]-y(i);
-    }
-    // We chose the weighted block order since this makes J quasi-homogeneous!
-    ideal Conv=slimgb(J);
-    J=Conv,I;
-    J=slimgb(J); //or J=std(J); or J=groebner(J); etc.
-    ideal vars;
-    vars[n]=0;
-    vars=vars,y(1..m);
-    map emb=newring,vars;
-    ideal G=emb(J);
-    J=J-G;
-    for (i=1;i<=ncols(G);i++)
-    { if (J[i]<>0)
-      { G[i]=0;
-      }
-    }
-    G=compress(G);
-    vars=ideal();
-    for (i=2;i<=n;i++)
-    { vars[i]=0;
-    }
-    vars=vars,y(1..m);
-    emb=newring,vars;
-    G=compress(emb(G));
-    export(G);
-    export(Conv);
+     setring(newring);
+     ideal J=ideal(imap(br,F));
+     ideal I=imap(br,I);
+     for (i=1;i<=m;i++)
+     { J[i]=J[i]-y(i);
+     }
+     // We chose the weighted block order since this makes J
+     // quasi-homogeneous!
+     ideal Conv=groebner(J);
+     J=Conv,I;
+     J=J=groebner(J);
+     ideal vars;
+     vars[n]=0;
+     vars=vars,y(1..m);
+     map emb=newring,vars;
+     ideal G=emb(J);
+     J=J-G;
+     for (i=1;i<=ncols(G);i++)
+     { if (J[i]<>0)
+       { G[i]=0;
+       }
+     }
+     G=compress(G);
+     vars=ideal();
+     for (i=2;i<=n;i++)
+     { vars[i]=0;
+     }
+     vars=vars,y(1..m);
+     emb=newring,vars;
+     G=compress(emb(G));
+     export(G);
+     export(Conv);
 
-    setring(smallring);
-    ideal G = compress(imap(newring,G));
-    export(G);
+     setring(smallring);
+     ideal G = compress(imap(newring,G));
+     export(G);
 
-    list L;
-    L[1]=smallring;
-    L[2]=newring;
+     list L;
+     L[1]=smallring;
+     L[2]=newring;
 
-    dbprint( printlevel-voice+3,"
+     dbprint( printlevel-voice+3,"
 // 'rel_orbit_variety' created a list of two rings.
 // If L is the name of that list, you can access
 // the first ring by
 //   def R = L[1]; setring R;
 // (similarly for the second ring)");
-    return(L);
-  }
-  else
-  { "ERROR:   the <matrix> may only have one row";
-    return();
-  }
+     return(L);
+   }
+   else
+   { "ERROR:   the <matrix> may only have one row";
+     return();
+   }
 }
 example
 { "EXAMPLE: Sturmfels: Algorithms in Invariant Theory 2.6.3:"; echo=2;
-         ring R=0,(x,y,z),dp;
-         matrix F[1][3]=x+y+z,xy+xz+yz,xyz;
-         ideal I=x2+y2+z2-1,x2y+y2z+z2x-2x-2y-2z,xy2+yz2+zx2-2x-2y-2z;
-         list L = rel_orbit_variety(I,F);
-         def AllR = L[2];
-         setring(AllR);
-         print(G);
-         print(Conv);
-         basering;
+          ring R=0,(x,y,z),dp;
+          matrix F[1][3]=x+y+z,xy+xz+yz,xyz;
+          ideal I=x2+y2+z2-1,x2y+y2z+z2x-2x-2y-2z,xy2+yz2+zx2-2x-2y-2z;
+          list L = rel_orbit_variety(I,F);
+          def AllR = L[2];
+          setring(AllR);
+          print(G);
+          print(Conv);
+          basering;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
