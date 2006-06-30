@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.96 2006-06-08 08:12:51 bricken Exp $ */
+/* $Id: tgb.cc,v 1.97 2006-06-30 08:43:31 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -319,7 +319,43 @@ int kSBucketLength(kBucket* b)
   return s*c;
 }
 #endif
+
+static BOOLEAN elength_is_normal_length(poly p, slimgb_alg* c){
+    ring r=c->r;
+    if (p_GetComp(p,r)!=0) return FALSE;
+    if (c->lastDpBlockStart<=pVariables){
+        int i;
+        for(i=1;i<=pVariables;i++){
+            if (p_GetExp(p,i,r)!=0){
+                break;
+            }
+        }
+        if (i>=c->lastDpBlockStart) {
+        //wrp(p);
+        //PrintS("\n");
+        return TRUE;
+        }
+        else return FALSE;
+    }else 
+    return FALSE;
+}
+static BOOLEAN get_last_dp_block_start(ring r){
+    //ring r=c->r;
+    int last_block;
+    
+    if (rRing_has_CompLastBlock(r)){
+        last_block=rBlocks(r) - 3;
+    }
+    else {last_block=rBlocks(r)-2;}
+    assume(last_block>=0);
+    if (r->order[last_block]==ringorder_dp)
+        return r->block0[last_block];
+    return pVariables+1;
+
+}
+
 static wlen_type do_pELength(poly p, slimgb_alg* c, int dlm=-1){
+
   if(p==NULL) return 0;
   wlen_type s=0;
   poly pi=p;
@@ -368,18 +404,29 @@ wlen_type kEBucketLength(kBucket* b, poly lm,slimgb_alg* ca)
     lm=kBucketGetLm(b);
   }
   if(lm==NULL) return 0;
+  if(elength_is_normal_length(lm,ca)) {
+    return bucket_guess(b);
+  }
   int d=pTotaldegree(lm,ca->r);
   int i;
   for (i=b->buckets_used;i>=0;i--)
   {
     if(b->buckets[i]==NULL) continue;
+    
+    if ((pTotaldegree(b->buckets[i])<=d) &&(elength_is_normal_length(b->buckets[i],ca))){
+        s+=b->buckets_length[i];
+    } else
+    {
     s+=do_pELength(b->buckets[i],ca,d);
+    }
   }
   return s;
 }
 
 static inline int pELength(poly p, slimgb_alg* c,int l){
   if (p==NULL) return 0;
+  if ((l>0) &&(elength_is_normal_length(p,c)))
+    return l;
   return do_pELength(p,c);
 }
 
@@ -2110,7 +2157,8 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
   this->syz_comp=syz_comp;
   r=currRing;
   nc=rIsPluralRing(r);
-
+  this->lastDpBlockStart=get_last_dp_block_start(r);
+  //Print("last dp Block start: %i\n", this->lastDpBlockStart);
   is_homog=TRUE;
   {
     int hz;
