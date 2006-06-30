@@ -400,6 +400,13 @@ setring F3;
 list L=essdevelop((x3-xy2+y3)*(x2+y2)*(x4-x3y+xy3+y4));
 L[2];
 def HNring = L[1]; setring HNring; displayHNE(hne);
+def rr=r;
+map T; int ii;
+for (ii=1; ii<=size(hne); ii++) {
+ T=basering,param(hne[ii]);
+ T(f);
+}
+kill T,f,ii;
 setring F3;
 kill HNring;
 L=essdevelop(x2+y3+xy4);
@@ -415,6 +422,7 @@ def HNring = L[1]; setring HNring;  displayHNE(hne);
 show(extdevelop(hne[1],8));          // Fehler in factorize endlos!
 map T=basering,param(hne[1]);
 T(f);
+kill T;
 setring r; kill HNring;
 L=hnexpansion((x2+iy3)^6+x15);     // Als Ersatz fuer die Zwischenzeit
 def HNring = L[1]; setring HNring;
