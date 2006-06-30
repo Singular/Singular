@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.403 2006-06-13 14:29:11 Singular Exp $ */
+/* $Id: iparith.cc,v 1.404 2006-06-30 16:07:54 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3273,7 +3273,7 @@ static BOOLEAN jjDEG_M(leftv res, leftv u)
   int d=-1;
   int dummy;
   int i;
-  for(i=IDELEMS(I);i>=0;i--)
+  for(i=IDELEMS(I)-1;i>=0;i--)
     if (I->m[i]!=NULL) d=si_max(d,(int)pLDeg(I->m[i],&dummy,currRing));
   res->data = (char *)d;
   return FALSE;
