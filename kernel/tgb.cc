@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.97 2006-06-30 08:43:31 bricken Exp $ */
+/* $Id: tgb.cc,v 1.98 2006-06-30 08:45:44 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -319,7 +319,7 @@ int kSBucketLength(kBucket* b)
   return s*c;
 }
 #endif
-
+//BUG/TODO this stuff will fail on internal Schreyer orderings
 static BOOLEAN elength_is_normal_length(poly p, slimgb_alg* c){
     ring r=c->r;
     if (p_GetComp(p,r)!=0) return FALSE;
