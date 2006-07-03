@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.98 2006-06-30 08:45:44 bricken Exp $ */
+/* $Id: tgb.cc,v 1.99 2006-07-03 05:12:55 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -171,7 +171,7 @@ int QlogSize(number n){
 #ifdef LEN_VAR3
 inline wlen_type pSLength(poly p,int l)
 {
-  int c;
+  wlen_type c;
   number coef=pGetCoeff(p);
   if (rField_is_Q(currRing)){
     c=QlogSize(coef);
@@ -191,7 +191,7 @@ inline wlen_type pSLength(poly p,int l)
 wlen_type kSBucketLength(kBucket* b, poly lm=NULL)
 {
   int s=0;
-  int c;
+  wlen_type c;
   number coef;
   if(lm==NULL)
     coef=pGetCoeff(kBucketGetLm(b));
@@ -439,14 +439,16 @@ static inline wlen_type pQuality(poly p, slimgb_alg* c, int l=-1){
     l=pLength(p);
   if(c->isDifficultField) {
     if(c->eliminationProblem){
-      int cs;
+      wlen_type cs;
       number coef=pGetCoeff(p);
       if (rField_is_Q(currRing)){
          cs=QlogSize(coef);
       }
       else
-     cs=nSize(coef);
+        cs=nSize(coef);
      wlen_type erg=cs;
+     if(TEST_V_COEFSTRAT)
+        erg*=cs;
      //erg*=cs;//for quadratic
      erg*=pELength(p,c,l);
     //FIXME: not quadratic coeff size
@@ -479,7 +481,7 @@ wlen_type red_object::guess_quality(slimgb_alg* c){
     if (c->isDifficultField){
       //s=kSBucketLength(bucket,this->p);
       if(c->eliminationProblem){
-    int cs;
+    wlen_type cs;
     number coef;
 
     coef=pGetCoeff(kBucketGetLm(bucket));
@@ -506,6 +508,8 @@ wlen_type red_object::guess_quality(slimgb_alg* c){
     wlen_type erg=kEBucketLength(this->bucket,this->p,c);
     //erg*=cs;//for quadratic
     erg*=cs;
+    if (TEST_V_COEFSTRAT)
+        erg*=cs;
     //return cs*kEBucketLength(this->bucket,this->p,c);
     return erg;
       }
@@ -701,12 +705,12 @@ static BOOLEAN trivial_syzygie(int pos1,int pos2,poly bound,slimgb_alg* c){
 }
 
 //! returns position sets w as weight
-int find_best(red_object* r,int l, int u, int &w, slimgb_alg* c){
+int find_best(red_object* r,int l, int u, wlen_type &w, slimgb_alg* c){
   int best=l;
   int i;
   w=r[l].guess_quality(c);
   for(i=l+1;i<=u;i++){
-    int w2=r[i].guess_quality(c);
+    wlen_type w2=r[i].guess_quality(c);
     if(w2<w){
       w=w2;
       best=i;
@@ -2861,17 +2865,17 @@ static poly kBucketGcd(kBucket* b, ring r)
 
 
 
-static inline int quality_of_pos_in_strat_S(int pos, slimgb_alg* c){
+static inline wlen_type quality_of_pos_in_strat_S(int pos, slimgb_alg* c){
   if (c->strat->lenSw!=NULL) return c->strat->lenSw[pos];
   return c->strat->lenS[pos];
 }
-static inline int quality_of_pos_in_strat_S_mult_high(int pos, poly high, slimgb_alg* c)
+static inline wlen_type quality_of_pos_in_strat_S_mult_high(int pos, poly high, slimgb_alg* c)
   //meant only for nc
 {
   poly m=pOne();
   pExpVectorDiff(m,high ,c->strat->S[pos]);
   poly product=nc_mm_Mult_p(m, pCopy(c->strat->S[pos]), c->r);
-  int erg=pQuality(product,c);
+  wlen_type erg=pQuality(product,c);
   pDelete(&m);
   pDelete(&product);
   return erg;
@@ -2884,7 +2888,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
     if(pLmEqual(c->strat->S[erg.reduce_by],los[erg.to_reduce_u].p))
     {
       int i;
-      int quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
+      wlen_type quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
       int best=erg.to_reduce_u+1;
 /*
       for (i=erg.to_reduce_u;i>=erg.to_reduce_l;i--){
@@ -2895,7 +2899,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
   }
       }
       if(best!=erg.to_reduce_u+1){*/
-      int qc;
+      wlen_type qc;
       best=find_best(los,erg.to_reduce_l,erg.to_reduce_u,qc,c);
       if(qc<quality_a){
   los[best].flatten();
@@ -2922,11 +2926,11 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
       if (erg.to_reduce_u>erg.to_reduce_l){
 
   int i;
-  int quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
+  wlen_type quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
   if (c->nc)
     quality_a=quality_of_pos_in_strat_S_mult_high(erg.reduce_by, los[erg.to_reduce_u].p, c);
   int best=erg.to_reduce_u+1;
-  int qc;
+  wlen_type qc;
   best=find_best(los,erg.to_reduce_l,erg.to_reduce_u,qc,c);
   assume(qc==los[best].guess_quality(c));
   if(qc<quality_a){
@@ -3000,7 +3004,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
       assume(erg.reduce_by==erg.to_reduce_u+1);
       int best=erg.reduce_by;
       wlen_type quality_a=los[erg.reduce_by].guess_quality(c);
-      int qc;
+      wlen_type qc;
       best=find_best(los,erg.to_reduce_l,erg.to_reduce_u,qc,c);
 
       int i;
@@ -3021,8 +3025,8 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
       //further assume, that reduce_by is the above all other polys
       //with same leading term
       int il=erg.reduce_by;
-      int quality_a =los[erg.reduce_by].guess_quality(c);
-      int qc;
+      wlen_type quality_a =los[erg.reduce_by].guess_quality(c);
+      wlen_type qc;
       while((il>0) && pLmEqual(los[il-1].p,los[il].p)){
   il--;
   qc=los[il].guess_quality(c);
