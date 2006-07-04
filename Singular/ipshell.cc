@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.138 2006-06-09 16:24:40 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.139 2006-07-04 07:12:40 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -965,10 +965,22 @@ int iiRegularity(lists L)
 
   if (r==NULL)
     return -2;
-  intvec * dummy=syBetti(r,len,&reg);
-  omFreeSize((ADDRESS)r,len*sizeof(ideal));
+  intvec *weights=NULL;
+  int add_row_shift=0;
+  intvec *ww=(intvec *)atGet(&(L->m[0]),"isHomog",INTVEC_CMD);
+  if (ww!=NULL)
+  {
+     weights=ivCopy(ww);
+     add_row_shift = ww->min_in();
+     (*weights) -= add_row_shift;
+  }
+  //Print("attr:%x\n",weights);
+
+  intvec *dummy=syBetti(r,len,&reg,weights);
+  if (weights!=NULL) delete weights;
   delete dummy;
-  return reg+1;
+  omFreeSize((ADDRESS)r,len*sizeof(ideal));
+  return reg+1+add_row_shift;
 }
 
 BOOLEAN iiDebugMarker=TRUE;
