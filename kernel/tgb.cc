@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.99 2006-07-03 05:12:55 bricken Exp $ */
+/* $Id: tgb.cc,v 1.100 2006-07-06 07:00:15 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -142,7 +142,6 @@ int kSBucketLength(kBucket* b, poly lm)
 #endif
 
 
-// 3.Variante: Laenge: Platz fuer Leitk * Monomanzahl
 
 
 
@@ -3421,6 +3420,7 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
   c->apairs=spn_merge(c->apairs,c->pair_top+1,pairs,delay_s,c);
   c->pair_top+=delay_s;
   omfree(delay);
+  omfree(pairs);
   return;
 }
 void red_object::flatten(){
