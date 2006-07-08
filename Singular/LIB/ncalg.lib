@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncalg.lib,v 1.16 2006-05-05 14:34:01 motsak Exp $";
+version="$Id: ncalg.lib,v 1.17 2006-07-08 22:53:04 motsak Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  ncalg.lib      Definitions of important GR-algebras
@@ -283,7 +283,7 @@ EXAMPLE: example makeUg2; shows examples
 example
 { "EXAMPLE:"; echo = 2;
    def a = makeUg2();
-   setring a;  a;
+   setring a;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -711,7 +711,6 @@ example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUso5();
    setring ncAlgebra;
-   ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -850,7 +849,6 @@ example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUso7();
    setring ncAlgebra;
-   ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -1146,7 +1144,6 @@ example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUso9();
    setring ncAlgebra;
-   ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -1701,7 +1698,6 @@ example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUso11();
    setring ncAlgebra;
-   ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -1935,7 +1931,6 @@ example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUsp3();
    setring ncAlgebra;
-   ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -2231,7 +2226,6 @@ example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUsp4();
    setring ncAlgebra;
-   ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -2786,7 +2780,6 @@ example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUsp5();
    setring ncAlgebra;
-   ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -2878,7 +2871,6 @@ example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUso6();
    setring ncAlgebra;
-   ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -3090,7 +3082,6 @@ example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUso8();
    setring ncAlgebra;
-   ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -3512,7 +3503,6 @@ example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUso10();
    setring ncAlgebra;
-   ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -4258,7 +4248,6 @@ example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUso12();
    setring ncAlgebra;
-   ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -4842,7 +4831,6 @@ example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUf4();
    setring ncAlgebra;
-   ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -5882,7 +5870,6 @@ example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUe6();
    setring ncAlgebra;
-   ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -8455,7 +8442,6 @@ example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUe7();
    setring ncAlgebra;
-   ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -16239,6 +16225,5 @@ example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUe8();
    setring ncAlgebra;
-   ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
