@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.267 2006-07-14 15:11:48 Singular Exp $
+@comment $Id: reference.doc,v 1.268 2006-07-14 15:12:42 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -45,7 +45,7 @@ The general syntax of a function is
                    [target =] function_name (<arguments>);
 @end format
 If no target is specified, the result is printed.
-In some cases (e.g., @code{export}, @code{keepring}, 
+In some cases (e.g., @code{export}, @code{keepring},
 @code{setring}, @code{type}) the brackets are optional. For the commands
 @code{kill}, @code{help}, @code{break}, @code{quit}, @code{exit}
 and @code{LIB} no brackets are allowed.
@@ -401,7 +401,7 @@ generator in the first module.
 @*For the computation betti uses only the initial monomials. This could lead
 to confusing results for a non-homogeneous input.
 
-If the optional second argument is non-zero, the Betti numbers will be minimized. 
+If the optional second argument is non-zero, the Betti numbers will be minimized.
 @c If it is 0 then the Betti numbers correspond exactly to the input -
 @c otherwise the command is identical to the one-argument form.
 @item @strong{Example:}
@@ -1334,7 +1334,7 @@ See
 the same as the type of the first argument
 @item @strong{Purpose:}
 eliminates variables occurring as factors of the second argument from an
-ideal (resp.@: a submodule of a free module), by intersecting it 
+ideal (resp.@: a submodule of a free module), by intersecting it
 (resp. each component of the submodule) with the subring not containing these variables.
 @c comment: GMG insisted on changing the definition
 @c eliminates variables occurring as factors of the second argument from an
@@ -3127,7 +3127,7 @@ See
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-reads a library of procedures from a file. In contrast to the command 
+reads a library of procedures from a file. In contrast to the command
 @code{load}, the procedures from the library are added to the package
 @code{Top} as well as the package corresponding to the library.
 If the given filename does
@@ -5290,7 +5290,7 @@ See
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
-decomposes a ring/qring into a list of 4 (or 6 in the noncommutative case, 
+decomposes a ring/qring into a list of 4 (or 6 in the noncommutative case,
 see @ref{ringlist (plural)}) components:
 @enumerate
 @item
@@ -5330,10 +5330,10 @@ the quotient ideal.
  list l = ringlist(r);
  l;
  //  Now change l and create a new ring, by
- //- changing the base field to the function field with parameter a, 
- //- introducing one extra variable y, 
+ //- changing the base field to the function field with parameter a,
+ //- introducing one extra variable y,
  //- defining the block ordering (dp(2),wp(3,4)).
- //- define the minpoly after creating the function field 
+ //- define the minpoly after creating the function field
  l[1]=list(0,list("a"),list(list("lp",1)),ideal(0));
  l[2][size(l[2])+1]="y";
  l[3][3]=l[3][2]; // save the module ordering
@@ -5344,7 +5344,7 @@ the quotient ideal.
  list lra = ringlist(ra);
  lra[1][4]=ideal(a2+1);
  def Ra = ring(lra);
- setring Ra; Ra; 
+ setring Ra; Ra;
 @c example
 @end smallexample
 @end table
@@ -5431,57 +5431,57 @@ See
 @cindex simplex
 @table @code
 @item @strong{Syntax:}
-@code{simplex (} matrix_expression@code{,} int_expression@code{,} 
-int_expression@code{,} int_expression@code{,} int_expression@code{,} 
+@code{simplex (} matrix_expression@code{,} int_expression@code{,}
+int_expression@code{,} int_expression@code{,} int_expression@code{,}
 int_expression@code{)}
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
 perform the simplex algorithm for the tableau given by the input, e.g.
-M,m,n,m1,m2,m3: 
+M,m,n,m1,m2,m3:
 
 @table @asis
-@item  M matrix of numbers : 
-     first row describing the objective function (maximize problem), 
-     the remaining rows describing constraints; 
+@item  M matrix of numbers :
+     first row describing the objective function (maximize problem),
+     the remaining rows describing constraints;
 @item  m,n,m1,m2,m3 int :
-     n = number of variables; 
-     m = total number of constraints; 
-     m1 = number of <=constraints (rows 2 ... m1+1 of M); 
-     m2 = number of >=constraints (rows m1+2 ... m1+m2+1 of M); 
+     n = number of variables;
+     m = total number of constraints;
+     m1 = number of <=constraints (rows 2 ... m1+1 of M);
+     m2 = number of >=constraints (rows m1+2 ... m1+m2+1 of M);
      m3 = number of == constraints.
-@end table 
+@end table
 
-The following assumptions are made: 
+The following assumptions are made:
 @table @asis
-@item   * ground field is of type @code{(real,N)}, N>=4; 
-@item   * the matrix M is of size m x n; 
+@item   * ground field is of type @code{(real,N)}, N>=4;
+@item   * the matrix M is of size m x n;
 @item   * m=m1+m2+m3;
 @item   * the entries M[2,1] ,..., M[m+1,1] are non-negative;
 @item   * the variables x(i) are non-negative;
 @item   * a row  b, a(1) ,..., a(n)  corresponds to  b+a(1)x(1)+...+a(n)x(n);
 @item   * for a <=, >=, or == constraint: add "in mind" >=0, <=0, or ==0.
-@end table   
+@end table
 
-The output is a list L with 
+The output is a list L with
 @table @asis
 @item * L[1] = matrix
-@item * L[2] = int: 
-    0 = finite solution found;  1 = unbounded;  -1 = no solution;  
+@item * L[2] = int:
+    0 = finite solution found;  1 = unbounded;  -1 = no solution;
    -2 = error occured;
-@item * L[3] = intvec :  
-   L[3][k] = number of variable which corresponds to row k+1 of L[1];             
-@item * L[4] = intvec :  
-   L[4][j] = number of variable which is represented by column j+1 of L[1] 
+@item * L[3] = intvec :
+   L[3][k] = number of variable which corresponds to row k+1 of L[1];
+@item * L[4] = intvec :
+   L[4][j] = number of variable which is represented by column j+1 of L[1]
    ("non-basis variable");
-@item * L[5] = int :  
+@item * L[5] = int :
    number of constraints (= m);
-@item * L[6] = int :  
+@item * L[6] = int :
    number of variables (= n).
 @end table
 
-The solution can be read from the first column of L[1] as is done by the 
-procedure @ref{simplexOut} in @code{solve.lib}. 
+The solution can be read from the first column of L[1] as is done by the
+procedure @ref{simplexOut} in @code{solve.lib}.
 
 @item @strong{Example:}
 @smallexample
@@ -5667,11 +5667,11 @@ Currently best results are examples over function fields (parameters).
 
 At this moment the implementation is not optimal for weighted degree orderings.
 
-The program only supports the options @code{prot}, which will give protocol output 
+The program only supports the options @code{prot}, which will give protocol output
 and @code{redSB} for returning a reduced Groebner basis.
 The protocol messages of @code{slimgb} mean the following:
 @* @code{M[n,m]} means a parallel reduction of @code{n} elements with @code{m} non-zero output elements,
-@* @code{b} notices an exchange trick described in the thesis and 
+@* @code{b} notices an exchange trick described in the thesis and
 @* @code{e} adds a reductor with non-minimal leading term.
 
 For an example see @ref{slim Groebner bases}.
@@ -6936,8 +6936,8 @@ See
 @code{exportto(} package_name @code{, }name @code{);}
 @*@code{exportto(} package_name @code{,} list_of_names @code{);}
 @item @strong{Purpose:}
-transfers an identifier in the current package into the one specified by 
-package_name. package_name can be @code{Current}, @code{Top} 
+transfers an identifier in the current package into the one specified by
+package_name. package_name can be @code{Current}, @code{Top}
 or any other identifier of type package.
 
 @item @strong{Note:}
@@ -6945,7 +6945,7 @@ Objects defined in a ring are not automatically exported
 when exporting the ring.
 
 @item @strong{Warning:}
-The identifier is transfered to the other package. It does no longer 
+The identifier is transfered to the other package. It does no longer
 exist in the current package. If the identifier should only be copied,
 @ref{importfrom} should be used instead.
 
@@ -7055,8 +7055,8 @@ See
 @code{importfrom(} package_name @code{, }name @code{);}
 @*@code{importfrom(} package_name @code{,} list_of_names @code{);}
 @item @strong{Purpose:}
-creates a new identifier in the current package which is a copy of the 
-one specified by name in the package package_name. package_name can be 
+creates a new identifier in the current package which is a copy of the
+one specified by name in the package package_name. package_name can be
 @code{Top} or any other identifier of type package.
 
 @item @strong{Note:}
@@ -7065,8 +7065,8 @@ when importing the ring.
 
 @item @strong{Warning:}
 The identifier is copied to the current package. It does still exist
-(independently) in the package package_name. If the identifier should 
-be erased in the package from which it originates, @ref{exportto} should 
+(independently) in the package package_name. If the identifier should
+be erased in the package from which it originates, @ref{exportto} should
 be used instead.
 
 @item @strong{Example:}
@@ -7097,7 +7097,7 @@ See
 @item @strong{Warning:}
 This command is obsolete. Instead the respective identifiers in the ring
 should be exported and the ring itself should subsequently be returned.
-The command is only included for backward compatibility and may be 
+The command is only included for backward compatibility and may be
 removed in future releases.
 
 @item @strong{Purpose:}
@@ -7152,16 +7152,16 @@ none
 @c libraries, by starting up @sc{Singular} with the option @code{-v}, or by
 @c issuing the command @code{system("with");"}.
 reads a library of procedures from a file. In contrast to the command
-@code{LIB}, the command @code{load} does not add the procedures of the 
-library to the package @code{Top}, but only to the package corresponding 
+@code{LIB}, the command @code{load} does not add the procedures of the
+library to the package @code{Top}, but only to the package corresponding
 to the library. If the given filename does
 not start with @kbd{.} or @kbd{/}, the following directories are
-searched for it (in the given order): the current directory, the 
+searched for it (in the given order): the current directory, the
 directories given in the environment variable @code{SINGULARPATH}, some
-default directories relative to the location of the @sc{Singular} 
-executable program, and finally some default absolute directories. 
-You can view the search path which @sc{Singular} uses to locate its 
-libraries, by starting up @sc{Singular} with the option @code{-v}, 
+default directories relative to the location of the @sc{Singular}
+executable program, and finally some default absolute directories.
+You can view the search path which @sc{Singular} uses to locate its
+libraries, by starting up @sc{Singular} with the option @code{-v},
 or by issuing the command @code{system("with");}.
 
 @end table
@@ -7193,7 +7193,7 @@ Only the names of the procedures in the library are loaded, the body of
 the procedures is read during the first call of this procedure. This minimizes
 memory consumption by unused procedures.  When @sc{Singular} is started
 with the @code{-q} or @code{--quiet} option, no message about the
-loading of a library is displayed.  
+loading of a library is displayed.
 
 @smallexample
 @c example

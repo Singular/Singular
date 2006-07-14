@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.132 2006-07-14 15:11:47 Singular Exp $
+@comment $Id: types.doc,v 1.133 2006-07-14 15:12:41 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -484,7 +484,7 @@ standard basis and minimal generating set of an ideal (see @ref{mstd})
 multiplicity, resp.@: degree, of the ideal of leading terms (see @ref{mult})
 @item ncols
 number of columns (see @ref{ncols})
-@item nres 
+@item nres
 computes a free resolution of an ideal resp.@: module M which is
 minimized from the second free module on (see @ref{nres})
 @item preimage
@@ -1992,7 +1992,7 @@ the target of a map is @strong{ALWAYS} the actual basering
 the preimage ring has to be stored "by its name", that means, maps can only be
 used in such contexts, where the name of the preimage ring can be
 resolved (this has to be considered in subprocedures).
-@c (i.e., there might be problems for rings/maps defined in subprocedures). 
+@c (i.e., there might be problems for rings/maps defined in subprocedures).
 See also @ref{Identifier resolution}, @ref{Names in procedures}.
 @end itemize
 
@@ -2219,7 +2219,7 @@ map expressions combined by composition using parentheses (@code{(}, @code{)})
 @table @asis
 @item @code{( )}
 composition of maps. If, for example, @code{f} and @code{g} are maps,
-then @code{f(g)} is a map expression giving the composition 
+then @code{f(g)} is a map expression giving the composition
 @tex
 $f \circ g$
 @end tex
@@ -2254,7 +2254,7 @@ is a map entry (the image of the corresponding variable)
 @cindex map related functions
 
 @table @code
-@item fetch 
+@item fetch
 the identity map between rings and qrings (see @ref{fetch})
 @item imap
 a convenient map procedure for inclusions and projections of rings (see @ref{imap})
@@ -2715,7 +2715,7 @@ minimal free resolution of an ideal resp.@: module w.r.t. a minimal set of gener
 (see @ref{mres})
 @item mult
 multiplicity, resp.@: degree, of the module of leading terms (see @ref{mult})
-@item nres 
+@item nres
 computes a free resolution of an ideal resp.@: module M which is
 minimized from the second free module on (see @ref{nres})
 @item ncols
@@ -3000,12 +3000,12 @@ real part of a complex number
 @cindex ::
 
 The data type package is used to group identifiers into collections.
-It is mainly used as an internal means to avoid collisions of names 
+It is mainly used as an internal means to avoid collisions of names
 of identifiers in libraries with variable names defined by the user.
 The most important package is the toplevel package, called @code{Top}.
-It contains all user defined identifiers as well as all user accessible 
+It contains all user defined identifiers as well as all user accessible
 library procedures. Identifiers which are local to a library are contained
-in a package whose name is obtained from the name of the library, where the 
+in a package whose name is obtained from the name of the library, where the
 first letter is converted to uppercase, the remaining ones to lowercase.
 Another reserved package name is @code{Current} which denotes the current
 package name in use.
@@ -3056,10 +3056,10 @@ defines a package (Only relevant in very special situations).
       generate a copy of an identifier from the specified package in the
       current package
 (see @ref{importfrom})
-@item listvar 
+@item listvar
       list variables currently defined in a given package
 (see @ref{listvar})
-@item load 
+@item load
       load a library or dynamic module
 (see @ref{load})
 @item LIB
@@ -3958,7 +3958,7 @@ coefficients need not be written any vector may be considered
 also as an element of a free module of higher rank.
 (E.g., if @code{f} and @code{g} are polynomials then
 @code{f*gen(1)+g*gen(3)+gen(4)} may also be written as @code{[f,0,g,1]}
-or as @code{[f,0,g,1,0]}.) 
+or as @code{[f,0,g,1,0]}.)
 Note that the elements of a vector have to be
 surrounded by square brackets (@code{[}  , @code{]})
 (cf. @ref{Representation of mathematical objects}).
