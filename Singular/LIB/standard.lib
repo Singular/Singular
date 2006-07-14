@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.76 2005-11-04 14:23:10 Singular Exp $";
+version="$Id: standard.lib,v 1.77 2006-07-14 15:10:54 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -146,13 +146,10 @@ proc groebner(def i, list #)
          @code{groebner (} module_expression@code{,} int_expression @code{)}
 TYPE:    type of the first argument
 PURPOSE: computes the standard basis of the first argument @code{I}
-         (ideal or module), by a heuristically chosen method: if the
-         ordering of the current ring is a local ordering, or if it is a
-         non-block ordering and the current ring has no parameters, then
-         @code{std(I)} is returned. Otherwise, @code{I} is mapped into a
-         ring with no parameters and ordering dp, where its Hilbert series
-         is computed. This is followed by a Hilbert-series based std
-         computation in the original ring.
+         (ideal or module), by a heuristically chosen method: 
+         possiblities are @code{std}, @code{slimgb} and/or conversions
+         based on @code{fglm}, @code{stdhilb} etc.
+         @code{option(prot)} tells about the chosen way.
 NOTE: If a 2nd argument @code{wait} is given, then the computation proceeds
       at most @code{wait} seconds. That is, if no result could be computed in
       @code{wait} seconds, then the computation is interrupted, 0 is returned,
@@ -482,9 +479,8 @@ example
   groebner(i);
   ring rp=(0,a,b),(c,d), lp;
   ideal i=imap(r,i);
-  ideal j=groebner(i);
+  groebner(i);
   option(noprot);
-  j; simplify(j,1); std(i);
   if (system("with","MP")) {groebner(i,0);}
   defined(groebner_error);
 }
@@ -669,8 +665,8 @@ TYPE:    ideal
 SYNTAX:  @code{quot (} module_expression@code{,} ideal_expression @code{)}
 TYPE:    module
 PURPOSE: computes the quotient of the 1st and the 2nd argument.
-         If a 3rd argument 'n' is given the n-th method is used
-         (n=1...5).
+         If a 3rd argument @code{n} is given the @code{n}-th method is used
+         (@code{n}=1...5).
 SEE ALSO: quotient
 EXAMPLE: example quot; shows an example"
 {
@@ -1034,13 +1030,13 @@ example
   ring r=0,(x,y,z),dp;
   module m=[1,y],[0,x+z];
   intmat M=betti(mres(m,0));
-  list l=r,m,M;
+  list l=r,m,matrix(M);
   printf("s:%s,l:%l",1,2);
   printf("s:%s",l);
   printf("s:%s",list(l));
   printf("2l:%2l",list(l));
-  printf("%p",list(l));
-  printf("%;",list(l));
+  printf("%p",matrix(M));
+  printf("%;",matrix(M));
   printf("%b",M);
 }
 
