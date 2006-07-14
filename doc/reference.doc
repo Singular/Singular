@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.268 2006-07-14 15:12:42 Singular Exp $
+@comment $Id: reference.doc,v 1.269 2006-07-14 16:53:57 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3419,7 +3419,7 @@ See
 @item @strong{Syntax:}
 @code{memory (} int_expression @code{)}
 @item @strong{Type:}
-int
+bigint
 @item @strong{Purpose:}
 returns statistics concerning the memory management:
 @itemize @bullet
@@ -3440,11 +3440,11 @@ also @ref{option}).
   poly p=(x(1)+x(500))^50;
   proc ReportMemoryUsage()
   {  "Memory currently used by SINGULAR     :",memory(0),"Byte (",
-     memory(0)/1023, "KByte)" +newline+
+     int(memory(0)/1023), "KByte)" +newline+
      "Memory currently allocated from system:",memory(1), "Byte (",
-     memory(1)/1023, "KByte)";
+     int(memory(1)/1023), "KByte)";
      "Maximal memory allocated from system  :",memory(2), "Byte (",
-     memory(2)/1023, "KByte)";
+     int(memory(2)/1023), "KByte)";
   }
   ReportMemoryUsage();
   kill p;

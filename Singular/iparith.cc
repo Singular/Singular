@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.404 2006-06-30 16:07:54 Singular Exp $ */
+/* $Id: iparith.cc,v 1.405 2006-07-14 16:53:55 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3691,19 +3691,25 @@ static BOOLEAN jjLISTRING(leftv res, leftv v)
   res->data=(char *)r;
   return FALSE;
 }
+#if SIZEOF_LONG == 8
+static number jjBI2N(long d);
+#else
+#define jjBI2N(D) nlInit((int)D)
+#endif
 static BOOLEAN jjMEMORY(leftv res, leftv v)
 {
   omUpdateInfo();
+  long d;
   switch(((int)(long)v->Data()))
   {
   case 0:
-    res->data = (char *)om_Info.UsedBytes;
+    res->data=(char *)jjBI2N(om_Info.UsedBytes);
     break;
   case 1:
-    res->data = (char *)om_Info.CurrentBytesSystem;
+    res->data = (char *)jjBI2N(om_Info.CurrentBytesSystem);
     break;
   case 2:
-    res->data = (char *)om_Info.MaxBytesSystem;
+    res->data = (char *)jjBI2N(om_Info.MaxBytesSystem);
     break;
 
   default:
@@ -3711,11 +3717,24 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
     omPrintInfo(stdout);
     omPrintBinStats(stdout);
     res->data = (char *)0;
+    res->rtyp = NONE;
   }
   return FALSE;
   res->data = (char *)0;
   return FALSE;
 }
+#if SIZEOF_LONG == 8
+static number jjBI2N(long d)
+{
+  if (d<((long)INT_MAX)) return nlInit((int)d);
+  else
+  {
+    number n=nlRInit(0);
+    mpz_set_si(&n->z,d);
+    return n;
+  }
+}
+#endif
 static BOOLEAN jjMONITOR1(leftv res, leftv v)
 {
   monitor((char *)(v->Data()),PROT_I);
@@ -4624,7 +4643,7 @@ struct sValCmd1 dArith1[]=
 ,{jjWRONG,      MAP_CMD,         0,              ANY_TYPE       ALLOW_PLURAL}
 ,{jjDUMMY,      MATRIX_CMD,      MATRIX_CMD,     MATRIX_CMD     ALLOW_PLURAL}
 ,{jjidMaxIdeal, MAXID_CMD,       XS(IDEAL_CMD),  INT_CMD        ALLOW_PLURAL}
-,{jjMEMORY,     MEMORY_CMD,      INT_CMD,        INT_CMD        ALLOW_PLURAL}
+,{jjMEMORY,     MEMORY_CMD,      BIGINT_CMD,     INT_CMD        ALLOW_PLURAL}
 ,{jjidMinBase,  MINBASE_CMD,     XS(IDEAL_CMD),  IDEAL_CMD      NO_PLURAL}
 ,{jjidMinBase,  MINBASE_CMD,     XS(MODUL_CMD),  MODUL_CMD      NO_PLURAL}
 ,{jjMINRES,     MINRES_CMD,      LIST_CMD,       LIST_CMD       ALLOW_PLURAL}
