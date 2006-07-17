@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.77 2006-07-14 15:10:54 Singular Exp $";
+version="$Id: standard.lib,v 1.78 2006-07-17 14:16:52 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -8,7 +8,6 @@ PROCEDURES:
  stdfglm(ideal[,ord])   standard basis of ideal via fglm [and ordering ord]
  stdhilb(ideal[,h])     standard basis of ideal using the Hilbert function
  groebner(ideal/module) standard basis using a heuristically chosen method
- quot(any,any[,n])      quotient using heuristically chosen method
  res(ideal/module,[i])  free resolution of ideal or module
  sprintf(fmt,...)       returns fomatted string
  fprintf(link,fmt,..)   writes formatted string to link

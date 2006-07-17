@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.269 2006-07-14 16:53:57 Singular Exp $
+@comment $Id: reference.doc,v 1.270 2006-07-17 14:16:46 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4836,7 +4836,8 @@ See
 @ref{module}.
 @c ref
 @c ---------------------------------------
-@node qhweight, quot, prune, Functions
+@c @node qhweight, quot, prune, Functions
+@node qhweight, quote, prune, Functions
 @subsection qhweight
 @cindex qhweight
 @table @code
@@ -4864,14 +4865,14 @@ See
 @c ref
 
 @c ---------------------------------------
-@node quot, quote, qhweight, Functions
-@subsection quot
-@cindex quot
-@c lib standard.lib:quot lib_fun lib_ex subsection
-
+@c @node quot, quote, qhweight, Functions
+@c @subsection quot
+@c @cindex quot
+@c @c lib standard.lib:quot lib_fun lib_ex subsection
 
 @c ---------------------------------------
-@node quote, quotient, quot, Functions
+@c @node quote, quotient, quot, Functions
+@node quote, quotient, qhweight, Functions
 @subsection quote
 @cindex quote
 @table @code
