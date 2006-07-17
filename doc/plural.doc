@@ -91,12 +91,12 @@
 @ifset singularmanual
 @node  Getting started with PLURAL, Data types @value{PSUFFIX}, , PLURAL
 @section  Getting started with PLURAL
-@end ifset 
+@end ifset
 
 @ifclear singularmanual
 @node   Getting started with PLURAL, Data types @value{PSUFFIX}, , Top
 @chapter Getting started with PLURAL
-@end ifclear 
+@end ifclear
 
 @cindex  Getting started with PLURAL
 @include pluconventions.tex
@@ -104,7 +104,7 @@
 @c ----------------------------------------------------------------------------
 @c @ifset singularmanual
 @c @menu
-@c * Data types @value{PSUFFIX}::  
+@c * Data types @value{PSUFFIX}::
 @c @end menu
 @c @end ifset
 
@@ -114,23 +114,23 @@
 @ifset singularmanual
 @section Data types @value{PSUFFIX}
 @lowersections
-@end ifset 
+@end ifset
 
 @ifclear singularmanual
 @chapter Data types @value{PSUFFIX}
-@end ifclear 
+@end ifclear
 
 @cindex Data types @value{PSUFFIX}
 @include plutypes.tex
 
 @ifset singularmanual
 @raisesections
-@end ifset 
+@end ifset
 
 @c ----------------------------------------------------------------------------
 @c @ifset singularmanual
 @c @menu
-@c * Functions @value{PSUFFIX}::  
+@c * Functions @value{PSUFFIX}::
 @c @end menu
 @c @end ifset
 
@@ -150,13 +150,13 @@
 
 @ifset singularmanual
 @raisesections
-@end ifset 
+@end ifset
 
 
 @c ----------------------------------------------------------------------------
 @c @ifset singularmanual
 @c @menu
-@c * Mathematical background @value{PSUFFIX}::  
+@c * Mathematical background @value{PSUFFIX}::
 @c @end menu
 @c @end ifset
 
@@ -176,7 +176,7 @@
 
 @ifset singularmanual
 @raisesections
-@end ifset 
+@end ifset
 
 @c --------------------------------------------------------------------
 @ifset singularmanual
@@ -201,7 +201,7 @@ Use the @code{LIB} command for loading of single libraries.
 @strong{Note:} For any computation in @sc{Plural}, the monomial ordering must be a global ordering.
 
 @c , and the
-@c command @code{LIB "all.lib";} for loading all libraries of 
+@c command @code{LIB "all.lib";} for loading all libraries of
 @c @sc{Singular} and @sc{Plural} together.
 
 @menu
@@ -211,7 +211,7 @@ Use the @code{LIB} command for loading of single libraries.
 * gkdim_lib::
 * ncall_lib::
 * ncalg_lib::
-* ncdecomp_lib::               
+* ncdecomp_lib::
 * nctools_lib::
 * perron_lib::
 * qmatrix_lib::
@@ -308,7 +308,7 @@ LIB "ncall.lib";
 
 @ifset singularmanual
 @raisesections
-@end ifset 
+@end ifset
 
 @c ----------------------------------------------------------
 
@@ -323,4 +323,4 @@ LIB "ncall.lib";
 @appendix Index @value{PSUFFIX}
 @cindex  Index @value{PSUFFIX}
 @printindex cp
-@end ifclear 
+@end ifclear

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: tricks.doc,v 1.9 2004-04-15 16:46:03 Singular Exp $
+@comment $Id: tricks.doc,v 1.10 2006-07-17 14:32:25 Singular Exp $
 @comment this file contains the "Tricks and pittfals" sections
 
 @c The following directives are necessary for proper compilation
@@ -35,7 +35,7 @@
 @sc{Singular} has the following limitations:
 @itemize @bullet
 @item
-the characteristic of a prime field must be less or equal than 2147483629 
+the characteristic of a prime field must be less or equal than 2147483629
 @item
 the (weighted) degree of a monomial must be less or equal  than 2147483647
 @item
@@ -55,7 +55,7 @@ from -2147483648 to 2147483647
 floating point numbers (type @code{number} from field @code{real}) have
 a limited range which is machine dependent. A typical range is -1.0e-38
 to 1.0e+38.  The string representation of overflow and underflow is
-machine dependent, as well. For example "@code{Inf}" on Linux, or 
+machine dependent, as well. For example "@code{Inf}" on Linux, or
 "@code{+.+00e+00}" on HPUX.
 @c @item
 @c a token (in the input) must have 16383 characters or less.
@@ -76,7 +76,7 @@ statements may not contain more than 10000 tokens
 @cindex non-english special characters
 @cindex special characters, non-english
 All input to Singular must be 7-bit clean, i.e. special characters like the
-the German Umlaute (@"a, @"o, etc.), or the French accent characters may 
+the German Umlaute (@"a, @"o, etc.), or the French accent characters may
 neither appear as input to @sc{Singular}, nor in libraries or procedure
 definitions.
 @end itemize
@@ -139,7 +139,7 @@ then the value of the logical expression is determined. For example, the
 logical expressions @code{(a || b)} is evaluated by first evaluating
 @code{a} @emph{and} @code{b}, even though the value of @code{b} has no
 influence on the value of @code{(a || b)}, if @code{a} evaluates to
-true. 
+true.
 
 Note, that this evaluation is different from the left-to-right,
 conditional evaluation of logical expressions (as found in most
@@ -440,7 +440,7 @@ second integer denotes the length of the substring. The result is
 returned as a @code{string}. Square brackets enclosing an @code{intvec}
 (e.g.@: @code{s[intvec(2,6)]}) return the characters of the string at the
 position given by the values of the @code{intvec}. The result is
-returned as an expression list of strings. 
+returned as an expression list of strings.
 @c  Note, that this problem does
 @c  not occur for square brackets enclosing a single @code{int} or more than
 @c  two @code{int}s. Those always return an expression list of strings.

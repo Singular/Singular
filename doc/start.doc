@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.49 2001-08-27 14:40:09 Singular Exp $
+@comment $Id: start.doc,v 1.50 2006-07-17 14:32:24 Singular Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added changes by GMG.
 
@@ -258,7 +258,7 @@ get the previous input line)
 @sc{Singular} is a special purpose system for polynomial
 computations. Hence, most of the powerful computations in @sc{Singular}
 require the prior definition of a ring. Most important rings are
-polynomial rings over a field, localizations hereof, or quotient rings of
+polynomial rings over a field, localizations thereof, or quotient rings of
 such rings modulo an ideal. However, some simple computations with
 integers (machine integers of limited size) and manipulations of strings
 are available without a ring.
@@ -335,7 +335,7 @@ Text starting with @code{//} denotes a comment and is ignored in
 calculations, as seen in the previous example. Furthermore @sc{Singular}
 maintains a history of the previous lines of input, which may be accessed by
 @code{CTRL-P} (previous) and @code{CTRL-N} (next) or the arrows on the
-keyboard. Note that the history is not available on Macintosh systems.
+keyboard.
 
 The whole manual is available online by typing the command @code{help;} .
 Explanation on single topics, e.g., on @code{intmat}, which defines a
@@ -364,6 +364,7 @@ from left to right:
 
 @smallexample
 intmat m[3][3] = 1,2,3,4,5,6,7,8,9;
+m;
 @end smallexample
 
 @noindent A single matrix entry may be selected and changed using
@@ -461,7 +462,7 @@ degree reverse lexicographical ordering (@code{ds}).
 
 @item ring r4=(0,a),(mu,nu),lp;
 transcendental extension of @math{Q} by @math{a}, variable names
-@code{mu} and @code{nu}.
+@code{mu} and @code{nu}, lexicographical ordering.
 
 @item ring r5=real,(a,b),lp;
 floating point numbers (single machine precision),
@@ -524,10 +525,10 @@ x^3
 @end ifinfo
 may be entered in two ways: either using the power operator @code{^},
 saying @code{x^3}, or in short-hand notation without operator, saying
-@code{x3}. Note that the short-hand notation is forbidden if the name
-of the ring variable consists of more than one character. Note, that
-@sc{Singular} always expands brackets and automatically sorts the terms
-with respect to the monomial ordering of the basering.
+@code{x3}. Note that the short-hand notation is forbidden if a name
+of the ring variable(s) consists of more than one character(see @xref{Miscellaneous oddities} for details).
+Note, that @sc{Singular} always expands brackets and automatically
+sorts the terms with respect to the monomial ordering of the basering.
 
 @smallexample
 poly f =  x3+y3+(x-y)*x2y2+z2;

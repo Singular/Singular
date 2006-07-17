@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pluconventions.doc,v 1.12 2005-05-02 21:59:47 levandov Exp $
+@comment $Id: pluconventions.doc,v 1.13 2006-07-17 14:32:22 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -35,7 +35,7 @@
 @c * qring@value{PSUFFIX}::
 @c @end menu
 
-@c ----------------------------------------------- 
+@c -----------------------------------------------
 
 @table @strong
 @item @strong{What is and what does @sc{Plural}?}
@@ -46,14 +46,14 @@ providing many algorithms for computations within certain noncommutative algebra
 
 @sc{Plural} is compatible with @sc{Singular}, since it uses the
 same data structures, sometimes interpreting them in a different way
-and/or modifying them for its own purposes. 
-In spite of such a difference, one can always transfer 
-objects from commutative rings of @sc{Singular} 
+and/or modifying them for its own purposes.
+In spite of such a difference, one can always transfer
+objects from commutative rings of @sc{Singular}
 to noncommutative rings @sc{Plural} and back.
 
 
 With @sc{Plural}, one can set up a noncommutative @math{G}-algebra with
-a Poincar@'e-Birkhoff-Witt (PBW) basis, say, @math{A} (see @ref{G-algebras} for step-by-step building instructions and also @ref{PLURAL libraries} 
+a Poincar@'e-Birkhoff-Witt (PBW) basis, say, @math{A} (see @ref{G-algebras} for step-by-step building instructions and also @ref{PLURAL libraries}
 for procedures for setting many important algebras easily).
 
 Functionalities of @sc{Plural} (enlisted in @ref{Functions  @value{PSUFFIX}}) are accessible as soon as the basering becomes noncommutative (see @ref{ncalgebra}).
@@ -73,9 +73,9 @@ by two-sided ideals (see @ref{twostd}).
 
 @table @strong
 @item @strong{What @sc{Plural} does not:}
-@itemize 
+@itemize
 
-@item 
+@item
 @sc{Plural} does not perform computations in free algebra or in its general factor algebras.
 
 One can only work with @math{G}-algebras and with their factor-algebras
@@ -84,7 +84,7 @@ by two-sided ideals.
 @item @sc{Plural} requires a monomial ordering but it does not work with local and mixed orderings.
 
 Right now, one can use only global orderings in @sc{Plural}
-(see @ref{General definitions for orderings}). 
+(see @ref{General definitions for orderings}).
 
 This will be enhaced in the future by providing the possibility of computations in a tensor product of a noncommutative algebra (with a global ordering)
 @* with a commutative algebra (with any ordering).
@@ -92,30 +92,30 @@ This will be enhaced in the future by providing the possibility of computations 
 @item @sc{Plural} does not handle noncommutative parameters.
 
 Defining parameters, one @strong{cannot} impose noncommutative relations
-on them. Moreover, it is impossible to introduce 
-@* parameters which do not commute with variables. 
+on them. Moreover, it is impossible to introduce
+@* parameters which do not commute with variables.
 
 @end itemize
 @end table
 
 
-@table @strong  
+@table @strong
 @item @sc{Plural} conventions
 
 @item *-multiplication  @value{PSUFFIX}
-@itemize 
+@itemize
 
 in the noncommutative case, the correct multiplication of @code{y} by
- @code{x} must be written as @code{y*x}. 
-@* Both expressions @code{yx} and @code{xy} are equal, since they are 
+ @code{x} must be written as @code{y*x}.
+@* Both expressions @code{yx} and @code{xy} are equal, since they are
 interpreted as commutative expressions. See example in @ref{poly expressions @value{PSUFFIX}}.
-@* Note, that @sc{Plural} output consists only of monomials, hence the signs @code{*} are omitted. 
+@* Note, that @sc{Plural} output consists only of monomials, hence the signs @code{*} are omitted.
 
 @end itemize
 
 @item   @code{ideal} @value{PSUFFIX}
 @itemize
-                        
+
 Under an @code{ideal} @sc{Plural} understands a list of generators
 of a @strong{left} ideal. For more information see @ref{ideal @value{PSUFFIX}}.
  @* For a @strong{two-sided ideal} @code{T}, use command @ref{twostd} in order to compute
@@ -125,27 +125,27 @@ the two-sided Groebner basis of @code{T}.
 
 @item @code{module} @value{PSUFFIX}
 @itemize
-Under a @code{module} @sc{Plural} understands 
-@strong{either} a fininitely generated @strong{left} submodule of a free module (of finite rank) 
+Under a @code{module} @sc{Plural} understands
+@strong{either} a fininitely generated @strong{left} submodule of a free module (of finite rank)
 @* @strong{or} a factor module of a free module (of finite rank) by its left submodule (see @ref{module @value{PSUFFIX}} for details).
 @end itemize
 
 @c @item ordering @value{PSUFFIX}
 @c @itemize
-@c @sc{Plural} works with @strong{global} orderings  only.  
+@c @sc{Plural} works with @strong{global} orderings  only.
 @c @ifset singularmanual
 @c See @ref{ General definitions for orderings }
 @c @end ifset
-@c @ifclear singularmanual 
-@c See @sc{Singular} manual section General definitions for orderings. 
+@c @ifclear singularmanual
+@c See @sc{Singular} manual section General definitions for orderings.
 @c @end ifclear
 @c @end itemize
 
 @item @code{qring} @value{PSUFFIX}
 
 @itemize
-In @sc{Plural} it is only possible to build factor-algebras modulo @strong{two-sided} ideals (see @ref{qring @value{PSUFFIX}}). 
-@end itemize 
-@end table   
+In @sc{Plural} it is only possible to build factor-algebras modulo @strong{two-sided} ideals (see @ref{qring @value{PSUFFIX}}).
+@end itemize
+@end table
 
 

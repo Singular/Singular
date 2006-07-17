@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.143 2006-06-23 13:26:51 Singular Exp $
+@comment $Id: singular.doc,v 1.144 2006-07-17 14:32:24 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -22,7 +22,7 @@
 @end iftex
 
 @set singularmanual 1
-@set withplural 1 
+@set withplural 1
 @set PSUFFIX  (plural)
 @set namespaces 1
 @include version.texi
@@ -594,27 +594,27 @@ LIB "all.lib";
 @subsection Control theory background
 
 Control systems are usually described by differential (or
-difference) equations, but their properties of interest are 
-most naturally expressed in terms of the system trajectories 
-(the set of all solutions to the equations). This is formalized 
-by the notion of the system @emph{behavior}. On the other hand, 
-the manipulation of linear system equations can be formalized 
-using algebra, more precisely module theory. The relationship 
-between modules and behaviors is very rich and leads to deep 
-results on system structure. 
+difference) equations, but their properties of interest are
+most naturally expressed in terms of the system trajectories
+(the set of all solutions to the equations). This is formalized
+by the notion of the system @emph{behavior}. On the other hand,
+the manipulation of linear system equations can be formalized
+using algebra, more precisely module theory. The relationship
+between modules and behaviors is very rich and leads to deep
+results on system structure.
 
 
 The key to the module-behavior correspondence
-is a property of some signal spaces that are modules 
-over the ring of differential (or difference) operators, 
+is a property of some signal spaces that are modules
+over the ring of differential (or difference) operators,
 namely, @emph{the injective cogenerator property}.
 This property makes it possible to translate any statement on the
-solution spaces that can be expressed in terms of images and kernels, 
-to an equivalent statement on the modules. Thus analytic properties 
-can be identified with algebraic properties, and conversely, the 
-results of manipulating the modules using computer algebra can 
-be re-translated and interpreted using the language of systems theory. 
-This duality (@emph{algebraic analysis}) is widely used in behavioral 
+solution spaces that can be expressed in terms of images and kernels,
+to an equivalent statement on the modules. Thus analytic properties
+can be identified with algebraic properties, and conversely, the
+results of manipulating the modules using computer algebra can
+be re-translated and interpreted using the language of systems theory.
+This duality (@emph{algebraic analysis}) is widely used in behavioral
 systems and control theory today.
 
 
@@ -629,10 +629,10 @@ to another without violating the system law (concatenation of
 trajectories). For one-dimensional systems (ODE) that evolve in time,
 this is usually interpreted as switching from a given past trajectory
 to a desired future trajectory. Thus the system can be forced to
-behave in an arbitrarily prescribed way. 
+behave in an arbitrarily prescribed way.
 
 
-The extreme case opposed to controllability is @strong{autonomy}: autonomous systems evolve independently according to their law, without being influenceable 
+The extreme case opposed to controllability is @strong{autonomy}: autonomous systems evolve independently according to their law, without being influenceable
 from the outside. Again, the property can be refined in terms
 of autonomy degrees.
 

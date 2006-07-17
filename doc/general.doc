@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.204 2006-06-20 07:42:21 Singular Exp $
+@comment $Id: general.doc,v 1.205 2006-07-17 14:32:19 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -199,11 +199,11 @@ The browser which is used to display the help information, can be either
 set at startup time with the command line option  (@pxref{Command line
 options})
 @smallexample
---brower=<browser>
+--browser=<browser>
 @end smallexample
 or with the @sc{Singular} command (@pxref{system})
 @smallexample
-system("--browser", <browser>);
+system("--browser", "<browser>");
 @end smallexample
 The  @sc{Singular} command
 @smallexample
@@ -244,7 +244,7 @@ default browser is set automatically to @code{emacs}).
 
 
 Obviously, certain external files and programs are required for the
-@sc{Singular} help system to work correctly. If something is not availabel
+@sc{Singular} help system to work correctly. If something is not available
 or goes wrong, here are some tips for troubleshooting the help system:
 
 @itemize @bullet
@@ -494,7 +494,7 @@ Allow the @code{netscape} and @code{html} help browser to fetch HTML manual page
 the net from the WWW home-site of @sc{Singular}. @xref{The online help
 system}, for more info.
 
-@item @code{--browser=VAL}
+@item @code{--browser="VAL"}
 @cindex --browser
 @cindex browser, command line option
 Use @code{VAL} as browser for the @sc{Singular} online manual.
@@ -741,7 +741,7 @@ prevents the execution of the"global"
 @cindex interface, Emacs
 @cindex user interface, Emacs
 
-Besides running @sc{Singular} in an ASCII-terminal, @sc{Singular} might
+Besides, running @sc{Singular} in an ASCII-terminal, @sc{Singular} might
 also be run within Emacs. Emacs (or, XEmacs which is very similar) is a
 powerful and freely available text editor, which, among others,
 provides a framework for the implementation of interactive user
@@ -843,7 +843,7 @@ is no @key{META} key, type @key{ESC}, release it, then type the
 character @code{<chr>}.
 @end multitable
 
-For user new to Emacs, we highly recommend that they go through the
+For a user new to Emacs, we highly recommend that they go through the
 interactive Emacs tutorial: type @code{C-h t} to start it.
 
 For others, it is important to understand the following Emacs concepts:
@@ -974,7 +974,7 @@ buffer called @code{*singular*} and the @sc{Singular} prompt you are
 ready to start your @sc{Singular} session.
 
 @code{ESingular} inherits all @code{Singular} options. For a description
-off all these options, see @ref{Command line options}. Additionally
+of all these options, see @ref{Command line options}. Additionally
 there are the following options which are special to @code{ESingular}:
 
 @multitable @columnfractions .3 .7
@@ -1295,7 +1295,7 @@ Editing input and output:
 @itemize @bullet
 
 @item @code{singular-beginning-of-line} (key @code{C-a}): moves point to
-beginning of line, then skip past the @sc{Singular} prompt, if any.
+beginning of line, then skips past the @sc{Singular} prompt, if any.
 
 @item @code{singular-toggle-truncate-lines} (key @code{C-c C-t} or menu
 @code{Commands->Truncate lines}): toggles whether long lines should be
@@ -1473,8 +1473,8 @@ ordering has to be chosen such that the unit-elements of the
 ring are precisely those elements with leading monomial 1.  For more
 information, see @ref{Monomial orderings}.
 
-Every floating point number in a ring consists of two parts, wich may be
-choosen from the user. The leading part represents the number and the rest
+Every floating point number in a ring consists of two parts, which may be
+chosen from the user. The leading part represents the number and the rest
 is for the numerical stability. Two numbers with a difference only in the
 rest are equal.
 
@@ -2746,6 +2746,7 @@ matrix (@pxref{matrix type cast})
   vector v=[1,2];
   print(matrix(v));
   module(matrix(i,3,2));
+  // generators are columns of a matrix
 @c example
 @end smallexample
 
@@ -3100,8 +3101,8 @@ should furthermore comply with  certain rules as explained in
 @cindex local names
 
 All variables are local to the procedure they are defined in and to
-the package in which the procedure is defined. Locally defined variables 
-cannot interfere with names in other procedures and are automatically 
+the package in which the procedure is defined. Locally defined variables
+cannot interfere with names in other procedures and are automatically
 deleted after leaving the procedure.
 
 Internally, local variables are stored using the nesting level. A variable
@@ -3109,11 +3110,11 @@ is said to have nesting level 1, if it is local to a procedure that was
 called interactively, nesting level 2, if it is local to a procedure that
 was called by a procedure of nesting level 1 etc. @code{listvar()} also
 displays the nesting level, nesting level 0 is used for global objects
-(see @ref{listvar}). 
+(see @ref{listvar}).
 
 To keep local variables after leaving the procedure, they have to be
 exported (i.e. made known) to some higher level or to some package
-by a command like @code{export} or @code{exportto} (@pxref{export}, 
+by a command like @code{export} or @code{exportto} (@pxref{export},
 @pxref{exportto}, @pxref{importfrom}; see also @pxref{package}).
 
 @strong{Example:}
@@ -3366,7 +3367,7 @@ to an error message while loading the library.
 If an error occurs, loading is aborted and an error message is displayed,
 specifying the type of error and the line where it was detected.
 
-The first line of the library should start with the string 
+The first line of the library should start with the string
 @code{// Singular-library}.
 
 The category-, info- and version-string are defined as follows:
@@ -3486,11 +3487,11 @@ made about their input (like the type of list elements), and, if
 necessary, omit an error using the  function @ref{ERROR}.
 
 @item
-Names of procedures should not be shorter than 4 characters and should 
+Names of procedures should not be shorter than 4 characters and should
 not contain any special characters, in particular the use of @code{_}
 in names of procedures is discourraged. If the name of the procedure is
-composed of more than one word, each new word should start with a 
-capital letter, all other letters should be lower case. 
+composed of more than one word, each new word should start with a
+capital letter, all other letters should be lower case.
 
 @item
 No procedures should be defined within the body of another procedure.
@@ -3968,8 +3969,8 @@ and then @key{RETURN} .
 @c ---------------------------------------
 @node Tracing of procedures,Source code debugger,Debugging tools,Debugging tools
 @subsection Tracing of procedures
-Setting the @code{TRACE} variable to 1 (resp.@: 3) results in a listing of
-the called procedures (resp.@: together with line numbers).
+Setting the @code{TRACE} variable to 1 (resp.@: 3) results in reporting of
+the all procedures entries and exits (resp.@: together with line numbers).
 If @code{TRACE} is set to 4, @code{Singular}
 displays each line before its interpretation and waits for the @key{RETURN}
 key being pressed.
@@ -4190,23 +4191,23 @@ LIB "sample.lib";
 @cindex Dynamic loading
 
 In addition to the concept of libraries, it is also possible to
-dynamically extend the functionality by loading functions written 
-in C/C++ or some other higher programming language. A collection 
+dynamically extend the functionality by loading functions written
+in C/C++ or some other higher programming language. A collection
 of such functions is called a dynamic module and can be loaded by
-the command @code{LIB} or @code{load}. It is basically handled in 
-the same way as a library: upon loading, a new @code{package} is 
-created which holds the contents of the dynamic module, but in contrast 
-to the case of a library, the name of the @code{package} is not derived 
-from the filename, but is hardcoded in the dynamic module. In particular, 
-general information about it can be displayed by the command 
-@code{help package_name}. After loading the dynamic module, its functions 
+the command @code{LIB} or @code{load}. It is basically handled in
+the same way as a library: upon loading, a new @code{package} is
+created which holds the contents of the dynamic module, but in contrast
+to the case of a library, the name of the @code{package} is not derived
+from the filename, but is hardcoded in the dynamic module. In particular,
+general information about it can be displayed by the command
+@code{help package_name}. After loading the dynamic module, its functions
 can be used exactly like the built-in @sc{Singular} functions.
 
 To have the full functionality of a built-in function, dynamic modules
 need to comply with certain requirements on their internal structure.
-As this would be beyond the scope of the @code{Singular} manual, 
-a separate, more detailed guide on how to write and use dynamic modules 
-can be found 
-at @code{http://www.singular.uni-kl.de/DynMod.ps}. 
+As this would be beyond the scope of the @code{Singular} manual,
+a separate, more detailed guide on how to write and use dynamic modules
+can be found
+at @code{http://www.singular.uni-kl.de/DynMod.ps}.
 
 

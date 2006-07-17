@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pdata.doc,v 1.22 2000-12-22 16:02:52 mschulze Exp $
+@comment $Id: pdata.doc,v 1.23 2006-07-17 14:32:21 Singular Exp $
 @comment this file contains the "Polynomial data" appendix.
 
 @c The following directives are necessary for proper compilation
@@ -95,14 +95,14 @@ nrows($v$)
 @ifinfo
 nrows(v)
 @end ifinfo
-where 
+where
 @tex
 nrows($v$)
 @end tex
 @ifinfo
-nrows(v) 
+nrows(v)
 @end ifinfo
-is equal to the maximal index 
+is equal to the maximal index
 @tex
 $r$
 @end tex
@@ -116,7 +116,7 @@ $f_r \not= 0$.
 @ifinfo
 f_r<>0.
 @end ifinfo
-This is due to the fact, that internally 
+This is due to the fact, that internally
 @tex
 $v$
 @end tex
@@ -137,7 +137,7 @@ $f_i=0$
 @ifinfo
 f_i=0
 @end ifinfo
-(for reasons of efficiency), hence the last 0-entries of 
+(for reasons of efficiency), hence the last 0-entries of
 @tex
 $v$
 @end tex
@@ -147,7 +147,7 @@ v
 are lost.
 Only more complex structures are able to keep the rank.
 
-A module 
+A module
 @tex
 $M$
 @end tex
@@ -162,7 +162,7 @@ $v_1,...,v_k$
 v_1,....v_k
 @end ifinfo
 which generate the module as a submodule of the free module of rank
-equal to 
+equal to
 @tex
 nrows($M$)
 @end tex
@@ -189,14 +189,14 @@ number of rows and columns.
 
 By the above remarks it might appear that @sc{Singular} is only able to handle
 submodules of a free module. However, this is not true. @sc{Singular}
-can compute with any finitely generated module over the basering 
+can compute with any finitely generated module over the basering
 @tex
 $R$.
-@end tex 
+@end tex
 @ifinfo
 R.
 @end ifinfo
-Such a module, say 
+Such a module, say
 @tex
 $N$,
 @end tex
@@ -206,12 +206,12 @@ N,
 is not represented by its generators but by its
 (generators and) relations. This means that
 @tex
-$N = R^n/M$ where $n$ 
+$N = R^n/M$ where $n$
 @end tex
 @ifinfo
 N = R^n/M where n
 @end ifinfo
-is the number of generators of 
+is the number of generators of
 @tex
 $N$ and $M \subseteq R^n$
 @end tex
@@ -219,7 +219,7 @@ $N$ and $M \subseteq R^n$
 N and M in R^n
 @end ifinfo
 is the module of relations.
-In other words, defining  a module 
+In other words, defining  a module
 @tex
 $M$
 @end tex
@@ -241,7 +241,7 @@ $N = R^n/M$.
 N=R^n/M.
 @end ifinfo
 
-Note that most functions, when applied to a module 
+Note that most functions, when applied to a module
 @tex
 $M$,
 @end tex
@@ -255,7 +255,7 @@ $M$.
 @ifinfo
 M.
 @end ifinfo
-However, there are some functions which deal with 
+However, there are some functions which deal with
 @tex
 $N = R^n/M$ instead of $M$.
 @end tex
@@ -263,14 +263,14 @@ $N = R^n/M$ instead of $M$.
 N=R^n/M instead of M.
 @end ifinfo
 
-For example, @code{std(M)} computes a standard basis of 
+For example, @code{std(M)} computes a standard basis of
 @tex
 $M$
 @end tex
 @ifinfo
 M
 @end ifinfo
-(and thus gives another representation of 
+(and thus gives another representation of
 @tex
 $N$ as $N = R^n/$std($M$)).
 @end tex
@@ -286,22 +286,22 @@ dim(R^n/M), resp.@: dim_k(R^n/M)
 @end ifinfo
 (if M is given by a standard basis).
 
-The function @code{syz(M)}  returns the first syzygy module of 
+The function @code{syz(M)}  returns the first syzygy module of
 @tex
 $M$,
 @end tex
 @ifinfo
 M,
 @end ifinfo
-i.e@:., the module 
-of relations of the given generators of 
+i.e@:., the module
+of relations of the given generators of
 @tex
 $M$
 @end tex
 @ifinfo
 M
 @end ifinfo
-which is equal to the second syzygy module of 
+which is equal to the second syzygy module of
 @tex
 $N$.
 @end tex
@@ -363,12 +363,12 @@ flexibility might also be confusing for the novice user.  Therefore, we
 recommend to those not familiar with monomial orderings to generally use
 the ordering @code{dp} for computations in the polynomial ring
 @tex
-$K[x_1,\ldots,x_n]$, 
+$K[x_1,\ldots,x_n]$,
 @end tex
 @ifinfo
-K[x1,...,xn], 
+K[x1,...,xn],
 @end ifinfo
-resp.@:  @code{ds} for computations in the localization 
+resp.@:  @code{ds} for computations in the localization
 @tex
 $\hbox{Loc}_{(x)}K[x_1,\ldots,x_n]$.
 @end tex
@@ -377,27 +377,27 @@ Loc_(x)K[x1,...,xn].
 @end ifinfo
 
 For inhomogenous input ideals,  standard (resp.@: groebner) bases
-computations are generally faster 
-with the orderings 
+computations are generally faster
+with the orderings
 @tex
 $\hbox{Wp}(w_1, \ldots, w_n)$
 @end tex
 @ifinfo
 Wp(w_1, ..., w_n)
 @end ifinfo
-(resp.@: 
+(resp.@:
 @tex
 $\hbox{Ws}(w_1, \ldots, w_n)$)
 @end tex
 @ifinfo
 Ws(w_1, ..., w_n))
 @end ifinfo
-if the input is quasihomogenous w.r.t. the weights 
+if the input is quasihomogenous w.r.t. the weights
 @tex
-$w_1$, $\ldots$, $w_n$ of $x_1$, $\ldots$, $x_n$. 
+$w_1$, $\ldots$, $w_n$ of $x_1$, $\ldots$, $x_n$.
 @end tex
 @ifinfo
-w_1, ..., w_n of x_1, ..., x_n. 
+w_1, ..., w_n of x_1, ..., x_n.
 @end ifinfo
 
 If the output needs to be "triangular" (resp.@: "block-triangular"), the
@@ -437,7 +437,7 @@ We do not require
  See the literature cited in @ref{References}.
 @end ifset
 
-It is known that any monomial ordering can be represented by a matrix 
+It is known that any monomial ordering can be represented by a matrix
 @tex
 $M$ in $GL(n,R)$,
 @end tex
@@ -456,7 +456,7 @@ Let $K$ be the ground field, \hbox{$x = (x_1, \ldots, x_n)$} the
 variables and $<$ a monomial ordering, then Loc $K[x]$ denotes the
 localization of $K[x]$ with respect to the multiplicatively closed set $$\{1 +
 g \mid g = 0 \hbox{ or } g \in K[x]\backslash \{0\} \hbox{ and }L(g) <
-1\}.$$   Here, $L(g)$ 
+1\}.$$   Here, $L(g)$
 denotes the leading monomial of $g$, i.e., the biggest monomial of $g$ with
 respect to $<$.   The result of any computation which uses standard basis
 computations has to be interpreted in Loc $K[x]$.
@@ -477,9 +477,9 @@ computations has to be interpreted in Loc K[x].
 @end ifinfo
 
 Note that the definition of a ring includes the definition of its
-monomial ordering (see 
+monomial ordering (see
 @ref{Rings and orderings}). @sc{Singular} offers the monomial orderings
-described in the following sections. 
+described in the following sections.
 
 
 @c --------------------------------------------------------------------------
@@ -529,7 +529,7 @@ degree reverse lexicographical ordering:
 @cindex degree reverse lexicographical ordering
 @cindex dp, global ordering
 @*
-@ifinfo 
+@ifinfo
 let deg(x^a) = a_1 + @dots{} + a_n, then
 @end ifinfo
 @tex
@@ -558,7 +558,7 @@ degree lexicographical ordering:
 @cindex degree lexicographical ordering
 @cindex Dp, global ordering
 @*
-@ifinfo 
+@ifinfo
 let deg(x^a) = a_1 + @dots{} + a_n, then
 @end ifinfo
 @tex
@@ -592,7 +592,7 @@ weighted reverse lexicographical ordering:
 @end ifinfo
 @tex
 let $w_1, \ldots, w_n$ be positive integers. Then ${\tt wp}(w_1, \ldots,
-w_n)$ 
+w_n)$
 @end tex
  is defined as @code{dp}
  but with
@@ -612,7 +612,7 @@ weighted lexicographical ordering:
 @end ifinfo
 @tex
 let $w_1, \ldots, w_n$ be positive integers. Then ${\tt Wp}(w_1, \ldots,
-w_n)$ 
+w_n)$
 @end tex
  is defined as @code{Dp}
  but with
@@ -637,7 +637,7 @@ Loc K[x] = K[x]_(x),
 @tex
 Loc $K[x]$ = $K[x]_{(x)}$,
 @end tex
- the localization of 
+ the localization of
 @tex
 $K[x]$
 @end tex
@@ -672,7 +672,7 @@ negative degree reverse lexicographical ordering:
 @cindex negative degree reverse lexicographical ordering
 @cindex ds, local ordering
 @*
-@ifinfo 
+@ifinfo
 let deg(x^a) = a_1 + @dots{} + a_n, then
 @end ifinfo
 @tex
@@ -715,7 +715,7 @@ x^a < x^b <==>
 @*     a_1 = b_1, @dots{}, a_(i-1) = b_(i-1), a_i < b_i.
 @end ifinfo
 @tex
-    $x^\alpha < x^\beta \Leftrightarrow \deg(x^\alpha) > \deg(x^\beta)$ or 
+    $x^\alpha < x^\beta \Leftrightarrow \deg(x^\alpha) > \deg(x^\beta)$ or
 @end tex
 @iftex
 @*
@@ -796,14 +796,14 @@ generators of Loc K[x]^r, the r-fold direct sum of Loc K[x].
 @end ifinfo
 @tex
 $\{ x^a e_i  \mid  a \in N^n, 1 \leq i \leq r \}$ in Loc $K[x]^r$ = Loc
-$K[x]e_1 
+$K[x]e_1
 + \ldots +$Loc $K[x]e_r$, where $e_1, \ldots, e_r$ denote the canonical
 generators of Loc $K[x]^r$, the r-fold direct sum of Loc $K[x]$.
 (The function {\tt gen(i)} yields $e_i$).
 @end tex
 
 We have two possibilities: either to give priority to the component of a
-vector in 
+vector in
 @ifinfo
 Loc K[x]^r
 @end ifinfo
@@ -815,7 +815,7 @@ to the coefficients.
 The orderings @code{(<,c)} and @code{(<,C)} give priority to the
 coefficients; whereas
 @code{(c,<)} and @code{(C,<)} give priority to the components.
-@*Let < be any of the monomial orderings of 
+@*Let < be any of the monomial orderings of
 @tex
 Loc $K[x]$
 @end tex
@@ -871,7 +871,7 @@ $<_m = (C, <)$ denotes the module ordering (giving priority to the component):
 @end iftex
 @tex
 \quad \quad   $x^\alpha e_i <_m x^\beta e_j \Leftrightarrow i < j$ or ($
-i = j $ and $ x^\alpha < x^\beta $). 
+i = j $ and $ x^\alpha < x^\beta $).
 @end tex
 
 @strong{Example:}
@@ -930,7 +930,7 @@ $<_m = (c, <)$ denotes the module ordering (giving priority to the component):
 @end iftex
 @tex
 \quad \quad   $x^\alpha e_i <_m x^\beta e_j \Leftrightarrow i > j$ or ($
-i = j $ and $ x^\alpha < x^\beta $). 
+i = j $ and $ x^\alpha < x^\beta $).
 @end tex
 
 @strong{Example:}
@@ -967,14 +967,14 @@ In all cases @sc{Singular} can read input in both formats.
 @cindex orderings, M
 @cindex M, ordering
 
-Let 
+Let
 @tex
 $M$
 @end tex
 @ifinfo
 M
 @end ifinfo
-be an invertible 
+be an invertible
 @tex
 $(n \times n)$-matrix
 @end tex
@@ -1230,19 +1230,19 @@ $\left(\matrix{
 @c example
 @end smallexample
 
-If the ring has 
+If the ring has
 @tex
 $n$
 @end tex
 @ifinfo
 n
 @end ifinfo
-variables and the matrix contains less than 
+variables and the matrix contains less than
 @tex
 $n \times n$
 @end tex
 @ifinfo
-n x n 
+n x n
 @end ifinfo
 entries an error message is given, if there are more entries,
 the last ones are ignored.
@@ -1290,7 +1290,7 @@ ordering (or block ordering) $<\ := (<_1,<_2)$ on $K[x,y]$ is the following:
 @*
 @tex
 \quad \quad $x^a y^b < x^A y^B \Leftrightarrow x^a <_1 x^A $ or ($x^a =
-x^A$ and $y^b <_2 y^B$). 
+x^A$ and $y^b <_2 y^B$).
 @end tex
 @end iftex
 
@@ -1300,7 +1300,7 @@ orderings.
 In @sc{Singular}, any of the above global orderings, local orderings or matrix
 orderings may be combined (in an arbitrary manner and length) to a product
 ordering.   E.g., @code{(lp(3), M(1, 2, 3, 1, 1, 1, 1, 0, 0), ds(4),
-ws(1,2,3))} 
+ws(1,2,3))}
 defines: @code{lp} on the first 3 variables, the matrix ordering
 @code{M(1, 2, 3, 1, 1, 1, 1, 0, 0)} on the next 3 variables,
 @code{ds} on the next 4 variables and
@@ -1311,7 +1311,7 @@ defines: @code{lp} on the first 3 variables, the matrix ordering
 @subsection Extra weight vector
 @cindex Extra weight vector
 @cindex a, ordering
-@cindex orderings, a 
+@cindex orderings, a
 
 @ifinfo
 a(w_1, @dots{}, w_n),
@@ -1335,7 +1335,7 @@ $\deg(x^\alpha) = w_1 \alpha_1 + \cdots + w_n\alpha_n$
 and
 @*
 @ifinfo
-deg(x^a) < deg(x^b) ==> x^a < x^b 
+deg(x^a) < deg(x^b) ==> x^a < x^b
 @end ifinfo
 @tex
     $$\deg(x^\alpha) < \deg(x^\beta) \Rightarrow x^\alpha < x^\beta,$$
