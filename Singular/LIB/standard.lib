@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.78 2006-07-17 14:16:52 Singular Exp $";
+version="$Id: standard.lib,v 1.79 2006-07-17 15:36:04 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -153,7 +153,7 @@ NOTE: If a 2nd argument @code{wait} is given, then the computation proceeds
       at most @code{wait} seconds. That is, if no result could be computed in
       @code{wait} seconds, then the computation is interrupted, 0 is returned,
       a warning message is displayed, and the global variable
-      @code{groebner_error} is defined.
+      @code{Standard::groebner_error} is defined.
 SEE ALSO: stdhilb, stdfglm, std
 KEYWORDS: time limit on computations; MP, groebner basis computations
 EXAMPLE: example groebner;  shows an example"
@@ -481,7 +481,7 @@ example
   groebner(i);
   option(noprot);
   if (system("with","MP")) {groebner(i,0);}
-  defined(groebner_error);
+  defined(Standard::groebner_error);
 }
 
 proc res(list #)
