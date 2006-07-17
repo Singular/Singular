@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.50 2006-07-17 14:32:24 Singular Exp $
+@comment $Id: start.doc,v 1.51 2006-07-17 14:40:31 Singular Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added changes by GMG.
 
@@ -526,7 +526,7 @@ x^3
 may be entered in two ways: either using the power operator @code{^},
 saying @code{x^3}, or in short-hand notation without operator, saying
 @code{x3}. Note that the short-hand notation is forbidden if a name
-of the ring variable(s) consists of more than one character(see @xref{Miscellaneous oddities} for details).
+of the ring variable(s) consists of more than one character(see @ref{Miscellaneous oddities} for details).
 Note, that @sc{Singular} always expands brackets and automatically
 sorts the terms with respect to the monomial ordering of the basering.
 

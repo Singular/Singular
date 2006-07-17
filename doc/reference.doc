@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.270 2006-07-17 14:16:46 Singular Exp $
+@comment $Id: reference.doc,v 1.271 2006-07-17 14:38:46 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -156,7 +156,6 @@ and @code{LIB} no brackets are allowed.
 * printf::
 * prune::
 * qhweight::
-* quot::
 * quote::
 * quotient::
 * random::
