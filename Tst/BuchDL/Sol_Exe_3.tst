@@ -102,11 +102,7 @@ NOTE:    Output is a presentation matrix for the truncation of
   intvec vv = attrib(L,"isHomog");
   if (d>m) 
   { 
-    vv = vv+d; 
-  }
-  else 
-  { 
-    vv = vv+m; 
+    vv = vv+d-m; 
   }
   attrib(L,"isHomog",vv);
   return(L);
