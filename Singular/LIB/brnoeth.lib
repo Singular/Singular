@@ -1,4 +1,4 @@
-version="$Id: brnoeth.lib,v 1.18 2006-07-18 11:59:44 Singular Exp $";
+version="$Id: brnoeth.lib,v 1.19 2006-07-18 15:48:10 Singular Exp $";
 category="Coding theory";
 info="
 LIBRARY:   brnoeth.lib  Brill-Noether Algorithm, Weierstrass-SG and AG-codes
@@ -901,7 +901,7 @@ static proc rationalize (lf,string datum,string rel)
   // warning : ring lf must have only variables (x,y) and basering must have
   //           at least (x,y)
   // warning : the case of minpoly=0 is supposed unnecessary, since then
-  //           "datum" should be already written in the right way, i.e. in 
+  //           "datum" should be already written in the right way, i.e. in
   //           terms of the prime field
   def base_r=basering;
   if (rel=="a")

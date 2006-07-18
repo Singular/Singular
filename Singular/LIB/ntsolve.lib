@@ -1,6 +1,6 @@
 //(GMG, last modified 16.12.00)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ntsolve.lib,v 1.14 2002-04-11 14:51:50 westenb Exp $";
+version="$Id: ntsolve.lib,v 1.15 2006-07-18 15:48:29 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  ntsolve.lib     Real Newton Solving of Polynomial Systems
@@ -17,7 +17,7 @@ LIB "general.lib";
 
 proc nt_solve (ideal gls, ideal ini, list #)
 "USAGE:   nt_solve(gls,ini[,ipar]); gls,ini= ideals, ipar=list/intvec,@*
-  gls: contains the equations, for which a solution will be computed
+  gls: contains the equations, for which a solution will be computed@*
   ini: ideal of initial values (approximate solutions to start with),@*
   ipar: control integers (default: ipar = 100,10)
   @format

@@ -1,4 +1,4 @@
-// $Id: signcond.lib,v 1.6 2005-05-11 16:10:23 Singular Exp $
+// $Id: signcond.lib,v 1.7 2006-07-18 15:48:30 Singular Exp $
 // E. Tobis  12.Nov.2004
 // last change 5. May 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@ proc signcnd(ideal P,ideal I)
 "USAGE:     signcnd(P,I); ideal P,I
 RETURN:    list: the sign conditions realized by the polynomials of P on V(I).
            The output of signcnd is a list of two lists. Both lists have the
-           same length. That length is the number of sign conditions realized
+           same length. This length is the number of sign conditions realized
            by the polynomials of P on the set V(i).
            Each element of the first list indicates a sign condition of the
            polynomials of P.

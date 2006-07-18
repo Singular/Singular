@@ -1,4 +1,4 @@
-version="$Id: absfact.lib,v 1.4 2005-10-18 13:02:56 Singular Exp $";
+version="$Id: absfact.lib,v 1.5 2006-07-18 15:48:09 Singular Exp $";
 category="Factorization";
 info="
 LIBRARY: absfact.lib   Absolute factorization for characteristic 0
@@ -7,10 +7,10 @@ AUTHORS: Wolfram Decker,       decker at math.uni-sb.de
          Gerhard Pfister,      pfister at mathematik.uni-kl.de
 
 OVERVIEW:
- A library for computing the absolute factorization of multivariate 
- polynomials f with coefficients in a field K of characteristic zero. 
- Using Trager's idea, the implemented algorithm computes an absolutely 
- irreducible factor by factorizing over some finite extension field L 
+ A library for computing the absolute factorization of multivariate
+ polynomials f with coefficients in a field K of characteristic zero.
+ Using Trager's idea, the implemented algorithm computes an absolutely
+ irreducible factor by factorizing over some finite extension field L
  (which is chosen such that V(f) has a smooth point with coordinates in L).
  Then a minimal extension field is determined making use of the
  Rothstein-Trager partial fraction decomposition algorithm. See [Cheze
@@ -52,7 +52,7 @@ RETURN: 1 if s belongs to l, 0 otherwise
 }
 ////////////////////////////////////////////////////////////////////
 static proc variableWithSmallestPositiveDegree(poly p)
-"USAGE:  variableWithSmallestPositiveDegree(p);  p poly 
+"USAGE:  variableWithSmallestPositiveDegree(p);  p poly
 RETURN: int;  0 if p is constant. Otherwise, the index of the
         variable which has the smallest positive degree in p.
 "
@@ -96,7 +96,7 @@ RETURN: poly:  a proper irreducible simple factor of p of smallest
 ////////////////////////////////////////////////////////////////////
 static proc smallestProperFactor(poly p)
 "USAGE:  smallestProperFactor(p);   p poly
-RETURN: poly:  a proper irreducible factor of p of smallest degree. 
+RETURN: poly:  a proper irreducible factor of p of smallest degree.
         If p is constant, 0 is returned.
 "
 {
@@ -119,8 +119,8 @@ RETURN: poly:  a proper irreducible factor of p of smallest degree.
 ////////////////////////////////////////////////////////////////////
 static proc extensionContainingSmoothPoint(poly p, int m)
 "USAGE:  extensionContainingSmoothPoint(p,m);  p poly, m int
-RETURN: poly:  an irreducible univariate polynomial that defines an 
-        algebraic extension of the current ground field that contains 
+RETURN: poly:  an irreducible univariate polynomial that defines an
+        algebraic extension of the current ground field that contains
         a smooth point of the hypersurface defined by p=0.
 "
 {
@@ -193,9 +193,9 @@ NOTE:   To be called by the RothsteinTrager procedure only.
 static proc RothsteinTrager(list g, poly p, int m, int expectedDegQ)
 "USAGE:  RothsteinTrager(g,p,m,d);  g list, p poly, m,d int
 RETURN: list L consisting of two entries of type poly
-NOTE:   the return value is the Rothstein-Trager partial fraction 
+NOTE:   the return value is the Rothstein-Trager partial fraction
         decomposition of the quotient s/p, where s is a generic linear
-        combination of the elements of g. The genericity via d 
+        combination of the elements of g. The genericity via d
         (the expected degree of L[1]).
 "
 {
@@ -246,10 +246,10 @@ NOTE:   the return value is the Rothstein-Trager partial fraction
 static proc absFactorizeIrreducible(poly p)
 "USAGE:   absFactorizeIrreducible(p);   p poly
 ASSUME:  p is an irreducible polynomial that does not depend on the last
-         variable @z of the basering. 
+         variable @z of the basering.
 RETURN:  list L of two polynomials: q=L[1] is an irreducible polynomial of
-         minimal degree in @z such that p has an absolute factor 
-         over K[@z]/<q>, and f represents such an absolute factor. 
+         minimal degree in @z such that p has an absolute factor
+         over K[@z]/<q>, and f represents such an absolute factor.
 "
 {
   int dblevel = printlevel - voice + 2;
@@ -312,13 +312,13 @@ RETURN:  list L of two polynomials: q=L[1] is an irreducible polynomial of
 
 ////////////////////////////////////////////////////////////////////
 proc absFactorize(poly p, list #)
-"USAGE:  absFactorize(p [,s]);   p poly, s string 
-ASSUME: coefficient field is the field of rational numbers or a 
+"USAGE:  absFactorize(p [,s]);   p poly, s string
+ASSUME: coefficient field is the field of rational numbers or a
         transcendental extension thereof
 RETURN: ring @code{R} which is obtained from the current basering
-        by adding a new parameter (if a string @code{s} is given as a 
+        by adding a new parameter (if a string @code{s} is given as a
         second input, the new parameter gets this string as name). The ring
-        @code{R} comes with a list @code{absolute_factors} with the 
+        @code{R} comes with a list @code{absolute_factors} with the
         following entries:
 @format
     absolute_factors[1]: ideal   (the absolute factors)
@@ -326,21 +326,21 @@ RETURN: ring @code{R} which is obtained from the current basering
     absolute_factors[3]: ideal   (the minimal polynomials)
     absolute_factors[4]: int     (total number of nontriv. absolute factors)
 @end format
-        The entry @code{absolute_factors[1][1]} is a constant, the 
+        The entry @code{absolute_factors[1][1]} is a constant, the
         entry @code{absolute_factors[3][1]} is the parameter added to the
         current ring.@*
         Each of the remaining entries @code{absolute_factors[1][j]} stands for
-        a class of conjugated absolute factors. The corresponding entry 
+        a class of conjugated absolute factors. The corresponding entry
         @code{absolute_factors[3][j]} is the minimal polynomial of the
         field extension over which the factor is minimally defined (its degree
-        is the number of conjugates in the class). If the entry 
-        @code{absolute_factors[3][j]} coincides with @code{absolute_factors[3][1]}, 
-        no field extension was necessary for the @code{j}th (class of) 
-        absolute factor(s).    
-NOTE:   All factors are presented denominator- and content-free. The constant 
+        is the number of conjugates in the class). If the entry
+        @code{absolute_factors[3][j]} coincides with @code{absolute_factors[3][1]},
+        no field extension was necessary for the @code{j}th (class of)
+        absolute factor(s).
+NOTE:   All factors are presented denominator- and content-free. The constant
         factor (first entry) is chosen such that the product of all (!) the
-        (denominator- and content-free) absolute factors of @code{p} equals 
-        @code{p / absolute_factors[1][1]}.    
+        (denominator- and content-free) absolute factors of @code{p} equals
+        @code{p / absolute_factors[1][1]}.
 SEE ALSO: factorize, absPrimdecGTZ
 EXAMPLE: example absFactorize; shows an example
 "
@@ -352,12 +352,12 @@ EXAMPLE: example absFactorize; shows an example
   if (char(MP) != 0) {
     ERROR("// absfact.lib::absFactorize is only implemented for "+
           "characteristic 0");
-  }  
+  }
   if(minpoly!=0) {
     ERROR("// absfact.lib::absFactorize is not implemented for algebraic "
           +"extensions");
   }
- 
+
   int n = nvars(MP);
   int pa=npars(MP);
   list lMP= ringlist(MP);
@@ -388,7 +388,7 @@ EXAMPLE: example absFactorize; shows an example
     lMP[1]=0;
     n=n+npars(MP);
   }
-  
+
   // MPz is obtained by adding the new variable @z to MP
   // ordering is wp(1...1)
   // All the above subroutines work in MPz
@@ -399,7 +399,7 @@ EXAMPLE: example absFactorize; shows an example
 	{
 	  newvar=#[1];
 	}
-      else 
+      else
       {
         newvar = "a";
       }
@@ -418,18 +418,18 @@ EXAMPLE: example absFactorize; shows an example
       }
     }
   lMP[2][n+1] = newvar;
-  
+
   // new ordering
   vv=vv,1;
   list orst;
   orst[1]=list("wp",vv);
   orst[2]=list("C",0);
   lMP[3]=orst;
-  
+
   def MPz = ring(lMP);
   setring(MPz);
   poly p=imap(MP,p);
-  
+
   // special treatment in the homogeneous case, dropping one variable
   // by substituting the first variable by 1
   int ho=homog(p);
@@ -438,7 +438,7 @@ EXAMPLE: example absFactorize; shows an example
       int dh=deg(p);
       p=subst(p,var(1),1);
       int di=deg(p);
-    } 
+    }
   list rat_facts = factorize(p);
   int s = size(rat_facts[1]);
   list tmpf; // absolute factors
@@ -518,7 +518,7 @@ EXAMPLE: example absFactorize; shows an example
   intvec mults;
   int nfacts;
   number co=1;
-  minpols[1]=tmpf[1][1];  
+  minpols[1]=tmpf[1][1];
   facts[1]=tmpf[1][2];     //the coefficient
   for(i=2;i<=size(tmpf);i++)
     {
@@ -536,7 +536,7 @@ EXAMPLE: example absFactorize; shows an example
       nfacts=nfacts+mults[i]*deg(minpols[i]);
     }
   list absolute_factors=facts,mults,minpols,nfacts;
-  
+
   // create ring with extra parameter `newvar` for output:
   setring(MP);
   list Lout=ringlist(MP);
@@ -562,7 +562,7 @@ EXAMPLE: example absFactorize; shows an example
   dbprint( printlevel-voice+3,"
 // 'absFactorize' created a ring, in which a list absolute_factors (the
 // absolute factors) is stored.
-// To access the list of absolute factors, type (if the name S was assigned 
+// To access the list of absolute factors, type (if the name S was assigned
 // to the return value):
         setring(S); absolute_factors; ");
   return(MPo);
@@ -672,7 +672,7 @@ absolute_factors;
 
 ring R1 = 0, x, dp;
 def S1 = absFactorize(x4-2);
-setring(S1); 
+setring(S1);
 absolute_factors;
 
 ring R3 = 0, (x,y), dp;
@@ -686,5 +686,5 @@ poly f = y4+2*xy2-7*x2+14*y2+6*x+47;
 def S4 = absFactorize(f);
 setring(S4);
 absolute_factors;
-  
+
 */

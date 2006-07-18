@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.17 2005-08-12 16:47:08 levandov Exp $";
+version="$Id: nctools.lib,v 1.18 2006-07-18 15:48:27 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -523,7 +523,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 proc ndcond(list #)
-"USAGE:   ndcond(); 
+"USAGE:   ndcond();
 RETURN:  ideal
 PURPOSE: compute the non-degeneracy conditions of the basering
 NOTE: if @code{printlevel} > 0, the procedure displays intermediate information (by default, @code{printlevel}=0 )
@@ -598,7 +598,7 @@ proc Weyl(list #)
 "USAGE:   Weyl([p]); p an optional integer
 RETURN:  nothing
 PURPOSE: create a Weyl algebra structure on a basering
-NOTE: suppose the number of variables of a basering is 2k. 
+NOTE: suppose the number of variables of a basering is 2k.
 (if this number is odd, an error message will be returned)
 @*    by default, the procedure treats first k variables as coordinates x_i and the last k as differentials d_i
 @*    if nonzero p is given, the procedure treats 2k variables of a basering as k pairs (x_i,d_i), i.e. variables with odd numbers are treated as coordinates and with even numbers as differentials
@@ -608,8 +608,8 @@ EXAMPLE: example Weyl; shows examples
 {
   //there are two possibilities for choosing the PBW basis.
   //The variables have names x(i) for coordinates and d(i) for partial
-  // differentiations. By default, the procedure 
-  //creates a ring, where the variables are ordered as x(1..n),d(1..n).  the 
+  // differentiations. By default, the procedure
+  //creates a ring, where the variables are ordered as x(1..n),d(1..n).  the
   // tensor product-like realization x(1),d(1),x(2),d(2),... is used.
   string rname=nameof(basering);
   if ( rname == "basering") // i.e. no ring has been set yet
@@ -754,7 +754,7 @@ proc makeWeyl(int n, list #)
 RETURN:  ring
 PURPOSE: create an n-th Weyl algebra
 NOTE:    activate this ring with the \"setring\" command.
-@*       The presentation of an n-th Weyl algebra is classical: D(i)x(i)=x(i)D(i)+1, 
+@*       The presentation of an n-th Weyl algebra is classical: D(i)x(i)=x(i)D(i)+1,
 @*       where x(i) correspond to coordinates and D(i) to partial differentiations, i=1,...,n.
 SEE ALSO: Weyl
 EXAMPLE: example makeWeyl; shows examples

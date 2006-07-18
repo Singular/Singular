@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.47 2005-10-18 12:31:55 Singular Exp $";
+version="$Id: normal.lib,v 1.48 2006-07-18 15:48:27 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -1894,7 +1894,7 @@ EXAMPLE: example deltaLoc;  shows an example
         setring R;
         kill HNEring;
       }
-      else 
+      else
       {
         nb=size(HNEXP);
       }

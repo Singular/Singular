@@ -1,4 +1,4 @@
-version="$Id: hnoether.lib,v 1.51 2005-10-06 16:19:28 Singular Exp $";
+version="$Id: hnoether.lib,v 1.52 2006-07-18 15:48:19 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  hnoether.lib   Hamburger-Noether (Puiseux) Expansion
@@ -2532,7 +2532,7 @@ EXAMPLE: example extdevelop;  shows an example
  else { v[zeile]=Q; }               // HNE war exakt
  if (ringwechsel)
  {
-   kill extdguenstig; 
+   kill extdguenstig;
  }
 
  return(list(mneu,v,switch,f));
@@ -3475,10 +3475,10 @@ RETURN: list: first entry = list of HNErings,
      //---------- Sonderbehandlung: faktorisiere einige Polynome ueber Q(a): --
      if ((charstr(basering)=="0,a") and (essential==0)) {
         // ====================================================
-        // neu CL:  06.10.05 
+        // neu CL:  06.10.05
         poly CHPOLY=charPoly(leitf,M,N);
         poly tstpoly;
-        if (defined(faktoren)!=0) { 
+        if (defined(faktoren)!=0) {
           // Test, damit kein Fehler eingebaut (vermutlich nicht notwendig)
           tstpoly = faktoren[1][1]^faktoren[2][1];
           for (k=2; k<=size(faktoren[1]); k++) {
@@ -3486,7 +3486,7 @@ RETURN: list: first entry = list of HNErings,
           }
           tstpoly = CHPOLY-tstpoly*(CHPOLY/tstpoly);
           kill CHPOLY;
-        }                                  
+        }
         if ((numberofRingchanges>1) and (defined(faktoren)!=0) and (tstpoly==0)) {
           def L_help=factorlist(faktoren,conjugates);
           faktoren=L_help[1];
@@ -3513,7 +3513,7 @@ RETURN: list: first entry = list of HNErings,
        else {     // eliminiere alle konjugierten Nullstellen bis auf eine:
          ideal hilf_id;
          for (zaehler=1; zaehler<=size(faktoren[1]); zaehler++) {
-           hilf_id=factorize(faktoren[1][zaehler],1); 
+           hilf_id=factorize(faktoren[1][zaehler],1);
            if (size(hilf_id)>1) {
              poly fac=hilf_id[1];
              dd=deg(fac);

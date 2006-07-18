@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: latex.lib,v 1.26 2005-05-18 18:23:50 Singular Exp $";
+version="$Id: latex.lib,v 1.27 2006-07-18 15:48:21 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: latex.lib    Typesetting of Singular-Objects in LaTeX2e
@@ -2754,7 +2754,7 @@ bv +
 ev);
 
   ring @r4_h=0,(x,y,z),dp;
-  export @r4_h; 
+  export @r4_h;
   ring r5=0,(u,v),dp;
   map @phi_h=@r4_h,u2,uv -v,v2;  export @phi_h;
   texmap(fname,@phi_h,@r4_h,r5);

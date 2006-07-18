@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: algebra.lib,v 1.13 2006-03-13 09:24:08 Singular Exp $";
+version="$Id: algebra.lib,v 1.14 2006-07-18 15:48:09 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  algebra.lib   Compute with Algbras and Algebra Maps
@@ -67,9 +67,9 @@ EXAMPLE: example algebra_containment; shows an example
     //-----------------
     // neu CL 10/05:
     int is_qring;
-    if (size(ideal(br))>0) { 
-      is_qring=1; 
-      ideal IdQ = ideal(br); 
+    if (size(ideal(br))>0) {
+      is_qring=1;
+      ideal IdQ = ideal(br);
     }
     //-----------------
     // ---------- create new ring with extra variables --------------------
@@ -257,9 +257,9 @@ EXAMPLE: example inSubring; shows an example
   list l;
   // neu CL 10/05:
   int is_qring;
-  if (size(ideal(gnir))>0) { 
-    is_qring=1; 
-    ideal IdQ = ideal(gnir); 
+  if (size(ideal(gnir))>0) {
+    is_qring=1;
+    ideal IdQ = ideal(gnir);
   }
   // ---------- create new ring with extra variables --------------------
   //the intersection of ideal nett=(p-y(0),I[1]-y(1),...)

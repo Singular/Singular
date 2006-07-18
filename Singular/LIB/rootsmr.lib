@@ -1,4 +1,4 @@
-// $Id: rootsmr.lib,v 1.1 2005-05-11 16:13:25 Singular Exp $
+// $Id: rootsmr.lib,v 1.2 2006-07-18 15:48:30 Singular Exp $
 // E. Tobis  12.Nov.2004, April 2004
 // last change 7. May 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
@@ -43,7 +43,7 @@ proc nrRootsProbab(ideal I, list #)
 "USAGE:     nrRootsProbab(I,[n]); ideal I, int n
 RETURN:    int: the number of real roots of the ideal I by a probabilistic
            algorithm
-ASSUME:    If I is no Groebner basis then a Groebner basis will be computed
+ASSUME:    If I is not a Groebner basis, then a Groebner basis will be computed
            by using std. If I is already a Groebner basis (i.e. if
            attrib(I,"isSB"); returns 1) then this Groebner basis will be
            used, hence it must be one w.r.t. (any) global ordering. This may
@@ -105,14 +105,14 @@ proc nrRootsDeterm(ideal I)
 "USAGE:     nrRootsDeterm(I); ideal I
 RETURN:    int: the number of real roots of the ideal I by a deterministic
            algorithm
-ASSUME:    If I is no Groebner basis then a Groebner basis will be computed
+ASSUME:    If I is not a Groebner basis, then a Groebner basis will be computed
            by using std. If I is already a Groebner basis (i.e. if
            attrib(I,"isSB"); returns 1) then this Groebner basis will be
            used, hence it must be one w.r.t. (any) global ordering. This may
            be useful if the ideal is known to be a Groebner basis or if it
            can be computed faster by a different method.
 NOTE:      If printlevel>0 the number of complex solutions is displayed
-           (default: printlevel=0). The proc nrRootsProbab is usually faster.
+           (default: printlevel=0). The procedure nrRootsProbab is usually faster.
 SEE ALSO:  nrroots, nrRootsProbab, sturmquery, solve
 EXAMPLE:   example nrRootsDeterm; shows an example"
 {

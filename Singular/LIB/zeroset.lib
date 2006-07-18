@@ -1,17 +1,17 @@
 // Last change 12.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: zeroset.lib,v 1.14 2005-05-10 17:56:17 Singular Exp $";
+version="$Id: zeroset.lib,v 1.15 2006-07-18 15:48:31 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  zeroset.lib      Procedures For Roots and Factorization
 AUTHOR:   Thomas Bayer,    email: tbayer@mathematik.uni-kl.de
           http://wwwmayr.informatik.tu-muenchen.de/personen/bayert/
-          Current Adress: Institut fuer Informatik, TU Muenchen
+          Current Address: Institut fuer Informatik, TU Muenchen
 
 OVERVIEW:
  Algorithms for finding the zero-set of a zero-dim. ideal in Q(a)[x_1,..,x_n],
- Roots and Factorization of univariate polynomials over Q(a)[t]
- where a is an algebraic number. Written in the frame of the
+ roots and factorization of univariate polynomials over Q(a)[t]
+ where a is an algebraic number. Written in the scope of the
  diploma thesis (advisor: Prof. Gert-Martin Greuel) 'Computations of moduli
  spaces of semiquasihomogeneous singularities and an implementation in Singular'.
  This library is meant as a preliminary extension of the functionality
@@ -168,7 +168,7 @@ RETURN:  list, all entries are polynomials
   _[3] = minpoly of the algebraic extension of the ground field
   @end format
 ASSUME:  basering = Q[x,a] ideal mpoly must be defined, it might be 0!
-NOTE:    might change the ideal mpoly !!
+NOTE:    might change the ideal mpoly!!
 EXAMPLE: example  Roots; shows an example
 "
 {
@@ -407,7 +407,7 @@ example
 
 proc InvertNumberMain(poly f)
 "USAGE:   InvertNumberMain(f); where f is a polynomial
-PURPOSE: compute 1/f if f is a number in Q(a) i.e., f is represented by a
+PURPOSE: compute 1/f if f is a number in Q(a), i.e., f is represented by a
          polynomial in Q[a].
 RETURN:  poly 1/f
 ASSUME:  basering = Q[x_1,...,x_n,a], ideal mpoly must be defined and != 0 !
@@ -506,7 +506,7 @@ example
 
 proc QuotientMain(poly f, poly g)
 "USAGE:   QuotientMain(f, g); where f,g are polynomials
-PURPOSE: compute the quotient q and remainder r s.t. f = g*q + r, deg(r) < deg(g)
+PURPOSE: compute the quotient q and remainder r s.th. f = g*q + r, deg(r) < deg(g)
 RETURN:  list of polynomials
   @format
   _[1] = quotient  q
@@ -585,8 +585,8 @@ ASSUME:  basering = Q[x,a] and ideal mpoly is defined (it might be 0),
 proc EGCD(poly f, poly g)
 "USAGE:   EGCD(f, g); where f,g are polynomials
 PURPOSE: compute the polynomial gcd of f and g over Q(a)[x]
-RETURN:  polynomial h s.t. h is a greatest common divisor of f and g (not nec.
-         monic)
+RETURN:  polynomial h s.th. h is a greatest common divisor of f and g (not
+         necessarily monic)
 ASSUME:  basering = Q(a)[t]
 EXAMPLE: example  EGCD; shows an example
 "
@@ -718,7 +718,7 @@ RETURN:  list with 3 entries
   _[3] = s (int)
   @end format
 ASSUME:  f must be squarefree, basering = Q[x,a] and ideal mpoly is equal to
-         'minpoly',this represents the ring Q(a)[x] together with 'minpoly'.
+         'minpoly', this represents the ring Q(a)[x] together with 'minpoly'.
 NOTE:   the norm is an element of Q[x]
 EXAMPLE: example  SqfrNorm; shows an example
 "

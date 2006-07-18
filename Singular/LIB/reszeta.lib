@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: reszeta.lib,v 1.7 2005-06-07 11:43:40 Singular Exp $";
+version="$Id: reszeta.lib,v 1.8 2006-07-18 15:48:29 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  reszeta.lib       Zeta-function of Denef and Loeser
@@ -1751,13 +1751,13 @@ proc zetaDL(list re,int d,list #)
 @*        a     = integer
 ASSUME:   L is the output of resolution of singularities
 COMPUTE:  local Denef-Loeser zeta function, if string s1 is present and
-             has the value 'local'; global Denef-Loeser zeta function 
+             has the value 'local'; global Denef-Loeser zeta function
              otherwise
-          if string s1 or s2 has the value "A", additionally the 
+          if string s1 or s2 has the value "A", additionally the
              characteristic polynomial of the monodromy is computed
 RETURN:   list l
           if a is not present:
-          l[1]: string specifying the Denef-Loeser zeta function 
+          l[1]: string specifying the Denef-Loeser zeta function
           l[2]: string specifying characteristic polynomial of monodromy,
                 if "A" was specified
           if a is present

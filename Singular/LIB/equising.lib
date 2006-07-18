@@ -1,4 +1,4 @@
-version="$Id: equising.lib,v 1.16 2006-06-13 14:29:48 Singular Exp $";
+version="$Id: equising.lib,v 1.17 2006-07-18 15:48:12 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  equising.lib  Equisingularity Stratum of a Family of Plane Curves
@@ -1085,7 +1085,7 @@ static proc esComputation (int typ, poly p_F, list #)
       }
     }
   }
- 
+
   // Computation for all equimultiple sections being trivial (I^s(f))
   ideal Jtriv=J;
   for (i=1;i<=no_b; i++)
@@ -1128,7 +1128,7 @@ static proc esComputation (int typ, poly p_F, list #)
     }
   }
 
-  //new CL 11/06:  check in which equations b(k) appears and remove those b(k) 
+  //new CL 11/06:  check in which equations b(k) appears and remove those b(k)
   //               which appear in exactly one of the equations (by removing this
   //               equation)
   dbprint(i_print,"// ");
@@ -1143,11 +1143,11 @@ static proc esComputation (int typ, poly p_F, list #)
 
   for (i=1;i<=no_b; i++)
   {
-    ideal b_appears_in(i);            // Eintraege sind spaeter 1 oder 0 
-    intmat b_app_in(i)[1][ncJ];       // Eintraege sind spaeter 1 oder 0 
-    b_appears_in(i)[ncJ]=0;  
+    ideal b_appears_in(i);            // Eintraege sind spaeter 1 oder 0
+    intmat b_app_in(i)[1][ncJ];       // Eintraege sind spaeter 1 oder 0
+    b_appears_in(i)[ncJ]=0;
     J_Tmp = J-subst(J,b(i),0);
-    for (Z=1; Z<=ncJ; Z++) { 
+    for (Z=1; Z<=ncJ; Z++) {
       if (J_Tmp[Z]<>0) {      // b(i) appear in J_Tmp[Z]
         b_appears_in(i)[Z]=1;
         b_app_in(i)[1,Z]=1;

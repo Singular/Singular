@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: arcAtPoint.lib,v 1.1 2006-05-11 13:03:59 Singular Exp $";
+version="$Id: arcAtPoint.lib,v 1.2 2006-07-18 15:48:10 Singular Exp $";
 //-*- mode:C++;-*-
 
 category="Singularities";
@@ -7,43 +7,43 @@ info="
 LIBRARY:  arcAtPoint.lib        Truncations of arcs at a singular point
 AUTHOR:   Nadine Cremer         cremer@mathematik.uni-kl.de
 
-OVERVIEW: An arc is given by a power series in one variable, say t, and 
+OVERVIEW: An arc is given by a power series in one variable, say t, and
           truncating it at a positive integer i means cutting
-          the t-powers > i. The set of arcs truncated at order 
-          <bound> is denoted Tr(i). An algorithm for computing 
+          the t-powers > i. The set of arcs truncated at order
+          <bound> is denoted Tr(i). An algorithm for computing
           these sets (which happen to be constructible) is given in
-          [Lejeune-Jalabert, M.: Courbes trac\'ees sur un germe 
+          [Lejeune-Jalabert, M.: Courbes trac\'ees sur un germe
           d'hypersurface, American Journal of Mathematics, 112 (1990)].
-          Our procedures for computing the locally closed sets contributing 
-          to the set of truncations rely on this algorithm. 
+          Our procedures for computing the locally closed sets contributing
+          to the set of truncations rely on this algorithm.
 
 PROCEDURES:
-    nashmult(f,bound);         determines locally closed sets relevant 
-                               for computing truncations of arcs over a 
+    nashmult(f,bound);         determines locally closed sets relevant
+                               for computing truncations of arcs over a
                                hypersurface with isolated singularity
-                               defined by f. The sets are given by two 
-                               ideals specifying relations between 
-                               coefficients of power series in t. One 
-                               of the ideals defines an open set, the 
-                               other one the complement of a closed 
-                               set within the open one. 
-                               We consider only coefficients up to 
+                               defined by f. The sets are given by two
+                               ideals specifying relations between
+                               coefficients of power series in t. One
+                               of the ideals defines an open set, the
+                               other one the complement of a closed
+                               set within the open one.
+                               We consider only coefficients up to
                                t^<bound>.
-                               Moreover, the sequence of Nash 
-                               Multiplicities of each set is 
+                               Moreover, the sequence of Nash
+                               Multiplicities of each set is
                                displayed
-    removepower(I);            modifies the ideal I such that the 
-                               algebraic set defined by it remains 
+    removepower(I);            modifies the ideal I such that the
+                               algebraic set defined by it remains
                                the same: removes powers of variables
-    idealsimplify(I,maxiter);  further simplification of I in the 
-                               above sense: reduction with other  
-                               elements of I. The positive integer 
-                               <maxiter> gives a bound to the number of 
+    idealsimplify(I,maxiter);  further simplification of I in the
+                               above sense: reduction with other
+                               elements of I. The positive integer
+                               <maxiter> gives a bound to the number of
                                repetition steps
-    equalJinI(I,J);            tests if two ideals I and J are equal 
-                               under the assumption that J is 
-                               contained in I. Returns 1 if this is  
-                               true and 0 otherwise 
+    equalJinI(I,J);            tests if two ideals I and J are equal
+                               under the assumption that J is
+                               contained in I. Returns 1 if this is
+                               true and 0 otherwise
     ";
 
 LIB "ring.lib";
@@ -59,24 +59,24 @@ LIB "sing.lib";
 //////////////////////////////////////////////////////////////////////
 
 
-proc nashmult (poly f, int bound)  
+proc nashmult (poly f, int bound)
 "USAGE:   nashmult(f,bound); f polynomial, bound positive integer
-CREATE:  allsteps: 
+CREATE:  allsteps:
 @format
-         a list containing all relevant locally closed sets 
-         up to order <bound> and their sequences of 
+         a list containing all relevant locally closed sets
+         up to order <bound> and their sequences of
          Nash Multiplicities
 @end format
-         setstep: 
+         setstep:
 @format
          list of relevant locally closed sets
          obtained from sequences of length bound+1
 @end format
 RETURN:  ring, original basering with additional
-         variables t and coeffiecients up to t^<bound> 
+         variables t and coeffiecients up to t^<bound>
 EXAMPLE: example nashmult; shows an example"
 
-{ 
+{
  // Make sure that only admissible  parameters are entered
 
  if (bound<1)
@@ -88,81 +88,81 @@ EXAMPLE: example nashmult; shows an example"
 
  int k,s,step,loop;                   // loop variables
  int pos;                             // position parameter
- int countall;                        // position parameter 
- list allsteps;                       // saves results from all 
-                                      // steps                        
+ int countall;                        // position parameter
+ list allsteps;                       // saves results from all
+                                      // steps
  def r=basering;
  int startvar=nvars(basering);
  intvec control=order(f);             // initialize
  def R=ringchange(bound+1);           // ring in which result lies
 
 
- setring R;                           // make it basering 
- ideal I0;                            
- list init=control,I0,I0;                       
- list setstep=insert(setstep,init);   // stores Nash multiplicities  
- kill I0;                             // and underlying sets (given   
- kill init;                           // that the sets are not    
-                                       // empty),will be a list of   
-                                      // lists, each of which   
+ setring R;                           // make it basering
+ ideal I0;
+ list init=control,I0,I0;
+ list setstep=insert(setstep,init);   // stores Nash multiplicities
+ kill I0;                             // and underlying sets (given
+ kill init;                           // that the sets are not
+                                       // empty),will be a list of
+                                      // lists, each of which
                                       // containing an intvec and
                                       // two ideals
 
-                            
-  // consider all possible sequences of multiplicities<=<bound>: 
 
- for(step=2;step<=bound+1;step++)          
- {                                    
-   list setsteptmp;                    // temporary variable, local  
+  // consider all possible sequences of multiplicities<=<bound>:
+
+ for(step=2;step<=bound+1;step++)
+ {
+   list setsteptmp;                    // temporary variable, local
                                        // to this loop
    int count;                          // position parameter
    int setsize=size(setstep);
 
-   setring r;                         
-   def rplug=pluginCoeffs(f,step);     // substitute variables in f  
-                                       // by polynomials in t of 
-                                       // degree <step>   
+   setring r;
+   def rplug=pluginCoeffs(f,step);     // substitute variables in f
+                                       // by polynomials in t of
+                                       // degree <step>
    setring R;
    ideal coe=imap(rplug,resultcoe);    // gives the t-coefficients
    kill rplug;
 
 
-   // consider all sequences of lenght <step-1> giving rise to a 
+   // consider all sequences of lenght <step-1> giving rise to a
    // family...
 
-   for(loop=1;loop<=setsize;loop++)  
-   {     
+   for(loop=1;loop<=setsize;loop++)
+   {
      control=setstep[loop][1];       // initialization. <control>
-     int sizecontrol=size(control);  // describes Nash mutiplicities 
-     ideal gprev=setstep[loop][3];   // in this step, <fprev> and 
-     ideal fprev=setstep[loop][2];   // <gprev> the already obtained 
+     int sizecontrol=size(control);  // describes Nash mutiplicities
+     ideal gprev=setstep[loop][3];   // in this step, <fprev> and
+     ideal fprev=setstep[loop][2];   // <gprev> the already obtained
                                      // relations
 
      ideal actcoe=reduce(coe,slimgb(fprev));  // take into account
                                               // existing relations
 
-     pos=1;                          // determine first nonzero 
-     while(actcoe[pos]==0)           // t-coefficient 
-     {                               
+     pos=1;                          // determine first nonzero
+     while(actcoe[pos]==0)           // t-coefficient
+     {
        pos++;
-     } 
+     }
 
-     ideal fset;                     // will store relations  
-     ideal gset;                     // defining the  
+     ideal fset;                     // will store relations
+     ideal gset;                     // defining the
                                      // constructible sets
 
      int m0=control[sizecontrol];    // bounds the computations
 
      // consider all possible sequences arising from <control>...
 
-     control=control,0;                
+     control=control,0;
      for (s=1;s<=m0;s++)
-     { 
-       control[step]=control[step]+1;  // the next possible sequence  
+     {
+       control[step]=control[step]+1;  // the next possible sequence
                                        // of multiplicities
- 
+
        fset=fset,actcoe[pos+s-1],gset; // add new condition
-       gset=gset,fset;                     
+       gset=gset,fset;
 
        for(k=0;k<startvar;k++)         // additional conditions for
        {                               // <gset>:
@@ -170,12 +170,12 @@ EXAMPLE: example nashmult; shows an example"
          var(startvar+1+step+k*(bound+1)));
          int coesize=ncols(coevar);
          if (coesize>=2)               // add coeff. of nonconstant
-         {                             // terms in "highest" 
+         {                             // terms in "highest"
            gset=gset,coevar[2..coesize]; // variables
          }
-         kill coevar;                              
-         kill coesize;                             
-       } 
+         kill coevar;
+         kill coesize;
+       }
        fset=fprev,fset;                // add obtained conditions
        gset=fprev,gset;                // to the existing ones...
        gset=idealsimplify(gset,1000);  // ...and simplify
@@ -184,33 +184,33 @@ EXAMPLE: example nashmult; shows an example"
 
         // if we have found a nontrivial component...
 
-       if (control[step-1]==1)       
+       if (control[step-1]==1)
        {
-         list comp=control,fset,gset;              // ...add it and        
-         setsteptmp=insert(setsteptmp,comp,count); // multiplicity 
-         count++;    
+         list comp=control,fset,gset;              // ...add it and
+         setsteptmp=insert(setsteptmp,comp,count); // multiplicity
+         count++;
          kill comp;
        }
        else
        {
          if (equalJinI(gset,fset)==0)
-	 {
-           list comp=control,fset,gset;             // ...add it and    
-           setsteptmp=insert(setsteptmp,comp,count);// multiplicity 
-           count++;    
+         {
+           list comp=control,fset,gset;             // ...add it and
+           setsteptmp=insert(setsteptmp,comp,count);// multiplicity
+           count++;
            kill comp;
          }
-       } 
+       }
      }
-     kill fset,gset,actcoe,sizecontrol,fprev,gprev,m0;                       
-  }  
-  setstep=setsteptmp; 
+     kill fset,gset,actcoe,sizecontrol,fprev,gprev,m0;
+  }
+  setstep=setsteptmp;
 
   allsteps=insert(allsteps,setstep,countall);   // add results from
   countall++;                                   // this step
 
   kill setsteptmp,count,coe,setsize;
- } 
+ }
  export(setstep);
  export(allsteps);
  return(R);
@@ -222,11 +222,11 @@ example
   poly f=z4+y3-x2;
   def R=nashmult(f,2);
   setring R;
-  allsteps; 
+  allsteps;
 }
 
 
-      
+
 //////////////////////////////////////////////////////////////////////
 //                                                                  //
 //               SUBSTITUE VARIABLES BY POLYNOMIALS                 //
@@ -239,45 +239,45 @@ static proc pluginCoeffs (poly f,int i)
 CREATE:  matrix, the t-coefficients obtained by replacing each
          variable of f by a polynomial in t
 RETURN:  ring, corresponds to f and i in the sense that it is
-         the original ring with added variables t and 
+         the original ring with added variables t and
          t-coefficients up to t^<bound> "
-{ 
+{
   int startvar=nvars(basering);
   def r=basering;
   def R=ringchange(i);              // changes the ring
   setring R;                        // makes it new basering;
-  ideal I=tpolys(i,startvar);                    
+  ideal I=tpolys(i,startvar);
   map h=r,I;                        // define map
-  ideal resultplug=h(f);            
-  matrix resultcoe=coeffs(resultplug[1],t);     
+  ideal resultplug=h(f);
+  matrix resultcoe=coeffs(resultplug[1],t);
   export(resultcoe);                // keep accessible
-  export(resultplug); 
-  return(R);                        // 
+  export(resultplug);
+  return(R);                        //
 }
 
 //////////////////////////////////////////////////////////////////////
-static proc tpolys (int i,int k)  
+static proc tpolys (int i,int k)
 "USAGE:   tpolys(i,k); i,k integer
-RETURN:  ideal, generated by k polynomials in t of degree i 
-         of the form a(1)*t+..+a(i)*t^i          
+RETURN:  ideal, generated by k polynomials in t of degree i
+         of the form a(1)*t+..+a(i)*t^i
 NOTE:    called from pluginCoeffs"
-{                                
-  int s,t;                          
-  int v;           
-  poly sum; 
-  ideal I; 
-  for(t=1;t<=k;t++) 
-  {  
-    v=(t-1)*i; 
-    for(s=1;s<=i;s++) 
-    { 
-      sum=sum+var(1+k+v+s)*var(k+1)^s;  
-    }                                   
-    I[t]=sum; 
-    sum=0; 
-  }   
-  return(I); 
-} 
+{
+  int s,t;
+  int v;
+  poly sum;
+  ideal I;
+  for(t=1;t<=k;t++)
+  {
+    v=(t-1)*i;
+    for(s=1;s<=i;s++)
+    {
+      sum=sum+var(1+k+v+s)*var(k+1)^s;
+    }
+    I[t]=sum;
+    sum=0;
+  }
+  return(I);
+}
 
 
 //////////////////////////////////////////////////////////////////////
@@ -289,12 +289,12 @@ NOTE:    called from pluginCoeffs"
 
 static proc ringchange (int i)
 "USAGE:   ringchange(i); i integer
-RETURN:  ring, extends basering by variables t and 
+RETURN:  ring, extends basering by variables t and
           #(variables of basering)*i new variables"
-{    
+{
   def R=changevar(""+varstr(basering)+",t,"
   +variables(nvars(basering),i)+"");
-  return(R);                 
+  return(R);
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -302,34 +302,34 @@ static proc variables (int k,int i)
 "USAGE:   variables(k,i); k,i integer
 ASSUME:  1<=k<=26, i>=1
 RETURN:  string of names of variables added in ringchange
-NOTE:    called from ringchange, we use this procedure to  
-          obtain a nice shape of the ring created " 
+NOTE:    called from ringchange, we use this procedure to
+          obtain a nice shape of the ring created "
 {
   list l;
-  int s,u;                             
-  string str;               
-  for (u=1;u<=k;u++) 
+  int s,u;
+  string str;
+  for (u=1;u<=k;u++)
   {
     for (s=1;s<=i;s++)
     {
-      str=""+atoz(u)+"("+string(s)+")"; // creates new variables    
+      str=""+atoz(u)+"("+string(s)+")"; // creates new variables
       l[(u-1)*i+s]=str;                 // saves them in a list
     }
-  } 
-  string str1=string(l);               // makes a string of the  
+  }
+  string str1=string(l);               // makes a string of the
   return(str1);                        // list (needed for change
 }                                      // of ring)
 
 //////////////////////////////////////////////////////////////////////
-static proc atoz (int n) 
+static proc atoz (int n)
 "USAGE:   atoz(n); n integer
 ASSUME:  1<=n<=26
 RETURN:  string, the nth letter of the alphabet"
-{  
- string s="ring r=0,("+A_Z("a",n)+"),ds;"; 
- execute(s); 
- return (string(var(n))); 
-} 
+{
+ string s="ring r=0,("+A_Z("a",n)+"),ds;";
+ execute(s);
+ return (string(var(n)));
+}
 
 
 //////////////////////////////////////////////////////////////////////
@@ -339,11 +339,11 @@ RETURN:  string, the nth letter of the alphabet"
 //////////////////////////////////////////////////////////////////////
 
 
-static proc order (poly f) 
+static proc order (poly f)
 "USAGE:   order(f); f polynomial
-RETURN:  int i, such that f_i is the smallest (in terms of degree)  
+RETURN:  int i, such that f_i is the smallest (in terms of degree)
          non-zero homogeneous part
-NOTE:    is designed for ordering dp"                  
+NOTE:    is designed for ordering dp"
 {
  int k=deg(f);
  int i;
@@ -357,11 +357,11 @@ NOTE:    is designed for ordering dp"
 }
 
 //////////////////////////////////////////////////////////////////////
-static proc modd (poly f, poly g)  
+static proc modd (poly f, poly g)
 "USAGE:   modd(f,g); f,g polynomials
 RETURN:  poly, f mod g division with remainder
-NOTE:    called from idealsimplify where it is used to modify 
-          the generating set of an ideal"          
+NOTE:    called from idealsimplify where it is used to modify
+          the generating set of an ideal"
 {
   poly result=f-(f/g)*g;
   return(result);
@@ -372,9 +372,9 @@ proc removepower (ideal I)
 "USAGE:   removepower(I); I ideal
 SEE ALSO:idealsimplify
 RETURN:  ideal defining the same zeroset as I: if any  generator
-         of I is a power of one single variable, replace it by the 
+         of I is a power of one single variable, replace it by the
          respective variable
-EXAMPLE: example removepower; shows an example"    
+EXAMPLE: example removepower; shows an example"
 {
   int i,j;
   int divisornumber=0;
@@ -384,16 +384,16 @@ EXAMPLE: example removepower; shows an example"
   {
     if(size(I[j])==1)         // test if generators are powers
     {                         // of variables...
-      for(i=1;i<=nvars(basering);i++)     
-      {  
+      for(i=1;i<=nvars(basering);i++)
+      {
         if(modd(I[j],var(i))==0)
         {
-          divisornumber++;   
+          divisornumber++;
           pos=i;
         }
       }
     }
-    if(divisornumber==1)      // ...if so, replace by variable   
+    if(divisornumber==1)      // ...if so, replace by variable
     {
       I[j]=var(pos);
     }
@@ -415,9 +415,9 @@ example
 proc idealsimplify (ideal I, int maxiter)
 "USAGE:   idealsimplify(I); I ideal
 ASSUME:  procedure is stable for sufficiently large maxiter
-RETURN:  ideal defining the same zeroset as I: replace   generators 
+RETURN:  ideal defining the same zeroset as I: replace   generators
          of I by the generator modulo other generating elements
-EXAMPLE: example idealsimplify; shows an example "           
+EXAMPLE: example idealsimplify; shows an example "
 {
   if(maxiter<1)
     {ERROR("The integer argument has to be positive!")}
@@ -427,12 +427,12 @@ EXAMPLE: example idealsimplify; shows an example "
   int i,j,ci,n,cols;
   for(iteration=0;iteration<maxiter;iteration++)
   {
-    comp=I; 
+    comp=I;
     n=ncols(I);
     for(j=2;j<=n;j++)         // reduce with lower elements
-    { 
+    {
       for(i=1;i<j;i++)
-      { 
+      {
         if(I[i]!=0)
         {
           I[j]=modd(I[j],I[i]);
@@ -444,20 +444,20 @@ EXAMPLE: example idealsimplify; shows an example "
     kill n;
     int n=ncols(I);
     for(j=n-1;j>=1;j--)       // reduce with higher elements
-    { 
+    {
       for(i=n;i>j;i--)
-      { 
+      {
         if(I[i]!=0)
         {
           I[j]=modd(I[j],I[i]);
-	}
+        }
       }
-     }  
+     }
     I=simplify(removepower(I),7);
-  
+
     if (ncols(I)==ncols(comp))      //check if I has changed
-    { 
-      cols=ncols(I);  
+    {
+      cols=ncols(I);
       changed=0;
       for(ci=1;ci<=cols;ci++)
       {
@@ -480,18 +480,18 @@ example
   ideal I = x3,y+z2-x2;
   I;
 
-  idealsimplify(I,10); 
+  idealsimplify(I,10);
 }
 
 //////////////////////////////////////////////////////////////////////
 proc equalJinI (ideal I, ideal J)
 "USAGE:   equalJinI(I,J); (I,J ideals)
 ASSUME:  J contained in I and both I and J have been processed
-         with idealsimplify before  
+         with idealsimplify before
 SEE ALSO: idealsimplify
 RETURN:  1, if I=J, 0 otherwise
 EXAMPLE: example equalJinI; shows an example"
-{ 
+{
   int col=ncols(I);
   J=slimgb(J);
   int k;
@@ -508,8 +508,8 @@ example
   ring r=0,(x,y,z),dp;
   ideal I = x,y+z2;
   ideal J1= x;
-  ideal J2= x,y+z2; 
+  ideal J2= x,y+z2;
 
   equalJinI(I,J1);
-  equalJinI(I,J2);   
+  equalJinI(I,J2);
 }

@@ -1,4 +1,4 @@
-version="$Id: qmatrix.lib,v 1.12 2005-05-18 18:09:12 levandov Exp $";
+version="$Id: qmatrix.lib,v 1.13 2006-07-18 15:48:29 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: qmatrix.lib     Quantum matrices, quantum minors and symmetric groups
@@ -17,7 +17,7 @@ LengthSymElement(v);        calculates the length of the element v of S(n)
 LengthSym(M);               calculates the length of each element of M, being M a subset of S(n)
 ";
 
-LIB "ncalg.lib"; 
+LIB "ncalg.lib";
 LIB "nctools.lib";  // for rootofUnity
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -78,7 +78,7 @@ example
 // If size(v)=n, the group is S(n). The permutation is i->v[i].
 
 proc LengthSymElement(intvec v)
-"USAGE:  LengthSymElement(v); v intvec 
+"USAGE:  LengthSymElement(v); v intvec
 RETURN:  int
 PURPOSE: determine the length of v
 ASSUME:  v represents an element of S(n); otherwise the output may have no sense
@@ -107,7 +107,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc LengthSym(intmat M)
-"USAGE:   LengthSym(M); M an intmat 
+"USAGE:   LengthSym(M); M an intmat
 RETURN:  intvec
 PURPOSE: determine a vector, where the i-th element is the length of the i-th row of M
 ASSUME: M represents a subset of S(n) (each row must be an element of S(n)); otherwise, the output may have no sense
@@ -218,7 +218,7 @@ proc qminor(intvec I, intvec J, int nr)
 "USAGE:        qminor(I,J,n); I,J intvec, n int
 RETURN: poly, the quantum minor
 ASSUME: I is the ordered list of the rows to consider in the minor,
-@*      J is the ordered list of the columns to consider in the minor, 
+@*      J is the ordered list of the columns to consider in the minor,
 @*      I and J must have the same number of elements,
 @*      n is the order of the quantum matrix algebra you are working with (quantMat(n)).
 SEE ALSO: quantMat
@@ -253,7 +253,7 @@ EXAMPLE: example qminor; shows examples
 }
 example
 {
-  "EXAMPLE:"; 
+  "EXAMPLE:";
   echo=2;
   def r = quantMat(3); // let r be a quantum matrix of order 3
   setring r;

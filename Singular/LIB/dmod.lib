@@ -1,21 +1,21 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.7 2006-06-24 19:55:31 levandov Exp $";
+version="$Id: dmod.lib,v 1.8 2006-07-18 15:48:12 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
 AUTHORS: Viktor Levandovskyy,     levandov@risc.uni-linz.ac.at
 @*       Jorge Martin Morales,    jorge@unizar.es
 
-THEORY: Given a polynomial ring R = K[x_1,...,x_n] and a polynomial F in R, 
+THEORY: Given a polynomial ring R = K[x_1,...,x_n] and a polynomial F in R,
         one is interested in the ring R[1/F^s] for a natural number s.
-@* In fact, the ring R[1/F^s] has a structure of a D(R)-module, where D(R) 
+@* In fact, the ring R[1/F^s] has a structure of a D(R)-module, where D(R)
 @* is a Weyl algebra K<x_1,...,x_n,d_1,...,d_n | d_j x_j = x_j d_j +1>.
-@* Constructively, one needs to find a left ideal I = I(F^s) in D(R), such 
+@* Constructively, one needs to find a left ideal I = I(F^s) in D(R), such
 @* that K[x_1,...,x_n,1/F^s] is isomorphic to D(R)/I as a D(R)-module.
 @* We provide two implementations:
-@* 1) the classical Ann F^s algorithm from Oaku and Takayama (J. Pure 
+@* 1) the classical Ann F^s algorithm from Oaku and Takayama (J. Pure
         Applied Math., 1999) and
-@* 2) the newer Ann F^s algorithm by Briancon and Maisonobe (Remarques sur 
+@* 2) the newer Ann F^s algorithm by Briancon and Maisonobe (Remarques sur
         l'ideal de Bernstein associe a des polynomes, preprint, 2002).
 
 PROCEDURES:
