@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.405 2006-07-14 16:53:55 Singular Exp $ */
+/* $Id: iparith.cc,v 1.406 2006-07-18 16:09:18 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -5469,6 +5469,7 @@ static BOOLEAN jjRES3(leftv res, leftv u, leftv v, leftv w)
     intvec * iv=(intvec*)atGet(u,"isHomog",INTVEC_CMD);
     if (iv!=NULL)
     {
+      l=1;
       if (!idTestHomModule(u_id,currQuotient,iv))
       {
         WarnS("wrong weights");
@@ -5478,7 +5479,6 @@ static BOOLEAN jjRES3(leftv res, leftv u, leftv v, leftv w)
       {
         weights = (intvec**)omAlloc0Bin(void_ptr_bin);
         weights[0] = ivCopy(iv);
-        l=1;
       }
     }
     r=syResolvente(u_id,maxl,&l, &weights, iiOp==MRES_CMD);
