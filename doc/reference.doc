@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.271 2006-07-17 14:38:46 Singular Exp $
+@comment $Id: reference.doc,v 1.272 2006-07-18 09:21:00 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -6140,31 +6140,9 @@ system("getenv","PATH");
 @expansion{} /bin:/usr/bin:/usr/local/bin
 system("Singular");
 @expansion{} /usr/local/bin/Singular
+@c example
 // report value of all options
 system("--");
-@expansion{} // --batch           0
-@expansion{} // --execute
-@expansion{} // --sdb             0
-@expansion{} // --echo            0
-@expansion{} // --help            0
-@expansion{} // --quiet           0
-@expansion{} // --random          937848971
-@expansion{} // --no-tty          0
-@expansion{} // --user-option
-@expansion{} // --version         0
-@expansion{} // --allow-net       0
-@expansion{} // --browser
-@expansion{} // --emacs           0
-@expansion{} // --no-stdlib       0
-@expansion{} // --no-rc           0
-@expansion{} // --no-warn         0
-@expansion{} // --no-out          0
-@expansion{} // --min-time        "0.5"
-@expansion{} // --mp-port
-@expansion{} // --mp-host
-@expansion{} // --ticks-per-sec   1
-@expansion{} // --mp-transp
-@expansion{} // --mp-mode
 // set minimal display time to 0.02 seconds
 system("--min-time", "0.02");
 // set timer resolution to 0.01 seconds
@@ -6175,6 +6153,7 @@ system("--random", 12345678);
 system("--allow-net", 1);
 // and set help browser to netscape
 system("--browser", "netscape");
+@c example
 @end smallexample
 @end table
 @c -------------------------------------------------
