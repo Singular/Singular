@@ -2204,7 +2204,7 @@ fi
 	        ac_lib_dl=yes
 	  fi
 	;;
-	i386Mac-darwin)
+	ix86Mac-darwin)
 	  echo $ac_n "checking for dlopen in -ldl""... $ac_c" 1>&6
 echo "configure:2210: checking for dlopen in -ldl" >&5
 ac_lib_var=`echo dl'_'dlopen | sed 'y%./+-%__p_%'`
