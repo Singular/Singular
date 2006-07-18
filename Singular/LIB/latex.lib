@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: latex.lib,v 1.27 2006-07-18 15:48:21 Singular Exp $";
+version="$Id: latex.lib,v 1.28 2006-07-18 15:53:58 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: latex.lib    Typesetting of Singular-Objects in LaTeX2e
@@ -228,7 +228,7 @@ proc texdemo(list #)
 "USAGE:   texdemo();
 RETURN:  nothing; generates a LaTeX2e file called @code{texlibdemo.tex}
          explaining the features of @code{latex.lib} and its global variables.
-NOTE:    this proc may take some time.
+NOTE:    this procedure may take some time.
 "
 { int TeXdemostart = system("pid");
   string fname = "texlibdemo";
@@ -1047,7 +1047,7 @@ RETURN:  if @code{fname=\"\"}: string, the ring in TeX-typesetting;@*
 NOTE:    preceding \">>\" are deleted and suffix \".tex\" (if not given)
          is added to @code{fname}.@*
          The optional list L is assumed to be a list of strings which control,
-         e.g., the symbol for the field of coefficients.@*
+         for instamce the symbol for the field of coefficients.@*
          For more details call @code{texdemo();} (generates a LaTeX2e
          file called @code{texlibdemo.tex} which explains all features of
          @code{texring}).
@@ -1246,7 +1246,7 @@ example
 proc xdvi(string fname, list #)
 "USAGE:   xdvi(fname[,style]); fname,style = string
 RETURN:  nothing; displays dvi-file fname.dvi with previewer xdvi
-NOTE:    ending .dvi may miss in fname
+NOTE:    suffix .dvi may be omitted in fname
          style overwrites the default setting xdvi
 EXAMPLE: example xdvi; shows an example
 "

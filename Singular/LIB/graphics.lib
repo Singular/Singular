@@ -1,6 +1,6 @@
 //last change: 13.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: graphics.lib,v 1.10 2001-02-19 14:17:46 lossen Exp $";
+version="$Id: graphics.lib,v 1.11 2006-07-18 15:53:58 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: graphics.lib    Procedures to use Graphics with Mathematica
@@ -157,7 +157,7 @@ proc  mplot(string fname,ideal I,list #)
 RETURN:  string, text with Mathematica commands to display a plot
 NOTE:    The plotregion is defaulted to -1,1 around zero.
          For implicit given curves enter first the string returned by
-         proc mathinit into Mathematica in order to load ImplicitPlot.
+         procedure mathinit into Mathematica in order to load ImplicitPlot.
          The following conventions for I are used:
   @format
   - ideal with 2 entries in one variable means a parametrised plane curve,

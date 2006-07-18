@@ -1,6 +1,6 @@
 // last modified 21.07.2005, Oliver Wienand
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.26 2005-07-27 10:35:27 Singular Exp $";
+version="$Id: surf.lib,v 1.27 2006-07-18 15:53:58 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: surf.lib    Procedures for Graphics with Surf
@@ -42,7 +42,8 @@ proc plot(ideal I,list #)
 "USAGE:   plot(I);  I ideal or poly
 ASSUME: I defines a plane curve or a surface given by one equation
 RETURN: nothing
-NOTE: requires the external program 'surf' to be installed, to close the graphical just press 'Q'
+NOTE: requires the external program 'surf' to be installed,
+      to close the graphical interface just press 'Q'
 EXAMPLE: example plot; shows an example
 "
 {
