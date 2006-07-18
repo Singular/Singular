@@ -1,6 +1,6 @@
 // Last change 10.12.2000 (TB)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: rinvar.lib,v 1.14 2005-05-10 17:56:16 Singular Exp $";
+version="$Id: rinvar.lib,v 1.15 2006-07-18 11:59:45 Singular Exp $";
 category="Invariant theory";
 info="
 LIBRARY:  rinvar.lib      Invariant Rings of Reductive Groups
@@ -277,7 +277,7 @@ PURPOSE: compute the Zariski closure of the image of the variety of I under
          the morphism F.
 NOTE:    if 'I' and 'F' are quasihomogenous w.r.t. 'w' then the Hilbert-driven
          'std' is used.
-RETURN:  polynomial ring over the same groundfield, containing the ideal
+RETURN:  polynomial ring over the same ground field, containing the ideal
          'imageid'. The variables are Y(1),...,Y(k) where k = size(F)
          - 'imageid' is the ideal of the Zariski closure of F(X) where
            X is the variety of I.
@@ -928,7 +928,7 @@ example
 proc ReynoldsOperator(ideal Grp, ideal Gaction, list #)
 "USAGE:   ReynoldsOperator(G, action [, opt]); ideal G, action; int opt
 PURPOSE: compute the Reynolds operator of the group G which act via 'action'
-RETURN:  polynomial ring R over a simple extension of the groundfield of the
+RETURN:  polynomial ring R over a simple extension of the ground field of the
          basering (the extension might be trivial), containing a list
          'ROelements', the ideals 'id', 'actionid' and the polynomial 'newA'.
          R = K(a)[s(1..r),t(1..n)].

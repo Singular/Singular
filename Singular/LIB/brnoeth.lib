@@ -1,4 +1,4 @@
-version="$Id: brnoeth.lib,v 1.17 2005-09-27 16:52:54 Singular Exp $";
+version="$Id: brnoeth.lib,v 1.18 2006-07-18 11:59:44 Singular Exp $";
 category="Coding theory";
 info="
 LIBRARY:   brnoeth.lib  Brill-Noether Algorithm, Weierstrass-SG and AG-codes
@@ -29,8 +29,6 @@ AUXILIARY PROCEDURES:
  dual_code(C);          computes the dual code
  sys_code(C);           computes an equivalent systematic code
  permute_L(L,P);        applies a permutation to a list
-
-SEE ALSO:  hnoether_lib, triang_lib
 
 KEYWORDS:  Weierstrass semigroup; Algebraic Geometry codes;
            Brill-Noether algorithm

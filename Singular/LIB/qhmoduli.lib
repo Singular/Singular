@@ -32,7 +32,7 @@ proc ModEqn(poly f, list #)
 "USAGE:   ModEqn(f [, opt]); poly f; int opt;
 PURPOSE: compute equations of the moduli space of semiquasihomogenos hypersurface         singularity with principal part f w.r.t. right equivalence
 ASSUME:  f quasihomogeneous polynomial with an isolated singularity at 0
-RETURN:  polynomial ring, possibly a simple extension of the groundfield of
+RETURN:  polynomial ring, possibly a simple extension of the ground field of
          the basering, containing the ideal 'modid'
          - 'modid' is the ideal of the moduli space  if opt is even (> 0).
            otherwise it contains generators of the coordinate ring R of the
@@ -193,7 +193,7 @@ PURPOSE: compute the quotient of the variety given by the parameterization
          'emb'  by the linear action 'action' of the algebraic group G.
 ASSUME:  'action' is linear, G must be finite if the Reynolds operator is
          needed (i.e., NullCone(G,action) returns some non-invariant polys)
-RETURN:   polynomial ring over a simple extension of the groundfield of the
+RETURN:   polynomial ring over a simple extension of the ground field of the
           basering, containing the ideals 'id' and 'embedid'.
           - 'id' contains the equations of the quotient, if opt = 1;
             if opt = 0, 2, 'id' contains generators of the coordinate ring R
@@ -291,7 +291,7 @@ proc ArnoldAction(poly f, list #)
 PURPOSE: compute the induced action of the stabilizer G of f on T_, where
          T_ is given by the upper monomials B of the Milnor algebra of f.
 ASSUME:  f is quasihomogeneous
-RETURN:  polynomial ring over the same groundfield, containing the ideals
+RETURN:  polynomial ring over the same ground field, containing the ideals
          'actionid' and 'stabid'.
          - 'actionid' is the ideal defining the induced action of Gf on T_ @*
          - 'stabid' is the ideal of the stabilizer Gf in the new ring
