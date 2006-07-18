@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.139 2006-07-04 07:12:40 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.140 2006-07-18 16:10:45 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -498,7 +498,10 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
 #ifdef HAVE_NS
       if (IDTYP(h)==PACKAGE_CMD && really_all)
       {
+        package save_p=currPack;
+        currPack=IDPACKAGE(h);
         list_cmd(0,IDID(h),"//      ",FALSE);
+        currPack=save_p;
       }
 #endif /* HAVE_NS */
     }
