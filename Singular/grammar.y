@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.117 2005-09-24 15:02:03 Singular Exp $ */
+/* $Id: grammar.y,v 1.118 2006-07-18 16:16:49 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1238,7 +1238,7 @@ listcmd:
         | LISTVAR_CMD '(' elemexpr ',' ROOT_DECL ')'
           {
 #ifdef HAVE_NS
-            PrintS("?????\n");
+            //PrintS("?????\n");
             if($3.Typ() == PACKAGE_CMD)
               list_cmd($5,NULL,"// ",TRUE);
 #endif /* HAVE_NS */
@@ -1247,7 +1247,7 @@ listcmd:
         | LISTVAR_CMD '(' elemexpr ',' ROOT_DECL_LIST ')'
           {
 #ifdef HAVE_NS
-            PrintS("?????\n");
+            //PrintS("?????\n");
             if($3.Typ() == PACKAGE_CMD)
               list_cmd($5,NULL,"// ",TRUE);
 #endif /* HAVE_NS */
@@ -1256,7 +1256,7 @@ listcmd:
         | LISTVAR_CMD '(' elemexpr ',' RING_DECL ')'
           {
 #ifdef HAVE_NS
-            PrintS("?????\n");
+            //PrintS("?????\n");
             if($3.Typ() == PACKAGE_CMD)
               list_cmd($5,NULL,"// ",TRUE);
 #endif /* HAVE_NS */
@@ -1265,7 +1265,7 @@ listcmd:
         | LISTVAR_CMD '(' elemexpr ',' currring_lists ')'
           {
 #ifdef HAVE_NS
-            PrintS("?????\n");
+            //PrintS("?????\n");
             if($3.Typ() == PACKAGE_CMD)
               list_cmd($5,NULL,"// ",TRUE);
 #endif /* HAVE_NS */
@@ -1274,7 +1274,7 @@ listcmd:
         | LISTVAR_CMD '(' elemexpr ',' RING_CMD ')'
           {
 #ifdef HAVE_NS
-            PrintS("?????\n");
+            //PrintS("?????\n");
             if($3.Typ() == PACKAGE_CMD)
               list_cmd($5,NULL,"// ",TRUE);
 #endif /* HAVE_NS */
@@ -1283,7 +1283,7 @@ listcmd:
         | LISTVAR_CMD '(' elemexpr ',' MATRIX_CMD ')'
           {
 #ifdef HAVE_NS
-            PrintS("?????\n");
+            //PrintS("?????\n");
             if($3.Typ() == PACKAGE_CMD)
               list_cmd($5,NULL,"// ",TRUE);
 #endif /* HAVE_NS */
@@ -1292,7 +1292,7 @@ listcmd:
         | LISTVAR_CMD '(' elemexpr ',' INTMAT_CMD ')'
           {
 #ifdef HAVE_NS
-            PrintS("?????\n");
+            //PrintS("?????\n");
             if($3.Typ() == PACKAGE_CMD)
               list_cmd($5,NULL,"// ",TRUE);
 #endif /* HAVE_NS */
@@ -1301,21 +1301,21 @@ listcmd:
         | LISTVAR_CMD '(' elemexpr ',' PROC_CMD ')'
           {
 #ifdef HAVE_NS
-            PrintS("?????\n");
+            //PrintS("?????\n");
             if($3.Typ() == PACKAGE_CMD)
               list_cmd($5,NULL,"// ",TRUE);
 #endif /* HAVE_NS */
             $3.CleanUp();
           }
-        | LISTVAR_CMD '(' elemexpr ',' elemexpr ')'
-          {
-#ifdef HAVE_NS
-            PrintS("?????\n");
-            //if($3.Typ() == PACKAGE_CMD)
-            //  list_cmd($5,NULL,"// ",TRUE);
-#endif /* HAVE_NS */
-            $3.CleanUp();
-          }
+        //| LISTVAR_CMD '(' elemexpr ',' elemexpr ')'
+        //  {
+        //#ifdef HAVE_NS
+        //    //PrintS("?????\n");
+        //    //if($3.Typ() == PACKAGE_CMD)
+        //    //  list_cmd($5,NULL,"// ",TRUE);
+        //#endif /* HAVE_NS */
+        //    $3.CleanUp();
+        //  }
         | LISTVAR_CMD '(' ')'
           {
             list_cmd(-1,NULL,"// ",TRUE);
@@ -1340,9 +1340,15 @@ ringcmd:
                   &$6,            /* names of ringvariables */
                   &$8);            /* ordering */
             idhdl newRingHdl=NULL;
+
             if (b!=NULL)
             {
-              newRingHdl=enterid(ring_name, myynest, RING_CMD, &IDROOT);
+              #ifdef HAVE_NS
+                newRingHdl=enterid(ring_name, myynest, RING_CMD, 
+                                   &($2.req_packhdl->idroot));
+              #else
+                newRingHdl=enterid(ring_name, myynest, RING_CMD, &IDROOT);
+              #endif
               $2.CleanUp();
               if (newRingHdl!=NULL)
               {
