@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_win.texi,v 1.12 2002-03-08 15:25:21 mschulze Exp $
+@comment $Id: INSTALL_win.texi,v 1.13 2006-07-18 10:06:59 Singular Exp $
 @c FILE:    INSTALL.texi
 @c PURPOSE: Installation instructions for Singular on MSWindows
 @c          This file is displayed during installation and copied to
@@ -13,10 +13,10 @@
 @majorheading Installation instructions for Singular on MS Windows.
 @end ifclear
 
-@heading For the impatient:
+@heading For the impatient (with only one file download):
 @itemize
 @item
-If you run Windows NT/2000, make sure you are logged in with the
+If you run Windows NT/2000/XP, make sure you are logged in with the
 @code{Administrator} rights.
 @item
 If you have @code{Cygwin} or @code{XEmacs} installed, please read the information below.
@@ -25,6 +25,7 @@ Execute the self-extracting installation archive and
 @strong{carefully} follow the instructions given there.
 Setup will analyze your system, create the corresponding configuration
 and give you further tips on the installation process.
+(see @uref{http://www.singular.uni-kl.de/WINDOWS/pfwinstall.html})
 @item
 In case of troubles, see the installed file @code{/etc/INSTALL} or visit
 @strong{Singular Forum} at @uref{http://www.singular.uni-kl.de/forum}.
@@ -32,172 +33,31 @@ In case of troubles, see the installed file @code{/etc/INSTALL} or visit
 
 @heading Installation preliminaries
 
-To run @sc{Singular} on MS Windows requires that the Cygwin DLL
-(dynamically linked library) version 1.1.8 or higher is installed on your
-system (see @uref{http://sources.redhat.com/cygwin/} for details about
-Cygwin). We install and configure Cygwin version 1.1.8 automatically, if
-the @code{BasicCygwin} component is selected.
+@sc{Singular} is a CYGWIN package on MS Windows: you can install it
+with the Cygwin Installer (Net Install):
+you will find the packages related to @sc{Singular} under 
+@itemize
+@item a.Category Math
+singular-base, singular-share,
+singular-help (optional,recommended),
+singular-icons(optional),
+singular-surf (optional,recommended)
+@item b.Category Editors
+emacs or xemacs (optional,needed if you wish to use Singular (Emacs) or ESingular) 
+@item c.Category Shells
+rxvt (optional,strongly recommended) 
+@end itemize
 
 To run @sc{ESingular} (i.e. @sc{Singular} within its Emacs interface) on
 MS Windows requires furthermore that the XEmacs editor is installed on
 your system.
 
-@cindex Windows installation, components
-@cindex Components of Windows installation
-
-Therefore, the @sc{Singular} installation is divided into the following
-components:
-@table @code
-@item @strong{Program Files:}
-        @table @code
-@item Singular-@value{VERSION}
-Contains the @sc{Singular} Program, Documentation And Example Files.
-@*All files of this component are installed under the directory
-@code{/usr/local/Singular/@value{VERSION}}
-@item BasicCygwin
-Contains the Cygwin DLL and basic tools/programs (like @code{bash} or
-@code{info}) of the  Cygwin environment.
-@*The Cygwin DLL and programs are installed in the directory
-@code{/bin}. Miscellaneous documentation and configuration files are
-installed into the directory @code{/etc}.
-@item XEmacs
-Contains the Cygwin port of the XEmacs editor (see
-@url{http://www.xemacs.org} for more about XEmacs) version 21.1.12.
-@*All files of this component are installed under the directory
-@code{/usr/local}.
-@item ESingular-@value{VERSION}
-Contains The @sc{ESingular}, the most comfortable Singular interface.
-Requires XEmacs.
-        @end table
-@item @strong{Help Files:}
-@table @code
-@item WinHelp
-Contains Singular Manual, converted to Windows help format (.hlp).
-We recommend to install it, because it is small and is set by default
-in all the Singular executables.
-@item HTML Help
-Contains "native" Singular Manual. It's not included by default,
-because it is much bigger than WinHelp, though it has better formatting
-of mathematical formulae.
-@end table
-@end table
-
-@heading Downloading preliminaries
-
-To install @sc{Singular} on a PC running Windows 95/98/NT/2K, you need
-to download @emph{one} of the following archive files:
-
-@table @code
-@item Singular-@value{VERSION}-Compact.exe
-Minimal archive to download. Contains the @code{BasicCygwin},
-@code{Singular-@value{VERSION}} and @code{WinHelp} components.
-@item Singular-@value{VERSION}-Typical.exe
-Typical archive to download. Contains the @code{BasicCygwin},
-@code{Singular-@value{VERSION}},@code{XEmacs},
-@code{ESingular-@value{VERSION}},@code{WinHelp} and @code{HTML Help}
-components.
-
-@end table
-
-You can obtain these (and other) archives from
+Complete installion informations ifor Windows are available from
 @display
-@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/}.
+@uref{http://www.singular.uni-kl.de/WINDOWS/index.html}.
 @end display
 
 @include register.texi
-
-@heading Installing SINGULAR
-
-The recent Setup program analyzes your system, e.g. detecting
-whether Cygwin is present and functional. Then it gives you
-hints and/or error messages with instructions during the installation.
-
-@table @code
-@item If you have Cygwin installed
-        If the version of @code{cygwin1.dll} is not less than 1.1.8,
-        you will be prompted that the @code{BasicCygwin} component will not
-        be installed. Moreover, the Cygwin root directory will be proposed as
-        the default installation directory. You can accept it, then
-        @code{Singular} will be placed into the existing Cygwin environment.
-        If you choose another destination, @code{Singular} will use Cygwin
-        programs anyway. If your Cygwin has incorrect settings (like
-        inconsistent mount points among the important ones), @code{Singular}
-        Setup will correct them.
-
-@item If you have XEmacs installed
-        The @code{Cygwin} port of XEmacs version 21.1.12 with the most
-        important packages is included in the distribution. The use of
-        non-@code{Cygwin} ports
-        or earlier @code{Cygwin} ports has some quirks and does not work
-        properly together with @code{Singular} (i.e., running @code{ESingular}
-        results in problems). Nevertheless, if you want to test the
-        compatibility of @code{ESingular} with your own @code{XEmacs}, just
-        de-select the XEmacs component, but leave @code{ESingular} selected.
-        If your XEmacs would be incompatible with ESingular, you can
-        install just the XEmacs component and use in fact two different
-        XEmacs programs.
-        The setup program will search for XEmacs and packages
-        in <TARGETDIR>/usr/local/lib. Here <TARGETDIR> is the directory
-        which you selected while running setup. If you have @code{Cygwin} and/or
-        XEmacs, you might have XEmacs installed there. To avoid the overwriting
-        of your XEmacs files, setup will ask you what to do.
-@end table
-
-@heading Customizing SINGULAR
-
-The following step(s) are optional:
-@itemize
-@item
-To conveniently access all files on your computer, mount the drives of
-your disk(s):
-@enumerate
-@item
-Open a bash shell.
-@item
-For each drive (letter) issue the following command (the drive @code{C:}
-is used in the example):
-@example
-mount -f -s -t C: /C
-@end example
-@end enumerate
-After mounting the drive(s) this way, you can conveniently access the
-files on a drive from the bash and from XEmacs using the @code{/C/}
-prefix.
-
-@item
-Create your personal @code{HOME} directory.
-@*Various applications (e.g., @code{bash} or @code{XEmacs}) store
-user-specific configuration/customization files in the @code{HOME}
-directory of the current user. During the installation, the @code{HOME}
-directory is globally set for all users to @code{/home/Singular}. To
-create your individual  @code{HOME} directory follow these steps:
-@enumerate
-@item
-Create a directory (folder), say, @code{C:\home\MyHome}.
-@item
-Copy all files from @code{/home/Singular} to @code{C:\home\MyHome}.
-@item
-Set the _user_ environment variable @code{HOME} to @code{C:\home\MyHome}:
-@*On Windows 95/98, edit the respective line the @code{AUTOEXEC.BAT}
-file.
-@*On Windows NT/2K add an entry in your @code{Environment} control
-panel.
-@item
-Restart your computer (On Windows 95/98).
-@end enumerate
-You may furthermore examine the files copied into your  @code{HOME}
-directory and adjust (i.e. edit) them to your personal
-preferences/needs.
-
-@end itemize
-
-@heading Uninstalling Singular
-
-You can uninstall individual or all installed components by opening the
-@code{Software} panel of the @code{System configuration} control
-panel. Simply double-click the @code{Singular-@value{VERSION}} item and
-follow the instructions given there.
-
 
 For any other troubles,
 please send an email to @email{singular@@mathematik.uni-kl.de}
