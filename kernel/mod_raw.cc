@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.11 2006-06-07 10:47:25 Singular Exp $ */
+/* $Id: mod_raw.cc,v 1.12 2006-07-18 11:25:05 bricken Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -196,7 +196,7 @@ extern "C" {
 #define HAVE_ELF_SYSTEM
 #endif
 
-#ifdef i386Mac_darwin
+#ifdef ix86Mac_darwin
 #define HAVE_ELF_SYSTEM
 #endif
 
