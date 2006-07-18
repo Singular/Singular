@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.33 2005-05-23 15:47:35 levandov Exp $";
+version="$Id: control.lib,v 1.34 2006-07-18 09:29:34 Singular Exp $";
 category="System and Control Theory";
 info="
 LIBRARY:  control.lib     Algebraic analysis tools for System and Control Theory
@@ -11,26 +11,26 @@ SUPPORT: Forschungsschwerpunkt 'Mathematik und Praxis' (Project of Dr. E. Zerz
 and V. Levandovskyy), Uni Kaiserslautern
 
 MAIN PROCEDURES:
-  control(R);            analysis of controllability-related properties of R (using Ext modules)
-  controlDim(R);           analysis of controllability-related properties of R (using dimension)
-  autonom(R);            analysis of autonomy-related properties of R (using Ext modules)
-  autonomDim(R);           analysis of autonomy-related properties of R (using dimension)
+  control(R);     analysis of controllability-related properties of R (using Ext modules)
+  controlDim(R);  analysis of controllability-related properties of R (using dimension)
+  autonom(R);     analysis of autonomy-related properties of R (using Ext modules)
+  autonomDim(R);  analysis of autonomy-related properties of R (using dimension)
 
 COMPONENT PROCEDURES:
-  leftKernel(R);         a left kernel of R
-  rightKernel(R);        a right kernel of R
-  leftInverse(R);        a left inverse of R
-  rightInverse(R);       a right inverse of R
-  smith(M);              a Smith form of a module M
-  colrank(M);            a column rank of M as of matrix
-  genericity(M);         analysis of the genericity of parameters
-  canonize(L);           Groebnerification for modules in the output of control or autonomy procs
-  iostruct(R);           computes an IO-structure of behavior given by a module R
-  findTorsion(R, I);     generators of the submodule of a module R, annihilated by the ideal I
+  leftKernel(R);       a left kernel of R
+  rightKernel(R);      a right kernel of R
+  leftInverse(R);      a left inverse of R
+  rightInverse(R);     a right inverse of R
+  smith(M);            a Smith form of a module M
+  colrank(M);          a column rank of M as of matrix
+  genericity(M);       analysis of the genericity of parameters
+  canonize(L);         Groebnerification for modules in the output of control or autonomy procs
+  iostruct(R);         computes an IO-structure of behavior given by a module R
+  findTorsion(R, I);   generators of the submodule of a module R, annihilated by the ideal I
 
 AUXILIARY PROCEDURES:
-  controlExample(s);     set up an example from the mini database inside of the library
-  view();                well-formatted output of lists, modules and matrices
+  controlExample(s);   set up an example from the mini database inside of the library
+  view();              well-formatted output of lists, modules and matrices
 ";
 
 LIB "homolog.lib";
@@ -142,7 +142,7 @@ example
   ring r;
   list L;
   matrix M[1][3] = x2+x,y3-y,z5-4z+7;
-  L[1] = "a matrix:"; 
+  L[1] = "a matrix:";
   L[2] = M;
   L[3] = "an ideal:";
   L[4] = ideal(M);
@@ -475,7 +475,7 @@ proc colrank(module M)
 "USAGE: colrank(M); M a matrix/module
 RETURN: int
 PURPOSE: compute the column rank of M as of matrix
-NOTE: this procedure uses Bareiss algorithm 
+NOTE: this procedure uses Bareiss algorithm
 "{
   // NOte continued:
   // which might not terminate in some cases
@@ -929,7 +929,7 @@ proc iostruct(module R)
 "USAGE: iostruct( R ); R a module
 RETURN:  list L with entries: string s, intvec v, module P and module Q
 PURPOSE:  if R is the kernel-representation-matrix of some system, then we output a input-ouput representation Py=Qu of the system, the components that have been chosen as outputs(intvec v) and a comment s
-NOTE:  the procedure uses Bareiss algorithm 
+NOTE:  the procedure uses Bareiss algorithm
 EXAMPLE:  example iostruct; shows an example
 "
 {
@@ -1474,7 +1474,7 @@ static proc exCauchy1()
   R=transpose(R);
   export R;
   return(@r);
-};
+}
 //----------------------------------------------------------
 static proc exCauchy2()
 {
@@ -1486,7 +1486,7 @@ static proc exCauchy2()
   R=transpose(R);
   export R;
   return(@r);
-};
+}
 //----------------------------------------------------------
 static proc exZerz1()
 {
@@ -1496,7 +1496,7 @@ static proc exZerz1()
   R=transpose(R);
   export R;
   return(@r);
-};
+}
 //----------------------------------------------------------
 //control
 //----------------------------------------------------------
@@ -1508,7 +1508,7 @@ static proc exControl1()
   R=transpose(R);
   export R;
   return(@r);
-};
+}
 //----------------------------------------------------------
 static proc exControl2()
 {
@@ -1519,7 +1519,7 @@ static proc exControl2()
   R=transpose(R);
   export R;
   return(@r);
-};
+}
 //----------------------------------------------------------
 static proc exAntenna()
 {
@@ -1535,7 +1535,7 @@ static proc exAntenna()
   R=transpose(R);
   export R;
   return(@r);
-};
+}
 
 //----------------------------------------------------------
 
@@ -1557,7 +1557,7 @@ static proc exEinstein()
   R=transpose(R);
   export R;
   return(@r);
-};
+}
 
 //----------------------------------------------------------
 static proc exFlexibleRod()
@@ -1569,7 +1569,7 @@ static proc exFlexibleRod()
   R=transpose(R);
   export R;
   return(@r);
-};
+}
 
 //----------------------------------------------------------
 static proc exTwoPendula()
@@ -1582,7 +1582,7 @@ static proc exTwoPendula()
   R=transpose(R);
   export R;
   return(@r);
-};
+}
 //----------------------------------------------------------
 static proc exWindTunnel()
 {
@@ -1594,4 +1594,4 @@ static proc exWindTunnel()
   R=transpose(R);
   export R;
   return(@r);
-};
+}
