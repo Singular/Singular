@@ -1,6 +1,6 @@
 //last change: 13.02.2001 (Eric Westenberger)
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: triang.lib,v 1.9 2005-05-10 17:56:16 Singular Exp $";
+version="$Id: triang.lib,v 1.10 2006-07-18 15:22:16 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: triang.lib   Decompose Zero-dimensional Ideals into Triangular Sets
@@ -25,7 +25,7 @@ LIB "elim.lib";    // Muss geladen werden fuer sat().
 
 proc triangL (ideal G)
 "USAGE:   triangL(G); G=ideal
-ASSUME:  G is the reduced lexicographical Groebner bases of the
+ASSUME:  G is the reduced lexicographical Groebner basis of the
          zero-dimensional ideal (G), sorted by increasing leading terms.
 RETURN:  a list of finitely many triangular systems, such that
          the union of their varieties equals the variety of (G).
@@ -38,7 +38,7 @@ EXAMPLE: example triangL; shows an example
     // Test, ob G Groebnerbasis eines nulldimensionalen Ideals ist.
     if (attrib(G,"isSB") <> 1)
     {
-        print("   ? Error: The input is no groebner bases.");
+        print("   ? Error: The input is no groebner basis.");
         return();
     }
     else
@@ -175,7 +175,7 @@ example
 
 proc triangLfak (ideal G)
 "USAGE:   triangLfak(G); G=ideal
-ASSUME:  G is the reduced lexicographical Groebner bases of the
+ASSUME:  G is the reduced lexicographical Groebner basis of the
          zero-dimensional ideal (G), sorted by increasing leading terms.
 RETURN:  a list of finitely many triangular systems, such that
          the union of their varieties equals the variety of (G).
@@ -213,7 +213,7 @@ NOTE:    Algorithmus von Lazard (siehe: Lazard, D.: Solving
     // Test, ob G Groebnerbasis eines nulldimensionalen Ideals ist.
     if (attrib(G,"isSB") <> 1)
     {
-        print("   ? Error: The input is no groebner bases.");
+        print("   ? Error: The input is no groebner basis.");
         return();
     }
     else
@@ -626,7 +626,7 @@ RETURN:  Entweder Triangulierung [T1,T2] von (T) oder
 
 proc triangM (ideal G, list #)
 "USAGE:   triangM(G[,i]); G=ideal, i=integer,@*
-ASSUME:  G is the reduced lexicographical Groebner bases of the
+ASSUME:  G is the reduced lexicographical Groebner basis of the
          zero-dimensional ideal (G), sorted by increasing leading terms.
 RETURN:  a list of finitely many triangular systems, such that
          the union of their varieties equals the variety of (G).
@@ -642,7 +642,7 @@ EXAMPLE: example triangM; shows an example
     // Test, ob G Groebnerbasis ist.
     if (attrib(G,"isSB") <> 1)
     {
-        print("   ? Error: The input is no groebner bases.");
+        print("   ? Error: The input is no groebner basis.");
         return();
     }
 
@@ -806,7 +806,7 @@ example
 
 proc triangMH (ideal G, list #)
 "USAGE:   triangMH(G[,i]); G=ideal, i=integer
-ASSUME:  G is the reduced lexicographical Groebner bases of the
+ASSUME:  G is the reduced lexicographical Groebner basis of the
          zero-dimensional ideal (G), sorted by increasing leading terms.
 RETURN:  a list of finitely many triangular systems, such that
          the disjoint union of their varieties equals the variety of (G).
@@ -824,7 +824,7 @@ EXAMPLE: example triangMH; shows an example
     // Test, ob G Groebnerbasis ist.
     if (attrib(G,"isSB") <> 1)
     {
-        print("   ? Error: The input is no groebner bases.");
+        print("   ? Error: The input is no groebner basis.");
         return();
     }
 

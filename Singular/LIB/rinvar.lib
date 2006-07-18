@@ -1,14 +1,14 @@
 // Last change 10.12.2000 (TB)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: rinvar.lib,v 1.15 2006-07-18 11:59:45 Singular Exp $";
+version="$Id: rinvar.lib,v 1.16 2006-07-18 15:22:15 Singular Exp $";
 category="Invariant theory";
 info="
 LIBRARY:  rinvar.lib      Invariant Rings of Reductive Groups
 AUTHOR:   Thomas Bayer,   tbayer@in.tum.de
           http://wwwmayr.informatik.tu-muenchen.de/personen/bayert/
-          Current Adress: Institut fuer Informatik, TU Muenchen
+          Current Address: Institut fuer Informatik, TU Muenchen
 OVERVIEW:
- Implementation based on Derksen's algorithm. Written in the frame of the
+ Implementation based on Derksen's algorithm. Written in the scope of the
  diploma thesis (advisor: Prof. Gert-Martin Greuel) 'Computations of moduli
  spaces of semiquasihomogenous singularities and an implementation in Singular'
 
@@ -218,13 +218,13 @@ ASSUME: basering = K[t_1,...,t_m,...], 'I' is quasihomogenous w.r.t. 'w' and
 
 proc HilbertSeries(ideal I, wt)
 "USAGE:   HilbertSeries(I, w); ideal I, intvec wt
-PURPOSE: compute the polynomial p of the Hilbert Series,represented by p/q, of
+PURPOSE: compute the polynomial p of the Hilbert Series, represented by p/q, of
          the ring K[t_1,...,t_m,y_1,...,y_r]/I1 where 'w' are the weights of
          the variables, computed, e.g., by 'HilbertWeights', 'I1' is of the
          form I[1] - y_1,...,I[r] - y_r and is quasihomogenous w.r.t. 'w'
 RETURN:  intvec
 NOTE:    the leading 0 of the result does not belong to p, but is needed in
-         the hilbert-driven 'std'.
+         the Hilbert driven 'std'.
 "
 {
   int i;
@@ -506,8 +506,8 @@ example
 
 proc LinearActionQ(Gaction, int nrs)
 "USAGE:   LinearActionQ(action,nrs); ideal action, int nrs
-PURPOSE: check if the action defined by 'action' is linear w.r.t. the variables
-         var(nrs + 1...nvars(basering)).
+PURPOSE: check whether the action defined by 'action' is linear w.r.t. the
+         variables var(nrs + 1...nvars(basering)).
 RETURN:  0 action not linear
          1 action is linear
 EXAMPLE: example LinearActionQ; shows an example
@@ -549,7 +549,7 @@ example
 
 proc LinearCombinationQ(ideal I, poly f)
 "USAGE:   LinearCombination(I, f); ideal I, poly f
-PURPOSE: test if f can be written as a linear combination of the generators of I.
+PURPOSE: test whether f can be written as a linear combination of the generators of I.
 RETURN:  0 f is not a linear combination
          1 f is a linear combination
 "
@@ -731,7 +731,7 @@ example
 
 proc InvariantQ(poly f, ideal G, action)
 "USAGE:   InvariantQ(f, G, action); poly f; ideal G, action
-PURPOSE: check if the polynomial f is invariant w.r.t. G where G acts via
+PURPOSE: check whether the polynomial f is invariant w.r.t. G, where G acts via
          'action' on K^m.
 ASSUME:  basering = K[s_1,...,s_m,t_1,...,t_m] where K = Q of K = Q(a) and
          minpoly != 0, f contains only t_1,...,t_m, G is the ideal of an
@@ -857,7 +857,7 @@ ASSUME:  basering = K[s(1..r),t(1..n)], K = Q or K = Q(a) and minpoly != 0,
          G is an ideal of a reductive algebraic group in K[s(1..r)],
          'action' is a linear group action of G on K^n (n = ncols(action))
 RETURN:  ideal of the nullcone of G.
-NOTE:    the generators of the nullcone are homogenous, but i.g. not invariant
+NOTE:    the generators of the nullcone are homogenous, but in general not invariant
 EXAMPLE: example NullCone; shows an example
 "
 {
@@ -927,7 +927,7 @@ example
 
 proc ReynoldsOperator(ideal Grp, ideal Gaction, list #)
 "USAGE:   ReynoldsOperator(G, action [, opt]); ideal G, action; int opt
-PURPOSE: compute the Reynolds operator of the group G which act via 'action'
+PURPOSE: compute the Reynolds operator of the group G which acts via 'action'
 RETURN:  polynomial ring R over a simple extension of the ground field of the
          basering (the extension might be trivial), containing a list
          'ROelements', the ideals 'id', 'actionid' and the polynomial 'newA'.
@@ -1002,7 +1002,7 @@ ASSUME:  basering = K[s(1..r),t(1..n)], K = Q or K = Q(a') and minpoly != 0,
 
 proc ReynoldsImage(list reynoldsOp, poly f)
 "USAGE:   ReynoldsImage(RO, f); list RO, poly f
-PURPOSE: compute the Reynolds image of the polynomial f where RO represents
+PURPOSE: compute the Reynolds image of the polynomial f, where RO represents
          the Reynolds operator
 RETURN:  poly
 "
@@ -1063,7 +1063,7 @@ PURPOSE: simplify ideal I to the ideal I', do not change the names of the
          I' contains variables var(1..m)
 RETURN: list
   _[1] ideal I'
-  _[2] ideal representing a map phi to a ring with probably less vars. s.t.
+  _[2] ideal representing a map phi to a ring with probably less vars. s.th.
        phi(I) = I'
   _[3] list of variables
   _[4] list from 'elimpart'

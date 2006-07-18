@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: solve.lib,v 1.34 2005-09-06 09:02:34 Singular Exp $";
+version="$Id: solve.lib,v 1.35 2006-07-18 15:22:15 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: solve.lib     Complex Solving of Polynomial Systems
@@ -517,8 +517,8 @@ static proc addzero(list zz,string ss,int iz,int a)
 proc solve( ideal G, list # )
 "USAGE:   solve(G [, m, n [, l]] [,\"oldring\"] [,\"nodisplay\"] ); G = ideal,
          m, n, l = integers (control parameters of the method), outR ring
-         m: precision of output in digits ( 4 <= m) and of the
-            generated ring of complex numbers;
+         m: precision of output in digits ( 4 <= m) and of the generated ring
+            of complex numbers;
          n: control of multiplicity
             n = 0, return all different roots
             n != 0, find all roots (with multiplicity)
@@ -540,7 +540,7 @@ RETURN:  (1) If called without the additional parameter @code{\"oldring\"}: @*
          of all different solutions with the multiplicity SOL[i][2].@*
          SOL is ordered w.r.t. multiplicity (the smallest first). @*
          (2) If called with the additional parameter @code{\"oldring\"}, the
-         procedure looks for an appropriate ring (on the Top level) in which
+         procedure looks for an appropriate ring (at top level) in which
          the solutions can be stored (interactive). @*
          The user may then select an appropriate ring and choose a name for
          the output list in this ring. The list is exported directly to the
@@ -1888,7 +1888,7 @@ ASSUME:  the ground field has char 0;  i is a zero-dimensional ideal
 RETURN:  ring @code{R} with the same number of variables but with complex
          coefficients (and precision p). @code{R} comes with a list
          @code{rlist} of numbers, in which the complex roots of i are stored.
-NOTE:    The proc uses a triangular system (Lazard's Algorithm with
+NOTE:    The procedure uses a triangular system (Lazard's Algorithm with
          factorization) computed from a standard basis to determine
          recursively all complex roots of the input ideal i with Laguerre's
          algorithm.
@@ -1931,9 +1931,9 @@ ASSUME:  the ground field has char 0;@*
 RETURN:  ring @code{R} with the same number of variables but with complex
          coefficients (and precision p). @code{R} comes with a list
          @code{rlist} of numbers, in which the complex roots of i are stored.
-NOTE:    The proc uses a triangular system (Moellers Algorithm) computed from a
-         standard basis to determine recursively all complex roots with
-         Laguerre's algorithm of input ideal i.
+NOTE:    The procedure uses a triangular system (Moellers Algorithm) computed
+         from a standard basis  of input ideal i to determine recursively all
+         complex roots with Laguerre's algorithm.
 EXAMPLE: example triangM_solve; shows an example
 "
 {
@@ -1969,12 +1969,12 @@ proc triangL_solve( ideal fi, list # )
 "USAGE:   triangL_solve(i [, p] ); i=ideal, p=integer,@*
          p>0: gives precision of complex numbers in digits (default: p=30).
 ASSUME:  the ground field has char 0; i is a zero-dimensional ideal.
-RETURN:  ring @code{R} with the same number of variables but with complex
+RETURN:  ring @code{R} with the same number of variables, but with complex
          coefficients (and precision p). @code{R} comes with a list
          @code{rlist} of numbers, in which the complex roots of i are stored.
-NOTE:    The proc uses a triangular system (Lazard's Algorithm) computed from
-         a standard basis to determine recursively all complex roots with
-         Laguerre's algorithm of input ideal i.
+NOTE:    The procedure uses a triangular system (Lazard's Algorithm) computed
+         from a standard basis of input ideal i to determine recursively all
+         complex roots with Laguerre's algorithm.
 EXAMPLE: example triangL_solve; shows an example
 "
 {
@@ -2015,9 +2015,9 @@ proc triang_solve( list lfi, int prec, list # )
          d>0: gives precision (1<d<p) for near-zero-determination,@*
          (default: d=1/2*p).
 ASSUME:  the ground field has char 0;@*
-         l was computed using Algorithm of Lazard or Algorithm of Moeller
-         (see triang.lib).
-RETURN:  ring @code{R} with the same number of variables but with complex
+         l was computed using the algorithm of Lazard or the algorithm of
+         Moeller (see triang.lib).
+RETURN:  ring @code{R} with the same number of variables, but with complex
          coefficients (and precision p). @code{R} comes with a list
          @code{rlist} of numbers, in which the complex roots of l are stored.@*
 EXAMPLE: example triang_solve; shows an example
@@ -2117,7 +2117,7 @@ example
 proc simplexOut(list l)
 "USAGE:   simplexOut(l); l list
 ASSUME:  l is the output of simplex.
-RETURN:  nothing. The procedure prints the computed solution of simplex
+RETURN:  Nothing. The procedure prints the computed solution of simplex
          (as strings) in a nice format.
 SEE ALSO: simplex
 EXAMPLE: example simplexOut; shows an example

@@ -1,6 +1,6 @@
 // (anne, last modified 23.5.00) last modified: 12.12.2000
 /////////////////////////////////////////////////////////////////////////////
-version="$Id: stratify.lib,v 1.7 2001-01-31 17:49:53 Singular Exp $";
+version="$Id: stratify.lib,v 1.8 2006-07-18 15:22:16 Singular Exp $";
 category="Invariant theory";
 info="
 LIBRARY: stratify.lib   Algorithmic Stratification for Unipotent Group-Actions
@@ -40,7 +40,7 @@ proc prepMat(matrix M, intvec wr, intvec ws, int step)
          where M is a matrix, wr is an intvec of size ncols(M),
          ws an intvec of size nrows(M) and step is an integer
 RETURN:  2 lists of submatrices corresponding to the filtrations
-         specified by wr and ws
+         specified by wr and ws:
          the first list corresponds to the list for the filtration
          of AdA, i.e. the ranks of these matrices will be the r_i,
          the second one to the list for the filtration of L, i.e.
