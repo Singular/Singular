@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.4 2006-06-13 10:21:01 Singular Exp $ */
+/* $Id: longrat.h,v 1.5 2006-07-19 13:49:29 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
@@ -48,6 +48,7 @@ struct snumber
 
 LINLINE BOOLEAN  nlEqual(number a, number b);
 LINLINE number   nlInit(int i);
+number nlRInit (int i);
 LINLINE BOOLEAN  nlIsOne(number a);
 LINLINE BOOLEAN  nlIsZero(number za);
 LINLINE number   nlCopy(number a);
