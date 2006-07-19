@@ -11,7 +11,7 @@
  *           have to be defined before this file is included
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Set.h,v 1.3 2006-06-22 12:08:58 Singular Exp $
+ *  Version: $Id: p_Procs_Set.h,v 1.4 2006-07-19 13:12:15 Singular Exp $
  *******************************************************************/
 #include "modulop.h"
 
@@ -143,9 +143,7 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
   p_Ord       ord = p_OrdIs(r);
 
   assume(p_Procs != NULL);
-//#ifdef RDEBUG
   memset(p_Procs, 0, sizeof(p_Procs_s));
-//#endif
   _p_procs = p_Procs;
   assume(IsValidSpec(field, length, ord));
 
@@ -156,20 +154,9 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
   CheckProc(p_ShallowCopyDelete);
   CheckProc(p_Mult_nn);
   CheckProc(pp_Mult_nn);
-  #ifdef HAVE_PLURAL
-  if (rIsPluralRing(r))
-  {
-      p_Procs->pp_Mult_mm=nc_pp_Mult_mm;
-      p_Procs->p_Mult_mm=nc_p_Mult_mm;
-      p_Procs->p_Minus_mm_Mult_qq=nc_p_Minus_mm_Mult_qq_ign;
-  }
-  else
-  #endif
-  {
-    CheckProc(pp_Mult_mm);
-    CheckProc(p_Mult_mm);
-    CheckProc(p_Minus_mm_Mult_qq);
-  }
+  CheckProc(pp_Mult_mm);
+  CheckProc(p_Mult_mm);
+  CheckProc(p_Minus_mm_Mult_qq);
   CheckProc(pp_Mult_mm_Noether);
   CheckProc(p_Add_q);
   CheckProc(p_Neg);
@@ -183,6 +170,17 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
          p_Procs->p_Minus_mm_Mult_qq == p_Minus_mm_Mult_qq__FieldGeneral_LengthGeneral_OrdGeneral ||
          r->OrdSgn == 1 || r->LexOrder);
 */
+  #ifdef HAVE_PLURAL
+  if (rIsPluralRing(r))
+  {
+    p_Procs->p_Mult_mm=nc_p_Mult_mm;
+    _p_procs->p_Mult_mm=nc_p_Mult_mm;
+    p_Procs->pp_Mult_mm=nc_pp_Mult_mm;
+    _p_procs->pp_Mult_mm=nc_pp_Mult_mm;
+    p_Procs->p_Minus_mm_Mult_qq=nc_p_Minus_mm_Mult_qq_ign;
+    _p_procs->p_Minus_mm_Mult_qq=nc_p_Minus_mm_Mult_qq_ign;
+  }
+  #endif
 }
 
 #ifdef RDEBUG
