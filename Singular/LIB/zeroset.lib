@@ -1,6 +1,6 @@
 // Last change 12.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: zeroset.lib,v 1.15 2006-07-18 15:48:31 Singular Exp $";
+version="$Id: zeroset.lib,v 1.16 2006-07-19 13:48:17 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  zeroset.lib      Procedures For Roots and Factorization
@@ -411,6 +411,7 @@ PURPOSE: compute 1/f if f is a number in Q(a), i.e., f is represented by a
          polynomial in Q[a].
 RETURN:  poly 1/f
 ASSUME:  basering = Q[x_1,...,x_n,a], ideal mpoly must be defined and != 0 !
+NOTE:    outdated, use / instead
 "
 {
   if(diff(f, var(1)) != 0) { ERROR("number must not contain variable !");}
@@ -477,6 +478,7 @@ RETURN:  list of polynomials
   _[2] = remainder r
   @end format
 ASSUME:  basering = Q[x] or Q(a)[x]
+NOTE: outdated, use div/mod instead
 EXAMPLE: example  Quotient; shows an example
 "
 {
@@ -514,6 +516,7 @@ RETURN:  list of polynomials
   @end format
 ASSUME:  basering = Q[x,a] and ideal mpoly is defined (it might be 0),
          this represents the ring Q(a)[x] together with its minimal polynomial.
+NOTE: outdated, use div/mod instead
 EXAMPLE: example  Quotient; shows an example
 "
 {
@@ -536,6 +539,7 @@ PURPOSE: compute the remainder of the division of f by g, i.e. a polynomial r
          s.t. f = g*q + r, deg(r) < deg(g).
 RETURN:  poly
 ASSUME:  basering = Q[x] or Q(a)[x]
+NOTE: outdated, use mod/reduce instead
 "
 {
   def REMB = basering;
@@ -566,6 +570,7 @@ PURPOSE: compute the remainder r s.t. f = g*q + r, deg(r) < deg(g)
 RETURN:  poly
 ASSUME:  basering = Q[x,a] and ideal mpoly is defined (it might be 0),
          this represents the ring Q(a)[x] together with its minimal polynomial.
+NOTE: outdated, use mod/reduce instead
 "
 {
   int dg;
@@ -588,6 +593,7 @@ PURPOSE: compute the polynomial gcd of f and g over Q(a)[x]
 RETURN:  polynomial h s.th. h is a greatest common divisor of f and g (not
          necessarily monic)
 ASSUME:  basering = Q(a)[t]
+NOTE: outdated, use gcd instead
 EXAMPLE: example  EGCD; shows an example
 "
 {
@@ -619,6 +625,7 @@ PURPOSE: compute the polynomial gcd of f and g over Q(a)[x]
 RETURN:  poly
 ASSUME:  basering = Q[x,a] and ideal mpoly is defined (it might be 0),
          this represents the ring Q(a)[x] together with its minimal polynomial.
+NOTE: outdated, use gcd instead
 EXAMPLE: example EGCD; shows an example
 "
 {
@@ -771,6 +778,7 @@ RETURN:  list with two entries
 ASSUME:  basering must be the univariate polynomial ring over a field, which
          is Q or a simple extension of Q given by a minpoly.
 NOTE:    if basering = Q[t] then this is the built-in @code{factorize}
+NOTE: outdated, use factorize instead
 EXAMPLE: example  Factor; shows an example
 "
 {
@@ -809,6 +817,7 @@ RETURN:  list with 2 entries
   @end format
 ASSUME:  basering = Q[x,a], representing Q(a)[x]. An ideal mpoly must
          be defined, representing the minimal polynomial (it might be 0!).
+NOTE: outdated, use factorize instead
 EXAMPLE: example  Factor; shows an example
 "
 {
@@ -1395,6 +1404,7 @@ PURPOSE: reduces the coefficients of f w.r.t. the ideal 'moly' if they contain
 RETURN:  poly
 ASSUME:  basering = Q[x_1,...,x_n,a]
          ideal mpoly must be defined, it might be 0 !
+NOTE: outdated, use reduce instead
 "
 {
   matrix coMx;
