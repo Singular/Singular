@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.106 2006-05-29 15:29:47 Singular Exp $ */
+/* $Id: tesths.cc,v 1.107 2006-07-19 13:10:14 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -45,7 +45,7 @@ int main(          /* main entry to Singular */
 {
 #ifdef HAVE_FACTORY
   On(SW_USE_NTL);
-  Off(SW_USE_NTL_GCD_0); // On -> seg11 in Old/algnorm, Old/factor...
+  On(SW_USE_NTL_GCD_0); // On -> seg11 in Old/algnorm, Old/factor...
   On(SW_USE_NTL_GCD_P); // On -> cyle in Short/brnoeth_s: fixed
   On(SW_USE_EZGCD);
   Off(SW_USE_NTL_SORT); // may be changed by an command line option
@@ -135,7 +135,7 @@ int main(          /* main entry to Singular */
 "  Development"
 #endif
 "\n"
-" A Computer Algebra System for Polynomial Computations   /   version %s(beta)\n"
+" A Computer Algebra System for Polynomial Computations   /   version %s\n"
 "                                                       0<\n"
 "     by: G.-M. Greuel, G. Pfister, H. Schoenemann        \\   %s\n"
 "FB Mathematik der Universitaet, D-67653 Kaiserslautern    \\\n"
