@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.23 2005-12-05 14:20:47 Singular Exp $
+@comment $Id: INSTALL_unix.texi,v 1.24 2006-07-20 12:08:51 Singular Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on Unix
 @c
@@ -30,10 +30,10 @@ Unix
 platform, you need the following two
 archives:
 @table @code
-@item 
+@item a:
 Singular-@value{VERSION}-share.tar.gz
 contains architecture independent data like documentation and libraries.
-@item 
+@item b:
 Singular-@value{VERSION}-@value{_UNAME}.tar.gz
 contains architecture dependent executables, like the @sc{Singular}
 program.
@@ -169,7 +169,7 @@ library, i.e. @code{/usr/lib/libreadline.so}
 @item visualization of curves and surfaces
 @tab
 @uref{http://www.mathematik.uni-mainz.de/AlgebraischeGeometrie/surf/surf.shtml,,surf}
-version 0.9 or higher (only available for Linux and Solaris).
+version 0.9 or higher (available for Linux, Solaris, MacOS X and Windows).
 @end multitable
 
 You may download most of these programs from
