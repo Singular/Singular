@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncalg.lib,v 1.18 2006-07-18 15:48:22 Singular Exp $";
+version="$Id: ncalg.lib,v 1.19 2006-07-20 11:10:22 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  ncalg.lib      Definitions of important GR-algebras
@@ -283,6 +283,7 @@ EXAMPLE: example makeUg2; shows examples
 example
 { "EXAMPLE:"; echo = 2;
    def a = makeUg2();
+   a;
    setring a;
 }
 
@@ -349,6 +350,7 @@ EXAMPLE: example makeUgl; shows examples
 example
 { "EXAMPLE:"; echo = 2;
    def a=makeUgl(3);
+   a;
    setring a; a;
 };
 
@@ -710,6 +712,7 @@ EXAMPLE: example makeUso5; shows examples
 example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUso5();
+   ncAlgebra;
    setring ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
@@ -848,6 +851,7 @@ EXAMPLE: example makeUso7; shows examples
 example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUso7();
+   ncAlgebra;
    setring ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
@@ -1143,6 +1147,7 @@ EXAMPLE: example makeUso9; shows examples
 example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUso9();
+   ncAlgebra;
    setring ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
@@ -1697,6 +1702,7 @@ EXAMPLE: example makeUso11; shows examples
 example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUso11();
+   ncAlgebra;
    setring ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
@@ -1930,6 +1936,7 @@ EXAMPLE: example makeUsp3; shows examples
 example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUsp3();
+   ncAlgebra;
    setring ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
@@ -2225,6 +2232,7 @@ EXAMPLE: example makeUsp4; shows examples
 example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUsp4();
+   ncAlgebra;
    setring ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
@@ -2779,6 +2787,7 @@ EXAMPLE: example makeUsp5; shows examples
 example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUsp5();
+   ncAlgebra;
    setring ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
@@ -2870,6 +2879,7 @@ EXAMPLE: example makeUso6; shows examples
 example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUso6();
+   ncAlgebra;
    setring ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
@@ -3081,6 +3091,7 @@ EXAMPLE: example makeUso8; shows examples
 example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUso8();
+   ncAlgebra;
    setring ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
@@ -3502,6 +3513,7 @@ EXAMPLE: example makeUso10; shows examples
 example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUso10();
+   ncAlgebra;
    setring ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
@@ -4247,6 +4259,7 @@ EXAMPLE: example makeUso12; shows examples
 example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUso12();
+   ncAlgebra;
    setring ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
@@ -4830,6 +4843,7 @@ EXAMPLE: example makeUf4; shows examples
 example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUf4();
+   ncAlgebra;
    setring ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
@@ -5869,6 +5883,7 @@ EXAMPLE: example makeUe6; shows examples
 example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUe6();
+   ncAlgebra;
    setring ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
@@ -8441,6 +8456,7 @@ EXAMPLE: example makeUe7; shows examples
 example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUe7();
+   ncAlgebra;
    setring ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
@@ -16224,6 +16240,7 @@ EXAMPLE: example makeUe8; shows examples
 example
 { "EXAMPLE:"; echo = 2;
    def ncAlgebra = makeUe8();
+   ncAlgebra;
    setring ncAlgebra;
 }
 ////////////////////////////////////////////////////////////////////
