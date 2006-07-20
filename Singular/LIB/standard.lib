@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.80 2006-07-18 15:48:30 Singular Exp $";
+version="$Id: standard.lib,v 1.81 2006-07-20 12:26:46 pohl Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -1112,15 +1112,19 @@ proc minres(list #)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc weightKB(def stc, int dd, list wim)
-"USAGE:   weightKB(stc,dd,wim);
-          stc ideal/module (standard basis),
-          dd int (degree of the result),
-          wim list of intvec (weights of the degree):
-            wim[1] for all variables (>0),
-            wim[2] only for module for the generators.
-RETURN:  same type as stc
-         (the terms of the kbase w.r.t. stc with
-          weighted degree equals dd)
+"SYNTAX: @code{weightKB (} module_expression@code{,} int_expression @code{,}
+            list_expression @code{)}@*
+         @code{weightKB (} ideal_expression@code{,} int_expression@code{,}
+            list_expression @code{)}
+RETURN:  the same as the input type of the first argument
+PURPOSE:  Computes the part of a vector space basis of the respective quotient with
+          weighted degree of the monomials equal to the second argument. The last
+          argument contains the information about the weights as a list of intvec:
+            @code{wim[1]} for all variables (positive),
+            @code{wim[2]} only for module for the generators.
+NOTE:     This is a generalisation for the command @code{kbase} with the same first
+          two arguments.
+SEE ALSO: kbase
 EXAMPLE: example weightKB; shows an example
 "
 {
@@ -1290,6 +1294,13 @@ static proc weightmon(int va, int drest, poly mm)
     weightmon(va-1,m2,mm);
   }
   return();
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=0,(x,y,z),dp;
+  ideal i = x6,y4,xyz;
+  intvec w = 2,3,6;
+  weightKB(i, 12, list(w));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
