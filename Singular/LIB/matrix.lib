@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.30 2005-05-06 16:01:49 Singular Exp $";
+version="$Id: matrix.lib,v 1.31 2006-07-20 17:02:38 Singular Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -686,7 +686,7 @@ example
 
 proc multcol (matrix A, int c, poly p)
 "USAGE:   addcol(A,c,p);  A matrix, p poly, c positive integer
-RETURN:  matrix,  A being modified by multiplying column c with p
+RETURN:  matrix,  A being modified by multiplying column c by p
 EXAMPLE: example multcol; shows an example
 "
 {
@@ -704,7 +704,7 @@ example
 
 proc multrow (matrix A, int r, poly p)
 "USAGE:   multrow(A,r,p);  A matrix, p poly, r positive integer
-RETURN:  matrix,  A being modified by multiplying row r with p
+RETURN:  matrix,  A being modified by multiplying row r by p
 EXAMPLE: example multrow; shows an example
 "
 {
@@ -722,7 +722,7 @@ example
 
 proc permcol (matrix A, int c1, int c2)
 "USAGE:   permcol(A,c1,c2);  A matrix, c1,c2 positive integers
-RETURN:  matrix,  A being modified by permuting column c1 and c2
+RETURN:  matrix,  A being modified by permuting columns c1 and c2
 EXAMPLE: example permcol; shows an example
 "
 {
