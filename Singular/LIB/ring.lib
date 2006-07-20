@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ring.lib,v 1.26 2005-05-18 18:07:51 levandov Exp $";
+version="$Id: ring.lib,v 1.27 2006-07-20 15:35:51 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -257,7 +257,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc extendring (int n, string va, string o, list #)
-"USAGE:   extendring(n,va,o[iv,i,r]);  va,o=strings, n,i=integers, r=ring,
+"USAGE:   extendring(n,va,o[,iv,i,r]);  va,o=strings, n,i=integers, r=ring,
           iv=intvec of positive integers or iv=0
 RETURN:  ring R, which extends the ring r by adding n new variables in front
          of (resp. after, if i!=0) the old variables.
@@ -291,7 +291,7 @@ RETURN:  ring R, which extends the ring r by adding n new variables in front
 NOTE:    This proc is useful for adding deformation parameters.
          This proc uses 'execute' or calls a procedure using 'execute'.
          If you use it in your own proc, it may be advisable to let the local
-         names of your proc start with a @ (see the file HelpForProc)
+         names of your proc start with a @
 EXAMPLE: example extendring; shows an example
 "
 {
@@ -417,16 +417,17 @@ proc fetchall (R, list #)
 "USAGE:   fetchall(R[,s]);  R=ring/qring, s=string
 CREATE:  fetch all objects of ring R (of type poly/ideal/vector/module/number/
          matrix) into the basering.
-         If no 3rd argument is present, the names are the same as in R. If,
-         say, f is a poly in R and the 3rd argument is the string \"R\", then f
+         If no 2nd argument is present, the names are the same as in R. If,
+         say, f is a poly in R and the 2nd argument is the string \"R\", then f
          is maped to f_R etc.
 RETURN:  no return value
 NOTE:    As fetch, this procedure maps the 1st, 2nd, ... variable of R to the
          1st, 2nd, ... variable of the basering.
-         The 3rd argument is useful in order to avoid conflicts of names, the
+         The 2nd argument is useful in order to avoid conflicts of names, the
          empty string is allowed
 CAUTION: fetchall does not work inside a procedure.
          It does not work if R contains a map.
+SEE ALSO: imapall
 EXAMPLE: example fetchall; shows an example
 "
 {
@@ -462,16 +463,17 @@ proc imapall (R, list #)
 "USAGE:   imapall(R[,s]);  R=ring/qring, s=string
 CREATE:  map all objects of ring R (of type poly/ideal/vector/module/number/
          matrix) into the basering, by applying imap to all objects of R.
-         If no 3rd argument is present, the names are the same as in R. If,
+         If no 2nd argument is present, the names are the same as in R. If,
          say, f is a poly in R and the 3rd argument is the string \"R\", then f
          is maped to f_R etc.
 RETURN:  no return value
 NOTE:    As imap, this procedure maps the variables of R to the variables with
          the same name in the basering, the other variables are maped to 0.
-         The 3rd argument is useful in order to avoid conflicts of names, the
+         The 2nd argument is useful in order to avoid conflicts of names, the
          empty string is allowed
 CAUTION: imapall does not work inside a procedure
          It does not work if R contains a map
+SEE ALSO: fetchall
 EXAMPLE: example imapall; shows an example
 "
 {
@@ -596,7 +598,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc ringtensor (list #)
-"USAGE:   ringtensor(r1,r2,...); s=string, r1,r2,...=rings
+"USAGE:   ringtensor(r1,r2,...);  r1,r2,...=rings
 RETURN:  ring R whose variables are the variables from all rings r1,r2,...
          and whose monomial ordering is the block (product) ordering of the
          respective monomial orderings of r1,r2,... . Hence, R
@@ -758,9 +760,9 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc preimageLoc(string R_name,string phi_name,string Q_name )
-"SYNTAX: @code{preimageLoc (} ring_name, map_name, ideal_name  @code{)}
+"USAGE: preimageLoc ( ring_name, map_name, ideal_name );
         all input parameters of type string
-TYPE:    ideal
+RETURN:  ideal
 PURPOSE: computes the preimage of an ideal under a given map for non-global
          orderings.
          The second argument has to be the name of a map from the basering to
