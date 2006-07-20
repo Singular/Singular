@@ -411,7 +411,7 @@ with c*v(opt) minimal) by the following procedure:
 @item (1) Compute the toric ideal I(A) using one of the algorithms in the previous section.
 @item (2) Compute the reduced Groebner basis G(c) of I(A) w.r.t.@: @math{>_c}.
 @item (3) Reduce @math{x^v} modulo G(c) using the Hironaka division algorithm.
-If the result of this reduction is @math{x^{v_0}}, then @math{v_0} is an optimal
+If the result of this reduction is @math{x^w}, then @math{w} is an optimal
 solution of the given instance.
 @end itemize
 
