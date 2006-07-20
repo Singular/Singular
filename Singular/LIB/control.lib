@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.34 2006-07-18 09:29:34 Singular Exp $";
+version="$Id: control.lib,v 1.35 2006-07-20 22:17:11 levandov Exp $";
 category="System and Control Theory";
 info="
 LIBRARY:  control.lib     Algebraic analysis tools for System and Control Theory
@@ -398,6 +398,7 @@ proc control(module R)
 "USAGE:  control(R);  R a module (R is the matrix of the system of equations to be investigated)
 RETURN:  list
 PURPOSE: compute the list of all the properties concerning controllability of the system (behavior), represented by the matrix R
+NOTE: the properties and corresponding data like controllability, flatness, dimension of the system, degree of controllability, kernel and image representations, genericity of parameters, obstructions to controllability, annihilator of torsion submodule and left inverse are investigated
 EXAMPLE:  example control; shows an example
 "
 {
@@ -440,21 +441,23 @@ proc controlDim(module R)
 RETURN: list
 PURPOSE: computes list of all the properties concerning controllability of the system (behavior), represented by the  matrix R
 EXAMPLE:  example controlDim; shows an example
-NOTE: this procedure is analogous to 'control' but uses dimension calculations.This approach works for full row rank matrices only.
+NOTE: the properties and corresponding data like controllability, flatness, dimension of the system, degree of controllability, kernel and image representations, genericity of parameters, obstructions to controllability, annihilator of torsion submodule and left inverse are investigated.
+@* This procedure is analogous to 'control' but uses dimension calculations. 
+@* The implemented approach works for full row rank matrices only (the check is done automatically).
 "
 {
   if( nrows(R) != colrank(transpose(R)) )
   {
     return ("controlDim cannot be applied, since R does not have full row rank");
   }
-  intvec v=Opt_Our();
-  module R_std=std(R);
-  int d=dim_Our(R_std);
-  int NVars=nvars(basering);
-  int i=NVars-d;
-  module Ext_1=std(Ext_Our(1,R_std));
-  matrix T=lift(R,R_std);
-  list l=genericity(T);
+  intvec     v = Opt_Our();
+  module R_std = std(R);
+  int        d = dim_Our(R_std);
+  int    NVars = nvars(basering);
+  int        i = NVars-d;
+  module Ext_1 = std(Ext_Our(1,R_std));
+  matrix     T = lift(R,R_std);
+  list       l = genericity(T);
   option(set, v);
   return( control_output( i, NVars, R, Ext_1, l));
 }
@@ -578,20 +581,21 @@ proc autonomDim(module R)
 "USAGE:  autonomDim(R);   R a module (R is a matrix of the system of equations which is to be investigated)
 RETURN: list
 PURPOSE: computes the list of all the properties concerning autonomy of the system (behavior), represented by the matrix R
-NOTE:  this procedure is analogous to 'autonom' but uses dimension calculations
+NOTE: the properties and corresponding data like autonomy resp. strong autonomy, dimension of the system, autonomy degree, kernel representation and (over)determinacy are investigated.
+@* This procedure is analogous to 'autonom' but uses dimension calculations
 EXAMPLE:  example autonomDim; shows an example
 "
 {
   int d;
-  int NVars = nvars(basering);
-  module RT = transpose(R);
+  int NVars  = nvars(basering);
+  module RT  = transpose(R);
   module RC;  //for computation of controllable part if if exists
   int R_rank = ncols(R);
-  d     = dim_Our( std(RT) );  //this is the dimension of the system
-  int i = NVars-d;  //First non-zero Ext
+  d          = dim_Our( std(RT) );  //this is the dimension of the system
+  int      i = NVars-d;  //First non-zero Ext
   if( d==0 )
     {
-      RC=leftKernel(rightKernel(R));
+      RC = leftKernel(rightKernel(R));
       R_rank=colrank(R);
     }
   return( autonom_output(i,NVars,RC,R_rank) );
@@ -613,6 +617,7 @@ proc autonom(module R)
 "USAGE:  autonom(R);   R a module (R is a matrix of the system of equations which is to be investigated)
 RETURN:  list
 PURPOSE: find all the properties concerning autonomy of the system (behavior) represented by the  matrix R
+NOTE: the properties and corresponding data like autonomy resp. strong autonomy, dimension of the system, autonomy degree, kernel representation and (over)determinacy are investigated
 EXAMPLE: example autonom; shows an example
 "
 {
@@ -630,7 +635,7 @@ EXAMPLE: example autonom; shows an example
   };
   if (i==0)
   {
-    RC=leftKernel(rightKernel(R));
+    RC = leftKernel(rightKernel(R));
     R_rank=colrank(R);
   }
   return(autonom_output(i,NVars,RC,R_rank));
@@ -654,8 +659,9 @@ proc genericity(matrix M)
 "USAGE:  genericity(M); M is a matrix/module
 RETURN:  list (of strings)
 PURPOSE: determine parametric expressions which have been assumed to be non-zero in the process of computing the Groebner basis
-NOTE: we strongly recommend to switch on the redSB and redTail options;
-@*    the procedure is effective with the lift procedure for modules with parameters
+NOTE: the output list consists of two strings. The first string contains the variables only, whereas the second string contains polynomials.
+$* We strongly recommend to switch on the redSB and redTail options.
+@* The procedure is effective with the lift procedure for modules with parameters
 EXAMPLE:  example genericity; shows an example
 "
 {
