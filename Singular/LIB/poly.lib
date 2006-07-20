@@ -1,9 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: poly.lib,v 1.37 2005-05-18 18:07:51 levandov Exp $";
+version="$Id: poly.lib,v 1.38 2006-07-20 14:51:56 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  poly.lib      Procedures for Manipulating Polys, Ideals, Modules
-AUTHORS:  O. Bachmann, G.-M: Greuel, A. Fruehbis
+AUTHORS:  O. Bachmann, G.-M. Greuel, A. Fruehbis
 
 PROCEDURES:
  cyclic(int);           ideal of cyclic n-roots
@@ -48,7 +48,7 @@ static proc bino(int a, int b)
 }
 
 proc hilbPoly(ideal I)
-"USAGE: hilbPoly(I) I a homogeneous ideal
+"USAGE: hilbPoly(I); I a homogeneous ideal
 RETURN: the Hilbert polynomial of basering/I as an intvec v=v_0,...,v_r
         such that the Hilbert polynomial is (v_0+v_1*t+...v_r*t^r)/r!
 EXAMPLE: example hilbPoly; shows an example
@@ -96,7 +96,7 @@ proc substitute (I,list #)
            substitute (I,v,f[,v1,f1,v2,f2,...]); I object of basering which
            can be mapped, v,v1,v2,.. ring variables, f,f1,f2,... poly
 @*       - case 2: typeof(#[1])==ideal:
-           substitute1 (I,v,f); I object of basering which can be mapped,
+           substitute (I,v,f); I object of basering which can be mapped,
            v ideal of ring variables, f ideal
 RETURN:  object of same type as I,
 @*       - case 1: ring variable v,v1,v2,... substituted by polynomials
@@ -190,7 +190,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc katsura
-"USAGE: katsura([n]): n integer
+"USAGE: katsura([n]); n integer
 RETURN: katsura(n) : n-th katsura ideal of
          (1) newly created and set ring (32003, x(0..n), dp), if
              nvars(basering) < n
@@ -325,7 +325,7 @@ example
 
 proc maxcoef (f)
 "USAGE:   maxcoef(f);  f  poly/ideal/vector/module/matrix
-RETURN:  maximal length of coefficient of f of type int (by counting the
+RETURN:  maximal length of coefficient of f of type int (by measuring the
          length of the string of each coefficient)
 EXAMPLE: example maxcoef; shows examples
 "
@@ -366,8 +366,9 @@ RETURN:  int/intmat, each component equals maximal degree of monomials in the
          corresponding component of id, independent of ring ordering
          (maxdeg of each var is 1).
          Of type int if id is of type poly, of type intmat else
-NOTE:    proc maxdeg1 returns 1 integer, the absolute maximum; moreover, it has
+NOTE:    proc maxdeg1 returns an integer, the absolute maximum; moreover, it has
          an option for computing weighted degrees
+SEE ALSO: maxdeg1
 EXAMPLE: example maxdeg; shows examples
 "
 {
@@ -633,7 +634,8 @@ example
 
 proc normalize (id)
 "USAGE:   normalize(id);  id=poly/vector/ideal/module
-RETURN:  object of same type with leading coefficient equal to 1
+RETURN:  object of same type,s
+         each element is normalized to make its leading coefficient equal to 1
 EXAMPLE: example normalize; shows an example
 "
 {
@@ -701,7 +703,7 @@ example
 proc lcm (id, list #)
 "USAGE:   lcm(p[,q]); p int/intvec q a list of integers or
           p poly/ideal q a list of polynomials
-RETURN:  the least common multiple of the common entries of p and q:
+RETURN:  the least common multiple of p and q:
 @*         - of type int if p is an int/intvec
 @*         - of type poly if p is a poly/ideal
 EXAMPLE: example lcm; shows an example

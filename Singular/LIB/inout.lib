@@ -1,6 +1,6 @@
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: inout.lib,v 1.27 2006-05-18 13:51:36 Singular Exp $";
+version="$Id: inout.lib,v 1.28 2006-07-20 14:51:56 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  inout.lib     Printing and Manipulating In- and Output
@@ -25,7 +25,6 @@ proc allprint (list #)
 "USAGE:   allprint(L);  L list
 DISPLAY: prints L[1], L[2], ... if an integer with name ALLprint is defined.
 @*       makes \"pause\",   if ALLprint > 0
-@*       listvar(matrix), if ALLprint = 2
 RETURN:  no return value
 EXAMPLE: example allprint; shows an example
 "
@@ -34,7 +33,6 @@ EXAMPLE: example allprint; shows an example
    {
       int i;
       for( i=1; i<=size(#); i=i+1 ) { print(#[i]); }
-      if( ALLprint==2 ) { pause(); listvar(matrix); }
       if( ALLprint >0 ) { pause(); }
    }
    return();
@@ -52,7 +50,7 @@ example
 proc lprint
 "USAGE:   lprint(id[,n]);  id poly/ideal/vector/module/matrix, n integer
 RETURN:  string of id in a format fitting into lines of size n, such that no
-         monomial gests destroyed, i.e. the new line starts with + or -;
+         monomial gets destroyed, i.e. the new line starts with + or -;
          (default: n = pagewidth).
 NOTE:    id is printed columnwise, each column separated by a blank line;
          hence lprint(transpose(id)); displays a matrix id in a format which
@@ -111,7 +109,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc pmat (matrix m, list #)
-"USAGE:   pmat(M,[n]);  M matrix, n integer
+"USAGE:   pmat(M[,n]);  M matrix, n integer
 DISPLAY: display M in array format if it fits into pagewidth; if n is given,
          only the first n characters of each colum are shown
 RETURN:  no return value
@@ -183,8 +181,9 @@ example
 
 proc rMacaulay
 "USAGE:   rMacaulay(s[,n]);  s string, n integer
-RETURN:  A string which should be readable by Singular if s is a string which
-         was produced by Macaulay. If a second argument is present the first
+RETURN:  A string denoting a file which should be readable by Singular
+         and it should be produced by Macaulay Classic.
+         If a second argument is present the first
          n lines of the file are deleted (which is useful if the file was
          produced e.g. by the putstd command of Macaulay).
 NOTE:    This does not always work with 'cut and paste' since the character
@@ -535,7 +534,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc showrecursive (id,poly p,list #)
-"USAGE:   showrecursive(id,p[ord]); id= any object of basering, p= product of
+"USAGE:   showrecursive(id,p[,ord]); id= any object of basering, p= product of
          variables and ord=string (any allowed ordstr)
 DISPLAY: display 'id' in a recursive format as a polynomial in the variables
          occuring in p with coefficients in the remaining variables. This is
@@ -640,12 +639,12 @@ proc writelist (string fil, string nam, list L)
 CREATE:  a file with name `file`, write the content of the list L into it and
          call the list `name`, keeping the list structure
 RETURN:  no return value
-NOTE:    The syntax of writelist uses and is similar to the syntax of the
+NOTE:    The syntax of writelist is similar to the syntax of the
          write command of Singular which does not manage lists properly.
          If (file,name) = (\"listfile\",\"L1\"),  writelist creates (resp.
          appends if listfile exists) a file with name listfile and stores
          there the list L under the name L1. The Singular command
-         execute(read(\"listfile\")); assignes the content of L (stored in
+         execute(read(\"listfile\")); assigns the content of L (stored in
          listfile) to a list L1.
 @*       On a UNIX system, write(\">file\",...) overwrites an existing file
          `file` while write(\"file\",...) and write(\">>file\",...) append.
@@ -686,7 +685,8 @@ example
 proc pause(list #)
 "USAGE:    pause([ prompt ])  prompt string
 RETURN:   none
-PURPOSE:  interrupt the execution of commands until user input
+PURPOSE:  interrupt the execution of commands, displays prompt or pause
+          and waits for user input
 NOTE:     pause is useful in procedures in connection with printlevel to
           interrupt the computation and to display intermediate results.
 SEE ALSO: read, printlevel

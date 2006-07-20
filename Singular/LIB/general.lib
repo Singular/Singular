@@ -2,7 +2,7 @@
 //anne, added deleteSublist and watchdog 12.12.2000
 //eric, added absValue 11.04.2002
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.49 2006-03-27 13:53:00 Singular Exp $";
+version="$Id: general.lib,v 1.50 2006-07-20 14:51:56 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -47,7 +47,7 @@ proc A_Z (string s,int n)
 "USAGE:   A_Z(\"a\",n);  a any letter, n integer (-26<= n <=26, !=0)
 RETURN:  string of n small (if a is small) or capital (if a is capital)
          letters, comma separated, beginning with a, in alphabetical
-         order (or revers alphabetical order if n<0)
+         order (or reverse alphabetical order if n<0)
 EXAMPLE: example A_Z; shows an example
 "
 {
@@ -100,9 +100,9 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc ASCII (list #)
 "USAGE:   ASCII([n,m]); n,m= integers (32 <= n <= m <= 126)
-RETURN:   string of printable ASCII characters (no native language support)
-          ASCII():    string of  all ASCII characters with its numbers,
-          ASCII(n):   n-th ASCII character
+RETURN:   string of printable ASCII characters (no native language support)@*
+          ASCII():    string of  all ASCII characters with its numbers,@*
+          ASCII(n):   n-th ASCII character@*
           ASCII(n,m): n-th up to m-th ASCII character (inclusive)
 EXAMPLE: example ASCII; shows an example
 "
@@ -153,7 +153,6 @@ RETURN:  absValue(c); the absolute value of c
 NOTE:    absValue(c)=c if c>=0; absValue=-c if c<=0.
 @*       So the function can be applied to any type, for which comparison
 @*       operators are defined.
-SEE ALSO: boolean expressions
 EXAMPLE: example absValue; shows an example
 "
 {
@@ -345,13 +344,13 @@ example
 { "EXAMPLE:"; echo = 2;
    factorial(37);"";                 //37! of type string (as long integer)
    ring r1 = 0,x,dp;
-   number p = factorial(37,0);       //37! of type number, computed in r
+   number p = factorial(37,0);       //37! of type number, computed in r1
    p;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc fibonacci (int n, list #)
-"USAGE:    fibonacci(n);  n,p integers
+"USAGE:    fibonacci(n[,p]);  n,p integers
 RETURN:   fibonacci(n): nth Fibonacci number, f(0)=f(1)=1, f(i+1)=f(i-1)+f(i)
 @*        - computed in characteristic 0, of type string
 @*        fibonacci(n,p): f(n) computed in characteristic 0 or prime(p)
@@ -407,11 +406,9 @@ example
 
 proc kmemory (list #)
 "USAGE:   kmemory([n,[v]]); n,v integers
-RETURN:  memory in kilobyte of type int
+RETURN:  memory in kilobyte of type bigint
 @*       n=0: memory used by active variables (same as no parameters)
 @*       n=1: total memory allocated by Singular
-@*       n=2: difference between top and init memory adress (sbrk memory)
-@*       n!=0,1,2: 0
 DISPLAY: detailed information about allocated and used memory if v!=0
 NOTE:    kmemory uses internal function 'memory' to compute kilobyte, and
          is the same as 'memory' for n!=0,1,2
@@ -827,7 +824,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc sort (id, list #)
-"USAGE:   sort(id[v,o,n]); id = ideal/module/intvec/list(of intvec's or int's)
+"USAGE:   sort(id[,v,o,n]); id = ideal/module/intvec/list(of intvec's or int's)
 @*       sort may be called with 1, 2 or 3 arguments in the following way:
 @*       sort(id[,v,n]); v=intvec of positive integers, n=integer,
 @*       sort(id[,o,n]); o=string (any allowed ordstr of a ring), n=integer
@@ -1114,7 +1111,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc watchdog(int i, string cmd)
-"USAGE:   watchdog(i,cmd); i integer; cmd string
+"USAGE:   watchdog(i,cmd); i integer, cmd string
 RETURN:  Result of cmd, if the result can be computed in i seconds.
          Otherwise the computation is interrupted after i seconds,
          the string "Killed" is returned and the global variable
@@ -1260,7 +1257,7 @@ RETURN:  a list, say l,
          l[3] : remaining factor ( n=product{ (l[1][i]^l[2][i])*l[3]} )
                 type(l[3])=typeof(n)
 NOTE:    If n is a long integer (of type number) then the procedure
-         finds primefactors <= min(p,32003) but n may be larger as
+         finds primefactors <= min(p,32003) but n may as larger as
          2147483647 (max. integer representation)
 WARNING: the procedure works for small integers only, just by testing all
          primes (not to be considerd as serious prime factorization!)
@@ -1433,15 +1430,15 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 proc primecoeffs(J, list #)
-"USAGE:   primecoeffs(J[,q]); J any type which can be converted to a matrix
+"USAGE:   primecoeffs(J[,p]); J any type which can be converted to a matrix
          e.g. ideal, matrix, vector, module, int, intvec
-         q = intger
+         p = integer
 COMPUTE: primefactors <= min(p,32003) of coeffs of J (default p = 32003)
-RETURN:  a list, say l, of two intvectors:
-         l[1] : the different primefactors of all coefficients of J
+RETURN:  a list, say l, of two intvectors:@*
+         l[1] : the different primefactors of all coefficients of J@*
          l[2] : the different remaining factors
 NOTE:    the procedure works for small integers only, just by testing all
-         primes (not to be considerd as serious prime factorization!)
+         primes (not to be considered as serious prime factorization!)
 EXAMPLE: example primecoeffs; shows an example
 "
 {
@@ -1513,7 +1510,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc timeFactorize(poly i,list #)
-"USAGE:  timeFactorize(p,d)  poly p , integer d
+"USAGE:  timeFactorize(p,d); poly p , integer d
 RETURN:  factorize(p) if the factorization finished after d-1
          seconds otherwhise f is considered to be irreducible
 EXAMPLE: example timeFactorize; shows an example
@@ -1668,7 +1665,7 @@ example
 proc factorH(poly p)
 "USAGE:  factorH(p)  p poly
 RETURN:  factorize(p)
-NOTE:    changes variables to become the last variable the principal
+NOTE:    changes variables to make the last variable the principal
          one in the multivariate factorization and factorizes then
          the polynomial
 EXAMPLE: example factorH; shows an example
