@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.78 2006-07-17 14:32:21 Singular Exp $
+@comment $Id: math.doc,v 1.79 2006-07-20 14:30:27 Singular Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -69,18 +69,19 @@ basis}\} \to R^r, (p,G) \mapsto \hbox{NF}(p|G)$, is called a {\bf normal
 form} if for any $p \in R^r$ and any standard basis $G$ the following
 holds: if $\hbox{NF}(p|G) \not= 0$ then $L(g)$ does not divide
 $L(\hbox{NF}(p|G))$ for all $g \in G$.
+(Note that such a function is not unique).
 
 \noindent
 $\hbox{NF}(p|G)$ is called a {\bf normal form of} $p$ {\bf with
-respect to} $G$ (note that such a function is not unique).
+respect to} $G$
 @end tex
 @ifinfo
 A function NF : R^r x @{G | G a standard basis@} -> R^r, (p,G) ->
 NF(p|G), is called a @strong{normal form} if for any p in R^r and any
 standard basis G the following holds: if NF(p|G) <> 0 then L(g) does not
 divide L(NF(p|G)) for all g in G.
-@*NF(p|G) is called a @strong{normal form} of p with respect to G (note
-that such a function is not unique).
+(Note that such a function is not unique).
+@*NF(p|G) is called a @strong{normal form} of p with respect to G
 @end ifinfo
 @item ideal membership:
 @cindex Ideal membership
@@ -112,7 +113,7 @@ and the Hilbert function H_L(I) of the leading ideal L(I) coincide.
 @cindex Hilbert function
 @cindex Hilbert series
 @tex
-Let M $=\bigoplus_i M_i$ be a graded module over $K[x_1,..,x_n]$ with
+Let M $=\bigoplus_{i\in Z} M_i$ be a graded module over $K[x_1,..,x_n]$ with
 respect to weights $(w_1,..w_n)$.
 The {\bf Hilbert function} of $M$, $H_M$, is defined (on the integers) by
 $$H_M(k) :=dim_K M_k.$$
@@ -157,7 +158,7 @@ for s >= N.
 @*
 @*
 @tex
-Generalizing these to quasihomogeneous modules we get
+Generalizing this to quasihomogeneous modules we get
 $$\hbox{HP}_M(t)={Q(t)\over {\Pi_{i=1}^n(1-t^{w_i})}}$$
 where $Q(t)$ is a polynomial in ${\bf Z}[t]$.
 $Q(t)$ is called the {\bf first (weighted) Hilbert series} of M.
@@ -243,8 +244,8 @@ $A_1$
 @ifinfo
 A_1
 @end ifinfo
-generate @math{I}. Note, that resolutions need not to be finite (i.e., of
-finite length). The Hilbert Syzygy Theorem states, that for
+generate @math{I}. Note that resolutions need not to be finite (i.e., of
+finite length). The Hilbert Syzygy Theorem states that for
 @tex
 $R=\hbox{Loc}_< K[\underline{x}]$
 @end tex
@@ -281,11 +282,11 @@ $$
         \bigoplus_a R\cdot e_{a,1} \longleftarrow \ldots \longleftarrow
         \bigoplus_a R\cdot e_{a,n} \longleftarrow 0
 $$
-be a minimal free resolution of $R^n/I$ considered with homogeneous maps
+be a minimal free resolution of $R^r/I$ considered with homogeneous maps
 of degree 0. Then the {\bf graded Betti number} $b_{i,j}$ of $R^r/I$ is
 the minimal number of generators $e_{a,j}$ in degree $i+j$ of the $j$-th
 syzygy module of $R^r/I$ (i.e., the $(j-1)$-st syzygy module of
-$I$). Note, that by definition the $0$-th syzygy module of $R^r/I$ is $R^r$
+$I$). Note that, by definition, the $0$-th syzygy module of $R^r/I$ is $R^r$
 and the 1st syzygy module of $R^r/I$ is $I$.
 @end tex
 @ifinfo
@@ -303,8 +304,7 @@ definition the 0th syzygy module of R^r/I is R^r and the 1st syzygy module
 of R^r/I is I.
 @end ifinfo
 
-The @strong{regularity} of @math{I} is the smallest integer @math{s}
-such that
+The @strong{regularity} of @math{I} is the smallest integer @math{s} such that
 @tex
 $$
     \hbox{deg}(e_{a,j}) \le s+j-1 \quad \hbox{for all $j$.}
@@ -450,12 +450,12 @@ The spectrum consists of $\mu$ rational numbers $\alpha_1,\dots,\alpha_\mu$ such
 These {\bf spectral numbers} lie in the open interval $(-1,n)$, symmetric about the midpoint $(n-1)/2$.
 
 The spectrum is constant under $\mu$-constant deformations and has the following semicontinuity property:
-The number of spectral numbers in an interval $(a,a+1]$ of all singularities of a small deformation of $f$ is greater or equal to that of f in this interval.
+The number of spectral numbers in an interval $(a,a+1]$ of all singularities of a small deformation of $f$ is greater than or equal to that of f in this interval.
 For semiquasihomogeneous singularities, this also holds for intervals of the form $(a,a+1)$.
 
 Two given isolated singularities $f$ and $g$ determine two spectra and from these spectra we get an integer.
 This integer is the maximal positive integer $k$ such that the semicontinuity holds for the spectrum of $f$ and $k$ times the spectrum of $g$.
-These numbers give bounds for the maximal number of isolated singularties of a specific type on a hypersurface $X\subset{P}^n$ of degree $d$:
+These numbers give bounds for the maximal number of isolated singularities of a specific type on a hypersurface $X\subset{P}^n$ of degree $d$:
 such a hypersurface has a smooth hyperplane section, and the complement is a small deformation of a cone over this hyperplane section.
 The cone itself being a $\mu$-constant deformation of $x_0^d+\dots+x_n^d=0$, the singularities are bounded by the spectrum of $x_0^d+\dots+x_n^d$.
 
@@ -488,7 +488,7 @@ For semiquasihomogeneous singularities, this also holds for intervals of the for
 
 Two given isolated singularities f and g determine two spectra and from these spectra we get an integer.
 This integer is the maximal positive integer k such that the semicontinuity holds for the spectrum of f and k times the spectrum of g.
-These numbers give bounds for the maximal number of isolated singularties of a specific type on a hypersurface X in P^n of degree d:
+These numbers give bounds for the maximal number of isolated singularities of a specific type on a hypersurface X in P^n of degree d:
 such a hypersurface has a smooth hyperplane section, and the complement is a small deformation of a cone over this hyperplane section.
 The cone itself being a mu-constant deformation of x_0^d+...+x_n^d=0, the singularities are bounded by the spectrum of x_0^d+...+x_n^d.
 
@@ -505,25 +505,28 @@ exp(-2*pi*i*M)
 @end ifinfo
 is a monodromy matrix of @math{f} and the Jordan normal form of @math{M}:
 @smallexample
-  // not computed !!
-  LIB "gmssing.lib";
+@c example
+  LIB "mondromy.lib";
   ring R=0,(x,y),ds;
   poly f=x5+x2y2+y5;
-  matrix M=monodromy(f);
-  print(jordanform(M));
+  matrix M=monodromyB(f);
+  print(M);
+@c example
 @end smallexample
 
 Now, we compute the V-fitration on @math{H''/H'} and the spectrum:
 @smallexample
-  // not computed !!
+@c example
   LIB "gmssing.lib";
   ring R=0,(x,y),ds;
   poly f=x5+x2y2+y5;
-  list l=vfiltration(f);
-  print(l[1]);
-  print(l[2]);
-  print(l[3]);
-  print(l[4]);
+  list l=vfilt(f);
+  print(l[1]); // spectral numbers
+  print(l[2]); // corresponding multiplicities
+  print(l[3]); // vector space of i-th graded part
+  print(l[4]); // monomial vector space basis of H''/s*H''
+  print(l[5]); // standard basis of Jacobian ideal
+@c example
 @end smallexample
 Here @code{l[1]} contains the spectral numbers, @code{l[2]} the corresponding multiplicities, @code{l[3]} a @math{C}-basis of the V-filtration on @math{H''/H'} in terms of the monomial basis of
 @tex
@@ -532,7 +535,7 @@ $O/J_f\cong H''/H'$
 @ifinfo
 O/J_f~=H''/H'
 @end ifinfo
-in @code{l[4]}.
+in @code{l[4]} (seperated by degree).
 
 @tex
 If the principal part of $f$ is $C$-nondegenerate, one can compute the spectrum using the library {\tt spectrum.lib}.
