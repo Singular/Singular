@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.144 2006-07-17 14:32:24 Singular Exp $
+@comment $Id: singular.doc,v 1.145 2006-07-20 12:07:46 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -209,8 +209,8 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @sc{Singular} comes with a set of standard libraries. Their content is
 described in the following subsections.
 
-Use the @ref{LIB} command for loading of single libraries, and the
-command @code{LIB "all.lib";} for loading all libraries.
+Use the @code{LIB} command (see @ref{LIB}) for loading of single libraries,
+and the command @code{LIB "all.lib";} for loading all libraries.
 
 @menu
 * standard_lib:: extensions of Singular kernel
