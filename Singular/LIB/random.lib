@@ -1,6 +1,6 @@
 //(GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: random.lib,v 1.16 2001-01-16 13:48:40 Singular Exp $";
+version="$Id: random.lib,v 1.17 2006-07-20 15:19:35 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  random.lib    Creating Random and Sparse Matrices, Ideals, Polys
@@ -26,7 +26,7 @@ LIB "matrix.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc genericid (id, list #)
-"USAGE:   genericid(id,[,p,b]);  id ideal/module, k,p,b integers
+"USAGE:   genericid(id[,p,b]);  id ideal/module, p,b integers
 RETURN:  system of generators of id which are generic, sparse, triagonal linear
          combinations of given generators with coefficients in [1,b] and
          sparsety p percent, bigger p being sparser (default: p=75, b=30000)
@@ -54,7 +54,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc randomid (id, list #)
-"USAGE:   randomid(id,[k,b]);  id ideal/module, b,k integers
+"USAGE:   randomid(id[,k,b]);  id ideal/module, b,k integers
 RETURN:  ideal/module having k generators which are random linear combinations
          of generators of id with coefficients in the interval [-b,b]
          (default: b=30000, k=size(id))
@@ -118,7 +118,7 @@ proc sparseid (int k, int u, list #)
 "USAGE:   sparseid(k,u[,o,p,b]);  k,u,o,p,b integers
 RETURN:  ideal having k generators, each of degree d, u<=d<=o, p percent of
          terms in degree d are 0, the remaining have random coefficients
-         in the interval [1,b], (default: o=u=d, p=75, b=30000)
+         in the interval [1,b], (default: o=u, p=75, b=30000)
 EXAMPLE: example sparseid; shows an example
 "
 {
@@ -243,7 +243,7 @@ proc sparsepoly (int u, list #)
 "USAGE:   sparsepoly(u[,o,p,b]);  u,o,p,b integers
 RETURN:  poly having only terms in degree d, u<=d<=o, p percent of the terms
          in degree d are 0, the remaining have random coefficients in [1,b),
-         (defaults: o=u=d, p=75, b=30000)
+         (defaults: o=u, p=75, b=30000)
 EXAMPLE:  example sparsepoly; shows an example
 "
 {
@@ -350,7 +350,8 @@ proc randomLast(int b)
 "USAGE:   randomLast(b);  b int
 RETURN:  ideal = maxideal(1), but the last variable is exchanged by a random
          linear combination of all variables, with coefficients in the
-         interval [-b,b].
+         interval [-b,b], except for the last variable which always has
+         coefficient 1
 EXAMPLE: example randomLast; shows an example
 "
 {
