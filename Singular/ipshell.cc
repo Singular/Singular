@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.140 2006-07-18 16:10:45 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.141 2006-07-21 12:36:26 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -4175,14 +4175,16 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
   while (sl!=NULL)
   {
     intvec *iv = (intvec *)(sl->data);
-    if (((*iv)[1]==ringorder_c)||((*iv)[1]==ringorder_C)) i++;
+    if (((*iv)[1]==ringorder_c)||((*iv)[1]==ringorder_C))
+      i++;
     else if ((*iv)[1]==ringorder_L)
     {
       R->bitmask=(*iv)[2];
       n--;
     }
     else if (((*iv)[1]!=ringorder_a)
-    && ((*iv)[1]!=ringorder_a64)) o++;
+    && ((*iv)[1]!=ringorder_a64))
+      o++;
     n++;
     sl=sl->next;
   }
@@ -4256,6 +4258,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
             if (iv->length() == 3) last+=(*iv)[2];
             else last += (*iv)[0];
             R->block1[n] = last;
+            if (R->block0[n]>R->block1[n]) return TRUE;
             if (rCheckIV(iv)) return TRUE;
             break;
           case ringorder_S:
@@ -4475,10 +4478,12 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
         else ffChar=TRUE;
       }
     }
-    else {
+    else
+    {
 #ifdef HAVE_RING2TOM
       int blupp = Is2toM(ch);
-      if (blupp != 0) {
+      if (blupp != 0)
+      {
         cring = 1; // Use Z/2^ch
         ch = blupp;
         Print("Beta: using Z/2^%d", ch);
