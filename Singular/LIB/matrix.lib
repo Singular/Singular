@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.31 2006-07-20 17:02:38 Singular Exp $";
+version="$Id: matrix.lib,v 1.32 2006-07-24 14:06:06 Singular Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -742,7 +742,7 @@ example
 
 proc permrow (matrix A, int r1, int r2)
 "USAGE:   permrow(A,r1,r2);  A matrix, r1,r2 positive integers
-RETURN:  matrix,  A being modified by permuting row r1 and r2
+RETURN:  matrix,  A being modified by permuting rows r1 and r2
 EXAMPLE: example permrow; shows an example
 "
 {

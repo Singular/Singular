@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.38 2005-05-06 14:38:43 hannes Exp $";
+version="$Id: linalg.lib,v 1.39 2006-07-24 14:06:05 Singular Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib  Algorithmic Linear Algebra
@@ -236,7 +236,7 @@ example
 //////////////////////////////////////////////////////////////////////////////
 proc sym_gauss(matrix A)
 "USAGE:    sym_gauss(A);  A = symmetric matrix
-RETURN:   matrix, diagonalisation with symmetric gauss algorithm
+RETURN:   matrix, diagonalisation of A with symmetric gauss algorithm
 EXAMPLE:  example sym_gauss; shows an example"
 {
   int i,j;
@@ -275,7 +275,7 @@ example
 
 //////////////////////////////////////////////////////////////////////////////
 proc orthogonalize(matrix A)
-"USAGE:    orthogonalize(A); A = constant matrix
+"USAGE:    orthogonalize(A); A = matrix of constants
 RETURN:    matrix, orthogonal basis of the colum space of A
 EXAMPLE:   example orthogonalize; shows an example "
 {
@@ -312,8 +312,9 @@ example
 ////////////////////////////////////////////////////////////////////////////
 proc diag_test(matrix A)
 "USAGE:          diag_test(A); A = const square matrix
-RETURN:   int,  1 if A is diagonalisable, 0 if not
-               -1 no statement is possible, since A does not split.
+RETURN:   int,  1 if A is diagonalizable,@*
+                0 if not@*
+               -1 if no statement is possible, since A does not split.
 NOTE:     The test works only for split matrices, i.e if eigenvalues of A
           are in the ground field.
           Does not work with parameters (uses factorize,gcd).
@@ -857,7 +858,7 @@ example
 proc gaussred_pivot(matrix A)
 "USAGE:     gaussred_pivot(A);   A any constant matrix
 RETURN:    list Z:  Z[1]=P , Z[2]=U , Z[3]=S , Z[4]=rank(A)
-           gives n row reduced matrix S, a permutation matrix P and a
+           gives a row reduced matrix S, a permutation matrix P and a
            normalized lower triangular matrix U, with P*A=U*S
 NOTE:      with row pivoting
 EXAMPLE:   example gaussred_pivot; shows an example"
@@ -1416,7 +1417,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc minipoly(matrix M,list #)
-"USAGE:   minpoly(M); matrix M
+"USAGE:   minipoly(M); matrix M
 ASSUME:  eigenvalues of M in basefield
 RETURN:
 @format
@@ -1595,9 +1596,10 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc spprint(list sp)
-"USAGE:   spprint(sp); list sp
+"USAGE:   spprint(sp); list sp (helper routine for spnf, gmssing.lib)
 RETURN:  string s;  spectrum sp
 EXAMPLE: example spprint; shows examples
+SEE ALSO: gmssing_lib, spnf
 "
 {
   string s;
