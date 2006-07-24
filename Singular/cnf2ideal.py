@@ -1,5 +1,19 @@
 import re
 import sys
+from probstat import Cartesian
+from optparse import OptionParser
+from itertools import repeat
+from string import Template
+parser = OptionParser()
+PB="PB"
+SING="SING"
+parser.add_option("-f", "--format",
+                  action="store", dest="format", type="string", default=PB,
+                  help="select format from SING/PB")
+parser.add_option("-i", "--invert",
+                  action="store_true", dest="invert", default=False,
+                  help="invert mapping to true/false")
+
 def iscomment(line):
     return re.match("^c",line)
 
@@ -45,6 +59,9 @@ def gen_clauses(input_numbers):
         else:
             act.append(i)
     return erg
+    
+def xor(a,b):
+    return (a and not b) or (b and not a)
 def gen_poly_Singular(clause):
     def num2factor(f):
         assert(f!=0)
@@ -60,9 +77,52 @@ def gen_Singular(clauses):
     polys=[gen_poly_Singular(c) for c in clauses]
     polys.extend(["".join(["x(",str(i),")*(x(",str(i)+")-1)"]) for i in xrange(1,vars+1)])
     ideal="".join(["ideal i=",",\n".join(polys),";"])
-    command="std(i);"
+    command='LIB "digimult.lib";\n option(prot);\n satisfiable(i);'
     return "\n".join([ring_def,ideal,command,"$;\n"])
-if __name__=='__main__':        
+    
+def gen_poly_PB(clause):
+    def term2string(t):
+        if len(t)==0:
+            return "1"
+        return "*".join(["x("+str(v) +")" for v in t])
+    
+    vars=tuple([v for v in clause if v>0])
+    negated_vars=tuple([-v for v in clause if v<0])
+    if len(negated_vars)>0:
+        terms=[tuple([negated_vars[i] for (i,j) in enumerate(combination) if j==1])\
+            + vars for combination\
+            in Cartesian(list(repeat([0,1],len(negated_vars))))]
+    else:
+        terms=[vars]
+    res="+".join([term2string(t) for t in terms])
+    return res
+    #add_vars=[negated_var[i] for (i,j) in enumerate(combination) if j==1]
+    
+def gen_PB(clauses):
+    start_str=Template("""from PyPolyBoRi import *
+r=Ring($vars)
+def x(i):
+    return Monomial(Variable(i))
+ideal=\
+[
+""")
+    start_str=start_str.substitute(vars=vars)
+    
+    
+
+    poly_str=",\\\n   ".join([gen_poly_PB(c) for c in clauses])
+    end_str="""]
+ideal=[Polynomial(p) for p in ideal]
+"""
+    return start_str+poly_str+end_str
+    
+if __name__=='__main__':
+    (options, args) = parser.parse_args()
     clauses=gen_clauses(process_input(sys.stdin))
+    if options.invert:
+        clauses=[[-i for i in c] for c in clauses]
+    #
 #    print clauses
-    print gen_Singular(clauses)
+    #print gen_Singular(clauses)
+    print gen_PB(clauses)
+    
