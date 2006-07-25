@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: homolog.lib,v 1.21 2006-07-18 15:48:21 Singular Exp $";
+version="$Id: homolog.lib,v 1.22 2006-07-25 17:54:27 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  homolog.lib   Procedures for Homological Algebra
@@ -225,11 +225,11 @@ example
 
 proc cupproduct (module M,N,P,int p,q,list #)
 "USAGE:   cupproduct(M,N,P,p,q[,any]);  M,N,P modules, p,q integers
-COMPUTE: cup-product Ext^p(M',N') x Ext^q(N',P') ---> Ext^p+q(M',P'),
+COMPUTE: cup-product Ext^p(M',N') x Ext^q(N',P') ---> Ext^(p+q)(M',P'),
          where M':=R^m/M, if M in R^m, R basering (i.e. M':=coker(matrix(M)))
 ASSUME:  all Ext's  are of finite dimension
 RETURN:  - if called with 5 arguments: matrix of the associated linear map
-         Ext^p (tensor) Ext^q --> Ext^p+q,  i.e. the columns of <matrix>
+         Ext^p (tensor) Ext^q --> Ext^(p+q),  i.e. the columns of <matrix>
          present the coordinates of the cup products (b_i & c_j) with respect
          to a kbase of Ext^p+q  (b_i resp. c_j are the choosen bases of Ext^p,
          resp. Ext^q).@*

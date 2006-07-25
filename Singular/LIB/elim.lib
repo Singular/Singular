@@ -1,7 +1,7 @@
-// $Id: elim.lib,v 1.18 2005-05-18 17:55:15 Singular Exp $
+// $Id: elim.lib,v 1.19 2006-07-25 17:54:26 Singular Exp $
 // (GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: elim.lib,v 1.18 2005-05-18 17:55:15 Singular Exp $";
+version="$Id: elim.lib,v 1.19 2006-07-25 17:54:26 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      Elimination, Saturation and Blowing up
@@ -102,7 +102,7 @@ example
 
 proc elim (id, int n, int m)
 "USAGE:   elim(id,n,m);  id ideal/module, n,m integers
-RETURNS: ideal/module obtained from id by eliminating variables n..m
+RETURNS: ideal/module obtained from id by eliminating variables var(n) to var(m)
 NOTE:    no special monomial ordering is required, result is a SB with
          respect to ordering dp (resp. ls) if the first var not to be
          eliminated belongs to a -p (resp. -s) blockordering

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: resolve.lib,v 1.5 2005-06-07 11:28:19 Singular Exp $";
+version="$Id: resolve.lib,v 1.6 2006-07-25 17:54:28 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  resolve.lib      Resolution of singularities (Desingularization)
@@ -4387,7 +4387,7 @@ example
    echo = 2;
    ring R=0,(x,y,z),dp;
    ideal J=x3+y5+yz2+xy4;
-   list L=resolve(J,1);
+   list L=resolve(J,0);
    def Q=L[1][7];
    setring Q;
    showBO(BO);

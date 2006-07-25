@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.48 2006-07-18 15:48:27 Singular Exp $";
+version="$Id: normal.lib,v 1.49 2006-07-25 17:54:28 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -355,7 +355,7 @@ proc normal(ideal id, list #)
          (which is sometimes more efficient);
          if @code{choose=\"wd\"} the delta invariant is computed
          simultaneously; this may take much more time in the reducible case,
-         since the factorizing standard basis algorithm cannot be used.
+         since the factorizing standard basis algorithm cannot be used.@*
          if @code{choose=\"g\"} the generators of the integral closure
          are computed.
 ASSUME:  The ideal must be radical, for non-radical ideals the output may

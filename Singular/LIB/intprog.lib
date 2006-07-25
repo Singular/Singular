@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: intprog.lib,v 1.5 2001-02-06 11:31:54 anne Exp $";
+version="$Id: intprog.lib,v 1.6 2006-07-25 17:54:27 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: intprog.lib      Integer Programming with Groebner Basis Methods
@@ -654,7 +654,7 @@ NOTE:   This procedure returns the solution(s) of the given IP-problem(s)
         @*- an algorithm of Bigatti/La Scala/Robbiano (blr),
         @*- the algorithm of Hosten/Sturmfels (hs),
         @*- the algorithm of DiBiase/Urbanke (du).
-        The argument `alg' should be the abbreviation for an algorithm as
+        @*The argument `alg' should be the abbreviation for an algorithm as
         above: ct, pct, ect, pt, blr, hs or du.
 
         `ct' allows computation of an optimal solution of the IP-problem

@@ -1,4 +1,4 @@
-// $Id: mprimdec.lib,v 1.5 2005-04-28 09:22:17 Singular Exp $
+// $Id: mprimdec.lib,v 1.6 2006-07-25 17:54:27 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // mprimdec.lib
 // algorithms for primary decomposition for modules based on
@@ -9,6 +9,9 @@
 // written by Alexander Dreyer
 //
 // $Log: not supported by cvs2svn $
+// Revision 1.5  2005/04/28 09:22:17  Singular
+// *hannes/lossen: new ring.lib
+//
 // Revision 1.4  2001/08/27 14:47:54  Singular
 // *hannes: merge-2-0-2
 //
@@ -19,7 +22,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: mprimdec.lib,v 1.5 2005-04-28 09:22:17 Singular Exp $";
+version="$Id: mprimdec.lib,v 1.6 2006-07-25 17:54:27 Singular Exp $";
 category="Commutative Algebra";
 
 info="
@@ -141,10 +144,9 @@ proc PrimdecA(module @N, list #)
 "USAGE:   PrimdecA (N[, i]); module N, int i
 RETURN:  list l
          a (not necessarily minimal) primary decomposition of N
-         computed by a generalized version of
-         the algorithm of Schimoyama/Yokoyama,
-         if i!=0 is given, the factorizing Groebner is used
-         to compute the isolated primes
+         computed by a generalized version of the algorithm of Schimoyama/Yokoyama,
+         @*if i!=0 is given, the factorizing Groebner is used to compute the
+         isolated primes
 EXAMPLE: example PrimdecA; shows an example
 "
 
@@ -372,9 +374,8 @@ proc modDec(module @N, list #)
 "USAGE:   modDec (N[, i]); module N, int i
 RETURN:  list l
          a minimal primary decomposition of N
-         computed by an generalized version of
-         the algorithm of Schimoyama/Yokoyama,
-         if i=1 is given, the factorizing Groebner is used
+         computed by an generalized version of the algorithm of Schimoyama/Yokoyama,
+         @*if i=1 is given, the factorizing Groebner is used
 EXAMPLE: example modDec; shows an example
 "
 {
@@ -462,10 +463,8 @@ proc zeroMod (module @N, list #)
 "USAGE:   zeroMod (N[, check]); zero-dimensional module N[, module check]
 RETURN:  list l
          the minimal primary decomposition of a zero-dimensional module N,
-         computed by a gernalized version of the algorithm
-         of Gianni, Trager and Zacharias
-NOTE:    if the parameter check is given, only components
-         not containing check are computed
+         computed by a gernalized version of the algorithm of Gianni, Trager and Zacharias
+NOTE:    if the parameter check is given, only components not containing check are computed
 EXAMPLE: example zeroMod; shows an example
 "
 {
@@ -603,10 +602,8 @@ proc GTZmod (module @N, list #)
 "USAGE:   GTZmod (N[, check]); module N[, module check]
 RETURN:  list l
          the minimal primary decomposition of the module N,
-         computed by a gernalized version of the algorithm
-         of Gianny, Trager and Zacharias
-NOTE:    if the parameter check is given, only components
-         not containing check are computed
+         computed by a gernalized version of the algorithm of Gianny, Trager and Zacharias
+NOTE:    if the parameter check is given, only components not containing check are computed
 EXAMPLE: example GTZmod; shows an example
 "
 {
@@ -905,8 +902,7 @@ RETURN:  (l, check) list l, module check
          s.th. the intersection of the modules is equal to the
          zero-dimensional module N, furthermore l[j][3]=annil(l[j][1])
          if l[j][2]!=0 then the module l[j][1] is primary
-            with associated prime l[j][2],
-            and check=intersect(check, l[j][1]) is computed
+            with associated prime l[j][2], and check=intersect(check, l[j][1]) is computed
 NOTE:    if the parameter check is given, only components not containing
          check are computed; if ann is given, ann is used instead of annil(N)
 EXAMPLE: example splitting; shows an example
@@ -1693,8 +1689,7 @@ proc dec1var (module @N, list #)
 RETURN:  list l
          the minimal primary decomposition of a submodule N of R^s
          if nvars(R)=1
-NOTE:    if the parameter check is given, only components
-         not containing check are computed
+NOTE:    if the parameter check is given, only components not containing check are computed
 EXAMPLE: example zeroMod; shows an example
 "
 {

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: reszeta.lib,v 1.8 2006-07-18 15:48:29 Singular Exp $";
+version="$Id: reszeta.lib,v 1.9 2006-07-25 17:54:29 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  reszeta.lib       Zeta-function of Denef and Loeser
@@ -4061,8 +4061,7 @@ RETURN:   list l, where
                 is divisor k (if k!=0)
                 if k==0, no divisor corresponding to i,j
           l[2]: list ll, where each entry of ll is a list of intvecs
-                entry i,j in list ll[k] implies BO[4][j] of chart i
-                is divisor k
+                entry i,j in list ll[k] implies BO[4][j] of chart i is divisor k
           l[3]: list L
 EXAMPLE:  example collectDiv;   shows an example
 "
@@ -4427,7 +4426,7 @@ example
 //we really need to blow up curves even if the generic point of
 //the curve the total transform is n.c.
 //this occurs here in r[2][5]
-   list re=resolve(I,1);
+   list re=resolve(I,0);
    list di=collectDiv(re);
    di;
 }
