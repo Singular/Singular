@@ -107,6 +107,7 @@ exit;
 """)
     var_list=", ".join(["x"+str(i+1) for i in xrange(vars)])
     ideal=",\n".join([gen_poly_Magma(p) for p in clauses])
+    ideal=ideal+",\n"+",\n".join(["x"+str(i)+"^2+x"+str(i) for i in xrange(1,vars+1)])
     return start_str.substitute({"nvars":str(vars), "var_list":var_list, "ideal":ideal})
     
 def gen_poly_PB(clause):
