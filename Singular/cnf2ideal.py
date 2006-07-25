@@ -85,6 +85,29 @@ def gen_Singular(clauses):
     #command='LIB "digimult.lib";\n option(prot);\n satisfiable(i);'
     command='option(redTail);\noption(prot);\nstd(i);\n'
     return "\n".join([ring_def,ideal,command,"$;\n"])
+
+
+def gen_poly_Magma(clause):
+    def num2factor(f):
+        assert(f!=0)
+        if (f>0):
+            return "".join(["x",str(f),""])
+        else:
+            return "".join(["(1-x",str(-f),")"])
+    if clause:
+        return("*".join( [num2factor(f) for f in clause]))
+
+def gen_Magma(clauses):
+    start_str=Template("""F:=FiniteField(2);
+R< $var_list >:=PolynomialRing(F,$nvars,"lex");
+i:=ideal< R | $ideal
+>;
+GroebnerBasis(i);
+exit;
+""")
+    var_list=", ".join(["x"+str(i+1) for i in xrange(vars)])
+    ideal=",\n".join([gen_poly_Magma(p) for p in clauses])
+    return start_str.substitute({"nvars":str(vars), "var_list":var_list, "ideal":ideal})
     
 def gen_poly_PB(clause):
     def term2string(t):
@@ -153,7 +176,24 @@ def  convert_file_Singular(cnf,invert):
     out=open(out_file_name,"w")
     out.write(gen_Singular(clauses))
     out.close()
+
+
+def  convert_file_Magma(cnf,invert):
+    clauses=gen_clauses(process_input(open(cnf)))
     
+    #clauses=gen_clauses(process_input(sys.stdin))
+    if invert:
+        clauses=[[-i for i in c] for c in clauses]
+    #
+#    print clauses
+    #print gen_Singular(clauses)
+    out_file_name=cnf[:-3]+"magma"
+    if invert:
+        out_file_name=out_file_name[:-6]+"Inverted.magma"
+    out=open(out_file_name,"w")
+    #print out
+    out.write(gen_Magma(clauses))
+    out.close()    
     
 if __name__=='__main__':
     (options, args) = parser.parse_args()
@@ -174,4 +214,4 @@ if __name__=='__main__':
         if options.format==ALL:
             convert_file_PB(a, options.invert)
             convert_file_Singular(a, options.invert)
-            
+            convert_file_Magma(a, options.invert)
