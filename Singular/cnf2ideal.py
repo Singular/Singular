@@ -4,12 +4,17 @@ from probstat import Cartesian
 from optparse import OptionParser
 from itertools import repeat
 from string import Template
+from re import sub
 parser = OptionParser()
 PB="PB"
 SING="SING"
+ALL="all"
 parser.add_option("-f", "--format",
-                  action="store", dest="format", type="string", default=PB,
+                  action="store", dest="format", type="string", default=ALL,
                   help="select format from SING/PB")
+#parser.add_option("-c", "--cnf",
+#                  action="store", dest="cnf", type="string", default=None,
+#                  help="select input cnf")
 parser.add_option("-i", "--invert",
                   action="store_true", dest="invert", default=False,
                   help="invert mapping to true/false")
@@ -73,11 +78,12 @@ def gen_poly_Singular(clause):
         return("*".join( [num2factor(f) for f in clause]))
 
 def gen_Singular(clauses):
-    ring_def="".join(["ring r=2,x(1..",str(vars),"),dp;"])
+    ring_def="".join(["ring r=2,x(1..",str(vars),"),lp;"])
     polys=[gen_poly_Singular(c) for c in clauses]
     polys.extend(["".join(["x(",str(i),")*(x(",str(i)+")-1)"]) for i in xrange(1,vars+1)])
     ideal="".join(["ideal i=",",\n".join(polys),";"])
-    command='LIB "digimult.lib";\n option(prot);\n satisfiable(i);'
+    #command='LIB "digimult.lib";\n option(prot);\n satisfiable(i);'
+    command='option(redTail);\noption(prot);\nstd(i);\n'
     return "\n".join([ring_def,ideal,command,"$;\n"])
     
 def gen_poly_PB(clause):
@@ -115,14 +121,57 @@ ideal=\
 ideal=[Polynomial(p) for p in ideal]
 """
     return start_str+poly_str+end_str
-    
-if __name__=='__main__':
-    (options, args) = parser.parse_args()
-    clauses=gen_clauses(process_input(sys.stdin))
-    if options.invert:
+
+from re import sub
+def  convert_file_PB(cnf,invert):
+    clauses=gen_clauses(process_input(open(cnf)))
+    #clauses=gen_clauses(process_input(sys.stdin))
+    if invert:
         clauses=[[-i for i in c] for c in clauses]
     #
 #    print clauses
     #print gen_Singular(clauses)
-    print gen_PB(clauses)
+    out_file_name=cnf[:-3]+"py"
+    if invert:
+        out_file_name=out_file_name[:-3]+"Inverted.py"
+    out_file_name=sub("-","_",out_file_name)
+    out=open(out_file_name,"w")
+    out.write(gen_PB(clauses))
+    out.close()
+def  convert_file_Singular(cnf,invert):
+    clauses=gen_clauses(process_input(open(cnf)))
     
+    #clauses=gen_clauses(process_input(sys.stdin))
+    if invert:
+        clauses=[[-i for i in c] for c in clauses]
+    #
+#    print clauses
+    #print gen_Singular(clauses)
+    out_file_name=cnf[:-3]+"sing"
+    if invert:
+        out_file_name=out_file_name[:-5]+"Inverted.sing"
+    out=open(out_file_name,"w")
+    out.write(gen_Singular(clauses))
+    out.close()
+    
+    
+if __name__=='__main__':
+    (options, args) = parser.parse_args()
+    #clauses=gen_clauses(process_input(open(options.cnf)))
+    #clauses=gen_clauses(process_input(sys.stdin))
+    #if options.invert:
+    #    clauses=[[-i for i in c] for c in clauses]
+    #
+#    print clauses
+    #print gen_Singular(clauses)
+    #out_file_name=options.cnf[:-3]+"py"
+    #if options.invert:
+    #    out_file_name=out_file_name[:-3]+"Inverted.py"
+    #out=open(out_file_name,"w")
+    #out.write(gen_PB(clauses))
+    #out.close()
+    for a in args:
+        if options.format==ALL:
+            convert_file_PB(a, options.invert)
+            convert_file_Singular(a, options.invert)
+            
