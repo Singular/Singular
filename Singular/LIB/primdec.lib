@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.122 2006-07-25 12:29:00 Singular Exp $";
+version="$Id: primdec.lib,v 1.123 2006-07-25 18:00:01 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -5374,14 +5374,14 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 proc radical(ideal i, list #)
-"USAGE:           radical(i); i ideal.
-                        Optional parameters in list #: (can be entered in any order)
-                        1, "equiRad" -> equiRadical is computed
-                        0, "fullRad" -> full radical is computed  (default)
-                        "SL" ->                 Laplagne algorithm is used (default)
-                        "KL" ->                 Krick/Logar algorithm is used
-                        "facstd" ->             uses facstd to first decompose the ideal (default for non homogeneous ideals)
-                        "noFacstd" ->        does not use facstd (default for homogeneous ideals)
+"USAGE: radical(i); i ideal.
+   Optional parameters in list #: (can be entered in any order)
+   1, \"equiRad\" -> equiRadical is computed
+   0, \"fullRad\" -> full radical is computed  (default)
+   \"SL\" ->         Laplagne algorithm is used (default)
+   \"KL\" ->         Krick/Logar algorithm is used
+   \"facstd\" ->     uses facstd to first decompose the ideal (default for non homogeneous ideals)
+   \"noFacstd\" ->   does not use facstd (default for homogeneous ideals)
 RETURN:  ideal, the radical of i (or the equiradical if required in the input parameters)
 NOTE:    A combination of the algorithms of Krick/Logar or Laplagne and Kemper is used.
          Works also in positive characteristic (Kempers algorithm).
