@@ -1,16 +1,16 @@
 // $Id:
 //GMG, last modified 28.9.01
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: teachstd.lib,v 1.5 2006-07-18 15:48:31 Singular Exp $";
+version="$Id: teachstd.lib,v 1.6 2006-07-25 12:02:44 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY:  teachstd.lib   Procedures for teaching standard bases
 AUTHOR:                  G.-M. Greuel, greuel@mathematik.uni-kl.de
 
-NOTE: The library is intended to be used for teaching purposes but not
+NOTE: The library is intended to be used for teaching purposes, but not
       for serious computations. Sufficiently high printlevel allows to
       control each step, thus illustrating the algorithms at work.
-      The procedures are implemented exatly as described in the book
+      The procedures are implemented exactly as described in the book
       'A SINGULAR Introduction to Commutative Algebra' by G.-M. Greuel and
       G. Pfister (Springer 2002).
 
@@ -727,7 +727,7 @@ proc localstd (id)
 "USAGE:   localstd (id); id = ideal
 RETURN:  A standard basis for a local degree ordering, using Lazard's method.
 NOTE:    The procedure homogenizes id w.r.t. a new 1st variable local@t,
-         computes a SB wrt (dp(1),dp) and substitutes local@t by 1.
+         computes a SB w.r.t. (dp(1),dp) and substitutes local@t by 1.
          Hence the result is a SB with respect to an ordering which sorts
          first w.r.t. the subdegree of the original variables and then refines
          it with dp. This is the local degree ordering ds.
