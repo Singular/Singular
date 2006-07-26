@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.124 2006-07-26 11:50:30 Singular Exp $";
+version="$Id: primdec.lib,v 1.125 2006-07-26 13:48:05 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
-AUTHORS:  Gerhard Pfister, pfister@mathematik.uni-kl.de (GTZ)
-@*        Wolfram Decker, decker@math.uni-sb.de         (SY)
-@*        Hans Schoenemann, hannes@mathematik.uni-kl.de (SY)
-@*        Santiago Laplagne, slaplagn@dm.uba.ar         (GTZ)
+AUTHORS:  Gerhard Pfister, pfister@mathematik.uni-kl.de (GTZ)@*
+          Wolfram Decker, decker@math.uni-sb.de         (SY)@*
+          Hans Schoenemann, hannes@mathematik.uni-kl.de (SY)@*
+          Santiago Laplagne, slaplagn@dm.uba.ar         (GTZ)
 
 OVERVIEW:
     Algorithms for primary decomposition based on the ideas of
@@ -5422,22 +5422,22 @@ EXAMPLE: example radical; shows an example
          if(typeof(#[j]) == "string"){
             if(#[j] == "KL") {
                algorithm = "KL";
-               valid = 1}
+               valid = 1;}
             if(#[j] == "SL") {
                algorithm = "SL";
-               valid = 1}
+               valid = 1;}
             if(#[j] == "noFacstd") {
                useFac = 0;
-               valid = 1}
+               valid = 1;}
             if(#[j] == "facstd") {
                useFac = 1;
-               valid = 1}
+               valid = 1;}
             if(#[j] == "equiRad") {
                il = 1;
-               valid = 1}
+               valid = 1;}
             if(#[j] == "fullRad") {
                il = 0;
-               valid = 1}
+               valid = 1;}
          }
          if(valid == 0) {
             dbprint(1, "Warning! The following input parameter was not recognized:", #[j]);
@@ -5468,7 +5468,7 @@ EXAMPLE: example radical; shows an example
    {
       pr = facstd(i);
    } else {
-      pr = i
+      pr = i;
    }
    option(set, op);
    int s = size(pr);
@@ -5521,9 +5521,9 @@ example
 // used also by radicalSL procedure.
 //
 static proc radicalKL(ideal I, ideal ser, list #) {
-// ideal I                  The ideal for which the radical is computed
-// ideal ser                Used to reduce components already obtained
-// list #                   If #[1] = 1, equiradical is computed.
+// ideal I     The ideal for which the radical is computed
+// ideal ser   Used to reduce components already obtained
+// list #      If #[1] = 1, equiradical is computed.
 
         // I needs to be a Groebner basis.
         if (attrib(I, "isSB") != 1) {
@@ -5926,9 +5926,9 @@ static proc radicalSLIteration (ideal I, ideal P);
     dbprint(printlevel - voice, "// The ideal is ", J);
     dbprint(printlevel - voice, "// The dimension is ", dim(groebner(J)));
 
-    int allMaximal = 0;      // Compute the zerodim reduction for only one indep set.
-    ideal re = 1;            // No reduction is need, there are not redundant components.
-    list emptyList = list(); // Look for primes of any dimension, not only of max dimension.
+    int allMaximal = 0;                   // Compute the zerodim reduction for only one indep set.
+    ideal re = 1;                           // No reduction is need, there are not redundant components.
+    list emptyList = list();   // Look for primes of any dimension, not only of max dimension.
     list result = radicalReduction(J, re, allMaximal, emptyList);
 
     return(result[1]);
@@ -7484,7 +7484,6 @@ static proc minAssSL(ideal I)
 // Input = I, ideal
 // Output = primaryDec where primaryDec is the list of the minimal
 // associated primes and the primary components corresponding to these primes.
-
 {
   ideal P = 1;
   list pd = list();
@@ -7503,21 +7502,17 @@ static proc minAssSL(ideal I)
       primaryDec = primaryDec + pd[1];
       // Debug
       dbprint(printlevel - voice, "// We intersect the prime ideals obtained.");
-      /*
-      for (k = 1; k <= size(pd); k++) {
-        P = intersect(P, pd[k]);
-      };
-      */
       P = intersect(P, pd[2]);
       // Debug
       dbprint(printlevel - voice, "// Intersection finished.");
     } else {
-      stop = 1
+      stop = 1;
     }
   }
+
   // Returns only the primary components, not the radical.
   return(primaryDec);
-};
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Given an ideal I and an ideal P (intersection of some minimal prime ideals
@@ -7995,7 +7990,6 @@ EXAMPLE: example newZero_decomp; shows an example
        }
        else
        {
-
           lres1=psi(@lh);
           lres0=psi1(lres1);
        }
