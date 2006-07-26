@@ -420,10 +420,12 @@ run.o: run.c run.h
 	gcc -c -I. -O2 run.c -o run.o
 
 runTSingular : run.o TSingular_res.o
-	gcc -mwindows -e _mainCRTStartup run.o TSingular_res.o -o runTSingular.exe
+	gcc -mwindows run.o TSingular_res.o -o runTSingular.exe
+#	gcc -mwindows -e _mainCRTStartup run.o TSingular_res.o -o runTSingular.exe
 
 runESingular : run.o ESingular_res.o
-	gcc -mwindows -e _mainCRTStartup run.o ESingular_res.o -o runESingular.exe
+	gcc -mwindows run.o ESingular_res.o -o runESingular.exe
+#	gcc -mwindows -e _mainCRTStartup run.o ESingular_res.o -o runESingular.exe
 
 RUN_SINGULARS=runESingular runTSingular
 

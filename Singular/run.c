@@ -45,7 +45,7 @@
  #include <sys/stat.h>
  #include <sys/cygwin.h>
  #include <sys/unistd.h>
-WinMainCRTStartup() { mainCRTStartup(); }
+//WinMainCRTStartup() { mainCRTStartup(); }
 #else
  #include <direct.h>
 #endif
@@ -83,7 +83,7 @@ WinMain (HINSTANCE hSelf, HINSTANCE hPrev, LPSTR cmdline, int nShow)
       if (argc >= 1)
          strcpy(execname,argv[0]);
    }
-   /* at this point, execpath is defined, as are argv[] and execname */   
+   /* at this point, execpath is defined, as are argv[] and execname */
 #ifdef DEBUG
    j = sprintf(buffer,"\nexecname : %s\nexecpath : %s\n",execname,execpath);
    for (i = 0; i < argc; i++)
@@ -129,7 +129,7 @@ int start_child(char* cmdline, int wait_for_child)
    start.cb = sizeof (start);
    start.dwFlags = STARTF_USESHOWWINDOW;
    start.wShowWindow = SW_HIDE;
-      
+
    sec_attrs.nLength = sizeof (sec_attrs);
    sec_attrs.lpSecurityDescriptor = NULL;
    sec_attrs.bInheritHandle = FALSE;
@@ -153,7 +153,7 @@ void xemacs_special(char* exec)
 {
   /*
    * if we're trying to run xemacs, AND this file was in %emacs_dir%\bin,
-   * then set emacs_dir environment variable 
+   * then set emacs_dir environment variable
    */
    char* p;
    char* p2;
