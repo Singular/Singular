@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.141 2006-07-21 12:36:26 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.142 2006-07-26 13:49:28 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1675,10 +1675,11 @@ lists rDecompose(const ring r)
   }
   else if (rIsExtension(r))
   {
-    rDecomposeCF(&(L->m[0]),r->algring,r);
+    if (r->algring!=NULL)
+      rDecomposeCF(&(L->m[0]),r->algring,r);
     if (L->m[0].rtyp==0)
     {
-      omFreeBin(slists_bin,(void *)L);
+      //omFreeBin(slists_bin,(void *)L);
       return NULL;
     }
   }
