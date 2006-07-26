@@ -319,7 +319,7 @@ cygwin-dist-scripts:
 	@echo -e  '' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '##################### Singular CAS' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '# Emacs + Singular EXP' >> /etc/postinstall/singular-icons.sh
-	@echo -e  'mkshortcut -A -a \047bash -l -c "/usr/share/lib/Singular/startxserver.bat && sleep 1 &&  ESingular"\047 \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  'mkshortcut -A -a \047bash -l -c "${CYGWIN_SINGULAR_BIN}/startxserver.bat && sleep 1 &&  ESingular"\047 \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -i ${CYGWIN_SINGULAR_BIN}/runESingular.exe -n "Singular CAS\\Singular (Emacs and X-Server) (experimental)" \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -w /bin \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -P /usr/X11R6/bin/run.exe -d "Start Singular in Emacs after starting the X - Server"' >> /etc/postinstall/singular-icons.sh
@@ -422,7 +422,7 @@ cygwin-dist-install: cygwin-dist-scripts ## ${BINDIST_NAME}.tar.gz
 	cp ${CYGWIN_AUX_FILES}/startxserver.bat ${CYGWIN_SINGULAR_BIN}/
 	unix2dos ${CYGWIN_SINGULAR_BIN}/startxserver.bat
 ##	Download setup exe
-	export http_proxy=http://positron:3128; \
+	export xhttp_proxy=http://positron:3128; \
 	wget http://cygwin.com/setup.exe -O ${CYGWIN_SINGULAR_BIN}/cygwin-setup.exe
 ##	or copy from local folder
 #	cp ${CYGWIN_AUX_FILES}/cygwin-setup.exe ${CYGWIN_SINGULAR_BIN}/cygwin-setup.exe
@@ -505,12 +505,23 @@ cygwin-setup-init:
 	cat ${CYGWIN_AUX_FILES}/setup.ini ${CYGWIN_REP_DIR}/setup.ini
 	@echo >> ${CYGWIN_REP_DIR}/setup.ini
 ##	Download setup exe
-	export http_proxy=http://positron:3128; \
+	export xhttp_proxy=http://positron:3128; \
 	wget http://cygwin.com/setup.exe -O ${CYGWIN_REP_DIR}/setup.exe
 ##	or copy from local folder
 #	cp ${CYGWIN_AUX_FILES}/cygwin-setup.exe ${CYGWIN_REP_DIR}/setup.exe
 
-cygwin-setup: cygwin-setup-init cygwin-setup-base cygwin-setup-share cygwin-setup-icons cygwin-setup-help cygwin-setup-surf cygwin-setup-helper
+cygwin-setup-beta: cygwin-setup-init cygwin-setup-helper cygwin-setup-base cygwin-setup-share cygwin-setup-icons cygwin-setup-help cygwin-setup-surf
+	cp ${CYGWIN_REP_DIR}/setup.ini ${CYGWIN_REP_DIR}/setup
+	cd ${CYGWIN_REP_DIR} && bzip2 -f setup
+	cd ${CYGWIN_REP_DIR} && md5sum setup.* | sed -e 's/*//g' > md5.sum
+	cp -r ${CYGWIN_REP_DIR}/release/* ${CYGWIN_ORIG}/Full/release
+	rm -rf ${CYGWIN_ORIG}/Full/release/singular-base/singular-base-*-src.tar.bz2
+	rm -rf ${CYGWIN_ORIG}/Full/release/singular-surf/singular-surf-*-src.tar.bz2
+	cp -r ${CYGWIN_REP_DIR}/release/* ${CYGWIN_ORIG}/Small/release
+	rm -rf ${CYGWIN_ORIG}/Small/release/singular-base/singular-base-*-src.tar.bz2
+	rm -rf ${CYGWIN_ORIG}/Small/release/singular-surf/singular-surf-*-src.tar.bz2
+
+cygwin-setup: cygwin-setup-init cygwin-setup-helper
 	cp ${CYGWIN_REP_DIR}/setup.ini ${CYGWIN_REP_DIR}/setup
 	cd ${CYGWIN_REP_DIR} && bzip2 -f setup
 	cd ${CYGWIN_REP_DIR} && md5sum setup.* | sed -e 's/*//g' > md5.sum
