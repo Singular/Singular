@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.33 2006-06-08 06:07:06 bricken Exp $
+// $Id: claptmpl.cc,v 1.34 2006-07-27 09:04:07 Singular Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -209,7 +209,7 @@ using std::vector;
 using boost::dynamic_bitset;
 template class dynamic_bitset<>;
 template class vector<dynamic_bitset<> >;
-#else
+#elif defined(USE_STDVECBOOL)
 #include <vector>
 using std::vector;
 template class vector<bool>;
