@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.29 2006-06-22 12:08:57 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.30 2006-07-27 08:36:41 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -2185,7 +2185,7 @@ ideal Approx_Step(ideal L)
 {
   int N=currRing->N;
   int i,j; // k=syzcomp
-  int flag, flagcnt, syzcnt=0;
+  int flag, flagcnt=0, syzcnt=0;
   int syzcomp = 0;
   int k=1; /* for ideals not modules */
   ideal I = kStd(L, currQuotient,testHomog,NULL,NULL,0,0,NULL);
