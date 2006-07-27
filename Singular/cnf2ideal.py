@@ -143,6 +143,11 @@ ideal=\
     poly_str=",\\\n   ".join([gen_poly_PB(c) for c in clauses])
     end_str="""]
 ideal=[Polynomial(p) for p in ideal]
+try:
+    del p
+except:
+    pass
+
 """
     return start_str+poly_str+end_str
 
