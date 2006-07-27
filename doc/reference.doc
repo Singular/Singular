@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.272 2006-07-18 09:21:00 Singular Exp $
+@comment $Id: reference.doc,v 1.273 2006-07-27 11:50:16 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4416,17 +4416,17 @@ shows correct usage in error messages (set by default).
 @item @tab @tab @tab
 @item @tab @code{lres}
 @tab @code{.} @tab minimal syzygy found
-@item @tab @tab @math{n} @tab slanted degree, i.e., row of Betti matrix
-@item @tab @tab @code{(m}@math{n}@code{)} @tab calculate in module @math{n}
+@item @tab @tab n @tab slanted degree, i.e., row of Betti matrix
+@item @tab @tab @code{(mn)} @tab calculate in module @math{n}
 @item @tab @tab @code{g} @tab pair found giving reductum and syzygy
 @item @tab @tab @tab
 @item @tab @code{mres}
-@tab @code{[}@math{d}@code{]}
+@tab @code{[d]}
 @tab computations of the @math{d}-th syzygy module
 @item @tab @tab @tab all other characters: like the output of @code{std}
 @item @tab @tab @tab
 @item @tab @code{minres}
-@tab @code{[}@math{d}@code{]}
+@tab @code{[d]}
 @tab minimizing of the @math{d}-th syzygy module
 @item @tab @tab @tab
 @item @tab @code{mstd} @tab @tab all characters: like the output of @code{std}
@@ -4435,27 +4435,27 @@ shows correct usage in error messages (set by default).
 @tab @code{r} @tab reduced a leading term
 @item @tab @tab @code{t} @tab reduced a non-leading term
 @item @tab @code{res}
-@tab @code{[}@math{d}@code{]}
+@tab @code{[d]}
 @tab computations of the @math{d}-th syzygy module
 @item @tab @tab @tab all other characters: like the output of @code{std}
 @item @tab @tab @tab
 @item @tab @code{sres}
 @tab @code{.} @tab syzygy found
-@item @tab @tab @code{(}@math{n}@code{)} @tab @math{n} elements remaining
-@item @tab @tab @code{[}@math{n}@code{]} @tab finished module @math{n}
+@item @tab @tab @code{(n)} @tab @math{n} elements remaining
+@item @tab @tab @code{[n]} @tab finished module @math{n}
 @item @tab @tab @tab
 @item @tab @code{std}
-@tab @code{[}@math{m}@code{:}@math{n}@code{]}
+@tab @code{[m:n]}
 @tab internal ring change to poly representation with exponent bound
 @math{m} and @math{n} words in exponent vector
 @item @tab @tab @code{s} @tab found a new element of the standard basis
 @item @tab @tab @code{-} @tab reduced a pair/S-polynomial to 0
 @item @tab @tab @code{.} @tab postponed a reduction of a pair/S-polynomial
 @item @tab @tab @code{h} @tab used Hilbert series criterion
-@item @tab @tab @code{H(}@math{d}@code{)} @tab found a 'highest corner' of degree @math{d}, no need to consider higher degrees
-@item @tab @tab @code{(}@math{n}@code{)} @tab @math{n} critical pairs are still to be reduced
-@item @tab @tab @code{(S:}@math{n}@code{)} @tab doing complete reduction of @math{n} elements
-@item @tab @tab @math{d} @tab the degree of the leading terms is currently @math{d}
+@item @tab @tab @code{H(d)} @tab found a 'highest corner' of degree @math{d}, no need to consider higher degrees
+@item @tab @tab @code{(n)} @tab @math{n} critical pairs are still to be reduced
+@item @tab @tab @code{(S:n)} @tab doing complete reduction of @math{n} elements
+@item @tab @tab d @tab the degree of the leading terms is currently @math{d}
 @item @tab @tab @tab
 @item @tab @code{stdfglm} @tab @tab all characters in first part: like the output of @code{std}
 @item @tab @tab @tab all characters in second part: like the output of @code{fglm}
