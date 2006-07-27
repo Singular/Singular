@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.cc,v 1.4 2006-07-19 13:11:30 Singular Exp $ */
+/* $Id: mmalloc.cc,v 1.5 2006-07-27 09:09:37 Singular Exp $ */
 /*
 * ABSTRACT: standard version of C++-memory management alloc func
 */
@@ -23,7 +23,7 @@ void* operator new ( size_t size )
 
 void operator delete ( void* block )
 {
-  omFree( block );
+  omfree( block );
 }
 
 void* operator new[] ( size_t size )
@@ -36,5 +36,5 @@ void* operator new[] ( size_t size )
 
 void operator delete[] ( void* block )
 {
-  omFree( block );
+  omfree( block );
 }
