@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.22 2006-05-02 16:24:22 Singular Exp $ */
+/* $Id: structs.h,v 1.23 2006-07-27 08:38:19 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -31,7 +31,7 @@ typedef void * Sy_reference;
    but configure dislikes it */
 
 
-#if defined(i386) || defined(x86_64_Linux)
+#if defined(i386) || defined(x86_64_Linux) || defined(ix86_SunOS)
 // the following settings seems to be better on i386 and x86_64 processors
 // define if a*b is with mod instead of tables
 #define HAVE_MULT_MOD
