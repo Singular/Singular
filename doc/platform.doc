@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: platform.doc,v 1.14 2005-05-23 16:24:41 Singular Exp $
+@comment $Id: platform.doc,v 1.15 2006-07-27 09:56:09 Singular Exp $
 @comment this file contains Release notes and various howto's
 
 @c The following directives are necessary for proper compilation
@@ -44,14 +44,17 @@
 @cindex howto, download
 
 @sc{Singular} is available as binary program for most common hard-
-and software platforms. Release versions of @sc{Singular} can be
-downloaded with ftp from our FTP site
+and software platforms. 
+Instructions to download and install Singular can be found
+at
 @display
-@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/},
+@uref{http://www.singular.uni-kl.de/download.html}.
 @end display
-or, using your favourite WWW browser, from
+
+Release versions of @sc{Singular} are also available 
+from our FTP site
 @display
-@uref{http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/}.
+@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/}.
 @end display
 
 @include README_download.texi

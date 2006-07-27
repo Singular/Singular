@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_download.texi,v 1.11 2006-07-20 12:08:16 Singular Exp $
+@comment $Id: README_download.texi,v 1.12 2006-07-27 09:56:09 Singular Exp $
 @c FILE: README_download.texi
 @c PURPOSE: downloading instructions, to be includeded in manual and README_ftp
 @c
@@ -10,7 +10,7 @@
 
 @heading To download @sc{Singular} for a Unix platform
 
-Make sure that you have approximately 12MByte of free disk space and follow
+Make sure that you have approximately 20 MByte of free disk space and follow
 these steps.
 
 @enumerate
@@ -20,8 +20,6 @@ You need to download two (archive) files:
 @item a:
 Singular-@value{VERSION}-share.tar.gz 
 contains architecture independent data like documentation and libraries
-(alternatively, you may also download 
-@code{Singular-@value{VERSION}-share.zip}).
 @item b:
 Singular-@value{VERSION}-<uname>.tar.gz
 contains architecture dependent executables, like the @sc{Singular}
@@ -45,7 +43,7 @@ described below.
 @item @code{ix86-SunOS}
 @tab PC/Opteron workstations running Solaris version 5
 @item @code{ppcMac-darwin}
-@tab ppcMacintosh computers running OS X
+@tab ppcMacintosh computers running OS X (10.4)
 @item @code{x86_64-Linux}
 @tab Opteron workstations running Linux in 64bit mode
 @item @code{IRIX-6}
@@ -113,5 +111,10 @@ for details on how to finish the installation.
 @end enumerate
 
 @heading To download @sc{Singular} for the Macintosh
-The port of @sc{Singular} will be available soon.
+We recommend @code{fink} to install @code{Singular} on a Macintosh running 
+Mac OsX: it supports currently the follwing versions of OsX:
+10.4/intel, 10.4/powerpc, 10.4/powerpc (transitional), 10.3.
+If you want to try to intall a binary package, the Unix installation
+instructions apply.
+(See @uref{http://fink.sf.net})
 
