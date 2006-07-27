@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.205 2006-07-17 14:32:19 Singular Exp $
+@comment $Id: general.doc,v 1.206 2006-07-27 16:58:01 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1660,7 +1660,7 @@ declares a ring and sets it as the current basering.
 The coefficient_field is given by one of the following:
 @enumerate
 @item
-a non-negative int_expression less or equal 32003.
+a non-negative int_expression less or equal 2147483629.
 @* The int_expression should either be 0, specifying the field of
 rational numbers Q, or a prime number p, specifying the finite field
 with p elements.  If it is not a prime number, int_expression is
