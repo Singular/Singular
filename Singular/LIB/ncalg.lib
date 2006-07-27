@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncalg.lib,v 1.19 2006-07-20 11:10:22 Singular Exp $";
+version="$Id: ncalg.lib,v 1.20 2006-07-27 16:27:08 motsak Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  ncalg.lib      Definitions of important GR-algebras
@@ -285,6 +285,7 @@ example
    def a = makeUg2();
    a;
    setring a;
+   // ...  56  noncommutative relations
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -350,7 +351,6 @@ EXAMPLE: example makeUgl; shows examples
 example
 { "EXAMPLE:"; echo = 2;
    def a=makeUgl(3);
-   a;
    setring a; a;
 };
 
@@ -714,6 +714,7 @@ example
    def ncAlgebra = makeUso5();
    ncAlgebra;
    setring ncAlgebra;
+  // ...  28  noncommutative relations
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -853,6 +854,7 @@ example
    def ncAlgebra = makeUso7();
    ncAlgebra;
    setring ncAlgebra;
+   // ...  107  noncommutative relations
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -1149,6 +1151,7 @@ example
    def ncAlgebra = makeUso9();
    ncAlgebra;
    setring ncAlgebra;
+   // ...  264  noncommutative relations
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -1704,6 +1707,7 @@ example
    def ncAlgebra = makeUso11();
    ncAlgebra;
    setring ncAlgebra;
+   // ...  523  noncommutative relations
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -1938,6 +1942,7 @@ example
    def ncAlgebra = makeUsp3();
    ncAlgebra;
    setring ncAlgebra;
+   // ...  107  noncommutative relations
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -2234,6 +2239,7 @@ example
    def ncAlgebra = makeUsp4();
    ncAlgebra;
    setring ncAlgebra;
+   // ...  264  noncommutative relations
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -2789,6 +2795,7 @@ example
    def ncAlgebra = makeUsp5();
    ncAlgebra;
    setring ncAlgebra;
+   // ...  523  noncommutative relations
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -2881,6 +2888,7 @@ example
    def ncAlgebra = makeUso6();
    ncAlgebra;
    setring ncAlgebra;
+  // ...  60  noncommutative relations
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -3093,6 +3101,7 @@ example
    def ncAlgebra = makeUso8();
    ncAlgebra;
    setring ncAlgebra;
+   // ...  180  noncommutative relations
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -3515,6 +3524,7 @@ example
    def ncAlgebra = makeUso10();
    ncAlgebra;
    setring ncAlgebra;
+   // ...  390  noncommutative relations
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -4261,6 +4271,7 @@ example
    def ncAlgebra = makeUso12();
    ncAlgebra;
    setring ncAlgebra;
+   // ...  714  noncommutative relations
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -4845,6 +4856,7 @@ example
    def ncAlgebra = makeUf4();
    ncAlgebra;
    setring ncAlgebra;
+   // ...  552  noncommutative relations
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -5885,6 +5897,7 @@ example
    def ncAlgebra = makeUe6();
    ncAlgebra;
    setring ncAlgebra;
+   // ...  1008  noncommutative relations
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -8458,6 +8471,7 @@ example
    def ncAlgebra = makeUe7();
    ncAlgebra;
    setring ncAlgebra;
+   // ...  2541  noncommutative relations
 }
 ////////////////////////////////////////////////////////////////////
 
@@ -16242,5 +16256,6 @@ example
    def ncAlgebra = makeUe8();
    ncAlgebra;
    setring ncAlgebra;
+   // ...  7752  noncommutative relations
 }
 ////////////////////////////////////////////////////////////////////
