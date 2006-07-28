@@ -1,43 +1,37 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: center.lib,v 1.23 2006-07-18 15:48:11 Singular Exp $"
+version="$Id: center.lib,v 1.24 2006-07-28 13:01:08 motsak Exp $"
 category="Noncommutative"
 info="
-LIBRARY:  center.lib      computation of central elements of GR-algebras
-AUTHOR:  Oleksandr Motsak,        motsak@mathematik.uni-kl.de.
-OVERVIEW: Computing elements of center and centralizers of sets of elements
-in non-commutative algebras.
+LIBRARY:  center.lib      Computation of central elements of GR-algebras
 
-MAIN PROCEDURES:
-centralizeSet(F, V):          v.s. basis of the centralizer of F within V
-centralizerVS(F, D):          v.s. basis of the centralizer of F
-centralizerRed(F, D[, N]):    reduced basis of the centralizer of F
-centerVS(D):                  v.s. basis of the center
-centerRed(D[, k]):            reduced basis of the center
+AUTHOR:  Oleksandr Motsak, email: motsak@mathematik.uni-kl.de
 
-center(D[, k]):               reduced basis of the center
-centralizer(F, D[, k]):       reduced bais of the centralizer of F
+OVERVIEW: A library for computing elements of the center and centralizers of sets of elements in GR-algebras.
 
-sa_reduce(V):              's.a. reduction' of pairwise commuting elements
-sa_poly_reduce(p, V):      's.a. reduction' of p by pairwise commuting elements
+KEYWORDS:  center; centralizer; reduce; centralize; PBW
 
-inCenter(T):                  checks the centrality of list/ideal/poly T
-inCentralizer(T, S):          checks whether list/ideal/poly T commute with S
-isCartan(p):                  checks whether polynomial p is a Cartan element
-
-AUXILIARY PROCEDURES:
-applyAdF(Basis, f):           images of elements under the k-linear map Ad_{f}
-linearMapKernel(Images):      kernel of a linear map given by images
-linearCombinations(Basis, C): k-linear combinations of elements
-
-variablesStandard():           set of algebra generators in their natural order
-variablesSorted():             heuristically sorted set of algebra generators
-
-PBW_eqDeg(Deg):                PBW monomials of given degree
-PBW_maxDeg(MaxDeg):            PBW monomials up to given degree
-PBW_maxMonom(MaxMonom):        PBW monomials up to given maximal monomial
-
-KEYWORDS:  center; centralizer; cartan; reduce; centralize; PBW
-"
+PROCEDURES:
+  centralizeSet(F, V)          v.s. basis of the centralizer of F within V
+  centralizerVS(F, D)          v.s. basis of the centralizer of F
+  centralizerRed(F, D[, N])    reduced basis of the centralizer of F
+  centerVS(D)                  v.s. basis of the center
+  centerRed(D[, k])            reduced basis of the center
+  center(D[, k])               reduced basis of the center
+  centralizer(F, D[, k])       reduced bais of the centralizer of F
+  sa_reduce(V)              's.a. reduction' of pairwise commuting elements
+  sa_poly_reduce(p, V)      's.a. reduction' of p by pairwise commuting elements
+  inCenter(T)                  checks the centrality of list/ideal/poly T
+  inCentralizer(T, S)          checks whether list/ideal/poly T commute with S
+  isCartan(p)                  checks whether polynomial p is a Cartan element
+  applyAdF(Basis, f)           images of elements under the k-linear map Ad_f
+  linearMapKernel(Images)      kernel of a linear map given by images
+  linearCombinations(Basis, C)  k-linear combinations of elements
+  variablesStandard()          set of algebra generators in their natural order
+  variablesSorted()            heuristically sorted set of algebra generators
+  PBW_eqDeg(Deg)               PBW monomials of given degree
+  PBW_maxDeg(MaxDeg)           PBW monomials up to given degree
+  PBW_maxMonom(MaxMonom)       PBW monomials up to given maximal monomial
+";
 
 LIB "general.lib" // for "sort"
 LIB "poly.lib" // for "maxdeg"
@@ -311,7 +305,8 @@ PURPOSE: smooths the ideal in a current QUOTIENT(!) ring.
 
 /******************************************************/
 proc PBW_maxDeg( int MaxDeg )
-"USAGE: PBW_maxDeg(MaxDeg); int MaxDeg
+"
+USAGE: PBW_maxDeg(MaxDeg); MaxDeg int
 PURPOSE: Compute PBW elements up to a given maximal degree.
 RETURN: ideal consisting of found elements.
 NOTE: unit is omitted. Weights are ignored!
@@ -346,7 +341,8 @@ example
 
 /******************************************************/
 proc PBW_eqDeg( int Deg )
-"USAGE: PBW_eqDeg(Deg); int Deg
+"
+USAGE: PBW_eqDeg(Deg); Deg int
 PURPOSE: Compute PBW elements of a given degree.
 RETURN: ideal consisting of found elements.
 NOTE: Unit is omitted. Weights are ignored!
@@ -374,7 +370,8 @@ example
 
 /******************************************************/
 proc PBW_maxMonom( poly MaxMonom )
-"USAGE: PBW_maxMonom(m); poly m
+"
+USAGE: PBW_maxMonom(m); m poly
 PURPOSE: Compute PBW elements up to a given maximal one.
 RETURN: ideal consisting of found elements.
 NOTE: Unit is omitted. Weights are ignored!
@@ -427,9 +424,10 @@ example
 /******************************************************/
 proc applyAdF( ideal I, poly p )
   "
-USAGE: applyAdF( Basis, f); ideal Basis, poly f
-PURPOSE: Apply Ad_{f} to every element of Basis
-RETURN: ideal, Ad_{f}(Basis)
+USAGE: applyAdF(B, f); B ideal, f poly
+PURPOSE: Apply Ad_f to every element of B
+RETURN: ideal, generated by Ad_f(B[i]), 1<=i<=size(B)
+NOTE:  Ad_f(v) := [f, v] = f*v - v*f
 SEE ALSO:   linearMapKernel; linearMapKernel
 "
 {
@@ -465,10 +463,12 @@ example
   ideal Image = applyAdF( Basis, e ); Image;
 
   // Now we have a linear map given by: Basis_i --> Image_i
-  // Let's compute its kernel:
+  // Let's compute its kernel K:
+
+  // 1. compute syzygy module C:
   module C = linearMapKernel( Image ); C;
 
-  // Now we can compute the kernel of Ad_e by means of basis vectors:
+  // 2. compute corresponding combinations of basis vectors:
   ideal K = linearCombinations(Basis, C); K;
 
   // Let's check that Ad_e(K) is zero:
@@ -479,10 +479,10 @@ example
 
 /******************************************************/
 proc linearMapKernel( ideal Images )
-"USAGE: linearMapKernel( Images ); ideal Images
-PURPOSE: Computes the kernel of a linear map: e_i \mapsto Images[i],
-@* where e_i are certain basis vectors
-RETURN: syzygy module, or 0 if all images are zeroes
+"
+USAGE: linearMapKernel( Images ); Images ideal
+PURPOSE: Computes the syzygy module of the linear map given by Images.
+RETURN: syzygy module, or int(0) if all images are zeroes
 SEE ALSO:   applyAdF; linearMapKernel
 "
 {
@@ -584,10 +584,12 @@ example
   ideal Image = applyAdF( Basis, e ); Image;
 
   // Now we have a linear map given by: Basis_i --> Image_i
-  // Let's compute its kernel:
+  // Let's compute its kernel K:
+
+  // 1. compute syzygy module C:
   module C = linearMapKernel( Image ); C;
 
-  // Now we can compute the kernel of Ad_e by means of basis vectors:
+  // 2. compute corresponding combinations of basis vectors:
   ideal K = linearCombinations(Basis, C); K;
 
   // Let's check that Ad_e(K) is zero:
@@ -601,8 +603,8 @@ example
 /******************************************************/
 proc linearCombinations( ideal Basis, module KER )
   "
-USAGE:  linearCombinations( Basis, C ); ideal Basis, module C
-PURPOSE: computes linear combinations of Basis vectors with coefficients from C
+USAGE:  linearCombinations( Basis, C ); Basis ideal, C module
+PURPOSE: forms linear combinations of elements from Basis by replacing gen(i) by Basis[i] in C
 RETURN: ideal generated by computed linear combinations
 SEE ALSO:   linearMapKernel; applyAdF
 "
@@ -664,10 +666,12 @@ example
   ideal Image = applyAdF( Basis, e ); Image;
 
   // Now we have a linear map given by: Basis_i --> Image_i
-  // Let's compute its kernel:
+  // Let's compute its kernel K:
+
+  // 1. compute syzygy module C:
   module C = linearMapKernel( Image ); C;
 
-  // Now we can compute the kernel of Ad_e by means of basis vectors:
+  // 2. compute corresponding combinations of basis vectors:
   ideal K = linearCombinations(Basis, C); K;
 
   // Let's check that Ad_e(K) is zero:
@@ -753,8 +757,10 @@ NOTE: the result is a set of all basis vectors having a zero image
 
 
 /******************************************************/
-proc variablesStandard() // Returns an ideal of variables in a current base ring.
-"USAGE:      variablesStandard();
+// Returns an ideal of variables in a current base ring.
+proc variablesStandard()
+"
+USAGE:      variablesStandard();
 RETURN:     ideal, generated by algebra variables
 PURPOSE:    computes the set of algebra variables taken in their natural order
 SEE ALSO:   variablesSorted
@@ -780,12 +786,14 @@ example
 }
 
 /******************************************************/
-proc variablesSorted() // Sorts variables into an ideal. This is a kind of heuristics!
-"USAGE:      variablesSorted();
+// Sorts variables into an ideal. This is a kind of heuristics!
+proc variablesSorted()
+"
+USAGE:      variablesSorted();
 RETURN:     ideal, generated by sorted algebra variables
 PURPOSE:    computes the set of algebra variables sorted so that
 @* Cartan variables go first
-NOTE:       This is a heuristics for the computation of center:
+NOTE:       This is a heuristics for the computation of the center:
 @* it is better to compute centralizers of Cartan variables first since in this
 @* case we can omit solving the system of equations.
 SEE ALSO:   variablesStandard
@@ -848,12 +856,13 @@ example
 
 
 /******************************************************/
-proc centralizeSet( ideal F, ideal V ) // HL 'core' function
-"USAGE:      centralizeSet( F, V ); ideal F, ideal V
-INPUT:      a finite set of elements F, vector space basis V
-RETURN:     ideal, generated by base elements
-PURPOSE:    computes a v.s. basis of the centralizer of F in v.s. V
-NOTE:       Cen(F,V) is computed by the formula Cen(F[N],..,Cen(F[1],V)..)
+// HL 'core' function
+proc centralizeSet( ideal F, ideal V )
+"
+USAGE:      centralizeSet( F, V ); F, V ideals
+INPUT:      F, V finite sets of elements of the base algebra
+RETURN:     ideal, generated by computed elements
+PURPOSE:    computes a vector space basis of the centralizer of the set F in the vector space generated by V over the ground field
 SEE ALSO:   centralizerVS; centralizer; inCentralizer
 EXAMPLE:    example centralizeSet; shows an example
 "
@@ -903,33 +912,34 @@ example
   matrix D[4][4]=0;
   D[2,4] = -e(1);
   D[3,4] = -e(2);
-  // This is $A_{41}$ - the first real Lie algebra of dimension $4$.
+  // This is A_4_1 - the first real Lie algebra of dimension 4.
   ncalgebra(1,D);
 
   ideal F = variablesSorted(); F;
 
-  // the center of $A_{41}$ is generated by
-  // $e(1)$ and $-1/2*e(2)^2+e(1)*e(3)$
+  // the center of A_4_1 is generated by
+  // e(1) and -1/2*e(2)^2+e(1)*e(3)
   // therefore one may consider computing it in the following way:
 
-  // 1. Compute PBW basis consisting of
-  //    monomials of exponent <= (1,2,1,0)
+  // 1. Compute a PBW basis consisting of
+  //    monomials with exponent <= (1,2,1,0)
   ideal V = PBW_maxMonom( e(1) * e(2)^ 2 * e(3) );
 
-  // 2. Compute the centralizer of F within vector space
+  // 2. Compute the centralizer of F within the vector space
   //    spanned by these monomials:
   ideal C = centralizeSet( F, V ); C;
 
-  inCenter(C);
+  inCenter(C); // check the result
 }
 
 
 
 /******************************************************/
 proc centralizerVS( ideal F, int d )
-  "USAGE:      centralizerVS( F, D ); ideal F, int D
-RETURN:     ideal, generated by elements of degree <= D
-PURPOSE:    computes a v.s. basis of the centralizer of F up to degree D.
+  "
+USAGE:      centralizerVS( F, D ); F ideal, D int
+RETURN:     ideal, generated by computed elements
+PURPOSE:    computes a vector space basis of centralizer(F) up to degree D
 NOTE:       D must be non-negative
 SEE ALSO:   centerVS; centralizer; inCentralizer
 EXAMPLE:    example centralizerVS; shows an example
@@ -956,10 +966,11 @@ example
   D[1,2]=-z;  D[1,3]=2*x;  D[2,3]=-2*y;
   ncalgebra(1,D); // this algebra is U(sl_2)
   ideal F = x, y;
-  // find all elements commuting with x and y of degree <= 4:
+  // find generators of the vector space of elements 
+  // of degree <= 4 commuting with x and y:
   ideal C = centralizerVS(F, 4);
   C;
-  inCentralizer(C, F);
+  inCentralizer(C, F); // check the result
 }
 
 
@@ -974,9 +985,10 @@ example
 
 /******************************************************/
 proc centerVS( int D )
-"USAGE:      centerVS( D ); int D
-RETURN:     ideal, generated by elements of degree <= D
-PURPOSE:    computes a v.s. basis of the center up to degree D.
+"
+USAGE:      centerVS( D ); D int
+RETURN:     ideal, generated by computed elements
+PURPOSE:    computes a vector space basis of the center up to degree D
 NOTE:       D must be non-negative
 SEE ALSO:   centralizerVS; center; inCenter
 EXAMPLE:    example centerVS; shows an example
@@ -1008,26 +1020,28 @@ example
   matrix D[3][3]=0;
   D[1,2]=-z;  D[1,3]=2*x;  D[2,3]=-2*y;
   ncalgebra(1,D); // this algebra is U(sl_2)
-  // find all central elements of degree <= 4
+  // find a basis of the vector space of all
+  // central elements of degree <= 4:
   ideal Z = centerVS(4);
   Z;
   // note that the second element is the square of the first
-  // plus the multiple of the first:
+  // plus a multiple of the first:
   Z[2] - Z[1]^2 + 8*Z[1];
-  inCenter(Z);
+  inCenter(Z); // check the result
 }
 
 
 /******************************************************/
 proc centralizerRed( ideal F, int D, list # )
-"USAGE:      centralizerRed( F, D[, N] ); ideal F, int D[, int N]
-RETURN:     ideal, generated by computed generators
-PURPOSE:    computes a subalgebra generators of centralizer(F) up to degree D.
+"
+USAGE:      centralizerRed( F, D[, N] ); F ideal, D int, N optional int
+RETURN:     ideal, generated by computed elements
+PURPOSE:    computes subalgebra generators of centralizer(F) up to degree D.
 NOTE:       In general, one cannot compute the whole centralizer(F).
 @* Hence, one has to specify a termination condition via arguments D and/or N.
-@* If D is positive, only centralizing elements up to degree D will be found.
+@* If D is positive, only centralizing elements up to degree D are computed.
 @* If D is negative, the termination is determined by N only.
-@* If N is given, the computation stops if at least N elements has been found.
+@* If N is given, the computation stops if at least N elements have been found.
 @* Warning: if N is given and bigger than the actual number of generators,
 @* the procedure may not terminate.
 @* Current ordering must be a degree compatible well-ordering.
@@ -1286,24 +1300,25 @@ example
   D[1,2]=-z;  D[1,3]=2*x;  D[2,3]=-2*y;
   ncalgebra(1,D); // this algebra is U(sl_2)
   ideal F = x, y;
-  // find subalgebra generators degree <= 4 of an algebra of
+  // find subalgebra generators of degree <= 4 of the subalgebra of
   // all elements commuting with x and y:
   ideal C = centralizerRed(F, 4);
   C;
-  inCentralizer(C, F);
+  inCentralizer(C, F); // check the result
 }
 
 
 /******************************************************/
 proc centerRed( int D, list # )
-"USAGE:      centerRed( D[, N] ); int D[, int N]
-RETURN:     ideal, generated by computed generators
-PURPOSE:    computes a subalgebra generators of the center up to degree D.
+"
+USAGE:      centerRed( D[, N] ); D int, N optional int
+RETURN:     ideal, generated by computed elements
+PURPOSE:    computes subalgebra generators of the center up to degree D
 NOTE:       In general, one cannot compute the whole center.
 @* Hence, one has to specify a termination condition via arguments D and/or N.
 @* If D is positive, only central elements up to degree D will be found.
 @* If D is negative, the termination is determined by N only.
-@* If N is given, the computation stops if at least N elements has been found.
+@* If N is given, the computation stops if at least N elements have been found.
 @* Warning: if N is given and bigger than the actual number of generators,
 @* the procedure may not terminate.
 @* Current ordering must be a degree compatible well-ordering.
@@ -1331,16 +1346,17 @@ example
   matrix D[3][3]=0;
   D[1,2]=z;
   ncalgebra(1,D); // it is a Heisenberg algebra
-  // find vector space basis of center of degree <= 3
+  // find a basis of the vector space of 
+  // central elements of degree <= 3:
   ideal VSZ = centerVS(3);
   // There should be 3 degrees of z.
   VSZ;
-  inCenter(VSZ);
+  inCenter(VSZ); // check the result
   // find "minimal" central elements of degree <= 3
   ideal SAZ = centerRed(3);
   // Only 'z' must be computed
   SAZ;
-  inCenter(SAZ);
+  inCenter(SAZ); // check the result
 }
 
 
@@ -1352,7 +1368,8 @@ example
 
 /******************************************************/
 static proc INTERRED( ideal S )
-  "USAGE:      INTERRED( S ); ideal S
+  "
+USAGE:      INTERRED( S ); S ideal
 RETURN:      ideal, interreduced S
 PURPOSE:     interreduction without monomial multiplication,
     just make every leading monomial occur in a single polynomial
@@ -1514,11 +1531,13 @@ static proc mindegInt( ideal I )
 }
 
 /******************************************************/
-proc sa_reduce( ideal V ) // 'subalgebra basis' computation
-"USAGE:     sa_reduce(V); ideal V
-RETURN:     ideal, generated by found elements
-PURPOSE:    compute a s.a. basis of an algebra generated by V
-NOTE:       May produce wrong result in quotient algebras.
+// 'subalgebra basis' computation
+proc sa_reduce( ideal V ) 
+"
+USAGE:     sa_reduce(V); V ideal
+RETURN:     ideal, generated by computed elements
+PURPOSE:    compute a subalgebra basis of an algebra generated by the elements of V
+NOTE:       At the moment the usage of this procedure is limited to G-algebras
 SEE ALSO:   sa_poly_reduce
 EXAMPLE:    example sa_reduce; shows an example
 "
@@ -1636,11 +1655,13 @@ example
 
 
 /******************************************************/
-proc sa_poly_reduce( poly p, ideal V ) // subalgebra reduction of a polynomial
-"USAGE:      sa_poly_reduce(p, V); poly p, ideal V
+// subalgebra reduction of a polynomial
+proc sa_poly_reduce( poly p, ideal V )
+"
+USAGE:      sa_poly_reduce(p, V); p poly, V ideal
 RETURN:     polynomial, a reduction of p wrt V
-PURPOSE:    computes a reduction of polynomial p wrt V
-NOTE:       May produce wrong result in quotient algebras.
+PURPOSE:    computes a reduction of the polynomial p wrt the subalgebra generated by elements of V
+NOTE:       At the moment the usage of this procedure is limited to G-algebras
 SEE ALSO:   sa_reduce
 EXAMPLE:    example sa_poly_reduce; shows an example
 "
@@ -1804,10 +1825,12 @@ static proc inCentralizer_list( def l, ideal S )
 
 
 /******************************************************************************/
-proc inCentralizer( def a, ideal S ) // Checks the commutativity of polynomials of a with the polynomials in S
-"USAGE:   inCentralizer(a, S); a poly/list/ideal, S poly/ideal
-RETURN:  integer, 1 if a in the centralizer(S), 0 otherwise
-PURPOSE: check whether a is centralizing with respect to elements of S
+// Checks the commutativity of polynomials of a with the polynomials in S
+proc inCentralizer( def a, ideal S )
+"
+USAGE:   inCentralizer(E, S); E poly/list/ideal, S poly/ideal
+RETURN:  integer, 1 if E is in the centralizer(S), 0 otherwise
+PURPOSE: check whether the elements of E are in the centralizer(S)
 EXAMPLE: example inCentralizer; shows examples
 "
 {
@@ -1852,7 +1875,7 @@ example
   D[1,2]=-z;
   ncalgebra(1,D); // the Heisenberg algebra
   poly f = x^2;
-  poly a = z; // 'z' is central => it lies in any centralizer!
+  poly a = z; // 'z' is central => it lies in every centralizer!
   poly b = y^2;
   inCentralizer(a, f);
   inCentralizer(b, f);
@@ -1866,10 +1889,12 @@ example
 }
 
 /******************************************************/
-proc inCenter( def a ) // Checks the centrality of a
-  "USAGE:   inCenter(a); a poly/list/ideal
-RETURN:  integer, 1 if a in the center, 0 otherwise
-PURPOSE: check whether a given element is central
+// Checks the centrality of a
+proc inCenter( def a )
+  "
+USAGE:   inCenter(E); E poly/list/ideal
+RETURN:  integer, 1 if E is in the center, 0 otherwise
+PURPOSE: check whether the elements of E are central
 EXAMPLE: example inCenter; shows examples
 "
 {
@@ -1907,11 +1932,13 @@ example
 
 
 /******************************************************/
-proc isCartan( poly f ) // Checks whether f is a Cartan element.
-"USAGE:       isCartan(f); poly f
+// Checks whether f is a Cartan element.
+proc isCartan( poly f )
+"
+USAGE:       isCartan(f); f poly
 PURPOSE:     check whether f is a Cartan element.
 RETURN:      integer, 1 if f is a Cartan element and 0 otherwise.
-NOTE:        f is a Cartan element
+NOTE:        f is a Cartan element of the algebra A
 @* iff for all g in A there exists C in K such that [f, g] = C * g
 @* iff for all variables v_i there exist C in K such that [f, v_i] = C * v_i.
 "
@@ -1984,15 +2011,17 @@ example
 
 
 /******************************************************/
-proc center( int D, list # ) // Computes the generators of the center of a basering
-"USAGE:      center(D[, N]); int D, int N
-RETURN:     ideal, generated by elements of degree at most D
-PURPOSE:    computes a subalgebra generators of the center up to degree D.
+// Computes the generators of the center of a basering
+proc center( int D, list # )
+"
+USAGE:      center(D[, N]); D int, N optional int
+RETURN:     ideal, generated by computed elements
+PURPOSE:    computes subalgebra generators of the center up to degree D
 NOTE:       In general, one cannot compute the whole center.
 @* Hence, one has to specify a termination condition via arguments D and/or N.
 @* If D is positive, only central elements up to degree D will be found.
 @* If D is negative, the termination is determined by N only.
-@* If N is given, the computation stops if at least N elements has been found.
+@* If N is given, the computation stops if at least N elements have been found.
 @* Warning: if N is given and bigger than the actual number of generators,
 @* the procedure may not terminate.
 @* Current ordering must be a degree compatible well-ordering.
@@ -2024,24 +2053,28 @@ example
   matrix D[4][4]=0;
   D[1,2]=-z;  D[1,3]=2*x;  D[2,3]=-2*y;
   ncalgebra(1,D); // this algebra is U(sl_2) tensored with K[t]
-  ideal Z = center(3); // find all central elements of degree <= 3
+  // find generators of the center of degree <= 3:
+  ideal Z = center(3); 
   Z;
-  inCenter(Z);
-  ideal ZZ = center(-1, 1); // find one central element of the lowest degree
+  inCenter(Z); // check the result
+  // find at least one generator of the center:
+  ideal ZZ = center(-1, 1); 
   ZZ;
-  inCenter(ZZ);
+  inCenter(ZZ); // check the result
 }
 
 /******************************************************/
-proc centralizer( ideal S, int D, list # ) // Computes the generators of the centralizer of S in a basering
-"USAGE:      centralizer(F, D[, N]); poly/ideal F, int D[, int N]
-RETURN:     ideal, generated by computed generators
-PURPOSE:    computes a subalgebra generators of centralizer(F) up to degree D.
+// Computes the generators of the centralizer of S in a basering
+proc centralizer( ideal S, int D, list # )
+"
+USAGE:      centralizer(F, D[, N]); F poly/ideal, D int, N optional int
+RETURN:     ideal, generated by computed elements
+PURPOSE:    computes subalgebra generators of centralizer(F) up to degree D
 NOTE:       In general, one cannot compute the whole centralizer(F).
 @* Hence, one has to specify a termination condition via arguments D and/or N.
 @* If D is positive, only centralizing elements up to degree D will be found.
 @* If D is negative, the termination is determined by N only.
-@* If N is given, the computation stops if at least N elements has been found.
+@* If N is given, the computation stops if at least N elements have been found.
 @* Warning: if N is given and bigger than the actual number of generators,
 @* the procedure may not terminate.
 @* Current ordering must be a degree compatible well-ordering.
@@ -2075,22 +2108,25 @@ example
   ncalgebra(1,D); // this algebra is U(sl_2)
   poly f = 4*x*y+z^2-2*z; // a central polynomial
   f;
-  ideal c = centralizer(f, 2); // find all elements of the centralizer of f
-  // of degree <= 2
+  // find generators of the centralizer of f of degree <= 2:
+  ideal c = centralizer(f, 2); 
   c;  // since f is central, the answer consists of generators of A
-  inCentralizer(c, f);
-  ideal cc = centralizer(f,-1,2); // find at least two elements of the centralizer of f
+  inCentralizer(c, f); // check the result
+  // find at least two generators of the centralizer of f:
+  ideal cc = centralizer(f,-1,2); 
   cc;
-  inCentralizer(cc, f);
+  inCentralizer(cc, f); // check the result
   poly g = z^2-2*z; // some non-central polynomial
-  c = centralizer(g, 2); // find all elements of the centralizer of g
-  // of degree <= 2
+  // find generators of the centralizer of g of degree <= 2:
+  c = centralizer(g, 2); 
   c;
-  inCentralizer(c, g);
-  centralizer(g,-1,1); // find the element of the lowest degree in the centralizer
-  cc = centralizer(g,-1,2); // find at least two elements of the centralizer of g
+  inCentralizer(c, g); // check the result
+  // find at least one generator of the centralizer of g:
+  centralizer(g,-1,1); 
+  // find at least two generators of the centralizer of g:
+  cc = centralizer(g,-1,2); 
   cc;
-  inCentralizer(cc, g);
+  inCentralizer(cc, g); // check the result
 }
 
 

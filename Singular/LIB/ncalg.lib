@@ -1,49 +1,46 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncalg.lib,v 1.20 2006-07-27 16:27:08 motsak Exp $";
+version="$Id: ncalg.lib,v 1.21 2006-07-28 13:01:09 motsak Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  ncalg.lib      Definitions of important GR-algebras
 AUTHORS:  Viktor Levandovskyy,     levandov@mathematik.uni-kl.de,
-@*          Oleksandr Motsak,        motsak@mathematik.uni-kl.de.
+@*        Oleksandr Motsak, email: motsak@mathematik.uni-kl.de
 
 CONVENTIONS: This library provides pre-defined important noncommutative algebras.
 @* For universal enveloping algebras of finite dimensional Lie algebras sl_n, gl_n, g_2 etc.
 there are functions @code{makeUsl}, @code{makeUgl}, @code{makeUg2} etc.
 @* There are quantized enveloping algebras U_q(sl_2) and U_q(sl_3) (via functions @code{makeQsl2}, @code{makeQsl3})
-@* and non-standard quantum deformation of so_3, accessible via @code{makeQso3} function.
+and non-standard quantum deformation of so_3, accessible via @code{makeQso3} function.
+@* For bigger algebras we suppress the output of the (lengthy) list of non-commutative relations 
+and provide only the number of these relations instead.
 
 PROCEDURES:
-makeUsl2([p]);    create U(sl_2) in the variables (e,f,h) in char p>=0
-makeUsl(n[,p]);   create U(sl_n) in char p>=0
-makeUgl(n,[p]);   create U(gl_n) in the variables (e_i_j (1<i,j<n)) in char p>=0
-
-makeUso5([p]);          create U(so_5) in the variables (x(i),y(i),H(i)) in char p>=0
-makeUso6([p]);          create U(so_6) in the variables (x(i),y(i),H(i)) in char p>=0
-makeUso7([p]);          create U(so_7) in the variables (x(i),y(i),H(i)) in char p>=0
-makeUso8([p]);          create U(so_8) in the variables (x(i),y(i),H(i)) in char p>=0
-makeUso9([p]);          create U(so_9) in the variables (x(i),y(i),H(i)) in char p>=0
-makeUso10([p]);         create U(so_{10}) in the variables (x(i),y(i),H(i)) in char p>=0
-makeUso11([p]);         create U(so_{11}) in the variables (x(i),y(i),H(i)) in char p>=0
-makeUso12([p]);         create U(so_{12}) in the variables (x(i),y(i),H(i)) in char p>=0
-
-makeUsp1([p]);          create U(sp_1) in the variables (x(i),y(i),H(i)) in char p>=0
-makeUsp2([p]);          create U(sp_2) in the variables (x(i),y(i),H(i)) in char p>=0
-makeUsp3([p]);          create U(sp_3) in the variables (x(i),y(i),H(i)) in char p>=0
-makeUsp4([p]);          create U(sp_4) in the variables (x(i),y(i),H(i)) in char p>=0
-makeUsp5([p]);          create U(sp_5) in the variables (x(i),y(i),H(i)) in char p>=0
-
-makeUg2([p]);            create U(g_2) in the variables (x(i),y(i),Ha,Hb) in char p>=0
-makeUf4([p]);            create U(f_4) in the variables (x(i),y(i),H(i)) in char p>=0
-makeUe6([p]);            create U(e_6) in the variables (x(i),y(i),H(i)) in char p>=0
-makeUe7([p]);            create U(e_7) in the variables (x(i),y(i),H(i)) in char p>=0
-makeUe8([p]);            create U(e_8) in the variables (x(i),y(i),H(i)) in char p>=0
-
-makeQso3([n]);    create U_q(so_3) in the presentation of Klimyk (if int n is given, the quantum parameter will be specialized at the 2n-th root of unity)
-makeQsl2([n]);    preparation for U_q(sl_2) as factor-algebra; if n is specified, the quantum parameter q will be specialized at the n-th root of unity
-makeQsl3([n]);    preparation for U_q(sl_3) as factor-algebra; if n is specified, the quantum parameter q will be specialized at the n-th root of unity
-
-Qso3Casimir(n [,m]); returns a list with the (optionally normalized) Casimir elements of U_q(so_3) for the quantum parameter specialized at the 2n-th root of unity
-GKZsystem(A, sord, alg [,v]);  define a ring and a Gelfand-Kapranov-Zelevinsky system of differential equations
+  makeUsl2([p])    create U(sl_2) in the variables (e,f,h) in char p>=0
+  makeUsl(n[,p])   create U(sl_n) in char p>=0
+  makeUgl(n,[p])   create U(gl_n) in the variables (e_i_j (1<i,j<n)) in char p>=0
+  makeUso5([p])    create U(so_5) in the variables (x(i),y(i),H(i)) in char p>=0
+  makeUso6([p])    create U(so_6) in the variables (x(i),y(i),H(i)) in char p>=0
+  makeUso7([p])    create U(so_7) in the variables (x(i),y(i),H(i)) in char p>=0
+  makeUso8([p])    create U(so_8) in the variables (x(i),y(i),H(i)) in char p>=0
+  makeUso9([p])    create U(so_9) in the variables (x(i),y(i),H(i)) in char p>=0
+  makeUso10([p])   create U(so_{10}) in the variables (x(i),y(i),H(i)) in char p>=0
+  makeUso11([p])   create U(so_{11}) in the variables (x(i),y(i),H(i)) in char p>=0
+  makeUso12([p])   create U(so_{12}) in the variables (x(i),y(i),H(i)) in char p>=0
+  makeUsp1([p])    create U(sp_1) in the variables (x(i),y(i),H(i)) in char p>=0
+  makeUsp2([p])    create U(sp_2) in the variables (x(i),y(i),H(i)) in char p>=0
+  makeUsp3([p])    create U(sp_3) in the variables (x(i),y(i),H(i)) in char p>=0
+  makeUsp4([p])    create U(sp_4) in the variables (x(i),y(i),H(i)) in char p>=0
+  makeUsp5([p])    create U(sp_5) in the variables (x(i),y(i),H(i)) in char p>=0
+  makeUg2([p])     create U(g_2) in the variables (x(i),y(i),Ha,Hb) in char p>=0
+  makeUf4([p])     create U(f_4) in the variables (x(i),y(i),H(i)) in char p>=0
+  makeUe6([p])     create U(e_6) in the variables (x(i),y(i),H(i)) in char p>=0
+  makeUe7([p])     create U(e_7) in the variables (x(i),y(i),H(i)) in char p>=0
+  makeUe8([p])     create U(e_8) in the variables (x(i),y(i),H(i)) in char p>=0
+  makeQso3([n])    create U_q(so_3) in the presentation of Klimyk (if int n is given, the quantum parameter will be specialized at the 2n-th root of unity)
+  makeQsl2([n])    preparation for U_q(sl_2) as factor-algebra; if n is specified, the quantum parameter q will be specialized at the n-th root of unity
+  makeQsl3([n])    preparation for U_q(sl_3) as factor-algebra; if n is specified, the quantum parameter q will be specialized at the n-th root of unity
+  Qso3Casimir(n [,m]) returns a list with the (optionally normalized) Casimir elements of U_q(so_3) for the quantum parameter specialized at the 2n-th root of unity
+  GKZsystem(A, sord, alg [,v])  define a ring and a Gelfand-Kapranov-Zelevinsky system of differential equations
 ";
 
 LIB "nctools.lib"; // rootofUnity,

@@ -1,6 +1,6 @@
-// $Id: ncall.lib,v 1.4 2005-06-07 10:24:45 Singular Exp $
+// $Id: ncall.lib,v 1.5 2006-07-28 13:01:14 motsak Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncall.lib,v 1.4 2005-06-07 10:24:45 Singular Exp $";
+version="$Id: ncall.lib,v 1.5 2006-07-28 13:01:14 motsak Exp $";
 category = "Noncommutative";
 info="
 LIBRARY:  ncall.lib   Load all noncommutative libraries
@@ -26,4 +26,5 @@ LIB "nctools.lib";
 LIB "gkdim.lib";
 LIB "qmatrix.lib";
 LIB "involut.lib";
+LIB "dmod.lib";
 //LIB "nchomolog.lib";
