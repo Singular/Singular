@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.145 2006-07-20 12:07:46 Singular Exp $
+@comment $Id: singular.doc,v 1.146 2006-07-28 13:08:23 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -651,11 +651,17 @@ The libraries in this section are intended to be used for teaching purposes
 but not for serious computations.
 
 @menu
+* krypto_lib:: Procedures for teaching cryptography
 * teachstd_lib:: Procedures for teaching standard bases
 * weierstr_lib:: Procedures for the Weierstrass Theorems
 @end menu
 @c ---------------------------------------------------------
-@node teachstd_lib, weierstr_lib, Teaching, Teaching
+@node krypto_lib, teachstd_lib, Teaching, Teaching
+@subsection krypto_lib
+@c lib krypto.lib
+
+@c ---------------------------------------------------------
+@node teachstd_lib, weierstr_lib, krypto_lib, Teaching
 @subsection teachstd_lib
 @c lib teachstd.lib
 
