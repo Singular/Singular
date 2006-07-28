@@ -1,0 +1,2058 @@
+//GP, last modified 28.6.06
+///////////////////////////////////////////////////////////////////////////////
+version="$Id: krypto.lib,v 1.1 2006-07-28 13:06:22 Singular Exp $";
+category="Teaching";
+info="
+LIBRARY:  krypto.lib     Procedures for teaching cryptography
+AUTHOR:                  Gerhard Pfister, pfister@mathematik.uni-kl.de
+
+NOTE: The library contains procedures to compute the discrete logarithm,
+      primaly-tests, factorization included elliptic curve methodes.
+      The library is intended to be used for teaching purposes but not
+      for serious computations. Sufficiently high printlevel allows to
+      control each step, thus illustrating the algorithms at work.
+
+
+PROCEDURES:
+ decimal(s);                number corresponding to the hexadecimal number s
+ exgcdN(a,n)                compute s,t,d such that d=gcd(a,n)=s*a+t*n
+ eexgcdN(L)                 T with sum_i L[i]*T[i]=T[n+1]=gcd(L[1],...,L[n])
+ gcdN(a,b)                  compute gcd(a,b)
+ lcmN(a,b)                  compute lcm(a,b)
+ powerN(m,d,n)              compute m^d mod n
+ chineseRem(T,L)            compute x such that x = T[i] mod L[i]
+ Jacobi(a,n)                the generalized Legendre symbol of a and n
+ primList(n)                the list of all primes <=n
+ primL(q)                   all primes p_1,...,p_r such that q<p_1*...*p_r
+ intPart(x)                 the integral part of a rational number
+ intRoot(m)                 the integral part of the square root of m
+ squareRoot(a,p)            the square root of a in Z/p, p prime
+ solutionsMod2(M)           basis solutions of Mx=0 over Z/2
+ powerX(q,i,I)              q-th power of the i-th variable modulo I
+ babyGiant(b,y,p)           discrete logarithm x: b^x=y mod p
+ rho(b,y,p)                 discrete logarithm x: b^x=y mod p
+ MillerRabin(n,k)           probabilistic primaly-test of Miller-Rabin
+ SolowayStrassen(n,k)       probabilistic primaly-test of Soloway-Strassen
+ PocklingtonLehmer(N,[])    primaly-test of Pocklington-Lehmer
+ PollardRho(n,k,a,[])       Pollard's rho factorization
+ pFactor(n,B,P)             Pollard's p-factorization
+ quadraticSieve(n,c,B,k)    quadratic sieve factorization
+ isOnCurve(N,a,b,P)         P is on the curve y^2z=x^3+a*xz^2+b*z^3  over Z/N
+ ellipticAdd(N,a,b,P,Q)     P+Q, addition on elliptic curves
+ ellipticMult(N,a,b,P,k)    k*P on elliptic curves
+ ellipticRandomCurve(N)     generates y^2z=x^3+a*xz^2+b*z^3  over Z/N randomly
+ ellipticRandomPoint(N,a,b) random point on y^2z=x^3+a*xz^2+b*z^3  over Z/N
+ countPoints(N,a,b)         number of points of y^2=x^3+a*x+b  over Z/N
+ ellipticAllPoints(N,a,b)   points of y^2=x^3+a*x+b  over Z/N
+ ShanksMestre(q,a,b,[])     number of points of y^2=x^3+a*x+b  over Z/N
+ Schoof(N,a,b)              number of points of y^2=x^3+a*x+b  over Z/N
+ generateG(a,b,m)           m-th division polynomial of y^2=x^3+a*x+b  over Z/N
+ factorLenstraECM(N,S,B,[]) Lenstra's factorization
+ ECPP(N)                    primaly-test of Goldwasser-Kilian
+
+              [parameters in square brackets are optional]
+";
+
+LIB "poly.lib";
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+//=============================================================================
+//=========================== basic prozedures ================================
+//=============================================================================
+
+proc decimal(string s)
+"USAGE:  decimal(s); s = string
+ RETURN: the (decimal)number corresponding to the hexadecimal number s
+ EXAMPLE:example decimal; shows an example
+"
+{
+   int n=size(s);
+   int i;
+   number m,k;
+   number t=16;
+   for(i=n;i>0;i--)
+   {
+      if(s[i]=="1"){k=1;}
+      if(s[i]=="2"){k=2;}
+      if(s[i]=="3"){k=3;}
+      if(s[i]=="4"){k=4;}
+      if(s[i]=="5"){k=5;}
+      if(s[i]=="6"){k=6;}
+      if(s[i]=="7"){k=7;}
+      if(s[i]=="8"){k=8;}
+      if(s[i]=="9"){k=9;}
+      if(s[i]=="a"){k=10;}
+      if(s[i]=="b"){k=11;}
+      if(s[i]=="c"){k=12;}
+      if(s[i]=="d"){k=13;}
+      if(s[i]=="e"){k=14;}
+      if(s[i]=="f"){k=15;}
+      m=m+k*t^(n-i);
+   }
+   return(m);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   string s  ="8edfe37dae96cfd2466d77d3884d4196";
+   decimal(s);
+}
+
+proc exgcdN(number a, number n)
+"USAGE:  exgcdN(a,n);
+ RETURN: a list s,t,d of numbers, d=gcd(a,n)=s*a+t*n
+ EXAMPLE:example exgcdN; shows an example
+"
+{
+  number x=a mod n;
+  if(x==0){return(list(0,1,n))}
+  list l=exgcdN(n,x);
+  return(list(l[2],l[1]-(a-x)*l[2]/n,l[3]))
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   exgcdN(24,15);
+}
+
+proc eexgcdN(list L)
+"USAGE:  eexgcdN(L);
+ RETURN: list T such that sum_i L[i]*T[i]=T[n+1]=gcd(L[1],...,L[n])
+ EXAMPLE:example eexgcdN; shows an example
+"
+{
+   if(size(L)==2){return(exgcdN(L[1],L[2]));}
+   number p=L[size(L)];
+   L=delete(L,size(L));
+   list T=eexgcdN(L);
+   list S=exgcdN(T[size(T)],p);
+   int i;
+   for(i=1;i<=size(T)-1;i++)
+   {
+      T[i]=T[i]*S[1];
+   }
+   p=T[size(T)];
+   T[size(T)]=S[2];
+   T[size(T)+1]=S[3];
+   return(T);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   eexgcdN(list(24,15,21));
+}
+
+proc gcdN(number a, number b)
+"USAGE:  gcdN(a,b);
+ RETURN: gcd(a,b)
+ EXAMPLE:example gcdN; shows an example
+"
+{
+   if((a mod b)==0){return(b)}
+   return(gcdN(b,a mod b));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   gcdN(24,15);
+}
+
+proc lcmN(number a, number b)
+"USAGE:  lcmN(a,b);
+ RETURN: lcm(a,b);
+ EXAMPLE:example lcmN; shows an example
+"
+{
+   number d=gcdN(a,b);
+   return(a*b/d);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   lcmN(24,15);
+}
+
+proc powerN(number m, number d, number n)
+"USAGE:  powerN(m,d,n);
+ RETURN: m^d mod n
+ EXAMPLE:example powerN; shows an example
+"
+{
+   if(d==0){return(1)}
+   int i;
+   for(i=12;i>=2;i--)
+   {
+      if((d mod i)==0){return(powerN(m,d/i,n)^i mod n);}
+   }
+   return(m*powerN(m,d-1,n) mod n);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   powerN(24,15,7);
+}
+
+proc chineseRem(list T,list L)
+"USAGE:  chineseRem(T,L);
+ RETURN: x such that x = T[i] mod L[i]
+ NOTE:   chinese remainder theorem
+ EXAMPLE:example chineseRem; shows an example
+"
+{
+   int i;
+   int n=size(L);
+   number N=1;
+   for(i=1;i<=n;i++)
+   {
+      N=N*L[i];
+   }
+   list M;
+   for(i=1;i<=n;i++)
+   {
+      M[i]=N/L[i];
+   }
+   list S=eexgcdN(M);
+   number x;
+   for(i=1;i<=n;i++)
+   {
+      x=x+S[i]*M[i]*T[i];
+   }
+   x=x mod N;
+   return(x);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   chineseRem(list(24,15,7),list(2,3,5));
+}
+
+proc Jacobi(number a, number n)
+"USAGE:  Jacobi(a,n);
+ RETURN: the generalized Legendre symbol
+ NOTE: if a and n are odd primes then
+       Jacobi(a,n)=0,1,-1 if n|a, a=x^2 mod n,else
+ EXAMPLE:example Jacobi; shows an example
+"
+{
+   int i;
+   int z=1;
+   number t=1;
+   number k;
+
+   if((((n-1)/2) mod 2)!=0){z=-1;}
+   if(a<0){return(z*Jacobi(-a,n));}
+   a=a mod n;
+   if(n==1){return(1);}
+   if(a==0){return(0);}
+
+   while(a!=0)
+   {
+      while((a mod 2)==0)
+      {
+         a=a/2;
+         if(((n mod 8)==3)||((n mod 8)==5)){t=-t;}
+      }
+      k=a;a=n;n=k;
+      if(((a mod 4)==3)&&((n mod 4)==3)){t=-t;}
+      a=a mod n;
+   }
+   if (n==1){return(t);}
+   return(0);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   Jacobi(13580555397810650806,5792543);
+}
+
+proc primList(int n)
+"USAGE:  primList(n);
+ RETURN: the list of all primes <=n
+ EXAMPLE:example primList; shows an example
+"
+{
+   int i,j;
+   list re;
+   re[1]=2;
+   re[2]=3;
+   for(i=4;i<=n;i++)
+   {
+     j=1;
+     while(j<=size(re))
+     {
+        if((i mod re[j])==0){break;}
+        j++;
+     }
+     if(j==size(re)+1){re[size(re)+1]=i;}
+   }
+   return(re);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   primList(100);
+}
+
+proc primL(number q)
+"USAGE:  primL(q);
+ RETURN: list of all primes p_1,...,p_r such that q<p_1*...*p_r
+ EXAMPLE:example primL; shows an example
+"
+{
+   int i,j;
+   list re;
+   re[1]=2;
+   re[2]=3;
+   number s=6;
+   i=3;
+   while(s<=q)
+   {
+     i++;
+     j=1;
+     while(j<=size(re))
+     {
+        if((i mod re[j])==0){break;}
+        j++;
+     }
+     if(j==size(re)+1)
+     {
+        re[size(re)+1]=i;
+        s=s*i;
+     }
+   }
+   return(re);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   primL(20);
+}
+
+proc intPart(number x)
+"USAGE:  intPart(x);
+ RETURN: the integral part of a rational number
+ EXAMPLE:example intPart; shows an example
+"
+{
+   return((numerator(x)-(numerator(x) mod denominator(x)))/denominator(x));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   intPart(7/3);
+}
+
+proc intRoot(number m)
+"USAGE:  intRoot(m);
+ RETURN: the integral part of the square root of m
+ EXAMPLE:example intRoot; shows an example
+"
+{
+   number x=1;
+   number t=x^2;
+   number s=(x+1)^2;
+   while(((m>t)&&(m>s))||((m<t)&&(m<s)))
+   {
+      x=intPart(x/2+m/(2*x));  //Newton step
+      t=x^2;
+      if(t>m)
+      {
+         s=(x-1)^2;
+      }
+      else
+      {
+         s=(x+1)^2;
+      }
+   }
+   if(t>m){return(x-1);}
+   if(s==m){return(x+1);}
+   return(x);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   intRoot(20);
+}
+
+proc squareRoot(number a, number p)
+"USAGE:  squareRoot(a,p);
+ RETURN: the square root of a in Z/p, p prime
+ NOTE:   assumes the Jacobi symbol is 1 or p=2.
+ EXAMPLE:example squareRoot; shows an example
+"
+{
+   if(p==2){return(a);}
+   if((a mod p)==0){return(0);}
+   if(powerN(a,p-1,p)!=1)
+   {
+      "p is not prime";
+      return(number(-5));
+   }
+   number n=random(1,2147483647) mod p;
+   if(n==0){n=n+1;}
+   number j=Jacobi(n,p);
+   if(j==0)
+   {
+      "p is not prime";
+      return(number(-5));
+   }
+   if(j==1)
+   {
+      return(squareRoot(a,p));
+   }
+   number q=p-1;
+   number e=0;
+   number two=2;
+   number z,m,t;
+   while((q mod 2)==0)
+   {
+      e=e+1;
+      q=q/2;
+   }
+   number y=powerN(n,q,p);
+   number r=e;
+   number x=powerN(a,(q-1)/2,p);
+   number b=a*x^2 mod p;
+   x=a*x mod p;
+
+   while(((b-1) mod p)!=0)
+   {
+      m=0;z=b;
+      while(((z-1) mod p)!=0)
+      {
+         z=z^2 mod p;
+         m=m+1;
+      }
+      t=powerN(y,powerN(two,r-m-1,p),p);
+      y=t^2 mod p;
+      r=m;
+      x=x*t mod p;
+      b=b*y mod p;
+   }
+   return(x);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   squareRoot(8315890421938608,32003);
+}
+
+
+proc solutionsMod2(matrix M)
+"USAGE:  solutionsMod2(M);
+ RETURN: an intmat containing a basis of the vector space of solutions
+         of the linear system of equations defined by M over the prime
+         field of characteristic 2
+ EXAMPLE:example solutionsMod2; shows an example
+"
+{
+   def R=basering;
+   ring Rhelp=2,z,(c,dp);
+   matrix M=imap(R,M);
+   matrix S=syz(M);
+   setring(R);
+   matrix S=imap(Rhelp,S);
+   int i,j;
+   //Typ-Konvertierung. Die Loesungsmenge von number zu int
+   intmat v[nrows(S)][ncols(S)];
+   for(i=1;i<=nrows(S);i++)
+   {
+      for(j=1;j<=ncols(S);j++)
+      {
+         if(S[i,j]==1){v[i,j]=1;}
+      }
+   }
+   return(v);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   matrix M[3][3]=1,2,3,4,5,6,7,6,5;
+   solutionsMod2(M);
+}
+
+proc powerX(int q, int i, ideal I)
+"USAGE:  powerX(q,i,I);
+ RETURN: the q-th power of the i-th variable modulo I
+ ASSUME: I is a standard basis
+ EXAMPLE:example powerX; shows an example
+"
+{
+   if(q<=181){return(reduce(var(i)^int(q),I));}
+   if((q mod 5)==0){return(reduce(powerX(q div 5,i,I)^5,I));}
+   if((q mod 4)==0){return(reduce(powerX(q div 4,i,I)^4,I));}
+   if((q mod 3)==0){return(reduce(powerX(q div 3,i,I)^3,I));}
+   if((q mod 2)==0){return(reduce(powerX(q div 2,i,I)^2,I));}
+   return(reduce(var(i)*powerX(q-1,i,I),I));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,(x,y),dp;
+   powerX(100,2,std(ideal(x3-1,y2-x)));
+}
+
+//======================================================================
+//=========================== Discrete Logarithm =======================
+//======================================================================
+
+//============== Shank's baby step - giant step ========================
+
+proc babyGiant(number b, number y, number p)
+"USAGE:  babyGiant(b,y,p);
+ RETURN: the discrete logarithm x: b^x=y mod p
+ NOTE:   giant-step-baby-step
+ EXAMPLE:example babyGiant; shows an example
+"
+{
+   int i,j,m;
+   list l;
+   number h=1;
+   number x;
+
+//choose m minimal such that m^2>p
+   for(i=1;i<=p;i++){if(i^2>p) break;}
+   m=i;
+
+//baby-step:  compute the table y*b^i for 1<=i<=m
+   for(i=1;i<=m;i++){l[i]=y*b^i mod p;}
+
+//giant-step: compute b^(m+j), 1<=j<=m and search in the baby-step table
+//for an i with y*b^i=b^(m*j). If found then x=m*j-i
+   number g=b^m mod p;
+   while(j<m)
+   {
+      j++;
+      h=h*g mod p;
+      for(i=1;i<=m;i++)
+      {
+         if(h==l[i])
+         {
+            x=m*j-i;
+            j=m;
+            break;
+         }
+     }
+   }
+   return(x);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,z,dp;
+   number b=2;
+   number y=10;
+   number p=101;
+   babyGiant(b,y,p);
+}
+
+//==============  Pollards rho  =================================
+
+proc rho(number b, number y, number p)
+"USAGE:  rho(b,y,p);
+ RETURN: the discrete logarithm x=log_b(y): b^x=y mod p
+ NOTE: Pollard's rho:
+       choose random f_0 in 0,...,p-2 ,e_0=0, define x_0=b^f_0.
+       define x_i=y^e_ib^f_i as below. For i large enough there is i
+       with x_(i/2)=x_i.
+       s:=e_(i/2)-e_i mod p-1 and t:=f_i-f_(i/2) mod p-1,
+       d=gcd(s,p-1)=u*s+v*(p-1) then x=tu/d +j*(p-1)/d
+       for some j (to be found by trying)
+ EXAMPLE:example rho; shows an example
+"
+{
+   int i=1;
+   int j;
+   number s,t;
+   list e,f,x;
+
+   e[1]=0;
+   f[1]=random(0,2147483629) mod (p-1);
+   x[1]=powerN(b,f[1],p);
+   while(i)
+   {
+      if((x[i] mod 3)==1)
+      {
+         x[i+1]=y*x[i] mod p;
+         e[i+1]=e[i]+1 mod (p-1);
+         f[i+1]=f[i];
+      }
+      if((x[i] mod 3)==2)
+      {
+         x[i+1]=x[i]^2 mod p;
+         e[i+1]=e[i]*2 mod (p-1);
+         f[i+1]=f[i]*2 mod (p-1);
+      }
+      if((x[i] mod 3)==0)
+      {
+         x[i+1]=x[i]*b mod p;
+         e[i+1]=e[i];
+         f[i+1]=f[i]+1 mod (p-1);
+      }
+      i++;
+      for(j=i-1;j>=1;j--)
+      {
+         if(x[i]==x[j])
+         {
+            s=(e[j]-e[i]) mod (p-1);
+            t=(f[i]-f[j]) mod (p-1);
+            if(s!=0)
+            {
+               i=0;
+            }
+            else
+            {
+               e[1]=0;
+               f[1]=random(0,2147483629) mod (p-1);
+               x[1]=powerN(b,f[1],p);
+               i=1;
+            }
+            break;
+         }
+      }
+   }
+
+   list w=exgcdN(s,p-1);
+   number u=w[1];
+   number d=w[3];
+
+   number a=(t*u/d) mod (p-1);
+
+   while(powerN(b,a,p)!=y)
+   {
+      a=(a+(p-1)/d) mod (p-1);
+   }
+   return(a);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   number b=2;
+   number y=10;
+   number p=101;
+   rho(b,y,p);
+}
+//====================================================================
+//====================== Primality Tests =============================
+//====================================================================
+
+//================================= Miller-Rabin =====================
+
+proc MillerRabin(number n, int k)
+"USAGE:  MillerRabin(n,k);
+ RETURN: 1 if n is prime, 0 else
+ NOTE: probabilistic test of Miller-Rabin with k loops if n is prime
+       using the theorem:If n is prime, n-1=2^s*r, r odd, then
+       powerN(a,r,n)=1 or powerN(a,r*2^i,n)=-1 for some i
+ EXAMPLE:example MillerRabin; shows an example
+"
+{
+   if(n<0){n=-n;}
+   if((n==2)||(n==3)){return(1);}
+   if((n mod 2)==0){return(0);}
+
+   int i;
+   number a,b,j,r,s;
+   r=n-1;
+   s=0;
+   while((r mod 2)==0)
+   {
+      s=s+1;
+      r=r/2;
+   }
+   while(i<k)
+   {
+      i++;
+      a=random(2,2147483629) mod n; if(a==0){a=3;}
+      if(exgcdN(a,n)[3]!=1){return(0);}
+      b=powerN(a,r,n);
+      if(b!=1)
+      {
+         j=0;
+         while(j<s)
+         {
+           if(((b+1) mod n)==0) break;
+           b=powerN(b,2,n);
+           j=j+1;
+         }
+         if(j==s){return(0);}
+      }
+   }
+   return(1);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,z,dp;
+   number x=2;
+   x=x^787-1;
+   MillerRabin(x,3);
+}
+
+//======================= Soloway-Strassen  ==========================
+
+proc SolowayStrassen(number n, int k)
+"USAGE:  SolowayStrassen(n,k);
+ RETURN: 1 if n is prime, 0 else
+ NOTE: probabilistic test of Soloway-Strassen with k loops if n is
+       prime using the theorem:
+       If n is prime then powerN(a,(n-1)/2,n)=Jacobi(a,n) mod n
+ EXAMPLE:example SolowayStrassen; shows an example
+"
+{
+   if(n<0){n=-n;}
+   if((n==2)||(n==3)){return(1);}
+   if((n mod 2)==0){return(0);}
+
+   number a;
+   int i;
+   while(i<k)
+   {
+      i++;
+      a=random(2,2147483629) mod n; if(a==0){a=3;}
+      if(gcdN(a,n)!=1){return(0);}
+      if(powerN(a,(n-1)/2,n)!=(Jacobi(a,n) mod n)){return(0);}
+   }
+   return(1);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,z,dp;
+   number h=10;
+   number p=h^100+267;
+   //p=h^100+43723;
+   //p=h^200+632347;
+   SolowayStrassen(h,3);
+}
+
+
+/*
+ring R=0,z,dp;
+number p=398075086424064937397125500550386491199064362342526708406385189575946388957261768583317;
+number q=472772146107435302536223071973048224632914695302097116459852171130520711256363590397527;
+number n=p*q;
+SolowayStrassen(n,3);
+*/
+
+//===================== Pocklington-Lehmer ==============================
+
+proc PocklingtonLehmer(number N, list #)
+"USAGE: PocklingtonLehmer(N); optional: PocklingtonLehmer(N,L);
+        L a list of the first k primes
+ RETURN:N is not prime or {A,{p},{a_p}} as certificate for N being prime
+ NOTE:assumes that it is possible to factorize N-1=A*B such that gcd(A,B)=1
+      the factorization of A is completely known and A^2>N .
+      N is prime if and only if for each prime factor p of A we can find
+      a_p such that a_p^(N-1)=1 mod N and gcd(a_p^((N-1)/p)-1,N)=1
+ EXAMPLE:example PocklingtonLehmer; shows an example
+"
+{
+   number m=intRoot(N);
+   if(size(#)>0)
+   {
+      list S=PollardRho(N-1,10000,1,#);
+   }
+   else
+   {
+      list S=PollardRho(N-1,10000,1);
+   }
+   int i,j;
+   number A=1;
+   number p,a,g;
+   list PA;
+   list re;
+
+   while(i<size(S))
+   {
+      p=S[i+1];
+      A=A*p;
+      PA[i+1]=p;
+      if(A>m){break;}
+
+      while(1)
+      {
+        p=p*S[i+1];
+        if(((N-1) mod p)==0)
+        {
+           A=A*p;
+        }
+        else
+        {
+           break;
+        }
+      }
+      i++;
+   }
+   if(A<=m)
+   {
+     A=N/A;
+     PA=list(S[size(S)]);
+   }
+   for(i=1;i<=size(PA);i++)
+   {
+      a=1;
+      while(a<N-1)
+      {
+         a=a+1;
+         if(powerN(a,N-1,N)!=1){return("not prime");}
+         g=gcdN(powerN(a,(N-1)/PA[i],N),N);
+         if(g==1)
+         {
+           re[size(re)+1]=list(PA[i],a);
+           break;
+         }
+         if(g<N){"not prime";return(g);}
+      }
+   }
+   return(list(A,re));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,z,dp;
+   number N=105554676553297;
+   PocklingtonLehmer(N);
+   list L=primList(1000);
+   PocklingtonLehmer(N,L);
+}
+
+//=======================================================================
+//======================= Factorization =================================
+//=======================================================================
+
+//======================= Pollards rho  =================================
+
+proc PollardRho(number n, int k, int allFactors, list #)
+"USAGE:  PollardRho(n,k,allFactors); optional: PollardRho(n,k,allFactors,L);
+         L a list of the first k primes
+ RETURN: a list of factors of n (which could be just n),if allFactors=0
+         a list of all factors of n ,if allFactors=1
+ NOTE: probabilistic rho-algorithm of Pollard to find a factor of n in k loops
+       creates a sequence x_i such that (x_i)^2=(x_2i)^2 mod n for some i
+       computes gcd(x_i-x_2i,n) to find a divisor
+       To define the sequence choose x,a and define x_n+1=x_n^2+a mod n, x_1=x
+       If allFactors is 1, it tries to find recursively all prime factors
+       using the Soloway-Strassen test.
+ EXAMPLE:example PollardRho; shows an example
+"
+{
+    int i,j;
+    list L=primList(100);
+    list re,se;
+    if(n<0){n=-n;}
+    if(n==1){return(re);}
+
+//this is optional: test whether a prime of the list # devides n
+    if(size(#)>0)
+    {
+       L=#;
+    }
+    for(i=1;i<=size(L);i++)
+    {
+       if((n mod L[i])==0)
+       {
+          re[size(re)+1]=L[i];
+          while((n mod L[i])==0)
+          {
+             n=n/L[i];
+          }
+       }
+       if(n==1){return(re);}
+    }
+    int e=size(re);
+//here the rho-algorithm starts
+    number a,d,x,y;
+    while(n>1)
+    {
+       a=random(2,2147483629);
+       x=random(2,2147483629);
+       y=x;
+       d=1;
+       i=0;
+       while(i<k)
+       {
+          i++;
+          x=powerN(x,2,n); x=(x+a) mod n;
+          y=powerN(y,2,n); y=(y+a) mod n;
+          y=powerN(y,2,n); y=(y+a) mod n;
+          d=gcdN(x-y,n);
+          if(d>1)
+          {
+             re[size(re)+1]=d;
+             while((n mod d)==0)
+             {
+               n=n/d;
+             }
+             break;
+          }
+          if(i==k)
+          {
+             re[size(re)+1]=n;
+             n=1;
+          }
+       }
+
+    }
+    if(allFactors)      //want to obtain all prime factors
+    {
+       i=e;
+       while(i<size(re))
+       {
+          i++;
+
+          if(!SolowayStrassen(re[i],5))
+          {
+             se=PollardRho(re[i],2*k,1);
+             re[i]=se[size(se)];
+             for(j=1;j<=size(se)-1;j++)
+             {
+                re[size(re)+1]=se[j];
+             }
+             i--;
+          }
+       }
+    }
+    return(re);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,z,dp;
+   number h=10;
+   number p=h^30+4;
+   PollardRho(p,5000,0);
+}
+
+//======================== Pollards p-factorization ================
+proc pFactor(number n,int B, list P)
+"USAGE:  pFactor(n,B.P); n to be factorized, B a bound , P a list of primes
+ RETURN: a list of factors of n or the message: no factor found
+ NOTE: Pollard's p-factorization
+       creates the product k of powers of primes (bounded by B)  from
+       the list P with the idea that for a prime divisor p of n p-1|k
+       then p devides gcd(a^k-1,n) for some random a
+ EXAMPLE:example pFactor; shows an example
+"
+{
+   int i;
+   number k=1;
+   number w;
+   while(i<size(P))
+   {
+      i++;
+      w=P[i];
+      if(w>B) break;
+      while(w*P[i]<=B)
+      {
+         w=w*P[i];
+      }
+      k=k*w;
+   }
+   number a=random(2,2147483629);
+   number d=gcdN(powerN(a,k,n)-1,n);
+   if((d>1)&&(d<n)){return(d);}
+   return("no factor found");
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,z,dp;
+   list L=primList(1000);
+   pFactor(1241143,13,L);
+   number h=10;
+   h=h^30+25;
+   pFactor(h,20,L);
+}
+
+//==================== quadratic sieve ==============================
+
+proc quadraticSieve(number n, int c, list B, int k)
+"USAGE:  quadraticSieve(n,c,B,k); n to be factorized, {-c,c] the
+         sieve-intervall, B a list of primes,
+         k for using the first k elements in B
+ RETURN: a list of factors of n or the message: no divisor found
+ NOTE: quadraticSieve: Idea is to find x,y such that x^2=y^2 mod n
+                       gcd(x-y,n) can be a proper divisor of n
+ EXAMPLE:example quadraticSieve; shows an example
+"
+{
+   number f,d;
+   int i,j,l,s,p;
+   list S,tmp;
+   intvec v;
+   v[k]=0;
+
+//compute the integral part of the square root of n
+   number m=intRoot(n);
+
+//consider the function f(X)=(X+m)^2-n and compute for s in [-c,c] the values
+   while(i<=2*c)
+   {
+      f=(i-c+m)^2-n;
+      tmp[1]=i-c+m;
+      tmp[2]=f;
+      tmp[3]=v;
+      S[i+1]=tmp;
+      i++;
+   }
+
+//the sieve with p in B
+//find all s in [-c,c] such that f(s) has all prime divisors in the first
+//k elements of B and the decomposition of f(s). They are characterized
+//by 1 or -1 at the second place of S[j]:
+//S[j]=j-c+m,f(j-c)/p_1^v_1*...*p_k^v_k, v_1,...,v_k maximal
+   for(i=1;i<=k;i++)
+   {
+      p=B[i];
+      if((p>2)&&(Jacobi(n,p)==-1)){i++;continue;}//n is no quadratic rest mod p
+      j=1;
+      while(j<=p)
+      {
+         if(j>2*c+1) break;
+         f=S[j][2];
+         v=S[j][3];
+         s=0;
+         while((f mod p)==0)
+         {
+            s++;
+            f=f/p;
+         }
+         if(s)
+         {
+           S[j][2]=f;
+           v[i]=s;
+           S[j][3]=v;
+           l=j;
+           while(l+p<=2*c+1)
+           {
+              l=l+p;
+              f=S[l][2];
+              v=S[l][3];
+              s=0;
+              while((f mod p)==0)
+              {
+                s++;
+                f=f/p;
+              }
+              S[l][2]=f;
+              v[i]=s;
+              S[l][3]=v;
+           }
+         }
+         j++;
+      }
+   }
+   list T;
+   for(j=1;j<=2*c+1;j++)
+   {
+      if((S[j][2]==1)||(S[j][2]==-1))
+      {
+         T[size(T)+1]=S[j];
+      }
+   }
+
+//the system of equations for the exponents {l_s} for the f(s) such
+//product f(s)^l_s is a square (l_s are 1 or 0)
+   matrix M[k+1][size(T)];
+   for(j=1;j<=size(T);j++)
+   {
+      if(T[j][2]==-1){M[1,j]=1;}
+      for(i=1;i<=k;i++)
+      {
+         M[i+1,j]=T[j][3][i];
+      }
+   }
+   intmat G=solutionsMod2(M);
+
+//construction of x and y such that x^2=y^2 mod n and d=gcd(x-y,n)
+//y=square root of product f(s)^l_s
+//x=product s+m
+   number x=1;
+   number y=1;
+
+   for(i=1;i<=ncols(G);i++)
+   {
+      kill v;
+      intvec v;
+      v[k]=0;
+      for(j=1;j<=size(T);j++)
+      {
+         x=x*T[j][1]^G[j,i] mod n;
+         if((T[j][2]==-1)&&(G[j,i]==1)){y=-y;}
+         v=v+G[j,i]*T[j][3];
+
+      }
+      for(l=1;l<=k;l++)
+      {
+         y=y*B[l]^(v[l]/2) mod n;
+      }
+      d=gcdN(x-y,n);
+      if((d>1)&&(d<n)){return(d);}
+   }
+   return("no divisor found");
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,z,dp;
+   list L=primList(5000);
+   quadraticSieve(7429,3,L,4);
+   quadraticSieve(1241143,100,L,50);
+}
+
+//======================================================================
+//==================== elliptic curves  ================================
+//======================================================================
+
+//================= elementary operations ==============================
+
+proc isOnCurve(number N, number a, number b, list P)
+"USAGE:  isOnCurve(N,a,b,P);
+ RETURN: 1 or 0 (depending on whether P is on the curve or not)
+ NOTE: checks whether P=(P[1]:P[2]:P[3]) is a point on the elliptic
+       curve defined by y^2z=x^3+a*xz^2+b*z^3  over Z/N
+ EXAMPLE:example isOnCurve; shows an example
+"
+{
+   if(((P[2]^2*P[3]-P[1]^3-a*P[1]*P[3]^2-b*P[3]^3) mod N)!=0){return(0);}
+   return(1);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,z,dp;
+   isOnCurve(32003,5,7,list(10,16,1));
+}
+
+proc ellipticAdd(number N, number a, number b, list P, list Q)
+"USAGE:  ellipticAdd(N,a,b,P,Q);
+ RETURN: list L, representing the point P+Q
+ NOTE: P=(P[1]:P[2]:P[3]),Q =(Q[1]:Q[2]:Q[3])points on the
+       elliptic curve defined by y^2z=x^3+a*xz^2+b*z^3  over Z/N
+ EXAMPLE:example ellipticAdd; shows an example
+"
+{
+   if(N==2){ERROR("not implemented for 2");}
+   int i;
+   for(i=1;i<=3;i++)
+   {
+      P[i]=P[i] mod N;
+      Q[i]=Q[i] mod N;
+   }
+   list Resu;
+   Resu[1]=number(0);
+   Resu[2]=number(1);
+   Resu[3]=number(0);
+   list Error;
+   Error[1]=0;
+   //test for ellictic curve
+   number D=4*a^3+27*b^2;
+   number g=gcdN(D,N);
+   if(g==N){return(Error);}
+   if(g!=1)
+   {
+      P[4]=g;
+      return(P);
+   }
+   if(((P[1]==0)&&(P[2]==0)&&(P[3]==0))||((Q[1]==0)&&(Q[2]==0)&&(Q[3]==0)))
+   {
+      Error[1]=-2;
+      return(Error);
+   }
+   if(!isOnCurve(N,a,b,P)||!isOnCurve(N,a,b,Q))
+   {
+      Error[1]=-1;
+      return(Error);
+   }
+   if(P[3]==0){return(Q);}
+   if(Q[3]==0){return(P);}
+   list I=exgcdN(P[3],N);
+   if(I[3]!=1)
+   {
+      P[4]=I[3];
+      return(P);
+   }
+   P[1]=P[1]*I[1] mod N;
+   P[2]=P[2]*I[1] mod N;
+   I=exgcdN(Q[3],N);
+   if(I[3]!=1)
+   {
+      P[4]=I[3];
+      return(P);
+   }
+   Q[1]=Q[1]*I[1] mod N;
+   Q[2]=Q[2]*I[1] mod N;
+   if((P[1]==Q[1])&&(((P[2]+Q[2]) mod N)==0)){return(Resu);}
+   number L;
+   if((P[1]==Q[1])&&(P[2]==Q[2]))
+   {
+      I=exgcdN(2*Q[2],N);
+      if(I[3]!=1)
+      {
+         P[4]=I[3];
+         return(P);
+      }
+      L=I[1]*(3*Q[1]^2+a) mod N;
+   }
+   else
+   {
+      I=exgcdN(Q[1]-P[1],N);
+      if(I[3]!=1)
+      {
+         P[4]=I[3];
+         return(P);
+      }
+      L=(Q[2]-P[2])*I[1] mod N;
+   }
+   Resu[1]=(L^2-P[1]-Q[1]) mod N;
+   Resu[2]=(L*(P[1]-Resu[1])-P[2]) mod N;
+   Resu[3]=number(1);
+   return(Resu);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,z,dp;
+   number N=11;
+   number a=1;
+   number b=6;
+   list P,Q;
+   P[1]=2;
+   P[2]=4;
+   P[3]=1;
+   Q[1]=3;
+   Q[2]=5;
+   Q[3]=1;
+   ellipticAdd(N,a,b,P,Q);
+}
+
+proc ellipticMult(number N, number a, number b, list P, number k)
+"USAGE:  ellipticMult(N,a,b,P,k);
+ RETURN: a list L representing the point k*P
+ NOTE:  P=(P[1]:P[2]:P[3]) a point on the elliptic curve
+        defined by y^2z=x^3+a*xz^2+b*z^3  over Z/N
+ EXAMPLE:example ellipticMult; shows an example
+"
+{
+   if(P[3]==0){return(P);}
+   list resu;
+   resu[1]=number(0);
+   resu[2]=number(1);
+   resu[3]=number(0);
+
+   if(k==0){return(resu);}
+   if(k==1){return(P);}
+   if(k==2){return(ellipticAdd(N,a,b,P,P));}
+   if(k==-1)
+   {
+      resu=P;
+      resu[2]=N-P[2];
+      return(resu);
+   }
+   if(k<0)
+   {
+      resu=ellipticMult(N,a,b,P,-k);
+      return(ellipticMult(N,a,b,resu,-1));
+   }
+   if((k mod 2)==0)
+   {
+      resu=ellipticMult(N,a,b,P,k/2);
+      return(ellipticAdd(N,a,b,resu,resu));
+   }
+   resu=ellipticMult(N,a,b,P,k-1);
+   return(ellipticAdd(N,a,b,resu,P));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,z,dp;
+   number N=11;
+   number a=1;
+   number b=6;
+   list P;
+   P[1]=2;
+   P[2]=4;
+   P[3]=1;
+   ellipticMult(N,a,b,P,3);
+}
+
+//================== Random for elliptic curves =====================
+
+proc ellipticRandomCurve(number N)
+"USAGE:  ellipticRandomCurve(N);
+ RETURN: a list of two random numbers a,b and 4a^3+27b^2 mod N
+ NOTE:   y^2z=x^3+a*xz^2+b^2*z^3 defines an elliptic curve over Z/N
+ EXAMPLE:example ellipticRandomCurve; shows an example
+"
+{
+   int k;
+   while(k<=10)
+   {
+     k++;
+     number a=random(1,2147483647) mod N;
+     number b=random(1,2147483647) mod N;
+     //test for ellictic curve
+     number D=4*a^3+27*b^4; //the constant term is b^2
+     number g=gcdN(D,N);
+     if(g<N){return(list(a,b,g));}
+   }
+   ERROR("no random curve found");
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,z,dp;
+   ellipticRandomCurve(32003);
+}
+
+proc ellipticRandomPoint(number N, number a, number b)
+"USAGE:  ellipticRandomPoint(N,a,b);
+ RETURN: a list representing  a random point (x:y:z) of the elliptic curve
+         defined by y^2z=x^3+a*xz^2+b*z^3  over Z/N
+ EXAMPLE:example ellipticRandomPoint; shows an example
+"
+{
+   number x=random(1,2147483647) mod N;
+   number h=x^3+a*x+b;
+   list resu;
+   resu[1]=x;
+   resu[2]=0;
+   resu[3]=1;
+   if(h==0){return(resu);}
+
+   number n=Jacobi(h,N);
+   if(n==0)
+   {
+      resu=-5;
+      "N is not prime";
+      return(resu);
+   }
+   if(n==1)
+   {
+      resu[2]=squareRoot(h,N);
+      return(resu);
+   }
+   return(ellipticRandomPoint(N,a,b));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,z,dp;
+   ellipticRandomPoint(32003,3,181);
+}
+
+
+
+//====================================================================
+//======== counting the points of an elliptic curve  =================
+//====================================================================
+
+//==================   the trivial approaches  =======================
+proc countPoints(number N, number a, number b)
+"USAGE:  countPoints(N,a,b);
+ RETURN: the number of points of the elliptic curve defined by
+         y^2=x^3+a*x+b  over Z/N
+ NOTE: trivial aproach
+ EXAMPLE:example countPoints; shows an example
+"
+{
+  number x;
+  number r=N+1;
+  while(x<N)
+  {
+     r=r+Jacobi((x^3+a*x+b) mod N,N);
+     x=x+1;
+  }
+  return(r);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,z,dp;
+   countPoints(181,71,150);
+}
+
+proc ellipticAllPoints(number N, number a, number b)
+"USAGE:  ellipticAllPoints(N,a,b);
+ RETURN: list of points (x:y:z) of the elliptic curve
+         defined by y^2z=x^3+a*xz^2+b*z^3  over Z/N
+ NOTE:
+ EXAMPLE:example ellipticAllPoints; shows an example
+"
+{
+   list resu,point;
+   point[1]=0;
+   point[2]=1;
+   point[3]=0;
+   resu[1]=point;
+   point[3]=1;
+   number x,h,n;
+   while(x<N)
+   {
+      h=(x^3+a*x+b) mod N;
+      if(h==0)
+      {
+         point[1]=x;
+         point[2]=0;
+         resu[size(resu)+1]=point;
+      }
+      else
+      {
+         n=Jacobi(h,N);
+         if(n==1)
+         {
+            n=squareRoot(h,N);
+            point[1]=x;
+            point[2]=n;
+            resu[size(resu)+1]=point;
+            point[2]=N-n;
+            resu[size(resu)+1]=point;
+         }
+      }
+      x=x+1;
+   }
+   return(resu);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,z,dp;
+   ellipticAllPoints(181,71,150);
+}
+
+//================ the algorithm of Shanks and Mestre =================
+
+proc ShanksMestre(number q, number a, number b, list #)
+"USAGE:  ShanksMestre(q,a,b); optional:ShanksMestre(q,a,b,s);
+         s the number of loops in the algorithm (default s=1)
+ RETURN: the number of points of the elliptic curve defined by
+         y^2=x^3+a*x+b  over Z/N
+ NOTE: algorithm of Shanks and Mestre (giant-step-baby-step)
+ EXAMPLE:example ShanksMestre; shows an example
+"
+{
+   number n=intRoot(4*q);
+   number m=intRoot(intRoot(16*q))+1;
+   number d;
+   int i,j,k,s;
+   list B,K,T,P,Q,R,mP;
+   B[1]=list(0,1,0);
+   if(size(#)>0)
+   {
+      s=#[1];
+   }
+   else
+   {
+      s=1;
+   }
+   while(k<s)
+   {
+      P =ellipticRandomPoint(q,a,b);
+      Q =ellipticMult(q,a,b,P,n+q+1);
+
+      while(j<m)
+      {
+         j++;
+         B[j+1]=ellipticAdd(q,a,b,P,B[j]);  //baby-step list
+      }
+      mP=ellipticAdd(q,a,b,P,B[j]);
+      mP[2]=q-mP[2];
+      while(i<m)                            //giant-step
+      {
+         j=0;
+         while(j<m)
+         {
+            j=j+1;
+            if((Q[1]==B[j][1])&&(Q[2]==B[j][2])&&(Q[3]==B[j][3]))
+            {
+
+               T[1]=P;
+               T[2]=q+1+n-(i*m+j-1);
+               K[size(K)+1]=T;
+               if(size(K)>1)
+               {
+                  if(K[size(K)][2]!=K[size(K)-1][2])
+                  {
+                     d=gcdN(K[size(K)][2],K[size(K)-1][2]);
+                     if(ellipticMult(q,a,b,K[size(K)],d)[3]==0)
+                     {
+                       K[size(K)][2]=K[size(K)-1][2];
+                     }
+                  }
+               }
+               i=int(m);
+               break;
+            }
+         }
+         i=i+1;
+         Q=ellipticAdd(q,a,b,mP,Q);
+      }
+      k++;
+   }
+   if(size(K)>0)
+   {
+      int te=1;
+      for(i=1;i<=size(K)-1;i++)
+      {
+         if(K[size(K)][2]!=K[i][2])
+         {
+           if(ellipticMult(q,a,b,K[i],K[size(K)][2])[3]!=0)
+           {
+             te=0;
+             break;
+           }
+         }
+      }
+      if(te)
+      {
+         return(K[size(K)][2]);
+      }
+   }
+   return(ShanksMestre(q,a,b,s));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,z,dp;
+   ShanksMestre(32003,71,602);
+}
+
+//==================== Schoof's algorithm =============================
+
+proc Schoof(number N,number a, number b)
+"USAGE:  Schoof(N,a,b);
+ RETURN: the number of points of the elliptic curve
+         defined by y^2=x^3+a*x+b  over Z/N
+ NOTE:  algorithm of Schoof
+ EXAMPLE:example Schoof; shows an example
+"
+{
+   int pr=printlevel;
+//test for ellictic curve
+   number D=4*a^3+27*b^2;
+   number G=gcdN(D,N);
+   if(G==N){ERROR("not an elliptic curve");}
+   if(G!=1){ERROR("not a prime");}
+
+//=== small N
+  // if((N<=500)&&(pr<5)){return(countPoints(int(N),a,b));}
+
+//=== the general case
+   number q=intRoot(4*N);
+   list L=primL(2*q);
+   int r=size(L);
+   list T;
+   int i,j;
+   for(j=1;j<=r;j++)
+   {
+      T[j]=(testElliptic(int(N),a,b,L[j])+int(q)) mod L[j];
+   }
+   if(pr>=5)
+   {
+      "===================================================================";
+      "Chinese remainder :";
+      for(i=1;i<=size(T);i++)
+      {
+         " x =",T[i]," mod ",L[i];
+      }
+      "gives t+ integral part of the square root of q (to be positive)";
+      chineseRem(T,L);
+      "we obtain t = ",chineseRem(T,L)-q;
+      "===================================================================";
+   }
+   number t=chineseRem(T,L)-q;
+   return(N+1-t);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,z,dp;
+   Schoof(32003,71,602);
+}
+
+/*
+needs 518 sec
+Schoof(2147483629,17,3567);
+2147168895
+*/
+
+
+proc generateG(number a,number b, int m)
+"USAGE:  generateG(a,b,m);
+ RETURN: m-th division polynomial
+ NOTE: generate the recursively defined polynomials in Z[x,y],
+       so called division polynomials, p_m=generateG(a,b,m) such
+       that on the elliptic curve defined by y^2=x^3+a*x+b  over Z/N
+       and a point P=(x:y:1) the point m*P is
+       (x-(p_(m-1)*p_(m+1))/p_m^2
+       : (p_(m+2)*p_(m-1)^2-p_(m-2)*p_(m+1)^2)/4y*p_m^3 :1)
+       m*P=0  iff p_m(P)=0
+ EXAMPLE:example generateG; shows an example
+"
+{
+   poly f;
+   if(m==0){return(f);}
+   if(m==1){return(1);}
+   if(m==2){f=2*var(1);return(f);}
+   if(m==3){f=3*var(2)^4+6*a*var(2)^2+12*b*var(2)-a^2;return(f);}
+   if(m==4)
+   {
+      f=4*var(1)*(var(2)^6+5*a*var(2)^4+20*b*var(2)^3-5*a^2*var(2)^2
+        -4*a*b*var(2)-8*b^2-a^3);
+      return(f);
+   }
+   if((m mod 2)==0)
+   {
+      f=(generateG(a,b,m/2+2)*generateG(a,b,m/2-1)^2
+        -generateG(a,b,m/2-2)*generateG(a,b,m/2+1)^2)
+        *generateG(a,b,m/2)/(2*var(1));
+      return(f);
+   }
+   f=generateG(a,b,(m-1)/2+2)*generateG(a,b,(m-1)/2)^3
+     -generateG(a,b,(m-1)/2-1)*generateG(a,b,(m-1)/2+1)^3;
+   return(f);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,(x,y),dp;
+   generateG(7,15,4);
+}
+
+
+proc testElliptic(int q,number a,number b,int l)
+"USAGE:  testElliptic(q,a,b,l);
+ RETURN: an integer t, the trace of the Frobenius
+ NOTE: the kernel for the Schoof algorithm: looks for the t
+       such that for all points (x:y:1) in C[l]={P in C | l*P=0},
+       C the elliptic curve defined by y^2=x^3+a*x+b  over Z/q
+       with group structure induced by 0=(0:1:0),
+       (x:y:1)^(q^2)-t*(x:y:1)^q -ql*(x:y:1)=(0:1:0), ql= q mod l,
+       trace of Frobenius.
+ EXAMPLE:example testElliptic; shows an example
+"
+{
+   int pr=printlevel;
+   def R=basering;
+   ring S=q,(y,x),lp;
+   number a=imap(R,a);
+   number b=imap(R,b);
+   poly F=y2-x3-a*x-b;       // the curve C
+   poly G=generateG(a,b,l);
+   ideal I=std(ideal(F,G));  // the points C[l]
+   poly xq=powerX(q,2,I);
+   poly yq=powerX(q,1,I);
+   poly xq2=reduce(subst(xq,x,xq,y,yq),I);
+   poly yq2=reduce(subst(yq,x,xq,y,yq),I);
+   ideal J;
+   int ql=q mod l;
+   if(ql==0){ERROR("q is not prime");}
+   int t;
+   poly F1,F2,G1,G2,P1,P2,Q1,Q2,H1,H2,L1,L2;
+
+   if(pr>=5)
+   {
+      "===================================================================";
+      "q=",q;
+      "l=",l;
+      "q mod l=",ql;
+      "the Groebner basis for C[l]:";I;
+      "x^q mod I = ",xq;
+      "x^(q^2) mod I = ",xq2;
+      "y^q mod I = ",yq;
+      "y^(q^2) mod I = ",yq2;
+      pause();
+   }
+   //==== l=2 =============================================================
+   if(l==2)
+   {
+      xq=powerX(q,2,std(x3+a*x+b));
+      J=std(ideal(xq-x,x3+a*x+b));
+      if(deg(J[1])==0){t=1;}
+      if(pr>=5)
+      {
+         "===================================================================";
+         "the case l=2";
+         "the gcd(x^q-x,x^3+ax+b)=",J[1];
+         pause();
+      }
+      setring R;
+      return(t);
+   }
+   //=== (F1/G1,F2/G2)=[ql](x,y) ==========================================
+   if(ql==1)
+   {
+      F1=x;G1=1;F2=y;G2=1;
+   }
+   else
+   {
+      G1=reduce(generateG(a,b,ql)^2,I);
+      F1=reduce(x*G1-generateG(a,b,ql-1)*generateG(a,b,ql+1),I);
+      G2=reduce(4*y*generateG(a,b,ql)^3,I);
+      F2=reduce(generateG(a,b,ql+2)*generateG(a,b,ql-1)^2
+               -generateG(a,b,ql-2)*generateG(a,b,ql+1)^2,I);
+
+   }
+   if(pr>=5)
+   {
+      "===================================================================";
+      "the point ql*(x,y)=(F1/G1,F2/G2)";
+      "F1=",F1;
+      "G1=",G1;
+      "F2=",F2;
+      "G2=",G2;
+      pause();
+   }
+   //==== the case t=0 :  the equations for (x,y)^(q^2)=-[ql](x,y) ===
+   J[1]=xq2*G1-F1;
+   J[2]=yq2*G2+F2;
+   if(pr>=5)
+   {
+      "===================================================================";
+      "the case t=0 mod l";
+      "the equations for (x,y)^(q^2)=-[ql](x,y) :";
+      J;
+      "the test, if they vanish for all points in C[l]:";
+      reduce(J,I);
+      pause();
+   }
+   //=== test if all points of C[l] satisfy  (x,y)^(q^2)=-[ql](x,y)
+   //=== if so: t mod l =0 is returned
+   if(size(reduce(J,I))==0){setring R;return(0);}
+
+   //==== test for (x,y)^(q^2)=[ql](x,y) for some point
+
+   J=xq2*G1-F1,yq2*G2-F2;
+   J=std(J+I);
+   if(pr>=5)
+   {
+      "===================================================================";
+      "test if (x,y)^(q^2)=[ql](x,y) for one point";
+      "if so, the Frobenius has an eigenvalue 2ql/t: (x,y)^q=(2ql/t)*(x,y)";
+      "it follows that t^2=4q mod l";
+      "if w is one square root of q mod l";
+      "t =2w mod l or -2w mod l ";
+      "-------------------------------------------------------------------";
+      "the equations for (x,y)^(q^2)=[ql](x,y) :";
+      xq2*G1-F1,yq2*G2-F2;
+      "the test if one point satisfies them";
+      J;
+      pause();
+   }
+   if(deg(J[1])>0)
+   {
+      setring R;
+      int w=int(squareRoot(q,l));
+      setring S;
+      //=== +/-2w mod l zurueckgeben, wenn (x,y)^q=+/-[w](x,y)
+      //==== the case t>0 :  (Q1/P1,Q2/P2)=[w](x,y) ==============
+      if(w==1)
+      {
+         Q1=x;P1=1;Q2=y;P2=1;
+      }
+      else
+      {
+         P1=reduce(generateG(a,b,w)^2,I);
+         Q1=reduce(x*G1-generateG(a,b,w-1)*generateG(a,b,w+1),I);
+         P2=reduce(4*y*generateG(a,b,w)^3,I);
+         Q2=reduce(generateG(a,b,w+2)*generateG(a,b,w-1)^2
+               -generateG(a,b,w-2)*generateG(a,b,w+1)^2,I);
+      }
+      J=xq*P1-Q1,yq*P2-Q2;
+      J=std(I+J);
+      if(pr>=5)
+      {
+      "===================================================================";
+      "the Frobenius has an eigenvalue, one of the roots of  w^2=q mod l:";
+      "one root is:";w;
+      "test, if it is the eigenvalue (if not it must be -w):";
+      "the equations for (x,y)^q=w*(x,y)";I;xq*P1-Q1,yq*P2-Q2;
+      "the Groebner basis";
+       J;
+         pause();
+      }
+      if(deg(J[1])>0){return(2*w mod l);}
+      return(-2*w mod l);
+   }
+
+   //==== the case t>0 :  (Q1/P1,Q2/P2)=(x,y)^(q^2)+[ql](x,y) =====
+   P1=reduce(G1*G2^2*(F1-xq2*G1)^2,I);
+   Q1=reduce((F2-yq2*G2)^2*G1^3-F1*G2^2*(F1-xq2*G1)^2-xq2*P1,I);
+   P2=reduce(P1*G2*(F1-xq2*G1),I);
+   Q2=reduce((xq2*P1-Q1)*(F2-yq2*G2)*G1-yq2*P2,I);
+
+   if(pr>=5)
+   {
+      "we are in the general case:";
+      "(x,y)^(q^2)!=ql*(x,y) and (x,y)^(q^2)!=-ql*(x,y) ";
+      "the point (Q1/P1,Q2/P2)=(x,y)^(q^2)+[ql](x,y)";
+      "Q1=",Q1;
+      "P1=",P1;
+      "Q2=",Q2;
+      "P2=",P2;
+      pause();
+   }
+   while(t<(l-1)/2)
+   {
+      t++;
+      //====  (H1/L1,H2/L2)=[t](x,y)^q ===============================
+      if(t==1)
+      {
+         H1=xq;L1=1;
+         H2=yq;L2=1;
+      }
+      else
+      {
+         H1=x*generateG(a,b,t)^2-generateG(a,b,t-1)*generateG(a,b,t+1);
+         H1=subst(H1,x,xq,y,yq);
+         H1=reduce(H1,I);
+         L1=generateG(a,b,t)^2;
+         L1=subst(L1,x,xq,y,yq);
+         L1=reduce(L1,I);
+         H2=generateG(a,b,t+2)*generateG(a,b,t-1)^2
+           -generateG(a,b,t-2)*generateG(a,b,t+1)^2;
+         H2=subst(H2,x,xq,y,yq);
+         H2=reduce(H2,I);
+         L2=4*y*generateG(a,b,t)^3;
+         L2=subst(L2,x,xq,y,yq);
+         L2=reduce(L2,I);
+      }
+      J=Q1*L1-P1*H1,Q2*L2-P2*H2;
+      if(pr>=5)
+      {
+      "we test now the different t, 0<t<=(l-1)/2:";
+      "the point (H1/L1,H2/L2)=[t](x,y)^q :";
+      "H1=",H1;
+      "L1=",L1;
+      "H2=",H2;
+      "L2=",L2;
+      "the equations for (x,y)^(q^2)+[ql](x,y)=[t](x,y)^q :";J;
+      "the test";reduce(J,I);
+      "the test for l-t (the x-cordinate is the same):";
+       Q1*L1-P1*H1,Q2*L2+P2*H2;
+       reduce(ideal(Q1*L1-P1*H1,Q2*L2+P2*H2),I);
+         pause();
+      }
+      if(size(reduce(J,I))==0){setring R;return(t);}
+      J=Q1*L1-P1*H1,Q2*L2+P2*H2;
+      if(size(reduce(J,I))==0){setring R;return(l-t);}
+   }
+   ERROR("something is wrong in testElliptic");
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,z,dp;
+   testElliptic(1267985441,338474977,64740730,3);
+}
+
+//============================================================================
+//================== Factorization and Primality Test ========================
+//============================================================================
+
+//============= Lenstra's ECM Factorization ==================================
+
+proc factorLenstraECM(number N, list S, int B, list #)
+"USAGE:  factorLenstraECM(N,S,B); optional: factorLenstraECM(N,S,B,d);
+         d+1 the number of loops in the algorithm (default d=0)
+ RETURN: a factor of N or the message no factor found
+ NOTE: - computes a factor of N using Lenstra's ECM factorization
+       - the idea is that the fact that N is not prime is dedected using
+         the operations on the elliptic curve
+       - is similarly to Pollard's p-1-factorization
+ EXAMPLE:example factorLenstraECM; shows an example
+"
+{
+   list L,P;
+   number g,M,w;
+   int i,j,k,d;
+   int l=size(S);
+   if(size(#)>0)
+   {
+      d=#[1];
+   }
+
+   while(i<=d)
+   {
+      L=ellipticRandomCurve(N);
+      if(L[3]>1){return(L[3]);} //the discriminant was not invertible
+      P=list(0,L[2],1);
+      j=0;
+      M=1;
+      while(j<l)
+      {
+         j++;
+         w=S[j];
+         if(w>B) break;
+         while(w*S[j]<B)
+         {
+           w=w*S[j];
+         }
+         M=M*w;
+         P=ellipticMult(N,L[1],L[2]^2,P,w);
+         if(size(P)==4){return(P[4]);}  //some inverse did not exsist
+         if(P[3]==0){break;}            //the case M*P=0
+      }
+      i++;
+   }
+   return("no factor found");
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,z,dp;
+   list L=primList(1000);
+   factorLenstraECM(181*32003,L,10,5);
+   number h=10;
+   h=h^30+25;
+   factorLenstraECM(h,L,4,3);
+}
+
+//================= ECPP (Goldwasser-Kilian) a primaly-test =============
+
+proc ECPP(number N)
+"USAGE:  ECPP(N);
+ RETURN: message:N is not prime or {L,P,m,q} as certificate for N being prime
+         L a list (y^2=x^3+L[1]*x+L[2] defines an elliptic curve C)
+         P a list ((P[1]:P[2]:P[3]) is a point of C)
+         m,q integers
+ ASSUME: gcd(N,6)=1
+ NOTE:   The basis of the thest is the following theorem:
+         Given C, an elliptic curve over Z/N, P a point of C(Z/N),
+         m an integer, q a prime with the following properties:
+         - q|m
+         - q>(4-th root(N) +1)^2
+         - m*P=0=(0:1:0)
+         - (m/q)*P=(x:y:z) and z a unit in Z/N
+         Then N is prime.
+ EXAMPLE:example ECPP; shows an example
+"
+{
+   list L,S,P;
+   number m,q;
+   int i;
+
+   number n=intRoot(intRoot(N));
+   n=(n+1)^2;                         //lower bound for q
+   while(1)
+   {
+      L=ellipticRandomCurve(N);       //a random elliptic curve C
+      m=ShanksMestre(N,L[1],L[2],3);  //number of points of the curve C
+      S=PollardRho(m,10000,1);        //factorization of m
+      for(i=1;i<=size(S);i++)         //search for q between the primes
+      {
+         q=S[i];
+         if(n<q){break;}
+      }
+      if(n<q){break;}
+   }
+   number u=m/q;
+   while(1)
+   {
+      P=ellipticRandomPoint(N,L[1],L[2]);  //a random point on C
+      if(ellipticMult(N,L[1],L[2],P,m)[3]!=0){"N is not prime";return(-5);}
+      if(ellipticMult(N,L[1],L[2],P,u)[3]!=0)
+      {
+         L=delete(L,3);
+         return(list(L,P,m,q));
+      }
+   }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,z,dp;
+   number N=1267985441;
+   ECPP(N);
+}
+
+
+/*
+//===============================================================
+//=======  Example for DSA  =====================================
+//===============================================================
+Suppose a file test is given.It contains "Oscar".
+
+//Hash-function MD5 under Linux
+
+md5sum test           8edfe37dae96cfd2466d77d3884d4196
+
+//================================================================
+
+ring R=0,x,dp;
+
+number q=2^19+21;          //524309
+number o=2*3*23*number(7883)*number(16170811);
+
+number p=o*q+1;            //9223372036869000547
+number b=2;
+number g=power(2,o,p);     //8308467587808723131
+
+number a=111111;
+number A=power(g,a,p);     //8566038811843553785
+
+number h =decimal("8edfe37dae96cfd2466d77d3884d4196");
+
+                           //189912871665444375716340628395668619670
+h= h mod q;                //259847
+
+number k=123456;
+
+number ki=exgcd(k,q)[1];    //50804
+                            //inverse von k mod q
+
+number r= power(g,k,p) mod q;    //76646
+
+number s=ki*(h+a*r) mod q;       //2065
+
+//========== signatur is (r,s)=(76646,2065) =====================
+//==================== verification  ============================
+
+number si=exgcd(s,q)[1];  //inverse von s mod q
+number e1=si*h mod q;
+number e2=si*r mod q;
+number rr=((power(g,e1,p)*power(A,e2,p)) mod p) mod q;    //76646
+
+//===============================================================
+//=======  Example for knapsack  ================================
+//===============================================================
+ring R=(5^5,t),x,dp;
+R;
+//   # ground field : 3125
+//   primitive element : t
+//   minpoly        : 1*t^5+4*t^1+2*t^0
+//   number of vars : 1
+//        block   1 : ordering dp
+//                  : names    x
+//        block   2 : ordering C
+
+proc findEx(number n, number g)
+{
+   int i;
+   for(i=0;i<=size(basering)-1;i++)
+   {
+      if(g^i==n){return(i);}
+   }
+}
+
+number g=t^3;                       //choice of the primitive root
+
+findEx(t+1,g);
+//2091
+findEx(t+2,g);
+//2291
+findEx(t+3,g);
+//1043
+
+intvec b=1,2091,2291,1043;          // k=4
+int z=199;
+intvec v=1043+z,1+z,2091+z,2291+z;  //permutation   pi=(0123)
+v;
+1242,200,2290,2490
+
+//(1101)=(e_3,e_2,e_1,e_0)
+//encoding 2490+2290+1242=6022 und 1+1+0+1=3
+
+//(6022,3) decoding: c-z*c'=6022-199*3=5425
+
+ring S=5,x,dp;
+poly F=x5+4x+2;
+poly G=reduce((x^3)^5425,std(F));
+G;
+//x3+x2+x+1
+
+factorize(G);
+//[1]:
+//   _[1]=1
+//   _[2]=x+1
+//   _[3]=x-2
+//   _[4]=x+2
+//[2]:
+//   1,1,1,1
+
+//factors x+1,x+2,x+3, i.e.  (1110)=(e_pi(3),e_pi(2),e_pi(1),e_pi(0))
+
+//pi(0)=1,pi(1)=2,pi(2)=3,pi(3)=0 gives:  (1101)
+
+*/
