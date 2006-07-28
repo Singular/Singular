@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.274 2006-07-27 16:58:02 Singular Exp $
+@comment $Id: reference.doc,v 1.275 2006-07-28 13:00:14 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2785,6 +2785,9 @@ deletes from the first argument all terms of degree bigger than the second argum
   v=[f,1,0];
   module m=v,v,[1,x2,z3,0,1];
   jet(m,2);
+  ring rs=0,x,ds;
+  // 1/(1+x) till degree 5
+  jet(1,1+x,5);
 @c example
 @end smallexample
 @end table
@@ -3294,12 +3297,12 @@ identifier of type package.
   poly f=x+y+z;
   int i=7;
   ideal I=f,x,y;
-  listvar(all);
   listvar();
   listvar(r);
   listvar(t1);
   listvar(proc);
-  listvar(Standard, proc);
+  LIB "poly.lib";
+  listvar(Poly);
 @c example
 @end smallexample
 @end table
@@ -3926,20 +3929,18 @@ package_name can be @code{Current}, @code{Top} or any other
 identifier of type package.
 @item @strong{Example:}
 @smallexample
-@c example error
+@c example
   int i=9;
   ring r;
   poly f;
   package p;
   int p::j;
-  ring p::q;
   poly g;
   setring r;
   list l=names();
   l[1..3];
   names(r);
   names(p);
-  names(p::q);
 @c example
 @end smallexample
 @end table
@@ -5090,6 +5091,10 @@ See
 @*@code{reduce (} module_expression@code{,} module_expression @code{)}
 @*@code{reduce (} module_expression@code{,} module_expression@code{,} int_expression @code{)}
 @*@code{reduce (} module_expression@code{,} matrix_expression@code{,} module_expression @code{)}
+@*@code{reduce (} poly/vector/ideal/module@code{,} ideal/module@code{,} int@code{,} intvec @code{)}
+@*@code{reduce (} ideal@code{,} matrix@code{,} ideal@code{,} int @code{)}
+@*@code{reduce (} poly@code{,} poly@code{,} ideal@code{,} int @code{)}
+@*@code{reduce (} poly@code{,} poly@code{,} ideal@code{,} int@code{,} intvec @code{)}
 @item @strong{Type:}
 the type of the first argument
 @item @strong{Purpose:}
@@ -5100,7 +5105,7 @@ The result may have no meaning if the second argument is not a standard basis.
 @*The third (optional) argument 1 of type int forces a reduction which considers only the leading term and does no tail reduction.
 @*If a second argument @code{u} of type poly or matrix is given, the first argument @code{p} is replaced by @code{p/u}.
 This works only for zero dimensional ideals (resp.@: modules) in the third argument and gives, even in a local ring, a reduced normal form which is the projection to the quotient by the ideal (resp.@: module).
-One may give a degree bound in the fourth argument with respect to a weight vector in the fifth argument in order to make the third argument zero dimensional.
+One may give a degree bound in the fourth argument with respect to a weight vector in the fifth argument in order have a finite computation.
 If some of the weights are zero, the procedure may not terminate!
 @item @strong{Note:}
 The commands @code{reduce} and @code{NF} are synonymous.
@@ -5115,6 +5120,10 @@ The commands @code{reduce} and @code{NF} are synonymous.
   ideal j=std(i);
   reduce(3z3yx2+7y4x2+yx5+z12y2x2,j);
   reduce(3z3yx2+7y4x2+yx5+z12y2x2,j,1);
+  // 4 arguments:
+  ring rs=0,x,ds;
+  // normalform of 1/(1+x) w.r.t. (x3) up to degree 5
+  reduce(poly(1),1+x,ideal(x3),5);
 @c example
 @end smallexample
 @end table
