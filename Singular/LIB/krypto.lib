@@ -1,6 +1,6 @@
 //GP, last modified 28.6.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: krypto.lib,v 1.1 2006-07-28 13:06:22 Singular Exp $";
+version="$Id: krypto.lib,v 1.2 2006-07-31 08:59:16 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY:  krypto.lib     Procedures for teaching cryptography
@@ -64,8 +64,8 @@ LIB "poly.lib";
 
 proc decimal(string s)
 "USAGE:  decimal(s); s = string
- RETURN: the (decimal)number corresponding to the hexadecimal number s
- EXAMPLE:example decimal; shows an example
+RETURN: the (decimal)number corresponding to the hexadecimal number s
+EXAMPLE:example decimal; shows an example
 "
 {
    int n=size(s);
@@ -102,8 +102,8 @@ example
 
 proc exgcdN(number a, number n)
 "USAGE:  exgcdN(a,n);
- RETURN: a list s,t,d of numbers, d=gcd(a,n)=s*a+t*n
- EXAMPLE:example exgcdN; shows an example
+RETURN: a list s,t,d of numbers, d=gcd(a,n)=s*a+t*n
+EXAMPLE:example exgcdN; shows an example
 "
 {
   number x=a mod n;
@@ -119,8 +119,8 @@ example
 
 proc eexgcdN(list L)
 "USAGE:  eexgcdN(L);
- RETURN: list T such that sum_i L[i]*T[i]=T[n+1]=gcd(L[1],...,L[n])
- EXAMPLE:example eexgcdN; shows an example
+RETURN: list T such that sum_i L[i]*T[i]=T[n+1]=gcd(L[1],...,L[n])
+EXAMPLE:example eexgcdN; shows an example
 "
 {
    if(size(L)==2){return(exgcdN(L[1],L[2]));}
@@ -146,8 +146,8 @@ example
 
 proc gcdN(number a, number b)
 "USAGE:  gcdN(a,b);
- RETURN: gcd(a,b)
- EXAMPLE:example gcdN; shows an example
+RETURN: gcd(a,b)
+EXAMPLE:example gcdN; shows an example
 "
 {
    if((a mod b)==0){return(b)}
@@ -161,8 +161,8 @@ example
 
 proc lcmN(number a, number b)
 "USAGE:  lcmN(a,b);
- RETURN: lcm(a,b);
- EXAMPLE:example lcmN; shows an example
+RETURN: lcm(a,b);
+EXAMPLE:example lcmN; shows an example
 "
 {
    number d=gcdN(a,b);
@@ -176,8 +176,8 @@ example
 
 proc powerN(number m, number d, number n)
 "USAGE:  powerN(m,d,n);
- RETURN: m^d mod n
- EXAMPLE:example powerN; shows an example
+RETURN: m^d mod n
+EXAMPLE:example powerN; shows an example
 "
 {
    if(d==0){return(1)}
@@ -196,9 +196,9 @@ example
 
 proc chineseRem(list T,list L)
 "USAGE:  chineseRem(T,L);
- RETURN: x such that x = T[i] mod L[i]
- NOTE:   chinese remainder theorem
- EXAMPLE:example chineseRem; shows an example
+RETURN: x such that x = T[i] mod L[i]
+NOTE:   chinese remainder theorem
+EXAMPLE:example chineseRem; shows an example
 "
 {
    int i;
@@ -230,10 +230,9 @@ example
 
 proc Jacobi(number a, number n)
 "USAGE:  Jacobi(a,n);
- RETURN: the generalized Legendre symbol
- NOTE: if a and n are odd primes then
-       Jacobi(a,n)=0,1,-1 if n|a, a=x^2 mod n,else
- EXAMPLE:example Jacobi; shows an example
+RETURN: the generalized Legendre symbol
+NOTE: if n is an odd prime then Jacobi(a,n)=0,1,-1 if n|a, a=x^2 mod n,else
+EXAMPLE:example Jacobi; shows an example
 "
 {
    int i;
@@ -269,8 +268,8 @@ example
 
 proc primList(int n)
 "USAGE:  primList(n);
- RETURN: the list of all primes <=n
- EXAMPLE:example primList; shows an example
+RETURN: the list of all primes <=n
+EXAMPLE:example primList; shows an example
 "
 {
    int i,j;
@@ -291,13 +290,15 @@ proc primList(int n)
 }
 example
 { "EXAMPLE:"; echo = 2;
-   primList(100);
+   list L=primList(100);
+   size(L);
+   L[size(L)];
 }
 
 proc primL(number q)
 "USAGE:  primL(q);
- RETURN: list of all primes p_1,...,p_r such that q<p_1*...*p_r
- EXAMPLE:example primL; shows an example
+RETURN: list of all primes p_1,...,p_r such that q<p_1*...*p_r
+EXAMPLE:example primL; shows an example
 "
 {
    int i,j;
@@ -331,8 +332,8 @@ example
 
 proc intPart(number x)
 "USAGE:  intPart(x);
- RETURN: the integral part of a rational number
- EXAMPLE:example intPart; shows an example
+RETURN: the integral part of a rational number
+EXAMPLE:example intPart; shows an example
 "
 {
    return((numerator(x)-(numerator(x) mod denominator(x)))/denominator(x));
@@ -345,8 +346,8 @@ example
 
 proc intRoot(number m)
 "USAGE:  intRoot(m);
- RETURN: the integral part of the square root of m
- EXAMPLE:example intRoot; shows an example
+RETURN: the integral part of the square root of m
+EXAMPLE:example intRoot; shows an example
 "
 {
    number x=1;
@@ -377,9 +378,9 @@ example
 
 proc squareRoot(number a, number p)
 "USAGE:  squareRoot(a,p);
- RETURN: the square root of a in Z/p, p prime
- NOTE:   assumes the Jacobi symbol is 1 or p=2.
- EXAMPLE:example squareRoot; shows an example
+RETURN: the square root of a in Z/p, p prime
+NOTE:   assumes the Jacobi symbol is 1 or p=2.
+EXAMPLE:example squareRoot; shows an example
 "
 {
    if(p==2){return(a);}
@@ -441,10 +442,10 @@ example
 
 proc solutionsMod2(matrix M)
 "USAGE:  solutionsMod2(M);
- RETURN: an intmat containing a basis of the vector space of solutions
-         of the linear system of equations defined by M over the prime
-         field of characteristic 2
- EXAMPLE:example solutionsMod2; shows an example
+RETURN: an intmat containing a basis of the vector space of solutions of the
+        linear system of equations defined by M over the prime field of
+        characteristic 2
+EXAMPLE:example solutionsMod2; shows an example
 "
 {
    def R=basering;
@@ -454,7 +455,6 @@ proc solutionsMod2(matrix M)
    setring(R);
    matrix S=imap(Rhelp,S);
    int i,j;
-   //Typ-Konvertierung. Die Loesungsmenge von number zu int
    intmat v[nrows(S)][ncols(S)];
    for(i=1;i<=nrows(S);i++)
    {
@@ -474,9 +474,9 @@ example
 
 proc powerX(int q, int i, ideal I)
 "USAGE:  powerX(q,i,I);
- RETURN: the q-th power of the i-th variable modulo I
+RETURN: the q-th power of the i-th variable modulo I
  ASSUME: I is a standard basis
- EXAMPLE:example powerX; shows an example
+EXAMPLE:example powerX; shows an example
 "
 {
    if(q<=181){return(reduce(var(i)^int(q),I));}
@@ -500,9 +500,9 @@ example
 
 proc babyGiant(number b, number y, number p)
 "USAGE:  babyGiant(b,y,p);
- RETURN: the discrete logarithm x: b^x=y mod p
- NOTE:   giant-step-baby-step
- EXAMPLE:example babyGiant; shows an example
+RETURN: the discrete logarithm x: b^x=y mod p
+NOTE:   giant-step-baby-step
+EXAMPLE:example babyGiant; shows an example
 "
 {
    int i,j,m;
@@ -549,15 +549,14 @@ example
 
 proc rho(number b, number y, number p)
 "USAGE:  rho(b,y,p);
- RETURN: the discrete logarithm x=log_b(y): b^x=y mod p
- NOTE: Pollard's rho:
-       choose random f_0 in 0,...,p-2 ,e_0=0, define x_0=b^f_0.
-       define x_i=y^e_ib^f_i as below. For i large enough there is i
-       with x_(i/2)=x_i.
-       s:=e_(i/2)-e_i mod p-1 and t:=f_i-f_(i/2) mod p-1,
-       d=gcd(s,p-1)=u*s+v*(p-1) then x=tu/d +j*(p-1)/d
-       for some j (to be found by trying)
- EXAMPLE:example rho; shows an example
+RETURN: the discrete logarithm x=log_b(y): b^x=y mod p
+NOTE: Pollard's rho:
+       choose random f_0 in 0,...,p-2 ,e_0=0, define x_0=b^f_0, define
+       x_i=y^e_ib^f_i as below. For i large enough there is i with
+       x_(i/2)=x_i. Let s:=e_(i/2)-e_i mod p-1 and t:=f_i-f_(i/2) mod p-1,
+       d=gcd(s,p-1)=u*s+v*(p-1) then x=tu/d +j*(p-1)/d for some j (to be
+       found by trying)
+EXAMPLE:example rho; shows an example
 "
 {
    int i=1;
@@ -639,11 +638,11 @@ example
 
 proc MillerRabin(number n, int k)
 "USAGE:  MillerRabin(n,k);
- RETURN: 1 if n is prime, 0 else
- NOTE: probabilistic test of Miller-Rabin with k loops if n is prime
-       using the theorem:If n is prime, n-1=2^s*r, r odd, then
+RETURN: 1 if n is prime, 0 else
+NOTE: probabilistic test of Miller-Rabin with k loops to test if n is prime.
+       Using the theorem:If n is prime, n-1=2^s*r, r odd, then
        powerN(a,r,n)=1 or powerN(a,r*2^i,n)=-1 for some i
- EXAMPLE:example MillerRabin; shows an example
+EXAMPLE:example MillerRabin; shows an example
 "
 {
    if(n<0){n=-n;}
@@ -691,11 +690,11 @@ example
 
 proc SolowayStrassen(number n, int k)
 "USAGE:  SolowayStrassen(n,k);
- RETURN: 1 if n is prime, 0 else
- NOTE: probabilistic test of Soloway-Strassen with k loops if n is
+RETURN: 1 if n is prime, 0 else
+NOTE: probabilistic test of Soloway-Strassen with k loops to test if n is
        prime using the theorem:
        If n is prime then powerN(a,(n-1)/2,n)=Jacobi(a,n) mod n
- EXAMPLE:example SolowayStrassen; shows an example
+EXAMPLE:example SolowayStrassen; shows an example
 "
 {
    if(n<0){n=-n;}
@@ -737,12 +736,12 @@ SolowayStrassen(n,3);
 proc PocklingtonLehmer(number N, list #)
 "USAGE: PocklingtonLehmer(N); optional: PocklingtonLehmer(N,L);
         L a list of the first k primes
- RETURN:N is not prime or {A,{p},{a_p}} as certificate for N being prime
- NOTE:assumes that it is possible to factorize N-1=A*B such that gcd(A,B)=1
+RETURN:message N is not prime or {A,{p},{a_p}} as certificate for N being prime
+NOTE:assumes that it is possible to factorize N-1=A*B such that gcd(A,B)=1
       the factorization of A is completely known and A^2>N .
       N is prime if and only if for each prime factor p of A we can find
       a_p such that a_p^(N-1)=1 mod N and gcd(a_p^((N-1)/p)-1,N)=1
- EXAMPLE:example PocklingtonLehmer; shows an example
+EXAMPLE:example PocklingtonLehmer; shows an example
 "
 {
    number m=intRoot(N);
@@ -822,15 +821,15 @@ example
 proc PollardRho(number n, int k, int allFactors, list #)
 "USAGE:  PollardRho(n,k,allFactors); optional: PollardRho(n,k,allFactors,L);
          L a list of the first k primes
- RETURN: a list of factors of n (which could be just n),if allFactors=0
-         a list of all factors of n ,if allFactors=1
- NOTE: probabilistic rho-algorithm of Pollard to find a factor of n in k loops
-       creates a sequence x_i such that (x_i)^2=(x_2i)^2 mod n for some i
-       computes gcd(x_i-x_2i,n) to find a divisor
-       To define the sequence choose x,a and define x_n+1=x_n^2+a mod n, x_1=x
-       If allFactors is 1, it tries to find recursively all prime factors
-       using the Soloway-Strassen test.
- EXAMPLE:example PollardRho; shows an example
+RETURN: a list of factors of n (which could be just n),if allFactors=0
+        a list of all factors of n ,if allFactors=1
+NOTE: probabilistic rho-algorithm of Pollard to find a factor of n in k loops.
+      Creates a sequence x_i such that (x_i)^2=(x_2i)^2 mod n for some i,
+      computes gcd(x_i-x_2i,n) to find a divisor. To define the sequence
+      choose x,a and define x_n+1=x_n^2+a mod n, x_1=x.
+      If allFactors is 1, it tries to find recursively all prime factors
+      using the Soloway-Strassen test.
+EXAMPLE:example PollardRho; shows an example
 "
 {
     int i,j;
@@ -922,12 +921,12 @@ example
 //======================== Pollards p-factorization ================
 proc pFactor(number n,int B, list P)
 "USAGE:  pFactor(n,B.P); n to be factorized, B a bound , P a list of primes
- RETURN: a list of factors of n or the message: no factor found
- NOTE: Pollard's p-factorization
+RETURN: a list of factors of n or the message: no factor found
+NOTE: Pollard's p-factorization
        creates the product k of powers of primes (bounded by B)  from
        the list P with the idea that for a prime divisor p of n p-1|k
        then p devides gcd(a^k-1,n) for some random a
- EXAMPLE:example pFactor; shows an example
+EXAMPLE:example pFactor; shows an example
 "
 {
    int i;
@@ -962,13 +961,13 @@ example
 //==================== quadratic sieve ==============================
 
 proc quadraticSieve(number n, int c, list B, int k)
-"USAGE:  quadraticSieve(n,c,B,k); n to be factorized, {-c,c] the
+"USAGE:  quadraticSieve(n,c,B,k); n to be factorized, [-c,c] the
          sieve-intervall, B a list of primes,
          k for using the first k elements in B
- RETURN: a list of factors of n or the message: no divisor found
- NOTE: quadraticSieve: Idea is to find x,y such that x^2=y^2 mod n
-                       gcd(x-y,n) can be a proper divisor of n
- EXAMPLE:example quadraticSieve; shows an example
+RETURN: a list of factors of n or the message: no divisor found
+NOTE: quadraticSieve: Idea is to find x,y such that x^2=y^2 mod n then
+      gcd(x-y,n) can be a proper divisor of n
+EXAMPLE:example quadraticSieve; shows an example
 "
 {
    number f,d;
@@ -1102,10 +1101,10 @@ example
 
 proc isOnCurve(number N, number a, number b, list P)
 "USAGE:  isOnCurve(N,a,b,P);
- RETURN: 1 or 0 (depending on whether P is on the curve or not)
- NOTE: checks whether P=(P[1]:P[2]:P[3]) is a point on the elliptic
-       curve defined by y^2z=x^3+a*xz^2+b*z^3  over Z/N
- EXAMPLE:example isOnCurve; shows an example
+RETURN: 1 or 0 (depending on whether P is on the curve or not)
+NOTE: checks whether P=(P[1]:P[2]:P[3]) is a point on the elliptic
+      curve defined by y^2z=x^3+a*xz^2+b*z^3  over Z/N
+EXAMPLE:example isOnCurve; shows an example
 "
 {
    if(((P[2]^2*P[3]-P[1]^3-a*P[1]*P[3]^2-b*P[3]^3) mod N)!=0){return(0);}
@@ -1119,10 +1118,10 @@ example
 
 proc ellipticAdd(number N, number a, number b, list P, list Q)
 "USAGE:  ellipticAdd(N,a,b,P,Q);
- RETURN: list L, representing the point P+Q
- NOTE: P=(P[1]:P[2]:P[3]),Q =(Q[1]:Q[2]:Q[3])points on the
-       elliptic curve defined by y^2z=x^3+a*xz^2+b*z^3  over Z/N
- EXAMPLE:example ellipticAdd; shows an example
+RETURN: list L, representing the point P+Q
+NOTE: P=(P[1]:P[2]:P[3]),Q =(Q[1]:Q[2]:Q[3])points on the elliptic curve
+      defined by y^2z=x^3+a*xz^2+b*z^3  over Z/N
+EXAMPLE:example ellipticAdd; shows an example
 "
 {
    if(N==2){ERROR("not implemented for 2");}
@@ -1220,10 +1219,10 @@ example
 
 proc ellipticMult(number N, number a, number b, list P, number k)
 "USAGE:  ellipticMult(N,a,b,P,k);
- RETURN: a list L representing the point k*P
- NOTE:  P=(P[1]:P[2]:P[3]) a point on the elliptic curve
-        defined by y^2z=x^3+a*xz^2+b*z^3  over Z/N
- EXAMPLE:example ellipticMult; shows an example
+RETURN: a list L representing the point k*P
+NOTE:  P=(P[1]:P[2]:P[3]) a point on the elliptic curve defined by
+       y^2z=x^3+a*xz^2+b*z^3  over Z/N
+EXAMPLE:example ellipticMult; shows an example
 "
 {
    if(P[3]==0){return(P);}
@@ -1271,9 +1270,9 @@ example
 
 proc ellipticRandomCurve(number N)
 "USAGE:  ellipticRandomCurve(N);
- RETURN: a list of two random numbers a,b and 4a^3+27b^2 mod N
- NOTE:   y^2z=x^3+a*xz^2+b^2*z^3 defines an elliptic curve over Z/N
- EXAMPLE:example ellipticRandomCurve; shows an example
+RETURN: a list of two random numbers a,b and 4a^3+27b^2 mod N
+NOTE:   y^2z=x^3+a*xz^2+b^2*z^3 defines an elliptic curve over Z/N
+EXAMPLE:example ellipticRandomCurve; shows an example
 "
 {
    int k;
@@ -1297,9 +1296,9 @@ example
 
 proc ellipticRandomPoint(number N, number a, number b)
 "USAGE:  ellipticRandomPoint(N,a,b);
- RETURN: a list representing  a random point (x:y:z) of the elliptic curve
-         defined by y^2z=x^3+a*xz^2+b*z^3  over Z/N
- EXAMPLE:example ellipticRandomPoint; shows an example
+RETURN: a list representing  a random point (x:y:z) of the elliptic curve
+        defined by y^2z=x^3+a*xz^2+b*z^3  over Z/N
+EXAMPLE:example ellipticRandomPoint; shows an example
 "
 {
    number x=random(1,2147483647) mod N;
@@ -1339,10 +1338,10 @@ example
 //==================   the trivial approaches  =======================
 proc countPoints(number N, number a, number b)
 "USAGE:  countPoints(N,a,b);
- RETURN: the number of points of the elliptic curve defined by
-         y^2=x^3+a*x+b  over Z/N
- NOTE: trivial aproach
- EXAMPLE:example countPoints; shows an example
+RETURN: the number of points of the elliptic curve defined by
+        y^2=x^3+a*x+b  over Z/N
+NOTE: trivial aproach
+EXAMPLE:example countPoints; shows an example
 "
 {
   number x;
@@ -1362,10 +1361,9 @@ example
 
 proc ellipticAllPoints(number N, number a, number b)
 "USAGE:  ellipticAllPoints(N,a,b);
- RETURN: list of points (x:y:z) of the elliptic curve
-         defined by y^2z=x^3+a*xz^2+b*z^3  over Z/N
- NOTE:
- EXAMPLE:example ellipticAllPoints; shows an example
+RETURN: list of points (x:y:z) of the elliptic curve defined by
+        y^2z=x^3+a*xz^2+b*z^3  over Z/N
+EXAMPLE:example ellipticAllPoints; shows an example
 "
 {
    list resu,point;
@@ -1404,18 +1402,20 @@ proc ellipticAllPoints(number N, number a, number b)
 example
 { "EXAMPLE:"; echo = 2;
    ring R = 0,z,dp;
-   ellipticAllPoints(181,71,150);
+   list L=ellipticAllPoints(181,71,150);
+   size(L);
+   L[size(L)];
 }
 
 //================ the algorithm of Shanks and Mestre =================
 
 proc ShanksMestre(number q, number a, number b, list #)
-"USAGE:  ShanksMestre(q,a,b); optional:ShanksMestre(q,a,b,s);
-         s the number of loops in the algorithm (default s=1)
- RETURN: the number of points of the elliptic curve defined by
+"USAGE:  ShanksMestre(q,a,b); optional:ShanksMestre(q,a,b,s); s the number
+         of loops in the algorithm (default s=1)
+RETURN: the number of points of the elliptic curve defined by
          y^2=x^3+a*x+b  over Z/N
- NOTE: algorithm of Shanks and Mestre (giant-step-baby-step)
- EXAMPLE:example ShanksMestre; shows an example
+NOTE: algorithm of Shanks and Mestre (giant-step-baby-step)
+EXAMPLE:example ShanksMestre; shows an example
 "
 {
    number n=intRoot(4*q);
@@ -1507,10 +1507,10 @@ example
 
 proc Schoof(number N,number a, number b)
 "USAGE:  Schoof(N,a,b);
- RETURN: the number of points of the elliptic curve
-         defined by y^2=x^3+a*x+b  over Z/N
- NOTE:  algorithm of Schoof
- EXAMPLE:example Schoof; shows an example
+RETURN: the number of points of the elliptic curve defined by
+        y^2=x^3+a*x+b  over Z/N
+NOTE:  algorithm of Schoof
+EXAMPLE:example Schoof; shows an example
 "
 {
    int pr=printlevel;
@@ -1564,15 +1564,13 @@ Schoof(2147483629,17,3567);
 
 proc generateG(number a,number b, int m)
 "USAGE:  generateG(a,b,m);
- RETURN: m-th division polynomial
- NOTE: generate the recursively defined polynomials in Z[x,y],
-       so called division polynomials, p_m=generateG(a,b,m) such
-       that on the elliptic curve defined by y^2=x^3+a*x+b  over Z/N
-       and a point P=(x:y:1) the point m*P is
-       (x-(p_(m-1)*p_(m+1))/p_m^2
-       : (p_(m+2)*p_(m-1)^2-p_(m-2)*p_(m+1)^2)/4y*p_m^3 :1)
-       m*P=0  iff p_m(P)=0
- EXAMPLE:example generateG; shows an example
+RETURN: m-th division polynomial
+NOTE: generate the recursively defined polynomials in Z[x,y],so called
+ division polynomials, p_m=generateG(a,b,m) such that on the elliptic curve
+ defined by y^2=x^3+a*x+b  over Z/N and a point P=(x:y:1) the point m*P is
+ (x-(p_(m-1)*p_(m+1))/p_m^2 :(p_(m+2)*p_(m-1)^2-p_(m-2)*p_(m+1)^2)/4y*p_m^3 :1)
+ m*P=0  iff p_m(P)=0
+EXAMPLE:example generateG; shows an example
 "
 {
    poly f;
@@ -1606,14 +1604,13 @@ example
 
 proc testElliptic(int q,number a,number b,int l)
 "USAGE:  testElliptic(q,a,b,l);
- RETURN: an integer t, the trace of the Frobenius
- NOTE: the kernel for the Schoof algorithm: looks for the t
-       such that for all points (x:y:1) in C[l]={P in C | l*P=0},
-       C the elliptic curve defined by y^2=x^3+a*x+b  over Z/q
-       with group structure induced by 0=(0:1:0),
-       (x:y:1)^(q^2)-t*(x:y:1)^q -ql*(x:y:1)=(0:1:0), ql= q mod l,
-       trace of Frobenius.
- EXAMPLE:example testElliptic; shows an example
+RETURN: an integer t, the trace of the Frobenius
+NOTE: the kernel for the Schoof algorithm: looks for the t such that for all
+      points (x:y:1) in C[l]={P in C | l*P=0},C the elliptic curve defined by
+      y^2=x^3+a*x+b  over Z/q with group structure induced by 0=(0:1:0),
+      (x:y:1)^(q^2)-t*(x:y:1)^q -ql*(x:y:1)=(0:1:0), ql= q mod l, trace of
+      Frobenius.
+EXAMPLE:example testElliptic; shows an example
 "
 {
    int pr=printlevel;
@@ -1838,12 +1835,12 @@ example
 proc factorLenstraECM(number N, list S, int B, list #)
 "USAGE:  factorLenstraECM(N,S,B); optional: factorLenstraECM(N,S,B,d);
          d+1 the number of loops in the algorithm (default d=0)
- RETURN: a factor of N or the message no factor found
- NOTE: - computes a factor of N using Lenstra's ECM factorization
-       - the idea is that the fact that N is not prime is dedected using
-         the operations on the elliptic curve
-       - is similarly to Pollard's p-1-factorization
- EXAMPLE:example factorLenstraECM; shows an example
+RETURN: a factor of N or the message no factor found
+NOTE: - computes a factor of N using Lenstra's ECM factorization
+      - the idea is that the fact that N is not prime is dedected using
+        the operations on the elliptic curve
+      - is similarly to Pollard's p-1-factorization
+EXAMPLE:example factorLenstraECM; shows an example
 "
 {
    list L,P;
@@ -1894,12 +1891,12 @@ example
 
 proc ECPP(number N)
 "USAGE:  ECPP(N);
- RETURN: message:N is not prime or {L,P,m,q} as certificate for N being prime
+RETURN: message:N is not prime or {L,P,m,q} as certificate for N being prime
          L a list (y^2=x^3+L[1]*x+L[2] defines an elliptic curve C)
          P a list ((P[1]:P[2]:P[3]) is a point of C)
          m,q integers
- ASSUME: gcd(N,6)=1
- NOTE:   The basis of the thest is the following theorem:
+ASSUME: gcd(N,6)=1
+NOTE:   The basis of the the algorithm is the following theorem:
          Given C, an elliptic curve over Z/N, P a point of C(Z/N),
          m an integer, q a prime with the following properties:
          - q|m
@@ -1907,7 +1904,7 @@ proc ECPP(number N)
          - m*P=0=(0:1:0)
          - (m/q)*P=(x:y:z) and z a unit in Z/N
          Then N is prime.
- EXAMPLE:example ECPP; shows an example
+EXAMPLE:example ECPP; shows an example
 "
 {
    list L,S,P;
