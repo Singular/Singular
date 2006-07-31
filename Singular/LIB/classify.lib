@@ -1,6 +1,6 @@
 // KK,GMG last modified: 17.12.00
 ///////////////////////////////////////////////////////////////////////////////
-version  = "$Id: classify.lib,v 1.52 2005-10-11 15:58:21 Singular Exp $";
+version  = "$Id: classify.lib,v 1.53 2006-07-31 09:11:10 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  classify.lib  Arnold Classifier of Singularities
@@ -21,10 +21,10 @@ PROCEDURES:
  morsesplit(f);      residual part of f after applying the splitting lemma
  quickclass(f)       normal form of f determined by invariants (milnorcode)
  singularity(s,[]);  normal form of singularity given by its name s and index
- swap(a,b);          returns b,a
- A_L(s/f)            shortcut for quickclass(f) or normalform(s)
+ A_L(s/f);           shortcut for quickclass(f) or normalform(s)
  normalform(s);      normal form of singularity given by its name s
- debug_log(lev,[])   print trace and debugging information w.r.t level>@DeBug
+ debug_log(lev,[]);  print trace and debugging information w.r.t level>@DeBug
+ swap(a,b);          swaps the arguments
            (parameters in square brackets [] are optional)
 ";
 
@@ -67,7 +67,7 @@ REMARK:   This version of classify is only beta. Please send bugs and
 NOTE:     type init_debug(n); (0 <= n <= 10) in order to get intermediate
           information, higher values of n give more information.
           The proc creates several global objects with names all starting
-          with @, hence there should be no name conflicts
+          with @, hence there should be no name conflicts.
 EXAMPLE:  example classify; shows an example"
 {
 //---------------------------- initialisation ---------------------------------
@@ -2835,7 +2835,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc swap
 "USAGE:    swap(a,b);
-RETURN:   b,a if b,a is the input (any type)"
+RETURN:   b,a if a,b is the input (any type)"
 {
   return(#[2],#[1]);
 }

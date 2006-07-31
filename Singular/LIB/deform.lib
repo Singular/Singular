@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.36 2006-05-11 16:21:15 Singular Exp $
+// $Id: deform.lib,v 1.37 2006-07-31 09:11:10 Singular Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.36 2006-05-11 16:21:15 Singular Exp $";
+version="$Id: deform.lib,v 1.37 2006-07-31 09:11:10 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  deform.lib    Miniversal Deformation of Singularities and Modules
@@ -304,7 +304,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc mod_versal(matrix Mo, ideal I, list #)
-"USAGE:   mod_versal(Mo,I[,d,any]); I=ideal, M=module, d=int, any =list
+"USAGE:   mod_versal(Mo,Io[,d,any]); Io=ideal, Mo=module, d=int, any =list
 COMPUTE: miniversal deformation of coker(Mo) over Qo=Po/Io, Po=basering;
 RETURN:  list L of 4 rings:
          L[1] extending the basering Po by new variables given by
