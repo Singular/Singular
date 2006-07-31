@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_download.texi,v 1.12 2006-07-27 09:56:09 Singular Exp $
+@comment $Id: README_download.texi,v 1.13 2006-07-31 10:15:57 Singular Exp $
 @c FILE: README_download.texi
 @c PURPOSE: downloading instructions, to be includeded in manual and README_ftp
 @c
@@ -71,11 +71,6 @@ Unpack the archives:
 @smallexample
 gzip -dc Singular-@value{VERSION}-<uname>.tar.gz | tar -pxf -
 gzip -dc Singular-@value{VERSION}-share.tar.gz | tar -pxf -
-@end smallexample
-If you have downloaded @code{Singular-@value{VERSION}-share.zip},
-unpack with 
-@smallexample
-unzip -u Singular-@value{VERSION}-share.zip
 @end smallexample
 
 @item 
