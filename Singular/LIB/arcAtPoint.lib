@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: arcAtPoint.lib,v 1.2 2006-07-18 15:48:10 Singular Exp $";
+version="$Id: arcAtPoint.lib,v 1.3 2006-07-31 12:15:57 Singular Exp $";
 //-*- mode:C++;-*-
 
 category="Singularities";
@@ -73,7 +73,7 @@ CREATE:  allsteps:
          obtained from sequences of length bound+1
 @end format
 RETURN:  ring, original basering with additional
-         variables t and coeffiecients up to t^<bound>
+         variables t and coefficients up to t^<bound>
 EXAMPLE: example nashmult; shows an example"
 
 {
@@ -413,8 +413,8 @@ example
 
 //////////////////////////////////////////////////////////////////////
 proc idealsimplify (ideal I, int maxiter)
-"USAGE:   idealsimplify(I); I ideal
-ASSUME:  procedure is stable for sufficiently large maxiter
+"USAGE:   idealsimplify(I,m); I ideal, m int
+ASSUME:  procedure is stable for sufficiently large m
 RETURN:  ideal defining the same zeroset as I: replace   generators
          of I by the generator modulo other generating elements
 EXAMPLE: example idealsimplify; shows an example "
