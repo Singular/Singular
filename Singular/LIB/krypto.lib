@@ -1,6 +1,6 @@
 //GP, last modified 28.6.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: krypto.lib,v 1.2 2006-07-31 08:59:16 Singular Exp $";
+version="$Id: krypto.lib,v 1.3 2006-08-01 07:40:06 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY:  krypto.lib     Procedures for teaching cryptography
@@ -475,7 +475,7 @@ example
 proc powerX(int q, int i, ideal I)
 "USAGE:  powerX(q,i,I);
 RETURN: the q-th power of the i-th variable modulo I
- ASSUME: I is a standard basis
+ASSUME: I is a standard basis
 EXAMPLE:example powerX; shows an example
 "
 {
