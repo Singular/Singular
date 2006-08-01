@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.275 2006-07-28 13:00:14 Singular Exp $
+@comment $Id: reference.doc,v 1.276 2006-08-01 08:26:15 pohl Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5332,6 +5332,8 @@ parameters specifying the ordering and the size of the block ( intvec : typicall
 @item
 the quotient ideal.
 @end enumerate
+The list defines the ring by the command @code{ring} and modifying the list
+modifies the ring ( see the following example ).
 @item @strong{Example:}
 @smallexample
 @c example
@@ -5374,7 +5376,7 @@ See
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-returns the number of the variable if the name is a ring variable of the
+returns the number of the variable if the name/poly is a ring variable of the
 basering or if the string is the name of a ring variable of the
 basering; returns 0 if not. Hence the return value of @code{rvar} can
 also be used in a boolean context to check whether the variable exists.
@@ -5447,7 +5449,7 @@ int_expression@code{)}
 list
 @item @strong{Purpose:}
 perform the simplex algorithm for the tableau given by the input, e.g.
-M,m,n,m1,m2,m3:
+@code{simplex (}M, m, n, m1, m2, m3 @code{)}:
 
 @table @asis
 @item  M matrix of numbers :
@@ -7504,13 +7506,16 @@ and its multiplicity (@code{mult}) is lower than @code{multBound}.
 @*Reset this bound by setting @code{multBound} to 0.
 @item @strong{Example:}
 @smallexample
-multBound = 20;
-option();
-@expansion{}    //options for 'std'-command: multBound
-ideal j=std(i);
-multBound;
-@expansion{} 20
-multBound = 0;  //disables multBound
+ring r=0,(x,y,z),ds;
+ideal i,j;
+i=x7+y7+z6,x6+y8+z7,x7+y5+z8,
+x2y3+y2z3+x3z2,x3y2+y3z2+x2z3;
+multBound=100;
+j=std(i);
+degree(j);
+multBound=0;  //disables multBound
+j=std(i);
+degree(j);
 @end smallexample
 @end table
 @c ref
