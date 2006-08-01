@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.206 2006-07-27 16:58:01 Singular Exp $
+@comment $Id: general.doc,v 1.207 2006-08-01 16:24:17 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -2389,9 +2389,15 @@ polynomials.  Example: @code{s[3]}, @code{m[1,3]}, @code{i[1..3]},
 @item @code{+}
 @cindex +
 addition operator
+@item @code{++}
+@cindex ++
+increment operator
 @item @code{-}
 @cindex -
 subtraction operator
+@item @code{--}
+@cindex --
+decrement operator
 @item @code{*}
 @cindex *
 multiplication operator
@@ -2401,7 +2407,7 @@ division  operator.  @xref{Miscellaneous oddities}, for the difference
 between the division operators @code{/} and @code{div}.
 @item @code{%}
 @cindex %
-modulo operator
+modulo operator (@code{mod} is an alias to @code{%})
 @item @code{^} or @code{**}
 @cindex ^
 @cindex **
