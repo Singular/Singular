@@ -1,4 +1,5 @@
 ;; Test which should pass shifted exponents
+alexpoly
 algebralib
 allres_s
 barei_s
