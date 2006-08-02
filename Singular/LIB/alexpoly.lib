@@ -1,4 +1,4 @@
-version="$Id: alexpoly.lib,v 1.11 2005-05-06 17:17:01 Singular Exp $";
+version="$Id: alexpoly.lib,v 1.12 2006-08-02 09:20:50 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  alexpoly.lib   Resolution Graph and Alexander Polynomial
@@ -31,6 +31,7 @@ KEYWORDS: Hamburger-Noether expansion; Puiseux expansion; curve singularities;
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 LIB "hnoether.lib";
+LIB "equising.lib";
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 proc resolutiongraph (def INPUT,list #)
@@ -53,7 +54,7 @@ NOTE:    In case the Hamburger-Noether expansion of the curve f is needed
          @*
          If you are not sure whether the INPUT polynomial is reduced or not, use
          @code{squarefree(INPUT)} as input instead.
-SEE ALSO: develop, hnexpansion, totalmultiplicities, alexanderpolyinomal
+SEE ALSO: develop, hnexpansion, totalmultiplicities, alexanderpolynomial
 EXAMPLE: example resolutiongraph;  shows an example
 "
 {
@@ -1422,7 +1423,7 @@ NOTE:    The equisingular Tjurina number is calculated with the aid of a Hamburg
          @*
          If you are not sure whether the INPUT polynomial is reduced or not, use
          @code{squarefree(INPUT)} as input instead.
-SEE ALSO: tau_es, develop, hnexpansion, totalmultiplicities, equising.lib
+SEE ALSO: tau_es, develop, hnexpansion, totalmultiplicities, equising_lib
 EXAMPLE: example tau_es2;  shows an example
 "
 {
