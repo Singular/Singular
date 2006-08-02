@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: resolve.lib,v 1.6 2006-07-25 17:54:28 Singular Exp $";
+version="$Id: resolve.lib,v 1.7 2006-08-02 09:24:56 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  resolve.lib      Resolution of singularities (Desingularization)
@@ -100,15 +100,24 @@ example
 
 proc blowUp(ideal J,ideal C,list #)
 "USAGE:  blowUp(J,C[,W][,E]);
-@*       J,C,W = ideals
-@*       E     = list
+         W,J,C = ideals,
+         E     = list
 ASSUME:  J  = ideal containing W ( W = 0 if not specified)
 @*       C  = ideal containing J
 @*       E  = list of smooth hypersurfaces (e.g. exceptional divisors)
-COMPUTE: the blowing up of W in C, the exceptional locus, the strict transform
-@*       of J
-RETURN:  list of size at most size(C),
-         l[i] is a ring containing a basic object BO:
+NOTE:    W the ideal of the ambient space, C the ideal of the center of
+         the blowup and J the ideal of the variety
+COMPUTE: the blowing up of W in C, the exceptional locus, the strict
+         transform of J and the blowup map
+RETURN:  list, say l, of size at most size(C),
+         l[i] is the affine ring corresponding to the i-th chart
+         each l[i] contains the ideals
+         - aS, ideal of the blownup ambient space
+         - sT, ideal of the strict transform
+         - eD, ideal of the exceptional divisor
+         - bM, ideal corresponding to the blowup map
+@*       -------------------------------------------------------------------
+         l[i] contains also a list BO (basic object for the experts):
          BO[1] an ideal, say Wi, defining the ambient space of the i-th chart
                of the blowing up
          BO[2] an ideal defining the strict transform
@@ -130,6 +139,7 @@ RETURN:  list of size at most size(C),
 EXAMPLE: example blowUp;  shows an example
 "
 {
+  def S=basering;
   ideal W;
   list E;
   ideal abb=maxideal(1);
@@ -164,6 +174,25 @@ EXAMPLE: example blowUp;  shows an example
   export locaT;
   list blow=blowUpBO(BO,C,0);
   kill locaT;
+  int i;
+  for(i=1;i<=size(blow);i++)
+  {
+     def Q=blow[i];
+     setring Q;
+     ideal aS=BO[1];
+     ideal sT=BO[2];
+     ideal eD=BO[4][size(BO[4])];
+     ideal bM=BO[5];
+     kill lastMap;
+     kill thisChart;
+     export(aS);
+     export(sT);
+     export(eD);
+     export(bM);
+     blow[i]=Q;
+     setring S;
+     kill Q;
+  }
   return(blow);
 }
 example
@@ -175,7 +204,10 @@ example
    list blow=blowUp(J,C);
    def Q=blow[1];
    setring Q;
-   BO;
+   aS;
+   sT;
+   eD;
+   bM;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
