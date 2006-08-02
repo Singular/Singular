@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.60 2006-07-24 09:12:09 Singular Exp $
+@comment $Id: NEWS.texi,v 1.61 2006-08-02 15:51:31 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -49,6 +49,8 @@ experimental: new type @nref{bigint}
 @c experimental: @code{python} / @code{ipython} interface
 @item
 more architectures: Solaris on x86/opteron, ...
+@item
+build process improved: builds automatically without patches on 64bit architectures
 @end itemize
 
 @heading NEWS in version 3-0-1
