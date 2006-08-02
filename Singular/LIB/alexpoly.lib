@@ -1,4 +1,4 @@
-version="$Id: alexpoly.lib,v 1.12 2006-08-02 09:20:50 Singular Exp $";
+version="$Id: alexpoly.lib,v 1.13 2006-08-02 10:05:56 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  alexpoly.lib   Resolution Graph and Alexander Polynomial
@@ -1478,7 +1478,9 @@ EXAMPLE: example tau_es2;  shows an example
       // Otherwise call the procedure with the output of totalmultiplicities(INPUT,"tau").
       else
       {
-        return(tau_es(totalmultiplicities(INPUT,"tau")));
+        graphs=list(INPUT[1]);
+        multipl=list(INPUT[2]);
+        contact=list(INPUT[3]);
       }
     }
     else
