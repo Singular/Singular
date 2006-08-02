@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: resolve.lib,v 1.7 2006-08-02 09:24:56 Singular Exp $";
+version="$Id: resolve.lib,v 1.8 2006-08-02 11:06:11 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  resolve.lib      Resolution of singularities (Desingularization)
@@ -116,7 +116,7 @@ RETURN:  list, say l, of size at most size(C),
          - sT, ideal of the strict transform
          - eD, ideal of the exceptional divisor
          - bM, ideal corresponding to the blowup map
-@*       -------------------------------------------------------------------
+@*       -------------------------------------------------------------------@*
          l[i] contains also a list BO (basic object for the experts):
          BO[1] an ideal, say Wi, defining the ambient space of the i-th chart
                of the blowing up
