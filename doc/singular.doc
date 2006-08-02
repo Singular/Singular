@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.146 2006-07-28 13:08:23 Singular Exp $
+@comment $Id: singular.doc,v 1.147 2006-08-02 10:25:24 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -400,6 +400,7 @@ LIB "all.lib";
 @cindex Singularities
 
 @menu
+* alexpoly_lib:: resolution graph and Alexander polynomial
 * arcAtPoint_lib:: truncations of arcs at a singular point
 * classify_lib:: procedures for the Arnold-classifier of singularities
 * deform_lib:: procedures for computing miniversal deformation
@@ -415,7 +416,11 @@ LIB "all.lib";
 @end menu
 
 @c ---------------------------------------------------------
-@node arcAtPoint_lib, classify_lib, Singularities, Singularities
+@node alexpoly_lib, arcAtPoint_lib, Singularities, Singularities
+@subsection alexpoly_lib
+@c lib alexpoly.lib
+@c ---------------------------------------------------------
+@node arcAtPoint_lib, classify_lib, alexpoly_lib, Singularities
 @subsection arcAtPoint_lib
 @c lib arcAtPoint.lib
 @c ---------------------------------------------------------
