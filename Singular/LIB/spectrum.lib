@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: spectrum.lib,v 1.18 2003-05-30 09:49:37 mschulze Exp $";
+version="$Id: spectrum.lib,v 1.19 2006-08-02 15:40:53 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  spectrum.lib  Singularity Spectrum for Nondegenerate Singularities
@@ -53,7 +53,10 @@ example
 { "EXAMPLE:"; echo = 2;
   ring R=0,(x,y),ds;
   poly f=x^31+x^6*y^7+x^2*y^12+x^13*y^2+y^29;
-  spectrumnd(f);
+  list s=spectrumnd(f);
+  size(s[1]);
+  s[1][22];
+  s[2][22];
 }
 ///////////////////////////////////////////////////////////////////////////////
 

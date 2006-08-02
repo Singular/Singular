@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmssing.lib,v 1.9 2005-05-18 18:16:32 Singular Exp $";
+version="$Id: gmssing.lib,v 1.10 2006-08-02 15:40:50 Singular Exp $";
 category="Singularities";
 
 info="
@@ -219,9 +219,9 @@ proc gmsnf(ideal p,int K)
 ASSUME:   basering returned by gmsring
 RETURN:
   list nf;
-  ideal nf[1];  projection of p to <gmsbasis>C{{s}} mod s^(K+1)
+  ideal nf[1];  projection of p to <gmsbasis>C{{s}} mod s^(K+1) @*
   ideal nf[2];  p==nf[1]+nf[2]
-NOTE:     computation can be continued by setting p=nf[2]
+NOTE:     computation can be continued by setting p to nf[2][1]
 EXAMPLE:  example gmsnf; shows examples
 "
 {
@@ -300,7 +300,7 @@ list l;
   matrix l[1];  C@{@{s@}@}-basis representation of p mod s^(K+1)
   ideal l[2];  p==matrix(gmsbasis)*l[1]+l[2]
 @end format
-NOTE:     computation can be continued by setting p=l[2]
+NOTE:     computation can be continued by setting p to l[2]
 EXAMPLE:  example gmscoeffs; shows examples
 "
 {
@@ -579,7 +579,8 @@ proc bernstein(poly t)
 "USAGE:    bernstein(t); poly t
 ASSUME:   characteristic 0; local degree ordering;
           isolated critical point 0 of t
-RETURN:   ideal r;  roots of the Bernstein polynomial b excluding the root -1
+RETURN:   list:  
+          roots of the Bernstein polynomial b (ideal) and its multiplicies 
 NOTE:     the roots of b are negative rational numbers and -1 is a root of b
 KEYWORDS: Bernstein polynomial
 EXAMPLE:  example bernstein; shows examples
@@ -1231,7 +1232,7 @@ example
 
 proc sppnf(list sp)
 "USAGE:   sppnf(list(a,w[,m])); ideal a, intvec w, intvec m
-ASSUME:  ncols(e)==size(w)==size(m)
+ASSUME:  ncols(a)==size(w)==size(m)
 RETURN:  order (a[i][,w[i]]) with multiplicity m[i] lexicographically
 EXAMPLE: example sppnf; shows examples
 "

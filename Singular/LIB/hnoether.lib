@@ -1,4 +1,4 @@
-version="$Id: hnoether.lib,v 1.52 2006-07-18 15:48:19 Singular Exp $";
+version="$Id: hnoether.lib,v 1.53 2006-08-02 15:40:51 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  hnoether.lib   Hamburger-Noether (Puiseux) Expansion
@@ -1627,7 +1627,7 @@ RETURN:  list of two integer matrices:
 @item  @code{multsequence(INPUT)[1][i,*]}
    contains the multiplicities of the branches at their infinitely near point
    of 0 in its (i-1) order neighbourhood (i.e., i=1: multiplicity of the
-   branches themselves, i=2: multiplicity of their 1st quadratic transformed,
+   branches themselves, i=2: multiplicity of their 1st quadratic transform,
    etc., @*
    Hence, @code{multsequence(INPUT)[1][*,j]} is the multiplicity sequence
    of branch j.
@@ -1787,7 +1787,7 @@ DISPLAY: the sequence of multiplicities:
                       @code{[(a_n),(b_n), ....., (c_n)]}
      with:
        @code{a_1 , ... , a_n} the sequence of multiplicities of the 1st branch,
-       @code{[...]} the multiplicities of the j-th transformed of all branches,
+       @code{[...]} the multiplicities of the j-th transform of all branches,
        @code{(...)} indicating branches meeting in an infinitely near point.
 @end format
 NOTE:  The Same restrictions as in @code{multsequence} apply for the input.@*
@@ -2241,7 +2241,7 @@ proc is_NND (poly f, list #)
 ASSUME:  f is convenient, that is, f(x,0) != 0 != f(0,y);@*
          mu (optional) is Milnor number of f.@*
          NP (optional) is output of @code{newtonpoly(f)}.
-RETURN:  int: 1 if f in Newton non-degenerate, 0 otherwise.
+RETURN:  int: 1 if f is Newton non-degenerate, 0 otherwise.
 SEE ALSO: newtonpoly
 KEYWORDS: Newton non-degenerate; Newton polygon
 EXAMPLE: example is_NND;  shows examples
@@ -4235,7 +4235,7 @@ proc delta
          or the list of HN data computed by @code{hnexpansion(f)}.
 RETURN:  int, the delta invariant of the singularity at 0, that is, the vector
          space dimension of R~/R, (R~ the normalization of the local ring of
-         the singularity.
+         the singularity).
 NOTE:    In case the Hamburger-Noether expansion of the curve f is needed
          for other purposes as well it is better to calculate this first
          with the aid of @code{hnexpansion} and use it as input instead of

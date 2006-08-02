@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmspoly.lib,v 1.13 2005-05-11 13:02:32 Singular Exp $";
+version="$Id: gmspoly.lib,v 1.14 2006-08-02 15:40:50 Singular Exp $";
 category="Singularities";
 
 info="
@@ -145,7 +145,7 @@ static proc vfilt(matrix B,int d)
   module V0=var(1)^(d-1)*freemodule(mu);
   attrib(V0,"isSB",1);
   module V1=B;
-  option("redSB");
+  option(redSB);
   while(size(reduce(V1,V0))>0)
   {
     V=std(V0+V1);

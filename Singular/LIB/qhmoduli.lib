@@ -38,9 +38,9 @@ RETURN:  polynomial ring, possibly a simple extension of the ground field of
            otherwise it contains generators of the coordinate ring R of the
            moduli space (note : Spec(R) is the moduli space)
 OPTIONS: 1 compute equations of the mod. space,
-         2 use a primary decomposition
-         4 compute E_f0, i.e., the image of G_f0
-         To combine options, add their value, default: opt =7
+         2 use a primary decomposition,
+         4 compute E_f0, i.e., the image of G_f0,
+         to combine options, add their value, default: opt =7
 EXAMPLE: example ModEqn; shows an example
 "
 {
@@ -201,8 +201,8 @@ RETURN:   polynomial ring over a simple extension of the ground field of the
           - 'embedid' = 0, if opt = 1;
             if opt = 0, 2, it is the ideal defining the equivariant embedding
 OPTIONS: 1 compute equations of the quotient,
-         2 use a primary decomposition when computing the Reynolds operator @*
-         To combine options, add their value, default: opt =3.
+         2 use a primary decomposition when computing the Reynolds operator,@*
+         to combine options, add their value, default: opt =3.
 EXAMPLE: example QuotientEquations; shows an example
 "
 {
@@ -409,7 +409,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc StabOrder(list #)
-"USAGE:   StabOrder(f); poly f;
+"USAGE:   StabOrder(f); poly f
 PURPOSE: compute the order of the stabilizer group of f.
 ASSUME:  f quasihomogeneous polynomial with an isolated singularity at 0
 RETURN:  int
@@ -432,7 +432,7 @@ proc StabEqn(poly f)
 "USAGE:   StabEqn(f); f polynomial
 PURPOSE: compute the equations of the isometry group of f.
 ASSUME:  f semiquasihomogeneous polynomial with an isolated singularity at 0
-RETURN:  list of two ring 'S1', 'S2'
+RETURN:  list of two rings 'S1', 'S2'
          - 'S1' contians the equations of the stabilizer (ideal 'stabid') @*
          - 'S2' contains the action of the stabilizer (ideal 'actionid')
 EXAMPLE: example StabEqn; shows an example
@@ -468,10 +468,10 @@ example
 
 proc StabEqnId(ideal data, intvec wt)
 "USAGE:   StabEqn(I, w); I ideal, w intvec
-PURPOSE: compute the equations of the isometry group of the ideal I
+PURPOSE: compute the equations of the isometry group of the ideal I,
          each generator of I is fixed by the stabilizer.
 ASSUME:  I semiquasihomogeneous ideal wrt 'w' with an isolated singularity at 0
-RETURN:  list of two ring 'S1', 'S2'
+RETURN:  list of two rings 'S1', 'S2'
          - 'S1' contians the equations of the stabilizer (ideal 'stabid') @*
          - 'S2' contains the action of the stabilizer (ideal 'actionid')
 EXAMPLE: example StabEqnId; shows an example
@@ -1416,7 +1416,7 @@ static proc PSum(e)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc Max(data)
-"USAGE:   Max(data); intvec/list of integers data
+"USAGE:   Max(data); intvec/list of integers
 PURPOSE: find the maximal integer contained in 'data'
 RETURN:  list
 ASSUME:  'data' contians only integers and is not empty
@@ -1430,11 +1430,15 @@ ASSUME:  'data' contians only integers and is not empty
   }
   return(max);
 }
+example
+{"EXAMPLE:";  echo = 2;
+  Max(list(1,2,3));
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
 proc Min(data)
-"USAGE:   Min(data); intvec/list of integers data
+"USAGE:   Min(data); intvec/list of integers
 PURPOSE: find the minimal integer contained in 'data'
 RETURN:  list
 ASSUME:  'data' contians only integers and is not empty
@@ -1447,6 +1451,10 @@ ASSUME:  'data' contians only integers and is not empty
     if(data[i] < min) { min = data[i]; }
   }
   return(min);
+}
+example
+{"EXAMPLE:";  echo = 2;
+  Min(intvec(1,2,3));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

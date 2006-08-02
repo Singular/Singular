@@ -1,6 +1,6 @@
 // (anne, last modified 31.5.99)
 /////////////////////////////////////////////////////////////////////////////
-version="$Id: spcurve.lib,v 1.20 2005-05-06 14:39:18 hannes Exp $";
+version="$Id: spcurve.lib,v 1.21 2006-08-02 15:40:53 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY: spcurve.lib    Deformations and Invariants of CM-codim 2 Singularities
@@ -273,8 +273,8 @@ example
 proc discr(ideal kurve, int n)
 "USAGE:   discr(sem,n);  sem ideal, n integer
 ASSUME:  sem is the versal deformation of an ideal of codimension 2. @*
-         the first n variables of the ring are treated as variables
-         all the others as parameters
+         The first n variables of the ring are treated as variables
+         all the others as parameters.
 RETURN:  ideal describing the discriminant
 NOTE:    This is not a powerful algorithm!
 EXAMPLE: example discr; shows an example"

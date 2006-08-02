@@ -1,7 +1,7 @@
-// $Id: sing.lib,v 1.29 2005-05-06 14:39:12 hannes Exp $
+// $Id: sing.lib,v 1.30 2006-08-02 15:40:52 Singular Exp $
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: sing.lib,v 1.29 2005-05-06 14:39:12 hannes Exp $";
+version="$Id: sing.lib,v 1.30 2006-08-02 15:40:52 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  sing.lib      Invariants of Singularities
@@ -181,9 +181,9 @@ example
 proc is_reg (poly f, id)
 "USAGE:   is_reg(f,id); f poly, id ideal or module
 RETURN:  1 if multiplication with f is injective modulo id, 0 otherwise
-NOTE:    let R be the basering and id a submodule of R^n. The procedure checks
+NOTE:    Let R be the basering and id a submodule of R^n. The procedure checks
          injectivity of multiplication with f on R^n/id. The basering may be a
-         quotient ring
+         quotient ring.
 EXAMPLE: example is_reg; shows an example
 "
 {
@@ -213,9 +213,9 @@ example
 proc is_regs (ideal i, list #)
 "USAGE:   is_regs(i[,id]); i poly, id ideal or module (default: id=0)
 RETURN:  1 if generators of i are a regular sequence modulo id, 0 otherwise
-NOTE:    let R be the basering and id a submodule of R^n. The procedure checks
+NOTE:    Let R be the basering and id a submodule of R^n. The procedure checks
          injectivity of multiplication with i[k] on R^n/id+i[1..k-1].
-         The basering may be a quotient ring
+         The basering may be a quotient ring.
          printlevel >=0: display comments (default)
          printlevel >=1: display comments during computation
 EXAMPLE: example is_regs; shows an example
@@ -430,7 +430,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc qhspectrum (poly f, intvec w)
-"USAGE:   qhspectrum(f,w);  f=poly, w=intvec;
+"USAGE:   qhspectrum(f,w);  f=poly, w=intvec
 ASSUME:  f is a weighted homogeneous isolated singularity w.r.t. the weights
          given by w; w must consist of as many positive integers as there
          are variables of the basering
@@ -439,7 +439,7 @@ COMPUTE: the spectral numbers of the w-homogeneous polynomial f, computed in a
 RETURN:  intvec  d,s1,...,su  where:
          d = w-degree(f)  and  si/d = i-th spectral-number(f)
          No return value if basering has parameters or if f is no isolated
-         singularity, displays a warning in this case
+         singularity, displays a warning in this case.
 EXAMPLE: example qhspectrum; shows an example
 "
 {
@@ -567,11 +567,11 @@ DISPLAY: k-dimension of T_1(id) if printlevel >= 0 (default)
 NOTE:    T_1(id) itself is usually of minor importance. Nevertheless, from it
          all relevant information can be obtained. The most important are
          probably vdim(T_1(id)); (which computes the Tjurina number),
-         hilb(T_1(id)); and kbase(T_1(id));
-         If T_1 is called with two argument, then matrix([2])*(kbase([1]))
+         hilb(T_1(id)); and kbase(T_1(id)).
+         If T_1 is called with two arguments, then matrix([2])*(kbase([1]))
          represents a basis of 1st order semiuniversal deformation of id
          (use proc 'deform', to get this in a direct way).
-         For a complete intersection the proc Tjurina is faster
+         For a complete intersection the proc Tjurina is faster.
 EXAMPLE: example T_1; shows an example
 "
 {
@@ -652,7 +652,7 @@ RETURN:  T_2(id): T_2-module of id . This is a std basis of a presentation of
          to get T_2(id).
 DISPLAY: k-dimension of T_2(id) if printlevel >= 0 (default)
 NOTE:    The most important information is probably vdim(T_2(id)).
-         Use proc miniversal to get equations of miniversal deformation.
+         Use proc miniversal to get equations of the miniversal deformation.
 EXAMPLE: example T_2; shows an example
 "
 {
@@ -726,7 +726,7 @@ RETURN:  T_12(i): list of 2 modules: @*
              [9]= presentation of T_2-module, no std basis
 DISPLAY: k-dimension of T_1 and T_2 if printlevel >= 0 (default)
 NOTE:    Use proc miniversal from deform.lib to get miniversal deformation of i,
-         the list contains all objects used by proc miniversal
+         the list contains all objects used by proc miniversal.
 EXAMPLE: example T_12; shows an example
 "
 {
@@ -799,10 +799,10 @@ proc codim (id1, id2)
 "USAGE:   codim(id1,id2); id1,id2 ideal or module, both must be standard bases
 RETURN:  int, which is:
          1. the codimension of id2 in id1, i.e. the vectorspace dimension of
-            id1/id2 if id2 is contained in id1 and if this number is finite
-         2. -1 if the dimension of id1/id2 is infinite
+            id1/id2 if id2 is contained in id1 and if this number is finite@*
+         2. -1 if the dimension of id1/id2 is infinite@*
          3. -2 if id2 is not contained in id1,
-COMPUTE: consider the two hilberseries iv1(t) and iv2(t), then, in case 1.,
+COMPUTE: consider the two Hilbert series iv1(t) and iv2(t), then, in case 1.,
          q(t)=(iv2(t)-iv1(t))/(1-t)^n must be rational, and the result is the
          sum of the coefficients of q(t) (n dimension of basering)
 EXAMPLE: example codim; shows an example
@@ -932,8 +932,8 @@ example
 proc tangentcone (id,list #)
 "USAGE:   tangentcone(id [,n]); id = ideal, n = int
 RETURN:  the tangent cone of id
-NOTE:    the procedure works for any monomial ordering.
-         If n=0 use std w.r.t. local ordering ds, if n=1 use locstd
+NOTE:    The procedure works for any monomial ordering.
+         If n=0 use std w.r.t. local ordering ds, if n=1 use locstd.
 EXAMPLE: example tangentcone; shows an example
 "
 {
