@@ -1,4 +1,4 @@
-version="$Id: alexpoly.lib,v 1.13 2006-08-02 10:05:56 Singular Exp $";
+version="$Id: alexpoly.lib,v 1.14 2006-08-02 10:14:06 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  alexpoly.lib   Resolution Graph and Alexander Polynomial
@@ -31,7 +31,6 @@ KEYWORDS: Hamburger-Noether expansion; Puiseux expansion; curve singularities;
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 LIB "hnoether.lib";
-LIB "equising.lib";
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 proc resolutiongraph (def INPUT,list #)
@@ -1478,20 +1477,18 @@ EXAMPLE: example tau_es2;  shows an example
       // Otherwise call the procedure with the output of totalmultiplicities(INPUT,"tau").
       else
       {
-        graphs=list(INPUT[1]);
-        multipl=list(INPUT[2]);
-        contact=list(INPUT[3]);
+        return(tau_es2(totalmultiplicities(INPUT,"tau")));
       }
     }
     else
     {
-      return(tau_es(totalmultiplicities(INPUT,"tau")));
+      return(tau_es2(totalmultiplicities(INPUT,"tau")));
     }
   }
   // Otherwise call the procedure with the output of totalmultiplicities(INPUT,"tau").
   else
   {
-    return(tau_es(totalmultiplicities(INPUT,"tau")));
+    return(tau_es2(totalmultiplicities(INPUT,"tau")));
   }
   /// End of checking the input
   ///////////////////////////////////////////////////////
@@ -1548,7 +1545,7 @@ EXAMPLE: example tau_es2;  shows an example
     }
     // Calculate the equisingular Tjurina number of the strict transform at the i-th
     // intersection point with the first exceptional divisor.
-    tau_i=tau_es(list(graphs_ed,multipl_ed,contact_ed));
+    tau_i=tau_es2(list(graphs_ed,multipl_ed,contact_ed));
     // Calculate the number no. of blow ups needed to separate the strict transform of
     // the curve defined by the input from the first exceptional divisor at their i-th
     // intersection point.
