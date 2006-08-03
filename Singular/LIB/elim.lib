@@ -1,7 +1,7 @@
-// $Id: elim.lib,v 1.20 2006-08-03 07:31:21 Singular Exp $
+// $Id: elim.lib,v 1.21 2006-08-03 09:00:41 Singular Exp $
 // (GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: elim.lib,v 1.20 2006-08-03 07:31:21 Singular Exp $";
+version="$Id: elim.lib,v 1.21 2006-08-03 09:00:41 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      Elimination, Saturation and Blowing up
@@ -61,7 +61,7 @@ NOTE:    The procedure creates a new ring with variables y(1..k) and x(1..n)
          the y-block has ordering dp if C is not homogeneous
          resp. the weighted ordering wp(b1,...bk) if C is homogeneous
          with deg(C[i])=bi.
-SEE ALSO:blowUp from resolve.lib
+SEE ALSO:blowUp
 EXAMPLE: example blowup0; shows examples
 "{
    def br = basering;
