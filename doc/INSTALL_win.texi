@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_win.texi,v 1.13 2006-07-18 10:06:59 Singular Exp $
+@comment $Id: INSTALL_win.texi,v 1.14 2006-08-03 08:18:27 Singular Exp $
 @c FILE:    INSTALL.texi
 @c PURPOSE: Installation instructions for Singular on MSWindows
 @c          This file is displayed during installation and copied to
@@ -52,7 +52,7 @@ To run @sc{ESingular} (i.e. @sc{Singular} within its Emacs interface) on
 MS Windows requires furthermore that the XEmacs editor is installed on
 your system.
 
-Complete installion informations ifor Windows are available from
+Complete installation informations for Windows are available from
 @display
 @uref{http://www.singular.uni-kl.de/WINDOWS/index.html}.
 @end display
