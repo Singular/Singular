@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.25 2006-08-03 08:18:27 Singular Exp $
+@comment $Id: INSTALL_unix.texi,v 1.26 2006-08-03 09:53:02 Singular Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on Unix
 @c
@@ -13,7 +13,7 @@
 @end ifclear
 
 @ifclear UNAME
-@set _UNAME <uname>
+@set _UNAME uname
 @end ifclear
 
 @ifset UNAME
@@ -29,7 +29,7 @@ For a Linux system with RPM (like Redhat/Fedora, Mandrake/Mandriva, SuSE etc.),
 or with DEB (like Debian, Ubuntu etc.) one should follow
 the intructions at @url{http://www.singular.uni-kl.de/UNIX/}.
 
-The manual installation is described below:
+The manual installation (for all other Unix systems) is described below:
 
 To install @sc{Singular} on a
 @ifset UNAME
