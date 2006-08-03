@@ -1,7 +1,7 @@
-// $Id: elim.lib,v 1.19 2006-07-25 17:54:26 Singular Exp $
+// $Id: elim.lib,v 1.20 2006-08-03 07:31:21 Singular Exp $
 // (GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: elim.lib,v 1.19 2006-07-25 17:54:26 Singular Exp $";
+version="$Id: elim.lib,v 1.20 2006-08-03 07:31:21 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      Elimination, Saturation and Blowing up
@@ -23,81 +23,168 @@ LIB "poly.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc blowup0 (ideal j,list #)
-"USAGE:   blowup0(j[,s1,s2]); j ideal, s1,s2 nonempty strings
-CREATE:  Create a presentation of the blowup ring of j
-RETURN:  no return value
-NOTE:    s1 and s2 are used to give names to the blownup ring and the blownup
-         ideal (default: s1=\"j\", s2=\"A\")
-         Assume R = char,x(1..n),ord is the basering of j, and s1=\"j\", s2=\"A\"
-         then the procedure creates a new ring with name Bl_jR
-         (equal to R[A,B,...])
-               Bl_jR = char,(A,B,...,x(1..n)),(dp(k),ord)
-         with k=ncols(j) new variables A,B,... and ordering wp(d1..dk) if j is
-         homogeneous with deg(j[i])=di resp. dp otherwise for these vars.
-         If k>26 or size(s2)>1, say s2=\"A()\", the new vars are A(1),...,A(k).
-         Let j_ be the kernel of the ring map Bl_jR -> R defined by A(i)->j[i],
-         x(i)->x(i), then the quotient ring Bl_jR/j_ is the blowup ring of j
-         in R (being isomorphic to R+j+j^2+...). Moreover the procedure creates
-         a std basis of j_ with name j_ in Bl_jR.
-         This proc uses 'execute' or calls a procedure using 'execute'.
-DISPLAY: printlevel >=0: explain created objects (default)
+proc blowup0 (ideal J,ideal C, list #)
+"USAGE:   blowup0(J,C [,W]); J,C,W ideals
+@*       C = ideal of center of blowup, J = ideal to be blown up,
+         W = ideal of ambient space
+ASSUME:  inclusion of ideals : W in J, J in C.
+         If not, the procedure replaces J by J+W and C by C+J+W
+RETURN:  a ring, say B, containing the ideals C,J,W and the ideals
+@*         - bR (ideal defining the blown up basering)
+@*         - aS (ideal of blown up ambient space)
+@*         - eD (ideal of exceptional divisor)
+@*         - tT (ideal of total transform)
+@*         - sT (ideal of strict transform)
+@*         - bM (ideal of the blowup map from basering to B)
+@*       such that B/bR is isomorphic to the blowup ring BC.
+PURPOSE: compute the projective blowup of the basering in the center C, the
+         exceptional locus, the total and strict tranform of J,
+         and the blowup map.
+         The projective blowup is a presentation of the blowup ring
+         BC = R[C] = R + t*C + t^2*C^2 + ... (also called Rees ring) of the
+         ideal C in the ring basering R.
+THEORY:  If basering = K[x1,...,xn] and C = <f1,...,fk> then let
+         B = K[x1,...,xn,y1,...,yk] and aS the preimage in B of W
+         under the map B -> K[x1,...,xn,t], xi -> xi, yi -> t*fi.
+         aS is homogeneous in the variables yi and defines a variety
+         Z=V(aS) in  A^n x P^(k-1), the ambient space of the blowup of V(W).
+         The projection Z -> A^n is an isomorphism outside the preimage
+         of the center V(C) in A^n and is called the blowup of the center.
+         The preimage of V(C) is called the exceptional set, the preimage of
+         V(J) is called the total transform of V(J). The strict transform
+         is the closure of (total transform - exceptional set).
+@*       If C = <x1,...,xn> then aS = <yi*xj - yj*xi | i,j=1,...,n>
+         and Z is the blowup of A^n in 0, the exceptional set is P^(k-1).
+NOTE:    The procedure creates a new ring with variables y(1..k) and x(1..n)
+         where n=nvars(basering) and k=ncols(C). The ordering is a block
+         ordering where the x-block has the ordering of the basering and
+         the y-block has ordering dp if C is not homogeneous
+         resp. the weighted ordering wp(b1,...bk) if C is homogeneous
+         with deg(C[i])=bi.
+SEE ALSO:blowUp from resolve.lib
 EXAMPLE: example blowup0; shows examples
 "{
-   string bsr = nameof(basering);
    def br = basering;
-   string cr,vr,o = charstr(br),varstr(br),ordstr(br);
-   int n,k,i = nvars(br),ncols(j),0;
-   int p = printlevel-voice+3;  // p=printlevel+1 (default: p=1)
-//---------------- create coordinate ring of blown up space -------------------
-   if( size(#)==0 ) { #[1] = "j"; #[2] = "A"; }
-   if( size(#)==1 ) { #[2] = "A"; }
-   if( k<=26 and size(#[2])==1 ) { string nv = A_Z(#[2],k)+","; }
-   else { string nv = (#[2])[1]+"(1.."+string(k)+"),"; }
-   intvec v;
-   if( homog(j) )
+   list l = ringlist(br);
+   int n,k,i = nvars(br),ncols(C),0;
+   ideal W;
+   if (size(#) !=0)
+   { W = #[1];}
+   J = J,W;
+   //J = interred(J+W);
+//------------------------- create rings for blowup ------------------------
+//Create rings tr = K[x(1),...,x(n),t] and nr = K[x(1),...,x(n),y(1),...,y(k)]
+//and map Bl: nr --> tr, x(i)->x(i), y(i)->t*fi.
+//Let ord be the ordering of the basering.
+//We change the ringlist l by changing l[2] and l[3]
+//For K[t,x(1),...,x(n),t]
+// - l[2]: the variables to x(1),...,x(n),t
+// - l[3]: the ordering to a block ordering (ord,dp(1))
+//For K[x(1),...,x(n),y(1),...,y(k)]
+// - l[2]: the variables to x(1),...,x(n),y(1),...,y(k),
+// - l[3]: the ordering to a block ordering (ord,dp) if C is
+//         not homogeneous or to (ord,wp(b1,...bk),ord) if C is
+//         homogeneous with deg(C[i])=bi;
+
+//--------------- create tr = K[x(1),...,x(n),t] ---------------------------
+   int s = size(l[3]);
+   for ( i=1; i<=n; i++)
    {
-      v=1;
-      for( i=1; i<=k; i=i+1) { v[i+1]=deg(j[i]); }
-      string nor = "),(wp(v),";
+      l[2][i]="x("+string(i)+")";
    }
-   else { string nor = "),(dp(1+k),";}
-   execute("ring Bl=("+cr+"),(t,"+nv+vr+nor+o+");");
-//---------- map to new ring, eliminate and create blown up ideal -------------
-   ideal j=imap(br,j);
-   for( i=1; i<=k; i=i+1) { j[i]=var(1+i)-t*j[i]; }
-   j=eliminate(j,t);
-   v=v[2..size(v)];
-   execute("ring Bl_"+#[1]+bsr+"=("+cr+"),("+nv+vr+nor+o+");");
-   ideal `#[1]+"_"`=imap(Bl,j);
-   exportto(Top,basering);
-   export `#[1]+"_"`;
-   setring br;
-//------------------- some comments about usage and names  --------------------
-dbprint(p,"",
-"// The proc created the ring Bl_"+#[1]+bsr+" (equal to "+bsr+"["+nv[1,size(nv)-1]+"])",
-"// it contains the ideal "+#[1]+"_ , such that",
-"//             Bl_"+#[1]+bsr+"/"+#[1]+"_ is the blowup ring",
-"// show(Bl_"+#[1]+bsr+"); shows this ring.",
-"// Make Bl_"+#[1]+bsr+" the basering and see "+#[1]+"_ by typing:",
-"   setring Bl_"+#[1]+bsr+";","   "+#[1]+"_;");
-   return();
+   l[2]=insert(l[2],"t",n);
+   l[3]=insert(l[3],list("dp",1),s-1);
+   def tr = ring(l);
+
+//--------------- create nr = K[x(1),...,x(n),y(1),...,y(k)] ---------------
+   l[2]=delete(l[2],n+1);
+   l[3]=delete(l[3],s);
+   for ( i=1; i<=k; i++)
+   {
+      l[2][n+i]="y("+string(i)+")";
+   }
+
+   //---- change l[3]:
+   l[3][s+1] = l[3][s];         // save the module ordering of the basering
+   intvec w;
+   w[k]=0; w=w+1;
+   intvec v;                    // containing the weights for the varibale
+   if( homog(C) )
+   {
+      for( i=1; i<=k; i++)
+      {
+         v[i]=deg(C[i]);
+      }
+      if (v != w)
+      {
+         l[3][s]=list("wp",v);
+      }
+      else
+      {
+         l[3][s]=list("dp",v);
+      }
+   }
+   else
+   {
+      for( i=1; i<=k; i++)
+      {
+         v[i]=1;
+      }
+      l[3][s]=list("dp",v);
+   }
+   def nr = ring(l);
+
+//-------- create blowup map Bl: nr --> tr, x(i)->x(i), y(i)->t*fi ---------
+   setring tr;
+   ideal C = fetch(br,C);
+   ideal bl = x(1..n);
+   for( i=1; i<=k; i++) { bl = bl,t*C[i]; }
+   map Bl = nr,bl;
+   ideal Z;
+//------------------ compute blown up objects and return  -------------------
+   setring nr;
+   ideal bR = preimage(tr,Bl,Z);   //ideal of blown up affine space A^n
+   ideal C = fetch(br,C);
+   ideal J = fetch(br,J);
+   ideal W = fetch(br,W);
+   ideal aS = interred(bR+W);                //ideal of ambient space
+   ideal tT = interred(J+bR+W);              //ideal of total transform
+   ideal eD = interred(C+J+bR+W);            //ideal of exceptional divisor
+   ideal sT = sat(tT,C)[1];       //ideal of strict transform
+   ideal bM = x(1..n);            //ideal of blowup map br --> nr
+
+   export(bR,C,J,W,aS,tT,eD,sT,bM);
+   return(nr);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R=0,(x,y),dp;
-   poly f=y2+x3; ideal j=jacob(f);
-   blowup0(j);
-   show(Bl_jR);
-   setring Bl_jR;
-   j_;"";
-   ring r=32003,(x,y,z),ds;
-   blowup0(maxideal(1),"m","T()");
-   show(Bl_mr);
-   setring Bl_mr;
-   m_;
-   kill Bl_jR, Bl_mr;
-}
+   ring r  = 0,(x,y),dp;
+   poly f  = x2+y3;
+   ideal C = x,y;           //center of blowup
+   def B1 = blowup0(f,C);
+   setring B1;
+   aS;                      //ideal of blown up ambient space
+   tT;                      //ideal of total transform of f
+   sT;                      //ideal of strict transform of f
+   eD;                      //ideal of exceptional divisor
+   bM;                      //ideal of blowup map r --> B1
+
+   ring R  = 0,(x,y,z),ds;
+   poly f  = y2+x3+z5;
+   ideal C = y2,x,z;
+   ideal W = z-x;
+   def B2 = blowup0(f,C,W);
+   setring B2;
+   B2;                       //weighted ordering
+   bR;                       //ideal of blown up R
+   aS;                       //ideal of blown up R/W
+   sT;                       //strict transform of f
+   eD;                       //ideal of exceptional divisor
+   //Note that the different affine charts are {y(i)=1}
+ }
+///////////////////////////////////////////////////////////////////////////////
+
+
 ///////////////////////////////////////////////////////////////////////////////
 
 proc elim (id, int n, int m)
