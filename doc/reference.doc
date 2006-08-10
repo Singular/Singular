@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.276 2006-08-01 08:26:15 pohl Exp $
+@comment $Id: reference.doc,v 1.277 2006-08-10 12:52:39 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -106,6 +106,7 @@ and @code{LIB} no brackets are allowed.
 * impart::
 * indepSet::
 * insert::
+* interpolation::
 * interred::
 * intersect::
 * jacob::
@@ -2508,7 +2509,7 @@ See
 @ref{ideal}.
 @c ref
 @c ---------------------------------------
-@node insert, interred, indepSet, Functions
+@node insert, interpolation, indepSet, Functions
 @subsection insert
 @cindex insert
 
@@ -2536,7 +2537,58 @@ See
 @ref{delete}.
 @c ref
 @c ---------------------------------------
-@node interred, intersect, insert, Functions
+@node interpolation, interred, insert, Functions
+@subsection interpolation
+@cindex interpolation
+
+@table @code
+@item @strong{Syntax:}
+@code{interpolation (} list@code{,} intvec @code{)}
+@item @strong{Type:}
+ideal
+@item @strong{Purpose:}
+@code{interpolation(l,v)} computes the reduced Groebner basis of the intersection
+of ideals l[1]^v[1],...,l[N]^v[N] by applying linear algebra methods.
+@item @strong{Assume:}
+Every ideal from the list l must be a maximal ideal of a point and should have
+the following form: variable_1-coordinate_1,...,variable_n-coordinate_n, where n
+is the number of variables in the ring.
+@*The ring should be a polynomial ring over Zp or Q with global ordering.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=0,(x,y),dp;
+  ideal p_1=x,y;
+  ideal p_2=x+1,y+1;
+  ideal p_3=x+2,y-1;
+  ideal p_4=x-1,y+2;
+  ideal p_5=x-1,y-3;
+  ideal p_6=x,y+3;
+  ideal p_7=x+2,y;
+  list l=p_1,p_2,p_3,p_4,p_5,p_6,p_7;
+  intvec v=2,1,1,1,1,1,1;
+  ideal j=interpolation(l,v);
+  // generator of degree 3 gives the equation of the unique
+  // singular cubic passing
+  // through p_1,...,p_7 with singularity at p_1
+  j;
+  // computes values of generators of j at p_4, results should be 0
+  subst(j,x,1,y,-2);
+  // computes values of derivatives d/dx of generators at (0,0)
+  subst(diff(j,x),x,0,y,0);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{fglm};
+@ref{intersect};
+@ref{std};
+@ref{diff};
+@ref{subst}.
+@c ref
+@c ---------------------------------------
+@node interred, intersect, interpolation, Functions
 @subsection interred
 @cindex interred
 @table @code

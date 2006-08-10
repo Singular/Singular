@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.407 2006-07-26 13:49:29 Singular Exp $ */
+/* $Id: iparith.cc,v 1.408 2006-08-10 12:51:38 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -56,6 +56,11 @@
 #ifdef HAVE_FGLM
 #include "fglm.h"
 #endif
+#define HAVE_INTERPOLATION
+#ifdef HAVE_INTERPOLATION
+#include "interpolation.h"
+#endif
+
 
 #include "ipshell.h"
 
@@ -230,6 +235,9 @@ cmdnames cmds[] =
   { "indepSet",    0, INDEPSET_CMD ,      CMD_12},
   { "insert",      0, INSERT_CMD ,        CMD_23},
   { "int",         0, INT_CMD ,           ROOT_DECL},
+#ifdef HAVE_INTERPOLATION
+  { "interpolation",0,INTERPOLATE_CMD ,   CMD_2},
+#endif
   { "interred",    0, INTERRED_CMD ,      CMD_1},
   { "intersect",   0, INTERSECT_CMD ,     CMD_M},
   { "intmat",      0, INTMAT_CMD ,        INTMAT_CMD},
@@ -3023,6 +3031,9 @@ struct sValCmd2 dArith2[]=
 ,{jjIMPORTFROM,IMPORTFROM_CMD, NONE,           PACKAGE_CMD, ANY_TYPE ALLOW_PLURAL}
 ,{jjINDEPSET2, INDEPSET_CMD,   LIST_CMD,       IDEAL_CMD,  INT_CMD NO_PLURAL}
 ,{lInsert,     INSERT_CMD,     LIST_CMD,       LIST_CMD,   DEF_CMD ALLOW_PLURAL}
+#ifdef HAVE_INTERPOLATION
+,{jjINTERPOLATION,INTERPOLATE_CMD,IDEAL_CMD,   LIST_CMD,   INTVEC_CMD NO_PLURAL}
+#endif
 ,{jjINTERSECT, INTERSECT_CMD,  IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD ALLOW_PLURAL}
 ,{jjINTERSECT, INTERSECT_CMD,  MODUL_CMD,      MODUL_CMD,  MODUL_CMD ALLOW_PLURAL}
 ,{jjJanetBasis2, JANET_CMD,    IDEAL_CMD,      IDEAL_CMD,  INT_CMD ALLOW_PLURAL}
