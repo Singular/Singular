@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.120 2005-10-28 14:56:12 Singular Exp $ */
+/* $Id: iplib.cc,v 1.121 2006-08-10 12:52:21 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -425,8 +425,6 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
 {
   int err;
   procinfov pi = IDPROC(pn);
-  char *plib = iiConvName(pi->libname);
-  omFree((ADDRESS)plib);
   if(pi->is_static && myynest==0)
   {
     Werror("'%s::%s()' is a local procedure and cannot be accessed by an user.",
@@ -451,8 +449,9 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
 #endif
   switch (pi->language)
   {
-      default:
-      case LANG_NONE:
+    default:
+    case LANG_NONE:
+                 WerrorS("undefined proc");
                  err=TRUE;
                  break;
 
