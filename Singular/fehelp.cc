@@ -3,7 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
-* versin $Id: fehelp.cc,v 1.48 2005-09-01 08:30:25 wienand Exp $
+* versin $Id: fehelp.cc,v 1.49 2006-08-10 13:59:47 Singular Exp $
 */
 
 #include <string.h>
@@ -242,15 +242,22 @@ static void feBrowserFile()
         char *name=strtok(buf,"!");
         char *req=strtok(NULL,"!");
         char *cmd=strtok(NULL,"!");
-        while ((cmd[0]!='\0') && (cmd[strlen(cmd)-1]<=' '))
-          cmd[strlen(cmd)-1]='\0';
-        //Print("name %d >>%s<<\n\treq:>>%s<<\n\tcmd:>>%s<<\n",br,name,req,cmd);
-        heHelpBrowsers[br].browser=(char *)omStrDup(name);
-        heHelpBrowsers[br].init_proc=heGenInit;
-        heHelpBrowsers[br].help_proc=heGenHelp;
-        heHelpBrowsers[br].required=omStrDup(req);
-        heHelpBrowsers[br].action=omStrDup(cmd);
-        br++;
+        if ((name!=NULL) && (req!=NULL) && (cmd!=NULL))
+        { 
+          while ((cmd[0]!='\0') && (cmd[strlen(cmd)-1]<=' '))
+            cmd[strlen(cmd)-1]='\0';
+          //Print("name %d >>%s<<\n\treq:>>%s<<\n\tcmd:>>%s<<\n",br,name,req,cmd);
+          heHelpBrowsers[br].browser=(char *)omStrDup(name);
+          heHelpBrowsers[br].init_proc=heGenInit;
+          heHelpBrowsers[br].help_proc=heGenHelp;
+          heHelpBrowsers[br].required=omStrDup(req);
+          heHelpBrowsers[br].action=omStrDup(cmd);
+          br++;
+        }
+        else
+        {
+          Print("syntax error in help.cnf, at line starting with %s\n",buf);
+        }
       }
     }
     fclose(f);
