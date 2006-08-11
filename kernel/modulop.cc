@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.5 2005-07-27 15:48:29 Singular Exp $ */
+/* $Id: modulop.cc,v 1.6 2006-08-11 09:47:22 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -101,64 +101,43 @@ BOOLEAN npIsMOne (number a)
 }
 
 #ifdef HAVE_DIV_MOD
-#if 1 //ifdef HAVE_NTL // in ntl.a
+#ifdef USE_NTL_XGCD
+//ifdef HAVE_NTL // in ntl.a
 //extern void XGCD(long& d, long& s, long& t, long a, long b);
 #include <NTL/ZZ.h>
 #ifdef NTL_CLIENT
 NTL_CLIENT
 #endif
-#else
-void XGCD(long& d, long& s, long& t, long a, long b)
-{
-   long  u, v, u0, v0, u1, v1, u2, v2, q, r;
-
-   long aneg = 0, bneg = 0;
-
-   if (a < 0) {
-      a = -a;
-      aneg = 1;
-   }
-
-   if (b < 0) {
-      b = -b;
-      bneg = 1;
-   }
-
-   u1=1; v1=0;
-   u2=0; v2=1;
-   u = a; v = b;
-
-   while (v != 0) {
-      q = u / v;
-      r = u % v;
-      u = v;
-      v = r;
-      u0 = u2;
-      v0 = v2;
-      u2 =  u1 - q*u2;
-      v2 = v1- q*v2;
-      u1 = u0;
-      v1 = v0;
-   }
-
-   if (aneg)
-      u1 = -u1;
-
-   if (bneg)
-      v1 = -v1;
-
-   d = u;
-   s = u1;
-   t = v1;
-}
 #endif
 
 long InvMod(long a)
 {
    long d, s, t;
 
+#ifdef USE_NTL_XGCD
    XGCD(d, s, t, a, npPrimeM);
    assume (d == 1);
+#else
+   long  u, v, u0, v0, u1, v1, u2, v2, q, r;
+
+   assume(a>0);
+   u1=1; u2=0;
+   u = a; v = npPrimeM;
+
+   while (v != 0)
+   {
+      q = u / v;
+      r = u % v;
+      u = v;
+      v = r;
+      u0 = u2;
+      u2 = u1 - q*u2;
+      u1 = u0;
+   }
+
+   assume(u==1);
+   s = u1;
+#endif
    if (s < 0)
       return s + npPrimeM;
    else
