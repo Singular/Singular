@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.46 2006-05-08 12:55:12 Singular Exp $ */
+/* $Id: ring.cc,v 1.47 2006-08-11 09:47:03 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -489,6 +489,7 @@ int rOrderName(char * ordername)
 
 char * rOrdStr(ring r)
 {
+  if ((r==NULL)||(r->order==NULL)) return omStrDup("");
   int nblocks,l,i;
 
   for (nblocks=0; r->order[nblocks]; nblocks++);
@@ -545,6 +546,7 @@ char * rOrdStr(ring r)
 
 char * rVarStr(ring r)
 {
+  if ((r==NULL)||(r->names==NULL)) return omStrDup("");
   int i;
   int l=2;
   char *s;
@@ -614,7 +616,7 @@ char * rCharStr(ring r)
 
 char * rParStr(ring r)
 {
-  if (r->parameter==NULL) return omStrDup("");
+  if ((r==NULL)||(r->parameter==NULL)) return omStrDup("");
 
   int i;
   int l=2;
