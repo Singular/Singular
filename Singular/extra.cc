@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.240 2006-06-12 00:08:15 wienand Exp $ */
+/* $Id: extra.cc,v 1.241 2006-08-14 17:08:21 wienand Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2493,7 +2493,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     {
       extern int strat_nr;
       extern int strat_fac_debug;
-      strat_fac_debug=(int)(long)h->Data(); 
+      strat_fac_debug=(int)(long)h->Data();
       strat_nr=0;
       return FALSE;
     }
@@ -2507,6 +2507,30 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       poly f = (poly) h->Data();
       res->rtyp=POLY_CMD;
       res->data=(poly) kFindZeroPoly(f, r, r);
+      return(FALSE);
+    }
+    else
+/*==================== Creating zero polynomials =================*/
+    if (strcmp(sys_cmd, "createG0")==0)
+    {
+      /* long exp[50];
+      int N = 0;
+      while (h != NULL)
+      {
+        N += 1;
+        exp[N] = (long) h->Data();
+        // if (exp[i] % 2 != 0) exp[i] -= 1;
+        h = h->next;
+      }
+      for (int k = 1; N + k <= currRing->N; k++) exp[k] = 0;
+
+      poly t_p;
+      res->rtyp=POLY_CMD;
+      res->data= (poly) kCreateZeroPoly(exp, -1, &t_p, currRing, currRing);
+      return(FALSE); */
+
+      res->rtyp = IDEAL_CMD;
+      res->data = (ideal) createG0();
       return(FALSE);
     }
     else
@@ -2532,12 +2556,25 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return(FALSE);
     }
     else
-    if (strcmp(sys_cmd, "reduce_fct")==0)
+/*==================== Testing groebner basis =================*/
+    if (strcmp(sys_cmd, "spoly")==0)
     {
-      ring r = currRing;
-      poly f = (poly)h->Data();
+      poly f = pCopy((poly) h->Data());
+      h = h->next;
+      poly g = pCopy((poly) h->Data());
+
       res->rtyp=POLY_CMD;
-      res->data=NULL;
+      res->data=(poly) plain_spoly(f,g);
+      return(FALSE);
+    }
+    else
+    if (strcmp(sys_cmd, "testGB")==0)
+    {
+      ideal I = (ideal) h->Data();
+      h = h->next;
+      ideal GI = (ideal) h->Data();
+      res->rtyp = INT_CMD;
+      res->data = (void *) testGB(I, GI);
       return(FALSE);
     }
     else
@@ -2732,30 +2769,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else return TRUE;
     }
     else
-#ifdef HAVE_RING2TOM
-/*==================== Testing groebner basis =================*/
-    if (strcmp(sys_cmd, "spoly")==0)
-    {
-      poly f = pCopy((poly) h->Data());
-      h = h->next;
-      poly g = pCopy((poly) h->Data());
-
-      res->rtyp=POLY_CMD;
-      res->data=(poly) plain_spoly(f,g);
-      return(FALSE);
-    }
-    else
-    if (strcmp(sys_cmd, "testGB")==0)
-    {
-      ideal I = (ideal) h->Data();
-      h = h->next;
-      ideal GI = (ideal) h->Data();
-      res->rtyp = INT_CMD;
-      res->data = (void *) testGB(I, GI);
-      return(FALSE);
-    }
-    else
-#endif
 #ifdef ix86_Win
 /*==================== Python Singular =================*/
     if (strcmp(sys_cmd, "python") == 0)
