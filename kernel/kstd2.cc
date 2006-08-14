@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.17 2006-06-07 18:44:23 wienand Exp $ */
+/* $Id: kstd2.cc,v 1.18 2006-08-14 17:08:36 wienand Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -185,31 +185,6 @@ long factorial(long arg)
    return tmp;
 }
 
-long ind2(long arg)
-{
-  long ind = 0;
-  if (arg <= 0) return 0;
-  while (arg%2 == 0)
-  {
-    arg = arg / 2;
-    ind++;
-  }
-  return ind;
-}
-
-long ind_fact_2(long arg)
-{
-  long ind = 0;
-  if (arg <= 0) return 0;
-  if (arg%2 == 1) { arg--; }
-  while (arg > 0)
-  {
-    ind += ind2(arg);
-    arg = arg - 2;
-  }
-  return ind;
-}
-
 poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
 {
   // m = currRing->ch
@@ -224,7 +199,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
   int a_ind2 = ind2(a);
 
   long k = 1;
-  // of interest is only k_ind2, special routine for improvement ... TOTO OLIVER
+  // of interest is only k_ind2, special routine for improvement ... TODO OLIVER
   for (int i = 1; i <= leadRing->N; i++)
   {
     k_ind2 = k_ind2 + ind_fact_2(p_GetExp(p, i, leadRing));
@@ -281,7 +256,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
     pNext(tmp2) = zeroPoly;
     return tmp2;
   }
-  long alpha_k = twoPow(leadRing->ch - k_ind2);
+/*  long alpha_k = twoPow(leadRing->ch - k_ind2);
   if (1 == 0 && alpha_k <= a) {  // Temporarly disabled, reducing coefficients not compatible with std TODO Oliver
     zeroPoly = p_ISet((a / alpha_k)*alpha_k, tailRing);
     for (int i = 1; i <= leadRing->N; i++) {
@@ -307,7 +282,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
     zeroPoly = p_LmDeleteAndNext(zeroPoly, tailRing);
     pNext(tmp2) = zeroPoly;
     return tmp2;
-  }
+  } */
   return NULL;
 }
 
@@ -342,7 +317,8 @@ int redRing2toM (LObject* h,kStrategy strat)
   h->SetShortExpVector();
   loop
   {
-    zeroPoly = NULL; //kFindDivisibleByZeroPoly(h);
+#ifdef HAVE_VANGB
+    zeroPoly = kFindDivisibleByZeroPoly(h);
     if (zeroPoly != NULL)
     {
       if (TEST_OPT_PROT)
@@ -365,6 +341,7 @@ int redRing2toM (LObject* h,kStrategy strat)
       j = strat->tl;
     }
     else
+#endif
     {
       j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
       if (j < 0) return 1;
@@ -993,13 +970,20 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // enter into S, L, and T
       enterT(strat->P, strat);
 #ifdef HAVE_RING2TOM
+#ifdef HAVE_VANGB
+      int at_R = strat->tl;
+#endif
       if (currRing->cring == 1)
         superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
       else
 #endif
         enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
       // posInS only depends on the leading term
+#ifdef HAVE_VANGB
+      strat->enterS(strat->P, pos, strat, at_R);
+#else
       strat->enterS(strat->P, pos, strat, strat->tl);
+#endif
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 //      Print("[%d]",hilbeledeg);
       if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
