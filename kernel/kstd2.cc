@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.18 2006-08-14 17:08:36 wienand Exp $ */
+/* $Id: kstd2.cc,v 1.19 2006-08-15 04:46:23 wienand Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -319,6 +319,9 @@ int redRing2toM (LObject* h,kStrategy strat)
   {
 #ifdef HAVE_VANGB
     zeroPoly = kFindDivisibleByZeroPoly(h);
+#else
+    zeroPoly = NULL;
+#endif
     if (zeroPoly != NULL)
     {
       if (TEST_OPT_PROT)
@@ -341,7 +344,6 @@ int redRing2toM (LObject* h,kStrategy strat)
       j = strat->tl;
     }
     else
-#endif
     {
       j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
       if (j < 0) return 1;
