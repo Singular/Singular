@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgbgauss.cc,v 1.7 2005-05-17 15:26:27 bricken Exp $ */
+/* $Id: tgbgauss.cc,v 1.8 2006-08-21 17:08:47 Singular Exp $ */
 /*
 * ABSTRACT: gauss implementation for F4
 */
@@ -14,61 +14,70 @@
 #include "polys.h"
 static const int bundle_size=100;
 
-mac_poly mac_p_add_ff_qq(mac_poly a, number f,mac_poly b){
+mac_poly mac_p_add_ff_qq(mac_poly a, number f,mac_poly b)
+{
   mac_poly erg;
   mac_poly* set_this;
   set_this=&erg;
-  while((a!=NULL) &&(b!=NULL)){
-    if (a->exp<b->exp){
+  while((a!=NULL) &&(b!=NULL))
+  {
+    if (a->exp<b->exp)
+    {
       (*set_this)=a;
       a=a->next;
       set_this= &((*set_this)->next);
-    } 
-    else{
-      if (a->exp>b->exp){
-	mac_poly in =new mac_poly_r();
-	in->exp=b->exp;
-	in->coef=nMult(b->coef,f);
-	(*set_this)=in;
-	b=b->next;
-	set_this= &((*set_this)->next);
+    }
+    else
+    {
+      if (a->exp>b->exp)
+      {
+        mac_poly in =new mac_poly_r();
+        in->exp=b->exp;
+        in->coef=nMult(b->coef,f);
+        (*set_this)=in;
+        b=b->next;
+        set_this= &((*set_this)->next);
       }
-      else {
-	//a->exp==b->ecp
-	number n=nMult(b->coef,f);
-	number n2=nAdd(a->coef,n);
-	nDelete(&n);
-	nDelete(&(a->coef));
-	if (nIsZero(n2)){
-	  nDelete(&n2);
-	  mac_poly ao=a;
-	  a=a->next;
-	  delete ao;
-	  b=b->next;
-	  
-	} else {
-	  a->coef=n2;
-	  b=b->next;
-	  (*set_this)=a;
-	  a=a->next;
-	  set_this= &((*set_this)->next);
-	}
- 
+      else
+      {
+        //a->exp==b->ecp
+        number n=nMult(b->coef,f);
+        number n2=nAdd(a->coef,n);
+        nDelete(&n);
+        nDelete(&(a->coef));
+        if (nIsZero(n2))
+        {
+          nDelete(&n2);
+          mac_poly ao=a;
+          a=a->next;
+          delete ao;
+          b=b->next;
+        }
+        else
+        {
+          a->coef=n2;
+          b=b->next;
+          (*set_this)=a;
+          a=a->next;
+          set_this= &((*set_this)->next);
+        }
       }
-    
     }
   }
-  if((a==NULL)&&(b==NULL)){
+  if((a==NULL)&&(b==NULL))
+  {
     (*set_this)=NULL;
     return erg;
   }
-  if (b==NULL) {
+  if (b==NULL)
+  {
     (*set_this=a);
     return erg;
   }
-  
+
   //a==NULL
-  while(b!=NULL){
+  while(b!=NULL)
+  {
     mac_poly mp= new mac_poly_r();
     mp->exp=b->exp;
     mp->coef=nMult(f,b->coef);
@@ -78,18 +87,21 @@ mac_poly mac_p_add_ff_qq(mac_poly a, number f,mac_poly b){
   }
   (*set_this)=NULL;
   return erg;
-  
 }
-void mac_mult_cons(mac_poly p,number c){
-  while(p){
+
+void mac_mult_cons(mac_poly p,number c)
+{
+  while(p)
+  {
     number m=nMult(p->coef,c);
     nDelete(&(p->coef));
     p->coef=m;
     p=p->next;
   }
-  
 }
-int mac_length(mac_poly p){
+
+int mac_length(mac_poly p)
+{
   int l=0;
   while(p){
     l++;
@@ -97,8 +109,10 @@ int mac_length(mac_poly p){
   }
   return l;
 }
+
 //contrary to delete on the mac_poly_r, the coefficients are also destroyed here
-void mac_destroy(mac_poly p){
+void mac_destroy(mac_poly p)
+{
   mac_poly iter=p;
   while(iter)
   {
@@ -109,7 +123,8 @@ void mac_destroy(mac_poly p){
   }
 }
 
-void simple_gauss(tgb_sparse_matrix* mat, slimgb_alg* c){
+void simple_gauss(tgb_sparse_matrix* mat, slimgb_alg* c)
+{
   int col, row;
   int* row_cache=(int*) omalloc(mat->get_rows()*sizeof(int));
   col=0;
@@ -119,7 +134,7 @@ void simple_gauss(tgb_sparse_matrix* mat, slimgb_alg* c){
   int matcol=mat->get_columns();
   int* area=(int*) omalloc(sizeof(int)*((matcol-1)/bundle_size+1));
   const int max_area_index=(matcol-1)/bundle_size;
-    //rows are divided in areas 
+    //rows are divided in areas
   //if row begins with columns col, it is located in [area[col/bundle_size],area[col/bundle_size+1]-1]
   assume(pn>0);
   //first clear zeroes
@@ -131,7 +146,7 @@ void simple_gauss(tgb_sparse_matrix* mat, slimgb_alg* c){
       pn--;
       if(i!=pn){i--;}
     }
- 
+
   }
   mat->sort_rows();
   for(i=0;i<pn;i++)
@@ -148,7 +163,7 @@ void simple_gauss(tgb_sparse_matrix* mat, slimgb_alg* c){
     {
       int j;
       for(j=last_area+1;j<=this_area;j++)
-	area[j]=i;
+        area[j]=i;
       last_area=this_area;
     }
   }
@@ -156,67 +171,70 @@ void simple_gauss(tgb_sparse_matrix* mat, slimgb_alg* c){
   {
     area[i]=pn;
   }
-  while(row<pn-1){
+  while(row<pn-1)
+  {
     //row is the row where pivot should be
     // row== pn-1 means we have only to act on one row so no red nec.
     //we assume further all rows till the pn-1 row are non-zero
-    
+
     //select column
-   
+
     //col=mat->min_col_not_zero_in_row(row);
     int max_in_area;
     {
       int tai=row_cache[row]/bundle_size;
       assume(tai<=max_area_index);
       if(tai==max_area_index)
-	max_in_area=pn-1;
+        max_in_area=pn-1;
       else
-	max_in_area=area[tai+1]-1;
+        max_in_area=area[tai+1]-1;
     }
     assume(row_cache[row]==mat->min_col_not_zero_in_row(row));
     col=row_cache[row];
 
-    
     assume(col!=matcol);
     int found_in_row;
-    
+
     found_in_row=row;
     BOOLEAN must_reduce=FALSE;
     assume(pn<=mat->get_rows());
-    for(i=row+1;i<=max_in_area;i++){
+    for(i=row+1;i<=max_in_area;i++)
+    {
       int first;//=mat->min_col_not_zero_in_row(i);
       assume(row_cache[i]==mat->min_col_not_zero_in_row(i));
       first=row_cache[i];
       assume(first!=matcol);
       if(first<col)
       {
-	col=first;
-	found_in_row=i;
-	must_reduce=FALSE;
+        col=first;
+        found_in_row=i;
+        must_reduce=FALSE;
       }
-      else {
-	if(first==col)
-	  must_reduce=TRUE;
+      else
+      {
+        if(first==col)
+          must_reduce=TRUE;
       }
     }
     //select pivot
     int act_l=nSize(mat->get(found_in_row,col))*mat->non_zero_entries(found_in_row);
     if(must_reduce)
     {
-      for(i=found_in_row+1;i<=max_in_area;i++){
-	assume(mat->min_col_not_zero_in_row(i)>=col);
-	int first;
-	assume(row_cache[i]==mat->min_col_not_zero_in_row(i));
-	first=row_cache[i];
-	assume(first!=matcol);
-	//      if((!(mat->is_zero_entry(i,col)))&&(mat->non_zero_entries(i)<act_l))
-	int nz;
-	if((row_cache[i]==col)&&((nz=nSize(mat->get(i,col))*mat->non_zero_entries(i))<act_l))
-	{
-	  found_in_row=i;
-	act_l=nz;
-	}
-	
+      for(i=found_in_row+1;i<=max_in_area;i++)
+      {
+        assume(mat->min_col_not_zero_in_row(i)>=col);
+        int first;
+        assume(row_cache[i]==mat->min_col_not_zero_in_row(i));
+        first=row_cache[i];
+        assume(first!=matcol);
+        //      if((!(mat->is_zero_entry(i,col)))&&(mat->non_zero_entries(i)<act_l))
+        int nz;
+        if((row_cache[i]==col)&&((nz=nSize(mat->get(i,col))*mat->non_zero_entries(i))<act_l))
+        {
+          found_in_row=i;
+          act_l=nz;
+        }
+
       }
     }
     mat->perm_rows(row,found_in_row);
@@ -224,9 +242,8 @@ void simple_gauss(tgb_sparse_matrix* mat, slimgb_alg* c){
     row_cache[row]=row_cache[found_in_row];
     row_cache[found_in_row]=h;
 
-
-
-    if(!must_reduce){
+    if(!must_reduce)
+    {
       row++;
       continue;
     }
@@ -247,69 +264,68 @@ void simple_gauss(tgb_sparse_matrix* mat, slimgb_alg* c){
       assume(first!=matcol);
       if(row_cache[i]==col)
       {
-	
-	number c1=mat->get(i,col);
-	number c2=mat->get(row,col);
-	number n1=c1;
-	number n2=c2;
 
-	ksCheckCoeff(&n1,&n2);
-	//nDelete(&c1);
-	n1=nNeg(n1);
-	mat->mult_row(i,n2);
-	mat->add_lambda_times_row(i,row,n1);
-	nDelete(&n1);
-	nDelete(&n2);
-	assume(mat->is_zero_entry(i,col));
-	row_cache[i]=mat->min_col_not_zero_in_row(i);
-	assume(mat->min_col_not_zero_in_row(i)>col);
-	if(row_cache[i]==matcol)
-	{
-	  int index;
-	  index=i;
-	  int last_in_area;
-	  int this_cai=col_area_index;
-	  while(this_cai<max_area_index)
-	  {
-	    last_in_area=area[this_cai+1]-1;
-	    int h_c=row_cache[last_in_area];
-	    row_cache[last_in_area]=row_cache[index];
-	    row_cache[index]=h_c;
-	    mat->perm_rows(index,last_in_area);
-	    index=last_in_area;
-	    this_cai++;
-	    area[this_cai]--;
-	  }
-	  mat->perm_rows(index,pn-1);
-	  row_cache[index]=row_cache[pn-1];
-	  row_cache[pn-1]=matcol;
-	  pn--;
-	}
-	else 
-	{
-	  int index;
-	  index=i;
-	  int last_in_area;
-	  int this_cai=col_area_index;
-	  int final_cai=row_cache[index]/bundle_size;
-	  assume(final_cai<=max_area_index);
-	  while(this_cai<final_cai)
-	  {
-	    last_in_area=area[this_cai+1]-1;
-	    int h_c=row_cache[last_in_area];
-	    row_cache[last_in_area]=row_cache[index];
-	    row_cache[index]=h_c;
-	    mat->perm_rows(index,last_in_area);
-	    index=last_in_area;
-	    this_cai++;
-	    area[this_cai]--;
-	  }
-	}
+        number c1=mat->get(i,col);
+        number c2=mat->get(row,col);
+        number n1=c1;
+        number n2=c2;
+
+        ksCheckCoeff(&n1,&n2);
+        //nDelete(&c1);
+        n1=nNeg(n1);
+        mat->mult_row(i,n2);
+        mat->add_lambda_times_row(i,row,n1);
+        nDelete(&n1);
+        nDelete(&n2);
+        assume(mat->is_zero_entry(i,col));
+        row_cache[i]=mat->min_col_not_zero_in_row(i);
+        assume(mat->min_col_not_zero_in_row(i)>col);
+        if(row_cache[i]==matcol)
+        {
+          int index;
+          index=i;
+          int last_in_area;
+          int this_cai=col_area_index;
+          while(this_cai<max_area_index)
+          {
+            last_in_area=area[this_cai+1]-1;
+            int h_c=row_cache[last_in_area];
+            row_cache[last_in_area]=row_cache[index];
+            row_cache[index]=h_c;
+            mat->perm_rows(index,last_in_area);
+            index=last_in_area;
+            this_cai++;
+            area[this_cai]--;
+          }
+          mat->perm_rows(index,pn-1);
+          row_cache[index]=row_cache[pn-1];
+          row_cache[pn-1]=matcol;
+          pn--;
+        }
+        else
+        {
+          int index;
+          index=i;
+          int last_in_area;
+          int this_cai=col_area_index;
+          int final_cai=row_cache[index]/bundle_size;
+          assume(final_cai<=max_area_index);
+          while(this_cai<final_cai)
+          {
+            last_in_area=area[this_cai+1]-1;
+            int h_c=row_cache[last_in_area];
+            row_cache[last_in_area]=row_cache[index];
+            row_cache[index]=h_c;
+            mat->perm_rows(index,last_in_area);
+            index=last_in_area;
+            this_cai++;
+            area[this_cai]--;
+          }
+        }
       }
       else
-	assume(mat->min_col_not_zero_in_row(i)>col);
+        assume(mat->min_col_not_zero_in_row(i)>col);
     }
-
 //     for(i=row+1;i<pn;i++)
 //     {
 //       assume(mat->min_col_not_zero_in_row(i)==row_cache[i]);
@@ -317,30 +333,26 @@ void simple_gauss(tgb_sparse_matrix* mat, slimgb_alg* c){
 //       assume(matcol==mat->get_columns());
 //       if(row_cache[i]==matcol)
 //       {
-// 	assume(mat->zero_row(i));
-// 	mat->perm_rows(i,pn-1);
-// 	row_cache[i]=row_cache[pn-1];
-// 	row_cache[pn-1]=matcol;
-// 	pn--;
-// 	if(i!=pn){i--;}
+//         assume(mat->zero_row(i));
+//         mat->perm_rows(i,pn-1);
+//         row_cache[i]=row_cache[pn-1];
+//         row_cache[pn-1]=matcol;
+//         pn--;
+//         if(i!=pn){i--;}
 //       }
 //     }
 #ifdef TGB_DEBUG
   {
-  int last=-1;
-  for(i=0;i<pn;i++)
-  {
-    int act=mat->min_col_not_zero_in_row(i);
-    assume(act>last);
-    
-  }
-  for(i=pn;i<mat->get_rows();i++)
-  {
-    assume(mat->zero_row(i));
-    
-  }
-  
-
+    int last=-1;
+    for(i=0;i<pn;i++)
+    {
+      int act=mat->min_col_not_zero_in_row(i);
+      assume(act>last);
+    }
+    for(i=pn;i<mat->get_rows();i++)
+    {
+      assume(mat->zero_row(i));
+    }
   }
 #endif
     row++;
@@ -348,7 +360,9 @@ void simple_gauss(tgb_sparse_matrix* mat, slimgb_alg* c){
   omfree(area);
   omfree(row_cache);
 }
-void simple_gauss2(tgb_matrix* mat){
+
+void simple_gauss2(tgb_matrix* mat)
+{
   int col, row;
   col=0;
   row=0;
@@ -369,23 +383,23 @@ void simple_gauss2(tgb_matrix* mat){
     //row is the row where pivot should be
     // row== pn-1 means we have only to act on one row so no red nec.
     //we assume further all rows till the pn-1 row are non-zero
-    
+
     //select column
-   
+
     //    col=mat->min_col_not_zero_in_row(row);
     assume(col!=mat->get_columns());
     int found_in_row=-1;
-    
+
     //    found_in_row=row;
     assume(pn<=mat->get_rows());
     for(i=row;i<pn;i++)
     {
       //    int first=mat->min_col_not_zero_in_row(i);
       //  if(first<col)
-      if(!(mat->is_zero_entry(i,col))){
-	
-	found_in_row=i;
-	break;
+      if(!(mat->is_zero_entry(i,col)))
+      {
+        found_in_row=i;
+        break;
       }
     }
     if(found_in_row!=-1)
@@ -394,37 +408,35 @@ void simple_gauss2(tgb_matrix* mat){
       int act_l=mat->non_zero_entries(found_in_row);
       for(i=i+1;i<pn;i++)
       {
-	int vgl;
-	assume(mat->min_col_not_zero_in_row(i)>=col);
-	if((!(mat->is_zero_entry(i,col)))&&((vgl=mat->non_zero_entries(i))<act_l))
-	{
-	  found_in_row=i;
-	  act_l=vgl;
-	}
-	
+        int vgl;
+        assume(mat->min_col_not_zero_in_row(i)>=col);
+        if((!(mat->is_zero_entry(i,col)))
+        &&((vgl=mat->non_zero_entries(i))<act_l))
+        {
+          found_in_row=i;
+          act_l=vgl;
+        }
+
       }
       mat->perm_rows(row,found_in_row);
-      
-      
+
       //reduction
       for(i=row+1;i<pn;i++){
-	assume(mat->min_col_not_zero_in_row(i)>=col);
-	if(!(mat->is_zero_entry(i,col)))
-	{
-	  
-	  number c1=nNeg(nCopy(mat->get(i,col)));
-	  number c2=mat->get(row,col);
-	  number n1=c1;
-	  number n2=c2;
-	  
-	  ksCheckCoeff(&n1,&n2);
-	  nDelete(&c1);
-	  mat->mult_row(i,n2);
-	  mat->add_lambda_times_row(i,row,n1);
-	  assume(mat->is_zero_entry(i,col));
-	  
-	} 
-	assume(mat->min_col_not_zero_in_row(i)>col);
+        assume(mat->min_col_not_zero_in_row(i)>=col);
+        if(!(mat->is_zero_entry(i,col)))
+        {
+          number c1=nNeg(nCopy(mat->get(i,col)));
+          number c2=mat->get(row,col);
+          number n1=c1;
+          number n2=c2;
+
+          ksCheckCoeff(&n1,&n2);
+          nDelete(&c1);
+          mat->mult_row(i,n2);
+          mat->add_lambda_times_row(i,row,n1);
+          assume(mat->is_zero_entry(i,col));
+        }
+        assume(mat->min_col_not_zero_in_row(i)>col);
       }
       row++;
     }
@@ -433,16 +445,17 @@ void simple_gauss2(tgb_matrix* mat){
 //     {
 //       if(mat->zero_row(i))
 //       {
-// 	mat->perm_rows(i,pn-1);
-// 	pn--;
-// 	if(i!=pn){i--;}
+//         mat->perm_rows(i,pn-1);
+//         pn--;
+//         if(i!=pn){i--;}
 //       }
 //     }
-
   }
 }
 
-tgb_matrix::tgb_matrix(int i, int j){
+
+tgb_matrix::tgb_matrix(int i, int j)
+{
   n=(number**) omalloc(i*sizeof (number*));;
   int z;
   int z2;
@@ -458,7 +471,9 @@ tgb_matrix::tgb_matrix(int i, int j){
   this->rows=i;
   free_numbers=FALSE;
 }
-tgb_matrix::~tgb_matrix(){
+
+tgb_matrix::~tgb_matrix()
+{
   int z;
   for(z=0;z<rows;z++)
   {
@@ -466,21 +481,23 @@ tgb_matrix::~tgb_matrix(){
     {
       if(free_numbers)
       {
-	int z2;
-	for(z2=0;z2<columns;z2++)
-	{
-	  nDelete(&(n[z][z2]));
-	}
+        int z2;
+        for(z2=0;z2<columns;z2++)
+        {
+          nDelete(&(n[z][z2]));
+        }
       }
       omfree(n[z]);
     }
   }
   omfree(n);
 }
-void tgb_matrix::print(){
+
+void tgb_matrix::print()
+{
   int i;
   int j;
-  Print("\n");
+  PrintLn();
   for(i=0;i<rows;i++)
   {
     Print("(");
@@ -494,33 +511,47 @@ void tgb_matrix::print(){
     Print(")\n");
   }
 }
+
 //transfers ownership of n to the matrix
-void tgb_matrix::set(int i, int j, number n){
+void tgb_matrix::set(int i, int j, number n)
+{
   assume(i<rows);
   assume(j<columns);
   this->n[i][j]=n;
 }
-int tgb_matrix::get_rows(){
+
+int tgb_matrix::get_rows()
+{
   return rows;
 }
-int tgb_matrix::get_columns(){
+
+int tgb_matrix::get_columns()
+{
   return columns;
 }
-number tgb_matrix::get(int i, int j){
+
+number tgb_matrix::get(int i, int j)
+{
   assume(i<rows);
   assume(j<columns);
   return n[i][j];
 }
-BOOLEAN tgb_matrix::is_zero_entry(int i, int j){
+
+BOOLEAN tgb_matrix::is_zero_entry(int i, int j)
+{
   return (nIsZero(n[i][j]));
 }
-void tgb_matrix::perm_rows(int i, int j){
+
+void tgb_matrix::perm_rows(int i, int j)
+{
   number* h;
   h=n[i];
   n[i]=n[j];
   n[j]=h;
 }
-int tgb_matrix::min_col_not_zero_in_row(int row){
+
+int tgb_matrix::min_col_not_zero_in_row(int row)
+{
   int i;
   for(i=0;i<columns;i++)
   {
@@ -529,7 +560,9 @@ int tgb_matrix::min_col_not_zero_in_row(int row){
   }
   return columns;//error code
 }
-int tgb_matrix::next_col_not_zero(int row,int pre){
+
+int tgb_matrix::next_col_not_zero(int row,int pre)
+{
   int i;
   for(i=pre+1;i<columns;i++)
   {
@@ -538,7 +571,9 @@ int tgb_matrix::next_col_not_zero(int row,int pre){
   }
   return columns;//error code
 }
-BOOLEAN tgb_matrix::zero_row(int row){
+
+BOOLEAN tgb_matrix::zero_row(int row)
+{
   int i;
   for(i=0;i<columns;i++)
   {
@@ -547,7 +582,9 @@ BOOLEAN tgb_matrix::zero_row(int row){
   }
   return TRUE;
 }
-int tgb_matrix::non_zero_entries(int row){
+
+int tgb_matrix::non_zero_entries(int row)
+{
   int i;
   int z=0;
   for(i=0;i<columns;i++)
@@ -557,10 +594,13 @@ int tgb_matrix::non_zero_entries(int row){
   }
   return z;
 }
+
 //row add_to=row add_to +row summand*factor
-void tgb_matrix::add_lambda_times_row(int add_to,int summand,number factor){
+void tgb_matrix::add_lambda_times_row(int add_to,int summand,number factor)
+{
   int i;
-  for(i=0;i<columns;i++){
+  for(i=0;i<columns;i++)
+  {
     if(!(nIsZero(n[summand][i])))
     {
       number n1=n[add_to][i];
@@ -571,11 +611,14 @@ void tgb_matrix::add_lambda_times_row(int add_to,int summand,number factor){
     }
   }
 }
-void tgb_matrix::mult_row(int row,number factor){
+
+void tgb_matrix::mult_row(int row,number factor)
+{
   if (nIsOne(factor))
     return;
   int i;
-  for(i=0;i<columns;i++){
+  for(i=0;i<columns;i++)
+  {
     if(!(nIsZero(n[row][i])))
     {
       number n1=n[row][i];
@@ -584,7 +627,9 @@ void tgb_matrix::mult_row(int row,number factor){
     }
   }
 }
-void tgb_matrix::free_row(int row, BOOLEAN free_non_zeros){
+
+void tgb_matrix::free_row(int row, BOOLEAN free_non_zeros)
+{
   int i;
   for(i=0;i<columns;i++)
     if((free_non_zeros)||(!(nIsZero(n[row][i]))))
@@ -593,8 +638,8 @@ void tgb_matrix::free_row(int row, BOOLEAN free_non_zeros){
   n[row]=NULL;
 }
 
-
-tgb_sparse_matrix::tgb_sparse_matrix(int i, int j, ring rarg){
+tgb_sparse_matrix::tgb_sparse_matrix(int i, int j, ring rarg)
+{
   mp=(mac_poly*) omalloc(i*sizeof (mac_poly));;
   int z;
   int z2;
@@ -607,30 +652,33 @@ tgb_sparse_matrix::tgb_sparse_matrix(int i, int j, ring rarg){
   free_numbers=FALSE;
   r=rarg;
 }
-tgb_sparse_matrix::~tgb_sparse_matrix(){
+
+tgb_sparse_matrix::~tgb_sparse_matrix()
+{
   int z;
   for(z=0;z<rows;z++)
   {
-    if(mp[z])
+    if(mp[z]!=NULL)
     {
       if(free_numbers)
       {
-	mac_destroy(mp[z]);
+        mac_destroy(mp[z]);
       }
       else {
-	while(mp[z])
-	{
-	 
-	  mac_poly next=mp[z]->next;
-	  delete mp[z];
-	  mp[z]=next;
-	}
+        while(mp[z]!=NULL)
+        {
+          mac_poly next=mp[z]->next;
+          delete mp[z];
+          mp[z]=next;
+        }
       }
     }
   }
   omfree(mp);
 }
-static int row_cmp_gen(const void* a, const void* b){
+
+static int row_cmp_gen(const void* a, const void* b)
+{
   const mac_poly ap= *((mac_poly*) a);
   const mac_poly bp=*((mac_poly*) b);
   if (ap==NULL) return 1;
@@ -638,10 +686,14 @@ static int row_cmp_gen(const void* a, const void* b){
   if (ap->exp<bp->exp) return -1;
   return 1;
 }
-void tgb_sparse_matrix::sort_rows(){
+
+void tgb_sparse_matrix::sort_rows()
+{
   qsort(mp,rows,sizeof(mac_poly),row_cmp_gen);
 }
-void tgb_sparse_matrix::print(){
+
+void tgb_sparse_matrix::print()
+{
   int i;
   int j;
   Print("\n");
@@ -659,8 +711,10 @@ void tgb_sparse_matrix::print(){
     Print(")\n");
   }
 }
+
 //transfers ownership of n to the matrix
-void tgb_sparse_matrix::set(int i, int j, number n){
+void tgb_sparse_matrix::set(int i, int j, number n)
+{
   assume(i<rows);
   assume(j<columns);
   mac_poly* set_this=&mp[i];
@@ -690,21 +744,22 @@ void tgb_sparse_matrix::set(int i, int j, number n){
     mac_poly dt=(*set_this);
     (*set_this)=dt->next;
     delete dt;
-    
-   
   }
   return;
 }
 
-
-
-int tgb_sparse_matrix::get_rows(){
+int tgb_sparse_matrix::get_rows()
+{
   return rows;
 }
-int tgb_sparse_matrix::get_columns(){
+
+int tgb_sparse_matrix::get_columns()
+{
   return columns;
 }
-number tgb_sparse_matrix::get(int i, int j){
+
+number tgb_sparse_matrix::get(int i, int j)
+{
   assume(i<rows);
   assume(j<columns);
   mac_poly r=mp[i];
@@ -718,7 +773,9 @@ number tgb_sparse_matrix::get(int i, int j){
   assume(r->exp==j);
   return r->coef;
 }
-BOOLEAN tgb_sparse_matrix::is_zero_entry(int i, int j){
+
+BOOLEAN tgb_sparse_matrix::is_zero_entry(int i, int j)
+{
   assume(i<rows);
   assume(j<columns);
   mac_poly r=mp[i];
@@ -731,21 +788,21 @@ BOOLEAN tgb_sparse_matrix::is_zero_entry(int i, int j){
   assume(!nIsZero(r->coef));
   assume(r->exp==j);
   return FALSE;
-  
 }
 
-int tgb_sparse_matrix::min_col_not_zero_in_row(int row){
+int tgb_sparse_matrix::min_col_not_zero_in_row(int row)
+{
   if(mp[row]!=NULL)
   {
     assume(!nIsZero(mp[row]->coef));
     return mp[row]->exp;
   }
   else
-
- 
-  return columns;//error code
+    return columns;//error code
 }
-int tgb_sparse_matrix::next_col_not_zero(int row,int pre){  
+
+int tgb_sparse_matrix::next_col_not_zero(int row,int pre)
+{
   mac_poly r=mp[row];
   while((r!=NULL)&&(r->exp<=pre))
     r=r->next;
@@ -756,27 +813,32 @@ int tgb_sparse_matrix::next_col_not_zero(int row,int pre){
   }
   return columns;//error code
 }
-BOOLEAN tgb_sparse_matrix::zero_row(int row){
+
+BOOLEAN tgb_sparse_matrix::zero_row(int row)
+{
   assume((mp[row]==NULL)||(!nIsZero(mp[row]->coef)));
   if (mp[row]==NULL)
     return TRUE;
   else
     return FALSE;
 }
-void tgb_sparse_matrix::row_normalize(int row){
+
+void tgb_sparse_matrix::row_normalize(int row)
+{
   if (!rField_has_simple_inverse(r))  /* Z/p, GF(p,n), R, long R/C */
   {
     mac_poly m=mp[row];
-	while (m!=NULL)
-	{
-	  if (currRing==r) {nTest(m->coef);}
-	  n_Normalize(m->coef,r);
-	  m=m->next;
-	}
+    while (m!=NULL)
+    {
+      if (currRing==r) {nTest(m->coef);}
+      n_Normalize(m->coef,r);
+      m=m->next;
+    }
   }
 }
-void tgb_sparse_matrix::row_content(int row){
-  
+
+void tgb_sparse_matrix::row_content(int row)
+{
   mac_poly ph=mp[row];
   number h,d;
   mac_poly p;
@@ -790,19 +852,20 @@ void tgb_sparse_matrix::row_content(int row){
   else
   {
     nNormalize(ph->coef);
-    if(!nGreaterZero(ph->coef)) {
+    if(!nGreaterZero(ph->coef))
+    {
       //ph = pNeg(ph);
       p=ph;
-      while(p)
+      while(p!=NULL)
       {
-	p->coef=nNeg(p->coef);
-	p=p->next;
+        p->coef=nNeg(p->coef);
+        p=p->next;
       }
     }
-    
+
     h=nCopy(ph->coef);
     p = ph->next;
-    
+
     while (p!=NULL)
     {
       nNormalize(p->coef);
@@ -821,46 +884,48 @@ void tgb_sparse_matrix::row_content(int row){
     {
       while (p!=NULL)
       {
-    
         d = nIntDiv(pGetCoeff(p),h);
-	nDelete(&p->coef);
+        nDelete(&p->coef);
         p->coef=d;
         p=p->next;
       }
     }
     nDelete(&h);
-
   }
 }
-int tgb_sparse_matrix::non_zero_entries(int row){
-
+int tgb_sparse_matrix::non_zero_entries(int row)
+{
   return mac_length(mp[row]);
 }
-//row add_to=row add_to +row summand*factor
-void tgb_sparse_matrix::add_lambda_times_row(int add_to,int summand,number factor){
-  mp[add_to]= mac_p_add_ff_qq(mp[add_to], factor,mp[summand]);
 
+//row add_to=row add_to +row summand*factor
+void tgb_sparse_matrix::add_lambda_times_row(int add_to,int summand,number factor)
+{
+  mp[add_to]= mac_p_add_ff_qq(mp[add_to], factor,mp[summand]);
 }
-void tgb_sparse_matrix::mult_row(int row,number factor){
+
+void tgb_sparse_matrix::mult_row(int row,number factor)
+{
   if (nIsZero(factor))
   {
     mac_destroy(mp[row]);
     mp[row]=NULL;
-   
+
     return;
   }
   if(nIsOne(factor))
     return;
   mac_mult_cons(mp[row],factor);
 }
-void tgb_sparse_matrix::free_row(int row, BOOLEAN free_non_zeros){
+
+void tgb_sparse_matrix::free_row(int row, BOOLEAN free_non_zeros)
+{
   if(free_non_zeros)
     mac_destroy(mp[row]);
   else
   {
-    while(mp[row])
+    while(mp[row]!=NULL)
     {
-      
       mac_poly next=mp[row]->next;
       delete mp[row];
       mp[row]=next;
