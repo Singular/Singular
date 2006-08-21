@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: walk.cc,v 1.11 2006-05-05 13:08:30 Singular Exp $ */
+/* $Id: walk.cc,v 1.12 2006-08-21 16:53:53 Singular Exp $ */
 /*
 * ABSTRACT: Implementation of the Groebner walk
 */
@@ -93,7 +93,6 @@
 
 #include "mpr_complex.h"
 
-ideal Gnull = NULL;
 int nstep;
 
 extern BOOLEAN ErrorCheck();
