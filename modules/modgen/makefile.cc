@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.26 2006-07-01 16:10:32 Singular Exp $ */
+/* $Id: makefile.cc,v 1.27 2006-08-23 15:40:58 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -160,7 +160,43 @@ static char *object_name(char *p)
 /*========================================================================*/
 /*===  Machine depend Makefile creation                                ===*/
 /*========================================================================*/
-#if defined(ix86_Linux) || defined(ix86_Linux_libc5) || defined(ix86_freebsd)|| defined(x86_64_Linux) || defined(IRIX_6) || defined(sparc64_Linux) || defined(IA64_Linux) || defined(DecAlpha_Linux)
+#if defined(ix86_Linux)
+#define HAVE_ELF_SYSTEM
+#endif
+
+#if defined(ix86_Linux_libc5)
+#define HAVE_ELF_SYSTEM
+#endif
+
+#if defined(ix86_freebsd)
+#define HAVE_ELF_SYSTEM
+#endif
+
+#if defined(x86_64_Linux)
+#define HAVE_ELF_SYSTEM
+#endif
+
+#if defined(IRIX_6)
+#define HAVE_ELF_SYSTEM
+#endif
+
+#if defined(sparc64_Linux)
+#define HAVE_ELF_SYSTEM
+#endif
+
+#if defined(IA64_Linux)
+#define HAVE_ELF_SYSTEM
+#endif
+
+#if defined(DecAlpha_Linux)
+#define HAVE_ELF_SYSTEM
+#endif
+
+#if defined(ppc_Linux)
+#define HAVE_ELF_SYSTEM
+#endif
+
+#if defined(HAVE_ELF_SYSTEM)
 void build_compile_section(
   FILE *fp,
   moddefv module
@@ -195,9 +231,9 @@ void build_compile_section(
           module->major, module->minor, module->level, module->targetname);
   fprintf(fp, "\n");
 }
-#endif /* ix86_Linux */
 
 /*========================================================================*/
+#else
 #if defined(HPUX_9) || defined(HPUX_10)
 void build_compile_section(
   FILE *fp,
@@ -214,10 +250,8 @@ void build_compile_section(
   fprintf(fp, "\t\t${OBJS}\n");
 }
 
-#endif /* HPUX_9  or HPUX_10 */
-
+#else /* HPUX_9  or HPUX_10 */
 /*========================================================================*/
-#  ifdef m68k_MPW
 void build_compile_section(
   FILE *fp,
   moddefv module
@@ -226,87 +260,38 @@ void build_compile_section(
   fprintf(fp, "all:\t\n");
   fprintf(fp, "\techo \"don't know how to build library\"\n");
 }
-#  endif /* 68k_MPW */
+#endif 
+#endif 
 
-/*========================================================================*/
-#  ifdef AIX_4
-void build_compile_section(
-  FILE *fp,
-  moddefv module
-  )
-{
-  fprintf(fp, "all:\t\n");
-  fprintf(fp, "\techo \"don't know how to build library\"\n");
-}
-#  endif /* AIX_4 */
+//#  ifdef ix86_Win
+//void build_compile_section(
+//  FILE *fp,
+//  moddefv module
+//  )
+//{
+//  fprintf(fp, "all:\t%s.dll %s_g.dll \n", module->name, module->name);
+//  fprintf(fp, "\n");
+//  fprintf(fp, "%%.o: %%.cc Makefile\n");
+//  fprintf(fp, "\t${CC} ${CFLAGS} -c $< -o $*.o\n");
+//  fprintf(fp, "\n");
+//  fprintf(fp, "%%.og: %%.cc Makefile\n");
+//  fprintf(fp, "\t${CC} ${DCFLAGS} -c $< -o $*.og\n");
+//  fprintf(fp, "\n");
+//
+//  fprintf(fp, "%s.dll: ${OBJS}\n", module->name);
+//  fprintf(fp, "\t${CC} ${CFLAGS} -Wl,--out-implib,lib%s.import.a -shared \\\n",
+//          module->name);
+//  fprintf(fp, "\t\t-o %s.dll ${OBJS}\n", module->name);
+//  fprintf(fp, "\n");
+//
+//  fprintf(fp, "%s_g.so: ${DOBJS}\n", module->name);
+//  fprintf(fp, "\t${CC} ${DCFLAGS} -Wl,--out-implib,lib%s_g.import.a -shared \\\n",
+//          module->name);
+//  fprintf(fp, "\t\t-o %s_g.dll ${DOBJS}\n", module->name);
+//  fprintf(fp, "\n");
+//
+//  fprintf(fp, "all:\t\n");
+//  fprintf(fp, "\techo \"don't know how to build library\"\n");
+//}
+//#  endif /* ix86_Win */
 
-/*========================================================================*/
-#  ifdef Sun3OS_4
-void build_compile_section(
-  FILE *fp,
-  moddefv module
-  )
-{
-  fprintf(fp, "all:\t\n");
-  fprintf(fp, "\techo \"don't know how to build library\"\n");
-}
-#  endif /* Sun3OS_4 */
-
-/*========================================================================*/
-#  if defined(SunOS_4) || defined(SunOS_5)
-void build_compile_section(
-  FILE *fp,
-  moddefv module
-  )
-{
-  fprintf(fp, "all:\t\n");
-  fprintf(fp, "\techo \"don't know how to build library\"\n");
-}
-#  endif /* SunOS_4 or SunOS_5 */
-
-/*========================================================================*/
-#  ifdef ix86_Win
-void build_compile_section(
-  FILE *fp,
-  moddefv module
-  )
-{
-  fprintf(fp, "all:\t%s.dll %s_g.dll \n", module->name, module->name);
-  fprintf(fp, "\n");
-  fprintf(fp, "%%.o: %%.cc Makefile\n");
-  fprintf(fp, "\t${CC} ${CFLAGS} -c $< -o $*.o\n");
-  fprintf(fp, "\n");
-  fprintf(fp, "%%.og: %%.cc Makefile\n");
-  fprintf(fp, "\t${CC} ${DCFLAGS} -c $< -o $*.og\n");
-  fprintf(fp, "\n");
-
-  fprintf(fp, "%s.dll: ${OBJS}\n", module->name);
-  fprintf(fp, "\t${CC} ${CFLAGS} -Wl,--out-implib,lib%s.import.a -shared \\\n",
-          module->name);
-  fprintf(fp, "\t\t-o %s.dll ${OBJS}\n", module->name);
-  fprintf(fp, "\n");
-
-  fprintf(fp, "%s_g.so: ${DOBJS}\n", module->name);
-  fprintf(fp, "\t${CC} ${DCFLAGS} -Wl,--out-implib,lib%s_g.import.a -shared \\\n",
-          module->name);
-  fprintf(fp, "\t\t-o %s_g.dll ${DOBJS}\n", module->name);
-  fprintf(fp, "\n");
-
-  fprintf(fp, "all:\t\n");
-  fprintf(fp, "\techo \"don't know how to build library\"\n");
-}
-#  endif /* ix86_Win */
-
-/*========================================================================*/
-#  ifdef ppc_MPW
-void build_compile_section(
-  FILE *fp,
-  moddefv module
-  )
-{
-  fprintf(fp, "all:\t\n");
-  fprintf(fp, "\techo \"don't know how to build library\"\n");
-}
-#  endif /* ppc_MPW */
-
-/*========================================================================*/
