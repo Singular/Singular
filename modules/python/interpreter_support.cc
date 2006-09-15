@@ -1,4 +1,4 @@
-//$Id: interpreter_support.cc,v 1.21 2006-06-21 06:27:11 bricken Exp $
+//$Id: interpreter_support.cc,v 1.22 2006-09-15 09:27:44 Singular Exp $
 
 #include <sstream>
 #include <boost/python.hpp>
@@ -31,13 +31,13 @@ static void free_leftv(leftv args){
 
 matrix matrixFromArray(const array& f){
   object o=f.attr("shape");
-  
+
   object o1=o[0];
-  
+
   object o2=o[1];
   int l1=extract<int>(o1);
 
-  
+
   int l2=extract<int>(o2);
   matrix m=mpNew(l1,l2);
   for(int i=0;i<l1;i++){
@@ -65,7 +65,7 @@ class arg_list{
       args->CleanUp();
       omFreeBin(args, sleftv_bin);
     }
-    
+
   }
   leftv pop_front(){
     assume(args!=NULL);
@@ -103,7 +103,7 @@ class arg_list{
   }
   void appendint(int p){
       leftv v=initArg();
-    v->data=(void*)p;
+    v->data=(void*)((long)p);
     v->rtyp=INT_CMD;
     internal_append(v);
   }
@@ -125,7 +125,7 @@ class arg_list{
     v->data=m;
     v->rtyp=MATRIX_CMD;
     internal_append(v);
-    
+
   }
   void appendString(const char* s){
     leftv v=initArg();
@@ -143,7 +143,7 @@ class arg_list{
 
   lists dumpToLists(){
     int n=length();
-    
+
     lists res=(lists)omAlloc0Bin(slists_bin);
     res->Init(n);
     for(int i=0;i<n;i++){
@@ -154,7 +154,7 @@ class arg_list{
         omFreeBin(iv, sleftv_bin);
     }
     return res;
-    
+
   }
   void appendPrelist(arg_list& l){
     leftv v=initArg();
@@ -181,13 +181,13 @@ class arg_list{
     if (args!=NULL){
       leftv last=args;
       while(last->next!=NULL){
-	last=last->next;
+        last=last->next;
       }
       last->next=v;
     } else
       args=v;
   }
-  
+
 };
 
 class idhdl_wrap{
@@ -209,24 +209,24 @@ class idhdl_wrap{
     Print("type:%d\n",id->typ);
   }
   void writePoly(const Poly& p){
-    
+
     if (id->typ==POLY_CMD){
       p_Delete(&id->data.p, currRing);
       id->data.p=p.as_poly();
     }
-    
+
   }
   void writeIdeal(const Ideal& p){
     if (id->typ==IDEAL_CMD){
       id_Delete(&id->data.uideal, currRing);
-      
+
       id->data.uideal=p.as_ideal();
     }
   }
   void writeModule(const Module& p){
     if (id->typ==MODUL_CMD){
       id_Delete(&id->data.uideal, currRing);
-      
+
       id->data.uideal=p.as_module();
     }
   }
@@ -236,14 +236,14 @@ class idhdl_wrap{
     }
   }
   void writeNumber(const Number& p){
-     
+
  if (id->typ==NUMBER_CMD){
       n_Delete(&id->data.n, currRing);
       id->data.n=p.as_number();
     }
   }
   void writeVector(const Vector& p){
-       
+
     if (id->typ==VECTOR_CMD){
       p_Delete(&id->data.p, currRing);
       id->data.p=p.as_poly();
@@ -294,10 +294,10 @@ static array buildPythonMatrix(matrix m, ring r){
   using boost::python::tuple;
   using boost::python::object;
   using boost::python::list;
- 
+
   list l;
-  
-  
+
+
   for(int i=1;i<=MATROWS(m);i++){
     list row;
     for(int j=1;j<=MATCOLS(m);j++){
@@ -310,16 +310,16 @@ static array buildPythonMatrix(matrix m, ring r){
   }
   //FIXME: should call this only once
   array::set_module_and_type("Numeric",
-			     "ArrayType"
-			     );
-  
+                             "ArrayType"
+                             );
+
   return array(l);
 }
 boost::python::object buildPyObjectFromLeftv(leftv v);
 boost::python::list buildPythonList(lists l, ring r){
     using boost::python::list;
     list res;
-    
+
     for(int i=0;i<=l->nr;i++){
         leftv lv=&l->m[i];
         object o=buildPyObjectFromLeftv(lv);
@@ -332,40 +332,36 @@ boost::python::object buildPyObjectFromLeftv(leftv v){
   using boost::python::object;
   switch (v->rtyp){
   case INT_CMD:
-    return object((int)v->data);
+    return object((int)((long)v->data));
   case POLY_CMD:
-    
     return object(Poly((poly) v->data, currRing));
   case STRING_CMD:
     return str((const char*) v->data);
   case  VECTOR_CMD:
-   
     return object( Vector((poly) v->data, currRing));
   case IDEAL_CMD:
     return object(Ideal((ideal) v->data, currRing));
   case MODUL_CMD:
     return object(Module((ideal) v->data, currRing));
   case  NUMBER_CMD:
-  
     return object(Number((number) v->data, currRing));
   case MATRIX_CMD:
-    {
-      return buildPythonMatrix((matrix) v->data,currRing);
-    }
+    return buildPythonMatrix((matrix) v->data,currRing);
   case LIST_CMD:
     return buildPythonList((lists) v->data, currRing);
   case RING_CMD:
     return object(Ring((ring) v->data));
   case INTVEC_CMD:
     return object(Intvec(*(intvec*) v->data));
+
   default:
-    
     return object();
   }
 }
-boost::python::object buildPyObjectFromIdhdl(const idhdl_wrap&  id){
+boost::python::object buildPyObjectFromIdhdl(const idhdl_wrap&  id)
+{
   using boost::python::object;
- 
+
   switch (id.id->typ){
   case STRING_CMD:
     return str((const char*) id.id->data.ustring);
@@ -373,10 +369,10 @@ boost::python::object buildPyObjectFromIdhdl(const idhdl_wrap&  id){
   case INT_CMD:
     return object((int)id.id->data.i);
   case POLY_CMD:
-    
+
     return object(Poly((poly) id.id->data.p, currRing));
   case  VECTOR_CMD:
-   
+
     return object( Vector((poly) id.id->data.p, currRing));
   case IDEAL_CMD:
     //object res;
@@ -387,7 +383,7 @@ boost::python::object buildPyObjectFromIdhdl(const idhdl_wrap&  id){
 
     return object(Module((ideal) id.id->data.uideal, currRing));
   case  NUMBER_CMD:
-  
+
     return object(Number((number) id.id->data.n, currRing));
   case MATRIX_CMD:
     {
@@ -400,7 +396,7 @@ boost::python::object buildPyObjectFromIdhdl(const idhdl_wrap&  id){
   case INTVEC_CMD:
     return object(Intvec(*(intvec*) id.id->data.iv));
   default:
-    return object();    
+    return object();
     //Py_INCREF(Py_None);
     //return Py_None;
   }
@@ -408,7 +404,7 @@ boost::python::object buildPyObjectFromIdhdl(const idhdl_wrap&  id){
 
 boost::python::object call_interpreter_method(const idhdl_wrap& proc, const arg_list& args){
   //idhdl oldPackHDL=currPackHdl;
- 
+
   //package oldPack=currPack;
   //currPack=proc.id->data.pinf->pack;
   //currPackHdl=packFindHdl(currPack);
@@ -422,11 +418,11 @@ boost::python::object call_interpreter_method(const idhdl_wrap& proc, const arg_
   errorreported=inerror=0;
 
   return buildPyObjectFromLeftv(&iiRETURNEXPR[voice]);
-  
+
   //return res;
 }
 boost::python::object call_builtin_method_general(const char* name, arg_list& l){
-  
+
 
   int cmd_n=-1;
   IsCmd(name,cmd_n);
@@ -434,10 +430,10 @@ boost::python::object call_builtin_method_general(const char* name, arg_list& l)
 
 //   return Py_None;
   if (cmd_n<0){
-  
+
 
   return object();
- 
+
   } else {
 
 
@@ -449,25 +445,25 @@ boost::python::object call_builtin_method_general(const char* name, arg_list& l)
       break;
     case 2:
       {
-	leftv arg1=l.pop_front();
-	leftv arg2=l.pop_front();
-	iiExprArith2(res,arg1,cmd_n,arg2,TRUE);
-	free_leftv(arg1);
-	free_leftv(arg2);
-	break;
+        leftv arg1=l.pop_front();
+        leftv arg2=l.pop_front();
+        iiExprArith2(res,arg1,cmd_n,arg2,TRUE);
+        free_leftv(arg1);
+        free_leftv(arg2);
+        break;
       }
     case 3:
       {
-	leftv arg1=l.pop_front();
-	leftv arg2=l.pop_front();
-	leftv arg3=l.pop_front();
-	
-	
-	iiExprArith3(res,cmd_n,arg1,arg2,arg3);
-	free_leftv(arg1);
-	free_leftv(arg2);
-	free_leftv(arg3);
-	break;
+        leftv arg1=l.pop_front();
+        leftv arg2=l.pop_front();
+        leftv arg3=l.pop_front();
+
+
+        iiExprArith3(res,cmd_n,arg1,arg2,arg3);
+        free_leftv(arg1);
+        free_leftv(arg2);
+        free_leftv(arg3);
+        break;
       }
     default:
       iiExprArithM(res, l.args, cmd_n);
@@ -484,7 +480,7 @@ static boost::python::str idhdl_as_str(idhdl_wrap iw){
   idhdl i=iw.id;
   using boost::python::str;
   //ring r=p.getRing();
-  
+
 
   std::basic_stringstream<char>  s;
   s<<i;
@@ -529,7 +525,7 @@ void export_interpreter()
   def("cbm",call_builtin_method_general);
   def("transfer_to_python",buildPyObjectFromIdhdl);
   def("is_builtin", is_builtin);
-  
+
 }
 
 
