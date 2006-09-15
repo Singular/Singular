@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.cc,v 1.18 2006-05-15 09:03:06 Singular Exp $ */
+/* $Id: int_poly.cc,v 1.19 2006-09-15 10:15:48 Singular Exp $ */
 
 #include <config.h>
 
@@ -201,7 +201,7 @@ InternalPoly::print(OSTREAM &aStream, char * aString )
                     theStream << aString << ends; // results from error in GNU strstream
                 theString = theStream.str();
                 theCursor->coeff.print( aStream, theString );
-                delete [] theString;
+                theStream.freeze(0);//delete [] theString;
             }
             theCursor = theCursor->next;
             if ( theCursor && ( theCursor->coeff.sign() >= 0 ) )
