@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.27 2006-06-20 08:15:27 Singular Exp $
+@comment $Id: COPYING.texi,v 1.28 2006-09-20 09:08:16 Singular Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -173,6 +173,7 @@ Simon King,
 Anen Lakhal,
 Martin Lamm,
 Santiago Laplagne,
+Gregoire Lecerf,
 Francisco Javier Lobillo,
 Bernd Martin,
 Michael Me@ss{}ollen,
@@ -211,6 +212,7 @@ Oleksandr Yena.
 @cindex Lakhal, Anen
 @cindex Lamm, Martin
 @cindex Laplagne, Santiago
+@cindex Lecerf, Gregoire
 @cindex Lobillo, Javier
 @cindex Martin, Bernd
 @cindex Me@ss{}ollen, Michael
