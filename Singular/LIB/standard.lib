@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.81 2006-07-20 12:26:46 pohl Exp $";
+version="$Id: standard.lib,v 1.82 2006-09-20 16:42:01 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -251,11 +251,11 @@ EXAMPLE: example groebner;  shows an example"
      //if ordering is global, there are parameters and minpoly is 0
      if (((npars(basering)>0) &&(minpoly==0)))
      { return(slimgb(i)); }
-     // oerdering dp, char 0
+     // ordering dp, char 0
      if((char(P)==0) && (system("nblocks") <= 2) && (find(ordstr_P,"dp")>0))
      { return(slimgb(i)); }
   }
-  // for module case, not already hadled by slimgb:
+  // for module case, not already handled by slimgb:
   if (nrows(i)>1)
   { return(std(i)); }
   int IsSimple_P;
@@ -305,7 +305,6 @@ EXAMPLE: example groebner;  shows an example"
   int nvarP = nvars(P);
   int k;
   ideal Qideal = ideal(P);
-  string ri;
 
   if (npars_P > 0)
   {
@@ -367,8 +366,7 @@ EXAMPLE: example groebner;  shows an example"
   // compute std and hilbert series
   if (p_opt)
   {
-    ri = string(Phelp);
-    "std in " + ri;
+    "std in " + string(Phelp);
   }
   intvec hi=hilb(std(qh),1);
 
@@ -426,8 +424,7 @@ EXAMPLE: example groebner;  shows an example"
     kill Phelp;
     if (p_opt)
     {
-      ri = string(Phelp1);
-      "std with hilb in " + ri;
+      "std with hilb in " + string(Phelp1);
     }
     // compute std with Hilbert series
     qh = std(qh, hi);
