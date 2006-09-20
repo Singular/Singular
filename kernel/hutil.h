@@ -33,7 +33,6 @@ extern int  hCo, hMu, hMu2;
 
 
 scfmon hInit(ideal S, ideal Q, int * Nexist, ring tailRing = currRing);
-void hWeight();
 void hDelete(scfmon ev, int ev_length);
 void hComp(scfmon exist, int Nexist, int ak, scfmon stc, int * Nstc);
 void hSupp(scfmon stc, int Nstc, varset var, int * Nvar);

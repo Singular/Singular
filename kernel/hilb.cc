@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hilb.cc,v 1.2 2005-04-26 08:58:13 Singular Exp $ */
+/* $Id: hilb.cc,v 1.3 2006-09-20 16:47:14 Singular Exp $ */
 /*
 *  ABSTRACT -  Hilbert series
 */
@@ -222,10 +222,14 @@ static intvec * hSeries(ideal S, intvec *modulweight,
     return hseries1;
   }
 
+  #if 0
   if (wdegree == NULL)
     hWeight();
   else
     hWDegree(wdegree);
+  #else
+  if (wdegree != NULL) hWDegree(wdegree);
+  #endif
 
   p0 = (int *)omAllocBin(int_bin);
   *p0 = 1;

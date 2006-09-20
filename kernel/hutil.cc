@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.8 2005-06-09 08:30:02 Singular Exp $ */
+/* $Id: hutil.cc,v 1.9 2006-09-20 16:47:15 Singular Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -108,6 +108,7 @@ scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
   return ex;
 }
 
+#if 0
 void hWeight()
 {
   int i, k;
@@ -132,6 +133,7 @@ void hWeight()
     }
   }
 }
+#endif
 
 void hDelete(scfmon ev, int ev_length)
 {
