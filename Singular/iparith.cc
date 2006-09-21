@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.409 2006-09-21 16:00:10 Singular Exp $ */
+/* $Id: iparith.cc,v 1.410 2006-09-21 17:08:48 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -518,8 +518,8 @@ static BOOLEAN jjCOMPARE_P(leftv res, leftv u, leftv v)
   int r=pCmp(p,q);
   if (r==0)
   {
-    /* compare lead coeffs */
     number h=nSub(pGetCoeff(p),pGetCoeff(q));
+    /* compare lead coeffs */
     r = -1+nIsZero(h)+2*nGreaterZero(h); /* -1: <, 0:==, 1: > */
     nDelete(&h);
   }
@@ -636,7 +636,7 @@ static BOOLEAN jjPOWER_I(leftv res, leftv u, leftv v)
       if (overflow)
         WarnS("int overflow(^), result may be wrong");
     }
-    res->data = (char *)rc;
+    res->data = (char *)((long)rc);
     if (u!=NULL) return jjOP_REST(res,u,v);
     return FALSE;
   }
@@ -807,7 +807,7 @@ static BOOLEAN jjPLUS_I(leftv res, leftv u, leftv v)
   unsigned int a=(unsigned int)(unsigned long)u->Data();
   unsigned int b=(unsigned int)(unsigned long)v->Data();
   unsigned int c=a+b;
-  res->data = (char *)c;
+  res->data = (char *)((long)c);
   if (((Sy_bit(31)&a)==(Sy_bit(31)&b))&&((Sy_bit(31)&a)!=(Sy_bit(31)&c)))
   {
     WarnS("int overflow(+), result may be wrong");
@@ -889,7 +889,7 @@ static BOOLEAN jjMINUS_I(leftv res, leftv u, leftv v)
   {
     WarnS("int overflow(-), result may be wrong");
   }
-  res->data = (char *)c;
+  res->data = (char *)((long)c);
   return jjPLUSMINUS_Gen(res,u,v);
 }
 static BOOLEAN jjMINUS_BI(leftv res, leftv u, leftv v)
@@ -935,7 +935,7 @@ static BOOLEAN jjTIMES_I(leftv res, leftv u, leftv v)
   int c=a * b;
   if ((b!=0) && (c/b !=a))
     WarnS("int overflow(*), result may be wrong");
-  res->data = (char *)c;
+  res->data = (char *)((long)c);
   if ((u->Next()!=NULL) || (v->Next()!=NULL))
     return jjOP_REST(res,u,v);
   return FALSE;
@@ -1116,7 +1116,7 @@ static BOOLEAN jjDIVMOD_I(leftv res, leftv u, leftv v)
     case '/':
         r= (a / b);     break;
   }
-  res->data=(void *)r;
+  res->data=(void *)((long)r);
   return FALSE;
 }
 static BOOLEAN jjDIV_BI(leftv res, leftv u, leftv v)
@@ -1252,13 +1252,13 @@ static BOOLEAN jjEQUAL_I(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjEQUAL_Ma(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)mpEqual((matrix)u->Data(),(matrix)v->Data());
+  res->data = (char *)((long)mpEqual((matrix)u->Data(),(matrix)v->Data()));
   jjEQUAL_REST(res,u,v);
   return FALSE;
 }
 static BOOLEAN jjEQUAL_N(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)nEqual((number)u->Data(),(number)v->Data());
+  res->data = (char *)((long)nEqual((number)u->Data(),(number)v->Data()));
   jjEQUAL_REST(res,u,v);
   return FALSE;
 }
@@ -1266,7 +1266,7 @@ static BOOLEAN jjEQUAL_P(leftv res, leftv u, leftv v)
 {
   poly p=(poly)u->Data();
   poly q=(poly)v->Data();
-  res->data = (char *) (pEqualPolys(p,q));
+  res->data = (char *) ((long)pEqualPolys(p,q));
   jjEQUAL_REST(res,u,v);
   return FALSE;
 }
@@ -1325,7 +1325,7 @@ static BOOLEAN jjINDEX_IV(leftv res, leftv u, leftv v)
   t.rtyp=INT_CMD;
   for (i=0;i<iv->length(); i++)
   {
-    t.data=(char *)(*iv)[i];
+    t.data=(char *)((long)(*iv)[i]);
     if (p==NULL)
     {
       p=res;
@@ -1476,7 +1476,7 @@ static BOOLEAN jjKLAMMER_IV(leftv res, leftv u, leftv v)
   intvec * iv=(intvec *)v->Data();
   leftv p=NULL;
   int i;
-  int slen = strlen(u->name) + 14;
+  long slen = strlen(u->name) + 14;
   char *n = (char*) omAlloc(slen);
 
   for (i=0;i<iv->length(); i++)
@@ -1633,7 +1633,7 @@ static BOOLEAN jjDEG_M_IV(leftv res, leftv u, leftv v)
   int i;
   for(i=IDELEMS(I);i>=0;i--) d=si_max(d,(int)pDegW(I->m[i],iv));
   omFreeSize((ADDRESS)iv,(pVariables+1)*sizeof(short));
-  res->data = (char *)d;
+  res->data = (char *)((long)d);
   return FALSE;
 }
 static BOOLEAN jjDEG_IV(leftv res, leftv u, leftv v)
@@ -1674,11 +1674,11 @@ static BOOLEAN jjDIM2(leftv res, leftv v, leftv w)
 {
   assumeStdFlag(v);
   if(currQuotient==NULL)
-    res->data = (char *)scDimInt((ideal)(v->Data()),(ideal)w->Data());
+    res->data = (char *)((long)scDimInt((ideal)(v->Data()),(ideal)w->Data()));
   else
   {
     ideal q=idSimpleAdd(currQuotient,(ideal)w->Data());
-    res->data = (char *)scDimInt((ideal)(v->Data()),q);
+    res->data = (char *)((long)scDimInt((ideal)(v->Data()),q));
     idDelete(&q);
   }
   return FALSE;
@@ -1759,9 +1759,9 @@ static BOOLEAN jjEXTGCD_I(leftv res, leftv u, leftv v)
   if ( vv /*(int)(long)v->Data()*/ < 0 ) b=-b;
   lists L=(lists)omAllocBin(slists_bin);
   L->Init(3);
-  L->m[0].rtyp=INT_CMD;   L->m[0].data=(void *)p0;
-  L->m[1].rtyp=INT_CMD;   L->m[1].data=(void *)a;
-  L->m[2].rtyp=INT_CMD;   L->m[2].data=(void *)b;
+  L->m[0].rtyp=INT_CMD;   L->m[0].data=(void *)(long)p0;
+  L->m[1].rtyp=INT_CMD;   L->m[1].data=(void *)(long)a;
+  L->m[2].rtyp=INT_CMD;   L->m[2].data=(void *)(long)b;
   res->rtyp=LIST_CMD;
   res->data=(char *)L;
   return FALSE;
@@ -1939,7 +1939,7 @@ static BOOLEAN jjGCD_I(leftv res, leftv u, leftv v)
     p0 = p1; p1 = r;
   }
   res->rtyp=INT_CMD;
-  res->data=(char *)p0;
+  res->data=(char *)(long)p0;
   return FALSE;
 }
 static BOOLEAN jjGCD_BI(leftv res, leftv u, leftv v)
