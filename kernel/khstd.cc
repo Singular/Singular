@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: khstd.cc,v 1.2 2005-02-17 09:42:19 Singular Exp $ */
+/* $Id: khstd.cc,v 1.3 2006-09-21 16:02:20 Singular Exp $ */
 /*
 * ABSTRACT:utils for hilbert driven kStd
 */
@@ -86,8 +86,10 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
           return;
         }
       }
-      if (eledeg != 0)
+      if (eledeg > 0) // elements to delete
         break;
+      else if (eledeg <0) // strange....see bug_43
+        return;
       deg++;
     } /* loop */
     delete newhilb;
