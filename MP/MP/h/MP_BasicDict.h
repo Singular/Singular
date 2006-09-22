@@ -1,10 +1,10 @@
 /***************************************************************************
  *
- *   HEADER FILE:  MP_BasicDict.h                                         
- *                                                                
+ *   HEADER FILE:  MP_BasicDict.h
+ *
  *      The MP basic dictionary (definitions and declarations)
- *      
- *        
+ *
+ *
  *   Change Log:
  *      1/97 obachman  -- this is a first try
  *
@@ -37,12 +37,12 @@
 #define MP_CopBasicLess             14
 #define MP_CopBasicAnd              15
 #define MP_CopBasicOr               16
-#define MP_CopBasicEqual            17    
+#define MP_CopBasicEqual            17
 #define MP_CopBasicNotEqual         18
 #define MP_CopBasicRange            19
 #define MP_CopBasicIndex            20
 #define MP_CopBasicDiff             21
-#define MP_CopBasicInterSect        22        
+#define MP_CopBasicInterSect        22
 #define MP_CopBasicSubst            23
 #define MP_CopBasicNot              24
 #define MP_CopBasicAssign           25

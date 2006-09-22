@@ -1,9 +1,9 @@
 /****************************************************************
- *                                                                  
+ *
  *   HEADER FILE:  MP_Link.h
  *
  *   struct link is adapted from the Sun XDR distribution.
- *   Copyright (C) 1984, Sun Microsystems, Inc. 
+ *   Copyright (C) 1984, Sun Microsystems, Inc.
  *
  ***************************************************************/
 
@@ -13,13 +13,13 @@
 /* Sending modes */
 #define MP_SEND_FRAG_MSG      1
 #define MP_SEND_WHOLE_MSG     2
-#define MP_DEFAULT_SEND_MODE  MP_SEND_FRAG_MSG 
+#define MP_DEFAULT_SEND_MODE  MP_SEND_FRAG_MSG
 
 /* Receiving modes */
 #define MP_RECV_FRAG_MSG_RECVER   1
 #define MP_RECV_FRAG_MSG_SENDER   2
 #define MP_RECV_WHOLE_MSG         3
-#define MP_DEFAULT_RECV_MODE      MP_RECV_FRAG_MSG_RECVER 
+#define MP_DEFAULT_RECV_MODE      MP_RECV_FRAG_MSG_RECVER
 
 /* Options that can be set for a link */
 #define MP_LINK_SEND_MODE_OPT 1

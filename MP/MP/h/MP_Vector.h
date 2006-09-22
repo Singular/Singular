@@ -1,7 +1,7 @@
 /****************************************************************
- *                                                                  
+ *
  *   HEADER FILE:  MP_Vector.h
- *                                                                
+ *
  ***************************************************************/
 
 #ifndef _MP_Vector_h
@@ -52,7 +52,7 @@ _ANSI_ARGS_((MP_Link_pt link, void **elems,
              MP_Common_t elem_type, MP_NumChild_t num_elems));
 
 EXTERN MP_Status_t
-IMP_GetReal64Vector _ANSI_ARGS_((MP_Link_pt link, 
+IMP_GetReal64Vector _ANSI_ARGS_((MP_Link_pt link,
                                  MP_Real64_t **dvec, MP_NumChild_t len));
 
 EXTERN MP_Status_t

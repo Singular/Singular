@@ -1,5 +1,5 @@
 /****************************************************************
- *                                                                  
+ *
  *   HEADER FILE:  MP_GmpBigInt.h
  *
  *  The bigint routines of gmp
@@ -25,6 +25,6 @@ EXTERN char *IMP_GmpIntToStr _ANSI_ARGS_((MP_ApInt_t mp_apint,
                                           char *buffer));
 EXTERN long IMP_GmpIntAsciiSize _ANSI_ARGS_((MP_ApInt_t mp_apint));
 
-#endif /* MP_HAVE_GMP_APINT */ 
+#endif /* MP_HAVE_GMP_APINT */
 
 #endif /* _MP_GmpBigInt_h */

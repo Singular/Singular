@@ -1,9 +1,9 @@
 /***************************************************************************
- *                                                                  
+ *
  *   HEADER FILE:  MP_FileTransp.h
- * 
+ *
  *        Declarations for the "file" transport device.
- *                                                                
+ *
  *  Change Log:
  *       September 10, 1995  SG - Updated implementation.  Much cleaning
  *                                to make it presentable.

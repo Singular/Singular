@@ -1,13 +1,13 @@
 /***************************************************************************
- *                                                                  
- *   HEADER FILE:  MP_Env.h 
- * 
+ *
+ *   HEADER FILE:  MP_Env.h
+ *
  *        Declarations to maintain the MP environment.  The environment
  *        includes the name of the host machine, the log file name and
  *      file descriptor and the buffer pool containing all the buffers
  *      to be shared among the links.  The initialization should be
  *      done once before any MP-related activities occur.
- *                                                                
+ *
  *  Change Log:
  *       September 10, 1995  SG - Updated implementation.  Much cleaning
  *                                to make it presentable.
@@ -18,7 +18,7 @@
  *                                MP_SacBigInt.c for some details.
  ***************************************************************************/
 #ifndef _MP_Env_h
-#define _MP_Env_h 
+#define _MP_Env_h
 
 
 
@@ -39,7 +39,7 @@
 
 
 /*
- * Options that can be set for an environment 
+ * Options that can be set for an environment
  */
 #define MP_BUFFER_SIZE_OPT       1
 #define MP_MAX_FREE_BUFFERS_OPT  2
@@ -74,16 +74,16 @@ struct transp_list_elem {
 typedef struct mp_environment {
     MP_TranspList_pt transp_dev_list; /* list of supported transport devices */
     buffer_pool_pt   buff_pool;       /* buffer pool shared by  links in this
-                                       *  env  
+                                       *  env
                                        */
     int   num_o_buff;
     int   buffer_size;                /* size of each buffer in the pool     */
-    int   max_free_buffers;           /* max number of free buffers in the 
+    int   max_free_buffers;           /* max number of free buffers in the
                                        * pool
                                        */
 
     int   init_free_buffers;          /* initial number of free buffers in the
-                                       * pool 
+                                       * pool
                                        */
 
     int   num_links;                  /* to handout unique link ids for this
@@ -93,7 +93,7 @@ typedef struct mp_environment {
     FILE  *logfd;                     /* log file for all logging events     */
     char  *logfilename;
     char  thishost[MP_HOST_NAME_LEN];
-    MP_Boolean_t initialized;         /* can't set options after env has been 
+    MP_Boolean_t initialized;         /* can't set options after env has been
                                        * init
                                        */
 
@@ -110,13 +110,13 @@ EXTERN MP_ENV MP_InitializeEnv _ANSI_ARGS_((MP_Env_pt env));
 EXTERN void MP_ReleaseEnv _ANSI_ARGS_((MP_Env_pt env));
 EXTERN int MP_SetEnvOption _ANSI_ARGS_((MP_Env_pt env, int option, int value));
 EXTERN int    MP_GetEnvOption _ANSI_ARGS_((MP_Env_pt env, int option));
-EXTERN MP_TranspList_pt IMP_GetTranspByName _ANSI_ARGS_((MP_Env_pt env, 
+EXTERN MP_TranspList_pt IMP_GetTranspByName _ANSI_ARGS_((MP_Env_pt env,
                                                          int transp_dev));
-EXTERN MP_Status_t MP_AddEnvTranspDevice _ANSI_ARGS_((MP_Env_pt env, 
+EXTERN MP_Status_t MP_AddEnvTranspDevice _ANSI_ARGS_((MP_Env_pt env,
                                         int transp_dev, MP_TranspOps_t *ops));
-EXTERN MP_Status_t MP_SetEnvBigIntFormat _ANSI_ARGS_((MP_Env_t *env, 
+EXTERN MP_Status_t MP_SetEnvBigIntFormat _ANSI_ARGS_((MP_Env_t *env,
                              MP_BigIntOps_t *ops, MP_BigNumFormat_t format));
-EXTERN MP_Status_t MP_SetEnvBigRealFormat _ANSI_ARGS_((MP_Env_t *env, 
+EXTERN MP_Status_t MP_SetEnvBigRealFormat _ANSI_ARGS_((MP_Env_t *env,
                              MP_BigRealOps_t *ops, MP_BigNumFormat_t format));
 EXTERN MP_Status_t open_logfile _ANSI_ARGS_((MP_ENV env));
 #endif /* _MP_Env_h */

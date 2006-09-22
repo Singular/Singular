@@ -1,7 +1,7 @@
 /***************************************************************************
- *                                                                  
+ *
  *   HEADER FILE:  MP_PvmTransp.h
- * 
+ *
  *
  *  Change Log:
  *      1/25/96 sgray - formal creation of PVM transport device.
@@ -26,7 +26,7 @@ typedef struct{
   char    *myhost;
 } MP_PVM_t;
 
-/*#include "/tmp_mnt/home/Owl/sgray/MP/MP/MP_PvmTransp.c" */ 
+/*#include "/tmp_mnt/home/Owl/sgray/MP/MP/MP_PvmTransp.c" */
 
 #endif /*  MP_HAVE_PVM */
 

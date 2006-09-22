@@ -1,5 +1,5 @@
 /****************************************************************
- *                                                                  
+ *
  *   HEADER FILE:  MP_Buffer.h
  *
  *       Contains all declarations related to buffer and buffer pool.

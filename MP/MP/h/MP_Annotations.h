@@ -18,7 +18,7 @@
 #define _MP_Annotations_h
 
 /* global variables - maps annotation numbers to string
- * identifying the annotation - used for testing.  See 
+ * identifying the annotation - used for testing.  See
  * the corresponding dictionary for the defines.
  */
 EXTERN char *MpAnnotations[];         /* MP_MpDict.h    */

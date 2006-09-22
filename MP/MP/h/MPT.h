@@ -6,17 +6,17 @@
  * Created: 11/96
  *
  * Change History (most recent first):
- *     
+ *
  ******************************************************************/
 #ifndef _MPT_H_
 #define _MPT_H_
 
 #include"MP.h"
 
-/*************************************************************** 
- * 
+/***************************************************************
+ *
  * Declare all names of types that we use
- * 
+ *
  ***************************************************************/
 typedef struct MPT_Tree_t MPT_Tree_t;
 typedef MPT_Tree_t * MPT_Tree_pt;
@@ -38,10 +38,10 @@ typedef MPT_DynArgs_t * MPT_DynArgs_pt;
 
 typedef void * MPT_ExternalData_t;
 
-/*************************************************************** 
- * 
+/***************************************************************
+ *
  * Tree declarations
- * 
+ *
  ***************************************************************/
 
 /* A Tree consists of */
@@ -51,15 +51,15 @@ struct MPT_Tree_t
   MPT_Arg_pt      args;  /* and possibly of arguments */
 };
 
-/*************************************************************** 
- * 
+/***************************************************************
+ *
  * Node declaration
- * 
+ *
  ***************************************************************/
 /* A node has a */
 struct MPT_Node_t
 {
-  MP_NodeType_t     type; 
+  MP_NodeType_t     type;
   MP_DictTag_t      dict; /* may have a defined semantics in a dictionary */
   MPT_Arg_t         nvalue; /* always has a (node) value */
   MP_NumChild_t     numchild; /* may specify that numchild args follow */
@@ -67,10 +67,10 @@ struct MPT_Node_t
   MPT_Annot_pt      *annots; /* which are stored here */
 };
 
-/*************************************************************** 
- * 
- * Annotation declaration 
- * 
+/***************************************************************
+ *
+ * Annotation declaration
+ *
  ***************************************************************/
 /* An annot has */
 struct MPT_Annot_t
@@ -81,8 +81,8 @@ struct MPT_Annot_t
   MPT_Tree_pt       value; /* and may have a tree as value */
 };
 
-/*************************************************************** 
- * 
+/***************************************************************
+ *
  * Argument declaration
  *
  * The problem is that we need to compactly represent (arrays and
@@ -146,7 +146,7 @@ struct MPT_Annot_t
 struct MPT_DynArgs_t
 {
   MP_Uint32_t   length; /* Length of array pointed to by */
-  MPT_Arg_pt    args;    
+  MPT_Arg_pt    args;
 };
 
 /* Union -- for ProtoD:Union data*/
@@ -161,10 +161,10 @@ struct MPT_Union_t
    node->type */
 #define MPT_ExternalDataType    255
 
-/*************************************************************** 
- * 
- * From MPT_Error.c 
- * 
+/***************************************************************
+ *
+ * From MPT_Error.c
+ *
  ***************************************************************/
 
 /* Enumeration of MPT specific errors */
@@ -207,10 +207,10 @@ extern void MPT_Assume(MP_Boolean_t value);
 #define MPT_Assume(x) ((void)0)
 #endif
 
-/*************************************************************** 
- * 
+/***************************************************************
+ *
  * From MPT_Tree.c Copying/Deleting a tree
- * 
+ *
  ***************************************************************/
 extern void MPT_DeleteTree(MPT_Tree_pt tree);
 extern void MPT_DeleteNode(MPT_Node_pt node);
@@ -225,10 +225,10 @@ extern void MPT_CpyArgs(MPT_Arg_pt *oargs, MPT_Arg_pt args,
 extern void MPT_CpyTypespecedArg(MPT_Arg_t *oarg, MPT_Arg_t arg,
                                  MPT_Tree_pt typespec);
 
-/*************************************************************** 
- * 
+/***************************************************************
+ *
  * From MPT_Get.c
- * 
+ *
  ***************************************************************/
 
 extern MPT_Status_t MPT_GetTree(MP_Link_pt link, MPT_Tree_pt *otree);
@@ -244,10 +244,10 @@ extern MPT_Status_t MPT_SkipAnnot(MP_Link_pt link, MP_Boolean_t *req);
 extern MPT_Status_t MPT_SkipAnnots(MP_Link_pt link, MP_NumAnnot_t na,
                                    MP_Boolean_t *req);
 
-/*************************************************************** 
- * 
+/***************************************************************
+ *
  * From MPT_Put.c
- * 
+ *
  ***************************************************************/
 extern MPT_Status_t MPT_PutTree(MP_Link_pt link, MPT_Tree_pt tree);
 extern MPT_Status_t MPT_PutNode(MP_Link_pt link, MPT_Node_pt node);
@@ -257,10 +257,10 @@ extern MPT_Status_t MPT_PutArgs(MP_Link_pt link, MPT_Arg_pt args,
 extern MPT_Status_t MPT_PutTypespecedArg(MP_Link_pt link, MPT_Arg_t arg,
                                          MPT_Tree_pt typespec);
 
-/*************************************************************** 
- * 
+/***************************************************************
+ *
  * From MPT_ApNumber.c
- * 
+ *
  ***************************************************************/
 
 extern void MPT_InitCpyApInt(MPT_Arg_t *dest, MPT_Arg_t src);
@@ -272,10 +272,10 @@ extern MPT_Status_t MPT_GetApReal(MP_Link_pt link, MPT_Arg_t *arg);
 extern MPT_Status_t MPT_PutApInt(MP_Link_pt link, MPT_Arg_t arg);
 extern MPT_Status_t MPT_PutApReal(MP_Link_pt link, MPT_Arg_t arg);
 
-/*************************************************************** 
- * 
+/***************************************************************
+ *
  * From MPT_Misc.c
- * 
+ *
  ***************************************************************/
 
 extern MPT_Annot_pt MPT_FindAnnot(MPT_Node_pt node, MP_DictTag_t dict,
@@ -288,10 +288,10 @@ extern void MPT_PopRecUnion();
 extern MPT_Tree_pt MPT_RecStructTree;
 extern MPT_Tree_pt MPT_RecUnionTree;
 
-/*************************************************************** 
- * 
+/***************************************************************
+ *
  * From MPT_ExternalData.c
- * 
+ *
  ***************************************************************/
 
 extern void (*MPT_DeleteExternalData)(MPT_Arg_t edata);
@@ -305,10 +305,10 @@ extern MPT_Status_t (*MPT_PutExternalData)(MP_Link_pt link,
 
 
 
-/*************************************************************** 
- * 
+/***************************************************************
+ *
  * Useful Macros
- * 
+ *
  ***************************************************************/
 #define mpt_failr(cond)                              \
 do {                                                 \

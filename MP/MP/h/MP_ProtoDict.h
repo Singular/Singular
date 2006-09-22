@@ -1,10 +1,10 @@
 /***************************************************************************
  *
- *   HEADER FILE:  MP_ProtoDict.h                                         
- *                                                                
+ *   HEADER FILE:  MP_ProtoDict.h
+ *
  *      The prototype dictionary (definitions and declarations)
- *      
- *        
+ *
+ *
  *   Change Log:
  *
  *

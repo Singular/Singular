@@ -1,12 +1,12 @@
 /***************************************************************************
  *
- *   HEADER FILE:  MP_Types.h                                         
- *                                                                
- *        Most of the typedefs needed by MP are here, including the definition 
- *      of node and annotation packets.                  
- *        
+ *   HEADER FILE:  MP_Types.h
+ *
+ *        Most of the typedefs needed by MP are here, including the definition
+ *      of node and annotation packets.
+ *
  *   Change Log:
- *     May 30, 1995 SG - added defines for new types for MP 1.0        
+ *     May 30, 1995 SG - added defines for new types for MP 1.0
  *     December 12, 1995 SG - added ifdef for AIX per Hannes' instructions
  *     December 20, 1995 SG - added enum for fp format
  *     4/23/96 sgray - added defines to support different arbitrary precision

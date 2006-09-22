@@ -1,7 +1,7 @@
 /****************************************************************
- *                  
- *   HEADER FILE:  MP.h                 
- *        
+ *
+ *   HEADER FILE:  MP.h
+ *
  *        Everything we need.  Saves doing a zillion includes
  *        in user programs.
  *

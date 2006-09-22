@@ -1,7 +1,7 @@
 /***************************************************************************
- *                                                                  
+ *
  *   HEADER FILE:  MP_TbTransp.h
- * 
+ *
  *   PURPOSE: ToolBus stuff - not much to do.
  *
  *   Change Log:
@@ -29,13 +29,13 @@ typedef struct{
   char    *myhost;       /* host on which we are running - must have this */
 } MP_TB_t;
 
-EXTERN MP_Status_t MP_TbPutMsg _ANSI_ARGS_((MP_Link_pt link, char **tb_data, 
-                                            unsigned long *len)); 
-EXTERN MP_Status_t MP_TbGetMsg _ANSI_ARGS_((MP_Link_pt link, char *tb_data, 
-                                            unsigned long len)); 
+EXTERN MP_Status_t MP_TbPutMsg _ANSI_ARGS_((MP_Link_pt link, char **tb_data,
+                                            unsigned long *len));
+EXTERN MP_Status_t MP_TbGetMsg _ANSI_ARGS_((MP_Link_pt link, char *tb_data,
+                                            unsigned long len));
 EXTERN MP_Status_t MP_TbSetTerm _ANSI_ARGS_((MP_Link_pt link, term *t));
 
-/* 
+/*
  * if your device may not be available everywhere you want to use MP,
  * don't try to compile the source into the library as the link will
  * fail.  The alternative is to include the transport device interface

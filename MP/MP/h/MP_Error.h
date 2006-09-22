@@ -1,10 +1,10 @@
 /***************************************************************************
- *                                                                  
- *   HEADER FILE:  MP_Error.h 
- * 
+ *
+ *   HEADER FILE:  MP_Error.h
+ *
  *        All the error encodings and the routines the set clear
  *        and print errors.
- *                                                                
+ *
  *  Change Log:
  *       10/18/95 OB      - put MP_Failure, MP_Success into enum MP_Errors
  *       July 7, 1995  SG - updated MP_Errors to reflect newtypes

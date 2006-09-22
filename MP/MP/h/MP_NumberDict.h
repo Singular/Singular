@@ -1,10 +1,10 @@
 /***************************************************************************
  *
- *   HEADER FILE:  MP_NumberDict.h                                         
- *                                                                
+ *   HEADER FILE:  MP_NumberDict.h
+ *
  *      The Numbertype dictionary (definitions and declarations)
- *      
- *        
+ *
+ *
  *   Change Log:
  *
  *

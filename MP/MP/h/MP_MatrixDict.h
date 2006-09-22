@@ -1,10 +1,10 @@
 /***************************************************************************
  *
- *   HEADER FILE:  MP_MatrixDict.h                                         
- *                                                                
+ *   HEADER FILE:  MP_MatrixDict.h
+ *
  *      The Matrixtype dictionary (definitions and declarations)
- *      
- *        
+ *
+ *
  *   Change Log:
  *
  *

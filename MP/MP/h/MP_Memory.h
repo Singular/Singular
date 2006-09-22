@@ -1,7 +1,7 @@
 /****************************************************************
- *                                                                  
+ *
  *   HEADER FILE:  MP_Memory.h
- *                                                                
+ *
  ***************************************************************/
 
 
@@ -11,7 +11,7 @@
 #ifdef EXTERNAL_MALLOC_H
 #include EXTERNAL_MALLOC_H
 #else
- 
+
 EXTERN void* (*IMP_MemAllocFnc) _ANSI_ARGS_((size_t));
 EXTERN void* (*IMP_MemReallocFnc) _ANSI_ARGS_((void *, size_t, size_t));
 EXTERN void  (*IMP_MemFreeFnc) _ANSI_ARGS_((void *, size_t));

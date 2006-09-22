@@ -1,5 +1,5 @@
 /****************************************************************
- *                                                                  
+ *
  *   HEADER FILE:  MP_GmpBigReal.h
  *
  *  The bigreal routines of gmp

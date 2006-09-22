@@ -1,5 +1,5 @@
 /****************************************************************
- *                                                                  
+ *
  *   HEADER FILE:  MP_Util.h
  *
  ***************************************************************/
@@ -15,8 +15,8 @@
 #define MP_URGENT_EVENT  "UrgentE"
 #define MP_CONTROL_EVENT "CntrlE "
 
-/* 
- * Logging is done on a per link basis.  The user is allowed to 
+/*
+ * Logging is done on a per link basis.  The user is allowed to
  * specify which events to log.  The default is to log all events.
  * Error events are always logged and cannot be disabled.
  */
@@ -40,7 +40,7 @@ EXTERN char *IMP_StrDup  _ANSI_ARGS_((char* s));
 
 EXTERN void MP_LogEvent _ANSI_ARGS_((MP_Link_pt link, char *event, char *msg));
 
-EXTERN MP_Status_t MP_SetError _ANSI_ARGS_((MP_Link_pt link, 
+EXTERN MP_Status_t MP_SetError _ANSI_ARGS_((MP_Link_pt link,
                                             MP_Status_t the_err));
 
 #define MP_ClearError(link) ((MP_Status_t) (link)->MP_errno = MP_Success)

@@ -1,10 +1,10 @@
 /***************************************************************************
  *
- *   HEADER FILE:  MP_PolyDict.h                                         
- *                                                                
+ *   HEADER FILE:  MP_PolyDict.h
+ *
  *      The Polytype dictionary (definitions and declarations)
- *      
- *        
+ *
+ *
  *   Change Log:
  *
  *
@@ -36,7 +36,7 @@
  * (Common) Constants
  *
  ***************************************************************************/
-#define MP_CcPolyOrdering_Unknown       0 
+#define MP_CcPolyOrdering_Unknown       0
 #define MP_CcPolyOrdering_Vector        1 /* a */
 #define MP_CcPolyOrdering_Matrix        2 /* M */
 #define MP_CcPolyOrdering_IncComp       3 /* c */

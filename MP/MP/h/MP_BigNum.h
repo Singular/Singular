@@ -1,7 +1,7 @@
 /****************************************************************
- *                                                                  
+ *
  *   HEADER FILE:  MP_BigNum.h
- *                        
+ *
  * The relevant declarations for the handling of BigNums
  *
  ****************************************************************/
@@ -45,8 +45,8 @@ typedef struct  MP_BigNum_t
 {
     MP_BigNumFormat_t native_bigint_format;
     MP_BigIntOps_pt   bigint_ops;
-    MP_BigNumFormat_t native_bigreal_format; 
-    MP_BigRealOps_pt  bigreal_ops; 
+    MP_BigNumFormat_t native_bigreal_format;
+    MP_BigRealOps_pt  bigreal_ops;
 } MP_BigNum_t;
 
 EXTERN MP_Status_t IMP_PutDummyBigInt(MP_Link_pt link, MP_ApInt_t dummy);
