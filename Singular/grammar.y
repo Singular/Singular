@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.118 2006-07-18 16:16:49 Singular Exp $ */
+/* $Id: grammar.y,v 1.119 2006-09-22 10:32:09 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -563,7 +563,7 @@ elemexpr:
             /*remember not to omFree($1)
             *because it is a part of the scanner buffer*/
             $$.rtyp  = INT_CMD;
-            $$.data = (void *)i;
+            $$.data = (void *)(long)i;
 
             /* check: out of range input */
             int l = strlen($1)+2;
@@ -840,7 +840,7 @@ expr_arithmetic:
             memset(&$$,0,sizeof($$));
             int i; TESTSETINT($2,i);
             $$.rtyp  = INT_CMD;
-            $$.data = (void *)(i == 0 ? 1 : 0);
+            $$.data = (void *)(long)(i == 0 ? 1 : 0);
           }
         | '-' expr %prec UMINUS
           {

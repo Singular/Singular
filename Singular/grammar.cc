@@ -1753,7 +1753,7 @@ case 35:
             /*remember not to omFree($1)
             *because it is a part of the scanner buffer*/
             yyval.lv.rtyp  = INT_CMD;
-            yyval.lv.data = (void *)i;
+            yyval.lv.data = (void *)(long)i;
 
             /* check: out of range input */
             int l = strlen(yyvsp[0].name)+2;
@@ -2126,7 +2126,7 @@ case 88:
             memset(&yyval.lv,0,sizeof(yyval.lv));
             int i; TESTSETINT(yyvsp[0].lv,i);
             yyval.lv.rtyp  = INT_CMD;
-            yyval.lv.data = (void *)(i == 0 ? 1 : 0);
+            yyval.lv.data = (void *)(long)(i == 0 ? 1 : 0);
           ;
     break;}
 case 89:

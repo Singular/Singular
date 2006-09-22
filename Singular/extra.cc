@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.241 2006-08-14 17:08:21 wienand Exp $ */
+/* $Id: extra.cc,v 1.242 2006-09-22 10:32:11 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -205,7 +205,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         r = (ring) h->Data();
       }
       res->rtyp = INT_CMD;
-      res->data = (void*) (rBlocks(r) - 1);
+      res->data = (void*) (long)(rBlocks(r) - 1);
       return FALSE;
     }
 /*==================== version ==================================*/
@@ -220,7 +220,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     if(strcmp(sys_cmd,"gen")==0)
     {
       res->rtyp=INT_CMD;
-      res->data=(void *)npGen;
+      res->data=(void *)(long)npGen;
       return FALSE;
     }
     else
@@ -228,9 +228,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     if(strcmp(sys_cmd,"sh")==0)
     {
       res->rtyp=INT_CMD;
-      if (h==NULL) res->data = (void *)system("sh");
+      if (h==NULL) res->data = (void *)(long) system("sh");
       else if (h->Typ()==STRING_CMD)
-        res->data = (void*) system((char*)(h->Data()));
+        res->data = (void*)(long) system((char*)(h->Data()));
       else
         WerrorS("string expected");
       return FALSE;
@@ -316,7 +316,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     {
       res->rtyp=INT_CMD;
     #ifndef MSDOS
-      res->data=(void *)getpid();
+      res->data=(void *)(long) getpid();
     #else
       res->data=(void *)1;
     #endif
@@ -453,7 +453,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     if (strcmp(sys_cmd,"HC")==0)
     {
       res->rtyp=INT_CMD;
-      res->data=(void *)HCord;
+      res->data=(void *)(long) HCord;
       return FALSE;
     }
     else
@@ -479,7 +479,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         return TRUE;
       }
       res->rtyp=INT_CMD;
-      res->data=(void*) siRandomStart;
+      res->data=(void*)(long) siRandomStart;
       return FALSE;
     }
 /*==================== complexNearZero ======================*/
@@ -1244,7 +1244,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       res->rtyp = POLY_CMD;
       res->data =  (poly) result;
       */
-      res->rtyp = INT_CMD; res->data = (void*) MivSame(arg1, arg2);
+      res->rtyp = INT_CMD;
+      res->data = (void*)(long) MivSame(arg1, arg2);
       return FALSE;
     }
   else
@@ -1276,7 +1277,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       res->rtyp = POLY_CMD;
       res->data =  (poly) result;
       */
-      res->rtyp = INT_CMD;res->data = (void*) M3ivSame(arg1, arg2, arg3);
+      res->rtyp = INT_CMD;
+      res->data = (void*)(long) M3ivSame(arg1, arg2, arg3);
       return FALSE;
     }
   else
@@ -2076,7 +2078,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       if ((h!=NULL) &&(h->Typ()==POLY_CMD))
       {
         res->rtyp=INT_CMD;
-        res->data=(void *)singclap_isSqrFree((poly)h->Data());
+        res->data=(void *)(long) singclap_isSqrFree((poly)h->Data());
         return FALSE;
       }
       else
@@ -2605,7 +2607,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     if (strcmp(sys_cmd, "mults")==0)
     {
       res->rtyp=INT_CMD ;
-      res->data=(void*) Mults();
+      res->data=(void*)(long) Mults();
       return(FALSE);
     }
     else

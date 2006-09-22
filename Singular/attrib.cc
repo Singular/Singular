@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.26 2006-05-08 15:38:43 Singular Exp $ */
+/* $Id: attrib.cc,v 1.27 2006-09-22 10:32:11 Singular Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -322,7 +322,7 @@ BOOLEAN atATTRIB2(leftv res,leftv a,leftv b)
   if (strcmp(name,"isSB")==0)
   {
     res->rtyp=INT_CMD;
-    res->data=(void *)hasFlag(v,FLAG_STD);
+    res->data=(void *)(long)hasFlag(v,FLAG_STD);
   }
   else if ((strcmp(name,"rank")==0)&&(v->Typ()==MODUL_CMD))
   {
