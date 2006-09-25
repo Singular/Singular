@@ -291,11 +291,11 @@ LINK_CXX = $(CXX) $(NTL_INCLUDE) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS_CXX)
 
 
 all:
-	make setup1
-	make setup2
-	make setup3
-	make setup4
-	make ntl.a
+	$(MAKE) setup1
+	$(MAKE) setup2
+	$(MAKE) setup3
+	$(MAKE) setup4
+	$(MAKE) ntl.a
 
 
 # setup1 generates the file ../incluse/NTL/mach_desc.h
@@ -358,7 +358,7 @@ GetTime.o: GetTime.c
 #################################################################
 
 check:
-	make QuickTest
+	$(MAKE) QuickTest
 	./QuickTest
 	- sh RemoveProg QuickTest
 	sh TestScript
