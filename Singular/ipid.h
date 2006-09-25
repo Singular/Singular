@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.41 2003-12-10 16:57:14 Singular Exp $ */
+/* $Id: ipid.h,v 1.42 2006-09-25 14:22:15 Singular Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -58,6 +58,16 @@ class proclevel {
   void    pop();
 };
 extern proclevel *procstack;
+
+typedef struct
+{
+  int (*iiAddCproc)(char *libname, char *procname, BOOLEAN pstatic,
+                    BOOLEAN(*func)(leftv res, leftv v));
+  int (*iiArithAddCmd)(char *szName, short nAlias, short nTokval,
+                       short nToktype, short nPos);
+
+} SModulFunctions;
+
 
 /*extern idhdl      currRingHdl; in structs.h */
 /*extern ring     currRing;  in structs.h */
