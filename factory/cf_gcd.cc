@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.47 2006-05-16 13:43:18 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.48 2006-09-25 12:33:11 Singular Exp $ */
 
 #include <config.h>
 
@@ -626,8 +626,17 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
             if ( !( getCharacteristic() == 0 && isOn( SW_RATIONAL ) ) )
             {
                 CanonicalForm d;
+#if 1
                 do{ d = gcd_poly( f, g ); }
                 while ((!fdivides(d,f)) || (!fdivides(d,g)));
+#else
+                while(1)
+                { 
+                  d = gcd_poly( f, g ); 
+                  if ((fdivides(d,f)) && (fdivides(d,g))) break;
+                  printf("g"); fflush(stdout);
+                }
+#endif
                 return abs( d );
             }
             else
