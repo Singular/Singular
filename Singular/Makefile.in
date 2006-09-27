@@ -520,7 +520,8 @@ backup: tar
 	mcopy -o Singular-${SINGULAR_VERSION}-src.tar.gz a:
 
 TAGS:   ${SOURCES} ${ESOURCES} ${HEADERS} 
-	etags ${SOURCES} ${ESOURCES} ${HEADERS}
+	etags ${SOURCES} ${ESOURCES} ${HEADERS} ../kernel/*.[ch] ../kernel/*.cc ../kernel/*.inc
+
 
 tags:   
 	ctags *.y *.[lch] *.cc *.inc ../kernel/*.[ch] ../kernel/*.cc ../kernel/*.inc

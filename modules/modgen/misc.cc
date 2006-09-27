@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.25 2006-04-06 19:37:00 anne Exp $ */
+/* $Id: misc.cc,v 1.26 2006-09-27 17:46:27 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -34,6 +34,28 @@
 #  define logx
 #endif
 
+typedef struct {
+  unsigned long nCmdUsed;      /**< number of commands used */
+  unsigned long nCmdAllocated; /**< number of commands-slots allocated */
+  unsigned long nLastIdentifier;
+  cmdnames *sCmds;             /**< array of existing commands */
+
+#ifndef GENTABLE
+  struct sValCmd1 *psValCmd1;
+  struct sValCmd2 *psValCmd2;
+  struct sValCmd3 *psValCmd3;
+  struct sValCmdM *psValCmdM;
+#endif /* GENTABLE */
+} SArithBase;
+
+
+/*---------------------------------------------------------------------*
+ * File scope Variables (Variables share by several functions in
+ *                       the same file )
+ *
+ *---------------------------------------------------------------------*/
+static SArithBase sArithBase;  /**< Base entry for arithmetic */
+
 char *DYNAinclude[] = {
    "",
    "#include <dlfcn.h>",
@@ -53,6 +75,14 @@ BOOLEAN siq=FALSE;
 char *lastreserved=NULL;
 #define SELF_CMD MAX_TOK+1
 
+/*---------------------------------------------------------------------*
+ * Extern Functions declarations
+ *
+ *---------------------------------------------------------------------*/
+static int _gentable_sort_cmds(const void *a, const void *b);
+extern int iiArithRemoveCmd(char *szName);
+extern int iiArithAddCmd(char *szName, short nAlias, short nTokval,
+                         short nToktype, short nPos=-1);
 extern void enter_id(FILE *fp, idtyp t, char *name, char *value,
                      int lineno, char *file);
 extern void write_enter_id(FILE *fp);
@@ -77,7 +107,7 @@ int IsCmd(char *n, int & tok)
 {
   int an=1;
   int i,v;
-  int en=LAST_IDENTIFIER;
+  int en=sArithBase.nLastIdentifier;
   
   if( strcmp(n, "SELF") == 0) {
     tok = SELF_CMD;
@@ -91,16 +121,16 @@ int IsCmd(char *n, int & tok)
     return tok;
   }
   
-  loop
+  for(an=0; an<sArithBase.nCmdUsed; )
   {
     if(an>=en-1)
     {
-      if (strcmp(n, cmds[an].name) == 0)
+      if (strcmp(n, sArithBase.sCmds[an].name) == 0)
       {
         i=an;
         break;
       }
-      else if (strcmp(n, cmds[en].name) == 0)
+      else if ((an!=en) && (strcmp(n, sArithBase.sCmds[en].name) == 0))
       {
         i=en;
         break;
@@ -111,61 +141,54 @@ int IsCmd(char *n, int & tok)
       }
     }
     i=(an+en)/2;
-    v=strcmp(n,cmds[i].name);
+    if (*n < *(sArithBase.sCmds[i].name))
+    {
+      en=i-1;
+    }
+    else if (*n > *(sArithBase.sCmds[i].name))
+    {
+      an=i+1;
+    }
+    else
+    {
+      v=strcmp(n,sArithBase.sCmds[i].name);
     if(v<0)
     {
-      en=i;
+        en=i-1;
     }
     else if(v>0)
     {
-      an=i;
+        an=i+1;
     }
     else /*v==0*/
     {
       break;
     }
   }
-  lastreserved=cmds[i].name;
-  tok=cmds[i].tokval;
-  if(cmds[i].alias==2)
-  {
-    if(trace)printf("outdated identifier `%s` used - please change your code",
-    cmds[i].name);
-    cmds[i].alias=1;
   }
-#if 0
-  if (!expected_parms)
-  {
-    switch (tok)
+  lastreserved=sArithBase.sCmds[i].name;
+  tok=sArithBase.sCmds[i].tokval;
+  if(sArithBase.sCmds[i].alias==2)
     {
-      case IDEAL_CMD:
-      case INT_CMD:
-      case INTVEC_CMD:
-      case MAP_CMD:
-      case MATRIX_CMD:
-      case MODUL_CMD:
-      case POLY_CMD:
-      case PROC_CMD:
-      case RING_CMD:
-      case STRING_CMD:
-        cmdtok = tok;
-        break;
-    }
+    if(trace)printf("outdated identifier `%s` used - please change your code",
+    sArithBase.sCmds[i].name);
+    sArithBase.sCmds[i].alias=1;
   }
-#endif
+
   logx("IsCmd: [%d] %s\n", tok, n);
   
-  if( (cmds[i].toktype==ROOT_DECL) ||
-      (cmds[i].toktype==ROOT_DECL_LIST) ||
-      (cmds[i].toktype==RING_DECL) ||
-      (cmds[i].toktype==IDEAL_CMD) ||
-      (cmds[i].toktype==INTMAT_CMD) ||
-      (cmds[i].toktype==MODUL_CMD) ||
-      (cmds[i].toktype==MATRIX_CMD))// ||
-//      ((cmds[i].toktype>=DRING_CMD) && (cmds[i].toktype<=VECTOR_CMD))) 
-    return cmds[i].toktype;
+  if( (sArithBase.sCmds[i].toktype==ROOT_DECL) ||
+      (sArithBase.sCmds[i].toktype==ROOT_DECL_LIST) ||
+      (sArithBase.sCmds[i].toktype==RING_DECL) ||
+      (sArithBase.sCmds[i].toktype==IDEAL_CMD) ||
+      (sArithBase.sCmds[i].toktype==INTMAT_CMD) ||
+      (sArithBase.sCmds[i].toktype==MODUL_CMD) ||
+      (sArithBase.sCmds[i].toktype==MATRIX_CMD))// ||
+//      ((csArithBase.sCds[i].toktype>=DRING_CMD) && (cmds[i].toktype<=VECTOR_CMD))) 
+    return sArithBase.sCmds[i].toktype;
   return 0;
 }
+
 
 char * decl2str(int n, char *name)
 {
@@ -433,7 +456,7 @@ void generate_mod(
   for(proccnt=0; proccnt<module->proccnt; proccnt++) {
     printf("->%s, %s\n", module->procs[proccnt].procname,
            module->procs[proccnt].funcname);
-    fprintf(module->modfp, "  iiAddCproc(\"%s\",\"%s\",%s, mod_%s);\n",
+    fprintf(module->modfp, "  psModulFunctions->iiAddCproc(\"%s\",\"%s\",%s, mod_%s);\n",
 	    module->name, module->procs[proccnt].procname, 
 	    module->procs[proccnt].is_static ? "TRUE" : "FALSE",
             module->procs[proccnt].funcname);
@@ -615,3 +638,172 @@ void init_type_conv()
 }
 
 /*========================================================================*/
+/*---------------------------------------------------------------------*/
+/** 
+ * @brief compares to entry of cmdsname-list
+
+ @param[in] a   
+ @param[in] b   
+
+ @return <ReturnValue>
+**/
+/*---------------------------------------------------------------------*/
+static int _gentable_sort_cmds(
+  const void *a,
+  const void *b
+  )
+{
+  cmdnames *pCmdL = (cmdnames*)a;
+  cmdnames *pCmdR = (cmdnames*)b;
+  
+  if(a==NULL || b==NULL)             return 0;
+
+  /* empty entries goes to the end of the list for later reuse */
+  if(pCmdL->name==NULL) return 1;
+  if(pCmdR->name==NULL) return -1;
+  
+  /* $INVALID$ must come first */
+  if(strcmp(pCmdL->name, "$INVALID$")==0) return -1;
+  if(strcmp(pCmdR->name, "$INVALID$")==0) return  1;
+  
+  /* tokval=-1 are reserved names at the end */
+  if( (pCmdL->tokval==-1) && pCmdR->tokval==-1)
+    return strcmp(pCmdL->name, pCmdR->name);
+
+  /* pCmdL->tokval==-1, pCmdL goes at the end */
+  if(pCmdL->tokval==-1) return 1;
+  /* pCmdR->tokval==-1, pCmdR goes at the end */
+  if(pCmdR->tokval==-1) return -1;
+
+  return strcmp(pCmdL->name, pCmdR->name);
+}
+
+/*---------------------------------------------------------------------*/
+/** 
+ * @brief initialisation of arithmetic structured data
+
+ @retval 0 on success
+
+**/
+/*---------------------------------------------------------------------*/
+int iiInitArithmetic()
+{
+  int i;
+  //printf("iiInitArithmetic()\n");
+#ifndef GENTABLE
+  memset(&sArithBase, 0, sizeof(sArithBase));
+  iiInitCmdName();
+  /* fix last-identifier */
+#endif   /* !GENTABLE */
+}
+
+int iiArithFindCmd(const char *szName)
+{
+  int an=0;
+  int i = 0,v = 0;
+#ifndef GENTABLE
+  int en=sArithBase.nLastIdentifier;
+
+  for(an=0; an<sArithBase.nCmdUsed; ) {
+    if(an>=en-1) {
+      if (strcmp(szName, sArithBase.sCmds[an].name) == 0) {
+        //Print("RET-an=%d %s\n", an, sArithBase.sCmds[an].name);
+        return an;
+      } else if (strcmp(szName, sArithBase.sCmds[en].name) == 0)
+      {
+        //Print("RET-en=%d %s\n", en, sArithBase.sCmds[en].name);
+        return en;
+      }
+      else
+      {
+        //Print("RET- 1\n");
+        return -1;
+      }
+    }
+    i=(an+en)/2;
+    if (*szName < *(sArithBase.sCmds[i].name)) {
+      en=i-1;
+    }
+    else if (*szName > *(sArithBase.sCmds[i].name))
+    {
+      an=i+1;
+    }
+    else
+    {
+      v=strcmp(szName,sArithBase.sCmds[i].name);
+      if(v<0)
+      {
+        en=i-1;
+      }
+      else if(v>0)
+      {
+        an=i+1;
+      }
+      else /*v==0*/
+      {
+        //Print("RET-i=%d %s\n", i, sArithBase.sCmds[i].name);
+        return i;
+      }
+    }
+  }
+  //if(i>=0 && i<sArithBase.nCmdUsed)
+  //  return i;
+  //Print("RET-2\n");
+  return -2;
+#else
+  return 0;
+#endif
+}
+
+int iiArithAddCmd(
+  char *szName,
+  short nAlias,
+  short nTokval,
+  short nToktype,
+  short nPos
+  )
+{
+  //printf("AddCmd(%s, %d, %d, %d, %d)\n", szName, nAlias,
+  //       nTokval, nToktype, nPos);
+  if(nPos>=0) {
+    if(nPos>=sArithBase.nCmdAllocated) return -1;
+    if(szName!=NULL) sArithBase.sCmds[nPos].name    = strdup(szName);
+    else sArithBase.sCmds[nPos].name = NULL;
+    sArithBase.sCmds[nPos].alias   = nAlias;
+    sArithBase.sCmds[nPos].tokval  = nTokval;
+    sArithBase.sCmds[nPos].toktype = nToktype;
+    sArithBase.nCmdUsed++;
+    //if(nTokval>0) sArithBase.nLastIdentifier++;
+  } else {
+    if(szName==NULL) return -1;
+    int nIndex = iiArithFindCmd(szName);
+    if(nIndex>=0) {
+      printf("'%s' already exists at %d\n", szName, nIndex);
+      return -1;
+    }
+    
+    if(sArithBase.nCmdUsed>=sArithBase.nCmdAllocated) {
+      /* needs to create new slots */
+      unsigned long nSize = (sArithBase.nCmdAllocated+1)*sizeof(cmdnames);
+      sArithBase.sCmds = (cmdnames *)realloc(sArithBase.sCmds, nSize);
+      if(sArithBase.sCmds==NULL) return -1;
+      sArithBase.nCmdAllocated++;
+    } 
+    /* still free slots available */
+    sArithBase.sCmds[sArithBase.nCmdUsed].name    = strdup(szName);
+    sArithBase.sCmds[sArithBase.nCmdUsed].alias   = nAlias;
+    sArithBase.sCmds[sArithBase.nCmdUsed].tokval  = nTokval;
+    sArithBase.sCmds[sArithBase.nCmdUsed].toktype = nToktype;
+    sArithBase.nCmdUsed++;
+
+    qsort(sArithBase.sCmds, sArithBase.nCmdUsed, sizeof(cmdnames),
+          (&_gentable_sort_cmds));
+    for(sArithBase.nLastIdentifier=sArithBase.nCmdUsed-1; 
+        sArithBase.nLastIdentifier>0; sArithBase.nLastIdentifier--) {
+      if(sArithBase.sCmds[sArithBase.nLastIdentifier].tokval>=0) break;
+    }
+    //Print("L=%d\n", sArithBase.nLastIdentifier);
+  }
+  return 0;
+}
+

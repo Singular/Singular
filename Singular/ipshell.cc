@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.142 2006-07-26 13:49:28 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.143 2006-09-27 17:46:11 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -65,33 +65,6 @@ int  myynest = -1;
 static BOOLEAN iiNoKeepRing=TRUE;
 
 /*0 implementation*/
-
-char * Tok2Cmdname(int tok)
-{
-  int i = 0;
-  if (tok < 0)
-  {
-    return cmds[0].name;
-  }
-  if (tok==ANY_TYPE) return "any_type";
-  if (tok==NONE) return "nothing";
-  //if (tok==IFBREAK) return "if_break";
-  //if (tok==VECTOR_FROM_POLYS) return "vector_from_polys";
-  //if (tok==ORDER_VECTOR) return "ordering";
-  //if (tok==REF_VAR) return "ref";
-  //if (tok==OBJECT) return "object";
-  //if (tok==PRINT_EXPR) return "print_expr";
-  if (tok==IDHDL) return "identifier";
-  while (cmds[i].tokval!=0)
-  {
-    if ((cmds[i].tokval == tok)&&(cmds[i].alias==0))
-    {
-      return cmds[i].name;
-    }
-    i++;
-  }
-  return cmds[0].name;
-}
 
 char * iiTwoOps(int t)
 {

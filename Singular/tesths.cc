@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.108 2006-09-21 17:00:39 Singular Exp $ */
+/* $Id: tesths.cc,v 1.109 2006-09-27 17:46:12 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -36,6 +36,8 @@
 #include <factory.h>
 #endif
 
+extern int iiInitArithmetic();
+
 const char *singular_date=__DATE__ " " __TIME__;
 
 /*0 implementation*/
@@ -56,13 +58,13 @@ int main(          /* main entry to Singular */
 #endif
 #ifdef GENTABLE
   extern void ttGen1();
-  extern void ttGen2();
+  extern void ttGen2b();
   extern void ttGen4();
   extern void mpsr_ttGen(); // For initialization of (CMD, MP_COP) tables
   mpsr_ttGen();
   ttGen4();
   ttGen1();
-  ttGen2();
+  ttGen2b();
 #else
   // Don't worry: ifdef OM_NDEBUG, then all these calls are undef'ed
   omInitRet_2_Info(argv[0]);
@@ -76,6 +78,7 @@ int main(          /* main entry to Singular */
 
   // do this first, because -v might print version path
   feInitResources(argv[0]);
+  iiInitArithmetic();
 
   // parse command line options
   while((optc = fe_getopt_long(argc, argv,

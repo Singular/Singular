@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.411 2006-09-22 12:08:03 Singular Exp $ */
+/* $Id: iparith.cc,v 1.412 2006-09-27 17:46:09 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -52,10 +52,10 @@
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
 #include "kstdfac.h"
-#endif
+#endif /* HAVE_FACTORY */
 #ifdef HAVE_FGLM
 #include "fglm.h"
-#endif
+#endif /* HAVE_FGLM */
 #define HAVE_INTERPOLATION
 #ifdef HAVE_INTERPOLATION
 #include "interpolation.h"
@@ -74,11 +74,11 @@
 #define NO_PLURAL_N      0
 #define COMM_PLURAL     ,2
 #define COMM_PLURAL_N    2
-#else
+#else /* HAVE_PLURAL */
 #define ALLOW_PLURAL
 #define NO_PLURAL
 #define COMM_PLURAL
-#endif
+#endif /* HAVE_PLURAL */
 
 /*=============== types =====================*/
 struct sValCmdTab
@@ -100,7 +100,7 @@ struct sValCmd1
   short arg;
 #ifdef HAVE_PLURAL
   short valid_for_plural;
-#endif
+# endif /* HAVE_PLURAL */
 };
 
 typedef BOOLEAN (*proc2)(leftv,leftv,leftv);
@@ -113,7 +113,7 @@ struct sValCmd2
   short arg2;
 #ifdef HAVE_PLURAL
   short valid_for_plural;
-#endif
+# endif /* HAVE_PLURAL */
 };
 
 typedef BOOLEAN (*proc3)(leftv,leftv,leftv,leftv);
@@ -127,7 +127,7 @@ struct sValCmd3
   short arg3;
 #ifdef HAVE_PLURAL
   short valid_for_plural;
-#endif
+# endif /* HAVE_PLURAL */
 };
 struct sValCmdM
 {
@@ -137,9 +137,39 @@ struct sValCmdM
   short number_of_args; /* -1: any, -2: any >0, .. */
 #ifdef HAVE_PLURAL
   short valid_for_plural;
-#endif
+# endif /* HAVE_PLURAL */
 };
-#endif
+#endif /* GENTABLE */
+
+typedef struct {
+  unsigned long nCmdUsed;      /**< number of commands used */
+  unsigned long nCmdAllocated; /**< number of commands-slots allocated */
+  unsigned long nLastIdentifier;
+  cmdnames *sCmds;             /**< array of existing commands */
+
+#ifndef GENTABLE
+  struct sValCmd1 *psValCmd1;
+  struct sValCmd2 *psValCmd2;
+  struct sValCmd3 *psValCmd3;
+  struct sValCmdM *psValCmdM;
+#endif /* GENTABLE */
+} SArithBase;
+
+/*---------------------------------------------------------------------*
+ * File scope Variables (Variables share by several functions in
+ *                       the same file )
+ *
+ *---------------------------------------------------------------------*/
+static SArithBase sArithBase;  /**< Base entry for arithmetic */
+
+/*---------------------------------------------------------------------*
+ * Extern Functions declarations
+ *
+ *---------------------------------------------------------------------*/
+static int _gentable_sort_cmds(const void *a, const void *b);
+extern int iiArithRemoveCmd(char *szName);
+extern int iiArithAddCmd(char *szName, short nAlias, short nTokval,
+                         short nToktype, short nPos=-1);
 
 /*============= proc =======================*/
 static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport = FALSE);
@@ -344,9 +374,9 @@ cmdnames cmds[] =
   { "sortvec",     0, SORTVEC_CMD ,       CMD_1},
   #ifdef OLD_RES
   { "sres",        0, SRES_CMD ,          CMD_23},
-  #else
+#else /* OLD_RES */
   { "sres",        0, SRES_CMD ,          CMD_2},
-  #endif
+#endif /* OLD_RES */
   { "status",      0, STATUS_CMD,         CMD_M},
   { "std",         0, STD_CMD ,           CMD_123},
   { "string",      0, STRING_CMD ,        ROOT_DECL_LIST},
@@ -358,7 +388,7 @@ cmdnames cmds[] =
   { "transpose",   0, TRANSPOSE_CMD ,     CMD_1},
   #ifdef HAVE_PLURAL
   { "twostd",      0, TWOSTD_CMD ,        CMD_1},
-  #endif
+#endif /* HAVE_PLURAL */
   { "type",        0, TYPE_CMD ,          TYPE_CMD},
   { "typeof",      0, TYPEOF_CMD ,        CMD_1},
   { "uressolve",   0, URSOLVE_CMD,        CMD_M},
@@ -407,7 +437,7 @@ cmdnames cmds[] =
 /* end of list marker */
   { NULL, 0, 0, 0}
 };
-#endif
+#endif /* GENTABLE */
 
 /*=================== operations with 2 args.: static proc =================*/
 static BOOLEAN jjOP_IV_I(leftv res, leftv u, leftv v)
@@ -797,7 +827,7 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
         WerrorS("<package>::<id> expected");
         return TRUE;
   }
-#else
+#else /* HAVE_NS */
   WerrorS("package is not supported in this version");
 #endif /* HAVE_NS */
   return FALSE;
@@ -1199,10 +1229,10 @@ static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
       idDelete(&I);
       res->data=(void *)p;
     }
-#else
+#else /* HAVE_FACTORY */
     WerrorS("division only by a monomial");
     return TRUE;
-#endif
+#endif /* HAVE_FACTORY */
   }
   else
   {
@@ -1232,10 +1262,10 @@ static BOOLEAN jjDIV_Ma(leftv res, leftv u, leftv v)
       #ifdef HAVE_FACTORY
         MATELEM(mm,i,j) = singclap_pdivide( MATELEM(m,i,j) ,
                                            q /*(poly)(v->Data())*/ );
-      #else
+#else /* HAVE_FACTORY */
         WerrorS("division only by a monomial");
         return TRUE;
-      #endif
+#endif /* HAVE_FACTORY */
       }
       else
         MATELEM(mm,i,j) = pDivideM(pCopy(MATELEM(m,i,j)),pHead(q));
@@ -1728,9 +1758,9 @@ static BOOLEAN jjEXPORTTO(leftv res, leftv u, leftv v)
 #ifdef HAVE_NS
   //Print("exportto %s -> %s\n",v->Name(),u->Name() );
   return iiExport(v,0,(idhdl)u->data);
-#else
+#else /* HAVE_NS */
   return TRUE;
-#endif
+#endif /* HAVE_NS */
 }
 static BOOLEAN jjERROR(leftv res, leftv u)
 {
@@ -1805,7 +1835,7 @@ static BOOLEAN jjFACSTD2(leftv res, leftv v, leftv w)
   res->data=(void *)L;
   return FALSE;
 }
-#endif
+#endif /* HAVE_FACTORY */
 static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
 {
   ring r=(ring)u->Data();
@@ -1981,7 +2011,7 @@ static BOOLEAN jjGCD_P(leftv res, leftv u, leftv v)
                                  (poly)(v->CopyD(POLY_CMD)));
   return FALSE;
 }
-#endif
+#endif /* HAVE_FACTORY */
 static BOOLEAN jjHILBERT2(leftv res, leftv u, leftv v)
 {
   assumeStdFlag(u);
@@ -2318,9 +2348,9 @@ static BOOLEAN jjRANDOM(leftv res, leftv u, leftv v)
   int j=(int)(long)v->Data();
 #ifdef buildin_rand
   res->data =(char *)(long)((i > j) ? i : (siRand() % (j-i+1)) + i);
-#else
+#else /* buildin_rand */
   res->data =(char *)(long)((i > j) ? i : (rand() % (j-i+1)) + i);
-#endif
+#endif /* buildin_rand */
   return FALSE;
 }
 static BOOLEAN jjREAD2(leftv res, leftv u, leftv v)
@@ -3950,9 +3980,9 @@ static BOOLEAN jjRESERVEDNAME(leftv res, leftv v)
   char *s= (char *)v->Data();
   int i = 1;
   int l = strlen(s);
-  while (cmds[i].tokval!=0)
-  {
-    if (strcmp(s, cmds[i].name) == 0)
+  for(i=0; i<sArithBase.nCmdUsed; i++) {
+    //while (cmds[i].tokval!=0){
+    if (strcmp(s, sArithBase.sCmds[i].name) == 0)
     {
       res->data = (char *)1;
       return FALSE;
@@ -4027,12 +4057,12 @@ static BOOLEAN jjSLIM_GB(leftv res, leftv u)
       hom=isHomog;
     }
   }
-   
+
   assume(u_id->rank>=idRankFreeModule(u_id));
-  res->data=(char *)t_rep_gb(currRing, 
+  res->data=(char *)t_rep_gb(currRing,
     u_id,u_id->rank);
   //res->data=(char *)t_rep_gb(currRing, u_id);
-  
+
   if(!TEST_OPT_DEGBOUND) setFlag(res,FLAG_STD);
   if (w!=NULL) atSet(res,omStrDup("isHomog"),w,INTVEC_CMD);
   return FALSE;
@@ -6230,13 +6260,19 @@ static BOOLEAN jjREDUCE5(leftv res, leftv u)
 static BOOLEAN jjRESERVED0(leftv res, leftv v)
 {
   int i=1;
-  loop
+  unsigned short nCount = (sArithBase.nCmdUsed-1)/3;
+  if((3*nCount)<sArithBase.nCmdUsed) nCount++;
+  //Print("CMDS: %d/%d\n", sArithBase.nCmdUsed,
+  //      sArithBase.nCmdAllocated);
+  for(i=0; i<nCount; i++)
   {
-    Print("%-20s",cmds[i].name);
-    i++;
-    if(cmds[i].name==NULL)
-      break;
-    if ((i%3)==1) PrintLn();
+    Print("%-20s",sArithBase.sCmds[i+1].name);
+    if(i+1+nCount<sArithBase.nCmdUsed)
+      Print("%-20s",sArithBase.sCmds[i+1+nCount].name);
+    if(i+1+2*nCount<sArithBase.nCmdUsed)
+      Print("%-20s",sArithBase.sCmds[i+1+2*nCount].name);
+    //if ((i%3)==1) PrintLn();
+    PrintLn();
   }
   PrintLn();
   return FALSE;
@@ -6581,6 +6617,7 @@ void ttGen1()
   fclose(outfile);
 }
 /*-------------------------------------------------------------------*/
+#if 0
 void ttGen2()
 {
   FILE *outfile = myfopen("iparith.inc","a");
@@ -6592,7 +6629,7 @@ void ttGen2()
   fprintf(outfile,"// identifier table for Singular\n//\n");
 
   fprintf(outfile,
-  "cmdnames cmds[] =\n"
+  "cmdnames OLDcmds[] =\n"
   "{  // name-string     alias  tokval toktype\n"
   "{ \"$INVALID$\",            0,  -1, 0},\n");
   int i=1;
@@ -6700,6 +6737,96 @@ void ttGen2()
 "/* end of list marker */\n"
 "  { NULL, 0, 0, 0}\n"
 "};\n"
+"#ifdef HAVE_RTIMER\n"
+"#define LAST_IDENTIFIER %d\n"
+"#else\n"
+"#define LAST_IDENTIFIER %d\n"
+"#endif\n",id_nr,id_nr-1);
+  fclose(outfile);
+}
+#endif
+/*---------------------------------------------------------------------*/
+/**
+ * @brief generate cmds initialisation
+**/
+/*---------------------------------------------------------------------*/
+
+void ttGen2b()
+{
+  int cmd_size = (sizeof(cmds)/sizeof(cmdnames))-1;
+
+  FILE *outfile = myfopen("iparith.inc","a");
+  fprintf(outfile,
+  "/****************************************\n"
+  "*  Computer Algebra System SINGULAR     *\n"
+  "****************************************/\n\n");
+/*-------------------------------------------------------------------*/
+  fprintf(outfile,"// identifier table for Singular\n//\n");
+
+  fprintf(
+    outfile,
+    "void iiInitCmdName() {\n"
+    "  sArithBase.nCmdUsed      = 0;\n"
+    "  sArithBase.nCmdAllocated = %d;\n"
+    "  sArithBase.sCmds = (cmdnames*)omAlloc0(sArithBase.nCmdAllocated*sizeof(cmdnames));\n"
+    "\n"
+    "  // name-string        alias  tokval toktype\n",
+    cmd_size);
+  int m=0;
+  int id_nr=0;
+
+  qsort(&cmds, cmd_size, sizeof(cmdnames), (&_gentable_sort_cmds));
+
+  for(m=0; m<cmd_size; m++) {
+    if(cmds[m].tokval>0) id_nr++;
+    if(cmds[m].tokval==VRTIMER) fprintf(outfile,"#ifdef HAVE_RTIMER\n");
+    fprintf(outfile,"  iiArithAddCmd(\"%s\", %*d, %3d, ",cmds[m].name,
+            20-strlen(cmds[m].name),
+            cmds[m].alias,
+            cmds[m].tokval);
+    switch(cmds[m].toktype) {
+        case CMD_1:            fprintf(outfile,"CMD_1"); break;
+        case CMD_2:            fprintf(outfile,"CMD_2"); break;
+        case CMD_3:            fprintf(outfile,"CMD_3"); break;
+        case CMD_12:           fprintf(outfile,"CMD_12"); break;
+        case CMD_123 :         fprintf(outfile,"CMD_123"); break;
+        case CMD_23:           fprintf(outfile,"CMD_23"); break;
+        case CMD_M:            fprintf(outfile,"CMD_M"); break;
+        case SYSVAR:           fprintf(outfile,"SYSVAR"); break;
+        case ROOT_DECL:        fprintf(outfile,"ROOT_DECL"); break;
+        case ROOT_DECL_LIST:   fprintf(outfile,"ROOT_DECL_LIST"); break;
+        case RING_DECL:        fprintf(outfile,"RING_DECL"); break;
+        case NONE:             fprintf(outfile,"NONE"); break;
+        default:
+          if((cmds[m].toktype>' ') &&(cmds[m].toktype<127)) {
+            fprintf(outfile,"'%c'",cmds[m].toktype);
+          } else {
+            fprintf(outfile,"%d",cmds[m].toktype);
+          }
+          break;
+#if 0
+          fprintf(outfile,"  iiArithAddCmd(\"%s\", %*d,  -1, 0 );\n",
+              cmds[m].name, 20-strlen(cmds[m].name),
+              0/*cmds[m].alias*/
+              /*-1 cmds[m].tokval*/
+              /*0 cmds[m].toktype*/);
+#endif
+    }
+    fprintf(outfile,", %d);\n", m);
+    if(cmds[m].tokval==VRTIMER) fprintf(outfile,"#endif\n");
+  }
+  fprintf(outfile, "/* end of list marker */\n");
+  fprintf(outfile,
+          "#ifdef HAVE_RTIMER\n"
+          "  sArithBase.nLastIdentifier = %d;\n"
+          "#else /* HAVE_RTIMER */\n"
+          "  sArithBase.nLastIdentifier = %d;\n"
+          "#endif /* HAVE_RTIMER */\n",
+          id_nr,id_nr-1);
+
+
+  fprintf(outfile,
+"}\n"
 "#ifdef HAVE_RTIMER\n"
 "#define LAST_IDENTIFIER %d\n"
 "#else\n"
@@ -7570,18 +7697,19 @@ int IsCmd(const char *n, int & tok)
   int an=1;
   int i,v;
 #ifndef GENTABLE
-  int en=LAST_IDENTIFIER;
+  int en=sArithBase.nLastIdentifier;
 
-  loop
+  //loop
+  for(an=0; an<sArithBase.nCmdUsed; )
   {
     if(an>=en-1)
     {
-      if (strcmp(n, cmds[an].name) == 0)
+      if (strcmp(n, sArithBase.sCmds[an].name) == 0)
       {
         i=an;
         break;
       }
-      else if ((an!=en) && (strcmp(n, cmds[en].name) == 0))
+      else if ((an!=en) && (strcmp(n, sArithBase.sCmds[en].name) == 0))
       {
         i=en;
         break;
@@ -7592,17 +7720,17 @@ int IsCmd(const char *n, int & tok)
       }
     }
     i=(an+en)/2;
-    if (*n < *(cmds[i].name))
+    if (*n < *(sArithBase.sCmds[i].name))
     {
       en=i-1;
     }
-    else if (*n > *(cmds[i].name))
+    else if (*n > *(sArithBase.sCmds[i].name))
     {
       an=i+1;
     }
     else
     {
-      v=strcmp(n,cmds[i].name);
+      v=strcmp(n,sArithBase.sCmds[i].name);
       if(v<0)
       {
         en=i-1;
@@ -7617,13 +7745,13 @@ int IsCmd(const char *n, int & tok)
       }
     }
   }
-  lastreserved=cmds[i].name;
-  tok=cmds[i].tokval;
-  if(cmds[i].alias==2)
+  lastreserved=sArithBase.sCmds[i].name;
+  tok=sArithBase.sCmds[i].tokval;
+  if(sArithBase.sCmds[i].alias==2)
   {
     Warn("outdated identifier `%s` used - please change your code",
-    cmds[i].name);
-    cmds[i].alias=1;
+    sArithBase.sCmds[i].name);
+    sArithBase.sCmds[i].alias=1;
   }
   if (currRingHdl==NULL)
   {
@@ -7658,7 +7786,7 @@ int IsCmd(const char *n, int & tok)
         break;
     }
   }
-  return cmds[i].toktype;
+  return sArithBase.sCmds[i].toktype;
 #else
   return 0;
 #endif
@@ -7680,6 +7808,348 @@ static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op)
 
 #endif
   assume(0);
+  return 0;
+}
+
+#ifdef GENTABLE
+char * Tok2Cmdname(int tok)
+{
+  int i = 0;
+  if (tok < 0)
+  {
+    return cmds[0].name;
+  }
+  if (tok==ANY_TYPE) return "any_type";
+  if (tok==NONE) return "nothing";
+  //if (tok==IFBREAK) return "if_break";
+  //if (tok==VECTOR_FROM_POLYS) return "vector_from_polys";
+  //if (tok==ORDER_VECTOR) return "ordering";
+  //if (tok==REF_VAR) return "ref";
+  //if (tok==OBJECT) return "object";
+  //if (tok==PRINT_EXPR) return "print_expr";
+  if (tok==IDHDL) return "identifier";
+  while (cmds[i].tokval!=0)
+  {
+    if ((cmds[i].tokval == tok)&&(cmds[i].alias==0))
+    {
+      return cmds[i].name;
+    }
+    i++;
+  }
+  return cmds[0].name;
+}
+#else /* GENTABLE */
+char * Tok2Cmdname(int tok)
+{
+  int i = 0;
+  if (tok < 0)
+  {
+    return sArithBase.sCmds[0].name;
+  }
+  if (tok==ANY_TYPE) return "any_type";
+  if (tok==NONE) return "nothing";
+  //if (tok==IFBREAK) return "if_break";
+  //if (tok==VECTOR_FROM_POLYS) return "vector_from_polys";
+  //if (tok==ORDER_VECTOR) return "ordering";
+  //if (tok==REF_VAR) return "ref";
+  //if (tok==OBJECT) return "object";
+  //if (tok==PRINT_EXPR) return "print_expr";
+  if (tok==IDHDL) return "identifier";
+  for(i=0; i<sArithBase.nCmdUsed; i++)
+    //while (sArithBase.sCmds[i].tokval!=0)
+  {
+    if ((sArithBase.sCmds[i].tokval == tok)&&
+        (sArithBase.sCmds[i].alias==0))
+    {
+      return sArithBase.sCmds[i].name;
+    }
+  }
+  return sArithBase.sCmds[0].name;
+}
+#endif /* GENTABLE */
+
+
+/*---------------------------------------------------------------------*/
+/**
+ * @brief compares to entry of cmdsname-list
+
+ @param[in] a
+ @param[in] b
+
+ @return <ReturnValue>
+**/
+/*---------------------------------------------------------------------*/
+static int _gentable_sort_cmds( const void *a, const void *b )
+{
+  cmdnames *pCmdL = (cmdnames*)a;
+  cmdnames *pCmdR = (cmdnames*)b;
+
+  if(a==NULL || b==NULL)             return 0;
+
+  /* empty entries goes to the end of the list for later reuse */
+  if(pCmdL->name==NULL) return 1;
+  if(pCmdR->name==NULL) return -1;
+
+  /* $INVALID$ must come first */
+  if(strcmp(pCmdL->name, "$INVALID$")==0) return -1;
+  if(strcmp(pCmdR->name, "$INVALID$")==0) return  1;
+
+  /* tokval=-1 are reserved names at the end */
+  if (pCmdL->tokval==-1)
+  {
+    if (pCmdR->tokval==-1)
+       return strcmp(pCmdL->name, pCmdR->name);
+    /* pCmdL->tokval==-1, pCmdL goes at the end */
+    return 1;
+  }
+  /* pCmdR->tokval==-1, pCmdR goes at the end */
+  if(pCmdR->tokval==-1) return -1;
+
+  return strcmp(pCmdL->name, pCmdR->name);
+}
+
+/*---------------------------------------------------------------------*/
+/**
+ * @brief initialisation of arithmetic structured data
+
+ @retval 0 on success
+
+**/
+/*---------------------------------------------------------------------*/
+int iiInitArithmetic()
+{
+  int i;
+  //printf("iiInitArithmetic()\n");
+#ifndef GENTABLE
+  memset(&sArithBase, 0, sizeof(sArithBase));
+  iiInitCmdName();
+  /* fix last-identifier */
+#if 0
+  /* we expect that gentable allready did every thing */
+  for(sArithBase.nLastIdentifier=sArithBase.nCmdUsed-1;
+      sArithBase.nLastIdentifier>0; sArithBase.nLastIdentifier--) {
+    if(sArithBase.sCmds[sArithBase.nLastIdentifier].tokval>=0) break;
+  }
+#endif
+  //Print("L=%d\n", sArithBase.nLastIdentifier);
+
+  //iiArithAddCmd(szName, nAlias, nTokval, nToktype);
+  //iiArithAddCmd("mygcd", 1, GCD_CMD, CMD_2);
+
+  //iiArithAddCmd("Top", 0,-1,0);
+
+
+  //for(i=0; i<sArithBase.nCmdUsed; i++) {
+  //  printf("CMD[%03d] %s, %d, %d, %d\n", i,
+  //         sArithBase.sCmds[i].name,
+  //         sArithBase.sCmds[i].alias,
+  //         sArithBase.sCmds[i].tokval,
+  //         sArithBase.sCmds[i].toktype);
+  //}
+  //iiArithRemoveCmd("Top");
+  //iiArithAddCmd("mygcd", 2, GCD_CMD, CMD_2);
+  //iiArithRemoveCmd("mygcd");
+  //iiArithAddCmd("kkk", 1, 1234, CMD_1);
+#endif   /* !GENTABLE */
+}
+
+/*---------------------------------------------------------------------*/
+/**
+ * @brief append newitem of size sizeofitem to the list named list.
+
+ @param[in,out] list
+ @param[in,out] item_count
+ @param[in] sizeofitem
+ @param[in] newitem
+
+ @retval  0 success
+ @retval -1 failure
+**/
+/*---------------------------------------------------------------------*/
+int iiArithAddItem2list(
+  void **list,
+  long  *item_count,
+  long sizeofitem,
+  void *newitem
+  )
+{
+  int count = *item_count;
+
+  //TRACE(0, "add_item_to_list(%p, %p, %ld, %p)\n", list, item_count,
+  //       sizeofitem, newitem);
+
+  if(count==0)
+  {
+    *list = (void *)omAlloc(sizeofitem);
+  }
+  else
+  {
+    *list = (void *)omRealloc(*list, (count+1) * sizeofitem);
+  }
+  if((*list)==NULL) return -1;
+
+  //memset((*list)+count*sizeofitem, 0, sizeofitem);
+  //memcpy((*list)+count*sizeofitem, newitem, sizeofitem);
+
+  /* erhoehe counter um 1 */
+  (count)++;
+  *item_count = count;
+  return 0;
+}
+
+int iiArithFindCmd(const char *szName)
+{
+#ifndef GENTABLE
+  int an=0;
+  int i = 0,v = 0;
+  int en=sArithBase.nLastIdentifier;
+
+  for(an=0; an<sArithBase.nCmdUsed; )
+  {
+    if(an>=en-1)
+    {
+      if (strcmp(szName, sArithBase.sCmds[an].name) == 0)
+      {
+        //Print("RET-an=%d %s\n", an, sArithBase.sCmds[an].name);
+        return an;
+      }
+      else if (strcmp(szName, sArithBase.sCmds[en].name) == 0)
+      {
+        //Print("RET-en=%d %s\n", en, sArithBase.sCmds[en].name);
+        return en;
+      }
+      else
+      {
+        //Print("RET- 1\n");
+        return -1;
+      }
+    }
+    i=(an+en)/2;
+    if (*szName < *(sArithBase.sCmds[i].name))
+    {
+      en=i-1;
+    }
+    else if (*szName > *(sArithBase.sCmds[i].name))
+    {
+      an=i+1;
+    }
+    else
+    {
+      v=strcmp(szName,sArithBase.sCmds[i].name);
+      if(v<0)
+      {
+        en=i-1;
+      }
+      else if(v>0)
+      {
+        an=i+1;
+      }
+      else /*v==0*/
+      {
+        //Print("RET-i=%d %s\n", i, sArithBase.sCmds[i].name);
+        return i;
+      }
+    }
+  }
+  //if(i>=0 && i<sArithBase.nCmdUsed)
+  //  return i;
+  //Print("RET-2\n");
+  return -2;
+#else
+  return 0;
+#endif
+}
+
+char *iiArithGetCmd( int nPos )
+{
+  if(nPos<0) return NULL;
+  if(nPos<sArithBase.nCmdUsed)
+    return sArithBase.sCmds[nPos].name;
+  return NULL;
+}
+
+int iiArithRemoveCmd( char *szName)
+{
+  int nIndex;
+  if(szName==NULL) return -1;
+
+  nIndex = iiArithFindCmd(szName);
+  if(nIndex<0 || nIndex>=sArithBase.nCmdUsed)
+  {
+    Print("'%s' not found (%d)\n", szName, nIndex);
+    return -1;
+  }
+  omFree(sArithBase.sCmds[nIndex].name);
+  sArithBase.sCmds[nIndex].name=0;
+  qsort(sArithBase.sCmds, sArithBase.nCmdUsed, sizeof(cmdnames),
+        (&_gentable_sort_cmds));
+  sArithBase.nCmdUsed--;
+
+  /* fix last-identifier */
+  for(sArithBase.nLastIdentifier=sArithBase.nCmdUsed-1;
+      sArithBase.nLastIdentifier>0; sArithBase.nLastIdentifier--)
+  {
+    if(sArithBase.sCmds[sArithBase.nLastIdentifier].tokval>=0) break;
+  }
+  //Print("L=%d\n", sArithBase.nLastIdentifier);
+  return 0;
+}
+
+int iiArithAddCmd(
+  char *szName,
+  short nAlias,
+  short nTokval,
+  short nToktype,
+  short nPos
+  )
+{
+  //printf("AddCmd(%s, %d, %d, %d, %d)\n", szName, nAlias,
+  //       nTokval, nToktype, nPos);
+  if(nPos>=0)
+  {
+    if(nPos>=sArithBase.nCmdAllocated) return -1;
+    if(szName!=NULL) sArithBase.sCmds[nPos].name    = omStrDup(szName);
+    else sArithBase.sCmds[nPos].name = NULL;
+    sArithBase.sCmds[nPos].alias   = nAlias;
+    sArithBase.sCmds[nPos].tokval  = nTokval;
+    sArithBase.sCmds[nPos].toktype = nToktype;
+    sArithBase.nCmdUsed++;
+    //if(nTokval>0) sArithBase.nLastIdentifier++;
+  }
+  else
+  {
+    if(szName==NULL) return -1;
+    int nIndex = iiArithFindCmd(szName);
+    if(nIndex>=0)
+    {
+      Print("'%s' already exists at %d\n", szName, nIndex);
+      return -1;
+    }
+
+    if(sArithBase.nCmdUsed>=sArithBase.nCmdAllocated)
+    {
+      /* needs to create new slots */
+      unsigned long nSize = (sArithBase.nCmdAllocated+1)*sizeof(cmdnames);
+      sArithBase.sCmds = (cmdnames *)omRealloc(sArithBase.sCmds, nSize);
+      if(sArithBase.sCmds==NULL) return -1;
+      sArithBase.nCmdAllocated++;
+    }
+    /* still free slots available */
+    sArithBase.sCmds[sArithBase.nCmdUsed].name    = omStrDup(szName);
+    sArithBase.sCmds[sArithBase.nCmdUsed].alias   = nAlias;
+    sArithBase.sCmds[sArithBase.nCmdUsed].tokval  = nTokval;
+    sArithBase.sCmds[sArithBase.nCmdUsed].toktype = nToktype;
+    sArithBase.nCmdUsed++;
+
+    qsort(sArithBase.sCmds, sArithBase.nCmdUsed, sizeof(cmdnames),
+          (&_gentable_sort_cmds));
+    for(sArithBase.nLastIdentifier=sArithBase.nCmdUsed-1;
+        sArithBase.nLastIdentifier>0; sArithBase.nLastIdentifier--)
+    {
+      if(sArithBase.sCmds[sArithBase.nLastIdentifier].tokval>=0) break;
+    }
+    //Print("L=%d\n", sArithBase.nLastIdentifier);
+  }
   return 0;
 }
 

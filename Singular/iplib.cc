@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.121 2006-08-10 12:52:21 Singular Exp $ */
+/* $Id: iplib.cc,v 1.122 2006-09-27 17:46:11 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -35,6 +35,9 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport);
                                     BOOLEAN pstatic = FALSE);
 #endif /* HAVE_LIBPARSER */
 #define NS_LRING (procstack->cRing)
+
+extern int iiArithAddCmd(char *szName, short nAlias, short nTokval,
+                         short nToktype, short nPos);
 
 #include "mod_raw.h"
 
@@ -1084,7 +1087,8 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport)
   typedef int (*fktn_t)(int(*iiAddCproc)(char *libname, char *procname,
                                BOOLEAN pstatic,
                                BOOLEAN(*func)(leftv res, leftv v)));
-  fktn_t fktn;
+  typedef int (*fktn2_t)(SModulFunctions*);
+  fktn2_t fktn;
   idhdl pl;
   char *plib = iiConvName(newlib);
   BOOLEAN RET=TRUE;
@@ -1127,15 +1131,19 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport)
   }
   else
   {
+    SModulFunctions sModulFunctions;
+    
 #ifdef HAVE_NS
     package s=currPack;
     currPack=IDPACKAGE(pl);
 #endif
-    fktn = (fktn_t)dynl_sym(IDPACKAGE(pl)->handle, "mod_init");
+    fktn = (fktn2_t)dynl_sym(IDPACKAGE(pl)->handle, "mod_init");
     if( fktn!= NULL)
     {
-      if (autoexport) (*fktn)(iiAddCprocTop);
-      else            (*fktn)(iiAddCproc);
+      sModulFunctions.iiArithAddCmd = iiArithAddCmd;
+      if (autoexport) sModulFunctions.iiAddCproc = iiAddCprocTop;
+      else            sModulFunctions.iiAddCproc = iiAddCproc;
+      (*fktn)(&sModulFunctions);
     }
     else Werror("mod_init: %s\n", dynl_error());
     if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s \n", fullname);

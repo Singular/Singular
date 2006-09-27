@@ -59,6 +59,7 @@ extern char *yytext;
 
 moddef module_def;
 
+extern int iiInitArithmetic();
 int init_modgen(
   moddefv module_def,
   char *filename
@@ -158,6 +159,7 @@ main( int argc, char *argv[] )
     return 1;
   }
   
+  iiInitArithmetic();
   if(init_modgen(&module_def, argv[optind])) return 1;
   init_type_conv();
   do {

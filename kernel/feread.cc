@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.8 2006-07-18 11:25:05 bricken Exp $ */
+/* $Id: feread.cc,v 1.9 2006-09-27 17:45:40 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -49,6 +49,8 @@ static char * fe_fgets_stdin_init(char *pr,char *s, int size);
 char * (*fe_fgets_stdin)(char *pr,char *s, int size)
  = fe_fgets_stdin_init;
 
+extern char *iiArithGetCmd(int);
+
 /* ===================================================================*/
 /* =                   static/dymanic readline                      = */
 /* ===================================================================*/
@@ -80,7 +82,7 @@ char *command_generator (char *text, int state)
   }
 
   /* Return the next name which partially matches from the command list. */
-  while ((name = cmds[list_index].name)!=NULL)
+  while ((name = iiArithGetCmd(list_index))!=NULL)
   {
     list_index++;
 

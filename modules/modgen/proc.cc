@@ -1,5 +1,5 @@
 /*
- * $Id: proc.cc,v 1.25 2006-06-25 16:19:16 motsak Exp $
+ * $Id: proc.cc,v 1.26 2006-09-27 17:46:28 Singular Exp $
  */
 
 #include <stdio.h>
@@ -52,7 +52,7 @@ void setup_proc(
   
         /* write call to add procname to list */
         fprintf(module->modfp, 
-	        "  iiAddCproc(currPack->libname,\"%s\",%s, mod_%s);\n",
+	        "  psModulFunctions->iiAddCproc(currPack->libname,\"%s\",%s, mod_%s);\n",
                 proc->procname, 
                 proc->is_static ? "TRUE" : "FALSE",
                 proc->procname);
@@ -523,21 +523,21 @@ void write_function_errorhandling(
 
 /*========================================================================*/
 void write_help(
-  moddefv module,
+  moddefv pModule,
   procdefv pi
   )
 {
   unsigned int i;
   if(pi->help_string!=NULL) {
-    fprintf(module->fmtfp2, "#line %d \"%s\"\n", pi->lineno_other,
-            module->filename);
-    fprintf(module->fmtfp2, "  enter_id(\"%s_help\",", pi->procname);
-    fprintf(module->fmtfp2, " \"");
+    fprintf(pModule->fmtfp2, "#line %d \"%s\"\n", pi->lineno_other,
+            pModule->filename);
+    fprintf(pModule->fmtfp2, "  enter_id(\"%s_help\",", pi->procname);
+    fprintf(pModule->fmtfp2, " \"");
     for(i=0; i<strlen(pi->help_string); i++) {
-	if(pi->help_string[i]=='\n') fprintf(module->fmtfp2,"\\n");
-	else fprintf(module->fmtfp2,"%c", pi->help_string[i]);
+	if(pi->help_string[i]=='\n') fprintf(pModule->fmtfp2,"\\n");
+	else fprintf(pModule->fmtfp2,"%c", pi->help_string[i]);
     }
-    fprintf(module->fmtfp2, "\", STRING_CMD);\n\n", pi->help_string);
+    fprintf(pModule->fmtfp2, "\", STRING_CMD);\n\n", pi->help_string);
   }
 }
 

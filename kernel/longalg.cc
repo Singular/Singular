@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.16 2006-08-14 17:36:59 Singular Exp $ */
+/* $Id: longalg.cc,v 1.17 2006-09-27 17:45:40 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1352,10 +1352,6 @@ BOOLEAN naGreaterZero(number za)
   naTest(za);
   if ((zb!=NULL) && (zb->z!=NULL))
   {
-    //if (zb->n!=NULL)
-    //{
-    //  return TRUE;
-    //}
     return (nacGreaterZero(napGetCoeff(zb->z))||(!napIsConstant(zb->z)));
   }
   /* else */ return FALSE;
