@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.277 2006-08-10 12:52:39 Singular Exp $
+@comment $Id: reference.doc,v 1.278 2006-09-27 13:35:08 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3870,9 +3870,10 @@ See
 list
 @item @strong{Purpose:}
 returns a list whose first entry is a standard basis for the ideal, resp.@:
-module, and whose second entry is both a minimal generating set for the
-ideal, resp.@: module, and a subset of the standard basis for homogeneous
-input (w.r.t.@: any monomial ordering).
+module, and whose second entry is a generating set for the
+ideal, resp.@: module, and a subset of the standard basis.
+If the ideal/module is homogeneous, this second entry is a minimal
+generating set.
 @item @strong{Example:}
 @smallexample
 @c example
