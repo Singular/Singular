@@ -1,4 +1,4 @@
-version="$Id: involut.lib,v 1.8 2005-06-10 17:04:59 levandov Exp $";
+version="$Id: involut.lib,v 1.9 2006-09-27 00:42:54 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  involut.lib  Procedures for Computations and Operations with Involutions
@@ -534,14 +534,14 @@ EXAMPLE: example findInvo; shows examples
 }
 example
 { "EXAMPLE:"; echo = 2;
- def a = makeWeyl(1);
- setring a; // this algebra is a first Weyl algebra
- def X = findInvo();
- setring X; // ring with new variables, corr. to unknown coefficients
- L;
- // look at the matrix in the new variables, defining the linear involution
- print(L[1][2]);
- L[1][1];  // where new variables obey these relations
+  def a = makeWeyl(1);
+  setring a; // this algebra is a first Weyl algebra
+  def X = findInvo();
+  setring X; // ring with new variables, corr. to unknown coefficients
+  L;
+  // look at the matrix in the new variables, defining the linear involution
+  print(L[1][2]);
+  L[1][1];  // where new variables obey these relations
 }
 ///////////////////////////////////////////////////////////////////////////
 proc findInvoDiag()
@@ -662,14 +662,14 @@ EXAMPLE: example findInvoDiag; shows examples
 }
 example
 { "EXAMPLE:"; echo = 2;
- def a = makeWeyl(1);
- setring a; // this algebra is a first Weyl algebra
- def X = findInvoDiag();
- setring X; // ring with new variables, corresponding to unknown coefficients
- // print matrices, defining linear involutions
- print(L[1][2]);  // a first matrix: we see it is constant
- print(L[2][2]);  // and a second possible matrix; it is constant too
- L; // let us take a look on the whole list
+  def a = makeWeyl(1);
+  setring a; // this algebra is a first Weyl algebra
+  def X = findInvoDiag();
+  setring X; // ring with new variables, corresponding to unknown coefficients
+  // print matrices, defining linear involutions
+  print(L[1][2]);  // a first matrix: we see it is constant
+  print(L[2][2]);  // and a second possible matrix; it is constant too
+  L; // let us take a look on the whole list
 }
 /////////////////////////////////////////////////////////////////////
 proc findAuto(int n)
@@ -678,8 +678,8 @@ RETURN: a ring together with a list of pairs L, where
 @*        L[i][1]  =  Groebner Basis of an i-th associated prime,
 @*        L[i][2]  =  matrix, defining a linear map, with entries, reduced with respect to L[i][1]
 PURPOSE: computes the ideal of linear automorphisms of the basering, given by a matrix, n-th power of which gives identity (i.e. unipotent matrix)
-NOTE: if n=0, a matrix, defining an automorphism is not assumed to be unipotent. For convenience, the full ideal of relations @code{idJ}
-and the initial matrix with indeterminates @code{matD} are exported in the output ring
+NOTE: if n=0, a matrix, defining an automorphism is not assumed to be unipotent but just non-degenerate. A nonzero parameter @code{@p} is introduced as the value of the determinant of the matrix above.
+@* For convenience, the full ideal of relations @code{idJ} and the initial matrix with indeterminates @code{matD} are mutually exported in the output ring
 SEE ALSO: findInvo
 EXAMPLE: example findAuto; shows examples
 "{
@@ -694,16 +694,16 @@ EXAMPLE: example findAuto; shows examples
 
   matrix Rel = RelMatr(); //the matrix of relations
 
-  string s   = new_var(); //string of new variables
+  string @ss = new_var(); //string of new variables
   string Par = parstr(@B); //string of parameters in old ring
 
   if (Par=="") // if there are no parameters
   {
-    execute("ring @@K=0,("+varstr(@B)+","+s+"), dp;"); //new ring with new variables
+    execute("ring @@K=0,("+varstr(@B)+","+@ss+"), dp;"); //new ring with new variables
   }
   else //if there exist parameters
   {
-     execute("ring @@K=(0,"+Par+") ,("+varstr(@B)+","+s+"), dp;");//new ring with new variables
+     execute("ring @@K=(0,"+Par+") ,("+varstr(@B)+","+@ss+"), dp;");//new ring with new variables
   };
 
   matrix Rel = imap(@B, Rel); //consider the matrix of relations in new ring
@@ -755,21 +755,31 @@ EXAMPLE: example findAuto; shows examples
   };
   J = simplify(J,2);
   //-------------------------------------------------
-  if ( Par=="" ) //initializes the ring of relations
+  if (( Par=="" ) && (n!=0)) //initializes the ring of relations
   {
-    execute("ring @@KK=0,("+s+"), dp;");
+    execute("ring @@KK=0,("+@ss+"), dp;");
   }
-  else
+  if (( Par=="" ) && (n==0)) //initializes the ring of relations
   {
-    execute("ring @@KK=(0,"+Par+"),("+s+"), dp;");
+    execute("ring @@KK=(0,@p),("+@ss+"), dp;");
+  }
+  if ( Par!="" )
+  {
+    execute("ring @@KK=(0,"+Par+"),("+@ss+"), dp;");
   };
+  //  execute("setring @@KK;");
+  //  basering;
   ideal J = imap(@@K,J); // ideal, considered in @@KK now
   string snv = "["+string(NVars)+"]";
-  execute("matrix @@D"+snv+snv+"="+s+";"); // matrix with entries=new variables
+  execute("matrix @@D"+snv+snv+"="+@ss+";"); // matrix with entries=new variables
 
   if (n>=2)
   {
     J = J, ideal( @@D*@@D-matrix( freemodule(NVars) ) ); // add the condition that homomorphism to square is just identity
+  }
+  if (n==0)
+  {
+    J = J, det(@@D)-@p; // det of non-unipotent matrix is nonzero
   }
   J       = simplify(J,2); // without extra zeros
   list mL = minAssGTZ(J); // components not in GB
@@ -797,12 +807,23 @@ EXAMPLE: example findAuto; shows examples
 }
 example
 { "EXAMPLE:"; echo = 2;
- def a = makeWeyl(1);
- setring a; // this algebra is a first Weyl algebra
- def X = findAuto(2);
- setring X; // ring with new variables - unknown coefficients
- // look at matrices, defining linear automorphisms:
- print(L[1][2]);  // a first one: we see it is constant
- print(L[2][2]);  // and a second possible matrix; it is constant too
- L; // let us take a look on the whole list
+  def a = makeWeyl(1);
+  setring a; // this algebra is a first Weyl algebra
+  def X = findAuto(2);
+  setring X; // ring with new variables - unknown coefficients
+  size(L); // we have (size(L)) families in the answer
+  // look at matrices, defining linear automorphisms:
+  print(L[1][2]);  // a first one: we see it is the identity
+  print(L[2][2]);  // and a second possible matrix; it is diagonal
+  // L; // we can take a look on the whole list, too
+  kill X; kill a;
+  //----------- find all the linear automorphisms --------------------
+  //----------- use the call findAuto(0)          --------------------
+  ring r = 0,(x,s),dp;
+  ncalgebra(1,s); // the shift algebra
+  s*x; // the only relation in the algebra is:
+  def Y = findAuto(0); 
+  setring Y;
+  size(L); // here, we have 1 parametrized family
+  print(L[1][2]); // here, @p is a nonzero parameter
 }
