@@ -291,7 +291,7 @@ BOOLEAN setOption(leftv res, leftv v)
         intvec *w=(intvec*)v->Data();
         test=(*w)[0];
         verbose=(*w)[1];
-
+#if 0
         if (TEST_OPT_INTSTRATEGY && (currRing!=NULL)
         && rField_has_simple_inverse()
 #ifdef HAVE_RING2TOM
@@ -300,6 +300,7 @@ BOOLEAN setOption(leftv res, leftv v)
         ) {
           test &=~Sy_bit(OPT_INTSTRATEGY);
         }
+#endif
         goto okay;
       }
     }
@@ -322,6 +323,7 @@ BOOLEAN setOption(leftv res, leftv v)
         }
         else
           Warn("cannot set option");
+#if 0
         if (TEST_OPT_INTSTRATEGY && (currRing!=NULL)
         && rField_has_simple_inverse()
 #ifdef HAVE_RING2TOM
@@ -330,6 +332,7 @@ BOOLEAN setOption(leftv res, leftv v)
         ) {
           test &=~Sy_bit(OPT_INTSTRATEGY);
         }
+#endif
         goto okay;
       }
       else if ((strncmp(n,"no",2)==0)
