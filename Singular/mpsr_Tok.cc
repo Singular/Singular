@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Tok.cc,v 1.31 2005-07-27 09:59:27 Singular Exp $ */
+/* $Id: mpsr_Tok.cc,v 1.32 2006-09-29 08:44:56 Singular Exp $ */
 
 /***************************************************************
  *
@@ -155,24 +155,7 @@ short mpsr_mp2ord(MP_Common_t mp_ord)
 
 #ifdef GENTABLE
 
-// This returns 1 if tok is a token which can appear in a Singular
-// (quoted) command, and 0 otherwise
 #include"ipshell.h" // has declarations of dArith
-
-
-  // some special cmds which do not fit in with the others, and
-  // nevertheless need to be transmitted
-short ExtraCmds[] =
-{
-  OPTION_CMD,
-  NAMES_CMD,
-//  RESERVEDNAME_CMD,
-  PROC_CMD,
-  MAP_CMD,
-  PACKAGE_CMD,
-  '=',
-  0
-};
 
 
 // This the list of all tokens which have an MP representation as a
@@ -376,41 +359,6 @@ cmd_dictcop cmd_dictcops[] =
   }
 };
 
-
-static short IsCmdToken(short tok)
-{
-  short i = 0;
-  // cmds with one arg
-  while (dArith1[i].cmd != 0)
-    if (dArith1[i].cmd == tok) return 1;
-    else i++;
-
-  // cmds with two args
-  i=0;
-  while (dArith2[i].cmd != 0)
-    if (dArith2[i].cmd == tok) return 1;
-    else i++;
-
-  // cmds with three args
-  i=0;
-  while (dArith3[i].cmd != 0)
-    if (dArith3[i].cmd == tok) return 1;
-    else i++;
-
-  // cmds with many args
-  i=0;
-  while (dArithM[i].cmd != 0)
-    if (dArithM[i].cmd == tok) return 1;
-    else i++;
-
-  // cmds which are somewhat special (like those having 0 args)
-  i=0;
-  while (ExtraCmds[i] != 0)
-    if (ExtraCmds[i] == tok) return 1;
-    else i++;
-
-  return 0;
-}
 
 // Given a Singular token, find matching (dict,op): Return 1 if one is
 // found, 0, otherwise

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.412 2006-09-27 17:46:09 Singular Exp $ */
+/* $Id: iparith.cc,v 1.413 2006-09-29 08:44:54 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -141,10 +141,8 @@ struct sValCmdM
 };
 #endif /* GENTABLE */
 
-typedef struct {
-  unsigned long nCmdUsed;      /**< number of commands used */
-  unsigned long nCmdAllocated; /**< number of commands-slots allocated */
-  unsigned long nLastIdentifier;
+typedef struct
+{
   cmdnames *sCmds;             /**< array of existing commands */
 
 #ifndef GENTABLE
@@ -153,6 +151,10 @@ typedef struct {
   struct sValCmd3 *psValCmd3;
   struct sValCmdM *psValCmdM;
 #endif /* GENTABLE */
+
+  int nCmdUsed;      /**< number of commands used */
+  int nCmdAllocated; /**< number of commands-slots allocated */
+  int nLastIdentifier; /**< valid indentifieres are slot 1..nLastIdentifier */
 } SArithBase;
 
 /*---------------------------------------------------------------------*
@@ -3980,8 +3982,8 @@ static BOOLEAN jjRESERVEDNAME(leftv res, leftv v)
   char *s= (char *)v->Data();
   int i = 1;
   int l = strlen(s);
-  for(i=0; i<sArithBase.nCmdUsed; i++) {
-    //while (cmds[i].tokval!=0){
+  for(i=0; i<sArithBase.nCmdUsed; i++)
+  {
     if (strcmp(s, sArithBase.sCmds[i].name) == 0)
     {
       res->data = (char *)1;
@@ -6260,7 +6262,7 @@ static BOOLEAN jjREDUCE5(leftv res, leftv u)
 static BOOLEAN jjRESERVED0(leftv res, leftv v)
 {
   int i=1;
-  unsigned short nCount = (sArithBase.nCmdUsed-1)/3;
+  int nCount = (sArithBase.nCmdUsed-1)/3;
   if((3*nCount)<sArithBase.nCmdUsed) nCount++;
   //Print("CMDS: %d/%d\n", sArithBase.nCmdUsed,
   //      sArithBase.nCmdAllocated);
@@ -7694,13 +7696,13 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
 /*=================== general utilities ============================*/
 int IsCmd(const char *n, int & tok)
 {
-  int an=1;
-  int i,v;
 #ifndef GENTABLE
+  int i;
+  int an=1;
   int en=sArithBase.nLastIdentifier;
 
-  //loop
-  for(an=0; an<sArithBase.nCmdUsed; )
+  loop
+  //for(an=0; an<sArithBase.nCmdUsed; )
   {
     if(an>=en-1)
     {
@@ -7730,7 +7732,7 @@ int IsCmd(const char *n, int & tok)
     }
     else
     {
-      v=strcmp(n,sArithBase.sCmds[i].name);
+      int v=strcmp(n,sArithBase.sCmds[i].name);
       if(v<0)
       {
         en=i-1;
@@ -7842,7 +7844,7 @@ char * Tok2Cmdname(int tok)
 char * Tok2Cmdname(int tok)
 {
   int i = 0;
-  if (tok < 0)
+  if (tok <= 0)
   {
     return sArithBase.sCmds[0].name;
   }
@@ -8107,9 +8109,10 @@ int iiArithAddCmd(
   //       nTokval, nToktype, nPos);
   if(nPos>=0)
   {
-    if(nPos>=sArithBase.nCmdAllocated) return -1;
-    if(szName!=NULL) sArithBase.sCmds[nPos].name    = omStrDup(szName);
-    else sArithBase.sCmds[nPos].name = NULL;
+    // no checks: we rely on a correct generated code in iparith.inc
+    assume(nPos < sArithBase.nCmdAllocated);
+    assume(szName!=NULL);
+    sArithBase.sCmds[nPos].name    = omStrDup(szName);
     sArithBase.sCmds[nPos].alias   = nAlias;
     sArithBase.sCmds[nPos].tokval  = nTokval;
     sArithBase.sCmds[nPos].toktype = nToktype;
@@ -8153,3 +8156,55 @@ int iiArithAddCmd(
   return 0;
 }
 
+#ifdef GENTABLE
+  // some special cmds which do not fit in with the others, and
+  // nevertheless need to be transmitted
+short ExtraCmds[] =
+{
+  OPTION_CMD,
+  NAMES_CMD,
+//  RESERVEDNAME_CMD,
+  PROC_CMD,
+  MAP_CMD,
+  PACKAGE_CMD,
+  '=',
+  0
+};
+
+// This returns 1 if tok is a token which can appear in a Singular
+// (quoted) command, and 0 otherwise
+short IsCmdToken(short tok)
+{
+  int i = 0;
+  // cmds with one arg
+  while (dArith1[i].cmd != 0)
+    if (dArith1[i].cmd == tok) return 1;
+    else i++;
+
+  // cmds with two args
+  i=0;
+  while (dArith2[i].cmd != 0)
+    if (dArith2[i].cmd == tok) return 1;
+    else i++;
+
+  // cmds with three args
+  i=0;
+  while (dArith3[i].cmd != 0)
+    if (dArith3[i].cmd == tok) return 1;
+    else i++;
+
+  // cmds with many args
+  i=0;
+  while (dArithM[i].cmd != 0)
+    if (dArithM[i].cmd == tok) return 1;
+    else i++;
+
+  // cmds which are somewhat special (like those having 0 args)
+  i=0;
+  while (ExtraCmds[i] != 0)
+    if (ExtraCmds[i] == tok) return 1;
+    else i++;
+
+  return 0;
+}
+#endif
