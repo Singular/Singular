@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.13 2006-05-03 12:12:51 Singular Exp $
+// $Id: clapsing.cc,v 1.14 2006-10-02 14:47:51 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -319,9 +319,10 @@ poly singclap_resultant ( poly f, poly g , poly x)
     if (nGetChar()==1) setCharacteristic( 0 );
     else               setCharacteristic( -nGetChar() );
     poly res;
+    Variable X(i+rPar(currRing));
     if (currRing->minpoly!=NULL)
     {
-      Variable X(i);
+      //Variable X(i);
       CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPClapAP( f,a ) ), G( convSingAPClapAP( g,a ) );
@@ -329,7 +330,7 @@ poly singclap_resultant ( poly f, poly g , poly x)
     }
     else
     {
-      Variable X(i+rPar(currRing));
+      //Variable X(i+rPar(currRing));
       number nf,ng;
       pCleardenom_n(f,nf);pCleardenom_n(g,ng);
       int ef,eg;
@@ -901,6 +902,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
         {
           singclap_factorize_retry++;
           //if( si_factor_reminder) Print("problem with factorize, retrying\n");
+        //#define FEHLER_FACTORIZE
         #ifdef FEHLER_FACTORIZE
           Print("Problem....:");pWrite(f);
           J=L;
