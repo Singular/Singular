@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.49 2005-07-27 09:59:26 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.50 2006-10-04 12:37:42 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -156,10 +156,47 @@ struct sigcontext_struct {
         unsigned long oldmask;
         unsigned long cr2;
 };
+#define HAVE_SIGSTRUCT
 # endif
 typedef struct sigcontext_struct sigcontext;
+#endif
+#if defined(linux) && defined(x86_64_Linux)
+struct sigcontext_struct {
+        unsigned long r8;
+        unsigned long r9;
+        unsigned long r10;
+        unsigned long r11;
+        unsigned long r12;
+        unsigned long r13;
+        unsigned long r14;
+        unsigned long r15;
+        unsigned long rdi;
+        unsigned long rsi;
+        unsigned long rbp;
+        unsigned long rbx;
+        unsigned long rdx;
+        unsigned long rax;
+        unsigned long rcx;
+        unsigned long rsp;
+        unsigned long eip /*rip*/;
+        unsigned long eflags;           /* RFLAGS */
+        unsigned short cs;
+        unsigned short gs;
+        unsigned short fs;
+        unsigned short __pad0;
+        unsigned long err;
+        unsigned long trapno;
+        unsigned long oldmask;
+        unsigned long cr2;
+        struct _fpstate __user *fpstate;        /* zero when no FPU context */
+        unsigned long reserved1[8];
+};
+#define HAVE_SIGSTRUCT
+typedef struct sigcontext_struct sigcontext;
+#endif
 
 
+#if defined(linux) && defined(HAVE_SIGSTRUCT)
 /*2---------------------------------------------------------------------*/
 /** 
  * @brief signal handler for run time errors, linux/i386 version
@@ -175,7 +212,7 @@ void sigsegv_handler(int sig, sigcontext s)
   {
     fprintf(stderr,"Segment fault/Bus error occurred at %x because of %x (r:%d)\n"
                    "please inform the authors\n",
-                   (int)s.eip,(int)s.cr2,siRandomStart);
+                   (long)s.eip,(long)s.cr2,siRandomStart);
   }
 # ifdef __OPTIMIZE__
   if(si_restart<3)
@@ -259,7 +296,7 @@ void sigalarm_handler(int sig, sigcontext s)
   setitimer(ITIMER_VIRTUAL,&t,&o);
   si_set_signal(SIGVTALRM,(si_hdl_typ)sigalarm_handler);
 }
-# endif /* PAGE_TEST */
+#endif /* PAGE_TEST */
 
 /*2
 * init signal handlers, linux/i386 version
