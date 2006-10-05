@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.20 2006-10-05 10:28:47 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.21 2006-10-05 18:26:10 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -80,23 +80,25 @@ int kFindDivisibleByInT(const TSet &T, const unsigned long* sevT,
 }
 
 // same as above, only with set S
-int kFindDivisibleByInS(const polyset &S, const unsigned long* sev, const int sl, LObject* L)
+int kFindDivisibleByInS(const kStrategy strat, LObject* L)
 {
   unsigned long not_sev = ~L->sev;
   poly p = L->GetLmCurrRing();
   int j = 0;
 
   pAssume(~not_sev == p_GetShortExpVector(p, currRing));
+  int ende=posInS(strat,strat->sl,p,0)+1;
+  if (ende>strat->sl) ende=strat->sl;
   loop
   {
-    if (j > sl) return -1;
+    if (j > ende) return -1;
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
-    if (p_LmShortDivisibleBy(S[j], sev[j],
+    if (p_LmShortDivisibleBy(strat->S[j], strat->sevS[j],
                              p, not_sev, currRing))
         return j;
 #else
-    if ( !(sev[j] & not_sev) &&
-         p_LmDivisibleBy(S[j], p, currRing))
+    if ( !(strat->sevS[j] & not_sev) &&
+         p_LmDivisibleBy(strat->S[j], p, currRing))
       return j;
 #endif
     j++;
@@ -554,7 +556,7 @@ int redLazy (LObject* h,kStrategy strat)
       if (at <= strat->Ll)
       {
 #if 0
-        if (kFindDivisibleByInS(strat->S, strat->sevS, strat->sl, h) < 0)
+        if (kFindDivisibleByInS(strat, h) < 0)
           return 1;
 #endif
 #ifdef KDEBUG
@@ -705,7 +707,7 @@ int redHoney (LObject* h, kStrategy strat)
       at = strat->posInL(strat->L,strat->Ll,h,strat);
       if (at <= strat->Ll)
       {
-        if (kFindDivisibleByInS(strat->S, strat->sevS, strat->sl, h) < 0)
+        if (kFindDivisibleByInS(strat, h) < 0)
           return 1;
         enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
 #ifdef KDEBUG
@@ -752,7 +754,7 @@ poly redNF (poly h,kStrategy strat)
     else
 #endif
 */
-      j=kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P);
+      j=kFindDivisibleByInS(strat,&P);
     if (j>=0)
     {
       nNormalize(pGetCoeff(P.p));

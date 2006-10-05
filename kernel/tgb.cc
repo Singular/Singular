@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.100 2006-07-06 07:00:15 bricken Exp $ */
+/* $Id: tgb.cc,v 1.101 2006-10-05 18:26:10 Singular Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -769,7 +769,7 @@ static void cleanS(kStrategy strat, slimgb_alg* c){
   while(i<=strat->sl){
     P.p=strat->S[i];
     P.sev=strat->sevS[i];
-    if(kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P)!=i)
+    if(kFindDivisibleByInS(strat,&P)!=i)
     {
       deleteInS(i,strat);
       //remember destroying poly
@@ -1546,15 +1546,12 @@ static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n)
   //int max_pos=simple_posInS(strat,P.p);
   loop
     {
-
-      j=kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P);
+      j=kFindDivisibleByInS(strat,&P);
       if ((j>=0) && ((!n)||
         ((strat->lenS[j]<=n) &&
          ((strat->lenSw==NULL)||
          (strat->lenSw[j]<=n)))))
       {
-
-
         nNormalize(pGetCoeff(P.p));
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG)
@@ -2028,7 +2025,7 @@ static poly redNFTail (poly h,const int sl,kStrategy strat, int len)
       P.SetShortExpVector();
       loop
       {
-          j=kFindDivisibleByInS(strat->S,strat->sevS,sl,&P);
+          j=kFindDivisibleByInS(strat,&P);
           if (j>=0)
           {
 #ifdef REDTAIL_PROT
