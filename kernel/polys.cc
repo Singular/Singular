@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.10 2006-06-12 00:35:13 wienand Exp $ */
+/* $Id: polys.cc,v 1.11 2006-10-05 18:25:10 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -194,7 +194,12 @@ char * p_Read(char *st, poly &rc, ring r)
     j = r_IsRingVar(ss,r);
     if (j >= 0)
     {
+      char *s_save=s;
       s = eati(s,&i);
+      if (((unsigned long)i) >  r->bitmask)
+      {
+        return s_save;
+      }
       p_AddExp(rc,1+j, (Exponent_t)i, r);
     }
     else
