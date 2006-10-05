@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.19 2006-08-15 04:46:23 wienand Exp $ */
+/* $Id: kstd2.cc,v 1.20 2006-10-05 10:28:47 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -164,10 +164,12 @@ int kRingFindDivisibleByInS(const polyset &S, const unsigned long* sev, const in
 */
 
 /* now in kutil.cc
-long twoPow(long arg) {
+long twoPow(long arg)
+{
   long t = arg;
   long result = 1;
-  while (t > 0) {
+  while (t > 0)
+  {
     result = 2 * result;
     t--;
   }
@@ -248,7 +250,8 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
     p_Setm(lead_mult, tailRing);
     zeroPoly = p_Mult_mm(zeroPoly, lead_mult, tailRing);
     tmp2 = p_NSet(nCopy(pGetCoeff(zeroPoly)), leadRing);
-    for (int i = 1; i <= leadRing->N; i++) {
+    for (int i = 1; i <= leadRing->N; i++)
+    {
       pSetExp(tmp2, i, p_GetExp(zeroPoly, i, tailRing));
     }
     p_Setm(tmp2, leadRing);
@@ -257,25 +260,31 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
     return tmp2;
   }
 /*  long alpha_k = twoPow(leadRing->ch - k_ind2);
-  if (1 == 0 && alpha_k <= a) {  // Temporarly disabled, reducing coefficients not compatible with std TODO Oliver
+  if (1 == 0 && alpha_k <= a)
+  {  // Temporarly disabled, reducing coefficients not compatible with std TODO Oliver
     zeroPoly = p_ISet((a / alpha_k)*alpha_k, tailRing);
-    for (int i = 1; i <= leadRing->N; i++) {
-      for (long j = 1; j <= p_GetExp(p, i, leadRing); j++) {
+    for (int i = 1; i <= leadRing->N; i++)
+    {
+      for (long j = 1; j <= p_GetExp(p, i, leadRing); j++)
+      {
         tmp1 = nInit(j);
         tmp2 = p_ISet(1, tailRing);
         p_SetExp(tmp2, i, 1, tailRing);
         p_Setm(tmp2, tailRing);
-        if (nIsZero(tmp1)) {
+        if (nIsZero(tmp1))
+        {
           zeroPoly = p_Mult_q(zeroPoly, tmp2, tailRing);
         }
-        else {
+        else
+        {
           tmp3 = p_ISet((long) tmp1, tailRing);
           zeroPoly = p_Mult_q(zeroPoly, p_Add_q(tmp2, tmp3, tailRing), tailRing);
         }
       }
     }
     tmp2 = p_ISet((long) pGetCoeff(zeroPoly), leadRing);
-    for (int i = 1; i <= leadRing->N; i++) {
+    for (int i = 1; i <= leadRing->N; i++)
+    {
       pSetExp(tmp2, i, p_GetExp(zeroPoly, i, tailRing));
     }
     p_Setm(tmp2, leadRing);
@@ -364,7 +373,8 @@ int redRing2toM (LObject* h,kStrategy strat)
 #endif
 
     ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
-    if (zeroPoly != NULL) {
+    if (zeroPoly != NULL)
+    {
       // TODO Free memory of zeropoly and last element of L
       strat->tl--;
     }
@@ -735,7 +745,8 @@ poly redNF (poly h,kStrategy strat)
   {
 /* Obsolete since change in pLmDiv
 #ifdef HAVE_RING2TOM
-    if (currRing->cring == 1) {
+    if (currRing->cring == 1)
+    {
       j=kRingFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P);
     }
     else
@@ -861,10 +872,10 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
        *a predefined number Kstd1_deg
        */
       while ((strat->Ll >= 0)
-	&& (strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL)
+        && (strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL)
         && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
             || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg)))
-	)
+        )
         deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
       if (strat->Ll<0) break;
       else strat->noClearS=TRUE;
@@ -902,7 +913,8 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     }
 
 #ifdef HAVE_RING2TOM
-    if (strat->P.p == NULL && strat->P.t_p == NULL) {
+    if (strat->P.p == NULL && strat->P.t_p == NULL)
+    {
       red_result = 0;
     }
     else

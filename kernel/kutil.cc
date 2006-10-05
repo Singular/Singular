@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.30 2006-08-14 17:08:36 wienand Exp $ */
+/* $Id: kutil.cc,v 1.31 2006-10-05 10:30:03 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1021,7 +1021,7 @@ void initEcartPairBba (LObject* Lp,poly f,poly g,int ecartF,int ecartG)
   (*Lp).ecart = 0;
   (*Lp).length = 0;
 }
-         
+
 void initEcartPairMora (LObject* Lp,poly f,poly g,int ecartF,int ecartG)
 {
   Lp->FDeg = Lp->pFDeg();
@@ -2177,7 +2177,8 @@ poly kCreateZeroPoly(long exp[], long cabsind, poly* t_p, ring leadRing, ring ta
     }
   }
   tmp2 = p_NSet(nCopy(pGetCoeff(zeroPoly)), leadRing);
-  for (int i = 1; i <= leadRing->N; i++) {
+  for (int i = 1; i <= leadRing->N; i++)
+  {
     pSetExp(tmp2, i, p_GetExp(zeroPoly, i, tailRing));
   }
   p_Setm(tmp2, leadRing);
@@ -2253,7 +2254,7 @@ void initenterzeropairsRing (poly p, int ecart, kStrategy strat, int atR)
   while ( nextZeroSimplexExponent(exp, ind, cexp, cind, &cabsind, bound, currRing->N) );
 }
 
-/* 
+/*
  * Create the Groebner basis of the vanishing polynomials.
  */
 
@@ -2402,7 +2403,8 @@ void enterExtendedSpoly(poly h,kStrategy strat)
         PrintS("Z");
       }
       poly tmp = p_ISet((long) ((p)->coef), currRing);
-      for (int i = 1; i <= currRing->N; i++) {
+      for (int i = 1; i <= currRing->N; i++)
+      {
         pSetExp(tmp, i, p_GetExp(p, i, strat->tailRing));
       }
       p_Setm(tmp, currRing);
@@ -3439,7 +3441,8 @@ inline int getIndexRng(long coeff)
   if (coeff == 0) return -1;
   long tmp = coeff;
   int ind = 0;
-  while (tmp % 2 == 0) {
+  while (tmp % 2 == 0)
+  {
     tmp = tmp / 2;
     ind++;
   }
@@ -4035,7 +4038,8 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
       {
 /* obsolete
 #ifdef HAVE_RING2TOM
-        if (currRing->cring == 1) {
+        if (currRing->cring == 1)
+        {
             With = kRingFindDivisibleByInS(strat, pos, &Ln, &With_s);
         } else
 #endif
@@ -4048,7 +4052,8 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
         int j;
 /* Obsolete
 #ifdef HAVE_RING2TOM
-        if (currRing->cring == 1) {
+        if (currRing->cring == 1)
+        {
            j = kRingFindDivisibleByInT(strat->T, strat->sevT, strat->tl, &Ln);
         } else
 #endif
