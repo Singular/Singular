@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.413 2006-09-29 08:44:54 Singular Exp $ */
+/* $Id: iparith.cc,v 1.414 2006-10-06 14:47:45 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -714,7 +714,7 @@ static BOOLEAN jjPOWER_P(leftv res, leftv u, leftv v)
 {
   res->data = (char *)pPower((poly)u->CopyD(POLY_CMD),(int)(long)v->Data());
   if (u!=NULL) return jjOP_REST(res,u,v);
-  return FALSE;
+  return errorreported; /* pPower may set errorreported via Werror */
 }
 static BOOLEAN jjPOWER_ID(leftv res, leftv u, leftv v)
 {
