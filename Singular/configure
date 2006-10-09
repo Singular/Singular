@@ -1409,10 +1409,10 @@ if test "${GXX}" = yes; then
     CXXFLAGS="${temp_flags} --no-rtti"
   fi
   temp_flags="${CXXFLAGS}"
-  if test "${ac_cv_cxx_have_exceptions}" = yes; then
-    CXXFLAGS="${temp_flags} --no-exceptions"
-  fi
   CXXTEMPLFLAGS="-fno-implicit-templates"
+  if test "${ac_cv_cxx_have_exceptions}" = yes; then
+    CXXTEMPLFLAGS="${CXXTEMPLFLAGS} --no-exceptions"
+  fi
   if test "$ac_cv_is_aix" = yes; then
     CXXNOOPTFLAGS="-w"
   else
