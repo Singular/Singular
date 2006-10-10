@@ -489,12 +489,12 @@ MPT_GP_DistMvPoly_pt MPT_GetGP_DistMvPoly(MPT_Node_pt tnode)
   return new 
     MPT_GP_DistMvPoly_t(tnode, coeffs, nvars,
                         MPT_GetGP_Ordering(
-                          MPT_AnnotValue(tnode,
+                          (MPT_Node_t*)MPT_AnnotValue(tnode,
                                          MP_PolyDict,
                                          MP_AnnotPolyOrdering), 
                           nvars), 
                         MPT_GetGP_Ordering(
-                          MPT_AnnotValue(tnode,
+                          (MPT_Node_t*)MPT_AnnotValue(tnode,
                                          MP_PolyDict,
                                          MP_AnnotShouldHavePolyOrdering),
                           nvars));
