@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.3 2005-07-27 15:48:29 Singular Exp $ */
+/* $Id: mpr_complex.cc,v 1.4 2006-10-11 15:57:00 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -39,8 +39,8 @@ size_t gmp_output_digits= DEFPREC;
 
 extern int mmInit(void);
 int dummy=mmInit();
-static gmp_float gmpRel(0.0);
-static gmp_float diff(0.0);
+static gmp_float *gmpRel=NULL;
+static gmp_float *diff=NULL;
 
 
 /** Set size of mantissa
@@ -62,10 +62,14 @@ void setGMPFloatDigits( size_t digits, size_t rest )
   size_t db = bits+rb;
   gmp_output_digits= digits;
   mpf_set_default_prec( db );
-  mpf_set_prec(*diff._mpfp(),32);
-  mpf_set_prec(*gmpRel._mpfp(),32);
-  mpf_set_d(*gmpRel._mpfp(),0.1);
-  mpf_pow_ui(*gmpRel._mpfp(),*gmpRel._mpfp(),digits);
+  if (diff!=NULL) delete diff;
+  diff=new gmp_float(0.0);
+  mpf_set_prec(*diff->_mpfp(),32);
+  if (gmpRel!=NULL) delete gmpRel;
+  gmpRel=new gmp_float(0.0);
+  mpf_set_prec(*gmpRel->_mpfp(),32);
+  mpf_set_d(*gmpRel->_mpfp(),0.1);
+  mpf_pow_ui(*gmpRel->_mpfp(),*gmpRel->_mpfp(),digits);
 }
 
 size_t getGMPFloatDigits()
@@ -134,11 +138,11 @@ gmp_float & gmp_float::operator += ( const gmp_float & a )
     return *this;
   }
   mpf_add( t, t, a.t );
-  mpf_set(diff.t, t);
-  mpf_set_prec(diff.t, 32);
-  mpf_div(diff.t, diff.t, a.t);
-  mpf_abs(diff.t, diff.t);
-  if(mpf_cmp(diff.t, gmpRel.t) < 0)
+  mpf_set(diff->t, t);
+  mpf_set_prec(diff->t, 32);
+  mpf_div(diff->t, diff->t, a.t);
+  mpf_abs(diff->t, diff->t);
+  if(mpf_cmp(diff->t, gmpRel->t) < 0)
     mpf_set_d( t, 0.0);
   return *this;
 }
@@ -155,11 +159,11 @@ gmp_float & gmp_float::operator -= ( const gmp_float & a )
     return *this;
   }
   mpf_sub( t, t, a.t );
-  mpf_set(diff.t, t);
-  mpf_set_prec(diff.t, 32);
-  mpf_div(diff.t, diff.t, a.t);
-  mpf_abs(diff.t, diff.t);
-  if(mpf_cmp(diff.t, gmpRel.t) < 0)
+  mpf_set(diff->t, t);
+  mpf_set_prec(diff->t, 32);
+  mpf_div(diff->t, diff->t, a.t);
+  mpf_abs(diff->t, diff->t);
+  if(mpf_cmp(diff->t, gmpRel->t) < 0)
     mpf_set_d( t, 0.0);
   return *this;
 }
@@ -171,10 +175,10 @@ bool operator == ( const gmp_float & a, const gmp_float & b )
     return false;
   if((mpf_sgn(a.t)==0) && (mpf_sgn(b.t)==0))
     return true;
-  mpf_sub(diff.t, a.t, b.t);
-  mpf_div(diff.t, diff.t, a.t);
-  mpf_abs(diff.t, diff.t);
-  if(mpf_cmp(diff.t, gmpRel.t) < 0)
+  mpf_sub(diff->t, a.t, b.t);
+  mpf_div(diff->t, diff->t, a.t);
+  mpf_abs(diff->t, diff->t);
+  if(mpf_cmp(diff->t, gmpRel->t) < 0)
     return true;
   else
     return false;
@@ -192,9 +196,9 @@ bool gmp_float::isOne()
 #else
   if (mpf_sgn(t) <= 0)
     return false;
-  mpf_sub_ui(diff.t, t, 1);
-  mpf_abs(diff.t, diff.t);
-  if(mpf_cmp(diff.t, gmpRel.t) < 0)
+  mpf_sub_ui(diff->t, t, 1);
+  mpf_abs(diff->t, diff->t);
+  if(mpf_cmp(diff->t, gmpRel->t) < 0)
     return true;
   else
     return false;
@@ -208,9 +212,9 @@ bool gmp_float::isMOne()
 #else
   if (mpf_sgn(t) >= 0)
     return false;
-  mpf_add_ui(diff.t, t, 1);
-  mpf_abs(diff.t, diff.t);
-  if(mpf_cmp(diff.t, gmpRel.t) < 0)
+  mpf_add_ui(diff->t, t, 1);
+  mpf_abs(diff->t, diff->t);
+  if(mpf_cmp(diff->t, gmpRel->t) < 0)
     return true;
   else
     return false;
@@ -710,12 +714,12 @@ void gmp_complex::SmallToZero()
   if (ar > ai)
   {
     mpf_div(*ai._mpfp(), *ai._mpfp(), *ar._mpfp());
-    if (ai < gmpRel) this->imag(0.0);
+    if (ai < *gmpRel) this->imag(0.0);
   }
   else
   {
     mpf_div(*ar._mpfp(), *ar._mpfp(), *ai._mpfp());
-    if (ar < gmpRel) this->real(0.0);
+    if (ar < *gmpRel) this->real(0.0);
   }
 }
 
