@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.12 2006-10-05 18:26:09 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.13 2006-10-12 08:55:39 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -294,7 +294,8 @@ int redEcart (LObject* h,kStrategy strat)
       at = strat->posInL(strat->L,strat->Ll,h,strat);
       if (at <= strat->Ll)
       {
-        if (kFindDivisibleByInS(strat, h) < 0)
+        int dummy=strat->sl;
+        if (kFindDivisibleByInS(strat, &dummy, h) < 0)
         {
           if (strat->honey && !strat->posInLDependsOnLength)
             h->SetLength(strat->length_pLength);
@@ -415,7 +416,8 @@ int redFirst (LObject* h,kStrategy strat)
         at = strat->posInL(strat->L,strat->Ll,h,strat);
         if (at <= strat->Ll)
         {
-          if (kFindDivisibleByInS(strat, h) < 0)
+          int dummy=strat->sl;
+          if (kFindDivisibleByInS(strat,&dummy, h) < 0)
             return 1;
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
 #ifdef KDEBUG

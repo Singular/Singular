@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.101 2006-10-05 18:26:10 Singular Exp $ */
+/* $Id: tgb.cc,v 1.102 2006-10-12 08:55:42 Singular Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -766,21 +766,25 @@ BOOLEAN lenS_correct(kStrategy strat){
 static void cleanS(kStrategy strat, slimgb_alg* c){
   int i=0;
   LObject P;
-  while(i<=strat->sl){
+  while(i<=strat->sl)
+  {
     P.p=strat->S[i];
     P.sev=strat->sevS[i];
-    if(kFindDivisibleByInS(strat,&P)!=i)
+    int dummy=strat->sl;
+    if(kFindDivisibleByInS(strat,&dummy,&P)!=i)
     {
       deleteInS(i,strat);
       //remember destroying poly
       BOOLEAN found=FALSE;
       int j;
       for(j=0;j<c->n;j++)
-  if(c->S->m[j]==P.p)
-  {
-    found=TRUE;
-    break;
-  }
+      {
+        if(c->S->m[j]==P.p)
+        {
+          found=TRUE;
+          break;
+        }
+      }
       if (!found)
   pDelete(&P.p);
       //remember additional reductors
@@ -1545,8 +1549,9 @@ static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n)
   //  lenSw=strat->lenSw;
   //int max_pos=simple_posInS(strat,P.p);
   loop
-    {
-      j=kFindDivisibleByInS(strat,&P);
+  {
+      int dummy=strat->sl;
+      j=kFindDivisibleByInS(strat,&dummy,&P);
       if ((j>=0) && ((!n)||
         ((strat->lenS[j]<=n) &&
          ((strat->lenSw==NULL)||
@@ -2025,7 +2030,8 @@ static poly redNFTail (poly h,const int sl,kStrategy strat, int len)
       P.SetShortExpVector();
       loop
       {
-          j=kFindDivisibleByInS(strat,&P);
+          int dummy=strat->sl;
+          j=kFindDivisibleByInS(strat,&dummy,&P);
           if (j>=0)
           {
 #ifdef REDTAIL_PROT

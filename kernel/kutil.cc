@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.31 2006-10-05 10:30:03 Singular Exp $ */
+/* $Id: kutil.cc,v 1.32 2006-10-12 08:55:40 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1222,8 +1222,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
   pSetm(Lp.lcm);
   if (strat->sugarCrit)
   {
-    if(
-    (!((strat->ecartS[i]>0)&&(ecart>0)))
+    if((!((strat->ecartS[i]>0)&&(ecart>0)))
     && pHasNotCF(p,strat->S[i]))
     {
     /*
@@ -1459,11 +1458,11 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
   if(pHasNotCF(p,strat->S[i]))
   {
     //PrintS("prod-crit\n");
-      if (!rIsPluralRing(currRing))
-      {
-        strat->cp++;
-        return;
-      }
+    if (!rIsPluralRing(currRing))
+    {
+      strat->cp++;
+      return;
+    }
   }
 
   int      l,j,compare;
@@ -2650,7 +2649,8 @@ void reorderS (int* suc,kStrategy strat)
 * Assumption: posInS only depends on the leading term
 *             otherwise, bba has to be changed
 */
-int posInS (kStrategy strat, int length,poly p, int ecart_p)
+int posInS (const kStrategy strat, const int length,const poly p,
+            const int ecart_p)
 {
   if(length==-1) return 0;
   polyset set=strat->S;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.21 2006-10-05 18:26:10 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.22 2006-10-12 08:55:40 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -80,15 +80,17 @@ int kFindDivisibleByInT(const TSet &T, const unsigned long* sevT,
 }
 
 // same as above, only with set S
-int kFindDivisibleByInS(const kStrategy strat, LObject* L)
+int kFindDivisibleByInS(const kStrategy strat, int* max_ind, LObject* L)
 {
   unsigned long not_sev = ~L->sev;
   poly p = L->GetLmCurrRing();
   int j = 0;
 
   pAssume(~not_sev == p_GetShortExpVector(p, currRing));
-  int ende=posInS(strat,strat->sl,p,0)+1;
-  if (ende>strat->sl) ende=strat->sl;
+  int ende=strat->sl;
+  if ((*max_ind)<ende) ende=posInS(strat,*max_ind,p,0)+1;
+  if (ende>(*max_ind)) ende=(*max_ind);
+  (*max_ind)=ende;
   loop
   {
     if (j > ende) return -1;
@@ -707,7 +709,8 @@ int redHoney (LObject* h, kStrategy strat)
       at = strat->posInL(strat->L,strat->Ll,h,strat);
       if (at <= strat->Ll)
       {
-        if (kFindDivisibleByInS(strat, h) < 0)
+        int dummy=strat->sl;
+        if (kFindDivisibleByInS(strat, &dummy, h) < 0)
           return 1;
         enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
 #ifdef KDEBUG
@@ -729,10 +732,11 @@ int redHoney (LObject* h, kStrategy strat)
 *  reduction procedure for the normal form
 */
 
-poly redNF (poly h,kStrategy strat)
+poly redNF (poly h,int &max_ind,kStrategy strat)
 {
   if (h==NULL) return NULL;
   int j;
+  max_ind=strat->sl;
 
   if (0 > strat->sl)
   {
@@ -754,7 +758,7 @@ poly redNF (poly h,kStrategy strat)
     else
 #endif
 */
-      j=kFindDivisibleByInS(strat,&P);
+      j=kFindDivisibleByInS(strat,&max_ind,&P);
     if (j>=0)
     {
       nNormalize(pGetCoeff(P.p));
@@ -1061,11 +1065,12 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   }
   kTest(strat);
   if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
-  p = redNF(pCopy(q),strat);
+  int max_ind;
+  p = redNF(pCopy(q),max_ind,strat);
   if ((p!=NULL)&&(lazyReduce==0))
   {
     if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
-    p = redtailBba(p,strat->sl,strat);
+    p = redtailBba(p,max_ind,strat);
   }
   /*- release temp data------------------------------- -*/
   omfree(strat->sevS);
@@ -1088,6 +1093,7 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   poly   p;
   int   i;
   ideal res;
+  int max_ind;
 
   if (idIs0(q))
     return idInit(IDELEMS(q),q->rank);
@@ -1116,11 +1122,11 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
     if (q->m[i]!=NULL)
     {
       if (TEST_OPT_PROT) { PrintS("r");mflush(); }
-      p = redNF(pCopy(q->m[i]),strat);
+      p = redNF(pCopy(q->m[i]),max_ind,strat);
       if ((p!=NULL)&&(lazyReduce==0))
       {
         if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
-        p = redtailBba(p,strat->sl,strat);
+        p = redtailBba(p,max_ind,strat);
       }
       res->m[i]=p;
     }
