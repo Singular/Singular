@@ -9,15 +9,29 @@
 
                         Copyright (C) 1999-2006
 
-
                                *NOTICE*
 
-For this package the GPL does not apply. Permission of use within the
-software SINGULAR is granted by the author. In addition to this
-permission to modify the sources is granted to the copyright holders
-of SINGULAR.
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at your
+option) any later version with the following additional restrictions
+(which override any conflicting restrictions in the GPL):
 
-If you wish to use this package outside of SINGULAR or to modify it in
-any way, please contact the author
-"Olaf Bachmann" <obachman@mathematik.uni-kl.de>.
+This package is part of the software SINGULAR. The GPL is valid for
+this package, other packages may have other copyrights.
+
+Their copyrights and licences can be found in the accompanying files
+which are distributed along with these packages.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+59 Temple Place, Suite 330, Boston, MA  02111-1307  USA (see GPL)
+
+Please send any comments or bug reports to
+<singular@mathematik.uni-kl.de>.
 
