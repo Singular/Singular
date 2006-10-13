@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.414 2006-10-06 14:47:45 Singular Exp $ */
+/* $Id: iparith.cc,v 1.415 2006-10-13 12:16:37 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2122,9 +2122,14 @@ static BOOLEAN jjLIFTSTD(leftv res, leftv u, leftv v)
   setFlag(res,FLAG_STD);
   return FALSE;
 }
-static BOOLEAN jjLOAD2(leftv res, leftv v, leftv w)
+static BOOLEAN jjLOAD_E(leftv res, leftv v, leftv u)
 {
-  return jjLOAD(res, v,(int)(long)w->Data());
+  char * s=(char *)u->Data();
+  if(strcmp(s, "with")==0)
+    return jjLOAD(res, v, TRUE);
+  WerrorS("invalid second argument");
+  WerrorS("load(\"libname\" [,\"with\"]);");
+  return TRUE;
 }
 static BOOLEAN jjMINOR(leftv res, leftv u, leftv v)
 {
@@ -2823,16 +2828,6 @@ static BOOLEAN jjWRONG(leftv res, leftv u)
   return TRUE;
 }
 
-static BOOLEAN jjLOAD_E(leftv res, leftv v, leftv u)
-{
-  char * s=(char *)u->Data();
-  if(strcmp(s, "with")==0)
-    return jjLOAD(res, v, TRUE);
-  WerrorS("invalid second argument");
-  WerrorS("load(\"libname\" [,\"with\"]);");
-  return TRUE;
-}
-
 /*=================== operations with 2 args.: table =================*/
 
 struct sValCmd2 dArith2[]=
@@ -3102,7 +3097,7 @@ struct sValCmd2 dArith2[]=
 ,{jjLIFTSTD,   LIFTSTD_CMD,    IDEAL_CMD,      IDEAL_CMD,  MATRIX_CMD ALLOW_PLURAL}
 ,{jjLIFTSTD,   LIFTSTD_CMD,    MODUL_CMD,      MODUL_CMD,  MATRIX_CMD ALLOW_PLURAL}
 ,{jjCALL2MANY, LIST_CMD,       LIST_CMD,       DEF_CMD,    DEF_CMD ALLOW_PLURAL}
-,{jjLOAD2,     LOAD_CMD,       NONE,           STRING_CMD, INT_CMD ALLOW_PLURAL}
+,{jjLOAD_E,    LOAD_CMD,       NONE,           STRING_CMD, STRING_CMD ALLOW_PLURAL}
 ,{jjRES,       LRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD NO_PLURAL}
 ,{jjMINOR,     MINOR_CMD,      IDEAL_CMD,      MATRIX_CMD, INT_CMD NO_PLURAL}
 ,{jjCALL2MANY, MODUL_CMD,      MODUL_CMD,      DEF_CMD,    DEF_CMD ALLOW_PLURAL}
@@ -3113,6 +3108,7 @@ struct sValCmd2 dArith2[]=
 //,{jjRES,       MRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD NO_PLURAL}
 ,{jjRES,       MRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD ALLOW_PLURAL}
 ,{jjRES,       MRES_CMD,       RESOLUTION_CMD, MODUL_CMD,  INT_CMD ALLOW_PLURAL}
+//,{nuMPResMat,  MPRES_CMD,      MODUL_CMD,      IDEAL_CMD,  INT_CMD NO_PLURAL}
 #ifdef HAVE_PLURAL
 ,{jjPlural_num_poly, NCALGEBRA_CMD,  NONE,  POLY_CMD,   POLY_CMD   NO_PLURAL}
 ,{jjPlural_num_mat,  NCALGEBRA_CMD,  NONE,  POLY_CMD,   MATRIX_CMD NO_PLURAL}
@@ -3160,8 +3156,6 @@ struct sValCmd2 dArith2[]=
 ,{jjVARSTR2,   VARSTR_CMD,     STRING_CMD,     RING_CMD,   INT_CMD ALLOW_PLURAL}
 ,{jjVARSTR2,   VARSTR_CMD,     STRING_CMD,     QRING_CMD,  INT_CMD ALLOW_PLURAL}
 ,{jjWEDGE,     WEDGE_CMD,      MATRIX_CMD,     MATRIX_CMD, INT_CMD NO_PLURAL}
-,{jjLOAD_E,    LOAD_CMD,       NONE,           STRING_CMD, STRING_CMD ALLOW_PLURAL}
-,{nuMPResMat,  MPRES_CMD,      MODUL_CMD,      IDEAL_CMD,  INT_CMD NO_PLURAL}
 ,{NULL,        0,              0,              0,          0 NO_PLURAL}
 };
 /*=================== operations with 1 arg.: static proc =================*/
