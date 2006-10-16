@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.144 2006-10-13 12:16:36 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.145 2006-10-16 15:47:30 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -3570,7 +3570,6 @@ BOOLEAN loSimplex( leftv res, leftv args )
   return FALSE;
 }
 
-/* not used: nuMPResMat
 BOOLEAN nuMPResMat( leftv res, leftv arg1, leftv arg2 )
 {
   ideal gls = (ideal)(arg1->Data());
@@ -3593,7 +3592,6 @@ BOOLEAN nuMPResMat( leftv res, leftv arg1, leftv arg2 )
 
   return FALSE;
 }
-*/
 
 BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
 {
