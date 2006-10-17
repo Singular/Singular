@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.23 2006-10-16 15:06:24 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.24 2006-10-17 16:17:53 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -87,8 +87,9 @@ int kFindDivisibleByInS(const kStrategy strat, int* max_ind, LObject* L)
   int j = 0;
 
   pAssume(~not_sev == p_GetShortExpVector(p, currRing));
-  int ende=posInS(strat,*max_ind,p,0)+1;
-  if (ende>(*max_ind)) ende=(*max_ind);
+  //int ende=posInS(strat,*max_ind,p,0)+1+(strat->ak>0)*pGetComp(p);
+  //if (ende>(*max_ind)) ende=(*max_ind);
+  int ende=strat->sl;
   (*max_ind)=ende;
   loop
   {
@@ -556,8 +557,9 @@ int redLazy (LObject* h,kStrategy strat)
       at = strat->posInL(strat->L,strat->Ll,h,strat);
       if (at <= strat->Ll)
       {
-#if 0
-        if (kFindDivisibleByInS(strat, h) < 0)
+#if 1
+        int dummy=strat->sl;
+        if (kFindDivisibleByInS(strat, &dummy, h) < 0)
           return 1;
 #endif
 #ifdef KDEBUG

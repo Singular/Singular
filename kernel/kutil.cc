@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.32 2006-10-12 08:55:40 Singular Exp $ */
+/* $Id: kutil.cc,v 1.33 2006-10-17 16:17:53 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2658,7 +2658,10 @@ int posInS (const kStrategy strat, const int length,const poly p,
   int an = 0;
   int en = length;
   int cmp_int = pOrdSgn;
-  if (currRing->MixedOrder)
+  int pc=pGetComp(p);
+  if ((currRing->MixedOrder)
+  //|| (strat->ak>0)
+  )
   {
     int o=pWTotaldegree(p);
     int oo=pWTotaldegree(set[length]);
@@ -2678,8 +2681,7 @@ int posInS (const kStrategy strat, const int length,const poly p,
         return en;
       }
       i=(an+en) / 2;
-      if ((pWTotaldegree(set[an])>=o)
-      && (pLmCmp(set[i],p) == cmp_int)) en=i;
+      if ((pWTotaldegree(set[i])>=o) && (pLmCmp(set[i],p) == cmp_int)) en=i;
       else                              an=i;
     }
   }
@@ -2716,7 +2718,7 @@ int posInS (const kStrategy strat, const int length,const poly p,
 #endif
     if (pLmCmp(set[length],p)== -cmp_int)
       return length+1;
-
+  
     loop
     {
       if (an >= en-1)
