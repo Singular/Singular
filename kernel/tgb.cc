@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.102 2006-10-12 08:55:42 Singular Exp $ */
+/* $Id: tgb.cc,v 1.103 2006-10-17 06:48:43 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -771,7 +771,8 @@ static void cleanS(kStrategy strat, slimgb_alg* c){
     P.p=strat->S[i];
     P.sev=strat->sevS[i];
     int dummy=strat->sl;
-    if(kFindDivisibleByInS(strat,&dummy,&P)!=i)
+    //if(kFindDivisibleByInS(strat,&dummy,&P)!=i)
+    if (kFindDivisibleByInS_easy(strat,P.p,P.sev)!=i)
     {
       deleteInS(i,strat);
       //remember destroying poly
@@ -2031,7 +2032,7 @@ static poly redNFTail (poly h,const int sl,kStrategy strat, int len)
       loop
       {
           int dummy=strat->sl;
-          j=kFindDivisibleByInS(strat,&dummy,&P);
+          j=kFindDivisibleByInS_easy(strat,P.p,P.sev);//kFindDivisibleByInS(strat,&dummy,&P);
           if (j>=0)
           {
 #ifdef REDTAIL_PROT
