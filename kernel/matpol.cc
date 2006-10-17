@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.5 2005-10-26 15:35:35 Singular Exp $ */
+/* $Id: matpol.cc,v 1.6 2006-10-17 16:24:45 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -148,9 +148,10 @@ matrix mpMultP(matrix a, poly p)
 
   pNormalize(p);
   for (k=m*n-1; k>0; k--)
-  {  
-    a->m[k] = pMult(a->m[k], pCopy(p));
-  }  
+  {
+    if (a->m[k]!=NULL)
+      a->m[k] = pMult(a->m[k], pCopy(p));
+  }
   a->m[0] = pMult(a->m[0], p);
   return a;
 }
@@ -214,8 +215,11 @@ matrix mpMult(matrix a, matrix b)
       t = NULL;
       for (k=1; k<=p; k++)
       {
-        s = ppMult_qq(MATELEM(a,i,k), MATELEM(b,k,j));
-        t = pAdd(t,s);
+        if ((MATELEM(a,i,k)!=NULL) && (MATELEM(b,k,j)!=NULL))
+        {
+          s = ppMult_qq(MATELEM(a,i,k), MATELEM(b,k,j));
+          t = pAdd(t,s);
+        }
       }
       pNormalize(t);
       MATELEM(c,i,j) = t;
@@ -338,7 +342,7 @@ class mp_permmatrix
 #define SIZE_OF_SYSTEM_PAGE 4096
 #endif
 /*2
-* entries of a are minors and go to result (only if not in R) 
+* entries of a are minors and go to result (only if not in R)
 */
 void mpMinorToResult(ideal result, int &elems, matrix a, int r, int c,
                      ideal R)
@@ -1816,7 +1820,7 @@ BOOLEAN mpIsDiagUnit(matrix U)
         if (!pIsUnit(MATELEM(U,i,i))) return FALSE;
       }
       else if (MATELEM(U,i,j)!=NULL) return FALSE;
-    }  
+    }
   }
   return TRUE;
 }
