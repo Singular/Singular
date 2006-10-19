@@ -24,3 +24,74 @@ any way, please contact the authors
 "Norbert Kajler" <kajler@paris.ensmp.fr>
 "Paul Wang" <pwang@mcs.kent.edu>
 For details see README
+--------------------------------------------------------------------------
+Important addition:
+
+As of September 2006, MP is also licensed under GPL:
+
+From: Simon Gray <SGRAY@wooster.edu>
+Date: 07-Sep-2006 07:43
+Subject: Re: License for MP
+To: "Paul S. Wang" <pwang@cs.kent.edu>, Jordi Gutierrez Hermoso
+<jordigh@gmail.com>
+Cc: kajler@paris.ensmp.fr
+
+
+Agreed. Nice to hear this combination is still being used.
+
+
+Simon Gray, PhD
+Department of Mathematics and Computer Science
+College of Wooster
+
+
+---------- Forwarded message ----------
+From: Norbert Kajler <Norbert.Kajler@ensmp.fr>
+Date: 07-Sep-2006 07:35
+Subject: Re: License for MP
+To: Jordi Gutierrez Hermoso <jordigh@gmail.com>
+Cc: sgray@mcs.kent.edu, pwang@cs.kent.edu
+
+
+Dear Jordi, Paul, Simon,
+
+I have no objection either, and agrees with whatever Paul decides.
+
+BTW, I just attended a lecture by Richard Stallman yesterday.  I know next
+to nothing about DRM and software licenses but after listening Richard,
+my understanding is that a "free" program (in terms of GNU philosophy)
+is indeed a program that includes some kind of viral licence (so that
+programs derived from a "free" program must remain 100% "free", and so on).
+
+Therefore I am confused with the following sentences :
+
+ > The specific problem is that you do not allow modifications of your code fo
+r
+ > commercial purposes, which according to the DFSG, makes your code
+ > non-free.
+
+Not that I insist on any kind of license, but it looks like I missed
+something :-)
+
+Regards,
+-- Norbert
+
+
+
+---------- Forwarded message ----------
+From: Paul S. Wang <pwang@cs.kent.edu>
+Date: 06-Sep-2006 16:22
+Subject: Re: License for MP
+To: Jordi Gutierrez Hermoso <jordigh@gmail.com>
+Cc: kajler@paris.ensmp.fr, sgray@wooster.edu
+
+
+Jordi,
+
+I am agreeable to any reasonable license including GLP.
+
+I am forwarding the msg to Simon and Norbert to see what
+they say.
+
+Paul
+
