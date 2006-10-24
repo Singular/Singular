@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.33 2006-10-17 16:17:53 Singular Exp $ */
+/* $Id: kutil.cc,v 1.34 2006-10-24 09:45:22 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2089,15 +2089,16 @@ void enterOneZeroPairRing (poly f, poly t_p, poly p, int ecart, kStrategy strat,
 
 /* Helper for kCreateZeroPoly
  * enumerating the exponents
+ring r = 2^2, (a, b, c), lp; ideal G0 = system("createG0"); ideal G = interred(G0); ncols(G0); ncols(G);
  */
 
-int nextZeroSimplexExponent (long exp[], long ind[], long cexp[], long cind[], long* cabsind, long bound, long N)
+int nextZeroSimplexExponent (long exp[], long ind[], long cexp[], long cind[], long* cabsind, long step[], long bound, long N)
 /* gives the next exponent from the set H_1 */
 {
-  if (*cabsind < bound)
+  long add = ind2(cexp[1] + 2);
+  if ((*cabsind < bound) && (*cabsind - step[1] + add < bound))
   {
     cexp[1] += 2;
-    long add = ind2(cexp[1]);
     cind[1] += add;
     *cabsind += add;
   }
@@ -2110,14 +2111,40 @@ int nextZeroSimplexExponent (long exp[], long ind[], long cexp[], long cind[], l
     cexp[i] = exp[i];
     *cabsind -= cind[i];
     cind[i] = ind[i];
+    step[i] = 500000;
     *cabsind += cind[i];
     // Print("in: %d\n", *cabsind);
     i += 1;
     if (i > N) return 0;
+    do
+    {
+      step[1] = 500000;
+      for (int j = i + 1; j <= N; j++)
+      {
+        if (step[1] > step[j]) step[1] = step[j];
+      }
+      add = ind2(cexp[i] + 2);
+      if (*cabsind - step[1] + add >= bound)
+      {
+        cexp[i] = exp[i];
+        *cabsind -= cind[i];
+        cind[i] = ind[i];
+        *cabsind += cind[i];
+        step[i] = 500000;
+        i += 1;
+        if (i > N) return 0;
+      }
+      else step[1] = -1;
+    } while (step[1] != -1);
+    step[1] = 500000;
     cexp[i] += 2;
-    long add = ind2(cexp[i]);
     cind[i] += add;
     *cabsind += add;
+    if (add < step[i]) step[i] = add;
+    for (i = 2; i <= N; i++)
+    {
+      if (step[1] > step[i]) step[1] = step[i];
+    }
   }
   return 1;
 }
@@ -2204,6 +2231,7 @@ void initenterzeropairsRing (poly p, int ecart, kStrategy strat, int atR)
   long mult[50];           // How to multiply the elements of G
   long cabsind = 0;        // The abs. index of cexp, i.e. the sum of cind
   long habsind = 0;        // The abs. index of the coefficient of h
+  long step[50];           // The last increases
   for (int i = 1; i <= currRing->N; i++)
   {
     exp[i] = p_GetExp(p, i, currRing);
@@ -2216,7 +2244,9 @@ void initenterzeropairsRing (poly p, int ecart, kStrategy strat, int atR)
     ind[i] = ind_fact_2(exp[i]);
     cabsind += ind[i];
     cind[i] = ind[i];
+    step[i] = 500000;
   }
+  step[1] = 500000;
   habsind = ind2((long) p_GetCoeff(p, currRing));
   long bound = currRing->ch - habsind;
 #ifdef OLI_DEBUG
@@ -2230,7 +2260,7 @@ void initenterzeropairsRing (poly p, int ecart, kStrategy strat, int atR)
 #endif
   if (cabsind == 0)
   {
-    if (!(nextZeroSimplexExponent(exp, ind, cexp, cind, &cabsind, bound, currRing->N)))
+    if (!(nextZeroSimplexExponent(exp, ind, cexp, cind, &cabsind, step, bound, currRing->N)))
     {
       return;
     }
@@ -2250,7 +2280,7 @@ void initenterzeropairsRing (poly p, int ecart, kStrategy strat, int atR)
 #endif
     enterOneZeroPairRing(zeroPoly, t_p, p, ecart, strat, atR);
   }
-  while ( nextZeroSimplexExponent(exp, ind, cexp, cind, &cabsind, bound, currRing->N) );
+  while ( nextZeroSimplexExponent(exp, ind, cexp, cind, &cabsind, step, bound, currRing->N) );
 }
 
 /*
@@ -2267,14 +2297,17 @@ ideal createG0()
   long mult[50];           // How to multiply the elements of G
   long cabsind = 0;        // The abs. index of cexp, i.e. the sum of cind
   long habsind = 0;        // The abs. index of the coefficient of h
+  long step[50];           // The last increases
   for (int i = 1; i <= currRing->N; i++)
   {
     exp[i] = 0;
     cexp[i] = exp[i];
     ind[i] = 0;
+    step[i] = 500000;
     cind[i] = ind[i];
   }
   long bound = currRing->ch;
+  step[1] = 500000;
 #ifdef OLI_DEBUG
   PrintS("-------------\npoly  :");
   wrp(p);
@@ -2286,7 +2319,7 @@ ideal createG0()
 #endif
   if (cabsind == 0)
   {
-    if (!(nextZeroSimplexExponent(exp, ind, cexp, cind, &cabsind, bound, currRing->N)))
+    if (!(nextZeroSimplexExponent(exp, ind, cexp, cind, &cabsind, step, bound, currRing->N)))
     {
       return idInit(1, 1);
     }
@@ -2310,7 +2343,7 @@ ideal createG0()
     IDELEMS(G0) += 1;
     G0->m[IDELEMS(G0) - 1] = zeroPoly;
   }
-  while ( nextZeroSimplexExponent(exp, ind, cexp, cind, &cabsind, bound, currRing->N) );
+  while ( nextZeroSimplexExponent(exp, ind, cexp, cind, &cabsind, step, bound, currRing->N) );
   idSkipZeroes(G0);
   return G0;
 }

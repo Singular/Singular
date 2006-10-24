@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.24 2006-10-17 16:17:53 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.25 2006-10-24 09:45:22 wienand Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -316,7 +316,7 @@ int redRing2toM (LObject* h,kStrategy strat)
   int at,d,i;
   int j = 0;
   int pass = 0;
-  poly zeroPoly;
+  poly zeroPoly = NULL;
 
 // TODO warum SetpFDeg notwendig?
   h->SetpFDeg();
@@ -332,9 +332,6 @@ int redRing2toM (LObject* h,kStrategy strat)
   {
 #ifdef HAVE_VANGB
     zeroPoly = kFindDivisibleByZeroPoly(h);
-#else
-    zeroPoly = NULL;
-#endif
     if (zeroPoly != NULL)
     {
       if (TEST_OPT_PROT)
@@ -357,6 +354,7 @@ int redRing2toM (LObject* h,kStrategy strat)
       j = strat->tl;
     }
     else
+#endif
     {
       j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
       if (j < 0) return 1;
@@ -377,11 +375,13 @@ int redRing2toM (LObject* h,kStrategy strat)
 #endif
 
     ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
+#ifdef HAVE_VANGB
     if (zeroPoly != NULL)
     {
       // TODO Free memory of zeropoly and last element of L
       strat->tl--;
     }
+#endif
 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
