@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.44 2006-07-07 10:17:04 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.45 2006-10-25 10:14:52 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -100,6 +100,7 @@ class slimgb_alg
 {
   public:
     slimgb_alg(ideal I, int syz_comp,BOOLEAN F4);
+		void introduceDelayedPairs(poly* pa,int s);
     virtual ~slimgb_alg();
 #ifndef HAVE_BOOST
 #ifdef USE_STDVECBOOL

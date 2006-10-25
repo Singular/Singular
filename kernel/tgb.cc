@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.103 2006-10-17 06:48:43 bricken Exp $ */
+/* $Id: tgb.cc,v 1.104 2006-10-25 10:14:51 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1552,7 +1552,8 @@ static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n)
   loop
   {
       int dummy=strat->sl;
-      j=kFindDivisibleByInS(strat,&dummy,&P);
+      j=kFindDivisibleByInS_easy(strat,P.p,P.sev);
+      //j=kFindDivisibleByInS(strat,&dummy,&P);
       if ((j>=0) && ((!n)||
         ((strat->lenS[j]<=n) &&
          ((strat->lenSw==NULL)||
@@ -2159,6 +2160,33 @@ static int poly_crit(const void* ap1, const void* ap2){
   if (l1>l2) return 1;
   return 0;
 }
+void slimgb_alg::introduceDelayedPairs(poly* pa,int s){
+	if (s==0) return;
+	sorted_pair_node** si_array=(sorted_pair_node**) omalloc(s* sizeof(sorted_pair_node*));
+	
+	for( unsigned int i = 0; i < s; i++ )
+	{
+		sorted_pair_node* si=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
+		si->i=-1;
+		si->j=-2;
+		poly p=pa[i];
+		simplify_poly(p,r);
+		si->expected_length=pQuality(p,this,pLength(p));
+		si->deg=pTotaldegree_full(p);
+		if (!rField_is_Zp(r)){
+		  pCleardenom(p);
+		}
+		si->lcm_of_lm=p;
+
+		//      c->apairs[n-1-i]=si;
+		si_array[i]=si;
+		
+  }
+	
+  qsort(si_array,s,sizeof(sorted_pair_node*),tgb_pair_better_gen2);
+	apairs=spn_merge(apairs,pair_top+1,si_array,s,this);
+  pair_top+=s;
+}
 slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
   completed=FALSE;
   this->syz_comp=syz_comp;
@@ -2289,6 +2317,10 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
   assume(strat->sl==strat->Shdl->idelems()-1);
   if(!(F4_mode))
   {
+		poly* array_arg=I->m;
+		array_arg++;
+		introduceDelayedPairs(array_arg,n-1);
+		/*
     for (i=1;i<n;i++)//the 1 is wanted, because first element is added to basis
     {
       //     add_to_basis(I->m[i],-1,-1,c);
@@ -2305,7 +2337,7 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
       //      c->apairs[n-1-i]=si;
       apairs[n-i-1]=si;
       ++(pair_top);
-    }
+    }*/
   }
   else
   {
@@ -3398,8 +3430,10 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
   }
 
 
-  sorted_pair_node** pairs=(sorted_pair_node**)
-    omalloc(delay_s*sizeof(sorted_pair_node*));
+  //sorted_pair_node** pairs=(sorted_pair_node**)
+  //  omalloc(delay_s*sizeof(sorted_pair_node*));
+  c->introduceDelayedPairs(delay,delay_s);
+  /*
   for(i=0;i<delay_s;i++){
 
       poly p=delay[i];
@@ -3422,9 +3456,9 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
   }
   qsort(pairs,delay_s,sizeof(sorted_pair_node*),tgb_pair_better_gen2);
   c->apairs=spn_merge(c->apairs,c->pair_top+1,pairs,delay_s,c);
-  c->pair_top+=delay_s;
+  c->pair_top+=delay_s;*/
   omfree(delay);
-  omfree(pairs);
+  //omfree(pairs);
   return;
 }
 void red_object::flatten(){
