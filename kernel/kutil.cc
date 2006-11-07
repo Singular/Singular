@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.34 2006-10-24 09:45:22 wienand Exp $ */
+/* $Id: kutil.cc,v 1.35 2006-11-07 10:16:50 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2083,7 +2083,7 @@ void enterOneZeroPairRing (poly f, poly t_p, poly p, int ecart, kStrategy strat,
 
     strat->initEcartPair(&Lp,f,p,0/*strat->ecartS[i]*/,ecart);     // Attention: TODO: break ecart
     l = strat->posInL(strat->B,strat->Bl,&Lp,strat);
-    // enterL(&strat->B, &strat->Bl, &strat->Bmax, Lp, l);
+    enterL(&strat->B, &strat->Bl, &strat->Bmax, Lp, l);
   }
 }
 
@@ -2310,7 +2310,7 @@ ideal createG0()
   step[1] = 500000;
 #ifdef OLI_DEBUG
   PrintS("-------------\npoly  :");
-  wrp(p);
+//  wrp(p);
   Print("\nexp   : (%d, %d)\n", exp[1] + mult[1], exp[2] + mult[1]);
   Print("cexp  : (%d, %d)\n", cexp[1], cexp[2]);
   Print("cind  : (%d, %d)\n", cind[1], cind[2]);
@@ -2398,7 +2398,7 @@ void initenterpairsRing (poly h,int k,int ecart,int isFromQ,kStrategy strat, int
     }
 
 #ifdef HAVE_VANGB
-    initenterzeropairsRing(h, ecart, strat, atR);
+    // initenterzeropairsRing(h, ecart, strat, atR);
 #endif
 
     if (new_pair) chainCritRing(h,ecart,strat);
