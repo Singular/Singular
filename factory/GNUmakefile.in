@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.46 2006-01-05 13:38:18 Singular Exp $
+# $Id: GNUmakefile.in,v 1.47 2006-11-07 08:18:22 Singular Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -96,12 +96,12 @@ WARNFLAGS =	-w
 
 # flags to translate library c files
 LIBCFLAGS =	$(WARNFLAGS) \
-		-I$(includedir) -I. -I$(srcdir) \
+		-I. -I$(srcdir) -I$(includedir) \
 		$(DEFS) $(CPPFLAGS) $(CFLAGS)
 
 # flags to translate library c++ files
 LIBCXXFLAGS =	$(WARNFLAGS) -fno-implicit-templates \
-		-I$(includedir) -I. -I$(srcdir) \
+		-I. -I$(srcdir) -I$(includedir) \
 		$(DEFS) $(CPPFLAGS) $(CXXFLAGS)
 
 # flags to translate ftmpl_inst.cc
@@ -114,7 +114,7 @@ TESTCXXFLAGS =	$(LIBCXXFLAGS)
 TESTLDFLAGS = 	$(LIBS) $(LDFLAGS)
 
 # flags to create dependency lists
-DEPCXXFLAGS =	-I$(includedir) -I. -I$(srcdir) \
+DEPCXXFLAGS =	-I. -I$(srcdir) -I$(includedir) \
 		$(DEFS) $(CPPFLAGS)
 
 #
