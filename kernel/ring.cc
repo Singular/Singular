@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.47 2006-08-11 09:47:03 Singular Exp $ */
+/* $Id: ring.cc,v 1.48 2006-11-08 12:18:56 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -578,7 +578,7 @@ char * rCharStr(ring r)
       s=omStrDup("real");                    /* R */
     else
     {
-      s=(char *)omAlloc(6);
+      s=(char *)omAlloc(MAX_INT_LEN+1);
       sprintf(s,"%d",i);                   /* Q, Z/p */
     }
     return s;
@@ -594,13 +594,13 @@ char * rCharStr(ring r)
   {
     l+=(strlen(r->parameter[i])+1);
   }
-  s=(char *)omAlloc(l+6);
+  s=(char *)omAlloc(l+MAX_INT_LEN+1);
   s[0]='\0';
   if (r->ch<0)       sprintf(s,"%d",-r->ch); /* Fp(a) */
   else if (r->ch==1) sprintf(s,"0");         /* Q(a)  */
   else
   {
-    sprintf(s,"%d,%s",r->ch,r->parameter[0]); /* Fq  */
+    sprintf(s,"%d,%s",r->ch,r->parameter[0]); /* GF(q)  */
     return s;
   }
   char tt[2];
