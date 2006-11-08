@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.125 2006-07-26 13:48:05 Singular Exp $";
+version="$Id: primdec.lib,v 1.126 2006-11-08 13:37:21 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -2041,7 +2041,6 @@ static proc primT(ideal i)
    return(0);
 }
 
-
 static proc minAssPrimes(ideal i, list #)
 "USAGE:   minAssPrimes(i); i ideal
       Optional parameters in list #: (can be entered in any order)
@@ -2053,20 +2052,30 @@ RETURN:  list = the minimal associated prime ideals of i
 EXAMPLE: example minAssPrimes; shows an example
 "
 {
+   if(size(i) == 0){return(list(ideal(0)));}
    string algorithm;    // Algorithm to be used
    string facstdOption;    // To uses proc facstd
    int j;          // Counter
-   def P = basering;
-   if(size(i) == 0){return(list(ideal(0)));}
+   def P0 = basering;
+   list Pl=ringlist(P0);
+   intvec dp_w;
+   for(j=nvars(P0);j>0;j--) {dp_w[j]=1;}
+   Pl[3]=list(list("dp",dp_w),list("C",0));
+   def P=ring(Pl);
+   setring P;
+   ideal i=imap(P0,i);
 
    // Set input parameters
    algorithm = "SL";         // Default: SL algorithm
    facstdOption = "noFacstd";    // Default: facstd is not used
-   if(size(#) > 0){
+   if(size(#) > 0)
+   {
      int valid;
-     for(j = 1; j <= size(#); j++){
+     for(j = 1; j <= size(#); j++)
+     {
        valid = 0;
-       if((typeof(#[j]) == "int") or (typeof(#[j]) == "number")) {
+       if((typeof(#[j]) == "int") or (typeof(#[j]) == "number"))
+       {
          if (#[j] == 0) {facstdOption = "noFacstd"; valid = 1;}    // If #[j] == 0, facstd is not used.
          if (#[j] == 1) {facstdOption = "facstd";   valid = 1;}    // If #[j] == 1, facstd is used.
        }
@@ -2112,7 +2121,7 @@ EXAMPLE: example minAssPrimes; shows an example
       }
    }
 
-   if(dim(i) == -1){re = ideal(1); return(re);}
+   if(dim(i) == -1){setring P0;return(ideal(1));}
    if((dim(i) == 0) && (npars(P) == 0))
    {
       int di = vdim(i);
@@ -2149,22 +2158,29 @@ EXAMPLE: example minAssPrimes; shows an example
       }
       setring P;
       re = imap(gnir, re);
+      re=phi(re);
       option(set, op);
-      return(phi(re));
+      setring(P0);
+      list re=imap(P,re);
+      return(re);
    }
 
    // Lines changed
    if ((facstdOption == "noFacstd") || (dim(i) == 0)) {
-      if (algorithm == "GTZ") {
+      if (algorithm == "GTZ")
+      {
          re[1] = decomp(i, 2);
-      } else {
+      } else
+      {
          re[1] = minAssSL(i);
       }
       re = union(re);
       option(set, op);
-      return(phi(re));
+      re=phi(re);
+      setring(P0);
+      list re=imap(P,re);
+      return(re);
    }
-
    q = facstd(i);
 
 /*
@@ -2185,7 +2201,6 @@ EXAMPLE: example minAssPrimes; shows an example
       kill gnir;
    };
 */
-
    option(set,op);
    // Debug
    dbprint(printlevel - voice, "Components returned by facstd", size(q), q);
@@ -2205,8 +2220,10 @@ EXAMPLE: example minAssPrimes; shows an example
       dbprint(printlevel - voice, "re[j]:", re[j]);
    }
    re = union(re);
-
-   return(phi(re));
+   re=phi(re);
+   setring(P0);
+   list re=imap(P,re);
+   return(re);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -5397,16 +5414,26 @@ EXAMPLE: example radical; shows an example
       "// Not implemented for this ordering, please change to global ordering."
       );
    }
-   def @P=basering;
+   if(size(i) == 0){return(ideal(0));}
    int j;
+   def P0 = basering;
+   list Pl=ringlist(P0);
+   intvec dp_w;
+   for(j=nvars(P0);j>0;j--) {dp_w[j]=1;}
+   Pl[3]=list(list("dp",dp_w),list("C",0));
+   def @P=ring(Pl);
+   setring @P;
+   ideal i=imap(P0,i);
+
    int il;
    string algorithm;
    int useFac;
 
    // Set input parameters
    algorithm = "SL";                                 // Default: SL algorithm
-   il = 0;                                           // Default: Full radical (not only equiRadical)
-   if (homog(i) == 1) {                              // Default: facStd is used, except if the ideal is homogeneous.
+   il = 0;                                           // Default: Full radical
+(not only equiRadical)
+   if (homog(i) == 1) {   // Default: facStd is used, except if the ideal is homogeneous.
       useFac = 0;
    } else {
       useFac = 1;
@@ -5415,8 +5442,9 @@ EXAMPLE: example radical; shows an example
       int valid;
       for(j = 1; j <= size(#); j++){
          valid = 0;
-         if((typeof(#[j]) == "int") or (typeof(#[j]) == "number")) {
-            il = #[j];                        // If il == 1, equiRadical is computed
+         if((typeof(#[j]) == "int") or (typeof(#[j]) == "number"))
+         {
+            il = #[j];          // If il == 1, equiRadical is computed
             valid = 1;
          }
          if(typeof(#[j]) == "string"){
@@ -5439,13 +5467,13 @@ EXAMPLE: example radical; shows an example
                il = 0;
                valid = 1;}
          }
-         if(valid == 0) {
+         if(valid == 0)
+         {
             dbprint(1, "Warning! The following input parameter was not recognized:", #[j]);
          }
       }
    }
 
-   if(size(i) == 0){return(ideal(0));}
    ideal rad = 1;
    intvec op = option(get);
    list qr = simplifyIdeal(i);
@@ -5459,7 +5487,10 @@ EXAMPLE: example radical; shows an example
    if(di == 0)
    {
       i = zeroRad(i, qr[1]);
-      return(interred(phi(i)));
+      i=interred(phi(i));
+      setring(P0);
+      i=imap(@P,i);
+      return(i);
    }
 
    option(redSB);
@@ -5494,12 +5525,16 @@ EXAMPLE: example radical; shows an example
       {
          // SL Debug
          dbprint(printlevel-voice, "The radical of this component is not needed.");
-         dbprint(printlevel-voice, "size(reduce(rad, pr[s + 1 - j], 1))", size(reduce(rad, pr[s + 1 - j], 1)));
+         dbprint(printlevel-voice, "size(reduce(rad, pr[s + 1 - j], 1))",
+                 size(reduce(rad, pr[s + 1 - j], 1)));
          dbprint(printlevel-voice, "dim(pr[s + 1 - j])", dim(pr[s + 1 - j]));
          dbprint(printlevel-voice, "il", il);
       }
    }
-   return(interred(phi(rad)));
+   rad=interred(phi(rad));
+   setring(P0);
+   i=imap(@P,rad);
+   return(i);
 }
 example
 { "EXAMPLE:";  echo = 2;
