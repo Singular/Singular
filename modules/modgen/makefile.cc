@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.27 2006-08-23 15:40:58 Singular Exp $ */
+/* $Id: makefile.cc,v 1.28 2006-11-09 13:23:43 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -208,7 +208,7 @@ void build_compile_section(
   fprintf(fp, "\t${CC} ${CFLAGS} -c -fPIC -DPIC $< -o $*.o\n");
   fprintf(fp, "\n");
   fprintf(fp, "%%.og: %%.cc Makefile\n");
-  fprintf(fp, "\t${CC} ${DCFLAGS} -c -fPIC -DPIC $< -o $*.og\n");
+  fprintf(fp, "\t${CC} ${DCFLAGS} -g -c -fPIC -DPIC $< -o $*.og\n");
   fprintf(fp, "\n");
   
   fprintf(fp, "%s.so: ${OBJS}\n", module->targetname);
