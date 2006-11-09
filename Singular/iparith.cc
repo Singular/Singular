@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.416 2006-10-16 15:47:29 Singular Exp $ */
+/* $Id: iparith.cc,v 1.417 2006-11-09 12:56:57 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -6762,6 +6762,9 @@ void ttGen2b()
 
   fprintf(
     outfile,
+    "#ifdef MODULE_GENERATOR\n"
+    "#define omAlloc0(A) malloc(A)\n"
+    "#endif\n"
     "void iiInitCmdName() {\n"
     "  sArithBase.nCmdUsed      = 0;\n"
     "  sArithBase.nCmdAllocated = %d;\n"
