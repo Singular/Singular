@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.45 2006-10-25 10:14:52 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.46 2006-11-09 08:15:52 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -173,6 +173,7 @@ class red_object{
   kBucket_pt bucket;
   poly p;
   unsigned long sev;
+  int sugar;
   void flatten();
   void validate();
   wlen_type initial_quality;

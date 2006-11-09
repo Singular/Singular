@@ -4,12 +4,16 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.104 2006-10-25 10:14:51 bricken Exp $ */
+/* $Id: tgb.cc,v 1.105 2006-11-09 08:15:51 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
 //#include <vector>
 //using namespace std;
+
+
+///@TODO: delay nur auf Sugarvergrößerung
+///@TODO: grade aus ecartS, setze dazu strat->honey; und nutze p.ecart
 #include "mod2.h"
 #include "tgb.h"
 #include "tgb_internal.h"
@@ -396,7 +400,7 @@ wlen_type pELength(poly p, ring r){
   return s;
 }
 
-wlen_type kEBucketLength(kBucket* b, poly lm,slimgb_alg* ca)
+wlen_type kEBucketLength(kBucket* b, poly lm,int sugar,slimgb_alg* ca)
 {
   wlen_type s=0;
   if(lm==NULL){
@@ -407,6 +411,14 @@ wlen_type kEBucketLength(kBucket* b, poly lm,slimgb_alg* ca)
     return bucket_guess(b);
   }
   int d=pTotaldegree(lm,ca->r);
+  #if 1
+  assume(sugar>=d);
+  s=1+(bucket_guess(b)-1)*(sugar-d+1);
+  return s;
+  #else
+  
+  
+  //int d=pTotaldegree(lm,ca->r);
   int i;
   for (i=b->buckets_used;i>=0;i--)
   {
@@ -420,6 +432,7 @@ wlen_type kEBucketLength(kBucket* b, poly lm,slimgb_alg* ca)
     }
   }
   return s;
+  #endif
 }
 
 static inline int pELength(poly p, slimgb_alg* c,int l){
@@ -504,7 +517,7 @@ wlen_type red_object::guess_quality(slimgb_alg* c){
     }
     #endif
     //FIXME:not quadratic
-    wlen_type erg=kEBucketLength(this->bucket,this->p,c);
+    wlen_type erg=kEBucketLength(this->bucket,this->p,this->sugar,c);
     //erg*=cs;//for quadratic
     erg*=cs;
     if (TEST_V_COEFSTRAT)
@@ -518,7 +531,7 @@ wlen_type red_object::guess_quality(slimgb_alg* c){
     {
       if(c->eliminationProblem)
   //if (false)
-  s=kEBucketLength(this->bucket,this->p,c);
+  s=kEBucketLength(this->bucket,this->p,this->sugar,c);
       else s=bucket_guess(bucket);
     }
 
@@ -1799,7 +1812,9 @@ static void go_on (slimgb_alg* c){
     buf[j].p=p[j];
     buf[j].sev=pGetShortExpVector(p[j]);
     buf[j].bucket = kBucketCreate(currRing);
-
+    if (c->eliminationProblem){
+        buf[j].sugar=pTotaldegree_full(p[j]);
+    }
     int len=pLength(p[j]);
     kBucketInit(buf[j].bucket,buf[j].p,len);
     buf[j].initial_quality=buf[j].guess_quality(c);
@@ -3089,6 +3104,9 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
     int j=erg.reduce_by;
     int old_length=c->strat->lenS[j];// in view of S
     los[bp].p=p;
+    if (c->eliminationProblem){
+        los[bp].sugar=pTotaldegree_full(p);
+    }
     kBucketInit(los[bp].bucket,p,old_length);
     wlen_type qal=pQuality(clear_into,c,new_length);
     int pos_in_c=-1;
@@ -3221,6 +3239,7 @@ static void multi_reduction_find(red_object* los, int losl,slimgb_alg* c,int sta
   while(i>=0){
     assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)<=0));
     assume(is_valid_ro(los[i]));
+    assume((!(c->eliminationProblem))||(los[i].sugar>=pTotaldegree(los[i].p)));
     j=kFindDivisibleByInS_easy(strat,los[i]);
     if(j>=0){
 
@@ -3498,14 +3517,22 @@ void simple_reducer::reduce(red_object* r, int l, int u){
   int i;
 //debug start
   int im;
-
+ 
+  int reducer_deg;
+  if(c->eliminationProblem){
+    assume(p_LmEqual(r[l].p,r[u].p,c->r));
+    int lm_deg=pTotaldegree(r[l].p);
+    reducer_deg=lm_deg+pTotaldegree_full(p)-pTotaldegree(p);
+  }
 
   for(i=l;i<=u;i++){
 
 
 
     this->do_reduce(r[i]);
-
+    if (c->eliminationProblem){
+        r[i].sugar=si_max(r[i].sugar,reducer_deg);
+    }
   }
   for(i=l;i<=u;i++){
 
@@ -3552,7 +3579,9 @@ void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
 
     }
     pNormalize(red);
-
+    if (c->eliminationProblem){
+        r[rn].sugar=pTotaldegree_full(red);
+    }
 
     if ((!(erg.fromS))&&(TEST_V_UPTORADICAL)){
 
