@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ring.lib,v 1.27 2006-07-20 15:35:51 Singular Exp $";
+version="$Id: ring.lib,v 1.28 2006-11-09 09:00:09 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -681,7 +681,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc ringweights (list # )
+proc ringweights (def P)
 "USAGE:   ringweights(P); P=name of an existing ring (true name, not a string)
 RETURN:  intvec consisting of the weights of the variables of P, as they
          appear when typing P;.
@@ -690,61 +690,11 @@ NOTE:    This is useful when enlarging P but keeping the weights of the old
 EXAMPLE: example ringweights; shows an example
 "
 {
-   int ii,q,fi,fo,fia;
-   intvec rw,nw;
-   string os;
-   def P = #[1];
-   string osP = ordstr(P);
-   fo  = 1;
-//------------------------- find weights in ordstr(P) -------------------------
-   fi  = find(osP,"(",fo);
-   fia = find(osP,"a",fo)+find(osP,"w",fo)+find(osP,"W",fo);
-   while ( fia )
-   {
-      os = osP[fi+1,find(osP,")",fi)-fi-1];
-      if( find(os,",") )
-      {
-         execute("nw = "+os+";");
-         if( size(nw) > ii )
-         {
-             rw = rw,nw[ii+1..size(nw)];
-         }
-         else  {  ii = ii - size(nw); }
-
-         if( find(osP[1,fi],"a",fo) ) { ii = size(nw); }
-      }
-      else
-      {
-         execute("q = "+os+";");
-         if( q > ii )
-         {
-            nw = 0; nw[q-ii] = 0;
-            nw = nw + 1;          //creates an intvec 1,...,1 of length q-ii
-            rw = rw,nw;
-         }
-         else { ii = ii - q; }
-      }
-      fo  = fi+1;
-      fi  = find(osP,"(",fo);
-      fia = find(osP,"a",fo)+find(osP,"w",fo)+find(osP,"W",fo);
-   }
-//-------------- adjust weight vector to length = nvars(P)  -------------------
-   if( fo > 1 )
-   {                                            // case when weights were found
-      rw = rw[2..size(rw)];
-      if( size(rw) > nvars(P) )
-      {
-         rw = rw[1..nvars(P)];
-      }
-      if( size(rw) < nvars(P) )
-      {
-         nw=0; nw[nvars(P)-size(rw)]=0; nw=nw+1; rw=rw,nw;
-      }
-   }
-   else
-   {                                         // case when no weights were found
-      rw[nvars(P)]= 0; rw=rw+1;
-   }
+   int i;
+   intvec rw;
+//------------------------- find weights  -------------------------
+   for(i=nvars(P);i>0;i--)
+   { rw[i]=ord(var(i)); }
    return(rw);
 }
 example
