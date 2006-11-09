@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.105 2006-11-09 08:15:51 bricken Exp $ */
+/* $Id: tgb.cc,v 1.106 2006-11-09 11:14:49 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -821,7 +821,7 @@ static int bucket_guess(kBucket* bucket){
 
 
 
-static int add_to_reductors(slimgb_alg* c, poly h, int len, BOOLEAN simplified){
+static int add_to_reductors(slimgb_alg* c, poly h, int len, int ecart, BOOLEAN simplified){
   //inDebug(h);
   assume(lenS_correct(c->strat));
   assume(len==pLength(h));
@@ -834,6 +834,7 @@ static int add_to_reductors(slimgb_alg* c, poly h, int len, BOOLEAN simplified){
   LObject P; memset(&P,0,sizeof(P));
   P.tailRing=c->r;
   P.p=h; /*p_Copy(h,c->r);*/
+  P.ecart=ecart;
   P.FDeg=pFDeg(P.p,c->r);
   if (!(simplified)){
       if (!rField_is_Zp(c->r)){
@@ -1227,7 +1228,8 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
 //  BOOLEAN corr=lenS_correct(c->strat);
   BOOLEAN R_found=FALSE;
   void* hp;
-
+  int sugar;
+  int ecart=0;
   ++(c->n);
   ++(c->S->ncols);
   int i,j;
@@ -1259,9 +1261,11 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
   pEnlargeSet(&c->S->m,c->n-1,1);
   if (c->T_deg_full)
     ENLARGE(c->T_deg_full,int);
-  c->T_deg[i]=pTotaldegree(h);
+  sugar=c->T_deg[i]=pTotaldegree(h);
   if(c->T_deg_full){
-    c->T_deg_full[i]=pTotaldegree_full(h);
+    sugar=c->T_deg_full[i]=pTotaldegree_full(h);
+    ecart=sugar-c->T_deg[i];
+    assume(ecart>=0);
   }
 
 
@@ -1504,7 +1508,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
   omfree(nodes);
   nodes=NULL;
 
-  add_to_reductors(c, h, c->lengths[c->n-1], TRUE);
+  add_to_reductors(c, h, c->lengths[c->n-1], ecart,TRUE);
   //i=posInS(c->strat,c->strat->sl,h,0 ecart);
   if (!(c->nc)){
     if (c->lengths[c->n-1]==1)
@@ -2229,6 +2233,7 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
     }
   }
   eliminationProblem=((!(is_homog))&&((pLexOrder)));
+  
   //  Print("is homog:%d",c->is_homog);
   void* h;
   poly hp;
@@ -2301,6 +2306,8 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
   else
     S=idInit(1,I->rank);
   strat=new skStrategy;
+  if (eliminationProblem)
+    strat->honey=TRUE;
   strat->syzComp = 0;
   initBuchMoraCrit(strat);
   initBuchMoraPos(strat);
@@ -3122,20 +3129,30 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
   break;
       }
     }
+    
+    int tdeg_full=-1;
+    int tdeg=-1;
     if(pos_in_c>=0)
     {
       #ifdef TGB_RESORT_PAIRS
       c->used_b=TRUE;
       c->replaced[pos_in_c]=TRUE;
       #endif
+      tdeg=c->T_deg[pos_in_c];
       c->S->m[pos_in_c]=clear_into;
       c->lengths[pos_in_c]=new_length;
       c->weighted_lengths[pos_in_c]=qal;
       if (c->gcd_of_terms[pos_in_c]==NULL)
         c->gcd_of_terms[pos_in_c]=gcd_of_terms(clear_into,c->r);
       if (c->T_deg_full)
-  c->T_deg_full[pos_in_c]=pTotaldegree_full(clear_into);
+        tdeg_full=c->T_deg_full[pos_in_c]=pTotaldegree_full(clear_into);
+      else tdeg_full=tdeg;
       c_S_element_changed_hook(pos_in_c,c);
+    } else {
+      if (c->eliminationProblem){
+        tdeg_full=pTotaldegree_full(clear_into);
+        tdeg=pTotaldegree(clear_into);
+      }
     }
     c->strat->S[j]=clear_into;
     c->strat->lenS[j]=new_length;
@@ -3159,6 +3176,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
 
     if (new_pos<j)
     {
+      if (c->strat->honey) c->strat->ecartS[j]=tdeg_full-tdeg;
       move_forward_in_S(j,new_pos,c->strat);
       erg.reduce_by=new_pos;
     }
@@ -3442,7 +3460,11 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
       c->expandS[i]=erg.expand;
       c->expandS[i+1]=NULL;
 #else
-      add_to_reductors(c,erg.expand,erg.expand_length);
+      int ecart=0;
+      if (c->eliminationProblem){
+        ecart=pTotaldegree_full(erg.expand)-pTotaldegree(erg.expand);
+      }
+      add_to_reductors(c,erg.expand,erg.expand_length,ecart);
 #endif
     }
 
@@ -3518,11 +3540,11 @@ void simple_reducer::reduce(red_object* r, int l, int u){
 //debug start
   int im;
  
-  int reducer_deg;
+  
   if(c->eliminationProblem){
     assume(p_LmEqual(r[l].p,r[u].p,c->r));
-    int lm_deg=pTotaldegree(r[l].p);
-    reducer_deg=lm_deg+pTotaldegree_full(p)-pTotaldegree(p);
+    /*int lm_deg=pTotaldegree(r[l].p);
+    reducer_deg=lm_deg+pTotaldegree_full(p)-pTotaldegree(p);*/
   }
 
   for(i=l;i<=u;i++){
@@ -3627,8 +3649,20 @@ void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
 
 
   assume(red_len==pLength(red));
-
-  pointer=new simple_reducer(red,red_len,c);
+  
+  int reducer_deg=0;
+  if (c->eliminationProblem){
+     int lm_deg=pTotaldegree(r[erg.to_reduce_l].p);
+     int ecart;
+     if (erg.fromS){
+       assume(pTotaldegree_full(red)<=c->T_deg_full[erg.reduce_by]);
+       ecart=c->strat->ecartS[erg.reduce_by];
+     } else {
+       ecart=pTotaldegree_full(red)-lm_deg;
+     }
+     reducer_deg=lm_deg+ecart;
+  }
+  pointer=new simple_reducer(red,red_len,reducer_deg,c);
 
   if ((!work_on_copy) && (!erg.fromS))
     pointer->fill_back=r[rn].bucket;

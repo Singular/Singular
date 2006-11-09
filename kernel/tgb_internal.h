@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.46 2006-11-09 08:15:52 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.47 2006-11-09 11:14:50 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -193,7 +193,7 @@ enum calc_state
   };
 static BOOLEAN pair_cmp(sorted_pair_node* a,sorted_pair_node* b);
 template <class len_type, class set_type>  int pos_helper(kStrategy strat, poly p, len_type len, set_type setL, polyset set);
-static int add_to_reductors(slimgb_alg* c, poly h, int len, BOOLEAN simplified=FALSE);
+static int add_to_reductors(slimgb_alg* c, poly h, int len, int ecart, BOOLEAN simplified=FALSE);
 static int bucket_guess(kBucket* bucket);
 static poly redNFTail (poly h,const int sl,kStrategy strat, int len);
 static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n=0);
@@ -251,8 +251,10 @@ class simple_reducer:public reduction_step{
   poly p;
   kBucket_pt fill_back;
   int p_len;
-  simple_reducer(poly p, int p_len, slimgb_alg* c =NULL){
+  int reducer_deg;
+  simple_reducer(poly p, int p_len,int reducer_deg, slimgb_alg* c =NULL){
     this->p=p;
+    this->reducer_deg=reducer_deg;
     assume(p_len==pLength(p));
     this->p_len=p_len;
     this->c=c;
