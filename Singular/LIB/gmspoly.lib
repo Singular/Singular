@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmspoly.lib,v 1.14 2006-08-02 15:40:50 Singular Exp $";
+version="$Id: gmspoly.lib,v 1.15 2006-11-09 08:59:53 Singular Exp $";
 category="Singularities";
 
 info="
@@ -55,7 +55,7 @@ static proc maxdegree(matrix A)
 
 proc isTame(poly f)
 "USAGE:    isTame(f); poly f
-ASSUME: basering has no variables named w(1),w(2),...
+ASSUME:   basering has no variables named w(1),w(2),...
 RETURN:
 @format
 int k=
@@ -489,11 +489,8 @@ EXAMPLE:  example goodBasis; shows examples
     while(size(B)<mu||size(B0)<mu||maxdegree(b)+deg(f)>k)
     {
       k++;
-
       K=K,K0;
-      M=M,M0;
       K0=K0*X;
-      M0=M0*X;
 
       B=0;
       while(size(B)==0||size(B)>mu)
@@ -507,6 +504,8 @@ EXAMPLE:  example goodBasis; shows examples
           }
         }
         L0=L0*X;
+        M=M,M0;
+        M0=M0*X;
 
         K1=coeffs(K,K,product(X));
         L1=std(coeffs(L,M,product(X)));
