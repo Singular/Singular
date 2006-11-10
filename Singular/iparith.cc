@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.417 2006-11-09 12:56:57 Singular Exp $ */
+/* $Id: iparith.cc,v 1.418 2006-11-10 18:12:01 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -5562,6 +5562,12 @@ static BOOLEAN jjSTATUS3(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjSTD_HILB_W(leftv res, leftv u, leftv v, leftv w)
 {
+  intvec *vw=(intvec *)w->Data(); // weights of vars
+  if (vw->length()!=currRing->N)
+  {
+    Werror("%d weights for %d variables",vw->length(),currRing->N);
+    return TRUE;
+  }
   ideal result;
   intvec *ww=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   tHomog hom=testHomog;
@@ -5585,7 +5591,7 @@ static BOOLEAN jjSTD_HILB_W(leftv res, leftv u, leftv v, leftv w)
               &ww,                  // module weights
               (intvec *)v->Data(),  // hilbert series
               0,0,                  // syzComp, newIdeal
-              (intvec *)w->Data()); // weights of vars
+              vw);                  // weights of vars
   idSkipZeroes(result);
   res->data = (char *)result;
   setFlag(res,FLAG_STD);
@@ -7951,6 +7957,7 @@ int iiInitArithmetic()
   //iiArithRemoveCmd("mygcd");
   //iiArithAddCmd("kkk", 1, 1234, CMD_1);
 #endif   /* !GENTABLE */
+  return 0;
 }
 
 /*---------------------------------------------------------------------*/
