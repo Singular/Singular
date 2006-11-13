@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ring.lib,v 1.28 2006-11-09 09:00:09 Singular Exp $";
+version="$Id: ring.lib,v 1.29 2006-11-13 11:36:31 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -560,17 +560,18 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc ord_test (r)
-"USAGE:   ord_test(r);  r ring
+"USAGE:   ord_test(r);  r ring/qring
 RETURN:  int 1 (resp. -1, resp. 0) if ordering of r is global (resp. local,
          resp. mixed)
 EXAMPLE: example ord_test; shows an example
 "
 {
-   if (typeof(r) != "ring")
+   if ((typeof(r) != "ring") or (typeof(r) != "qring"))
    {
       "// ord_test requires a ring as input";
       return();
    }
+   if (attrib(r,"global")==1) { return(1);}
    def BAS = basering;
    setring r;
    poly f;
