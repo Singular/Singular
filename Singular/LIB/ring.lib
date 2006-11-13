@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ring.lib,v 1.29 2006-11-13 11:36:31 Singular Exp $";
+version="$Id: ring.lib,v 1.30 2006-11-13 12:45:14 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -566,10 +566,9 @@ RETURN:  int 1 (resp. -1, resp. 0) if ordering of r is global (resp. local,
 EXAMPLE: example ord_test; shows an example
 "
 {
-   if ((typeof(r) != "ring") or (typeof(r) != "qring"))
+   if ((typeof(r) != "ring") and (typeof(r) != "qring"))
    {
-      "// ord_test requires a ring as input";
-      return();
+      ERROR("ord_test requires a ring/qring as input");
    }
    if (attrib(r,"global")==1) { return(1);}
    def BAS = basering;
