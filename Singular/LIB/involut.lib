@@ -1,4 +1,4 @@
-version="$Id: involut.lib,v 1.9 2006-09-27 00:42:54 levandov Exp $";
+version="$Id: involut.lib,v 1.10 2006-11-13 11:35:28 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  involut.lib  Procedures for Computations and Operations with Involutions
@@ -678,7 +678,7 @@ RETURN: a ring together with a list of pairs L, where
 @*        L[i][1]  =  Groebner Basis of an i-th associated prime,
 @*        L[i][2]  =  matrix, defining a linear map, with entries, reduced with respect to L[i][1]
 PURPOSE: computes the ideal of linear automorphisms of the basering, given by a matrix, n-th power of which gives identity (i.e. unipotent matrix)
-NOTE: if n=0, a matrix, defining an automorphism is not assumed to be unipotent but just non-degenerate. A nonzero parameter @code{@p} is introduced as the value of the determinant of the matrix above.
+NOTE: if n=0, a matrix, defining an automorphism is not assumed to be unipotent but just non-degenerate. A nonzero parameter @code{@@p} is introduced as the value of the determinant of the matrix above.
 @* For convenience, the full ideal of relations @code{idJ} and the initial matrix with indeterminates @code{matD} are mutually exported in the output ring
 SEE ALSO: findInvo
 EXAMPLE: example findAuto; shows examples
