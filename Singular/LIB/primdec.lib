@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.127 2006-11-08 13:45:02 Singular Exp $";
+version="$Id: primdec.lib,v 1.128 2006-11-13 12:57:33 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -2323,7 +2323,7 @@ NOTE:    An embedded component q (primary ideal) of i can be replaced in the
 EXAMPLE:example equidim; shows an example
 "
 {
-  if(ord_test(basering)!=1)
+  if(attrib(basering,"global")!=1)
   {
       ERROR(
       "// Not implemented for this ordering, please change to global ordering."
@@ -2429,7 +2429,7 @@ RETURN:  ideal of equidimensional locus (of maximal dimension) of i.
 EXAMPLE: example equidimMax; shows an example
 "
 {
-  if(ord_test(basering)!=1)
+  if(attrib(basering,"global")!=1)
   {
       ERROR(
       "// Not implemented for this ordering, please change to global ordering."
@@ -3798,7 +3798,7 @@ NOTE:    Uses the algorithm of Eisenbud/Huneke/Vasconcelos, which
 EXAMPLE: example radicalEHV; shows an example
 "
 {
-   if(ord_test(basering)!=1)
+   if(attrib(basering,"global")!=1)
    {
       ERROR(
       "// Not implemented for this ordering, please change to global ordering."
@@ -5079,7 +5079,7 @@ NOTE:    Algorithm of Gianni/Trager/Zacharias.
 EXAMPLE: example primdecGTZ; shows an example
 "
 {
-   if(ord_test(basering)!=1)
+   if(attrib(basering,"global")!=1)
    {
       ERROR(
       "// Not implemented for this ordering, please change to global ordering."
@@ -5131,7 +5131,7 @@ EXAMPLE: example absPrimdecGTZ; shows an example
            +"characteristic 0");
   }
 
-   if(ord_test(basering)!=1)
+   if(attrib(basering,"global")!=1)
    {
       ERROR(
       "// Not implemented for this ordering, please change to global ordering."
@@ -5230,7 +5230,7 @@ NOTE:    Algorithm of Shimoyama/Yokoyama.
 EXAMPLE: example primdecSY; shows an example
 "
 {
-   if(ord_test(basering)!=1)
+   if(attrib(basering,"global")!=1)
    {
       ERROR(
       "// Not implemented for this ordering, please change to global ordering."
@@ -5307,7 +5307,7 @@ EXAMPLE: example minAssGTZ; shows an example
      }
    }
 
-   if(ord_test(basering)!=1)
+   if(attrib(basering,"global")!=1)
    {
       ERROR(
       "// Not implemented for this ordering, please change to global ordering."
@@ -5344,7 +5344,7 @@ NOTE:    If c=0, the given ordering of the variables is used. @*
 EXAMPLE: example minAssChar; shows an example
 "
 {
-   if(ord_test(basering)!=1)
+   if(attrib(basering,"global")!=1)
    {
       ERROR(
       "// Not implemented for this ordering, please change to global ordering."
@@ -5373,13 +5373,13 @@ NOTE:    A combination of the algorithms of Krick/Logar (with modifications by L
 EXAMPLE: example equiRadical; shows an example
 "
 {
-   if(ord_test(basering)!=1)
-   {
-      ERROR(
-      "// Not implemented for this ordering, please change to global ordering."
-      );
-   }
-   return(radical(i, 1));
+  if(attrib(basering,"global")!=1)
+  {
+     ERROR(
+     "// Not implemented for this ordering, please change to global ordering."
+     );
+  }
+  return(radical(i, 1));
 }
 example
 { "EXAMPLE:";  echo = 2;
@@ -5407,133 +5407,139 @@ NOTE:    A combination of the algorithms of Krick/Logar (with modifications by L
 EXAMPLE: example radical; shows an example
 "
 {
-   dbprint(printlevel - voice, "Radical, version 2006.05.08");
-   if(ord_test(basering)!=1)
-   {
-      ERROR(
-      "// Not implemented for this ordering, please change to global ordering."
-      );
-   }
-   if(size(i) == 0){return(ideal(0));}
-   int j;
-   def P0 = basering;
-   list Pl=ringlist(P0);
-   intvec dp_w;
-   for(j=nvars(P0);j>0;j--) {dp_w[j]=1;}
-   Pl[3]=list(list("dp",dp_w),list("C",0));
-   def @P=ring(Pl);
-   setring @P;
-   ideal i=imap(P0,i);
+  dbprint(printlevel - voice, "Radical, version 2006.05.08");
+  if(attrib(basering,"global")!=1)
+  {
+     ERROR(
+     "// Not implemented for this ordering, please change to global ordering."
+     );
+  }
+  if(size(i) == 0){return(ideal(0));}
+  int j;
+  def P0 = basering;
+  list Pl=ringlist(P0);
+  intvec dp_w;
+  for(j=nvars(P0);j>0;j--) {dp_w[j]=1;}
+  Pl[3]=list(list("dp",dp_w),list("C",0));
+  def @P=ring(Pl);
+  setring @P;
+  ideal i=imap(P0,i);
 
-   int il;
-   string algorithm;
-   int useFac;
+  int il;
+  string algorithm;
+  int useFac;
 
-   // Set input parameters
-   algorithm = "SL";                                 // Default: SL algorithm
-   il = 0;                                           // Default: Full radical (not only equiRadical)
-   if (homog(i) == 1) {   // Default: facStd is used, except if the ideal is homogeneous.
-      useFac = 0;
-   } else {
-      useFac = 1;
-   }
-   if(size(#) > 0){
-      int valid;
-      for(j = 1; j <= size(#); j++){
-         valid = 0;
-         if((typeof(#[j]) == "int") or (typeof(#[j]) == "number"))
-         {
-            il = #[j];          // If il == 1, equiRadical is computed
-            valid = 1;
-         }
-         if(typeof(#[j]) == "string"){
-            if(#[j] == "KL") {
-               algorithm = "KL";
-               valid = 1;}
-            if(#[j] == "SL") {
-               algorithm = "SL";
-               valid = 1;}
-            if(#[j] == "noFacstd") {
-               useFac = 0;
-               valid = 1;}
-            if(#[j] == "facstd") {
-               useFac = 1;
-               valid = 1;}
-            if(#[j] == "equiRad") {
-               il = 1;
-               valid = 1;}
-            if(#[j] == "fullRad") {
-               il = 0;
-               valid = 1;}
-         }
-         if(valid == 0)
-         {
-            dbprint(1, "Warning! The following input parameter was not recognized:", #[j]);
-         }
-      }
-   }
-
-   ideal rad = 1;
-   intvec op = option(get);
-   list qr = simplifyIdeal(i);
-   map phi = @P, qr[2];
-
-   option(redSB);
-   i = groebner(qr[1]);
-   option(set, op);
-   int di = dim(i);
-
-   if(di == 0)
-   {
-      i = zeroRad(i, qr[1]);
-      i=interred(phi(i));
-      setring(P0);
-      i=imap(@P,i);
-      return(i);
-   }
-
-   option(redSB);
-   list pr;
-   if(useFac == 1)
-   {
-      pr = facstd(i);
-   } else {
-      pr = i;
-   }
-   option(set, op);
-   int s = size(pr);
-   if(useFac == 1) {
-      dbprint(printlevel - voice, "Number of components returned by facstd: ", s);
-   }
-   for(j = 1; j <= s; j++)
-   {
-      attrib(pr[s + 1 - j], "isSB", 1);
-      if((size(reduce(rad, pr[s + 1 - j], 1)) != 0) && ((dim(pr[s + 1 - j]) == di) || !il))
+  // Set input parameters
+  algorithm = "SL";                                 // Default: SL algorithm
+  il = 0;                                           // Default: Full radical (not only equiRadical)
+  if (homog(i) == 1)
+  {   // Default: facStd is used, except if the ideal is homogeneous.
+     useFac = 0;
+  } else {
+     useFac = 1;
+  }
+  if(size(#) > 0){
+    int valid;
+    for(j = 1; j <= size(#); j++)
+    {
+      valid = 0;
+      if((typeof(#[j]) == "int") or (typeof(#[j]) == "number"))
       {
-         // SL Debug messages
-         dbprint(printlevel-voice, "We shall compute the radical of ", pr[s + 1 - j]);
-         dbprint(printlevel-voice, "The dimension is: ", dim(pr[s+1-j]));
-
-         if(algorithm == "KL") {
-            rad = intersect(rad, radicalKL(pr[s + 1 - j], rad, il));
-         }
-         if(algorithm == "SL") {
-            rad = intersect(rad, radicalSL(pr[s + 1 - j], il));
-         }
-      } else
-      {
-         // SL Debug
-         dbprint(printlevel-voice, "The radical of this component is not needed.");
-         dbprint(printlevel-voice, "size(reduce(rad, pr[s + 1 - j], 1))",
-                 size(reduce(rad, pr[s + 1 - j], 1)));
-         dbprint(printlevel-voice, "dim(pr[s + 1 - j])", dim(pr[s + 1 - j]));
-         dbprint(printlevel-voice, "il", il);
+        il = #[j];          // If il == 1, equiRadical is computed
+        valid = 1;
       }
-   }
-   rad=interred(phi(rad));
-   setring(P0);
-   i=imap(@P,rad);
-   return(i);
+      if(typeof(#[j]) == "string"){
+        if(#[j] == "KL") {
+          algorithm = "KL";
+          valid = 1;
+        }
+        if(#[j] == "SL") {
+          algorithm = "SL";
+          valid = 1;
+        }
+        if(#[j] == "noFacstd") {
+          useFac = 0;
+          valid = 1;}
+        if(#[j] == "facstd") {
+          useFac = 1;
+          valid = 1;}
+        if(#[j] == "equiRad") {
+          il = 1;
+          valid = 1;}
+        if(#[j] == "fullRad") {
+          il = 0;
+          valid = 1;}
+      }
+      if(valid == 0)
+      {
+        dbprint(1, "Warning! The following input parameter was not recognized:", #[j]);
+      }
+    }
+  }
+
+  ideal rad = 1;
+  intvec op = option(get);
+  list qr = simplifyIdeal(i);
+  map phi = @P, qr[2];
+
+  option(redSB);
+  i = groebner(qr[1]);
+  option(set, op);
+  int di = dim(i);
+
+  if(di == 0)
+  {
+    i = zeroRad(i, qr[1]);
+    i=interred(phi(i));
+    setring(P0);
+    i=imap(@P,i);
+    return(i);
+  }
+
+  option(redSB);
+  list pr;
+  if(useFac == 1)
+  {
+    pr = facstd(i);
+  } else {
+    pr = i;
+  }
+  option(set, op);
+  int s = size(pr);
+  if(useFac == 1) {
+    dbprint(printlevel - voice, "Number of components returned by facstd: ", s);
+  }
+  for(j = 1; j <= s; j++)
+  {
+    attrib(pr[s + 1 - j], "isSB", 1);
+    if((size(reduce(rad, pr[s + 1 - j], 1)) != 0) && ((dim(pr[s + 1 - j]) == di) || !il))
+    {
+      // SL Debug messages
+      dbprint(printlevel-voice, "We shall compute the radical of ", pr[s + 1 - j]);
+      dbprint(printlevel-voice, "The dimension is: ", dim(pr[s+1-j]));
+
+      if(algorithm == "KL")
+      {
+        rad = intersect(rad, radicalKL(pr[s + 1 - j], rad, il));
+      }
+      if(algorithm == "SL") {
+        rad = intersect(rad, radicalSL(pr[s + 1 - j], il));
+      }
+    }
+    else
+    {
+      // SL Debug
+      dbprint(printlevel-voice, "The radical of this component is not needed.");
+      dbprint(printlevel-voice, "size(reduce(rad, pr[s + 1 - j], 1))",
+              size(reduce(rad, pr[s + 1 - j], 1)));
+      dbprint(printlevel-voice, "dim(pr[s + 1 - j])", dim(pr[s + 1 - j]));
+      dbprint(printlevel-voice, "il", il);
+    }
+  }
+  rad=interred(phi(rad));
+  setring(P0);
+  i=imap(@P,rad);
+  return(i);
 }
 example
 { "EXAMPLE:";  echo = 2;
@@ -6120,7 +6126,7 @@ NOTE:    Uses algorithm of Eisenbud/Huneke/Vasconcelos.
 EXAMPLE: example prepareAss; shows an example
 "
 {
-  if(ord_test(basering)!=1)
+  if(attrib(basering,"global")!=1)
   {
       ERROR(
       "// Not implemented for this ordering, please change to global ordering."
@@ -6168,7 +6174,7 @@ NOTE:    Uses algorithm of Eisenbud, Huneke and Vasconcelos.
 EXAMPLE: example equidimMaxEHV; shows an example
 "
 {
-  if(ord_test(basering)!=1)
+  if(attrib(basering,"global")!=1)
   {
       ERROR(
       "// Not implemented for this ordering, please change to global ordering."
@@ -6236,98 +6242,98 @@ NOTE:    The algorithm (of Monico), works well only for a small total number
 EXAMPLE: example zerodec; shows an example
 "
 {
-   if(ord_test(basering)!=1)
-   {
-      ERROR(
-      "// Not implemented for this ordering, please change to global ordering."
-      );
-   }
-   def R=basering;
-   poly q;
-   int j,time;
-   matrix m;
-   list re;
-   poly va=var(1);
-   ideal J=groebner(I);
-   ideal ba=kbase(J);
-   int d=vdim(J);
-   dbprint(printlevel-voice+2,"// multiplicity of ideal : "+ string(d));
+  if(attrib(basering,"global")!=1)
+  {
+    ERROR(
+    "// Not implemented for this ordering, please change to global ordering."
+    );
+  }
+  def R=basering;
+  poly q;
+  int j,time;
+  matrix m;
+  list re;
+  poly va=var(1);
+  ideal J=groebner(I);
+  ideal ba=kbase(J);
+  int d=vdim(J);
+  dbprint(printlevel-voice+2,"// multiplicity of ideal : "+ string(d));
 //------ compute matrix of multiplication on R/I with generic element p -----
-   int e=nvars(basering);
-   poly p=randomLast(100)[e]+random(-50,50);     //the generic element
-   matrix n[d][d];
-   time = timer;
-   for(j=2;j<=e;j++)
-   {
-      va=va*var(j);
-   }
-   for(j=1;j<=d;j++)
-   {
-      q=reduce(p*ba[j],J);
-      m=coeffs(q,ba,va);
-      n[j,1..d]=m[1..d,1];
-   }
-   dbprint(printlevel-voice+2,
-      "// time for computing multiplication matrix (with generic element) : "+
-      string(timer-time));
+  int e=nvars(basering);
+  poly p=randomLast(100)[e]+random(-50,50);     //the generic element
+  matrix n[d][d];
+  time = timer;
+  for(j=2;j<=e;j++)
+  {
+    va=va*var(j);
+  }
+  for(j=1;j<=d;j++)
+  {
+    q=reduce(p*ba[j],J);
+    m=coeffs(q,ba,va);
+    n[j,1..d]=m[1..d,1];
+  }
+  dbprint(printlevel-voice+2,
+    "// time for computing multiplication matrix (with generic element) : "+
+    string(timer-time));
 //---------------- compute characteristic polynomial of matrix --------------
-   execute("ring P1=("+charstr(R)+"),T,dp;");
-   matrix n=imap(R,n);
-   time = timer;
-   poly charpol=det(n-T*freemodule(d));
-   dbprint(printlevel-voice+2,"// time for computing char poly: "+
-           string(timer-time));
+  execute("ring P1=("+charstr(R)+"),T,dp;");
+  matrix n=imap(R,n);
+  time = timer;
+  poly charpol=det(n-T*freemodule(d));
+  dbprint(printlevel-voice+2,"// time for computing char poly: "+
+         string(timer-time));
 //------------------- factorize characteristic polynomial -------------------
 //check first if constant term of charpoly is != 0 (which is true for
 //sufficiently generic element)
-   if(charpol[size(charpol)]!=0)
-   {
-     time = timer;
-     list fac=factor(charpol);
-     testFactor(fac,charpol);
-     dbprint(printlevel-voice+2,"// time for factorizing char poly: "+
-             string(timer-time));
-     int f=size(fac[1]);
+  if(charpol[size(charpol)]!=0)
+  {
+    time = timer;
+    list fac=factor(charpol);
+    testFactor(fac,charpol);
+    dbprint(printlevel-voice+2,"// time for factorizing char poly: "+
+            string(timer-time));
+    int f=size(fac[1]);
 //--------------------------- the irreducible case --------------------------
-     if(f==1)
-     {
-       setring R;
-       re=I;
-       return(re);
-     }
+    if(f==1)
+    {
+      setring R;
+      re=I;
+      return(re);
+    }
 //---------------------------- the reducible case ---------------------------
 //if f_i are the irreducible factors of charpoly, mult=ri, then <I,g_i^ri>
 //are the primary components where g_i = f_i(p). However, substituting p in
 //f_i may result in a huge object although the final result may be small.
 //Hence it is better to simultaneously reduce with I. For this we need a new
 //ring.
-     execute("ring P=("+charstr(R)+"),(T,"+varstr(R)+"),(dp(1),dp);");
-     list rfac=imap(P1,fac);
-     intvec ov=option(get);;
-     option(redSB);
-     list re1;
-     ideal new = T-imap(R,p),imap(R,J);
-     attrib(new, "isSB",1);    //we know that new is a standard basis
-     for(j=1;j<=f;j++)
-     {
-        re1[j]=reduce(rfac[1][j]^rfac[2][j],new);
-     }
-     setring R;
-     re = imap(P,re1);
-     for(j=1;j<=f;j++)
-     {
-        J=I,re[j];
-        re[j]=interred(J);
-     }
-     option(set,ov);
-     return(re);
+    execute("ring P=("+charstr(R)+"),(T,"+varstr(R)+"),(dp(1),dp);");
+    list rfac=imap(P1,fac);
+    intvec ov=option(get);;
+    option(redSB);
+    list re1;
+    ideal new = T-imap(R,p),imap(R,J);
+    attrib(new, "isSB",1);    //we know that new is a standard basis
+    for(j=1;j<=f;j++)
+    {
+      re1[j]=reduce(rfac[1][j]^rfac[2][j],new);
+    }
+    setring R;
+    re = imap(P,re1);
+    for(j=1;j<=f;j++)
+    {
+      J=I,re[j];
+      re[j]=interred(J);
+    }
+    option(set,ov);
+    return(re);
   }
   else
 //------------------- choice of generic element failed -------------------
   {
-     dbprint(printlevel-voice+2,"// try new generic element!");
-     setring R;
-     return(zerodec(I));
+    dbprint(printlevel-voice+2,"// try new generic element!");
+    setring R;
+    return(zerodec(I));
   }
 }
 example
