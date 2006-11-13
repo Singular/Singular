@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.cc,v 1.19 2006-09-25 12:33:36 Singular Exp $ */
+/* $Id: NTLconvert.cc,v 1.20 2006-11-13 14:12:45 Singular Exp $ */
 #include <config.h>
 
 #ifdef HAVE_SINGULAR
@@ -571,21 +571,13 @@ CFFList convertNTLvec_pair_GF2X_long2FacCFFList
 // OUTPUT: The converted Factory-integer of type canonicalform                //
 ////////////////////////////////////////////////////////////////////////////////
 
-static char *cf_stringtemp=NULL;
-static char *cf_stringtemp2=NULL;
+static char *cf_stringtemp;
+static char *cf_stringtemp2;
 static int cf_stringtemp_l=0;
 CanonicalForm convertZZ2CF(ZZ coefficient)
 {
   long coeff_long;
   //CanonicalForm tmp=0;
-  if (cf_stringtemp_l==0)
-  {
-    cf_stringtemp=(char *)Alloc(1023);
-    cf_stringtemp2=(char *)Alloc(1023);
-    cf_stringtemp[0]='\0';
-    cf_stringtemp2[0]='\0';
-    cf_stringtemp_l=1023;
-  }
   char dummy[2];
   int minusremainder=0;
   char numbers[]="0123456789abcdef";
@@ -603,6 +595,14 @@ CanonicalForm convertZZ2CF(ZZ coefficient)
   else
   {
     // coefficient is not immediate (gmp-number)
+    if (cf_stringtemp_l==0)
+    {
+      cf_stringtemp=(char *)Alloc(1023);
+      cf_stringtemp2=(char *)Alloc(1023);
+      cf_stringtemp[0]='\0';
+      cf_stringtemp2[0]='\0';
+      cf_stringtemp_l=1023;
+    }
 
     // convert coefficient to char* (input for gmp)
     dummy[1]='\0';
