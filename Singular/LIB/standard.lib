@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.82 2006-09-20 16:42:01 Singular Exp $";
+version="$Id: standard.lib,v 1.83 2006-11-13 10:15:34 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -7,6 +7,7 @@ LIBRARY: standard.lib   Procedures which are always loaded at Start-up
 PROCEDURES:
  stdfglm(ideal[,ord])   standard basis of ideal via fglm [and ordering ord]
  stdhilb(ideal[,h])     standard basis of ideal using the Hilbert function
+ hilbstd(ideal[,h])     standard basis using (weighted) Hilbert function
  groebner(ideal/module) standard basis using a heuristically chosen method
  res(ideal/module,[i])  free resolution of ideal or module
  sprintf(fmt,...)       returns fomatted string
@@ -137,7 +138,106 @@ example
 }
 //////////////////////////////////////////////////////////////////////////
 
+proc hilbstd(ideal i,list #)
+"SYNTAX: @code{stdhilb (} ideal_expression @code{)} @*
+         @code{stdhilb (} ideal_expression@code{,} intvec_expression @code{)}
+TYPE:    ideal
+PURPOSE: Computes a Groebner basis of the homogeneous ideal in the basering.
+THEORY:  Compute first a standard basis of the (weighted) homogenization
+         of the ideal, then the (weighted) Hilbert function and finally
+         a Groebner basis in the original ring by using the computed Hilbert
+         function@*
+         An optional second argument will be used as 1st Hilbert function.
+ASSUME:  The optional second argument is the first Hilbert series as computed
+         by @code{hilb}.
+NOTE:    This procedure makes stdhilb obsolet since it is a generalization
+         to rings with some variables having weights >1. Parameters are kept.
+SEE ALSO: stdfglm, std, groebner
+KEYWORDS: Hilbert function
+EXAMPLE: example hilbstd;  shows an example"
+{
+   def R=basering;
+   list lR = ringlist(R);
+   intvec v = size(lR[1..size(lR)]);   //size of lists lR[i] in lR
+   int n = nvars(R);
+   intvec w;                 //ringweights
+   int ii, neg;
+   for(ii=1; ii<=n; ii++)
+   {
+     w[ii]=deg(var(ii));
+     if(w[ii] <= 0)
+     {neg = 1;}
+   }
+//---------- exclude cases to which hilbstd should no be applied  ----------
+   if( homog(i) || find(ordstr(R),"s") || find(ordstr(R),"M")
+       || find(ordstr(R),"a") || (neg > 0) )
+   {
+      if((size(#)!=0) && homog(i))
+      {
+         return(std(i,#[1]));
+      }
+      return(std(i));
+   }
+
+//----------- create ring for fast computation of hilbert series --------
+   list lS=lR;
+   lS[2]=insert(lR[2],"@t",v[2]);
+   lS[3]=lR[3][1],lR[3][size(lR[3])];
+   intvec ww=w,1;
+   if(w==1)
+   {
+     lS[3][1]=list("dp",ww);
+   }
+   else
+   {
+     lS[3][1]=list("wp",ww);
+   }
+
+   def S = ring(lS);              //ring with one weighted block of variables
+   setring S;
+   ideal i = homog(imap(R,i),@t); //weighted homog of i
+   string s_opt = option();
+   int p_opt=(find(s_opt, "prot"));
+   if (p_opt) {"std in " + string(S);}
+   intvec h = hilb(std(i),1);     //compute weighted hilbert series of i
+
+//------------- use hilbert driven std with original ordering  ------------
+   setring R;                     //can access to lR only in R
+   lR[2]=lS[2];
+   lR[3]=insert(lR[3],list("dp",1),v[3]-1);
+   //insert a last block for homogenizing variabble
+
+   def T = ring(lR);             //T = R with 1 homogenizing variable @t
+   setring T;                    //added to last block with weight 1
+   ideal i=fetch(S,i);           //homogenized i in T
+
+   if (p_opt) {"std with hilb in " + string(T);}
+   ideal a=std(i,h,ww);           //use h from S and Hilbert driven std in T
+
+//-------------------- dehomogenize and simplify -------------------------
+   a=subst(a,@t,1);              //dehomogenize in T (do not use map!)
+   a=simplify(a,34);             //keep only a[j] with different leading terms
+
+//-------------------- back to original ring -------------------------
+   setring R;
+   ideal a = fetch(T,a);
+   attrib(a,"isSB",1);
+   return(a);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring  r=0,(x,y,z),(wp(43),wp(49,56));
+   ideal i=y3+x2,x2y+x2,x3-x2,z4-x2-y;
+   ideal i1=hilbstd(i); i1;
+   // the latter computation is equivalent to:
+   ring r1=0,(x,y,z),wp(43,49,56);
+   ideal i = imap(r,i);
+   intvec v=hilb(std(i),1);
+   setring r;
+   ideal i2 = hilbstd(i,v);
+}
 //////////////////////////////////////////////////////////////////////////
+
 proc groebner(def i, list #)
 "SYNTAX: @code{groebner (} ideal_expression @code{)} @*
          @code{groebner (} module_expression @code{)} @*
@@ -219,28 +319,36 @@ EXAMPLE: example groebner;  shows an example"
             int groebner_error = 1;
             export groebner_error;
           }
-          "// ** groebner did not finish";
+          "** groebner did not finish";
           j = system("sh", "kill " + string(pid));
         }
         return (result);
       }
       else
       {
-        "// ** groebner needs int as 2nd arg";
+        "** groebner needs int as 2nd arg";
       }
     }
     else
     {
-      "// ** groebner with two args is not supported in this configuration";
+      "** groebner with two args is not supported in this configuration";
     }
   }
 
   // we are still here -- do the actual computation
   string ordstr_P = ordstr(P);
-  if ((find(ordstr_P,"s") > 0)
+  int nvarP = nvars(P);
+  intvec w;                     //ringweights
+  int neg,k;
+  for(k=1;  k<=nvarP; k++)
+  {
+     w[k]=deg(var(k));
+     if(w[k] <= 0) {neg=1;}
+  }
+  if ( ( find(ordstr_P,"s") > 0)
   ||(find(ordstr_P,"M") > 0)
-  ||(find(ordstr_P,"w") > 0)
-  ||(find(ordstr_P,"W") > 0))
+  ||(find(ordstr_P,"a") > 0)
+  ||(neg>0) )
   {
     //spaeter den lokalen fall ueber lp oder aehnlich behandeln
     return(std(i));
@@ -255,7 +363,7 @@ EXAMPLE: example groebner;  shows an example"
      if((char(P)==0) && (system("nblocks") <= 2) && (find(ordstr_P,"dp")>0))
      { return(slimgb(i)); }
   }
-  // for module case, not already handled by slimgb:
+  // for module case, not already hadled by slimgb:
   if (nrows(i)>1)
   { return(std(i)); }
   int IsSimple_P;
@@ -302,8 +410,6 @@ EXAMPLE: example groebner;  shows an example"
 
   list BRlist = ringlist(P);
   int add_vars = 0;
-  int nvarP = nvars(P);
-  int k;
   ideal Qideal = ideal(P);
 
   if (npars_P > 0)
@@ -340,14 +446,25 @@ EXAMPLE: example groebner;  shows an example"
   // save ordering for later use
   list ord_P = BRlist[3];   // should be ring independent
 
-  // ordering is set to (dp, C)
-  intvec weight_dp = 1;
-  for (k=2; k<=nvarP+add_vars; k++) { weight_dp = weight_dp,1; }
+  //ordering is set to (wp(w,1..1), C) where w are the ringweights
+    intvec weight_wp = w;
+  for(k=nvarP+1;  k<=nvarP+add_vars; k++)
+  {
+     weight_wp[k]=1;
+  }
+
   BRlist[3] = list();
-  BRlist[3][1]=list("dp",weight_dp);
+  if(weight_wp==1)
+  {
+    BRlist[3][1]=list("dp",weight_wp);
+  }
+  else
+  {
+    BRlist[3][1]=list("wp",weight_wp);
+  }
   BRlist[3][2]=list("C",intvec(0));
 
-  // change the ring
+  //------------ change the ring
   def Phelp = ring(BRlist);
   kill BRlist;
   setring Phelp;
@@ -373,13 +490,15 @@ EXAMPLE: example groebner;  shows an example"
   if (add_vars == 0)
   {
     // no additional variables were introduced
-    setring P; // can immediately change to original ring
-    // simply compute std with hilbert series in original ring
+    setring P;  // can immediately change to original ring
+                // simply compute std with hilbert series in original ring
     if (p_opt)
     {
       "std with hilb in basering";
     }
-    i = std(i, hi);
+    if ( w==1 ) { i = std(i,hi); }
+    else { i = std(i,hi,w); }
+
   }
   else
   {
@@ -387,35 +506,37 @@ EXAMPLE: example groebner;  shows an example"
     // need another intermediate ring
     list BRlist = ringlist(Phelp);
     BRlist[3] = list();
-    for (k=1; k<=size(ord_P); k++)
+    for (k=1; k<=size(ord_P)-1; k++)
     {
       BRlist[3][k] = ord_P[k];
     }
 
-    if ( IsSimple_P && (add_vars==1) && (size(ord_P)==2) && (ord_P[1][1]=="lp") )
+    if( IsSimple_P && (add_vars==1) && (size(ord_P)==2) && (ord_P[1][1]=="lp"))
     {
       // for lp with at most one parameter, we do not need a block ordering
       intvec OW = BRlist[3][1][2];
       OW = OW,1;
-      BRlist[3][1][2] = OW;
+      BRlist[3][1][2] = OW; // extend block1 by 1
+      BRlist[3][2]=ord_P[2]; // copy block 2
     }
     else
     {
-      if ( IsSimple_P && (add_vars==1) && (size(ord_P)==2) && (ord_P[2][1]=="lp") )
+      if( IsSimple_P && (add_vars==1) && (size(ord_P)==2)&&(ord_P[2][1]=="lp"))
       {
         // for lp with at most one parameter, we do not need a block ordering
-        intvec OW = BRlist[3][2][2];
+        intvec OW = ord_P[2][2];
         OW = OW,1;
-        BRlist[3][2][2] = OW;
+	BRlist[3][2]=ord_P[2];
+        BRlist[3][2][2] = OW; // extend block 2 by 1
       }
       else
       {
         intvec OW = 1;
         for (k=2; k<=add_vars; k++) { OW = OW,1; }
-        BRlist[3][size(ord_P)+1] = list("dp",OW);
+        BRlist[3][size(ord_P)] = list("dp",OW);
+        BRlist[3][size(BRlist[3])+1]=ord_P[size(ord_P)];
       }
     }
-
     // change to intermediate ring
     def Phelp1 = ring(BRlist);
     setring Phelp1;
@@ -424,10 +545,12 @@ EXAMPLE: example groebner;  shows an example"
     kill Phelp;
     if (p_opt)
     {
-      "std with hilb in " + string(Phelp1);
+      "std with hilb in " + string(Phelp1);;
     }
     // compute std with Hilbert series
-    qh = std(qh, hi);
+    if (weight_wp==1) { qh = std(qh, hi);}
+    else { qh = std(qh, hi, weight_wp);}
+
     // subst 1 for homogenizing var
     if (!is_homog)
     {
@@ -468,7 +591,7 @@ EXAMPLE: example groebner;  shows an example"
   return (i);
 }
 example
-{ "EXAMPLE: "; echo=2;
+{ "EXAMPLE: "; echo=2; // LIB "./standard.lib";
   ring r=0,(a,b,c,d),lp;
   option(prot);
   ideal i=a+b+c+d,ab+ad+bc+cd,abc+abd+acd+bcd,abcd-1; // cyclic 4
@@ -480,6 +603,8 @@ example
   if (system("with","MP")) {groebner(i,0);}
   defined(Standard::groebner_error);
 }
+
+//////////////////////////////////////////////////////////////////////////
 
 proc res(list #)
 "@c we do texinfo here:
