@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.76 2006-11-16 16:07:49 Singular Exp $ */
+/* $Id: ipid.cc,v 1.77 2006-11-16 16:08:58 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -443,40 +443,16 @@ void killhdl(idhdl h)
     killhdl2(h,&currRing->idroot,currRing);
   else
   {
-//#ifdef HAVE_NS
-//    if(t==PACKAGE_CMD)
-//    {
-//      killhdl2(h,&(basePack->idroot),NULL);
-//    }
-//    else
-//    {
-//      idhdl s=currPack->idroot;
-//      while ((s!=h) && (s!=NULL)) s=s->next;
-//      if (s!=NULL)
-//        killhdl2(h,&(currPack->idroot),NULL);
-//      else if (basePack!=currPack)
-//      {
-//        idhdl s=basePack->idroot;
-//        while ((s!=h) && (s!=NULL)) s=s->next;
-//        if (s!=NULL)
-//          killhdl2(h,&(basePack->idroot),currRing);
-//        else
-//          killhdl2(h,&(currRing->idroot),currRing);
-//       }
-//    }
-//#else /* HAVE_NS */
     {
       idhdl s=IDROOT;
       while ((s!=h) && (s!=NULL)) s=s->next;
       if (s==NULL) killhdl2(h,&(currRing->idroot),currRing);
       else killhdl2(h,&IDROOT,currRing);
     }
-//#endif /* HAVE_NS */
   }
 }
-#endif
-
-#ifdef HAVE_NS
+#else 
+//#ifdef HAVE_NS
 void killhdl(idhdl h, package proot)
 {
   int t=IDTYP(h);
