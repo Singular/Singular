@@ -2,7 +2,7 @@
 //anne, added deleteSublist and watchdog 12.12.2000
 //eric, added absValue 11.04.2002
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.51 2006-11-16 10:55:58 Singular Exp $";
+version="$Id: general.lib,v 1.52 2006-11-16 14:57:17 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -958,7 +958,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc lsum (int n, list l)
+static proc lsum (int n, list l)
 { if (n>10)
   { return( lsum(n/2,list(l[1..(n/2)])) + lsum(n-n/2, list(l[(n/2+1)..n])) );
   }
