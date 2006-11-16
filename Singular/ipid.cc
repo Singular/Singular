@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.75 2006-05-29 16:10:50 Singular Exp $ */
+/* $Id: ipid.cc,v 1.76 2006-11-16 16:07:49 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -434,50 +434,54 @@ void killid(char * id, idhdl * ih)
     Werror("kill what ?");
 }
 
+#ifndef HAVE_NS
 void killhdl(idhdl h)
 {
   int t=IDTYP(h);
-  if ((BEGIN_RING<t) && (t<END_RING) && (t!=QRING_CMD))
+  if (((BEGIN_RING<t) && (t<END_RING) && (t!=QRING_CMD))
+  || ((t==LIST_CMD) && (lRingDependend((lists)IDDATA(h)))))
     killhdl2(h,&currRing->idroot,currRing);
   else
   {
-#ifdef HAVE_NS
-    if(t==PACKAGE_CMD)
-    {
-      killhdl2(h,&(basePack->idroot),NULL);
-    }
-    else
-    {
-      idhdl s=currPack->idroot;
-      while ((s!=h) && (s!=NULL)) s=s->next;
-      if (s!=NULL)
-        killhdl2(h,&(currPack->idroot),NULL);
-      else if (basePack!=currPack)
-      {
-        idhdl s=basePack->idroot;
-        while ((s!=h) && (s!=NULL)) s=s->next;
-        if (s!=NULL)
-          killhdl2(h,&(basePack->idroot),currRing);
-        else
-          killhdl2(h,&(currRing->idroot),currRing);
-       }
-    }
-#else /* HAVE_NS */
+//#ifdef HAVE_NS
+//    if(t==PACKAGE_CMD)
+//    {
+//      killhdl2(h,&(basePack->idroot),NULL);
+//    }
+//    else
+//    {
+//      idhdl s=currPack->idroot;
+//      while ((s!=h) && (s!=NULL)) s=s->next;
+//      if (s!=NULL)
+//        killhdl2(h,&(currPack->idroot),NULL);
+//      else if (basePack!=currPack)
+//      {
+//        idhdl s=basePack->idroot;
+//        while ((s!=h) && (s!=NULL)) s=s->next;
+//        if (s!=NULL)
+//          killhdl2(h,&(basePack->idroot),currRing);
+//        else
+//          killhdl2(h,&(currRing->idroot),currRing);
+//       }
+//    }
+//#else /* HAVE_NS */
     {
       idhdl s=IDROOT;
       while ((s!=h) && (s!=NULL)) s=s->next;
       if (s==NULL) killhdl2(h,&(currRing->idroot),currRing);
       else killhdl2(h,&IDROOT,currRing);
     }
-#endif /* HAVE_NS */
+//#endif /* HAVE_NS */
   }
 }
+#endif
 
 #ifdef HAVE_NS
 void killhdl(idhdl h, package proot)
 {
   int t=IDTYP(h);
-  if ((BEGIN_RING<t) && (t<END_RING) && (t!=QRING_CMD))
+  if (((BEGIN_RING<t) && (t<END_RING) && (t!=QRING_CMD))
+  || ((t==LIST_CMD) && (lRingDependend((lists)IDDATA(h)))))
     killhdl2(h,&currRing->idroot,currRing);
   else
   {
