@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.8 2006-11-17 14:31:06 Singular Exp $ */
+/* $Id: matpol.cc,v 1.9 2006-11-17 15:35:48 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -193,7 +193,6 @@ matrix mpSub(matrix a, matrix b)
 matrix mpMult(matrix a, matrix b)
 {
   int i, j, k;
-  poly s, t, aik, bkj;
   int m = MATROWS(a);
   int p = MATCOLS(a);
   int q = MATCOLS(b);
@@ -210,22 +209,28 @@ matrix mpMult(matrix a, matrix b)
 
   for (i=1; i<=m; i++)
   {
-    for (j=1; j<=q; j++)
+    for (k=1; k<=p; k++)
     {
-      t = NULL;
-      for (k=1; k<=p; k++)
+      poly aik;
+      if ((aik=MATELEM(a,i,k))!=NULL)
       {
-	poly a_p, b_p;
-        if (((a_p=MATELEM(a,i,k))!=NULL) && ((b_p=MATELEM(b,k,j))!=NULL))
+        for (j=1; j<=q; j++)
         {
-          s = ppMult_qq(a_p /*MATELEM(a,i,k)*/, b_p/*MATELEM(b,k,j)*/);
-          t = pAdd(t,s);
+          poly bkj;
+          if ((bkj=MATELEM(b,k,j))!=NULL)
+          {
+	    poly *cij=&(MATELEM(c,i,j));
+            poly s = ppMult_qq(aik /*MATELEM(a,i,k)*/, bkj/*MATELEM(b,k,j)*/);
+            if (/*MATELEM(c,i,j)*/ (*cij)==NULL) (*cij)=s;
+            else (*cij) = pAdd((*cij) /*MATELEM(c,i,j)*/ ,s);
+          }
         }
       }
-      pNormalize(t);
-      MATELEM(c,i,j) = t;
+    //  pNormalize(t);
+    //  MATELEM(c,i,j) = t;
     }
   }
+  for(i=m*q-1;i>=0;i--) pNormalize(c->m[i]);
   return c;
 }
 
