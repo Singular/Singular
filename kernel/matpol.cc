@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.6 2006-10-17 16:24:45 Singular Exp $ */
+/* $Id: matpol.cc,v 1.7 2006-11-17 14:17:16 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -215,9 +215,10 @@ matrix mpMult(matrix a, matrix b)
       t = NULL;
       for (k=1; k<=p; k++)
       {
-        if ((MATELEM(a,i,k)!=NULL) && (MATELEM(b,k,j)!=NULL))
+	poly a_p, b_p;
+        if (((a_p=MATELEM(a,i,k))!=NULL) || ((b_p=MATELEM(b,k,j))!=NULL))
         {
-          s = ppMult_qq(MATELEM(a,i,k), MATELEM(b,k,j));
+          s = ppMult_qq(a_p /*MATELEM(a,i,k)*/, b_p/*MATELEM(b,k,j)*/);
           t = pAdd(t,s);
         }
       }
