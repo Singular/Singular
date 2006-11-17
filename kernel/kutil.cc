@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.35 2006-11-07 10:16:50 wienand Exp $ */
+/* $Id: kutil.cc,v 1.36 2006-11-17 14:48:40 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2677,8 +2677,7 @@ void reorderS (int* suc,kStrategy strat)
 
 /*2
 *looks up the position of p in set
-*set[0] is the smallest with respect to the ordering-procedure
-*pComp
+*set[0] is the smallest with respect to the ordering-procedure deg/pComp
 * Assumption: posInS only depends on the leading term
 *             otherwise, bba has to be changed
 */
@@ -2693,7 +2692,9 @@ int posInS (const kStrategy strat, const int length,const poly p,
   int cmp_int = pOrdSgn;
   int pc=pGetComp(p);
   if ((currRing->MixedOrder)
-  //|| (strat->ak>0)
+#if 0
+  || ((strat->ak>0) && ((currRing->order[0]==ringorder_c)||((currRing->order[0]==ringorder_C))))
+#endif
   )
   {
     int o=pWTotaldegree(p);
