@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.20 2006-06-28 15:06:49 Singular Exp $ */
+/* $Id: ideals.cc,v 1.21 2006-11-17 14:31:07 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2719,7 +2719,7 @@ ideal idVec2Ideal(poly vec)
    return result;
 }
 
-// #define NEW_STUFF
+//#define NEW_STUFF
 #ifndef NEW_STUFF
 // converts mat to module, destroys mat
 ideal idMatrix2Module(matrix mat)
@@ -2760,7 +2760,7 @@ ideal idMatrix2Module(matrix mat)
   int i,j, l;
   poly h;
   poly p;
-  sBucket_pt bucket = sBucketInit(currRing);
+  sBucket_pt bucket = sBucketCreate(currRing);
 
   for(j=0;j<mc /*MATCOLS(mat)*/;j++) /* j is also index in result->m */
   {
@@ -2770,12 +2770,13 @@ ideal idMatrix2Module(matrix mat)
       if (h!=NULL)
       {
         MATELEM(mat,i,j+1)=NULL;
-        p_SetCompP(h,i, currRing, &l);
+        p_SetCompP(h,i, currRing);
         sBucket_Merge_p(bucket, h, l);
       }
     }
     sBucketClearMerge(bucket, &(result->m[j]), &l);
   }
+  sBucketDestroy(&bucket);
 
   // obachman: need to clean this up
   idDelete((ideal*) &mat);
