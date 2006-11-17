@@ -1,5 +1,5 @@
 S///////////////////////////////////////////////////////////////////////////////
-version="$Id: sheafcoh.lib,v 1.8 2006-07-18 15:48:30 Singular Exp $";
+version="$Id: sheafcoh.lib,v 1.9 2006-11-17 14:15:42 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  sheafcoh.lib   Procedures for Computing Sheaf Cohomology
@@ -29,10 +29,8 @@ LIB "homolog.lib";
 static proc jacobM(matrix M)
 {
    int n=nvars(basering);
-   int a=nrows(M);
-   int b=ncols(M);
    matrix B=transpose(diff(M,var(1)));
-   int i,j;
+   int i;
    for(i=2;i<=n;i++)
    {
      B=concat(B,transpose(diff(M,var(i))));

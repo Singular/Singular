@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.32 2006-07-24 14:06:06 Singular Exp $";
+version="$Id: matrix.lib,v 1.33 2006-11-17 14:15:42 Singular Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -94,7 +94,7 @@ EXAMPLE: example concat; shows an example
 {
    int i;
    module B=module(#[1]);
-   for( i=2; i<=size(#); i=i+1 ) { B=B,module(#[i]); }
+   for( i=2; i<=size(#); i++ ) { B=B,module(#[i]); }
    return(matrix(B));
 }
 example
