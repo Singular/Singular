@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.9 2006-11-17 15:35:48 Singular Exp $ */
+/* $Id: matpol.cc,v 1.10 2006-11-18 12:58:00 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -245,7 +245,8 @@ matrix mpTransp(matrix a)
   {
     for (j=0; j<r; j++)
     {
-      *p++ = pCopy(a->m[j*c+i]);
+      if (a->m[j*c+i]!=NULL) *p = pCopy(a->m[j*c+i]);
+      p++;
     }
   }
   return b;
