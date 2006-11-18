@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.33 2006-11-17 14:15:42 Singular Exp $";
+version="$Id: matrix.lib,v 1.34 2006-11-18 12:57:31 Singular Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -58,11 +58,11 @@ EXAMPLE: example compress; shows an example
       else
       { intmat B[nrows(A)][size(m)]; }
       int i,j;
-      for( i=1; i<=ncols(A); i=i+1 )
+      for( i=1; i<=ncols(A); i++ )
       {
          if( m[i]!=[0] )
          {
-            j=j+1;
+            j++;
             B[1..nrows(A),j]=A[1..nrows(A),i];
          }
       }
@@ -93,8 +93,8 @@ EXAMPLE: example concat; shows an example
 "
 {
    int i;
-   module B=module(#[1]);
-   for( i=2; i<=size(#); i++ ) { B=B,module(#[i]); }
+   for( i=size(#);i>0; i-- ) { #[i]=module(#[i]); }
+   module B=#[1..size(#)];
    return(matrix(B));
 }
 example
@@ -123,7 +123,7 @@ EXAMPLE: example diag; shows an example
    {
       int i; ideal id=#[1];
       int n=ncols(id); matrix A[n][n];
-      for( i=1; i<=n; i=i+1 ) { A[i,i]=id[i]; }
+      for( i=1; i<=n; i++ ) { A[i,i]=id[i]; }
    }
    return(A);
 }
@@ -145,8 +145,8 @@ EXAMPLE: example dsum; shows an example
 {
    int i,N,a;
    list L;
-   for( i=1; i<=size(#); i=i+1 ) { N=N+nrows(#[i]); }
-   for( i=1; i<=size(#); i=i+1 )
+   for( i=1; i<=size(#); i++ ) { N=N+nrows(#[i]); }
+   for( i=1; i<=size(#); i++ )
    {
       matrix B[N][ncols(#[i])];
       B[a+1..a+nrows(#[i]),1..ncols(#[i])]=#[i];
@@ -222,7 +222,7 @@ EXAMPLE: example is_complex; shows an example
 {
    int i;
    module @test;
-   for( i=1; i<=size(c)-1; i=i+1 )
+   for( i=1; i<=size(c)-1; i++ )
    {
       c[i]=matrix(c[i]); c[i+1]=matrix(c[i+1]);
       @test=c[i]*c[i+1];
@@ -261,9 +261,9 @@ EXAMPLE: example outer; shows an example
    {
      int N = nrows(A)*nrows(B);
      matrix C[N][ncols(B)];
-     for( i=1; i<=ncols(A); i=i+1 )
+     for( i=1; i<=ncols(A); i++ )
      {
-       for( j=1; j<=nrows(A); j=j+1 )
+       for( j=1; j<=nrows(A); j++ )
        {
           C[(j-1)*nrows(B)+1..j*nrows(B),1..ncols(B)]=A[j,i]*B;
        }
@@ -372,7 +372,7 @@ EXAMPLE: example skewmat; shows an example
    else { ideal id=#[1]; }
    id = id,B[1..n,1..n];
    int i,j;
-   for( i=0; i<=n-2; i=i+1 )
+   for( i=0; i<=n-2; i++ )
    {
       B[i+1,i+2..n]=id[j+1..j+n-i-1];
       j=j+n-i-1;
@@ -429,13 +429,13 @@ EXAMPLE: example symmat; shows an example
    else { ideal id=#[1]; }
    id = id,B[1..n,1..n];
    int i,j;
-   for( i=0; i<=n-1; i=i+1 )
+   for( i=0; i<=n-1; i++ )
    {
       B[i+1,i+1..n]=id[j+1..j+n-i];
       j=j+n-i;
    }
    matrix A=transpose(B);
-   for( i=1; i<=n; i=i+1 ) {  A[i,i]=0; }
+   for( i=1; i<=n; i++ ) {  A[i,i]=0; }
    B=A+B;
    return(B);
 }
@@ -786,8 +786,8 @@ EXAMPLE: example rowred; shows an example
    int i,j,k,l,rk;
    poly p;
    matrix d[m][n];
-   for (i=1;i<=m;i=i+1)
-   {  for (j=1;j<=n;j=j+1)
+   for (i=1;i<=m;i++)
+   {  for (j=1;j<=n;j++)
       {  p = A[i,j];
          if (ord(p)==0)
          {  if (deg(p)==0) { d[i,j]=p; }
@@ -804,13 +804,13 @@ EXAMPLE: example rowred; shows an example
          b  = permrow(b,rk,k);
          p  = b[rk,l];         p = 1/p;
          b  = multrow(b,rk,p);
-         for (i=1;i<=m;i=i+1)
+         for (i=1;i<=m;i++)
          {
             if (rk-i) { b = addrow(b,rk,-b[i,l],i);}
          }
          d = 0;
-         for (i=rk+1;i<=m;i=i+1)
-         {  for (j=l+1;j<=n;j=j+1)
+         for (i=rk+1;i<=m;i++)
+         {  for (j=l+1;j<=n;j++)
             {  p = b[i,j];
                if (ord(p)==0)
                {  if (deg(p)==0) { d[i,j]=p; }
@@ -910,7 +910,7 @@ EXAMPLE: example rm_unitcol; shows an example
 {
  int l,j;
  intvec v;
- for (j=1;j<=ncols(A);j=j+1)
+ for (j=1;j<=ncols(A);j++)
  {
     if (gen(l+1)==module(A)[j]) {l=l+1;}
     else { v=v,j;}
@@ -946,7 +946,7 @@ EXAMPLE: example rm_unitrow; shows an example
  int l,j;
  intvec v;
  module M = transpose(A);
- for (j=1; j <= nrows(A); j=j+1)
+ for (j=1; j <= nrows(A); j++)
  {
     if (gen(l+1) == M[j]) { l=l+1; }
     else { v=v,j; }
