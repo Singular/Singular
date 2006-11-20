@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.82 2006-05-30 07:28:21 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.83 2006-11-20 11:24:51 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -1077,10 +1077,11 @@ static BOOLEAN jiA_MATRIX_L(leftv l,leftv r)
   sleftv t;
   memset(&t,0,sizeof(sleftv));
   t.rtyp=POLY_CMD;
+  int mxn=MATROWS(m)*MATCOLS(m);
   loop
   {
     i=0;
-    while ((i<MATROWS(m)*MATCOLS(m))&&(l!=NULL))
+    while ((i<mxn /*MATROWS(m)*MATCOLS(m)*/)&&(l!=NULL))
     {
       t.data=(char *)m->m[i];
       m->m[i]=NULL;
@@ -1115,12 +1116,16 @@ static BOOLEAN jiA_MATRIX_L(leftv l,leftv r)
       break;
     }
     if ((r->Typ()==IDEAL_CMD)||(r->Typ()==MATRIX_CMD))
+    {
       m=(matrix)r->CopyD(MATRIX_CMD);
+      mxn=MATROWS(m)*MATCOLS(m);
+    }
     else if (r->Typ()==POLY_CMD)
     {
       m=mpNew(1,1);
       MATELEM(m,1,1)=(poly)r->CopyD(POLY_CMD);
       pNormalize(MATELEM(m,1,1));
+      mxn=1;
     }
     else
     {
