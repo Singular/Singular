@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.12 2006-11-20 09:38:35 Singular Exp $ */
+/* $Id: matpol.cc,v 1.13 2006-11-20 11:10:39 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -149,23 +149,13 @@ matrix mpMultP(matrix a, poly p)
 {
   int k, n = a->nrows, m = a->ncols;
 
-  if (p!=NULL)
+  pNormalize(p);
+  for (k=m*n-1; k>0; k--)
   {
-    pNormalize(p);
-    for (k=m*n-1; k>0; k--)
-    {
-      if (a->m[k]!=NULL)
-        a->m[k] = pMult(a->m[k], pCopy(p));
-    }
-    a->m[0] = pMult(a->m[0], p);
+    if (a->m[k]!=NULL)
+      a->m[k] = pMult(a->m[k], pCopy(p));
   }
-  else
-  {
-    for (k=m*n-1; k>=0; k--)
-    {
-      pDelete(&a->m[k]);
-    }
-  }
+  a->m[0] = pMult(a->m[0], p);
   return a;
 }
 
