@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.11 2006-11-20 09:20:21 Singular Exp $ */
+/* $Id: matpol.cc,v 1.12 2006-11-20 09:38:35 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -161,8 +161,10 @@ matrix mpMultP(matrix a, poly p)
   }
   else
   {
-    for (k=m*n-1; k>0; k--)
-        pDelete(&a->m[k]);
+    for (k=m*n-1; k>=0; k--)
+    {
+      pDelete(&a->m[k]);
+    }
   }
   return a;
 }
