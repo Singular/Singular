@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.418 2006-11-10 18:12:01 Singular Exp $ */
+/* $Id: iparith.cc,v 1.419 2006-11-20 09:18:37 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2875,10 +2875,10 @@ struct sValCmd2 dArith2[]=
 ,{jjTIMES_P,   '*',            VECTOR_CMD,     POLY_CMD,   VECTOR_CMD ALLOW_PLURAL}
 ,{jjTIMES_P,   '*',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD ALLOW_PLURAL}
 ,{jjTIMES_MA_P1,'*',           IDEAL_CMD,      IDEAL_CMD,  POLY_CMD ALLOW_PLURAL}
-,{jjTIMES_MA_P2,'*',           IDEAL_CMD,      POLY_CMD,   IDEAL_CMD ALLOW_PLURAL}
+,{jjTIMES_MA_P2,'*',           IDEAL_CMD,      POLY_CMD,   IDEAL_CMD NO_PLURAL}
 ,{jjTIMES_ID,  '*',            IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD ALLOW_PLURAL}
 ,{jjTIMES_MA_P1,'*',           MODUL_CMD,      IDEAL_CMD,  VECTOR_CMD ALLOW_PLURAL}
-,{jjTIMES_MA_P2,'*',           MODUL_CMD,      VECTOR_CMD, IDEAL_CMD ALLOW_PLURAL}
+,{jjTIMES_MA_P2,'*',           MODUL_CMD,      VECTOR_CMD, IDEAL_CMD NO_PLURAL}
 ,{jjTIMES_ID,  '*',            MODUL_CMD,      IDEAL_CMD,  MODUL_CMD ALLOW_PLURAL}
 ,{jjTIMES_ID,  '*',            MODUL_CMD,      MODUL_CMD,  IDEAL_CMD ALLOW_PLURAL}
 ,{jjTIMES_MA_P1,'*',           MATRIX_CMD,     MATRIX_CMD, POLY_CMD ALLOW_PLURAL}
