@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.13 2006-05-02 16:25:17 Singular Exp $ */
+/* $Id: longrat.cc,v 1.14 2006-11-21 11:00:56 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -1296,6 +1296,10 @@ int nlModP(number n, int p)
   if (n->s!=3)
   {
     int in=mpz_mmod_ui(NULL,&n->n,(unsigned long)p);
+    #ifdef NV_OPS
+    if (npPrimeM>NV_MAX_PRIME)
+    return (int)((long)nvDiv((number)iz,(number)in));
+    #endif
     return (int)((long)npDiv((number)iz,(number)in));
   }
   return iz;

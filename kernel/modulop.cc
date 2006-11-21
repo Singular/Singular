@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.6 2006-08-11 09:47:22 Singular Exp $ */
+/* $Id: modulop.cc,v 1.7 2006-11-21 11:00:56 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -162,10 +162,14 @@ inline number npInversM (number c)
 
 number npDiv (number a,number b)
 {
+//#ifdef NV_OPS
+//  if (npPrimeM>NV_MAX_PRIME)
+//    return nvDiv(a,b);
+//#endif
   if ((long)a==0)
     return (number)0;
 #ifndef HAVE_DIV_MOD
-  else if ((long)b==0)
+  if ((long)b==0)
   {
     WerrorS("div by 0");
     return (number)0;
@@ -266,12 +270,12 @@ char * npRead (char *s, number *a)
   }
   if (n == 1)
     *a = (number)z;
-  else 
+  else
 #ifdef NV_OPS
     if (npPrimeM>NV_MAX_PRIME)
       *a = nvDiv((number)z,(number)n);
     else
-#endif    
+#endif
       *a = npDiv((number)z,(number)n);
   return s;
 }
