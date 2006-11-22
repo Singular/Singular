@@ -1,4 +1,4 @@
-version="$Id: involut.lib,v 1.10 2006-11-13 11:35:28 Singular Exp $";
+version="$Id: involut.lib,v 1.11 2006-11-22 21:43:27 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  involut.lib  Procedures for Computations and Operations with Involutions
@@ -434,16 +434,16 @@ EXAMPLE: example findInvo; shows examples
 
   matrix Rel = RelMatr(); //the matrix of relations
 
-  string s   = new_var(); //string of new variables
+  string @ss   = new_var(); //string of new variables
   string Par = parstr(@B); //string of parameters in old ring
 
   if (Par=="") // if there are no parameters
   {
-    execute("ring @@K=0,("+varstr(@B)+","+s+"), dp;"); //new ring with new variables
+    execute("ring @@K=0,("+varstr(@B)+","+@ss+"), dp;"); //new ring with new variables
   }
   else //if there exist parameters
   {
-     execute("ring @@K=(0,"+Par+") ,("+varstr(@B)+","+s+"), dp;");//new ring with new variables
+     execute("ring @@K=(0,"+Par+") ,("+varstr(@B)+","+@ss+"), dp;");//new ring with new variables
   };
 
   matrix Rel = imap(@B, Rel); //consider the matrix of relations in new ring
@@ -497,15 +497,15 @@ EXAMPLE: example findInvo; shows examples
   //-------------------------------------------------
   if ( Par=="" ) //initializes the ring of relations
   {
-    execute("ring @@KK=0,("+s+"), dp;");
+    execute("ring @@KK=0,("+@ss+"), dp;");
   }
   else
   {
-    execute("ring @@KK=(0,"+Par+"),("+s+"), dp;");
+    execute("ring @@KK=(0,"+Par+"),("+@ss+"), dp;");
   };
   ideal J = imap(@@K,J); // ideal, considered in @@KK now
   string snv = "["+string(NVars)+"]";
-  execute("matrix @@D"+snv+snv+"="+s+";"); // matrix with entries=new variables
+  execute("matrix @@D"+snv+snv+"="+@ss+";"); // matrix with entries=new variables
 
   J = J, ideal( @@D*@@D-matrix( freemodule(NVars) ) ); // add the condition that involution to square is just identity
   J = simplify(J,2); // without extra zeros
@@ -561,16 +561,16 @@ EXAMPLE: example findInvoDiag; shows examples
 
   matrix Rel = RelMatr(); //the matrix of relations
 
-  string s   = new_var_special(); //string of new variables
+  string @ss   = new_var_special(); //string of new variables
   string Par = parstr(@B); //string of parameters in old ring
 
   if (Par=="") // if there are no parameters
   {
-    execute("ring @@K=0,("+varstr(@B)+","+s+"), dp;"); //new ring with new variables
+    execute("ring @@K=0,("+varstr(@B)+","+@ss+"), dp;"); //new ring with new variables
   }
   else //if there exist parameters
   {
-    execute("ring @@K=(0,"+Par+") ,("+varstr(@B)+","+s+"), dp;");//new ring with new variables
+    execute("ring @@K=(0,"+Par+") ,("+varstr(@B)+","+@ss+"), dp;");//new ring with new variables
   };
 
   matrix Rel = imap(@B, Rel); //consider the matrix of relations in new ring
@@ -620,11 +620,11 @@ EXAMPLE: example findInvoDiag; shows examples
 
   if ( Par=="" ) //initializes the ring of relations
   {
-    execute("ring @@KK=0,("+s+"), dp;");
+    execute("ring @@KK=0,("+@ss+"), dp;");
   }
   else
   {
-    execute("ring @@KK=(0,"+Par+"),("+s+"), dp;");
+    execute("ring @@KK=(0,"+Par+"),("+@ss+"), dp;");
   };
 
   ideal J = imap(@@K,J); // ideal, considered in @@KK now
