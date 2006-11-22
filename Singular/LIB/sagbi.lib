@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: sagbi.lib,v 1.4 2005-06-07 10:05:19 Singular Exp $";
+version="$Id: sagbi.lib,v 1.5 2006-11-22 21:40:29 levandov Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  SAGBI.lib  Compute Subalgebras bases Analogous to Groebner bases for ideals
@@ -49,7 +49,7 @@ EXAMPLE: example sagbiSPoly; show an example "
 
   if(b!=0)
     {
-      id =reduce(id,std(0));
+      id =reduce(id,groebner(0));
     }
   int n,m=nvars(bsr),ncols(id);
   int z;
@@ -74,17 +74,17 @@ EXAMPLE: example sagbiSPoly; show an example "
     {
     //==================create anew ring with extra variables================
 
-      execute("ring R1="+charstr(bsr)+",("+varstr(bsr)+",y(1..m)),(dp(n),dp(m));");
+      execute("ring R1="+charstr(bsr)+",("+varstr(bsr)+",@y(1..m)),(dp(n),dp(m));");
       execute("minpoly=number("+mp+");");
       ideal id=imap(bsr,id);
       ideal A;
 
       for(z=1;z<=m;z++)
         {
-          A[z]=lead(id[z])-y(z);
+          A[z]=lead(id[z])-@y(z);
         }
 
-      A=std(A);
+      A=groebner(A);
       ideal kern=nselect(A,1,n);// "kern" is the kernel of the ring map:
                            // R1----->bsr ;y(z)----> lead(id[z]).
                           //"kern" is the ideal of algebraic relations between
@@ -150,14 +150,14 @@ static proc std1(ideal J,ideal I,list #)
     {tt=#[1];}
 
   if(size(I)==0)
-    {@result=std(J);}
+    {@result=groebner(J);}
 
   if((size(I)!=0) && (size(J)-size(I)>=1))
     {
 
       qring Q=I;
       ideal J=fetch(br,J);
-      J=std(J);
+      J=groebner(J);
       setring br;
       Res=fetch(Q,J);// Res contains the generators that we add to I
                       //to get the generators of std(J);
@@ -187,8 +187,8 @@ static proc Spoly1(list l,ideal I,ideal J,int a)
 
   if(b!=0)
     {
-      I=reduce(I,std(0));
-      J=reduce(J,std(0));
+      I=reduce(I,groebner(0));
+      J=reduce(J,groebner(0));
     }
 
 
@@ -213,7 +213,7 @@ static proc Spoly1(list l,ideal I,ideal J,int a)
 
       //================create a new ring with extra variables==============
 
-      execute("ring R1="+charstr(R)+",("+varstr(R)+",y((ii+1)..(ii+jj))),(dp(n),dp(kk+jj-n));");
+      execute("ring R1="+charstr(R)+",("+varstr(R)+",@y((ii+1)..(ii+jj))),(dp(n),dp(kk+jj-n));");
       ideal kern1;
       ideal A=fetch(R,A);
       attrib(A,"isSB",1);
@@ -287,8 +287,8 @@ EXAMPLE: reduction; show an example"
 
   if(b !=0) //means that the basering is a quotient ring
     {
-      p=reduce(p,std(0));
-      dom=reduce(dom,std(0));
+      p=reduce(p,groebner(0));
+      dom=reduce(groebner,std(0));
     }
 
   int i,choose;
@@ -358,7 +358,7 @@ EXAMPLE: reduction; show an example"
        }
      if(choose==2)
        {
-         ideal kern= nselect(std(dom),1,n);//"nselect" is combinatorial command
+         ideal kern= nselect(groebner(dom),1,n);//"nselect" is combinatorial command
                                          //which uses the internal command
                                         // "simplify"
        }
