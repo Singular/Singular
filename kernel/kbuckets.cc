@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.27 2006-02-27 14:42:05 bricken Exp $ */
+/* $Id: kbuckets.cc,v 1.28 2006-11-23 12:46:17 Singular Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -739,7 +739,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
 #ifdef HAVE_RING2TOM
     l1 = pLength(p1);
     assume(pLength(p1) == l1);
-#endif    
+#endif
     i = pLogLength(l1);
   }
   else
@@ -792,7 +792,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
 /// assume (l <= 0 || pLength(p) == l)
 void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
 {
-    assume((!rIsPluralRing(bucket->bucket_ring))||p_IsConstant(m, bucket->bucket_ring)); 
+    assume((!rIsPluralRing(bucket->bucket_ring))||p_IsConstant(m, bucket->bucket_ring));
   assume(l <= 0 || pLength(p) == l);
   int i, l1;
   poly p1 = p;
@@ -870,7 +870,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
       i = pLogLength(l1);
     }
   }
-  
+
   else
   {
     #ifdef USE_COEF_BUCKETS
@@ -888,7 +888,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
     p_SetCoeff(m,n_Copy(n,r),r);
     #endif
   }
-  
+
 
   while ((bucket->buckets[i] != NULL) && (p1!=NULL))
   {
@@ -951,7 +951,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
   bucket->buckets[i] = p1;
 #ifdef USE_COEF_BUCKETS
   assume(bucket->coef[i]==NULL);
-  
+
   if (!(n_IsOne(n,r)))
   {
     bucket->coef[i]=p_NSet(n,r);
@@ -961,7 +961,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
     bucket->coef[i]=NULL;
     n_Delete(&n,r);
   }
-  
+
   if ((p1==NULL) && (bucket->coef[i]!=NULL))
     p_Delete(&bucket->coef[i],r);
 #endif
@@ -1087,7 +1087,7 @@ number kBucketPolyRed(kBucket_pt bucket,
                       poly p1, int l1,
                       poly spNoether)
 {
-  assume((!rIsPluralRing(bucket->bucket_ring))||p_LmEqual(p1,kBucketGetLm(bucket), bucket->bucket_ring)); 
+  assume((!rIsPluralRing(bucket->bucket_ring))||p_LmEqual(p1,kBucketGetLm(bucket), bucket->bucket_ring));
   assume(p1 != NULL &&
          p_DivisibleBy(p1,  kBucketGetLm(bucket), bucket->bucket_ring));
   assume(pLength(p1) == (int) l1);
@@ -1132,11 +1132,11 @@ number kBucketPolyRed(kBucket_pt bucket,
   #if 0
   //@Viktor, don't ignore coefficients on monomials
   if(l1==1) {
-    
+
     //if (rField_is_Q(bucket->bucket_ring)) {
       //avoid this for function fields, as gcds are expensive at the moment
-      
-     
+
+
       coef=p_GetCoeff(a1,bucket->bucket_ring);
       lm=p_Mult_nn(lm, coef, bucket->bucket_ring);
       p_SetCoeff0(a1, n_Init(1,bucket->bucket_ring), bucket->bucket_ring);
@@ -1146,9 +1146,9 @@ number kBucketPolyRed(kBucket_pt bucket,
     //}
   }
   #endif
-  
+
   kBucket_Minus_m_Mult_p(bucket, lm, a1, &l1, spNoether);
-  
+
   if (backuped)
     p_SetCoeff0(a1,coef,bucket->bucket_ring);
   p_DeleteLm(&lm, bucket->bucket_ring);
@@ -1156,29 +1156,32 @@ number kBucketPolyRed(kBucket_pt bucket,
   kbTest(bucket);
   return rn;
 }
-static BOOLEAN nIsPseudoUnit(number n, ring r){
-    if (rField_is_Zp(r))
-        return TRUE;
-    if (r->parameter==NULL)
-    {
-        if (r->cf->nSize(n)==1)
-            return TRUE;
-        else
-            return FALSE;
-    }
-    //if (r->parameter!=NULL)
-    number one=n_Init(1,r);
-    if (n_Equal(n,one,r)) {
+static BOOLEAN nIsPseudoUnit(number n, ring r)
+{
+  if (rField_is_Zp(r))
+    return TRUE;
+  if (r->parameter==NULL)
+  {
+    if (r->cf->nSize(n)==1)
+      return TRUE;
+    else
+      return FALSE;
+  }
+  //if (r->parameter!=NULL)
+  number one=n_Init(1,r);
+  if (n_Equal(n,one,r))
+  {
     n_Delete(&one,r);
     return TRUE;
-    }
-    n_Delete(&one,r);
-    number minus_one=n_Init(-1,r);
-    if (n_Equal(n,minus_one,r)){
-        n_Delete(&minus_one,r);
-        return TRUE;
-    }
-    return FALSE;
+  }
+  n_Delete(&one,r);
+  number minus_one=n_Init(-1,r);
+  if (n_Equal(n,minus_one,r))
+  {
+    n_Delete(&minus_one,r);
+    return TRUE;
+  }
+  return FALSE;
 }
 
 void kBucketSimpleContent(kBucket_pt bucket)
@@ -1206,12 +1209,12 @@ void kBucketSimpleContent(kBucket_pt bucket)
     {
       assume(bucket->buckets[i]==NULL);
     }
-    if ((bucket->buckets[i]!=NULL) &&     (nIsPseudoUnit(p_GetCoeff(bucket->coef[i],r),r)))
-
+    if ((bucket->buckets[i]!=NULL)
+    && (nIsPseudoUnit(p_GetCoeff(bucket->coef[i],r),r)))
       return;
   }
   //return;
-  
+
   number coef=n_Init(0,r);
   //ATTENTION: will not work correct for GB over ring
   //if (TEST_OPT_PROT)
@@ -1226,8 +1229,7 @@ void kBucketSimpleContent(kBucket_pt bucket)
     {
       assume(bucket->coef[i]!=NULL);
       assume(!(n_IsZero(pGetCoeff(bucket->coef[i]),r)));
-      
-      
+
       //in this way it should crash on programming errors, yeah
       number temp=nGcd(coef, pGetCoeff(bucket->coef[i]),r);
       n_Delete(&coef,r );
@@ -1248,7 +1250,6 @@ void kBucketSimpleContent(kBucket_pt bucket)
     PrintS("S");
   for(i=0;i<=MAX_BUCKET;i++)
   {
-    
     if (bucket->buckets[i]!=NULL)
     {
       assume(!(n_IsZero(coef,r)));
