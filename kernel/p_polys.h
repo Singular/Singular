@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.2 2005-09-08 11:14:09 bricken Exp $
+ *  Version: $Id: p_polys.h,v 1.3 2006-11-23 15:04:54 Singular Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -321,7 +321,7 @@ PINLINE2 poly p_SortAdd(poly p, const ring r, BOOLEAN revert = FALSE);
  * Misc stuff
  *
  ***************************************************************/
-PINLINE2 void p_Setm(poly p, ring r);
+PINLINE2 void p_Setm(poly p, const ring r);
 p_SetmProc p_GetSetmProc(ring r);
 
 // TODO:

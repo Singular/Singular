@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.4 2005-05-04 14:42:09 Singular Exp $
+ *  Version: $Id: p_polys.cc,v 1.5 2006-11-23 15:04:54 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -31,7 +31,7 @@ static int _ExternalComponents = 0;
 
 BOOLEAN pSetm_error=0;
 
-void p_Setm_General(poly p, ring r)
+void p_Setm_General(poly p, const ring r)
 {
   p_LmCheckPolyRing(p, r);
   int pos=0;
@@ -181,20 +181,20 @@ void p_Setm_Syz(poly p, ring r, int* Components, long* ShiftedComponents)
 }
 
 // dummy for lp, ls, etc
-void p_Setm_Dummy(poly p, ring r)
+void p_Setm_Dummy(poly p, const ring r)
 {
   p_LmCheckPolyRing(p, r);
 }
 
 // for dp, Dp, ds, etc
-void p_Setm_TotalDegree(poly p, ring r)
+void p_Setm_TotalDegree(poly p, const ring r)
 {
   p_LmCheckPolyRing(p, r);
   p->exp[r->pOrdIndex] = p_ExpVectorQuerSum(p, r);
 }
 
 // for wp, Wp, ws, etc
-void p_Setm_WFirstTotalDegree(poly p, ring r)
+void p_Setm_WFirstTotalDegree(poly p, const ring r)
 {
   p_LmCheckPolyRing(p, r);
   p->exp[r->pOrdIndex] = pWFirstTotalDegree(p, r);

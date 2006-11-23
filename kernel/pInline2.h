@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.5 2006-06-22 16:59:13 Singular Exp $
+ *  Version: $Id: pInline2.h,v 1.6 2006-11-23 15:04:54 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -87,7 +87,7 @@ PINLINE2 Order_t p_SetOrder(poly p, long o, ring r)
 }
 
 // Setm
-PINLINE2 void p_Setm(poly p, ring r)
+PINLINE2 void p_Setm(poly p, const ring r)
 {
   p_CheckRing2(r);
   r->p_Setm(p, r);

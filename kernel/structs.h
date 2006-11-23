@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.23 2006-07-27 08:38:19 Singular Exp $ */
+/* $Id: structs.h,v 1.24 2006-11-23 15:04:54 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -313,7 +313,7 @@ extern package basePack;
 
 typedef long     (*pLDegProc)(poly p, int *length, ring r);
 typedef long     (*pFDegProc)(poly p, ring r);
-typedef void     (*p_SetmProc)(poly p, ring r);
+typedef void     (*p_SetmProc)(poly p, const ring r);
 
 typedef enum
 {
