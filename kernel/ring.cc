@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.48 2006-11-08 12:18:56 Singular Exp $ */
+/* $Id: ring.cc,v 1.49 2006-11-23 10:37:16 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3357,7 +3357,7 @@ void rNGetSComps(int** currComponents, long** currShiftedComponents, ring r)
 /////////////////////////////////////////////////////////////////////////////
 //
 // The following routines all take as input a ring r, and return R
-// where R has a certain property. P might be equal r in which case r
+// where R has a certain property. R might be equal r in which case r
 // had already this property
 //
 // Without argument, these functions work on currRing and change it,
