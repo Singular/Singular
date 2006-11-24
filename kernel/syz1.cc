@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.10 2004-11-09 14:55:01 Singular Exp $ */
+/* $Id: syz1.cc,v 1.11 2006-11-24 12:18:28 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -2029,9 +2029,9 @@ void syPrint(syStrategy syzstr)
     {
       syzstr->resolution = new intvec(syzstr->length+1);
       SRes rP=syzstr->resPairs;
-      (*syzstr->resolution)[0]
-        = si_max(1,(int)idRankFreeModule(syzstr->res[1],
-                                 (syzstr->syRing != NULL ? syzstr->syRing : currRing)));
+      assume(idRankFreeModule(syzstr->res[1],
+                                 (syzstr->syRing != NULL ? syzstr->syRing : currRing))==syzstr->res[1]->rank);
+      (*syzstr->resolution)[0] = syzstr->res[1]->rank;
       while ((l<syzstr->length) && (rP[l]!=NULL))
       {
         j=0;

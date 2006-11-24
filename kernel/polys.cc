@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.11 2006-10-05 18:25:10 Singular Exp $ */
+/* $Id: polys.cc,v 1.12 2006-11-24 12:18:27 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -403,13 +403,14 @@ poly pTakeOutComp(poly * p, int k)
   if (pGetComp(q)==k)
   {
     result = q;
-    while ((q!=NULL) && (pGetComp(q)==k))
+    do
     {
       pSetComp(q,0);
       pSetmComp(q);
       qq = q;
       pIter(q);
     }
+    while ((q!=NULL) && (pGetComp(q)==k));
     *p = q;
     pNext(qq) = NULL;
   }
