@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.23 2006-11-24 09:53:01 Singular Exp $ */
+/* $Id: ideals.cc,v 1.24 2006-11-24 13:44:38 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -3484,7 +3484,7 @@ matrix idCoeffOfKBase(ideal arg, ideal kbase, poly how)
 */
 static int idReadOutUnits(ideal arg,int* comp)
 {
-  if (idIs0(arg)) return -1;
+  assume(!idIs0(arg));
   int i=0,j, generator=-1;
   int rk_arg=arg->rank; //idRankFreeModule(arg);
   int * componentIsUsed =(int *)omAlloc((rk_arg+1)*sizeof(int));
@@ -3563,12 +3563,13 @@ static void idDeleteComp(ideal arg,int red_comp)
 ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
 {
   if (idIs0(arg)) return idInit(1,arg->rank);
-  int next_gen,next_comp;
+  int i,next_gen,next_comp;
   ideal res=arg;
 
   if (!inPlace) res = idCopy(arg);
   res->rank=si_max(res->rank,idRankFreeModule(res));
 
+  intvec *wtmp=NULL;
   loop
   {
     next_gen = idReadOutUnits(res,&next_comp);
@@ -3577,19 +3578,30 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
     idDeleteComp(res,next_comp);
     if ((w !=NULL)&&(*w!=NULL))
     {
-      intvec *wtmp;
-      if ((*w)->length()==1)
+      if (wtmp==NULL)
       {
-        wtmp=new intvec(1);
-        // (*wtmp)[0]=0;
+        if ((*w)->length()==1)
+        {
+          wtmp=new intvec(1);
+          // (*wtmp)[0]=0;
+        }
+        else
+        {
+          wtmp=new intvec((*w)->length()-1);
+          for(i=0;i<wtmp->length();i++) (*wtmp)[i]=(**w)[i];
+	}
       }
-      else
-      {
-        wtmp=new intvec((*w)->length()-1);
-        int i;
-        for(i=0;i<next_comp-1;i++) (*wtmp)[i]=(**w)[i];
-        for(i=next_comp;i<(*w)->length();i++) (*wtmp)[i-1]=(**w)[i];
-      }
+      for(i=next_comp;i<(*w)->length();i++) (*wtmp)[i-1]=(*wtmp)[i];
+    }
+  }
+  if ((w !=NULL)&&(*w!=NULL))
+  {
+    delete *w;
+    *w=wtmp;
+    if (wtmp->length()>1)
+    { 
+      wtmp=new intvec(res->rank);
+      for(i=0;i<res->rank;i++) (*wtmp)[i]=(**w)[i];
       delete *w;
       *w=wtmp;
     }
