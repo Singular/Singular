@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.22 2006-11-17 17:58:10 Singular Exp $ */
+/* $Id: ideals.cc,v 1.23 2006-11-24 09:53:01 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -3485,33 +3485,33 @@ matrix idCoeffOfKBase(ideal arg, ideal kbase, poly how)
 static int idReadOutUnits(ideal arg,int* comp)
 {
   if (idIs0(arg)) return -1;
-  int i=0,j,rk_arg=idRankFreeModule(arg),generator=-1;
-  intvec * componentIsUsed =new intvec(rk_arg+1);
+  int i=0,j, generator=-1;
+  int rk_arg=arg->rank; //idRankFreeModule(arg);
+  int * componentIsUsed =(int *)omAlloc((rk_arg+1)*sizeof(int));
   poly p,q;
 
-  while ((i<IDELEMS(arg)) && (generator<0))
+  while ((generator<0) && (i<IDELEMS(arg)))
   {
-    for (j=rk_arg;j>=0;j--)
-      (*componentIsUsed)[j]=0;
+    memset(componentIsUsed,0,(rk_arg+1)*sizeof(int));
     p = arg->m[i];
     while (p!=NULL)
     {
       j = pGetComp(p);
-      if ((*componentIsUsed)[j]==0)
+      if (componentIsUsed[j]==0)
       {
         if (pLmIsConstantComp(p))
         {
           generator = i;
-          (*componentIsUsed)[j] = 1;
+          componentIsUsed[j] = 1;
         }
         else
         {
-          (*componentIsUsed)[j] = -1;
+          componentIsUsed[j] = -1;
         }
       }
-      else if ((*componentIsUsed)[j]>0)
+      else if (componentIsUsed[j]>0)
       {
-        ((*componentIsUsed)[j])++;
+        (componentIsUsed[j])++;
       }
       pIter(p);
     }
@@ -3521,15 +3521,16 @@ static int idReadOutUnits(ideal arg,int* comp)
   *comp = -1;
   for (j=0;j<=rk_arg;j++)
   {
-    if ((*componentIsUsed)[j]>0)
+    if (componentIsUsed[j]>0)
     {
-      if ((*comp==-1) || ((*componentIsUsed)[j]<i))
+      if ((*comp==-1) || (componentIsUsed[j]<i))
       {
         *comp = j;
-        i= (*componentIsUsed)[j];
+        i= componentIsUsed[j];
       }
     }
   }
+  omFree(componentIsUsed);
   return generator;
 }
 
@@ -3566,6 +3567,8 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
   ideal res=arg;
 
   if (!inPlace) res = idCopy(arg);
+  res->rank=si_max(res->rank,idRankFreeModule(res));
+
   loop
   {
     next_gen = idReadOutUnits(res,&next_comp);
