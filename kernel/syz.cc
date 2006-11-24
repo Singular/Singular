@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.10 2005-05-20 15:32:36 Singular Exp $ */
+/* $Id: syz.cc,v 1.11 2006-11-24 10:29:08 Singular Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -243,11 +243,12 @@ void syGaussForOne(ideal syz, int elnum, int ModComp,int from,int till)
   pTakeOutComp(&(actWith), ModComp, &unit1, &lu);
   while (from<till)
   {
-    if (syz->m[from]!=NULL)
+    poly tmp=syz->m[from];
+    if (/*syz->m[from]*/ tmp!=NULL)
     {
-      pTakeOutComp(&(syz->m[from]), ModComp, &unit2, &lu);
-      syz->m[from] = pMult(pCopy(unit1),syz->m[from]);
-      syz->m[from] = pSub(syz->m[from],
+      pTakeOutComp(&(tmp), ModComp, &unit2, &lu);
+      tmp = pMult(pCopy(unit1),tmp);
+      syz->m[from] = pSub(tmp,
         pMult(unit2,pCopy(actWith)));
     }
     from++;
