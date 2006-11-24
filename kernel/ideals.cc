@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.24 2006-11-24 13:44:38 Singular Exp $ */
+/* $Id: ideals.cc,v 1.25 2006-11-24 15:54:54 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -3484,7 +3484,7 @@ matrix idCoeffOfKBase(ideal arg, ideal kbase, poly how)
 */
 static int idReadOutUnits(ideal arg,int* comp)
 {
-  assume(!idIs0(arg));
+  if (idIs0(arg)) return -1;
   int i=0,j, generator=-1;
   int rk_arg=arg->rank; //idRankFreeModule(arg);
   int * componentIsUsed =(int *)omAlloc((rk_arg+1)*sizeof(int));
@@ -3594,7 +3594,7 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
       for(i=next_comp;i<(*w)->length();i++) (*wtmp)[i-1]=(*wtmp)[i];
     }
   }
-  if ((w !=NULL)&&(*w!=NULL))
+  if ((w !=NULL)&&(*w!=NULL)&&(wtmp!=NULL))
   {
     delete *w;
     *w=wtmp;
