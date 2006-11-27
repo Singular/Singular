@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.25 2006-11-24 15:54:54 Singular Exp $ */
+/* $Id: ideals.cc,v 1.26 2006-11-27 12:55:57 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -3569,42 +3569,25 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
   if (!inPlace) res = idCopy(arg);
   res->rank=si_max(res->rank,idRankFreeModule(res));
 
-  intvec *wtmp=NULL;
+  int del=0;
   loop
   {
     next_gen = idReadOutUnits(res,&next_comp);
     if (next_gen<0) break;
+    del++;
     syGaussForOne(res,next_gen,next_comp,0,IDELEMS(res));
     idDeleteComp(res,next_comp);
     if ((w !=NULL)&&(*w!=NULL))
     {
-      if (wtmp==NULL)
-      {
-        if ((*w)->length()==1)
-        {
-          wtmp=new intvec(1);
-          // (*wtmp)[0]=0;
-        }
-        else
-        {
-          wtmp=new intvec((*w)->length()-1);
-          for(i=0;i<wtmp->length();i++) (*wtmp)[i]=(**w)[i];
-	}
-      }
-      for(i=next_comp;i<(*w)->length();i++) (*wtmp)[i-1]=(*wtmp)[i];
+      for(i=next_comp;i<(*w)->length();i++) (**w)[i-1]=(**w)[i];
     }
   }
-  if ((w !=NULL)&&(*w!=NULL)&&(wtmp!=NULL))
+  if ((w !=NULL)&&(*w!=NULL) &&(del>0))
   {
+    intvec *wtmp=new intvec((*w)->length()-del);
+    for(i=0;i<res->rank;i++) (*wtmp)[i]=(**w)[i];
     delete *w;
     *w=wtmp;
-    if (wtmp->length()>1)
-    { 
-      wtmp=new intvec(res->rank);
-      for(i=0;i<res->rank;i++) (*wtmp)[i]=(**w)[i];
-      delete *w;
-      *w=wtmp;
-    }
   }
   idSkipZeroes(res);
   return res;
