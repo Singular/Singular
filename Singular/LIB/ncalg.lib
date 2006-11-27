@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncalg.lib,v 1.21 2006-07-28 13:01:09 motsak Exp $";
+version="$Id: ncalg.lib,v 1.22 2006-11-27 13:29:59 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  ncalg.lib      Definitions of important GR-algebras
@@ -351,6 +351,8 @@ example
    setring a; a;
 };
 
+
+
 ///////////////////////////////////////////////////////////////////////////////
 proc makeQso3(list #)
 "USAGE:   makeQso3([n]), n an optional int
@@ -648,10 +650,33 @@ example
 //   intmat A[2][3]=2,1,0,0,1,2;
 ///////////////////////////////////////////////////////////////////////////////
 
+// need: real Uso3 in the symmetric presentation
+// is not isomorphic to Usl2 over R (but C)
+proc makeUso3(list #)
+"USAGE:   makeUso3([p]), p an optional int
+PURPOSE: set up the real U(so_3) algebra in the symmetric presentation; if p is specified, 
+RETURN:  ring
+NOTE:    activate this ring with the @code{setring} command
+SEE ALSO: makeUsl, makeUgl, makeUso5
+EXAMPLE: example makeUso3; shows examples
+"{
+  int @p = defInt(#);
+  ring @@@r=@p,(x,y,z),dp;
+  matrix D[3][3];
+  D[1,2]=-z;
+  D[1,3]=y;
+  D[2,3]=-x;
+  ncalgebra(1,D);
+  return(@@@r);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   def K = makeUso3(5);
+   setring K;
+   K;
+}
 
-
-
-
+///////////////////////////////////////////////////////////////////////////////
 
 
 // Algebra: so5(Q) has the type: B2, and defined by:
