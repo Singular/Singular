@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plumath.doc,v 1.32 2005-09-23 21:25:10 levandov Exp $
+@comment $Id: plumath.doc,v 1.33 2006-11-27 13:28:44 levandov Exp $
 @comment this file contains the mathematical background of Singular:Plural
 
 @c The following directives are necessary for proper compilation
@@ -575,7 +575,7 @@ Other sources to check are the following books and articles:
 @itemize @bullet
 @item
 @c DK  book
-Y. Drozd and V. Kirichenko.
+ [DK] Y. Drozd and V. Kirichenko.
     Finite dimensional algebras. With an appendix by Vlastimil
   Dlab.
    Springer, 1994
@@ -595,7 +595,7 @@ Y. Drozd and V. Kirichenko.
 
 @item
 @c Kr  Book
- Kredel, H.
+ [Kr] Kredel, H.
      Solvable polynomial rings.
   Shaker, 1993
 
@@ -682,7 +682,7 @@ N. Iorgov.
  On the Center of $q$-Deformed Algebra $U'_q( \rm so _3)$ Related to
   Quantum Gravity at $q$ a Root of $1$.
 @end tex
-In   Proceedings of IV Int. Conf. "Symmetry in Nonlinear
+In Proceedings of IV Int. Conf. "Symmetry in Nonlinear
   Mathematical Physics",(2001) Kyiv, Ukraine
 
 @item
@@ -718,7 +718,7 @@ A. Kandri-Rody and V. Weispfenning.
 @c LVdiss  art
  [LV] Levandovskyy, V.
    Non-commutative Computer Algebra for polynomial algebras: Gr@"obner bases, applications and implementation.
-   Doctoral Thesis, Universit@"at Kaiserslautern, 2005.
+   Doctoral Thesis, Universit@"at Kaiserslautern, 2005. Available online at @code{http://kluedo.ub.uni-kl.de/volltexte/2005/1883/}.
 
 @item
 @c LV3  article
@@ -743,13 +743,7 @@ A. Kandri-Rody and V. Weispfenning.
 @c NS  art
 T. N@"u@ss{}ler and H. Sch@"onemann.
   Gr@"obner bases in algebras with zero-divisors.
-     Preprint 244, Universit@"at Kaiserslautern, 1993.
-
-@item
-@c CMR  art
-Ringel, C. M.
-  PBW-bases of quantum groups.
-   J. Reine Angew. Math., 470:51-88, 1996.
+     Preprint 244, Universit@"at Kaiserslautern, 1993. Available online at @code{http://www.mathematik.uni-kl.de/~zca/Reports_on_ca/index.html}.
 
 @item
 @c S:03  InColl
