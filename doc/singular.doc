@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.147 2006-08-02 10:25:24 Singular Exp $
+@comment $Id: singular.doc,v 1.148 2006-11-27 13:27:32 levandov Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -350,11 +350,15 @@ LIB "all.lib";
 @subsection homolog_lib
 @c lib homolog.lib
 @c ----------------------------------------------------------
-@node intprog_lib, mprimdec_lib, homolog_lib, Commutative algebra
+@node intprog_lib, lll_lib, homolog_lib, Commutative algebra
 @subsection intprog_lib
 @c lib intprog.lib
 @c ---------------------------------------------------------
-@node mprimdec_lib, mregular_lib, intprog_lib, Commutative algebra
+@node lll_lib, mprimdec_lib, intprog_lib, Commutative algebra
+@subsection lll_lib
+@c lib lll.lib
+@c ---------------------------------------------------------
+@node mprimdec_lib, mregular_lib, lll_lib, Commutative algebra
 @subsection mprimdec_lib
 @c lib mprimdec.lib
 @c ----------------------------------------------------------
