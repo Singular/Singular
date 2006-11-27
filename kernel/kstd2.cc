@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.26 2006-11-17 14:47:37 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.27 2006-11-27 16:09:46 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -92,7 +92,7 @@ int kFindDivisibleByInS(const kStrategy strat, int* max_ind, LObject* L)
   if (ende>(*max_ind)) ende=(*max_ind);
 #else
   int ende=strat->sl;
-#endif  
+#endif
   (*max_ind)=ende;
   loop
   {
@@ -600,6 +600,7 @@ int redHoney (LObject* h, kStrategy strat)
   pass = j = 0;
   d = reddeg = h->GetpFDeg() + h->ecart;
   h->SetShortExpVector();
+  int li;
   h_p = h->GetLmTailRing();
   not_sev = ~ h->sev;
   loop
@@ -608,6 +609,7 @@ int redHoney (LObject* h, kStrategy strat)
     if (j < 0) return 1;
 
     ei = strat->T[j].ecart;
+    li = strat->T[j].pLength;
     ii = j;
     /*
      * the polynomial to reduce with (up to the moment) is;
@@ -620,9 +622,13 @@ int redHoney (LObject* h, kStrategy strat)
       i++;
       if (i > strat->tl)
         break;
-      if (ei <= h->ecart)
+      if (ei < h->ecart)
         break;
-      if ((strat->T[i].ecart < ei) &&
+      if (li==1)
+        break;
+      if (((strat->T[i].ecart < ei)
+         || ((strat->T[i].ecart <= h->ecart) && (strat->T[i].pLength < li)))
+         &&
           p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
                                h_p, not_sev, strat->tailRing))
       {
@@ -630,6 +636,7 @@ int redHoney (LObject* h, kStrategy strat)
          * the polynomial to reduce with is now;
          */
         ei = strat->T[i].ecart;
+        li = strat->T[i].pLength;
         ii = i;
       }
     }
@@ -671,6 +678,97 @@ int redHoney (LObject* h, kStrategy strat)
 #endif
     assume(strat->fromT == FALSE);
 
+#if 0 // test poly exchange
+    if (strat->inStdFac==0)
+    {
+      int ll;
+      poly t_p;
+      if (strat->tailRing==currRing)
+        t_p=strat->T[ii].p;
+      else
+        t_p=strat->T[ii].t_p;
+      if ((p_LmCmp(h_p,t_p,strat->tailRing)==0)
+      && ((ll=h->GuessLength()) < strat->T[ii].pLength))
+      {
+        h->GetP();
+        if ((h->pLength=h->GetpLength()) < strat->T[ii].pLength)
+        {
+          if (TEST_OPT_PROT)  PrintS("e");
+          h->GetP();
+          if (h->p!=NULL)
+          {
+            if (strat->T[ii].p!=NULL)
+            {
+              poly swap;
+              omTypeAlloc0Bin(poly,swap,currRing->PolyBin);
+              memcpy(swap,h->p,currRing->PolyBin->sizeW*sizeof(long));
+              memcpy(h->p,strat->T[ii].p,currRing->PolyBin->sizeW*sizeof(long));
+              memcpy(strat->T[ii].p,swap,currRing->PolyBin->sizeW*sizeof(long));
+              omFreeBinAddr(swap);
+            }
+            else
+            {
+              strat->T[ii].p=h->p;
+              h->p=NULL;
+            }
+          }
+          else
+          {
+            if (strat->T[ii].p!=NULL)
+            {
+              h->p=strat->T[ii].p;
+              strat->T[ii].p=NULL;
+            }
+            // else: all NULL
+          }
+          if (h->t_p!=NULL)
+          {
+            if (strat->T[ii].t_p!=NULL)
+            {
+              poly swap;
+              omTypeAlloc0Bin(poly,swap,strat->tailRing->PolyBin);
+              memcpy(swap,h->t_p,strat->tailRing->PolyBin->sizeW*sizeof(long));
+              memcpy(h->t_p,strat->T[ii].t_p,strat->tailRing->PolyBin->sizeW*sizeof(long));
+              memcpy(strat->T[ii].t_p,swap,strat->tailRing->PolyBin->sizeW*sizeof(long));
+              omFreeBinAddr(swap);
+            }
+            else
+            {
+              strat->T[ii].t_p=h->t_p;
+              h->t_p=NULL;
+            }
+          }
+          else
+          {
+            if (strat->T[ii].t_p!=NULL)
+            {
+              h->t_p=strat->T[ii].t_p;
+              strat->T[ii].t_p=NULL;
+            }
+            // else: all NULL
+          }
+          if (strat->tailRing != currRing && (strat->T[ii].p != NULL)
+          && pNext(strat->T[ii].p) != NULL)
+             strat->T[ii].max =p_GetMaxExpP(pNext(strat->T[ii].p), strat->tailRing);
+          else
+             strat->T[ii].max = NULL;
+          h->pLength=0;h->pLength=h->GetpLength();
+          strat->T[ii].pLength=0;strat->T[ii].pLength=strat->T[ii].GetpLength();
+          if (strat->T[ii].is_normalized)
+          {
+            strat->T[ii].is_normalized=0;
+            strat->T[ii].pNorm();
+          }
+          else
+          {
+            if (TEST_OPT_INTSTRATEGY)
+              strat->T[ii].pCleardenom();
+          }
+          h->PrepareRed(strat->use_buckets);
+        }
+      }
+    }
+#endif // test poly exchange
     ksReducePoly(h, &(strat->T[ii]), NULL, NULL, strat);
 
 #ifdef KDEBUG
@@ -922,13 +1020,11 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       strat->P.PrepareRed(strat->use_buckets);
     }
 
-#ifdef HAVE_RING2TOM
     if (strat->P.p == NULL && strat->P.t_p == NULL)
     {
       red_result = 0;
     }
     else
-#endif
     {
       if (TEST_OPT_PROT)
         message((strat->honey ? strat->P.ecart : 0) + strat->P.pFDeg(),
@@ -1008,6 +1104,17 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #else
       strat->enterS(strat->P, pos, strat, strat->tl);
 #endif
+      int pl=pLength(strat->P.p);
+      if (pl==1)
+      {
+        //if (TEST_OPT_PROT)
+        //PrintS("<1>");
+      }
+      else if (pl==2)
+      {
+        //if (TEST_OPT_PROT)
+        //PrintS("<2>");
+      }
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 //      Print("[%d]",hilbeledeg);
       if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
