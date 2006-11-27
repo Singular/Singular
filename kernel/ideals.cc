@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.26 2006-11-27 12:55:57 Singular Exp $ */
+/* $Id: ideals.cc,v 1.27 2006-11-27 13:44:44 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -3534,6 +3534,7 @@ static int idReadOutUnits(ideal arg,int* comp)
   return generator;
 }
 
+#if 0
 static void idDeleteComp(ideal arg,int red_comp)
 {
   int i,j;
@@ -3555,6 +3556,30 @@ static void idDeleteComp(ideal arg,int red_comp)
   }
   (arg->rank)--;
 }
+#endif
+
+static void idDeleteComps(ideal arg,int* red_comp,int del)
+// red_comp is an array [0..args->rank]
+{
+  int i,j;
+  poly p;
+
+  for (i=IDELEMS(arg)-1;i>=0;i--)
+  {
+    p = arg->m[i];
+    while (p!=NULL)
+    {
+      j = pGetComp(p);
+      if (red_comp[j]!=j)
+      {
+        pSetComp(p,red_comp[j]);
+        pSetmComp(p);
+      }
+      pIter(p);
+    }
+  }
+  (arg->rank) -= del;
+}
 
 /*2
 * returns the presentation of an isomorphic, minimally
@@ -3568,6 +3593,8 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
 
   if (!inPlace) res = idCopy(arg);
   res->rank=si_max(res->rank,idRankFreeModule(res));
+  int *red_comp=(int*)omAlloc((res->rank+1)*sizeof(int));
+  for (i=res->rank;i>=0;i--) red_comp[i]=i;
 
   int del=0;
   loop
@@ -3576,12 +3603,17 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
     if (next_gen<0) break;
     del++;
     syGaussForOne(res,next_gen,next_comp,0,IDELEMS(res));
-    idDeleteComp(res,next_comp);
+    for(i=next_comp+1;i<=arg->rank;i++) red_comp[i]--;
     if ((w !=NULL)&&(*w!=NULL))
     {
       for(i=next_comp;i<(*w)->length();i++) (**w)[i-1]=(**w)[i];
     }
   }
+
+  idDeleteComps(res,red_comp,del);
+  idSkipZeroes(res);
+  omFree(red_comp);
+
   if ((w !=NULL)&&(*w!=NULL) &&(del>0))
   {
     intvec *wtmp=new intvec((*w)->length()-del);
@@ -3589,7 +3621,6 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
     delete *w;
     *w=wtmp;
   }
-  idSkipZeroes(res);
   return res;
 }
 
