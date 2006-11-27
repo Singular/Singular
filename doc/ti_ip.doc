@@ -57,7 +57,7 @@ I= ( x^v(i)+ - x^v(i)- | i=1,@dots{},r ).
 @end display
 @end ifinfo
 
-The required lattice basis can be computed using the LLL-algorithm (@pxref{[Coh93]}). For the computation of the saturation, there are various
+The required lattice basis can be computed using the LLL-algorithm (@ref{lll_lib}, see @pxref{[Coh93]}). For the computation of the saturation, there are various
 possibilities described in the
 @tex
 section Algorithms.
@@ -142,7 +142,7 @@ a special importance in the application to integer programming
 The algorithm of Pottier (@pxref{[Pot94]}) starts by computing a lattice
 @tex
 basis $v_1,\ldots,v_r$ for the integer kernel of $A$ using the
-LLL-algorithm. The ideal corresponding to the lattice basis vectors
+LLL-algorithm (@ref{lll_lib}). The ideal corresponding to the lattice basis vectors
 $$ I_1=<x^{v_i^+}-x^{v_i^-}|i=1,\ldots,r> $$
 is saturated -- as in the algorithm of Conti and Traverso -- by
 inversion of all variables: One adds an auxiliary variable $t$ and the
@@ -152,7 +152,7 @@ $t$.
 @end tex
 @ifinfo
 basis v(1),@dots{},v(r) for the integer kernel of A using the
-LLL-algorithm. The ideal corresponding to the lattice basis vectors @*
+LLL-algorithm (@ref{lll_lib}). The ideal corresponding to the lattice basis vectors @*
 @display
 I1= ( x^v(i)+ - x^v(i)- | i=1,@dots{},r )
 @end display
@@ -178,7 +178,7 @@ with positive coefficients in its row space. This is a real restriction,
 i.e., the algorithm will not necessarily work in the general case.
 
 A lattice basis $v_1,\ldots,v_r$ is again computed via the
-LLL-algorithm. The saturation step is performed in the following way:
+LLL-algorithm (@ref{lll_lib}). The saturation step is performed in the following way:
 First note that $w$ induces a positive grading w.r.t. which the ideal
 $$ I=<x^{v_i^+}-x^{v_i^-}|i=1,\ldots,r> $$
 corresponding to our lattice basis is homogeneous. We use the following
@@ -205,7 +205,7 @@ with positive coefficients in its row space. This is a real restriction,
 i.e., the algorithm will not necessarily work in the general case.
 
 A lattice basis v(1),@dots{},v(r) is again computed via the
-LLL-algorithm. The saturation step is performed in the following way:
+LLL-algorithm (@ref{lll_lib}). The saturation step is performed in the following way:
 First note that w induces a positive grading w.r.t.@: which the ideal @*
 @display
 I= ( x^v(i)+ - x^v(i)- | i=1,@dots{},r )
@@ -421,8 +421,8 @@ instance by an extended instance with the matrix used
 in the Conti-Traverso algorithm. Indeed, the Conti-Traverso
 algorithm offers the possibility to verify solvability of a given
 instance and to find an initial solution in the case of existence (but
-none of the other algorithms does!). Details can be found in [CoTr91]
-and [The99].
+none of the other algorithms does!). Details can be found in @pxref{[CoTr91]}
+and @pxref{[The99]}.
 
 An implementation of the above algorithm and some examples can be found in @ref{intprog_lib}.
 
@@ -434,7 +434,7 @@ perform steps (1) and (2) above only once. As the running time of step (3)
 is very short, solving all the instances is not much harder than
 solving one single instance.
 
-For a detailed discussion see [The99].
+For a detailed discussion see @pxref{[The99]}.
 
 @node Relevant References, , Integer programming, Toric ideals and integer programming
 @subsection Relevant References
@@ -446,7 +446,7 @@ For a detailed discussion see [The99].
 
 @item [BLR98]  Bigatti, A.M.; La Scala, R.; Robbiano, L.: @anchor{[BLR98]}
    Computing toric ideals.
-   Journal of Symbolic Computation (to appear)
+   Journal of Symbolic Computation (1999) 27, 351-366
 
 @item [Coh93]  Cohen, H.: @anchor{[Coh93]}
    A Course in Computational Algebraic Number Theory.
@@ -464,7 +464,7 @@ For a detailed discussion see [The99].
 
 @item [HoSh98]  Hosten, S.; Shapiro, J.: @anchor{[HoSh98]}
    Primary decomposition of lattice basis ideals.
-   (to appear)
+   Journal of Symbolic Computation (2000), 29, 625-639
 
 @item [HoSt95]  Hosten, S.; Sturmfels, B.: @anchor{[HoSt95]}
    GRIN: An implementation of Groebner bases for integer programming.
