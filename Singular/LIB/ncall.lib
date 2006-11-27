@@ -1,6 +1,6 @@
-// $Id: ncall.lib,v 1.5 2006-07-28 13:01:14 motsak Exp $
+// $Id: ncall.lib,v 1.6 2006-11-27 13:30:30 levandov Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncall.lib,v 1.5 2006-07-28 13:01:14 motsak Exp $";
+version="$Id: ncall.lib,v 1.6 2006-11-27 13:30:30 levandov Exp $";
 category = "Noncommutative";
 info="
 LIBRARY:  ncall.lib   Load all noncommutative libraries
@@ -13,6 +13,7 @@ LIBRARY:  ncall.lib   Load all noncommutative libraries
   gkdim.lib:       Procedures for calculating the Gelfand-Kirillov dimension
   qmatrix.lib:     Quantum matrices, quantum minors and symmetric groups
   involut.lib:     Computations and operations with involutions
+  perron.lib:      Computation of algebraic dependences
 @end format
 ";
 
@@ -27,4 +28,5 @@ LIB "gkdim.lib";
 LIB "qmatrix.lib";
 LIB "involut.lib";
 LIB "dmod.lib";
+LIB "perron.lib";
 //LIB "nchomolog.lib";
