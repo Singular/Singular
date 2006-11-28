@@ -276,6 +276,7 @@ i;  // mit Leerzeichen beginnen.
 
 + Die Funktionalitaet von doc2tex ist im sourcecode ausfuehrlich
   domkumentiert. Siehe doc2tex.pl - Vorspann.
++ Innerhalb einer @tex-Umgebeung keine texinfo-Befehle (wie @ref) verwenden.
 
 ------------------------------------------------------------
-$Id: STYLEGUIDE,v 1.18 2003-02-05 18:29:52 levandov Exp $
+$Id: STYLEGUIDE,v 1.19 2006-11-28 14:53:53 Singular Exp $
