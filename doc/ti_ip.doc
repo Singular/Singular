@@ -57,7 +57,9 @@ I= ( x^v(i)+ - x^v(i)- | i=1,@dots{},r ).
 @end display
 @end ifinfo
 
-The required lattice basis can be computed using the LLL-algorithm (@ref{lll_lib}, see @pxref{[Coh93]}). For the computation of the saturation, there are various
+The required lattice basis can be computed using the LLL-algorithm
+(@ref{lll_lib},
+see @pxref{[Coh93]}). For the computation of the saturation, there are various
 possibilities described in the
 @tex
 section Algorithms.
@@ -139,10 +141,17 @@ a special importance in the application to integer programming
 @cindex algorithm of Pottier
 
 
-The algorithm of Pottier (@pxref{[Pot94]}) starts by computing a lattice
+The algorithm of Pottier (@pxref{[Pot94]}) starts by computing a lattice basis
 @tex
-basis $v_1,\ldots,v_r$ for the integer kernel of $A$ using the
-LLL-algorithm (@ref{lll_lib}). The ideal corresponding to the lattice basis vectors
+$v_1,\ldots,v_r$
+for the integer kernel of $A$
+@end tex
+@ifinfo
+v(1),@dots{},v(r) for the integer kernel of A
+@end ifinfo
+using the LLL-algorithm (@ref{lll_lib}).
+The ideal corresponding to the lattice basis vectors
+@tex
 $$ I_1=<x^{v_i^+}-x^{v_i^-}|i=1,\ldots,r> $$
 is saturated -- as in the algorithm of Conti and Traverso -- by
 inversion of all variables: One adds an auxiliary variable $t$ and the
@@ -151,8 +160,6 @@ in $K[t,x_1,\ldots,x_n]$ from which one computes $I_A$ by elimination of
 $t$.
 @end tex
 @ifinfo
-basis v(1),@dots{},v(r) for the integer kernel of A using the
-LLL-algorithm (@ref{lll_lib}). The ideal corresponding to the lattice basis vectors @*
 @display
 I1= ( x^v(i)+ - x^v(i)- | i=1,@dots{},r )
 @end display
@@ -162,7 +169,6 @@ generator t * x(1) *@dots{}* x(n) -1 to obtain an ideal I2 in
 K[t,x(1),@dots{},x(n)] from which one computes I(A) by elimination of
 t.
 @end ifinfo
-
 
 @node Hosten and Sturmfels, Di Biase and Urbanke, Pottier, Algorithms
 
@@ -178,7 +184,8 @@ with positive coefficients in its row space. This is a real restriction,
 i.e., the algorithm will not necessarily work in the general case.
 
 A lattice basis $v_1,\ldots,v_r$ is again computed via the
-LLL-algorithm (@ref{lll_lib}). The saturation step is performed in the following way:
+LLL-algorithm.
+The saturation step is performed in the following way:
 First note that $w$ induces a positive grading w.r.t. which the ideal
 $$ I=<x^{v_i^+}-x^{v_i^-}|i=1,\ldots,r> $$
 corresponding to our lattice basis is homogeneous. We use the following
@@ -205,7 +212,8 @@ with positive coefficients in its row space. This is a real restriction,
 i.e., the algorithm will not necessarily work in the general case.
 
 A lattice basis v(1),@dots{},v(r) is again computed via the
-LLL-algorithm (@ref{lll_lib}). The saturation step is performed in the following way:
+LLL-algorithm (@ref{lll_lib}).
+The saturation step is performed in the following way:
 First note that w induces a positive grading w.r.t.@: which the ideal @*
 @display
 I= ( x^v(i)+ - x^v(i)- | i=1,@dots{},r )
