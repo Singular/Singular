@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.148 2006-11-27 13:27:32 levandov Exp $
+@comment $Id: singular.doc,v 1.149 2006-11-28 15:59:14 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -317,6 +317,7 @@ LIB "all.lib";
 * grwalk_lib:: Groebner walk and Fraktal walk
 * homolog_lib:: procedures for homological algebra
 * intprog_lib:: Integer Programming
+* lll_lib:: Integral LLL-Algorithm
 * mprimdec_lib:: procedures for primary decomposition of modules
 * mregular_lib:: procedures for Castelnuovo-Mumford regularity
 * normal_lib:: procedure for normalization
