@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.36 2006-11-17 14:48:40 Singular Exp $ */
+/* $Id: kutil.cc,v 1.37 2006-11-29 18:09:45 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -4747,6 +4747,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
   LObject h;
   int i, suc=0;
   poly redSi=NULL;
+  BOOLEAN change;
 //  Print("nach initS: updateS start mit sl=%d\n",(strat->sl));
 //  for (i=0; i<=(strat->sl); i++)
 //  {
@@ -4762,36 +4763,39 @@ void updateS(BOOLEAN toT,kStrategy strat)
       i=suc+1;
       while (i<=strat->sl)
       {
+        change=FALSE;
         if (((strat->syzComp==0) || (pGetComp(strat->S[i])<=strat->syzComp))
         && ((strat->fromQ==NULL) || (strat->fromQ[i]==0)))
         {
-          pDelete(&redSi);
           redSi = pHead(strat->S[i]);
           strat->S[i] = redBba(strat->S[i],i-1,strat);
           if ((strat->ak!=0)&&(strat->S[i]!=NULL))
             strat->S[i]=redQ(strat->S[i],i+1,strat); /*reduce S[i] mod Q*/
-          if (TEST_OPT_DEBUG && (pCmp(redSi,strat->S[i])!=0))
-          {
-            PrintS("reduce:");
-            wrp(redSi);PrintS(" to ");p_wrp(strat->S[i], currRing, strat->tailRing);PrintLn();
-          }
-          if (TEST_OPT_PROT && (pCmp(redSi,strat->S[i])!=0))
-          {
-            if (strat->S[i]==NULL)
-              PrintS("V");
-            else
-              PrintS("v");
-            mflush();
-          }
+          if (pCmp(redSi,strat->S[i])!=0)
+	  {
+	    change=TRUE;
+            if (TEST_OPT_DEBUG)
+            {
+              PrintS("reduce:");
+              wrp(redSi);PrintS(" to ");p_wrp(strat->S[i], currRing, strat->tailRing);PrintLn();
+            }
+            if (TEST_OPT_PROT)
+            {
+              if (strat->S[i]==NULL)
+                PrintS("V");
+              else
+                PrintS("v");
+              mflush();
+            }
+	  }
+          pDeleteLm(&redSi);
           if (strat->S[i]==NULL)
           {
-            pDelete(&redSi);
             deleteInS(i,strat);
             i--;
           }
-          else
+          else if (change)
           {
-            pDelete(&redSi);
             if (TEST_OPT_INTSTRATEGY)
             {
               //pContent(strat->S[i]);
@@ -4846,10 +4850,10 @@ void updateS(BOOLEAN toT,kStrategy strat)
       i=suc;
       while (i<=strat->sl)
       {
+        change=FALSE;
         if (((strat->syzComp==0) || (pGetComp(strat->S[i])<=strat->syzComp))
         && ((strat->fromQ==NULL) || (strat->fromQ[i]==0)))
         {
-          pDelete(&redSi);
           redSi=pHead((strat->S)[i]);
           (strat->S)[i] = redMora((strat->S)[i],i-1,strat);
           if ((strat->S)[i]==NULL)
@@ -4857,11 +4861,10 @@ void updateS(BOOLEAN toT,kStrategy strat)
             deleteInS(i,strat);
             i--;
           }
-          else
+          else if (pCmp((strat->S)[i],redSi)!=0)
           {
             if (TEST_OPT_INTSTRATEGY)
             {
-              pDelete(&redSi);
               pCleardenom(strat->S[i]);// also does a pContent
               h.p = strat->S[i];
               strat->initEcart(&h);
@@ -4869,7 +4872,6 @@ void updateS(BOOLEAN toT,kStrategy strat)
             }
             else
             {
-              pDelete(&redSi);
               pNorm(strat->S[i]);
               h.p = strat->S[i];
               strat->initEcart(&h);
@@ -4878,6 +4880,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
             h.sev =  pGetShortExpVector(h.p);
             strat->sevS[i] = h.sev;
           }
+          pDeleteLm(&redSi);
           kTest(strat);
         }
         i++;
@@ -4923,7 +4926,6 @@ void updateS(BOOLEAN toT,kStrategy strat)
     }
     if (suc!= -1) updateS(toT,strat);
   }
-  if (redSi!=NULL) pDeleteLm(&redSi);
 #ifdef KDEBUG
   kTest(strat);
 #endif
