@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.3 2006-03-20 20:33:57 wienand Exp $ */
+/* $Id: numbers.cc,v 1.4 2006-11-29 16:48:41 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -177,7 +177,7 @@ void nSetChar(ring r)
   nSize  = r->cf->nSize;
   nRePart = r->cf->nRePart;
   nImPart = r->cf->nImPart;
-  if (!errorreported) nNULL=r->cf->nNULL;
+  nNULL=r->cf->nNULL;
 }
 
 /*2
