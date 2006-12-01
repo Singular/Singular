@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.278 2006-09-27 13:35:08 Singular Exp $
+@comment $Id: reference.doc,v 1.279 2006-12-01 16:05:31 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5199,7 +5199,7 @@ See
 int
 @item @strong{Purpose:}
 computes the regularity of a homogeneous ideal, resp.@: module, from a
-minimal resolution given by the list expression.
+minimal resolution given by the argument.
 @*
 @ifinfo
 Let
@@ -5385,8 +5385,8 @@ parameters specifying the ordering and the size of the block ( intvec : typicall
 @item
 the quotient ideal.
 @end enumerate
-The list defines the ring by the command @code{ring} and modifying the list
-modifies the ring ( see the following example ).
+From a list of such structure, a new ring may be defined by the command @code{ring}
+( see the following example ).
 @item @strong{Example:}
 @smallexample
 @c example
@@ -6466,7 +6466,7 @@ k=1,@dots{},N.
 @end ifinfo
 @tex
 {\tt vandermonde(p,v,d)} computes the (unique) polynomial of degree
-@code{d} with prescribed values {\tt v[1],...,v[N]} at the points
+{\tt d} with prescribed values {\tt v[1],...,v[N]} at the points
 {\tt p}$^0,\dots,$ {\tt p}$^{N-1}$, {\tt N=(d+1)}$^n$, $n$ the
 number of ring variables.
 
