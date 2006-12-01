@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.83 2006-11-13 10:15:34 Singular Exp $";
+version="$Id: standard.lib,v 1.84 2006-12-01 16:04:56 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -7,7 +7,6 @@ LIBRARY: standard.lib   Procedures which are always loaded at Start-up
 PROCEDURES:
  stdfglm(ideal[,ord])   standard basis of ideal via fglm [and ordering ord]
  stdhilb(ideal[,h])     standard basis of ideal using the Hilbert function
- hilbstd(ideal[,h])     standard basis using (weighted) Hilbert function
  groebner(ideal/module) standard basis using a heuristically chosen method
  res(ideal/module,[i])  free resolution of ideal or module
  sprintf(fmt,...)       returns fomatted string
@@ -16,6 +15,7 @@ PROCEDURES:
  weightKB(stc,dd,vl)    degree dd part of a kbase wrt. some weigths
 ";
 
+// hilbstd(ideal[,h])     standard basis using (weighted) Hilbert function
 //////////////////////////////////////////////////////////////////////////////
 
 proc stdfglm (ideal i, list #)
@@ -1239,11 +1239,12 @@ proc weightKB(def stc, int dd, list wim)
          @code{weightKB (} ideal_expression@code{,} int_expression@code{,}
             list_expression @code{)}
 RETURN:  the same as the input type of the first argument
-PURPOSE:  Computes the part of a vector space basis of the respective quotient with
-          weighted degree of the monomials equal to the second argument. The last
+PURPOSE:  computes the part of a vector space basis of the quotient
+          defined by the first argument with weighted degree of the monomials
+          equal to the second argument. The last
           argument contains the information about the weights as a list of intvec:
-            @code{wim[1]} for all variables (positive),
-            @code{wim[2]} only for module for the generators.
+            @code{wim[1]} weights for all variables (positive),
+            @code{wim[2]} weights for the module generators.
 NOTE:     This is a generalisation for the command @code{kbase} with the same first
           two arguments.
 SEE ALSO: kbase
