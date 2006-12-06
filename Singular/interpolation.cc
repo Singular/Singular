@@ -1596,7 +1596,7 @@ ideal interpolation(lists L, intvec *v)
 
   if (!data_ok)
   {
-     GeneralDone;
+     GeneralDone();
      WerrorS("data structure is invalid");
      return NULL;
   }
