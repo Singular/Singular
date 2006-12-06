@@ -103,7 +103,7 @@ modp_number modp_denom; // denominator of mod p computations
 modp_result_entry *modp_result; // list of results for various mod p calculations (used for modp - first result is the desired one)
 modp_result_entry *cur_result; // pointer to current result (as before)
 modp_number *congr; // primes used in computations (chinese remainder theorem) (not used for modp)
-modp_number *gamma; // inverts used in chinese remainder theorem (not used for modp)
+modp_number *in_gamma; // inverts used in chinese remainder theorem (not used for modp)
 mpz_t bigcongr; // result, in fact, is given in mod bigcongr (not used for modp)
 
 mpz_t *polycoef; // polynomial integercoefficients (not used for modp)
@@ -1043,7 +1043,7 @@ void PrepareChinese (int n) // initialization for CRA
      cur_ptr=modp_result;
      modp_number *congr_ptr;
      modp_number prod;
-     gamma=(modp_number*)mdmALLOC(sizeof(modp_number)*n);
+     in_gamma=(modp_number*)mdmALLOC(sizeof(modp_number)*n);
      congr=(modp_number*)mdmALLOC(sizeof(modp_number)*n);
      congr_ptr=congr;
      while (cur_ptr!=NULL)
@@ -1056,7 +1056,7 @@ void PrepareChinese (int n) // initialization for CRA
      {
          prod=congr[0]%congr[k];
          for (i=1;i<=k-1;i++) prod=(prod*congr[i])%congr[k];
-         gamma[i]=OneInverse(prod,congr[k]);
+         in_gamma[i]=OneInverse(prod,congr[k]);
      }
      mpz_init(bigcongr);
      mpz_set_ui(bigcongr,congr[0]);
@@ -1065,7 +1065,7 @@ void PrepareChinese (int n) // initialization for CRA
 
 void CloseChinese (int n) // after CRA
 {
-     mdmFREE(gamma);
+     mdmFREE(in_gamma);
      mdmFREE(congr);
      mpz_clear(bigcongr);
 }
@@ -1130,7 +1130,7 @@ void ReconstructGenerator (int ngen,int n,bool show) // recostruction of generat
              for (j=k-2;j>=0;j--) temp=(temp*congr[j]+v[j])%congr[k];
              temp=u[k]-temp;
              if (temp<0) temp=temp+congr[k];
-             v[k]=(temp*gamma[k])%congr[k];
+             v[k]=(temp*in_gamma[k])%congr[k];
          }
          mpz_set_si(sol,v[n-1]);
          for (k=n-2;k>=0;k--)
