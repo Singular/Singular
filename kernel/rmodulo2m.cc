@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.4 2006-03-20 20:33:57 wienand Exp $ */
+/* $Id: rmodulo2m.cc,v 1.5 2006-12-06 16:59:49 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -57,7 +57,7 @@ number nr2mLcm (number a,number b,ring r)
 
 /*
  * Give the largest non unit k, such that a = x * k, b = y * k has
- * a solution. 
+ * a solution.
  */
 number nr2mGcd (number a,number b,ring r)
 {
@@ -245,13 +245,21 @@ number nr2mDiv (number a,number b)
     return (number)0;
   else if ((long)b%2==0)
   {
-    WerrorS("div by zero divisor");
-    return (number)0;
+    if ((long)b != 0)
+    {
+      while ((long) b%2 == 0 && (long) a%2 == 0)
+      {
+        a = (number) ((long) a / 2);
+        b = (number) ((long) b / 2);
+      }
+    }
+    if ((long) b%2 == 0)
+    {
+      WerrorS("div by zero divisor");
+      return (number)0;
+    }
   }
-  else
-  {
-    return (number) nr2mMult(a, nr2mInversM(b));
-  }
+  return (number) nr2mMult(a, nr2mInversM(b));
 }
 
 number nr2mIntDiv (number a,number b)
