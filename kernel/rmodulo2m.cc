@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.5 2006-12-06 16:59:49 wienand Exp $ */
+/* $Id: rmodulo2m.cc,v 1.6 2006-12-06 17:43:32 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -18,7 +18,7 @@
 #include "ring.h"
 #include "rmodulo2m.h"
 
-
+#ifdef HAVE_RING2TOM
 int nr2mExp;
 long nr2mModul;
 
@@ -387,10 +387,8 @@ char * nr2mRead (char *s, number *a)
   }
   if (n == 1)
     *a = (number)z;
-  else 
+  else
       *a = nr2mDiv((number)z,(number)n);
   return s;
 }
-
-
-
+#endif

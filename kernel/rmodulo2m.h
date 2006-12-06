@@ -1,12 +1,13 @@
-//#ifndef RMODULO2M_H
-//#define RMODULO2M_H
+#ifndef RMODULO2M_H
+#define RMODULO2M_H
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.h,v 1.2 2006-03-20 20:33:57 wienand Exp $ */
+/* $Id: rmodulo2m.h,v 1.3 2006-12-06 17:43:32 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
+#ifdef HAVE_RING2TOM
 #include "structs.h"
 
 extern int nr2mExp;
@@ -61,3 +62,6 @@ static inline number nr2mSubM(number a, number b)
 
 #define nr2mNegM(A) (number)(nr2mModul-(long)(A))
 #define nr2mEqualM(A,B)  ((A)==(B))
+
+#endif
+#endif
