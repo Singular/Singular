@@ -111,7 +111,7 @@ then
         exit 1
     fi
 # SunOS ########################################################
-elif (echo $uname_m | $egrep "SunOS" > $devnull)
+elif (echo $uname_a | $egrep "SunOS" > $devnull)
 then
     if (echo $uname_a | $egrep "sun3" > $devnull)
     then
