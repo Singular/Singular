@@ -1,6 +1,6 @@
 @comment -*-texinfo-*-
-@comment $Id: tricks.doc,v 1.10 2006-07-17 14:32:25 Singular Exp $
-@comment this file contains the "Tricks and pittfals" sections
+@comment $Id: tricks.doc,v 1.11 2006-12-06 16:42:47 Singular Exp $
+@comment this file contains the "Tricks and pittfalls" sections
 
 @c The following directives are necessary for proper compilation
 @c with emacs (C-c C-e C-r).  Please keep it as it is.  Since it
@@ -22,13 +22,14 @@
 
 @menu
 * Limitations::
+* System dependent limitations::
 * Major differences to the C programming language::
 * Miscellaneous oddities::
 * Identifier resolution::
 @end menu
 
 @c -------------------------------------------------------------------------
-@node Limitations,Major differences to the C programming language,,Tricks and pitfalls
+@node Limitations,System dependent limitations,,Tricks and pitfalls
 @section Limitations
 @cindex Limitations
 
@@ -82,7 +83,26 @@ definitions.
 @end itemize
 
 @c -------------------------------------------------------------------------
-@node Major differences to the C programming language,Miscellaneous oddities,Limitations,Tricks and pitfalls
+@node System dependent limitations,Major differences to the C programming language,Limitations,Tricks and pitfalls
+@section System dependent limitations
+@cindex System dependent limitations
+
+Ports of @sc{Singular} to different systems do not always implement all
+possible parts of @sc{Singular}:
+@itemize @bullet
+@item
+MP links are available only for 32bit unix systems.
+@item
+dynamic modules are implemented for
+  @itemize @bullet
+  @item
+  unix systems with ELF format for executables (Linux, Solaris)
+  @item
+  HPUX
+  @end itemize
+@end itemize
+@c -------------------------------------------------------------------------
+@node Major differences to the C programming language,Miscellaneous oddities,System dependent limitations,Tricks and pitfalls
 @section Major differences to the C programming language
 @cindex C programming language
 
