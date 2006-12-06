@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.28 2006-09-20 09:08:16 Singular Exp $
+@comment $Id: COPYING.texi,v 1.29 2006-12-06 17:38:47 Singular Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -23,9 +23,7 @@
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation ( version 2 of the License );
-with the following additional restrictions (which override any conflicting
-restrictions in the GPL):
+the Free Software Foundation ( version 2 of the License ).
 
 The following software used with @sc{Singular} have their own copyright:
 the omalloc library, the readline library,
@@ -38,6 +36,8 @@ XEmacs editor (XEmacs).
 
 Their copyrights and licenses can be found in the accompanying files
 which are distributed along with these packages.
+(As of version 3-0-3 of @sc{Singular}, all parts have GPL or LGPL
+as (one of) their licences.)
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of

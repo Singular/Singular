@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.149 2006-11-28 15:59:14 Singular Exp $
+@comment $Id: singular.doc,v 1.150 2006-12-06 17:38:47 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -318,6 +318,7 @@ LIB "all.lib";
 * homolog_lib:: procedures for homological algebra
 * intprog_lib:: Integer Programming
 * lll_lib:: Integral LLL-Algorithm
+* modStd_lib:: Groebner basis of ideals
 * mprimdec_lib:: procedures for primary decomposition of modules
 * mregular_lib:: procedures for Castelnuovo-Mumford regularity
 * normal_lib:: procedure for normalization
@@ -355,11 +356,15 @@ LIB "all.lib";
 @subsection intprog_lib
 @c lib intprog.lib
 @c ---------------------------------------------------------
-@node lll_lib, mprimdec_lib, intprog_lib, Commutative algebra
+@node lll_lib, modStd_lib, intprog_lib, Commutative algebra
 @subsection lll_lib
 @c lib lll.lib
 @c ---------------------------------------------------------
-@node mprimdec_lib, mregular_lib, lll_lib, Commutative algebra
+@node modStd_lib, mprimdec_lib, lll_lib, Commutative algebra
+@subsection modStd_lib
+@c lib modStd.lib
+@c ---------------------------------------------------------
+@node mprimdec_lib, mregular_lib, modStd_lib, Commutative algebra
 @subsection mprimdec_lib
 @c lib mprimdec.lib
 @c ----------------------------------------------------------
