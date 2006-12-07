@@ -53,7 +53,7 @@ CFLAGS	+= --no-rtti --no-exceptions -O3 -w -fomit-frame-pointer -pipe -fno-impli
 LIBS	+= -L/usr/local/lib
 
 OBJS	= main.o mod_grammar.o scanner.o misc.o makefile.o utils.o \
-	creat_top.o proc.o proc_setup.o
+	creat_top.o proc.o proc_setup.o getopt.o getopt1.o
 
 ############################################################
 ###

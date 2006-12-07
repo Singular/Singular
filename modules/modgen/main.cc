@@ -9,7 +9,12 @@
 #include <string.h>
 #include <mylimits.h>
 #include <unistd.h>
+#include "config.h"
+#ifdef HAVE_GETOPT_LONG
 #include <getopt.h>
+#else
+#include "my_getopt.h"
+#endif
 
 #include "modgen.h"
 #include "pathnames.h"

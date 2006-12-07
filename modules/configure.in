@@ -16,9 +16,9 @@ dnl here are some defaults
 
 SINGULAR_MAJOR_VERSION=${SINGULAR_MAJOR_VERSION:-3}
 SINGULAR_MINOR_VERSION=${SINGULAR_MINOR_VERSION:-0}
-SINGULAR_SUB_VERSION=${SINGULAR_SUB_VERSION:-0}
+SINGULAR_SUB_VERSION=${SINGULAR_SUB_VERSION:-3}
 SINGULAR_VERSION="${SINGULAR_VERSION:-$SINGULAR_MAJOR_VERSION${VERSION_SEP}$SINGULAR_MINOR_VERSION${VERSION_SEP}$SINGULAR_SUB_VERSION}"
-VERSION_DATE=${VERSION_DATE:-"May 2005"}
+VERSION_DATE=${VERSION_DATE:-"December 2006"}
 
 dnl pass them on into the Makefiles
 AC_SUBST(SINGULAR_VERSION)
@@ -55,6 +55,11 @@ AC_SUBST(LD)
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([fcntl.h stddef.h stdlib.h string.h unistd.h])
+
+AC_CHECK_HEADERS([getopt.h])
+AC_CHECK_FUNCS([getopt_long],,
+   [# FreeBSD has a gnugetopt library for this
+    AC_CHECK_LIB([gnugetopt],[getopt_long],[AC_DEFINE([HAVE_GETOPT_LONG])])])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST

@@ -93,3 +93,7 @@
 
 /* Define to `unsigned' if <sys/types.h> does not define. */
 #undef size_t
+
+/* Define to use GNU getopt_long from the system */
+#undef HAVE_GETOPT_LONG
+
