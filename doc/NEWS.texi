@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.63 2006-12-07 14:27:39 Singular Exp $
+@comment $Id: NEWS.texi,v 1.64 2006-12-07 18:09:44 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -35,8 +35,8 @@ kernel updated for the optional use of boost
 @item
 new command: (@nref{interpolation}: ideal of points with given multiplicities)
 @item
-new library: modStd.lib (@nref{modStd_lib}): Groebner base computations via
-chinese remainder theorem
+new library: modStd.lib (@nref{modStd_lib}): Groebner base computations
+over the rational numbers via modular computations
 @c @item
 @c improved center.lib (@nref{center_lib}): revised implementation, new functions (sa_reduce etc.)
 @item
@@ -46,6 +46,8 @@ new algorithms in primdec.lib (@nref{primdec_lib}): radical et al.
 @item
 improved version of @nref{slimgb}, incorporated into @nref{groebner},
 strategy change in groebner.
+@item
+operation for sparse matrices improved: multiplication, prune, conversion to module
 @c @item
 @c experimental: @code{python} / @code{ipython} interface
 @end itemize
