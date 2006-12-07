@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.62 2006-12-06 17:38:47 Singular Exp $
+@comment $Id: NEWS.texi,v 1.63 2006-12-07 14:27:39 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -40,7 +40,7 @@ chinese remainder theorem
 @c @item
 @c improved center.lib (@nref{center_lib}): revised implementation, new functions (sa_reduce etc.)
 @item
-revised resolve.lib (@nref{resolve_lib}).
+resolve.lib: blow ups revised (@nref{resolve_lib}).
 @item
 new algorithms in primdec.lib (@nref{primdec_lib}): radical et al.
 @item
