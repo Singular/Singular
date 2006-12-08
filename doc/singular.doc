@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.151 2006-12-07 18:09:44 Singular Exp $
+@comment $Id: singular.doc,v 1.152 2006-12-08 17:08:16 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -110,7 +110,7 @@ This is the texinfo file describing Singular (version @value{VERSION})
 * Functions and system variables::
 * Tricks and pitfalls::
 @ifset withplural
-* PLURAL::
+* Non-commutative subsystem PLURAL::
 @end ifset
 * Examples::
 * Polynomial data::
@@ -152,7 +152,7 @@ This is the texinfo file describing Singular (version @value{VERSION})
 
 @c ----------------------------------------------------------------------------
 @ifset withplural
-@node Tricks and pitfalls, PLURAL, Functions and system variables, Top
+@node Tricks and pitfalls, Non-commutative subsystem PLURAL, Functions and system variables, Top
 @end ifset
 
 @ifclear withplural
@@ -165,15 +165,15 @@ This is the texinfo file describing Singular (version @value{VERSION})
 
 @c ----------------------------------------------------------------------------
 @ifset withplural
-@node PLURAL, Examples, Tricks and pitfalls, Top
-@chapter PLURAL
-@cindex PLURAL
+@node Non-commutative subsystem PLURAL, Examples, Tricks and pitfalls, Top
+@chapter Non-commutative subsystem PLURAL
+@cindex Non-commutative subsystem PLURAL
 @include s-plural.tex
 @end ifset
 
 @c ----------------------------------------------------------------------------
 @ifset withplural
-@node Examples, Polynomial data, PLURAL, Top
+@node Examples, Polynomial data, Non-commutative subsystem PLURAL, Top
 @end ifset
 
 @ifclear withplural

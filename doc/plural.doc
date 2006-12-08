@@ -2,8 +2,8 @@
 @ifclear singularmanual
 @c -----------------------Top node-----------------------------------
 @node Top, Getting started with PLURAL, Top, Top
-@c @chapter PLURAL
-@c @cindex PLURAL
+@c @chapter Non-commutative subsystem PLURAL
+@c @cindex Non-commutative subsystem PLURAL
 
 
 @ifclear PSUFFIX
@@ -89,7 +89,7 @@
 @c @include general.tex
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node  Getting started with PLURAL, Data types @value{PSUFFIX}, , PLURAL
+@node  Getting started with PLURAL, Data types @value{PSUFFIX}, , Non-commutative subsystem PLURAL
 @section  Getting started with PLURAL
 @end ifset
 
@@ -109,7 +109,7 @@
 @c @end ifset
 
 
-@node Data types @value{PSUFFIX}, Functions @value{PSUFFIX}, Getting started with PLURAL, PLURAL
+@node Data types @value{PSUFFIX}, Functions @value{PSUFFIX}, Getting started with PLURAL, Non-commutative subsystem PLURAL
 
 @ifset singularmanual
 @section Data types @value{PSUFFIX}
@@ -134,7 +134,7 @@
 @c @end menu
 @c @end ifset
 
-@node Functions @value{PSUFFIX}, Mathematical background @value{PSUFFIX}, Data types @value{PSUFFIX}, PLURAL
+@node Functions @value{PSUFFIX}, Mathematical background @value{PSUFFIX}, Data types @value{PSUFFIX}, Non-commutative subsystem PLURAL
 
 @ifset singularmanual
 @section Functions @value{PSUFFIX}
@@ -160,7 +160,7 @@
 @c @end menu
 @c @end ifset
 
-@node Mathematical background @value{PSUFFIX}, PLURAL libraries, Functions @value{PSUFFIX}, PLURAL
+@node Mathematical background @value{PSUFFIX}, PLURAL libraries, Functions @value{PSUFFIX}, Non-commutative subsystem PLURAL
 
 @ifset singularmanual
 @section Mathematical background @value{PSUFFIX}
@@ -180,7 +180,7 @@
 
 @c --------------------------------------------------------------------
 @ifset singularmanual
-@node PLURAL libraries, , Mathematical background @value{PSUFFIX}, PLURAL
+@node PLURAL libraries, , Mathematical background @value{PSUFFIX}, Non-commutative subsystem PLURAL
 @section PLURAL libraries
 @lowersections
 @end ifset
