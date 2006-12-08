@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.27 2006-11-27 16:09:46 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.28 2006-12-08 17:50:54 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -442,40 +442,83 @@ int redRing2toM (LObject* h,kStrategy strat)
 */
 int redHomog (LObject* h,kStrategy strat)
 {
-//  if (strat->tl<0) return 1;
-#ifdef KDEBUG
-  if (TEST_OPT_DEBUG)
-  {
-    PrintS("red:");
-    h->wrp();
-    PrintS(" ");
-  }
-#endif
-  int j;
-  int pass = 0;
+  if (strat->tl<0) return 1;
+  //if (h->GetLmTailRing()==NULL) return 0; // HS: SHOULD NOT BE NEEDED!
+  assume(h->FDeg == h->pFDeg());
+
+  poly h_p;
+  int i,j,at,pass, ii, h_d;
+  unsigned long not_sev;
+  long reddeg,d;
+
+  pass = j = 0;
+  d = reddeg = h->GetpFDeg();
+  h->SetShortExpVector();
+  int li;
+  h_p = h->GetLmTailRing();
+  not_sev = ~ h->sev;
   loop
   {
-    // find a poly with which we can reduce
-    h->SetShortExpVector();
     j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
-    if (j < 0)
-    {
-      h->SetpFDeg();
-      return 1;
-    }
+    if (j < 0) return 1;
 
-    // now we found one which is divisible -- reduce it
-    ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
+    li = strat->T[j].pLength;
+    ii = j;
+    /*
+     * the polynomial to reduce with (up to the moment) is;
+     * pi with length li
+     */
+    i = j;
+#if 1
+    loop
+    {
+      /*- search the shortest possible with respect to length -*/
+      i++;
+      if (i > strat->tl)
+        break;
+      if (li<=1)
+        break;
+      if ((strat->T[i].pLength < li)
+         &&
+          p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
+                               h_p, not_sev, strat->tailRing))
+      {
+        /*
+         * the polynomial to reduce with is now;
+         */
+        li = strat->T[i].pLength;
+        ii = i;
+      }
+    }
+#endif
+
+    /*
+     * end of search: have to reduce with pi
+     */
+#ifdef KDEBUG
+    if (TEST_OPT_DEBUG)
+    {
+      PrintS("red:");
+      h->wrp();
+      PrintS(" with ");
+      strat->T[ii].wrp();
+    }
+#endif
+    assume(strat->fromT == FALSE);
+
+    ksReducePoly(h, &(strat->T[ii]), NULL, NULL, strat);
 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
-      Print("\nto ", h->t_p);
+      PrintS("\nto ");
       h->wrp();
       PrintLn();
     }
 #endif
-    if (h->GetLmTailRing() == NULL)
+
+    h_p = h->GetLmTailRing();
+    if (h_p == NULL)
     {
       if (h->lcm!=NULL) pLmFree(h->lcm);
 #ifdef KDEBUG
@@ -483,17 +526,29 @@ int redHomog (LObject* h,kStrategy strat)
 #endif
       return 0;
     }
-    if (!K_TEST_OPT_REDTHROUGH &&
-        (strat->Ll >= 0) && (pass > strat->LazyPass))
+    h->SetShortExpVector();
+    not_sev = ~ h->sev;
+    /*
+     * try to reduce the s-polynomial h
+     *test first whether h should go to the lazyset L
+     *-if the degree jumps
+     *-if the number of pre-defined reductions jumps
+     */
+    pass++;
+    if (!K_TEST_OPT_REDTHROUGH && (strat->Ll >= 0) && (pass > strat->LazyPass))
     {
       h->SetLmCurrRing();
-      int at = strat->posInL(strat->L,strat->Ll,h,strat);
+      at = strat->posInL(strat->L,strat->Ll,h,strat);
       if (at <= strat->Ll)
       {
-#ifdef KDEBUG
-        if (TEST_OPT_DEBUG) Print(" ->L[%d]\n",at);
-#endif
+        int dummy=strat->sl;
+        if (kFindDivisibleByInS(strat, &dummy, h) < 0)
+          return 1;
         enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+#ifdef KDEBUG
+        if (TEST_OPT_DEBUG)
+          Print(" lazy: -> L%d\n",at);
+#endif
         h->Clear();
         return -1;
       }
@@ -624,7 +679,7 @@ int redHoney (LObject* h, kStrategy strat)
         break;
       if (ei < h->ecart)
         break;
-      if (li==1)
+      if (li<=1)
         break;
       if (((strat->T[i].ecart < ei)
          || ((strat->T[i].ecart <= h->ecart) && (strat->T[i].pLength < li)))

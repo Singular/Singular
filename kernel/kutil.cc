@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.37 2006-11-29 18:09:45 Singular Exp $ */
+/* $Id: kutil.cc,v 1.38 2006-12-08 17:50:55 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1006,13 +1006,14 @@ void initEcartNormal (LObject* h)
 {
   h->FDeg = h->pFDeg();
   h->ecart = h->pLDeg() - h->FDeg;
+  h->length=h->GetpLength();
 }
 
 void initEcartBBA (LObject* h)
 {
   h->FDeg = h->pFDeg();
   (*h).ecart = 0;
-  (*h).length = 0;
+  h->length=h->GetpLength();
 }
 
 void initEcartPairBba (LObject* Lp,poly f,poly g,int ecartF,int ecartG)
@@ -4005,6 +4006,8 @@ poly redtail (LObject* L, int pos, kStrategy strat)
       else
         With = kFindDivisibleByInS(strat, pos, &Ln, &With_s, e);
       if (With == NULL) break;
+      With->length=0;
+      With->pLength=0;
       strat->redTailChange=TRUE;
       if (ksReducePolyTail(L, With, h, strat->kNoetherTail()))
       {
@@ -4558,6 +4561,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
           pos = posInS(strat,strat->sl,h.p,h.ecart);
           enterpairsSpecial(h.p,strat->sl,h.ecart,pos,strat,strat->tl+1);
           strat->enterS(h,pos,strat, strat->tl+1);
+	  h.pLength=pLength(h.p);
           enterT(h,strat);
         }
       }
@@ -4837,6 +4841,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
         else assume(strat->sevS[i] == pGetShortExpVector(h.p));
         h.sev = strat->sevS[i];
         h.SetpFDeg();
+	h.pLength=pLength(h.p);
         /*puts the elements of S also to T*/
         enterT(h,strat);
         strat->S_2_R[i] = strat->tl;
@@ -5047,7 +5052,7 @@ void enterT(LObject p, kStrategy strat, int atT)
   assume(strat->tailRing == p.tailRing);
   // redMoraNF complains about this -- but, we don't really
   // neeed this so far
-  // assume(p.pLength == 0 || pLength(p.p) == p.pLength);
+  assume(p.pLength == 0 || pLength(p.p) == p.pLength);
   assume(p.FDeg == p.pFDeg());
   assume(!p.is_normalized || nIsOne(pGetCoeff(p.p)));
 
