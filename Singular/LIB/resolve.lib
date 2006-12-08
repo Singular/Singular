@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: resolve.lib,v 1.8 2006-08-02 11:06:11 Singular Exp $";
+version="$Id: resolve.lib,v 1.9 2006-12-08 09:37:33 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  resolve.lib      Resolution of singularities (Desingularization)
@@ -8,10 +8,17 @@ AUTHORS:  A. Fruehbis-Krueger,  anne@mathematik.uni-kl.de,
 @*        G. Pfister,           pfister@mathematik.uni-kl.de
 
 MAIN PROCEDURES:
- blowUp(J,C[,W,E]) computes the blowing up of the variety V(J) inside V(W) in
-                   the center V(C)
+ blowUp(J,C[,W,E]) computes the blowing up of the variety V(J) (considered
+                   as embedded in V(W)) in the (smooth) center V(C),
+ blowUp2(J,C)      computes the blowing up of the variety V(J) in the
+                   (possibly singular) center V(C)
  Center(J[,W,E])   computes 'Villamayor'-center for blow up
  resolve(J)        computes the desingularization of the variety V(J)
+
+PROCEDURES FOR PRETTY PRINTING OF OUTPUT:
+ showBO(BO)      prints the content of a BO in more human readable form
+ presentTree(L)  prints the final charts in more human readable form
+ showDataTypes() prints help text for output data types
 
 AUXILLARY PROCEDURES:
  blowUpBO(BO,C)  computes the blowing up of the variety V(BO[1]) in the
@@ -21,7 +28,6 @@ AUXILLARY PROCEDURES:
                  given basic object
  Delta(BO)       apply the Delta-operator of [Bravo,Encinas,Villamayor]
  DeltaList(BO)   list of results of Delta^0 to Delta^bmax
- showBO(BO)      prints the content of a BO in more human readable form
 ";
 LIB "elim.lib";
 LIB "primdec.lib";
@@ -33,9 +39,61 @@ LIB "sing.lib";
 //                     1) optimization of the local case
 //                     2) optimization in Coeff
 //                     3) change invariant to represent coeff=1 case
-//                     4) create procedures marked by * in above list
 ///////////////////////////////////////////////////////////////////////////////
 
+proc showDataTypes()
+"USAGE:  showDataTypes();
+RETURN:  nothing, only pretty printing of extended version of help text
+EXAMPLE: none
+"
+{
+"                               ";
+"//////////////// Short description of data type BO ///////////////////";
+"BO[1] an ideal, say Wi, defining the ambient space of the i-th chart";
+"      of the blowing up";
+"BO[2] an ideal defining the strict transform";
+"BO[3] intvec, the first integer b such that in the original object";
+"      (Delta^b(BO[2]))==1";
+"      the subsequent integers have the same property for Coeff-Objects";
+"      of BO[2] used when determining the center";
+"BO[4] the list of exceptional divisors";
+"BO[5] an ideal defining the map K[W] ----> K[Wi]";
+"BO[6] an intvec BO[6][j]=1 indicates that <BO[4][j],BO[2]>=1, i.e. the";
+"      strict transform does not meet the j-th exceptional divisor";
+"BO[7] intvec,";
+"      the index of the first blown-up object in the resolution process";
+"      leading to this object for which the value of b was BO[3]";
+"      the subsequent ones are the indices for the Coeff-Objects";
+"      of BO[2] used when determining the center";
+"BO[i], i>7: internal data";
+"                      ";
+pause();
+"              ";
+"///////////// Short description of data in a chart ///////////////////";
+"All chart data is stored in an object of type ring, the following ";
+"variables are always present in such a ring:";
+"BO:      list of type basic object containing the variety, ambient space,";
+"         exceptional divisors and further data (see previous page)";
+"cent:    ideal, describing the upcoming center determined by the algorithm";
+"path:    module (autoconverted to matrix)";
+"         path[1][i]= (i-1)st chart in resolution history of this chart";
+"         path[2][i]= index of chart of the blow up leading to i-th chart";
+"                     in resolution history";
+"lastMap: ideal, describing the preceding blow up leading to this chart";
+"                      ";
+pause();
+"                  ";
+"///////////// Short description of type resolution data //////////////";
+"list L containing two lists:";
+"L[1]: list of rings, containing the final charts";
+"L[2]: list of rings, containing all charts created in the resolution";
+"      process";
+"The most convenient way to view these data is the procedure presentTree()";
+"from this library. Alternatively, it can be digested using tools from";
+"the libraries reszeta.lib and resgraph.lib";
+"//////////////////////////////////////////////////////////////////////";
+}
+///////////////////////////////////////////////////////////////////////////////
 proc createBO(ideal J,list #)
 "USAGE:  createBO(J[,W][,E]);
 @*       J,W = ideals
@@ -107,35 +165,23 @@ ASSUME:  J  = ideal containing W ( W = 0 if not specified)
 @*       E  = list of smooth hypersurfaces (e.g. exceptional divisors)
 NOTE:    W the ideal of the ambient space, C the ideal of the center of
          the blowup and J the ideal of the variety
+         Important difference to blowUp2:
+         - the ambient space V(W) is blown up and V(J) transformed in it
+@*         - V(C) is assumed to be non-singular
 COMPUTE: the blowing up of W in C, the exceptional locus, the strict
          transform of J and the blowup map
 RETURN:  list, say l, of size at most size(C),
+
          l[i] is the affine ring corresponding to the i-th chart
          each l[i] contains the ideals
          - aS, ideal of the blownup ambient space
          - sT, ideal of the strict transform
          - eD, ideal of the exceptional divisor
          - bM, ideal corresponding to the blowup map
-@*       -------------------------------------------------------------------@*
-         l[i] contains also a list BO (basic object for the experts):
-         BO[1] an ideal, say Wi, defining the ambient space of the i-th chart
-               of the blowing up
-         BO[2] an ideal defining the strict transform
-         BO[3] intvec, the first integer b such that in the original object
-               (Delta^b(BO[2]))==1
-               the subsequent integers have the same property for Coeff-Objects
-               of BO[2] used when determining the center
-         BO[4] the list of exceptional divisors
-         BO[5] an ideal defining the map K[W] ----> K[Wi]
-         BO[6] an intvec BO[6][j]=1 indicates that <BO[4][j],BO[2]>=1, i.e. the
-               strict transform does not meet the j-th exceptional divisor
-         BO[7] intvec,
-               the index of the first blown-up object in the resolution process
-               leading to this object for which the value of b was BO[3]
-               the subsequent ones are the indices for the Coeff-Objects
-               of BO[2] used when determining the center
-         BO[8] a matrix indicating that BO[4][i] meets BO[4][j] by BO[8][i,j]=1
-               for i < j
+
+         l[i] also contains a list BO, which can best be viewed with showBO(BO)
+         detailed information on the data type BO can be viewed via the
+         command showDataTypes();
 EXAMPLE: example blowUp;  shows an example
 "
 {
@@ -211,6 +257,178 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
+proc blowUp2(ideal J,ideal C)
+"USAGE:  blowUp2(J,C);
+         J,C = ideals,
+ASSUME:  C  = ideal containing J
+NOTE:    C the ideal of the center of the blowup and J the ideal
+         of the variety
+         Important differences to blowUp:
+         - V(J) itself is blown up, not the ambient space
+         - C is not assumed to be non-singular
+COMPUTE: the blowing up of J in C, the exceptional locus and the blow-up
+         map
+RETURN:  list, say l, of size at most size(C),
+
+         l[i] is the affine ring corresponding to the i-th chart
+         each l[i] contains the ideals
+         - Jnew, ideal of the blownup J
+         - eD, ideal of the new exceptional divisor
+         - bM, ideal corresponding to the blowup map
+
+EXAMPLE: example blowUp2;  shows an example
+"
+{
+//----------------------------------------------------------------------------
+// Initialization and basic sanity checks of the input data
+//----------------------------------------------------------------------------
+  int i,j;
+  def S=basering;
+  def laM=maxideal(1);
+//--- number of generators of C should be as small as possible
+  def mstdC=mstd(C);
+  if(ncols(mstdC[1])<ncols(mstdC[2]))
+  {
+     C=mstdC[1];
+  }
+  else
+  {
+     C=mstdC[2];
+  }
+  C=simplify(interred(C),2);
+//--- the empty set is not a good center ;-)
+  if(deg(lead(C[1]))==0)
+  {
+     ERROR("Your chosen center was the empty set. Exiting.");
+  }
+//--- V(C) should be a subset of V(J)
+  if(size(reduce(J,std(C)))>0)
+  {
+     ERROR("V(J) does not contain V(C). Exiting.");
+  }
+//---------------------------------------------------------------------------
+// To compute the blowing up, we need to consider
+//       (K[x_1,\dots,x_n]/J)[t*C[1],...,t*C[m]]
+// which we want to represent as a quotient of K[x_1,...,x_n,y_1,..,y_m]
+// by an ideal obtained by elimination of the extra variable t.
+// (in the comments n=nvars(S) and m=ncols(C))
+//---------------------------------------------------------------------------
+//--- set up rings for the elimination
+  string r1="ring R=("+charstr(basering)+"),(x(1.."+string(nvars(S));
+  r1=r1+"),y(1.."+string(ncols(C))+")),dp;";
+  string r1t="ring Rt=("+charstr(basering)+"),(x(1.."+string(nvars(S));
+  r1t=r1t+"),y(1.."+string(ncols(C))+"),t),(dp,dp(1));";
+  execute(r1);       // ring for describing the transforms
+  execute(r1t);      // like r1, but with additional variable t
+  def J=fetch(S,J);
+  def C=fetch(S,C);
+//--- we need to eliminate t from J,y(1)-t*C[1],...y(m)-t*C[m]
+  ideal elId=J;
+  for(i=1;i<=ncols(C);i++)
+  {
+     elId=elId,y(i)-t*C[i];
+  }
+  elId=eliminate(elId,t);   // ideal describing the transform of J
+  setring R;                // get rid of t
+  def elId=fetch(Rt,elId);
+  def E=fetch(S,C);         // determine exceptional divisor
+  E=E+elId;
+  def laM0=fetch(S,laM);    // the blowup map
+//-----------------------------------------------------------------------------
+// The result is now represented in an A^n \times P^{m-1}, hence
+// involving n+m variables. For further computations we would like
+// to pass to charts to keep the total number of variables as low as
+// possible
+//----------------------------------------------------------------------------
+  list resList;
+  ideal Jsub;
+  ideal Esub;
+  ideal laM;
+  ideal testId;
+  map phi;
+  list templist;
+  for(i=1;i<=nvars(R)-nvars(S);i++)
+  {
+//--- first pass elId and E on to the i-th chart
+      Jsub=std(subst(elId,y(i),1));
+      if(deg(Jsub[1])==0)
+      {
+//--- transform does not meet this chart ==> ignore it
+         i++;
+         continue;
+      }
+      Esub=std(subst(E,y(i),1));
+//--- now get rid of unnecessary variables
+//--- first by appropriate coordinate changes
+      templist=elimpart(Jsub);
+      if(size(templist[2])>0)
+      {
+         phi=R,templist[5];
+         Jsub=phi(Jsub);
+         Jsub=simplify(interred(Jsub),2);
+         Esub=phi(Esub);
+         Esub=simplify(interred(Esub),2);
+         laM=phi(laM0);
+      }
+      else
+      {
+         laM=laM0;
+      }
+//--- then by dropping non-occuring variables
+      testId=Jsub,Esub,laM;
+      templist=findvars(testId,0);
+      if(size(templist[1])<nvars(R))
+      {
+         for(j=1;j<=size(templist[4]);j++)
+         {
+            laM=subst(laM,var(templist[4][j]),0);
+         }
+         execute("ring Rnew=("+charstr(basering)+"),("+string(templist[1])+"),dp;");
+         ideal Jnew=imap(R,Jsub);
+         ideal eD=imap(R,Esub);
+         ideal bM=imap(R,laM);
+      }
+      else
+      {
+         def Rnew=basering;
+         ideal Jnew=Jsub;
+         ideal eD=Esub;
+         ideal bM=laM;
+      }
+//--- export the relevant data of this ring and add the ring to the list
+      export Jnew;
+      export eD;
+      export bM;
+      resList[size(resList)+1]=Rnew;
+      setring R;
+      kill Rnew;
+  }
+  setring S;
+  return(resList);
+}
+example
+{  "EXAMPLE:";
+   echo = 2;
+   ring r=0,(x,y,z),dp;
+   ideal I=z2-x^3*y^2;
+   ideal C=z,xy;
+   list li=blowUp2(I,C);
+   size(li);                  // number of charts
+   def S1=li[1];
+   setring S1;                // chart 1
+   basering;
+   Jnew;
+   eD;
+   bM;
+   def S2=li[2];
+   setring S2;                // chart 2
+   basering;
+   Jnew;
+   eD;
+   bM;
+}
+///////////////////////////////////////////////////////////////////////////////
+
 proc Center(ideal J,list #)
 "USAGE:  Center(J[,W][,E])
 @*       J,W = ideals
@@ -219,6 +437,7 @@ ASSUME:  J  = ideal containing W ( W = 0 if not specified)
 @*       E  = list of smooth hypersurfaces (e.g. exceptional divisors)
 COMPUTE: the center of the blow-up of J for the resolution algorithm
          of [Bravo,Encinas,Villamayor]
+RETURN:  ideal, describing the center
 EXAMPLE: example Center;  shows an example
 "
 {
@@ -295,30 +514,30 @@ NOTE:    blowUpBO may be applied to basic objects in the sense of
 @*       referred to as BM.
 RETURN:  a list l of length at most size(C),
          l[i] is a ring containing an object BO resp. BM:
-         BO[1]=BM[1] an ideal, say Wi, defining the ambient space of the
+@*         BO[1]=BM[1] an ideal, say Wi, defining the ambient space of the
                i-th chart of the blowing up
-         BO[2]=BM[2] an ideal defining the strict transform
-         BO[3] intvec, the first integer b such that in the original object
+@*         BO[2]=BM[2] an ideal defining the strict transform
+@*         BO[3] intvec, the first integer b such that in the original object
                (Delta^b(BO[2]))==1
                the subsequent integers have the same property for Coeff-Objects
                of BO[2] used when determining the center
-         BM[3] intvec, BM[3][i] is the assigned multiplicity of BM[2][i]
-         BO[4]=BM[4] the list of exceptional divisors
-         BO[5]=BM[5] an ideal defining the map K[W] ----> K[Wi]
-         BO[6]=BM[6] an intvec BO[6][j]=1 indicates that <BO[4][j],BO[2]>=1,
+@*         BM[3] intvec, BM[3][i] is the assigned multiplicity of BM[2][i]
+@*         BO[4]=BM[4] the list of exceptional divisors
+@*         BO[5]=BM[5] an ideal defining the map K[W] ----> K[Wi]
+@*         BO[6]=BM[6] an intvec BO[6][j]=1 indicates that <BO[4][j],BO[2]>=1,
                i.e. the strict transform does not meet the j-th exceptional
                divisor
-         BO[7] intvec,
+@*         BO[7] intvec,
                the index of the first blown-up object in the resolution process
                leading to this object for which the value of b was BO[3]
                the subsequent ones are the indices for the Coeff-Objects
                of BO[2] used when determining the center
-         BM[7] intvec, BM[7][i] is the index at which the (2i-1)st entry
+@*         BM[7] intvec, BM[7][i] is the index at which the (2i-1)st entry
                of the invariant first reached its current maximal value
-         BO[8]=BM[8] a matrix indicating that BO[4][i] meets BO[4][j] by
+@*         BO[8]=BM[8] a matrix indicating that BO[4][i] meets BO[4][j] by
                BO[8][i,j]=1 for i < j
-         BO[9] empty
-         BM[9] the invariant
+@*         BO[9] empty
+@*         BM[9] the invariant
 
 EXAMPLE: example blowUpBO;  shows an example
 "
@@ -3587,6 +3806,53 @@ proc goodChoice(list BO, poly p)
 }
 //////////////////////////////////////////////////////////////////////////////
 
+proc presentTree(list L)
+"USAGE:  presentTree(L);
+         L=list, output of resolve
+RETURN:  nothing, only pretty printing of the output data of resolve()
+EXAMPLE: none
+"
+{
+  def r=basering;
+  int i,j,k;
+  if(size(L[2])==1)
+  {
+     "The object was already resolved or the list L does not";
+     "have required input format. There is just one chart in";
+     "the tree.";
+     return();
+  }
+  for(i=1;i<=size(L[1]);i++)
+  {
+    "                        ";
+    "/////////////////////////// Final Chart",i,"/////////////////////////";
+    def s=L[1][i];
+    setring s;
+    "======================== History of this chart ======================";
+    for(j=2;j<=ncols(path);j++)
+    {
+      "                  ";
+      "Blow Up",j-1,":";
+      "     Center determined in L[2]["+string(path[1,j])+"],";
+      "     Passing to chart ",path[2,j]," in resulting blow up.";
+    }
+    "                 ";
+    "======================== Data of this chart ========================";
+    showBO(BO);
+    setring r;
+    kill s;
+    pause();
+  }
+  "////////////////////////////////////////////////////////////////////";
+  "For identification of exceptional divisors please use the tools";
+  "provided by reszeta.lib, e.g. collectDiv.";
+  "For viewing an illustration of the tree of charts please use the";
+  "procedure ResTree from resgraph.lib.";
+  "////////////////////////////////////////////////////////////////////";
+  return();
+}
+//////////////////////////////////////////////////////////////////////////////
+
 proc showBO(list BO)
 "USAGE:  showBO(BO);
 @*        BO=basic object, a list: ideal W,
@@ -3602,16 +3868,16 @@ EXAMPLE:  none
 "
 {
   "                       ";
-  "==== W: ";BO[1];"      ";
-  "==== J: ";BO[2];"      ";
+  "==== Ambient Space: ";BO[1];"      ";
+  "==== Ideal of Variety: ";BO[2];"      ";
   int i;
   list M;
   for(i=1;i<=size(BO[4]);i++)
   {
     M[i]=ideal(BO[4][i]);
   }
-  "==== E: ";print(M);"   ";
-  "==== Intersection"; print(BO[8]);"     ";
+  "==== Exceptional Divisors: ";print(M);"   ";
+  "==== Images of variables of original ring:";BO[5];"   ";
 }
 //////////////////////////////////////////////////////////////////////////////
 static
@@ -3653,6 +3919,7 @@ RETURN:  a list l of 2 lists of rings
          l[1][i] is a ring containing a basic object BO, the result of the
          resolution.
          l[2] contains all rings which occured during the resolution process
+NOTE:    result may be viewed in a human readable form using presentTree()
 EXAMPLE: example resolve;  shows an example
 "
 {
@@ -4253,15 +4520,15 @@ EXAMPLE: example resolve;  shows an example
       if((debu) || (praes_stop))
       {
 //--- Show BO of this step
-         "++++++++++++++    BO    +++++++++++++++++++++++";
-         size(endRings);
-         size(allRings);
-         i;
-         "+++++++++++++++++++++++++++++++++++++++++++++++";
+         "++++++++++++++ Overview of Current Chart +++++++++++++++++++++++";
+         "Current number of final charts:",size(endRings);
+         "Total number of charts currently in chart-tree:",size(allRings);
+         "Index of the current chart in chart-tree:",i;
+         "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
          showBO(BO);
-         "-------  Center ------------";
+         "-------------------------- Upcoming Center ---------------------";
          interred(cent);
-         "----------------------------";
+         "----------------------------------------------------------------";
       }
       if(praes_stop)
       {
