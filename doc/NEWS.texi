@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.65 2006-12-08 17:08:15 Singular Exp $
+@comment $Id: NEWS.texi,v 1.66 2006-12-08 18:06:15 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -47,7 +47,7 @@ new algorithms in primdec.lib (@nref{primdec_lib}): radical et al.
 improved version of @nref{slimgb}, incorporated into @nref{groebner},
 strategy change in groebner.
 @item
-operation for sparse matrices improved: multiplication, prune, conversion to module
+operation for sparse matrices improved: multiplication, prune, conversion to module.
 @c @item
 @c experimental: @code{python} / @code{ipython} interface
 @end itemize
