@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.106 2006-11-09 11:14:49 bricken Exp $ */
+/* $Id: tgb.cc,v 1.107 2006-12-08 14:09:21 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2232,7 +2232,7 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
       if(!(is_homog)) break;
     }
   }
-  eliminationProblem=((!(is_homog))&&((pLexOrder)));
+  eliminationProblem=((!(is_homog))&&((pLexOrder)||(I->rank>0)));
   
   //  Print("is homog:%d",c->is_homog);
   void* h;
