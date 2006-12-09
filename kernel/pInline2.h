@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.6 2006-11-23 15:04:54 Singular Exp $
+ *  Version: $Id: pInline2.h,v 1.7 2006-12-09 11:55:35 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -145,6 +145,23 @@ PINLINE2 int p_GetExp(poly p, int v, ring r)
          ((p->exp[(r->VarOffset[v] & 0xffffff)] >> (r->VarOffset[v] >> 24))
           & r->bitmask);
 #endif
+}
+// partial compare exponent
+// r->VarOffset encodes the position in p->exp (lower 24 bits)
+// and number of bits to shift to the right in the upper 8 bits
+PINLINE2 int p_Comp_k_n(poly a, poly b, int k, ring r)
+{
+  p_LmCheckPolyRing2(a, r);
+  p_LmCheckPolyRing2(b, r);
+  pAssume2(k > 0 && k <= r->N);
+  int i=k;
+  for(;i<=r->N;i++)
+  {
+    if(a->exp[(r->VarOffset[i] & 0xffffff)]
+    != b->exp[(r->VarOffset[i] & 0xffffff)])
+      return FALSE;
+  }
+  return TRUE;
 }
 PINLINE2 int p_SetExp(poly p, int v, int e, ring r)
 {

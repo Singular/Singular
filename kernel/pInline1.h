@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.6 2006-06-07 18:44:24 wienand Exp $
+ *  Version: $Id: pInline1.h,v 1.7 2006-12-09 11:55:35 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -149,6 +149,27 @@ PINLINE1 poly p_Head(poly p, ring r)
   p_ExpVectorCopy(np, p, r);
   _pNext(np) = NULL;
   _pSetCoeff0(np, n_Copy(_pGetCoeff(p), r));
+  return np;
+}
+// set all exponents l..k to 0, assume exp. k+1..n and 1..l-1 are in 
+// different blocks
+// set coeff to 1
+PINLINE1 poly p_GetExp_k_n(poly p, int l, int k, ring r)
+{
+  if (p == NULL) return NULL;
+  p_LmCheckPolyRing1(p, r);
+  poly np;
+  omTypeAllocBin(poly, np, r->PolyBin);
+  p_SetRingOfLm(np, r);
+  p_ExpVectorCopy(np, p, r);
+  _pNext(np) = NULL;
+  _pSetCoeff0(np, n_Init(1, r));
+  int i;
+  for(i=l;i<=k;i++)
+  {
+    np->exp[(r->VarOffset[i] & 0xffffff)] =0;
+  }
+  p_Setm(np,r);
   return np;
 }
 
