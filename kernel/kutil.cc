@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.38 2006-12-08 17:50:55 Singular Exp $ */
+/* $Id: kutil.cc,v 1.39 2006-12-09 14:23:11 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1458,9 +1458,9 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
   //PrintS("try ");wrp(strat->S[i]);PrintS(" and ");wrp(p);PrintLn();
   if(pHasNotCF(p,strat->S[i]))
   {
-    //PrintS("prod-crit\n");
     if (!rIsPluralRing(currRing))
     {
+      //PrintS("prod-crit\n");
       strat->cp++;
       return;
     }
@@ -1492,9 +1492,17 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
   }
   /*-  compute the short s-polynomial -*/
 
-  Lp.p = ksCreateShortSpoly(strat->S[i],p,strat->tailRing);
+  #ifdef HAVE_PLURAL
+  if (rIsPluralRing(currRing))
+  {
+    Lp.p = nc_CreateShortSpoly(strat->S[i],p);
+  }
+  else
+  #endif
+    Lp.p = ksCreateShortSpoly(strat->S[i],p,strat->tailRing);
   if (Lp.p == NULL)
   {
+     //PrintS("short spoly==NULL\n");
      pLmFree(Lp.lcm);
   }
   else
@@ -2561,13 +2569,18 @@ void enterpairsSpecial (poly h,int k,int ecart,int pos,kStrategy strat, int atR 
       enterOnePairSpecial(j,h,ecart,strat, atR);
     }
   }
-  j=pos;
-  loop
+  #ifdef HAVE_PLURAL
+  if (!rIsPluralRing(currRing))
+  #endif
   {
-    unsigned long h_sev = pGetShortExpVector(h);
-    if (j > k) break;
-    clearS(h,h_sev,&j,&k,strat);
-    j++;
+    j=pos;
+    loop
+    {
+      unsigned long h_sev = pGetShortExpVector(h);
+      if (j > k) break;
+      clearS(h,h_sev,&j,&k,strat);
+      j++;
+    }
   }
 }
 
@@ -4436,7 +4449,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
 
   if (Q!=NULL) i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
   else i=setmaxT;
-  i=((i+IDELEMS(F)+15)/16)*16;
+  i=((i+IDELEMS(F)+IDELEMS(P)+15)/16)*16;
   strat->ecartS=initec(i);
   strat->sevS=initsevS(i);
   strat->S_2_R=initS_2_R(i);
