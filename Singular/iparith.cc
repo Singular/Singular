@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.419 2006-11-20 09:18:37 Singular Exp $ */
+/* $Id: iparith.cc,v 1.420 2006-12-09 13:47:36 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2794,7 +2794,7 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   }
   BITSET save_test=test;
   test|=Sy_bit(OPT_SB_1);
-  result=kStd(i1,currQuotient,hom,&w,NULL,0,IDELEMS(i1)-1);
+  result=kStd(i1,currQuotient,hom,&w,NULL,0,IDELEMS(i1)-idElem(i0));
   test=save_test;
   idDelete(&i1);
   idSkipZeroes(result);
