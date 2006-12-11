@@ -1,6 +1,6 @@
 // AH/GP last modified:  12.05.2006
 //////////////////////////////////////////////////////////////////////////////
-version = "$Id: noether.lib,v 1.1 2006-12-11 12:52:42 Singular Exp $";
+version = "$Id: noether.lib,v 1.2 2006-12-11 18:54:29 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: noether.lib   Noether normalization of an ideal (not nessecary homogeneous)
@@ -415,7 +415,7 @@ THEORY:  The satiety, or saturation index, of a homogeneous ideal i is the
 //////////////////////////////////////////////////////////////////////////////
 proc msatiety (ideal i)
 "
-USAGE:   satiety (i); i ideal,
+USAGE:   msatiety (i); i ideal,
 RETURN:  an integer, the satiety of i.
          (returns -1 if i is not homogeneous)
 ASSUME:  i is a homogeneous ideal of the basering R=K[x(0)..x(n)].
