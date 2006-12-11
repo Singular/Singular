@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.94 2006-05-29 15:14:30 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.95 2006-12-11 13:14:16 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -484,7 +484,7 @@ static inline void * s_internalCopy(const int t,  void *d)
       break; /* error recovery: do nothing */
     //case COMMAND:
     default:
-      Warn("internalCopy: cannot copy type %s(%d)",
+      Warn("s_internalCopy: cannot copy type %s(%d)",
             Tok2Cmdname(t),t);
 #endif
   }
