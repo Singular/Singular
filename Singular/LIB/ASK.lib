@@ -1,0 +1,622 @@
+//CM, last modified 10.12.06
+///////////////////////////////////////////////////////////////////////////////
+version="$Id: ASK.lib,v 1.1 2006-12-11 12:52:42 Singular Exp $";
+category="Teaching";
+info="
+LIBRARY: ASK.lib
+         PROCEDURES FOR PRIMALITY TESTING AFTER AGRAWAL, SAXENA, KAYAL
+AUTHORS: Christoph Mang
+
+OVERVIEV:
+ Algorithms for primality testing in polynomial time
+ based on the ideas of Agrawal, Saxena and  Kayal.
+
+
+
+
+PROCEDURES:
+
+
+schnellexp(a,m)            a^m for numbers a,m
+schnellexpt(a,m,n)         a^m for numbers a,m; if a^k>n n+1 is returned
+log2(n)                    logarithm to basis 2 of n
+PerfectPowerTest(n)        checks if there are a,b>1, so that a^b=n
+schnellexppoly(a,m)        a^m for number m,poly a
+wurzel(r)                  square root of number r
+euler(r)                   phi-function of euler
+coeffmod(f,n)              poly f modulo number n (coefficients mod n)
+powerpolyX(q,n,a,r)        (poly a)^q modulo (poly r,number n)
+ask(n)                     ASK-Algorithm; deterministic Primality test
+";
+
+LIB "krypto.lib";
+LIB "ntsolve.lib";
+
+
+
+
+
+///////////////////////////////////////////////////////////////
+//                                                           //
+//   Fast Exponentiation                                     //
+//                                                           //
+///////////////////////////////////////////////////////////////
+
+
+
+
+proc schnellexp(number a,number m)
+"USAGE: schnellexp(a,m);
+RETURN: the m-th power of a
+NOTE:   uses fast exponentiation
+EXAMPLE:example schnellexp; shows an example
+"
+{
+ number b,c,d;
+ c=m;
+ b=a;
+ d=1;
+
+  while(c>=1)
+  {
+    if((c mod 2)==1)
+     {
+       d=d*b;
+     }
+
+   b=b^2;
+   c=intPart(c/2);
+
+  }
+ return(d)
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   schnellexp(24,1234);
+}
+
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+proc schnellexpt(number a,number m,number n)
+"USAGE: schnellexpt(a,m,n);
+RETURN: the m-th power of a; if a^m>n the procedure returns n+1
+NOTE:   uses fast exponentiation
+EXAMPLE:example schnellexpt; shows an example
+"
+{
+ number b,c,d;
+ c=m;
+ b=a;
+ d=1;
+
+  while(c>=1)
+  {
+   if(b>n)
+     {
+      return(n+1);
+     }
+
+    if((c mod 2)==1)
+     {
+       d=d*b;
+       if(d>n)
+        {
+          return(n+1);
+        }
+     }
+
+   b=b^2;
+   c=intPart(c/2);
+
+  }
+ return(d)
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   schnellexpt(2,10,1022);
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+proc schnellexppoly(poly a,number m)
+"USAGE: schnellexppoly(a,m);
+RETURN: the m-th power of poly a
+NOTE:   uses fast exponentiation;
+        proc schnellexp for a poly a instead of a number a;
+EXAMPLE:example schnellexppoly; shows an example
+"
+{
+ number c;
+ poly b,d;
+
+ c=m;
+ b=a;
+ d=1;
+
+  while(c>=1)
+  {
+    if((c mod 2)==1)
+     {
+       d=d*b;
+     }
+
+   b=b^2;
+   c=intPart(c/2);
+
+  }
+ return(d)
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   poly a=3*x3-x2+5;
+   number m=21;
+   schnellexppoly(a,m);
+}
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////
+//                                                           //
+//   GENERAL PROCEDURES                                      //
+//                                                           //
+///////////////////////////////////////////////////////////////
+
+
+
+
+proc log2(number x)
+"USAGE:  log2(x);
+RETURN:  logarithm to basis 2 of x
+NOTE:    calculates the natural logarithm of x with a power-series
+         of the ln, then the basis is changed to 2
+EXAMPLE: example log2; shows an example
+"
+{
+ number b,c,d,t,l,k;
+                                         // log2=logarithmus zur basis 2,
+                                         // log=natuerlicher logarithmus
+ b=100000000000000000000000000000000000000000000000000;
+ c=141421356237309504880168872420969807856967187537695;    // c/b=sqrt(2)
+ d=69314718055994530941723212145817656807550013436026;     // d/b=log(2)
+
+//bringen x zunaechst zwischen 1/sqrt(2) und sqrt(2), so dass Reihe schnell
+//konvergiert, berechnen dann Reihe bis 30. Summanden und letztendlich
+//log2(x)=log(x)/log(2)=(log(x/2^j)+j*log(2))/log(2)  für große x
+//log2(x)=log(x)/log(2)=(log(x*2^j)-j*log(2))/log(2)  für kleine x
+
+number j=0;
+
+if(x<(b/c))
+ {
+
+  while(x<(b/c))
+   {
+    x=x*2;
+    j=j+1;
+   }
+
+  t=(x-1)/(x+1);
+  k=0;
+  l=0;
+  while(k<30)       //fuer  x*2^j wird Reihe bis k-tem Summanden berechnet
+   {
+    l=l+2*schnellexp(t,2*k+1)/(2*k+1);      //l=log(x*2^j) nach k Summanden
+
+    k=k+1;
+   }
+
+
+   return((l*b/d)-j);         //log2(x)=log(x*2^j)/log(2)-j wird ausgegeben
+ }
+
+
+ while(x>(c/b))
+   {
+    x=x/2;
+    j=j+1;
+   }
+
+ t=(x-1)/(x+1);
+ k=0;
+ l=0;
+
+ while(k<30)         //fuer  x/2^j wird Reihe bis k-tem Summanden berechnet
+  {
+   l=l+2*schnellexp(t,2*k+1)/(2*k+1);       //l=log(x/2^j) nach k Summanden
+   k=k+1;
+  }
+
+ return((l*b/d)+j);     //hier wird log2(x)=log(x/2^j)/log(2)+j  ausgegeben
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   log2(1024);
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////
+
+
+proc wurzel(number r)
+"USAGE: wurzel(r);
+ASSUME: caracteristic of basering is 0, r>=0
+RETURN: number, square root of r
+EXAMPLE:example wurzel; shows an example
+"
+{
+ poly f=var(1)^2-r;             //Wurzel wird als Nullstelle eines Polys
+                                //mit proc nt_solve genähert
+
+ def B=basering;
+
+ ring R=(real,40),var(1),dp;
+
+ poly g=imap(B,f);
+ list l=nt_solve(g,1.1);
+ number m=leadcoef(l[1][1]);
+
+ setring B;
+ number m1=imap(R,m);
+ return(m1);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   wurzel(7629412809180100);
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////
+
+
+proc euler(number r)
+"USAGE: euler(r);
+RETURN: number phi(r), where phi is eulers phi-function
+NOTE:   first r is factorized with proc PollardRho, then phi(r) is
+        calculated with the help of phi(p) of every factor p;
+EXAMPLE:example euler; shows an example
+"
+{
+  list l=PollardRho(r,5000,1);           //bestimmen der Primfaktoren von r
+
+ int k;
+ number phi=r;
+
+   for(k=1;k<=size(l);k++)
+    {
+      phi=phi-phi/l[k];       //berechnen phi(r) mit Hilfe der
+    }                         //Primfaktoren und Eigenschaften der phi-Fktn
+
+ return(phi);
+
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   euler(99991);
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////
+//                                                           //
+//   PERFECT POWER TEST                                      //
+//                                                           //
+///////////////////////////////////////////////////////////////
+
+
+proc PerfectPowerTest(number n)
+"USAGE: PerfectPowerTest(n);
+RETURN: 0 if there are numbers a,b>1 with a^b=n;
+        1 if there are no numbers a,b>1 with a^b=n;
+        if printlevel>=1 and there are a,b>1 with a^b=n,
+        then a,b are printed
+EXAMPLE:example PerfectPowerTest; shows an example
+"
+{
+  number a,b,c,e,f,m,l,p;
+  b=2;
+  l=log2(n);
+  e=0;
+  f=1;
+
+  while(b<=l)
+   {
+     a=1;
+     c=n;
+
+     while(c-a>=2)
+      {
+        m=intPart((a+c)/2);
+        p=schnellexpt(m,b,n);
+
+        if(p==n)
+          {
+            if(printlevel>=1){"es existieren Zahlen a,b>1 mit a^b=n";
+                          "a=";m;"b=";b;pause();}
+            return(e);
+          }
+
+        if(p<n)
+          {
+            a=m;
+          }
+        else
+          {
+            c=m;
+          }
+      }
+     b=b+1;
+   }
+  if(printlevel>=1){"es existieren keine Zahlen a,b>1  mit a^b=n";pause();}
+  return(f);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   PerfectPowerTest(887503681);
+}
+
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////
+//                                                           //
+//   FAST MODULAR EXPONENTIATION OF POLYNOMIALS              //
+//                                                           //
+///////////////////////////////////////////////////////////////
+
+
+
+proc coeffmod(poly f,number n)
+"USAGE: coeffmod(f,n);
+ASSUME: poly f depends on at most var(1) of the basering
+RETURN: poly f modulo number n
+NOTE:   at first the coefficients of the monomials of the poly f are
+        determined, then their remainder modulo n is calculated,
+        after that the poly 'is put together' again
+EXAMPLE:example coeffmod; shows an example
+"
+{
+  matrix M=coeffs(f,var(1));         //Bestimmung der Polynomkoeffizienten
+  int i=1;
+  poly g;
+  number o=nrows(M);
+
+  while(i<=o)
+    {
+      g=g+(leadcoef(M[i,1]) mod n)*var(1)^(i-1) ;
+                     // umwandeln der Koeffizienten in numbers,
+                     // Berechnung der Reste dieser numbers modulo n,
+                     // poly mit neuen Koeffizienten wieder zusammensetzen
+      i=i+1;
+    }
+  return(g);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   poly f=2457*x4+52345*x3-98*x2+5;
+   number n=3;
+   coeffmod(f,n);
+}
+
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////
+
+
+proc powerpolyX(number q,number n,poly a,poly r)
+"USAGE: powerpolyX(q,n,a,r);
+RETURN: the q-th power of poly a modulo poly r and number n
+EXAMPLE:example powerpolyX; shows an example
+"
+{
+  ideal I=std(r);
+
+   if(q==1){return(coeffmod(reduce(a,I),n));}
+   if((q mod 5)==0){return(coeffmod(reduce(powerpolyX(q/5,n,a,r)^5,I),n));}
+   if((q mod 4)==0){return(coeffmod(reduce(powerpolyX(q/4,n,a,r)^4,I),n));}
+   if((q mod 3)==0){return(coeffmod(reduce(powerpolyX(q/3,n,a,r)^3,I),n));}
+   if((q mod 2)==0){return(coeffmod(reduce(powerpolyX(q/2,n,a,r)^2,I),n));}
+
+  return(coeffmod(reduce(a*powerpolyX(q-1,n,a,r),I),n));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R=0,x,dp;
+   poly a=3*x3-x2+5;
+   poly r=x7-1;
+   number q=123;
+   number n=5;
+   powerpolyX(q,n,a,r);
+}
+
+
+
+
+///////////////////////////////////////////////////////////////
+//                                                           //
+//   ASK PRIMALITY TEST                                      //
+//                                                           //
+///////////////////////////////////////////////////////////////
+
+
+
+proc ask(number n)
+"USAGE: ask(n);
+ASSUME: n>1
+RETURN: 0 if n is composite;
+        1 if n is prime;
+        if printlevel>=1, you are informed what the procedure will do
+        or has calculated
+NOTE:   ASK-algorithm; uses proc powerpolyX for step 5
+EXAMPLE:example ask; shows an example
+"
+{
+  number c,p;
+  c=0;
+  p=1;
+
+  if(n==2)
+   {
+    return(p);
+   }
+
+
+ if(printlevel>=1){"Beginn: Test ob a^b=n fuer a,b>1";pause();}
+
+ if(0==PerfectPowerTest(n))             // Schritt1 des ASK-Alg.
+   {
+    return(c);
+   }
+
+ if(printlevel>=1)
+ {"Beginn: Berechnung von r, so dass ord(n) in Z/rZ groesser log2(n)^2 ";
+  pause();}
+
+ number k,M,M2,b;
+ int r;                          // Zeile 526-542: Schritt 2
+ M=log2(n);                      // darin sind die Schritte
+ M2=intPart(M^2);                // 3 und 4 integriert
+ r=2;
+
+
+ if(gcdN(n,r)!=1)   //falls ggt ungleich eins, Teiler von n gefunden,
+                    // Schritt 3 des ASK-Alg.
+   {
+    if(printlevel>=1){"Zahl r gefunden mit r|n";"r=";r;pause();}
+    return(c);
+   }
+
+ if(r==n-1)              // falls diese Bedingung erfüllt ist, ist
+                         // ggT(a,n)=1 für 0<a<=r, schritt 4 des ASK-Alg.
+  {
+   if(printlevel>=1){"ggt(r,n)=1 fuer alle 1<r<n";pause();}
+   return(p);
+  }
+
+  k=1;
+  b=1;
+
+  while(k<=M2)         //Beginn des Ordnungstests für aktuelles r
+    {
+           b=((b*n) mod r);
+
+     if(b==1)   //tritt Bedingung ein so gilt für aktuelles r,k:
+                //n^k=1 mod r
+                //tritt Bedingung ein, wird wegen k<=M2=intPart(log2(n)^2)
+                //r erhöht,k=0 gesetzt und Ordnung erneut untersucht
+                //tritt diese Bedingung beim größten k=intPart(log2(n)^2)
+                //nicht ein, so ist ord_r_(n)>log2(n)^2 und Schleife
+                //wird nicht mehr ausgeführt
+      {
+           if(r==2147483647)
+        {
+             string e="error: r überschreitet integer Bereich und darf
+                   nicht als Grad eines Polynoms verwendet werden";
+         return(e);
+        }
+
+       r=r+1;
+
+       if(gcdN(n,r)!=1)   //falls ggt ungleich eins, Teiler von n gefunden,
+                          //wird aufgrund von Schritt 3 des ASK-Alg. für
+                          //jeden Kandidaten r getestet
+         {
+          if(printlevel>=1){"Zahl r gefunden mit r|n";"r=";r;pause();}
+          return(c);
+         }
+
+       if(r==n-1)         //falls diese Bedingung erfüllt ist,
+                          //ist n wegen Zeile 571 prim
+                          //wird aufgrund von Schritt 4 des ASK-Alg. für
+                          //jeden Kandidaten r getestet
+         {
+          if(printlevel>=1){"ggt(r,n)=1 fuer alle 1<r<n";pause();}
+          return(p);
+         }
+
+       k=0;               //für neuen Kandidaten r, muss k für den
+                          //Ordnungstest zurückgesetzt werden
+      }
+
+     k=k+1;
+    }
+
+
+
+ if(printlevel>=1)
+  {"Zahl r gefunden, so dass ord(n) in Z/rZ groesser log2(n)^2 ";
+   "r=";r;pause();}
+
+
+
+ number l=1;                         // Zeile 603-628: Schritt 5
+ poly f,g;                           // Zeile 618 überprüft Gleichungen für
+                                     // das jeweilige a
+ g=var(1)^r-1;
+ number grenze=intPart(wurzel(euler(r))*M);
+
+ if(printlevel>=1)
+ {"Beginn: Ueberpruefung ob (x+a)^n kongruent x^n+a mod (x^r-1,n)
+        fuer 0<a<=intPart(wurzel(phi(r))*log2(n))=";grenze;pause();}
+
+ while(l<=grenze)          //
+   {
+     if(printlevel>=1){"a=";l;}
+     f=var(1)+l;
+
+      if(powerpolyX(n,n,f,g)!=(schnellexppoly(var(1),(n mod r))+l))
+       {
+         if(printlevel>=1)
+          {"Fuer a=";l;"ist (x+a)^n nicht kongruent x^n+a mod (x^r-1,n)";
+            pause();}
+
+         return(c);
+       }
+
+      l=l+1;
+   }
+
+ if(printlevel>=1)
+  {"(x+a)^n kongruent x^n+a mod (x^r-1,n) fuer 0<a<wurzel(phi(r))*log2(n)";
+    pause();}
+
+ return(p);       // Schritt 6
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   ask(100003);
+}
+
+
