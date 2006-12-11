@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: AtkinsTest.lib,v 1.1 2006-12-11 12:52:42 Singular Exp $";
+version="$Id: AtkinsTest.lib,v 1.2 2006-12-11 18:08:15 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY:  AtkinsTest.lib     Procedures for teaching cryptography
 AUTHOR:                      Stefan Steidel, Stefan.Steidel@gmx.de
 
 NOTE: The library contains auxiliary procedures to compute the elliptic
-       curve primality test of Atkin and the "Atkin´s Test" itself.
+       curve primality test of Atkin and the Atkin's Test itself.
        The library is intended to be used for teaching purposes but not
        for serious computations. Sufficiently high printLevel allows to
        control each step, thus illustrating the algorithms at work.
@@ -463,8 +463,8 @@ proc sqr(number w, int k)
 example
  { "EXAMPLE:"; echo = 2;
     ring R = (real,60),x,dp;
-    number w=288469650108669535726081;
-    sqr(w,60);
+    number ww=288469650108669535726081;
+    sqr(ww,60);
  }
 
 
