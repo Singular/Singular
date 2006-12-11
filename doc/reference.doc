@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.280 2006-12-11 15:50:24 bulygin Exp $
+@comment $Id: reference.doc,v 1.281 2006-12-11 15:55:07 bulygin Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -315,7 +315,7 @@ Result is a list: the first entry is a module with a minimal independent set
 of vectors (as a matrix lower triangular),
 the second entry an intvec with the permutation of the rows
 w.r.t.@: the original matrix, that is, a k at position l indicates that
-row k became row l.
+row k was carried over to the row l.
 @* The further parameters control the algorithm. @code{bareiss(M,i,j)}
 does not attempt to diagonalize the last i rows in the elimination procedure
 and stops computing when the remaining number of vectors (columns) to reduce
