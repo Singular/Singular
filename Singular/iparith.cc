@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.421 2006-12-09 14:24:14 Singular Exp $ */
+/* $Id: iparith.cc,v 1.422 2006-12-11 13:14:43 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1616,6 +1616,7 @@ static BOOLEAN jjCALL2MANY(leftv res, leftv u, leftv v)
   u->next=(leftv)omAllocBin(sleftv_bin);
   memcpy(u->next,v,sizeof(sleftv));
   BOOLEAN r=iiExprArithM(res,u,iiOp);
+  v->Init();
   // iiExprArithM did the CleanUp
   return r;
 }
@@ -5029,8 +5030,10 @@ static BOOLEAN jjCALL3MANY(leftv res, leftv u, leftv v, leftv w)
   u->next->next=(leftv)omAllocBin(sleftv_bin);
   memcpy(u->next->next,w,sizeof(sleftv));
   BOOLEAN r=iiExprArithM(res,u,iiOp);
+  v->Init();
+  w->Init();
+  //w->rtyp=0; w->data=NULL;
   // iiExprArithM did the CleanUp
-  w->rtyp=0; w->data=NULL;
   return r;
 }
 static BOOLEAN jjBAREISS3(leftv res, leftv u, leftv v, leftv w)
@@ -7043,7 +7046,9 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
       //Print("siq:%d\n",siq);
       command d=(command)omAlloc0Bin(ip_command_bin);
       memcpy(&d->arg1,a,sizeof(sleftv));
+      //a->Init();
       memcpy(&d->arg2,b,sizeof(sleftv));
+      //b->Init();
       d->argc=2;
       d->op=op;
       res->data=(char *)d;
@@ -7222,6 +7227,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
       //Print("siq:%d\n",siq);
       command d=(command)omAlloc0Bin(ip_command_bin);
       memcpy(&d->arg1,a,sizeof(sleftv));
+      //a->Init();
       d->op=op;
       d->argc=1;
       res->data=(char *)d;
@@ -7397,8 +7403,11 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
       //Print("siq:%d\n",siq);
       command d=(command)omAlloc0Bin(ip_command_bin);
       memcpy(&d->arg1,a,sizeof(sleftv));
+      //a->Init();
       memcpy(&d->arg2,b,sizeof(sleftv));
+      //b->Init();
       memcpy(&d->arg3,c,sizeof(sleftv));
+      //c->Init();
       d->op=op;
       d->argc=3;
       res->data=(char *)d;
@@ -7611,26 +7620,25 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
         {
           case 3:
             memcpy(&d->arg3,a->next->next,sizeof(sleftv));
-            a->next->next->rtyp=0;
-            a->next->next->data=NULL;
-            a->next->next->name=NULL;
-            a->next->next->attribute=NULL;
+            a->next->next->Init();
             /* no break */
           case 2:
             memcpy(&d->arg2,a->next,sizeof(sleftv));
-            a->next->rtyp=0;
-            a->next->name=NULL;
-            a->next->data=NULL;
-            a->next->attribute=NULL;
+            a->next->Init();
+	    a->next->next=d->arg2.next;
             d->arg2.next=NULL;
             /* no break */
           case 1:
+            a->Init();
+	    a->next=d->arg1.next;
             d->arg1.next=NULL;
         }
-        if (d->argc>3) a->next=NULL;
+	if (d->argc>3) a->next=NULL;
+        a->name=NULL;
         a->rtyp=0;
         a->data=NULL;
-        a->name=NULL;
+        a->e=NULL;
+        a->attribute=NULL;
         a->CleanUp();
       }
       res->rtyp=COMMAND;
