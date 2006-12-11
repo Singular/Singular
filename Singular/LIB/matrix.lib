@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.35 2006-11-20 11:12:52 Singular Exp $";
+version="$Id: matrix.lib,v 1.36 2006-12-11 14:22:46 Singular Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -31,7 +31,7 @@ PROCEDURES:
  colred(A[,any]);       reduction of matrix A with elementary col-operations
  rm_unitrow(A);         remove unit rows and associated columns of A
  rm_unitcol(A);         remove unit columns and associated rows of A
- headStand(A);          A[n-i+1,m-j+1]=headStand(A[i,j])
+ headStand(A);          A[n-i+1,m-j+1]:=A[i,j]
           (parameters in square brackets [] are optional)
 ";
 

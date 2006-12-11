@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.40 2006-07-17 14:32:22 Singular Exp $
+@comment $Id: plureference.doc,v 1.41 2006-12-11 14:22:30 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -472,7 +472,7 @@ factor-module.
 
 @item @strong{Note:}
 in the noncommutative case, a ring modulo an ideal has a ring stucture
-if and only if an ideal is two-sided.
+if and only if the ideal is two-sided.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -1210,7 +1210,7 @@ $\{b \in R^n \mid bJ \subset M\}$.
 @end tex
 @end itemize
 @item @strong{Note:}
-It must used for two-sided ideals (bimodules) only, otherwise the
+It an only be used for two-sided ideals (bimodules), otherwise the
 result may have no meaning.
 
 @item @strong{Example:}
