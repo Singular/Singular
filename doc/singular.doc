@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.152 2006-12-08 17:08:16 Singular Exp $
+@comment $Id: singular.doc,v 1.153 2006-12-11 18:07:55 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -321,6 +321,7 @@ LIB "all.lib";
 * modStd_lib:: Groebner basis of ideals via modular computations
 * mprimdec_lib:: procedures for primary decomposition of modules
 * mregular_lib:: procedures for Castelnuovo-Mumford regularity
+* noether_lib:: Noether normalization of an ideal
 * normal_lib:: procedure for normalization
 * primdec_lib:: procedures for primary decomposition
 * primitiv_lib:: procedures for finding a primitive element
@@ -368,11 +369,15 @@ LIB "all.lib";
 @subsection mprimdec_lib
 @c lib mprimdec.lib
 @c ----------------------------------------------------------
-@node mregular_lib, normal_lib, mprimdec_lib, Commutative algebra
+@node mregular_lib, noether_lib, mprimdec_lib, Commutative algebra
 @subsection mregular_lib
 @c lib mregular.lib
+@c ----------------------------------------------------------
+@node noether_lib, normal_lib, mregular_lib, Commutative algebra
+@subsection noether_lib
+@c lib noether.lib
 @c ---------------------------------------------------------
-@node normal_lib, primdec_lib, mregular_lib, Commutative algebra
+@node normal_lib, primdec_lib, noether_lib, Commutative algebra
 @subsection normal_lib
 @c lib normal.lib
 @c ----------------------------------------------------------
@@ -666,12 +671,24 @@ The libraries in this section are intended to be used for teaching purposes
 but not for serious computations.
 
 @menu
+* ASK_lib:: Algorithms for primality testing in polynomial time
+* AtkinsTest_lib:: Procedures for teaching cryptography
 * krypto_lib:: Procedures for teaching cryptography
 * teachstd_lib:: Procedures for teaching standard bases
 * weierstr_lib:: Procedures for the Weierstrass Theorems
 @end menu
 @c ---------------------------------------------------------
-@node krypto_lib, teachstd_lib, Teaching, Teaching
+@node ASK_lib, AtkinsTest_lib, Teaching, Teaching
+@subsection ASK_lib
+@c lib ASK.lib
+
+@c ---------------------------------------------------------
+@node AtkinsTest_lib, krypto_lib, ASK_lib, Teaching
+@subsection AtkinsTest_lib
+@c lib AtkinsTest.lib
+
+@c ---------------------------------------------------------
+@node krypto_lib, teachstd_lib, AtkinsTest_lib, Teaching
 @subsection krypto_lib
 @c lib krypto.lib
 
