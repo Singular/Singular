@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.119 2006-09-22 10:32:09 Singular Exp $ */
+/* $Id: grammar.y,v 1.120 2006-12-11 13:15:49 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -467,7 +467,7 @@ flowctrl: ifcmd
           | filecmd
           | helpcmd
           | examplecmd
-            {currentVoice->ifsw=0;}
+            {if (currentVoice!=NULL) currentVoice->ifsw=0;}
         ;
 
 example_dummy : EXAMPLE_CMD BLOCKTOK { omFree((ADDRESS)$2); }
