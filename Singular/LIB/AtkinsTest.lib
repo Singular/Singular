@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: AtkinsTest.lib,v 1.3 2006-12-11 18:51:12 Singular Exp $";
+version="$Id: AtkinsTest.lib,v 1.4 2006-12-12 15:46:40 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY:  AtkinsTest.lib     Procedures for teaching cryptography
@@ -13,22 +13,22 @@ NOTE: The library contains auxiliary procedures to compute the elliptic
 
 
 PROCEDURES:
-  new(L,D)                     checks if number D already exists in list L
-  bubblesort(L)                sorts elements (out of Z) of the list L in decreasing order
-  disc(N,k)                    generates a sequence of negative discriminants D with |D|<4N, sort in decreasing order
-  Cornacchia(d,p)              computes solution (x,y) for the Diophantine equation x^2+d*y^2=p with p prime and 0<d<p
+  new(L,D)        checks if number D already exists in list L
+  bubblesort(L)   sorts elements (out of Z) of the list L in decreasing order
+  disc(N,k)       generates a sequence of negative discriminants D with |D|<4N, sort in decreasing order
+  Cornacchia(d,p) computes solution (x,y) for the Diophantine equation x^2+d*y^2=p with p prime and 0<d<p
   CornacchiaModified(D,p)      computes solution (x,y) for the Diophantine equation x^2+|D|*y^2=4p with p prime
-  pFactor1(n,B,P)              Pollard's p-factorization
-  maximum(L)                   computes the maximal number contained in list L
-  cmod(x,y)                    computes x mod y while working in the complex numbers, e.g. ring C=(complex,30,i),x,dp;
-  sqr(w,k)                     computes the square root of w
-  e(z,k)                       computes e^z, i.e. the exponential function of z to the order k
-  jot(t,k)                     computes the j-invariant of the complex number t
-  round(r)                     rounds r to the nearest number out of Z
+  pFactor1(n,B,P) Pollard's p-factorization
+  maximum(L)      computes the maximal number contained in list L
+  cmod(x,y)       computes x mod y while working in the complex numbers, e.g. ring C=(complex,30,i),x,dp;
+  sqr(w,k)        computes the square root of w
+  e(z,k)          computes e^z, i.e. the exponential function of z to the order k
+  jot(t,k)        computes the j-invariant of the complex number t
+  round(r)        rounds r to the nearest number out of Z
   HilbertClassPolynomial(D,k)  computes the monic polynomial of degree h(D) in Z[X] of which jot((D+sqr(D))/2) is a root
-  RootsModp(p,P)               computes roots of the polynomial P modulo p with p prime and p>=3
-  w(D)                         computes the number of roots of unity in the quadratic order of discriminant D
-  Atkin(N,K,B)                 tries to prove that N is prime
+  RootsModp(p,P)  computes roots of the polynomial P modulo p with p prime and p>=3
+  w(D)            computes the number of roots of unity in the quadratic order of discriminant D
+  Atkin(N,K,B)    tries to prove that N is prime
 ";
 
 LIB "krypto.lib";
@@ -45,18 +45,17 @@ RETURN:  1, if D does not already exist in L,
 EXAMPLE:example new; shows an example
 "
 {
-      number a=1;                // a=1 bedeutet: D noch nicht in L vorhanden
-      int i;
-      for(i=1;i<=size(L);i++)
-         {
-           if(D==L[i])
-              {
-                a=-1;            // a=-1 bedeutet: D bereits in L vorhanden
-                break;
-              }
-         }
-
-      return(a);
+  number a=1;                // a=1 bedeutet: D noch nicht in L vorhanden
+  int i;
+  for(i=1;i<=size(L);i++)
+  {
+    if(D==L[i])
+    {
+      a=-1;            // a=-1 bedeutet: D bereits in L vorhanden
+      break;
+    }
+  }
+ return(a);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -66,33 +65,30 @@ example
     new(L,D);
 }
 
-
-
 proc bubblesort(list L)
 "USAGE: bubblesort(L);
 RETURN: list L, sort in decreasing order
 EXAMPLE:example bubblesort; shows an example
 "
 {
-      number b;
-      int n,i,j;
-      while(j==0)
-         {
-           i=i+1;
-           j=1;
-           for(n=1;n<=size(L)-i;n++)
-              {
-                if(L[n]<L[n+1])
-                   {
-                     b=L[n];
-                     L[n]=L[n+1];
-                     L[n+1]=b;
-                     j=0;
-                   }
-              }
-         }
-
-      return(L);
+  number b;
+  int n,i,j;
+  while(j==0)
+  {
+    i=i+1;
+    j=1;
+    for(n=1;n<=size(L)-i;n++)
+    {
+      if(L[n]<L[n+1])
+      {
+        b=L[n];
+        L[n]=L[n+1];
+        L[n+1]=b;
+        j=0;
+      }
+    }
+  }
+  return(L);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -111,25 +107,24 @@ NOTE:   D=b^2-4*a, where 0<=b<=k and intPart((b^2)/4)+1<=a<=k for each b
 EXAMPLE:example disc; shows an example
 "
 {
-      list L=-3,-4,-7;
-      number D;
-      number B;
-      int a,b;
-      for(b=0;b<=k;b++)
-         {
-           B=b^2;
-           for(a=int(intPart(B/4))+1;a<=k;a++)
-              {
-                D=-4*a+B;
-                if((D<0)&&((D mod 4)!=2)&&((D mod 4)!=3)&&(absValue(D)<4*N)&&(new(L,D)==1))
-                   {
-                     L[size(L)+1]=D;
-                   }
-              }
-         }
-
-      L=bubblesort(L);
-      return(L);
+  list L=-3,-4,-7;
+  number D;
+  number B;
+  int a,b;
+  for(b=0;b<=k;b++)
+  {
+    B=b^2;
+    for(a=int(intPart(B/4))+1;a<=k;a++)
+    {
+      D=-4*a+B;
+      if((D<0)&&((D mod 4)!=2)&&((D mod 4)!=3)&&(absValue(D)<4*N)&&(new(L,D)==1))
+      {
+        L[size(L)+1]=D;
+      }
+    }
+  }
+  L=bubblesort(L);
+  return(L);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -148,76 +143,71 @@ ASSUME: 0<d<p
 EXAMPLE:example Cornacchia; shows an example
 "
 {
+  if((d<0)||(p<d))                                                   // (0)[Test if assumptions well-defined]
+  {
+    return(0);
+    // ERROR("Parameters wrong selected! It has to be 0<d<p!");
+  }
+  else
+  {
+    number k,x(0),x(1),a,b,l,r,c,i;
+    int j;
 
-      if((d<0)||(p<d))                                                   // (0)[Test if assumptions well-defined]
-         {
-           return(0);
-           // ERROR("Parameters wrong selected! It has to be 0<d<p!");
-         }
+    k=Jacobi(-d,p);                                               // (1)[Test if residue]
+    if(k==-1)
+    {
+      return(-1);
+      // ERROR("The Diophantine equation has no solution!");
+    }
+    else
+    {
+      x(0)=squareRoot(-d,p);                                   // (2)[Compute square root]
+      x(1)=-x(0) mod p;
+      while(1)
+      {
+        while((p/2>=x(0))||(p<=x(0)))
+        {
+          x(0)=x(0)+p;
+          if(p<=x(0))
+          {
+            x(0)=-x(0)+p;
+          }
+        }
 
-      else
-         {
-           number k,x(0),x(1),a,b,l,r,c,i;
-           int j;
+        a=p;
+        b=x(0);
+        l=intRoot(p);
 
-           k=Jacobi(-d,p);                                               // (1)[Test if residue]
-           if(k==-1)
-              {
-                return(-1);
-                // ERROR("The Diophantine equation has no solution!");
-              }
+        while(b>l)                                          // (3)[Euclidean algorithm]
+        {
+          r=a mod b;
+          a=b;
+          b=r;
+        }
 
-           else
-              {
-                x(0)=squareRoot(-d,p);                                   // (2)[Compute square root]
-                x(1)=-x(0) mod p;
-                while(1)
-                   {
-                     while((p/2>=x(0))||(p<=x(0)))
-                        {
-                          x(0)=x(0)+p;
-                          if(p<=x(0))
-                             {
-                               x(0)=-x(0)+p;
-                             }
-                        }
-
-                     a=p;
-                     b=x(0);
-                     l=intRoot(p);
-
-                     while(b>l)                                          // (3)[Euclidean algorithm]
-                        {
-                          r=a mod b;
-                          a=b;
-                          b=r;
-                        }
-
-                     c=(p-b^2)/d;                                        // (4)[Test solution]
-                     i=intRoot(c);
-                     if((((p-b^2) mod d)!=0)||(c!=i^2))
-                        {
-                          if(j==1)
-                             {
-                               return(-1);
-                               // ERROR("The Diophantine equation has no solution!");
-                             }
-
-                          else
-                             {
-                               j=j+1;
-                               x(0)=x(1);
-                             }
-                        }
-
-                     else
-                        {
-                          list L=b,i;
-                          return(L);
-                        }
-                   }
-              }
-         }
+        c=(p-b^2)/d;                                        // (4)[Test solution]
+        i=intRoot(c);
+        if((((p-b^2) mod d)!=0)||(c!=i^2))
+        {
+          if(j==1)
+          {
+            return(-1);
+            // ERROR("The Diophantine equation has no solution!");
+          }
+          else
+          {
+            j=j+1;
+            x(0)=x(1);
+          }
+        }
+        else
+        {
+          list L=b,i;
+          return(L);
+        }
+      }
+    }
+  }
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -236,7 +226,6 @@ ASSUME: D<0, D kongruent 0 or 1 modulo 4 and |D|<4p
 EXAMPLE:example CornacchiaModified; shows an example
 "
 {
-
       if((D>=0)||((D mod 4)==2)||((D mod 4)==3)||(absValue(D)>=4*p))            // (0)[Test if assumptions well-defined]
          {
            return(0);
