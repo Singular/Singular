@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.66 2006-12-08 18:06:15 Singular Exp $
+@comment $Id: NEWS.texi,v 1.67 2006-12-12 15:01:31 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -37,6 +37,12 @@ new command: (@nref{interpolation}: ideal of points with given multiplicities)
 @item
 new library: modStd.lib (@nref{modStd_lib}): Groebner base computations
 over the rational numbers via modular computations
+@item
+new library: noether.lib (@nref{noether_lib}): Noether normalization of an ideal(not nessecary homogeneous)
+@item
+new library: AtkinsTest.lib (@nref{AtkinsTest_lib}): the elliptic curve primality test of Atkin
+@item
+new library: ASK.lib (@nref{ASK_lib}): primality testing after Agrawal, Saxena, Kayal
 @c @item
 @c improved center.lib (@nref{center_lib}): revised implementation, new functions (sa_reduce etc.)
 @item
