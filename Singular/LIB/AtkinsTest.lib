@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: AtkinsTest.lib,v 1.5 2006-12-14 11:30:04 pfister Exp $";
+version="$Id: AtkinsTest.lib,v 1.6 2006-12-14 17:30:46 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY:  AtkinsTest.lib     Procedures for teaching cryptography
@@ -820,418 +820,549 @@ EXAMPLE:example Atkin; shows an example
       if(N==1)           {return(-1);}
       if((N==2)||(N==3)) {return(1);}
       if(gcdN(N,6)!=1)
-         {
-           if(printlevel>=1) {"ggT(N,6)="+string(gcdN(N,6));pause();}
-           return(-1);
-         }
+      {
+        if(printlevel>=1)
+        {
+          "ggT(N,6)="+string(gcdN(N,6));
+          pause();
+        }
+        return(-1);
+      }
       else
+      {
+         int i;                                                             // (1)[Initialize]
+         int n(i);
+         number N(i)=N;
+         if(printlevel>=1)
          {
-           int i;                                                             // (1)[Initialize]
-           int n(i);
-           number N(i)=N;
-           if(printlevel>=1) {"Setze i=0, n=0 und N(i)=N(0)="+string(N(i))+".";pause();}
+           "Setze i=0, n=0 und N(i)=N(0)="+string(N(i))+".";
+           pause();
+         }
 
-           // declarations:
-           int j(0),j(1),j(2),j(3),j(4),k;                                    // running indices
-           list L;                                                            // all primes smaller than 1000
-           list H;                                                            // sequence of negative discriminants
-           number D;                                                          // discriminant out of H
-           list L1,L2,S,S1,S2,R;                                              // lists of relevant elements
-           list P,P1,P2;                                                      // elliptic points on E(Z/N(i)Z)
-           number m,q;                                                        // m=|E(Z/N(i)Z)| and q|m
-           number a,b,j,c;                                                    // characterize E(Z/N(i)Z)
-           number g,u;                                                        // g out of Z/N(i)Z, u=Jacobi(g,N(i))
-           poly T;                                                            // T=HilbertClassPolynomial(D,K)
-           matrix M;                                                          // M contains the coefficients of T
+         // declarations:
+         int j(0),j(1),j(2),j(3),j(4),k;                                    // running indices
+         list L;                                                            // all primes smaller than 1000
+         list H;                                                            // sequence of negative discriminants
+         number D;                                                          // discriminant out of H
+         list L1,L2,S,S1,S2,R;                                              // lists of relevant elements
+         list P,P1,P2;                                                      // elliptic points on E(Z/N(i)Z)
+         number m,q;                                                        // m=|E(Z/N(i)Z)| and q|m
+         number a,b,j,c;                                                    // characterize E(Z/N(i)Z)
+         number g,u;                                                        // g out of Z/N(i)Z, u=Jacobi(g,N(i))
+         poly T;                                                            // T=HilbertClassPolynomial(D,K)
+         matrix M;                                                          // M contains the coefficients of T
 
-           if(printlevel>=1) {"Liste H der moeglichen geeigneten Diskriminanten wird berechnet.";}
-           H=disc(N,K/2);
-           if(printlevel>=1) {"H="+string(H);pause();}
+         if(printlevel>=1)
+         {
+           "Liste H der moeglichen geeigneten Diskriminanten wird berechnet.";
+         }
+         H=disc(N,K/2);
+         if(printlevel>=1) {"H="+string(H);pause();}
 
-           int step=2;
-           while(1)
+         int step=2;
+         while(1)
+            {
+              if(step==2)
               {
+                L=5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,193,197,199,211,223,227,229,233,239,241,251,257,263,269,271,277,281,283,293,307,311,313,317,331,337,347,349,353,359,367,373,379,383,389,397,401,409,419,421,431,433,439,443,449,457,461,463,467,479,487,491,499,503,509,521,523,541,547,557,563,569,571,577,587,593,599,601,607,613,617,619,631,641,643,647,653,659,661,673,677,683,691,701,709,719,727,733,739,743,751,757,761,769,773,787,797,809,811,821,823,827,829,839,853,857,859,863,877,881,883,887,907,911,919,929,937,941,947,953,967,971,977,983,991,997;
+                for(j(0)=1;j(0)<=size(L);j(0)++)                         // (2)[Is N(i) small??]
+                {
+                  if(((N(i) mod L[j(0)])==0)&&(N(i)!=L[j(0)]))
+                  {
+                    if(printlevel>=1)
+                    {
+                      "N("+string(i)+")="+string(N(i))+" ist durch "+string(L[j(0)])+" teilbar.";pause();
+                    }
+                    step=14;
+                    break;
+                  }
+                }
+
                 if(step==2)
-                   {
-                     L=5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,193,197,199,211,223,227,229,233,239,241,251,257,263,269,271,277,281,283,293,307,311,313,317,331,337,347,349,353,359,367,373,379,383,389,397,401,409,419,421,431,433,439,443,449,457,461,463,467,479,487,491,499,503,509,521,523,541,547,557,563,569,571,577,587,593,599,601,607,613,617,619,631,641,643,647,653,659,661,673,677,683,691,701,709,719,727,733,739,743,751,757,761,769,773,787,797,809,811,821,823,827,829,839,853,857,859,863,877,881,883,887,907,911,919,929,937,941,947,953,967,971,977,983,991,997;
-                     for(j(0)=1;j(0)<=size(L);j(0)++)                         // (2)[Is N(i) small??]
-                        {
-                          if(((N(i) mod L[j(0)])==0)&&(N(i)!=L[j(0)]))
-                             {
-                               if(printlevel>=1) {"N("+string(i)+")="+string(N(i))+" ist durch "+string(L[j(0)])+" teilbar.";pause();}
-                               step=14;
-                               break;
-                             }
-                        }
-
-                     if(step==2)
-                        {
-                          step=3;
-                        }
-                   }
-
-                if(step==3)                                                   // (3)[Choose next discriminant]
-                   {
-                     n(i)=n(i)+1;
-                     if(n(i)==size(H)+1)
-                        {
-                          if(printlevel>=1) {"Algorithmus nicht anwendbar, da zu wenige geeignete Diskriminanten existieren.";
-                                             "Erhoehe den Genauigkeitsparameter K und starte den Algorithmus erneut.";pause();}
-                          return(0);
-                        }
-
-                     D=H[n(i)];
-                     if(printlevel>=1) {"Naechste Diskriminante D wird gewaehlt. D="+string(D)+".";pause();}
-
-                     if(Jacobi(D,N(i))!=1)
-                        {
-                          if(printlevel>=1) {"Jacobi(D,N("+string(i)+"))="+string(Jacobi(D,N(i)));pause();}
-                          continue;
-                        }
-
-                     else
-                        {
-                          L1=CornacchiaModified(D,N(i));
-                          if(size(L1)>1)
-                             {
-                               if(printlevel>=1) {"Die Loesung (x,y) der Gleichung x^2+|D|y^2=4N("+string(i)+") lautet";L1;pause();}
-                               step=4;
-                             }
-
-                          else
-                             {
-                               if(L1[1]==-1)
-                                  {
-                                    if(printlevel>=1) {"Die Gleichung x^2+|D|y^2=4N("+string(i)+") hat keine Loesung.";pause();}
-                                    continue;
-                                  }
-
-                               if(L1[1]==0)
-                                  {
-                                    if(printLevel>=1) {"Algorithmus fuer N("+string(i)+")="+string(N(i))+" nicht anwendbar, da zu wenige geeignete Diskriminanten existieren.";pause();}
-                                    step=14;
-                                  }
-                             }
-                        }
-                   }
-
-                if(step==4)                                                   // (4)[Factor m]
-                   {
-                     if(printlevel>=1) {"Die Liste L2 der moeglichen m=|E(Z/N("+string(i)+")Z)| wird berechnet.";}
-                     if(absValue(L1[1])^2<=4*N(i)) {L2=N(i)+1+L1[1],N(i)+1-L1[1];}
-                     if(D==-4)
-                        {
-                          if(absValue(2*L1[2])^2<=4*N(i)) {L2[size(L2)+1]=N(i)+1+2*L1[2];
-                                                           L2[size(L2)+1]=N(i)+1-2*L1[2];}
-                        }
-
-                     if(D==-3)
-                        {
-                          if(absValue(L1[1]+3*L1[2])^2<=4*N(i)) {L2[size(L2)+1]=N(i)+1+(L1[1]+3*L1[2])/2;
-                                                                 L2[size(L2)+1]=N(i)+1-(L1[1]+3*L1[2])/2;}
-                          if(absValue(L1[1]-3*L1[2])^2<=4*N(i)) {L2[size(L2)+1]=N(i)+1+(L1[1]-3*L1[2])/2;
-                                                                 L2[size(L2)+1]=N(i)+1-(L1[1]-3*L1[2])/2;}
-                        }
-
-                     if(size(L2)==0)
-                        {
-                          if(printlevel>=1) {"Nach dem Satz von Hasse wurden keine moeglichen m=|E(Z/N("+string(i)+")Z)|";
-                                             "fuer D="+string(D)+" gefunden.";}
-                          step=3;
-                          continue;
-                        }
-
-                     else
-                        {
-                          if(printlevel>=1) {"L2=";L2;pause();}
-                        }
-
-                     if(printlevel>=1) {"Die Liste S der Faktoren aller moeglichen m wird berechnet.";}
-                     S=list();
-                     for(j(1)=1;j(1)<=size(L2);j(1)++)
-                        {
-                          m=L2[j(1)];
-                          if(m!=0)
-                             {
-                               S1=PollardRho(m,10000,1,L);
-                               S2=pFactor1(m,100,L);
-                               S[size(S)+1]=list(m,S1+S2);
-                             }
-                        }
-                     if(printlevel>=1) {"S=";S;pause();}
-                     step=5;
-                   }
-
-                if(step==5)                                                   // (5)[Does a suitable m exist??]
-                   {
-                     for(j(2)=1;j(2)<=size(S);j(2)++)
-                        {
-                          m=L2[j(2)];
-                          for(j(3)=1;j(3)<=size(S[j(2)][2]);j(3)++)
-                             {
-                               q=S[j(2)][2][j(3)];
-                               if((q>(intRoot(intRoot(N(i)))+1)^2) && (MillerRabin(q,5)==1))
-                                  {
-                                    step=6;
-                                    break;
-                                  }
-                             }
-
-                          if(step==6)
-                             {
-                               if(printlevel>=1) {"Geeignetes Paar (m,q) gefunden, so dass q|m,";
-                                                  "q>(4-th root(N("+string(i)+"))+1)^2 und q den Miller-Rabin-Test passiert.";
-                                                  "m="+string(m)+",";"q="+string(q);pause();}
-                               break;
-                             }
-
-                          else
-                             {
-                               step=3;
-                             }
-                        }
-
-                     if(step==3)
-                        {
-                          if(printlevel>=1) {"Kein geeignetes Paar (m,q), so dass q|m,";
-                                             "q>(4-th root(N("+string(i)+"))+1)^2 und q den Miller-Rabin-Test passiert, gefunden.";pause();}
-                          continue;
-                        }
-                   }
-
-                if(step==6)                                                   // (6)[Compute elliptic curve]
-                   {
-                     if(D==-4)
-                        {
-                          a=-1;
-                          b=0;
-                          if(printlevel>=1) {"Da D=-4, setze a=-1 und b=0.";pause();}
-                        }
-
-                     if(D==-3)
-                        {
-                          a=0;
-                          b=-1;
-                          if(printlevel>=1) {"Da D=-3, setze a=0 und b=-1.";pause();}
-                        }
-
-                     if(D<-4)
-                        {
-                          if(printlevel>=1) {"Das Minimalpolynom T von j((D+sqr(D))/2) aus Z[X] fuer D="+string(D)+" wird berechnet.";}
-                          T=HilbertClassPolynomial(D,K);
-                          if(printlevel>=1) {"T="+string(T);pause();}
-
-                          M=coeffs(T,var(1));
-                          T=0;
-
-                          for(j(4)=1;j(4)<=nrows(M);j(4)++)
-                             {
-                               M[j(4),1]=leadcoef(M[j(4),1]) mod N(i);
-                               T=T+M[j(4),1]*var(1)^(j(4)-1);
-                             }
-                          if(printlevel>=1) {"Setze T=T mod N("+string(i)+").";"T="+string(T);pause();}
-
-                          R=RootsModp(int(N(i)),T);
-                          if(deg(T)>size(R)){ERROR("Das Polynom T zerfaellt modulo N("+string(i)+") nicht vollstaendig in Linearfaktoren."
-                                                   "Erhoehe den Genauigkeitsparameter K und starte den Algorithmus erneut.");}
-                          if(printlevel>=1) {if(deg(T)>1) {"Die "+string(deg(T))+" Nullstellen von T modulo N("+string(i)+") sind";R;pause();}
-                                             if(deg(T)==1){"Die Nullstelle von T modulo N("+string(i)+") ist";R;pause();}}
-
-                          j=R[1];
-                          c=j*exgcdN(j-1728,N(i))[1];
-                          a=-3*c mod N(i);
-                          b=2*c mod N(i);
-                          if(printlevel>=1) {"Waehle die Nullstelle j="+string(j)+" aus und setze";"c=j/(j-1728) mod N("+string(i)+"), a=-3c mod N("+string(i)+"), b=2c mod N("+string(i)+").";
-                                             "a="+string(a)+",";"b="+string(b);pause();}
-                        }
-
-                     step=7;
-                   }
-
-                if(step==7)                                                   // (7)[Find g]
-                   {
-                     if(D==-3)
-                        {
-                          while(1)
-                             {
-                               g=random(1,2147483647) mod N(i);
-                               u=Jacobi(g,N(i));
-                               if((u==-1)&&(powerN(g,(N(i)-1)/3,N(i))!=1))
-                                  {
-                                    if(printlevel>=1) {"g="+string(g);pause();}
-                                    break;
-                                  }
-                             }
-                        }
-
-                     else
-                        {
-                          while(1)
-                             {
-                               g=random(1,2147483647) mod N(i);
-                               u=Jacobi(g,N(i));
-                               if(u==-1)
-                                  {
-                                    if(printlevel>=1) {"g="+string(g);pause();}
-                                    break;
-                                  }
-                             }
-                        }
-
-                     step=8;
-                   }
-
-                if(step==8)                                                   // (8)[Find P]
-                   {
-                     if(printlevel>=1) {"Ein zufaelliger Punkt P auf der Elliptischen Kurve";
-                                        "mit der Gleichung y^2=x^3+ax+b fuer";"N("+string(i)+")="+string(N(i))+",";"   a="+string(a)+",";"   b="+string(b);"wird gewaehlt.";}
-                     P=ellipticRandomPoint(N(i),a,b);
-                     if(printlevel>=1) {"P=("+string(P)+")";pause();}
-
-                     if(size(P)==1)
-                        {
-                          step=14;
-                        }
-
-                     else
-                        {
-                          step=9;
-                        }
-                   }
-
-                if(step==9)                                                   // (9)[Find right curve]
-                   {
-                     if(printlevel>=1) {"Die Punkte P2=(m/q)*P und P1=q*P2 auf der Kurve werden berechnet.";}
-                     P2=ellipticMult(N(i),a,b,P,m/q);
-                     P1=ellipticMult(N(i),a,b,P2,q);
-                     if(printlevel>=1) {"P1=("+string(P1)+"),";"P2=("+string(P2)+")";pause();}
-
-                     if((P1[1]==0)&&(P1[2]==1)&&(P1[3]==0))
-                        {
-                          step=12;
-                        }
-
-                     else
-                        {
-                          if(printlevel>=1) {"Da P1!=(0:1:0), ist fuer die Koeffizienten a="+string(a)+" und b="+string(b)+" m!=|E(Z/N("+string(i)+")Z)|.";
-                                             "Waehle daher neue Koeffizienten a und b.";pause();}
-                          step=10;
-                        }
-                   }
-
-                if(step==10)
-                   {
-                     k=k+1;
-                     if(k>=w(D))
-                        {
-                          if(printlevel>=1) {"Da k=w(D)="+string(k)+", ist N("+string(i)+")="+string(N(i))+" nicht prim.";pause();}
-                          step=14;
-                        }
-
-                     else
-                        {
-                          if(D<-4) {a=a*g^2 mod N(i); b=b*g^3 mod N(i);
-                                    if(printlevel>=1) {"Da D<-4, setze a=a*g^2 mod N("+string(i)+") und b=b*g^3 mod N("+string(i)+").";"a="+string(a)+",";"b="+string(b)+",";"k="+string(k);pause();}}
-                          if(D==-4){a=a*g mod N(i);
-                                    if(printlevel>=1) {"Da D=-4, setze a=a*g mod N("+string(i)+").";"a="+string(a)+",";"b="+string(b)+",";"k="+string(k);pause();}}
-                          if(D==-3){b=b*g mod N(i);
-                                    if(printlevel>=1) {"Da D=-3, setze b=b*g mod N("+string(i)+").";"a="+string(a)+",";"b="+string(b)+",";"k="+string(k);pause();}}
-                          step=8;
-                          continue;
-                        }
-                   }
-
-                if(step==11)                                                  // (11)[Find a new P]
-                   {
-                     if(printlevel>=1) {"Ein neuer zufaelliger Punkt P auf der Elliptischen Kurve wird gewaehlt,";
-                                        "da auch P2=(0:1:0).";}
-                     P=ellipticRandomPoint(N(i),a,b);
-                     if(printlevel>=1) {"P=("+string(P)+")";pause();}
-
-                     if(size(P)==1)
-                        {
-                          step=14;
-                        }
-
-                     else
-                        {
-                          if(printlevel>=1) {"Die Punkte P2=(m/q)*P und P1=q*P2 auf der Kurve werden berechnet.";}
-                          P2=ellipticMult(N(i),a,b,P,m/q);
-                          P1=ellipticMult(N(i),a,b,P2,q);
-                          if(printlevel>=1) {"P1=("+string(P1)+"),";"P2=("+string(P2)+")";pause();}
-
-                          if((P1[1]!=0)||(P1[2]!=1)||(P1[3]!=0))
-                             {
-                               if(printlevel>=1) {"Da P1!=(0:1:0), ist, fuer die Koeffizienten a="+string(a)+" und b="+string(b)+", m!=|E(Z/N("+string(i)+")Z)|.";
-                                                  "Waehle daher neue Koeffizienten a und b.";pause();}
-                               step=10;
-                               continue;
-                             }
-
-                          else
-                             {
-                               step=12;
-                             }
-                        }
-                   }
-
-                if(step==12)                                                  // (12)[Check P]
-                   {
-                     if((P2[1]==0)&&(P2[2]==1)&&(P2[3]==0))
-                        {
-                          step=11;
-                          continue;
-                        }
-
-                     else
-                        {
-                          step=13;
-                        }
-                   }
-
-                if(step==13)                                                  // (13)[Recurse]
-                   {
-                     if(i<B)
-                        {
-                          if(printlevel>=1) {string(i+1)+". Rekursion:";"";
-                                             "N("+string(i)+")="+string(N(i))+" erfuellt die Bedingungen des zugrunde liegenden Satzes,";
-                                             "da P1=(0:1:0) und P2[3] aus (Z/N("+string(i)+")Z)*.";"";
-                                             "Untersuche nun, ob auch der gefundene Faktor q="+string(q)+" diese Bedingungen erfuellt.";
-                                             "Setze dazu i=i+1, N("+string(i+1)+")=q="+string(q)+" und beginne den Algorithmus von vorne.";pause();}
-                          i=i+1;
-                          int n(i);
-                          number N(i)=q;
-                          k=0;
-                          step=2;
-                          continue;
-                        }
-
-                     else
-                        {
-                          if(printlevel>=1) {"N(B)=N("+string(i)+")="+string(N(i))+" erfuellt die Bedingungen des zugrunde liegenden Satzes,";
-                                             "da P1=(0:1:0) und P2[3] aus (Z/N("+string(i)+")Z)*.";
-                                             "Insbesondere ist N="+string(N)+" prim.";pause();}
-                          return(1);
-                        }
-                   }
-
-                if(step==14)                                                  // (14)[Backtrack]
-                   {
-                     if(i>0)
-                        {
-                          if(printlevel>=1) {"Setze i=i-1 und starte den Algorithmus fuer N("+string(i-1)+")="+string(N(i-1))+" mit neuer Diskriminanten von vorne.";pause();}
-                          i=i-1;
-                          k=0;
-                          step=3;
-                        }
-
-                     else
-                        {
-                          if(printlevel>=1) {"N(0)=N="+string(N)+" und daher ist N nicht prim.";pause();}
-                          return(-1);
-                        }
-                   }
+                {
+                  step=3;
+                }
               }
+
+              if(step==3)                                                   // (3)[Choose next discriminant]
+                 {
+                   n(i)=n(i)+1;
+                   if(n(i)==size(H)+1)
+                   {
+                     if(printlevel>=1)
+                     {
+                       "Algorithmus nicht anwendbar, da zu wenige geeignete Diskriminanten existieren.";
+                       "Erhoehe den Genauigkeitsparameter K und starte den Algorithmus erneut.";pause();
+                     }
+                     return(0);
+                   }
+
+                   D=H[n(i)];
+                   if(printlevel>=1) {"Naechste Diskriminante D wird gewaehlt. D="+string(D)+".";pause();}
+
+                   if(Jacobi(D,N(i))!=1)
+                      {
+                        if(printlevel>=1) {"Jacobi(D,N("+string(i)+"))="+string(Jacobi(D,N(i)));pause();}
+                        continue;
+                      }
+
+                   else
+                   {
+                     L1=CornacchiaModified(D,N(i));
+                     if(size(L1)>1)
+                     {
+                       if(printlevel>=1)
+                       {
+                         "Die Loesung (x,y) der Gleichung x^2+|D|y^2=4N("+string(i)+") lautet";
+                         L1;
+                         pause();
+                       }
+                       step=4;
+                     }
+                     else
+                     {
+                       if(L1[1]==-1)
+                       {
+                         if(printlevel>=1)
+                         {
+                           "Die Gleichung x^2+|D|y^2=4N("+string(i)+") hat keine Loesung.";
+                           pause();
+                         }
+                         continue;
+                       }
+
+                       if(L1[1]==0)
+                       {
+                         if(printLevel>=1)
+                         {
+                           "Algorithmus fuer N("+string(i)+")="+string(N(i))+" nicht anwendbar, da zu wenige geeignete Diskriminanten existieren.";
+                           pause();
+                         }
+                         step=14;
+                       }
+                     }
+                   }
+                 }
+
+              if(step==4)                                                   // (4)[Factor m]
+                 {
+                   if(printlevel>=1) {"Die Liste L2 der moeglichen m=|E(Z/N("+string(i)+")Z)| wird berechnet.";}
+                   if(absValue(L1[1])^2<=4*N(i)) {L2=N(i)+1+L1[1],N(i)+1-L1[1];}
+                   if(D==-4)
+                   {
+                     if(absValue(2*L1[2])^2<=4*N(i))
+                     {
+                       L2[size(L2)+1]=N(i)+1+2*L1[2];
+                       L2[size(L2)+1]=N(i)+1-2*L1[2];
+                     }
+                   }
+
+                   if(D==-3)
+                   {
+                     if(absValue(L1[1]+3*L1[2])^2<=4*N(i))
+                     {
+                       L2[size(L2)+1]=N(i)+1+(L1[1]+3*L1[2])/2;
+                       L2[size(L2)+1]=N(i)+1-(L1[1]+3*L1[2])/2;
+                     }
+                     if(absValue(L1[1]-3*L1[2])^2<=4*N(i))
+                     {
+                       L2[size(L2)+1]=N(i)+1+(L1[1]-3*L1[2])/2;
+                       L2[size(L2)+1]=N(i)+1-(L1[1]-3*L1[2])/2;
+                     }
+                   }
+
+                   if(size(L2)==0)
+                   {
+                     if(printlevel>=1)
+                     {
+                       "Nach dem Satz von Hasse wurden keine moeglichen m=|E(Z/N("+string(i)+")Z)|";
+                       "fuer D="+string(D)+" gefunden.";
+                     }
+                     step=3;
+                     continue;
+                   }
+                   else
+                   {
+                     if(printlevel>=1)
+                     {
+                       "L2=";L2;
+                       pause();
+                     }
+                   }
+
+                   if(printlevel>=1) {"Die Liste S der Faktoren aller moeglichen m wird berechnet.";}
+                   S=list();
+                   for(j(1)=1;j(1)<=size(L2);j(1)++)
+                   {
+                     m=L2[j(1)];
+                     if(m!=0)
+                     {
+                       S1=PollardRho(m,10000,1,L);
+                       S2=pFactor1(m,100,L);
+                       S[size(S)+1]=list(m,S1+S2);
+                     }
+                   }
+                   if(printlevel>=1)
+                   {
+                     "S=";S;
+                     pause();
+                   }
+                   step=5;
+                 }
+
+              if(step==5)                                                   // (5)[Does a suitable m exist??]
+              {
+                for(j(2)=1;j(2)<=size(S);j(2)++)
+                {
+                  m=L2[j(2)];
+                  for(j(3)=1;j(3)<=size(S[j(2)][2]);j(3)++)
+                  {
+                    q=S[j(2)][2][j(3)];
+                    if((q>(intRoot(intRoot(N(i)))+1)^2) && (MillerRabin(q,5)==1))
+                    {
+                      step=6;
+                      break;
+                    }
+                  }
+
+                  if(step==6)
+                  {
+                    if(printlevel>=1)
+                    {
+                      "Geeignetes Paar (m,q) gefunden, so dass q|m,";
+                      "q>(4-th root(N("+string(i)+"))+1)^2 und q den Miller-Rabin-Test passiert.";
+                      "m="+string(m)+",";"q="+string(q);
+                      pause();
+                    }
+                    break;
+                  }
+                  else
+                  {
+                    step=3;
+                  }
+                }
+
+                if(step==3)
+                {
+                  if(printlevel>=1)
+                  {
+                    "Kein geeignetes Paar (m,q), so dass q|m,";
+                    "q>(4-th root(N("+string(i)+"))+1)^2 und q den Miller-Rabin-Test passiert, gefunden.";
+                    pause();
+                  }
+                  continue;
+                }
+              }
+
+              if(step==6)                                                   // (6)[Compute elliptic curve]
+                 {
+                   if(D==-4)
+                   {
+                     a=-1;
+                     b=0;
+                     if(printlevel>=1)
+                     {
+                       "Da D=-4, setze a=-1 und b=0.";
+                       pause();
+                     }
+                   }
+
+                   if(D==-3)
+                   {
+                     a=0;
+                     b=-1;
+                     if(printlevel>=1)
+                     {
+                       "Da D=-3, setze a=0 und b=-1.";
+                       pause();
+                     }
+                   }
+
+                   if(D<-4)
+                   {
+                     if(printlevel>=1)
+                     {
+                       "Das Minimalpolynom T von j((D+sqr(D))/2) aus Z[X] fuer D="+string(D)+" wird berechnet.";
+                     }
+                     T=HilbertClassPolynomial(D,K);
+                     if(printlevel>=1)
+                     {
+                       "T="+string(T);
+                       pause();
+                     }
+
+                     M=coeffs(T,var(1));
+                     T=0;
+
+                     for(j(4)=1;j(4)<=nrows(M);j(4)++)
+                     {
+                       M[j(4),1]=leadcoef(M[j(4),1]) mod N(i);
+                       T=T+M[j(4),1]*var(1)^(j(4)-1);
+                     }
+                     if(printlevel>=1)
+                     {
+                       "Setze T=T mod N("+string(i)+").";"T="+string(T);
+                       pause();
+                     }
+
+                     R=RootsModp(int(N(i)),T);
+                     if(deg(T)>size(R))
+                     {
+                       ERROR("Das Polynom T zerfaellt modulo N("+string(i)+") nicht vollstaendig in Linearfaktoren."+
+                             "Erhoehe den Genauigkeitsparameter K und starte den Algorithmus erneut.");
+                     }
+                     if(printlevel>=1)
+                     {
+                       if(deg(T)>1)
+                       {
+                         "Die "+string(deg(T))+" Nullstellen von T modulo N("+string(i)+") sind";
+                         R;
+                         pause();
+                       }
+                       if(deg(T)==1)
+                       {
+                         "Die Nullstelle von T modulo N("+string(i)+") ist";
+                         R;
+                         pause();
+                       }
+                     }
+
+                     j=R[1];
+                     c=j*exgcdN(j-1728,N(i))[1];
+                     a=-3*c mod N(i);
+                     b=2*c mod N(i);
+                     if(printlevel>=1)
+                     {
+                       "Waehle die Nullstelle j="+string(j)+" aus und setze";"c=j/(j-1728) mod N("+string(i)+"), a=-3c mod N("+string(i)+"), b=2c mod N("+string(i)+").";
+                       "a="+string(a)+",";"b="+string(b);
+                       pause();
+                     }
+                   }
+
+                   step=7;
+                 }
+
+              if(step==7)                                                   // (7)[Find g]
+              {
+                if(D==-3)
+                {
+                  while(1)
+                  {
+                    g=random(1,2147483647) mod N(i);
+                    u=Jacobi(g,N(i));
+                    if((u==-1)&&(powerN(g,(N(i)-1)/3,N(i))!=1))
+                    {
+                      if(printlevel>=1)
+                      {
+                        "g="+string(g);
+                        pause();
+                      }
+                      break;
+                    }
+                  }
+                }
+                else
+                {
+                  while(1)
+                  {
+                    g=random(1,2147483647) mod N(i);
+                    u=Jacobi(g,N(i));
+                    if(u==-1)
+                    {
+                      if(printlevel>=1)
+                      {
+                        "g="+string(g);
+                        pause();
+                      }
+                      break;
+                    }
+                  }
+                }
+
+                step=8;
+              }
+
+              if(step==8)                                                   // (8)[Find P]
+              {
+                if(printlevel>=1)
+                {
+                  "Ein zufaelliger Punkt P auf der Elliptischen Kurve";
+                  "mit der Gleichung y^2=x^3+ax+b fuer";"N("+string(i)+")="+string(N(i))+",";"   a="+string(a)+",";"   b="+string(b);"wird gewaehlt.";
+                }
+                P=ellipticRandomPoint(N(i),a,b);
+                if(printlevel>=1) {"P=("+string(P)+")";pause();}
+
+                if(size(P)==1)
+                {
+                  step=14;
+                }
+                else
+                {
+                  step=9;
+                }
+              }
+
+              if(step==9)                                                   // (9)[Find right curve]
+                 {
+                   if(printlevel>=1) {"Die Punkte P2=(m/q)*P und P1=q*P2 auf der Kurve werden berechnet.";}
+                   P2=ellipticMult(N(i),a,b,P,m/q);
+                   P1=ellipticMult(N(i),a,b,P2,q);
+                   if(printlevel>=1) {"P1=("+string(P1)+"),";"P2=("+string(P2)+")";pause();}
+
+                   if((P1[1]==0)&&(P1[2]==1)&&(P1[3]==0))
+                   {
+                     step=12;
+                   }
+                   else
+                   {
+                     if(printlevel>=1) {"Da P1!=(0:1:0), ist fuer die Koeffizienten a="+string(a)+" und b="+string(b)+" m!=|E(Z/N("+string(i)+")Z)|.";
+                                           "Waehle daher neue Koeffizienten a und b.";pause();}
+                     step=10;
+                   }
+                 }
+
+              if(step==10)
+                 {
+                   k=k+1;
+                   if(k>=w(D))
+                      {
+                        if(printlevel>=1) {"Da k=w(D)="+string(k)+", ist N("+string(i)+")="+string(N(i))+" nicht prim.";pause();}
+                        step=14;
+                      }
+
+                   else
+                      {
+                        if(D<-4) {a=a*g^2 mod N(i); b=b*g^3 mod N(i);
+                                  if(printlevel>=1) {"Da D<-4, setze a=a*g^2 mod N("+string(i)+") und b=b*g^3 mod N("+string(i)+").";"a="+string(a)+",";"b="+string(b)+",";"k="+string(k);pause();}}
+                        if(D==-4){a=a*g mod N(i);
+                                  if(printlevel>=1) {"Da D=-4, setze a=a*g mod N("+string(i)+").";"a="+string(a)+",";"b="+string(b)+",";"k="+string(k);pause();}}
+                        if(D==-3){b=b*g mod N(i);
+                                  if(printlevel>=1) {"Da D=-3, setze b=b*g mod N("+string(i)+").";"a="+string(a)+",";"b="+string(b)+",";"k="+string(k);pause();}}
+                        step=8;
+                        continue;
+                      }
+                 }
+
+              if(step==11)                                                  // (11)[Find a new P]
+              {
+                if(printlevel>=1)
+                {
+                  "Ein neuer zufaelliger Punkt P auf der Elliptischen Kurve wird gewaehlt,";
+                  "da auch P2=(0:1:0).";
+                }
+                P=ellipticRandomPoint(N(i),a,b);
+                if(printlevel>=1)
+                {
+                  "P=("+string(P)+")";
+                  pause();
+                }
+
+                if(size(P)==1)
+                {
+                  step=14;
+                }
+                else
+                {
+                  if(printlevel>=1)
+                  {
+                    "Die Punkte P2=(m/q)*P und P1=q*P2 auf der Kurve werden berechnet.";
+                  }
+                  P2=ellipticMult(N(i),a,b,P,m/q);
+                  P1=ellipticMult(N(i),a,b,P2,q);
+                  if(printlevel>=1)
+                  {
+                    "P1=("+string(P1)+"),";"P2=("+string(P2)+")";
+                    pause();
+                  }
+
+                  if((P1[1]!=0)||(P1[2]!=1)||(P1[3]!=0))
+                  {
+                    if(printlevel>=1)
+                    {
+                      "Da P1!=(0:1:0), ist, fuer die Koeffizienten a="+string(a)+" und b="+string(b)+", m!=|E(Z/N("+string(i)+")Z)|.";
+                      "Waehle daher neue Koeffizienten a und b.";
+                      pause();
+                    }
+                    step=10;
+                    continue;
+                  }
+                  else
+                  {
+                    step=12;
+                  }
+                }
+              }
+
+              if(step==12)                                                  // (12)[Check P]
+              {
+                if((P2[1]==0)&&(P2[2]==1)&&(P2[3]==0))
+                {
+                  step=11;
+                  continue;
+                }
+                else
+                {
+                  step=13;
+                }
+              }
+
+              if(step==13)                                                  // (13)[Recurse]
+              {
+                if(i<B)
+                {
+                  if(printlevel>=1)
+                  {
+                    string(i+1)+". Rekursion:";"";
+                    "N("+string(i)+")="+string(N(i))+" erfuellt die Bedingungen des zugrunde liegenden Satzes,";
+                    "da P1=(0:1:0) und P2[3] aus (Z/N("+string(i)+")Z)*.";"";
+                    "Untersuche nun, ob auch der gefundene Faktor q="+string(q)+" diese Bedingungen erfuellt.";
+                    "Setze dazu i=i+1, N("+string(i+1)+")=q="+string(q)+" und beginne den Algorithmus von vorne.";
+                    pause();
+                  }
+                  i=i+1;
+                  int n(i);
+                  number N(i)=q;
+                  k=0;
+                  step=2;
+                  continue;
+                }
+                else
+                {
+                  if(printlevel>=1)
+                  {
+                    "N(B)=N("+string(i)+")="+string(N(i))+" erfuellt die Bedingungen des zugrunde liegenden Satzes,";
+                    "da P1=(0:1:0) und P2[3] aus (Z/N("+string(i)+")Z)*.";
+                    "Insbesondere ist N="+string(N)+" prim.";
+                    pause();
+                  }
+                  return(1);
+                }
+              }
+
+              if(step==14)                                                  // (14)[Backtrack]
+              {
+                if(i>0)
+                {
+                  if(printlevel>=1)
+                  {
+                    "Setze i=i-1 und starte den Algorithmus fuer N("+string(i-1)+")="+string(N(i-1))+" mit neuer Diskriminanten von vorne.";
+                    pause();
+                  }
+                  i=i-1;
+                  k=0;
+                  step=3;
+                }
+                else
+                {
+                  if(printlevel>=1)
+                  {
+                    "N(0)=N="+string(N)+" und daher ist N nicht prim.";
+                    pause();
+                  }
+                  return(-1);
+                }
+              }
+            }
          }
 }
 example
