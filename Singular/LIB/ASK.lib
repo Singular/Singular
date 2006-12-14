@@ -1,6 +1,6 @@
 //CM, last modified 10.12.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ASK.lib,v 1.1 2006-12-11 12:52:42 Singular Exp $";
+version="$Id: ASK.lib,v 1.2 2006-12-14 12:02:03 pfister Exp $";
 category="Teaching";
 info="
 LIBRARY: ASK.lib
@@ -11,17 +11,11 @@ OVERVIEV:
  Algorithms for primality testing in polynomial time
  based on the ideas of Agrawal, Saxena and  Kayal.
 
-
-
-
 PROCEDURES:
 
-
-schnellexp(a,m)            a^m for numbers a,m
 schnellexpt(a,m,n)         a^m for numbers a,m; if a^k>n n+1 is returned
 log2(n)                    logarithm to basis 2 of n
 PerfectPowerTest(n)        checks if there are a,b>1, so that a^b=n
-schnellexppoly(a,m)        a^m for number m,poly a
 wurzel(r)                  square root of number r
 euler(r)                   phi-function of euler
 coeffmod(f,n)              poly f modulo number n (coefficients mod n)
@@ -32,55 +26,11 @@ ask(n)                     ASK-Algorithm; deterministic Primality test
 LIB "krypto.lib";
 LIB "ntsolve.lib";
 
-
-
-
-
 ///////////////////////////////////////////////////////////////
 //                                                           //
-//   Fast Exponentiation                                     //
+//   FAST (MODULAR) EXPONENTIATION                           //
 //                                                           //
-///////////////////////////////////////////////////////////////
-
-
-
-
-proc schnellexp(number a,number m)
-"USAGE: schnellexp(a,m);
-RETURN: the m-th power of a
-NOTE:   uses fast exponentiation
-EXAMPLE:example schnellexp; shows an example
-"
-{
- number b,c,d;
- c=m;
- b=a;
- d=1;
-
-  while(c>=1)
-  {
-    if((c mod 2)==1)
-     {
-       d=d*b;
-     }
-
-   b=b^2;
-   c=intPart(c/2);
-
-  }
- return(d)
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   ring R = 0,x,dp;
-   schnellexp(24,1234);
-}
-
-
-
-////////////////////////////////////////////////////////////////////////
-
-
+/////////////////////////////////////////////////////////////// 
 proc schnellexpt(number a,number m,number n)
 "USAGE: schnellexpt(a,m,n);
 RETURN: the m-th power of a; if a^m>n the procedure returns n+1
@@ -120,64 +70,70 @@ example
    ring R = 0,x,dp;
    schnellexpt(2,10,1022);
 }
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-proc schnellexppoly(poly a,number m)
-"USAGE: schnellexppoly(a,m);
-RETURN: the m-th power of poly a
-NOTE:   uses fast exponentiation;
-        proc schnellexp for a poly a instead of a number a;
-EXAMPLE:example schnellexppoly; shows an example
+////////////////////////////////////////////////////////////////////////////
+proc coeffmod(poly f,number n)
+"USAGE: coeffmod(f,n); 
+ASSUME: poly f depends on at most var(1) of the basering
+RETURN: poly f modulo number n 
+NOTE:   at first the coefficients of the monomials of the poly f are 
+        determined, then their remainder modulo n is calculated, 
+        after that the poly 'is put together' again 
+EXAMPLE:example coeffmod; shows an example
 "
-{
- number c;
- poly b,d;
+{ 
+  matrix M=coeffs(f,var(1));         //Bestimmung der Polynomkoeffizienten
+  int i=1;
+  poly g;
+  number o=nrows(M);
 
- c=m;
- b=a;
- d=1;
-
-  while(c>=1)
-  {
-    if((c mod 2)==1)
-     {
-       d=d*b;
-     }
-
-   b=b^2;
-   c=intPart(c/2);
-
-  }
- return(d)
+  while(i<=o)
+    {            
+      g=g+(leadcoef(M[i,1]) mod n)*var(1)^(i-1) ;
+                     // umwandeln der Koeffizienten in numbers, 
+                     // Berechnung der Reste dieser numbers modulo n, 
+                     // poly mit neuen Koeffizienten wieder zusammensetzen 
+      i=i+1;
+    }
+  return(g);
 }
 example
-{ "EXAMPLE:"; echo = 2;
+{ "EXAMPLE:"; echo = 2;                            
    ring R = 0,x,dp;
+   poly f=2457*x4+52345*x3-98*x2+5;
+   number n=3;
+   coeffmod(f,n);
+} 
+//////////////////////////////////////////////////////////////////////////
+proc powerpolyX(number q,number n,poly a,poly r)
+"USAGE: powerpolyX(q,n,a,r); 
+RETURN: the q-th power of poly a modulo poly r and number n         
+EXAMPLE:example powerpolyX; shows an example
+"
+{
+  ideal I=std(r);
+   
+   if(q==1){return(coeffmod(reduce(a,I),n));}
+   if((q mod 5)==0){return(coeffmod(reduce(powerpolyX(q/5,n,a,r)^5,I),n));}
+   if((q mod 4)==0){return(coeffmod(reduce(powerpolyX(q/4,n,a,r)^4,I),n));}
+   if((q mod 3)==0){return(coeffmod(reduce(powerpolyX(q/3,n,a,r)^3,I),n));}
+   if((q mod 2)==0){return(coeffmod(reduce(powerpolyX(q/2,n,a,r)^2,I),n));}
+
+  return(coeffmod(reduce(a*powerpolyX(q-1,n,a,r),I),n));
+}  
+example
+{ "EXAMPLE:"; echo = 2;                             
+   ring R=0,x,dp;
    poly a=3*x3-x2+5;
-   number m=21;
-   schnellexppoly(a,m);
+   poly r=x7-1;
+   number q=123;
+   number n=5;
+   powerpolyX(q,n,a,r);
 }
-
-
-
-
-
-
 ///////////////////////////////////////////////////////////////
 //                                                           //
 //   GENERAL PROCEDURES                                      //
 //                                                           //
 ///////////////////////////////////////////////////////////////
-
-
-
-
 proc log2(number x)
 "USAGE:  log2(x);
 RETURN:  logarithm to basis 2 of x
@@ -186,21 +142,22 @@ NOTE:    calculates the natural logarithm of x with a power-series
 EXAMPLE: example log2; shows an example
 "
 {
- number b,c,d,t,l,k;
+   number b,c,d,t,l;
+   int k;
                                          // log2=logarithmus zur basis 2,
                                          // log=natuerlicher logarithmus
- b=100000000000000000000000000000000000000000000000000;
- c=141421356237309504880168872420969807856967187537695;    // c/b=sqrt(2)
- d=69314718055994530941723212145817656807550013436026;     // d/b=log(2)
+   b=100000000000000000000000000000000000000000000000000;
+   c=141421356237309504880168872420969807856967187537695;    // c/b=sqrt(2)
+   d=69314718055994530941723212145817656807550013436026;     // d/b=log(2)
 
 //bringen x zunaechst zwischen 1/sqrt(2) und sqrt(2), so dass Reihe schnell
 //konvergiert, berechnen dann Reihe bis 30. Summanden und letztendlich
 //log2(x)=log(x)/log(2)=(log(x/2^j)+j*log(2))/log(2)  für große x
 //log2(x)=log(x)/log(2)=(log(x*2^j)-j*log(2))/log(2)  für kleine x
 
-number j=0;
+ number j=0;
 
-if(x<(b/c))
+ if(x<(b/c))
  {
 
   while(x<(b/c))
@@ -214,7 +171,7 @@ if(x<(b/c))
   l=0;
   while(k<30)       //fuer  x*2^j wird Reihe bis k-tem Summanden berechnet
    {
-    l=l+2*schnellexp(t,2*k+1)/(2*k+1);      //l=log(x*2^j) nach k Summanden
+    l=l+2*(t^(2*k+1))/(2*k+1);      //l=log(x*2^j) nach k Summanden
 
     k=k+1;
    }
@@ -236,7 +193,7 @@ if(x<(b/c))
 
  while(k<30)         //fuer  x/2^j wird Reihe bis k-tem Summanden berechnet
   {
-   l=l+2*schnellexp(t,2*k+1)/(2*k+1);       //l=log(x/2^j) nach k Summanden
+   l=l+2*(t^(2*k+1))/(2*k+1);       //l=log(x/2^j) nach k Summanden
    k=k+1;
   }
 
@@ -247,12 +204,7 @@ example
    ring R = 0,x,dp;
    log2(1024);
 }
-
-
-
 //////////////////////////////////////////////////////////////////////////
-
-
 proc wurzel(number r)
 "USAGE: wurzel(r);
 ASSUME: caracteristic of basering is 0, r>=0
@@ -280,12 +232,7 @@ example
    ring R = 0,x,dp;
    wurzel(7629412809180100);
 }
-
-
-
 //////////////////////////////////////////////////////////////////////////
-
-
 proc euler(number r)
 "USAGE: euler(r);
 RETURN: number phi(r), where phi is eulers phi-function
@@ -312,18 +259,11 @@ example
    ring R = 0,x,dp;
    euler(99991);
 }
-
-
-
-
-
 ///////////////////////////////////////////////////////////////
 //                                                           //
 //   PERFECT POWER TEST                                      //
 //                                                           //
 ///////////////////////////////////////////////////////////////
-
-
 proc PerfectPowerTest(number n)
 "USAGE: PerfectPowerTest(n);
 RETURN: 0 if there are numbers a,b>1 with a^b=n;
@@ -375,102 +315,11 @@ example
    ring R = 0,x,dp;
    PerfectPowerTest(887503681);
 }
-
-
-
-
-
-
-
-
-///////////////////////////////////////////////////////////////
-//                                                           //
-//   FAST MODULAR EXPONENTIATION OF POLYNOMIALS              //
-//                                                           //
-///////////////////////////////////////////////////////////////
-
-
-
-proc coeffmod(poly f,number n)
-"USAGE: coeffmod(f,n);
-ASSUME: poly f depends on at most var(1) of the basering
-RETURN: poly f modulo number n
-NOTE:   at first the coefficients of the monomials of the poly f are
-        determined, then their remainder modulo n is calculated,
-        after that the poly 'is put together' again
-EXAMPLE:example coeffmod; shows an example
-"
-{
-  matrix M=coeffs(f,var(1));         //Bestimmung der Polynomkoeffizienten
-  int i=1;
-  poly g;
-  number o=nrows(M);
-
-  while(i<=o)
-    {
-      g=g+(leadcoef(M[i,1]) mod n)*var(1)^(i-1) ;
-                     // umwandeln der Koeffizienten in numbers,
-                     // Berechnung der Reste dieser numbers modulo n,
-                     // poly mit neuen Koeffizienten wieder zusammensetzen
-      i=i+1;
-    }
-  return(g);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   ring R = 0,x,dp;
-   poly f=2457*x4+52345*x3-98*x2+5;
-   number n=3;
-   coeffmod(f,n);
-}
-
-
-
-
-
-
-
-
-//////////////////////////////////////////////////////////////////////////
-
-
-proc powerpolyX(number q,number n,poly a,poly r)
-"USAGE: powerpolyX(q,n,a,r);
-RETURN: the q-th power of poly a modulo poly r and number n
-EXAMPLE:example powerpolyX; shows an example
-"
-{
-  ideal I=std(r);
-
-   if(q==1){return(coeffmod(reduce(a,I),n));}
-   if((q mod 5)==0){return(coeffmod(reduce(powerpolyX(q/5,n,a,r)^5,I),n));}
-   if((q mod 4)==0){return(coeffmod(reduce(powerpolyX(q/4,n,a,r)^4,I),n));}
-   if((q mod 3)==0){return(coeffmod(reduce(powerpolyX(q/3,n,a,r)^3,I),n));}
-   if((q mod 2)==0){return(coeffmod(reduce(powerpolyX(q/2,n,a,r)^2,I),n));}
-
-  return(coeffmod(reduce(a*powerpolyX(q-1,n,a,r),I),n));
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   ring R=0,x,dp;
-   poly a=3*x3-x2+5;
-   poly r=x7-1;
-   number q=123;
-   number n=5;
-   powerpolyX(q,n,a,r);
-}
-
-
-
-
 ///////////////////////////////////////////////////////////////
 //                                                           //
 //   ASK PRIMALITY TEST                                      //
 //                                                           //
 ///////////////////////////////////////////////////////////////
-
-
-
 proc ask(number n)
 "USAGE: ask(n);
 ASSUME: n>1
@@ -595,7 +444,7 @@ EXAMPLE:example ask; shows an example
      if(printlevel>=1){"a=";l;}
      f=var(1)+l;
 
-      if(powerpolyX(n,n,f,g)!=(schnellexppoly(var(1),(n mod r))+l))
+       if(powerpolyX(n,n,f,g)!=(var(1)^(int((n mod r)))+l))
        {
          if(printlevel>=1)
           {"Fuer a=";l;"ist (x+a)^n nicht kongruent x^n+a mod (x^r-1,n)";
@@ -616,7 +465,8 @@ EXAMPLE:example ask; shows an example
 example
 { "EXAMPLE:"; echo = 2;
    ring R = 0,x,dp;
-   ask(100003);
+   //ask(100003);
+   ask(32003);
 }
 
 
