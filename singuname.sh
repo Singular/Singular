@@ -225,7 +225,23 @@ then
         echo ${prefix}-Unknown
         exit 1
     fi
+<<<<<<< singuname.sh
+# sparc64-Linux ############################################
+elif (echo $uname_a | $egrep "sparc64" >$devnull)
+then
+    prefix=sparc64
+    if (echo $uname_a | $egrep "Linux" > $devnull)
+    then
+        echo ${prefix}-Linux
+        exit 0
+    else
+        echo ${prefix}-Unknown
+        exit 1
+    fi
 
+=======
+
+>>>>>>> 1.22
 else # Unknown ########################################################
     echo Unknown
     exit 2
