@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ring.lib,v 1.30 2006-11-13 12:45:14 Singular Exp $";
+version="$Id: ring.lib,v 1.31 2006-12-15 14:15:51 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -19,8 +19,8 @@ PROCEDURES:
  ringtensor(\"R\",s,t,..);create ring R, tensor product of rings s,t,...
  ringweights(r);          intvec of weights of ring variables of ring r
  preimageLoc(R,phi,Q)     computes preimage for non-global orderings
-             (parameters in square brackets [] are optional)
  rootofUnity(n);         the minimal polynomial for the n-th primitive root of unity
+             (parameters in square brackets [] are optional)
 ";
 
 LIB "inout.lib";

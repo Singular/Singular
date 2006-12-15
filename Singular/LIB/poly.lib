@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: poly.lib,v 1.39 2006-12-14 08:47:33 pfister Exp $";
+version="$Id: poly.lib,v 1.40 2006-12-15 14:15:51 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  poly.lib      Procedures for Manipulating Polys, Ideals, Modules
@@ -673,12 +673,12 @@ EXAMPLE: example rad_con; shows an example
   int dB=degBound;
   degBound=0;
   string mp=string(minpoly);
-  execute("ring R=("+charstr(br)+"),(x(1..n),@z),dp;");
+  execute("ring R=("+charstr(br)+"),(@x(1..n),@z),dp;");
   execute("minpoly=number("+mp+");");
-  ideal irrel=x(1..n);
+  ideal irrel=@x(1..n);
   map f=br,irrel;
   poly p=f(g);
-  ideal J=f(I)+ideal(p*@z-1);
+  ideal J=f(I),ideal(p*@z-1);
   J=std(J);
   degBound=dB;
   if (J[1]==1)

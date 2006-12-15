@@ -1,10 +1,10 @@
 //CM, last modified 10.12.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ASK.lib,v 1.2 2006-12-14 12:02:03 pfister Exp $";
+version="$Id: ASK.lib,v 1.3 2006-12-15 14:15:51 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY: ASK.lib
-         PROCEDURES FOR PRIMALITY TESTING AFTER AGRAWAL, SAXENA, KAYAL
+         Procedures for primality testing after Agrawal, Saxena, Kayal
 AUTHORS: Christoph Mang
 
 OVERVIEV:

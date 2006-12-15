@@ -1,11 +1,11 @@
 S///////////////////////////////////////////////////////////////////////////////
-version="$Id: sheafcoh.lib,v 1.9 2006-11-17 14:15:42 Singular Exp $";
+version="$Id: sheafcoh.lib,v 1.10 2006-12-15 14:15:52 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  sheafcoh.lib   Procedures for Computing Sheaf Cohomology
 AUTHORS:  Wolfram Decker, decker@math.uni-sb.de,
 @*        Christoph Lossen,  lossen@mathematik.uni-kl.de
-@*        Gerhrd Pfister,  pfister@mathematik.uni-kl.de
+@*        Gerhard Pfister,  pfister@mathematik.uni-kl.de
 
 PROCEDURES:
  truncate(phi,d);        truncation of coker(phi) at d
