@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.5 2006-06-28 15:06:49 Singular Exp $ */
+/* $Id: ideals.h,v 1.6 2006-12-15 17:16:07 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -152,4 +152,6 @@ intvec *idQHomWeight(ideal id);
 void    idNormalize(ideal id);
 
 ideal idXXX (ideal  h1, int k);
+
+poly id_GCD(poly f, poly g, const ring r);
 #endif

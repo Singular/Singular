@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.28 2006-12-08 17:50:54 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.29 2006-12-15 17:16:07 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -447,7 +447,7 @@ int redHomog (LObject* h,kStrategy strat)
   assume(h->FDeg == h->pFDeg());
 
   poly h_p;
-  int i,j,at,pass, ii, h_d;
+  int i,j,at,pass, ii;
   unsigned long not_sev;
   long reddeg,d;
 
@@ -563,17 +563,56 @@ int redHomog (LObject* h,kStrategy strat)
 int redLazy (LObject* h,kStrategy strat)
 {
   if (strat->tl<0) return 1;
-  int at,d,i;
+  int at,d,i,ii,li;
   int j = 0;
   int pass = 0;
   assume(h->pFDeg() == h->FDeg);
   long reddeg = h->GetpFDeg();
+  unsigned long not_sev;
 
   h->SetShortExpVector();
+  poly h_p = h->GetLmTailRing();
+  not_sev = ~ h->sev;
   loop
   {
     j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
     if (j < 0) return 1;
+   
+    li = strat->T[j].pLength;
+    ii = j;
+    /*
+     * the polynomial to reduce with (up to the moment) is;
+     * pi with length li
+     */
+
+    i = j;
+#if 1
+    loop
+    {
+      /*- search the shortest possible with respect to length -*/
+      i++;
+      if (i > strat->tl)
+        break;
+      if (li<=1)
+        break;
+      if ((strat->T[i].pLength < li)
+         &&
+          p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
+                               h_p, not_sev, strat->tailRing))
+      {
+        /*
+         * the polynomial to reduce with is now;
+         */
+        li = strat->T[i].pLength;
+        ii = i;
+      }
+    }
+#endif
+
+    /*
+     * end of search: have to reduce with pi
+     */
+
 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
@@ -581,11 +620,11 @@ int redLazy (LObject* h,kStrategy strat)
       PrintS("red:");
       h->wrp();
       PrintS(" with ");
-      strat->T[j].wrp();
+      strat->T[ii].wrp();
     }
 #endif
 
-    ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
+    ksReducePoly(h, &(strat->T[ii]), NULL, NULL, strat);
 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
@@ -596,7 +635,9 @@ int redLazy (LObject* h,kStrategy strat)
     }
 #endif
 
-    if (h->GetLmTailRing() == NULL)
+    h_p=h->GetLmTailRing();
+
+    if (h_p == NULL)
     {
       if (h->lcm!=NULL) pLmFree(h->lcm);
 #ifdef KDEBUG
@@ -605,6 +646,7 @@ int redLazy (LObject* h,kStrategy strat)
       return 0;
     }
     h->SetShortExpVector();
+    not_sev = ~ h->sev;
     d = h->SetpFDeg();
     /*- try to reduce the s-polynomial -*/
     pass++;
@@ -635,7 +677,6 @@ int redLazy (LObject* h,kStrategy strat)
     }
   }
 }
-
 /*2
 *  reduction procedure for the sugar-strategy (honey)
 * reduces h with elements from T choosing first possible

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.12 2006-11-24 12:18:27 Singular Exp $ */
+/* $Id: polys.cc,v 1.13 2006-12-15 17:16:07 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -645,8 +645,11 @@ void pDeleteComp(poly * p,int k)
 BOOLEAN pHasNotCF(poly p1, poly p2)
 {
 
-  if (pGetComp(p1) > 0 || pGetComp(p2) > 0)
-    return FALSE;
+  if (!TEST_OPT_IDLIFT)
+  {
+    if (pGetComp(p1) > 0 || pGetComp(p2) > 0)
+      return FALSE;
+  }
   int i = 1;
   loop
   {

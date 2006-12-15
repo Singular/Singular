@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.24 2006-11-23 15:04:54 Singular Exp $ */
+/* $Id: structs.h,v 1.25 2006-12-15 17:16:07 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -644,26 +644,27 @@ inline long si_min(const long a, const long b)  { return (a<b) ? a : b; }
 ** defines for BITSETs
 */
 
-#define V_SHOW_MEM  2
-#define V_YACC      3
-#define V_REDEFINE  4
-#define V_READING   5
-#define V_LOAD_LIB  6
-#define V_DEBUG_LIB 7
-#define V_LOAD_PROC 8
-#define V_DEF_RES   9
-#define V_DEBUG_MEM 10
-#define V_SHOW_USE  11
-#define V_IMAP      12
-#define V_PROMPT    13
-#define V_NSB       14
-#define V_CONTENTSB 15
+#define V_SHOW_MEM    2
+#define V_YACC        3
+#define V_REDEFINE    4
+#define V_READING     5
+#define V_LOAD_LIB    6
+#define V_DEBUG_LIB   7
+#define V_LOAD_PROC   8
+#define V_DEF_RES     9
+#define V_DEBUG_MEM  10
+#define V_SHOW_USE   11
+#define V_IMAP       12
+#define V_PROMPT     13
+#define V_NSB        14
+#define V_CONTENTSB  15
 #define V_CANCELUNIT 16
 #define V_MODPSOLVSB 17
 #define V_UPTORADICAL 18
-#define V_FINDMONOM 19
-#define V_COEFSTRAT 20
-#define V_DEG_STOP  31
+#define V_FINDMONOM  19
+#define V_COEFSTRAT  20
+#define V_IDLIFT     21
+#define V_DEG_STOP   31
 
 
 #define OPT_PROT           0
@@ -714,6 +715,7 @@ inline long si_min(const long a, const long b)  { return (a<b) ? a : b; }
 #define TEST_OPT_OLDSTD            BTEST1(OPT_OLDSTD)
 #define TEST_OPT_CONTENTSB         BVERBOSE(V_CONTENTSB)
 #define TEST_OPT_CANCELUNIT        BVERBOSE(V_CANCELUNIT)
+#define TEST_OPT_IDLIFT            BVERBOSE(V_IDLIFT)
 
 #define TEST_VERB_NSB              BVERBOSE(V_NSB)
 #define TEST_V_DEG_STOP            BVERBOSE(V_DEG_STOP)

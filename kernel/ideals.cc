@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.27 2006-11-27 13:44:44 Singular Exp $ */
+/* $Id: ideals.cc,v 1.28 2006-12-15 17:16:06 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1530,7 +1530,12 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
   *ma=mpNew(1,0);
   if (idIs0(h1))
     return idInit(1,h1->rank);
+
+  BITSET save_verbose=verbose;
+
   k=si_max(1,(int)idRankFreeModule(h1));
+
+  if (k==1) verbose |=Sy_bit(V_IDLIFT);
 
   ring orig_ring=currRing;
   ring syz_ring=rCurrRingAssure_SyzComp();
@@ -1615,6 +1620,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
   }
 
   if (syz_ring!=orig_ring) rKill(syz_ring);
+  verbose = save_verbose;
   return s_h3;
 }
 
@@ -3728,4 +3734,22 @@ void idNormalize(ideal I)
       pIter(p);
     }
   }
+}
+
+#include "clapsing.h"
+
+poly id_GCD(poly f, poly g, const ring r)
+{
+  ring save_r=currRing;
+  rChangeCurrRing(r);
+  ideal I=idInit(2,1); I->m[0]=f; I->m[1]=g;
+  intvec *w = NULL;
+  ideal S=idSyzygies(I,testHomog,&w);
+  if (w!=NULL) delete w;
+  poly gg=pTakeOutComp(&(S->m[0]),2);
+  idDelete(&S);
+  poly gcd_p=singclap_pdivide(f,gg);
+  pDelete(&gg);
+  rChangeCurrRing(save_r);
+  return gcd_p;
 }
