@@ -1,7 +1,7 @@
 LIB "tst.lib";
 tst_init();
 ring r = 32003,(x,y,z),dp;
-system("PLURAL",-1,1);
+ncalgebra(-1,1);
 r;
 // ring of some differential-like operators 
 poly s1  = x3y2+151x5y+186xy6+169y9;

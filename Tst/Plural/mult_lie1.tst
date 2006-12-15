@@ -7,7 +7,7 @@ matrix D[3][3];
 D[1,2]=-z;
 D[1,3]=2x;
 D[2,3]=-2y;
-system("PLURAL",1,D);
+ncalgebra(1,D);
 int N=11;
 poly f;
 poly g;

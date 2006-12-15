@@ -9,7 +9,7 @@ C[2,3]=Q2;
 D[1,2]=-Q*z;
 D[1,3]=1/Q*y;
 D[2,3]=-Q*x; 
-system("PLURAL",C,D);
+ncalgebra(C,D);
 int N=5;
 poly f;
 poly g;

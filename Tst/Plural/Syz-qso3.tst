@@ -17,7 +17,7 @@ A[2,3]=Q2;
 B[1,2]=-Q*z;
 B[1,3]=1/Q*y;
 B[2,3]=-Q*x;
-system("PLURAL",A,B);
+ncalgebra(A,B);
 poly Cq=Q^4*x2+y2+Q^4*z2+Q*(1-Q^4)*x*y*z;
 poly C1=x^3+x;
 poly C2=y^3+y;

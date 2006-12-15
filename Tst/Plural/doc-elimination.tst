@@ -6,7 +6,7 @@ matrix d[4][4];
 d[1,2]=-h;
 d[1,3]=2*e;
 d[2,3]=-2*f;
-system("PLURAL",1,d);
+ncalgebra(1,d);
 // it is U(sl_2)+K[a]
 option(redSB);
 option(redTail);

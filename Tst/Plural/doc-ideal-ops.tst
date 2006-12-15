@@ -5,7 +5,7 @@ matrix D[3][3];
 D[1,2]=-z;
 D[1,3]=y;
 D[2,3]=x;
-system("PLURAL",1,D); 
+ncalgebra(1,D); 
 ideal I = 0,x,0,1;
 I;
 I + 0;    // simplification

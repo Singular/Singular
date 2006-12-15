@@ -7,7 +7,7 @@ matrix d[3][3];
 d[1,2]=-z;
 d[1,3]=y;
 d[2,3]=-x;
-system("PLURAL",1,d); //U(so_3)
+ncalgebra(1,d); //U(so_3)
 ideal I=x3+4x,y2-z2,z3+z;
 I=std(I);
 I;
@@ -22,7 +22,7 @@ C[2,3]=Q2;
 D[1,2]=-Q*z;
 D[1,3]=1/Q*y;
 D[2,3]=-Q*x; 
-system("PLURAL",C,D);
+ncalgebra(C,D);
 ideal J=x3+4x,y2-z2,z3+z;
 J=std(J);
 J;

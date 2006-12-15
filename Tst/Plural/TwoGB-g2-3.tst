@@ -58,7 +58,7 @@ D[10,13]=-y(4);
 D[11,13]=-3*y(5);
 D[11,14]=y(5);
 D[12,14]=-y(6);
-system("PLURAL",1,D);
+ncalgebra(1,D);
 ideal i=x(1)^3;
 option(redSB);
 option(redTail);

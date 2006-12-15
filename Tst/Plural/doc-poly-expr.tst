@@ -12,7 +12,7 @@ poly(i);
 typeof(_);
 kill r;
 ring r=0,(x,y),dp;
-system("PLURAL",1,1);
+ncalgebra(1,1);
 // it is a Weyl algebra 
 r;
 yx;      // not correct input

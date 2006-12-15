@@ -5,7 +5,7 @@ matrix d[3][3];
 d[1,2]=-z;
 d[1,3]=2x;
 d[2,3]=-2y;
-system("PLURAL",1,d); 
+ncalgebra(1,d); 
 // it is algebra U(sl_2)
 int N=3;
 poly f=1;

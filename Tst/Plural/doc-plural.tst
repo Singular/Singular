@@ -10,7 +10,7 @@ C[2,3]=Q2;
 D[1,2]=-Q*z;
 D[1,3]=1/Q*y;
 D[2,3]=-Q*x; 
-system("PLURAL",C,D);
+ncalgebra(C,D);
 // it is quantum deformation U'_q(so_3)
 // where q=Q^2 specialized at the 3rd root of unity
 r1;
@@ -24,7 +24,7 @@ d[3,4]=Xb; d[3,5]=-Xa; d[3,6]=-Ha-Hb;
 d[3,7]=Xc; d[3,8]=Xc; d[4,5]=Yc;
 d[4,7]=-2*Ya; d[4,8]=Ya; d[5,7]=Yb;
 d[5,8]=-2*Yb; d[6,7]=-Yc; d[6,8]=-Yc;
-system("PLURAL",1,d);
+ncalgebra(1,d);
 // it is U(sl_3)
 r2;
 kill r2;
@@ -32,12 +32,12 @@ ring r3=0,(a,b,c,d),lp;
 matrix c[4][4];
 c[1,2]=1; c[1,3]=3; c[1,4]=-2;
 c[2,3]=-1; c[2,4]=-3; c[3,4]=1;
-system("PLURAL",c,0);
+ncalgebra(c,0);
 // it is some quasi--commutative algebra
 r3;
 kill r3;
 ring r4=0,(t,u,v,w),dp;
-system("PLURAL",-1,0);
+ncalgebra(-1,0);
 // it is anticommutative algebra
 r4;
 kill r4;
