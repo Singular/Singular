@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.242 2006-09-22 10:32:11 Singular Exp $ */
+/* $Id: extra.cc,v 1.243 2006-12-15 14:33:05 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -763,6 +763,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
 /*==================== PLURAL =================*/
+#if 0
     if (strcmp(sys_cmd, "PLURAL") == 0)
     {
       matrix C;
@@ -975,6 +976,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
+#endif
 /*==================== opp ==================================*/
     if (strcmp(sys_cmd, "opp")==0)
     {
@@ -2766,6 +2768,21 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         if (strcmp(s,"SPARSEMOD")==0) { if (d) On(SW_USE_SPARSEMOD); else Off(SW_USE_SPARSEMOD); } else
         if (strcmp(s,"homog")==0) { if (d) singular_homog_flag=1; else singular_homog_flag=0; } else
         return TRUE;
+        return FALSE;
+      }
+      else return TRUE;
+    }
+    else
+/*==================== gcd-test =================*/
+    if (strcmp(sys_cmd, "GCD") == 0)
+    {
+      if ((h!=NULL) && (h->Typ()==POLY_CMD)
+      && (h->next!=NULL) && (h->next->Typ()==POLY_CMD))
+      {
+        poly f=(poly)h->Data();
+        poly g=(poly)h->next->Data();
+        res->rtyp=POLY_CMD;
+        res->data=(char*)id_GCD(f,g,currRing);
         return FALSE;
       }
       else return TRUE;
