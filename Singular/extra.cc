@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.243 2006-12-15 14:33:05 Singular Exp $ */
+/* $Id: extra.cc,v 1.244 2006-12-15 15:25:11 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2773,6 +2773,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else return TRUE;
     }
     else
+#if 0
 /*==================== gcd-test =================*/
     if (strcmp(sys_cmd, "GCD") == 0)
     {
@@ -2788,6 +2789,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else return TRUE;
     }
     else
+#endif
 #ifdef ix86_Win
 /*==================== Python Singular =================*/
     if (strcmp(sys_cmd, "python") == 0)
