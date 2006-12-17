@@ -1,7 +1,7 @@
 LIB "tst.lib";
 tst_init();
 ring r=0,(x,y,z),dp;
-system ("PLURAL",-1,0); 
+ncalgebra(-1,0); 
 ideal m = maxideal(1);
 m;
 poly f = x2;
