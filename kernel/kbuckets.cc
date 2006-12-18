@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.28 2006-11-23 12:46:17 Singular Exp $ */
+/* $Id: kbuckets.cc,v 1.29 2006-12-18 20:45:08 motsak Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -674,9 +674,9 @@ void kBucket_Add_q(kBucket_pt bucket, poly q, int *l)
     assume(bucket->buckets_used<= MAX_BUCKET);
   }
 
+  kbTest(bucket);
   bucket->buckets[i] = q;
   bucket->buckets_length[i]=l1;
-  kbTest(bucket);
   if (i >= bucket->buckets_used)
     bucket->buckets_used = i;
   else
