@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.153 2006-12-11 18:07:55 Singular Exp $
+@comment $Id: singular.doc,v 1.154 2006-12-18 18:40:39 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -521,8 +521,6 @@ LIB "all.lib";
 * triang_lib:: procedures for decomposing zero-dimensional ideals
 * ntsolve_lib:: one real solution of polynomial systems (Newton iteration)
 * zeroset_lib:: procedures for roots and factorization
-* rootsmr_lib:: counting the number of real roots
-* rootsur_lib:: counting number of real roots of univariate polynomial
 * signcond_lib:: computing realizable sign conditions
 @end menu
 
@@ -543,23 +541,14 @@ LIB "all.lib";
 @subsection ntsolve_lib
 @c lib ntsolve.lib
 @c ---------------------------------------------------------
-@node zeroset_lib,rootsmr_lib , ntsolve_lib, Symbolic-numerical solving
+@node zeroset_lib,signcond_lib, ntsolve_lib, Symbolic-numerical solving
 @subsection zeroset_lib
 @c lib zeroset.lib
 @c ---------------------------------------------------------
-@node rootsmr_lib, signcond_lib ,zeroset_lib, Symbolic-numerical solving
-@subsection rootsmr_lib
-@c lib rootsmr.lib
-@c ---------------------------------------------------------
-@node signcond_lib, rootsur_lib, rootsmr_lib, Symbolic-numerical solving
+@node signcond_lib, , zeroset_lib, Symbolic-numerical solving
 @subsection signcond_lib
 @c lib signcond.lib
 @c ---------------------------------------------------------
-@node rootsur_lib, , signcond_lib, Symbolic-numerical solving
-@subsection rootsur_lib
-@c lib rootsur.lib
-
-@c ----------------------------------------------------------------------------
 @node Visualization, Coding theory, Symbolic-numerical solving, SINGULAR libraries
 @section Visualization
 @cindex Visualization
@@ -676,6 +665,8 @@ but not for serious computations.
 * krypto_lib:: Procedures for teaching cryptography
 * teachstd_lib:: Procedures for teaching standard bases
 * weierstr_lib:: Procedures for the Weierstrass Theorems
+* rootsmr_lib:: counting the number of real roots
+* rootsur_lib:: counting number of real roots of univariate polynomial
 @end menu
 @c ---------------------------------------------------------
 @node ASK_lib, AtkinsTest_lib, Teaching, Teaching
@@ -698,9 +689,19 @@ but not for serious computations.
 @c lib teachstd.lib
 
 @c ---------------------------------------------------------
-@node weierstr_lib,, teachstd_lib, Teaching
+@node weierstr_lib,rootsmr_lib, teachstd_lib, Teaching
 @subsection weierstr_lib
 @c lib weierstr.lib
+
+@c ---------------------------------------------------------
+@node rootsmr_lib,rootsur_lib, weierstr_lib, Teaching
+@subsection rootsmr_lib
+@c lib rootsmr.lib
+
+@c ---------------------------------------------------------
+@node rootsur_lib,,rootsmr_lib, Teaching
+@subsection rootsur_lib
+@c lib rootsur.lib
 
 @c ----------------------------------------------------------
 @node Release Notes, Index, SINGULAR libraries, Top
