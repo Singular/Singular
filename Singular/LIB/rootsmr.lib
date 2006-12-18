@@ -1,8 +1,8 @@
-// $Id: rootsmr.lib,v 1.2 2006-07-18 15:48:30 Singular Exp $
+// $Id: rootsmr.lib,v 1.3 2006-12-18 18:36:24 Singular Exp $
 // E. Tobis  12.Nov.2004, April 2004
 // last change 7. May 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
-category="Symbolic-numerical solving"
+category="Teaching"
 info="
 LIBRARY: rootsmr.lib Counting the number of real roots of polynomial systems
 AUTHOR:               Enrique A. Tobis, etobis@dc.uba.ar
