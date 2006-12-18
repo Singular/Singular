@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: platform.doc,v 1.15 2006-07-27 09:56:09 Singular Exp $
+@comment $Id: platform.doc,v 1.16 2006-12-18 18:40:11 Singular Exp $
 @comment this file contains Release notes and various howto's
 
 @c The following directives are necessary for proper compilation
@@ -84,4 +84,60 @@ from our FTP site
 @cindex instructions, Macintosh installation
 @cindex howto, install on Macintosh
 
-For the SINGULAR version for Mac OS X refer to the Unix section.
+Installation of the provided binaries
+
+Do not try to use the Finder for the installation!
+
+After inserting the CD open a terminal (under /Applications/Utilities) and
+type the following commands (you need an Admin Account):
+
+sudo tar -xvzf /Volumes/CDROM/MAC/OSX/Singular-3-0-3-ppcMac-darwin.tar.gz
+
+sudo tar -xvzf /Volumes/CDROM/MAC/OSX/Singular-3-0-3-share.tar.gz
+
+sudo ln -sf /usr/local/Singular/3-0-3/ppcMac-darwin/Singular /usr/local/bin/Singular-3-0-3
+
+The first two commands unpack the tar.gz files and copy the Singular
+files (binaries and documentation, libs, etc) to /usr/local/Singular/3-0-3.
+
+The last command creates a link in /usr/local/bin so that you can just type
+Singular-3-0-3
+to run Singular in any terminal.
+
+
+(The expert might wish to read the INSTALL_unix.html file in the UNIX
+directory for alternatives).
+
+Installation via fink
+
+Fink is a well-known package format for Mac OS X.
+(see http://fink.sf.net)
+
+There are two packages: singular-doc and singular.
+
+They are available for 10.3 and 10.4 (in fink called 10.4-transitional).
+
+If you have fink installed, try one of the two possibilities:
+
+@itemize
+@item
+   type in a shell:
+     @code{fink selfupdate}
+     @*@code{fink install singular singular-doc}
+
+@item
+(using the Fink Commander):
+
+   @itemize
+   @item
+   Start your Fink Commander
+   @item
+   After updating the package list,
+   there should appear "singular" and "singular-doc" as packages
+   @item
+   Install it from sources (fink will do that automatic for you).
+   @end itemize
+
+@end itemize
+
+
