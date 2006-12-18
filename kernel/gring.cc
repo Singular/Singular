@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.30 2006-07-27 08:36:41 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.31 2006-12-18 17:05:27 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -131,20 +131,20 @@ poly nc_p_Mult_mm_Common(poly p, const poly m, int side, const ring r)
       {
         expOut=expP;
 #ifdef PDEBUG
-	if (side) 
+        if (side)
         {
-	  Print("Multiplication in the left module from the right");
-	}
-#endif          
+          Print("Multiplication in the left module from the right");
+        }
+#endif
       }
       else
       {
         /* REPORT_ERROR */
 #ifdef PDEBUG
-	const char* s;
-	if (side==1) s="nc_p_Mult_mm";
-	else s="nc_mm_Mult_p";
-	Print("%s: exponent mismatch %d and %d\n",s,expP,expM);
+        const char* s;
+        if (side==1) s="nc_p_Mult_mm";
+        else s="nc_mm_Mult_p";
+        Print("%s: exponent mismatch %d and %d\n",s,expP,expM);
 #endif
         expOut=0;
       }
@@ -154,7 +154,7 @@ poly nc_p_Mult_mm_Common(poly p, const poly m, int side, const ring r)
     cOut=n_Mult(cP,cM,r);
     if (side==1)
     {
-      v = nc_mm_Mult_nn(P, M, r);      
+      v = nc_mm_Mult_nn(P, M, r);
     }
     else
     {
@@ -272,7 +272,7 @@ poly nc_mm_Mult_nn(int *F0, int *G0, const ring r)
               cff = n_Copy(p_GetCoeff(MATELEM(r->nc->COM,j,i),r),r);
               nPower(cff,cpower,&tmp_num);
               cff = nMult(totcff,tmp_num);
-	      nDelete(&totcff);
+              nDelete(&totcff);
               nDelete(&tmp_num);
               totcff = n_Copy(cff,r);
               n_Delete(&cff,r);
@@ -291,10 +291,10 @@ poly nc_mm_Mult_nn(int *F0, int *G0, const ring r)
     freeT(G,rN);
     return(out);
   } /* end nc_skew */
-    
+
   /* now we have to destroy out! */
-  p_Delete(&out,r);  
-  out = NULL;  
+  p_Delete(&out,r);
+  out = NULL;
 
   if (iG==jG)
     /* g is univariate monomial */
@@ -800,7 +800,7 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
     {
       for (m=1;m<=cMTsize;m++)
       {
-	out = MATELEM(r->nc->MT[UPMATELEM(j,i,rN)],k,m);
+        out = MATELEM(r->nc->MT[UPMATELEM(j,i,rN)],k,m);
         if ( out != NULL )
         {
           MATELEM(tmp,k,m) = out;/*MATELEM(r->nc->MT[UPMATELEM(j,i,rN)],k,m)*/
@@ -1342,8 +1342,8 @@ poly nc_p_Bracket_qq(poly p, poly q)
       {
         coef = nMult(pGetCoeff(p),pGetCoeff(Q));
         pres = p_Mult_nn(pres,coef,currRing);
-	if (UseBuckets) sBucket_Add_p(bu_out,pres,pLength(pres));
-	else res=p_Add_q(res,pres,currRing);
+        if (UseBuckets) sBucket_Add_p(bu_out,pres,pLength(pres));
+        else res=p_Add_q(res,pres,currRing);
         nDelete(&coef);
       }
       pIter(Q);
@@ -1431,7 +1431,7 @@ poly nc_mm_Bracket_nn(poly m1, poly m2)
             if (!pLmIsConstant(suffix)) bres = nc_p_Mult_mm(bres, suffix,currRing);
             ares=p_Add_q(ares, bres,currRing);
             /* What to give free? */
-	    /* Do we have to free PREFIX/SUFFIX? it seems so */
+            /* Do we have to free PREFIX/SUFFIX? it seems so */
             pDelete(&prefix);
             pDelete(&suffix);
           }
@@ -1534,7 +1534,7 @@ ideal twostd(ideal I)
     iSize=idElem(J);
     id_tmp=idSimpleAdd(J,K);
     idDelete(&K);
-    idDelete(&J); 
+    idDelete(&J);
     BITSET save_test=test;
     test|=Sy_bit(OPT_SB_1);
     J=kStd(id_tmp, currQuotient, testHomog,NULL,NULL,0,iSize);
@@ -1620,7 +1620,7 @@ void ncKill(ring r)
     {
       for(j=i+1;j<=rN;j++)
       {
-	id_Delete((ideal *)&(r->nc->MT[UPMATELEM(i,j,rN)]),r->nc->basering);
+        id_Delete((ideal *)&(r->nc->MT[UPMATELEM(i,j,rN)]),r->nc->basering);
       }
     }
     omFreeSize((ADDRESS)r->nc->MT,rN*(rN-1)/2*sizeof(matrix));
@@ -1630,7 +1630,7 @@ void ncKill(ring r)
   id_Delete((ideal *)&(r->nc->C),r->nc->basering);
   id_Delete((ideal *)&(r->nc->D),r->nc->basering);
   r->nc->basering->ref--;
-  if (r->nc->basering<=0) 
+  if (r->nc->basering<=0)
   {
     rKill(r->nc->basering);
   }
@@ -1710,27 +1710,27 @@ BOOLEAN nc_CheckSubalgebra(poly PolyVar, ring r)
   for (i=1; i<rN; i++)
   {
     if (ExpVar[i]==0) /* i.e. not in PolyVar */
-    {  
+    {
       for (j=i+1; j<=rN; j++)
       {
-	if (ExpVar[j]==0)
-	{
-	  test = nc_p_CopyGet(MATELEM(r->nc->D,i,j),r);
-	  while (test!=NULL)
-	  {
+        if (ExpVar[j]==0)
+        {
+          test = nc_p_CopyGet(MATELEM(r->nc->D,i,j),r);
+          while (test!=NULL)
+          {
             p_GetExpV(test, ExpTmp, r);
-	    OK=1;
-	    for (k=1;k<=rN;k++)
+            OK=1;
+            for (k=1;k<=rN;k++)
             {
-	      if (ExpTmp[k]!=0)
-	      {
-		if (ExpVar[k]!=0) OK=0;
-	      }
+              if (ExpTmp[k]!=0)
+              {
+                if (ExpVar[k]!=0) OK=0;
+              }
             }
-	    if (!OK) return(TRUE);
-	    pIter(test);
+            if (!OK) return(TRUE);
+            pIter(test);
           }
-	}
+        }
       }
     }
   }
@@ -1748,7 +1748,7 @@ BOOLEAN nc_CheckOrdCondition(matrix D, ring r)
 /* is admissible for r and D == r->nc->D */
 /* to be executed in a currRing */
 {
-  /* analyze D: an upper triangular matrix of polys */ 
+  /* analyze D: an upper triangular matrix of polys */
   /* check the ordering condition for D */
   ring save = currRing;
   int WeChangeRing = 0;
@@ -1763,26 +1763,26 @@ BOOLEAN nc_CheckOrdCondition(matrix D, ring r)
   for(i=1; i<r->N; i++)
   {
     for(j=i+1; j<=r->N; j++)
-    { 
+    {
       p = nc_p_CopyGet(MATELEM(D,i,j),r);
       if ( p != NULL)
       {
-	q = p_ISet(1,r); // replaces pOne();
-	p_SetExp(q,i,1,r);
-	p_SetExp(q,j,1,r);
-	p_Setm(q,r);
-	if (p_LmCmp(q,p,r) != 1) /* i.e. lm(p)==xy < lm(q)==D_ij  */
-	{
-	  Print("Bad ordering at %d,%d\n",i,j);
+        q = p_ISet(1,r); // replaces pOne();
+        p_SetExp(q,i,1,r);
+        p_SetExp(q,j,1,r);
+        p_Setm(q,r);
+        if (p_LmCmp(q,p,r) != 1) /* i.e. lm(p)==xy < lm(q)==D_ij  */
+        {
+          Print("Bad ordering at %d,%d\n",i,j);
 #ifdef PDEBUG
-	  p_Write(p,r);
-	  p_Write(q,r);
+          p_Write(p,r);
+          p_Write(q,r);
 #endif
-	  report = 1;
-	}
-	p_Delete(&q,r);
-	p_Delete(&p,r);
-	p = NULL;
+          report = 1;
+        }
+        p_Delete(&q,r);
+        p_Delete(&p,r);
+        p = NULL;
       }
     }
   }
@@ -1799,7 +1799,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
   /* detects nc_type, DO NOT initialize multiplication but call for it at the end*/
   /* checks the ordering condition and evtl. NDC */
 {
-  matrix CC = NULL; 
+  matrix CC = NULL;
   matrix DD = NULL;
   poly CN = NULL;
   poly DN = NULL;
@@ -1817,7 +1817,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
     }
     else  /* kill the previous nc data */
     {
-      ncKill(r); 
+      ncKill(r);
     }
   }
   ring save = currRing;
@@ -1840,14 +1840,14 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
   {
     CN = MATELEM(CCC,1,1);
   }
-  else 
+  else
   {
     if ((CCC != NULL) && ( (MATCOLS(CCC)!=r->N) || (MATROWS(CCC)!=r->N) ))
     {
       Werror("Square %d x %d  matrix expected",r->N,r->N);
       ncCleanUp(r);
       if (WeChangeRing)
-	rChangeCurrRing(save);
+        rChangeCurrRing(save);
       return TRUE;
     }
   }
@@ -1861,14 +1861,14 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
   {
     DN = MATELEM(DDD,1,1);
   }
-  else 
+  else
   {
     if ((DDD != NULL) && ( (MATCOLS(DDD)!=r->N) || (MATROWS(DDD)!=r->N) ))
     {
       Werror("Square %d x %d  matrix expected",r->N,r->N);
       ncCleanUp(r);
       if (WeChangeRing)
-	rChangeCurrRing(save);
+        rChangeCurrRing(save);
       return TRUE;
     }
   }
@@ -1885,14 +1885,14 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
       Werror("Incorrect input : zero coefficients are not allowed");
       ncCleanUp(r);
       if (WeChangeRing)
-	rChangeCurrRing(save);
+        rChangeCurrRing(save);
       return TRUE;
     }
-    if (nIsOne(nN)) 
+    if (nIsOne(nN))
     {
-      r->nc->type = nc_lie; 
+      r->nc->type = nc_lie;
     }
-    else 
+    else
     {
       r->nc->type = nc_general;
     }
@@ -1902,7 +1902,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
     {
       for(j=i+1; j<=r->N; j++)
       {
-	MATELEM(C,i,j) = nc_p_CopyPut(CN,r);
+        MATELEM(C,i,j) = nc_p_CopyPut(CN,r);
       }
     }
   }
@@ -1910,74 +1910,74 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
   {
     C = mpCopy(CC);
     /* analyze C */
-    if ( MATELEM(C,1,2) == NULL ) 
+    if ( MATELEM(C,1,2) == NULL )
       pN = NULL; /* check the consistency later */
-    else 
+    else
       pN = p_GetCoeff(MATELEM(C,1,2),r);
     tmpIsSkewConstant = 1;
     for(i=1; i<r->N; i++)
     {
       for(j=i+1; j<=r->N; j++)
-      { 
-	if (MATELEM(C,i,j) == NULL)
-	  qN = NULL;
-	else
-	  qN = p_GetCoeff(MATELEM(C,i,j),r);
-	if ( qN == NULL )   /* check the consistency: Cij!=0 */
+      {
+        if (MATELEM(C,i,j) == NULL)
+          qN = NULL;
+        else
+          qN = p_GetCoeff(MATELEM(C,i,j),r);
+        if ( qN == NULL )   /* check the consistency: Cij!=0 */
         // find also illegal pN
-	{
-	  Werror("Incorrect input : matrix of coefficients contains zeros in the upper triangle");
-	  ncCleanUp(r);
-	  if (WeChangeRing)
-	    rChangeCurrRing(save);
-	  return TRUE;
-	}
-	if (!nEqual(pN,qN)) tmpIsSkewConstant = 0;
+        {
+          Werror("Incorrect input : matrix of coefficients contains zeros in the upper triangle");
+          ncCleanUp(r);
+          if (WeChangeRing)
+            rChangeCurrRing(save);
+          return TRUE;
+        }
+        if (!nEqual(pN,qN)) tmpIsSkewConstant = 0;
       }
     }
     r->nc->IsSkewConstant=tmpIsSkewConstant;
-    if ( (tmpIsSkewConstant) && (nIsOne(pN)) ) 
+    if ( (tmpIsSkewConstant) && (nIsOne(pN)) )
     {
       r->nc->type = nc_lie;
     }
-    else 
+    else
     {
       r->nc->type = nc_general;
     }
   }
 
   /* initialition of the matrix D */
-  if ( DD == NULL ) 
+  if ( DD == NULL )
     /* we treat DN only (it could also be NULL) */
   {
     D = mpNew(r->N,r->N);
     if (DN  == NULL)
     {
-      if ( (r->nc->type == nc_lie) || (r->nc->type == nc_undef) )  
+      if ( (r->nc->type == nc_lie) || (r->nc->type == nc_undef) )
       {
-	r->nc->type = nc_comm; /* it was nc_skew earlier */
+        r->nc->type = nc_comm; /* it was nc_skew earlier */
       }
       else /* nc_general, nc_skew */
       {
-	r->nc->type = nc_skew;
+        r->nc->type = nc_skew;
       }
     }
     else /* DN  != NULL */
-    { 
+    {
       for(i=1; i<r->N; i++)
       {
-	for(j=i+1; j<=r->N; j++)
-	{
-	  MATELEM(D,i,j) = nc_p_CopyPut(DN,r);
-	}
+        for(j=i+1; j<=r->N; j++)
+        {
+          MATELEM(D,i,j) = nc_p_CopyPut(DN,r);
+        }
       }
     }
   }
   else /* DD != NULL */
-  { 
-    D = mpCopy(DD); 
+  {
+    D = mpCopy(DD);
   }
-  /* analyze D */ 
+  /* analyze D */
   /* check the ordering condition for D (both matrix and poly cases) */
 
   if ( nc_CheckOrdCondition(D, r) )
@@ -2023,25 +2023,25 @@ BOOLEAN nc_InitMultiplication(ring r)
   short DefMTsize=7;
   int IsNonComm=0;
   int tmpIsSkewConstant;
-  
+
   for(i=1; i<r->N; i++)
   {
     for(j=i+1; j<=r->N; j++)
     {
       if ( MATELEM(r->nc->D,i,j) == NULL ) /* quasicommutative case */
       {
-	/* 1x1 mult.matrix */
-	r->nc->MTsize[UPMATELEM(i,j,r->N)] = 1;
-	r->nc->MT[UPMATELEM(i,j,r->N)] = mpNew(1,1);
+        /* 1x1 mult.matrix */
+        r->nc->MTsize[UPMATELEM(i,j,r->N)] = 1;
+        r->nc->MT[UPMATELEM(i,j,r->N)] = mpNew(1,1);
       }
       else /* pure noncommutative case */
       {
-	/* TODO check the special multiplication properties */
-	IsNonComm = 1;
-	p_Delete(&(MATELEM(COM,i,j)),r);
-	//MATELEM(COM,i,j) = NULL; // done by p_Delete
-	r->nc->MTsize[UPMATELEM(i,j,r->N)] = DefMTsize; /* default sizes */
-	r->nc->MT[UPMATELEM(i,j,r->N)] = mpNew(DefMTsize, DefMTsize);
+        /* TODO check the special multiplication properties */
+        IsNonComm = 1;
+        p_Delete(&(MATELEM(COM,i,j)),r);
+        //MATELEM(COM,i,j) = NULL; // done by p_Delete
+        r->nc->MTsize[UPMATELEM(i,j,r->N)] = DefMTsize; /* default sizes */
+        r->nc->MT[UPMATELEM(i,j,r->N)] = mpNew(DefMTsize, DefMTsize);
       }
       /* set MT[i,j,1,1] to c_i_j*x_i*x_j + D_i_j */
       p = p_ISet(1,r); /* instead of     p = pOne(); */
@@ -2065,7 +2065,7 @@ BOOLEAN nc_InitMultiplication(ring r)
       //      if ((tmpIsSkewConstant==1) && (nIsOne(pGetCoeff(pN)))) r->nc->type=nc_lie;
       //      else r->nc->type=nc_general;
     }
-    if (IsNonComm==0) 
+    if (IsNonComm==0)
     {
       r->nc->type=nc_skew; /* TODO: check whether it is commutative */
       r->nc->IsSkewConstant=tmpIsSkewConstant;
@@ -2103,8 +2103,8 @@ poly nc_pSubst(poly p, int n, poly e)
     {
       for (i=n+1; i<=rN; i++)
       {
-	SUF[i] = PRE[i];
-	PRE[i] = 0;
+        SUF[i] = PRE[i];
+        PRE[i] = 0;
       }
       res =  pPower(pCopy(e),pow);
       /* multiply with prefix */
@@ -2163,7 +2163,7 @@ static ideal idPrepareStd(ideal T, ideal s,  int k)
       q = pOne();
       pSetComp(q,k+1+j);
       pSetmComp(q);
-#if 0      
+#if 0
       while (pNext(p)) pIter(p);
       pNext(p) = q;
 #else
@@ -2228,13 +2228,13 @@ ideal Approx_Step(ideal L)
       q = kNF(I,currQuotient,q,0,0);
       if (q!=0)
       {
-	h2->m[j]=pCopy(q);
-	//	pShift(&(h2->m[flag]),1);
-	flag++;
-	pDelete(&q);
+        h2->m[j]=pCopy(q);
+        //        pShift(&(h2->m[flag]),1);
+        flag++;
+        pDelete(&q);
       }
       else
-	h2->m[j]=0;
+        h2->m[j]=0;
     }
     /* W[1..idElems(I)] */
     if (flag >0)
@@ -2251,16 +2251,16 @@ ideal Approx_Step(ideal L)
       rSetSyzComp(syzcomp);
       if (orig_ring != syz_ring)
       {
-	s_h2=idrCopyR_NoSort(h2,orig_ring);
-	//	s_trickyQuotient=idrCopyR_NoSort(trickyQuotient,orig_ring);
-	//	rDebugPrint(syz_ring);
-	s_I=idrCopyR_NoSort(I,orig_ring);
+        s_h2=idrCopyR_NoSort(h2,orig_ring);
+        //        s_trickyQuotient=idrCopyR_NoSort(trickyQuotient,orig_ring);
+        //        rDebugPrint(syz_ring);
+        s_I=idrCopyR_NoSort(I,orig_ring);
       }
       else
       {
-	s_h2 = h2;
-	s_I  = I;
-	//	s_trickyQuotient=trickyQuotient;
+        s_h2 = h2;
+        s_I  = I;
+        //        s_trickyQuotient=trickyQuotient;
       }
       idTest(s_h2);
       //      idTest(s_trickyQuotient);
@@ -2278,35 +2278,35 @@ ideal Approx_Step(ideal L)
       idShow(s_h3);
       if (orig_ring != syz_ring)
       {
-	idDelete(&s_h2);
-	for (j=0; j<IDELEMS(s_h3); j++)
-	{
-	  if (s_h3->m[j] != NULL)
-	  {
-	    if (p_MinComp(s_h3->m[j],syz_ring) > syzcomp) /* i.e. it is a syzygy */
-	      pShift(&s_h3->m[j], -syzcomp);
-	    else
-	      pDelete(&s_h3->m[j]);
-	  }
-	}
-	idSkipZeroes(s_h3);
-	s_h3->rank -= syzcomp;
-	rChangeCurrRing(orig_ring);
-	//	s_h3 = idrMoveR_NoSort(s_h3, syz_ring);
-	s_h3 = idrMoveR_NoSort(s_h3, syz_ring);
-	rKill(syz_ring);
+        idDelete(&s_h2);
+        for (j=0; j<IDELEMS(s_h3); j++)
+        {
+          if (s_h3->m[j] != NULL)
+          {
+            if (p_MinComp(s_h3->m[j],syz_ring) > syzcomp) /* i.e. it is a syzygy */
+              pShift(&s_h3->m[j], -syzcomp);
+            else
+              pDelete(&s_h3->m[j]);
+          }
+        }
+        idSkipZeroes(s_h3);
+        s_h3->rank -= syzcomp;
+        rChangeCurrRing(orig_ring);
+        //        s_h3 = idrMoveR_NoSort(s_h3, syz_ring);
+        s_h3 = idrMoveR_NoSort(s_h3, syz_ring);
+        rKill(syz_ring);
       }
       idTest(s_h3);
       S[syzcnt]=kStd(s_h3,currQuotient,(tHomog)FALSE,NULL,NULL);
       syzcnt++;
       idDelete(&s_h3);
     } /* end if flag >0 */
-    else 
+    else
     {
       flagcnt++;
     }
   }
-  if (flagcnt == N) 
+  if (flagcnt == N)
   {
     Print("the input is a two--sided ideal");
     return(I);
@@ -2322,16 +2322,16 @@ ideal Approx_Step(ideal L)
     MI = idModule2Matrix(SI);
     res= idInit(MATCOLS(MI),1);
     for (i=1; i<= MATCOLS(MI); i++)
-    {    
+    {
       p = NULL;
       for (j=0; j< idElem(I); j++)
-      { 
-	q = pCopy(MATELEM(MI,j+1,i));
-	if (q!=NULL)
-	{
-	  q = pMult(q,pCopy(I->m[j]));
-	  p = pAdd(p,q);
-	}
+      {
+        q = pCopy(MATELEM(MI,j+1,i));
+        if (q!=NULL)
+        {
+          q = pMult(q,pCopy(I->m[j]));
+          p = pAdd(p,q);
+        }
       }
       res->m[i-1]=p;
     }
@@ -2413,7 +2413,7 @@ poly p_CopyEmbed(poly p, ring srcRing, int shift, int par_shift)
     //    if (srcRing->P > 0)
     //    {
     //      for (i=0; i<srcRing->P; i++)
-    //	par_perm[i]=-i;
+    //        par_perm[i]=-i;
     //    }
     if ((shift<0) || (shift > currRing->N))
     {
@@ -2471,8 +2471,8 @@ ideal idOppose(ring Rop, ideal I)
   int i;
   ideal idOp = idInit(I->ncols, I->rank);
   for (i=0; i< (I->ncols)*(I->nrows); i++)
-  { 
-    idOp->m[i] = pOppose(Rop,I->m[i]); 
+  {
+    idOp->m[i] = pOppose(Rop,I->m[i]);
   }
   idTest(idOp);
   return idOp;
@@ -2522,7 +2522,7 @@ BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate)
 //   {
 //     for (i=0;i<=r->ExpL_Size;i++)
 //     {
-//       if ((p->exp[i]) && (pp->exp[i]))  return(FALSE); 
+//       if ((p->exp[i]) && (pp->exp[i]))  return(FALSE);
 //       /* nonzero exponent of non-comm variable */
 //     }
 //     pIter(p);
