@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.29 2006-12-15 17:16:07 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.30 2006-12-18 08:55:03 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -579,6 +579,12 @@ int redLazy (LObject* h,kStrategy strat)
     if (j < 0) return 1;
    
     li = strat->T[j].pLength;
+    #if 0
+    if (li==0)
+    {
+      li=strat->T[j].pLength=pLength(strat->T[j].p);
+    }
+    #endif
     ii = j;
     /*
      * the polynomial to reduce with (up to the moment) is;
@@ -595,6 +601,13 @@ int redLazy (LObject* h,kStrategy strat)
         break;
       if (li<=1)
         break;
+    #if 0
+      if (strat->T[i].pLength==0)
+      {
+        PrintS("!");
+        strat->T[i].pLength=pLength(strat->T[i].p);
+      }
+   #endif
       if ((strat->T[i].pLength < li)
          &&
           p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
@@ -603,6 +616,7 @@ int redLazy (LObject* h,kStrategy strat)
         /*
          * the polynomial to reduce with is now;
          */
+	PrintS("+");
         li = strat->T[i].pLength;
         ii = i;
       }
@@ -650,7 +664,7 @@ int redLazy (LObject* h,kStrategy strat)
     d = h->SetpFDeg();
     /*- try to reduce the s-polynomial -*/
     pass++;
-    if (!K_TEST_OPT_REDTHROUGH &&
+    if (//!K_TEST_OPT_REDTHROUGH &&
         (strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
     {
       h->SetLmCurrRing();
@@ -706,6 +720,13 @@ int redHoney (LObject* h, kStrategy strat)
 
     ei = strat->T[j].ecart;
     li = strat->T[j].pLength;
+    #if 0
+    if (li==0)
+    {
+       PrintS("!");
+       li=strat->T[j].pLength=pLength(strat->T[j].p);
+    }
+    #endif
     ii = j;
     /*
      * the polynomial to reduce with (up to the moment) is;
@@ -718,11 +739,11 @@ int redHoney (LObject* h, kStrategy strat)
       i++;
       if (i > strat->tl)
         break;
-      if (ei < h->ecart)
-        break;
+      //if (ei < h->ecart)
+      //  break;
       if (li<=1)
         break;
-      if (((strat->T[i].ecart < ei)
+      if ((((strat->T[i].ecart < ei) && (ei> h->ecart))
          || ((strat->T[i].ecart <= h->ecart) && (strat->T[i].pLength < li)))
          &&
           p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
@@ -1184,7 +1205,8 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
 
       // enter into S, L, and T
-      enterT(strat->P, strat);
+      if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
+        enterT(strat->P, strat);
 #ifdef HAVE_RING2TOM
 #ifdef HAVE_VANGB
       int at_R = strat->tl;
@@ -1195,11 +1217,19 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
         enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
       // posInS only depends on the leading term
+      if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
+      {
 #ifdef HAVE_VANGB
       strat->enterS(strat->P, pos, strat, at_R);
 #else
       strat->enterS(strat->P, pos, strat, strat->tl);
 #endif
+      }
+      else
+      {
+        strat->P.Delete();
+      }
+#if 0
       int pl=pLength(strat->P.p);
       if (pl==1)
       {
@@ -1211,6 +1241,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         //if (TEST_OPT_PROT)
         //PrintS("<2>");
       }
+#endif
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 //      Print("[%d]",hilbeledeg);
       if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
