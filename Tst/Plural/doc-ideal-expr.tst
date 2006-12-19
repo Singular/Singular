@@ -8,6 +8,7 @@ poly f = x2;
 poly g = y3;
 ideal i = x*y*z , f-g, g*(x-y) + f^4 ,0, 2x-z2y;
 ideal M = i + maxideal(10);
+M;
 timer =0;
 i = M*M;
 tst_ignore(timer, "time");
