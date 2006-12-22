@@ -1,6 +1,6 @@
 //GP, last modified 28.6.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: krypto.lib,v 1.4 2006-12-14 10:49:05 pfister Exp $";
+version="$Id: krypto.lib,v 1.5 2006-12-22 12:06:28 pfister Exp $";
 category="Teaching";
 info="
 LIBRARY:  krypto.lib     Procedures for teaching cryptography
@@ -929,7 +929,7 @@ example
 //======================== Pollards p-factorization ================
 proc pFactor(number n,int B, list P)
 "USAGE:  pFactor(n,B.P); n to be factorized, B a bound , P a list of primes
-RETURN: a list of factors of n or the message: no factor found
+RETURN: a list of factors of n or n if no factor found
 NOTE: Pollard's p-factorization
        creates the product k of powers of primes (bounded by B)  from
        the list P with the idea that for a prime divisor p of n p-1|k
@@ -954,7 +954,7 @@ EXAMPLE:example pFactor; shows an example
    number a=random(2,2147483629);
    number d=gcdN(powerN(a,k,n)-1,n);
    if((d>1)&&(d<n)){return(d);}
-   return("no factor found");
+   return(n);
 }
 example
 { "EXAMPLE:"; echo = 2;
