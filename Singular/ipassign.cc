@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.83 2006-11-20 11:24:51 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.84 2007-01-03 00:00:45 motsak Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -37,6 +37,7 @@
 #include "attrib.h"
 #include "silink.h"
 #include "ipshell.h"
+#include "sca.h"
 
 /*=================== proc =================*/
 static BOOLEAN jjECHO(leftv res, leftv a)
@@ -514,6 +515,7 @@ static BOOLEAN jiA_MAP_ID(leftv res, leftv a, Subexpr e)
   f->preimage = rn;
   return FALSE;
 }
+#if 0
 static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
 {
   // the follwing can only happen, if:
@@ -549,6 +551,50 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
   rSetHdl((idhdl)res->data);
   return FALSE;
 }
+#endif
+static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
+{
+  // the follwing can only happen, if:
+  //   - the left side is of type qring AND not an id
+  if ((e!=NULL)||(res->rtyp!=IDHDL))
+  {
+    WerrorS("qring_id expected");
+    return TRUE;
+  }
+  ring qr;
+  int i,j;
+  int *pi;
+
+  assumeStdFlag(a);
+  qr=(ring)res->Data();
+  ring qrr=rCopy(currRing);
+  memcpy4(qr,qrr,sizeof(ip_sring));
+  omFreeBin((ADDRESS)qrr, ip_sring_bin);
+  if (qr->qideal!=NULL) idDelete(&qr->qideal);
+  qr->qideal = (ideal)a->CopyD(IDEAL_CMD);
+
+  // qr is a copy of currRing with the new qideal!
+  #ifdef HAVE_PLURAL
+  if(rIsPluralRing(currRing))
+  {
+    if (!hasFlag(a,FLAG_TWOSTD))
+    {
+      Warn("%s is no twosided standard basis",a->Name());
+    }
+
+    // is this an exterior algebra or a commuunative polynomial ring \otimes exterior algebra?
+    // we should check whether qr->qideal is of the form: y_i^2, y_{i+1}^2, \ldots, y_j^2 (j > i)
+    //.if yes, setup qr->nc->type, etc.
+    SetupSCA(qr, currRing); 
+  }
+  #endif
+  //currRing=qr;
+  //currRingHdl=(idhdl)res->data;
+  //currQuotient=qr->qideal;
+  rSetHdl((idhdl)res->data);
+  return FALSE;
+}
+
 static BOOLEAN jiA_RING(leftv res, leftv a, Subexpr e)
 {
   BOOLEAN have_id=TRUE;
