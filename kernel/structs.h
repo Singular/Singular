@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.25 2006-12-15 17:16:07 Singular Exp $ */
+/* $Id: structs.h,v 1.26 2007-01-03 00:17:12 motsak Exp $ */
 /*
 * ABSTRACT
 */
@@ -63,7 +63,7 @@ typedef long long int64;
 #elif SIZEOF_LONG == 8
 typedef long int64;
 #else
-#error int64 undefined 
+#error int64 undefined
 #endif
 
 
@@ -100,16 +100,19 @@ enum n_coeffType
   n_long_C
 };
 
-#ifdef HAVE_PLURAL
+// #ifdef HAVE_PLURAL
 enum nc_type
 {
-  nc_general=0, /* yx=q xy+... */
+  nc_error = -1, // Something's gone wrong!
+  nc_general = 0, /* yx=q xy+... */
   nc_skew, /*1*/ /* yx=q xy */
   nc_comm, /*2*/ /* yx= xy */
   nc_lie,  /*3*/ /* yx=xy+... */
-  nc_undef /*4*/  /* for internal reasons */
+  nc_undef, /*4*/  /* for internal reasons */
+
+  nc_exterior /*5*/ // Exterior Algebra(SCA): yx= -xy & (!:) x^2 = 0
 };
-#endif
+// #endif
 
 typedef enum { LT_NONE, LT_NOTFOUND, LT_SINGULAR, LT_ELF, LT_HPUX, LT_MACH_O} lib_types;
 
@@ -143,10 +146,10 @@ struct s_si_link_extension;
 
 typedef struct  n_Procs_s  n_Procs_s;
 
-#ifdef HAVE_PLURAL
+// #ifdef HAVE_PLURAL
 struct nc_struct;
 typedef struct nc_struct   nc_struct;
-#endif
+// #endif
 
 typedef struct _ssubexpr   sSubexpr;
 typedef struct _sssym      ssym;
@@ -409,7 +412,70 @@ struct sro_ord
   } data;
 };
 
-#ifdef HAVE_PLURAL
+// #ifdef HAVE_PLURAL
+// NC pProcs:
+typedef poly (*mm_Mult_p_Proc_Ptr)(const poly m, poly p, const ring r);
+typedef poly (*mm_Mult_pp_Proc_Ptr)(const poly m, const poly p, const ring r);
+
+typedef ideal (*GB_Proc_Ptr)(const ideal F, const ideal Q, const intvec *w, const intvec *hilb, kStrategy strat);
+
+typedef poly (*SPoly_Proc_Ptr)(const poly p1, const poly p2, const ring r);
+typedef poly (*SPolyReduce_Proc_Ptr)(const poly p1, poly p2, const ring r);
+
+typedef void (*Bucket_Proc_Ptr)(kBucket_pt b, poly p, number *c);
+
+struct nc_pProcs
+{
+public:
+  mm_Mult_p_Proc_Ptr                    mm_Mult_p;
+  mm_Mult_pp_Proc_Ptr                   mm_Mult_pp;
+
+  Bucket_Proc_Ptr                       BucketPolyRed;
+  Bucket_Proc_Ptr                       BucketPolyRed_Z;
+
+  SPoly_Proc_Ptr                        SPoly;
+  SPolyReduce_Proc_Ptr                  ReduceSPoly;
+
+  GB_Proc_Ptr                           GB;
+//                                         GlobalGB, // BBA
+//                                         LocalGB;  // MORA
+};
+
+
+struct nc_struct
+{
+  short ref;
+  nc_type type;
+  ring basering; // the ring C,D,.. live in
+  matrix C;
+  matrix D;
+  matrix *MT;
+  matrix COM;
+  int *MTsize;
+
+  // IsSkewConstantindicates whethere coeffs C_ij are all equal, effective together with nc_type=nc_skew
+  int IsSkewConstant;
+
+  private:
+    // treat variables from iAltVarsStart till iAltVarsEnd as alternating vars.
+    // these variables should have odd degree, though that will not be checked
+    // iAltVarsStart, iAltVarsEnd are only used together with nc_type=nc_exterior
+    // 1 <= iAltVarsStart <= iAltVarsEnd <= r->N
+    unsigned int iFirstAltVar, iLastAltVar;
+
+  public:
+    inline unsigned int& FirstAltVar() { return (iFirstAltVar); };
+    inline unsigned int& LastAltVar () { return (iLastAltVar ); };
+
+    inline unsigned int FirstAltVar() const { return (iFirstAltVar); };
+    inline unsigned int LastAltVar () const { return (iLastAltVar ); };
+
+  public:
+    nc_pProcs p_Procs; // NC procedures.
+
+};
+// #endif
+#if 0
 struct nc_struct
 {
   short ref;
@@ -424,6 +490,7 @@ struct nc_struct
   /* effective together with nc_type=nc_skew */
 };
 #endif
+
 
 struct sip_sring
 {

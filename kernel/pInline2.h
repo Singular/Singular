@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.7 2006-12-09 11:55:35 Singular Exp $
+ *  Version: $Id: pInline2.h,v 1.8 2007-01-03 00:17:11 motsak Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -526,27 +526,33 @@ PINLINE2 poly p_Mult_mm(poly p, poly m, const ring r)
 // return p - m*Copy(q), destroys p; const: p,m
 PINLINE2 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, const ring r)
 {
-  int shorter;
-  poly last;
-  return r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r, last);
-}
-PINLINE2 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
-                                 poly spNoether, const ring r)
-{
-  int shorter;
-  poly last,res;
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(r))
   {
-     res = nc_p_Minus_mm_Mult_qq(p, m, q, r);
-     lp = pLength(res);
+    int lp, lq;
+    poly spNoether;
+    return nc_p_Minus_mm_Mult_qq(p, m, q, lp, lq, spNoether, r);
   }
-  else
 #endif
-  {
-    res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, spNoether, r, last);
-    lp = (lp + lq) - shorter;
-  }
+
+  int shorter;
+  poly last;
+
+  return r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r, last); // !!!
+}
+
+PINLINE2 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
+                                 poly spNoether, const ring r)
+{
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(r))
+     return nc_p_Minus_mm_Mult_qq(p, m, q, lp, lq, spNoether, r);
+#endif
+
+  int shorter;
+  poly last,res;
+  res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, spNoether, r, last);
+  lp = (lp + lq) - shorter;
   return res;
 }
 
@@ -589,7 +595,7 @@ PINLINE2 poly p_Mult_q(poly p, poly q, const ring r)
   {
 #ifdef HAVE_PLURAL
     if (rIsPluralRing(r))
-      q = nc_mm_Mult_p(p, q, r);
+      q = mm_Mult_p(p, q, r);
     else
 #endif /* HAVE_PLURAL */
       q = r->p_Procs->p_Mult_mm(q, p, r);
@@ -602,9 +608,9 @@ PINLINE2 poly p_Mult_q(poly p, poly q, const ring r)
   {
   // NEEDED
 #ifdef HAVE_PLURAL
-    if (rIsPluralRing(r))
-      p = nc_p_Mult_mm(p, q, r);
-    else
+/*    if (rIsPluralRing(r))
+      p = gnc_p_Mult_mm(p, q, r); // ???
+    else*/
 #endif /* HAVE_PLURAL */
       p = r->p_Procs->p_Mult_mm(p, q, r);
 
@@ -613,7 +619,7 @@ PINLINE2 poly p_Mult_q(poly p, poly q, const ring r)
   }
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(r))
-    return _nc_p_Mult_q(p, q, 0, r);
+    return _nc_p_Mult_q(p, q, r);
   else
 #endif
   return _p_Mult_q(p, q, 0, r);
@@ -629,7 +635,7 @@ PINLINE2 poly pp_Mult_qq(poly p, poly q, const ring r)
   {
 #ifdef HAVE_PLURAL
     if (rIsPluralRing(r))
-      return nc_mm_Mult_p(p, p_Copy(q,r), r);
+      return mm_Mult_pp(p, q, r);
 #endif
     return r->p_Procs->pp_Mult_mm(q, p, r, last);
   }
@@ -646,7 +652,7 @@ PINLINE2 poly pp_Mult_qq(poly p, poly q, const ring r)
   poly res;
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(r))
-    res = _nc_p_Mult_q(p, qq, 1, r);
+    res = _nc_pp_Mult_qq(p, qq, r);
   else
 #endif
     res = _p_Mult_q(p, qq, 1, r);
@@ -661,19 +667,18 @@ PINLINE2 poly pp_Mult_qq(poly p, poly q, const ring r)
 PINLINE2 poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
                                 const ring r)
 {
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(r))
+    return nc_p_Plus_mm_Mult_qq(p, m, q, lp, lq, r);
+#endif
+
   poly res, last;
   int shorter;
   number n_old = pGetCoeff(m);
   number n_neg = n_Copy(n_old, r);
   n_neg = n_Neg(n_neg, r);
   pSetCoeff0(m, n_neg);
-#ifdef HAVE_PLURAL
-  if (rIsPluralRing(r))
-    res = nc_p_Minus_mm_Mult_qq(p, m, q, r);
-  else
-#endif
-    res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r, last);
-
+  res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r, last);
   lp = (lp + lq) - shorter;
   pSetCoeff0(m, n_old);
   n_Delete(&n_neg, r);

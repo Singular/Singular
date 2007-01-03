@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.14 2006-12-08 17:50:54 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.15 2007-01-03 00:17:10 motsak Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1669,23 +1669,28 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(currRing))
   {
-    r=gr_bba(F,Q,strat);
+    if (w!=NULL)
+      r = nc_GB(F, Q, *w, hilb, strat);
+    else
+      r = nc_GB(F, Q, NULL, hilb, strat);
   }
   else
 #endif
-  if (pOrdSgn==-1)
   {
-    if (w!=NULL)
-      r=mora(F,Q,*w,hilb,strat);
+    if (pOrdSgn==-1)
+    {
+      if (w!=NULL)
+        r=mora(F,Q,*w,hilb,strat);
+      else
+        r=mora(F,Q,NULL,hilb,strat);
+    }
     else
-      r=mora(F,Q,NULL,hilb,strat);
-  }
-  else
-  {
-    if (w!=NULL)
-      r=bba(F,Q,*w,hilb,strat);
-    else
-      r=bba(F,Q,NULL,hilb,strat);
+    {
+      if (w!=NULL)
+        r=bba(F,Q,*w,hilb,strat);
+      else
+        r=bba(F,Q,NULL,hilb,strat);
+    }
   }
 #ifdef KDEBUG
   idTest(r);

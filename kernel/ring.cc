@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.49 2006-11-23 10:37:16 Singular Exp $ */
+/* $Id: ring.cc,v 1.50 2007-01-03 00:17:11 motsak Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1213,6 +1213,12 @@ int rSum(ring r1, ring r2, ring &sum)
     nMapFunc nMap2 = nSetMap(R2);
     matrix C1 = R1->nc->C, C2 = R2->nc->C;
     matrix D1 = R1->nc->D, D2 = R2->nc->D;
+
+    // !!!! BUG? C1 and C2 might live in different baserings!!!
+    // Let's assume its the currRing! :)
+    assume( R1->nc->basering == currRing );
+    assume( R2->nc->basering == currRing );
+    
     int l = rVar(R1) + rVar(R2);
     matrix C  = mpNew(l,l);
     matrix D  = mpNew(l,l);

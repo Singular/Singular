@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.39 2006-12-09 14:23:11 Singular Exp $ */
+/* $Id: kutil.cc,v 1.40 2007-01-03 00:17:10 motsak Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -16,9 +16,8 @@
 #include "mod2.h"
 #include <mylimits.h>
 #include "structs.h"
-#ifdef HAVE_PLURAL
 #include "gring.h"
-#endif
+#include "sca.h"
 #ifdef KDEBUG
 #undef KDEBUG
 #define KDEBUG 2
@@ -969,11 +968,6 @@ static inline void clearS (poly p, unsigned long p_sev, int* at, int* k,
 /*2
 *enters p at position at in L
 */
-#ifdef PDEBUG
-/* int zaehler=0; */
-/* for counting number of pairs in Plural */
-#endif /*PDEBUG*/
-
 void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at)
 {
 #ifdef PDEBUG
@@ -1221,7 +1215,12 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
 
   pLcm(p,strat->S[i],Lp.lcm);
   pSetm(Lp.lcm);
-  if (strat->sugarCrit)
+
+  const bool bIsPluralRing = rIsPluralRing(currRing);
+  const bool bIsSCA        = rIsSCA(currRing) && strat->homog; // for prod-crit
+  const bool bNCProdCrit   = ( !bIsPluralRing || bIsSCA ); // commutative or homogeneous SCA
+
+  if (strat->sugarCrit && bNCProdCrit)
   {
     if((!((strat->ecartS[i]>0)&&(ecart>0)))
     && pHasNotCF(p,strat->S[i]))
@@ -1290,11 +1289,10 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
   }
   else /*sugarcrit*/
   {
-#ifdef HAVE_PLURAL
-    if (!rIsPluralRing(currRing))
+    if (bNCProdCrit)
     {
       // if currRing->nc_type!=quasi (or skew)
-#endif
+      // TODO: enable productCrit for super commutative algebras...
       if(/*(strat->ak==0) && productCrit(p,strat->S[i])*/
       pHasNotCF(p,strat->S[i]))
       {
@@ -1349,9 +1347,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
         }
       }
     }
-#ifdef HAVE_PLURAL
   }
-#endif
   /*
   *the pair (S[i],p) enters B if the spoly != 0
   */
@@ -1364,24 +1360,33 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
     Lp.p=NULL;
   else
   {
-#ifdef HAVE_PLURAL
-    if (currRing->nc!=NULL)
+    if ( bIsPluralRing )
     {
-      if ((currRing->nc->type==nc_lie) && (pHasNotCF(p,strat->S[i])))
-        /* generalized prod-crit for lie-type */
+      if(pHasNotCF(p, strat->S[i]))
       {
-          strat->cp++;
-          Lp.p = nc_p_Bracket_qq(pCopy(p),strat->S[i]);
+        if(ncRingType(currRing) == nc_lie)
+        {
+            // generalized prod-crit for lie-type
+            strat->cp++;
+            Lp.p = nc_p_Bracket_qq(pCopy(p),strat->S[i]);
+        }
+        else
+        if( bIsSCA )
+        {
+            // product criterion for homogeneous case in SCA
+            strat->cp++;
+            Lp.p = NULL;
+        }
+        else
+          Lp.p = nc_SPoly(strat->S[i],p,currRing); // ?
       }
-      else  Lp.p = nc_CreateSpoly(strat->S[i],p,NULL,currRing);
+      else
+        Lp.p = nc_SPoly(strat->S[i],p,currRing);
     }
     else
     {
-#endif
-    Lp.p = ksCreateShortSpoly(strat->S[i],p, strat->tailRing);
-#ifdef HAVE_PLURAL
+      Lp.p = ksCreateShortSpoly(strat->S[i],p, strat->tailRing);
     }
-#endif
   }
   if (Lp.p == NULL)
   {
@@ -1407,16 +1412,8 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
     Lp.p1 = strat->S[i];
     Lp.p2 = p;
 
-#ifdef HAVE_PLURAL
-    if (currRing->nc==NULL)
-    {
-#endif
-
-     pNext(Lp.p) = strat->tail;
-
-#ifdef HAVE_PLURAL
-    }
-#endif
+    if ( !bIsPluralRing )
+      pNext(Lp.p) = strat->tail;
 
     if (atR >= 0)
     {
@@ -1429,21 +1426,13 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
       Lp.i_r2 = -1;
     }
     strat->initEcartPair(&Lp,strat->S[i],p,strat->ecartS[i],ecart);
+
     if (TEST_OPT_INTSTRATEGY)
     {
-
-#ifdef HAVE_PLURAL
-      if (currRing->nc==NULL)
-      {
-#endif
-
-      nDelete(&(Lp.p->coef));
-
-#ifdef HAVE_PLURAL
-      }
-#endif
-
+      if (!bIsPluralRing)
+        nDelete(&(Lp.p->coef));
     }
+
     l = strat->posInL(strat->B,strat->Bl,&Lp,strat);
     enterL(&strat->B,&strat->Bl,&strat->Bmax,Lp,l);
   }
@@ -1458,7 +1447,8 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
   //PrintS("try ");wrp(strat->S[i]);PrintS(" and ");wrp(p);PrintLn();
   if(pHasNotCF(p,strat->S[i]))
   {
-    if (!rIsPluralRing(currRing))
+    //PrintS("prod-crit\n");
+    if(!rIsPluralRing(currRing) || (rIsSCA(currRing) && strat->homog))
     {
       //PrintS("prod-crit\n");
       strat->cp++;
@@ -1492,14 +1482,15 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
   }
   /*-  compute the short s-polynomial -*/
 
-  #ifdef HAVE_PLURAL
+//   #ifdef HAVE_PLURAL
   if (rIsPluralRing(currRing))
   {
-    Lp.p = nc_CreateShortSpoly(strat->S[i],p);
+    Lp.p = nc_CreateShortSpoly(strat->S[i],p); // ???
   }
   else
-  #endif
+//   #endif
     Lp.p = ksCreateShortSpoly(strat->S[i],p,strat->tailRing);
+
   if (Lp.p == NULL)
   {
      //PrintS("short spoly==NULL\n");
@@ -2569,9 +2560,9 @@ void enterpairsSpecial (poly h,int k,int ecart,int pos,kStrategy strat, int atR 
       enterOnePairSpecial(j,h,ecart,strat, atR);
     }
   }
-  #ifdef HAVE_PLURAL
+//   #ifdef HAVE_PLURAL
   if (!rIsPluralRing(currRing))
-  #endif
+//   #endif
   {
     j=pos;
     loop
@@ -2766,7 +2757,7 @@ int posInS (const kStrategy strat, const int length,const poly p,
 #endif
     if (pLmCmp(set[length],p)== -cmp_int)
       return length+1;
-  
+
     loop
     {
       if (an >= en-1)
@@ -4574,7 +4565,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
           pos = posInS(strat,strat->sl,h.p,h.ecart);
           enterpairsSpecial(h.p,strat->sl,h.ecart,pos,strat,strat->tl+1);
           strat->enterS(h,pos,strat, strat->tl+1);
-	  h.pLength=pLength(h.p);
+      h.pLength=pLength(h.p);
           enterT(h,strat);
         }
       }
@@ -4789,8 +4780,8 @@ void updateS(BOOLEAN toT,kStrategy strat)
           if ((strat->ak!=0)&&(strat->S[i]!=NULL))
             strat->S[i]=redQ(strat->S[i],i+1,strat); /*reduce S[i] mod Q*/
           if (pCmp(redSi,strat->S[i])!=0)
-	  {
-	    change=TRUE;
+      {
+        change=TRUE;
             if (TEST_OPT_DEBUG)
             {
               PrintS("reduce:");
@@ -4804,7 +4795,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
                 PrintS("v");
               mflush();
             }
-	  }
+      }
           pDeleteLm(&redSi);
           if (strat->S[i]==NULL)
           {
@@ -4854,7 +4845,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
         else assume(strat->sevS[i] == pGetShortExpVector(h.p));
         h.sev = strat->sevS[i];
         h.SetpFDeg();
-	h.pLength=pLength(h.p);
+    h.pLength=pLength(h.p);
         /*puts the elements of S also to T*/
         enterT(h,strat);
         strat->S_2_R[i] = strat->tl;
@@ -5135,16 +5126,15 @@ void initBuchMoraCrit(kStrategy strat)
   /* alway use tailreduction, except:
   * - in local rings, - in lex order case, -in ring over extensions */
   strat->noTailReduction = !TEST_OPT_REDTAIL;
-#ifdef HAVE_PLURAL
+
   // and r is plural_ring
-  if (currRing->nc!=NULL)
-    //or it has non-quasi-comm type... later
-  {
+  if( rIsPluralRing(currRing) || (rIsSCA(currRing) && !strat->homog) )
+  {    //or it has non-quasi-comm type... later
     strat->sugarCrit = FALSE;
-    strat->Gebauer = FALSE ;
+    strat->Gebauer = FALSE;
     strat->honey = FALSE;
   }
-#endif
+
 #ifdef HAVE_RING2TOM
   // Coefficient ring?
   if (currRing->cring == 1)

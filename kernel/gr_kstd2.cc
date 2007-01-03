@@ -1,13 +1,16 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.8 2005-07-27 15:48:28 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.9 2007-01-03 00:17:09 motsak Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
 
 #include "mod2.h"
-#ifdef HAVE_PLURAL
+
+// #ifdef HAVE_PLURAL
+
+
 #include "omalloc.h"
 #include "polys.h"
 #include "ideals.h"
@@ -21,23 +24,19 @@
 #include "intvec.h"
 #include "structs.h"
 #include "gring.h"
+#include "sca.h"
 
-/*2
-* consider the part above syzComp:
-* (assume the polynomial comes from a syz computation)
-* - it is a constant term: return a copy of it
-* - else: return NULL
+#if 0
+/*3
+* reduction of p2 with p1
+* do not destroy p1 and p2
+* p1 divides p2 -> for use in NF algorithm
 */
-static poly kFromInput(poly p,kStrategy strat)
+poly gnc_ReduceSpolyNew(const poly p1, poly p2/*,poly spNoether*/, const ring r)
 {
-  poly q=p;
-
-  if (pGetComp(q)>strat->syzComp) return NULL;
-  while ((q!=NULL) && (pGetComp(q)<=strat->syzComp)) pIter(q);
-  if (pIsConstantComp(q))
-    return pHead(q);
-  return NULL;
+  return(nc_ReduceSPoly(p1,p_Copy(p2,r)/*,spNoether*/,r));
 }
+#endif
 
 /*2
 *reduces h with elements from T choosing  the first possible
@@ -74,7 +73,7 @@ int redGrFirst (LObject* h,kStrategy strat)
         PrintS(" with ");
         wrp(strat->S[j]);
       }
-      (*h).p = nc_ReduceSpoly(strat->S[j],(*h).p, NULL, currRing);
+      (*h).p = nc_ReduceSPoly(strat->S[j],(*h).p, currRing);
       //spSpolyRed(strat->T[j].p,(*h).p,strat->kNoether);
 
       if (TEST_OPT_DEBUG)
@@ -177,7 +176,7 @@ static int nc_redHomog (LObject* h,kStrategy strat)
         wrp(strat->S[j]);
       }
       /*- compute the s-polynomial -*/
-      (*h).p = nc_ReduceSpoly(strat->S[j],(*h).p,strat->kNoether,currRing);
+      (*h).p = nc_ReduceSPoly(strat->S[j],(*h).p/*,strat->kNoether*/,currRing);
       if ((*h).p == NULL)
       {
         if (TEST_OPT_DEBUG) PrintS(" to 0\n");
@@ -210,6 +209,7 @@ static int nc_redHomog (LObject* h,kStrategy strat)
   }
 }
 
+#if 0
 /*2
 *  reduction procedure for the homogeneous case
 *  and the case of a degree-ordering
@@ -497,7 +497,7 @@ static int nc_redHoney (LObject*  h,kStrategy strat)
       if (strat->fromT)
       {
         strat->fromT=FALSE;
-        (*h).p = nc_ReduceSpolyNew(pi,(*h).p,strat->kNoether,currRing);
+        (*h).p = gnc_ReduceSpolyNew(pi,(*h).p,strat->kNoether,currRing);
       }
       else
         (*h).p = nc_ReduceSpoly(pi,(*h).p,strat->kNoether,currRing);
@@ -747,12 +747,18 @@ static int nc_redBest (LObject*  h,kStrategy strat)
   }
 }
 
-static void gr_initBba(ideal F,kStrategy strat)
+#endif
+
+void gr_initBba(ideal F, kStrategy strat)
 {
+  assume(rIsPluralRing(currRing));
+
   int i;
   idhdl h;
  /* setting global variables ------------------- */
   strat->enterS = enterSBba;
+
+/*
   if ((BTEST1(20)) && (!strat->honey))
     strat->red = nc_redBest;
   else if (strat->honey)
@@ -763,10 +769,11 @@ static void gr_initBba(ideal F,kStrategy strat)
     strat->red = nc_redHomog0;
   else
     strat->red = nc_redHomog;
-  if (rIsPluralRing(currRing))
-  {
+*/
+
+//   if (rIsPluralRing(currRing))
     strat->red = redGrFirst;
-  }
+
   if (pLexOrder && strat->honey)
     strat->initEcart = initEcartNormal;
   else
@@ -804,8 +811,10 @@ static void gr_initBba(ideal F,kStrategy strat)
   }
 }
 
-ideal gr_bba (ideal F, ideal Q, kStrategy strat)
+ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat)
 {
+  assume(pOrdSgn != -1); // no mora!!! it terminates only for global ordering!!! (?)
+
   intvec *w=NULL;
   intvec *hilb=NULL;
   int   srmax,lrmax;
@@ -856,7 +865,7 @@ ideal gr_bba (ideal F, ideal Q, kStrategy strat)
         strat->cp++;
         /* prod.crit itself in nc_CreateSpoly */
       }
-      strat->P.p = nc_CreateSpoly(strat->P.p1,strat->P.p2,strat->kNoether,currRing);
+      strat->P.p = nc_SPoly(strat->P.p1,strat->P.p2/*,strat->kNoether*/,currRing);
     }
     if (strat->P.p != NULL)
     {
@@ -946,4 +955,17 @@ ideal gr_bba (ideal F, ideal Q, kStrategy strat)
 #endif /*PDEBUG*/
   return (strat->Shdl);
 }
-#endif
+
+ideal gnc_gr_mora(const ideal, const ideal, const intvec *, const intvec *, kStrategy)
+{
+  PrintS("Sorry, non-commutative mora is not yet implemented!");
+  PrintLn();
+
+  // Not yet!
+  return NULL;
+}
+
+// #endif
+
+
+

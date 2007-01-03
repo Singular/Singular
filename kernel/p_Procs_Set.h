@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /***************************************************************
- *  File:    p_ProcsSet.h
+ *  File:    p_Procs_Set.h
  *  Purpose: Procedures for setting p_Procs at run time
  *  Note:    this file is included by p_Procs_Dynamic/Static.cc
  *           The macros
@@ -11,9 +11,12 @@
  *           have to be defined before this file is included
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Set.h,v 1.4 2006-07-19 13:12:15 Singular Exp $
+ *  Version: $Id: p_Procs_Set.h,v 1.5 2007-01-03 00:17:11 motsak Exp $
  *******************************************************************/
 #include "modulop.h"
+
+#include "sca.h"
+
 
 // extract p_Procs properties from a ring
 static inline p_Field p_FieldIs(ring r)
@@ -170,16 +173,18 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
          p_Procs->p_Minus_mm_Mult_qq == p_Minus_mm_Mult_qq__FieldGeneral_LengthGeneral_OrdGeneral ||
          r->OrdSgn == 1 || r->LexOrder);
 */
+  #if 1
   #ifdef HAVE_PLURAL
   if (rIsPluralRing(r))
   {
-    p_Procs->p_Mult_mm=nc_p_Mult_mm;
-    _p_procs->p_Mult_mm=nc_p_Mult_mm;
-    p_Procs->pp_Mult_mm=nc_pp_Mult_mm;
-    _p_procs->pp_Mult_mm=nc_pp_Mult_mm;
-    p_Procs->p_Minus_mm_Mult_qq=nc_p_Minus_mm_Mult_qq_ign;
-    _p_procs->p_Minus_mm_Mult_qq=nc_p_Minus_mm_Mult_qq_ign;
+    SetProcsGNC(r, _p_procs);
+
+    if(rIsSCA(r))
+    {
+      SetProcsSCA(r, _p_procs);
+    }
   }
+  #endif
   #endif
 }
 

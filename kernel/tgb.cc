@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.107 2006-12-08 14:09:21 bricken Exp $ */
+/* $Id: tgb.cc,v 1.108 2007-01-03 00:17:12 motsak Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -12,7 +12,7 @@
 //using namespace std;
 
 
-///@TODO: delay nur auf Sugarvergrößerung
+///@TODO: delay nur auf Sugarvergrï¿½erung
 ///@TODO: grade aus ecartS, setze dazu strat->honey; und nutze p.ecart
 #include "mod2.h"
 #include "tgb.h"
@@ -21,6 +21,7 @@
 #include "F4.h"
 #include "digitech.h"
 #include "gring.h"
+#include "sca.h"
 
 #include "longrat.h"
 #define SR_HDL(A) ((long)(A))
@@ -190,7 +191,7 @@ inline wlen_type pSLength(poly p,int l)
     return res;
   }
 }
-//! TODO CoefBuckets berücksichtigen
+//! TODO CoefBuckets bercksichtigen
 wlen_type kSBucketLength(kBucket* b, poly lm=NULL)
 {
   int s=0;
@@ -255,7 +256,7 @@ inline wlen_type pSLength(poly p,int l)
   assume(erg>=0);
   return erg; /*pLength(p)*/;
 }
-//! TODO CoefBuckets berücksichtigen
+//! TODO CoefBuckets bercksichtigen
 wlen_type kSBucketLength(kBucket* b, poly lm=NULL)
 {
   wlen_type s=0;
@@ -339,13 +340,13 @@ static BOOLEAN elength_is_normal_length(poly p, slimgb_alg* c){
         return TRUE;
         }
         else return FALSE;
-    }else 
+    }else
     return FALSE;
 }
 static BOOLEAN get_last_dp_block_start(ring r){
     //ring r=c->r;
     int last_block;
-    
+
     if (rRing_has_CompLastBlock(r)){
         last_block=rBlocks(r) - 3;
     }
@@ -416,14 +417,14 @@ wlen_type kEBucketLength(kBucket* b, poly lm,int sugar,slimgb_alg* ca)
   s=1+(bucket_guess(b)-1)*(sugar-d+1);
   return s;
   #else
-  
-  
+
+
   //int d=pTotaldegree(lm,ca->r);
   int i;
   for (i=b->buckets_used;i>=0;i--)
   {
     if(b->buckets[i]==NULL) continue;
-    
+
     if ((pTotaldegree(b->buckets[i])<=d) &&(elength_is_normal_length(b->buckets[i],ca))){
         s+=b->buckets_length[i];
     } else
@@ -1247,7 +1248,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
     ENLARGE(c->lengths,int);
     #ifndef HAVE_BOOST
     #ifndef USE_STDVECBOOL
-    
+
     ENLARGE(c->states, char*);
     #endif
     #endif
@@ -1295,10 +1296,10 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
 
   #else
   #ifdef USE_STDVECBOOL
-    
+
     c->states.push_back(vector<bool>(i));
-   
-  
+
+
   #else
   if (i>0)
     c->states[i]=(char*)  omalloc(i*sizeof(char));
@@ -1331,7 +1332,8 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
       c->states[i][j]=HASTREP;
 
       }
-    else if ((!(c->nc)) &&  (pHasNotCF(c->S->m[i],c->S->m[j])))
+    else if (( (!c->nc) || (c->is_homog && rIsSCA(c->r) ) ) &&  (pHasNotCF(c->S->m[i],c->S->m[j])))
+//     else if ((!(c->nc)) &&  (pHasNotCF(c->S->m[i],c->S->m[j])))
     {
       c->easy_product_crit++;
       c->states[i][j]=HASTREP;
@@ -1429,10 +1431,10 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
   //}
   }
   }//if syz_comp end
-  
-  
-  
-  
+
+
+
+
   assume(spc<=i);
   //now ideal quotient crit
   qsort(nodes,spc,sizeof(sorted_pair_node*),iq_crit);
@@ -1522,6 +1524,47 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
     c->Rcounter=0;
     cleanS(c->strat,c);
   }
+
+  // for SCA:
+  // here write at the end of nodes_final[spc_final,...,spc_final+lmdeg-1]
+  if(rIsSCA(c->r))
+  {
+    const poly pNext = pNext(h);
+
+    if(pNext != NULL)
+    {
+      // for additional polynomials
+      const unsigned int m_iFirstAltVar = scaFirstAltVar(c->r);
+      const unsigned int m_iLastAltVar  = scaLastAltVar(c->r);
+
+      int N = // c->r->N;
+              m_iLastAltVar - m_iFirstAltVar + 1; // should be enough
+      // TODO: but we may also use got = gcd({m}_{m\in f}))!
+
+       poly* array_arg=(poly*)omalloc(N*sizeof(poly)); // !
+       int j = 0;
+
+
+      for( unsigned short v = m_iFirstAltVar; v <= m_iLastAltVar; v++ )
+      // for all x_v | Ann(lm(h))
+      if( p_GetExp(h, v, c->r) ) // TODO: use 'got' here!
+      {
+        assume(p_GetExp(h, v, c->r)==1);
+
+        poly p = xi_Mult_pp(v, pNext, c->r); // x_v * h;
+
+        if(p != NULL) // if (x_v * h != 0)
+          array_arg[j++] = p;
+      } // for all x_v | Ann(lm(h))
+
+      c->introduceDelayedPairs(array_arg, j);
+
+      omfree(array_arg); // !!!
+    }
+//     Print("Saturation - done!!!\n");
+  } // if SCAlgebra
+
+
   if(!ip){
     qsort(nodes_final,spc_final,sizeof(sorted_pair_node*),tgb_pair_better_gen2);
 
@@ -1779,7 +1822,7 @@ static void go_on (slimgb_alg* c){
       if (!c->nc)
   h=ksOldCreateSpoly(c->S->m[s->i], c->S->m[s->j], NULL, c->r);
       else
-  h= nc_CreateSpoly(c->S->m[s->i], c->S->m[s->j], NULL, c->r);
+  h= nc_SPoly(c->S->m[s->i], c->S->m[s->j]/*, NULL*/, c->r);
     }
     else
       h=s->lcm_of_lm;
@@ -2180,30 +2223,30 @@ static int poly_crit(const void* ap1, const void* ap2){
   return 0;
 }
 void slimgb_alg::introduceDelayedPairs(poly* pa,int s){
-	if (s==0) return;
-	sorted_pair_node** si_array=(sorted_pair_node**) omalloc(s* sizeof(sorted_pair_node*));
-	
-	for( unsigned int i = 0; i < s; i++ )
-	{
-		sorted_pair_node* si=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
-		si->i=-1;
-		si->j=-2;
-		poly p=pa[i];
-		simplify_poly(p,r);
-		si->expected_length=pQuality(p,this,pLength(p));
-		si->deg=pTotaldegree_full(p);
-		if (!rField_is_Zp(r)){
-		  pCleardenom(p);
-		}
-		si->lcm_of_lm=p;
+    if (s==0) return;
+    sorted_pair_node** si_array=(sorted_pair_node**) omalloc(s* sizeof(sorted_pair_node*));
 
-		//      c->apairs[n-1-i]=si;
-		si_array[i]=si;
-		
+    for( unsigned int i = 0; i < s; i++ )
+    {
+        sorted_pair_node* si=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
+        si->i=-1;
+        si->j=-2;
+        poly p=pa[i];
+        simplify_poly(p,r);
+        si->expected_length=pQuality(p,this,pLength(p));
+        si->deg=pTotaldegree_full(p);
+        if (!rField_is_Zp(r)){
+          pCleardenom(p);
+        }
+        si->lcm_of_lm=p;
+
+        //      c->apairs[n-1-i]=si;
+        si_array[i]=si;
+
   }
-	
+
   qsort(si_array,s,sizeof(sorted_pair_node*),tgb_pair_better_gen2);
-	apairs=spn_merge(apairs,pair_top+1,si_array,s,this);
+    apairs=spn_merge(apairs,pair_top+1,si_array,s,this);
   pair_top+=s;
 }
 slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
@@ -2233,7 +2276,7 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
     }
   }
   eliminationProblem=((!(is_homog))&&((pLexOrder)||(I->rank>0)));
-  
+
   //  Print("is homog:%d",c->is_homog);
   void* h;
   poly hp;
@@ -2339,10 +2382,10 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
   assume(strat->sl==strat->Shdl->idelems()-1);
   if(!(F4_mode))
   {
-		poly* array_arg=I->m;
-		array_arg++;
-		introduceDelayedPairs(array_arg,n-1);
-		/*
+        poly* array_arg=I->m;
+        array_arg++;
+        introduceDelayedPairs(array_arg,n-1);
+        /*
     for (i=1;i<n;i++)//the 1 is wanted, because first element is added to basis
     {
       //     add_to_basis(I->m[i],-1,-1,c);
@@ -2375,7 +2418,7 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
   memset(add_later->m,0,ADD_LATER_SIZE*sizeof(poly));
 }
 slimgb_alg::~slimgb_alg(){
-  
+
   if (!(completed)){
       poly* add=(poly*) omalloc((pair_top+2)*sizeof(poly));
       int piter;
@@ -2390,7 +2433,7 @@ slimgb_alg::~slimgb_alg(){
 
             }
         }
-    
+
         free_sorted_pair_node(s,r);
         apairs[piter]=NULL;
       }
@@ -2557,7 +2600,7 @@ slimgb_alg::~slimgb_alg(){
 ideal t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode){
 
   //  Print("QlogSize(0) %d, QlogSize(1) %d,QlogSize(-2) %d, QlogSize(5) %d\n", QlogSize(nlInit(0)),QlogSize(nlInit(1)),QlogSize(nlInit(-2)),QlogSize(nlInit(5)));
-  
+
   if (TEST_OPT_PROT)
     if (F4_mode)
       PrintS("F4 Modus \n");
@@ -2573,7 +2616,7 @@ ideal t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode){
     assume(I->m[i]!=NULL);
     simplify_poly(I->m[i],currRing);
   }
-  
+
 
   qsort(I->m,IDELEMS(I),sizeof(poly),poly_crit);
   //Print("Idelems %i \n----------\n",IDELEMS(I));
@@ -2803,7 +2846,7 @@ static int tgb_pair_better_gen(const void* ap,const void* bp){
   if (a->deg>b->deg) return 1;
 
 
- 
+
  int comp=pLmCmp(a->lcm_of_lm, b->lcm_of_lm);
 
   if (comp==1) return 1;
@@ -2931,7 +2974,7 @@ static inline wlen_type quality_of_pos_in_strat_S_mult_high(int pos, poly high, 
 {
   poly m=pOne();
   pExpVectorDiff(m,high ,c->strat->S[pos]);
-  poly product=nc_mm_Mult_p(m, pCopy(c->strat->S[pos]), c->r);
+  poly product = mm_Mult_pp(m, c->strat->S[pos], c->r);
   wlen_type erg=pQuality(product,c);
   pDelete(&m);
   pDelete(&product);
@@ -3129,7 +3172,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
   break;
       }
     }
-    
+
     int tdeg_full=-1;
     int tdeg=-1;
     if(pos_in_c>=0)
@@ -3383,7 +3426,7 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
   int curr_pos=losl-1;
 
 
-//  nicht reduzierbare einträge in ergebnisliste schreiben
+//  nicht reduzierbare eintrï¿½e in ergebnisliste schreiben
   // nullen loeschen
   while(curr_pos>=0){
 
@@ -3529,7 +3572,7 @@ void simple_reducer::do_reduce(red_object & ro){
        p_len,
        c->strat->kNoether);
   else
-    nc_kBucketPolyRed_Z(ro.bucket, p, &coef);
+    nc_BucketPolyRed_Z(ro.bucket, p, &coef);
   nDelete(&coef);
 }
 
@@ -3539,8 +3582,8 @@ void simple_reducer::reduce(red_object* r, int l, int u){
   int i;
 //debug start
   int im;
- 
-  
+
+
   if(c->eliminationProblem){
     assume(p_LmEqual(r[l].p,r[u].p,c->r));
     /*int lm_deg=pTotaldegree(r[l].p);
@@ -3624,7 +3667,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
     if (!c->nc)
       red_cp=ppMult_mm(red,m);
     else
-      red_cp=nc_mm_Mult_p(m, pCopy(red), c->r);
+      red_cp = mm_Mult_pp(m, red, c->r);
     if(!erg.fromS){
       kBucketInit(r[rn].bucket,red,red_len);
     }
@@ -3649,7 +3692,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
 
 
   assume(red_len==pLength(red));
-  
+
   int reducer_deg=0;
   if (c->eliminationProblem){
      int lm_deg=pTotaldegree(r[erg.to_reduce_l].p);
