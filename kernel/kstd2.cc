@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.31 2007-01-03 00:17:10 motsak Exp $ */
+/* $Id: kstd2.cc,v 1.32 2007-01-04 10:42:46 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1205,7 +1205,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
 
       // enter into S, L, and T
-      if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
+      //if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
         enterT(strat->P, strat);
 #ifdef HAVE_RING2TOM
 #ifdef HAVE_VANGB
@@ -1227,7 +1227,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
       else
       {
-        strat->P.Delete();
+      //  strat->P.Delete(); // syzComp test: it is in T
       }
 #if 0
       int pl=pLength(strat->P.p);

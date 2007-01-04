@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.15 2007-01-03 00:17:10 motsak Exp $ */
+/* $Id: kstd1.cc,v 1.16 2007-01-04 10:42:45 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -263,7 +263,7 @@ int redEcart (LObject* h,kStrategy strat)
     else
       // this has the side effect of setting h->length
       h->ecart = h->pLDeg(strat->LDegLast) - h->GetpFDeg();
-
+#if 0
     if (strat->syzComp!=0)
     {
       if ((strat->syzComp>0) && (h->Comp() > strat->syzComp))
@@ -276,6 +276,7 @@ int redEcart (LObject* h,kStrategy strat)
         return -2;
       }
     }
+#endif
     /*- try to reduce the s-polynomial -*/
     pass++;
     d = h->GetpFDeg()+h->ecart;
@@ -372,6 +373,7 @@ int redFirst (LObject* h,kStrategy strat)
     }
     h->SetShortExpVector();
 
+#if 0
     if ((strat->syzComp!=0) && !strat->honey)
     {
       if ((strat->syzComp>0) &&
@@ -386,6 +388,7 @@ int redFirst (LObject* h,kStrategy strat)
         return -2;
       }
     }
+#endif    
     if (!strat->homog)
     {
       if (!K_TEST_OPT_OLDSTD && strat->honey)
@@ -2016,17 +2019,17 @@ static BOOLEAN kMoraUseBucket(kStrategy strat)
   if (strat->red == redFirst)
   {
 #ifdef NO_LDEG
-    if (!strat->syzComp)
+    if (strat->syzComp==0)
       return TRUE;
 #else
-    if ((strat->homog || strat->honey) && !strat->syzComp)
+    if ((strat->homog || strat->honey) && (strat->syzComp==0))
       return TRUE;
 #endif
   }
   else
   {
     assume(strat->red == redEcart);
-    if (strat->honey && !strat->syzComp)
+    if (strat->honey && (strat->syzComp==0))
       return TRUE;
   }
 #endif

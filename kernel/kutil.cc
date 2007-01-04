@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.40 2007-01-03 00:17:10 motsak Exp $ */
+/* $Id: kutil.cc,v 1.41 2007-01-04 10:42:46 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -319,7 +319,8 @@ void cancelunit (LObject* L)
         if (L->t_p != NULL) pSetCoeff0(L->t_p,eins);
         L->ecart = 0;
         L->length = 1;
-        if (L->pLength > 0) L->pLength = 1;
+        //if (L->pLength > 0)s
+        L->pLength = 1;
         if (L->last != NULL) L->last = p;
 
         if (L->t_p != NULL && pNext(L->t_p) != NULL)
@@ -928,7 +929,7 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
       // search p in T, if it is there, do not delete it
       if (pOrdSgn != -1 || kFindInT(set[j].p, strat) < 0)
       {
-        // assure that for global ordereings kFindInT fails
+        // assure that for global orderings kFindInT fails
         assume(pOrdSgn == -1 || kFindInT(set[j].p, strat) < 0);
         set[j].Delete();
       }
@@ -1000,14 +1001,17 @@ void initEcartNormal (LObject* h)
 {
   h->FDeg = h->pFDeg();
   h->ecart = h->pLDeg() - h->FDeg;
-  h->length=h->GetpLength();
+  h->pLength=h->GetpLength();
+  // h->length is set by h->pLDeg
 }
 
 void initEcartBBA (LObject* h)
 {
   h->FDeg = h->pFDeg();
   (*h).ecart = 0;
-  h->length=h->GetpLength();
+  h->pLength=h->GetpLength();
+  h->pLDeg();
+  // h->length is set by h->pLDeg
 }
 
 void initEcartPairBba (LObject* Lp,poly f,poly g,int ecartF,int ecartG)
@@ -1028,7 +1032,7 @@ void initEcartPairMora (LObject* Lp,poly f,poly g,int ecartF,int ecartG)
 /*2
 *if ecart1<=ecart2 it returns TRUE
 */
-BOOLEAN sugarDivisibleBy(int ecart1, int ecart2)
+static inline BOOLEAN sugarDivisibleBy(int ecart1, int ecart2)
 {
   return (ecart1 <= ecart2);
 }
@@ -2483,8 +2487,9 @@ void clearSbatch (poly h,int k,int pos,kStrategy strat)
 {
   int j = pos;
   if ( (!strat->fromT)
-  && ((strat->syzComp==0)
-    ||(pGetComp(h)<=strat->syzComp)))
+  && (1//(strat->syzComp==0)
+    //||(pGetComp(h)<=strat->syzComp)))
+  ))
   {
     //Print("start clearS k=%d, pos=%d, sl=%d\n",k,pos,strat->sl);
     unsigned long h_sev = pGetShortExpVector(h);
@@ -2607,7 +2612,8 @@ void pairs (kStrategy strat)
   {
     i++;
     if (i >= strat->sl) break;
-    if ((strat->syzComp==0) || (pGetComp(strat->S[i])<=strat->syzComp))
+    if (1//(strat->syzComp==0) || (pGetComp(strat->S[i])<=strat->syzComp))
+    )
     {
       j=i;
       loop
@@ -4772,7 +4778,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
       while (i<=strat->sl)
       {
         change=FALSE;
-        if (((strat->syzComp==0) || (pGetComp(strat->S[i])<=strat->syzComp))
+        if (1//((strat->syzComp==0) || (pGetComp(strat->S[i])<=strat->syzComp))
         && ((strat->fromQ==NULL) || (strat->fromQ[i]==0)))
         {
           redSi = pHead(strat->S[i]);
@@ -4860,7 +4866,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
       while (i<=strat->sl)
       {
         change=FALSE;
-        if (((strat->syzComp==0) || (pGetComp(strat->S[i])<=strat->syzComp))
+        if (1//((strat->syzComp==0) || (pGetComp(strat->S[i])<=strat->syzComp))
         && ((strat->fromQ==NULL) || (strat->fromQ[i]==0)))
         {
           redSi=pHead((strat->S)[i]);
