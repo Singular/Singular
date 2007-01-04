@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.1 2007-01-03 00:04:00 motsak Exp $
+ *  Version: $Id: sca.cc,v 1.2 2007-01-04 14:09:47 motsak Exp $
  *******************************************************************/
 
 // #define PDEBUG 2
@@ -1217,11 +1217,12 @@ bool SetupSCA(ring& rGR, const ring rG)
   if(ncRingType(rG) != nc_skew)
     return false;
 
-  if(rG->nc->IsSkewConstant != 1)
-    return false;
+//   if(rG->nc->IsSkewConstant != 1)
+//     return false;
+//
+//   if(!n_IsMOne(p_GetCoeff(MATELEM(rG->nc->COM,1,2),rG->nc->basering), rG->nc->basering)) // COM live in basering!
+//     return false;
 
-  if(!n_IsMOne(p_GetCoeff(MATELEM(rG->nc->COM,1,2),rG->nc->basering), rG->nc->basering)) // COM live in basering!
-    return false;
 
   assume(rGR->qideal != NULL);
 
@@ -1329,26 +1330,41 @@ bool SetupSCA(ring& rGR, const ring rG)
   assume( iAltVarStart <= iAltVarEnd   );
   assume( iAltVarEnd   <= N            );
 
+#ifdef PDEBUG
+//   Print("AltVars: [%d, %d]\n", iAltVarStart, iAltVarEnd);
+#endif
 
-/*
-  // Anti-commutative (c_{ij} = -1)?
-  for( int i = iAltVarStart; i < iAltVarEnd; i++ )
-    for( int j = i + 1; i <= iAltVarEnd; j++ )
-      if(!n_IsMOne(p_GetCoeff(MATELEM(rG->nc->COM,i,j),rG->nc->basering), rG->nc->basering)) // COM live in basering!
-        return false;
+  const ring rBase = rG->nc->basering;
+  const matrix C   = rG->nc->C; // live in rBase!
 
+  for(int i = 1; i < N; i++)
+  {
+    for(int j = i + 1; j <= N; j++)
+    {
+      assume(MATELEM(C,i,j) != NULL); // after CallPlural!
+      number c = p_GetCoeff(MATELEM(C,i,j), rBase);
 
-  for( int i = 1; i < iAltVarStart-1; i++ )
-    for( int j = i + 1; i < iAltVarStart; j++ )
-      if(!n_IsOne(p_GetCoeff(MATELEM(rG->nc->COM,i,j),rG->nc->basering), rG->nc->basering)) // COM live in basering!
-        return false;
-
-
-  for( int i = iAltVarEnd+1; i < N; i++ )
-    for( int j = i + 1; i <= N; j++ )
-      if(!n_IsOne(p_GetCoeff(MATELEM(rG->nc->COM,i,j),rG->nc->basering), rG->nc->basering)) // COM live in basering!
-        return false;
-*/
+      if( (iAltVarStart <= i) && (j <= iAltVarEnd) ) // S <= i < j <= E
+      { // anticommutative part
+        if( !n_IsMOne(c, rBase) )
+        {
+#ifdef PDEBUG
+//           Print("Wrong Coeff at: [%d, %d]\n", i, j);
+#endif
+          return false;
+        }
+      } else
+      { // should commute
+        if( !n_IsOne(c, rBase) )
+        {
+#ifdef PDEBUG
+//           Print("Wrong Coeff at: [%d, %d]\n", i, j);
+#endif
+          return false;
+        }
+      }
+    }
+  }
 
   //////////////////////////////////////////////////////////////////////////
   // ok... let's setup it!!!
@@ -2150,9 +2166,19 @@ void SetProcsSCA(ring& rGR, p_Procs_s* p_Procs)
 
 
   if (pOrdSgn==-1)
+  {
+#ifdef PDEBUG
+//           Print("Local case => GB == mora!\n");
+#endif
     rGR->nc->p_Procs.GB          = sca_mora; // local ordering => Mora, otherwise - Buchberger!
+  }
   else
+  {
+#ifdef PDEBUG
+//           Print("Global case => GB == bba!\n");
+#endif
     rGR->nc->p_Procs.GB          = sca_gr_bba; // sca_bba?
+  }
 
 
 //   rGR->nc->p_Procs.GlobalGB    = sca_gr_bba;
