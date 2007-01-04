@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ffops.h,v 1.10 2006-07-18 14:30:25 Singular Exp $ */
+/* $Id: ffops.h,v 1.11 2007-01-04 10:40:19 Singular Exp $ */
 
 #ifndef INCL_FFOPS_H
 #define INCL_FFOPS_H
@@ -27,7 +27,7 @@ inline int ff_norm ( const int a )
     n += (n >> 31) & ff_prime; 
     return n;
 #else
-    if (n <0) n += ff_prime;
+    if (n < 0) n += ff_prime;
     return n;
 #endif
 }
@@ -47,7 +47,7 @@ inline int ff_longnorm ( const long a )
     n += (n >> 31) & ff_prime; 
     return n;
 #else
-    if (n <0) n += ff_prime;
+    if (n < 0) n += ff_prime;
     return n;
 #endif
 }
@@ -55,10 +55,13 @@ inline int ff_longnorm ( const long a )
 inline int ff_bignorm ( const INT64 a )
 {
     int n = (int)(a % (INT64)ff_prime);
-    if ( n < 0 )
-	return n + ff_prime;
-    else
-	return n;
+#if defined(i386) || defined(NTL_AVOID_BRANCHING)
+    n += (n >> 31) & ff_prime; 
+    return n;
+#else
+    if (n < 0) n += ff_prime;
+    return n;
+#endif
 }
 
 inline int ff_add ( const int a, const int b )
@@ -85,7 +88,7 @@ inline int ff_sub ( const int a, const int b )
     return r;
 #else
     int r=( a - b );
-    if (r <0) r += ff_prime;
+    if (r < 0) r += ff_prime;
     return r;
 #endif
 }
@@ -93,7 +96,14 @@ inline int ff_sub ( const int a, const int b )
 inline int ff_neg ( const int a )
 {
     //return ff_norm( -a );
+// EXPERIMENT
+#if defined(i386) || defined(NTL_AVOID_BRANCHING)
+    int r= -a;
+    r += (r >> 31) & ff_prime; 
+    return r;
+#else
     return ( a == 0 ? 0 : ff_prime-a );
+#endif
 }
 
 inline int ff_mul ( const int a, const int b )
