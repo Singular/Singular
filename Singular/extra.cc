@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.244 2006-12-15 15:25:11 Singular Exp $ */
+/* $Id: extra.cc,v 1.245 2007-01-04 14:08:00 motsak Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -81,6 +81,7 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 #ifdef HAVE_PLURAL
 #include "ring.h"
 #include "gring.h"
+#include "sca.h"
 #include "ipconv.h"
 #endif
 
@@ -498,7 +499,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
             {
               res->rtyp=INT_CMD;
               res->data=(void*)complexNearZero((gmp_complex*)h->Data(),
-			                       (int)((long)(h->next->Data())));
+                             (int)((long)(h->next->Data())));
               return FALSE;
             }
         }
@@ -834,7 +835,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         else currRing->nc->type=nc_skew;
         currRing->nc->IsSkewConstant=1;
         /* create matrix C */
-        C=mpNew(currRing->N,currRing->N);
+        C=mpNew(currRing->N,currRing->N);  "Alternating variables: [", AltVarStart(ER), ", ", AltVarEnd(ER), "].";
+
         for(i=1;i<currRing->N;i++)
         {
           for(j=i+1;j<=currRing->N;j++)
@@ -977,6 +979,31 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
 #endif
+/*==================== sca?AltVar ==================================*/
+    if ( (strcmp(sys_cmd, "AltVarStart") == 0) || (strcmp(sys_cmd, "AltVarEnd") == 0) )
+    {
+      ring r = currRing;
+
+      if((h!=NULL) && (h->Typ()==RING_CMD)) r = (ring)h->Data(); else
+      {
+        WerrorS("`system(\"AltVarStart\"[,<ring>])` expected");
+        return TRUE;
+      }
+
+      res->rtyp=INT_CMD;
+
+      if (rIsSCA(r))
+      {
+        if(strcmp(sys_cmd, "AltVarStart") == 0)
+          res->data = (void*)scaFirstAltVar(r);
+        else
+          res->data = (void*)scaLastAltVar(r);
+        return FALSE;
+      }
+
+      res->data=NULL;
+      return TRUE;
+    }
 /*==================== opp ==================================*/
     if (strcmp(sys_cmd, "opp")==0)
     {
@@ -2803,7 +2830,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 //          Py_Initialize();
 //          initPySingular();
         }
-//	    PyRun_SimpleString(c);
+//      PyRun_SimpleString(c);
         return FALSE;
       }
       else return TRUE;
@@ -2819,7 +2846,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           Py_Initialize();
           initPySingular();
         }
-	PyRun_SimpleString(
+  PyRun_SimpleString(
 "try:                                                                                       \n\
     __IPYTHON__                                                                             \n\
 except NameError:                                                                           \n\
@@ -2830,7 +2857,7 @@ else:                                                                           
     argv = ['-pi1','In <\\#>:','-pi2','   .\\D.:','-po','Out<\\#>:']                        \n\
     banner = '*** Nested interpreter ***'                                                   \n\
     exit_msg = '*** Back in main IPython ***'                                               \n\
-											    \n\
+                          \n\
 # First import the embeddable shell class                                                   \n\
 from IPython.Shell import IPShellEmbed                                                      \n\
 # Now create the IPython shell instance. Put ipshell() anywhere in your code                \n\
