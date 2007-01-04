@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: sagbi.lib,v 1.5 2006-11-22 21:40:29 levandov Exp $";
+version="$Id: sagbi.lib,v 1.6 2007-01-04 12:49:27 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  SAGBI.lib  Compute Subalgebras bases Analogous to Groebner bases for ideals
@@ -14,8 +14,8 @@ PROCEDURES:
  proc sagbiPart(I);    Construct partial SAGBI basis for the Subalgebra defined by I
 ";
 
- LIB "algebra.lib";
- LIB "elim.lib";
+LIB "algebra.lib";
+LIB "elim.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 proc sagbiSPoly(id ,list #)
@@ -31,9 +31,9 @@ RETURN: an ideal
 EXAMPLE: example sagbiSPoly; show an example "
 {
   if(size(#)==0)
-    {
-      #[1]=0;
-    }
+  {
+    #[1]=0;
+  }
   degBound=0;
   def bsr=basering;
   ideal vars=maxideal(1);
@@ -48,9 +48,9 @@ EXAMPLE: example sagbiSPoly; show an example "
   //class,which is the case of this procedure.
 
   if(b!=0)
-    {
-      id =reduce(id,groebner(0));
-    }
+  {
+    id =reduce(id,groebner(0));
+  }
   int n,m=nvars(bsr),ncols(id);
   int z;
   string mp=string(minpoly);
@@ -58,70 +58,68 @@ EXAMPLE: example sagbiSPoly; show an example "
   list L;
 
   if(id==0)
+  {
+    if(#[1]==0)
     {
-      if(#[1]==0)
-        {
-          return(P);
-        }
-      else
-        {
-          return(L);
-        }
+      return(P);
     }
-
-  else
-
+    else
     {
+      return(L);
+    }
+  }
+  else
+  {
     //==================create anew ring with extra variables================
 
-      execute("ring R1="+charstr(bsr)+",("+varstr(bsr)+",@y(1..m)),(dp(n),dp(m));");
-      execute("minpoly=number("+mp+");");
-      ideal id=imap(bsr,id);
-      ideal A;
+    execute("ring R1="+charstr(bsr)+",("+varstr(bsr)+",@y(1..m)),(dp(n),dp(m));");
+    execute("minpoly=number("+mp+");");
+    ideal id=imap(bsr,id);
+    ideal A;
 
-      for(z=1;z<=m;z++)
-        {
-          A[z]=lead(id[z])-@y(z);
-        }
+    for(z=1;z<=m;z++)
+    {
+      A[z]=lead(id[z])-@y(z);
+    }
 
-      A=groebner(A);
-      ideal kern=nselect(A,1,n);// "kern" is the kernel of the ring map:
-                           // R1----->bsr ;y(z)----> lead(id[z]).
-                          //"kern" is the ideal of algebraic relations between
-                         // lead(id[z]).
+    A=groebner(A);
+    ideal kern=nselect(A,1,n);// "kern" is the kernel of the ring map:
+                        // R1----->bsr ;y(z)----> lead(id[z]).
+                        //"kern" is the ideal of algebraic relations between
+                        // lead(id[z]).
 
-      export kern,A;// we export:* the ideal A  to avoid useless computations
-               //                  betwee 2 steps in sagbi procedure.
-              //                 *the ideal kern : some times we can get intresting
-             //                    informations from this ideal.
+    export kern,A;// we export:
+                  // * the ideal A  to avoid useless computations
+                  //   between 2 steps in sagbi procedure.
+                  // * the ideal kern : some times we can get intresting
+                  //   informations from this ideal.
 
-      setring bsr;
-      map phi=R1,vars,id;
+    setring bsr;
+    map phi=R1,vars,id;
 
-      // the sagbiSPolynomials are the image by phi of the generators of kern
+    // the sagbiSPolynomials are the image by phi of the generators of kern
 
-      P=simplify(phi(kern),1);
-      if(#[1]==0)
-        {
-          return(P);
-        }
-      else
-        {
-          L=P,R1;
-          kill phi,vars;
+    P=simplify(phi(kern),1);
+    if(#[1]==0)
+    {
+      return(P);
+    }
+    else
+    {
+      L=P,R1;
+      kill phi,vars;
 
-                 dbprint(printlevel-voice+3,"
+      dbprint(printlevel-voice+3,"
 // 'sagbiSPoly' created a ring as 2nd element of the list.
 // The ring contains the ideal 'kern'  of algebraic relations between the
 //leading terms of the generators of I.
 // To access to this ring and see 'kern' you should give the ring a name,
 // e.g.:
                def S = L[2]; setring S; kern;
-        ");
-                 return(L);
-        }
-
+      ");
+      return(L);
     }
+  }
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -146,29 +144,23 @@ static proc std1(ideal J,ideal I,list #)
   ideal Res,@result;
 
 
-  if(size(#)>0)
-    {tt=#[1];}
+  if(size(#)>0) {tt=#[1];}
 
-  if(size(I)==0)
-    {@result=groebner(J);}
+  if(size(I)==0) {@result=groebner(J);}
 
   if((size(I)!=0) && (size(J)-size(I)>=1))
-    {
+  {
+    qring Q=I;
+    ideal J=fetch(br,J);
+    J=groebner(J);
+    setring br;
+    Res=fetch(Q,J);// Res contains the generators that we add to I
+                   // to get the generators of std(J);
+    @result=Res+I;
+  }
 
-      qring Q=I;
-      ideal J=fetch(br,J);
-      J=groebner(J);
-      setring br;
-      Res=fetch(Q,J);// Res contains the generators that we add to I
-                      //to get the generators of std(J);
-      @result=Res+I;
-
-    }
-
-  if(tt==0)
-    {return(@result);}
-  else
-    {return(Res);}
+  if(tt==0) { return(@result);}
+  else      { return(Res);}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -186,81 +178,73 @@ static proc Spoly1(list l,ideal I,ideal J,int a)
   int b=size(B);
 
   if(b!=0)
-    {
-      I=reduce(I,groebner(0));
-      J=reduce(J,groebner(0));
-    }
-
-
+  {
+    I=reduce(I,groebner(0));
+    J=reduce(J,groebner(0));
+  }
   int n,ii,jj=nvars(br),ncols(I),ncols(J);
   int z;
   list @L;
   string mp =string(minpoly);
 
   if(size(J)==0)
-    {
-      @L =sagbiSPoly(I,1);
-    }
+  {
+    @L =sagbiSPoly(I,1);
+  }
   else
+  {
+    ideal @sum=I+J;
+    ideal P1;
+    ideal P=l[1];//P is the ideal of spolynomials of I;
+    def R=l[2];setring R;int kk=nvars(R);
+    ideal J=fetch(br,J);
+
+    //================create a new ring with extra variables==============
+
+    execute("ring R1="+charstr(R)+",("+varstr(R)+",@y((ii+1)..(ii+jj))),(dp(n),dp(kk+jj-n));");
+    ideal kern1;
+    ideal A=fetch(R,A);
+    attrib(A,"isSB",1);
+    ideal J=fetch(R,J);
+    ideal kern=fetch(R,kern);
+    ideal A1;
+    for(z=1;z<=jj;z++)
     {
-      ideal @sum=I+J;
-      ideal P1;
-      ideal P=l[1];//P is the ideal of spolynomials of I;
-      def R=l[2];setring R;int kk=nvars(R);
-      ideal J=fetch(br,J);
+      A1[z]=lead(J[z])-var(z+kk);
+    }
+    A1=A+A1;
+    ideal @Res=std1(A1,A,1);// the generators of @Res are whose we have to add
+                            // to A to get std(A1).
+    A=A+@Res;
+    kern1=nselect(@Res,1,n);
+    kern=kern+kern1;
+    export kern,kern1,A;
+    setring br;
+    map phi=R1,vars,@sum;
+    P1=simplify(phi(kern1),1);//P1 is th ideal we add to P to get the ideal
+                              //of Spolynomials of @sum.
+    P=P+P1;
 
-
-
-      //================create a new ring with extra variables==============
-
-      execute("ring R1="+charstr(R)+",("+varstr(R)+",@y((ii+1)..(ii+jj))),(dp(n),dp(kk+jj-n));");
-      ideal kern1;
-      ideal A=fetch(R,A);
-      attrib(A,"isSB",1);
-      ideal J=fetch(R,J);
-      ideal kern=fetch(R,kern);
-      ideal A1;
-      for(z=1;z<=jj;z++)
-        {
-          A1[z]=lead(J[z])-var(z+kk);
-        }
-      A1=A+A1;
-      ideal @Res=std1(A1,A,1);//the generators of @Res are whose we have to add
-                             //to A to get std(A1).
-      A=A+@Res;
-      kern1=nselect(@Res,1,n);
-      kern=kern+kern1;
-      export kern,kern1,A;
-      setring br;
-      map phi=R1,vars,@sum;
-      P1=simplify(phi(kern1),1);//P1 is th ideal we add to P to get the ideal
-                                //of Spolynomials of @sum.
-      P=P+P1;
-
-      if (a==1)
-        {
-          @L=P,R1;
-          kill phi,vars;
-          dbprint(printlevel-voice+3,"
+    if (a==1)
+    {
+      @L=P,R1;
+      kill phi,vars;
+      dbprint(printlevel-voice+3,"
 // 'Spoly1' created a ring as 2nd element of the list.
 // The ring contains the ideal 'kern'  of algebraic relations between the
 //generators of I+J.
 // To access to this ring and see 'kern' you should give the ring a name,
 // e.g.:
                def @ring = L[2]; setring @ring ; kern;
-        ");
-        }
-      if(a==2)
-        {
-          @L=P1,R1;
-          kill phi,vars;
-        }
+      ");
     }
-
+    if(a==2)
+    {
+      @L=P1,R1;
+      kill phi,vars;
+    }
+  }
   return(@L);
-
-
-
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -286,110 +270,111 @@ EXAMPLE: reduction; show an example"
   //class,which is the case of this algorithm.
 
   if(b !=0) //means that the basering is a quotient ring
-    {
-      p=reduce(p,groebner(0));
-      dom=reduce(groebner,std(0));
-    }
+  {
+    p=reduce(p,groebner(0));
+    dom=reduce(groebner,std(0));
+  }
 
   int i,choose;
   int z=ncols(dom);
 
   if((size(#)>0) && (typeof(#[1])=="int"))
-    {
-      choose = #[1];
-    }
+  {
+    choose = #[1];
+  }
   if (size(#)>1)
-    {
-      choose =#[2];
-    }
+  {
+    choose =#[2];
+  }
 
   //=======================first algorithm(default)=========================
-   if ( choose == 0 )
+  if ( choose == 0 )
   {
-     list L = algebra_containment(lead(p),lead(dom),1);
-     if( L[1]==1 )
-     {
-  // the ring L[2] = char(bsr),(x(1..nvars(bsr)),y(1..z)),(dp(n),dp(m)),
-  // contains poly check s.t. LT(p) is of the form check(LT(f1),...,LT(fr))
-       def s1 = L[2];
-       map psi = s1,maxideal(1),dom;
-       poly re = p - psi(check);
-       // divide by the maximal power of #[1]
-          if ( (size(#)>0) && (typeof(#[1])=="poly") )
-
-            {  while ((re!=0) && (re!=#[1]) &&(subst(re,#[1],0)==0))
-             {
-               re=re/#[1];
-             }
-            }
-          return(re);
-     }
-  return(p);
-  }
-   //======================2end variant of algorithm=========================
-   //It uses two different commands for elimaination.
-   //if(choose==1):"elimainate"command.
-   //if (choose==2):"nselect" command.
-   else
+    list L = algebra_containment(lead(p),lead(dom),1);
+    if( L[1]==1 )
+    {
+      // the ring L[2] = char(bsr),(x(1..nvars(bsr)),y(1..z)),(dp(n),dp(m)),
+      // contains poly check s.t. LT(p) is of the form check(LT(f1),...,LT(fr))
+      def s1 = L[2];
+      map psi = s1,maxideal(1),dom;
+      poly re = p - psi(check);
+      // divide by the maximal power of #[1]
+      if ( (size(#)>0) && (typeof(#[1])=="poly") )
       {
-        poly v=product(maxideal(1));
-
-  //------------- change the basering bsr to bsr[@(0),...,@(z)] ----------
-  execute("ring s="+charstr(basering)+",("+varstr(basering)+",@(0..z)),dp;");
-// Ev hier die Reihenfolge der Vars aendern. Dazu muss unten aber entsprechend
-// geaendert werden:
-//  execute("ring s="+charstr(basering)+",(@(0..z),"+varstr(basering)+"),dp;");
-
-  //constructs the leading ideal of dom=(p-@(0),dom[1]-@(1),...,dom[z]-@(z))
-     ideal dom=imap(bsr,dom);
-     for (i=1;i<=z;i++)
-     {
-        dom[i]=lead(dom[i])-var(nvars(bsr)+i+1);
-     }
-     dom=lead(imap(bsr,p))-@(0),dom;
-
-      //---------- eliminate the variables of the basering bsr --------------
-  //i.e. computes dom intersected with K[@(0),...,@(z)].
-
-     if(choose==1)
-       {
-         ideal kern=eliminate(dom,imap(bsr,v));//eliminate does not need a
-                                              //standard basis as input.
-       }
-     if(choose==2)
-       {
-         ideal kern= nselect(groebner(dom),1,n);//"nselect" is combinatorial command
-                                         //which uses the internal command
-                                        // "simplify"
-       }
-
-  //---------  test wether @(0)-h(@(1),...,@(z)) is in ker ---------------
-  // for some poly h and divide by maximal power of q=#[1]
-     poly h;
-     z=size(kern);
-     for (i=1;i<=z;i++)
-     {
-        h=kern[i]/@(0);
-        if (deg(h)==0)
-        {  h=(1/h)*kern[i];
-        // define the map psi : s ---> bsr defined by @(i) ---> p,dom[i]
-           setring bsr;
-           map psi=s,maxideal(1),p,dom;
-           poly re=psi(h);
-           // divide by the maximal power of #[1]
-           if ((size(#)>0) && (typeof(#[1])== "poly") )
-           {  while ((re!=0) && (re!=#[1]) &&(subst(re,#[1],0)==0))
-              {  re=re/#[1];
-              }
-           }
-           return(re);
+        while ((re!=0) && (re!=#[1]) &&(subst(re,#[1],0)==0))
+        {
+          re=re/#[1];
         }
-     }
-     setring bsr;
-     return(p);
+      }
+      return(re);
+    }
+    return(p);
   }
+  //======================2end variant of algorithm=========================
+  //It uses two different commands for elimaination.
+  //if(choose==1):"elimainate"command.
+  //if (choose==2):"nselect" command.
+  else
+  {
+    poly v=product(maxideal(1));
 
+    //------------- change the basering bsr to bsr[@(0),...,@(z)] ----------
+    execute("ring s="+charstr(basering)+",("+varstr(basering)+",@(0..z)),dp;");
+    // Ev hier die Reihenfolge der Vars aendern. Dazu muss unten aber entsprechend
+    // geaendert werden:
+    //  execute("ring s="+charstr(basering)+",(@(0..z),"+varstr(basering)+"),dp;");
 
+    //constructs the leading ideal of dom=(p-@(0),dom[1]-@(1),...,dom[z]-@(z))
+    ideal dom=imap(bsr,dom);
+    for (i=1;i<=z;i++)
+    {
+      dom[i]=lead(dom[i])-var(nvars(bsr)+i+1);
+    }
+    dom=lead(imap(bsr,p))-@(0),dom;
+
+    //---------- eliminate the variables of the basering bsr --------------
+    //i.e. computes dom intersected with K[@(0),...,@(z)].
+
+    if(choose==1)
+    {
+      ideal kern=eliminate(dom,imap(bsr,v));//eliminate does not need a
+                                            //standard basis as input.
+    }
+    if(choose==2)
+    {
+      ideal kern= nselect(groebner(dom),1,n);//"nselect" is combinatorial command
+                                         //which uses the internal command
+                                         // "simplify"
+    }
+
+    //---------  test wether @(0)-h(@(1),...,@(z)) is in ker ---------------
+    // for some poly h and divide by maximal power of q=#[1]
+    poly h;
+    z=size(kern);
+    for (i=1;i<=z;i++)
+    {
+      h=kern[i]/@(0);
+      if (deg(h)==0)
+      {
+        h=(1/h)*kern[i];
+        // define the map psi : s ---> bsr defined by @(i) ---> p,dom[i]
+        setring bsr;
+        map psi=s,maxideal(1),p,dom;
+        poly re=psi(h);
+        // divide by the maximal power of #[1]
+        if ((size(#)>0) && (typeof(#[1])== "poly") )
+        {
+          while ((re!=0) && (re!=#[1]) &&(subst(re,#[1],0)==0))
+          {
+            re=re/#[1];
+          }
+        }
+        return(re);
+      }
+    }
+    setring bsr;
+    return(p);
+  }
 }
 example
 {"EXAMPLE:"; echo = 2;
@@ -420,18 +405,18 @@ static proc completeReduction1(poly p,ideal dom,list #) //tail reduction
   poly p1,p2,re;
   p1=p;
   while(p1!=0)
+  {
+    p2=reduction(p1,dom,#);
+    if(p2!=p1)
     {
-      p2=reduction(p1,dom,#);
-      if(p2!=p1)
-        {
-          p1=p2;
-        }
-      else
-        {
-          re=re+lead(p2);
-          p1=p2-lead(p2);
-        }
+      p1=p2;
     }
+    else
+    {
+      re=re+lead(p2);
+      p1=p2-lead(p2);
+    }
+  }
   return(re);
 }
 
@@ -458,35 +443,34 @@ EXAMPLE: example sagbiNF; show example "
   ideal Red;
   poly re;
   if(typeof(id)=="ideal")
-    {
-      int i=ncols(id);
-      for(z=1;z<=i;z++)
+  {
+    int i=ncols(id);
+    for(z=1;z<=i;z++)
     {
       if(k==0)
-        {
-
-          id[z]=completeReduction(id[z],dom,#);
-        }
+      {
+        id[z]=completeReduction(id[z],dom,#);
+      }
       else
-        {
-          id[z]=completeReduction1(id[z],dom,#);//tail reduction.
-        }
+      {
+        id[z]=completeReduction1(id[z],dom,#);//tail reduction.
+      }
     }
-  Red=simplify(id,7);
-  return(Red);
-    }
+    Red=simplify(id,7);
+    return(Red);
+  }
   if(typeof(id)=="poly")
+  {
+    if(k==0)
     {
-      if(k==0)
-        {
-          re=completeReduction(id,dom,#);
-        }
-      else
-        {
-          re=completeReduction1(id,dom,#);
-        }
-      return(re);
+      re=completeReduction(id,dom,#);
     }
+    else
+    {
+      re=completeReduction1(id,dom,#);
+    }
+    return(re);
+  }
 }
 example
 {"EXAMPLE:"; echo = 2;
@@ -508,22 +492,21 @@ static proc intRed(id,int k, list #)
   ideal Rest,intRed;
   z=ncols(id);
   for(i=1;i<=z;i++)
+  {
+    Rest=id;
+    Rest[i]=0;
+    Rest=simplify(Rest,2);
+    if(k==0)
     {
-      Rest=id;
-      Rest[i]=0;
-      Rest=simplify(Rest,2);
-      if(k==0)
-        {
-          intRed[i]=completeReduction(id[i],Rest,#);
-        }
-      else
-        {
-          intRed[i]=completeReduction1(id[i],Rest,#);
-        }
+      intRed[i]=completeReduction(id[i],Rest,#);
     }
+    else
+    {
+      intRed[i]=completeReduction1(id[i],Rest,#);
+    }
+  }
   intRed=simplify(intRed,7);//1+2+4 in simplify command
   return(intRed);
-
 }
 //////////////////////////////////////////////////////////////////////////////
 
@@ -548,13 +531,13 @@ EXAMPLE: example sagbi; show example "
   list L;
   S=intRed(id,k,#);
   while(size(S)!=size(oldS))
-    {
-      L=Spoly1(L,S,Red,2);
-      Red=L[1];
-      Red=sagbiNF(Red,S,k,#);
-      oldS=S;
-      S=S+Red;
-    }
+  {
+    L=Spoly1(L,S,Red,2);
+    Red=L[1];
+    Red=sagbiNF(Red,S,k,#);
+    oldS=S;
+    S=S+Red;
+  }
   return(S);
 }
 example
@@ -590,14 +573,14 @@ EXAMPLE: example sagbiPart; show example "
   list L;
   S=intRed(id,k,#);
   while((size(S)!=size(oldS))&&(counter<=c))
-    {
-      L=Spoly1(L,S,Red,2);
-      Red=L[1];
-      Red=sagbiNF(Red,S,k,#);
-      oldS=S;
-      S=S+Red;
-      counter=counter+1;
-    }
+  {
+    L=Spoly1(L,S,Red,2);
+    Red=L[1];
+    Red=sagbiNF(Red,S,k,#);
+    oldS=S;
+    S=S+Red;
+    counter=counter+1;
+  }
   return(S);
 }
 example
