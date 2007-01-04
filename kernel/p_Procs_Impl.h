@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Impl.h,v 1.1.1.1 2003-10-06 12:16:00 Singular Exp $
+ *  Version: $Id: p_Procs_Impl.h,v 1.2 2007-01-04 16:22:46 Singular Exp $
  *******************************************************************/
 #ifndef P_PROCS_IMPL_H
 #define P_PROCS_IMPL_H
@@ -106,6 +106,9 @@ typedef enum p_Field
 {
   FieldGeneral = 0,
   FieldZp,          
+#ifdef NV_OPS
+  FieldZpGeneral,
+#endif
   FieldQ,
   FieldR,
   FieldGF,
@@ -495,7 +498,7 @@ static inline void pp_Mult_mm_Noether_Filter(p_Field &field,
 #endif
       )
   {
-    // all the other orderings might occur (remeber Mixed Orderings!)
+    // all the other orderings might occur (remember Mixed Orderings!)
     field = FieldGeneral;
     ord = OrdGeneral;
     length = LengthGeneral;
@@ -659,6 +662,21 @@ do                                                                      \
   SetProc(p_Merge_q, FieldGeneral, length, ord);                        \
 }                                                                       \
 while (0)
+
+#ifdef NV_OPS
+#define SetProcs_nv(field, length, ord)                                 \
+do                                                                      \
+{                                                                       \
+  SetProc(p_Delete, field, LengthGeneral, OrdGeneral);                  \
+  SetProc(p_ShallowCopyDelete, FieldGeneral, length, OrdGeneral);       \
+  SetProc(p_Copy, field, length, OrdGeneral);                           \
+  SetProc(p_Add_q, field, length, ord);                                 \
+  SetProc(p_kBucketSetLm, field, length, ord);                          \
+  SetProc(p_Neg, field, LengthGeneral, OrdGeneral);                     \
+  SetProc(p_Merge_q, FieldGeneral, length, ord);                        \
+}                                                                       \
+while (0)
+#endif
 
 #endif // P_PROCS_IMPL_H
 

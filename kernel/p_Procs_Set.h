@@ -11,7 +11,7 @@
  *           have to be defined before this file is included
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Set.h,v 1.5 2007-01-03 00:17:11 motsak Exp $
+ *  Version: $Id: p_Procs_Set.h,v 1.6 2007-01-04 16:22:47 Singular Exp $
  *******************************************************************/
 #include "modulop.h"
 
@@ -25,7 +25,7 @@ static inline p_Field p_FieldIs(ring r)
 #ifdef NV_OPS
   {
     if (r->ch<=NV_MAX_PRIME) return FieldZp;
-    else                     return FieldGeneral;
+    else                     return FieldZpGeneral;
   }
 #else
     return FieldZp;
@@ -151,6 +151,16 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
   assume(IsValidSpec(field, length, ord));
 
   InitSetProcs(field, length, ord);
+  #ifdef NV_OPS
+  if (field==FieldZpGeneral)
+  {
+    // set all (mult/div.) routines to FieldGeneral-variants
+    SetProcs(FieldGeneral, length,ord); // p_Mult_nn, ...
+    // set all non-mult/div. routines to FieldZp-variants
+    SetProcs_nv(FieldZp, length,ord); // p_Delete, p_ShallowCopyDelete...
+  }
+  else
+  #endif  
   SetProcs(field, length, ord);
   CheckProc(p_Copy);
   CheckProc(p_Delete);
