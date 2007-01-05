@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.32 2007-01-04 10:42:46 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.33 2007-01-05 17:59:32 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -723,7 +723,7 @@ int redHoney (LObject* h, kStrategy strat)
     #if 0
     if (li==0)
     {
-       PrintS("!");
+       //PrintS("!");
        li=strat->T[j].pLength=pLength(strat->T[j].p);
     }
     #endif
@@ -869,8 +869,8 @@ int redHoney (LObject* h, kStrategy strat)
              strat->T[ii].max =p_GetMaxExpP(pNext(strat->T[ii].p), strat->tailRing);
           else
              strat->T[ii].max = NULL;
-          h->pLength=0;h->pLength=h->GetpLength();
-          strat->T[ii].pLength=0;strat->T[ii].pLength=strat->T[ii].GetpLength();
+          h->length=h->pLength=pLength(h->p);
+          strat->T[ii].length=strat->T[ii].pLength=pLength(strat->T[ii].p);
           if (strat->T[ii].is_normalized)
           {
             strat->T[ii].is_normalized=0;

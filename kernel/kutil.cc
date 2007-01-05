@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.41 2007-01-04 10:42:46 Singular Exp $ */
+/* $Id: kutil.cc,v 1.42 2007-01-05 17:59:32 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -241,7 +241,8 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
         }
         else if (fromNext)
           L->max  = p_GetMaxExpP(pNext(L->p), L->tailRing ); // p1;
-        if (L->pLength != 0) L->pLength = l;
+        //if (L->pLength != 0) 
+        L->pLength = l;
         // Hmmm when called from updateT, then only
         // reset ecart when cut
         if (fromNext)
@@ -319,7 +320,7 @@ void cancelunit (LObject* L)
         if (L->t_p != NULL) pSetCoeff0(L->t_p,eins);
         L->ecart = 0;
         L->length = 1;
-        //if (L->pLength > 0)s
+        //if (L->pLength > 0)
         L->pLength = 1;
         if (L->last != NULL) L->last = p;
 
@@ -1001,17 +1002,15 @@ void initEcartNormal (LObject* h)
 {
   h->FDeg = h->pFDeg();
   h->ecart = h->pLDeg() - h->FDeg;
-  h->pLength=h->GetpLength();
   // h->length is set by h->pLDeg
+  h->length=h->pLength=pLength(h->p);
 }
 
 void initEcartBBA (LObject* h)
 {
   h->FDeg = h->pFDeg();
   (*h).ecart = 0;
-  h->pLength=h->GetpLength();
-  h->pLDeg();
-  // h->length is set by h->pLDeg
+  h->length=h->pLength=pLength(h->p);
 }
 
 void initEcartPairBba (LObject* Lp,poly f,poly g,int ecartF,int ecartG)
@@ -4520,7 +4519,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
           pos = posInS(strat,strat->sl,h.p,h.ecart);
         h.sev = pGetShortExpVector(h.p);
         strat->enterS(h,pos,strat, strat->tl+1);
-        h.length = pLength(h.p);
+        h.length = h.GetpLength();
         h.SetpFDeg();
         enterT(h,strat);
       }
@@ -4533,7 +4532,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
       LObject h;
       h.p=pCopy(P->m[i]);
       strat->initEcart(&h);
-      h.length = pLength(h.p);
+      h.length = h.pLength = pLength(h.p);
       if (TEST_OPT_INTSTRATEGY)
       {
         h.pCleardenom();
@@ -4548,7 +4547,10 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
         {
           h.p=redBba(h.p,strat->sl,strat);
           if (h.p!=NULL)
+          {
             h.p=redtailBba(h.p,strat->sl,strat);
+          }
+          h.length=h.pLength=pLength(h.p);
         }
         else
         {
@@ -4571,7 +4573,6 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
           pos = posInS(strat,strat->sl,h.p,h.ecart);
           enterpairsSpecial(h.p,strat->sl,h.ecart,pos,strat,strat->tl+1);
           strat->enterS(h,pos,strat, strat->tl+1);
-      h.pLength=pLength(h.p);
           enterT(h,strat);
         }
       }
@@ -4786,8 +4787,8 @@ void updateS(BOOLEAN toT,kStrategy strat)
           if ((strat->ak!=0)&&(strat->S[i]!=NULL))
             strat->S[i]=redQ(strat->S[i],i+1,strat); /*reduce S[i] mod Q*/
           if (pCmp(redSi,strat->S[i])!=0)
-      {
-        change=TRUE;
+          {
+            change=TRUE;
             if (TEST_OPT_DEBUG)
             {
               PrintS("reduce:");
@@ -4801,7 +4802,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
                 PrintS("v");
               mflush();
             }
-      }
+          }
           pDeleteLm(&redSi);
           if (strat->S[i]==NULL)
           {
@@ -4847,11 +4848,12 @@ void updateS(BOOLEAN toT,kStrategy strat)
           strat->initEcart(&h);
           strat->ecartS[i] = h.ecart;
         }
+        else
+          h.length=h.pLength=pLength(h.p);
         if (strat->sevS[i] == 0) {strat->sevS[i] = pGetShortExpVector(h.p);}
         else assume(strat->sevS[i] == pGetShortExpVector(h.p));
         h.sev = strat->sevS[i];
         h.SetpFDeg();
-    h.pLength=pLength(h.p);
         /*puts the elements of S also to T*/
         enterT(h,strat);
         strat->S_2_R[i] = strat->tl;
@@ -4930,10 +4932,10 @@ void updateS(BOOLEAN toT,kStrategy strat)
         h.p = strat->S[i];
         h.ecart=strat->ecartS[i];
         h.sev = strat->sevS[i];
+        h.length = h.pLength = pLength(h.p);
       }
       if ((strat->fromQ==NULL) || (strat->fromQ[i]==0))
         cancelunit1(&h,&suc,strat->sl,strat);
-      h.length = pLength(h.p);
       h.SetpFDeg();
       /*puts the elements of S also to T*/
       enterT(h,strat);

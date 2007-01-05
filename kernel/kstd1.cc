@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.16 2007-01-04 10:42:45 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.17 2007-01-05 17:59:32 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -89,12 +89,12 @@ static BOOLEAN kMoraUseBucket(kStrategy strat);
 
 static void kOptimizeLDeg(pLDegProc ldeg, kStrategy strat)
 {
-  if (strat->ak == 0 && !rIsSyzIndexRing(currRing))
+//  if (strat->ak == 0 && !rIsSyzIndexRing(currRing))
     strat->length_pLength = TRUE;
-  else
-    strat->length_pLength = FALSE;
+//  else
+//    strat->length_pLength = FALSE;
 
-  if ((ldeg == pLDeg0c && !rIsSyzIndexRing(currRing)) ||
+  if ((ldeg == pLDeg0c /*&& !rIsSyzIndexRing(currRing)*/) ||
       (ldeg == pLDeg0 && strat->ak == 0))
   {
     strat->LDegLast = TRUE;
@@ -336,7 +336,7 @@ int redFirst (LObject* h,kStrategy strat)
     reddeg = strat->LazyDegree+d;
   }
   h->SetShortExpVector();
-  while (1)
+  loop
   {
     j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
     if (j < 0)
