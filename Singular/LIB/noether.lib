@@ -1,32 +1,39 @@
-// AH/GP last modified:  12.05.2006
+// AH last modified:  01.07.2007
 //////////////////////////////////////////////////////////////////////////////
-version = "$Id: noether.lib,v 1.3 2006-12-11 18:57:42 Singular Exp $";
+version = "$Id: noether.lib,v 1.4 2007-01-08 12:59:38 pfister Exp $";
 category="Commutative Algebra";
 info="
-LIBRARY: noether.lib   Noether normalization of an ideal (not nessecary homogeneous)
+LIBRARY: noether.lib   Noether normalization of an ideal (not nessecary 
+                       homogeneous)
 AUTHORS: A. Hashemi,  Amir.Hashemi@lip6.fr
 
 
 OVERVIEW:
- A library for computing the Noether normalization of an ideal that DOES NOT require the computation of the dimension of the ideal.
-It checks whether an ideal is in Noether position.  A modular version of these algorithms is also provided.
-The procedures are based on a paper of Amir Hashemi 'Efficient Algorithms for Computing Noether Normalization'
-Submitted to: Special Issue of Mathematics in Computer Science on Symbolic and Numeric Computation.
+A library for computing the Noether normalization of an ideal that DOES NOT 
+require the computation of the dimension of the ideal.
+It checks whether an ideal is in Noether position.  A modular version of 
+these algorithms is also provided.
+The procedures are based on a paper of Amir Hashemi 'Efficient Algorithms for 
+Computing Noether Normalization'
+Submitted to: Special Issue of Mathematics in Computer Science on Symbolic 
+and Numeric Computation.
 
-This library computes also Castelnuovo-Mumford regularity and satiety of an ideal.  A modular version of these algorithms is also provided.
-The procedures are based on a paper of Amir Hashemi 'Computation of  Castelnuovo-Mumford regularity and satiety'
+This library computes also Castelnuovo-Mumford regularity and satiety of an 
+ideal.  A modular version of these algorithms is also provided.
+The procedures are based on a paper of Amir Hashemi 'Computation of  
+Castelnuovo-Mumford regularity and satiety'
 Submitted to: ISSAC 2007.
 
 
 PROCEDURES:
  NP_test(id);  checks whether monomial ideal id is in Noether position
- MNP_test(id);  checks whether ideal id is in Noether position by modular methods
- NP(id);  Noether normalization of ideal id
- MNP(id);  Noether normalization of ideal id by modular methods
- nsatiety(id);  Satiety of ideal id
+ MNP_test(id); the same as above using modular methods
+ NP(id);       Noether normalization of ideal id
+ MNP(id);      Noether normalization of ideal id by modular methods
+ nsatiety(id); Satiety of ideal id
  msatiety(id)  Satiety of ideal id by modular methods
- regCM(id);  Castelnuovo-Mumford regularity of ideal id
- mregCM(id);  Castelnuovo-Mumford regularity of ideal id by modular methods
+ regCM(id);    Castelnuovo-Mumford regularity of ideal id
+ mregCM(id);   Castelnuovo-Mumford regularity of ideal id by modular methods
 ";
 LIB "elim.lib";
 LIB "algebra.lib";
@@ -35,14 +42,15 @@ LIB "ring.lib";
 LIB "presolve.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
+
 proc NP_test (ideal I)
 "
-USAGE:  NP-test (I); I monomial ideal
-RETURN:  A list which first element is 1 if i is in Noether position
-  0  otherwise. The second element of this list is the list of variable which
-  its first part is the variable such that a power of this varaibles belong to the initial of i.
-  It return also the dimension of i if i is in Noether position
-ASSUME:  i is a nonzero monomial ideal.
+USAGE:	NP-test (I); I monomial ideal
+RETURN:	A list which first element is 1 if i is in Noether position
+	0  otherwise. The second element of this list is the list of variable which 
+	its first part is the variable such that a power of this varaibles belong to the initial of i.
+	It return also the dimension of i if i is in Noether position
+ASSUME:	i is a nonzero monomial ideal.
 "
 {
 //--------------------------- initialisation ---------------------------------
@@ -53,56 +61,56 @@ ASSUME:  i is a nonzero monomial ideal.
    list L,Y,P1,P2,P3;
    if (I[1]==1)
    {
-   print("The ideal is 1");return(1);
+	 print("The ideal is 1");return(1);
    }
    for ( ii = 1; ii <= n+1; ii++ )
      {
-  L[ii]=0;
+	L[ii]=0;
      }
    for ( ii = 1; ii <= size(I); ii++ )
    {
-    Y=findvars(I[ii],1)[1];
-  l=rvar(Y[1][1]);
-  if (size(Y[1])==1)
-  {
-    L[l]=1;
-    P1=insert(P1,Y[1][1]);
-  }
-  if (L[l]==0)
-  {
-    L[l]=-1;
-  }
+  	Y=findvars(I[ii],1)[1];
+	l=rvar(Y[1][1]);
+	if (size(Y[1])==1)	
+	{
+		L[l]=1;
+		P1=insert(P1,Y[1][1]);
+	}
+	if (L[l]==0)
+	{
+		L[l]=-1;
+	}
     }
    t=size(P1);
    if (t==0)
    {
          for ( jj = 1; jj <= n+1; jj++ )
          {
-         P3=insert(P3,varstr(jj));
-         }
+	       P3=insert(P3,varstr(jj));
+         }        
    }
    else
    {
          P2=findvars(ideal(P1[1..t]),1)[3];
          for ( jj = 1; jj <= size(P2[1]); jj++ )
          {
-         P3=insert(P3,P2[1][jj]);
+	       P3=insert(P3,P2[1][jj]);
          }
    }
    if (L[n+1]==-1)
         {
-     return(list(0,P1+P3));
-  }
+		 return(list(0,P1+P3));	
+	}
    for ( ii = 1; ii <= n; ii++ )
      {
-  if (L[ii]==-1)
+	if (L[ii]==-1)
         {
-     return(list(0,P1+P3));
-  }
-  if (L[ii]==0 and L[ii+1]==1)
+		 return(list(0,P1+P3));	
+	}
+	if (L[ii]==0 and L[ii+1]==1)
         {
-     return(list(0,P1+P3));
-  }
+		 return(list(0,P1+P3));	
+	}
     }
     d=n+1-sum(L);
     print("The dimension of the ideal is:");print(d);
@@ -111,9 +119,9 @@ ASSUME:  i is a nonzero monomial ideal.
 }
 //////////////////////////////////////////
 proc MNP_test (ideal i)
-"USAGE:  MNP-test (i); i an ideal
-RETURN:  1 if i is in Noether position 0  otherwise.
-NOTE:  This test is a probabilistic test, and it computes the initial of the ideal modulo the prime number 2147483647 (the biggest prime less than 2^31).
+"USAGE:	MNP-test (i); i an ideal
+RETURN:	1 if i is in Noether position 0  otherwise.
+NOTE:	This test is a probabilistic test, and it computes the initial of the ideal modulo the prime number 2147483647 (the biggest prime less than 2^31).	
 "
 {
        "// WARNING:
@@ -144,7 +152,7 @@ NOTE:  This test is a probabilistic test, and it computes the initial of the ide
 proc NP (ideal i)
 "
 USAGE:   NP (i); i ideal
-RETURN:  A linear map phi such that  phi(i) is in Noether position
+RETURN:  A linear map phi such that  phi(i) is in Noether position 
 "
 {
 //--------------------------- initialisation ---------------------------------
@@ -167,29 +175,29 @@ RETURN:  A linear map phi such that  phi(i) is in Noether position
    #=NP_test(sbi);
    if ( #[1]== 1 )
      {
-  return ("The ideal is in Noether position and the time of this computation is:",rtimer-time,"/10 sec.");
+	return ("The ideal is in Noether position and the time of this computation is:",rtimer-time,"/10 sec.");
      }
    else
      {
-    L=maxideal(1);
-    chcoord=maxideal(1);
-     for ( ii = 1; ii<=n+1; ii++ )
-    {
-       chcoord[rvar(#[2][ii])]=L[ii];
-    }
-    phi=r1,chcoord;
+		L=maxideal(1);
+		chcoord=maxideal(1);
+ 		for ( ii = 1; ii<=n+1; ii++ ) 
+		{
+ 			chcoord[rvar(#[2][ii])]=L[ii];
+		}
+		phi=r1,chcoord;
                 sbi=phi(sbi);
                 if ( NP_test(sbi)[1] == 1 )
-              {
-            setring r0;
-            chcoord=fetch(r1,chcoord);
-     return (chcoord,"and the time of this computation is:",rtimer-time,"/10 sec.");
+    	        {
+       		 setring r0;
+       		 chcoord=fetch(r1,chcoord);
+		 return (chcoord,"and the time of this computation is:",rtimer-time,"/10 sec.");
                 }
      }
    while ( nl < 30 )
    {
      nl=nl+1;
-     I=i;
+     I=i;	
      L=maxideal(1);
      for ( ii = n; ii>=0; ii-- )
      {
@@ -200,20 +208,20 @@ RETURN:  A linear map phi such that  phi(i) is in Noether position
        m=select1(maxideal(1),1,(ii+1));
        for ( jj = 1; jj<=ii+1; jj++ )
        {
-           P=P+ran[1,jj]*m[jj];
+       		P=P+ran[1,jj]*m[jj];
        }
        chcoord[ii+1]=P;
-  L[ii+1]=P;
+	L[ii+1]=P;
        P=0;
        phi=r1,chcoord;
        I=phi(I);
        if ( NP_test(sort(lead(std(I)))[1])[1] == 1 )
-         {
-     K=x(ii..n);
-            setring r0;
-            K=fetch(r1,K);
-                 ideal L=fetch(r1,L);
-     return (L,"and the time of this computation is:",rtimer-time,"/10 sec.");
+    	   {
+		 K=x(ii..n);
+       		 setring r0;
+       		 K=fetch(r1,K);
+                 ideal L=fetch(r1,L); 
+		 return (L,"and the time of this computation is:",rtimer-time,"/10 sec.");
            }
 
      }
@@ -225,9 +233,9 @@ RETURN:  A linear map phi such that  phi(i) is in Noether position
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc MNP (ideal i)
-"USAGE:  MNP (i); i ideal
-RETURN:  A linear map phi such that  phi(i) is in Noether position
-NOTE:  It uses the procedure  MNP_test to test Noether position.
+"USAGE:	MNP (i); i ideal
+RETURN:	A linear map phi such that  phi(i) is in Noether position
+NOTE:	It uses the procedure  MNP_test to test Noether position.	
 "
 {
 //--------------------------- initialisation ---------------------------------
@@ -245,32 +253,32 @@ NOTE:  It uses the procedure  MNP_test to test Noether position.
    i = fetch(r0,i);
    time=rtimer;
    system("--ticks-per-sec",10);
-    #=MNP_test(i);
+   #=MNP_test(i);
    if ( #[1]== 1 )
      {
-  return ("The ideal is in Noether position and the time of this computation is:",rtimer-time,"/10 sec.");
+	return ("The ideal is in Noether position and the time of this computation is:",rtimer-time,"/10 sec.");
      }
    else
      {
-    L=maxideal(1);
-    chcoord=maxideal(1);
-     for ( ii = 1; ii<=n+1; ii++ )
-    {
-       chcoord[rvar(#[2][ii])]=L[ii];
-    }
-    phi=r1,chcoord;
+		L=maxideal(1);
+		chcoord=maxideal(1);
+ 		for ( ii = 1; ii<=n+1; ii++ ) 
+		{
+ 			chcoord[rvar(#[2][ii])]=L[ii];
+		}
+		phi=r1,chcoord;
                 I=phi(i);
                 if ( MNP_test(I)[1] == 1 )
-              {
-            setring r0;
-            chcoord=fetch(r1,chcoord);
-     return (chcoord,"and the time of this computation is:",rtimer-time,"/10 sec.");
+    	        {
+       		 setring r0;
+       		 chcoord=fetch(r1,chcoord);
+		 return (chcoord,"and the time of this computation is:",rtimer-time,"/10 sec.");
                 }
      }
    while ( nl < 30 )
    {
      nl=nl+1;
-     I=i;
+     I=i;	
      L=maxideal(1);
      for ( ii = n; ii>=0; ii-- )
      {
@@ -281,7 +289,7 @@ NOTE:  It uses the procedure  MNP_test to test Noether position.
        m=select1(maxideal(1),1,(ii+1));
        for ( jj = 1; jj<=ii+1; jj++ )
        {
-           P=P+ran[1,jj]*m[jj];
+       		P=P+ran[1,jj]*m[jj];
        }
        chcoord[ii+1]=P;
        L[ii+1]=P;
@@ -289,12 +297,12 @@ NOTE:  It uses the procedure  MNP_test to test Noether position.
        phi=r1,chcoord;
        I=phi(I);
        if ( MNP_test(I)[1] == 1 )
-         {
-     K=x(ii..n);
-            setring r0;
-            K=fetch(r1,K);
-                 ideal L=fetch(r1,L);
-     return (L,"and the time of this computation is:",rtimer-time,"/10 sec.");
+    	   {
+		 K=x(ii..n);
+       		 setring r0;
+       		 K=fetch(r1,K);
+                 ideal L=fetch(r1,L); 
+		 return (L,"and the time of this computation is:",rtimer-time,"/10 sec.");
            }
 
      }
@@ -308,10 +316,10 @@ NOTE:  It uses the procedure  MNP_test to test Noether position.
 ////////////////////////////////////////////////////////////////////////////////////
 proc Test (ideal i)
 "
-USAGE:   Test (i); i a monomial ideal,
+USAGE:   Test (i); i a monomial ideal, 
 RETURN:  1 if the last variable is in generic position for i and 0 otherwise.
-THEORY:  The last variable is in generic position if the quotient of the ideal
-   with respect to this variable is equal to the quotient of the ideal with respect to the maximal ideal.
+THEORY:  The last variable is in generic position if the quotient of the ideal 
+	 with respect to this variable is equal to the quotient of the ideal with respect to the maximal ideal.
 "
 {
 //--------------------------- initialisation ---------------------------------
@@ -328,7 +336,7 @@ THEORY:  The last variable is in generic position if the quotient of the ideal
    ret=1;
    if (size(reduce(I,i)) <> 0)
    {
-  ret=0;
+	ret=0;
    }
 return(ret);
 }
@@ -337,13 +345,13 @@ return(ret);
 ////////////////////////////////////////////////////////////////////////////////////
 proc nsatiety (ideal i)
 "
-USAGE:   nsatiety (i); i ideal,
+USAGE:   nsatiety (i); i ideal, 
 RETURN:  an integer, the satiety of i.
          (returns -1 if i is not homogeneous)
 ASSUME:  i is a homogeneous ideal of the basering R=K[x(0)..x(n)].
 THEORY:  The satiety, or saturation index, of a homogeneous ideal i is the
          least integer s such that, for all d>=s, the degree d part of the
-         ideals i and isatiety=satiety(i,maxideal(1))[1] coincide.
+         ideals i and isat=sat(i,maxideal(1))[1] coincide.
 "
 {
 //--------------------------- initialisation ---------------------------------
@@ -364,24 +372,24 @@ THEORY:  The satiety, or saturation index, of a homogeneous ideal i is the
    if ( homog(sbi) == 0 )
    {
        dbprint(2,"The ideal is not homogeneous, and time for this test is: " + string(rtimer-time) + "/100sec.");
-  return ();
+	return ();
    }
    I=simplify(lead(sbi),1);
    attrib(I,"isSB",1);
    K=select(I,n+1);
    if (size(K) == 0)
    {
-  dbprint(2,"satiety(i)=0 and the time of this computation: " + string(rtimer-time) + "/100sec.");
-  return();
+	dbprint(2,"sat(i)=0 and the time of this computation: " + string(rtimer-time) + "/100sec.");
+	return();
    }
    if (Test(I) == 1 )
    {
-  dbprint(2,"satiety(i)=" + string(maxdeg1(K)) + " and the time of this computation: " + string(rtimer-time) + "/100sec.");
-  return();
+	dbprint(2,"sat(i)=" + string(maxdeg1(K)) + " and the time of this computation: " + string(rtimer-time) + "/100sec.");
+	return();
    }
    while ( nl < 5 )
    {
-     nl=nl+1;
+     nl=nl+1;	
      chcoord=select1(maxideal(1),1,(n));
      ran=random(100,1,n);
      ran=intmat(ran,1,n+1);
@@ -389,7 +397,7 @@ THEORY:  The satiety, or saturation index, of a homogeneous ideal i is the
      m=select1(maxideal(1),1,(n+1));
      for ( jj = 1; jj<=n+1; jj++ )
        {
-           P=P+ran[1,jj]*m[jj];
+       		P=P+ran[1,jj]*m[jj];
        }
      chcoord[n+1]=P;
      P=0;
@@ -397,16 +405,16 @@ THEORY:  The satiety, or saturation index, of a homogeneous ideal i is the
      L=std(phi(i));
      I=simplify(lead(L),1);
      attrib(I,"isSB",1);
-     K=select(I,n+1);
+     K=select(I,n+1); 
      if (size(K) == 0)
      {
-  dbprint(2,"satiety(i)=0 and the time of this computation: " + string(rtimer-time) + "/100sec.");
-  return();
+	dbprint(2,"sat(i)=0 and the time of this computation: " + string(rtimer-time) + "/100sec.");
+	return();
      }
      if (Test(I) == 1 )
      {
-  dbprint(2,"satiety(i)=" + string(maxdeg1(K)) + " and the time of this computation: " + string(rtimer-time) + "/100sec.");
-  return();
+	dbprint(2,"sat(i)=" + string(maxdeg1(K)) + " and the time of this computation: " + string(rtimer-time) + "/100sec.");
+	return();
      }
    }
 }
@@ -415,19 +423,20 @@ THEORY:  The satiety, or saturation index, of a homogeneous ideal i is the
 //////////////////////////////////////////////////////////////////////////////
 proc msatiety (ideal i)
 "
-USAGE:   msatiety (i); i ideal,
+USAGE:   msatiety (i); i ideal, 
 RETURN:  an integer, the satiety of i.
          (returns -1 if i is not homogeneous)
 ASSUME:  i is a homogeneous ideal of the basering R=K[x(0)..x(n)].
 THEORY:  The satiety, or saturation index, of a homogeneous ideal i is the
          least integer s such that, for all d>=s, the degree d part of the
-         ideals i and isatiety=satiety(i,maxideal(1))[1] coincide.
-NOTE:   This is a probabilistic procedure, and it computes the initial of the ideal modulo the prime number 2147483647 (the biggest prime less than 2^31).
+         ideals i and isat=sat(i,maxideal(1))[1] coincide.
+NOTE:	 This is a probabilistic procedure, and it computes the initial of the ideal modulo the prime number 2147483647 (the biggest prime less than 2^31).
 "
 {
 //--------------------------- initialisation ---------------------------------
-       "// WARNING:
-// The procedure is probabilistic and  it computes the initial of the ideal modulo the prime number 2147483647";
+       "// WARNING: The characteristic of base field must be zero.
+// The procedure is probabilistic and  it computes the 
+//initial ideals modulo the prime number 2147483647.";
    int e,ii,jj,h,d,time,lastv,nl,ret,s1,d1,siz,j,si,u,k,p;
    intvec v1;
    intmat ran;
@@ -448,7 +457,7 @@ NOTE:   This is a probabilistic procedure, and it computes the initial of the id
    {
        "// WARNING: The ideal is not homogeneous.";
        dbprint(2,"Time for this test is: " + string(rtimer-time) + "/100sec.");
-  return ();
+	return ();
    }
    option(redSB);
    p=2147483647;
@@ -466,17 +475,17 @@ NOTE:   This is a probabilistic procedure, and it computes the initial of the id
    K=select(I,n+1);
    if (size(K) == 0)
    {
-  dbprint(2,"msatiety(i)=0 and the time of this computation: " + string(rtimer-time) + "/100sec.");
-  return();
+	dbprint(2,"msat(i)=0 and the time of this computation: " + string(rtimer-time) + "/100sec.");
+	return();
    }
    if (Test(I) == 1 )
    {
-  dbprint(2,"msatiety(i)=" + string(maxdeg1(K)) + " and the time of this computation: " + string(rtimer-time) + "/100sec.");
-  return();
+	dbprint(2,"msat(i)=" + string(maxdeg1(K)) + " and the time of this computation: " + string(rtimer-time) + "/100sec.");
+	return();
    }
    while ( nl < 30 )
    {
-     nl=nl+1;
+     nl=nl+1;	
      chcoord=select1(maxideal(1),1,(n));
      ran=random(100,1,n);
      ran=intmat(ran,1,n+1);
@@ -484,7 +493,7 @@ NOTE:   This is a probabilistic procedure, and it computes the initial of the id
      m=select1(maxideal(1),1,(n+1));
      for ( jj = 1; jj<=n+1; jj++ )
        {
-           P=P+ran[1,jj]*m[jj];
+       		P=P+ran[1,jj]*m[jj];
        }
      chcoord[n+1]=P;
      P=0;
@@ -501,44 +510,43 @@ NOTE:   This is a probabilistic procedure, and it computes the initial of the id
      kill oro;
      lsbi1=lead(sbi);
      attrib(lsbi1,"isSB",1);
-     K=select(lsbi1,n+1);
+     K=select(lsbi1,n+1); 
      if (size(K) == 0)
      {
-  dbprint(2,"msatiety(i)=0 and the time of this computation: " + string(rtimer-time) + "/100sec.");
-  return();
+	dbprint(2,"msat(i)=0 and the time of this computation: " + string(rtimer-time) + "/100sec.");
+	return();
      }
      if (Test(lsbi1) == 1 )
      {
-  dbprint(2,"msatiety(i)=" + string(maxdeg1(K)) + " and the time of this computation: " + string(rtimer-time) + "/100sec.");
-  return();
+	dbprint(2,"msat(i)=" + string(maxdeg1(K)) + " and the time of this computation: " + string(rtimer-time) + "/100sec.");
+	return();
      }
    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //
-proc regCM (ideal i)
+proc reg (ideal i)
 "
-USAGE:  regCM (i); i ideal
-RETURN:  the Castelnuovo-Mumford regularity of i.
+USAGE:	reg (i); i ideal
+RETURN:	the Castelnuovo-Mumford regularity of i.
          (returns -1 if i is not homogeneous)
 ASSUME:  i is a homogeneous ideal.
 "
 {
 //--------------------------- initialisation ---------------------------------
-   int e,ii,jj,H,h,d,time,lastv,nv,nl;
-   int lastind,ch,nesttest,NPtest,nl,N,acc;
-   intmat ran;
+   int e,ii,jj,H,h,d,time,nl;
    def r0 = basering;
    int n = nvars(r0)-1;
    string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
    execute(s);
-   ideal i,sbi,I,J,K,chcoord,m,L;
+   ideal i,sbi,I,J,K,L;
    list #;
    poly P;
    map phi;
    i = fetch(r0,i);
    time=rtimer;
+   system("--ticks-per-sec",100);
    sbi=std(i);
 //----- Check ideal homogeneous
    if ( homog(sbi) == 0 )
@@ -549,136 +557,229 @@ ASSUME:  i is a homogeneous ideal.
    I=simplify(lead(sbi),1);
    attrib(I,"isSB",1);
    d=dim(I);
-   K=select(I,n+1);
-   if (size(K) == 0)
+   if (char(r1) > 0 and d == 0)
    {
-  h=0;
-   }
-   if (Test(I) == 1)
-   {
-  h=maxdeg1(K);
+   	def r2=changechar("0",r1); 
+   	setring r2;
+   	ideal sbi,I,i,K,T;
+   	map phi;
+   	I = fetch(r1,I);
+   	i=I;
+	attrib(I,"isSB",1);
    }
    else
    {
-  while ( nl < 5 )
-  {
-    nl=nl+1;
-         chcoord=select1(maxideal(1),1,(n));
-         ran=random(100,1,n);
-         ran=intmat(ran,1,n+1);
-         ran[1,n+1]=1;
-         m=select1(maxideal(1),1,(n+1));
-         for ( jj = 1; jj<=n+1; jj++ )
-           {
-             P=P+ran[1,jj]*m[jj];
-           }
-         chcoord[n+1]=P;
-         P=0;
-         phi=r1,chcoord;
-    i=phi(i);
-         I=simplify(lead(std(i)),1);
-         attrib(I,"isSB",1);
-         K=select(I,n+1);
-         if (size(K) == 0)
-         {
-      h=0;break
-         }
-         if (Test(I) == 1 )
-         {
-      h=maxdeg1(K);break;
-    }
-  }
-    }
+   	def r2=changechar(charstr(r1),r1);
+   	setring r2;
+   	ideal sbi,I,i,K,T,ic,Ic;
+   	map phi;
+   	I = imap(r1,I); 
+	Ic=I;
+	attrib(I,"isSB",1);
+   	i = imap(r1,i);
+	ic=i;
+   }
+   K=select(I,n+1);
+   if (size(K) == 0)
+   {
+	h=0;
+   }
+   else
+   {
+	if (Test(I) == 1)
+   	{
+		h=maxdeg1(K);
+   	}
+   	else
+   	{	 
+		while ( nl < 30 )
+		{
+			nl=nl+1;
+     			phi=r2,randomLast(100);
+			T=phi(i);
+     			I=simplify(lead(std(T)),1);
+     			attrib(I,"isSB",1);
+     			K=select(I,n+1); 
+     			if (size(K) == 0)
+     			{
+				h=0;break
+     			}
+     			if (Test(I) == 1 )
+     			{
+				h=maxdeg1(K);break;
+			}
+		}
+		i=T;
+    	}
+   }
    for ( ii = n; ii>=n-d+1; ii-- )
    {
-  i=subst(i,x(ii),0);
-  s = "ring mr = ",charstr(r0),",x(0..ii-1),dp;";
-  execute(s);
-  ideal i,sbi,I,J,K,chcoord,m,L;
-     poly P;
-     map phi;
-  i=imap(r1,i);
-  sbi=std(i);
-        I=simplify(lead(sbi),1);
-  attrib(I,"isSB",1);
-       K=select(I,ii);
-       if (size(K) == 0)
-       {
-    H=0;
-       }
-  if (Test(I) == 1)
-  {
-    H=maxdeg1(K);
-     }
-     else
-     {
-    while ( nl < 5 )
-    {
-      nl=nl+1;
-           chcoord=select1(maxideal(1),1,(ii-1));
-           ran=random(100,1,ii-1);
-           ran=intmat(ran,1,ii);
-           ran[1,ii]=1;
-           m=select1(maxideal(1),1,(ii));
-           for ( jj = 1; jj<=ii; jj++ )
-             {
-               P=P+ran[1,jj]*m[jj];
-             }
-           chcoord[ii]=P;
-           P=0;
-           phi=mr,chcoord;
-           i=phi(i);
-           I=simplify(lead(std(i)),1);
-           attrib(I,"isSB",1);
-           K=select(I,ii);
-           if (size(K) == 0)
-           {
-        H=0;break;
-           }
-           if (Test(I) == 1 )
-           {
-        H=maxdeg1(K);break;
-      }
-    }
-    setring r1;
-    i=imap(mr,i);
-    kill mr;
-      }
-  if (H > h)
-  {
-    h=H;
-  }
+	i=subst(i,x(ii),0);
+	s = "ring mr = ",charstr(r1),",x(0..ii-1),dp;";	
+	execute(s);
+	ideal i,sbi,I,J,K,L,T;
+   	poly P;
+   	map phi;
+	i=imap(r2,i);
+        I=simplify(lead(std(i)),1);
+	attrib(I,"isSB",1);
+     	K=select(I,ii);
+     	if (size(K) == 0)
+     	{
+		H=0;
+     	}
+	else
+	{
+		if (Test(I) == 1)
+		{
+			H=maxdeg1(K);
+   		}
+   		else
+   		{
+			while ( nl < 30 )
+			{
+				nl=nl+1;	
+     				phi=mr,randomLast(100);
+				T=phi(i);
+     				I=simplify(lead(std(T)),1);
+     				attrib(I,"isSB",1);
+     				K=select(I,ii); 
+     				if (size(K) == 0)
+     				{
+					H=0;break;
+     				}
+     				if (Test(I) == 1 )
+     				{
+					H=maxdeg1(K);break;
+				}
+			} 
+			setring r2;
+			i=imap(mr,T);
+			kill mr;
+    		}
+	}
+	if (H > h)
+	{
+		h=H;
+	}
    }
-dbprint(2,"regCM(i)=" + string(h) + " and the time of this computation: " + string(rtimer-time) + "/100sec.");
-return();
+   if (nl < 30)
+   {	
+   	dbprint(2,"reg(i)=" + string(h) + " and the time of this computation: " + string(rtimer-time) + " sec./100");
+   	return();
+   }
+   else
+   {
+	I=Ic;
+	attrib(I,"isSB",1);
+	i=ic;
+	K=subst(select(I,n+1),x(n),1);
+	K=K*maxideal(maxdeg1(I));
+	if (size(reduce(K,I)) <> 0)
+   	{
+		nl=0;
+		while ( nl < 30 )
+		{
+			nl=nl+1;
+     			phi=r1,randomLast(100);
+			sbi=phi(i);
+     			I=simplify(lead(std(sbi)),1);
+     			attrib(I,"isSB",1);
+    			K=subst(select(I,n+1),x(n),1);
+   			K=K*maxideal(maxdeg1(I));
+    			if (size(reduce(K,I)) == 0)
+			{
+				break;
+			}
+		}
+   	}	
+	h=maxdeg1(simplify(reduce(quotient(I,maxideal(1)),I),2))+1;
+   	for ( ii = n; ii> n-d+1; ii-- )
+   	{
+		sbi=subst(sbi,x(ii),0);
+		s = "ring mr = ",charstr(r0),",x(0..ii-1),dp;";	
+		execute(s);
+		ideal sbi,I,L,K,T;
+		map phi;
+		sbi=imap(r1,sbi);
+		I=simplify(lead(std(sbi)),1);
+		attrib(I,"isSB",1);
+		K=subst(select(I,ii),x(ii-1),1);
+		K=K*maxideal(maxdeg1(I));
+		if (size(reduce(K,I)) <> 0)
+ 		{
+			nl=0;
+			while ( nl < 30 )
+			{
+				nl=nl+1;
+				L=randomLast(100);
+     				phi=mr,L;
+				T=phi(sbi);
+     				I=simplify(lead(std(T)),1);
+     				attrib(I,"isSB",1);
+    				K=subst(select(I,ii),x(ii-1),1);
+   				K=K*maxideal(maxdeg1(I));
+    				if (size(reduce(K,I)) == 0)
+				{
+					sbi=T;
+					break;
+				}
+			}	
+		}
+		H=maxdeg1(simplify(reduce(quotient(I,maxideal(1)),I),2))+1;
+		if (H > h)
+		{
+			h=H;
+		}
+        	setring r1;
+		sbi=fetch(mr,sbi);
+		kill mr;
+   	}
+   sbi=subst(sbi,x(n-d+1),0);
+   s = "ring mr = ",charstr(r0),",x(0..n-d),dp;";	
+   execute(s);
+   ideal sbi,I,L,K,T;
+   map phi;
+   sbi=imap(r1,sbi);
+   I=simplify(lead(std(sbi)),1);
+   attrib(I,"isSB",1);
+   H=maxdeg1(simplify(reduce(quotient(I,maxideal(1)),I),2))+1;
+   if (H > h)
+   {
+	h=H;
+   }
+   dbprint(2,"reg(i)=" + string(h) + " and the time of this computation: " + string(rtimer-time) + " sec./100");
+   return();
+   }
 }
+
 //////////////////////////////////////////////////////////////////////////////
 //
-proc mregCM (ideal i)
+proc mreg (ideal i)
 "
-USAGE:  mregCM (i); i ideal
-RETURN:  an integer, the Castelnuovo-Mumford regularity of i.
+USAGE:	 mreg (i); i ideal
+RETURN:	 an integer, the Castelnuovo-Mumford regularity of i.
          (returns -1 if i is not homogeneous)
-ASSUME:  i is a homogeneous ideal.
-NOTE:   This is a probabilistic procedure, and it computes the initial of the ideal modulo the prime number 2147483647 (the biggest prime less than 2^31).
+ASSUME:  i is a homogeneous ideal and the characteristic of base field is zero..
+NOTE:	 This is a probabilistic procedure, and it computes the initial of the ideal modulo the prime number 2147483647 (the biggest prime less than 2^31).
 "
 {
 //--------------------------- initialisation ---------------------------------
-       "// WARNING:
-// The procedure is probabilistic and  it computes the initial of the ideal modulo the prime number 2147483647";
-   int e,ii,jj,H,h,d,time,lastv,sat,firstind,nv,nl,p;
-   int lastind,ch,nesttest,NPtest,nl,N,acc;
-   intmat ran;
+       "// WARNING: The characteristic of base field musr be zero.
+// This procedure is probabilistic and  it computes the initial 
+//ideals modulo the prime number 2147483647";
+   int e,ii,jj,H,h,d,time,p,nl;
    def r0 = basering;
    int n = nvars(r0)-1;
    string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
    execute(s);
-   ideal i,sbi,I,J,K,chcoord,m,L,lsbi1,lsbi2;
+   ideal i,sbi,I,J,K,L,lsbi1,lsbi2;
    list #;
    poly P;
    map phi;
    i = fetch(r0,i);
    time=rtimer;
+   system("--ticks-per-sec",100);
 //----- Check ideal homogeneous
    if ( homog(i) == 0 )
    {
@@ -701,142 +802,135 @@ NOTE:   This is a probabilistic procedure, and it computes the initial of the id
    kill oro;
    I=lsbi1;
    d=dim(I);
-   K=select(I,n+1);
+   K=select(I,n+1); 
    if (size(K) == 0)
    {
-  h=0;
-   }
-   if (Test(I) == 1)
-   {
-  h=maxdeg1(K);
+	h=0;
    }
    else
    {
-  while ( nl < 5 )
-  {
-    nl=nl+1;
-         chcoord=select1(maxideal(1),1,(n));
-         ran=random(100,1,n);
-         ran=intmat(ran,1,n+1);
-         ran[1,n+1]=1;
-         m=select1(maxideal(1),1,(n+1));
-         for ( jj = 1; jj<=n+1; jj++ )
-           {
-             P=P+ran[1,jj]*m[jj];
-           }
-         chcoord[n+1]=P;
-         P=0;
-         phi=r1,chcoord;
-    i=phi(i);
-       #=ringlist(r1);
-       #[1]=p;
-       def oro=ring(#);
-       setring oro;
-       ideal sbi,lsbi;
-       sbi=fetch(r1,i);
-       lsbi=lead(std(sbi));
-       setring r1;
-       lsbi1=fetch(oro,lsbi);
-       lsbi1=simplify(lsbi1,1);
-       attrib(lsbi1,"isSB",1);
-       kill oro;
-    I=lsbi1;
-         K=select(I,n+1);
-         if (size(K) == 0)
-         {
-      h=0;break
-         }
-         if (Test(I) == 1 )
-         {
-      h=maxdeg1(K);break;
-    }
-  }
-    }
+	if (Test(I) == 1)
+   	{
+		h=maxdeg1(K);
+   	}
+   	else
+   	{
+		while ( nl < 30 )
+		{
+			nl=nl+1;	
+      			phi=r1,randomLast(100);
+			sbi=phi(i);
+   			#=ringlist(r1);
+   			#[1]=p;
+   			def oro=ring(#);
+   			setring oro;
+   			ideal sbi,lsbi;
+   			sbi=fetch(r1,sbi);
+   			lsbi=lead(std(sbi));
+   			setring r1;
+   			lsbi1=fetch(oro,lsbi);
+   			lsbi1=simplify(lsbi1,1);
+   			attrib(lsbi1,"isSB",1);
+   			kill oro;
+			I=lsbi1;
+     			K=select(I,n+1); 
+     			if (size(K) == 0)
+     			{
+				h=0;break
+     			}
+     			if (Test(I) == 1 )
+     			{
+				h=maxdeg1(K);break;
+			}
+		}
+		i=sbi;
+    	}
+   }
    for ( ii = n; ii>=n-d+1; ii-- )
    {
-  i=subst(i,x(ii),0);
-  s = "ring mr = ",charstr(r0),",x(0..ii-1),dp;";
-  execute(s);
-  ideal i,sbi,I,J,K,chcoord,m,L,lsbi1;
-     poly P;
+	i=subst(i,x(ii),0);
+	s = "ring mr = ","0",",x(0..ii-1),dp;";	
+	execute(s);
+	ideal i,sbi,I,J,K,L,lsbi1;
+   	poly P;
         list #;
-     map phi;
-  i=imap(r1,i);
-     #=ringlist(mr);
-     #[1]=p;
-     def oro=ring(#);
-     setring oro;
-     ideal sbi,lsbi;
-     sbi=fetch(mr,i);
-     lsbi=lead(std(sbi));
-     setring mr;
-     lsbi1=fetch(oro,lsbi);
-     lsbi1=simplify(lsbi1,1);
-     attrib(lsbi1,"isSB",1);
-     kill oro;
-  I=lsbi1;
-       K=select(I,ii);
-       if (size(K) == 0)
-       {
-    H=0;
-       }
-  if (Test(I) == 1)
-  {
-    H=maxdeg1(K);
-     }
-     else
-     {
-    while ( nl < 5 )
-    {
-      nl=nl+1;
-           chcoord=select1(maxideal(1),1,(ii-1));
-           ran=random(100,1,ii-1);
-           ran=intmat(ran,1,ii);
-           ran[1,ii]=1;
-           m=select1(maxideal(1),1,(ii));
-           for ( jj = 1; jj<=ii; jj++ )
-             {
-               P=P+ran[1,jj]*m[jj];
-             }
-           chcoord[ii]=P;
-           P=0;
-           phi=mr,chcoord;
-           i=phi(i);
-         #=ringlist(mr);
-         #[1]=p;
-         def oro=ring(#);
-         setring oro;
-         ideal sbi,lsbi;
-         sbi=fetch(mr,i);
-         lsbi=lead(std(sbi));
-         setring mr;
-         lsbi1=fetch(oro,lsbi);
-         lsbi1=simplify(lsbi1,1);
-         attrib(lsbi1,"isSB",1);
-         kill oro;
-      I=lsbi1;
-           K=select(I,ii);
-           if (size(K) == 0)
-           {
-        H=0;break;
-           }
-           if (Test(I) == 1 )
-           {
-        H=maxdeg1(K);break;
-      }
-    }
-    setring r1;
-    i=imap(mr,i);
-    kill mr;
-      }
-  if (H > h)
-  {
-    h=H;
-  }
-  }
-dbprint(2,"mregCM(i)=" + string(h) + " and the time of this computation: " + string(rtimer-time) + "/100sec.");
+   	map phi;
+	i=imap(r1,i);
+   	#=ringlist(mr);
+   	#[1]=p;
+   	def oro=ring(#);
+   	setring oro;
+   	ideal sbi,lsbi;
+   	sbi=fetch(mr,i);
+   	lsbi=lead(std(sbi));
+   	setring mr;
+   	lsbi1=fetch(oro,lsbi);
+   	lsbi1=simplify(lsbi1,1);
+   	attrib(lsbi1,"isSB",1);
+   	kill oro;
+	I=lsbi1;
+     	K=select(I,ii);
+     	if (size(K) == 0)
+     	{
+		H=0;
+     	}
+	else
+	{
+		if (Test(I) == 1)
+		{
+			H=maxdeg1(K);
+   		}
+   		else
+   		{
+			nl=0;
+			while ( nl < 30 )
+			{
+				nl=nl+1;	
+     				phi=mr,randomLast(100);
+     				sbi=phi(i);
+   				#=ringlist(mr);
+   				#[1]=p;
+   				def oro=ring(#);
+  	 			setring oro;
+   				ideal sbi,lsbi;
+   				sbi=fetch(mr,sbi);
+	   			lsbi=lead(std(sbi));
+   				setring mr;
+   				lsbi1=fetch(oro,lsbi);
+   				lsbi1=simplify(lsbi1,1);
+   				kill oro;
+				I=lsbi1;
+				attrib(I,"isSB",1);
+     				K=select(I,ii); 
+     				if (size(K) == 0)
+     				{
+					H=0;break;
+     				}
+     				if (Test(I) == 1 )
+     				{
+					H=maxdeg1(K);break;
+				}
+			} 
+			setring r1;
+			i=imap(mr,sbi);
+			kill mr;
+    		}
+	}
+	if (H > h)
+	{
+		h=H;
+	}
+   }
+dbprint(2,"mreg(i)=" + string(h) + " and the time of this computation: " + string(rtimer-time) + "sec./100");
 return();
 }
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////
 example
 { "EXAMPLE:"; echo = 2;
 ring r=0,(X,Y,a,b),dp;
@@ -915,5 +1009,4 @@ example
 ring r=0,(a,b,c,d,e,f,g,h,v,w,k,l,m,n,o,p,q,s,t,u),dp;
 ideal i=af+bg+ch+dv+ew-1/2, a2f+b2g+c2h+d2v+e2w-1/3,tdw+agk+ahl+bhm+avn+bvo+cvp+awq+bwu+cws-1/6, a3f+b3g+c3h+d3v+e3w-1/4, tdew+abgk+achl+bchm+advn+bdvo+cdvp+aewq+bewu+cews-1/8, td2w+a2gk+a2hl+b2hm+a2vn+b2vo+c2vp+a2wq+b2wu+c2ws-1/12, ahkm+tawn+tbwo+avko+tcwp+avlp+bvmp+awku+awls+bwms-1/24, a4f+b4g+c4h+d4v+e4w-1/5, tde2w+ab2gk+ac2hl+bc2hm+ad2vn+bd2vo+cd2vp+ae2wq+be2wu+ce2ws-1/10, td2ew+a2bgk+a2chl+b2chm+a2dvn+b2dvo+c2dvp+a2ewq+b2ewu+c2ews-1/15,achkm+taewn+tbewo+advko+tcewp+advlp+bdvmp+aewku+aewls+bewms-1/30,t2d2w+a2gk2+a2hl2+2abhlm+b2hm2+a2vn2+2abvno+b2vo2+2acvnp+2bcvop+c2vp2+2tadwq+a2wq2+2tbdwu+2abwqu+b2wu2+2tcdws+2acwqs+2bcwus+c2ws2-1/20,td3w+a3gk+a3hl+b3hm+a3vn+b3vo+c3vp+a3wq+b3wu+c3ws-1/20,abhkm+tadwn+tbdwo+abvko+tcdwp+acvlp+bcvmp+abwku+acwls+bcwms-1/40,a2hkm+ta2wn+tb2wo+a2vko+tc2wp+a2vlp+b2vmp+a2wku+a2wls+b2wms-1/60,tawko+tawlp+tbwmp+avkmp+awkms-1/20;
 }
-
 
