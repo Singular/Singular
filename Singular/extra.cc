@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.246 2007-01-08 16:53:51 Singular Exp $ */
+/* $Id: extra.cc,v 1.247 2007-01-08 16:59:41 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -835,7 +835,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         else currRing->nc->type=nc_skew;
         currRing->nc->IsSkewConstant=1;
         /* create matrix C */
-        C=mpNew(currRing->N,currRing->N);  
+        C=mpNew(currRing->N,currRing->N);  "Alternating variables: [", AltVarStart(ER), ", ", AltVarEnd(ER), "].";
+
         for(i=1;i<currRing->N;i++)
         {
           for(j=i+1;j<=currRing->N;j++)
@@ -2606,7 +2607,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return FALSE;
       }
 
-      WerrorS("`system(\"AltVarStart\",<ring>" requires sca");
+      WerrorS("`system(\"AltVarStart\",<ring>) requires sca");
       return TRUE;
     }
 /*==================== t-rep-GB ==================================*/
