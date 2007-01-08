@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.245 2007-01-04 14:08:00 motsak Exp $ */
+/* $Id: extra.cc,v 1.246 2007-01-08 16:53:51 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -835,8 +835,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         else currRing->nc->type=nc_skew;
         currRing->nc->IsSkewConstant=1;
         /* create matrix C */
-        C=mpNew(currRing->N,currRing->N);  "Alternating variables: [", AltVarStart(ER), ", ", AltVarEnd(ER), "].";
-
+        C=mpNew(currRing->N,currRing->N);  
         for(i=1;i<currRing->N;i++)
         {
           for(j=i+1;j<=currRing->N;j++)
@@ -979,31 +978,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
 #endif
-/*==================== sca?AltVar ==================================*/
-    if ( (strcmp(sys_cmd, "AltVarStart") == 0) || (strcmp(sys_cmd, "AltVarEnd") == 0) )
-    {
-      ring r = currRing;
-
-      if((h!=NULL) && (h->Typ()==RING_CMD)) r = (ring)h->Data(); else
-      {
-        WerrorS("`system(\"AltVarStart\"[,<ring>])` expected");
-        return TRUE;
-      }
-
-      res->rtyp=INT_CMD;
-
-      if (rIsSCA(r))
-      {
-        if(strcmp(sys_cmd, "AltVarStart") == 0)
-          res->data = (void*)scaFirstAltVar(r);
-        else
-          res->data = (void*)scaLastAltVar(r);
-        return FALSE;
-      }
-
-      res->data=NULL;
-      return TRUE;
-    }
 /*==================== opp ==================================*/
     if (strcmp(sys_cmd, "opp")==0)
     {
@@ -2610,6 +2584,31 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
+/*==================== sca?AltVar ==================================*/
+    if ( (strcmp(sys_cmd, "AltVarStart") == 0) || (strcmp(sys_cmd, "AltVarEnd") == 0) )
+    {
+      ring r = currRing;
+
+      if((h!=NULL) && (h->Typ()==RING_CMD)) r = (ring)h->Data(); else
+      {
+        WerrorS("`system(\"AltVarStart\"[,<ring>])` expected");
+        return TRUE;
+      }
+
+      res->rtyp=INT_CMD;
+
+      if (rIsSCA(r))
+      {
+        if(strcmp(sys_cmd, "AltVarStart") == 0)
+          res->data = (void*)scaFirstAltVar(r);
+        else
+          res->data = (void*)scaLastAltVar(r);
+        return FALSE;
+      }
+
+      WerrorS("`system(\"AltVarStart\",<ring>" requires sca");
+      return TRUE;
+    }
 /*==================== t-rep-GB ==================================*/
     if (strcmp(sys_cmd, "unifastmult")==0)
     {
