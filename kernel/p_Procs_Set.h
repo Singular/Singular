@@ -11,7 +11,7 @@
  *           have to be defined before this file is included
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Set.h,v 1.6 2007-01-04 16:22:47 Singular Exp $
+ *  Version: $Id: p_Procs_Set.h,v 1.7 2007-01-08 16:03:12 Singular Exp $
  *******************************************************************/
 #include "modulop.h"
 
@@ -183,7 +183,6 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
          p_Procs->p_Minus_mm_Mult_qq == p_Minus_mm_Mult_qq__FieldGeneral_LengthGeneral_OrdGeneral ||
          r->OrdSgn == 1 || r->LexOrder);
 */
-  #if 1
   #ifdef HAVE_PLURAL
   if (rIsPluralRing(r))
   {
@@ -194,7 +193,6 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
       SetProcsSCA(r, _p_procs);
     }
   }
-  #endif
   #endif
 }
 
