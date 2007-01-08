@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.28 2006-12-15 17:16:06 Singular Exp $ */
+/* $Id: ideals.cc,v 1.29 2007-01-08 16:05:40 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1088,7 +1088,7 @@ ideal idSect (ideal h1,ideal h2)
       if (syz_ring==orig_ring)
         temp->m[k] = pCopy(first->m[i]);
       else
-	temp->m[k] = prCopyR(first->m[i], orig_ring);
+        temp->m[k] = prCopyR(first->m[i], orig_ring);
       q = pOne();
       pSetComp(q,i+1+length);
       pSetmComp(q);
@@ -1108,7 +1108,7 @@ ideal idSect (ideal h1,ideal h2)
       if (syz_ring==orig_ring)
         temp->m[k] = pCopy(second->m[i]);
       else
-	temp->m[k] = prCopyR(second->m[i], orig_ring);
+        temp->m[k] = prCopyR(second->m[i], orig_ring);
       if (slength==0) pShift(&(temp->m[k]),1);
       k++;
     }
@@ -1128,9 +1128,9 @@ ideal idSect (ideal h1,ideal h2)
     && (p_GetComp(temp1->m[i],syz_ring)>length))
     {
       if(syz_ring==orig_ring)
-	p = pCopy(temp1->m[i]);
+        p = pCopy(temp1->m[i]);
       else
-	p = prCopyR(temp1->m[i], syz_ring);
+        p = prCopyR(temp1->m[i], syz_ring);
       while (p!=NULL)
       {
         q = pNext(p);
@@ -1138,7 +1138,7 @@ ideal idSect (ideal h1,ideal h2)
         k = pGetComp(p)-1-length;
         pSetComp(p,0);
         pSetmComp(p);
-	/* Warning! multiply only from the left! it's very important for Plural */
+        /* Warning! multiply only from the left! it's very important for Plural */
         result->m[j] = pAdd(result->m[j],pMult(p,pCopy(first->m[k])));
         p = q;
       }
@@ -2396,12 +2396,12 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   if (rIsPluralRing(currRing))
   {
     BOOLEAN BAD = FALSE;
-    if ( nc_rComplete(origR, &tmpR) ) 
+    if ( nc_rComplete(origR, &tmpR) )
     {
       Werror("error in nc_rComplete");
       BAD = TRUE;
     }
-    if (!BAD) 
+    if (!BAD)
     {
       /* tests the admissibility of the new elim. ordering */
       if ( nc_CheckOrdCondition( (&tmpR)->nc->D, &tmpR) )
@@ -2419,7 +2419,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
       omFreeSize((ADDRESS)block0,ordersize*sizeof(int));
       omFreeSize((ADDRESS)block1,ordersize*sizeof(int));
       rUnComplete(&tmpR);
-      if (w!=NULL)      
+      if (w!=NULL)
       {
         delete w;
       }
@@ -3021,7 +3021,7 @@ BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w)
     if (p!=NULL) cmax=si_max(cmax,(int)pMaxComp(p)+1);
   }
   if (w->length()+1 < cmax)
-  { 
+  {
     // Print("length: %d - %d \n", w->length(),cmax);
     return FALSE;
   }
@@ -3037,10 +3037,10 @@ BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w)
       {
         pIter(p);
         if (p==NULL) break;
-        if (d!=pFDeg(p,currRing)) 
+        if (d!=pFDeg(p,currRing))
         {
-          //pWrite(q); wrp(p); Print(" -> %d - %d\n",d,pFDeg(p,currRing)); 
-          return FALSE; 
+          //pWrite(q); wrp(p); Print(" -> %d - %d\n",d,pFDeg(p,currRing));
+          return FALSE;
         }
       }
     }
