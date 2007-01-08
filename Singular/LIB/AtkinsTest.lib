@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: AtkinsTest.lib,v 1.7 2007-01-08 13:14:02 pfister Exp $";
+version="$Id: AtkinsTest.lib,v 1.8 2007-01-08 14:08:49 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY:  AtkinsTest.lib     Procedures for teaching cryptography
@@ -14,7 +14,7 @@ NOTE: The library contains auxiliary procedures to compute the elliptic
 
 PROCEDURES:
   new(L,D)                     checks if number D already exists in list L
-  bubblesort(L)                sorts elements of the list L 
+  bubblesort(L)                sorts elements of the list L
   disc(N,k)                    generates a list of negative discriminants
   Cornacchia(d,p)              computes solution (x,y) for x^2+d*y^2=p
   CornacchiaModified(D,p)      computes solution (x,y) for x^2+|D|*y^2=4p
@@ -187,7 +187,7 @@ EXAMPLE:example Cornacchia; shows an example
        }
     }
   }
-}      
+}
 example
 { "EXAMPLE:"; echo = 2;
     ring R = 0,x,dp;
@@ -205,7 +205,7 @@ ASSUME: D<0, D kongruent 0 or 1 modulo 4 and |D|<4p
 EXAMPLE:example CornacchiaModified; shows an example
 "
 {
-   if((D>=0)||((D mod 4)==2)||((D mod 4)==3)||(absValue(D)>=4*p)) 
+   if((D>=0)||((D mod 4)==2)||((D mod 4)==3)||(absValue(D)>=4*p))
    {// (0)[Test if assumptions well-defined]
       return(0);
       // ERROR("Parameters wrong selected!");
@@ -242,7 +242,7 @@ EXAMPLE:example CornacchiaModified; shows an example
             }
             a=2*p;
             b=x(0);
-            l=intRoot(4*p);     
+            l=intRoot(4*p);
             while(b>l)     // (4)[Euclidean algorithm]
             {
                r=a mod b;
@@ -253,7 +253,7 @@ EXAMPLE:example CornacchiaModified; shows an example
             if((((4*p-b^2) mod absValue(D))!=0)||(c!=intRoot(c)^2))
             {
                return(-1);
-               // ERROR("The Diophantine equation has no solution!");  
+               // ERROR("The Diophantine equation has no solution!");
             }
             else
             {
@@ -809,7 +809,7 @@ NOTE:   - K/2 is input for the procedure "disc",
           B describes the number of recursions being calculated
         - The basis of the the algorithm is the following theorem:
           Let N be an integer coprime to 6 and different from 1 and E be an
-          ellipic curve modulo N. Assume that we know an integer m and a 
+          ellipic curve modulo N. Assume that we know an integer m and a
           point P of E(Z/NZ) satisfying the following conditions.
            (1) There exists a prime divisor q of m such that q>(4-th root(N)+1)^2.
            (2) m*P=O(E)=(0:1:0).
@@ -855,7 +855,7 @@ EXAMPLE:example Atkin; shows an example
       if(step==2)                  // (2)[Is N(i) small??]
       {
         L=5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,193,197,199,211,223,227,229,233,239,241,251,257,263,269,271,277,281,283,293,307,311,313,317,331,337,347,349,353,359,367,373,379,383,389,397,401,409,419,421,431,433,439,443,449,457,461,463,467,479,487,491,499,503,509,521,523,541,547,557,563,569,571,577,587,593,599,601,607,613,617,619,631,641,643,647,653,659,661,673,677,683,691,701,709,719,727,733,739,743,751,757,761,769,773,787,797,809,811,821,823,827,829,839,853,857,859,863,877,881,883,887,907,911,919,929,937,941,947,953,967,971,977,983,991,997;
-        for(j(0)=1;j(0)<=size(L);j(0)++)                         
+        for(j(0)=1;j(0)<=size(L);j(0)++)
         {
           if(((N(i) mod L[j(0)])==0)&&(N(i)!=L[j(0)]))
           {
@@ -903,7 +903,7 @@ EXAMPLE:example Atkin; shows an example
             }
             if(L1[1]==0)
             {
-              if(printLevel>=1) {"Algorithmus fuer N("+string(i)+")="+string(N(i))+" nicht anwendbar,"; 
+              if(printLevel>=1) {"Algorithmus fuer N("+string(i)+")="+string(N(i))+" nicht anwendbar,";
                                  "da zu wenige geeignete Diskriminanten existieren.";pause();}
               step=14;
             }
@@ -1029,7 +1029,7 @@ EXAMPLE:example Atkin; shows an example
           {
             ERROR("Das Polynom T zerfaellt modulo N("+string(i)+") nicht vollstaendig in Linearfaktoren."
                   "Erhoehe den Genauigkeitsparameter K und starte den Algorithmus erneut.");
-          }                                                                        
+          }
           if(printlevel>=1) {if(deg(T)>1) {"Die "+string(deg(T))+" Nullstellen von T modulo N("+string(i)+") sind";
                                            R;pause();}
                              if(deg(T)==1){"Die Nullstelle von T modulo N("+string(i)+") ist";R;pause();}}
@@ -1112,7 +1112,7 @@ EXAMPLE:example Atkin; shows an example
         }
       }
 
-      if(step==10)                 // (10)[Change coefficients]     
+      if(step==10)                 // (10)[Change coefficients]
       {
         k=k+1;
         if(k>=w(D))
@@ -1210,7 +1210,7 @@ EXAMPLE:example Atkin; shows an example
       {
         if(i>0)
         {
-          if(printlevel>=1) {"Setze i=i-1 und starte den Algorithmus fuer N("+string(i-1)+")="+string(N(i-1))+" mit"; 
+          if(printlevel>=1) {"Setze i=i-1 und starte den Algorithmus fuer N("+string(i-1)+")="+string(N(i-1))+" mit";
                              "neuer Diskriminanten von vorne.";pause();}
           i=i-1;
           k=0;
