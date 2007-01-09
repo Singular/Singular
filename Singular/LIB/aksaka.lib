@@ -1,9 +1,9 @@
 //CM, last modified 10.12.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ASK.lib,v 1.3 2006-12-15 14:15:51 Singular Exp $";
+version="$Id: aksaka.lib,v 1.1 2007-01-09 10:31:48 Singular Exp $";
 category="Teaching";
 info="
-LIBRARY: ASK.lib
+LIBRARY: aksaka.lib
          Procedures for primality testing after Agrawal, Saxena, Kayal
 AUTHORS: Christoph Mang
 
@@ -23,14 +23,14 @@ powerpolyX(q,n,a,r)        (poly a)^q modulo (poly r,number n)
 ask(n)                     ASK-Algorithm; deterministic Primality test
 ";
 
-LIB "krypto.lib";
+LIB "crypto.lib";
 LIB "ntsolve.lib";
 
 ///////////////////////////////////////////////////////////////
 //                                                           //
 //   FAST (MODULAR) EXPONENTIATION                           //
 //                                                           //
-/////////////////////////////////////////////////////////////// 
+///////////////////////////////////////////////////////////////
 proc schnellexpt(number a,number m,number n)
 "USAGE: schnellexpt(a,m,n);
 RETURN: the m-th power of a; if a^m>n the procedure returns n+1
@@ -72,46 +72,46 @@ example
 }
 ////////////////////////////////////////////////////////////////////////////
 proc coeffmod(poly f,number n)
-"USAGE: coeffmod(f,n); 
+"USAGE: coeffmod(f,n);
 ASSUME: poly f depends on at most var(1) of the basering
-RETURN: poly f modulo number n 
-NOTE:   at first the coefficients of the monomials of the poly f are 
-        determined, then their remainder modulo n is calculated, 
-        after that the poly 'is put together' again 
+RETURN: poly f modulo number n
+NOTE:   at first the coefficients of the monomials of the poly f are
+        determined, then their remainder modulo n is calculated,
+        after that the poly 'is put together' again
 EXAMPLE:example coeffmod; shows an example
 "
-{ 
+{
   matrix M=coeffs(f,var(1));         //Bestimmung der Polynomkoeffizienten
   int i=1;
   poly g;
   number o=nrows(M);
 
   while(i<=o)
-    {            
+    {
       g=g+(leadcoef(M[i,1]) mod n)*var(1)^(i-1) ;
-                     // umwandeln der Koeffizienten in numbers, 
-                     // Berechnung der Reste dieser numbers modulo n, 
-                     // poly mit neuen Koeffizienten wieder zusammensetzen 
+                     // umwandeln der Koeffizienten in numbers,
+                     // Berechnung der Reste dieser numbers modulo n,
+                     // poly mit neuen Koeffizienten wieder zusammensetzen
       i=i+1;
     }
   return(g);
 }
 example
-{ "EXAMPLE:"; echo = 2;                            
+{ "EXAMPLE:"; echo = 2;
    ring R = 0,x,dp;
    poly f=2457*x4+52345*x3-98*x2+5;
    number n=3;
    coeffmod(f,n);
-} 
+}
 //////////////////////////////////////////////////////////////////////////
 proc powerpolyX(number q,number n,poly a,poly r)
-"USAGE: powerpolyX(q,n,a,r); 
-RETURN: the q-th power of poly a modulo poly r and number n         
+"USAGE: powerpolyX(q,n,a,r);
+RETURN: the q-th power of poly a modulo poly r and number n
 EXAMPLE:example powerpolyX; shows an example
 "
 {
   ideal I=std(r);
-   
+
    if(q==1){return(coeffmod(reduce(a,I),n));}
    if((q mod 5)==0){return(coeffmod(reduce(powerpolyX(q/5,n,a,r)^5,I),n));}
    if((q mod 4)==0){return(coeffmod(reduce(powerpolyX(q/4,n,a,r)^4,I),n));}
@@ -119,9 +119,9 @@ EXAMPLE:example powerpolyX; shows an example
    if((q mod 2)==0){return(coeffmod(reduce(powerpolyX(q/2,n,a,r)^2,I),n));}
 
   return(coeffmod(reduce(a*powerpolyX(q-1,n,a,r),I),n));
-}  
+}
 example
-{ "EXAMPLE:"; echo = 2;                             
+{ "EXAMPLE:"; echo = 2;
    ring R=0,x,dp;
    poly a=3*x3-x2+5;
    poly r=x7-1;
@@ -468,5 +468,4 @@ example
    //ask(100003);
    ask(32003);
 }
-
 

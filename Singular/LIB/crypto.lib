@@ -1,9 +1,9 @@
 //GP, last modified 28.6.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: krypto.lib,v 1.5 2006-12-22 12:06:28 pfister Exp $";
+version="$Id: crypto.lib,v 1.1 2007-01-09 10:31:49 Singular Exp $";
 category="Teaching";
 info="
-LIBRARY:  krypto.lib     Procedures for teaching cryptography
+LIBRARY:  crypto.lib     Procedures for teaching cryptography
 AUTHOR:                  Gerhard Pfister, pfister@mathematik.uni-kl.de
 
 NOTE: The library contains procedures to compute the discrete logarithm,

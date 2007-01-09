@@ -1,9 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: AtkinsTest.lib,v 1.8 2007-01-08 14:08:49 Singular Exp $";
+version="$Id: atkins.lib,v 1.1 2007-01-09 10:31:48 Singular Exp $";
 category="Teaching";
 info="
-LIBRARY:  AtkinsTest.lib     Procedures for teaching cryptography
-AUTHOR:                      Stefan Steidel, Stefan.Steidel@gmx.de
+LIBRARY:  atkins.lib     Procedures for teaching cryptography
+AUTHOR:                  Stefan Steidel, Stefan.Steidel@gmx.de
 
 NOTE: The library contains auxiliary procedures to compute the elliptic
        curve primality test of Atkin and the Atkin's Test itself.
@@ -31,7 +31,7 @@ PROCEDURES:
 
 ";
 
-LIB "krypto.lib";
+LIB "crypto.lib";
 LIB "general.lib";
 LIB "ntsolve.lib";
 LIB "inout.lib";
