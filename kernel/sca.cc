@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.2 2007-01-04 14:09:47 motsak Exp $
+ *  Version: $Id: sca.cc,v 1.3 2007-01-09 11:21:15 Singular Exp $
  *******************************************************************/
 
 // #define PDEBUG 2
@@ -1075,7 +1075,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
       for( unsigned int i = m_iFirstAltVar; i <= m_iLastAltVar; i++ )
       if( p_GetExp(save, i, currRing) )
       {
-        const poly tt = xi_Mult_pp(i, pNext, currRing);
+        const poly tt = sca_pp_Mult_xi_pp(i, pNext, currRing);
 
 #ifdef PDEBUG
         p_Test(tt, currRing);
@@ -1384,7 +1384,7 @@ bool SetupSCA(ring& rGR, const ring rG)
 }
 
 // return x_i * pPoly; preserve pPoly.
-poly xi_Mult_pp(unsigned int i, const poly pPoly, const ring rRing)
+poly sca_pp_Mult_xi_pp(unsigned int i, const poly pPoly, const ring rRing)
 {
   assume(1 <= i);
   assume(i <= rRing->N);
@@ -1644,7 +1644,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec *hilb
       for( unsigned short i = m_iFirstAltVar; i <= m_iLastAltVar; i++ )
       if( p_GetExp(pSave, i, currRing) )
       {
-        const poly pNew = xi_Mult_pp(i, pNext, currRing);
+        const poly pNew = sca_pp_Mult_xi_pp(i, pNext, currRing);
 
 #ifdef PDEBUG
         p_Test(pNew, currRing);
@@ -2057,7 +2057,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
 
         assume(p_GetExp(pSave, i, currRing) == 1);
 
-        const poly pNew = xi_Mult_pp(i, pNext, currRing);
+        const poly pNew = sca_pp_Mult_xi_pp(i, pNext, currRing);
 
 #ifdef PDEBUG
         p_Test(pNew, currRing);

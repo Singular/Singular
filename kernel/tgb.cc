@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.108 2007-01-03 00:17:12 motsak Exp $ */
+/* $Id: tgb.cc,v 1.109 2007-01-09 11:21:15 Singular Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1551,7 +1551,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
       {
         assume(p_GetExp(h, v, c->r)==1);
 
-        poly p = xi_Mult_pp(v, pNext, c->r); // x_v * h;
+        poly p = sca_pp_Mult_xi_pp(v, pNext, c->r); // x_v * h;
 
         if(p != NULL) // if (x_v * h != 0)
           array_arg[j++] = p;

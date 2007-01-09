@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sca.h,v 1.1 2007-01-03 00:04:00 motsak Exp $ */
+/* $Id: sca.h,v 1.2 2007-01-09 11:21:15 Singular Exp $ */
 
 #include <structs.h>
 // #include <polys-impl.h>
@@ -75,11 +75,12 @@ inline void scaLastAltVar(ring r, int n)
 
 // this is not a basic operation... but it for efficiency we did it specially for SCA:
 // return x_i * pPoly; preserve pPoly.
-poly xi_Mult_pp(unsigned int i, const poly pPoly, const ring rRing);
+poly sca_pp_Mult_xi_pp(unsigned int i, const poly pPoly, const ring rRing);
 
 // set pProcs for r and the variable p_Procs
 // should be used by p_ProcsSet in "p_Procs_Set.h"
 void SetProcsSCA(ring& rGR, p_Procs_s* p_Procs);
+
 
 // is this an exterior algebra or a commutative polynomial ring \otimes exterior algebra?
 // we should check whether qr->qideal is of the form: y_i^2, y_{i+1}^2, \ldots, y_j^2 (j > i)
