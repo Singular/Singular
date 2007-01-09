@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.128 2006-11-13 12:57:33 Singular Exp $";
+version="$Id: primdec.lib,v 1.129 2007-01-09 17:43:41 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -106,7 +106,7 @@ NOTE:    result is a std basis in the basering
         fac=fac+factorize(@h[@i],1);
      }
    }
-   fac=simplify(fac,4);
+   fac=simplify(fac,6);
    poly @f=1;
    if(deg(fac[1])>0)
    {
@@ -161,7 +161,7 @@ proc minSat(ideal inew, ideal h)
          fac=fac+factorize(h[i],1);
       }
    }
-   fac=simplify(fac,4);
+   fac=simplify(fac,6);
    if(size(fac)==0)
    {
       l=inew,1;
@@ -3271,7 +3271,7 @@ EXAMPLE: example decomp; shows an example
                  fac=fac+factorize(@h[lauf],1);
               }
            }
-           fac=simplify(fac,4);
+           fac=simplify(fac,6);
            @q=1;
            for(lauf=1;lauf<=size(fac);lauf++)
            {
@@ -4719,7 +4719,7 @@ static proc pseudo_prim_dec_i (ideal SI, list L)
       }
     }
     // delete superfluous polynomials
-    fac=simplify(fac,8);
+    fac=simplify(fac,8+2);
     // saturation
     SQi,f0,f,fac=minsat_ppd(SI,fac);
     I'=I',f;
@@ -5863,7 +5863,7 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #) {
                 fac = fac + factorize(@h[lauf], 1);
             }
          }
-         fac = simplify(fac, 4);
+         fac = simplify(fac, 6);
          @q = 1;
          for(lauf = 1; lauf <= size(fac); lauf++)
          {
@@ -6828,7 +6828,7 @@ EXAMPLE: example newDecompStep; shows an example
                  fac=fac+factorize(@h[lauf],1);
               }
            }
-           fac=simplify(fac,4);
+           fac=simplify(fac,6);
            @q=1;
            for(lauf=1;lauf<=size(fac);lauf++)
            {
