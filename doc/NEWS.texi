@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.68 2007-01-09 14:53:14 Singular Exp $
+@comment $Id: NEWS.texi,v 1.69 2007-01-09 14:55:20 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -42,7 +42,7 @@ new library: noether.lib (@nref{noether_lib}): Noether normalization of an ideal
 @item
 new library: atkins.lib (@nref{atkins_lib}): the elliptic curve primality test of Atkin
 @item
-new library: asaka.lib (@nref{asaka_lib}): primality testing after Agrawal, Saxena, Kayal
+new library: aksaka.lib (@nref{aksaka_lib}): primality testing after Agrawal, Saxena, Kayal
 @item
 new library: arcpoint.lib (@nref{arcpoint_lib}): truncations of arcs at a singular point
 @c @item
