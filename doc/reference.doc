@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.281 2006-12-11 15:55:07 bulygin Exp $
+@comment $Id: reference.doc,v 1.282 2007-01-09 15:00:14 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1619,7 +1619,8 @@ type @code{(p^n,a)}.
 @end table
 @c ref
 See
-@ref{poly}.
+@ref{poly};
+@ref{absFactorize).
 @c ref
 @c ---------------------------------------
 @node fetch, fglm, factorize, Functions
