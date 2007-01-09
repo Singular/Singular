@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.51 2007-01-09 12:36:05 Singular Exp $ */
+/* $Id: ring.cc,v 1.52 2007-01-09 13:07:04 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3937,8 +3937,6 @@ ring rOpposite(ring src)
   {
     return r;
   }
-  if ( rIsPluralRing(src) )
-  {
   rChangeCurrRing(r);  /* we were not in r */
   /* basic nc constructions  */
   r->nc           = (nc_struct *)omAlloc0(sizeof(nc_struct));
@@ -3948,7 +3946,6 @@ ring rOpposite(ring src)
   int *perm       = (int *)omAlloc0((rVar(r)+1)*sizeof(int));
   int *par_perm   = NULL;
   nMapFunc nMap   = nSetMap(src);
-  int j;
   int ni,nj;
   for(i=1; i<=r->N; i++)
   {
@@ -3956,6 +3953,10 @@ ring rOpposite(ring src)
   }
   matrix C = mpNew(rVar(r),rVar(r));
   matrix D = mpNew(rVar(r),rVar(r));
+  r->nc->C = C;
+  r->nc->D = D;
+  if (nc_InitMultiplication(r))
+    WarnS("Error initializing multiplication!");
   for (i=1; i< rVar(r); i++)
   {
     for (j=i+1; j<=rVar(r); j++)
@@ -3968,8 +3969,6 @@ ring rOpposite(ring src)
   }
   idTest((ideal)C);
   idTest((ideal)D);
-  r->nc->C = C;
-  r->nc->D = D;
   if (nc_InitMultiplication(r))
     WarnS("Error initializing multiplication!");
   r->nc->IsSkewConstant =   src->nc->IsSkewConstant;
@@ -3982,7 +3981,6 @@ ring rOpposite(ring src)
   }
   rTest(r);
   rChangeCurrRing(save);
-  }
 #endif /* HAVE_PLURAL */
   return r;
 }

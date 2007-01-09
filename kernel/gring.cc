@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.32 2007-01-03 00:17:09 motsak Exp $
+ *  Version: $Id: gring.cc,v 1.33 2007-01-09 13:07:04 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 // #ifdef HAVE_PLURAL
@@ -2451,22 +2451,23 @@ BOOLEAN nc_InitMultiplication(ring r)
     {
       if ( MATELEM(r->nc->D,i,j) == NULL ) /* quasicommutative case */
       {
-    /* 1x1 mult.matrix */
-    r->nc->MTsize[UPMATELEM(i,j,r->N)] = 1;
-    r->nc->MT[UPMATELEM(i,j,r->N)] = mpNew(1,1);
+        /* 1x1 mult.matrix */
+        r->nc->MTsize[UPMATELEM(i,j,r->N)] = 1;
+        r->nc->MT[UPMATELEM(i,j,r->N)] = mpNew(1,1);
       }
       else /* pure noncommutative case */
       {
-    /* TODO check the special multiplication properties */
-    IsNonComm = 1;
-    p_Delete(&(MATELEM(COM,i,j)),r);
-    //MATELEM(COM,i,j) = NULL; // done by p_Delete
-    r->nc->MTsize[UPMATELEM(i,j,r->N)] = DefMTsize; /* default sizes */
-    r->nc->MT[UPMATELEM(i,j,r->N)] = mpNew(DefMTsize, DefMTsize);
+        /* TODO check the special multiplication properties */
+        IsNonComm = 1;
+        p_Delete(&(MATELEM(COM,i,j)),r);
+        //MATELEM(COM,i,j) = NULL; // done by p_Delete
+        r->nc->MTsize[UPMATELEM(i,j,r->N)] = DefMTsize; /* default sizes */
+        r->nc->MT[UPMATELEM(i,j,r->N)] = mpNew(DefMTsize, DefMTsize);
       }
       /* set MT[i,j,1,1] to c_i_j*x_i*x_j + D_i_j */
       p = p_ISet(1,r); /* instead of     p = pOne(); */
-      p_SetCoeff(p,n_Copy(pGetCoeff(MATELEM(r->nc->C,i,j)),r),r);
+      if (MATELEM(r->nc->C,i,j)!=NULL)
+        p_SetCoeff(p,n_Copy(pGetCoeff(MATELEM(r->nc->C,i,j)),r),r);
       p_SetExp(p,i,1,r);
       p_SetExp(p,j,1,r);
       p_Setm(p,r);
