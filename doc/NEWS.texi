@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.69 2007-01-09 14:55:20 Singular Exp $
+@comment $Id: NEWS.texi,v 1.70 2007-01-09 17:47:17 motsak Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -35,6 +35,8 @@ kernel updated for the optional use of boost
 @item
 new command: (@nref{interpolation}: ideal of points with given multiplicities)
 @item
+non-commutative kernel subsystem was rewritten for more efficient super-commutative (and exterior) algebras
+@item
 new library: modstd.lib (@nref{modstd_lib}): Groebner base computations
 over the rational numbers via modular computations
 @item
@@ -45,8 +47,10 @@ new library: atkins.lib (@nref{atkins_lib}): the elliptic curve primality test o
 new library: aksaka.lib (@nref{aksaka_lib}): primality testing after Agrawal, Saxena, Kayal
 @item
 new library: arcpoint.lib (@nref{arcpoint_lib}): truncations of arcs at a singular point
-@c @item
-@c improved center.lib (@nref{center_lib}): revised implementation, new functions (sa_reduce etc.)
+@item
+sheafcoh.lib: new experimental functions (sheafCohBGG2 + static ones)
+@item
+nctools.lib: new functions for super-commutative algebras (SuperCommutative, IsSCA, AltVarStart, AltVarEnd)
 @item
 resolve.lib: blow ups revised (@nref{resolve_lib}).
 @item
