@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.19 2007-01-04 14:06:26 motsak Exp $";
+version="$Id: nctools.lib,v 1.20 2007-01-09 17:04:23 motsak Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -25,13 +25,15 @@ ncRelations(r);         recover the non-commutative relations of a G-algebra,
 isCentral(p);           check for the commutativity of a polynomial in the G-algebra,
 isNC();                 check whether basering is noncommutative,
 UpOneMatrix(N);         return NxN matrix with 1's in the whole upper triagle,
+AltVarStart()           return first alternating variable of a super-commutative algebra,
+AltVarEnd()             return last alternating variable of a super-commutative algebra,
+IsSCA()                 checks whether current ring is a super-commutative algebra
 ";
 
-// AltVarStart()        return first alternating variable of a super-commutative algebra
-// AltVarEnd()          return last alternating variable of a super-commutative algebra
 
 LIB "ring.lib"; // for rootofUnity
 LIB "poly.lib"; // for newtonDiag
+LIB "general.lib"; // for sort
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -782,31 +784,7 @@ EXAMPLE: example SuperCommutative; shows examples
   Q = twostd(Q);
   qring @EA = Q;
 
-//   @EA;
-
-//   if( defined(AltVarStart) )
-//   {
-//     kill AltVarStart;
-//   }
-//
-//   if( defined(AltVarEnd) )
-//   {
-//     kill AltVarEnd;
-//   }
-
-//   int AltVarStart = b;
-//   int AltVarEnd   = e;
-//
-//   // Why export does NOT work???!!!
-//   export( AltVarStart );
-//   export( AltVarEnd );
-
-/*
-  exportto( Current, AltVarStart );
-  exportto( Current, AltVarEnd );
-*/
-//   "Alt: [", AltVarStart, ", ", AltVarEnd, "].";
-//   "Alternating variables: [", AltVarStart(), ", ", AltVarEnd(), "].";
+//   "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "].";
   return(@EA);
 }
 example
@@ -815,18 +793,158 @@ example
   ring R = 0,(x(1..4)),dp; // global!
   def ER = SuperCommutative(); // the same as Exterior (b = 1, e = N)
   setring ER; ER;
+  "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "].";
   kill R; kill ER;
   ring R = 0,(x(1..4)),(lp(1), dp(3)); // global!
   def ER = SuperCommutative(2); // b = 2, e = N
   setring ER; ER;
+  "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "].";
   kill R; kill ER;
   ring R = 0,(x(1..6)),(ls(2), dp(2), lp(2)); // local!
   def ER = SuperCommutative(3,4); // b = 3, e = 4
   setring ER; ER;
+  "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "].";
   kill R; kill ER;
 }
 
-/*
+
+static proc ParseSCA()
+"
+RETURN: list {AltVarStart, AltVarEnd} is currRing is SCA, returns undef otherwise.
+"
+{
+  def rRing = basering;
+  list L = ringlist(rRing);
+  
+  if( size(L)!=6 )
+  {
+    return("The current ring is commutative!");
+  }
+
+  module D = simplify(L[6], 2 + 4);
+  
+  if( size(D)>0 )
+  {
+    return("The current ring is not SCA! (D!=0)");
+  }
+
+  int i, j;
+  int N = nvars(rRing);
+  
+  int b = N+1;
+  int e = 0;
+
+  poly p;
+
+  ideal I = sort(L[4])[1];
+
+//   "Q = ", string(I);
+  
+  intvec exp;
+  int d;
+  int n = 0;
+  
+  for( i = size(I); i > 0; i-- )
+  {
+    p = I[i];
+//     p;
+
+    if( size(p) != 1 )
+    {
+      return("The current ring is not SCA! (Wrong quotient ideal, not monomial)");
+    }
+    
+    exp = leadexp(p);
+//     exp;
+    d = 0;
+    for( j = size(exp); j >= 1; j-- )
+    {
+      d = d + exp[j];
+//       d;
+      
+      if( (d!=2) && (d!=0) )
+      {
+        return("The current ring is not SCA! (Wrong quotient ideal, wrong leading exponent)");
+      }
+      
+      if(exp[j] == 2)
+      {
+        if(b > j)
+        {
+          b = j; // min
+          n = n + 1;
+        }
+        if(e < j)
+        {
+          e = j; // max
+          n = n + 1; // => n = n + 1 twice for the 1st one
+        }
+      }
+    }
+    
+    if( d!=2 )
+    {
+      return("The current ring is not SCA! (Wrong quotient ideal, wrong leading exponent)");
+    }
+  }
+
+//   b, e, n;
+
+  if(size(I) == 0)
+  {
+    b = N+1;
+    e = N+1;
+    n = 2;
+  }
+
+//   if( (e < 1) || (b > N) )
+//   {
+//     ERROR("The current ring is not SCA! (wrong quotient ideal, bad squares)");
+//     return();
+//   }
+
+  if( (e - b + 2) != n ) // +2 instead of +1!
+  {
+    return("The current ring is not SCA! (wrong quotient ideal, bad range)");
+  }
+  
+
+  matrix C = L[5];
+  poly c;
+  
+  for( i = 1; i < N; i++ )
+  {
+    for( j = i+1; j <= N; j++ )
+    {
+      c = C[i, j];
+
+      if( (b <= i) && (j <= e) ) // S <= i < j <= E
+      { // anticommutative part
+        if( c!= -1 )
+        {
+          return("The current ring is not SCA! (C["+ string(i)+"," + string(j)+"]!=-1)");
+        }
+      } else
+      { // should commute
+        if( c!=1 )
+        {
+          return("The current ring is not SCA! (C["+ string(i)+"," + string(j)+"]!=1)");
+        }
+      }
+    }
+  }
+
+  if( (b > N) || (e > N))
+  {
+    return("The current ring is commutative!");
+  }
+  
+  return(list(b, e));
+}
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////
 proc AltVarStart()
 "USAGE:   AltVarStart();
@@ -836,7 +954,15 @@ NOTE:  basering should be a super-commutative algebra!
 EXAMPLE: example AltVarStart; shows examples
 "
 {
-  return system("AltVarStart");
+  def l = ParseSCA();
+
+  if( typeof(l) != "string" )
+  {
+    return(l[1]);
+  }
+
+  ERROR(l);
+  return();
 }
 example
 {
@@ -844,7 +970,7 @@ example
   ring R = 0,(x(1..4)),dp; // global!
   def ER = SuperCommutative(2); // (b = 2, e = N)
   setring ER; ER;
-  "Alternating variables: [", AltVarStart(), ", ", AltVarEnd(), "].";
+  "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "].";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -856,7 +982,15 @@ NOTE:  basering should be a super-commutative algebra!
 EXAMPLE: example AltVarEnd; shows examples
 "
 {
-  return system("AltVarEnd");
+  def l = ParseSCA();
+
+  if( typeof(l) != "string" )
+  {
+    return(l[2]);
+  }
+
+  ERROR(l);
+  return();
 }
 example
 {
@@ -864,9 +998,84 @@ example
   ring R = 0,(x(1..4)),dp; // global!
   def ER = SuperCommutative(2); // (b = 2, e = N)
   setring ER; ER;
-  "Alternating variables: [", AltVarStart(), ", ", AltVarEnd(), "].";
+  "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "].";
 }
-*/
+
+///////////////////////////////////////////////////////////////////////////////
+proc IsSCA()
+"USAGE:   IsSCA();
+RETURN:  int
+PURPOSE:  returns 1 if basering is a supercommutative algebra and 0 otherwise.
+NOTE:     no error message!
+EXAMPLE: example IsSCA; shows examples
+"
+{
+  def l = ParseSCA();
+
+  if( typeof(l) != "string" )
+  {
+    return(1);
+  }
+
+  return(0);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+/////////////////////////////////////////////////////////////////////
+  ring R = 0,(x(1..4)),dp; // commutative
+  if(IsSCA())
+    { "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "]."; }
+  else
+    { "Not a supercommutative algebra!!!"; }
+  kill R;
+/////////////////////////////////////////////////////////////////////
+  ring R = 0,(x(1..4)),dp; 
+  ncalgebra(1, 0); // still commutative!
+  if(IsSCA())
+    { "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "]."; }
+  else
+    { "Not a supercommutative algebra!!!"; }
+  kill R;
+/////////////////////////////////////////////////////////////////////
+  ring R = 0,(x(1..4)),dp;
+  list CurrRing = ringlist(R);
+  def ER = ring(CurrRing);
+  setring ER; // R;
+  
+  matrix E = UpOneMatrix(nvars(R));
+
+  int i, j; int b = 2; int e = 3;
+
+  for ( i = b; i < e; i++ )
+  {
+    for ( j = i+1; j <= e; j++ )
+    {
+      E[i, j] = -1;
+    }
+  }
+
+  ncalgebra(E,0);
+  if(IsSCA())
+    { "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "]."; }
+  else
+    { "Not a supercommutative algebra!!!"; }
+  kill R;
+  kill ER;
+/////////////////////////////////////////////////////////////////////
+  ring R = 0,(x(1..4)),dp;
+  def ER = SuperCommutative(2); // (b = 2, e = N)
+  setring ER; ER;
+  if(IsSCA())
+    { "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "]."; }
+  else
+    { "Not a supercommutative algebra!!!"; }
+  kill R;
+  kill ER;
+  
+}
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 proc Exterior(list #)
