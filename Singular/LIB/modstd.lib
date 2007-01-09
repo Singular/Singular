@@ -1,6 +1,6 @@
 //GP, last modified 23.10.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: modstd.lib,v 1.1 2007-01-09 10:31:49 Singular Exp $";
+version="$Id: modstd.lib,v 1.2 2007-01-09 12:44:33 pfister Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: modstd.lib  Grobner basis of ideals
@@ -17,31 +17,28 @@ NOTE:
  Computation , April 2003, Volume 35, (4), p. 403-419.
 
 
+
 PROCEDURES:
-modStd(I,1);   compute the reduced Groebner basis of I using modular methods
-modS(I,L);     liftings to Q of Groebner bases of I mod p for p in L
+modStd(I);     compute a standard basis of I using modular methods
+modS(I,L);     liftings to Q of standard bases of I mod p for p in L 
 primeList(n);  list of n primes  <= 2134567879 in decreasing order
 ";
 
-LIB "crypto.lib";
+LIB "poly.lib";
+LIB "krypto.lib";
 ///////////////////////////////////////////////////////////////////////////////
-proc modStd(ideal I,list #)
-"USAGE:  modStd(I,[k]); I ideal (an optional integer k)
-RETURN:  if # is empty:
-         an ideal which is with high probability a reduced Groebner basis of I;
-         it is not tested whether the result is a Groebner basis and
-         it is not tested whether the result contains I.
-         if #[1]=1:
-         a Groebner basis which contains I if no warning appears;
-         if I is homogeneous it is a Groebner basis of I
-NOTE:    the procedure computes the reduced Groebner basis of I (over the
-         rational numbers) by using  modular methods. If #[1]=1 and a
-         warning appears then the result is a Groebner basis with no defined
-         relation to I; this is a sign that not enough prime numbers have
+proc modStd(ideal I)
+"USAGE:  modStd(I); 
+RETURN:  a standard basis of I if no warning appears; 
+NOTE:    the procedure computes a standard basis of I (over the 
+         rational numbers) by using  modular methods. If a 
+         warning appears then the result is a standard basis with no defined
+         relation to I; this is a sign that not enough prime numbers have 
          been used. For further experiments see procedure modS.
 EXAMPLE: example modStd; shows an example
 "
 {
+  int aa=timer;
   def R0=basering;
   list rl=ringlist(R0);
   if((npars(R0)>0)||(rl[1]>0))
@@ -49,12 +46,27 @@ EXAMPLE: example modStd; shows an example
      ERROR("characteristic of basering should be zero");
   }
   int l,j,k,q;
+  int en=2134567879;
+  int an=1000000000;
+  intvec hi,hl,hc,hpl,hpc;
   list T,TT;
   list L=primeList(5);
-  L[6]=prime(random(1000000000,2000000000));
+  L[6]=prime(random(an,en));
   ideal J,cT,lT,K;
-  ideal I0=I;
-
+  ideal I0=I; 
+  int h=homog(I);
+  if((!h)&&(ord_test(R0)==0))
+  {
+     ERROR("input is not homogeneous and ordering is not local");
+  }
+  if(h)
+  {
+     execute("ring gn="+string(L[6])+",x(1.."+string(nvars(R0))+"),dp;");
+     ideal I=fetch(R0,I);
+     ideal J=std(I);
+     hi=hilb(J,1);
+     setring R0;
+  }
   for (j=1;j<=size(L);j++)
   {
     rl[1]=L[j];
@@ -62,37 +74,32 @@ EXAMPLE: example modStd; shows an example
     setring oro;
     ideal I=fetch(R0,I);
     option(redSB);
-    ideal I1=groebner(I);
+    if(h)
+    {
+       ideal I1=std(I,hi);
+    }
+    else
+    {
+      if(ord_test(R0)==-1)
+      {
+         ideal I1=std(I);
+      }
+      else
+      {
+         matrix M;
+         ideal I1=liftstd(I,M);
+      }
+    }
     setring R0;
     T[j]=fetch(oro,I1);
     kill oro;
   }
   //================= delete unlucky primes ====================
   // unlucky iff the leading ideal is wrong
-  lT=lead(T[size(T)]);
-  for (j=1;j<size(T);j++)
-  {
-     cT=lead(T[j]);
-     for(k=1;k<=size(lT);k++)
-     {
-        if(lT[k]<cT[k]){lT=cT;break;}
-     }
-     if(size(lT)<size(cT)){lT=cT;}
-  }
-  j=1;
-  attrib(lT,"isSB",1);
-  while(j<=size(T))
-  {
-     cT=lead(T[j]);
-     attrib(cT,"isSB",1);
-     if((size(reduce(cT,lT))!=0)||(size(reduce(lT,cT))!=0))
-     {
-        T=delete(T,j);
-        L=delete(L,j);
-        j--;
-     }
-     j++;
-  }
+  list LL=deleteUnluckyPrimes(T,L);
+  T=LL[1];
+  L=LL[2];
+  lT=LL[3];
   //============ now all leading ideals are the same ============
   for(j=1;j<=ncols(T[1]);j++)
   {
@@ -100,20 +107,20 @@ EXAMPLE: example modStd; shows an example
     {
       TT[k]=T[k][j];
     }
-    J[j]=liftPoly(TT,L);
+    J[j]=liftPoly(TT,L); 
   }
   //=========== chooses more primes up to the moment the result becomes stable
   while(1)
   {
      k=0;
-     q=prime(random(2000000011,2100000000));
+     q=prime(random(an,en));
      while(k<size(L))
      {
         k++;
         if(L[k]==q)
         {
            k=0;
-           q=prime(random(1000000,2100000000));
+           q=prime(random(an,en));
         }
      }
      L[size(L)+1]=q;
@@ -122,7 +129,22 @@ EXAMPLE: example modStd; shows an example
      setring @r;
      ideal i=fetch(R0,I);
      option(redSB);
-     i=groebner(i);
+     if(h)
+     {
+       i=std(i,hi);
+     }
+     else
+     {
+       if(ord_test(R0)==-1)
+       {
+          i=std(i);
+       }
+       else
+       {
+          matrix M;
+          i=liftstd(i,M);
+       }
+     }
      setring R0;
      T[size(T)+1]=fetch(@r,i);
      kill @r;
@@ -145,19 +167,26 @@ EXAMPLE: example modStd; shows an example
            K[j]=liftPoly(TT,L);
         }
         k=1;
-        for(j=1;j<=size(K);j++){if(K[j]-J[j]!=0){k=0;break;}}
+        for(j=1;j<=size(K);j++)
+        {
+           if(K[j]-J[j]!=0)
+           {
+              k=0;
+              J=K;
+              break;
+           }
+        }
      }
      if(k){break;}
   }
-  //============ optional test for standard basis and I=J =======
-  if(size(#)>0)
-  {
-    J=std(J);
-    I0=reduce(I0,J);
-    if(size(I0)>0){"WARNING: The input ideal is not contained
+  //============  test for standard basis and I=J =======
+"computed";timer-aa;aa=timer;
+  J=std(J);
+  I0=reduce(I0,J);
+  if(size(I0)>0){"WARNING: The input ideal is not contained 
                         in the ideal generated by the standardbasis";}
-  }
   attrib(J,"isSB",1);
+"verification";timer-aa;
   return(J);
 }
 example
@@ -166,10 +195,11 @@ example
    ideal I=3x3+x2+1,11y5+y3+2,5z4+z2+4;
    ideal J=modStd(I);
    J;
-}
+}   
 ///////////////////////////////////////////////////////////////////////////////
-proc modS(ideal I, list L)
+proc modS(ideal I, list L, list #)
 "USAGE:  modS(I,L); I ideal, L list of primes
+         if size(#)>0 std is used instead of groebner
 RETURN:  an ideal which is with high probability a standard basis
 NOTE:    This procedure is designed for fast experiments.
          It is not tested whether the result is a standard basis.
@@ -194,22 +224,76 @@ EXAMPLE: example modS; shows an example
     setring @r;
     ideal i=fetch(R0,I);
     option(redSB);
-    i=groebner(i);
+    if(size(#)>0)
+    {
+       i=std(i);
+    }
+    else
+    {
+       i=groebner(i)
+    }
     setring R0;
     T[j]=fetch(@r,i);
     kill @r;
   }
   //================= delete unlucky primes ====================
   // unlucky iff the leading ideal is wrong
-  lT=lead(T[1]);
-  for (j=2;j<=size(T);j++)
+  list LL=deleteUnluckyPrimes(T,L);
+  T=LL[1];
+  L=LL[2];
+  //============ now all leading ideals are the same ============
+  for(j=1;j<=ncols(T[1]);j++)
+  {
+    for(k=1;k<=size(L);k++)
+    {
+      TT[k]=T[k][j];
+    }
+    J[j]=liftPoly(TT,L);  
+  }
+  attrib(J,"isSB",1);
+  return(J);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   list L=3,5,11,13,181;
+   ring r=0,(x,y,z),dp;
+   ideal I=3x3+x2+1,11y5+y3+2,5z4+z2+4;
+   ideal J=modS(I,L);
+   J;
+}  
+/////////////////////////////////////////////////////////////////////////////// 
+proc deleteUnluckyPrimes(list T,list L)
+"USAGE:  deleteUnluckyPrimes(T,L);T list of polys, L list of primes  
+RETURN:  list L,T with T list of polys, L list of primes
+EXAMPLE: example deleteUnluckyPrimes; shows an example
+NOTE:    works only for homogeneous ideals with global orderings or
+         for ideals with local orderings
+"
+{
+  int j,k;
+  intvec hl,hc;
+  ideal cT,lT;
+
+  lT=lead(T[size(T)]);
+  attrib(lT,"isSB",1);
+  hl=hilb(lT,1);
+  for (j=1;j<size(T);j++)
   {
      cT=lead(T[j]);
-     for(k=1;k<=size(lT);k++)
+     attrib(cT,"isSB",1);
+     hc=hilb(cT,1);
+     if(hl==hc)
      {
-        if(lT[k]<cT[k]){lT=cT;break;}
+        for(k=1;k<=size(lT);k++)
+        {
+           if(lT[k]<cT[k]){lT=cT;break;}
+           if(lT[k]>cT[k]){break;}
+        }
      }
-     if(size(lT)<size(cT)){lT=cT;}
+     else
+     {
+        if(hc<hl){lT=cT;hl=hilb(lT,1);}
+     }
   }
   j=1;
   attrib(lT,"isSB",1);
@@ -225,27 +309,21 @@ EXAMPLE: example modS; shows an example
      }
      j++;
   }
-  //============ now all leading ideals are the same ============
-  for(j=1;j<=ncols(T[1]);j++)
-  {
-    for(k=1;k<=size(L);k++)
-    {
-      TT[k]=T[k][j];
-    }
-    J[j]=liftPoly(TT,L);
-
-  }
-  attrib(J,"isSB",1);
-  return(J);
+  return(list(T,L,lT));
 }
 example
 { "EXAMPLE:"; echo = 2;
-   list L=3,5,11,13,181;
-   ring r=0,(x,y,z),dp;
-   ideal I=3x3+x2+1,11y5+y3+2,5z4+z2+4;
-   ideal J=modS(I,L);
-   J;
-}
+   list L=2,3,5,7,11;
+   ring r=0,(y,x),Dp;
+   ideal I1=y2x,y6;
+   ideal I2=yx2,y3x,x5,y6;
+   ideal I3=y2x,x3y,x5,y6;
+   ideal I4=y2x,x3y,x5;
+   ideal I5=y2x,yx3,x5,y6;
+   list T=I1,I2,I3,I4,I5;
+   list TT=deleteUnluckyPrimes(T,L);
+   TT;
+}  
 ///////////////////////////////////////////////////////////////////////////////
 proc liftPoly(list T, list L)
 "USAGE:  liftPoly(T,L); T list of polys, L list of primes
@@ -258,7 +336,7 @@ EXAMPLE: example liftPoly; shows an example
    poly p;
    list TT;
    number n;
-
+  
    number N=L[1];
    for(i=2;i<=size(L);i++)
    {
@@ -287,8 +365,8 @@ EXAMPLE: example liftPoly; shows an example
           TT[i]=0;
        }
      }
-     n=chineseR(TT,L);
-     n=Farey(N,n);
+     n=chineseR(TT,L,N);
+     n=Farey(N,n); 
      result=result+n*p;
    }
 }
@@ -299,10 +377,37 @@ example
    list T=x2+7000x+13000,x2+100x+147y+40,x2+120x+191y+10,x2+x+67y+100;
    liftPoly(T,L);
 }
+ /////////////////////////////////////////////////////////////////////////////// 
+proc fareyIdeal(ideal I,list L)
+{
+   poly result,p;
+   int i,j;
+   number n;
+   number N=L[1];
+   for(i=2;i<=size(L);i++)
+   {
+      N=N*L[i];
+   }
+
+   for(i=1;i<=size(I);i++)
+   {
+     p=I[i];
+     result=lead(p);
+     while(1)
+     {
+        if (p==0) {break;}
+        p=p-lead(p);
+        n=Farey(N,leadcoef(p)); 
+        result=result+n*leadmonom(p);
+     }
+     I[i]=result;
+   }
+   return(I);
+}
 ///////////////////////////////////////////////////////////////////////////////
 proc Farey (number P, number N)
 "USAGE:  Farey (P,N); P, N number;
-RETURN:  a rational number a/b such that a/b=N mod P
+RETURN:  a rational number a/b such that a/b=N mod P 
          and |a|,|b|<(P/2)^{1/2}
 "
 {
@@ -313,13 +418,16 @@ RETURN:  a rational number a/b such that a/b=N mod P
    B=1;
    while (N!=0)
    {
-        if (2*N^2<P){return(N/B);}
-        D=E mod N;
-        C=A-(E-E mod N)/N*B;
-        E=N;
-        N=D;
-        A=B;
-        B=C;
+        if (2*N^2<P)
+        {           
+           return(N/B);
+        }
+	D=E mod N;
+	C=A-(E-E mod N)/N*B;
+	E=N;
+	N=D;
+	A=B;
+	B=C;
    }
    return(0);
 }
@@ -328,28 +436,22 @@ example
    ring R = 0,x,dp;
    Farey(32003,12345);
 }
-///////////////////////////////////////////////////////////////////////////////
-proc chineseR(list T,list L)
-"USAGE:  chineseRem(T,L);
+ ///////////////////////////////////////////////////////////////////////////////
+proc chineseR(list T,list L,number N)
+"USAGE:  chineseR(T,L);
 RETURN: x such that x = T[i] mod L[i]
 NOTE:   chinese remainder theorem
-EXAMPLE:example chineseRem; shows an example
+EXAMPLE:example chineseR; shows an example
 "
 {
    number x;
    if(size(L)==1)
    {
       x=T[1] mod L[1];
-      if(x>L[1]/2){x=x-L[1];}
       return(x);
    }
    int i;
    int n=size(L);
-   number N=1;
-   for(i=1;i<=n;i++)
-   {
-      N=N*L[i];
-   }
    list M;
    for(i=1;i<=n;i++)
    {
@@ -361,18 +463,18 @@ EXAMPLE:example chineseRem; shows an example
       x=x+S[i]*M[i]*T[i];
    }
    x=x mod N;
-   if (x>N/2) { x=x-N; }
    return(x);
 }
 example
 { "EXAMPLE:"; echo = 2;
    ring R = 0,x,dp;
-   chineseRem(list(24,15,7),list(2,3,5));
+   chineseR(list(24,15,7),list(2,3,5));
 }
+  
 ///////////////////////////////////////////////////////////////////////////////
 proc primeList(int n)
 "USAGE:  primeList(n);
-RETURN: the list of n greatest primes  <= 2134567879
+RETURN: the list of n greatest primes  <= 2134567879   
 EXAMPLE:example primList; shows an example
 "
 {
@@ -391,7 +493,7 @@ example
    list L=primeList(10);
    size(L);
    L[size(L)];
-}
+}   
 ///////////////////////////////////////////////////////////////////////////////
 /*
 ring r=0,(x,y,z),lp;
@@ -415,8 +517,12 @@ poly s3 = 8x3 + 12y3 + xz2 + 3;
 poly s4 = 7x2y4 + 18xy3z2 +  y3z3;
 ideal i =  s1, s2, s3, s4;
 
-ring r=0,x(1..4),lp;
-ideal i=cyclic(4);
+int n = 6;
+ring r = 0,(x(1..n)),lp;
+ideal i = cyclic(n);
+ring s=0,(x(1..n),t),lp;
+ideal i=imap(r,i);
+i=homog(i,t);
 
 ring r=0,(x(1..4),s),(dp(4),dp);
 poly s1 =1 + s^2*x(1)*x(3) + s^8*x(2)*x(3) + s^19*x(1)*x(2)*x(4);
@@ -425,4 +531,36 @@ poly s3 = x(2) + s^10*x(3)*x(4) + s^11*x(1)*x(4);
 poly s4 = x(3) + s^4*x(1)*x(2) + s^19*x(1)*x(3)*x(4) +s^24*x(2)*x(3)*x(4);
 poly s5 = x(4) + s^31* x(1)* x(2)* x(3)* x(4);
 ideal i =  s1, s2, s3, s4, s5;
+
+ring r=0,(x,y,z),ds;
+int a =16;
+int b =15;
+int c =4;
+int t =1;
+poly f =x^a+y^b+z^(3*c)+x^(c+2)*y^(c-1)+x^(c-1)*y^(c-1)*z3+x^(c-2)*y^c*(y2+t*x)^2;
+ideal i= jacob(f);
+
+ring r=0,(x,y,z),ds;
+int a =25;
+int b =25;
+int c =5;
+int t =1;
+poly f =x^a+y^b+z^(3*c)+x^(c+2)*y^(c-1)+x^(c-1)*y^(c-1)*z3+x^(c-2)*y^c*(y2+t*x)^2;
+ideal i= jacob(f),f;
+
+ring r=0,(x,y,z),ds;
+int a=10;
+poly f =xyz*(x+y+z)^2 +(x+y+z)^3 +x^a+y^a+z^a;
+ideal i= jacob(f);
+
+ring r=0,(x,y,z),ds;
+int a =6;
+int b =8;
+int c =10;
+int alpha =5;
+int beta= 5;
+int t= 1;
+poly f =x^a+y^b+z^c+x^alpha*y^(beta-5)+x^(alpha-2)*y^(beta-3)+x^(alpha-3)*y^(beta-4)*z^2+x^(alpha-4)*y^(beta-4)*(y^2+t*x)^2;
+ideal i= jacob(f);
+
 */
