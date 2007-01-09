@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.154 2006-12-18 18:40:39 Singular Exp $
+@comment $Id: singular.doc,v 1.155 2007-01-09 10:45:53 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -318,7 +318,7 @@ LIB "all.lib";
 * homolog_lib:: procedures for homological algebra
 * intprog_lib:: Integer Programming
 * lll_lib:: Integral LLL-Algorithm
-* modStd_lib:: Groebner basis of ideals via modular computations
+* modstd_lib:: Groebner basis of ideals via modular computations
 * mprimdec_lib:: procedures for primary decomposition of modules
 * mregular_lib:: procedures for Castelnuovo-Mumford regularity
 * noether_lib:: Noether normalization of an ideal
@@ -357,15 +357,15 @@ LIB "all.lib";
 @subsection intprog_lib
 @c lib intprog.lib
 @c ---------------------------------------------------------
-@node lll_lib, modStd_lib, intprog_lib, Commutative algebra
+@node lll_lib, modstd_lib, intprog_lib, Commutative algebra
 @subsection lll_lib
 @c lib lll.lib
 @c ---------------------------------------------------------
-@node modStd_lib, mprimdec_lib, lll_lib, Commutative algebra
-@subsection modStd_lib
-@c lib modStd.lib
+@node modstd_lib, mprimdec_lib, lll_lib, Commutative algebra
+@subsection modstd_lib
+@c lib modstd.lib
 @c ---------------------------------------------------------
-@node mprimdec_lib, mregular_lib, modStd_lib, Commutative algebra
+@node mprimdec_lib, mregular_lib, modstd_lib, Commutative algebra
 @subsection mprimdec_lib
 @c lib mprimdec.lib
 @c ----------------------------------------------------------
@@ -416,7 +416,7 @@ LIB "all.lib";
 
 @menu
 * alexpoly_lib:: resolution graph and Alexander polynomial
-* arcAtPoint_lib:: truncations of arcs at a singular point
+* arcpoint_lib:: truncations of arcs at a singular point
 * classify_lib:: procedures for the Arnold-classifier of singularities
 * deform_lib:: procedures for computing miniversal deformation
 * equising_lib:: procedures for equisingularity strata
@@ -431,15 +431,15 @@ LIB "all.lib";
 @end menu
 
 @c ---------------------------------------------------------
-@node alexpoly_lib, arcAtPoint_lib, Singularities, Singularities
+@node alexpoly_lib, arcpoint_lib, Singularities, Singularities
 @subsection alexpoly_lib
 @c lib alexpoly.lib
 @c ---------------------------------------------------------
-@node arcAtPoint_lib, classify_lib, alexpoly_lib, Singularities
-@subsection arcAtPoint_lib
-@c lib arcAtPoint.lib
+@node arcpoint_lib, classify_lib, alexpoly_lib, Singularities
+@subsection arcpoint_lib
+@c lib arcpoint.lib
 @c ---------------------------------------------------------
-@node classify_lib, deform_lib, arcAtPoint_lib, Singularities
+@node classify_lib, deform_lib, arcpoint_lib, Singularities
 @subsection classify_lib
 @c lib classify.lib unix_only
 @c ----------------------------------------------------------
@@ -660,31 +660,31 @@ The libraries in this section are intended to be used for teaching purposes
 but not for serious computations.
 
 @menu
-* ASK_lib:: Algorithms for primality testing in polynomial time
-* AtkinsTest_lib:: Procedures for teaching cryptography
-* krypto_lib:: Procedures for teaching cryptography
+* aksaka_lib:: Algorithms for primality testing in polynomial time
+* atkins_lib:: Procedures for teaching cryptography
+* crypto_lib:: Procedures for teaching cryptography
 * teachstd_lib:: Procedures for teaching standard bases
 * weierstr_lib:: Procedures for the Weierstrass Theorems
 * rootsmr_lib:: counting the number of real roots
 * rootsur_lib:: counting number of real roots of univariate polynomial
 @end menu
 @c ---------------------------------------------------------
-@node ASK_lib, AtkinsTest_lib, Teaching, Teaching
-@subsection ASK_lib
-@c lib ASK.lib
+@node aksaka_lib, atkins_lib, Teaching, Teaching
+@subsection aksaka_lib
+@c lib aksaka.lib
 
 @c ---------------------------------------------------------
-@node AtkinsTest_lib, krypto_lib, ASK_lib, Teaching
-@subsection AtkinsTest_lib
-@c lib AtkinsTest.lib
+@node atkins_lib, crypto_lib, aksaka_lib, Teaching
+@subsection atkins_lib
+@c lib atkins.lib
 
 @c ---------------------------------------------------------
-@node krypto_lib, teachstd_lib, AtkinsTest_lib, Teaching
-@subsection krypto_lib
-@c lib krypto.lib
+@node crypto_lib, teachstd_lib, atkins_lib, Teaching
+@subsection crypto_lib
+@c lib crypto.lib
 
 @c ---------------------------------------------------------
-@node teachstd_lib, weierstr_lib, krypto_lib, Teaching
+@node teachstd_lib, weierstr_lib, crypto_lib, Teaching
 @subsection teachstd_lib
 @c lib teachstd.lib
 
