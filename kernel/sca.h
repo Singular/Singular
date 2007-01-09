@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sca.h,v 1.2 2007-01-09 11:21:15 Singular Exp $ */
+/* $Id: sca.h,v 1.3 2007-01-09 14:29:32 Singular Exp $ */
 
 #include <structs.h>
 // #include <polys-impl.h>
@@ -87,7 +87,7 @@ void SetProcsSCA(ring& rGR, p_Procs_s* p_Procs);
 // if yes, setup qr->nc->type, etc.
 // should be used inside QRing definition!
 // NOTE: (&TODO): Factors of SuperCommutative Algebras are not supported this way!
-bool SetupSCA(ring& rGR, const ring rG);
+bool sca_SetupSCA(ring& rGR, const ring rG);
 
 
 

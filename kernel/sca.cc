@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.3 2007-01-09 11:21:15 Singular Exp $
+ *  Version: $Id: sca.cc,v 1.4 2007-01-09 14:29:33 Singular Exp $
  *******************************************************************/
 
 // #define PDEBUG 2
@@ -1193,7 +1193,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 // is this an exterior algebra or a commuunative polynomial ring \otimes exterior algebra?
 // we should check whether qr->qideal is of the form: y_i^2, y_{i+1}^2, \ldots, y_j^2 (j > i)
 //.if yes, setup qr->nc->type, etc.
-bool SetupSCA(ring& rGR, const ring rG)
+bool sca_SetupSCA(ring& rGR, const ring rG)
 {
 //   return false; // test Plural
 

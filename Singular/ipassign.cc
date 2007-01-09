@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.84 2007-01-03 00:00:45 motsak Exp $ */
+/* $Id: ipassign.cc,v 1.85 2007-01-09 14:31:05 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -585,7 +585,7 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
     // is this an exterior algebra or a commuunative polynomial ring \otimes exterior algebra?
     // we should check whether qr->qideal is of the form: y_i^2, y_{i+1}^2, \ldots, y_j^2 (j > i)
     //.if yes, setup qr->nc->type, etc.
-    SetupSCA(qr, currRing); 
+    sca_SetupSCA(qr, currRing); 
   }
   #endif
   //currRing=qr;
