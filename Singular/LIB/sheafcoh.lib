@@ -1,5 +1,5 @@
-S///////////////////////////////////////////////////////////////////////////////
-version="$Id: sheafcoh.lib,v 1.12 2007-01-04 15:13:47 Singular Exp $";
+///////////////////////////////////////////////////////////////////////////////
+version="$Id: sheafcoh.lib,v 1.13 2007-01-09 17:21:46 motsak Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  sheafcoh.lib   Procedures for Computing Sheaf Cohomology
@@ -11,6 +11,7 @@ PROCEDURES:
  truncate(phi,d);        truncation of coker(phi) at d
  CM_regularity(M);       Castelnuovo-Mumford regularity of coker(M)
  sheafCohBGG(M,l,h);     cohomology of sheaf associated to coker(M)
+ sheafCohBGG2(M,l,h);    cohomology of sheaf associated to coker(M), experimental version
  sheafCoh(M,l,h);        cohomology of sheaf associated to coker(M)
  dimH(i,M,d);            compute h^i(F(d)), F sheaf associated to coker(M)
 
@@ -37,6 +38,103 @@ static proc jacobM(matrix M)
    }
    return(transpose(B));
 }
+
+// returns transposed Jacobian of a module M
+static proc tJacobian(module M)
+{
+  M = transpose(M);
+
+  int N = nvars(basering);
+  int k = ncols(M);
+  int r = nrows(M);
+
+  module Result;
+  Result[N*k] = 0;
+
+  int i, j;
+  int l = 1;
+
+  for( j = 1; j <= N; j++ ) // for all variables
+  {
+    for( i = 1; i <= k; i++ ) // for every v \in transpose(M)
+    {
+      Result[l] = diff(M[i], var(j));
+      l++;
+    }
+  }
+
+  return(Result);
+}
+
+
+/**
+  let M = { w_1, ..., w_k }, k = size(M) == ncols(M), n = nvars(currRing).
+  assuming that nrows(M) <= m*n;
+  computes transpose(M) * transpose( var(1) I_m | ... | var(n) I_m ) :== transpose(module{f_1, ... f_k}),
+  where f_i = \sum_{j=1}^{m} (w_i, v_j) gen(j),  (w_i, v_j) is a `scalar` multiplication.
+  that is, if w_i = (a^1_1, ... a^1_m) | (a^2_1, ..., a^2_m) | ... | (a^n_1, ..., a^n_m) then
+
+  (a^1_1, ... a^1_m) | (a^2_1, ..., a^2_m) | ... | (a^n_1, ..., a^n_m)
+*  var_1  ... var_1  |  var_2  ...  var_2  | ... |  var_n  ...  var(n)
+*  gen_1  ... gen_m  |  gen_1  ...  gen_m  | ... |  gen_1  ...  gen_m
++ =>
+  f_i =
+  
+   a^1_1 * var(1) * gen(1) + ... + a^1_m * var(1) * gen(m) +
+   a^2_1 * var(2) * gen(1) + ... + a^2_m * var(2) * gen(m) +
+                             ...
+   a^n_1 * var(n) * gen(1) + ... + a^n_m * var(n) * gen(m);
+
+   NOTE: for every f_i we run only ONCE along w_i saving partial sums into a temporary array of polys of size m
+
+*/
+static proc TensorModuleMult(int m, module M)
+{
+  int n = nvars(basering);
+  int k = ncols(M);
+  
+  int g, cc, vv;
+  
+  poly h;
+
+  module Temp; // = {f_1, ..., f_k }
+
+  intvec exp;
+  vector pTempSum, w;
+  
+  for( int i = k; i > 0; i-- ) // for every w \in M
+  {
+    pTempSum[m] = 0;
+    w = M[i];
+
+    while(w != 0) // for each term of w...
+    {
+      exp = leadexp(w);
+      g = exp[n+1]; // module component!
+      h = w[g];
+
+      w = w - h * gen(g);
+
+      cc = g % m;
+      
+      if( cc == 0)
+      {
+        cc = m;
+      }
+      
+      vv = 1 + (g - cc) / m;
+      
+      pTempSum = pTempSum + h * var(vv) * gen(cc);
+    }
+
+    Temp[i] = pTempSum;
+  }
+
+  Temp = transpose(Temp);
+
+  return(Temp);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 static proc max(int i,int j)
 {
@@ -225,7 +323,6 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
 proc sheafCohBGG(module M,int l,int h)
 "USAGE:   sheafCohBGG(M,l,h);    M module, l,h int
 ASSUME:  @code{M} is graded, and it comes assigned with an admissible degree
@@ -338,6 +435,124 @@ example
    attrib(M,"isHomog",v);
    def B=sheafCohBGG(M,-8,4);
 }
+
+///////////////////////////////////////////////////////////////////////////////
+proc sheafCohBGG2(module M,int l,int h)
+"USAGE:   sheafCohBGG2(M,l,h);    M module, l,h int
+ASSUME:  @code{M} is graded, and it comes assigned with an admissible degree
+         vector as an attribute, @code{h>=l}, and the basering has @code{n+1}
+         variables.
+RETURN:  intmat, cohomology of twists of the coherent sheaf F on P^n
+         associated to coker(M). The range of twists is determined by @code{l},
+         @code{h}.
+DISPLAY: The intmat is displayed in a diagram of the following form: @*
+  @format
+                l            l+1                      h
+  ----------------------------------------------------------
+      n:     h^n(F(l))    h^n(F(l+1))   ......    h^n(F(h))
+           ...............................................
+      1:     h^1(F(l))    h^1(F(l+1))   ......    h^1(F(h))
+      0:     h^0(F(l))    h^0(F(l+1))   ......    h^0(F(h))
+  ----------------------------------------------------------
+    chi:     chi(F(l))    chi(F(l+1))   ......    chi(F(h))
+  @end format
+         A @code{'-'} in the diagram refers to a zero entry; a @code{'*'}
+         refers to a negative entry (= dimension not yet determined).
+         refers to a not computed dimension. @*
+NOTE:    This procedure is based on the Bernstein-Gel'fand-Gel'fand
+         correspondence and on Tate resolution ( see [Eisenbud, Floystad,
+         Schreyer: Sheaf cohomology and free resolutions over exterior
+         algebras, Trans AMS 355 (2003)] ).@*
+         @code{sheafCohBGG(M,l,h)} does not compute all values in the above
+         table. To determine all values of @code{h^i(F(d))}, @code{d=l..h},
+         use @code{sheafCohBGG(M,l-n,h+n)}.
+         Experimental version. Should require less memory.
+SEE ALSO: sheafCohBGG
+EXAMPLE: example sheafCohBGG2; shows an example
+"
+{
+  int i,j,k,row,col;
+  if( typeof(attrib(M,"isHomog"))!="intvec" ) {
+     if (size(M)==0) { attrib(M,"isHomog",0); }
+     else { ERROR("No admissible degree vector assigned"); }
+  }
+  intvec ivOptionsSave = option(get);
+  option(redSB); option(redTail);
+  
+  int n=nvars(basering)-1;
+  int ell=l+n;
+  def R=basering;
+  int reg = CM_regularity(M);
+  int bound=max(reg+1,h-1);
+  module MT=truncate(M,bound);
+  int m=nrows(MT);
+  MT = tJacobian(MT); // transpose(jacobM(MT));
+  MT=syz(MT);
+
+  module SS = TensorModuleMult(m, MT);
+  
+  //--- to the exterior algebra
+  def AR = Exterior(); setring AR;
+  
+  module EM=imap(R,SS);
+  intvec w;
+  //--- here we are with our matrix
+  int bound1=max(1,bound-ell+1);
+  for (i=1; i<=nrows(EM); i++)
+  {
+     w[i]=-bound-1;
+  }
+  attrib(EM,"isHomog",w);
+  resolution RE = minres(nres(EM,bound1));
+  intmat Betti=betti(RE);
+  k=ncols(Betti);
+  row=nrows(Betti);
+  int shift=attrib(Betti,"rowShift")+(k+ell-1);
+  intmat newBetti[n+1][h-l+1];
+  for (j=1; j<=row; j++) {
+    for (i=l; i<=h; i++) {
+      if ((k+1-j-i+ell-shift>0) and (j+i-ell+shift>=1)) {
+        newBetti[n+2-shift-j,i-l+1]=Betti[j,k+1-j-i+ell-shift];
+      }
+      else { newBetti[n+2-shift-j,i-l+1]=-1; }
+    }
+  }
+  for (j=2; j<=n+1; j++) {
+    for (i=1; i<j; i++) {
+      newBetti[j,i]=-1;
+    }
+  }
+  int d=k-h+ell-1;
+  for (j=1; j<=n; j++) {
+    for (i=h-l+1; i>=k+j; i--) {
+      newBetti[j,i]=-1;
+    }
+  }
+  displayCohom(newBetti,l,h,n);
+  
+  setring R;
+  option(set, ivOptionsSave);
+  
+  return(newBetti);
+}
+example
+{"EXAMPLE:";
+   echo = 2;
+   // cohomology of structure sheaf on P^4:
+   //-------------------------------------------
+   ring r=0,x(1..5),dp;
+   module M=0;
+   def A=sheafCohBGG2(0,-9,4);
+   // cohomology of cotangential bundle on P^3:
+   //-------------------------------------------
+   ring R=0,(x,y,z,u),dp;
+   resolution T1=mres(maxideal(1),0);
+   module M=T1[3];
+   intvec v=2,2,2,2,2,2;
+   attrib(M,"isHomog",v);
+   def B=sheafCohBGG2(M,-8,4);
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
