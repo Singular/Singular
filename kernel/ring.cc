@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.50 2007-01-03 00:17:11 motsak Exp $ */
+/* $Id: ring.cc,v 1.51 2007-01-09 12:36:05 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1215,9 +1215,8 @@ int rSum(ring r1, ring r2, ring &sum)
     matrix D1 = R1->nc->D, D2 = R2->nc->D;
 
     // !!!! BUG? C1 and C2 might live in different baserings!!!
-    // Let's assume its the currRing! :)
-    assume( R1->nc->basering == currRing );
-    assume( R2->nc->basering == currRing );
+    // it cannot be both the currRing! :)
+    // the currRing is sum!
     
     int l = rVar(R1) + rVar(R2);
     matrix C  = mpNew(l,l);
@@ -1230,6 +1229,10 @@ int rSum(ring r1, ring r2, ring &sum)
         MATELEM(C,i,j) = pOne();
       }
     }
+    sum->nc->C = C;
+    sum->nc->D = D;
+    if (nc_InitMultiplication(sum))
+      WarnS("Error initializing multiplication!");
     for (i=1; i< rVar(R1); i++)
     {
       for (j=i+1; j<=rVar(R1); j++)
@@ -1242,21 +1245,19 @@ int rSum(ring r1, ring r2, ring &sum)
         }
       }
     }
+    idTest((ideal)C);
     for (i=1; i< rVar(R2); i++)
     {
       for (j=i+1; j<=rVar(R2); j++)
       {
         MATELEM(C,rVar(R1)+i,rVar(R1)+j) = pPermPoly(MATELEM(C2,i,j),perm2,R2,nMap2,par_perm2,rPar(R2));
-              if (MATELEM(D2,i,j) != NULL)
+        if (MATELEM(D2,i,j) != NULL)
         {
           MATELEM(D,rVar(R1)+i,rVar(R1)+j) = pPermPoly(MATELEM(D2,i,j),perm2,R2,nMap2,par_perm2,rPar(R2));
         }
       }
     }
-    idTest((ideal)C);
     idTest((ideal)D);
-    sum->nc->C = C;
-    sum->nc->D = D;
     if (nc_InitMultiplication(sum))
       WarnS("Error initializing multiplication!");
     sum->nc->IsSkewConstant =(int)((R1->nc->IsSkewConstant) && (R2->nc->IsSkewConstant));
