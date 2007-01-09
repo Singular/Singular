@@ -229,14 +229,14 @@ endif
 # MAKE SURE THAT THIS IS UP_TO_DATE
 #
 
-SLIB0 = absfact.lib  arcAtPoint.lib AtkinsTest.lib ASK.lib\
-	ainvar.lib   alexpoly.lib  algebra.lib   brnoeth.lib \
-	classify.lib control.lib   deform.lib    elim.lib      equising.lib \
+SLIB0 = absfact.lib  arcpoint.lib  atkins.lib    aksaka.lib\
+	ainvar.lib   alexpoly.lib  algebra.lib   brnoeth.lib   classify.lib \
+	control.lib  crypto.lib    deform.lib    elim.lib      equising.lib \
 	finvar.lib   gmspoly.lib   gmssing.lib   general.lib   graphics.lib \
 	grwalk.lib   groups.lib    hnoether.lib  homolog.lib   inout.lib \
-	intprog.lib  krypto.lib    latex.lib     linalg.lib    lll.lib \
+	intprog.lib  latex.lib     linalg.lib    lll.lib \
 	makedbm.lib  matrix.lib \
-	modStd.lib   mprimdec.lib  mondromy.lib  mregular.lib  rootsmr.lib \
+	modstd.lib   mprimdec.lib  mondromy.lib  mregular.lib  rootsmr.lib \
 	noether.lib  normal.lib   ntsolve.lib  \
 	poly.lib     presolve.lib  primdec.lib   primitiv.lib   qhmoduli.lib \
 	random.lib   reesclos.lib  resolve.lib   resgraph.lib   reszeta.lib \
