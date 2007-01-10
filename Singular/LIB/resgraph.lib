@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: resgraph.lib,v 1.4 2007-01-10 10:15:51 Singular Exp $";
-category="Commutative Algebra";
+version="$Id: resgraph.lib,v 1.5 2007-01-10 10:24:56 Singular Exp $";
+category="Visualization";
 info="
 LIBRARY:  resgraph.lib            Visualization of Resolution Data
 
