@@ -1,4 +1,36 @@
+//////////////////////////////////////////////////////////////////////////////
+version="$Id: resgraph.lib,v 1.4 2007-01-10 10:15:51 Singular Exp $";
+category="Commutative Algebra";
+info="
+LIBRARY:  resgraph.lib            Visualization of Resolution Data
+
+AUTHOR: A. Fruehbis-Krueger,  anne@mathematik.uni-kl.de,
+
+NOTE: This library uses the external programs surf, graphviz and xv.
+@*    Input data is assumed to originate from resolve.lib and reszeta.lib
+
+PROCEDURES:
+InterDiv(M[,name])   dual graph of resolution of a surface (uses graphviz,xv)
+ResTree(L,M[,name])  tree of charts of resolution (uses graphviz,xv)
+finalCharts(L,...)   pictures of final charts of surface (uses surf)
+";
+
 proc InterDiv(intmat M, list #)
+"USAGE:  InterDiv(M[,name]);
+@*       M = matrix
+@*       name = string
+ASSUME:  - M is first list entry of output of 'intersectionDiv'
+@*         from library reszeta.lib
+@*       - write permission in the current directory or in the
+@*         directory in which the file with name 'name' resides
+CREATE:  file 'name.jpg' containing dual graph of resolution
+@*       if filename is given
+NOTE:    only available on UNIX-type systems and programs
+@*       'xv' (X11/Xorg package) and 'dot' (Graphviz package) need to
+@*       be in the standard search PATH
+RETURN:  nothing, only generating graphics output in separate window
+EXAMPLE: not available (for technical reasons)
+"
 {
   "Warning: alpha testing version of this procedure";
   int i,j;
@@ -61,7 +93,7 @@ proc InterDiv(intmat M, list #)
      outfile=system("getenv","PWD") + "/" + outfile;
   }
   j=system("sh","dot -Tjpg " + @filename + " -o "+ outfile);
-  j=system("sh","/usr/bin/X11/xv " + outfile + " &");
+  j=system("sh","xv " + outfile + " &");
 //---------------------------------------------------------------------------
 // clean up if necessary
 //---------------------------------------------------------------------------
@@ -112,6 +144,26 @@ proc buildFilename(string datei)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc ResTree(list re, intmat DivMat, list #)
+"USAGE:  ResTree(L,M[,name][,mark]);
+@*       L = list
+@*       M = matrix
+@*       name = string
+@*       mark = intvec
+ASSUME:  - L is the output of 'resolve' from resolve.lib
+@*       - M is first entry of output of 'collectDiv(L);' from reszeta.lib
+@*       - write permission in the current directory or in the
+@*         directory in which the file with name 'name' resides
+@*       - mark intvec of size size(L[2])
+@*            mark[i]=0 (default) border of box black
+@*            mark[i]=1 border of box red
+CREATE:  file 'name.jpg' containing the tree of charts of L
+@*       if filename is given
+NOTE:    only available on UNIX-type systems and programs
+@*       'xv' (X11/Xorg package) and 'dot' (Graphviz package) need to
+@*       be in the standard search PATH
+RETURN:  nothing, only generating graphics output in separate window
+EXAMPLE: not available (for technical reasons)
+"
 {
 //-----------------------------------------------------------------------------
 // Initialization and definition of the temporary filename
@@ -244,6 +296,24 @@ proc ResTree(list re, intmat DivMat, list #)
 /////////////////////////////////////////////////////////////////////////////
 
 proc finalCharts(list re, list inter, intvec endiv, list #)
+"USAGE:  finalCharts(L1,L2,iv[,name]);
+@*       L1 = list
+@*       L2 = list
+@*       iv = intvec
+@*       name = string
+ASSUME:  - L1 is the output of 'resolve' from resolve.lib
+@*       - L2 is the output of 'intersectionDiv(L1)' from reszeta.lib
+@*       - iv is the first entry of the output of 'abstractR(L1)'
+@*       - write permission in the current directory or in the
+@*         directory in which the file with name 'name' resides
+CREATE:  - new windows in which surf-images of the final charts are presented
+@*       - several '.ras' files in the directory in which 'name' resides
+NOTE:    only available on UNIX-type systems
+@*       external programs 'surf' and 'xv' (X11/Xorg package) need to be
+@*       in the standard search PATH
+RETURN:  nothing, only generating graphics output in separate window
+EXAMPLE: not available (for technical reasons)
+"
 {
 //-----------------------------------------------------------------------------
 // Initialization and Sanity Checks
