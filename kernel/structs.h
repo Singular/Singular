@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.26 2007-01-03 00:17:12 motsak Exp $ */
+/* $Id: structs.h,v 1.27 2007-01-10 16:12:46 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -731,6 +731,7 @@ inline long si_min(const long a, const long b)  { return (a<b) ? a : b; }
 #define V_FINDMONOM  19
 #define V_COEFSTRAT  20
 #define V_IDLIFT     21
+#define V_LENGTH     22
 #define V_DEG_STOP   31
 
 
@@ -783,6 +784,7 @@ inline long si_min(const long a, const long b)  { return (a<b) ? a : b; }
 #define TEST_OPT_CONTENTSB         BVERBOSE(V_CONTENTSB)
 #define TEST_OPT_CANCELUNIT        BVERBOSE(V_CANCELUNIT)
 #define TEST_OPT_IDLIFT            BVERBOSE(V_IDLIFT)
+#define TEST_OPT_LENGTH            BVERBOSE(V_LENGTH)
 
 #define TEST_VERB_NSB              BVERBOSE(V_NSB)
 #define TEST_V_DEG_STOP            BVERBOSE(V_DEG_STOP)

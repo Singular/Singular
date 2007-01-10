@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.33 2007-01-05 17:59:32 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.34 2007-01-10 16:12:46 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -470,6 +470,7 @@ int redHomog (LObject* h,kStrategy strat)
      */
     i = j;
 #if 1
+    if (!TEST_OPT_LENGTH)
     loop
     {
       /*- search the shortest possible with respect to length -*/
@@ -593,6 +594,7 @@ int redLazy (LObject* h,kStrategy strat)
 
     i = j;
 #if 1
+    if (!TEST_OPT_LENGTH)
     loop
     {
       /*- search the shortest possible with respect to length -*/
@@ -733,6 +735,7 @@ int redHoney (LObject* h, kStrategy strat)
      * pi with ecart ei
      */
     i = j;
+    if (!TEST_OPT_LENGTH)
     loop
     {
       /*- takes the first possible with respect to ecart -*/
