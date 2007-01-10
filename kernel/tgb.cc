@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.110 2007-01-10 10:56:45 bricken Exp $ */
+/* $Id: tgb.cc,v 1.111 2007-01-10 17:17:27 Singular Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2610,9 +2610,10 @@ ideal t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode){
   //debug_Ideal=arg_debug_Ideal;
   //if (debug_Ideal) PrintS("DebugIdeal received\n");
   // Print("Idelems %i \n----------\n",IDELEMS(arg_I));
-  ideal I=idCompactify(arg_I);
-   int i;
+  ideal I=idCopy(arg_I);
+  idCompactify(I);
   if (idIs0(I)) return I;
+  int i;
   for(i=0;i<IDELEMS(I);i++)
   {
     assume(I->m[i]!=NULL);

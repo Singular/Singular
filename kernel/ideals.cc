@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.30 2007-01-10 10:42:00 Singular Exp $ */
+/* $Id: ideals.cc,v 1.31 2007-01-10 17:17:27 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -522,9 +522,7 @@ ideal idSimpleAdd (ideal h1,ideal h2)
 ideal idAdd (ideal h1,ideal h2)
 {
   ideal result = idSimpleAdd(h1,h2);
-  ideal tmp = idCompactify(result);
-
-  idDelete(&result);
+  idCompactify(result);
   return tmp;
 }
 
@@ -566,10 +564,8 @@ ideal  idMult (ideal h1,ideal  h2)
     }
   }
   {
-    ideal tmp = idCompactify(hh);
-    idDelete(&hh);
-    return tmp;
-    //return hh;
+    idCompactify(hh);
+    return hh;
   }
 }
 
@@ -2570,7 +2566,7 @@ ideal idMinors(matrix a, int ar, ideal R)
 /*2
 *skips all zeroes and double elements, searches also for units
 */
-ideal idCompactify(ideal id)
+void idCompactify(ideal id)
 {
   int i,j;
   BOOLEAN b=FALSE;
@@ -2583,55 +2579,13 @@ ideal idCompactify(ideal id)
   }
   if (b)
   {
-    ideal result=idInit(1,id->rank);
-    result->m[0]=pOne();
-    return result;
+    for(i=IDELEMS(id)-1;i>=0;i--) pDelete(&id->m[i]);
+    id->m[0]=pOne();
   }
   else
   {
-    ideal result=idCopy(id);
-    //if (IDELEMS(result) < 1)
-    {
-      for (i=1;i<IDELEMS(result);i++)
-      {
-        if (result->m[i]!=NULL)
-        {
-          for (j=0;j<i;j++)
-          {
-            if ((result->m[j]!=NULL)
-            && (pComparePolys(result->m[i],result->m[j])))
-            {
-              pDelete(&(result->m[j]));
-            }
-          }
-        }
-      }
-    }
-//    else
-//    {
-//      intvec *v=idSort(result,TRUE);
-//      for(i=0;i<IDELEMS(result);i++)
-//        (*v)[i]--;
-//      for (i=0;i<IDELEMS(result)-1;i++)
-//      {
-//        if (((*v)[i]>=0)
-//        && (result->m[(*v)[i]]!=NULL))
-//        {
-//          j=i+1;
-//          while ((j<IDELEMS(result))
-//          && ((*v)[j]>=0)
-//          && (result->m[(*v)[j]]!=NULL)
-//          && (pComparePolys(result->m[(*v)[i]],result->m[(*v)[j]])))
-//          {
-//            pDelete(&(result->m[(*v)[j]]));
-//            j++;
-//          }
-//        }
-//      }
-//      delete v;
-//    }
-    idSkipZeroes(result);
-    return result;
+    idDelMultiples(id);
+    idSkipZeroes(id);
   }
 }
 
