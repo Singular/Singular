@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.109 2007-01-09 11:21:15 Singular Exp $ */
+/* $Id: tgb.cc,v 1.110 2007-01-10 10:56:45 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2529,8 +2529,10 @@ slimgb_alg::~slimgb_alg(){
   omfree(c->apairs);
   if (TEST_OPT_PROT)
   {
-    Print("calculated %d NFs\n",c->normal_forms);
-    Print("applied %i product crit, %i extended_product crit \n", c->easy_product_crit, c->extended_product_crit);
+    //Print("calculated %d NFs\n",c->normal_forms);
+      Print("\nNF:%i product criterion:%i, ext_product criterion:%i \n", c->normal_forms, c->easy_product_crit, c->extended_product_crit);
+      
+    
   }
   int deleted_form_c_s=0;
 
