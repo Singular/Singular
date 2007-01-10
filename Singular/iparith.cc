@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.425 2007-01-09 10:47:45 Singular Exp $ */
+/* $Id: iparith.cc,v 1.426 2007-01-10 15:45:57 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2646,14 +2646,6 @@ static BOOLEAN jjSIMPL_ID(leftv res, leftv u, leftv v)
   {
     idDelLmEquals(id);
   }
-  if (sw & SIMPL_NULL)
-  {
-    idSkipZeroes(id);
-  }
-  if (sw & SIMPL_NORM)
-  {
-    idNorm(id);
-  }
   if (sw & SIMPL_MULT)
   {
     idDelMultiples(id);
@@ -2661,6 +2653,14 @@ static BOOLEAN jjSIMPL_ID(leftv res, leftv u, leftv v)
   else if(sw & SIMPL_EQU)
   {
     idDelEquals(id);
+  }
+  if (sw & SIMPL_NULL)
+  {
+    idSkipZeroes(id);
+  }
+  if (sw & SIMPL_NORM)
+  {
+    idNorm(id);
   }
   res->data = (char * )id;
   return FALSE;
