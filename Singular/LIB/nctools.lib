@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.20 2007-01-09 17:04:23 motsak Exp $";
+version="$Id: nctools.lib,v 1.21 2007-01-11 01:27:14 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -19,6 +19,7 @@ makeHeisenberg(N, [p,d]); return n-th Heisenberg algebra in (x(i),y(i),h) realiz
 Exterior();               return qring, the exterior algebra of a basering,
 findimAlgebra(M,[r]);     create finite dimensional algebra structure from the basering and the multiplication matrix M,
 SuperCommutative([b,e]);  return qring, the super-commutative algebra over a basering,
+rightStd(I);              compute a right Groebner basis of an ideal,
 
 AUXILIARY PROCEDURES:
 ncRelations(r);         recover the non-commutative relations of a G-algebra,
@@ -1199,4 +1200,34 @@ example
    kill r;
 }
 
+
+proc rightStd(ideal I)
+"USAGE:  rightStd(I); I an ideal
+PURPOSE: compute a right Groebner basis of I
+RETURN:  ideal
+EXAMPLE: example rightStd; shows examples
+"
+{
+  def A = basering;
+  def Aopp = opposite(A);
+  setring Aopp;
+  ideal Iopp = oppose(A,I);
+  ideal Jopp = std(Iopp);
+  setring A;
+  ideal J = oppose(Aopp,Jopp);
+  return(J);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  LIB "ncalg.lib";
+  def A = makeUsl(2);
+  setring A;
+  ideal I = e2,f;
+  option(redSB);
+  option(redTail);
+  ideal LI = std(I);
+  LI;
+  ideal RI = rightStd(I);
+  RI;
+}
 //////////////////////////////////////////////////////////////////////
