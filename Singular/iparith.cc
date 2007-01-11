@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.430 2007-01-11 12:57:35 Singular Exp $ */
+/* $Id: iparith.cc,v 1.431 2007-01-11 17:40:08 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1076,6 +1076,13 @@ static BOOLEAN jjTIMES_MA(leftv res, leftv u, leftv v)
     return jjOP_REST(res,u,v);
   return FALSE;
 }
+static BOOLEAN jjGE_BI(leftv res, leftv u, leftv v)
+{
+  number h=nlSub((number)u->Data(),(number)v->Data());
+  res->data = (char *) (nlGreaterZero(h)||(nlIsZero(h)));
+  nlDelete(&h);
+  return FALSE;
+}
 static BOOLEAN jjGE_I(leftv res, leftv u, leftv v)
 {
   res->data = (char *)((int)((long)u->Data()) >= (int)((long)v->Data()));
@@ -1086,6 +1093,13 @@ static BOOLEAN jjGE_N(leftv res, leftv u, leftv v)
   number h=nSub((number)u->Data(),(number)v->Data());
   res->data = (char *) (nGreaterZero(h)||(nIsZero(h)));
   nDelete(&h);
+  return FALSE;
+}
+static BOOLEAN jjGT_BI(leftv res, leftv u, leftv v)
+{
+  number h=nlSub((number)u->Data(),(number)v->Data());
+  res->data = (char *) (nlGreaterZero(h)&&(!nlIsZero(h)));
+  nlDelete(&h);
   return FALSE;
 }
 static BOOLEAN jjGT_I(leftv res, leftv u, leftv v)
@@ -1100,6 +1114,10 @@ static BOOLEAN jjGT_N(leftv res, leftv u, leftv v)
   nDelete(&h);
   return FALSE;
 }
+static BOOLEAN jjLE_BI(leftv res, leftv u, leftv v)
+{
+  return jjGE_BI(res,v,u);
+}
 static BOOLEAN jjLE_I(leftv res, leftv u, leftv v)
 {
   res->data = (char *)((int)((long)u->Data()) <= (int)((long)v->Data()));
@@ -1107,10 +1125,11 @@ static BOOLEAN jjLE_I(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjLE_N(leftv res, leftv u, leftv v)
 {
-  number h=nSub((number)v->Data(),(number)u->Data());
-  res->data = (char *) (nGreaterZero(h)||nIsZero(h));
-  nDelete(&h);
-  return FALSE;
+  return GE_N(res,v,u);
+}
+static BOOLEAN jjLT_BI(leftv res, leftv u, leftv v)
+{
+  return jjGT_BI(res,v,u);
 }
 static BOOLEAN jjLT_I(leftv res, leftv u, leftv v)
 {
@@ -1119,10 +1138,7 @@ static BOOLEAN jjLT_I(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjLT_N(leftv res, leftv u, leftv v)
 {
-  number h=nSub((number)v->Data(),(number)u->Data());
-  res->data = (char *) (nGreaterZero(h)&&(!nIsZero(h)));
-  nDelete(&h);
-  return FALSE;
+  return jjGT_N(res,v,u);
 }
 static BOOLEAN jjDIVMOD_I(leftv res, leftv u, leftv v)
 {
@@ -1274,6 +1290,12 @@ static BOOLEAN jjDIV_Ma(leftv res, leftv u, leftv v)
     }
   }
   res->data=(char *)mm;
+  return FALSE;
+}
+static BOOLEAN jjEQUAL_BI(leftv res, leftv u, leftv v)
+{
+  res->data = (char *)((long)nlEqual((number)u->Data(),(number)v->Data()));
+  jjEQUAL_REST(res,u,v);
   return FALSE;
 }
 static BOOLEAN jjEQUAL_I(leftv res, leftv u, leftv v)
@@ -2931,6 +2953,7 @@ struct sValCmd2 dArith2[]=
 ,{jjCOMPARE_IV,LE,             INT_CMD,        INTVEC_CMD, INTVEC_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_P, LE,             INT_CMD,        POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_P, LE,             INT_CMD,        VECTOR_CMD, VECTOR_CMD ALLOW_PLURAL}
+,{jjLE_BI,     LE,             INT_CMD,        BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjLT_I,      '<',            INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
 ,{jjLT_N,      '<',            INT_CMD,        NUMBER_CMD, NUMBER_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_IV_I,'<',           INT_CMD,        INTVEC_CMD, INT_CMD ALLOW_PLURAL}
@@ -2938,6 +2961,7 @@ struct sValCmd2 dArith2[]=
 ,{jjCOMPARE_S, '<',            INT_CMD,        STRING_CMD, STRING_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_P, '<',            INT_CMD,        POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_P, '<',            INT_CMD,        VECTOR_CMD, VECTOR_CMD ALLOW_PLURAL}
+,{jjLT_BI,     '<',            INT_CMD,        BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjGE_I,      GE,             INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
 ,{jjGE_N,      GE,             INT_CMD,        NUMBER_CMD, NUMBER_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_S, GE,             INT_CMD,        STRING_CMD, STRING_CMD ALLOW_PLURAL}
@@ -2945,6 +2969,7 @@ struct sValCmd2 dArith2[]=
 ,{jjCOMPARE_IV,GE,             INT_CMD,        INTVEC_CMD, INTVEC_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_P, GE,             INT_CMD,        POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_P, GE,             INT_CMD,        VECTOR_CMD, VECTOR_CMD ALLOW_PLURAL}
+,{jjGE_BI,     GE,             INT_CMD,        BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjGT_I,      '>',            INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
 ,{jjGT_N,      '>',            INT_CMD,        NUMBER_CMD, NUMBER_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_S, '>',            INT_CMD,        STRING_CMD, STRING_CMD ALLOW_PLURAL}
@@ -2952,6 +2977,7 @@ struct sValCmd2 dArith2[]=
 ,{jjCOMPARE_IV,'>',            INT_CMD,        INTVEC_CMD, INTVEC_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_P, '>',            INT_CMD,        POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_P, '>',            INT_CMD,        VECTOR_CMD, VECTOR_CMD ALLOW_PLURAL}
+,{jjGT_BI,     '>',            INT_CMD,        BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjAND_I,     '&',            INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
 ,{jjOR_I,      '|',            INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
 ,{jjEQUAL_I,   EQUAL_EQUAL,    INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
@@ -2962,6 +2988,7 @@ struct sValCmd2 dArith2[]=
 ,{jjCOMPARE_IV_I,EQUAL_EQUAL,  INT_CMD,        INTVEC_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_IV,EQUAL_EQUAL,    INT_CMD,        INTVEC_CMD, INTVEC_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_IV,EQUAL_EQUAL,    INT_CMD,        INTMAT_CMD, INTMAT_CMD ALLOW_PLURAL}
+,{jjEQUAL_BI,  EQUAL_EQUAL,    INT_CMD,        BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjEQUAL_Ma,  EQUAL_EQUAL,    INT_CMD,        MATRIX_CMD, MATRIX_CMD ALLOW_PLURAL}
 ,{jjWRONG2,    EQUAL_EQUAL,    0,              IDEAL_CMD,  IDEAL_CMD ALLOW_PLURAL}
 ,{jjWRONG2,    EQUAL_EQUAL,    0,              MODUL_CMD,  MODUL_CMD ALLOW_PLURAL}
