@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.282 2007-01-09 15:00:14 Singular Exp $
+@comment $Id: reference.doc,v 1.283 2007-01-11 17:46:56 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4312,6 +4312,9 @@ rings with characteristic 0 and not set for all other rings.
 uses a more lazy approach in std computations,
 which was used in Singular version before 2-0
 (and which may lead to faster or slower computations, depending on the example)
+@item @code{length}
+@cindex length, option
+select shorter reduceers in std computations,
 @c ---------
 @c @item @code{minRes}
 @c @cindex minRes, option

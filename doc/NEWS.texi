@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.71 2007-01-10 10:33:29 Singular Exp $
+@comment $Id: NEWS.texi,v 1.72 2007-01-11 17:46:56 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -37,7 +37,7 @@ new command: (@nref{interpolation}: ideal of points with given multiplicities)
 @item
 non-commutative kernel subsystem was rewritten for more efficient super-commutative (and exterior) algebras
 @item
-@nref{std} et al.: selection strategy for reductions changed.
+@nref{std} et al.: new selection strategy for reductions (@nref{option} (length)).
 @item
 @nref{simplify} slightly changed: does not omit zero polynomial unless
 specified.
