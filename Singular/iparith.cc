@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.429 2007-01-11 12:47:50 Singular Exp $ */
+/* $Id: iparith.cc,v 1.430 2007-01-11 12:57:35 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3981,12 +3981,12 @@ static BOOLEAN jjRESERVEDNAME(leftv res, leftv v)
   int l = strlen(s);
   for(i=0; i<sArithBase.nCmdUsed; i++)
   {
+    //Print("test %d, >>%s<<, tab:>>%s<<\n",i,s,sArithBase.sCmds[i].name);
     if (strcmp(s, sArithBase.sCmds[i].name) == 0)
     {
       res->data = (char *)1;
       return FALSE;
     }
-    i++;
   }
   //res->data = (char *)0;
   return FALSE;
@@ -6780,7 +6780,7 @@ void ttGen2b()
     "  sArithBase.nCmdAllocated = %d;\n"
     "  sArithBase.sCmds = (cmdnames*)omAlloc0(sArithBase.nCmdAllocated*sizeof(cmdnames));\n"
     "\n"
-    "  // name-string        alias  tokval toktype\n",
+    "  // name-string                   alias  tokval toktype index\n",
     cmd_size);
   int m=0;
   int id_nr=0;
