@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.111 2007-01-10 17:17:27 Singular Exp $ */
+/* $Id: tgb.cc,v 1.112 2007-01-11 10:58:22 Singular Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1525,6 +1525,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
     cleanS(c->strat,c);
   }
 
+#ifdef HAVE_PLURAL
   // for SCA:
   // here write at the end of nodes_final[spc_final,...,spc_final+lmdeg-1]
   if(rIsSCA(c->r))
@@ -1562,7 +1563,8 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
       omfree(array_arg); // !!!
     }
 //     Print("Saturation - done!!!\n");
-  } // if SCAlgebra
+  }
+#endif // if SCAlgebra
 
 
   if(!ip){
@@ -1818,11 +1820,14 @@ static void go_on (slimgb_alg* c){
     now_t_rep(s->i,s->j,c);
     }
     poly h;
-    if(s->i>=0){
-      if (!c->nc)
-  h=ksOldCreateSpoly(c->S->m[s->i], c->S->m[s->j], NULL, c->r);
+    if(s->i>=0)
+    {
+#ifdef HAVE_PLURAL
+      if (c->nc)
+        h= nc_SPoly(c->S->m[s->i], c->S->m[s->j]/*, NULL*/, c->r);
       else
-  h= nc_SPoly(c->S->m[s->i], c->S->m[s->j]/*, NULL*/, c->r);
+#endif
+        h=ksOldCreateSpoly(c->S->m[s->i], c->S->m[s->j], NULL, c->r);
     }
     else
       h=s->lcm_of_lm;
@@ -2531,8 +2536,8 @@ slimgb_alg::~slimgb_alg(){
   {
     //Print("calculated %d NFs\n",c->normal_forms);
       Print("\nNF:%i product criterion:%i, ext_product criterion:%i \n", c->normal_forms, c->easy_product_crit, c->extended_product_crit);
-      
-    
+
+
   }
   int deleted_form_c_s=0;
 
@@ -2972,17 +2977,19 @@ static inline wlen_type quality_of_pos_in_strat_S(int pos, slimgb_alg* c){
   if (c->strat->lenSw!=NULL) return c->strat->lenSw[pos];
   return c->strat->lenS[pos];
 }
+#ifdef HAVE_PLURAL
 static inline wlen_type quality_of_pos_in_strat_S_mult_high(int pos, poly high, slimgb_alg* c)
   //meant only for nc
 {
   poly m=pOne();
   pExpVectorDiff(m,high ,c->strat->S[pos]);
-  poly product = mm_Mult_pp(m, c->strat->S[pos], c->r);
+  poly product = nc_mm_Mult_pp(m, c->strat->S[pos], c->r);
   wlen_type erg=pQuality(product,c);
   pDelete(&m);
   pDelete(&product);
   return erg;
 }
+#endif
 
 static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,find_erg & erg){
   erg.expand=NULL;
@@ -3030,8 +3037,10 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
 
   int i;
   wlen_type quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
+  #ifdef HAVE_PLURAL
   if (c->nc)
     quality_a=quality_of_pos_in_strat_S_mult_high(erg.reduce_by, los[erg.to_reduce_u].p, c);
+  #endif
   int best=erg.to_reduce_u+1;
   wlen_type qc;
   best=find_best(los,erg.to_reduce_l,erg.to_reduce_u,qc,c);
@@ -3568,14 +3577,17 @@ int red_object::clear_to_poly(){
 
 
 void reduction_step::reduce(red_object* r, int l, int u){}
-void simple_reducer::do_reduce(red_object & ro){
+void simple_reducer::do_reduce(red_object & ro)
+{
   number coef;
-  if (!c->nc)
+#ifdef HAVE_PLURAL
+  if (c->nc)
+    nc_BucketPolyRed_Z(ro.bucket, p, &coef);
+  else
+#endif
     coef=kBucketPolyRed(ro.bucket,p,
        p_len,
        c->strat->kNoether);
-  else
-    nc_BucketPolyRed_Z(ro.bucket, p, &coef);
   nDelete(&coef);
 }
 
@@ -3667,10 +3679,12 @@ void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
       pSetExp(m,i,(pGetExp(r[erg.to_reduce_l].p, i)-pGetExp(red,i)));
     pSetm(m);
     poly red_cp;
-    if (!c->nc)
-      red_cp=ppMult_mm(red,m);
+    #ifdef HAVE_PLURAL
+    if (c->nc)
+      red_cp = nc_mm_Mult_pp(m, red, c->r);
     else
-      red_cp = mm_Mult_pp(m, red, c->r);
+    #endif
+      red_cp=ppMult_mm(red,m);
     if(!erg.fromS){
       kBucketInit(r[rn].bucket,red,red_len);
     }

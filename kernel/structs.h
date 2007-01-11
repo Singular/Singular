@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.27 2007-01-10 16:12:46 Singular Exp $ */
+/* $Id: structs.h,v 1.28 2007-01-11 10:58:22 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -412,17 +412,17 @@ struct sro_ord
   } data;
 };
 
-// #ifdef HAVE_PLURAL
+#ifdef HAVE_PLURAL
 // NC pProcs:
-typedef poly (*mm_Mult_p_Proc_Ptr)(const poly m, poly p, const ring r);
-typedef poly (*mm_Mult_pp_Proc_Ptr)(const poly m, const poly p, const ring r);
+typedef poly (*nc_mm_Mult_p_Proc_Ptr)(const poly m, poly p, const ring r);
+typedef poly (*nc_mm_Mult_pp_Proc_Ptr)(const poly m, const poly p, const ring r);
 
-typedef ideal (*GB_Proc_Ptr)(const ideal F, const ideal Q, const intvec *w, const intvec *hilb, kStrategy strat);
+typedef ideal (*nc_GB_Proc_Ptr)(const ideal F, const ideal Q, const intvec *w, const intvec *hilb, kStrategy strat);
 
-typedef poly (*SPoly_Proc_Ptr)(const poly p1, const poly p2, const ring r);
-typedef poly (*SPolyReduce_Proc_Ptr)(const poly p1, poly p2, const ring r);
+typedef poly (*nc_SPoly_Proc_Ptr)(const poly p1, const poly p2, const ring r);
+typedef poly (*nc_SPolyReduce_Proc_Ptr)(const poly p1, poly p2, const ring r);
 
-typedef void (*Bucket_Proc_Ptr)(kBucket_pt b, poly p, number *c);
+typedef void (*nc_Bucket_Proc_Ptr)(kBucket_pt b, poly p, number *c);
 
 struct nc_pProcs
 {
@@ -474,7 +474,7 @@ struct nc_struct
     nc_pProcs p_Procs; // NC procedures.
 
 };
-// #endif
+#endif
 #if 0
 struct nc_struct
 {

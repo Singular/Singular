@@ -4,13 +4,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sca.h,v 1.4 2007-01-11 10:27:04 Singular Exp $ */
+/* $Id: sca.h,v 1.5 2007-01-11 10:58:21 Singular Exp $ */
 
+#include <gring.h>
 #ifdef HAVE_PLURAL
 #include <structs.h>
 // #include <polys-impl.h>
-// #include <ring.h>
-#include <gring.h>
+#include <ring.h>
 
 inline bool rIsSCA(ring r)
 {
@@ -30,43 +30,29 @@ inline unsigned int scaFirstAltVar(ring r)
 {
   assume(rIsSCA(r));
 
-#ifdef HAVE_PLURAL
   return (r->nc->FirstAltVar());
-#else
-  return (0); //
-#endif
 };
 
 inline unsigned int scaLastAltVar(ring r)
 {
   assume(rIsSCA(r));
 
-#ifdef HAVE_PLURAL
   return (r->nc->LastAltVar());
-#else
-  return (0); //
-#endif
 };
 
 inline void scaFirstAltVar(ring r, int n)
 {
   assume(rIsSCA(r));
 
-#ifdef HAVE_PLURAL
   r->nc->FirstAltVar() = n;
-#endif
 };
 
 inline void scaLastAltVar(ring r, int n)
 {
   assume(rIsSCA(r));
 
-#ifdef HAVE_PLURAL
   r->nc->LastAltVar() = n;
-#endif
 };
-
-
 
 
 
@@ -134,5 +120,9 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
 #endif
 
 
-#endif // #ifndef GRING_SUPER_COMMUTATIVE_ALGEBRA_H
+#else
+#define rIsSCA(R) 0
+#define scaFirstAltVar(R) 0
+#define scaLastAltVar(R) 0
 #endif
+#endif // #ifndef GRING_SUPER_COMMUTATIVE_ALGEBRA_H
