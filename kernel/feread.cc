@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.9 2006-09-27 17:45:40 Singular Exp $ */
+/* $Id: feread.cc,v 1.10 2007-01-11 09:20:35 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -13,21 +13,13 @@
 
 #undef USE_READLINE4
 
+#define OM_NO_MALLOC_MACROS
 
 //----------------------------------------
 #ifdef ix86_Win
 #define READLINE_STATIC
 #endif
 #include "febase.h"
-#ifdef ix86_Win
-#define OM_NO_MALLOC_MACROS
-#endif
-#ifdef ppcMac_darwin
-#define OM_NO_MALLOC_MACROS
-#endif
-#ifdef ix86Mac_darwin
-#define OM_NO_MALLOC_MACROS
-#endif
 #include "omalloc.h"
 
 #include "../Singular/static.h"
