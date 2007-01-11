@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.431 2007-01-11 17:40:08 Singular Exp $ */
+/* $Id: iparith.cc,v 1.432 2007-01-11 17:42:43 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1080,7 +1080,7 @@ static BOOLEAN jjGE_BI(leftv res, leftv u, leftv v)
 {
   number h=nlSub((number)u->Data(),(number)v->Data());
   res->data = (char *) (nlGreaterZero(h)||(nlIsZero(h)));
-  nlDelete(&h);
+  nlDelete(&h,NULL);
   return FALSE;
 }
 static BOOLEAN jjGE_I(leftv res, leftv u, leftv v)
@@ -1099,7 +1099,7 @@ static BOOLEAN jjGT_BI(leftv res, leftv u, leftv v)
 {
   number h=nlSub((number)u->Data(),(number)v->Data());
   res->data = (char *) (nlGreaterZero(h)&&(!nlIsZero(h)));
-  nlDelete(&h);
+  nlDelete(&h,NULL);
   return FALSE;
 }
 static BOOLEAN jjGT_I(leftv res, leftv u, leftv v)
@@ -1125,7 +1125,7 @@ static BOOLEAN jjLE_I(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjLE_N(leftv res, leftv u, leftv v)
 {
-  return GE_N(res,v,u);
+  return jjGE_N(res,v,u);
 }
 static BOOLEAN jjLT_BI(leftv res, leftv u, leftv v)
 {
