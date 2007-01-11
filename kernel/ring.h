@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.15 2007-01-03 00:17:12 motsak Exp $ */
+/* $Id: ring.h,v 1.16 2007-01-11 10:27:04 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -31,6 +31,15 @@ ring rCopy0(ring r, BOOLEAN copy_qideal = TRUE, BOOLEAN copy_ordering = TRUE);
 void   rNameCheck(ring R);
 ring   rOpposite(ring r);
 ring   rEnvelope(ring r);
+
+#ifdef HAVE_PLURAL
+inline BOOLEAN rIsPluralRing(ring r)
+{
+  return ((r != NULL) && (r->nc != NULL) && (r->nc->type != nc_error));
+}
+#else
+#define rIsPluralRing(R) 0
+#endif
 
 
 

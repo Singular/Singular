@@ -3,12 +3,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.15 2007-01-03 00:17:10 motsak Exp $ */
+/* $Id: gring.h,v 1.16 2007-01-11 10:27:03 Singular Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
 
-// #ifdef HAVE_PLURAL
+#ifdef HAVE_PLURAL
 #include "structs.h"
 
 /* the part, related to the interface */
@@ -127,15 +127,6 @@ ideal idOppose(ring Rop, ideal I);
 // NC inlines
 
 
-
-inline BOOLEAN rIsPluralRing(ring r)
-{
-#ifdef HAVE_PLURAL
-  return ((r != NULL) && (r->nc != NULL) && (r->nc->type != nc_error));
-#else
-  return 0;
-#endif
-}
 
 inline void ncRingType(ring r, nc_type t)
 {
@@ -267,4 +258,5 @@ inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const intvec *
 // Macros used to access upper triangle matrices C,D... (which are actually ideals) // afaik
 #define UPMATELEM(i,j,nVar) ( (nVar * ((i)-1) - ((i) * ((i)-1))/2 + (j)-1)-(i) )
 
+#endif
 #endif

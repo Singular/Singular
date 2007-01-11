@@ -4,8 +4,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sca.h,v 1.3 2007-01-09 14:29:32 Singular Exp $ */
+/* $Id: sca.h,v 1.4 2007-01-11 10:27:04 Singular Exp $ */
 
+#ifdef HAVE_PLURAL
 #include <structs.h>
 // #include <polys-impl.h>
 // #include <ring.h>
@@ -134,4 +135,4 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
 
 
 #endif // #ifndef GRING_SUPER_COMMUTATIVE_ALGEBRA_H
-
+#endif

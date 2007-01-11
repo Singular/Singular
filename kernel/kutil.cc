@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.42 2007-01-05 17:59:32 Singular Exp $ */
+/* $Id: kutil.cc,v 1.43 2007-01-11 10:27:03 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1219,9 +1219,15 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
   pLcm(p,strat->S[i],Lp.lcm);
   pSetm(Lp.lcm);
 
-  const bool bIsPluralRing = rIsPluralRing(currRing);
-  const bool bIsSCA        = rIsSCA(currRing) && strat->homog; // for prod-crit
-  const bool bNCProdCrit   = ( !bIsPluralRing || bIsSCA ); // commutative or homogeneous SCA
+#ifdef HAVE_PLURAL
+  const BOOLEAN bIsPluralRing = rIsPluralRing(currRing);
+  const BOOLEAN bIsSCA        = rIsSCA(currRing) && strat->homog; // for prod-crit
+  const BOOLEAN bNCProdCrit   = ( !bIsPluralRing || bIsSCA ); // commutative or homogeneous SCA
+#else
+  const BOOLEAN bIsPluralRing = FALSE;
+  const BOOLEAN bIsSCA        = FALSE;
+  const BOOLEAN bNCProdCrit   = TRUE;
+#endif
 
   if (strat->sugarCrit && bNCProdCrit)
   {
@@ -1363,6 +1369,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
     Lp.p=NULL;
   else
   {
+    #ifdef HAVE_PLURAL
     if ( bIsPluralRing )
     {
       if(pHasNotCF(p, strat->S[i]))
@@ -1387,6 +1394,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
         Lp.p = nc_SPoly(strat->S[i],p,currRing);
     }
     else
+    #endif
     {
       Lp.p = ksCreateShortSpoly(strat->S[i],p, strat->tailRing);
     }
@@ -1451,7 +1459,9 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
   if(pHasNotCF(p,strat->S[i]))
   {
     //PrintS("prod-crit\n");
+    #ifdef HAVE_PLURAL
     if(!rIsPluralRing(currRing) || (rIsSCA(currRing) && strat->homog))
+    #endif
     {
       //PrintS("prod-crit\n");
       strat->cp++;
@@ -1485,13 +1495,13 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
   }
   /*-  compute the short s-polynomial -*/
 
-//   #ifdef HAVE_PLURAL
+  #ifdef HAVE_PLURAL
   if (rIsPluralRing(currRing))
   {
     Lp.p = nc_CreateShortSpoly(strat->S[i],p); // ???
   }
   else
-//   #endif
+  #endif
     Lp.p = ksCreateShortSpoly(strat->S[i],p,strat->tailRing);
 
   if (Lp.p == NULL)
@@ -5135,6 +5145,7 @@ void initBuchMoraCrit(kStrategy strat)
   * - in local rings, - in lex order case, -in ring over extensions */
   strat->noTailReduction = !TEST_OPT_REDTAIL;
 
+#ifdef HAVE_PLURAL
   // and r is plural_ring
   if( rIsPluralRing(currRing) || (rIsSCA(currRing) && !strat->homog) )
   {    //or it has non-quasi-comm type... later
@@ -5142,6 +5153,7 @@ void initBuchMoraCrit(kStrategy strat)
     strat->Gebauer = FALSE;
     strat->honey = FALSE;
   }
+#endif
 
 #ifdef HAVE_RING2TOM
   // Coefficient ring?
