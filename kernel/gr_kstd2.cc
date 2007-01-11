@@ -1,14 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.9 2007-01-03 00:17:09 motsak Exp $ */
+/* $Id: gr_kstd2.cc,v 1.10 2007-01-11 10:10:37 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
 
 #include "mod2.h"
 
-// #ifdef HAVE_PLURAL
+#ifdef HAVE_PLURAL
 
 
 #include "omalloc.h"
@@ -965,7 +965,5 @@ ideal gnc_gr_mora(const ideal, const ideal, const intvec *, const intvec *, kStr
   return NULL;
 }
 
-// #endif
-
-
+#endif
 

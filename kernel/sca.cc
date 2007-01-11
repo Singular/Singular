@@ -6,12 +6,13 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.4 2007-01-09 14:29:33 Singular Exp $
+ *  Version: $Id: sca.cc,v 1.5 2007-01-11 10:08:28 Singular Exp $
  *******************************************************************/
 
 // #define PDEBUG 2
 #include "mod2.h"
 
+#ifdef HAVE_PLURAL
 // for
 #define PLURAL_INTERNAL_DECLARATIONS
 #include "sca.h"
@@ -2212,3 +2213,4 @@ void SetProcsSCA(ring& rGR, p_Procs_s* p_Procs)
 
 #endif
 }
+#endif

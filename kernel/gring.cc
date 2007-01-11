@@ -6,10 +6,10 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.33 2007-01-09 13:07:04 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.34 2007-01-11 10:09:22 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
-// #ifdef HAVE_PLURAL
+#ifdef HAVE_PLURAL
 #define PLURAL_INTERNAL_DECLARATIONS
 
 #include "febase.h"
@@ -2992,7 +2992,7 @@ BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate)
   return diagnose;
 }
 
-// #endif
+#endif
 
 
 // int Commutative_Context(ring r, leftv expression)
