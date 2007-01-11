@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.31 2007-01-10 17:17:27 Singular Exp $ */
+/* $Id: ideals.cc,v 1.32 2007-01-11 10:11:23 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -523,7 +523,7 @@ ideal idAdd (ideal h1,ideal h2)
 {
   ideal result = idSimpleAdd(h1,h2);
   idCompactify(result);
-  return tmp;
+  return result;
 }
 
 /*2
