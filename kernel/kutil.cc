@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.43 2007-01-11 10:27:03 Singular Exp $ */
+/* $Id: kutil.cc,v 1.44 2007-01-11 15:45:25 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1003,7 +1003,8 @@ void initEcartNormal (LObject* h)
   h->FDeg = h->pFDeg();
   h->ecart = h->pLDeg() - h->FDeg;
   // h->length is set by h->pLDeg
-  h->length=h->pLength=pLength(h->p);
+  h->pLength=pLength(h->p);
+  h->length=h->pLength;
 }
 
 void initEcartBBA (LObject* h)
@@ -2083,7 +2084,6 @@ void enterOneZeroPairRing (poly f, poly t_p, poly p, int ecart, kStrategy strat,
     tmp_h.SetShortExpVector();
     strat->initEcart(&tmp_h);
     tmp_h.sev = pGetShortExpVector(tmp_h.p);
-    tmp_h.SetpFDeg();
     tmp_h.t_p = t_p;
 
     enterT(tmp_h, strat, strat->tl + 1);
@@ -2459,19 +2459,19 @@ void enterExtendedSpoly(poly h,kStrategy strat)
       LObject h;
       h.p = tmp;
       h.tailRing = strat->tailRing;
-      if (TEST_OPT_INTSTRATEGY)
-      {
-        //pContent(h.p);
-        h.pCleardenom(); // also does a pContent
-      }
-      else
-      {
-        h.pNorm();
-      }
-      strat->initEcart(&h);
       int posx;
       if (h.p!=NULL)
       {
+        if (TEST_OPT_INTSTRATEGY)
+        {
+          //pContent(h.p);
+          h.pCleardenom(); // also does a pContent
+        }
+        else
+        {
+          h.pNorm();
+        }
+        strat->initEcart(&h);
         if (strat->Ll==-1)
           posx =0;
         else
@@ -4295,13 +4295,13 @@ void initS (ideal F, ideal Q,kStrategy strat)
         {
           h.pNorm();
         }
-        strat->initEcart(&h);
         if (pOrdSgn==-1)
         {
           deleteHC(&h, strat);
         }
         if (h.p!=NULL)
         {
+          strat->initEcart(&h);
           if (strat->sl==-1)
             pos =0;
           else
@@ -4321,6 +4321,11 @@ void initS (ideal F, ideal Q,kStrategy strat)
     {
       LObject h;
       h.p = pCopy(F->m[i]);
+      if (pOrdSgn==-1)
+      {
+        cancelunit(&h);  /*- tries to cancel a unit -*/
+        deleteHC(&h, strat);
+      }
       if (TEST_OPT_INTSTRATEGY)
       {
         //pContent(h.p);
@@ -4330,14 +4335,9 @@ void initS (ideal F, ideal Q,kStrategy strat)
       {
         h.pNorm();
       }
-      strat->initEcart(&h);
-      if (pOrdSgn==-1)
-      {
-        cancelunit(&h);  /*- tries to cancel a unit -*/
-        deleteHC(&h, strat);
-      }
       if (h.p!=NULL)
       {
+        strat->initEcart(&h);
         if (strat->sl==-1)
           pos =0;
         else
@@ -4377,6 +4377,10 @@ void initSL (ideal F, ideal Q,kStrategy strat)
       {
         LObject h;
         h.p = pCopy(Q->m[i]);
+        if (pOrdSgn==-1)
+        {
+          deleteHC(&h,strat);
+        }
         if (TEST_OPT_INTSTRATEGY)
         {
           //pContent(h.p);
@@ -4386,13 +4390,9 @@ void initSL (ideal F, ideal Q,kStrategy strat)
         {
           h.pNorm();
         }
-        strat->initEcart(&h);
-        if (pOrdSgn==-1)
-        {
-          deleteHC(&h,strat);
-        }
         if (h.p!=NULL)
         {
+          strat->initEcart(&h);
           if (strat->sl==-1)
             pos =0;
           else
@@ -4412,6 +4412,11 @@ void initSL (ideal F, ideal Q,kStrategy strat)
     {
       LObject h;
       h.p = pCopy(F->m[i]);
+      if (pOrdSgn==-1)
+      {
+        cancelunit(&h);  /*- tries to cancel a unit -*/
+        deleteHC(&h, strat);
+      }
       if (TEST_OPT_INTSTRATEGY)
       {
         //pContent(h.p);
@@ -4421,14 +4426,9 @@ void initSL (ideal F, ideal Q,kStrategy strat)
       {
         h.pNorm();
       }
-      strat->initEcart(&h);
-      if (pOrdSgn==-1)
-      {
-        cancelunit(&h);  /*- tries to cancel a unit -*/
-        deleteHC(&h, strat);
-      }
       if (h.p!=NULL)
       {
+        strat->initEcart(&h);
         if (strat->Ll==-1)
           pos =0;
         else
@@ -4483,13 +4483,13 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
         //{
         //  h.pNorm();
         //}
-        strat->initEcart(&h);
         if (pOrdSgn==-1)
         {
           deleteHC(&h,strat);
         }
         if (h.p!=NULL)
         {
+          strat->initEcart(&h);
           if (strat->sl==-1)
             pos =0;
           else
@@ -4497,7 +4497,6 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
             pos = posInS(strat,strat->sl,h.p,h.ecart);
           }
           h.sev = pGetShortExpVector(h.p);
-          h.SetpFDeg();
           strat->enterS(h,pos,strat, strat->tl+1);
           enterT(h, strat);
           strat->fromQ[pos]=1;
@@ -4512,25 +4511,23 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
     {
       LObject h;
       h.p = pCopy(F->m[i]);
-      if (pOrdSgn==1)
-      {
-        h.p=redtailBba(h.p,strat->sl,strat);
-      }
-      strat->initEcart(&h);
       if (pOrdSgn==-1)
       {
         deleteHC(&h,strat);
       }
+      else
+      {
+        h.p=redtailBba(h.p,strat->sl,strat);
+      }
       if (h.p!=NULL)
       {
+        strat->initEcart(&h);
         if (strat->sl==-1)
           pos =0;
         else
           pos = posInS(strat,strat->sl,h.p,h.ecart);
         h.sev = pGetShortExpVector(h.p);
         strat->enterS(h,pos,strat, strat->tl+1);
-        h.length = h.GetpLength();
-        h.SetpFDeg();
         enterT(h,strat);
       }
     }
@@ -4541,8 +4538,6 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
     {
       LObject h;
       h.p=pCopy(P->m[i]);
-      strat->initEcart(&h);
-      h.length = h.pLength = pLength(h.p);
       if (TEST_OPT_INTSTRATEGY)
       {
         h.pCleardenom();
@@ -4560,15 +4555,14 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
           {
             h.p=redtailBba(h.p,strat->sl,strat);
           }
-          h.length=h.pLength=pLength(h.p);
         }
         else
         {
           h.p=redMora(h.p,strat->sl,strat);
-          strat->initEcart(&h);
         }
         if(h.p!=NULL)
         {
+          strat->initEcart(&h);
           if (TEST_OPT_INTSTRATEGY)
           {
             h.pCleardenom();
@@ -4589,7 +4583,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
       else
       {
         h.sev = pGetShortExpVector(h.p);
-        h.SetpFDeg();
+        strat->initEcart(&h);
         strat->enterS(h,0,strat, strat->tl+1);
         enterT(h,strat);
       }
@@ -4853,17 +4847,14 @@ void updateS(BOOLEAN toT,kStrategy strat)
         {
           h.p = strat->S[i];
         }
+        strat->initEcart(&h);
         if (strat->honey)
         {
-          strat->initEcart(&h);
           strat->ecartS[i] = h.ecart;
         }
-        else
-          h.length=h.pLength=pLength(h.p);
         if (strat->sevS[i] == 0) {strat->sevS[i] = pGetShortExpVector(h.p);}
         else assume(strat->sevS[i] == pGetShortExpVector(h.p));
         h.sev = strat->sevS[i];
-        h.SetpFDeg();
         /*puts the elements of S also to T*/
         enterT(h,strat);
         strat->S_2_R[i] = strat->tl;
@@ -4890,19 +4881,16 @@ void updateS(BOOLEAN toT,kStrategy strat)
           }
           else if (pCmp((strat->S)[i],redSi)!=0)
           {
+            h.p = strat->S[i];
+            strat->initEcart(&h);
+            strat->ecartS[i] = h.ecart;
             if (TEST_OPT_INTSTRATEGY)
             {
               pCleardenom(strat->S[i]);// also does a pContent
-              h.p = strat->S[i];
-              strat->initEcart(&h);
-              strat->ecartS[i] = h.ecart;
             }
             else
             {
-              pNorm(strat->S[i]);
-              h.p = strat->S[i];
-              strat->initEcart(&h);
-              strat->ecartS[i] = h.ecart;
+              pNorm(strat->S[i]); // == h.p
             }
             h.sev =  pGetShortExpVector(h.p);
             strat->sevS[i] = h.sev;
