@@ -1,3 +1,10 @@
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+/* $Id: digitech.cc,v 1.5 2007-01-11 10:57:51 Singular Exp $ */
+#include "mod2.h"
+#include "ring.h"
+
 #include "digitech.h"
 #include "kbuckets.h"
 #include "ideals.h"
