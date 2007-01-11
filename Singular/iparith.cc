@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.426 2007-01-10 15:45:57 Singular Exp $ */
+/* $Id: iparith.cc,v 1.427 2007-01-11 11:26:01 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -6931,6 +6931,7 @@ void ttGen4()
       if ((s!=NULL) && (isalpha(s[0])) && (strcmp(s,old_s)!=0))
       {
         old_s=s;
+        #ifdef HAVE_PLURAL
         switch (dArith1[i].valid_for_plural)
         {
           case NO_PLURAL_N:
@@ -6943,6 +6944,7 @@ void ttGen4()
             fprintf(outfile,"@item @ref{%s} @tab %s\n",s,s);
             break;
         }
+        #endif
       }
     }
     i++;

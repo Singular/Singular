@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.248 2007-01-08 17:30:43 motsak Exp $ */
+/* $Id: extra.cc,v 1.249 2007-01-11 11:24:12 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2584,6 +2584,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
+#ifdef HAVE_PLURAL
 /*==================== sca?AltVar ==================================*/
     if ( (strcmp(sys_cmd, "AltVarStart") == 0) || (strcmp(sys_cmd, "AltVarEnd") == 0) )
     {
@@ -2609,6 +2610,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       WerrorS("`system(\"AltVarStart/End\",<ring>) requires a SCA ring");
       return TRUE;
     }
+#endif
 /*==================== t-rep-GB ==================================*/
     if (strcmp(sys_cmd, "unifastmult")==0)
     {
