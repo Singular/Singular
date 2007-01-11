@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.32 2007-01-11 10:11:23 Singular Exp $ */
+/* $Id: ideals.cc,v 1.33 2007-01-11 13:00:22 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2585,8 +2585,8 @@ void idCompactify(ideal id)
   else
   {
     idDelMultiples(id);
-    idSkipZeroes(id);
   }
+  idSkipZeroes(id);
 }
 
 /*2
