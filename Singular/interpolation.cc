@@ -1,3 +1,8 @@
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+/* $Id: interpolation.cc,v 1.4 2007-01-11 11:24:58 Singular Exp $ */
+
 #include "mod2.h"
 #include "structs.h"
 #include "febase.h"
@@ -7,6 +12,7 @@
 #include "lists.h"
 #include "longrat.h"
 #include "ipid.h"
+#include "ring.h"
 #include <factory.h>
 
 //memory management
