@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.428 2007-01-11 11:32:11 Singular Exp $ */
+/* $Id: iparith.cc,v 1.429 2007-01-11 12:47:50 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -8028,7 +8028,8 @@ int iiArithFindCmd(const char *szName)
   int i = 0,v = 0;
   int en=sArithBase.nLastIdentifier;
 
-  for(an=0; an<sArithBase.nCmdUsed; )
+  loop
+  //for(an=0; an<sArithBase.nCmdUsed; )
   {
     if(an>=en-1)
     {
