@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.31 2006-06-13 13:39:02 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.32 2007-01-11 11:24:32 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -23,6 +23,7 @@
 #include "silink.h"
 #include "syz.h"
 #include "attrib.h"
+#include "ring.h"
 #include "ipconv.h"
 
 typedef void *   (*iiConvertProc)(void * data);
