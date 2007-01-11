@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.7 2007-01-03 00:17:10 motsak Exp $ */
+/* $Id: kspoly.cc,v 1.8 2007-01-11 10:37:35 Singular Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -65,6 +65,7 @@ int ksReducePoly(LObject* PR,
            (p_GetComp(p2, tailRing) == 0 &&
             p_MaxComp(pNext(p2),tailRing) == 0));
 
+#ifdef HAVE_PLURAL
   if (rIsPluralRing(currRing))
   {
     // for the time being: we know currRing==strat->tailRing
@@ -84,6 +85,7 @@ int ksReducePoly(LObject* PR,
     else nDelete(&c);
     return 0;
   }
+#endif
 
   if (t2==NULL)           // Divisor is just one term, therefore it will
   {                       // just cancel the leading term

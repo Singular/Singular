@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.29 2006-12-18 20:45:08 motsak Exp $ */
+/* $Id: kbuckets.cc,v 1.30 2007-01-11 10:37:34 Singular Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -11,6 +11,7 @@
 #include "pShallowCopyDelete.h"
 #include "kbuckets.h"
 #include "numbers.h"
+#include "ring.h"
 #include "p_Procs.h"
 
 #ifdef HAVE_COEF_BUCKETS

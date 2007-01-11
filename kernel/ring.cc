@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.52 2007-01-09 13:07:04 Singular Exp $ */
+/* $Id: ring.cc,v 1.53 2007-01-11 10:37:35 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -26,9 +26,9 @@
 #include "p_Procs.h"
 #ifdef HAVE_PLURAL
 #include "gring.h"
-#include "matpol.h"
-#include "maps.h"
 #endif
+#include "maps.h"
+#include "matpol.h"
 #ifdef HAVE_FACTORY
 #include "factory.h"
 #endif
@@ -3997,7 +3997,7 @@ ring rEnvelope(ring R)
   rTest(Renv);
   return Renv;
 }
-
+#ifdef HAVE_PLURAL
 BOOLEAN nc_rComplete(ring src, ring dest)
 /* returns TRUE is there were errors */
 /* dest is actualy equals src with the different ordering */
@@ -4062,6 +4062,7 @@ BOOLEAN nc_rComplete(ring src, ring dest)
   }
   return FALSE;
 }
+#endif
 
 void rModify_a_to_A(ring r)
 // to be called BEFORE rComplete:
