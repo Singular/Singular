@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.34 2007-01-11 10:09:22 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.35 2007-01-11 11:27:25 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -38,7 +38,7 @@ poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp,
                                     const int, const poly, const ring r)
 {
   poly mc  = p_Neg( p_Copy(m, r), r );
-  poly mmc = mm_Mult_pp( mc, q, r );
+  poly mmc = nc_mm_Mult_pp( mc, q, r );
   p_Delete(&mc, r);
 
   p = p_Add_q(p, mmc, r);
@@ -52,7 +52,7 @@ poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp,
 poly nc_p_Plus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp,
                               const int, const ring r)
 {
-  p = p_Add_q(p, mm_Mult_pp( m, q, r ), r);
+  p = p_Add_q(p, nc_mm_Mult_pp( m, q, r ), r);
 
   lp = pLength(p);
 
@@ -1138,7 +1138,7 @@ poly gnc_ReduceSpolyOld(const poly p1, poly p2/*,poly spNoether*/, const ring r)
     C  = nDiv(C,  cG);
   }
   p2 = p_Mult_nn(p2, C, r);
-  poly out = mm_Mult_pp(m, pNext(p1), r);
+  poly out = nc_mm_Mult_pp(m, pNext(p1), r);
   N = p_Add_q(N, out, r);
   p_Test(p2,r);
   p_Test(N,r);
@@ -1199,7 +1199,7 @@ poly gnc_ReduceSpolyNew(const poly p1, poly p2, const ring r)
   p_Test(p2,r);
   n_Delete(&C,r);
 
-  poly out = mm_Mult_pp(m, pNext(p1), r);
+  poly out = nc_mm_Mult_pp(m, pNext(p1), r);
   p_Delete(&m,r);
 
   N = p_Add_q(N, out, r);
@@ -1458,7 +1458,7 @@ void gnc_ReduceSpolyTail(poly p1, poly q, poly q2, poly spNoether, const ring r)
   p_Test(m,r);
 #endif
   /* pSetComp(m,r)=0? */
-  poly M = mm_Mult_pp(m, p1,r);
+  poly M = nc_mm_Mult_pp(m, p1,r);
   number C=p_GetCoeff(M,r);
   M=p_Add_q(M,mm_Mult_p(m,p_LmDeleteAndNext(p_Copy(p1,r),r),r),r); // _pp?
   q=p_Mult_nn(q,C,r);
@@ -1513,7 +1513,7 @@ void gnc_kBucketPolyRedOld(kBucket_pt b, poly p, number *c)
 #ifdef PDEBUG
   pTest(m);
 #endif
-  poly pp= mm_Mult_pp(m,p,currRing);
+  poly pp= nc_mm_Mult_pp(m,p,currRing);
   pDelete(&m);
   number n=nCopy(pGetCoeff(pp));
   number MinusOne=nInit(-1);
@@ -1567,7 +1567,7 @@ void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c)
   pTest(m);
 #endif
 
-  poly pp = mm_Mult_pp(m,p,currRing);
+  poly pp = nc_mm_Mult_pp(m,p,currRing);
   pDelete(&m);
 
   const number n = pGetCoeff(pp);
@@ -1615,7 +1615,7 @@ void gnc_kBucketPolyRed_ZOld(kBucket_pt b, poly p, number *c)
     *c = kBucketPolyRed(b,p,pLength(p),NULL);
     return;
   }
-  poly pp = mm_Mult_pp(m,p,currRing);
+  poly pp = nc_mm_Mult_pp(m,p,currRing);
   number c2,cc;
   pCleardenom_n(pp,c2);
   pDelete(&m);
@@ -1644,7 +1644,7 @@ void gnc_kBucketPolyRed_ZNew(kBucket_pt b, poly p, number *c)
     *c = kBucketPolyRed(b,p,pLength(p),NULL);
     return;
   }
-  poly pp = mm_Mult_pp(m,p,currRing);
+  poly pp = nc_mm_Mult_pp(m,p,currRing);
   number c2,cc;
   pCleardenom_n(pp,c2);
   pDelete(&m);
@@ -1670,7 +1670,7 @@ inline void nc_PolyPolyRedOld(poly &b, poly p, number *c)
 #ifdef PDEBUG
   pTest(m);
 #endif
-  poly pp=mm_Mult_pp(m,p,currRing);
+  poly pp=nc_mm_Mult_pp(m,p,currRing);
   pDelete(&m);
   number n=nCopy(pGetCoeff(pp));
   number MinusOne=nInit(-1);
@@ -1706,7 +1706,7 @@ inline void nc_PolyPolyRedNew(poly &b, poly p, number *c)
 #ifdef PDEBUG
   pTest(m);
 #endif
-  poly pp=mm_Mult_pp(m, p, currRing);
+  poly pp=nc_mm_Mult_pp(m, p, currRing);
   pDelete(&m);
 
   const number n = pGetCoeff(pp); // no new copy

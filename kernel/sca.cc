@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.5 2007-01-11 10:08:28 Singular Exp $
+ *  Version: $Id: sca.cc,v 1.6 2007-01-11 11:27:25 Singular Exp $
  *******************************************************************/
 
 // #define PDEBUG 2
@@ -768,10 +768,10 @@ poly sca_SPoly( const poly p1, const poly p2, const ring r )
   p_SetCoeff(m1, C2, r);                           // lc(m1) = C2!!!
   p_SetCoeff(m2, C1, r);                           // lc(m2) = C1!!!
 
-  poly tmp1 = mm_Mult_pp (m1, pNext(p1), r);    // tmp1 = m1 * tail(p1),
+  poly tmp1 = nc_mm_Mult_pp (m1, pNext(p1), r);    // tmp1 = m1 * tail(p1),
   p_Delete(&m1,r);  //  => n_Delete(&C1,r);
 
-  poly tmp2 = mm_Mult_pp (m2, pNext(p2), r);    // tmp1 = m2 * tail(p2),
+  poly tmp2 = nc_mm_Mult_pp (m2, pNext(p2), r);    // tmp1 = m2 * tail(p2),
   p_Delete(&m2,r);  //  => n_Delete(&C1,r);
 
   poly spoly = p_Add_q (tmp1, tmp2, r); // spoly = spoly(lt(p1), lt(p2)) + m1 * tail(p1), delete tmp1,2
@@ -847,7 +847,7 @@ poly sca_ReduceSpoly(const poly p1, poly p2, const ring r)
   p2 = p_Mult_nn(p2, C1, r); // p2 !!!
   n_Delete(&C1,r);
 
-  poly T = mm_Mult_pp(m, pNext(p1), r);
+  poly T = nc_mm_Mult_pp(m, pNext(p1), r);
   p_Delete(&m, r);
 
   p2 = p_Add_q(p2, T, r);

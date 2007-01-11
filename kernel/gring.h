@@ -3,13 +3,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.16 2007-01-11 10:27:03 Singular Exp $ */
+/* $Id: gring.h,v 1.17 2007-01-11 11:27:25 Singular Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
 
 #ifdef HAVE_PLURAL
 #include "structs.h"
+#include "ring.h"
 
 /* the part, related to the interface */
 BOOLEAN nc_CallPlural(matrix CC, matrix DD, poly CN, poly DN, ring r);
@@ -131,20 +132,14 @@ ideal idOppose(ring Rop, ideal I);
 inline void ncRingType(ring r, nc_type t)
 {
   assume((r != NULL) && (r->nc != NULL));
-#ifdef HAVE_PLURAL
   r->nc->type = t;
-#endif
 };
 
 inline nc_type ncRingType(ring r)
 {
   assume(rIsPluralRing(r));
 
-#ifdef HAVE_PLURAL
   return (r->nc->type);
- #else
-  return (nc_error); //
-#endif
 };
 
 
@@ -153,71 +148,50 @@ inline nc_type ncRingType(ring r)
 // //////////////////////////////////////////////////////
 
 // returns m*p, does neither destroy p nor m
-inline poly mm_Mult_pp(const poly m, const poly p, const ring r)
+inline poly nc_mm_Mult_pp(const poly m, const poly p, const ring r)
 {
-#ifdef HAVE_PLURAL
   assume(rIsPluralRing(r));
   assume(r->nc->p_Procs.mm_Mult_pp!=NULL);
   return r->nc->p_Procs.mm_Mult_pp(m, p, r);
-#else
-  Werror("Wrong call to NC function\n");
 //  return pp_Mult_mm( p, m, r);
-#endif
 }
 
 
 // returns m*p, does destroy p, preserves m
 inline poly mm_Mult_p(const poly m, poly p, const ring r)
 {
-#ifdef HAVE_PLURAL
   assume(rIsPluralRing(r));
   assume(r->nc->p_Procs.mm_Mult_p!=NULL);
   return r->nc->p_Procs.mm_Mult_p(m, p, r);
-#else
-  Werror("Wrong call to NC function\n");
 //   return p_Mult_mm( p, m, r);
-#endif
 }
 
 inline poly nc_SPoly(const poly p1, const poly p2, const ring r)
 {
-#ifdef HAVE_PLURAL
   assume(rIsPluralRing(r));
   assume(r->nc->p_Procs.SPoly!=NULL);
   return r->nc->p_Procs.SPoly(p1, p2, r);
-#else
-  Werror("Wrong call to NC function\n");
-#endif
 }
 
 inline poly nc_ReduceSPoly(const poly p1, poly p2, const ring r)
 {
-#ifdef HAVE_PLURAL
   assume(rIsPluralRing(r));
   assume(r->nc->p_Procs.ReduceSPoly!=NULL);
   return r->nc->p_Procs.ReduceSPoly(p1, p2, r);
-#else
-  Werror("Wrong call to NC function\n");
-#endif
 }
 
 inline void nc_BucketPolyRed(kBucket_pt b, poly p, number *c)
 {
-#ifdef HAVE_PLURAL
   assume(rIsPluralRing(currRing));
 
 //   return gnc_kBucketPolyRedNew(b, p, c);
 
   assume(currRing->nc->p_Procs.BucketPolyRed!=NULL);
   return currRing->nc->p_Procs.BucketPolyRed(b, p, c);
-#else
-  Werror("Wrong call to NC function\n");
-#endif
 }
 
 inline void nc_BucketPolyRed_Z(kBucket_pt b, poly p, number *c)
 {
-#ifdef HAVE_PLURAL
   assume(rIsPluralRing(currRing));
 
 //   return gnc_kBucketPolyRed_ZNew(b, p, c);
@@ -225,14 +199,10 @@ inline void nc_BucketPolyRed_Z(kBucket_pt b, poly p, number *c)
   assume(currRing->nc->p_Procs.BucketPolyRed_Z!=NULL);
   return currRing->nc->p_Procs.BucketPolyRed_Z(b, p, c);
 
-#else
-  Werror("Wrong call to NC function\n");
-#endif
 }
 
 inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const intvec *hilb, kStrategy strat)
 {
-#ifdef HAVE_PLURAL
   assume(rIsPluralRing(currRing));
 
   assume(currRing->nc->p_Procs.GB!=NULL);
@@ -249,9 +219,6 @@ inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const intvec *
     return currRing->nc->p_Procs.GlobalGB(F, Q, w, hilb, strat);
   }
 */
-#else
-  Werror("Wrong call to NC function\n");
-#endif
 }
 
 
