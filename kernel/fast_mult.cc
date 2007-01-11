@@ -1,6 +1,13 @@
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+/* $Id: fast_mult.cc,v 1.21 2007-01-11 10:37:51 Singular Exp $ */
+#include "mod2.h"
+#include "ring.h"
 #include "fast_mult.h"
 #include "kbuckets.h"
 #include "febase.h"
+
 typedef poly fastmultrec(poly f, poly g, ring r);
 static const int pass_option=1;
 static int mults=0;
