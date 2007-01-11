@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.44 2007-01-11 15:45:25 Singular Exp $ */
+/* $Id: kutil.cc,v 1.45 2007-01-11 17:04:40 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1003,8 +1003,7 @@ void initEcartNormal (LObject* h)
   h->FDeg = h->pFDeg();
   h->ecart = h->pLDeg() - h->FDeg;
   // h->length is set by h->pLDeg
-  h->pLength=pLength(h->p);
-  h->length=h->pLength;
+  h->length=h->pLength=pLength(h->p);
 }
 
 void initEcartBBA (LObject* h)
@@ -4412,29 +4411,32 @@ void initSL (ideal F, ideal Q,kStrategy strat)
     {
       LObject h;
       h.p = pCopy(F->m[i]);
-      if (pOrdSgn==-1)
-      {
-        cancelunit(&h);  /*- tries to cancel a unit -*/
-        deleteHC(&h, strat);
-      }
-      if (TEST_OPT_INTSTRATEGY)
-      {
-        //pContent(h.p);
-        h.pCleardenom(); // also does a pContent
-      }
-      else
-      {
-        h.pNorm();
-      }
       if (h.p!=NULL)
       {
-        strat->initEcart(&h);
-        if (strat->Ll==-1)
-          pos =0;
-        else
-          pos = strat->posInL(strat->L,strat->Ll,&h,strat);
-        h.sev = pGetShortExpVector(h.p);
-        enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
+        if (pOrdSgn==-1)
+        {
+          cancelunit(&h);  /*- tries to cancel a unit -*/
+          deleteHC(&h, strat);
+        }
+        if (h.p!=NULL)
+        {
+          if (TEST_OPT_INTSTRATEGY)
+          {
+            //pContent(h.p);
+            h.pCleardenom(); // also does a pContent
+          }
+          else
+          {
+            h.pNorm();
+          }
+          strat->initEcart(&h);
+          if (strat->Ll==-1)
+            pos =0;
+          else
+            pos = strat->posInL(strat->L,strat->Ll,&h,strat);
+          h.sev = pGetShortExpVector(h.p);
+          enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
+        }
       }
     }
   }
