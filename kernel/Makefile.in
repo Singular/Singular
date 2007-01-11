@@ -137,7 +137,7 @@ STATIC_SOURCES=p_Procs_Static.cc
 ESOURCES=mmalloc.cc $(DL_KERNEL_SOURCES) $(DL_LIB_SOURCES) $(STATIC_SOURCES)
 
 SOURCES=${CSOURCES} ${CXXSOURCES} \
-	syz2.cc prCopyTemplate.cc \
+	prCopyTemplate.cc \
         p_Delete__T.cc p_ShallowCopyDelete__T.cc \
         p_Copy__T.cc p_Mult_nn__T.cc  pp_Mult_nn__T.cc \
         pp_Mult_mm__T.cc p_Mult_mm__T.cc \
