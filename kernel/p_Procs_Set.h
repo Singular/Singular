@@ -11,7 +11,7 @@
  *           have to be defined before this file is included
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Set.h,v 1.7 2007-01-08 16:03:12 Singular Exp $
+ *  Version: $Id: p_Procs_Set.h,v 1.8 2007-01-12 11:08:42 Singular Exp $
  *******************************************************************/
 #include "modulop.h"
 
@@ -131,7 +131,7 @@ do                                                          \
   if (p_Procs->which == NULL)                               \
   {                                                         \
     dReportBug("p_Procs is NULL");                          \
-    Warn("Singular will work properly, but much slower");   \
+    WarnS("Singular will work properly, but much slower");  \
     p_Procs->which = (which##_Proc_Ptr)                     \
       which##__FieldGeneral_LengthGeneral_OrdGeneral;       \
   }                                                         \
@@ -151,6 +151,7 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
   assume(IsValidSpec(field, length, ord));
 
   InitSetProcs(field, length, ord);
+  SetProcs(field, length, ord);
   #ifdef NV_OPS
   if (field==FieldZpGeneral)
   {
@@ -161,7 +162,6 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
   }
   else
   #endif  
-  SetProcs(field, length, ord);
   CheckProc(p_Copy);
   CheckProc(p_Delete);
   CheckProc(p_ShallowCopyDelete);

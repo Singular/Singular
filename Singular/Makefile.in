@@ -96,17 +96,18 @@ LIBS		= -lsingfac -lsingcf -lntl  -static -lreadline -lhtmlhelp -Xlinker -Bdynam
 LIBSG		= -lsingfac -lsingcf -lntl  -static -lreadline -lhtmlhelp -Xlinker -Bdynamic -lgmp -lcygncurses6 
 endif
 MP_LIBS		= @MP_LIBS@
-DL_KERNEL	= @DL_KERNEL@
 HAVE_MPSR       = @HAVE_MPSR@
 
 ifdef LD_STATIC
 LDFLAGS  := ${STATIC_LDFLAGS} ${LDFLAGS}
 SING_EXEC = Singular-static
 LIBS := ${MP_LIBS} ${LIBS}
+LIBSG := ${MP_LIBS} ${LIBSG}
 DL_KERNEL =
 else
 LDFLAGS  := ${LD_DYN_FLAGS} ${LDFLAGS}
 SING_EXEC = Singular
+DL_KERNEL	= @DL_KERNEL@
 endif
 
 # CXXFLAGS =  -g -Wall -Wno-unused

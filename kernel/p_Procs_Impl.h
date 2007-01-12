@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Impl.h,v 1.2 2007-01-04 16:22:46 Singular Exp $
+ *  Version: $Id: p_Procs_Impl.h,v 1.3 2007-01-12 11:08:42 Singular Exp $
  *******************************************************************/
 #ifndef P_PROCS_IMPL_H
 #define P_PROCS_IMPL_H
@@ -637,6 +637,7 @@ do                                                          \
   p_Field t_field = field;                                  \
   p_Ord t_ord = ord;                                        \
   p_Length t_length = length;                               \
+  DoSetProc(what, FieldGeneral, LengthGeneral, OrdGeneral); \
   FastProcFilter(what##_Proc, t_field, t_length, t_ord);    \
   DoSetProc(what, t_field, t_length, t_ord);                \
 }                                                           \
@@ -645,6 +646,7 @@ while (0)                                                   \
 #define SetProcs(field, length, ord)                                    \
 do                                                                      \
 {                                                                       \
+  SetProc(p_Copy, field, length, OrdGeneral);                           \
   SetProc(p_Delete, field, LengthGeneral, OrdGeneral);                  \
   SetProc(p_Mult_nn, field, LengthGeneral, OrdGeneral);                 \
   SetProc(pp_Mult_nn, field, length, OrdGeneral);                       \

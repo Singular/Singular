@@ -4,13 +4,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sca.h,v 1.5 2007-01-11 10:58:21 Singular Exp $ */
+/* $Id: sca.h,v 1.6 2007-01-12 11:08:42 Singular Exp $ */
 
 #include <gring.h>
 #ifdef HAVE_PLURAL
 #include <structs.h>
 // #include <polys-impl.h>
-#include <ring.h>
+// #include <ring.h>
 
 inline bool rIsSCA(ring r)
 {
