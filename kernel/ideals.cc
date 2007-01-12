@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.33 2007-01-11 13:00:22 Singular Exp $ */
+/* $Id: ideals.cc,v 1.34 2007-01-12 12:41:46 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2272,8 +2272,8 @@ ideal idPower(ideal given,int exp)
   pDelete(&p1);
   idDelete(&temp);
   result->nrows = 1;
-  idSkipZeroes(result);
   idDelEquals(result);
+  idSkipZeroes(result);
   return result;
 }
 
