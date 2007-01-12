@@ -7,7 +7,7 @@
  *  Note:    this file is included by p_Procs.cc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs_Generate.cc,v 1.1.1.1 2003-10-06 12:16:00 Singular Exp $
+ *  Version: $Id: p_Procs_Generate.cc,v 1.2 2007-01-12 14:28:30 Singular Exp $
  *******************************************************************/
 
 
@@ -279,7 +279,6 @@ int main()
       }
       else
         printf("0,");
-
     }
     printf("\n};\n");
   }

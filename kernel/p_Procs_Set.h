@@ -11,7 +11,7 @@
  *           have to be defined before this file is included
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Set.h,v 1.8 2007-01-12 11:08:42 Singular Exp $
+ *  Version: $Id: p_Procs_Set.h,v 1.9 2007-01-12 14:28:31 Singular Exp $
  *******************************************************************/
 #include "modulop.h"
 
@@ -125,6 +125,8 @@ static p_Procs_s *_p_procs;
 static int set_names = 0;
 #endif
 
+#if (defined(HAVE_DL) && defined(HAVE_DYNAMIC_LOADING))
+
 #define CheckProc(which)                                    \
 do                                                          \
 {                                                           \
@@ -136,8 +138,22 @@ do                                                          \
       which##__FieldGeneral_LengthGeneral_OrdGeneral;       \
   }                                                         \
 }                                                           \
-while (0)
+while (0);
 
+#else
+// static variant
+#define CheckProc(which)                                    \
+do                                                          \
+{                                                           \
+  if (p_Procs->which == NULL)                               \
+  {                                                         \
+    p_Procs->which = (which##_Proc_Ptr)                     \
+      which##__FieldGeneral_LengthGeneral_OrdGeneral;       \
+  }                                                         \
+}                                                           \
+while (0);
+
+#endif
 // Choose a set of p_Procs
 void p_ProcsSet(ring r, p_Procs_s* p_Procs)
 {

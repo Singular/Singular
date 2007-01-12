@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Impl.h,v 1.3 2007-01-12 11:08:42 Singular Exp $
+ *  Version: $Id: p_Procs_Impl.h,v 1.4 2007-01-12 14:28:30 Singular Exp $
  *******************************************************************/
 #ifndef P_PROCS_IMPL_H
 #define P_PROCS_IMPL_H
@@ -648,20 +648,19 @@ do                                                                      \
 {                                                                       \
   SetProc(p_Copy, field, length, OrdGeneral);                           \
   SetProc(p_Delete, field, LengthGeneral, OrdGeneral);                  \
+  SetProc(p_ShallowCopyDelete, FieldGeneral, length, OrdGeneral);       \
   SetProc(p_Mult_nn, field, LengthGeneral, OrdGeneral);                 \
   SetProc(pp_Mult_nn, field, length, OrdGeneral);                       \
-  SetProc(p_ShallowCopyDelete, FieldGeneral, length, OrdGeneral);       \
-  SetProc(p_Copy, field, length, OrdGeneral);                           \
   SetProc(pp_Mult_mm, field, length, OrdGeneral);                       \
-  SetProc(pp_Mult_mm_Noether, field, length, ord);                      \
   SetProc(p_Mult_mm, field, length, OrdGeneral);                        \
-  SetProc(p_Add_q, field, length, ord);                                 \
   SetProc(p_Minus_mm_Mult_qq, field, length, ord);                      \
-  SetProc(p_kBucketSetLm, field, length, ord);                          \
+  SetProc(pp_Mult_mm_Noether, field, length, ord);                      \
+  SetProc(p_Add_q, field, length, ord);                                 \
   SetProc(p_Neg, field, LengthGeneral, OrdGeneral);                     \
   SetProc(pp_Mult_Coeff_mm_DivSelect, field, length, OrdGeneral);       \
   SetProc(pp_Mult_Coeff_mm_DivSelectMult, field, length, OrdGeneral);   \
   SetProc(p_Merge_q, FieldGeneral, length, ord);                        \
+  SetProc(p_kBucketSetLm, field, length, ord);                          \
 }                                                                       \
 while (0)
 
