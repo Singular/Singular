@@ -68,14 +68,15 @@ LIBS		= -lsingfac -lsingcf -lntl -lgmp -lreadline -lncurses -lomalloc_ndebug
 #LIBS		= -lsingfac -lsingcf -lgmp
 endif
 MP_LIBS		= @MP_LIBS@
-DL_KERNEL	= @DL_KERNEL@
 
 ifdef LD_STATIC
 LDFLAGS  := ${STATIC_LDFLAGS} ${LDFLAGS} 
 LIBS := ${MP_LIBS} ${LIBS}
+LIBSG := ${MP_LIBS} ${LIBSG}
 DL_KERNEL =
 else
 LDFLAGS  := ${LD_DYN_FLAGS} ${LDFLAGS} 
+DL_KERNEL	= @DL_KERNEL@
 endif
 
 # CXXFLAGS =  -g -Wall -Wno-unused
