@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.35 2006-07-20 22:17:11 levandov Exp $";
+version="$Id: control.lib,v 1.36 2007-01-14 22:09:42 levandov Exp $";
 category="System and Control Theory";
 info="
 LIBRARY:  control.lib     Algebraic analysis tools for System and Control Theory
@@ -659,7 +659,7 @@ proc genericity(matrix M)
 "USAGE:  genericity(M); M is a matrix/module
 RETURN:  list (of strings)
 PURPOSE: determine parametric expressions which have been assumed to be non-zero in the process of computing the Groebner basis
-NOTE: the output list consists of two strings. The first string contains the variables only, whereas the second string contains polynomials.
+NOTE: the output list consists of strings. The first string contains the variables only, whereas each further string contain a single polynomial in parameters.
 $* We strongly recommend to switch on the redSB and redTail options.
 @* The procedure is effective with the lift procedure for modules with parameters
 EXAMPLE:  example genericity; shows an example
@@ -816,7 +816,7 @@ static proc evas_genericity(matrix M)
   // called from the main genericity proc
   ideal I = ideal(M);
   I = simplify(I,2+4);
-  int s = size(I);
+  int s = ncols(I);
   ideal Den;
   poly p;
   int i;
@@ -832,32 +832,33 @@ static proc evas_genericity(matrix M)
   Den = simplify(Den,2+4);
   string newvars = parstr(basering);
   def save = basering;
-  string NewRing = "ring @NR =" +string(char(basering))+",("+newvars+"),Dp;";
+  string NewRing = "ring @NR =(" +string(char(basering))+"),("+newvars+"),Dp;";
   execute(NewRing);
   ideal F;
   ideal Den = imap(save,Den);
   Den = simplify(Den,2);
-  int s1 = size(Den);
+  int s1 = ncols(Den);
   for (i=1; i<=s1; i++)
   {
-    if (Den[i] !=1)
+    if (normalize(Den[i]) !=1)
     {
       F= F, factorize(Den[i],1);
     }
   }
   F = simplify(F, 2+4+8);
   ideal @L = F;
+  @L = simplify(@L,2);
   list SL;
   int c,j;
   string Mono;
   c = 1;
-  for (j=1; j<=size(@L);j++)
+  for (j=1; j<= ncols(@L);j++)
   {
     if (leadcoef(@L[j]) <0)
     {
       @L[j] = -1*@L[j];
     }
-    if ( (@L[j] - lead(@L[j]))==0 ) //@L[j] is a monomial
+    if (((@L[j] - lead(@L[j]))==0 ) && (@L[j]!=0) ) //@L[j] is a monomial
     {
       Mono = Mono + string(@L[j])+ ","; // concatenation
     }
@@ -869,7 +870,7 @@ static proc evas_genericity(matrix M)
   }
   if (Mono!="")
   {
-    Mono = Mono[1..size(Mono)-1]; // delete the last semicolon
+    Mono = Mono[1..size(Mono)-1]; // delete the last colon
   }
   SL[1] = Mono;
   setring save;
