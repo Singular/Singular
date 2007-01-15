@@ -132,7 +132,7 @@ void fill_example_package();
 
 #line 2 "python.mod"
 /*
- *  $Id: python.cc,v 1.5 2005-10-05 06:46:59 bricken Exp $
+ *  $Id: python.cc,v 1.6 2007-01-15 09:45:54 bricken Exp $
  *
  *  Test mod fuer modgen
  */
@@ -150,10 +150,13 @@ void mbpython(char* in);
 
 #line 137 "python.cc"
 extern "C" {
-int mod_init(
-  int (*iiAddCproc)(char *libname, char *procname, BOOLEAN pstatic,
-              BOOLEAN(*func)(leftv res, leftv v))
-  )
+//int mod_init(
+//  int (*iiAddCproc)(char *libname, char *procname, BOOLEAN pstatic,
+//              BOOLEAN(*func)(leftv res, leftv v))
+//  )
+  int mod_init(
+    SModulFunctions* psModulFunctions
+    )
 {
   idhdl h;
   char * tempstr;
@@ -184,18 +187,20 @@ int mod_init(
 #line 20 "python.mod"
   enter_id("category","tests", STRING_CMD);
 #line 22 "python.mod"
-  enter_id("version","$Id: python.cc,v 1.5 2005-10-05 06:46:59 bricken Exp $", STRING_CMD);
+  enter_id("version","$Id: python.cc,v 1.6 2007-01-15 09:45:54 bricken Exp $", STRING_CMD);
 #line 23 "python.mod"
   enter_id("info","LIBRARY: kernel.lib  PROCEDURES OF GENERAL TYPE WRITEN IN C python(input); eval a string  in python", STRING_CMD);
 #line 26 "python.mod"
 #line 27 "python.mod"
   Py_Initialize();
+  PyRun_SimpleString("from sys import path\n\
+path.insert(0,'.')\n");
   initSingular();
   init_Singular();
 
 #line 36 "python.mod"
-  iiAddCproc(currPack->libname,"python",FALSE, mod_python);
-
+  psModulFunctions->iiAddCproc(currPack->libname,"python",FALSE, mod_python);
+//psModulFunctions->iiAddCproc("packagename","procname",FALSE, procedure);
   if(ret!=-1) fclose(binfp);
   return 0;
 }
