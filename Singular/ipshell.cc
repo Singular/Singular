@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.145 2006-10-16 15:47:30 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.146 2007-01-15 17:45:33 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -707,8 +707,8 @@ leftv iiMap(map theMap, char * what)
       sleftv tmpW;
       memset(&tmpW,0,sizeof(sleftv));
       tmpW.rtyp=IDTYP(w);
-      if (tmpW.rtyp==MAP_CMD) 
-      { 
+      if (tmpW.rtyp==MAP_CMD)
+      {
         tmpW.rtyp=IDEAL_CMD;
         save_r=IDMAP(w)->preimage;
         IDMAP(w)->preimage=0;
@@ -734,7 +734,7 @@ leftv iiMap(map theMap, char * what)
         return NULL;
       }
       if (save_r!=NULL)
-      { 
+      {
         IDMAP(w)->preimage=save_r;
         IDMAP((idhdl)v)->preimage=omStrDup(save_r);
         v->rtyp=MAP_CMD;
@@ -1931,11 +1931,11 @@ ring rCompose(const lists  L)
       }
       R->order[j]=rOrderName(omStrDup((char*)vv->m[0].Data())); // assume STRING
       if (j==0) R->block0[0]=1;
-      else 
+      else
       {
          int jj=j-1;
          while((jj>=0)
-         && ((R->order[jj]== ringorder_a) 
+         && ((R->order[jj]== ringorder_a)
             || (R->order[jj]== ringorder_aa)
             || (R->order[jj]== ringorder_c)
             || (R->order[jj]== ringorder_C)
@@ -2028,7 +2028,15 @@ ring rCompose(const lists  L)
   {
     ideal q=(ideal)L->m[3].Data();
     if (q->m[0]!=NULL)
+    {
+      if ((R->ch!=currRing->ch)
+      || (R->P!=currRing->P))
+      {
+        WerrorS("coefficient fields must be equal if q-ideal !=0");
+        goto rCompose_err;
+      }
       R->qideal=idrCopyR(q,currRing,R);
+    }
   }
   else
   {
@@ -4367,7 +4375,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   int ch;
 #ifdef HAVE_RING2TOM
   int cring = 0;
-#endif  
+#endif
   int float_len=0;
   int float_len2=0;
   ring R = NULL;
