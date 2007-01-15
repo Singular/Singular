@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.207 2006-08-01 16:24:17 Singular Exp $
+@comment $Id: general.doc,v 1.208 2007-01-15 16:54:50 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -3327,16 +3327,16 @@ loading of a library is displayed.  More precisely, option @code{-q} (and
 likewise @code{--quiet}) unsets option @code{loadLib} to inhibit
 monitoring of library loading (@pxref{option}).
 
-All loaded libraries are displayed by the @code{LIB;}
+All loaded libraries are displayed by the @code{listvar(package);}
 command:
 @smallexample
 @c example
   option(loadLib);   // show loading of libraries;
                      // standard.lib is loaded
-  LIB;
+  listvar(package);
                      // the names of the procedures of inout.lib
   LIB "inout.lib";   // are now known to Singular
-  LIB;
+  listvar(package);
 @c example
 @end smallexample
 

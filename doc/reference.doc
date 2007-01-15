@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.283 2007-01-11 17:46:56 Singular Exp $
+@comment $Id: reference.doc,v 1.284 2007-01-15 16:54:51 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3194,14 +3194,6 @@ directory, each directory contained in the library
 @item @strong{Note on standard.lib:}
 Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
 library @code{standard.lib} is automatically loaded at start-up time.
-
-@c @item @strong{Syntax:}
-@c @code{LIB;}
-@c @item @strong{Type:}
-@c string
-@c @item @strong{Purpose:}
-@c shows all loaded libraries written in Singular.
-
 
 @item @strong{Example:}
 @smallexample
