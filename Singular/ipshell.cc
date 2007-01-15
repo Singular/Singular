@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.146 2007-01-15 17:45:33 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.147 2007-01-15 18:19:13 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -29,6 +29,7 @@
 #include "syz.h"
 #include "numbers.h"
 #include "modulop.h"
+#include "longalg.h"
 #include "lists.h"
 #include "attrib.h"
 #include "ipconv.h"
@@ -2032,10 +2033,75 @@ ring rCompose(const lists  L)
       if ((R->ch!=currRing->ch)
       || (R->P!=currRing->P))
       {
-        WerrorS("coefficient fields must be equal if q-ideal !=0");
-        goto rCompose_err;
+      #if 1
+            WerrorS("coefficient fields must be equal if q-ideal !=0");
+            goto rCompose_err;
+      #else
+        ring orig_ring=currRing;
+        rChangeCurrRing(R);
+        int *perm=NULL;
+        int *par_perm=NULL;
+        int par_perm_size=0;
+        nMapFunc nMap;
+        BOOLEAN bo;
+
+        if ((nMap=nSetMap(orig_ring))==NULL)
+        {
+          if (rEqual(orig_ring,currRing))
+          {
+            nMap=nCopy;
+          }
+          else
+          // Allow imap/fetch to be make an exception only for:
+          if ( (rField_is_Q_a(orig_ring) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
+            (rField_is_Q() || rField_is_Q_a() ||
+             (rField_is_Zp() || rField_is_Zp_a())))
+           ||
+           (rField_is_Zp_a(orig_ring) &&  // Zp(a..) -> Zp(a..) || Zp
+            (rField_is_Zp(currRing, rInternalChar(orig_ring)) ||
+             rField_is_Zp_a(currRing, rInternalChar(orig_ring)))) )
+          {
+            par_perm_size=rPar(orig_ring);
+            BITSET save_test=test;
+            naSetChar(rInternalChar(orig_ring),orig_ring);
+            nSetChar(currRing);
+            test=save_test;
+          }
+          else
+          {
+            WerrorS("coefficient fields must be equal if q-ideal !=0");
+            goto rCompose_err;
+          }
+        }
+        if ((orig_ring->N!=pVariables) || (rPar(orig_ring)!=rPar(currRing)))
+        {
+          perm=(int *)omAlloc0((orig_ring->N+1)*sizeof(int));
+          if (par_perm_size!=0)
+            par_perm=(int *)omAlloc0(par_perm_size*sizeof(int));
+          maFindPerm(orig_ring->names,orig_ring->N,orig_ring->parameter,orig_ring->P,
+            currRing->names,currRing->N,currRing->parameter, currRing->P,
+            perm,par_perm, currRing->ch);
+        }
+        sleftv tmpW,tmpR;
+        memset(&tmpW,0,sizeof(sleftv));
+        tmpW.rtyp=IDEAL_CMD;
+        tmpW.data=q;
+        if ((bo=maApplyFetch(IMAP_CMD,NULL,&tmpR,&tmpW, orig_ring,
+                         perm,par_perm,par_perm_size,nMap)))
+        {
+          WerrorS("cannot map q-ideal");
+        }
+        if (perm!=NULL)
+          omFreeSize((ADDRESS)perm,(orig_ring->N+1)*sizeof(int));
+        if (par_perm!=NULL)
+          omFreeSize((ADDRESS)par_perm,par_perm_size*sizeof(int));
+        rChangeCurrRing(orig_ring);
+        if (bo) goto rCompose_err;
+        R->qideal=(ideal)tmpR.data;
+      #endif
       }
-      R->qideal=idrCopyR(q,currRing,R);
+      else
+        R->qideal=idrCopyR(q,currRing,R);
     }
   }
   else
