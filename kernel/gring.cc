@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.35 2007-01-11 11:27:25 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.36 2007-01-15 17:11:00 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -26,6 +26,8 @@
 
 #include "gring.h"
 
+// dirty tricks:
+#include "p_MemAdd.h"
 
 /* global nc_macros : */
 
