@@ -11,7 +11,7 @@
  *           have to be defined before this file is included
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Set.h,v 1.10 2007-01-15 08:41:25 Singular Exp $
+ *  Version: $Id: p_Procs_Set.h,v 1.11 2007-01-15 17:13:59 Singular Exp $
  *******************************************************************/
 #include "modulop.h"
 
@@ -153,7 +153,6 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
     // set all non-mult/div. routines to FieldZp-variants
     SetProcs_nv(FieldZp, length,ord); // p_Delete, p_ShallowCopyDelete...
   }
-  else
   #endif  
   CheckProc(p_Copy);
   CheckProc(p_Delete);

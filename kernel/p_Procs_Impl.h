@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Impl.h,v 1.5 2007-01-15 08:41:25 Singular Exp $
+ *  Version: $Id: p_Procs_Impl.h,v 1.6 2007-01-15 17:15:10 Singular Exp $
  *******************************************************************/
 #ifndef P_PROCS_IMPL_H
 #define P_PROCS_IMPL_H
@@ -634,7 +634,6 @@ do                                                          \
   p_Field t_field = field;                                  \
   p_Ord t_ord = ord;                                        \
   p_Length t_length = length;                               \
-  DoSetProc(what, FieldGeneral, LengthGeneral, OrdGeneral); \
   FastProcFilter(what##_Proc, t_field, t_length, t_ord);    \
   DoSetProc(what, t_field, t_length, t_ord);                \
 }                                                           \
