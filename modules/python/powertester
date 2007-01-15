@@ -1,14 +1,15 @@
 ring r=0,(x,y,z),lp;
 timer=1;
-python_module::python("from Singular import number,  polynomial, power_series
-zero=number(0)
-one=number(1)
-zerop=polynomial(0)
-onep=polynomial(1)
-x=polynomial('x')
-g=x*number(-1)+polynomial(1)
+LIB("python_module.so");
+Python_module::python("from Singular import Number,  Polynomial, power_series
+zero=Number(0)
+one=Number(1)
+zerop=Polynomial(0)
+onep=Polynomial(1)
+x=Polynomial('x')
+g=Number(-1)*x+Polynomial(1)
 print g
-f=polynomial(1)
+f=Polynomial(1)
 s=power_series(f,g);
 i=0
 for t in s:
@@ -23,11 +24,11 @@ for t in s:
   i=i+1
   if i>10:
    break
-g=polynomial('x')+polynomial('y')
-g = g * number(-1)
-g=g+polynomial(1)
+g=Polynomial('x')+Polynomial('y')
+g = Number(-1)*g
+g=g+Polynomial(1)
 print g
-s=power_series(polynomial(1),g)
+s=power_series(Polynomial(1),g)
 i=0
 for t in s:
   print t
