@@ -11,7 +11,7 @@
  *           have to be defined before this file is included
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Set.h,v 1.9 2007-01-12 14:28:31 Singular Exp $
+ *  Version: $Id: p_Procs_Set.h,v 1.10 2007-01-15 08:41:25 Singular Exp $
  *******************************************************************/
 #include "modulop.h"
 
@@ -22,14 +22,7 @@
 static inline p_Field p_FieldIs(ring r)
 {
   if (rField_is_Zp(r))
-#ifdef NV_OPS
-  {
-    if (r->ch<=NV_MAX_PRIME) return FieldZp;
-    else                     return FieldZpGeneral;
-  }
-#else
     return FieldZp;
-#endif
   if (rField_is_R(r)) return FieldR;
   if (rField_is_GF(r)) return FieldGF;
   if (rField_is_Q(r)) return FieldQ;
@@ -125,8 +118,6 @@ static p_Procs_s *_p_procs;
 static int set_names = 0;
 #endif
 
-#if (defined(HAVE_DL) && defined(HAVE_DYNAMIC_LOADING))
-
 #define CheckProc(which)                                    \
 do                                                          \
 {                                                           \
@@ -140,20 +131,6 @@ do                                                          \
 }                                                           \
 while (0);
 
-#else
-// static variant
-#define CheckProc(which)                                    \
-do                                                          \
-{                                                           \
-  if (p_Procs->which == NULL)                               \
-  {                                                         \
-    p_Procs->which = (which##_Proc_Ptr)                     \
-      which##__FieldGeneral_LengthGeneral_OrdGeneral;       \
-  }                                                         \
-}                                                           \
-while (0);
-
-#endif
 // Choose a set of p_Procs
 void p_ProcsSet(ring r, p_Procs_s* p_Procs)
 {
@@ -169,7 +146,7 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
   InitSetProcs(field, length, ord);
   SetProcs(field, length, ord);
   #ifdef NV_OPS
-  if (field==FieldZpGeneral)
+  if ((field==FieldZp) && (r->ch>NV_MAX_PRIME))
   {
     // set all (mult/div.) routines to FieldGeneral-variants
     SetProcs(FieldGeneral, length,ord); // p_Mult_nn, ...

@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Impl.h,v 1.4 2007-01-12 14:28:30 Singular Exp $
+ *  Version: $Id: p_Procs_Impl.h,v 1.5 2007-01-15 08:41:25 Singular Exp $
  *******************************************************************/
 #ifndef P_PROCS_IMPL_H
 #define P_PROCS_IMPL_H
@@ -106,9 +106,6 @@ typedef enum p_Field
 {
   FieldGeneral = 0,
   FieldZp,          
-#ifdef NV_OPS
-  FieldZpGeneral,
-#endif
   FieldQ,
   FieldR,
   FieldGF,
