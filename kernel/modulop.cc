@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.7 2006-11-21 11:00:56 Singular Exp $ */
+/* $Id: modulop.cc,v 1.8 2007-01-15 17:12:09 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -387,6 +387,7 @@ BOOLEAN npDBTest (number a, char *f, int l)
 {
   if (((long)a<0) || ((long)a>npPrimeM))
   {
+    Print("wrong mod p number %ld at %s,%d\n",(long)a,f,l);
     return FALSE;
   }
   return TRUE;
