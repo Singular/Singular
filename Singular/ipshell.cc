@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.148 2007-01-16 14:03:36 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.149 2007-01-16 14:05:12 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -2085,7 +2085,7 @@ ring rCompose(const lists  L)
         {
           dest_id->m[i]=pPermPoly(q->m[i],perm,orig_ring,nMap,
                                   par_perm,par_perm_size);
-          pTest(dest_id-m[i]);
+          pTest(dest_id->m[i]);
         }
         R->qideal=dest_id;
         if (perm!=NULL)
