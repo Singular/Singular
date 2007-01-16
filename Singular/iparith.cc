@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.432 2007-01-11 17:42:43 Singular Exp $ */
+/* $Id: iparith.cc,v 1.433 2007-01-16 13:29:47 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -31,6 +31,7 @@
 #include "subexpr.h"
 #include "lists.h"
 #include "longalg.h"
+#include "modulop.h"
 #include "numbers.h"
 #include "stairc.h"
 #include "maps.h"
@@ -3277,6 +3278,38 @@ static BOOLEAN jjBAREISS(leftv res, leftv v)
 //  res->data = (char *)m;
 //  return FALSE;
 //}
+static BOOLEAN jjBI2N(leftv res, leftv u)
+{
+  if (rField_is_Q())
+  {
+    res->data=u->CopyD();
+    return FALSE;
+  }
+  else
+  {
+    BOOLEAN bo=FALSE;
+    number n=(number)u->CopyD();
+    if (rField_is_Zp())
+    {
+      res->data=(void *)npMap0(n);
+    }
+    else if (rField_is_Q_a())
+    {
+      res->data=(void *)naMap00(n);
+    }
+    else if (rField_is_Zp_a())
+    {
+      res->data=(void *)naMap0P(n);
+    }
+    else
+    {
+      WerrorS("cannot convert bigint to this field");
+      bo=TRUE;
+    }
+    nlDelete(&n,NULL);
+    return bo;
+  } 
+}
 static BOOLEAN jjCALL1MANY(leftv res, leftv u)
 {
   return iiExprArithM(res,u,iiOp);
@@ -3776,9 +3809,9 @@ static BOOLEAN jjLISTRING(leftv res, leftv v)
   return FALSE;
 }
 #if SIZEOF_LONG == 8
-static number jjBI2N(long d);
+static number jjLONG2N(long d);
 #else
-#define jjBI2N(D) nlInit((int)D)
+#define jjLONG2N(D) nlInit((int)D)
 #endif
 static BOOLEAN jjMEMORY(leftv res, leftv v)
 {
@@ -3787,13 +3820,13 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
   switch(((int)(long)v->Data()))
   {
   case 0:
-    res->data=(char *)jjBI2N(om_Info.UsedBytes);
+    res->data=(char *)jjLONG2N(om_Info.UsedBytes);
     break;
   case 1:
-    res->data = (char *)jjBI2N(om_Info.CurrentBytesSystem);
+    res->data = (char *)jjLONG2N(om_Info.CurrentBytesSystem);
     break;
   case 2:
-    res->data = (char *)jjBI2N(om_Info.MaxBytesSystem);
+    res->data = (char *)jjLONG2N(om_Info.MaxBytesSystem);
     break;
 
   default:
@@ -4744,6 +4777,7 @@ struct sValCmd1 dArith1[]=
 ,{jjNAMES,      NAMES_CMD,       LIST_CMD,       QRING_CMD      ALLOW_PLURAL}
 ,{jjDUMMY,      NUMBER_CMD,      NUMBER_CMD,     NUMBER_CMD     ALLOW_PLURAL}
 ,{jjP2N,        NUMBER_CMD,      NUMBER_CMD,     POLY_CMD       ALLOW_PLURAL}
+,{jjBI2N,       NUMBER_CMD,      NUMBER_CMD,     BIGINT_CMD     ALLOW_PLURAL}
 ,{jjRPAR,       NPARS_CMD,       INT_CMD,        RING_CMD       ALLOW_PLURAL}
 ,{jjRPAR,       NPARS_CMD,       INT_CMD,        QRING_CMD      ALLOW_PLURAL}
 ,{jjNVARS,      NVARS_CMD,       INT_CMD,        RING_CMD       ALLOW_PLURAL}
