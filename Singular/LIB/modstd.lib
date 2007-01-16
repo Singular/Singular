@@ -1,6 +1,6 @@
 //GP, last modified 23.10.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: modstd.lib,v 1.3 2007-01-10 08:09:36 pfister Exp $";
+version="$Id: modstd.lib,v 1.4 2007-01-16 14:52:58 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: modstd.lib  Grobner basis of ideals
@@ -25,7 +25,7 @@ primeList(n);  list of n primes  <= 2134567879 in decreasing order
 ";
 
 LIB "poly.lib";
-LIB "krypto.lib";
+LIB "crypto.lib";
 ///////////////////////////////////////////////////////////////////////////////
 proc modStd(ideal I)
 "USAGE:  modStd(I); 
