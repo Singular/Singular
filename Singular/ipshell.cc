@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.147 2007-01-15 18:19:13 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.148 2007-01-16 14:03:36 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -2033,7 +2033,7 @@ ring rCompose(const lists  L)
       if ((R->ch!=currRing->ch)
       || (R->P!=currRing->P))
       {
-      #if 1
+      #if 0
             WerrorS("coefficient fields must be equal if q-ideal !=0");
             goto rCompose_err;
       #else
@@ -2073,31 +2073,26 @@ ring rCompose(const lists  L)
             goto rCompose_err;
           }
         }
-        if ((orig_ring->N!=pVariables) || (rPar(orig_ring)!=rPar(currRing)))
+        perm=(int *)omAlloc0((orig_ring->N+1)*sizeof(int));
+        if (par_perm_size!=0)
+          par_perm=(int *)omAlloc0(par_perm_size*sizeof(int));
+        maFindPerm(orig_ring->names,orig_ring->N,orig_ring->parameter,orig_ring->P,
+          currRing->names,currRing->N,currRing->parameter, currRing->P,
+          perm,par_perm, currRing->ch);
+        ideal dest_id=idInit(IDELEMS(q),1);
+        int i;
+        for(i=IDELEMS(q)-1; i>=0; i--)
         {
-          perm=(int *)omAlloc0((orig_ring->N+1)*sizeof(int));
-          if (par_perm_size!=0)
-            par_perm=(int *)omAlloc0(par_perm_size*sizeof(int));
-          maFindPerm(orig_ring->names,orig_ring->N,orig_ring->parameter,orig_ring->P,
-            currRing->names,currRing->N,currRing->parameter, currRing->P,
-            perm,par_perm, currRing->ch);
+          dest_id->m[i]=pPermPoly(q->m[i],perm,orig_ring,nMap,
+                                  par_perm,par_perm_size);
+          pTest(dest_id-m[i]);
         }
-        sleftv tmpW,tmpR;
-        memset(&tmpW,0,sizeof(sleftv));
-        tmpW.rtyp=IDEAL_CMD;
-        tmpW.data=q;
-        if ((bo=maApplyFetch(IMAP_CMD,NULL,&tmpR,&tmpW, orig_ring,
-                         perm,par_perm,par_perm_size,nMap)))
-        {
-          WerrorS("cannot map q-ideal");
-        }
+        R->qideal=dest_id;
         if (perm!=NULL)
           omFreeSize((ADDRESS)perm,(orig_ring->N+1)*sizeof(int));
         if (par_perm!=NULL)
           omFreeSize((ADDRESS)par_perm,par_perm_size*sizeof(int));
         rChangeCurrRing(orig_ring);
-        if (bo) goto rCompose_err;
-        R->qideal=(ideal)tmpR.data;
       #endif
       }
       else
