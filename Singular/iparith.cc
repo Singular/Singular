@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.433 2007-01-16 13:29:47 Singular Exp $ */
+/* $Id: iparith.cc,v 1.434 2007-01-16 13:39:15 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3310,6 +3310,23 @@ static BOOLEAN jjBI2N(leftv res, leftv u)
     return bo;
   } 
 }
+static BOOLEAN jjBI2P(leftv res, leftv u)
+{
+  sleftv tmp;
+  BOOLEAN bo=jjBI2N(&tmp,u);
+  if (!bo)
+  {
+    number n=(number) tmp.data;
+    if (nIsZero(n)) { res->data=NULL;nDelete(&n); }
+    else
+    {
+      poly p=pOne();
+      pSetCoeff(p,n);
+      res->data=(void *)p;
+    }
+  }
+  return bo;
+}
 static BOOLEAN jjCALL1MANY(leftv res, leftv u)
 {
   return iiExprArithM(res,u,iiOp);
@@ -4792,6 +4809,7 @@ struct sValCmd1 dArith1[]=
 ,{jjPARSTR1,    PARSTR_CMD,      STRING_CMD,     INT_CMD        ALLOW_PLURAL}
 ,{jjrParStr,    PARSTR_CMD,      XS(STRING_CMD), RING_CMD       ALLOW_PLURAL}
 ,{jjrParStr,    PARSTR_CMD,      XS(STRING_CMD), QRING_CMD      ALLOW_PLURAL}
+,{jjBI2P,       POLY_CMD,        POLY_CMD,       BIGINT_CMD     ALLOW_PLURAL}
 ,{jjDUMMY,      POLY_CMD,        POLY_CMD,       POLY_CMD       ALLOW_PLURAL}
 ,{jjPREIMAGE_R, PREIMAGE_CMD,    RING_CMD,       MAP_CMD        NO_PLURAL}
 ,{jjPRIME,      PRIME_CMD,       INT_CMD,        INT_CMD        ALLOW_PLURAL}
