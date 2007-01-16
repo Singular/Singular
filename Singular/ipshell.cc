@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.149 2007-01-16 14:05:12 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.150 2007-01-16 14:35:59 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1801,67 +1801,6 @@ ring rCompose(const lists  L)
   // 4: C
   // 5: D
   ring R=(ring) omAlloc0Bin(sip_sring_bin);
-  if (L->m[0].Typ()==INT_CMD)
-  {
-    R->ch=(int)(long)L->m[0].Data();
-    if (R->ch!=-1)
-    {
-      int l;
-      if (((R->ch!=0) && (R->ch<2))
-      #ifndef NV_OPS
-      || (R->ch > 32003)
-      #endif
-      || ((l=IsPrime(R->ch))!=R->ch)
-      )
-      {
-        Warn("%d is invalid characteristic of ground field. %d is used.", R->ch,l);
-        R->ch=l;
-      }
-    }
-  }
-  else if (L->m[0].Typ()==LIST_CMD)
-  {
-    lists LL=(lists)L->m[0].Data();
-    if (LL->nr<3)
-      rComposeC(LL,R); /* R, long_R, long_C */
-    else
-    {
-      R->algring=rCompose((lists)L->m[0].Data());
-      if (R->algring==NULL)
-      {
-        WerrorS("could not create rational function coefficient field");
-        goto rCompose_err;
-      }
-      if (R->algring->ch>0)
-         R->ch= -R->algring->ch;
-      else
-         R->ch=1;
-      R->P=R->algring->N;
-      R->parameter=(char**)omAlloc0(R->P*sizeof(char_ptr));
-      int i;
-      for(i=R->P-1;i>=0;i--)
-        R->parameter[i]=omStrDup(R->algring->names[i]);
-      if (R->algring->qideal!=NULL)
-      {
-        if (IDELEMS(R->algring->qideal)==1)
-        {
-          R->minpoly=pGetCoeff(R->algring->qideal->m[0]);
-          omFreeBinAddr(R->algring->qideal->m[0]);
-          R->algring->qideal->m[0]=NULL;
-          idDelete(&(R->algring->qideal));
-        }
-        else
-        {
-          WerrorS("not implemented yet.");
-        }
-      }
-    }
-  }
-  else
-  {
-    WerrorS("coefficient field must be described by `int` or `list`");
-    goto rCompose_err;
-  }
   // ------------------------- VARS ---------------------------
   if (L->m[1].Typ()==LIST_CMD)
   {
@@ -2022,6 +1961,70 @@ ring rCompose(const lists  L)
     WerrorS("ordering must be given as `list`");
     goto rCompose_err;
   }
+  // ------------------------------------------------------------------
+  // 0: char:
+  if (L->m[0].Typ()==INT_CMD)
+  {
+    R->ch=(int)(long)L->m[0].Data();
+    if (R->ch!=-1)
+    {
+      int l;
+      if (((R->ch!=0) && (R->ch<2))
+      #ifndef NV_OPS
+      || (R->ch > 32003)
+      #endif
+      || ((l=IsPrime(R->ch))!=R->ch)
+      )
+      {
+        Warn("%d is invalid characteristic of ground field. %d is used.", R->ch,l);
+        R->ch=l;
+      }
+    }
+  }
+  else if (L->m[0].Typ()==LIST_CMD)
+  {
+    lists LL=(lists)L->m[0].Data();
+    if (LL->nr<3)
+      rComposeC(LL,R); /* R, long_R, long_C */
+    else
+    {
+      R->algring=rCompose((lists)L->m[0].Data());
+      if (R->algring==NULL)
+      {
+        WerrorS("could not create rational function coefficient field");
+        goto rCompose_err;
+      }
+      if (R->algring->ch>0)
+         R->ch= -R->algring->ch;
+      else
+         R->ch=1;
+      R->P=R->algring->N;
+      R->parameter=(char**)omAlloc0(R->P*sizeof(char_ptr));
+      int i;
+      for(i=R->P-1;i>=0;i--)
+        R->parameter[i]=omStrDup(R->algring->names[i]);
+      if (R->algring->qideal!=NULL)
+      {
+        if (IDELEMS(R->algring->qideal)==1)
+        {
+          R->minpoly=naInit(1);
+	  lnumber n=(lnumber)R->minpoly;
+	  n->z=R->algring->qideal->m[0];
+          R->algring->qideal->m[0]=NULL;
+          idDelete(&(R->algring->qideal));
+        }
+        else
+        {
+          WerrorS("not implemented yet.");
+        }
+      }
+    }
+  }
+  else
+  {
+    WerrorS("coefficient field must be described by `int` or `list`");
+    goto rCompose_err;
+  }
   // ------------------------ Q-IDEAL ------------------------
   rComplete(R);
 
@@ -2030,8 +2033,7 @@ ring rCompose(const lists  L)
     ideal q=(ideal)L->m[3].Data();
     if (q->m[0]!=NULL)
     {
-      if ((R->ch!=currRing->ch)
-      || (R->P!=currRing->P))
+      if (R->ch!=currRing->ch)
       {
       #if 0
             WerrorS("coefficient fields must be equal if q-ideal !=0");
