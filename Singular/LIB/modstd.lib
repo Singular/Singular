@@ -1,6 +1,6 @@
 //GP, last modified 23.10.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: modstd.lib,v 1.4 2007-01-16 14:52:58 Singular Exp $";
+version="$Id: modstd.lib,v 1.5 2007-01-16 15:05:18 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: modstd.lib  Grobner basis of ideals
@@ -232,7 +232,7 @@ EXAMPLE: example modS; shows an example
     }
     else
     {
-       i=groebner(i)
+       i=groebner(i);
     }
     setring R0;
     T[j]=fetch(@r,i);
