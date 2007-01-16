@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.33 2007-01-16 13:30:26 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.34 2007-01-16 13:38:50 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -101,12 +101,6 @@ static void * iiV2Ma(void *data)
 }
 
 static void * iiN2P(void *data);
-static void * iiBI2P(void *d)
-{
-  void *r=iiBI2N(d);
-  if(errorreported) return NULL;
-  else              return iiN2P(r);
-}
 
 static void * iiDummy(void *data)
 {
@@ -248,8 +242,6 @@ struct sConvertTypes dConvertTypes[] =
    { INTVEC_CMD,      MATRIX_CMD,     iiIm2Ma , NULL },
 //  intmat -> matrix
    { INTMAT_CMD,      MATRIX_CMD,     iiIm2Ma , NULL },
-//  bigint -> poly
-   { BIGINT_CMD,      NUMBER_CMD,     iiBI2P , NULL },
 //  number -> poly
    { NUMBER_CMD,      POLY_CMD,       iiN2P  , NULL },
 //  number -> matrix
