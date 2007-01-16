@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.32 2007-01-11 11:24:32 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.33 2007-01-16 13:30:26 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -98,32 +98,6 @@ static void * iiV2Ma(void *data)
   m->rank=h;
   pDelete((poly *)&data);
   return (void *)m;
-}
-static void * iiBI2N(void *d)
-{
-  void *r=NULL;
-  if (rField_is_Q())
-    r=d;
-  else
-  {
-    number n=(number)d;
-    if (rField_is_Zp())
-    {
-      r=(void *)npMap0(n);
-    }
-    else if (rField_is_Q_a())
-    {
-      r=(void *)naMap00(n);
-    }
-    else if (rField_is_Zp_a())
-    {
-      r=(void *)naMap0P(n);
-    }
-    else
-      WerrorS("cannot convert bigint to this field");
-    nlDelete(&n,NULL);
-  }
-  return r;
 }
 
 static void * iiN2P(void *data);
@@ -274,8 +248,6 @@ struct sConvertTypes dConvertTypes[] =
    { INTVEC_CMD,      MATRIX_CMD,     iiIm2Ma , NULL },
 //  intmat -> matrix
    { INTMAT_CMD,      MATRIX_CMD,     iiIm2Ma , NULL },
-//  bigint -> number
-   { BIGINT_CMD,      NUMBER_CMD,     iiBI2N , NULL },
 //  bigint -> poly
    { BIGINT_CMD,      NUMBER_CMD,     iiBI2P , NULL },
 //  number -> poly
