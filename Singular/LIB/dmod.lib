@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.9 2007-01-14 22:10:42 levandov Exp $";
+version="$Id: dmod.lib,v 1.10 2007-01-16 15:34:26 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -31,7 +31,7 @@ GUIDE:
 @* - Ann F^s = I = I(F^s) = LD in D(R)[s] can be computed by SannfsBM, SannfsOT, SannfsLOT
 @* - global Bernstein polynomial bs resp. BS in K[s] can be computed by bernsteinBM
 @* - Ann F^s0 = I(F^s0) = LD0 in D(R) can be computed by annfs0, annfsBM, annfsOT, annfsLOT
-@* - all the relevant data (LD, LD0, bs, PS) are computed by BoperatorBM
+@* - all the relevant data (LD, LD0, bs, PS) are computed by operatorBM
 
 PROCEDURES:
 
@@ -45,10 +45,10 @@ SannfsLOT(F[,eng]);    compute Ann F^s in D[s] for a poly F (Levandovskyy modifi
 SannfsOT(F[,eng]);     compute Ann F^s in D[s] for a poly F (algorithm of Oaku-Takayama)
 
 bernsteinBM(F[,eng]);  compute global Bernstein poly for a poly F (algorithm of Briancon-Maisonobe)
-operatorBM(F[,eng]);   compute Ann F^s, Ann F^s0, bs and PS for a poly F (algorithm of Briancon-Maisonobe)
+operatorBM(F[,eng]);   compute Ann F^s, Ann F^s0, BS and PS for a poly F (algorithm of Briancon-Maisonobe)
 annfsParamBM(F[,eng]); compute the generic Ann F^s and exceptional parametric constellations for a poly F with parametric coefficients (algorithm by Briancon and Maisonobe)
 
-annfsBMI(F[,eng]);  compute Ann F^s and Bernstein ideal for a poly F=f1*..*fP (algorithm of Briancon-Maisonobe)
+annfsBMI(F[,eng]);  compute Ann F^s and Bernstein ideal for a poly F=f1*..*fP (multivariate algorithm of Briancon-Maisonobe)
 
 
 AUXILIARY PROCEDURES:
@@ -96,7 +96,7 @@ PURPOSE: compute the annihilator ideal of f^s in D[s], where D is the Weyl Algeb
 NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the ideal LD is the annihilator of f^s.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
-@*       otherwise (and by default) @code{slimgb} is used.
+@*       otherwise, and by default @code{slimgb} is used.
 @*       If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example annfsBM; shows examples
@@ -279,9 +279,9 @@ example
 proc bernsteinBM(poly F, list #)
 "USAGE:  bernsteinBM(f [,eng]);  f a poly, eng an optional int
 RETURN:  list of roots of the Bernstein polynomial b and its multiplicies
-PURPOSE: compute the global Bernstein-Sato polynomial for a hypersurface, defined by F, according to the algorithm by Briancon and Maisonobe
+PURPOSE: compute the global Bernstein-Sato polynomial for a hypersurface, defined by f, according to the algorithm by Briancon and Maisonobe
 NOTE:    If eng <>0, @code{std} is used for Groebner basis computations,
-@*       otherwise (and by default) @code{slimgb} is used.
+@*       otherwise, and by default @code{slimgb} is used.
 @*       If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example bernsteinBM; shows examples
@@ -505,7 +505,7 @@ NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the ideal LD is the needed D-mod structure,
 @*       - the list BS is the list of roots and multiplicities of a Bernstein polynomial of f.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
-@*       otherwise (and by default) @code{slimgb} is used.
+@*       otherwise, and by default @code{slimgb} is used.
 @*       If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example annfsBM; shows examples
@@ -786,7 +786,7 @@ example
 proc operatorBM(poly F, list #)
 "USAGE:  operatorBM(f [,eng]);  f a poly, eng an optional int
 RETURN:  ring
-PURPOSE: compute an operator PS of a polynomial f such that PS*f^(s+1) = bs*f^s, according to the algorithm by Briancon and Maisonobe
+PURPOSE: compute the B-operator and other relevant data for Ann F^s, according to the algorithm by Briancon and Maisonobe
 NOTE:    activate this ring with the @code{setring} command. In this ring D[s]
 @*       - the polynomial F is the same as the input,
 @*       - the ideal LD is the annihilator of f^s in Dn[s],
@@ -1081,11 +1081,12 @@ example
   def A = operatorBM(F);
   setring A;
   F; // the original polynomial itself
-  LD; // 
-  LD0;
-  bs; BS;
-  PS;
-  reduce(PS*F-bs,LD);
+  LD; // generic annihilator
+  LD0; // annihilator
+  bs; // normalized Bernstein poly
+  BS; // root and multiplicities of the Bernstein poly
+  PS; // the operator, s.t. PS*F^{s+1} = bs*F^s mod LD
+  reduce(PS*F-bs,LD); // check the property of PS
 }
 
 proc annfsParamBM (poly F, list #)
@@ -1096,7 +1097,7 @@ NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the ideal LD is the D-module structure oa Ann F^s
 @*       - the ideal Param contains the list of the special parameters.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
-@*       otherwise (and by default) @code{slimgb} is used.
+@*       otherwise, and by default @code{slimgb} is used.
 @*       If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example annfsParamBM; shows examples
@@ -1310,7 +1311,7 @@ example
   LD;  
   Param;
   setring r;
-  poly G = x2-(y-a)^2; // try the exceptional values of parameters
+  poly G = x2-(y-a)^2; // try the exceptional value b=a of parameters
   def B = annfsParamBM(G); setring B;
   LD;  
   Param;
@@ -1335,7 +1336,7 @@ NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the ideal LD is the needed D-mod structure,
 @*       - the list BS is the Bernstein ideal of a polynomial f = F[1]*..*F[P].
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
-@*       otherwise (and by default) @code{slimgb} is used.
+@*       otherwise, and by default @code{slimgb} is used.
 @*       If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example annfsBMI; shows examples
@@ -1658,7 +1659,7 @@ NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the ideal LD is the needed D-mod structure,
 @*       - the list BS contains roots with multiplicities of a Bernstein polynomial of f.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
-@*       otherwise (and by default) @code{slimgb} is used.
+@*       otherwise, and by default @code{slimgb} is used.
 @*       If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example annfsOT; shows examples
@@ -2028,7 +2029,7 @@ PURPOSE: compute the D-module structure of basering[f^s], according to the 1st s
 NOTE:    activate this ring with the @code{setring} command.
 @*       In the ring D[s], the ideal LD is the needed D-mod structure.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
-@*       otherwise (and by default) @code{slimgb} is used.
+@*       otherwise, and by default @code{slimgb} is used.
 @*       If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example SannfsOT; shows examples
@@ -2306,7 +2307,7 @@ PURPOSE: compute the D-module structure of basering[f^s], according to the 1st s
 NOTE:    activate this ring with the @code{setring} command. 
 @*       In the ring D[s], the ideal LD is the needed D-mod structure,
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
-@*       otherwise (and by default) @code{slimgb} is used.
+@*       otherwise, and by default @code{slimgb} is used.
 @*       If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example SannfsBM; shows examples
@@ -2505,7 +2506,7 @@ PURPOSE: compute the D-module structure of basering[f^s], according to the Levan
 NOTE:    activate this ring with the @code{setring} command. 
 @*       In the ring D[s], the ideal LD is the needed D-mod structure. 
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
-@*       otherwise (and by default) @code{slimgb} is used.
+@*       otherwise, and by default @code{slimgb} is used.
 @*       If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example SannfsLOT; shows examples
@@ -2726,7 +2727,7 @@ NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the ideal LD is the annihilator of f^s,
 @*       - the list BS contains the roots with multiplicities of a Bernstein polynomial of f.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
-@*       otherwise (and by default) @code{slimgb} is used.
+@*       otherwise, and by default @code{slimgb} is used.
 @*       If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example annfsLOT; shows examples
@@ -2768,7 +2769,7 @@ NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the ideal LD is the annihilator of f^s,
 @*       - the list BS contains the roots with multiplicities of a Bernstein polynomial of f.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
-@*       otherwise (and by default) @code{slimgb} is used.
+@*       otherwise, and by default @code{slimgb} is used.
 @*       If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example annfs0; shows examples
@@ -2784,7 +2785,7 @@ EXAMPLE: example annfs0; shows examples
   }
   def @R2 = basering;
   // we're in D_n[s], where the elim ord for s is set
-  ideal J = NF(I,F);
+  ideal J = NF(I,std(F));
   // make leadcoeffs positive
   int i;
   for (i=1; i<= ncols(J); i++)
@@ -2837,7 +2838,6 @@ EXAMPLE: example annfs0; shows examples
   Nnew = Nnew - 1; // former 2*N;
   // list RL = ringlist(save);  // is defined earlier
   //  kill Lord, tmp, iv;
-  int i;
   list L = 0;
   list Lord, tmp;
   intvec iv;
