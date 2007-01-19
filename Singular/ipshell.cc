@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.151 2007-01-18 13:29:39 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.152 2007-01-19 17:31:42 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -2079,22 +2079,23 @@ ring rCompose(const lists  L)
         if (par_perm_size!=0)
           par_perm=(int *)omAlloc0(par_perm_size*sizeof(int));
         int i;
-	#if 0
+	//#if 0
 	// use imap:
         maFindPerm(orig_ring->names,orig_ring->N,orig_ring->parameter,orig_ring->P,
           currRing->names,currRing->N,currRing->parameter, currRing->P,
           perm,par_perm, currRing->ch);
-	#else
+	//#else
 	// use fetch
 	if (par_perm_size!=0)
 	  for(i=si_min(rPar(orig_ring),rPar(currRing))-1;i>=0;i--) par_perm[i]=-(i+1);
 	for(i=si_min(orig_ring->N,pVariables);i>0;i--) perm[i]=i;
-	#endif
+	//#endif
         ideal dest_id=idInit(IDELEMS(q),1);
         for(i=IDELEMS(q)-1; i>=0; i--)
         {
           dest_id->m[i]=pPermPoly(q->m[i],perm,orig_ring,nMap,
                                   par_perm,par_perm_size);
+	  //  PrintS("map:");pWrite(dest_id->m[i]);PrintLn();
           pTest(dest_id->m[i]);
         }
         R->qideal=dest_id;
