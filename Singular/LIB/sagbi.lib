@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: sagbi.lib,v 1.6 2007-01-04 12:49:27 Singular Exp $";
+version="$Id: sagbi.lib,v 1.7 2007-01-20 21:20:25 levandov Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  SAGBI.lib  Compute Subalgebras bases Analogous to Groebner bases for ideals
@@ -7,11 +7,11 @@ AUTHORS: Gerhard Pfister,        pfister@mathematik.uni-kl.de,
 @*       Anen Lakhal,            alakhal@mathematik.uni-kl.de
 
 PROCEDURES:
- proc reduction(p,I);  Perform one step subalgebra reducton (for short S-reduction) of p w.r.t I
- proc sagbiSPoly(I);   Compute the S-polynomilas of the Subalgebra defined by the genartors of I
- proc sagbiNF(id,I);   Perform iterated S-reductions in order to compute Subalgebras normal forms
- proc sagbi(I);        Construct SAGBI basis for the Subalgebra defined by I
- proc sagbiPart(I);    Construct partial SAGBI basis for the Subalgebra defined by I
+ reduction(p,I);  perform one step subalgebra reducton (for short S-reduction) of p w.r.t I
+ sagbiSPoly(I);   compute the S-polynomials of the Subalgebra defined by the genartors of I
+ sagbiNF(id,I);   perform iterated S-reductions in order to compute Subalgebras normal forms
+ sagbi(I);        construct SAGBI basis for the Subalgebra defined by I
+ sagbiPart(I);    construct partial SAGBI basis for the Subalgebra defined by I
 ";
 
 LIB "algebra.lib";
@@ -72,7 +72,7 @@ EXAMPLE: example sagbiSPoly; show an example "
   {
     //==================create anew ring with extra variables================
 
-    execute("ring R1="+charstr(bsr)+",("+varstr(bsr)+",@y(1..m)),(dp(n),dp(m));");
+    execute("ring R1=("+charstr(bsr)+"),("+varstr(bsr)+",@y(1..m)),(dp(n),dp(m));");
     execute("minpoly=number("+mp+");");
     ideal id=imap(bsr,id);
     ideal A;
@@ -201,7 +201,12 @@ static proc Spoly1(list l,ideal I,ideal J,int a)
 
     //================create a new ring with extra variables==============
 
-    execute("ring R1="+charstr(R)+",("+varstr(R)+",@y((ii+1)..(ii+jj))),(dp(n),dp(kk+jj-n));");
+    execute("ring R1=("+charstr(R)+"),("+varstr(R)+",@y((ii+1)..(ii+jj))),(dp(n),dp(kk+jj-n));");
+    // *levandov: would it not be easier and better to use
+    // ring @Y = char(R),(@y((ii+1)..(ii+jj))),dp;
+    // def R1 = R + @Y;
+    // setring R1;
+    // -> thus 
     ideal kern1;
     ideal A=fetch(R,A);
     attrib(A,"isSB",1);
@@ -271,8 +276,8 @@ EXAMPLE: reduction; show an example"
 
   if(b !=0) //means that the basering is a quotient ring
   {
-    p=reduce(p,groebner(0));
-    dom=reduce(groebner,std(0));
+    p=reduce(p,std(0));
+    dom=reduce(dom,std(0));
   }
 
   int i,choose;
@@ -319,7 +324,7 @@ EXAMPLE: reduction; show an example"
     poly v=product(maxideal(1));
 
     //------------- change the basering bsr to bsr[@(0),...,@(z)] ----------
-    execute("ring s="+charstr(basering)+",("+varstr(basering)+",@(0..z)),dp;");
+    execute("ring s=("+charstr(basering)+"),("+varstr(basering)+",@(0..z)),dp;");
     // Ev hier die Reihenfolge der Vars aendern. Dazu muss unten aber entsprechend
     // geaendert werden:
     //  execute("ring s="+charstr(basering)+",(@(0..z),"+varstr(basering)+"),dp;");
@@ -428,9 +433,9 @@ proc sagbiNF(id,ideal dom,int k,list#)
 "USAGE: sagbiNF(id,dom,k[,n]); id either poly or ideal,dom ideal, k and n positive intergers.
 RETURN: depends On the type of id; ideal or polynomial.
 @format
-    The integer k determine waht kind of s-reduction is performad:
-    - if (k=0) no tail s-reduction is performaed.
-    - if (k=1) tail s-reduction is perofrmed.
+    The integer k determines what kind of s-reduction is performed:
+    - if (k=0) no tail s-reduction is performed.
+    - if (k=1) tail s-reduction is performed.
     Three Algorthim  variants  are used to perform Subalgebra reduction.
     The positive integer n determine which variant should be used.
     n may take the values (0 or default),1 or 2.
@@ -480,7 +485,7 @@ example
  ideal dom =x2,x2y+y,x3y2;
  poly p=x4+x2y+y;
  sagbiNF(p,dom,0);
- sagbiNF(p,dom,1);// tail subalgebra reduction is perofrmed
+ sagbiNF(p,dom,1);// tail subalgebra reduction is performed
 }
 
 
@@ -511,14 +516,14 @@ static proc intRed(id,int k, list #)
 //////////////////////////////////////////////////////////////////////////////
 
 proc sagbi(id,int k,list#)
-"USAGE: sagbi(id,k[,n]); id ideal, k and n positive integer.
+"USAGE: sagbi(id,k[,n]); id ideal, k and n positive integers.
 RETURN: A SAGBI basis for the subalgebra defined by the generators of id.
 @format
-    k determine waht kind of s-reduction is performad:
-     - if (k=0) no tail s-reduction is performaed.
-     - if (k=1) tail s-reduction is perofrmed, and S-intereduced SAGBI basis
+    k determine what kind of s-reduction is performed:
+     - if (k=0) no tail s-reduction is performed.
+     - if (k=1) tail s-reduction is performed, and S-interreduced SAGBI basis
        is returned.
-    Three Algorthim  variants  are used to perform Subalgebra reduction.
+    Three Algorithm variants are used to perform Subalgebra reduction.
     The positive interger n determine which variant should be used.
     n may take the values (0 or default),1 or 2.
 @end format
@@ -549,15 +554,15 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc sagbiPart(id,int k,int c,list #)
 "USAGE: sagbi(id,k,c[,n]); id ideal, k, c and n positive integer.
-RETURN: A partial SAGBI basis for the subalgebra defined by the genrators of id.
+RETURN: A partial SAGBI basis for the subalgebra defined by the generators of id.
 @format
-     should stop.k determine waht kind of s-reduction is performad:
-     - if (k=0) no tail s-reduction is performaed.
-     - if (k=1) tail s-reduction is perofrmed, and S-intereduced SAGBI basis
+     should stop. k determine what kind of s-reduction is performed:
+     - if (k=0) no tail s-reduction is performed.
+     - if (k=1) tail s-reduction is performed, and S-intereduced SAGBI basis
       is returned.
-     c  determine; after which turn Sagbi basis computations should stop
-     Three Algorthim  variants  are used to perform Subalgebra reduction.
-     The positive interger n determine which variant should be used.
+     c  determines, after which turn Sagbi basis computations should stop
+     Three Algorithm variants are used to perform Subalgebra reduction.
+     The positive integer n determines which variant should be used.
      n may take the values (0 or default),1 or 2.
 @end format
 NOTE:- SAGBI bases computations may be performed either
