@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.284 2007-01-15 16:54:51 Singular Exp $
+@comment $Id: reference.doc,v 1.285 2007-01-23 22:23:38 krueger Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4697,6 +4697,10 @@ and the ideal has to be an ideal in the given ring.
 To compute the kernel of a map, the preimage of zero has to be determined.
 Hence there is no special command for computing the kernel of a map in
 @sc{Singular}.
+@item @strong{Note:}
+As @code{preimage} is handling ideals (not polynomials), the result of a preimage
+calculation of a principal ideal, whose generator is not in the image of the map,
+is the zero ideal.
 @item @strong{Example:}
 @smallexample
 @c example
