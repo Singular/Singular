@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.35 2007-01-18 13:22:14 Singular Exp $ */
+/* $Id: ideals.cc,v 1.36 2007-01-23 19:00:39 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -181,7 +181,7 @@ void idSkipZeroes (ideal ide)
 */
 void idNorm(ideal id)
 {
-  for (int i=IDELEMS(id)-1; i>-0; i--)
+  for (int i=IDELEMS(id)-1; i>=0; i--)
   {
     if (id->m[i] != NULL)
     {
@@ -196,20 +196,18 @@ void idNorm(ideal id)
 */
 void idDelMultiples(ideal id)
 {
-  int i, j, t;
-  int k = IDELEMS(id), l = k;
-  for (i=k-1; i>=0; i--)
+  int i, j;
+  int k = IDELEMS(id)-1;
+  for (i=k; i>=0; i--)
   {
     if (id->m[i]!=NULL)
     {
-      for (j=k-1; j>i; j--)
+      for (j=k; j>i; j--)
       {
-        if (id->m[j]!=NULL)
+        if ((id->m[j]!=NULL)
+        && (pComparePolys(id->m[i], id->m[j])))
         {
-          if(pComparePolys(id->m[i], id->m[j]))
-          {
-            pDelete(&id->m[j]);
-          }
+          pDelete(&id->m[j]);
         }
       }
     }
@@ -226,15 +224,13 @@ void idDelEquals(ideal id)
   int k = IDELEMS(id), l = k;
   for (i=k-1; i>=0; i--)
   {
-    if (id->m[i]!=NULL)
+    for (j=k-1; j>i; j--)
     {
-      for (j=k-1; j>i; j--)
+      if ((i!=j)
+      && (id->m[i]!=NULL) && (id->m[j]!=NULL)
+      && (pEqualPolys(id->m[i], id->m[j])))
       {
-        if ((id->m[j]!=NULL)
-        && (pEqualPolys(id->m[i], id->m[j])))
-        {
-          pDelete(&id->m[j]);
-        }
+        pDelete(&id->m[j]);
       }
     }
   }
@@ -246,14 +242,15 @@ void idDelEquals(ideal id)
 void idDelLmEquals(ideal id)
 {
   int i, j, t;
-  int k = IDELEMS(id);
+  int k = IDELEMS(id), l = k;
   for (i=k-1; i>=0; i--)
   {
     if (id->m[i] != NULL)
     {
-      for (j=k-1; j>i; j--)
+      for (j=l-1; j>=0; j--)
       {
-        if ((id->m[j] != NULL)
+        if ((i!=j)
+        && (id->m[j] != NULL)
         && pLmEqual(id->m[i], id->m[j]))
         {
           pDelete(&id->m[j]);
@@ -271,18 +268,13 @@ void idDelDiv(ideal id)
   {
     if (id->m[i] != NULL)
     {
-      for (j=k-1; j>i; j--)
+      for (j=k-1; j>=0; j--)
       {
-        if (id->m[j]!=NULL)
+        if ((i!=j)
+        && (id->m[j]!=NULL)
+        && pDivisibleBy(id->m[i], id->m[j]))
         {
-          if(pDivisibleBy(id->m[i], id->m[j]))
-          {
-            pDelete(&id->m[j]);
-          }
-          else if(pDivisibleBy(id->m[j], id->m[i]))
-          {
-            pDelete(&id->m[i]);
-          }
+          pDelete(&id->m[j]);
         }
       }
     }
