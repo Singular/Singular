@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: sagbi.lib,v 1.7 2007-01-20 21:20:25 levandov Exp $";
+version="$Id: sagbi.lib,v 1.8 2007-01-23 15:03:37 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  SAGBI.lib  Compute Subalgebras bases Analogous to Groebner bases for ideals
@@ -206,7 +206,7 @@ static proc Spoly1(list l,ideal I,ideal J,int a)
     // ring @Y = char(R),(@y((ii+1)..(ii+jj))),dp;
     // def R1 = R + @Y;
     // setring R1;
-    // -> thus 
+    // -> thus
     ideal kern1;
     ideal A=fetch(R,A);
     attrib(A,"isSB",1);

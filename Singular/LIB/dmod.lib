@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.11 2007-01-20 21:21:52 levandov Exp $";
+version="$Id: dmod.lib,v 1.12 2007-01-23 15:03:30 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -477,7 +477,7 @@ EXAMPLE: example bernsteinBM; shows examples
   //dbprint(ppl-1, sP);
   // convert factors to a list of their roots and multiplicities
   bs =  normalize(bs);
-  bs = -subst(bs,s,0); 
+  bs = -subst(bs,s,0);
   setring save;
   ideal bs = imap(@R3,bs);
   kill @R3;
@@ -650,10 +650,10 @@ EXAMPLE: example annfsBM; shows examples
   kill NName;
   tmp[2]  = iv;
   Lord[2] = tmp;
-  tmp[1]  = "C";  
-  iv      = 0;  
+  tmp[1]  = "C";
+  iv      = 0;
   tmp[2]  = iv;
-  Lord[3] = tmp;  
+  Lord[3] = tmp;
   tmp     = 0;
   L[3]    = Lord;
   // we are done with the list. Now add a Plural part
@@ -940,10 +940,10 @@ EXAMPLE: example operatorBM; shows examples
   kill NName;
   tmp[2]  = iv;
   Lord[2] = tmp;
-  tmp[1]  = "C";  
-  iv      = 0;  
+  tmp[1]  = "C";
+  iv      = 0;
   tmp[2]  = iv;
-  Lord[3] = tmp;  
+  Lord[3] = tmp;
   tmp     = 0;
   L[3]    = Lord;
   // we are done with the list. Now add a Plural part
@@ -1061,7 +1061,7 @@ EXAMPLE: example operatorBM; shows examples
   poly PS = T[1,1];
   dbprint(ppl,"// -4-3- an operator PS found, PS*f^(s+1) = b(s)*f^s");
   dbprint(ppl-1,PS);
-  option(redSB); 
+  option(redSB);
   dbprint(ppl,"// -4-4- the final cosmetic std");
   LD0 = engine(LD0,eng);  //std does the job too
   LD  = engine(LD,eng);
@@ -1232,7 +1232,7 @@ EXAMPLE: example annfsParamBM; shows examples
   export sParam;
   kill T;
   dbprint(ppl,"// -2-4- the special parameters has been computed");
-  dbprint(ppl, sParam); 
+  dbprint(ppl, sParam);
   // create Dn[s], where Dn is the ordinary Weyl Algebra, and put the result into it,
   // thus creating the ring @R2
   // keep: N, i,j,s, tmp, RL
@@ -1306,12 +1306,12 @@ example
   poly F = x^2 - (y-a)*(y-b);
   printlevel = 0;
   def A = annfsParamBM(F);  setring A;
-  LD;  
+  LD;
   Param;
   setring r;
   poly G = x2-(y-a)^2; // try the exceptional value b=a of parameters
   def B = annfsParamBM(G); setring B;
-  LD;  
+  LD;
   Param;
 }
 
@@ -1408,7 +1408,7 @@ EXAMPLE: example annfsBMI; shows examples
     s = s+"1,";
   }
   s[size(s)]= ";";
-  execute(s);  
+  execute(s);
   kill s;
   tmp[2]  = iv;
   Lord[2] = tmp;
@@ -1423,11 +1423,11 @@ EXAMPLE: example annfsBMI; shows examples
   setring @R;
   matrix @D[Nnew][Nnew];
   for (i=1; i<=P; i++)
-  { 
-    @D[i,i+P] = t(i); 
+  {
+    @D[i,i+P] = t(i);
   }
   for(i=1; i<=N; i++)
-  { 
+  {
     @D[2*P+i,2*P+N+i] = 1;
   }
   // L[5] = matrix(UpOneMatrix(Nnew));
@@ -1460,7 +1460,7 @@ EXAMPLE: example annfsBMI; shows examples
   ideal J = engine(I,eng);
   ideal K = nselect(J,1,P);
   kill I,J;
-  dbprint(ppl,"// -1-3- all t(i) are eliminated");                         
+  dbprint(ppl,"// -1-3- all t(i) are eliminated");
   dbprint(ppl-1, K);  //K is without t(i)
   // ----------- the ring @R2 ------------
   // _x, _Dx,s;  elim.ord for _x,_Dx.
@@ -1506,10 +1506,10 @@ EXAMPLE: example annfsBMI; shows examples
   kill NName;
   tmp[2]  = iv;
   Lord[2] = tmp;
-  tmp[1]  = "C";  
-  iv      = 0;  
+  tmp[1]  = "C";
+  iv      = 0;
   tmp[2]  = iv;
-  Lord[3] = tmp;  
+  Lord[3] = tmp;
   tmp     = 0;
   L[3]    = Lord;
   // we are done with the list. Now add a Plural part
@@ -1572,7 +1572,7 @@ EXAMPLE: example annfsBMI; shows examples
   }
   // create the ring @R4(_x,_Dx,_s) and put the result into it,
   // _x, _Dx,s;  ord "dp".
-  // keep: N, i,j,s, tmp, RL  
+  // keep: N, i,j,s, tmp, RL
   setring save;
   Nnew = 2*N+P;
   // list RL = ringlist(save);  //is defined earlier
@@ -2215,7 +2215,7 @@ EXAMPLE: example SannfsOT; shows examples
   ideal M  = engine(K,eng);
   ideal K2 = nselect(M,1,2);
   dbprint(ppl,"// -2-3- t,Dt are eliminated");
-  dbprint(ppl-1, K2);  
+  dbprint(ppl-1, K2);
   K2 = engine(K2,eng);
   setring save;
   // ----------- the ring @R3 ------------
@@ -2302,7 +2302,7 @@ proc SannfsBM(poly F, list #)
 "USAGE:  SannfsBM(f [,eng]);  f a poly, eng an optional int
 RETURN:  ring
 PURPOSE: compute the D-module structure of basering[f^s], according to the 1st step of the algorithm by Briancon and Maisonobe in the ring D[s], where D is the Weyl algebra
-NOTE:    activate this ring with the @code{setring} command. 
+NOTE:    activate this ring with the @code{setring} command.
 @*       In the ring D[s], the ideal LD is the needed D-mod structure,
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise, and by default @code{slimgb} is used.
@@ -2501,8 +2501,8 @@ proc SannfsLOT(poly F, list #)
 "USAGE:  SannfsLOT(f [,eng]);  f a poly, eng an optional int
 RETURN:  ring
 PURPOSE: compute the D-module structure of basering[f^s], according to the Levandovskyy's modification of the algorithm by Oaku and Takayama in the ring D[s], where D is the Weyl algebra
-NOTE:    activate this ring with the @code{setring} command. 
-@*       In the ring D[s], the ideal LD is the needed D-mod structure. 
+NOTE:    activate this ring with the @code{setring} command.
+@*       In the ring D[s], the ideal LD is the needed D-mod structure.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise, and by default @code{slimgb} is used.
 @*       If printlevel=1, progress debug messages will be printed,
@@ -2741,14 +2741,14 @@ EXAMPLE: example annfsLOT; shows examples
   }
   printlevel=printlevel+1;
   def save = basering;
-  def @A = SannfsLOT(F,eng); 
+  def @A = SannfsLOT(F,eng);
   setring @A;
   poly F = imap(save,F);
   def B  = annfs0(LD,F,eng);
   return(B);
 }
 example
-{ 
+{
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),Dp;
   poly F = x^3+y^3+z^3;
@@ -2763,7 +2763,7 @@ proc annfs0(ideal I, poly F, list #)
 "USAGE:  annfs0(I, F [,eng]);  I an ideal, F a poly, eng an optional int
 RETURN:  ring
 PURPOSE: compute the annihilator ideal of f^s in the Weyl Algebra, based on the
-output of procedures SannfsBM, SannfsOT or SannfsLOT 
+output of procedures SannfsBM, SannfsOT or SannfsLOT
 NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the ideal LD is the annihilator of f^s,
 @*       - the list BS contains the roots with multiplicities of a Bernstein polynomial of f.
@@ -2823,7 +2823,7 @@ EXAMPLE: example annfs0; shows examples
     m[i-1] = P[2][i];
   }
   bs =  normalize(bs);
-  bs = -subst(bs,s,0); 
+  bs = -subst(bs,s,0);
   dbprint(ppl,"// -2-3- minimal interger root found");
   dbprint(ppl-1, sP);
  //TODO: sort BS!
@@ -2902,7 +2902,7 @@ example
   ring r = 0,(x,y,z),Dp;
   poly F = x^3+y^3+z^3;
   printlevel = 0;
-  def A = SannfsBM(F); 
+  def A = SannfsBM(F);
   // alternatively, one can use SannfsOT or SannfsLOT
   setring A;
   LD;
@@ -3300,7 +3300,7 @@ EXAMPLE: example minIntRoot; shows examples
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring r   = 0,(x,y),ds; 
+  ring r   = 0,(x,y),ds;
   poly f1  = x*y*(x+y);
   ideal I1 = bernstein(f1)[1]; // a local Bernstein poly
   minIntRoot(I1,0);

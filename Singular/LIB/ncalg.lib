@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncalg.lib,v 1.22 2006-11-27 13:29:59 levandov Exp $";
+version="$Id: ncalg.lib,v 1.23 2007-01-23 15:03:31 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  ncalg.lib      Definitions of important GR-algebras
@@ -11,7 +11,7 @@ CONVENTIONS: This library provides pre-defined important noncommutative algebras
 there are functions @code{makeUsl}, @code{makeUgl}, @code{makeUg2} etc.
 @* There are quantized enveloping algebras U_q(sl_2) and U_q(sl_3) (via functions @code{makeQsl2}, @code{makeQsl3})
 and non-standard quantum deformation of so_3, accessible via @code{makeQso3} function.
-@* For bigger algebras we suppress the output of the (lengthy) list of non-commutative relations 
+@* For bigger algebras we suppress the output of the (lengthy) list of non-commutative relations
 and provide only the number of these relations instead.
 
 PROCEDURES:
@@ -654,7 +654,7 @@ example
 // is not isomorphic to Usl2 over R (but C)
 proc makeUso3(list #)
 "USAGE:   makeUso3([p]), p an optional int
-PURPOSE: set up the real U(so_3) algebra in the symmetric presentation; if p is specified, 
+PURPOSE: set up the real U(so_3) algebra in the symmetric presentation; if p is specified,
 RETURN:  ring
 NOTE:    activate this ring with the @code{setring} command
 SEE ALSO: makeUsl, makeUgl, makeUso5

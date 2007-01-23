@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmssing.lib,v 1.10 2006-08-02 15:40:50 Singular Exp $";
+version="$Id: gmssing.lib,v 1.11 2007-01-23 15:03:30 Singular Exp $";
 category="Singularities";
 
 info="
@@ -579,8 +579,8 @@ proc bernstein(poly t)
 "USAGE:    bernstein(t); poly t
 ASSUME:   characteristic 0; local degree ordering;
           isolated critical point 0 of t
-RETURN:   list:  
-          roots of the Bernstein polynomial b (ideal) and its multiplicies 
+RETURN:   list:
+          roots of the Bernstein polynomial b (ideal) and its multiplicies
 NOTE:     the roots of b are negative rational numbers and -1 is a root of b
 KEYWORDS: Bernstein polynomial
 EXAMPLE:  example bernstein; shows examples

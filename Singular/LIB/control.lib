@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.36 2007-01-14 22:09:42 levandov Exp $";
+version="$Id: control.lib,v 1.37 2007-01-23 15:03:29 Singular Exp $";
 category="System and Control Theory";
 info="
 LIBRARY:  control.lib     Algebraic analysis tools for System and Control Theory
@@ -442,7 +442,7 @@ RETURN: list
 PURPOSE: computes list of all the properties concerning controllability of the system (behavior), represented by the  matrix R
 EXAMPLE:  example controlDim; shows an example
 NOTE: the properties and corresponding data like controllability, flatness, dimension of the system, degree of controllability, kernel and image representations, genericity of parameters, obstructions to controllability, annihilator of torsion submodule and left inverse are investigated.
-@* This procedure is analogous to 'control' but uses dimension calculations. 
+@* This procedure is analogous to 'control' but uses dimension calculations.
 @* The implemented approach works for full row rank matrices only (the check is done automatically).
 "
 {

@@ -1,4 +1,4 @@
-version="$Id: involut.lib,v 1.11 2006-11-22 21:43:27 levandov Exp $";
+version="$Id: involut.lib,v 1.12 2007-01-23 15:03:30 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  involut.lib  Procedures for Computations and Operations with Involutions
@@ -822,7 +822,7 @@ example
   ring r = 0,(x,s),dp;
   ncalgebra(1,s); // the shift algebra
   s*x; // the only relation in the algebra is:
-  def Y = findAuto(0); 
+  def Y = findAuto(0);
   setring Y;
   size(L); // here, we have 1 parametrized family
   print(L[1][2]); // here, @p is a nonzero parameter

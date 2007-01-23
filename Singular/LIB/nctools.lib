@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.21 2007-01-11 01:27:14 levandov Exp $";
+version="$Id: nctools.lib,v 1.22 2007-01-23 15:03:36 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -816,14 +816,14 @@ RETURN: list {AltVarStart, AltVarEnd} is currRing is SCA, returns undef otherwis
 {
   def rRing = basering;
   list L = ringlist(rRing);
-  
+
   if( size(L)!=6 )
   {
     return("The current ring is commutative!");
   }
 
   module D = simplify(L[6], 2 + 4);
-  
+
   if( size(D)>0 )
   {
     return("The current ring is not SCA! (D!=0)");
@@ -831,7 +831,7 @@ RETURN: list {AltVarStart, AltVarEnd} is currRing is SCA, returns undef otherwis
 
   int i, j;
   int N = nvars(rRing);
-  
+
   int b = N+1;
   int e = 0;
 
@@ -840,11 +840,11 @@ RETURN: list {AltVarStart, AltVarEnd} is currRing is SCA, returns undef otherwis
   ideal I = sort(L[4])[1];
 
 //   "Q = ", string(I);
-  
+
   intvec exp;
   int d;
   int n = 0;
-  
+
   for( i = size(I); i > 0; i-- )
   {
     p = I[i];
@@ -854,7 +854,7 @@ RETURN: list {AltVarStart, AltVarEnd} is currRing is SCA, returns undef otherwis
     {
       return("The current ring is not SCA! (Wrong quotient ideal, not monomial)");
     }
-    
+
     exp = leadexp(p);
 //     exp;
     d = 0;
@@ -862,12 +862,12 @@ RETURN: list {AltVarStart, AltVarEnd} is currRing is SCA, returns undef otherwis
     {
       d = d + exp[j];
 //       d;
-      
+
       if( (d!=2) && (d!=0) )
       {
         return("The current ring is not SCA! (Wrong quotient ideal, wrong leading exponent)");
       }
-      
+
       if(exp[j] == 2)
       {
         if(b > j)
@@ -882,7 +882,7 @@ RETURN: list {AltVarStart, AltVarEnd} is currRing is SCA, returns undef otherwis
         }
       }
     }
-    
+
     if( d!=2 )
     {
       return("The current ring is not SCA! (Wrong quotient ideal, wrong leading exponent)");
@@ -908,11 +908,11 @@ RETURN: list {AltVarStart, AltVarEnd} is currRing is SCA, returns undef otherwis
   {
     return("The current ring is not SCA! (wrong quotient ideal, bad range)");
   }
-  
+
 
   matrix C = L[5];
   poly c;
-  
+
   for( i = 1; i < N; i++ )
   {
     for( j = i+1; j <= N; j++ )
@@ -939,7 +939,7 @@ RETURN: list {AltVarStart, AltVarEnd} is currRing is SCA, returns undef otherwis
   {
     return("The current ring is commutative!");
   }
-  
+
   return(list(b, e));
 }
 
@@ -1031,7 +1031,7 @@ example
     { "Not a supercommutative algebra!!!"; }
   kill R;
 /////////////////////////////////////////////////////////////////////
-  ring R = 0,(x(1..4)),dp; 
+  ring R = 0,(x(1..4)),dp;
   ncalgebra(1, 0); // still commutative!
   if(IsSCA())
     { "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "]."; }
@@ -1043,7 +1043,7 @@ example
   list CurrRing = ringlist(R);
   def ER = ring(CurrRing);
   setring ER; // R;
-  
+
   matrix E = UpOneMatrix(nvars(R));
 
   int i, j; int b = 2; int e = 3;
@@ -1073,7 +1073,7 @@ example
     { "Not a supercommutative algebra!!!"; }
   kill R;
   kill ER;
-  
+
 }
 
 

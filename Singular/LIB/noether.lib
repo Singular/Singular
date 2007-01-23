@@ -1,6 +1,6 @@
 // AH last modified:  01.07.2007
 //////////////////////////////////////////////////////////////////////////////
-version = "$Id: noether.lib,v 1.5 2007-01-08 16:29:02 Singular Exp $";
+version = "$Id: noether.lib,v 1.6 2007-01-23 15:03:37 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: noether.lib   Noether normalization of an ideal (not nessecary
@@ -71,7 +71,7 @@ ASSUME: i is a nonzero monomial ideal.
    {
      Y=findvars(I[ii],1)[1];
      l=rvar(Y[1][1]);
-     if (size(Y[1])==1)        
+     if (size(Y[1])==1)
      {
        L[l]=1;
        P1=insert(P1,Y[1][1]);
@@ -87,7 +87,7 @@ ASSUME: i is a nonzero monomial ideal.
      for ( jj = 1; jj <= n+1; jj++ )
      {
        P3=insert(P3,varstr(jj));
-     } 
+     }
    }
    else
    {
@@ -99,17 +99,17 @@ ASSUME: i is a nonzero monomial ideal.
    }
    if (L[n+1]==-1)
    {
-     return(list(0,P1+P3));        
+     return(list(0,P1+P3));
    }
    for ( ii = 1; ii <= n; ii++ )
    {
      if (L[ii]==-1)
      {
-       return(list(0,P1+P3));        
+       return(list(0,P1+P3));
      }
      if (L[ii]==0 and L[ii+1]==1)
      {
-       return(list(0,P1+P3));        
+       return(list(0,P1+P3));
      }
    }
    d=n+1-sum(L);
@@ -120,7 +120,7 @@ ASSUME: i is a nonzero monomial ideal.
 proc MNP_test (ideal i)
 "USAGE: MNP-test (i); i an ideal
 RETURN: 1 if i is in Noether position 0  otherwise.
-NOTE:   This test is a probabilistic test, and it computes the initial of the ideal modulo the prime number 2147483647 (the biggest prime less than 2^31).        
+NOTE:   This test is a probabilistic test, and it computes the initial of the ideal modulo the prime number 2147483647 (the biggest prime less than 2^31).
 "
 {
   "// WARNING:
@@ -195,7 +195,7 @@ RETURN:  A linear map phi such that  phi(i) is in Noether position
   while ( nl < 30 )
   {
     nl=nl+1;
-    I=i;        
+    I=i;
     L=maxideal(1);
     for ( ii = n; ii>=0; ii-- )
     {
@@ -232,7 +232,7 @@ RETURN:  A linear map phi such that  phi(i) is in Noether position
 proc MNP (ideal i)
 "USAGE:  MNP (i); i ideal
 RETURN:  A linear map phi such that  phi(i) is in Noether position
-NOTE:    It uses the procedure  MNP_test to test Noether position.        
+NOTE:    It uses the procedure  MNP_test to test Noether position.
 "
 {
 //--------------------------- initialisation ---------------------------------
@@ -275,7 +275,7 @@ NOTE:    It uses the procedure  MNP_test to test Noether position.
    while ( nl < 30 )
    {
      nl=nl+1;
-     I=i;        
+     I=i;
      L=maxideal(1);
      for ( ii = n; ii>=0; ii-- )
      {
@@ -383,7 +383,7 @@ THEORY:  The satiety, or saturation index, of a homogeneous ideal i is the
   }
   while ( nl < 5 )
   {
-    nl=nl+1;        
+    nl=nl+1;
     chcoord=select1(maxideal(1),1,(n));
     ran=random(100,1,n);
     ran=intmat(ran,1,n+1);
@@ -478,7 +478,7 @@ NOTE:    This is a probabilistic procedure, and it computes the initial of the i
   }
   while ( nl < 30 )
   {
-    nl=nl+1;        
+    nl=nl+1;
     chcoord=select1(maxideal(1),1,(n));
     ran=random(100,1,n);
     ran=intmat(ran,1,n+1);
@@ -583,7 +583,7 @@ ASSUME:  i is a homogeneous ideal.
       h=maxdeg1(K);
     }
     else
-    {        
+    {
       while ( nl < 30 )
       {
         nl=nl+1;
@@ -607,7 +607,7 @@ ASSUME:  i is a homogeneous ideal.
   for ( ii = n; ii>=n-d+1; ii-- )
   {
     i=subst(i,x(ii),0);
-    s = "ring mr = ",charstr(r1),",x(0..ii-1),dp;";        
+    s = "ring mr = ",charstr(r1),",x(0..ii-1),dp;";
     execute(s);
     ideal i,sbi,I,J,K,L,T;
     poly P;
@@ -630,7 +630,7 @@ ASSUME:  i is a homogeneous ideal.
       {
         while ( nl < 30 )
         {
-          nl=nl+1;        
+          nl=nl+1;
           phi=mr,randomLast(100);
           T=phi(i);
           I=simplify(lead(std(T)),1);
@@ -656,7 +656,7 @@ ASSUME:  i is a homogeneous ideal.
     }
   }
   if (nl < 30)
-  {        
+  {
     dbprint(2,"reg(i)=" + string(h) + " and the time of this computation: " + string(rtimer-time) + " sec./100");
     return();
   }
@@ -684,12 +684,12 @@ ASSUME:  i is a homogeneous ideal.
           break;
         }
       }
-    }        
+    }
     h=maxdeg1(simplify(reduce(quotient(I,maxideal(1)),I),2))+1;
     for ( ii = n; ii> n-d+1; ii-- )
     {
       sbi=subst(sbi,x(ii),0);
-      s = "ring mr = ",charstr(r0),",x(0..ii-1),dp;";        
+      s = "ring mr = ",charstr(r0),",x(0..ii-1),dp;";
       execute(s);
       ideal sbi,I,L,K,T;
       map phi;
@@ -716,7 +716,7 @@ ASSUME:  i is a homogeneous ideal.
             sbi=T;
             break;
           }
-        }        
+        }
       }
       H=maxdeg1(simplify(reduce(quotient(I,maxideal(1)),I),2))+1;
       if (H > h)
@@ -728,7 +728,7 @@ ASSUME:  i is a homogeneous ideal.
       kill mr;
     }
     sbi=subst(sbi,x(n-d+1),0);
-    s = "ring mr = ",charstr(r0),",x(0..n-d),dp;";        
+    s = "ring mr = ",charstr(r0),",x(0..n-d),dp;";
     execute(s);
     ideal sbi,I,L,K,T;
     map phi;
@@ -808,7 +808,7 @@ NOTE:    This is a probabilistic procedure, and it computes the initial of the i
     {
       while ( nl < 30 )
       {
-        nl=nl+1;        
+        nl=nl+1;
         phi=r1,randomLast(100);
         sbi=phi(i);
         #=ringlist(r1);
@@ -840,7 +840,7 @@ NOTE:    This is a probabilistic procedure, and it computes the initial of the i
   for ( ii = n; ii>=n-d+1; ii-- )
   {
     i=subst(i,x(ii),0);
-    s = "ring mr = ","0",",x(0..ii-1),dp;";        
+    s = "ring mr = ","0",",x(0..ii-1),dp;";
     execute(s);
     ideal i,sbi,I,J,K,L,lsbi1;
     poly P;
@@ -876,7 +876,7 @@ NOTE:    This is a probabilistic procedure, and it computes the initial of the i
         nl=0;
         while ( nl < 30 )
         {
-          nl=nl+1;        
+          nl=nl+1;
           phi=mr,randomLast(100);
           sbi=phi(i);
           #=ringlist(mr);

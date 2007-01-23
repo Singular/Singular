@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: poly.lib,v 1.40 2006-12-15 14:15:51 Singular Exp $";
+version="$Id: poly.lib,v 1.41 2007-01-23 15:03:37 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  poly.lib      Procedures for Manipulating Polys, Ideals, Modules
@@ -682,12 +682,12 @@ EXAMPLE: example rad_con; shows an example
   J=std(J);
   degBound=dB;
   if (J[1]==1)
-  { 
+  {
      setring br;
      return(1);
   }
   else
-  { 
+  {
      setring br;
      return(0);
   }
