@@ -474,6 +474,7 @@ clean: mostlyclean
 distclean: clean
 	-rm -f iparith.inc mpsr_Tok.inc stamp.h 
 	-rm -f Singular* *.gprof *.bprof *~ .\#* version.h
+	rm -f plural_cmd.inc
 	-rm -f mod2.h Makefile TAGS* tags config.status config.cache config.log
 
 srcclean:
