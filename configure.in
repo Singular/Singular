@@ -809,6 +809,12 @@ fi
 if test -d sgroup; then
   SUBDIRS="$SUBDIRS sgroup"
 fi
+if test -d kernel; then
+  SUBDIRS="$SUBDIRS kernel"
+fi
+if test -d IntegerProgramming; then
+  SUBDIRS="$SUBDIRS IntegerProgramming"
+fi
 if test -d Singular; then
   SUBDIRS="$SUBDIRS Singular"
 fi
