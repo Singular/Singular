@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: sagbi.lib,v 1.8 2007-01-23 15:03:37 Singular Exp $";
+version="$Id: sagbi.lib,v 1.9 2007-01-23 18:27:17 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  SAGBI.lib  Compute Subalgebras bases Analogous to Groebner bases for ideals
@@ -7,7 +7,7 @@ AUTHORS: Gerhard Pfister,        pfister@mathematik.uni-kl.de,
 @*       Anen Lakhal,            alakhal@mathematik.uni-kl.de
 
 PROCEDURES:
- reduction(p,I);  perform one step subalgebra reducton (for short S-reduction) of p w.r.t I
+ sagbiRreduction(p,I);  perform one step subalgebra reducton (for short S-reduction) of p w.r.t I
  sagbiSPoly(I);   compute the S-polynomials of the Subalgebra defined by the genartors of I
  sagbiNF(id,I);   perform iterated S-reductions in order to compute Subalgebras normal forms
  sagbi(I);        construct SAGBI basis for the Subalgebra defined by I
@@ -253,15 +253,15 @@ static proc Spoly1(list l,ideal I,ideal J,int a)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc reduction(poly p,ideal dom,list #)//one step Subalgebra reduction
-"USAGE: reduction(p,dom[,n]); p poly , dom  ideal
+proc sagbiReduction(poly p,ideal dom,list #)//one step Subalgebra reduction
+"USAGE: sagbiReduction(p,dom[,n]); p poly , dom  ideal
 RETURN: a polynomial
 @format
     Three algorithm variants are used to perform subalgebra reduction.
     The positive interger n determine which variant should be used.
     n may take the values (0 or default),1 or 2.
 @end format
-EXAMPLE: reduction; show an example"
+EXAMPLE: sagbiReduction; show an example"
 {
   def bsr=basering;
   ideal B=ideal(bsr);//When the basering is quotient ring  this type casting
@@ -386,20 +386,20 @@ example
   ring r= 0,(x,y),dp;
   ideal dom =x2,y2,xy-y;
   poly p=x4+x3y+xy2-y2;
-  reduction(p,dom);
-  reduction(p,dom,1);
-  reduction(p,dom,2);
+  sagbiReduction(p,dom);
+  sagbiReduction(p,dom,1);
+  sagbiReduction(p,dom,2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 static proc completeReduction(poly p,ideal dom,list#)//reduction
 {
   poly p1=p;
-  poly p2=reduction(p,dom,#);
+  poly p2=sagbiReduction(p,dom,#);
   while (p1!=p2)
   {
     p1=p2;
-    p2=reduction(p1,dom,#);
+    p2=sagbiReduction(p1,dom,#);
   }
   return(p2);
 }
@@ -411,7 +411,7 @@ static proc completeReduction1(poly p,ideal dom,list #) //tail reduction
   p1=p;
   while(p1!=0)
   {
-    p2=reduction(p1,dom,#);
+    p2=sagbiReduction(p1,dom,#);
     if(p2!=p1)
     {
       p1=p2;
