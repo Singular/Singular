@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.36 2007-01-15 17:11:00 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.37 2007-01-24 17:16:48 bricken Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1622,10 +1622,10 @@ void gnc_kBucketPolyRed_ZOld(kBucket_pt b, poly p, number *c)
   pCleardenom_n(pp,c2);
   pDelete(&m);
   *c = kBucketPolyRed(b,pp,pLength(pp),NULL);
-  cc=*c;
-  *c=nMult(*c,c2);
+  //cc=*c;
+  //*c=nMult(*c,c2);
   nDelete(&c2);
-  nDelete(&cc);
+  //nDelete(&cc);
   pDelete(&pp);
 
 }
@@ -1651,10 +1651,10 @@ void gnc_kBucketPolyRed_ZNew(kBucket_pt b, poly p, number *c)
   pCleardenom_n(pp,c2);
   pDelete(&m);
   *c = kBucketPolyRed(b,pp,pLength(pp),NULL);
-  cc=*c;
-  *c=nMult(*c,c2);
+  //cc=*c;
+  //*c=nMult(*c,c2);
   nDelete(&c2);
-  nDelete(&cc);
+  //nDelete(&cc);
   pDelete(&pp);
 
 }
