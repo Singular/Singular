@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.36 2007-01-23 19:00:39 Singular Exp $ */
+/* $Id: ideals.cc,v 1.37 2007-01-24 10:00:55 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -220,17 +220,19 @@ void idDelMultiples(ideal id)
 */
 void idDelEquals(ideal id)
 {
-  int i, j, t;
-  int k = IDELEMS(id), l = k;
-  for (i=k-1; i>=0; i--)
+  int i, j;
+  int k = IDELEMS(id)-1;
+  for (i=k; i>=0; i--)
   {
-    for (j=k-1; j>i; j--)
+    if (id->m[i]!=NULL)
     {
-      if ((i!=j)
-      && (id->m[i]!=NULL) && (id->m[j]!=NULL)
-      && (pEqualPolys(id->m[i], id->m[j])))
+      for (j=k; j>i; j--)
       {
-        pDelete(&id->m[j]);
+        if ((id->m[j]!=NULL)
+        && (pEqualPolys(id->m[i], id->m[j])))
+        {
+          pDelete(&id->m[j]);
+        }
       }
     }
   }
@@ -241,16 +243,15 @@ void idDelEquals(ideal id)
 //
 void idDelLmEquals(ideal id)
 {
-  int i, j, t;
-  int k = IDELEMS(id), l = k;
-  for (i=k-1; i>=0; i--)
+  int i, j;
+  int k = IDELEMS(id)-1;
+  for (i=k; i>=0; i--)
   {
     if (id->m[i] != NULL)
     {
-      for (j=l-1; j>=0; j--)
+      for (j=k; j>i; j--)
       {
-        if ((i!=j)
-        && (id->m[j] != NULL)
+        if ((id->m[j] != NULL)
         && pLmEqual(id->m[i], id->m[j]))
         {
           pDelete(&id->m[j]);
@@ -262,19 +263,25 @@ void idDelLmEquals(ideal id)
 
 void idDelDiv(ideal id)
 {
-  int i, j, t;
-  int k = IDELEMS(id), l = k;
-  for (i=k-1; i>=0; i--)
+  int i, j;
+  int k = IDELEMS(id)-1;
+  for (i=k; i>=0; i--)
   {
     if (id->m[i] != NULL)
     {
-      for (j=k-1; j>=0; j--)
+      for (j=k; j>i; j--)
       {
-        if ((i!=j)
-        && (id->m[j]!=NULL)
-        && pDivisibleBy(id->m[i], id->m[j]))
+        if (id->m[j]!=NULL)
         {
-          pDelete(&id->m[j]);
+          if(pDivisibleBy(id->m[i], id->m[j]))
+          {
+            pDelete(&id->m[j]);
+          }
+          else if(pDivisibleBy(id->m[j], id->m[i]))
+          {
+            pDelete(&id->m[i]);
+            break;
+          }
         }
       }
     }
