@@ -75,7 +75,7 @@ maintainer-install uninstall:
 	done
 
 install-doc:
-	cd doc; make install
+	cd doc; ${MAKE} install
 
 ##############################################################
 # cleaning up
