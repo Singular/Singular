@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.6 2007-01-11 11:27:25 Singular Exp $
+ *  Version: $Id: sca.cc,v 1.7 2007-01-25 16:36:50 Singular Exp $
  *******************************************************************/
 
 // #define PDEBUG 2
@@ -1074,7 +1074,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
       const poly pNext = pNext(save);
 
       for( unsigned int i = m_iFirstAltVar; i <= m_iLastAltVar; i++ )
-      if( p_GetExp(save, i, currRing) )
+      if( pGetExp(save, i)!=0 )
       {
         const poly tt = sca_pp_Mult_xi_pp(i, pNext, currRing);
 
