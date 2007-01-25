@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.285 2007-01-23 22:23:38 krueger Exp $
+@comment $Id: reference.doc,v 1.286 2007-01-25 11:20:08 bricken Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4355,6 +4355,7 @@ progress during the following computations:
 @code{stdfglm},
 @code{stdhilb},
 @code{syz}.
+@anchor{option(redSB)}
 See below for more details.
 @c ---------
 @item @code{redSB}
@@ -4488,6 +4489,14 @@ shows correct usage in error messages (set by default).
 @tab @code{[d]}
 @tab computations of the d-th syzygy module
 @item @tab @tab @tab all other characters: like the output of @code{std}
+@item @tab @tab @tab
+@item @tab @code{slimgb}
+@tab @code{M[n,m]} @tab 	parallel reduction of n elements with m non-zero output elements
+@item @tab @tab @code{.} @tab postponed a reduction of a pair/S-polynomial
+@item @tab @tab @code{b} @tab exchange of a reductor by a 'better' one
+@item @tab @tab @code{e} @tab a new reductor with non-minimal leading term
+@item @tab @tab @code{(n)} @tab n critical pairs are still to be reduced
+@item @tab @tab d @tab the maximal degree of the leading terms is currently d
 @item @tab @tab @tab
 @item @tab @code{sres}
 @tab @code{.} @tab syzygy found
@@ -5714,31 +5723,38 @@ See
 @cindex slimgb
 @table @code
 @item @strong{Syntax:}
-@code{slimgb (} ideal_expression@code{)}
-
+@* @code{slimgb (} ideal_expression@code{)}
+@* @code{slimgb (} module_expression@code{)}
 @item @strong{Type:}
-ideal
+ideal or module
 @item @strong{Purpose:}
-returns a Groebner basis of an ideal with respect to the
-monomial ordering of the basering, which has to be global.
+
+@ref{slim Groebner bases}
+
+
+Returns a Groebner basis of an ideal or module with respect to the monomial 
+ordering of the basering (which has to be global).
 @item @strong{Note:}
-The algorithm is described in the diploma thesis of Michael Brickenstein
-"Neue Varianten zur Berechnung von Groebnerbasen",
-written 2004 under supervision of G.-M. Greuel in Kaiserslautern.
+The algorithm is designed to keep polynomials slim (short with small coefficients). For details see @code{http://www.mathematik.uni-kl.de/~zca/Reports_on_ca/35/paper_35_full.ps.gz}.
+A reduced Groebner basis is returned if option(redSB) is set 
+(see @ref{option(redSB)}).
+To view the progress of long running computations, use option(prot) 
+(see @ref{option(prot)}).
 
-It is designed to keep polynomials slim (short with small coefficients).
-Currently best results are examples over function fields (parameters).
 
-At this moment the implementation is not optimal for weighted degree orderings.
 
-The program only supports the options @code{prot}, which will give protocol output
-and @code{redSB} for returning a reduced Groebner basis.
-The protocol messages of @code{slimgb} mean the following:
-@* @code{M[n,m]} means a parallel reduction of @code{n} elements with @code{m} non-zero output elements,
-@* @code{b} notices an exchange trick described in the thesis and
-@* @code{e} adds a reductor with non-minimal leading term.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=2,(x,y,z),lp;
+  poly s1=z*(x*y+1);
+  poly s2=x2+x;
+  poly s3=y2+y;
+  ideal i=s1,s2,s3;
+  slimgb(i);
+@c example
+@end smallexample
 
-For an example see @ref{slim Groebner bases}.
 @end table
 
 @c ref
