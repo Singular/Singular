@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.437 2007-01-18 10:31:37 Singular Exp $ */
+/* $Id: iparith.cc,v 1.438 2007-01-25 19:13:00 motsak Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -67,8 +67,10 @@
 
 #include "mpr_inout.h"
 
+
 #ifdef HAVE_PLURAL
 #include "gring.h"
+#include "sca.h"
 #define ALLOW_PLURAL    ,1
 #define ALLOW_PLURAL_N   1
 #define NO_PLURAL       ,0
@@ -4123,7 +4125,13 @@ static BOOLEAN jjRPAR(leftv res, leftv v)
 }
 static BOOLEAN jjSLIM_GB(leftv res, leftv u)
 {
-  if (currQuotient!=NULL)
+#ifdef HAVE_PLURAL
+  const bool bIsSCA = rIsSCA(currRing);
+#else
+  const bool bIsSCA = false;
+#endif 
+   
+  if ((currQuotient!=NULL) && !bIsSCA)
   {
     Werror("qring not supported by slimgb at the moment");
     return TRUE;
