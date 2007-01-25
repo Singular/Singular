@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.37 2007-01-24 17:16:48 bricken Exp $
+ *  Version: $Id: gring.cc,v 1.38 2007-01-25 19:42:26 motsak Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1362,9 +1362,9 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
   poly M1    = mm_Mult_p(m1,p_Head(p1,r),r); // M1 = m1 * lt(p1)
   poly M2    = mm_Mult_p(m2,p_Head(p2,r),r); // M2 = m2 * lt(p2)
 
-#ifdef PDEBUG
   if(M1 == NULL || M2 == NULL)
   {
+#ifdef PDEBUG
        Print("\np1 = ");
        p_Write(p1, r);
 
@@ -1378,8 +1378,9 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
        p_Write(m2, r);
 
        Werror("ERROR in nc_CreateSpoly: result of multiplication is Zero!\n");
-  }
 #endif
+       return(NULL);
+  }
 
   number C1  = n_Copy(p_GetCoeff(M1,r),r);      // C1 = lc(M1)
   number C2  = n_Copy(p_GetCoeff(M2,r),r);      // C2 = lc(M2)
