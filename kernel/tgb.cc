@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.112 2007-01-11 10:58:22 Singular Exp $ */
+/* $Id: tgb.cc,v 1.113 2007-01-26 12:08:28 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1963,13 +1963,13 @@ static void go_on (slimgb_alg* c){
     kBucketClear(buf[j].bucket,&p, &len);
     kBucketDestroy(&buf[j].bucket);
 
-    if (!c->nc) {
+    //if (!c->nc) {
       if ((TEST_OPT_REDTAIL)&&(c->S->rank<=1)){
       p=redNFTail(p,c->strat->sl,c->strat, 0);
       } else {
       p=redTailShort(p, c->strat);
       }
-      }
+      //}
     sbuf[j]=add_to_basis_ideal_quotient(p,c,ibuf+j);
     //sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
   }
@@ -2075,6 +2075,7 @@ static void go_on (slimgb_alg* c){
 
 static poly redNFTail (poly h,const int sl,kStrategy strat, int len)
 {
+  BOOLEAN nc=rIsPluralRing(currRing);
   if (h==NULL) return NULL;
   pTest(h);
   if (0 > sl)
@@ -2118,7 +2119,10 @@ static poly redNFTail (poly h,const int sl,kStrategy strat, int len)
 #endif
             number coef;
             pTest(strat->S[j]);
-            coef=kBucketPolyRed(P.bucket,strat->S[j],
+            if (nc){
+              nc_BucketPolyRed_Z(P.bucket, strat->S[j], &coef);
+            } else
+              coef=kBucketPolyRed(P.bucket,strat->S[j],
                                 strat->lenS[j]/*pLength(strat->S[j])*/,strat->kNoether);
             pMult_nn(res,coef);
             nDelete(&coef);
