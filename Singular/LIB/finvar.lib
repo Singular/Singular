@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.54 2007-01-23 13:03:59 Singular Exp $"
+version="$Id: finvar.lib,v 1.55 2007-01-26 09:29:25 king Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -90,7 +90,8 @@ THEORY:  x^i-1 is divided by the j-th cyclotomic polynomial where j takes on
 EXAMPLE: example cyclotomic; shows an example
 "
 { if (i<=0)
-  { ERROR("ERROR:   the input should be > 0.");
+  { "ERROR:   the input should be > 0.";
+    return();
   }
   poly v1=var(1);
   if (i==1)
@@ -160,7 +161,8 @@ EXAMPLE: example group_reynolds; shows an example
  //------------------------ making sure the input is okay ---------------------
   if (typeof(#[size(#)])=="int")
   { if (size(#)==1)
-    { ERROR("ERROR:   there are no matrices given among the parameters");
+    { "ERROR:   there are no matrices given among the parameters";
+      return();
     }
     int v=#[size(#)];
     gen_num=size(#)-1;
@@ -170,15 +172,18 @@ EXAMPLE: example group_reynolds; shows an example
     gen_num=size(#);
   }
   if (typeof(#[1])<>"matrix")
-  { ERROR("ERROR:   The parameters must be a list of matrices and maybe an <int>");
+  { "ERROR:   The parameters must be a list of matrices and maybe an <int>";
+    return();
   }
   int n=nrows(#[1]);
   if (n<>nvars(basering))
-  { ERROR("ERROR:   the number of variables of the basering needs to be the same"+newline+
-    "         as the dimension of the matrices");
+  { "ERROR:   the number of variables of the basering needs to be the same";
+    "         as the dimension of the matrices";
+    return();
   }
   if (n<>ncols(#[1]))
-  { ERROR("ERROR:   matrices need to be square and of the same dimensions");
+  { "ERROR:   matrices need to be square and of the same dimensions";
+    return();
   }
   matrix vars=matrix(maxideal(1));     // creating an nx1-matrix containing the
   vars=transpose(vars);                // variables of the ring -
@@ -204,10 +209,12 @@ EXAMPLE: example group_reynolds; shows an example
                                        // compatible with the task of the
                                        // procedure
     if (not(typeof(#[j])=="matrix"))
-    { ERROR("ERROR:   The parameters must be a list of matrices and maybe an <int>");
+    { "ERROR:   The parameters must be a list of matrices and maybe an <int>";
+      return();
     }
     if ((n!=nrows(#[j])) or (n!=ncols(#[j])))
-    { ERROR("ERROR:   matrices need to be square and of the same dimensions");
+    { "ERROR:   matrices need to be square and of the same dimensions";
+       return();
     }
     if (unique(G(1..i),#[j]))
     { i++;
@@ -372,24 +379,28 @@ EXAMPLE: example molien; shows an example
   { if (size(#[size(#)])==3)
     { int mol_flag=#[size(#)][1];
       if (#[size(#)][2]<0 && (ch==0 or (ch<>0 && mol_flag<>0)))
-      { ERROR("ERROR:   the second component of <intvec> should be >=0");
+      { "ERROR:   the second component of <intvec> should be >=0"
+        return();
       }
       int interval=#[size(#)][2];
       int v=#[size(#)][3];
     }
     else
-    { ERROR("ERROR:   <intvec> should have three components");
+    { "ERROR:   <intvec> should have three components";
+      return();
     }
     if (ch<>0)
     { if (typeof(#[size(#)-1])=="int")
       { int r=#[size(#)-1];
         if (typeof(#[size(#)-2])<>"string")
-        { ERROR("ERROR:   In characteristic p>0 a <string> must be given for the name of a new"+newline+
-          "         ring where the Molien series can be stored");
+        { "ERROR:   In characteristic p>0 a <string> must be given for the name of a new";
+          "         ring where the Molien series can be stored";
+          return();
         }
         else
         { if (#[size(#)-2]=="")
-          { ERROR("ERROR:   <string> may not be empty");
+          { "ERROR:   <string> may not be empty";
+            return();
           }
           string newring=#[size(#)-2];
           g=size(#)-3;
@@ -397,13 +408,14 @@ EXAMPLE: example molien; shows an example
       }
       else
       { if (typeof(#[size(#)-1])<>"string")
-        { ERROR("ERROR:   In characteristic p>0 a <string> must be given for the name of a new"+newline+
-          "         ring where the Molien series can be stored");
+        { "ERROR:   In characteristic p>0 a <string> must be given for the name of a new";
+          "         ring where the Molien series can be stored";
           return();
         }
         else
         { if (#[size(#)-1]=="")
-          { ERROR("ERROR:   <string> may not be empty");
+          { "ERROR:   <string> may not be empty";
+            return();
           }
           string newring=#[size(#)-1];
           g=size(#)-2;
@@ -423,12 +435,14 @@ EXAMPLE: example molien; shows an example
     { if (typeof(#[size(#)])=="int")
       { int r=#[size(#)];
         if (typeof(#[size(#)-1])<>"string")
-        { ERROR("ERROR:   in characteristic p>0 a <string> must be given for the name of a new"+newline+
-          "         ring where the Molien series can be stored");
+        { "ERROR:   in characteristic p>0 a <string> must be given for the name of a new";
+          "         ring where the Molien series can be stored";
+            return();
         }
         else
         { if (#[size(#)-1]=="")
-          { ERROR("ERROR:   <string> may not be empty");
+          { "ERROR:   <string> may not be empty";
+            return();
           }
           string newring=#[size(#)-1];
           g=size(#)-2;
@@ -436,12 +450,14 @@ EXAMPLE: example molien; shows an example
       }
       else
       { if (typeof(#[size(#)])<>"string")
-        { ERROR("ERROR:   in characteristic p>0 a <string> must be given for the name of a new"+newline+
-          "         ring where the Molien series can be stored");
+        { "ERROR:   in characteristic p>0 a <string> must be given for the name of a new";
+          "         ring where the Molien series can be stored";
+          return();
         }
         else
         { if (#[size(#)]=="")
-          { ERROR("ERROR:   <string> may not be empty");
+          { "ERROR:   <string> may not be empty";
+            return();
           }
           string newring=#[size(#)];
           g=size(#)-1;
@@ -455,7 +471,8 @@ EXAMPLE: example molien; shows an example
   }
   if (ch<>0)
   { if ((g/r)*r<>g)
-   { ERROR("ERROR:   <int> should divide the group order.");
+   { "ERROR:   <int> should divide the group order."
+      return();
     }
   }
   if (ch<>0)
@@ -490,12 +507,14 @@ EXAMPLE: example molien; shows an example
   }
  //----------------------------------------------------------------------------
   if (not(typeof(#[1])=="matrix"))
-  { ERROR("ERROR:   the parameters must be a list of matrices and maybe an <intvec>");
+  { "ERROR:   the parameters must be a list of matrices and maybe an <intvec>";
+    return();
   }
   int n=nrows(#[1]);
   if (n<>nvars(br))
-  { ERROR("ERROR:   the number of variables of the basering needs to be the same"+newline+
-    "         as the dimension of the square matrices");
+  { "ERROR:   the number of variables of the basering needs to be the same";
+    "         as the dimension of the square matrices";
+    return();
   }
   if (v && voice<>2)
   { "";
@@ -521,10 +540,12 @@ EXAMPLE: example molien; shows an example
  //------------ computing 1/det(1+xE) for all E in the group ------------------
     for (int j=1;j<=g;j++)
     { if (not(typeof(#[j])=="matrix"))
-      { ERROR("ERROR:   the parameters must be a list of matrices and maybe an <intvec>");
+      { "ERROR:   the parameters must be a list of matrices and maybe an <intvec>";
+        return();
       }
       if ((n<>nrows(#[j])) or (n<>ncols(#[j])))
-      { ERROR("ERROR:   matrices need to be square and of the same dimensions");
+      { "ERROR:   matrices need to be square and of the same dimensions";
+         return();
       }
       p=det(I-v1*#[j]);                // denominator of new term -
       M[1,1]=M[1,1]*p+M[1,2];          // expanding M[1,1]/M[1,2] + 1/p
@@ -616,10 +637,12 @@ EXAMPLE: example molien; shows an example
       for (i=1;i<=g;i++)
       { setring br;
         if (not(typeof(#[i])=="matrix"))
-        { ERROR("ERROR:   the parameters must be a list of matrices and maybe an <intvec>");
+        { "ERROR:   the parameters must be a list of matrices and maybe an <intvec>";
+          return();
         }
         if ((n<>nrows(#[i])) or (n<>ncols(#[i])))
-        { ERROR("ERROR:   matrices need to be square and of the same dimensions");
+        { "ERROR:   matrices need to be square and of the same dimensions";
+           return();
         }
         setring bre;
         p=det(xI-f2(G(i)));           // characteristic polynomial of G(i)
@@ -775,10 +798,12 @@ EXAMPLE: example molien; shows an example
     for (i=1;i<=g;i++)
     { setring br;
       if (not(typeof(#[i])=="matrix"))
-      { ERROR("ERROR:   the parameters must be a list of matrices and maybe an <intvec>");
+      { "ERROR:   the parameters must be a list of matrices and maybe an <intvec>";
+        return();
       }
       if ((n<>nrows(#[i])) or (n<>ncols(#[i])))
-      { ERROR("ERROR:   matrices need to be square and of the same dimensions");
+      { "ERROR:   matrices need to be square and of the same dimensions";
+         return();
       }
       string stM(i)=string(#[i]);
       for (j=1;j<=size(stM(i));j++)
@@ -900,23 +925,25 @@ EXAMPLE: example reynolds_molien; shows an example
   { if (size(#[size(#)])==3)
     { int mol_flag=#[size(#)][1];
       if (#[size(#)][2]<0 && (ch==0 or (ch<>0 && mol_flag<>0)))
-      { ERROR("ERROR:   the second component of the <intvec> should be >=0");
+      { "ERROR:   the second component of the <intvec> should be >=0";
+        return();
       }
       int interval=#[size(#)][2];
       int v=#[size(#)][3];
     }
     else
-    { ERROR("ERROR:   <intvec> should have three components");
+    { "ERROR:   <intvec> should have three components";
+      return();
     }
     if (ch<>0)
     { if (typeof(#[size(#)-1])<>"string")
-      { ERROR("ERROR:   in characteristic p a <string> must be given for the name");
+      { "ERROR:   in characteristic p a <string> must be given for the name";
         "         of a new ring where the Molien series can be stored";
         return();
       }
       else
       { if (#[size(#)-1]=="")
-        { ERROR("ERROR:   <string> may not be empty");
+        { "ERROR:   <string> may not be empty";
           return();
         }
         string newring=#[size(#)-1];
@@ -933,12 +960,14 @@ EXAMPLE: example reynolds_molien; shows an example
     int mol_flag=0;                    // computing of Molien series is default
     if (ch<>0)
     { if (typeof(#[size(#)])<>"string")
-      { ERROR("ERROR:   in characteristic p a <string> must be given for the name"+newline+
-        "         of a new ring where the Molien series can be stored");
+      { "ERROR:   in characteristic p a <string> must be given for the name";
+        "         of a new ring where the Molien series can be stored";
+        return();
       }
       else
       { if (#[size(#)]=="")
-        { ERROR("ERROR:   <string> may not be empty");
+        { "ERROR:   <string> may not be empty";
+          return();
         }
         string newring=#[size(#)];
         gen_num=size(#)-1;
@@ -989,15 +1018,18 @@ EXAMPLE: example reynolds_molien; shows an example
  //----------- computing Molien series in the straight forward way ------------
   if (ch==0)
   { if (typeof(#[1])<>"matrix")
-    { ERROR("ERROR:   the parameters must be a list of matrices and maybe an <intvec>");
+    { "ERROR:   the parameters must be a list of matrices and maybe an <intvec>";
+      return();
     }
     int n=nrows(#[1]);
     if (n<>nvars(br))
-    { ERROR("ERROR:   the number of variables of the basering needs to be the same"+newline+
-      "         as the dimension of the matrices");
+    { "ERROR:   the number of variables of the basering needs to be the same";
+      "         as the dimension of the matrices";
+      return();
     }
     if (n<>ncols(#[1]))
-    { ERROR("ERROR:   matrices need to be square and of the same dimensions");
+    { "ERROR:   matrices need to be square and of the same dimensions";
+      return();
     }
     matrix vars=matrix(maxideal(1));   // creating an nx1-matrix containing the
     vars=transpose(vars);              // variables of the ring -
@@ -1023,10 +1055,12 @@ EXAMPLE: example reynolds_molien; shows an example
                                        // compatible with the task of the
                                        // procedure
       if (not(typeof(#[j])=="matrix"))
-      { ERROR("ERROR:   the parameters must be a list of matrices and maybe an <intvec>");
+      { "ERROR:   the parameters must be a list of matrices and maybe an <intvec>";
+        return();
       }
       if ((n!=nrows(#[j])) or (n!=ncols(#[j])))
-      { ERROR("ERROR:   matrices need to be square and of the same dimensions");
+      { "ERROR:   matrices need to be square and of the same dimensions";
+         return();
       }
       if (unique(G(1..i),#[j]))
       { i++;
@@ -1619,6 +1653,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
+
 proc invariant_basis_reynolds (matrix REY,int d,list #)
 "USAGE:   invariant_basis_reynolds(REY,d[,flags]);
          REY: a <matrix> representing the Reynolds operator, d: an <int>
@@ -1747,7 +1782,7 @@ proc sort_of_invariant_basis (ideal sP,matrix REY,int d,int step_fac)
   degBound=d;
   int j=ncols(mon);
   int i;
-  mon=sort(mon,intvec(j..1))[1];
+  mon=sort(mon,intvec(j..1))[1]; 
   ideal B;                             // will contain the "sort of basis"
   if (step_fac>j)
   { B=compress(evaluate_reynolds(REY,mon));
@@ -2129,7 +2164,7 @@ EXAMPLE: example primary_char0; shows an example
     {                                  // invariants
       if (cd<>dif)
       { P,sP,CI,dB=search(n,d,B,cd,P,sP,i,dif,dB,CI); // searching for dif invariants
-      }
+      }                                
       else                             // i.e. we can take all of B
       { for(j=i+1;j<=i+dif;j++)
         { CI=CI+ideal(var(j)^d);
@@ -4395,11 +4430,11 @@ USAGE:    secondary_char0(P,REY,M[,v][,\"old\"]);
                n is the number of variables of the basering;
 @*          REY: a gxn <matrix> representing the Reynolds operator, where
                g the size of the corresponding group;
-@*          M: a 1x2 <matrix> giving numerator and denominator of the Molien
+@*          M: a 1x2 <matrix> giving numerator and denominator of the Molien 
                series;
 @*          v: an optional <int>;
-@*          \"old\": if this string occurs as (optional) parameter, then an
-               old version of secondary_char0 is used (for downward
+@*          \"old\": if this string occurs as (optional) parameter, then an   
+               old version of secondary_char0 is used (for downward 
                compatibility)
 ASSUME:   The characteristic of basering is zero;
           REY is the 1st return value of group_reynolds(), reynolds_molien() or
@@ -4407,26 +4442,25 @@ ASSUME:   The characteristic of basering is zero;
 @*        M is the return value of molien()
           or the second one of reynolds_molien() or the third one of
           primary_invariants()
-RETURN:   Homogeneous secondary invariants and irreducible secondary
+RETURN:   Homogeneous secondary invariants and irreducible secondary 
           invariants of the invariant ring (both type <matrix>)
-DISPLAY:  Information on the progress of the computations if v is an integer
+DISPLAY:  Information on the progress of the computations if v is an integer 
           different from 0.
 THEORY:   The secondary invariants are calculated by finding a basis (in terms
           of monomials) of the basering modulo the primary invariants, mapping
           those to invariants with the Reynolds operator. Among these images
           or their power products we pick a maximal subset that is linearly
-          independent modulo the primary invariants (see paper \"Some
-          Algorithms in Invariant Theory of Finite Groups\" by Kemper and
-          Steel (1997)) using Groebner basis techniques. The size of this set
-          can be read off from the Molien series.
-NOTE:     Secondary invariants are not uniquely determined by the given data.
-          Specifically, the output of secondary_char0(P,REY,M,\"old\") will
-          differ from the output of secondary_char0(P,REY,M). However, the
+          independent modulo the primary invariants using Groebner basis techniques 
+          (see paper \"Fast Computation of Secondary Invariants\" by S. King).
+          The size of this set can be read off from the Molien series.
+NOTE:     Secondary invariants are not uniquely determined by the given data. 
+          Specifically, the output of secondary_char0(P,REY,M,\"old\") will 
+          differ from the output of secondary_char0(P,REY,M). However, the  
           ideal generated by the irreducible homogeneous
           secondary invariants will be the same in both cases.
 @*        There are three internal parameters \"pieces\", \"MonStep\" and \"IrrSwitch\".
           The default values of the parameters should be fine in most cases. However,
-          in some cases, different values may provide a better balance of memory
+          in some cases, different values may provide a better balance of memory 
           consumption (smaller values) and speed (bigger values).
 SEE ALSO: irred_secondary_char0;
 EXAMPLE:  example secondary_char0; shows an example
@@ -4519,7 +4553,7 @@ EXAMPLE:  example secondary_char0; shows an example
                                        // secondary invariants, we need to find
                                        // of a certain degree -
   m=nrows(dimmat);                     // m-1 is the highest degree
-  if (v)
+  if (v) 
   { "We need to find";
     for (j=1;j<=m;j++)
      { if (int(dimmat[j,1])<>1)
@@ -4594,7 +4628,7 @@ EXAMPLE:  example secondary_char0; shows an example
 // smaller than the degree of "Mul1".
       for (k=1;k<i-1;k++)
       { if (int(dimmat[i,1])==counter)
-        { break;
+        { break; 
         }
         if (typeof(ISSort[k])<>"none")
         { Mul1 = ISSort[k];
@@ -4677,7 +4711,7 @@ EXAMPLE:  example secondary_char0; shows an example
       // The remaining sec. inv. are irreducible!
       if (int(dimmat[i,1])<>counter)   // need more than all the power products
       { if (v)
-        { "There are irreducible secondary invariants in degree ", i-1," !";
+        { "There are irreducible secondary invariants in degree ", i-1," !!";
         }
         if (i>IrrSwitch)  // use sparse algorithm
         { mon = kbase(sP,i-1);
@@ -4700,8 +4734,8 @@ EXAMPLE:  example secondary_char0; shows an example
           { irrcounter=0;
             j=0;                         // j goes through all of mon -
             // Compare the comments on the computation of reducible sec. inv.!
-            while (int(dimmat[i,1])<>counter)
-            { if ((j mod MonStep) == 0)
+            while (int(dimmat[i,1])<>counter) 
+            { if ((j mod MonStep) == 0) 
               { if ((j+MonStep) <= ncols(mon))
                 { B[j+1..j+MonStep] = normalize(evaluate_reynolds(REY,ideal(mon[j+1..j+MonStep])));
                   ReducedCandidates[j+1..j+MonStep] = reduce(ideal(B[j+1..j+MonStep]),sP);
@@ -4712,7 +4746,7 @@ EXAMPLE:  example secondary_char0; shows an example
                   ReducedCandidates[j+1..ncols(mon)] = reduce(ideal(B[j+1..ncols(mon)]),sP);
                   Indicator[j+1..ncols(mon)] = reduce(ideal(ReducedCandidates[j+1..ncols(mon)]),SaveRed);
                 }
-              }
+              } 
               j++;
               helpP = Indicator[j];
               if (helpP <>0)                  // B[j] should be added
@@ -4741,11 +4775,11 @@ EXAMPLE:  example secondary_char0; shows an example
               ReducedCandidates[j]=0;
               Indicator[j]=0;
             }
-          }
+          } 
         }  // if i>IrrSwitch
         else  // use fast algorithm
         { B=sort_of_invariant_basis(sP,REY,i-1,int(dimmat[i,1])*6);
-                                       // B contains
+                                       // B contains 
                                        // images of kbase(sP,i-1) under the
                                        // Reynolds operator that are linearly
                                        // independent
@@ -4853,30 +4887,30 @@ USAGE:    irred_secondary_char0(P,REY,M[,v]);
                n is the number of variables of the basering;
 @*          REY: a gxn <matrix> representing the Reynolds operator, where
                g the size of the corresponding group;
-@*          M: a 1x2 <matrix> giving numerator and denominator of the
+@*          M: a 1x2 <matrix> giving numerator and denominator of the 
                Molien series;
 @*          v: an optional <int>;
-RETURN:   Irreducible homogeneous secondary invariants of the invariant ring
+RETURN:   Irreducible homogeneous secondary invariants of the invariant ring 
           (type <matrix>)
 ASSUME:   We are in the non-modular case, i.e., the characteristic of the basering
           does not divide the group order;
           REY is the 1st return value of group_reynolds(), reynolds_molien() or
           the second one of primary_invariants();
-          M is the return value of molien() or the second one of
+          M is the return value of molien() or the second one of 
           reynolds_molien() or the third one of primary_invariants()
 DISPLAY:  Information on the progress of computations if v does not equal 0
 THEORY:   The secondary invariants are calculated by finding a basis (in terms
           of monomials) of the basering modulo the primary invariants, mapping
           those to invariants with the Reynolds operator. Among these images
           or their power products we pick a maximal subset that is linearly
-          independent modulo the primary invariants (see paper \"Some
-          Algorithms in Invariant Theory of Finite Groups\" by Kemper and
-          Steel (1997)) using Groebner basis techniques. The size of this set
+          independent modulo the primary invariants using Groebner basis techniques
+          (see paper \"Fast Computation of Secondary Invariants\" by S. King).
+          The size of this set 
           can be read off from the Molien series. Here, only irreducible secondary
           invariants are explicitly computed, which saves time and memory.
 @*        There are three internal parameters \"pieces\", \"MonStep\" and \"IrrSwitch\".
           The default values of the parameters should be fine in most cases. However,
-          in some cases, different values may provide a better balance of memory
+          in some cases, different values may provide a better balance of memory 
           consumption (smaller values) and speed (bigger values).
 SEE ALSO: secondary_char0
 KEYWORDS: irreducible secondary invariant
@@ -4950,7 +4984,7 @@ EXAMPLE:  example irred_secondary_char0; shows an example
                                        // secondary invariants, we need to find
                                        // of a certain degree -
   m=nrows(dimmat);                     // m-1 is the highest degree
-  if (v)
+  if (v) 
   { "We need to find";
     for (j=1;j<=m;j++)
      { if (int(dimmat[j,1])<>1)
@@ -4981,7 +5015,7 @@ EXAMPLE:  example irred_secondary_char0; shows an example
   list RedSSort;           // sec. Inv. reduced by sP, sorted first by degree and then
                            // by the minimal degree of a non-constant invariant factor
   list RedISSort;          // irr. sec. Inv. reduced by sP, sorted by degree
-
+ 
   poly helpP;
   ideal helpI;
   ideal Indicator;        // will tell us which candidates for sec. inv. we can choose
@@ -5115,7 +5149,7 @@ EXAMPLE:  example irred_secondary_char0; shows an example
       // The remaining sec. inv. are irreducible!
       if (int(dimmat[i,1])<>counter)   // need more than all the power products
       { if (v)
-        { "There are irreducible secondary invariants in degree ", i-1," !";
+        { "There are irreducible secondary invariants in degree ", i-1," !!";
         }
         if (i>IrrSwitch)  // use sparse algorithm
         { mon = kbase(sP,i-1);
@@ -5138,8 +5172,8 @@ EXAMPLE:  example irred_secondary_char0; shows an example
           { irrcounter=0;
             j=0;                         // j goes through all of mon -
           // Compare the comments on the computation of reducible sec. inv.!
-            while (int(dimmat[i,1])<>counter)
-            { if ((j mod MonStep) == 0)
+            while (int(dimmat[i,1])<>counter) 
+            { if ((j mod MonStep) == 0) 
               { if ((j+MonStep) <= ncols(mon))
                 { B[j+1..j+MonStep] = normalize(evaluate_reynolds(REY,ideal(mon[j+1..j+MonStep])));
                   ReducedCandidates[j+1..j+MonStep] = reduce(ideal(B[j+1..j+MonStep]),sP);
@@ -5150,7 +5184,7 @@ EXAMPLE:  example irred_secondary_char0; shows an example
                   ReducedCandidates[j+1..ncols(mon)] = reduce(ideal(B[j+1..ncols(mon)]),sP);
                   Indicator[j+1..ncols(mon)] = reduce(ideal(ReducedCandidates[j+1..ncols(mon)]),SaveRed);
                 }
-              }
+              } 
               j++;
               helpP = Indicator[j];
               if (helpP <>0)                     // B[j] should be added
@@ -5271,7 +5305,7 @@ example
 ring r= 0, (a,b,c,d,e,f),dp;
 matrix A1[6][6] = 0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0;
 matrix A2[6][6] = 0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0;
-list L = primary_invariants(A1,A2);
+list L = primary_invariants(A1,A2); 
 matrix IS = irred_secondary_char0(L[1],L[2],L[3],0);
 IS;
 }
@@ -5509,17 +5543,17 @@ proc secondary_charp (matrix P, matrix REY, string ring_name, list #)
                n is the number of variables of the basering;
 @*          REY: a gxn <matrix> representing the Reynolds operator, where
                g the size of the corresponding group;
-@*          ringname: a <string> giving the name of a ring of characteristic 0
-               containing a 1x2 <matrix> M giving numerator and denominator of the Molien
+@*          ringname: a <string> giving the name of a ring of characteristic 0 
+               containing a 1x2 <matrix> M giving numerator and denominator of the Molien 
                series;
 @*          v: an optional <int>;
-@*          \"old\": if this string occurs as (optional) parameter, then an
-               old version of secondary_char0 is used (for downward
+@*          \"old\": if this string occurs as (optional) parameter, then an   
+               old version of secondary_char0 is used (for downward 
                compatibility)
 ASSUME:   The characteristic of basering is not zero;
           REY is the 1st return value of group_reynolds(), reynolds_molien() or
           the second one of primary_invariants();
-@*        `ringname` is the name of a ring of characteristic 0 that has been created
+@*        `ringname` is the name of a ring of characteristic 0 that has been created 
           by molien() or reynolds_molien() or primary_invariants()
 RETURN:   secondary invariants of the invariant ring (type <matrix>) and
           irreducible secondary invariants (type <matrix>)
@@ -5528,10 +5562,9 @@ THEORY:   The secondary invariants are calculated by finding a basis (in terms
           of monomials) of the basering modulo the primary invariants, mapping
           those to invariants with the Reynolds operator. Among these images
           or their power products we pick a maximal subset that is linearly
-          independent modulo the primary invariants (see paper \"Some
-          Algorithms in Invariant Theory of Finite Groups\" by Kemper and
-          Steel (1997)) using Groebner basis techniques. The size of this set
-          can be read off from the Molien series.
+          independent modulo the primary invariants using Groebner basis techniques 
+          (see paper \"Fast Computation of Secondary Invariants\" by S. King).
+          The size of this set can be read off from the Molien series.
 EXAMPLE:  example secondary_charp; shows an example
 "
 {
@@ -5551,7 +5584,8 @@ EXAMPLE:  example secondary_charp; shows an example
 
  //---------------- checking input and setting verbose mode -------------------
   if (char(br)==0)
-  { ERROR("ERROR:   secondary_charp should only be used with rings of characteristic p>0.");
+  { "ERROR:   secondary_charp should only be used with rings of characteristic p>0.";
+    return();
   }
   int i;
   if (size(#)>0)
@@ -5578,8 +5612,8 @@ EXAMPLE:  example secondary_charp; shows an example
         }
       }
       else
-      { ERROR("ERROR:   If the last optional parameter is a string, it should be \"old\".");
-        //return(matrix(ideal()),matrix(ideal()));
+      { "ERROR:   If the last optional parameter is a string, it should be \"old\".";
+        return(matrix(ideal()),matrix(ideal()));
       }
     }
   }
@@ -5588,15 +5622,18 @@ EXAMPLE:  example secondary_charp; shows an example
                                        // as the number of primary invariants,
                                        // we should get
   if (ncols(P)<>n)
-  { ERROR("ERROR:   The first parameter ought to be the matrix of the primary"+newline+
-    "         invariants.");
+  { "ERROR:   The first parameter ought to be the matrix of the primary";
+    "         invariants."
+    return();
   }
   if (ncols(REY)<>n)
-  { ERROR("ERROR:   The second parameter ought to be the Reynolds operator.");
+  { "ERROR:   The second parameter ought to be the Reynolds operator."
+    return();
   }
   if (typeof(`ring_name`)<>"ring")
-  { ERROR("ERROR:   The <string> should give the name of the ring where the Molien."+newline+
-    "         series is stored.");
+  { "ERROR:   The <string> should give the name of the ring where the Molien."
+    "         series is stored.";
+    return();
   }
   if (v && voice==2)
   { "";
@@ -5623,7 +5660,7 @@ EXAMPLE:  example secondary_charp; shows an example
                                        // secondary invariants, we need to find
                                        // of a certain degree -
   m=nrows(dimmat);                     // m-1 is the highest degree
-  if (v)
+  if (v) 
   { "We need to find";
     for (j=1;j<=m;j++)
      { if (int(dimmat[j,1])<>1)
@@ -5704,7 +5741,7 @@ EXAMPLE:  example secondary_charp; shows an example
 // smaller than the degree of "Mul1".
       for (k=1;k<i-1;k++)
       { if (deg_dim_vec[i]==counter)
-        { break;
+        { break; 
         }
         if (typeof(ISSort[k])<>"none")
         { Mul1 = ISSort[k];
@@ -5787,7 +5824,7 @@ EXAMPLE:  example secondary_charp; shows an example
       // The remaining sec. inv. are irreducible!
       if (deg_dim_vec[i]<>counter)   // need more than all the power products
       { if (v)
-        { "There are irreducible secondary invariants in degree ", i-1," !";
+        { "There are irreducible secondary invariants in degree ", i-1," !!";
         }
         if (i>IrrSwitch)  // use sparse algorithm
         { mon = kbase(sP,i-1);
@@ -5810,8 +5847,8 @@ EXAMPLE:  example secondary_charp; shows an example
           { irrcounter=0;
             j=0;                         // j goes through all of mon -
             // Compare the comments on the computation of reducible sec. inv.!
-            while (deg_dim_vec[i]<>counter)
-            { if ((j mod MonStep) == 0)
+            while (deg_dim_vec[i]<>counter) 
+            { if ((j mod MonStep) == 0) 
               { if ((j+MonStep) <= ncols(mon))
                 { B[j+1..j+MonStep] = normalize(evaluate_reynolds(REY,ideal(mon[j+1..j+MonStep])));
                   ReducedCandidates[j+1..j+MonStep] = reduce(ideal(B[j+1..j+MonStep]),sP);
@@ -5822,7 +5859,7 @@ EXAMPLE:  example secondary_charp; shows an example
                   ReducedCandidates[j+1..ncols(mon)] = reduce(ideal(B[j+1..ncols(mon)]),sP);
                   Indicator[j+1..ncols(mon)] = reduce(ideal(ReducedCandidates[j+1..ncols(mon)]),SaveRed);
                 }
-              }
+              } 
               j++;
               helpP = Indicator[j];
               if (helpP <>0)                  // B[j] should be added
@@ -5851,11 +5888,11 @@ EXAMPLE:  example secondary_charp; shows an example
               ReducedCandidates[j]=0;
               Indicator[j]=0;
             }
-          }
+          } 
         }  // if i>IrrSwitch
         else  // use fast algorithm
         { B=sort_of_invariant_basis(sP,REY,i-1,deg_dim_vec[i]*6);
-                                       // B contains
+                                       // B contains 
                                        // images of kbase(sP,i-1) under the
                                        // Reynolds operator that are linearly
                                        // independent
@@ -5958,28 +5995,38 @@ example
 
 proc secondary_no_molien (matrix P, matrix REY, list #)
 "USAGE:   secondary_no_molien(P,REY[,deg_vec,v]);
-         P: a 1xn <matrix> with primary invariants, REY: a gxn <matrix>
-         representing the Reynolds operator, deg_vec: an optional <intvec>
-         listing some degrees where no non-trivial homogeneous invariants can
-         be found, v: an optional <int>
-ASSUME:  n is the number of variables of the basering, g the size of the group,
-         REY is the 1st return value of group_reynolds(), reynolds_molien() or
-         the second one of primary_invariants(), deg_vec is the second return
-         value of primary_char0_no_molien(), primary_charp_no_molien(),
-         primary_char0_no_molien_random() or primary_charp_no_molien_random()
-RETURN:  secondary invariants of the invariant ring (type <matrix>)
-DISPLAY: information if v does not equal 0
-THEORY:  Secondary invariants are calculated by finding a basis (in terms of
-         monomials) of the basering modulo primary invariants, mapping those to
-         invariants with the Reynolds operator and using these images as
-         candidates for secondary invariants. We have the Reynolds operator, hence,
-         we are in the non-modular case. Therefore, the invariant ring is Cohen-Macaulay,
-         hence the number of secondary invariants is the product of the degrees of
-         primary invariants divided by the group order.
-EXAMPLE: example secondary_no_molien; shows an example
+          P: a 1xn <matrix> with primary invariants, REY: a gxn <matrix>
+          representing the Reynolds operator, deg_vec: an optional <intvec>
+          listing some degrees where no non-trivial homogeneous invariants can
+          be found, v: an optional <int>
+ASSUME:   n is the number of variables of the basering, g the size of the group,
+          REY is the 1st return value of group_reynolds(), reynolds_molien() or
+          the second one of primary_invariants(), deg_vec is the second return
+          value of primary_char0_no_molien(), primary_charp_no_molien(),
+          primary_char0_no_molien_random() or primary_charp_no_molien_random()
+RETURN:   secondary invariants of the invariant ring (type <matrix>)
+DISPLAY:  information if v does not equal 0
+THEORY:   Secondary invariants are calculated by finding a basis (in terms of
+          monomials) of the basering modulo primary invariants, mapping those to
+          invariants with the Reynolds operator and using these images as
+          candidates for secondary invariants. We have the Reynolds operator, hence,
+          we are in the non-modular case. Therefore, the invariant ring is Cohen-Macaulay,
+          hence the number of secondary invariants is the product of the degrees of 
+          primary invariants divided by the group order.
+          <secondary_and_irreducible_no_molien> should usually be faster and of more useful
+          functionality.
+SEE ALSO: secondary_and_irreducible_no_molien
+EXAMPLE:  example secondary_no_molien; shows an example
 "
-{ int i;
-  degBound=0;
+{ int MonStep = 15;  // The Reynolds operator is applied to blocks of #MonStep# monomials.
+                     // If this parameter is small, the memory consumption will decrease.
+  int IrrSwitch = 7; // Up to degree #IrrSwitch#-1, we use a method for generating
+                     // irreducible secondaries that tends to produce a smaller output
+                     // (which is good for subsequent computations). However, this method
+                     // needs to much memory in high degrees, and so we use a sparser method
+                     // from degree #IrrSwitch# on.
+  int i;
+  def br=basering;
  //------------------ checking input and setting verbose ----------------------
   if (size(#)==1 or size(#)==2)
   { if (typeof(#[size(#)])=="int")
@@ -5988,7 +6035,8 @@ EXAMPLE: example secondary_no_molien; shows an example
         { intvec deg_vec=#[size(#)-1];
         }
         else
-        { ERROR("ERROR:   the third parameter should be an <intvec>");
+        { "ERROR:   the third parameter should be an <intvec>";
+          return();
         }
       }
       int v=#[size(#)];
@@ -6000,17 +6048,20 @@ EXAMPLE: example secondary_no_molien; shows an example
           int v=0;
         }
         else
-        { ERROR("ERROR:   the third parameter should be an <intvec>");
+        { "ERROR:   the third parameter should be an <intvec>";
+          return();
         }
       }
       else
-      { ERROR("ERROR:   wrong list of parameters");
+      { "ERROR:   wrong list of parameters";
+        return();
       }
     }
   }
   else
   { if (size(#)>2)
-    { ERROR("ERROR:   there are too many parameters");
+    { "ERROR:   there are too many parameters";
+      return();
     }
     int v=0;
   }
@@ -6019,11 +6070,22 @@ EXAMPLE: example secondary_no_molien; shows an example
                                        // as the number of primary invariants,
                                        // we should get
   if (ncols(P)<>n)
-  { ERROR("ERROR:   The first parameter ought to be the matrix of the primary"+newline+
-    "         invariants.");
+  { "ERROR:   The first parameter ought to be the matrix of the primary";
+    "         invariants."
+    return();
   }
-  if (ncols(REY)<>n)
-  { ERROR("ERROR:   The second parameter ought to be the Reynolds operator.");
+  if (ncols(REY)<>n) 
+  { "ERROR:   The second parameter ought to be the Reynolds operator.";
+    return();
+  }
+  if (char(br)<>0)
+  { if (nrows(REY) mod char(br) == 0)
+    { "ERROR:   We need to be in the non-modular case.";
+      return();
+    }
+  }
+  else
+  { "WARNING: In char 0, secondary_char0 should be faster.";
   }
   if (v && voice==2)
   { "";
@@ -6041,8 +6103,21 @@ EXAMPLE: example secondary_no_molien; shows an example
     "";
   }
  //------------------------- initializing variables ---------------------------
+  int dgb = degBound;
+  degBound=0;
   ideal sP=groebner(ideal(P));
-  ideal B, TEST;
+  ideal Reductor,SaveRed;  // sP union Reductor is a Groebner basis up to degree i-1
+  int SizeSave;
+  poly helpP;
+  ideal helpI;
+  ideal Indicator;        // will tell us which candidates for sec. inv. we can choose
+  ideal ReducedCandidates;
+  int helpint;
+  int k2,k3,minD;
+  int ii;
+  int saveAttr;
+  ideal mon,B;            
+
   ideal S=1;                           // 1 is the first secondary invariant
   int counter=1;
   i=0;
@@ -6053,38 +6128,89 @@ EXAMPLE: example secondary_no_molien; shows an example
  //--------------------- generating secondary invariants ----------------------
   while (counter<>max)
   { i++;
+    Reductor = ideal(0);
+    helpint = 0;
+    SaveRed = Reductor;
+    SizeSave = 0;
+    attrib(Reductor,"isSB",1);
+    attrib(SaveRed,"isSB",1);
     if (deg_vec[k]<>i)
     { if (v)
       { "  Searching in degree "+string(i)+"...";
       }
-      B=sort_of_invariant_basis(sP,REY,i,max); // B contains images of
+      if (i>IrrSwitch)  // use sparse algorithm
+      { mon = kbase(sP,i);
+        ii = ncols(mon);
+        j=0;                         // j goes through all of mon -
+        // Compare the comments on the computation of reducible sec. inv.!
+        while ((j<ii) and (counter < max))
+        { if ((j mod MonStep) == 0) 
+          { if ((j+MonStep) <= ii)
+            { B[j+1..j+MonStep] = normalize(evaluate_reynolds(REY,ideal(mon[j+1..j+MonStep])));
+              ReducedCandidates[j+1..j+MonStep] = reduce(ideal(B[j+1..j+MonStep]),sP);
+              Indicator[j+1..j+MonStep] = reduce(ideal(ReducedCandidates[j+1..j+MonStep]),SaveRed);
+            }
+            else
+            { B[j+1..ncols(mon)] = normalize(evaluate_reynolds(REY,ideal(mon[j+1..ncols(mon)])));
+              ReducedCandidates[j+1..ncols(mon)] = reduce(ideal(B[j+1..ncols(mon)]),sP);
+              Indicator[j+1..ncols(mon)] = reduce(ideal(ReducedCandidates[j+1..ncols(mon)]),SaveRed);
+            }
+          } 
+          j++;
+          helpP = Indicator[j];
+          if (helpP <>0)                  // B[j] should be added
+          { counter++; 
+            S[counter] = B[j];
+            if (v)
+            { "  We found"+string(counter)+" sec. inv. in degree"+string(i);
+            }
+            if (counter == max) {break;}
+            Reductor = ideal(helpP);
+            attrib(Reductor, "isSB",1);
+            Indicator=reduce(Indicator,Reductor);
+            SizeSave++;
+            SaveRed[SizeSave] = helpP;
+            attrib(SaveRed, "isSB",1);
+          }
+          B[j]=0;
+          ReducedCandidates[j]=0;
+          Indicator[j]=0;
+        }
+      }  // if i>IrrSwitch
+      else  // use fast algorithm
+      { B=sort_of_invariant_basis(sP,REY,i,max); // B contains images of
                                        // kbase(sP,i) under the Reynolds
                                        // operator that are linearly independent
                                        // and that don't reduce to 0 modulo sP
-      TEST=sP;
-      for (j=1;j<=ncols(B);j++)
-      {                                // that are linearly independent modulo
-                                       // TEST
-        if (reduce(B[j],TEST)<>0)      // B[j] should be added
-        { S=S,B[j];
-          counter++;
-          if (v)
-          { "  We find: "+string(B[j]);
-          }
-          if (counter==max)
-          { break;
-          }
-          else
-          { if (j<>ncols(B))
-            { //TEST=std(TEST+ideal(NF(B[j],TEST))); // should soon be replaced by
-                                                   // next line
-              TEST=std(TEST,B[j]);
+        j=0;                         // j goes through all of B -
+        // Compare the comments on the computation of reducible sec. inv.!
+        ReducedCandidates = reduce(B,sP);
+        Indicator = reduce(ReducedCandidates,SaveRed);
+        ii = ncols(Indicator);
+        while ((j<ii) and (counter < max))
+        { j++;
+          helpP = Indicator[j];
+          if (helpP <>0)                  // B[j] should be added
+          { counter++;
+            S[counter] = B[j];
+            if (v)
+            { "  We found sec. inv. number "+string(counter)+" in degree "+string(i);
             }
+            if (counter == max) {break;}
+            Reductor = ideal(helpP);
+            attrib(Reductor, "isSB",1);
+            Indicator=reduce(Indicator,Reductor);
+            SizeSave++;
+            SaveRed[SizeSave] = helpP;
+            attrib(SaveRed, "isSB",1);
           }
+          B[j]=0;
+          ReducedCandidates[j]=0;
+          Indicator[j]=0;
         }
-      }
+      } // i<=IrrSwitch
     }
-    else
+    else // if deg_vec[k]=i:
     { if (size(deg_vec)==k)
       { k=1; }
       else
@@ -6095,22 +6221,27 @@ EXAMPLE: example secondary_no_molien; shows an example
   { ""; }
   if (v)
   { "  We're done!"; ""; }
+  degBound = dgb;
   return(matrix(S));
 }
 example
 { "EXAMPLE: Sturmfels: Algorithms in Invariant Theory 2.3.7:"; echo=2;
-         ring R=0,(x,y,z),dp;
+         ring R=3,(x,y,z),dp;
          matrix A[3][3]=0,1,0,-1,0,0,0,0,-1;
          list L=primary_invariants(A,intvec(1,1,0));
-         matrix S=secondary_no_molien(L[1..3]);
+         // In that example, there are no secondary invariants
+         // in degree 1 or 2.
+         matrix S=secondary_no_molien(L[1..2],intvec(1,2),1);
          print(S);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc secondary_and_irreducibles_no_molien (matrix P, matrix REY, list #)
-"USAGE:   secondary_and_irreducibles_no_molien(P,REY[,v]);
+"USAGE:   secondary_and_irreducibles_no_molien(P,REY[,deg_vec,v]);
          P: a 1xn <matrix> with primary invariants, REY: a gxn <matrix>
-         representing the Reynolds operator, v: an optional <int>
+         representing the Reynolds operator, deg_vec: an optional <intvec>
+         listing some degrees where no non-trivial homogeneous invariants can
+         be found, v: an optional <int>
 ASSUME:  n is the number of variables of the basering, g the size of the group,
          REY is the 1st return value of group_reynolds(), reynolds_molien() or
          the second one of primary_invariants()
@@ -6119,15 +6250,29 @@ RETURN:  secondary invariants of the invariant ring (type <matrix>) and
 DISPLAY: information if v does not equal 0
 THEORY:  Secondary invariants are calculated by finding a basis (in terms of
          monomials) of the basering modulo primary invariants, mapping those to
-         invariants with the Reynolds operator and using these images or their
-         power products such that they are linearly independent modulo the
-         primary invariants (see paper \"Some Algorithms in Invariant Theory of
-         Finite Groups\" by Kemper and Steel (1997)).
+         invariants with the Reynolds operator. Among these images
+         or their power products we pick a maximal subset that is linearly
+         independent modulo the primary invariants using Groebner basis techniques 
+         (see paper \"Fast Computation of Secondary Invariants\" by S. King).
+         We have the Reynolds operator, hence, we are in the non-modular case. 
+         Therefore, the invariant ring is Cohen-Macaulay, hence the number of 
+         secondary invariants is the product of the degrees of primary invariants 
+         divided by the group order.
 EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
 "
-{ int i;
-  degBound=0;
- //--------------------- checking input and setting verbose mode --------------
+{ int pieces = 15;   // For generating reducible secondaries, blocks of #pieces# secondaries
+                     // are formed.
+                     // If this parameter is small, the memory consumption will decrease.
+  int MonStep = 15;  // The Reynolds operator is applied to blocks of #MonStep# monomials.
+                     // If this parameter is small, the memory consumption will decrease.
+  int IrrSwitch = 7; // Up to degree #IrrSwitch#-1, we use a method for generating
+                     // irreducible secondaries that tends to produce a smaller output
+                     // (which is good for subsequent computations). However, this method
+                     // needs to much memory in high degrees, and so we use a sparser method
+                     // from degree #IrrSwitch# on.
+  int i;
+  def br=basering;
+ //------------------ checking input and setting verbose ----------------------
   if (size(#)==1 or size(#)==2)
   { if (typeof(#[size(#)])=="int")
     { if (size(#)==2)
@@ -6135,7 +6280,8 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
         { intvec deg_vec=#[size(#)-1];
         }
         else
-        { ERROR("ERROR:   the third parameter should be an <intvec>");
+        { "ERROR:   the third parameter should be an <intvec>";
+          return();
         }
       }
       int v=#[size(#)];
@@ -6147,17 +6293,20 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
           int v=0;
         }
         else
-        { ERROR("ERROR:   the third parameter should be an <intvec>");
+        { "ERROR:   the third parameter should be an <intvec>";
+          return();
         }
       }
       else
-      { ERROR("ERROR:   wrong list of parameters");
+      { "ERROR:   wrong list of parameters";
+        return();
       }
     }
   }
   else
   { if (size(#)>2)
-    { ERROR("ERROR:   there are too many parameters");
+    { "ERROR:   there are too many parameters";
+      return();
     }
     int v=0;
   }
@@ -6166,11 +6315,22 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
                                        // as the number of primary invariants,
                                        // we should get
   if (ncols(P)<>n)
-  { ERROR("ERROR:   The first parameter ought to be the matrix of the primary"+newline+
-    "         invariants.");
+  { "ERROR:   The first parameter ought to be the matrix of the primary";
+    "         invariants."
+    return();
   }
-  if (ncols(REY)<>n)
-  { ERROR("ERROR:   The second parameter ought to be the Reynolds operator.");
+  if (ncols(REY)<>n) 
+  { "ERROR:   The second parameter ought to be the Reynolds operator.";
+    return();
+  }
+  if (char(br)<>0)
+  { if (nrows(REY) mod char(br) == 0)
+    { "ERROR:   We need to be in the non-modular case.";
+      return();
+    }
+  }
+  else
+  { "WARNING: In char 0, secondary_char0 should be faster.";
   }
   if (v && voice==2)
   { "";
@@ -6187,16 +6347,42 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
     "  In degree 0 we have: 1";
     "";
   }
- //------------------------ initializing variables ----------------------------
-  intmat PP;
-  poly pp;
-  int k;
-  intvec irreducible_deg_vec;
-  ideal sP=groebner(ideal(P));
-  ideal B,TEST,IS;
-  ideal S=1;                           // 1 is the first secondary invariant
+ //-------------------------- initializing variables --------------------------
+  ideal ProdCand;          // contains products of secondary invariants,
+                           // i.e., candidates for reducible sec. inv.
+  ideal Mul1,Mul2;
+
+  int dgb=degBound;
+  degBound = 0;
+  option(redSB);
+  ideal sP = groebner(ideal(P));
+                           // This is the only explicit Groebner basis computation!
+  ideal Reductor,SaveRed;  // sP union Reductor is a Groebner basis up to degree i-1
+  int SizeSave;
+
+  list SSort;         // sec. inv. first sorted by degree and then sorted by the
+                      // minimal degree of a non-constant invariant factor.
+  list ISSort;        // irr. sec. inv. sorted by degree
+
+  poly helpP;
+  ideal helpI;
+  ideal Indicator;        // will tell us which candidates for sec. inv. we can choose
+  ideal ReducedCandidates;
+  int helpint;
+  int k,k2,k3,minD;
+  int ii;
+  int saveAttr;
+  ideal mon,B,IS;              // IS will contain all irr. sec. inv.
+
   int counter=1;
-  i=0;
+  int irrcounter;
+  i=1;      // the degree under consideration is i-1
+  SSort[i] = list();
+  for (k=1;k<=i;k++)
+  { SSort[i][k]=ideal();
+    attrib(SSort[i][k],"size",0);
+  }
+
   if (defined(deg_vec)<>voice)
   { intvec deg_vec;
   }
@@ -6204,71 +6390,214 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
  //------------------- generating secondary invariants ------------------------
   while (counter<>max)
   { i++;
-    if (deg_vec[l]<>i)
-    { if (v)
-      { "  Searching in degree "+string(i)+"...";
-      }
-      TEST=sP;
-      if (IS[1]<>0)
-      { PP=power_products(irreducible_deg_vec,i);  // generating all power
-      }                                // products of irreducible secondary
-                                       // invariants
-      if (size(ideal(PP))<>0)
-      { for (j=1;j<=ncols(PP);j++)     // going through all those power products
-        { pp=1;
-          for (k=1;k<=nrows(PP);k++)
-          { pp=pp*IS[1,k]^PP[k,j];
-          }
-          if (reduce(pp,TEST)<>0)
-          { S=S,pp;
-            counter++;
-            if (v)
-            { "  We find: "+string(pp);
-            }
-            if (counter<>max)
-            { //TEST=std(TEST+ideal(NF(pp,TEST))); // should soon be replaced by
-                                                 // next line
-              TEST=std(TEST,pp);
-            }
-            else
-            { break;
-            }
-          }
-        }
-      }
-      if (max<>counter)
-      { B=sort_of_invariant_basis(sP,REY,i,max); // B contains images of
-                                       // kbase(sP,i) under the Reynolds
-                                       // operator that are linearly independent
-                                       // and that don't reduce to 0 modulo sP
-        for (j=1;j<=ncols(B);j++)
-        { if (reduce(B[j],TEST)<>0)    // B[j] should be added
-          { S=S,B[j];
-            IS=IS+ideal(B[j]);
-            if (irreducible_deg_vec[1]==0)
-            { irreducible_deg_vec[1]=i;
-            }
-            else
-            { irreducible_deg_vec=irreducible_deg_vec,i;
-            }
-            counter++;
-            if (v)
-            { "  We find: "+string(B[j]);
-            }
-            if (counter==max)
-            { break;
-            }
-            else
-            { if (j<>ncols(B))
-              { //TEST=std(TEST+ideal(NF(B[j],TEST))); // should soon be replaced
-                                                     // by next line
-                 TEST=std(TEST,B[j]);
-              }
-            }
-          }
-        }
-      }
+    SSort[i] = list();
+    for (k=1;k<=i;k++)
+    { SSort[i][k]=ideal();
+      attrib(SSort[i][k],"size",0);
     }
+    if (deg_vec[l]<>i-1)
+    { if (v)
+      { "  Searching in degree "+string(i-1);
+        "  Looking for Power Products...";
+      }
+      Reductor = ideal(0);
+      helpint = 0;
+      SaveRed = Reductor;
+      SizeSave = 0;
+      attrib(Reductor,"isSB",1);
+      attrib(SaveRed,"isSB",1);
+// We start searching for reducible secondary invariants in degree i-1, i.e., those
+// that are power products of irreducible secondary invariants.
+// It suffices to restrict the search at products of one _irreducible_ sec. inv. (Mul1)
+// with some sec. inv. (Mul2).
+// Moreover, we avoid to consider power products twice since we take a product
+// into account only if the minimal degree of a non-constant invariant factor in "Mul2" is not
+// smaller than the degree of "Mul1".
+      for (k=1;k<i-1;k++)
+      { if (max==counter)
+        { break; 
+        }
+        if (typeof(ISSort[k])<>"none")
+        { Mul1 = ISSort[k];
+        }
+        else
+        { Mul1 = ideal(0);
+        }
+        if (Mul1[1]<>0)
+        { for (minD=k;minD<i-k;minD++)
+          { if (max==counter)
+            { break;
+            }
+            for (k2=1;k2 <= ((attrib(SSort[i-k-1][minD],"size")-1) div pieces)+1; k2++)
+            { if (max==counter)
+              { break;
+              }
+              Mul2=ideal(0);
+              if (attrib(SSort[i-k-1][minD],"size")>=k2*pieces)
+              { for (k3=1;k3<=pieces;k3++)
+                { Mul2[k3] = SSort[i-k-1][minD][((k2-1)*pieces)+k3];
+                }
+              }
+              else
+              { for (k3=1;k3<=(attrib(SSort[i-k-1][minD],"size") mod pieces);k3++)
+                { Mul2[k3] = SSort[i-k-1][minD][((k2-1)*pieces)+k3];
+                }
+              }
+//              if (i<10)
+                ProdCand = simplify(Mul1*Mul2,4);
+//              else { ProdCand = Mul1*Mul2;}
+              ReducedCandidates = reduce(ProdCand,sP);
+                  // sP union SaveRed union Reductor is a homogeneous Groebner basis
+                  // up to degree i-1.
+                  // We first reduce by sP (which is fixed, so we can do it once for all),
+                  // then by SaveRed resp. by Reductor (which is modified during
+                  // the computations).
+              Indicator = reduce(ReducedCandidates,SaveRed);
+                             // If Indicator[ii]==0 then ReducedCandidates it the reduction
+                             // of an invariant that is in the algebra generated by primary
+                             // invariants and previously computed secondary invariants.
+                             // Otherwise ProdCand[ii] can be taken as secondary invariant.
+              if (size(Indicator)<>0)
+              { for (ii=1;ii<=ncols(ProdCand);ii++)     // going through all the power products
+                { helpP = Indicator[ii];
+                  if (helpP <> 0)
+                  { counter++;
+                    saveAttr = attrib(SSort[i-1][k],"size")+1;
+                    SSort[i-1][k][saveAttr] = ProdCand[ii];
+                        // By construction, this is a _reducible_ s.i.
+                    attrib(SSort[i-1][k],"size",saveAttr);
+                    if (v)
+                    { "We found sec. inv. number",counter, " in degree",i-1;
+                    }
+                    if (max<>counter)
+                    { Reductor = ideal(helpP);
+                        // Lemma: If G is a homogeneous Groebner basis up to degree i-1 and p is a
+                        // homogeneous polynomial of degree i-1 then G union NF(p,G) is
+                        // a homogeneous Groebner basis up to degree i-1.
+                      attrib(Reductor, "isSB",1);
+                        // if Reductor becomes too large, we reduce the whole of Indicator by
+                        // it, save it in SaveRed, and work with a smaller Reductor. This turns
+                        // out to save a little time.
+                      Indicator=reduce(Indicator,Reductor);
+                      SizeSave++;
+                      SaveRed[SizeSave] = helpP;
+                      attrib(SaveRed, "isSB",1);
+                    }
+                    else
+                    { break;
+                    }
+                  }
+                }
+              }
+//              attrib(SaveRed, "isSB",1);
+            }
+          }
+        }
+      }
+
+      // The remaining sec. inv. are irreducible!
+      if (max<>counter)
+      { if (v)
+        { "Looking for irreducible secondary invariants in degree ", i-1;
+        }
+        if (i>IrrSwitch)  // use sparse algorithm
+        { mon = kbase(sP,i-1);
+//          mon = ideal(mon[ncols(mon)..1]);
+          ii = ncols(mon);
+          irrcounter=0;
+          j=0;                         // j goes through all of mon -
+          // Compare the comments on the computation of reducible sec. inv.!
+          while ((j<ii) and (max<>counter)) 
+          { if ((j mod MonStep) == 0) 
+            { if ((j+MonStep) <= ii)
+              { B[j+1..j+MonStep] = normalize(evaluate_reynolds(REY,ideal(mon[j+1..j+MonStep])));
+                ReducedCandidates[j+1..j+MonStep] = reduce(ideal(B[j+1..j+MonStep]),sP);
+                Indicator[j+1..j+MonStep] = reduce(ideal(ReducedCandidates[j+1..j+MonStep]),SaveRed);
+              }
+              else
+              { B[j+1..ii] = normalize(evaluate_reynolds(REY,ideal(mon[j+1..ii])));
+                ReducedCandidates[j+1..ii] = reduce(ideal(B[j+1..ii]),sP);
+                Indicator[j+1..ii] = reduce(ideal(ReducedCandidates[j+1..ii]),SaveRed);
+              }
+            } 
+            j++;
+            helpP = Indicator[j];
+            if (helpP <>0)                  // B[j] should be added
+            { counter++; irrcounter++;
+              IS=IS,B[j];
+              saveAttr = attrib(SSort[i-1][i-1],"size")+1;
+              SSort[i-1][i-1][saveAttr] = B[j];
+              attrib(SSort[i-1][i-1],"size",saveAttr);
+              if (typeof(ISSort[i-1]) <> "none")
+              { ISSort[i-1][irrcounter] = B[j];
+              }
+              else
+              { ISSort[i-1] = ideal(B[j]);
+              }
+              if (v)
+              { "  We found the irreducible sec. inv. "+string(B[j]);
+              }
+              if (counter == max) { break; }
+              Reductor = ideal(helpP);
+              attrib(Reductor, "isSB",1);
+              Indicator=reduce(Indicator,Reductor);
+              SizeSave++;
+              SaveRed[SizeSave] = helpP;
+              attrib(SaveRed, "isSB",1);
+            }
+            B[j]=0;
+            ReducedCandidates[j]=0;
+            Indicator[j]=0;
+          }
+        }  // if i>IrrSwitch
+        else  // use fast algorithm
+        { B=sort_of_invariant_basis(sP,REY,i-1,max);
+                                       // B contains 
+                                       // images of kbase(sP,i-1) under the
+                                       // Reynolds operator that are linearly
+                                       // independent
+          irrcounter=0;
+          j=0;                         // j goes through all of B -
+          // Compare the comments on the computation of reducible sec. inv.!
+          ReducedCandidates = reduce(B,sP);
+          Indicator = reduce(ReducedCandidates,SaveRed);
+          ii = ncols(Indicator);
+          while ((j<ii) and (max<>counter))
+          { j++;
+            helpP = Indicator[j];
+            if (helpP <>0)                  // B[j] should be added
+            { counter++; irrcounter++;
+              IS=IS,B[j];
+              saveAttr = attrib(SSort[i-1][i-1],"size")+1;
+              SSort[i-1][i-1][saveAttr] = B[j];
+              attrib(SSort[i-1][i-1],"size",saveAttr);
+              if (typeof(ISSort[i-1]) <> "none")
+              { ISSort[i-1][irrcounter] = B[j];
+              }
+              else
+              { ISSort[i-1] = ideal(B[j]);
+              }
+              if (v)
+              { "  We found the irreducible sec. inv. "+string(B[j]);
+              }
+              Reductor = ideal(helpP);
+              attrib(Reductor, "isSB",1);
+              Indicator=reduce(Indicator,Reductor);
+              SizeSave++;
+              SaveRed[SizeSave] = helpP;
+              attrib(SaveRed, "isSB",1);
+            }
+            if (max == counter) { break;}
+            B[j]=0;
+            ReducedCandidates[j]=0;
+            Indicator[j]=0;
+          }
+        } // i<=IrrSwitch
+      } // Computation of irreducible secondaries
+      if (v)
+      { "";
+      }
+    } // if (deg_vec[l]<>i-1)
     else
     { if (size(deg_vec)==l)
       { l=1;
@@ -6277,7 +6606,7 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
       { l++;
       }
     }
-  }
+  } // while counter <> max
   if (v)
   { "";
   }
@@ -6285,14 +6614,35 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
   { "  We're done!";
     "";
   }
-  return(matrix(S),matrix(IS));
+  degBound = dgb;
+  // Prepare return:
+  matrix S[1][max];
+  S[1,1]=1;
+  j=1;
+  k=1;
+  while (j<>max)
+  { for (k2=1;k2<=k;k2++)
+    { if (typeof(attrib(SSort[k][k2],"size"))=="int")
+      { for (i=1;i<=attrib(SSort[k][k2],"size");i++)
+        { j++;
+          S[1,j] = SSort[k][k2][i];
+        }
+        SSort[k][k2]=ideal();
+      }
+    }
+    k++;
+  }
+  return(S,matrix(compress(IS)));
 }
+
 example
 { "EXAMPLE: Sturmfels: Algorithms in Invariant Theory 2.3.7:"; echo=2;
-         ring R=0,(x,y,z),dp;
+         ring R=3,(x,y,z),dp;
          matrix A[3][3]=0,1,0,-1,0,0,0,0,-1;
          list L=primary_invariants(A,intvec(1,1,0));
-         matrix S,IS=secondary_and_irreducibles_no_molien(L[1..2]);
+         // In that example, there are no secondary invariants
+         // in degree 1 or 2.
+         matrix S,IS=secondary_and_irreducibles_no_molien(L[1..2],intvec(1,2),1);
          print(S);
          print(IS);
 }
@@ -6320,15 +6670,18 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
   { if (typeof(#[size(#)])=="int")
     { int gen_num=size(#)-1;
       if (gen_num==0)
-      { ERROR("ERROR:   There are no generators of the finite matrix group given.");
+      { "ERROR:   There are no generators of the finite matrix group given.";
+        return();
       }
       int v=#[size(#)];
       for (i=1;i<=gen_num;i++)
       { if (typeof(#[i])<>"matrix")
-        { ERROR("ERROR:   These parameters should be generators of the finite matrix group.");
+        { "ERROR:   These parameters should be generators of the finite matrix group.";
+          return();
         }
         if ((n<>nrows(#[i])) or (n<>ncols(#[i])))
-        { ERROR("ERROR:   matrices need to be square and of the same dimensions");
+        { "ERROR:   matrices need to be square and of the same dimensions";
+          return();
         }
       }
     }
@@ -6337,20 +6690,24 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
       int gen_num=size(#);
       for (i=1;i<=gen_num;i++)
       { if (typeof(#[i])<>"matrix")
-        { ERROR("ERROR:   These parameters should be generators of the finite matrix group.");
+        { "ERROR:   These parameters should be generators of the finite matrix group.";
+          return();
         }
         if ((n<>nrows(#[i])) or (n<>ncols(#[i])))
-        { ERROR("ERROR:   matrices need to be square and of the same dimensions");
+        { "ERROR:   matrices need to be square and of the same dimensions";
+          return();
         }
       }
     }
   }
   else
-  { ERROR("ERROR:   There are no generators of the finite matrix group given.");
+  { "ERROR:   There are no generators of the finite matrix group given.";
+    return();
   }
   if (ncols(P)<>n)
-  { ERROR("ERROR:   The first parameter ought to be the matrix of the primary"+newline+
-    "         invariants.");
+  { "ERROR:   The first parameter ought to be the matrix of the primary";
+    "         invariants."
+    return();
   }
   if (v && voice==2)
   { "";
@@ -6504,7 +6861,8 @@ THEORY:  Bases of homogeneous invariants are generated successively and those
 EXAMPLE: example invariant_ring; shows an example
 "
 { if (size(#)==0)
-  { ERROR("ERROR:   There are no generators given.");
+  { "ERROR:   There are no generators given.";
+    return();
   }
   int ch=char(basering);               // the algorithms depend very much on the
                                        // characteristic of the ground field -
@@ -6517,12 +6875,14 @@ EXAMPLE: example invariant_ring; shows an example
  //------------------- checking input and setting flags -----------------------
   if (typeof(#[size(#)])=="intvec")
   { if (size(#[size(#)])<>3)
-    { ERROR("ERROR:   The <intvec> should have three entries.");
+    { "ERROR:   The <intvec> should have three entries.";
+      return();
     }
     gen_num=size(#)-1;
     mol_flag=#[size(#)][1];
     if (#[size(#)][2]<0 && (ch==0 or (ch<>0 && mol_flag<>0)))
-    { ERROR("ERROR:   the second component of <intvec> should be >=0");
+    { "ERROR:   the second component of <intvec> should be >=0";
+      return();
     }
     int interval=#[size(#)][2];
     v=#[size(#)][3];
@@ -6634,7 +6994,9 @@ EXAMPLE: example invariant_ring; shows an example
   }
   if (mol_flag==-1)
   { if (ch==0)
-    { ERROR("ERROR:   Characteristic 0 can only be simulated in characteristic p>>0.");
+    { "ERROR:   Characteristic 0 can only be simulated in characteristic p>>0.
+";
+      return();
     }
     list L=group_reynolds(#[1..gen_num],v);
     string newring="aksldfalkdsflkj";
@@ -6651,7 +7013,9 @@ EXAMPLE: example invariant_ring; shows an example
   }
   else                                 // the user specified that the
   { if (ch==0)                         // characteristic divides the group order
-    { ERROR("ERROR:   The characteristic cannot divide the group order when it is 0.");
+    { "ERROR:   The characteristic cannot divide the group order when it is 0.
+";
+      return();
     }
     if (v)
     { "";
@@ -6706,7 +7070,8 @@ THEORY:  is the same as for invariant_ring except that random combinations of
 EXAMPLE: example invariant_ring_random; shows an example
 "
 { if (size(#)<2)
-  { ERROR("ERROR:   There are too few parameters.");
+  { "ERROR:   There are too few parameters.";
+    return();
   }
   int ch=char(basering);               // the algorithms depend very much on the
                                        // characteristic of the ground field
@@ -6719,18 +7084,21 @@ EXAMPLE: example invariant_ring_random; shows an example
  //------------------- checking input and setting flags -----------------------
   if (typeof(#[size(#)])=="intvec" && typeof(#[size(#)-1])=="int")
   { if (size(#[size(#)])<>3)
-    { ERROR("ERROR:   <intvec> should have three entries.");
+    { "ERROR:   <intvec> should have three entries.";
+      return();
     }
     gen_num=size(#)-2;
     mol_flag=#[size(#)][1];
     if (#[size(#)][2]<0 && (ch==0 or (ch<>0 && mol_flag<>0)))
-    { ERROR("ERROR:   the second component of <intvec> should be >=0");
+    { "ERROR:   the second component of <intvec> should be >=0";
+      return();
     }
     int interval=#[size(#)][2];
     v=#[size(#)][3];
     int max=#[size(#)-1];
     if (gen_num==0)
-    { ERROR("ERROR:   There are no generators of a finite matrix group given.");
+    { "ERROR:   There are no generators of a finite matrix group given.";
+      return();
     }
   }
   else
@@ -6742,19 +7110,22 @@ EXAMPLE: example invariant_ring_random; shows an example
       int max=#[size(#)];
     }
    else
-    { ERROR("ERROR:   If the two last parameters are not <int> and <intvec>, the last"+newline+
-      "         parameter should be an <int>.");
+    { "ERROR:   If the two last parameters are not <int> and <intvec>, the last";
+      "         parameter should be an <int>.";
+      return();
     }
   }
   for (int i=1;i<=gen_num;i++)
   { if (typeof(#[i])=="matrix")
     { if (nrows(#[i])<>n or ncols(#[i])<>n)
-      { ERROR("ERROR:   The number of variables of the base ring needs to be the same"+newline+
-        "         as the dimension of the square matrices");
+      { "ERROR:   The number of variables of the base ring needs to be the same";
+        "         as the dimension of the square matrices";
+        return();
       }
     }
     else
-    { ERROR("ERROR:   The first parameters should be a list of matrices");
+    { "ERROR:   The first parameters should be a list of matrices";
+      return();
     }
   }
  //----------------------------------------------------------------------------
@@ -6858,7 +7229,9 @@ EXAMPLE: example invariant_ring_random; shows an example
   }
   if (mol_flag==-1)
   { if (ch==0)
-    { ERROR("ERROR:   Characteristic 0 can only be simulated in characteristic p>>0.");
+    { "ERROR:   Characteristic 0 can only be simulated in characteristic p>>0.
+";
+      return();
     }
     list L=group_reynolds(#[1..gen_num],v);
     string newring="aksldfalkdsflkj";
@@ -6875,7 +7248,9 @@ EXAMPLE: example invariant_ring_random; shows an example
   }
   else                                 // the user specified that the
   { if (ch==0)                         // characteristic divides the group order
-    { ERROR("ERROR:   The characteristic cannot divide the group order when it is 0.");
+    { "ERROR:   The characteristic cannot divide the group order when it is 0.
+";
+      return();
     }
     if (v)
     { "";
@@ -6908,7 +7283,8 @@ THEORY:  The ideal of algebraic relations of the invariant ring generators is
 EXAMPLE: example orbit_variety; shows an example
 "
 { if (newring=="")
-  { ERROR("ERROR:   the second parameter may not be an empty <string>");
+  { "ERROR:   the second parameter may not be an empty <string>";
+    return();
   }
   if (nrows(F)==1)
   { def br=basering;
@@ -6936,7 +7312,8 @@ EXAMPLE: example orbit_variety; shows an example
     return();
   }
   else
-  { ERROR("ERROR:   the <matrix> may only have one row");
+  { "ERROR:   the <matrix> may only have one row";
+    return();
   }
 }
 example
@@ -6968,37 +7345,37 @@ proc rel_orbit_variety(ideal I,matrix F,list #)
 "USAGE:    rel_orbit_variety(I,F[,s]);
 @*          I: an <ideal> invariant under the action of a group,
 @*          F: a 1xm <matrix> defining the invariant ring of this group.
-@*          s: optional <string>; if s is present then (for downward
-               compatibility) the old procedure <relative_orbit_variety>
+@*          s: optional <string>; if s is present then (for downward 
+               compatibility) the old procedure <relative_orbit_variety> 
                is called, and in this case s gives the name of a new <ring>.
 RETURN:   Without optional s, a list L of two rings is returned.
-@*        The ring L[1] carries a weighted degree order with variables
-            y(1..m), the weight of y(k) equal to the degree of the
+@*        The ring L[1] carries a weighted degree order with variables 
+            y(1..m), the weight of y(k) equal to the degree of the 
             k-th generators F[1,k] of the invariant ring.
-            L[1] contains a Groebner basis (type <ideal>, named G) of the
+            L[1] contains a Groebner basis (type <ideal>, named G) of the 
             ideal defining the relative orbit variety with  respect to I.
 @*        The ring L[2] has the variables of the basering together with y(1..m)
-            and carries a block order: The first block is the order of the
+            and carries a block order: The first block is the order of the 
             basering, the second is the weighted degree order occuring in L[1].
-            L[2] contains G and a Groebner basis (type <ideal>, named Conv)
-            such that if p is any invariant polynomial expressed in the
-            variables of the basering then reduce(p,Conv) is a polynomial in
-            the new variables y(1..m) such that evaluation at the generators
-            of the invariant ring yields p. This can be used to avoid the
-            application of <algebra_containment>
+            L[2] contains G and a Groebner basis (type <ideal>, named Conv) 
+            such that if p is any invariant polynomial expressed in the 
+            variables of the basering then reduce(p,Conv) is a polynomial in 
+            the new variables y(1..m) such that evaluation at the generators 
+            of the invariant ring yields p. This can be used to avoid the 
+            application of <algebra_containment> 
             (see @ref{algebra_containment}).
 @*        For the case of optional s, see @ref{relative_orbit_variety}.
 THEORY:   A Groebner basis of the ideal of algebraic relations of the invariant
-          ring generators is calculated, then one of the basis elements plus
-          the ideal generators. The variables of the original ring are
-          eliminated and the polynomials that are left define the relative
-          orbit variety with respect to I. The elimination is done by a
-          weighted blockorder that has the advantage of dealing with
+          ring generators is calculated, then one of the basis elements plus 
+          the ideal generators. The variables of the original ring are 
+          eliminated and the polynomials that are left define the relative 
+          orbit variety with respect to I. The elimination is done by a 
+          weighted blockorder that has the advantage of dealing with 
           quasi-homogeneous ideals.
-NOTE:     We provide the ring L[1] for the sake of downward compatibility,
-          since it is closer to the ring returned by relative_orbit_variety
-          than L[2]. However, L[1] carries a weighted degree order, whereas
-          the ring returned by relative_orbit_variety is lexicographically
+NOTE:     We provide the ring L[1] for the sake of downward compatibility, 
+          since it is closer to the ring returned by relative_orbit_variety 
+          than L[2]. However, L[1] carries a weighted degree order, whereas 
+          the ring returned by relative_orbit_variety is lexicographically 
           ordered.
 SEE ALSO: relative_orbit_variety
 EXAMPLE:  example rel_orbit_variety; shows an example.
@@ -7010,7 +7387,8 @@ EXAMPLE:  example rel_orbit_variety; shows an example.
       return();
     }
     else
-    { ERROR("ERROR:    the third parameter may either be empty or a <string>.");
+    { "ERROR:    the third parameter may either be empty or a <string>.";
+      return();
     }
   }
   degBound=0;
@@ -7051,9 +7429,9 @@ EXAMPLE:  example rel_orbit_variety; shows an example.
     { J[i]=J[i]-y(i);
     }
     // We chose the weighted block order since this makes J quasi-homogeneous!
-    ideal Conv=groebner(J);
+    ideal Conv=groebner(J); 
     J=Conv,I;
-    J=groebner(J);
+    J=groebner(J); 
     ideal vars;
     vars[n]=0;
     vars=vars,y(1..m);
@@ -7093,7 +7471,8 @@ EXAMPLE:  example rel_orbit_variety; shows an example.
     return(L);
   }
   else
-  { ERROR("ERROR:   the <matrix> may only have one row");
+  { "ERROR:   the <matrix> may only have one row";
+    return();
   }
 }
 example
@@ -7116,7 +7495,7 @@ USAGE:   relative_orbit_variety(I,F,s);
          I: an <ideal> invariant under the action of a group,
 @*       F: a 1xm  <matrix> defining the invariant ring of this group,
 @*       s: a <string> giving a name for a new ring
-RETURN:  The procedure ends with a new ring named s.
+RETURN:  The procedure ends with a new ring named s. 
          It contains a Groebner basis
          (type <ideal>, named G) for the ideal defining the
          relative orbit variety with respect to I in the new ring.
@@ -7125,14 +7504,15 @@ THEORY:  A Groebner basis of the ideal of algebraic relations of the invariant
          ideal generators. The variables of the original ring are eliminated
          and the polynomials that are left define the relative orbit variety
          with respect to I.
-NOTE:    This procedure is now replaced by rel_orbit_variety
-         (see @ref{rel_orbit_variety}), which uses a different elemination
+NOTE:    This procedure is now replaced by rel_orbit_variety 
+         (see @ref{rel_orbit_variety}), which uses a different elemination 
          order that should usually allow faster computations.
 SEE ALSO: rel_orbit_variety
 EXAMPLE: example relative_orbit_variety; shows an example
 "
 { if (newring=="")
-  { ERROR("ERROR:   the third parameter may not be empty a <string>");
+  { "ERROR:   the third parameter may not be empty a <string>";
+    return();
   }
   degBound=0;
   if (nrows(F)==1)
@@ -7141,7 +7521,7 @@ EXAMPLE: example relative_orbit_variety; shows an example
     int m=ncols(F);
     string mp=string(minpoly);
     execute("ring R=("+charstr(br)+"),("+varstr(br)+",y(1..m)),lp;");
-    execute("minpoly=number("+mp+");");
+    execute("minpoly=number("+mp+");"); 
     ideal J=ideal(imap(br,F));
     ideal I=imap(br,I);
     for (int i=1;i<=m;i++)
@@ -7161,7 +7541,7 @@ EXAMPLE: example relative_orbit_variety; shows an example
     ideal G=emb(J);
     J=J-G;
     for (i=1;i<=ncols(G);i++)
-    { if (J[i]<>0)
+    { if (J[i]<>0)  
       { G[i]=0;
       }
     }
@@ -7176,11 +7556,12 @@ EXAMPLE: example relative_orbit_variety; shows an example
     map emb=R,vars;
     ideal G=emb(G);
     kill vars, emb;
-    keepring `newring`;
+    keepring `newring`;   
     return();
   }
   else
-  { ERROR("ERROR:   the <matrix> may only have one row");
+  { "ERROR:   the <matrix> may only have one row";
+    return();
   }
 }
 
@@ -7225,7 +7606,8 @@ EXAMPLE: example image_of_variety; shows an example
     return(imap(newring,trafo));
   }
   else
-  { ERROR("ERROR:   the <matrix> may only have one row");
+  { "ERROR:   the <matrix> may only have one row";
+    return();
   }
 }
 example
