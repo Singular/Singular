@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.113 2007-01-26 12:08:28 bricken Exp $ */
+/* $Id: tgb.cc,v 1.114 2007-01-26 12:32:17 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -3042,7 +3042,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
   int i;
   wlen_type quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
   #ifdef HAVE_PLURAL
-  if (c->nc)
+  if ((c->nc) && (!(rIsSCA(c->r))))
     quality_a=quality_of_pos_in_strat_S_mult_high(erg.reduce_by, los[erg.to_reduce_u].p, c);
   #endif
   int best=erg.to_reduce_u+1;
