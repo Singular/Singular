@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.55 2007-01-26 09:29:25 king Exp $"
+version="$Id: finvar.lib,v 1.56 2007-01-27 15:03:55 Singular Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -4711,7 +4711,7 @@ EXAMPLE:  example secondary_char0; shows an example
       // The remaining sec. inv. are irreducible!
       if (int(dimmat[i,1])<>counter)   // need more than all the power products
       { if (v)
-        { "There are irreducible secondary invariants in degree ", i-1," !!";
+        { "There are irreducible secondary invariants in degree ", i-1," !";
         }
         if (i>IrrSwitch)  // use sparse algorithm
         { mon = kbase(sP,i-1);
@@ -5149,7 +5149,7 @@ EXAMPLE:  example irred_secondary_char0; shows an example
       // The remaining sec. inv. are irreducible!
       if (int(dimmat[i,1])<>counter)   // need more than all the power products
       { if (v)
-        { "There are irreducible secondary invariants in degree ", i-1," !!";
+        { "There are irreducible secondary invariants in degree ", i-1," !";
         }
         if (i>IrrSwitch)  // use sparse algorithm
         { mon = kbase(sP,i-1);
@@ -5824,7 +5824,7 @@ EXAMPLE:  example secondary_charp; shows an example
       // The remaining sec. inv. are irreducible!
       if (deg_dim_vec[i]<>counter)   // need more than all the power products
       { if (v)
-        { "There are irreducible secondary invariants in degree ", i-1," !!";
+        { "There are irreducible secondary invariants in degree ", i-1," !";
         }
         if (i>IrrSwitch)  // use sparse algorithm
         { mon = kbase(sP,i-1);
@@ -6146,14 +6146,22 @@ EXAMPLE:  example secondary_no_molien; shows an example
         while ((j<ii) and (counter < max))
         { if ((j mod MonStep) == 0) 
           { if ((j+MonStep) <= ii)
-            { B[j+1..j+MonStep] = normalize(evaluate_reynolds(REY,ideal(mon[j+1..j+MonStep])));
-              ReducedCandidates[j+1..j+MonStep] = reduce(ideal(B[j+1..j+MonStep]),sP);
-              Indicator[j+1..j+MonStep] = reduce(ideal(ReducedCandidates[j+1..j+MonStep]),SaveRed);
+            { ideal tmp = normalize(evaluate_reynolds(REY,ideal(mon[j+1..j+MonStep])));
+              B[j+1..j+MonStep] = tmp[1..MonStep];
+              tmp = reduce(ideal(B[j+1..j+MonStep]),sP);
+              ReducedCandidates[j+1..j+MonStep] = tmp[1..MonStep];
+              tmp = reduce(ideal(ReducedCandidates[j+1..j+MonStep]),SaveRed);
+              Indicator[j+1..j+MonStep] = tmp[1..MonStep];
+	      kill tmp;
             }
             else
-            { B[j+1..ncols(mon)] = normalize(evaluate_reynolds(REY,ideal(mon[j+1..ncols(mon)])));
-              ReducedCandidates[j+1..ncols(mon)] = reduce(ideal(B[j+1..ncols(mon)]),sP);
-              Indicator[j+1..ncols(mon)] = reduce(ideal(ReducedCandidates[j+1..ncols(mon)]),SaveRed);
+            { ideal tmp = normalize(evaluate_reynolds(REY,ideal(mon[j+1..ncols(mon)])));
+              B[j+1..ncols(mon)] = tmp[1..ncols(mon)-j];
+              tmp = reduce(ideal(B[j+1..ncols(mon)]),sP);
+              ReducedCandidates[j+1..ncols(mon)] = tmp[1..ncols(mon)-j];
+              tmp = reduce(ideal(ReducedCandidates[j+1..ncols(mon)]),SaveRed);
+              Indicator[j+1..ncols(mon)] = tmp[1..ncols(mon)-j];
+	      kill tmp;
             }
           } 
           j++;
@@ -6162,7 +6170,7 @@ EXAMPLE:  example secondary_no_molien; shows an example
           { counter++; 
             S[counter] = B[j];
             if (v)
-            { "  We found"+string(counter)+" sec. inv. in degree"+string(i);
+            { "  We found "+string(counter)+" sec. inv. in degree "+string(i);
             }
             if (counter == max) {break;}
             Reductor = ideal(helpP);
