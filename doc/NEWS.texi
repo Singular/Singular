@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.72 2007-01-11 17:46:56 Singular Exp $
+@comment $Id: NEWS.texi,v 1.73 2007-01-28 20:16:56 king Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -66,6 +66,14 @@ new algorithms in primdec.lib (@nref{primdec_lib}): radical et al.
 improved version of @nref{slimgb}, incorporated into @nref{groebner},
 strategy change in groebner.
 @item
+improved version of @nref{secondary_char0} and 
+@nref{irred_secondary_char0} in finvar.lib (@nref{finvar_lib}).
+@item
+finvar.lib: algorithm of @nref{secondary_char0} is now also used in the 
+non-modular char-p case @nref{secondary_charp}, 
+@nref{secondary_no_molien}, nref{secondary_and_irreducibles_no_molien} 
+(@nref{finvar_lib}).
+@item
 operation for sparse matrices improved: multiplication, prune, conversion to module.
 @c @item
 @c experimental: @code{python} / @code{ipython} interface
@@ -92,6 +100,16 @@ revised ncalg.lib (@nref{ncalg_lib}): new algebras, U(sl_n) and U(g_2) changed t
 new algorithms in primdec.lib (@nref{primdec_lib}): radical et al.
 @item
 improved version of @nref{slimgb}, incorporated into @nref{groebner}
+@item
+new algorithm for @nref{secondary_char0} in finvar.lib 
+(@nref{finvar_lib}), which is a dramatic improvement.
+@item
+new function @nref{irred_secondary_char0} in finvar.lib 
+(@nref{finvar_lib}).
+@item
+@nref{rel_orbit_variety} replaces @nref{relative_orbit_variety} (in 
+finvar.lib @nref{finvar_lib}), using a different elimination order that 
+will usually speed up computations. 
 @item
 improved module generator (@code{modgen})
 @item
