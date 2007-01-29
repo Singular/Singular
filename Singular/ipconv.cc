@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.34 2007-01-16 13:38:50 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.35 2007-01-29 18:19:59 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -74,17 +74,6 @@ static void * iiP2Id(void *data)
   {
     poly p=(poly)data;
     if (pGetComp(p)!=0) I->rank=pMaxComp(p);
-#ifdef DRING
-    else if (pDRING)
-    {
-      while (p!=NULL)
-      {
-        pdSetDFlag(p,1);
-        pSetm(p);
-        pIter(p);
-      }
-    }
-#endif
   }
   return (void *)I;
 }
