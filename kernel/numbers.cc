@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.4 2006-11-29 16:48:41 Singular Exp $ */
+/* $Id: numbers.cc,v 1.5 2007-01-29 16:58:32 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -568,6 +568,18 @@ void nKillChar(ring r)
 	         }
                  #endif
                  break;
+	    case n_Zp_a:
+	    case n_Q_a:
+	         {
+		   number n=r->minpoly;
+		   if (n!=NULL)
+		   {
+		     r->minpoly=NULL;
+		     if (r==currRing) naMinimalPoly=NULL;
+		     naDelete(&n,r);
+		   }
+		 }
+		 break;
 
             default:
                  break;
