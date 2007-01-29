@@ -150,7 +150,7 @@ SOURCES=${CSOURCES} ${CXXSOURCES} \
 
 HEADERS=hutil.h stairc.h ideals.h \
 	longalg.h structs.h intvec.h int64vec.h longrat.h \
-	numbers.h stype.h clapconv.h ipconv.h maps.h \
+	numbers.h stype.h clapconv.h maps.h \
 	clapsing.h matpol.h polys.h p_polys.h syz.h \
 	ring.h timer.h dError.h fast_maps.h \
 	febase.h shortfl.h mpr_complex.h mpr_global.h \

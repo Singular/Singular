@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.54 2007-01-29 17:00:54 Singular Exp $ */
+/* $Id: ring.cc,v 1.55 2007-01-29 18:08:21 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -15,7 +15,6 @@
 #include "polys.h"
 #include "numbers.h"
 #include "febase.h"
-#include "ipconv.h"
 #include "intvec.h"
 #include "longalg.h"
 #include "ffields.h"
