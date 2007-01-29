@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.153 2007-01-23 15:19:46 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.154 2007-01-29 16:56:37 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -4680,8 +4680,6 @@ void rKill(ring r)
     {
       if (r->qideal!=NULL)
       {
-        idDelete(&r->qideal);
-        r->qideal=NULL;
         currQuotient=NULL;
       }
       if (ppNoether!=NULL) pDelete(&ppNoether);
@@ -4697,7 +4695,7 @@ void rKill(ring r)
       currRing=NULL;
       currRingHdl=NULL;
     }
-    else if (r->qideal!=NULL)
+    if (r->qideal!=NULL)
     {
       id_Delete(&r->qideal, r);
       r->qideal = NULL;
