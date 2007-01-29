@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.85 2007-01-09 14:31:05 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.86 2007-01-29 16:56:56 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -432,7 +432,9 @@ static BOOLEAN jiA_INTVEC(leftv res, leftv a, Subexpr e)
 }
 static BOOLEAN jiA_IDEAL(leftv res, leftv a, Subexpr e)
 {
+  if (currRing->minpoly!=NULL) {omCheckAddr(currRing->minpoly);}
   if (res->data!=NULL) idDelete((ideal*)&res->data);
+  if (currRing->minpoly!=NULL) {omCheckAddr(currRing->minpoly);}
   res->data=(void *)a->CopyD(MATRIX_CMD);
   idNormalize((ideal)res->data);
   jiAssignAttr(res,a);
@@ -561,13 +563,11 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
     WerrorS("qring_id expected");
     return TRUE;
   }
-  ring qr;
-  int i,j;
-  int *pi;
 
   assumeStdFlag(a);
-  qr=(ring)res->Data();
-  ring qrr=rCopy(currRing);
+  ring qr=(ring)res->Data(); // the declaration allocated space
+  ring qrr=rCopy(currRing); 
+                 // we have to fill it, but the copy also allocates space
   memcpy4(qr,qrr,sizeof(ip_sring));
   omFreeBin((ADDRESS)qrr, ip_sring_bin);
   if (qr->qideal!=NULL) idDelete(&qr->qideal);
@@ -582,7 +582,7 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
       Warn("%s is no twosided standard basis",a->Name());
     }
 
-    // is this an exterior algebra or a commuunative polynomial ring \otimes exterior algebra?
+    // is this an exterior algebra or a commutative polynomial ring \otimes exterior algebra?
     // we should check whether qr->qideal is of the form: y_i^2, y_{i+1}^2, \ldots, y_j^2 (j > i)
     //.if yes, setup qr->nc->type, etc.
     sca_SetupSCA(qr, currRing); 
