@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.53 2007-01-11 10:37:35 Singular Exp $ */
+/* $Id: ring.cc,v 1.54 2007-01-29 17:00:54 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -90,6 +90,10 @@ static void rOptimizeLDeg(ring r);
 // global variables:
 void rChangeCurrRing(ring r)
 {
+ // if ((currRing!=NULL) && (currRing->minpoly!=NULL))
+ // {
+ //   omCheckAddr(currRing->minpoly);
+ // }
   /*------------ set global ring vars --------------------------------*/
   currRing = r;
   currQuotient=NULL;
@@ -1792,6 +1796,10 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
             r->typ[j].data.dp.start, r->typ[j].data.dp.end,r->N);
       }
     }
+  }
+  if (r->minpoly!=NULL)
+  {
+    omCheckAddr(r->minpoly);
   }
   //assume(r->cf!=NULL);
 
