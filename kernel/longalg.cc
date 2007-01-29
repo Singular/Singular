@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.19 2007-01-15 17:12:09 Singular Exp $ */
+/* $Id: longalg.cc,v 1.20 2007-01-29 16:57:59 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -86,7 +86,10 @@ void naSetChar(int i, ring r)
   naMap = naCopy;
 
   if (r->minpoly!=NULL)
+  {
     naMinimalPoly=((lnumber)r->minpoly)->z;
+    omCheckAddr(naMinimalPoly);
+  }
   else
     naMinimalPoly = NULL;
   if (r->minideal!=NULL)
@@ -933,11 +936,14 @@ int naInt(number &n)
 */
 void naDelete(number *p, const ring r)
 {
-  lnumber l = (lnumber) * p;
-  if (l==NULL) return;
-  nap_Delete(&(l->z),r);
-  nap_Delete(&(l->n),r);
-  omFreeBin((ADDRESS)l,  rnumber_bin);
+  if ((*p)!=r->minpoly)
+  {
+    lnumber l = (lnumber) * p;
+    if (l==NULL) return;
+    nap_Delete(&(l->z),r);
+    nap_Delete(&(l->n),r);
+    omFreeBin((ADDRESS)l,  rnumber_bin);
+  }
   *p = NULL;
 }
 
