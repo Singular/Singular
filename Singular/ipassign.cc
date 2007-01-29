@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.86 2007-01-29 16:56:56 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.87 2007-01-29 18:34:45 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -432,12 +432,15 @@ static BOOLEAN jiA_INTVEC(leftv res, leftv a, Subexpr e)
 }
 static BOOLEAN jiA_IDEAL(leftv res, leftv a, Subexpr e)
 {
-  if (currRing->minpoly!=NULL) {omCheckAddr(currRing->minpoly);}
   if (res->data!=NULL) idDelete((ideal*)&res->data);
-  if (currRing->minpoly!=NULL) {omCheckAddr(currRing->minpoly);}
   res->data=(void *)a->CopyD(MATRIX_CMD);
   idNormalize((ideal)res->data);
   jiAssignAttr(res,a);
+  if (((res->rtyp==IDEAL_CMD)||(res->rtyp==MODUL_CMD))
+  && (IDELEMS((ideal)(res->data))==1))
+  {
+    setFlag(res,FLAG_STD);
+  }
   return FALSE;
 }
 static BOOLEAN jiA_RESOLUTION(leftv res, leftv a, Subexpr e)
@@ -564,14 +567,15 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
     return TRUE;
   }
 
-  assumeStdFlag(a);
   ring qr=(ring)res->Data(); // the declaration allocated space
   ring qrr=rCopy(currRing); 
                  // we have to fill it, but the copy also allocates space
   memcpy4(qr,qrr,sizeof(ip_sring));
   omFreeBin((ADDRESS)qrr, ip_sring_bin);
   if (qr->qideal!=NULL) idDelete(&qr->qideal);
-  qr->qideal = (ideal)a->CopyD(IDEAL_CMD);
+  ideal id=(ideal)a->CopyD(IDEAL_CMD);
+  if (idElem(id)>1) assumeStdFlag(a);
+  qr->qideal = id;
 
   // qr is a copy of currRing with the new qideal!
   #ifdef HAVE_PLURAL
