@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.115 2007-01-29 06:37:35 bricken Exp $ */
+/* $Id: tgb.cc,v 1.116 2007-01-30 10:37:54 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -3722,7 +3722,6 @@ void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
      int lm_deg=pTotaldegree(r[erg.to_reduce_l].p);
      int ecart;
      if (erg.fromS){
-       assume(pTotaldegree_full(red)<=c->T_deg_full[erg.reduce_by]);
        ecart=c->strat->ecartS[erg.reduce_by];
      } else {
        ecart=pTotaldegree_full(red)-lm_deg;
