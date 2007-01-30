@@ -14,11 +14,15 @@ for a summary of the comaand-line options of regress.cmd.
 
 To test(s) correctness of Singular:
 -----------------------------------
-1.) Put the Singular binary in this directory.
+1.) Put the Singular binary in this directory
+    (prefered solution: ln -s <path_to_Singular_binary> Singular)
 2.) Run 
      perl ./regress.cmd [*.tst] [*.lst]
     with the desired tst (i.e., Singular test scripts) or lst (list 
     of tst files -- see Old/universal.lst for an example) file(s).
+    (prefered test scenario:
+    perl ./regress.cmd Old/universal.lst Short/ok_s.lst Long/ok_l.lst
+    )
 3.) If no differences between the new results and the
     previously obtained results are found, regress.cmd exits with
     status 0.
@@ -142,6 +146,6 @@ To add a new test for a library/commando to the test-suite:
   cd <directopry where xx.tst resides>; perl ../regress.cmd -g xx.tst
 
 * You can download the newest version of tst.lib from
-  ftp://www.mathematik.uni-kl.de/pub/Math/Singular/misc/tst.lib
+  ftp://www.mathematik.uni-kl.de/pub/Math/Singular/singular-cd/LIBRARIES/tst.lib
 
 
