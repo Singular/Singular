@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.116 2007-01-30 10:37:54 bricken Exp $ */
+/* $Id: tgb.cc,v 1.117 2007-01-30 13:54:56 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -25,7 +25,7 @@
 
 #include "longrat.h"
 #define SR_HDL(A) ((long)(A))
-static const int bundle_size=100;
+static const int bundle_size=1000;
 static const int delay_factor=3;
 int QlogSize(number n);
 #define ADD_LATER_SIZE 500
@@ -3395,28 +3395,75 @@ static int multi_reduction_clear_zeroes(red_object* los, int  losl, int l, int u
   return deleted;
 
 }
+int search_red_object_pos(red_object* a, int top, red_object* key ){
+    
+    int an = 0;
+    int en= top;
+    if (top==-1) return 0;
+    if (pLmCmp(key->p,a[top].p)==1)
+      return top+1;
+    int i;
+    loop
+    {
+      if (an >= en-1)
+      {
+        if (pLmCmp(key->p,a[an].p)==-1)
+           return an;
+        return en;
+      }
+      i=(an+en) / 2;
+      if (pLmCmp(key->p,a[i].p)==-1)
+        en=i;
+      else
+        an=i;
+    }
 
+}
 static void sort_region_down(red_object* los, int l, int u, slimgb_alg* c)
 {
-  qsort(los+l,u-l+1,sizeof(red_object),red_object_better_gen);
+  int r_size=u-l+1;
+  qsort(los+l,r_size,sizeof(red_object),red_object_better_gen);
   int i;
-
-  for(i=l;i<=u;i++)
-  {
-    BOOLEAN moved=FALSE;
-    int j;
-    for(j=i;j;j--)
-    {
-      if(pLmCmp(los[j].p,los[j-1].p)==-1){
-  red_object h=los[j];
-  los[j]=los[j-1];
-  los[j-1]=h;
-  moved=TRUE;
-      }
-      else break;
+  int * new_indices=(int*) omalloc((r_size)*sizeof(int));
+  int bound=0;
+  BOOLEAN at_end=FALSE;
+  for(i=l;i<=u;i++){
+    if (!(at_end)){
+      bound=new_indices[i-l]=bound+search_red_object_pos(los+bound,l-bound-1,los+i);
+      if (bound==l) at_end=TRUE;
     }
-    if(!moved) return;
+    else{
+      new_indices[i-l]=l;
+    }
   }
+  red_object* los_region=(red_object*) omalloc(sizeof(red_object)*(u-l+1));
+  for (int i=0;i<r_size;i++){
+    new_indices[i]+=i;
+    los_region[i]=los[l+i];
+    assume((i==0)||(new_indices[i]>new_indices[i-1]));
+    
+  }
+
+  i=r_size-1;
+  int j=u;
+  int j2=l-1;
+  while(i>=0){
+    if (new_indices[i]==j){
+      los[j]=los_region[i];
+      i--;
+      j--;
+    } else{
+      assume(new_indices[i]<j);
+      los[j]=los[j2];
+      assume(j2>=0);
+      j2--;
+      j--;
+    }
+  }
+  omfree(los_region);
+  
+  omfree(new_indices);
+
 }
 
 //assume that los is ordered ascending by leading term, all non zero
