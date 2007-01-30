@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.20 2007-01-29 16:57:59 Singular Exp $ */
+/* $Id: longalg.cc,v 1.21 2007-01-30 09:30:16 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1049,9 +1049,6 @@ number naSub(number la, number lb)
 
   lnumber a = (lnumber)la;
   lnumber b = (lnumber)lb;
-  if (a->n !=NULL) naNormalize(la);
-  if (b->n !=NULL) naNormalize(lb);
-
 
   omCheckAddrSize(a,sizeof(snumber));
   omCheckAddrSize(b,sizeof(snumber));
@@ -1155,7 +1152,6 @@ number naMult(number la, number lb)
   if ((x!=NULL) && (napIsConstant(x)) && nacIsOne(napGetCoeff(x)))
     napDelete(&x);
   lo->n = x;
-  lo->s = 0;
   if(lo->z==NULL)
   {
     omFreeBin((ADDRESS)lo, rnumber_bin);
@@ -1164,12 +1160,13 @@ number naMult(number la, number lb)
 #if 1
   else if (lo->n!=NULL)
   {
+    lo->s = 0;
     number luu=(number)lo;
     naNormalize(luu);
     lo=(lnumber)luu;
   }
   else
-    lo->s=2;
+    lo->s=3;
 #endif
   naTest((number)lo);
   return (number)lo;
@@ -1254,14 +1251,16 @@ number naDiv(number la, number lb)
   }
   if ((napIsConstant(x)) && nacIsOne(napGetCoeff(x)))
     napDelete(&x);
-  lo->s = 0;
   lo->n = x;
   if (lo->n!=NULL)
   {
-     number luu=(number)lo;
-     naNormalize(luu);
-     lo=(lnumber)luu;
+    lo->s = 0;
+    number luu=(number)lo;
+    naNormalize(luu);
+    lo=(lnumber)luu;
   }
+  else
+    lo->s=3;
   naTest((number)lo);
   return (number)lo;
 }
@@ -1661,6 +1660,7 @@ number naGcd(number a, number b, const ring r)
 * FACTORY_GCD_TEST: do not apply built in gcd for
 *   univariate polynomials, always use Factory
 */
+//#define FACTORY_GCD_TEST
 void naNormalize(number &pp)
 {
 
@@ -1708,11 +1708,8 @@ void naNormalize(number &pp)
       napIter(y);
     }
     y = p->n;
-  }
   // p->n !=NULL:
   /* collect all denoms from y and multiply x and y by it */
-  if (naIsChar0)
-  {
     number n=napLcm(y);
     napMultN(x,n);
     napMultN(y,n);
@@ -1730,7 +1727,7 @@ void naNormalize(number &pp)
     }
     y = p->n;
   }
-  if (naMinimalPoly == NULL)
+  if ((naMinimalPoly == NULL) && (x!=NULL) && (y!=NULL))
   {
     int i;
     for (i=naNumbOfPar-1; i>=0; i--)
