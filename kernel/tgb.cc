@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.118 2007-01-30 14:03:16 bricken Exp $ */
+/* $Id: tgb.cc,v 1.119 2007-01-30 15:10:36 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2642,9 +2642,12 @@ ideal t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode){
 
   while ((c->pair_top>=0) && ((!(TEST_OPT_DEGBOUND)) || (c->apairs[c->pair_top]->deg<=Kstd1_deg)))
   {
+    #ifdef HAVE_F4
     if(F4_mode)
       go_on_F4(c);
+
     else
+    #endif
       go_on(c);
   }
   if (c->pair_top<0)
