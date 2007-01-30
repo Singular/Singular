@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.117 2007-01-30 13:54:56 bricken Exp $ */
+/* $Id: tgb.cc,v 1.118 2007-01-30 14:03:16 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1793,10 +1793,10 @@ static void go_on (slimgb_alg* c){
   }
   c->average_length=c->average_length/c->n;
   i=0;
-  poly* p=(poly*) omalloc((PAR_N+1)*sizeof(poly));//nullterminated
+  poly* p=(poly*) omalloc((bundle_size+1)*sizeof(poly));//nullterminated
 
   int curr_deg=-1;
-  while(i<PAR_N){
+  while(i<bundle_size){
     sorted_pair_node* s=top_pair(c);//here is actually chain criterium done
 
 
