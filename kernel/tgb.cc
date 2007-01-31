@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.120 2007-01-31 15:22:21 bricken Exp $ */
+/* $Id: tgb.cc,v 1.121 2007-01-31 23:21:55 motsak Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2160,9 +2160,11 @@ static poly redNFTail (poly h,const int sl,kStrategy strat, int len)
 #endif
             number coef;
             pTest(strat->S[j]);
+#ifdef HAVE_PLURAL
             if (nc){
               nc_BucketPolyRed_Z(P.bucket, strat->S[j], &coef);
             } else
+#endif
               coef=kBucketPolyRed(P.bucket,strat->S[j],
                                 strat->lenS[j]/*pLength(strat->S[j])*/,strat->kNoether);
             pMult_nn(res,coef);
