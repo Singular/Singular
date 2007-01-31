@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.119 2007-01-30 15:10:36 bricken Exp $ */
+/* $Id: tgb.cc,v 1.120 2007-01-31 15:22:21 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -14,6 +14,7 @@
 
 ///@TODO: delay nur auf Sugarvergr�erung
 ///@TODO: grade aus ecartS, setze dazu strat->honey; und nutze p.ecart
+//@TODO: no tail reductions in syz comp
 #include "mod2.h"
 #include "tgb.h"
 #include "tgb_internal.h"
@@ -329,7 +330,7 @@ static BOOLEAN elength_is_normal_length(poly p, slimgb_alg* c){
     if (p_GetComp(p,r)!=0) return FALSE;
     if (c->lastDpBlockStart<=pVariables){
         int i;
-        for(i=1;i<=pVariables;i++){
+        for(i=1;i<c->lastDpBlockStart;i++){
             if (p_GetExp(p,i,r)!=0){
                 break;
             }
@@ -909,6 +910,43 @@ static void move_forward_in_S(int old_pos, int new_pos,kStrategy strat)
   if (strat->lenSw!=NULL)
     for (i=old_pos; i>new_pos; i--)
       strat->lenSw[i] = strat->lenSw[i-1];
+
+  strat->S[new_pos]=p;
+  strat->ecartS[new_pos]=ecart;
+  strat->sevS[new_pos]=sev;
+  strat->S_2_R[new_pos]=s_2_r;
+  strat->lenS[new_pos]=length;
+  if(strat->lenSw!=NULL)
+    strat->lenSw[new_pos]=length_w;
+  //assume(lenS_correct(strat));
+}
+
+static void move_backward_in_S(int old_pos, int new_pos,kStrategy strat)
+{
+  assume(old_pos<=new_pos);
+  poly p=strat->S[old_pos];
+  int ecart=strat->ecartS[old_pos];
+  long sev=strat->sevS[old_pos];
+  int s_2_r=strat->S_2_R[old_pos];
+  int length=strat->lenS[old_pos];
+  assume(length==pLength(strat->S[old_pos]));
+  wlen_type length_w;
+  if(strat->lenSw!=NULL)
+    length_w=strat->lenSw[old_pos];
+  int i;
+  for (i=old_pos; i<new_pos; i++)
+  {
+    strat->S[i] = strat->S[i+1];
+    strat->ecartS[i] = strat->ecartS[i+1];
+    strat->sevS[i] = strat->sevS[i+1];
+    strat->S_2_R[i] = strat->S_2_R[i+1];
+  }
+  if (strat->lenS!=NULL)
+    for (i=old_pos; i<new_pos; i++)
+      strat->lenS[i] = strat->lenS[i+1];
+  if (strat->lenSw!=NULL)
+    for (i=old_pos; i<new_pos; i++)
+      strat->lenSw[i] = strat->lenSw[i+1];
 
   strat->S[new_pos]=p;
   strat->ecartS[new_pos]=ecart;
@@ -1967,7 +2005,7 @@ static void go_on (slimgb_alg* c){
     kBucketDestroy(&buf[j].bucket);
 
     //if (!c->nc) {
-      if ((TEST_OPT_REDTAIL)&&(c->S->rank<=1)){
+      if (c->tailReductions){
       p=redNFTail(p,c->strat->sl,c->strat, 0);
       } else {
       p=redTailShort(p, c->strat);
@@ -2262,6 +2300,7 @@ void slimgb_alg::introduceDelayedPairs(poly* pa,int s){
   pair_top+=s;
 }
 slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
+  lastCleanedDeg=-1;
   completed=FALSE;
   this->syz_comp=syz_comp;
   r=currRing;
@@ -2287,8 +2326,8 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
       if(!(is_homog)) break;
     }
   }
-  eliminationProblem=((!(is_homog))&&((pLexOrder)||(I->rank>0)));
-
+  eliminationProblem=((!(is_homog))&&((pLexOrder)||(I->rank>1)));
+  tailReductions=((is_homog)||((TEST_OPT_REDTAIL)&&(!(I->rank>1))));
   //  Print("is homog:%d",c->is_homog);
   void* h;
   poly hp;
@@ -2783,8 +2822,86 @@ static sorted_pair_node* pop_pair(slimgb_alg* c){
   if(c->pair_top<0) return NULL;
   else return (c->apairs[c->pair_top--]);
 }
+void slimgb_alg::cleanDegs(int lower, int upper){
+  assume(is_homog);
+  int deg;
+  if (TEST_OPT_PROT){
+    PrintS("C");
+  }
+  for(deg=lower;deg<=upper;deg++){
+    int i;
+    for(i=0;i<n;i++){
+      if (T_deg[i]==deg){
+          poly h;
+          h=S->m[i];
+          h=redNFTail(h,strat->sl,strat,lengths[i]);
+          if (!rField_is_Zp(r))
+          {
+            pContent(h);
+            pCleardenom(h);//should be unnecessary
+          } else pNorm(h);
+          //TODO:GCD of TERMS
+          poly got=::gcd_of_terms(h,r);
+          p_Delete(&gcd_of_terms[i],r);
+          gcd_of_terms[i]=got;
+          int len=pLength(h);
+          wlen_type wlen=pQuality(h,this,len);
+          if (weighted_lengths)
+            weighted_lengths[i]=wlen;
+          lengths[i]=len;
+          assume(h==S->m[i]);
+          int j;
+          for(j=0;j<=strat->sl;j++){
+            if (h==strat->S[j]){
+              int new_pos=simple_posInS(strat, h,len, wlen);
+              if (strat->lenS){
+                strat->lenS[j]=len;
+              }
+              if (strat->lenSw){
+                strat->lenSw[j]=wlen;
+              }
+              if (new_pos<j){
+                move_forward_in_S(j,new_pos,strat);
+              }else{
+                if (new_pos>j)
+                 new_pos=new_pos-1;//is identical with one element
+                if (new_pos>j)
+                  move_backward_in_S(j,new_pos,strat);
+              }
+              break;
+            }
+          }
+        }
+        
+    }
+  
+  }
+  {
+    int i,j;
+    for(i=0;i<this->n;i++){
+      for(j=0;j<i;j++){
+        if (T_deg[i]+T_deg[j]<=upper){
+          now_t_rep(i,j,this);
+        }
+      }
+    }
+  }
+  //TODO resort and update strat->S,strat->lenSw
+  //TODO mark pairs
+}
 sorted_pair_node* top_pair(slimgb_alg* c){
-  super_clean_top_of_pair_list(c);//yeah, I know, it's odd that I use a different proc here
+  while(c->pair_top>=0){
+    super_clean_top_of_pair_list(c);//yeah, I know, it's odd that I use a different proc here
+    if ((c->is_homog)&&(c->pair_top>=0)&&(c->apairs[c->pair_top]->deg>=c->lastCleanedDeg+2)){
+      int upper=c->apairs[c->pair_top]->deg-1;
+      c->cleanDegs(c->lastCleanedDeg+1,upper);
+      c->lastCleanedDeg=upper;
+    } else{
+      break;
+    }
+    
+  }
+
 
   if(c->pair_top<0) return NULL;
   else return (c->apairs[c->pair_top]);

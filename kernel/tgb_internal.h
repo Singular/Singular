@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.47 2006-11-09 11:14:50 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.48 2007-01-31 15:22:22 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -102,6 +102,7 @@ class slimgb_alg
     slimgb_alg(ideal I, int syz_comp,BOOLEAN F4);
 		void introduceDelayedPairs(poly* pa,int s);
     virtual ~slimgb_alg();
+    void cleanDegs(int lower, int upper);
 #ifndef HAVE_BOOST
 #ifdef USE_STDVECBOOL
   vector<vector<bool> > states;
@@ -157,10 +158,11 @@ class slimgb_alg
   int extended_product_crit;
   int average_length;
   int lastDpBlockStart;
+  int lastCleanedDeg;
   BOOLEAN isDifficultField;
   BOOLEAN completed;
   BOOLEAN is_homog;
-  
+  BOOLEAN tailReductions;
   BOOLEAN eliminationProblem;
   BOOLEAN F4_mode;
   BOOLEAN nc;
