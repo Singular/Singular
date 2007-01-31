@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.87 2007-01-29 18:34:45 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.88 2007-01-31 23:56:34 motsak Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -586,10 +586,7 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
       Warn("%s is no twosided standard basis",a->Name());
     }
 
-    // is this an exterior algebra or a commutative polynomial ring \otimes exterior algebra?
-    // we should check whether qr->qideal is of the form: y_i^2, y_{i+1}^2, \ldots, y_j^2 (j > i)
-    //.if yes, setup qr->nc->type, etc.
-    sca_SetupSCA(qr, currRing); 
+    nc_SetupQuotient(qr, currRing); 
   }
   #endif
   //currRing=qr;
