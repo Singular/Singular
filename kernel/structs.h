@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.29 2007-01-11 11:27:26 Singular Exp $ */
+/* $Id: structs.h,v 1.30 2007-01-31 23:51:25 motsak Exp $ */
 /*
 * ABSTRACT
 */
@@ -461,7 +461,11 @@ struct nc_struct
     // these variables should have odd degree, though that will not be checked
     // iAltVarsStart, iAltVarsEnd are only used together with nc_type=nc_exterior
     // 1 <= iAltVarsStart <= iAltVarsEnd <= r->N
-    unsigned int iFirstAltVar, iLastAltVar;
+    unsigned int iFirstAltVar, iLastAltVar; // = 0 by default
+    
+    // for factors of super-commutative algebras we need 
+    // the part of general quotient ideal modulo squares!    
+    ideal idSCAQuotient; // = NULL by default.
 
   public:
     inline unsigned int& FirstAltVar() { return (iFirstAltVar); };
@@ -469,6 +473,8 @@ struct nc_struct
 
     inline unsigned int FirstAltVar() const { return (iFirstAltVar); };
     inline unsigned int LastAltVar () const { return (iLastAltVar ); };
+
+    inline ideal& SCAQuotient() { return (idSCAQuotient); };
 
   public:
     nc_pProcs p_Procs; // NC procedures.

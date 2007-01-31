@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.10 2007-01-11 10:10:37 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.11 2007-01-31 23:51:23 motsak Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -10,6 +10,7 @@
 
 #ifdef HAVE_PLURAL
 
+#define PLURAL_INTERNAL_DECLARATIONS
 
 #include "omalloc.h"
 #include "polys.h"
@@ -749,7 +750,7 @@ static int nc_redBest (LObject*  h,kStrategy strat)
 
 #endif
 
-void gr_initBba(ideal F, kStrategy strat)
+void nc_gr_initBba(ideal F, kStrategy strat)
 {
   assume(rIsPluralRing(currRing));
 
@@ -825,7 +826,7 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
   // initHilbCrit(F,Q,&hilb,strat);
   /* in plural we don't need Hilb yet */
-  gr_initBba(F,strat);
+  nc_gr_initBba(F,strat);
   initBuchMoraPos(strat);
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
   /*Shdl=*/initBuchMora(F, Q,strat);
@@ -860,7 +861,7 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
       /* deletes the short spoly and computes */
       pLmFree(strat->P.p);
       /* the real one */
-      if ((currRing->nc->type==nc_lie) && pHasNotCF(strat->P.p1,strat->P.p2)) /* prod crit */
+      if ((ncRingType(currRing)==nc_lie) && pHasNotCF(strat->P.p1,strat->P.p2)) /* prod crit */
       {
         strat->cp++;
         /* prod.crit itself in nc_CreateSpoly */
@@ -921,7 +922,7 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
               else pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
               strat->enterS(strat->P,pos,strat,-1);
             }
-            if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
+//            if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
           }
           if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
       if (strat->sl>srmax) srmax = strat->sl;
@@ -932,8 +933,18 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
     //kTest(strat);
   }
   if (TEST_OPT_DEBUG) messageSets(strat);
+
   /* complete reduction of the standard basis--------- */
-  if (TEST_OPT_REDSB) completeReduce(strat);
+  if (TEST_OPT_REDSB){
+     completeReduce(strat); // ???
+
+//    ideal I = strat->Shdl;
+//    ideal erg = kInterRed(I,Q);
+//    assume(I!=erg);
+//    id_Delete(&I, currRing);
+//    strat->Shdl = erg;
+  }
+
   /* release temp data-------------------------------- */
   exitBuchMora(strat);
   if (TEST_OPT_WEIGHTM)
@@ -948,6 +959,8 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   }
   if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
+
+
 #ifdef PDEBUG
 /* for counting number of pairs [enterL] in Plural */
 /*   extern int zaehler; */

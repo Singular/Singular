@@ -6,9 +6,10 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.38 2007-01-25 19:42:26 motsak Exp $
+ *  Version: $Id: gring.cc,v 1.39 2007-01-31 23:51:23 motsak Exp $
  *******************************************************************/
 #include "mod2.h"
+
 #ifdef HAVE_PLURAL
 #define PLURAL_INTERNAL_DECLARATIONS
 
@@ -25,6 +26,7 @@
 #include "p_Mult_q.h"
 
 #include "gring.h"
+#include "sca.h"
 
 // dirty tricks:
 #include "p_MemAdd.h"
@@ -35,7 +37,55 @@
 #define freeN(A,k) omFreeSize((ADDRESS)A,k*sizeof(number))
 
 
+// some forward declarations:
 
+
+// polynomial multiplication functions for p_Procs : 
+poly gnc_pp_Mult_mm(const poly p, const poly m, const ring r, poly &last);
+poly gnc_p_Mult_mm(poly p, const poly m, const ring r);
+poly gnc_mm_Mult_p(const poly m, poly p, const ring r);
+poly gnc_mm_Mult_pp(const poly m, const poly p, const ring r);
+
+
+// set pProcs for r and global variable p_Procs as for general non-commutative algebras.
+void gnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs);
+
+/* syzygies : */
+poly gnc_CreateSpolyOld(const poly p1, const poly p2/*, poly spNoether*/, const ring r);
+poly gnc_ReduceSpolyOld(const poly p1, poly p2/*, poly spNoether*/, const ring r);
+
+poly gnc_CreateSpolyNew(const poly p1, const poly p2/*, poly spNoether*/, const ring r);
+poly gnc_ReduceSpolyNew(const poly p1, poly p2/*, poly spNoether*/, const ring r);
+
+
+
+void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c);
+void gnc_kBucketPolyRed_ZNew(kBucket_pt b, poly p, number *c);
+
+void gnc_kBucketPolyRedOld(kBucket_pt b, poly p, number *c);
+void gnc_kBucketPolyRed_ZOld(kBucket_pt b, poly p, number *c);
+
+
+// poly gnc_ReduceSpolyNew(poly p1, poly p2, poly spNoether, const ring r);
+// void gnc_ReduceSpolyTail(poly p1, poly q, poly q2, poly spNoether, const ring r);
+
+// void nc_kBucketPolyRed(kBucket_pt b, poly p); 
+
+ideal gnc_gr_mora(const ideal, const ideal, const intvec *, const intvec *, kStrategy); // Not yet!
+ideal gnc_gr_bba (const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat);
+
+
+#if 0
+// deprecated functions:
+//  poly gnc_p_Minus_mm_Mult_qq_ign(poly p, const poly m, poly q, int & d1, poly d2, const ring ri, poly &d3);
+//  poly gnc_p_Minus_mm_Mult_qq(poly p, const poly m, poly q, const ring r);
+//  poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp, int lq, const ring r);
+//  poly nc_p_Plus_mm_Mult_qq (poly p, const poly m, const poly q, int &lp, int lq, const ring r);
+#endif
+
+
+
+///////////////////////////////////////////////////////////////////////////////
 poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp,
                                     const int, const poly, const ring r)
 {
@@ -324,7 +374,7 @@ poly gnc_mm_Mult_nn(int *F0, int *G0, const ring r)
   number tmp_num=NULL;
   int cpower=0;
 
-  if (r->nc->type==nc_skew)
+  if (ncRingType(r)==nc_skew)
   {
     if (r->nc->IsSkewConstant==1)
     {
@@ -1129,7 +1179,7 @@ poly gnc_ReduceSpolyOld(const poly p1, poly p2/*,poly spNoether*/, const ring r)
   p_Test(m,r);
 #endif
   /* pSetComp(m,r)=0? */
-  poly   N  = mm_Mult_p(m, p_Head(p1,r), r);
+  poly   N  = nc_mm_Mult_p(m, p_Head(p1,r), r);
   number C  = n_Copy( p_GetCoeff(N,  r), r);
   number cF = n_Copy( p_GetCoeff(p2, r),r);
   /* GCD stuff */
@@ -1183,7 +1233,7 @@ poly gnc_ReduceSpolyNew(const poly p1, poly p2, const ring r)
 #endif
 
   /* pSetComp(m,r)=0? */
-  poly   N  = mm_Mult_p(m, p_Head(p1,r), r);
+  poly   N  = nc_mm_Mult_p(m, p_Head(p1,r), r);
 
   number C  = n_Copy( p_GetCoeff(N,  r), r);
   number cF = n_Copy( p_GetCoeff(p2, r), r);
@@ -1237,7 +1287,7 @@ poly gnc_CreateSpolyOld(poly p1, poly p2/*,poly spNoether*/, const ring r)
 #endif
     return(NULL);
   }
-  if ((r->nc->type==nc_lie) && pHasNotCF(p1,p2)) /* prod crit */
+  if ((ncRingType(r)==nc_lie) && pHasNotCF(p1,p2)) /* prod crit */
   {
     return(nc_p_Bracket_qq(pCopy(p2),p1));
   }
@@ -1263,9 +1313,9 @@ poly gnc_CreateSpolyOld(poly p1, poly p2/*,poly spNoether*/, const ring r)
 #endif
   p_Delete(&pL,r);
   /* zero exponents ! */
-  poly M1    = mm_Mult_p(m1,p_Head(p1,r),r);
+  poly M1    = nc_mm_Mult_p(m1,p_Head(p1,r),r);
   number C1  = n_Copy(p_GetCoeff(M1,r),r);
-  poly M2    = mm_Mult_p(m2,p_Head(p2,r),r);
+  poly M2    = nc_mm_Mult_p(m2,p_Head(p2,r),r);
   number C2  = n_Copy(p_GetCoeff(M2,r),r);
   /* GCD stuff */
   number C = nGcd(C1,C2,r);
@@ -1291,11 +1341,11 @@ poly gnc_CreateSpolyOld(poly p1, poly p2/*,poly spNoether*/, const ring r)
   /* M1 is killed, M2=res = C2 M1 - C1 M2 */
   poly tmp=p_Copy(p1,r);
   tmp=p_LmDeleteAndNext(tmp,r);
-  M1=mm_Mult_p(m1,tmp,r);
+  M1=nc_mm_Mult_p(m1,tmp,r);
   tmp=p_Copy(p2,r);
   tmp=p_LmDeleteAndNext(tmp,r);
   M2=p_Add_q(M2,M1,r);
-  M1=mm_Mult_p(m2,tmp,r);
+  M1=nc_mm_Mult_p(m2,tmp,r);
   M2=p_Add_q(M2,M1,r);
   p_Delete(&m1,r);
   p_Delete(&m2,r);
@@ -1359,8 +1409,8 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
   p_Delete(&pL,r);
 
   /* zero exponents !? */
-  poly M1    = mm_Mult_p(m1,p_Head(p1,r),r); // M1 = m1 * lt(p1)
-  poly M2    = mm_Mult_p(m2,p_Head(p2,r),r); // M2 = m2 * lt(p2)
+  poly M1    = nc_mm_Mult_p(m1,p_Head(p1,r),r); // M1 = m1 * lt(p1)
+  poly M2    = nc_mm_Mult_p(m2,p_Head(p2,r),r); // M2 = m2 * lt(p2)
 
   if(M1 == NULL || M2 == NULL)
   {
@@ -1418,11 +1468,11 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
 
   poly tmp=p_Copy(p1,r);                         // tmp = p1
   tmp=p_LmDeleteAndNext(tmp,r);                  // tmp = tail(p1)
-  M1 = mm_Mult_p(m1,tmp,r);                      // M1 = m1 * tail(p1), delete tmp
+  M1 = nc_mm_Mult_p(m1,tmp,r);                      // M1 = m1 * tail(p1), delete tmp
   tmp=p_Copy(p2,r);                              // tmp = p2
   tmp=p_LmDeleteAndNext(tmp,r);                  // tmp = tail(p2)
   M2=p_Add_q(M2,M1,r);                           // M2 = spoly(lt(p1), lt(p2)) + m1 * tail(p1), delete M1
-  M1 = mm_Mult_p(m2,tmp,r);                      // M1 = m2 * tail(p2), detele tmp
+  M1 = nc_mm_Mult_p(m2,tmp,r);                      // M1 = m2 * tail(p2), detele tmp
   M2=p_Add_q(M2,M1,r);                           // M2 = spoly(lt(p1), lt(p2)) + m1 * tail(p1) + m2*tail(p2)
                                                  // delete M1
 
@@ -1463,7 +1513,7 @@ void gnc_ReduceSpolyTail(poly p1, poly q, poly q2, poly spNoether, const ring r)
   /* pSetComp(m,r)=0? */
   poly M = nc_mm_Mult_pp(m, p1,r);
   number C=p_GetCoeff(M,r);
-  M=p_Add_q(M,mm_Mult_p(m,p_LmDeleteAndNext(p_Copy(p1,r),r),r),r); // _pp?
+  M=p_Add_q(M,nc_mm_Mult_p(m,p_LmDeleteAndNext(p_Copy(p1,r),r),r),r); // _pp?
   q=p_Mult_nn(q,C,r);
   number MinusOne=n_Init(-1,r);
   if (!n_Equal(cQ,MinusOne,r))
@@ -2042,7 +2092,7 @@ void ncKill(ring r)
     {
       for(j=i+1;j<=rN;j++)
       {
-    id_Delete((ideal *)&(r->nc->MT[UPMATELEM(i,j,rN)]),r->nc->basering);
+        id_Delete((ideal *)&(r->nc->MT[UPMATELEM(i,j,rN)]),r->nc->basering);
       }
     }
     omFreeSize((ADDRESS)r->nc->MT,rN*(rN-1)/2*sizeof(matrix));
@@ -2051,13 +2101,20 @@ void ncKill(ring r)
   }
   id_Delete((ideal *)&(r->nc->C),r->nc->basering);
   id_Delete((ideal *)&(r->nc->D),r->nc->basering);
+  
+  if( rIsSCA(r) && (r->nc->SCAQuotient() != NULL) )
+  {
+    id_Delete(&r->nc->SCAQuotient(), r->nc->basering);    
+  }
+
   r->nc->basering->ref--;
-  if (r->nc->basering<=0)
+  
+  if (r->nc->basering->ref<=0)
   {
     rKill(r->nc->basering);
   }
-  omFreeSize((ADDRESS)r->nc,sizeof(nc_struct));
-  r->nc=NULL;
+  
+  ncCleanUp(r);
 }
 
 void ncCleanUp(ring r)
@@ -2253,7 +2310,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
   r->nc->ref = 1;
   r->nc->basering = r;
   r->ref++;
-  r->nc->type = nc_undef;
+  ncRingType(r, nc_undef);
 
   /* initialition of the matrix C */
   /* check the correctness of arguments */
@@ -2312,11 +2369,11 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
     }
     if (nIsOne(nN))
     {
-      r->nc->type = nc_lie;
+      ncRingType(r, nc_lie);
     }
     else
     {
-      r->nc->type = nc_general;
+      ncRingType(r, nc_general);
     }
     r->nc->IsSkewConstant = 1;
     C = mpNew(r->N,r->N);
@@ -2360,11 +2417,11 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
     r->nc->IsSkewConstant=tmpIsSkewConstant;
     if ( (tmpIsSkewConstant) && (nIsOne(pN)) )
     {
-      r->nc->type = nc_lie;
+      ncRingType(r, nc_lie);
     }
     else
     {
-      r->nc->type = nc_general;
+      ncRingType(r, nc_general);
     }
   }
 
@@ -2375,13 +2432,13 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
     D = mpNew(r->N,r->N);
     if (DN  == NULL)
     {
-      if ( (r->nc->type == nc_lie) || (r->nc->type == nc_undef) )
+      if ( (ncRingType(r) == nc_lie) || (ncRingType(r) == nc_undef) )
       {
-    r->nc->type = nc_comm; /* it was nc_skew earlier */
+        ncRingType(r, nc_comm); /* it was nc_skew earlier */
       }
       else /* nc_general, nc_skew */
       {
-    r->nc->type = nc_skew;
+        ncRingType(r, nc_skew);
       }
     }
     else /* DN  != NULL */
@@ -2417,6 +2474,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
   return nc_InitMultiplication(r);
 }
 
+//////////////////////////////////////////////////////////////////////////////
 BOOLEAN nc_InitMultiplication(ring r)
 {
   /* returns TRUE if there were errors */
@@ -2425,7 +2483,7 @@ BOOLEAN nc_InitMultiplication(ring r)
   /* and r->nc->IsSkewConstant for the skew case */
   if (rVar(r)==1)
   {
-    r->nc->type=nc_comm;
+    ncRingType(r, nc_comm);
     r->nc->IsSkewConstant=1;
     return FALSE;
   }
@@ -2482,7 +2540,7 @@ BOOLEAN nc_InitMultiplication(ring r)
       // p = NULL;// done by p_Delete
     }
   }
-  if (r->nc->type==nc_undef)
+  if (ncRingType(r)==nc_undef)
   {
     if (IsNonComm==1)
     {
@@ -2492,14 +2550,13 @@ BOOLEAN nc_InitMultiplication(ring r)
     }
     if (IsNonComm==0)
     {
-      r->nc->type=nc_skew; /* TODO: check whether it is commutative */
+      ncRingType(r, nc_skew); /* TODO: check whether it is commutative */
       r->nc->IsSkewConstant=tmpIsSkewConstant;
     }
   }
   r->nc->COM=COM;
 
-  SetProcsGNC(r, r->p_Procs);
-
+  gnc_p_ProcsSet(r, r->p_Procs);
 
   if (WeChangeRing)
   {
@@ -2508,9 +2565,8 @@ BOOLEAN nc_InitMultiplication(ring r)
   return FALSE;
 }
 
-void SetProcsGNC(ring& rGR, p_Procs_s* p_Procs)
+void gnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
 {
-
   // "commutative"
   rGR->p_Procs->p_Mult_mm  = gnc_p_Mult_mm;
   rGR->p_Procs->pp_Mult_mm = gnc_pp_Mult_mm;
@@ -2521,7 +2577,7 @@ void SetProcsGNC(ring& rGR, p_Procs_s* p_Procs)
   p_Procs->p_Minus_mm_Mult_qq = NULL; // gnc_p_Minus_mm_Mult_qq_ign; // should not be used!!!
 
 
-  // non-commutaitve
+  // non-commutaitve multiplication by monomial from the left
   rGR->nc->p_Procs.mm_Mult_p   = gnc_mm_Mult_p;
   rGR->nc->p_Procs.mm_Mult_pp  = gnc_mm_Mult_pp;
 
@@ -2539,6 +2595,7 @@ void SetProcsGNC(ring& rGR, p_Procs_s* p_Procs)
   rGR->nc->p_Procs.BucketPolyRed  = gnc_kBucketPolyRedOld;
   rGR->nc->p_Procs.BucketPolyRed_Z= gnc_kBucketPolyRed_ZOld;
 #else
+  // A bit cleaned up and somewhat rewritten functions...
   rGR->nc->p_Procs.SPoly       = gnc_CreateSpolyNew;
   rGR->nc->p_Procs.ReduceSPoly = gnc_ReduceSpolyNew;
 
@@ -2550,6 +2607,7 @@ void SetProcsGNC(ring& rGR, p_Procs_s* p_Procs)
 
 
 #if 0
+    // Old Stuff
     p_Procs->p_Mult_mm   = gnc_p_Mult_mm;
     _p_procs->p_Mult_mm  = gnc_p_Mult_mm;
 
@@ -2569,6 +2627,22 @@ void SetProcsGNC(ring& rGR, p_Procs_s* p_Procs)
 
 #endif
 }
+
+
+// set pProcs table for rGR and global variable p_Procs
+void nc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
+{
+  assume(rIsPluralRing(rGR));
+  assume(p_Procs!=NULL);
+
+  gnc_p_ProcsSet(rGR, p_Procs);
+
+  if(rIsSCA(rGR))
+  {
+    sca_p_ProcsSet(rGR, p_Procs);
+  }
+}
+
 
 
 /* substitute the n-th variable by e in p
@@ -2603,7 +2677,7 @@ poly nc_pSubst(poly p, int n, poly e)
       pre = pOne();
       pSetExpV(pre,PRE);
       pSetm(pre);
-      res = mm_Mult_p(pre,res,currRing);
+      res = nc_mm_Mult_p(pre,res,currRing);
       /* multiply with suffix */
       suf = pOne();
       pSetExpV(suf,SUF);
@@ -2854,8 +2928,11 @@ ring nc_rCreateNCcomm(ring r)
   r->nc = (nc_struct *)omAlloc0(sizeof(nc_struct));
   r->nc->ref = 1;
   r->nc->basering = r;
-  r->nc->type = nc_comm;
+  ncRingType(r, nc_comm);
   r->nc->IsSkewConstant = 1;
+  
+  // no reference increment to the base commutative ring???
+  
   matrix C = mpNew(r->N,r->N);
   matrix D = mpNew(r->N,r->N);
   int i,j;
@@ -2994,6 +3071,15 @@ BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate)
   /* TODO: varnames are e->E etc */
   return diagnose;
 }
+
+
+
+bool nc_SetupQuotient(ring rGR, const ring rG)
+{
+  // currently only super-commutative extension deals with factors. 
+  return sca_SetupQuotient(rGR, rG);
+}
+
 
 #endif
 

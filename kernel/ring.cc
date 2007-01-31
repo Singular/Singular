@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.55 2007-01-29 18:08:21 Singular Exp $ */
+/* $Id: ring.cc,v 1.56 2007-01-31 23:51:24 motsak Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -25,6 +25,7 @@
 #include "p_Procs.h"
 #ifdef HAVE_PLURAL
 #include "gring.h"
+#include "sca.h"
 #endif
 #include "maps.h"
 #include "matpol.h"
@@ -389,8 +390,23 @@ void rWrite(ring r)
     }
     else PrintS(" ...");
 #ifdef PDEBUG
-    Print("\n//   noncommutative type:%d",r->nc->type);
+    Print("\n//   noncommutative type:%d", (int)ncRingType(r));
     Print("\n//   is skew constant:%d",r->nc->IsSkewConstant);
+    if( rIsSCA(r) )
+    {
+      Print("\n//   alternating variables: [%d, %d]", scaFirstAltVar(r), scaLastAltVar(r));
+      const ideal Q = r->nc->SCAQuotient(); // resides within r!
+      if (Q!=NULL)
+      {
+        PrintS("\n//   quotient of sca by ideal");
+        if (r==currRing)
+        {
+          PrintLn();
+          iiWriteMatrix((matrix)Q,"__",1);
+        }
+        else PrintS(" ...");
+      }
+    }
     Print("\n//   ref:%d",r->nc->ref);
 #endif
   }
@@ -1156,27 +1172,27 @@ int rSum(ring r1, ring r2, ring &sum)
     if ( !R1_is_nc ) nc_rCreateNCcomm(R1);
     if ( !R2_is_nc ) nc_rCreateNCcomm(R2);
     /* nc->type's */
-    sum->nc->type = nc_undef;
-    nc_type t1 = R1->nc->type, t2 = R2->nc->type;
-    if ( t1==t2) sum->nc->type = t1;
+    ncRingType(sum, nc_undef);
+    nc_type t1 = ncRingType(R1), t2 = ncRingType(R2);
+    if ( t1==t2) ncRingType(sum, t1);
     else
     {
-      if ( (t1==nc_general) || (t2==nc_general) ) sum->nc->type = nc_general;
+      if ( (t1==nc_general) || (t2==nc_general) ) ncRingType(sum, nc_general);
     }
-    if (sum->nc->type == nc_undef) /* not yet done */
+    if (ncRingType(sum) == nc_undef) /* not yet done */
     {
       switch (t1)
       {
         case nc_comm:
-          sum->nc->type = t2;
+          ncRingType(sum, t2);
           break;
         case nc_lie:
           switch(t2)
           {
             case nc_skew:
-              sum->nc->type = nc_general;  break;
+              ncRingType(sum, nc_general);  break;
             case nc_comm:
-              sum->nc->type = nc_lie;  break;
+              ncRingType(sum, nc_lie);  break;
             default:
               /*sum->nc->type = nc_undef;*/  break;
           }
@@ -1185,9 +1201,9 @@ int rSum(ring r1, ring r2, ring &sum)
           switch(t2)
           {
             case nc_lie:
-              sum->nc->type = nc_lie;  break;
+              ncRingType(sum, nc_lie);  break;
             case nc_comm:
-              sum->nc->type = nc_skew;  break;
+              ncRingType(sum, nc_skew);  break;
             default:
               /*sum->nc->type = nc_undef;*/  break;
           }
@@ -1196,7 +1212,7 @@ int rSum(ring r1, ring r2, ring &sum)
           break;
       }
     }
-    if (sum->nc->type == nc_undef)
+    if (ncRingType(sum) == nc_undef)
       WarnS("Error on recognizing nc types");
     /* multiplication matrices business: */
     /* find permutations of vars and pars */
@@ -3949,7 +3965,7 @@ ring rOpposite(ring src)
   r->nc           = (nc_struct *)omAlloc0(sizeof(nc_struct));
   r->nc->ref      = 1; /* in spite of rCopy(src)? */
   r->nc->basering = r;
-  r->nc->type     =  src->nc->type;
+  ncRingType(r, ncRingType(src));
   int *perm       = (int *)omAlloc0((rVar(r)+1)*sizeof(int));
   int *par_perm   = NULL;
   nMapFunc nMap   = nSetMap(src);

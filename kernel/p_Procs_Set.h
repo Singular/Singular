@@ -11,11 +11,14 @@
  *           have to be defined before this file is included
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Set.h,v 1.11 2007-01-15 17:13:59 Singular Exp $
+ *  Version: $Id: p_Procs_Set.h,v 1.12 2007-01-31 23:51:24 motsak Exp $
  *******************************************************************/
 #include "modulop.h"
 
-#include "sca.h"
+#ifdef HAVE_PLURAL
+// for nc_p_ProcsSet:
+#include "gring.h"
+#endif
 
 
 // extract p_Procs properties from a ring
@@ -175,17 +178,10 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
          p_Procs->p_Minus_mm_Mult_qq == p_Minus_mm_Mult_qq__FieldGeneral_LengthGeneral_OrdGeneral ||
          r->OrdSgn == 1 || r->LexOrder);
 */
-  #ifdef HAVE_PLURAL
+#ifdef HAVE_PLURAL
   if (rIsPluralRing(r))
-  {
-    SetProcsGNC(r, _p_procs);
-
-    if(rIsSCA(r))
-    {
-      SetProcsSCA(r, _p_procs);
-    }
-  }
-  #endif
+    nc_p_ProcsSet(r, _p_procs); // Setup non-commutative p_Procs table!
+#endif
 }
 
 #ifdef RDEBUG

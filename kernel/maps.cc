@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.5 2005-09-05 12:30:29 Singular Exp $ */
+/* $Id: maps.cc,v 1.6 2007-01-31 23:51:24 motsak Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -257,7 +257,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
     omFreeSize(wv, sizeof(int*)*(ordersize)); wv=NULL;
     omFreeSize(names, (currRing->N)*sizeof(char*)); names=NULL;
     memset(&tmpR,0,sizeof(tmpR));
-    if ((rIsPluralRing(sourcering)) && (sourcering->nc->type!=nc_comm)) 
+    if ((rIsPluralRing(sourcering)) && (ncRingType(sourcering)!=nc_comm)) 
     {
       Werror("Sorry, not yet implemented for noncomm. rings");
       return NULL;

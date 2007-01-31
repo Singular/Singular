@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.7 2007-01-25 16:36:50 Singular Exp $
+ *  Version: $Id: sca.cc,v 1.8 2007-01-31 23:51:25 motsak Exp $
  *******************************************************************/
 
 // #define PDEBUG 2
@@ -42,8 +42,33 @@
 #include "weight.h"
 
 
-//   scaFirstAltVar( r, 0 );
-//   scaLastAltVar( r, 0 );
+// poly functions defined in p_Procs :
+
+// return pPoly * pMonom; preserve pPoly and pMonom.
+poly sca_pp_Mult_mm(const poly pPoly, const poly pMonom, const ring rRing, poly &);
+
+// return pMonom * pPoly; preserve pPoly and pMonom.
+poly sca_mm_Mult_pp(const poly pMonom, const poly pPoly, const ring rRing);
+
+// return pPoly * pMonom; preserve pMonom, destroy or reuse pPoly.
+poly sca_p_Mult_mm(poly pPoly, const poly pMonom, const ring rRing);
+
+// return pMonom * pPoly; preserve pMonom, destroy or reuse pPoly.
+poly sca_mm_Mult_p(const poly pMonom, poly pPoly, const ring rRing);
+
+
+// compute the spolynomial of p1 and p2
+poly sca_SPoly(const poly p1, const poly p2, const ring r);
+poly sca_ReduceSpoly(const poly p1, poly p2, const ring r);
+
+// Modified Plural's Buchberger's algorithmus.
+ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat);
+
+// Modified modern Sinuglar Buchberger's algorithm.
+ideal sca_bba(const ideal F, const ideal Q, const intvec *w, const intvec *, kStrategy strat);
+
+// Modified modern Sinuglar Mora's algorithm.
+ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kStrategy strat);
 
 
 
@@ -279,7 +304,7 @@ inline poly sca_xi_Mult_mm(unsigned int i, const poly pMonom, const ring rRing)
     assume( i <= scaLastAltVar(rRing));
     assume( scaFirstAltVar(rRing) <= i );
 
-    if( p_GetExp(pMonom, i, rRing) ) // result is zero!
+    if( p_GetExp(pMonom, i, rRing) != 0 ) // => result is zero!
       return NULL;
 
     const unsigned int iFirstAltVar = scaFirstAltVar(rRing);
@@ -938,7 +963,15 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 {
   assume(rIsSCA(currRing));
 
-  BOOLEAN bIdHomog = id_IsYHomogeneous(F, currRing);
+  const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
+  const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
+  
+  ideal tempF = id_KillSquares(F, m_iFirstAltVar, m_iLastAltVar, currRing);
+  const ideal tempQ = currRing->nc->SCAQuotient();
+
+  BOOLEAN bIdHomog = id_IsBiHomogeneous(tempF, m_iFirstAltVar, m_iLastAltVar, currRing);
+
+  assume( !bIdHomog || strat->homog ); //  bIdHomog =====[implies]>>>>> strat->homog
 
   strat->homog = strat->homog && bIdHomog;
 
@@ -951,10 +984,10 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
    PrintS("<sca::bba>\n");
   {
     Print("ideal F: \n");
-    for (int i = 0; i < F->idelems(); i++)
+    for (int i = 0; i < tempF->idelems(); i++)
     {
       Print("; F[%d] = ", i+1);
-      p_Write(F->m[i], currRing);
+      p_Write(tempF->m[i], currRing);
     }
     Print(";\n");
     PrintLn();
@@ -975,25 +1008,19 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 
   initBuchMoraCrit(strat); // set Gebauer, honey, sugarCrit
 
-  gr_initBba(F,strat); // set enterS, red, initEcart, initEcartPair
+  nc_gr_initBba(tempF,strat); // set enterS, red, initEcart, initEcartPair
 
   initBuchMoraPos(strat);
 
 
   // ?? set spSpolyShort, reduce ???
 
-  initBuchMora(F, NULL, strat); // Q  = squares!!!!!!!
+  initBuchMora(tempF, tempQ, strat); // currRing->nc->SCAQuotient() instead of Q == squares!!!!!!!
 
   strat->posInT=posInT110; // !!!
 
   srmax = strat->sl;
   reduc = olddeg = lrmax = 0;
-
-
-  const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
-  const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
-
-
 
 
   /* compute------------------------------------------------------- */
@@ -1060,22 +1087,24 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 
     if (strat->sl > srmax) srmax = strat->sl;
 
-    ////////////// children !!!!!!!!!!!!!
-
     const poly save = strat->P.p;
-
-//     if( save != NULL )
-    {
 
 #ifdef PDEBUG
       p_Test(save, currRing);
 #endif
+    assume( save != NULL );
+    
+    // SCA Specials:
 
+    {
       const poly pNext = pNext(save);
-
+      
+      if( pNext != NULL )
       for( unsigned int i = m_iFirstAltVar; i <= m_iLastAltVar; i++ )
-      if( pGetExp(save, i)!=0 )
+      if( p_GetExp(save, i, currRing) != 0 )
       {
+        assume(p_GetExp(save, i, currRing) == 1);
+        
         const poly tt = sca_pp_Mult_xi_pp(i, pNext, currRing);
 
 #ifdef PDEBUG
@@ -1113,8 +1142,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 //         strat->red(&h, strat); // wrt S
 //         if(h.IsNull()) continue;
 
-
-  //       poly save = p_Copy(h.p, currRing);
+//         poly save = p_Copy(h.p, currRing);
 
         int pos;
 
@@ -1157,7 +1185,9 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 
   if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
 
-//  if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
+  if (tempQ!=NULL) updateResult(strat->Shdl,tempQ,strat);
+  
+  id_Delete(&tempF, currRing);
 
 
   /* complete reduction of the standard basis--------- */
@@ -1165,7 +1195,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 //     completeReduce(strat); // ???
 
     ideal I = strat->Shdl;
-    ideal erg = kInterRed(I,NULL);
+    ideal erg = kInterRed(I,tempQ);
     assume(I!=erg);
     id_Delete(&I, currRing);
     strat->Shdl = erg;
@@ -1173,17 +1203,6 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 
 
 #if 0
-  {
-    Print("ideal S: \n");
-    for (int i = 0; i < F->idelems(); i++)
-    {
-      Print("; S[%d] = ", 1+i);
-      p_Write(F->m[i], currRing);
-    }
-    Print(";\n");
-    PrintLn();
-  }
-
    PrintS("</sca::bba>\n");
 #endif
 
@@ -1191,10 +1210,14 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 }
 
 
-// is this an exterior algebra or a commuunative polynomial ring \otimes exterior algebra?
-// we should check whether qr->qideal is of the form: y_i^2, y_{i+1}^2, \ldots, y_j^2 (j > i)
-//.if yes, setup qr->nc->type, etc.
-bool sca_SetupSCA(ring& rGR, const ring rG)
+// should be used only inside nc_SetupQuotient!
+// Check whether this our case:
+//  1. rG is  a commutative polynomial ring \otimes anticommutative algebra
+//  2. factor ideal rGR->qideal contains squares of all alternating variables.
+// 
+// if yes, make rGR a super-commutative algebra!
+// NOTE: Factors of SuperCommutative Algebras are supported this way!
+bool sca_SetupQuotient(ring rGR, const ring rG)
 {
 //   return false; // test Plural
 
@@ -1207,133 +1230,22 @@ bool sca_SetupSCA(ring& rGR, const ring rG)
   assume(rIsPluralRing(rG));
 
   const int N = rG->N;
+
   if(N < 2)
     return false;
-
-  // skew-commutative + constant skew? => no tensor products at the moment!!! Only exterior algebras are supported!
-
-//   if( rG->nc->D != NULL )
-//     return false;
 
   if(ncRingType(rG) != nc_skew)
     return false;
 
-//   if(rG->nc->IsSkewConstant != 1)
-//     return false;
-//
-//   if(!n_IsMOne(p_GetCoeff(MATELEM(rG->nc->COM,1,2),rG->nc->basering), rG->nc->basering)) // COM live in basering!
-//     return false;
+  if(rGR->qideal == NULL) // there will be a factor!
+    return false;
+
+  if(rG->qideal != NULL) // we cannot change from factor to factor!
+    return false;
 
 
-  assume(rGR->qideal != NULL);
-
-  // sort qr->qideal:
-
-  // for sanity
-  ring rSaveRing = currRing;
-
-  bool bWeChangeRing = false;
-  if(currRing != rG)
-  {
-    rChangeCurrRing(rG);
-    bWeChangeRing = true;
-  }
-
-  const ideal idQuotient = rGR->qideal;
-  const int   iQSize = idQuotient->idelems();
-
-  intvec *iv = idSort(idQuotient, FALSE); // by lex, currRing dependent!!! :(
-  assume(iv != NULL);
-
-  // check for y_{iAltVarStart}^2, y_{iAltVarStart+1}^2, \ldots, y_{iAltVarEnd}^2 (iAltVarEnd > iAltVarStart)
-  bool bSCA = true;
-
-  int iAltVarStart = -1;
-  int iAltVarEnd   = -1;
-
-  for(int i = 0; i < iQSize; i++)
-  {
-    const poly t = idQuotient->m[(*iv)[i]-1];
-
-    if( pNext(t) != NULL )
-    {
-      bSCA = false;
-      break;
-    }
-
-    const int iComp = p_GetComp(t, rG);
-
-    if( iComp > 0 )
-    {
-      bSCA = false;
-      break;
-    }
-
-    int iV = -1;
-
-    for (int j = N; j; j--)
-    {
-      const int e = p_GetExp (t, j, rGR);
-
-      if( e > 0 )
-      {
-        if( (e != 2) || (iV != -1) )
-        {
-          bSCA = false;
-          break;
-        }
-
-        iV = j;
-      }
-    }
-
-    if(!bSCA) break;
-
-    if(iV == -1)
-    {
-      bSCA = false;
-      break;
-    }
-
-    if(iAltVarStart == -1)
-    {
-      iAltVarStart = iV;
-      iAltVarEnd   = iV;
-    } else
-    {
-      if((iAltVarStart-1) == iV)
-      {
-        iAltVarStart = iV;
-      } else
-      if((iAltVarEnd+1) == iV)
-      {
-        iAltVarEnd = iV;
-      } else
-      {
-        bSCA = false;
-        break;
-      }
-    }
-  }
-
-  // cleanup:
-  delete iv;
-
-  if (bWeChangeRing)
-  {
-    rChangeCurrRing(rSaveRing);
-  }
-
-
-  if(!bSCA) return false;
-
-  assume( 1            <= iAltVarStart );
-  assume( iAltVarStart <= iAltVarEnd   );
-  assume( iAltVarEnd   <= N            );
-
-#ifdef PDEBUG
-//   Print("AltVars: [%d, %d]\n", iAltVarStart, iAltVarEnd);
-#endif
+  int iAltVarEnd = -1;
+  int iAltVarStart   = N+1;
 
   const ring rBase = rG->nc->basering;
   const matrix C   = rG->nc->C; // live in rBase!
@@ -1344,6 +1256,36 @@ bool sca_SetupSCA(ring& rGR, const ring rG)
     {
       assume(MATELEM(C,i,j) != NULL); // after CallPlural!
       number c = p_GetCoeff(MATELEM(C,i,j), rBase);
+      
+      if( n_IsMOne(c, rBase) )
+      {        
+        if( i < iAltVarStart) 
+          iAltVarStart = i;
+          
+        if( j > iAltVarEnd)
+          iAltVarEnd = j;
+      } else
+      {
+        if( !n_IsOne(c, rBase) )
+        {
+#ifdef PDEBUG
+//           Print("Wrong Coeff at: [%d, %d]\n", i, j);
+#endif
+          return false;
+        }
+      }
+    }
+  }
+
+  if( (iAltVarEnd == -1) || (iAltVarStart == (N+1)) )
+    return false; // either no alternating varables, or a single one => we are in commutative case!
+  
+  for(int i = 1; i < N; i++)
+  {
+    for(int j = i + 1; j <= N; j++)
+    {
+      assume(MATELEM(C,i,j) != NULL); // after CallPlural!
+      number c = p_GetCoeff(MATELEM(C,i,j), rBase);      
 
       if( (iAltVarStart <= i) && (j <= iAltVarEnd) ) // S <= i < j <= E
       { // anticommutative part
@@ -1367,20 +1309,81 @@ bool sca_SetupSCA(ring& rGR, const ring rG)
     }
   }
 
+  assume( 1            <= iAltVarStart );
+  assume( iAltVarStart < iAltVarEnd   );
+  assume( iAltVarEnd   <= N            );
+
+  bool bWeChangeRing = false;
+  // for sanity
+  ring rSaveRing = currRing;
+
+  if(rSaveRing != rG)
+  {
+    rChangeCurrRing(rG);
+    bWeChangeRing = true;
+  }
+
+  assume(rGR->qideal != NULL);
+  assume(rG->qideal == NULL);
+  
+  const ideal idQuotient = rGR->qideal;
+
+  // check for 
+  // y_{iAltVarStart}^2, y_{iAltVarStart+1}^2, \ldots, y_{iAltVarEnd}^2  (iAltVarEnd > iAltVarStart) 
+  // to be within quotient ideal.
+
+  bool bSCA = true;
+
+  for ( int i = iAltVarStart; (i <= iAltVarEnd) && bSCA; i++ )
+  {
+    poly square = p_ISet(1, rSaveRing);
+    p_SetExp(square, i, 2, rSaveRing); // square = var(i)^2.
+    p_Setm(square, rSaveRing);
+
+    // square = NF( var(i)^2 | Q )
+    // NOTE: rSaveRing == currRing now! 
+    // NOTE: there is no better way to check this in general!
+    square = kNF(idQuotient, NULL, square, 0, 0); 
+    
+    if( square != NULL ) // var(i)^2 is not in Q?
+    {
+      p_Delete(&square, rSaveRing);
+      bSCA = false;      
+    }    
+  }
+  
+
+  if (bWeChangeRing)
+  {
+    rChangeCurrRing(rSaveRing);
+  }
+
+  if(!bSCA) return false;
+  
+
+
+#ifdef PDEBUG
+//  Print("AltVars: [%d, %d]\n", iAltVarStart, iAltVarEnd);
+#endif
+
+
   //////////////////////////////////////////////////////////////////////////
-  // ok... let's setup it!!!
+  // ok... here we go. let's setup it!!!
   //////////////////////////////////////////////////////////////////////////
+  ideal tempQ = id_KillSquares(idQuotient, iAltVarStart, iAltVarEnd, rG); // in rG!!!
+
+  rGR->nc->SCAQuotient() = idrMoveR(tempQ, rG, rGR); // deletes tempQ!
 
   ncRingType( rGR, nc_exterior );
 
   scaFirstAltVar( rGR, iAltVarStart );
   scaLastAltVar( rGR, iAltVarEnd );
 
-  // ????????????????????????????????????????????????????????????????????????????????
-  // check ordering!!! alternating variables must be bigger than all other variables?
 
-  SetProcsSCA(rGR, rGR->p_Procs);
 
+  sca_p_ProcsSet(rGR, rGR->p_Procs);
+
+  
   return true;
 }
 
@@ -1417,7 +1420,12 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec *hilb
 {
   assume(rIsSCA(currRing));
 
-  BOOLEAN bIdHomog = id_IsYHomogeneous(F, currRing);
+  const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
+  const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
+
+  BOOLEAN bIdHomog = id_IsBiHomogeneous(F, m_iFirstAltVar, m_iLastAltVar, currRing);
+
+  assume( !bIdHomog || strat->homog ); //  bIdHomog =====[implies]>>>>> strat->homog
 
   strat->homog = strat->homog && bIdHomog;
 
@@ -1441,7 +1449,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec *hilb
 
 //   initHilbCrit(F, Q, &hilb, strat);
 
-//  gr_initBba(F,strat);
+//  nc_gr_initBba(F,strat);
   initBba(F, strat); // set enterS, red, initEcart, initEcartPair
 
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
@@ -1475,10 +1483,6 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec *hilb
 
   ///////////////////////////////////////////////////////////////
   // SCA:
-  const unsigned short m_iFirstAltVar = scaFirstAltVar(currRing);
-  const unsigned short m_iLastAltVar  = scaLastAltVar(currRing);
-
-
 
   /* compute------------------------------------------------------- */
   while (strat->Ll >= 0)
@@ -1642,9 +1646,11 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec *hilb
       const poly pNext = pNext(pSave);
 
 //       if(0)
-      for( unsigned short i = m_iFirstAltVar; i <= m_iLastAltVar; i++ )
-      if( p_GetExp(pSave, i, currRing) )
+      for( unsigned int i = m_iFirstAltVar; i <= m_iLastAltVar; i++ )
+      if( p_GetExp(pSave, i, currRing) != 0 )
       {
+        assume(p_GetExp(pSave, i, currRing) == 1);
+        
         const poly pNew = sca_pp_Mult_xi_pp(i, pNext, currRing);
 
 #ifdef PDEBUG
@@ -1782,69 +1788,6 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec *hilb
 }
 
 
-
-// y-Degree
-inline long p_yDegree(const poly p, const ring r)
-{
-  assume(rIsSCA(r));
-
-  const unsigned short m_iFirstAltVar = scaFirstAltVar(r);
-  const unsigned short m_iLastAltVar  = scaLastAltVar(r);
-
-  long sum = 0;
-
-  for(int i = m_iFirstAltVar; i <= m_iLastAltVar; i++)
-    sum += p_GetExp(p, i, r);
-
-  return sum;
-}
-
-
-
-
-/**2
- * tests whether p is sca-homogeneous without respect to the actual weigths(=>all ones)
- */
-BOOLEAN p_IsYHomogeneous(const poly p, const ring r)
-{
-  assume(rIsSCA(r));
-
-  if( p == NULL ) return TRUE;
-
-  poly q = p;
-
-  const long o = p_yDegree(q, r);
-  pIter(q);
-
-  while( q != NULL )
-  {
-    if (p_yDegree(q,r) != o) return FALSE;
-    pIter(q);
-  }
-
-  return TRUE;
-}
-
-
-/*2
-*returns true if id is y-homogenous without respect to the aktual weights(=> all ones)
-*/
-BOOLEAN id_IsYHomogeneous(const ideal id, const ring r)
-{
-  if (id == NULL) return TRUE;
-
-  const int iSize = IDELEMS(id);
-
-  if (iSize == 0) return TRUE;
-
-  BOOLEAN b = TRUE;
-
-  for(int i = iSize - 1; (i >= 0 ) && b; i--)
-    b = p_IsYHomogeneous(id->m[i], r);
-
-  return b;
-}
-
 // //////////////////////////////////////////////////////////////////////////////
 // sca mora...
 
@@ -1883,7 +1826,18 @@ static int sca_mora_loop_count;
 // ideal sca_mora (ideal F, ideal Q, intvec *w, intvec *, kStrategy strat)
 ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kStrategy strat)
 {
-  BOOLEAN bIdHomog = id_IsYHomogeneous(F, currRing);
+  assume(rIsSCA(currRing));
+
+  const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
+  const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
+  
+  ideal tempF = id_KillSquares(F, m_iFirstAltVar, m_iLastAltVar, currRing);
+  
+  const ideal tempQ = currRing->nc->SCAQuotient();
+
+  BOOLEAN bIdHomog = id_IsBiHomogeneous(tempF, m_iFirstAltVar, m_iLastAltVar, currRing);
+
+  assume( !bIdHomog || strat->homog ); //  bIdHomog =====[implies]>>>>> strat->homog
 
   strat->homog = strat->homog && bIdHomog;
 
@@ -1891,11 +1845,11 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
   assume( strat->homog == bIdHomog );
 #endif /*PDEBUG*/
 
-
 #ifdef HAVE_ASSUME
   sca_mora_count++;
   sca_mora_loop_count = 0;
 #endif
+
 #ifdef KDEBUG
   om_Opts.MinTrack = 5;
 #endif
@@ -1910,9 +1864,9 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
   /*- setting global variables ------------------- -*/
   initBuchMoraCrit(strat);
 //   initHilbCrit(F,NULL,&hilb,strat); // no Q!
-  initMora(F,strat);
+  initMora(tempF, strat);
   initBuchMoraPos(strat);
-  /*Shdl=*/initBuchMora(F,NULL,strat); // no Q!
+  /*Shdl=*/initBuchMora(tempF, tempQ, strat); // temp Q, F!
 //   if (TEST_OPT_FASTHC) missingAxis(&strat->lastAxis,strat);
   /*updateS in initBuchMora has Hecketest
   * and could have put strat->kHEdgdeFound FALSE*/
@@ -1950,10 +1904,6 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
 //     kStratInitChangeTailRing(strat);
 #endif
 
-
-  // 4SCA:
-  const unsigned short m_iFirstAltVar = scaFirstAltVar(currRing);
-  const unsigned short m_iLastAltVar  = scaLastAltVar(currRing);
 
   while (strat->Ll >= 0)
   {
@@ -2051,9 +2001,9 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
       const poly pSave = strat->P.p;
       const poly pNext = pNext(pSave);
 
-//       if(0)
-      for( unsigned short i = m_iFirstAltVar; i <= m_iLastAltVar; i++ )
-      if( p_GetExp(pSave, i, currRing) )
+      if(pNext != NULL)
+      for( unsigned int i = m_iFirstAltVar; i <= m_iLastAltVar; i++ )
+      if( p_GetExp(pSave, i, currRing) != 0 )
       {
 
         assume(p_GetExp(pSave, i, currRing) == 1);
@@ -2141,8 +2091,11 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
       ecartWeights=NULL;
     }
   }
-//   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
+  if (tempQ!=NULL) updateResult(strat->Shdl,tempQ,strat);
   idTest(strat->Shdl);
+  
+  id_Delete( &tempF, currRing);
+  
   return (strat->Shdl);
 }
 
@@ -2151,7 +2104,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
 
 
 
-void SetProcsSCA(ring& rGR, p_Procs_s* p_Procs)
+void sca_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
 {
 
   // "commutative" procedures:
@@ -2213,4 +2166,214 @@ void SetProcsSCA(ring& rGR, p_Procs_s* p_Procs)
 
 #endif
 }
+
+
+// bi-Degree (x, y) of lm(p)
+// Y are ones from iFirstAltVar up to iLastAltVar
+inline void p_GetSCADegree(const poly p, 
+  const unsigned int iFirstAltVar, const unsigned int iLastAltVar, 
+  long& dx, long& dy, const ring r)
+{
+  const unsigned int N  = r->N;
+
+  int i = 1;
+  
+  dx = 0;
+  dy = 0;
+  
+  for(; i < iFirstAltVar; i++)
+    dx += p_GetExp(p, i, r);
+
+  for(; i <= iLastAltVar; i++)
+    dy += p_GetExp(p, i, r);
+
+  for(; i <= N; i++)
+    dx += p_GetExp(p, i, r);
+}
+
+// tests whether p is bi-homogeneous without respect to the actual weigths(=>all ones)
+// Polynomial is bi-homogeneous iff all monomials have the same bi-degree (x,y).
+// Y are ones from iFirstAltVar up to iLastAltVar
+bool p_IsBiHomogeneous(const poly p, 
+  const unsigned int iFirstAltVar, const unsigned int iLastAltVar, 
+  const ring r)
+{
+  if( p == NULL ) return true;
+
+  poly q = p;
+
+
+  long dx, dy;
+
+  p_GetSCADegree( q, iFirstAltVar, iLastAltVar, dx, dy, r); // get bi degree of lm(p)
+
+  pIter(q);
+
+  for(; q != NULL; pIter(q) )
+  {
+    long x, y;    
+    
+    p_GetSCADegree( q, iFirstAltVar, iLastAltVar, x, y, r); // get bi degree of q
+    
+    if ( (x != dx) || (y != dy) ) return false;
+  }
+
+  return true;
+}
+
+
+// returns true if id is bi-homogenous without respect to the aktual weights(=> all ones)
+bool id_IsBiHomogeneous(const ideal id, 
+  const unsigned int iFirstAltVar, const unsigned int iLastAltVar, 
+  const ring r)
+{
+  if (id == NULL) return true; // zero ideal
+
+  const int iSize = IDELEMS(id);
+
+  if (iSize == 0) return true;
+
+  bool b = true;
+
+  for(int i = iSize - 1; (i >= 0 ) && b; i--)
+    b = p_IsBiHomogeneous(id->m[i], iFirstAltVar, iLastAltVar, r);
+
+  return b;
+}
+
+
+
+
+// reduce term lt(m) modulo <y_i^2> , i = iFirstAltVar .. iLastAltVar:
+// either create a copy of m or return NULL
+inline poly m_KillSquares(const poly m, 
+  const unsigned int iFirstAltVar, const unsigned int iLastAltVar, 
+  const ring r)
+{  
+#ifdef PDEBUG
+  p_Test(m, r);
+
+#if 0
+  Print("m_KillSquares, m = "); // !
+  p_Write(m, r);
+#endif
+#endif
+
+  assume( m != NULL );
+
+  for(int k = iFirstAltVar; k <= iLastAltVar; k++)
+    if( p_GetExp(m, k, r) > 1 )
+      return NULL;  
+  
+  return p_Head(m, r);
+}
+
+
+// reduce polynomial p modulo <y_i^2> , i = iFirstAltVar .. iLastAltVar
+poly p_KillSquares(const poly p, 
+  const unsigned int iFirstAltVar, const unsigned int iLastAltVar, 
+  const ring r)
+{  
+#ifdef PDEBUG
+  p_Test(p, r);
+
+#if 0
+  Print("p_KillSquares, p = "); // !
+  p_Write(p, r);
+#endif
+#endif
+
+
+  if( p == NULL )
+    return NULL;
+
+  poly pResult = NULL;
+  poly* ppPrev = &pResult;
+
+  for( poly q = p; q!= NULL; pIter(q) )
+  {
+#ifdef PDEBUG
+    p_Test(q, r);
+#endif
+
+    // terms will be in the same order because of quasi-ordering!    
+    poly v = m_KillSquares(q, iFirstAltVar, iLastAltVar, r);
+
+    if( v != NULL )
+    {
+      *ppPrev = v;
+      ppPrev = &pNext(v);
+    }
+
+  }
+
+#ifdef PDEBUG
+  p_Test(pResult, r);
+#if 0
+  Print("p_KillSquares => "); // !
+  p_Write(pResult, r);
+#endif
+#endif
+
+  return(pResult);
+}
+  
+
+
+
+// reduces ideal id modulo <y_i^2> , i = iFirstAltVar .. iLastAltVar
+// returns the reduced ideal or zero ideal. 
+ideal id_KillSquares(const ideal id, 
+  const unsigned int iFirstAltVar, const unsigned int iLastAltVar, 
+  const ring r)
+{
+  if (id == NULL) return id; // zero ideal
+
+  const int iSize = id->idelems();
+
+  if (iSize == 0) return id;
+ 
+  ideal temp = idInit(iSize, 1);
+  
+#if 0
+   PrintS("<id_KillSquares>\n");
+  {
+    Print("ideal id: \n");
+    for (int i = 0; i < id->idelems(); i++)
+    {
+      Print("; id[%d] = ", i+1);
+      p_Write(id->m[i], r);
+    }
+    Print(";\n");
+    PrintLn();
+  }
+#endif
+  
+
+  for (int j = 0; j < iSize; j++)
+    temp->m[j] = p_KillSquares(id->m[j], iFirstAltVar, iLastAltVar, r);
+
+  idSkipZeroes(temp);
+
+#if 0
+   PrintS("<id_KillSquares>\n");
+  {
+    Print("ideal temp: \n");
+    for (int i = 0; i < temp->idelems(); i++)
+    {
+      Print("; temp[%d] = ", i+1);
+      p_Write(temp->m[i], r);
+    }
+    Print(";\n");
+    PrintLn();
+  }
+   PrintS("</id_KillSquares>\n");
+#endif
+
+  return temp;
+}
+
+
+
+
 #endif

@@ -3,57 +3,48 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.17 2007-01-11 11:27:25 Singular Exp $ */
+/* $Id: gring.h,v 1.18 2007-01-31 23:51:24 motsak Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
 
 #ifdef HAVE_PLURAL
-#include "structs.h"
-#include "ring.h"
+
+#include <structs.h>
+#include <ring.h>
 
 /* the part, related to the interface */
 BOOLEAN nc_CallPlural(matrix CC, matrix DD, poly CN, poly DN, ring r);
+
 BOOLEAN nc_CheckOrdCondition(matrix D, ring r);
 BOOLEAN nc_CheckSubalgebra(poly PolyVar, ring r);
-BOOLEAN nc_InitMultiplication(ring r);
+BOOLEAN nc_InitMultiplication(ring r); // should call nc_p_ProcsSet!
 BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate);
 
-// set pProcs for r and global variable p_Procs
-void SetProcsGNC(ring& rGR, p_Procs_s* p_Procs);
 
-ring nc_rCreateNCcomm(ring r);
-void ncKill(ring r);
+// set pProcs table for rGR and global variable p_Procs
+// this should be used by p_ProcsSet in p_Procs_Set.h
+void nc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs);
+
+// this function should be used inside QRing definition!
+// we go from rG into factor ring rGR with factor ideal rGR->qideal.
+bool nc_SetupQuotient(ring rGR, const ring rG);
+
+
+// used by "rSum" from ring.cc only! 
+// purpose init nc structure for initially commutative ring:
+// "creates a commutative nc extension; "converts" comm.ring to a Plural ring"
+ring nc_rCreateNCcomm(ring r); 
+
 void ncCleanUp(ring r); /* smaller than kill */
-
-/* poly functions defined in p_Procs : */
-
-/* other routines we need in addition : */
-// poly gnc_p_Minus_mm_Mult_qq(poly p, const poly m, poly q, const ring r);
-
-// #define PLURAL_INTERNAL_DECLARATIONS
-
-#ifdef PLURAL_INTERNAL_DECLARATIONS
-// // poly gnc_p_Minus_mm_Mult_qq_ign(poly p, const poly m, poly q, int & d1, poly d2, const ring ri, poly &d3);
+void ncKill(ring r);
 
 
-poly gnc_pp_Mult_mm(const poly p, const poly m, const ring r, poly &last);
-poly gnc_p_Mult_mm(poly p, const poly m, const ring r);
-poly gnc_mm_Mult_p(const poly m, poly p, const ring r);
-poly gnc_mm_Mult_pp(const poly m, const poly p, const ring r);
-#endif
-
-
-
-// // for p_Minus_mm_Mult_qq in pInline2.h
-// poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp, int lq, const ring r);
-// // for p_Plus_mm_Mult_qq in pInline2.h
-// poly nc_p_Plus_mm_Mult_qq (poly p, const poly m, const poly q, int &lp, int lq, const ring r);
-
-
-//
+// for p_Minus_mm_Mult_qq in pInline2.h
 poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp,
                                     const int, const poly, const ring r);
+
+// // for p_Plus_mm_Mult_qq in pInline2.h
 // returns p + m*q destroys p, const: q, m
 poly nc_p_Plus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp,
                               const int, const ring r);
@@ -75,35 +66,6 @@ poly nc_p_CopyPut(poly a, const ring r);
 
 void nc_PolyPolyRed(poly &b, poly p, number *c);
 poly nc_CreateShortSpoly(poly p1, poly p2, const ring r=currRing);
-
-
-#define PLURAL_INTERNAL_DECLARATIONS
-#ifdef PLURAL_INTERNAL_DECLARATIONS
-/* syzygies : */
-poly gnc_CreateSpolyOld(const poly p1, const poly p2/*, poly spNoether*/, const ring r);
-poly gnc_ReduceSpolyOld(const poly p1, poly p2/*, poly spNoether*/, const ring r);
-
-poly gnc_CreateSpolyNew(const poly p1, const poly p2/*, poly spNoether*/, const ring r);
-poly gnc_ReduceSpolyNew(const poly p1, poly p2/*, poly spNoether*/, const ring r);
-
-
-
-void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c);
-void gnc_kBucketPolyRed_ZNew(kBucket_pt b, poly p, number *c);
-
-void gnc_kBucketPolyRedOld(kBucket_pt b, poly p, number *c);
-void gnc_kBucketPolyRed_ZOld(kBucket_pt b, poly p, number *c);
-
-
-// poly gnc_ReduceSpolyNew(poly p1, poly p2, poly spNoether, const ring r);
-// void gnc_ReduceSpolyTail(poly p1, poly q, poly q2, poly spNoether, const ring r);
-
-/* void nc_kBucketPolyRed(kBucket_pt b, poly p); */
-void gr_initBba(ideal F,kStrategy strat);
-
-ideal gnc_gr_bba (const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat);
-ideal gnc_gr_mora(const ideal, const ideal, const intvec *, const intvec *, kStrategy); // Not yet!
-#endif
 
 
 /* brackets: */
@@ -158,7 +120,7 @@ inline poly nc_mm_Mult_pp(const poly m, const poly p, const ring r)
 
 
 // returns m*p, does destroy p, preserves m
-inline poly mm_Mult_p(const poly m, poly p, const ring r)
+inline poly nc_mm_Mult_p(const poly m, poly p, const ring r)
 {
   assume(rIsPluralRing(r));
   assume(r->nc->p_Procs.mm_Mult_p!=NULL);
@@ -225,5 +187,13 @@ inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const intvec *
 // Macros used to access upper triangle matrices C,D... (which are actually ideals) // afaik
 #define UPMATELEM(i,j,nVar) ( (nVar * ((i)-1) - ((i) * ((i)-1))/2 + (j)-1)-(i) )
 
-#endif
-#endif
+
+#ifdef PLURAL_INTERNAL_DECLARATIONS
+
+// we need nc_gr_initBba for sca_gr_bba and gr_bba.
+void nc_gr_initBba(ideal F,kStrategy strat); 
+
+#endif // PLURAL_INTERNAL_DECLARATIONS
+
+#endif // HAVE_PLURAL :(
+#endif // 

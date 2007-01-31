@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.37 2007-01-24 10:00:55 Singular Exp $ */
+/* $Id: ideals.cc,v 1.38 2007-01-31 23:51:24 motsak Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2313,7 +2313,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
     /* in the NC case, we have to check the admissibility of */
     /* the subalgebra to be intersected with */
   {
-    if (currRing->nc->type!=nc_skew) /* in (quasi)-commutative algebras every subalgebra is admissible */
+    if (ncRingType(currRing)!=nc_skew) /* in (quasi)-commutative algebras every subalgebra is admissible */
     {
       if (nc_CheckSubalgebra(delVar,currRing))
       {
