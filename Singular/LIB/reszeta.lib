@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: reszeta.lib,v 1.9 2006-07-25 17:54:29 Singular Exp $";
+version="$Id: reszeta.lib,v 1.10 2007-02-01 18:39:17 krueger Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  reszeta.lib       Zeta-function of Denef and Loeser
@@ -1757,7 +1757,7 @@ COMPUTE:  local Denef-Loeser zeta function, if string s1 is present and
              characteristic polynomial of the monodromy is computed
 RETURN:   list l
           if a is not present:
-          l[1]: string specifying the Denef-Loeser zeta function
+          l[1]: string specifying the Denef-Loeser zeta function 
           l[2]: string specifying characteristic polynomial of monodromy,
                 if "A" was specified
           if a is present
@@ -3295,6 +3295,7 @@ EXAMPLE:  example intersectionDiv;  shows an example
    }
    iden=tmpiden;                      // store the modified divisor list
    kill tmpiden;                      // and clean up temporary objects
+iden;
 //---------------------------------------------------------------------------
 // Now we have decomposed everything into irreducible components over Q,
 // but over C there might still be some reducible ones left:
@@ -4061,7 +4062,8 @@ RETURN:   list l, where
                 is divisor k (if k!=0)
                 if k==0, no divisor corresponding to i,j
           l[2]: list ll, where each entry of ll is a list of intvecs
-                entry i,j in list ll[k] implies BO[4][j] of chart i is divisor k
+                entry i,j in list ll[k] implies BO[4][j] of chart i
+                is divisor k
           l[3]: list L
 EXAMPLE:  example collectDiv;   shows an example
 "
@@ -4426,7 +4428,7 @@ example
 //we really need to blow up curves even if the generic point of
 //the curve the total transform is n.c.
 //this occurs here in r[2][5]
-   list re=resolve(I,0);
+   list re=resolve(I,1);
    list di=collectDiv(re);
    di;
 }
@@ -4830,6 +4832,7 @@ proc fetchInTree(list L,
 //----------------------------------------------------------------------------
    if(size(algext)>0)
    {
+//--- size(algext)>0: case of algebraic extension of base field
       if(defined(tstr)){kill tstr;}
       string tstr="ring So1=(0,t),("+varstr(L[2][o1])+"),("+ordstr(L[2][o1])+");";
       execute(tstr);
@@ -4867,6 +4870,7 @@ proc fetchInTree(list L,
    }
    else
    {
+//--- size(algext)==0: no algebraic extension of base needed
       def So1=L[2][o1];
       setring So1;
       if(defined(id1)) { kill id1; }
@@ -4881,14 +4885,13 @@ proc fetchInTree(list L,
          return(ideal(1));
       }
      // id1=radical(id1);
-
       ideal id2=1;
       list idlist;
       if(defined(notE)){kill notE;}
       list notE;
       intvec nE;
       idlist[1]=list(id1,id2,nE);
-   }
+   }        
    if(defined(tli)){kill tli;}
    list tli;
    if(defined(id1)) { kill id1; }
@@ -4899,25 +4902,35 @@ proc fetchInTree(list L,
    ideal Etemp;
    for(m=1;m<=size(idlist);m++)
    {
+//!!! Duplicate Block!!! All changes also needed below!!!
+//!!! no subprocedure due to large data overhead!!!
+//--- run through all ideals to be fetched
       id1=idlist[m][1];
       id2=idlist[m][2];
       nE=idlist[m][3];
       for(i=branchPos-1;i<=size(BO[4]);i++)
       {
+//--- run through all relevant exceptional divisors
         if(size(reduce(BO[4][i],std(id1+BO[1])))==0)
         {
+//--- V(id1) is contained in except. div. i in this chart
            if(size(reduce(id1,std(BO[4][i])))!=0)
            {
+//--- V(id1) does not equal except. div. i of this chart
              Etemp=BO[4][i];
              if(npars(basering)>0)
              {
+//--- we are in an algebraic extension of the base field
                 if(defined(prtemp)){kill prtemp;}
-                list prtemp=minAssGTZ(BO[4][i]);
+                list prtemp=minAssGTZ(BO[4][i]);  // C-comp. of except. div.
+                j=1;                   
                 if(size(prtemp)>1)
                 {
+//--- more than 1 component
                   Etemp=ideal(1);
                   for(j=1;j<=size(prtemp);j++)
                   {
+//--- find correct component
                      if(size(reduce(prtemp[j],std(id1)))==0)
                      {
                         Etemp=prtemp[j];
@@ -4929,18 +4942,45 @@ proc fetchInTree(list L,
                     ERROR("fetchInTree:something wrong in field extension");
                   }
                 }
+                prtemp=delete(prtemp,j); // remove this comp. from list
+                while(size(prtemp)>1)
+                {
+//--- collect all the others into prtemp[1]
+                  prtemp[1]=intersect(prtemp[1],prtemp[size(prtemp)]);
+                  prtemp=delete(prtemp,size(prtemp));
+                }
              }
+//--- determine tli[1] and tli[2] such that 
+//--- V(id1) \cap D(id2) = V(tli[1]) \cap D(tli[2]) \cap BO[4][i]
+//--- inside V(BO[1]) (and if necessary inside V(BO[1]+BO[2]))
              if(inJ)
              {
-                tli=findTrans(id1+BO[2],Etemp,notE,BO[2]);
+                tli=findTrans(id1+BO[2]+BO[1],Etemp,notE,BO[2]);
              }
              else
              {
-                tli=findTrans(id1,Etemp,notE);
+                tli=findTrans(id1+BO[1],Etemp,notE);
+             }
+             if(npars(basering)>0)
+             {
+//--- in algebraic extension: make sure we stay outside the other components
+                if(size(prtemp)>0)
+                {
+                   for(j=1;j<=ncols(prtemp[1]);j++)
+                   {
+//--- find the (univariate) generator of prtemp[1] which is the remaining
+//--- factor from the factorization over the extension field
+                      if(size(reduce(prtemp[1][j],std(id1)))>0)
+                      {
+                         tli[2]=tli[2]*prtemp[1][j];
+                      }
+                   }
+                }
              }
            }
            else
            {
+//--- V(id1) equals except. div. i of this chart
              tli[1]=ideal(0);
              tli[2]=ideal(1);
            }
@@ -4964,6 +5004,7 @@ proc fetchInTree(list L,
         idlist[m][2]=id2;
         idlist[m][3]=nE;
       }
+//!!! End of Duplicate Block !!!!
    }
    if(o1>1)
    {
@@ -5015,16 +5056,70 @@ proc fetchInTree(list L,
          setring S;
          if(defined(phi)) { kill phi; }
          map phi=T,lastMap;
+//--- now do the actual blowing down ...
          for(m=1;m<=size(idlist);m++)
          {
+//--- ... for each entry of idlist separately
             if(defined(id1)){kill id1;}
             if(defined(id2)){kill id2;}
             ideal id1=idlist[m][1]+BO[1];
-            ideal id2=idlist[m][2]+BO[1];
+            ideal id2=idlist[m][2];
             nE=idlist[m][3];
+            if(defined(debug_fetchInTree)>0)
+            {
+               "Blowing down entry",m,"of idlist:";
+               setring S;
+               "Abbildung:";phi;
+               "before preimage";
+               id1;
+               id2;
+            }
             setring T;
             ideal id1=preimage(S,phi,id1);
             ideal id2=preimage(S,phi,id2);
+            if(defined(debug_fetchInTree)>0)
+            {
+               "after preimage";
+               id1;
+               id2;
+            }
+            if(size(id2)==0)
+            {
+//--- preimage of (principal ideal) id2 was zero, i.e. 
+//--- generator of previous id2 not in image
+              setring S;
+//--- it might just be one offending factor ==> factorize
+              ideal id2factors=factorize(id2[1])[1];
+              int zzz=size(id2factors);
+              ideal curfactor;
+              setring T;
+              id2=ideal(1);
+              ideal curfactor;
+              for(int mm=1;mm<=zzz;mm++)
+              {
+//--- blow down each factor separately
+                 setring S;
+                 curfactor=id2factors[mm];
+                 setring T;
+                 curfactor=preimage(S,phi,curfactor);
+                 if(size(curfactor)>0)
+                 {
+                    id2[1]=id2[1]*curfactor[1];
+                 }
+              }
+              kill curfactor;
+              setring S;
+              kill curfactor;
+              kill id2factors;
+              setring T;
+              kill mm;
+              kill zzz;
+              if(defined(debug_fetchInTree)>0)
+              {
+                 "corrected id2:";
+                 id2;
+              }
+            }
             idlist[m]=list(id1,id2,nE);
             kill id1,id2;
             setring S;
@@ -5034,6 +5129,9 @@ proc fetchInTree(list L,
 //--- exceptional divisor
          for(m=1;m<=size(idlist);m++)
          {
+//!!! Duplicate Block!!! All changes also needed above!!!
+//!!! no subprocedure due to large data overhead!!!
+//--- run through all ideals to be fetched
             if(defined(id1)) {kill id1;}
             if(defined(id2)) {kill id2;}
             if(defined(notE)) {kill notE;}
@@ -5044,21 +5142,27 @@ proc fetchInTree(list L,
             nE=idlist[m][3];
             for(i=branchPos-1;i<=size(BO[4]);i++)
             {
+//--- run through all relevant exceptional divisors
                if(size(reduce(BO[4][i],std(id1)))==0)
                {
+//--- V(id1) is contained in except. div. i in this chart
                   if(size(reduce(id1,std(BO[4][i])))!=0)
                   {
+//--- V(id1) does not equal except. div. i of this chart
                      if(defined(Etemp)) {kill Etemp;}
                      ideal Etemp=BO[4][i];
                      if(npars(basering)>0)
                      {
+//--- we are in an algebraic extension of the base field
                         if(defined(prtemp)){kill prtemp;}
-                        list prtemp=minAssGTZ(BO[4][i]);
+                        list prtemp=minAssGTZ(BO[4][i]); // C-comp.except.div.
                         if(size(prtemp)>1)
                         {
+//--- more than 1 component
                            Etemp=ideal(1);
                            for(j=1;j<=size(prtemp);j++)
                            {
+//--- find correct component
                                if(size(reduce(prtemp[j],std(id1)))==0)
                                {
                                   Etemp=prtemp[j];
@@ -5070,16 +5174,42 @@ proc fetchInTree(list L,
                               ERROR("fetchInTree:something wrong in field extension");
                            }
                         }
+                        prtemp=delete(prtemp,j); // remove this comp. from list
+                        while(size(prtemp)>1)
+                        {
+//--- collect all the others into prtemp[1]
+                           prtemp[1]=intersect(prtemp[1],prtemp[size(prtemp)]);
+                           prtemp=delete(prtemp,size(prtemp));
+                        }
                      }
                      if(defined(tli)) {kill tli;}
+//--- determine tli[1] and tli[2] such that 
+//--- V(id1) \cap D(id2) = V(tli[1]) \cap D(tli[2]) \cap BO[4][i]
+//--- inside V(BO[1]) (and if necessary inside V(BO[1]+BO[2]))
                      if(inJ)
                      {
-                        def tli=findTrans(id1+BO[2],Etemp,notE,BO[2]);
+                        def tli=findTrans(id1+BO[2]+BO[1],Etemp,notE,BO[2]);
                      }
                      else
                      {
-                        def tli=findTrans(id1,Etemp,notE);
+                        def tli=findTrans(id1+BO[1],Etemp,notE);
                      }
+                    if(npars(basering)>0)
+                    {
+//--- in algebraic extension: make sure we stay outside the other components
+                      if(size(prtemp)>0)
+                      {
+                         for(j=1;j<=ncols(prtemp[1]);j++)
+                         {
+//--- find the (univariate) generator of prtemp[1] which is the remaining
+//--- factor from the factorization over the extension field
+                           if(size(reduce(prtemp[1][j],std(id1)))>0)
+                           {
+                              tli[2]=tli[2]*prtemp[1][j];
+                           }
+                         }
+                      }
+                    }
                   }
                   else
                   {
@@ -5106,6 +5236,7 @@ proc fetchInTree(list L,
                idlist[m][2]=id2;
                idlist[m][3]=nE;
             }
+//!!! End of Duplicate Block !!!!
          }
          kill S;
          if(defined(und_jetzt_raus))
@@ -5114,6 +5245,15 @@ proc fetchInTree(list L,
            break;
          }
       }
+      if(defined(debug_fetchInTree)>0)
+      {
+        "idlist after current blow down step:";
+        idlist;
+      }
+   }
+   if(defined(debug_fetchInTree)>0)
+   {
+      "Blowing down ended";
    }
 //----------------------------------------------------------------------------
 // Blow up ideal id1 from L[2][comPa] to L[2][m1]. To this end, first
@@ -5121,12 +5261,15 @@ proc fetchInTree(list L,
 //----------------------------------------------------------------------------
    if(m1==comPa)
    {
+//--- no further blow ups needed
       if(size(algext)==0)
       {
+//--- no field extension ==> we are done
         return(idlist[1][1]);
       }
       else
       {
+//--- field extension ==> we need to encode the result
         list retlist;
         for(m=1;m<=size(idlist);m++)
         {
@@ -5135,6 +5278,7 @@ proc fetchInTree(list L,
         return(retlist);
       }
    }
+//--- we need to blow up
    if(defined(path_m1)) { kill path_m1; }
    matrix path_m1=imap(Sm1,path);
    intvec path_togo;
@@ -5149,10 +5293,12 @@ proc fetchInTree(list L,
    i=1;
    while(i<size(path_togo))
    {
+//--- we need to blow up following the path path_togo through the tree 
       def S=basering;
       if(defined(T)){kill T;}
       if(size(algext)>0)
       {
+//--- in an algebraic extension of the base field
          if(defined(T0)){kill T0;}
          def T0=L[2][path_togo[i+1]];
          if(defined(tstr)){kill tstr;}
@@ -5168,6 +5314,12 @@ proc fetchInTree(list L,
          if(defined(phi)){kill phi;}
          map phi=S,lastMap;
          list idlist=phi(idlist);
+         if(defined(debug_fetchInTree)>0)
+         {
+           "in blowing up (algebraic extension case):";
+           phi;
+           idlist;
+         }
       }
       else
       {
@@ -5179,11 +5331,23 @@ proc fetchInTree(list L,
          list idlist=phi(idlist);
          idlist[1][1]=radical(idlist[1][1]);
          idlist[1][2]=radical(idlist[1][2]);
+         if(defined(debug_fetchInTree)>0)
+         {
+           "in blowing up (case without field extension):";
+           phi;
+           idlist;
+         }
       }
       for(m=1;m<=size(idlist);m++)
       {
+//--- get rid of new exceptional divisor
          idlist[m][1]=sat(idlist[m][1]+BO[1],BO[4][size(BO[4])])[1];
          idlist[m][2]=sat(idlist[m][2],BO[4][size(BO[4])])[1];
+      }
+      if(defined(debug_fetchInTree)>0)
+      {
+        "after saturation:";
+        idlist;
       }
       if((size(algext)==0)&&(deg(std(idlist[1][1])[1])==0))
       {
@@ -5194,6 +5358,13 @@ proc fetchInTree(list L,
       kill S;
       i++;
    }
+   if(defined(debug_fetchInTree)>0)
+   {
+      "End of blowing up steps";
+   }
+//---------------------------------------------------------------------------
+// prepare results for returning them
+//---------------------------------------------------------------------------
    ideal E,bla;
    intvec kv;
    list retlist;
