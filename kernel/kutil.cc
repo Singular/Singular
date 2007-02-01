@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.46 2007-02-01 16:20:44 Singular Exp $ */
+/* $Id: kutil.cc,v 1.47 2007-02-01 16:39:30 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -950,21 +950,6 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
   memset(&(set[*length]),0,sizeof(LObject));
 #endif
   (*length)--;
-}
-
-/*2
-*is used after updating the pairset,if the leading term of p
-*divides the leading term of some S[i] it will be canceled
-*/
-static inline void clearS (poly p, unsigned long p_sev, int* at, int* k,
-                    kStrategy strat)
-{
-  assume(p_sev == pGetShortExpVector(p));
-  if (strat->noClearS) return;
-  if (!pLmShortDivisibleBy(p,p_sev, strat->S[*at], ~ strat->sevS[*at])) return;
-  deleteInS((*at),strat);
-  (*at)--;
-  (*k)--;
 }
 
 /*2
