@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.20 2006-10-12 08:55:41 Singular Exp $ */
+/* $Id: kutil.h,v 1.21 2007-02-01 18:22:35 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -628,6 +628,8 @@ BOOLEAN kStratChangeTailRing(kStrategy strat,
 // right before main loop in bba
 void kStratInitChangeTailRing(kStrategy strat);
 
+KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
+  kStrategy strat);
 #include "kInline.cc"
 
 

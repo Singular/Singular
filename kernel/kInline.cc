@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.4 2007-02-01 16:39:30 Singular Exp $
+ *  Version: $Id: kInline.cc,v 1.5 2007-02-01 18:22:35 Singular Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -1044,7 +1044,7 @@ KINLINE poly redtailBba(TObject *T, int pos,kStrategy strat, BOOLEAN withT)
   return p;
 }
 
-static inline void clearS (poly p, unsigned long p_sev, int* at, int* k,
+KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
                     kStrategy strat)
 {
   assume(p_sev == pGetShortExpVector(p));
