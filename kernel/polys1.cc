@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.22 2006-10-06 16:39:43 Singular Exp $ */
+/* $Id: polys1.cc,v 1.23 2007-02-01 16:21:44 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -297,12 +297,6 @@ poly pPower(poly p, int i)
 //      case 0:
 //      {
 //        rc=pOne();
-//#ifdef DRING
-//        if ((pDRING) && (pdDFlag(p)==1))
-//        {
-//          pdSetDFlag(rc,1);
-//        }
-//#endif
 //        pDelete(&p);
 //        break;
 //      }
