@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.11 2007-01-31 23:51:23 motsak Exp $ */
+/* $Id: gr_kstd2.cc,v 1.12 2007-02-01 18:53:54 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -19,6 +19,7 @@
 #include "kutil.h"
 #include "kstd1.h"
 #include "khstd.h"
+#include "kutil.h"
 //#include "spolys.h"
 //#include "cntrlc.h"
 #include "weight.h"
@@ -935,16 +936,25 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   if (TEST_OPT_DEBUG) messageSets(strat);
 
   /* complete reduction of the standard basis--------- */
-  if (TEST_OPT_REDSB){
-     completeReduce(strat); // ???
-
-//    ideal I = strat->Shdl;
-//    ideal erg = kInterRed(I,Q);
-//    assume(I!=erg);
-//    id_Delete(&I, currRing);
-//    strat->Shdl = erg;
+  if (TEST_OPT_SB_1)
+  {
+    int k=1;
+    int j;
+    while(k<=strat->sl)
+    {
+      j=0;
+      loop
+      {
+        if (j>=k) break;
+        clearS(strat->S[j],strat->sevS[j],&k,&j,strat);
+        j++;
+      }
+      k++;
+    }
   }
 
+  if (TEST_OPT_REDSB)
+     completeReduce(strat);
   /* release temp data-------------------------------- */
   exitBuchMora(strat);
   if (TEST_OPT_WEIGHTM)
