@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.39 2007-01-31 23:51:23 motsak Exp $
+ *  Version: $Id: gring.cc,v 1.40 2007-02-01 17:24:03 motsak Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -1946,7 +1946,7 @@ ideal twostd(ideal I)
   int i;
   int j;
   int s;
-  int flag;
+  bool flag;
   poly p=NULL;
   poly q=NULL;
   ideal J=kStd(I, currQuotient,testHomog,NULL,NULL,0,0,NULL);
@@ -1957,26 +1957,70 @@ ideal twostd(ideal I)
   ideal id_tmp=NULL;
   int rN=currRing->N;
   int iSize=0;
+
   loop
   {
-    flag=0;
-    K=NULL;
-    s=idElem(J);
+    flag = true; // nothing new!
+    K    = NULL;
+    s    = idElem(J);
+    
     for (i=0;i<=s-1;i++)
     {
       p=J->m[i];
-      for (j=1;j<=rN;j++)
+
+        #ifdef PDEBUG
+          p_Test(p, currRing);
+        #if 0
+          Print("p: "); // !
+          p_Write(p, currRing);
+        #endif
+        #endif
+
+      for (j=1;j<=rN;j++) // for all j = 1..N
       {
         varj = pOne();
         pSetExp(varj,j,1);
         pSetm(varj);
-        q = pp_Mult_mm(p,varj,currRing);
+        q = pp_Mult_mm(p,varj,currRing); // q = J[i] * var(j), 
         pDelete(&varj);
+
+        #ifdef PDEBUG
+          p_Test(p, currRing);
+          p_Test(q, currRing);
+        #if 0
+          Print("Reducing p: "); // !
+          p_Write(p, currRing);
+
+          Print("With q: "); // !
+          p_Write(q, currRing);
+        #endif
+        #endif
+        
         q = nc_ReduceSPoly(p,q,currRing);
+
+        #ifdef PDEBUG
+          p_Test(q, currRing);
+        #if 0
+          Print("Reducing q: "); // !
+          p_Write(q, currRing);
+
+          Print("With J!\n"); 
+        #endif
+        #endif
+
         q = kNF(J,currQuotient,q,0,0);
+
+        #ifdef PDEBUG
+          p_Test(q, currRing);
+        #if 0
+          Print("=> q: "); // !
+          p_Write(q, currRing);
+        #endif
+        #endif
+
         if (q!=NULL)
         {
-          if (pIsConstant(q))
+          if (pIsConstant(q)) // => return (1)!
           {
             Q=idInit(1,1);
             Q->m[0]=pOne();
@@ -1985,7 +2029,8 @@ ideal twostd(ideal I)
             if (K!=NULL) idDelete(&K);
             return(Q);
           }
-          flag=1;
+          
+          flag=false;
           Q=idInit(1,1);
           Q->m[0]=q;
           id_tmp=idSimpleAdd(K,Q);
@@ -1995,23 +2040,88 @@ ideal twostd(ideal I)
         }
       }
     }
-    if (flag==0)
+    if (flag) // nothing new!
       /* i.e. all elements are two-sided */
     {
-      idDelete(&K);
+//      idDelete(&K);
       return(J);
     }
     /* now we update GrBasis J with K */
     //    iSize=IDELEMS(J);
+  #ifdef PDEBUG
+    idTest(J);
+  #if 0
+    Print("J:");
+    idPrint(J);
+    PrintLn();
+  #endif // debug
+  #endif  
+
+
+
+  #ifdef PDEBUG
+    idTest(K);
+  #if 0
+    Print("+K:");
+    idPrint(K);
+    PrintLn();
+  #endif // debug
+  #endif  
+
+
     iSize=idElem(J);
     id_tmp=idSimpleAdd(J,K);
     idDelete(&K);
     idDelete(&J);
+    
     BITSET save_test=test;
-    test|=Sy_bit(OPT_SB_1);
-    J=kStd(id_tmp, currQuotient, testHomog,NULL,NULL,0,iSize);
-    test=save_test;
+
+    #if 1
+      test|=Sy_bit(OPT_SB_1);
+      J = kStd(id_tmp, currQuotient, testHomog, NULL, NULL, 0, iSize); // J = J + K, J - std    
+    #else
+      J=kStd(id_tmp, currQuotient,testHomog,NULL,NULL,0,0,NULL);
+    #endif
+    test = save_test;
+    
+    idDelete(&id_tmp); // !!!
+
     idSkipZeroes(J);
+        
+  #ifdef PDEBUG
+    idTest(J);
+  #if 0
+    Print("J:");
+    idPrint(J);
+    PrintLn();
+  #endif // debug
+  #endif  
+
+// bug:
+
+//J:Module of rank 1,real rank 0 and 4 generators.
+//generator 0: f
+//generator 1: h2+h
+//generator 2: eh+e
+//generator 3: e2
+
+//+K:Module of rank 1,real rank 0 and 2 generators.
+//generator 0: h
+//generator 1: e
+
+// =>>>>
+
+//J:Module of rank 1,real rank 0 and 6 generators.
+//generator 0: h
+//generator 1: f
+//generator 2: e
+//generator 3: h2+h
+//generator 4: eh+e
+//generator 5: e2
+
+
+
+    
   }
 }
 
