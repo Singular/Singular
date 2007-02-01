@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.45 2007-01-11 17:04:40 Singular Exp $ */
+/* $Id: kutil.cc,v 1.46 2007-02-01 16:20:44 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2517,17 +2517,11 @@ void clearSbatch (poly h,int k,int pos,kStrategy strat)
 */
 void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 {
-  if (currRing->cring == 1)
-  {
+  assume (currRing->cring == 1)
     // enter also zero divisor * poly, if this is non zero and of smaller degree
     enterExtendedSpoly(h, strat);
     initenterpairsRing(h, k, ecart, 0, strat, atR);
-  }
-  else
-  {
-    initenterpairs(h, k, ecart, 0, strat, atR);
-  }
-  clearSbatch(h, k, pos, strat);
+    clearSbatch(h, k, pos, strat);
 }
 #endif
 
