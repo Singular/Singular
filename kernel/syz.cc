@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.11 2006-11-24 10:29:08 Singular Exp $ */
+/* $Id: syz.cc,v 1.12 2007-02-02 15:19:46 motsak Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -24,6 +24,9 @@
 #include "syz.h"
 #include "prCopy.h"
 
+#ifdef HAVE_PLURAL
+#include "sca.h"
+#endif // HAVE_PLURAL
 
 void syDeleteRes(resolvente * res,int length)
 {
@@ -612,10 +615,25 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
 
 syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
 {
+#ifdef HAVE_PLURAL
+  ideal idSaveCurrQuotient = currQuotient;
+  ideal idSaveCurrRingQuotient = currRing->qideal;
+  if( rIsSCA(currRing) )
+  {
+    currQuotient = currRing->nc->SCAQuotient();
+    currRing->qideal = currQuotient;
+
+    const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
+    const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
+    
+    arg = id_KillSquares(arg, m_iFirstAltVar, m_iLastAltVar, currRing); // kill suares in input!
+  }
+#endif
+  
   int typ0;
   syStrategy result=(syStrategy)omAlloc0(sizeof(ssyStrategy));
 
-  if ((w!=NULL) && (!idTestHomModule(arg,currQuotient,w)))
+  if ((w!=NULL) && (!idTestHomModule(arg,currQuotient,w))) // is this right in SCA case???
   {
     WarnS("wrong weights given(2):");w->show();PrintLn();
     idHomModule(arg,currQuotient,&w);
@@ -646,6 +664,19 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
     fr[i] = NULL;
   }
   omFreeSize((ADDRESS)fr,(result->length)*sizeof(ideal));
+
+
+#ifdef HAVE_PLURAL
+  if( rIsSCA(currRing) )
+  {
+    currQuotient     = idSaveCurrQuotient; 
+    currRing->qideal = idSaveCurrRingQuotient;
+
+    id_Delete(&arg, currRing);
+  }
+#endif
+
+
   return result;
 }
 
