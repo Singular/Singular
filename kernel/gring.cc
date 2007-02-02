@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.40 2007-02-01 17:24:03 motsak Exp $
+ *  Version: $Id: gring.cc,v 1.41 2007-02-02 12:53:52 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -2219,7 +2219,7 @@ void ncKill(ring r)
 
   r->nc->basering->ref--;
   
-  if (r->nc->basering->ref<=0)
+  if ((r->nc->basering->ref<=0)&&(r->nc->basering->nc==NULL))
   {
     rKill(r->nc->basering);
   }
