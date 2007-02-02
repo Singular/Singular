@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.41 2007-02-02 12:53:52 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.42 2007-02-02 13:00:33 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -2604,7 +2604,8 @@ BOOLEAN nc_InitMultiplication(ring r)
     rChangeCurrRing(r);
     WeChangeRing = 1;
   }
-  assume( currRing == r->nc->basering ); // otherwise we cannot work with all these matrices!
+  assume( (currRing == r->nc->basering) 
+       || ((currRing->nc!=NULL) && (currRing->nc->basering==r->nc->basering)) );   // otherwise we cannot work with all these matrices!
 
   int i,j;
   r->nc->MT = (matrix *)omAlloc0((r->N*(r->N-1))/2*sizeof(matrix));
