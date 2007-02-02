@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.73 2007-01-28 20:16:56 king Exp $
+@comment $Id: NEWS.texi,v 1.74 2007-02-02 13:28:33 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -71,7 +71,7 @@ improved version of @nref{secondary_char0} and
 @item
 finvar.lib: algorithm of @nref{secondary_char0} is now also used in the 
 non-modular char-p case @nref{secondary_charp}, 
-@nref{secondary_no_molien}, nref{secondary_and_irreducibles_no_molien} 
+@nref{secondary_no_molien}, @nref{secondary_and_irreducibles_no_molien} 
 (@nref{finvar_lib}).
 @item
 operation for sparse matrices improved: multiplication, prune, conversion to module.
