@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.57 2007-01-30 11:05:10 king Exp $"
+version="$Id: finvar.lib,v 1.58 2007-02-02 13:25:09 Singular Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -6039,9 +6039,6 @@ THEORY:   Secondary invariants are calculated by finding a basis (in terms of
           we are in the non-modular case. Therefore, the invariant ring is Cohen-Macaulay,
           hence the number of secondary invariants is the product of the degrees of 
           primary invariants divided by the group order.
-          <secondary_and_irreducible_no_molien> should usually be faster and of more useful
-          functionality.
-SEE ALSO: secondary_and_irreducible_no_molien
 EXAMPLE:  example secondary_no_molien; shows an example
 "
 { int MonStep = 15;  // The Reynolds operator is applied to blocks of #MonStep# monomials.
