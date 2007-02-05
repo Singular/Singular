@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.88 2007-01-31 23:56:34 motsak Exp $ */
+/* $Id: ipassign.cc,v 1.89 2007-02-05 17:10:50 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -797,7 +797,11 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
     // error handling ---------------------------------------------------
     if (!errorreported)
     {
-      Werror("`%s` = `%s` is not supported"
+      if ((l->rtyp==IDHDL) && (l->e==NULL))
+        Werror("`%s`(%s) = `%s` is not supported",
+	  Tok2Cmdname(lt),l->Name(),Tok2Cmdname(rt));
+      else
+         Werror("`%s` = `%s` is not supported"
              ,Tok2Cmdname(lt),Tok2Cmdname(rt));
       if (BVERBOSE(V_SHOW_USE))
       {
