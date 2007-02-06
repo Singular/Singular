@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.121 2007-01-31 23:21:55 motsak Exp $ */
+/* $Id: tgb.cc,v 1.122 2007-02-06 09:59:00 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -25,6 +25,9 @@
 #include "sca.h"
 
 #include "longrat.h"
+#include "modulop.h"
+#include <stdlib.h>
+#include <stdio.h>
 #define SR_HDL(A) ((long)(A))
 static const int bundle_size=1000;
 static const int delay_factor=3;
@@ -1818,12 +1821,430 @@ BOOLEAN is_valid_ro(red_object & ro){
   if ((r2.p!=ro.p)||(r2.sev!=ro.sev)) return FALSE;
   return TRUE;
 }
+static int terms_sort_crit(const void* a, const void* b){
+  return -pLmCmp(*((poly*) a),*((poly*) b));
+}
+static void unify_terms(poly* terms,int & sum){
+  if (sum==0) return;
+  int last=0;
+  int curr=1;
+  while(curr<sum){
+    if (!(pLmEqual(terms[curr],terms[last]))){
+      terms[++last]=terms[curr];
+    }
+    ++curr;
+  }
+  sum=last+1;
+}
+static void export_mat(number* number_array,int pn, int tn,const char* format_str, int mat_nr){
+  char matname[20];
+  sprintf(matname,format_str,mat_nr);
+  FILE* out=fopen(matname,"w");
+  int i,j;
+  fprintf(out,"mat=[\n");
+  for(i=0;i<pn;i++){
+    fprintf(out,"[\n");
+    for(j=0;j<tn;j++){
+      if (j>0){
+        fprintf(out,", ");
+      }
+      fprintf(out,"%i",npInt(number_array[i*tn+j]));
+      
+    }
+    if (i<pn-1)
+      fprintf(out,"],\n");
+    else
+      fprintf(out,"],\n");
+  }
+  fprintf(out,"]\n");
+  fclose(out);
+}
+int modP_lastIndexRow(number* row,int ncols){
+  int lastIndex;
+  for(lastIndex=ncols-1;lastIndex>=0;lastIndex--){
+    if (!(npIsZero(row[lastIndex]))){
+      return lastIndex;
+    }
+  }
+  return -1;
+}
+class ModPMatrixProxyOnArray{
+public:
+  friend class ModPMatrixBackSubstProxOnArray;
+  int ncols,nrows;
+  ModPMatrixProxyOnArray(number* array, int nrows, int ncols){
+    this->ncols=ncols;
+    this->nrows=nrows;
+    rows=(number**) omalloc(nrows*sizeof(number*));
+    startIndices=(int*)omalloc(nrows*sizeof(int));
+    int i;
+    for(i=0;i<nrows;i++){
+      rows[i]=array+(i*ncols);
+      updateStartIndex(i,-1);
+    }
+  }
+  ~ModPMatrixProxyOnArray(){
+    omfree(rows);
+    omfree(startIndices);
+  }
+  
+  void permRows(int i, int j){
+    number* h=rows[i];
+    rows[i]=rows[j];
+    rows[j]=h;
+    int hs=startIndices[i];
+    startIndices[i]=startIndices[j];
+    startIndices[j]=hs;
+  }
+  void multiplyRow(int row, number coef){
+    int i;
+    number* row_array=rows[row];
+    for(i=startIndices[row];i<ncols;i++){
+      row_array[i]=npMult(row_array[i],coef);
+    }
+  }
+  void reduceOtherRowsForward(int r){
+    
+    //assume rows "under r" have bigger or equal start index
+    number* row_array=rows[r];
+  
+    int start=startIndices[r];
+    number coef=row_array[start];
+    assume(start<ncols);
+    int other_row;
+    assume(!(npIsZero(row_array[start])));
+    if (!(npIsOne(coef)))
+      multiplyRow(r,npInvers(coef));
+    int lastIndex=modP_lastIndexRow(row_array, ncols);
+    for (other_row=r+1;other_row<nrows;other_row++){
+      assume(startIndices[other_row]>=start);
+      if (startIndices[other_row]==start){
+        int i;
+        number* other_row_array=rows[other_row];
+        number coef2=npNeg(other_row_array[start]);
+        for(i=start;i<=lastIndex;i++){
+          other_row_array[i]=npAdd(npMult(coef2,row_array[i]),other_row_array[i]);
+        }
+        updateStartIndex(other_row,start);
+        assume(npIsZero(other_row_array[start]));
+      }
+    }
+  }
+  void updateStartIndex(int row,int lower_bound){
+    number* row_array=rows[row];
+    assume((lower_bound<0)||(npIsZero(row_array[lower_bound])));
+    int i;
+    for(i=lower_bound+1;i<ncols;i++){
+      if (!(npIsZero(row_array[i])))
+        break;
+    }
+    startIndices[row]=i;
+  }
+  int getStartIndex(int row){
+    return startIndices[row];
+  }
+  BOOLEAN findPivot(int &r, int &c){
+    //row>=r, col>=c
+    
+    while(c<ncols){
+      int i;
+      for(i=r;i<nrows;i++){
+        assume(startIndices[i]>=c);
+        if (startIndices[i]==c){
+          //r=i;
+          if (r!=i)
+            permRows(r,i);
+          return TRUE;
+        }
+      }
+      c++;
+    }
+    return FALSE;
+  }
+protected:
+  number** rows;
+  int* startIndices;
+};
+class ModPMatrixBackSubstProxOnArray{
+  int *startIndices;
+  number** rows;
+  int *lastReducibleIndices;
+  int ncols;
+  int nrows;
+  int nonZeroUntil;
+public:
+  void multiplyRow(int row, number coef){
+    int i;
+    number* row_array=rows[row];
+    for(i=startIndices[row];i<ncols;i++){
+      row_array[i]=npMult(row_array[i],coef);
+    }
+  }
+  ModPMatrixBackSubstProxOnArray(ModPMatrixProxyOnArray& p){
+//  (number* array, int nrows, int ncols, int* startIndices, number** rows){
+    //we borrow some parameters ;-)
+    //we assume, that nobody changes the order of the rows
+    this->startIndices=p.startIndices;
+    this->rows=p.rows;
+    this->ncols=p.ncols;
+    this->nrows=p.nrows;
+    lastReducibleIndices=(int*) omalloc(nrows*sizeof(int));
+    nonZeroUntil=0;
+    while(nonZeroUntil<nrows){
+      if (startIndices[nonZeroUntil]<ncols){
+       
+        nonZeroUntil++;
+      } else break;
+      
+    }
+    if (TEST_OPT_PROT)
+      Print("rank:%i\n",nonZeroUntil);
+    nonZeroUntil--;
+    int i;
+    for(i=0;i<=nonZeroUntil;i++){
+      assume(startIndices[i]<ncols);
+      assume(!(npIsZero(rows[i][startIndices[i]])));
+      assume(startIndices[i]>=i);
+      updateLastReducibleIndex(i,nonZeroUntil+1);
+    }
+  }
+  void updateLastReducibleIndex(int r, int upper_bound){
+    number* row_array=rows[r];
+    if (upper_bound>nonZeroUntil) upper_bound=nonZeroUntil+1;
+    int i;
+    for(i=upper_bound-1;i>r;i--){
+      int start=startIndices[i];
+      assume(start<ncols);
+      if (!(npIsZero(row_array[start]))){
+        lastReducibleIndices[r]=start;
+        return;
+      }
+    }
+    lastReducibleIndices[r]=-1;
+  }
+  void backwardSubstitute(int r){
+    int start=startIndices[r];
+    assume(start<ncols);
+    
+    number* row_array=rows[r];
+    assume((!(npIsZero(row_array[start]))));
+    assume(start<ncols);
+    int other_row;
+    if (!(nIsOne(row_array[r]))){
+      //it should be one, but this safety is not expensive
+      multiplyRow(r, npInvers(row_array[start]));
+    }
+    int lastIndex=modP_lastIndexRow(row_array, ncols);
+    assume(lastIndex<ncols);
+    assume(lastIndex>=0);
+    for(other_row=r-1;other_row>=0;other_row--){
+      assume(lastReducibleIndices[other_row]<=start);
+      if (lastReducibleIndices[other_row]==start){
+        number* other_row_array=rows[other_row];
+        number coef=npNeg(other_row_array[start]);
+        assume(!(npIsZero(coef)));
+        int i;
+        assume(start>startIndices[other_row]);
+        for(i=start;i<=lastIndex;i++){
+          other_row_array[i]=npAdd(npMult(coef,row_array[i]),other_row_array[i]);
+        }
+        updateLastReducibleIndex(other_row,r);
+      }
+    }
+  }
+  ~ModPMatrixBackSubstProxOnArray(){
+    omfree(lastReducibleIndices);
+  }
+  void backwardSubstitute(){
+    int i;
+    for(i=nonZeroUntil;i>0;i--){
+      backwardSubstitute(i);
+    }
+  }
+};
+static void simplest_gauss_modp(number* a, int nrows,int ncols){
+  //use memmoves for changing rows
+  if (TEST_OPT_PROT)
+    PrintS("StartGauss\n");
+  ModPMatrixProxyOnArray mat(a,nrows,ncols);
+  
+  int c=0;
+  int r=0;
+  while(mat.findPivot(r,c)){
+    //int pivot=find_pivot()
+      mat.reduceOtherRowsForward(r);
+    r++;
+    c++;
+  }
+  ModPMatrixBackSubstProxOnArray backmat(mat);
+  backmat.backwardSubstitute();
+  //backward substitutions
+  if (TEST_OPT_PROT)
+    PrintS("StopGauss\n");
+}
+static void linalg_step_modp(poly *p, poly* p_out, int&pn, poly* terms,int tn, slimgb_alg* c){
+  static int export_n=0;
+  assume(terms[tn-1]!=NULL);
+  assume(rField_is_Zp(c->r));
+  //I don't do deletes, copies of numbers ...
+  number zero=npInit(0);
+  int array_size=pn*tn;
+  number* number_array=(number*) omalloc(pn*tn*sizeof(number));
+  int i;
+  for(i=0;i<array_size;i++){
+    number_array[i]=zero;
+  }
+  for(i=0;i<pn;i++){
+    poly h=p[i];
+    int base=tn*i;
+    while(h!=NULL){
+      //Print("h:%i\n",h);
+      number coef=p_GetCoeff(h,c->r);
+      poly* ptr_to_h=(poly*) bsearch(&h,terms,tn,sizeof(poly),terms_sort_crit);
+      assume(ptr_to_h!=NULL);
+      int pos=ptr_to_h-terms;
+      number_array[base+pos]=coef;
+      pIter(h);
+    }
+    p_Delete(&h,c->r);
+  }
+#if 0
+  //export matrix
+  export_mat(number_array,pn,tn,"mat%i.py",++export_n);
+#endif
+  int rank=pn;
+  simplest_gauss_modp(number_array,rank,tn);
+  int act_row=0;
+  int p_pos=0;
+  for(i=0;i<pn;i++){
+    poly h=NULL;
+    int j;
+    int base=tn*i;
+    number* row=number_array+base;
+    for(j=tn-1;j>=0;j--){
+      if (!(npIsZero(row[j]))){
+        poly t=terms[j];
+        t=p_LmInit(t,c->r);
+        p_SetCoeff(t,row[j],c->r);
+        pNext(t)=h;
+        h=t;
+      }
+      
+    }
+   if (h!=NULL){
+     p_out[p_pos++]=h;
+   } 
+  }
+  pn=p_pos;
+  //assert(p_pos==rank)
+  while(p_pos<pn){
+    p_out[p_pos++]=NULL;
+  }
+#if 0
+  export_mat(number_array,pn,tn,"mat%i.py",++export_n);
+#endif
+}
+static void mass_add(poly* p, int pn,slimgb_alg* c){
+    int j;
+    int* ibuf=(int*) omalloc(pn*sizeof(int));
+    sorted_pair_node*** sbuf=(sorted_pair_node***) omalloc(pn*sizeof(sorted_pair_node**));
+    for(j=0;j<pn;j++){
+      sbuf[j]=add_to_basis_ideal_quotient(p[j],c,ibuf+j);
+    }
+    int sum=0;
+    for(j=0;j<pn;j++){
+      sum+=ibuf[j];
+    }
+    sorted_pair_node** big_sbuf=(sorted_pair_node**) omalloc(sum*sizeof(sorted_pair_node*));
+    int partsum=0;
+    for(j=0;j<pn;j++)
+    {
+      memmove(big_sbuf+partsum, sbuf[j],ibuf[j]*sizeof(sorted_pair_node*));
+      omfree(sbuf[j]);
+      partsum+=ibuf[j];
+    }
 
-
+    qsort(big_sbuf,sum,sizeof(sorted_pair_node*),tgb_pair_better_gen2);
+    c->apairs=spn_merge(c->apairs,c->pair_top+1,big_sbuf,sum,c);
+    c->pair_top+=sum;
+    clean_top_of_pair_list(c);
+    omfree(big_sbuf);
+    omfree(sbuf);
+    omfree(ibuf);
+    //omfree(buf);
+  #ifdef TGB_DEBUG
+    int z;
+    for(z=1;z<=c->pair_top;z++)
+    {
+      assume(pair_better(c->apairs[z],c->apairs[z-1],c));
+    }
+  #endif
+   
+}
+static void noro_step(poly*p,int &pn,slimgb_alg* c){
+  poly* reduced=(poly*) omalloc(pn*sizeof(poly));
+  int j;
+  int* reduced_len=(int*) omalloc(pn*sizeof(int));
+  int reduced_c=0;
+  if (TEST_OPT_PROT)
+    PrintS("reduced system:\n");
+  for(j=0;j<pn;j++){
+   
+    poly h=p[j];
+    int h_len=pLength(h);
+    number coef;
+    h=redNF2(p_Copy(h,c->r),c,h_len,coef,0);
+    if (h!=NULL){
+      h=redNFTail(h,c->strat->sl,c->strat,h_len);
+      h_len=pLength(h);
+      reduced[reduced_c]=h;
+      reduced_len[reduced_c]=h_len;
+      reduced_c++;
+      if (TEST_OPT_PROT)
+        Print("%d ",h_len);
+    }
+  }
+  int reduced_sum=0;
+  for(j=0;j<reduced_c;j++){
+    reduced_sum+=reduced_len[j];
+  }
+  poly* terms=(poly*) omalloc(reduced_sum*sizeof(poly));
+  int tc=0;
+  for(j=0;j<reduced_c;j++){
+    poly h=reduced[j];
+    
+    while(h!=NULL){
+      terms[tc++]=h;
+      pIter(h);
+      assume(tc<=reduced_sum);
+    }
+  }
+  assume(tc==reduced_sum);
+  qsort(terms,reduced_sum,sizeof(poly),terms_sort_crit);
+  int nterms=reduced_sum;
+  if (TEST_OPT_PROT)
+    Print("orig estimation:%i\n",reduced_sum);
+  unify_terms(terms,nterms);
+  if (TEST_OPT_PROT)
+    Print("actual number of columns:%i\n",nterms);
+  int rank=reduced_c;
+  linalg_step_modp(reduced, p,rank,terms,nterms,c);
+  omfree(terms);
+  
+  pn=rank;
+  omfree(reduced);
+  if (TEST_OPT_PROT)
+    PrintS("\n");
+}
 
 static void go_on (slimgb_alg* c){
   //set limit of 1000 for multireductions, at the moment for
   //programming reasons
+  #ifdef USE_NORO
+  const BOOLEAN use_noro=((!(c->nc))&&(rField_is_Zp(c->r)));
+  #else
+  const BOOLEAN use_noro=FALSE;
+  #endif
   int i=0;
   c->average_length=0;
   for(i=0;i<c->n;i++){
@@ -1876,7 +2297,7 @@ static void go_on (slimgb_alg* c){
 //       now_t_rep(s->j,s->i,c);
     number coef;
     int mlen=pLength(h);
-    if (!c->nc){
+    if ((!c->nc)&(!(use_noro))){
       h=redNF2(h,c,mlen,coef,2);
       redTailShort(h,c->strat);
       nDelete(&coef);
@@ -1901,6 +2322,22 @@ static void go_on (slimgb_alg* c){
   red_object* buf=(red_object*) omalloc(i*sizeof(red_object));
   c->normal_forms+=i;
   int j;
+#if 1
+  //if ((!(c->nc))&&(rField_is_Zp(c->r))){
+  if (use_noro){
+    int pn=i;
+    noro_step(p,pn,c);
+    if (TEST_OPT_PROT){
+      Print("reported rank:%i\n",pn);
+    }
+    mass_add(p,pn,c);
+    return;
+    /*if (TEST_OPT_PROT)
+      for(j=0;j<pn;j++){
+        p_wrp(p[j],c->r);
+      }*/
+  }
+#endif 
   for(j=0;j<i;j++){
     buf[j].p=p[j];
     buf[j].sev=pGetShortExpVector(p[j]);
@@ -1920,14 +2357,7 @@ static void go_on (slimgb_alg* c){
   {
     Print("%dM[%d,",curr_deg,i);
   }
-#ifdef FIND_DETERMINISTIC
-  c->modifiedS=(BOOLEAN*) omalloc((c->strat->sl+1)*sizeof(BOOLEAN));
-  c->expandS=(poly*) omalloc((1)*sizeof(poly));
-  c->expandS[0]=NULL;
-  int z2;
-  for(z2=0;z2<=c->strat->sl;z2++)
-    c->modifiedS[z2]=FALSE;
-#endif
+
   multi_reduction(buf, i, c);
   #ifdef TGB_RESORT_PAIRS
   if (c->used_b) {
@@ -1961,41 +2391,11 @@ static void go_on (slimgb_alg* c){
  }
 #endif
   //resort S
-#ifdef FIND_DETERMINISTIC
-  for(z2=0;z2<=c->strat->sl;z2++)
-  {
-    if (c->modifiedS[z2])
-    {
-      wlen_type qual;
-      int new_pos;
-      if (c->strat->lenSw!=NULL)
-          new_pos=simple_posInS(c->strat,c->strat->S[z2],strat->lenS[z2],strat->Sw[z2]);
-      else
-          new_pos=simple_posInS(c->strat,c->strat->S[z2],strat->lenS[z2],lenS[z2]);
 
-      if (new_pos<z2)
-      {
-         move_forward_in_S(z2,new_pos,c->strat);
-      }
-
-      assume(new_pos<=z2);
-    }
-  }
-  for(z2=0;c->expandS[z2]!=NULL;z2++)
-  {
-    add_to_reductors(c,c->expandS[z2],pLength(c->expandS[z2]));
-    // PrintS("E");
-  }
-  omfree(c->modifiedS);
-  c->modifiedS=NULL;
-  omfree(c->expandS);
-  c->expandS=NULL;
-#endif
   if (TEST_OPT_PROT)
       Print("%i]",i);
 
-  int* ibuf=(int*) omalloc(i*sizeof(int));
-  sorted_pair_node*** sbuf=(sorted_pair_node***) omalloc(i*sizeof(sorted_pair_node**));
+  poly* add_those=(poly*) omalloc(i*sizeof(poly));
   for(j=0;j<i;j++)
   {
     int len;
@@ -2011,97 +2411,23 @@ static void go_on (slimgb_alg* c){
       p=redTailShort(p, c->strat);
       }
       //}
-    sbuf[j]=add_to_basis_ideal_quotient(p,c,ibuf+j);
+      add_those[j]=p;
+
     //sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
   }
-  int sum=0;
-  for(j=0;j<i;j++){
-    sum+=ibuf[j];
-  }
-  sorted_pair_node** big_sbuf=(sorted_pair_node**) omalloc(sum*sizeof(sorted_pair_node*));
-  int partsum=0;
-  for(j=0;j<i;j++)
-  {
-    memmove(big_sbuf+partsum, sbuf[j],ibuf[j]*sizeof(sorted_pair_node*));
-    omfree(sbuf[j]);
-    partsum+=ibuf[j];
-  }
-
-  qsort(big_sbuf,sum,sizeof(sorted_pair_node*),tgb_pair_better_gen2);
-  c->apairs=spn_merge(c->apairs,c->pair_top+1,big_sbuf,sum,c);
-  c->pair_top+=sum;
-  clean_top_of_pair_list(c);
-  omfree(big_sbuf);
-  omfree(sbuf);
-  omfree(ibuf);
+  mass_add(add_those,i,c);
+  omfree(add_those);
   omfree(buf);
-#ifdef TGB_DEBUG
-  int z;
-  for(z=1;z<=c->pair_top;z++)
-  {
-    assume(pair_better(c->apairs[z],c->apairs[z-1],c));
-  }
-#endif
+  
+  
+  
+  
+  
+  
+
   if (TEST_OPT_PROT)
       Print("(%d)",c->pair_top+1);
-  while(!(idIs0(c->add_later))){
-    ideal add=c->add_later;
-    idSkipZeroes(add);
-    for(j=0;j<add->idelems();j++){
-        assume(pLength(add->m[j])==1);
-        p_SetCoeff(add->m[j],n_Init(1,currRing),currRing);
-
-    }
-    ideal add2=kInterRed(add,NULL);
-    id_Delete(&add,currRing);
-    idSkipZeroes(add2);
-    c->add_later=idInit(ADD_LATER_SIZE,c->S->rank);
-    memset(c->add_later->m,0,ADD_LATER_SIZE*sizeof(poly));
-//     for(i=0;i<add2->idelems();i++){
-//       if (add2->m[i]!=NULL)
-//           add_to_basis_ideal_quotient(add2->m[i],-1,-1,c,NULL);
-//       add2->m[i]=NULL;
-//     }
-    int i=add2->idelems();
-    int* ibuf=(int*) omalloc(i*sizeof(int));
-  sorted_pair_node*** sbuf=(sorted_pair_node***) omalloc(i*sizeof(sorted_pair_node**));
-
-  for(j=0;j<i;j++)
-  {
-    int len;
-    poly p;
-    //buf[j].flatten();
-    //kBucketClear(buf[j].bucket,&p, &len);
-    //kBucketDestroy(&buf[j].bucket);
-    p=add2->m[j];
-    add2->m[j]=NULL;
-
-    sbuf[j]=add_to_basis_ideal_quotient(p,c,ibuf+j);
-    //sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
-  }
-  int sum=0;
-  for(j=0;j<i;j++){
-    sum+=ibuf[j];
-  }
-  sorted_pair_node** big_sbuf=(sorted_pair_node**) omalloc(sum*sizeof(sorted_pair_node*));
-  int partsum=0;
-  for(j=0;j<i;j++)
-  {
-    memmove(big_sbuf+partsum, sbuf[j],ibuf[j]*sizeof(sorted_pair_node*));
-    omfree(sbuf[j]);
-    partsum+=ibuf[j];
-  }
-
-  qsort(big_sbuf,sum,sizeof(sorted_pair_node*),tgb_pair_better_gen2);
-  c->apairs=spn_merge(c->apairs,c->pair_top+1,big_sbuf,sum,c);
-  c->pair_top+=sum;
-  clean_top_of_pair_list(c);
-  omfree(big_sbuf);
-  omfree(sbuf);
-  omfree(ibuf);
-  //omfree(buf);
-    id_Delete(&add2, c->r);
-  }
+  //TODO: implement that while(!(idIs0(c->add_later)))
   #ifdef TGB_RESORT_PAIRS
   delete c->replaced;
   c->replaced=NULL;
@@ -2302,6 +2628,7 @@ void slimgb_alg::introduceDelayedPairs(poly* pa,int s){
   pair_top+=s;
 }
 slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
+
   lastCleanedDeg=-1;
   completed=FALSE;
   this->syz_comp=syz_comp;
