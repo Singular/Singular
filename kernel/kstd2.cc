@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.37 2007-02-01 18:53:54 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.38 2007-02-06 13:16:52 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -37,8 +37,9 @@ int kFindDivisibleByInT(const TSet &T, const unsigned long* sevT,
 {
   unsigned long not_sev = ~L->sev;
   int j = start;
-  poly p;
-  ring r;
+  poly p=L->p;
+  ring r=currRing;
+  if (p==NULL)  { r=L->tailRing; p=L->t_p; }
   L->GetLm(p, r);
 
   pAssume(~not_sev == p_GetShortExpVector(p, r));
@@ -1408,3 +1409,4 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   if (TEST_OPT_PROT) PrintLn();
   return res;
 }
+
