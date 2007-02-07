@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: timer.cc,v 1.2 2005-07-26 17:04:15 Singular Exp $ */
+/* $Id: timer.cc,v 1.3 2007-02-07 10:44:44 Singular Exp $ */
 
 /*
 *  ABSTRACT - get the computing time
@@ -118,6 +118,9 @@ int getTimer()
 * stops timer, writes string s and the time since last call of startTimer
 * if this time is > mintime sec
 */
+#ifdef EXTEND_TIMER_D
+extern int iiOp;
+#endif
 void writeTime(char* v)
 {
   clock_t curr;
@@ -127,7 +130,13 @@ void writeTime(char* v)
 
   double f =  ((double)curr) / (double)HZ;
   if (f > mintime)
+  {
+#ifdef EXTEND_TIMER_D
+    Print("//%s %.2f sec (%d) >>%s<<\n" ,v ,f,iiOp,my_yylinebuf);
+#else
     Print("//%s %.2f sec\n" ,v ,f);
+#endif
+  }
 }
 
 #ifdef HAVE_RTIMER
