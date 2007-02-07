@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.49 2007-02-06 09:59:01 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.50 2007-02-07 12:39:56 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -17,7 +17,12 @@
 #include "structs.h"
 #include "polys.h"
 #include "stdlib.h"
-//#define USE_NORO 1
+#define USE_NORO 1
+//#define NORO_CACHE 1
+#ifdef NORO_CACHE
+#include <map>
+#include <vector>
+#endif
 #ifdef HAVE_BOOST_DYNAMIC_BITSET_HPP
 #define  HAVE_BOOST 1
 #endif
@@ -56,6 +61,36 @@ using std::vector;
 //#define FIND_DETERMINISTIC
 //#define REDTAIL_PROT
 //#define QUICK_SPOLY_TEST
+class PolySimple{
+public:
+  PolySimple(poly p){
+    impl=p;
+  }
+  PolySimple(){
+    impl=NULL;
+  }
+  PolySimple(const PolySimple& a){
+    //impl=p_Copy(a.impl,currRing);
+    impl=a.impl;
+  }
+  PolySimple& operator=(const PolySimple& p2){
+    //p_Delete(&impl,currRing);
+    //impl=p_Copy(p2.impl,currRing);
+    impl=p2.impl;
+    return *this;
+  }
+  ~PolySimple(){
+    //p_Delete(&impl,currRing);
+  }
+  bool operator< (const PolySimple& other) const{
+    return pLmCmp(impl,other.impl)<0;
+  }
+  bool operator==(const PolySimple& other){
+    return pLmEqual(impl,other.impl);
+  }
+  poly impl;
+  
+};
 struct sorted_pair_node{
   //criterium, which is stable 0. small lcm 1. small i 2. small j
   wlen_type expected_length;

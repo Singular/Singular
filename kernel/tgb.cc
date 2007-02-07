@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.123 2007-02-07 10:49:41 Singular Exp $ */
+/* $Id: tgb.cc,v 1.124 2007-02-07 12:39:55 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -28,6 +28,7 @@
 #include "modulop.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <map>
 #define SR_HDL(A) ((long)(A))
 static const int bundle_size=1000;
 static const int delay_factor=3;
@@ -2181,22 +2182,207 @@ static void mass_add(poly* p, int pn,slimgb_alg* c){
   #endif
    
 }
+
+#ifdef NORO_CACHE
+class NoroCache{
+public:
+  void insert(poly term, poly nf, int len){
+    assume(impl.find(p_Copy(term,currRing))==impl.end());
+    assume(len==pLength(nf));
+    if (term==nf){
+      poly copied=p_Copy(term, currRing);
+      term=copied;
+      nf=copied;
+      ressources.push_back(copied);
+    } else{
+      term=p_Copy(term,currRing);
+
+      ressources.push_back(term);
+      if (nf){
+        nf=p_Copy(nf,currRing);
+        ressources.push_back(nf);
+      }
+    }
+    impl[term]=std::pair<PolySimple,int> (nf,len);
+  }
+  poly lookup(poly term, BOOLEAN& succ, int& len){
+    cache_map::iterator it=impl.find(term);
+    if (it!=impl.end()){
+      succ=TRUE;
+      //PrintS("Hit");
+      len=it->second.second;
+      return it->second.first.impl;
+    } else {
+      //PrintS("Miss");
+      succ=FALSE;
+      return NULL;
+    }
+  }
+  ~NoroCache(){
+    int s=ressources.size();
+    int i;
+    for(i=0;i<s;i++){
+      p_Delete(&ressources[i].impl,currRing);
+    }
+  }
+protected:
+  typedef std::vector<PolySimple> poly_vec;
+  poly_vec ressources;
+  typedef std::map<PolySimple,std::pair<PolySimple,int> > cache_map;
+  cache_map impl;
+};
+
+static poly noro_red(poly p, int &len, NoroCache* cache,slimgb_alg* c);
+
+static poly noro_red_mon(poly t, int &len, BOOLEAN& changed, NoroCache* cache,slimgb_alg* c){
+  BOOLEAN succ;
+  //wrp(t);
+  changed=TRUE;
+  poly cache_lookup=cache->lookup(t,succ, len);//don't own this yet
+  if (succ){
+    if (p_LmEqual(cache_lookup,t,c->r)){
+      //know they are equal
+      len=1;
+      changed=FALSE;
+      return t;
+    }
+    poly t_new=ppMult_nn(cache_lookup,pGetCoeff(t));
+    pDelete(&t);
+    return t_new;
+  } else {
+    unsigned long sev=p_GetShortExpVector(t,currRing);
+    int i=kFindDivisibleByInS_easy(c->strat,t,sev);
+    if (i>=0){
+      number coef_bak=pGetCoeff(t);
+      if (!(npIsOne(coef_bak))){
+        number coef_inverse=npInvers(coef_bak);
+        t=pMult_nn(t,coef_inverse);
+
+      }
+      assume(npIsOne(p_GetCoeff(c->strat->S[i],c->r)));
+      number coefstrat=p_GetCoeff(c->strat->S[i],c->r);
+    //assume(nIsOne(coef));
+      
+      poly t_copy_mon=p_Copy(t,c->r);
+
+      
+      //TODO: t=spoly(t,..)
+      p_ExpVectorSub(t,c->strat->S[i],c->r);
+      p_SetCoeff(t,npNeg(npInvers(coefstrat)),c->r);
+      p_Setm(t,c->r);
+      assume(c->strat->S[i]!=NULL);
+      poly t_to_del=t;
+      t=pp_Mult_mm(pNext(c->strat->S[i]),t,c->r);
+      p_Delete(&t_to_del,c->r);
+      len=c->strat->lenS[i]-1;
+      t=noro_red(t,len,cache,c);
+      
+      
+      cache->insert(t_copy_mon,t,pLength(t));
+      p_Delete(&t_copy_mon,c->r);
+      t=pMult_nn(t,coef_bak);
+      return t;
+    } else {
+      number coef_bak=p_GetCoeff(t,c->r);
+      number one=npInit(1);
+      p_SetCoeff(t,one,c->r);
+      len=1;
+      cache->insert(t,t,len);
+      p_SetCoeff(t,coef_bak,c->r);
+      return t;
+    }
+  }
+}
+//len input and out: Idea: reverse addition
+static poly noro_red(poly p, int &len, NoroCache* cache,slimgb_alg* c){
+  assume(len==pLength(p));
+  poly orig_p=p;
+  //poly* pre_buckets=(poly*) omalloc(len*sizeof(poly));
+  //int* pre_buckets_len=(int*) omalloc(len*sizeof(int));
+  //wrp(p);
+  if (p==NULL) {
+    len=0;
+    return NULL;
+  }
+  kBucket_pt bucket=kBucketCreate(currRing);
+  kBucketInit(bucket,NULL,0);
+  int pos=0;
+  poly unchanged_head=NULL;
+  poly unchanged_tail=NULL;
+  int unchanged_size=0;
+  while(p){
+    poly t=p;
+    pIter(p);
+    pNext(t)=NULL;
+    int l;
+    //poly reference=p_Head(t,c->r);
+    BOOLEAN changed;
+    t=noro_red_mon(t,l,changed,cache,c);
+    if (!(changed)){
+      unchanged_size++;
+      if (unchanged_head){
+        pNext(unchanged_tail)=t;
+        pIter(unchanged_tail);
+      } else{
+        unchanged_tail=t;
+        unchanged_head=t;
+      }
+    } else{
+      assume(l==pLength(t));
+
+      kBucket_Add_q(bucket,t,&l);
+    }
+    //pre_buckets[pos]=t;
+    //pre_buckets_len[pos++]=l;
+  }
+    //todo catch in general the length from cache
+
+  assume(pos==len);
+  int i;
+  //for(i=pos-1;i>=0;i--){
+  //  kBucket_Add_q(bucket,pre_buckets[i],&pre_buckets_len[i]);
+  //}
+  poly res;
+  len=0;
+  kBucket_Add_q(bucket,unchanged_head,&unchanged_size);
+  kBucketClear(bucket,&res,&len);
+  kBucketDestroy(&bucket);
+  //omfree(pre_buckets);
+  //omfree(pre_buckets_len);
+  return res;
+}
+#endif
+
 static void noro_step(poly*p,int &pn,slimgb_alg* c){
   poly* reduced=(poly*) omalloc(pn*sizeof(poly));
   int j;
   int* reduced_len=(int*) omalloc(pn*sizeof(int));
   int reduced_c=0;
-  if (TEST_OPT_PROT)
-    PrintS("reduced system:\n");
+  //if (TEST_OPT_PROT)
+  //  PrintS("reduced system:\n");
+#ifdef NORO_CACHE
+  NoroCache cache;
+#endif
   for(j=0;j<pn;j++){
    
     poly h=p[j];
     int h_len=pLength(h);
+
     number coef;
+#ifndef NORO_CACHE
     h=redNF2(p_Copy(h,c->r),c,h_len,coef,0);
+#else
+    h=noro_red(p_Copy(h,c->r),h_len,&cache,c);
+    assume(pLength(h)==h_len);
+#endif
     if (h!=NULL){
+#ifndef NORO_CACHE
+     
       h=redNFTail(h,c->strat->sl,c->strat,h_len);
       h_len=pLength(h);
+#endif
+      
+
       reduced[reduced_c]=h;
       reduced_len[reduced_c]=h_len;
       reduced_c++;
@@ -2233,6 +2419,7 @@ static void noro_step(poly*p,int &pn,slimgb_alg* c){
   
   pn=rank;
   omfree(reduced);
+
   if (TEST_OPT_PROT)
     PrintS("\n");
 }
