@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.30 2007-01-31 23:51:25 motsak Exp $ */
+/* $Id: structs.h,v 1.31 2007-02-07 18:28:25 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -172,7 +172,7 @@ typedef struct snumber *   number;
 typedef polyrec *          poly;
 typedef poly *             polyset;
 typedef ip_sideal *        ideal;
-typedef ip_smap *          map;
+//typedef ip_smap *          map; // conflict with tgb.cc
 typedef struct sideal_list *      ideal_list;
 typedef ideal *            resolvente;
 typedef union uutypes      utypes;
@@ -832,7 +832,8 @@ union uutypes
   poly          p;
   number        n;
   ideal         uideal;
-  map           umap;
+  //map           umap;
+  ip_smap *     umap;
   matrix        umatrix;
   char *        ustring;
   intvec *      iv;

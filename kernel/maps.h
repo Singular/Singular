@@ -3,11 +3,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.h,v 1.1.1.1 2003-10-06 12:15:57 Singular Exp $ */
+/* $Id: maps.h,v 1.2 2007-02-07 18:28:25 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
 #include "structs.h"
+typedef ip_smap *          map;
 
 poly maEval(map theMap, poly p, ring preimage_r, nMapFunc nMap,matrix s=NULL);
 map maCopy(map theMap);

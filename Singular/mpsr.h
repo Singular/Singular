@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr.h,v 1.23 2006-06-21 17:23:34 Singular Exp $ */
+/* $Id: mpsr.h,v 1.24 2007-02-07 18:28:54 Singular Exp $ */
 /***************************************************************
  *
  * File:       mpsr.h
@@ -21,6 +21,7 @@
 
 #include"MPT.h"
 #include"structs.h"
+typedef ip_smap *          map;
 #include"subexpr.h"
 #include"omalloc.h"
 #include"polys.h"

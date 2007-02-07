@@ -3,12 +3,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.48 2006-09-29 08:44:56 Singular Exp $ */
+/* $Id: ipshell.h,v 1.49 2007-02-07 18:28:54 Singular Exp $ */
 /*
 * ABSTRACT
 */
 #include <stdio.h>
 #include "structs.h"
+typedef ip_smap *          map;
+
 
 extern int  traceit ;
 #define TRACE_SHOW_PROC   1
