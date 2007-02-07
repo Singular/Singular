@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.8 2007-01-11 10:37:35 Singular Exp $ */
+/* $Id: kspoly.cc,v 1.9 2007-02-07 10:49:40 Singular Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -72,7 +72,7 @@ int ksReducePoly(LObject* PR,
     // no exp-bound checking needed 
     // (only needed if exp-bound(tailring)<exp-b(currRing))
     number c;
-    if (PR->bucket!=NULL)  nc_BucketPolyRed(PR->bucket, p2,&c);
+    if (PR->bucket!=NULL)  nc_kBucketPolyRed(PR->bucket, p2,&c);
     else 
     {
       poly _p = (PR->t_p != NULL ? PR->t_p : PR->p);

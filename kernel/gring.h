@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.18 2007-01-31 23:51:24 motsak Exp $ */
+/* $Id: gring.h,v 1.19 2007-02-07 10:49:40 Singular Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -128,21 +128,21 @@ inline poly nc_mm_Mult_p(const poly m, poly p, const ring r)
 //   return p_Mult_mm( p, m, r);
 }
 
-inline poly nc_SPoly(const poly p1, const poly p2, const ring r)
+inline poly nc_CreateSpoly(const poly p1, const poly p2, const ring r)
 {
   assume(rIsPluralRing(r));
   assume(r->nc->p_Procs.SPoly!=NULL);
   return r->nc->p_Procs.SPoly(p1, p2, r);
 }
 
-inline poly nc_ReduceSPoly(const poly p1, poly p2, const ring r)
+inline poly nc_ReduceSpoly(const poly p1, poly p2, const ring r)
 {
   assume(rIsPluralRing(r));
   assume(r->nc->p_Procs.ReduceSPoly!=NULL);
   return r->nc->p_Procs.ReduceSPoly(p1, p2, r);
 }
 
-inline void nc_BucketPolyRed(kBucket_pt b, poly p, number *c)
+inline void nc_kBucketPolyRed(kBucket_pt b, poly p, number *c)
 {
   assume(rIsPluralRing(currRing));
 

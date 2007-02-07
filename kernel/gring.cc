@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.42 2007-02-02 13:00:33 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.43 2007-02-07 10:49:39 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -1996,7 +1996,7 @@ ideal twostd(ideal I)
         #endif
         #endif
         
-        q = nc_ReduceSPoly(p,q,currRing);
+        q = nc_ReduceSpoly(p,q,currRing);
 
         #ifdef PDEBUG
           p_Test(q, currRing);

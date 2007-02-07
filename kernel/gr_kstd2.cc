@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.12 2007-02-01 18:53:54 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.13 2007-02-07 10:49:39 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -75,7 +75,7 @@ int redGrFirst (LObject* h,kStrategy strat)
         PrintS(" with ");
         wrp(strat->S[j]);
       }
-      (*h).p = nc_ReduceSPoly(strat->S[j],(*h).p, currRing);
+      (*h).p = nc_ReduceSpoly(strat->S[j],(*h).p, currRing);
       //spSpolyRed(strat->T[j].p,(*h).p,strat->kNoether);
 
       if (TEST_OPT_DEBUG)
@@ -178,7 +178,7 @@ static int nc_redHomog (LObject* h,kStrategy strat)
         wrp(strat->S[j]);
       }
       /*- compute the s-polynomial -*/
-      (*h).p = nc_ReduceSPoly(strat->S[j],(*h).p/*,strat->kNoether*/,currRing);
+      (*h).p = nc_ReduceSpoly(strat->S[j],(*h).p,currRing);
       if ((*h).p == NULL)
       {
         if (TEST_OPT_DEBUG) PrintS(" to 0\n");
@@ -867,7 +867,7 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
         strat->cp++;
         /* prod.crit itself in nc_CreateSpoly */
       }
-      strat->P.p = nc_SPoly(strat->P.p1,strat->P.p2/*,strat->kNoether*/,currRing);
+      strat->P.p = nc_CreateSpoly(strat->P.p1,strat->P.p2,currRing);
     }
     if (strat->P.p != NULL)
     {

@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.122 2007-02-06 09:59:00 bricken Exp $ */
+/* $Id: tgb.cc,v 1.123 2007-02-07 10:49:41 Singular Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2283,7 +2283,7 @@ static void go_on (slimgb_alg* c){
     {
 #ifdef HAVE_PLURAL
       if (c->nc){
-        h= nc_SPoly(c->S->m[s->i], c->S->m[s->j]/*, NULL*/, c->r);
+        h= nc_CreateSpoly(c->S->m[s->i], c->S->m[s->j]/*, NULL*/, c->r);
         if (h!=NULL)
           pCleardenom(h);
       }
