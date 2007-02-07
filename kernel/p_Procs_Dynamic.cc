@@ -6,7 +6,7 @@
  *  Purpose: source for dynamically loaded version of p_Procs
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Dynamic.cc,v 1.1.1.1 2003-10-06 12:16:00 Singular Exp $
+ *  Version: $Id: p_Procs_Dynamic.cc,v 1.2 2007-02-07 10:42:54 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "structs.h"
@@ -175,6 +175,7 @@ static void* GetDynamicProc(const char* proc_s, p_Proc proc,
           p_FieldEnum_2_String(field),
           p_LengthEnum_2_String(length),
           p_OrdEnum_2_String(ord));
+  // printf("set %s\n",proc_name);
   // first, try to get the proc from the kernel
   proc_ptr = dynl_sym(DYNL_KERNEL_HANDLE, proc_name);
   if (proc_ptr == NULL)
