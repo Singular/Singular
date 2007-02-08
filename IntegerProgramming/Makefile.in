@@ -73,10 +73,9 @@ install-bindist: $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4)
 install-bindist-plural: install-bindist
 
 clean: 
-	rm -f *.o *~ 
+	rm -f *.o *~  $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4) $(LLL)
 
 distclean: clean
-	rm -f $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4)
 	-rm -f ${bindir}/$(MAIN1)
 	-rm -f ${bindir}/$(MAIN2)
 	-rm -f ${bindir}/$(MAIN3)

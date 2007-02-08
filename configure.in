@@ -84,6 +84,20 @@ dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl compiler stuff
 dnl is needed to check for libs and headers, later on
 dnl
+dnl we do not want to have "-g -O" for CFLAGS
+if test "${CXXFLAGS+set}" != set; then
+  ac_cxxflags_set=no
+  CXXFLAGS="-O"
+fi
+if test "${CFLAGS+set}" != set; then
+  CFLAGS="-O"
+  ac_cflags_set=no
+fi
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl compiler stuff
+dnl is needed to check for libs and headers, later on
+dnl
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_INSTALL
