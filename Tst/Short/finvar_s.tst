@@ -27,14 +27,17 @@ example primary_charp_without_random;
 example primary_invariants_random;
 example power_products;
 example secondary_char0;
+example irred_secondary_char0;
 example secondary_charp;
 example secondary_no_molien;
+example irred_secondary_no_molien;
 example secondary_and_irreducibles_no_molien;
 example secondary_not_cohen_macaulay;
 example invariant_ring;
 example invariant_ring_random;
 example orbit_variety;
 example relative_orbit_variety;
+example rel_orbit_variety;
 example image_of_variety;
 
 tst_status(1);$
