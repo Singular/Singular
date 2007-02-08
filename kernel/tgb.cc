@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.124 2007-02-07 12:39:55 bricken Exp $ */
+/* $Id: tgb.cc,v 1.125 2007-02-08 10:40:18 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -28,7 +28,8 @@
 #include "modulop.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include <map>
+
+#define BUCKETS_FOR_NORO_RED 1
 #define SR_HDL(A) ((long)(A))
 static const int bundle_size=1000;
 static const int delay_factor=3;
@@ -2184,104 +2185,223 @@ static void mass_add(poly* p, int pn,slimgb_alg* c){
 }
 
 #ifdef NORO_CACHE
+class NoroCacheNode{
+public:
+  NoroCacheNode** branches;
+  int branches_len;
+
+  
+  NoroCacheNode(){
+    branches=NULL;
+    branches_len=0;
+  }
+  NoroCacheNode* setNode(int branch, NoroCacheNode* node){
+    if (branch>=branches_len){
+      if (branches==NULL){
+        branches_len=branch+1;
+        branches=(NoroCacheNode**) omalloc(branches_len*sizeof(NoroCacheNode*));
+        int i;
+        for(i=0;i<branches_len;i++){
+          branches[i]=NULL;
+        }
+      }else{
+        int branches_len_old=branches_len;
+        branches_len=branch+1;
+        branches=(NoroCacheNode**) omrealloc(branches,branches_len*sizeof(NoroCacheNode*));
+        int i;
+        for(i=branches_len_old;i<branches_len;i++){
+          branches[i]=NULL;
+        }
+      }
+    }
+    assume(branches[branch]==NULL);
+    branches[branch]=node;
+    return node;
+  }
+  NoroCacheNode* getBranch(int branch){
+    if (branch<branches_len) return branches[branch];
+    return NULL;
+  }
+  virtual ~NoroCacheNode(){
+    int i;
+    for(i=0;i<branches_len;i++){
+      delete branches[i];
+    }
+    omfree(branches);
+  }
+  NoroCacheNode* getOrInsertBranch(int branch){
+    if ((branch<branches_len)&&(branches[branch]))
+      return branches[branch];
+    else{
+      return setNode(branch,new NoroCacheNode());
+    }
+  }
+};
+class DataNoroCacheNode:public NoroCacheNode{
+public:
+  
+  int value_len;
+  poly value_poly;
+  DataNoroCacheNode(poly p, int len){
+    value_len=len;
+    value_poly=p;
+  }
+};
 class NoroCache{
 public:
+  poly temp_term;
+#ifndef BUCKETS_FOR_NORO_RED
+  int reserved;
+  poly* recursionPolyBuffer;
+#endif
+  static const int backLinkCode=-222;
   void insert(poly term, poly nf, int len){
-    assume(impl.find(p_Copy(term,currRing))==impl.end());
-    assume(len==pLength(nf));
+    //assume(impl.find(p_Copy(term,currRing))==impl.end());
+    //assume(len==pLength(nf));
     if (term==nf){
-      poly copied=p_Copy(term, currRing);
-      term=copied;
-      nf=copied;
-      ressources.push_back(copied);
-    } else{
-      term=p_Copy(term,currRing);
 
-      ressources.push_back(term);
+      treeInsertBackLink(term);
+      return;
+    } else{
+      //term=p_Copy(term,currRing);
+
+      //ressources.push_back(term);
       if (nf){
         nf=p_Copy(nf,currRing);
         ressources.push_back(nf);
       }
+      treeInsert(term,nf,len);
+      return;
     }
-    impl[term]=std::pair<PolySimple,int> (nf,len);
+    
+    //impl[term]=std::pair<PolySimple,int> (nf,len);
   }
-  poly lookup(poly term, BOOLEAN& succ, int& len){
-    cache_map::iterator it=impl.find(term);
-    if (it!=impl.end()){
-      succ=TRUE;
-      //PrintS("Hit");
-      len=it->second.second;
-      return it->second.first.impl;
-    } else {
-      //PrintS("Miss");
-      succ=FALSE;
-      return NULL;
-    }
+
+  poly lookup(poly term, BOOLEAN& succ, int & len);
+  NoroCache(){
+#ifndef BUCKETS_FOR_NORO_RED
+    reserved=0;
+    recursionPolyBuffer=(poly*)omalloc(1000000*sizeof(poly));
+#endif
+    temp_term=pOne();
   }
+#ifndef BUCKETS_FOR_NORO_RED
+  poly* reserve(int n){
+    poly* res=recursionPolyBuffer+reserved;
+    reserved+=n;
+    return res;
+  }
+  void free(int n){
+    reserved-=n;
+  }
+#endif
   ~NoroCache(){
     int s=ressources.size();
     int i;
     for(i=0;i<s;i++){
       p_Delete(&ressources[i].impl,currRing);
     }
+    p_Delete(&temp_term,currRing);
+#ifndef BUCKETS_FOR_NORO_RED
+    omfree(recursionPolyBuffer);
+#endif
   }
 protected:
+  void treeInsert(poly term,poly nf,int len){
+    int i;
+    int nvars=pVariables;
+    NoroCacheNode* parent=&root;
+    for(i=1;i<nvars;i++){
+      parent=parent->getOrInsertBranch(p_GetExp(term,i,currRing));
+    }
+    parent->setNode(p_GetExp(term,nvars,currRing),new DataNoroCacheNode(nf,len));
+  }
+  void treeInsertBackLink(poly term){
+    int i;
+    int nvars=pVariables;
+    NoroCacheNode* parent=&root;
+    for(i=1;i<nvars;i++){
+      parent=parent->getOrInsertBranch(p_GetExp(term,i,currRing));
+    }
+    parent->setNode(p_GetExp(term,nvars,currRing),new DataNoroCacheNode(NULL,backLinkCode));
+  }
+  
+  //@TODO descruct nodes;
   typedef std::vector<PolySimple> poly_vec;
   poly_vec ressources;
-  typedef std::map<PolySimple,std::pair<PolySimple,int> > cache_map;
-  cache_map impl;
+  //typedef std::map<PolySimple,std::pair<PolySimple,int> > cache_map;
+  //cache_map impl;
+  NoroCacheNode root;
 };
+poly NoroCache::lookup(poly term, BOOLEAN& succ, int & len){
+  int i;
+  NoroCacheNode* parent=&root;
+  for(i=1;i<pVariables;i++){
+    parent=parent->getBranch(p_GetExp(term,i,currRing));
+    if (!(parent)){
+      succ=FALSE;
+      return NULL;
+    }
+  }
+  DataNoroCacheNode* res_holder=(DataNoroCacheNode*) parent->getBranch(p_GetExp(term,i,currRing));
+  if (res_holder){
+    succ=TRUE;
+    if ((res_holder->value_poly==0) &&(res_holder->value_len==backLinkCode)){
+      len=1;
+      return term;
+    }
+    len=res_holder->value_len;
+    return res_holder->value_poly;
+  } else {
+    succ=FALSE;
+    return NULL;
+  }
+}
+poly noro_red(poly p, int &len, NoroCache* cache,slimgb_alg* c);
 
-static poly noro_red(poly p, int &len, NoroCache* cache,slimgb_alg* c);
-
-static poly noro_red_mon(poly t, int &len, BOOLEAN& changed, NoroCache* cache,slimgb_alg* c){
+poly noro_red_mon(poly t, int &len, BOOLEAN& changed, NoroCache* cache,slimgb_alg* c){
   BOOLEAN succ;
   //wrp(t);
   changed=TRUE;
   poly cache_lookup=cache->lookup(t,succ, len);//don't own this yet
   if (succ){
-    if (p_LmEqual(cache_lookup,t,c->r)){
+    if (cache_lookup==t){
       //know they are equal
       len=1;
       changed=FALSE;
       return t;
     }
     poly t_new=ppMult_nn(cache_lookup,pGetCoeff(t));
-    pDelete(&t);
+    p_Delete(&t,c->r);
     return t_new;
   } else {
     unsigned long sev=p_GetShortExpVector(t,currRing);
     int i=kFindDivisibleByInS_easy(c->strat,t,sev);
     if (i>=0){
       number coef_bak=pGetCoeff(t);
-      if (!(npIsOne(coef_bak))){
-        number coef_inverse=npInvers(coef_bak);
-        t=pMult_nn(t,coef_inverse);
 
-      }
+      p_SetCoeff(t,npInit(1),c->r);
       assume(npIsOne(p_GetCoeff(c->strat->S[i],c->r)));
       number coefstrat=p_GetCoeff(c->strat->S[i],c->r);
-    //assume(nIsOne(coef));
       
-      poly t_copy_mon=p_Copy(t,c->r);
-
-      
-      //TODO: t=spoly(t,..)
-      p_ExpVectorSub(t,c->strat->S[i],c->r);
-      p_SetCoeff(t,npNeg(npInvers(coefstrat)),c->r);
-      p_Setm(t,c->r);
+      //poly t_copy_mon=p_Copy(t,c->r);
+      poly exp_diff=cache->temp_term;
+      p_ExpVectorDiff(exp_diff,t,c->strat->S[i],c->r);
+      p_SetCoeff(exp_diff,npNeg(npInvers(coefstrat)),c->r);
+      p_Setm(exp_diff,c->r);
       assume(c->strat->S[i]!=NULL);
-      poly t_to_del=t;
-      t=pp_Mult_mm(pNext(c->strat->S[i]),t,c->r);
-      p_Delete(&t_to_del,c->r);
+      //poly t_to_del=t;
+      poly res;
+      res=pp_Mult_mm(pNext(c->strat->S[i]),exp_diff,c->r);
+
       len=c->strat->lenS[i]-1;
-      t=noro_red(t,len,cache,c);
+      res=noro_red(res,len,cache,c);
       
-      
-      cache->insert(t_copy_mon,t,pLength(t));
-      p_Delete(&t_copy_mon,c->r);
-      t=pMult_nn(t,coef_bak);
-      return t;
+      cache->insert(t,res,pLength(res));
+      p_Delete(&t,c->r);
+      //p_Delete(&t_copy_mon,c->r);
+      res=pMult_nn(res,coef_bak);
+      return res;
     } else {
       number coef_bak=p_GetCoeff(t,c->r);
       number one=npInit(1);
@@ -2293,8 +2413,23 @@ static poly noro_red_mon(poly t, int &len, BOOLEAN& changed, NoroCache* cache,sl
     }
   }
 }
+poly tree_add(poly* a,int begin, int end,ring r){
+  int d=end-begin;
+  switch(d){
+    case 0:
+      return NULL;
+    case 1:
+      return a[begin];
+    case 2:
+      return p_Add_q(a[begin],a[begin+1],r);
+    default:
+      int s=d/2;
+      return p_Add_q(tree_add(a,begin,begin+s,r),tree_add(a,begin+s,end,r),r);
+  }
+}
+
 //len input and out: Idea: reverse addition
-static poly noro_red(poly p, int &len, NoroCache* cache,slimgb_alg* c){
+poly noro_red(poly p, int &len, NoroCache* cache,slimgb_alg* c){
   assume(len==pLength(p));
   poly orig_p=p;
   //poly* pre_buckets=(poly*) omalloc(len*sizeof(poly));
@@ -2304,12 +2439,23 @@ static poly noro_red(poly p, int &len, NoroCache* cache,slimgb_alg* c){
     len=0;
     return NULL;
   }
+  if (len==1){
+    BOOLEAN changed;
+    return noro_red_mon(p,len,changed,cache,c);
+  }
+  #ifdef BUCKETS_FOR_NORO_RED
   kBucket_pt bucket=kBucketCreate(currRing);
   kBucketInit(bucket,NULL,0);
-  int pos=0;
+  #endif
+  //int pos=0;
   poly unchanged_head=NULL;
   poly unchanged_tail=NULL;
   int unchanged_size=0;
+  #ifndef BUCKETS_FOR_NORO_RED
+  poly * pre_buckets=cache->reserve(len);
+  #endif
+  int reserved=len;//(poly*) omalloc(len*sizeof(poly));
+  int pos=0;
   while(p){
     poly t=p;
     pIter(p);
@@ -2329,31 +2475,43 @@ static poly noro_red(poly p, int &len, NoroCache* cache,slimgb_alg* c){
       }
     } else{
       assume(l==pLength(t));
-
+#ifdef BUCKETS_FOR_NORO_RED
       kBucket_Add_q(bucket,t,&l);
+#else
+     pre_buckets[pos++]=t;
+#endif
     }
     //pre_buckets[pos]=t;
     //pre_buckets_len[pos++]=l;
   }
     //todo catch in general the length from cache
 
-  assume(pos==len);
+  //assume(pos==len);
   int i;
   //for(i=pos-1;i>=0;i--){
   //  kBucket_Add_q(bucket,pre_buckets[i],&pre_buckets_len[i]);
   //}
   poly res;
   len=0;
+  
+  #ifdef BUCKETS_FOR_NORO_RED
   kBucket_Add_q(bucket,unchanged_head,&unchanged_size);
   kBucketClear(bucket,&res,&len);
   kBucketDestroy(&bucket);
+  #else
+  res=tree_add(pre_buckets,0,pos,c->r);
+  res=p_Add_q(unchanged_head,res,c->r);
+  len=pLength(res);
+  cache->free(reserved);
+  //omfree(pre_buckets);
+  #endif
   //omfree(pre_buckets);
   //omfree(pre_buckets_len);
   return res;
 }
 #endif
 
-static void noro_step(poly*p,int &pn,slimgb_alg* c){
+void noro_step(poly*p,int &pn,slimgb_alg* c){
   poly* reduced=(poly*) omalloc(pn*sizeof(poly));
   int j;
   int* reduced_len=(int*) omalloc(pn*sizeof(int));
