@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.58 2007-02-02 13:25:09 Singular Exp $"
+version="$Id: finvar.lib,v 1.59 2007-02-08 15:20:54 king Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -37,12 +37,15 @@ AUXILIARY PROCEDURES:
  primary_charp_without_random()    p.i., char p, without R.o. or M.s., random.
  power_products()                  exponents for power products
  secondary_char0()                 secondary invariants (s.i.) in char 0
- irred_secondary_char0()           irreducible secondary invariants in char 0
- secondary_charp()                 secondary invariants in char p
- secondary_no_molien()             secondary invariants, without Molien series
+ irred_secondary_char0()           irreducible s.i. in char 0
+ secondary_charp()                 s.i. in char p, with Molien series and 
+                                   Reynolds operator
+ secondary_no_molien()             s.i., without Molien series but with 
+                                   Reynolds operator
+ irred_secondary_no_molien()       irreducible s.i., without Molien series
                                    but with Reynolds operator
  secondary_and_irreducibles_no_molien() s.i. & irreducible s.i., without M.s.
- secondary_not_cohen_macaulay()    s.i. when invariant ring not Cohen-Macaulay
+ secondary_not_cohen_macaulay()    s.i. when the invariant ring is not Cohen-Macaulay
  orbit_variety()                   ideal of the orbit variety
  rel_orbit_variety()               ideal of a relative orbit variety (new version)
  relative_orbit_variety()          ideal of a relative orbit variety (old version)
@@ -4304,7 +4307,7 @@ THEORY:  The secondary invariants are calculated by finding a basis (in terms
                                        // of a certain degree -
   m=nrows(dimmat);                     // m-1 is the highest degree
   if (v)
-  { "  In degree 0 we have: 1";
+  { "In degree 0 we have: 1";
     "";
   }
  //-------------------------- initializing variables --------------------------
@@ -4320,7 +4323,7 @@ THEORY:  The secondary invariants are calculated by finding a basis (in terms
   { if (int(dimmat[i,1])<>0)           // when it is == 0 we need to find 0
     {                                  // elements in the current degree (i-1)
       if (v)
-      { "  Searching in degree "+string(i-1)+", we need to find "+string(int(dimmat[i,1]))+" invariant(s)...";
+      { "Searching in degree "+string(i-1)+", we need to find "+string(int(dimmat[i,1]))+" invariant(s)...";
       }
       TEST=sP;
       counter=0;                       // we'll count up to degvec[i]
@@ -4467,7 +4470,7 @@ EXAMPLE:  example secondary_char0; shows an example
 "
 {
  //----------  Internal parameters, whose choice might improve the performance -----
-  int pieces = 15;   // For generating reducible secondaries, blocks of #pieces# secondaries
+  int pieces = 3;   // For generating reducible secondaries, blocks of #pieces# secondaries
                      // are formed.
                      // If this parameter is small, the memory consumption will decrease.
   int MonStep = 15;  // The Reynolds operator is applied to blocks of #MonStep# monomials.
@@ -4565,7 +4568,7 @@ EXAMPLE:  example secondary_char0; shows an example
      }
   }
   if (v)
-  { "  In degree 0 we have: 1";
+  { "In degree 0 we have: 1";
     "";
   }
  //-------------------------- initializing variables --------------------------
@@ -4579,16 +4582,19 @@ EXAMPLE:  example secondary_char0; shows an example
   ideal sP = groebner(ideal(P));
                            // This is the only explicit Groebner basis computation!
   ideal Reductor,SaveRed;  // sP union Reductor is a Groebner basis up to degree i-1
+ideal sP_Reductor;          // will contain sP union Reductor.
+int sPOffset = ncols(sP);
   int SizeSave;
 
   list SSort;         // sec. inv. first sorted by degree and then sorted by the
                       // minimal degree of a non-constant invariant factor.
   list ISSort;        // irr. sec. inv. sorted by degree
+int NrIS;
 
   poly helpP;
   ideal helpI;
   ideal Indicator;        // will tell us which candidates for sec. inv. we can choose
-  ideal ReducedCandidates;
+//  ideal ReducedCandidates;
   int helpint;
   int k,k2,k3,minD;
   int ii;
@@ -4607,10 +4613,11 @@ EXAMPLE:  example secondary_char0; shows an example
   { if (int(dimmat[i,1])<>0)           // when it is == 0 we need to find no
     {                                  // elements in the current degree (i-1)
       if (v)
-      { "  Searching in degree "+string(i-1)+", we need to find "+string(int(dimmat[i,1]))+
+      { "Searching in degree "+string(i-1)+", we need to find "+string(int(dimmat[i,1]))+
         " invariant(s)...";
         "  Looking for Power Products...";
       }
+sP_Reductor = sP;
       counter = 0;                       // we'll count up to dimmat[i,1]
       Reductor = ideal(0);
       helpint = 0;
@@ -4659,17 +4666,12 @@ EXAMPLE:  example secondary_char0; shows an example
 //              if (i<10)
                 ProdCand = simplify(Mul1*Mul2,4);
 //              else { ProdCand = Mul1*Mul2;}
-              ReducedCandidates = reduce(ProdCand,sP);
+//              ReducedCandidates = reduce(ProdCand,sP);
                   // sP union SaveRed union Reductor is a homogeneous Groebner basis
                   // up to degree i-1.
-                  // We first reduce by sP (which is fixed, so we can do it once for all),
-                  // then by SaveRed resp. by Reductor (which is modified during
-                  // the computations).
-              Indicator = reduce(ReducedCandidates,SaveRed);
-                             // If Indicator[ii]==0 then ReducedCandidates it the reduction
-                             // of an invariant that is in the algebra generated by primary
-                             // invariants and previously computed secondary invariants.
-                             // Otherwise ProdCand[ii] can be taken as secondary invariant.
+//              Indicator = reduce(ReducedCandidates,SaveRed);
+              Indicator = reduce(ProdCand,sP_Reductor);
+                             // If Indicator[ii]<>0 then ProdCand[ii] can be taken as secondary invariant.
               if (size(Indicator)<>0)
               { for (ii=1;ii<=ncols(ProdCand);ii++)     // going through all the power products
                 { helpP = Indicator[ii];
@@ -4680,21 +4682,22 @@ EXAMPLE:  example secondary_char0; shows an example
                         // By construction, this is a _reducible_ s.i.
                     attrib(SSort[i-1][k],"size",saveAttr);
                     if (v)
-                    { "We found",counter, " of", int(dimmat[i,1])," secondaries in degree",i-1;
+                    { "    We found",counter, "of", int(dimmat[i,1]),"secondaries in degree",i-1;
                     }
                     if (int(dimmat[i,1])<>counter)
                     { Reductor = ideal(helpP);
-                        // Lemma: If G is a homogeneous Groebner basis up to degree i-1 and p is a
-                        // homogeneous polynomial of degree i-1 then G union NF(p,G) is
-                        // a homogeneous Groebner basis up to degree i-1.
                       attrib(Reductor, "isSB",1);
-                        // if Reductor becomes too large, we reduce the whole of Indicator by
-                        // it, save it in SaveRed, and work with a smaller Reductor. This turns
-                        // out to save a little time.
                       Indicator=reduce(Indicator,Reductor);
                       SizeSave++;
                       SaveRed[SizeSave] = helpP;
+sP_Reductor[sPOffset+SizeSave] = helpP;
+attrib(sP_Reductor, "isSB",1);
+                        // Lemma: If G is a homogeneous Groebner basis up to degree i-1 and p is a
+                        // homogeneous polynomial of degree i-1 then G union NF(p,G) is
+                        // a homogeneous Groebner basis up to degree i-1. Hence, sP_Reductor
+                        // is a homog. GB up to degree i-1.
                       attrib(SaveRed, "isSB",1);
+                      attrib(Reductor, "isSB",1);
                     }
                     else
                     { break;
@@ -4708,16 +4711,17 @@ EXAMPLE:  example secondary_char0; shows an example
         }
       }
 
+NrIS = int(dimmat[i,1])-counter;
       // The remaining sec. inv. are irreducible!
-      if (int(dimmat[i,1])<>counter)   // need more than all the power products
+      if (NrIS>0)   // need more than all the power products
       { if (v)
-        { "There are irreducible secondary invariants in degree ", i-1," !";
+        { "  There are ",NrIS,"irreducible secondary invariants in degree ", i-1;
         }
-        mon = kbase(sP,i-1);
+        mon = kbase(sP_Reductor,i-1);
 //        mon = ideal(mon[ncols(mon)..1]);
         ii = ncols(mon);
         if ((i>IrrSwitch) or (ii>200)) // use sparse algorithm
-        { if (counter==0 && ii==int(dimmat[i,1])) // then we can use all of mon
+        { if (ii+counter==int(dimmat[i,1])) // then we can use all of mon
           { B=normalize(evaluate_reynolds(REY,mon));
             IS=IS+B;
             saveAttr = attrib(SSort[i-1][i-1],"size")+ii;
@@ -4729,7 +4733,7 @@ EXAMPLE:  example secondary_char0; shows an example
             else
             { ISSort[i-1] = B;
             }
-            if (v) {"  We found: "; print(B);}
+            if (v) {"    We found all",NrIS,"irreducibles in degree ",i-1;}
           }
           else
           { irrcounter=0;
@@ -4740,18 +4744,18 @@ EXAMPLE:  example secondary_char0; shows an example
               { if ((j+MonStep) <= ii)
                 { ideal tmp = normalize(evaluate_reynolds(REY,ideal(mon[j+1..j+MonStep])));
                   B[j+1..j+MonStep] = tmp[1..MonStep];
-                  tmp = reduce(tmp,sP);
-                  ReducedCandidates[j+1..j+MonStep] = tmp[1..MonStep];
-                  tmp = reduce(tmp,SaveRed);
+//                  tmp = reduce(tmp,sP);
+//                  ReducedCandidates[j+1..j+MonStep] = tmp[1..MonStep];
+                  tmp = reduce(tmp,sP_Reductor);
                   Indicator[j+1..j+MonStep] = tmp[1..MonStep];
                   kill tmp;
                 }
                 else
                 { ideal tmp = normalize(evaluate_reynolds(REY,ideal(mon[j+1..ii])));
                   B[j+1..ii] = tmp[1..ii-j];
-                  tmp = reduce(tmp,sP);
-                  ReducedCandidates[j+1..ii] = tmp[1..ii-j];
-                  tmp = reduce(tmp,SaveRed);
+//                  tmp = reduce(tmp,sP);
+//                  ReducedCandidates[j+1..ii] = tmp[1..ii-j];
+                  tmp = reduce(tmp,sP_Reductor);
                   Indicator[j+1..ii] = tmp[1..ii-j];
                   kill tmp;
                 }
@@ -4770,8 +4774,8 @@ EXAMPLE:  example secondary_char0; shows an example
                 else
                 { ISSort[i-1] = ideal(B[j]);
                 }
-                if (v)
-                { "  We found the irreducible sec. inv. "+string(B[j]);
+                if (v) 
+                { "    We found", irrcounter,"of", NrIS ,"irr. sec. inv. in degree ",i-1; 
                 }
                 Reductor = ideal(helpP);
                 attrib(Reductor, "isSB",1);
@@ -4779,15 +4783,17 @@ EXAMPLE:  example secondary_char0; shows an example
                 SizeSave++;
                 SaveRed[SizeSave] = helpP;
                 attrib(SaveRed, "isSB",1);
+sP_Reductor[sPOffset+SizeSave] = helpP;
+attrib(sP_Reductor, "isSB",1);
               }
               B[j]=0;
-              ReducedCandidates[j]=0;
+//              ReducedCandidates[j]=0;
               Indicator[j]=0;
             }
           } 
         }  // if i>IrrSwitch
         else  // use fast algorithm
-        { B=sort_of_invariant_basis(sP,REY,i-1,int(dimmat[i,1])*6);
+        { B=sort_of_invariant_basis(sP_Reductor,REY,i-1,int(dimmat[i,1])*6);
                                        // B contains 
                                        // images of kbase(sP,i-1) under the
                                        // Reynolds operator that are linearly
@@ -4803,14 +4809,14 @@ EXAMPLE:  example secondary_char0; shows an example
             else
             { ISSort[i-1] = B;
             }
-            if (v) {"  We found: "; print(B);}
+            if (v) {"    We found all",NrIS,"irreducibles in degree ",i-1;}
           }
           else
           { irrcounter=0;
             j=0;                         // j goes through all of B -
             // Compare the comments on the computation of reducible sec. inv.!
-            ReducedCandidates = reduce(B,sP);
-            Indicator = reduce(ReducedCandidates,SaveRed);
+//            ReducedCandidates = reduce(B,sP);
+            Indicator = reduce(B,sP_Reductor);
             while (int(dimmat[i,1])<>counter)
             { j++;
               helpP = Indicator[j];
@@ -4826,8 +4832,8 @@ EXAMPLE:  example secondary_char0; shows an example
                 else
                 { ISSort[i-1] = ideal(B[j]);
                 }
-                if (v)
-                { "  We found the irreducible sec. inv. "+string(B[j]);
+                if (v) 
+                { "    We found", irrcounter,"of", NrIS,"irr. sec. inv. in degree ",i-1; 
                 }
                 Reductor = ideal(helpP);
                 attrib(Reductor, "isSB",1);
@@ -4835,9 +4841,11 @@ EXAMPLE:  example secondary_char0; shows an example
                 SizeSave++;
                 SaveRed[SizeSave] = helpP;
                 attrib(SaveRed, "isSB",1);
+sP_Reductor[sPOffset+SizeSave] = helpP;
+attrib(sP_Reductor, "isSB",1);
               }
               B[j]=0;
-              ReducedCandidates[j]=0;
+//              ReducedCandidates[j]=0;
               Indicator[j]=0;
             }
           }
@@ -4891,7 +4899,7 @@ example
 
 proc irred_secondary_char0 (matrix P, matrix REY, matrix M, list #)
 "
-USAGE:    irred_secondary_char0(P,REY,M[,v]);
+USAGE:    irred_secondary_char0(P,REY,M[,v][,\"PP\"]);
 @*          P: a 1xn <matrix> with homogeneous primary invariants, where
                n is the number of variables of the basering;
 @*          REY: a gxn <matrix> representing the Reynolds operator, where
@@ -4899,6 +4907,8 @@ USAGE:    irred_secondary_char0(P,REY,M[,v]);
 @*          M: a 1x2 <matrix> giving numerator and denominator of the 
                Molien series;
 @*          v: an optional <int>;
+@*          \"PP\": if this string occurs as (optional) parameter, then in
+               all degrees power products of irr. sec. inv. will be computed.
 RETURN:   Irreducible homogeneous secondary invariants of the invariant ring 
           (type <matrix>)
 ASSUME:   We are in the non-modular case, i.e., the characteristic of the basering
@@ -4914,9 +4924,13 @@ THEORY:   The secondary invariants are calculated by finding a basis (in terms
           or their power products we pick a maximal subset that is linearly
           independent modulo the primary invariants using Groebner basis techniques
           (see paper \"Fast Computation of Secondary Invariants\" by S. King).
-          The size of this set 
-          can be read off from the Molien series. Here, only irreducible secondary
-          invariants are explicitly computed, which saves time and memory.
+          The size of this set can be read off from the Molien series. Here, only 
+          irreducible secondary invariants are explicitly computed, which saves time and 
+          memory.
+@*        Moreover, if no irr. sec. inv. in degree d-1 have been found and unless the last
+          optional paramter \"PP\" is used, a Groebner basis of primary invariants and 
+          irreducible secondary invariants up to degree d-2 is computed, which allows to 
+          detect irr. sec. inv. in degree d without computing power products. 
 @*        There are three internal parameters \"pieces\", \"MonStep\" and \"IrrSwitch\".
           The default values of the parameters should be fine in most cases. However,
           in some cases, different values may provide a better balance of memory 
@@ -4926,16 +4940,16 @@ KEYWORDS: irreducible secondary invariant
 EXAMPLE:  example irred_secondary_char0; shows an example
 "
 { //----------  Internal parameters, whose choice might improve the performance -----
-  int pieces = 15;   // For generating reducible secondaries, blocks of #pieces# secondaries
+  int pieces = 3;    // For generating reducible secondaries, blocks of #pieces# secondaries
                      // are formed.
                      // If this parameter is small, the memory consumption will decrease.
   int MonStep = 15;  // The Reynolds operator is applied to blocks of #MonStep# monomials.
                      // If this parameter is small, the memory consumption will decrease.
-  int IrrSwitch = 7; // Up to degree #IrrSwitch#-1, we use a method for generating
-                     // irreducible secondaries that tends to produce a smaller output
-                     // (which is good for subsequent computations). However, this method
-                     // needs to much memory in high degrees, and so we use a sparser method
-                     // from degree #IrrSwitch# on.
+  int IrrSwitch = 7; // Up to degree #IrrSwitch#-1, or if there are few monomials in kbase(sP,i-1),
+                     // we use a method for generating irreducible secondaries that tends to 
+                     // produce a smaller output (which is good for subsequent computations). 
+                     // However, this method needs to much memory in high degrees, and so we 
+                     // use a sparser method from degree #IrrSwitch# upwards.
 
   def br=basering;
  //----------------- checking input and setting verbose mode ------------------
@@ -4946,8 +4960,8 @@ EXAMPLE:  example irred_secondary_char0; shows an example
   }
   int i;
   if (size(#)>0)
-  { if (typeof(#[size(#)])=="int")
-    { int v=#[size(#)];
+  { if (typeof(#[1])=="int")
+    { int v=#[1];
     }
     else
     { int v=0;
@@ -4955,6 +4969,19 @@ EXAMPLE:  example irred_secondary_char0; shows an example
   }
   else
   { int v=0;
+  }
+
+  int UsePP;
+  if (size(#)>0)
+  { if (typeof(#[size(#)])=="string")
+    { if (#[size(#)]=="PP")
+      { UsePP = 1;
+      }
+      else
+      { "ERROR:   If the last optional parameter is a string, it should be \"PP\".";
+        return(matrix(ideal()),matrix(ideal()));
+      }
+    }
   }
   int n=nvars(br);                // n is the number of variables, as well
                                   // as the size of the matrices, as well
@@ -4994,7 +5021,7 @@ EXAMPLE:  example irred_secondary_char0; shows an example
                                        // of a certain degree -
   m=nrows(dimmat);                     // m-1 is the highest degree
   if (v) 
-  { "We need to find";
+  { "There are";
     for (j=1;j<=m;j++)
      { if (int(dimmat[j,1])<>1)
        { int(dimmat[j,1]), "secondary invariants in degree",j-1;
@@ -5005,7 +5032,7 @@ EXAMPLE:  example irred_secondary_char0; shows an example
      }
   }
   if (v)
-  { "  In degree 0 we have: 1";
+  { "In degree 0 we have: 1";
     "";
   }
  //-------------------------- initializing variables --------------------------
@@ -5018,6 +5045,12 @@ EXAMPLE:  example irred_secondary_char0; shows an example
   degBound = 0;
   option(redSB);
   ideal sP = groebner(ideal(P));
+ideal TotalReductor = sP;        // will eventually be groebner(ideal(P)+IS)
+ideal sP_Reductor;          // will contain sP union Reductor.
+int sPOffset = ncols(sP);
+int LastNewIS=-10;           // if the Last New Irr. Sec. was found in degree i-2 then
+                           // we compute TotalReductor again
+int TotalSet = 1;         // It TotalSet is 0, we eventually need to re-compute TotalReductor.
   ideal Reductor,SaveRed;  // sP union Reductor is a Groebner basis up to degree i-1
   int SizeSave;
 
@@ -5044,12 +5077,17 @@ EXAMPLE:  example irred_secondary_char0; shows an example
    }
 //--------------------- generating secondary invariants ----------------------
   for (i=2;i<=m;i++)                   // going through dimmat -
-  { if (int(dimmat[i,1])<>0)           // when it is == 0 we need to find no
+  { 
+if ((LastNewIS == i-3) and (UsePP==0))
+{ if (v) {"Computing Groebner basis for primaries and previously found irreducibles...";}
+  TotalReductor = groebner(sP+IS); 
+  TotalSet = 1; 
+}
+    if (int(dimmat[i,1])<>0)           // when it is == 0 we need to find no
     {                                  // elements in the current degree (i-1)
       if (v)
-      { "  Searching in degree "+string(i-1)+", we need to find "+
-        string(int(dimmat[i,1]))+" invariant(s)...";
-        "  Looking for Power Products...";
+      { "Searching in degree "+string(i-1)+". There are "+
+        string(int(dimmat[i,1]))+" secondary invariant(s)...";
       }
       counter = 0;                       // we'll count up to dimmat[i,1]
       Reductor = ideal(0);
@@ -5059,6 +5097,13 @@ EXAMPLE:  example irred_secondary_char0; shows an example
       attrib(Reductor,"isSB",1);
       attrib(SaveRed,"isSB",1);
 
+if ( TotalSet==0 )
+{
+      if (v)
+      {
+        "  Looking for Power Products...";
+      }
+sP_Reductor = sP;
 // We start searching for reducible secondary invariants in degree i-1, i.e., those
 // that are power products of irreducible secondary invariants.
 // It suffices to restrict the search at products of one _irreducible_ sec. inv. (Mul1)
@@ -5125,45 +5170,64 @@ EXAMPLE:  example irred_secondary_char0; shows an example
                         // of degree i-1.
                     attrib(RedSSort[i-1][k],"size",saveAttr);
                     if (v)
-                    { "We found",counter, " of", int(dimmat[i,1])," secondaries in degree",i-1;
+                    { 
+                      "    We found reducible sec. inv. number "+string(counter);
                     }
                     if (int(dimmat[i,1])<>counter)
                     { Reductor = ideal(helpP);
-                        // Lemma: If G is a homogeneous Groebner basis up to degree i-1 and p is a
-                        // homogeneous polynomial of degree i-1 then G union NF(p,G) is
-                        // a homogeneous Groebner basis up to degree i-1.
                       attrib(Reductor, "isSB",1);
-                        // if Reductor becomes too large, we reduce the whole of Indicator by
-                        // it, save it in SaveRed, and work with a smaller Reductor. This turns
-                        // out to save a little time.
                       Indicator=reduce(Indicator,Reductor);
                       SizeSave++;
                       SaveRed[SizeSave] = helpP;
+sP_Reductor[sPOffset+SizeSave] = helpP;
+attrib(sP_Reductor, "isSB",1);
+                        // Lemma: If G is a homogeneous Groebner basis up to degree i-1 and p is a
+                        // homogeneous polynomial of degree i-1 then G union NF(p,G) is
+                        // a homogeneous Groebner basis up to degree i-1. Hence, sP_Reductor
+                        // is a homog. GB up to degree i-1.
                       attrib(SaveRed, "isSB",1);
                       attrib(Reductor, "isSB",1);
                     }
                     else
                     { break;
                     }
-                  }
-                }
-              }
+                  } // new reducible sec. inv. found
+                } // loop through ProdCand
+              } // if there is some reducible sec. inv.
               attrib(SaveRed, "isSB",1);
               attrib(Reductor, "isSB",1);
             }
           }
         }
       }
+} // if TotalSet==0
+else 
+{ if (v) {"  We don't compute Power Products!"; }
+// Instead of computing Power Products, we can compute a Groebner basis of the ideal
+// generated by the primary and previously found irr. sec. invariants up to degree i-2. An invariant
+// polynomial of degree i-1 belongs to this ideal if and only if it belongs to the sub-algebra
+// generated by primary and irreducible secondary invariants up to degree i-2.
+// Hence, if we find an invariant outside this ideal, it is an irreducible secondary 
+// invariant of degree i-1.
+}
 
       // The remaining sec. inv. are irreducible!
       if (int(dimmat[i,1])<>counter)   // need more than all the power products
+                                       // or work without power products
       { if (v)
-        { "There are irreducible secondary invariants in degree ", i-1," !";
+        { "  Looking for irreducible secondary invariants in degree ", i-1;
         }
-        mon = kbase(sP,i-1);
+//        mon = kbase(sP,i-1);
+        if (TotalSet==0)
+        { mon = kbase(sP_Reductor,i-1);
+        }
+        else
+        { mon = kbase(TotalReductor,i-1);
+        }
         ii = ncols(mon);
-        if ((i>IrrSwitch) or (ii>200))  // use sparse algorithm
-        { if (counter==0 && ii==int(dimmat[i,1])) // then we can use all of mon
+if (mon[1]<>0)
+      { if ((i>IrrSwitch) or (ii>200))  // use sparse algorithm
+        { if (TotalSet==0 && ii+counter==int(dimmat[i,1])) // then we can use all of mon
           { B=normalize(evaluate_reynolds(REY,mon));
             IS=IS+B;
             saveAttr = attrib(RedSSort[i-1][i-1],"size")+ii;
@@ -5175,20 +5239,30 @@ EXAMPLE:  example irred_secondary_char0; shows an example
             else
             { RedISSort[i-1] = NF(B,sP);
             }
-            if (v) {"  We found: "; print(B);}
+            TotalSet=0;  // i.e., TotalReductor needs to be re-computed
+//            if (v) {"  We found: "; print(B);}
+            if (v) {"    We found "+string(size(B))+" irred. sec. inv.";}
           }
           else
           { irrcounter=0;
             j=0;                         // j goes through all of mon -
           // Compare the comments on the computation of reducible sec. inv.!
-            while (int(dimmat[i,1])<>counter) 
+while (j < ii) // we can break the loop if counter==int(dimmat[i,1])
+// while (int(dimmat[i,1])<>counter) 
             { if ((j mod MonStep) == 0) 
               { if ((j+MonStep) <= ii)
                 { ideal tmp = normalize(evaluate_reynolds(REY,ideal(mon[j+1..j+MonStep])));
                   B[j+1..j+MonStep] = tmp[1..MonStep];
                   tmp = reduce(tmp,sP);
                   ReducedCandidates[j+1..j+MonStep] = tmp[1..MonStep];
+if (TotalSet == 0)
+{
                   tmp = reduce(tmp,SaveRed);
+}
+else
+{
+                  tmp = reduce(tmp,TotalReductor);
+}
                   Indicator[j+1..j+MonStep] = tmp[1..MonStep];
                   kill tmp;
                 }
@@ -5197,7 +5271,14 @@ EXAMPLE:  example irred_secondary_char0; shows an example
                   B[j+1..ii] = tmp[1..ii-j];
                   tmp = reduce(tmp,sP);
                   ReducedCandidates[j+1..ii] = tmp[1..ii-j];
+if (TotalSet == 0)
+{
                   tmp = reduce(tmp,SaveRed);
+}
+else
+{
+                  tmp = reduce(tmp,TotalReductor);
+}
                   Indicator[j+1..ii] = tmp[1..ii-j];
                   kill tmp;
                 }
@@ -5205,7 +5286,8 @@ EXAMPLE:  example irred_secondary_char0; shows an example
               j++;
               helpP = Indicator[j];
               if (helpP <>0)                     // B[j] should be added
-              { counter++; irrcounter++;
+              { TotalSet=0;  // i.e., TotalReductor needs to be re-computed
+                counter++; irrcounter++;
                 IS=IS,B[j];
                 saveAttr = attrib(RedSSort[i-1][i-1],"size")+1;
                 RedSSort[i-1][i-1][saveAttr] = ReducedCandidates[j];
@@ -5217,7 +5299,8 @@ EXAMPLE:  example irred_secondary_char0; shows an example
                 { RedISSort[i-1] = ideal(ReducedCandidates[j]);
                 }
                 if (v)
-                { "  We found the irreducible sec. inv. "+string(B[j]);
+                { //"  We found the irreducible sec. inv. "+string(B[j]);
+                  "    We found irred. sec. inv. number "+string(irrcounter);
                 }
                 Reductor = ideal(helpP);
                 attrib(Reductor, "isSB",1);
@@ -5226,6 +5309,8 @@ EXAMPLE:  example irred_secondary_char0; shows an example
                 SaveRed[SizeSave] = helpP;
                 attrib(SaveRed, "isSB",1);
                 attrib(Reductor, "isSB",1);
+LastNewIS = i-1;
+if (int(dimmat[i,1])==counter) { break; }
               }
               mon[j]=0;
               B[j]=0;
@@ -5235,13 +5320,19 @@ EXAMPLE:  example irred_secondary_char0; shows an example
           }
         }  // if i>IrrSwitch
         else  // use fast algorithm
-        { B=sort_of_invariant_basis(sP,REY,i-1,int(dimmat[i,1])*6);
+        { if (TotalSet == 0)
+          { B=sort_of_invariant_basis(sP_Reductor,REY,i-1,int(dimmat[i,1])*6);
+          }
+          else
+          { B=sort_of_invariant_basis(TotalReductor,REY,i-1,int(dimmat[i,1])*6);
+          }
+//        B=sort_of_invariant_basis(sP,REY,i-1,int(dimmat[i,1])*6);
                                        // B is a set of
                                        // images of kbase(sP,i-1) under the
                                        // Reynolds operator that are linearly
                                        // independent and that do not reduce to
                                        // 0 modulo sP -
-          if (counter==0 && ncols(B)==int(dimmat[i,1])) // then we can take all of B
+          if (TotalSet==0 && ncols(B)+counter==int(dimmat[i,1])) // then we can take all of B
           { IS=IS+B;
             saveAttr = attrib(RedSSort[i-1][i-1],"size")+int(dimmat[i,1]);
             RedSSort[i-1][i-1] = RedSSort[i-1][i-1] + B;
@@ -5252,7 +5343,8 @@ EXAMPLE:  example irred_secondary_char0; shows an example
             else
             { RedISSort[i-1] = B;
             }
-            if (v) {"  We found: ";print(B);}
+//            if (v) {"  We found: ";print(B);}
+            if (v) {"    We found "+string(size(B))+" irred. sec. inv.";}
           }
           else
           { irrcounter=0;
@@ -5265,7 +5357,8 @@ EXAMPLE:  example irred_secondary_char0; shows an example
               j++;
               helpP = Indicator[j];
               if (helpP <>0)                     // B[j] should be added
-              { counter++; irrcounter++;
+              { TotalSet=0;  // i.e., TotalReductor needs to be re-computed
+                counter++; irrcounter++;
                 IS=IS,B[j];
                 saveAttr = attrib(RedSSort[i-1][i-1],"size")+1;
                 RedSSort[i-1][i-1][saveAttr] = ReducedCandidates[j];
@@ -5277,7 +5370,8 @@ EXAMPLE:  example irred_secondary_char0; shows an example
                 { RedISSort[i-1] = ideal(ReducedCandidates[j]);
                 }
                 if (v)
-                { "  We found the irreducible sec. inv. "+string(B[j]);
+                { //"  We found the irreducible sec. inv. "+string(B[j]);
+                  "    We found irred. sec. inv. number "+string(irrcounter);
                 }
                 Reductor = ideal(helpP);
                 attrib(Reductor, "isSB",1);
@@ -5286,6 +5380,8 @@ EXAMPLE:  example irred_secondary_char0; shows an example
                 SaveRed[SizeSave] = helpP;
                 attrib(SaveRed, "isSB",1);
                 attrib(Reductor, "isSB",1);
+LastNewIS = i-1;
+if (int(dimmat[i,1])==counter) { break; }
               }
               B[j]=0;
               ReducedCandidates[j]=0;
@@ -5293,6 +5389,7 @@ EXAMPLE:  example irred_secondary_char0; shows an example
             }
           }
         } // i<=IrrSwitch
+} // if mon[1]<>0
       } // Computation of irreducible secondaries
       if (v)
       { "";
@@ -5423,7 +5520,7 @@ EXAMPLE: example secondary_charp; shows an example
   { deg_dim_vec=deg_dim_vec,int(dimmat[j,1]);
   }
   if (v)
-  { "  In degree 0 we have: 1";
+  { "In degree 0 we have: 1";
     "";
   }
  //------------------------ initializing variables ----------------------------
@@ -5440,7 +5537,7 @@ EXAMPLE: example secondary_charp; shows an example
   { if (deg_dim_vec[i]<>0)             // when it is == 0 we need to find 0
     {                                  // elements in the current degree (i-1)
       if (v)
-      { "  Searching in degree "+string(i-1)+", we need to find "+string(deg_dim_vec[i])+" invariant(s)...";
+      { "Searching in degree "+string(i-1)+", we need to find "+string(deg_dim_vec[i])+" invariant(s)...";
       }
       TEST=sP;
       counter=0;                       // we'll count up to degvec[i]
@@ -5586,7 +5683,7 @@ EXAMPLE:  example secondary_charp; shows an example
 "
 {
  //----------  Internal parameters, whose choice might improve the performance -----
-  int pieces = 15;   // For generating reducible secondaries, blocks of #pieces# secondaries
+  int pieces = 3;   // For generating reducible secondaries, blocks of #pieces# secondaries
                      // are formed.
                      // If this parameter is small, the memory consumption will decrease.
   int MonStep = 15;  // The Reynolds operator is applied to blocks of #MonStep# monomials.
@@ -5694,7 +5791,7 @@ EXAMPLE:  example secondary_charp; shows an example
                                               // which is the number of secondaries in degree i-1
   }
   if (v)
-  { "  In degree 0 we have: 1";
+  { "In degree 0 we have: 1";
     "";
   }
  //------------------------ initializing variables ----------------------------
@@ -5709,11 +5806,14 @@ EXAMPLE:  example secondary_charp; shows an example
   ideal sP = groebner(ideal(P));
                            // This is the only explicit Groebner basis computation!
   ideal Reductor,SaveRed;  // sP union Reductor is a Groebner basis up to degree i-1
+ideal sP_Reductor;          // will contain sP union Reductor.
+int sPOffset = ncols(sP);
   int SizeSave;
 
   list SSort;         // sec. inv. first sorted by degree and then sorted by the
                       // minimal degree of a non-constant invariant factor.
   list ISSort;        // irr. sec. inv. sorted by degree
+int NrIS;
 
   poly helpP;
   ideal helpI;
@@ -5737,12 +5837,13 @@ EXAMPLE:  example secondary_charp; shows an example
   { if (deg_dim_vec[i]<>0)             // when it is == 0 we need to find no
     {                                  // elements in the current degree (i-1)
       if (v)
-      { "  Searching in degree "+string(i-1)+", we need to find "+string(deg_dim_vec[i])+
+      { "Searching in degree "+string(i-1)+", we need to find "+string(deg_dim_vec[i])+
         " invariant(s)...";
         "  Looking for Power Products...";
       }
       counter = 0;                       // we'll count up to deg_dim_vec[i]
       Reductor = ideal(0);
+sP_Reductor = sP;
       helpint = 0;
       SaveRed = Reductor;
       SizeSave = 0;
@@ -5810,19 +5911,19 @@ EXAMPLE:  example secondary_charp; shows an example
                         // By construction, this is a _reducible_ s.i.
                     attrib(SSort[i-1][k],"size",saveAttr);
                     if (v)
-                    { "We found",counter, " of", deg_dim_vec[i]," secondaries in degree",i-1;
+                    { "    We found", counter, "of", deg_dim_vec[i], "secondaries in degree",i-1;
                     }
                     if (deg_dim_vec[i]<>counter)
                     { Reductor = ideal(helpP);
-                        // Lemma: If G is a homogeneous Groebner basis up to degree i-1 and p is a
-                        // homogeneous polynomial of degree i-1 then G union NF(p,G) is
-                        // a homogeneous Groebner basis up to degree i-1.
                       attrib(Reductor, "isSB",1);
-                        // if Reductor becomes too large, we reduce the whole of Indicator by
-                        // it, save it in SaveRed, and work with a smaller Reductor. This turns
-                        // out to save a little time.
                       Indicator=reduce(Indicator,Reductor);
                       SizeSave++;
+sP_Reductor[sPOffset+SizeSave] = helpP;
+attrib(sP_Reductor, "isSB",1);
+                        // Lemma: If G is a homogeneous Groebner basis up to degree i-1 and p is a
+                        // homogeneous polynomial of degree i-1 then G union NF(p,G) is
+                        // a homogeneous Groebner basis up to degree i-1. Hence, sP_Reductor
+                        // is a homog. GB up to degree i-1.
                       SaveRed[SizeSave] = helpP;
                       attrib(SaveRed, "isSB",1);
                     }
@@ -5838,12 +5939,13 @@ EXAMPLE:  example secondary_charp; shows an example
         }
       }
 
+NrIS = deg_dim_vec[i]-counter;
       // The remaining sec. inv. are irreducible!
-      if (deg_dim_vec[i]<>counter)   // need more than all the power products
+      if (NrIS>0)   // need more than all the power products
       { if (v)
-        { "There are irreducible secondary invariants in degree ", i-1," !";
+        { "  There are ",NrIS,"irreducible secondary invariants in degree ", i-1;
         }
-        mon = kbase(sP,i-1);
+        mon = kbase(sP_Reductor,i-1);
         ii = ncols(mon);
 //        mon = ideal(mon[ncols(mon)..1]);
         if ((i>IrrSwitch) or (ii>200)) // use sparse algorithm
@@ -5859,7 +5961,7 @@ EXAMPLE:  example secondary_charp; shows an example
             else
             { ISSort[i-1] = B;
             }
-            if (v) {"  We found: "; print(B);}
+            if (v) {"    We found all",NrIS,"irreducibles in degree ",i-1;}
           }
           else
           { irrcounter=0;
@@ -5900,8 +6002,8 @@ EXAMPLE:  example secondary_charp; shows an example
                 else
                 { ISSort[i-1] = ideal(B[j]);
                 }
-                if (v)
-                { "  We found the irreducible sec. inv. "+string(B[j]);
+                if (v) 
+                { "    We found", irrcounter,"of", NrIS ,"irr. sec. inv. in degree ",i-1; 
                 }
                 Reductor = ideal(helpP);
                 attrib(Reductor, "isSB",1);
@@ -5933,7 +6035,7 @@ EXAMPLE:  example secondary_charp; shows an example
             else
             { ISSort[i-1] = B;
             }
-            if (v) {"  We found: "; print(B);}
+            if (v) {"    We found all",NrIS,"irreducibles in degree ",i-1;}
           }
           else
           { irrcounter=0;
@@ -5956,8 +6058,8 @@ EXAMPLE:  example secondary_charp; shows an example
                 else
                 { ISSort[i-1] = ideal(B[j]);
                 }
-                if (v)
-                { "  We found the irreducible sec. inv. "+string(B[j]);
+                if (v) 
+                { "    We found", irrcounter,"of", NrIS ,"irr. sec. inv. in degree ",i-1; 
                 }
                 Reductor = ideal(helpP);
                 attrib(Reductor, "isSB",1);
@@ -6039,6 +6141,9 @@ THEORY:   Secondary invariants are calculated by finding a basis (in terms of
           we are in the non-modular case. Therefore, the invariant ring is Cohen-Macaulay,
           hence the number of secondary invariants is the product of the degrees of 
           primary invariants divided by the group order.
+          <secondary_and_irreducible_no_molien> should usually be faster and of more useful
+          functionality.
+SEE ALSO: secondary_and_irreducible_no_molien
 EXAMPLE:  example secondary_no_molien; shows an example
 "
 { int MonStep = 15;  // The Reynolds operator is applied to blocks of #MonStep# monomials.
@@ -6122,7 +6227,7 @@ EXAMPLE:  example secondary_no_molien; shows an example
   if (v)
   { "  We need to find "+string(max)+" secondary invariants.";
     "";
-    "  In degree 0 we have: 1";
+    "In degree 0 we have: 1";
     "";
   }
  //------------------------- initializing variables ---------------------------
@@ -6159,7 +6264,7 @@ EXAMPLE:  example secondary_no_molien; shows an example
     attrib(SaveRed,"isSB",1);
     if (deg_vec[k]<>i)
     { if (v)
-      { "  Searching in degree "+string(i)+"...";
+      { "Searching in degree "+string(i)+"...";
       }
       mon = kbase(sP,i);
       ii = ncols(mon);
@@ -6193,7 +6298,7 @@ EXAMPLE:  example secondary_no_molien; shows an example
           { counter++; 
             S[counter] = B[j];
             if (v)
-            { "  We found sec. inv. number "+string(counter)+" in degree "+string(i);
+            { "    We found sec. inv. number "+string(counter)+" in degree "+string(i);
             }
             if (counter == max) {break;}
             Reductor = ideal(helpP);
@@ -6225,7 +6330,7 @@ EXAMPLE:  example secondary_no_molien; shows an example
           { counter++;
             S[counter] = B[j];
             if (v)
-            { "  We found sec. inv. number "+string(counter)+" in degree "+string(i);
+            { "    We found sec. inv. number "+string(counter)+" in degree "+string(i);
             }
             if (counter == max) {break;}
             Reductor = ideal(helpP);
@@ -6291,7 +6396,7 @@ THEORY:  Secondary invariants are calculated by finding a basis (in terms of
          divided by the group order.
 EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
 "
-{ int pieces = 15;   // For generating reducible secondaries, blocks of #pieces# secondaries
+{ int pieces = 3;    // For generating reducible secondaries, blocks of #pieces# secondaries
                      // are formed.
                      // If this parameter is small, the memory consumption will decrease.
   int MonStep = 15;  // The Reynolds operator is applied to blocks of #MonStep# monomials.
@@ -6375,7 +6480,7 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
   if (v)
   { "  We need to find "+string(max)+" secondary invariants.";
     "";
-    "  In degree 0 we have: 1";
+    "In degree 0 we have: 1";
     "";
   }
  //-------------------------- initializing variables --------------------------
@@ -6428,7 +6533,7 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
     }
     if (deg_vec[l]<>i-1)
     { if (v)
-      { "  Searching in degree "+string(i-1);
+      { "Searching in degree "+string(i-1);
         "  Looking for Power Products...";
       }
       Reductor = ideal(0);
@@ -6498,7 +6603,7 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
                         // By construction, this is a _reducible_ s.i.
                     attrib(SSort[i-1][k],"size",saveAttr);
                     if (v)
-                    { "We found sec. inv. number",counter, " in degree",i-1;
+                    { "    We found sec. inv. number",counter, "in degree",i-1;
                     }
                     if (max<>counter)
                     { Reductor = ideal(helpP);
@@ -6529,7 +6634,7 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
       // The remaining sec. inv. are irreducible!
       if (max<>counter)
       { if (v)
-        { "Looking for irreducible secondary invariants in degree ", i-1;
+        { "  Looking for irreducible secondary invariants in degree ", i-1;
         }
         mon = kbase(sP,i-1);
 //        mon = ideal(mon[ncols(mon)..1]);
@@ -6574,7 +6679,7 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
               { ISSort[i-1] = ideal(B[j]);
               }
               if (v)
-              { "  We found the irreducible sec. inv. "+string(B[j]);
+              { "    We found irreducible sec. inv. number", irrcounter, "in degree", i-1;
               }
               if (counter == max) { break; }
               Reductor = ideal(helpP);
@@ -6617,7 +6722,7 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
               { ISSort[i-1] = ideal(B[j]);
               }
               if (v)
-              { "  We found the irreducible sec. inv. "+string(B[j]);
+              { "    We found irreducible sec. inv. number", irrcounter, "in degree", i-1;
               }
               Reductor = ideal(helpP);
               attrib(Reductor, "isSB",1);
@@ -6683,6 +6788,209 @@ example
          // in degree 1 or 2.
          matrix S,IS=secondary_and_irreducibles_no_molien(L[1..2],intvec(1,2),1);
          print(S);
+         print(IS);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc irred_secondary_no_molien (matrix P, matrix REY, list #)
+"USAGE:   irred_secondary_no_molien(P,REY[,deg_vec,v]);
+         P: a 1xn <matrix> with primary invariants, REY: a gxn <matrix>
+         representing the Reynolds operator, deg_vec: an optional <intvec>
+         listing some degrees where no irreducible secondary invariants can
+         be found, v: an optional <int>
+ASSUME:  n is the number of variables of the basering, g the size of the group,
+         REY is the 1st return value of group_reynolds(), reynolds_molien() or
+         the second one of primary_invariants()
+RETURN:  Irreducible secondary invariants of the invariant ring (type <matrix>)
+DISPLAY: information if v does not equal 0
+THEORY:  Irred. secondary invariants are calculated by finding a basis (in terms of
+         monomials) of the basering modulo primary and previously found secondary
+         invariants, mapping those to invariants with the Reynolds operator. Among 
+         these images we pick a maximal subset that is linearly independent modulo 
+         the primary and previously found secondary invariants, using Groebner basis 
+         techniques.
+EXAMPLE: example irred_secondary_no_molien; shows an example
+"
+{ int MonStep = 29;
+
+  def br=basering;
+ //------------------ checking input and setting verbose ----------------------
+  if (size(#)==1 or size(#)==2)
+  { if (typeof(#[size(#)])=="int")
+    { if (size(#)==2)
+      { if (typeof(#[size(#)-1])=="intvec")
+        { intvec deg_vec=#[size(#)-1];
+        }
+        else
+        { "ERROR:   the third parameter should be an <intvec>";
+          return();
+        }
+      }
+      int v=#[size(#)];
+    }
+    else
+    { if (size(#)==1)
+      { if (typeof(#[size(#)])=="intvec")
+        { intvec deg_vec=#[size(#)];
+          int v=0;
+        }
+        else
+        { "ERROR:   the third parameter should be an <intvec>";
+          return();
+        }
+      }
+      else
+      { "ERROR:   wrong list of parameters";
+        return();
+      }
+    }
+  }
+  else
+  { if (size(#)>2)
+    { "ERROR:   there are too many parameters";
+      return();
+    }
+    int v=0;
+  }
+  int n=nvars(basering);               // n is the number of variables, as well
+                                       // as the size of the matrices, as well
+                                       // as the number of primary invariants,
+                                       // we should get
+  if (ncols(P)<>n)
+  { "ERROR:   The first parameter ought to be the matrix of the primary";
+    "         invariants."
+    return();
+  }
+  if (ncols(REY)<>n) 
+  { "ERROR:   The second parameter ought to be the Reynolds operator.";
+    return();
+  }
+  if (char(br)<>0)
+  { if (nrows(REY) mod char(br) == 0)
+    { "ERROR:   We need to be in the non-modular case.";
+      return();
+    }
+  }
+  if (v && voice==2)
+  { "";
+  }
+  if (defined(deg_vec)<>voice)
+  { intvec deg_vec;
+  }
+  int l=1;
+
+ //-------------------------- initializing variables --------------------------
+
+  int dgb = degBound;
+  degBound = 0;
+  int d,block, counter, totalcount, monsize,i,j, fin,hlp;
+  poly helpP,lmp; 
+  block = 1;
+  ideal mon, MON, Inv, IS,RedInv, NewIS, NewReductor;
+  int NewIScounter;
+  ideal sP = slimgb(ideal(P));
+  int Max = vdim(sP);
+  if (Max<0) 
+  { "ERROR:   The second parameter ought to be the Reynolds operator.";
+    return();
+  }
+  ideal sIS = sP;   // sIS will be a Groebner basis up to degree d of P+irred. sec. inv.
+  while (totalcount < Max)
+  { d++;
+    if (deg_vec[l]<>d)
+    { if (v) { "Searching irred. sec. inv. in degree "+string(d); }
+      NewIS = ideal();
+      NewIScounter=0;
+      MON = kbase(sP,d);
+      mon = kbase(sIS,d);
+      monsize=ncols(mon);
+      totalcount = totalcount + ncols(MON);
+      if (mon[1]<>0)
+      {
+        if (v) { "  We have "+string(monsize)+" candidates for irred. secondaries";}
+        block=0; // Loops through the monomials
+        while (block<monsize)
+        { if ((block mod MonStep) == 0) 
+          { if ((block+MonStep) <= monsize)
+            { ideal tmp = normalize(evaluate_reynolds(REY,ideal(mon[block+1..block+MonStep])));
+              Inv[block+1..block+MonStep] = tmp[1..MonStep];
+              tmp = reduce(tmp,sIS);
+              RedInv[block+1..block+MonStep] = tmp[1..MonStep];
+              kill tmp;
+            }
+            else
+            { ideal tmp = normalize(evaluate_reynolds(REY,ideal(mon[block+1..monsize])));
+              Inv[block+1..monsize] = tmp[1..monsize-block];
+              tmp = reduce(tmp,sIS);
+              RedInv[block+1..monsize] = tmp[1..monsize-block];
+              kill tmp;
+            }
+          } 
+          block++;
+          helpP = RedInv[block];
+          if (helpP<>0)
+          { counter++; // found new irr. sec. inv.!
+            if (v) { "    We found irred. sec. inv. number "+string(counter)+" in degree "+string(d); }
+            IS[counter] = Inv[block];
+            sIS = sIS,helpP;
+            attrib(sIS,"isSB",1);
+            NewIScounter++;
+            NewIS[NewIScounter] = helpP;
+// for permutation of variables, the following might yield a speed-up;
+// however, for general group actions it does not work:
+//          for (i=block;i<=monsize;i++)
+//          { if (Inv[block]<>reduce(Inv[block],std(mon[i])))
+//            { mon[i] = 0;
+//            }
+//          }
+
+            mon[block]=0;
+            Inv[block]=0; 
+            RedInv[block]=0;
+            NewReductor[1]=helpP;
+            attrib(NewReductor,"isSB",1);
+            RedInv = reduce(RedInv,NewReductor);
+          }
+        } // loop through monomials
+      } // if mon[1]<>0
+      if (totalcount < Max)
+      { if (NewIScounter==0)
+        { if (fin==0)
+          { degBound = 0;
+            sIS = groebner(sIS);
+            fin=1;  
+          }
+        }
+        else
+        { degBound = d+1;
+          sIS = groebner(sIS+NewIS);  
+          degBound = 0;
+          fin = 0;
+        }
+      }
+      attrib(sIS,"isSB",1);
+    } // if degree d is not excluded by deg_vec 
+    else
+    { if (size(deg_vec)==l)
+      { l=1;
+      }
+      else
+      { l++;
+      }
+    }
+  } // loop through degree
+  degBound = dgb;
+  return(matrix(IS));
+}
+
+example
+{ "EXAMPLE: Sturmfels: Algorithms in Invariant Theory 2.3.7:"; echo=2;
+         ring R=3,(x,y,z),dp;
+         matrix A[3][3]=0,1,0,-1,0,0,0,0,-1;
+         list L=primary_invariants(A,intvec(1,1,0));
+         // In that example, there are no secondary invariants
+         // in degree 1 or 2.
+         matrix IS=irred_secondary_no_molien(L[1..2],intvec(1,2),1);
          print(IS);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -6880,8 +7188,8 @@ proc invariant_ring (list #)
          (the root of the extension field occurs not among the coefficients)
 RETURN:  primary and secondary invariants (both of type <matrix>) generating
          the invariant ring with respect to the matrix group generated by the
-         matrices in the input and irreducible secondary invariants (type
-         <matrix>) if the Molien series was available
+         matrices in the input, and irreducible secondary invariants if we are
+         in the non-modular case.
 DISPLAY: information about the various stages of the program if the third flag
          does not equal 0
 THEORY:  Bases of homogeneous invariants are generated successively and those
@@ -6976,12 +7284,12 @@ EXAMPLE: example invariant_ring; shows an example
           }
           list l=primary_charp_no_molien(L[1],v);
           if (size(l)==2)
-          { matrix S=secondary_no_molien(l[1],L[1],l[2],v);
+          { matrix S,IS=secondary_and_irreducibles_no_molien(l[1],L[1],l[2],v);
           }
           else
-          { matrix S=secondary_no_molien(l[1],L[1],v);
+          { matrix S,IS=secondary_and_irreducibles_no_molien(l[1],L[1],v);
           }
-          return(l[1],S);
+          return(l[1],S,IS);
         }
       }
       else                             // the modular case
@@ -7002,23 +7310,23 @@ EXAMPLE: example invariant_ring; shows an example
     if (ch==0)
     { list l=primary_char0_no_molien(L[1],v);
       if (size(l)==2)
-      { matrix S=secondary_no_molien(l[1],L[1],l[2],v);
+      { matrix S,IS=secondary_and_irreducibles_no_molien(l[1],L[1],l[2],v);
       }
       else
-      { matrix S=secondary_no_molien(l[1],L[1],v);
+      { matrix S,IS=secondary_and_irreducibles_no_molien(l[1],L[1],v);
       }
-      return(l[1],S);
+      return(l[1],S,IS);
     }
     else
     { if (L[1]<>0)                     // testing whether we are in the modular
       { list l=primary_charp_no_molien(L[1],v); // case
         if (size(l)==2)
-        { matrix S=secondary_no_molien(l[1],L[1],l[2],v);
+        { matrix S,IS=secondary_and_irreducibles_no_molien(l[1],L[1],l[2],v);
         }
         else
-        { matrix S=secondary_no_molien(l[1],L[1],v);
+        { matrix S,IS=secondary_and_irreducibles_no_molien(l[1],L[1],v);
         }
-        return(l[1],S);
+        return(l[1],S,IS);
       }
       else                             // the modular case
       { if (v)
@@ -7097,9 +7405,9 @@ proc invariant_ring_random (list #)
          expansion is simple (the root of the extension field does not occur
          among the coefficients)
 RETURN:  primary and secondary invariants (both of type <matrix>) generating
-         invariant ring with respect to the matrix group generated by the
-         matrices in the input and irreducible secondary invariants (type
-         <matrix>) if the Molien series was available
+         the invariant ring with respect to the matrix group generated by the
+         matrices in the input, and irreducible secondary invariants if we are
+         in the non-modular case.
 DISPLAY: information about the various stages of the program if the third flag
          does not equal 0
 THEORY:  is the same as for invariant_ring except that random combinations of
@@ -7211,12 +7519,12 @@ EXAMPLE: example invariant_ring_random; shows an example
           }
           list l=primary_charp_no_molien_random(L[1],max,v);
           if (size(l)==2)
-          { matrix S=secondary_no_molien(l[1],L[1],l[2],v);
+          { matrix S,IS=secondary_and_irreducibles_no_molien(l[1],L[1],l[2],v);
           }
           else
-          { matrix S=secondary_no_molien(l[1],L[1],v);
+          { matrix S,IS=secondary_and_irreducibles_no_molien(l[1],L[1],v);
           }
-          return(l[1],S);
+          return(l[1],S,IS);
         }
       }
       else                             // the modular case
@@ -7237,23 +7545,23 @@ EXAMPLE: example invariant_ring_random; shows an example
     if (ch==0)
     { list l=primary_char0_no_molien_random(L[1],max,v);
       if (size(l)==2)
-      { matrix S=secondary_no_molien(l[1],L[1],l[2],v);
+      { matrix S,IS=secondary_and_irreducibles_no_molien(l[1],L[1],l[2],v);
       }
       else
-      { matrix S=secondary_no_molien(l[1],L[1],v);
+      { matrix S,IS=secondary_and_irreducibles_no_molien(l[1],L[1],v);
       }
-      return(l[1],S);
+      return(l[1],S,IS);
     }
     else
     { if (L[1]<>0)                     // testing whether we are in the modular
       { list l=primary_charp_no_molien_random(L[1],max,v); // case
         if (size(l)==2)
-        { matrix S=secondary_no_molien(l[1],L[1],l[2],v);
+        { matrix S,IS=secondary_and_irreducibles_no_molien(l[1],L[1],l[2],v);
         }
         else
-        { matrix S=secondary_no_molien(l[1],L[1],v);
+        { matrix S,IS=secondary_and_irreducibles_no_molien(l[1],L[1],v);
         }
-        return(l[1],S);
+        return(l[1],S,IS);
       }
       else                             // the modular case
       { if (v)
