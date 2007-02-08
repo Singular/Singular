@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.125 2007-02-08 10:40:18 bricken Exp $ */
+/* $Id: tgb.cc,v 1.126 2007-02-08 13:13:45 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -19,7 +19,7 @@
 #include "tgb.h"
 #include "tgb_internal.h"
 #include "tgbgauss.h"
-#include "F4.h"
+
 #include "digitech.h"
 #include "gring.h"
 #include "sca.h"
@@ -2250,7 +2250,7 @@ public:
 class NoroCache{
 public:
   poly temp_term;
-#ifndef BUCKETS_FOR_NORO_RED
+#ifdef NORO_RED_ARRAY_RESERVER
   int reserved;
   poly* recursionPolyBuffer;
 #endif
@@ -2279,13 +2279,13 @@ public:
 
   poly lookup(poly term, BOOLEAN& succ, int & len);
   NoroCache(){
-#ifndef BUCKETS_FOR_NORO_RED
+#ifdef NORO_RED_ARRAY_RESERVER
     reserved=0;
     recursionPolyBuffer=(poly*)omalloc(1000000*sizeof(poly));
 #endif
     temp_term=pOne();
   }
-#ifndef BUCKETS_FOR_NORO_RED
+#ifdef NORO_RED_ARRAY_RESERVER
   poly* reserve(int n){
     poly* res=recursionPolyBuffer+reserved;
     reserved+=n;
@@ -2302,7 +2302,7 @@ public:
       p_Delete(&ressources[i].impl,currRing);
     }
     p_Delete(&temp_term,currRing);
-#ifndef BUCKETS_FOR_NORO_RED
+#ifdef NORO_RED_ARRAY_RESERVER
     omfree(recursionPolyBuffer);
 #endif
   }
@@ -2359,21 +2359,47 @@ poly NoroCache::lookup(poly term, BOOLEAN& succ, int & len){
 }
 poly noro_red(poly p, int &len, NoroCache* cache,slimgb_alg* c);
 
-poly noro_red_mon(poly t, int &len, BOOLEAN& changed, NoroCache* cache,slimgb_alg* c){
+class MonRedRes{
+public:
+  poly p;
+  number coef;
+  BOOLEAN changed;
+  int len;
+  BOOLEAN onlyBorrowed;
+  bool operator<(const MonRedRes& other) const{
+    int cmp=p_LmCmp(p,other.p,currRing);
+    if ((cmp<0)||((cmp==0)&&((onlyBorrowed)&&(!(other.onlyBorrowed))))){
+      return true;
+    } else return false;
+  }
+};
+
+MonRedRes noro_red_mon(poly t, NoroCache* cache,slimgb_alg* c){
+  MonRedRes res_holder;
   BOOLEAN succ;
   //wrp(t);
-  changed=TRUE;
-  poly cache_lookup=cache->lookup(t,succ, len);//don't own this yet
+  res_holder.changed=TRUE;
+  poly cache_lookup=cache->lookup(t,succ, res_holder.len);//don't own this yet
   if (succ){
     if (cache_lookup==t){
       //know they are equal
-      len=1;
-      changed=FALSE;
-      return t;
+      //res_holder.len=1;
+      
+      res_holder.changed=FALSE;
+      res_holder.p=t;
+      res_holder.coef=npInit(1);
+      res_holder.onlyBorrowed=FALSE;
+      return res_holder;
     }
     poly t_new=ppMult_nn(cache_lookup,pGetCoeff(t));
     p_Delete(&t,c->r);
-    return t_new;
+    //res_holder.len=1;
+    //res_holder.changed=TRUE;
+    res_holder.p=t_new;
+    res_holder.coef=npInit(1);
+    res_holder.onlyBorrowed=FALSE;
+    return res_holder;
+    //return t_new;
   } else {
     unsigned long sev=p_GetShortExpVector(t,currRing);
     int i=kFindDivisibleByInS_easy(c->strat,t,sev);
@@ -2394,22 +2420,33 @@ poly noro_red_mon(poly t, int &len, BOOLEAN& changed, NoroCache* cache,slimgb_al
       poly res;
       res=pp_Mult_mm(pNext(c->strat->S[i]),exp_diff,c->r);
 
-      len=c->strat->lenS[i]-1;
-      res=noro_red(res,len,cache,c);
+      res_holder.len=c->strat->lenS[i]-1;
+      res=noro_red(res,res_holder.len,cache,c);
       
       cache->insert(t,res,pLength(res));
       p_Delete(&t,c->r);
       //p_Delete(&t_copy_mon,c->r);
       res=pMult_nn(res,coef_bak);
-      return res;
+      res_holder.changed=TRUE;
+      res_holder.p=res;
+      res_holder.coef=npInit(1);
+      res_holder.onlyBorrowed=FALSE;
+      return res_holder;
+
     } else {
       number coef_bak=p_GetCoeff(t,c->r);
       number one=npInit(1);
       p_SetCoeff(t,one,c->r);
-      len=1;
-      cache->insert(t,t,len);
+      res_holder.len=1;
+      cache->insert(t,t,res_holder.len);
       p_SetCoeff(t,coef_bak,c->r);
-      return t;
+      //return t;
+      res_holder.changed=FALSE;
+      res_holder.p=t;
+      
+      res_holder.coef=npInit(1);
+      res_holder.onlyBorrowed=FALSE;
+      return res_holder;
     }
   }
 }
@@ -2439,10 +2476,7 @@ poly noro_red(poly p, int &len, NoroCache* cache,slimgb_alg* c){
     len=0;
     return NULL;
   }
-  if (len==1){
-    BOOLEAN changed;
-    return noro_red_mon(p,len,changed,cache,c);
-  }
+
   #ifdef BUCKETS_FOR_NORO_RED
   kBucket_pt bucket=kBucketCreate(currRing);
   kBucketInit(bucket,NULL,0);
@@ -2460,25 +2494,25 @@ poly noro_red(poly p, int &len, NoroCache* cache,slimgb_alg* c){
     poly t=p;
     pIter(p);
     pNext(t)=NULL;
-    int l;
+    //int l;
     //poly reference=p_Head(t,c->r);
-    BOOLEAN changed;
-    t=noro_red_mon(t,l,changed,cache,c);
-    if (!(changed)){
+    //BOOLEAN changed;
+    MonRedRes red=noro_red_mon(t,cache,c);
+    if (!(red.changed)){
       unchanged_size++;
       if (unchanged_head){
-        pNext(unchanged_tail)=t;
+        pNext(unchanged_tail)=red.p;
         pIter(unchanged_tail);
       } else{
-        unchanged_tail=t;
-        unchanged_head=t;
+        unchanged_tail=red.p;
+        unchanged_head=red.p;
       }
     } else{
-      assume(l==pLength(t));
+      assume(red.len==pLength(red.p));
 #ifdef BUCKETS_FOR_NORO_RED
-      kBucket_Add_q(bucket,t,&l);
+      kBucket_Add_q(bucket,red.p,&red.len);
 #else
-     pre_buckets[pos++]=t;
+     pre_buckets[pos++]=red.p;
 #endif
     }
     //pre_buckets[pos]=t;
