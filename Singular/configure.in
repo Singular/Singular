@@ -574,7 +574,7 @@ AC_ARG_WITH(apint,
   [  --with-apint=PACKAGE    use PACKAGE for arbitary integer arithmetic])
 AC_ARG_WITH(
   Plural,
-  [  --with-Plural           do compile with Plural support])
+  [  --without-Plural        do compile without Plural support])
 AC_ARG_WITH(
   NTL,
   [  --with-NTL              build for use with NTL.],
