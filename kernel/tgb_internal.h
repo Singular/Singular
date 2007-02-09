@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.51 2007-02-08 10:40:19 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.52 2007-02-09 12:30:50 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -18,7 +18,7 @@
 #include "polys.h"
 #include "stdlib.h"
 //#define USE_NORO 1
-#define NORO_CACHE 1
+//#define NORO_CACHE 1
 #ifdef NORO_CACHE
 //#include <map>
 #include <vector>
@@ -91,6 +91,26 @@ public:
   poly impl;
   
 };
+class DataNoroCacheNode;
+class MonRedRes{
+public:
+  poly p;
+  number coef;
+  BOOLEAN changed;
+  int len;
+  BOOLEAN onlyBorrowed;
+  bool operator<(const MonRedRes& other) const{
+    int cmp=p_LmCmp(p,other.p,currRing);
+    if ((cmp<0)||((cmp==0)&&((onlyBorrowed)&&(!(other.onlyBorrowed))))){
+      return true;
+    } else return false;
+  }
+  DataNoroCacheNode* ref;
+  MonRedRes(){
+    ref=NULL;
+    p=NULL;
+  }
+};
 struct sorted_pair_node{
   //criterium, which is stable 0. small lcm 1. small i 2. small j
   wlen_type expected_length;
@@ -102,6 +122,12 @@ struct sorted_pair_node{
   
 };
 
+
+class NoroPlaceHolder{
+public:
+  DataNoroCacheNode* ref;
+  number coef;
+};
 
 //static ideal debug_Ideal;
 
