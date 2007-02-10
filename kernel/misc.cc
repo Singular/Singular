@@ -166,7 +166,7 @@ void m2_end(int i)
 #define  R         2836        /*  M % A                  */
 
 
-int siSeed = 1L;
+int siSeed = 1;
 
 
 int siRand()
