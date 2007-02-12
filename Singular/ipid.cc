@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.77 2006-11-16 16:08:58 Singular Exp $ */
+/* $Id: ipid.cc,v 1.78 2007-02-12 17:26:08 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -109,9 +109,9 @@ idhdl idrec::get(const char * s, int lev)
     if ((l==0)||(l==lev))
     {
       id=IDID(h);
-      if (*(short *)s==*(short *)id)
+      if (*s==*id)
       {
-        if (0 == strcmp(s+1,id+1))
+        if (id[1]=='\0')  // we know: s[1]=='\0'
         {
           if (l==lev) return h;
           found=h;
