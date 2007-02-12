@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.127 2007-02-09 12:30:49 bricken Exp $ */
+/* $Id: tgb.cc,v 1.128 2007-02-12 14:29:54 Singular Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2064,7 +2064,7 @@ public:
     }
   }
 };
-static void simplest_gauss_modp(number* a, int nrows,int ncols){
+void simplest_gauss_modp(number* a, int nrows,int ncols){
   //use memmoves for changing rows
   if (TEST_OPT_PROT)
     PrintS("StartGauss\n");

@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.52 2007-02-09 12:30:50 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.53 2007-02-12 14:29:54 Singular Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -379,5 +379,7 @@ template <class len_type, class set_type>  int pos_helper(kStrategy strat, poly 
 
 static wlen_type pair_weighted_length(int i, int j, slimgb_alg* c);
 wlen_type pELength(poly p, ring r);
-
+void simplest_gauss_modp(number* a, int nrows,int ncols);
+// a: a[0,0],a[0,1]....a[nrows-1,ncols-1]
+// assume: field is Zp
 #endif
