@@ -3,7 +3,7 @@
  *  Purpose: declaration of common Debug/Check/Track stuff
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id: omDebug.h,v 1.15 2003-05-12 14:45:32 Singular Exp $
+ *  Version: $Id: omDebug.h,v 1.16 2007-02-13 17:19:45 Singular Exp $
  *******************************************************************/
 #ifndef OM_DEBUG_H
 #define OM_DEBUG_H
@@ -88,7 +88,7 @@ void* omGetCustomOfTrackAddr(void* addr);
 #if defined(OM_NDEBUG) || ! defined(OM_HAVE_TRACK)
 #define omGetUsedBlocksOfPage(page)     (page->used_blocks)
 #else
-#define omGetUsedBlocksOfPage(page)     (page->used_blocks & ~(((unsigned long) 1) << (BIT_SIZEOF_LONG -1)))
+#define omGetUsedBlocksOfPage(page)     ((long)(page->used_blocks & ~(((unsigned long) 1) << (BIT_SIZEOF_LONG -1))))
 #endif
 
 #ifndef OM_NDEBUG
