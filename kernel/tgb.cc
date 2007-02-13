@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.129 2007-02-13 14:19:48 bricken Exp $ */
+/* $Id: tgb.cc,v 1.130 2007-02-13 14:58:52 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2084,6 +2084,19 @@ void simplest_gauss_modp(number* a, int nrows,int ncols){
   if (TEST_OPT_PROT)
     PrintS("StopGauss\n");
 }
+static void write_poly_to_row(number* row, poly h, poly*terms, int tn){
+  //poly* base=row;
+  while(h!=NULL){
+    //Print("h:%i\n",h);
+    number coef=p_GetCoeff(h,c->r);
+    poly* ptr_to_h=(poly*) bsearch(&h,terms,tn,sizeof(poly),terms_sort_crit);
+    assume(ptr_to_h!=NULL);
+    int pos=ptr_to_h-terms;
+    row[pos]=coef;
+    //number_array[base+pos]=coef;
+    pIter(h);
+  }
+}
 static void linalg_step_modp(poly *p, poly* p_out, int&pn, poly* terms,int tn, slimgb_alg* c){
   static int export_n=0;
   assume(terms[tn-1]!=NULL);
@@ -2098,17 +2111,9 @@ static void linalg_step_modp(poly *p, poly* p_out, int&pn, poly* terms,int tn, s
   }
   for(i=0;i<pn;i++){
     poly h=p[i];
-    int base=tn*i;
-    while(h!=NULL){
-      //Print("h:%i\n",h);
-      number coef=p_GetCoeff(h,c->r);
-      poly* ptr_to_h=(poly*) bsearch(&h,terms,tn,sizeof(poly),terms_sort_crit);
-      assume(ptr_to_h!=NULL);
-      int pos=ptr_to_h-terms;
-      number_array[base+pos]=coef;
-      pIter(h);
-    }
-    p_Delete(&h,c->r);
+    //int base=tn*i;
+    write_poly_to_row(number_array+tn*i,h,terms,tn);
+
   }
 #if 0
   //export matrix
