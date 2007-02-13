@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.128 2007-02-12 14:29:54 Singular Exp $ */
+/* $Id: tgb.cc,v 1.129 2007-02-13 14:19:48 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2250,6 +2250,7 @@ public:
   int value_len;
   poly value_poly;
   DenseRow* row;
+  int term_index;
   DataNoroCacheNode(poly p, int len){
     value_len=len;
     value_poly=p;
@@ -2259,6 +2260,8 @@ public:
 class NoroCache{
 public:
   poly temp_term;
+  void collectIrreducibleMonomials( std::vector<DataNoroCacheNode*>& res);
+  void collectIrreducibleMonomials(int level,  NoroCacheNode* node, std::vector<DataNoroCacheNode*>& res);
 #ifdef NORO_RED_ARRAY_RESERVER
   int reserved;
   poly* recursionPolyBuffer;
@@ -2345,6 +2348,27 @@ protected:
   //cache_map impl;
   NoroCacheNode root;
 };
+void NoroCache::collectIrreducibleMonomials( std::vector<DataNoroCacheNode*>& res){
+  int i;
+  for(i=0;i<root.branches_len;i++){
+    collectIrreducibleMonomials(1,root.branches[i],res);
+  }
+}
+void NoroCache::collectIrreducibleMonomials(int level, NoroCacheNode* node, std::vector<DataNoroCacheNode*>& res){
+  assume(level>=0);
+  if (node==NULL) return;
+  if (level<pVariables){
+    int i,sum;
+    for(i=0;i<node->branches_len;i++){
+      collectIrreducibleMonomials(level+1,node->branches[i],res);
+    }
+  } else {
+    DataNoroCacheNode* dn=(DataNoroCacheNode*) node;
+    if (dn->value_len==backLinkCode){
+      res.push_back(dn);
+    } 
+  }
+}
 DataNoroCacheNode* NoroCache::getCacheReference(poly term){
   int i;
   NoroCacheNode* parent=&root;
@@ -2656,16 +2680,22 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
     PrintS("\n");
 }
 #else
+class TermNoroDataNode{
+public:
+  DataNoroCacheNode* node;
+  poly t;
+};
+static int term_nodes_sort_crit(const void* a, const void* b){
+  return -pLmCmp(((TermNoroDataNode*) a)->t,((TermNoroDataNode*) b)->t);
+}
 void noro_step(poly*p,int &pn,slimgb_alg* c){
-  poly* reduced=(poly*) omalloc(pn*sizeof(poly));
+  
   int j;
-  int* reduced_len=(int*) omalloc(pn*sizeof(int));
-  int reduced_c=0;
-  //if (TEST_OPT_PROT)
-  //  PrintS("reduced system:\n");
-#ifdef NORO_CACHE
+
+
   NoroCache cache;
-#endif
+
+  std::vector<std::vector<NoroPlaceHolder> > place_holders(pn);
   for(j=0;j<pn;j++){
    
     poly h=p[j];
@@ -2675,52 +2705,36 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
 
     
     std::vector<NoroPlaceHolder> ph=noro_red(p_Copy(h,c->r),h_len,&cache,c);
-    assume(pLength(h)==h_len);
-
-    if (h!=NULL){
-
-      
-
-      reduced[reduced_c]=h;
-      reduced_len[reduced_c]=h_len;
-      reduced_c++;
-      if (TEST_OPT_PROT)
-        Print("%d ",h_len);
-    }
+    place_holders[j]=ph;
   }
-  PrintS("blupper\n");
-  int reduced_sum=0;
-  for(j=0;j<reduced_c;j++){
-    reduced_sum+=reduced_len[j];
-  }
-  poly* terms=(poly*) omalloc(reduced_sum*sizeof(poly));
-  int tc=0;
-  for(j=0;j<reduced_c;j++){
-    poly h=reduced[j];
-    
-    while(h!=NULL){
-      terms[tc++]=h;
-      pIter(h);
-      assume(tc<=reduced_sum);
-    }
-  }
-  assume(tc==reduced_sum);
-  qsort(terms,reduced_sum,sizeof(poly),terms_sort_crit);
-  int nterms=reduced_sum;
-  if (TEST_OPT_PROT)
-    Print("orig estimation:%i\n",reduced_sum);
-  unify_terms(terms,nterms);
-  if (TEST_OPT_PROT)
-    Print("actual number of columns:%i\n",nterms);
-  int rank=reduced_c;
-  linalg_step_modp(reduced, p,rank,terms,nterms,c);
-  omfree(terms);
+  std::vector<DataNoroCacheNode*> irr_nodes;
+  cache.collectIrreducibleMonomials(irr_nodes);
+  //now can build up terms array
+  int n=irr_nodes.size();//cache.countIrreducibleMonomials();
   
-  pn=rank;
-  omfree(reduced);
-
-  if (TEST_OPT_PROT)
-    PrintS("\n");
+  TermNoroDataNode* term_nodes=(TermNoroDataNode*) omalloc(n*sizeof(TermNoroDataNode));
+  
+  for(j=0;j<n;j++){
+    assume(irr_nodes[j]!=NULL);
+    assume(irr_nodes[j]->value_len==NoroCache::backLinkCode);
+    term_nodes[j].t=irr_nodes[j]->value_poly;
+    assume(term_nodes[j].t!=NULL);
+    term_nodes[j].node=irr_nodes[j];
+  }
+  
+  
+  qsort(term_nodes,n,sizeof(TermNoroDataNode),term_nodes_sort_crit);
+  poly* terms=(poly*) omalloc(n*sizeof(poly));
+  for(j=0;j<n;j++){
+    term_nodes[j].node->term_index=j;
+    terms[j]=term_nodes[j].t;
+  }
+  
+  
+  omfree(terms);
+  omfree(term_nodes);
+  //don't forget the rank
+  
 }
 #endif
 
