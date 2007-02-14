@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.438 2007-01-25 19:13:00 motsak Exp $ */
+/* $Id: iparith.cc,v 1.439 2007-02-14 13:43:28 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3500,9 +3500,10 @@ static BOOLEAN jjDUMP(leftv res, leftv v)
 static BOOLEAN jjE(leftv res, leftv v)
 {
   res->data = (char *)pOne();
-  pSetComp((poly)res->data,(int)(long)v->Data());
+  int co=(int)(long)v->Data();
+  pSetComp((poly)res->data,co);
   pSetm((poly)res->data);
-  return FALSE;
+  return (co<=0);
 }
 static BOOLEAN jjEXECUTE(leftv res, leftv v)
 {
