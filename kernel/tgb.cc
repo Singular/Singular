@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.130 2007-02-13 14:58:52 bricken Exp $ */
+/* $Id: tgb.cc,v 1.131 2007-02-14 13:55:47 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2084,11 +2084,11 @@ void simplest_gauss_modp(number* a, int nrows,int ncols){
   if (TEST_OPT_PROT)
     PrintS("StopGauss\n");
 }
-static void write_poly_to_row(number* row, poly h, poly*terms, int tn){
+static void write_poly_to_row(number* row, poly h, poly*terms, int tn, ring r){
   //poly* base=row;
   while(h!=NULL){
     //Print("h:%i\n",h);
-    number coef=p_GetCoeff(h,c->r);
+    number coef=p_GetCoeff(h,r);
     poly* ptr_to_h=(poly*) bsearch(&h,terms,tn,sizeof(poly),terms_sort_crit);
     assume(ptr_to_h!=NULL);
     int pos=ptr_to_h-terms;
@@ -2097,7 +2097,22 @@ static void write_poly_to_row(number* row, poly h, poly*terms, int tn){
     pIter(h);
   }
 }
-static void linalg_step_modp(poly *p, poly* p_out, int&pn, poly* terms,int tn, slimgb_alg* c){
+static poly row_to_poly(number* row, poly* terms, int tn, ring r){
+  poly h=NULL;
+  int j;
+  for(j=tn-1;j>=0;j--){
+    if (!(npIsZero(row[j]))){
+      poly t=terms[j];
+      t=p_LmInit(t,r);
+      p_SetCoeff(t,row[j],r);
+      pNext(t)=h;
+      h=t;
+    }
+    
+  }
+  return h;
+}
+static void linalg_step_modp(poly *p, poly* p_out, int& pn, poly* terms,int tn, slimgb_alg* c){
   static int export_n=0;
   assume(terms[tn-1]!=NULL);
   assume(rField_is_Zp(c->r));
@@ -2112,7 +2127,7 @@ static void linalg_step_modp(poly *p, poly* p_out, int&pn, poly* terms,int tn, s
   for(i=0;i<pn;i++){
     poly h=p[i];
     //int base=tn*i;
-    write_poly_to_row(number_array+tn*i,h,terms,tn);
+    write_poly_to_row(number_array+tn*i,h,terms,tn,c->r);
 
   }
 #if 0
@@ -2128,16 +2143,8 @@ static void linalg_step_modp(poly *p, poly* p_out, int&pn, poly* terms,int tn, s
     int j;
     int base=tn*i;
     number* row=number_array+base;
-    for(j=tn-1;j>=0;j--){
-      if (!(npIsZero(row[j]))){
-        poly t=terms[j];
-        t=p_LmInit(t,c->r);
-        p_SetCoeff(t,row[j],c->r);
-        pNext(t)=h;
-        h=t;
-      }
-      
-    }
+    h=row_to_poly(row,terms,tn,c->r);
+    
    if (h!=NULL){
      p_out[p_pos++]=h;
    } 
@@ -2199,6 +2206,7 @@ public:
   NoroCacheNode(){
     branches=NULL;
     branches_len=0;
+    
   }
   NoroCacheNode* setNode(int branch, NoroCacheNode* node){
     if (branch>=branches_len){
@@ -2246,9 +2254,16 @@ public:
 class DenseRow{
 public:
   number* array;
-  int start;
+  int begin;
   int end;
+  DenseRow(){
+    array=NULL;
+  }
+  ~DenseRow(){
+    omfree(array);
+  }
 };
+
 class DataNoroCacheNode:public NoroCacheNode{
 public:
   
@@ -2260,13 +2275,21 @@ public:
     value_len=len;
     value_poly=p;
     row=NULL;
+    term_index=-1;
+  }
+  ~DataNoroCacheNode(){
+    //p_Delete(&value_poly,currRing);
+    if (row) delete row;
   }
 };
 class NoroCache{
 public:
   poly temp_term;
+  void evaluatePlaceHolder(number* row,std::vector<NoroPlaceHolder>& place_holders);
   void collectIrreducibleMonomials( std::vector<DataNoroCacheNode*>& res);
   void collectIrreducibleMonomials(int level,  NoroCacheNode* node, std::vector<DataNoroCacheNode*>& res);
+  void evaluateRows();
+  void evaluateRows(int level, NoroCacheNode* node);
 #ifdef NORO_RED_ARRAY_RESERVER
   int reserved;
   poly* recursionPolyBuffer;
@@ -2275,16 +2298,19 @@ public:
   DataNoroCacheNode* insert(poly term, poly nf, int len){
     //assume(impl.find(p_Copy(term,currRing))==impl.end());
     //assume(len==pLength(nf));
+    assume(npIsOne(p_GetCoeff(term,currRing)));
     if (term==nf){
       term=p_Copy(term,currRing);
 
       ressources.push_back(term);
+      nIrreducibleMonomials++;
       return treeInsertBackLink(term);
       
     } else{
-
+      
       if (nf){
         //nf=p_Copy(nf,currRing);
+        assume(p_LmCmp(nf,term,currRing)==-1);
         ressources.push_back(nf);
       }
       return treeInsert(term,nf,len);
@@ -2294,6 +2320,8 @@ public:
     //impl[term]=std::pair<PolySimple,int> (nf,len);
   }
   DataNoroCacheNode* insertAndTransferOwnerShip(poly t, ring r){
+    nIrreducibleMonomials++;
+    ressources.push_back(t);
     return treeInsertBackLink(t);
   }
   poly lookup(poly term, BOOLEAN& succ, int & len);
@@ -2301,8 +2329,10 @@ public:
   NoroCache(){
 #ifdef NORO_RED_ARRAY_RESERVER
     reserved=0;
+    
     recursionPolyBuffer=(poly*)omalloc(1000000*sizeof(poly));
 #endif
+    nIrreducibleMonomials=0;
     temp_term=pOne();
   }
 #ifdef NORO_RED_ARRAY_RESERVER
@@ -2326,6 +2356,8 @@ public:
     omfree(recursionPolyBuffer);
 #endif
   }
+  
+  int nIrreducibleMonomials;
 protected:
   DataNoroCacheNode* treeInsert(poly term,poly nf,int len){
     int i;
@@ -2343,7 +2375,7 @@ protected:
     for(i=1;i<nvars;i++){
       parent=parent->getOrInsertBranch(p_GetExp(term,i,currRing));
     }
-    return (DataNoroCacheNode*) parent->setNode(p_GetExp(term,nvars,currRing),new DataNoroCacheNode(NULL,backLinkCode));
+    return (DataNoroCacheNode*) parent->setNode(p_GetExp(term,nvars,currRing),new DataNoroCacheNode(term,backLinkCode));
   }
   
   //@TODO descruct nodes;
@@ -2352,7 +2384,78 @@ protected:
   //typedef std::map<PolySimple,std::pair<PolySimple,int> > cache_map;
   //cache_map impl;
   NoroCacheNode root;
+  
 };
+void NoroCache::evaluateRows(){
+  //after that can evaluate placeholders
+  int i;
+  for(i=0;i<root.branches_len;i++){
+    evaluateRows(1,root.branches[i]);
+  }
+}
+void NoroCache::evaluateRows(int level, NoroCacheNode* node){
+  assume(level>=0);
+  if (node==NULL) return;
+  if (level<pVariables){
+    int i,sum;
+    for(i=0;i<node->branches_len;i++){
+      evaluateRows(level+1,node->branches[i]);
+    }
+  } else {
+    DataNoroCacheNode* dn=(DataNoroCacheNode*) node;
+    if (dn->value_len!=backLinkCode){
+      dn->row=new DenseRow();
+      dn->row->array=(number*) omalloc(nIrreducibleMonomials*sizeof(number));
+      dn->row->begin=0;
+      dn->row->end=nIrreducibleMonomials;
+      number* row= dn->row->array;
+      int i;
+      for(i=0;i<nIrreducibleMonomials;i++){
+        row[i]=npInit(0);
+      }
+      poly p=dn->value_poly;
+      i=0;
+      while(p){
+        DataNoroCacheNode* ref=getCacheReference(p);
+
+        int idx=ref->term_index;
+        if (i==0){
+          dn->row->begin=idx;
+        }
+        dn->row->end=idx+1;
+        i++;
+        assume(idx>=0);
+        //Print("idx:%d\n",idx);
+        row[idx]=p_GetCoeff(p,currRing);
+        pIter(p);
+      }
+      //p_Delete(&dn->value_poly,currRing);
+    } 
+  }
+}
+void NoroCache::evaluatePlaceHolder(number* row,std::vector<NoroPlaceHolder>& place_holders){
+  int i;
+  int s=place_holders.size();
+  for(i=0;i<s;i++){
+    DataNoroCacheNode* ref=place_holders[i].ref;
+    number coef=place_holders[i].coef;
+    if (ref->value_len==backLinkCode){
+      row[ref->term_index]=npAdd(row[ref->term_index],coef);
+    } else {
+      DenseRow* ref_row=ref->row;
+      int j;
+      if (!(npIsOne(coef))){
+        for(j=ref_row->begin;j<ref_row->end;j++){
+          row[j]=npAdd(row[j],npMult(coef,ref_row->array[j]));
+        }
+      } else{
+        for(j=ref_row->begin;j<ref_row->end;j++)
+          row[j]=npAdd(row[j],ref_row->array[j]);
+      }
+    }
+  }
+  
+}
 void NoroCache::collectIrreducibleMonomials( std::vector<DataNoroCacheNode*>& res){
   int i;
   for(i=0;i<root.branches_len;i++){
@@ -2416,7 +2519,7 @@ poly noro_red_non_unique(poly p, int &len, NoroCache* cache,slimgb_alg* c);
 
 MonRedRes noro_red_mon(poly t, BOOLEAN force_unique, NoroCache* cache,slimgb_alg* c){
   MonRedRes res_holder;
-  
+
   //wrp(t);
   res_holder.changed=TRUE;
   if (force_unique){
@@ -2426,102 +2529,105 @@ MonRedRes noro_red_mon(poly t, BOOLEAN force_unique, NoroCache* cache,slimgb_alg
       if (res_holder.len==NoroCache::backLinkCode){
         res_holder.len=1;
 
-    
+
       }
+      res_holder.coef=p_GetCoeff(t,c->r);
       res_holder.p=ref->value_poly;
       res_holder.ref=ref;
       res_holder.onlyBorrowed=TRUE;
       res_holder.changed=TRUE;
+      p_Delete(&t,c->r);
       return res_holder;
     }
   } else{
-  BOOLEAN succ;
-  poly cache_lookup=cache->lookup(t,succ, res_holder.len);//don't own this yet
-  if (succ){
-    if (cache_lookup==t){
+    BOOLEAN succ;
+    poly cache_lookup=cache->lookup(t,succ, res_holder.len);//don't own this yet
+    if (succ){
+      if (cache_lookup==t){
       //know they are equal
       //res_holder.len=1;
-      
-      res_holder.changed=FALSE;
-      res_holder.p=t;
-      res_holder.coef=npInit(1);
-      res_holder.onlyBorrowed=FALSE;
-      return res_holder;
-    }
+
+        res_holder.changed=FALSE;
+        res_holder.p=t;
+        res_holder.coef=npInit(1);
+        
+        res_holder.onlyBorrowed=FALSE;
+        return res_holder;
+      }
     //poly t_new=ppMult_nn(cache_lookup,pGetCoeff(t));
-    res_holder.coef=p_GetCoeff(t,c->r);
-    p_Delete(&t,c->r);
+      res_holder.coef=p_GetCoeff(t,c->r);
+      p_Delete(&t,c->r);
     //res_holder.len=1;
     //res_holder.changed=TRUE;
-    res_holder.p=cache_lookup;
-    
-    res_holder.onlyBorrowed=TRUE;
-    return res_holder;
+      res_holder.p=cache_lookup;
+
+      res_holder.onlyBorrowed=TRUE;
+      return res_holder;
     //return t_new;
+    }
   }
-}
-  
-    unsigned long sev=p_GetShortExpVector(t,currRing);
-    int i=kFindDivisibleByInS_easy(c->strat,t,sev);
-    if (i>=0){
-      number coef_bak=p_GetCoeff(t,c->r);
 
-      p_SetCoeff(t,npInit(1),c->r);
-      assume(npIsOne(p_GetCoeff(c->strat->S[i],c->r)));
-      number coefstrat=p_GetCoeff(c->strat->S[i],c->r);
-      
+  unsigned long sev=p_GetShortExpVector(t,currRing);
+  int i=kFindDivisibleByInS_easy(c->strat,t,sev);
+  if (i>=0){
+    number coef_bak=p_GetCoeff(t,c->r);
+
+    p_SetCoeff(t,npInit(1),c->r);
+    assume(npIsOne(p_GetCoeff(c->strat->S[i],c->r)));
+    number coefstrat=p_GetCoeff(c->strat->S[i],c->r);
+
       //poly t_copy_mon=p_Copy(t,c->r);
-      poly exp_diff=cache->temp_term;
-      p_ExpVectorDiff(exp_diff,t,c->strat->S[i],c->r);
-      p_SetCoeff(exp_diff,npNeg(npInvers(coefstrat)),c->r);
-      p_Setm(exp_diff,c->r);
-      assume(c->strat->S[i]!=NULL);
+    poly exp_diff=cache->temp_term;
+    p_ExpVectorDiff(exp_diff,t,c->strat->S[i],c->r);
+    p_SetCoeff(exp_diff,npNeg(npInvers(coefstrat)),c->r);
+    p_Setm(exp_diff,c->r);
+    assume(c->strat->S[i]!=NULL);
       //poly t_to_del=t;
-      poly res;
-      res=pp_Mult_mm(pNext(c->strat->S[i]),exp_diff,c->r);
+    poly res;
+    res=pp_Mult_mm(pNext(c->strat->S[i]),exp_diff,c->r);
 
-      res_holder.len=c->strat->lenS[i]-1;
-      res=noro_red_non_unique(res,res_holder.len,cache,c);
-      
-      DataNoroCacheNode* ref=cache->insert(t,res,pLength(res));
-      p_Delete(&t,c->r);
+    res_holder.len=c->strat->lenS[i]-1;
+    res=noro_red_non_unique(res,res_holder.len,cache,c);
+    
+    DataNoroCacheNode* ref=cache->insert(t,res,res_holder.len);
+    p_Delete(&t,c->r);
       //p_Delete(&t_copy_mon,c->r);
       //res=pMult_nn(res,coef_bak);
-      
-      res_holder.changed=TRUE;
-      res_holder.p=res;
-      res_holder.coef=coef_bak;
-      res_holder.onlyBorrowed=TRUE;
-      res_holder.ref=ref;
-      return res_holder;
 
-    } else {
-      number coef_bak=p_GetCoeff(t,c->r);
-      number one=npInit(1);
-      p_SetCoeff(t,one,c->r);
-      res_holder.len=1;
-      if (!(force_unique)){
+    res_holder.changed=TRUE;
+    res_holder.p=res;
+    res_holder.coef=coef_bak;
+    res_holder.onlyBorrowed=TRUE;
+    res_holder.ref=ref;
+    return res_holder;
+
+  } else {
+    number coef_bak=p_GetCoeff(t,c->r);
+    number one=npInit(1);
+    p_SetCoeff(t,one,c->r);
+    res_holder.len=1;
+    if (!(force_unique)){
       res_holder.ref=cache->insert(t,t,res_holder.len);
       p_SetCoeff(t,coef_bak,c->r);
       //return t;
-      
+
       //we need distinction
       res_holder.changed=FALSE;
       res_holder.p=t;
-      
+
       res_holder.coef=npInit(1);
       res_holder.onlyBorrowed=FALSE;
       return res_holder;
-     } else {
-       res_holder.ref=cache->insertAndTransferOwnerShip(t,c->r);
-       res_holder.coef=coef_bak;
-       res_holder.onlyBorrowed=TRUE;
-       res_holder.changed=FALSE;
-       res_holder.p=t;
-       return res_holder;
-     }
+    } else {
+      res_holder.ref=cache->insertAndTransferOwnerShip(t,c->r);
+      res_holder.coef=coef_bak;
+      res_holder.onlyBorrowed=TRUE;
+      res_holder.changed=FALSE;
+      res_holder.p=t;
+      return res_holder;
     }
-  
+  }
+
 }
 poly tree_add(poly* a,int begin, int end,ring r){
   int d=end-begin;
@@ -2556,10 +2662,14 @@ poly noro_red_non_unique(poly p, int &len, NoroCache* cache,slimgb_alg* c){
     poly t=p;
     pIter(p);
     pNext(t)=NULL;
-
+#ifndef NDEBUG
+    number coef_debug=p_GetCoeff(t,currRing);
+#endif
     MonRedRes red=noro_red_mon(t,FALSE,cache,c);
     if ((!(red.changed))&&(!(red.onlyBorrowed))){
       unchanged_size++;
+      assume(npIsOne(red.coef));
+      assume(p_GetCoeff(red.p,currRing)==coef_debug);
       if (unchanged_head){
         pNext(unchanged_tail)=red.p;
         pIter(unchanged_tail);
@@ -2569,7 +2679,12 @@ poly noro_red_non_unique(poly p, int &len, NoroCache* cache,slimgb_alg* c){
       }
     } else{
       assume(red.len==pLength(red.p));
-      kBucket_Add_q(bucket,red.p,&red.len);
+      if (red.onlyBorrowed){
+        t=pp_Mult_nn(red.p,red.coef,currRing);
+      } else {
+        t=p_Mult_nn(red.p,red.coef,currRing);
+      }
+      kBucket_Add_q(bucket,t,&red.len);
     }
   }
   poly res=NULL;
@@ -2600,6 +2715,7 @@ std::vector<NoroPlaceHolder> noro_red(poly p, int &len, NoroCache* cache,slimgb_
       NoroPlaceHolder h;
       h.ref=red.ref;
       h.coef=red.coef;
+      assume(!((h.ref->value_poly==NULL) &&(h.ref->value_len!=0)));
       if (h.ref->value_poly)
         res.push_back(h);
     }
@@ -2694,7 +2810,7 @@ static int term_nodes_sort_crit(const void* a, const void* b){
   return -pLmCmp(((TermNoroDataNode*) a)->t,((TermNoroDataNode*) b)->t);
 }
 void noro_step(poly*p,int &pn,slimgb_alg* c){
-  
+  //Print("Input rows %d\n",pn);
   int j;
 
 
@@ -2715,8 +2831,11 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
   std::vector<DataNoroCacheNode*> irr_nodes;
   cache.collectIrreducibleMonomials(irr_nodes);
   //now can build up terms array
+  //Print("historic irred Mon%d\n",cache.nIrreducibleMonomials);
   int n=irr_nodes.size();//cache.countIrreducibleMonomials();
-  
+  cache.nIrreducibleMonomials=n;
+  if (TEST_OPT_PROT)
+    Print("Irred Mon:%d\n",n);
   TermNoroDataNode* term_nodes=(TermNoroDataNode*) omalloc(n*sizeof(TermNoroDataNode));
   
   for(j=0;j<n;j++){
@@ -2734,10 +2853,39 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
     term_nodes[j].node->term_index=j;
     terms[j]=term_nodes[j].t;
   }
-  
-  
+  if (TEST_OPT_PROT)
+    Print("Evaluate Rows \n");
+  cache.evaluateRows();
+  number* number_array=(number*) omalloc(n*pn*sizeof(number));
+  number zero=npInit(0);
+  if (TEST_OPT_PROT)
+     Print("Evaluate Place Holders\n");
+  for(j=0;j<pn;j++){
+    int i;
+    number* row=number_array+n*j;
+    for(i=0;i<n;i++){
+      row[i]=zero;
+    }
+    cache.evaluatePlaceHolder(row,place_holders[j]);
+  }
+  if (TEST_OPT_PROT){
+    Print("Input rows %d\n",pn);
+  }
+  static int export_n=0;
+  //export_mat(number_array,pn,n,"mat%i.py",++export_n);
+  simplest_gauss_modp(number_array,pn,n);
+
+  int p_pos=0;
+  for(j=0;j<pn;j++){
+    poly h=row_to_poly(number_array+j*n,terms,n,c->r);
+    if(h!=NULL){
+      p[p_pos++]=h;
+    }
+  }
+  pn=p_pos;
   omfree(terms);
   omfree(term_nodes);
+  omfree(number_array);
   //don't forget the rank
   
 }
@@ -2747,7 +2895,8 @@ static void go_on (slimgb_alg* c){
   //set limit of 1000 for multireductions, at the moment for
   //programming reasons
   #ifdef USE_NORO
-  const BOOLEAN use_noro=((!(c->nc))&&(rField_is_Zp(c->r)));
+  //Print("module rank%d\n",c->S->rank);
+  const BOOLEAN use_noro=((!(c->nc))&&(c->S->rank<=1)&&(rField_is_Zp(c->r)));
   #else
   const BOOLEAN use_noro=FALSE;
   #endif
@@ -2832,6 +2981,7 @@ static void go_on (slimgb_alg* c){
   //if ((!(c->nc))&&(rField_is_Zp(c->r))){
   if (use_noro){
     int pn=i;
+    if (pn==0) return;
     noro_step(p,pn,c);
     if (TEST_OPT_PROT){
       Print("reported rank:%i\n",pn);
