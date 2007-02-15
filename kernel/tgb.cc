@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.137 2007-02-15 11:37:03 bricken Exp $ */
+/* $Id: tgb.cc,v 1.138 2007-02-15 15:16:32 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2883,7 +2883,7 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
     number coef;
 
     
-    std::vector<NoroPlaceHolder> ph=noro_red(p_Copy(h,c->r),h_len,&cache,c);
+    std::vector<NoroPlaceHolder> ph=noro_red(h,h_len,&cache,c);
     place_holders[j]=ph;
   }
   std::vector<DataNoroCacheNode*> irr_nodes;
