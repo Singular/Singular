@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.131 2007-02-14 13:55:47 bricken Exp $ */
+/* $Id: tgb.cc,v 1.132 2007-02-15 07:43:36 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2333,6 +2333,7 @@ public:
     recursionPolyBuffer=(poly*)omalloc(1000000*sizeof(poly));
 #endif
     nIrreducibleMonomials=0;
+    nReducibleMonomials=0;
     temp_term=pOne();
   }
 #ifdef NORO_RED_ARRAY_RESERVER
@@ -2358,9 +2359,11 @@ public:
   }
   
   int nIrreducibleMonomials;
+  int nReducibleMonomials;
 protected:
   DataNoroCacheNode* treeInsert(poly term,poly nf,int len){
     int i;
+    nReducibleMonomials++;
     int nvars=pVariables;
     NoroCacheNode* parent=&root;
     for(i=1;i<nvars;i++){
@@ -2834,8 +2837,10 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
   //Print("historic irred Mon%d\n",cache.nIrreducibleMonomials);
   int n=irr_nodes.size();//cache.countIrreducibleMonomials();
   cache.nIrreducibleMonomials=n;
-  if (TEST_OPT_PROT)
+  if (TEST_OPT_PROT){
     Print("Irred Mon:%d\n",n);
+    Print("red Mon:%d\n",cache.nReducibleMonomials);
+  }
   TermNoroDataNode* term_nodes=(TermNoroDataNode*) omalloc(n*sizeof(TermNoroDataNode));
   
   for(j=0;j<n;j++){
