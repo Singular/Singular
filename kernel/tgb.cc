@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.134 2007-02-15 09:42:27 bricken Exp $ */
+/* $Id: tgb.cc,v 1.135 2007-02-15 10:57:42 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1906,10 +1906,10 @@ public:
     }
   }
   void reduceOtherRowsForward(int r){
-    
+
     //assume rows "under r" have bigger or equal start index
     number* row_array=rows[r];
-  
+
     int start=startIndices[r];
     number coef=row_array[start];
     assume(start<ncols);
@@ -1917,15 +1917,24 @@ public:
     assume(!(npIsZero(row_array[start])));
     if (!(npIsOne(coef)))
       multiplyRow(r,npInvers(coef));
+    assume(npIsOne(row_array[start]));
     int lastIndex=modP_lastIndexRow(row_array, ncols);
+    number minus_one=npInit(-1);
     for (other_row=r+1;other_row<nrows;other_row++){
       assume(startIndices[other_row]>=start);
       if (startIndices[other_row]==start){
         int i;
         number* other_row_array=rows[other_row];
         number coef2=npNeg(other_row_array[start]);
-        for(i=start;i<=lastIndex;i++){
-          other_row_array[i]=npAdd(npMult(coef2,row_array[i]),other_row_array[i]);
+        if (coef2==minus_one){
+          for(i=start;i<=lastIndex;i++){
+            other_row_array[i]=npSub(other_row_array[i], row_array[i]);
+          }
+      }else {
+          assume(FALSE);
+          for(i=start;i<=lastIndex;i++){
+            other_row_array[i]=npAdd(npMult(coef2,row_array[i]),other_row_array[i]);
+          }
         }
         updateStartIndex(other_row,start);
         assume(npIsZero(other_row_array[start]));
@@ -2475,25 +2484,26 @@ void NoroCache::evaluatePlaceHolder(number* row,std::vector<NoroPlaceHolder>& pl
       number* ref_end=ref_row->array+(ref_row->end-ref_row->begin);
       number* my_pos=row+ref_row->begin;
       //TODO npisOne distinction
-      while(ref_begin!=ref_end){
-        
-        *my_pos=npAdd(*my_pos,npMult(coef,*ref_begin));
-        ++ref_begin;
-        ++my_pos;
-      }
-      /*int j;
       if (!(npIsOne(coef))){
-        for(j=ref_row->begin;j<ref_row->end;j++){
-          row[j]=npAdd(row[j],npMult(coef,ref_row->array[j]));
+        while(ref_begin!=ref_end){
+
+          *my_pos=npAdd(*my_pos,npMult(coef,*ref_begin));
+          ++ref_begin;
+          ++my_pos;
         }
-      } else{
-        
-        for(j=ref_row->begin;j<ref_row->end;j++)
-          row[j]=npAdd(row[j],ref_row->array[j]);
-      }*/
+      }
+      else{
+        while(ref_begin!=ref_end){
+
+          *my_pos=npAdd(*my_pos,*ref_begin);
+          ++ref_begin;
+          ++my_pos;
+        }
+      }
+
     }
   }
-  
+
 }
 void NoroCache::collectIrreducibleMonomials( std::vector<DataNoroCacheNode*>& res){
   int i;
@@ -3015,7 +3025,7 @@ static void go_on (slimgb_alg* c){
   c->replaced=new bool[c->n];
   c->used_b=FALSE;
   #endif
-  red_object* buf=(red_object*) omalloc(i*sizeof(red_object));
+  
   c->normal_forms+=i;
   int j;
 #if 1
@@ -3035,7 +3045,8 @@ static void go_on (slimgb_alg* c){
         p_wrp(p[j],c->r);
       }*/
   }
-#endif 
+#endif
+  red_object* buf=(red_object*) omalloc(i*sizeof(red_object));
   for(j=0;j<i;j++){
     buf[j].p=p[j];
     buf[j].sev=pGetShortExpVector(p[j]);
@@ -3324,6 +3335,7 @@ void slimgb_alg::introduceDelayedPairs(poly* pa,int s){
   qsort(si_array,s,sizeof(sorted_pair_node*),tgb_pair_better_gen2);
     apairs=spn_merge(apairs,pair_top+1,si_array,s,this);
   pair_top+=s;
+  omfree(si_array);
 }
 slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
 
