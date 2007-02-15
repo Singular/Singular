@@ -35,7 +35,9 @@ proc check_ideal_std(int n, string ostring)
   
 proc check_module_std(int n, string ostring)
 {
+  "check_module_std n=",n," ostring=",ostring;
   string ringstr = "ring r = 32003,x(0.." + string(n-1) + ")," + ostring + ";";
+  ringstr;
   string modulestr = "module j = ";
   int i;
 
@@ -44,7 +46,7 @@ proc check_module_std(int n, string ostring)
     modulestr = modulestr + "x("+ string(i) + ")*gen(" +  string(i+1) + ") + ";
     modulestr = modulestr + "x("+ string(i) + ")*gen(" +  string(i+2) + ") + ";
   }
-  modulestr = modulestr + "x(" + string(n-1) + ")*gen(" +  string(i) + "), ";
+  modulestr = modulestr + "x(" + string(n-1) + ")*gen(" +  string(n) + "), ";
 
   
   for (i=0; i < n-1; i++)
@@ -54,8 +56,8 @@ proc check_module_std(int n, string ostring)
     modulestr = modulestr + "x("+ string(i % n) + ")*x(" + string((i+1) % n) +
       ")*gen(" +  string(2) + ") + ";
   }
-  modulestr = modulestr + "x("+ string(i % n) + ")*x(" + string((i+1) % n) +
-    ")*gen(" +  string(i) + "),";
+  modulestr = modulestr + "x("+ string((n-1) % n) + ")*x(" + string(n % n) +
+    ")*gen(" +  string((i%n)+1) + "),";
 
   for (i=0; i < n-1; i++)
   {
@@ -65,7 +67,7 @@ proc check_module_std(int n, string ostring)
       + ")*x(" + string((i+2) % n) + ")*gen(" +  string(2) + ")  + ";
   }
   modulestr = modulestr + "x("+ string(i % n) + ")*x(" + string((i+1) % n)
-    + ")*x(" + string((i+2) % n) + ")*gen(" +  string(i) + ");";
+    + ")*x(" + string((i+2) % n) + ")*gen(" +  string(n) + ");";
 
   execute(ringstr);
   execute(modulestr);
