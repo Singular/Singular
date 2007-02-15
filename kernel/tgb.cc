@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.132 2007-02-15 07:43:36 bricken Exp $ */
+/* $Id: tgb.cc,v 1.133 2007-02-15 08:28:08 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2327,9 +2327,9 @@ public:
   poly lookup(poly term, BOOLEAN& succ, int & len);
   DataNoroCacheNode* getCacheReference(poly term);
   NoroCache(){
+    buffer=NULL;
 #ifdef NORO_RED_ARRAY_RESERVER
     reserved=0;
-    
     recursionPolyBuffer=(poly*)omalloc(1000000*sizeof(poly));
 #endif
     nIrreducibleMonomials=0;
@@ -2387,14 +2387,17 @@ protected:
   //typedef std::map<PolySimple,std::pair<PolySimple,int> > cache_map;
   //cache_map impl;
   NoroCacheNode root;
-  
+  number* buffer;
 };
 void NoroCache::evaluateRows(){
   //after that can evaluate placeholders
   int i;
+  buffer=(number*) omalloc(nIrreducibleMonomials*sizeof(number));
   for(i=0;i<root.branches_len;i++){
     evaluateRows(1,root.branches[i]);
   }
+  omfree(buffer);
+  buffer=NULL;
 }
 void NoroCache::evaluateRows(int level, NoroCacheNode* node){
   assume(level>=0);
@@ -2408,7 +2411,29 @@ void NoroCache::evaluateRows(int level, NoroCacheNode* node){
     DataNoroCacheNode* dn=(DataNoroCacheNode*) node;
     if (dn->value_len!=backLinkCode){
       dn->row=new DenseRow();
-      dn->row->array=(number*) omalloc(nIrreducibleMonomials*sizeof(number));
+      DenseRow* row=dn->row;
+      memset(buffer,0,sizeof(number)*nIrreducibleMonomials);
+      poly p=dn->value_poly;
+      if (p==NULL) {row->array=NULL;row->begin=0;row->end=0; return;}
+      int i=0;
+      int idx;
+      number* a=buffer;
+      while(p){
+        DataNoroCacheNode* ref=getCacheReference(p);
+        
+        idx=ref->term_index;
+        assume(idx>=0);
+        a[idx]=p_GetCoeff(p,currRing);
+        if (i==0) row->begin=idx;
+        i++;
+        pIter(p);
+      }
+      row->end=idx+1;
+      assume(row->end>row->begin);
+      int len=row->end-row->begin;
+      row->array=(number*) omalloc((len)*sizeof(number));
+      memcpy(row->array,a+row->begin,len*sizeof(number));
+      /*dn->row->array=(number*) omalloc(nIrreducibleMonomials*sizeof(number));
       dn->row->begin=0;
       dn->row->end=nIrreducibleMonomials;
       number* row= dn->row->array;
@@ -2419,9 +2444,7 @@ void NoroCache::evaluateRows(int level, NoroCacheNode* node){
       poly p=dn->value_poly;
       i=0;
       while(p){
-        DataNoroCacheNode* ref=getCacheReference(p);
 
-        int idx=ref->term_index;
         if (i==0){
           dn->row->begin=idx;
         }
@@ -2431,7 +2454,8 @@ void NoroCache::evaluateRows(int level, NoroCacheNode* node){
         //Print("idx:%d\n",idx);
         row[idx]=p_GetCoeff(p,currRing);
         pIter(p);
-      }
+      }*/
+      
       //p_Delete(&dn->value_poly,currRing);
     } 
   }
@@ -2446,15 +2470,27 @@ void NoroCache::evaluatePlaceHolder(number* row,std::vector<NoroPlaceHolder>& pl
       row[ref->term_index]=npAdd(row[ref->term_index],coef);
     } else {
       DenseRow* ref_row=ref->row;
-      int j;
+      if (ref_row==NULL) continue;
+      number* ref_begin=ref_row->array;
+      number* ref_end=ref_row->array+(ref_row->end-ref_row->begin);
+      number* my_pos=row+ref_row->begin;
+      //TODO npisOne distinction
+      while(ref_begin!=ref_end){
+        
+        *my_pos=npAdd(*my_pos,npMult(coef,*ref_begin));
+        ++ref_begin;
+        ++my_pos;
+      }
+      /*int j;
       if (!(npIsOne(coef))){
         for(j=ref_row->begin;j<ref_row->end;j++){
           row[j]=npAdd(row[j],npMult(coef,ref_row->array[j]));
         }
       } else{
+        
         for(j=ref_row->begin;j<ref_row->end;j++)
           row[j]=npAdd(row[j],ref_row->array[j]);
-      }
+      }*/
     }
   }
   
@@ -2992,6 +3028,7 @@ static void go_on (slimgb_alg* c){
       Print("reported rank:%i\n",pn);
     }
     mass_add(p,pn,c);
+    omfree(p);
     return;
     /*if (TEST_OPT_PROT)
       for(j=0;j<pn;j++){
