@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.133 2007-02-15 08:28:08 bricken Exp $ */
+/* $Id: tgb.cc,v 1.134 2007-02-15 09:42:27 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2851,7 +2851,9 @@ static int term_nodes_sort_crit(const void* a, const void* b){
 void noro_step(poly*p,int &pn,slimgb_alg* c){
   //Print("Input rows %d\n",pn);
   int j;
-
+  if (TEST_OPT_PROT){
+    Print("Input rows %d\n",pn);
+  }
 
   NoroCache cache;
 
@@ -2909,9 +2911,7 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
     }
     cache.evaluatePlaceHolder(row,place_holders[j]);
   }
-  if (TEST_OPT_PROT){
-    Print("Input rows %d\n",pn);
-  }
+  
   static int export_n=0;
   //export_mat(number_array,pn,n,"mat%i.py",++export_n);
   simplest_gauss_modp(number_array,pn,n);
