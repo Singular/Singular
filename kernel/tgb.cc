@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.136 2007-02-15 11:13:40 bricken Exp $ */
+/* $Id: tgb.cc,v 1.137 2007-02-15 11:37:03 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2730,9 +2730,15 @@ poly noro_red_non_unique(poly p, int &len, NoroCache* cache,slimgb_alg* c){
     } else{
       assume(red.len==pLength(red.p));
       if (red.onlyBorrowed){
+        if (npIsOne(red.coef)){
+          t=p_Copy(red.p,currRing);
+        }else
         t=pp_Mult_nn(red.p,red.coef,currRing);
       } else {
-        t=p_Mult_nn(red.p,red.coef,currRing);
+        if (npIsOne(red.coef))
+        t=red.p;
+        else
+         t=p_Mult_nn(red.p,red.coef,currRing);
       }
       kBucket_Add_q(bucket,t,&red.len);
     }
