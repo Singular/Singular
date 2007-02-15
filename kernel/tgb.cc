@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.135 2007-02-15 10:57:42 bricken Exp $ */
+/* $Id: tgb.cc,v 1.136 2007-02-15 11:13:40 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -32,6 +32,7 @@
 #define BUCKETS_FOR_NORO_RED 1
 #define SR_HDL(A) ((long)(A))
 static const int bundle_size=1000;
+static const int bundle_size_noro=1000;
 static const int delay_factor=3;
 int QlogSize(number n);
 #define ADD_LATER_SIZE 500
@@ -2958,10 +2959,13 @@ static void go_on (slimgb_alg* c){
   }
   c->average_length=c->average_length/c->n;
   i=0;
-  poly* p=(poly*) omalloc((bundle_size+1)*sizeof(poly));//nullterminated
+  int max_pairs=bundle_size;
+  if (use_noro)
+    max_pairs=bundle_size_noro;
+  poly* p=(poly*) omalloc((max_pairs+1)*sizeof(poly));//nullterminated
 
   int curr_deg=-1;
-  while(i<bundle_size){
+  while(i<max_pairs){
     sorted_pair_node* s=top_pair(c);//here is actually chain criterium done
 
 
