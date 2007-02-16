@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.8 2007-01-31 23:51:25 motsak Exp $
+ *  Version: $Id: sca.cc,v 1.9 2007-02-16 11:05:54 motsak Exp $
  *******************************************************************/
 
 // #define PDEBUG 2
@@ -969,7 +969,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   ideal tempF = id_KillSquares(F, m_iFirstAltVar, m_iLastAltVar, currRing);
   const ideal tempQ = currRing->nc->SCAQuotient();
 
-  BOOLEAN bIdHomog = id_IsBiHomogeneous(tempF, m_iFirstAltVar, m_iLastAltVar, currRing);
+  bool bIdHomog = id_IsSCAHomogeneous(tempF, NULL, NULL, currRing); // wCx == wCy == NULL!
 
   assume( !bIdHomog || strat->homog ); //  bIdHomog =====[implies]>>>>> strat->homog
 
@@ -1423,7 +1423,9 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec *hilb
   const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
   const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
 
-  BOOLEAN bIdHomog = id_IsBiHomogeneous(F, m_iFirstAltVar, m_iLastAltVar, currRing);
+  ideal tempF = id_KillSquares(F, m_iFirstAltVar, m_iLastAltVar, currRing);
+
+  bool bIdHomog = id_IsSCAHomogeneous(tempF, NULL, NULL, currRing); // wCx == wCy == NULL!
 
   assume( !bIdHomog || strat->homog ); //  bIdHomog =====[implies]>>>>> strat->homog
 
@@ -1450,11 +1452,11 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec *hilb
 //   initHilbCrit(F, Q, &hilb, strat);
 
 //  nc_gr_initBba(F,strat);
-  initBba(F, strat); // set enterS, red, initEcart, initEcartPair
+  initBba(tempF, strat); // set enterS, red, initEcart, initEcartPair
 
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
   // ?? set spSpolyShort, reduce ???
-  initBuchMora(F, NULL, strat); // Q = squares!!!
+  initBuchMora(tempF, NULL, strat); // Q = squares!!!
 
 //   if (strat->minim>0) strat->M = idInit(IDELEMS(F),F->rank);
 
@@ -1765,6 +1767,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec *hilb
   if (TEST_OPT_REDSB) completeReduce(strat);
 
   /* release temp data-------------------------------- */
+  id_Delete(&tempF, currRing);
 
   exitBuchMora(strat);
 
@@ -1835,7 +1838,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
   
   const ideal tempQ = currRing->nc->SCAQuotient();
 
-  BOOLEAN bIdHomog = id_IsBiHomogeneous(tempF, m_iFirstAltVar, m_iLastAltVar, currRing);
+  bool bIdHomog = id_IsSCAHomogeneous(tempF, NULL, NULL, currRing); // wCx == wCy == NULL!
 
   assume( !bIdHomog || strat->homog ); //  bIdHomog =====[implies]>>>>> strat->homog
 
@@ -2168,63 +2171,96 @@ void sca_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
 }
 
 
-// bi-Degree (x, y) of lm(p)
-// Y are ones from iFirstAltVar up to iLastAltVar
-inline void p_GetSCADegree(const poly p, 
-  const unsigned int iFirstAltVar, const unsigned int iLastAltVar, 
-  long& dx, long& dy, const ring r)
+// bi-Degree (x, y) of monomial "m"
+// x-es and y-s are weighted by wx and wy resp.
+// [optional] components have weights by wCx and wCy.
+inline void m_GetBiDegree(const poly m, 
+  const intvec *wx, const intvec *wy, 
+  const intvec *wCx, const intvec *wCy, 
+  int& dx, int& dy, const ring r)
 {
   const unsigned int N  = r->N;
-
-  int i = 1;
   
-  dx = 0;
-  dy = 0;
+  p_Test(m, r);
   
-  for(; i < iFirstAltVar; i++)
-    dx += p_GetExp(p, i, r);
+  assume( wx != NULL );
+  assume( wy != NULL );
+  
+  assume( wx->cols() == 1 );
+  assume( wy->cols() == 1 );
 
-  for(; i <= iLastAltVar; i++)
-    dy += p_GetExp(p, i, r);
+  assume( wx->rows() >= N );
+  assume( wy->rows() >= N );
 
-  for(; i <= N; i++)
-    dx += p_GetExp(p, i, r);
+  int x = 0;
+  int y = 0;
+  
+  for(int i = N; i > 0; i--)
+  {
+    const int d = p_GetExp(m, i, r);
+    x += d * (*wx)[i-1];
+    y += d * (*wy)[i-1];
+  }
+  
+  if( (wCx != NULL) && (wCy != NULL) )
+  {
+    const int c = p_GetComp(m, r);
+
+    if( wCx->range(c) )
+      x += (*wCx)[c];
+
+    if( wCy->range(c) )
+      x += (*wCy)[c];      
+  }
+  
+  dx = x;
+  dy = y;
 }
 
-// tests whether p is bi-homogeneous without respect to the actual weigths(=>all ones)
-// Polynomial is bi-homogeneous iff all monomials have the same bi-degree (x,y).
-// Y are ones from iFirstAltVar up to iLastAltVar
+// returns true if polynom p is bi-homogenous with respect to the given weights
+// simultaneously sets bi-Degree
 bool p_IsBiHomogeneous(const poly p, 
-  const unsigned int iFirstAltVar, const unsigned int iLastAltVar, 
+  const intvec *wx, const intvec *wy, 
+  const intvec *wCx, const intvec *wCy, 
+  int &dx, int &dy,
   const ring r)
 {
-  if( p == NULL ) return true;
+  if( p == NULL ) 
+  {
+    dx = 0;
+    dy = 0;
+    return true;
+  }
 
   poly q = p;
 
 
-  long dx, dy;
+  int ddx, ddy;
 
-  p_GetSCADegree( q, iFirstAltVar, iLastAltVar, dx, dy, r); // get bi degree of lm(p)
+  m_GetBiDegree( q, wx, wy, wCx, wCy, ddx, ddy, r); // get bi degree of lm(p)
 
   pIter(q);
 
   for(; q != NULL; pIter(q) )
   {
-    long x, y;    
+    int x, y;    
     
-    p_GetSCADegree( q, iFirstAltVar, iLastAltVar, x, y, r); // get bi degree of q
+    m_GetBiDegree( q, wx, wy, wCx, wCy, x, y, r); // get bi degree of q
     
-    if ( (x != dx) || (y != dy) ) return false;
+    if ( (x != ddx) || (y != ddy) ) return false;
   }
+  
+  dx = ddx;
+  dy = ddy;
 
   return true;
 }
 
 
-// returns true if id is bi-homogenous without respect to the aktual weights(=> all ones)
+// returns true if id is bi-homogenous without respect to the given weights
 bool id_IsBiHomogeneous(const ideal id, 
-  const unsigned int iFirstAltVar, const unsigned int iLastAltVar, 
+  const intvec *wx, const intvec *wy, 
+  const intvec *wCx, const intvec *wCy, 
   const ring r)
 {
   if (id == NULL) return true; // zero ideal
@@ -2234,11 +2270,64 @@ bool id_IsBiHomogeneous(const ideal id,
   if (iSize == 0) return true;
 
   bool b = true;
+  int x, y;
 
   for(int i = iSize - 1; (i >= 0 ) && b; i--)
-    b = p_IsBiHomogeneous(id->m[i], iFirstAltVar, iLastAltVar, r);
+    b = p_IsBiHomogeneous(id->m[i], wx, wy, wCx, wCy, x, y, r);
 
   return b;
+}
+
+
+// returns an intvector with [nvars(r)] integers [1/0]
+// 1 - for commutative variables
+// 0 - for anticommutative variables
+intvec *ivGetSCAXVarWeights(const ring r)
+{
+  const unsigned int N  = r->N;
+
+  const int CommutativeVariable = 1;
+  const int AntiCommutativeVariable = 0;
+  
+  intvec* w = new intvec(N, 1, CommutativeVariable);
+  
+  if( rIsSCA(r) )
+  {
+    const unsigned int m_iFirstAltVar = scaFirstAltVar(r);
+    const unsigned int m_iLastAltVar  = scaLastAltVar(r);  
+
+    for (unsigned int i = m_iFirstAltVar; i<= m_iLastAltVar; i++)
+    {
+      (*w)[i-1] = AntiCommutativeVariable;
+    }  
+  }
+  return w;
+}
+
+
+// returns an intvector with [nvars(r)] integers [1/0]
+// 0 - for commutative variables
+// 1 - for anticommutative variables
+intvec *ivGetSCAYVarWeights(const ring r)
+{
+  const unsigned int N  = r->N;
+
+  const int CommutativeVariable = 0;
+  const int AntiCommutativeVariable = 1;
+  
+  intvec* w = new intvec(N, 1, CommutativeVariable);
+  
+  if( rIsSCA(r) )
+  {
+    const unsigned int m_iFirstAltVar = scaFirstAltVar(r);
+    const unsigned int m_iLastAltVar  = scaLastAltVar(r);  
+
+    for (unsigned int i = m_iFirstAltVar; i<= m_iLastAltVar; i++)
+    {
+      (*w)[i-1] = AntiCommutativeVariable;
+    }  
+  }
+  return w;
 }
 
 

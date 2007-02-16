@@ -4,11 +4,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sca.h,v 1.7 2007-01-31 23:51:25 motsak Exp $ */
+/* $Id: sca.h,v 1.8 2007-02-16 11:05:54 motsak Exp $ */
 
 #include <ring.h>
 #include <gring.h>
 #include <structs.h>
+#include <intvec.h>
 
 
 // we must always have this test!
@@ -71,20 +72,77 @@ void sca_p_ProcsSet(ring rGR, p_Procs_s* p_Procs);
 
 //////////////////////////////////////////////////////////////////////////////////////
 
-// tests whether p is bi-homogeneous without respect to the actual weigths(=>all ones)
-// Polynomial is bi-homogeneous iff all monomials have the same bi-degree (x,y).
-// Y are ones from iFirstAltVar up to iLastAltVar
+// TODO: correct the following descriptions...
+
+// tests whether p is bi-homogeneous with respect to the given variable'(component')-weights
+// ps: polynomial is bi-homogeneous iff all terms have the same bi-degree (x,y).
 bool p_IsBiHomogeneous(const poly p, 
-  const unsigned int iFirstAltVar, const unsigned int iLastAltVar, 
+  const intvec *wx, const intvec *wy, 
+  const intvec *wCx, const intvec *wCy, 
+  int &dx, int &dy,
   const ring r);
+  
+    
+//////////////////////////////////////////////////////////////////////////////////////
+
+// tests whether p is bi-homogeneous with respect to the given variable'(component')-weights
+// ps: ideal is bi-homogeneous iff all its generators are bi-homogeneous polynomials.
+bool id_IsBiHomogeneous(const ideal id, 
+  const intvec *wx, const intvec *wy, 
+  const intvec *wCx, const intvec *wCy,
+  const ring r);
+
 
 //////////////////////////////////////////////////////////////////////////////////////
 
-// returns true if id is bi-homogenous without respect to the aktual weights(=> all ones)
-// Ideal is bi-homogeneous iff all its generators are bi-homogeneous.
-bool id_IsBiHomogeneous(const ideal id, 
-  const unsigned int iFirstAltVar, const unsigned int iLastAltVar, 
-  const ring r);
+// Scecial for SCA:
+
+// returns an intvector with [nvars(r)] integers [1/0]
+// 1 - for commutative variables
+// 0 - for anticommutative variables
+intvec *ivGetSCAXVarWeights(const ring r);
+
+// returns an intvector with [nvars(r)] integers [1/0]
+// 0 - for commutative variables
+// 1 - for anticommutative variables
+intvec *ivGetSCAYVarWeights(const ring r);
+
+
+inline bool p_IsSCAHomogeneous(const poly p, 
+  const intvec *wCx, const intvec *wCy,
+  const ring r)
+{
+  // inefficient! don't use it in time-critical code!
+  intvec *wx = ivGetSCAXVarWeights(r);
+  intvec *wy = ivGetSCAYVarWeights(r);
+  
+  int x,y;
+
+  bool homog = p_IsBiHomogeneous( p, wx, wy, wCx, wCy, x, y, r );
+  
+  delete wx;
+  delete wy;
+  
+  return homog;  
+}
+
+
+inline bool id_IsSCAHomogeneous(const ideal id, 
+  const intvec *wCx, const intvec *wCy,
+  const ring r)
+{
+  // inefficient! don't use it in time-critical code!
+  intvec *wx = ivGetSCAXVarWeights(r);
+  intvec *wy = ivGetSCAYVarWeights(r);
+
+  bool homog = id_IsBiHomogeneous( id, wx, wy, wCx, wCy, r );
+  
+  delete wx;
+  delete wy;
+  
+  return homog;  
+}
+
 
 //////////////////////////////////////////////////////////////////////////////////////
 
