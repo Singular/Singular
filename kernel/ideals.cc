@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.38 2007-01-31 23:51:24 motsak Exp $ */
+/* $Id: ideals.cc,v 1.39 2007-02-16 10:50:10 motsak Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2951,12 +2951,16 @@ BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w)
     p=P[i];
     if (p!=NULL) cmax=si_max(cmax,(int)pMaxComp(p)+1);
   }
+  if (w != NULL)
   if (w->length()+1 < cmax)
   {
     // Print("length: %d - %d \n", w->length(),cmax);
     return FALSE;
   }
-  pSetModDeg(w);
+
+  if(w!=NULL)
+    pSetModDeg(w);
+
   for (i=length-1;i>=0;i--)
   {
     p=P[i];
@@ -2971,12 +2975,17 @@ BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w)
         if (d!=pFDeg(p,currRing))
         {
           //pWrite(q); wrp(p); Print(" -> %d - %d\n",d,pFDeg(p,currRing));
+          if(w!=NULL)
+            pSetModDeg(NULL);
           return FALSE;
         }
       }
     }
   }
-  pSetModDeg(NULL);
+  
+  if(w!=NULL)
+    pSetModDeg(NULL);
+  
   return TRUE;
 }
 
