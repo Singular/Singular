@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.19 2007-02-07 10:49:40 Singular Exp $ */
+/* $Id: gring.h,v 1.20 2007-02-16 11:07:10 motsak Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -65,6 +65,9 @@ poly nc_p_CopyGet(poly a, const ring r);
 poly nc_p_CopyPut(poly a, const ring r);
 
 void nc_PolyPolyRed(poly &b, poly p, number *c);
+
+
+
 poly nc_CreateShortSpoly(poly p1, poly p2, const ring r=currRing);
 
 
@@ -141,6 +144,15 @@ inline poly nc_ReduceSpoly(const poly p1, poly p2, const ring r)
   assume(r->nc->p_Procs.ReduceSPoly!=NULL);
   return r->nc->p_Procs.ReduceSPoly(p1, p2, r);
 }
+
+/*
+inline void nc_PolyReduce(poly &b, const poly p, number *c, const ring r) // nc_PolyPolyRed
+{
+  assume(rIsPluralRing(r));
+//  assume(r->nc->p_Procs.PolyReduce!=NULL);
+//  r->nc->p_Procs.PolyReduce(b, p, c, r);
+}
+*/
 
 inline void nc_kBucketPolyRed(kBucket_pt b, poly p, number *c)
 {

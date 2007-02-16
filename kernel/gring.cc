@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.43 2007-02-07 10:49:39 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.44 2007-02-16 11:07:11 motsak Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -1784,7 +1784,11 @@ inline void nc_PolyPolyRedNew(poly &b, poly p, number *c)
 
 void nc_PolyPolyRed(poly &b, poly p, number *c)
 {
+#if 0
   nc_PolyPolyRedOld(b, p, c);
+#else
+  nc_PolyPolyRedNew(b, p, c);
+#endif
 }
 
 
