@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: intvec.h,v 1.5 2005-05-20 15:33:19 Singular Exp $ */
+/* $Id: intvec.h,v 1.6 2007-02-16 10:52:22 motsak Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -42,11 +42,21 @@ public:
   }
 
   void resize(int new_length);
-  inline int range(int i)
+  inline int range(int i) const
     { return ((i<row) && (i>=0) && (col==1)); }
-  inline int range(int i, int j)
+  inline int range(int i, int j) const
     { return ((i<row) && (i>=0) && (j<col) && (j>=0)); }
   inline int& operator[](int i)
+    {
+#ifndef NDEBUG
+      if((i<0)||(i>=row*col))
+      {
+        Werror("wrong intvec index:%d\n",i);
+      }
+#endif
+      return v[i];
+    }
+  inline const int& operator[](int i) const
     {
 #ifndef NDEBUG
       if((i<0)||(i>=row*col))
