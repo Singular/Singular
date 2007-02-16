@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.3 2005-05-18 15:59:58 Singular Exp $ */
+/* $Id: syz.h,v 1.4 2007-02-16 10:54:07 motsak Exp $ */
 /*
 * ABSTRACT: Resolutions
 */
@@ -93,6 +93,9 @@ void syReOrderResolventFB(resolvente res,int length, int initial=1);
 
 resolvente syLaScala1(ideal arg,int * length);
 syStrategy syLaScala3(ideal arg,int * length);
+
+syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights = NULL);
+
 syStrategy syHilb(ideal arg,int * length);
 syStrategy syKosz(ideal arg,int * length);
 

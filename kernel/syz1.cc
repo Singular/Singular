@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.11 2006-11-24 12:18:28 Singular Exp $ */
+/* $Id: syz1.cc,v 1.12 2007-02-16 10:54:07 motsak Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -2593,6 +2593,134 @@ syStrategy syLaScala3(ideal arg,int * length)
 /*--- creates new pairs -----------------------------*/
     syCreateNewPairs(syzstr,index,i);
     if (index<(*length)-1)
+    {
+      syCreateNewPairs(syzstr,index+1,j);
+    }
+    index++;
+    nextPairs = syChosePairs(syzstr,&index,&howmuch,&actdeg);
+    //if (TEST_OPT_PROT) Print("(%d,%d)",howmuch,index);
+  }
+  if (temp!=NULL) idDelete(&temp);
+  kBucketDestroy(&(syzstr->bucket));
+  if (origR != syzstr->syRing)
+    rChangeCurrRing(origR);
+  pDeleteLm(&redpol);
+  if (TEST_OPT_PROT) PrintLn();
+  return syzstr;
+}
+
+
+
+/*2
+* more general implementation of LaScala's algorithm
+* assumes that the given module is (quasi-)homogeneous
+* works with slanted degree, uses syChosePairs
+*/
+syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights)
+{
+  BOOLEAN noPair=FALSE;
+  int i,j,actdeg=32000,index=0,reg=-1;
+  int startdeg,howmuch;
+  poly p;
+  ideal temp;
+  SSet nextPairs;
+  syStrategy syzstr=(syStrategy)omAlloc0(sizeof(ssyStrategy));
+  ring origR = currRing;
+
+  if(weights!= NULL) 
+    syzstr->cw = new intvec(weights);
+  else
+    syzstr->cw = NULL;
+
+  if ((idIs0(arg)) ||
+      ((idRankFreeModule(arg)>0) && (!idTestHomModule(arg, NULL, syzstr->cw))))
+  {
+    syzstr->minres = (resolvente)omAlloc0Bin(ideal_bin);
+    syzstr->length = 1;
+    syzstr->minres[0] = idInit(1,arg->rank);
+    return syzstr;
+  }
+
+
+  //crit = 0;
+  //euler = -1;
+  redpol = pInit();
+  
+  if( maxlength > 0 )
+    syzstr->length = maxlength; //  = pVariables+2;
+  else
+    syzstr->length = maxlength = pVariables+2;  
+
+  // Creare dp,S ring and change to it
+  syzstr->syRing = rCurrRingAssure_dp_S();
+  assume(syzstr->syRing != origR);
+
+  // set initial ShiftedComps
+  currcomponents = (int*)omAlloc0((arg->rank+1)*sizeof(int));
+  currShiftedComponents = (long*)omAlloc0((arg->rank+1)*sizeof(long));
+  for (i=0;i<=arg->rank;i++)
+  {
+    currShiftedComponents[i] = (i)*SYZ_SHIFT_BASE;
+    currcomponents[i] = i;
+  }
+  rChangeSComps(currcomponents, currShiftedComponents, arg->rank);
+/*--- initializes the data structures---------------*/
+  syzstr->Tl = new intvec(maxlength);
+  temp = idInit(IDELEMS(arg),arg->rank);
+  for (i=0;i<IDELEMS(arg);i++)
+  {
+    temp->m[i] = prCopyR( arg->m[i], origR);
+    if (temp->m[i]!=NULL)
+    {
+      j = pTotaldegree(temp->m[i]);
+      if (j<actdeg) actdeg = j;
+    }
+  }
+  idTest(temp);
+  idSkipZeroes(temp);
+  idTest(temp);
+  syzstr->resPairs = syInitRes(temp,&maxlength,syzstr->Tl,syzstr->cw);
+  omFreeSize((ADDRESS)currcomponents,(arg->rank+1)*sizeof(int));
+  omFreeSize((ADDRESS)currShiftedComponents,(arg->rank+1)*sizeof(long));
+  syzstr->res = (resolvente)omAlloc0((maxlength+1)*sizeof(ideal));
+  syzstr->orderedRes = (resolvente)omAlloc0((maxlength+1)*sizeof(ideal));
+  syzstr->elemLength = (int**)omAlloc0((maxlength+1)*sizeof(int*));
+  syzstr->truecomponents = (int**)omAlloc0((maxlength+1)*sizeof(int*));
+  syzstr->ShiftedComponents = (long**)omAlloc0((maxlength+1)*sizeof(long*));
+  syzstr->backcomponents = (int**)omAlloc0((maxlength+1)*sizeof(int*));
+  syzstr->Howmuch = (int**)omAlloc0((maxlength+1)*sizeof(int*));
+  syzstr->Firstelem = (int**)omAlloc0((maxlength+1)*sizeof(int*));
+  syzstr->sev = (unsigned long **) omAlloc0((maxlength+1)*sizeof(unsigned long *));
+  syzstr->bucket = kBucketCreate();
+  int len0=idRankFreeModule(temp)+1;
+
+  startdeg = actdeg;
+  nextPairs = syChosePairs(syzstr,&index,&howmuch,&actdeg);
+  //if (TEST_OPT_PROT) Print("(%d,%d)",howmuch,index);
+/*--- computes the resolution ----------------------*/
+  while (nextPairs!=NULL)
+  {
+    if (TEST_OPT_PROT) Print("%d",actdeg);
+    if (TEST_OPT_PROT) Print("(m%d)",index);
+    if (index==0)
+      i = syInitSyzMod(syzstr,index,len0);
+    else
+      i = syInitSyzMod(syzstr,index);
+    currcomponents = syzstr->truecomponents[si_max(index-1,0)];
+    currShiftedComponents = syzstr->ShiftedComponents[si_max(index-1,0)];
+    rChangeSComps(currcomponents, currShiftedComponents,
+                  IDELEMS(syzstr->res[si_max(index-1,0)]));
+    j = syInitSyzMod(syzstr,index+1);
+    if (index>0)
+    {
+      syRedNextPairs(nextPairs,syzstr,howmuch,index);
+      syCompactifyPairSet(syzstr->resPairs[index],(*syzstr->Tl)[index],0);
+    }
+    else
+      syRedGenerOfCurrDeg(syzstr,actdeg,index+1);
+/*--- creates new pairs -----------------------------*/
+    syCreateNewPairs(syzstr,index,i);
+    if (index<(maxlength-1))
     {
       syCreateNewPairs(syzstr,index+1,j);
     }
