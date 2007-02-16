@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.138 2007-02-15 15:16:32 bricken Exp $ */
+/* $Id: tgb.cc,v 1.139 2007-02-16 07:24:12 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2273,13 +2273,37 @@ public:
     omfree(array);
   }
 };
+class SparseRow{
+public:
+  int* idx_array;
+  number* coef_array;
+  int len;
+  SparseRow(){
+    len=0;
+    idx_array=NULL;
+    coef_array=NULL;
+  }
+  SparseRow(int n){
+    len=n;
+    idx_array=(int*) omalloc(n*sizeof(int));
+    coef_array=(number*) omalloc(n*sizeof(number));
+  }
+  ~SparseRow(){
+    omfree(idx_array);
+    omfree(coef_array);
+  }
+};
 
 class DataNoroCacheNode:public NoroCacheNode{
 public:
   
   int value_len;
   poly value_poly;
+  #ifdef NORO_SPARSE_ROWS_PRE
+  SparseRow* row;
+  #else
   DenseRow* row;
+  #endif
   int term_index;
   DataNoroCacheNode(poly p, int len){
     value_len=len;
@@ -2420,6 +2444,7 @@ void NoroCache::evaluateRows(int level, NoroCacheNode* node){
   } else {
     DataNoroCacheNode* dn=(DataNoroCacheNode*) node;
     if (dn->value_len!=backLinkCode){
+      #ifndef NORO_SPARSE_ROWS_PRE
       dn->row=new DenseRow();
       DenseRow* row=dn->row;
       memset(buffer,0,sizeof(number)*nIrreducibleMonomials);
@@ -2443,30 +2468,28 @@ void NoroCache::evaluateRows(int level, NoroCacheNode* node){
       int len=row->end-row->begin;
       row->array=(number*) omalloc((len)*sizeof(number));
       memcpy(row->array,a+row->begin,len*sizeof(number));
-      /*dn->row->array=(number*) omalloc(nIrreducibleMonomials*sizeof(number));
-      dn->row->begin=0;
-      dn->row->end=nIrreducibleMonomials;
-      number* row= dn->row->array;
-      int i;
-      for(i=0;i<nIrreducibleMonomials;i++){
-        row[i]=npInit(0);
-      }
-      poly p=dn->value_poly;
-      i=0;
+      #else
+      assume(dn->value_len==dn->value_poly);
+      dn->row=new SparseRow(dn->value_len);
+      SparseRow* row=dn->row;
+      int i=0;
       while(p){
-
-        if (i==0){
-          dn->row->begin=idx;
-        }
-        dn->row->end=idx+1;
-        i++;
+        DataNoroCacheNode* ref=getCacheReference(p);
+        
+        idx=ref->term_index;
         assume(idx>=0);
-        //Print("idx:%d\n",idx);
-        row[idx]=p_GetCoeff(p,currRing);
+        row->idx_array[i]=idx;
+        row->coef_array[i]=p_GetCoeff(p,currRing);
+        
+        i++;
         pIter(p);
-      }*/
+      }
+      if (i!=dn->value_len){
+        Print("F4 calc wrong, as poly len was wrong\n");
+      }
+      assume(i==dn->value_len);
+      #endif
       
-      //p_Delete(&dn->value_poly,currRing);
     } 
   }
 }
@@ -2479,6 +2502,7 @@ void NoroCache::evaluatePlaceHolder(number* row,std::vector<NoroPlaceHolder>& pl
     if (ref->value_len==backLinkCode){
       row[ref->term_index]=npAdd(row[ref->term_index],coef);
     } else {
+      #ifndef NORO_SPARSE_ROWS_PRE
       DenseRow* ref_row=ref->row;
       if (ref_row==NULL) continue;
       number* ref_begin=ref_row->array;
@@ -2503,6 +2527,20 @@ void NoroCache::evaluatePlaceHolder(number* row,std::vector<NoroPlaceHolder>& pl
       }
 
     }
+    
+    #else
+    SparseRow* ref_row=ref->row;
+    if (ref_row==NULL) continue;
+    int n=ref_row->len;
+    int j;
+    int* idx_array=ref_row->idx_array;
+    number* coef_array=ref_row->coef_array;
+    for(j=0;j<n;j++){
+      int idx=idx_array[j];
+      number ref_coef=coef_array[j];
+      row[idx]=npAdd(row[idx],npMult(coef,ref_coef));
+    }
+    #endif
   }
 
 }
