@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.54 2007-02-20 10:47:46 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.55 2007-02-20 15:11:04 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -19,7 +19,8 @@
 #include "stdlib.h"
 //#define USE_NORO 1
 //#define NORO_CACHE 1
-#define NORO_SPARSE_ROWS_PRE 1
+//#define NORO_SPARSE_ROWS_PRE 1
+//#define NORO_NON_POLY 1
 #ifdef NORO_CACHE
 //#include <map>
 #include <vector>
