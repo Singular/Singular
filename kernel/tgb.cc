@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.139 2007-02-16 07:24:12 bricken Exp $ */
+/* $Id: tgb.cc,v 1.140 2007-02-20 10:47:45 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2444,11 +2444,12 @@ void NoroCache::evaluateRows(int level, NoroCacheNode* node){
   } else {
     DataNoroCacheNode* dn=(DataNoroCacheNode*) node;
     if (dn->value_len!=backLinkCode){
+      poly p=dn->value_poly;
       #ifndef NORO_SPARSE_ROWS_PRE
       dn->row=new DenseRow();
       DenseRow* row=dn->row;
       memset(buffer,0,sizeof(number)*nIrreducibleMonomials);
-      poly p=dn->value_poly;
+      
       if (p==NULL) {row->array=NULL;row->begin=0;row->end=0; return;}
       int i=0;
       int idx;
@@ -2469,14 +2470,14 @@ void NoroCache::evaluateRows(int level, NoroCacheNode* node){
       row->array=(number*) omalloc((len)*sizeof(number));
       memcpy(row->array,a+row->begin,len*sizeof(number));
       #else
-      assume(dn->value_len==dn->value_poly);
+      assume(dn->value_len==pLength(dn->value_poly));
       dn->row=new SparseRow(dn->value_len);
       SparseRow* row=dn->row;
       int i=0;
       while(p){
         DataNoroCacheNode* ref=getCacheReference(p);
         
-        idx=ref->term_index;
+        int idx=ref->term_index;
         assume(idx>=0);
         row->idx_array[i]=idx;
         row->coef_array[i]=p_GetCoeff(p,currRing);
@@ -2526,7 +2527,7 @@ void NoroCache::evaluatePlaceHolder(number* row,std::vector<NoroPlaceHolder>& pl
         }
       }
 
-    }
+    
     
     #else
     SparseRow* ref_row=ref->row;
@@ -2541,6 +2542,7 @@ void NoroCache::evaluatePlaceHolder(number* row,std::vector<NoroPlaceHolder>& pl
       row[idx]=npAdd(row[idx],npMult(coef,ref_coef));
     }
     #endif
+  }
   }
 
 }
@@ -2717,6 +2719,73 @@ MonRedRes noro_red_mon(poly t, BOOLEAN force_unique, NoroCache* cache,slimgb_alg
   }
 
 }
+SparseRow* noro_red_to_non_poly(poly p, int &len, NoroCache* cache,slimgb_alg* c);
+MonRedResNP noro_red_mon_to_non_poly(poly t,  NoroCache* cache,slimgb_alg* c){
+  MonRedResNP res_holder;
+
+
+    DataNoroCacheNode* ref=cache->getCacheReference(t);
+    if (ref!=NULL){
+
+      /*if (res_holder.len==NoroCache::backLinkCode){
+        res_holder.len=1;
+
+
+      }*/
+      res_holder.coef=p_GetCoeff(t,c->r);
+      
+      res_holder.ref=ref;
+      p_Delete(&t,c->r);
+      return res_holder;
+    }
+ 
+  unsigned long sev=p_GetShortExpVector(t,currRing);
+  int i=kFindDivisibleByInS_easy(c->strat,t,sev);
+  if (i>=0){
+    number coef_bak=p_GetCoeff(t,c->r);
+
+    p_SetCoeff(t,npInit(1),c->r);
+    assume(npIsOne(p_GetCoeff(c->strat->S[i],c->r)));
+    number coefstrat=p_GetCoeff(c->strat->S[i],c->r);
+
+      //poly t_copy_mon=p_Copy(t,c->r);
+    poly exp_diff=cache->temp_term;
+    p_ExpVectorDiff(exp_diff,t,c->strat->S[i],c->r);
+    p_SetCoeff(exp_diff,npNeg(npInvers(coefstrat)),c->r);
+    p_Setm(exp_diff,c->r);
+    assume(c->strat->S[i]!=NULL);
+      //poly t_to_del=t;
+    poly res;
+    res=pp_Mult_mm(pNext(c->strat->S[i]),exp_diff,c->r);
+
+    int len=c->strat->lenS[i]-1;
+    SparseRow* srow;
+    srow=noro_red_to_non_poly(res,len,cache,c);
+    
+    //DataNoroCacheNode* ref=cache->insert(t,srow);
+    p_Delete(&t,c->r);
+      //p_Delete(&t_copy_mon,c->r);
+      //res=pMult_nn(res,coef_bak);
+
+
+    res_holder.coef=coef_bak;
+    res_holder.ref=ref;
+    return res_holder;
+
+  } else {
+    number coef_bak=p_GetCoeff(t,c->r);
+    number one=npInit(1);
+    p_SetCoeff(t,one,c->r);
+ 
+    res_holder.ref=cache->insertAndTransferOwnerShip(t,c->r);
+    res_holder.coef=coef_bak;
+   
+    return res_holder;
+    
+  }
+
+}
+
 poly tree_add(poly* a,int begin, int end,ring r){
   int d=end-begin;
   switch(d){
@@ -2792,8 +2861,64 @@ poly noro_red_non_unique(poly p, int &len, NoroCache* cache,slimgb_alg* c){
 
   return res;
 }
+#ifdef NORO_SPARSE_ROWS_PRE
+//len input and out: Idea: reverse addition
+SparseRow* noro_red_to_non_poly(poly p, int &len, NoroCache* cache,slimgb_alg* c){
+  assume(len==pLength(p));
+  poly orig_p=p;
+  if (p==NULL) {
+    len=0;
+    return NULL;
+  }
+  number* temp_array=(number*) omalloc(cache->nIrreducibleMonomials*sizeof(number));
+  memset(temp_array,0,sizeof(number)*cache->nIrreducibleMonomials);
+  
+  MonRedResNP* mon=(MonRedResNP*) omalloc(len*sizeof(MonRedResNP));
+  int i=0;
+
+  while(p){
+
+    poly t=p;
+    pIter(p);
+    pNext(t)=NULL;
+    
+#ifndef NDEBUG
+    number coef_debug=p_GetCoeff(t,currRing);
+#endif
+    MonRedResNP red=noro_red_mon_to_non_poly(t,cache,c);
+    mon[i]=red;
+    i++;
+  }
+  assume(i==len);
+  len=i;
+  for(i=0;i<len;i++){
+    MonRedResNP red=mon[i];
+    if ((red.ref)){
+      if (red.ref->row){
+        SparseRow* row=red.ref->row;
+        number coef=red.coef;
+        for(i=0;i<row->len;i++){
+          int idx=row->idx_array[i];
+          temp_array[idx]=npAdd(temp_array[idx],npMult(row->coef_array[i],coef));
+        }
+      }
+      else{
+        if (red.ref->value_len==NoroCache::backLinkCode){
+          temp_array[red.ref->term_index]=red.coef;
+        } else {
+          PrintS("third case\n");
+        }
+      }
+    }
+  }
+  
 
 
+
+
+  //TODO:return res;
+}
+#endif
 //len input and out: Idea: reverse addition
 std::vector<NoroPlaceHolder> noro_red(poly p, int &len, NoroCache* cache,slimgb_alg* c){
   std::vector<NoroPlaceHolder> res;

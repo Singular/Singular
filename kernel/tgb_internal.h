@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.53 2007-02-12 14:29:54 Singular Exp $ */
+/* $Id: tgb_internal.h,v 1.54 2007-02-20 10:47:46 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -19,6 +19,7 @@
 #include "stdlib.h"
 //#define USE_NORO 1
 //#define NORO_CACHE 1
+#define NORO_SPARSE_ROWS_PRE 1
 #ifdef NORO_CACHE
 //#include <map>
 #include <vector>
@@ -109,6 +110,16 @@ public:
   MonRedRes(){
     ref=NULL;
     p=NULL;
+  }
+};
+class MonRedResNP{
+public:
+  number coef;
+
+
+  DataNoroCacheNode* ref;
+  MonRedResNP(){
+    ref=NULL;
   }
 };
 struct sorted_pair_node{
