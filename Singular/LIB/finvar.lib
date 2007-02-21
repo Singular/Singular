@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.61 2007-02-15 22:47:28 king Exp $"
+version="$Id: finvar.lib,v 1.62 2007-02-21 13:10:11 king Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -15,6 +15,10 @@ MAIN PROCEDURES:
  invariant_ring_random()           generators of the i.r., randomized alg.
  primary_invariants()              primary invariants (p.i.)
  primary_invariants_random()       primary invariants, randomized alg.
+ invariant_algebra_reynolds()      minimal (algebra) generating set for the invariant
+                                   ring of a finite matrix group, in the non-modular case
+ invariant_algebra_perm()          minimal (algebra) generating set for the invariant
+                                   ring or a permutation group, in the non-modular case
 
 AUXILIARY PROCEDURES:
  cyclotomic()                      cyclotomic polynomial
@@ -50,6 +54,8 @@ AUXILIARY PROCEDURES:
  rel_orbit_variety()               ideal of a relative orbit variety (new version)
  relative_orbit_variety()          ideal of a relative orbit variety (old version)
  image_of_variety()                ideal of the image of a variety
+ orbit_sums                        orbit sums of a set of monomials under the action of
+                                   a permutation group
 ";
 ///////////////////////////////////////////////////////////////////////////////
 // perhaps useful procedures (no help provided):
@@ -63,6 +69,8 @@ AUXILIARY PROCEDURES:
 // search_random                   searches a # of p.i., char 0, randomized
 // p_search_random                 searches a # of p.i., char p, randomized
 // concat_intmat                   concatenates two integer matrices
+// GetGroup                        disjoint cycle presentation of perm. group
+//                                 -> permuation matrices
 ///////////////////////////////////////////////////////////////////////////////
 
 LIB "matrix.lib";
@@ -4427,8 +4435,7 @@ THEORY:  The secondary invariants are calculated by finding a basis (in terms
 
 
 proc secondary_char0 (matrix P, matrix REY, matrix M, list #)
-"
-USAGE:    secondary_char0(P,REY,M[,v][,\"old\"]);
+"USAGE:    secondary_char0(P,REY,M[,v][,\"old\"]);
 @*          P: a 1xn <matrix> with homogeneous primary invariants, where
                n is the number of variables of the basering;
 @*          REY: a gxn <matrix> representing the Reynolds operator, where
@@ -4882,8 +4889,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc irred_secondary_char0 (matrix P, matrix REY, matrix M, list #)
-"
-USAGE:    irred_secondary_char0(P,REY,M[,v][,\"PP\"]);
+"USAGE:    irred_secondary_char0(P,REY,M[,v][,\"PP\"]);
 @*          P: a 1xn <matrix> with homogeneous primary invariants, where
                n is the number of variables of the basering;
 @*          REY: a gxn <matrix> representing the Reynolds operator, where
@@ -7776,8 +7782,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc relative_orbit_variety(ideal I,matrix F,string newring)
-"
-USAGE:   relative_orbit_variety(I,F,s);
+"USAGE:   relative_orbit_variety(I,F,s);
          I: an <ideal> invariant under the action of a group,
 @*       F: a 1xm  <matrix> defining the invariant ring of this group,
 @*       s: a <string> giving a name for a new ring
@@ -7905,3 +7910,520 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
+static proc GetMatrix(list GEN)
+{ matrix M[nvars(basering)][nvars(basering)];
+  int i,j;
+  for (i=1;i<=size(GEN);i++)
+  { for (j=1;j<size(GEN[i]);j++)
+    { M[GEN[i][j+1],GEN[i][j]] = 1;
+    }
+    M[GEN[i][1],GEN[i][size(GEN[i])]] = 1;
+  }
+  return(M);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//           MINIMAL GENERATING SETS
+///////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Input: Disjoint cycle presentation of a permutation group
+// Output: Permuation matrices representing that group
+///////////////////////////////////////////////////////////////////////////////
+proc GetGroup(list GRP)
+{ list L;
+  int i,j,k;
+  intvec fix;
+  for (i=1;i<=size(GRP);i++)
+  { L[i] = GetMatrix(GRP[i]);
+// Fixelemente des Zyklus
+    fix = intvec(0);
+    fix[nvars(basering)]=0;
+    for (j=1;j<=size(GRP[i]);j++)
+    { for (k=1;k<=size(GRP[i][j]);k++)
+      { fix[GRP[i][j][k]]=1;
+      }
+    }
+    for (j=1;j<=nvars(basering);j++)
+    { if (fix[j]==0)
+      { L[i][j,j]=1;
+      }
+    }
+  }
+  return(L);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc orbit_sums (ideal mon, list M)
+"USAGE:    orbit_sums(mon, Per);
+          mon is of type <ideal> and is formed by monomials of degree d.
+          Per is a list of ideals providing a permutation of the ring variables.
+ASSUME:   mon contains at least the minimal monomial in each orbit sum of degree d
+          under the permutation group given by Per.
+RETURN:   an <ideal> whose generators are the orbit sums of degree d under the permutation 
+          group given by Per.
+SEE ALSO: invariant_algebra_perm
+KEYWORDS: orbit sum
+EXAMPLE: example orbit_sums; shows an example
+"
+{ 
+//----------------- checking input ------------------
+  mon=simplify(mon,2); // remove 0
+  if (not homog(sum(mon)))
+  { "ERROR: Monomials in the first parameter must be of the same degree.";
+    return();
+  } 
+  int k,k2;
+  for (k=1;k<=ncols(mon);k++)
+  { if (leadmonom(mon[k])!=mon[k])
+    { "ERROR: The first parameter must be formed by monomials.";
+      return();
+    }
+  }
+  for (k2=1;k2<=size(M);k2++)
+  { if (typeof(M[k2])!="ideal")
+    { "ERROR: The second parameter must be a list of ideals providing a ";
+      "       permutation of the ring variables.";
+      return();
+    }
+    if ((ncols(M[k2])!=nvars(basering))     
+     or (ncols(M[k2])!=ncols(simplify(M[k2],6)))
+     or (M[k2][1]==0))
+    { "ERROR: The second parameter must be a list of ideals providing a ";
+      "       permutation of the ring variables.";
+      return();
+    }
+    for (k=1;k<=ncols(M[k2]);k++)
+    { if ((leadmonom(M[k2][k])!=M[k2][k]) or (deg(M[k2][k])!=1))
+      { "ERROR: The second parameter must be a list of ideals providing a ";
+        "       permutation of the ring variables.";
+        return();
+      }
+    }
+  }
+//--------------- preparing steps -------------------
+  int dgb = degBound;
+  degBound = 0;
+  def br = basering;
+  ideal tmpI;
+  int g;
+// rings that allow fast permutation of variables with >fetch< and >imap<
+  for (g=1;g<=size(M);g++)
+  { list tmpL(g);
+    execute("ring tmpR("+string(g)+") = "+charstr(br)+", ("+string(M[g])+"),("+ordstr(br)+")");
+    ideal tmpI; poly OrbitS; list L(g);
+    setring(br);
+  }
+// Remove non-minimal monomials.
+// Strategy: If m1, m2 are monomials related by a group generator
+//           then remember only the smaller of the two.
+// This is where we use the assumption on mon!
+  for (g=1;g<=size(M);g++)
+  { setring tmpR(g);
+    tmpI=fetch(br,mon);
+    setring br;
+    tmpI=imap(tmpR(g),tmpI);
+    for (k=1;k<=ncols(mon);k++)
+    { if ( mon[k]!=0)
+      { if (tmpI[k] < mon[k])
+        { 
+          mon[k]=0;
+        }
+        else
+        { if (tmpI[k]>mon[k])
+          { 
+            mon=NF(mon,std(tmpI[k]));
+          }
+        }
+      }
+    }
+  }
+  mon=simplify(mon,2);
+
+// main part: form orbits
+  list L,newL;  // contains partial orbits
+  for (k=1;k<=ncols(mon);k++)
+  { L[k]=ideal(mon[k]);
+    attrib(L[k],"isSB",1);
+  }
+  newL=L;
+  poly tmp;
+  int GenOK, j,i;
+  poly OrbitS=mon[1];  
+  mon[1]=0;
+  int countOrbits;
+  ideal AllOrbits;
+  while (1) // apply all generators to the monomials that have been found
+            // in the preceding step
+  { GenOK = 0;
+    for (g=1;g<=size(M);g++)  // Generator g is applied to partial orbits
+    { setring tmpR(g);
+      L(g)=fetch(br,newL);
+      setring br;
+      tmpL(g)=imap(tmpR(g),L(g));
+    }
+    for (k=1;k<=size(L);k++)
+    { if (L[k][1]!=0)   // if the orbit was not fused or completed before
+      { newL[k] = tmpL(1)[k];
+        for (g=2;g<=size(M);g++)
+        { newL[k] = newL[k]+tmpL(g)[k];
+        }
+        newL[k] = simplify(NF(newL[k],L[k]),2);
+        attrib(newL[k],"isSB",1);
+        if (newL[k][1] != 0)  // i.e., the Orbit is not complete under all generators yet 
+        { GenOK=-1;    
+          L[k] = L[k],newL[k];
+          attrib(L[k],"isSB",1);
+          // fuse orbits:
+          for (k2=k+1;k2<=size(L);k2++)
+          { if (size(NF(newL[k2],L[k]))!=size(newL[k2]))
+            { L[k] = L[k]+L[k2];
+              attrib(L[k],"isSB",1);
+              newL[k] = newL[k]+newL[k2];
+              attrib(newL[k],"isSB",1);
+              L[k2]=ideal(0);
+              newL[k2]=ideal(0);
+            }
+          } // fuse orbits
+        } // the orbit was not complete yet
+        else
+        { countOrbits++;
+          AllOrbits[countOrbits]=sum(L[k]);
+          L[k]=ideal(0);
+          newL[k]=ideal(0);
+        } // the orbit was complete
+      } // if orbit was not yet fused/completed before
+    } // loop through partial orbits
+    if (GenOK == 0)  // i.e., all orbits are complete, so we can break the iteration
+    { break;
+    } 
+  } // iterate
+  degBound = dgb;
+  return(AllOrbits);
+}
+example
+{ "EXAMPLE: orbits sums in degree 3 under the action of the alternating group;";
+  "         it doesn't matter that we are in the modular case"; echo=2;
+         ring R=3,(a,b,c,d),dp;
+         list Per=ideal(b,c,a,d),ideal(a,c,d,b);
+         ideal orb=orbit_sums(kbase(std(0),2),Per);
+         orb;
+}
+ 
+///////////////////////////////////////////////////////////////////////////////
+
+proc invariant_algebra_perm (list #)
+"USAGE:    invariant_algebra_perm(GEN[,v]);
+@*        GEN: a list of generators of a permutation group. It is given in disjoint cycle 
+          form, where trivial cycles can be omitted; e.g., the generator (1,2)(3,4)(5) is 
+          given by <list(list(1,2),list(3,4))>.
+@*        v: an optional <int>
+RETURN:   A minimal homogeneous generating set of the invariant ring of the group presented
+          by GEN, type <matrix>
+ASSUME:   We are in the non-modular case, i.e., the characteristic of the basering
+          does not divide the group order. Note that the function does not verify whether 
+          the assumption holds or not
+DISPLAY:  Information on the progress of computations if v does not equal 0
+THEORY:   We do an incremental search in increasing degree d. Generators of the invariant
+          ring are found among the orbit sums of degree d. The generators are chosen by
+          Groebner basis techniques.
+SEE ALSO: invariant_algebra_reynolds
+KEYWORDS: invariant ring minimal generating set permutation group
+EXAMPLE:  example invariant_algebra_perm; shows an example
+"
+{ 
+//----------------- checking input and setting verbose mode ------------------
+  if (size(#)==0)
+  { "ERROR: There are no parameters given.";
+    return();
+  }
+  if (typeof(#[size(#)])=="int")
+  { int v=#[size(#)];
+    list GEN=#[1..size(#)-1];
+  }
+  else
+  { int v=0;
+    list GEN=#;
+  }
+  int i,j,k;
+  for (i=1;i<=size(GEN);i++)
+  { if (typeof(GEN[i])!="list")
+    { "ERROR: The permutation group must be given by generators in";
+      "       disjoint cycle presentation";
+      return();
+    }
+    for (j=1;j<=size(GEN[i]);j++)
+    { if (typeof(GEN[i][j])!="list")
+      { "ERROR: The permutation group must be given by generators in";
+        "       disjoint cycle presentation";
+      return();
+      }
+      for (k=1;k<=size(GEN[i][j]);k++)
+      { if (typeof(GEN[i][j][k])!="int")
+        { "ERROR: The permutation group must be given by generators in";
+          "       disjoint cycle presentation";
+          return();
+        }
+      }
+    }
+  }
+  def TST=sort(sum(sum(GEN)))[1];
+  if (TST[1]<=0)
+  { "ERROR: The permutation group must be given by generators in";
+    "       disjoint cycle presentation";
+    return();
+  }
+  for (i=1;i<size(TST);i++)
+  { if ((TST[i]==TST[i+1]) or (TST[i+1]>nvars(basering)))
+    { "ERROR: The permutation group must be given by generators in";
+      "       disjoint cycle presentation";
+      return();
+    }
+  }
+
+//-------------- starting computation -------------------------
+  list GRP = GetGroup(GEN);
+  def br=basering;
+  int dgb = degBound;
+  degBound = 0;
+  int counter, totalcount, OrbSize,
+      NextCand, sGoffset, fin,MaxD,LastGDeg;
+  ideal OrbSums, RedSums, NewReductor;
+  poly helpP,lmp; 
+
+
+// Transform the matrices generating the group into ring maps
+  int maxG = size(GRP);
+
+  matrix vars=transpose(matrix(maxideal(1)));
+
+  ideal tmpI;
+  int g;
+  list M; // M provides maps corresponding to the group generators:
+  for (i=1;i<=maxG;i++)
+  { tmpI = ideal(GRP[i]*vars);
+    M[i] = tmpI;
+  }
+
+  ideal G;  // G will contain homog. alg.generators
+  poly Inv;
+  ideal mon;
+
+  ideal sG = std(G);
+  int d=1;
+  while ((fin==0) or (d<=MaxD))
+  { if (v)
+    { "Searching generators in degree",d; 
+    }
+    counter = 0; // counts generators in degree d
+    OrbSums = orbit_sums(kbase(sG,d),M);
+    RedSums = reduce(OrbSums,sG);
+    sGoffset=ncols(sG);
+    OrbSize = ncols(OrbSums);
+    if (v) 
+    { "  We have "+string(OrbSize)+" orbit sums of degree "+string(d);
+    }
+// loop through orbit_sum, and select generators among them
+    for (i=1;i<=OrbSize;i++)  
+    { helpP = RedSums[i];
+      if (helpP<>0)
+      { counter++; // found new inv. algebra generator!
+        totalcount++;
+        if (v) 
+        { "    We found generator number "+string(totalcount)+
+          " in degree "+string(d); 
+        }
+        G[totalcount] = OrbSums[i];
+        sG[sGoffset+counter] = helpP;
+        attrib(sG,"isSB",1);
+        NewReductor[1]=helpP;
+        attrib(NewReductor,"isSB",1);
+        RedSums = reduce(RedSums,NewReductor);
+        LastGDeg=d;
+      } // found new generator
+    } // loop through orbit sums
+    if ((MaxD>0) and (d==MaxD))
+    { if (v)
+      { "We went beyond the degree bound, so we are done!";
+      }
+      break;
+    }
+    d++;
+// Prepare computations of the next degree
+    if (LastGDeg==d-2)
+    { degBound=0;
+      if (v) {"Presumably all generators have been found";}
+      sG = groebner(sG); 
+      fin = 0;
+    }
+    if (LastGDeg==d-1)
+    { degBound=d;
+      if (v) { "Computing Groebner basis up to the new degree",d; }
+      sG = groebner(sG);
+      attrib(sG,"isSB",1);
+      fin = 0;
+    }
+    if ((fin==0) and (dim(sG)==0))
+    { MaxD = maxdeg1(kbase(sG));
+      if (v) 
+      { if (MaxD>=d) {"We found the degree bound",MaxD; }
+        else {"We found the degree bound",d-1;}
+      }
+      if (MaxD<d)
+      { if (v) {"We went beyond the degree bound, so, we are done!";}
+        break;
+      }
+      fin = 1;
+    } // computing degree bound  
+  } // for increasing degrees
+  kill sG;
+  degBound=dgb;
+  return(matrix (G));
+}
+example
+{ "EXAMPLE: A non-transitive action of S_2 on four variables"; echo=2;
+         ring R=0,(a,b,c,d),dp;
+         def GEN=list(list(list(1,3),list(2,4)));
+         matrix G = invariant_algebra_perm(GEN,1);
+         G;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc invariant_algebra_reynolds (matrix REY, list #)
+"USAGE:    invariant_algebra_reynolds(REY[,v]);
+@*        REY: a gxn <matrix> representing the Reynolds operator of a finite matrix group, 
+               where g ist the group order and n is the number of variables of the basering;
+@*        v: an optional <int>
+RETURN:   A minimal homogeneous generating set of the invariant ring, type <matrix>
+ASSUME:   We are in the non-modular case, i.e., the characteristic of the basering
+          does not divide the group order;
+          REY is the 1st return value of group_reynolds(), reynolds_molien() or
+          the second one of primary_invariants()
+DISPLAY:  Information on the progress of computations if v does not equal 0
+THEORY:   We do an incremental search in increasing degree d. Generators of the invariant
+          ring are found among the Reynolds images of monomials of degree d. The generators are 
+          chosen by Groebner basis techniques.
+SEE ALSO: invariant_algebra_perm
+KEYWORDS: invariant ring minimal generating set matrix group
+EXAMPLE:  example invariant_algebra_reynolds; shows an example
+"
+{ int MonStep = 10;
+  int v=1;
+  def br=basering;
+  int dgb = degBound;
+  degBound = 0;
+  int block, counter, totalcount, monsize,i,j,
+      sGoffset, fin,MaxD,LastGDeg;
+  poly helpP,lmp; 
+  block = 1;
+  ideal mon, MON, Inv, G;  // G will contain homog. alg.generators
+  ideal RedInv, NewG, NewReductor;
+  int NewGcounter;
+  intvec dimvec;
+
+  ideal sG = std(G);
+  int d=1;
+  dimvec[d] = dim(sG);
+  while ((fin==0) or (d<=MaxD))
+  { NewG = ideal();
+    NewGcounter=0;
+    mon = kbase(sG,d);
+    sGoffset=ncols(sG);
+    monsize = ncols(mon);
+    if (mon[1]<>0)
+    { if (v) { "  We have "+string(monsize)+
+     " relevant monomials in degree "+string(d);}
+      block=0; // Loops through the monomials
+      while (block<monsize)
+      { if ((block mod MonStep) == 0) 
+        { if ((block+MonStep) <= monsize)
+          { ideal tmp = normalize(evaluate_reynolds(REY,ideal(mon[block+1..block+MonStep])));
+            Inv[block+1..block+MonStep] = tmp[1..MonStep];
+            tmp = reduce(tmp,sG);
+            RedInv[block+1..block+MonStep] = tmp[1..MonStep];
+            kill tmp;
+          }
+          else
+          { ideal tmp = normalize(evaluate_reynolds(REY,ideal(mon[block+1..monsize])));
+            Inv[block+1..monsize] = tmp[1..monsize-block];
+            tmp = reduce(tmp,sG);
+            RedInv[block+1..monsize] = tmp[1..monsize-block];
+            kill tmp;
+          }
+        } 
+        block++;
+        helpP = RedInv[block];
+        if (helpP<>0)
+        { counter++; // found new inv. algebra generator!
+          if (v) { "    We found generator number "+string(counter)+
+                   " in degree "+string(d); }
+          G[counter] = Inv[block];
+          sG[sGoffset+counter] = helpP;
+          attrib(sG,"isSB",1);
+          NewGcounter++;
+          NewG[NewGcounter] = helpP;
+          mon[block]=0;
+          Inv[block]=0; 
+          RedInv[block]=0;
+          NewReductor[1]=helpP;
+          attrib(NewReductor,"isSB",1);
+          RedInv = reduce(RedInv,NewReductor);
+          LastGDeg=d;
+        }
+      } // loop through monomials
+    } // if mon[1]<>0
+    if ((MaxD>0) and (d==MaxD))
+    { if (v)
+      { "We went beyond the degree bound, so we are done!";
+      }
+      break;
+    }
+    d++;
+// Prepare computations of the next degree
+    if (LastGDeg==d-2)
+    { degBound=0;
+      if (v) {"Presumably all generators have been found";}
+      sG = groebner(sG); 
+      fin = 0;
+    }
+    if (LastGDeg==d-1)
+    { degBound=d;
+      if (v) { "Computing Groebner basis up to the new degree",d; }
+      sG = groebner(sG);
+      attrib(sG,"isSB",1);
+      fin = 0;
+    }
+    if ((fin==0) and (dim(sG)==0))
+    { MaxD = maxdeg1(kbase(sG));
+      if (v) 
+      { if (MaxD>=d) {"We found the degree bound",MaxD; }
+        else {"We found the degree bound",d-1;}
+      }
+      if (MaxD<d)
+      { if (v) {"We went beyond the degree bound, so, we are done!";}
+        break;
+      }
+      fin = 1;
+    } // computing degree bound  
+  } // for increasing degrees
+  kill sG;
+  degBound=dgb;
+  return(matrix (G));
+}
+example
+{ "EXAMPLE: A non-transitive action of S_2 on four variables"; echo=2;
+         ring R=0,(a,b,c,d),dp;
+         matrix A[4][4]=
+           0,0,1,0,
+           0,0,0,1,
+           1,0,0,0,
+           0,1,0,0;
+         list L = group_reynolds(A);
+         matrix G = invariant_algebra_reynolds(L[1],1);
+         G;
+}
+
+///////////////////////////////////////////////////////////////////////////////
