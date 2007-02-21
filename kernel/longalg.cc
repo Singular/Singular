@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.21 2007-01-30 09:30:16 Singular Exp $ */
+/* $Id: longalg.cc,v 1.22 2007-02-21 16:15:34 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -65,6 +65,16 @@ static napoly napTailred(napoly q);
 static BOOLEAN napDivPoly(napoly p, napoly q);
 static int napExpi(int i, napoly a, napoly b);
 static ring nacRing;
+#define NA_NORMALIZE_CNT 3
+static inline void naNormalize0(number &pp)
+{
+  lnumber p = (lnumber)pp;
+  if ((p!=NULL) && (p->z!=NULL))
+  {
+    p->cnt++;
+    if (p->cnt>NA_NORMALIZE_CNT) naNormalize(pp);
+  }
+}
 
 #define napCopy(p)       (napoly)p_Copy((poly)p,nacRing)
 
@@ -876,6 +886,7 @@ number naInit(int i)
       l->z = z;
       l->s = 2;
       l->n = NULL;
+      l->cnt=0;
       return (number)l;
     }
   }
@@ -891,6 +902,7 @@ number  naPar(int i)
   napSetExp(l->z,i,1);
   p_Setm(l->z,nacRing);
   l->n = NULL;
+  l->cnt=0;
   return (number)l;
 }
 
@@ -912,6 +924,7 @@ int     naSize(number n)     /* size desc. */
 {
   lnumber l = (lnumber)n;
   if (l==NULL) return -1;
+  if (l->cnt>0) naNormalize(n);
   int len_z;
   int len_n;
   int o=napMaxDegLen(l->z,len_z)+napMaxDegLen(l->n,len_n);
@@ -924,6 +937,7 @@ int     naSize(number n)     /* size desc. */
 int naInt(number &n)
 {
   lnumber l=(lnumber)n;
+  naNormalize(n);
   if ((l!=NULL)&&(l->n==NULL)&&(napIsConstant(l->z)))
   {
     return nacInt(napGetCoeff(l->z));
@@ -954,12 +968,14 @@ number naCopy(number p)
 {
   if (p==NULL) return NULL;
   naTest(p);
+  naNormalize(p);
   lnumber erg;
   lnumber src = (lnumber)p;
   erg = (lnumber)omAlloc0Bin(rnumber_bin);
   erg->z = napCopy(src->z);
   erg->n = napCopy(src->n);
   erg->s = src->s;
+  erg->cnt=src->cnt;
   return (number)erg;
 }
 number na_Copy(number p, const ring r)
@@ -971,6 +987,7 @@ number na_Copy(number p, const ring r)
   erg->z = nap_Copy(src->z,r);
   erg->n = nap_Copy(src->n,r);
   erg->s = src->s;
+  erg->cnt=src->cnt;
   return (number)erg;
 }
 
@@ -1022,10 +1039,11 @@ number naAdd(number la, number lb)
   }
   lu->n = x;
   lu->s = 0;
+  lu->cnt=a->cnt+b->cnt+1;
   if (lu->n!=NULL)
   {
      number luu=(number)lu;
-     naNormalize(luu);
+     naNormalize0(luu);
      lu=(lnumber)luu;
   }
   naTest((number)lu);
@@ -1081,10 +1099,11 @@ number naSub(number la, number lb)
   }
   lu->n = x;
   lu->s = 0;
+  lu->cnt=a->cnt+b->cnt+1;
   if (lu->n!=NULL)
   {
      number luu=(number)lu;
-     naNormalize(luu);
+     naNormalize0(luu);
      lu=(lnumber)luu;
   }
   naTest((number)lu);
@@ -1152,6 +1171,7 @@ number naMult(number la, number lb)
   if ((x!=NULL) && (napIsConstant(x)) && nacIsOne(napGetCoeff(x)))
     napDelete(&x);
   lo->n = x;
+  lo->cnt=a->cnt+b->cnt+1;
   if(lo->z==NULL)
   {
     omFreeBin((ADDRESS)lo, rnumber_bin);
@@ -1162,7 +1182,7 @@ number naMult(number la, number lb)
   {
     lo->s = 0;
     number luu=(number)lo;
-    naNormalize(luu);
+    naNormalize0(luu);
     lo=(lnumber)luu;
   }
   else
@@ -1252,11 +1272,12 @@ number naDiv(number la, number lb)
   if ((napIsConstant(x)) && nacIsOne(napGetCoeff(x)))
     napDelete(&x);
   lo->n = x;
+  lo->cnt=a->cnt+b->cnt+1;
   if (lo->n!=NULL)
   {
     lo->s = 0;
     number luu=(number)lo;
-    naNormalize(luu);
+    naNormalize0(luu);
     lo=(lnumber)luu;
   }
   else
@@ -1326,10 +1347,11 @@ number naInvers(number a)
   }
   else
     lo->n = x;
+  lo->cnt=b->cnt+1;
   if (lo->n!=NULL)
   {
      number luu=(number)lo;
-     naNormalize(luu);
+     naNormalize0(luu);
      lo=(lnumber)luu;
   }
   naTest((number)lo);
@@ -1446,6 +1468,7 @@ char  *naRead(char *s, number *p)
     a->s = 0;
     naTest(*p);
   }
+  a->cnt=0;
   return s;
 }
 
@@ -1559,6 +1582,7 @@ BOOLEAN naIsOne(number za)
   a->z = napInit(1);
   a->n = NULL;
   a->s = 2;
+  a->cnt=0;
   return TRUE;
 }
 
@@ -1642,10 +1666,11 @@ number naGcd(number a, number b, const ring r)
     }
   }
 #endif
-
+  result->cnt=0;
   naTest((number)result);
   return (number)result;
 }
+
 
 /*2
 * naNumbOfPar = 1:
@@ -1669,7 +1694,7 @@ void naNormalize(number &pp)
 
   if ((p==NULL) /*|| (p->s==2)*/)
     return;
-  p->s = 2;
+  p->s = 2; p->cnt=0;
   napoly x = p->z;
   napoly y = p->n;
   if ((y!=NULL) && (naMinimalPoly!=NULL))
@@ -1948,6 +1973,7 @@ number naLcm(number la, number lb, const ring r)
   }
   nacDelete(&t,nacRing);
   result->z = x;
+  result->cnt=0;
 #ifdef HAVE_FACTORY
   if (b->n!=NULL)
   {
@@ -1958,6 +1984,7 @@ number naLcm(number la, number lb, const ring r)
   naTest(la);
   naTest(lb);
   naTest((number)result);
+  naNormalize((number)result);
   return ((number)result);
 }
 
@@ -2013,6 +2040,7 @@ number naMapP0(number c)
   if (npIsZero(c)) return NULL;
   lnumber l=(lnumber)omAllocBin(rnumber_bin);
   l->s=2;
+  l->cnt=0;
   l->z=(napoly)p_Init(nacRing);
   int i=(int)((long)c);
   if (i>(naPrimeM>>2)) i-=naPrimeM;
@@ -2029,6 +2057,7 @@ number naMap00(number c)
   if (nlIsZero(c)) return NULL;
   lnumber l=(lnumber)omAllocBin(rnumber_bin);
   l->s=0;
+  l->cnt=0;
   l->z=(napoly)p_Init(nacRing);
   napGetCoeff(l->z)=nlCopy(c);
   l->n=NULL;
@@ -2043,6 +2072,7 @@ number naMapPP(number c)
   if (npIsZero(c)) return NULL;
   lnumber l=(lnumber)omAllocBin(rnumber_bin);
   l->s=2;
+  l->cnt=0;
   l->z=(napoly)p_Init(nacRing);
   napGetCoeff(l->z)=c; /* omit npCopy, because npCopy is a no-op */
   l->n=NULL;
@@ -2061,6 +2091,7 @@ number naMapPP1(number c)
   if (npIsZero(n)) return NULL;
   lnumber l=(lnumber)omAllocBin(rnumber_bin);
   l->s=2;
+  l->cnt=0;
   l->z=(napoly)p_Init(nacRing);
   napGetCoeff(l->z)=n;
   l->n=NULL;
@@ -2078,6 +2109,7 @@ number naMap0P(number c)
   npTest(n);
   lnumber l=(lnumber)omAllocBin(rnumber_bin);
   l->s=2;
+  l->cnt=0;
   l->z=(napoly)p_Init(nacRing);
   napGetCoeff(l->z)=n;
   l->n=NULL;
@@ -2168,6 +2200,7 @@ number naMapQaQb(number c)
   lnumber erg= (lnumber)omAlloc0Bin(rnumber_bin);
   lnumber src =(lnumber)c;
   erg->s=src->s;
+  erg->cnt=src->cnt;
   erg->z=napMap(src->z);
   erg->n=napMap(src->n);
   if (naMinimalPoly!=NULL)
@@ -2378,6 +2411,7 @@ number   naGetDenom(number &n, const ring r)
     lnumber rr=(lnumber)omAlloc0Bin(rnumber_bin);
     rr->z=nap_Copy(naGetDenom0(x),r);
     rr->s = 2;
+    rr->cnt=0;
     return (number)rr;
   }
   return r->cf->nInit(1);
