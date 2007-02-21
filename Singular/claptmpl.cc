@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.37 2007-02-13 14:19:23 bricken Exp $
+// $Id: claptmpl.cc,v 1.38 2007-02-21 10:14:11 bricken Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -220,11 +220,11 @@ template int pos_helper(kStrategy strat, poly p, int len, intset  setL, polyset 
 template int pos_helper(kStrategy strat, poly p, wlen_type len, wlen_set setL, polyset set);
 #ifdef NORO_CACHE
 //template class std::map<PolySimple,std::pair<PolySimple,int> >;
-#include <queue>
+//#include <queue>
 template class std::vector<PolySimple>;
-template class std::priority_queue<MonRedRes>;
-template class std::vector<NoroPlaceHolder>;
-template class std::vector<std::vector<NoroPlaceHolder> >;
+//template class std::priority_queue<MonRedRes>;
+//template class std::vector<NoroPlaceHolder>;
+//template class std::vector<std::vector<NoroPlaceHolder> >;
 template class std::vector<DataNoroCacheNode*>;
 //std::priority_queue<MonRedRes>
 #endif
