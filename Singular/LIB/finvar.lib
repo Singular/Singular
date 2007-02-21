@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.62 2007-02-21 13:10:11 king Exp $"
+version="$Id: finvar.lib,v 1.63 2007-02-21 13:16:56 king Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -8104,7 +8104,7 @@ EXAMPLE: example orbit_sums; shows an example
   return(AllOrbits);
 }
 example
-{ "EXAMPLE: orbits sums in degree 3 under the action of the alternating group;";
+{ "EXAMPLE: orbit sums in degree 2 under the action of the alternating group;";
   "         it doesn't matter that we are in the modular case"; echo=2;
          ring R=3,(a,b,c,d),dp;
          list Per=ideal(b,c,a,d),ideal(a,c,d,b);
@@ -8283,7 +8283,7 @@ EXAMPLE:  example invariant_algebra_perm; shows an example
   return(matrix (G));
 }
 example
-{ "EXAMPLE: A non-transitive action of S_2 on four variables"; echo=2;
+{ "EXAMPLE: An action of S_2 on four variables"; echo=2;
          ring R=0,(a,b,c,d),dp;
          def GEN=list(list(list(1,3),list(2,4)));
          matrix G = invariant_algebra_perm(GEN,1);
@@ -8414,7 +8414,7 @@ EXAMPLE:  example invariant_algebra_reynolds; shows an example
   return(matrix (G));
 }
 example
-{ "EXAMPLE: A non-transitive action of S_2 on four variables"; echo=2;
+{ "EXAMPLE: An action of S_2 on four variables"; echo=2;
          ring R=0,(a,b,c,d),dp;
          matrix A[4][4]=
            0,0,1,0,
