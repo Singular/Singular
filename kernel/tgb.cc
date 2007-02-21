@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.141 2007-02-20 15:11:03 bricken Exp $ */
+/* $Id: tgb.cc,v 1.142 2007-02-21 07:05:45 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1934,7 +1934,7 @@ public:
       }else {
           //assume(FALSE);
           for(i=start;i<=lastIndex;i++){
-            other_row_array[i]=npAdd(npMult(coef2,row_array[i]),other_row_array[i]);
+            other_row_array[i]=npAddM(npMult(coef2,row_array[i]),other_row_array[i]);
           }
         }
         updateStartIndex(other_row,start);
@@ -1946,8 +1946,9 @@ public:
     number* row_array=rows[row];
     assume((lower_bound<0)||(npIsZero(row_array[lower_bound])));
     int i;
+    number zero=npInit(0);
     for(i=lower_bound+1;i<ncols;i++){
-      if (!(npIsZero(row_array[i])))
+      if (!(row_array[i]==0))
         break;
     }
     startIndices[row]=i;
@@ -2024,10 +2025,11 @@ public:
     number* row_array=rows[r];
     if (upper_bound>nonZeroUntil) upper_bound=nonZeroUntil+1;
     int i;
+    number zero=npInit(0);
     for(i=upper_bound-1;i>r;i--){
       int start=startIndices[i];
       assume(start<ncols);
-      if (!(npIsZero(row_array[start]))){
+      if (!(row_array[start]==zero)){
         lastReducibleIndices[r]=start;
         return;
       }
@@ -2058,7 +2060,7 @@ public:
         int i;
         assume(start>startIndices[other_row]);
         for(i=start;i<=lastIndex;i++){
-          other_row_array[i]=npAdd(npMult(coef,row_array[i]),other_row_array[i]);
+          other_row_array[i]=npAddM(npMult(coef,row_array[i]),other_row_array[i]);
         }
         updateLastReducibleIndex(other_row,r);
       }
@@ -2539,7 +2541,7 @@ void NoroCache::evaluatePlaceHolder(number* row,std::vector<NoroPlaceHolder>& pl
     DataNoroCacheNode* ref=place_holders[i].ref;
     number coef=place_holders[i].coef;
     if (ref->value_len==backLinkCode){
-      row[ref->term_index]=npAdd(row[ref->term_index],coef);
+      row[ref->term_index]=npAddM(row[ref->term_index],coef);
     } else {
       #ifndef NORO_SPARSE_ROWS_PRE
       DenseRow* ref_row=ref->row;
@@ -2551,7 +2553,7 @@ void NoroCache::evaluatePlaceHolder(number* row,std::vector<NoroPlaceHolder>& pl
       if (!(npIsOne(coef))){
         while(ref_begin!=ref_end){
 
-          *my_pos=npAdd(*my_pos,npMult(coef,*ref_begin));
+          *my_pos=npAddM(*my_pos,npMult(coef,*ref_begin));
           ++ref_begin;
           ++my_pos;
         }
@@ -2559,7 +2561,7 @@ void NoroCache::evaluatePlaceHolder(number* row,std::vector<NoroPlaceHolder>& pl
       else{
         while(ref_begin!=ref_end){
 
-          *my_pos=npAdd(*my_pos,*ref_begin);
+          *my_pos=npAddM(*my_pos,*ref_begin);
           ++ref_begin;
           ++my_pos;
         }
@@ -2577,7 +2579,7 @@ void NoroCache::evaluatePlaceHolder(number* row,std::vector<NoroPlaceHolder>& pl
     for(j=0;j<n;j++){
       int idx=idx_array[j];
       number ref_coef=coef_array[j];
-      row[idx]=npAdd(row[idx],npMult(coef,ref_coef));
+      row[idx]=npAddM(row[idx],npMult(coef,ref_coef));
     }
     #endif
   }
@@ -2902,7 +2904,7 @@ SparseRow* noro_red_to_non_poly(poly p, int &len, NoroCache* cache,slimgb_alg* c
     return NULL;
   }
   
-  
+  number zero=npInit(0);
   MonRedResNP* mon=(MonRedResNP*) omalloc(len*sizeof(MonRedResNP));
   int i=0;
 
@@ -2933,15 +2935,24 @@ SparseRow* noro_red_to_non_poly(poly p, int &len, NoroCache* cache,slimgb_alg* c
         SparseRow* row=red.ref->row;
         number coef=red.coef;
         int j;
+        if (!(npIsOne(coef))){
         for(j=0;j<row->len;j++){
           int idx=row->idx_array[j];
-          temp_array[idx]=npAdd(temp_array[idx],npMult(row->coef_array[j],coef));
+          assume(!(npIsZero(coef)));
+          assume(!(npIsZero(row->coef_array[j])));
+          temp_array[idx]=npAddM(temp_array[idx],npMultM(row->coef_array[j],coef));
           assume(idx<temp_size);
+        }}else{
+          for(j=0;j<row->len;j++){
+            int idx=row->idx_array[j];
+            temp_array[idx]=npAddM(temp_array[idx],row->coef_array[j]);
+            assume(idx<temp_size);
+          }
         }
       }
       else{
         if (red.ref->value_len==NoroCache::backLinkCode){
-          temp_array[red.ref->term_index]=npAdd(temp_array[red.ref->term_index],red.coef);
+          temp_array[red.ref->term_index]=npAddM(temp_array[red.ref->term_index],red.coef);
         } else {
           //PrintS("third case\n");
         }
@@ -2950,14 +2961,14 @@ SparseRow* noro_red_to_non_poly(poly p, int &len, NoroCache* cache,slimgb_alg* c
   }
   int non_zeros=0;
   for(i=0;i<cache->nIrreducibleMonomials;i++){
-    if (!(npIsZero(temp_array[i]))){
+    if (!(temp_array[i]==zero)){
       non_zeros++;
     }
   }
   SparseRow* res=new SparseRow(non_zeros);
   int pos=0;
   for(i=0;i<cache->nIrreducibleMonomials;i++){
-    if (!(npIsZero(temp_array[i]))){
+    if (!(zero==temp_array[i])){
     
       res->idx_array[pos]=i;
       res->coef_array[pos]=temp_array[i];
