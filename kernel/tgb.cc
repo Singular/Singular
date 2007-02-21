@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.143 2007-02-21 08:35:09 bricken Exp $ */
+/* $Id: tgb.cc,v 1.144 2007-02-21 10:02:47 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -709,7 +709,9 @@ static BOOLEAN trivial_syzygie(int pos1,int pos2,poly bound,slimgb_alg* c){
   {
     loop
       {
-  if (pGetExp(p1, i)-pGetExp(m,i) + pGetExp(p2, i) > pGetExp(bound,i))   return FALSE;
+  if (pGetExp(p1, i)-pGetExp(m,i) + pGetExp(p2, i) > pGetExp(bound,i))  {
+    pDelete(&m);
+    return FALSE;}
   if (i == pVariables){
     pDelete(&m);
     //PrintS("trivial");
@@ -2989,6 +2991,7 @@ SparseRow* noro_red_to_non_poly(poly p, int &len, NoroCache* cache,slimgb_alg* c
 }
 #endif
 //len input and out: Idea: reverse addition
+#ifndef NORO_NON_POLY
 std::vector<NoroPlaceHolder> noro_red(poly p, int &len, NoroCache* cache,slimgb_alg* c){
   std::vector<NoroPlaceHolder> res;
    while(p){
@@ -3009,7 +3012,7 @@ std::vector<NoroPlaceHolder> noro_red(poly p, int &len, NoroCache* cache,slimgb_
     }
     return res;
 }
-
+#endif
 
 #endif
 
