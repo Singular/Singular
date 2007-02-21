@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.63 2007-02-21 13:16:56 king Exp $"
+version="$Id: finvar.lib,v 1.64 2007-02-21 13:39:21 king Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -8147,7 +8147,8 @@ EXAMPLE:  example invariant_algebra_perm; shows an example
   { int v=0;
     list GEN=#;
   }
-  int i,j,k;
+  int i,j,k,k2;
+  list TST;
   for (i=1;i<=size(GEN);i++)
   { if (typeof(GEN[i])!="list")
     { "ERROR: The permutation group must be given by generators in";
@@ -8168,21 +8169,20 @@ EXAMPLE:  example invariant_algebra_perm; shows an example
         }
       }
     }
-  }
-  def TST=sort(sum(sum(GEN)))[1];
-  if (TST[1]<=0)
-  { "ERROR: The permutation group must be given by generators in";
-    "       disjoint cycle presentation";
-    return();
-  }
-  for (i=1;i<size(TST);i++)
-  { if ((TST[i]==TST[i+1]) or (TST[i+1]>nvars(basering)))
+    TST=sort(sum(sum(GEN[i])))[1];
+    if (TST[1]<=0)
     { "ERROR: The permutation group must be given by generators in";
       "       disjoint cycle presentation";
       return();
     }
+    for (k2=1;k2<size(TST);k2++)
+    { if ((TST[k2]==TST[k2+1]) or (TST[k2+1]>nvars(basering)))
+      { "ERROR: The permutation group must be given by generators in";
+        "       disjoint cycle presentation";
+        return();
+      }
+    }
   }
-
 //-------------- starting computation -------------------------
   list GRP = GetGroup(GEN);
   def br=basering;
