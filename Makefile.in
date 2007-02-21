@@ -38,7 +38,7 @@ all install:
 	@ for SUBDIR in ${BUILD1_SUBDIRS}; \
 	do \
 	  echo ${MAKE} $@ in $${SUBDIR}; \
-	  (cd $${SUBDIR} && ${MAKE} $@ ); \
+	  (cd $${SUBDIR} && ${MAKE} $@ ) || exit 1;\
 	  (if test "$${SUBDIR}" = Texinfo && test -d doc; then \
 		for FILE in ${TEXINFO_TEX_FILES}; \
 		do \
