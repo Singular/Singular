@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.142 2007-02-21 07:05:45 bricken Exp $ */
+/* $Id: tgb.cc,v 1.143 2007-02-21 08:35:09 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1864,8 +1864,9 @@ static void export_mat(number* number_array,int pn, int tn,const char* format_st
 }
 int modP_lastIndexRow(number* row,int ncols){
   int lastIndex;
+  number zero=npInit(0);
   for(lastIndex=ncols-1;lastIndex>=0;lastIndex--){
-    if (!(npIsZero(row[lastIndex]))){
+    if (!(row[lastIndex]==zero)){
       return lastIndex;
     }
   }
@@ -1910,7 +1911,7 @@ public:
 
     //assume rows "under r" have bigger or equal start index
     number* row_array=rows[r];
-
+    number zero=npInit(0);
     int start=startIndices[r];
     number coef=row_array[start];
     assume(start<ncols);
@@ -1929,11 +1930,13 @@ public:
         number coef2=npNeg(other_row_array[start]);
         if (coef2==minus_one){
           for(i=start;i<=lastIndex;i++){
-            other_row_array[i]=npSub(other_row_array[i], row_array[i]);
+            if (row_array[i]!=zero)
+              other_row_array[i]=npSubM(other_row_array[i], row_array[i]);
           }
       }else {
           //assume(FALSE);
           for(i=start;i<=lastIndex;i++){
+            if (row_array[i]!=zero)
             other_row_array[i]=npAddM(npMult(coef2,row_array[i]),other_row_array[i]);
           }
         }
@@ -2039,7 +2042,7 @@ public:
   void backwardSubstitute(int r){
     int start=startIndices[r];
     assume(start<ncols);
-    
+    number zero=npInit(0);
     number* row_array=rows[r];
     assume((!(npIsZero(row_array[start]))));
     assume(start<ncols);
@@ -2060,7 +2063,8 @@ public:
         int i;
         assume(start>startIndices[other_row]);
         for(i=start;i<=lastIndex;i++){
-          other_row_array[i]=npAddM(npMult(coef,row_array[i]),other_row_array[i]);
+          if (row_array[i]!=zero)
+            other_row_array[i]=npAddM(npMult(coef,row_array[i]),other_row_array[i]);
         }
         updateLastReducibleIndex(other_row,r);
       }
@@ -2112,8 +2116,9 @@ static void write_poly_to_row(number* row, poly h, poly*terms, int tn, ring r){
 static poly row_to_poly(number* row, poly* terms, int tn, ring r){
   poly h=NULL;
   int j;
+  number zero=npInit(0);
   for(j=tn-1;j>=0;j--){
-    if (!(npIsZero(row[j]))){
+    if (!(zero==(row[j]))){
       poly t=terms[j];
       t=p_LmInit(t,r);
       p_SetCoeff(t,row[j],r);
@@ -3155,8 +3160,8 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
     terms[j]=term_nodes[j].t;
   }
   #endif
-  if (TEST_OPT_PROT)
-    Print("Evaluate Rows \n");
+  //if (TEST_OPT_PROT)
+  //  Print("Evaluate Rows \n");
   #ifndef NORO_NON_POLY
   cache.evaluateRows();
   #endif
