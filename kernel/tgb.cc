@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.146 2007-02-22 13:56:32 bricken Exp $ */
+/* $Id: tgb.cc,v 1.147 2007-02-22 14:46:49 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1826,7 +1826,7 @@ BOOLEAN is_valid_ro(red_object & ro){
   if ((r2.p!=ro.p)||(r2.sev!=ro.sev)) return FALSE;
   return TRUE;
 }
-static int terms_sort_crit(const void* a, const void* b){
+int terms_sort_crit(const void* a, const void* b){
   return -pLmCmp(*((poly*) a),*((poly*) b));
 }
 static void unify_terms(poly* terms,int & sum){
@@ -1865,276 +1865,8 @@ static void export_mat(number* number_array,int pn, int tn,const char* format_st
   fclose(out);
 }
 typedef unsigned short number_type;
-#define prec_cast(a) (unsigned int) (a)
-#define to_number_type(a) (number_type) prec_cast(a)
-int modP_lastIndexRow(number_type* row,int ncols){
-  int lastIndex;
-  const number_type zero=0;//npInit(0);
-  for(lastIndex=ncols-1;lastIndex>=0;lastIndex--){
-    if (!(row[lastIndex]==zero)){
-      return lastIndex;
-    }
-  }
-  return -1;
-}
 
-class ModPMatrixProxyOnArray{
-public:
-  friend class ModPMatrixBackSubstProxOnArray;
-  int ncols,nrows;
-  ModPMatrixProxyOnArray(number_type* array, int nrows, int ncols){
-    this->ncols=ncols;
-    this->nrows=nrows;
-    rows=(number_type**) omalloc(nrows*sizeof(number_type*));
-    startIndices=(int*)omalloc(nrows*sizeof(int));
-    int i;
-    for(i=0;i<nrows;i++){
-      rows[i]=array+(i*ncols);
-      updateStartIndex(i,-1);
-    }
-  }
-  ~ModPMatrixProxyOnArray(){
-    omfree(rows);
-    omfree(startIndices);
-  }
-  
-  void permRows(int i, int j){
-    number_type* h=rows[i];
-    rows[i]=rows[j];
-    rows[j]=h;
-    int hs=startIndices[i];
-    startIndices[i]=startIndices[j];
-    startIndices[j]=hs;
-  }
-  void multiplyRow(int row, number_type coef){
-    int i;
-    number_type* row_array=rows[row];
-    for(i=startIndices[row];i<ncols;i++){
-      row_array[i]=to_number_type(npMult((number) row_array[i],(number) coef));
-    }
-  }
-  void reduceOtherRowsForward(int r){
 
-    //assume rows "under r" have bigger or equal start index
-    number_type* row_array=rows[r];
-    number_type zero=to_number_type(npInit(0));
-    int start=startIndices[r];
-    number_type coef=row_array[start];
-    assume(start<ncols);
-    int other_row;
-    assume(!(npIsZero((number) row_array[start])));
-    if (!(npIsOne((number) coef)))
-      multiplyRow(r,to_number_type(npInvers((number) coef)));
-    assume(npIsOne((number) row_array[start]));
-    int lastIndex=modP_lastIndexRow(row_array, ncols);
-    number minus_one=npInit(-1);
-    for (other_row=r+1;other_row<nrows;other_row++){
-      assume(startIndices[other_row]>=start);
-      if (startIndices[other_row]==start){
-        int i;
-        number_type* other_row_array=rows[other_row];
-        number coef2=npNeg((number) other_row_array[start]);
-        if (coef2==minus_one){
-          for(i=start;i<=lastIndex;i++){
-            if (row_array[i]!=zero)
-              other_row_array[i]=to_number_type(npSubM((number) other_row_array[i], (number) row_array[i]));
-          }
-      }else {
-          //assume(FALSE);
-          for(i=start;i<=lastIndex;i++){
-            if (row_array[i]!=zero)
-            other_row_array[i]=to_number_type(npAddM(npMult(coef2,(number) row_array[i]),(number) other_row_array[i]));
-          }
-        }
-        updateStartIndex(other_row,start);
-        assume(npIsZero((number) other_row_array[start]));
-      }
-    }
-  }
-  void updateStartIndex(int row,int lower_bound){
-    number_type* row_array=rows[row];
-    assume((lower_bound<0)||(npIsZero((number) row_array[lower_bound])));
-    int i;
-    //number_type zero=npInit(0);
-    for(i=lower_bound+1;i<ncols;i++){
-      if (!(row_array[i]==0))
-        break;
-    }
-    startIndices[row]=i;
-  }
-  int getStartIndex(int row){
-    return startIndices[row];
-  }
-  BOOLEAN findPivot(int &r, int &c){
-    //row>=r, col>=c
-    
-    while(c<ncols){
-      int i;
-      for(i=r;i<nrows;i++){
-        assume(startIndices[i]>=c);
-        if (startIndices[i]==c){
-          //r=i;
-          if (r!=i)
-            permRows(r,i);
-          return TRUE;
-        }
-      }
-      c++;
-    }
-    return FALSE;
-  }
-protected:
-  number_type** rows;
-  int* startIndices;
-};
-class ModPMatrixBackSubstProxOnArray{
-  int *startIndices;
-  number_type** rows;
-  int *lastReducibleIndices;
-  int ncols;
-  int nrows;
-  int nonZeroUntil;
-public:
-  void multiplyRow(int row, number_type coef){
-    int i;
-    number_type* row_array=rows[row];
-    for(i=startIndices[row];i<ncols;i++){
-      row_array[i]=to_number_type(npMult((number) row_array[i],(number) coef));
-    }
-  }
-  ModPMatrixBackSubstProxOnArray(ModPMatrixProxyOnArray& p){
-//  (number_type* array, int nrows, int ncols, int* startIndices, number_type** rows){
-    //we borrow some parameters ;-)
-    //we assume, that nobody changes the order of the rows
-    this->startIndices=p.startIndices;
-    this->rows=p.rows;
-    this->ncols=p.ncols;
-    this->nrows=p.nrows;
-    lastReducibleIndices=(int*) omalloc(nrows*sizeof(int));
-    nonZeroUntil=0;
-    while(nonZeroUntil<nrows){
-      if (startIndices[nonZeroUntil]<ncols){
-       
-        nonZeroUntil++;
-      } else break;
-      
-    }
-    if (TEST_OPT_PROT)
-      Print("rank:%i\n",nonZeroUntil);
-    nonZeroUntil--;
-    int i;
-    for(i=0;i<=nonZeroUntil;i++){
-      assume(startIndices[i]<ncols);
-      assume(!(npIsZero((number) rows[i][startIndices[i]])));
-      assume(startIndices[i]>=i);
-      updateLastReducibleIndex(i,nonZeroUntil+1);
-    }
-  }
-  void updateLastReducibleIndex(int r, int upper_bound){
-    number_type* row_array=rows[r];
-    if (upper_bound>nonZeroUntil) upper_bound=nonZeroUntil+1;
-    int i;
-    const number_type zero=0;//npInit(0);
-    for(i=upper_bound-1;i>r;i--){
-      int start=startIndices[i];
-      assume(start<ncols);
-      if (!(row_array[start]==zero)){
-        lastReducibleIndices[r]=start;
-        return;
-      }
-    }
-    lastReducibleIndices[r]=-1;
-  }
-  void backwardSubstitute(int r){
-    int start=startIndices[r];
-    assume(start<ncols);
-    number_type zero=0;//npInit(0);
-    number_type* row_array=rows[r];
-    assume((!(npIsZero((number) row_array[start]))));
-    assume(start<ncols);
-    int other_row;
-    if (!(npIsOne((number) row_array[r]))){
-      //it should be one, but this safety is not expensive
-      multiplyRow(r, to_number_type(npInvers((number) row_array[start])));
-    }
-    int lastIndex=modP_lastIndexRow(row_array, ncols);
-    assume(lastIndex<ncols);
-    assume(lastIndex>=0);
-    for(other_row=r-1;other_row>=0;other_row--){
-      assume(lastReducibleIndices[other_row]<=start);
-      if (lastReducibleIndices[other_row]==start){
-        number_type* other_row_array=rows[other_row];
-        number coef=npNeg((number) other_row_array[start]);
-        assume(!(npIsZero(coef)));
-        int i;
-        assume(start>startIndices[other_row]);
-        for(i=start;i<=lastIndex;i++){
-          if (row_array[i]!=zero)
-            other_row_array[i]=to_number_type(npAddM(npMult(coef,(number)row_array[i]),(number)other_row_array[i]));
-        }
-        updateLastReducibleIndex(other_row,r);
-      }
-    }
-  }
-  ~ModPMatrixBackSubstProxOnArray(){
-    omfree(lastReducibleIndices);
-  }
-  void backwardSubstitute(){
-    int i;
-    for(i=nonZeroUntil;i>0;i--){
-      backwardSubstitute(i);
-    }
-  }
-};
-void simplest_gauss_modp(number_type* a, int nrows,int ncols){
-  //use memmoves for changing rows
-  if (TEST_OPT_PROT)
-    PrintS("StartGauss\n");
-  ModPMatrixProxyOnArray mat(a,nrows,ncols);
-  
-  int c=0;
-  int r=0;
-  while(mat.findPivot(r,c)){
-    //int pivot=find_pivot()
-      mat.reduceOtherRowsForward(r);
-    r++;
-    c++;
-  }
-  ModPMatrixBackSubstProxOnArray backmat(mat);
-  backmat.backwardSubstitute();
-  //backward substitutions
-  if (TEST_OPT_PROT)
-    PrintS("StopGauss\n");
-}
-static void write_poly_to_row(number_type* row, poly h, poly*terms, int tn, ring r){
-  //poly* base=row;
-  while(h!=NULL){
-    //Print("h:%i\n",h);
-    number coef=p_GetCoeff(h,r);
-    poly* ptr_to_h=(poly*) bsearch(&h,terms,tn,sizeof(poly),terms_sort_crit);
-    assume(ptr_to_h!=NULL);
-    int pos=ptr_to_h-terms;
-    row[pos]=to_number_type(coef);
-    //number_type_array[base+pos]=coef;
-    pIter(h);
-  }
-}
-static poly row_to_poly(number_type* row, poly* terms, int tn, ring r){
-  poly h=NULL;
-  int j;
-  number_type zero=0;//;npInit(0);
-  for(j=tn-1;j>=0;j--){
-    if (!(zero==(row[j]))){
-      poly t=terms[j];
-      t=p_LmInit(t,r);
-      p_SetCoeff(t,(number) row[j],r);
-      pNext(t)=h;
-      h=t;
-    }
-    
-  }
-  return h;
-}
 #ifdef USE_NORO
 #ifndef NORO_CACHE
 static void linalg_step_modp(poly *p, poly* p_out, int& pn, poly* terms,int tn, slimgb_alg* c){
@@ -2780,6 +2512,7 @@ public:
 static int term_nodes_sort_crit(const void* a, const void* b){
   return -pLmCmp(((TermNoroDataNode*) a)->t,((TermNoroDataNode*) b)->t);
 }
+
 void noro_step(poly*p,int &pn,slimgb_alg* c){
   //Print("Input rows %d\n",pn);
   int j;
@@ -2788,11 +2521,9 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
   }
 
   NoroCache cache;
-#ifndef NORO_NON_POLY
-  std::vector<std::vector<NoroPlaceHolder> > place_holders(pn);
-#else
+
   SparseRow** srows=(SparseRow**) omalloc(pn*sizeof(SparseRow*));
-#endif
+
   for(j=0;j<pn;j++){
    
     poly h=p[j];
@@ -2800,12 +2531,9 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
 
     //number coef;
 
-    #ifndef NORO_NON_POLY
-    std::vector<NoroPlaceHolder> ph=noro_red(h,h_len,&cache,c);
-    place_holders[j]=ph;
-    #else
+
     srows[j]=noro_red_to_non_poly(h,h_len,&cache,c);
-    #endif
+
   }
   std::vector<DataNoroCacheNode*> irr_nodes;
   cache.collectIrreducibleMonomials(irr_nodes);
@@ -2830,45 +2558,35 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
   
   qsort(term_nodes,n,sizeof(TermNoroDataNode),term_nodes_sort_crit);
   poly* terms=(poly*) omalloc(n*sizeof(poly));
-  #ifndef NORO_NON_POLY
-  for(j=0;j<n;j++){
-    term_nodes[j].node->term_index=j;
-    terms[j]=term_nodes[j].t;
-  }
-  #else
+
   int* old_to_new_indices=(int*) omalloc(cache.nIrreducibleMonomials*sizeof(int));
   for(j=0;j<n;j++){
     old_to_new_indices[term_nodes[j].node->term_index]=j;
     term_nodes[j].node->term_index=j;
     terms[j]=term_nodes[j].t;
   }
-  #endif
+
   //if (TEST_OPT_PROT)
   //  Print("Evaluate Rows \n");
-  #ifndef NORO_NON_POLY
-  cache.evaluateRows();
-  #endif
+
   number_type* number_array=(number_type*) omalloc(n*pn*sizeof(number_type));
   memset(number_array,0,sizeof(number_type)*n*pn);
   number zero=npInit(0);
-  if (TEST_OPT_PROT)
-     Print("Evaluate Place Holders\n");
+
   for(j=0;j<pn;j++){
     int i;
     number_type* row=number_array+n*j;
     /*for(i=0;i<n;i++){
       row[i]=zero;
     }*/
-    #ifndef NORO_NON_POLY
-    cache.evaluatePlaceHolder(row,place_holders[j]);
-    #else
+
     SparseRow* srow=srows[j];
     for(i=0;i<srow->len;i++){
       int idx=old_to_new_indices[srow->idx_array[i]];
-      row[idx]=to_number_type(srow->coef_array[i]);
+      row[idx]=F4mat_to_number_type(srow->coef_array[i]);
     }
     delete srow;
-    #endif
+
   }
   
   static int export_n=0;
