@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.23 2007-02-22 08:27:02 Singular Exp $ */
+/* $Id: longalg.cc,v 1.24 2007-02-22 14:52:40 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1039,7 +1039,7 @@ number naAdd(number la, number lb)
   }
   lu->n = x;
   lu->s = 0;
-  lu->cnt=a->cnt+b->cnt+1;
+  lu->cnt=si_max(a->cnt,b->cnt)+1;
   if (lu->n!=NULL)
   {
      number luu=(number)lu;
@@ -1099,7 +1099,7 @@ number naSub(number la, number lb)
   }
   lu->n = x;
   lu->s = 0;
-  lu->cnt=a->cnt+b->cnt+1;
+  lu->cnt=si_max(a->cnt,b->cnt)+1;
   if (lu->n!=NULL)
   {
      number luu=(number)lu;
