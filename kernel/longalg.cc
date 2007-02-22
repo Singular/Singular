@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.22 2007-02-21 16:15:34 Singular Exp $ */
+/* $Id: longalg.cc,v 1.23 2007-02-22 08:27:02 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1984,7 +1984,6 @@ number naLcm(number la, number lb, const ring r)
   naTest(la);
   naTest(lb);
   naTest((number)result);
-  naNormalize((number)result);
   return ((number)result);
 }
 
