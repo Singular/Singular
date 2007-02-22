@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.55 2007-02-20 15:11:04 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.56 2007-02-22 10:45:00 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -17,10 +17,13 @@
 #include "structs.h"
 #include "polys.h"
 #include "stdlib.h"
+#include <modulop.h>
 //#define USE_NORO 1
-//#define NORO_CACHE 1
-//#define NORO_SPARSE_ROWS_PRE 1
-//#define NORO_NON_POLY 1
+#ifdef USE_NORO
+#define NORO_CACHE 1
+#define NORO_SPARSE_ROWS_PRE 1
+#define NORO_NON_POLY 1
+#endif
 #ifdef NORO_CACHE
 //#include <map>
 #include <vector>
@@ -387,11 +390,356 @@ template <class len_type, class set_type>  int pos_helper(kStrategy strat, poly 
   }
 
 }
+#ifdef NORO_CACHE
+typedef unsigned short tgb_uint16;
+typedef unsigned char tgb_uint8;
+typedef unsigned int tgb_uint32;
+class NoroCacheNode{
+public:
+  NoroCacheNode** branches;
+  int branches_len;
 
+  
+  NoroCacheNode(){
+    branches=NULL;
+    branches_len=0;
+    
+  }
+  NoroCacheNode* setNode(int branch, NoroCacheNode* node){
+    if (branch>=branches_len){
+      if (branches==NULL){
+        branches_len=branch+1;
+        branches_len=si_max(branches_len,3);
+        branches=(NoroCacheNode**) omalloc(branches_len*sizeof(NoroCacheNode*));
+        int i;
+        for(i=0;i<branches_len;i++){
+          branches[i]=NULL;
+        }
+      }else{
+        int branches_len_old=branches_len;
+        branches_len=branch+1;
+        branches=(NoroCacheNode**) omrealloc(branches,branches_len*sizeof(NoroCacheNode*));
+        int i;
+        for(i=branches_len_old;i<branches_len;i++){
+          branches[i]=NULL;
+        }
+      }
+    }
+    assume(branches[branch]==NULL);
+    branches[branch]=node;
+    return node;
+  }
+  NoroCacheNode* getBranch(int branch){
+    if (branch<branches_len) return branches[branch];
+    return NULL;
+  }
+  virtual ~NoroCacheNode(){
+    int i;
+    for(i=0;i<branches_len;i++){
+      delete branches[i];
+    }
+    omfree(branches);
+  }
+  NoroCacheNode* getOrInsertBranch(int branch){
+    if ((branch<branches_len)&&(branches[branch]))
+      return branches[branch];
+    else{
+      return setNode(branch,new NoroCacheNode());
+    }
+  }
+};
+class DenseRow{
+public:
+  number* array;
+  int begin;
+  int end;
+  DenseRow(){
+    array=NULL;
+  }
+  ~DenseRow(){
+    omfree(array);
+  }
+};
+class SparseRow{
+public:
+  int* idx_array;
+  number* coef_array;
+  int len;
+  SparseRow(){
+    len=0;
+    idx_array=NULL;
+    coef_array=NULL;
+  }
+  SparseRow(int n){
+    len=n;
+    idx_array=(int*) omalloc(n*sizeof(int));
+    coef_array=(number*) omalloc(n*sizeof(number));
+  }
+  ~SparseRow(){
+    omfree(idx_array);
+    omfree(coef_array);
+  }
+};
 
+class DataNoroCacheNode:public NoroCacheNode{
+public:
+  
+  int value_len;
+  poly value_poly;
+  #ifdef NORO_SPARSE_ROWS_PRE
+  SparseRow* row;
+  #else
+  DenseRow* row;
+  #endif
+  int term_index;
+  DataNoroCacheNode(poly p, int len){
+    value_len=len;
+    value_poly=p;
+    row=NULL;
+    term_index=-1;
+  }
+  #ifdef NORO_SPARSE_ROWS_PRE
+  DataNoroCacheNode(SparseRow* row){
+    if (row!=NULL)
+      value_len=row->len;
+    else
+      value_len=0;
+    value_poly=NULL;
+    this->row=row;
+    term_index=-1;
+  }
+  #endif
+  ~DataNoroCacheNode(
+  ){
+    //p_Delete(&value_poly,currRing);
+    if (row) delete row;
+  }
+};
+class NoroCache{
+public:
+  poly temp_term;
+  void evaluatePlaceHolder(number* row,std::vector<NoroPlaceHolder>& place_holders);
+  void collectIrreducibleMonomials( std::vector<DataNoroCacheNode*>& res);
+  void collectIrreducibleMonomials(int level,  NoroCacheNode* node, std::vector<DataNoroCacheNode*>& res);
+  void evaluateRows();
+  void evaluateRows(int level, NoroCacheNode* node);
+#ifdef NORO_RED_ARRAY_RESERVER
+  int reserved;
+  poly* recursionPolyBuffer;
+#endif
+  static const int backLinkCode=-222;
+  DataNoroCacheNode* insert(poly term, poly nf, int len){
+    //assume(impl.find(p_Copy(term,currRing))==impl.end());
+    //assume(len==pLength(nf));
+    assume(npIsOne(p_GetCoeff(term,currRing)));
+    if (term==nf){
+      term=p_Copy(term,currRing);
+
+      ressources.push_back(term);
+      nIrreducibleMonomials++;
+      return treeInsertBackLink(term);
+      
+    } else{
+      
+      if (nf){
+        //nf=p_Copy(nf,currRing);
+        assume(p_LmCmp(nf,term,currRing)==-1);
+        ressources.push_back(nf);
+      }
+      return treeInsert(term,nf,len);
+      
+    }
+    
+    //impl[term]=std::pair<PolySimple,int> (nf,len);
+  }
+  #ifdef NORO_SPARSE_ROWS_PRE
+  DataNoroCacheNode* insert(poly term, SparseRow* srow){
+    //assume(impl.find(p_Copy(term,currRing))==impl.end());
+    //assume(len==pLength(nf));
+
+      return treeInsert(term,srow);
+      
+ 
+    //impl[term]=std::pair<PolySimple,int> (nf,len);
+  }
+  #endif
+  DataNoroCacheNode* insertAndTransferOwnerShip(poly t, ring r){
+    
+    ressources.push_back(t);
+    DataNoroCacheNode* res=treeInsertBackLink(t);
+    res->term_index=nIrreducibleMonomials;
+    nIrreducibleMonomials++;
+    return res;
+  }
+  poly lookup(poly term, BOOLEAN& succ, int & len);
+  DataNoroCacheNode* getCacheReference(poly term);
+  NoroCache(){
+    buffer=NULL;
+#ifdef NORO_RED_ARRAY_RESERVER
+    reserved=0;
+    recursionPolyBuffer=(poly*)omalloc(1000000*sizeof(poly));
+#endif
+    nIrreducibleMonomials=0;
+    nReducibleMonomials=0;
+    temp_term=pOne();
+  }
+#ifdef NORO_RED_ARRAY_RESERVER
+  poly* reserve(int n){
+    poly* res=recursionPolyBuffer+reserved;
+    reserved+=n;
+    return res;
+  }
+  void free(int n){
+    reserved-=n;
+  }
+#endif
+  ~NoroCache(){
+    int s=ressources.size();
+    int i;
+    for(i=0;i<s;i++){
+      p_Delete(&ressources[i].impl,currRing);
+    }
+    p_Delete(&temp_term,currRing);
+#ifdef NORO_RED_ARRAY_RESERVER
+    omfree(recursionPolyBuffer);
+#endif
+  }
+  
+  int nIrreducibleMonomials;
+  int nReducibleMonomials;
+protected:
+  DataNoroCacheNode* treeInsert(poly term,poly nf,int len){
+    int i;
+    nReducibleMonomials++;
+    int nvars=pVariables;
+    NoroCacheNode* parent=&root;
+    for(i=1;i<nvars;i++){
+      parent=parent->getOrInsertBranch(p_GetExp(term,i,currRing));
+    }
+    return (DataNoroCacheNode*) parent->setNode(p_GetExp(term,nvars,currRing),new DataNoroCacheNode(nf,len));
+  }
+  #ifdef NORO_SPARSE_ROWS_PRE
+  DataNoroCacheNode* treeInsert(poly term,SparseRow* srow){
+    int i;
+    nReducibleMonomials++;
+    int nvars=pVariables;
+    NoroCacheNode* parent=&root;
+    for(i=1;i<nvars;i++){
+      parent=parent->getOrInsertBranch(p_GetExp(term,i,currRing));
+    }
+    return (DataNoroCacheNode*) parent->setNode(p_GetExp(term,nvars,currRing),new DataNoroCacheNode(srow));
+  }
+  #endif
+  DataNoroCacheNode* treeInsertBackLink(poly term){
+    int i;
+    int nvars=pVariables;
+    NoroCacheNode* parent=&root;
+    for(i=1;i<nvars;i++){
+      parent=parent->getOrInsertBranch(p_GetExp(term,i,currRing));
+    }
+    return (DataNoroCacheNode*) parent->setNode(p_GetExp(term,nvars,currRing),new DataNoroCacheNode(term,backLinkCode));
+  }
+  
+  //@TODO descruct nodes;
+  typedef std::vector<PolySimple> poly_vec;
+  poly_vec ressources;
+  //typedef std::map<PolySimple,std::pair<PolySimple,int> > cache_map;
+  //cache_map impl;
+  NoroCacheNode root;
+  number* buffer;
+};
+MonRedResNP noro_red_mon_to_non_poly(poly t,  NoroCache* cache,slimgb_alg* c);
+template<class storage_type> SparseRow* noro_red_to_non_poly_t(poly p, int &len, NoroCache* cache,slimgb_alg* c){
+  assume(len==pLength(p));
+  poly orig_p=p;
+  if (p==NULL) {
+    len=0;
+    return NULL;
+  }
+  
+  number zero=npInit(0);
+  MonRedResNP* mon=(MonRedResNP*) omalloc(len*sizeof(MonRedResNP));
+  int i=0;
+
+  while(p){
+
+    poly t=p;
+    pIter(p);
+    pNext(t)=NULL;
+    
+#ifndef NDEBUG
+    number coef_debug=p_GetCoeff(t,currRing);
+#endif
+    MonRedResNP red=noro_red_mon_to_non_poly(t,cache,c);
+    mon[i]=red;
+    i++;
+  }
+  
+  assume(i==len);
+  len=i;
+  //in the loop before nIrreducibleMonomials increases, so position here is important
+  storage_type* temp_array=(storage_type*) omalloc(cache->nIrreducibleMonomials*sizeof(storage_type));
+  int temp_size=cache->nIrreducibleMonomials;
+  memset(temp_array,0,sizeof(storage_type)*cache->nIrreducibleMonomials);
+  for(i=0;i<len;i++){
+    MonRedResNP red=mon[i];
+    if ((red.ref)){
+      if (red.ref->row){
+        SparseRow* row=red.ref->row;
+        number coef=red.coef;
+        int j;
+        if (!(npIsOne(coef))){
+        for(j=0;j<row->len;j++){
+          int idx=row->idx_array[j];
+          assume(!(npIsZero(coef)));
+          assume(!(npIsZero(row->coef_array[j])));
+          temp_array[idx]=(storage_type) (unsigned int) npAddM((number) temp_array[idx],npMultM(row->coef_array[j],coef));
+          assume(idx<temp_size);
+        }}else{
+          for(j=0;j<row->len;j++){
+            int idx=row->idx_array[j];
+            temp_array[idx]=(storage_type) (unsigned int) npAddM((number) temp_array[idx],row->coef_array[j]);
+            assume(idx<temp_size);
+          }
+        }
+      }
+      else{
+        if (red.ref->value_len==NoroCache::backLinkCode){
+          temp_array[red.ref->term_index]=(storage_type) (unsigned int) npAddM((number) temp_array[red.ref->term_index],red.coef);
+        } else {
+          //PrintS("third case\n");
+        }
+      }
+    }
+  }
+  int non_zeros=0;
+  for(i=0;i<cache->nIrreducibleMonomials;i++){
+    if (!(temp_array[i]==0)){
+      non_zeros++;
+    }
+  }
+  SparseRow* res=new SparseRow(non_zeros);
+  int pos=0;
+  for(i=0;i<cache->nIrreducibleMonomials;i++){
+    if (!(0==temp_array[i])){
+    
+      res->idx_array[pos]=i;
+      res->coef_array[pos]=(number) temp_array[i];
+
+      pos++;  
+    }
+    
+  }
+  omfree(temp_array);
+
+  omfree(mon);
+  return res;
+}
+#endif
 static wlen_type pair_weighted_length(int i, int j, slimgb_alg* c);
 wlen_type pELength(poly p, ring r);
 void simplest_gauss_modp(number* a, int nrows,int ncols);
+
 // a: a[0,0],a[0,1]....a[nrows-1,ncols-1]
 // assume: field is Zp
 #endif

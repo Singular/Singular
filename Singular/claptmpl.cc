@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.38 2007-02-21 10:14:11 bricken Exp $
+// $Id: claptmpl.cc,v 1.39 2007-02-22 10:45:12 bricken Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -226,6 +226,9 @@ template class std::vector<PolySimple>;
 //template class std::vector<NoroPlaceHolder>;
 //template class std::vector<std::vector<NoroPlaceHolder> >;
 template class std::vector<DataNoroCacheNode*>;
+template SparseRow* noro_red_to_non_poly_t<unsigned char>(poly p, int &len, NoroCache* cache,slimgb_alg* c);
+template SparseRow* noro_red_to_non_poly_t<unsigned short>(poly p, int &len, NoroCache* cache,slimgb_alg* c);
+template SparseRow* noro_red_to_non_poly_t<unsigned int>(poly p, int &len, NoroCache* cache,slimgb_alg* c);
 //std::priority_queue<MonRedRes>
 #endif
 //template int pos_helper(kStrategy strat, poly p, int len, intset setL, polyset set);
