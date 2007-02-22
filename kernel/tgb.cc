@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.145 2007-02-22 10:44:59 bricken Exp $ */
+/* $Id: tgb.cc,v 1.146 2007-02-22 13:56:32 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1864,9 +1864,12 @@ static void export_mat(number* number_array,int pn, int tn,const char* format_st
   fprintf(out,"]\n");
   fclose(out);
 }
-int modP_lastIndexRow(number* row,int ncols){
+typedef unsigned short number_type;
+#define prec_cast(a) (unsigned int) (a)
+#define to_number_type(a) (number_type) prec_cast(a)
+int modP_lastIndexRow(number_type* row,int ncols){
   int lastIndex;
-  number zero=npInit(0);
+  const number_type zero=0;//npInit(0);
   for(lastIndex=ncols-1;lastIndex>=0;lastIndex--){
     if (!(row[lastIndex]==zero)){
       return lastIndex;
@@ -1874,14 +1877,15 @@ int modP_lastIndexRow(number* row,int ncols){
   }
   return -1;
 }
+
 class ModPMatrixProxyOnArray{
 public:
   friend class ModPMatrixBackSubstProxOnArray;
   int ncols,nrows;
-  ModPMatrixProxyOnArray(number* array, int nrows, int ncols){
+  ModPMatrixProxyOnArray(number_type* array, int nrows, int ncols){
     this->ncols=ncols;
     this->nrows=nrows;
-    rows=(number**) omalloc(nrows*sizeof(number*));
+    rows=(number_type**) omalloc(nrows*sizeof(number_type*));
     startIndices=(int*)omalloc(nrows*sizeof(int));
     int i;
     for(i=0;i<nrows;i++){
@@ -1895,63 +1899,63 @@ public:
   }
   
   void permRows(int i, int j){
-    number* h=rows[i];
+    number_type* h=rows[i];
     rows[i]=rows[j];
     rows[j]=h;
     int hs=startIndices[i];
     startIndices[i]=startIndices[j];
     startIndices[j]=hs;
   }
-  void multiplyRow(int row, number coef){
+  void multiplyRow(int row, number_type coef){
     int i;
-    number* row_array=rows[row];
+    number_type* row_array=rows[row];
     for(i=startIndices[row];i<ncols;i++){
-      row_array[i]=npMult(row_array[i],coef);
+      row_array[i]=to_number_type(npMult((number) row_array[i],(number) coef));
     }
   }
   void reduceOtherRowsForward(int r){
 
     //assume rows "under r" have bigger or equal start index
-    number* row_array=rows[r];
-    number zero=npInit(0);
+    number_type* row_array=rows[r];
+    number_type zero=to_number_type(npInit(0));
     int start=startIndices[r];
-    number coef=row_array[start];
+    number_type coef=row_array[start];
     assume(start<ncols);
     int other_row;
-    assume(!(npIsZero(row_array[start])));
-    if (!(npIsOne(coef)))
-      multiplyRow(r,npInvers(coef));
-    assume(npIsOne(row_array[start]));
+    assume(!(npIsZero((number) row_array[start])));
+    if (!(npIsOne((number) coef)))
+      multiplyRow(r,to_number_type(npInvers((number) coef)));
+    assume(npIsOne((number) row_array[start]));
     int lastIndex=modP_lastIndexRow(row_array, ncols);
     number minus_one=npInit(-1);
     for (other_row=r+1;other_row<nrows;other_row++){
       assume(startIndices[other_row]>=start);
       if (startIndices[other_row]==start){
         int i;
-        number* other_row_array=rows[other_row];
-        number coef2=npNeg(other_row_array[start]);
+        number_type* other_row_array=rows[other_row];
+        number coef2=npNeg((number) other_row_array[start]);
         if (coef2==minus_one){
           for(i=start;i<=lastIndex;i++){
             if (row_array[i]!=zero)
-              other_row_array[i]=npSubM(other_row_array[i], row_array[i]);
+              other_row_array[i]=to_number_type(npSubM((number) other_row_array[i], (number) row_array[i]));
           }
       }else {
           //assume(FALSE);
           for(i=start;i<=lastIndex;i++){
             if (row_array[i]!=zero)
-            other_row_array[i]=npAddM(npMult(coef2,row_array[i]),other_row_array[i]);
+            other_row_array[i]=to_number_type(npAddM(npMult(coef2,(number) row_array[i]),(number) other_row_array[i]));
           }
         }
         updateStartIndex(other_row,start);
-        assume(npIsZero(other_row_array[start]));
+        assume(npIsZero((number) other_row_array[start]));
       }
     }
   }
   void updateStartIndex(int row,int lower_bound){
-    number* row_array=rows[row];
-    assume((lower_bound<0)||(npIsZero(row_array[lower_bound])));
+    number_type* row_array=rows[row];
+    assume((lower_bound<0)||(npIsZero((number) row_array[lower_bound])));
     int i;
-    number zero=npInit(0);
+    //number_type zero=npInit(0);
     for(i=lower_bound+1;i<ncols;i++){
       if (!(row_array[i]==0))
         break;
@@ -1980,26 +1984,26 @@ public:
     return FALSE;
   }
 protected:
-  number** rows;
+  number_type** rows;
   int* startIndices;
 };
 class ModPMatrixBackSubstProxOnArray{
   int *startIndices;
-  number** rows;
+  number_type** rows;
   int *lastReducibleIndices;
   int ncols;
   int nrows;
   int nonZeroUntil;
 public:
-  void multiplyRow(int row, number coef){
+  void multiplyRow(int row, number_type coef){
     int i;
-    number* row_array=rows[row];
+    number_type* row_array=rows[row];
     for(i=startIndices[row];i<ncols;i++){
-      row_array[i]=npMult(row_array[i],coef);
+      row_array[i]=to_number_type(npMult((number) row_array[i],(number) coef));
     }
   }
   ModPMatrixBackSubstProxOnArray(ModPMatrixProxyOnArray& p){
-//  (number* array, int nrows, int ncols, int* startIndices, number** rows){
+//  (number_type* array, int nrows, int ncols, int* startIndices, number_type** rows){
     //we borrow some parameters ;-)
     //we assume, that nobody changes the order of the rows
     this->startIndices=p.startIndices;
@@ -2021,16 +2025,16 @@ public:
     int i;
     for(i=0;i<=nonZeroUntil;i++){
       assume(startIndices[i]<ncols);
-      assume(!(npIsZero(rows[i][startIndices[i]])));
+      assume(!(npIsZero((number) rows[i][startIndices[i]])));
       assume(startIndices[i]>=i);
       updateLastReducibleIndex(i,nonZeroUntil+1);
     }
   }
   void updateLastReducibleIndex(int r, int upper_bound){
-    number* row_array=rows[r];
+    number_type* row_array=rows[r];
     if (upper_bound>nonZeroUntil) upper_bound=nonZeroUntil+1;
     int i;
-    number zero=npInit(0);
+    const number_type zero=0;//npInit(0);
     for(i=upper_bound-1;i>r;i--){
       int start=startIndices[i];
       assume(start<ncols);
@@ -2044,14 +2048,14 @@ public:
   void backwardSubstitute(int r){
     int start=startIndices[r];
     assume(start<ncols);
-    number zero=npInit(0);
-    number* row_array=rows[r];
-    assume((!(npIsZero(row_array[start]))));
+    number_type zero=0;//npInit(0);
+    number_type* row_array=rows[r];
+    assume((!(npIsZero((number) row_array[start]))));
     assume(start<ncols);
     int other_row;
-    if (!(nIsOne(row_array[r]))){
+    if (!(npIsOne((number) row_array[r]))){
       //it should be one, but this safety is not expensive
-      multiplyRow(r, npInvers(row_array[start]));
+      multiplyRow(r, to_number_type(npInvers((number) row_array[start])));
     }
     int lastIndex=modP_lastIndexRow(row_array, ncols);
     assume(lastIndex<ncols);
@@ -2059,14 +2063,14 @@ public:
     for(other_row=r-1;other_row>=0;other_row--){
       assume(lastReducibleIndices[other_row]<=start);
       if (lastReducibleIndices[other_row]==start){
-        number* other_row_array=rows[other_row];
-        number coef=npNeg(other_row_array[start]);
+        number_type* other_row_array=rows[other_row];
+        number coef=npNeg((number) other_row_array[start]);
         assume(!(npIsZero(coef)));
         int i;
         assume(start>startIndices[other_row]);
         for(i=start;i<=lastIndex;i++){
           if (row_array[i]!=zero)
-            other_row_array[i]=npAddM(npMult(coef,row_array[i]),other_row_array[i]);
+            other_row_array[i]=to_number_type(npAddM(npMult(coef,(number)row_array[i]),(number)other_row_array[i]));
         }
         updateLastReducibleIndex(other_row,r);
       }
@@ -2082,7 +2086,7 @@ public:
     }
   }
 };
-void simplest_gauss_modp(number* a, int nrows,int ncols){
+void simplest_gauss_modp(number_type* a, int nrows,int ncols){
   //use memmoves for changing rows
   if (TEST_OPT_PROT)
     PrintS("StartGauss\n");
@@ -2102,7 +2106,7 @@ void simplest_gauss_modp(number* a, int nrows,int ncols){
   if (TEST_OPT_PROT)
     PrintS("StopGauss\n");
 }
-static void write_poly_to_row(number* row, poly h, poly*terms, int tn, ring r){
+static void write_poly_to_row(number_type* row, poly h, poly*terms, int tn, ring r){
   //poly* base=row;
   while(h!=NULL){
     //Print("h:%i\n",h);
@@ -2110,20 +2114,20 @@ static void write_poly_to_row(number* row, poly h, poly*terms, int tn, ring r){
     poly* ptr_to_h=(poly*) bsearch(&h,terms,tn,sizeof(poly),terms_sort_crit);
     assume(ptr_to_h!=NULL);
     int pos=ptr_to_h-terms;
-    row[pos]=coef;
-    //number_array[base+pos]=coef;
+    row[pos]=to_number_type(coef);
+    //number_type_array[base+pos]=coef;
     pIter(h);
   }
 }
-static poly row_to_poly(number* row, poly* terms, int tn, ring r){
+static poly row_to_poly(number_type* row, poly* terms, int tn, ring r){
   poly h=NULL;
   int j;
-  number zero=npInit(0);
+  number_type zero=0;//;npInit(0);
   for(j=tn-1;j>=0;j--){
     if (!(zero==(row[j]))){
       poly t=terms[j];
       t=p_LmInit(t,r);
-      p_SetCoeff(t,row[j],r);
+      p_SetCoeff(t,(number) row[j],r);
       pNext(t)=h;
       h=t;
     }
@@ -2131,14 +2135,16 @@ static poly row_to_poly(number* row, poly* terms, int tn, ring r){
   }
   return h;
 }
+#ifdef USE_NORO
+#ifndef NORO_CACHE
 static void linalg_step_modp(poly *p, poly* p_out, int& pn, poly* terms,int tn, slimgb_alg* c){
   static int export_n=0;
   assume(terms[tn-1]!=NULL);
   assume(rField_is_Zp(c->r));
-  //I don't do deletes, copies of numbers ...
-  number zero=npInit(0);
+  //I don't do deletes, copies of number_types ...
+  const number_type zero=0;//npInit(0);
   int array_size=pn*tn;
-  number* number_array=(number*) omalloc(pn*tn*sizeof(number));
+  number_type* number_array=(number_type*) omalloc(pn*tn*sizeof(number_type));
   int i;
   for(i=0;i<array_size;i++){
     number_array[i]=zero;
@@ -2177,6 +2183,8 @@ static void linalg_step_modp(poly *p, poly* p_out, int& pn, poly* terms,int tn, 
   export_mat(number_array,pn,tn,"mat%i.py",++export_n);
 #endif
 }
+#endif
+#endif 
 static void mass_add(poly* p, int pn,slimgb_alg* c){
     int j;
     int* ibuf=(int*) omalloc(pn*sizeof(int));
@@ -2691,7 +2699,7 @@ std::vector<NoroPlaceHolder> noro_red(poly p, int &len, NoroCache* cache,slimgb_
 
 
 #endif
-
+#ifdef USE_NORO
 #ifndef NORO_CACHE
 void noro_step(poly*p,int &pn,slimgb_alg* c){
   poly* reduced=(poly*) omalloc(pn*sizeof(poly));
@@ -2840,14 +2848,14 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
   #ifndef NORO_NON_POLY
   cache.evaluateRows();
   #endif
-  number* number_array=(number*) omalloc(n*pn*sizeof(number));
-  memset(number_array,0,sizeof(number)*n*pn);
+  number_type* number_array=(number_type*) omalloc(n*pn*sizeof(number_type));
+  memset(number_array,0,sizeof(number_type)*n*pn);
   number zero=npInit(0);
   if (TEST_OPT_PROT)
      Print("Evaluate Place Holders\n");
   for(j=0;j<pn;j++){
     int i;
-    number* row=number_array+n*j;
+    number_type* row=number_array+n*j;
     /*for(i=0;i<n;i++){
       row[i]=zero;
     }*/
@@ -2857,7 +2865,7 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
     SparseRow* srow=srows[j];
     for(i=0;i<srow->len;i++){
       int idx=old_to_new_indices[srow->idx_array[i]];
-      row[idx]=srow->coef_array[i];
+      row[idx]=to_number_type(srow->coef_array[i]);
     }
     delete srow;
     #endif
@@ -2886,7 +2894,7 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
   
 }
 #endif
-
+#endif
 static void go_on (slimgb_alg* c){
   //set limit of 1000 for multireductions, at the moment for
   //programming reasons
@@ -2976,7 +2984,7 @@ static void go_on (slimgb_alg* c){
   
   c->normal_forms+=i;
   int j;
-#if 1
+#ifdef USE_NORO
   //if ((!(c->nc))&&(rField_is_Zp(c->r))){
   if (use_noro){
     int pn=i;
