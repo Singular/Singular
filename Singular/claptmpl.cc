@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.40 2007-02-22 14:46:51 bricken Exp $
+// $Id: claptmpl.cc,v 1.41 2007-02-23 09:07:41 bricken Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -235,6 +235,9 @@ template void simplest_gauss_modp<tgb_uint8> (tgb_uint8* a, int nrows,int ncols)
 template poly row_to_poly<tgb_uint8>(tgb_uint8* row, poly* terms, int tn, ring r);
 template poly row_to_poly<tgb_uint32>(tgb_uint32* row, poly* terms, int tn, ring r);
 template poly row_to_poly<tgb_uint16>(tgb_uint16* row, poly* terms, int tn, ring r);
+template void noro_step<tgb_uint8>(poly*p,int &pn,slimgb_alg* c);
+template void noro_step<tgb_uint16>(poly*p,int &pn,slimgb_alg* c);
+template void noro_step<tgb_uint32>(poly*p,int &pn,slimgb_alg* c);
 //std::priority_queue<MonRedRes>
 #endif
 //template int pos_helper(kStrategy strat, poly p, int len, intset setL, polyset set);

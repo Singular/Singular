@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.148 2007-02-23 08:34:40 bricken Exp $ */
+/* $Id: tgb.cc,v 1.149 2007-02-23 09:07:40 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1864,7 +1864,7 @@ static void export_mat(number* number_array,int pn, int tn,const char* format_st
   fprintf(out,"]\n");
   fclose(out);
 }
-typedef unsigned short number_type;
+//typedef unsigned short number_type;
 
 
 #ifdef USE_NORO
@@ -2392,12 +2392,12 @@ poly noro_red_non_unique(poly p, int &len, NoroCache* cache,slimgb_alg* c){
 
 SparseRow* noro_red_to_non_poly(poly p, int &len, NoroCache* cache,slimgb_alg* c){
   if (npPrimeM<255){
-    return noro_red_to_non_poly_t<unsigned char>(p,len,cache,c);
+    return noro_red_to_non_poly_t<tgb_uint8>(p,len,cache,c);
   } else {
     if (npPrimeM<65000){
-      return noro_red_to_non_poly_t<unsigned short>(p,len,cache,c);
+      return noro_red_to_non_poly_t<tgb_uint16>(p,len,cache,c);
     } else{
-      return noro_red_to_non_poly_t<unsigned int>(p,len,cache,c);
+      return noro_red_to_non_poly_t<tgb_uint32>(p,len,cache,c);
     }
   }
 }
@@ -2504,114 +2504,12 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
     PrintS("\n");
 }
 #else
-class TermNoroDataNode{
-public:
-  DataNoroCacheNode* node;
-  poly t;
-};
-static int term_nodes_sort_crit(const void* a, const void* b){
+
+int term_nodes_sort_crit(const void* a, const void* b){
   return -pLmCmp(((TermNoroDataNode*) a)->t,((TermNoroDataNode*) b)->t);
 }
 
-void noro_step(poly*p,int &pn,slimgb_alg* c){
-  //Print("Input rows %d\n",pn);
-  int j;
-  if (TEST_OPT_PROT){
-    Print("Input rows %d\n",pn);
-  }
 
-  NoroCache cache;
-
-  SparseRow** srows=(SparseRow**) omalloc(pn*sizeof(SparseRow*));
-  int non_zeros=0;
-  for(j=0;j<pn;j++){
-   
-    poly h=p[j];
-    int h_len=pLength(h);
-
-    //number coef;
-
-
-    srows[non_zeros]=noro_red_to_non_poly(h,h_len,&cache,c);
-    if (srows[non_zeros]!=NULL) non_zeros++;
-  }
-  std::vector<DataNoroCacheNode*> irr_nodes;
-  cache.collectIrreducibleMonomials(irr_nodes);
-  //now can build up terms array
-  //Print("historic irred Mon%d\n",cache.nIrreducibleMonomials);
-  int n=irr_nodes.size();//cache.countIrreducibleMonomials();
-  cache.nIrreducibleMonomials=n;
-  if (TEST_OPT_PROT){
-    Print("Irred Mon:%d\n",n);
-    Print("red Mon:%d\n",cache.nReducibleMonomials);
-  }
-  TermNoroDataNode* term_nodes=(TermNoroDataNode*) omalloc(n*sizeof(TermNoroDataNode));
-  
-  for(j=0;j<n;j++){
-    assume(irr_nodes[j]!=NULL);
-    assume(irr_nodes[j]->value_len==NoroCache::backLinkCode);
-    term_nodes[j].t=irr_nodes[j]->value_poly;
-    assume(term_nodes[j].t!=NULL);
-    term_nodes[j].node=irr_nodes[j];
-  }
-  
-  
-  qsort(term_nodes,n,sizeof(TermNoroDataNode),term_nodes_sort_crit);
-  poly* terms=(poly*) omalloc(n*sizeof(poly));
-
-  int* old_to_new_indices=(int*) omalloc(cache.nIrreducibleMonomials*sizeof(int));
-  for(j=0;j<n;j++){
-    old_to_new_indices[term_nodes[j].node->term_index]=j;
-    term_nodes[j].node->term_index=j;
-    terms[j]=term_nodes[j].t;
-  }
-
-  //if (TEST_OPT_PROT)
-  //  Print("Evaluate Rows \n");
-  pn=non_zeros;
-  number_type* number_array=(number_type*) omalloc(n*pn*sizeof(number_type));
-  memset(number_array,0,sizeof(number_type)*n*pn);
-  number zero=npInit(0);
-
-  for(j=0;j<pn;j++){
-    int i;
-    number_type* row=number_array+n*j;
-    /*for(i=0;i<n;i++){
-      row[i]=zero;
-    }*/
-
-    SparseRow* srow=srows[j];
-    if (srow){
-    for(i=0;i<srow->len;i++){
-      int idx=old_to_new_indices[srow->idx_array[i]];
-      row[idx]=F4mat_to_number_type(srow->coef_array[i]);
-    }
-    delete srow;
-    }
-  }
-  
-  static int export_n=0;
-  //export_mat(number_array,pn,n,"mat%i.py",++export_n);
-  simplest_gauss_modp(number_array,pn,n);
-
-  int p_pos=0;
-  for(j=0;j<pn;j++){
-    poly h=row_to_poly(number_array+j*n,terms,n,c->r);
-    if(h!=NULL){
-      p[p_pos++]=h;
-    }
-  }
-  pn=p_pos;
-  omfree(terms);
-  omfree(term_nodes);
-  omfree(number_array);
-  #ifdef NORO_NON_POLY
-  omfree(srows);
-  omfree(old_to_new_indices);
-  #endif
-  //don't forget the rank
-  
-}
 #endif
 #endif
 static void go_on (slimgb_alg* c){
@@ -2707,8 +2605,24 @@ static void go_on (slimgb_alg* c){
   //if ((!(c->nc))&&(rField_is_Zp(c->r))){
   if (use_noro){
     int pn=i;
-    if (pn==0) return;
-    noro_step(p,pn,c);
+    if (pn==0) {omfree(p);return;}
+    
+    {
+      
+      if (npPrimeM<255){
+        noro_step<tgb_uint8>(p,pn,c);
+      } else {
+        if (npPrimeM<65000){
+          noro_step<tgb_uint16>(p,pn,c);
+        } else{
+          noro_step<tgb_uint32>(p,pn,c);
+        }
+      }
+      
+      
+      
+    }
+    
     if (TEST_OPT_PROT){
       Print("reported rank:%i\n",pn);
     }

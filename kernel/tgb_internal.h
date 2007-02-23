@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.58 2007-02-23 08:34:40 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.59 2007-02-23 09:07:41 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -514,6 +514,11 @@ public:
     //p_Delete(&value_poly,currRing);
     if (row) delete row;
   }
+};
+class TermNoroDataNode{
+public:
+  DataNoroCacheNode* node;
+  poly t;
 };
 class NoroCache{
 public:
@@ -1037,6 +1042,106 @@ template <class number_type > void simplest_gauss_modp(number_type* a, int nrows
   //backward substitutions
   if (TEST_OPT_PROT)
     PrintS("StopGauss\n");
+}
+int term_nodes_sort_crit(const void* a, const void* b);
+template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
+  //Print("Input rows %d\n",pn);
+  int j;
+  if (TEST_OPT_PROT){
+    Print("Input rows %d\n",pn);
+  }
+
+  NoroCache cache;
+
+  SparseRow** srows=(SparseRow**) omalloc(pn*sizeof(SparseRow*));
+  int non_zeros=0;
+  for(j=0;j<pn;j++){
+   
+    poly h=p[j];
+    int h_len=pLength(h);
+
+    //number coef;
+
+
+    srows[non_zeros]=noro_red_to_non_poly_t<number_type>(h,h_len,&cache,c);
+    if (srows[non_zeros]!=NULL) non_zeros++;
+  }
+  std::vector<DataNoroCacheNode*> irr_nodes;
+  cache.collectIrreducibleMonomials(irr_nodes);
+  //now can build up terms array
+  //Print("historic irred Mon%d\n",cache.nIrreducibleMonomials);
+  int n=irr_nodes.size();//cache.countIrreducibleMonomials();
+  cache.nIrreducibleMonomials=n;
+  if (TEST_OPT_PROT){
+    Print("Irred Mon:%d\n",n);
+    Print("red Mon:%d\n",cache.nReducibleMonomials);
+  }
+  TermNoroDataNode* term_nodes=(TermNoroDataNode*) omalloc(n*sizeof(TermNoroDataNode));
+  
+  for(j=0;j<n;j++){
+    assume(irr_nodes[j]!=NULL);
+    assume(irr_nodes[j]->value_len==NoroCache::backLinkCode);
+    term_nodes[j].t=irr_nodes[j]->value_poly;
+    assume(term_nodes[j].t!=NULL);
+    term_nodes[j].node=irr_nodes[j];
+  }
+  
+  
+  qsort(term_nodes,n,sizeof(TermNoroDataNode),term_nodes_sort_crit);
+  poly* terms=(poly*) omalloc(n*sizeof(poly));
+
+  int* old_to_new_indices=(int*) omalloc(cache.nIrreducibleMonomials*sizeof(int));
+  for(j=0;j<n;j++){
+    old_to_new_indices[term_nodes[j].node->term_index]=j;
+    term_nodes[j].node->term_index=j;
+    terms[j]=term_nodes[j].t;
+  }
+
+  //if (TEST_OPT_PROT)
+  //  Print("Evaluate Rows \n");
+  pn=non_zeros;
+  number_type* number_array=(number_type*) omalloc(n*pn*sizeof(number_type));
+  memset(number_array,0,sizeof(number_type)*n*pn);
+  number zero=npInit(0);
+
+  for(j=0;j<pn;j++){
+    int i;
+    number_type* row=number_array+n*j;
+    /*for(i=0;i<n;i++){
+      row[i]=zero;
+    }*/
+
+    SparseRow* srow=srows[j];
+    if (srow){
+    for(i=0;i<srow->len;i++){
+      int idx=old_to_new_indices[srow->idx_array[i]];
+      row[idx]=F4mat_to_number_type(srow->coef_array[i]);
+    }
+    delete srow;
+    }
+  }
+  
+  static int export_n=0;
+  //export_mat(number_array,pn,n,"mat%i.py",++export_n);
+  simplest_gauss_modp(number_array,pn,n);
+
+  int p_pos=0;
+  for(j=0;j<pn;j++){
+    poly h=row_to_poly(number_array+j*n,terms,n,c->r);
+    if(h!=NULL){
+      p[p_pos++]=h;
+    }
+  }
+  pn=p_pos;
+  omfree(terms);
+  omfree(term_nodes);
+  omfree(number_array);
+  #ifdef NORO_NON_POLY
+  omfree(srows);
+  omfree(old_to_new_indices);
+  #endif
+  //don't forget the rank
+  
 }
 #endif
 
