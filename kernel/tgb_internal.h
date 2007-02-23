@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.60 2007-02-23 13:17:55 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.61 2007-02-23 13:30:35 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -392,7 +392,7 @@ template <class len_type, class set_type>  int pos_helper(kStrategy strat, poly 
 
 }
 #ifdef NORO_CACHE
-#define slim_prec_cast(a) (unsigned int) (a)
+#define slim_prec_cast(a) (unsigned int) (unsigned long) (a)
 #define F4mat_to_number_type(a) (number_type) slim_prec_cast(a)
 typedef unsigned short tgb_uint16;
 typedef unsigned char tgb_uint8;
@@ -808,7 +808,7 @@ template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly
       }
       else{
         if (red.ref->value_len==NoroCache<number_type>::backLinkCode){
-          temp_array[red.ref->term_index]=(number_type) (unsigned int) npAddM((number) temp_array[red.ref->term_index],red.coef);
+          temp_array[red.ref->term_index]=F4mat_to_number_type( npAddM((number) temp_array[red.ref->term_index],red.coef));
         } else {
           //PrintS("third case\n");
         }
