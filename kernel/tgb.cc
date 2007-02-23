@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.149 2007-02-23 09:07:40 bricken Exp $ */
+/* $Id: tgb.cc,v 1.150 2007-02-23 13:17:54 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -32,7 +32,7 @@
 #define BUCKETS_FOR_NORO_RED 1
 #define SR_HDL(A) ((long)(A))
 static const int bundle_size=100;
-static const int bundle_size_noro=1000;
+static const int bundle_size_noro=10000;
 static const int delay_factor=3;
 int QlogSize(number n);
 #define ADD_LATER_SIZE 500
@@ -1956,6 +1956,7 @@ static void mass_add(poly* p, int pn,slimgb_alg* c){
 }
 
 #ifdef NORO_CACHE
+#ifndef NORO_NON_POLY
 void NoroCache::evaluateRows(){
   //after that can evaluate placeholders
   int i;
@@ -2027,6 +2028,7 @@ void NoroCache::evaluateRows(int level, NoroCacheNode* node){
     } 
   }
 }
+
 void NoroCache::evaluatePlaceHolder(number* row,std::vector<NoroPlaceHolder>& place_holders){
   int i;
   int s=place_holders.size();
@@ -2079,67 +2081,14 @@ void NoroCache::evaluatePlaceHolder(number* row,std::vector<NoroPlaceHolder>& pl
   }
 
 }
-void NoroCache::collectIrreducibleMonomials( std::vector<DataNoroCacheNode*>& res){
-  int i;
-  for(i=0;i<root.branches_len;i++){
-    collectIrreducibleMonomials(1,root.branches[i],res);
-  }
-}
-void NoroCache::collectIrreducibleMonomials(int level, NoroCacheNode* node, std::vector<DataNoroCacheNode*>& res){
-  assume(level>=0);
-  if (node==NULL) return;
-  if (level<pVariables){
-    int i,sum;
-    for(i=0;i<node->branches_len;i++){
-      collectIrreducibleMonomials(level+1,node->branches[i],res);
-    }
-  } else {
-    DataNoroCacheNode* dn=(DataNoroCacheNode*) node;
-    if (dn->value_len==backLinkCode){
-      res.push_back(dn);
-    } 
-  }
-}
-DataNoroCacheNode* NoroCache::getCacheReference(poly term){
-  int i;
-  NoroCacheNode* parent=&root;
-  for(i=1;i<pVariables;i++){
-    parent=parent->getBranch(p_GetExp(term,i,currRing));
-    if (!(parent)){
-      return NULL;
-    }
-  }
-  DataNoroCacheNode* res_holder=(DataNoroCacheNode*) parent->getBranch(p_GetExp(term,i,currRing));
-  return res_holder;
-}
-poly NoroCache::lookup(poly term, BOOLEAN& succ, int & len){
-  int i;
-  NoroCacheNode* parent=&root;
-  for(i=1;i<pVariables;i++){
-    parent=parent->getBranch(p_GetExp(term,i,currRing));
-    if (!(parent)){
-      succ=FALSE;
-      return NULL;
-    }
-  }
-  DataNoroCacheNode* res_holder=(DataNoroCacheNode*) parent->getBranch(p_GetExp(term,i,currRing));
-  if (res_holder){
-    succ=TRUE;
-    if ((res_holder->value_len==backLinkCode)){
-      len=1;
-      return term;
-    }
-    len=res_holder->value_len;
-    return res_holder->value_poly;
-  } else {
-    succ=FALSE;
-    return NULL;
-  }
-}
-poly noro_red_non_unique(poly p, int &len, NoroCache* cache,slimgb_alg* c);
+#endif
 
 
 
+//poly noro_red_non_unique(poly p, int &len, NoroCache* cache,slimgb_alg* c);
+
+
+#ifndef NORO_NON_POLY
 MonRedRes noro_red_mon(poly t, BOOLEAN force_unique, NoroCache* cache,slimgb_alg* c){
   MonRedRes res_holder;
 
@@ -2251,82 +2200,9 @@ MonRedRes noro_red_mon(poly t, BOOLEAN force_unique, NoroCache* cache,slimgb_alg
   }
 
 }
-SparseRow* noro_red_to_non_poly(poly p, int &len, NoroCache* cache,slimgb_alg* c);
-MonRedResNP noro_red_mon_to_non_poly(poly t,  NoroCache* cache,slimgb_alg* c){
-  MonRedResNP res_holder;
-
-
-    DataNoroCacheNode* ref=cache->getCacheReference(t);
-    if (ref!=NULL){
-
-
-      res_holder.coef=p_GetCoeff(t,c->r);
-      
-      res_holder.ref=ref;
-      p_Delete(&t,c->r);
-      return res_holder;
-    }
- 
-  unsigned long sev=p_GetShortExpVector(t,currRing);
-  int i=kFindDivisibleByInS_easy(c->strat,t,sev);
-  if (i>=0){
-    number coef_bak=p_GetCoeff(t,c->r);
-
-    p_SetCoeff(t,npInit(1),c->r);
-    assume(npIsOne(p_GetCoeff(c->strat->S[i],c->r)));
-    number coefstrat=p_GetCoeff(c->strat->S[i],c->r);
-
-
-    poly exp_diff=cache->temp_term;
-    p_ExpVectorDiff(exp_diff,t,c->strat->S[i],c->r);
-    p_SetCoeff(exp_diff,npNeg(npInvers(coefstrat)),c->r);
-    p_Setm(exp_diff,c->r);
-    assume(c->strat->S[i]!=NULL);
-
-    poly res;
-    res=pp_Mult_mm(pNext(c->strat->S[i]),exp_diff,c->r);
-
-    int len=c->strat->lenS[i]-1;
-    SparseRow* srow;
-    srow=noro_red_to_non_poly(res,len,cache,c);
-    ref=cache->insert(t,srow);
-    p_Delete(&t,c->r);
-
-
-    res_holder.coef=coef_bak;
-    res_holder.ref=ref;
-    return res_holder;
-
-  } else {
-    number coef_bak=p_GetCoeff(t,c->r);
-    number one=npInit(1);
-    p_SetCoeff(t,one,c->r);
- 
-    res_holder.ref=cache->insertAndTransferOwnerShip(t,c->r);
-    assume(res_holder.ref!=NULL);
-    res_holder.coef=coef_bak;
-   
-    return res_holder;
-    
-  }
-
-}
-
-poly tree_add(poly* a,int begin, int end,ring r){
-  int d=end-begin;
-  switch(d){
-    case 0:
-      return NULL;
-    case 1:
-      return a[begin];
-    case 2:
-      return p_Add_q(a[begin],a[begin+1],r);
-    default:
-      int s=d/2;
-      return p_Add_q(tree_add(a,begin,begin+s,r),tree_add(a,begin+s,end,r),r);
-  }
-}
-
+#endif
+//SparseRow* noro_red_to_non_poly(poly p, int &len, NoroCache* cache,slimgb_alg* c);
+#ifndef NORO_NON_POLY
 //len input and out: Idea: reverse addition
 poly noro_red_non_unique(poly p, int &len, NoroCache* cache,slimgb_alg* c){
   assume(len==pLength(p));
@@ -2387,10 +2263,11 @@ poly noro_red_non_unique(poly p, int &len, NoroCache* cache,slimgb_alg* c){
 
   return res;
 }
+#endif
 #ifdef NORO_SPARSE_ROWS_PRE
 //len input and out: Idea: reverse addition
 
-SparseRow* noro_red_to_non_poly(poly p, int &len, NoroCache* cache,slimgb_alg* c){
+/*template <class number_type> SparseRow<number_type>* noro_red_to_non_poly(poly p, int &len, NoroCache<number_type>* cache,slimgb_alg* c){
   if (npPrimeM<255){
     return noro_red_to_non_poly_t<tgb_uint8>(p,len,cache,c);
   } else {
@@ -2400,7 +2277,7 @@ SparseRow* noro_red_to_non_poly(poly p, int &len, NoroCache* cache,slimgb_alg* c
       return noro_red_to_non_poly_t<tgb_uint32>(p,len,cache,c);
     }
   }
-}
+}*/
 #endif
 //len input and out: Idea: reverse addition
 #ifndef NORO_NON_POLY
@@ -2505,9 +2382,6 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
 }
 #else
 
-int term_nodes_sort_crit(const void* a, const void* b){
-  return -pLmCmp(((TermNoroDataNode*) a)->t,((TermNoroDataNode*) b)->t);
-}
 
 
 #endif

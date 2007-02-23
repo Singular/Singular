@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.41 2007-02-23 09:07:41 bricken Exp $
+// $Id: claptmpl.cc,v 1.42 2007-02-23 13:17:55 bricken Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -225,10 +225,12 @@ template class std::vector<PolySimple>;
 //template class std::priority_queue<MonRedRes>;
 //template class std::vector<NoroPlaceHolder>;
 //template class std::vector<std::vector<NoroPlaceHolder> >;
-template class std::vector<DataNoroCacheNode*>;
-template SparseRow* noro_red_to_non_poly_t<tgb_uint16>(poly p, int &len, NoroCache* cache,slimgb_alg* c);
-template SparseRow* noro_red_to_non_poly_t<tgb_uint32>(poly p, int &len, NoroCache* cache,slimgb_alg* c);
-template SparseRow* noro_red_to_non_poly_t<tgb_uint8>(poly p, int &len, NoroCache* cache,slimgb_alg* c);
+template class std::vector<DataNoroCacheNode<tgb_uint16>* >;
+template class std::vector<DataNoroCacheNode<tgb_uint8>* >;
+template class std::vector<DataNoroCacheNode<tgb_uint32>* >;
+template SparseRow<tgb_uint16> * noro_red_to_non_poly_t<tgb_uint16>(poly p, int &len, NoroCache<tgb_uint16>* cache,slimgb_alg* c);
+template SparseRow<tgb_uint32>* noro_red_to_non_poly_t<tgb_uint32>(poly p, int &len, NoroCache<tgb_uint32>* cache,slimgb_alg* c);
+template SparseRow<tgb_uint8>* noro_red_to_non_poly_t<tgb_uint8>(poly p, int &len, NoroCache<tgb_uint8>* cache,slimgb_alg* c);
 template void simplest_gauss_modp<tgb_uint16> (tgb_uint16* a, int nrows,int ncols);
 template void simplest_gauss_modp<tgb_uint32> (tgb_uint32* a, int nrows,int ncols);
 template void simplest_gauss_modp<tgb_uint8> (tgb_uint8* a, int nrows,int ncols);

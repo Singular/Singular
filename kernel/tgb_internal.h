@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.59 2007-02-23 09:07:41 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.60 2007-02-23 13:17:55 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -96,8 +96,8 @@ public:
   poly impl;
   
 };
-class DataNoroCacheNode;
-class MonRedRes{
+template<class number_type> class DataNoroCacheNode;
+/*class MonRedRes{
 public:
   poly p;
   number coef;
@@ -115,13 +115,13 @@ public:
     ref=NULL;
     p=NULL;
   }
-};
-class MonRedResNP{
+};*/
+template <class number_type> class MonRedResNP{
 public:
   number coef;
 
 
-  DataNoroCacheNode* ref;
+  DataNoroCacheNode<number_type>* ref;
   MonRedResNP(){
     ref=NULL;
   }
@@ -136,14 +136,15 @@ struct sorted_pair_node{
  
   
 };
-
-
+#ifdef NORO_CACHE
+#ifndef NORO_NON_POLY
 class NoroPlaceHolder{
 public:
   DataNoroCacheNode* ref;
   number coef;
 };
-
+#endif
+#endif
 //static ideal debug_Ideal;
 
 
@@ -391,6 +392,8 @@ template <class len_type, class set_type>  int pos_helper(kStrategy strat, poly 
 
 }
 #ifdef NORO_CACHE
+#define slim_prec_cast(a) (unsigned int) (a)
+#define F4mat_to_number_type(a) (number_type) slim_prec_cast(a)
 typedef unsigned short tgb_uint16;
 typedef unsigned char tgb_uint8;
 typedef unsigned int tgb_uint32;
@@ -460,34 +463,34 @@ public:
     omfree(array);
   }
 };
-class SparseRow{
+template <class number_type> class SparseRow{
 public:
   int* idx_array;
-  number* coef_array;
+  number_type* coef_array;
   int len;
   SparseRow(){
     len=0;
     idx_array=NULL;
     coef_array=NULL;
   }
-  SparseRow(int n){
+  SparseRow<number_type>(int n){
     len=n;
     idx_array=(int*) omalloc(n*sizeof(int));
-    coef_array=(number*) omalloc(n*sizeof(number));
+    coef_array=(number_type*) omalloc(n*sizeof(number_type));
   }
-  ~SparseRow(){
+  ~SparseRow<number_type>(){
     omfree(idx_array);
     omfree(coef_array);
   }
 };
 
-class DataNoroCacheNode:public NoroCacheNode{
+template <class number_type> class DataNoroCacheNode:public NoroCacheNode{
 public:
   
   int value_len;
   poly value_poly;
   #ifdef NORO_SPARSE_ROWS_PRE
-  SparseRow* row;
+  SparseRow<number_type>* row;
   #else
   DenseRow* row;
   #endif
@@ -499,7 +502,7 @@ public:
     term_index=-1;
   }
   #ifdef NORO_SPARSE_ROWS_PRE
-  DataNoroCacheNode(SparseRow* row){
+  DataNoroCacheNode(SparseRow<number_type>* row){
     if (row!=NULL)
       value_len=row->len;
     else
@@ -515,25 +518,29 @@ public:
     if (row) delete row;
   }
 };
-class TermNoroDataNode{
+template <class number_type> class TermNoroDataNode{
 public:
-  DataNoroCacheNode* node;
+  DataNoroCacheNode<number_type>* node;
   poly t;
 };
-class NoroCache{
+
+template <class number_type> class NoroCache{
 public:
   poly temp_term;
+#ifndef NORO_NON_POLY
   void evaluatePlaceHolder(number* row,std::vector<NoroPlaceHolder>& place_holders);
-  void collectIrreducibleMonomials( std::vector<DataNoroCacheNode*>& res);
-  void collectIrreducibleMonomials(int level,  NoroCacheNode* node, std::vector<DataNoroCacheNode*>& res);
   void evaluateRows();
   void evaluateRows(int level, NoroCacheNode* node);
+#endif
+  void collectIrreducibleMonomials( std::vector<DataNoroCacheNode<number_type>* >& res);
+  void collectIrreducibleMonomials(int level,  NoroCacheNode* node, std::vector<DataNoroCacheNode<number_type>* >& res);
+
 #ifdef NORO_RED_ARRAY_RESERVER
   int reserved;
   poly* recursionPolyBuffer;
 #endif
   static const int backLinkCode=-222;
-  DataNoroCacheNode* insert(poly term, poly nf, int len){
+  DataNoroCacheNode<number_type>* insert(poly term, poly nf, int len){
     //assume(impl.find(p_Copy(term,currRing))==impl.end());
     //assume(len==pLength(nf));
     assume(npIsOne(p_GetCoeff(term,currRing)));
@@ -558,7 +565,7 @@ public:
     //impl[term]=std::pair<PolySimple,int> (nf,len);
   }
   #ifdef NORO_SPARSE_ROWS_PRE
-  DataNoroCacheNode* insert(poly term, SparseRow* srow){
+  DataNoroCacheNode<number_type>* insert(poly term, SparseRow<number_type>* srow){
     //assume(impl.find(p_Copy(term,currRing))==impl.end());
     //assume(len==pLength(nf));
 
@@ -568,16 +575,16 @@ public:
     //impl[term]=std::pair<PolySimple,int> (nf,len);
   }
   #endif
-  DataNoroCacheNode* insertAndTransferOwnerShip(poly t, ring r){
+  DataNoroCacheNode<number_type>* insertAndTransferOwnerShip(poly t, ring r){
     
     ressources.push_back(t);
-    DataNoroCacheNode* res=treeInsertBackLink(t);
+    DataNoroCacheNode<number_type>* res=treeInsertBackLink(t);
     res->term_index=nIrreducibleMonomials;
     nIrreducibleMonomials++;
     return res;
   }
   poly lookup(poly term, BOOLEAN& succ, int & len);
-  DataNoroCacheNode* getCacheReference(poly term);
+  DataNoroCacheNode<number_type>* getCacheReference(poly term);
   NoroCache(){
     buffer=NULL;
 #ifdef NORO_RED_ARRAY_RESERVER
@@ -625,7 +632,7 @@ public:
   void* tempBuffer;
   size_t tempBufferSize;
 protected:
-  DataNoroCacheNode* treeInsert(poly term,poly nf,int len){
+  DataNoroCacheNode<number_type>* treeInsert(poly term,poly nf,int len){
     int i;
     nReducibleMonomials++;
     int nvars=pVariables;
@@ -633,10 +640,10 @@ protected:
     for(i=1;i<nvars;i++){
       parent=parent->getOrInsertBranch(p_GetExp(term,i,currRing));
     }
-    return (DataNoroCacheNode*) parent->setNode(p_GetExp(term,nvars,currRing),new DataNoroCacheNode(nf,len));
+    return (DataNoroCacheNode<number_type>*) parent->setNode(p_GetExp(term,nvars,currRing),new DataNoroCacheNode<number_type>(nf,len));
   }
   #ifdef NORO_SPARSE_ROWS_PRE
-  DataNoroCacheNode* treeInsert(poly term,SparseRow* srow){
+  DataNoroCacheNode<number_type>* treeInsert(poly term,SparseRow<number_type>* srow){
     int i;
     nReducibleMonomials++;
     int nvars=pVariables;
@@ -644,17 +651,17 @@ protected:
     for(i=1;i<nvars;i++){
       parent=parent->getOrInsertBranch(p_GetExp(term,i,currRing));
     }
-    return (DataNoroCacheNode*) parent->setNode(p_GetExp(term,nvars,currRing),new DataNoroCacheNode(srow));
+    return (DataNoroCacheNode<number_type>*) parent->setNode(p_GetExp(term,nvars,currRing),new DataNoroCacheNode<number_type>(srow));
   }
   #endif
-  DataNoroCacheNode* treeInsertBackLink(poly term){
+  DataNoroCacheNode<number_type>* treeInsertBackLink(poly term){
     int i;
     int nvars=pVariables;
     NoroCacheNode* parent=&root;
     for(i=1;i<nvars;i++){
       parent=parent->getOrInsertBranch(p_GetExp(term,i,currRing));
     }
-    return (DataNoroCacheNode*) parent->setNode(p_GetExp(term,nvars,currRing),new DataNoroCacheNode(term,backLinkCode));
+    return (DataNoroCacheNode<number_type>*) parent->setNode(p_GetExp(term,nvars,currRing),new DataNoroCacheNode<number_type>(term,backLinkCode));
   }
   
   //@TODO descruct nodes;
@@ -665,8 +672,84 @@ protected:
   NoroCacheNode root;
   number* buffer;
 };
-MonRedResNP noro_red_mon_to_non_poly(poly t,  NoroCache* cache,slimgb_alg* c);
-template<class storage_type> SparseRow* noro_red_to_non_poly_t(poly p, int &len, NoroCache* cache,slimgb_alg* c){
+template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly p, int &len, NoroCache<number_type>* cache,slimgb_alg* c);
+template<class number_type> MonRedResNP<number_type> noro_red_mon_to_non_poly(poly t,  NoroCache<number_type> * cache,slimgb_alg* c)
+{
+  MonRedResNP<number_type> res_holder;
+
+
+    DataNoroCacheNode<number_type>* ref=cache->getCacheReference(t);
+    if (ref!=NULL){
+
+
+      res_holder.coef=p_GetCoeff(t,c->r);
+      
+      res_holder.ref=ref;
+      p_Delete(&t,c->r);
+      return res_holder;
+    }
+ 
+  unsigned long sev=p_GetShortExpVector(t,currRing);
+  int i=kFindDivisibleByInS_easy(c->strat,t,sev);
+  if (i>=0){
+    number coef_bak=p_GetCoeff(t,c->r);
+
+    p_SetCoeff(t,npInit(1),c->r);
+    assume(npIsOne(p_GetCoeff(c->strat->S[i],c->r)));
+    number coefstrat=p_GetCoeff(c->strat->S[i],c->r);
+
+
+    poly exp_diff=cache->temp_term;
+    p_ExpVectorDiff(exp_diff,t,c->strat->S[i],c->r);
+    p_SetCoeff(exp_diff,npNeg(npInvers(coefstrat)),c->r);
+    p_Setm(exp_diff,c->r);
+    assume(c->strat->S[i]!=NULL);
+
+    poly res;
+    res=pp_Mult_mm(pNext(c->strat->S[i]),exp_diff,c->r);
+
+    int len=c->strat->lenS[i]-1;
+    SparseRow<number_type>* srow;
+    srow=noro_red_to_non_poly_t<number_type>(res,len,cache,c);
+    ref=cache->insert(t,srow);
+    p_Delete(&t,c->r);
+
+
+    res_holder.coef=coef_bak;
+    res_holder.ref=ref;
+    return res_holder;
+
+  } else {
+    number coef_bak=p_GetCoeff(t,c->r);
+    number one=npInit(1);
+    p_SetCoeff(t,one,c->r);
+ 
+    res_holder.ref=cache->insertAndTransferOwnerShip(t,c->r);
+    assume(res_holder.ref!=NULL);
+    res_holder.coef=coef_bak;
+   
+    return res_holder;
+    
+  }
+
+}
+/*
+poly tree_add(poly* a,int begin, int end,ring r){
+  int d=end-begin;
+  switch(d){
+    case 0:
+      return NULL;
+    case 1:
+      return a[begin];
+    case 2:
+      return p_Add_q(a[begin],a[begin+1],r);
+    default:
+      int s=d/2;
+      return p_Add_q(tree_add(a,begin,begin+s,r),tree_add(a,begin+s,end,r),r);
+  }
+}
+*/
+template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly p, int &len, NoroCache<number_type>* cache,slimgb_alg* c){
   assume(len==pLength(p));
   poly orig_p=p;
   if (p==NULL) {
@@ -675,7 +758,7 @@ template<class storage_type> SparseRow* noro_red_to_non_poly_t(poly p, int &len,
   }
   
   number zero=npInit(0);
-  MonRedResNP* mon=(MonRedResNP*) omalloc(len*sizeof(MonRedResNP));
+  MonRedResNP<number_type>* mon=(MonRedResNP<number_type>*) omalloc(len*sizeof(MonRedResNP<number_type>));
   int i=0;
 
   while(p){
@@ -687,7 +770,7 @@ template<class storage_type> SparseRow* noro_red_to_non_poly_t(poly p, int &len,
 #ifndef NDEBUG
     number coef_debug=p_GetCoeff(t,currRing);
 #endif
-    MonRedResNP red=noro_red_mon_to_non_poly(t,cache,c);
+    MonRedResNP<number_type> red=noro_red_mon_to_non_poly(t,cache,c);
     mon[i]=red;
     i++;
   }
@@ -695,36 +778,37 @@ template<class storage_type> SparseRow* noro_red_to_non_poly_t(poly p, int &len,
   assume(i==len);
   len=i;
   //in the loop before nIrreducibleMonomials increases, so position here is important
-  size_t temp_size_bytes=cache->nIrreducibleMonomials*sizeof(storage_type);
+  size_t temp_size_bytes=cache->nIrreducibleMonomials*sizeof(number_type)+8;//use 8bit int for testing
+  assume(sizeof(int64)==8);
   cache->ensureTempBufferSize(temp_size_bytes);
-  storage_type* temp_array=(storage_type*) cache->tempBuffer;//omalloc(cache->nIrreducibleMonomials*sizeof(storage_type));
+  number_type* temp_array=(number_type*) cache->tempBuffer;//omalloc(cache->nIrreducibleMonomials*sizeof(number_type));
   int temp_size=cache->nIrreducibleMonomials;
   memset(temp_array,0,temp_size_bytes);
   for(i=0;i<len;i++){
-    MonRedResNP red=mon[i];
+    MonRedResNP<number_type> red=mon[i];
     if ((red.ref)){
       if (red.ref->row){
-        SparseRow* row=red.ref->row;
+        SparseRow<number_type>* row=red.ref->row;
         number coef=red.coef;
         int j;
         if (!(npIsOne(coef))){
         for(j=0;j<row->len;j++){
           int idx=row->idx_array[j];
           assume(!(npIsZero(coef)));
-          assume(!(npIsZero(row->coef_array[j])));
-          temp_array[idx]=(storage_type) (unsigned int) npAddM((number) temp_array[idx],npMultM(row->coef_array[j],coef));
+          assume(!(npIsZero((number) row->coef_array[j])));
+          temp_array[idx]=F4mat_to_number_type(npAddM((number) temp_array[idx],npMultM((number) row->coef_array[j],coef)));
           assume(idx<temp_size);
         }}else{
           for(j=0;j<row->len;j++){
             int idx=row->idx_array[j];
-            temp_array[idx]=(storage_type) (unsigned int) npAddM((number) temp_array[idx],row->coef_array[j]);
+            temp_array[idx]=F4mat_to_number_type(   npAddM((number) temp_array[idx],(number) row->coef_array[j]));
             assume(idx<temp_size);
           }
         }
       }
       else{
-        if (red.ref->value_len==NoroCache::backLinkCode){
-          temp_array[red.ref->term_index]=(storage_type) (unsigned int) npAddM((number) temp_array[red.ref->term_index],red.coef);
+        if (red.ref->value_len==NoroCache<number_type>::backLinkCode){
+          temp_array[red.ref->term_index]=(number_type) (unsigned int) npAddM((number) temp_array[red.ref->term_index],red.coef);
         } else {
           //PrintS("third case\n");
         }
@@ -744,13 +828,14 @@ template<class storage_type> SparseRow* noro_red_to_non_poly_t(poly p, int &len,
     omfree(mon);
     return NULL;
   }
-  SparseRow* res=new SparseRow(non_zeros);
+  SparseRow<number_type>* res=new SparseRow<number_type>(non_zeros);
   int pos=0;
+  #if 0
   for(i=0;i<cache->nIrreducibleMonomials;i++){
     if (!(0==temp_array[i])){
     
       res->idx_array[pos]=i;
-      res->coef_array[pos]=(number) temp_array[i];
+      res->coef_array[pos]=temp_array[i];
 
       pos++;
       non_zeros--;
@@ -758,6 +843,43 @@ template<class storage_type> SparseRow* noro_red_to_non_poly_t(poly p, int &len,
     }
     
   }
+  #else
+  int64* start=(int64*) ((void*)temp_array);
+  int64* end;
+  const int multiple=sizeof(int64)/sizeof(number_type);
+  if (temp_size==0) end=start;
+  
+  else
+  { 
+    int temp_size_rounded=temp_size+(multiple-(temp_size%multiple));
+    assume(temp_size_rounded>=temp_size);
+    assume(temp_size_rounded%multiple==0);
+    assume(temp_size_rounded<temp_size+multiple);
+    number_type* nt_end=temp_array+temp_size_rounded;
+    end=(int64*)((void*)nt_end);
+  }
+  int64* it=start;
+  while(it!=end){
+    if ((*it)!=0){
+      int small_i;
+      const int temp_index=((number_type*)((void*) it))-temp_array;
+      const int bound=temp_index+multiple;
+      for(small_i=temp_index;small_i<bound;small_i++){
+        if(temp_array[small_i]!=0){
+          res->idx_array[pos]=small_i;
+          res->coef_array[pos]=temp_array[small_i];
+
+          pos++;
+          non_zeros--;
+          
+        }
+        if (non_zeros==0) break;
+      }
+      
+    }
+    ++it;
+  }
+  #endif
   //omfree(temp_array);
 
   omfree(mon);
@@ -771,8 +893,7 @@ int terms_sort_crit(const void* a, const void* b);
 // a: a[0,0],a[0,1]....a[nrows-1,ncols-1]
 // assume: field is Zp
 #ifdef USE_NORO
-#define slim_prec_cast(a) (unsigned int) (a)
-#define F4mat_to_number_type(a) (number_type) slim_prec_cast(a)
+
 
 template <class number_type > void write_poly_to_row(number_type* row, poly h, poly*terms, int tn, ring r){
   //poly* base=row;
@@ -813,6 +934,10 @@ template <class number_type > int modP_lastIndexRow(number_type* row,int ncols){
   }
   return -1;
 }
+template <class number_type> int term_nodes_sort_crit(const void* a, const void* b){
+  return -pLmCmp(((TermNoroDataNode<number_type>*) a)->t,((TermNoroDataNode<number_type>*) b)->t);
+}
+
 template <class number_type>class ModPMatrixBackSubstProxyOnArray;
 template <class number_type > class ModPMatrixProxyOnArray{
 public:
@@ -1043,7 +1168,7 @@ template <class number_type > void simplest_gauss_modp(number_type* a, int nrows
   if (TEST_OPT_PROT)
     PrintS("StopGauss\n");
 }
-int term_nodes_sort_crit(const void* a, const void* b);
+//int term_nodes_sort_crit(const void* a, const void* b);
 template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
   //Print("Input rows %d\n",pn);
   int j;
@@ -1051,9 +1176,9 @@ template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
     Print("Input rows %d\n",pn);
   }
 
-  NoroCache cache;
+  NoroCache<number_type> cache;
 
-  SparseRow** srows=(SparseRow**) omalloc(pn*sizeof(SparseRow*));
+  SparseRow<number_type> ** srows=(SparseRow<number_type>**) omalloc(pn*sizeof(SparseRow<number_type>*));
   int non_zeros=0;
   for(j=0;j<pn;j++){
    
@@ -1066,7 +1191,7 @@ template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
     srows[non_zeros]=noro_red_to_non_poly_t<number_type>(h,h_len,&cache,c);
     if (srows[non_zeros]!=NULL) non_zeros++;
   }
-  std::vector<DataNoroCacheNode*> irr_nodes;
+  std::vector<DataNoroCacheNode<number_type>*> irr_nodes;
   cache.collectIrreducibleMonomials(irr_nodes);
   //now can build up terms array
   //Print("historic irred Mon%d\n",cache.nIrreducibleMonomials);
@@ -1076,18 +1201,18 @@ template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
     Print("Irred Mon:%d\n",n);
     Print("red Mon:%d\n",cache.nReducibleMonomials);
   }
-  TermNoroDataNode* term_nodes=(TermNoroDataNode*) omalloc(n*sizeof(TermNoroDataNode));
+  TermNoroDataNode<number_type>* term_nodes=(TermNoroDataNode<number_type>*) omalloc(n*sizeof(TermNoroDataNode<number_type>));
   
   for(j=0;j<n;j++){
     assume(irr_nodes[j]!=NULL);
-    assume(irr_nodes[j]->value_len==NoroCache::backLinkCode);
+    assume(irr_nodes[j]->value_len==NoroCache<number_type>::backLinkCode);
     term_nodes[j].t=irr_nodes[j]->value_poly;
     assume(term_nodes[j].t!=NULL);
     term_nodes[j].node=irr_nodes[j];
   }
   
   
-  qsort(term_nodes,n,sizeof(TermNoroDataNode),term_nodes_sort_crit);
+  qsort(term_nodes,n,sizeof(TermNoroDataNode<number_type>),term_nodes_sort_crit<number_type>);
   poly* terms=(poly*) omalloc(n*sizeof(poly));
 
   int* old_to_new_indices=(int*) omalloc(cache.nIrreducibleMonomials*sizeof(int));
@@ -1111,7 +1236,7 @@ template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
       row[i]=zero;
     }*/
 
-    SparseRow* srow=srows[j];
+    SparseRow<number_type>* srow=srows[j];
     if (srow){
     for(i=0;i<srow->len;i++){
       int idx=old_to_new_indices[srow->idx_array[i]];
@@ -1142,6 +1267,65 @@ template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
   #endif
   //don't forget the rank
   
+}
+
+template <class number_type> void NoroCache<number_type>::collectIrreducibleMonomials( std::vector<DataNoroCacheNode<number_type> *>& res){
+  int i;
+  for(i=0;i<root.branches_len;i++){
+    collectIrreducibleMonomials(1,root.branches[i],res);
+  }
+}
+template <class number_type> void NoroCache<number_type>::collectIrreducibleMonomials(int level, NoroCacheNode* node, std::vector<DataNoroCacheNode<number_type>*>& res){
+  assume(level>=0);
+  if (node==NULL) return;
+  if (level<pVariables){
+    int i,sum;
+    for(i=0;i<node->branches_len;i++){
+      collectIrreducibleMonomials(level+1,node->branches[i],res);
+    }
+  } else {
+    DataNoroCacheNode<number_type>* dn=(DataNoroCacheNode<number_type>*) node;
+    if (dn->value_len==backLinkCode){
+      res.push_back(dn);
+    } 
+  }
+}
+
+template<class number_type> DataNoroCacheNode<number_type>* NoroCache<number_type>::getCacheReference(poly term){
+  int i;
+  NoroCacheNode* parent=&root;
+  for(i=1;i<pVariables;i++){
+    parent=parent->getBranch(p_GetExp(term,i,currRing));
+    if (!(parent)){
+      return NULL;
+    }
+  }
+  DataNoroCacheNode<number_type>* res_holder=(DataNoroCacheNode<number_type>*) parent->getBranch(p_GetExp(term,i,currRing));
+  return res_holder;
+}
+template<class number_type> poly NoroCache<number_type>::lookup(poly term, BOOLEAN& succ, int & len){
+  int i;
+  NoroCacheNode* parent=&root;
+  for(i=1;i<pVariables;i++){
+    parent=parent->getBranch(p_GetExp(term,i,currRing));
+    if (!(parent)){
+      succ=FALSE;
+      return NULL;
+    }
+  }
+  DataNoroCacheNode<number_type>* res_holder=(DataNoroCacheNode<number_type>*) parent->getBranch(p_GetExp(term,i,currRing));
+  if (res_holder){
+    succ=TRUE;
+    if ((res_holder->value_len==backLinkCode)){
+      len=1;
+      return term;
+    }
+    len=res_holder->value_len;
+    return res_holder->value_poly;
+  } else {
+    succ=FALSE;
+    return NULL;
+  }
 }
 #endif
 
