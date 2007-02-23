@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.9 2007-02-16 11:05:54 motsak Exp $
+ *  Version: $Id: sca.cc,v 1.10 2007-02-23 14:41:43 motsak Exp $
  *******************************************************************/
 
 // #define PDEBUG 2
@@ -1372,7 +1372,12 @@ bool sca_SetupQuotient(ring rGR, const ring rG)
   //////////////////////////////////////////////////////////////////////////
   ideal tempQ = id_KillSquares(idQuotient, iAltVarStart, iAltVarEnd, rG); // in rG!!!
 
-  rGR->nc->SCAQuotient() = idrMoveR(tempQ, rG, rGR); // deletes tempQ!
+  idSkipZeroes( tempQ );
+  
+  if( idIs0(tempQ) )
+    rGR->nc->SCAQuotient() = NULL;
+  else
+    rGR->nc->SCAQuotient() = idrMoveR(tempQ, rG, rGR); // deletes tempQ!
 
   ncRingType( rGR, nc_exterior );
 
