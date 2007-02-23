@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.439 2007-02-14 13:43:28 Singular Exp $ */
+/* $Id: iparith.cc,v 1.440 2007-02-23 17:13:13 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -517,7 +517,8 @@ static BOOLEAN jjCOMPARE_IV(leftv res, leftv u, leftv v)
       break;
   }
   jjEQUAL_REST(res,u,v);
-  return r==-2;
+  if(r==-2) { WerrorS("size incompatible"); return TRUE; }
+  return FALSE;
 }
 static BOOLEAN jjCOMPARE_IV_I(leftv res, leftv u, leftv v)
 {
