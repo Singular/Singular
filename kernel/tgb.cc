@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.147 2007-02-22 14:46:49 bricken Exp $ */
+/* $Id: tgb.cc,v 1.148 2007-02-23 08:34:40 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2523,7 +2523,7 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
   NoroCache cache;
 
   SparseRow** srows=(SparseRow**) omalloc(pn*sizeof(SparseRow*));
-
+  int non_zeros=0;
   for(j=0;j<pn;j++){
    
     poly h=p[j];
@@ -2532,8 +2532,8 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
     //number coef;
 
 
-    srows[j]=noro_red_to_non_poly(h,h_len,&cache,c);
-
+    srows[non_zeros]=noro_red_to_non_poly(h,h_len,&cache,c);
+    if (srows[non_zeros]!=NULL) non_zeros++;
   }
   std::vector<DataNoroCacheNode*> irr_nodes;
   cache.collectIrreducibleMonomials(irr_nodes);
@@ -2568,7 +2568,7 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
 
   //if (TEST_OPT_PROT)
   //  Print("Evaluate Rows \n");
-
+  pn=non_zeros;
   number_type* number_array=(number_type*) omalloc(n*pn*sizeof(number_type));
   memset(number_array,0,sizeof(number_type)*n*pn);
   number zero=npInit(0);
@@ -2581,12 +2581,13 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
     }*/
 
     SparseRow* srow=srows[j];
+    if (srow){
     for(i=0;i<srow->len;i++){
       int idx=old_to_new_indices[srow->idx_array[i]];
       row[idx]=F4mat_to_number_type(srow->coef_array[i]);
     }
     delete srow;
-
+    }
   }
   
   static int export_n=0;

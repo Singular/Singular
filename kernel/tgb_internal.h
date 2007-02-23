@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.57 2007-02-22 14:46:50 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.58 2007-02-23 08:34:40 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -582,6 +582,15 @@ public:
     nIrreducibleMonomials=0;
     nReducibleMonomials=0;
     temp_term=pOne();
+    tempBufferSize=3000;
+    tempBuffer=omalloc(tempBufferSize);
+  }
+  void ensureTempBufferSize(size_t size){
+    if (tempBufferSize<size){
+      tempBufferSize=2*size;
+      omfree(tempBuffer);
+      tempBuffer=omalloc(tempBufferSize);
+    }
   }
 #ifdef NORO_RED_ARRAY_RESERVER
   poly* reserve(int n){
@@ -603,10 +612,13 @@ public:
 #ifdef NORO_RED_ARRAY_RESERVER
     omfree(recursionPolyBuffer);
 #endif
+   omfree(tempBuffer);
   }
   
   int nIrreducibleMonomials;
   int nReducibleMonomials;
+  void* tempBuffer;
+  size_t tempBufferSize;
 protected:
   DataNoroCacheNode* treeInsert(poly term,poly nf,int len){
     int i;
@@ -678,9 +690,11 @@ template<class storage_type> SparseRow* noro_red_to_non_poly_t(poly p, int &len,
   assume(i==len);
   len=i;
   //in the loop before nIrreducibleMonomials increases, so position here is important
-  storage_type* temp_array=(storage_type*) omalloc(cache->nIrreducibleMonomials*sizeof(storage_type));
+  size_t temp_size_bytes=cache->nIrreducibleMonomials*sizeof(storage_type);
+  cache->ensureTempBufferSize(temp_size_bytes);
+  storage_type* temp_array=(storage_type*) cache->tempBuffer;//omalloc(cache->nIrreducibleMonomials*sizeof(storage_type));
   int temp_size=cache->nIrreducibleMonomials;
-  memset(temp_array,0,sizeof(storage_type)*cache->nIrreducibleMonomials);
+  memset(temp_array,0,temp_size_bytes);
   for(i=0;i<len;i++){
     MonRedResNP red=mon[i];
     if ((red.ref)){
@@ -714,9 +728,16 @@ template<class storage_type> SparseRow* noro_red_to_non_poly_t(poly p, int &len,
   }
   int non_zeros=0;
   for(i=0;i<cache->nIrreducibleMonomials;i++){
-    if (!(temp_array[i]==0)){
-      non_zeros++;
-    }
+    //if (!(temp_array[i]==0)){
+    //  non_zeros++;
+    //}
+    assume(((temp_array[i]!=0)==0)|| (((temp_array[i]!=0)==1)));
+    non_zeros+=(temp_array[i]!=0);
+  }
+  
+  if (non_zeros==0){
+    omfree(mon);
+    return NULL;
   }
   SparseRow* res=new SparseRow(non_zeros);
   int pos=0;
@@ -726,11 +747,13 @@ template<class storage_type> SparseRow* noro_red_to_non_poly_t(poly p, int &len,
       res->idx_array[pos]=i;
       res->coef_array[pos]=(number) temp_array[i];
 
-      pos++;  
+      pos++;
+      non_zeros--;
+      if (non_zeros==0) break;
     }
     
   }
-  omfree(temp_array);
+  //omfree(temp_array);
 
   omfree(mon);
   return res;
