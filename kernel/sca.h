@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sca.h,v 1.8 2007-02-16 11:05:54 motsak Exp $ */
+/* $Id: sca.h,v 1.9 2007-02-23 14:39:41 motsak Exp $ */
 
 #include <ring.h>
 #include <gring.h>
@@ -21,6 +21,23 @@ inline bool rIsSCA(const ring r)
   return false;
 #endif
 }
+
+
+// we must always have this test!
+inline ideal SCAQuotient(const ring r)
+{
+  if( !rIsSCA(r) ) 
+    return currQuotient;
+
+  // SCA!
+#ifdef HAVE_PLURAL
+  return r->nc->SCAQuotient();
+#else
+  // for sainity
+  return NULL;
+#endif
+}
+
 
 #ifdef HAVE_PLURAL
 #include <gring.h>
