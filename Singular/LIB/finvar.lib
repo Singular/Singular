@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.64 2007-02-21 13:39:21 king Exp $"
+version="$Id: finvar.lib,v 1.65 2007-02-24 15:08:04 Singular Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -4768,8 +4768,8 @@ EXAMPLE:  example secondary_char0; shows an example
                 else
                 { ISSort[i-1] = ideal(B[j]);
                 }
-                if (v) 
-                { "    We found", irrcounter,"of", NrIS ,"irr. sec. inv. in degree ",i-1; 
+                if (v)
+                { "    We found", irrcounter,"of", NrIS ,"irr. sec. inv. in degree ",i-1;
                 }
                 Reductor = ideal(helpP);
                 attrib(Reductor, "isSB",1);
@@ -4787,7 +4787,7 @@ EXAMPLE:  example secondary_char0; shows an example
         }  // if i>IrrSwitch
         else  // use fast algorithm
         { B=sort_of_invariant_basis(sP_Reductor,REY,i-1,int(dimmat[i,1])*6);
-                                       // B contains 
+                                       // B contains
                                        // images of kbase(sP,i-1) under the
                                        // Reynolds operator that are linearly
                                        // independent
@@ -4824,8 +4824,8 @@ EXAMPLE:  example secondary_char0; shows an example
                 else
                 { ISSort[i-1] = ideal(B[j]);
                 }
-                if (v) 
-                { "    We found", irrcounter,"of", NrIS,"irr. sec. inv. in degree ",i-1; 
+                if (v)
+                { "    We found", irrcounter,"of", NrIS,"irr. sec. inv. in degree ",i-1;
                 }
                 Reductor = ideal(helpP);
                 attrib(Reductor, "isSB",1);
@@ -4899,7 +4899,7 @@ proc irred_secondary_char0 (matrix P, matrix REY, matrix M, list #)
 @*          v: an optional <int>;
 @*          \"PP\": if this string occurs as (optional) parameter, then in
                all degrees power products of irr. sec. inv. will be computed.
-RETURN:   Irreducible homogeneous secondary invariants of the invariant ring 
+RETURN:   Irreducible homogeneous secondary invariants of the invariant ring
           (type <matrix>)
 ASSUME:   We are in the non-modular case, i.e., the characteristic of the basering
           does not divide the group order;
@@ -4914,13 +4914,13 @@ THEORY:   The secondary invariants are calculated by finding a basis (in terms
           or their power products we pick a maximal subset that is linearly
           independent modulo the primary invariants using Groebner basis techniques
           (see paper \"Fast Computation of Secondary Invariants\" by S. King).
-          The size of this set can be read off from the Molien series. Here, only 
-          irreducible secondary invariants are explicitly computed, which saves time and 
+          The size of this set can be read off from the Molien series. Here, only
+          irreducible secondary invariants are explicitly computed, which saves time and
           memory.
 @*        Moreover, if no irr. sec. inv. in degree d-1 have been found and unless the last
-          optional paramter \"PP\" is used, a Groebner basis of primary invariants and 
-          irreducible secondary invariants up to degree d-2 is computed, which allows to 
-          detect irr. sec. inv. in degree d without computing power products. 
+          optional paramter \"PP\" is used, a Groebner basis of primary invariants and
+          irreducible secondary invariants up to degree d-2 is computed, which allows to
+          detect irr. sec. inv. in degree d without computing power products.
 @*        There are three internal parameters \"pieces\", \"MonStep\" and \"IrrSwitch\".
           The default values of the parameters should be fine in most cases. However,
           in some cases, different values may provide a better balance of memory
@@ -4936,9 +4936,9 @@ EXAMPLE:  example irred_secondary_char0; shows an example
   int MonStep = 15;  // The Reynolds operator is applied to blocks of #MonStep# monomials.
                      // If this parameter is small, the memory consumption will decrease.
   int IrrSwitch = 7; // Up to degree #IrrSwitch#-1, or if there are few monomials in kbase(sP,i-1),
-                     // we use a method for generating irreducible secondaries that tends to 
-                     // produce a smaller output (which is good for subsequent computations). 
-                     // However, this method needs to much memory in high degrees, and so we 
+                     // we use a method for generating irreducible secondaries that tends to
+                     // produce a smaller output (which is good for subsequent computations).
+                     // However, this method needs to much memory in high degrees, and so we
                      // use a sparser method from degree #IrrSwitch# upwards.
   def br=basering;
  //----------------- checking input and setting verbose mode ------------------
@@ -5009,7 +5009,7 @@ EXAMPLE:  example irred_secondary_char0; shows an example
                                        // secondary invariants, we need to find
                                        // of a certain degree -
   m=nrows(dimmat);                     // m-1 is the highest degree
-  if (v) 
+  if (v)
   { "There are";
     for (j=1;j<=m;j++)
      { if (int(dimmat[j,1])<>1)
@@ -5068,8 +5068,8 @@ EXAMPLE:  example irred_secondary_char0; shows an example
   for (i=2;i<=m;i++)                   // going through dimmat -
   { if ((LastNewIS == i-3) and (UsePP==0))  // We guess that all irreducibles have been found!
     { if (v) {"Computing Groebner basis for primaries and previously found irreducibles...";}
-      TotalReductor = groebner(sP+IS); 
-      TotalSet = 1; 
+      TotalReductor = groebner(sP+IS);
+      TotalSet = 1;
     }
     if (int(dimmat[i,1])<>0)           // when it is == 0 we need to find no
     {                                  // elements in the current degree (i-1)
@@ -5155,7 +5155,7 @@ EXAMPLE:  example irred_secondary_char0; shows an example
                         // of degree i-1.
                     attrib(RedSSort[i-1][k],"size",saveAttr);
                     if (v)
-                    { 
+                    {
                       "    We found reducible sec. inv. number "+string(counter);
                     }
                     if (int(dimmat[i,1])<>counter)
@@ -5186,13 +5186,13 @@ EXAMPLE:  example irred_secondary_char0; shows an example
         }
       }
     } // if TotalSet==0
-    else 
+    else
     { if (v) {"  We don't compute Power Products!"; }
 // Instead of computing Power Products, we can compute a Groebner basis of the ideal
 // generated by the primary and previously found irr. sec. invariants up to degree i-2. An invariant
 // polynomial of degree i-1 belongs to this ideal if and only if it belongs to the sub-algebra
 // generated by primary and irreducible secondary invariants up to degree i-2.
-// Hence, if we find an invariant outside this ideal, it is an irreducible secondary 
+// Hence, if we find an invariant outside this ideal, it is an irreducible secondary
 // invariant of degree i-1.
 }
       // The remaining sec. inv. are irreducible!
@@ -5230,7 +5230,7 @@ EXAMPLE:  example irred_secondary_char0; shows an example
               j=0;                         // j goes through all of mon -
 // Compare the comments on the computation of reducible sec. inv.!
               while (j < ii) // we will break the loop if counter==int(dimmat[i,1])
-              { if ((j mod MonStep) == 0) 
+              { if ((j mod MonStep) == 0)
                 { if ((j+MonStep) <= ii)
                   { ideal tmp = normalize(evaluate_reynolds(REY,ideal(mon[j+1..j+MonStep])));
                     B[j+1..j+MonStep] = tmp[1..MonStep];
@@ -5259,7 +5259,7 @@ EXAMPLE:  example irred_secondary_char0; shows an example
                     Indicator[j+1..ii] = tmp[1..ii-j];
                     kill tmp;
                   }
-                } 
+                }
                 j++;
                 helpP = Indicator[j];
                 if (helpP <>0)                     // B[j] should be added
@@ -5302,10 +5302,10 @@ EXAMPLE:  example irred_secondary_char0; shows an example
             else
             { B=sort_of_invariant_basis(TotalReductor,REY,i-1,int(dimmat[i,1])*6);
             }
-                                       // B is a linearly independent set of reynolds  
+                                       // B is a linearly independent set of reynolds
                                        // images of monomials that do not occur
                                        // as leading monomials of the ideal spanned
-                                       // by primary and previously found irreducible 
+                                       // by primary and previously found irreducible
                                        // secondary invariants.
             if (TotalSet==0 && ncols(B)+counter==int(dimmat[i,1])) // then we can take all of B
             { IS=IS+B;
@@ -5322,7 +5322,7 @@ EXAMPLE:  example irred_secondary_char0; shows an example
             }
             else
             { irrcounter=0;
-              j=0;                         // j goes through all of B 
+              j=0;                         // j goes through all of B
 // Compare the comments on the computation of reducible sec. inv.!
               ReducedCandidates = reduce(B,sP);
               Indicator = reduce(ReducedCandidates,SaveRed);
@@ -5959,8 +5959,8 @@ EXAMPLE:  example secondary_charp; shows an example
                 else
                 { ISSort[i-1] = ideal(B[j]);
                 }
-                if (v) 
-                { "    We found", irrcounter,"of", NrIS ,"irr. sec. inv. in degree ",i-1; 
+                if (v)
+                { "    We found", irrcounter,"of", NrIS ,"irr. sec. inv. in degree ",i-1;
                 }
                 Reductor = ideal(helpP);
                 attrib(Reductor, "isSB",1);
@@ -6015,8 +6015,8 @@ EXAMPLE:  example secondary_charp; shows an example
                 else
                 { ISSort[i-1] = ideal(B[j]);
                 }
-                if (v) 
-                { "    We found", irrcounter,"of", NrIS ,"irr. sec. inv. in degree ",i-1; 
+                if (v)
+                { "    We found", irrcounter,"of", NrIS ,"irr. sec. inv. in degree ",i-1;
                 }
                 Reductor = ideal(helpP);
                 attrib(Reductor, "isSB",1);
@@ -6098,9 +6098,9 @@ THEORY:   Secondary invariants are calculated by finding a basis (in terms of
           we are in the non-modular case. Therefore, the invariant ring is Cohen-Macaulay,
           hence the number of secondary invariants is the product of the degrees of
           primary invariants divided by the group order.
-          <secondary_and_irreducible_no_molien> should usually be faster and of more useful
+          <secondary_and_irreducibles_no_molien> should usually be faster and of more useful
           functionality.
-SEE ALSO: secondary_and_irreducible_no_molien
+SEE ALSO: secondary_and_irreducibles_no_molien
 EXAMPLE:  example secondary_no_molien; shows an example
 "
 { int MonStep = 15;  // The Reynolds operator is applied to blocks of #MonStep# monomials.
@@ -6758,9 +6758,9 @@ RETURN:  Irreducible secondary invariants of the invariant ring (type <matrix>)
 DISPLAY: information if v does not equal 0
 THEORY:  Irred. secondary invariants are calculated by finding a basis (in terms of
          monomials) of the basering modulo primary and previously found secondary
-         invariants, mapping those to invariants with the Reynolds operator. Among 
-         these images we pick a maximal subset that is linearly independent modulo 
-         the primary and previously found secondary invariants, using Groebner basis 
+         invariants, mapping those to invariants with the Reynolds operator. Among
+         these images we pick a maximal subset that is linearly independent modulo
+         the primary and previously found secondary invariants, using Groebner basis
          techniques.
 EXAMPLE: example irred_secondary_no_molien; shows an example
 "
@@ -6814,7 +6814,7 @@ EXAMPLE: example irred_secondary_no_molien; shows an example
     "         invariants."
     return();
   }
-  if (ncols(REY)<>n) 
+  if (ncols(REY)<>n)
   { "ERROR:   The second parameter ought to be the Reynolds operator.";
     return();
   }
@@ -6837,13 +6837,13 @@ EXAMPLE: example irred_secondary_no_molien; shows an example
   int dgb = degBound;
   degBound = 0;
   int d,block, counter, totalcount, monsize,i,j, fin,hlp;
-  poly helpP,lmp; 
+  poly helpP,lmp;
   block = 1;
   ideal mon, MON, Inv, IS,RedInv, NewIS, NewReductor;
   int NewIScounter;
   ideal sP = slimgb(ideal(P));
   int Max = vdim(sP);
-  if (Max<0) 
+  if (Max<0)
   { "ERROR:   The second parameter ought to be the Reynolds operator.";
     return();
   }
@@ -6863,7 +6863,7 @@ EXAMPLE: example irred_secondary_no_molien; shows an example
         if (v) { "  We have "+string(monsize)+" candidates for irred. secondaries";}
         block=0; // Loops through the monomials
         while (block<monsize)
-        { if ((block mod MonStep) == 0) 
+        { if ((block mod MonStep) == 0)
           { if ((block+MonStep) <= monsize)
             { ideal tmp = normalize(evaluate_reynolds(REY,ideal(mon[block+1..block+MonStep])));
               Inv[block+1..block+MonStep] = tmp[1..MonStep];
@@ -6878,7 +6878,7 @@ EXAMPLE: example irred_secondary_no_molien; shows an example
               RedInv[block+1..monsize] = tmp[1..monsize-block];
               kill tmp;
             }
-          } 
+          }
           block++;
           helpP = RedInv[block];
           if (helpP<>0)
@@ -6890,7 +6890,7 @@ EXAMPLE: example irred_secondary_no_molien; shows an example
             NewIScounter++;
             NewIS[NewIScounter] = helpP;
             mon[block]=0;
-            Inv[block]=0; 
+            Inv[block]=0;
             RedInv[block]=0;
             NewReductor[1]=helpP;
             attrib(NewReductor,"isSB",1);
@@ -6903,18 +6903,18 @@ EXAMPLE: example irred_secondary_no_molien; shows an example
         { if (fin==0)
           { degBound = 0;
             sIS = groebner(sIS);
-            fin=1;  
+            fin=1;
           }
         }
         else
         { degBound = d+1;
-          sIS = groebner(sIS+NewIS);  
+          sIS = groebner(sIS+NewIS);
           degBound = 0;
           fin = 0;
         }
       }
       attrib(sIS,"isSB",1);
-    } // if degree d is not excluded by deg_vec 
+    } // if degree d is not excluded by deg_vec
     else
     { if (size(deg_vec)==l)
       { l=1;
@@ -7962,19 +7962,19 @@ proc orbit_sums (ideal mon, list M)
           Per is a list of ideals providing a permutation of the ring variables.
 ASSUME:   mon contains at least the minimal monomial in each orbit sum of degree d
           under the permutation group given by Per.
-RETURN:   an <ideal> whose generators are the orbit sums of degree d under the permutation 
+RETURN:   an <ideal> whose generators are the orbit sums of degree d under the permutation
           group given by Per.
 SEE ALSO: invariant_algebra_perm
 KEYWORDS: orbit sum
 EXAMPLE: example orbit_sums; shows an example
 "
-{ 
+{
 //----------------- checking input ------------------
   mon=simplify(mon,2); // remove 0
   if (not homog(sum(mon)))
   { "ERROR: Monomials in the first parameter must be of the same degree.";
     return();
-  } 
+  }
   int k,k2;
   for (k=1;k<=ncols(mon);k++)
   { if (leadmonom(mon[k])!=mon[k])
@@ -7988,7 +7988,7 @@ EXAMPLE: example orbit_sums; shows an example
       "       permutation of the ring variables.";
       return();
     }
-    if ((ncols(M[k2])!=nvars(basering))     
+    if ((ncols(M[k2])!=nvars(basering))
      or (ncols(M[k2])!=ncols(simplify(M[k2],6)))
      or (M[k2][1]==0))
     { "ERROR: The second parameter must be a list of ideals providing a ";
@@ -8028,12 +8028,12 @@ EXAMPLE: example orbit_sums; shows an example
     for (k=1;k<=ncols(mon);k++)
     { if ( mon[k]!=0)
       { if (tmpI[k] < mon[k])
-        { 
+        {
           mon[k]=0;
         }
         else
         { if (tmpI[k]>mon[k])
-          { 
+          {
             mon=NF(mon,std(tmpI[k]));
           }
         }
@@ -8051,7 +8051,7 @@ EXAMPLE: example orbit_sums; shows an example
   newL=L;
   poly tmp;
   int GenOK, j,i;
-  poly OrbitS=mon[1];  
+  poly OrbitS=mon[1];
   mon[1]=0;
   int countOrbits;
   ideal AllOrbits;
@@ -8072,8 +8072,8 @@ EXAMPLE: example orbit_sums; shows an example
         }
         newL[k] = simplify(NF(newL[k],L[k]),2);
         attrib(newL[k],"isSB",1);
-        if (newL[k][1] != 0)  // i.e., the Orbit is not complete under all generators yet 
-        { GenOK=-1;    
+        if (newL[k][1] != 0)  // i.e., the Orbit is not complete under all generators yet
+        { GenOK=-1;
           L[k] = L[k],newL[k];
           attrib(L[k],"isSB",1);
           // fuse orbits:
@@ -8098,7 +8098,7 @@ EXAMPLE: example orbit_sums; shows an example
     } // loop through partial orbits
     if (GenOK == 0)  // i.e., all orbits are complete, so we can break the iteration
     { break;
-    } 
+    }
   } // iterate
   degBound = dgb;
   return(AllOrbits);
@@ -8111,19 +8111,19 @@ example
          ideal orb=orbit_sums(kbase(std(0),2),Per);
          orb;
 }
- 
+
 ///////////////////////////////////////////////////////////////////////////////
 
 proc invariant_algebra_perm (list #)
 "USAGE:    invariant_algebra_perm(GEN[,v]);
-@*        GEN: a list of generators of a permutation group. It is given in disjoint cycle 
-          form, where trivial cycles can be omitted; e.g., the generator (1,2)(3,4)(5) is 
+@*        GEN: a list of generators of a permutation group. It is given in disjoint cycle
+          form, where trivial cycles can be omitted; e.g., the generator (1,2)(3,4)(5) is
           given by <list(list(1,2),list(3,4))>.
 @*        v: an optional <int>
 RETURN:   A minimal homogeneous generating set of the invariant ring of the group presented
           by GEN, type <matrix>
 ASSUME:   We are in the non-modular case, i.e., the characteristic of the basering
-          does not divide the group order. Note that the function does not verify whether 
+          does not divide the group order. Note that the function does not verify whether
           the assumption holds or not
 DISPLAY:  Information on the progress of computations if v does not equal 0
 THEORY:   We do an incremental search in increasing degree d. Generators of the invariant
@@ -8133,7 +8133,7 @@ SEE ALSO: invariant_algebra_reynolds
 KEYWORDS: invariant ring minimal generating set permutation group
 EXAMPLE:  example invariant_algebra_perm; shows an example
 "
-{ 
+{
 //----------------- checking input and setting verbose mode ------------------
   if (size(#)==0)
   { "ERROR: There are no parameters given.";
@@ -8191,7 +8191,7 @@ EXAMPLE:  example invariant_algebra_perm; shows an example
   int counter, totalcount, OrbSize,
       NextCand, sGoffset, fin,MaxD,LastGDeg;
   ideal OrbSums, RedSums, NewReductor;
-  poly helpP,lmp; 
+  poly helpP,lmp;
 
 
 // Transform the matrices generating the group into ring maps
@@ -8215,25 +8215,25 @@ EXAMPLE:  example invariant_algebra_perm; shows an example
   int d=1;
   while ((fin==0) or (d<=MaxD))
   { if (v)
-    { "Searching generators in degree",d; 
+    { "Searching generators in degree",d;
     }
     counter = 0; // counts generators in degree d
     OrbSums = orbit_sums(kbase(sG,d),M);
     RedSums = reduce(OrbSums,sG);
     sGoffset=ncols(sG);
     OrbSize = ncols(OrbSums);
-    if (v) 
+    if (v)
     { "  We have "+string(OrbSize)+" orbit sums of degree "+string(d);
     }
 // loop through orbit_sum, and select generators among them
-    for (i=1;i<=OrbSize;i++)  
+    for (i=1;i<=OrbSize;i++)
     { helpP = RedSums[i];
       if (helpP<>0)
       { counter++; // found new inv. algebra generator!
         totalcount++;
-        if (v) 
+        if (v)
         { "    We found generator number "+string(totalcount)+
-          " in degree "+string(d); 
+          " in degree "+string(d);
         }
         G[totalcount] = OrbSums[i];
         sG[sGoffset+counter] = helpP;
@@ -8255,7 +8255,7 @@ EXAMPLE:  example invariant_algebra_perm; shows an example
     if (LastGDeg==d-2)
     { degBound=0;
       if (v) {"Presumably all generators have been found";}
-      sG = groebner(sG); 
+      sG = groebner(sG);
       fin = 0;
     }
     if (LastGDeg==d-1)
@@ -8267,7 +8267,7 @@ EXAMPLE:  example invariant_algebra_perm; shows an example
     }
     if ((fin==0) and (dim(sG)==0))
     { MaxD = maxdeg1(kbase(sG));
-      if (v) 
+      if (v)
       { if (MaxD>=d) {"We found the degree bound",MaxD; }
         else {"We found the degree bound",d-1;}
       }
@@ -8276,7 +8276,7 @@ EXAMPLE:  example invariant_algebra_perm; shows an example
         break;
       }
       fin = 1;
-    } // computing degree bound  
+    } // computing degree bound
   } // for increasing degrees
   kill sG;
   degBound=dgb;
@@ -8294,7 +8294,7 @@ example
 
 proc invariant_algebra_reynolds (matrix REY, list #)
 "USAGE:    invariant_algebra_reynolds(REY[,v]);
-@*        REY: a gxn <matrix> representing the Reynolds operator of a finite matrix group, 
+@*        REY: a gxn <matrix> representing the Reynolds operator of a finite matrix group,
                where g ist the group order and n is the number of variables of the basering;
 @*        v: an optional <int>
 RETURN:   A minimal homogeneous generating set of the invariant ring, type <matrix>
@@ -8304,7 +8304,7 @@ ASSUME:   We are in the non-modular case, i.e., the characteristic of the baseri
           the second one of primary_invariants()
 DISPLAY:  Information on the progress of computations if v does not equal 0
 THEORY:   We do an incremental search in increasing degree d. Generators of the invariant
-          ring are found among the Reynolds images of monomials of degree d. The generators are 
+          ring are found among the Reynolds images of monomials of degree d. The generators are
           chosen by Groebner basis techniques.
 SEE ALSO: invariant_algebra_perm
 KEYWORDS: invariant ring minimal generating set matrix group
@@ -8317,7 +8317,7 @@ EXAMPLE:  example invariant_algebra_reynolds; shows an example
   degBound = 0;
   int block, counter, totalcount, monsize,i,j,
       sGoffset, fin,MaxD,LastGDeg;
-  poly helpP,lmp; 
+  poly helpP,lmp;
   block = 1;
   ideal mon, MON, Inv, G;  // G will contain homog. alg.generators
   ideal RedInv, NewG, NewReductor;
@@ -8338,7 +8338,7 @@ EXAMPLE:  example invariant_algebra_reynolds; shows an example
      " relevant monomials in degree "+string(d);}
       block=0; // Loops through the monomials
       while (block<monsize)
-      { if ((block mod MonStep) == 0) 
+      { if ((block mod MonStep) == 0)
         { if ((block+MonStep) <= monsize)
           { ideal tmp = normalize(evaluate_reynolds(REY,ideal(mon[block+1..block+MonStep])));
             Inv[block+1..block+MonStep] = tmp[1..MonStep];
@@ -8353,7 +8353,7 @@ EXAMPLE:  example invariant_algebra_reynolds; shows an example
             RedInv[block+1..monsize] = tmp[1..monsize-block];
             kill tmp;
           }
-        } 
+        }
         block++;
         helpP = RedInv[block];
         if (helpP<>0)
@@ -8366,7 +8366,7 @@ EXAMPLE:  example invariant_algebra_reynolds; shows an example
           NewGcounter++;
           NewG[NewGcounter] = helpP;
           mon[block]=0;
-          Inv[block]=0; 
+          Inv[block]=0;
           RedInv[block]=0;
           NewReductor[1]=helpP;
           attrib(NewReductor,"isSB",1);
@@ -8386,7 +8386,7 @@ EXAMPLE:  example invariant_algebra_reynolds; shows an example
     if (LastGDeg==d-2)
     { degBound=0;
       if (v) {"Presumably all generators have been found";}
-      sG = groebner(sG); 
+      sG = groebner(sG);
       fin = 0;
     }
     if (LastGDeg==d-1)
@@ -8398,7 +8398,7 @@ EXAMPLE:  example invariant_algebra_reynolds; shows an example
     }
     if ((fin==0) and (dim(sG)==0))
     { MaxD = maxdeg1(kbase(sG));
-      if (v) 
+      if (v)
       { if (MaxD>=d) {"We found the degree bound",MaxD; }
         else {"We found the degree bound",d-1;}
       }
@@ -8407,7 +8407,7 @@ EXAMPLE:  example invariant_algebra_reynolds; shows an example
         break;
       }
       fin = 1;
-    } // computing degree bound  
+    } // computing degree bound
   } // for increasing degrees
   kill sG;
   degBound=dgb;
