@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: reszeta.lib,v 1.10 2007-02-01 18:39:17 krueger Exp $";
+version="$Id: reszeta.lib,v 1.11 2007-02-24 15:15:26 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  reszeta.lib       Zeta-function of Denef and Loeser
@@ -1757,7 +1757,7 @@ COMPUTE:  local Denef-Loeser zeta function, if string s1 is present and
              characteristic polynomial of the monodromy is computed
 RETURN:   list l
           if a is not present:
-          l[1]: string specifying the Denef-Loeser zeta function 
+          l[1]: string specifying the Denef-Loeser zeta function
           l[2]: string specifying characteristic polynomial of monodromy,
                 if "A" was specified
           if a is present
@@ -4891,7 +4891,7 @@ proc fetchInTree(list L,
       list notE;
       intvec nE;
       idlist[1]=list(id1,id2,nE);
-   }        
+   }
    if(defined(tli)){kill tli;}
    list tli;
    if(defined(id1)) { kill id1; }
@@ -4923,7 +4923,7 @@ proc fetchInTree(list L,
 //--- we are in an algebraic extension of the base field
                 if(defined(prtemp)){kill prtemp;}
                 list prtemp=minAssGTZ(BO[4][i]);  // C-comp. of except. div.
-                j=1;                   
+                j=1;
                 if(size(prtemp)>1)
                 {
 //--- more than 1 component
@@ -4950,7 +4950,7 @@ proc fetchInTree(list L,
                   prtemp=delete(prtemp,size(prtemp));
                 }
              }
-//--- determine tli[1] and tli[2] such that 
+//--- determine tli[1] and tli[2] such that
 //--- V(id1) \cap D(id2) = V(tli[1]) \cap D(tli[2]) \cap BO[4][i]
 //--- inside V(BO[1]) (and if necessary inside V(BO[1]+BO[2]))
              if(inJ)
@@ -5085,7 +5085,7 @@ proc fetchInTree(list L,
             }
             if(size(id2)==0)
             {
-//--- preimage of (principal ideal) id2 was zero, i.e. 
+//--- preimage of (principal ideal) id2 was zero, i.e.
 //--- generator of previous id2 not in image
               setring S;
 //--- it might just be one offending factor ==> factorize
@@ -5183,7 +5183,7 @@ proc fetchInTree(list L,
                         }
                      }
                      if(defined(tli)) {kill tli;}
-//--- determine tli[1] and tli[2] such that 
+//--- determine tli[1] and tli[2] such that
 //--- V(id1) \cap D(id2) = V(tli[1]) \cap D(tli[2]) \cap BO[4][i]
 //--- inside V(BO[1]) (and if necessary inside V(BO[1]+BO[2]))
                      if(inJ)
@@ -5293,7 +5293,7 @@ proc fetchInTree(list L,
    i=1;
    while(i<size(path_togo))
    {
-//--- we need to blow up following the path path_togo through the tree 
+//--- we need to blow up following the path path_togo through the tree
       def S=basering;
       if(defined(T)){kill T;}
       if(size(algext)>0)
