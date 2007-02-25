@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.62 2007-02-25 06:09:43 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.63 2007-02-25 09:40:24 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -761,7 +761,9 @@ poly tree_add(poly* a,int begin, int end,ring r){
 
 template<class number_type> SparseRow<number_type>* convert_to_sparse_row(number_type* temp_array,int temp_size,int non_zeros){
 SparseRow<number_type>* res=new SparseRow<number_type>(non_zeros);
-int pos=0;
+//int pos=0;
+number_type* it_coef=res->coef_array;
+int* it_idx=res->idx_array;
 #if 0
 for(i=0;i<cache->nIrreducibleMonomials;i++){
   if (!(0==temp_array[i])){
@@ -796,16 +798,18 @@ while(it!=end){
     int small_i;
     const int temp_index=((number_type*)((void*) it))-temp_array;
     const int bound=temp_index+multiple;
+    number_type c;
     for(small_i=temp_index;small_i<bound;small_i++){
-      if(temp_array[small_i]!=0){
-        res->idx_array[pos]=small_i;
-        res->coef_array[pos]=temp_array[small_i];
-
-        pos++;
+      if((c=temp_array[small_i])!=0){
+        //res->idx_array[pos]=small_i;
+        //res->coef_array[pos]=temp_array[small_i];
+        (*(it_idx++))=small_i;
+        (*(it_coef++))=c;
+        //pos++;
         non_zeros--;
         
       }
-      if (non_zeros==0) break;
+      if UNLIKELY(non_zeros==0) break;
     }
     
   }
@@ -814,7 +818,16 @@ while(it!=end){
 #endif
 return res;
 }
-
+template <class number_type> void add_coef_times_sparse(number_type* temp_array,int temp_size,SparseRow<number_type>* row, number coef){
+  int j;
+  for(j=0;j<row->len;j++){
+    int idx=row->idx_array[j];
+    assume(!(npIsZero(coef)));
+    assume(!(npIsZero((number) row->coef_array[j])));
+    temp_array[idx]=F4mat_to_number_type(npAddM((number) temp_array[idx],npMultM((number) row->coef_array[j],coef)));
+    assume(idx<temp_size);
+  }
+}
 template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly p, int &len, NoroCache<number_type>* cache,slimgb_alg* c){
   assume(len==pLength(p));
   poly orig_p=p;
@@ -859,13 +872,11 @@ template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly
         number coef=red.coef;
         int j;
         if (!((coef==(number) 1)||(coef==minus_one))){
-        for(j=0;j<row->len;j++){
-          int idx=row->idx_array[j];
-          assume(!(npIsZero(coef)));
-          assume(!(npIsZero((number) row->coef_array[j])));
-          temp_array[idx]=F4mat_to_number_type(npAddM((number) temp_array[idx],npMultM((number) row->coef_array[j],coef)));
-          assume(idx<temp_size);
-        }}else{
+          add_coef_times_sparse(temp_array,temp_size,row,coef);
+        
+        
+        
+        }else{
           if (coef==(number) 1){
           for(j=0;j<row->len;j++){
             int idx=row->idx_array[j];
