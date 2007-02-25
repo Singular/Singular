@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.61 2007-02-23 13:30:35 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.62 2007-02-25 06:09:43 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -19,6 +19,8 @@
 #include "stdlib.h"
 #include <modulop.h>
 //#define USE_NORO 1
+
+
 #ifdef USE_NORO
 #define NORO_CACHE 1
 #define NORO_SPARSE_ROWS_PRE 1
@@ -749,6 +751,70 @@ poly tree_add(poly* a,int begin, int end,ring r){
   }
 }
 */
+#ifdef __GNUC__
+#define LIKELY(expression) (__builtin_expect(!!(expression), 1))
+#define UNLIKELY(expression) (__builtin_expect(!!(expression), 0))
+#else
+#define LIKELY(expression) (expression)
+#define UNLIKELY(expression) (expression)
+#endif
+
+template<class number_type> SparseRow<number_type>* convert_to_sparse_row(number_type* temp_array,int temp_size,int non_zeros){
+SparseRow<number_type>* res=new SparseRow<number_type>(non_zeros);
+int pos=0;
+#if 0
+for(i=0;i<cache->nIrreducibleMonomials;i++){
+  if (!(0==temp_array[i])){
+  
+    res->idx_array[pos]=i;
+    res->coef_array[pos]=temp_array[i];
+
+    pos++;
+    non_zeros--;
+    if (non_zeros==0) break;
+  }
+  
+}
+#else
+int64* start=(int64*) ((void*)temp_array);
+int64* end;
+const int multiple=sizeof(int64)/sizeof(number_type);
+if (temp_size==0) end=start;
+
+else
+{ 
+  int temp_size_rounded=temp_size+(multiple-(temp_size%multiple));
+  assume(temp_size_rounded>=temp_size);
+  assume(temp_size_rounded%multiple==0);
+  assume(temp_size_rounded<temp_size+multiple);
+  number_type* nt_end=temp_array+temp_size_rounded;
+  end=(int64*)((void*)nt_end);
+}
+int64* it=start;
+while(it!=end){
+  if UNLIKELY((*it)!=0){
+    int small_i;
+    const int temp_index=((number_type*)((void*) it))-temp_array;
+    const int bound=temp_index+multiple;
+    for(small_i=temp_index;small_i<bound;small_i++){
+      if(temp_array[small_i]!=0){
+        res->idx_array[pos]=small_i;
+        res->coef_array[pos]=temp_array[small_i];
+
+        pos++;
+        non_zeros--;
+        
+      }
+      if (non_zeros==0) break;
+    }
+    
+  }
+  ++it;
+}
+#endif
+return res;
+}
+
 template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly p, int &len, NoroCache<number_type>* cache,slimgb_alg* c){
   assume(len==pLength(p));
   poly orig_p=p;
@@ -784,6 +850,7 @@ template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly
   number_type* temp_array=(number_type*) cache->tempBuffer;//omalloc(cache->nIrreducibleMonomials*sizeof(number_type));
   int temp_size=cache->nIrreducibleMonomials;
   memset(temp_array,0,temp_size_bytes);
+  number minus_one=npInit(-1);
   for(i=0;i<len;i++){
     MonRedResNP<number_type> red=mon[i];
     if ((red.ref)){
@@ -791,7 +858,7 @@ template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly
         SparseRow<number_type>* row=red.ref->row;
         number coef=red.coef;
         int j;
-        if (!(npIsOne(coef))){
+        if (!((coef==(number) 1)||(coef==minus_one))){
         for(j=0;j<row->len;j++){
           int idx=row->idx_array[j];
           assume(!(npIsZero(coef)));
@@ -799,11 +866,18 @@ template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly
           temp_array[idx]=F4mat_to_number_type(npAddM((number) temp_array[idx],npMultM((number) row->coef_array[j],coef)));
           assume(idx<temp_size);
         }}else{
+          if (coef==(number) 1){
           for(j=0;j<row->len;j++){
             int idx=row->idx_array[j];
             temp_array[idx]=F4mat_to_number_type(   npAddM((number) temp_array[idx],(number) row->coef_array[j]));
             assume(idx<temp_size);
           }
+          } else {
+            for(j=0;j<row->len;j++){
+            int idx=row->idx_array[j];
+            temp_array[idx]=F4mat_to_number_type(   npSubM((number) temp_array[idx],(number) row->coef_array[j]));
+            assume(idx<temp_size);
+          }}
         }
       }
       else{
@@ -828,58 +902,8 @@ template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly
     omfree(mon);
     return NULL;
   }
-  SparseRow<number_type>* res=new SparseRow<number_type>(non_zeros);
-  int pos=0;
-  #if 0
-  for(i=0;i<cache->nIrreducibleMonomials;i++){
-    if (!(0==temp_array[i])){
-    
-      res->idx_array[pos]=i;
-      res->coef_array[pos]=temp_array[i];
+  SparseRow<number_type>* res=convert_to_sparse_row(temp_array,temp_size, non_zeros);
 
-      pos++;
-      non_zeros--;
-      if (non_zeros==0) break;
-    }
-    
-  }
-  #else
-  int64* start=(int64*) ((void*)temp_array);
-  int64* end;
-  const int multiple=sizeof(int64)/sizeof(number_type);
-  if (temp_size==0) end=start;
-  
-  else
-  { 
-    int temp_size_rounded=temp_size+(multiple-(temp_size%multiple));
-    assume(temp_size_rounded>=temp_size);
-    assume(temp_size_rounded%multiple==0);
-    assume(temp_size_rounded<temp_size+multiple);
-    number_type* nt_end=temp_array+temp_size_rounded;
-    end=(int64*)((void*)nt_end);
-  }
-  int64* it=start;
-  while(it!=end){
-    if ((*it)!=0){
-      int small_i;
-      const int temp_index=((number_type*)((void*) it))-temp_array;
-      const int bound=temp_index+multiple;
-      for(small_i=temp_index;small_i<bound;small_i++){
-        if(temp_array[small_i]!=0){
-          res->idx_array[pos]=small_i;
-          res->coef_array[pos]=temp_array[small_i];
-
-          pos++;
-          non_zeros--;
-          
-        }
-        if (non_zeros==0) break;
-      }
-      
-    }
-    ++it;
-  }
-  #endif
   //omfree(temp_array);
 
   omfree(mon);
