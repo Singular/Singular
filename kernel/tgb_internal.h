@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.65 2007-02-26 12:52:45 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.66 2007-02-26 15:14:47 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -1066,7 +1066,7 @@ template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly
     if ((red.ref) && (red.ref->row)){
       double act_density=(double) red.ref->row->len;
       act_density/=(double) cache->nIrreducibleMonomials;
-      max_density=si_max(act_density,max_density);
+      max_density=std::max(act_density,max_density);
     }
     mon[i]=red;
     i++;
