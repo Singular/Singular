@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.24 2007-02-22 14:52:40 Singular Exp $ */
+/* $Id: longalg.cc,v 1.25 2007-02-26 11:43:07 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -65,14 +65,18 @@ static napoly napTailred(napoly q);
 static BOOLEAN napDivPoly(napoly p, napoly q);
 static int napExpi(int i, napoly a, napoly b);
 static ring nacRing;
-#define NA_NORMALIZE_CNT 3
+#define NA_NORMALIZE_CNT 5
 static inline void naNormalize0(number &pp)
 {
   lnumber p = (lnumber)pp;
   if ((p!=NULL) && (p->z!=NULL))
   {
     p->cnt++;
-    if (p->cnt>NA_NORMALIZE_CNT) naNormalize(pp);
+    if ((p->cnt>NA_NORMALIZE_CNT)
+    //|| (currRing->minpoly!=NULL)
+    //|| ((p->n!=NULL) && (p->cnt>1))
+    )
+      naNormalize(pp);
   }
 }
 
@@ -1277,7 +1281,7 @@ number naDiv(number la, number lb)
   {
     lo->s = 0;
     number luu=(number)lo;
-    naNormalize0(luu);
+    naNormalize(luu);
     lo=(lnumber)luu;
   }
   else
