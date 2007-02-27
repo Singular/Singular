@@ -10,7 +10,9 @@
 
 #include <cstdlib>
 #include <cmath>
+#ifndef NOSTREAMIO
 #include <iostream>
+#endif
 
 #else
 
@@ -18,7 +20,9 @@
 
 #include <stdlib.h>
 #include <math.h>
+#ifndef NOSTREAMIO
 #include <iostream.h>
+#endif
 
 #endif
 
@@ -241,8 +245,9 @@ inline double to_double(unsigned long a) { return double(a); }
 inline double to_double(float a) { return double(a); }
 inline double to_double(double a) { return a; }
 
-
+#ifndef NOSTREAMIO
 long SkipWhiteSpace(NTL_SNS istream& s);
+#endif
 long IsWhiteSpace(long c);
 
 long CharToIntVal(long c);
