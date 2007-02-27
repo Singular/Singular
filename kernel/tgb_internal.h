@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.68 2007-02-27 10:12:14 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.69 2007-02-27 10:40:57 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -1063,6 +1063,35 @@ template<class number_type> void write_coef_times_xx_idx_to_buffer_dense(CoefIdx
   }
   }
 }
+template<class number_type> void write_coef_idx_to_buffer_dense(CoefIdx<number_type>* const pairs,int& pos, number_type* const coef_array,const int rlen){
+  int j;
+  
+  for(j=0;j<rlen;j++){
+    if (coef_array[j]!=0){
+    assume(coef_array[j]!=0);
+    CoefIdx<number_type> ci;
+    ci.coef=coef_array[j];
+    assume(ci.coef!=0);
+    ci.idx=j;
+    pairs[pos++]=ci;
+  }
+  }
+}
+
+template<class number_type> void write_minus_coef_idx_to_buffer_dense(CoefIdx<number_type>* const pairs,int& pos, number_type* const coef_array,const int rlen){
+  int j;
+  
+  for(j=0;j<rlen;j++){
+    if (coef_array[j]!=0){
+    assume(coef_array[j]!=0);
+    CoefIdx<number_type> ci;
+    ci.coef=F4mat_to_number_type(npNegM((number) coef_array[j]));
+    assume(ci.coef!=0);
+    ci.idx=j;
+    pairs[pos++]=ci;
+  }
+  }
+}
 template<class number_type> void write_coef_idx_to_buffer(CoefIdx<number_type>* const pairs,int& pos,int* const idx_array, number_type* const coef_array,const int rlen){
   int j;
   for(j=0;j<rlen;j++){
@@ -1127,7 +1156,16 @@ for(i=0;i<len;i++){
           }
         }
       } else{
-        write_coef_times_xx_idx_to_buffer_dense(pairs,pos,coef_array,rlen,coef);
+        if ((coef!=one)&&(coef!=minus_one)){ 
+          write_coef_times_xx_idx_to_buffer_dense(pairs,pos,coef_array,rlen,coef);
+        } else{
+          if (coef==one)
+            write_coef_idx_to_buffer_dense(pairs,pos,coef_array,rlen);
+          else {
+            assume(coef==minus_one);
+            write_minus_coef_idx_to_buffer_dense(pairs,pos,coef_array,rlen);
+          }
+        }
       }
     }
     else {
@@ -1212,7 +1250,7 @@ template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly
   assume(i==len);
   len=i;
   bool dense=true;
-  if (max_density<0.2) dense=false;
+  if (max_density<0.3) dense=false;
   if (dense){
     SparseRow<number_type>* res=noro_red_to_non_poly_dense(mon,len,cache);
     omfree(mon);
