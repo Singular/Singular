@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.66 2007-02-26 15:14:47 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.67 2007-02-27 08:03:44 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -820,17 +820,39 @@ while(it!=end){
 #endif
 return res;
 }
-template <class number_type> void add_coef_times_sparse(number_type* const temp_array,int temp_size,SparseRow<number_type>* row, number coef){
+template <class number_type> void add_coef_times_sparse(number_type* const temp_array,
+int temp_size,SparseRow<number_type>* row, number coef){
   int j;
   number_type* const coef_array=row->coef_array;
   int* const idx_array=row->idx_array;
   const int len=row->len;
-  for(j=0;j<len;j++){
-    int idx=idx_array[j];
-    assume(!(npIsZero(coef)));
-    assume(!(npIsZero((number) coef_array[j])));
-    temp_array[idx]=F4mat_to_number_type(npAddM((number) temp_array[idx],npMultM((number) coef_array[j],coef)));
-    assume(idx<temp_size);
+  tgb_uint32 buffer[256];
+  const tgb_uint32 prime=npPrimeM;
+  const tgb_uint32 c=F4mat_to_number_type(coef);
+  assume(!(npIsZero(coef)));
+  for(j=0;j<len;j=j+256){
+    const int bound=std::min(j+256,len);
+    int i;
+    int bpos=0;
+    for(i=j;i<bound;i++){
+      buffer[bpos++]=coef_array[i];
+    }
+    int bpos_bound=bound-j;
+    for(i=0;i<bpos_bound;i++){
+       buffer[i]*=c;
+     }
+    for(i=0;i<bpos_bound;i++){
+       buffer[i]=buffer[i]%prime;
+    }
+    bpos=0;
+    for(i=j;i<bound;i++){
+      int idx=idx_array[i];
+      assume(bpos<256);
+      assume(!(npIsZero((number) buffer[bpos])));
+      temp_array[idx]=F4mat_to_number_type(npAddM((number) temp_array[idx], (number) buffer[bpos++]));
+      assume(idx<temp_size);
+    }
+    
   }
 }
 template <class number_type> void add_sparse(number_type* const temp_array,int temp_size,SparseRow<number_type>* row){
