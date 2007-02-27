@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.67 2007-02-27 08:03:44 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.68 2007-02-27 10:12:14 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -481,6 +481,12 @@ public:
     idx_array=(int*) omalloc(n*sizeof(int));
     coef_array=(number_type*) omalloc(n*sizeof(number_type));
   }
+  SparseRow<number_type>(int n, const number_type* source){
+    len=n;
+    idx_array=NULL;
+    coef_array=(number_type*) omalloc(n*sizeof(number_type));
+    memcpy(coef_array,source,n*sizeof(number_type));
+  }
   ~SparseRow<number_type>(){
     omfree(idx_array);
     omfree(coef_array);
@@ -855,6 +861,78 @@ int temp_size,SparseRow<number_type>* row, number coef){
     
   }
 }
+template <class number_type> void add_coef_times_dense(number_type* const temp_array,
+int temp_size,const number_type* row, int len,number coef){
+  int j;
+  const number_type* const coef_array=row;
+  //int* const idx_array=row->idx_array;
+  //const int len=temp_size;
+  tgb_uint32 buffer[256];
+  const tgb_uint32 prime=npPrimeM;
+  const tgb_uint32 c=F4mat_to_number_type(coef);
+  assume(!(npIsZero(coef)));
+  for(j=0;j<len;j=j+256){
+    const int bound=std::min(j+256,len);
+    int i;
+    int bpos=0;
+    for(i=j;i<bound;i++){
+      buffer[bpos++]=coef_array[i];
+    }
+    int bpos_bound=bound-j;
+    for(i=0;i<bpos_bound;i++){
+       buffer[i]*=c;
+     }
+    for(i=0;i<bpos_bound;i++){
+       buffer[i]=buffer[i]%prime;
+    }
+    bpos=0;
+    for(i=j;i<bound;i++){
+      //int idx=idx_array[i];
+      assume(bpos<256);
+      //assume(!(npIsZero((number) buffer[bpos])));
+      temp_array[i]=F4mat_to_number_type(npAddM((number) temp_array[i], (number) buffer[bpos++]));
+      assume(i<temp_size);
+    }
+    
+  }
+}
+template <class number_type> void add_dense(number_type* const temp_array,
+int temp_size,const number_type* row, int len){
+  //int j;
+  const number_type* const coef_array=row;
+  //int* const idx_array=row->idx_array;
+  //const int len=temp_size;
+  tgb_uint32 buffer[256];
+  const tgb_uint32 prime=npPrimeM;
+  //const tgb_uint32 c=F4mat_to_number_type(coef);
+  
+  int i;
+  for(i=0;i<len;i++){
+   
+      temp_array[i]=F4mat_to_number_type(npAddM((number) temp_array[i], (number) row[i]));
+      assume(i<temp_size);
+    }
+    
+  }
+template <class number_type> void sub_dense(number_type* const temp_array,
+int temp_size,const number_type* row, int len){
+  //int j;
+  const number_type* const coef_array=row;
+  //int* const idx_array=row->idx_array;
+  //const int len=temp_size;
+  tgb_uint32 buffer[256];
+  const tgb_uint32 prime=npPrimeM;
+  //const tgb_uint32 c=F4mat_to_number_type(coef);
+  
+  int i;
+  for(i=0;i<len;i++){
+   
+      temp_array[i]=F4mat_to_number_type(npSubM((number) temp_array[i], (number) row[i]));
+      assume(i<temp_size);
+    }
+    
+  }
+
 template <class number_type> void add_sparse(number_type* const temp_array,int temp_size,SparseRow<number_type>* row){
   int j;
 
@@ -895,6 +973,7 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_dense(
          SparseRow<number_type>* row=red.ref->row;
          number coef=red.coef;
          int j;
+         if (row->idx_array){
          if (!((coef==(number) 1)||(coef==minus_one))){
            add_coef_times_sparse(temp_array,temp_size,row,coef);
 
@@ -908,7 +987,21 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_dense(
              sub_sparse(temp_array,temp_size,row);
            }
          }
+       } else 
+       //TODO: treat, 1,-1
+       if (!((coef==(number) 1)||(coef==minus_one))){
+         add_coef_times_dense(temp_array,temp_size,row->coef_array,row->len,coef);
+       } else {
+         if (coef==(number)1)
+           add_dense(temp_array,temp_size,row->coef_array,row->len);
+         else{
+           assume(coef==minus_one);
+           sub_dense(temp_array,temp_size,row->coef_array,row->len);
+           //add_coef_times_dense(temp_array,temp_size,row->coef_array,row->len,coef);
+         }
        }
+       }
+       
        else{
          if (red.ref->value_len==NoroCache<number_type>::backLinkCode){
            temp_array[red.ref->term_index]=F4mat_to_number_type( npAddM((number) temp_array[red.ref->term_index],red.coef));
@@ -931,7 +1024,7 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_dense(
      //omfree(mon);
      return NULL;
    }
-   SparseRow<number_type>* res=convert_to_sparse_row(temp_array,temp_size, non_zeros);
+   SparseRow<number_type>* res=new SparseRow<number_type>(temp_size,temp_array);//convert_to_sparse_row(temp_array,temp_size, non_zeros);
 
    //omfree(temp_array);
 
@@ -954,6 +1047,20 @@ template<class number_type> void write_coef_times_xx_idx_to_buffer(CoefIdx<numbe
     ci.coef=F4mat_to_number_type(npMultM((number) coef,(number) coef_array[j]));
     ci.idx=idx_array[j];
     pairs[pos++]=ci;
+  }
+}
+template<class number_type> void write_coef_times_xx_idx_to_buffer_dense(CoefIdx<number_type>* const pairs,int& pos, number_type* const coef_array,const int rlen, const number coef){
+  int j;
+  
+  for(j=0;j<rlen;j++){
+    if (coef_array[j]!=0){
+    assume(coef_array[j]!=0);
+    CoefIdx<number_type> ci;
+    ci.coef=F4mat_to_number_type(npMultM((number) coef,(number) coef_array[j]));
+    assume(ci.coef!=0);
+    ci.idx=j;
+    pairs[pos++]=ci;
+  }
   }
 }
 template<class number_type> void write_coef_idx_to_buffer(CoefIdx<number_type>* const pairs,int& pos,int* const idx_array, number_type* const coef_array,const int rlen){
@@ -979,45 +1086,51 @@ template<class number_type> void write_minus_coef_idx_to_buffer(CoefIdx<number_t
 }
 template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_sparse(MonRedResNP<number_type>* mon, int len,NoroCache<number_type>* cache){
   int i;
-  int together=0;
-  for(i=0;i<len;i++){
-    MonRedResNP<number_type> red=mon[i];
-    if ((red.ref) &&( red.ref->row)){
-      together+=red.ref->row->len;
-    } else {if ((red.ref) &&(red.ref->value_len==NoroCache<number_type>::backLinkCode))
+int together=0;
+for(i=0;i<len;i++){
+  MonRedResNP<number_type> red=mon[i];
+  if ((red.ref) &&( red.ref->row)){
+    together+=red.ref->row->len;
+    } else {
+      if ((red.ref) &&(red.ref->value_len==NoroCache<number_type>::backLinkCode))
       together++;
-      }
-    
   }
+
+}
   //PrintS("here\n");
-  if (together==0) return 0;
+if (together==0) return 0;
   //PrintS("there\n");
-  cache->ensureTempBufferSize(together*sizeof(CoefIdx<number_type>));
-  CoefIdx<number_type>* pairs=(CoefIdx<number_type>*) cache->tempBuffer; //omalloc(together*sizeof(CoefIdx<number_type>));
-  int pos=0;
-  int j;
-  const number one=npInit(1);
-  const number minus_one=npInit(-1);
-  for(i=0;i<len;i++){
-    MonRedResNP<number_type> red=mon[i];
-    if ((red.ref) &&( red.ref->row)){
+cache->ensureTempBufferSize(together*sizeof(CoefIdx<number_type>));
+CoefIdx<number_type>* pairs=(CoefIdx<number_type>*) cache->tempBuffer; //omalloc(together*sizeof(CoefIdx<number_type>));
+int pos=0;
+int j;
+const number one=npInit(1);
+const number minus_one=npInit(-1);
+for(i=0;i<len;i++){
+  MonRedResNP<number_type> red=mon[i];
+  if ((red.ref) &&( red.ref->row)){
       //together+=red.ref->row->len;
-      int* idx_array=red.ref->row->idx_array;
-      number_type* coef_array=red.ref->row->coef_array;
-      int rlen=red.ref->row->len;
-      number coef=red.coef;
+    int* idx_array=red.ref->row->idx_array;
+    number_type* coef_array=red.ref->row->coef_array;
+    int rlen=red.ref->row->len;
+    number coef=red.coef;
+    if (idx_array){
       if ((coef!=one)&&(coef!=minus_one)){
-      write_coef_times_xx_idx_to_buffer(pairs,pos,idx_array, coef_array,rlen, coef);
-    } else
-    {
-      if (coef==one){
-        write_coef_idx_to_buffer(pairs,pos,idx_array, coef_array,rlen);
-      } else {
-        assume(coef==minus_one);
-        write_minus_coef_idx_to_buffer(pairs,pos,idx_array, coef_array,rlen);
+        write_coef_times_xx_idx_to_buffer(pairs,pos,idx_array, coef_array,rlen, coef);
+        } else
+        {
+          if (coef==one){
+            write_coef_idx_to_buffer(pairs,pos,idx_array, coef_array,rlen);
+          } else {
+            assume(coef==minus_one);
+            write_minus_coef_idx_to_buffer(pairs,pos,idx_array, coef_array,rlen);
+          }
+        }
+      } else{
+        write_coef_times_xx_idx_to_buffer_dense(pairs,pos,coef_array,rlen,coef);
       }
     }
-    } else {
+    else {
       if ((red.ref) &&(red.ref->value_len==NoroCache<number_type>::backLinkCode)){
         CoefIdx<number_type> ci;
         ci.coef=F4mat_to_number_type(red.coef);
@@ -1026,11 +1139,13 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_sparse
       }
     }
   }
-  assume(pos==together);
+  assume(pos<=together);
+  together=pos;
+
   std::sort(pairs,pairs+together);
-  
+
   int act=0;
-  
+
   assume(pairs[0].coef!=0);
   for(i=1;i<together;i++){
     if (pairs[i].idx!=pairs[act].idx){
@@ -1042,9 +1157,9 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_sparse
       pairs[act].coef=F4mat_to_number_type(npAddM((number)pairs[act].coef,(number)pairs[i].coef));
     }
   }
-  
+
   if (pairs[act].coef==0){
-   
+
     act--;
   }
   int sparse_row_len=act+1;
@@ -1060,7 +1175,7 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_sparse
     }
   }
   //omfree(pairs);
-  
+
   return res;
 }
 template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly p, int &len, NoroCache<number_type>* cache,slimgb_alg* c){
@@ -1097,7 +1212,7 @@ template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly
   assume(i==len);
   len=i;
   bool dense=true;
-  if (max_density<0.05) dense=false;
+  if (max_density<0.2) dense=false;
   if (dense){
     SparseRow<number_type>* res=noro_red_to_non_poly_dense(mon,len,cache);
     omfree(mon);
@@ -1467,11 +1582,18 @@ template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
       int* const idx_array=srow->idx_array;
       number_type* const coef_array=srow->coef_array;
       const int len=srow->len;
-    for(i=0;i<len;i++){
-      int idx=old_to_new_indices[idx_array[i]];
-      row[idx]=F4mat_to_number_type(coef_array[i]);
-    }
-    delete srow;
+      if (srow->idx_array){
+        for(i=0;i<len;i++){
+         int idx=old_to_new_indices[idx_array[i]];
+         row[idx]=F4mat_to_number_type(coef_array[i]);
+        } 
+      }
+      else {
+        for(i=0;i<len;i++){
+          row[old_to_new_indices[i]]=F4mat_to_number_type(coef_array[i]);
+        }
+      }
+      delete srow;
     }
   }
   
