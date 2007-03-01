@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.32 2007-02-08 14:53:17 Singular Exp $ */
+/* $Id: structs.h,v 1.33 2007-03-01 09:15:51 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -32,30 +32,33 @@ typedef void * Sy_reference;
 
 
 #if defined(i386) || defined(x86_64_Linux) || defined(ix86_SunOS)
-// the following settings seems to be better on i386 and x86_64 processors
-// define if a*b is with mod instead of tables
-#define HAVE_MULT_MOD
-// #define HAVE_GENERIC_ADD
-// #ifdef HAVE_MULT_MOD
-// #define HAVE_DIV_MOD
-// #endif
-#endif
-
-#ifdef IA64_Linux
-// the following settings seems to be better on itanium processors
-// #define HAVE_MULT_MOD
-#define HAVE_GENERIC_ADD
-// #ifdef HAVE_MULT_MOD
-// #define HAVE_DIV_MOD
-// #endif
-#endif
-
-#ifdef SunOS_5
-// #define HAVE_GENERIC_ADD
-#define HAVE_MULT_MOD
-#ifdef HAVE_MULT_MOD
-#define HAVE_DIV_MOD
-#endif
+  // the following settings seems to be better on i386 and x86_64 processors
+  // define if a*b is with mod instead of tables
+  #define HAVE_MULT_MOD
+  // #define HAVE_GENERIC_ADD
+  // #ifdef HAVE_MULT_MOD
+  // #define HAVE_DIV_MOD
+  // #endif
+#elif defined(IA64_Linux)
+  // the following settings seems to be better on itanium processors
+  // #define HAVE_MULT_MOD
+  #define HAVE_GENERIC_ADD
+  // #ifdef HAVE_MULT_MOD
+  // #define HAVE_DIV_MOD
+  // #endif
+#elif defined(SunOS_5)
+  // #define HAVE_GENERIC_ADD
+  #define HAVE_MULT_MOD
+  #ifdef HAVE_MULT_MOD
+  #define HAVE_DIV_MOD
+  #endif
+#elif defined(ppc_Linux) || defined(ppcMac_darwin)
+  // the following settings seems to be better on ppc processors
+  // testet on: ppc_Linux, 740/750 PowerMac G3, 512k L2 cache
+  #define HAVE_MULT_MOD
+  // #ifdef HAVE_MULT_MOD
+  // #define HAVE_DIV_MOD
+  // #endif
 #endif
 
 #if SIZEOF_LONG == 4
