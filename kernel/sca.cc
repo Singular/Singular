@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.10 2007-02-23 14:41:43 motsak Exp $
+ *  Version: $Id: sca.cc,v 1.11 2007-03-02 14:26:54 motsak Exp $
  *******************************************************************/
 
 // #define PDEBUG 2
@@ -383,7 +383,7 @@ poly sca_p_Mult_mm(poly pPoly, const poly pMonom, const ring rRing)
 #ifdef PDEBUG
       if(iComponentMonomM==0 )
       {
-        Print("Multiplication in the left module from the right");
+        WarnS("Multiplication in the left module from the right");
       }
 #endif
     }
@@ -465,7 +465,7 @@ poly sca_pp_Mult_mm(const poly pPoly, const poly pMonom, const ring rRing, poly 
 #ifdef PDEBUG
       if(iComponentMonomM==0 )
       {
-        Print("Multiplication in the left module from the right");
+        WarnS("Multiplication in the left module from the right");
       }
 #endif
     }
@@ -575,7 +575,7 @@ poly sca_mm_Mult_pp(const poly pMonom, const poly pPoly, const ring rRing)
 #ifdef PDEBUG
       if(iComponent==0 )
       {
-        Print("Multiplication in the left module from the right");
+        WarnS("Multiplication in the left module from the right");
       }
 #endif
     }
@@ -648,7 +648,7 @@ poly sca_mm_Mult_p(const poly pMonom, poly pPoly, const ring rRing) // !!!!! the
 #ifdef PDEBUG
       if(iComponent==0 )
       {
-        Print("Multiplication in the left module from the right");
+        WarnS("Multiplication in the left module from the right");
       }
 #endif
     }
@@ -958,10 +958,31 @@ void addLObject(LObject& h, kStrategy& strat)
 
 }
 
+#ifndef NDEBUG
+
+// set it here if needed.
+#define MYTEST 0
+
+#else
+
+#define MYTEST 0
+
+#endif
+
+
 
 ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat)
 {
+#if MYTEST
+   PrintS("<sca_gr_bba>\n");
+#endif 
+
   assume(rIsSCA(currRing));
+
+#ifndef NDEBUG
+  idTest(F);
+  idTest(Q);  
+#endif
 
   const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
   const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
@@ -975,36 +996,30 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 
   strat->homog = strat->homog && bIdHomog;
 
-#ifdef PDEBUG
+
   assume( strat->homog == bIdHomog );
-#endif /*PDEBUG*/
 
 
-#if 0
-   PrintS("<sca::bba>\n");
+#if MYTEST
+/*
   {
     Print("ideal F: \n");
-    for (int i = 0; i < tempF->idelems(); i++)
-    {
-      Print("; F[%d] = ", i+1);
-      p_Write(tempF->m[i], currRing);
-    }
-    Print(";\n");
-    PrintLn();
+    idPrint(F);
+    Print("ideal tempF: \n");
+    idPrint(F);
   }
+*/
 #endif
 
 
-#ifdef PDEBUG
-//   PrintS("sca_gr_bba\n");
-#endif /*PDEBUG*/
 
 
 
   int srmax, lrmax;
   int olddeg, reduc;
   int red_result = 1;
-  int hilbeledeg = 1, hilbcount = 0, minimcnt = 0;
+//  int hilbeledeg = 1, minimcnt = 0;
+  int hilbcount = 0;
 
   initBuchMoraCrit(strat); // set Gebauer, honey, sugarCrit
 
@@ -1202,8 +1217,8 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   }
 
 
-#if 0
-   PrintS("</sca::bba>\n");
+#if MYTEST
+   PrintS("</sca_gr_bba>\n");
 #endif
 
   return (strat->Shdl);
@@ -1396,7 +1411,7 @@ bool sca_SetupQuotient(ring rGR, const ring rG)
 poly sca_pp_Mult_xi_pp(unsigned int i, const poly pPoly, const ring rRing)
 {
   assume(1 <= i);
-  assume(i <= rRing->N);
+  assume(i <= (unsigned int)rRing->N);
 
   if(rIsSCA(rRing))
     return sca_xi_Mult_pp(i, pPoly, rRing);
@@ -1421,7 +1436,7 @@ poly sca_pp_Mult_xi_pp(unsigned int i, const poly pPoly, const ring rRing)
 ///////////////////////////////////////////////////////////////////////////////////////
 
 // Under development!!!
-ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec *hilb, kStrategy strat)
+ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*hilb*/, kStrategy strat)
 {
   assume(rIsSCA(currRing));
 
@@ -1447,7 +1462,9 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec *hilb
 
   int   srmax, lrmax, red_result = 1;
   int   olddeg, reduc;
-  int hilbeledeg=1, hilbcount=0, minimcnt=0;
+
+//  int hilbeledeg = 1, minimcnt = 0;
+  int hilbcount = 0;
 
   BOOLEAN withT = FALSE;
 
@@ -1866,7 +1883,8 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
   int olddeg = 0;
   int reduc = 0;
   int red_result = 1;
-  int hilbeledeg=1,hilbcount=0;
+//  int hilbeledeg=1;
+  int hilbcount=0;
 
   strat->update = TRUE;
   /*- setting global variables ------------------- -*/
@@ -2194,8 +2212,8 @@ inline void m_GetBiDegree(const poly m,
   assume( wx->cols() == 1 );
   assume( wy->cols() == 1 );
 
-  assume( wx->rows() >= N );
-  assume( wy->rows() >= N );
+  assume( (unsigned int)wx->rows() >= N );
+  assume( (unsigned int)wy->rows() >= N );
 
   int x = 0;
   int y = 0;
@@ -2355,7 +2373,7 @@ inline poly m_KillSquares(const poly m,
 
   assume( m != NULL );
 
-  for(int k = iFirstAltVar; k <= iLastAltVar; k++)
+  for(unsigned int k = iFirstAltVar; k <= iLastAltVar; k++)
     if( p_GetExp(m, k, r) > 1 )
       return NULL;  
   
@@ -2427,7 +2445,7 @@ ideal id_KillSquares(const ideal id,
 
   if (iSize == 0) return id;
  
-  ideal temp = idInit(iSize, 1);
+  ideal temp = idInit(iSize, id->rank);
   
 #if 0
    PrintS("<id_KillSquares>\n");
@@ -2463,6 +2481,8 @@ ideal id_KillSquares(const ideal id,
   }
    PrintS("</id_KillSquares>\n");
 #endif
+
+//  temp->rank = idRankFreeModule(temp, r);
 
   return temp;
 }
