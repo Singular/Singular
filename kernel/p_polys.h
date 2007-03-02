@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.3 2006-11-23 15:04:54 Singular Exp $
+ *  Version: $Id: p_polys.h,v 1.4 2007-03-02 09:30:06 Singular Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -437,9 +437,9 @@ BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level);
 #define p_CheckRing(r)          ((void)0)
 #define P_CheckIf(cond, check)  ((void)0)
 
-#define p_Test(p,r)     ((void)0)
-#define p_LmTest(p,r)   ((void)0)
-#define pp_Test(p, lmRing, tailRing) ((void)0)
+#define p_Test(p,r)     (1)
+#define p_LmTest(p,r)   (1)
+#define pp_Test(p, lmRing, tailRing) (1)
 
 #endif
 
