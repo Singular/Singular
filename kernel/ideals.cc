@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.39 2007-02-16 10:50:10 motsak Exp $ */
+/* $Id: ideals.cc,v 1.40 2007-03-02 09:25:56 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -583,12 +583,12 @@ BOOLEAN idIs0 (ideal h)
   int i;
 
   if (h == NULL) return TRUE;
-  i = IDELEMS(h);
-  while ((i > 0) && (h->m[i-1] == NULL))
+  i = IDELEMS(h)-1;
+  while ((i >= 0) && (h->m[i] == NULL))
   {
     i--;
   }
-  if (i == 0)
+  if (i < 0)
     return TRUE;
   else
     return FALSE;
