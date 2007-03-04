@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.250 2007-03-04 18:24:46 levandov Exp $ */
+/* $Id: extra.cc,v 1.251 2007-03-04 22:56:34 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2633,10 +2633,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       if ((h!=NULL) && (h->Typ()==INT_CMD))
       {
 	is=(int)((long)(h->Data()));
-	res->rtyp=POLY_CMD;
+//	res->rtyp=POLY_CMD;
+	res->rtyp=IDEAL_CMD;
 	if (rIsPluralRing(currRing))
 	{ 
-	  res->data = nc_rat_ReduceSpolyNew(p, q, is, currRing);
+//	  res->data = nc_rat_ReduceSpolyNew(q,p,is, currRing);
+	res->data = ncGCD(p,q,currRing);	
 	}
 	else res->data=p;
       }
