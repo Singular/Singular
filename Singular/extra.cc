@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.249 2007-01-11 11:24:12 Singular Exp $ */
+/* $Id: extra.cc,v 1.250 2007-03-04 18:24:46 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -83,6 +83,7 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 #include "gring.h"
 #include "sca.h"
 #include "ipconv.h"
+#include "ratgring.h"
 #endif
 
 #ifdef ix86_Win /* only for the DLLTest */
@@ -675,26 +676,26 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
      return TRUE;
    }
    else
-   #endif
+#endif
 #ifdef HAVE_PLURAL
 /*==================== Approx_Step  =================*/
-      if (strcmp(sys_cmd, "astep") == 0)
-      {
-        ideal I;
-        if ((h!=NULL) && (h->Typ()==IDEAL_CMD))
-        {
-          I=(ideal)h->CopyD();
-          res->rtyp=IDEAL_CMD;
-          if (rIsPluralRing(currRing)) res->data=Approx_Step(I);
-          else res->data=I;
-          setFlag(res,FLAG_STD);
-        }
-        else return TRUE;
-        return FALSE;
-      }
+     if (strcmp(sys_cmd, "astep") == 0)
+     {
+       ideal I;
+       if ((h!=NULL) && (h->Typ()==IDEAL_CMD))
+       {
+	 I=(ideal)h->CopyD();
+	 res->rtyp=IDEAL_CMD;
+	 if (rIsPluralRing(currRing)) res->data=Approx_Step(I);
+	 else res->data=I;
+	 setFlag(res,FLAG_STD);
+       }
+       else return TRUE;
+       return FALSE;
+     }
 /*==================== PrintMat  =================*/
-      if (strcmp(sys_cmd, "PrintMat") == 0)
-      {
+    if (strcmp(sys_cmd, "PrintMat") == 0)
+    {
         int a;
         int b;
         ring r;
@@ -1865,6 +1866,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #endif
 #include "mpsr.h"
 #include "mod_raw.h"
+#include "ratgring.h"
 
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {
@@ -2610,6 +2612,38 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       WerrorS("`system(\"AltVarStart/End\",<ring>) requires a SCA ring");
       return TRUE;
     }
+    else
+/*==================== RatNF, noncomm rational coeffs =================*/
+    if (strcmp(sys_cmd, "ratNF") == 0)
+    {
+      poly p,q;
+      int is;
+      if ((h!=NULL) && (h->Typ()==POLY_CMD))
+      {
+	p=(poly)h->CopyD();
+	h=h->next;
+      }
+      else return TRUE;
+      if ((h!=NULL) && (h->Typ()==POLY_CMD))
+      {
+	q=(poly)h->CopyD();
+	h=h->next;
+      }
+      else return TRUE;
+      if ((h!=NULL) && (h->Typ()==INT_CMD))
+      {
+	is=(int)((long)(h->Data()));
+	res->rtyp=POLY_CMD;
+	if (rIsPluralRing(currRing))
+	{ 
+	  res->data = nc_rat_ReduceSpolyNew(p, q, is, currRing);
+	}
+	else res->data=p;
+      }
+      else return TRUE;
+      return FALSE;
+    }
+    else
 #endif
 /*==================== t-rep-GB ==================================*/
     if (strcmp(sys_cmd, "unifastmult")==0)
@@ -2870,6 +2904,8 @@ ipshell()");
     }
     else
               */
+
+
 #endif
 /*==================== Error =================*/
       Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
