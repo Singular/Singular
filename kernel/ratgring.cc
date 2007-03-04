@@ -6,7 +6,7 @@
  *  Purpose: Ore-noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: ratgring.cc,v 1.2 2007-03-04 18:18:17 levandov Exp $
+ *  Version: $Id: ratgring.cc,v 1.3 2007-03-04 22:56:16 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -62,6 +62,7 @@ void pLcmRat(poly a, poly b, poly m, int rat_shift)
 poly p_HeadRat(poly p, int ishift, ring r)
 {
   poly q   = pNext(p);
+  if (q == NULL) return p;
   poly res = p_Head(p,r);
   while ( p_Comp_k_n(p, q, ishift, r) )
   {
@@ -107,19 +108,23 @@ ideal ncGCD(poly p, poly q, const ring r)
   h->m[0] = p_Copy(p,r);
   h->m[1] = p_Copy(q,r);
 #ifdef PDEBUG
-  Print("running syzygy comp. for nc_GCD:");
+  Print("running syzygy comp. for nc_GCD:\n");
 #endif
   ideal sh = idSyzygies(h, testHomog, &w);
 #ifdef PDEBUG
-  Print("done syzygy comp. for nc_GCD");
+  Print("done syzygy comp. for nc_GCD\n");
 #endif
   /* in comm case, there is only 1 syzygy */
   /*   singclap_gcd(); */
   poly K, K1, K2;
   K  = sh->m[0]; /* take just the first element - to be enhanced later */
   K1 = pTakeOutComp(&K, 1); // 1st component is taken out from K
+//  K2 = pTakeOutComp(&K, 2);
+  p_SetCompP(K1,0,r);
   pShift(&K,-2); // 2nd component to 0th comp.
-  K2 = K;
+//  K2 = pTakeOutComp(&K, 2);
+  p_SetCompP(K2,0,r);
+  K2 = K; 
 
   /* checking signs before multiplying */    
   number ck1 = p_GetCoeff(K1,r);
@@ -135,8 +140,8 @@ ideal ncGCD(poly p, poly q, const ring r)
   }
   idDelete(&h);
   h = idInit(2,1);
-  h->m[0] = K1;
-  h->m[1] = K2;
+  h->m[0] = p_Copy(K1,r);
+  h->m[1] = p_Copy(K2,r);
   idDelete(&sh);
   return(h);
 }
@@ -326,7 +331,7 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
 
   /* pSetComp(m,r)=0? */
   poly HH, H;
-  HH = p_HeadRat(p1,is,r); // lm_D(g)
+  HH = p_Copy(p_HeadRat(p1,is,r),r); // lm_D(g)
   H  = r->nc->p_Procs.mm_Mult_p(m, p_Copy(HH, r), r); // d^aplha lm_D(g)
 
   poly K  = p_Copy( p_GetCoeffRat(H,  is, r), r);
@@ -340,10 +345,10 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
   // p_LmDeleteAndNextRat(out, is, r);
 
   ideal ncsyz = ncGCD(P,K,r);
-  poly KK = ncsyz->m[0]; // k'
-  poly PP = ncsyz->m[1]; // p'
+  poly KK = p_Copy(ncsyz->m[0],r); // k'
+  poly PP = p_Copy(ncsyz->m[1],r); // p'
   
-  HH = p_HeadRat(p2,is,r);
+  HH = p_Copy(p_HeadRat(p2,is,r),r);
   HH = p_Neg(HH, r);
   p2 = p_Add_q(p2, HH, r); // t_f
 
@@ -351,7 +356,7 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
   // p_LmDeleteAndNextRat(p2, is, r);
 
 
-  HH = p_HeadRat(H,is,r);
+  HH = p_Copy(p_HeadRat(H,is,r),r);
   HH = p_Neg(HH, r);
   H  = p_Add_q(H, HH, r); // r_g
 
@@ -359,9 +364,9 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
   // p_LmDeleteAndNextRat(H, is, r);
 
 
-  p2 = p_Mult_mm(p2, KK, r); // p2 = k' t_f
+  p2 = p_Mult_q(p2, KK, r); // p2 = k' t_f
   p_Test(p2,r);
-  p_Delete(&KK,r);
+//  p_Delete(&KK,r);
 
   out = r->nc->p_Procs.mm_Mult_p(m, out, r); // d^aplha t_g
   p_Delete(&m,r);
