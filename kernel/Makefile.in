@@ -103,7 +103,7 @@ CXXSOURCES=clapconv.cc \
     modulop.cc mpr_complex.cc sparsmat.cc fast_maps.cc \
     fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc fglmcomb.cc \
     numbers.cc polys.cc p_polys.cc polys0.cc polys1.cc polys-impl.cc \
-    ring.cc shortfl.cc kspoly.cc \
+    ratgring.cc ring.cc shortfl.cc kspoly.cc \
     syz.cc syz0.cc syz1.cc syz2.cc syz3.cc\
     timer.cc weight.cc \
     GMPrat.cc multicnt.cc npolygon.cc semic.cc spectrum.cc splist.cc \
@@ -167,7 +167,7 @@ HEADERS=hutil.h stairc.h ideals.h \
 	eigenval.h units.h mod_raw.h kbuckets.h sbuckets.h\
 	mpr_global.h mpr_inout.h mpr_base.h mpr_numeric.h \
 	fegetopt.h distrib.h \
-	prCopy.h prCopyMacros.h \
+	ratgring.h prCopy.h prCopyMacros.h \
         p_MemAdd.h p_MemCopy.h p_MemCmp.h p_Numbers.h \
         pInline2.h pInline1.h pInline0.h mmalloc.h static.h\
         omSingularConfig.h pShallowCopyDelete.h \
