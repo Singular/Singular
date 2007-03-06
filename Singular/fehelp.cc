@@ -3,7 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
-* versin $Id: fehelp.cc,v 1.49 2006-08-10 13:59:47 Singular Exp $
+* versin $Id: fehelp.cc,v 1.50 2007-03-06 10:21:51 Singular Exp $
 */
 
 #include <string.h>
@@ -439,12 +439,12 @@ static char* strclean(char* str)
 {
   if (str == NULL) return NULL;
   char *s=str;
-  while (*s <= ' ' && *s != '\0') s++;
+  while ((*s <= ' ') && (*s != '\0')) s++;
   if (*s == '\0') return NULL;
   char *ss=s;
   while (*ss!='\0') ss++;
   ss--;
-  while (*ss <= ' ' && *ss != '\0')
+  while ((*ss <= ' ') && (*ss != '\0'))
   {
     *ss='\0';
     ss--;
@@ -462,7 +462,7 @@ static char* strclean(char* str)
 static BOOLEAN heKey2Entry(char* filename, char* key, heEntry hentry)
 {
   FILE* fd;
-  char c, k;
+  int c, k;
   int kl, i;
   *(hentry->key) = '\0';
   *(hentry->url) = '\0';
