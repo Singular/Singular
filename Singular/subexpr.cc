@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.95 2006-12-11 13:14:16 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.96 2007-03-08 12:28:52 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -282,7 +282,7 @@ void sleftv::CleanUp(ring r)
       case MATRIX_CMD:
       case MODUL_CMD:
       case IDEAL_CMD:
-        if (((long)data) & 3==0)
+        if ((((long)data) & 3)==0)
         {
           if (r!=NULL) id_Delete((ideal *)(&data),r);
         }
