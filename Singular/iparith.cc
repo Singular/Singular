@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.440 2007-02-23 17:13:13 Singular Exp $ */
+/* $Id: iparith.cc,v 1.441 2007-03-08 16:50:59 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -377,7 +377,7 @@ cmdnames cmds[] =
   { "size",        0, COUNT_CMD ,         CMD_1},
   { "slimgb",      0, SLIM_GB_CMD ,       CMD_1},
   { "sortvec",     0, SORTVEC_CMD ,       CMD_1},
-  #ifdef OLD_RES
+#ifdef OLD_RES
   { "sres",        0, SRES_CMD ,          CMD_23},
 #else /* OLD_RES */
   { "sres",        0, SRES_CMD ,          CMD_2},
@@ -391,7 +391,7 @@ cmdnames cmds[] =
   { "test",        0, TEST_CMD ,          CMD_M},
   { "trace",       0, TRACE_CMD ,         CMD_1},
   { "transpose",   0, TRANSPOSE_CMD ,     CMD_1},
-  #ifdef HAVE_PLURAL
+#ifdef HAVE_PLURAL
   { "twostd",      0, TWOSTD_CMD ,        CMD_1},
 #endif /* HAVE_PLURAL */
   { "type",        0, TYPE_CMD ,          TYPE_CMD},
@@ -4289,7 +4289,7 @@ static BOOLEAN jjENVELOPE(leftv res, leftv a)
 static BOOLEAN jjTWOSTD(leftv res, leftv a)
 {
   if (rIsPluralRing(currRing))  res->data=(ideal)twostd((ideal)a->Data());
-  else  res->data=(ideal)a->Data();
+  else  res->data=(ideal)a->CopyD();
   setFlag(res,FLAG_STD);
   setFlag(res,FLAG_TWOSTD);
   return FALSE;
