@@ -278,6 +278,7 @@ endif
 all:	kversion.h libkernel.a libkernel-g.a ${DL_LIBS} ${DL_LIBSG} ${OBJS2} ${OBJSG2}
 
 libkernel.a: ${OBJS}
+	-rm -f libkernel.a
 	ar cr $@ $^
 
 p_Procs_Lib.o: p_Procs_Lib.inc
@@ -448,6 +449,7 @@ $(OBJG2) : %.og: %.c
 	$(CCG)  ${CFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
 
 libkernel-g.a: ${OBJG}
+	-rm -f libkernel-g.a
 	ar cr $@ $^
 
 ##
