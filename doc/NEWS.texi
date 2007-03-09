@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.76 2007-02-27 17:06:54 king Exp $
+@comment $Id: NEWS.texi,v 1.77 2007-03-09 18:42:34 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -74,7 +74,7 @@ finvar.lib: new algorithm for @nref{irred_secondary_char0} (@nref{finvar_lib}).
 finvar.lib: new function @nref{irred_secondary_no_molien} (@nref{finvar_lib}).
 @item
 finvar.lib: new functions for computing minimal generating sets of
-invariant rings of finite groups in the non-modular case: @nref{invariang_algebra_reynolds} for finite 
+invariant rings of finite groups in the non-modular case: @nref{invariant_algebra_reynolds} for finite 
 matrix groups and @nref{invariant_algebra_perm} for permutation groups (@nref{finvar_lib}). 
 @item
 operation for sparse matrices improved: multiplication, prune, conversion to module.
