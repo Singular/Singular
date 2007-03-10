@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.121 2007-03-10 14:40:54 Singular Exp $ */
+/* $Id: grammar.y,v 1.122 2007-03-10 15:14:15 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -348,8 +348,8 @@ void yyerror(char * fmt)
 %left '&'
 %left EQUAL_EQUAL NOTEQUAL
 %left '<'
-%left '+' '-'
-%left '/'
+%left '+' '-' ':'
+%left '/' '*'
 %left UMINUS NOT
 %left  '^'
 %left '[' ']'
