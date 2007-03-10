@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.120 2006-12-11 13:15:49 Singular Exp $ */
+/* $Id: grammar.y,v 1.121 2007-03-10 14:40:54 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -834,6 +834,10 @@ expr_arithmetic:
         | expr DOTDOT expr
           {
             if(iiExprArith2(&$$,&$1,DOTDOT,&$3)) YYERROR;
+          }
+        | expr ':' expr
+          {
+            if(iiExprArith2(&$$,&$1,':',&$3)) YYERROR;
           }
         | NOT expr
           {

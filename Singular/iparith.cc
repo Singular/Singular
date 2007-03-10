@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.441 2007-03-08 16:50:59 Singular Exp $ */
+/* $Id: iparith.cc,v 1.442 2007-03-10 14:40:52 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -485,6 +485,19 @@ static BOOLEAN jjOP_IM_I(leftv res, leftv u, leftv v)
 static BOOLEAN jjOP_I_IM(leftv res, leftv u, leftv v)
 {
   return jjOP_IM_I(res,v,u);
+}
+static BOOLEAN jjCOLON(leftv res, leftv u, leftv v)
+{
+  int l=(int)(long)v->Data();
+  if (l>0)
+  {
+    int d=(int)(long)u->Data();
+    intvec *vv=new intvec(l);
+    int i;
+    for(i=0;i<l;i++) { (*vv)[i]=d; }
+    res->data=(char *)vv;
+  }
+  return (l<=0);
 }
 static BOOLEAN jjDOTDOT(leftv res, leftv u, leftv v)
 {
@@ -3030,6 +3043,7 @@ struct sValCmd2 dArith2[]=
 ,{jjMAP,       '(',            ANY_TYPE/*set by p*/,MAP_CMD, DEF_CMD ALLOW_PLURAL}
 ,{jjKLAMMER,   '(',            ANY_TYPE/*set by p*/,ANY_TYPE, INT_CMD ALLOW_PLURAL}
 ,{jjKLAMMER_IV,'(',            ANY_TYPE/*set by p*/,ANY_TYPE, INTVEC_CMD ALLOW_PLURAL}
+,{jjCOLON,     ':',            INTVEC_CMD,     INT_CMD,    INT_CMD ALLOW_PLURAL}
 // and the procedures with 2 arguments:
 ,{atATTRIB2,   ATTRIB_CMD,     NONE/*set by p*/,DEF_CMD,   STRING_CMD ALLOW_PLURAL}
 ,{jjWRONG2,    BAREISS_CMD,    0,              DEF_CMD,    DEF_CMD ALLOW_PLURAL}
