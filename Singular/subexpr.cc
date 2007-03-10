@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.96 2007-03-08 12:28:52 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.97 2007-03-10 13:02:00 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -282,18 +282,13 @@ void sleftv::CleanUp(ring r)
       case MATRIX_CMD:
       case MODUL_CMD:
       case IDEAL_CMD:
-        if ((((long)data) & 3)==0)
-        {
-          if (r!=NULL) id_Delete((ideal *)(&data),r);
-        }
-        else
-        {
-          //printf("ptr err.\n");
-          data=NULL;
-        }
+	if ((((long)data) & 3)==0)
+	{
+          if(r!=NULL) id_Delete((ideal *)(&data),r);
+	}
         break;
       case STRING_CMD:
-          omFree((ADDRESS)data);
+        omFree((ADDRESS)data);
         break;
       case POLY_CMD:
       case VECTOR_CMD:
@@ -359,7 +354,7 @@ void sleftv::CleanUp(ring r)
         ::Print("CleanUp: unknown type %d\n",rtyp);  /* DEBUG */
 #endif
     } /* end switch: (rtyp) */
-    //data=NULL;
+    //data=NULL; // will be done by Init() at the end
   }
   if (attribute!=NULL)
   {
@@ -386,7 +381,7 @@ void sleftv::CleanUp(ring r)
       case VMINPOLY:
       case LIB_CMD:
       case 0:
-        //attribute=NULL;
+        //attribute=NULL; // will be done by Init() at the end
         break;
       default:
       {
@@ -407,7 +402,7 @@ void sleftv::CleanUp(ring r)
     omFreeBin((ADDRESS)e, sSubexpr_bin);
     e=h;
   }
-  //rtyp=NONE;
+  //rtyp=NONE; // will be done by Init() at the end
   if (next!=NULL)
   {
     leftv tmp_n;
@@ -1249,7 +1244,7 @@ void syMake(leftv v,char * id, idhdl packhdl)
   {
   //  Print("setting req_packhdl to %s\n",IDID(packhdl));
     v->req_packhdl = IDPACKAGE(packhdl);
-  }  
+  }
   else v->req_packhdl = currPack;
 //  if (v->req_packhdl!=basePack)
 //    Print("search %s in %s\n",id,v->req_packhdl->libname);
@@ -1424,7 +1419,7 @@ void syMake(leftv v,char * id, idhdl packhdl)
     {
       h=basePack->idroot->get(id,myynest);
       if (h!=NULL)
-      {	
+      {
         if (id!=IDID(h)) omFree((ADDRESS)id);
         v->rtyp = IDHDL;
         v->data = (char *)h;
