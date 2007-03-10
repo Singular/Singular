@@ -6,7 +6,7 @@
  *  Purpose: Ore-noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: ratgring.cc,v 1.3 2007-03-04 22:56:16 levandov Exp $
+ *  Version: $Id: ratgring.cc,v 1.4 2007-03-10 13:14:33 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -383,4 +383,64 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
 
 
 
+// return: FALSE, if there exists i in ishift..r->N,
+//                 such that a->exp[i] > b->exp[i]
+//         TRUE, otherwise
+
+BOOLEAN p_DivisibleByRat(poly a, poly b, int ishift, const ring r)
+{
+  int i;
+  for(i=r->N;i>ishift;i--)
+  {
+    if (p_GetExp(a,i,r) > p_GetExp(b,i,r)) return FALSE;
+  }
+  return ((p_GetComp(a,r)==p_GetComp(b,r)) || (p_GetComp(a,r)==0));
+}
+/*2
+*reduces h with elements from reducer choosing the best possible
+* element in t with respect to the given red_length
+* arrays reducer and red_length are [0..(rl-1)]
+*/
+int redRat (poly* h,poly *reducer, int *red_length,int rl, int ishift, ring r)
+{
+  if (h==NULL) return 0;
+
+  int j,i,l;
+
+  loop
+  {
+    j=rl;l=MAX_INT_VAL;
+    for(i=rl-1;i>=0;i--)
+    {
+      if (l>red_length[i]) && (p_DivisibleByRat(reducer[i],h,ishift,r)))
+      {
+        j=i; l=red_length[i];
+      }
+    }
+    if (j >=rl)
+    {
+      return 1; // not reducible
+    }
+
+    if (TEST_OPT_DEBUG)
+    {
+      PrintS("reduce ");
+      p_wrp(h,r);
+      PrintS(" with ");
+      p_wrp(reducer[j],r);
+    }
+    poly hh=nc_rat_ReduceSpolyNew(h, reducer[j], ishift, r);
+    p_Delete(&h,r); h=hh;
+    if (TEST_OPT_DEBUG)
+    {
+      PrintS(" to ");
+      p_wrp(h,r);
+      PrintLn();
+    }
+    if (h==NULL)
+    {
+      return 0;
+    }
+  }
+}
 #endif
