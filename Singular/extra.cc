@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.251 2007-03-04 22:56:34 levandov Exp $ */
+/* $Id: extra.cc,v 1.252 2007-03-10 15:42:13 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2614,6 +2614,54 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 /*==================== RatNF, noncomm rational coeffs =================*/
+    if (strcmp(sys_cmd, "intratNF") == 0)
+    {
+      poly p;
+      poly *q;
+      ideal I;
+      int is;
+      if ((h!=NULL) && (h->Typ()==POLY_CMD))
+      {
+	p=(poly)h->CopyD();
+	h=h->next;
+	//	Print("poly is done\n");
+      }
+      else return TRUE;
+      if ((h!=NULL) && (h->Typ()==IDEAL_CMD))
+      {
+	I=(ideal)h->CopyD();
+	q = I->m;
+	h=h->next;
+	//	Print("ideal is done\n");
+      }
+      else return TRUE;
+      if ((h!=NULL) && (h->Typ()==INT_CMD))
+      {
+	is=(int)((long)(h->Data()));
+	//	res->rtyp=INT_CMD;
+	//	Print("int is done\n");
+	//	res->rtyp=IDEAL_CMD;
+	if (rIsPluralRing(currRing))
+	{ 
+          int *pl=(int*)omAlloc0(IDELEMS(I)*sizeof(int));
+	  Print("starting redRat\n");
+	  //res->data = (char *)
+	  redRat(&p, q, pl, (int)IDELEMS(I),is,currRing);
+	  res->data=p;
+	  res->rtyp=POLY_CMD;
+	  //	res->data = ncGCD(p,q,currRing);	
+	}
+	else 
+	{
+	  res->rtyp=POLY_CMD;
+	  res->data=p;
+	}
+      }
+      else return TRUE;
+      return FALSE;
+    }
+    else
+/*==================== RatNF, noncomm rational coeffs =================*/
     if (strcmp(sys_cmd, "ratNF") == 0)
     {
       poly p,q;
@@ -2633,12 +2681,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       if ((h!=NULL) && (h->Typ()==INT_CMD))
       {
 	is=(int)((long)(h->Data()));
-//	res->rtyp=POLY_CMD;
-	res->rtyp=IDEAL_CMD;
+	res->rtyp=POLY_CMD;
+	//	res->rtyp=IDEAL_CMD;
 	if (rIsPluralRing(currRing))
 	{ 
-//	  res->data = nc_rat_ReduceSpolyNew(q,p,is, currRing);
-	res->data = ncGCD(p,q,currRing);	
+	  res->data = nc_rat_ReduceSpolyNew(q,p,is, currRing);
+	  //	res->data = ncGCD(p,q,currRing);	
 	}
 	else res->data=p;
       }
