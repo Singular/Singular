@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ratgring.h,v 1.2 2007-03-04 18:18:17 levandov Exp $ */
+/* $Id: ratgring.h,v 1.3 2007-03-10 13:14:33 Singular Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -94,5 +94,16 @@ poly nc_rat_ReduceSpolyNew(poly p1, poly p2, int ishift, ring r);
 // #define nc_kBucketPolyRed(A,B,C) 0
 // #define nc_PolyPolyRed(A,B,C) 0
 
+// return: FALSE, if there exists i in ishift..r->N,
+//                 such that a->exp[i] > b->exp[i]
+//         TRUE, otherwise
+BOOLEAN p_DivisibleByRat(poly a, poly b, int ishift, const ring r);
+
+/*2
+*reduces h with elements from reducer choosing the best possible
+* element in t with respect to the given red_length
+* arrays reducer and red_length are [0..(rl-1)]
+*/
+int redRat (poly* h,poly *reducer, int *red_length,int rl, int ishift, ring r);
 #endif /* HAVE_PLURAL */
 #endif

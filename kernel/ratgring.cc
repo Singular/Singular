@@ -6,7 +6,7 @@
  *  Purpose: Ore-noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: ratgring.cc,v 1.4 2007-03-10 13:14:33 Singular Exp $
+ *  Version: $Id: ratgring.cc,v 1.5 2007-03-10 13:17:15 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -403,7 +403,7 @@ BOOLEAN p_DivisibleByRat(poly a, poly b, int ishift, const ring r)
 */
 int redRat (poly* h,poly *reducer, int *red_length,int rl, int ishift, ring r)
 {
-  if (h==NULL) return 0;
+  if ((*h)==NULL) return 0;
 
   int j,i,l;
 
@@ -412,7 +412,7 @@ int redRat (poly* h,poly *reducer, int *red_length,int rl, int ishift, ring r)
     j=rl;l=MAX_INT_VAL;
     for(i=rl-1;i>=0;i--)
     {
-      if (l>red_length[i]) && (p_DivisibleByRat(reducer[i],h,ishift,r)))
+      if ((l>red_length[i]) && (p_DivisibleByRat(reducer[i],*h,ishift,r)))
       {
         j=i; l=red_length[i];
       }
@@ -425,19 +425,19 @@ int redRat (poly* h,poly *reducer, int *red_length,int rl, int ishift, ring r)
     if (TEST_OPT_DEBUG)
     {
       PrintS("reduce ");
-      p_wrp(h,r);
+      p_wrp(*h,r);
       PrintS(" with ");
       p_wrp(reducer[j],r);
     }
-    poly hh=nc_rat_ReduceSpolyNew(h, reducer[j], ishift, r);
-    p_Delete(&h,r); h=hh;
+    poly hh=nc_rat_ReduceSpolyNew(*h, reducer[j], ishift, r);
+    p_Delete(h,r); *h=hh;
     if (TEST_OPT_DEBUG)
     {
       PrintS(" to ");
-      p_wrp(h,r);
+      p_wrp(*h,r);
       PrintLn();
     }
-    if (h==NULL)
+    if ((*h)==NULL)
     {
       return 0;
     }
