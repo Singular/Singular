@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.11 2007-03-04 22:56:16 levandov Exp $
+ *  Version: $Id: pInline2.h,v 1.12 2007-03-10 15:41:49 levandov Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -158,7 +158,8 @@ PINLINE2 int p_Comp_k_n(poly a, poly b, int k, ring r)
   int i=k;
   for(;i<=r->N;i++)
   {
-    if (a->exp[(r->VarOffset[i] & 0xffffff)] != b->exp[(r->VarOffset[i] & 0xffffff)]) return FALSE;
+    if (p_GetExp(a,i,r) != p_GetExp(b,i,r)) return FALSE;
+    //    if (a->exp[(r->VarOffset[i] & 0xffffff)] != b->exp[(r->VarOffset[i] & 0xffffff)]) return FALSE;
   }
   return TRUE;
 }

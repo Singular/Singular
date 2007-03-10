@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ratgring.h,v 1.3 2007-03-10 13:14:33 Singular Exp $ */
+/* $Id: ratgring.h,v 1.4 2007-03-10 15:41:49 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -25,7 +25,9 @@ poly p_GetCoeffRat(poly p, int ishift, ring r);
 
 poly p_HeadRat(poly p, int ishift, ring r);
 
-void p_LmDeleteAndNextRat(poly p, int ishift, ring r);
+void p_LmDeleteAndNextRat(poly *p, int ishift, ring r);
+
+void p_ExpVectorDiffRat(poly pr, poly p1, poly p2, int ishift, ring r);
 
 ideal ncGCD(poly p, poly q, ring r);
 
