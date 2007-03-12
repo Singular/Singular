@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncalg.lib,v 1.23 2007-01-23 15:03:31 Singular Exp $";
+version="$Id: ncalg.lib,v 1.24 2007-03-12 13:14:02 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  ncalg.lib      Definitions of important GR-algebras
@@ -590,7 +590,7 @@ ASSUME: This procedure uses toric_lib and therefore inherits its input requireme
 SEE ALSO: toric_lib
 EXAMPLE: example GKZsystem; shows examples
 "{
-  int d = nrows(A);
+  int @d = nrows(A);
   int n = ncols(A);
   execute("ring r1=0,(d(1..n)),"+sord+";");
   ideal I0;
@@ -611,12 +611,13 @@ EXAMPLE: example GKZsystem; shows examples
       return();
     }
   };
-  execute("ring GR = (0,b(1..d)),(x(1..n),d(1..n)),"+sord+";");
+  string sord2 = "(a(0:" + string(n) + ")," + sord + ")";
+  execute("ring GR = (0,b(1..@d)),(x(1..n),d(1..n)),"+sord2+";");
   Weyl();
   int i,j;
   poly p;
   ideal I;
-  for (i=1; i<=d; i++)
+  for (i=1; i<=@d; i++)
   {
     p = -b(i);
     for (j=1; j<=n; j++)
@@ -633,7 +634,7 @@ EXAMPLE: example GKZsystem; shows examples
 }
 example
 {"EXAMPLE:"; echo = 2;
-  // example 3.1.4 from the [SST] without vector w
+  // example 3.1.4 from the [SST] without the vector w
   intmat A[2][4]=3,2,1,0,0,1,2,3;
   print(A);
   def D1 = GKZsystem(A,"lp","ect");
@@ -648,6 +649,7 @@ example
 }
 // easier example: 3.1.1 from SST
 //   intmat A[2][3]=2,1,0,0,1,2;
+
 ///////////////////////////////////////////////////////////////////////////////
 
 // need: real Uso3 in the symmetric presentation
