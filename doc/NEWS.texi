@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.77 2007-03-09 18:42:34 Singular Exp $
+@comment $Id: NEWS.texi,v 1.78 2007-03-12 13:07:45 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -32,6 +32,8 @@ that means that all parts of @sc{Singular} are licenced under GPL (resp. LGPL).
 factory, libfac, Singular updated for gcc 4.1.x
 @item
 kernel updated for the optional use of boost
+@item
+new operator @code{a:b} : @code{intvec} of length @code{b} with constant entries @code{a}
 @item
 new command: (@nref{interpolation}: ideal of points with given multiplicities)
 @item

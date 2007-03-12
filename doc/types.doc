@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.135 2006-07-17 14:32:25 Singular Exp $
+@comment $Id: types.doc,v 1.136 2007-03-12 13:07:45 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -140,6 +140,11 @@ See
 @cindex bigint operations
 @cindex mod
 @cindex div
+@cindex +
+@cindex -
+@cindex *
+@cindex /
+@cindex ^
 
 @c remark: the following table should have style @asis, since the
 @c   commas below should not by set in style @code.
@@ -357,6 +362,9 @@ a type cast to ideal
 @node ideal operations, ideal related functions, ideal expressions, ideal
 @subsection ideal operations
 @cindex ideal operations
+@cindex +
+ycindex *
+ycindex ^
 
 @table @asis
 @item @code{+}
@@ -661,6 +669,11 @@ See
 @cindex int operations
 @cindex mod
 @cindex div
+@cindex +
+@cindex -
+@cindex *
+@cindex /
+@cindex %
 
 @c remark: the following table should have style @asis, since the
 @c   commas below should not by set in style @code.
@@ -1050,6 +1063,9 @@ See
 @node intmat operations, intmat related functions, intmat type cast, intmat
 @subsection intmat operations
 @cindex intmat operations
+@cindex +
+@cindex -
+@cindex *
 
 @table @asis
 @item @code{+}
@@ -1181,11 +1197,20 @@ defines an intvec variable.
 @node intvec expressions, intvec operations, intvec declarations, intvec
 @subsection intvec expressions
 @cindex intvec expressions
+@cindex :
+@cindex +
+@cindex -
+@cindex *
+@cindex /
+@cindex %
 
 An intvec expression is:
 @enumerate
 @item
 a range: int expression @code{..} int expression
+@item
+a repeated entry: int expression @code{:} int expression
+@*(@code{a:b} generates an @code{intvec} of length @code{b} with constant entries @code{a})
 @item
 a function returning intvec
 @item
