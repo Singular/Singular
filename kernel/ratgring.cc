@@ -6,7 +6,7 @@
  *  Purpose: Ore-noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: ratgring.cc,v 1.6 2007-03-10 15:41:49 levandov Exp $
+ *  Version: $Id: ratgring.cc,v 1.7 2007-03-12 14:13:07 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -381,14 +381,16 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
   H  = r->nc->p_Procs.mm_Mult_p(m, p_Copy(HH, r), r); // d^aplha lm_D(g)
 
   poly K  = p_Copy( p_GetCoeffRat(H,  is, r), r);
+  Print("k: "); p_wrp(K,r); PrintS("\n");
   poly P  = p_Copy( p_GetCoeffRat(p2, is, r), r);
+  Print("p: "); p_wrp(P,r); PrintS("\n");
 
   //  HH = p_Neg(HH, r);
   //  poly out = NULL;
   //  out = p_Add_q(p_Copy(p1,r), HH, r); // out == t_g
 
-  Print("f: "); p_wrp(p2,r); PrintS(" ");
-  Print("g: "); p_wrp(p1,r); PrintS(" ");
+  Print("f: "); p_wrp(p2,r); PrintS("\n");
+  Print("g: "); p_wrp(p1,r); PrintS("\n");
 
   // alt:
   poly out = p1; //p_Copy(p1,r);

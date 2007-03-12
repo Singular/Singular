@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.252 2007-03-10 15:42:13 levandov Exp $ */
+/* $Id: extra.cc,v 1.253 2007-03-12 14:13:22 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2619,7 +2619,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       poly p;
       poly *q;
       ideal I;
-      int is;
+      int is, k, id;
       if ((h!=NULL) && (h->Typ()==POLY_CMD))
       {
 	p=(poly)h->CopyD();
@@ -2643,7 +2643,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 	//	res->rtyp=IDEAL_CMD;
 	if (rIsPluralRing(currRing))
 	{ 
+	  id = IDELEMS(I);
           int *pl=(int*)omAlloc0(IDELEMS(I)*sizeof(int));
+	  for(k=0; k < id; k++)
+	  {
+	    pl[k] = pLength(I->m[k]);
+	  }
 	  Print("starting redRat\n");
 	  //res->data = (char *)
 	  redRat(&p, q, pl, (int)IDELEMS(I),is,currRing);
