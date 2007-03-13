@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.78 2007-02-12 17:26:08 Singular Exp $ */
+/* $Id: ipid.cc,v 1.79 2007-03-13 16:03:24 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -612,8 +612,7 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
   else if (IDTYP(h)==LIST_CMD)
   {
     IDLIST(h)->Clean(r);
-    //omFreeSize((ADDRESS)IDLIST(h)->m, (IDLIST(h)->nr+1)*sizeof(sleftv));
-    //omFreeBin((ADDRESS)IDLIST(h),  slists_bin);
+    //IDLIST(h)=NULL;
   }
   // link  -------------------------------------------------------------
   else if (IDTYP(h)==LINK_CMD)
@@ -640,7 +639,7 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
     Print("=======>%s(%x)<====\n", IDID(h), IDID(h));
 #endif
 
-  if (IDID(h)) // OB: ?????
+  if (IDID(h)!=NULL) // OB: ?????
     omFree((ADDRESS)IDID(h));
   IDID(h)=NULL;
   IDDATA(h)=NULL;
