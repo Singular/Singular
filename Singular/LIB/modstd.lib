@@ -1,6 +1,6 @@
 //GP, last modified 23.10.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: modstd.lib,v 1.6 2007-01-23 15:03:30 Singular Exp $";
+version="$Id: modstd.lib,v 1.7 2007-03-13 18:48:27 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: modstd.lib  Grobner basis of ideals
@@ -424,12 +424,12 @@ RETURN:  a rational number a/b such that a/b=N mod P
         {
            return(N/B);
         }
-	D=E mod N;
-	C=A-(E-E mod N)/N*B;
-	E=N;
-	N=D;
-	A=B;
-	B=C;
+        D=E mod N;
+        C=A-(E-E mod N)/N*B;
+        E=N;
+        N=D;
+        A=B;
+        B=C;
    }
    return(0);
 }
@@ -440,8 +440,8 @@ example
 }
  ///////////////////////////////////////////////////////////////////////////////
 proc chineseR(list T,list L,number N)
-"USAGE:  chineseR(T,L);
-RETURN: x such that x = T[i] mod L[i]
+"USAGE:  chineseR(T,L,N);
+RETURN: x such that x = T[i] mod L[i], N=product(L[i])
 NOTE:   chinese remainder theorem
 EXAMPLE:example chineseR; shows an example
 "
@@ -470,7 +470,7 @@ EXAMPLE:example chineseR; shows an example
 example
 { "EXAMPLE:"; echo = 2;
    ring R = 0,x,dp;
-   chineseR(list(24,15,7),list(2,3,5));
+   chineseR(list(24,15,7),list(2,3,5),30);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
