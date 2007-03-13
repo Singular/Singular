@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.52 2006-10-04 13:51:28 motsak Exp $ */
+/* $Id: cntrlc.cc,v 1.53 2007-03-13 18:54:15 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -24,10 +24,6 @@
 #include "polys.h"
 #include "feOpt.h"
 #include "version.h"
-#ifdef PAGE_TEST
-#include "page.h"
-#endif /* PAGE_TEST */
-
 
 /* undef, if you don't want GDB to come up on error */
 
@@ -39,39 +35,38 @@
 #undef CALL_GDB
 #endif
 
-#ifdef unix
-# ifndef hpux
-#  include <unistd.h>
-#  include <sys/types.h>
+#if defined(unix) && !defined(hpux)
+ #include <unistd.h>
+ #include <sys/types.h>
 
-#  ifdef TIME_WITH_SYS_TIME
-#   include <time.h>
-#   ifdef HAVE_SYS_TIME_H
-#     include <sys/time.h>
-#   endif
-#  else
-#   ifdef HAVE_SYS_TIME_H
-#     include <sys/time.h>
-#   else
-#     include <time.h>
-#   endif
-#  endif
-#  ifdef HAVE_SYS_TIMES_H
-#   include <sys/times.h>
-#  endif
+ #ifdef TIME_WITH_SYS_TIME
+   #include <time.h>
+   #ifdef HAVE_SYS_TIME_H
+     #include <sys/time.h>
+   #endif
+ #else
+   #ifdef HAVE_SYS_TIME_H
+     #include <sys/time.h>
+   #else
+     #include <time.h>
+   #endif
+ #endif
+ #ifdef HAVE_SYS_TIMES_H
+   #include <sys/times.h>
+ #endif
 
-#  define INTERACTIVE 0
-#  define STACK_TRACE 1
-#  ifdef CALL_GDB
-static void debug (int);
-static void debug_stop (char **);
-#  endif
-#  ifndef __OPTIMIZE__
-static void stack_trace (char **);
-static void stack_trace_sigchld (int);
-#  endif
-# endif /* !hpux */
-#endif  /* unix */
+ #define INTERACTIVE 0
+ #define STACK_TRACE 1
+
+ #ifdef CALL_GDB
+   static void debug (int);
+   static void debug_stop (char **);
+ #endif
+ #ifndef __OPTIMIZE__
+   static void stack_trace (char **);
+   static void stack_trace_sigchld (int);
+ #endif
+#endif
 
 /*---------------------------------------------------------------------*
  * File scope Variables (Variables share by several functions in
@@ -100,7 +95,7 @@ void sigint_handler(int sig);
 si_hdl_typ si_set_signal ( int sig, si_hdl_typ signal_handler);
 
 /*---------------------------------------------------------------------*/
-/** 
+/**
  * @brief meta function for binding a signal to an handler
 
  @param[in] sig             Signal number
@@ -127,11 +122,10 @@ si_hdl_typ si_set_signal (
 
 
 /*---------------------------------------------------------------------*/
-/*-- linux and i386 ---*/
-#if defined(linux) && defined(__i386__)
-# if defined(HAVE_SIGCONTEXT) || defined(HAVE_ASM_SIGCONTEXT_H)
-#  include <asm/sigcontext.h>
-# else
+#if defined(ix86_Linux)
+  #if defined(HAVE_SIGCONTEXT) || defined(HAVE_ASM_SIGCONTEXT_H)
+  #include <asm/sigcontext.h>
+  #else
 struct sigcontext_struct {
         unsigned short gs, __gsh;
         unsigned short fs, __fsh;
@@ -156,22 +150,23 @@ struct sigcontext_struct {
         unsigned long oldmask;
         unsigned long cr2;
 };
+#endif
 #define HAVE_SIGSTRUCT
-# endif
 typedef struct sigcontext_struct sigcontext;
 #endif
-#if defined(linux) && defined(x86_64_Linux)
+
+#if defined(x86_64_Linux)
 #define HAVE_SIGSTRUCT
 #endif
 
 
-#if defined(linux) && defined(HAVE_SIGSTRUCT)
+#if defined(HAVE_SIGSTRUCT)
 /*2---------------------------------------------------------------------*/
-/** 
- * @brief signal handler for run time errors, linux/i386 version
+/**
+ * @brief signal handler for run time errors, linux/i386, x86_64 version
 
- @param[in] sig     
- @param[in] s   
+ @param[in] sig
+ @param[in] s
 **/
 /*---------------------------------------------------------------------*/
 void sigsegv_handler(int sig, sigcontext s)
@@ -188,7 +183,7 @@ void sigsegv_handler(int sig, sigcontext s)
 		   #endif
 		   (long)s.cr2,siRandomStart);
   }
-# ifdef __OPTIMIZE__
+#ifdef __OPTIMIZE__
   if(si_restart<3)
   {
     si_restart++;
@@ -196,15 +191,15 @@ void sigsegv_handler(int sig, sigcontext s)
     init_signals();
     longjmp(si_start_jmpbuf,1);
   }
-# endif /* __OPTIMIZE__ */
-# ifdef CALL_GDB
+#endif /* __OPTIMIZE__ */
+#ifdef CALL_GDB
   if (sig!=SIGINT) debug(INTERACTIVE);
-# endif /* CALL_GDB */
+#endif /* CALL_GDB */
   exit(0);
 }
 
 /*---------------------------------------------------------------------*/
-/** 
+/**
  * @brief additional default signal handler
 
   // some newer Linux version cannot have SIG_IGN for SIGCHLD,
@@ -213,64 +208,12 @@ void sigsegv_handler(int sig, sigcontext s)
   //  Redhat 9.x/FC x reports sometimes -1
   // see also: hpux_system
 
- @param[in] sig     
+ @param[in] sig
 **/
 /*---------------------------------------------------------------------*/
 void sig_ign_hdl(int sig)
 {
 }
-
-# ifdef PAGE_TEST
-#  ifndef PAGE_INTERRUPT_TIME
-#   define PAGE_INTERRUPT_TIME 1
-#  endif
-
-/*---------------------------------------------------------------------*/
-/** 
- * @brief signal handler for segmentation faults
-
- @param[in] sig     
- @param[in] s   
-**/
-/*---------------------------------------------------------------------*/
-void sig11_handler(int sig, sigcontext s)
-{
-  unsigned long base =(unsigned long)(s.cr2&(~4095));
-  int i;
-  i=mmPage_tab_ind-1;
-  while (mmPage_tab[i]!=base) i--;
-  mmUse_tab[i]='1';
-  mmPage_tab_acc++;
-  mmPage_AllowAccess((void *)base);
-  si_set_signal(SIGSEGV,(si_hdl_typ)sig11_handler);
-}
-
-/*---------------------------------------------------------------------*/
-/** 
- * @brief signal handler for alarm signals
-
- @param[in] sig     
- @param[in] s   
-**/
-/*---------------------------------------------------------------------*/
-void sigalarm_handler(int sig, sigcontext s)
-{
-  int i=mmPage_tab_ind-1;
-  mmWriteStat();
-  for(;i>=0;i--)
-  {
-    mmPage_DenyAccess((void *)mmPage_tab[i]);
-  }
-  struct itimerval t,o;
-  memset(&t,0,sizeof(t));
-  t.it_value.tv_sec     =(unsigned)0;
-  t.it_value.tv_usec    =(unsigned) PAGE_INTERRUPT_TIME;
-  o.it_value.tv_sec     =(unsigned)0;
-  o.it_value.tv_usec    =(unsigned)PAGE_INTERRUPT_TIME;
-  setitimer(ITIMER_VIRTUAL,&t,&o);
-  si_set_signal(SIGVTALRM,(si_hdl_typ)sigalarm_handler);
-}
-#endif /* PAGE_TEST */
 
 /*2
 * init signal handlers, linux/i386 version
@@ -278,22 +221,10 @@ void sigalarm_handler(int sig, sigcontext s)
 void init_signals()
 {
 /*4 signal handler: linux*/
-# ifdef PAGE_TEST
-  si_set_signal(SIGSEGV,(si_hdl_typ)sig11_handler);
-  struct itimerval t,o;
-  memset(&t,0,sizeof(t));
-  t.it_value.tv_sec     =(unsigned)0;
-  t.it_value.tv_usec    =(unsigned)PAGE_INTERRUPT_TIME;
-  o.it_value.tv_sec     =(unsigned)0;
-  o.it_value.tv_usec    =(unsigned)PAGE_INTERRUPT_TIME;
-  setitimer(ITIMER_VIRTUAL,&t,&o);
-  si_set_signal(SIGVTALRM,(si_hdl_typ)sigalarm_handler);
-# else /* PAGE_TEST */
   if (SIG_ERR==si_set_signal(SIGSEGV,(si_hdl_typ)sigsegv_handler))
   {
     PrintS("cannot set signal handler for SEGV\n");
   }
-# endif /* PAGE_TEST */
   if (SIG_ERR==si_set_signal(SIGFPE, (si_hdl_typ)sigsegv_handler))
   {
     PrintS("cannot set signal handler for FPE\n");
@@ -314,10 +245,8 @@ void init_signals()
   si_set_signal(SIGCHLD, (si_hdl_typ)sig_ign_hdl);
 }
 
-#else /* linux && __i386__ */
 /*---------------------------------------------------------------------*/
-/*-- SPARC_SUNOS_4 ---*/
-# ifdef SPARC_SUNOS_4
+#elif defined(SunOS) /*SPARC_SUNOS*/
 /*2
 * signal handler for run time errors, sparc sunos 4 version
 */
@@ -331,7 +260,7 @@ void sigsegv_handler(int sig, int code, struct sigcontext *scp, char *addr)
                    "please inform the authors\n",
                    (int)addr,siRandomStart);
   }
-#  ifdef __OPTIMIZE__
+#ifdef __OPTIMIZE__
   if(si_restart<3)
   {
     si_restart++;
@@ -339,10 +268,10 @@ void sigsegv_handler(int sig, int code, struct sigcontext *scp, char *addr)
     init_signals();
     longjmp(si_start_jmpbuf,1);
   }
-#  endif /* __OPTIMIZE__ */
-#  ifdef CALL_GDB
+#endif /* __OPTIMIZE__ */
+#ifdef CALL_GDB
   if (sig!=SIGINT) debug(STACK_TRACE);
-#  endif /* CALL_GDB */
+#endif /* CALL_GDB */
   exit(0);
 }
 
@@ -360,7 +289,7 @@ void init_signals()
   si_set_signal(SIGINT ,sigint_handler);
   si_set_signal(SIGCHLD, (void (*)(int))SIG_IGN);
 }
-# else /* SPARC_SUNOS_4 */
+#else
 
 /*---------------------------------------------------------------------*/
 /*2
@@ -376,7 +305,7 @@ void sigsegv_handler(int sig)
                    "please inform the authors\n",
                    siRandomStart);
   }
-#   ifdef __OPTIMIZE__
+  #ifdef __OPTIMIZE__
   if(si_restart<3)
   {
     si_restart++;
@@ -384,17 +313,15 @@ void sigsegv_handler(int sig)
     init_signals();
     longjmp(si_start_jmpbuf,1);
   }
-#   endif /* __OPTIMIZE__ */
-#   ifdef unix
-#    ifndef hpux
-/* debug(..) does not work under HPUX (because ptrace does not work..) */
-#     ifdef CALL_GDB
-#      ifndef MSDOS
+  #endif /* __OPTIMIZE__ */
+  #if defined(unix) && !defined(hpux)
+  /* debug(..) does not work under HPUX (because ptrace does not work..) */
+  #ifdef CALL_GDB
+  #ifndef MSDOS
   if (sig!=SIGINT) debug(STACK_TRACE);
-#      endif /* MSDOS */
-#     endif /* CALL_GDB */
-#    endif /* !hpux */
-#   endif /* unix */
+  #endif /* MSDOS */
+  #endif /* CALL_GDB */
+  #endif /* unix */
   exit(0);
 }
 
@@ -403,33 +330,32 @@ void sigsegv_handler(int sig)
 */
 void init_signals()
 {
-#  ifndef MSDOS
+  #ifndef MSDOS
 /* signals are not implemented in DJGCC */
 /*4 signal handler:*/
   si_set_signal(SIGSEGV,(void (*) (int))sigsegv_handler);
-#    ifdef SIGBUS
+  #ifdef SIGBUS
   si_set_signal(SIGBUS, sigsegv_handler);
-#    endif /* SIGBUS */
-#    ifdef SIGFPE
+  #endif /* SIGBUS */
+  #ifdef SIGFPE
   si_set_signal(SIGFPE, sigsegv_handler);
-#    endif /* SIGFPE */
-#    ifdef SIGILL
+  #endif /* SIGFPE */
+  #ifdef SIGILL
   si_set_signal(SIGILL, sigsegv_handler);
-#    endif /* SIGILL */
-#    ifdef SIGIOT
+  #endif /* SIGILL */
+  #ifdef SIGIOT
   si_set_signal(SIGIOT, sigsegv_handler);
-#    endif /* SIGIOT */
-#    ifdef SIGXCPU
+  #endif /* SIGIOT */
+  #ifdef SIGXCPU
   si_set_signal(SIGXCPU, (void (*)(int))SIG_IGN);
-#    endif /* SIGIOT */
+  #endif /* SIGIOT */
   si_set_signal(SIGINT ,sigint_handler);
-#if defined(HPUX_9) || defined(HPUX_10)
+  #if defined(HPUX_9) || defined(HPUX_10)
   si_set_signal(SIGCHLD, (void (*)(int))SIG_IGN);
-#endif
-#  endif /* !MSDOS */
+  #endif
+  #endif /* !MSDOS */
 }
-# endif /* SPARC_SUNOS_4 */
-#endif /* linux && __i386__ */
+#endif
 
 
 #ifndef MSDOS
@@ -439,9 +365,9 @@ void init_signals()
 void sigint_handler(int sig)
 {
   mflush();
-#  ifdef HAVE_FEREAD
+  #ifdef HAVE_FEREAD
   if (fe_is_raw_tty) fe_temp_reset();
-#  endif /* HAVE_FEREAD */
+  #endif /* HAVE_FEREAD */
   loop
   {
     int cnt=0;
@@ -457,31 +383,9 @@ void sigint_handler(int sig)
     {
       c = 'a';
     }
-    
+
     switch(c)
     {
-#  if defined(MONOM_COUNT) || defined(DIV_COUNT)
-              case 'e':
-#   ifdef MONOM_COUNT
-                extern void ResetMonomCount();
-                ResetMonomCount();
-#   endif /* MONOM_COUNT */
-#   ifdef DIV_COUNT
-                extern void ResetDivCount();
-                ResetDivCount();
-#   endif /* DIV_COUNT */
-                break;
-              case 'o':
-#   ifdef MONOM_COUNT
-                extern void OutputMonomCount();
-                OutputMonomCount();
-#   endif /* COUNT */
-#   ifdef DIV_COUNT
-                extern void OutputDivCount();
-                OutputDivCount();
-#   endif /* DIV_COUNT */
-                break;
-#  endif /* defined(MONOM_COUNT) || defined(DIV_COUNT) */
       case 'q':
                 m2_end(2);
       case 'r':
@@ -536,9 +440,9 @@ static void debug (int method)
   char buf[16];
   char *args[4] = { "gdb", "Singularg", NULL, NULL };
 
-#     ifdef HAVE_FEREAD
+  #ifdef HAVE_FEREAD
   if (fe_is_raw_tty) fe_temp_reset();
-#     endif /* HAVE_FEREAD */
+  #endif /* HAVE_FEREAD */
 
   sprintf (buf, "%d", getpid ());
 
@@ -697,7 +601,7 @@ static void stack_trace_sigchld (int signum)
 
 /* Under HPUX 9, system(...) returns -1 if SIGCHLD does not equal
    SIG_DFL. However, if it stays at SIG_DFL we get zombie processes
-   for terminated childs generated by fork. Therefors some special treatment 
+   for terminated childs generated by fork. Therefors some special treatment
    is necessary */
 #ifdef HPUX_9
 # undef system
