@@ -2,7 +2,7 @@
 //major revision Jan/Feb. 2007, GMG
 //groebner mit Optionen versehen
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.88 2007-02-24 15:09:51 Singular Exp $";
+version="$Id: standard.lib,v 1.89 2007-03-14 18:17:34 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -193,15 +193,12 @@ EXAMPLE: example stdhilb;  shows an example"
   string ordstr_P = ordstr(P);     //ordering of basering as string
   int nvarP = nvars(P);
   intvec w;                        //for ringweights of basering P
-  int k,neg;
+  int k;
   for(k=1;  k<=nvarP; k++)
   {
      w[k]=deg(var(k));
-     if(w[k] <= 0)
-     {
-       neg=1;
-     }
   }
+  int neg=1-attrib (P,"global");
 
   //save options:
   int p_opt;
@@ -497,11 +494,7 @@ EXAMPLE: example par2varRing; shows an example"
 
    //converted parameters get one block dp. If module ordering was in front
    //it stays in front, otherwise it will be moved to the end
-   intvec OW = 1;
-   for (k = 2; k <= npar; k++)
-   {
-      OW = OW,1;
-   }
+   intvec OW = 1:npar;
    if( rlist[3][nblock][1] =="c" || rlist[3][nblock][1] =="C" )
    {
       rlist[3][nblock+1] = rlist[3][nblock];
@@ -947,15 +940,11 @@ EXAMPLE: example groebner;  shows an example"
   int nvars_P = nvars(P);
   int npars_P = npars(P);
   intvec w;                     //for ringweights of basering P
-  int neg;
   for(k=1;  k<=nvars_P; k++)
   {
      w[k]=deg(var(k));
-     if(w[k] <= 0)
-     {
-       neg=1;
-     }
   }
+  int neg=1-attrib (P,"global");
 
   //save options:
   intvec opt=option(get);
