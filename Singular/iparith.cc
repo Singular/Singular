@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.442 2007-03-10 14:40:52 Singular Exp $ */
+/* $Id: iparith.cc,v 1.443 2007-03-15 14:36:33 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -212,6 +212,7 @@ cmdnames cmds[] =
   { "char",        0, CHARACTERISTIC_CMD ,CMD_1},
   { "char_series", 0, CHAR_SERIES_CMD ,   CMD_1},
   { "charstr",     0, CHARSTR_CMD ,       CMD_1},
+  { "chinrem",     0, CHINREM_CMD ,       CMD_2},
   { "cleardenom",  0, CONTENT_CMD ,       CMD_1},
   { "close",       0, CLOSE_CMD ,         CMD_1},
   { "coef",        0, COEF_CMD ,          CMD_M},
@@ -1659,6 +1660,56 @@ static BOOLEAN jjCALL2MANY(leftv res, leftv u, leftv v)
   // iiExprArithM did the CleanUp
   return r;
 }
+static BOOLEAN jjCHINREM_BI(leftv res, leftv u, leftv v)
+{
+  intvec *c=(intvec*)u->Data();
+  intvec* p=(intvec*)v->Data();
+  int rl=p->length();
+  number *x=(number *)omAlloc(rl*sizeof(number));
+  number *q=(number *)omAlloc(rl*sizeof(number));
+  int i;
+  for(i=rl-1;i>=0;i--)
+  {
+    q[i]=nlInit((*p)[i]);
+    x[i]=nlInit((*c)[i]);
+  }
+  number n=nlChineseRemainder(x,q,rl);
+  for(i=rl-1;i>=0;i--)
+  {
+    nlDelete(&(q[i]),currRing);
+    nlDelete(&(x[i]),currRing);
+  }
+  omFree(x); omFree(q);
+  res->data=(char *)n;
+  return FALSE;
+}
+static BOOLEAN jjCHINREM_P(leftv res, leftv u, leftv v)
+{
+#if 0
+  ideal c=(ideal)u->CopyD();
+  intvec* p=(intvec*)v->Data();
+  int rl=p->length();
+  poly r=NULL,h;
+  number *x=(number *)omAlloc(rl*sizeof(number));
+  number *q=(number *)omAlloc(rl*sizeof(number));
+  int i;
+  for(i=rl-1;i>=0;i--)
+  {
+    q[i]=nlInit((*p)[i]);
+  }
+  // for each monom
+  //number n=nlChineseRemainder(x,q,rl);
+  for(i=rl-1;i>=0;i--)
+  {
+    nlDelete(&(q[i]),currRing);
+  }
+  omFree(x); omFree(q);
+  res->data=(char *)r;
+  return FALSE;
+#else
+  return TRUE; // not yet implemented
+#endif
+}
 static BOOLEAN jjCOEF(leftv res, leftv u, leftv v)
 {
   poly p=(poly)v->Data();
@@ -3054,6 +3105,8 @@ struct sValCmd2 dArith2[]=
 #ifdef HAVE_PLURAL
 ,{jjBRACKET,   BRACKET_CMD,    POLY_CMD,       POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 #endif
+,{jjCHINREM_BI,CHINREM_CMD,    BIGINT_CMD,     INTVEC_CMD, INTVEC_CMD ALLOW_PLURAL}
+,{jjCHINREM_P, CHINREM_CMD,    POLY_CMD,       IDEAL_CMD,  IDEAL_CMD ALLOW_PLURAL}
 ,{jjCOEF,      COEF_CMD,       MATRIX_CMD,     POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  POLY_CMD ALLOW_PLURAL}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     MODUL_CMD,  POLY_CMD ALLOW_PLURAL}
