@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.5 2006-07-19 13:49:29 Singular Exp $ */
+/* $Id: longrat.h,v 1.6 2007-03-15 14:24:03 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
@@ -79,6 +79,7 @@ int      nlModP(number n, int p);
 int      nlSize(number n);
 number   nlGetDenom(number &n, const ring r);
 number   nlGetNom(number &n, const ring r);
+number   nlChineseRemainder(number *x, number *q,int rl);
 #ifdef LDEBUG
 BOOLEAN  nlDBTest(number a, char *f, int l);
 #endif

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.7 2005-12-12 18:05:33 Singular Exp $
+// $Id: clapconv.cc,v 1.8 2007-03-15 14:24:03 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -713,6 +713,27 @@ convRecTrP ( const CanonicalForm & f, int * exp, poly & result , int offs)
     pSetm( term );
     result = pAdd( result, term );
   }
+}
+
+number   nlChineseRemainder(number *x, number *q,int rl)
+// elemenst in the array are x[0..(rl-1)], q[0..(rl-1)]
+{
+#ifdef HAVE_FACTORY
+  CFArray X(rl), Q(rl);
+  int i;
+  for(i=rl-1;i>=0;i--)
+  {
+    X[i]=CanonicalForm(nlInt(x[i]));
+    Q[i]=CanonicalForm(nlInt(q[i]));
+  }
+  CanonicalForm xnew,qnew;
+  chineseRemainder(X,Q,xnew,qnew);
+  number n=convClapNSingN(xnew);
+  return n;
+#else
+  WerrorS("not implemented");
+  return nlInit(0);
+#endif
 }
 
 #if 0
