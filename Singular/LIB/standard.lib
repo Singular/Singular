@@ -2,7 +2,7 @@
 //major revision Jan/Feb. 2007, GMG
 //groebner mit Optionen versehen
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.89 2007-03-14 18:17:34 Singular Exp $";
+version="$Id: standard.lib,v 1.90 2007-03-16 13:27:19 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -39,96 +39,96 @@ SEE ALSO: fglm, groebner, std, slimgb, stdhilb
 KEYWORDS: fglm
 EXAMPLE: example stdfglm; shows an example"
 {
-   if (nrows(i) > 1)
-   {
-      ERROR("first argument of 'stdfglm' must be an ideal");
-   }
-   string os;
-   int s = size(#);
-   def P= basering;
-   string algorithm;
-   int ii;
-   for( ii=1; ii<=s; ii++)
-   {
-      if ( typeof(#[ii])== "string" )
+  if (nrows(i) > 1)
+  {
+    ERROR("first argument of 'stdfglm' must be an ideal");
+  }
+  string os;
+  int s = size(#);
+  def P= basering;
+  string algorithm;
+  int ii;
+  for( ii=1; ii<=s; ii++)
+  {
+    if ( typeof(#[ii])== "string" )
+    {
+      if ( #[ii]=="std" || #[ii]=="slimgb" )
       {
-         if ( #[ii]=="std" || #[ii]=="slimgb" )
-         {
-            algorithm =  #[ii];
-            # = delete(#,ii);
-            s = s-1;
-            ii--;
-         }
+        algorithm =  #[ii];
+        # = delete(#,ii);
+        s--;
+        ii--;
       }
-   }
+    }
+  }
 
-   if( s > 0 && (typeof(#[1]) == "string") )
-   {
-      os = #[1];
-      ideal Qideal = ideal(P);
-      int sQ = size(Qideal);
-      int sM = size(minpoly);
-      if ( sM!=0 )
+  if( s > 0 && (typeof(#[1]) == "string") )
+  {
+    os = #[1];
+    ideal Qideal = ideal(P);
+    int sQ = size(Qideal);
+    int sM = size(minpoly);
+    if ( sM!=0 )
+    {
+      string mpoly = string(minpoly);
+    }
+    if (sQ!=0 )
+    {
+      execute("ring Rfglm=("+charstr(P)+"),("+varstr(P)+"),"+os+";");
+      ideal Qideal = fetch(P,Qideal);
+      qring Pfglm = groebner(Qideal,"std","slimgb");
+    }
+    else
+    {
+      execute("ring Pfglm=("+charstr(P)+"),("+varstr(P)+"),"+os+";");
+    }
+    if ( sM!=0 )
+    {
+      execute("minpoly="+mpoly+";");
+    }
+  }
+  else
+  {
+    list BRlist = ringlist(P);
+    int nvarP = nvars(P);
+    intvec w;                       //for ringweights of basering P
+    int k;
+    for(k=1;  k <= nvarP; k++)
+    {
+      w[k]=deg(var(k));
+    }
+
+    BRlist[3] = list();
+    if( s==0 or (typeof(#[1]) != "string") )
+    {
+      if( w==1 )
       {
-         string mpoly = string(minpoly);
-      }
-      if (sQ!=0 )
-      {
-        execute("ring Rfglm=("+charstr(P)+"),("+varstr(P)+"),"+os+";");
-        ideal Qideal = fetch(P,Qideal);
-        qring Pfglm = groebner(Qideal,"std","slimgb");
+        BRlist[3][1]=list("dp",w);
       }
       else
       {
-        execute("ring Pfglm=("+charstr(P)+"),("+varstr(P)+"),"+os+";");
+        BRlist[3][1]=list("wp",w);
       }
-      if ( sM!=0 )
-      {
-        execute("minpoly="+mpoly+";");
-      }
+      BRlist[3][2]=list("C",intvec(0));
+      def Pfglm = ring(quotientList(BRlist));
+      setring Pfglm;
     }
-    else
-    {
-      list BRlist = ringlist(P);
-      int nvarP = nvars(P);
-      intvec w;                       //for ringweights of basering P
-      int k;
-      for(k=1;  k <= nvarP; k++)
-      {
-        w[k]=deg(var(k));
-      }
+  }
+  ideal i = fetch(P,i);
 
-      BRlist[3] = list();
-      if( s==0 or (typeof(#[1]) != "string") )
-      {
-        if( w==1 )
-        {
-           BRlist[3][1]=list("dp",w);
-        }
-        else
-        {
-           BRlist[3][1]=list("wp",w);
-        }
-        BRlist[3][2]=list("C",intvec(0));
-        def Pfglm = ring(quotientList(BRlist));
-        setring Pfglm;
-      }
-    }
-    ideal i = fetch(P,i);
-
-    intvec opt = option(get);            //save options
-    option(redSB);
-    if (size(algorithm) > 0)
-    {
-       i = groebner(i,algorithm);
-    }
-    else
-    {
-       i = groebner(i);
-    }
-    option(set,opt);
-    setring P;
-    return (fglm(Pfglm,i));
+  intvec opt = option(get);            //save options
+  option(redSB);
+  if (size(algorithm) > 0)
+  {
+    i = groebner(i,algorithm);
+  }
+  else
+  {
+    i = groebner(i);
+  }
+  option(set,opt);
+  setring P;
+  return (fglm(Pfglm,i));
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -181,8 +181,7 @@ EXAMPLE: example stdhilb;  shows an example"
   int nr = nrows(i);            //nr=1 iff i is an ideal
   ideal Qideal = ideal(P);      //defining the quotient ideal if P is a qring
   int was_qring;                //remembers if basering was a qring
-  int is_homog = homog(Qideal); //remembers if Qideal was homog (homog(0)=1)
-  is_homog = is_homog*homog(i); //check for homogeneity of i and Qideal
+  int is_homog =homog(i);       //check for homogeneity of i and Qideal
   if (size(Qideal) > 0)
   {
      was_qring = 1;
@@ -196,7 +195,7 @@ EXAMPLE: example stdhilb;  shows an example"
   int k;
   for(k=1;  k<=nvarP; k++)
   {
-     w[k]=deg(var(k));
+    w[k]=deg(var(k));
   }
   int neg=1-attrib (P,"global");
 
@@ -209,165 +208,153 @@ EXAMPLE: example stdhilb;  shows an example"
   string method;
   for (k=1; k<=size(#); k++)
   {
-     if (typeof(#[k]) == "intvec")
-     {
-        intvec hi = #[k];
-     }
-     if (typeof(#[k]) == "string")
-     {
-       method = method + "," + #[k];
-     }
+    if (typeof(#[k]) == "intvec")
+    {
+      intvec hi = #[k];
+    }
+    if (typeof(#[k]) == "string")
+    {
+      method = method + "," + #[k];
+    }
   }
 
   if (npars(P) > 0)             //clear denominators of parameters
   {
     for( k=ncols(i); k>0; k-- )
     {
-       i[k]=cleardenom(i[k]);
+      i[k]=cleardenom(i[k]);
     }
   }
 
 //---------- exclude cases to which stdhilb should no be applied  ----------
 //Note that quotient ideal of qring must be homogeneous too
 
-   if( find(ordstr_P,"s") || find(ordstr_P,"M")
-       || find(ordstr_P,"a") || (neg > 0) )
-   {
-      if( defined(hi) && is_homog )
-      {
-         if (p_opt){"std with given Hilbert function in basering";}
-         return( std(i,hi,w) );
-      }
-      if (p_opt){"//--stdhilb not implemented, use std in basering";}
-      //if ( neg )
-      //{
-      //  "//*** WARNING: non-positive ring weights, computation may not finish";
-      //}
-      return( std(i) );
-   }
+  if( find(ordstr_P,"s") || find(ordstr_P,"M")
+      || find(ordstr_P,"a") || (neg > 0) )
+  {
+    if( defined(hi) && is_homog )
+    {
+      if (p_opt){"std with given Hilbert function in basering";}
+      return( std(i,hi,w) );
+    }
+    if (p_opt){"//--stdhilb not implemented, use std in basering";}
+    //if ( neg )
+    //{
+    //  "//*** WARNING: non-positive ring weights, computation may not finish";
+    //}
+    return( std(i) );
+  }
 
 //------------------------ change to hilbRing ----------------------------
 
-     list hiRi = hilbRing(i);  //The ground field of P and Philb coincide
-     intvec W = hiRi[2];       //Philb has an extra variable @ or @(k)
-     def Philb = hiRi[1];      //Philb is no qring and the predefined
-     setring Philb;            //ideal/module Id(1) in Philb is homogeneous
-                               //Parameters of P are not converted in Philb
+  list hiRi = hilbRing(i);  //The ground field of P and Philb coincide
+  intvec W = hiRi[2];       //Philb has an extra variable @ or @(k)
+  def Philb = hiRi[1];      //Philb is no qring and the predefined
+  setring Philb;            //ideal/module Id(1) in Philb is homogeneous
+                            //Parameters of P are not converted in Philb
 //-------- compute Hilbert function of homogenized ideal in Philb ---------
 //Philb has only 1 block. There are three cases
 
-     string algorithm;       //possibilities: std, slimgb, stdorslimgb
-     //define algorithm:
-     if( find(method,"std") && !find(method,"slimgb") )
-     {
-        algorithm = "std";
-     }
-     if( find(method,"slimgb") && !find(method,"std") )
-     {
-         algorithm = "slimgb";
-     }
-     if( find(method,"std") && find(method,"slimgb") ||
-         (!find(method,"std") && !find(method,"slimgb")) )
-     {
-        algorithm = "stdorslimgb";
-     }
+  string algorithm;       //possibilities: std, slimgb, stdorslimgb
+  //define algorithm:
+  if( find(method,"std") && !find(method,"slimgb") )
+  {
+    algorithm = "std";
+  }
+  if( find(method,"slimgb") && !find(method,"std") )
+  {
+    algorithm = "slimgb";
+  }
+  if( find(method,"std") && find(method,"slimgb") ||
+    (!find(method,"std") && !find(method,"slimgb")) )
+  {
+    algorithm = "stdorslimgb";
+  }
 
-     if ( algorithm=="std" || ( algorithm=="stdorslimgb" && char(P)>0 ) )
-     {
-        if (p_opt) {"std in ring " + string(Philb);}
-        intvec hi = hilb( std(Id(1)),1,W );
-     }
-     if ( algorithm=="slimgb" || ( algorithm=="stdorslimgb" && char(P)==0 ) )
-     {
-        intvec hi = hilb(qslimgb(Id(1)),1,W);
-     }
+  if ( algorithm=="std" || ( algorithm=="stdorslimgb" && char(P)>0 ) )
+  {
+    if (p_opt) {"std in ring " + string(Philb);}
+    intvec hi = hilb( std(Id(1)),1,W );
+  }
+  if ( algorithm=="slimgb" || ( algorithm=="stdorslimgb" && char(P)==0 ) )
+  {
+    intvec hi = hilb(qslimgb(Id(1)),1,W);
+  }
 
-   //-------------- we need another intermediate ring Phelp ----------------
-   //In Phelp we change the ordering from Philb, otherwise it coincides with
-   //Philb, that is, it has in addition to P an extra homogenizing variable
-   //with name @, resp. @(i) if @ and @(1), ..., @(i-1) are defined.
-   //Phelp has the same ordering as P on common variables. In Phelp
-   //a quotient ideal from P is added to the input
+  //-------------- we need another intermediate ring Phelp ----------------
+  //In Phelp we change the ordering from Philb, otherwise it coincides with
+  //Philb, that is, it has in addition to P an extra homogenizing variable
+  //with name @, resp. @(i) if @ and @(1), ..., @(i-1) are defined.
+  //Phelp has the same ordering as P on common variables. In Phelp
+  //a quotient ideal from P is added to the input
 
-      list BRlist = ringlist(Philb);
-      BRlist[3] = list();
-      int so = size(ord_P);
-      if( ord_P[so][1] =="c" || ord_P[so][1] =="C" )
-      {
-         list moduleord = ord_P[so];
-         so = so-1;
-      }
-      for (k=1; k<=so; k++)
-      {
-         BRlist[3][k] = ord_P[k];
-      }
+  list BRlist = ringlist(Philb);
+  BRlist[3] = list();
+  int so = size(ord_P);
+  if( ord_P[so][1] =="c" || ord_P[so][1] =="C" )
+  {
+    list moduleord = ord_P[so];
+    so = so-1;
+  }
+  for (k=1; k<=so; k++)
+  {
+    BRlist[3][k] = ord_P[k];
+  }
 
-      BRlist[3][so+1] = list("dp",1);
-      w = w,1;
+  BRlist[3][so+1] = list("dp",1);
+  w = w,1;
 
-      if( defined(moduleord) )
-      {
-        BRlist[3][so+2] = moduleord;
-      }
+  if( defined(moduleord) )
+  {
+    BRlist[3][so+2] = moduleord;
+  }
 
 //------ change to extended ring and compute std with hilbert series ------
-      def Phelp = ring(quotientList(BRlist));
-      setring Phelp;
-      def i = imap(Philb, Id(1));
-      kill Philb;
+  def Phelp = ring(quotientList(BRlist));
+  setring Phelp;
+  def i = imap(Philb, Id(1));
+  kill Philb;
 
-      // compute std with Hilbert series
-      if (w ==1)
-      {
-         if (p_opt){ "std with hilb in " + string(Phelp);}
-         i = std(i, hi);
-      }
-      else
-      {
-         if(p_opt){"std with weighted hilb in "+string(Phelp);}
-         i = std(i, hi, w);
-      }
+  // compute std with Hilbert series
+  if (w ==1)
+  {
+    if (p_opt){ "std with hilb in " + string(Phelp);}
+    i = std(i, hi);
+  }
+  else
+  {
+    if(p_opt){"std with weighted hilb in "+string(Phelp);}
+    i = std(i, hi, w);
+  }
 
 //-------------------- go back to original ring ---------------------------
- //The main computation is done. Do not forget to simplfy before maping.
+//The main computation is done. Do not forget to simplfy before maping.
 
-      // subst 1 for homogenizing var
-      if ( p_opt )
-      {
-          "dehomogenization";
-      }
-      i = subst(i, var(nvars(basering)), 1);
+  // subst 1 for homogenizing var
+  if ( p_opt ) { "dehomogenization"; }
+  i = subst(i, var(nvars(basering)), 1);
 
-       if (p_opt)
-       {
-         "simplification";
-       }
-       i= simplify(i,34);
+  if (p_opt) { "simplification"; }
+  i= simplify(i,34);
 
-       setring P;
-       if (p_opt)
-       {
-         "imap to ring "+string(P);
-       }
-       i = imap(Phelp,i);
-       kill Phelp;
-       if( was_qring)
-       {
-         i = NF(i,std(0));
-       }
-       i = simplify(i,34);
+  setring P;
+  if (p_opt) { "imap to ring "+string(P); }
+  i = imap(Phelp,i);
+  kill Phelp;
+  if( was_qring)
+  {
+    i = NF(i,std(0));
+  }
+  i = simplify(i,34);
 
-       // compute reduced SB
-       if (find(s_opt, "redSB") > 0)
-       {
-         if (p_opt)
-         {
-           "//interreduction";
-         }
-         i=interred(i);
-       }
-       attrib(i, "isSB", 1);
-       return (i);
+  // compute reduced SB
+  if (find(s_opt, "redSB") > 0)
+  {
+    if (p_opt) { "//interreduction"; }
+    i=interred(i);
+  }
+  attrib(i, "isSB", 1);
+  return (i);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -404,28 +391,28 @@ NOTE:    the command ring(quotientList(RL)) defines a quotient ring correctly
 SEE ALSO: ringlist, ring
 EXAMPLE: example quotientList; shows an example"
 {
-   def P = basering;
-   if( size(#) > 0 )
-   {
-      if ( #[1] == "isSB")
-      {
-         return (RL);
-      }
-   }
-   ideal Qideal  = RL[4];  //##Achtung: falls basering Nullteiler hat, kann
-                           //die SB eines Elements mehrere Elemente enthalten
-   if( size(Qideal) <= 0)
-   {
+  def P = basering;
+  if( size(#) > 0 )
+  {
+    if ( #[1] == "isSB")
+    {
       return (RL);
-   }
+    }
+  }
+  ideal Qideal  = RL[4];  //##Achtung: falls basering Nullteiler hat, kann
+                           //die SB eines Elements mehrere Elemente enthalten
+  if( size(Qideal) <= 0)
+  {
+    return (RL);
+  }
 
-   RL[4] = ideal(0);
-   def Phelp = ring(RL);
-   setring Phelp;
-   ideal Qideal = groebner(fetch(P,Qideal));
-   setring P;
-   RL[4]=fetch(Phelp,Qideal);
-   return (RL);
+  RL[4] = ideal(0);
+  def Phelp = ring(RL);
+  setring Phelp;
+  ideal Qideal = groebner(fetch(P,Qideal));
+  setring P;
+  RL[4]=fetch(Phelp,Qideal);
+  return (RL);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -458,76 +445,76 @@ RETURN:  list, say L, with L[1] a ring where the parameters of the
          If the basering has no parameters then L[1] is the basering.
 EXAMPLE: example par2varRing; shows an example"
 {
-   def P = basering;
-   int npar = npars(P);  //number of parameters
-   int s = size(#);
-   int ii;
-   if ( npar == 0)
-   {
-     dbprint(printlevel-voice+3,"// ** no parameters, ring was not changed");
-     for( ii = 1; ii <= s; ii++)
-     {
-        def Id(ii) = #[ii];
-        export (Id(ii));
-     }
-     return(list(P));
-   }
-
-   list rlist = ringlist(P);
-   list parlist = rlist[1];
-   rlist[1] = parlist[1];
-   poly Minpoly = minpoly;     //check for minpoly:
-   int sm = size(Minpoly);
-
-   //now create new ring
-   for( ii = 1; ii <= s; ii++)
-   {
+  def P = basering;
+  int npar = npars(P);  //number of parameters
+  int s = size(#);
+  int ii;
+  if ( npar == 0)
+  {
+    dbprint(printlevel-voice+3,"// ** no parameters, ring was not changed");
+    for( ii = 1; ii <= s; ii++)
+    {
       def Id(ii) = #[ii];
-   }
-   int nvar = size(rlist[2]);
-   int nblock = size(rlist[3]);
-   int k;
-   for (k=1; k<=npar; k++)
-   {
-      rlist[2][nvar+k] = parlist[2][k];   //change variable list
-   }
+      export (Id(ii));
+    }
+    return(list(P));
+  }
 
-   //converted parameters get one block dp. If module ordering was in front
-   //it stays in front, otherwise it will be moved to the end
-   intvec OW = 1:npar;
-   if( rlist[3][nblock][1] =="c" || rlist[3][nblock][1] =="C" )
-   {
-      rlist[3][nblock+1] = rlist[3][nblock];
-      rlist[3][nblock] = list("dp",OW);
-   }
-   else
-   {
-      rlist[3][nblock+1] = list("dp",OW);
-   }
+  list rlist = ringlist(P);
+  list parlist = rlist[1];
+  rlist[1] = parlist[1];
+  poly Minpoly = minpoly;     //check for minpoly:
+  int sm = size(Minpoly);
 
-   def Ppar2var = ring(quotientList(rlist));
-   setring Ppar2var;
-   if ( sm == 0 )
-   {
-      for( ii = 1; ii <= s; ii++)
-      {
-        def Id(ii) = imap(P,Id(ii));
-        export (Id(ii));
-      }
-   }
-   else
-   {
-      if( find(option(),"prot") ){"//add minpoly to input";}
-      poly Minpoly = imap(P,Minpoly);
-      for( ii = 1; ii <= s; ii++)
-      {
-        def Id(ii) = imap(P,Id(ii));
-        Id(ii) = Id(ii),Minpoly*freemodule(nrows(Id(ii)));
-        export (Id(ii));
-      }
-   }
-   list Lpar2var = Ppar2var;
-   return(Lpar2var);
+  //now create new ring
+  for( ii = 1; ii <= s; ii++)
+  {
+    def Id(ii) = #[ii];
+  }
+  int nvar = size(rlist[2]);
+  int nblock = size(rlist[3]);
+  int k;
+  for (k=1; k<=npar; k++)
+  {
+    rlist[2][nvar+k] = parlist[2][k];   //change variable list
+  }
+
+  //converted parameters get one block dp. If module ordering was in front
+  //it stays in front, otherwise it will be moved to the end
+  intvec OW = 1:npar;
+  if( rlist[3][nblock][1] =="c" || rlist[3][nblock][1] =="C" )
+  {
+    rlist[3][nblock+1] = rlist[3][nblock];
+    rlist[3][nblock] = list("dp",OW);
+  }
+  else
+  {
+    rlist[3][nblock+1] = list("dp",OW);
+  }
+
+  def Ppar2var = ring(quotientList(rlist));
+  setring Ppar2var;
+  if ( sm == 0 )
+  {
+    for( ii = 1; ii <= s; ii++)
+    {
+      def Id(ii) = imap(P,Id(ii));
+      export (Id(ii));
+    }
+  }
+  else
+  {
+    if( find(option(),"prot") ){"//add minpoly to input";}
+    poly Minpoly = imap(P,Minpoly);
+    for( ii = 1; ii <= s; ii++)
+    {
+      def Id(ii) = imap(P,Id(ii));
+      Id(ii) = Id(ii),Minpoly*freemodule(nrows(Id(ii)));
+      export (Id(ii));
+    }
+  }
+  list Lpar2var = Ppar2var;
+  return(Lpar2var);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -565,91 +552,91 @@ PURPOSE: Prepare a ring for computing the (weighted) hilbert series of
 EXAMPLE: example hilbRing; shows an example
 "
 {
-   def P = basering;
-   ideal Qideal = ideal(P);    //defining the quotient ideal if P is a qring
-   if( size(Qideal) != 0 )
-   {
-     int is_qring =1;
-   }
-   list BRlist = ringlist(P);
-   BRlist[4] = ideal(0);
+  def P = basering;
+  ideal Qideal = ideal(P);    //defining the quotient ideal if P is a qring
+  if( size(Qideal) != 0 )
+  {
+    int is_qring =1;
+  }
+  list BRlist = ringlist(P);
+  BRlist[4] = ideal(0);
 
-   int nvarP = nvars(P);
-   int s = size(#);
-   intvec w;                   //for ringweights of basering P
-   int k;
-   for(k=1;  k<=nvarP; k++)
-   {
-       w[k]=deg(var(k));
-   }
+  int nvarP = nvars(P);
+  int s = size(#);
+  intvec w;                   //for ringweights of basering P
+  int k;
+  for(k=1;  k<=nvarP; k++)
+  {
+    w[k]=deg(var(k));
+  }
 
-   for(k = 1; k <= s; k++)
-   {
-      def Id(k) = #[k];
-      int nr(k) = nrows(Id(k));
-   }
+  for(k = 1; k <= s; k++)
+  {
+    def Id(k) = #[k];
+    int nr(k) = nrows(Id(k));
+  }
 
-    // a homogenizing variable is added:
-    // call it @, resp. @(k) if @(1),...,@(k-1) are defined
-    string homvar;
-    if ( defined(@)==0 )
+  // a homogenizing variable is added:
+  // call it @, resp. @(k) if @(1),...,@(k-1) are defined
+  string homvar;
+  if ( defined(@)==0 )
+  {
+    homvar = "@";
+  }
+  else
+  {
+    k=1;
+    while( defined(@(k)) != 0 )
     {
-       homvar = "@";
+      k++;
     }
-    else
-    {
-       k=1;
-       while( defined(@(k)) != 0 )
-       {
-          k++;
-       }
-       homvar = "@("+string(k)+")";
-    }
-    BRlist[2][nvarP+1] = homvar;
-    w[nvarP +1]=1;
+    homvar = "@("+string(k)+")";
+  }
+  BRlist[2][nvarP+1] = homvar;
+  w[nvarP +1]=1;
 
-    //ordering is set to (dp,C) if weights of all variables are 1
-    //resp. to (wp(w,1),C) where w are the ringweights of basering P
-    //homogenizing var gets weight 1:
+  //ordering is set to (dp,C) if weights of all variables are 1
+  //resp. to (wp(w,1),C) where w are the ringweights of basering P
+  //homogenizing var gets weight 1:
 
-    BRlist[3] = list();
-    if(w==1)
-    {
-      BRlist[3][1]=list("dp",w);
-    }
-    else
-    {
-      BRlist[3][1]=list("wp",w);
-    }
-    BRlist[3][2]=list("C",intvec(0));
+  BRlist[3] = list();
+  BRlist[3][2]=list("C",intvec(0));
+  if(w==1)
+  {
+    BRlist[3][1]=list("dp",w);
+  }
+  else
+  {
+    BRlist[3][1]=list("wp",w);
+  }
 
-    //change ring and get ideal from previous ring
-    def Philb = ring(quotientList(BRlist));
-    kill BRlist;
-    setring Philb;
-    if( defined(is_qring) )
-    {
-       ideal @Qidealhilb@ =  homog( imap(P,Qideal), `homvar` );
-       export(@Qidealhilb@);
+  //change ring and get ideal from previous ring
+  def Philb = ring(quotientList(BRlist));
+  kill BRlist;
+  setring Philb;
+  if( defined(is_qring) )
+  {
+    ideal @Qidealhilb@ =  homog( imap(P,Qideal), `homvar` );
+    export(@Qidealhilb@);
 
-       if( find(option(),"prot") ){"add quotient ideal to input";}
-       for(k = 1; k <= s; k++)
-       {  //homogenize
-          def Id(k) =  homog( imap(P,Id(k)), `homvar` );
-              Id(k) =  Id(k),@Qidealhilb@*freemodule(nr(k)) ;
-          export(Id(k));
-       }
+    if( find(option(),"prot") ){"add quotient ideal to input";}
+    for(k = 1; k <= s; k++)
+    {  //homogenize
+      def Id(k) =  homog( imap(P,Id(k)), `homvar` );
+      Id(k) =  Id(k),@Qidealhilb@*freemodule(nr(k)) ;
+      export(Id(k));
     }
-    else
-    {
-        for(k = 1; k <= s; k++)
-        { //homogenize
-            def Id(k) =  homog( imap(P,Id(k)), `homvar` );
-            export(Id(k));
-        }
+  }
+  else
+  {
+    for(k = 1; k <= s; k++)
+    { //homogenize
+      def Id(k) =  homog( imap(P,Id(k)), `homvar` );
+      export(Id(k));
     }
-    list Lhilb = Philb,w;
-    return(Lhilb);
+  }
+  list Lhilb = Philb,w;
+  return(Lhilb);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -678,58 +665,49 @@ NOTE:    As long as slimgb does not know qrings qslimgb should be used in case
          added to the input and slimgb is applied.
 EXAMPLE: example qslimgb; shows an example"
 {
-    def P = basering;
-    ideal Qideal = ideal(P);      //defining the quotient ideal if P is a qring
-    int p_opt;
-    if( find(option(),"prot") )
-    {
-      p_opt=1;
-    }
-    if (size(Qideal) == 0)
-    {
-      if (p_opt)
-      {
-         "slimgb in ring " + string(P);
-      }
-      return(slimgb(i));
-    }
+  def P = basering;
+  ideal Qideal = ideal(P);      //defining the quotient ideal if P is a qring
+  int p_opt;
+  if( find(option(),"prot") )
+  {
+    p_opt=1;
+  }
+  if (size(Qideal) == 0)
+  {
+    if (p_opt) { "slimgb in ring " + string(P); }
+    return(slimgb(i));
+  }
 
-    //case of a qring; since slimgb does not know qrings we
-    //delete the quotient ideal and add it to i
+  //case of a qring; since slimgb does not know qrings we
+  //delete the quotient ideal and add it to i
 
-    list BRlist = ringlist(P);
-    BRlist[4] = ideal(0);
-    def Phelp = ring(BRlist);
-    kill BRlist;
-    setring Phelp;
-    // module case:
-    def iq = imap(P,i);
-    iq = iq, imap(P,Qideal)*freemodule(nrows(iq));
-    if (p_opt)
-    {
-       "slimgb in ring " + string(Phelp);
-       "(with quotient ideal added to input)";
-    }
-    iq = slimgb(iq);
+  list BRlist = ringlist(P);
+  BRlist[4] = ideal(0);
+  def Phelp = ring(BRlist);
+  kill BRlist;
+  setring Phelp;
+  // module case:
+  def iq = imap(P,i);
+  iq = iq, imap(P,Qideal)*freemodule(nrows(iq));
+  if (p_opt)
+  {
+    "slimgb in ring " + string(Phelp);
+    "(with quotient ideal added to input)";
+  }
+  iq = slimgb(iq);
 
-    setring P;
-    if (p_opt)
-    {
-       "//imap to original ring";
-    }
-    i = imap(Phelp,iq);
-    kill Phelp;
+  setring P;
+  if (p_opt) { "//imap to original ring"; }
+  i = imap(Phelp,iq);
+  kill Phelp;
 
-    if (find(option(),"redSB") > 0)
-    {
-       if (p_opt)
-       {
-         "//interreduction";
-       }
-       i=interred(i);
-    }
-    attrib(i, "isSB", 1);
-    return (i);
+  if (find(option(),"redSB") > 0)
+  {
+    if (p_opt) { "//interreduction"; }
+    i=interred(i);
+  }
+  attrib(i, "isSB", 1);
+  return (i);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -787,8 +765,8 @@ HINT:    Since there exists no uniform best method for computing standard
 SEE ALSO: stdhilb, stdfglm, std, slimgb
 KEYWORDS: time limit on computations; MP, groebner basis computations
 EXAMPLE: example groebner;  shows an example"
-{
 
+{
 //Vorgabe einer Teilmenge aus {hilb,fglm,par2var,std,slimgb}
 //Aktuelle Einstellungen (Jan 2007):
 //---------------------------------
@@ -927,10 +905,11 @@ EXAMPLE: example groebner;  shows an example"
 
   ideal Qideal = ideal(P);      //defining the quotient ideal if P is a qring
   int was_qring;                //remembers if basering was a qring
-  int is_homog = homog(Qideal); //remembers if Qideal was homog (homog(0)=1)
+  //int is_homog = 1;
   if (size(Qideal) > 0)
   {
      was_qring = 1;
+     //is_homog = homog(Qideal); //remembers if Qideal was homog (homog(0)=1)
   }
   list BRlist = ringlist(P);
 
@@ -956,8 +935,8 @@ EXAMPLE: example groebner;  shows an example"
 //If other methods are not implemented or do not make sense, i.e. for
 //local or mixed orderings, matrix orderings, extra weight vector and modules
 
-  if(  ( find(ordstr_P,"s") > 0 )
-    || ( find(ordstr_P,"M") > 0 )
+  if(  //( find(ordstr_P,"s") > 0 ) || // covered by neg
+       ( find(ordstr_P,"M") > 0 )
     || ( find(ordstr_P,"a") > 0 )
     || ( neg>0 ) )
   {
@@ -970,25 +949,25 @@ EXAMPLE: example groebner;  shows an example"
 //The interesting cases start now.
 
  //------------------ classify the possible settings ---------------------
- string algorithm;       //possibilities: std, slimgb, stdorslimgb
- string conversion;      //possibilities: hilb, fglm, hilborfglm, no
- string partovar;        //possibilities: yes, no
- string order;           //possibilities: simple, !simple
- string direct;          //possibilities: yes, no
+  string algorithm;       //possibilities: std, slimgb, stdorslimgb
+  string conversion;      //possibilities: hilb, fglm, hilborfglm, no
+  string partovar;        //possibilities: yes, no
+  string order;           //possibilities: simple, !simple
+  string direct;          //possibilities: yes, no
 
   //define algorithm:
   if( find(method,"std") && !find(method,"slimgb") )
   {
-     algorithm = "std";
+    algorithm = "std";
   }
   if( find(method,"slimgb") && !find(method,"std") )
   {
-     algorithm = "slimgb";
+    algorithm = "slimgb";
   }
   if( find(method,"std") && find(method,"slimgb") ||
       (!find(method,"std") && !find(method,"slimgb")) )
   {
-     algorithm = "stdorslimgb";
+    algorithm = "stdorslimgb";
   }
 
   //define conversion:
@@ -998,15 +977,15 @@ EXAMPLE: example groebner;  shows an example"
   }
   if( find(method,"fglm") && !find(method,"hilb") )
   {
-     conversion = "fglm";
+    conversion = "fglm";
   }
   if( find(method,"fglm") && find(method,"hilb") )
   {
-     conversion = "hilborfglm";
+    conversion = "hilborfglm";
   }
   if( !find(method,"fglm") && !find(method,"hilb") )
   {
-     conversion = "no";
+    conversion = "no";
   }
 
   //define partovar:
@@ -1035,11 +1014,11 @@ EXAMPLE: example groebner;  shows an example"
            (algorithm=="std" || algorithm=="slimgb" ||
             (find(method,"std") && find(method,"slimgb")) ) ) )
   {
-     direct = "yes";
+    direct = "yes";
   }
   else
   {
-     direct = "no";
+    direct = "no";
   }
 
   //order=="simple" means that the ordering of the variables consists of one
@@ -1056,17 +1035,15 @@ EXAMPLE: example groebner;  shows an example"
 //---------------------------- direct methods -----------------------------
   if ( direct == "yes" )
   {
-     if ( algorithm=="std" || (algorithm=="stdorslimgb" && char(P)>0) )
-     {
-           if (p_opt) { "std in " + string(P); }
-           i = std(i);
-           return(i);
-     }
-     if ( algorithm=="slimgb" || (algorithm=="stdorslimgb" && char(P)==0) )
-     {
-           i = qslimgb(i);
-           return(i);
-     }
+    if ( algorithm=="std" || (algorithm=="stdorslimgb" && char(P)>0) )
+    {
+      if (p_opt) { "std in " + string(P); }
+      return(std(i));
+    }
+    if ( algorithm=="slimgb" || (algorithm=="stdorslimgb" && char(P)==0) )
+    {
+      return(qslimgb(i));
+    }
   }
 
 //--------------------------- indirect methods -----------------------------
@@ -1078,144 +1055,133 @@ EXAMPLE: example groebner;  shows an example"
 //given in order to be performed.
 
 //------------ case where no parameters are made to variables  -------------
-   if (  partovar == "no" && conversion == "hilb"
-     || (partovar == "no" && conversion == "fglm" )
-     || (partovar == "no" && conversion == "hilborfglm" )
-     || (partovar == "no" && conversion == "no" && direct == "no") )
-        //last case: heuristic
-   {
-     if ( conversion=="fglm" )
-     {
-       if ( algorithm=="std" || (algorithm=="stdorslimgb" && char(P)>0) )
-       {
-         return (stdfglm(i,"std"));
-       }
-       if ( algorithm=="slimgb" || (algorithm=="stdorslimgb" && char(P)==0) )
-       {
-         return (stdfglm(i,"slimgb"));
-       }
-     }
-     else
-     {
-       if ( algorithm=="std" || (algorithm=="stdorslimgb" && char(P)>0) )
-       {
-         return (stdhilb(i,"std"));
-       }
-       if ( algorithm=="slimgb" || (algorithm=="stdorslimgb" && char(P)==0) )
-       {
-         return (stdhilb(i,"slimgb"));
-       }
-     }
-   }
+  if (  partovar == "no" && conversion == "hilb"
+    || (partovar == "no" && conversion == "fglm" )
+    || (partovar == "no" && conversion == "hilborfglm" )
+    || (partovar == "no" && conversion == "no" && direct == "no") )
+  //last case: heuristic
+  {
+    if ( conversion=="fglm" )
+    {
+      if ( algorithm=="std" || (algorithm=="stdorslimgb" && char(P)>0) )
+      {
+        return (stdfglm(i,"std"));
+      }
+      if ( algorithm=="slimgb" || (algorithm=="stdorslimgb" && char(P)==0) )
+      {
+        return (stdfglm(i,"slimgb"));
+      }
+    }
+    else
+    {
+      if ( algorithm=="std" || (algorithm=="stdorslimgb" && char(P)>0) )
+      {
+        return (stdhilb(i,"std"));
+      }
+      if ( algorithm=="slimgb" || (algorithm=="stdorslimgb" && char(P)==0) )
+      {
+        return (stdhilb(i,"slimgb"));
+      }
+    }
+  }
 
 //------------ case where parameters are made to variables  ----------------
 //define a ring Phelp via par2varRing in which the parameters are variables
 
-   else
-   {
-      // reset options
-      option(none);
-      // turn on options prot, mem, redSB, intStrategy if previously set
-      if ( find(s_opt, "prot") )
+  else
+  {
+    // reset options
+    option(none);
+    // turn on options prot, mem, redSB, intStrategy if previously set
+    if ( find(s_opt, "prot") )
       { option(prot); }
-      if ( find(s_opt, "mem") )
+    if ( find(s_opt, "mem") )
       { option(mem); }
-      if ( find(s_opt, "redSB") )
+    if ( find(s_opt, "redSB") )
       { option(redSB); }
-      if ( find(s_opt, "intStrategy") )
+    if ( find(s_opt, "intStrategy") )
       { option(intStrategy); }
 
-      is_homog = is_homog*homog(i); //check for homogeneity of i and Qideal
+    //first clear denominators of parameters
+    if (npars_P > 0)
+    {
+      for( k=ncols(i); k>0; k-- )
+      { i[k]=cleardenom(i[k]); }
+    }
 
-     //first clear denominators of parameters
-      if (npars_P > 0)
-      {
-         for( k=ncols(i); k>0; k-- )
-         { i[k]=cleardenom(i[k]); }
-      }
+    def Phelp = par2varRing(i)[1];   //minpoly is mapped with i
+    setring Phelp;
+    def i = Id(1);
+    //is_homog = homog(i);
 
-      def Phelp = par2varRing(i)[1];   //minpoly is mapped with i
-      setring Phelp;
-      def i = Id(1);
-      is_homog = homog(i);
-
-      //If parameters are converted to ring variables, they appear in an extra
-      //block. Therefore we use always hilb for this block ordering:
-      if ( conversion=="fglm" )
+    //If parameters are converted to ring variables, they appear in an extra
+    //block. Therefore we use always hilb for this block ordering:
+    if ( conversion=="fglm" )
+    {
+      i = (stdfglm(i));       //only uesful for 1 parameter with minpoly
+    }
+    else
+    {
+      if ( algorithm=="std" || (algorithm=="stdorslimgb" && char(P)>0) )
       {
-         i = (stdfglm(i));       //only uesful for 1 parameter with minpoly
+        i = stdhilb(i,"std");
       }
-      else
+      if ( algorithm=="slimgb" || (algorithm=="stdorslimgb" && char(P)==0) )
       {
-        if ( algorithm=="std" || (algorithm=="stdorslimgb" && char(P)>0) )
-        {
-           i = stdhilb(i,"std");
-        }
-        if ( algorithm=="slimgb" || (algorithm=="stdorslimgb" && char(P)==0) )
-        {
-           i = stdhilb(i,"slimgb");
-        }
+        i = stdhilb(i,"slimgb");
       }
-   }
+    }
+  }
 
 //-------------------- go back to original ring ---------------------------
 //The main computation is done. However, the SB coming from a ring with
 //extra variables is in general too big. We simplify it befor mapping it
 //to the basering.
 
-       if (p_opt)
-       {
-         "//simplification";
-       }
+  if (p_opt) { "//simplification"; }
 
-       if (was_minpoly)
-       {
-          ideal Minpoly = imap(P,Minpoly);
-          attrib(Minpoly,"isSB",1);
-          i = simplify(NF(i,Minpoly),2);
-       }
+  if (was_minpoly)
+  {
+    ideal Minpoly = imap(P,Minpoly);
+    attrib(Minpoly,"isSB",1);
+    i = simplify(NF(i,Minpoly),2);
+  }
 
-       def Li = lead(i);
-       setring P;
-       def Li = imap(Phelp,Li);
-       Li = simplify(Li,32);
-       intvec vi;
-       for (k=1; k<=ncols(Li); k++)
-       {
-         vi[k] = Li[k]==0;
-       }
+  def Li = lead(i);
+  setring P;
+  def Li = imap(Phelp,Li);
+  Li = simplify(Li,32);
+  intvec vi;
+  for (k=1; k<=ncols(Li); k++)
+  {
+    vi[k] = Li[k]==0;
+  }
 
-       setring Phelp;
-       for (k=1;  k<=size(i) ;k++)
-       {
-           if(vi[k]==1)
-           {
-              i[k]=0;
-           }
-       }
-       i = simplify(i,2);
+  setring Phelp;
+  for (k=1;  k<=size(i) ;k++)
+  {
+    if(vi[k]==1)
+    {
+      i[k]=0;
+    }
+  }
+  i = simplify(i,2);
 
-       setring P;
-       if (p_opt)
-       {
-         "//imap to original ring";
-       }
-       i = imap(Phelp,i);
-       kill Phelp;
-       i = simplify(i,34);
+  setring P;
+  if (p_opt) { "//imap to original ring"; }
+  i = imap(Phelp,i);
+  kill Phelp;
+  i = simplify(i,34);
 
-       // clean-up time
-       option(set, opt);
-       if (find(s_opt, "redSB") > 0)
-       {
-         if (p_opt)
-         {
-           "//interreduction";
-         }
-         i=interred(i);
-       }
-       attrib(i, "isSB", 1);
-       return (i);
+  // clean-up time
+  option(set, opt);
+  if (find(s_opt, "redSB") > 0)
+  {
+    if (p_opt) { "//interreduction"; }
+    i=interred(i);
+  }
+  attrib(i, "isSB", 1);
+  return (i);
 }
 example
 { "EXAMPLE: "; echo=2;
