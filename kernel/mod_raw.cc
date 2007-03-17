@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.12 2006-07-18 11:25:05 bricken Exp $ */
+/* $Id: mod_raw.cc,v 1.13 2007-03-17 16:38:42 Singular Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -18,7 +18,7 @@
 
 
 #include "mod2.h"
-#include "static.h"
+#include "../Singular/static.h"
 #ifdef HAVE_STATIC
 #undef HAVE_DL
 #endif
