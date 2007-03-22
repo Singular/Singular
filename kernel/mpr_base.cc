@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.4 2006-01-05 13:50:42 Singular Exp $ */
+/* $Id: mpr_base.cc,v 1.5 2007-03-22 13:34:54 Singular Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -1648,12 +1648,11 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
   lift[4][1]=3; lift[4][2]=7; lift[4][3]=1;  lift[4][4]=5;
   // now lift everything
   for ( i= 0; i <= n; i++ ) Qi[i]->lift( lift[i] );
-  E->dim++;
 #else
   // now lift everything
   for ( i= 0; i <= n; i++ ) Qi[i]->lift();
-  E->dim++;
 #endif
+  E->dim++;
 
   // run Row Content Function for every point in E
   for ( pnt= 1; pnt <= E->num; pnt++ )
@@ -1699,13 +1698,17 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
 #endif
 
   // now create matrix
+  if (E->num <1)
+  {
+    WerrorS("could not handle a degenerate situation: no inner points found");
+    goto theEnd;
+  }
   if ( createMatrix( E ) != E->num )
   {
     // this can happen if the shiftvector shift is to large or not generic
     istate= resMatrixBase::fatalError;
     WerrorS("resMatrixSparse::resMatrixSparse: Error in resMatrixSparse::createMatrix!");
     goto theEnd;
-    //return;
   }
 
  theEnd:

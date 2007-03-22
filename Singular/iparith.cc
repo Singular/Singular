@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.443 2007-03-15 14:36:33 Singular Exp $ */
+/* $Id: iparith.cc,v 1.444 2007-03-22 13:34:52 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3533,6 +3533,7 @@ static BOOLEAN jjDET_S(leftv res, leftv v)
 {
   ideal I=(ideal)v->Data();
   poly p;
+  if (IDELEMS(I)<1) return TRUE;
   if (smCheckDet(I,IDELEMS(I),FALSE))
   {
     matrix m=idModule2Matrix(idCopy(I));
