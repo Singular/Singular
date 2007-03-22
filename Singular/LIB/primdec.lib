@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.131 2007-03-21 15:39:12 Singular Exp $";
+version="$Id: primdec.lib,v 1.132 2007-03-22 18:02:32 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -1097,7 +1097,8 @@ EXAMPLE: example zero_decomp; shows an example
 
 //=================== the new part ============================
 
-      @qh=groebner(@qh,"par2var");
+      if (npars(basering)>1) { @qh=groebner(@qh,"par2var"); }
+      else                   { @qh=groebner(@qh); }
 
 //=============================================================
 //       if(npars(@P)>0)
@@ -8065,7 +8066,8 @@ EXAMPLE: example newZero_decomp; shows an example
 
 //=================== the new part ============================
 
-      @qh=groebner(@qh,"par2var");
+      if (npars(basering)>1) { @qh=groebner(@qh,"par2var"); }
+      else                   { @qh=groebner(@qh); }
 
 //=============================================================
 //       if(npars(@P)>0)
@@ -8128,7 +8130,8 @@ EXAMPLE: example newZero_decomp; shows an example
       @k--;
       if(size(lres0)==2)
       {
-        lres0[2]=groebner(lres0[2],"par2var");
+        if (npars(basering)>1) { lres0[2]=groebner(lres0[2],"par2var"); }
+        else                   { lres0[2]=groebner(lres0[2]); }
       }
       else
       {
