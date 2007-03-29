@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.39 2007-02-07 10:49:40 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.40 2007-03-29 11:34:53 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1283,7 +1283,18 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     }
   }
 
-  if (TEST_OPT_REDSB) completeReduce(strat);
+  if (TEST_OPT_REDSB) 
+  {
+    completeReduce(strat); 
+    if (strat->completeReduce_retry)
+    {
+      cleanT(strat);strat->tailRing=currRing;
+      int i;
+      for(i=strat->sl;i>=0;i--) strat->S_2_R[i]=-1;
+      completeReduce(strat);
+    }
+  }
+ 
   /* release temp data-------------------------------- */
   exitBuchMora(strat);
   if (TEST_OPT_WEIGHTM)

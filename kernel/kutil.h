@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.21 2007-02-01 18:22:35 Singular Exp $ */
+/* $Id: kutil.h,v 1.22 2007-03-29 11:34:52 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -331,6 +331,7 @@ public:
   char    news;
   char    newt;/*used for messageSets*/
   char    noClearS;
+  char    completeReduce_retry;
 
   skStrategy();
   ~skStrategy();

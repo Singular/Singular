@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.48 2007-02-07 10:49:40 Singular Exp $ */
+/* $Id: kutil.cc,v 1.49 2007-03-29 11:34:52 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -241,7 +241,7 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
         }
         else if (fromNext)
           L->max  = p_GetMaxExpP(pNext(L->p), L->tailRing ); // p1;
-        //if (L->pLength != 0) 
+        //if (L->pLength != 0)
         L->pLength = l;
         // Hmmm when called from updateT, then only
         // reset ecart when cut
@@ -4069,49 +4069,32 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
     loop
     {
       Ln.SetShortExpVector();
-      if (! withT)
-      {
-/* obsolete
-#ifdef HAVE_RING2TOM
-        if (currRing->cring == 1)
-        {
-            With = kRingFindDivisibleByInS(strat, pos, &Ln, &With_s);
-        } else
-#endif
-*/
-            With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
-        if (With == NULL) break;
-      }
-      else
+      if (withT)
       {
         int j;
-/* Obsolete
-#ifdef HAVE_RING2TOM
-        if (currRing->cring == 1)
-        {
-           j = kRingFindDivisibleByInT(strat->T, strat->sevT, strat->tl, &Ln);
-        } else
-#endif
-*/
-           j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, &Ln);
+        j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, &Ln);
         if (j < 0) break;
         With = &(strat->T[j]);
       }
+      else
+      {
+        With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
+        if (With == NULL) break;
+      }
+      strat->redTailChange=TRUE;
       if (ksReducePolyTail(L, With, &Ln))
       {
         // reducing the tail would violate the exp bound
-        pNext(h) = Ln.GetTP();
-        L->pLength += Ln.GetpLength();
-        if (L->p != NULL) pNext(L->p) = pNext(p);
-        if (kStratChangeTailRing(strat, L))
-          return redtailBba(L, pos, strat, withT);
-        else
-        { // should never get here -- need to fix this
-          assume(0);
-          return NULL;
-        }
+	//  set a flag and hope for a retry (in bba)
+	strat->completeReduce_retry=TRUE;
+        do
+        {
+          pNext(h) = Ln.LmExtractAndIter();
+          pIter(h);
+          L->pLength++;
+        } while (!Ln.IsNull());
+	goto all_done;
       }
-      strat->redTailChange=TRUE;
       if (Ln.IsNull()) goto all_done;
       if (! withT) With_s.Init(currRing);
     }
@@ -4121,8 +4104,8 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
   }
 
   all_done:
+  Ln.Delete();
   if (L->p != NULL) pNext(L->p) = pNext(p);
-  assume(pLength(L->p != NULL ? L->p : L->t_p) == L->pLength);
 
   if (strat->redTailChange)
   {
