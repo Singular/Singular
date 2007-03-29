@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.40 2007-03-29 11:34:53 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.41 2007-03-29 11:41:11 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -581,7 +581,7 @@ int redLazy (LObject* h,kStrategy strat)
   {
     j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
     if (j < 0) return 1;
-   
+
     li = strat->T[j].pLength;
     #if 0
     if (li==0)
@@ -621,7 +621,7 @@ int redLazy (LObject* h,kStrategy strat)
         /*
          * the polynomial to reduce with is now;
          */
-	PrintS("+");
+        PrintS("+");
         li = strat->T[i].pLength;
         ii = i;
       }
@@ -1283,18 +1283,21 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     }
   }
 
-  if (TEST_OPT_REDSB) 
+  if (TEST_OPT_REDSB)
   {
-    completeReduce(strat); 
+    completeReduce(strat);
     if (strat->completeReduce_retry)
     {
+      // completeReduce needed larger exponents, retry
+      // to reduce with S (instead of T)
+      // and in currRing (instead of strat->tailRing)
       cleanT(strat);strat->tailRing=currRing;
       int i;
       for(i=strat->sl;i>=0;i--) strat->S_2_R[i]=-1;
       completeReduce(strat);
     }
   }
- 
+
   /* release temp data-------------------------------- */
   exitBuchMora(strat);
   if (TEST_OPT_WEIGHTM)
