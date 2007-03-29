@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.67 2007-03-08 12:30:10 Singular Exp $"
+version="$Id: finvar.lib,v 1.68 2007-03-29 14:36:01 king Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -8317,7 +8317,12 @@ KEYWORDS: invariant ring minimal generating set matrix group
 EXAMPLE:  example invariant_algebra_reynolds; shows an example
 "
 { int MonStep = 10;
-  int v=1;
+  int v;
+  if (size(#))
+  { if (typeof(#[1])=="int")
+    { v=#[1];
+    }
+  }
   def br=basering;
   int dgb = degBound;
   degBound = 0;
