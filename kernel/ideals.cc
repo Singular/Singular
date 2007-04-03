@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.40 2007-03-02 09:25:56 Singular Exp $ */
+/* $Id: ideals.cc,v 1.41 2007-04-03 15:16:39 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2368,22 +2368,22 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   /* update nc structure on tmpR */
   if (rIsPluralRing(currRing))
   {
-    BOOLEAN BAD = FALSE;
+    BOOLEAN bBAD = FALSE;
     if ( nc_rComplete(origR, &tmpR) )
     {
       Werror("error in nc_rComplete");
-      BAD = TRUE;
+      bBAD = TRUE;
     }
-    if (!BAD)
+    if (!bBAD)
     {
       /* tests the admissibility of the new elim. ordering */
       if ( nc_CheckOrdCondition( (&tmpR)->nc->D, &tmpR) )
       {
         Werror("no elimination is possible: ordering condition is violated");
-        BAD = TRUE;
+        bBAD = TRUE;
       }
     }
-    if (BAD)
+    if (bBAD)
     {
       // cleanup
       omFree((ADDRESS)wv[0]);

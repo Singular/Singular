@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.24 2007-03-20 13:03:08 Singular Exp $ */
+/* $Id: polys1.cc,v 1.25 2007-04-03 15:16:39 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -569,7 +569,7 @@ void pContent(poly ph)
 #endif
     if (rField_is_Q_a())
     {
-      number hz = nlInit(1);
+      number hzz = nlInit(1);
       h = nlInit(1);
       p=ph;
       while (p!=NULL)
@@ -578,9 +578,9 @@ void pContent(poly ph)
         napoly c_n=c_n_n->z;
         while (c_n!=NULL)
         { // each monom: coeff in Q
-          d=nlLcm(hz,pGetCoeff(c_n),currRing->algring);
-          n_Delete(&hz,currRing->algring);
-          hz=d;
+          d=nlLcm(hzz,pGetCoeff(c_n),currRing->algring);
+          n_Delete(&hzz,currRing->algring);
+          hzz=d;
           pIter(c_n);
         }
         c_n=c_n_n->n;
@@ -593,15 +593,15 @@ void pContent(poly ph)
         }
         pIter(p);
       }
-      /* hz contains the 1/lcm of all denominators in c_n_n->z*/
+      /* hzz contains the 1/lcm of all denominators in c_n_n->z*/
       /* h contains the 1/lcm of all denominators in c_n_n->n*/
       number htmp=nlInvers(h);
-      number hztmp=nlInvers(hz);
-      number hh=nlMult(hz,h);
-      nlDelete(&hz,currRing->algring);
+      number hzztmp=nlInvers(hzz);
+      number hh=nlMult(hzz,h);
+      nlDelete(&hzz,currRing->algring);
       nlDelete(&h,currRing->algring);
-      number hg=nlGcd(hztmp,htmp,currRing->algring);
-      nlDelete(&hztmp,currRing->algring);
+      number hg=nlGcd(hzztmp,htmp,currRing->algring);
+      nlDelete(&hzztmp,currRing->algring);
       nlDelete(&htmp,currRing->algring);
       h=nlMult(hh,hg);
       nlDelete(&hg,currRing->algring);

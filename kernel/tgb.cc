@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.150 2007-02-23 13:17:54 bricken Exp $ */
+/* $Id: tgb.cc,v 1.151 2007-04-03 15:16:39 Singular Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2811,11 +2811,11 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
   //Print("last dp Block start: %i\n", this->lastDpBlockStart);
   is_homog=TRUE;
   {
-    int hz;
-    for(hz=0;hz<IDELEMS(I);hz++){
-      assume(I->m[hz]!=NULL);
-      int d=pTotaldegree(I->m[hz]);
-      poly t=I->m[hz]->next;
+    int hzz;
+    for(hzz=0;hzz<IDELEMS(I);hzz++){
+      assume(I->m[hzz]!=NULL);
+      int d=pTotaldegree(I->m[hzz]);
+      poly t=I->m[hzz]->next;
       while(t)
       {
         if (d!=pTotaldegree(t,r))
