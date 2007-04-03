@@ -161,16 +161,16 @@ then
         exit 1
     fi
 # AIX ########################################################
-elif (echo $uname_m | $egrep "AIX" > $devnull)
+elif (echo $uname_a | $egrep "AIX" > $devnull)
 then
     prefix=AIX
     if (uname -v |  $egrep "4" > $devnull)
     then
         echo ${prefix}-4
         exit 0
-    elif (uname -v |  $egrep "3" > $devnull)
+    elif (uname -v |  $egrep "5" > $devnull)
     then
-        echo ${prefix}-3
+        echo ${prefix}-5
         exit 0
     else
         echo ${prefix}-Unknown
