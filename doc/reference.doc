@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.286 2007-01-25 11:20:08 bricken Exp $
+@comment $Id: reference.doc,v 1.287 2007-04-04 18:02:16 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4454,6 +4454,8 @@ shows correct usage in error messages (set by default).
 @*The output reported on @code{option(prot)} has the following meaning:
 @multitable @columnfractions .01 .14 .11 .65
 
+@item @tab (command)
+@tab (character) @tab (meaning)
 @item @tab @code{facstd}
 @tab @code{F} @tab found a new factor
 @item @tab @tab @tab all other characters: like the output of @code{std} and @code{reduce}
@@ -4463,7 +4465,7 @@ shows correct usage in error messages (set by default).
 @item @tab @tab @code{+} @tab edge monomial found
 @item @tab @tab @code{-} @tab border monomial found
 @item @tab @tab @tab
-@item @tab @code{groebner} @tab @tab all characters: like the output of @code{std}
+@item @tab @code{groebner} @tab @tab all characters: like the output of @code{std}/@code{slimgb}
 @item @tab @tab @tab
 @item @tab @code{lres}
 @tab @code{.} @tab minimal syzygy found
