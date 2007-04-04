@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight.cc,v 1.3 2006-06-16 17:17:14 Singular Exp $ */
+/* $Id: weight.cc,v 1.4 2007-04-04 14:13:31 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -19,19 +19,18 @@
 
 /*0 implementation*/
 extern "C" double (*wFunctional)(int *degw, int *lpol, int npol,
-       double *rel, double wx);
+       double *rel, double wx, double wNsqr);
 extern "C" double wFunctionalMora(int *degw, int *lpol, int npol,
-       double *rel, double wx);
+       double *rel, double wx, double wNsqr);
 extern "C" double wFunctionalBuch(int *degw, int *lpol, int npol,
-       double *rel, double wx);
+       double *rel, double wx, double wNsqr);
 extern "C" void wAdd(int *A, int mons, int kn, int xx);
 extern "C" void wNorm(int *degw, int *lpol, int npol, double *rel);
 extern "C" void wFirstSearch(int *A, int *x, int mons,
-        int *lpol, int npol, double *rel, double *fopt);
+        int *lpol, int npol, double *rel, double *fopt, double wNsqr);
 extern "C" void wSecondSearch(int *A, int *x, int *lpol,
-        int npol, int mons, double *rel, double *fk);
+        int npol, int mons, double *rel, double *fk, double wNsqr);
 extern "C" void wGcd(int *x, int n);
-extern double wNsqr;
 
 static void wDimensions(polyset s, int sl, int *lpol, int *npol, int *mons)
 {
@@ -107,7 +106,7 @@ static void wInit(polyset s, int sl, int mons, int *A)
   omFreeSize((ADDRESS)pl, a);
 }
 
-void wCall(polyset s, int sl, int *x)
+void wCall(polyset s, int sl, int *x, double wNsqr)
 {
   int  n, q, npol, mons, i;
   int  *A, *xopt, *lpol, *degw;
@@ -135,12 +134,12 @@ void wCall(polyset s, int sl, int *x)
   for (i = n; i!=0; i--)
     wAdd(A, mons, i, 1);
   wNorm(degw, lpol, npol, rel);
-  f1 = (*wFunctional)(degw, lpol, npol, rel, (double)1.0);
+  f1 = (*wFunctional)(degw, lpol, npol, rel, (double)1.0, wNsqr);
   if (TEST_OPT_PROT) Print("// %e\n",f1);
   eps = f1;
   fx = (double)2.0 * eps;
   memset(x, 0, (n + 1) * sizeof(int));
-  wFirstSearch(A, x, mons, lpol, npol, rel, &fx);
+  wFirstSearch(A, x, mons, lpol, npol, rel, &fx, wNsqr);
   if (TEST_OPT_PROT) Print("// %e\n",fx);
   memcpy(x + 1, xopt + 1, n * sizeof(int));
   memset(degw, 0, mons * sizeof(int));
@@ -149,7 +148,7 @@ void wCall(polyset s, int sl, int *x)
     x[i] *= 16;
     wAdd(A, mons, i, x[i]);
   }
-  wSecondSearch(A, x, lpol, npol, mons, rel, &fx);
+  wSecondSearch(A, x, lpol, npol, mons, rel, &fx, wNsqr);
   if (TEST_OPT_PROT) Print("// %e\n",fx);
   if (fx >= eps)
   {
@@ -188,13 +187,12 @@ void kEcartWeights(polyset s, int sl, short *eweight)
 
   *eweight = 0;
   n = pVariables;
-  wNsqr = (double)2.0 / (double)n;
   if (pOrdSgn == -1)
     wFunctional = wFunctionalMora;
   else
     wFunctional = wFunctionalBuch;
   x = (int * )omAlloc(2 * (n + 1) * sizeof(int));
-  wCall(s, sl, x);
+  wCall(s, sl, x, (double)2.0 / (double)n);
   for (i = n; i!=0; i--)
     eweight[i] = x[i + n + 1];
   omFreeSize((ADDRESS)x, 2 * (n + 1) * sizeof(int));

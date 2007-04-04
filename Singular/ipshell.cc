@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.154 2007-01-29 16:56:37 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.155 2007-04-04 14:13:31 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -2376,10 +2376,10 @@ BOOLEAN kWeight(leftv res,leftv id)
   s = F->m;
   sl = IDELEMS(F) - 1;
   n = pVariables;
-  wNsqr = (double)2.0 / (double)n;
+  double wNsqr = (double)2.0 / (double)n;
   wFunctional = wFunctionalBuch;
   x = (int * )omAlloc(2 * (n + 1) * sizeof(int));
-  wCall(s, sl, x);
+  wCall(s, sl, x, wNsqr);
   for (i = n; i!=0; i--)
     (*iv)[i-1] = x[i + n + 1];
   omFreeSize((ADDRESS)x, 2 * (n + 1) * sizeof(int));
@@ -4112,90 +4112,6 @@ lists rootArranger::listOfRoots( const unsigned int oprec )
 
   return listofroots;
 }
-
-#ifdef PDEBUG
-
-#if (OM_TRACK > 2) && defined(OM_TRACK_CUSTOM)
-
-void p_SetRingOfPoly(poly p, ring r)
-{
-  while (p != NULL)
-  {
-    p_SetRingOfLm(p, r);
-    pIter(p);
-  }
-}
-
-void p_SetRingOfIdeal(ideal id, ring r)
-{
-  if (id == NULL) return;
-
-  int i, n = id->ncols*id->nrows;
-
-  for (i=0; i<n; i++)
-  {
-    p_SetRingOfPoly(id->m[i], r);
-  }
-}
-
-void p_SetRingOfList(lists L, ring r)
-{
-  int i;
-  for (i=0; i<L->nr; i++)
-  {
-    p_SetRingOfLeftv(&(L->m[i]), r);
-  }
-}
-
-void p_SetRingOfCommand(command cmd, ring r)
-{
-  if (cmd->op == PROC_CMD && cmd->argc == 2)
-    p_SetRingOfLeftv(&(cmd->arg2), r);
-  else if (cmd->argc > 0)
-  {
-    p_SetRingOfLeftv(&(cmd->arg1), r);
-    if (cmd->argc > 1)
-    {
-      p_SetRingOfLeftv(&(cmd->arg2), r);
-      if (cmd->argc > 2)
-        p_SetRingOfLeftv(&(cmd->arg3), r);
-    }
-  }
-}
-
-void p_SetRingOfLeftv(leftv l, ring r)
-{
-  while (l != NULL)
-  {
-    switch(l->rtyp)
-    {
-        case POLY_CMD:
-        case VECTOR_CMD:
-          p_SetRingOfPoly((poly) l->data, r);
-      break;
-
-      case IDEAL_CMD:
-      case MODUL_CMD:
-      case MATRIX_CMD:
-      case MAP_CMD:
-        p_SetRingOfIdeal((ideal) l->data, r);
-        break;
-
-        case LIST_CMD:
-          p_SetRingOfList((lists) l->data, r);
-          break;
-
-        case COMMAND:
-          p_SetRingOfCommand((command)l->data, r);
-        default:
-          break;
-    }
-    l = l->next;
-  }
-}
-#endif // (OM_TRACK > 2) && defined(OM_TRACK_CUSTOM)
-
-#endif // PDEBUG
 
 // from ring.cc
 void rSetHdl(idhdl h)

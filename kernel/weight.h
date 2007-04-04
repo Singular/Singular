@@ -6,7 +6,7 @@
 /*
 * ABSTRACT
 */
-/* $Id: weight.h,v 1.1.1.1 2003-10-06 12:15:57 Singular Exp $ */
+/* $Id: weight.h,v 1.2 2007-04-04 14:13:31 Singular Exp $ */
 
 #include "structs.h"
 
@@ -24,12 +24,11 @@ long totaldegreeWecart_IV(poly p, ring r, const short *w);
 short * iv2array(intvec * iv);
 
 // internal:
-extern double wNsqr;
 extern "C" double (*wFunctional)(int *degw, int *lpol, int npol,
-       double *rel, double wx);
+       double *rel, double wx, double wNsqr);
 extern "C" double wFunctionalBuch(int *degw, int *lpol, int npol,
-       double *rel, double wx);
-void wCall(polyset s, int sl, int *x);
+       double *rel, double wx, double wNsqr);
+void wCall(polyset s, int sl, int *x, double wNsqr);
 
 #endif
 
