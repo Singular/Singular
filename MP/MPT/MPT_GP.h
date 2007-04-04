@@ -94,7 +94,7 @@ MPT_GP_Comp_pt      MPT_GetGP_Comp(MPT_Node_pt tnode);
 MPT_GP_Poly_pt      MPT_GetGP_Poly(MPT_Node_pt tnode);
 MPT_GP_MvPoly_pt    MPT_GetGP_MvPoly(MPT_Node_pt tnode);
 MPT_GP_DistMvPoly_pt MPT_GetGP_DistMvPoly(MPT_Node_pt tnode);
-MPT_GP_Ordering_pt MPT_GetGP_Ordering(MPT_Node_pt tnode, long nvars);
+MPT_GP_Ordering_pt MPT_GetGP_Ordering(MPT_Tree_pt o_tree, long nvars);
 
 /////////////////////////////////////////////////////////////////////
 ///
@@ -103,7 +103,7 @@ MPT_GP_Ordering_pt MPT_GetGP_Ordering(MPT_Node_pt tnode, long nvars);
 /////////////////////////////////////////////////////////////////////
 class MPT_GP_Ordering_t : public GP_Ordering_t
 {
-  friend MPT_GP_Ordering_pt MPT_GetGP_Ordering(MPT_Tree_pt tnode,long nvars);
+  friend MPT_GP_Ordering_pt MPT_GetGP_Ordering(MPT_Tree_pt o_tree, long nvars);
   
 public:
   
