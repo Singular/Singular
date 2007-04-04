@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.132 2007-03-22 18:02:32 Singular Exp $";
+version="$Id: primdec.lib,v 1.133 2007-04-04 09:19:04 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -5145,7 +5145,7 @@ EXAMPLE: example absPrimdecGTZ; shows an example
   int k=find(newvar,",",find(newvar,",")+1);
   newvar=newvar[k+1..size(newvar)];
   list lR=ringlist(R);
-  int i,d;
+  int i,de;
   intvec vv;
   for(i=1;i<=n;i++){vv[i]=1;}
 
@@ -5174,12 +5174,12 @@ EXAMPLE: example absPrimdecGTZ; shows an example
     g=2*var(n)-f;
     M[n]=f;
     N[n]=g;
-    d=deg(p);
+    de=deg(p);
     phi=Rz,M;
     psi=Rz,N;
     I=phi(I),p,q;
     I=std(I);
-    absolute_primes[i]=list(psi(I),d);
+    absolute_primes[i]=list(psi(I),de);
     primary_decomp[i]=list(L[i][1],L[i][2]);
   }
   export(primary_decomp);
