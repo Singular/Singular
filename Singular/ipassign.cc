@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.89 2007-02-05 17:10:50 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.90 2007-04-04 12:38:07 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -27,12 +27,11 @@
 #include "subexpr.h"
 #include "lists.h"
 #include "numbers.h"
-//#include "modulop.h"
 #include "longalg.h"
 #include "stairc.h"
 #include "maps.h"
 #include "syz.h"
-#include "weight.h"
+//#include "weight.h"
 #include "ipconv.h"
 #include "attrib.h"
 #include "silink.h"

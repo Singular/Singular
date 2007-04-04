@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.122 2007-03-10 15:14:15 Singular Exp $ */
+/* $Id: grammar.y,v 1.123 2007-04-04 12:38:07 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -31,7 +31,6 @@
 #include "ideals.h"
 #include "numbers.h"
 #include "polys.h"
-#include "weight.h"
 #include "stairc.h"
 #include "timer.h"
 #include "cntrlc.h"
