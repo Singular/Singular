@@ -1,0 +1,1222 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$Id: realrad.lib,v 1.1 2007-04-11 15:21:40 Singular Exp $";
+category="real algebra";
+info="
+LIBRARY:  realrad.lib   Computation of real radicals
+AUTHOR :  Silke Spang
+
+OVERVIEW:
+   Algorithms about the computation of the real
+   radical of an arbitary ideal over the rational numbers
+   and transcendetal extensions thereof
+
+PROCEDURES:
+ realpoly(f);     Computes the real part of the univariate polynomial f
+ realzero(j);     Computes the real radical of the zerodimensional ideal j
+ realrad(j);      Computes the real radical of an arbitary ideal over
+                  transcendental extension of the rational numbers
+";
+
+LIB "inout.lib";
+LIB "poly.lib";
+LIB "matrix.lib";
+LIB "general.lib";
+LIB "rootsur.lib";
+LIB "algebra.lib";
+LIB "standard.lib";
+LIB "primdec.lib";
+LIB "elim.lib";
+
+///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//// the main procedure //////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+proc realrad(ideal id)
+"USAGE: realrad(id), id an ideal of arbitary dimension
+RETURN: the real radical of id
+EXAMPE: example realrad; shows an example"
+{
+
+  def r=basering;
+  int n=nvars(basering);
+  // for faster Groebner basis and dimension compuations
+  string neuring ="ring schnell=("+charstr(r)+"),("+varstr(r)+"),dp;";
+  execute(neuring);
+  def ri=basering;
+
+  list reddim;//reduct dimension to 0
+  list lpar,lvar,sub;//for the ringchange
+  string pari,vari;
+  int i,siz,l,j;
+  string less="list lessvar="+varstr(r)+";";
+  execute(less);
+  ideal id=imap(r,id);
+  l=size(id);
+  for (i=1;i<=l;i++)
+  {
+    id[i]=simplify_gen(id[i]);
+  }
+  id=groebner(id);
+  if (dim(id)<=0)
+  {
+    id=realzero(id);
+    setring r;
+    id=imap(ri,id);
+    return(id);
+  }
+  //sub are the subsets of {x_1,...,x_n}
+  sub=subset(n);
+  siz=size(sub)-1;//we dont want to localize on all variables
+
+  //for the empty set
+  reddim[1]=zeroreduct(id);
+  reddim[1]=realzero(reddim[1]);
+  for (i=1;i<=siz;i++)
+  {
+
+    lvar=lessvar;
+    lpar=list();
+    l=size(sub[i]);
+    for (j=1;j<=l;j++)
+    {
+      lpar=lpar+list(lvar[sub[i][j]-j+1]);
+      lvar=delete(lvar,sub[i][j]-j+1);
+    }
+    for(j=1;j<=l;j++)//there are l entries in lpar
+    {
+      pari=pari+","+string(lpar[j]);
+    }
+    l=n-l;//there are the remaining n-l entries in lvar
+    for(j=1;j<=l;j++)//there are l entries in lpar
+    {
+      vari=vari+","+string(lvar[j]);
+    }
+    vari=vari[2..size(vari)];
+    neuring="ring neu=("+charstr(r)+pari+"),("+vari+"),dp;";
+    execute(neuring);
+    ideal id=imap(r,id);
+    ideal buffer=zeroreduct(id);
+    buffer=realzero(buffer);
+    setring ri;
+    reddim[i+1]=imap(neu,buffer);
+    kill neu;
+    //compute the intersection of buffer with r
+    reddim[i+1]=contnonloc(reddim[i+1],pari,vari);
+    vari="";
+    pari="";
+  }
+  id=intersect(reddim[1..(siz+1)]);
+  id=timeStd(id,301);//simplify the output
+  setring r;
+  id=imap(ri,id);
+  return(id);
+
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,(a,b,c),lp;
+  ideal i1=c2-(a+b)^2*(a+b-1);
+  ideal i2=a4+a3+a2+a+1,(b4-2)*(b3+2),c+1;
+  ideal i=intersect(i1,i2);
+  realrad(i);
+}
+
+
+static proc zeroreduct(ideal i)
+"USAGE:zeroreduct(i), i an arbitary ideal
+RETURN: an ideal j of dimension <=0 s.th. i is contained in
+        j and j is contained in i_{Iso} which is the zariski closure
+        of all real isolated points of i
+"
+{
+ list equi;
+ int d,n,di;
+ n=nvars(basering);
+ def r=basering;
+
+ //chance ring to get faster groebner bases computation for dimensions
+
+ string rneu="ring neu=("+charstr(r)+"),("+varstr(r)+"),dp;";
+ execute(rneu);
+ ideal i=imap(r,i);
+
+ i=groebner(i);
+ while (dim(i)> 0)
+ {
+   equi=equidim(i);
+   d=size(equi);
+   di=dim(equi[d]);
+   equi[d]=radical(equi[d]);
+   equi[d]=equi[d],minor(jacob(equi[d]),n-di);
+   equi[d]=radical(equi[d]);
+   i=intersect(equi[1..d]);
+   i=groebner(i);
+ }
+
+ setring r;
+ i=imap(neu,i);
+ i=timeStd(i,301);
+ return(i);
+}
+//////////////////////////////////////////////////////////////////////////////
+///////the zero-dimensional case /////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+proc realzero(ideal j)
+"USAGE:    realzero(j); a zero-dimensional ideal j
+RETURN:    j: a zero dimensional ideal, which is the real radical
+              of i, if dim(i)=0
+           0: otherwise
+           this acts via
+           primary decomposition (i=1)
+           listdecomp (i=2) or facstd (i=3)
+EXAMPLE:   example realzero; shows an example"
+
+
+{
+ list prim,prepared,nonshape,realu;
+ int r;//counter
+ int l;//number of first poly with degree >1 or even
+ l=size(j);
+ for (r=1;r<=l;r++)
+ {
+   j[r]=simplify_gen(j[r]);
+   if (j[r]==1)
+   {
+     return(ideal(1));
+   }
+ }
+ option(redSB);
+ //j=groebner(j);
+ //special case
+ //if (j==1)
+ //{
+ //  return(j);
+ //}
+ if (nvars(basering)==1)
+ {
+   j=groebner(j);
+   j=realpoly(j[1]);
+   return(j);
+ }
+
+
+ //if (dim(j)>0) {return(0);}
+
+ def r_alt=basering;
+ //store the ring
+ //for a ring chance to the ordering lp;
+ execute("ring r_neu =("+charstr(basering)+"),("+varstr(basering)+"),lp;");
+ setring r_neu;
+ ideal boeser,max;
+ prepared[1]=ideal(1);
+ ideal j=imap(r_alt,j);
+ //ideal j=fglm(r_alt,j);
+ prim=primdecGTZ(j);
+ for (r=1;r<=size(prim);r++)
+ {
+   max=prim[r][2];
+   max=groebner(max);
+   realu=prepare_max(max);
+   max=realu[1];
+   if (max!=1)
+   {
+     if (realu[2]==1)
+     {
+       prepared=insert(prepared,max);
+     }
+     else
+     {
+       nonshape=insert(nonshape,max);
+     }
+   }
+ }
+ j=intersect(prepared[1..size(prepared)]);
+
+ //use a variable change into general position to obtain
+ //the shape via radzero
+ if (size(nonshape)>0)
+ {
+   boeser=GeneralPos(nonshape);
+   j=intersect(j,boeser);
+ }
+ j=timeStd(j,301);
+ setring r_alt;
+ j=fetch(r_neu,j);
+ return(j);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  //in non parametric fields
+  ring r=0,(x,y),dp;
+  ideal i=(y3+3y2+y+1)*(y2+4y+4)*(x2+1),(x2+y)*(x2-y2)*(x2+2xy+y2)*(y2+y+1);
+  realzero(i);
+  ideal j=(y3+3y2+y+1)*(y2-2y+1),(x2+y)*(x2-y2);
+  realzero(j);
+
+  //to get every path
+  ring r1=(0,t),(x,y),lp;
+  ideal m1=x2+1-t,y3+t2;
+  ideal m2=x2+t2+1,y2+t;
+  ideal m3=x2+1-t,y2-t;
+  ideal m4=x^2+1+t,y2-t;
+  ideal i=intersect(m1,m2,m3,m4);
+  realzero(i);
+
+}
+
+static proc GeneralPos(list buffer)
+"USAGE:    GeneralPos(buffer);
+           buffer a list of maximal ideals which failed the prepare_max-test
+RETURN:    j: the intersection of their realradicals
+EXAMPLE:   example radzero; shows no example"
+{
+ def r=basering;
+ int n,ll;
+ //for the mapping in general position
+ map phi,psi;
+ ideal j;
+ ideal jmap=randomLast(20);
+ string ri;
+ intvec @hilb;
+ ideal trans,transprep;// the transformation ideals
+ int nva=nvars(r);
+ int zz,k,l;//counter
+ poly randp;
+ for (zz=1;zz<nva;zz++)
+ {
+   if (npars(basering)>0)
+   {
+     randp=randp+(random(0,5)*par(1)+random(0,5)*par(1)^2+random(0,5))*var(zz);
+   }
+   else
+   {
+     randp=randp+random(0,5)*var(zz);
+   }
+ }
+ randp=randp+var(nva);
+
+ //now they are all irreducible in the non univariate case and
+ //real in the univariate case
+
+ int m=size(buffer);
+ for (l=1;l<=m;l++)
+ {
+   //searching first non univariate polynomial with an even degree
+   //for odd degree we could use the fundamental theorem of algebra and
+   //get real zeros
+
+   //this will act via a coordinate chance into general position
+   //denote that this random chance doesn't work allways
+   //the ideas for the transformation into general position are
+   //used from the primdec.lib
+   transprep=buffer[l];
+   if (voice>=10)
+   {
+     jmap[size(jmap)]=randp;
+   }
+
+
+   for (k=2;k<=n;k++)
+   {
+     if (ord(buffer[l][k])==1)
+     {
+       for (zz=1;zz<=nva;zz++)
+       {
+         if (lead(buffer[l][k])/var(zz)!=0)
+         {
+           transprep[k]=var(zz);
+         }
+       }
+       jmap[nva]=subst(jmap[nva],lead(buffer[l][k]),0);
+     }
+   }
+   phi =r,jmap;
+   for (k=1;k<=nva;k++)
+   {
+     jmap[k]=-(jmap[k]-2*var(k));
+   }
+   psi =r,jmap;
+
+   //coordinate chance
+   trans=phi(transprep);
+
+   //acting with the chanced ideal
+
+   trans=groebner(trans);
+   trans[1]=realpoly(trans[1]);
+
+   //special case
+   if (trans==1)
+   {
+     buffer[l]=trans;
+   }
+   else
+   {
+     ri="ring rhelp=("+charstr(r)+ "),(" +varstr(r)+ ",@t),dp;";
+     execute(ri);
+     ideal trans=homog(imap(r,trans),@t);
+
+     ideal trans1=std(trans);
+     @hilb=hilb(trans1,1);
+     ri= "ring rhelp1=("
+                   +charstr(r)+ "),(" +varstr(rhelp)+ "),lp;";
+     execute(ri);
+     ideal trans=homog(imap(r,trans),@t);
+     kill rhelp;
+     trans=std(trans,@hilb);
+     trans=subst(trans,@t,1);//dehomogenising
+     setring r;
+     trans=imap(rhelp1,trans);
+     kill rhelp1;
+     trans=std(trans);
+     attrib(trans,"isSB",1);
+
+     trans=realzero(trans);
+
+     //going back
+     buffer[l]=psi(trans);
+     buffer[l]=timeStd(buffer[l],301);//timelimit for std computation
+   }
+ }
+ //option(returnSB);
+ j=intersect(buffer[1..m]);
+ return(j);
+
+}
+
+/*proc minAssReal(ideal i, int erg)
+{
+  int l,m,d,e,r,fac;
+  ideal buffer,factor;
+  list minreal;
+  l=size(i);
+  for (r=1;r<=l;r++)
+  {
+    i[r]=simplify_gen(i[r]);
+
+  }
+
+  list pr=primdecGTZ(i);
+  m=size(pr);
+  for (l=1;l<=m;l++)
+  {
+     d=dim(std(pr[l][2]));
+     buffer=realrad(pr[l][2]);
+     buffer=std(buffer);
+     e=dim(buffer);
+     if (d==e)
+     {
+         minreal=minreal+list(pr[l]);
+     }
+  }
+  if (erg==0)
+  {
+   return(minreal);
+  }
+  else
+  {
+     pr=list();
+     m=size(minreal);
+     for (l=1;l<=m;l++)
+     {
+       pr=insert(pr,minreal[l][2]);
+     }
+     i=intersect(pr[1..m]);
+     i=timeStd(i,301);
+     list realmin=minreal+list(i);
+     return(realmin);
+  }
+}*/
+//////////////////////////////////////////////////////////////////////////////
+///////the univariate case ///////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+proc realpoly(poly f)
+"USAGE:    realpoly(f); a univariate poly f;
+RETURN:    poly f, where f is the real part of the input f
+EXAMPLE:   example realpoly; shows an example"
+{
+ def r=basering;
+ int tester;
+ if (size(parstr(r))!=0)
+ {
+   string changering="ring rneu=0,("+parstr(r)+","+varstr(r)+"),lp";
+   execute(changering);
+   poly f=imap(r,f);
+   tester=1;
+ }
+ f=simplify(f,1);//wlog f is monic
+ if (f==1)
+ {
+   setring r;
+   return(f);
+ }
+ ideal j=factorize(f,1);//for getting the squarefree factorization
+ poly erg=1;
+ for (int i=1;i<=size(j);i=i+1)
+ {
+  if (is_real(j[i])==1) {erg=erg*j[i];}
+  //we only need real primes
+ }
+ if (tester==1)
+ {
+   setring(r);
+   poly erg=imap(rneu,erg);
+ }
+ return(erg);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r1 = 0,x,dp;
+   poly f=x5+16x2+x+1;
+   realpoly(f);
+   realpoly(f*(x4+2));
+   ring r2=0,(x,y),dp;
+   poly f=x6-3x4y2 + y6 + x2y2 -6y+5;
+   realpoly(f);
+   ring r3=0,(x,y,z),dp;
+   poly f=x4y4-2x5y3z2+x6y2z4+2x2y3z-4x3y2z3+2x4yz5+z2y2-2z4yx+z6x2;
+   realpoly(f);
+   realpoly(f*(x2+y2+1));
+}
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+//// for semi-definiteness/////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+proc decision(poly f)
+" USAGE: decission(f); a multivariate polynomial f in Q[x_1,..,x_n] and lc f=0
+ RETURN: assume that the basering has a lexicographical ordering,
+         1 if f is positive semidefinite  0 if f is indefinite
+EXAMPLE: decision shows an example
+{
+   string ri,lessvar,perm;
+   ideal jac;
+   list varlist,buffer,isol,@s,lhelp,lhelp1,lfac,worklist;
+   poly p,g;
+   def rbuffer;
+   def r=basering;
+   //diverse zaehler
+   int @z,zz,count,tester;
+   int n=nvars(r);
+   //specialcases
+
+   if (leadcoef(f)<0)
+   {
+     return(0);
+   }
+   lfac=factorize(f,2);
+   ideal factor=lfac[1];
+   intvec ex=lfac[2];
+   factor=factor[1];
+   zz=size(factor);
+   f=1;
+   for (@z=1;@z<=zz;@z++)
+   {
+     if ((ex[@z] mod 2)==1)
+     {
+        f=f*factor[@z];
+     }
+   }
+   if (deg(f)<=0)
+   {
+     if (leadcoef(f)>=0)
+     {
+       return(1);
+     }
+     return(0);
+   }
+   //for recursion
+   if (n==1)
+   {
+    if (sturm(f,-length(f),length(f))==0)
+    {
+      return(1);
+    }
+    return(0);
+   }
+   //search for a p in Q[x_n] such that f is pos. sem. definite
+   //iff for every isolating setting S={a_1,...,a_r} holds that
+   //every f(x_1,..,x_n-1, a_i) is positiv semidefinite
+   //recursion of variables
+   ///////////////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////////////
+   perm="varlist="+varstr(r)+";";
+   execute(perm);
+   varlist=delete(varlist,n);
+   for (@z=1;@z<n;@z++)
+   {
+     lessvar=lessvar+","+string(varlist[@z]);
+   }
+   lessvar=lessvar[2..size(lessvar)];
+   ri="ring r_neu="+charstr(r)+",(@t,"+string(var(n))+","+lessvar+"),dp;";
+   execute(ri);
+   poly f=imap(r,f);
+   list varlist=imap(r,varlist);
+   ideal jac=jacob(@t+f);
+   jac=jac[3..(n+1)];
+   ideal eins=std(jac);
+   ideal i=@t+f,jac;
+   //use Wu method
+   if (eins==1)
+   {
+     zz=0;
+   }
+   else
+   {
+     matrix m=char_series(i);
+     zz=nrows(m);//number of rows
+   }
+   poly p=1;
+   for (@z=1;@z<=zz;@z++)
+   {
+     p=p*m[@z,1];
+   }
+   //trailing coefficient of p
+   p=subst(p,@t,0);
+   p=realpoly(p);
+   @s=subset(n-1);
+   ideal jacs;
+   for (@z=1;@z<=size(@s);@z++)
+   {
+     perm="";
+     lhelp=list();
+
+     worklist=varlist;
+     buffer=jac[1..(n-1)];
+     //vorbereitungen fuer den Ringwechsel
+     //setze worklist=x_1,..,x_(n-1)
+
+     for (zz=1;zz<=size(@s[@z]);zz++)
+     {
+      buffer =delete(buffer ,@s[@z][zz]-zz+1);
+      worklist=delete(worklist,@s[@z][zz]-zz+1);
+      lhelp=lhelp+list(string(var(@s[@z][zz]+2)));
+      lhelp1=insert(lhelp,string(var(@s[@z][zz]+2)));
+     }
+     //worklist=(x_1,...,x_n-1)\(x_i1,...,x_ik)
+     //lhelp =(x_i1,...,x_ik)
+     //buffer=diff(f,x_i) i not in (i1,..,ik);
+
+     worklist=list("@t",string(var(2)))+lhelp+worklist;
+     for (zz=1;zz<=n+1;zz++)
+     {
+       perm=perm+","+string(worklist[zz]);
+     }
+     perm=perm[2..size(perm)];
+     if (size(buffer)!=0)
+     {
+      jacs=buffer[1..size(buffer)];
+      jacs=@t+f,jacs;
+     }
+     else
+     {
+      jacs=@t+f;
+     }
+     rbuffer=basering;
+     //perm=@t,x_n,x_1,..,x_ik,x\(x_i1,..,x_ik)
+     ri="ring rh=0,("+perm+"),dp;";
+     execute(ri);
+     ideal jacs=imap(rbuffer,jacs);
+     poly p=imap(rbuffer,p);
+     matrix m=char_series(jacs);
+     poly e=1;
+     for (count=1;count<=nrows(m);count++)
+     {
+       e=e*m[count,1];
+     }
+     //search for the leading coefficient of e in
+     //Q(@t,x_n)[x_@s[@z][1],..,x_@s[@z][size(@s[@z])]
+     intmat l[n-1][n-1];
+     for (zz=1;zz<n;zz++)
+     {
+       l[zz,n-zz]=1;
+     }
+     ri="ring rcoef="+"(0,@t,"+varstr(r)[2*n-1]+"),
+     ("+lessvar+"),M(l);";
+     execute(ri);
+     kill l;
+     poly e=imap(rh,e);
+     e=leadcoef(e);
+     setring rh;
+     e=imap(rcoef,e);
+     e=subst(e,@t,0);
+     e=realpoly(e);
+     p=p*e;
+     setring r_neu;
+     p=imap(rh,p);
+     kill rh,rcoef;
+   }
+   setring r;
+   p=imap(r_neu,p);
+   ///////////////////////////////////////////////////////////////////////////
+   ///////////found polynomial p /////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////////////
+   //Compute an isolating set for p
+   ri="ring iso="+charstr(r)+","+varstr(r)[2*n-1]+",lp;";
+   execute(ri);
+   poly p=imap(r,p);
+   isol=isolset(p);
+   setring r;
+   list isol=imap(iso,isol);
+   tester=1;
+   for (@z=1;@z<=size(isol);@z++)
+   {
+     ri="ring rless="+charstr(r)+",("+lessvar+"),lp;";
+     g=subst(f,var(n),isol[@z]);
+     execute(ri);
+     poly g=imap(r,g);
+     tester=tester*decision(g);
+     setring r;
+     kill rless;
+   }
+   return(tester);
+}
+
+
+proc isolset(poly f)
+"USAGE:  isolset(f); f a univariate polynomial over the rational numbers
+RETURN: An isolating set of f
+NOTE: algorithm can be found in M-F. Roy,R: Pollack, S. Basu page 373
+EXAMPLE: example isolset; shows an example"
+{
+ int i,case;
+ number m;
+ list buffer;
+ //only real roots count
+ f=realpoly(f);
+ poly seppart=f;
+ seppart=simplify(seppart,1);
+ //int N=binlog(length(seppart));
+ //number zweihochN=exp(2,N+1);
+ number zweihochN=length(f);
+ //a special case
+ if (deg(seppart)==0)
+ {
+   return(list(number(0)));
+ }
+ if (sturm(seppart,-zweihochN,zweihochN)==1)
+ {
+  return(list(-zweihochN,zweihochN));
+ }
+ //getting bernstein coeffs
+ ideal id=isuni(f)-zweihochN;
+ map jmap=basering,id;
+ seppart=jmap(seppart);
+
+ id=2*zweihochN*var(1);
+ jmap=basering,id;
+ seppart=jmap(seppart);
+
+ matrix c=coeffs(seppart,var(1));
+ int s=size(c);
+ poly recproc;
+ //Reciprocal polynomial
+ for (i=1;i<=s;i++)
+ {
+  recproc=recproc+c[s+1-i,1]*(var(1)^(i-1));
+ }
+ jmap=basering,var(1)+1;
+ seppart=jmap(recproc);
+ list bernsteincoeffs,bern;
+ c=coeffs(seppart,var(1));
+ for (i=1;i<=s;i++)
+ {
+   bern[i]=number(c[s+1-i,1])/binomial(s-1,i-1,0);
+ }
+ bernsteincoeffs=bern,list(-zweihochN,zweihochN);
+ list POS;
+ POS[1]=bernsteincoeffs;
+ list L;
+ while (size(POS)!=0)
+ {
+  if (varsigns(POS[1][1])<2)
+  {
+    case=varsigns(POS[1][1]);
+  }
+  else
+  {
+    case=2;
+  }
+  //case Anweisung
+  buffer=POS[1];
+  POS=delete(POS,1);
+  while(1)
+  {
+   if (case==1)
+   {
+    L=L+buffer[2];
+    break;
+   }
+
+   if (case==2)
+   {
+    m=number(buffer[2][1]+buffer[2][2])/2;
+    bern=BernsteinCoefficients(buffer[1],buffer[2],m);
+    POS=bern+POS;
+    if (leadcoef(sign(leadcoef(subst(f,isuni(f),m))))==0)
+    {
+      number epsilon=1/10;
+      while (sturm(f,m-epsilon,m+epsilon)!=1)
+      {
+        epsilon=epsilon/10;
+      }
+      L=L+list(m-epsilon,m+epsilon);
+    }
+    break;
+   }
+  break;
+  }
+ }
+ i=1;
+ while (i<size(L))
+ {
+   if (L[i]==L[i+1])
+   {
+     L=delete(L,i);
+   }
+   else
+   {
+     i=i+1;
+   }
+ }
+ return(L);
+}
+
+static proc BernsteinCoefficients(list bern,list lr,number m)
+"USAGE :BernsteinCoefficients(bern,lr,m);
+        a list bern=b_0,...,b_p representing a polynomial P of degree <=p
+        in the Bernstein basis pf lr=(l,r) an a number m in Q
+ RETURN:a list erg=erg1,erg2 s.th. erg1=erg1[1],erg[2] and erg1[1] are
+        the bernstein coefficients of P wrt to erg1[2]=(l,m) and erg2[1]
+        is one for erg2[2]=(m,r)
+ EXAMPLE: Bernsteincoefficients shows no example
+"
+{
+ //Zaehler
+ int i,j;
+ list erg,erg1,erg2;
+ number a=(lr[2]-m)/(lr[2]-lr[1]);
+ number b=(m-lr[1])/(lr[2]-lr[1]);
+ int p=size(bern);
+ list berns,buffer,buffer2;
+ berns[1]=bern;
+ for (i=2;i<=p;i++)
+ {
+  for (j=1;j<=p+1-i;j++)
+  {
+   buffer[j]=a*berns[i-1][j]+b*berns[i-1][j+1];
+  }
+  berns[i]=buffer;
+  buffer=list();
+ }
+
+ for (i=1;i<=p;i++)
+ {
+  buffer[i]=berns[i][1];
+  buffer2[i]=berns[p+1-i][i];
+ }
+ erg1=buffer,list(lr[1],m);
+ erg2=buffer2,list(m,lr[2]);
+ erg=erg1,erg2;
+ return(erg);
+}
+
+static proc binlog(number i)
+{
+ int erg;
+ if (i<2) {return(0);}
+ else
+ {
+  erg=1+binlog(i/2);
+  return(erg);
+ }
+}
+static proc exp(int a, int b)
+{
+   number res = 1;
+   while (b > 0) {
+   if (b mod 2 == 1) {
+       res = res * a;
+       b = b-1;
+   }
+   a = a * a;
+   b = b div 2;
+   }
+   return(res);
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+///////diverse Hilfsprozeduren ///////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////////
+/////wichtig fuers Verstaendnis//////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+static proc is_real(poly f)
+"USAGE:     is_real(f);a univariate irreducible polynomial f;
+RETURN:    1: if f is real
+           0: is f is not real
+EXAMPLE:   example is_real; shows an example"
+
+{
+  int d,anz,i;
+  def r=basering;
+
+  if (f==1) {return(1);}
+  if (isuniv(f)==0)
+  {
+   for (i=1;i<=nvars(r);i++)
+   {
+     d=size(coeffs(f,var(i)))+1;
+     if ((d mod 2)==1)
+     {
+       return(1);
+     }
+   }
+   d=1-decision(f);
+   return(d);
+  }
+  d=deg(f) mod 2;
+  if (d==1)
+  {
+     return(1);//because of fundamental theorem of algebra
+  }
+  else
+  {
+   f=simplify(f,1);//wlog we can assume that f is monic
+   number a=leadcoef(sign(leadcoef(subst(f,isuni(f),-length(f)))));
+   number b=leadcoef(sign(leadcoef(subst(f,isuni(f),length(f)))));
+   if
+   (a*b!=1)
+   //polynomials are contineous so the image is an interval
+   //referres to analysis
+   {
+      return(1);
+   }
+   else
+   {
+      anz=sturm(f,-length(f),length(f));
+      if (anz==0) {return(0);}
+      else {return(1);}
+   }
+  }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r1 = 0,x,dp;
+   poly f=x2+1;
+   is_real(f);
+
+}
+
+
+static proc prepare_max(ideal m)
+"USAGE: prepare_max(m); m a maximal ideal in Q(y_1,...,y_m)[x_1,...,x_n]
+RETURN: a list erg=(id,j); where id is the real radical of m if j=1 (i.e. m
+        satisfies the shape lemma in one variable x_i) else id=m and j=0;
+EXAMPLE: is_in_shape shows an exmaple;
+"
+
+{
+  int j,k,i,l,fakul;
+  def r=basering;
+  int n=nvars(r);
+  list erg,varlist,perm;
+  string wechsler,vari;
+  //option(redSB);
+
+  for (i=1;i<=n;i++)
+  {
+   varlist=varlist+list(var(i));
+  }
+  perm=permutation(varlist);
+  fakul=size(perm);
+  for (i=1;i<=fakul;i++)
+  {
+    for (j=1;j<=n;j++)
+    {
+      vari=vari+","+string(perm[i][j]);
+    }
+    vari=vari[2..size(vari)];
+    wechsler="ring r_neu=("+charstr(r)+"),("+vari+"),lp;";
+    execute(wechsler);
+    ideal id=imap(r,m);
+    id=groebner(id);
+    k=search_first(id,2,2);
+    setring r;
+    m=imap(r_neu,id);
+    m[1]=realpoly(m[1]);
+    if (m[1]==1)
+    {
+      erg[1]=ideal(1);
+      erg[2]=1;
+      return(erg);
+    }
+    if (k>n)
+    {
+      erg[1]=m;
+      erg[2]=1;
+      return(erg);
+    }
+    else
+    {
+      for (l=k;l<=n;l++)
+      {
+        if (realpoly(m[l])==1)
+        {
+          erg[1]=ideal(1);
+          erg[2]=1;
+          return(erg);
+        }
+      }
+    }
+    vari="";
+    kill r_neu;
+  }
+  if (size(parstr(r))==0)
+  {
+    erg[1]=m;
+    j=1;
+    for (i=1;i<=n;i++)
+    {
+      j=j*isuniv(m[i]);
+    }
+    erg[2]=j;
+    return(erg);
+  }
+  erg[1]=m;
+  erg[2]=0;
+  return(erg);
+}
+
+static proc length(poly f)
+"USAGE:    length(f); poly f;
+RETURN:    sum of the absolute Value of all coeffients of an irreducible
+           poly nomial f
+EXAMPLE:   example length; shows an example"
+
+{
+ number erg,buffer;
+ f=simplify(f,1);//wlog f is monic
+ int n=size(f);
+ for (int i=1;i<=n;i=i+1)
+ {
+   buffer= leadcoef(f[i]);
+   erg=erg + absValue(buffer);
+ }
+
+ return(erg);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r1 = 0,x,dp;
+   poly f=x4-6x3+x2+1;
+   norm(f);
+
+   ring r2=0,(x,y),dp;
+   poly g=x2-y3;
+   length(g);
+
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////weniger wichtig fuers Verstaendnis//////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+static proc isuniv(poly f)
+{
+  int erg;
+  if (f==0)
+  {
+    erg=1;
+  }
+  else
+  {
+  erg=(isuni(f)!=0);
+  }
+  return(erg);
+}
+static proc search_first(ideal j,int start, int i)
+"USAGE:    searchfirst(j, start, i);
+           id a reduced groebner basis wrt lex
+RETURN:    if i=1 then turns the number of the first non univariate entry
+           with order >1 in its leading term after start
+           else the first non univariate of even order
+EXAMPLE:   example norm; shows no example"
+{
+  int n=size(j);
+  int k=start;//counter
+  j=j,0;
+  if (i==1)
+  {
+    while
+    ((k<=n)&&(ord(j[k])==1))
+    {
+      k=k+1;
+    }
+  }
+  else
+  {
+    while
+    ((k<=n)&&(ord(j[k]) mod 2==1))
+    {
+      k=k+1;
+    }
+
+  }
+ return(k);
+}
+
+static proc subset(int n)
+"USAGE :subset(n); n>=0 in Z
+RETURN :l a list of all non-empty subsets of {1,..,n}
+EXAMPLE:subset(n) shows an example;
+"
+{
+ list l,buffer;
+ int i,j,binzahl;
+ if (n<=0)
+ {
+   return(l);
+ }
+ int grenze=int(exp(2,n))-1;
+ for (i=1;i<=grenze;i++)
+ {
+  binzahl=i;
+  for (j=1;j<=n;j++)
+  {
+   if ((binzahl mod 2)==1)
+   {
+     buffer=buffer+list(j);
+   }
+   binzahl=binzahl div 2;
+  }
+  l[i]=buffer;
+  buffer=list();
+ }
+ return(l);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  subset(3);
+  subset(4);
+}
+
+proc permutation(list L)
+" USAGE: permutation(L); L a list
+ OUTPUT: a list of all permutation lists of L
+EXAMPLE: permutation(L) gives an example"
+{
+  list erg,buffer,permi,einfueger;
+  int i,j,l;
+  int n=size(L);
+  if (n==0)
+  {
+    return(erg);
+  }
+  if (n==1)
+  {
+    erg=list(L);
+    return(erg);
+  }
+  for (i=1;i<=n;i++)
+  {
+    buffer=delete(L,i);
+    einfueger=permutation(buffer);
+    l=size(einfueger);
+    for (j=1;j<=l;j++)
+    {
+      permi=list(L[i])+einfueger[j];
+      erg=insert(erg,permi);
+    }
+  }
+  return(erg);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  list L1="Nur","ein","Beispiel";
+  permutaion(L1);
+  list L2=1,2,3,4;
+  permutaion(L2);
+}
+static proc simplify_gen(poly f)
+"USAGE : simplify_gen(f); f a polymimial in Q(y_1,..,y_m)[x_1,..,x_n]
+RETURN : a polynomial g such that g is the square-free part of f  and
+        every real univariate factor of f is cancelled out
+EXAMPLE:simplify_gen gives no example"
+{
+  int i,l;
+  ideal factor;
+  poly g=1;
+  factor=factorize(f,2)[1];
+  l=size(factor);
+  for (i=1;i<=l;i++)
+  {
+    if (isuniv(factor[i]))
+    {
+        g=g*realpoly(factor[i]);
+    }
+    else
+    {
+      g=g*factor[i];
+    }
+  }
+  return(g);
+}
+static proc contnonloc(ideal id,string pari, string vari)
+"INPUT : a radical ideal id in in F[pari+vari] which is radical in
+         F(pari)[vari), pari and vari strings of variables
+OUTPUT : the contraction ideal of id, i.e. idF(pari)[vari]\cap F[pari+vari]
+EXAMPLE: contnonloc shows an example
+"
+{
+  list pr;
+  list contractpr;
+  int i,l,tester;
+  ideal primcomp;
+  def r=basering;
+  string neu="ring r_neu=("+charstr(r)+pari+"),("+vari+"),dp;";
+  execute(neu);
+  def r1=basering;
+  ideal buffer;
+  setring r;
+  pr=primdecGTZ(id);
+  l=size(pr);
+  contractpr[1]=ideal(1);
+  for (i=1;i<=l;i++)
+  {
+    primcomp=pr[i][2];
+    setring r1;
+    buffer=imap(r,primcomp);
+    buffer=groebner(buffer);
+    if (buffer==1)
+    {
+     tester=0;
+    }
+    else
+    {
+     tester=1;
+    }
+    setring r;
+
+    //id only consits of non units in F(pari)
+    if (tester==1)
+    {
+     contractpr=insert(contractpr,primcomp);
+    }
+  }
+  l=size(contractpr);
+  id=intersect(contractpr[1..l]);
+  return(id);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring  r = 0,(a,b,c),lp;
+   ideal i=b3+c5,ab2+c3;
+   ideal j=contnonloc(i,",b","a,c");
+   j;
+}

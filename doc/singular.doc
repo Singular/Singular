@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.156 2007-01-10 10:26:45 Singular Exp $
+@comment $Id: singular.doc,v 1.157 2007-04-11 15:21:41 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -325,6 +325,7 @@ LIB "all.lib";
 * normal_lib:: procedure for normalization
 * primdec_lib:: procedures for primary decomposition
 * primitiv_lib:: procedures for finding a primitive element
+* realrad_lib:: procedures for finding the real radical
 * reesclos_lib:: Rees Algebra and integral closure of an ideal
 * resolve_lib:: Resolution of Singularities
 * reszeta_lib:: Applications of Resolution of Singularities
@@ -385,11 +386,15 @@ LIB "all.lib";
 @subsection primdec_lib
 @c lib primdec.lib
 @c ---------------------------------------------------------
-@node primitiv_lib, reesclos_lib, primdec_lib, Commutative algebra
+@node primitiv_lib, realrad_lib, primdec_lib, Commutative algebra
 @subsection primitiv_lib
 @c lib primitiv.lib
 @c ---------------------------------------------------------
-@node reesclos_lib, resolve_lib, primitiv_lib, Commutative algebra
+@node realrad_lib, reesclos_lib, primitiv_lib, Commutative algebra
+@subsection realrad_lib
+@c lib realrad.lib
+@c ---------------------------------------------------------
+@node reesclos_lib, resolve_lib, realrad_lib, Commutative algebra
 @subsection reesclos_lib
 @c lib reesclos.lib
 @c ---------------------------------------------------------
