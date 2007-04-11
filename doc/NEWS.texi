@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.78 2007-03-12 13:07:45 Singular Exp $
+@comment $Id: NEWS.texi,v 1.79 2007-04-11 15:26:08 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -56,6 +56,9 @@ new library: aksaka.lib (@nref{aksaka_lib}): primality testing after Agrawal, Sa
 new library: arcpoint.lib (@nref{arcpoint_lib}): truncations of arcs at a singular point
 @item
 new library: resgraph.lib (@nref{resgraph_lib}): visualization of resolution data.
+@item
+new library: realrad.lib (@nref{realrad_lib}): computation of the real radical
+over the rational numbers and extensions thereof
 @item
 sheafcoh.lib: new experimental functions (sheafCohBGG2)
 @item
