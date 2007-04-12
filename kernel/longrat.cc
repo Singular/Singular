@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.15 2007-04-12 16:33:52 Singular Exp $ */
+/* $Id: longrat.cc,v 1.16 2007-04-12 16:58:38 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -1160,64 +1160,66 @@ void nlNormalize (number &x)
       }
     }
   }
-  if (x->s==0)
+  else if (x->s==0)
   {
-    //BOOLEAN divided=FALSE;
-    MP_INT gcd;
-    mpz_init(&gcd);
-    mpz_gcd(&gcd,&x->z,&x->n);
-    x->s=1;
-    if (mpz_cmp_si(&gcd,(long)1)!=0)
+    if (mpz_cmp_si(&x->n,(long)1)==0)
     {
-      MP_INT r;
-      mpz_init(&r);
-      MPZ_EXACTDIV(&r,&x->z,&gcd);
-      mpz_set(&x->z,&r);
-      MPZ_EXACTDIV(&r,&x->n,&gcd);
-      mpz_set(&x->n,&r);
-      mpz_clear(&r);
-      //divided=TRUE;
-      if (mpz_cmp_si(&x->n,(long)1)==0)
+      mpz_clear(&x->n);
+      if (mpz_size1(&x->z)<=MP_SMALL)
       {
-        mpz_clear(&x->n);
-        if (mpz_size1(&x->z)<=MP_SMALL)
+        int ui=(int)mpz_get_si(&x->z);
+        if ((((ui<<3)>>3)==ui)
+        && (mpz_cmp_si(&x->z,(long)ui)==0))
         {
-          int ui=(int)mpz_get_si(&x->z);
-          if ((((ui<<3)>>3)==ui)
-          && (mpz_cmp_si(&x->z,(long)ui)==0))
-          {
-            mpz_clear(&x->z);
+          mpz_clear(&x->z);
 #if defined(LDEBUG)
-            x->debug=654324;
+          x->debug=654324;
 #endif
-            omFreeBin((ADDRESS)x, rnumber_bin);
-            x=INT_TO_SR(ui);
-            return;
-          }
+          omFreeBin((ADDRESS)x, rnumber_bin);
+          x=INT_TO_SR(ui);
+          return;
         }
-        x->s=3;
       }
+      x->s=3;
     }
-    mpz_clear(&gcd);
-#if 0
-    else if (divided)
+    else
     {
-#define mpz_alloc1(A) ((A)->_mp_alloc)
-      int l;
-      if ((mpz_alloc1(&x->n)>>1) >= (l=mpz_size1(&x->n)))
+      MP_INT gcd;
+      mpz_init(&gcd);
+      mpz_gcd(&gcd,&x->z,&x->n);
+      x->s=1;
+      if (mpz_cmp_si(&gcd,(long)1)!=0)
       {
-        _mpz_realloc(&x->n,l /* mpz_size1(&x->n)*/);
-      }
-    }
-    if (divided)
-    {
-      int l;
-      if ((mpz_alloc1(&x->z)>>1) >= (l=mpz_size1(&x->z)))
-      {
-        _mpz_realloc(&x->z,l /*mpz_size1(&x->z)*/);
-      }
-    }
+        MP_INT r;
+        mpz_init(&r);
+        MPZ_EXACTDIV(&r,&x->z,&gcd);
+        mpz_set(&x->z,&r);
+        MPZ_EXACTDIV(&r,&x->n,&gcd);
+        mpz_set(&x->n,&r);
+        mpz_clear(&r);
+        if (mpz_cmp_si(&x->n,(long)1)==0)
+        {
+          mpz_clear(&x->n);
+          if (mpz_size1(&x->z)<=MP_SMALL)
+          {
+            int ui=(int)mpz_get_si(&x->z);
+            if ((((ui<<3)>>3)==ui)
+            && (mpz_cmp_si(&x->z,(long)ui)==0))
+            {
+              mpz_clear(&x->z);
+#if defined(LDEBUG)
+              x->debug=654324;
 #endif
+              omFreeBin((ADDRESS)x, rnumber_bin);
+              x=INT_TO_SR(ui);
+              return;
+            }
+          }
+          x->s=3;
+        }
+      }
+      mpz_clear(&gcd);
+    }
   }
 #ifdef LDEBUG
   nlTest(x);
