@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.14 2006-11-21 11:00:56 Singular Exp $ */
+/* $Id: longrat.cc,v 1.15 2007-04-12 16:33:52 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -1162,7 +1162,7 @@ void nlNormalize (number &x)
   }
   if (x->s==0)
   {
-    BOOLEAN divided=FALSE;
+    //BOOLEAN divided=FALSE;
     MP_INT gcd;
     mpz_init(&gcd);
     mpz_gcd(&gcd,&x->z,&x->n);
@@ -1176,29 +1176,30 @@ void nlNormalize (number &x)
       MPZ_EXACTDIV(&r,&x->n,&gcd);
       mpz_set(&x->n,&r);
       mpz_clear(&r);
-      divided=TRUE;
+      //divided=TRUE;
+      if (mpz_cmp_si(&x->n,(long)1)==0)
+      {
+        mpz_clear(&x->n);
+        if (mpz_size1(&x->z)<=MP_SMALL)
+        {
+          int ui=(int)mpz_get_si(&x->z);
+          if ((((ui<<3)>>3)==ui)
+          && (mpz_cmp_si(&x->z,(long)ui)==0))
+          {
+            mpz_clear(&x->z);
+#if defined(LDEBUG)
+            x->debug=654324;
+#endif
+            omFreeBin((ADDRESS)x, rnumber_bin);
+            x=INT_TO_SR(ui);
+            return;
+          }
+        }
+        x->s=3;
+      }
     }
     mpz_clear(&gcd);
-    if (mpz_cmp_si(&x->n,(long)1)==0)
-    {
-      mpz_clear(&x->n);
-      if (mpz_size1(&x->z)<=MP_SMALL)
-      {
-        int ui=(int)mpz_get_si(&x->z);
-        if ((((ui<<3)>>3)==ui)
-        && (mpz_cmp_si(&x->z,(long)ui)==0))
-        {
-          mpz_clear(&x->z);
-#if defined(LDEBUG)
-          x->debug=654324;
-#endif
-          omFreeBin((ADDRESS)x, rnumber_bin);
-          x=INT_TO_SR(ui);
-          return;
-        }
-      }
-      x->s=3;
-    }
+#if 0
     else if (divided)
     {
 #define mpz_alloc1(A) ((A)->_mp_alloc)
@@ -1216,6 +1217,7 @@ void nlNormalize (number &x)
         _mpz_realloc(&x->z,l /*mpz_size1(&x->z)*/);
       }
     }
+#endif
   }
 #ifdef LDEBUG
   nlTest(x);
