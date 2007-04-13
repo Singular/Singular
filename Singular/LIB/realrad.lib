@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: realrad.lib,v 1.1 2007-04-11 15:21:40 Singular Exp $";
+version="$Id: realrad.lib,v 1.2 2007-04-13 14:24:28 spang Exp $";
 category="real algebra";
 info="
 LIBRARY:  realrad.lib   Computation of real radicals
@@ -116,15 +116,17 @@ EXAMPE: example realrad; shows an example"
 }
 example
 { "EXAMPLE:"; echo = 2;
-  ring r=0,(a,b,c),lp;
-  ideal i1=c2-(a+b)^2*(a+b-1);
-  ideal i2=a4+a3+a2+a+1,(b4-2)*(b3+2),c+1;
-  ideal i=intersect(i1,i2);
-  realrad(i);
+  ring r1=0,(x,y,z),lp;
+  //dimension 0
+  ideal i0=(x2+1)*(x3-2),(y3-2)*(y2+y+1),z3+2;
+  //dimension 1
+  ideal i1=(y3+3y2+y+1)*(y2+4y+4)*(x2+1),(x2+y)*(x2-y2)*(x2+2xy+y2)*(y2+y+1); 
+  ideal i=intersect(i0,i1);
+  realrad(i); 
 }
 
 
-static proc zeroreduct(ideal i)
+/*static*/ proc zeroreduct(ideal i)
 "USAGE:zeroreduct(i), i an arbitary ideal
 RETURN: an ideal j of dimension <=0 s.th. i is contained in
         j and j is contained in i_{Iso} which is the zariski closure
@@ -147,8 +149,8 @@ RETURN: an ideal j of dimension <=0 s.th. i is contained in
  {
    equi=equidim(i);
    d=size(equi);
-   di=dim(equi[d]);
    equi[d]=radical(equi[d]);
+   di=dim(std(equi[d]));
    equi[d]=equi[d],minor(jacob(equi[d]),n-di);
    equi[d]=radical(equi[d]);
    i=intersect(equi[1..d]);
