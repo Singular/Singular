@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Get.h,v 1.14 2003-12-10 17:35:18 Singular Exp $ */
+/* $Id: mpsr_Get.h,v 1.15 2007-04-18 16:15:59 Singular Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.h
@@ -110,7 +110,11 @@ inline idhdl mpsr_InitIdhdl(short tok, void *data, char *name)
   IDID(h) = omStrDup(name);
   IDTYP(h) = tok;
   IDDATA(h) = (char *) data;
-
+#ifdef HAVE_IDI
+  extern int iiS2I(const char *s, int &less4);
+  int dummy;
+  h->id_i=iiS2I(name,dummy);
+#endif
   return h;
 }
 

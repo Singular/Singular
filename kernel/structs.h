@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.33 2007-03-01 09:15:51 Singular Exp $ */
+/* $Id: structs.h,v 1.34 2007-04-18 16:15:58 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -30,6 +30,7 @@ typedef void * Sy_reference;
 /* the following defines should really go into mod2.h,
    but configure dislikes it */
 
+#define HAVE_IDI 1
 
 #if defined(i386) || defined(x86_64_Linux) || defined(ix86_SunOS)
   // the following settings seems to be better on i386 and x86_64 processors
@@ -858,6 +859,9 @@ class idrec
 
   short      lev;
   short      ref;
+#ifdef HAVE_IDI
+  int        id_i;
+#endif
 
 #define IDNEXT(a)    ((a)->next)
 #define IDTYP(a)     ((a)->typ)

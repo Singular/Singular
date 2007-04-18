@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.79 2007-03-13 16:03:24 Singular Exp $ */
+/* $Id: ipid.cc,v 1.80 2007-04-18 16:15:58 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -57,6 +57,28 @@ void paCleanUp(package pack);
 
 /*0 implementation*/
 
+#ifdef HAVE_IDI
+int iiS2I(const char *s, int &less4)
+{
+  less4=1;
+  int i;
+  i=s[0];
+  if (s[1]!='\0')
+  {
+    i=(i<<8)+s[1];
+    if (s[2]!='\0')
+    {
+      i=(i<<8)+s[2];
+      if (s[3]!='\0')
+      {
+        i=(i<<8)+s[3];
+        less4=0;
+      }
+    }
+  }
+  return i;  
+}
+#endif
 idhdl idrec::get(const char * s, int lev)
 {
   assume(s!=NULL);
@@ -65,6 +87,7 @@ idhdl idrec::get(const char * s, int lev)
   idhdl found=NULL;
   int l;
   char *id;
+#ifndef HAVE_IDI
   if (s[1]=='\0')
   {
     while (h!=NULL)
@@ -202,7 +225,7 @@ idhdl idrec::get(const char * s, int lev)
       id=IDID(h);
       if (*(short *)s==*(short *)id)
       {
-        if (0 == strcmp(s+2,id+2))
+        if (0 == strcmp(s+1,id+1))
         {
           if (l==lev) return h;
           found=h;
@@ -215,6 +238,29 @@ idhdl idrec::get(const char * s, int lev)
   }
   }
   return found;
+#else
+  int less4;
+  int i=iiS2I(s,less4);
+  while (h!=NULL)
+  {
+    omCheckAddr(IDID(h));
+    l=IDLEV(h);
+    if ((l==0)||(l==lev))
+    {
+      if (i==h->id_i)
+      {
+        id=IDID(h);
+        if (less4 || (0 == strcmp(s+4,id+4)))
+        {
+          if (l==lev) return h;
+          found=h;
+        }
+      }
+    }
+    h = IDNEXT(h);
+  }
+  return found;
+#endif
 }
 
 //idrec::~idrec()
@@ -236,6 +282,10 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
   IDTYP(h)  = t;
   IDLEV(h)  = lev;
   IDNEXT(h) = this;
+#ifdef HAVE_IDI
+  int dummy;
+  h->id_i=iiS2I(s,dummy);
+#endif
   if (init)
   {
     switch (t)
