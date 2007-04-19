@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.80 2007-04-18 16:15:58 Singular Exp $ */
+/* $Id: ipid.cc,v 1.81 2007-04-19 12:05:39 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -58,9 +58,8 @@ void paCleanUp(package pack);
 /*0 implementation*/
 
 #ifdef HAVE_IDI
-int iiS2I(const char *s, int &less4)
+int iiS2I(const char *s)
 {
-  less4=1;
   int i;
   i=s[0];
   if (s[1]!='\0')
@@ -72,7 +71,6 @@ int iiS2I(const char *s, int &less4)
       if (s[3]!='\0')
       {
         i=(i<<8)+s[3];
-        less4=0;
       }
     }
   }
@@ -239,8 +237,8 @@ idhdl idrec::get(const char * s, int lev)
   }
   return found;
 #else
-  int less4;
-  int i=iiS2I(s,less4);
+  int i=iiS2I(s);
+  int less4=(i < (1<<24));
   while (h!=NULL)
   {
     omCheckAddr(IDID(h));
@@ -283,8 +281,7 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
   IDLEV(h)  = lev;
   IDNEXT(h) = this;
 #ifdef HAVE_IDI
-  int dummy;
-  h->id_i=iiS2I(s,dummy);
+  h->id_i=iiS2I(s);
 #endif
   if (init)
   {
