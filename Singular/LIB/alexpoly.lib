@@ -1,4 +1,4 @@
-version="$Id: alexpoly.lib,v 1.14 2006-08-02 10:14:06 Singular Exp $";
+version="$Id: alexpoly.lib,v 1.15 2007-04-19 15:10:38 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  alexpoly.lib   Resolution Graph and Alexander Polynomial
@@ -16,6 +16,7 @@ PROCEDURES:
  totalmultiplicities(f);    resolution graph, total multiplicities and strict multiplicities of f
  alexanderpolynomial(f);    Alexander polynomial of f
  semigroup(f);              calculates generators for the semigroup of f
+ proximitymatrix(f);        calculates the proximity matrix of f
  multseq2charexp(v);        converts multiplicity sequence to characteristic exponents
  charexp2multseq(v);        converts characteristic exponents to multiplicity sequence
  charexp2generators(v);     converts characteristic exponents to generators of the semigroup
@@ -2221,3 +2222,279 @@ NOTE:     This procedure is only for internal use; it is called in tau_es.
   return(M);
 }
 
+proc proximitymatrix (def INPUT)
+"USAGE:  proximitymatrix(INPUT); INPUT poly or list or intmat
+ASSUME:  INPUT is either a REDUCED bivariate polynomial defining a plane curve singularity,
+         or the output of @code{hnexpansion(f[,\"ess\"])}, or the list @code{hne} in
+         the ring created by @code{hnexpansion(f[,\"ess\"])}, or the output of
+         @code{develop(f)} resp. of @code{extdevelop(f,n)}, or a list containing 
+         the contact matrix and a list of integer vectors with the characteristic exponents 
+         of the branches of a plane curve singularity, or an integer vector containing the
+         characteristic exponents of an irreducible plane curve singularity, or the resolution 
+         graph of a plane curve singularity (i.e. the output of resolutiongraph or
+         the first entry in the output of totalmultiplicities).
+RETURN:  list, of three integer matrices. The first one is the proximity matrix of 
+         the plane curve defined by the INPUT, i.e. the entry i,j is 1 if the 
+         infinitely near point corresponding to row i is proximate to the infinitely 
+         near point corresponding to row j. The second integer matrix is the incidence matrix of the 
+         resolution graph of the plane curve. The entry on the diagonal in row i is -s-1 
+         if s is the number of points proximate to the infinitely near point corresponding 
+         to the ith row in the matrix. The third integer matrix is the incidence matrix of 
+         the Enriques diagram of the plane curve singularity, i.e. each row corresponds to 
+         an infinitely near point in the minimal standard resolution, including the
+         strict transforms of the branches, the diagonal element gives
+         the level of the point, and the entry i,j is -1 if row i is proximate to row j.
+NOTE:    In case the Hamburger-Noether expansion of the curve f is needed
+         for other purposes as well it is better to calculate this first
+         with the aid of @code{hnexpansion} and use it as input instead of
+         the polynomial itself. 
+         @*
+         If you are not sure whether the INPUT polynomial is reduced or not, use 
+         @code{squarefree(INPUT)} as input instead.
+         @*
+         If the input is a smooth curve, then the output will consist of 
+         three one-by-one zero matrices.
+         @*
+         For the definitions of the computed objects see e.g. the book 
+         Eduardo Casas-Alvero, Singularities of Plane Curves.        
+SEE ALSO: develop, hnexpansion, totalmultiplicities, alexanderpolynomial
+EXAMPLE: example proximitymatrix;  shows an example
+"
+{
+  ///////// Decide on the type of input. //////////
+  if (typeof(INPUT)=="intmat")
+  {
+    intmat resgr=INPUT;
+  }
+  else 
+  {
+    intmat resgr=totalmultiplicities(INPUT)[1];
+  }
+  ////////  Deal with the case of a smooth curve ////////////////
+  if (size(resgr)==1)
+  {
+    return(list(intmat(intvec(1),1,1),intmat(intvec(-1),1,1),intmat(intvec(0),1,1)));
+  }
+  ////////  Calculate the proximity resolution graph ////////////
+  int i,j;
+  int n=nrows(resgr); 
+  intvec diag; // Diagonal of the Enriques diagram.
+  int si; // number of points proximate to the point corresponding to the ith row
+  // Adjust the weights of the nodes corresponding to strict transforms so
+  // as if there had been one additional blow up.
+  for (i=1;i<=n;i++)
+  {
+    // Check if the row corresponds to an exceptional divisor ...
+    if (resgr[i,i]<0)
+    {
+      j=1;
+      while ((resgr[i,j]==0) or (i==j))
+      {
+        j++;
+      }
+      resgr[i,i]=resgr[j,j]+1;
+    }
+  }  
+  // Set the weights in the resolution graph to the blowing up level in the resolution.
+  for (i=1;i<=n;i++)
+  {
+    resgr[i,i]=resgr[i,i]-1;
+    diag[i]=resgr[i,i]; // The level of the corresponding infinitely near point.
+  }  
+  // Replace the weights in the resolution graph by 
+  // -s-1, where s is the number of points which are proximate to the point.
+  for (i=1;i<=n;i++)
+  {
+    si=-1;  
+    // Find the points of higher weight which are connected to the ith row.
+    for (j=i+1;j<=n;j++)
+    {
+      // If the point in row j is connected to the ith row, then all the points of
+      // weight resgr[i,i]+1 to weight resgr[j,j] in the corresponding subgraph
+      // are proximate to the point of the ith row. This number is just resgr[j,j]-resgr[i,i].
+      if ((resgr[i,j]!=0) and (resgr[j,j]>0))
+      {
+        si=si-(resgr[j,j]-resgr[i,i]);
+      }
+    }
+    resgr[i,i]=si;
+  }
+  ///////////////  Calculate the proximity matrix  ///////////////////
+  intmat proximity=proxgauss(resgr);
+  intmat enriques=proximity;
+  for (i=1;i<=nrows(enriques);i++)
+  {
+    enriques[i,i]=diag[i];
+  }
+  return(list(proximity,resgr,enriques));
+}
+example
+{
+  "EXAMPLE:";
+  echo=2;
+  ring r=0,(x,y),ls;
+  poly f1=(y2-x3)^2-4x5y-x7;
+  poly f2=y2-x3;
+  poly f3=y3-x2;
+  list proximity=proximitymatrix(f1*f2*f3);
+  /// The proximity matrix P ///
+  print(proximity[1]);
+  /// The proximity resolution graph N ///
+  print(proximity[2]);
+  /// They satisfy N=-transpose(P)*P ///
+  print(-transpose(proximity[1])*proximity[1]);
+  /// The incidence matrix of the Enriques diagram ///
+  print(proximity[3]);
+  /// If M is the matrix of multiplicities and TM the matrix of total
+  /// multiplicities of the singularity, then  M=P*TM.
+  /// We therefore calculate the (total) multiplicities. Note that
+  /// they have to be slightly extended.
+  list MULT=extend_multiplicities(totalmultiplicities(f1*f2*f3));
+  intmat TM=MULT[1];  // Total multiplicites.
+  intmat M=MULT[2];   // Multiplicities.
+  /// Check: M-P*TM=0.
+  M-proximity[1]*TM;
+  /// Check: inverse(P)*M-TM=0.
+  intmat_inverse(proximity[1])*M-TM;
+}
+
+static proc addmultiplrows (intmat M, int i, int j, int ki, int kj)
+"USAGE:   addmultiplrows(M,i,j,ki,kj);  intmat M, int i,j,ki,kj
+RETURN:   intmat, replaces the j-th row in M by ki-times the i-th row plus
+                  kj times the j-th
+NOTE:     This procedure is only for internal use; it is called in intmat_inverse
+          and proxgauss.
+"
+{
+  for (int k=1;k<=ncols(M);k++)
+  {
+    M[j,k]=kj*M[j,k]+ki*M[i,k];
+  }
+  return(M);
+}
+
+
+static proc proxgauss (intmat M)
+"USAGE:   proxgauss(M);  intmat M
+ASSUME:   M is the output of proximity_resgr
+RETURN:   intmat, replaces the j-th row in M by ki-times the i-th row plus
+                  kj times the j-th
+NOTE:     This procedure is only for internal use; it is called in intmat_inverse.
+"
+{
+  int i;
+  int n=nrows(M);
+  if (n==1)
+  {
+    M[1,1]=1;
+    return(M);
+  }
+  else
+  {
+    if (M[n,n]<0)
+    {    
+      M=addmultiplrows(M,n,n,-1,0);
+    }
+    for (i=n-1;i>=1;i--)
+    {
+      if (M[i,n]!=0)
+      {
+        M=addmultiplrows(M,n,i,-M[i,n],M[n,n]);
+      }
+    }
+    intmat N[n-1][n-1]=M[1..n-1,1..n-1];
+    N=proxgauss(N);
+    M[1..n-1,1..n-1]=N[1..n-1,1..n-1];
+    return(M);
+  }
+}
+
+proc extend_multiplicities (list rg)
+"USAGE:      extend_multiplicities(rg); list rg
+ASSUME:      rg is the output of the procedure totalmultiplicities
+RETURN:      list, the first entry is an integer matrix containing the total
+             multiplicities and the second entry is an integer matrix containing
+             the multiplicies of the resolution given by rg, where the zeros 
+             corresponding to the strict transforms of the branches of the curve
+             have been replaced by the (total) multiplicities of the infinitely near
+             point corresponding to one further blow up for each branch.
+KEYWORDS:    total multiplicities; multiplicity sequence; resolution graph
+EXAMPLE:     example extend_multiplicities;   shows an example
+"
+{
+  intmat resgr,tm,mt=rg[1],rg[2],rg[3];
+  int i,j;
+  for (i=1;i<=nrows(resgr);i++)
+  {
+    if (resgr[i,i]<0)
+    {
+      j=1;
+      while ((resgr[i,j]==0) or (i==j))
+      {
+        j++;
+      }
+      tm[i,1..ncols(tm)]=tm[j,1..ncols(tm)];
+      tm[i,-resgr[i,i]]=tm[i,-resgr[i,i]]+1;
+      mt[i,-resgr[i,i]]=1;
+    }
+  }
+  return(list(tm,mt));
+}
+example
+{
+  "EXAMPLE:";
+  echo=2;
+  ring r=0,(x,y),ls;
+  poly f1=(y2-x3)^2-4x5y-x7;
+  poly f2=y2-x3;
+  poly f3=y3-x2;
+  // Calculate the resolution graph and the (total) multiplicities of f1*f2*f3.
+  list RESGR=totalmultiplicities(f1*f2*f3);
+  // Extend the (total) multiplicities.
+  list MULT=extend_multiplicities(RESGR);
+  // Compare the total multiplicities.
+  RESGR[2];
+  MULT[1];
+  // Compare the multiplicities.
+  RESGR[3];
+  MULT[2];
+}
+
+proc intmat_inverse (intmat M)
+"USAGE:      intmat_inverse(M); intmat M 
+ASSUME:      M is a lower triangular integer matrix with diagonal entries 1 or -1
+RETURN:      intmat, the inverse of M
+KEYWORDS:    integer matrix, inverse
+EXAMPLE:     example intmat_inverse;   shows an example
+"
+{
+  int i,j,k;
+  int n=nrows(M);
+  intmat U[n][n];
+  for (i=1;i<=n;i++)
+  {
+    U[i,i]=1;
+  }
+  for (i=1;i<=n;i++)
+  {
+    if (M[i,i]==-1)
+    {      
+      M=addmultiplrows(M,i,i,-1,0);
+      U=addmultiplrows(U,i,i,-1,0);
+    }
+    for (j=i+1;j<=n;j++)
+    {      
+      U=addmultiplrows(U,i,j,-M[j,i],M[i,i]);
+      M=addmultiplrows(M,i,j,-M[j,i],M[i,i]);
+    }  
+  }
+  return(U);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  intmat M[5][5]=1,0,0,0,0,1,1,0,0,0,2,1,1,0,0,3,1,1,1,0,4,1,1,1,1 ;
+  intmat U=intmat_inverse(M);
+  print(U);
+  print(U*M);
+}
