@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.16 2007-04-12 16:58:38 Singular Exp $ */
+/* $Id: longrat.cc,v 1.17 2007-04-19 14:17:58 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -622,32 +622,9 @@ number nlIntDiv (number a, number b)
     {
       return nlRInit(1<<28);
     }
-    /* consider the signs of a and b:
-    *  + + -> u=a+b-1
-    *  + - -> u=a-b-1
-    *  - + -> u=a-b+1
-    *  - - -> u=a+b+1
-    */
     int aa=SR_TO_INT(a);
     int bb=SR_TO_INT(b);
-    if (aa>0)
-    {
-      if (bb>0)
-        return INT_TO_SR((aa+bb-1)/bb);
-      else
-        return INT_TO_SR((aa-bb-1)/bb);
-    }
-    else
-    {
-      if (bb>0)
-      {
-        return INT_TO_SR((aa-bb+1)/bb);
-      }
-      else
-      {
-        return INT_TO_SR((aa+bb+1)/bb);
-      }
-    }
+    return INT_TO_SR(aa/bb);
   }
   if (SR_HDL(a) & SR_INT)
   {
@@ -675,36 +652,6 @@ number nlIntDiv (number a, number b)
   assume(a->s==3);
   assume(b->s==3);
   mpz_init_set(&u->z,&a->z);
-  /* consider the signs of a and b:
-  *  + + -> u=a+b-1
-  *  + - -> u=a-b-1
-  *  - + -> u=a-b+1
-  *  - - -> u=a+b+1
-  */
-  if (mpz_isNeg(&a->z))
-  {
-    if (mpz_isNeg(&b->z))
-    {
-      mpz_add(&u->z,&u->z,&b->z);
-    }
-    else
-    {
-      mpz_sub(&u->z,&u->z,&b->z);
-    }
-    mpz_add_ui(&u->z,&u->z,1);
-  }
-  else
-  {
-    if (mpz_isNeg(&b->z))
-    {
-      mpz_sub(&u->z,&u->z,&b->z);
-    }
-    else
-    {
-      mpz_add(&u->z,&u->z,&b->z);
-    }
-    mpz_sub_ui(&u->z,&u->z,1);
-  }
   /* u=u/b */
   u->s = 3;
   MPZ_DIV(&u->z,&u->z,&b->z);
