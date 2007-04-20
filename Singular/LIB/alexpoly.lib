@@ -1,4 +1,4 @@
-version="$Id: alexpoly.lib,v 1.15 2007-04-19 15:10:38 Singular Exp $";
+version="$Id: alexpoly.lib,v 1.16 2007-04-20 12:21:12 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  alexpoly.lib   Resolution Graph and Alexander Polynomial
@@ -116,7 +116,7 @@ EXAMPLE: example totalmultiplicities;  shows an example
   /// the branches can be split with split_graph in order to get the graphs of the curves
   /// separated on the first exceptional divisor. Otherwise split_graph should not be applied!
   ///////////////////////////////////////////////////////////////////////////////////////////////
-  /// If #[1]="tau", then totalmultiplicities is called for the use in tau_es - thus it returns
+  /// If #[1]="tau", then totalmultiplicities is called for the use in tau_es2 - thus it returns
   /// the prolonged resolutiongraphs of the branches, their multiplicity sequences and their
   /// contact matrix - sorted appropriately.
   ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -278,7 +278,7 @@ EXAMPLE: example totalmultiplicities;  shows an example
     multipl[i]=mt;
   }
   ///////////////////////////////////////////////////////////////////////////////
-  // Check, if the procedure is called from inside tau_es.
+  // Check, if the procedure is called from inside tau_es2.
   int check_tau;
   if (size(#)==1)
   {
@@ -288,7 +288,7 @@ EXAMPLE: example totalmultiplicities;  shows an example
     }
   }
   /////////////////////////////////////////////////////////////////////////////////
-  // The procedure tau_es expects the branches to be ordered according to their
+  // The procedure tau_es2 expects the branches to be ordered according to their
   // contact during the resolution process.
   /////////////////////////////////////////////////////////////////////////////////
   if ((size(#)==0) or (check_tau==1))
@@ -304,7 +304,7 @@ EXAMPLE: example totalmultiplicities;  shows an example
     }
   }
   ///////////////////////////////////////////////////////////////////////////////////
-  /// If the procedure is called from inside tau_es, the output will be the prolonged
+  /// If the procedure is called from inside tau_es2, the output will be the prolonged
   /// resolutiongraphs of the branches, their multiplicity sequences and their contact matrix.
   if (check_tau==1)
   {
@@ -2122,7 +2122,7 @@ NOTE:     This procedure is only for internal use; it is called in totalmultipli
 static proc delete_row (intmat M,int i)
 "USAGE:    delete_row(M,i); M intmat, i int
 RETURN:   intmat, which is derived from M by removing the ith row
-NOTE:     This procedure is only for internal use; it is called in move_row and tau_es.
+NOTE:     This procedure is only for internal use; it is called in move_row and tau_es2.
 "
 {
   if ((i!=1) and (i!=nrows(M)))
@@ -2184,7 +2184,7 @@ NOTE:     This procedure is only for internal use; it is called in totalmultipli
 static proc find_last_non_one (intvec v,int k)
 "USAGE:    find_last_non_one (v,k); intvec v, int k
 RETURN:   int i, the last index i>=k such that v[i]!=1, or k-1 if no such i exists.
-NOTE:     This procedure is only for internal use; it is called in tau_es.
+NOTE:     This procedure is only for internal use; it is called in tau_es2.
 "
 {
   int i=size(v);
@@ -2205,7 +2205,7 @@ NOTE:     This procedure is only for internal use; it is called in tau_es.
 static proc intmat_minus_one (intmat M)
 "USAGE:    intmat_minus_one(M);  intmat M
 RETURN:   intmat, all non-zero entries of M deminuished by 1.
-NOTE:     This procedure is only for internal use; it is called in tau_es.
+NOTE:     This procedure is only for internal use; it is called in tau_es2.
 "
 {
   int i,j;
@@ -2227,36 +2227,36 @@ proc proximitymatrix (def INPUT)
 ASSUME:  INPUT is either a REDUCED bivariate polynomial defining a plane curve singularity,
          or the output of @code{hnexpansion(f[,\"ess\"])}, or the list @code{hne} in
          the ring created by @code{hnexpansion(f[,\"ess\"])}, or the output of
-         @code{develop(f)} resp. of @code{extdevelop(f,n)}, or a list containing 
-         the contact matrix and a list of integer vectors with the characteristic exponents 
+         @code{develop(f)} resp. of @code{extdevelop(f,n)}, or a list containing
+         the contact matrix and a list of integer vectors with the characteristic exponents
          of the branches of a plane curve singularity, or an integer vector containing the
-         characteristic exponents of an irreducible plane curve singularity, or the resolution 
+         characteristic exponents of an irreducible plane curve singularity, or the resolution
          graph of a plane curve singularity (i.e. the output of resolutiongraph or
          the first entry in the output of totalmultiplicities).
-RETURN:  list, of three integer matrices. The first one is the proximity matrix of 
-         the plane curve defined by the INPUT, i.e. the entry i,j is 1 if the 
-         infinitely near point corresponding to row i is proximate to the infinitely 
-         near point corresponding to row j. The second integer matrix is the incidence matrix of the 
-         resolution graph of the plane curve. The entry on the diagonal in row i is -s-1 
-         if s is the number of points proximate to the infinitely near point corresponding 
-         to the ith row in the matrix. The third integer matrix is the incidence matrix of 
-         the Enriques diagram of the plane curve singularity, i.e. each row corresponds to 
+RETURN:  list, of three integer matrices. The first one is the proximity matrix of
+         the plane curve defined by the INPUT, i.e. the entry i,j is 1 if the
+         infinitely near point corresponding to row i is proximate to the infinitely
+         near point corresponding to row j. The second integer matrix is the incidence matrix of the
+         resolution graph of the plane curve. The entry on the diagonal in row i is -s-1
+         if s is the number of points proximate to the infinitely near point corresponding
+         to the ith row in the matrix. The third integer matrix is the incidence matrix of
+         the Enriques diagram of the plane curve singularity, i.e. each row corresponds to
          an infinitely near point in the minimal standard resolution, including the
          strict transforms of the branches, the diagonal element gives
          the level of the point, and the entry i,j is -1 if row i is proximate to row j.
 NOTE:    In case the Hamburger-Noether expansion of the curve f is needed
          for other purposes as well it is better to calculate this first
          with the aid of @code{hnexpansion} and use it as input instead of
-         the polynomial itself. 
+         the polynomial itself.
          @*
-         If you are not sure whether the INPUT polynomial is reduced or not, use 
+         If you are not sure whether the INPUT polynomial is reduced or not, use
          @code{squarefree(INPUT)} as input instead.
          @*
-         If the input is a smooth curve, then the output will consist of 
+         If the input is a smooth curve, then the output will consist of
          three one-by-one zero matrices.
          @*
-         For the definitions of the computed objects see e.g. the book 
-         Eduardo Casas-Alvero, Singularities of Plane Curves.        
+         For the definitions of the computed objects see e.g. the book
+         Eduardo Casas-Alvero, Singularities of Plane Curves.
 SEE ALSO: develop, hnexpansion, totalmultiplicities, alexanderpolynomial
 EXAMPLE: example proximitymatrix;  shows an example
 "
@@ -2266,7 +2266,7 @@ EXAMPLE: example proximitymatrix;  shows an example
   {
     intmat resgr=INPUT;
   }
-  else 
+  else
   {
     intmat resgr=totalmultiplicities(INPUT)[1];
   }
@@ -2277,7 +2277,7 @@ EXAMPLE: example proximitymatrix;  shows an example
   }
   ////////  Calculate the proximity resolution graph ////////////
   int i,j;
-  int n=nrows(resgr); 
+  int n=nrows(resgr);
   intvec diag; // Diagonal of the Enriques diagram.
   int si; // number of points proximate to the point corresponding to the ith row
   // Adjust the weights of the nodes corresponding to strict transforms so
@@ -2294,18 +2294,18 @@ EXAMPLE: example proximitymatrix;  shows an example
       }
       resgr[i,i]=resgr[j,j]+1;
     }
-  }  
+  }
   // Set the weights in the resolution graph to the blowing up level in the resolution.
   for (i=1;i<=n;i++)
   {
     resgr[i,i]=resgr[i,i]-1;
     diag[i]=resgr[i,i]; // The level of the corresponding infinitely near point.
-  }  
-  // Replace the weights in the resolution graph by 
+  }
+  // Replace the weights in the resolution graph by
   // -s-1, where s is the number of points which are proximate to the point.
   for (i=1;i<=n;i++)
   {
-    si=-1;  
+    si=-1;
     // Find the points of higher weight which are connected to the ith row.
     for (j=i+1;j<=n;j++)
     {
@@ -2366,10 +2366,8 @@ NOTE:     This procedure is only for internal use; it is called in intmat_invers
           and proxgauss.
 "
 {
-  for (int k=1;k<=ncols(M);k++)
-  {
-    M[j,k]=kj*M[j,k]+ki*M[i,k];
-  }
+  int k=ncols(M);
+  M[j,1..k]=kj*M[j,1..k]+ki*M[i,1..k];
   return(M);
 }
 
@@ -2392,7 +2390,7 @@ NOTE:     This procedure is only for internal use; it is called in intmat_invers
   else
   {
     if (M[n,n]<0)
-    {    
+    {
       M=addmultiplrows(M,n,n,-1,0);
     }
     for (i=n-1;i>=1;i--)
@@ -2414,7 +2412,7 @@ proc extend_multiplicities (list rg)
 ASSUME:      rg is the output of the procedure totalmultiplicities
 RETURN:      list, the first entry is an integer matrix containing the total
              multiplicities and the second entry is an integer matrix containing
-             the multiplicies of the resolution given by rg, where the zeros 
+             the multiplicies of the resolution given by rg, where the zeros
              corresponding to the strict transforms of the branches of the curve
              have been replaced by the (total) multiplicities of the infinitely near
              point corresponding to one further blow up for each branch.
@@ -2461,7 +2459,7 @@ example
 }
 
 proc intmat_inverse (intmat M)
-"USAGE:      intmat_inverse(M); intmat M 
+"USAGE:      intmat_inverse(M); intmat M
 ASSUME:      M is a lower triangular integer matrix with diagonal entries 1 or -1
 RETURN:      intmat, the inverse of M
 KEYWORDS:    integer matrix, inverse
@@ -2471,22 +2469,19 @@ EXAMPLE:     example intmat_inverse;   shows an example
   int i,j,k;
   int n=nrows(M);
   intmat U[n][n];
-  for (i=1;i<=n;i++)
-  {
-    U[i,i]=1;
-  }
+  U=U+1;
   for (i=1;i<=n;i++)
   {
     if (M[i,i]==-1)
-    {      
+    {
       M=addmultiplrows(M,i,i,-1,0);
       U=addmultiplrows(U,i,i,-1,0);
     }
     for (j=i+1;j<=n;j++)
-    {      
+    {
       U=addmultiplrows(U,i,j,-M[j,i],M[i,i]);
       M=addmultiplrows(M,i,j,-M[j,i],M[i,i]);
-    }  
+    }
   }
   return(U);
 }
