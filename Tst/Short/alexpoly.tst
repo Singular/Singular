@@ -272,7 +272,7 @@ for (int i=1;i<=52;i++)
 {
   TM[i]=totalmultiplicities(FF[i]);
   TM[i];
-  proximitymatrix(TM[i][1])
+  proximitymatrix(TM[i][1]);
 }
 // ------------ test of alexanderpolynomial: -------------------
 list ALEX=alexanderpolynomial(f[22]*f[23]);
