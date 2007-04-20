@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.36 2006-12-11 14:22:46 Singular Exp $";
+version="$Id: matrix.lib,v 1.37 2007-04-20 12:27:17 Singular Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -654,7 +654,8 @@ RETURN:  matrix,  A being modified by adding p times column c1 to column c2
 EXAMPLE: example addcol; shows an example
 "
 {
-   A[1..nrows(A),c2]=A[1..nrows(A),c2]+p*A[1..nrows(A),c1];
+   int k=nrows(A);
+   A[1..k,c2]=A[1..k,c2]+p*A[1..k,c1];
    return(A);
 }
 example
@@ -672,7 +673,8 @@ RETURN:  matrix,  A being modified by adding p times row r1 to row r2
 EXAMPLE: example addrow; shows an example
 "
 {
-   A[r2,1..ncols(A)]=A[r2,1..ncols(A)]+p*A[r1,1..ncols(A)];
+   int k=ncols(A);
+   A[r2,1..k]=A[r2,1..k]+p*A[r1,1..k];
    return(A);
 }
 example
@@ -690,7 +692,8 @@ RETURN:  matrix,  A being modified by multiplying column c by p
 EXAMPLE: example multcol; shows an example
 "
 {
-   A[1..nrows(A),c]=p*A[1..nrows(A),c];
+   int k=nrows(A);
+   A[1..k,c]=p*A[1..k,c];
    return(A);
 }
 example
@@ -708,7 +711,8 @@ RETURN:  matrix,  A being modified by multiplying row r by p
 EXAMPLE: example multrow; shows an example
 "
 {
-   A[r,1..ncols(A)]=p*A[r,1..ncols(A)];
+   int k=ncols(A);
+   A[r,1..k]=p*A[r,1..k];
    return(A);
 }
 example
@@ -727,8 +731,9 @@ EXAMPLE: example permcol; shows an example
 "
 {
    matrix B=A;
-   B[1..nrows(B),c1]=A[1..nrows(A),c2];
-   B[1..nrows(B),c2]=A[1..nrows(A),c1];
+   int k=nrows(B);
+   B[1..k,c1]=A[1..k,c2];
+   B[1..k,c2]=A[1..k,c1];
    return(B);
 }
 example
@@ -747,8 +752,9 @@ EXAMPLE: example permrow; shows an example
 "
 {
    matrix B=A;
-   B[r1,1..ncols(B)]=A[r2,1..ncols(A)];
-   B[r2,1..ncols(B)]=A[r1,1..ncols(A)];
+   int k=ncols(B);
+   B[r1,1..k]=A[r2,1..k];
+   B[r2,1..k]=A[r1,1..k];
    return(B);
 }
 example
