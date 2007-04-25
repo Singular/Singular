@@ -100,13 +100,8 @@ struct fe_option
 #define required_argument        1
 #define optional_argument        2
 
-#if __STDC__ || defined(PROTO)
-/* #if defined(__GNU_LIBRARY__)*/
-/* Many other libraries have conflicting prototypes for getopt, with
-   differences in the consts, in stdlib.h.  To avoid compilation
-   errors, only prototype getopt for the GNU C library.  */
+#if defined(__STDC__) || defined(PROTO) || defined(__cplusplus)
 extern int fe_getopt (int argc, char *const *argv, const char *shortopts);
-/* #endif */
 extern int fe_getopt_long (int argc, char *const *argv, const char *shortopts,
                         const struct fe_option *longopts, int *longind);
 extern int fe_getopt_long_only (int argc, char *const *argv,
