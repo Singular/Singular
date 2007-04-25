@@ -244,6 +244,7 @@ static-bindist ${BINDIST_NAME}-static.tar.gz:
 	if test -d ${TMPDIR}; then rm -fr ${TMPDIR}; fi
 	${MAKE} install-bindist localdir=${TMPDIR} LD_STATIC=1
 	chmod -R a+rX ${TMPDIR}
+	-rm -f ${TMPDIR}/Singular/*/*/*.so
 	cd ${TMPDIR}; tar cf ${BINDIST_NAME}-static.tar Singular; ${MYGZIP} ${BINDIST_NAME}-static.tar
 	mv ${TMPDIR}/${BINDIST_NAME}-static.tar.gz .
 	rm -rf ${TMPDIR}
