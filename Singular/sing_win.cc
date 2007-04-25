@@ -1,3 +1,12 @@
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+/* $Id: sing_win.cc,v 1.6 2007-04-25 16:56:11 Singular Exp $ */
+
+/*
+* ABSTRACT: Windows specific routines
+*/
+
 #include "mod2.h"
 #ifdef ix86_Win
 #include <windows.h>
