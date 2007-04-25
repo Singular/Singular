@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.h,v 1.7 2004-01-19 11:26:20 Singular Exp $ */
+/* $Id: NTLconvert.h,v 1.8 2007-04-25 11:00:51 Singular Exp $ */
 #ifndef INCL_NTLCONVERT_H
 #define INCL_NTLCONVERT_H
 
@@ -27,6 +27,7 @@
 #include "int_int.h"
 #include <limits.h>
 #include <NTL/ZZ_pEXFactoring.h>
+#include <NTL/lzz_pEXFactoring.h>
 #include <NTL/GF2EXFactoring.h>
 
 #ifdef NTL_CLIENT               // in <NTL/tools.h>: using of name space NTL
@@ -53,6 +54,8 @@ CanonicalForm convertNTLGF2E2CF(GF2E coefficient,Variable x);
 CFFList convertNTLvec_pair_GF2EX_long2FacCFFList(vec_pair_GF2EX_long e,GF2E multi,Variable x,Variable alpha);
 GF2EX convertFacCF2NTLGF2EX(CanonicalForm f,GF2X mipo);
 ZZ_pEX convertFacCF2NTLZZ_pEX(CanonicalForm f,ZZ_pX mipo);
+zz_pEX convertFacCF2NTLzz_pEX(CanonicalForm f,zz_pX mipo);
+CFFList convertNTLvec_pair_zzpEX_long2FacCFFList(vec_pair_zz_pEX_long e,zz_pE multi,Variable x,Variable alpha);
 
 #endif
 #endif

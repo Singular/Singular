@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.29 2005-12-13 13:59:54 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.30 2007-04-25 11:00:51 Singular Exp $ */
 
 //{{{ docu
 //
@@ -536,24 +536,38 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
       ccc.restore();
 
       // set minimal polynomial in NTL
+      #ifdef NTL_ZZ
       ZZ_pX minPo=convertFacCF2NTLZZpX(getMipo(alpha));
       ZZ_pEContext c(minPo);
+      #else
+      zz_pX minPo=convertFacCF2NTLzzpX(getMipo(alpha));
+      zz_pEContext c(minPo);
+      #endif
 
       c.restore();
 
       // convert to NTL
+      #ifdef NTL_ZZ
       ZZ_pEX f1=convertFacCF2NTLZZ_pEX(f,minPo);
+      ZZ_pE leadcoeff= LeadCoeff(f1);
+      #else
+      zz_pEX f1=convertFacCF2NTLzz_pEX(f,minPo);
+      zz_pE leadcoeff= LeadCoeff(f1);
+      #endif
 
       //make monic
-      ZZ_pE leadcoeff= LeadCoeff(f1);
       f1=f1 / leadcoeff;
 
       // factorize using NTL
+      #ifdef NTL_ZZ
       vec_pair_ZZ_pEX_long factors;
+      #else
+      vec_pair_zz_pEX_long factors;
+      #endif
       CanZass(factors,f1);
 
       // return converted result
-      F=convertNTLvec_pair_ZZpEX_long2FacCFFList(factors,leadcoeff,f.mvar(),alpha);
+      F=convertNTLvec_pair_zzpEX_long2FacCFFList(factors,leadcoeff,f.mvar(),alpha);
     }
     else
     {
