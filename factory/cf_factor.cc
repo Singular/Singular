@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.30 2007-04-25 11:00:51 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.31 2007-04-25 11:13:34 Singular Exp $ */
 
 //{{{ docu
 //
@@ -530,10 +530,15 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     {
       // First all cases with characteristic !=2
       // set remainder
+      #ifdef NTL_ZZ
       ZZ r;
       r=getCharacteristic();
       ZZ_pContext ccc(r);
       ccc.restore();
+      #else
+      zz_pContext ccc(getCharacteristic());
+      ccc.restore();
+      #endif
 
       // set minimal polynomial in NTL
       #ifdef NTL_ZZ
