@@ -107,7 +107,7 @@ CXXSOURCES=clapconv.cc \
     syz.cc syz0.cc syz1.cc syz2.cc syz3.cc\
     timer.cc weight.cc \
     GMPrat.cc multicnt.cc npolygon.cc semic.cc spectrum.cc splist.cc \
-    mod_raw.cc sing_win.cc walkProc.cc walkMain.cc walkSupport.cc\
+    mod_raw.cc walkProc.cc walkMain.cc walkSupport.cc\
     eigenval.cc units.cc kbuckets.cc sbuckets.cc\
     mpr_inout.cc mpr_base.cc mpr_numeric.cc \
     prCopy.cc p_Mult_q.cc \
