@@ -192,7 +192,7 @@ HEADERS=lists.h attrib.h \
 	mpsr_Put.h walk.h\
 	dbm_sl.h libparse.h \
 	gms.h pcv.h eigenval_ip.h \
-	fegetopt.h distrib.h walk.h \
+	distrib.h walk.h \
         static.h \
         omSingularConfig.h
 
@@ -332,8 +332,8 @@ version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in \
 	echo "#define CC \"" ${CC} ${CFLAGS} ${DEFS}"\"" >>version.h
 	echo "#define CXX \"" ${CXX} ${CXXFLAGS} ${DEFS} "\"" >>version.h
 
-libparse: libparse_main.o utils.o fegetopt.o
-	${CXX}  ${CPPFLAGS} -DSTANDALONE_PARSER -o libparse libparse_main.o utils.o fegetopt.o ${LDFLAGS2} -lomalloc_ndebug
+libparse: libparse_main.o utils.o
+	${CXX}  ${CPPFLAGS} -DSTANDALONE_PARSER -o libparse libparse_main.o utils.o ../kernel/fegetopt.o ${LDFLAGS2} -lomalloc_ndebug
 
 libparse_main.o: libparse.cc
 	${CXX} ${CPPFLAGS} -c -o libparse_main.o libparse.cc  -DSTANDALONE_PARSER
@@ -348,14 +348,14 @@ libparse.cc: libparse.l
 
 # Hmm compiling with -fomit-frame-pointer resulted in access violation
 # under cygwin
-ESingular: fegetopt.o mod2.h feOpt.cc version.h emacs.cc \
+ESingular: mod2.h feOpt.cc version.h emacs.cc \
            feOptES.inc
-	${CXX} -O2 ${CPPFLAGS} ${DEFS} -DESINGULAR -DPROTO -o ESingular emacs.cc fegetopt.o \
+	${CXX} -O2 ${CPPFLAGS} ${DEFS} -DESINGULAR -DPROTO -o ESingular emacs.cc ../kernel/fegetopt.o \
 	${LDFLAGS} ${LIBS} ../kernel/mmalloc.o
 
-TSingular: fegetopt.o mod2.h feOpt.cc version.h emacs.cc \
+TSingular: mod2.h feOpt.cc version.h emacs.cc \
            feOptTS.inc
-	${CXX} -O2 ${CPPFLAGS} ${DEFS} -DTSINGULAR -DPROTO -o TSingular emacs.cc fegetopt.o \
+	${CXX} -O2 ${CPPFLAGS} ${DEFS} -DTSINGULAR -DPROTO -o TSingular emacs.cc ../kernel/fegetopt.o \
 	${LDFLAGS} ${LIBS} ../kernel/mmalloc.o
 
 feOpt.o: feOpt.inc feOptES.inc feOptTS.inc
@@ -661,9 +661,9 @@ installg: Singularg
 	${MKINSTALLDIRS} ${bindir}
 	${INSTALL_PROGRAM} Singularg ${bindir}	
 
-ESingularg: fegetopt.og mod2.h feOpt.cc version.h emacs.cc \
+ESingularg: mod2.h feOpt.cc version.h emacs.cc \
            feOptES.inc
-	${CXXG} ${CXXFLAGSG} ${CPPFLAGS} -DESINGULAR -g ${DEFSG} -o ESingularg emacs.cc fegetopt.og ${LDFLAGS} ${LIBS} -lomalloc ../kernel/mmalloc.og
+	${CXXG} ${CXXFLAGSG} ${CPPFLAGS} -DESINGULAR -g ${DEFSG} -o ESingularg emacs.cc ../kernel/fegetopt.og ${LDFLAGS} ${LIBS} -lomalloc ../kernel/mmalloc.og
 
 ##
 ## compiler and linker options for profile version
