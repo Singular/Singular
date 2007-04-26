@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.cc,v 1.21 2007-03-01 12:17:24 Singular Exp $ */
+/* $Id: NTLconvert.cc,v 1.22 2007-04-26 08:22:48 Singular Exp $ */
 #include <config.h>
 
 #ifdef HAVE_SINGULAR
@@ -48,6 +48,8 @@
 #define Free(A,L) free(A)
 #endif
 
+int fac_NTL_char=-1;            // the current characterstic for NTL calls
+                                // -1: undefined
 #ifdef NTL_CLIENT               // in <NTL/tools.h>: using of name space NTL
 NTL_CLIENT
 #endif

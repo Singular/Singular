@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.48 2006-09-25 12:33:11 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.49 2007-04-26 08:22:48 Singular Exp $ */
 
 #include <config.h>
 
@@ -124,9 +124,33 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
   if (isOn(SW_USE_NTL_GCD_P) && ( getCharacteristic() > 0 )
   && isPurePoly(f) && isPurePoly(g))
   {
-    zz_pContext ccc(getCharacteristic());
-    ccc.restore();
-    zz_p::init(getCharacteristic());
+    if (fac_NTL_char!=getCharacteristic())
+    {
+      fac_NTL_char=getCharacteristic();
+      #ifdef NTL_ZZ
+      ZZ r;
+      r=getCharacteristic();
+      ZZ_pContext ccc(r);
+      #else
+      zz_pContext ccc(getCharacteristic());
+      #endif
+      ccc.restore();
+      #ifdef NTL_ZZ
+      ZZ_p::init(r);
+      #else
+      zz_p::init(getCharacteristic());
+      #endif
+    }
+    #ifdef NTL_ZZ
+    ZZ_pX F1=convertFacCF2NTLZZpX(f);
+    ZZ_pX G1=convertFacCF2NTLZZpX(g);
+    ZZ_pX R;
+    ZZ_pX A,B;
+    XGCD(R,A,B,F1,G1);
+    a=convertNTLZZpX2CF(A,f.mvar());
+    b=convertNTLZZpX2CF(B,f.mvar());
+    return convertNTLZZpX2CF(R,f.mvar());
+    #else
     zz_pX F1=convertFacCF2NTLzzpX(f);
     zz_pX G1=convertFacCF2NTLzzpX(g);
     zz_pX R;
@@ -135,6 +159,7 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
     a=convertNTLzzpX2CF(A,f.mvar());
     b=convertNTLzzpX2CF(B,f.mvar());
     return convertNTLzzpX2CF(R,f.mvar());
+    #endif
   }
 #endif
   CanonicalForm contf = content( f );
@@ -143,7 +168,8 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
   CanonicalForm p0 = f / contf, p1 = g / contg;
   CanonicalForm f0 = 1, f1 = 0, g0 = 0, g1 = 1, q, r;
 
-  while ( ! p1.isZero() ) {
+  while ( ! p1.isZero() )
+  {
       divrem( p0, p1, q, r );
       p0 = p1; p1 = r;
       r = g0 - g1 * q;
@@ -155,7 +181,8 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
   a = f0 / ( contf * contp0 );
   b = g0 / ( contg * contp0 );
   p0 /= contp0;
-  if ( p0.sign() < 0 ) {
+  if ( p0.sign() < 0 )
+  {
       p0 = -p0;
       a = -a;
       b = -b;
@@ -695,13 +722,34 @@ gcd_univar_ntl0( const CanonicalForm & F, const CanonicalForm & G )
 static CanonicalForm
 gcd_univar_ntlp( const CanonicalForm & F, const CanonicalForm & G )
 {
+  if (fac_NTL_char!=getCharacteristic())
+  {
+    fac_NTL_char=getCharacteristic();
+    #ifdef NTL_ZZ
+    ZZ r;
+    r=getCharacteristic();
+    ZZ_pContext ccc(r);
+    #else
     zz_pContext ccc(getCharacteristic());
+    #endif
     ccc.restore();
+    #ifdef NTL_ZZ
+    ZZ_p::init(r);
+    #else
     zz_p::init(getCharacteristic());
-    zz_pX F1=convertFacCF2NTLzzpX(F);
-    zz_pX G1=convertFacCF2NTLzzpX(G);
-    zz_pX R=GCD(F1,G1);
-    return  convertNTLzzpX2CF(R,F.mvar());
+    #endif
+  }
+  #ifdef NTL_ZZ
+  ZZ_pX F1=convertFacCF2NTLZZpX(F);
+  ZZ_pX G1=convertFacCF2NTLZZpX(G);
+  ZZ_pX R=GCD(F1,G1);
+  return  convertNTLZZpX2CF(R,F.mvar());
+  #else
+  zz_pX F1=convertFacCF2NTLzzpX(F);
+  zz_pX G1=convertFacCF2NTLzzpX(G);
+  zz_pX R=GCD(F1,G1);
+  return  convertNTLzzpX2CF(R,F.mvar());
+  #endif
 }
 
 #endif

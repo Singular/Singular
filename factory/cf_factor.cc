@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.31 2007-04-25 11:13:34 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.32 2007-04-26 08:22:48 Singular Exp $ */
 
 //{{{ docu
 //
@@ -79,7 +79,8 @@ int find_mvar(const CanonicalForm & f)
   return mv;
 }
 
-#if 0
+#if 1
+#ifndef NOSTREAMIO
 void out_cf(char *s1,const CanonicalForm &f,char *s2)
 {
   printf("%s",s1);
@@ -159,6 +160,7 @@ void test_cff(CFFList &L,const CanonicalForm & f)
   }
   if ((f-t)!=0) { printf("problem:\n");out_cf("factor:",f," has problems\n");}
 }
+#endif
 #endif
 
 bool isPurePoly(const CanonicalForm & f)
@@ -346,19 +348,23 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       if (getCharacteristic()!=2)
       {
         // set remainder
-        #ifdef NTL_ZZ
-        ZZ r;
-        r=getCharacteristic();
-        ZZ_pContext ccc(r);
-        #else
-        zz_pContext ccc(getCharacteristic());
-        #endif
-        ccc.restore();
-        #ifdef NTL_ZZ
-        ZZ_p::init(r);
-        #else
-        zz_p::init(getCharacteristic());
-        #endif
+        if (fac_NTL_char!=getCharacteristic())
+        {
+          fac_NTL_char=getCharacteristic();
+          #ifdef NTL_ZZ
+          ZZ r;
+          r=getCharacteristic();
+          ZZ_pContext ccc(r);
+          #else
+          zz_pContext ccc(getCharacteristic());
+          #endif
+          ccc.restore();
+          #ifdef NTL_ZZ
+          ZZ_p::init(r);
+          #else
+          zz_p::init(getCharacteristic());
+          #endif
+        }
         // convert to NTL
         #ifdef NTL_ZZ
         ZZ_pX f1=convertFacCF2NTLZZpX(f);
@@ -389,11 +395,11 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       else
       {
         // Specialcase characteristic==2
-        ZZ r;r=2;
-        ZZ_p::init(r);
-
-        // remainder is 2 --> nothing to set
-
+        if (fac_NTL_char!=2)
+        {
+          fac_NTL_char=2;
+          zz_p::init(2);
+        }
         // convert to NTL using the faster conversion routine for characteristic 2
         GF2X f1=convertFacCF2NTLGF2X(f);
         // no make monic necessary in GF2
@@ -530,15 +536,23 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     {
       // First all cases with characteristic !=2
       // set remainder
-      #ifdef NTL_ZZ
-      ZZ r;
-      r=getCharacteristic();
-      ZZ_pContext ccc(r);
-      ccc.restore();
-      #else
-      zz_pContext ccc(getCharacteristic());
-      ccc.restore();
-      #endif
+      if (fac_NTL_char!=getCharacteristic())
+      {
+        fac_NTL_char=getCharacteristic();
+        #ifdef NTL_ZZ
+        ZZ r;
+        r=getCharacteristic();
+        ZZ_pContext ccc(r);
+        #else
+        zz_pContext ccc(getCharacteristic());
+        #endif
+        ccc.restore();
+        #ifdef NTL_ZZ
+        ZZ_p::init(r);
+        #else
+        zz_p::init(getCharacteristic());
+        #endif
+      }
 
       // set minimal polynomial in NTL
       #ifdef NTL_ZZ

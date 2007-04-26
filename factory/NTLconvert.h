@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.h,v 1.8 2007-04-25 11:00:51 Singular Exp $ */
+/* $Id: NTLconvert.h,v 1.9 2007-04-26 08:22:48 Singular Exp $ */
 #ifndef INCL_NTLCONVERT_H
 #define INCL_NTLCONVERT_H
 
@@ -57,5 +57,6 @@ ZZ_pEX convertFacCF2NTLZZ_pEX(CanonicalForm f,ZZ_pX mipo);
 zz_pEX convertFacCF2NTLzz_pEX(CanonicalForm f,zz_pX mipo);
 CFFList convertNTLvec_pair_zzpEX_long2FacCFFList(vec_pair_zz_pEX_long e,zz_pE multi,Variable x,Variable alpha);
 
+extern int fac_NTL_char;
 #endif
 #endif
