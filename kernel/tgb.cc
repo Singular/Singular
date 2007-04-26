@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.151 2007-04-03 15:16:39 Singular Exp $ */
+/* $Id: tgb.cc,v 1.152 2007-04-26 05:40:59 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2391,7 +2391,7 @@ static void go_on (slimgb_alg* c){
   //programming reasons
   #ifdef USE_NORO
   //Print("module rank%d\n",c->S->rank);
-  const BOOLEAN use_noro=((!(c->nc))&&(c->S->rank<=1)&&(rField_is_Zp(c->r)));
+  const BOOLEAN use_noro=((!(c->nc))&&(c->S->rank<=1)&&(rField_is_Zp(c->r)) &&(!(c->eliminationProblem))&&(npPrimeM<=32003));
   #else
   const BOOLEAN use_noro=FALSE;
   #endif
@@ -2785,9 +2785,10 @@ void slimgb_alg::introduceDelayedPairs(poly* pa,int s){
         simplify_poly(p,r);
         si->expected_length=pQuality(p,this,pLength(p));
         si->deg=pTotaldegree_full(p);
-        if (!rField_is_Zp(r)){
+        /*if (!rField_is_Zp(r)){
+          pContent(p);
           pCleardenom(p);
-        }
+        }*/
         si->lcm_of_lm=p;
 
         //      c->apairs[n-1-i]=si;
@@ -3339,8 +3340,9 @@ void slimgb_alg::cleanDegs(int lower, int upper){
           h=redNFTail(h,strat->sl,strat,lengths[i]);
           if (!rField_is_Zp(r))
           {
+            pCleardenom(h);
             pContent(h);
-            pCleardenom(h);//should be unnecessary
+            
           } else pNorm(h);
           //TODO:GCD of TERMS
           poly got=::gcd_of_terms(h,r);
@@ -3846,8 +3848,9 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
       c->strat->lenSw[j]=qal;
     if (!rField_is_Zp(c->r))
     {
-      pContent(clear_into);
       pCleardenom(clear_into);//should be unnecessary
+      pContent(clear_into);
+      
     }
     else
       pNorm(clear_into);
@@ -4330,8 +4333,9 @@ void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
 
     if (!rField_is_Zp(c->r))
     {
-      pContent(red);
       pCleardenom(red);//should be unnecessary
+      pContent(red);
+      
 
     }
     pNormalize(red);
