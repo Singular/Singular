@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.13 2006-12-15 17:16:07 Singular Exp $ */
+/* $Id: polys.cc,v 1.14 2007-04-26 09:22:34 wienand Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -109,6 +109,27 @@ poly pDivide(poly a, poly b)
   return result;
 }
 
+#ifdef HAVE_RING2TOM
+#define pDiv_nn(p, n)              p_Div_nn(p, n, currRing)
+
+poly p_Div_nn(poly p, const number n, const ring r)
+{
+  pAssume(!n_IsZero(n,r));
+  p_Test(p, r);
+
+  poly q = p;
+  while (p != NULL)
+  {
+    number nc = pGetCoeff(p);
+    pSetCoeff0(p, n_Div(nc, n, r));
+    n_Delete(&nc, r);
+    pIter(p);
+  }
+  p_Test(q, r);
+  return q;
+}
+#endif
+
 /*2
 * divides a by the monomial b, ignores monomials which are not divisible
 * assumes that b is not NULL
@@ -119,7 +140,17 @@ poly pDivideM(poly a, poly b)
   poly result=a;
   poly prev=NULL;
   int i;
+#ifdef HAVE_RING2TOM
+  bool unit = true;
+  number inv = pGetCoeff(b);
+  if ((currRing->cring == 1) && ((long) pGetCoeff(b) % 2 == 0))
+  {
+    unit = false;
+  }
+  if (unit) inv=nInvers(inv);
+#else
   number inv=nInvers(pGetCoeff(b));
+#endif
 
   while (a!=NULL)
   {
@@ -146,6 +177,13 @@ poly pDivideM(poly a, poly b)
       }
     }
   }
+#ifdef HAVE_RING2TOM
+  if (!unit)
+  {
+    pDiv_nn(result,inv);
+  }
+  else
+#endif
   pMult_nn(result,inv);
   nDelete(&inv);
   pDelete(&b);
