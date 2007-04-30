@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.49 2007-03-29 11:34:52 Singular Exp $ */
+/* $Id: kutil.cc,v 1.50 2007-04-30 15:47:41 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2567,82 +2567,26 @@ void enterpairsSpecial (poly h,int k,int ecart,int pos,kStrategy strat, int atR 
 }
 
 /*2
-*constructs the pairset at the beginning
-*of the buchberger/mora algorithm
-*/
-void pairs (kStrategy strat)
-{
-  int j,i;
-//  Print("pairs:sl=%d\n",strat->sl);
-//  for (i=0; i<=strat->sl; i++)
-//  {
-//    Print("s%d:",i);pWrite(strat->S[i]);
-//  }
-  if (strat->fromQ!=NULL)
-  {
-    for (i=1; i<=strat->sl; i++)
-    {
-      initenterpairs(strat->S[i],i-1,strat->ecartS[i],strat->fromQ[i],strat);
-    }
-  }
-  else
-  {
-    for (i=1; i<=strat->sl; i++)
-    {
-      initenterpairs(strat->S[i],i-1,strat->ecartS[i],0,strat);
-    }
-  }
-  /*deletes superfluous elements in S*/
-  i = -1;
-  loop
-  {
-    i++;
-    if (i >= strat->sl) break;
-    if (1//(strat->syzComp==0) || (pGetComp(strat->S[i])<=strat->syzComp))
-    )
-    {
-      j=i;
-      loop
-      {
-        j++;
-        if (j > strat->sl) break;
-        if (pLmShortDivisibleBy(strat->S[i], strat->sevS[i],
-                              strat->S[j], ~ strat->sevS[j]))
-        {
-        //  Print("delete %d=",j);
-        //  wrp(strat->S[j]);
-        //  Print(" wegen %d=",i);
-        //  wrp(strat->S[i]);
-        //  Print("( fromQ=%d)\n", (strat->fromQ) ? strat->fromQ[j]:0);
-          if ((strat->fromQ==NULL) || (strat->fromQ[j]==0))
-          {
-            deleteInS(j,strat);
-            j--;
-          }
-        }
-      }
-    }
-  }
-}
-
-/*2
 *reorders  s with respect to posInS,
 *suc is the first changed index or zero
 */
+
 void reorderS (int* suc,kStrategy strat)
 {
   int i,j,at,ecart, s2r;
   int fq=0;
   unsigned long sev;
   poly  p;
+  int new_suc=strat->sl+1;
+  i= *suc;
+  if (i<0) i=0;
 
-  *suc = -1;
-  for (i=1; i<=strat->sl; i++)
+  for (; i<=strat->sl; i++)
   {
     at = posInS(strat,i-1,strat->S[i],strat->ecartS[i]);
     if (at != i)
     {
-      if ((*suc > at) || (*suc == -1)) *suc = at;
+      if (new_suc > at) new_suc = at;
       p = strat->S[i];
       ecart = strat->ecartS[i];
       sev = strat->sevS[i];
@@ -2669,6 +2613,8 @@ void reorderS (int* suc,kStrategy strat)
       }
     }
   }
+  if (new_suc <= strat->sl) *suc=new_suc;
+  else                      *suc=-1;
 }
 
 
@@ -4624,6 +4570,7 @@ void cancelunit1 (LObject* p,int *suc, int index,kStrategy strat )
   }
 }
 
+#if 0
 /*2
 * reduces h using the elements from Q in the set S
 * procedure used in updateS
@@ -4648,6 +4595,7 @@ static poly redQ (poly h, int j, kStrategy strat)
   }
   return h;
 }
+#endif
 
 /*2
 * reduces h using the set S
@@ -4729,7 +4677,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
   LObject h;
   int i, suc=0;
   poly redSi=NULL;
-  BOOLEAN change;
+  BOOLEAN change,any_change;
 //  Print("nach initS: updateS start mit sl=%d\n",(strat->sl));
 //  for (i=0; i<=(strat->sl); i++)
 //  {
@@ -4738,6 +4686,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
 //    pWrite(strat->S[i]);
 //  }
 //  Print("pOrdSgn=%d\n", pOrdSgn);
+  any_change=FALSE;
   if (pOrdSgn==1)
   {
     while (suc != -1)
@@ -4746,16 +4695,16 @@ void updateS(BOOLEAN toT,kStrategy strat)
       while (i<=strat->sl)
       {
         change=FALSE;
-        if (1//((strat->syzComp==0) || (pGetComp(strat->S[i])<=strat->syzComp))
-        && ((strat->fromQ==NULL) || (strat->fromQ[i]==0)))
+        if (((strat->fromQ==NULL) || (strat->fromQ[i]==0)) && (i>0))
         {
           redSi = pHead(strat->S[i]);
           strat->S[i] = redBba(strat->S[i],i-1,strat);
-          if ((strat->ak!=0)&&(strat->S[i]!=NULL))
-            strat->S[i]=redQ(strat->S[i],i+1,strat); /*reduce S[i] mod Q*/
+          //if ((strat->ak!=0)&&(strat->S[i]!=NULL))
+          //  strat->S[i]=redQ(strat->S[i],i+1,strat); /*reduce S[i] mod Q*/
           if (pCmp(redSi,strat->S[i])!=0)
           {
             change=TRUE;
+            any_change=TRUE;
             if (TEST_OPT_DEBUG)
             {
               PrintS("reduce:");
@@ -4792,7 +4741,8 @@ void updateS(BOOLEAN toT,kStrategy strat)
         }
         i++;
       }
-      reorderS(&suc,strat);
+      if (any_change) reorderS(&suc,strat);
+      else break;
     }
     if (toT)
     {
@@ -4832,8 +4782,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
       while (i<=strat->sl)
       {
         change=FALSE;
-        if (1//((strat->syzComp==0) || (pGetComp(strat->S[i])<=strat->syzComp))
-        && ((strat->fromQ==NULL) || (strat->fromQ[i]==0)))
+        if (((strat->fromQ==NULL) || (strat->fromQ[i]==0)) && (i>0))
         {
           redSi=pHead((strat->S)[i]);
           (strat->S)[i] = redMora((strat->S)[i],i-1,strat);
@@ -4844,6 +4793,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
           }
           else if (pCmp((strat->S)[i],redSi)!=0)
           {
+            any_change=TRUE;
             h.p = strat->S[i];
             strat->initEcart(&h);
             strat->ecartS[i] = h.ecart;
@@ -4866,7 +4816,8 @@ void updateS(BOOLEAN toT,kStrategy strat)
 #ifdef KDEBUG
       kTest(strat);
 #endif
-      reorderS(&suc,strat);
+      if (any_change) reorderS(&suc,strat);
+      else { suc=-1; break; }
       if (h.p!=NULL)
       {
         if (!strat->kHEdgeFound)
@@ -4879,8 +4830,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
     }
     for (i=0; i<=strat->sl; i++)
     {
-      if (((strat->fromQ==NULL) || (strat->fromQ[i]==0))
-      )
+      if ((strat->fromQ==NULL) || (strat->fromQ[i]==0))
       {
         strat->S[i] = h.p = redtail(strat->S[i],strat->sl,strat);
         strat->initEcart(&h);
@@ -5283,10 +5233,9 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   strat->kIdeal = NULL;
   strat->fromT = FALSE;
   strat->noTailReduction = !TEST_OPT_REDTAIL;
-  if(!TEST_OPT_SB_1)
+  if (!TEST_OPT_SB_1) 
   {
     updateS(TRUE,strat);
-    pairs(strat);
   }
   if (strat->fromQ!=NULL) omFreeSize(strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
   strat->fromQ=NULL;
