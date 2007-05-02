@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.17 2007-01-05 17:59:32 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.18 2007-05-02 10:01:23 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -388,7 +388,7 @@ int redFirst (LObject* h,kStrategy strat)
         return -2;
       }
     }
-#endif    
+#endif
     if (!strat->homog)
     {
       if (!K_TEST_OPT_OLDSTD && strat->honey)
@@ -1875,75 +1875,236 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
 */
 #if 0
 // new version
-ideal kInterRed(ideal F, ideal Q)
+ideal kInterRed (ideal F, ideal Q)
 {
-  ideal r;
-  BOOLEAN b=pLexOrder,toReset=FALSE;
-  kStrategy strat=new skStrategy;
-  strat->interred_flag=TRUE;
-  tHomog h;
-  intvec *w=NULL;
+  int   srmax,lrmax, red_result = 1;
+  int   olddeg,reduc,j;
+  BOOLEAN need_update=FALSE;
 
-  if (rField_has_simple_inverse())
-    strat->LazyPass=20;
-  else
-    strat->LazyPass=2;
-  strat->LazyDegree = 1;
+  kStrategy strat = new skStrategy;
+  strat->kHEdgeFound = ppNoether != NULL;
+  strat->kNoether=pCopy(ppNoether);
   strat->ak = idRankFreeModule(F);
-  if (strat->ak == 0)
+  initBuchMoraCrit(strat);
+  initBuchMoraPos(strat);
+  strat->NotUsedAxis = (BOOLEAN *)omAlloc((pVariables+1)*sizeof(BOOLEAN));
+  for (j=pVariables; j>0; j--) strat->NotUsedAxis[j] = TRUE;
+  strat->enterS      = enterSBba;
+  strat->posInT      = posInT17;
+  strat->initEcart   = initEcartNormal;
+  strat->sl          = -1;
+  strat->tl          = -1;
+  strat->Ll          = -1;
+  strat->tmax        = setmaxT;
+  strat->Lmax        = setmaxL;
+  strat->T           = initT();
+  strat->R           = initR();
+  strat->L           = initL();
+  strat->sevT        = initsevT();
+  strat->red         = redLazy;
+  strat->tailRing    = currRing;
+  if (pOrdSgn == -1)
+    strat->honey = TRUE;
+  initSL(F,Q,strat);
+  for(j=strat->Ll; j>=0; j--)
+    strat->L[j].tailRing=currRing;
+  if (TEST_OPT_REDSB)
+    strat->noTailReduction=FALSE;
+
+  srmax = strat->sl;
+  reduc = olddeg = lrmax = 0;
+
+#ifndef NO_BUCKETS
+  if (!TEST_OPT_NOT_BUCKETS)
+    strat->use_buckets = 1;
+#endif
+
+  // strat->posInT = posInT_pLength;
+  kTest_TS(strat);
+
+  /* compute------------------------------------------------------- */
+  while (strat->Ll >= 0)
   {
-    h = (tHomog)idHomIdeal(F,Q);
-  }
-  else
-  {
-    h = (tHomog)idHomModule(F,Q,&w);
-  }
-  pLexOrder=b;
-  if (h==isHomog)
-  {
-    if (strat->ak > 0 && (w!=NULL))
+    if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
+#ifdef KDEBUG
+    if (TEST_OPT_DEBUG) messageSets(strat);
+#endif
+    if (strat->Ll== 0) strat->interpt=TRUE;
+    /* picks the last element from the lazyset L */
+    strat->P = strat->L[strat->Ll];
+    strat->Ll--;
+
+    // for input polys, prepare reduction
+    strat->P.PrepareRed(strat->use_buckets);
+
+    if (strat->P.p == NULL && strat->P.t_p == NULL)
     {
-      strat->kModW = kModW = w;
-      pFDegOld = pFDeg;
-      pLDegOld = pLDeg;
-      pSetDegProcs(kModDeg);
-      toReset = TRUE;
+      red_result = 0;
     }
-    pLexOrder = TRUE;
-    strat->LazyPass*=2;
-  }
-  strat->homog=h;
-#ifdef KDEBUG
-  idTest(F);
-#endif
-  if (pOrdSgn==-1)
-  {
-    if (w!=NULL)
-      r=mora(F,Q,w,NULL,strat);
     else
-      r=mora(F,Q,NULL,NULL,strat);
-  }
-  else
-  {
-    if (w!=NULL)
-      r=bba(F,Q,w,NULL,strat);
-    else
-      r=bba(F,Q,NULL,NULL,strat);
+    {
+      if (TEST_OPT_PROT)
+        message((strat->honey ? strat->P.ecart : 0) + strat->P.pFDeg(),
+                &olddeg,&reduc,strat, red_result);
+
+      /* reduction of the element choosen from L */
+      red_result = strat->red(&strat->P,strat);
+    }
+
+    // reduction to non-zero new poly
+    if (red_result == 1)
+    {
+      /* statistic */
+      if (TEST_OPT_PROT) PrintS("s");
+
+      // get the polynomial (canonicalize bucket, make sure P.p is set)
+      strat->P.GetP(strat->lmBin);
+
+      int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
+
+      // reduce the tail and normalize poly
+      if (TEST_OPT_INTSTRATEGY)
+      {
+        strat->P.pCleardenom();
+        if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+        {
+          strat->P.p = redtailBba(&(strat->P),pos-1,strat, FALSE);
+          strat->P.pCleardenom();
+        }
+      }
+      else
+      {
+        strat->P.pNorm();
+        if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+          strat->P.p = redtailBba(&(strat->P),pos-1,strat, FALSE);
+      }
+
+#ifdef KDEBUG
+      if (TEST_OPT_DEBUG){PrintS("new s:");strat->P.wrp();PrintLn();}
+#endif
+
+      // enter into S, L, and T
+      enterT(strat->P, strat);
+      // posInS only depends on the leading term
+      strat->enterS(strat->P, pos, strat, strat->tl);
+      if (pos<strat->sl)
+      {
+        need_update=TRUE;
+#if 0
+        LObject h;
+        for(j=strat->sl;j>pos;j--)
+        {
+          if (TEST_OPT_PROT) { PrintS("+"); mflush(); }
+          memset(&h, 0, sizeof(h));
+          h.p=strat->S[j];
+          int i;
+          for(i=strat->tl;i>=0;i--)
+          {
+            if (pLmCmp(h.p,strat->T[i].p)==0)
+            {
+              if (i < strat->tl)
+              {
+#ifdef ENTER_USE_MEMMOVE
+                memmove(&(strat->T[i]), &(strat->T[i+1]),
+                   (strat->tl-i)*sizeof(TObject));
+                memmove(&(strat->sevT[i]), &(strat->sevT[i+1]),
+                   (strat->tl-i)*sizeof(unsigned long));
+#endif
+                for (int l=i; l<strat->tl; l++)
+                {
+#ifndef ENTER_USE_MEMMOVE
+                  strat->T[l] = strat->T[l+1];
+                  strat->sevT[l] = strat->sevT[l+1];
+#endif
+                  strat->R[strat->T[l].i_r] = &(strat->T[l]);
+                }
+              }
+              strat->tl--;
+              break;
+            }
+          }
+          strat->S[j]=NULL;
+          strat->sl--;
+          if (TEST_OPT_INTSTRATEGY)
+          {
+            //pContent(h.p);
+            h.pCleardenom(); // also does a pContent
+          }
+          else
+          {
+            h.pNorm();
+          }
+          strat->initEcart(&h);
+                    if (strat->Ll==-1)
+            pos =0;
+          else
+            pos = strat->posInL(strat->L,strat->Ll,&h,strat);
+          h.sev = pGetShortExpVector(h.p);
+          enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
+        }
+#endif
+      }
+      if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
+      if (strat->sl>srmax) srmax = strat->sl;
+    }
+#ifdef KDEBUG
+    memset(&(strat->P), 0, sizeof(strat->P));
+#endif
+    kTest_TS(strat);
   }
 #ifdef KDEBUG
-  idTest(r);
+  if (TEST_OPT_DEBUG) messageSets(strat);
 #endif
-  if (toReset)
+  /* complete reduction of the standard basis--------- */
+  if (TEST_OPT_REDSB)
   {
-    kModW = NULL;
-    pRestoreDegProcs(pFDegOld, pLDegOld);
+    completeReduce(strat);
+    if (strat->completeReduce_retry)
+    {
+      // completeReduce needed larger exponents, retry
+      // to reduce with S (instead of T)
+      // and in currRing (instead of strat->tailRing)
+      cleanT(strat);strat->tailRing=currRing;
+      int i;
+      for(i=strat->sl;i>=0;i--) strat->S_2_R[i]=-1;
+      completeReduce(strat);
+    }
   }
-  pLexOrder = b;
-//Print("%d reductions canceled \n",strat->cel);
-  HCord=strat->HCord;
+
+  /* release temp data-------------------------------- */
+  if (TEST_OPT_PROT) messageStat(srmax,lrmax,0,strat);
+  if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
+  ideal shdl=strat->Shdl;
+  idSkipZeroes(shdl);
+  pDelete(&strat->kHEdge);
+  omFreeSize((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
+  omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
+  omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
+  omFreeSize((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
+  omFreeSize((ADDRESS)strat->L,(strat->Lmax)*sizeof(LObject));
+  omfree(strat->sevT);
+  omfree(strat->S_2_R);
+  omfree(strat->R);
+
+  if (strat->fromQ)
+  {
+    for (j=IDELEMS(strat->Shdl)-1;j>=0;j--)
+    {
+      if(strat->fromQ[j]) pDelete(&strat->Shdl->m[j]);
+    }
+    omFreeSize((ADDRESS)strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
+    strat->fromQ=NULL;
+  }
   delete(strat);
-  if (w!=NULL) delete w;
-  return r;
+#if 0
+  if (need_update)
+  {
+    ideal res=kInterRed(shdl,Q);
+    idDelete(&shdl);
+    shdl=res;
+  }
+#endif
+  return shdl;
 }
 #else
 // old version
