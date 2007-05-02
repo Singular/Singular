@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.14 2006-10-02 14:47:51 Singular Exp $
+// $Id: clapsing.cc,v 1.15 2007-05-02 10:02:11 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -891,10 +891,13 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
         while(T_e>0)  { T_F_conv=pMult(T_F_conv,pCopy(p)); T_e--; }
         pDelete(&p);
       }
-      number n_T=pGetCoeff(T_F_conv);
+      number n_T;
+      if (T_F_conv!=NULL) n_T=pGetCoeff(T_F_conv);
+      else                n_T=nInit(0);
       number n_f=pGetCoeff(f);
-      poly n_f_m=pMult_nn(pCopy(f),n_T);
-      T_F_conv=pMult_nn(T_F_conv,n_f);
+      poly n_f_m=pCopy(f);
+      if (n_T!=NULL) n_f_m=pMult_nn(n_f_m,n_T);
+      if (T_F_conv!=NULL) T_F_conv=pMult_nn(T_F_conv,n_f);
       T_F_conv=pSub(T_F_conv,n_f_m);
       if (T_F_conv!=NULL)
       {
