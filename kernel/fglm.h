@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.h,v 1.1.1.1 2003-10-06 12:15:52 Singular Exp $
+// $Id: fglm.h,v 1.2 2007-05-02 10:04:32 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -39,11 +39,11 @@ public:
     BOOLEAN isBasisOrEdge() const { return ( (divisors[0] == numVars) ? TRUE : FALSE ); }
     void newDivisor( int var ) { divisors[ ++divisors[0] ]= var; }
 #ifndef NOSTREAMIO
-friend ostream & operator <<(ostream &, fglmSelem);
+//friend ostream & operator <<(ostream &, fglmSelem);
 #endif
 };
 #ifndef NOSTREAMIO
-inline ostream & operator <<(ostream & os, fglmSelem) { return os;};
+//inline ostream & operator <<(ostream & os, fglmSelem) { return os;};
 #endif
 
 class fglmDelem
@@ -59,11 +59,11 @@ public:
     BOOLEAN isBasisOrEdge() const { return ( (insertions == 0) ? TRUE : FALSE ); }
     void newDivisor() { insertions--; }
 #ifndef NOSTREAMIO
-friend ostream & operator <<(ostream &, fglmDelem);
+//friend ostream & operator <<(ostream &, fglmDelem);
 #endif
 };
 #ifndef NOSTREAMIO
-inline ostream & operator <<(ostream & os, fglmDelem) { return os;};
+//inline ostream & operator <<(ostream & os, fglmDelem) { return os;};
 #endif
 
 // fglmzero(...):
