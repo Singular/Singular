@@ -98,6 +98,33 @@ endif
 MP_LIBS		= @MP_LIBS@
 HAVE_MPSR       = @HAVE_MPSR@
 
+#
+# Handle libSINGULAR stuff
+#
+
+SO_SUFFIX = so
+LIBSINGULAR_FLAGS = -export-dynamic 
+LIBSINGULAR_LD = $(CXX)
+
+# correct suffix for dynamic linking
+ifeq ($(SINGUNAME),ix86Mac-darwin)
+SO_SUFFIX        = dylib
+LIBSINGULAR_FLAGS = -single_module
+LIBSINGULAR_LD = $(LD)
+endif
+
+ifeq ($(SINGUNAME),ppcMac-darwin)
+SO_SUFFIX        = dylib
+LIBSINGULAR_FLAGS = -singule_module
+LIBSINGULAR_LD = $(LD)
+endif
+
+LIBSINGULAR_LIBS =-lsingfac -lsingcf -lntl -lreadline -lgmp -lomalloc_ndebug
+
+#
+# End libSINGULAR
+#
+
 ifdef LD_STATIC
 LDFLAGS  := ${STATIC_LDFLAGS} ${LDFLAGS}
 SING_EXEC = Singular-static
@@ -168,14 +195,6 @@ ESOURCES=iparith.cc $(COMMON_SOURCES) \
 
 SOURCES=${CSOURCES} ${CXXSOURCES} \
 	grammar.y scanner.l libparse.l \
-        p_Delete__T.cc p_ShallowCopyDelete__T.cc \
-        p_Copy__T.cc p_Mult_nn__T.cc  pp_Mult_nn__T.cc \
-        pp_Mult_mm__T.cc p_Mult_mm__T.cc \
-        p_Minus_mm_Mult_qq__T.cc p_Add_q__T.cc \
-	p_Neg__T.cc pp_Mult_Coeff_mm_DivSelect__T.cc \
-	pp_Mult_Coeff_mm_DivSelectMult__T.cc \
-	p_Merge_q__T.cc pp_Mult_mm_Noether__T.cc\
-	p_kBucketSetLm__T.cc \
 	utils.cc utils.h \
 	tesths.cc mpsr_Tok.cc claptmpl.cc 
 
@@ -303,6 +322,17 @@ Singular${S_EXT}: mod2.h Makefile version.h $(WIN_LIBS) scanner.cc  ${OBJS} \
 	  -o Singular${S_EXT} \
 	  tesths.cc iparith.o mpsr_Tok.o claptmpl.o\
 	  ${OBJS} ${LDFLAGS} ${LIBS} ../kernel/mmalloc.o
+
+libsingular: mod2.h Makefile version.h $(WIN_LIBS) scanner.cc  ${OBJS} \
+         iparith.o libsingular-tesths.o libparse.cc claptmpl.o mpsr_Tok.o $(DL_LIBS) 
+	$(LIBSINGULAR_LD) ${SLDFLAGS} ${LIBSINGULAR_FLAGS} -o libsingular.${SO_SUFFIX} \
+	libsingular-tesths.o iparith.o mpsr_Tok.o claptmpl.o \
+	${OBJS} -lkernel -L../kernel -L../factory -L../libfac -L${libdir} ${LIBSINGULAR_LIBS} ../kernel/mmalloc.o
+
+libsingular-tesths.o: tesths.cc
+	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -DLIBSINGULAR \
+	  ${SLDFLAGS} -o libsingular-tesths.o \
+          -c tesths.cc 
 
 ../modules/python/libpython_module.a:
 	cd ../modules/python; scons
@@ -439,6 +469,8 @@ endif
 ##
 install: all installbin installslib
 
+install-nolns: all installbin-nolns installslib-nolns
+
 installbin: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}
 	${MKINSTALLDIRS} ${bindir}
 	${INSTALL_PROGRAM} ${SING_EXEC} ${SINGULAR}
@@ -449,8 +481,29 @@ installbin: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}
 	rm -f ${bindir}/${SING_EXEC}${EXEC_EXT}
 	cd ${bindir}; ${LN_S} ${SINGULAR} Singular${EXEC_EXT};
 
+installbin-nolns: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}
+	${MKINSTALLDIRS} ${bindir}
+	${INSTALL_PROGRAM} ${SING_EXEC} ${SINGULAR}
+	-${INSTALL_PROGRAM} *.so ${bindir}
+	${INSTALL_PROGRAM} libparse ${RUN_SINGULARS} ${bindir}
+	${INSTALL_PROGRAM} ESingular TSingular ${DL_LIBS} ${bindir}
+	chmod a+x ${SINGULAR}
+	rm -f ${bindir}/${SING_EXEC}${EXEC_EXT}
+	cd ${bindir}; ${INSTALL_PROGRAM} ${SINGULAR} Singular${EXEC_EXT};
+
 installslib: LIB
 	test -r ${slibdir} || ${LN_S} `pwd`/LIB ${slibdir}
+
+installslib-nolns: LIB
+	test -r ${slibdir} || ${INSTALL} -d `pwd`/LIB ${slibdir}
+	${INSTALL} `pwd`/LIB/*.lib ${slibdir}
+	${MKINSTALLDIRS} ${slibdir}/gftables
+	${INSTALL} `pwd`/LIB/gftables/* ${slibdir}/gftables/
+
+install-libsingular: libsingular
+	${INSTALL_PROGRAM} *.$(SO_SUFFIX) ${libdir}
+	${INSTALL_PROGRAM} libsingular.h ${includedir}
+
 
 
 uninstall: uninstallbin
