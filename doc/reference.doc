@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.288 2007-05-03 13:27:40 Singular Exp $
+@comment $Id: reference.doc,v 1.289 2007-05-03 14:50:45 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -60,6 +60,7 @@ and @code{LIB} no brackets are allowed.
 * char::
 * char_series::
 * charstr::
+* chinrem::
 * cleardenom::
 * close::
 * coef::
@@ -595,7 +596,7 @@ See
 @ref{Characteristic sets}.
 @c ref
 @c ---------------------------------------
-@node charstr, cleardenom, char_series, Functions
+@node charstr, chinrem, char_series, Functions
 @subsection charstr
 @cindex charstr
 
