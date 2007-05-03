@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.155 2007-04-04 14:13:31 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.156 2007-05-03 13:52:25 wienand Exp $ */
 /*
 * ABSTRACT:
 */
@@ -4365,7 +4365,7 @@ BOOLEAN rSleftvList2StringArray(sleftv* sl, char** p)
 ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 {
   int ch;
-#ifdef HAVE_RING2TOM
+#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
   int cring = 0;
 #endif
   int float_len=0;
@@ -4405,6 +4405,61 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       pn->next->name=omStrDup("i");
     }
   }
+#ifdef HAVE_RINGMODN
+  else if ((pn->name != NULL)
+  && (strcmp(pn->name,"modnat")==0))
+  {
+    long module = 0;
+    if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
+    {
+      module =(unsigned long) pn->next->Data();
+      pn=pn->next;
+    }
+    if ((module < 2))
+    {
+      Werror("Wrong ground ring specification");
+      goto rInitError;
+    }
+    ch = module;
+    cring = 2;
+  }
+#endif
+#ifdef HAVE_RING2TOM
+  else if ((pn->name != NULL)
+  && (strcmp(pn->name,"modpow")==0))
+  {
+    long base = 0;
+    long exp = 0;
+    if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
+    {
+      base =(unsigned long) pn->next->Data();
+      pn=pn->next;
+      if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
+      {
+        exp = (unsigned long) pn->next->Data();
+        pn=pn->next;
+      }
+    }
+    if ((base < 2) || (exp < 1))
+    {
+      Werror("Wrong ground ring specification");
+      goto rInitError;
+    }
+    ch = exp;
+    if (base == 2)
+    {
+      cring = 1; // Use Z/2^ch
+      Print("Beta: using Z/2^%d", ch);
+      PrintLn();
+    }
+    else
+    {
+      cring = base;
+      Werror("p^n not yet implemented");
+      goto rInitError;
+    }
+  }
+#endif
   else
   {
     Werror("Wrong ground field specification");
@@ -4426,7 +4481,11 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
    *         p   -p : Fp(a)           *names         FALSE
    *         q    q : GF(q=p^n)       *names         TRUE
   */
-  if (ch!=-1)
+  if ((ch!=-1)
+#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
+       && (cring == 0)
+#endif
+     )
   {
     int l = 0;
 
@@ -4454,18 +4513,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     }
     else
     {
-#ifdef HAVE_RING2TOM
-      int blupp = Is2toM(ch);
-      if (blupp != 0)
-      {
-        cring = 1; // Use Z/2^ch
-        ch = blupp;
-        Print("Beta: using Z/2^%d", ch);
-        PrintLn();
-      }
-      else
-#endif
-        ch = IsPrime(ch);
+      ch = IsPrime(ch);
     }
   }
   // allocated ring and set ch
