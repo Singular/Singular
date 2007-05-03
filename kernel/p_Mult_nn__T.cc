@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Mult_nn__T.cc,v 1.7 2007-05-03 13:50:09 wienand Exp $
+ *  Version: $Id: p_Mult_nn__T.cc,v 1.8 2007-05-03 14:04:34 Singular Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -22,12 +22,12 @@ LINKAGE poly p_Mult_nn(poly p, const number n, const ring r)
   p_Test(p, r);
 
   poly q = p;
-#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
+#if defined(HAVE_RING2TOM) || defined(HAVE_RINGMODN)
   poly old = NULL;
 #endif
   while (p != NULL)
   {
-#if not(defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN))
+#if !defined(HAVE_RING2TOM) && !defined(HAVE_RINGMODN)
     number nc = pGetCoeff(p);
     pSetCoeff0(p, n_Mult(n, nc, r));
     n_Delete(&nc, r);
