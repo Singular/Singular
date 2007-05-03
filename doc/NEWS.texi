@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.79 2007-04-11 15:26:08 Singular Exp $
+@comment $Id: NEWS.texi,v 1.80 2007-05-03 14:13:39 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -34,6 +34,8 @@ factory, libfac, Singular updated for gcc 4.1.x
 kernel updated for the optional use of boost
 @item
 new operator @code{a:b} : @code{intvec} of length @code{b} with constant entries @code{a}
+@item
+new command: (@nref{chinrem}: lifting via chinese remainder theorem)
 @item
 new command: (@nref{interpolation}: ideal of points with given multiplicities)
 @item
