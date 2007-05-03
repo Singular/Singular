@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.56 2007-01-31 23:51:24 motsak Exp $ */
+/* $Id: ring.cc,v 1.57 2007-05-03 13:50:10 wienand Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2734,8 +2734,8 @@ static void rSetOption(ring r)
     r->options &= ~Sy_bit(OPT_REDTHROUGH);
 
   // set intStrategy
-#ifdef HAVE_RING2TOM
-  if (rField_is_Extension(r) || rField_is_Q(r) || rField_is_Ring_2toM(r))
+#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
+  if (rField_is_Extension(r) || rField_is_Q(r) || r->cring > 0)
 #else
   if (rField_is_Extension(r) || rField_is_Q(r))
 #endif

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.5 2007-01-29 16:58:32 Singular Exp $ */
+/* $Id: numbers.cc,v 1.6 2007-05-03 13:50:09 wienand Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -24,6 +24,9 @@
 #include "shortfl.h"
 #ifdef HAVE_RING2TOM
 #include "rmodulo2m.h"
+#endif
+#ifdef HAVE_RINGMODN
+#include "rmodulon.h"
 #endif
 
 //static int characteristic = 0;
@@ -116,6 +119,13 @@ void nSetChar(ring r)
     nr2mSetExp(c, r);
   }
 #endif  
+#ifdef HAVE_RINGMODN
+  /*----------------------ring Z / n----------------*/
+  else if (rField_is_Ring_ModN(r))
+  {
+    nrnSetExp(c, r);
+  }
+#endif
   else if (rField_is_Zp(r))
   /*----------------------char. p----------------*/
   {
@@ -312,6 +322,42 @@ void nInitChar(ring r)
      n->nName= ndName;
 #ifdef LDEBUG
 //     n->nDBTest=nr2mDBTest;
+#endif
+  }
+#endif
+#ifdef HAVE_RINGMODN
+  /* -------------- Z/n ----------------------- */
+  else if (rField_is_Ring_ModN(r))
+  {
+     nrnInitExp(c,r);
+     n->nInit  = nrnInit;
+     n->nCopy  = ndCopy;
+     n->nInt   = nrnInt;
+     n->nAdd   = nrnAdd;
+     n->nSub   = nrnSub;
+     n->nMult  = nrnMult;
+     n->nDiv   = nrnDiv;
+     n->nIntDiv       = nrnIntDiv;
+     n->nExactDiv= nrnDiv;
+     n->nNeg   = nrnNeg;
+     n->nInvers= nrnInvers;
+     n->nGreater = nrnGreater;
+     n->nEqual = nrnEqual;
+     n->nIsZero = nrnIsZero;
+     n->nIsOne = nrnIsOne;
+     n->nIsMOne = nrnIsMOne;
+     n->nGreaterZero = nrnGreaterZero;
+     n->nWrite = nrnWrite;
+     n->nRead = nrnRead;
+     n->nPower = nrnPower;
+     n->cfSetMap = nrnSetMap;
+     n->nNormalize = nDummy2;
+     n->nLcm          = nrnLcm;
+     n->nGcd          = nrnGcd;
+//     n->nGetUnit = nrnGetUnit; //TODO OLIVER
+     n->nName= ndName;
+#ifdef LDEBUG
+//     n->nDBTest=nrnDBTest;
 #endif
   }
 #endif

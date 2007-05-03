@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.50 2007-04-30 15:47:41 Singular Exp $ */
+/* $Id: kutil.cc,v 1.51 2007-05-03 13:50:08 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1024,7 +1024,7 @@ static inline BOOLEAN sugarDivisibleBy(int ecart1, int ecart2)
 #ifdef HAVE_RING2TOM
 /* TODO move to numbers.cc
  */
-inline int nComp(long a, long b)
+inline int nComp(NATNUMBER a, NATNUMBER b)
 {
   assume(a != 0 && b != 0);
   while (a % 2 == 0 && b % 2 == 0)
@@ -2501,7 +2501,7 @@ void clearSbatch (poly h,int k,int pos,kStrategy strat)
 */
 void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 {
-  assume (currRing->cring == 1)
+    assume (currRing->cring == 1);
     // enter also zero divisor * poly, if this is non zero and of smaller degree
     enterExtendedSpoly(h, strat);
     initenterpairsRing(h, k, ecart, 0, strat, atR);

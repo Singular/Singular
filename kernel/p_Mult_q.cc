@@ -6,7 +6,7 @@
  *  Purpose: multiplication of polynomials
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Mult_q.cc,v 1.2 2006-01-13 18:10:05 wienand Exp $
+ *  Version: $Id: p_Mult_q.cc,v 1.3 2007-05-03 13:50:09 wienand Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -164,7 +164,7 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
   p_Test(q, r);
 
   poly res = pp_Mult_mm(p,q,r);     // holds initially q1*p
-#ifdef HAVE_RING2TOM
+#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
   if (res == NULL) {
     res = p_ISet(1, r);
     p_SetCoeff(res, (number) 0, r);
@@ -179,7 +179,7 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
 
   // now the main loop
   Top:
-#ifdef HAVE_RING2TOM
+#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
   if (qn == NULL && rn == NULL) goto Work;
   if (qn == NULL) goto Greater;
 #endif
@@ -236,7 +236,7 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
     p_Delete(&p, r);
     p_Delete(&q, r);
   }
-#ifdef HAVE_RING2TOM
+#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
   if (n_IsZero(p_GetCoeff(res, r), r)) {
     res = p_LmDeleteAndNext(res, r);
   }

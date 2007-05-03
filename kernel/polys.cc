@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.14 2007-04-26 09:22:34 wienand Exp $ */
+/* $Id: polys.cc,v 1.15 2007-05-03 13:50:09 wienand Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -140,6 +140,12 @@ poly pDivideM(poly a, poly b)
   poly result=a;
   poly prev=NULL;
   int i;
+#ifdef HAVE_RINGMODN
+  if (currRing->cring == 2)
+  {
+    WarnS("Not implemenet, 2007-05-03 12:22:46");
+  }   
+#endif
 #ifdef HAVE_RING2TOM
   bool unit = true;
   number inv = pGetCoeff(b);
@@ -714,6 +720,12 @@ void pNorm(poly p1)
 {
   poly h;
   number k, c;
+#ifdef HAVE_RINGMODN
+  if (currRing->cring == 2)
+  {
+    WarnS("Not implemenet, 2007-05-03 12:22:46");
+  }   
+#endif
 #ifdef HAVE_RING2TOM
   if (currRing->cring != 0)
   {
@@ -737,6 +749,7 @@ void pNorm(poly p1)
      return;
     }
   }
+  else
 #endif
   if (p1!=NULL)
   {

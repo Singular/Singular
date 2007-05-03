@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.17 2007-01-31 23:51:25 motsak Exp $ */
+/* $Id: ring.h,v 1.18 2007-05-03 13:50:10 wienand Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -91,7 +91,14 @@ BOOLEAN rRing_has_CompLastBlock(ring r=currRing);
 #ifdef HAVE_RING2TOM
 inline BOOLEAN rField_is_Ring_2toM(ring r=currRing)
 { return (r->cring == 1); }
+#endif
 
+#ifdef HAVE_RINGMODN
+inline BOOLEAN rField_is_Ring_ModN(ring r=currRing)
+{ return (r->cring == 2); }
+#endif
+
+#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
 inline BOOLEAN rField_is_Zp(ring r=currRing)
 { return (r->cring == 0) && (r->ch > 1) && (r->parameter==NULL); }
 
@@ -191,15 +198,15 @@ inline BOOLEAN rField_is_long_C(ring r=currRing)
 
 inline BOOLEAN rField_has_simple_inverse(ring r=currRing)
 /* { return (r->ch>1) || (r->ch== -1); } *//* Z/p, GF(p,n), R, long_R, long_C*/
-#ifdef HAVE_RING2TOM
-{ return (r->cring==1) || (r->ch>1) || ((r->ch== -1) && (r->float_len < 10)); } /* Z/2^n, Z/p, GF(p,n), R, long_R, long_C*/
+#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
+{ return (r->cring > 0) || (r->ch>1) || ((r->ch== -1) && (r->float_len < 10)); } /* Z/2^n, Z/p, GF(p,n), R, long_R, long_C*/
 #else
 { return (r->ch>1) || ((r->ch== -1) && (r->float_len < 10)); } /* Z/p, GF(p,n), R, long_R, long_C*/
 #endif
 
 inline BOOLEAN rField_has_simple_Alloc(ring r=currRing)
-#ifdef HAVE_RING2TOM
-{ return (rField_is_Ring_2toM(r) || rField_is_Zp(r) || rField_is_GF(r) || rField_is_R(r)); }
+#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
+{ return (r->cring > 0 || rField_is_Zp(r) || rField_is_GF(r) || rField_is_R(r)); }
 #else
 { return (rField_is_Zp(r) || rField_is_GF(r) || rField_is_R(r)); }
 #endif

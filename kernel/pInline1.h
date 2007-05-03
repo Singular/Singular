@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.9 2007-03-10 15:41:49 levandov Exp $
+ *  Version: $Id: pInline1.h,v 1.10 2007-05-03 13:50:09 wienand Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -19,6 +19,9 @@
 #include "p_MemCmp.h"
 #include "structs.h"
 #include "numbers.h"
+#ifdef HAVE_RINGMODN
+#include "febase.h"
+#endif
 
 #if PDEBUG > 0 || defined(NO_PINLINE1)
 
@@ -400,6 +403,12 @@ static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, poly b, ring r)
   }
   else
 #endif
+#ifdef HAVE_RINGMODN
+  if (r->cring == 2) {
+    PrintS("Not yet implemented, 2007-05-03 11:53:12");
+  }
+  else
+#endif
   return TRUE;
 }
 
@@ -450,12 +459,17 @@ static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, ring r_a, poly b, ring r_b)
   if (r_a->cring == 1 || r_b->cring == 1) {
     long lside = (long) p_GetCoeff(a, r_a);
     long rside = (long) p_GetCoeff(b, r_b);
-    // Später durch bitvergleiche viel schneller TODO OLIVER
     while (lside%2 == 0 && rside%2 == 0) {
       lside = lside / 2;
       rside = rside / 2;
     }
     return (lside%2 != 0);
+  }
+  else
+#endif
+#ifdef HAVE_RINGMODN
+  if (r_a->cring == 2 || r_b->cring == 2) {
+    PrintS("Not yet implemented, 2007-05-02 11:56:44");
   }
   else
 #endif
@@ -530,6 +544,13 @@ PINLINE1 BOOLEAN p_DivisibleBy(poly a, poly b, ring r)
     }
     else
 #endif
+#ifdef HAVE_RINGMODN
+    if (r->cring == 2) {
+      PrintS("Not yet implemented 2007-05-02 11:55:20");
+      return FALSE;
+    }
+    else
+#endif
       return _p_LmDivisibleByNoComp(a,b,r);
   return FALSE;
 }
@@ -541,6 +562,12 @@ PINLINE1 BOOLEAN p_DivisibleBy(poly a, ring r_a, poly b, ring r_b)
 #ifdef HAVE_RING2TOM
     if (r_a->cring == 1) {
       return _p_LmRingDivisibleByNoComp(a, r_a, b, r_b);
+    }
+    else
+#endif
+#ifdef HAVE_RINGMODN
+    if (r_a->cring == 2) {
+      PrintS("Not yet implemented, 2007-05-03 11:59:20");
     }
     else
 #endif

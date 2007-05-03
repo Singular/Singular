@@ -6,7 +6,7 @@
  *  Purpose: template for p_Minus_m_Mult_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Minus_mm_Mult_qq__T.cc,v 1.4 2006-02-15 13:01:22 Singular Exp $
+ *  Version: $Id: p_Minus_mm_Mult_qq__T.cc,v 1.5 2007-05-03 13:50:09 wienand Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -66,7 +66,7 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
 
   Equal:   // qm equals p
   tb = n_Mult(pGetCoeff(q), tm, r);
-#ifdef HAVE_RING2TOM
+#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
   if ((long) tb != 0) {
 #endif
   tc = pGetCoeff(p);
@@ -85,7 +85,7 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
     n_Delete(&tc, r);
     p = p_LmFreeAndNext(p, r);
   }
-#ifdef HAVE_RING2TOM
+#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
   }
 #endif
   n_Delete(&tb, r);
@@ -96,14 +96,14 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
 
 
   Greater:
-#ifdef HAVE_RING2TOM
+#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
   tb = n_Mult(pGetCoeff(q), tneg, r);
   if ((long) tb != 0)
   {
 #endif
   pSetCoeff0(qm, n_Mult(pGetCoeff(q), tneg, r));
   a = pNext(a) = qm;       // append qm to result and advance q
-#ifdef HAVE_RING2TOM
+#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
   }
   else
   { shorter++; }

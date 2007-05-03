@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.4 2007-02-07 10:47:53 Singular Exp $
+ *  Version: $Id: pDebug.cc,v 1.5 2007-05-03 13:50:09 wienand Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -139,6 +139,12 @@ BOOLEAN p_DebugLmDivisibleByNoComp(poly a, poly b, ring r)
     i--;
   }
   while (i);
+#ifdef HAVE_RINGMODN
+  if (currRing->cring == 2)
+  {
+    WarnS("Not implemenet, 2007-05-03 12:22:46");
+  }
+#endif
 #ifdef HAVE_RING2TOM
   if (r->cring == 1) {
      long lside = (long) pGetCoeff(a);

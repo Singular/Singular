@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.6 2006-12-06 17:43:32 Singular Exp $ */
+/* $Id: rmodulo2m.cc,v 1.7 2007-05-03 13:50:10 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -20,14 +20,14 @@
 
 #ifdef HAVE_RING2TOM
 int nr2mExp;
-long nr2mModul;
+NATNUMBER nr2mModul;
 
 /*
  * Multiply two numbers
  */
 number nr2mMult (number a,number b)
 {
-  if (((long)a == 0) || ((long)b == 0))
+  if (((NATNUMBER)a == 0) || ((NATNUMBER)b == 0))
     return (number)0;
   else
     return nr2mMultM(a,b);
@@ -38,18 +38,18 @@ number nr2mMult (number a,number b)
  */
 number nr2mLcm (number a,number b,ring r)
 {
-  long res = 0;
-  if ((long) a == 0) a = (number) 1;
-  if ((long) b == 0) b = (number) 1;
-  while ((long) a % 2 == 0)
+  NATNUMBER res = 0;
+  if ((NATNUMBER) a == 0) a = (number) 1;
+  if ((NATNUMBER) b == 0) b = (number) 1;
+  while ((NATNUMBER) a % 2 == 0)
   {
-    a = (number) ((long) a / 2);
-    if ((long) b % 2 == 0) b = (number) ((long) b / 2);
+    a = (number) ((NATNUMBER) a / 2);
+    if ((NATNUMBER) b % 2 == 0) b = (number) ((NATNUMBER) b / 2);
     res++;
   }
-  while ((long) b % 2 == 0)
+  while ((NATNUMBER) b % 2 == 0)
   {
-    b = (number) ((long) b / 2);
+    b = (number) ((NATNUMBER) b / 2);
     res++;
   }
   return (number) (1L << res);  // (2**res)
@@ -61,21 +61,21 @@ number nr2mLcm (number a,number b,ring r)
  */
 number nr2mGcd (number a,number b,ring r)
 {
-  long res = 0;
-  if ((long) a == 0 && (long) b == 0) return (number) 1;
-  while ((long) a % 2 == 0 && (long) b % 2 == 0)
+  NATNUMBER res = 0;
+  if ((NATNUMBER) a == 0 && (NATNUMBER) b == 0) return (number) 1;
+  while ((NATNUMBER) a % 2 == 0 && (NATNUMBER) b % 2 == 0)
   {
-    a = (number) ((long) a / 2);
-    b = (number) ((long) b / 2);
+    a = (number) ((NATNUMBER) a / 2);
+    b = (number) ((NATNUMBER) b / 2);
     res++;
   }
-  if ((long) b % 2 == 0)
+  if ((NATNUMBER) b % 2 == 0)
   {
-    return (number) ((1L << res));// * (long) a);  // (2**res)*a    a ist Einheit
+    return (number) ((1L << res));// * (NATNUMBER) a);  // (2**res)*a    a ist Einheit
   }
   else
   {
-    return (number) ((1L << res));// * (long) b);  // (2**res)*b    b ist Einheit
+    return (number) ((1L << res));// * (NATNUMBER) b);  // (2**res)*b    b ist Einheit
   }
 }
 
@@ -84,7 +84,7 @@ void nr2mPower (number a, int i, number * result)
   if (i==0)
   {
     //npInit(1,result);
-    *(long *)result = 1;
+    *(NATNUMBER *)result = 1;
   }
   else if (i==1)
   {
@@ -102,7 +102,7 @@ void nr2mPower (number a, int i, number * result)
  */
 number nr2mInit (int i)
 {
-  long ii = i;
+  NATNUMBER ii = i;
   while (ii < 0) ii += nr2mModul;
   while ((ii>1) && (ii >= nr2mModul)) ii -= nr2mModul;
   return (number) ii;
@@ -113,8 +113,8 @@ number nr2mInit (int i)
  */
 int nr2mInt(number &n)
 {
-  if ((long)n > (nr2mModul >>1)) return (int)((long)n - nr2mModul);
-  else return (int)((long)n);
+  if ((NATNUMBER)n > (nr2mModul >>1)) return (int)((NATNUMBER)n - nr2mModul);
+  else return (int)((NATNUMBER)n);
 }
 
 number nr2mAdd (number a, number b)
@@ -129,17 +129,17 @@ number nr2mSub (number a, number b)
 
 BOOLEAN nr2mIsZero (number  a)
 {
-  return 0 == (long)a;
+  return 0 == (NATNUMBER)a;
 }
 
 BOOLEAN nr2mIsOne (number a)
 {
-  return 1 == (long)a;
+  return 1 == (NATNUMBER)a;
 }
 
 BOOLEAN nr2mIsMOne (number a)
 {
-  return nr2mModul == (long)a + 1;
+  return nr2mModul == (NATNUMBER)a + 1;
 }
 
 BOOLEAN nr2mEqual (number a,number b)
@@ -149,19 +149,19 @@ BOOLEAN nr2mEqual (number a,number b)
 
 BOOLEAN nr2mGreater (number a,number b)
 {
-  if ((long) a == 0) return TRUE;
-  if ((long) b == 0) return FALSE;
-  while ((long) a % 2 == 0 && (long) b % 2 == 0)
+  if ((NATNUMBER) a == 0) return TRUE;
+  if ((NATNUMBER) b == 0) return FALSE;
+  while ((NATNUMBER) a % 2 == 0 && (NATNUMBER) b % 2 == 0)
   {
-    a = (number) ((long) a / 2);
-    b = (number) ((long) b / 2);
+    a = (number) ((NATNUMBER) a / 2);
+    b = (number) ((NATNUMBER) b / 2);
 }
-  return ((long) b % 2 == 1);
+  return ((NATNUMBER) b % 2 == 1);
 }
 
 BOOLEAN nr2mGreaterZero (number k)
 {
-  int h = (int)((long) k);
+  int h = (int)((NATNUMBER) k);
   return ((int)h !=0) && (h <= (nr2mModul>>1));
 }
 
@@ -218,7 +218,7 @@ void XGCD(long& d, long& s, long& t, long a, long b)
 }
 #endif
 
-long InvMod(long a)
+NATNUMBER InvMod(NATNUMBER a)
 {
    long d, s, t;
 
@@ -234,26 +234,26 @@ long InvMod(long a)
 inline number nr2mInversM (number c)
 {
   // Table !!!
-  long inv;
-  inv = InvMod((long)c);
+  NATNUMBER inv;
+  inv = InvMod((NATNUMBER)c);
   return (number) inv;
 }
 
 number nr2mDiv (number a,number b)
 {
-  if ((long)a==0)
+  if ((NATNUMBER)a==0)
     return (number)0;
-  else if ((long)b%2==0)
+  else if ((NATNUMBER)b%2==0)
   {
-    if ((long)b != 0)
+    if ((NATNUMBER)b != 0)
     {
-      while ((long) b%2 == 0 && (long) a%2 == 0)
+      while ((NATNUMBER) b%2 == 0 && (NATNUMBER) a%2 == 0)
       {
-        a = (number) ((long) a / 2);
-        b = (number) ((long) b / 2);
+        a = (number) ((NATNUMBER) a / 2);
+        b = (number) ((NATNUMBER) b / 2);
       }
     }
-    if ((long) b%2 == 0)
+    if ((NATNUMBER) b%2 == 0)
     {
       WerrorS("div by zero divisor");
       return (number)0;
@@ -264,19 +264,19 @@ number nr2mDiv (number a,number b)
 
 number nr2mIntDiv (number a,number b)
 {
-  if ((long)a==0)
+  if ((NATNUMBER)a==0)
   {
     return (number) 0;
   }
   else
   {
-    return (number) ((long) a / (long) b);
+    return (number) ((NATNUMBER) a / (NATNUMBER) b);
   }
 }
 
 number  nr2mInvers (number c)
 {
-  if ((long)c%2==0)
+  if ((NATNUMBER)c%2==0)
   {
     WerrorS("division by zero divisor");
     return (number)0;
@@ -286,7 +286,7 @@ number  nr2mInvers (number c)
 
 number nr2mNeg (number c)
 {
-  if ((long)c==0) return c;
+  if ((NATNUMBER)c==0) return c;
   return nr2mNegM(c);
 }
 
@@ -341,7 +341,7 @@ void nr2mInitExp(int m, ring r)
 #ifdef LDEBUG
 BOOLEAN nr2mDBTest (number a, char *f, int l)
 {
-  if (((long)a<0) || ((long)a>nr2mModul))
+  if (((NATNUMBER)a<0) || ((NATNUMBER)a>nr2mModul))
   {
     return FALSE;
   }
@@ -351,8 +351,8 @@ BOOLEAN nr2mDBTest (number a, char *f, int l)
 
 void nr2mWrite (number &a)
 {
-  if ((long)a > (nr2mModul >>1)) StringAppend("-%d",(int)(nr2mModul-((long)a)));
-  else                          StringAppend("%d",(int)((long)a));
+  if ((NATNUMBER)a > (nr2mModul >>1)) StringAppend("-%d",(int)(nr2mModul-((NATNUMBER)a)));
+  else                          StringAppend("%d",(int)((NATNUMBER)a));
 }
 
 char* nr2mEati(char *s, int *i)

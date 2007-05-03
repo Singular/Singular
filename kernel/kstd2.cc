@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.41 2007-03-29 11:41:11 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.42 2007-05-03 13:50:08 wienand Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -187,9 +187,9 @@ long twoPow(long arg)
 }
 */
 
-long factorial(long arg)
+NATNUMBER factorial(NATNUMBER arg)
 {
-   long tmp = 1; arg++;
+   NATNUMBER tmp = 1; arg++;
    for (int i = 2; i < arg; i++)
    {
      tmp *= i;
@@ -205,19 +205,19 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
 
   poly p = input_p;
   poly zeroPoly = NULL;
-  long a = (long) pGetCoeff(p);
+  NATNUMBER a = (NATNUMBER) pGetCoeff(p);
 
   int k_ind2 = 0;
   int a_ind2 = ind2(a);
 
-  long k = 1;
+  NATNUMBER k = 1;
   // of interest is only k_ind2, special routine for improvement ... TODO OLIVER
   for (int i = 1; i <= leadRing->N; i++)
   {
     k_ind2 = k_ind2 + ind_fact_2(p_GetExp(p, i, leadRing));
   }
 
-  a = (long) pGetCoeff(p);
+  a = (NATNUMBER) pGetCoeff(p);
 
   number tmp1;
   poly tmp2, tmp3;
@@ -240,7 +240,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
         s_exp = s_exp - 2;
       }
       p_SetExp(lead_mult, i, p_GetExp(p, i,leadRing) - s_exp, tailRing);
-      for (long j = 1; j <= s_exp; j++)
+      for (NATNUMBER j = 1; j <= s_exp; j++)
       {
         tmp1 = nInit(j);
         tmp2 = p_ISet(1, tailRing);
@@ -269,13 +269,13 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
     pNext(tmp2) = zeroPoly;
     return tmp2;
   }
-/*  long alpha_k = twoPow(leadRing->ch - k_ind2);
+/*  NATNUMBER alpha_k = twoPow(leadRing->ch - k_ind2);
   if (1 == 0 && alpha_k <= a)
   {  // Temporarly disabled, reducing coefficients not compatible with std TODO Oliver
     zeroPoly = p_ISet((a / alpha_k)*alpha_k, tailRing);
     for (int i = 1; i <= leadRing->N; i++)
     {
-      for (long j = 1; j <= p_GetExp(p, i, leadRing); j++)
+      for (NATNUMBER j = 1; j <= p_GetExp(p, i, leadRing); j++)
       {
         tmp1 = nInit(j);
         tmp2 = p_ISet(1, tailRing);
@@ -287,12 +287,12 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
         }
         else
         {
-          tmp3 = p_ISet((long) tmp1, tailRing);
+          tmp3 = p_ISet((NATNUMBER) tmp1, tailRing);
           zeroPoly = p_Mult_q(zeroPoly, p_Add_q(tmp2, tmp3, tailRing), tailRing);
         }
       }
     }
-    tmp2 = p_ISet((long) pGetCoeff(zeroPoly), leadRing);
+    tmp2 = p_ISet((NATNUMBER) pGetCoeff(zeroPoly), leadRing);
     for (int i = 1; i <= leadRing->N; i++)
     {
       pSetExp(tmp2, i, p_GetExp(zeroPoly, i, tailRing));

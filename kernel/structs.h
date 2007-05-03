@@ -3,12 +3,16 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.34 2007-04-18 16:15:58 Singular Exp $ */
+/* $Id: structs.h,v 1.35 2007-05-03 13:50:10 wienand Exp $ */
 /*
 * ABSTRACT
 */
 
 #include <string.h> /* for memset */
+
+#ifndef NATNUMBER
+#define NATNUMBER unsigned long
+#endif
 
 /* standard types */
 typedef unsigned char  uchar;
@@ -531,7 +535,7 @@ struct sip_sring
 
   struct omBin_s*   PolyBin; /* Bin from where monoms are allocated */
   int        ch;     /* characteristic */
-#ifdef HAVE_RING2TOM
+#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
   int        cring;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
 #endif
   int        ref; /* reference counter to the ring */

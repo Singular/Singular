@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.h,v 1.3 2006-12-06 17:43:32 Singular Exp $ */
+/* $Id: rmodulo2m.h,v 1.4 2007-05-03 13:50:10 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -11,7 +11,7 @@
 #include "structs.h"
 
 extern int nr2mExp;
-extern long nr2mModul;
+extern NATNUMBER nr2mModul;
 
 BOOLEAN nr2mGreaterZero (number k);
 number  nr2mMult        (number a, number b);
@@ -45,22 +45,22 @@ void    nr2mInitExp(int c, ring r);
 static inline number nr2mMultM(number a, number b)
 {
   return (number) 
-    ((((unsigned long) a)*((unsigned long) b)) % ((unsigned long) nr2mModul));
+    ((((NATNUMBER) a)*((NATNUMBER) b)) % ((NATNUMBER) nr2mModul));
 }
 
 static inline number nr2mAddM(number a, number b)
 {
-  long r = (long)a + (long)b;
+  NATNUMBER r = (NATNUMBER)a + (NATNUMBER)b;
   return (number) (r >= nr2mModul ? r - nr2mModul : r);
 }
 
 static inline number nr2mSubM(number a, number b)
 {
-  return (number)((long)a<(long)b ?
-                       nr2mModul-(long)b+(long)a : (long)a-(long)b);
+  return (number)((NATNUMBER)a<(NATNUMBER)b ?
+                       nr2mModul-(NATNUMBER)b+(NATNUMBER)a : (NATNUMBER)a-(NATNUMBER)b);
 }
 
-#define nr2mNegM(A) (number)(nr2mModul-(long)(A))
+#define nr2mNegM(A) (number)(nr2mModul-(NATNUMBER)(A))
 #define nr2mEqualM(A,B)  ((A)==(B))
 
 #endif
