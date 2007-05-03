@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.444 2007-03-22 13:34:52 Singular Exp $ */
+/* $Id: iparith.cc,v 1.445 2007-05-03 13:27:42 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1683,13 +1683,13 @@ static BOOLEAN jjCHINREM_BI(leftv res, leftv u, leftv v)
   res->data=(char *)n;
   return FALSE;
 }
+#if 0
 static BOOLEAN jjCHINREM_P(leftv res, leftv u, leftv v)
 {
-#if 0
-  ideal c=(ideal)u->CopyD();
+  lists c=(lists)u->CopyD(); // list of poly
   intvec* p=(intvec*)v->Data();
   int rl=p->length();
-  poly r=NULL,h;
+  poly r=NULL,h, result=NULL;
   number *x=(number *)omAlloc(rl*sizeof(number));
   number *q=(number *)omAlloc(rl*sizeof(number));
   int i;
@@ -1697,18 +1697,87 @@ static BOOLEAN jjCHINREM_P(leftv res, leftv u, leftv v)
   {
     q[i]=nlInit((*p)[i]);
   }
-  // for each monom
-  //number n=nlChineseRemainder(x,q,rl);
+  loop
+  {
+    for(i=rl-1;i>=0;i--)
+    {
+      if (c->m[i].Typ()!=POLY_CMD)
+      {
+        Werror("poly expected at pos %d",i+1);
+        for(i=rl-1;i>=0;i--)
+        {
+          nlDelete(&(q[i]),currRing);
+        }
+        omFree(x); omFree(q); // delete c
+        return TRUE;
+      }
+      h=((poly)c->m[i].Data());
+      if (r==NULL) r=h;
+      else if (pLmCmp(r,h)==-1) r=h;
+    }
+    if (r==NULL) break;
+    for(i=rl-1;i>=0;i--)
+    {
+      h=((poly)c->m[i].Data());
+      if (pLmCmp(r,h)==0)
+      { 
+        x[i]=pGetCoeff(h);
+        h=pLmFreeAndNext(h);
+        c->m[i].data=(char*)h;
+      }
+      else
+        x[i]=nlInit(0);
+    }
+    number n=nlChineseRemainder(x,q,rl);
+    for(i=rl-1;i>=0;i--)
+    {
+      nlDelete(&(x[i]),currRing);
+    }
+    h=pHead(r);
+    pSetCoeff(h,n);
+    result=pAdd(result,h);
+  }
   for(i=rl-1;i>=0;i--)
   {
     nlDelete(&(q[i]),currRing);
   }
   omFree(x); omFree(q);
-  res->data=(char *)r;
+  res->data=(char *)result;
   return FALSE;
-#else
-  return TRUE; // not yet implemented
+}
 #endif
+static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
+{
+  lists c=(lists)u->CopyD(); // list of ideal
+  intvec* p=(intvec*)v->Data();
+  int rl=p->length();
+  poly r=NULL,h; 
+  ideal result;
+  ideal *x=(ideal *)omAlloc(rl*sizeof(ideal));
+  int i;
+  for(i=rl-1;i>=0;i--)
+  {
+    if (c->m[i].Typ()!=IDEAL_CMD)
+    {
+      Werror("ideal expected at pos %d",i+1);
+      omFree(x); // delete c
+      return TRUE;
+    }
+    x[i]=((ideal)c->m[i].Data());
+  }
+  number *q=(number *)omAlloc(rl*sizeof(number));
+  for(i=rl-1;i>=0;i--)
+  {
+    q[i]=nlInit((*p)[i]);
+  }
+  result=idChineseRemainder(x,q,rl);
+  for(i=rl-1;i>=0;i--)
+  {
+    nlDelete(&(q[i]),currRing);
+  }
+  omFree(q);
+  res->data=(char *)result;
+  return FALSE;
 }
 static BOOLEAN jjCOEF(leftv res, leftv u, leftv v)
 {
@@ -3106,7 +3175,8 @@ struct sValCmd2 dArith2[]=
 ,{jjBRACKET,   BRACKET_CMD,    POLY_CMD,       POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 #endif
 ,{jjCHINREM_BI,CHINREM_CMD,    BIGINT_CMD,     INTVEC_CMD, INTVEC_CMD ALLOW_PLURAL}
-,{jjCHINREM_P, CHINREM_CMD,    POLY_CMD,       IDEAL_CMD,  IDEAL_CMD ALLOW_PLURAL}
+//,{jjCHINREM_P, CHINREM_CMD,    POLY_CMD,       LIST_CMD,   INTVEC_CMD ALLOW_PLURAL}
+,{jjCHINREM_ID,CHINREM_CMD,    IDEAL_CMD,      LIST_CMD,   INTVEC_CMD ALLOW_PLURAL}
 ,{jjCOEF,      COEF_CMD,       MATRIX_CMD,     POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  POLY_CMD ALLOW_PLURAL}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     MODUL_CMD,  POLY_CMD ALLOW_PLURAL}

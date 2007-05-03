@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.41 2007-04-03 15:16:39 Singular Exp $ */
+/* $Id: ideals.cc,v 1.42 2007-05-03 13:27:44 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -12,6 +12,7 @@
 #include "omalloc.h"
 #include "febase.h"
 #include "numbers.h"
+#include "longrat.h"
 #include "polys.h"
 #include "ring.h"
 #include "kstd1.h"
@@ -3692,4 +3693,58 @@ poly id_GCD(poly f, poly g, const ring r)
   pDelete(&gg);
   rChangeCurrRing(save_r);
   return gcd_p;
+}
+
+/*2
+* xx,q: arrays of length 0..rl-1
+* xx[i]: SB mod q[i]
+* assume: char=0
+* assume: q[i]!=0
+* destroys xx
+*/
+ideal idChineseRemainder(ideal *xx, number *q, int rl)
+{
+  ideal result=idInit(IDELEMS(xx[0]),1);
+  int i,j;
+  poly r,h,res_p;
+  number *x=(number *)omAlloc(rl*sizeof(number));
+  for(i=IDELEMS(result)-1;i>=0;i--)
+  {
+    res_p=NULL;
+    loop
+    {
+      r=NULL;
+      for(j=rl-1;j>=0;j--)
+      {
+        h=xx[j]->m[i];
+        if ((r==NULL)||(pLmCmp(r,h)==-1)) r=h;
+      }
+      if (r==NULL) break;
+      for(j=rl-1;j>=0;j--)
+      {
+        h=xx[j]->m[i];
+        if (pLmCmp(r,h)==0)
+        { 
+          x[j]=pGetCoeff(h);
+          h=pLmFreeAndNext(h);
+          xx[j]->m[i]=h;
+        }
+        else
+          x[j]=nlInit(0);
+      }
+      number n=nlChineseRemainder(x,q,rl);
+      for(j=rl-1;j>=0;j--)
+      {
+        nlDelete(&(x[j]),currRing);
+      }
+      h=pHead(r);
+      pSetCoeff(h,n);
+      res_p=pAdd(res_p,h);
+    }
+    result->m[i]=res_p;
+  }
+  omFree(x);
+  for(i=rl-1;i>=0;i--) idDelete(&(xx[i]));
+  omFree(xx);
+  return result;
 }

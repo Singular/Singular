@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.287 2007-04-04 18:02:16 Singular Exp $
+@comment $Id: reference.doc,v 1.288 2007-05-03 13:27:40 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -631,7 +631,35 @@ See
 @ref{varstr}.
 @c ref
 @c ---------------------------------------
-@node cleardenom, close, charstr, Functions
+@node chinrem, cleardenom, charstr, Functions
+@subsection chinrem
+@cindex chinrem
+
+@table @code
+@item @strong{Syntax:}
+@code{chinrem (} list, intvec @code{)}
+@*@code{chinrem (} intvec, intvec @code{)}
+@item @strong{Type:}
+ideal resp. bigint
+@item @strong{Purpose:}
+applies chines remainder theorem to the fisrt argument wrt. the moduli given in the second.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=0,(x,y),dp;
+  ideal i1=5x+2y,x2+3y2+xy;
+  ideal i2=2x-3y,2x2+4y2+5xy;
+  chinrem(list(i1,i2),intvec(7,11));
+  chinrem(intvec(2,-3),intvec(7,11));
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{modstd_lib}.
+@c ref
+@c ---------------------------------------
+@node cleardenom, close, chinrem, Functions
 @subsection cleardenom
 @cindex cleardenom
 
@@ -6100,7 +6128,8 @@ See
 @ref{poly};
 @ref{vector};
 @ref{ideal};
-@ref{module}.
+@ref{module};
+@ref{substitute}.
 @c ref
 @c ---------------------------------------
 @node  system, syz, subst, Functions

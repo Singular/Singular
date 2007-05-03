@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.8 2007-03-15 14:24:03 Singular Exp $
+// $Id: clapconv.cc,v 1.9 2007-05-03 13:27:45 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -729,6 +729,16 @@ number   nlChineseRemainder(number *x, number *q,int rl)
   CanonicalForm xnew,qnew;
   chineseRemainder(X,Q,xnew,qnew);
   number n=convClapNSingN(xnew);
+  number p=convClapNSingN(qnew);
+  number p2=nlIntDiv(p,nlInit(2));
+  if (nlGreater(n,p2))
+  {
+     number n2=nlSub(n,p);
+     nlDelete(&n,currRing);
+     n=n2;
+  }
+  nlDelete(&p,currRing);
+  nlDelete(&p2,currRing);
   return n;
 #else
   WerrorS("not implemented");
