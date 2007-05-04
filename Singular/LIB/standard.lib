@@ -2,7 +2,7 @@
 //major revision Jan/Feb. 2007, GMG
 //groebner mit Optionen versehen
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.90 2007-03-16 13:27:19 Singular Exp $";
+version="$Id: standard.lib,v 1.91 2007-05-04 07:54:30 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -1889,14 +1889,12 @@ static proc kbclass()
   export (wwtop,mmtop);
   ideal stdtop,kbtop;
   export (stdtop,kbtop);
-  return();
 }
 // delete global values
 static proc delkbclass()
 {
   kill wwtop,mmtop;
   kill stdtop,kbtop;
-  return();
 }
 //  select parts of the modul
 static proc kbprepare(module mstc)
