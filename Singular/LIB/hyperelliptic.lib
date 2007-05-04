@@ -1,0 +1,978 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$Id: hyperelliptic.lib,v 1.1 2007-05-04 13:02:40 Singular Exp $";
+category="Teaching";
+info="
+LIBRARY:    hyperelliptic.lib
+AUTHOR:     Markus Hochstetter, markushochstetter@gmx.de
+
+ NOTE: This library provides procedures for computing with divisors in the
+       jacobian of hyperelliptic curves. In addition procedures are available
+       for computing the rational representation of divisors and vice versa.
+       The library is intended to be used for teaching and demonstrating
+       purposes but not for efficient computations.
+
+
+
+
+PROCEDURES:
+  ishyper(h,f)           test, if y^2+h(x)y=f(x) is hyperelliptic
+  isoncurve(P,h,f)       test, if point P is on C: y^2+h(x)y=f(x)
+  chinrestp(b,moduli)    compute polynom x, s.t. x=b[i] mod moduli[i]
+  norm(a,b,h,f)          norm of a(x)-b(x)y in IF[C]
+  multi(a,b,c,d,h,f)     (a(x)-b(x)y)*(c(x)-d(x)y)  in IF[C]
+  ratrep (P,h,f)         returns polynomials a,b, s.t. div(a,b)=P
+  divisor(a,b,h,f,[])    computes divisor of a(x)-b(x)y
+  gcddivisor(p,q)        gcd of the divisors p and q
+  semidiv(D,h,f)         semireduced divisor of the pair of polys D[1], D[2]
+  cantoradd(D,Q,h,f)     adding divisors of the hyperell. curve y^2+h(x)y=f(x)
+  cantorred(D,h,f)       returns reduced divisor which is equivalent to D
+  double(D,h,f)          computes 2*D on y^2+h(x)y=f(x)
+  cantormult(m,D,h,f)    computes m*D on y^2+h(x)y=f(x)
+
+              [parameters in square brackets are optional]
+";
+///////////////////////////////////////////////////////////////////////////////
+
+
+//=============== Test, if a given curve is hyperelliptic =====================
+
+proc ishyper(poly h, poly f)
+"USAGE:   ishyper(h,f); h,f poly
+RETURN:  1 if y^2+h(x)y=f(x) is hyperelliptic, else 0
+NOTE:    Tests, if y^2+h(x)y=f(x) is a hyperelliptic curve.
+         Curve is defined over basering. Additionally shows error-messages.
+EXAMPLE: example ishyper; shows an example
+"
+{
+  // constructing a copy of the basering (only variable x),
+  // with variables x,y.
+  def R=basering;
+  list l= ringlist(R);
+  list ll=l[2];
+  ll="x","y";
+  l[2]=ll;
+  intvec v= l[3][1][2];
+  v=v,1;
+  l[3][1][2]=v;
+  def s=ring(l);
+  setring s;
+
+  // test, if y^2 + hy - f is hyperelliptic.
+  int i=1;
+  poly h=imap(R,h);
+  poly f=imap(R,f);
+  poly F=y2 + h*y - f;
+  ideal I=F, diff(F,x) , diff(F,y);
+  ideal J=std(I);
+  if ( J != 1 )
+  {
+      i=0;
+      "The curve is singular!";
+  }
+  if ( deg(f) mod 2 != 1 )
+  {
+     i=0;
+      "The polynomial ",f," has even degree!";
+  }
+  if ( leadcoef(f) != 1 )
+  {
+     i=0;
+     "The polynomial ",f," is not monic!";
+  }
+  if ( 2*deg(h) > deg(f)-1 )
+  {
+    i=0;
+     "The polynomial ",h," has degree ",deg(h),"!";
+  }
+  setring(R);
+  return(i);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R=7,x,dp;
+   // hyperelliptic curve y^2 + h*y = f
+   poly h=x;
+   poly f=x5+5x4+6x2+x+3;
+   ishyper(h,f);
+}
+
+
+//================= Test, if a given ponit is on the curve ====================
+
+proc isoncurve(list P, poly h, poly f)
+"USAGE:   isoncurve(P,h,f); h,f poly
+RETURN:  1 or 0 (if P is on curve or not)
+NOTE:    Tests, if P=(P[1],P[2]) is on the hyperelliptic curve
+         y^2+h(x)y=f(x) .
+         Curve is defined over basering.
+EXAMPLE: example isoncurve; shows an example
+"
+{
+   if ( P[2]^2 + subst(h,var(1),P[1])*P[2] - subst(f,var(1),P[1]) == 0 )
+   {
+      return(1);
+   }
+   return(0);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R=7,x,dp;
+   // hyperelliptic curve y^2 + h*y = f
+   poly h=x;
+   poly f=x5+5x4+6x2+x+3;
+   list P=2,3;
+   isoncurve(P,h,f);
+}
+
+
+//====================== Remainder of a polynomial division ===================
+
+proc divrem(f,g)
+"USAGE:   divrem(f,g);  f,g poly
+RETURN:  remainder of the division f/g
+NOTE:    Computes R, s.t. f=a*g + R, and deg(R) < deg(g)
+EXAMPLE: example divrem; shows an example
+"
+{
+   return(reduce(f,std(g)));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R=0,x,dp;
+   divrem(x2+1,x2);
+}
+
+
+//================ chinese remainder theorem for polynomials ==================
+
+proc chinrestp(list b,list moduli)
+"USAGE:   chinrestp(b,moduli);  b, moduli list of polynomials
+RETURN:  polynomial x, s.t. x= b[i] mod moduli[i]
+NOTE:    chinese remainder theorem for polynomials
+EXAMPLE: example chinrestp; shows an example
+"
+{
+   int i;
+   int n=size(moduli);
+   poly M=1;
+   for(i=1;i<=n;i++)
+   {
+      M=M*moduli[i];
+   }
+   list m;
+   for(i=1;i<=n;i++)
+   {
+      m[i]=M/moduli[i];
+   }
+   list y;
+   for(i=1;i<=n;i++)
+   {
+      y[i]= extgcd(moduli[i],m[i])[3];
+   }
+   poly B=0;
+   for(i=1;i<=n;i++)
+   {
+      B=B+y[i]*m[i]*b[i];
+   }
+   B=divrem(B,M);
+   return(B);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R=7,x,dp;
+   list b=3x-4, -3x2+1, 1, 4;
+   list moduli=(x-2)^2, (x-5)^3, x-1, x-6;
+   chinrestp(b,moduli);
+}
+
+
+//========================= norm of a polynomial ===============================
+
+proc norm(poly a, poly b, poly h, poly f)
+"USAGE:   norm(a,b,h,f);
+RETURN:  norm of a(x)-b(x)y in IF[C]
+NOTE:    The norm is a polynomial in just one variable.
+         Curve C:y^2+h(x)y=f(x) is defined over basering.
+EXAMPLE: example norm; shows an example
+"
+{
+   poly n=a^2+a*b*h-b^2*f;
+   return(n);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R=7,x,dp;
+   // hyperelliptic curve y^2 + h*y = f
+   poly h=x;
+   poly f=x5+5x4+6x2+x+3;
+   poly a=x2+1;
+   poly b=x;
+   norm(a,b,h,f);
+}
+
+
+//========== multiplikation of polynomials in the coordinate ring =============
+
+proc multi(poly a, poly b, poly c, poly d, poly h, poly f)
+"USAGE:   multi(a,b,c,d,h,f);
+RETURN:  list L with L[1]-L[2]y=(a(x)-b(x)y)*(c(x)-d(x)y) in IF[C]
+NOTE:    Curve C:y^2+h(x)y=f(x) is defined over basering.
+EXAMPLE: example multi; shows an example
+"
+{
+   poly A=a*c + b*d*f;
+   poly B=b*c +a*d + b*h*d;
+   return (list(A,B));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R=7,x,dp;
+   poly h=x;
+   poly f=x5+5x4+6x2+x+3;
+   // hyperelliptic curve y^2 + h*y = f
+   poly a=x2+1;
+   poly b=x;
+   poly c=5;
+   poly d=-x;
+   multi(a,b,c,d,h,f);
+}
+
+
+//================== polynomial expansion around a point ========================
+
+proc darst(list P,int k, poly h, poly f)
+"USAGE:   darst(P,k,h,f);
+RETURN:  list c of length k
+NOTE:    expansion around point P in IF[C], s.t.
+         y=c[1]+c[2]*(x-P[1]) +...+c[k]*(x-P[1])^k-1 + rest.
+         Curve C:y^2+h(x)y=f(x) is defined over basering.
+EXAMPLE: example darst; shows an example
+"
+{
+
+   if ( P[2] == -P[2]- subst(h,var(1),P[1]))
+   {
+    ERROR("no special points allowed");
+   }
+   list c;
+   list r;
+   list n;
+   poly N;
+   c[1]=P[2];
+   r[1]=list(0,-1,1,0);
+   poly r1,r2,r3,r4;
+   // rational function are represented as (r1 - r2*y) / (r3 - r4*y)
+
+   for (int i=1; i<k ; i++)
+   {
+      r1=r[i][1]-c[i]*r[i][3];
+      r2=r[i][2]-c[i]*r[i][4];
+      r3=r[i][3];
+      r4=r[i][4];
+      n=multi(r3,r4,r1+r2*h,-r2,h,f);
+      N=r1*r1 + r1*r2*h-r2*r2*f;
+      r[i+1]=list(N/(var(1)-P[1]),0,n[1],n[2]);
+      while ((divrem(r[i+1][1],var(1)-P[1]) ==0) and (divrem(r[i+1][2],var(1)-P[1]) ==0) and (divrem(r[i+1][3],var(1)-P[1]) ==0) and (divrem(r[i+1][4],var(1)-P[1]) ==0))
+      {
+          // reducing the rationl function
+          //(r[i+1][1] - r[i+1][2]*y)/(r[i+1][3] - r[i+1][4]) , otherwise there
+          // could be a pole, s.t. conditions are not fulfilled.
+          r[i+1][1]=(r[i+1][1]) / (var(1)-P[1]);
+          r[i+1][2]=(r[i+1][2]) / (var(1)-P[1]);
+          r[i+1][3]=(r[i+1][3]) / (var(1)-P[1]);
+          r[i+1][4]=(r[i+1][4]) / (var(1)-P[1]);
+      }
+      c[i+1]=(subst(r[i+1][1],var(1),P[1]) - subst(r[i+1][2],var(1),P[1])*P[2]) / (subst(r[i+1][3],var(1),P[1]) - subst(r[i+1][4],var(1),P[1])*P[2]);
+   }
+   return(c);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R=7,x,dp;
+   // hyperelliptic curve y^2 + h*y = f
+   poly h=x;
+   poly f=x5+5x4+6x2+x+3;
+   list P=5,3;
+   darst(P,3,h,f);
+}
+
+
+//================ rational representation of a divisor =======================
+
+proc ratrep1 (list P, poly h, poly f)
+"USAGE:   ratrep1(P,k,h,f);
+RETURN:  list (a,b)
+NOTE:    Important: P has to be semireduced!
+         Computes rational representation of the divisor
+         P[1][3]*(P[1][1], P[1][2]) +...+ P[sizeof(P)][3]*
+         *(P[sizeof(P)][1], P[sizeof(P)][2]) - (*)infty=div(a,b)
+         Divisor P has to be semireduced.
+         Curve C:y^2+h(x)y=f(x) is defined over basering.
+SEE AlSO: ratrep
+EXAMPLE: example ratrep1; shows an example
+"
+{
+   poly a=1;
+   list b;
+   list m;
+   list koef;
+   int k;
+
+   // Determination of the polynomial b[i] for each point using procedure darst
+   for (int i=1 ; i<= size(P); i++)
+   {
+      a=a*(var(1)-P[i][1])^(P[i][3]);    // computing polynomial a
+      m[i]=(var(1)-P[i][1])^(P[i][3]);
+      b[i]=P[i][2];
+      k=1;
+
+      while (divrem(b[i]*b[i] + b[i] *h - f,(var(1)-P[i][1])^(P[i][3])) != 0)
+      {
+          k=k+1;   // b[i]=P[i][2];
+          koef=darst(list (P[i][1],P[i][2]), k, h,f);
+          // could be improved, if one doesn't compute list coef completely new
+          // every time
+          b[i]=b[i]+ koef[k]*(var(1)-P[i][1])^(k-1);
+      }
+   }
+   // Return polynomial a and b. Polynomial b is solution of the congruencies
+   // b[i] mod m[i] .
+   return(list(a,chinrestp(b,m)));
+
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R=7,x,dp;
+   // hyperelliptic curve y^2 + h*y = f
+   poly h=x;
+   poly f=x5+5x4+6x2+x+3;
+   //divisor P
+   list P=list(-1,-3,1),list(1,1,1);
+   ratrep1(P,h,f);
+}
+
+
+//================ rational representation of a divisor =======================
+
+proc ratrep (list P, poly h, poly f)
+"USAGE:   ratrep(P,k,h,f);
+RETURN:  list (a,b)
+NOTE:    Importatnt: P has to be semireduced!
+         Computes rational representation of the divisor
+         P[1][3]*(P[1][1], P[1][2]) +...+ P[sizeof(P)][3]*
+         *(P[sizeof(P)][1], P[sizeof(P)][2]) - (*)infty=div(a,b)
+         Divisor P has to be semireduced.
+         Curve C:y^2+h(x)y=f(x) is defined over basering.
+         Works faster than ratrep1.
+SEE ALSO: ratrep1
+EXAMPLE: example ratrep; shows an example
+"
+{
+   poly a=1;
+   list b;
+   list m;
+   list koef;
+   int k;
+
+   poly c;
+   list r;
+   list n;
+   poly Norm;
+   poly r1,r2,r3,r4;
+
+   // Determination of the polynomial b[i] for each point using procedure darst
+   for (int i=1 ; i<= size(P); i++)
+   {
+      a=a*(var(1)-P[i][1])^(P[i][3]);     // computing polynomial a
+      m[i]=(var(1)-P[i][1])^(P[i][3]);
+      b[i]=P[i][2];
+      k=1;
+      c=P[i][2];
+      r=0,-1,1,0;
+      while (divrem(b[i]*b[i] + b[i] *h - f,(var(1)-P[i][1])^(P[i][3])) != 0)
+      {
+          k=k+1;
+          // here, the procedure darst was integrateg. In every pass a new
+          // coefficient c[i] is determined.
+          r1=r[1]-c*r[3];
+          r2=r[2]-c*r[4];
+          r3=r[3];
+          r4=r[4];
+          n=multi(r3,r4,r1+r2*h,-r2,h,f);
+          Norm=r1*r1 + r1*r2*h-r2*r2*f;
+          r=list(Norm/(var(1)-P[i][1]),0,n[1],n[2]);
+          while ((divrem(r[1],var(1)-P[i][1]) ==0) and (divrem(r[2],var(1)-P[i][1]) ==0) and (divrem(r[3],var(1)-P[i][1]) ==0) and (divrem(r[4],var(1)-P[i][1]) ==0))
+          {
+
+           // reducing the rationl function
+           // (r[1]-r[2]y)/(r[3]-r[4]y) , otherwise there
+           // could be a pole, s.t. conditions are not fulfilled.
+              r[1]=(r[1]) / (var(1)-P[i][1]);
+              r[2]=(r[2]) / (var(1)-P[i][1]);
+              r[3]=(r[3]) / (var(1)-P[i][1]);
+              r[4]=(r[4]) / (var(1)-P[i][1]);
+          }
+          c=(subst(r[1],var(1),P[i][1]) - subst(r[2],var(1),P[i][1])*P[i][2]) / (subst(r[3],var(1),P[i][1]) - subst(r[4],var(1),P[i][1])*P[i][2]);
+          b[i]=b[i]+ c*(var(1)-P[i][1])^(k-1);
+      }
+   }
+   // return polynomial a and b. Polynomial b is solution of the congruencies
+   // b[i] mod m[i] .
+   return(list(a,chinrestp(b,m)));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R=7,x,dp;
+   // hyperelliptic curve y^2 + h*y = f
+   poly h=x;
+   poly f=x5+5x4+6x2+x+3;
+   //Divisor P
+   list P=list(-1,-3,1),list(1,1,1);
+   ratrep(P,h,f);
+}
+
+
+//============== Order of a zero in a polynomial ==============================
+
+proc ordnung(poly x0 , poly g)
+"USAGE:   ordnung(x0,g);
+RETURN:  int i
+NOTE:    i is maximal, s.t. (x-x0)^i divides g
+EXAMPLE: example ordnung; shows an example
+"
+{
+   poly gg=g;
+   int i;
+   while ( divrem(gg,var(1)-x0) ==0 )
+   {
+      i=i+1;
+      gg=gg/(var(1)-x0);
+   }
+   return(i);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R=0,x,dp;
+   poly g=(x-5)^7*(x-3)^2;
+   number x0=5;
+   ordnung(x0,g);
+}
+
+
+//================== divisor of a polynomial function =========================
+
+proc divisor(poly a, poly b, poly h, poly f, list #)
+"USAGE:   divisor(a,b,h,f); optional: divisor(a,b,h,f,s); s=0,1
+RETURN:  list P
+NOTE:    P[1][3]*(P[1][1], P[1][2]) +...+ P[sizeof(P)][3]*
+         *(P[sizeof(P)][1], P[sizeof(P)][2]) - (*)infty=div(a(x)-b(x)y)
+         if there is an optional parameter s!=0, then divisor additonally
+         returns a parameter, which says, whether irreducible polynomials
+         occured during computations or not. Otherwise only warnings are
+         displayed on the monitor. For s=0 nothing happens.
+         Curve C:y^2+h(x)y=f(x) is defined over basering.
+EXAMPLE: example divisor; shows an example
+"
+{
+   list p;
+   int j;
+   poly x0;
+   list y;
+   list fa=factorize(gcd(a,b));  // wanted: common roots of a and b
+   poly Norm=norm(a,b,h,f);
+
+   int s;
+   int irred=0;
+   if (size(#)>0)
+   {
+      s=#[1];
+   }
+   else
+   {
+      s=0;
+   }
+
+   for (int i=2; i<=size(fa[1]) ; i++)
+   {
+      // searching roots by finding polynomials of degree 1
+      if ( deg(fa[1][i]) !=1 )
+      {
+         if (s==0)
+         {
+         "WARNIG: ", fa[1][i], "is irreducible over this field !";
+         }
+         else
+         {
+            irred=1;
+         }
+      }
+      else
+      {
+         x0=var(1) - fa[1][i];
+         // finding the y-coordinates; max. 2
+         y= factorize(var(1)^2 + var(1)*subst(h,var(1),x0) - subst(f,var(1),x0));
+         if ( deg(y[1][2]) == 1)
+         // if root belongs to point on curve, then...
+         {
+            // compute order of a-b*y in the founded point
+            j=j+1;
+            p[j]=list(x0,var(1)-y[1][2],fa[2][i]);
+            if ( y[2][2]== 1)          // ordinary point
+            {
+               j=j+1;
+               p[j]=list(x0 , var(1)-y[1][3] , fa[2][i] );
+               if (a/(var(1)-x0)^(fa[2][i]) - b/(var(1)-x0)^(fa[2][i]) * p[j][2] ==0 )
+               {
+                  p[j][3]= p[j][3] + ordnung(x0,norm(a/(var(1)-x0)^(fa[2][i]) , b/(var(1)-x0)^(fa[2][i]),h,f));
+               }
+               if (a/(var(1)-x0)^(fa[2][i]) - b/(var(1)-x0)^(fa[2][i]) * p[j-1][2] ==0 )
+               {
+               p[j-1][3]=p[j-1][3] + ordnung(x0,norm(a/(var(1)-x0)^(fa[2][i]) , b/(var(1)-x0)^(fa[2][i]),h,f));
+               }
+            }
+            else        // special point
+            {
+               p[j][3]=p[j][3] *2  ;
+               if (a/(var(1)-x0)^(fa[2][i]) - b/(var(1)-x0)^(fa[2][i]) * p[j][2] ==0 )
+               {
+                  p[j][3]=p[j][3] + ordnung(x0,norm(a/(var(1)-x0)^(fa[2][i]) , b/(var(1)-x0)^(fa[2][i]),h,f));
+               }
+            }
+
+         }
+         // Norm of a-b*y is reduced by common root of a and b
+         // (is worked off)
+         Norm = Norm/((var(1)-x0)^(ordnung(x0,Norm)));
+      }
+   }
+
+   // some points are still missing; points for which a and b have no common
+   // roots, but norm(a-b*Y)=0 .
+   fa=factorize(Norm);
+   for ( i=2 ; i<=size(fa[1]) ; i++)
+   {
+      if ( deg(fa[1][i]) !=1)
+      {
+         if (s==0)
+         {
+         "WARNING: ", fa[1][i], "is irreducible over this field !";
+         }
+         else
+         {
+            irred=1;
+         }
+      }
+      else
+      {
+         x0=var(1) - fa[1][i];
+         y= factorize(var(1)^2 + var(1)*subst(h,var(1),x0) - subst(f,var(1),x0));
+         if ( deg(y[1][2]) == 1)
+         // if root belongs to point on curve, then...
+         {
+            if (subst(a,var(1),x0)- subst(b,var(1),x0)* (var(1)-y[1][2]) ==0)
+            {
+               p[size(p)+1]=list(x0,var(1)-y[1][2], ordnung(x0,Norm,h,f));
+            }
+            if ( y[2][2]== 1)     // ordinary point
+            {
+               if (subst(a,var(1),x0)- subst(b,var(1),x0)* (var(1)-y[1][3]) ==0)
+               {
+               p[size(p)+1]=list(x0 , var(1)-y[1][3] , ordnung(x0,Norm,h,f));
+               }
+            }
+         }
+      }
+   }
+   if (s==0)
+   {
+      return(p);
+   }
+   return(p,irred);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R=7,x,dp;
+   // hyperelliptic curve y^2 + h*y = f
+   poly h=x;
+   poly f=x5+5x4+6x2+x+3;
+   poly a=(x-1)^2*(x-6);
+   poly b=0;
+   divisor(a,b,h,f,1);
+}
+
+
+//===================== gcd of two divisors ===================================
+
+proc gcddivisor(list p, list q)
+"USAGE:   gcddivisor(p,q);
+RETURN:  list P
+NOTE:    gcd of two divisors
+EXAMPLE: example gcddivisor; shows an example
+"
+{
+   list e;
+   int i,j;
+   for (i=1 ; i<= size(p) ; i++)
+   {
+      for (j=1 ; j<= size(q) ; j++)
+      {
+         if ( p[i][1] == q[j][1] and p[i][2] == q[j][2])
+         {
+            if ( p[i][3] <= q[j][3] )
+            {
+               e[size(e)+1]= list (p[i][1] , p[i][2] , p[i][3]);
+            }
+            else
+            {
+               e[size(e)+1]= list (q[j][1] , q[j][2] , q[j][3]);
+            }
+         }
+      }
+   }
+   return(e);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R=7,x,dp;
+   // hyperelliptic curve y^2 + h*y = f
+   poly h=x;
+   poly f=x5+5x4+6x2+x+3;
+   // two divisors
+   list p=list(-1,-3,1),list(1,1,2);
+   list q=list(1,1,1),list(2,2,1);
+   gcddivisor(p,q);
+}
+
+
+//========== semireduced divisor from rational representation=================
+
+proc semidiv(list D,poly h, poly f)
+"USAGE:   semidiv(D,h,f);
+RETURN:  list P
+NOTE:    important: Divisor D has to be semireduced!
+         Computes semireduced divisor
+         P[1][3]*(P[1][1], P[1][2]) +...+ P[sizeof(P)][3]*
+         *(P[sizeof(P)][1], P[sizeof(P)][2]) - (*)infty=div(D[1],D[2])
+         Curve C:y^2+h(x)y=f(x) is defined over basering.
+EXAMPLE: example semidiv; shows an example
+"
+{
+   if ( deg(D[2]) >= deg(D[1]) or divrem(D[2]^2+D[2]*h-f,D[1]) != 0 )
+   {
+      ERROR("Pair of polynomials doesn't belong to semireduced divisor!");
+   }
+   list D1,D2;
+   int s1,s2;
+   D1,s1=divisor(D[1],0,h,f,1);
+   D2,s2=divisor(D[2],1,h,f,1);
+
+   // Only if irreducible polynomials occured in D1 !and! D2 a warning
+   // is necessary.
+   if (s1==1 and s2==1)
+   {
+      "Attention:
+     Perhaps some points were not found over this field!";
+   }
+   return(gcddivisor(D1,D2));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R=7,x,dp;
+   // hyperelliptic curve y^2 + h*y = f
+   poly h=x;
+   poly f=x5+5x4+6x2+x+3;
+   // Divisor
+   list D=x2-1,2x-1;
+   semidiv(D,h,f);
+}
+
+
+//=============== Cantor's algorithm - composition ============================
+
+proc cantoradd(list D, list Q, poly h, poly f)
+"USAGE:   cantoradd(D,Q,h,f);
+RETURN:  list P
+NOTE:    Cantor's Algorithm - composition
+         important: D and Q have to be semireduced!
+         Computes semireduced divisor
+         div(P[1],P[2])= div(D[1],D[2]) + div(Q[1],Q[2])
+         The divisors are defined over the basering.
+         Curve C:y^2+h(x)y=f(x) is defined over the basering.
+EXAMPLE: example cantoradd; shows an example
+"
+{
+   poly a;
+   poly b;
+   list e=extgcd(D[1],Q[1]);
+   if ( e[1]==1 )
+   {
+      a=D[1]*Q[1];
+      b=divrem( e[2]*D[1]*Q[2] + e[3]*Q[1]*D[2] ,a);
+      return(list(a,b));
+   }
+   list c=extgcd(e[1],D[2]+Q[2]+h);
+   poly s1=e[2]*c[2];
+   poly s2=c[2]*e[3];
+   poly s3=c[3];
+   a=D[1]*Q[1]/c[1]^2;
+   b=divrem((s1*D[1]*Q[2] + s2*Q[1]*D[2] + s3*(D[2]*Q[2] + f))/c[1],a);
+   return(list(a,b));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R=7,x,dp;
+   // hyperelliptic curve y^2 + h*y = f
+   poly h=x;
+   poly f=x5+5x4+6x2+x+3;
+   // two divisors in rational representation
+   list D=x2-1,2x-1;
+   list Q=x2-3x+2,-3x+1;
+   cantoradd(D,Q,h,f);
+}
+
+
+//==================== Cantor's algorithm - reduction =========================
+
+proc cantorred(list D,poly h,poly f)
+"USAGE:   cantorred(D,h,f);
+RETURN:  list N
+NOTE:    Cantor's algorithm - reduction.
+         important: Divisor D has to be semireduced!
+         Computes reduced divisor div(N[1],N[2])= div(D[1],D[2]).
+         The divisors are defined over the basering.
+         Curve C:y^2+h(x)y=f(x) is defined over the basering.
+EXAMPLE: example cantorred; shows an example
+"
+{
+   list N=D;
+   while ( 2*deg(N[1]) > deg(f)-1 )
+   {
+      N[1]=(f - N[2]*h - N[2]^2)/N[1];
+      N[2]=divrem(-h-N[2],N[1]);
+   }
+   N[1]=N[1]/leadcoef(N[1]);
+   return(N);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R=7,x,dp;
+   // hyperelliptic curve y^2 + h*y = f
+   poly h=x;
+   poly f=x5+5x4+6x2+x+3;
+   // semireduced divisor
+   list D=2x4+3x3-3x-2, -x3-2x2+3x+1;
+   cantorred(D,h,f);
+}
+
+
+//================= doubling a semireduced divisor ============================
+
+proc double(list D, poly h, poly f)
+"USAGE:   double(D,h,f);
+RETURN:  list Q=2*D
+NOTE:    important: Divisor D has to be semireduced!
+         Special case of Cantor's algorithm.
+         Computes reduced divisor div(Q[1],Q[2])= 2*div(D[1],D[2])
+         The divisors are defined over the basering.
+         Curve C:y^2+h(x)y=f(x) is defined over the basering.
+EXAMPLE: example double; shows an example
+"
+{
+   list c=extgcd(D[1], 2*D[2] + h);
+   poly a=D[1]*D[1]/c[1]^2;
+   poly b=divrem((c[2]*D[1]*D[2] + c[3]*(D[2]*D[2] + f))/c[1],a);
+   return(cantorred(list(a,b),h,f));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R=7,x,dp;
+   // hyperelliptic curve y^2 + h*y = f
+   poly h=x;
+   poly f=x5+5x4+6x2+x+3;
+   // reduced divisor
+   list D=x2-1,2x-1;
+   double(D,h,f);
+}
+
+
+//================ multiples of a semireduced divisor =========================
+
+proc cantormult(int m, list D, poly h, poly f)
+"USAGE:   cantormult(m,D,h,f);
+RETURN:  list res=m*D
+NOTE:    important: Divisor D has to be semireduced!
+         Uses repeated doublings for a faster computation
+         of the reduced divisor m*D.
+         Attention: Factor m is int, this means bounded.
+         For m<0 the inverse of m*D is returned.
+         The divisors are defined over the basering.
+         Curve C:y^2+h(x)y=f(x) is defined over the basering.
+EXAMPLE: example cantormult; shows an example
+"
+{
+   list res=1,0;
+   list bas=D;
+   int exp=m;
+   if (exp==0) { return(list(1,0)); }
+   if (exp==1) { return(D); }
+   if (exp==-1) { return(list(D[1],-D[2]-h)) ; }
+   if ( exp < 0)
+   {
+      exp=-exp;
+   }
+   while ( exp > 0 )
+   {
+     if ( (exp mod 2) !=0 )
+     {
+       res = cantorred(cantoradd(res,bas,h,f),h,f);
+       exp=exp-1;
+     }
+     bas=double(bas,h,f);
+     exp=exp/2;
+   }
+   if ( m < 0 )
+   {
+      res[2]=-res[2]-h;
+   }
+   return(res);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R=7,x,dp;
+   // hyperelliptic curve y^2 + h*y = f
+   poly h=x;
+   poly f=x5+5x4+6x2+x+3;
+   // reduced divisor
+   list D=x2-1,2x-1;
+   cantormult(34,D,h,f);
+}
+
+
+/*
+//=============================================================================
+//   In the following you find a large example, which demostrates the use of
+//   the most important procedures.
+//=============================================================================
+//---- field with 2^5=32 elements ----
+ring r=(2,a),x,dp;
+minpoly=a5+a2+1;
+
+//---- hyperelliptic curve y^2 + hy = f ----
+poly h=x2+x;
+poly f=x5+x3+1;
+
+//---- two divisors ----
+list l1=list(a30,0,1),list(0,1,1);
+list l2=list(a30,a16,1),list(1,1,1);
+
+//---- their rational representation ----
+list D1=ratrep(l1,h,f); D1;
+//[1]:
+//   x2+(a4+a)*x
+//[2]:
+//   (a)*x+1
+
+list D2=ratrep(l2,h,f); D2;
+//[1]:
+//   x2+(a4+a+1)*x+(a4+a)
+//[2]:
+//   (a3+a2+a+1)*x+(a3+a2+a)
+
+//---- back to the point-based-representation ----
+semidiv(D1,h,f);
+//[1]:
+//   [1]:
+//      (a4+a)
+//   [2]:
+//      0
+//   [3]:
+//      1
+//[2]:
+//   [1]:
+//      0
+//   [2]:
+//      1
+//   [3]:
+//      1
+
+semidiv(D2,h,f);
+//[1]:
+//   [1]:
+//      (a4+a)
+//   [2]:
+//      (a4+a3+a+1)
+//   [3]:
+//      1
+//[2]:
+//   [1]:
+//      1
+//   [2]:
+//      1
+//   [3]:
+//      1
+
+//---- adding D1 and D2 ----
+list D12=cantorred(cantoradd(D1,D2,h,f),h,f);  D12;
+//[1]:
+//   x2+x
+//[2]:
+//   1
+
+//---- D1+D2 in point-based-representation ----
+semidiv(D12,h,f);
+//[1]:
+//   [1]:
+//      1
+//   [2]:
+//      1
+//   [3]:
+//      1
+//[2]:
+//   [1]:
+//      0
+//   [2]:
+//      1
+//   [3]:
+//      1
+
+//---- D1 + D1   (2 possible ways, same result) ----
+cantorred(cantoradd(D1,D1,h,f),h,f);
+double(D1,h,f);
+//[1]:
+//   x2+(a3+1)
+//[2]:
+//   (a4+a3+a+1)*x+(a4+a3+a2+a+1)
+
+//---- order of D1 in the jacobian over the basering ----
+int i=1;
+list E=D1;
+while (E[1] != 1 or E[2] != 0 )
+{
+   E= cantorred(cantoradd(E,D1,h,f),h,f);
+   i=i+1;
+}
+i;   // 482
+
+//---- proof with multiplikation validates the result ----
+cantormult(i,D1,h,f);
+//[1]:
+//   1
+//[2]:
+//   0
+
+//---- computing the inverse of D1 ----
+list d1= cantormult(-1,D1,h,f);  d1;
+//[1]:
+//   x2+(a4+a)*x
+//[2]:
+//   x2+(a+1)*x+1
+
+//---- proof validates the result ----
+cantoradd(d1,D1,h,f);
+//[1]:
+//   1
+//[2]:
+//   0
+
+
+*/
