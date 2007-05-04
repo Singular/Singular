@@ -2,7 +2,7 @@
 //major revision Jan/Feb. 2007, GMG
 //groebner mit Optionen versehen
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.91 2007-05-04 07:54:30 Singular Exp $";
+version="$Id: standard.lib,v 1.92 2007-05-04 07:59:31 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -1881,6 +1881,12 @@ EXAMPLE: example weightKB; shows an example
   delkbclass();
   return(mout);
 }
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0, (x,y), wp(1,2);
+  weightKB(ideal(0),3,intvec(1,2));
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // construct global values
 static proc kbclass()
