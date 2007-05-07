@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.6 2007-05-03 13:50:09 wienand Exp $ */
+/* $Id: numbers.cc,v 1.7 2007-05-07 16:23:04 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -286,7 +286,7 @@ void nInitChar(ring r)
     n->nSize       = naSize;
     n->n_GetDenom   = naGetDenom;
 #ifdef LDEBUG
-    //n->nDBTest     = naDBTest;
+    n->nDBTest     = naDBTest;
 #endif
   }
 #ifdef HAVE_RING2TOM
@@ -321,7 +321,7 @@ void nInitChar(ring r)
 //     n->nGetUnit = nr2mGetUnit; //TODO OLIVER
      n->nName= ndName;
 #ifdef LDEBUG
-//     n->nDBTest=nr2mDBTest;
+     n->nDBTest=nr2mDBTest;
 #endif
   }
 #endif
@@ -357,7 +357,7 @@ void nInitChar(ring r)
 //     n->nGetUnit = nrnGetUnit; //TODO OLIVER
      n->nName= ndName;
 #ifdef LDEBUG
-//     n->nDBTest=nrnDBTest;
+     n->nDBTest=nrnDBTest;
 #endif
   }
 #endif
@@ -394,7 +394,7 @@ void nInitChar(ring r)
     n->nSize  = nlSize;
     n->n_GetDenom = nlGetDenom;
 #ifdef LDEBUG
-    //n->nDBTest=nlDBTest;
+    n->nDBTest=nlDBTest;
 #endif
   }
   else if (rField_is_Zp(r))
@@ -424,7 +424,7 @@ void nInitChar(ring r)
     /* nName= ndName; */
     /*nSize  = ndSize;*/
 #ifdef LDEBUG
-    //n->nDBTest=npDBTest;
+    n->nDBTest=npDBTest;
 #endif
 #ifdef NV_OPS
     if (c>NV_MAX_PRIME)
@@ -465,7 +465,7 @@ void nInitChar(ring r)
     n->nName= nfName;
     /*nSize  = ndSize;*/
 #ifdef LDEBUG
-    //n->nDBTest=nfDBTest;
+    n->nDBTest=nfDBTest;
 #endif
   }
   /* -------------- R -----------------------*/
@@ -495,7 +495,7 @@ void nInitChar(ring r)
     /* nName= ndName; */
     /*nSize  = ndSize;*/
 #ifdef LDEBUG
-    //n->nDBTest=nrDBTest;
+    n->nDBTest=nrDBTest;
 #endif
   }
   /* -------------- long R -----------------------*/
@@ -526,7 +526,7 @@ void nInitChar(ring r)
     n->nName= ndName;
     n->nSize  = ndSize;
 #ifdef LDEBUG
-    //n->nDBTest=ngfDBTest;
+    n->nDBTest=ngfDBTest;
 #endif
   }
   /* -------------- long C -----------------------*/
@@ -560,7 +560,7 @@ void nInitChar(ring r)
     n->nImPart=ngcImPart;
     /*nSize  = ndSize;*/
 #ifdef LDEBUG
-    //n->nDBTest=ngcDBTest;
+    n->nDBTest=ngcDBTest;
 #endif
   }
 #ifdef TEST

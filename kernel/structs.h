@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.35 2007-05-03 13:50:10 wienand Exp $ */
+/* $Id: structs.h,v 1.36 2007-05-07 16:23:04 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -293,6 +293,9 @@ struct n_Procs_s
    nMapFunc (*cfSetMap)(ring src, ring dst);
    char *  (*nName)(number n);
    void    (*nInpMult)(number &a, number b, ring r);
+#ifdef LDEBUG
+   BOOLEAN (*nDBTest)(number a, char *f,int l);
+#endif
 //extern number  (*nMap)(number from);
 
    number nNULL; /* the 0 as constant */

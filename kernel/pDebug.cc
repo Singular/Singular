@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.5 2007-05-03 13:50:09 wienand Exp $
+ *  Version: $Id: pDebug.cc,v 1.6 2007-05-07 16:23:04 Singular Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -244,8 +244,7 @@ BOOLEAN _p_Test(poly p, ring r, int level)
     // number/coef check
     pPolyAssumeReturnMsg(p->coef != NULL || (n_GetChar(r) >= 2), "NULL coef");
     #ifdef LDEBUG
-    BOOLEAN npDBTest (number a, char *f, int l);
-    if (n_GetChar(r) >= 2) npDBTest(p->coef,__FILE__,__LINE__);
+    r->cf->nDBTest(p->coef,__FILE__,__LINE__);
     #endif
     pPolyAssumeReturnMsg(!n_IsZero(p->coef, r), "Zero coef");
 
