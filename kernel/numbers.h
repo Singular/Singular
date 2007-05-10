@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.6 2007-05-07 16:23:04 Singular Exp $ */
+/* $Id: numbers.h,v 1.7 2007-05-10 08:12:42 wienand Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -56,6 +56,9 @@ extern void    (*nWrite)(number &a);
 extern char *  (*nRead)(char * s, number * a);
 extern void    (*nNormalize)(number &a);
 extern BOOLEAN (*nGreater)(number a,number b),
+#ifdef HAVE_RINGS
+               (*nDivBy)(number a,number b),
+#endif
                (*nEqual)(number a,number b),
                (*nIsZero)(number a),
                (*nIsOne)(number a),

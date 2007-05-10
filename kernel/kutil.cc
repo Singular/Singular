@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.51 2007-05-03 13:50:08 wienand Exp $ */
+/* $Id: kutil.cc,v 1.52 2007-05-10 08:12:41 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2501,7 +2501,7 @@ void clearSbatch (poly h,int k,int pos,kStrategy strat)
 */
 void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 {
-    assume (currRing->cring == 1);
+    assume (rField_is_Ring(currRing));
     // enter also zero divisor * poly, if this is non zero and of smaller degree
     enterExtendedSpoly(h, strat);
     initenterpairsRing(h, k, ecart, 0, strat, atR);
@@ -2665,7 +2665,7 @@ int posInS (const kStrategy strat, const int length,const poly p,
   else
   {
 #ifdef HAVE_RING2TOM
-    if (currRing->cring == 1)
+    if (rField_is_Ring_2toM(currRing))
     {
       if (pLmCmp(set[length],p)== -cmp_int)
         return length+1;
@@ -4608,7 +4608,7 @@ static poly redBba (poly h,int maxIndex,kStrategy strat)
 
   while (j <= maxIndex)
   {
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RING2TOM_OLD
     if ((currRing->cring == 1 && pLmRingShortDivisibleBy(strat->S[j],strat->sevS[j], h, not_sev)) ||
         (currRing->cring == 0 && pLmShortDivisibleBy(strat->S[j],strat->sevS[j], h, not_sev)))
 #else
@@ -5056,9 +5056,9 @@ void initBuchMoraCrit(kStrategy strat)
   }
 #endif
 
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS
   // Coefficient ring?
-  if (currRing->cring == 1)
+  if (rField_is_Ring(currRing))
   {
     strat->sugarCrit = FALSE;
     strat->Gebauer = FALSE ;
@@ -5166,7 +5166,7 @@ void initBuchMoraPos (kStrategy strat)
   else if (BTEST1(12) || BTEST1(14) || BTEST1(16) || BTEST1(18))
     strat->posInT = posInT1;
 #ifdef HAVE_RING2TOM
-  if (currRing->cring == 1)
+  if (rField_is_Ring(currRing))
   {
     strat->posInL = posInL11;
     strat->posInT = posInT11;
@@ -5494,8 +5494,8 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
   ring new_tailRing = rModifyRing(currRing,
                                   // Hmmm .. the condition pFDeg == pDeg
                                   // might be too strong
-#ifdef HAVE_RING2TOM
-                                  (strat->homog && pFDeg == pDeg && currRing->cring == 0), // TODO Oliver
+#ifdef HAVE_RINGS
+                                  (strat->homog && pFDeg == pDeg && rField_is_Ring(currRing)), // TODO Oliver
 #else
                                   (strat->homog && pFDeg == pDeg),
 #endif

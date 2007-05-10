@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.15 2007-05-03 13:50:09 wienand Exp $ */
+/* $Id: polys.cc,v 1.16 2007-05-10 08:12:42 wienand Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -140,20 +140,8 @@ poly pDivideM(poly a, poly b)
   poly result=a;
   poly prev=NULL;
   int i;
-#ifdef HAVE_RINGMODN
-  if (currRing->cring == 2)
-  {
-    WarnS("Not implemenet, 2007-05-03 12:22:46");
-  }   
-#endif
-#ifdef HAVE_RING2TOM
-  bool unit = true;
-  number inv = pGetCoeff(b);
-  if ((currRing->cring == 1) && ((long) pGetCoeff(b) % 2 == 0))
-  {
-    unit = false;
-  }
-  if (unit) inv=nInvers(inv);
+#ifdef HAVE_RINGS
+  number inv=pGetCoeff(b);
 #else
   number inv=nInvers(pGetCoeff(b));
 #endif
@@ -183,14 +171,11 @@ poly pDivideM(poly a, poly b)
       }
     }
   }
-#ifdef HAVE_RING2TOM
-  if (!unit)
-  {
-    pDiv_nn(result,inv);
-  }
-  else
-#endif
+#ifdef HAVE_RINGS
+  pDiv_nn(result,inv);
+#else
   pMult_nn(result,inv);
+#endif
   nDelete(&inv);
   pDelete(&b);
   return result;
@@ -703,13 +688,9 @@ BOOLEAN pHasNotCF(poly p1, poly p2)
   }
 }
 
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS  //HACK TODO Oliver
 number nGetUnit(number k) {
-  long test = (long) k;
-  while (test%2 == 0) {
-    test = test / 2;
-  }
-  return (number) test;
+  return (number) nIntDiv(k, nGcd(k, 0, currRing));
 }
 #endif
 
@@ -720,21 +701,14 @@ void pNorm(poly p1)
 {
   poly h;
   number k, c;
-#ifdef HAVE_RINGMODN
-  if (currRing->cring == 2)
-  {
-    WarnS("Not implemenet, 2007-05-03 12:22:46");
-  }   
-#endif
-#ifdef HAVE_RING2TOM
-  if (currRing->cring != 0)
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(currRing))
   {
     if (p1!=NULL)
     {
       k = nGetUnit(pGetCoeff(p1));
       if (!nIsOne(k))
       {
-        k = nGetUnit(pGetCoeff(p1));
         c = nDiv(pGetCoeff(p1), k);
         pSetCoeff0(p1, c);
         h = pNext(p1);

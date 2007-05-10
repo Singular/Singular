@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.26 2007-05-03 13:50:09 wienand Exp $ */
+/* $Id: polys1.cc,v 1.27 2007-05-10 08:12:42 wienand Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -333,7 +333,11 @@ poly pPower(poly p, int i)
             return pMonPower(p,i);
           /* else: binom ?*/
           int char_p=rChar(currRing);
-          if (pNext(rc) != NULL)
+          if ((pNext(rc) != NULL)
+#ifdef HAVE_RINGS
+             || rField_is_Ring(currRing)
+#endif
+             )
             return pPow(p,i);
           if ((char_p==0) || (i<=char_p))
             return pTwoMonPower(p,i);
@@ -476,15 +480,14 @@ number pInitContent_a(poly ph);
 
 void pContent(poly ph)
 {
-#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
-  if (currRing->cring > 0) {
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(currRing)) {
     if (ph!=NULL)
     {
       number k = nGetUnit(pGetCoeff(ph));
       poly h;
       if (!nIsOne(k))
       {
-        k = nGetUnit(pGetCoeff(ph));
         pSetCoeff0(ph, nDiv(pGetCoeff(ph), k));
         h = pNext(ph);
         while (h != NULL)
@@ -937,8 +940,8 @@ void pCleardenom(poly ph)
   number d, h;
   poly p;
 
-#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
-  if (currRing->cring > 0)
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(currRing))
   {
     pContent(ph);
     return;

@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Impl.h,v 1.6 2007-01-15 17:15:10 Singular Exp $
+ *  Version: $Id: p_Procs_Impl.h,v 1.7 2007-05-10 08:12:42 wienand Exp $
  *******************************************************************/
 #ifndef P_PROCS_IMPL_H
 #define P_PROCS_IMPL_H
@@ -89,13 +89,18 @@
 
 // Predicate which returns true if alloc/copy/free of numbers is
 // like that of Zp
+#ifdef HAVE_RINGS
+#define ZP_COPY_FIELD(field) \
+  (field == FieldZp || field == FieldGF || field == FieldR || field == RingGeneral)
+#else
 #define ZP_COPY_FIELD(field) \
   (field == FieldZp || field == FieldGF || field == FieldR)
+#endif
 
 /***************************************************************
- *  
+ *
  * Definitions of our fields, lengths, ords, procs we work with
- * 
+ *
  *******************************************************************/
 
 // Here are the different parameters for setting the PolyProcs:
@@ -105,7 +110,7 @@
 typedef enum p_Field
 {
   FieldGeneral = 0,
-  FieldZp,          
+  FieldZp,
   FieldQ,
   FieldR,
   FieldGF,
@@ -114,6 +119,9 @@ typedef enum p_Field
   FieldLong_C,
   FieldZp_a,
   FieldQ_a,
+#endif
+#ifdef HAVE_RINGS
+  RingGeneral,
 #endif
   FieldUnknown
 } p_Field;
@@ -207,6 +215,9 @@ static inline char* p_FieldEnum_2_String(p_Field field)
       case FieldLong_C: return "FieldLong_C";
       case FieldZp_a: return "FieldZp_a";
       case FieldQ_a: return "FieldQ_a";
+#endif
+#ifdef HAVE_RINGS
+      case RingGeneral: return "RingGeneral";
 #endif
       case FieldUnknown: return "FieldUnknown";
   }
@@ -394,6 +405,9 @@ static inline void StaticKernelFilter(p_Field &field, p_Length &length,
 {
   // simply exclude some things
   if ((proc == pp_Mult_mm_Noether_Proc || proc == p_kBucketSetLm_Proc) &&
+#ifdef HAVE_RINGS
+      (field != RingGeneral) &&
+#endif
       (field != FieldZp))
   {
     field = FieldGeneral;
@@ -406,32 +420,38 @@ static inline void StaticKernelFilter(p_Field &field, p_Length &length,
 static inline void FastP_ProcsFilter(p_Field &field, p_Length &length, p_Ord &ord, const p_Proc proc)
 {
   if (HAVE_FAST_P_PROCS >= 5) return;
-  
+
   if (HAVE_FAST_P_PROCS < 3 && field == FieldQ)
     field = FieldGeneral;
-  
+
   if ((HAVE_FAST_P_PROCS == 0) ||
       (HAVE_FAST_P_PROCS <= 4 && field != FieldZp && field != FieldQ &&
        proc != p_Merge_q_Proc))
   {
+#ifdef HAVE_RINGS
+    if (field != RingGeneral)
+#endif
     field = FieldGeneral;
     length = LengthGeneral;
     ord = OrdGeneral;
     return;
   }
-  if (HAVE_FAST_P_PROCS == 1 || 
+  if (HAVE_FAST_P_PROCS == 1 ||
       (HAVE_FAST_P_PROCS == 4 && field != FieldZp && proc != p_Merge_q_Proc))
     ord = OrdGeneral;
 }
 
 static inline void FastFieldFilter(p_Field &field)
 {
-  if (HAVE_FAST_FIELD <= 0 || 
+  if (HAVE_FAST_FIELD <= 0 ||
       (HAVE_FAST_FIELD == 1 && field != FieldZp) ||
       (field != FieldZp && field != FieldQ))
+#ifdef HAVE_RINGS
+    if (field != RingGeneral)
+#endif
     field = FieldGeneral;
 }
-      
+
 static inline void FastLengthFilter(p_Length &length)
 {
   if ((HAVE_FAST_LENGTH == 3 && length <= LengthFive) ||
@@ -456,8 +476,8 @@ static inline void FastOrdZeroFilter(p_Ord &ord)
 {
   if (IsZeroOrd(ord))
   {
-    if ((HAVE_FAST_ZERO_ORD == 1 && (ord != OrdPosNomogPosZero && 
-                                     ord != OrdNomogPosZero && 
+    if ((HAVE_FAST_ZERO_ORD == 1 && (ord != OrdPosNomogPosZero &&
+                                     ord != OrdNomogPosZero &&
                                      ord != OrdPomogNegZero)) ||
         (HAVE_FAST_ZERO_ORD <= 0))
       ord = ZeroOrd_2_NonZeroOrd(ord, 1);
@@ -496,13 +516,16 @@ static inline void pp_Mult_mm_Noether_Filter(p_Field &field,
       )
   {
     // all the other orderings might occur (remember Mixed Orderings!)
+#ifdef HAVE_RINGS
+    if (field != RingGeneral)
+#endif
     field = FieldGeneral;
     ord = OrdGeneral;
     length = LengthGeneral;
   }
 }
-      
-static inline void FastProcFilter(p_Proc proc, p_Field &field, 
+
+static inline void FastProcFilter(p_Proc proc, p_Field &field,
                                   p_Length &length, p_Ord &ord)
 {
   switch(proc)
@@ -511,12 +534,12 @@ static inline void FastProcFilter(p_Proc proc, p_Field &field,
       case p_Merge_q_Proc:
         p_Add_q__Filter(length, ord);
         break;
-        
+
       case p_Copy_Proc:
       case p_Delete_Proc:
         NCopy__Filter(field);
         break;
-        
+
       case pp_Mult_mm_Noether_Proc:
         pp_Mult_mm_Noether_Filter(field, length, ord);
         break;
@@ -524,13 +547,16 @@ static inline void FastProcFilter(p_Proc proc, p_Field &field,
         case pp_Mult_Coeff_mm_DivSelectMult_Proc:
           if (length == LengthOne || length == LengthTwo)
           {
+#ifdef HAVE_RINGS
+            if (field != RingGeneral)
+#endif
             field = FieldGeneral;
             length = LengthGeneral;
             ord = OrdGeneral;
             return;
           }
           break;
-          
+
       default: break;
   }
 
@@ -553,12 +579,12 @@ static inline int IsValidSpec(p_Field field, p_Length length, p_Ord ord)
   if (length >= LengthThree && // i.e. 1, 2, or 3
       ord > ORD_MAX_N_3)       //  i.e. OrdNomogPosZero and below
     return 0;
-  
+
   if (length >= LengthTwo &&    // i.e. 1 or 2
       ord > ORD_MAX_N_2)        // i.e. PosNomog and below
     return 0;
 
-  if (length == LengthOne && 
+  if (length == LengthOne &&
       ord > ORD_MAX_N_1)           // i.e. PosPomogZero and below
     return 0;
 
@@ -568,7 +594,7 @@ static inline int IsValidSpec(p_Field field, p_Length length, p_Ord ord)
   return 1;
 }
 
- 
+
 static inline int index(p_Length length, p_Ord ord)
 {
   return length*OrdUnknown + ord;
@@ -592,10 +618,10 @@ static inline int index(p_Proc proc, p_Field field, p_Length length, p_Ord ord)
       case p_Mult_nn_Proc:
       case p_Neg_Proc:
         return field;
-        
+
       case p_ShallowCopyDelete_Proc:
         return length;
-        
+
       case p_Copy_Proc:
       case pp_Mult_mm_Proc:
       case p_Mult_mm_Proc:
@@ -609,10 +635,10 @@ static inline int index(p_Proc proc, p_Field field, p_Length length, p_Ord ord)
       case pp_Mult_mm_Noether_Proc:
       case p_kBucketSetLm_Proc:
         return index(field, length, ord);
-        
+
       case p_Merge_q_Proc:
         return index(length, ord);
-        
+
       default:
         assume(0);
         return -1;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.9 2007-02-07 10:49:40 Singular Exp $ */
+/* $Id: kspoly.cc,v 1.10 2007-05-10 08:12:40 wienand Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -212,8 +212,8 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   }
   else
     a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, tailRing,last);
-#ifdef HAVE_RING2TOM
-  if (currRing->cring == 1) l2 = pLength(a2);
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(currRing)) l2 = pLength(a2);
 #endif
 
   Pair->SetLmTail(m2, a2, l2, use_buckets, tailRing, last);
@@ -349,10 +349,10 @@ poly ksCreateShortSpoly(poly p1, poly p2, ring tailRing)
   int cm,i;
   BOOLEAN equal;
 
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS
   number lc1 = pGetCoeff(p1), lc2 = pGetCoeff(p2);
   int ct = ksCheckCoeff(&lc1, &lc2); // gcd and zero divisors
-  if (currRing->cring == 1)
+  if (rField_is_Ring(currRing))
   {
     if (a1 != NULL) t2 = nMult(pGetCoeff(a1),lc2);
     if (a2 != NULL) t1 = nMult(pGetCoeff(a2),lc1);
@@ -396,8 +396,8 @@ x2:
         p_SetComp(m2,c1,currRing);
       }
       p_Setm(m2, currRing);
-#ifdef HAVE_RING2TOM
-      if (currRing->cring == 1)
+#ifdef HAVE_RINGS
+      if (rField_is_Ring(currRing))
           pSetCoeff(m2, t1);
       else
 #endif
@@ -432,8 +432,8 @@ x1:
       p_SetComp(m1,c2,currRing);
     }
     p_Setm(m1, currRing);
-#ifdef HAVE_RING2TOM
-    if (currRing->cring == 1)
+#ifdef HAVE_RINGS
+      if (rField_is_Ring(currRing))
         pSetCoeff(m1, t2);
     else
 #endif
@@ -484,8 +484,8 @@ x1:
       if(cm==1)
       {
         p_LmFree(m2,currRing);
-#ifdef HAVE_RING2TOM
-        if (currRing->cring == 1)
+#ifdef HAVE_RINGS
+        if (rField_is_Ring(currRing))
           pSetCoeff(m1, t2);
         else
 #endif
@@ -495,8 +495,8 @@ x1:
       else
       {
         p_LmFree(m1,currRing);
-#ifdef HAVE_RING2TOM
-        if (currRing->cring == 1)
+#ifdef HAVE_RINGS
+        if (rField_is_Ring(currRing))
             pSetCoeff(m2, t1);
         else
 #endif
@@ -504,8 +504,8 @@ x1:
         return m2;
       }
     }
-#ifdef HAVE_RING2TOM
-    if (currRing->cring == 1)
+#ifdef HAVE_RINGS
+    if (rField_is_Ring(currRing))
     {
       t1 = nSub(t1, t2);
       equal = nIsZero(t1);
@@ -523,8 +523,8 @@ x1:
     if (!equal)
     {
       p_LmFree(m2,currRing);
-#ifdef HAVE_RING2TOM
-      if (currRing->cring == 1)
+#ifdef HAVE_RINGS
+      if (rField_is_Ring(currRing))
           pSetCoeff(m1, t1);
       else
 #endif
@@ -533,8 +533,8 @@ x1:
     }
     pIter(a1);
     pIter(a2);
-#ifdef HAVE_RING2TOM
-    if (currRing->cring == 1)
+#ifdef HAVE_RINGS
+    if (rField_is_Ring(currRing))
     {
       nDelete(&t1);
       if (a2 != NULL) t1 = nMult(pGetCoeff(a2),lc1);

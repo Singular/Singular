@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.h,v 1.1 2007-05-03 16:12:48 wienand Exp $ */
+/* $Id: rmodulon.h,v 1.2 2007-05-10 08:12:44 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -32,6 +32,7 @@ number   nrnIntDiv      (number a,number b);
 number  nrnNeg         (number c);
 number  nrnInvers      (number c);
 BOOLEAN nrnGreater     (number a, number b);
+BOOLEAN nrnDivBy       (number a, number b);
 BOOLEAN nrnEqual       (number a, number b);
 number   nrnLcm         (number a,number b, ring r);
 number   nrnGcd         (number a,number b,ring r);
@@ -40,7 +41,7 @@ void    nrnWrite       (number &a);
 char *  nrnRead        (char *s, number *a);
 char *  nrnName        (number n);
 #ifdef LDEBUG
-// BOOLEAN nrnDBTest      (number a, char *f, int l);
+BOOLEAN nrnDBTest      (number a, char *f, int l);
 #endif
 void    nrnSetExp(int c, ring r);
 void    nrnInitExp(int c, ring r);

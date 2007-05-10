@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_mm__T.cc,v 1.4 2007-05-03 13:50:09 wienand Exp $
+ *  Version: $Id: pp_Mult_mm__T.cc,v 1.5 2007-05-10 08:12:43 wienand Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -21,7 +21,7 @@ LINKAGE poly pp_Mult_mm(poly p, const poly m, const ring ri, poly &last)
   p_LmTest(m, ri);
   if (p == NULL)
   {
-    last = NULL;
+    last = NULL;      
     return NULL;
   }
   spolyrec rp;
@@ -37,7 +37,7 @@ LINKAGE poly pp_Mult_mm(poly p, const poly m, const ring ri, poly &last)
   do
   {
     tmp = n_Mult(ln, pGetCoeff(p), ri);
-#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
+#ifdef HAVE_ZERODIVISORS
     if (! n_IsZero(tmp, ri))
     {
 #endif
@@ -46,7 +46,7 @@ LINKAGE poly pp_Mult_mm(poly p, const poly m, const ring ri, poly &last)
       pSetCoeff0(q, tmp);
       p_MemSum(q->exp, p->exp, m_e, length);
       p_MemAddAdjust(q, ri);
-#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
+#ifdef HAVE_ZERODIVISORS
     }
 #endif
     p = pNext(p);

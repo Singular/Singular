@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.7 2007-05-07 16:23:04 Singular Exp $ */
+/* $Id: numbers.cc,v 1.8 2007-05-10 08:12:42 wienand Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -45,6 +45,9 @@ void   (*nNormalize)(number &a);
 number (*nCopy)(number a);
 number (*nRePart)(number a);
 number (*nImPart)(number a);
+#ifdef HAVE_RINGS
+BOOLEAN (*nDivBy)(number a,number b);
+#endif
 BOOLEAN (*nGreater)(number a,number b);
 BOOLEAN (*nEqual)(number a,number b);
 BOOLEAN (*nIsZero)(number a);
@@ -98,6 +101,10 @@ int ndSize(number a) { return (int)nIsZero(a)==FALSE; }
 
 number ndCopy(number a) { return a; }
 number nd_Copy(number a,const ring r) { return r->cf->nCopy(a); }
+
+#ifdef HAVE_RINGS
+BOOLEAN ndDivBy(number a, number b) { return TRUE; }
+#endif
 
 /*2
 * init operations for characteristic c (complete==TRUE)
@@ -172,6 +179,9 @@ void nSetChar(ring r)
   nNeg   = r->cf->nNeg;
   nInvers= r->cf->nInvers;
   nCopy  = r->cf->nCopy;
+#ifdef HAVE_RINGS
+  nDivBy = r->cf->nDivBy;
+#endif
   nGreater = r->cf->nGreater;
   nEqual = r->cf->nEqual;
   nIsZero = r->cf->nIsZero;
@@ -250,6 +260,9 @@ void nInitChar(ring r)
   n->nNormalize=nDummy2;
   n->nGcd  = ndGcd;
   n->nLcm  = ndGcd; /* tricky, isn't it ?*/
+#ifdef HAVE_RINGS
+  n->nDivBy = ndDivBy;
+#endif
   if (rField_is_Extension(r))
   {
     //naInitChar(c,TRUE,r);
@@ -305,6 +318,7 @@ void nInitChar(ring r)
      n->nExactDiv= nr2mDiv;
      n->nNeg   = nr2mNeg;
      n->nInvers= nr2mInvers;
+     n->nDivBy = nr2mDivBy;
      n->nGreater = nr2mGreater;
      n->nEqual = nr2mEqual;
      n->nIsZero = nr2mIsZero;
@@ -341,6 +355,7 @@ void nInitChar(ring r)
      n->nExactDiv= nrnDiv;
      n->nNeg   = nrnNeg;
      n->nInvers= nrnInvers;
+     n->nDivBy = nrnDivBy;
      n->nGreater = nrnGreater;
      n->nEqual = nrnEqual;
      n->nIsZero = nrnIsZero;

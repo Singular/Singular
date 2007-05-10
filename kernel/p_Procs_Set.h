@@ -11,7 +11,7 @@
  *           have to be defined before this file is included
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Set.h,v 1.12 2007-01-31 23:51:24 motsak Exp $
+ *  Version: $Id: p_Procs_Set.h,v 1.13 2007-05-10 08:12:42 wienand Exp $
  *******************************************************************/
 #include "modulop.h"
 
@@ -34,6 +34,9 @@ static inline p_Field p_FieldIs(ring r)
   if (rField_is_long_C(r)) return FieldLong_C;
   if (rField_is_Zp_a(r)) return FieldZp_a;
   if (rField_is_Q_a(r)) return FieldQ_a;
+#endif
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(r)) return RingGeneral;
 #endif
   return FieldGeneral;
 }
@@ -128,6 +131,7 @@ do                                                          \
   {                                                         \
     dReportBug("p_Procs is NULL");                          \
     WarnS("Singular will work properly, but much slower");  \
+    WarnS("If you chose a coef ring, it may not work at all");\
     p_Procs->which = (which##_Proc_Ptr)                     \
       which##__FieldGeneral_LengthGeneral_OrdGeneral;       \
   }                                                         \
@@ -156,7 +160,7 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
     // set all non-mult/div. routines to FieldZp-variants
     SetProcs_nv(FieldZp, length,ord); // p_Delete, p_ShallowCopyDelete...
   }
-  #endif  
+  #endif
   CheckProc(p_Copy);
   CheckProc(p_Delete);
   CheckProc(p_ShallowCopyDelete);

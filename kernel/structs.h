@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.36 2007-05-07 16:23:04 Singular Exp $ */
+/* $Id: structs.h,v 1.37 2007-05-10 08:12:44 wienand Exp $ */
 /*
 * ABSTRACT
 */
@@ -280,6 +280,9 @@ struct n_Procs_s
    char *  (*nRead)(char * s, number * a);
    void    (*nNormalize)(number &a);
    BOOLEAN (*nGreater)(number a,number b),
+#ifdef HAVE_RINGS
+           (*nDivBy)(number a, number b),
+#endif
            (*nEqual)(number a,number b),
            (*nIsZero)(number a),
            (*nIsOne)(number a),
@@ -538,8 +541,10 @@ struct sip_sring
 
   struct omBin_s*   PolyBin; /* Bin from where monoms are allocated */
   int        ch;     /* characteristic */
-#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
-  int        cring;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
+#ifdef HAVE_RINGS
+  unsigned int ringtype;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
+  unsigned long ringflaga;
+  unsigned int ringflagb;
 #endif
   int        ref; /* reference counter to the ring */
 

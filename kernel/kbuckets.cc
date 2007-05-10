@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.31 2007-03-02 09:28:12 Singular Exp $ */
+/* $Id: kbuckets.cc,v 1.32 2007-05-10 08:12:40 wienand Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -20,7 +20,7 @@
 #endif
 
 #ifdef USE_COEF_BUCKETS
-#ifdef HAVE_RING_2TOM
+#ifdef HAVE_RINGS_OLD
 #define MULTIPLY_BUCKET(B,I) do                                        \
   { if (B->coef[I]!=NULL)                                              \
     {                                                                  \
@@ -29,7 +29,7 @@
       B->coef[I]=NULL;                                                 \
     }                                                                  \
   } while(0)                                                           \
-    if (r->cring == 1) bucket->buckets_length[i] = pLength(bucket->buckets[i]);
+    if (rField_is_Ring(currRing)) bucket->buckets_length[i] = pLength(bucket->buckets[i]);
 #else
 #define MULTIPLY_BUCKET(B,I) do                                        \
   { if (B->coef[I]!=NULL)                                              \
@@ -594,7 +594,7 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
       if (bucket->coef[i]!=NULL)
       {
         bucket->coef[i] = p_Mult_nn(bucket->coef[i],n,r);
-#ifdef HAVE_RING_2TOM
+#ifdef HAVE_RING2TOM_OLD
         if (r->cring == 1 && (long) bucket->coef[i] == 0) {
           bucket->coef[i] = NULL;
           bucket->buckets[i] = NULL;
@@ -608,8 +608,8 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
       }
 #else
       bucket->buckets[i] = p_Mult_nn(bucket->buckets[i], n, r);
-#ifdef HAVE_RING2TOM
-      if (r->cring == 1) {
+#ifdef HAVE_RINGS
+      if (rField_is_Ring(currRing)) {
         bucket->buckets_length[i] = pLength(bucket->buckets[i]);
         kBucketAdjust(bucket, i);
       }
@@ -620,7 +620,7 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
   kbTest(bucket);
 #else
   bucket->p = p_Mult_nn(bucket->p, n, bucket->bucket_ring);
-#ifdef HAVE_RING_2TOM
+#ifdef HAVE_RING2TOM_OLD
   if (r->cring == 1) bucket->buckets_length[i] = pLength(bucket->buckets[i]);
 #endif
 #endif
@@ -738,9 +738,12 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
     l1 = bucket->buckets_length[i];
     bucket->buckets[i] = NULL;
     bucket->buckets_length[i] = 0;
-#ifdef HAVE_RING2TOM
-    l1 = pLength(p1);
-    assume(pLength(p1) == l1);
+#ifdef HAVE_RINGS
+    if (rField_is_Ring(currRing))
+    {
+      l1 = pLength(p1);
+      assume(pLength(p1) == l1);
+    }
 #endif
     i = pLogLength(l1);
   }
@@ -755,9 +758,12 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
     }
     else {
       p1 = r->p_Procs->pp_Mult_mm(p1, m, r, last);
-#ifdef HAVE_RING2TOM
-      l1 = pLength(p1);
-      i = pLogLength(l1);
+#ifdef HAVE_RINGS
+      if (rField_is_Ring(currRing))
+      {
+        l1 = pLength(p1);
+        i = pLogLength(l1);
+      }
 #endif
     }
     pSetCoeff0(m, nNeg(pGetCoeff(m)));

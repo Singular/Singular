@@ -6,7 +6,7 @@
  *  Purpose: template for pp_Mult_nn
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_nn__T.cc,v 1.5 2007-05-03 14:04:34 Singular Exp $
+ *  Version: $Id: pp_Mult_nn__T.cc,v 1.6 2007-05-10 08:12:43 wienand Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -27,7 +27,7 @@ LINKAGE poly pp_Mult_nn(poly p, const number n, const ring r)
 
   do
   {
-#if !defined(HAVE_RING2TOM) && !defined(HAVE_RINGMODN)
+#ifndef HAVE_ZERODIVISORS
     p_AllocBin(pNext(q), bin, r);
     q = pNext(q);
     number nc = pGetCoeff(p);
@@ -36,7 +36,7 @@ LINKAGE poly pp_Mult_nn(poly p, const number n, const ring r)
 #else
     number nc = pGetCoeff(p);
     number tmp = n_Mult(n, nc, r);
-    if (r->cring==0 || (r->cring ==1 && (long) tmp != 0))
+    if (tmp != NULL)
     {
       p_AllocBin(pNext(q), bin, r);
       q = pNext(q);

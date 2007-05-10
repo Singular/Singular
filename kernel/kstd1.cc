@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.18 2007-05-02 10:01:23 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.19 2007-05-10 08:12:41 wienand Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1008,7 +1008,7 @@ void initBba(ideal F,kStrategy strat)
     strat->red = redHomog;
   }
 #ifdef HAVE_RING2TOM
-  if (currRing->cring == 1) {
+  if (rField_is_Ring_2toM(currRing)) {
     strat->red = redRing2toM;
   }
 #endif

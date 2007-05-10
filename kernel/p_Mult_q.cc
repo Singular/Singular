@@ -6,7 +6,7 @@
  *  Purpose: multiplication of polynomials
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Mult_q.cc,v 1.3 2007-05-03 13:50:09 wienand Exp $
+ *  Version: $Id: p_Mult_q.cc,v 1.4 2007-05-10 08:12:42 wienand Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -73,6 +73,10 @@ static poly _p_Mult_q_Bucket(poly p, const int lp,
   p_Test(q, r);
 
   poly res = pp_Mult_mm(p,q,r);     // holds initially q1*p
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(currRing))
+    WarnS("_p_Mult_q_Bucket not ring testet !!!");
+#endif
   poly qq = pNext(q);               // we iter of this
   poly qn = pp_Mult_mm(qq, p,r);    // holds p1*qi
   poly pp = pNext(p);               // used for Lm(qq)*pp
@@ -155,8 +159,8 @@ static poly _p_Mult_q_Bucket(poly p, const int lp,
   return res;
 }
 
-
-static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
+#ifdef HAVE_RINGS
+static poly _p_Mult_q_Normal_ZeroDiv(poly p, poly q, const int copy, const ring r)
 {
   assume(p != NULL && pNext(p) != NULL && q != NULL && pNext(q) != NULL);
   pAssume1(! pHaveCommonMonoms(p, q));
@@ -164,12 +168,37 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
   p_Test(q, r);
 
   poly res = pp_Mult_mm(p,q,r);     // holds initially q1*p
-#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
-  if (res == NULL) {
-    res = p_ISet(1, r);
-    p_SetCoeff(res, (number) 0, r);
+  poly qq = pNext(q);               // we iter of this
+
+  while (qq != NULL)
+  {
+    res = p_Plus_mm_Mult_qq(res, qq, p, r);
+    pIter(qq);
   }
+
+  if (!copy)
+  {
+    p_Delete(&p, r);
+    p_Delete(&q, r);
+  }
+
+  p_Test(res, r);
+
+  return res;
+}
 #endif
+
+static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
+{
+  assume(p != NULL && pNext(p) != NULL && q != NULL && pNext(q) != NULL);
+#ifdef HAVE_RINGS
+  assume(!(rField_is_Ring(r));
+#endif
+  pAssume1(! pHaveCommonMonoms(p, q));
+  p_Test(p, r);
+  p_Test(q, r);
+
+  poly res = pp_Mult_mm(p,q,r);     // holds initially q1*p
   poly qq = pNext(q);               // we iter of this
   poly qn = pp_Mult_mm(qq, p,r);    // holds p1*qi
   poly pp = pNext(p);               // used for Lm(qq)*pp
@@ -179,10 +208,6 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
 
   // now the main loop
   Top:
-#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
-  if (qn == NULL && rn == NULL) goto Work;
-  if (qn == NULL) goto Greater;
-#endif
   if (rn == NULL) goto Smaller;
   p_LmCmpAction(rn, qn, r, goto Equal, goto Greater, goto Smaller);
 
@@ -236,11 +261,6 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
     p_Delete(&p, r);
     p_Delete(&q, r);
   }
-#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
-  if (n_IsZero(p_GetCoeff(res, r), r)) {
-    res = p_LmDeleteAndNext(res, r);
-  }
-#endif
   p_Test(res, r);
   return res;
 }
@@ -263,6 +283,11 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
     lq = l;
   }
   if (lq < MIN_LENGTH_BUCKET || TEST_OPT_NOT_BUCKETS)
+#ifdef HAVE_RINGS
+    if (rField_is_Ring(currRing))
+      return _p_Mult_q_Normal_ZeroDiv(p, q, copy, r);
+    else
+#endif
     return _p_Mult_q_Normal(p, q, copy, r);
   else
   {

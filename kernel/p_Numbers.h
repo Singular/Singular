@@ -6,7 +6,7 @@
  *  Purpose: macros/inline functions for number oerations
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Numbers.h,v 1.1.1.1 2003-10-06 12:16:00 Singular Exp $
+ *  Version: $Id: p_Numbers.h,v 1.2 2007-05-10 08:12:42 wienand Exp $
  *******************************************************************/
 #ifndef P_NUMBERS_H
 #define P_NUMBERS_H
@@ -22,6 +22,19 @@
 #define n_Sub_FieldGeneral(n1, n2, r)       (r)->cf->nSub(n1, n2)
 //#define n_InpMult_FieldGeneral(n1, n2, r)   (r)->cf->nInpMult(n1, n2, r)
 #define n_InpMult_FieldGeneral(n1, n2, r)   ndInpMult(n1, n2, r)
+
+#ifdef HAVE_RINGS
+#define n_Copy_RingGeneral(n, r)           (r)->cf->cfCopy(n,r)
+#define n_Delete_RingGeneral(n, r)         (r)->cf->cfDelete(n,r)
+#define n_Mult_RingGeneral(n1, n2, r)      (r)->cf->nMult(n1, n2)
+#define n_Add_RingGeneral(n1, n2, r)       (r)->cf->nAdd(n1, n2)
+#define n_IsZero_RingGeneral(n, r)         (r)->cf->nIsZero(n)
+#define n_Equal_RingGeneral(n1, n2, r)     (r)->cf->nEqual(n1, n2)
+#define n_Neg_RingGeneral(n, r)            (r)->cf->nNeg(n)
+#define n_Sub_RingGeneral(n1, n2, r)       (r)->cf->nSub(n1, n2)
+//#define n_InpMult_RingGeneral(n1, n2, r)   (r)->cf->nInpMult(n1, n2, r)
+#define n_InpMult_RingGeneral(n1, n2, r)   ndInpMult(n1, n2, r)
+#endif
 
 #include "modulop.h"
 #define n_Copy_FieldZp(n, r)        n

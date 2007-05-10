@@ -7,7 +7,7 @@
  *  Note:    this file is included by p_Procs.cc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs_Generate.cc,v 1.2 2007-01-12 14:28:30 Singular Exp $
+ *  Version: $Id: p_Procs_Generate.cc,v 1.3 2007-05-10 08:12:42 wienand Exp $
  *******************************************************************/
 
 
@@ -31,6 +31,9 @@ int FieldGeneralProcs = 0,
   FieldIndepProcs = 0,
   FieldZpProcs = 0,
   FieldQProcs = 0,
+#ifdef HAVE_RINGS
+  RingGeneralProcs = 0,
+#endif
   KernelProcs = 0,
   UnknownProcs = 0;
 
@@ -106,11 +109,19 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
       FieldZpProcs++;
     else if (strcmp(module, "FieldQ") == 0)
       FieldQProcs++;
+#ifdef HAVE_RINGS
+    else if (strcmp(module, "RingGeneral") == 0)
+      RingGeneralProcs++;
+#endif
     else
       UnknownProcs++;
 
     printf("#ifdef p_Procs_%s\n", module);
   }
+#endif
+#ifdef HAVE_RINGS
+  if (strcmp(s_field, "RingGeneral") == 0)
+    printf("#define HAVE_ZERODIVISORS\n");
 #endif
   i = 0;
   while (macros_field[i] != NULL)
@@ -184,6 +195,10 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
   printf("#undef %s\n#define %s %s\n", s_what, s_what, s_full_proc_name);
   printf("#include \"%s__T.cc\"\n", s_what);
   printf("#undef %s\n", s_what);
+#ifdef HAVE_RINGS
+  if (strcmp(s_field, "RingGeneral") == 0)
+    printf("#undef HAVE_ZERODIVISORS\n");
+#endif
 #ifndef p_Procs_Static
   printf("#endif // p_Procs_[Kernel|Field*]\n");
 #endif

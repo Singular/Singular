@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.10 2007-05-03 13:50:09 wienand Exp $
+ *  Version: $Id: pInline1.h,v 1.11 2007-05-10 08:12:42 wienand Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -20,7 +20,7 @@
 #include "structs.h"
 #include "numbers.h"
 #ifdef HAVE_RINGMODN
-#include "febase.h"
+// #include "febase.h"
 #endif
 
 #if PDEBUG > 0 || defined(NO_PINLINE1)
@@ -390,29 +390,14 @@ static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, poly b, ring r)
     while (i>=0);
   }
   pDivAssume(p_DebugLmDivisibleByNoComp(a, b, r) == TRUE);
-#ifdef HAVE_RING2TOM
-  if (r->cring == 1) {
-    long lside = (long) p_GetCoeff(a, r);
-    long rside = (long) p_GetCoeff(b, r);
-    // Später durch bitvergleiche viel schneller TODO OLIVER
-    while (lside%2 == 0 && rside%2 == 0) {
-      lside = lside / 2;
-      rside = rside / 2;
-    }
-    return (lside%2 != 0);
-  }
-  else
-#endif
-#ifdef HAVE_RINGMODN
-  if (r->cring == 2) {
-    PrintS("Not yet implemented, 2007-05-03 11:53:12");
-  }
-  else
-#endif
+#ifdef HAVE_RINGS
+  return nDivBy(p_GetCoeff(b, r), p_GetCoeff(a, r));
+#else
   return TRUE;
+#endif
 }
 
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RING2TOM_OLD
 /***************************************************************
  *
  * divisibility for rings (considers coefficients)
@@ -455,28 +440,14 @@ static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, ring r_a, poly b, ring r_b)
     i--;
   }
   while (i);
-#ifdef HAVE_RING2TOM
-  if (r_a->cring == 1 || r_b->cring == 1) {
-    long lside = (long) p_GetCoeff(a, r_a);
-    long rside = (long) p_GetCoeff(b, r_b);
-    while (lside%2 == 0 && rside%2 == 0) {
-      lside = lside / 2;
-      rside = rside / 2;
-    }
-    return (lside%2 != 0);
-  }
-  else
+#ifdef HAVE_RINGS
+  return nDivBy(p_GetCoeff(b, r), p_GetCoeff(a, r));
+#else
+  return TRUE;
 #endif
-#ifdef HAVE_RINGMODN
-  if (r_a->cring == 2 || r_b->cring == 2) {
-    PrintS("Not yet implemented, 2007-05-02 11:56:44");
-  }
-  else
-#endif
-    return TRUE;
 }
 
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RING2TOM_OLD
 static inline BOOLEAN _p_LmRingDivisibleByNoComp(poly a, ring r_a, poly b, ring r_b)
 {
   BOOLEAN mDiv = _p_LmDivisibleByNoComp(a, r_a, b, r_b);
@@ -521,7 +492,7 @@ PINLINE1 BOOLEAN p_LmDivisibleBy(poly a, poly b, ring r)
   return FALSE;
 }
 
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RING2TOM_OLD
 PINLINE1 BOOLEAN p_LmRingDivisibleBy(poly a, poly b, ring r)
 {
   p_LmCheckPolyRing1(b, r);
@@ -538,19 +509,6 @@ PINLINE1 BOOLEAN p_DivisibleBy(poly a, poly b, ring r)
   pIfThen1(a!=NULL, p_LmCheckPolyRing1(a, r));
 
   if (a != NULL && (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r)))
-#ifdef HAVE_RING2TOM
-    if (r->cring == 1) {
-      return _p_LmRingDivisibleByNoComp(a,b,r);
-    }
-    else
-#endif
-#ifdef HAVE_RINGMODN
-    if (r->cring == 2) {
-      PrintS("Not yet implemented 2007-05-02 11:55:20");
-      return FALSE;
-    }
-    else
-#endif
       return _p_LmDivisibleByNoComp(a,b,r);
   return FALSE;
 }
@@ -559,18 +517,6 @@ PINLINE1 BOOLEAN p_DivisibleBy(poly a, ring r_a, poly b, ring r_b)
   pIfThen1(b!=NULL, p_LmCheckPolyRing1(b, r_b));
   pIfThen1(a!=NULL, p_LmCheckPolyRing1(a, r_a));
   if (a != NULL) {
-#ifdef HAVE_RING2TOM
-    if (r_a->cring == 1) {
-      return _p_LmRingDivisibleByNoComp(a, r_a, b, r_b);
-    }
-    else
-#endif
-#ifdef HAVE_RINGMODN
-    if (r_a->cring == 2) {
-      PrintS("Not yet implemented, 2007-05-03 11:59:20");
-    }
-    else
-#endif
       return _p_LmDivisibleBy(a, r_a, b, r_b);
   }
   return FALSE;
@@ -601,7 +547,7 @@ PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a,
 #endif
 }
 
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RING2TOM_OLD
 PINLINE1 BOOLEAN p_LmRingShortDivisibleBy(poly a, unsigned long sev_a,
                                           poly b, unsigned long not_sev_b, ring r)
 {

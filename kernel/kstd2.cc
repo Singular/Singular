@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.42 2007-05-03 13:50:08 wienand Exp $ */
+/* $Id: kstd2.cc,v 1.43 2007-05-10 08:12:41 wienand Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1217,7 +1217,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #ifdef HAVE_VANGB
       int at_R = strat->tl;
 #endif
-      if (currRing->cring == 1)
+      if (rField_is_Ring_2toM(currRing))
         superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
       else
 #endif

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.7 2007-05-03 13:50:10 wienand Exp $ */
+/* $Id: rmodulo2m.cc,v 1.8 2007-05-10 08:12:43 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -149,6 +149,11 @@ BOOLEAN nr2mEqual (number a,number b)
 
 BOOLEAN nr2mGreater (number a,number b)
 {
+  return nr2mDivBy(a, b);
+}
+
+BOOLEAN nr2mDivBy (number a,number b)
+{
   if ((NATNUMBER) a == 0) return TRUE;
   if ((NATNUMBER) b == 0) return FALSE;
   while ((NATNUMBER) a % 2 == 0 && (NATNUMBER) b % 2 == 0)
@@ -161,8 +166,7 @@ BOOLEAN nr2mGreater (number a,number b)
 
 BOOLEAN nr2mGreaterZero (number k)
 {
-  int h = (int)((NATNUMBER) k);
-  return ((int)h !=0) && (h <= (nr2mModul>>1));
+  return ((NATNUMBER) k !=0) && ((NATNUMBER) k <= (nr2mModul>>1));
 }
 
 //#ifdef HAVE_DIV_MOD

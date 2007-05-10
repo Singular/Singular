@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.18 2007-05-03 13:50:10 wienand Exp $ */
+/* $Id: ring.h,v 1.19 2007-05-10 08:12:43 wienand Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -90,60 +90,65 @@ BOOLEAN rRing_has_CompLastBlock(ring r=currRing);
 
 #ifdef HAVE_RING2TOM
 inline BOOLEAN rField_is_Ring_2toM(ring r=currRing)
-{ return (r->cring == 1); }
+{ return (r->ringtype == 1); }
 #endif
 
 #ifdef HAVE_RINGMODN
 inline BOOLEAN rField_is_Ring_ModN(ring r=currRing)
-{ return (r->cring == 2); }
+{ return (r->ringtype == 2); }
 #endif
 
-#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
+#ifdef HAVE_RINGS
+inline BOOLEAN rField_is_Ring(ring r=currRing)
+{ return (r->ringtype > 0); }
+#endif
+
+#ifdef HAVE_RINGS
 inline BOOLEAN rField_is_Zp(ring r=currRing)
-{ return (r->cring == 0) && (r->ch > 1) && (r->parameter==NULL); }
+{ return (r->ringtype == 0) && (r->ch > 1) && (r->parameter==NULL); }
 
 inline BOOLEAN rField_is_Zp(ring r, int p)
-{ return (r->cring == 0) && (r->ch > 1 && r->ch == ABS(p) && r->parameter==NULL); }
+{ return (r->ringtype == 0) && (r->ch > 1 && r->ch == ABS(p) && r->parameter==NULL); }
 
 inline BOOLEAN rField_is_Q(ring r=currRing)
-{ return (r->cring == 0) && (r->ch == 0) && (r->parameter==NULL); }
+{ return (r->ringtype == 0) && (r->ch == 0) && (r->parameter==NULL); }
 
 inline BOOLEAN rField_is_numeric(ring r=currRing) /* R, long R, long C */
-{ return (r->cring == 0) && (r->ch ==  -1); }
+{ return (r->ringtype == 0) && (r->ch ==  -1); }
 
 inline BOOLEAN rField_is_R(ring r=currRing)
 {
   if (rField_is_numeric(r) && (r->float_len <= (short)SHORT_REAL_LENGTH))
-    return (r->cring == 0) && (r->parameter==NULL);
+    return (r->ringtype == 0) && (r->parameter==NULL);
   return FALSE;
 }
 
 inline BOOLEAN rField_is_GF(ring r=currRing)
-{ return (r->cring == 0) && (r->ch > 1) && (r->parameter!=NULL); }
+{ return (r->ringtype == 0) && (r->ch > 1) && (r->parameter!=NULL); }
 
 inline BOOLEAN rField_is_GF(ring r, int q)
-{ return (r->cring == 0) && (r->ch == q); }
+{ return (r->ringtype == 0) && (r->ch == q); }
 
 inline BOOLEAN rField_is_Zp_a(ring r=currRing)
-{ return (r->cring == 0) && (r->ch < -1); }
+{ return (r->ringtype == 0) && (r->ch < -1); }
 
 inline BOOLEAN rField_is_Zp_a(ring r, int p)
-{ return (r->cring == 0) && (r->ch < -1 ) && (-(r->ch) == ABS(p)); }
+{ return (r->ringtype == 0) && (r->ch < -1 ) && (-(r->ch) == ABS(p)); }
 
 inline BOOLEAN rField_is_Q_a(ring r=currRing)
-{ return (r->cring == 0) && (r->ch == 1); }
+{ return (r->ringtype == 0) && (r->ch == 1); }
 
 inline BOOLEAN rField_is_long_R(ring r=currRing)
 {
   if (rField_is_numeric(r) && (r->float_len >(short)SHORT_REAL_LENGTH))
-    return (r->cring == 0) && (r->parameter==NULL);
+    return (r->ringtype == 0) && (r->parameter==NULL);
   return FALSE;
 }
 
 inline BOOLEAN rField_is_long_C(ring r=currRing)
 {
   if (rField_is_numeric(r))
-    return (r->cring == 0) && (r->parameter!=NULL);
+    return (r->ringtype == 0) && (r->parameter!=NULL);
   return FALSE;
 }
 #else
@@ -198,18 +203,22 @@ inline BOOLEAN rField_is_long_C(ring r=currRing)
 
 inline BOOLEAN rField_has_simple_inverse(ring r=currRing)
 /* { return (r->ch>1) || (r->ch== -1); } *//* Z/p, GF(p,n), R, long_R, long_C*/
-#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
-{ return (r->cring > 0) || (r->ch>1) || ((r->ch== -1) && (r->float_len < 10)); } /* Z/2^n, Z/p, GF(p,n), R, long_R, long_C*/
+#ifdef HAVE_RINGS
+{ return (r->ringtype > 0) || (r->ch>1) || ((r->ch== -1) && (r->float_len < 10)); } /* Z/2^n, Z/p, GF(p,n), R, long_R, long_C*/
 #else
 { return (r->ch>1) || ((r->ch== -1) && (r->float_len < 10)); } /* Z/p, GF(p,n), R, long_R, long_C*/
 #endif
 
 inline BOOLEAN rField_has_simple_Alloc(ring r=currRing)
-#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
-{ return (r->cring > 0 || rField_is_Zp(r) || rField_is_GF(r) || rField_is_R(r)); }
-#else
-{ return (rField_is_Zp(r) || rField_is_GF(r) || rField_is_R(r)); }
+{ return (rField_is_Zp(r)
+       || rField_is_GF(r)
+#ifdef HAVE_RING2TOM
+       || rField_is_Ring_2toM(r)
 #endif
+#ifdef HAVE_RINGMODN
+       || rField_is_Ring_ModN(r)
+#endif
+       || rField_is_R(r)); }
 
 /* Z/p, GF(p,n), R: nCopy, nNew, nDelete are dummies*/
 inline BOOLEAN rField_is_Extension(ring r=currRing)

@@ -6,7 +6,7 @@
  *  Purpose: template for p_Minus_m_Mult_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Minus_mm_Mult_qq__T.cc,v 1.5 2007-05-03 13:50:09 wienand Exp $
+ *  Version: $Id: p_Minus_mm_Mult_qq__T.cc,v 1.6 2007-05-10 08:12:42 wienand Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -37,7 +37,7 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
     c;                             // used for temporary storage
 
 
-  number tm   = pGetCoeff(m),           // coefficient of m
+  number tm = pGetCoeff(m),           // coefficient of m
     tneg = n_Neg(n_Copy(tm, r), r),    // - (coefficient of m)
     tb,                            // used for tm*coeff(a1)
     tc;                            // used as intermediate number
@@ -66,7 +66,7 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
 
   Equal:   // qm equals p
   tb = n_Mult(pGetCoeff(q), tm, r);
-#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
+#ifdef HAVE_ZERODIVISORS
   if ((long) tb != 0) {
 #endif
   tc = pGetCoeff(p);
@@ -85,7 +85,7 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
     n_Delete(&tc, r);
     p = p_LmFreeAndNext(p, r);
   }
-#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
+#ifdef HAVE_ZERODIVISORS
   }
 #endif
   n_Delete(&tb, r);
@@ -96,19 +96,21 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
 
 
   Greater:
-#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
+#ifdef HAVE_ZERODIVISORS
   tb = n_Mult(pGetCoeff(q), tneg, r);
   if ((long) tb != 0)
   {
 #endif
-  pSetCoeff0(qm, n_Mult(pGetCoeff(q), tneg, r));
-  a = pNext(a) = qm;       // append qm to result and advance q
-#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
+    pSetCoeff0(qm, n_Mult(pGetCoeff(q), tneg, r));
+    a = pNext(a) = qm;       // append qm to result and advance q
+#ifdef HAVE_ZERODIVISORS
   }
   else
-  { shorter++; }
+  {
+    shorter++;
+  }
   n_Delete(&tb, r);
-#endif  
+#endif
   pIter(q);
   if (q == NULL) // are we done?
   {
