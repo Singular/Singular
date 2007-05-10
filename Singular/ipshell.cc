@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.156 2007-05-03 13:52:25 wienand Exp $ */
+/* $Id: ipshell.cc,v 1.157 2007-05-10 07:48:36 wienand Exp $ */
 /*
 * ABSTRACT:
 */
@@ -553,7 +553,7 @@ int exprlist_length(leftv v)
   return rc;
 }
 
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RING2TOM_OLD
 // avoid to test the "special" char: -1, 0, 1, 2
 int Is2toM(int p)  /* brute force !!!! */
 {
@@ -4365,8 +4365,10 @@ BOOLEAN rSleftvList2StringArray(sleftv* sl, char** p)
 ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 {
   int ch;
-#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
-  int cring = 0;
+#ifdef HAVE_RINGS
+  int ringtype = 0;
+  unsigned long ringflaga = 0;
+  unsigned int ringflagb = 0;
 #endif
   int float_len=0;
   int float_len2=0;
@@ -4421,22 +4423,23 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       goto rInitError;
     }
     ch = module;
-    cring = 2;
+    ringtype = 2;
+    ringflaga = module;
   }
 #endif
 #ifdef HAVE_RING2TOM
   else if ((pn->name != NULL)
   && (strcmp(pn->name,"modpow")==0))
   {
-    long base = 0;
-    long exp = 0;
+    unsigned long base = 0;
+    unsigned int exp = 0;
     if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
     {
       base =(unsigned long) pn->next->Data();
       pn=pn->next;
       if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
       {
-        exp = (unsigned long) pn->next->Data();
+        exp = (unsigned int) (unsigned long) pn->next->Data();
         pn=pn->next;
       }
     }
@@ -4448,13 +4451,17 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     ch = exp;
     if (base == 2)
     {
-      cring = 1; // Use Z/2^ch
+      ringtype = 1; // Use Z/2^ch
+      ringflaga = exp;
       Print("Beta: using Z/2^%d", ch);
       PrintLn();
     }
     else
     {
-      cring = base;
+      ringtype = 3;
+      ringflaga = base;
+      ringflagb = exp;
+      // ch = base**exp
       Werror("p^n not yet implemented");
       goto rInitError;
     }
@@ -4482,8 +4489,8 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
    *         q    q : GF(q=p^n)       *names         TRUE
   */
   if ((ch!=-1)
-#if defined(HAVE_RING2TOM)|| defined(HAVE_RINGMODN)
-       && (cring == 0)
+#ifdef HAVE_RINGS
+       && (ringtype == 0)
 #endif
      )
   {
@@ -4519,8 +4526,10 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   // allocated ring and set ch
   R = (ring) omAlloc0Bin(sip_sring_bin);
   R->ch = ch;
-#ifdef HAVE_RING2TOM
-  R->cring = cring;
+#ifdef HAVE_RINGS
+  R->ringtype = ringtype;
+  R->ringflaga = ringflaga;
+  R->ringflagb = ringflagb;
 #endif
   if (ch == -1)
   {
