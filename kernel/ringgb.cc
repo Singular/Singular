@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ringgb.cc,v 1.13 2007-05-11 10:48:05 wienand Exp $ */
+/* $Id: ringgb.cc,v 1.14 2007-05-11 11:40:28 wienand Exp $ */
 /*
 * ABSTRACT: ringgb interface
 */
@@ -160,13 +160,13 @@ int findRingSolver(poly rside, ideal G, ring r) {
 }
 
 poly plain_spoly(poly f, poly g) {
-  number cf = pGetCoeff(f), cg = pGetCoeff(g);
+  number cf = nCopy(pGetCoeff(f)), cg = nCopy(pGetCoeff(g));
   int ct = ksCheckCoeff(&cf, &cg); // gcd and zero divisors
   poly fm, gm;
   k_GetLeadTerms(f, g, currRing, fm, gm, currRing);
   pSetCoeff0(fm, cg);
   pSetCoeff0(gm, cf);  // and now, m1 * LT(p1) == m2 * LT(p2)
-  poly sp = pSub(pMult_mm(f, fm), pMult_mm(g, gm));
+  poly sp = pSub(ppMult_mm(f, fm), ppMult_mm(g, gm));
   pDelete(&fm);
   pDelete(&gm);
   return(sp);
@@ -179,16 +179,16 @@ poly ringNF(poly f, ideal G, ring r) {
   int i = findRingSolver(h, G, r);
   int c = 1;
   while (h != NULL && i >= 0) {
-    Print("%d-step NF - h:", c);
-    wrp(h);
-    PrintS(" ");
-    PrintS("G->m[i]:");
-    wrp(G->m[i]);
-    PrintLn();
+//    Print("%d-step NF - h:", c);
+//    wrp(h);
+//    PrintS(" ");
+//    PrintS("G->m[i]:");
+//    wrp(G->m[i]);
+//    PrintLn();
     h = plain_spoly(h, G->m[i]);
-    PrintS("=> h=");
-    wrp(h);
-    PrintLn();
+//    PrintS("=> h=");
+//    wrp(h);
+//    PrintLn();
     i = findRingSolver(h, G, r);
     c++;
   }
@@ -199,6 +199,7 @@ int testGB(ideal I, ideal GI) {
   poly f, g, h;
   int i = 0;
   int j = 0;
+  Print("I");
   for (i = 0; i < IDELEMS(I); i++) {
     if (ringNF(I->m[i], GI, currRing) != NULL) {
       Print("Not reduced to zero from I: ");
@@ -208,10 +209,10 @@ int testGB(ideal I, ideal GI) {
       PrintLn();
       return(0);
     }
-  }
-  Print("I");
-  for (i = 0; i < IDELEMS(GI); i++) {
     Print("-");
+  }
+  Print("G");
+  for (i = 0; i < IDELEMS(GI); i++) {
     for (j = i + 1; j < IDELEMS(GI); j++) {
       f = pCopy(GI->m[i]);
       g = pCopy(GI->m[j]);
@@ -229,8 +230,11 @@ int testGB(ideal I, ideal GI) {
         return(0);
       }
       pDelete(&h);
+      Print("-");
     }
   }
+//  Print("Fine.");
+//  PrintLn();
   return(1);
 }
 
