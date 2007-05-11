@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.52 2007-05-10 08:12:41 wienand Exp $ */
+/* $Id: kutil.cc,v 1.53 2007-05-11 10:48:04 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -103,7 +103,7 @@ inline void _my_memmove(void* d, void* s, long l)
 static poly redMora (poly h,int maxIndex,kStrategy strat);
 static poly redBba (poly h,int maxIndex,kStrategy strat);
 
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS
 #define pDivComp_EQUAL 2
 #define pDivComp_LESS 1
 #define pDivComp_GREATER -1
@@ -129,22 +129,22 @@ static inline int pDivCompRing(poly p, poly q)
       {
         if (la < lb)
         {
-          if (b) return 0;
+          if (b) return pDivComp_INCOMP;
           if (((la & divmask) ^ (lb & divmask)) != ((lb - la) & divmask))
-            return 0;
+            return pDivComp_INCOMP;
           a = TRUE;
         }
         else
         {
-          if (a) return 0;
+          if (a) return pDivComp_INCOMP;
           if (((la & divmask) ^ (lb & divmask)) != ((la - lb) & divmask))
-            return 0;
+            return pDivComp_INCOMP;
           b = TRUE;
         }
       }
     }
-    if (a) return 1;
-    if (b) return -1;
+    if (a) return pDivComp_LESS;
+    if (b) return pDivComp_GREATER;
     if (!a & !b) return pDivComp_EQUAL;
   }
   return 0;
@@ -490,13 +490,6 @@ void initPairtest(kStrategy strat)
 {
   strat->pairtest = (BOOLEAN *)omAlloc0((strat->sl+2)*sizeof(BOOLEAN));
 }
-
-#ifdef HAVE_RING2TOM
-//void initLMtest(kStrategy strat)
-//{
-//  strat->lmtest = (unsigned int *)omAlloc0((strat->sl*strat->sl/2+2)*sizeof(BOOLEAN));
-//}
-#endif
 
 /*2
 *test whether (p1,p2) or (p2,p1) is in L up position length
@@ -1021,34 +1014,7 @@ static inline BOOLEAN sugarDivisibleBy(int ecart1, int ecart2)
   return (ecart1 <= ecart2);
 }
 
-#ifdef HAVE_RING2TOM
-/* TODO move to numbers.cc
- */
-inline int nComp(NATNUMBER a, NATNUMBER b)
-{
-  assume(a != 0 && b != 0);
-  while (a % 2 == 0 && b % 2 == 0)
-  {
-    a = a / 2;
-    b = b / 2;
-  }
-  if (a % 2 == 0)
-  {
-    return -1;
-  }
-  else
-  {
-    if (b % 2 == 1)
-    {
-      return 0;
-    }
-    else
-    {
-      return 1;
-    }
-  }
-}
-
+#ifdef HAVE_RINGS
 /*2
 * put the pair (s[i],p)  into the set B, ecart=ecart(p) (ring case)
 */
@@ -1087,7 +1053,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   for(j = strat->Bl;j>=0;j--)
   {
     compare=pDivCompRing(strat->B[j].lcm,Lp.lcm);
-    compareCoeff = nComp((long) pGetCoeff(strat->B[j].lcm), (long) pGetCoeff(Lp.lcm));
+    compareCoeff = nComp(pGetCoeff(strat->B[j].lcm), pGetCoeff(Lp.lcm));
     if (compareCoeff == 0 || compare == compareCoeff)
     {
       if (compare == 1)
@@ -1110,7 +1076,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
     if (compare == pDivComp_EQUAL)
     {
       // Add hint for same LM and direction of LC (later) (TODO Oliver)
-      if (compareCoeff == 1)
+      if (compareCoeff == pDivComp_LESS)
       {
         strat->c3++;
         if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
@@ -1121,7 +1087,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
         break;
       }
       else
-      if (compareCoeff == -1)
+      if (compareCoeff == pDivComp_GREATER)
       {
         deleteInL(strat->B,&strat->Bl,j,strat);
         strat->c3++;
@@ -1807,7 +1773,7 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
   }
 }
 
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS
 /*2
 *the pairset B of pairs of type (s[i],p) is complete now. It will be updated
 *using the chain-criterion in B and L and enters B to L
@@ -1935,7 +1901,9 @@ void chainCritRing (poly p,int ecart,kStrategy strat)
     j--;
   }
 }
+#endif
 
+#ifdef HAVE_RING2TOM
 long twoPow(long arg)
 {
   return 1L << arg;
@@ -1995,7 +1963,7 @@ void enterOneZeroPairRing (poly f, poly t_p, poly p, int ecart, kStrategy strat,
   for(j = strat->Bl;j>=0;j--)
   {
     compare=pDivCompRing(strat->B[j].lcm,Lp.lcm);
-    compareCoeff = nComp((long) pGetCoeff(strat->B[j].lcm), (long) pGetCoeff(Lp.lcm));
+    compareCoeff = nComp(pGetCoeff(strat->B[j].lcm), pGetCoeff(Lp.lcm));
     if (compareCoeff == 0 || compare == compareCoeff)
     {
       if (compare == 1)
@@ -2342,8 +2310,10 @@ ideal createG0()
   while ( nextZeroSimplexExponent(exp, ind, cexp, cind, &cabsind, step, bound, currRing->N) );
   idSkipZeroes(G0);
   return G0;
-}
+}   
+#endif
 
+#ifdef HAVE_RINGS
 /*2
 *(s[0],h),...,(s[k],h) will be put to the pairset L
 */
@@ -2412,17 +2382,19 @@ ideal I=12xz-133y, 2xy-z;
 */
 void enterExtendedSpoly(poly h,kStrategy strat)
 {
-  if (((long) ((h)->coef)) % 2 == 0)
+  number gcd = nGcd((number) 0, pGetCoeff(h), strat->tailRing);
+  if ((NATNUMBER) gcd > 1)
   {
-    long a = ((long) ((h)->coef)) / 2;
-    long b = currRing->ch - 1;
     poly p = p_Copy(h->next, strat->tailRing);
+/*    long a = ((long) ((h)->coef)) / 2;
+    long b = currRing->ch - 1;
     while (a % 2 == 0)
     {
       a = a / 2;
       b--;
     }
-    p = p_Mult_nn(p, (number) twoPow(b), strat->tailRing);
+    p = p_Mult_nn(p, (number) twoPow(b), strat->tailRing); */
+    p = p_Mult_nn(p, nIntDiv(0, gcd), strat->tailRing);
 
     if (p != NULL)
     {
@@ -2664,8 +2636,8 @@ int posInS (const kStrategy strat, const int length,const poly p,
   }
   else
   {
-#ifdef HAVE_RING2TOM
-    if (rField_is_Ring_2toM(currRing))
+#ifdef HAVE_RINGS
+    if (rField_is_Ring(currRing))
     {
       if (pLmCmp(set[length],p)== -cmp_int)
         return length+1;
@@ -5165,7 +5137,7 @@ void initBuchMoraPos (kStrategy strat)
     strat->posInT = posInT19;
   else if (BTEST1(12) || BTEST1(14) || BTEST1(16) || BTEST1(18))
     strat->posInT = posInT1;
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
     strat->posInL = posInL11;
@@ -5495,7 +5467,7 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
                                   // Hmmm .. the condition pFDeg == pDeg
                                   // might be too strong
 #ifdef HAVE_RINGS
-                                  (strat->homog && pFDeg == pDeg && rField_is_Ring(currRing)), // TODO Oliver
+                                  (strat->homog && pFDeg == pDeg && !(rField_is_Ring(currRing))), // TODO Oliver
 #else
                                   (strat->homog && pFDeg == pDeg),
 #endif

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ringgb.cc,v 1.12 2006-06-12 00:35:13 wienand Exp $ */
+/* $Id: ringgb.cc,v 1.13 2007-05-11 10:48:05 wienand Exp $ */
 /*
 * ABSTRACT: ringgb interface
 */
@@ -46,25 +46,6 @@ int indexOf2(number n) {
     test = test / 2;
   }
   return i;
-}
-
-/*
- * Find an index i from G, such that
- * LT(rside) = x * LT(G[i]) has a solution
- * or -1 if rside is not in the
- * ideal of the leading coefficients
- * of the suitable g from G.
- */
-int findRing2toMsolver(poly rside, ideal G, ring r) {
-  if (rside == NULL) return -1;
-  int i;
-  int iO2rside = indexOf2(pGetCoeff(rside));
-  for (i = 0; i < IDELEMS(G); i++) {
-    if (indexOf2(pGetCoeff(G->m[i])) <= iO2rside && p_LmDivisibleBy(G->m[i], rside, r)) {
-      return i;
-    }
-  }
-  return -1;
 }
 
 /***************************************************************
@@ -119,20 +100,6 @@ void printPolyMsg(const char * start, poly f, const char * end)
   PrintS(end);
 }
 
-poly plain_spoly(poly f, poly g) {
-  number cf = pGetCoeff(f), cg = pGetCoeff(g);
-  int ct = ksCheckCoeff(&cf, &cg); // gcd and zero divisors
-  poly fm, gm;
-  k_GetLeadTerms(f, g, currRing, fm, gm, currRing);
-  pSetCoeff0(fm, cg);
-  pSetCoeff0(gm, cf);  // and now, m1 * LT(p1) == m2 * LT(p2)
-  poly sp = pSub(pMult_mm(f, fm), pMult_mm(g, gm));
-  pDelete(&fm);
-  pDelete(&gm);
-  return(sp);
-}
-
-
 poly spolyRing2toM(poly f, poly g, ring r) {
   poly m1 = NULL;
   poly m2 = NULL;
@@ -144,29 +111,6 @@ poly spolyRing2toM(poly f, poly g, ring r) {
   pDelete(&m1);
   pDelete(&m2);
   return(sp);
-}
-
-poly ringNF(poly f, ideal G, ring r) {
-  // If f = 0, then normal form is also 0
-  if (f == NULL) { return NULL; }
-  poly h = pCopy(f);
-  int i = findRing2toMsolver(h, G, r);
-  int c = 1;
-  while (h != NULL && i >= 0) {
-    // Print("%d-step NF - h:", c);
-    // wrp(h);
-    // PrintS(" ");
-    // PrintS("G->m[i]:");
-    // wrp(G->m[i]);
-    // PrintLn();
-    h = spolyRing2toM(h, G->m[i], r);
-    // PrintS("=> h=");
-    // wrp(h);
-    // PrintLn();
-    i = findRing2toMsolver(h, G, r);
-    c++;
-  }
-  return h;
 }
 
 poly ringRedNF (poly f, ideal G, ring r) {
@@ -186,6 +130,66 @@ poly ringRedNF (poly f, ideal G, ring r) {
       h = pAdd(h, pHead(g));
       pLmDelete(&g);
     }
+    c++;
+  }
+  return h;
+}
+
+#endif
+
+#ifdef HAVE_RINGS
+
+/*
+ * Find an index i from G, such that
+ * LT(rside) = x * LT(G[i]) has a solution
+ * or -1 if rside is not in the
+ * ideal of the leading coefficients
+ * of the suitable g from G.
+ */
+int findRingSolver(poly rside, ideal G, ring r) {
+  if (rside == NULL) return -1;
+  int i;
+//  int iO2rside = indexOf2(pGetCoeff(rside));
+  for (i = 0; i < IDELEMS(G); i++) {
+    if // (indexOf2(pGetCoeff(G->m[i])) <= iO2rside &&    / should not be necessary any more
+       (p_LmDivisibleBy(G->m[i], rside, r)) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+poly plain_spoly(poly f, poly g) {
+  number cf = pGetCoeff(f), cg = pGetCoeff(g);
+  int ct = ksCheckCoeff(&cf, &cg); // gcd and zero divisors
+  poly fm, gm;
+  k_GetLeadTerms(f, g, currRing, fm, gm, currRing);
+  pSetCoeff0(fm, cg);
+  pSetCoeff0(gm, cf);  // and now, m1 * LT(p1) == m2 * LT(p2)
+  poly sp = pSub(pMult_mm(f, fm), pMult_mm(g, gm));
+  pDelete(&fm);
+  pDelete(&gm);
+  return(sp);
+}
+
+poly ringNF(poly f, ideal G, ring r) {
+  // If f = 0, then normal form is also 0
+  if (f == NULL) { return NULL; }
+  poly h = pCopy(f);
+  int i = findRingSolver(h, G, r);
+  int c = 1;
+  while (h != NULL && i >= 0) {
+    Print("%d-step NF - h:", c);
+    wrp(h);
+    PrintS(" ");
+    PrintS("G->m[i]:");
+    wrp(G->m[i]);
+    PrintLn();
+    h = plain_spoly(h, G->m[i]);
+    PrintS("=> h=");
+    wrp(h);
+    PrintLn();
+    i = findRingSolver(h, G, r);
     c++;
   }
   return h;

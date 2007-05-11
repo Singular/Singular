@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.16 2007-05-10 08:12:42 wienand Exp $ */
+/* $Id: polys.cc,v 1.17 2007-05-11 10:48:04 wienand Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -109,7 +109,7 @@ poly pDivide(poly a, poly b)
   return result;
 }
 
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS   //TODO Oliver
 #define pDiv_nn(p, n)              p_Div_nn(p, n, currRing)
 
 poly p_Div_nn(poly p, const number n, const ring r)

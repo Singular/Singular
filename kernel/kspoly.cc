@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.10 2007-05-10 08:12:40 wienand Exp $ */
+/* $Id: kspoly.cc,v 1.11 2007-05-11 10:48:03 wienand Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -13,7 +13,7 @@
 #include "p_polys.h"
 #include "p_Procs.h"
 #include "gring.h"
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS
 #include "polys.h"
 #endif
 
@@ -213,7 +213,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   else
     a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, tailRing,last);
 #ifdef HAVE_RINGS
-  if (rField_is_Ring(currRing)) l2 = pLength(a2);
+  if (rField_is_Ring(currRing) && !(rField_is_Domain(currRing))) l2 = pLength(a2);
 #endif
 
   Pair->SetLmTail(m2, a2, l2, use_buckets, tailRing, last);

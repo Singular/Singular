@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.8 2007-05-10 08:12:43 wienand Exp $ */
+/* $Id: rmodulo2m.cc,v 1.9 2007-05-11 10:48:05 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -69,14 +69,14 @@ number nr2mGcd (number a,number b,ring r)
     b = (number) ((NATNUMBER) b / 2);
     res++;
   }
-  if ((NATNUMBER) b % 2 == 0)
-  {
-    return (number) ((1L << res));// * (NATNUMBER) a);  // (2**res)*a    a ist Einheit
-  }
-  else
-  {
+//  if ((NATNUMBER) b % 2 == 0)
+//  {
+//    return (number) ((1L << res));// * (NATNUMBER) a);  // (2**res)*a    a ist Einheit
+//  }
+//  else
+//  {
     return (number) ((1L << res));// * (NATNUMBER) b);  // (2**res)*b    b ist Einheit
-  }
+//  }
 }
 
 void nr2mPower (number a, int i, number * result)
@@ -162,6 +162,33 @@ BOOLEAN nr2mDivBy (number a,number b)
     b = (number) ((NATNUMBER) b / 2);
 }
   return ((NATNUMBER) b % 2 == 1);
+}
+
+int nr2mComp(number as, number bs)
+{
+  NATNUMBER a = (NATNUMBER) as;
+  NATNUMBER b = (NATNUMBER) bs;
+  assume(a != 0 && b != 0);
+  while (a % 2 == 0 && b % 2 == 0)
+  {
+    a = a / 2;
+    b = b / 2;
+  }
+  if (a % 2 == 0)
+  {
+    return -1;
+  }
+  else
+  {
+    if (b % 2 == 1)
+    {
+      return 0;
+    }
+    else
+    {
+      return 1;
+    }
+  }
 }
 
 BOOLEAN nr2mGreaterZero (number k)
@@ -270,10 +297,14 @@ number nr2mIntDiv (number a,number b)
 {
   if ((NATNUMBER)a==0)
   {
-    return (number) 0;
+    if ((NATNUMBER)b==0)
+      return (number) 1;
+    return (number) (nr2mModul / (NATNUMBER) b);
   }
   else
   {
+    if ((NATNUMBER)b==0)
+      return (number) 0;
     return (number) ((NATNUMBER) a / (NATNUMBER) b);
   }
 }

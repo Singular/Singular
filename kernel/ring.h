@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.19 2007-05-10 08:12:43 wienand Exp $ */
+/* $Id: ring.h,v 1.20 2007-05-11 10:48:05 wienand Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -100,7 +100,10 @@ inline BOOLEAN rField_is_Ring_ModN(ring r=currRing)
 
 #ifdef HAVE_RINGS
 inline BOOLEAN rField_is_Ring(ring r=currRing)
-{ return (r->ringtype > 0); }
+{ return (r->ringtype != 0); }
+
+inline BOOLEAN rField_is_Domain(ring r=currRing)
+{ return (r->ringtype < 0); }
 #endif
 
 #ifdef HAVE_RINGS

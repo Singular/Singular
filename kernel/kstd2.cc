@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.43 2007-05-10 08:12:41 wienand Exp $ */
+/* $Id: kstd2.cc,v 1.44 2007-05-11 10:48:03 wienand Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -309,8 +309,10 @@ poly kFindDivisibleByZeroPoly(LObject* h)
 {
   return kFindZeroPoly(h->GetLmCurrRing(), currRing, h->tailRing);
 }
+#endif
 
-#ifdef HAVE_RING2TOM
+
+#ifdef HAVE_RINGS
 /*2
 *  reduction procedure for the ring Z/2^m
 */
@@ -337,6 +339,7 @@ int redRing2toM (LObject* h,kStrategy strat)
   loop
   {
 #ifdef HAVE_VANGB
+#ifdef HAVE_RING2TOM
     zeroPoly = kFindDivisibleByZeroPoly(h);
     if (zeroPoly != NULL)
     {
@@ -361,6 +364,7 @@ int redRing2toM (LObject* h,kStrategy strat)
     }
     else
 #endif
+#endif
     {
       j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
       if (j < 0) return 1;
@@ -382,11 +386,13 @@ int redRing2toM (LObject* h,kStrategy strat)
 
     ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
 #ifdef HAVE_VANGB
+#ifdef HAVE_RING2TOM
     if (zeroPoly != NULL)
     {
       // TODO Free memory of zeropoly and last element of L
       strat->tl--;
     }
+#endif
 #endif
 
 #ifdef KDEBUG
@@ -436,7 +442,6 @@ int redRing2toM (LObject* h,kStrategy strat)
     }
   }
 }
-#endif
 #endif
 
 /*2
@@ -1087,7 +1092,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
 #ifdef KDEBUG
     loop_count++;
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS
     if (TEST_OPT_DEBUG) PrintS("--- next step ---\n");
 #endif
     if (TEST_OPT_DEBUG) messageSets(strat);
@@ -1213,11 +1218,11 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // enter into S, L, and T
       //if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
         enterT(strat->P, strat);
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS
 #ifdef HAVE_VANGB
       int at_R = strat->tl;
 #endif
-      if (rField_is_Ring_2toM(currRing))
+      if (rField_is_Ring(currRing))
         superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
       else
 #endif

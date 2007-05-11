@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.19 2007-05-10 08:12:41 wienand Exp $ */
+/* $Id: kstd1.cc,v 1.20 2007-05-11 10:48:03 wienand Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1007,8 +1007,8 @@ void initBba(ideal F,kStrategy strat)
     strat->LazyPass *=4;
     strat->red = redHomog;
   }
-#ifdef HAVE_RING2TOM
-  if (rField_is_Ring_2toM(currRing)) {
+#ifdef HAVE_RINGS  //TODO Oliver
+  if (rField_is_Ring(currRing)) {
     strat->red = redRing2toM;
   }
 #endif

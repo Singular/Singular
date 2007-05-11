@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.9 2006-03-28 12:56:06 Singular Exp $ */
+/* $Id: polys.h,v 1.10 2007-05-11 10:48:05 wienand Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -250,7 +250,7 @@ extern poly pHeadProc(poly p);
 #define   pIsPurePower(p)   p_IsPurePower(p, currRing)
 #define   pIsVector(p)      (pGetComp(p)>0)
 
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS
 /*
  * Test stuff for dev OLIVER
  */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.2 2007-05-10 08:12:43 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.3 2007-05-11 10:48:05 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -161,6 +161,15 @@ BOOLEAN nrnGreater (number a,number b)
   nrnDivBy(a, b);
 }
 
+int nrnComp(number a, number b)
+{
+   NATNUMBER bs = XSGCD2((NATNUMBER) b, nrnModul);
+   NATNUMBER as = XSGCD2((NATNUMBER) a, nrnModul);
+   if (bs == as) return 0;
+   if (as % bs == 0) return 1;
+   return -1;
+}
+
 BOOLEAN nrnDivBy (number a,number b)
 {
   return (XSGCD2((NATNUMBER) b / XSGCD2((NATNUMBER) a, (NATNUMBER) b), nrnModul) == 1);
@@ -266,10 +275,14 @@ number nrnIntDiv (number a,number b)
 {
   if ((NATNUMBER)a==0)
   {
-    return (number) 0;
+    if ((NATNUMBER)b==0)
+      return (number) 1;
+    return (number) ( nrnModul / (NATNUMBER) b);
   }
   else
   {
+    if ((NATNUMBER)b==0)
+      return (number) 0;
     return (number) ((NATNUMBER) a / (NATNUMBER) b);
   }
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.32 2007-05-10 08:12:40 wienand Exp $ */
+/* $Id: kbuckets.cc,v 1.33 2007-05-11 10:48:03 wienand Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -584,8 +584,8 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
 #ifdef USE_COEF_BUCKETS
       if (i<coef_start)
         bucket->buckets[i] = p_Mult_nn(bucket->buckets[i], n, r);
-#ifdef HAVE_RING2TOM
-        if (r->cring == 1) {
+#ifdef HAVE_RINGS
+        if (rField_is_Ring(r) && !(rField_is_Domain(r))) {
           bucket->buckets_length[i] = pLength(bucket->buckets[i]);
           kBucketAdjust(bucket, i);
         }
@@ -609,7 +609,7 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
 #else
       bucket->buckets[i] = p_Mult_nn(bucket->buckets[i], n, r);
 #ifdef HAVE_RINGS
-      if (rField_is_Ring(currRing)) {
+      if (rField_is_Ring(currRing) && !(rField_is_Domain(currRing))) {
         bucket->buckets_length[i] = pLength(bucket->buckets[i]);
         kBucketAdjust(bucket, i);
       }
@@ -739,7 +739,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
     bucket->buckets[i] = NULL;
     bucket->buckets_length[i] = 0;
 #ifdef HAVE_RINGS
-    if (rField_is_Ring(currRing))
+    if (rField_is_Ring(currRing) && !(rField_is_Domain(currRing)))
     {
       l1 = pLength(p1);
       assume(pLength(p1) == l1);
@@ -759,7 +759,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
     else {
       p1 = r->p_Procs->pp_Mult_mm(p1, m, r, last);
 #ifdef HAVE_RINGS
-      if (rField_is_Ring(currRing))
+      if (rField_is_Ring(currRing) && !(rField_is_Domain(currRing)))
       {
         l1 = pLength(p1);
         i = pLogLength(l1);

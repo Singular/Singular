@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.8 2007-05-10 08:12:42 wienand Exp $ */
+/* $Id: numbers.cc,v 1.9 2007-05-11 10:48:04 wienand Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -47,6 +47,7 @@ number (*nRePart)(number a);
 number (*nImPart)(number a);
 #ifdef HAVE_RINGS
 BOOLEAN (*nDivBy)(number a,number b);
+int     (*nComp)(number a,number b);
 #endif
 BOOLEAN (*nGreater)(number a,number b);
 BOOLEAN (*nEqual)(number a,number b);
@@ -104,6 +105,7 @@ number nd_Copy(number a,const ring r) { return r->cf->nCopy(a); }
 
 #ifdef HAVE_RINGS
 BOOLEAN ndDivBy(number a, number b) { return TRUE; }
+int ndComp(number a, number b) { return 0; }
 #endif
 
 /*2
@@ -180,6 +182,7 @@ void nSetChar(ring r)
   nInvers= r->cf->nInvers;
   nCopy  = r->cf->nCopy;
 #ifdef HAVE_RINGS
+  nComp  = r->cf->nComp;
   nDivBy = r->cf->nDivBy;
 #endif
   nGreater = r->cf->nGreater;
@@ -261,6 +264,7 @@ void nInitChar(ring r)
   n->nGcd  = ndGcd;
   n->nLcm  = ndGcd; /* tricky, isn't it ?*/
 #ifdef HAVE_RINGS
+  n->nComp = ndComp;
   n->nDivBy = ndDivBy;
 #endif
   if (rField_is_Extension(r))
@@ -319,6 +323,7 @@ void nInitChar(ring r)
      n->nNeg   = nr2mNeg;
      n->nInvers= nr2mInvers;
      n->nDivBy = nr2mDivBy;
+     n->nComp = nr2mComp;
      n->nGreater = nr2mGreater;
      n->nEqual = nr2mEqual;
      n->nIsZero = nr2mIsZero;
@@ -356,6 +361,7 @@ void nInitChar(ring r)
      n->nNeg   = nrnNeg;
      n->nInvers= nrnInvers;
      n->nDivBy = nrnDivBy;
+     n->nComp = nrnComp;
      n->nGreater = nrnGreater;
      n->nEqual = nrnEqual;
      n->nIsZero = nrnIsZero;

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.22 2007-03-29 11:34:52 Singular Exp $ */
+/* $Id: kutil.h,v 1.23 2007-05-11 10:48:04 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -396,14 +396,16 @@ poly redNF (poly h,int & max_ind,kStrategy strat);
 int redNF0 (LObject *P,kStrategy strat);
 poly redNFTail (poly h,const int sl,kStrategy strat);
 int redHoney (LObject* h, kStrategy strat);
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS
 int redRing2toM (LObject* h,kStrategy strat);
-long ind2(long arg);
-long ind_fact_2(long arg);
-long twoPow(long arg);
 void enterExtendedSpoly(poly h,kStrategy strat);
 void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR = -1);
 poly kCreateZeroPoly(long exp[], long cabsind, poly* t_p, ring leadRing, ring tailRing);
+#endif
+#ifdef HAVE_RING2TOM
+long ind2(long arg);
+long ind_fact_2(long arg);
+long twoPow(long arg);
 ideal createG0();
 #endif
 int redLazy (LObject* h,kStrategy strat);
@@ -547,7 +549,7 @@ int ksReducePoly(LObject* PR,
                  number *coef = NULL,
                  kStrategy strat = NULL);
 
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RING2TOM_OLD
 // same for rings
 int ksRingReducePoly(LObject* PR,
                  TObject* PW,
