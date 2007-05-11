@@ -345,7 +345,7 @@ install-bindist-plural: install-bindist
 ##
 mostlyclean: 
 	-rm -f p_Procs_*.inc
-	-rm -f *.o *.og core *.op *.ob *.ot *.od *_d.cc *_d.c p_Procs *.oa *.dl_o* *.so*
+	-rm -f *.o *.og core *.op *.ob *.ot *.od p_Procs *.oa *.dl_o* *.so*
 
 clean: mostlyclean
 	-rm -f *.bak *.d *.dd depend

@@ -518,7 +518,7 @@ uninstallbin:
 ##
 mostlyclean: 
 	-rm -f Singular Singular-static Singulara Singularg Singularp Singularb libparse feOpt*.inc
-	-rm -f *.o *.og core *.op *.ob *.ot Singulart *.od *_d.cc *_d.c  *.so*
+	-rm -f *.o *.og core *.op *.ot Singulart *.od *.so* *.dl_o*
 	-rm -f ESingular* TSingular*
 
 clean: mostlyclean
