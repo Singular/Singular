@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: realrad.lib,v 1.2 2007-04-13 14:24:28 spang Exp $";
+version="$Id: realrad.lib,v 1.3 2007-05-11 08:21:53 spang Exp $";
 category="real algebra";
 info="
 LIBRARY:  realrad.lib   Computation of real radicals
@@ -495,7 +495,7 @@ proc decision(poly f)
          1 if f is positive semidefinite  0 if f is indefinite
 EXAMPLE: decision shows an example
 {
-   string ri,lessvar,perm;
+   string ri,lessvar,parvar,perm;
    ideal jac;
    list varlist,buffer,isol,@s,lhelp,lhelp1,lfac,worklist;
    poly p,g;
@@ -554,7 +554,8 @@ EXAMPLE: decision shows an example
      lessvar=lessvar+","+string(varlist[@z]);
    }
    lessvar=lessvar[2..size(lessvar)];
-   ri="ring r_neu="+charstr(r)+",(@t,"+string(var(n))+","+lessvar+"),dp;";
+   parvar=string(var(n));
+   ri="ring r_neu="+charstr(r)+",(@t,"+parvar+","+lessvar+"),dp;";
    execute(ri);
    poly f=imap(r,f);
    list varlist=imap(r,varlist);
@@ -637,7 +638,7 @@ EXAMPLE: decision shows an example
      {
        l[zz,n-zz]=1;
      }
-     ri="ring rcoef="+"(0,@t,"+varstr(r)[2*n-1]+"),
+     ri="ring rcoef="+"(0,@t,"+parvar+"),
      ("+lessvar+"),M(l);";
      execute(ri);
      kill l;
@@ -658,7 +659,7 @@ EXAMPLE: decision shows an example
    ///////////found polynomial p /////////////////////////////////////////////
    ///////////////////////////////////////////////////////////////////////////
    //Compute an isolating set for p
-   ri="ring iso="+charstr(r)+","+varstr(r)[2*n-1]+",lp;";
+   ri="ring iso="+charstr(r)+","+parvar+",lp;";
    execute(ri);
    poly p=imap(r,p);
    isol=isolset(p);
