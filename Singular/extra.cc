@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.253 2007-03-12 14:13:22 levandov Exp $ */
+/* $Id: extra.cc,v 1.254 2007-05-11 10:50:40 wienand Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -54,7 +54,7 @@
 #include "prCopy.h"
 #include "mpr_complex.h"
 
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS
 #include "ringgb.h"
 #endif
 
@@ -2541,17 +2541,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return(FALSE);
     }
     else
-    if (strcmp(sys_cmd, "NF_ring")==0)
-    {
-      ring r = currRing;
-      poly f = (poly) h->Data();
-      h = h->next;
-      ideal G = (ideal) h->Data();
-      res->rtyp=POLY_CMD;
-      res->data=(poly) ringNF(f, G, r);
-      return(FALSE);
-    }
-    else
     if (strcmp(sys_cmd, "redNF_ring")==0)
     {
       ring r = currRing;
@@ -2563,7 +2552,20 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return(FALSE);
     }
     else
+#endif
+#ifdef HAVE_RINGS
 /*==================== Testing groebner basis =================*/
+    if (strcmp(sys_cmd, "NF_ring")==0)
+    {
+      ring r = currRing;
+      poly f = (poly) h->Data();
+      h = h->next;
+      ideal G = (ideal) h->Data();
+      res->rtyp=POLY_CMD;
+      res->data=(poly) ringNF(f, G, r);
+      return(FALSE);
+    }
+    else
     if (strcmp(sys_cmd, "spoly")==0)
     {
       poly f = pCopy((poly) h->Data());
