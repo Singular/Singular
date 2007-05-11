@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ringgb.h,v 1.6 2007-05-11 10:48:05 wienand Exp $ */
+/* $Id: ringgb.h,v 1.7 2007-05-11 10:56:03 wienand Exp $ */
 /*
 * ABSTRACT: ringgb interface
 */
