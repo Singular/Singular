@@ -1,0 +1,657 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$Id: discretize.lib,v 1.1 2007-05-13 19:27:53 levandov Exp $";
+category="Applications";
+info="
+LIBRARY: discretize.lib  Tools for the finite difference schemes
+AUTHORS: Viktor Levandovskyy,     levandov@risc.uni-linz.ac.at
+
+THEORY: presentation of difference operator polys in a polynomial, semi-factorized and nodal form.
+
+PROCEDURES:
+decoef(P,n);  decompose poly P into summands with respect to the number n
+difpoly2tex(S,P[,Q]); present the difference scheme in the nodal form
+
+AUXILIARY PROCEDURES:
+exp2pt(P[,L]); convert a polynomial M into the TeX format, in nodal form
+mon2pt(P[,L]); convert a monomial M into the TeX format, in nodal form
+texcoef(n);  converts the number n into TeX
+npar(n); search for 'n' among the parameters and returns its number
+magnitude(P); compute the square of the magnitude of a complex expression
+replace(s,what,with);  replace in s all the substrings with a given string
+xchange(w,a,b); exchange two substrings of a string 
+par2tex(s);     convert special characters to TeX in s
+";
+
+
+LIB "latex.lib";
+LIB "poly.lib";
+
+// 1. GLOBAL ASSUME: in the ring we have first Tx, then Tt: [FIXED, not needed anymore]!
+// 2. map vars other than Tx,Tt to parameters instead or just ignore them [?]
+// 3. clear the things with brackets
+// 4. todo: content resp lcmZ, gcdZ
+
+proc xchange(string where, string a, string b)
+"USAGE:  xchange(w,a,b);  w,a,b strings
+RETURN:  string
+PURPOSE:  exchanges substring 'a' with a substring 'b' in the string w
+NOTE:   
+EXAMPLE: example xchange; shows examples
+"{
+  // replaces a<->b in where
+  // assume they are of the same size [? seems to work]
+  string s = "H";
+  string t;
+  t = replace(where,a,s);
+  t = replace(t,b,a);
+  t = replace(t,s,b);
+  return(t);
+}
+example
+{
+ " EXAMPLE:"; echo=2;
+ ring r = (0,dt,dh,A),Tt,dp;
+ poly p = (Tt*dt+dh+1)^2+2*A;
+ string s = texpoly("",p);
+ s;
+ string t = xchange(s,"dh","dt");
+ t;
+}
+
+proc par2tex(string s)
+"USAGE:  par2tex(s);  s a string
+RETURN:  string
+PURPOSE: converts special characters to TeX in s
+NOTE: the convention is the following: Tx goes to T_x, dx to tri x (the same for t,y,z). Moreover, some parameters (theta,ro,A,V) are converted to greek letters.
+EXAMPLE: example par2tex; shows examples
+"{
+// s is a tex string with a poly
+// replace theta with \theta
+// A with \lambda
+// dt with \tri t
+// dh with \tri h
+// Tx with T_x, Ty with T_y
+// Tt with T_t
+// V with \nu
+// ro with \rho
+// dx with \tri x
+// dy with \tri y
+  string t = s;
+  t = replace(t,"Tt","T_t");
+  t = replace(t,"Tx","T_x");
+  t = replace(t,"Ty","T_y");
+  t = replace(t,"dt","\\tri t");
+  t = replace(t,"dh","\\tri h");
+  t = replace(t,"dx","\\tri x");
+  t = replace(t,"dy","\\tri y");
+  t = replace(t,"theta","\\theta");
+  t = replace(t,"A","\\lambda");
+  t = replace(t,"V","\\nu");
+  t = replace(t,"ro","\\rho");
+  return(t);
+}
+example
+{
+ " EXAMPLE:"; echo=2;
+ ring r = (0,dt,theta,A),Tt,dp;
+ poly p = (Tt*dt+theta+1)^2+2*A;
+ string s = texfactorize("",p);
+ s; 
+ par2tex(s);
+ string T = texfactorize("",p*(-theta*A)); 
+ par2tex(T);
+}
+
+proc replace(string s, string what, string with)
+"USAGE:  replace(s,what,with);  s,what,with strings
+RETURN:  string
+PURPOSE: replaces in 's' all the substrings 'what' with substring 'with'
+NOTE: the convention is the follopwing: Tx goes to T_x, dx to tri x (the same for t,y,z). Moreover, some parameters (theta,ro,A,V) are converted to greek letters.
+EXAMPLE: example replace; shows examples
+"{
+  // clear: replace in s, "what" with "with"
+  int ss = size(s);
+  int cn = find(s,what);
+  if ( (cn==0) || (cn>ss))
+  {
+    return(s);
+  }
+  int gn = 0; // global counter
+  int sw = size(what);
+  int swith = size(with);
+  string out="";
+  string tmp;
+  gn  = 0;   
+  while(cn!=0)
+  {
+//    "cn:";    cn;
+//    "gn";    gn;
+    tmp = "";
+    if (cn>gn)
+    {
+      tmp = s[gn..cn-1];
+    }
+//    "tmp:";tmp;
+    out = out+tmp+" "+with;    
+//    "out:";out;
+    gn  = cn + sw;
+    if (gn>ss)
+    {
+      // ( (gn>ss) || ((sw>1) && (gn >= ss)) )
+      // no need to append smth
+      return(out);
+    }
+//     if (gn == ss)
+//     {
+      
+//     }
+    cn  = find(s,what,gn);
+  }
+  // and now, append the rest of s
+  out = out + " "+ s[gn..ss];
+  return(out);
+}
+example
+{
+ " EXAMPLE:"; echo=2;
+ ring r = (0,dt,theta),Tt,dp;
+ poly p = (Tt*dt+theta+1)^2+2;
+ string s = texfactorize("",p);
+ s;
+ s = replace(s,"Tt","T_t"); s;
+ s = replace(s,"dt","\\tri t"); s; 
+ s = replace(s,"theta","\\theta"); s; 
+}
+
+proc exp2pt(poly P, list #)
+"USAGE:  exp2pt(P[,L]);  P poly, L an optional list of strings
+RETURN:  string
+PURPOSE: convert a polynomial M into the TeX format, in nodal form
+ASSUME: coefficients must not be fractional
+NOTE: an optional list L contains a string, which will replace the default
+value 'u' for the discretized function
+EXAMPLE: example exp2pt; shows examples
+"{
+// given poly in vars [now Tx,Tt are fixed], 
+// create Tex expression for points of lattice 
+// coeffs must not be fractional
+  string varnm = "u";
+  if (size(#) > 0)
+  {
+    if (typeof(#[1])=="string")
+    {
+      varnm = string(#[1]);
+    }
+  }
+  //  varnm;
+  string rz,mz;
+  while (P!=0)
+  {
+    mz = mon2pt(P,varnm);
+    if (mz[1]=="-")
+    {
+      rz = rz+mz;
+    }
+    else
+    {
+      rz = rz + "+" + mz;
+    }
+    P = P-lead(P);    
+  }
+  rz  = rz[2..size(rz)];
+  return(rz);
+}
+example
+{
+  " EXAMPLE:"; echo=2;
+  ring r = (0,dh,dt),(Tx,Tt),dp;
+  poly M = (4*dh*Tx^2+1)*(Tt-1)^2;
+  print(exp2pt(M));
+  print(exp2pt(M,"F"));
+}
+
+proc mon2pt(poly M, string V)
+"USAGE:  mon2pt(M,V);  M poly, V a string
+RETURN:  string
+PURPOSE: convert a monomial M into the TeX format, nodal form
+EXAMPLE: example mon2pt; shows examples
+"{
+  // searches for Tx, then Tt
+  // monomial to the lattice point conversion
+  // c*X^a*Y^b --> c*U^{n+a}_{j+b}
+  number cM = leadcoef(M);
+  intvec e = leadexp(M);
+  //  int a = e[2]; // convention: first Tx, then Tt
+  //  int b = e[1];
+  int i;
+  int a , b, c = 0,0,0;
+  int ia,ib,ic = 0,0,0;
+  int nv = nvars(basering);
+  string s;
+  for (i=1; i<=nv ; i++)
+  {
+    s = string(var(i));
+    if (s=="Tt") { a = e[i]; ia = i;}
+    if (s=="Tx") { b = e[i]; ib = i;}
+    if (s=="Ty") { c = e[i]; ic = i;}
+  }
+  //  if (ia==0) {"Error:Tt not found!"; return("");}
+  //  if (ib==0) {"Error:Tx not found!"; return("");}
+  //  if (ic==0)   {"Error:Ty not found!"; return("");}
+  //  string tc = texobj("",c); // why not texpoly?
+  string tc = texcoef(cM);
+  string rs;
+  if (cM==-1)
+  {
+    rs = "-";
+  }
+  if (cM^2 != 1)
+  {
+// we don't need 1 or -1 as coeffs
+//    rs = clTex(tc)+" ";
+//    rs = par2tex(rmDol(tc))+" ";
+    rs = par2tex(tc)+" ";
+  }
+// a = 0 or b = 0
+  rs = rs + V +"^{n";
+  if (a!=0)
+  {
+    rs = rs +"+"+string(a);
+  }
+  rs = rs +"}_{j";
+  if (b!=0)
+  {
+    rs = rs +"+"+string(b);
+  }
+  if (c!=0)
+  {
+    rs = rs + ",k+";
+    rs = rs + string(c);
+  }
+  rs = rs +"}";
+  return(rs);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+  ring r = (0,dh,dt),(Tx,Tt),dp;
+  poly M = (4*dh^2-dt)*Tx^3*Tt;
+  print(mon2pt(M,"u"));
+  poly N = ((dh-dt)/(dh+dt))*Tx^2*Tt^2;
+  print(mon2pt(N,"f"));
+  ring r2 = (0,dh,dt),(Tx,Ty,Tt),dp;
+  poly M  = (4*dh^2-dt)*Tx^3*Ty^2*Tt;
+  print(mon2pt(M,"u"));
+}
+
+proc npar(number n)
+"USAGE:  npar(n);  n a number
+RETURN:  int
+PURPOSE: searches for 'n' among the parameters and returns its number
+EXAMPLE: example npar; shows examples
+"{
+  // searches for n amongst parameters
+  // and returns its number
+  int i,j=0,0;  
+  list L = ringlist(basering);
+  list M = L[1][2]; // pars
+  string sn = string(n);
+  sn = sn[2..size(sn)-1];
+  for (i=1; i<=size(M);i++)
+  {
+    if (M[i] == sn) 
+    {
+      j = i;
+    }
+  }
+  if (j==0)
+  { 
+    "Incorrect parameter";
+  } 
+  return(j);
+}
+example
+{
+ "EXAMPLE:"; echo=2;
+  ring r = (0,dh,dt,theta,A),t,dp;
+  npar(dh); 
+  number T = theta;
+  npar(T);
+  npar(dh^2);
+}
+
+proc decoef(poly P, number n)
+"USAGE:  decoef(P,n);  P a poly, n a number
+RETURN:  ideal
+PURPOSE:  decompose poly P into summands with respect
+to the  presence of a number n in the coefficients
+NOTE:    n is usually a parameter with no power
+EXAMPLE: example decoef; shows examples
+"{
+  // decomposes poly into summands 
+  // wrt the presence of a number n in coeffs
+  // returns ideal
+  def br = basering;
+  int i,j=0,0;
+  int pos = npar(n);
+  if ((pos==0) || (P==0))
+  {
+    return(0);
+  }
+  pos = pos + nvars(basering);
+// map all pars except to vars, provided no things are in denominator
+  number con = content(P);
+  con = numerator(con);
+  P = cleardenom(P); //destroys content!
+  P = con*P; // restore the numerator part of the content
+  list M = ringlist(basering);
+  list L = M[1..4];
+  list Pars = L[1][2];
+  list Vars = L[2] + Pars;
+  L[1] = L[1][1]; // characteristic
+  L[2] = Vars;
+  // for non-comm things: don't need nc but graded algebra
+  //  list templ;
+  //  L[5] = templ;
+  //  L[6] = templ;
+  def @R = ring(L);
+  setring @R;
+  poly P = imap(br,P);
+  poly P0 = subst(P,var(pos),0);
+  poly P1 = P - P0; 
+  ideal I = P0,P1;
+  setring br;
+  ideal I = imap(@R,I);
+  kill @R;
+  // check: P0+P1==P
+  poly Q = I[1]+I[2];
+  if (P!=Q)
+  {
+    "Warning: problem in decoef";
+  }
+  return(I);
+// substract the pure part from orig and check if n is remained there
+}
+example
+{
+ " EXAMPLE:"; echo=2;
+  ring r = (0,dh,dt),(Tx,Tt),dp;
+  poly P = (4*dh^2-dt)*Tx^3*Tt + dt*dh*Tt^2 + dh*Tt;
+  decoef(P,dt);
+  decoef(P,dh);
+}
+
+proc texcoef(number n)
+"USAGE:  texcoef(n);  n a number
+RETURN:  string
+PURPOSE:  converts the number n into TeX format
+NOTE: if n is a polynomial, texcoef adds extra brackets.
+@* Performs some space substitutions
+EXAMPLE: example texcoef; shows examples
+"{
+  // makes tex from n
+  // and uses substitutions
+  // if n is a polynomial, adds brackets
+  number D  = denominator(n);
+  int DenIsOne = 0;
+  if ( D==number(1) ) 
+  { 
+    DenIsOne = 1;
+  }
+  string sd = texpoly("",D);
+  sd = rmDol(sd);
+  sd = par2tex(sd);
+  number N  = numerator(n);
+  string sn = texpoly("",N);
+  sn = rmDol(sn); 
+  sn = par2tex(sn);
+  string sout=""; 
+  int i;
+  int NisPoly = 0;
+  if (DenIsOne)
+  {
+    sout = sn;
+    for(i=1; i<=size(sout); i++)
+    {
+      if ( (sout[i]=="+") || (sout[i]=="-") )
+      {
+	NisPoly = 1;
+      }
+    }
+    if (NisPoly)
+    {
+      sout = "("+sout+")";
+    }
+  }
+  else
+  {
+    sout = "\\frac{"+sn+"}{"+sd+"}";
+  }
+  return(sout);
+}
+example
+{
+ " EXAMPLE:"; echo=2;
+  ring r = (0,dh,dt),(Tx,Tt),dp;
+  number n1,n2,n3 = dt/(4*dh^2-dt),(dt+dh)^2, 1/dh;
+  n1; texcoef(n1);
+  n2; texcoef(n2);
+  n3; texcoef(n3);
+}
+
+proc rmDol(string s)
+{
+  // removes $s and _no_ (s on appearance
+  int i = size(s);
+  if (s[1] == "$") { s = s[2..i]; i--;}
+  if (s[1] == "(") { s = s[2..i]; i--;}
+  if (s[i] == "$") { s = s[1..i-1]; i--;}
+  if (s[i] == ")") { s = s[1..i-1];}
+  return(s);
+}
+
+proc difpoly2tex(ideal S, list P, list #)
+"USAGE:  difpoly2tex(S,P[,Q]);  S an ideal, P and optional Q are lists
+RETURN:  string
+PURPOSE: present the difference scheme in the nodal form
+ASSUME: ideal S is the result of 'decoef' procedure
+NOTE: a list P may be empty or may contain parameters, which will not
+appear in denominators
+@* an optional list Q represents the part of the scheme, depending
+on other function, than the major part
+EXAMPLE: example difpoly2tex; shows examples
+"
+{
+  // S = sum s_i = orig diff poly or
+  // the result of decoef
+  // P = list of pars (numbers) not to be divided with, may be empty
+  // # is an optional list of polys, repr. the part dep. on "f", not on "u"
+  //  S = simplify(S,2); // destroys the leadcoef
+  // rescan S and remove 0s from it
+  int i;
+  ideal T;
+  int ss = ncols(S);
+  int j=1;
+  for(i=1; i<=ss; i++)
+  {
+    if (S[i]!=0)
+    {
+      T[j]=S[i];
+      j++;
+    }
+  }
+  S  = T;
+  ss = j-1; 
+  int GotF = 1;
+  list F;
+  if (size(#)>0)
+  {
+    F = #;
+    if ( (size(F)==1) && (F[1]==0) )
+    {
+      GotF = 0;
+    }
+  }
+  else
+  {
+    GotF = 0;
+  }
+  int sf = size(F);
+
+  ideal SC;
+  int  sp = size(P);
+  intvec np;
+  int GotP = 1;
+  if (sp==0)   
+  {
+    GotP = 0;
+  }
+  if (sp==1) 
+  { 
+    if (P[1]==0)
+    {
+      GotP = 0;
+    }
+  }
+  if (GotP)
+  {
+    for (i=1; i<=sp; i++)
+    {
+      np[i] = npar(P[i])+ nvars(basering);
+    }
+  }
+  for (i=1; i<=ss; i++)
+  {
+    SC[i] = leadcoef(S[i]);
+  }
+  if (GotF)
+  {
+    for (i=1; i<=sf; i++)
+    {
+      SC[ss+i] = leadcoef(F[i]);
+    }
+  }
+  def br = basering;
+// map all pars except to vars, provided no things are in denominator
+  list M = ringlist(basering);
+  list L = M[1..4]; // erase nc part
+  list Pars = L[1][2];
+  list Vars = L[2] + Pars;
+  L[1] = L[1][1]; // characteristic
+  L[2] = Vars;
+
+  def @R = ring(L);
+  setring @R;
+  ideal SC = imap(br,SC);
+  if (GotP)
+  {
+    for (i=1; i<=sp; i++)
+    {
+      SC = subst(SC,var(np[i]),1);
+    }
+  }
+  poly q=1;
+  q = lcm(q,SC);
+  setring br;
+  poly  q = imap(@R,q);
+  number lq = leadcoef(q);
+  //  lq;
+  number tmp;
+  string sout="";
+  string vname = "u";
+  for (i=1; i<=ss; i++)
+  {
+    tmp  = leadcoef(S[i]);
+    S[i] = S[i]/tmp;
+    tmp = tmp/lq;
+    sout = sout +"+ "+texcoef(tmp)+"\\cdot ("+exp2pt(S[i])+")";
+  }
+  if (GotF)
+  {
+    vname = "p"; //"f";
+    for (i=1; i<=sf; i++)
+    {
+      tmp  = leadcoef(F[i]);
+      F[i] = F[i]/tmp;
+      tmp = tmp/lq;
+      sout = sout +"+ "+texcoef(tmp)+"\\cdot ("+exp2pt(F[i],vname)+")";
+    }
+  }
+  sout = sout[3..size(sout)]; //rm first +
+  return(sout);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring r = (0,dh,dt,V),(Tx,Tt),dp;
+  poly M = (4*dh*Tx+dt)^2*(Tt-1) + V*Tt*Tx;
+  ideal I = decoef(M,dt);
+  list L; L[1] = V;
+  difpoly2tex(I,L);
+  poly G = V*dh^2*(Tt-Tx)^2;
+  difpoly2tex(I,L,G);
+}
+
+
+proc magnitude(poly P)
+"USAGE:  magnitude(P);  P a poly
+RETURN:  poly
+PURPOSE: compute the square of the magnitude of a complex expression
+ASSUME: i is the variable of a basering
+EXAMPLE: example magnitude; shows examples
+"
+{
+  // check whether i is present among the vars TODO
+  // assume i^2+1=0;
+  poly re = subst(P,i,0);
+  poly im = (P - re)/i;
+  return(re^2+im^2);
+}
+example
+{
+  "EXAMPLE:"; echo=2;
+  ring r = (0,d),(g,i,sin,cos),dp;
+  poly P = d*i*sin - g*cos +d^2;
+  magnitude(P);
+}
+
+
+proc clTex(string s)
+// removes beginning and ending $'s
+{
+  string t;
+  if (size(s)>2)
+  {
+    // why -3?
+     t = s[2..(size(s)-3)];
+  }
+  return(t);
+}
+
+proc ElimModComp(module M, int num)
+{
+  // check whether a curr.ord is elim-comp
+  string s = ordstr(basering);
+  int ns = size(s);
+  //  s[ns] = "c", "C"; 
+  if (s[1]="c")
+  {
+    // num last components
+  }
+  if (s[1]="C")
+  {
+    // num first components
+  }
+}
+
+
+proc simfrac(poly up, poly down)
+{
+  // simplifies a fraction up/down
+  // into the form up/down = RT[1] + RT[2]/down
+  list LL = division(up,down);
+  list RT;
+  RT[1] =  LL[1][1,1]; // integer part
+  RT[2] = L[2][1]; // new numerator
+  return(RT);
+}
