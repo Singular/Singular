@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.24 2007-02-24 15:15:26 Singular Exp $";
+version="$Id: nctools.lib,v 1.25 2007-05-13 18:29:43 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
 AUTHORS:   Levandovskyy V.,     levandov@mathematik.uni-kl.de,
 @*         Lobillo, F.J.,       jlobillo@ugr.es,
-@*           Rabelo, C.,          crabelo@ugr.es.
+@*         Rabelo, C.,          crabelo@ugr.es.
 
 SUPPORT: DFG (Deutsche Forschungsgesellschaft) and Metodos algebraicos y efectivos en grupos cuanticos, BFM2001-3141, MCYT, Jose Gomez-Torrecillas (Main researcher).
 
@@ -35,6 +35,7 @@ IsSCA()                 checks whether current ring is a super-commutative algeb
 LIB "ring.lib"; // for rootofUnity
 LIB "poly.lib"; // for newtonDiag
 LIB "general.lib"; // for sort
+// LIB "ncalg.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1203,20 +1204,20 @@ example
 }
 
 
-proc rightStd(ideal I)
-"USAGE:  rightStd(I); I an ideal
+proc rightStd(def I)
+"USAGE:  rightStd(I); I an ideal/ module
 PURPOSE: compute a right Groebner basis of I
-RETURN:  ideal
+RETURN:  the same type as input
 EXAMPLE: example rightStd; shows examples
 "
 {
   def A = basering;
   def Aopp = opposite(A);
   setring Aopp;
-  ideal Iopp = oppose(A,I);
-  ideal Jopp = std(Iopp);
+  def Iopp = oppose(A,I);
+  def Jopp = groebner(Iopp);
   setring A;
-  ideal J = oppose(Aopp,Jopp);
+  def J = oppose(Aopp,Jopp);
   return(J);
 }
 example
@@ -1232,4 +1233,109 @@ example
   ideal RI = rightStd(I);
   RI;
 }
+
+
+proc rightSyz(def I)
+"USAGE:  rightSyz(I); I an ideal/ module
+PURPOSE: compute a right syzygy module of I
+RETURN:  the same type as input
+EXAMPLE: example rightSyz; shows examples
+"
+{
+  def A = basering;
+  def Aopp = opposite(A);
+  setring Aopp;
+  def Iopp = oppose(A,I);
+  def Jopp = syz(Iopp);
+  setring A;
+  def J = oppose(Aopp,Jopp);
+  return(J);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,d),dp;
+  ncalgebra(1,1); // the first Weyl algebra
+  ideal I = x,d;
+  module LS = syz(I);
+  print(LS);
+  module RS = rightSyz(I);
+  print(RS);
+}
+
+
+proc rightNF(def v, def M)
+"USAGE:  rightNF(I); v a poly/vector, M an ideal/module
+PURPOSE: compute a right normal form of v w.r.t. M
+RETURN:  poly/vector (as of the 1st argument)
+EXAMPLE: example rightNF; shows examples
+"
+{
+  def A = basering;
+  def Aopp = opposite(A);
+  setring Aopp;
+  def vopp = oppose(A,v);
+  def Mopp = oppose(A,M);
+  Mopp = std(Mopp);
+  def wopp = NF(vopp,Mopp);
+  setring A;
+  def w    = oppose(Aopp,wopp);
+  w = simplify(w,2); // skip zeros in ideal/module
+  return(w);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  LIB "ncalg.lib";
+  ring r = 0,(x,d),dp;
+  ncalgebra(1,1); // Weyl algebra
+  ideal I = x; I = std(I);
+  poly  p = x*d+1;
+  NF(p,I); // left normal form
+  rightNF(p,I); // right normal form
+}
+
+// **********************************
+// * NF: Example for vector/module: *
+// **********************************
+// module M = [x,0],[0,d]; M = std(M);
+// vector v = (x*d+1)*[1,1];
+// print(NF(v,M));
+// print(rightNF(v,M));
+
+proc rightModulo(def M, def N)
+"USAGE:  rightModulo(M,N); M,N are ideals/modules
+PURPOSE: compute a right representation of the module (M+N)/N
+RETURN:  module
+ASSUME:  M,N are presentation matrices for right modules
+EXAMPLE: example rightModulo; shows examples
+"
+{
+  def A = basering;
+  def Aopp = opposite(A);
+  setring Aopp;
+  def Mopp = oppose(A,M);
+  def Nopp = oppose(A,N);
+  def Kopp = modulo(Mopp,Nopp);
+  setring A;
+  def K = oppose(Aopp,Kopp);
+  return(K);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  LIB "ncalg.lib";
+  def A = makeUsl(2);
+  setring A;
+  option(redSB);
+  option(redTail);
+  ideal I = e2,f2,h2-1;
+  I = twostd(I);
+  print(matrix(I));
+  ideal E  = std(e);
+  ideal TL = e,h-1; // the result of left modulo
+  TL;
+  ideal T = rightModulo(E,I);
+  T = rightStd(T+I);
+  T = rightStd(rightNF(T,I)); // make the output canonic
+  T;
+}
+
 //////////////////////////////////////////////////////////////////////
