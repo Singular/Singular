@@ -1,7 +1,7 @@
 /** Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: helpstuff.h,v 1.3 1997-09-12 07:19:57 Singular Exp $
+// $Id: helpstuff.h,v 1.4 2007-05-15 14:46:49 Singular Exp $
 ////////////////////////////////////////////////////////////
 #ifndef HELPSTUFF_H
 #define HELPSTUFF_H
@@ -26,23 +26,14 @@ inline int min ( const int a, const int b ){
 inline int max ( const int a, const int b ){
   return (a>b ? a:b);
 }
-//////////////////
-// For testing  //
-//////////////////
-#ifdef SPARSEGCD
-#include "gcd.h"
-#define mygcd(f,g) \
-((CanonicalForm) sparsemod( f,  g ))
-#else
-#define mygcd(f,g) \
-((CanonicalForm) gcd( f, g ))
-#endif
-
 #endif /* HELPSTUFF_H */
 
 ///////////////////////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1997/09/12 07:19:57  Singular
+* hannes/michael: libfac-0.3.0
+
 Revision 1.2  1997/04/25 22:23:49  michael
 Version for libfac-0.2.1
 

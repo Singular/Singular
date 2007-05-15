@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: alg_factor.cc,v 1.16 2006-05-16 14:46:48 Singular Exp $";
+static char * rcsid = "$Id: alg_factor.cc,v 1.17 2007-05-15 14:46:48 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -447,13 +447,15 @@ CanonicalForm alg_lc(const CanonicalForm &f)
 
 // the heart of the algorithm: the one from Trager
 static CFFList
-alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vminpoly, const Varlist & oldord, const CFList & as){
+alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vminpoly, const Varlist & oldord, const CFList & as)
+{
   CFFList L, Factorlist;
   CanonicalForm R, Rstar, s, g, h;
   CFList substlist;
 
   DEBINCLEVEL(CERR,"alg_factor");
   DEBOUTLN(CERR, "alg_factor: f= ", f);
+
   //out_cf("start alg_factor:",f,"\n");
   substlist= simpleextension(Astar, vminpoly, Rstar);
   DEBOUTLN(CERR, "alg_factor: substlist= ", substlist);
@@ -503,15 +505,18 @@ alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vmin
   DEBOUTLN(CERR, "alg_factor: Factorize(R)= ", Factorlist);
   if ( !Factorlist.getFirst().factor().inCoeffDomain() )
     Factorlist.insert(CFFactor(1,1));
-  if ( Factorlist.length() == 2 && Factorlist.getLast().exp()== 1){ // irreduzibel (first entry is a constant)
+  if ( Factorlist.length() == 2 && Factorlist.getLast().exp()== 1)
+  { // irreduzibel (first entry is a constant)
     L.append(CFFactor(f,1));
   }
-  else{
+  else
+  {
     DEBOUTLN(CERR, "alg_factor: g= ", g);
     CanonicalForm gnew= g(s,s.mvar());
     DEBOUTLN(CERR, "alg_factor: gnew= ", gnew);
     g=gnew;
-    for ( CFFListIterator i=Factorlist; i.hasItem(); i++){
+    for ( CFFListIterator i=Factorlist; i.hasItem(); i++)
+    {
       CanonicalForm fnew=i.getItem().factor();
       fnew= fnew(s,s.mvar());
       DEBOUTLN(CERR, "alg_factor: fnew= ", fnew);
@@ -521,11 +526,12 @@ alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vmin
         fnew= fnew(ii.getItem(), ii.getItem().mvar());
         DEBOUTLN(CERR, "alg_factor: fnew= ", fnew);
       }
-      if (degree(i.getItem().factor()) > 0 ){
+      if (degree(i.getItem().factor()) > 0 )
+      {
         // undo linear transformation!!!! and then gcd!
         //CERR << "algcd(" << g << "," << fnew << ",as" << as << ")" << "\n";
-        //out_cf("algcd g=",g,"\n");
-        //out_cf("algcd fnew=",fnew,"\n");
+        //out_cf("g=",g,"\n");
+        //out_cf("fnew=",fnew,"\n");
         //h= algcd(g,fnew, as, oldord);
         //if (as.length() >1)
         //  h= algcd(g,fnew, as, oldord);
@@ -536,13 +542,20 @@ alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vmin
         //CERR << "algcd result:" << h << "\n";
         DEBOUTLN(CERR, "  alg_factor: h= ", h);
         DEBOUTLN(CERR, "  alg_factor: oldord= ", oldord);
-        if ( degree(h) > 0 ){ //otherwise it's a constant
+        if ( degree(h) > 0 )
+        { //otherwise it's a constant
+          //CanonicalForm c=LC(h,g.mvar());
+          //out_cf("new lc h:",c,"\n");
+          //h= divide(h,c,as);
+          //out_cf("new factor h/c:",h,"\n");
           g= divide(g, h,as);
           DEBOUTLN(CERR, "alg_factor: g/h= ", g);
           DEBOUTLN(CERR, "alg_factor: s= ", s);
           DEBOUTLN(CERR, "alg_factor: substlist= ", substlist);
+          //out_cf("new g:",g,"\n");
           L.append(CFFactor(h,1));
         }
+        //else printf("degree <=1\n");
       }
     }
     // we are not interested in a
@@ -816,6 +829,9 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.16  2006/05/16 14:46:48  Singular
+*hannes: gcc 4.1 fixes
+
 Revision 1.15  2005/10/17 13:16:18  Singular
 *hannes: code cleanup
 

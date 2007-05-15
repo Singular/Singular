@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: SqrFree.cc,v 1.10 2006-05-16 14:46:50 Singular Exp $";
+static char * rcsid = "$Id: SqrFree.cc,v 1.11 2007-05-15 14:46:49 Singular Exp $";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de .\n Please include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -148,7 +148,7 @@ SqrFreeTest( const CanonicalForm & r, int opt){
     if ( getCharacteristic() > 0 && g.isZero() ) return 0 ;
     // Next: it would be best to have a *univariate* gcd-test which returns
     // 0 iff gcdtest(f,g) == 1 or a constant ( for real Polynomials )
-    g = mygcd(f,g);
+    g = gcd(f,g);
     if ( g.isOne() || (-g).isOne() ) return 1;
     else
       if ( getNumVars(g) == 0 ) return 1;// <- totaldegree!!!
@@ -181,7 +181,7 @@ SqrFreeTest( const CanonicalForm & r, int opt){
     g = f.deriv() ;
     // Next: it would be best to have a *multivariate* gcd-test which returns
     // 0 iff gcdtest(f,g) == 1 or a constant ( for real Polynomials )
-    g= mygcd(f,g);
+    g= gcd(f,g);
     if ( g.isOne() || (-g).isOne() || (g==f) || (getNumVars(g)==0) ) return 1 ;
     else return 0 ;
   }
@@ -293,10 +293,10 @@ SqrFreed( const CanonicalForm & r , const CanonicalForm &mipo=0){
     }
   }
   g = f.deriv();
-  DEBOUTLN(CERR, "calculating mygcd of ", f);
+  DEBOUTLN(CERR, "calculating gcd of ", f);
   DEBOUTLN(CERR, "               and ", g);
-  h = mygcd(f,pp(g));  h /= lc(h);
-  DEBOUTLN(CERR,"mygcd(f,g)= ",h);
+  h = gcd(f,pp(g));  h /= lc(h);
+  DEBOUTLN(CERR,"gcd(f,g)= ",h);
   if ( (h.isOne()) || ( h==f) || ((-h).isOne()) || getNumVars(h)==0 ) { // no common factor
     Outputlist= myappend(Outputlist,CFFactor(f,1)) ;
     DEBOUTLN(CERR, "Outputlist= ", Outputlist);
@@ -414,6 +414,9 @@ SqrFree(const CanonicalForm & r ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.10  2006/05/16 14:46:50  Singular
+*hannes: gcc 4.1 fixes
+
 Revision 1.9  2006/04/28 13:46:29  Singular
 *hannes: better tests for 0, 1
 

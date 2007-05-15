@@ -1,4 +1,4 @@
-//static char rcsid[] = "@(#) $Id: test.cc,v 1.2 1997-06-09 15:56:11 Singular Exp $";
+//static char rcsid[] = "@(#) $Id: test.cc,v 1.3 2007-05-15 14:46:49 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // CLAP - Includes
 //       (x+y+z)*(x+y-z)*(x-y+z)*(x-y-z)*x*y;
@@ -26,7 +26,7 @@ main()
 //    cout << " f(SqrFree)= " << endl;
 //    cout << SqrFree(f) << endl << endl;
 //cout << "gcd(f,f.deriv())= gcd(" << f << "," << f.deriv() << ")= " << gcd(f,f.deriv()) << endl;
-//cout << "mygcd(f,f.deriv())= mygcd(" << f << "," << f.deriv() << ")= " << mygcd(f,f.deriv()) << endl;
+//cout << "gcd(f,f.deriv())= gcd(" << f << "," << f.deriv() << ")= " << gcd(f,f.deriv()) << endl;
         Factorlist = Factorize( f );
         cout << Factorlist ;//<< endl;
 // Ueberpruefen:

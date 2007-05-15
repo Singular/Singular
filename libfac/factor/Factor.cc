@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.23 2006-05-16 14:46:49 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.24 2007-05-15 14:46:48 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -342,7 +342,7 @@ various_tests( const CanonicalForm & g, int deg, int vars_left){
   if ( degree(g) == deg ) // degrees match
     if ( level(compress(g,m)) == (vars_left) ) // exactly one variable less
       if ( SqrFreeTest(g,1) ) // poly is sqrfree
-        if ( mygcd(g,g.deriv()) == 1 ) // Discriminante != 0
+        if ( gcd(g,g.deriv()) == 1 ) // Discriminante != 0
            return 1;
   return 0;
 }
@@ -430,7 +430,8 @@ generate_mipo( int degree_of_Extension , const Variable & Extension ){
 // values. We take them and work with the resulting poly.    //
 ///////////////////////////////////////////////////////////////
 static int
-try_specializePoly(const CanonicalForm & f, const Variable & Extension, int deg, SFormList & Substitutionlist, int ii,int j){
+try_specializePoly(const CanonicalForm & f, const Variable & Extension, int deg, SFormList & Substitutionlist, int ii,int j)
+{
   int ok,i= ii;
   CanonicalForm ff= f;
 
@@ -439,14 +440,30 @@ try_specializePoly(const CanonicalForm & f, const Variable & Extension, int deg,
     i= Substitutionlist.length() + 1;
   }
 
-  if ( degree(Extension) > 0 ){ // working over Extensions
+  if ( degree(Extension) > 0 )
+  { // working over Extensions
     DEBOUTLN(CERR, "try_specializePoly: working over Extensions: ", Extension);
-    AlgExtGenerator g(Extension);
-    for ( int k=i ; k<j ; k++ ){ // try to find specialization for all
-                                 // variables (# = k ) beginning with the
+    if (Extension.level() > 0)
+    {
+    //  AlgExtGenerator g(Extension,minpoly );
+    //  for ( int k=i ; k<j ; k++ ) // try to find specialization for all
+    //  {                           // variables (# = k ) beginning with the
+    //                             // starting value i
+    //    ok= specialize_agvariable( ff, deg, Substitutionlist, k, j, g );
+    //    if ( ! ok ) return 0; // we failed
+    //  }
+      printf("libfac: try_specializePoly: extension level >0\n");
+      return 0; // we failed
+    }
+    else
+    {
+      AlgExtGenerator g(Extension);
+      for ( int k=i ; k<j ; k++ ) // try to find specialization for all
+      {                           // variables (# = k ) beginning with the
                                  // starting value i
-      ok= specialize_agvariable( ff, deg, Substitutionlist, k, j, g );
-      if ( ! ok ) return 0; // we failed
+        ok= specialize_agvariable( ff, deg, Substitutionlist, k, j, g );
+        if ( ! ok ) return 0; // we failed
+      }
     }
   }
   else{ // working over the ground-field
@@ -657,7 +674,7 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar){
     DEBOUTNL(CERR);
     ff = f.deriv();
     TIMING_START(discr_time);
-    ffuni = mygcd(f,ff);
+    ffuni = gcd(f,ff);
     TIMING_END(discr_time);
     if ( !(ffuni.isOne()) ){ //discriminante nonzero: split poly
       DEBOUTLN(CERR,"Nontrivial GCD of f= ", f);
@@ -691,7 +708,8 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar){
   // Look at the leading term:
   lt = LC(f);
   DEBOUTLN(CERR, "Leading term: ", lt);
-  if ( lt != f.genOne() ){
+  if ( lt != f.genOne() )
+  {
     // make the polynomial monic in the main variable
     ff = make_monic(f,lt); ffuni = ff;
     DEBOUTLN(CERR, "make_monic returned: ", ff);
@@ -701,15 +719,18 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar){
   TIMING_START(evaluate_time);
   success=evaluate(min(10,max(degree(ff), 5)), min(degree(ff),3), min(degree(ff),3), ff, Extension, alpha, Substitutionlist,UnivariateFactorlist);
   DEBOUTLN(CERR,  "Returned from evaluate: success: ", success);
-  for ( SFormListIterator ii=Substitutionlist; ii.hasItem(); ii++ ){
+  for ( SFormListIterator ii=Substitutionlist; ii.hasItem(); ii++ )
+  {
     DEBOUTLN(CERR, "Substituting ", ii.getItem().factor());
     DEBOUTLN(CERR, "       with value: ", ii.getItem().exp());
   }
 
-  if ( success==0 ){ // evalute wasn't successfull
+  if ( success==0 ) // evalute wasn't successfull
+  {
     success= specializePoly(ffuni,Extension,degree(ff),Substitutionlist,1,getNumVars(compress(ff,m)));
     DEBOUTLN(CERR,  "Returned from specializePoly: success: ", success);
-    if (success == 0 ){ // No spezialisation could be found
+    if (success == 0 ) // No spezialisation could be found
+    {
 #ifdef HAVE_SINGULAR_ERROR
       WarnS("libfac: Factorize: ERROR: Not able to find a valid specialization!");
 #else
@@ -730,11 +751,13 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar){
 
     ffuni = substitutePoly(ff,Substitutionlist);
     // We now have an univariat poly; factorize that
-    if ( degree(Extension) == 0   ){
+    if ( degree(Extension) == 0   )
+    {
       DEBOUTMSG(CERR, "Univ. Factorization over the ground field");
       UnivariateFactorlist = factorize(ffuni,1); // univ. poly is sqr-free!
     }
-    else{
+    else
+    {
       DEBOUTLN(CERR, "Univ. Factorization over extension of degree ",
                degree(getMipo(Extension,'x')) );
      #if 1
@@ -747,16 +770,19 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar){
      #endif
     }
   }
-  else{
+  else
+  {
     ffuni = substitutePoly(ff,Substitutionlist);
   }
     TIMING_END(evaluate_time);
-  if (UnivariateFactorlist.length() == 1){ // poly is irreduzibel
+  if (UnivariateFactorlist.length() == 1)
+  { // poly is irreduzibel
     DEBOUTLN(CERR, "Univ. poly is irreduzible: ", UnivariateFactorlist);
     Outputlist.append(CFFactor(F,1));
     return Outputlist;
   }
-  else{ // we have factors
+  else
+  { // we have factors
     DEBOUTSL(CERR);
     DEBOUT(CERR, "Univariate poly has " , UnivariateFactorlist.length());
     DEBOUT(CERR, " factors:  ", ffuni);
@@ -811,8 +837,8 @@ int cmpCF( const CFFactor & f, const CFFactor & g );
 // use Factorize(F,alpha,is_SqrFree) if not over Zp[x]/Q[x]  //
 ///////////////////////////////////////////////////////////////
 int find_mvar(const CanonicalForm &f);
-CFFList
-Factorize(const CanonicalForm & F, int is_SqrFree ){
+CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
+{
   CFFList Outputlist,SqrFreeList,Intermediatelist,Outputlist2;
   ListIterator<CFFactor> i,j;
   CanonicalForm g=1,unit=1,r=1;
@@ -827,7 +853,8 @@ Factorize(const CanonicalForm & F, int is_SqrFree ){
   DEBINCLEVEL(CERR, "Factorize");
   DEBOUTMSG(CERR, rcsid);
   DEBOUTLN(CERR, "Called with F= ", F);
-  if ( getCharacteristic() == 0 ) { // char == 0
+  if ( getCharacteristic() == 0 )
+  { // char == 0
     TIMING_START(factorize_time);
     //CERR << "Factoring in char=0 of " << F << " = " << Outputlist << "\n";
     Outputlist= factorize(F);
@@ -857,7 +884,8 @@ Factorize(const CanonicalForm & F, int is_SqrFree ){
   // (If gcd is fast...)
   ///////
   //  if ( ! SqrFreeTest(F) ){
-  if ( ! is_SqrFree ){
+  if ( ! is_SqrFree )
+  {
     TIMING_START(sqrfree_time);
     SqrFreeList = InternalSqrFree(F) ; // first sqrfree the polynomial
     // don't use sqrFree(F), factory's internal sqrFree for multiv.
@@ -873,7 +901,8 @@ Factorize(const CanonicalForm & F, int is_SqrFree ){
   else
     SqrFreeList.append(CFFactor(F,1));
   DEBOUTLN(CERR, "InternalSqrFreeList= ", SqrFreeList);
-  for ( i=SqrFreeList; i.hasItem(); i++ ){
+  for ( i=SqrFreeList; i.hasItem(); i++ )
+  {
     DEBOUTLN(CERR, "Factor under consideration: ", i.getItem().factor());
     // We need a compress on each list item ! Maybe we have less variables!
     g =compress(i.getItem().factor(),m);
@@ -881,14 +910,17 @@ Factorize(const CanonicalForm & F, int is_SqrFree ){
     if ( getNumVars(g) ==0 ) // a constant; Exp==1
       Outputlist.append( CFFactor(g,1) ) ;
     else// a real polynomial
-      if ( g.isUnivariate() ){
+      if ( g.isUnivariate() )
+      {
         Intermediatelist=factorize(g,1); // poly is sqr-free!
         for ( j=Intermediatelist; j.hasItem(); j++ )
           //Normally j.getItem().exp() should be 1
           Outputlist.append( CFFactor( m(j.getItem().factor()),exp*j.getItem().exp()));
       }
-      else{ // multivariate polynomial
-        if ( g.isHomogeneous() ){
+      else
+      { // multivariate polynomial
+        if ( g.isHomogeneous() )
+        {
           DEBOUTLN(CERR, "Poly is homogeneous! : ", g);
           // Now we can substitute one variable to 1, factorize and then
           // look on the resulting factors and their monomials for
@@ -910,13 +942,16 @@ Factorize(const CanonicalForm & F, int is_SqrFree ){
   g=1; unit=1;
   DEBOUTLN(CERR, "Outputlist is ", Outputlist);
   for ( i=Outputlist; i.hasItem(); i++ )
-    if ( level(i.getItem().factor()) > 0 ){
+    if ( level(i.getItem().factor()) > 0 )
+    {
       unit = lc(i.getItem().factor());
-      if ( getNumVars(unit) == 0 ){ // a constant; possibly 1
+      if ( getNumVars(unit) == 0 )
+      { // a constant; possibly 1
         Outputlist2.append(CFFactor(i.getItem().factor()/unit , i.getItem().exp()));
         g *=power(i.getItem().factor()/unit,i.getItem().exp());
       }
-      else{
+      else
+      {
         Outputlist2.append(i.getItem());
         g *=power(i.getItem().factor(),i.getItem().exp());
       }
@@ -958,7 +993,8 @@ Factorize(const CanonicalForm & F, int is_SqrFree ){
 //           * ensuring poly is sqrfree (n.y.i.)             //
 ///////////////////////////////////////////////////////////////
 CFFList
-Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree ){
+Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree )
+{
   CFFList Outputlist,SqrFreeList,Intermediatelist,Outputlist2;
   ListIterator<CFFactor> i,j;
   CanonicalForm g=1,unit=1,r=1;
@@ -1131,6 +1167,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.23  2006/05/16 14:46:49  Singular
+*hannes: gcc 4.1 fixes
+
 Revision 1.22  2006/04/28 13:46:29  Singular
 *hannes: better tests for 0, 1
 

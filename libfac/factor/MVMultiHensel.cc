@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.9 2006-05-16 14:46:49 Singular Exp $";
+// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.10 2007-05-15 14:46:49 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -28,10 +28,17 @@
 
 #ifdef SINGULAR
 #define HAVE_SINGULAR_ERROR
+#ifndef NOSTREAMIO
+void out_cf(char *s1,const CanonicalForm &f,char *s2);
+#endif
 #endif
 
 #ifdef HAVE_SINGULAR_ERROR
-   extern "C" { void WerrorS(char *); }
+   extern "C"
+   {
+     void WerrorS(char *);
+     void Werror(const char *fmt, ...);
+   }
 #endif
 
 #ifdef HENSELDEBUG
@@ -96,7 +103,7 @@ protected:
     {
       ia[ix].calculated=false;
       ia[ix].poly=0;
-    }  
+    }
   }
 // internal data representation
   int size;
@@ -110,7 +117,8 @@ protected:
 // Returns s and t.                                          //
 ///////////////////////////////////////////////////////////////
 static DiophantForm
-diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int i , RememberArray & A, RememberArray & B ) {
+diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int i , RememberArray & A, RememberArray & B )
+{
   DiophantForm Retvalue;
   CanonicalForm s,t,q,r;
   Variable x(levelU);
@@ -120,16 +128,20 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
 
   // Did we solve the diophantine equation yet?
   // If so, return the calculated values
-  if (A.checksize(i) && A[i].calculated && B[i].calculated ){
+  if (A.checksize(i) && A[i].calculated && B[i].calculated )
+  {
     Retvalue.One=A[i].poly;
     Retvalue.Two=B[i].poly;
     return Retvalue;
   }
 
   // Degrees ok? degree(F1,mainvar) + degree(F2,mainvar) <= i ?
-  if ( (degree(F1,levelU) + degree(F2,levelU) ) <= i ) {
+  if ( (degree(F1,levelU) + degree(F2,levelU) ) <= i )
+  {
 #ifdef HAVE_SINGULAR_ERROR
-    WerrorS("libfac: diophant ERROR: degree too large!  ");
+    Werror("libfac: diophant ERROR: degree too large!  (%d + %d <= %d)",degree(F1,levelU), degree(F2,levelU), i);
+      //out_cf("F1:",F1,"\n");
+      //out_cf("F2:",F2,"\n");
 #else
 #ifndef NOSTREAMIO
     CERR << "libfac: diophant ERROR: degree too large!  "
@@ -142,12 +154,16 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
     return Retvalue;
   }
 
-  if ( i == 0 ) { // call the extended gcd
+  if ( i == 0 )
+  { // call the extended gcd
     r=extgcd(F1,F2,s,t);
     // check if gcd(F1,F2) <> 1 , i.e. F1 and F2 are not relatively prime
-    if ( ! r.isOne() ){
+    if ( ! r.isOne() )
+    {
 #ifdef HAVE_SINGULAR_ERROR
       WerrorS("libfac: diophant ERROR: F1 and F2 are not relatively prime! ");
+      //out_cf("F1:",F1,"\n");
+      //out_cf("F2:",F2,"\n");
 #else
 #ifndef NOSTREAMIO
       CERR << "libfac: diophant ERROR: " << F1 << "  and  " << F2
@@ -161,19 +177,23 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
     }
     Retvalue.One = s; Retvalue.Two = t;
   }
-  else { // recursively call diophant
+  else
+  { // recursively call diophant
     Retvalue=diophant(levelU,F1,F2,i-1,A,B);
     Retvalue.One *= x; // createVar(levelU,1);
     Retvalue.Two *= x; // createVar(levelU,1);
     // Check degrees.
 
-    if ( degree(Retvalue.One,levelU) > degree(F2,levelU) ){
+    if ( degree(Retvalue.One,levelU) > degree(F2,levelU) )
+    {
       // Make degree(Retvalue.one,mainvar) < degree(F2,mainvar)
       divrem(Retvalue.One,F2,q,r);
       Retvalue.One = r; Retvalue.Two += F1*q;
     }
-    else {
-      if ( degree(Retvalue.Two,levelU) >= degree(F1,levelU) ){
+    else
+    {
+      if ( degree(Retvalue.Two,levelU) >= degree(F1,levelU) )
+      {
         // Make degree(Retvalue.Two,mainvar) <= degree(F1,mainvar)
         divrem(Retvalue.Two,F1,q,r);
         Retvalue.One += F2*q; Retvalue.Two = r;
@@ -429,6 +449,9 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.9  2006/05/16 14:46:49  Singular
+*hannes: gcc 4.1 fixes
+
 Revision 1.8  2002/07/30 15:11:19  Singular
 *hannes: minor cleanups
 

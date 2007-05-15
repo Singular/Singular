@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: csutil.cc,v 1.13 2006-06-19 13:37:47 Singular Exp $";
+static char * rcsid = "$Id: csutil.cc,v 1.14 2007-05-15 14:46:48 Singular Exp $";
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -201,7 +201,8 @@ Sprem ( const CanonicalForm &f, const CanonicalForm &g, CanonicalForm & m, Canon
 }
 
 CanonicalForm
-divide( const CanonicalForm & ff, const CanonicalForm & f, const CFList & as){
+divide( const CanonicalForm & ff, const CanonicalForm & f, const CFList & as)
+{
   CanonicalForm r,m,q;
 
   //out_cf("divide f=",ff,"\n");
@@ -223,13 +224,16 @@ divide( const CanonicalForm & ff, const CanonicalForm & f, const CFList & as){
 }
 
 static CanonicalForm
-myfitting( const CanonicalForm &f ){
+myfitting( const CanonicalForm &f )
+{
  CanonicalForm rem=f;
 
- if ( !(rem.isZero()) ){
+ if ( !(rem.isZero()) )
+ {
    if ( getCharacteristic() > 0 )
      return num((rem/lc(rem)));
-   else{
+   else
+   {
      On(SW_RATIONAL);
      CanonicalForm temp= mapinto(rem);
 //      CERR << "temp= " << temp << "\n";
@@ -269,14 +273,17 @@ Prem( const CFList &AS, const CFList &L ){
 }
 
 static CanonicalForm
-premasb( const CanonicalForm & f, const CFList & as){
+premasb( const CanonicalForm & f, const CFList & as)
+{
   CanonicalForm remd=f;
   CFList AS=as;
 
-  if ( as.length() > 1 ){
+  if ( as.length() > 1 )
+  {
     AS.removeFirst(); // get rid of first elem
     CanonicalForm elem;
-    while ( ! AS.isEmpty() ){ // thats true for at least the first iteration
+    while ( ! AS.isEmpty() )
+    { // thats true for at least the first iteration
       elem= AS.getLast();
       remd= Prem(remd,elem);
       AS.removeLast();
@@ -290,10 +297,12 @@ premasb( const CanonicalForm & f, const CFList & as){
 }
 
 CFList
-remsetb( const CFList & ps, const CFList & as){
+remsetb( const CFList & ps, const CFList & as)
+{
   CFList output;
   CanonicalForm elem;
-  for (CFListIterator i=ps; i.hasItem(); i++){
+  for (CFListIterator i=ps; i.hasItem(); i++)
+  {
     elem= premasb(i.getItem(),as);
     if ( elem != elem.genZero() ) output.append(elem);
   }
@@ -304,7 +313,8 @@ remsetb( const CFList & ps, const CFList & as){
 //////////////////////////////////
 // replace the power of factors of polys in as by 1 if any
 static CFList
-nopower( const CanonicalForm & init ){
+nopower( const CanonicalForm & init )
+{
   CFFList sqrfreelist;// = Factorize(init);//SqrFree(init);
   CFList output;
   CanonicalForm elem;
@@ -316,11 +326,13 @@ nopower( const CanonicalForm & init ){
   //  CERR << "nopower: f is " << init << "\n";
   //  CERR << "nopower: count is " << count << "\n";}
   if ( count > 1 ) sqrfreelist = CFFList( CFFactor(init,1));
-  else {
+  else
+  {
     sqrfreelist = Factorize(init);
     //sqrfreelist.removeFirst();
   }
-  for ( CFFListIterator i=sqrfreelist; i.hasItem(); i++ ){
+  for ( CFFListIterator i=sqrfreelist; i.hasItem(); i++ )
+  {
     elem=i.getItem().factor();
     if ( cls(elem) > 0 ) output.append(elem);
   }
@@ -362,16 +374,19 @@ removefactor( CanonicalForm & r , PremForm & Remembern){
   int n=level(r);
   CFListIterator j ;
 
-  for ( int J=1; J<= n ; J++ ){
+  for ( int J=1; J<= n ; J++ )
+  {
     testlist.append(CanonicalForm(Variable(J)));
   }
 
   //  testlist = Union(Remembern.FS1, testlist); // add candidates
 
   // remove already removed factors
-  for ( j = Remembern.FS2 ; j.hasItem(); j++ ){
+  for ( j = Remembern.FS2 ; j.hasItem(); j++ )
+  {
     testelem = j.getItem();
-    while ( 1 ){
+    while ( 1 )
+    {
       test = mydivremt(r,testelem,a,b);
       if ( test && b == r.genZero() ) r = a;
       else break;
@@ -379,13 +394,17 @@ removefactor( CanonicalForm & r , PremForm & Remembern){
   }
 
   // Let's look if we have other canditates to remove
-  for ( j = testlist ; j.hasItem(); j++ ){
+  for ( j = testlist ; j.hasItem(); j++ )
+  {
     testelem = j.getItem();
 //    if ( testelem != r && testelem != r.mvar() ){
-    if ( testelem != r ){
-      while ( 1 ){
+    if ( testelem != r )
+    {
+      while ( 1 )
+      {
         test = divremt(r,testelem,a,b);
-        if ( test && b == r.genZero() ){
+        if ( test && b == r.genZero() )
+        {
           Remembern.FS2= Union(Remembern.FS2, CFList(testelem));
           r = a;
           if ( r == 1 ) break;
@@ -403,16 +422,19 @@ removefactor( CanonicalForm & r , PremForm & Remembern){
 
 // all irreducible nonconstant factors of a set of polynomials
 CFList
-factorps( const CFList &ps ){
+factorps( const CFList &ps )
+{
   CFList qs;
   CFFList q;
   CanonicalForm elem;
 
-  for ( CFListIterator i=ps; i. hasItem(); i++ ){
+  for ( CFListIterator i=ps; i. hasItem(); i++ )
+  {
     q=Factorize(i.getItem());
     q.removeFirst();
     // Next can be simplified ( first (already removed) elem in q is the only constant
-    for ( CFFListIterator j=q; j.hasItem(); j++ ){
+    for ( CFFListIterator j=q; j.hasItem(); j++ )
+    {
       elem = j.getItem().factor();
       if ( getNumVars(elem) > 0 )
         qs= Union(qs, CFList(myfitting(elem)));
@@ -423,11 +445,13 @@ factorps( const CFList &ps ){
 
 // the initial of poly f wrt to the order of the variables
 static CanonicalForm
-inital( const CanonicalForm &f ){
+inital( const CanonicalForm &f )
+{
   CanonicalForm leadcoeff;
 
   if ( cls(f) == 0 ) {return f.genOne(); }
-  else {
+  else
+  {
     leadcoeff = LC(f,lvar(f));
     //    if ( leadcoeff != 0 )
     return myfitting(leadcoeff); //num(leadcoeff/lc(leadcoeff));
@@ -872,6 +896,9 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.13  2006/06/19 13:37:47  Singular
+*hannes: more CS renamed
+
 Revision 1.12  2006/05/16 14:46:49  Singular
 *hannes: gcc 4.1 fixes
 
