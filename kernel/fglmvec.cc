@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmvec.cc,v 1.1.1.1 2003-10-06 12:15:53 Singular Exp $
+// $Id: fglmvec.cc,v 1.2 2007-05-15 13:51:42 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -411,7 +411,7 @@ fglmVector::getelem( int i )
     return rep->getelem( i );
 }
 
-number
+const number
 fglmVector::getconstelem( int i ) const
 {
     return rep->getconstelem( i );
