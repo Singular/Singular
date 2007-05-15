@@ -253,7 +253,8 @@ SLIB0 = absfact.lib  arcpoint.lib  atkins.lib    aksaka.lib\
 	ainvar.lib   alexpoly.lib  algebra.lib   brnoeth.lib   classify.lib \
 	control.lib  crypto.lib    deform.lib    elim.lib      equising.lib \
 	finvar.lib   gmspoly.lib   gmssing.lib   general.lib   graphics.lib \
-	grwalk.lib   groups.lib    hnoether.lib  homolog.lib   inout.lib \
+	grwalk.lib   groups.lib    hnoether.lib  homolog.lib   hyperellicptic.lib \
+	inout.lib \
 	intprog.lib  latex.lib     linalg.lib    lll.lib \
 	makedbm.lib  matrix.lib \
 	modstd.lib   mondromy.lib  mprimdec.lib  mregular.lib  rootsmr.lib \

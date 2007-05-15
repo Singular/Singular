@@ -1,6 +1,6 @@
-// $Id: all.lib,v 1.51 2007-01-09 13:15:59 Singular Exp $
+// $Id: all.lib,v 1.52 2007-05-15 15:54:27 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.51 2007-01-09 13:15:59 Singular Exp $";
+version="$Id: all.lib,v 1.52 2007-05-15 15:54:27 Singular Exp $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries (commutative case)
@@ -33,6 +33,7 @@ LIB "grwalk.lib";
 LIB "groups.lib";
 LIB "hnoether.lib";
 LIB "homolog.lib";
+LIB "hyperellicptic.lib";
 LIB "inout.lib";
 LIB "intprog.lib";
 LIB "latex.lib";
@@ -41,8 +42,8 @@ LIB "lll.lib";
 LIB "makedbm.lib";
 LIB "matrix.lib";
 LIB "modstd.lib";
-LIB "mprimdec.lib";
 LIB "mondromy.lib";
+LIB "mprimdec.lib";
 LIB "mregular.lib";
 LIB "rootsmr.lib";
 LIB "noether.lib";
@@ -54,6 +55,7 @@ LIB "primdec.lib";
 LIB "primitiv.lib";
 LIB "qhmoduli.lib";
 LIB "random.lib";
+LIB "realrad.lib";
 LIB "reesclos.lib";
 LIB "resolve.lib";
 LIB "resgraph.lib";
