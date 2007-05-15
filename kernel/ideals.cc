@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.42 2007-05-03 13:27:44 Singular Exp $ */
+/* $Id: ideals.cc,v 1.43 2007-05-15 09:28:08 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -3748,3 +3748,14 @@ ideal idChineseRemainder(ideal *xx, number *q, int rl)
   omFree(xx);
   return result;
 }
+ideal idChineseRemainder(ideal *xx, intvec *iv)
+{
+  int rl=iv->length();
+  number *q=(number *)omAlloc(rl*sizeof(number));
+  int i;
+  for(i=0; i<rl; i++)
+  {
+    q[i]=nInit((*iv)[i]);
+  }
+  return idChineseRemainder(xx,q,rl);
+}  

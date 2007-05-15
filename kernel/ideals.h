@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.8 2007-05-03 13:27:44 Singular Exp $ */
+/* $Id: ideals.h,v 1.9 2007-05-15 09:28:08 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -156,4 +156,5 @@ ideal idXXX (ideal  h1, int k);
 poly id_GCD(poly f, poly g, const ring r);
 
 ideal idChineseRemainder(ideal *x, number *q, int rl);
+ideal idChineseRemainder(ideal *x, intvec *iv);
 #endif
