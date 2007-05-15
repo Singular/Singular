@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.254 2007-05-11 10:50:40 wienand Exp $ */
+/* $Id: extra.cc,v 1.255 2007-05-15 13:55:00 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1859,7 +1859,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
 #ifdef HAVE_EXTENDED_SYSTEM
 // You can put your own system calls here
-#include "fglmcomb.cc"
+#include "../kernel/fglmcomb.cc"
 #include "fglm.h"
 #ifdef HAVE_NEWTON
 #include <hc_newton.h>
