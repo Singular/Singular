@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.24 2007-05-15 14:46:48 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.25 2007-05-15 15:50:42 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -992,6 +992,28 @@ CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
 //           * choosing an algebraic extension (n.y.u.)      //
 //           * ensuring poly is sqrfree (n.y.i.)             //
 ///////////////////////////////////////////////////////////////
+CFFList Factorize2(const CanonicalForm & F, const CanonicalForm & minpoly )
+{
+  CFFList iF=Factorize(F);
+  CFFList G,H;
+  CanonicalForm fac;
+  int d;
+  ListIterator<CFFactor> i,k;
+  for ( i = iF; i.hasItem(); ++i )
+  {
+    d = i.getItem().exp();
+    fac = i.getItem().factor();
+    G = Factorize( fac, minpoly);
+    for ( k = G; k.hasItem(); ++k )
+    {
+      fac = k.getItem().factor();
+      int dd = k.getItem().exp();
+      H.append( CFFactor( fac , d*dd ) );
+    }
+  }
+  //Outputlist = newfactoras( F, as, 1);
+  return H;
+}
 CFFList
 Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree )
 {
@@ -1069,7 +1091,8 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
   // (If gcd is fast...)
   ///////
   //  if ( ! SqrFreeTest(F) ){
-  if ( ! is_SqrFree ){
+  if ( ! is_SqrFree )
+  {
     TIMING_START(sqrfree_time);
     SqrFreeList = InternalSqrFree(F, minpoly) ; // first sqrfree the polynomial
     // don't use sqrFree(F), factory's internal sqrFree for multiv.
@@ -1085,7 +1108,8 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
   else
     SqrFreeList.append(CFFactor(F,1));
   DEBOUTLN(CERR, "InternalSqrFreeList= ", SqrFreeList);
-  for ( i=SqrFreeList; i.hasItem(); i++ ){
+  for ( i=SqrFreeList; i.hasItem(); i++ )
+  {
     DEBOUTLN(CERR, "Factor under consideration: ", i.getItem().factor());
     // We need a compress on each list item ! Maybe we have less variables!
     g =compress(i.getItem().factor(),m);
@@ -1093,7 +1117,8 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
     if ( getNumVars(g) ==0 ) // a constant; Exp==1
       Outputlist.append( CFFactor(g,1) ) ;
     else// a real polynomial
-      if ( g.isUnivariate() ){
+      if ( g.isUnivariate() )
+      {
         Variable alpha=rootOf(minpoly);
         Intermediatelist=factorize2(g,alpha,minpoly); // poly is sqr-free!
         for ( j=Intermediatelist; j.hasItem(); j++ )
@@ -1102,8 +1127,10 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
            CFFactor( m(replacevar(j.getItem().factor(),alpha,minpoly.mvar())),
              exp*j.getItem().exp()));
       }
-      else{ // multivariate polynomial
-        if ( g.isHomogeneous() ){
+      else // multivariate polynomial
+      {
+        if ( g.isHomogeneous() )
+	{
           DEBOUTLN(CERR, "Poly is homogeneous! : ", g);
           // Now we can substitute one variable to 1, factorize and then
           // look on the resulting factors and their monomials for
@@ -1167,6 +1194,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.24  2007/05/15 14:46:48  Singular
+*hannes: factorize in Zp(a)[x...]
+
 Revision 1.23  2006/05/16 14:46:49  Singular
 *hannes: gcc 4.1 fixes
 
