@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.53 2007-05-11 10:48:04 wienand Exp $ */
+/* $Id: kutil.cc,v 1.54 2007-05-19 13:22:22 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1030,14 +1030,43 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
 #endif
   /*- computes the lcm(s[i],p) -*/
   Lp.lcm = pInit();
-
+  pSetCoeff(Lp.lcm, nLcm(pGetCoeff(p), pGetCoeff(strat->S[i]), currRing));
+  // Lp.lcm == 0
+  if (pGetCoeff(Lp.lcm) == NULL)
+  {
+#ifdef KDEBUG
+      if (TEST_OPT_DEBUG)
+      {
+        PrintS("--- Lp.lcm == 0\n");
+        PrintS("p:");
+        wrp(p);
+        Print("  strat->S[%d]:", i);
+        wrp(strat->S[i]);
+        PrintLn();
+      }
+#endif
+      strat->cp++;
+      pLmFree(Lp.lcm);
+      Lp.lcm=NULL;
+      return;
+  }
+  // basic product criterion
   pLcm(p,strat->S[i],Lp.lcm);
   pSetm(Lp.lcm);
-  pSetCoeff(Lp.lcm, nLcm(pGetCoeff(p), pGetCoeff(strat->S[i]), currRing));
   assume(!strat->sugarCrit);
-  // basic product criterion
-  if (pHasNotCF(p,strat->S[i]) && (long) pGetCoeff(p) % 2 == 1 && (long) pGetCoeff(strat->S[i]) % 2 == 1)
+  if (pHasNotCF(p,strat->S[i]) && nIsOne(nGcd(0, pGetCoeff(p), currRing)) && nIsOne(nGcd(0, pGetCoeff(strat->S[i]), currRing)))
   {
+#ifdef KDEBUG
+      if (TEST_OPT_DEBUG)
+      {
+        PrintS("--- product criterion func enterOnePairRing type 1\n");
+        PrintS("p:");
+        wrp(p);
+        Print("  strat->S[%d]:", i);
+        wrp(strat->S[i]);
+        PrintLn();
+      }
+#endif
       strat->cp++;
       pLmFree(Lp.lcm);
       Lp.lcm=NULL;
@@ -1059,6 +1088,17 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
       if (compare == 1)
       {
         strat->c3++;
+#ifdef KDEBUG
+        if (TEST_OPT_DEBUG)
+        {
+          PrintS("--- chain criterion type 1\n");
+          PrintS("strat->B[j]:");
+          wrp(strat->B[j].lcm);
+          PrintS("  Lp.lcm:");
+          wrp(Lp.lcm);
+          PrintLn();
+        }
+#endif
         if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
         {
           pLmFree(Lp.lcm);
@@ -1069,15 +1109,36 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
       else
       if (compare == -1)
       {
+#ifdef KDEBUG
+        if (TEST_OPT_DEBUG)
+        {
+          PrintS("--- chain criterion type 2\n");
+          Print("strat->B[%d].lcm:",j);
+          wrp(strat->B[j].lcm);
+          PrintS("  Lp.lcm:");
+          wrp(Lp.lcm);
+          PrintLn();
+        }
+#endif
         deleteInL(strat->B,&strat->Bl,j,strat);
         strat->c3++;
       }
     }
-    if (compare == pDivComp_EQUAL)
+    if ((compare == pDivComp_EQUAL) && (compareCoeff != 2))
     {
-      // Add hint for same LM and direction of LC (later) (TODO Oliver)
       if (compareCoeff == pDivComp_LESS)
       {
+#ifdef KDEBUG
+        if (TEST_OPT_DEBUG)
+        {
+          PrintS("--- chain criterion type 3\n");
+          Print("strat->B[%d].lcm:", j);
+          wrp(strat->B[j].lcm);
+          PrintS("  Lp.lcm:");
+          wrp(Lp.lcm);
+          PrintLn();
+        }
+#endif
         strat->c3++;
         if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
         {
@@ -1087,8 +1148,20 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
         break;
       }
       else
-      if (compareCoeff == pDivComp_GREATER)
+      // Add hint for same LM and LC (later) (TODO Oliver)
+      // if (compareCoeff == pDivComp_GREATER)
       {
+#ifdef KDEBUG
+        if (TEST_OPT_DEBUG)
+        {
+          PrintS("--- chain criterion type 4\n");
+          Print("strat->B[%d].lcm:", j);
+          wrp(strat->B[j].lcm);
+          PrintS("  Lp.lcm:");
+          wrp(Lp.lcm);
+          PrintLn();
+        }
+#endif
         deleteInL(strat->B,&strat->Bl,j,strat);
         strat->c3++;
       }
@@ -1098,7 +1171,15 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   *the pair (S[i],p) enters B if the spoly != 0
   */
   /*-  compute the short s-polynomial -*/
-  if ((strat->S[i]==NULL) || (p==NULL)) return;
+  if ((strat->S[i]==NULL) || (p==NULL)) {
+#ifdef KDEBUG
+    if (TEST_OPT_DEBUG)
+    {
+      PrintS("--- spoly = NULL\n");
+    }
+#endif
+    return;
+  }
   pNorm(p);
   if ((strat->fromQ!=NULL) && (isFromQ!=0) && (strat->fromQ[i]!=0))
   {
@@ -1112,6 +1193,12 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   }
   if (Lp.p == NULL)
   {
+#ifdef KDEBUG
+    if (TEST_OPT_DEBUG)
+    {
+      PrintS("--- spoly = NULL\n");
+    }
+#endif
     /*- the case that the s-poly is 0 -*/
     if (strat->pairtest==NULL) initPairtest(strat);
     strat->pairtest[i] = TRUE;/*- hint for spoly(S^[i],p)=0 -*/
@@ -1144,6 +1231,89 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
     strat->initEcartPair(&Lp,strat->S[i],p,strat->ecartS[i],ecart);
     l = strat->posInL(strat->B,strat->Bl,&Lp,strat);
     enterL(&strat->B,&strat->Bl,&strat->Bmax,Lp,l);
+  }
+}
+
+
+/*2
+* put the  lcm(s[i],p)  into the set B
+*/
+
+#include <NTL/ZZ.h>
+#ifdef NTL_CLIENT
+NTL_CLIENT
+#endif
+
+void enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR = -1)
+{
+  long d, s, t;
+  assume(i<=strat->sl);
+  LObject  Lp;
+  poly m1, m2, erg, gcd;
+
+  XGCD(d, s, t, (long) pGetCoeff(p), (long) pGetCoeff(strat->S[i]));
+
+
+  k_GetStrongLeadTerms(p, strat->S[i], currRing, m1, m2, gcd, strat->tailRing);
+
+  pSetCoeff0(m1, (number) t);
+  pSetCoeff0(m2, (number) s); 
+  pSetCoeff0(gcd, (number) d);
+
+
+#ifdef KDEBUG
+  if (TEST_OPT_DEBUG)
+  {
+    Print("t = %d; s = %d; d = %d\n", t, s, d);
+    PrintS("--- create strong gcd poly: ");
+    wrp(p);
+    Print("\n strat->S[%d]: ", i);
+    wrp(strat->S[i]);
+    PrintS(" ---> ");
+  }
+#endif
+
+  erg = p_Add_q(pp_Mult_mm(pNext(p), m1, strat->tailRing), pp_Mult_mm(pNext(strat->S[i]), m2, strat->tailRing), strat->tailRing);
+  pNext(gcd) = erg;
+
+#ifdef KDEBUG
+    if (TEST_OPT_DEBUG)
+    {
+      wrp(gcd);
+      PrintLn();
+    }
+#endif
+
+  LObject h;
+  h.p = gcd;
+  h.tailRing = strat->tailRing;
+  int posx;
+  if (h.p!=NULL)
+  {
+    if (TEST_OPT_INTSTRATEGY)
+    {
+      h.pCleardenom(); // also does a pContent
+    }
+    else
+    {
+      h.pNorm();
+    }
+    strat->initEcart(&h);
+    if (strat->Ll==-1)
+      posx =0;
+    else
+      posx = strat->posInL(strat->L,strat->Ll,&h,strat);
+    h.sev = pGetShortExpVector(h.p);
+    h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
+    if (pNext(p) != NULL)
+    {
+      // What does this? (Oliver)
+      // pShallowCopyDeleteProc p_shallow_copy_delete
+      //      = pGetShallowCopyDeleteProc(strat->tailRing, new_tailRing);
+      // pNext(p) = p_shallow_copy_delete(pNext(p),
+      //              currRing, strat->tailRing, strat->tailRing->PolyBin);
+    }
+    enterL(&strat->L,&strat->Ll,&strat->Lmax,h,posx);
   }
 }
 #endif
@@ -1798,6 +1968,17 @@ void chainCritRing (poly p,int ecart,kStrategy strat)
           {
             if (pDivisibleBy(strat->S[j],strat->B[i].lcm))
             {
+#ifdef KDEBUG
+              if (TEST_OPT_DEBUG)
+              {
+                PrintS("--- chain criterion func chainCritRing type 1\n");
+                PrintS("strat->S[j]:");
+                wrp(strat->S[j]);
+                PrintS("  strat->B[i].lcm:");
+                wrp(strat->B[i].lcm);
+                PrintLn();
+              }
+#endif
               deleteInL(strat->B,&strat->Bl,i,strat);
               strat->c3++;
             }
@@ -1811,7 +1992,7 @@ void chainCritRing (poly p,int ecart,kStrategy strat)
   assume(!(strat->Gebauer || strat->fromT));
   for (j=strat->Ll; j>=0; j--)
   {
-    if (strat->L[j].lcm != NULL && nGreater(pGetCoeff(strat->L[j].lcm), pGetCoeff(p)))
+    if (strat->L[j].lcm != NULL && nDivBy(pGetCoeff(strat->L[j].lcm), pGetCoeff(p)))
     {
       if (pCompareChain(p,strat->L[j].p1,strat->L[j].p2,strat->L[j].lcm))
       {
@@ -1819,7 +2000,17 @@ void chainCritRing (poly p,int ecart,kStrategy strat)
         {
           deleteInL(strat->L,&strat->Ll,j,strat);
           strat->c3++;
-          // Print("|UL|");
+#ifdef KDEBUG
+              if (TEST_OPT_DEBUG)
+              {
+                PrintS("--- chain criterion func chainCritRing type 2\n");
+                PrintS("strat->L[j].p:");
+                wrp(strat->L[j].p);
+                PrintS("  p:");
+                wrp(p);
+                PrintLn();
+              }
+#endif
         }
       }
     }
@@ -1860,12 +2051,22 @@ void chainCritRing (poly p,int ecart,kStrategy strat)
       {
         if (i < 0)  break;
         // Element is from B and has the same lcm as L[j]
-        if ((strat->L[i].p2 == p) && nGreater(pGetCoeff(strat->L[j].lcm), pGetCoeff(strat->L[i].lcm))
+        if ((strat->L[i].p2 == p) && nDivBy(pGetCoeff(strat->L[j].lcm), pGetCoeff(strat->L[i].lcm))
              && pLmEqual(strat->L[j].lcm,strat->L[i].lcm))
         {
           /*L[i] could be canceled but we search for a better one to cancel*/
           strat->c3++;
-          // Print("|EP|");
+#ifdef KDEBUG
+          if (TEST_OPT_DEBUG)
+          {
+            PrintS("--- chain criterion func chainCritRing type 3\n");
+            PrintS("strat->L[j].lcm:");
+            wrp(strat->L[j].lcm);
+            PrintS("  strat->L[i].lcm:");
+            wrp(strat->L[i].lcm);
+            PrintLn();
+          }
+#endif
           if (isInPairsetL(i-1,strat->L[j].p1,strat->L[i].p1,&l,strat)
           && (pNext(strat->L[l].p) == strat->tail)
           && (!pLmEqual(strat->L[i].p,strat->L[l].p))
@@ -2335,8 +2536,8 @@ void initenterpairsRing (poly h,int k,int ecart,int isFromQ,kStrategy strat, int
           if (!strat->fromQ[j])
           {
             new_pair=TRUE;
+            Print("TODO Oliver --- j:%d, Ll:%d\n",j,strat->Ll);
             enterOnePairRing(j,h,ecart,isFromQ,strat, atR);
-            Print("j:%d, Ll:%d\n",j,strat->Ll);
           }
         }
       }
@@ -2345,8 +2546,8 @@ void initenterpairsRing (poly h,int k,int ecart,int isFromQ,kStrategy strat, int
         new_pair=TRUE;
         for (j=0; j<=k; j++)
         {
-          enterOnePairRing(j,h,ecart,isFromQ,strat, atR);
           // Print("j:%d, Ll:%d\n",j,strat->Ll);
+          enterOnePairRing(j,h,ecart,isFromQ,strat, atR);
         }
       }
     }
@@ -2357,8 +2558,8 @@ void initenterpairsRing (poly h,int k,int ecart,int isFromQ,kStrategy strat, int
         if ((pGetComp(h)==pGetComp(strat->S[j])) || (pGetComp(strat->S[j])==0))
         {
           new_pair=TRUE;
+          Print("TODO Oliver --- j:%d, Ll:%d\n",j,strat->Ll);
           enterOnePairRing(j,h,ecart,isFromQ,strat, atR);
-          Print("j:%d, Ll:%d\n",j,strat->Ll);
         }
       }
     }
@@ -2369,6 +2570,35 @@ void initenterpairsRing (poly h,int k,int ecart,int isFromQ,kStrategy strat, int
 
     if (new_pair) chainCritRing(h,ecart,strat);
 
+  }
+/*
+ring r=256,(x,y,z),dp;
+ideal I=12xz-133y, 2xy-z;
+*/
+
+}
+
+/*2
+*(s[0],h),...,(s[k],h) will be put to the pairset L
+*/
+void initenterstrongPairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR = -1)
+{
+
+  if (!nIsOne(pGetCoeff(h)))
+  {
+    int j;
+    BOOLEAN new_pair=FALSE;
+
+    for (j=0; j<=k; j++)
+    {
+      // Print("j:%d, Ll:%d\n",j,strat->Ll);
+      if (((unsigned long) pGetCoeff(h) % (unsigned long) pGetCoeff(strat->S[j]) != 0) &&
+         ((unsigned long) pGetCoeff(strat->S[j]) % (unsigned long) pGetCoeff(h) != 0))
+      {
+        new_pair=TRUE;
+        enterOneStrongPoly(j,h,ecart,isFromQ,strat, atR);
+      }
+    }
   }
 /*
 ring r=256,(x,y,z),dp;
@@ -2402,6 +2632,14 @@ void enterExtendedSpoly(poly h,kStrategy strat)
       {
         PrintS("Z");
       }
+#ifdef KDEBUG
+      if (TEST_OPT_DEBUG)
+      {
+        PrintS("--- create zero spoly: ");
+        wrp(h);
+        PrintS(" ---> ");
+      }
+#endif
       poly tmp = p_ISet((long) ((p)->coef), currRing);
       for (int i = 1; i <= currRing->N; i++)
       {
@@ -2441,6 +2679,13 @@ void enterExtendedSpoly(poly h,kStrategy strat)
           // pNext(p) = p_shallow_copy_delete(pNext(p),
           //              currRing, strat->tailRing, strat->tailRing->PolyBin);
         }
+#ifdef KDEBUG
+        if (TEST_OPT_DEBUG)
+        {
+          wrp(tmp);
+          PrintLn();
+        }
+#endif
         enterL(&strat->L,&strat->Ll,&strat->Lmax,h,posx);
       }
     }
@@ -2455,7 +2700,7 @@ void clearSbatch (poly h,int k,int pos,kStrategy strat)
     //||(pGetComp(h)<=strat->syzComp)))
   ))
   {
-    //Print("start clearS k=%d, pos=%d, sl=%d\n",k,pos,strat->sl);
+    // Print("start clearS k=%d, pos=%d, sl=%d\n",k,pos,strat->sl);
     unsigned long h_sev = pGetShortExpVector(h);
     loop
     {
@@ -2463,7 +2708,7 @@ void clearSbatch (poly h,int k,int pos,kStrategy strat)
       clearS(h,h_sev, &j,&k,strat);
       j++;
     }
-    //Print("end clearS sl=%d\n",strat->sl);
+    // Print("end clearS sl=%d\n",strat->sl);
   }
 }
 
@@ -2477,6 +2722,7 @@ void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
     // enter also zero divisor * poly, if this is non zero and of smaller degree
     enterExtendedSpoly(h, strat);
     initenterpairsRing(h, k, ecart, 0, strat, atR);
+    initenterstrongPairs(h, k, ecart, 0, strat, atR);
     clearSbatch(h, k, pos, strat);
 }
 #endif
@@ -2489,6 +2735,7 @@ void enterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 {
   int j=pos;
 
+  assume (!rField_is_Ring(currRing));
   initenterpairs(h,k,ecart,0,strat, atR);
   if ( (!strat->fromT)
   && ((strat->syzComp==0)

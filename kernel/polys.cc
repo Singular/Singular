@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.17 2007-05-11 10:48:04 wienand Exp $ */
+/* $Id: polys.cc,v 1.18 2007-05-19 13:22:23 wienand Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -690,7 +690,21 @@ BOOLEAN pHasNotCF(poly p1, poly p2)
 
 #ifdef HAVE_RINGS  //HACK TODO Oliver
 number nGetUnit(number k) {
-  return (number) nIntDiv(k, nGcd(k, 0, currRing));
+  number unit = nIntDiv(k, nGcd(k, 0, currRing));
+  number gcd = nGcd(unit, 0, currRing);
+  if (!nIsOne(gcd))
+  {
+    number tmp = nMult(unit, unit);
+    number gcd_new = nGcd(tmp, 0, currRing);
+    while (gcd_new != gcd)
+    {
+      gcd = gcd_new;
+      tmp = nMult(tmp, unit);
+      gcd_new = nGcd(tmp, 0, currRing);
+    }
+    unit = nAdd(unit, nIntDiv(0, gcd_new));
+  }
+  return unit;
 }
 #endif
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.3 2007-05-11 10:48:05 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.4 2007-05-19 13:22:23 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -76,7 +76,9 @@ number nrnMult (number a,number b)
  */
 number nrnLcm (number a,number b,ring r)
 {
-  return (number) (XSGCD2(nrnModul, (NATNUMBER) a) * XSGCD2(nrnModul, (NATNUMBER) b) / XSGCD3(nrnModul, (NATNUMBER) a, (NATNUMBER) b));
+  NATNUMBER erg = XSGCD2(nrnModul, (NATNUMBER) a) * XSGCD2(nrnModul, (NATNUMBER) b) / XSGCD3(nrnModul, (NATNUMBER) a, (NATNUMBER) b);
+  if (erg == nrnModul) return NULL;   // Schneller als return erg % nrnModul ?
+  return (number) erg;
 }
 
 /*
@@ -166,8 +168,9 @@ int nrnComp(number a, number b)
    NATNUMBER bs = XSGCD2((NATNUMBER) b, nrnModul);
    NATNUMBER as = XSGCD2((NATNUMBER) a, nrnModul);
    if (bs == as) return 0;
-   if (as % bs == 0) return 1;
-   return -1;
+   if (as % bs == 0) return -1;
+   if (bs % as == 0) return 1;
+   return 2;
 }
 
 BOOLEAN nrnDivBy (number a,number b)
@@ -277,6 +280,8 @@ number nrnIntDiv (number a,number b)
   {
     if ((NATNUMBER)b==0)
       return (number) 1;
+    if ((NATNUMBER)b==1)
+      return (number) 0;
     return (number) ( nrnModul / (NATNUMBER) b);
   }
   else

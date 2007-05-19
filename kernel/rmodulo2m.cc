@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.9 2007-05-11 10:48:05 wienand Exp $ */
+/* $Id: rmodulo2m.cc,v 1.10 2007-05-19 13:22:23 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -299,6 +299,8 @@ number nr2mIntDiv (number a,number b)
   {
     if ((NATNUMBER)b==0)
       return (number) 1;
+    if ((NATNUMBER)b==1)
+      return (number) 0;
     return (number) (nr2mModul / (NATNUMBER) b);
   }
   else

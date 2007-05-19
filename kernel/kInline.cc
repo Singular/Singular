@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.5 2007-02-01 18:22:35 Singular Exp $
+ *  Version: $Id: kInline.cc,v 1.6 2007-05-19 13:22:22 wienand Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -956,6 +956,57 @@ KINLINE BOOLEAN k_GetLeadTerms(const poly p1, const poly p2, const ring p_r,
   m1 = m2 = NULL;
   return FALSE;
 }
+
+#ifdef HAVE_RINGS
+// get m1 = LCM(LM(p1), LM(p2))/LM(p1)
+//     m2 = LCM(LM(p1), LM(p2))/LM(p2)   in tailRing
+//    lcm = LCM(LM(p1), LM(p2)           in leadRing
+KINLINE BOOLEAN k_GetStrongLeadTerms(const poly p1, const poly p2, const ring leadRing,
+                               poly &m1, poly &m2, poly &lcm, const ring tailRing)
+{
+  p_LmCheckPolyRing(p1, leadRing);
+  p_LmCheckPolyRing(p2, leadRing);
+
+  int i;
+  Exponent_t x;
+  Exponent_t e1;
+  Exponent_t e2;
+  Exponent_t s;
+  m1 = p_Init(tailRing);
+  m2 = p_Init(tailRing);
+  lcm = p_Init(leadRing);
+
+  for (i = leadRing->N; i; i--)
+  {
+    e1 = p_GetExp(p1,i,leadRing);
+    e2 = p_GetExp(p2,i,leadRing);
+    x = e1 - e2;
+    s = e1 + e2;
+    if (x > 0)
+    {
+      p_SetExp(m2,i,x, tailRing);
+      p_SetExp(m1,i,0, tailRing);
+    }
+    else
+    {
+      p_SetExp(m1,i,-x, tailRing);
+      p_SetExp(m2,i,0, tailRing);
+    }
+    p_SetExp(lcm,i,s, leadRing);
+  }
+
+  p_Setm(m1, tailRing);
+  p_Setm(m2, tailRing);
+  p_Setm(lcm, leadRing);
+  return TRUE;
+
+  false_return:
+  p_LmFree(m1, tailRing);
+  p_LmFree(m2, tailRing);
+  m1 = m2 = NULL;
+  return FALSE;
+}
+#endif
 
 /***************************************************************
  *

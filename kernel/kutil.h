@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.23 2007-05-11 10:48:04 wienand Exp $ */
+/* $Id: kutil.h,v 1.24 2007-05-19 13:22:22 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -492,6 +492,10 @@ KINLINE poly k_LmShallowCopyDelete_tailRing_2_currRing(poly p, ring tailRing);
 // return FALSE and m1 == NULL, m2 == NULL     , otherwise
 KINLINE BOOLEAN k_GetLeadTerms(const poly p1, const poly p2, const ring p_r,
                                poly &m1, poly &m2, const ring m_r);
+#ifdef HAVE_RINGS
+KINLINE BOOLEAN k_GetStrongLeadTerms(const poly p1, const poly p2, const ring leadRing,
+                               poly &m1, poly &m2, poly &lcm, const ring taiRing);
+#endif
 #ifdef KDEBUG
 // test strat
 BOOLEAN kTest(kStrategy strat);
