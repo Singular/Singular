@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.15 2007-05-02 10:02:11 Singular Exp $
+// $Id: clapsing.cc,v 1.16 2007-05-21 16:41:29 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -820,8 +820,13 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
         CanonicalForm G( convSingTrPClapP( f ) );
         T_F=G;
 #ifdef HAVE_LIBFAC_P
-        //  over Q(a) / Fp(a)
-        L=Factorize(G, mipo);
+        //  over Q(a) / multivariate over Fp(a)
+        //if (rField_is_Zp_a())
+        {
+          L=Factorize2(G, mipo);
+        }
+        //else
+        //  L=Factorize(G, mipo);
 #else
         WarnS("complete factorization only for univariate polynomials");
         if (rField_is_Q_a() ||(!F.isUnivariate())) /* Q(a) */
@@ -868,7 +873,11 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     for ( ; J.hasItem(); J++ )
     {
       int T_e = J.getItem().exp();
-      while(T_e>0)  { T *= J.getItem().factor(); T_e--; }
+      while(T_e>0)
+      { 
+        if (!( J.getItem().factor().isZero())) T *= J.getItem().factor();
+        T_e--; 
+      }
     }
     T_F-=T;
     if (!T_F.isZero())
@@ -888,20 +897,21 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
           else
             p=( convClapAPSingAP( J.getItem().factor() ));
         }
-        while(T_e>0)  { T_F_conv=pMult(T_F_conv,pCopy(p)); T_e--; }
-        pDelete(&p);
+        if (p!=NULL)
+        {
+          while(T_e>0)  { T_F_conv=pMult(T_F_conv,pCopy(p)); T_e--; }
+          pDelete(&p);
+        }
       }
-      number n_T;
-      if (T_F_conv!=NULL) n_T=pGetCoeff(T_F_conv);
-      else                n_T=nInit(0);
+      number n_T=pGetCoeff(T_F_conv);
       number n_f=pGetCoeff(f);
       poly n_f_m=pCopy(f);
-      if (n_T!=NULL) n_f_m=pMult_nn(n_f_m,n_T);
-      if (T_F_conv!=NULL) T_F_conv=pMult_nn(T_F_conv,n_f);
+      n_f_m=pMult_nn(n_f_m,n_T);
+      T_F_conv=pMult_nn(T_F_conv,n_f);
       T_F_conv=pSub(T_F_conv,n_f_m);
       if (T_F_conv!=NULL)
       {
-        if (singclap_factorize_retry<3)
+        if (singclap_factorize_retry<1)
         {
           singclap_factorize_retry++;
           //if( si_factor_reminder) Print("problem with factorize, retrying\n");

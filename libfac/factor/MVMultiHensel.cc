@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.10 2007-05-15 14:46:49 Singular Exp $";
+// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.11 2007-05-21 16:40:12 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -117,7 +117,9 @@ protected:
 // Returns s and t.                                          //
 ///////////////////////////////////////////////////////////////
 static DiophantForm
-diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int i , RememberArray & A, RememberArray & B )
+diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 ,
+          int i , RememberArray & A, RememberArray & B,
+          const CanonicalForm &alpha )
 {
   DiophantForm Retvalue;
   CanonicalForm s,t,q,r;
@@ -135,6 +137,7 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
     return Retvalue;
   }
 
+#if 0
   // Degrees ok? degree(F1,mainvar) + degree(F2,mainvar) <= i ?
   if ( (degree(F1,levelU) + degree(F2,levelU) ) <= i )
   {
@@ -153,6 +156,7 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
     Retvalue.One=F1;Retvalue.Two=F2;
     return Retvalue;
   }
+#endif
 
   if ( i == 0 )
   { // call the extended gcd
@@ -160,10 +164,35 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
     // check if gcd(F1,F2) <> 1 , i.e. F1 and F2 are not relatively prime
     if ( ! r.isOne() )
     {
+      if (r.degree()<1) // some constant != 1 ?
+      {
+        Retvalue.One=s/r;Retvalue.Two=t/r;
+        return Retvalue;
+      }
+      else if (alpha!=0)
+      {
+        Variable Alpha=alpha.mvar();
+        if (r.mvar()==Alpha)   // from field extension ?
+        {
+          Variable X=rootOf(alpha);
+          r=replacevar(r,Alpha,X);
+          s=replacevar(s,Alpha,X);
+          t=replacevar(t,Alpha,X);
+          s/=r;
+          t/=r;
+          s=replacevar(s,X,Alpha);
+          t=replacevar(t,X,Alpha);
+          Retvalue.One=s; Retvalue.Two=t;
+          return Retvalue;
+        }
+      } 
 #ifdef HAVE_SINGULAR_ERROR
       WerrorS("libfac: diophant ERROR: F1 and F2 are not relatively prime! ");
-      //out_cf("F1:",F1,"\n");
-      //out_cf("F2:",F2,"\n");
+#ifndef NOSTREAMIO
+      out_cf("F1:",F1,"\n");
+      out_cf("F2:",F2,"\n");
+      out_cf("gcd:",r,"\n");
+#endif
 #else
 #ifndef NOSTREAMIO
       CERR << "libfac: diophant ERROR: " << F1 << "  and  " << F2
@@ -172,14 +201,14 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
      ;
 #endif
 #endif
-      Retvalue.One=F1;Retvalue.Two=F2;
+      Retvalue.One=s/r;Retvalue.Two=t/r;
       return Retvalue;
     }
     Retvalue.One = s; Retvalue.Two = t;
   }
   else
   { // recursively call diophant
-    Retvalue=diophant(levelU,F1,F2,i-1,A,B);
+    Retvalue=diophant(levelU,F1,F2,i-1,A,B,alpha);
     Retvalue.One *= x; // createVar(levelU,1);
     Retvalue.Two *= x; // createVar(levelU,1);
     // Check degrees.
@@ -220,21 +249,26 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
 static CanonicalForm
 make_delta( int levelU, const CanonicalForm & W,
             const CanonicalForm & F1, const CanonicalForm & F2,
-            RememberArray & A, RememberArray & B){
+            RememberArray & A, RememberArray & B,
+            const CanonicalForm &alpha)
+{
   CanonicalForm Retvalue;
   DiophantForm intermediate;
 
   DEBOUT(CERR, "make_delta: W= ", W);
   DEBOUTLN(CERR, "  degree(W,levelU)= ", degree(W,levelU) );
 
-  if ( levelU == level(W) ){ // same level, good
-    for ( CFIterator i=W; i.hasTerms(); i++){
-      intermediate=diophant(levelU,F1,F2,i.exp(),A,B);
+  if ( levelU == level(W) ) // same level, good
+  {
+    for ( CFIterator i=W; i.hasTerms(); i++)
+    {
+      intermediate=diophant(levelU,F1,F2,i.exp(),A,B,alpha);
       Retvalue += intermediate.One * i.coeff();
     }
   }
-  else{ // level(W) < levelU ; i.e. degree(w,levelU) == 0
-    intermediate=diophant(levelU,F1,F2,0,A,B);
+  else // level(W) < levelU ; i.e. degree(w,levelU) == 0
+  {
+    intermediate=diophant(levelU,F1,F2,0,A,B,alpha);
     Retvalue = W * intermediate.One;
   }
   DEBOUTLN(CERR, "make_delta: Returnvalue= ", Retvalue);
@@ -244,7 +278,8 @@ make_delta( int levelU, const CanonicalForm & W,
 static CanonicalForm
 make_square( int levelU, const CanonicalForm & W,
              const CanonicalForm & F1, const CanonicalForm & F2,
-             RememberArray & A, RememberArray & B){
+             RememberArray & A, RememberArray & B,const CanonicalForm &alpha)
+{
   CanonicalForm Retvalue;
   DiophantForm intermediate;
 
@@ -253,12 +288,12 @@ make_square( int levelU, const CanonicalForm & W,
 
   if ( levelU == level(W) ){ // same level, good
     for ( CFIterator i=W; i.hasTerms(); i++){
-      intermediate=diophant(levelU,F1,F2,i.exp(),A,B);
+      intermediate=diophant(levelU,F1,F2,i.exp(),A,B,alpha);
       Retvalue += i.coeff() * intermediate.Two;
     }
   }
   else{ // level(W) < levelU ; i.e. degree(w,levelU) == 0
-    intermediate=diophant(levelU,F1,F2,0,A,B);
+    intermediate=diophant(levelU,F1,F2,0,A,B,alpha);
     Retvalue = W * intermediate.Two;
   }
   DEBOUTLN(CERR, "make_square: Returnvalue= ", Retvalue);
@@ -276,7 +311,9 @@ make_square( int levelU, const CanonicalForm & W,
 ///////////////////////////////////////////////////////////////
 static DiophantForm
 mvhensel( const CanonicalForm & U , const CanonicalForm & F ,
-          const CanonicalForm & G , const SFormList & Substitutionlist){
+          const CanonicalForm & G , const SFormList & Substitutionlist,
+          const CanonicalForm &alpha)
+{
   CanonicalForm V,Fk=F,Gk=G,Rk,W,D,S;
   int  levelU=level(U), degU=subvardegree(U,levelU); // degree(U,{x_1,..,x_(level(U)-1)})
   DiophantForm Retvalue;
@@ -296,17 +333,18 @@ mvhensel( const CanonicalForm & U , const CanonicalForm & F ,
        << "          Gk= " << G << "\n"
        << "          Rk= " << Rk << "\n";
 #endif
-  for ( int k=2; k<=degU+1; k++){//2; k++){//degU+1; k++){
+  for ( int k=2; k<=degU+1; k++)
+  {
     W = mod_power(Rk,k,levelU);
 #ifdef HENSELDEBUG2
     CERR << "mvhensel: Iteration: " << k << "\n";
     CERR << "mvhensel: W= " << W << "\n";
 #endif
-    D = make_delta(levelU,W,F,G,A,B);
+    D = make_delta(levelU,W,F,G,A,B,alpha);
 #ifdef HENSELDEBUG2
     CERR << "mvhensel: D= " << D << "\n";
 #endif
-    S = make_square(levelU,W,F,G,A,B);
+    S = make_square(levelU,W,F,G,A,B,alpha);
 #ifdef HENSELDEBUG2
     CERR << "mvhensel: S= " << S << "\n";
 #endif
@@ -338,7 +376,9 @@ mvhensel( const CanonicalForm & U , const CanonicalForm & F ,
 ///////////////////////////////////////////////////////////////
 CFFList
 multihensel( const CanonicalForm & mF, const CFFList & Factorlist,
-             const SFormList & Substitutionlist){
+             const SFormList & Substitutionlist,
+             const CanonicalForm &alpha)
+{
   CFFList Returnlist,factorlist=Factorlist;
   DiophantForm intermediat;
   CanonicalForm Pl,Pr;
@@ -354,7 +394,7 @@ multihensel( const CanonicalForm & mF, const CFFList & Factorlist,
     if ( n == 2 ){
       intermediat= mvhensel(mF, factorlist.getFirst().factor(),
                             Factorlist.getLast().factor(),
-                            Substitutionlist);
+                            Substitutionlist,alpha);
       Returnlist.append(CFFactor(intermediat.One,1));
       Returnlist.append(CFFactor(intermediat.Two,1));
     }
@@ -370,12 +410,12 @@ multihensel( const CanonicalForm & mF, const CFFList & Factorlist,
       CERR << "multihensel: Pl,Pr, factorlist: " << Pl << "  " << Pr
            << "  " << factorlist << "\n";
 #endif
-      intermediat= mvhensel(mF,Pl,Pr,Substitutionlist);
+      intermediat= mvhensel(mF,Pl,Pr,Substitutionlist,alpha);
       Returnlist.append(CFFactor(intermediat.One,1));
-      Returnlist=Union( multihensel(intermediat.Two,factorlist,Substitutionlist), Returnlist);
+      Returnlist=Union( multihensel(intermediat.Two,factorlist,Substitutionlist,alpha), 
+                        Returnlist);
     }
   }
-
   return Returnlist;
 }
 
@@ -388,7 +428,8 @@ multihensel( const CanonicalForm & mF, const CFFList & Factorlist,
 ///////////////////////////////////////////////////////////////
 CFFList
 MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
-             const SFormList & Substitutionlist){
+             const SFormList & Substitutionlist, const CanonicalForm &alpha)
+{
   CFFList Returnlist,Retlistinter,factorlist=Factorlist,Ll;
   CFFListIterator i;
   DiophantForm intermediat;
@@ -400,19 +441,24 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
   DEBOUT(CERR,"           : n,h = ", n);
   DEBOUTLN(CERR,"  ", h);
 
-  if ( n == 1 ) {
+  if ( n == 1 )
+  {
     Returnlist.append(CFFactor(mF,1));
   }
-  else {
-    if ( n == 2 ){
+  else
+  {
+    if ( n == 2 )
+    {
       intermediat= mvhensel(mF, factorlist.getFirst().factor(),
                             Factorlist.getLast().factor(),
-                            Substitutionlist);
+                            Substitutionlist,alpha);
       Returnlist.append(CFFactor(intermediat.One,1));
       Returnlist.append(CFFactor(intermediat.Two,1));
     }
-    else { // more then two factors
-      for ( k=1 ; k<=h; k++){
+    else  // more then two factors
+    {
+      for ( k=1 ; k<=h; k++)
+      {
         Ll.append(factorlist.getFirst());
         factorlist.removeFirst();
       }
@@ -427,7 +473,7 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
       for ( i = factorlist; i.hasItem(); i++)
         Pr *= i.getItem().factor();
       DEBOUTLN(CERR, "MultiHensel: Pr= ", Pr);
-      intermediat = mvhensel(mF,Pl,Pr,Substitutionlist);
+      intermediat = mvhensel(mF,Pl,Pr,Substitutionlist,alpha);
       // divison test for intermediat.One and intermediat.Two ?
       CanonicalForm a,b;
       // we add a division test now for intermediat.One and intermediat.Two
@@ -436,8 +482,8 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
       if ( mydivremt (mF,intermediat.Two,a,b) && b == mF.genZero() )
         Retlistinter.append(CFFactor(intermediat.Two,1)  );
 
-      Ll = MultiHensel(intermediat.One, Ll, Substitutionlist);
-      Returnlist = MultiHensel(intermediat.Two, factorlist, Substitutionlist);
+      Ll = MultiHensel(intermediat.One, Ll, Substitutionlist,alpha);
+      Returnlist = MultiHensel(intermediat.Two, factorlist, Substitutionlist,alpha);
       Returnlist = Union(Returnlist,Ll);
 
       Returnlist = Union(Retlistinter,Returnlist);
@@ -449,6 +495,9 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.10  2007/05/15 14:46:49  Singular
+*hannes: factorize in Zp(a)[x...]
+
 Revision 1.9  2006/05/16 14:46:49  Singular
 *hannes: gcc 4.1 fixes
 

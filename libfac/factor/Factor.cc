@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.25 2007-05-15 15:50:42 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.26 2007-05-21 16:40:12 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -612,7 +612,8 @@ find_evaluation(int maxtries, int sametries, int failtries, const CanonicalForm 
 // Returns the list of factors.                              //
 ///////////////////////////////////////////////////////////////
 CFFList
-Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar){
+Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar)
+{
   CanonicalForm f,lt,ff,ffuni;
   Variable Extension=alpha.mvar();
   CFFList Outputlist,UnivariateFactorlist,Outputlist2;
@@ -625,14 +626,17 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar){
   if ( interrupt_handle() ) return CFFList() ;
   // INTERRUPTHANDLER
 
-  if ( F.isUnivariate() ){ // could have lost one Variable elsewhere
-    if ( degree(Extension) == 0 ){
+  if ( F.isUnivariate() ) // could have lost one Variable elsewhere
+  {
+    if ( degree(Extension) == 0 )
+    {
       TIMING_START(evaluate_time);
       Outputlist = factorize(F,1); // poly is sqr-free
       TIMING_END(evaluate_time);
       return Outputlist;
     }
-    else{
+    else
+    {
       if (Extension.level()<0)
       DEBOUTLN(CERR, "Univ. Factorization over extension of degree ",
                degree(getMipo(Extension,'x')) );
@@ -793,7 +797,7 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar){
     // INTERRUPTHANDLER
 
     TIMING_START(hensel_time);
-    Outputlist = MultiHensel(ff,UnivariateFactorlist,Substitutionlist);
+    Outputlist = MultiHensel(ff,UnivariateFactorlist,Substitutionlist, alpha);
     DEBOUTLN(CERR, "Outputlist after MultiHensel: ", Outputlist);
     TIMING_END(hensel_time);
 
@@ -992,7 +996,7 @@ CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
 //           * choosing an algebraic extension (n.y.u.)      //
 //           * ensuring poly is sqrfree (n.y.i.)             //
 ///////////////////////////////////////////////////////////////
-CFFList Factorize2(const CanonicalForm & F, const CanonicalForm & minpoly )
+CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
 {
   CFFList iF=Factorize(F);
   CFFList G,H;
@@ -1003,15 +1007,74 @@ CFFList Factorize2(const CanonicalForm & F, const CanonicalForm & minpoly )
   {
     d = i.getItem().exp();
     fac = i.getItem().factor();
-    G = Factorize( fac, minpoly);
+    if (fdivides(F,fac))
+    {
+      if ((getNumVars(fac)==0)||(fac.degree()<=1))
+      {
+#ifndef NOSTREAMIO
+#ifndef NDEBUG
+        printf("append trivial factor\n");
+#endif
+#endif
+        H.append( CFFactor( fac, d));
+        do {F/=fac; d--; } while (d>0);
+      }
+      else
+      {
+        G = Factorize( fac, minpoly);
+        for ( k = G; k.hasItem(); ++k )
+        {
+          fac = k.getItem().factor();
+          int dd = k.getItem().exp();
+          if ((!fac.isZero())&& fdivides(F,fac))
+          {
+#ifndef NOSTREAMIO
+#ifndef NDEBUG
+            out_cf("factor:",fac,"\n");
+#endif
+#endif
+            H.append( CFFactor( fac , d*dd ) );
+            do {F/=fac; d--; } while (d>0);
+          }
+        }
+      }
+    }
+  }
+  if (getNumVars(F)>0)
+  {
+#ifndef NOSTREAMIO
+#ifndef NDEBUG
+        out_cf("retry:",F,"\n");
+#endif
+#endif
+    G = Factorize(F, minpoly);
     for ( k = G; k.hasItem(); ++k )
     {
       fac = k.getItem().factor();
       int dd = k.getItem().exp();
-      H.append( CFFactor( fac , d*dd ) );
+      if ((!fac.isZero())&& fdivides(F,fac))
+      {
+#ifndef NOSTREAMIO
+#ifndef NDEBUG
+        out_cf("factor:",fac,"\n");
+#endif
+#endif
+        H.append( CFFactor( fac , d*dd ) );
+        do {F/=fac; d--; } while (d>0);
+      }
     }
   }
+  if (getNumVars(F)>0)
+  {
+#ifndef NOSTREAMIO
+#ifndef NDEBUG
+        out_cf("rest:",fac,"\n");
+#endif
+#endif
+    H.append( CFFactor(F,1) );
+  }
   //Outputlist = newfactoras( F, as, 1);
+  if(isOn(SW_USE_NTL_SORT)) H.sort(cmpCF);
   return H;
 }
 CFFList
@@ -1117,6 +1180,7 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
     if ( getNumVars(g) ==0 ) // a constant; Exp==1
       Outputlist.append( CFFactor(g,1) ) ;
     else// a real polynomial
+    {
       if ( g.isUnivariate() )
       {
         Variable alpha=rootOf(minpoly);
@@ -1148,6 +1212,7 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
           //Normally j.getItem().exp() should be 1
           Outputlist= myappend( Outputlist, CFFactor(m(j.getItem().factor()),exp*j.getItem().exp()));
       }
+    }
   }
   g=1; unit=1;
   DEBOUTLN(CERR, "Outputlist is ", Outputlist);
@@ -1194,6 +1259,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.25  2007/05/15 15:50:42  Singular
+*hannes: Factorize2
+
 Revision 1.24  2007/05/15 14:46:48  Singular
 *hannes: factorize in Zp(a)[x...]
 
