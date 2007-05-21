@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.26 2007-05-21 16:40:12 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.27 2007-05-21 16:50:56 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -1007,7 +1007,7 @@ CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
   {
     d = i.getItem().exp();
     fac = i.getItem().factor();
-    if (fdivides(F,fac))
+    if (fdivides(fac,F))
     {
       if ((getNumVars(fac)==0)||(fac.degree()<=1))
       {
@@ -1026,7 +1026,7 @@ CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
         {
           fac = k.getItem().factor();
           int dd = k.getItem().exp();
-          if ((!fac.isZero())&& fdivides(F,fac))
+          if ((!fac.isZero())&& fdivides(fac,F))
           {
 #ifndef NOSTREAMIO
 #ifndef NDEBUG
@@ -1052,7 +1052,7 @@ CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
     {
       fac = k.getItem().factor();
       int dd = k.getItem().exp();
-      if ((!fac.isZero())&& fdivides(F,fac))
+      if ((!fac.isZero())&& fdivides(fac,F))
       {
 #ifndef NOSTREAMIO
 #ifndef NDEBUG
@@ -1259,6 +1259,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.26  2007/05/21 16:40:12  Singular
+*hannes: Factorize2
+
 Revision 1.25  2007/05/15 15:50:42  Singular
 *hannes: Factorize2
 
