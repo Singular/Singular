@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.54 2007-05-19 13:22:22 wienand Exp $ */
+/* $Id: kutil.cc,v 1.55 2007-05-21 17:23:36 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2735,7 +2735,9 @@ void enterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 {
   int j=pos;
 
+#ifdef HAVE_RING2TOM
   assume (!rField_is_Ring(currRing));
+#endif
   initenterpairs(h,k,ecart,0,strat, atR);
   if ( (!strat->fromT)
   && ((strat->syzComp==0)
