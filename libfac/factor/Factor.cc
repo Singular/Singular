@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.27 2007-05-21 16:50:56 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.28 2007-05-21 17:56:55 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -1033,8 +1033,9 @@ CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
             out_cf("factor:",fac,"\n");
 #endif
 #endif
-            H.append( CFFactor( fac , d*dd ) );
-            do {F/=fac; d--; } while (d>0);
+            dd=d*dd;
+            H.append( CFFactor( fac , dd ) );
+            do {F/=fac; dd--; } while (dd>0);
           }
         }
       }
@@ -1044,14 +1045,14 @@ CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
   {
 #ifndef NOSTREAMIO
 #ifndef NDEBUG
-        out_cf("retry:",F,"\n");
+    out_cf("retry:",F,"\n");
 #endif
 #endif
     G = Factorize(F, minpoly);
     for ( k = G; k.hasItem(); ++k )
     {
       fac = k.getItem().factor();
-      int dd = k.getItem().exp();
+      d = k.getItem().exp();
       if ((!fac.isZero())&& fdivides(fac,F))
       {
 #ifndef NOSTREAMIO
@@ -1059,7 +1060,7 @@ CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
         out_cf("factor:",fac,"\n");
 #endif
 #endif
-        H.append( CFFactor( fac , d*dd ) );
+        H.append( CFFactor( fac , d ) );
         do {F/=fac; d--; } while (d>0);
       }
     }
@@ -1068,7 +1069,7 @@ CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
   {
 #ifndef NOSTREAMIO
 #ifndef NDEBUG
-        out_cf("rest:",fac,"\n");
+    out_cf("rest:",fac,"\n");
 #endif
 #endif
     H.append( CFFactor(F,1) );
@@ -1259,6 +1260,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.27  2007/05/21 16:50:56  Singular
+*hannes: fix fdivide test
+
 Revision 1.26  2007/05/21 16:40:12  Singular
 *hannes: Factorize2
 
