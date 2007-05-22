@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.29 2007-05-22 13:18:57 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.30 2007-05-22 14:30:53 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -1023,6 +1023,8 @@ static bool fdivides2(const CanonicalForm &F, const CanonicalForm &G, const Cano
 }
 CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
 {
+  extern bool diophant_error;
+  diophant_error=false;
   CFFList G,H;
   CanonicalForm fac;
   int d,e;
@@ -1331,6 +1333,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.29  2007/05/22 13:18:57  Singular
+*hannes: Factorize2: div test, sort etc.
+
 Revision 1.28  2007/05/21 17:56:55  Singular
 *hannes: fixed exp.
 

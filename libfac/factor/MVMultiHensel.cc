@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.11 2007-05-21 16:40:12 Singular Exp $";
+// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.12 2007-05-22 14:30:53 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -55,23 +55,28 @@ void out_cf(char *s1,const CanonicalForm &f,char *s2);
 ///////////////////////////////////////////////////////////////
 typedef bool Boolean;
 
- class DiophantForm {
+class DiophantForm
+{
  public:
    CanonicalForm One;
    CanonicalForm Two;
-   inline DiophantForm& operator=( const DiophantForm&  value ){
-     if ( this != &value ){
+   inline DiophantForm& operator=( const DiophantForm&  value )
+   {
+     if ( this != &value )
+     {
        One = value.One;
        Two = value.Two;
      }
      return *this;
    }
- };
+};
 
 // We remember an already calculated value; simple class for RememberArray
-class RememberForm {
+class RememberForm
+{
 public:
-  inline RememberForm operator=( CanonicalForm & value ){
+  inline RememberForm operator=( CanonicalForm & value )
+  {
     this->calculated = true;
     this->poly = value;
     return *this;
@@ -83,22 +88,26 @@ public:
 
 // Array to remember already calculated values; used for the diophantine
 // equation s*f + t*g = x^i
-class RememberArray {
+class RememberArray
+{
 public:
 // operations performed on arrays
-  RememberArray( int sz ){
+  RememberArray( int sz )
+  {
     size = sz;
     ia = new RememberForm[size];
 //    assert( ia != 0 ); // test if we got the memory
     init( sz );
   }
   ~RememberArray(){ delete [] ia; }
-  inline RememberForm& operator[]( int index ){
+  inline RememberForm& operator[]( int index )
+  {
     return ia[index];
   }
   bool checksize(int i) {return i<size;}
 protected:
-  void init( int ){
+  void init( int )
+  {
     for ( int ix=0; ix < size; ++ix)
     {
       ia[ix].calculated=false;
@@ -110,6 +119,7 @@ protected:
   RememberForm *ia;
 };
 
+bool diophant_error;
 
 ///////////////////////////////////////////////////////////////
 // Solve the Diophantine equation: ( levelU == mainvar )     //
@@ -137,10 +147,10 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 ,
     return Retvalue;
   }
 
-#if 0
   // Degrees ok? degree(F1,mainvar) + degree(F2,mainvar) <= i ?
   if ( (degree(F1,levelU) + degree(F2,levelU) ) <= i )
   {
+    diophant_error=true;
 #ifdef HAVE_SINGULAR_ERROR
     Werror("libfac: diophant ERROR: degree too large!  (%d + %d <= %d)",degree(F1,levelU), degree(F2,levelU), i);
       //out_cf("F1:",F1,"\n");
@@ -156,7 +166,6 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 ,
     Retvalue.One=F1;Retvalue.Two=F2;
     return Retvalue;
   }
-#endif
 
   if ( i == 0 )
   { // call the extended gcd
@@ -286,13 +295,16 @@ make_square( int levelU, const CanonicalForm & W,
   DEBOUT(CERR, "make_square: W= ", W );
   DEBOUTLN(CERR, "  degree(W,levelU)= ", degree(W,levelU));
 
-  if ( levelU == level(W) ){ // same level, good
-    for ( CFIterator i=W; i.hasTerms(); i++){
+  if ( levelU == level(W) ) // same level, good
+  {
+    for ( CFIterator i=W; i.hasTerms(); i++)
+    {
       intermediate=diophant(levelU,F1,F2,i.exp(),A,B,alpha);
       Retvalue += i.coeff() * intermediate.Two;
     }
   }
-  else{ // level(W) < levelU ; i.e. degree(w,levelU) == 0
+  else // level(W) < levelU ; i.e. degree(w,levelU) == 0
+  {
     intermediate=diophant(levelU,F1,F2,0,A,B,alpha);
     Retvalue = W * intermediate.Two;
   }
@@ -387,18 +399,22 @@ multihensel( const CanonicalForm & mF, const CFFList & Factorlist,
   DEBOUT(CERR, "multihensel: called with ", mF);
   DEBOUTLN(CERR, "  ", factorlist);
 
-  if ( n == 1 ) {
+  if ( n == 1 )
+  {
     Returnlist.append(CFFactor(mF,1));
   }
-  else {
-    if ( n == 2 ){
+  else
+  {
+    if ( n == 2 )
+    {
       intermediat= mvhensel(mF, factorlist.getFirst().factor(),
                             Factorlist.getLast().factor(),
                             Substitutionlist,alpha);
       Returnlist.append(CFFactor(intermediat.One,1));
       Returnlist.append(CFFactor(intermediat.Two,1));
     }
-    else { // more then two factors
+    else  // more then two factors
+    {
 #ifdef HENSELDEBUG2
       CERR << "multihensel: more than two factors!" << "\n";
 #endif
@@ -430,7 +446,9 @@ CFFList
 MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
              const SFormList & Substitutionlist, const CanonicalForm &alpha)
 {
-  CFFList Returnlist,Retlistinter,factorlist=Factorlist,Ll;
+  CFFList Ll;
+  if (diophant_error) return Ll;
+  CFFList Returnlist,Retlistinter,factorlist=Factorlist;
   CFFListIterator i;
   DiophantForm intermediat;
   CanonicalForm Pl,Pr;
@@ -495,6 +513,9 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.11  2007/05/21 16:40:12  Singular
+*hannes: Factorize2
+
 Revision 1.10  2007/05/15 14:46:49  Singular
 *hannes: factorize in Zp(a)[x...]
 
