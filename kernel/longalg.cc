@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.26 2007-05-22 09:59:09 Singular Exp $ */
+/* $Id: longalg.cc,v 1.27 2007-05-22 13:29:48 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -550,9 +550,10 @@ static char  *napRead(char *s, napoly *b)
       *b = a;
       return s;
     }
-    else if (i >= naNumbOfPar)
+    if (i >= naNumbOfPar)
       break;
   }
+  i=0;
   loop
   {
     olds = s;
