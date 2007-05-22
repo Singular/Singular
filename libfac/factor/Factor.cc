@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.28 2007-05-21 17:56:55 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.29 2007-05-22 13:18:57 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -144,11 +144,14 @@ necessary_condition( const CanonicalForm & F, int oldmainvar){
   g= swapvar(F,oldmainvar,n);
   g= g.deriv();
   if ( g.isZero() )
-    for ( int i=n; i>=1; i-- ){
+  {
+    for ( int i=n; i>=1; i-- )
+    {
       g= swapvar(F,i,n);
       g= g.deriv();
       if ( ! g.isZero() ) return i;
     }
+  }
   return oldmainvar;
 }
 
@@ -452,7 +455,9 @@ try_specializePoly(const CanonicalForm & f, const Variable & Extension, int deg,
     //    ok= specialize_agvariable( ff, deg, Substitutionlist, k, j, g );
     //    if ( ! ok ) return 0; // we failed
     //  }
-      printf("libfac: try_specializePoly: extension level >0\n");
+      #ifndef NDEBUG
+        printf("libfac: try_specializePoly: extension level >0\n");
+      #endif
       return 0; // we failed
     }
     else
@@ -814,15 +819,17 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar)
     if ( interrupt_handle() ) return CFFList() ;
     // INTERRUPTHANDLER
 
-    if ( lt != f.genOne() ){
+    if ( lt != f.genOne() )
+    {
       Outputlist = not_monic(Outputlist,lt,ff,level(ff));
       DEBOUTLN(CERR, "not_monic returned: ", Outputlist);
     }
 
     // have to back-swapvar the factors....
-    for ( CFFListIterator i=Outputlist; i.hasItem(); i++ ){
-        copy=i.getItem();
-        Outputlist2.append(CFFactor(swapvar(copy.factor(),oldmainvar,mainvar),copy.exp()));
+    for ( CFFListIterator i=Outputlist; i.hasItem(); i++ )
+    {
+      copy=i.getItem();
+      Outputlist2.append(CFFactor(swapvar(copy.factor(),oldmainvar,mainvar),copy.exp()));
     }
 
     return Outputlist2;
@@ -996,13 +1003,31 @@ CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
 //           * choosing an algebraic extension (n.y.u.)      //
 //           * ensuring poly is sqrfree (n.y.i.)             //
 ///////////////////////////////////////////////////////////////
+static bool fdivides2(const CanonicalForm &F, const CanonicalForm &G, const CanonicalForm &minpoly)
+{
+  if (minpoly!=0)
+  {
+  #if 0
+    Variable Alpha=minpoly.mvar();
+    Variable X=rootOf(minpoly);
+    CanonicalForm rF=replacevar(F,Alpha,X);
+    CanonicalForm rG=replacevar(G,Alpha,X);
+    return fdivides(rF,rG);;
+  #else
+    if (degree(F,F.mvar()) > degree(G,F.mvar())) return false;
+    return true;
+  #endif
+  }
+  else
+   return fdivides(F,G);
+}
 CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
 {
-  CFFList iF=Factorize(F);
   CFFList G,H;
   CanonicalForm fac;
-  int d;
+  int d,e;
   ListIterator<CFFactor> i,k;
+  CFFList iF=Factorize(F);
   for ( i = iF; i.hasItem(); ++i )
   {
     d = i.getItem().exp();
@@ -1025,20 +1050,42 @@ CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
         for ( k = G; k.hasItem(); ++k )
         {
           fac = k.getItem().factor();
-          int dd = k.getItem().exp();
-          if ((!fac.isZero())&& fdivides(fac,F))
+          int dd = k.getItem().exp()*d;
+          e=0;
+          while ((!fac.isZero())&& fdivides2(fac,F,minpoly) && (dd>0))
           {
 #ifndef NOSTREAMIO
 #ifndef NDEBUG
             out_cf("factor:",fac,"\n");
 #endif
 #endif
-            dd=d*dd;
-            H.append( CFFactor( fac , dd ) );
-            do {F/=fac; dd--; } while (dd>0);
+            e++;dd--;
+            F/=fac;
           }
+          if (e>0) H.append( CFFactor( fac , e ) );
         }
       }
+    }
+  }
+  if (getNumVars(F)>0)
+  {
+    G = Factorize(F, minpoly);
+    for ( k = G; k.hasItem(); ++k )
+    {
+      fac = k.getItem().factor();
+      d = k.getItem().exp();
+      e=0;
+      while ((!fac.isZero())&& fdivides2(fac,F,minpoly) &&(d>0))
+      {
+#ifndef NOSTREAMIO
+#ifndef NDEBUG
+        out_cf("factor:",fac,"\n");
+#endif
+#endif
+        e++; d--;
+        F/=fac;
+      }
+      if (e>0) H.append( CFFactor( fac , e ) );
     }
   }
   if (getNumVars(F)>0)
@@ -1048,20 +1095,44 @@ CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
     out_cf("retry:",F,"\n");
 #endif
 #endif
-    G = Factorize(F, minpoly);
-    for ( k = G; k.hasItem(); ++k )
+    iF=Factorize(F);
+    for ( i = iF; i.hasItem(); ++i )
     {
-      fac = k.getItem().factor();
-      d = k.getItem().exp();
-      if ((!fac.isZero())&& fdivides(fac,F))
+      d = i.getItem().exp();
+      fac = i.getItem().factor();
+      if (fdivides2(fac,F,minpoly))
       {
+        if ((getNumVars(fac)==0)||(fac.degree()<=1))
+        {
 #ifndef NOSTREAMIO
 #ifndef NDEBUG
-        out_cf("factor:",fac,"\n");
+          printf("append trivial factor\n");
 #endif
 #endif
-        H.append( CFFactor( fac , d ) );
-        do {F/=fac; d--; } while (d>0);
+          H.append( CFFactor( fac, d));
+          do {F/=fac; d--; } while (d>0);
+        }
+        else
+        {
+          G = Factorize( fac, minpoly);
+          for ( k = G; k.hasItem(); ++k )
+          {
+            fac = k.getItem().factor();
+            int dd = k.getItem().exp()*d;
+            e=0;
+            while ((!fac.isZero())&& fdivides2(fac,F,minpoly) && (dd>0))
+            {
+#ifndef NOSTREAMIO
+#ifndef NDEBUG
+              out_cf("factor:",fac,"\n");
+#endif
+#endif
+              e++;dd--;
+              F/=fac;
+            }
+            if (e>0) H.append( CFFactor( fac , e ) );
+          }
+        }
       }
     }
   }
@@ -1195,7 +1266,7 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
       else // multivariate polynomial
       {
         if ( g.isHomogeneous() )
-	{
+        {
           DEBOUTLN(CERR, "Poly is homogeneous! : ", g);
           // Now we can substitute one variable to 1, factorize and then
           // look on the resulting factors and their monomials for
@@ -1260,6 +1331,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.28  2007/05/21 17:56:55  Singular
+*hannes: fixed exp.
+
 Revision 1.27  2007/05/21 16:50:56  Singular
 *hannes: fix fdivide test
 
