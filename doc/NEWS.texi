@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.80 2007-05-03 14:13:39 Singular Exp $
+@comment $Id: NEWS.texi,v 1.81 2007-05-22 13:58:51 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -22,8 +22,11 @@
 
 @heading Updates for version @value{VERSION}
 
-The current version @value{VERSION} is mainly a bug fix release,
-but it contains also some new features:
+The current version @value{VERSION} is stabiliyzing release,
+a result of a long beta test and the integration of a lot of small
+fixes which were on our waiting list for integration.
+
+It contains also some new features:
 @itemize @bullet
 @item
 licence changed: omalloc and MP are now (also) available under GPL;
@@ -61,6 +64,8 @@ new library: resgraph.lib (@nref{resgraph_lib}): visualization of resolution dat
 @item
 new library: realrad.lib (@nref{realrad_lib}): computation of the real radical
 over the rational numbers and extensions thereof
+@item
+new library: hyperelliptic.lib (@nref{hyperelliptic_lib}): divisors in the jacobian of hyperelliptic curves.
 @item
 sheafcoh.lib: new experimental functions (sheafCohBGG2)
 @item
@@ -290,7 +295,7 @@ procedures, related to quantum matrices and minors
 @heading Porting
 
 @itemize @bullet
-@item Singular is available for ix86-Linux, HPUX_10,
+@item Singular is available for ix86-Linux, 
 SunOS-5, IRIX-6, ix86-Win (runs on Windows 95/98/NT4/2000/XP),
 FreeBSD, MacOS X, DecAlpha-Linux, x86_64-Linux (AMD64/Opteron/EM64T),
 IA64-Linux
