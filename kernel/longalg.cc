@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.25 2007-02-26 11:43:07 Singular Exp $ */
+/* $Id: longalg.cc,v 1.26 2007-05-22 09:59:09 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -509,6 +509,16 @@ static char *napHandleMons(char *s, int i, napoly ex)
   }
   return s;
 }
+static char *napHandlePars(char *s, int i, napoly ex)
+{
+  int  j;
+  if (strcmp(s,naParNames[i])==0)
+  {
+    s+=strlen(naParNames[i]);
+    napSetExp(ex,i+1,1);
+  }
+  return s;
+}
 
 /*3  reads a monomial  */
 static char  *napRead(char *s, napoly *b)
@@ -529,7 +539,20 @@ static char  *napRead(char *s, napoly *b)
   else
     napGetCoeff(a) = nacInit(1);
   i = 0;
-  char  *olds;
+  char  *olds=s;
+  loop
+  {
+    s = napHandlePars(s, i, a);
+    if (olds == s)
+      i++;
+    else if (*s == '\0') 
+    {
+      *b = a;
+      return s;
+    }
+    else if (i >= naNumbOfPar)
+      break;
+  }
   loop
   {
     olds = s;
