@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.55 2007-05-21 17:23:36 Singular Exp $ */
+/* $Id: kutil.cc,v 1.56 2007-05-22 16:14:09 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1256,8 +1256,8 @@ void enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
 
   k_GetStrongLeadTerms(p, strat->S[i], currRing, m1, m2, gcd, strat->tailRing);
 
-  pSetCoeff0(m1, (number) t);
-  pSetCoeff0(m2, (number) s); 
+  pSetCoeff0(m1, (number) s);
+  pSetCoeff0(m2, (number) t);
   pSetCoeff0(gcd, (number) d);
 
 
@@ -1265,7 +1265,14 @@ void enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
   if (TEST_OPT_DEBUG)
   {
     Print("t = %d; s = %d; d = %d\n", t, s, d);
-    PrintS("--- create strong gcd poly: ");
+    PrintS("m1 = ");
+    p_wrp(m1, strat->tailRing);
+    PrintS(" ; m2 = ");
+    p_wrp(m2, strat->tailRing);
+    PrintS(" ; gcd = ");
+    wrp(gcd);
+    PrintS("\n--- create strong gcd poly: ");
+    Print("\n p: ", i);
     wrp(p);
     Print("\n strat->S[%d]: ", i);
     wrp(strat->S[i]);
@@ -4475,7 +4482,11 @@ void initS (ideal F, ideal Q,kStrategy strat)
     }
   }
   /*- test, if a unit is in F -*/
-  if ((strat->sl>=0) && pIsConstant(strat->S[0]))
+  if ((strat->sl>=0) 
+#ifdef HAVE_RINGS
+       && !rField_is_Ring(currRing)
+#endif
+       && pIsConstant(strat->S[0]))
   {
     while (strat->sl>0) deleteInS(strat->sl,strat);
   }

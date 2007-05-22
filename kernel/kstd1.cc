@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.20 2007-05-11 10:48:03 wienand Exp $ */
+/* $Id: kstd1.cc,v 1.21 2007-05-22 16:14:09 wienand Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1068,6 +1068,10 @@ void initMora(ideal F,kStrategy strat)
      strat->kNoether = pCopy(ppNoether);
   else if (strat->kHEdgeFound || strat->homog)
     strat->red = redFirst;  /*take the first possible in T*/
+#ifdef HAVE_RINGS  //TODO Oliver
+  else if (rField_is_Ring(currRing))
+    strat->red = redRing2toM;
+#endif
   else
     strat->red = redEcart;/*take the first possible in under ecart-restriction*/
   if (strat->kHEdgeFound)
@@ -1902,6 +1906,11 @@ ideal kInterRed (ideal F, ideal Q)
   strat->L           = initL();
   strat->sevT        = initsevT();
   strat->red         = redLazy;
+#ifdef HAVE_RINGS  //TODO Oliver
+  if (rField_is_Ring(currRing)) {
+    strat->red = redRing2toM;
+  }
+#endif
   strat->tailRing    = currRing;
   if (pOrdSgn == -1)
     strat->honey = TRUE;
