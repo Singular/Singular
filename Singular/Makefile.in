@@ -667,8 +667,8 @@ endif
 ## compiler and linker options for debug version
 ##
 
-CCG		= gcc
-CXXG		= @CXX@
+CCG		= ${CC}
+CXXG		= ${CXX}
 CXXM		= gcc -MM -MG -DGENERATE_DEPEND
 CCM		= gcc -MM -MG -DGENERATE_DEPEND
 
