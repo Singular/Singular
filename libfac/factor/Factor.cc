@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.30 2007-05-22 14:30:53 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.31 2007-05-22 14:49:52 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -209,7 +209,8 @@ lt_is_product( const CanonicalForm & lt ){
 // Return the list of factors.                               //
 ///////////////////////////////////////////////////////////////
 static CFFList
-not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalForm & F, int levelF){
+not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalForm & F, int levelF)
+{
   CFFList Returnlist,IntermediateList;
   CFFListIterator i;
   CanonicalForm intermediate,lt= ltt,savelc;
@@ -218,16 +219,19 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
   int test1;
 
   if ( lt == lt.genOne() ) return TheList; // the poly was already monic
-  if ( TheList.length() <= 1 ){ // only one factor to substitute back
+  if ( TheList.length() <= 1 ) // only one factor to substitute back
+  {
     if ( totaldegree(lt) == 0 ) // lt is type numeric
       Returnlist.append( CFFactor(lt*TheList.getFirst().factor(),
                                   TheList.getFirst().exp()) );
-    else {
+    else
+    {
       intermediate = F(x*lt, levelF)/power(lt,degree(F,levelF)-1);
       Returnlist.append(CFFactor(intermediate,TheList.getFirst().exp()));
     }
   }
-  else { // more then one factor
+  else // more then one factor
+  {
     IntermediateList= TheList;
     if ( totaldegree(lt) == 0 ){ // lt is type numeric;(SqrFree-use, see above)
       Returnlist.append( CFFactor(lt*IntermediateList.getFirst().factor()
@@ -235,13 +239,16 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
       IntermediateList.removeFirst();
       Returnlist= Union(Returnlist,IntermediateList);
     }
-    else{ // lt is a) a product or b) a sum of terms
-      if ( lt_is_product(lt) ){ // case a)
+    else // lt is a) a product or b) a sum of terms
+    {
+      if ( lt_is_product(lt) ) // case a)
+      {
         DEBOUTLN(CERR, "lt_is_product: ", lt);
         savelc= content(lt) ; // can we simplify to savelc= lc(lt); ?
         while ( getNumVars(savelc) != 0 )
           savelc= content(savelc);
-        for ( i=TheList; i.hasItem();i++ ){
+        for ( i=TheList; i.hasItem();i++ )
+        {
           numerator= i.getItem().factor();
           numerator= numerator(x*lt,levelF); // x <- x*lt
           denumerator= power(lt,degree(F,levelF)-1); // == lt^(1-degree(F,x)
@@ -258,26 +265,31 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
         for ( CFFListIterator j=IntermediateList; j.hasItem(); j++)
           intermediate*= j.getItem().factor();
         test1= mydivremt( intermediate,F,a,b);
-        if ( test1 && b == intermediate.genZero() ) { // Yupp!
+        if ( test1 && b == intermediate.genZero() ) // Yupp!
+        {
           IntermediateList.append(CFFactor(1/a,1));
           Returnlist= IntermediateList;
         }
         else { Returnlist= IntermediateList; }
       }
-      else{ // case b)
+      else // case b)
+      {
         DEBOUTLN(CERR, "lt_is_sum: ", lt);
         CanonicalForm save_denumerator= 1;
-        for ( i=TheList; i.hasItem(); i++ ){
+        for ( i=TheList; i.hasItem(); i++ )
+        {
           numerator= i.getItem().factor();
           numerator= numerator(x*lt,levelF); // x <- x*lt
           denumerator= power(lt,degree(numerator,levelF)); // == lt^(-degree(numerator,x)
           test= content(numerator,x);
           test1= mydivremt(denumerator,test,a,b);
-          if ( test1 && b == numerator.genZero() ){ // Yupp!
+          if ( test1 && b == numerator.genZero() ) // Yupp!
+          {
             save_denumerator*= a;
             Returnlist.append(CFFactor(numerator/test ,1));
           }
-          else {
+          else
+          {
 #ifdef HAVE_SINGULAR_ERROR
             WerrorS("libfac: ERROR: not_monic1: case lt is a sum.");
 #else
@@ -296,7 +308,8 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
           // the multiplicity of the save_denumerator <-> lc
           // the following will do what we want
           Returnlist= myUnion( CFFList(CFFactor(1/a,1)),Returnlist) ;
-        else {
+        else
+        {
 #ifdef HAVE_SINGULAR_ERROR
           WerrorS("libfac: ERROR: not_monic2: case lt is a sum.");
 #else
@@ -1333,6 +1346,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.30  2007/05/22 14:30:53  Singular
+*hannes: diophant_error
+
 Revision 1.29  2007/05/22 13:18:57  Singular
 *hannes: Factorize2: div test, sort etc.
 
