@@ -2,7 +2,7 @@ LIB "tst.lib";
 tst_init();
 
 
-ring r=(0,a),(x,y),dp;
+ring R=(0,a),(x,y),dp;
 minpoly=a2+1;
 factorize(x4+y4);
 
