@@ -1,6 +1,6 @@
-// $Id: all.lib,v 1.52 2007-05-15 15:54:27 Singular Exp $
+// $Id: all.lib,v 1.53 2007-05-23 10:18:53 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.52 2007-05-15 15:54:27 Singular Exp $";
+version="$Id: all.lib,v 1.53 2007-05-23 10:18:53 Singular Exp $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries (commutative case)
@@ -33,7 +33,7 @@ LIB "grwalk.lib";
 LIB "groups.lib";
 LIB "hnoether.lib";
 LIB "homolog.lib";
-LIB "hyperellicptic.lib";
+LIB "hyperelliptic.lib";
 LIB "inout.lib";
 LIB "intprog.lib";
 LIB "latex.lib";
