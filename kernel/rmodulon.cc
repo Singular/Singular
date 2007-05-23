@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.4 2007-05-19 13:22:23 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.5 2007-05-23 07:47:31 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -113,7 +113,7 @@ void nrnPower (number a, int i, number * result)
  */
 number nrnInit (int i)
 {
-  NATNUMBER ii = i;
+  long ii = i;
   while (ii < 0) ii += nrnModul;
   while ((ii>1) && (ii >= nrnModul)) ii -= nrnModul;
   return (number) ii;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.56 2007-05-22 16:14:09 wienand Exp $ */
+/* $Id: kutil.cc,v 1.57 2007-05-23 07:47:29 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1256,9 +1256,9 @@ void enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
 
   k_GetStrongLeadTerms(p, strat->S[i], currRing, m1, m2, gcd, strat->tailRing);
 
-  pSetCoeff0(m1, (number) s);
-  pSetCoeff0(m2, (number) t);
-  pSetCoeff0(gcd, (number) d);
+  pSetCoeff0(m1, nInit(s));
+  pSetCoeff0(m2, nInit(t));
+  pSetCoeff0(gcd, nInit(d));
 
 
 #ifdef KDEBUG

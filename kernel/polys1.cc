@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.27 2007-05-10 08:12:42 wienand Exp $ */
+/* $Id: polys1.cc,v 1.28 2007-05-23 07:47:30 wienand Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -485,14 +485,14 @@ void pContent(poly ph)
     if (ph!=NULL)
     {
       number k = nGetUnit(pGetCoeff(ph));
-      poly h;
       if (!nIsOne(k))
       {
-        pSetCoeff0(ph, nDiv(pGetCoeff(ph), k));
-        h = pNext(ph);
+        k = nInvers(k);
+        poly h = pNext(ph);
+        pSetCoeff0(ph, nMult(pGetCoeff(ph), k));
         while (h != NULL)
         {
-          pSetCoeff(h, nDiv(pGetCoeff(h), k));
+          pSetCoeff(h, nMult(pGetCoeff(h), k));
           pIter(h);
         }
         nDelete(&k);

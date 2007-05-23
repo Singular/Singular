@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.18 2007-05-19 13:22:23 wienand Exp $ */
+/* $Id: polys.cc,v 1.19 2007-05-23 07:47:30 wienand Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -704,6 +704,7 @@ number nGetUnit(number k) {
     }
     unit = nAdd(unit, nIntDiv(0, gcd_new));
   }
+//  Print("k = %d ; unit = %d ; gcd = %d", k, unit, gcd);
   return unit;
 }
 #endif

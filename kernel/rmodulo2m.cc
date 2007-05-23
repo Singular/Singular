@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.10 2007-05-19 13:22:23 wienand Exp $ */
+/* $Id: rmodulo2m.cc,v 1.11 2007-05-23 07:47:31 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -102,7 +102,7 @@ void nr2mPower (number a, int i, number * result)
  */
 number nr2mInit (int i)
 {
-  NATNUMBER ii = i;
+  long ii = i;
   while (ii < 0) ii += nr2mModul;
   while ((ii>1) && (ii >= nr2mModul)) ii -= nr2mModul;
   return (number) ii;
