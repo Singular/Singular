@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.289 2007-05-03 14:50:45 Singular Exp $
+@comment $Id: reference.doc,v 1.290 2007-05-23 12:05:45 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -7469,38 +7469,6 @@ See
 * voice::
 @end menu
 @c ---------------------------------------
-@c @node alternating, degBound, System variables, System variables
-@c @subsection alternating
-@c @cindex alternating
-@c @table @code
-@c @item @strong{Syntax:}
-@c @code{alternating =} int_expression@code{;}
-@c @*int_variable @code{= alternating;}
-@c @item @strong{Purpose:}
-@c describes the position of the first alternating variable in the current
-@c basering, thus creating the tensor
-@c product of a polynomial ring with an exterior algebra.
-@c @*Remark: Setting @code{alternating=1;} defines the exterior algebra.
-@c @item @strong{Note:}
-@c These algebras are only available in those versions of
-@c @sc{Singular} which are compiled with the SRING option.
-@c The SRING version is
-@c significantly slower for usual (commutative) ring operations.
-@c @item @strong{Example:}
-@c @example
-@c   // define the exterior algebra in 3 variables x, y, z
-@c   ring r=0,(x,y,z),dp;
-@c   alternating=1;
-@c   y*x;
-@c   @expansion{} -1*xy
-@c @end example
-@c @end table
-@c @c ref
-@c See
-@c @ref{ring};
-@c @ref{int expressions}.
-@c @c ref
-@c @c -----------------------------------------------------
 @node degBound, echo, System variables, System variables
 @subsection degBound
 @cindex degBound
@@ -7514,6 +7482,9 @@ exceeds @code{degBound}.
 @* @code{degBound} should not be used for a global ordering with inhomogeneous
 input.
 @*Reset this bound by setting @code{degBound} to 0.
+@*The exact meaning of "degree" depends on the ring odering and the command:
+@code{slimgb} uses always the total degree withs weights 1,
+@code{std} does so only for block orderings.
 @item @strong{Example:}
 @smallexample
 degBound = 7;
