@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: tricks.doc,v 1.12 2007-05-23 12:05:47 Singular Exp $
+@comment $Id: tricks.doc,v 1.13 2007-05-23 13:17:59 Singular Exp $
 @comment this file contains the "Tricks and pittfalls" sections
 
 @c The following directives are necessary for proper compilation
@@ -447,19 +447,19 @@ computations. To reduce a polynomial @code{f} by hand w.r.t.@: the
 current quotient ideal use the command @code{reduce(f,std(0))}
 (@pxref{reduce}).
 
-@item definition of degree
-@cindex definition of degree
+@item degree of a polynomial
+@cindex degree of a polynomial
 
 @itemize
-@item degBound
-The exact meaning of "degree" depends on the ring odering and the command:
-@code{slimgb} uses always the total degree withs weights 1,
+@item @code{degBound}
+@*The exact meaning of "degree" depends on the ring odering and the command:
+@code{slimgb} uses always the total degree with weights 1,
 @code{std} does so only for block orderings.
-@item hilb
-the degree is the total degree withs weights 1 unless a weight vector is given
-@item kbase
-the degree is the total degree withs weights 1
-(to use another weight vector see @ref{weightKB}
+@item @code{hilb}
+@*the degree is the total degree with weights 1 unless a weight vector is given
+@item @code{kbase}
+@*the degree is the total degree with weights 1
+(to use another weight vector see @ref{weightKB})
 @end itemize
 
 @item substring selection

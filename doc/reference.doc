@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.290 2007-05-23 12:05:45 Singular Exp $
+@comment $Id: reference.doc,v 1.291 2007-05-23 13:17:57 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -7483,7 +7483,7 @@ exceeds @code{degBound}.
 input.
 @*Reset this bound by setting @code{degBound} to 0.
 @*The exact meaning of "degree" depends on the ring odering and the command:
-@code{slimgb} uses always the total degree withs weights 1,
+@code{slimgb} uses always the total degree with weights 1,
 @code{std} does so only for block orderings.
 @item @strong{Example:}
 @smallexample
