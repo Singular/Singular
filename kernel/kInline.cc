@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.6 2007-05-19 13:22:22 wienand Exp $
+ *  Version: $Id: kInline.cc,v 1.7 2007-05-23 09:23:02 wienand Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -981,16 +981,17 @@ KINLINE BOOLEAN k_GetStrongLeadTerms(const poly p1, const poly p2, const ring le
     e1 = p_GetExp(p1,i,leadRing);
     e2 = p_GetExp(p2,i,leadRing);
     x = e1 - e2;
-    s = e1 + e2;
     if (x > 0)
     {
       p_SetExp(m2,i,x, tailRing);
       p_SetExp(m1,i,0, tailRing);
+      s = e1;
     }
     else
     {
       p_SetExp(m1,i,-x, tailRing);
       p_SetExp(m2,i,0, tailRing);
+      s = e2;
     }
     p_SetExp(lcm,i,s, leadRing);
   }
