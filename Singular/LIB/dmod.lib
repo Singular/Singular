@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.13 2007-05-24 11:06:54 levandov Exp $";
+version="$Id: dmod.lib,v 1.14 2007-05-24 13:41:20 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -60,7 +60,7 @@ isHolonomic(M);   check whether a module is holonomic
 convloc(L);       replace global orderings with local in the ringlist L
 minIntRoot(P,fact); minimal integer root among the roots of a maximal ideal P
 
-SEE ALSO: gmssing.lib
+SEE ALSO: gmssing_lib
 ";
 
 LIB "nctools.lib";
