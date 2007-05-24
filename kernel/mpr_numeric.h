@@ -4,7 +4,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.h,v 1.2 2005-04-30 16:48:39 Singular Exp $ */
+/* $Id: mpr_numeric.h,v 1.3 2007-05-24 17:46:04 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -80,12 +80,14 @@ public:
   poly getPoly();
 
   //gmp_complex & operator[] ( const int i );
-  inline gmp_complex & operator[] ( const int i ) {
+  inline gmp_complex & operator[] ( const int i )
+  {
     return *theroots[i];
   }
   gmp_complex & evPointCoord( const int i );
 
-  inline gmp_complex * getRoot( const int i ) {
+  inline gmp_complex * getRoot( const int i )
+  {
     return theroots[i];
   }
 

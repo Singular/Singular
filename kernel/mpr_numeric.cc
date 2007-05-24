@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.cc,v 1.7 2005-08-26 16:02:24 Singular Exp $ */
+/* $Id: mpr_numeric.cc,v 1.8 2007-05-24 17:46:04 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -328,7 +328,8 @@ void rootContainer::fillContainer( number *_coeffs, number *_ievpoint,
   }
   nDelete( &nn );
 
-  if ( rt == cspecialmu && _ievpoint ) { // copy ievpoint
+  if ( rt == cspecialmu && _ievpoint )  // copy ievpoint
+  {
     ievpoint= (number *)omAlloc( (anz+2) * sizeof( number ) );
     for (i=0; i < anz+2; i++) ievpoint[i]= nCopy( _ievpoint[i] );
   }
@@ -400,7 +401,8 @@ gmp_complex & rootContainer::evPointCoord( const int i )
   if (ievpoint == NULL)
     WarnS("rootContainer::evPointCoord: ievpoint == NULL");
 
-  if ( (rt == cspecialmu) && found_roots ) {  // FIX ME
+  if ( (rt == cspecialmu) && found_roots ) // FIX ME
+  {
     if ( ievpoint[i] != NULL )
     {
       gmp_complex *tmp= new gmp_complex();

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.5 2007-03-22 13:34:54 Singular Exp $ */
+/* $Id: mpr_base.cc,v 1.6 2007-05-24 17:46:04 Singular Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -3069,6 +3069,8 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
   long tdg;
   poly pures,piter;
   int loops=(matchUp?n-2:n-1);
+  int nn=n;
+  if (loops==0) { loops=1;nn++;}
 
   mprPROTnl("uResultant::specializeInU");
 
@@ -3078,8 +3080,8 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
   roots= (rootContainer **) omAlloc( loops * sizeof(rootContainer*) );
   for ( i=0; i < loops; i++ ) roots[i]= new rootContainer(); // 0..n-2
 
-  number *pevpoint= (number *)omAlloc( n * sizeof( number ) );
-  for (i=0; i < n; i++) pevpoint[i]= nInit(0);
+  number *pevpoint= (number *)omAlloc( nn * sizeof( number ) );
+  for (i=0; i < nn; i++) pevpoint[i]= nInit(0);
 
   // now we evaluate D(u0,-1,0,...0), D(u0,0,-1,0,...,0), ..., D(u0,0,..,0,-1)
   // or D(u0,k1,k2,0,...,0), D(u0,k1,k2,k3,0,...,0), ..., D(u0,k1,k2,k3,...,kn)
@@ -3097,7 +3099,8 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
         {
           pevpoint[i]=nInit(1+siRand()%MAXEVPOINT);
           //pevpoint[i]=nInit(383);
-        } else pevpoint[i]=nInit(0);
+        }
+        else pevpoint[i]=nInit(0);
         mprPROTNnl(" ",pevpoint[i]);
       }
     }
@@ -3145,7 +3148,8 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
 
     mprSTICKYPROT(ST_BASE_EV); // .
 
-    if ( subDetVal != NULL ) {  // divide by common factor
+    if ( subDetVal != NULL )  // divide by common factor
+    {
       number detdiv;
       for ( i= 0; i <= tdg; i++ )
       {
