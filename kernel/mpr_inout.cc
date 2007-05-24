@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_inout.cc,v 1.3 2007-03-22 13:34:54 Singular Exp $ */
+/* $Id: mpr_inout.cc,v 1.4 2007-05-24 16:50:42 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultant
@@ -70,7 +70,7 @@ void mprPrintError( mprState state, const char * name )
     Werror("One element of the ideal %s is constant!",name);
     break;
   case mprInfNumOfVars:
-    Werror("Wrong number of elements in given ideal %s,houkd be %d resp. %d!",
+    Werror("Wrong number of elements in given ideal %s,should be %d resp. %d!",
            name,pVariables+1,pVariables);
     break;
   case mprNotZeroDim:
