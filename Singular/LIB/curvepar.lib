@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
-version="$Id: curvepar.lib,v 1.1 2007-05-24 11:57:58 Singular Exp $";
-category="Singularity Theory";
+version="$Id: curvepar.lib,v 1.2 2007-05-24 12:02:04 Singular Exp $";
+category="Singularities";
 info="
 LIBRARY:  space_curve.lib
 
