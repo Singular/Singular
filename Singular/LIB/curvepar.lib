@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
-version="$Id: curvepar.lib,v 1.2 2007-05-24 12:02:04 Singular Exp $";
+version="$Id: curvepar.lib,v 1.3 2007-05-24 13:37:19 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  space_curve.lib
@@ -739,8 +739,8 @@ RETURN:   list M of size 2.
           M[3] minimal generators of S
 "
 {
-  list L,l,q;
-  int i,j,t;
+  list L,l;
+  int i,j,t,q;
   for(i=1;i<=b;i++){L[i]=l;}
   int k=size(G);
   int n=G[1];
