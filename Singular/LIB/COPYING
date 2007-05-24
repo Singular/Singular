@@ -7,7 +7,7 @@
 
            Authors: see the header of the libraries or the list below
 
-                        Copyright (C) 1986-2006
+                        Copyright (C) 1986-2007
 
 
 
@@ -58,6 +58,7 @@ algebra.lib	Gert-Martin Greuel,     	greuel@mathematik.uni-kl.de,
 brnoeth.lib	Jose Ignacio Farran Martin, 	ignfar@eis.uva.es
 		Christoph Lossen,           	lossen@mathematik.uni-kl.de
 classify.lib	Kai Krueger, 			krueger@mathematik.uni-kl.de
+curvepar.lib    Maryna Viazovska,               viazovsk@mathematik.uni-kl.de
 deform.lib	Bernd Martin, 			martin@math.tu-cottbus.de
 dmod.lib        Viktor Levandovskyy,            levandov@risc.uni-linz.ac.at
 		Jorge Martin Morales,           jorge@unizar.es
@@ -74,6 +75,7 @@ graphics.lib	Christian Gorzel,		gorzelc@math.uni-muenster.de
 hnoether.lib	Martin Lamm,   			lamm@mathematik.uni-kl.de
 homolog.lib	Gert-Martin Greuel, 		greuel@mathematik.uni-kl.de,
 		Bernd Martin,  			martin@math.tu-cottbus.de
+hyperel.lib     Markus Hochstetter,             markushochstetter@gmx.de
 inout.lib	Gert-Martin Greuel, 		greuel@mathematik.uni-kl.de,
 		Bernd Martin,  			martin@math.tu-cottbus.de
 intprog.lib	Christine Theis, 		ctheis@math.uni-sb.de
