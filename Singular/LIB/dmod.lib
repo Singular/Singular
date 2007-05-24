@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.12 2007-01-23 15:03:30 Singular Exp $";
+version="$Id: dmod.lib,v 1.13 2007-05-24 11:06:54 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -33,23 +33,24 @@ GUIDE:
 @* - Ann F^s0 = I(F^s0) = LD0 in D(R) can be computed by annfs0, annfsBM, annfsOT, annfsLOT
 @* - all the relevant data (LD, LD0, bs, PS) are computed by operatorBM
 
-PROCEDURES:
+MAIN PROCEDURES:
 
-annfs0(I,F [,eng]);    compute Ann F^s0 in D and Bernstein poly from the known Ann F^s in D[s]
-annfsBM(F[,eng]);      compute Ann F^s0 in D and Bernstein poly for a poly F (algorithm of Briancon-Maisonobe)
-annfsLOT(F[,eng]);     compute Ann F^s0 in D and Bernstein poly for a poly F (Levandovskyy modification of the Oaku-Takayama algorithm)
-annfsOT(F[,eng]);      compute Ann F^s0 in D and Bernstein poly for a poly F (algorithm of Oaku-Takayama)
-
-SannfsBM(F[,eng]);     compute Ann F^s in D[s] for a poly F (algorithm of Briancon-Maisonobe)
-SannfsLOT(F[,eng]);    compute Ann F^s in D[s] for a poly F (Levandovskyy modification of the Oaku-Takayama algorithm)
-SannfsOT(F[,eng]);     compute Ann F^s in D[s] for a poly F (algorithm of Oaku-Takayama)
+annfs(F[,S,eng]);      compute Ann F^s0 in D and Bernstein poly for a poly F
 
 bernsteinBM(F[,eng]);  compute global Bernstein poly for a poly F (algorithm of Briancon-Maisonobe)
 operatorBM(F[,eng]);   compute Ann F^s, Ann F^s0, BS and PS for a poly F (algorithm of Briancon-Maisonobe)
-annfsParamBM(F[,eng]); compute the generic Ann F^s and exceptional parametric constellations for a poly F with parametric coefficients (algorithm by Briancon and Maisonobe)
+annfsParamBM(F[,eng]); compute the generic Ann F^s (algorithm by Briancon and Maisonobe) and exceptional parametric constellations for a poly F with parametric coefficients 
+annfsBMI(F[,eng]);     compute Ann F^s and Bernstein ideal for a poly F=f1*..*fP (multivariate algorithm of Briancon-Maisonobe)
 
-annfsBMI(F[,eng]);  compute Ann F^s and Bernstein ideal for a poly F=f1*..*fP (multivariate algorithm of Briancon-Maisonobe)
+SECONDARY D-MOD PROCEDURES:
 
+annfsBM(F[,eng]);      compute Ann F^s0 in D and Bernstein poly for a poly F (algorithm of Briancon-Maisonobe)
+annfsLOT(F[,eng]);     compute Ann F^s0 in D and Bernstein poly for a poly F (Levandovskyy modification of the Oaku-Takayama algorithm)
+annfsOT(F[,eng]);      compute Ann F^s0 in D and Bernstein poly for a poly F (algorithm of Oaku-Takayama)
+SannfsBM(F[,eng]);     compute Ann F^s in D[s] for a poly F (algorithm of Briancon-Maisonobe)
+SannfsLOT(F[,eng]);    compute Ann F^s in D[s] for a poly F (Levandovskyy modification of the Oaku-Takayama algorithm)
+SannfsOT(F[,eng]);     compute Ann F^s in D[s] for a poly F (algorithm of Oaku-Takayama)
+annfs0(I,F [,eng]);    compute Ann F^s0 in D and Bernstein poly from the known Ann F^s in D[s]
 
 AUXILIARY PROCEDURES:
 
@@ -58,6 +59,8 @@ reiffen(p,q);     create a poly, describing a Reiffen curve
 isHolonomic(M);   check whether a module is holonomic
 convloc(L);       replace global orderings with local in the ringlist L
 minIntRoot(P,fact); minimal integer root among the roots of a maximal ideal P
+
+SEE ALSO: gmssing.lib
 ";
 
 LIB "nctools.lib";
@@ -83,6 +86,129 @@ static proc engine(ideal I, int i)
     J = std(I);
   }
   return(J);
+}
+
+
+// new top-level procedure
+proc annfs(poly F, list #)
+"USAGE:  annfs(f [,S,eng]);  f a poly, S a string, eng an optional int
+RETURN:  ring
+PURPOSE: compute the D-module structure of basering[f^s] with the algorithm given in S and with the
+Groebner basis engine given in eng
+NOTE:    activate the output ring with the @code{setring} command. 
+@*       The value of a string S can be
+@*       'bm' (default) - for the algorithm of  Briancon and Maisonobe, 
+@*       'ot'  - for the algorithm of Oaku and Takayama,
+@*       'lot' - for the Levandovskyy's modification of the algorithm of Oaku and Takayama.
+@*       If eng <>0, @code{std} is used for Groebner basis computations,
+@*       otherwise, and by default @code{slimgb} is used.
+@*       In the output ring:
+@*       - the ideal LD is the needed D-module structure,
+@*       - the list  BS is the list of roots and multiplicities of a Bernstein polynomial of f.
+@*       If @code{printlevel}=1, progress debug messages will be printed,
+@*       if @code{printlevel}>=2, all the debug messages will be printed.
+EXAMPLE: example annfs; shows examples
+"
+{
+  int eng = 0;
+  int chs = 0; // choice
+  string algo = "bm";
+  string st;
+  if ( size(#)>0 )
+  {
+   if ( typeof(#[1]) == "string" )
+   {
+     st = string(#[1]);
+     if ( (st == "BM") || (st == "Bm") || (st == "bM") ||(st == "bm"))
+     {
+       algo = "bm";
+       chs  = 1; 
+     }
+     if ( (st == "OT") || (st == "Ot") || (st == "oT") || (st == "ot"))
+     {
+       algo = "ot";
+       chs  = 1; 
+     }
+     if ( (st == "LOT") || (st == "lOT") || (st == "Lot") || (st == "lot"))
+     {
+       algo = "lot";
+       chs  = 1; 
+     }
+     if (chs != 1)
+     {
+       // incorrect value of S
+       print("Incorrect algorithm given, proceed with the default BM");
+       algo = "bm";
+     }
+     // second arg
+     if (size(#)>1)
+     {
+       // exists 2nd arg 
+       if ( typeof(#[2]) == "int" )
+       {
+	 // the case: given alg, given engine
+	 eng = int(#[2]);
+       }
+       else
+       {
+	 eng = 0;
+       }
+     }
+     else
+     {
+       // no second arg
+       eng = 0;
+     }
+   }
+   else
+   {
+     if ( typeof(#[1]) == "int" )
+     {
+     // the case: default alg, engine
+     eng = int(#[1]);
+     //      algo = "bm";  //is already set
+     }
+     else
+     {
+       // incorr. 1st arg
+       algo = "bm";
+     }
+   }
+  }
+
+   // size(#)=0, i.e. there is no algorithm and no engine given
+   //  eng = 0; algo = "bm";  //are already set
+   // int ppl = printlevel-voice+2;
+  printlevel=printlevel+1;
+  def save = basering;
+  if ( algo=="ot")
+  {
+    def @A = annfsOT(F,eng);
+  }
+  else
+  {
+    if ( algo=="lot")
+    {
+      def @A = annfsLOT(F,eng);
+    }
+    else
+    {
+      // bm = default
+      def @A = annfsBM(F,eng);
+    }
+  }
+  return(@A);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),Dp;
+  poly F = x^3+y^3+z^3;
+  printlevel = 0;
+  def A  = annfs(F); // here, the default BM algorithm will be used
+  setring A;
+  LD;
+  BS;
 }
 
 // alternative code for SannfsBM, rename from annfsBM to ALTannfsBM
@@ -492,7 +618,7 @@ example
   printlevel = 0;
   bernsteinBM(F);
 }
-
+  
 // some changes
 proc annfsBM (poly F, list #)
 "USAGE:  annfsBM(f [,eng]);  f a poly, eng an optional int
@@ -1072,8 +1198,8 @@ example
 {
   "EXAMPLE:"; echo = 2;
   //  ring r = 0,(x,y,z,w),Dp;
-  ring r = 0,(x,y,z),Dp;
   //  poly F = x^3+y^3+z^2*w;
+  ring r = 0,(x,y,z),Dp;
   poly F = x^3+y^3+z^3;
   printlevel = 0;
   def A = operatorBM(F);
@@ -3572,14 +3698,50 @@ static proc ex_bcheck2()
   ring R = 0,(x,y),dp;
   poly F = x*y*(x+y);
   int eng = 0;
-  def A = annfsOT(F,eng);
+  def A = annfsBM(F,eng);
   setring A;
   LD;
 }
 
 static proc ex_BMI()
 {
+  // a hard example
   ring r = 0,(x,y),Dp;
   poly F1 = (x2-y3)*(x3-y2);
   poly F2 = (x2-y3)*(xy4+y5+x4);
+  ideal F = F1,F2;
+  def A = annfsBMI(F);
+  setring A;
+  LD;
+  BS;
+}
+
+static proc ex2_BMI()
+{
+  // this example was believed to be intractable in 2005 by Gago-Vargas, Castro and Ucha
+  ring r = 0,(x,y),Dp;
+  option(prot);
+  option(mem);
+  ideal F = x2+y3,x3+y2;
+  printlevel = 2;
+  def A = annfsBMI(F);
+  setring A;
+  LD;
+  BS;
+}
+
+static proc ex_operatorBM()
+{
+  ring r = 0,(x,y,z,w),Dp;
+  poly F = x^3+y^3+z^2*w;
+  printlevel = 0;
+  def A = operatorBM(F);
+  setring A;
+  F; // the original polynomial itself
+  LD; // generic annihilator
+  LD0; // annihilator
+  bs; // normalized Bernstein poly
+  BS; // root and multiplicities of the Bernstein poly
+  PS; // the operator, s.t. PS*F^{s+1} = bs*F^s mod LD
+  reduce(PS*F-bs,LD); // check the property of PS
 }
