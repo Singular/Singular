@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.59 2007-05-24 07:53:42 Singular Exp $ */
+/* $Id: ring.cc,v 1.60 2007-05-24 13:42:17 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -58,6 +58,7 @@ static const char * const ringorder_name[] =
   "Ws", //ringorder_Ws,
   "L", //ringorder_L,
   "aa", //ringorder_aa
+  "rs", //ringorder_rs,
   " _" //ringorder_unspec
 };
 
@@ -1474,8 +1475,9 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
   while (r1->order[i] != 0)
   {
     if (r2->order[i] == 0) return 0;
-    if ((r1->order[i] != r2->order[i]) ||
-        (r1->block0[i] != r2->block0[i]) || (r2->block0[i] != r1->block0[i]))
+    if ((r1->order[i] != r2->order[i])
+    || (r1->block0[i] != r2->block0[i])
+    || (r2->block0[i] != r1->block0[i]))
       return 0;
     if (r1->wvhdl[i] != NULL)
     {
@@ -1535,7 +1537,8 @@ rOrderType_t rGetOrderType(ring r)
   // check for simple ordering
   if (rHasSimpleOrder(r))
   {
-    if ((r->order[1] == ringorder_c) || (r->order[1] == ringorder_C))
+    if ((r->order[1] == ringorder_c)
+    || (r->order[1] == ringorder_C))
     {
       switch(r->order[0])
       {
@@ -1545,13 +1548,14 @@ rOrderType_t rGetOrderType(ring r)
           case ringorder_ws:
           case ringorder_ls:
           case ringorder_unspec:
-            if (r->order[1] == ringorder_C ||  r->order[0] == ringorder_unspec)
+            if (r->order[1] == ringorder_C
+	    ||  r->order[0] == ringorder_unspec)
               return rOrderType_ExpComp;
             return rOrderType_Exp;
 
           default:
             assume(r->order[0] == ringorder_lp ||
-                   r->order[0] == ringorder_rp ||
+                   r->order[0] == ringorder_rs ||
                    r->order[0] == ringorder_Dp ||
                    r->order[0] == ringorder_Wp ||
                    r->order[0] == ringorder_Ds ||
@@ -1578,10 +1582,13 @@ BOOLEAN rHasSimpleOrder(ring r)
   assume(blocks >= 1);
   if (blocks == 1) return TRUE;
   if (blocks > 2)  return FALSE;
-  if (r->order[0] != ringorder_c && r->order[0] != ringorder_C &&
-      r->order[1] != ringorder_c && r->order[1] != ringorder_C)
+  if ((r->order[0] != ringorder_c)
+  && (r->order[0] != ringorder_C)
+  && (r->order[1] != ringorder_c)
+  && i(r->order[1] != ringorder_C))
     return FALSE;
-  if (r->order[1] == ringorder_M || r->order[0] == ringorder_M)
+  if i((r->order[1] == ringorder_M)
+  || (r->order[0] == ringorder_M))
     return FALSE;
   return TRUE;
 }
@@ -1633,17 +1640,17 @@ BOOLEAN rOrder_is_WeightedOrdering(rRingOrder_t order)
 BOOLEAN rHasSimpleOrderAA(ring r)
 {
   int blocks = rBlocks(r) - 1;
-  if (blocks > 3 || blocks < 2) return FALSE;
+  if ((blocks > 3) || (blocks < 2)) return FALSE;
   if (blocks == 3)
   {
-    return ((r->order[0] == ringorder_aa && r->order[1] != ringorder_M &&
-             (r->order[2] == ringorder_c || r->order[2] == ringorder_C)) ||
-            ((r->order[0] == ringorder_c || r->order[0] == ringorder_C) &&
-             r->order[1] == ringorder_aa && r->order[2] != ringorder_M));
+    return (((r->order[0] == ringorder_aa) && (r->order[1] != ringorder_M) &&
+             ((r->order[2] == ringorder_c) || (r->order[2] == ringorder_C))) ||
+            (((r->order[0] == ringorder_c) || (r->order[0] == ringorder_C)) &&
+             (r->order[1] == ringorder_aa) && (r->order[2] != ringorder_M)));
   }
   else
   {
-    return (r->order[0] == ringorder_aa && r->order[1] != ringorder_M);
+    return ((r->order[0] == ringorder_aa) && (r->order[1] != ringorder_M));
   }
 }
 
@@ -1656,7 +1663,7 @@ BOOLEAN rOrd_SetCompRequiresSetm(ring r)
     for (pos=0;pos<r->OrdSize;pos++)
     {
       sro_ord* o=&(r->typ[pos]);
-      if (o->ord_typ == ro_syzcomp || o->ord_typ == ro_syz) return TRUE;
+      if ((o->ord_typ == ro_syzcomp) || (o->ord_typ == ro_syz)) return TRUE;
     }
   }
   return FALSE;
@@ -1701,7 +1708,7 @@ BOOLEAN rIsPolyVar(int v, ring r)
           return 2; /*don't know*/
         case ringorder_a64: /* assume: all weight are non-negative!*/
         case ringorder_lp:
-        case ringorder_rp:
+        case ringorder_rs:
         case ringorder_dp:
         case ringorder_Dp:
         case ringorder_wp:
@@ -2244,7 +2251,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
         }
         else
         {
-          order[j]=ringorder_rp;
+          order[j]=ringorder_rs;
           need_other_ring=TRUE;
           omit_degree=FALSE;
           omitted_degree = TRUE;
@@ -2499,6 +2506,7 @@ static void rHighSet(ring r, int o_r, int o)
       if (r->OrdSgn==-1) r->MixedOrder=TRUE;
       break;
     case ringorder_ls:
+    case ringorder_rs:
     case ringorder_ds:
     case ringorder_Ds:
     case ringorder_s:
@@ -2535,9 +2543,12 @@ static void rSetFirstWv(ring r, int i, int* order, int* block1, int** wvhdl)
   if(block1[i]!=r->N) r->LexOrder=TRUE;
   r->firstBlockEnds=block1[i];
   r->firstwv = wvhdl[i];
-  if ((order[i]== ringorder_ws) || (order[i]==ringorder_Ws)
-  || (order[i]== ringorder_wp) || (order[i]==ringorder_Wp)
-  || (order[i]== ringorder_a) /*|| (order[i]==ringorder_A)*/)
+  if ((order[i]== ringorder_ws)
+  || (order[i]==ringorder_Ws)
+  || (order[i]== ringorder_wp) 
+  || (order[i]==ringorder_Wp)
+  || (order[i]== ringorder_a)
+   /*|| (order[i]==ringorder_A)*/)
   {
     int j;
     for(j=block1[i]-r->block0[i];j>=0;j--)
@@ -2618,13 +2629,20 @@ static void rSetDegStuff(ring r)
         (order[1]==ringorder_s)))
       r->ComponentOrder=-1;
     if (r->OrdSgn == -1) r->pLDeg = pLDeg0c;
-    if ((order[0] == ringorder_lp) || (order[0] == ringorder_ls) || order[0] == ringorder_rp)
+    if ((order[0] == ringorder_lp)
+    || (order[0] == ringorder_ls)
+    || (order[0] == ringorder_rp)
+    || (order[0] == ringorder_rs))
     {
       r->LexOrder=TRUE;
       r->pLDeg = pLDeg1c;
+      r->pFDeg = pTotaldegree;
     }
-    if (order[0] == ringorder_wp || order[0] == ringorder_Wp ||
-        order[0] == ringorder_ws || order[0] == ringorder_Ws)
+    if ((order[0] == ringorder_a) 
+    || (order[0] == ringorder_wp) 
+    || (order[0] == ringorder_Wp) 
+    || (order[0] == ringorder_ws) 
+    || (order[0] == ringorder_Ws))
       r->pFDeg = pWFirstTotalDegree;
     r->firstBlockEnds=block1[0];
     r->firstwv = wvhdl[0];
@@ -2640,15 +2658,22 @@ static void rSetDegStuff(ring r)
     if ((order[0]==ringorder_C)||(order[0]==ringorder_S)||
         order[0]==ringorder_s)
       r->ComponentOrder=-1;
-    if ((order[1] == ringorder_lp) || (order[1] == ringorder_ls) || order[1] == ringorder_rp)
+    if ((order[1] == ringorder_lp)
+    || (order[1] == ringorder_ls)
+    || (order[1] == ringorder_rp)
+    || order[1] == ringorder_rs)
     {
       r->LexOrder=TRUE;
       r->pLDeg = pLDeg1c;
+      r->pFDeg = pTotaldegree;
     }
     r->firstBlockEnds=block1[1];
     r->firstwv = wvhdl[1];
-    if (order[1] == ringorder_wp || order[1] == ringorder_Wp ||
-        order[1] == ringorder_ws || order[1] == ringorder_Ws)
+    if ((order[1] == ringorder_a) 
+    || (order[1] == ringorder_wp) 
+    || (order[1] == ringorder_Wp) 
+    || (order[1] == ringorder_ws) 
+    || (order[1] == ringorder_Ws))
       r->pFDeg = pWFirstTotalDegree;
   }
   /*------- more than one block ----------------------*/
@@ -2828,6 +2853,11 @@ BOOLEAN rComplete(ring r, int force)
 
       case ringorder_ls:
         rO_LexVars_neg(j, j_bits, r->block0[i],r->block1[i], prev_ordsgn,
+                       tmp_ordsgn,v, bits, -1);
+        break;
+
+      case ringorder_rs:
+        rO_LexVars_neg(j, j_bits, r->block1[i],r->block0[i], prev_ordsgn,
                        tmp_ordsgn,v, bits, -1);
         break;
 
@@ -3935,6 +3965,7 @@ ring rOpposite(ring src)
       }
       // not yet done:
       case ringorder_ls:
+      case ringorder_rs:
       case ringorder_ds:
       case ringorder_Ds:
       case ringorder_ws:

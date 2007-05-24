@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.20 2007-05-11 10:48:05 wienand Exp $ */
+/* $Id: ring.h,v 1.21 2007-05-24 13:42:17 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -285,6 +285,7 @@ typedef enum rRingOrder_t
   ringorder_L,
   // the following are only used internally
   ringorder_aa, // for idElimination, like a, except pFDeg, pWeigths ignore it
+  ringorder_rs,
   ringorder_unspec
 } rRingOrder_t;
 
