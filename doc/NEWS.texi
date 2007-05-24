@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.81 2007-05-22 13:58:51 Singular Exp $
+@comment $Id: NEWS.texi,v 1.82 2007-05-24 09:04:24 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -22,7 +22,7 @@
 
 @heading Updates for version @value{VERSION}
 
-The current version @value{VERSION} is stabiliyzing release,
+The current version @value{VERSION} is stabilyzing release,
 a result of a long beta test and the integration of a lot of small
 fixes which were on our waiting list for integration.
 
@@ -36,13 +36,13 @@ factory, libfac, Singular updated for gcc 4.1.x
 @item
 kernel updated for the optional use of boost
 @item
-new operator @code{a:b} : @code{intvec} of length @code{b} with constant entries @code{a}
+new operator @code{a:b} gives an @code{intvec} of length @code{b} with constant entries @code{a}
 @item
 new command: (@nref{chinrem}: lifting via chinese remainder theorem)
 @item
 new command: (@nref{interpolation}: ideal of points with given multiplicities)
 @item
-non-commutative kernel subsystem was rewritten for more efficient super-commutative (and exterior) algebras
+non-commutative kernel subsystem was rewritten for more efficient super-commutative algebras (for example exterior algebras)
 @item
 @nref{std} et al.: new selection strategy for reductions (@nref{option} (length)).
 @item

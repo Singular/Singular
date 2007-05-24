@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.30 2007-01-03 23:05:21 levandov Exp $
+@comment $Id: COPYING.texi,v 1.31 2007-05-24 09:04:24 Singular Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -17,7 +17,7 @@
 @center @uref{http://www.mathematik.uni-kl.de/,,Department of Mathematics} and  @uref{http://www.mathematik.uni-kl.de/~zca/,,Centre for Computer Algebra}
 @center Authors: @uref{http://www.mathematik.uni-kl.de/~greuel,,G.-M. Greuel}, @uref{http://www.mathematik.uni-kl.de/~pfister,,G. Pfister}, @uref{http://www.mathematik.uni-kl.de/~hannes,,H. Schoenemann}
 
-@center Copyright @copyright{} 1986-2006
+@center Copyright @copyright{} 1986-2007
 @sp 2
 @center @strong{NOTICE}
 
@@ -117,25 +117,27 @@ Sch@"onemann.
 Currently, the @sc{Singular} team has the following members:
 Michael Brickenstein,
 Wolfram Decker,
+Alexander Dreyer,
 Anne Fr@"uhbis-Kr@"uger,
 Kai Kr@"uger,
-Christoph Lossen,
 Viktor Levandovskyy,
-Wilfred Pohl
+Oleksandr Motsak,
 and
 Oliver Wienand.
 @cindex Brickenstein, Michael 
 @cindex Decker, Wolfram
+@cindex Dreyer, Alexander
 @cindex Fr@"uhbis-Kr@"uger, Anne
 @cindex Kr@"uger, Kai
-@cindex Lossen, Christoph
 @cindex Levandovskyy, Viktor
-@cindex Pohl, Wilfred
+@cindex Motsak, Oleksandr 
 @cindex Wienand, Oliver
 
 Former members of the @sc{Singular} team are:
 Olaf Bachmann,
+Christoph Lossen,
 Wolfgang Neumann,
+Wilfred Pohl,
 Jens Schmidt,
 Mathias Schulze,
 Thomas Siebert,
@@ -144,7 +146,9 @@ Eric Westenberger
 and
 Tim Wichmann.
 @cindex Bachmann, Olaf
+@cindex Lossen, Christoph
 @cindex Neumann, Wolfgang
+@cindex Pohl, Wilfred
 @cindex Schmidt, Jens
 @cindex Schulze, Mathias
 @cindex Siebert, Thomas
@@ -156,8 +160,9 @@ Further contributions to @sc{Singular} were made by:
 Thomas Bayer,
 Isabelle Bermejo,
 Markus Becker,
+Stas Bulygin,
 Kai Dehmann,
-Alexander Dreyer,
+Marcin Dumnicki,
 Stephan Endra@ss{},
 Jose Ignacio Farran,
 Vladimir Gerdt,
@@ -169,18 +174,17 @@ Agnes Heydtmann,
 Dietmar Hillebrand,
 Tobias Hirsch,
 Manuel Kauers,
-Thomas Keilen,
 Simon King,
 Anen Lakhal,
 Martin Lamm,
 Santiago Laplagne,
 Gregoire Lecerf,
 Francisco Javier Lobillo,
+Thomas Markwig,
 Bernd Martin,
 Michael Me@ss{}ollen,
 Andrea Mindnich,
 Jorge Martin Morales,
-Oleksandr Motsak,
 Thomas N@"u@ss{}ler,
 Carlos Rabelo,
 Alfredo Sanchez-Navarro,
@@ -196,8 +200,9 @@ Oleksandr Yena.
 @cindex Bayer, Thomas
 @cindex Bermejo, Isabelle
 @cindex Becker, Markus 
+@cindex Bulygin, Stas
 @cindex Dehmann, Kai
-@cindex Dreyer, Alexander
+@cindex Dumnicki, Marcin
 @cindex Endra@ss{}, Stephan
 @cindex Farran, Jose Ignacio
 @cindex Gerdt, Vladimir 
@@ -209,18 +214,17 @@ Oleksandr Yena.
 @cindex Hillebrand, Dietmar
 @cindex Hirsch, Tobias
 @cindex Kauers, Manuel
-@cindex Keilen, Thomas
 @cindex King, Simon
 @cindex Lakhal, Anen
 @cindex Lamm, Martin
 @cindex Laplagne, Santiago
 @cindex Lecerf, Gregoire
 @cindex Lobillo, Javier
+@cindex Markwig, Thomas
 @cindex Martin, Bernd
 @cindex Me@ss{}ollen, Michael
 @cindex Mindnich, Andrea
 @cindex Morales, Jorge Martin
-@cindex Motsak, Oleksandr 
 @cindex N@"u@ss{}ler, Thomas
 @cindex Rabelo, Carlos
 @cindex Sanchez-Navarro, Alfredo 

@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.158 2007-05-23 12:05:47 Singular Exp $
+@comment $Id: singular.doc,v 1.159 2007-05-24 09:04:24 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -673,7 +673,7 @@ but not for serious computations.
 * aksaka_lib:: Algorithms for primality testing in polynomial time
 * atkins_lib:: Procedures for teaching cryptography
 * crypto_lib:: Procedures for teaching cryptography
-* hyperelliptic_lib:: Divisors in the jacobian of hyperelliptic curves
+* hyperel_lib:: Divisors in the jacobian of hyperelliptic curves
 * teachstd_lib:: Procedures for teaching standard bases
 * weierstr_lib:: Procedures for the Weierstrass Theorems
 * rootsmr_lib:: counting the number of real roots
@@ -690,17 +690,17 @@ but not for serious computations.
 @c lib atkins.lib
 
 @c ---------------------------------------------------------
-@node crypto_lib, hyperelliptic_lib, atkins_lib, Teaching
+@node crypto_lib, hyperel_lib, atkins_lib, Teaching
 @subsection crypto_lib
 @c lib crypto.lib
 
 @c ---------------------------------------------------------
-@node hyperelliptic_lib, teachstd_lib, crypto_lib, Teaching
-@subsection hyperelliptic_lib
-@c lib hyperelliptic.lib
+@node hyperel_lib, teachstd_lib, crypto_lib, Teaching
+@subsection hyperel_lib
+@c lib hyperel.lib
 
 @c ---------------------------------------------------------
-@node teachstd_lib, weierstr_lib, hyperelliptic_lib, Teaching
+@node teachstd_lib, weierstr_lib, hyperel_lib, Teaching
 @subsection teachstd_lib
 @c lib teachstd.lib
 
