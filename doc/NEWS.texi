@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.84 2007-05-24 13:16:23 motsak Exp $
+@comment $Id: NEWS.texi,v 1.85 2007-05-24 13:33:59 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -66,7 +66,9 @@ new library: resgraph.lib (@nref{resgraph_lib}): visualization of resolution dat
 new library: realrad.lib (@nref{realrad_lib}): computation of the real radical
 over the rational numbers and extensions thereof
 @item
-new library: hyperelliptic.lib (@nref{hyperelliptic_lib}): divisors in the jacobian of hyperelliptic curves.
+new library: hyperel.lib (@nref{hyperel_lib}): divisors in the jacobian of hyperelliptic curves.
+@item
+new library: curvepar.lib (@nref{curvepar_lib}): space curves.
 @item
 @nref{sheafcoh_lib}: new experimental functions, in particular @nref{sheafCohBGG2}.
 @item
