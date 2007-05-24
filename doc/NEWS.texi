@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.82 2007-05-24 09:04:24 Singular Exp $
+@comment $Id: NEWS.texi,v 1.83 2007-05-24 12:05:15 motsak Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -42,7 +42,7 @@ new command: (@nref{chinrem}: lifting via chinese remainder theorem)
 @item
 new command: (@nref{interpolation}: ideal of points with given multiplicities)
 @item
-non-commutative kernel subsystem was rewritten for more efficient super-commutative algebras (for example exterior algebras)
+non-commutative kernel subsystem was rewritten in order to support specific algebras (i.e. super-commutative algebras) more efficiently.
 @item
 @nref{std} et al.: new selection strategy for reductions (@nref{option} (length)).
 @item
@@ -67,9 +67,9 @@ over the rational numbers and extensions thereof
 @item
 new library: hyperelliptic.lib (@nref{hyperelliptic_lib}): divisors in the jacobian of hyperelliptic curves.
 @item
-sheafcoh.lib: new experimental functions (sheafCohBGG2)
+@nref{sheafcoh_lib}: new experimental functions, in particular @nref{sheafCohBGG2}.
 @item
-nctools.lib: new functions for super-commutative algebras (SuperCommutative, IsSCA, AltVarStart, AltVarEnd)
+@nref{nctools_lib}: new functions for super-commutative algebras (i.e. @nref{SuperCommutative}, @nref{IsSCA}, @nref{AltVarStart}, @nref{AltVarEnd}). 
 @item
 resolve.lib: blow ups revised (@nref{resolve_lib}).
 @item
