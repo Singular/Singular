@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.57 2007-05-23 07:47:29 wienand Exp $ */
+/* $Id: kutil.cc,v 1.58 2007-05-24 10:02:43 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2905,7 +2905,7 @@ int posInS (const kStrategy strat, const int length,const poly p,
           cmp = pLmCmp(set[an],p);
           if (cmp == cmp_int)  return an;
           if (cmp == -cmp_int) return en;
-          if (nGreater(pGetCoeff(p), pGetCoeff(set[an]))) return en;
+          if (nDivBy(pGetCoeff(p), pGetCoeff(set[an]))) return en;
           return an;
         }
         i = (an+en) / 2;
@@ -2914,7 +2914,7 @@ int posInS (const kStrategy strat, const int length,const poly p,
         else if (cmp == -cmp_int)   an = i;
         else
         {
-          if (nGreater(pGetCoeff(p), pGetCoeff(set[i]))) an = i;
+          if (nDivBy(pGetCoeff(p), pGetCoeff(set[i]))) an = i;
           else en = i;
         }
       }
