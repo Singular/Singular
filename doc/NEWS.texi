@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.83 2007-05-24 12:05:15 motsak Exp $
+@comment $Id: NEWS.texi,v 1.84 2007-05-24 13:16:23 motsak Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -42,7 +42,8 @@ new command: (@nref{chinrem}: lifting via chinese remainder theorem)
 @item
 new command: (@nref{interpolation}: ideal of points with given multiplicities)
 @item
-non-commutative kernel subsystem was rewritten in order to support specific algebras (i.e. super-commutative algebras) more efficiently.
+non-commutative kernel subsystem was rewritten in order to support specific algebras more efficiently. 
+Implemented algebras at the moment: super-commutative algebras (in particular exterior algebras).
 @item
 @nref{std} et al.: new selection strategy for reductions (@nref{option} (length)).
 @item
