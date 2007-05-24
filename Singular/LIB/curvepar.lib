@@ -1,0 +1,1054 @@
+///////////////////////////////////////////////////////////////////////////////////////////
+version="$Id: curvepar.lib,v 1.1 2007-05-24 11:57:58 Singular Exp $";
+category="Singularity Theory";
+info="
+LIBRARY:  space_curve.lib
+
+AUTHOR:   Viazovska Maryna, email: viazovsk@mathematik.uni-kl.de
+
+PROCEDURES:
+BlowingUp(f,I,l);          BlowingUp of V(I) at the point 0;
+CurveRes(I);               Resolution of V(I)
+CurveParam(I);             Parametrization of algebraic branches of V(I)
+WSemigroup(X,b);           Weierstrass semigroup of the curve
+";
+
+LIB "sing.lib";
+LIB "primdec.lib";
+LIB "linalg.lib";
+
+//////////////////////////////////////////////////////////////
+//----------Resolution of singular curve--------------------//
+//////////////////////////////////////////////////////////////
+
+proc BlowingUp(poly f,ideal I,list l)
+"USAGE:   BlowingUp(f,I,l);
+          f=poly
+          b=ideal
+          l=list
+
+ASSUME:   The basering is r=0,(x(1..n),a),dp
+          f is an irrreducible polynomial in k[a],
+          I is an ideal of a curve(if we consider a as a parameter)
+
+COMPUTE:  Blowing-up of the curve at point 0.
+
+RETURN:   list C of charts.
+          Each chart C[i] is a list of size 5
+          C[i][1] is an integer j. It shows, which standard chart do we consider.
+          C[i][2] is an irreducible poly g in k[a]. It is a minimal polynomial for the new parameter.
+          C[i][3] is an ideal H in k[a].
+                  c_i=F_i(a_new) for i=1..n,
+                  a_old=H[n+1](a_new).
+          C[i][4] is a map teta:k[x(1)..x(n),a]-->k[x(1)..x(n),a] from the new curve to the one one.
+                  x(1)-->x(j)*x(1)
+                  . . .
+                  x(j)-->x(j)
+                  . . .
+                  x(n)-->x(j)*(c_n+x(n))
+          C[i][5] is an ideal J of a new curve. J=teta(I).
+
+EXAMPLE: example BlowingUp; shows an example"
+{
+  def r=basering;
+  int n=nvars(r)-1;
+  ring r1=(0,a),(x(1..n)),ds;
+  number f=leadcoef(imap(r,f));
+  minpoly=f;
+  ideal I=imap(r,I);
+  ideal locI=std(I);
+  ideal J=tangentcone(I);
+
+  setring r;
+  ideal J=imap(r1,J);
+  ideal locI=imap(r1,locI);
+  int i,j,k,ind;
+  list C,C1,Z,Z1;
+  ideal B;
+  poly g,b;
+  ideal F,D,D1,I1,I2;
+  map teta,teta1;
+
+  list w=mlist(l,n);
+
+  for(j=1;j<=n;j++)
+  {
+    B=J;
+    for(i=1;i<j;i++)
+    {
+      B=B+x(w[i]);
+    }
+    B=B+(x(w[j])-1);
+    B=B+f;
+    Z=Z1;
+    if(dim(std(B))==0)
+    {
+      Z=ZeroIdeal(B);
+      for(i=1;i<j;i++)
+      {
+        D[w[i]]=x(w[j])*x(w[i]);
+      }
+      D[w[j]]=x(w[j]);
+      for(i=j+1;i<=n;i++)
+      {
+        D[w[i]]=x(w[j])*x(w[i]);
+      }
+      D[n+1]=a;
+      teta=r,D;
+      I1=teta(locI);
+      I1=reduce(I1,std(f));
+      ind=1;
+      for(i=1;i<=size(I1);i++)
+      {
+        ind=1;
+        while(ind==1)
+        {
+          if(gcd(x(w[j]),I1[i])==x(w[j]))
+          {
+            I1[i]=I1[i]/x(w[j]);
+          }
+          else
+          {ind=0;}
+        }
+      }
+    }
+
+    for(k=1;k<=size(Z);k++)
+    {
+      g=Z[k][1];
+      for(i=1;i<=n;i++){F[i]=Z[k][2][i];}
+      b=Z[k][3];
+      C1[1]=w[j];
+      C1[2]=g;
+      C1[3]=F;
+      for(i=1;i<j;i++)
+      {
+        D[w[i]]=x(w[j])*x(w[i]);
+      }
+      D[w[j]]=x(w[j]);
+      for(i=j+1;i<=n;i++)
+      {
+        D[w[i]]=x(w[j])*(F[w[i]]+x(w[i]));
+      }
+      D[n+1]=Z[k][2][n+1];
+      teta=r,D;
+      C1[4]=D;
+      for(i=1;i<=j;i++)
+      {
+        D1[w[i]]=x(w[i]);
+      }
+      for(i=j+1;i<=n;i++)
+      {
+        D1[w[i]]=F[w[i]]+x(w[i]);
+      }
+      D1[n+1]=a;
+      teta1=r,D1;
+      I2=teta1(I1);
+      I2=reduce(I2,std(g));
+      C1[5]=I2;
+      C=insert(C,C1);
+    }
+  }
+  return(C);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=0,(x(1..3),a),dp;
+  poly f=a2+1;
+  ideal i=x(1)^2+a*x(2)^3,x(3)^2-x(2);
+  list l=1,3,2;
+  list B=BlowingUp(f,i,l);
+  B;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+static proc ZeroIdeal(ideal J)
+"USAGE:   ZeroIdeal(J);
+          J=ideal
+ASSUME:   J is a zero-dimensional ideal in k[x(1),...,x(n)].
+COMPUTE:  Primary decomposition of radical(J). Each prime ideal J[i] has the form:
+          x(1)-f[1](b),...,x(n)-f[n](b),
+          f(b)=0, f irreducible
+          for some b=x(1)*a(1)+...+x(n)*a(n), a(i) in k.
+
+RETURN:   list Z of lists.
+          Each list Z[k] is a list of size 3
+          Z[k][1] is a poly f(b)
+          Z[k][2] is an ideal H, H[n]=f[n],
+          Z[k][3] is a poly x(1)*a(1)+...+x(n)*a(n)
+"
+{
+  def r=basering;
+  int n=nvars(r);
+  if(dim(std(J))!=0){return(0);}
+  ring s=0,(x(1..n)),lp;
+  ideal A,S;
+  int i,j,ind,q;
+  for(i=1;i<=n;i++)
+  {A[i]=x(i);}
+  map phi=r,A;
+  ideal J=phi(J);
+  ideal I=radical(J);
+  list D=zerodec(I);
+  list Z,u;
+  ideal H,T,Di;
+  intvec w,v;
+  map tau;
+  poly h;
+
+  for(i=1;i<=size(D);i++)
+  {
+    option(redSB);
+    ind=0;q=n;
+    while(ind==0 and q>0)
+    {
+      for(j=1;j<=n;j++){T[j]=x(j);}
+      T[q]=x(n);
+      T[n]=x(q);
+      tau=s,T;
+      Di=D[i];
+      S=std(tau(Di));
+      ind=1;
+      v=leadexp(S[1]);
+      if(leadmonom(S[1])!=x(n)^v[n]){ind=0;}
+      for(j=2;j<=n;j++)
+      {
+        if(leadmonom(S[j])!=x(n-j+1)){ind=0;}
+        H[n-j+1]= -S[j]/leadcoef(S[j])+x(n-j+1);
+        v=leadexp(H[n-j+1]);
+        if(leadcoef(H[n-j+1])*leadmonom(H[n-j+1])!=leadcoef(H[n-j+1])*x(n)^v[n])
+        {ind=0;}
+      }
+      if(ind==1)
+      {
+        u[1]=S[1];
+        H[n]=x(n);
+        H[n]=H[q];
+        H[q]=x(n);
+        u[2]=H;
+        u[3]=x(q);
+        Z[i]=u;
+      }
+      q--;
+    }
+    if(ind==0)
+    {
+      vector a;
+      while(ind==0)
+      {
+        h=x(n);
+        for(j=1;j<=n-1;j++){a=a+random(-10,10)*gen(j);h=h+a[j]*x(j);}
+        T=subst(S,x(n),h);
+        option(redSB);
+        T=std(T);
+        ind=1;
+        w=leadexp(T[1]);
+        if(leadmonom(T[1])!=x(n)^w[n]){ind=0;}
+        for(j=2;j<=n;j++)
+        {
+          if(leadmonom(T[j])!=x(n-j+1)){ind=0;}
+          H[n-j+1]= -T[j]/leadcoef(T[j])+x(n-j+1);
+          w=leadexp(H[n-j+1]);
+          if(leadmonom(H[n-j+1])*leadcoef(H[n-j+1])!=leadcoef(H[n-j+1])*x(n)^w[n])
+          {ind=0;}
+        }
+        if(ind==1)
+        {
+          list l;
+          l[1]=T[1];
+          H[n]=x(n);h=x(n);
+          for(j=1;j<=n-1;j++){H[n]=H[n]+a[j]*H[j];h=h-a[j]*x(j);}
+          l[2]=H;
+          l[3]=h;
+          Z[i]=l;
+        }
+      }
+    }
+  }
+  setring r;
+  ideal A;
+  list Z;
+  for(i=1;i<=n;i++)
+  {
+    A[i]=var(i);
+  }
+  map psi=s,A;
+  Z=psi(Z);
+  return(Z);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+//assume that the basering is k[x(1),...,x(n),a]
+
+static proc main(ideal I,ideal Psi,poly f,list m,list l,list HN)
+{
+  def s=basering;
+  int i,j;
+  list C,C1,C2,C3,l1,m1,HN1;
+  ideal J;
+  map psi;
+
+  if(SmoothTest(I,f)==1)
+  {
+    C2[1]=I;
+    C2[2]=Psi;
+    C2[3]=f;
+    C2[4]=m;
+    C2[5]=l;
+    C2[6]=HN;
+    C[1]=C2;
+  }
+  if(SmoothTest(I,f)==0)
+  {
+    int mm=mmult(I,f);
+    m1=insert(m,mm,size(m));
+    C1=BlowingUp(f,I,l);
+    for(j=1;j<=size(C1);j++)
+    {
+      C2[1]=C1[j][5];
+      J=C1[j][4];
+      psi=s,J;
+      C2[2]=psi(Psi);
+      C2[3]=C1[j][2];
+      C2[4]=m1;
+      l1=insert(l,C1[j][1],size(l));
+      C2[5]=l1;
+      HN1=psi(HN);
+      HN1=insert(HN1,C1[j][3],size(HN1)-1);
+      C2[6]=HN1;
+      C3=main(C2[1],C2[2],C2[3],C2[4],C2[5],C2[6]);
+      C=C+C3;
+    }
+  }
+  return(C);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+static proc SmoothTest(ideal I,poly f)
+//Assume I is a radical ideal of dimension 1 in a ring k[x(1..n),a]
+//Returns 1 if a curve V(I) is smooth at point 0 and returns 0 otherwise
+{
+  int ind,l;
+  def t=basering;
+  int n=nvars(t)-1;
+  ring r1=(0,a),(x(1..n)),dp;
+  number f=leadcoef(imap(t,f));
+  minpoly=f;
+  ideal I=imap(t,I);
+  matrix M=jacob(I);
+  for(l=1;l<=n;l++){M=subst(M,x(l),0);}
+  if(mat_rk(M)==(n-1)){ind=1;}
+  return(ind);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+proc CurveRes(ideal I)
+"USAGE:   CurveRes(I);
+          I ideal
+
+ASSUME:   The basering is r=0,(x(1..n))
+          V(I) is a curve with a singular point 0.
+
+COMPUTE:  Resolution of the curve V(I).
+
+RETURN:   a ring R=basering+k[a]
+          Ring R contains a list Resolve
+          Resolve is a list of charts
+          Each Resolve[i] is a list of size 6
+
+          Resolve[i][1] is an ideal J of a new curve. J=teta(I).
+          Resolve[i][2] ideal which represents the map
+                        teta:k[x(1)..x(n),a]-->k[x(1)..x(n),a] from the
+                        new curve to the old one.
+          Resolve[i][3] is an irreducible poly g in k[a]. It is a minimal polynomial for the new parameter a.
+          Resolve[i][4] sequence of multiplicities
+          Resolve[i][5] is a list of integers l. It shows, which standard charts we considered.
+          Resolve[i][6] HN matrix
+
+EXAMPLE: example CurveRes; shows an example"
+{
+  def r=basering;
+  int n=nvars(r);
+  ring s=0,(x(1..n),a),dp;
+  ideal A;
+  int i,j;
+  for(i=1;i<=n;i++)
+  {A[i]=x(i);}
+  map phi=r,A;
+  ideal I=phi(I);
+  poly f=a;
+  list l,m;
+  list HN=x(1);
+  ideal psi;
+  for(i=1;i<=n;i++)
+  {psi[i]=x(i);}
+  psi[n+1]=a;
+  list Resolve=main(I,psi,f,m,l,HN);
+  for(i=1;i<=size(Resolve);i++)
+  {
+    Resolve[i][6]=delete(Resolve[i][6],size(Resolve[i][6]));
+  }
+  export(Resolve);
+  return(s);
+}
+example
+{"EXAMPLE:"; echo=2;
+  ring r=0,(x,y,z),dp;
+  ideal i=x2-y3,z2-y5;
+  def s=CurveRes(i);
+  setring s;
+  Resolve;
+}
+
+//////////////////////////////////////////////////////////////////
+
+static proc mlist(list l,int n)
+{
+  list N,M;
+  int i,j;
+  for(i=1;i<=n;i++)
+  {
+    M[i]=i;
+  }
+  N=l+M;
+  for(i=1;i<=size(N)-1;i++)
+  {
+    j=i+1;
+    while(j<=size(N))
+    {
+      if(N[i]==N[j]){N=delete(N,j);}
+      else{j++;}
+    }
+  }
+  return(N);
+}
+
+/////////////////////////////////////////////////////////////////////
+//Assume that the basering is k[x(1..n),a]
+
+static proc mmult(ideal I,poly f)
+{
+  def r=basering;
+  int n=nvars(r)-1;
+  ring r1=(0,a),(x(1..n)),ds;
+  number f=leadcoef(imap(r,f));
+  minpoly=f;
+  ideal I=imap(r,I);
+  int m=mult(std(I));
+  return(m);
+}
+
+//////////////////////////////////////////////////////////////
+//--------Parametrization of smooth curve-------------------//
+//////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////
+//computes jacobian matrix, considering x(1..n) as variables and a(1..m) as parameters
+
+static proc mjacob(ideal I)
+{
+  def r=basering;
+  int n=nvars(r);
+  int k=size(I);
+  matrix M[k][n];
+  int i,j,l;
+  for(i=1;i<=k;i++)
+  {
+    for(j=1;j<=n;j++)
+    {
+      M[i,j]=diff(I[i],x(j));
+      for(l=1;l<=n;l++){M[i,j]=subst(M[i,j],x(l),0);}
+    }
+  }
+  return(M);
+}
+
+
+//////////////////////////////////////////////////////////
+
+static proc mmi(matrix M,int n)
+{
+  ideal l;
+  int k=nrows(M);
+  int i,j;
+  for(i=1;i<=k;i++)
+  {
+    l[i]=0;
+    for(j=1;j<=n;j++)
+    {
+      l[i]=l[i]+x(j)*M[i,j];
+    }
+  }
+  l=std(l);
+  int t=size(l);
+  i=1;
+  int mi=0;
+  while( mi==0 and i<=n-1)
+  {
+    if(diff(l[i],x(n-i))!=0){mi=n-i+1;}
+    else{i++;}
+  }
+  if(mi==0){mi=1;}
+  matrix Mi[k][n-1];
+  for(i=1;i<=k;i++)
+  {
+    for(j=1;j<=mi-1;j++)
+    {
+      Mi[i,j]=M[i,j];
+    }
+    for(j=mi;j<=n-1;j++)
+    {
+      Mi[i,j]=M[i,j+1];
+    }
+  }
+  list lmi=mi,Mi;
+  return(lmi);
+}
+
+
+//////////////////////////////////////////////////////////
+
+static proc mC(matrix Mi,int n)
+{
+  int k=nrows(Mi);
+  ideal c;
+  int i,j;
+  for(i=1;i<=n-1;i++)
+  {
+    c[i]=0;
+    for(j=1;j<=k;j++)
+    {
+      c[i]=c[i]+y(j)*Mi[j,i];
+    }
+  }
+  c=std(c);
+  return(c);
+}
+
+//////////////////////////////////////////////////////////
+
+proc mmF(ideal C, matrix Mi,int n,int k)
+{
+  int s=size(C);
+  intvec mf;
+  int p=0;
+  int t=0;
+  int i, j;
+  int v=0;
+  for(i=s;i>0;i--)
+  {
+    p=t;
+    j=1;
+    while(t==p and p+j<=k)
+    {
+      if(diff(C[i],y(p+j))==0){j++;}
+      if(diff(C[i],y(p+j))!=0){t=p+j;v++;mf[v]=t;}
+    }
+  }
+  matrix B[n-1][n-1];
+  for(i=1;i<=n-1;i++)
+  {
+    for(j=1;j<=n-1;j++)
+    {
+      B[i,j]=Mi[ mf[i],j];
+    }
+  }
+  list mmf=mf,B;
+  return(mmf);
+}
+
+
+/////////////////////////////////////////////////////
+
+static proc cparam(ideal I,poly f,int n,int m,int N)
+{
+  def r=basering;
+  ring s=(0,a),(x(1..n)),lp;
+  number f=leadcoef(imap(r,f));
+  minpoly=f;
+  ideal I=imap(r,I);
+  matrix M=mjacob(I);
+  list l0=mmi(M,n);
+  int mi=l0[1];
+  matrix Mi=l0[2];
+  int k=nrows(Mi);
+  ring q=(0,a),(y(1..k)),lp;
+  number f=leadcoef(imap(r,f));
+  minpoly=f;
+  matrix Mi=imap(s,Mi);
+  ideal D=mC(Mi,n);
+  list l1=mmF(D,Mi,n,k);
+  intvec mf=l1[1];
+  matrix B=l1[2];
+  setring s;
+  matrix B=imap(q,B);
+  matrix C=inverse(B);
+
+  int i,j,l;
+  ideal P;
+  for(i=1;i<mi;i++){P[i]=x(i);}
+  P[mi]=x(n);
+  for(i=1;i<=n-mi;i++){P[mi+i]=x(mi+i-1);}
+  map phi=s,P;
+  ideal I1=phi(I);
+  list X;
+  matrix d[n-1][1];
+  matrix b[n-1][1];
+  ideal Q;
+  map psi;
+  for(i=1;i<=N;i++)
+  {
+    for(j=1;j<=n-1;j++)
+    {
+      d[j,1]=diff(I1[mf[j]],x(n));
+      for(l=1;l<=n;l++){d[j,1]=subst(d[j,1],x(l),0);}
+    }
+    b=-C*d;
+    I1=jet(I1,N-i+2);
+    X[i]=b;
+    for(j=1;j<=n-1;j++){Q[j]=x(n)*(b[j,1]+x(j));}
+    Q[n]=x(n);
+    psi=s,Q;
+    I1=psi(I1);
+    I1=I1/x(n);
+  }
+  list Y=X,mi;
+  setring r;
+  list Y=imap(s,Y);
+  return(Y);
+}
+
+//////////////////////////////////////////////////////////////
+//--------Parametrization of singular curve-----------------//
+//////////////////////////////////////////////////////////////
+
+proc CurveParam (ideal I)
+"USAGE:   CurveParam(I);
+          I ideal
+
+ASSUME:   I is an ideal of a curve C with a singular point 0.
+
+COMPUTE:  Parametrization for algebraic branches of the curve C.
+
+RETURN:   list L of size 1.
+          L[1] is a ring ring rt=0,(t,a),ds;
+          Ring R contains a list Param
+          Param is a list of algebraic branches
+          Each Param[i] is a list of size 3
+
+          Param[i][1] is a list of polynomials
+          Param[i][2] is an irredusible polynomial f\in k[a].It is a minimal polynomial for the parameter a.
+          Param[i][3] is an integer b--upper bound for the conductor of Weierstrass semigroup
+
+
+EXAMPLE: example curveparam; shows an example"
+{
+  int i, j,mi,b,k;
+  def s=CurveRes(I);
+  setring s;
+  int n=nvars(s)-1;
+  list Param,l;
+  ideal D,P,Q,T;
+  poly f;
+  map tau;
+  list Z, Y,X;
+  for(j=1;j<=size(Resolve);j++)
+  {
+    b=0;
+    for(k=1;k<=size(Resolve[j][4]);k++)
+    {
+      b=b+Resolve[j][4][k]*(Resolve[j][4][k]+1);
+    }
+    if(b==0){b=1;}
+    Y=cparam(Resolve[j][1],Resolve[j][3],n,1,b);
+    X=Y[1];
+    mi=Y[2];
+    f=Resolve[j][3];
+    for(i=1;i<mi;i++)
+    {
+      P[i]=0;
+      for(k=1;k<=b;k++){P[i]=P[i]+X[k][i,1]*(x(1)^k);}
+    }
+    P[mi]=x(1);
+    for(i=mi+1;i<=n;i++)
+    {
+      P[i]=0;
+      for(k=1;k<=b;k++){P[i]=P[i]+X[k][i-1,1]*(x(1)^k);}
+    }
+    P[n+1]=a;
+    tau=s,P;
+    T=Resolve[j][2];
+    Q=tau(T);
+    for(i=1;i<=n;i++){Z[i]=jet(reduce(Q[i],std(f)),b+1);}
+    l[1]=Z;
+    l[2]=f;
+    l[3]=b;
+    Param[j]=l;
+  }
+  ring rt=0,(t,a),ds;
+  ideal D;
+  D[1]=t;
+  D[n+1]=a;
+  map delta=s,D;
+  list Param=delta(Param);
+  export(Param);
+  return(rt);
+}
+
+example
+{"EXAMPLE:";echo=2;
+  ring r=0,(x,y,z),dp;
+  ideal i=x2-y3,z2-y5;
+  def s=CurveParam(i);
+  setring s;
+  Param;
+  ring r=0,(x,y,z),dp;
+  ideal i=x2-y3,z2-y5;
+  def s=CurveParam(i);
+  setring s;
+  Param;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//----------Computation of Weierstrass Semigroup from parametrization--------------------//
+///////////////////////////////////////////////////////////////////////////////////////////
+
+proc Semi(intvec G,int b)
+"USAGE:   Semi(G,b);
+          G=intvec
+          b=int
+
+ASSUME:   G[1]<=G[2]<=...<=G[k],
+
+COMPUTE:  elements of semigroup S generated by the enteries of G till the bound b.
+          For each element i of S computes the list of integer vectors v of dimension
+          k=size(G), such that g[1]*v[1]+g[2]*v[2]+...+g[k]*v[k]=i. If there exists
+          conductor  of semigroup S  c<b-n, where n is minimal element of G, then
+          computes also c+n.
+
+RETURN:   list M of size 2.
+          L=M[1] is a list  of size min(b,c+n).
+          L[i] is a list of integer vectors.
+          If i is not in a semigroup S than L[i] is empty.
+          M[2] is an integer =min(b,c+n)
+          M[3] minimal generators of S
+"
+{
+  list L,l,q;
+  int i,j,t;
+  for(i=1;i<=b;i++){L[i]=l;}
+  int k=size(G);
+  int n=G[1];
+  int c=0;
+  intvec w,v;
+  for(i=1;i<=k;i++)
+  {
+    for(j=1;j<=k;j++)
+    {
+      if(j==i){w[j]=1;}
+      else{w[j]=0;}
+    }
+    L[G[i]]=insert(L[G[i]],w);
+  }
+  list L1=L;
+  int s=0;
+  int s1=0;
+  i=1;
+  int p;
+  while(i<=b and s<n)
+  {
+    for(j=1;j<=k;j++)
+    {
+      if(i-G[j]>0)
+      {
+        if(size(L[i-G[j]])>0)
+        {
+          for(t=1;t<=size(L[i-G[j]]);t++)
+          {
+            v=L[i-G[j]][t];
+            p=1;
+            for(q=1;q<j;q++)
+            {
+              if(v[q]>0){p=0;}
+            }
+            if(p==1){v[j]=v[j]+1;L[i]=insert(L[i],v);}
+          }
+        }
+      }
+    }
+    if(size(L[i])>0){s1=1;}
+    s=s1*(s+1);
+    s1=0;
+    i++;
+  }
+  intvec Gmin;
+  int jmin=1;
+  for(j=1;j<=k;j++)
+  {
+    if(size(L[G[j]])==size(L1[G[j]]))
+    {
+      Gmin[jmin]=G[j];
+      L1[G[j]]=insert(L1[G[j]],0);
+      jmin++;
+    }
+  }
+  list M=L,i-1,Gmin;
+  return(M);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+static proc AddElem(list L,int b,int k,int g,int n)
+"ASSUME:  L list of size b. L[i] list of integer vectors of dimension k.
+          b=int
+          k=int as above
+          g=int new generator
+          n=int. minimal generator
+
+RETURN: list M
+        M[1]=new L;
+        M[2]=new b;"
+{
+  int i,j;
+  intvec v;
+  for(i=1;i<=b;i++)
+  {
+    if(size(L[i])>0)
+    {
+      for(j=1;j<=size(L[i]);j++)
+      {
+        v=L[i][j];
+        v[k+1]=0;
+        L[i][j]=v;
+      }
+    }
+  }
+  intvec w;
+  w[k+1]=1;
+  L[g]=insert(L[g],w);
+  int s=0;
+  int s1=0;
+  i=1;
+  while(i<=b and s<n)
+  {
+    if(i-g>0)
+    {
+      if(size(L[i-g])>0)
+      {
+        for(j=1;j<=size(L[i-g]);j++)
+        {
+          v=L[i-g][j];
+          v[k+1]=v[k+1]+1;
+          L[i]=insert(L[i],v);
+        }
+      }
+    }
+    if(size(L[i])>0){s1=1;}
+    s=s1*(s+1);
+    s1=0;
+    i++;
+  }
+  int b1=i-1;
+  list M=L,b1;
+  return(M);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+proc WSemigroup(list X,int b0)
+"USAGE:    WSemigroup(X,b0);
+           X a list of polinomials in one vaiable, say t.
+           b0 an integer
+
+COMPUTE:   Weierstrass semigroup of space curve C,which is given by a parametrization X[1](t),...,X[k](t), till the bound b0.
+
+ASSUME:    b0 is greater then conductor
+
+RETURN:    list M of size 5.
+           M[1]= list of integers, which are minimal generators set of the Weierstrass semigroup.
+           M[2]=integer, conductor of the Weierstrass semigroup.
+           M[3]=intvec, all elements of the Weierstrass semigroup till some bound b,
+           which is greather than conductor.
+
+
+
+
+WARNING:   works only over the ring with one variable with ordering ds
+
+EXAMPLE: example WSemigroup; shows an example"
+{
+  int k=size(X);
+  intvec G;
+  int i,i2,g;
+  poly t=var(1);
+  poly h;
+  for(i=1;i<=k;i++)
+  {
+    G[i]=ord(X[i]);
+  }
+  for(i=1;i<k;i++)
+  {
+    for(i2=i;i2<=k;i2++)
+    {
+      if(G[i]>G[i2])
+      {
+        g=G[i];G[i]=G[i2];G[i2]=g;
+        h=X[i];X[i]=X[i2];X[i2]=h;
+      }
+    }
+  }
+  list U=Semi(G,b0);
+  list L=U[1];
+  int b=U[2];
+  G=U[3];
+  int k1=size(G);
+  list N, l;
+  for(i=1;i<=b;i++){N[i]=l;}
+  int j;
+  for(j=b0;j>b;j--){L=delete(L,j);}
+  poly p;
+  int s, e;
+  for(i=1;i<=b;i++)
+  {
+    for(j=1;j<=size(L[i]);j++)
+    {
+      p=1;
+      for(s=1;s<=k;s++)
+      {
+        for(e=1;e<=L[i][j][s];e++)
+        {
+          p=p*X[s];
+          p=jet(p,b);
+        }
+      }
+      N[i]=insert(N[i],p);
+    }
+  }
+  int j1, j2,m,b1,q,i1;
+  list M;
+  poly c1, c2, f;
+  ideal I;
+  matrix C, C1;
+  i=1;
+  while(i<=b)
+  {
+    for(j1=2;j1<=size(N[i]);j1++)
+    {
+      for(j2=1;j2<j1;j2++)
+      {
+        c1=coeffs(N[i][j1],t)[i+1,1];
+        c2=coeffs(N[i][j2],t)[i+1,1];
+        f=c2*N[i][j1]-c1*N[i][j2];
+        m=ord(f);
+        if(m>=0)
+        {
+          if(size(N[m])==0)
+          {
+            N[m]=insert(N[m],f);
+            if(size(L[m])==0)
+            {
+              M=AddElem(L,b,k,m,G[1]);
+              L=M[1];
+              b1=M[2];
+              G[k1+1]=m;
+              X[k+1]=f;
+              N[m]=insert(N[m],f);
+              k=k+1;
+              k1=k1+1;
+              if(b1<b)
+              {
+                for(i1=1;i1<=b1;i1++)
+                {
+                  for(s=1;s<=size(N[i1]);s++){N[i1][s]=jet(N[i1][s],b1);}
+                }
+                for(s=size(N);s>b1;s--){N=delete(N,s);}
+                for(s=size(L);s>b1;s--){L=delete(L,s);}
+              }
+              b=b1;
+            }
+          }
+          else
+          {
+            for(q=1;q<=size(N[m]);q++){I[q]=N[m][q];}
+            I[size(N[m])+1]=f;
+            C=coeffs(I,t);
+            C1=gauss_col(C);
+            if(C1[size(N[m])+1]!=0){N[m]=insert(N[m],f);}
+          }
+        }
+      }
+    }
+    i++;
+  }
+  intvec S;
+  j=1;
+  for(i=1;i<=b;i++)
+  {
+    if(size(L[i])>0){S[j]=i;j++;}
+  }
+  U=Semi(G,b);
+  G=U[3];
+  list Q=G,b-G[1]+1,S;
+  return(Q);
+}
+example
+{"EXAMPLE:";echo=2;
+  ring r=0,(t),ds;
+  list X=t4,t5+t11,t9+2*t7;
+  list L=WSemigroup(X,30);
+  L;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+/*
+LIB"spacecurve.lib";
+
+ring r=0,(x,y,z),dp;
+ideal i=x2-y3,z2-y5;
+def s=CurveParam(i);
+setring s;
+Param;
+
+ring r=0,(t),ds;
+list X=t4,t5+t11,t9+2*t7;
+list L=WSemigroup(X,30);
+L;
+
+
+ring r=0,(x,y,z,t),dp;
+ideal I=x-t4,y-t5-t11,z-t9-2t7;
+I=eliminate(I,t);
+ring r1=0,(x,y,z),dp;
+ideal I=imap(r,I);
+def s=CurveParam(I);
+setring s;
+Param;
+WSemigroup(Param[1][1],30);
+
+ring r=0,(x,y,z),dp;
+ideal I=(x5-y11)*(x2+(y+1)^3),z;
+def s=CurveParam(I);
+setring s;
+Param;
+
+
+ring r=0,(x,y,z),dp;
+ideal I=y2-x3-x2,z;
+def s=CurveParam(I);
+setring s;
+Param;
+setring r;
+I=intersect(I,ideal(y2-x3,z));
+s=CurveParam(I);
+setring s;
+Param;
+
+ring r=0,(x,y,z),dp;
+ideal I=y2+x3+x2,z;
+def s=CurveParam(I);
+setring s;
+Param;
+*/

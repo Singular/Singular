@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: hyperelliptic.lib,v 1.1 2007-05-04 13:02:40 Singular Exp $";
+version="$Id: hyperel.lib,v 1.1 2007-05-24 11:57:58 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY:    hyperelliptic.lib
