@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.159 2007-05-24 09:04:24 Singular Exp $
+@comment $Id: singular.doc,v 1.160 2007-05-24 12:01:43 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -423,6 +423,7 @@ LIB "all.lib";
 * alexpoly_lib:: resolution graph and Alexander polynomial
 * arcpoint_lib:: truncations of arcs at a singular point
 * classify_lib:: procedures for the Arnold-classifier of singularities
+* curvepar_lib:: procedures for space curves
 * deform_lib:: procedures for computing miniversal deformation
 * equising_lib:: procedures for equisingularity strata
 * gmssing_lib:: procedures for gauss-manin system of a singularity
@@ -444,9 +445,13 @@ LIB "all.lib";
 @subsection arcpoint_lib
 @c lib arcpoint.lib
 @c ---------------------------------------------------------
-@node classify_lib, deform_lib, arcpoint_lib, Singularities
+@node classify_lib, curvepar_lib, arcpoint_lib, Singularities
 @subsection classify_lib
 @c lib classify.lib unix_only
+@c ---------------------------------------------------------
+@node curvepar_lib, deform_lib, classify_lib, Singularities
+@subsection curvepar_lib
+@c lib curvepar.lib
 @c ----------------------------------------------------------
 @node deform_lib, equising_lib, classify_lib, Singularities
 @subsection deform_lib
