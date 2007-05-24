@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.157 2007-05-10 07:48:36 wienand Exp $ */
+/* $Id: ipshell.cc,v 1.158 2007-05-24 13:39:36 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1910,6 +1910,7 @@ ring rCompose(const lists  L)
          case ringorder_ls:
          case ringorder_ds:
          case ringorder_Ds:
+         case ringorder_rs:
            R->OrdSgn=-1;
          case ringorder_lp:
          case ringorder_dp:
@@ -1942,6 +1943,7 @@ ring rCompose(const lists  L)
            (R->order[j]==ringorder_Dp) ||
            (R->order[j]==ringorder_Ds) ||
            (R->order[j]==ringorder_rp) ||
+           (R->order[j]==ringorder_rs) ||
            (R->order[j]==ringorder_lp) ||
            (R->order[j]==ringorder_ls))
           &&
@@ -4223,6 +4225,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
           case ringorder_ls:
           case ringorder_ds:
           case ringorder_Ds:
+          case ringorder_rs:
             typ=-1;
           case ringorder_lp:
           case ringorder_dp:
@@ -4302,6 +4305,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
          (R->order[n]==ringorder_Dp) ||
          (R->order[n]==ringorder_Ds) ||
          (R->order[n]==ringorder_rp) ||
+         (R->order[n]==ringorder_rs) ||
          (R->order[n]==ringorder_lp) ||
          (R->order[n]==ringorder_ls))
         &&
