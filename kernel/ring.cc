@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.58 2007-05-10 08:12:43 wienand Exp $ */
+/* $Id: ring.cc,v 1.59 2007-05-24 07:53:42 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2832,7 +2832,7 @@ BOOLEAN rComplete(ring r, int force)
         break;
 
       case ringorder_rp:
-        rO_LexVars_neg(j, j_bits, r->block1[i],r->block0[i], prev_ordsgn,
+        rO_LexVars(j, j_bits, r->block1[i],r->block0[i], prev_ordsgn,
                        tmp_ordsgn,v, bits, -1);
         break;
 
