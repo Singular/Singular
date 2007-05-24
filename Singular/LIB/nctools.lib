@@ -1,11 +1,14 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.25 2007-05-13 18:29:43 levandov Exp $";
+version="$Id: nctools.lib,v 1.26 2007-05-24 09:16:59 motsak Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
 AUTHORS:   Levandovskyy V.,     levandov@mathematik.uni-kl.de,
 @*         Lobillo, F.J.,       jlobillo@ugr.es,
-@*         Rabelo, C.,          crabelo@ugr.es.
+@*         Rabelo, C.,          crabelo@ugr.es,
+@*         Motsak, O.,          motsak@mathematik.uni-kl.de.
+
+
 
 SUPPORT: DFG (Deutsche Forschungsgesellschaft) and Metodos algebraicos y efectivos en grupos cuanticos, BFM2001-3141, MCYT, Jose Gomez-Torrecillas (Main researcher).
 
@@ -18,7 +21,7 @@ makeWeyl(n, [p]);         return n-th Weyl algebra in (x(i),D(i)) presentation,
 makeHeisenberg(N, [p,d]); return n-th Heisenberg algebra in (x(i),y(i),h) realization,
 Exterior();               return qring, the exterior algebra of a basering,
 findimAlgebra(M,[r]);     create finite dimensional algebra structure from the basering and the multiplication matrix M,
-SuperCommutative([b,e, Q]);  return qring, the super-commutative algebra over a basering,
+SuperCommutative([b,e,Q]);  return qring, the super-commutative algebra over a basering,
 rightStd(I);              compute a right Groebner basis of an ideal,
 
 AUXILIARY PROCEDURES:
@@ -26,15 +29,14 @@ ncRelations(r);         recover the non-commutative relations of a G-algebra,
 isCentral(p);           check for the commutativity of a polynomial in the G-algebra,
 isNC();                 check whether basering is noncommutative,
 UpOneMatrix(N);         return NxN matrix with 1's in the whole upper triagle,
-AltVarStart()           return first alternating variable of a super-commutative algebra,
-AltVarEnd()             return last alternating variable of a super-commutative algebra,
-IsSCA()                 checks whether current ring is a super-commutative algebra
+AltVarStart();          return first alternating variable of a super-commutative algebra,
+AltVarEnd();            return last alternating variable of a super-commutative algebra,
+IsSCA();                checks whether current ring is a super-commutative algebra
 ";
 
 
 LIB "ring.lib"; // for rootofUnity
 LIB "poly.lib"; // for newtonDiag
-LIB "general.lib"; // for sort
 // LIB "ncalg.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
