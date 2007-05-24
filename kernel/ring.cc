@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.60 2007-05-24 13:42:17 Singular Exp $ */
+/* $Id: ring.cc,v 1.61 2007-05-24 13:50:46 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1585,9 +1585,9 @@ BOOLEAN rHasSimpleOrder(ring r)
   if ((r->order[0] != ringorder_c)
   && (r->order[0] != ringorder_C)
   && (r->order[1] != ringorder_c)
-  && i(r->order[1] != ringorder_C))
+  && (r->order[1] != ringorder_C))
     return FALSE;
-  if i((r->order[1] == ringorder_M)
+  if ((r->order[1] == ringorder_M)
   || (r->order[0] == ringorder_M))
     return FALSE;
   return TRUE;
@@ -2862,7 +2862,7 @@ BOOLEAN rComplete(ring r, int force)
         break;
 
       case ringorder_rp:
-        rO_LexVars(j, j_bits, r->block1[i],r->block0[i], prev_ordsgn,
+        rO_LexVars_neg(j, j_bits, r->block1[i],r->block0[i], prev_ordsgn,
                        tmp_ordsgn,v, bits, -1);
         break;
 
