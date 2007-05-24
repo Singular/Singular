@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.61 2007-05-24 13:50:46 Singular Exp $ */
+/* $Id: ring.cc,v 1.62 2007-05-24 14:19:04 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2335,6 +2335,9 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
              (r->typ[0].data.syz.limit +1)*sizeof(int));
     }
   }
+  // the special case: homog (omit_degree) and 1 block rs: that is global:
+  // it comes from dp
+  res->OrdSgn=r->OrdSgn;
   return res;
 }
 
