@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.16 2007-05-21 16:41:29 Singular Exp $
+// $Id: clapsing.cc,v 1.17 2007-05-25 13:30:52 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -911,7 +911,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       T_F_conv=pSub(T_F_conv,n_f_m);
       if (T_F_conv!=NULL)
       {
-        if (singclap_factorize_retry<1)
+        if (singclap_factorize_retry<3)
         {
           singclap_factorize_retry++;
           //if( si_factor_reminder) Print("problem with factorize, retrying\n");
