@@ -13,8 +13,8 @@ extern int libfac_interruptflag;
 /*ENDPUBLIC*/
 
 inline int
-interrupt_handle( ){
-
+interrupt_handle( )
+{
   if ( libfac_interruptflag ){ return 1; }
   return 0;
 }
@@ -23,5 +23,8 @@ interrupt_handle( ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1997/09/12 07:19:58  Singular
+* hannes/michael: libfac-0.3.0
+
 
 */

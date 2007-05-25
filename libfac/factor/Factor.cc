@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.32 2007-05-25 12:59:05 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.33 2007-05-25 16:02:01 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -159,12 +159,14 @@ necessary_condition( const CanonicalForm & F, int oldmainvar){
 // Make F monic. Return monic polynomial.                    //
 ///////////////////////////////////////////////////////////////
 static CanonicalForm
-make_monic( const CanonicalForm & F, const CanonicalForm & lt){
+make_monic( const CanonicalForm & F, const CanonicalForm & lt)
+{
   CanonicalForm intermediatpoly,f;
   Variable x(level(F));
 
   if ( degree(lt) == 0 ) f= 1/lt * F ;
-  else {
+  else
+  {
     intermediatpoly= power(lt,degree(F)-1);
     for ( int i=0; i<=degree(F); i++ )
       if ( ! F[i].isZero())
@@ -1038,8 +1040,6 @@ static bool fdivides2(const CanonicalForm &F, const CanonicalForm &G, const Cano
 }
 CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
 {
-  extern bool diophant_error;
-  diophant_error=false;
   CFFList G,H;
   CanonicalForm fac;
   int d,e;
@@ -1348,6 +1348,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.32  2007/05/25 12:59:05  Singular
+*hannes: fdivides2
+
 Revision 1.31  2007/05/22 14:49:52  Singular
 *hannes: format
 

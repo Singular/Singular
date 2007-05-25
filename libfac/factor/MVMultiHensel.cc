@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.12 2007-05-22 14:30:53 Singular Exp $";
+// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.13 2007-05-25 16:02:02 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -119,8 +119,6 @@ protected:
   RememberForm *ia;
 };
 
-bool diophant_error;
-
 ///////////////////////////////////////////////////////////////
 // Solve the Diophantine equation: ( levelU == mainvar )     //
 //            s*F1 + t*F2 = (mainvar)^i                      //
@@ -150,7 +148,6 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 ,
   // Degrees ok? degree(F1,mainvar) + degree(F2,mainvar) <= i ?
   if ( (degree(F1,levelU) + degree(F2,levelU) ) <= i )
   {
-    diophant_error=true;
 #ifdef HAVE_SINGULAR_ERROR
     Werror("libfac: diophant ERROR: degree too large!  (%d + %d <= %d)",degree(F1,levelU), degree(F2,levelU), i);
       //out_cf("F1:",F1,"\n");
@@ -447,7 +444,6 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
              const SFormList & Substitutionlist, const CanonicalForm &alpha)
 {
   CFFList Ll;
-  if (diophant_error) return Ll;
   CFFList Returnlist,Retlistinter,factorlist=Factorlist;
   CFFListIterator i;
   DiophantForm intermediat;
@@ -513,6 +509,9 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.12  2007/05/22 14:30:53  Singular
+*hannes: diophant_error
+
 Revision 1.11  2007/05/21 16:40:12  Singular
 *hannes: Factorize2
 
