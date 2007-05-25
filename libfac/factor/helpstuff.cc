@@ -1,7 +1,7 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: helpstuff.cc,v 1.4 2001-06-19 15:29:04 Singular Exp $";
+// static char * rcsid = "$Id: helpstuff.cc,v 1.5 2007-05-25 12:59:05 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -11,7 +11,8 @@
 #include "helpstuff.h"
 
 bool
-mydivremt ( const CanonicalForm& f, const CanonicalForm& g, CanonicalForm& a, CanonicalForm& b ){
+mydivremt ( const CanonicalForm& f, const CanonicalForm& g, CanonicalForm& a, CanonicalForm& b )
+{
   bool retvalue;
   CanonicalForm aa,bb;
   retvalue = divremt(f,g,a,bb);
@@ -22,7 +23,8 @@ mydivremt ( const CanonicalForm& f, const CanonicalForm& g, CanonicalForm& a, Ca
 }
 
 void
-mydivrem( const CanonicalForm& f, const CanonicalForm& g, CanonicalForm& a, CanonicalForm& b ){
+mydivrem( const CanonicalForm& f, const CanonicalForm& g, CanonicalForm& a, CanonicalForm& b )
+{
   bool retvalue;
   CanonicalForm aa,bb;
   retvalue = divremt(f,g,a,bb);
@@ -174,6 +176,9 @@ change_poly( const CanonicalForm & f , const SFormList & Substitutionlist ,int d
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  2001/06/19 15:29:04  Singular
+*hannes: optim.
+
 Revision 1.3  1997/09/12 07:19:56  Singular
 * hannes/michael: libfac-0.3.0
 

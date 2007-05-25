@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.31 2007-05-22 14:49:52 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.32 2007-05-25 12:59:05 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -1027,8 +1027,10 @@ static bool fdivides2(const CanonicalForm &F, const CanonicalForm &G, const Cano
     CanonicalForm rG=replacevar(G,Alpha,X);
     return fdivides(rF,rG);;
   #else
-    if (degree(F,F.mvar()) > degree(G,F.mvar())) return false;
-    return true;
+    CanonicalForm a,b;
+    mydivrem(G,F,a,b);
+    if (b.isZero()) return true;
+    else return false;
   #endif
   }
   else
@@ -1346,6 +1348,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.31  2007/05/22 14:49:52  Singular
+*hannes: format
+
 Revision 1.30  2007/05/22 14:30:53  Singular
 *hannes: diophant_error
 
