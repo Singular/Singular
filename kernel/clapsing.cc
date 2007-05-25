@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.17 2007-05-25 13:30:52 Singular Exp $
+// $Id: clapsing.cc,v 1.18 2007-05-25 14:16:16 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -673,7 +673,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   // with_exps: 3,1 return only true factors, no exponents
   //            2 return true factors and exponents
   //            0 return coeff, factors and exponents
-
+  BOOLEAN save_errorreported=errorreported;
 
   ideal res=NULL;
 
@@ -974,6 +974,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
             (**v)[0]=1;
             (**v)[1]=1;
           }
+	  errorreported=save_errorreported;
           return T_i;
         }
       }
@@ -1083,6 +1084,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   }
   else
     nDelete(&old_lead_coeff);
+  errorreported=save_errorreported;
 notImpl:
   if (res==NULL)
     WerrorS( feNotImplemented );
