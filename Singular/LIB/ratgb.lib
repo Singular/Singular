@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: ratgb.lib,v 1.1 2007-05-13 19:21:01 levandov Exp $";
+version="$Id: ratgb.lib,v 1.2 2007-05-27 01:51:40 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: ratgb.lib  Groebner bases in Ore localizations
@@ -7,6 +7,8 @@ AUTHOR: Viktor Levandovskyy,     levandov@risc.uni-linz.ac.at
 
 PROCEDURES: 
 ratstd(ideal I, int n);   compute Groebner basis in Ore localizations of the basering wrt first n variables
+
+SUPPORT: SpezialForschungsBereich F1301 of the Austrian FWF
 "
 
 proc ratstd(ideal I, int is)
@@ -14,6 +16,11 @@ proc ratstd(ideal I, int is)
 RETURN:  ring
 PURPOSE: compute the Groebner basis of I in the Ore localization of
 the basering with respect to first n variables
+ASSUME: the variables are organized in two blocks and
+@* the first block of length n contains the elements
+@*     with respect to which one localizes, 
+@* the basering is equipped with the elimination ordering 
+@*     for the variables in the second block
 NOTE:    the output ring O is commutative. The ideal rGBid in O
 represents the rational form of the output ideal pGBid in the basering.
 @* During the computation, the D-dimension of I and the corresponding
@@ -202,7 +209,7 @@ example
   rGBid; // rational form
 }
 
-proc exParam()
+static proc exParam()
 {
   // Appel F4
   ring r = (0,a,b,c,d),(x,y,Dx,Dy),(a(0,0,1,1),dp);
