@@ -2,7 +2,7 @@
 //major revision Jan/Feb. 2007, GMG
 //groebner mit Optionen versehen
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.92 2007-05-04 07:59:31 Singular Exp $";
+version="$Id: standard.lib,v 1.93 2007-06-01 13:17:23 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -776,11 +776,11 @@ EXAMPLE: example groebner;  shows an example"
 //1. Keine Vorgabe: es wirkt die aktuelle Heuristk:
 //   - Char p: std
 //   - Char = 0: slimgb (im qring wird Quotientenideal zum Input addiert)
-//   - 1-Block-Ordnungen: direkt Aufruf von std oder slimgb
+//   - 1-Block-Ordnungen/non-commutative: direkt Aufruf von std oder slimgb
 //   - Komplizierte Ordnungen (lp oder > 1 Block): hilb
 //   - Parameter werden grundsaetzlich nicht in Variable umgewandelt
 //   ? alternativ: more than 1 parameter will be converted to ring variable ?
-//   - fglm is keine Heruristik, da sonst vorher dim==0 peprueft werden muss
+//   - fglm is keine Heuristik, da sonst vorher dim==0 peprueft werden muss
 
 //2. Vorgabe aus {std,slimgb}: es wird wo immer moeglich das angegebene
 //   gewaehlt (da slimgb keine Hilbertfunktion kennt, wird std verwendet).
@@ -1008,7 +1008,8 @@ EXAMPLE: example groebner;  shows an example"
   }
 
   //define direct:
-  if ( (order=="simple" && (size(method)==0 )) ||
+  if ( (order=="simple" && (size(method)==0)) ||
+       (size(BRlist)>4) ||
         (order=="simple" && (method==",par2var" && npars_P==0 )) ||
          (conversion=="no" && partovar=="no" &&
            (algorithm=="std" || algorithm=="slimgb" ||
