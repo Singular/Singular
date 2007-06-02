@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.255 2007-05-15 13:55:00 Singular Exp $ */
+/* $Id: extra.cc,v 1.256 2007-06-02 13:28:22 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -113,6 +113,8 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 #include "walk.h"
 
 #include "fast_maps.h"
+
+/* #include "shiftgb.h" */
 
 #ifdef HAVE_EIGENVAL
 #include "eigenval_ip.h"
@@ -2696,6 +2698,33 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 	  //	res->data = ncGCD(p,q,currRing);	
 	}
 	else res->data=p;
+      }
+      else return TRUE;
+      return FALSE;
+    }
+    else
+/*==================== freeGB, twosided GB in free algebra =================*/
+    if (strcmp(sys_cmd, "freegb") == 0)
+    {
+      ideal I;
+      int uptodeg, lVblock;
+      if ((h!=NULL) && (h->Typ()==IDEAL_CMD))
+      {
+	I=(ideal)h->CopyD();
+	h=h->next;
+      }
+      else return TRUE;
+      if ((h!=NULL) && (h->Typ()==INT_CMD))
+      {
+	uptodeg=(int)((long)(h->Data()));
+	h=h->next;
+      }
+      else return TRUE;
+      if ((h!=NULL) && (h->Typ()==INT_CMD))
+      {
+	lVblock=(int)((long)(h->Data()));
+	//	res->data = freegb(I,uptodeg,lVblock);
+	//	res->rtyp = IDEAL_CMD;
       }
       else return TRUE;
       return FALSE;
