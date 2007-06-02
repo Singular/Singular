@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.33 2007-05-25 16:02:01 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.34 2007-06-02 10:21:57 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -1029,10 +1029,12 @@ static bool fdivides2(const CanonicalForm &F, const CanonicalForm &G, const Cano
     CanonicalForm rG=replacevar(G,Alpha,X);
     return fdivides(rF,rG);;
   #else
-    CanonicalForm a,b;
-    mydivrem(G,F,a,b);
-    if (b.isZero()) return true;
-    else return false;
+    if (degree(F,F.mvar()) > degree(G,F.mvar())) return false;
+    return true;
+    //CanonicalForm a,b;
+    //mydivrem(G,F,a,b);
+    //if (b.isZero()) return true;
+    //else return false;
   #endif
   }
   else
@@ -1044,7 +1046,9 @@ CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
   CanonicalForm fac;
   int d,e;
   ListIterator<CFFactor> i,k;
-  CFFList iF=Factorize(F);
+  libfac_interruptflag=0;
+  CFFList iF=Factorize(F,minpoly);
+  libfac_interruptflag=0;
   for ( i = iF; i.hasItem(); ++i )
   {
     d = i.getItem().exp();
@@ -1063,30 +1067,26 @@ CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
       }
       else
       {
-        G = Factorize( fac, minpoly);
-        for ( k = G; k.hasItem(); ++k )
+        e=0;
+        while ((!fac.isZero())&& fdivides2(fac,F,minpoly) && (d>0))
         {
-          fac = k.getItem().factor();
-          int dd = k.getItem().exp()*d;
-          e=0;
-          while ((!fac.isZero())&& fdivides2(fac,F,minpoly) && (dd>0))
-          {
 #ifndef NOSTREAMIO
 #ifndef NDEBUG
-            out_cf("factor:",fac,"\n");
+          out_cf("factor:",fac,"\n");
 #endif
 #endif
-            e++;dd--;
-            F/=fac;
-          }
-          if (e>0) H.append( CFFactor( fac , e ) );
+          e++;d--;
+          F/=fac;
         }
+        if (e>0) H.append( CFFactor( fac , e ) );
       }
     }
   }
+  libfac_interruptflag=0;
   if (getNumVars(F)>0)
   {
     G = Factorize(F, minpoly);
+    libfac_interruptflag=0;
     for ( k = G; k.hasItem(); ++k )
     {
       fac = k.getItem().factor();
@@ -1112,7 +1112,9 @@ CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
     out_cf("retry:",F,"\n");
 #endif
 #endif
+    libfac_interruptflag=0;
     iF=Factorize(F);
+    libfac_interruptflag=0;
     for ( i = iF; i.hasItem(); ++i )
     {
       d = i.getItem().exp();
@@ -1132,6 +1134,7 @@ CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
         else
         {
           G = Factorize( fac, minpoly);
+          libfac_interruptflag=0;
           for ( k = G; k.hasItem(); ++k )
           {
             fac = k.getItem().factor();
@@ -1164,6 +1167,7 @@ CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
   }
   //Outputlist = newfactoras( F, as, 1);
   if(isOn(SW_USE_NTL_SORT)) H.sort(cmpCF);
+  libfac_interruptflag=0;
   return H;
 }
 CFFList
@@ -1348,6 +1352,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.33  2007/05/25 16:02:01  Singular
+*hannes: removed diophant_error, format
+
 Revision 1.32  2007/05/25 12:59:05  Singular
 *hannes: fdivides2
 
