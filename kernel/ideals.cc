@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.43 2007-05-15 09:28:08 Singular Exp $ */
+/* $Id: ideals.cc,v 1.44 2007-06-13 15:01:50 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2409,9 +2409,13 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   // fetch data from the old ring
   for (k=0;k<IDELEMS(h1);k++) h->m[k] = prCopyR( h1->m[k], origR);
   // compute kStd
+#if 1
   hh = kStd(h,NULL,hom,&w,hilb);
   idDelete(&h);
-
+#else
+  extern ideal kGroebner(ideal F, ideal Q);
+  hh=kGroebner(h,NULL);
+#endif
   // go back to the original ring
   rChangeCurrRing(origR);
   i = IDELEMS(hh)-1;
@@ -2983,10 +2987,10 @@ BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w)
       }
     }
   }
-  
+
   if(w!=NULL)
     pSetModDeg(NULL);
-  
+
   return TRUE;
 }
 
@@ -3706,7 +3710,7 @@ ideal idChineseRemainder(ideal *xx, number *q, int rl)
 {
   ideal result=idInit(IDELEMS(xx[0]),1);
   int i,j;
-  poly r,h,res_p;
+  poly r,h,hh,res_p;
   number *x=(number *)omAlloc(rl*sizeof(number));
   for(i=IDELEMS(result)-1;i>=0;i--)
   {
@@ -3720,14 +3724,15 @@ ideal idChineseRemainder(ideal *xx, number *q, int rl)
         if ((r==NULL)||(pLmCmp(r,h)==-1)) r=h;
       }
       if (r==NULL) break;
+      h=pHead(r);
       for(j=rl-1;j>=0;j--)
       {
-        h=xx[j]->m[i];
-        if (pLmCmp(r,h)==0)
-        { 
-          x[j]=pGetCoeff(h);
-          h=pLmFreeAndNext(h);
-          xx[j]->m[i]=h;
+        hh=xx[j]->m[i];
+        if ((hh!=NULL) && (pLmCmp(r,hh)==0))
+        {
+          x[j]=pGetCoeff(hh);
+          hh=pLmFreeAndNext(hh);
+          xx[j]->m[i]=hh;
         }
         else
           x[j]=nlInit(0);
@@ -3737,8 +3742,8 @@ ideal idChineseRemainder(ideal *xx, number *q, int rl)
       {
         nlDelete(&(x[j]),currRing);
       }
-      h=pHead(r);
       pSetCoeff(h,n);
+      //Print("new mon:");pWrite(h);
       res_p=pAdd(res_p,h);
     }
     result->m[i]=res_p;
@@ -3758,4 +3763,4 @@ ideal idChineseRemainder(ideal *xx, intvec *iv)
     q[i]=nInit((*iv)[i]);
   }
   return idChineseRemainder(xx,q,rl);
-}  
+}
