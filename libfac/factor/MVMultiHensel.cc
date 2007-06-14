@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.13 2007-05-25 16:02:02 Singular Exp $";
+// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.14 2007-06-14 14:16:35 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -34,6 +34,7 @@ void out_cf(char *s1,const CanonicalForm &f,char *s2);
 #endif
 
 #ifdef HAVE_SINGULAR_ERROR
+extern int libfac_interruptflag;
    extern "C"
    {
      void WerrorS(char *);
@@ -48,6 +49,7 @@ void out_cf(char *s1,const CanonicalForm &f,char *s2);
 #endif
 
 #include "debug.h"
+#include "interrupt.h"
 #include "timing.h"
 
 ///////////////////////////////////////////////////////////////
@@ -149,7 +151,7 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 ,
   if ( (degree(F1,levelU) + degree(F2,levelU) ) <= i )
   {
 #ifdef HAVE_SINGULAR_ERROR
-    Werror("libfac: diophant ERROR: degree too large!  (%d + %d <= %d)",degree(F1,levelU), degree(F2,levelU), i);
+    if (!interrupt_handle()) Werror("libfac: diophant ERROR: degree too large!  (%d + %d <= %d)",degree(F1,levelU), degree(F2,levelU), i);
       //out_cf("F1:",F1,"\n");
       //out_cf("F2:",F2,"\n");
 #else
@@ -193,7 +195,7 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 ,
         }
       } 
 #ifdef HAVE_SINGULAR_ERROR
-      WerrorS("libfac: diophant ERROR: F1 and F2 are not relatively prime! ");
+      if (!interrupt_handle()) WerrorS("libfac: diophant ERROR: F1 and F2 are not relatively prime! ");
 #ifndef NOSTREAMIO
       out_cf("F1:",F1,"\n");
       out_cf("F2:",F2,"\n");
@@ -217,6 +219,9 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 ,
     Retvalue=diophant(levelU,F1,F2,i-1,A,B,alpha);
     Retvalue.One *= x; // createVar(levelU,1);
     Retvalue.Two *= x; // createVar(levelU,1);
+
+    if (interrupt_handle()) return Retvalue;
+
     // Check degrees.
 
     if ( degree(Retvalue.One,levelU) > degree(F2,levelU) )
@@ -270,6 +275,8 @@ make_delta( int levelU, const CanonicalForm & W,
     {
       intermediate=diophant(levelU,F1,F2,i.exp(),A,B,alpha);
       Retvalue += intermediate.One * i.coeff();
+
+      if (interrupt_handle()) return Retvalue;
     }
   }
   else // level(W) < levelU ; i.e. degree(w,levelU) == 0
@@ -298,6 +305,8 @@ make_square( int levelU, const CanonicalForm & W,
     {
       intermediate=diophant(levelU,F1,F2,i.exp(),A,B,alpha);
       Retvalue += i.coeff() * intermediate.Two;
+
+      if (interrupt_handle()) return Retvalue;
     }
   }
   else // level(W) < levelU ; i.e. degree(w,levelU) == 0
@@ -370,6 +379,7 @@ mvhensel( const CanonicalForm & U , const CanonicalForm & F ,
     CERR << "mvhensel: Gk= " << Gk << "\n";
 #endif
     if ( Rk.isZero() ) break;
+    if (interrupt_handle()) break;
   }
   Retvalue.One = change_poly(Fk,Substitutionlist,1);
   Retvalue.Two = change_poly(Gk,Substitutionlist,1);
@@ -509,6 +519,9 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.13  2007/05/25 16:02:02  Singular
+*hannes: removed diophant_error, format
+
 Revision 1.12  2007/05/22 14:30:53  Singular
 *hannes: diophant_error
 

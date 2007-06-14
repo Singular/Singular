@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.34 2007-06-02 10:21:57 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.35 2007-06-14 14:16:35 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -1042,134 +1042,83 @@ static bool fdivides2(const CanonicalForm &F, const CanonicalForm &G, const Cano
 }
 CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
 {
+#ifndef NDEBUG
+  printf("start Factorize2(int_flag=%d)\n",libfac_interruptflag);
+#endif
   CFFList G,H;
   CanonicalForm fac;
   int d,e;
   ListIterator<CFFactor> i,k;
   libfac_interruptflag=0;
   CFFList iF=Factorize(F,minpoly);
-  libfac_interruptflag=0;
-  for ( i = iF; i.hasItem(); ++i )
+  if ((libfac_interruptflag==0)||(iF.isEmpty()))
+    H=iF;
+  else
   {
-    d = i.getItem().exp();
-    fac = i.getItem().factor();
-    if (fdivides(fac,F))
-    {
-      if ((getNumVars(fac)==0)||(fac.degree()<=1))
-      {
-#ifndef NOSTREAMIO
 #ifndef NDEBUG
-        printf("append trivial factor\n");
-#endif
-#endif
-        H.append( CFFactor( fac, d));
-        do {F/=fac; d--; } while (d>0);
-      }
-      else
-      {
-        e=0;
-        while ((!fac.isZero())&& fdivides2(fac,F,minpoly) && (d>0))
-        {
-#ifndef NOSTREAMIO
-#ifndef NDEBUG
-          out_cf("factor:",fac,"\n");
-#endif
-#endif
-          e++;d--;
-          F/=fac;
-        }
-        if (e>0) H.append( CFFactor( fac , e ) );
-      }
-    }
-  }
-  libfac_interruptflag=0;
-  if (getNumVars(F)>0)
-  {
-    G = Factorize(F, minpoly);
-    libfac_interruptflag=0;
-    for ( k = G; k.hasItem(); ++k )
-    {
-      fac = k.getItem().factor();
-      d = k.getItem().exp();
-      e=0;
-      while ((!fac.isZero())&& fdivides2(fac,F,minpoly) &&(d>0))
-      {
-#ifndef NOSTREAMIO
-#ifndef NDEBUG
-        out_cf("factor:",fac,"\n");
-#endif
-#endif
-        e++; d--;
-        F/=fac;
-      }
-      if (e>0) H.append( CFFactor( fac , e ) );
-    }
-  }
-  if (getNumVars(F)>0)
-  {
-#ifndef NOSTREAMIO
-#ifndef NDEBUG
-    out_cf("retry:",F,"\n");
-#endif
+    printf("variant 2(int_flag=%d)\n",libfac_interruptflag);
 #endif
     libfac_interruptflag=0;
     iF=Factorize(F);
-    libfac_interruptflag=0;
-    for ( i = iF; i.hasItem(); ++i )
+    if (libfac_interruptflag==0)
     {
-      d = i.getItem().exp();
-      fac = i.getItem().factor();
-      if (fdivides2(fac,F,minpoly))
+      i = iF;
+      while( i.hasItem())
       {
-        if ((getNumVars(fac)==0)||(fac.degree()<=1))
+        d = i.getItem().exp();
+        fac = i.getItem().factor();
+        if (fdivides(fac,F))
         {
-#ifndef NOSTREAMIO
-#ifndef NDEBUG
-          printf("append trivial factor\n");
-#endif
-#endif
-          H.append( CFFactor( fac, d));
-          do {F/=fac; d--; } while (d>0);
-        }
-        else
-        {
-          G = Factorize( fac, minpoly);
-          libfac_interruptflag=0;
-          for ( k = G; k.hasItem(); ++k )
+          if ((getNumVars(fac)==0)||(fac.degree()<=1))
           {
-            fac = k.getItem().factor();
-            int dd = k.getItem().exp()*d;
-            e=0;
-            while ((!fac.isZero())&& fdivides2(fac,F,minpoly) && (dd>0))
-            {
 #ifndef NOSTREAMIO
 #ifndef NDEBUG
-              out_cf("factor:",fac,"\n");
+            printf("append trivial factor\n");
 #endif
 #endif
-              e++;dd--;
-              F/=fac;
+            H.append( CFFactor( fac, d));
+            do {F/=fac; d--; } while (d>0);
+          }
+          else
+          {
+            G = Factorize( fac, minpoly);
+            if (libfac_interruptflag!=0)
+            {
+              libfac_interruptflag=0;
+              k = G;
+              while( k.hasItem())
+              {
+                fac = k.getItem().factor();
+                int dd = k.getItem().exp()*d;
+                e=0;
+                while ((!fac.isZero())&& fdivides2(fac,F,minpoly) && (dd>0))
+                {
+#ifndef NOSTREAMIO
+#ifndef NDEBUG
+                  out_cf("factor:",fac,"\n");
+#endif
+#endif
+                  e++;dd--;
+                  F/=fac;
+                }
+                if (e>0) H.append( CFFactor( fac , e ) );
+                ++k;
+              }
             }
-            if (e>0) H.append( CFFactor( fac , e ) );
           }
         }
+        ++i;
       }
     }
   }
-  if (getNumVars(F)>0)
-  {
-#ifndef NOSTREAMIO
-#ifndef NDEBUG
-    out_cf("rest:",fac,"\n");
-#endif
-#endif
-    H.append( CFFactor(F,1) );
-  }
   //Outputlist = newfactoras( F, as, 1);
-  if(isOn(SW_USE_NTL_SORT)) H.sort(cmpCF);
-  libfac_interruptflag=0;
+  if((isOn(SW_USE_NTL_SORT))&&(!H.isEmpty())) H.sort(cmpCF);
+#ifndef NDEBUG
+  printf("end Factorize2(%d)\n",libfac_interruptflag);
+#endif
   return H;
 }
+
 CFFList
 Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree )
 {
@@ -1352,6 +1301,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.34  2007/06/02 10:21:57  Singular
+*hannes: fdivides2 again
+
 Revision 1.33  2007/05/25 16:02:01  Singular
 *hannes: removed diophant_error, format
 
