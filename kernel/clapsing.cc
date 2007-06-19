@@ -2,12 +2,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.19 2007-06-19 13:13:34 Singular Exp $
+// $Id: clapsing.cc,v 1.20 2007-06-19 14:12:58 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
 
-#define FACTORIZE2_DEBUG
+//#define FACTORIZE2_DEBUG
 #include "mod2.h"
 #include "omalloc.h"
 #ifdef HAVE_FACTORY
