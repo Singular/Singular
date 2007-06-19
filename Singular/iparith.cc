@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.445 2007-05-03 13:27:42 Singular Exp $ */
+/* $Id: iparith.cc,v 1.446 2007-06-19 09:12:41 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1590,7 +1590,7 @@ static BOOLEAN jjKLAMMER_rest(leftv res, leftv u, leftv v)
   h->next=tmp;
   return FALSE;
 }
-static BOOLEAN jjPROC(leftv res, leftv u, leftv v)
+BOOLEAN jjPROC(leftv res, leftv u, leftv v)
 {
   idrec tmp_proc;
   Subexpr e;
@@ -2833,7 +2833,7 @@ static BOOLEAN jjSQR_FREE_DEC(leftv res, leftv u,leftv dummy)
   int fac_sw=sw;
   if ((sw<0)||(sw>2)) fac_sw=1;
   singclap_factorize_retry=0;
-  ideal f=singclap_factorize((poly)(u->Data()), &v, fac_sw);
+  ideal f=singclap_factorize((poly)(u->CopyD()), &v, fac_sw);
   if (f==NULL)
     return TRUE;
   switch(sw)
@@ -3680,7 +3680,7 @@ static BOOLEAN jjFAC_P(leftv res, leftv u)
 {
   intvec *v=NULL;
   singclap_factorize_retry=0;
-  ideal f=singclap_factorize((poly)(u->Data()), &v, 0);
+  ideal f=singclap_factorize((poly)(u->CopyD()), &v, 0);
   if (f==NULL) return TRUE;
   ivTest(v);
   lists l=(lists)omAllocBin(slists_bin);
