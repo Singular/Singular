@@ -1,6 +1,6 @@
 //GP, last modified 23.10.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: modstd.lib,v 1.7 2007-03-13 18:48:27 Singular Exp $";
+version="$Id: modstd.lib,v 1.8 2007-06-19 09:11:59 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: modstd.lib  Grobner basis of ideals
@@ -21,7 +21,7 @@ NOTE:
 PROCEDURES:
 modStd(I);     compute a standard basis of I using modular methods
 modS(I,L);     liftings to Q of standard bases of I mod p for p in L
-primeList(n);  list of n primes  <= 2134567879 in decreasing order
+primeList(n);  intvec of n primes  <= 2134567879 in decreasing order
 ";
 
 LIB "poly.lib";
@@ -49,7 +49,7 @@ EXAMPLE: example modStd; shows an example
   int an=1000000000;
   intvec hi,hl,hc,hpl,hpc;
   list T,TT;
-  list L=primeList(5);
+  intvec L=primeList(5);
   L[6]=prime(random(an,en));
   ideal J,cT,lT,K;
   ideal I0=I;
@@ -152,7 +152,7 @@ EXAMPLE: example modStd; shows an example
      if((size(reduce(cT,lT))!=0)||(size(reduce(lT,cT))!=0))
      {
         T=delete(T,size(T));
-        L=delete(L,size(L));
+        L=L[1..size(L)-1];
         k=0;
      }
      else
@@ -264,9 +264,9 @@ example
    J;
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc deleteUnluckyPrimes(list T,list L)
-"USAGE:  deleteUnluckyPrimes(T,L);T list of polys, L list of primes
-RETURN:  list L,T with T list of polys, L list of primes
+proc deleteUnluckyPrimes(list T,intvec L)
+"USAGE:  deleteUnluckyPrimes(T,L);T list of polys, L intvec of primes
+RETURN:  list L,T with T list of polys, L intvec of primes
 EXAMPLE: example deleteUnluckyPrimes; shows an example
 NOTE:    works only for homogeneous ideals with global orderings or
          for ideals with local orderings
@@ -306,7 +306,12 @@ NOTE:    works only for homogeneous ideals with global orderings or
      if((size(reduce(cT,lT))!=0)||(size(reduce(lT,cT))!=0))
      {
         T=delete(T,j);
-        L=delete(L,j);
+        if(j==1) { L=L[2..size(L)]; }
+        else
+        {
+          if (j==size(L)) { L=L[1..size(L)-1]; }
+          else { L=L[1..j-1],L[j+1..size(L)]; }
+        }
         j--;
      }
      j++;
@@ -327,8 +332,8 @@ example
    TT;
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc liftPoly(list T, list L)
-"USAGE:  liftPoly(T,L); T list of polys, L list of primes
+proc liftPoly(list T, intvec L)
+"USAGE:  liftPoly(T,L); T list of polys, L intvec of primes
 RETURN:  poly p in Q[x] such that p mod L[i]=T[i]
 EXAMPLE: example liftPoly; shows an example
 "
@@ -380,7 +385,7 @@ example
    liftPoly(T,L);
 }
  ///////////////////////////////////////////////////////////////////////////////
-proc fareyIdeal(ideal I,list L)
+proc fareyIdeal(ideal I,intvec L)
 {
    poly result,p;
    int i,j;
@@ -439,7 +444,7 @@ example
    Farey(32003,12345);
 }
  ///////////////////////////////////////////////////////////////////////////////
-proc chineseR(list T,list L,number N)
+proc chineseR(list T,intvec L,number N)
 "USAGE:  chineseR(T,L,N);
 RETURN: x such that x = T[i] mod L[i], N=product(L[i])
 NOTE:   chinese remainder theorem
@@ -470,17 +475,17 @@ EXAMPLE:example chineseR; shows an example
 example
 { "EXAMPLE:"; echo = 2;
    ring R = 0,x,dp;
-   chineseR(list(24,15,7),list(2,3,5),30);
+   chineseR(list(24,15,7),intvec(2,3,5),30);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 proc primeList(int n)
 "USAGE:  primeList(n);
-RETURN: the list of n greatest primes  <= 2134567879
+RETURN: the intvec of n greatest primes  <= 2134567879
 EXAMPLE:example primList; shows an example
 "
 {
-  list L;
+  intvec L=0:n;
   int i;
   int p=2134567879;
   for(i=1;i<=n;i++)
@@ -492,7 +497,7 @@ EXAMPLE:example primList; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   list L=primeList(10);
+   intvec L=primeList(10);
    size(L);
    L[size(L)];
 }
