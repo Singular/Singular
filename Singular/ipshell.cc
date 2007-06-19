@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.158 2007-05-24 13:39:36 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.159 2007-06-19 09:13:25 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -2400,7 +2400,7 @@ BOOLEAN kQHWeight(leftv res,leftv v)
 #if 0
 BOOLEAN jjIS_SQR_FREE(leftv res, leftv u)
 {
-  BOOLEAN b=singclap_factorize((poly)(u->Data()), &v, 0);
+  BOOLEAN b=singclap_factorize((poly)(u->CopyD()), &v, 0);
   res->data=(void *)b;
 }
 #endif
@@ -4756,4 +4756,50 @@ idhdl rSimpleFindHdl(ring r, idhdl root, idhdl n=NULL)
   }
   //return next_best;
   return NULL;
+}
+
+extern BOOLEAN jjPROC(leftv res, leftv u, leftv v);
+ideal kGroebner(ideal F, ideal Q)
+{
+  //test|=Sy_bit(OPT_PROT);
+  idhdl save_ringhdl=currRingHdl;
+  ideal resid;
+  idhdl new_ring=NULL;
+  if ((currRingHdl==NULL) || (IDRING(currRingHdl)!=currRing))
+  {
+    currRingHdl=enterid(omStrDup(" GROEBNERring"),0,RING_CMD,&IDROOT,FALSE);
+    new_ring=currRingHdl;
+    IDRING(currRingHdl)=currRing;
+  }
+  sleftv v; memset(&v,0,sizeof(v)); v.rtyp=IDEAL_CMD; v.data=(char *) F;
+  idhdl h=ggetid("groebner",FALSE);
+  sleftv u; memset(&u,0,sizeof(u)); u.rtyp=IDHDL; u.data=(char *) h;
+            u.name=IDID(h);
+  
+  sleftv res; memset(&res,0,sizeof(res)); 
+  if(jjPROC(&res,&u,&v))
+  {
+    resid=kStd(F,Q,testHomog,NULL);
+  }
+  else
+  {
+    //printf("typ:%d\n",res.rtyp);
+    resid=(ideal)(res.data);
+  }
+  // cleanup GROEBNERring, save_ringhdl, u,v,(res )
+  if (new_ring!=NULL)
+  {
+    idhdl h=IDROOT;
+    if (h==new_ring) IDROOT=h->next;
+    else
+    {
+      while ((h!=NULL) &&(h->next!=new_ring)) h=h->next;
+      if (h!=NULL) h->next=h->next->next;
+    }
+    if (h!=NULL) omFreeSize(h,sizeof(*h));
+  }
+  currRingHdl=save_ringhdl;
+  u.CleanUp();
+  v.CleanUp();
+  return resid;
 }
