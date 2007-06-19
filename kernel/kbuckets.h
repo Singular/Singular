@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.h,v 1.6 2006-02-13 19:52:32 bricken Exp $ */
+/* $Id: kbuckets.h,v 1.7 2007-06-19 09:17:28 Singular Exp $ */
 #include "structs.h"
 #include "p_Procs.h"
 #include "pShallowCopyDelete.h"
@@ -202,12 +202,14 @@ public:
   ring bucket_ring;
 };
 
+#ifndef HAVE_PSEUDO_BUCKETS
 inline void kBucketAdjustBucketsUsed(kBucket_pt bucket)
 {
   while ( bucket->buckets_used > 0 &&
           bucket->buckets[bucket->buckets_used] == NULL)
     (bucket->buckets_used)--;
 }
+#endif
 
 inline const poly kBucketGetLm(kBucket_pt bucket)
 {
