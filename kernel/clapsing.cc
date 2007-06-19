@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.21 2007-06-19 15:14:46 Singular Exp $
+// $Id: clapsing.cc,v 1.22 2007-06-19 15:24:05 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -1015,9 +1015,9 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
         intvec *w=NULL;
         if (v!=NULL) w=*v;
         if (currRing->minpoly==NULL)
-          count_Factors(res,*v,j,ff,convClapPSingTrP( J.getItem().factor() ));
+          count_Factors(res,w,j,ff,convClapPSingTrP( J.getItem().factor() ));
         else
-          count_Factors(res,*v,j,ff,convClapAPSingAP( J.getItem().factor() ));
+          count_Factors(res,w,j,ff,convClapAPSingAP( J.getItem().factor() ));
       }
     }
     if (rField_is_Extension() && (!pIsConstantPoly(ff)))
