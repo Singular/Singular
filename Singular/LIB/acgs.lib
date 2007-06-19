@@ -1,0 +1,256 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$Id: acgs.lib,v 1.1 2007-06-19 16:33:52 Singular Exp $";
+category="General purpose";
+info="
+LIBRARY:  acgs.lib      experimental implementation for comprehensive Groebner systems
+AUTHOR:  Akira Suzuki (http://kurt.scitec.kobe-u.ac.jp/~sakira/CGBusingGB/)
+                      // <sakira@kobe-u.ac.jp>
+
+
+Please see \"A Simple Algorithm to compute Comprehensive
+Groebner Bases using Groebner Bases\" by Akira Suzuki and Yosuke Sato for details.
+PROCEDURES:
+  cgs(polys,vars,pars,R1,R2)     comprehensive Groebner systems
+  base2str(G)                    pretty print of the result G
+";
+// global variables are the followings:
+// Parameters, Variables, VMinDPoly,
+// RingAll, RingVar;
+
+
+proc setup_special_dpolys()
+{
+  poly VMinDPoly = Variables[size(Variables)];
+  export(VMinDPoly);
+}
+
+proc newcasebasis(poly Case, ideal Basis)
+{
+  list CB = Case, Basis;
+  return(CB);
+}
+
+proc contains(poly Vari, list Varis)
+{
+  int l = size(Varis);
+  for (int i = 1; i <= l; i ++)
+  {
+    if (Vari == Varis[i])
+    {
+      return(1);
+    }
+  }
+
+  return(0);
+}
+
+proc polys_heads(list PolyL)
+{
+  int i, j;
+  int length = size(PolyL);
+  if (!length)
+  {
+    return(PolyL);
+  }
+
+  setring(RingVar);
+  list PolyL = imap(RingAll, PolyL);
+  list HCoefs = list();
+  length = size(PolyL);
+  for (i = 1; i <= length; i ++)
+  {
+    HCoefs = insert(HCoefs, leadcoef(PolyL[i]));
+  }
+  setring(RingAll);
+  list HCoefs = imap(RingVar, HCoefs);
+
+  list CoefL;
+  ideal CoefLsub;
+  poly Coef;
+  for (i = 1; i <= length; i ++)
+  {
+    Coef = HCoefs[i];
+    if (typeof(Coef) == "poly")
+    {
+      CoefLsub = factorize(Coef, 1);
+      for (j = 1; j <= size(CoefLsub); j ++)
+      {
+	if (CoefLsub[j] > 1)
+        {
+	  CoefL = insert(CoefL, CoefLsub[j]);
+	}
+      }
+    }
+  }
+
+  for (i = 1; i <= size(CoefL); i ++)
+  {
+    Coef = CoefL[i];
+    for (j = i + 1; j <= size(CoefL); j ++)
+    {
+      if (Coef == CoefL[j])
+      {
+	CoefL = delete(CoefL, j);
+	j --;
+      }
+    }
+  }
+
+  return(CoefL);
+}
+
+proc polys_restrict_v(ideal Polys)
+{
+  return(polys_separate_v_p(Polys)[0]);
+}
+
+proc polys_restrict_p(ideal Polys)
+{
+  return(polys_separate_v_p(Polys)[1]);
+}
+
+proc polys_separate_v_p(ideal Polys)
+{
+  list R_v, R_p;
+  poly P;
+  int length = size(Polys);
+  
+  for (int i = 1; i <= length; i ++)
+  {
+    P = Polys[i];
+    if (P < VMinDPoly)
+    {
+      R_p = insert(R_p, P);
+    }
+    else
+    {
+      R_v = insert(R_v, P);
+    }
+  }
+
+  return(R_v, R_p);
+}
+
+proc cgs_main(ideal Polys)
+{
+  ideal F;
+  list FP, FV, HFact, Bases;
+  poly H;
+  int i;
+
+//    F = groebner(Polys);
+  F = slimgb(Polys);
+
+  if (F[1] == 1)
+  {
+    return(list());
+  }
+
+  FV, FP = polys_separate_v_p(F);
+
+  HFact = polys_heads(FV);
+  int HFL = size(HFact);
+
+  H = 1;
+  for (i = 1; i <= HFL; i ++)
+  {
+    H = H * HFact[i];
+  }
+
+  Bases = insert(Bases, list(H, F));
+
+  for (i = 1; i <= HFL; i ++)
+  {
+    //    print("paras:" + string(FP));
+    //    print("ideal:" + string(HFact[i]));
+    Bases = cgs_main(F + ideal(HFact[i])) + Bases;
+  }
+
+  return(Bases);
+}
+
+proc cgs(ideal Polys, list Vars, list Paras, RingVar, RingAll)
+{
+  option(redSB);
+  list Parameters = Paras;
+  list Variables = Vars;
+  poly VMinDPoly = Vars[size(Vars)];
+  export(Parameters, Variables, VMinDPoly);
+
+  export(RingVar, RingAll);
+  setring(RingAll);
+
+  list G = cgs_main(Polys);
+
+  keepring(RingAll);
+  return(G);
+}
+
+proc basis2str(list B)
+{
+  string Str;
+  ideal Factors;
+  int i;
+
+  Str = "(";
+  Factors = factorize(B[1], 1);
+  for (i = 1; i <= size(Factors); i ++)
+  {
+    Str = Str + "(" + string(Factors[i]) + ")";
+  }
+  Str = Str + "!=0,";
+
+  list FV, FP;
+  FV, FP = polys_separate_v_p(B[2]);
+  for (i = 1; i <= size(FP); i ++)
+  {
+    Str = Str + string(FP[i]) + "=0,";
+  }
+
+  if (size(Str) > 1)
+  {
+    Str = Str[1, size(Str) - 1] + ")[";
+  }
+  else
+  {
+    Str = "()[";
+  }
+
+  if (size(FV))
+  {
+    for (i = 1; i <= size(FV); i ++)
+    {
+      Str = Str + string(FV[i]) + ",";
+    }
+
+    Str = Str[1, size(Str) - 1] + "]";
+  }
+  else
+  {
+    Str += "]";
+  }
+
+  return(Str);
+}
+
+proc bases2str(list Bases)
+{
+  string Str;
+  int i;
+
+  Str = "";
+  for (i = 1; i <= size(Bases); i ++)
+  {
+    Str = Str + basis2str(Bases[i]) + newline;
+  }
+  
+  return(Str);
+}
+
+/*
+LIB "standard.lib";
+ring RingVar=(0,a,b),(x,y,t),lp; ring RingAll=0,(x,y,t,a,b),(lp(3),dp);
+ideal polys=x^3-a,y^4-b,x+y-t; list vars=x,y,t; list paras=a,b;
+list G = cgs(polys,vars,paras,RingVar,RingAll);
+bases2str(G);
+*/
