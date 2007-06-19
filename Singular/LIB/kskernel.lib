@@ -1,0 +1,535 @@
+
+////////////////////////////////////////////////////////////////
+info="
+LIBRARY:  kskernel.lib   PROCEDURES FOR COMPUTING THE KERNEL
+                         OF THE KODAIRA-SPENCER MAP
+
+AUTHOR:   Tetyana Povalyaeva, povalyae@mathematik.uni-kl.de
+
+PROCEDURES:
+ KSker(p,q);          kernel of the Kodaira-Spencer map of 
+                      a versal deformation of an irreducible
+                      plane curve singularity  
+ KSconvert(M);        kernel of the Kodaira-Spencer map in
+                      quasihomogeneous variables T with 
+                      corresponding negative degrees
+ KSlinear(M);         matrix of linear terms of the kernel of 
+                      the Kodaira-Spencer map
+ KScoef(i,j,P,Q,qq);  coefficient of the given term in the matrix 
+                      of kernel of the Kodaira-Spencer map
+ StringF(i,j,p,q);    expression in variables T(i) with non-resolved 
+                      brackets for the further computation of 
+                      coefficient in the matrix of kernel of the 
+                      Kodaira-Spencer map
+";
+////////////////////////////////////////////////////////////////
+
+//-------------------------- ALGORITHM II ---------------------
+
+//---------------------------- sub procedure ------------------
+// used in sorter
+proc minim(intmat M, int t)
+{
+  int m=v[t];
+  int i,k,done;
+  k=0;done=0;
+  for (i=t+1;i<nrows(M);i++)
+  { 
+    if (m>v[i])  { m=v[i];k=i;done=1; } 
+  }
+  if (done==1) 
+  {   
+    for (i=1;i<=3;i++)     
+    {
+      done=M[k,i];M[k,i]=M[t,i];M[t,i]=done;
+    }
+    i=v[k];v[k]=v[t];v[t]=i;
+  }
+return(M);
+}
+
+//---------------------------- sub procedure --------------------
+// sorts M by the third row, ascending
+proc sorter(intmat M)  
+{
+  intvec v;
+  int i;
+  for (i=1;i<=nrows(M);i++)
+  { v[i]=M[i,3]; }
+  export (v); 
+  int n=1;
+  while (n<=nrows(M))
+  { 
+    M=minim(M,n);
+    n++; 
+  }
+  kill v;
+  return(M);
+}
+
+//---------------------------- sub procedure --------------------
+// M is a sorted matrix of triples {i,j,k(i,j)}
+// returns a list of coefficients of p 
+// wrt. the base {x^i y^j,(i,j) in (M[i,j,k])}=B_u
+proc MonoDec(poly p, matrix M)
+{
+  poly q=p;
+  intvec V;
+  list C;
+  int nM=nrows(M); //cardinality of B_u
+  vector VC=gen(nM+1);
+  int k=1; int i=1; int j=1;
+  while (q!=0)
+  {
+    V=leadexp(q);
+    while ( !((V[1]==M[k,1]) && (V[2]==M[k,2])) ) 
+    {
+      if (k>=nM) 
+      { 
+	print("error in monomial base");
+	return(0);
+      }
+      k++;
+    }
+    VC=VC+leadcoef(q)*gen(k);
+    q=q-lead(q);  
+    k=1;
+  }
+  VC=VC-gen(nM+1);
+  return(VC);
+}
+
+//----------------------------- main program --------------------
+proc KSker (int p,q) 
+"USAGE:  KSker(int p,q); p,q relatively prime integers
+RETURN:  nothing; exports ring KSring, matrix KSkernel and list 'weights';
+         KSkernel is a matrix of coefficients of the 
+         generators of the kernel of Kodaira-Spencer map,
+         'weights' is a list of degrees for variables T
+EXAMPLE: example KSker; shows an example
+"
+{
+option(redSB);
+option(redTail);
+int c;
+int i,j;
+int k=0;
+list LM;
+list tmp;
+for (i=0;i<=p-2;i++)
+{  
+  for (j=0;j<=q-2;j++)
+  { 
+    c=(i*q)+(j*p)-(p*q);
+    if (c>0) 
+    {
+      k++;
+      tmp[1]=i;
+      tmp[2]=j;
+      tmp[3]=c; // index of T
+      LM[k]=tmp;
+      tmp=0;
+    }
+  }
+}
+if (k==0) 
+{
+  print("The kernel of the Kodaira-Spencer map equals zero"); 
+  return();
+}
+if (k==1) 
+{
+  ring KSring=0,(T(1)),ws(c);
+  matrix KSkernel[1][1]=c*T(1);
+  export KSring;
+  export KSkernel;
+  return();
+}
+LIB "general.lib";
+int cnt=k; // the total number of T's, now k>1
+intmat M[k][3]; // matrix with triples (i,j,k)
+for (i=1; i<=k; i++)
+{
+  M[i,1] = LM[i][1];
+  M[i,2] = LM[i][2];
+  M[i,3] = LM[i][3];
+}
+kill LM;
+M = sorter(M); // now the third column of M contains ordered ascending values
+list weights;
+for (i=1; i<=k; i++)
+{
+  weights[i] = M[i,3]; // positive weights for Ws ordering
+  M[i,3]   = i;
+}
+export weights;
+ring RT=0,(x,y,T(1..k)),(Ws(q,p),dp);
+poly F=x^p+y^q;
+i=0;j=0;
+for (k=1;k<=cnt;k++)
+{
+  i = M[k,1];
+  j = M[k,2];
+  F = F + T(k)*x^i*y^j;
+}     
+ideal I = diff(F,x),diff(F,y);
+I = std(I);
+k=0;
+list normal;
+poly mul;
+for (i=0;i<=p-2;i++)
+{  
+  for (j=0;j<=q-2;j++)
+  {
+    c = p*q - ((i+2)*q+(j+2)*p);
+    if ( c > 0 )
+    { 
+      mul = x^i*y^j*p*q*F;
+      k++;
+      normal[k] = NF(mul,I);
+    } 
+  }
+}
+// now we separate T's from (x,y) by treating T's as parameters
+ring ST=(0,T(1..k)),(x,y),Ws(q,p);
+setring ST;
+list Snormal = imap(RT,normal);
+ideal SI = imap(RT,I);
+kill RT;
+SI = std(SI);
+module L;
+for (i=1; i<=size(Snormal); i++)
+{
+  Snormal[i] = NF(Snormal[i],SI);
+  L[i] = MonoDec(Snormal[i],M);
+  if (L[i]==0) // MonoDec has detected non-basis element
+  {
+    print("Try reducing the input");
+    return(0);
+  }
+}
+// now L is a module in T's
+ring KSring=0,(T(1..k)),(C,ws(-weights[1..k]));
+module TL=imap(ST,L);
+kill ST;
+// sort it descendently
+TL = sort(TL)[1]; 
+// make the coefficients positive
+if ((leadcoef(TL[1,1])<0) || (leadcoef(TL[k,k])<0)) { TL = -TL;} 
+matrix KSkernel=matrix(TL);
+export KSring;
+export KSkernel;
+kill M;
+return();
+}
+example
+{ "EXAMPLE:"; echo=2;
+   int p=6;
+   int q=7; 
+   KSker(p,q);
+   setring KSring;
+   print(KSkernel);
+}
+
+//---------------------------- sub procedure ------------------
+// converts T(1..k) to T(w(1),..w(k)),
+// need global variable "weights"
+proc KSconvert(matrix M)
+"USAGE:  KSconvert(matrix M); 
+         M is a matrix of coefficients of the generators of 
+         the kernel of Kodaira-Spencer map in variables T(i) 
+         from the basering. To be called after the procedure 
+         KSker(p,q)
+RETURN:  nothing; exports ring KSring2 and matrix KSkernel2 within it, 
+         such that KSring2 resp. KSkernel2 are in variables
+         T(w) with weights -w. These weights are computed
+         in the procedure KSker(p,q)
+EXAMPLE: example KSconvert; shows an example
+"
+{
+  int s=ncols(M); // the total numbers of T's
+  ring T1=0,(T(1..weights[s])),dp;
+  matrix TM=imap(KSring,M);
+  int i;
+  for (i=s;i>=1;i--)
+  {
+    TM=subst(TM,T(i),T(weights[i]));
+  }
+  string Tw="0,(";
+  string Ww="Ws(";
+  string tempo="";
+  for (i=1; i<=s; i++)
+  {
+    tempo=string(weights[i]);
+    Tw = Tw+"T("+tempo+"),";
+    Ww = Ww+"-"+tempo+",";
+  }
+  Tw[size(Tw)] = ")";
+  Ww[size(Ww)] = ")";
+  Tw=Tw+","+Ww+";";
+  execute("ring KSring2="+Tw);
+  matrix KSkernel2=imap(T1,TM);
+  kill T1;
+  export KSring2;
+  export KSkernel2;
+  return();
+}
+example
+{ "EXAMPLE:"; echo=2;
+   int p=6;
+   int q=7; 
+   KSker(p,q);
+   setring KSring;
+   KSconvert(KSkernel);
+   setring KSring2;
+   print(KSkernel2);   
+}
+
+proc KSlinear(matrix M)
+"USAGE:  KSlinear(matrix M); 
+         computes matrix of linear terms of the kernel of the 
+         Kodaira-Spencer map. To be called after the procedure 
+         KSker(p,q)
+RETURN:  nothing; but replaces elements of the matrix KSkernel 
+         in the ring Ksring with their leading monomials
+         wrt. the local ordering (ls)
+EXAMPLE: example KSlinear; shows an example
+"
+{
+  int s=ncols(M); // the total numbers of T's
+  ring T1=0,(T(1..weights[s])),ls;
+  matrix TM=imap(KSring,M);
+  int i; int j;
+  for (i=1; i<=s;i++)
+  {
+    for (j=1; j<=s;j++)
+    {
+      if (TM[i,j]!=0) { TM[i,j]=lead(TM[i,j]); }
+    }
+  }
+  setring KSring;
+  KSkernel=imap(T1,TM);
+  kill T1;
+}
+example
+{ "EXAMPLE:"; echo=2;
+   int p=6;
+   int q=7; 
+   KSker(p,q);
+   setring KSring;
+   KSlinear(KSkernel);
+   print(KSkernel);   
+}
+
+//-------------------------- ALGORITHM I ----------------------
+
+//---------------------------- sub procedure ------------------
+proc seq(int p,q)
+// computes u,v such that 1<=u<=p-1, qu=1(mod p)
+//                        1<=v<=q-1, pv=1(mod q)    
+{
+  int u=1;  int v=1;
+  for(u=1; u<=p-1; u++)
+  {
+    if (((q*u)%p)==1) {break;}
+   }  
+  for(v=1; v<=q-1; v++)
+  {
+    if (((p*v)%q)==1) {break;}
+  }
+  return(u,v);
+}
+
+//---------------------------- sub procedure ------------------
+// returns maximal number i such that u(i)<=b
+proc mix(int b, list u)
+{
+  int result=0;
+  int s=size(u);
+  int w=s; 
+  if (s==0) { "size of list is 0"; return(result); } 
+  if (b<0 ) { "negative b in MIX"; return(result); }
+  while ((w>1) && (u[w]>b)) { w--;} // min w=1
+  if (w>1) 
+  { 
+    return(w); 
+  }
+  else // w<=1
+  {
+    if ( (w==1) && (u[w]> b) ) 
+    { 
+      w=0; 
+      return(w);
+    }  
+  }
+  return(w);
+}
+
+//---------------------------- sub procedure ------------------
+proc bracket(int r, int s)
+{
+  int b=s-r; 
+  int q;
+  int k=1;
+  int SF;
+  F=F+"*(";
+  while (b>0) // simulate repeat ... until b==0
+  { 
+    q=mix(b,u);
+    while (q>0)
+    {
+      b=u[q]-1;
+      if (u[q]==(s-r))   // adding T's of max degree
+      {
+	F=F+"T("+ string(q) +")"+ "+"; 
+      }
+      else 
+      {  
+	if (S[(1+r+u[q])]!="u")
+        {
+	  F=F+"T("+ string(q) +")";
+	  bracket(r+u[q],s);
+         }
+      }
+      q=mix(b,u);
+      if (q==0) {b=0;}
+    } // end  while q>0
+    SF=size(F); 
+    if (F[SF]!="+") 
+    { 
+      if (SF<=2) { F="";}
+      else { F=F[1..SF-2];}
+    }
+    if (b==0) { break; }   // ... until b==0
+  }
+  F[size(F)]=")";
+  F=F+"+";
+}
+
+//---------------------------- sub procedure ------------------
+// exports S, l, u
+proc StringS(int p, int q)
+{
+  int i=1; int j=0;
+  int e,e1=0,0;
+  string S="";
+  list l,u=0,0;
+  S="l";
+  l[1]=0;
+  int a,b=seq(p,q);
+  int k=1;
+  for (k=1;k<=(p*q-2*p-2*q);k++)
+  {
+    e=(e+a)%p; e1=(e1+b)%q;
+    if ( (e==(p-1)) || (e1==(q-1)) ) { S=S+" "; }  
+    else
+    {
+      if ((e*q+e1*p) <= (p*q))
+      {
+        i++; l[i]=k; S=S+"l";
+      }
+      else
+      {
+        j++; u[j]=k; S=S+"u";
+      }
+    }
+  }  
+  export S;
+  export u;
+  export l;
+}
+
+//---------------------------- main procedures ----------------
+proc StringF(int i, int j,int p, int q)
+"USAGE:  StringF(int i,j,p,q);
+RETURN:  nothing; exports string F which contains an expression 
+         in variables T(i) with non-resolved brackets 
+EXAMPLE: example StringF; shows an example
+"
+{
+  string F;
+  export F;
+  StringS(p,q);
+  bracket(l[i],u[j]);
+  F=F[3..(size(F)-2)];
+}
+example
+{ "EXAMPLE:"; echo=2;
+ int p=5; int q=14;
+ int i=2; int j=9;
+ StringF(i,j,p,q);
+ F;
+}
+
+proc KScoef(int i,j,P,Q, list qq);
+"USAGE:  KScoef(int i,j,P,Q, list qq);
+RETURN:  exports ring RC and number C within it. C is
+         the coefficient of the word defined in the list qq,
+         being a part of C[i,j] for x^p+y^q
+EXAMPLE: example KScoef; shows an example
+"
+// qq is a list of integers, representing
+// monomial T_q[1] * ...* T_q[s]
+// returns a ring RC in char 0 and number C in it
+{
+  int s=size(qq);
+  int U,V=seq(P,Q);
+  StringS(P,Q);
+  int n=l[i];
+  int d=P*Q;
+  int k=1; int m=1;
+  ring RC=0,x,dp;
+  number C=0;
+  number aux=0;
+  int t=0;
+  int e=0;
+  int e1=0;
+  aux = u[(qq[1])];
+  C = ((-1)^s)*(aux/d);
+  for (k=2; k<=s; k++)
+  {
+    t  = u[(qq[k-1])];
+    e  = (U*n)%P;
+    e  = e+ ((U*t)%P);
+    e1 = (V*n)%Q;
+    e1 = e1 + ((V*t)%Q);
+    n  = n + qq[k-1];
+    t  = u[(qq[k])];
+    if (e>=(P-1))
+    { 
+      aux = (U*t)%P;
+      aux = aux/P;
+      C = C*aux;
+    }
+    else
+    {
+      if (e1>=(Q-1))
+      {
+	aux = (V*t)%Q;
+	aux = aux/Q;
+	C = C*aux;
+      }
+    }
+  }
+  export RC;
+  export C;
+}
+example
+{ "EXAMPLE:"; echo=2;
+ int p=5; int q=14;
+ int i=2; int j=9;
+ list L;
+ ring r=0,x,dp;
+ number c;
+ L[1]=3; L[2]=1; L[3]=3; L[4]=2;
+ KScoef(i,j,p,q,L);
+ c=imap(RC,C);
+ c;
+ L[1]=3; L[2]=1; L[3]=2; L[4]=3;
+ KScoef(i,j,p,q,L);
+ c=c+imap(RC,C);
+ c; // it is a coefficient of T1*T2*T3^2 in C[2,9] for x^5+y^14
+}
+
+
+
