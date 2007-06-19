@@ -2,11 +2,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.18 2007-05-25 14:16:16 Singular Exp $
+// $Id: clapsing.cc,v 1.19 2007-06-19 13:13:34 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
 
+#define FACTORIZE2_DEBUG
 #include "mod2.h"
 #include "omalloc.h"
 #ifdef HAVE_FACTORY
@@ -204,7 +205,7 @@ poly singclap_gcd ( poly f, poly g )
   else         return pCopy(f); // g==0 => gcd=f (but do a pCleardenom)
   if (f==NULL) return pCopy(g); // f==0 => gcd=g (but do a pCleardenom)
 
-  if (pIsConstant(f) || pIsConstant(g)) return pOne();
+  if (pIsConstantPoly(f) || pIsConstantPoly(g)) return pOne();
 
   // for now there is only the possibility to handle polynomials over
   // Q and Fp ...
@@ -665,11 +666,104 @@ static int primepower(int c)
   return p;
 }
 
+BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac)
+{
+  pTest(f);
+  pTest(fac);
+  int e=0;
+  if (!pIsConstantPoly(fac))
+  {
+#ifdef FACTORIZE2_DEBUG
+    printf("start count_Factors(%d), Fdeg=%d, factor deg=%d\n",j,pTotaldegree(f),pTotaldegree(fac));
+    p_wrp(fac,currRing);PrintLn();
+#endif
+    On(SW_RATIONAL);
+    CanonicalForm F, FAC,Q,R;
+    Variable a;
+    if (( nGetChar() == 0 || nGetChar() > 1 )
+    && (currRing->parameter==NULL))
+    {
+      F=convSingPClapP( f );
+      FAC=convSingPClapP( fac );
+    }
+    // and over Q(a) / Fp(a)
+    else if (( nGetChar()==1 ) /* Q(a) */
+    || (nGetChar() <-1))       /* Fp(a) */
+    {
+      if (currRing->minpoly!=NULL)
+      {
+        CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
+        a=rootOf(mipo);
+        F=convSingAPClapAP( f,a );
+        FAC=convSingAPClapAP( fac,a );
+      }
+      else
+      {
+        F=convSingTrPClapP( f );
+        FAC=convSingTrPClapP( fac );
+      }
+    }
+    else
+      WerrorS( feNotImplemented );
+
+    poly q;
+    loop
+    {
+      Q=F;
+      Q/=FAC;
+      R=Q;
+      R*=FAC;
+      R-=F;
+      if (R.isZero())
+      {
+        if (( nGetChar() == 0 || nGetChar() > 1 )
+        && (currRing->parameter==NULL))
+        {
+          q = convClapPSingP( Q );
+        }
+        else if (( nGetChar()==1 ) /* Q(a) */
+        || (nGetChar() <-1))       /* Fp(a) */
+        {
+          if (currRing->minpoly!=NULL)
+          {
+            q= convClapAPSingAP(  Q  );
+          }
+          else
+          {
+            q= convClapPSingTrP(  Q  );
+          }
+        }
+        e++; pDelete(&f); f=q; q=NULL; F=Q;
+      }
+      else
+      {
+        break;
+      }
+    }
+    if (e==0)
+    {
+      Off(SW_RATIONAL);
+      return FALSE;
+    }
+  }
+  else e=1;
+  I->m[j]=fac;
+  if (v!=NULL) (*v)[j]=e;
+  Off(SW_RATIONAL);
+  return TRUE;
+}
+
 int singclap_factorize_retry;
-//extern int si_factor_reminder;
+#ifdef HAVE_LIBFAC_P
+extern int libfac_interruptflag;
+#endif
 
 ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
 {
+  pTest(f);
+#ifdef FACTORIZE2_DEBUG
+  printf("singclap_factorize, degree %d\n",pTotaldegree(f));
+#endif
   // with_exps: 3,1 return only true factors, no exponents
   //            2 return true factors and exponents
   //            0 return coeff, factors and exponents
@@ -744,10 +838,9 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   CFFList L;
   number N=NULL;
   number NN=NULL;
-  CanonicalForm T_F(0);
   number old_lead_coeff=nCopy(pGetCoeff(f));
 
-  if (!rField_is_Zp()) /* Q, Q(a), Zp(a) */
+  if (!rField_is_Zp() && !rField_is_Zp_a()) /* Q, Q(a) */
   {
     //if (f!=NULL) // already tested at start of routine
     {
@@ -764,11 +857,29 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       }
     }
   }
+  else if (rField_is_Zp_a())
+  {
+    //if (f!=NULL) // already tested at start of routine
+    if (singclap_factorize_retry==0)
+    {
+      number n0=nCopy(pGetCoeff(f));
+      if (with_exps==0)
+        N=nCopy(n0);
+      pNorm(f);
+      pCleardenom(f);
+      NN=nDiv(n0,pGetCoeff(f));
+      nDelete(&n0);
+      if (with_exps==0)
+      {
+        nDelete(&N);
+        N=nCopy(NN);
+      }
+    }
+  }
   if (rField_is_Q() || rField_is_Zp())
   {
     setCharacteristic( nGetChar() );
     CanonicalForm F( convSingPClapP( f ) );
-    T_F=F;
     if (nGetChar()==0) /* Q */
     {
       L = factorize( F );
@@ -776,7 +887,12 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     else /* Fp */
     {
 #ifdef HAVE_LIBFAC_P
-      L = Factorize( F );
+      do
+      {
+        libfac_interruptflag=0;
+        L = Factorize( F );
+      }
+      while ((libfac_interruptflag!=0) ||(L.isEmpty()));
 #else
       goto notImpl;
 #endif
@@ -788,7 +904,6 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     int c=rChar(currRing);
     setCharacteristic( c, primepower(c) );
     CanonicalForm F( convSingGFClapGF( f ) );
-    T_F=F;
     if (F.isUnivariate())
     {
       L = factorize( F );
@@ -809,7 +924,6 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPClapAP( f,a ) );
-      T_F=F;
       L.insert(F);
       if (rField_is_Zp_a() && F.isUnivariate())
       {
@@ -818,13 +932,18 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       else
       {
         CanonicalForm G( convSingTrPClapP( f ) );
-        T_F=G;
 #ifdef HAVE_LIBFAC_P
         //  over Q(a) / multivariate over Fp(a)
-        //if (rField_is_Zp_a())
+        do
         {
+          libfac_interruptflag=0;
           L=Factorize2(G, mipo);
         }
+        while ((libfac_interruptflag!=0) ||(L.isEmpty()));
+        #ifdef FACTORIZE2_DEBUG
+        printf("while okay\n");
+        #endif
+        libfac_interruptflag=0;
         //else
         //  L=Factorize(G, mipo);
 #else
@@ -843,7 +962,6 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     else
     {
       CanonicalForm F( convSingTrPClapP( f ) );
-      T_F=F;
       if (rField_is_Q_a())
       {
         L = factorize( F );
@@ -863,123 +981,13 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     goto notImpl;
   }
   {
+    poly ff=pCopy(f); // a copy for the retry stuff
     // the first factor should be a constant
     if ( ! L.getFirst().factor().inCoeffDomain() )
       L.insert(CFFactor(1,1));
     // convert into ideal
     int n = L.length();
     CFFListIterator J=L;
-    CanonicalForm T=1;
-    for ( ; J.hasItem(); J++ )
-    {
-      int T_e = J.getItem().exp();
-      while(T_e>0)
-      { 
-        if (!( J.getItem().factor().isZero())) T *= J.getItem().factor();
-        T_e--; 
-      }
-    }
-    T_F-=T;
-    if (!T_F.isZero())
-    {
-      poly T_F_conv=pOne();
-      J=L;
-      for ( ; J.hasItem(); J++ )
-      {
-        poly p;
-        int T_e = J.getItem().exp();
-        if (rField_is_Zp() || rField_is_Q())           /* Q, Fp */
-          p=( convClapPSingP( J.getItem().factor() ));
-        else if (rField_is_Extension())     /* Q(a), Fp(a) */
-        {
-          if (currRing->minpoly==NULL)
-            p=( convClapPSingTrP( J.getItem().factor() ));
-          else
-            p=( convClapAPSingAP( J.getItem().factor() ));
-        }
-        if (p!=NULL)
-        {
-          while(T_e>0)  { T_F_conv=pMult(T_F_conv,pCopy(p)); T_e--; }
-          pDelete(&p);
-        }
-      }
-      number n_T=pGetCoeff(T_F_conv);
-      number n_f=pGetCoeff(f);
-      poly n_f_m=pCopy(f);
-      n_f_m=pMult_nn(n_f_m,n_T);
-      T_F_conv=pMult_nn(T_F_conv,n_f);
-      T_F_conv=pSub(T_F_conv,n_f_m);
-      if (T_F_conv!=NULL)
-      {
-        if (singclap_factorize_retry<3)
-        {
-          singclap_factorize_retry++;
-          //if( si_factor_reminder) Print("problem with factorize, retrying\n");
-        //#define FEHLER_FACTORIZE
-        #ifdef FEHLER_FACTORIZE
-          Print("Problem....:");pWrite(f);
-          J=L;
-          for ( ; J.hasItem(); J++ )
-          {
-            if (rField_is_Zp() || rField_is_Q())           /* Q, Fp */
-              pWrite0( convClapPSingP( J.getItem().factor() ));
-            else if (rField_is_Extension())     /* Q(a), Fp(a) */
-            {
-              if (currRing->minpoly==NULL)
-                pWrite0( convClapPSingTrP( J.getItem().factor() ));
-              else
-                pWrite0( convClapAPSingAP( J.getItem().factor() ));
-            }
-            Print(" exp: %d\n", J.getItem().exp());
-          }
-          Print("mult:");
-          if (rField_is_Zp() || rField_is_Q())           /* Q, Fp */
-            pWrite( convClapPSingP( T ));
-          else if (rField_is_Extension())     /* Q(a), Fp(a) */
-          {
-            if (currRing->minpoly==NULL)
-              pWrite( convClapPSingTrP( T ));
-            else
-              pWrite( convClapAPSingAP( T ));
-          }
-          Print("diff: sing:"); pWrite(T_F_conv);
-          Print("diff: factory:");
-          if (rField_is_Zp() || rField_is_Q())           /* Q, Fp */
-            pWrite( convClapPSingP( T_F ));
-          else if (rField_is_Extension())     /* Q(a), Fp(a) */
-          {
-            if (currRing->minpoly==NULL)
-              pWrite( convClapPSingTrP( T_F ));
-            else
-              pWrite( convClapAPSingAP( T_F ));
-          }
-        #endif
-          ideal T_i=singclap_factorize ( f, v , with_exps);
-          if (N!=NULL) nDelete(&N);
-          pDelete(&T_F_conv);
-          return T_i;
-        }
-        else
-        {
-          singclap_factorize_retry=0;
-          WarnS("problem with factorize: irreducibility assumed");
-          ideal T_i=idInit(2,1);
-          T_i->m[0]=pOne();
-          T_i->m[1]=pCopy(f);
-          if (N!=NULL) nDelete(&N);
-          pDelete(&T_F_conv);
-          if (with_exps!=1)
-          {
-            (*v)=new intvec(2);
-            (**v)[0]=1;
-            (**v)[1]=1;
-          }
-	  errorreported=save_errorreported;
-          return T_i;
-        }
-      }
-    }
-    J=L;
     int j=0;
     if (with_exps!=1)
     {
@@ -993,8 +1001,10 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     res = idInit( n ,1);
     for ( ; J.hasItem(); J++, j++ )
     {
+      poly p;
       if (with_exps!=1) (**v)[j] = J.getItem().exp();
       if (rField_is_Zp() || rField_is_Q())           /* Q, Fp */
+        //count_Factors(res,*v,f, j, convClapPSingP( J.getItem().factor() );
         res->m[j] = convClapPSingP( J.getItem().factor() );
       #if 0
       else if (rField_is_GF())
@@ -1003,11 +1013,52 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       else if (rField_is_Extension())     /* Q(a), Fp(a) */
       {
         if (currRing->minpoly==NULL)
-          res->m[j] = convClapPSingTrP( J.getItem().factor() );
+          count_Factors(res,*v,j,ff,convClapPSingTrP( J.getItem().factor() ));
         else
-          res->m[j] = convClapAPSingAP( J.getItem().factor() );
+          count_Factors(res,*v,j,ff,convClapAPSingAP( J.getItem().factor() ));
       }
     }
+    if (rField_is_Extension() && (!pIsConstantPoly(ff)))
+    {
+      singclap_factorize_retry++;
+      if (singclap_factorize_retry<3)
+      {
+        int jj;
+        #ifdef FACTORIZE2_DEBUG
+        printf("factorize_retry\n");
+        #endif
+        intvec *ww=NULL;
+        idTest(res);
+        ideal h=singclap_factorize ( ff, &ww , with_exps);
+        idTest(h);
+        int l=(*v)->length();
+        (*v)->resize(l+ww->length()-1);
+        for(jj=0;jj<ww->length();jj++)
+          (*v)[jj+l]=(*ww)[jj];
+        delete ww;
+        ideal hh=idInit(IDELEMS(res)+IDELEMS(h),1);
+        for(jj=IDELEMS(res)-1;jj>=0;jj--)
+        {
+          hh->m[jj]=res->m[jj];
+          res->m[jj]=NULL;
+        }
+        for(jj=IDELEMS(h)-1;jj>=0;jj--)
+        {
+          hh->m[jj+IDELEMS(res)]=h->m[jj];
+          h->m[jj]=NULL;
+        }
+        idDelete(&res);
+        idDelete(&h);
+        res=hh;
+        idTest(res);
+        ff=NULL;
+      }
+      else
+      {
+        WarnS("problem with factorize");
+      }
+    }
+    pDelete(&ff);
     if (N!=NULL)
     {
       pMult_nn(res->m[0],N);
@@ -1053,8 +1104,9 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
         if ((v!=NULL) && ((*v)!=NULL))
         {
           intvec *w=*v;
-          *v = new intvec( si_max(n-j,1) );
-          for (i=0,j=0;i<w->length();i++)
+          int len=si_max(n-j,1);
+          *v = new intvec( len /*si_max(n-j,1)*/ );
+          for (i=0,j=0;i<si_min(w->length(),len);i++)
           {
             if((*w)[i]!=0)
             {
@@ -1090,13 +1142,13 @@ notImpl:
     WerrorS( feNotImplemented );
   if (NN!=NULL)
   {
-    pMult_nn(f,NN);
     nDelete(&NN);
   }
   if (N!=NULL)
   {
     nDelete(&N);
   }
+  //if (f!=NULL) pDelete(&f);
   //PrintS("......S\n");
   return res;
 }
