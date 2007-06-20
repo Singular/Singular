@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: latex.lib,v 1.28 2006-07-18 15:53:58 Singular Exp $";
+version="$Id: latex.lib,v 1.29 2007-06-20 22:30:41 levandov Exp $";
 category="Visualization";
 info="
 LIBRARY: latex.lib    Typesetting of Singular-Objects in LaTeX2e
@@ -676,7 +676,9 @@ EXAMPLE: example texobj; shows an example
 
  if (size(#)==1)
  { if (typeof(#[1])=="int" or typeof(#[1])=="intvec" or typeof(#[1])=="vector"
-   or typeof(#[1])=="number" or defined(TeXaligned)) { DA = D; DE = D; } }
+    or typeof(#[1])=="number" or typeof(#[1])=="bigint" or defined(TeXaligned)) 
+   { DA = D; DE = D; } 
+}
 
  s = DA;
 
@@ -693,7 +695,8 @@ EXAMPLE: example texobj; shows an example
      }
     else {s = s + obj + newline;}
    }
-   if (typeof(obj) == "int") { s = s + "  " + string(obj) + "  ";}
+   if (typeof(obj) == "int" or typeof(#[1])=="bigint") 
+   { s = s + "  " + string(obj) + "  ";}
 
    if (typeof(obj) == "intvec")
    { s = s + " (";
@@ -1433,10 +1436,10 @@ EXAMPLE: example texpoly; shows an example
     f = f - monom;
     cfm = leadcoef(monom);
     if (cfm*1 != 0) { monom = monom/cfm;} // the normalized monom
+    if (defined(TeXreplace)) { short =0;}  // this is essential //31.5.07
     s = string(monom) + "!";              // add a terminating sign
     cfmt = "";
 
-    if (defined(TeXreplace)) { short =0;}  // this is essential
     cfmt = string(cfm);
     if (size(cfmt)>1)                   // check if sign is < 0
     { if (cfmt[2]=="-") { cfm = (-1) *cfm; sign = "-";}}
@@ -1455,9 +1458,9 @@ EXAMPLE: example texpoly; shows an example
 
      if(realT) { monomt,msz = parsr(cfmt);}
      if (galT) { monomt,msz = parsg(cfmt);}
-     b = find(cfmt,")/(");                     // look if fraction
+     b = find(cfmt,"/(");                     // look if fraction  // 31.5.07
      b2 = find(cfmt,"/");
-     if (b) {b++;}
+     // if (b) {b++;}                         // 31.5.07
      n = size(cfmt);
      if (!(parT) and  !(realT) and !(galT))
      { if( !(b2) or defined(TeXnofrac))
@@ -1540,6 +1543,7 @@ example
   poly f = (-2a2 +b3 -2)/a * x2y4z5 + (a2+1)*x + a+1;
   f;
   texpoly("",f);
+  texpoly("",1/(a2+2)*x+2/b);
 }
 
 static proc parsp(string cfmt, int b)
@@ -1556,7 +1560,7 @@ static proc parsp(string cfmt, int b)
     if (defined(TeXnofrac))
     { if(fl1) { nom = "(" + nom + ")"; sz1++;}
       if(fl2) {denom = "(" + denom + ")"; sz2++;}
-      mt = nom+ "/"+ denom; msz = sz1+sz2 +1;
+      mt = "(" + nom+ "/"+ denom+ ")"; msz = sz1+sz2 +1;   //31.5.07
     }
     else
     { mt = "\\frac{" + nom + "}{" + denom + "}";
@@ -1587,10 +1591,11 @@ static proc parst(string s,int sec)                // parse parameter
   if (s[1]=="(") { s = s[2,size(s)-2]; }
   s = s + "!";
 
-  if(defined(TeXreplace)){ short =0;}   // only then replacing works correctly
+  //if(defined(TeXreplace)){ short =0;}   // hier ueberfluessig 31.5.07
   if (short)
-  { while(s[i]<>"!")
-    { b=i; j++;
+  { j = 0;  // 31.5.07  
+    while(s[i]<>"!")
+    { b=i; if (s[i]=="+" or s[i]=="-") {j++;}  // 31.5.07
       while(s[i]>="0" and s[i]<="9" or (s[i]=="+" or s[i]=="-") and s[i]!="!")
       {i++;}     // scan the number
         t =s[b,i-b];
@@ -1835,7 +1840,8 @@ static proc part0(string fname)
 
 write(fname,"\\newcommand{\\Line}{\\rule{\\textwidth}{0.25mm}\\\\[5mm]}");
 
-   write(fname,"\\centerline{\\large \\bf Demo file for latex.lib 2.0}");
+   write(fname,"\\centerline{\\large \\bf Demo file for latex.lib }");
+   write(fname,"\\centerline{07/05/3}");
    write(fname,"\\vspace{1cm}");
 
 //--
