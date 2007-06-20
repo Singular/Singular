@@ -1,6 +1,6 @@
 //GP, last modified 23.10.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: modstd.lib,v 1.9 2007-06-19 09:44:52 Singular Exp $";
+version="$Id: modstd.lib,v 1.10 2007-06-20 15:05:00 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: modstd.lib  Grobner basis of ideals
@@ -338,6 +338,40 @@ RETURN:  poly p in Q[x] such that p mod L[i]=T[i]
 EXAMPLE: example liftPoly; shows an example
 "
 {
+   ideal hh=chinrem(T,L);
+   poly h=hh[1];
+   poly p=lead(h);
+   poly result;
+   number n;
+   int i;
+   number N=L[1];
+   for(i=size(L);i>1;i--)
+   {
+      N=N*L[i];
+   }
+   while(h!=0)
+   {
+     n=Farey(N,leadcoef(h));
+     result=result+n*p;
+     h=h-lead(h);
+     p=leadmonom(h);
+   }
+   return(result);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,(x,y),dp;
+   intvec L=32003,181,241,499;
+   list T=ideal(x2+7000x+13000),ideal(x2+100x+147y+40),ideal(x2+120x+191y+10),ideal(x2+x+67y+100);
+   liftPoly(T,L);
+}
+///////////////////////////////////////////////////////////////////////////
+proc liftPoly1(list T, intvec L)
+"USAGE:  liftPoly1(T,L); T list of polys, L intvec of primes
+RETURN:  poly p in Q[x] such that p mod L[i]=T[i]
+EXAMPLE: example liftPoly; shows an example
+"
+{
    poly result;
    int i;
    poly p;
@@ -382,7 +416,7 @@ example
    ring R = 0,(x,y),dp;
    intvec L=32003,181,241,499;
    list T=x2+7000x+13000,x2+100x+147y+40,x2+120x+191y+10,x2+x+67y+100;
-   liftPoly(T,L);
+   liftPoly1(T,L);
 }
  ///////////////////////////////////////////////////////////////////////////////
 proc fareyIdeal(ideal I,intvec L)
