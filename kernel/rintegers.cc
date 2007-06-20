@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.2 2007-06-20 09:39:25 wienand Exp $ */
+/* $Id: rintegers.cc,v 1.3 2007-06-20 13:19:41 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -104,7 +104,7 @@ void nrzDelete(number *a, const ring r)
  */
 int nrzInt(number &n)
 {
-  return (int) mpz_get_si( (__mpz_struct*) &n);
+  return (int) mpz_get_si( (int_number) &n);
 }
 
 number nrzAdd (number a, number b)

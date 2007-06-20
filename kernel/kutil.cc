@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.59 2007-06-20 09:39:23 wienand Exp $ */
+/* $Id: kutil.cc,v 1.60 2007-06-20 13:19:40 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1253,7 +1253,7 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat,
 
   d = nExtGcd(pGetCoeff(p), pGetCoeff(strat->S[i]), &s, &t);
 
-  if (nIsOne(d) || nIsZero(s) || nIsZero(t))
+  if (nIsZero(s) || nIsZero(t))  // evtl. durch divBy tests ersetzen
   {
     nDelete(&d);
     nDelete(&s);
@@ -1271,7 +1271,7 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat,
 #ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
-    Print("t = %d; s = %d; d = %d\n", t, s, d);
+    Print("t = %d; s = %d; d = %d\n", nInt(t), nInt(s), nInt(d));
     PrintS("m1 = ");
     p_wrp(m1, strat->tailRing);
     PrintS(" ; m2 = ");
