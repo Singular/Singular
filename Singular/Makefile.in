@@ -252,7 +252,7 @@ endif
 SLIB0 = absfact.lib  arcpoint.lib  atkins.lib    aksaka.lib    ainvar.lib\
 	alexpoly.lib algebra.lib   brnoeth.lib   curvepar.lib  classify.lib \
         compregb.lib \
-	control.lib  curvpar.lib   crypto.lib    deform.lib    elim.lib \
+	control.lib  curvepar.lib   crypto.lib    deform.lib    elim.lib \
         equising.lib \
 	finvar.lib   gmspoly.lib   gmssing.lib   general.lib   graphics.lib \
 	grwalk.lib   groups.lib    hnoether.lib  homolog.lib   hyperel.lib \
