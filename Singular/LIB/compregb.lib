@@ -1,36 +1,39 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: acgs.lib,v 1.1 2007-06-19 16:33:52 Singular Exp $";
+version="$Id: compregb.lib,v 1.1 2007-06-20 13:30:42 Singular Exp $";
 category="General purpose";
 info="
-LIBRARY:  acgs.lib      experimental implementation for comprehensive Groebner systems
+LIBRARY:  compregb.lib      experimental implementation for comprehensive Groebner systems
 AUTHOR:  Akira Suzuki (http://kurt.scitec.kobe-u.ac.jp/~sakira/CGBusingGB/)
-                      // <sakira@kobe-u.ac.jp>
+                      (<sakira@kobe-u.ac.jp>)
+OVERVIEW:
+see \"A Simple Algorithm to compute Comprehensive Groebner Bases using Groebner
+Bases\" by Akira Suzuki and Yosuke Sato for details.
 
-
-Please see \"A Simple Algorithm to compute Comprehensive
-Groebner Bases using Groebner Bases\" by Akira Suzuki and Yosuke Sato for details.
 PROCEDURES:
-  cgs(polys,vars,pars,R1,R2)     comprehensive Groebner systems
-  base2str(G)                    pretty print of the result G
+  cgs(polys,vars,pars,R1,R2);     comprehensive Groebner systems
+  base2str(G);                    pretty print of the result G
+
+KEYWORDS: comprehensive Groebner system
 ";
+///////////////////////////////////////////////////////////////////////////////
 // global variables are the followings:
 // Parameters, Variables, VMinDPoly,
 // RingAll, RingVar;
 
-
-proc setup_special_dpolys()
+///////////////////////////////////////////////////////////////////////////////
+static proc setup_special_dpolys()
 {
   poly VMinDPoly = Variables[size(Variables)];
   export(VMinDPoly);
 }
 
-proc newcasebasis(poly Case, ideal Basis)
+static proc newcasebasis(poly Case, ideal Basis)
 {
   list CB = Case, Basis;
   return(CB);
 }
 
-proc contains(poly Vari, list Varis)
+static proc contains(poly Vari, list Varis)
 {
   int l = size(Varis);
   for (int i = 1; i <= l; i ++)
@@ -44,7 +47,7 @@ proc contains(poly Vari, list Varis)
   return(0);
 }
 
-proc polys_heads(list PolyL)
+static proc polys_heads(list PolyL)
 {
   int i, j;
   int length = size(PolyL);
@@ -99,17 +102,17 @@ proc polys_heads(list PolyL)
   return(CoefL);
 }
 
-proc polys_restrict_v(ideal Polys)
+static proc polys_restrict_v(ideal Polys)
 {
   return(polys_separate_v_p(Polys)[0]);
 }
 
-proc polys_restrict_p(ideal Polys)
+static proc polys_restrict_p(ideal Polys)
 {
   return(polys_separate_v_p(Polys)[1]);
 }
 
-proc polys_separate_v_p(ideal Polys)
+static proc polys_separate_v_p(ideal Polys)
 {
   list R_v, R_p;
   poly P;
@@ -131,7 +134,7 @@ proc polys_separate_v_p(ideal Polys)
   return(R_v, R_p);
 }
 
-proc cgs_main(ideal Polys)
+static proc cgs_main(ideal Polys)
 {
   ideal F;
   list FP, FV, HFact, Bases;
@@ -170,6 +173,15 @@ proc cgs_main(ideal Polys)
 }
 
 proc cgs(ideal Polys, list Vars, list Paras, RingVar, RingAll)
+"USAGE: cgs(Polys,Vars,Paras,RingVar,RingAll); Polys an ideal, Vars, the list
+        of variables, Paras the list of parameters, RingVar the ring with
+        Paras as parameters, RingAll the ring with Paras as variables
+        (RingAll should be the current ring)
+RETURN: a list L of lists L[i] of a polynomial and an ideal:
+        L[i][1] the polynomial giving the condition on the parameters
+        L[i][2] the Groebner basis for this case 
+EXAMPLE: example cgs; shows an example
+"
 {
   option(redSB);
   list Parameters = Paras;
@@ -185,7 +197,16 @@ proc cgs(ideal Polys, list Vars, list Paras, RingVar, RingAll)
   keepring(RingAll);
   return(G);
 }
-
+example
+{ "EXAMPLE:";echo=2; 
+  ring RingVar=(0,a,b),(x,y,t),lp; 
+  ring RingAll=0,(x,y,t,a,b),(lp(3),dp);
+  ideal polys=x^3-a,y^4-b,x+y-t; 
+  list vars=x,y,t; 
+  list paras=a,b;
+  list G = cgs(polys,vars,paras,RingVar,RingAll);
+  G;
+}
 proc basis2str(list B)
 {
   string Str;
@@ -248,7 +269,6 @@ proc bases2str(list Bases)
 }
 
 /*
-LIB "standard.lib";
 ring RingVar=(0,a,b),(x,y,t),lp; ring RingAll=0,(x,y,t,a,b),(lp(3),dp);
 ideal polys=x^3-a,y^4-b,x+y-t; list vars=x,y,t; list paras=a,b;
 list G = cgs(polys,vars,paras,RingVar,RingAll);
