@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.9 2007-05-11 10:48:04 wienand Exp $ */
+/* $Id: numbers.cc,v 1.10 2007-06-20 09:39:24 wienand Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -28,6 +28,9 @@
 #ifdef HAVE_RINGMODN
 #include "rmodulon.h"
 #endif
+#ifdef HAVE_RINGZ
+#include "rintegers.h"
+#endif
 
 //static int characteristic = 0;
 extern int IsPrime(int p);
@@ -48,6 +51,9 @@ number (*nImPart)(number a);
 #ifdef HAVE_RINGS
 BOOLEAN (*nDivBy)(number a,number b);
 int     (*nComp)(number a,number b);
+BOOLEAN (*nIsUnit)(number a);
+number  (*nGetUnit)(number a);
+number  (*nExtGcd)(number a, number b, number *s, number *t);
 #endif
 BOOLEAN (*nGreater)(number a,number b);
 BOOLEAN (*nEqual)(number a,number b);
@@ -106,6 +112,9 @@ number nd_Copy(number a,const ring r) { return r->cf->nCopy(a); }
 #ifdef HAVE_RINGS
 BOOLEAN ndDivBy(number a, number b) { return TRUE; }
 int ndComp(number a, number b) { return 0; }
+BOOLEAN ndIsUnit(number a) { return TRUE; }
+number  ndGetUnit (number a) { return nCopy(a); }
+number  ndExtGcd (number a, number b, number *s, number *t) { return nInit(1); }
 #endif
 
 /*2
@@ -126,6 +135,13 @@ void nSetChar(ring r)
   else if (rField_is_Ring_2toM(r))
   {
     nr2mSetExp(c, r);
+  }
+#endif  
+#ifdef HAVE_RINGZ
+  /*----------------------ring Z / 2^m----------------*/
+  else if (rField_is_Ring_Z(r))
+  {
+    nrzSetExp(c, r);
   }
 #endif  
 #ifdef HAVE_RINGMODN
@@ -184,6 +200,9 @@ void nSetChar(ring r)
 #ifdef HAVE_RINGS
   nComp  = r->cf->nComp;
   nDivBy = r->cf->nDivBy;
+  nIsUnit = r->cf->nIsUnit;
+  nGetUnit = r->cf->nGetUnit;
+  nExtGcd = r->cf->nExtGcd;
 #endif
   nGreater = r->cf->nGreater;
   nEqual = r->cf->nEqual;
@@ -266,6 +285,9 @@ void nInitChar(ring r)
 #ifdef HAVE_RINGS
   n->nComp = ndComp;
   n->nDivBy = ndDivBy;
+  n->nIsUnit = ndIsUnit;
+  n->nGetUnit = ndGetUnit;
+  n->nExtGcd = ndExtGcd;
 #endif
   if (rField_is_Extension(r))
   {
@@ -337,7 +359,9 @@ void nInitChar(ring r)
      n->nNormalize = nDummy2;
      n->nLcm          = nr2mLcm;
      n->nGcd          = nr2mGcd;
-//     n->nGetUnit = nr2mGetUnit; //TODO OLIVER
+     n->nIsUnit = nr2mIsUnit;
+     n->nGetUnit = nr2mGetUnit;
+     n->nExtGcd = nr2mExtGcd;
      n->nName= ndName;
 #ifdef LDEBUG
      n->nDBTest=nr2mDBTest;
@@ -375,10 +399,51 @@ void nInitChar(ring r)
      n->nNormalize = nDummy2;
      n->nLcm          = nrnLcm;
      n->nGcd          = nrnGcd;
-//     n->nGetUnit = nrnGetUnit; //TODO OLIVER
+     n->nIsUnit = nrnIsUnit;
+     n->nGetUnit = nrnGetUnit;
+     n->nExtGcd = nrnExtGcd;
      n->nName= ndName;
 #ifdef LDEBUG
      n->nDBTest=nrnDBTest;
+#endif
+  }
+#endif
+#ifdef HAVE_RINGZ
+  /* -------------- Z ----------------------- */
+  else if (rField_is_Ring_Z(r))
+  {
+     n->nInit  = nrzInit;
+     n->nCopy  = ndCopy;
+     n->nInt   = nrzInt;
+     n->nAdd   = nrzAdd;
+     n->nSub   = nrzSub;
+     n->nMult  = nrzMult;
+     n->nDiv   = nrzDiv;
+     n->nIntDiv       = nrzIntDiv;
+     n->nExactDiv= nrzDiv;
+     n->nNeg   = nrzNeg;
+     n->nInvers= nrzInvers;
+     n->nDivBy = nrzDivBy;
+     n->nComp = nrzComp;
+     n->nGreater = nrzGreater;
+     n->nEqual = nrzEqual;
+     n->nIsZero = nrzIsZero;
+     n->nIsOne = nrzIsOne;
+     n->nIsMOne = nrzIsMOne;
+     n->nGreaterZero = nrzGreaterZero;
+     n->nWrite = nrzWrite;
+     n->nRead = nrzRead;
+     n->nPower = nrzPower;
+     n->cfSetMap = nrzSetMap;
+     n->nNormalize = nDummy2;
+     n->nLcm          = nrzLcm;
+     n->nGcd          = nrzGcd;
+     n->nIsUnit = nrzIsUnit;
+     n->nGetUnit = nrzGetUnit;
+     n->nExtGcd = nrzExtGcd;
+     n->nName= ndName;
+#ifdef LDEBUG
+     n->nDBTest=nrzDBTest;
 #endif
   }
 #endif

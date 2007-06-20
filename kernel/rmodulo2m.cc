@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.11 2007-05-23 07:47:31 wienand Exp $ */
+/* $Id: rmodulo2m.cc,v 1.12 2007-06-20 09:39:25 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -79,6 +79,34 @@ number nr2mGcd (number a,number b,ring r)
 //  }
 }
 
+/*
+ * Give the largest non unit k, such that a = x * k, b = y * k has
+ * a solution.
+ */
+number nr2mExtGcd (number a, number b, number *s, number *t)
+{
+  NATNUMBER res = 0;
+  if ((NATNUMBER) a == 0 && (NATNUMBER) b == 0) return (number) 1;
+  while ((NATNUMBER) a % 2 == 0 && (NATNUMBER) b % 2 == 0)
+  {
+    a = (number) ((NATNUMBER) a / 2);
+    b = (number) ((NATNUMBER) b / 2);
+    res++;
+  }
+  if ((NATNUMBER) b % 2 == 0)
+  {
+    *t = NULL;
+    *s = nr2mInvers(a);
+    return (number) ((1L << res));// * (NATNUMBER) a);  // (2**res)*a    a ist Einheit
+  }
+  else
+  {
+    *s = NULL;
+    *t = nr2mInvers(b);
+    return (number) ((1L << res));// * (NATNUMBER) b);  // (2**res)*b    b ist Einheit
+  }
+}
+
 void nr2mPower (number a, int i, number * result)
 {
   if (i==0)
@@ -125,6 +153,21 @@ number nr2mAdd (number a, number b)
 number nr2mSub (number a, number b)
 {
   return nr2mSubM(a,b);
+}
+
+BOOLEAN nr2mIsUnit (number a)
+{
+  return ((NATNUMBER) a % 2 == 1);
+}
+
+number  nr2mGetUnit (number k)
+{
+  if (k == NULL) 
+    return (number) 1;
+  NATNUMBER tmp = (NATNUMBER) k;
+  while (tmp % 2 == 0)
+    tmp = tmp / 2;
+  return (number) tmp;
 }
 
 BOOLEAN nr2mIsZero (number  a)
@@ -371,7 +414,7 @@ void nr2mInitExp(int m, ring r)
   }
   else
   {
-    WarnS("nInitChar failed");
+    WarnS("nInitExp failed");
   }
 }
 

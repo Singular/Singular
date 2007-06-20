@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.19 2007-05-23 07:47:30 wienand Exp $ */
+/* $Id: polys.cc,v 1.20 2007-06-20 09:39:24 wienand Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -688,27 +688,6 @@ BOOLEAN pHasNotCF(poly p1, poly p2)
   }
 }
 
-#ifdef HAVE_RINGS  //HACK TODO Oliver
-number nGetUnit(number k) {
-  number unit = nIntDiv(k, nGcd(k, 0, currRing));
-  number gcd = nGcd(unit, 0, currRing);
-  if (!nIsOne(gcd))
-  {
-    number tmp = nMult(unit, unit);
-    number gcd_new = nGcd(tmp, 0, currRing);
-    while (gcd_new != gcd)
-    {
-      gcd = gcd_new;
-      tmp = nMult(tmp, unit);
-      gcd_new = nGcd(tmp, 0, currRing);
-    }
-    unit = nAdd(unit, nIntDiv(0, gcd_new));
-  }
-//  Print("k = %d ; unit = %d ; gcd = %d", k, unit, gcd);
-  return unit;
-}
-#endif
-
 /*2
 *divides p1 by its leading coefficient
 */
@@ -719,24 +698,26 @@ void pNorm(poly p1)
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
-    if (p1!=NULL)
+    if ((p1!=NULL) && rField_has_Units(currRing))
     {
       k = nGetUnit(pGetCoeff(p1));
       if (!nIsOne(k))
       {
         c = nDiv(pGetCoeff(p1), k);
+        nDelete(pGetCoeff(p1));
         pSetCoeff0(p1, c);
         h = pNext(p1);
         while (h != NULL)
         {
           c = nDiv(pGetCoeff(h), k);
-          pSetCoeff(h, c);
+          nDelete(pGetCoeff(h));
+          pSetCoeff0(h, c);
           pIter(h);
         }
-        nDelete(&k);
       }
-     return;
+      nDelete(&k);
     }
+    return;
   }
   else
 #endif

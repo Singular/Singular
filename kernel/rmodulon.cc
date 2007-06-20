@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.5 2007-05-23 07:47:31 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.6 2007-06-20 09:39:25 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -138,6 +138,26 @@ number nrnSub (number a, number b)
   return nrnSubM(a,b);
 }
 
+number  nrnGetUnit (number k)
+{
+  number unit = nrnIntDiv(k, nrnGcd(k, 0, currRing));
+  number gcd = nrnGcd(unit, 0, currRing);
+  if (!nrnIsOne(gcd))
+  {
+    number tmp = nrnMult(unit, unit);
+    number gcd_new = nrnGcd(tmp, 0, currRing);
+    while (gcd_new != gcd)
+    {
+      gcd = gcd_new;
+      tmp = nrnMult(tmp, unit);
+      gcd_new = nrnGcd(tmp, 0, currRing);
+    }
+    unit = nrnAdd(unit, nrnIntDiv(0, gcd_new));
+  }
+//  Print("k = %d ; unit = %d ; gcd = %d", k, unit, gcd);
+  return unit;
+}
+
 BOOLEAN nrnIsZero (number  a)
 {
   return 0 == (NATNUMBER)a;
@@ -146,6 +166,11 @@ BOOLEAN nrnIsZero (number  a)
 BOOLEAN nrnIsOne (number a)
 {
   return 1 == (NATNUMBER)a;
+}
+
+BOOLEAN nrnIsUnit (number a)
+{
+  return nrnIsOne(nrnGcd(0, a, currRing));
 }
 
 BOOLEAN nrnIsMOne (number a)
@@ -236,6 +261,21 @@ void XGCD(long& d, long& s, long& t, long a, long b)
 }
 #endif
 //#endif
+
+/*
+ * Give the largest non unit k, such that a = x * k, b = y * k has
+ * a solution and r, s, s.t. k = s*a + t*b
+ */
+number  nrnExtGcd (number a, number b, number *s, number *t)
+{
+  long bs;
+  long bt;
+  long d;
+  XGCD(d, bs, bt, (long) a, (long) b);
+  *s = nrnInit(bs);
+  *t = nrnInit(bt);
+  return (number) d;
+}
 
 NATNUMBER InvModN(NATNUMBER a)
 {

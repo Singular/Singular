@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.h,v 1.6 2007-05-11 10:48:05 wienand Exp $ */
+/* $Id: rmodulo2m.h,v 1.7 2007-06-20 09:39:25 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -23,6 +23,8 @@ void    nr2mPower       (number a, int i, number * result);
 BOOLEAN nr2mIsZero      (number a);
 BOOLEAN nr2mIsOne       (number a);
 BOOLEAN nr2mIsMOne      (number a);
+BOOLEAN nr2mIsUnit      (number a);
+number  nr2mGetUnit     (number a);
 number  nr2mDiv         (number a, number b);
 number  nr2mIntDiv      (number a,number b);
 number  nr2mNeg         (number c);
@@ -33,6 +35,7 @@ int     nr2mComp        (number a, number b);
 BOOLEAN nr2mEqual       (number a, number b);
 number  nr2mLcm         (number a,number b, ring r);
 number  nr2mGcd         (number a,number b,ring r);
+number  nr2mExtGcd      (number a, number b, number *s, number *t);
 nMapFunc nr2mSetMap     (ring src, ring dst);
 void    nr2mWrite       (number &a);
 char *  nr2mRead        (char *s, number *a);

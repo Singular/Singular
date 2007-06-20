@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.58 2007-05-24 10:02:43 wienand Exp $ */
+/* $Id: kutil.cc,v 1.59 2007-06-20 09:39:23 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1054,7 +1054,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   pLcm(p,strat->S[i],Lp.lcm);
   pSetm(Lp.lcm);
   assume(!strat->sugarCrit);
-  if (pHasNotCF(p,strat->S[i]) && nIsOne(nGcd(0, pGetCoeff(p), currRing)) && nIsOne(nGcd(0, pGetCoeff(strat->S[i]), currRing)))
+  if (pHasNotCF(p,strat->S[i]) && nIsUnit(pGetCoeff(p)) && nIsUnit(pGetCoeff(strat->S[i])))
   {
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG)
@@ -1244,21 +1244,28 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
 NTL_CLIENT
 #endif
 
-void enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR = -1)
+BOOLEAN enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR = -1)
 {
-  long d, s, t;
+  number d, s, t;
   assume(i<=strat->sl);
   LObject  Lp;
   poly m1, m2, erg, gcd;
 
-  XGCD(d, s, t, (long) pGetCoeff(p), (long) pGetCoeff(strat->S[i]));
+  d = nExtGcd(pGetCoeff(p), pGetCoeff(strat->S[i]), &s, &t);
 
+  if (nIsOne(d) || nIsZero(s) || nIsZero(t))
+  {
+    nDelete(&d);
+    nDelete(&s);
+    nDelete(&t);
+    return FALSE;
+  }
 
   k_GetStrongLeadTerms(p, strat->S[i], currRing, m1, m2, gcd, strat->tailRing);
 
-  pSetCoeff0(m1, nInit(s));
-  pSetCoeff0(m2, nInit(t));
-  pSetCoeff0(gcd, nInit(d));
+  pSetCoeff0(m1, s);
+  pSetCoeff0(m2, t);
+  pSetCoeff0(gcd, d);
 
 
 #ifdef KDEBUG
@@ -1322,6 +1329,7 @@ void enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
     }
     enterL(&strat->L,&strat->Ll,&strat->Lmax,h,posx);
   }
+  return TRUE;
 }
 #endif
 
@@ -2599,11 +2607,11 @@ void initenterstrongPairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, i
     for (j=0; j<=k; j++)
     {
       // Print("j:%d, Ll:%d\n",j,strat->Ll);
-      if (((unsigned long) pGetCoeff(h) % (unsigned long) pGetCoeff(strat->S[j]) != 0) &&
-         ((unsigned long) pGetCoeff(strat->S[j]) % (unsigned long) pGetCoeff(h) != 0))
+//      if (((unsigned long) pGetCoeff(h) % (unsigned long) pGetCoeff(strat->S[j]) != 0) &&
+//         ((unsigned long) pGetCoeff(strat->S[j]) % (unsigned long) pGetCoeff(h) != 0))
       {
-        new_pair=TRUE;
-        enterOneStrongPoly(j,h,ecart,isFromQ,strat, atR);
+        if (enterOneStrongPoly(j,h,ecart,isFromQ,strat, atR))
+          new_pair=TRUE;
       }
     }
   }
@@ -2727,7 +2735,7 @@ void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 {
     assume (rField_is_Ring(currRing));
     // enter also zero divisor * poly, if this is non zero and of smaller degree
-    enterExtendedSpoly(h, strat);
+    if (!(rField_is_Domain(currRing))) enterExtendedSpoly(h, strat);
     initenterpairsRing(h, k, ecart, 0, strat, atR);
     initenterstrongPairs(h, k, ecart, 0, strat, atR);
     clearSbatch(h, k, pos, strat);

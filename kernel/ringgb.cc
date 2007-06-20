@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ringgb.cc,v 1.15 2007-05-19 13:59:03 wienand Exp $ */
+/* $Id: ringgb.cc,v 1.16 2007-06-20 09:39:25 wienand Exp $ */
 /*
 * ABSTRACT: ringgb interface
 */
@@ -255,26 +255,29 @@ int testGB(ideal I, ideal GI) {
       Print("-");
     }
   }
-  Print(" Yes!\nzero-spoly --> 0?");
-  for (i = 0; i < IDELEMS(GI); i++) 
+  if (!(rField_is_Domain()))
   {
-    f = plain_zero_spoly(GI->m[i]);
-    nf = ringNF(f, GI, currRing);
-    if (nf != NULL) {
-      Print("spoly(");
-      wrp(GI->m[i]);
-      Print(", ");
-      wrp(0);
-      Print(") = ");
-      wrp(h);
-      Print(" --> ");
-      wrp(nf);
-      PrintLn();
-      return(0);
+    Print(" Yes!\nzero-spoly --> 0?");
+    for (i = 0; i < IDELEMS(GI); i++) 
+    {
+      f = plain_zero_spoly(GI->m[i]);
+      nf = ringNF(f, GI, currRing);
+      if (nf != NULL) {
+        Print("spoly(");
+        wrp(GI->m[i]);
+        Print(", ");
+        wrp(0);
+        Print(") = ");
+        wrp(h);
+        Print(" --> ");
+        wrp(nf);
+        PrintLn();
+        return(0);
+      }
+      pDelete(&f);
+      pDelete(&nf);
+      Print("-");
     }
-    pDelete(&f);
-    pDelete(&nf);
-    Print("-");
   }
   Print(" Yes!");
   PrintLn();

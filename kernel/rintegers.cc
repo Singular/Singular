@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.1 2007-06-19 10:47:30 wienand Exp $ */
+/* $Id: rintegers.cc,v 1.2 2007-06-20 09:39:25 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -21,14 +21,16 @@
 
 #ifdef HAVE_RINGZ
 
+typedef MP_INT *int_number;
+
 /*
  * Multiply two numbers
  */
 number nrzMult (number a, number b)
 {
-  mpz_t erg;
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
   mpz_init(erg);
-  mpz_mul(erg, (mpz_t) &a, (mpz_t) &b);
+  mpz_mul(erg, (int_number) a, (int_number) b);
   return (number) erg;
 }
 
@@ -37,9 +39,10 @@ number nrzMult (number a, number b)
  */
 number nrzLcm (number a,number b,ring r)
 {
-  mpz_t erg;
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
   mpz_init(erg);
-  return (number) erg;//TODO
+  mpz_lcm(erg, (int_number) a, (int_number) b);
+  return (number) erg;
 }
 
 /*
@@ -48,16 +51,36 @@ number nrzLcm (number a,number b,ring r)
  */
 number nrzGcd (number a,number b,ring r)
 {
-  mpz_t erg;
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
   mpz_init(erg);
-  return (number) erg;//TODO
+  mpz_gcd(erg, (int_number) a, (int_number) b);
+  return (number) erg;
+}
+
+/*
+ * Give the largest non unit k, such that a = x * k, b = y * k has
+ * a solution and r, s, s.t. k = s*a + t*b
+ */
+number  nrzExtGcd (number a, number b, number *s, number *t)
+{
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  int_number bs = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  int_number bt = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_init(bs);
+  mpz_init(bt);
+  mpz_gcdext(erg, bs, bt, (int_number) a, (int_number) b);
+  *s = (number) bs;
+  *t = (number) bt;
+  return (number) erg;
 }
 
 void nrzPower (number a, int i, number * result)
 {
-  mpz_t erg;
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
   mpz_init(erg);
-  return (number) erg;/TODO
+  mpz_pow_ui(erg, (int_number) a, i);
+  *result = (number) erg;
 }
 
 /*
@@ -65,9 +88,15 @@ void nrzPower (number a, int i, number * result)
  */
 number nrzInit (int i)
 {
-  mpz_t erg;
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
   mpz_init_set_si(erg, i);
   return (number) erg;
+}
+
+void nrzDelete(number *a, const ring r)
+{
+  mpz_clear((int_number) *a);
+  omFree((ADDRESS) *a);
 }
 
 /*
@@ -75,78 +104,123 @@ number nrzInit (int i)
  */
 int nrzInt(number &n)
 {
-  return (int) mpz_get_si(&n)
+  return (int) mpz_get_si( (__mpz_struct*) &n);
 }
 
 number nrzAdd (number a, number b)
 {
-  mpz_t erg;
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
   mpz_init(erg);
-  mpz_add(erg, (mpz_t) a, (mpz_t) b);
+  mpz_add(erg, (int_number) a, (int_number) b);
   return (number) erg;
 }
 
 number nrzSub (number a, number b)
 {
-  mpz_t erg;
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
   mpz_init(erg);
-  mpz_sub(erg, (mpz_t) a, (mpz_t) b);
+  mpz_sub(erg, (int_number) a, (int_number) b);
   return (number) erg;
+}
+
+number  nrzGetUnit (number a)
+{
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init_set_si(erg, 1);
+  return (number) erg;
+}
+
+BOOLEAN nrzIsUnit (number a)
+{
+  return 0 == mpz_cmpabs_ui((int_number) a, 1);
 }
 
 BOOLEAN nrzIsZero (number  a)
 {
-  return 0 == mpz_cmpabs_ui((mpz_t) a, 0);
+  return 0 == mpz_cmpabs_ui((int_number) a, 0);
 }
 
 BOOLEAN nrzIsOne (number a)
 {
-  return 0 == mpz_cmp_si((mpz_t) a, 1);
+  return 0 == mpz_cmp_si((int_number) a, 1);
 }
 
 BOOLEAN nrzEqual (number a,number b)
 {
-  return 0 == mpz_cmp((mpz_t) a, (mpz_t) b);
+  return 0 == mpz_cmp((int_number) a, (int_number) b);
 }
 
 BOOLEAN nrzGreater (number a,number b)
 {
-  return 0 < mpz_cmp((mpz_t) a, (mpz_t) b);
+  return 0 < mpz_cmp((int_number) a, (int_number) b);
 }
 
 int nrzComp(number a, number b)
 {
-   return 2;//TODO
+  if (nrnEqual(a, b)) return 0;
+  if (nrnDivBy(a, b)) return -1;
+  if (nrnDivBy(b, a)) return 1;
+  return 2;
 }
 
 BOOLEAN nrzDivBy (number a,number b)
 {
-  return FALSE;//TODO
+  return mpz_divisible_p((int_number) a, (int_number) b) > 0;//TODO
 }
 
 BOOLEAN nrzGreaterZero (number k)
 {
-  return 0 <= mpz_cmp_si((mpz_t) a, 0);
+  return 0 <= mpz_cmp_si((int_number) k, 0);
+}
+
+BOOLEAN nrzIsMOne (number a)
+{
+  return 0 == mpz_cmp_si((int_number) a, 1);
 }
 
 number nrzDiv (number a,number b)
 {
-  return (number)0; //TODO
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  int_number r = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_tdiv_qr(erg, r, (int_number) a, (int_number) b);
+  if (!nrzIsZero((number) r))
+  {
+    WarnS("Division by non divisible element.");
+    WarnS("Result is without remainder.");
+  }
+  mpz_clear(r);
+  omFree(r);
+  return (number) erg;
 }
 
 number nrzIntDiv (number a,number b)
 {
-  return (number)0; //TODO
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_tdiv_q(erg, (int_number) a, (int_number) b);
+  return (number) erg;
 }
 
 number  nrzInvers (number c)
 {
-  return (number)0; //TODO
+  if (!nrzIsUnit((number) c))
+  {
+    WarnS("Non invertible element.");
+    return (number)0; //TODO
+  }
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_set(erg, (int_number) c);
+  return (number) erg;
 }
 
 number nrzNeg (number c)
 {
-  return (number)0; //TODO
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_mul_si(erg, (int_number) c, -1);
+  return (number) erg;
 }
 
 nMapFunc nrzSetMap(ring src, ring dst)
@@ -176,44 +250,53 @@ BOOLEAN nrzDBTest (number a, char *f, int l)
 
 void nrzWrite (number &a)
 {
-  if ((NATNUMBER)a > (nrzModul >>1)) StringAppend("-%d",(int)(-((NATNUMBER)a)));
-  else                          StringAppend("%d",(int)((NATNUMBER)a));
+  char *s,*z;
+  if (a==NULL)
+  {
+    StringAppendS("o");
+  }
+  else
+  {
+    int l=mpz_sizeinbase((int_number) a, 10);
+    if (a->s<2) l=si_max(l,mpz_sizeinbase((int_number) a,10));
+    l+=2;
+    s=(char*)omAlloc(l);
+    z=mpz_get_str(s,10,(int_number) a);
+    StringAppendS(z);
+    omFreeSize((ADDRESS)s,l);
+  }
 }
 
-char* nrzEati(char *s, int *i)
+/*2
+* extracts a long integer from s, returns the rest    (COPY FROM longrat0.cc)
+*/
+char * nlEatLongC(char *s, MP_INT *i)
 {
+  char * start=s;
 
-  if (((*s) >= '0') && ((*s) <= '9'))
+  while (*s >= '0' && *s <= '9') s++;
+  if (*s=='\0')
   {
-    (*i) = 0;
-    do
-    {
-      (*i) *= 10;
-      (*i) += *s++ - '0';
-      if ((*i) >= (MAX_INT_VAL / 10)) (*i) = (*i) % nrzModul;
-    }
-    while (((*s) >= '0') && ((*s) <= '9'));
-    if ((*i) >= nrzModul) (*i) = (*i) % nrzModul;
+    mpz_set_str(i,start,10);
   }
-  else (*i) = 1;
+  else
+  {
+    char c=*s;
+    *s='\0';
+    mpz_set_str(i,start,10);
+    *s=c;
+  }
   return s;
 }
 
-char* nrzRead (char *s, number *a)
+char * nrzRead (char *s, number *a)
 {
-  int z;
-  int n=1;
-
-  s = nrzEati(s, &z);
-  if ((*s) == '/')
+  int_number z = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
   {
-    s++;
-    s = nrzEati(s, &n);
+    mpz_init(z);
+    s = nlEatLongC(s, z);
   }
-  if (n == 1)
-    *a = (number)z;
-  else
-      *a = nrzDiv((number)z,(number)n);
+  *a = (number) z;
   return s;
 }
 #endif

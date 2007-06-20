@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.28 2007-05-23 07:47:30 wienand Exp $ */
+/* $Id: polys1.cc,v 1.29 2007-06-20 09:39:24 wienand Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -482,7 +482,7 @@ void pContent(poly ph)
 {
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing)) {
-    if (ph!=NULL)
+    if ((ph!=NULL) && rField_has_Units(currRing))
     {
       number k = nGetUnit(pGetCoeff(ph));
       if (!nIsOne(k))

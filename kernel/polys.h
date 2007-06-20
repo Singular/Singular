@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.10 2007-05-11 10:48:05 wienand Exp $ */
+/* $Id: polys.h,v 1.11 2007-06-20 09:39:24 wienand Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -255,7 +255,7 @@ extern poly pHeadProc(poly p);
  * Test stuff for dev OLIVER
  */
  
-number nGetUnit(number k);
+// number nGetUnit(number k);
 #endif
 
 
