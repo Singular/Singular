@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.20 2007-06-20 09:39:24 wienand Exp $ */
+/* $Id: polys.cc,v 1.21 2007-06-20 09:59:47 wienand Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -704,13 +704,13 @@ void pNorm(poly p1)
       if (!nIsOne(k))
       {
         c = nDiv(pGetCoeff(p1), k);
-        nDelete(pGetCoeff(p1));
+        nDelete(&pGetCoeff(p1));
         pSetCoeff0(p1, c);
         h = pNext(p1);
         while (h != NULL)
         {
           c = nDiv(pGetCoeff(h), k);
-          nDelete(pGetCoeff(h));
+          nDelete(&pGetCoeff(h));
           pSetCoeff0(h, c);
           pIter(h);
         }
