@@ -1,4 +1,6 @@
 ////////////////////////////////////////////////////////////////
+version="$Id: kskernel.lib,v 1.3 2007-06-20 15:30:11 Singular Exp $";
+category="General purpose";
 info="
 LIBRARY:  kskernel.lib   PROCEDURES FOR COMPUTING THE KERNEL
                          OF THE KODAIRA-SPENCER MAP
@@ -141,8 +143,8 @@ EXAMPLE: example KSker; shows an example
   {
     ring KSring=0,(T(1)),ws(c);
     matrix KSkernel[1][1]=c*T(1);
-    export KSring;
-    export KSkernel;
+    export(KSring);exportto(Top,KSring);
+    export(KSkernel);
     return();
   }
   int cnt=k; // the total number of T's, now k>1
@@ -161,7 +163,7 @@ EXAMPLE: example KSker; shows an example
     weights[i] = M[i,3]; // positive weights for Ws ordering
     M[i,3]   = i;
   }
-  export weights;
+  export(weights);
   ring RT=0,(x,y,T(1..k)),(Ws(q,p),dp);
   poly F=x^p+y^q;
   i=0;j=0;
@@ -216,8 +218,8 @@ EXAMPLE: example KSker; shows an example
   // make the coefficients positive
   if ((leadcoef(TL[1,1])<0) || (leadcoef(TL[k,k])<0)) { TL = -TL;}
   matrix KSkernel=matrix(TL);
-  export KSring;
-  export KSkernel;
+  export(KSring);exportto(Top,KSring);
+  export(KSkernel);
   kill M;
   return();
 }
@@ -270,6 +272,7 @@ EXAMPLE: example KSconvert; shows an example
   matrix KSkernel2=imap(T1,TM);
   kill T1;
   export KSring2;
+  export(KSring2);exportto(Top,KSring2);
   export KSkernel2;
   return();
 }
@@ -365,7 +368,7 @@ proc mix(int b, list u)
 }
 
 //---------------------------- sub procedure ------------------
-proc bracket(int r, int s)
+proc bracket_k(int r, int s)
 {
   int b=s-r;
   int q;
@@ -387,7 +390,7 @@ proc bracket(int r, int s)
         if (S[(1+r+u[q])]!="u")
         {
           F=F+"T("+ string(q) +")";
-          bracket(r+u[q],s);
+          bracket_k(r+u[q],s);
          }
       }
       q=mix(b,u);
@@ -447,9 +450,9 @@ EXAMPLE: example StringF; shows an example
 "
 {
   string F;
-  export F;
+  export F;exportto(Top,F);
   StringS(p,q);
-  bracket(l[i],u[j]);
+  bracket_k(l[i],u[j]);
   F=F[3..(size(F)-2)];
 }
 example
@@ -510,7 +513,7 @@ EXAMPLE: example KScoef; shows an example
       }
     }
   }
-  export RC;
+  export RC;exportto(Top,RC);
   export C;
 }
 example
