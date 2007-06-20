@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.37 2007-01-23 15:03:29 Singular Exp $";
+version="$Id: control.lib,v 1.38 2007-06-20 22:31:00 levandov Exp $";
 category="System and Control Theory";
 info="
 LIBRARY:  control.lib     Algebraic analysis tools for System and Control Theory
@@ -840,7 +840,8 @@ static proc evas_genericity(matrix M)
   int s1 = ncols(Den);
   for (i=1; i<=s1; i++)
   {
-    if (normalize(Den[i]) !=1)
+    Den[i] = normalize(Den[i]);
+    if ( Den[i] !=1)
     {
       F= F, factorize(Den[i],1);
     }
