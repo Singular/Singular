@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.159 2007-06-19 09:13:25 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.160 2007-06-20 09:41:43 wienand Exp $ */
 /*
 * ABSTRACT:
 */
@@ -4411,6 +4411,15 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       pn->next->name=omStrDup("i");
     }
   }
+#ifdef HAVE_RINGZ
+  else if ((pn->name != NULL)
+  && (strcmp(pn->name,"integers")==0))
+  {
+    ch = 0;
+    ringtype = 4;
+    WarnS("integers not yet fully tested");
+  }
+#endif
 #ifdef HAVE_RINGMODN
   else if ((pn->name != NULL)
   && (strcmp(pn->name,"modnat")==0))
@@ -4429,6 +4438,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     ch = module;
     ringtype = 2;
     ringflaga = module;
+    WarnS("Z/n not yet fully tested");
   }
 #endif
 #ifdef HAVE_RING2TOM
@@ -4457,8 +4467,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     {
       ringtype = 1; // Use Z/2^ch
       ringflaga = exp;
-      Print("Beta: using Z/2^%d", ch);
-      PrintLn();
+      WarnS("Z/2^n not yet fully tested");
     }
     else
     {
