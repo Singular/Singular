@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.14 2007-05-24 13:41:20 Singular Exp $";
+version="$Id: dmod.lib,v 1.15 2007-06-20 15:39:44 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -39,7 +39,7 @@ annfs(F[,S,eng]);      compute Ann F^s0 in D and Bernstein poly for a poly F
 
 bernsteinBM(F[,eng]);  compute global Bernstein poly for a poly F (algorithm of Briancon-Maisonobe)
 operatorBM(F[,eng]);   compute Ann F^s, Ann F^s0, BS and PS for a poly F (algorithm of Briancon-Maisonobe)
-annfsParamBM(F[,eng]); compute the generic Ann F^s (algorithm by Briancon and Maisonobe) and exceptional parametric constellations for a poly F with parametric coefficients 
+annfsParamBM(F[,eng]); compute the generic Ann F^s (algorithm by Briancon and Maisonobe) and exceptional parametric constellations for a poly F with parametric coefficients
 annfsBMI(F[,eng]);     compute Ann F^s and Bernstein ideal for a poly F=f1*..*fP (multivariate algorithm of Briancon-Maisonobe)
 
 SECONDARY D-MOD PROCEDURES:
@@ -95,9 +95,9 @@ proc annfs(poly F, list #)
 RETURN:  ring
 PURPOSE: compute the D-module structure of basering[f^s] with the algorithm given in S and with the
 Groebner basis engine given in eng
-NOTE:    activate the output ring with the @code{setring} command. 
+NOTE:    activate the output ring with the @code{setring} command.
 @*       The value of a string S can be
-@*       'bm' (default) - for the algorithm of  Briancon and Maisonobe, 
+@*       'bm' (default) - for the algorithm of  Briancon and Maisonobe,
 @*       'ot'  - for the algorithm of Oaku and Takayama,
 @*       'lot' - for the Levandovskyy's modification of the algorithm of Oaku and Takayama.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
@@ -122,17 +122,17 @@ EXAMPLE: example annfs; shows examples
      if ( (st == "BM") || (st == "Bm") || (st == "bM") ||(st == "bm"))
      {
        algo = "bm";
-       chs  = 1; 
+       chs  = 1;
      }
      if ( (st == "OT") || (st == "Ot") || (st == "oT") || (st == "ot"))
      {
        algo = "ot";
-       chs  = 1; 
+       chs  = 1;
      }
      if ( (st == "LOT") || (st == "lOT") || (st == "Lot") || (st == "lot"))
      {
        algo = "lot";
-       chs  = 1; 
+       chs  = 1;
      }
      if (chs != 1)
      {
@@ -143,7 +143,7 @@ EXAMPLE: example annfs; shows examples
      // second arg
      if (size(#)>1)
      {
-       // exists 2nd arg 
+       // exists 2nd arg
        if ( typeof(#[2]) == "int" )
        {
 	 // the case: given alg, given engine
@@ -618,7 +618,7 @@ example
   printlevel = 0;
   bernsteinBM(F);
 }
-  
+
 // some changes
 proc annfsBM (poly F, list #)
 "USAGE:  annfsBM(f [,eng]);  f a poly, eng an optional int

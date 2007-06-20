@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: compregb.lib,v 1.1 2007-06-20 13:30:42 Singular Exp $";
+version="$Id: compregb.lib,v 1.2 2007-06-20 15:39:44 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  compregb.lib      experimental implementation for comprehensive Groebner systems
@@ -117,7 +117,7 @@ static proc polys_separate_v_p(ideal Polys)
   list R_v, R_p;
   poly P;
   int length = size(Polys);
-  
+
   for (int i = 1; i <= length; i ++)
   {
     P = Polys[i];
@@ -179,7 +179,7 @@ proc cgs(ideal Polys, list Vars, list Paras, RingVar, RingAll)
         (RingAll should be the current ring)
 RETURN: a list L of lists L[i] of a polynomial and an ideal:
         L[i][1] the polynomial giving the condition on the parameters
-        L[i][2] the Groebner basis for this case 
+        L[i][2] the Groebner basis for this case
 EXAMPLE: example cgs; shows an example
 "
 {
@@ -198,11 +198,11 @@ EXAMPLE: example cgs; shows an example
   return(G);
 }
 example
-{ "EXAMPLE:";echo=2; 
-  ring RingVar=(0,a,b),(x,y,t),lp; 
+{ "EXAMPLE:";echo=2;
+  ring RingVar=(0,a,b),(x,y,t),lp;
   ring RingAll=0,(x,y,t,a,b),(lp(3),dp);
-  ideal polys=x^3-a,y^4-b,x+y-t; 
-  list vars=x,y,t; 
+  ideal polys=x^3-a,y^4-b,x+y-t;
+  list vars=x,y,t;
   list paras=a,b;
   list G = cgs(polys,vars,paras,RingVar,RingAll);
   G;
@@ -264,7 +264,7 @@ proc bases2str(list Bases)
   {
     Str = Str + basis2str(Bases[i]) + newline;
   }
-  
+
   return(Str);
 }
 

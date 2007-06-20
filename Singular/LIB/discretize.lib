@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: discretize.lib,v 1.1 2007-05-13 19:27:53 levandov Exp $";
+version="$Id: discretize.lib,v 1.2 2007-06-20 15:39:44 Singular Exp $";
 category="Applications";
 info="
 LIBRARY: discretize.lib  Tools for the finite difference schemes
@@ -18,7 +18,7 @@ texcoef(n);  converts the number n into TeX
 npar(n); search for 'n' among the parameters and returns its number
 magnitude(P); compute the square of the magnitude of a complex expression
 replace(s,what,with);  replace in s all the substrings with a given string
-xchange(w,a,b); exchange two substrings of a string 
+xchange(w,a,b); exchange two substrings of a string
 par2tex(s);     convert special characters to TeX in s
 ";
 
@@ -35,7 +35,7 @@ proc xchange(string where, string a, string b)
 "USAGE:  xchange(w,a,b);  w,a,b strings
 RETURN:  string
 PURPOSE:  exchanges substring 'a' with a substring 'b' in the string w
-NOTE:   
+NOTE:
 EXAMPLE: example xchange; shows examples
 "{
   // replaces a<->b in where
@@ -96,9 +96,9 @@ example
  ring r = (0,dt,theta,A),Tt,dp;
  poly p = (Tt*dt+theta+1)^2+2*A;
  string s = texfactorize("",p);
- s; 
+ s;
  par2tex(s);
- string T = texfactorize("",p*(-theta*A)); 
+ string T = texfactorize("",p*(-theta*A));
  par2tex(T);
 }
 
@@ -121,7 +121,7 @@ EXAMPLE: example replace; shows examples
   int swith = size(with);
   string out="";
   string tmp;
-  gn  = 0;   
+  gn  = 0;
   while(cn!=0)
   {
 //    "cn:";    cn;
@@ -132,7 +132,7 @@ EXAMPLE: example replace; shows examples
       tmp = s[gn..cn-1];
     }
 //    "tmp:";tmp;
-    out = out+tmp+" "+with;    
+    out = out+tmp+" "+with;
 //    "out:";out;
     gn  = cn + sw;
     if (gn>ss)
@@ -143,7 +143,7 @@ EXAMPLE: example replace; shows examples
     }
 //     if (gn == ss)
 //     {
-      
+
 //     }
     cn  = find(s,what,gn);
   }
@@ -159,8 +159,8 @@ example
  string s = texfactorize("",p);
  s;
  s = replace(s,"Tt","T_t"); s;
- s = replace(s,"dt","\\tri t"); s; 
- s = replace(s,"theta","\\theta"); s; 
+ s = replace(s,"dt","\\tri t"); s;
+ s = replace(s,"theta","\\theta"); s;
 }
 
 proc exp2pt(poly P, list #)
@@ -172,8 +172,8 @@ NOTE: an optional list L contains a string, which will replace the default
 value 'u' for the discretized function
 EXAMPLE: example exp2pt; shows examples
 "{
-// given poly in vars [now Tx,Tt are fixed], 
-// create Tex expression for points of lattice 
+// given poly in vars [now Tx,Tt are fixed],
+// create Tex expression for points of lattice
 // coeffs must not be fractional
   string varnm = "u";
   if (size(#) > 0)
@@ -196,7 +196,7 @@ EXAMPLE: example exp2pt; shows examples
     {
       rz = rz + "+" + mz;
     }
-    P = P-lead(P);    
+    P = P-lead(P);
   }
   rz  = rz[2..size(rz)];
   return(rz);
@@ -292,29 +292,29 @@ EXAMPLE: example npar; shows examples
 "{
   // searches for n amongst parameters
   // and returns its number
-  int i,j=0,0;  
+  int i,j=0,0;
   list L = ringlist(basering);
   list M = L[1][2]; // pars
   string sn = string(n);
   sn = sn[2..size(sn)-1];
   for (i=1; i<=size(M);i++)
   {
-    if (M[i] == sn) 
+    if (M[i] == sn)
     {
       j = i;
     }
   }
   if (j==0)
-  { 
+  {
     "Incorrect parameter";
-  } 
+  }
   return(j);
 }
 example
 {
  "EXAMPLE:"; echo=2;
   ring r = (0,dh,dt,theta,A),t,dp;
-  npar(dh); 
+  npar(dh);
   number T = theta;
   npar(T);
   npar(dh^2);
@@ -328,7 +328,7 @@ to the  presence of a number n in the coefficients
 NOTE:    n is usually a parameter with no power
 EXAMPLE: example decoef; shows examples
 "{
-  // decomposes poly into summands 
+  // decomposes poly into summands
   // wrt the presence of a number n in coeffs
   // returns ideal
   def br = basering;
@@ -358,7 +358,7 @@ EXAMPLE: example decoef; shows examples
   setring @R;
   poly P = imap(br,P);
   poly P0 = subst(P,var(pos),0);
-  poly P1 = P - P0; 
+  poly P1 = P - P0;
   ideal I = P0,P1;
   setring br;
   ideal I = imap(@R,I);
@@ -394,8 +394,8 @@ EXAMPLE: example texcoef; shows examples
   // if n is a polynomial, adds brackets
   number D  = denominator(n);
   int DenIsOne = 0;
-  if ( D==number(1) ) 
-  { 
+  if ( D==number(1) )
+  {
     DenIsOne = 1;
   }
   string sd = texpoly("",D);
@@ -403,9 +403,9 @@ EXAMPLE: example texcoef; shows examples
   sd = par2tex(sd);
   number N  = numerator(n);
   string sn = texpoly("",N);
-  sn = rmDol(sn); 
+  sn = rmDol(sn);
   sn = par2tex(sn);
-  string sout=""; 
+  string sout="";
   int i;
   int NisPoly = 0;
   if (DenIsOne)
@@ -481,7 +481,7 @@ EXAMPLE: example difpoly2tex; shows examples
     }
   }
   S  = T;
-  ss = j-1; 
+  ss = j-1;
   int GotF = 1;
   list F;
   if (size(#)>0)
@@ -502,12 +502,12 @@ EXAMPLE: example difpoly2tex; shows examples
   int  sp = size(P);
   intvec np;
   int GotP = 1;
-  if (sp==0)   
+  if (sp==0)
   {
     GotP = 0;
   }
-  if (sp==1) 
-  { 
+  if (sp==1)
+  {
     if (P[1]==0)
     {
       GotP = 0;
@@ -633,7 +633,7 @@ proc ElimModComp(module M, int num)
   // check whether a curr.ord is elim-comp
   string s = ordstr(basering);
   int ns = size(s);
-  //  s[ns] = "c", "C"; 
+  //  s[ns] = "c", "C";
   if (s[1]="c")
   {
     // num last components

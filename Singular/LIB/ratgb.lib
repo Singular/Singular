@@ -1,11 +1,11 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: ratgb.lib,v 1.2 2007-05-27 01:51:40 levandov Exp $";
+version="$Id: ratgb.lib,v 1.3 2007-06-20 15:39:45 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: ratgb.lib  Groebner bases in Ore localizations
 AUTHOR: Viktor Levandovskyy,     levandov@risc.uni-linz.ac.at
 
-PROCEDURES: 
+PROCEDURES:
 ratstd(ideal I, int n);   compute Groebner basis in Ore localizations of the basering wrt first n variables
 
 SUPPORT: SpezialForschungsBereich F1301 of the Austrian FWF
@@ -18,8 +18,8 @@ PURPOSE: compute the Groebner basis of I in the Ore localization of
 the basering with respect to first n variables
 ASSUME: the variables are organized in two blocks and
 @* the first block of length n contains the elements
-@*     with respect to which one localizes, 
-@* the basering is equipped with the elimination ordering 
+@*     with respect to which one localizes,
+@* the basering is equipped with the elimination ordering
 @*     for the variables in the second block
 NOTE:    the output ring O is commutative. The ideal rGBid in O
 represents the rational form of the output ideal pGBid in the basering.
@@ -123,7 +123,7 @@ EXAMPLE: example ratstd; shows examples
   kill tmp2; list tmp2;
   tmp2[1] = L[3][2];
   tmp2[2] = L[3][3];
-  RL[3]   = tmp2; 
+  RL[3]   = tmp2;
 
   // factor ideal is ignored
   RL[4] = ideal(0);
@@ -136,11 +136,11 @@ EXAMPLE: example ratstd; shows examples
   setring @RAT;
 
   ideal LG = imap(save, LG);
-  // do not do groebner at this place, 
+  // do not do groebner at this place,
   // it may cause misordering!
 
   // 4. run simplify
-  
+
   ideal SLG = simplify(LG,8+32); //contains zeros
   intvec islg;
   if (SLG[1] == 0)
@@ -200,8 +200,8 @@ example
   matrix D[4][4];
   D[1,3] = K;
   D[2,4] = N;
-  ncalgebra(1,D); 
-  ideal I = (k+1)*K - (n-k), (n-k+1)*N - (n+1); 
+  ncalgebra(1,D);
+  ideal I = (k+1)*K - (n-k), (n-k+1)*N - (n+1);
   int is = 2;
   def A  = ratstd(I,is);
   pGBid; // polynomial form
