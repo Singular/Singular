@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.85 2007-05-24 13:33:59 Singular Exp $
+@comment $Id: NEWS.texi,v 1.86 2007-06-22 15:43:26 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -38,9 +38,9 @@ kernel updated for the optional use of boost
 @item
 new operator @code{a:b} gives an @code{intvec} of length @code{b} with constant entries @code{a}
 @item
-new command: (@nref{chinrem}: lifting via chinese remainder theorem)
+new command: (@nref{chinrem}): lifting via chinese remainder theorem
 @item
-new command: (@nref{interpolation}: ideal of points with given multiplicities)
+new command: (@nref{interpolation}): ideal of points with given multiplicities
 @item
 non-commutative kernel subsystem was rewritten in order to support specific algebras more efficiently. 
 Implemented algebras at the moment: super-commutative algebras (in particular exterior algebras).
@@ -49,6 +49,10 @@ Implemented algebras at the moment: super-commutative algebras (in particular ex
 @item
 @nref{simplify} slightly changed: does not omit zero polynomial unless
 specified.
+@item 
+new library: compregb.lib (@nref{compregb_lib}): comprehensive Groebner base system
+@item
+new library: kskernel.lib (@nref{kskernel_lib}): kernel of the kodaira-spencer map
 @item
 new library: modstd.lib (@nref{modstd_lib}): Groebner base computations
 over the rational numbers via modular computations

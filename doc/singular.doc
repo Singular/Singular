@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.160 2007-05-24 12:01:43 Singular Exp $
+@comment $Id: singular.doc,v 1.161 2007-06-22 15:43:37 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -244,6 +244,7 @@ with the @code{--no-stdlib} command line option (see
 
 @menu
 * all_lib:: load all other libraries
+* compregb_lib:: comprehensive Groebner base system
 * general_lib:: procedures of general type
 * inout_lib:: procedures for manipulating in- and output
 * poly_lib:: procedures for manipulating polynomials and ideals
@@ -252,7 +253,7 @@ with the @code{--no-stdlib} command line option (see
 @end menu
 
 @c ----------------------------------------------------------
-@node all_lib, general_lib, General purpose, General purpose
+@node all_lib, compregb_lib, General purpose, General purpose
 @subsection all_lib
 @cindex all_lib
 @cindex all.lib
@@ -268,7 +269,11 @@ LIB "all.lib";
 @c example
 @end smallexample
 @c ----------------------------------------------------------
-@node general_lib, inout_lib, all_lib, General purpose
+@node compregb_lib, general_lib, all_lib, General purpose
+@subsection compregb_lib
+@c lib  compregb.lib
+@c ----------------------------------------------------------
+@node general_lib, inout_lib, compregb_lib, General purpose
 @subsection general_lib
 @c lib  general.lib no_ex
 @c ----------------------------------------------------------
@@ -429,6 +434,7 @@ LIB "all.lib";
 * gmssing_lib:: procedures for gauss-manin system of a singularity
 * gmspoly_lib:: procedures for gauss-manin system of cohomologically tame polynomials
 * hnoether_lib:: procedures for the Hamburger-Noether (Puiseux) development
+* kskernel_lib:: procedures for kernel  of the the kodaira-spencer map
 * mondromy_lib:: procedures to compute the monodromy of a singularity
 * qhmoduli_lib:: procedures for moduli spaces of sqh-singularities
 * sing_lib:: procedures for computing invariants of singularities
@@ -453,7 +459,7 @@ LIB "all.lib";
 @subsection curvepar_lib
 @c lib curvepar.lib
 @c ----------------------------------------------------------
-@node deform_lib, equising_lib, classify_lib, Singularities
+@node deform_lib, equising_lib, curvepar_lib, Singularities
 @subsection deform_lib
 @c lib deform.lib
 @c ----------------------------------------------------------
@@ -469,11 +475,15 @@ LIB "all.lib";
 @subsection gmspoly_lib
 @c lib gmspoly.lib
 @c ---------------------------------------------------------
-@node hnoether_lib, mondromy_lib, gmspoly_lib, Singularities
+@node hnoether_lib, kskernel_lib, gmspoly_lib, Singularities
 @subsection hnoether_lib
 @c lib hnoether.lib
 @c ---------------------------------------------------------
-@node mondromy_lib, qhmoduli_lib, hnoether_lib, Singularities
+@node kskernel_lib, mondromy_lib, hnoether_lib, Singularities
+@subsection kskernel_lib
+@c lib kskernel.lib
+@c ---------------------------------------------------------
+@node mondromy_lib, qhmoduli_lib, kskernel_lib, Singularities
 @subsection mondromy_lib
 @c lib mondromy.lib
 @c ---------------------------------------------------------
