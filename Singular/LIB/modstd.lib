@@ -1,6 +1,6 @@
 //GP, last modified 23.10.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: modstd.lib,v 1.11 2007-06-22 15:27:33 Singular Exp $";
+version="$Id: modstd.lib,v 1.12 2007-06-22 15:30:11 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: modstd.lib  Grobner basis of ideals
@@ -341,7 +341,8 @@ EXAMPLE: example liftPoly; shows an example
    int i;
    list TT;
    for(i=size(T);i>0;i--)
-   { TT[i]=ideal(T[i]);
+   { TT[i]=ideal(T[i]); }
+   T=TT;
    ideal hh=chinrem(T,L);
    poly h=hh[1];
    poly p=lead(h);
