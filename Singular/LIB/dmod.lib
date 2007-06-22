@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.16 2007-06-20 22:53:10 levandov Exp $";
+version="$Id: dmod.lib,v 1.17 2007-06-22 16:00:59 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -69,7 +69,7 @@ convloc(L);         replace global orderings with local in the ringlist L
 minIntRoot(P,fact); minimal integer root among the roots of a maximal ideal P
 varnum(s);          the number of the variable with the name s
 
-SEE ALSO: gmssing_lib for computing the local Bernstein polynomial
+SEE ALSO: gmssing_lib
 ";
 
 LIB "nctools.lib";
