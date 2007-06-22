@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.208 2007-01-15 16:54:50 Singular Exp $
+@comment $Id: general.doc,v 1.209 2007-06-22 15:42:28 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -141,7 +141,8 @@ manual. Furthermore, topic may contain wildcard characters.
 @cindex help browsers
 Online help information can be displayed in various help browsers. The
 following table lists a summary of the supported browsers. See below for
-more details about particular browsers.
+more details about particular browsers. A complete, customizable list
+can be found in the file @code{LIB/help.cnf}.
 
 @multitable @columnfractions .2 .2 .6
 @item @strong{Browser} @tab @strong{Platform}
@@ -216,32 +217,26 @@ system("--browser");
 returns the currently used browser.
 
 If no browser is explicitely set by the user, then the first (w.r.t. the
-order of the browsers in the table above) available browser is
-chosen. In other words, the default browser is @code{netscape} for Unix
-platforms, and @code{html} for Windows, unless
-your local set-up does not allow to run it.
+order of the browsers in the file @code{LIB/help.cnf}) available browser is
+chosen. 
 
 The @code{.singularrc} (@pxref{Startup sequence}) file is a good place
 to set your default browser. Recall that if a file
 @code{$HOME/.singularrc} exists on your system, then the content of this
 file is executed before the first user input. Hence, putting
 @smallexample
-if (system("version") >= 1306) // keep backwards-compatibility
+if (! system("--emacs")
 @{
-  if (! system("--emacs")
-  @{
-    // only set help browser if not running within emacs
-    system("--browser", "info");
-  @}
-  // if help browser is later on set to netscape,
-  // allow it to fetch HTML pages from the net
-  system("--allow-net", 1);
-@}; // the last semicolon is important: otherwise no ">", but "." prompt
+  // only set help browser if not running within emacs
+  system("--browser", "info");
+@}
+// if help browser is later on set to netscape,
+// allow it to fetch HTML pages from the net
+system("--allow-net", 1);
 @end smallexample
 in your file @code{$HOME/.singularrc} sets your default browser to
 @code{info}, unless @sc{Singular} is run within emacs (in which case the
 default browser is set automatically to @code{emacs}).
-
 
 Obviously, certain external files and programs are required for the
 @sc{Singular} help system to work correctly. If something is not available
@@ -252,29 +247,17 @@ or goes wrong, here are some tips for troubleshooting the help system:
 @cindex DISPLAY environment variable
 @cindex environment variable, DISPLAY
 Under Unix, the environment variable @code{DISPLAY} has to be set for
-the browsers @code{netscape}, @code{tkinfo}, and @code{xinfo} to work.
+the browsers all X11 browsers like @code{netscape}, @code{tkinfo}, and @code{xinfo} to work.
 
 @item
-@cindex NETSCAPE environment variable
-@cindex XINFO environment variable
-@cindex XTERM environment variable
-@cindex INFO environment variable
 @cindex help browsers, setting command to use
-The help browsers @code{netscape}, @code{tkinfo}, @code{xinfo}, and
-@code{info} are only available if the respective programs are installed
+The help browsers are only available if the respective programs are installed
 on your system (for @code{xinfo}, the programs @code{xterm} and
 @code{info} are necessary). You can explicitely specify which program to
-use, by setting appropriate environment variables (whose names
-are the names of the respective programs in all up-case letters).
-@*For example,
-to use the program @code{navigator} with a private colormap as
-@code{netscape} help browser, set the environment variable
-@code{NETSCAPE} to the value
-@code{"navigator -install"}.
-@c TBC (@xref{Setting environment variables}).
+use, by changing the entry in @code{LIB/help.cnf}
 
 @item
-If the help browser @code{netscape} can not find the local html
+If the help browser can not find the local html
 pages of the @sc{Singular} manual (which it looks for at
 @code{$RootDir/html} -- see @ref{Loading of a library} for more info on
 @code{$RootDir}) @emph{and} the (command-line) option @code{--allow-net}
