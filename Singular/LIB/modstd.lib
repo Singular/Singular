@@ -1,6 +1,6 @@
 //GP, last modified 23.10.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: modstd.lib,v 1.10 2007-06-20 15:05:00 Singular Exp $";
+version="$Id: modstd.lib,v 1.11 2007-06-22 15:27:33 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: modstd.lib  Grobner basis of ideals
@@ -338,12 +338,15 @@ RETURN:  poly p in Q[x] such that p mod L[i]=T[i]
 EXAMPLE: example liftPoly; shows an example
 "
 {
+   int i;
+   list TT;
+   for(i=size(T);i>0;i--)
+   { TT[i]=ideal(T[i]);
    ideal hh=chinrem(T,L);
    poly h=hh[1];
    poly p=lead(h);
    poly result;
    number n;
-   int i;
    number N=L[1];
    for(i=size(L);i>1;i--)
    {
