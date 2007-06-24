@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.256 2007-06-02 13:28:22 levandov Exp $ */
+/* $Id: extra.cc,v 1.257 2007-06-24 16:53:32 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -114,7 +114,7 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 
 #include "fast_maps.h"
 
-/* #include "shiftgb.h" */
+#include "shiftgb.h"
 
 #ifdef HAVE_EIGENVAL
 #include "eigenval_ip.h"
@@ -2725,6 +2725,61 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 	lVblock=(int)((long)(h->Data()));
 	//	res->data = freegb(I,uptodeg,lVblock);
 	//	res->rtyp = IDEAL_CMD;
+      }
+      else return TRUE;
+      return FALSE;
+    }
+    else
+/*==================== shift-test for freeGB  =================*/
+    if (strcmp(sys_cmd, "stest") == 0)
+    {
+      poly p;
+      int sh,uptodeg, lVblock;
+      if ((h!=NULL) && (h->Typ()==POLY_CMD))
+      {
+	p=(poly)h->CopyD();
+	h=h->next;
+      }
+      else return TRUE;
+      if ((h!=NULL) && (h->Typ()==INT_CMD))
+      {
+	sh=(int)((long)(h->Data()));
+	h=h->next;
+      }
+      else return TRUE;
+
+      if ((h!=NULL) && (h->Typ()==INT_CMD))
+      {
+	uptodeg=(int)((long)(h->Data()));
+	h=h->next;
+      }
+      else return TRUE;
+      if ((h!=NULL) && (h->Typ()==INT_CMD))
+      {
+	lVblock=(int)((long)(h->Data()));
+	res->data = pLPshift(p,sh,uptodeg,lVblock);
+	res->rtyp = POLY_CMD;
+      }
+      else return TRUE;
+      return FALSE;
+    }
+    else
+/*==================== block-test for freeGB  =================*/
+    if (strcmp(sys_cmd, "btest") == 0)
+    {
+      poly p;
+      int lV;
+      if ((h!=NULL) && (h->Typ()==POLY_CMD))
+      {
+	p=(poly)h->CopyD();
+	h=h->next;
+      }
+      else return TRUE;
+      if ((h!=NULL) && (h->Typ()==INT_CMD))
+      {
+	lV=(int)((long)(h->Data()));
+	res->rtyp = INT_CMD;
+	res->data = (void*)pLastVblock(p, lV);
       }
       else return TRUE;
       return FALSE;
