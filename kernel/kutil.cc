@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.60 2007-06-20 13:19:40 wienand Exp $ */
+/* $Id: kutil.cc,v 1.61 2007-06-24 16:44:40 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -49,6 +49,9 @@
 #include "stairc.h"
 #include "kstd1.h"
 #include "pShallowCopyDelete.h"
+
+/* shiftgb stuff */
+#include "shiftgb.h"
 
 #ifdef KDEBUG
 #undef KDEBUG
@@ -6041,5 +6044,582 @@ int posInT_pLength(const TSet set,const int length,LObject &p)
 }
 
 #endif
+
+/* including the self pairs? */
+
+/*1
+* put the pairs (s[i],sh \dot p)  into the set B, ecart=ecart(p)
+*/
+
+void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV)
+{
+  atR = -1;
+  int j;
+  int lb = pLastVblock(p,lV);
+  poly q;
+  for (j=0; j<= uptodeg - lb; j++)
+  {
+    q = pLPshift(p,j,uptodeg,lV);
+    enterOnePairShift(i, q, ecart, isFromQ, strat, -1, uptodeg, lV);
+  }
+}
+
+/*2
+* put the pair (s[i],p)  into the set B, ecart=ecart(p)
+*/
+
+
+void enterOnePairShift (int i, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV)
+{
+
+  /* need additionally: int up_to_degree, poly V0 with the variables in (0)  or just the number lV = the length of the first block */
+  /* should cycle through all shifts of s[i] until up_to_degree - lastVblock(s[i]) */
+  /* that is create the pairs (f, s \dot g) for deg(s\dot g)= */
+  atR = -1;
+  assume(i<=strat->sl);
+  if (strat->interred_flag) return;
+
+  int      l,j,compare;
+  LObject  Lp;
+  Lp.i_r = -1;
+
+#ifdef KDEBUG
+  Lp.ecart=0; Lp.length=0;
+#endif
+  /*- computes the lcm(s[i],p) -*/
+  Lp.lcm = pInit();
+
+  pLcm(p,strat->S[i],Lp.lcm);
+  pSetm(Lp.lcm);
+
+  /* apply the V criterion */
+  if (!isInV(Lp.lcm, lV))
+  {
+    pLmFree(Lp.lcm);
+    Lp.lcm=NULL;
+    return;
+    /* + add the counter for applying the V criterion */
+  }
+
+
+#ifdef HAVE_PLURAL
+  const BOOLEAN bIsPluralRing = rIsPluralRing(currRing);
+  const BOOLEAN bIsSCA        = rIsSCA(currRing) && strat->homog; // for prod-crit
+  const BOOLEAN bNCProdCrit   = ( !bIsPluralRing || bIsSCA ); // commutative or homogeneous SCA
+#else
+  const BOOLEAN bIsPluralRing = FALSE;
+  const BOOLEAN bIsSCA        = FALSE;
+  const BOOLEAN bNCProdCrit   = TRUE;
+#endif
+
+  if (strat->sugarCrit && bNCProdCrit)
+  {
+    if((!((strat->ecartS[i]>0)&&(ecart>0)))
+    && pHasNotCF(p,strat->S[i]))
+    {
+    /*
+    *the product criterion has applied for (s,p),
+    *i.e. lcm(s,p)=product of the leading terms of s and p.
+    *Suppose (s,r) is in L and the leading term
+    *of p divides lcm(s,r)
+    *(==> the leading term of p divides the leading term of r)
+    *but the leading term of s does not divide the leading term of r
+    *(notice that this condition is automatically satisfied if r is still
+    *in S), then (s,r) can be cancelled.
+    *This should be done here because the
+    *case lcm(s,r)=lcm(s,p) is not covered by chainCrit.
+    *
+    *Moreover, skipping (s,r) holds also for the noncommutative case.
+    */
+      strat->cp++;
+      pLmFree(Lp.lcm);
+      Lp.lcm=NULL;
+      return;
+    }
+    else
+      Lp.ecart = si_max(ecart,strat->ecartS[i]);
+    if (strat->fromT && (strat->ecartS[i]>ecart))
+    {
+      pLmFree(Lp.lcm);
+      Lp.lcm=NULL;
+      return;
+      /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
+    }
+    /*
+    *the set B collects the pairs of type (S[j],p)
+    *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p)#lcm(r,p)
+    *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
+    *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
+    */
+    {
+      j = strat->Bl;
+      loop
+      {
+        if (j < 0)  break;
+        compare=pDivComp(strat->B[j].lcm,Lp.lcm);
+        if ((compare==1)
+        &&(sugarDivisibleBy(strat->B[j].ecart,Lp.ecart)))
+        {
+          strat->c3++;
+          if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
+          {
+            pLmFree(Lp.lcm);
+            return;
+          }
+          break;
+        }
+        else
+        if ((compare ==-1)
+        && sugarDivisibleBy(Lp.ecart,strat->B[j].ecart))
+        {
+          deleteInL(strat->B,&strat->Bl,j,strat);
+          strat->c3++;
+        }
+        j--;
+      }
+    }
+  }
+  else /*sugarcrit*/
+  {
+    if (bNCProdCrit)
+    {
+      // if currRing->nc_type!=quasi (or skew)
+      // TODO: enable productCrit for super commutative algebras...
+      if(/*(strat->ak==0) && productCrit(p,strat->S[i])*/
+      pHasNotCF(p,strat->S[i]))
+      {
+      /*
+      *the product criterion has applied for (s,p),
+      *i.e. lcm(s,p)=product of the leading terms of s and p.
+      *Suppose (s,r) is in L and the leading term
+      *of p devides lcm(s,r)
+      *(==> the leading term of p devides the leading term of r)
+      *but the leading term of s does not devide the leading term of r
+      *(notice that tis condition is automatically satisfied if r is still
+      *in S), then (s,r) can be canceled.
+      *This should be done here because the
+      *case lcm(s,r)=lcm(s,p) is not covered by chainCrit.
+      */
+          strat->cp++;
+          pLmFree(Lp.lcm);
+          Lp.lcm=NULL;
+          return;
+      }
+      if (strat->fromT && (strat->ecartS[i]>ecart))
+      {
+        pLmFree(Lp.lcm);
+        Lp.lcm=NULL;
+        return;
+        /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
+      }
+      /*
+      *the set B collects the pairs of type (S[j],p)
+      *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p)#lcm(r,p)
+      *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
+      *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
+      */
+      for(j = strat->Bl;j>=0;j--)
+      {
+        compare=pDivComp(strat->B[j].lcm,Lp.lcm);
+        if (compare==1)
+        {
+          strat->c3++;
+          if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
+          {
+            pLmFree(Lp.lcm);
+            return;
+          }
+          break;
+        }
+        else
+        if (compare ==-1)
+        {
+          deleteInL(strat->B,&strat->Bl,j,strat);
+          strat->c3++;
+        }
+      }
+    }
+  }
+  /*
+  *the pair (S[i],p) enters B if the spoly != 0
+  */
+  /*-  compute the short s-polynomial -*/
+  if (strat->fromT && !TEST_OPT_INTSTRATEGY)
+    pNorm(p);
+  if ((strat->S[i]==NULL) || (p==NULL))
+    return;
+  if ((strat->fromQ!=NULL) && (isFromQ!=0) && (strat->fromQ[i]!=0))
+    Lp.p=NULL;
+  else
+  {
+    #ifdef HAVE_PLURAL
+    if ( bIsPluralRing )
+    {
+      if(pHasNotCF(p, strat->S[i]))
+      {
+        if(ncRingType(currRing) == nc_lie)
+        {
+            // generalized prod-crit for lie-type
+            strat->cp++;
+            Lp.p = nc_p_Bracket_qq(pCopy(p),strat->S[i]);
+        }
+        else
+        if( bIsSCA )
+        {
+            // product criterion for homogeneous case in SCA
+            strat->cp++;
+            Lp.p = NULL;
+        }
+        else
+          Lp.p = nc_CreateSpoly(strat->S[i],p,currRing); // ?
+      }
+      else  Lp.p = nc_CreateSpoly(strat->S[i],p,currRing);
+    }
+    else
+    #endif
+    {
+      Lp.p = ksCreateShortSpoly(strat->S[i],p, strat->tailRing);
+    }
+  }
+  if (Lp.p == NULL)
+  {
+    /*- the case that the s-poly is 0 -*/
+    if (strat->pairtest==NULL) initPairtest(strat);
+    strat->pairtest[i] = TRUE;/*- hint for spoly(S^[i],p)=0 -*/
+    strat->pairtest[strat->sl+1] = TRUE;
+    /*hint for spoly(S[i],p) == 0 for some i,0 <= i <= sl*/
+    /*
+    *suppose we have (s,r),(r,p),(s,p) and spoly(s,p) == 0 and (r,p) is
+    *still in B (i.e. lcm(r,p) == lcm(s,p) or the leading term of s does not
+    *devide lcm(r,p)). In the last case (s,r) can be canceled if the leading
+    *term of p devides the lcm(s,r)
+    *(this canceling should be done here because
+    *the case lcm(s,p) == lcm(s,r) is not covered in chainCrit)
+    *the first case is handeled in chainCrit
+    */
+    if (Lp.lcm!=NULL) pLmFree(Lp.lcm);
+  }
+  else
+  {
+    /*- the pair (S[i],p) enters B -*/
+    Lp.p1 = strat->S[i];
+    Lp.p2 = p;
+
+    if ( !bIsPluralRing )
+      pNext(Lp.p) = strat->tail;
+
+    if (atR >= 0)
+    {
+      Lp.i_r1 = strat->S_2_R[i];
+      Lp.i_r2 = atR;
+    }
+    else
+    {
+      Lp.i_r1 = -1;
+      Lp.i_r2 = -1;
+    }
+    strat->initEcartPair(&Lp,strat->S[i],p,strat->ecartS[i],ecart);
+
+    if (TEST_OPT_INTSTRATEGY)
+    {
+      if (!bIsPluralRing)
+        nDelete(&(Lp.p->coef));
+    }
+
+    l = strat->posInL(strat->B,strat->Bl,&Lp,strat);
+    enterL(&strat->B,&strat->Bl,&strat->Bmax,Lp,l);
+  }
+}
+
+
+
+/*3
+*(s[0],h),...,(s[k],h) will be put to the pairset L
+* additionally we put the pairs (h, s \sdot h) for s>=1 to L
+*/
+void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, int atR)
+{
+  atR = -1;
+  if ((strat->syzComp==0)
+  || (pGetComp(h)<=strat->syzComp))
+  {
+    int j;
+    BOOLEAN new_pair=FALSE;
+
+    if (pGetComp(h)==0)
+    {
+      /* for Q!=NULL: build pairs (f,q),(f1,f2), but not (q1,q2)*/
+      if ((isFromQ)&&(strat->fromQ!=NULL))
+      {
+        for (j=0; j<=k; j++)
+        {
+          if (!strat->fromQ[j])
+          {
+            new_pair=TRUE;
+            enterOnePair(j,h,ecart,isFromQ,strat, atR);
+          //Print("j:%d, Ll:%d\n",j,strat->Ll);
+          }
+        }
+      }
+      else
+      {
+        new_pair=TRUE;
+        for (j=0; j<=k; j++)
+        {
+          enterOnePair(j,h,ecart,isFromQ,strat, atR);
+        }
+	/* HERE we put (h, s*h) pairs */
+      }
+    }
+    else
+    {
+      for (j=0; j<=k; j++)
+      {
+        if ((pGetComp(h)==pGetComp(strat->S[j]))
+        || (pGetComp(strat->S[j])==0))
+        {
+          new_pair=TRUE;
+          enterOnePair(j,h,ecart,isFromQ,strat, atR);
+        //Print("j:%d, Ll:%d\n",j,strat->Ll);
+        }
+      }
+      /* HERE we put (h, s*h) pairs TOO */
+    }
+
+    if (new_pair) chainCrit(h,ecart,strat);
+
+  }
+}
+
+
+
+/*2
+*reduces h with elements from T choosing  the first possible
+* element in t with respect to the given pDivisibleBy
+*/
+int redFirstShift (LObject* h,kStrategy strat)
+{
+  int at,reddeg,d,i;
+  int pass = 0;
+  int j = 0;
+
+  d = pFDeg((*h).p,currRing)+(*h).ecart;
+  reddeg = strat->LazyDegree+d;
+  loop
+  {
+    if (j > strat->sl)
+    {
+      if (TEST_OPT_DEBUG) PrintLn();
+      return 0;
+    }
+    if (TEST_OPT_DEBUG) Print("%d",j);
+    if (pDivisibleBy(strat->S[j],(*h).p))
+    {
+      if (TEST_OPT_DEBUG) PrintS("+\n");
+      /*
+      * the polynomial to reduce with is;
+      * T[j].p
+      */
+      if (!TEST_OPT_INTSTRATEGY)
+        pNorm(strat->S[j]);
+      if (TEST_OPT_DEBUG)
+      {
+        wrp(h->p);
+        PrintS(" with ");
+        wrp(strat->S[j]);
+      }
+      (*h).p = nc_ReduceSpoly(strat->S[j],(*h).p, currRing);
+      //spSpolyRed(strat->T[j].p,(*h).p,strat->kNoether);
+
+      if (TEST_OPT_DEBUG)
+      {
+        PrintS(" to ");
+        wrp(h->p);
+      }
+      if ((*h).p == NULL)
+      {
+        if (h->lcm!=NULL) p_LmFree((*h).lcm, currRing);
+        return 0;
+      }
+      if (TEST_OPT_INTSTRATEGY)
+      {
+        if (rField_is_Zp_a()) pContent(h->p);
+        else pCleardenom(h->p);// also does a pContent
+      }
+      /*computes the ecart*/
+      d = pLDeg((*h).p,&((*h).length),currRing);
+      (*h).FDeg=pFDeg((*h).p,currRing);
+      (*h).ecart = d-(*h).FDeg; /*pFDeg((*h).p);*/
+      if ((strat->syzComp!=0) && !strat->honey)
+      {
+        if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
+        {
+          if (TEST_OPT_DEBUG) PrintS(" > sysComp\n");
+          return 0;
+        }
+      }
+      /*- try to reduce the s-polynomial -*/
+      pass++;
+      /*
+      *test whether the polynomial should go to the lazyset L
+      *-if the degree jumps
+      *-if the number of pre-defined reductions jumps
+      */
+      if ((strat->Ll >= 0)
+      && ((d >= reddeg) || (pass > strat->LazyPass))
+      && !strat->homog)
+      {
+        at = strat->posInL(strat->L,strat->Ll,h,strat);
+        if (at <= strat->Ll)
+        {
+          i=strat->sl+1;
+          do
+          {
+            i--;
+            if (i<0) return 0;
+          } while (!pDivisibleBy(strat->S[i],(*h).p));
+          enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+          if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
+          (*h).p = NULL;
+          return 0;
+        }
+      }
+      if ((TEST_OPT_PROT) && (strat->Ll < 0) && (d >= reddeg))
+      {
+        reddeg = d+1;
+        Print(".%d",d);mflush();
+      }
+      j = 0;
+      if TEST_OPT_DEBUG PrintLn();
+    }
+    else
+    {
+      if (TEST_OPT_DEBUG) PrintS("-");
+      j++;
+    }
+  }
+}
+
+
+/*2
+*  reduction procedure for the homogeneous case
+*  and the case of a degree-ordering
+*/
+int redHomogShift (LObject* h,kStrategy strat)
+{
+  if (strat->tl<0) return 1;
+  //if (h->GetLmTailRing()==NULL) return 0; // HS: SHOULD NOT BE NEEDED!
+  assume(h->FDeg == h->pFDeg());
+
+  poly h_p;
+  int i,j,at,pass, ii;
+  unsigned long not_sev;
+  long reddeg,d;
+
+  pass = j = 0;
+  d = reddeg = h->GetpFDeg();
+  h->SetShortExpVector();
+  int li;
+  h_p = h->GetLmTailRing();
+  not_sev = ~ h->sev;
+  loop
+  {
+    j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
+    if (j < 0) return 1;
+
+    li = strat->T[j].pLength;
+    ii = j;
+    /*
+     * the polynomial to reduce with (up to the moment) is;
+     * pi with length li
+     */
+    i = j;
+#if 1
+    if (TEST_OPT_LENGTH)
+    loop
+    {
+      /*- search the shortest possible with respect to length -*/
+      i++;
+      if (i > strat->tl)
+        break;
+      if (li<=1)
+        break;
+      if ((strat->T[i].pLength < li)
+         &&
+          p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
+                               h_p, not_sev, strat->tailRing))
+      {
+        /*
+         * the polynomial to reduce with is now;
+         */
+        li = strat->T[i].pLength;
+        ii = i;
+      }
+    }
+#endif
+
+    /*
+     * end of search: have to reduce with pi
+     */
+#ifdef KDEBUG
+    if (TEST_OPT_DEBUG)
+    {
+      PrintS("red:");
+      h->wrp();
+      PrintS(" with ");
+      strat->T[ii].wrp();
+    }
+#endif
+    assume(strat->fromT == FALSE);
+
+    ksReducePoly(h, &(strat->T[ii]), NULL, NULL, strat);
+
+#ifdef KDEBUG
+    if (TEST_OPT_DEBUG)
+    {
+      PrintS("\nto ");
+      h->wrp();
+      PrintLn();
+    }
+#endif
+
+    h_p = h->GetLmTailRing();
+    if (h_p == NULL)
+    {
+      if (h->lcm!=NULL) pLmFree(h->lcm);
+#ifdef KDEBUG
+      h->lcm=NULL;
+#endif
+      return 0;
+    }
+    h->SetShortExpVector();
+    not_sev = ~ h->sev;
+    /*
+     * try to reduce the s-polynomial h
+     *test first whether h should go to the lazyset L
+     *-if the degree jumps
+     *-if the number of pre-defined reductions jumps
+     */
+    pass++;
+    if (!K_TEST_OPT_REDTHROUGH && (strat->Ll >= 0) && (pass > strat->LazyPass))
+    {
+      h->SetLmCurrRing();
+      at = strat->posInL(strat->L,strat->Ll,h,strat);
+      if (at <= strat->Ll)
+      {
+        int dummy=strat->sl;
+        if (kFindDivisibleByInS(strat, &dummy, h) < 0)
+          return 1;
+        enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+#ifdef KDEBUG
+        if (TEST_OPT_DEBUG)
+          Print(" lazy: -> L%d\n",at);
+#endif
+        h->Clear();
+        return -1;
+      }
+    }
+  }
+}
 
 #endif // KUTIL_CC

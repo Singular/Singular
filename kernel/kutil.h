@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.24 2007-05-19 13:22:22 wienand Exp $ */
+/* $Id: kutil.h,v 1.25 2007-06-24 16:44:41 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -639,5 +639,17 @@ KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
   kStrategy strat);
 #include "kInline.cc"
 
+/* shiftgb stuff */
+#include "shiftgb.h"
+void enterOnePairShift(int i, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV);
 
+void enterOnePairManyShifts(int i, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV);
+
+void initenterpairsShift (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR);
+
+void initBbaShift(ideal F,kStrategy strat);
+
+int redFirstShift (LObject* h,kStrategy strat);
+
+ideal freegb(ideal I, int uptodeg, int lVblock);
 #endif
