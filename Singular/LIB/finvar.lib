@@ -1,23 +1,23 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.68 2007-03-29 14:36:01 king Exp $"
+version="$Id: finvar.lib,v 1.69 2007-06-25 18:14:48 king Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
 AUTHOR: Agnes E. Heydtmann, email: agnes@math.uni-sb.de;
-        Simon A. King, email: king@mfo.de
+        Simon A. King, email: king@mathematik.uni-jena.de
 OVERVIEW:
  A library for computing polynomial invariants of finite matrix groups and
  generators of related varieties. The algorithms are based on B. Sturmfels,
- G. Kemper and W. Decker et al..
+ G. Kemper, S. King and W. Decker et al..
 
 MAIN PROCEDURES:
  invariant_ring()                  generators of the invariant ring (i.r.)
  invariant_ring_random()           generators of the i.r., randomized alg.
  primary_invariants()              primary invariants (p.i.)
  primary_invariants_random()       primary invariants, randomized alg.
- invariant_algebra_reynolds()      minimal (algebra) generating set for the invariant
+ invariant_algebra_reynolds()      minimal generating set for the invariant
                                    ring of a finite matrix group, in the non-modular case
- invariant_algebra_perm()          minimal (algebra) generating set for the invariant
+ invariant_algebra_perm()          minimal generating set for the invariant
                                    ring or a permutation group, in the non-modular case
 
 AUXILIARY PROCEDURES:
@@ -69,8 +69,8 @@ AUXILIARY PROCEDURES:
 // search_random                   searches a # of p.i., char 0, randomized
 // p_search_random                 searches a # of p.i., char p, randomized
 // concat_intmat                   concatenates two integer matrices
-// GetGroup                        disjoint cycle presentation of perm. group
-//                                 -> permuation matrices
+// GetGroup                        gets disjoint cycle presentation of perm. group,
+//                                 yields permuation matrices
 ///////////////////////////////////////////////////////////////////////////////
 
 LIB "matrix.lib";
@@ -4459,9 +4459,9 @@ DISPLAY:  Information on the progress of the computations if v is an integer
 THEORY:   The secondary invariants are calculated by finding a basis (in terms
           of monomials) of the basering modulo the primary invariants, mapping
           those to invariants with the Reynolds operator. Among these images
-          or their power products we pick a maximal subset that is linearly
-          independent modulo the primary invariants using Groebner basis techniques
-          (see paper \"Fast Computation of Secondary Invariants\" by S. King).
+          or their power products we pick secondary invariants using Groebner 
+          basis techniques (see S. King: Fast Computation of Secondary 
+          Invariants).
           The size of this set can be read off from the Molien series.
 NOTE:     Secondary invariants are not uniquely determined by the given data.
           Specifically, the output of secondary_char0(P,REY,M,\"old\") will
@@ -4911,9 +4911,8 @@ DISPLAY:  Information on the progress of computations if v does not equal 0
 THEORY:   The secondary invariants are calculated by finding a basis (in terms
           of monomials) of the basering modulo the primary invariants, mapping
           those to invariants with the Reynolds operator. Among these images
-          or their power products we pick a maximal subset that is linearly
-          independent modulo the primary invariants using Groebner basis techniques
-          (see paper \"Fast Computation of Secondary Invariants\" by S. King).
+          or their power products we pick secondary invariants using Groebner 
+          basis techniques (see S. King: Fast Computation of Secondary Invariants).
           The size of this set can be read off from the Molien series. Here, only
           irreducible secondary invariants are explicitly computed, which saves time and
           memory.
@@ -5643,9 +5642,8 @@ DISPLAY:  information if v does not equal 0
 THEORY:   The secondary invariants are calculated by finding a basis (in terms
           of monomials) of the basering modulo the primary invariants, mapping
           those to invariants with the Reynolds operator. Among these images
-          or their power products we pick a maximal subset that is linearly
-          independent modulo the primary invariants using Groebner basis techniques
-          (see paper \"Fast Computation of Secondary Invariants\" by S. King).
+          or their power products we pick secondary invariants using Groebner 
+          basis techniques (see S. King: Fast Computation of Secondary Invariants).
           The size of this set can be read off from the Molien series.
 EXAMPLE:  example secondary_charp; shows an example
 "
@@ -6104,8 +6102,8 @@ THEORY:   Secondary invariants are calculated by finding a basis (in terms of
           we are in the non-modular case. Therefore, the invariant ring is Cohen-Macaulay,
           hence the number of secondary invariants is the product of the degrees of
           primary invariants divided by the group order.
-          <secondary_and_irreducibles_no_molien> should usually be faster and of more useful
-          functionality.
+NOTE:     <secondary_and_irreducibles_no_molien> should usually be faster and of 
+          more useful functionality.
 SEE ALSO: secondary_and_irreducibles_no_molien
 EXAMPLE:  example secondary_no_molien; shows an example
 "
@@ -6350,13 +6348,13 @@ DISPLAY: information if v does not equal 0
 THEORY:  Secondary invariants are calculated by finding a basis (in terms of
          monomials) of the basering modulo primary invariants, mapping those to
          invariants with the Reynolds operator. Among these images
-         or their power products we pick a maximal subset that is linearly
-         independent modulo the primary invariants using Groebner basis techniques
-         (see paper \"Fast Computation of Secondary Invariants\" by S. King).
+         or their power products we pick secondary invariants using Groebner 
+         basis techniques (see S. King: Fast Computation of Secondary Invariants).
          We have the Reynolds operator, hence, we are in the non-modular case.
          Therefore, the invariant ring is Cohen-Macaulay, hence the number of
          secondary invariants is the product of the degrees of primary invariants
          divided by the group order.
+SEE ALSO: secondary_no_molien
 EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
 "
 { int pieces = 3;    // For generating reducible secondaries, blocks of #pieces# secondaries
@@ -6765,9 +6763,9 @@ DISPLAY: information if v does not equal 0
 THEORY:  Irred. secondary invariants are calculated by finding a basis (in terms of
          monomials) of the basering modulo primary and previously found secondary
          invariants, mapping those to invariants with the Reynolds operator. Among
-         these images we pick a maximal subset that is linearly independent modulo
-         the primary and previously found secondary invariants, using Groebner basis
+         these images we pick secondary invariants, using Groebner basis
          techniques.
+SEE ALSO: irred_secondary_char0
 EXAMPLE: example irred_secondary_no_molien; shows an example
 "
 { int MonStep = 29;
@@ -7646,7 +7644,7 @@ proc rel_orbit_variety(ideal I,matrix F,list #)
 @*          s: optional <string>; if s is present then (for downward
                compatibility) the old procedure <relative_orbit_variety>
                is called, and in this case s gives the name of a new <ring>.
-RETURN:   Without optional s, a list L of two rings is returned.
+RETURN:   Without optional string s, a list L of two rings is returned.
 @*        The ring L[1] carries a weighted degree order with variables
             y(1..m), the weight of y(k) equal to the degree of the
             k-th generators F[1,k] of the invariant ring.
@@ -7662,7 +7660,8 @@ RETURN:   Without optional s, a list L of two rings is returned.
             of the invariant ring yields p. This can be used to avoid the
             application of <algebra_containment>
             (see @ref{algebra_containment}).
-@*        For the case of optional s, see @ref{relative_orbit_variety}.
+@*        For the case of optional string s, the function is equivalent to
+          @ref{relative_orbit_variety}.
 THEORY:   A Groebner basis of the ideal of algebraic relations of the invariant
           ring generators is calculated, then one of the basis elements plus
           the ideal generators. The variables of the original ring are
@@ -7935,7 +7934,7 @@ static proc GetMatrix(list GEN)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Input: Disjoint cycle presentation of a permutation group
-// Output: Permuation matrices representing that group
+// Output: Permutation matrices representing that group
 ///////////////////////////////////////////////////////////////////////////////
 proc GetGroup(list GRP)
 { list L;
@@ -8130,11 +8129,13 @@ RETURN:   A minimal homogeneous generating set of the invariant ring of the grou
           by GEN, type <matrix>
 ASSUME:   We are in the non-modular case, i.e., the characteristic of the basering
           does not divide the group order. Note that the function does not verify whether
-          the assumption holds or not
+          this assumption holds or not
 DISPLAY:  Information on the progress of computations if v does not equal 0
 THEORY:   We do an incremental search in increasing degree d. Generators of the invariant
           ring are found among the orbit sums of degree d. The generators are chosen by
-          Groebner basis techniques.
+          Groebner basis techniques (see S. King: Minimal generating sets of non-modular 
+          invariant rings of finite groups).
+NOTE:     invariant_algebra_perm should not be used in rings with weighted orders. 
 SEE ALSO: invariant_algebra_reynolds
 KEYWORDS: invariant ring minimal generating set permutation group
 EXAMPLE:  example invariant_algebra_perm; shows an example
@@ -8311,7 +8312,9 @@ ASSUME:   We are in the non-modular case, i.e., the characteristic of the baseri
 DISPLAY:  Information on the progress of computations if v does not equal 0
 THEORY:   We do an incremental search in increasing degree d. Generators of the invariant
           ring are found among the Reynolds images of monomials of degree d. The generators are
-          chosen by Groebner basis techniques.
+          chosen by Groebner basis techniques (see S. King: Minimal generating sets of 
+          non-modular invariant rings of finite groups).
+NOTE:     invariant_algebra_reynolds should not be used in rings with weighted orders.
 SEE ALSO: invariant_algebra_perm
 KEYWORDS: invariant ring minimal generating set matrix group
 EXAMPLE:  example invariant_algebra_reynolds; shows an example
