@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.446 2007-06-19 09:12:41 Singular Exp $ */
+/* $Id: iparith.cc,v 1.447 2007-06-26 18:52:11 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3361,6 +3361,13 @@ static BOOLEAN jjPLUSPLUS(leftv res, leftv u)
   }
   return TRUE;
 }
+static BOOLEAN jjUMINUS_BI(leftv res, leftv u)
+{
+  number n=(number)u->CopyD(BIGINT_CMD);
+  n=nlNeg(n);
+  res->data = (char *)n;
+  return FALSE;
+}
 static BOOLEAN jjUMINUS_I(leftv res, leftv u)
 {
   res->data = (char *)(-(long)u->Data());
@@ -4796,6 +4803,7 @@ struct sValCmd1 dArith1[]=
  {jjPLUSPLUS,   PLUSPLUS,        NONE,           IDHDL          ALLOW_PLURAL}
 ,{jjPLUSPLUS,   MINUSMINUS,      NONE,           IDHDL          ALLOW_PLURAL}
 ,{jjUMINUS_I,   '-',             INT_CMD,        INT_CMD        ALLOW_PLURAL}
+,{jjUMINUS_BI,   '-',            BIGINT_CMD,     BIGINT_CMD     ALLOW_PLURAL}
 ,{jjUMINUS_N,   '-',             NUMBER_CMD,     NUMBER_CMD     ALLOW_PLURAL}
 ,{jjUMINUS_P,   '-',             POLY_CMD,       POLY_CMD       ALLOW_PLURAL}
 ,{jjUMINUS_P,   '-',             VECTOR_CMD,     VECTOR_CMD     ALLOW_PLURAL}
