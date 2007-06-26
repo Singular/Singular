@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.6 2007-06-20 09:39:25 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.7 2007-06-26 18:34:16 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -348,8 +348,36 @@ number nrnNeg (number c)
   return nrnNegM(c);
 }
 
+NATNUMBER nrnMapModul;
+NATNUMBER nrnMapCoef;
+
+number nrnMapModN(number from)
+{
+  NATNUMBER i = (nrnMapCoef * (NATNUMBER) from) % nrnModul;
+  return (number) i;
+}
+
 nMapFunc nrnSetMap(ring src, ring dst)
 {
+  if (rField_is_Ring_ModN(src))
+  {
+    if (src->ringflaga == dst->ringflaga) return ndCopy;
+    else
+    {
+      nrnMapModul = (NATNUMBER) src->ringflaga;
+      if (nrnModul % nrnMapModul == 0)
+      {
+        nrnMapCoef = (nrnModul / nrnMapModul);
+        NATNUMBER tmp = nrnModul;
+        nrnModul = nrnMapModul;
+        nrnMapCoef *= (NATNUMBER) nrnInvers((number) (nrnMapCoef % nrnMapModul));
+        nrnModul = tmp;
+      }
+      else
+        nrnMapCoef = 1;
+      return nrnMapModN;
+    }
+  }
   return NULL;      /* default */
 }
 
