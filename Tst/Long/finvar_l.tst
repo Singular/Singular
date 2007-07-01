@@ -349,9 +349,11 @@ tst_status();
 ring R14 = 0,(x(1..9)),dp;
 matrix Gperm = 
    invariant_algebra_perm(list(list(list(1,2,3,4,5,6,7,8,9))));
+tst_status();
 list L = group_reynolds(GetGroup(list(list(list(1,2,3,4,5,6,7,8,9)))));
 matrix Grey  = 
    invariant_algebra_reynolds(L[1]);
+tst_status();
 // the following is not unique!
 Gperm;
 Grey;
@@ -359,7 +361,7 @@ Grey;
 matrix Tst14a = groebner(ideal(Gperm));
 matrix Tst14b = groebner(ideal(Grey));
 Tst14a;
-Test14a==Tst14b;
+Tst14a==Tst14b;
 
 
 tst_status(1);$
