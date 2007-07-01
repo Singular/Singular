@@ -23,6 +23,7 @@ example primary_char0_random;
 example primary_charp_random;
 example primary_char0_no_molien_random;
 example primary_charp_no_molien_random;
+// the following randomized example often fails:
 example primary_charp_without_random;
 example primary_invariants_random;
 example power_products;
