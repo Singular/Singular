@@ -323,8 +323,6 @@ matrix TST12b = groebner(ideal(P)+ideal(IS2));
 TST12a;
 TST12a==TST12b;
 tst_status();
-kill R12;
-tst_status(1);$
 
 ring R13 = (0),(W1,W2,W3,V1,V2,V3,V4,V5,V6,V7,V8,V9,V10,V11,V12,V13,V14,V15,V16,V17,V18,V19),(L(255),dp(22),C);
 matrix P[1][22] = W1+W2+W3,W1*W2+W1*W3+W2*W3,W1*W2*W3,V6,V1,V2+V13+V18,V2*V13+V2*V18+V13*V18,V2*V13*V18,V3+V4+V7+V8+V10+V12,V7*V8+V3*V10+V4*V12,V4*V7+V3*V8+V10*V12,V3*V7+V4*V8+V4*V10+V8*V10+V3*V12+V7*V12,V3*V4*V10+V3*V7*V10+V7*V8*V10+V3*V4*V12+V4*V8*V12+V7*V8*V12,V3^6+V4^6+V7^6+V8^6+V10^6+V12^6,V11+V15,V11*V15,V5+V9+V14+V16+V17+V19,V5*V16+V9*V17+V14*V19,V9*V14+V16*V17+V5*V19,V5*V14+V9*V16+V5*V17+V14*V17+V9*V19+V16*V19,V5*V9*V16+V5*V14*V16+V5*V9*V17+V14*V16*V19+V9*V17*V19+V14*V17*V19,V5^6+V9^6+V14^6+V16^6+V17^6+V19^6;
@@ -347,7 +345,21 @@ matrix TST13b = groebner(ideal(P)+ideal(IS2));
 TST13a;
 TST13a==TST13b;
 tst_status();
-kill R13;
-listvar();
+
+ring R14 = 0,(x(1..9)),dp;
+matrix Gperm = 
+   invariant_algebra_perm(list(list(list(1,2,3,4,5,6,7,8,9))));
+list L = group_reynolds(GetGroup(list(list(list(1,2,3,4,5,6,7,8,9)))));
+matrix Grey  = 
+   invariant_algebra_reynolds(L[1]);
+// the following is not unique!
+Gperm;
+Grey;
+// the following is unique!
+matrix Tst14a = groebner(ideal(Gperm));
+matrix Tst14b = groebner(ideal(Grey));
+Tst14a;
+Test14a==Tst14b;
+
 
 tst_status(1);$
