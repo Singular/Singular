@@ -39,7 +39,7 @@ example orbit_variety; newline;
 example rel_orbit_variety; newline;
 example relative_orbit_variety; newline;
 example image_of_variety; newline;
-example orbit_sums; newbline;
+example orbit_sums; newline;
 
 tst_status(1);
 $
