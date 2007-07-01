@@ -4,8 +4,11 @@ tst_init();
 LIB "finvar.lib";
 
 example invariant_ring; newline;
+example invariant_ring_random; newline;
 example primary_invariants; newline;
 example primary_invariants_random; newline;
+example invariant_algebra_reynolds; newline;
+example invariant_algebra_perm; newline;
 example cyclotomic; newline;
 example group_reynolds; newline;
 example molien; newline;
@@ -25,13 +28,18 @@ example primary_char0_no_molien_random; newline;
 example primary_charp_no_molien_random; newline;
 example primary_charp_without_random; newline;
 example power_products; newline;
+example secondary_char0; newline;
+example irred_secondary_char0; newline;
 example secondary_charp; newline;
 example secondary_no_molien; newline;
+example irred_secondary_no_molien; newline;
 example secondary_and_irreducibles_no_molien; newline;
 example secondary_not_cohen_macaulay; newline;
 example orbit_variety; newline;
+example rel_orbit_variety; newline;
 example relative_orbit_variety; newline;
 example image_of_variety; newline;
+example orbit_sums; newbline;
 
 tst_status(1);
 $
