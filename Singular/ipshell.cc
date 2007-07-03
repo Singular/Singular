@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.160 2007-06-20 09:41:43 wienand Exp $ */
+/* $Id: ipshell.cc,v 1.161 2007-07-03 13:21:21 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -715,24 +715,32 @@ leftv iiMap(map theMap, char * what)
         IDMAP(w)->preimage=0;
       }
       tmpW.data=IDDATA(w);
-      #ifdef FAST_MAP
-      if ((tmpW.rtyp==IDEAL_CMD) && (nMap==nCopy)
-      #ifdef HAVE_PLURAL
-      && (!rIsPluralRing(currRing))
-      #endif
-      )
+      if (((tmpW.rtyp==IDEAL_CMD)||(tmpW.rtyp==MODUL_CMD)) && idIs0(IDIDEAL(w)))
       {
-        v->rtyp=IDEAL_CMD;
-        v->data=fast_map(IDIDEAL(w), IDRING(r), (ideal)theMap, currRing);
+        v->rtyp=tmpW.rtyp;
+        v->data=idInit(IDELEMS(IDIDEAL(w)),IDIDEAL(w)->rank);
       }
       else
-      #endif
-      if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,IDRING(r),NULL,NULL,0,nMap))
       {
-        Werror("cannot map %s(%d)",Tok2Cmdname(w->typ),w->typ);
-        omFreeBin((ADDRESS)v, sleftv_bin);
-        if (save_r!=NULL) IDMAP(w)->preimage=save_r;
-        return NULL;
+        #ifdef FAST_MAP
+        if ((tmpW.rtyp==IDEAL_CMD) && (nMap==nCopy)
+        #ifdef HAVE_PLURAL
+        && (!rIsPluralRing(currRing))
+        #endif
+        )
+        {
+          v->rtyp=IDEAL_CMD;
+          v->data=fast_map(IDIDEAL(w), IDRING(r), (ideal)theMap, currRing);
+        }
+        else
+        #endif
+        if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,IDRING(r),NULL,NULL,0,nMap))
+        {
+          Werror("cannot map %s(%d)",Tok2Cmdname(w->typ),w->typ);
+          omFreeBin((ADDRESS)v, sleftv_bin);
+          if (save_r!=NULL) IDMAP(w)->preimage=save_r;
+          return NULL;
+        }
       }
       if (save_r!=NULL)
       {
@@ -2010,8 +2018,8 @@ ring rCompose(const lists  L)
         if (IDELEMS(R->algring->qideal)==1)
         {
           R->minpoly=naInit(1);
-	  lnumber n=(lnumber)R->minpoly;
-	  n->z=R->algring->qideal->m[0];
+          lnumber n=(lnumber)R->minpoly;
+          n->z=R->algring->qideal->m[0];
           R->algring->qideal->m[0]=NULL;
           idDelete(&(R->algring->qideal));
         }
@@ -2081,27 +2089,27 @@ ring rCompose(const lists  L)
         if (par_perm_size!=0)
           par_perm=(int *)omAlloc0(par_perm_size*sizeof(int));
         int i;
-	#if 0
-	// use imap:
+        #if 0
+        // use imap:
         maFindPerm(orig_ring->names,orig_ring->N,orig_ring->parameter,orig_ring->P,
           currRing->names,currRing->N,currRing->parameter, currRing->P,
           perm,par_perm, currRing->ch);
-	#else
-	// use fetch
-	if ((rPar(orig_ring)>0) && (rPar(currRing)==0))
-	{
-	  for(i=si_min(rPar(orig_ring),rVar(currRing))-1;i>=0;i--) par_perm[i]=i+1;
-	}
-	else if (par_perm_size!=0)
-	  for(i=si_min(rPar(orig_ring),rPar(currRing))-1;i>=0;i--) par_perm[i]=-(i+1);
-	for(i=si_min(orig_ring->N,pVariables);i>0;i--) perm[i]=i;
-	#endif
+        #else
+        // use fetch
+        if ((rPar(orig_ring)>0) && (rPar(currRing)==0))
+        {
+          for(i=si_min(rPar(orig_ring),rVar(currRing))-1;i>=0;i--) par_perm[i]=i+1;
+        }
+        else if (par_perm_size!=0)
+          for(i=si_min(rPar(orig_ring),rPar(currRing))-1;i>=0;i--) par_perm[i]=-(i+1);
+        for(i=si_min(orig_ring->N,pVariables);i>0;i--) perm[i]=i;
+        #endif
         ideal dest_id=idInit(IDELEMS(q),1);
         for(i=IDELEMS(q)-1; i>=0; i--)
         {
           dest_id->m[i]=pPermPoly(q->m[i],perm,orig_ring,nMap,
                                   par_perm,par_perm_size);
-	  //  PrintS("map:");pWrite(dest_id->m[i]);PrintLn();
+          //  PrintS("map:");pWrite(dest_id->m[i]);PrintLn();
           pTest(dest_id->m[i]);
         }
         R->qideal=dest_id;
@@ -4784,8 +4792,8 @@ ideal kGroebner(ideal F, ideal Q)
   idhdl h=ggetid("groebner",FALSE);
   sleftv u; memset(&u,0,sizeof(u)); u.rtyp=IDHDL; u.data=(char *) h;
             u.name=IDID(h);
-  
-  sleftv res; memset(&res,0,sizeof(res)); 
+
+  sleftv res; memset(&res,0,sizeof(res));
   if(jjPROC(&res,&u,&v))
   {
     resid=kStd(F,Q,testHomog,NULL);
