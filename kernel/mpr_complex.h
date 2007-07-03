@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.h,v 1.4 2004-07-30 12:18:50 Singular Exp $ */
+/* $Id: mpr_complex.h,v 1.5 2007-07-03 14:45:57 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -116,7 +116,7 @@ public:
 
   inline int sign()    // t>0:+1, t==0:0, t<0:-1
   { return mpf_sgn( t ); };
-  
+
   bool isZero();  // t == 0 ?
   bool isOne();   // t == 1 ?
   bool isMOne();  // t == -1 ?
@@ -126,7 +126,7 @@ public:
   // access
   inline const mpf_t *mpfp() const { return &t; };
   inline mpf_t *_mpfp() { return &t; };
-  
+
   inline operator double() { return mpf_get_d( t ); };
   inline operator double() const { return mpf_get_d( t ); };
 
@@ -139,7 +139,7 @@ public:
     { return (int)mpf_get_si( t ); }
     return 0;
   };
-#endif  
+#endif
 
 private:
   mpf_t t;
@@ -225,6 +225,8 @@ public:
   inline void real( gmp_float val ) { r = val; }
   inline void imag( gmp_float val ) { i = val; }
 
+
+  inline bool isZero() { return (r.isZero() && i.isZero()); }
   void SmallToZero();
 };
 

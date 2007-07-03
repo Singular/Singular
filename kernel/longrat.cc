@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.17 2007-04-19 14:17:58 Singular Exp $ */
+/* $Id: longrat.cc,v 1.18 2007-07-03 14:45:56 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -455,7 +455,7 @@ number nlInvers(number a)
     }
     if (nlIsZero(a))
     {
-      WerrorS("div. 1/0");
+      WerrorS(nDivBy0);
       return INT_TO_SR(0);
     }
     n=(number)omAllocBin(rnumber_bin);
@@ -543,7 +543,7 @@ number   nlExactDiv(number a, number b)
 {
   if (b==INT_TO_SR(0))
   {
-    WerrorS("div. by 0");
+    WerrorS(nDivBy0);
     return INT_TO_SR(0);
   }
   if (a==INT_TO_SR(0))
@@ -609,7 +609,7 @@ number nlIntDiv (number a, number b)
 {
   if (b==INT_TO_SR(0))
   {
-    WerrorS("div. by 0");
+    WerrorS(nDivBy0);
     return INT_TO_SR(0);
   }
   if (a==INT_TO_SR(0))
@@ -690,7 +690,7 @@ number nlIntMod (number a, number b)
 {
   if (b==INT_TO_SR(0))
   {
-    WerrorS("div. by 0");
+    WerrorS(nDivBy0);
     return INT_TO_SR(0);
   }
   if (a==INT_TO_SR(0))
@@ -790,7 +790,7 @@ number nlDiv (number a, number b)
   number u;
   if (nlIsZero(b))
   {
-    WerrorS("div. by 0");
+    WerrorS(nDivBy0);
     return INT_TO_SR(0);
   }
   u=(number)omAllocBin(rnumber_bin);

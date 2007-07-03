@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.2 2004-07-30 12:18:50 Singular Exp $ */
+/* $Id: gnumpfl.cc,v 1.3 2007-07-03 14:45:56 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -175,9 +175,9 @@ number ngfNeg (number a)
 number ngfInvers(number a)
 {
   gmp_float* r= NULL;
-  if ( (a==NULL) /*|| ((gmp_float*)a)->isZero()*/ )
+  if ( (a==NULL) || ((gmp_float*)a)->isZero() )
   {
-    WerrorS("div. 1/0");
+    WerrorS(nDivBy0);
   }
   else
   {
@@ -258,15 +258,15 @@ number ngfMult (number a, number b)
 */
 number ngfDiv (number a, number b)
 {
-  if ( b==NULL /*|| ((gmp_float*)b)->isZero()*/ )
-  {
-    // a/0 = error
-    WerrorS("div. 1/0");
-    return NULL;
-  }
-  else if ( a==NULL )
+  if ( a==NULL )
   {
     // 0/b = 0
+    return NULL;
+  }
+  else if ( b==NULL || ((gmp_float*)b)->isZero() )
+  {
+    // a/0 = error
+    WerrorS(nDivBy0);
     return NULL;
   }
   gmp_float* r= new gmp_float( (*(gmp_float*)a) / (*(gmp_float*)b) );

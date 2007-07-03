@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.8 2007-01-15 17:12:09 Singular Exp $ */
+/* $Id: modulop.cc,v 1.9 2007-07-03 14:45:56 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -171,7 +171,7 @@ number npDiv (number a,number b)
 #ifndef HAVE_DIV_MOD
   if ((long)b==0)
   {
-    WerrorS("div by 0");
+    WerrorS(nDivBy0);
     return (number)0;
   }
   else
@@ -563,7 +563,7 @@ number nvDiv (number a,number b)
     return (number)0;
   else if ((long)b==0)
   {
-    WerrorS("div by 0");
+    WerrorS(nDivBy0);
     return (number)0;
   }
   else
@@ -576,7 +576,7 @@ number  nvInvers (number c)
 {
   if ((long)c==0)
   {
-    WerrorS("1/0");
+    WerrorS(nDivBy0);
     return (number)0;
   }
   return nvInversM(c);

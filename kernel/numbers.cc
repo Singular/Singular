@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.10 2007-06-20 09:39:24 wienand Exp $ */
+/* $Id: numbers.cc,v 1.11 2007-07-03 14:45:57 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -71,7 +71,6 @@ void   (*n__Delete)(number *a, const ring r);
 
 /*0 implementation*/
 number nNULL; /* the 0 as constant */
-
 
 n_Procs_s *cf_root=NULL;
 

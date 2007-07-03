@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.3 2005-05-18 15:39:19 Singular Exp $ */
+/* $Id: gnumpc.cc,v 1.4 2007-07-03 14:45:56 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -178,10 +178,11 @@ number ngcNeg (number a)
 */
 number ngcInvers(number a)
 {
-  gmp_complex* r= NULL;
-  if ( (a==NULL) /*|| ((gmp_complex*)a)->isZero()*/ )
+  gmp_complex* r = NULL;
+  if ( (a==NULL)
+  || (((gmp_complex*)a)->isZero()))
   {
-    WerrorS("div. 1/0");
+    WerrorS(nDivBy0);
   }
   else
   {
@@ -263,15 +264,16 @@ number ngcMult (number a, number b)
 */
 number ngcDiv (number a, number b)
 {
-  if ( b==NULL /*|| ((gmp_float*)b)->isZero()*/ )
-  {
-    // a/0 = error
-    WerrorS("div. 1/0");
-    return NULL;
-  }
-  else if ( a==NULL )
+  if ( a==NULL )
   {
     // 0/b = 0
+    return NULL;
+  }
+  else if (( b==NULL )
+  || (((gmp_complex*)b)->isZero()))
+  {
+    // a/0 = error
+    WerrorS(nDivBy0);
     return NULL;
   }
   gmp_complex* r= new gmp_complex( (*(gmp_complex*)a) / (*(gmp_complex*)b) );

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shortfl.cc,v 1.2 2005-07-27 15:48:29 Singular Exp $ */
+/* $Id: shortfl.cc,v 1.3 2007-07-03 14:45:57 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -151,7 +151,7 @@ number nrDiv (number a,number b)
   float n = nf(b).F();
   if (n == 0.0)
   {
-    WerrorS("a/0");
+    WerrorS(nDivBy0);
     return nf((float)0.0).N();
   }
   else
@@ -163,7 +163,7 @@ number  nrInvers (number c)
   float n = nf(c).F();
   if (n == 0.0)
   {
-    WerrorS("1/0");
+    WerrorS(nDivBy0);
     return nf((float)0.0).N();
   }
   return nf(1.0 / n).N();

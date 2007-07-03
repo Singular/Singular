@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.27 2007-05-22 13:29:48 Singular Exp $ */
+/* $Id: longalg.cc,v 1.28 2007-07-03 14:45:56 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1231,7 +1231,7 @@ number naIntDiv(number la, number lb)
   }
   if (b==NULL)
   {
-    WerrorS("div. by 0");
+    WerrorS(nDivBy0);
     return NULL;
   }
   naNormalize(la);
@@ -1264,7 +1264,7 @@ number naDiv(number la, number lb)
 
   if ((b==NULL) || (b->z==NULL))
   {
-    WerrorS("div. by 0");
+    WerrorS(nDivBy0);
     return NULL;
   }
   omCheckAddrSize(a,sizeof(snumber));
@@ -1339,7 +1339,7 @@ number naInvers(number a)
 
   if (b==NULL)
   {
-    WerrorS("div. by 0");
+    WerrorS(nDivBy0);
     return NULL;
   }
   omCheckAddrSize(b,sizeof(snumber));

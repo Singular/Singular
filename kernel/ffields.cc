@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.3 2005-07-27 15:48:28 Singular Exp $ */
+/* $Id: ffields.cc,v 1.4 2007-07-03 14:45:56 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -316,7 +316,7 @@ number nfDiv (number a,number b)
 #endif
   if ((long)b==(long)nfCharQ)
   {
-    WerrorS("div. by 0");
+    WerrorS(nDivBy0);
     return (number)((long)nfCharQ);
   }
 #ifdef LDEBUG
@@ -344,7 +344,7 @@ number  nfInvers (number c)
 #endif
   if ((long)c==(long)nfCharQ)
   {
-    WerrorS("div. 1/0");
+    WerrorS(nDivBy0);
     return (number)((long)nfCharQ);
   }
 #ifdef LDEBUG
