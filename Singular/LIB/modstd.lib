@@ -1,16 +1,17 @@
 //GP, last modified 23.10.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: modstd.lib,v 1.12 2007-06-22 15:30:11 Singular Exp $";
+version="$Id: modstd.lib,v 1.13 2007-07-04 13:14:43 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: modstd.lib  Grobner basis of ideals
 AUTHORS: A. Hashemi,     Amir.Hashemi@lip6.fr
 @*       G. Pfister      pfister@mathematik.uni-kl.de
 @*       H. Schoenemann  hannes@mathematik.uni-kl.de
+@*       Cindy Magin,    c.magin@web.de
 
 NOTE:
  A library for computing the Grobner basis of an ideal in the polynomial
- ring over the rational numbers using modular methods.The procedures are
+ ring over the rational numbers using modular methods. The procedures are
  inspired by the following paper:
  Elizabeth A. Arnold:
  Modular Algorithms for Computing Groebner Bases , Journal of Symbolic
@@ -22,6 +23,7 @@ PROCEDURES:
 modStd(I);     compute a standard basis of I using modular methods
 modS(I,L);     liftings to Q of standard bases of I mod p for p in L
 primeList(n);  intvec of n primes  <= 2134567879 in decreasing order
+pStd(p,i);     compute a standard basis of i using p-adic methods
 ";
 
 LIB "poly.lib";
@@ -540,6 +542,281 @@ example
    L[size(L)];
 }
 ///////////////////////////////////////////////////////////////////////////////
+proc pStd(int p,ideal i)
+"USAGE:  pStd(p,i);p integer, i ideal;
+RETURN:  an ideal G which is the groebner base for i
+EXAMPLE: example pStd; shows an example
+"
+{
+  def r=basering;
+  list rl=ringlist(r);
+  rl[1]=p;
+  def r1=ring(rl);
+  setring r1;
+  option(redSB);
+  ideal j=fetch(r,i);
+  ideal GP=groebner(j);
+  setring r;
+  ideal G=fetch(r1,GP);
+  attrib(G,"isSB",1);
+  matrix Z=transmat(p,i,G);
+  matrix G1=gstrich1(p,Z,i,G);
+  ideal g1=G1;
+  ideal g22=reduce(g1,G);
+  matrix G22=transpose(matrix(g22));
+  matrix M=redmat(G,G1,G22);
+  matrix Z2=-M*Z;
+  kill r1;
+  number c=p;
+  matrix G0=transpose(matrix(G));
+  G0= MmodN(G0+ (c)* G22,c^2);
+  matrix GF=fareyMatrix(G0,c^2);
+  Z=MmodN(Z+(c)*Z2,c^2);
+  matrix C=transpose(G);
+  int n=3;
+  while(GF<>C)
+  {
+    C=GF;
+    G1= gstrich2(c,Z,i,G0,n);
+    g1=G1;
+    g22=reduce(g1,G);
+    G22=transpose(matrix(g22));
+    M=redmat(G,G1,G22);
+    Z2=-M*Z;
+    Z=MmodN(Z+(c^(n-1))*Z2,c^n);
+    G0= MmodN(G0+ (c^(n-1))* G22,c^n);
+    GF=fareyMatrix(G0,c^n);
+    n++;
+  }
+  return(ideal(GF));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),dp;
+   ideal I=3x3+x2+1,11y5+y3+2,5z4+z2+4;
+   ideal J=pStd(32003,I);
+   J;
+}
+///////////////////////////////////////////////////////////////////////////
+proc transmat(int p,ideal i,ideal G)
+"USAGE:  transmat(p,I,G); p integer, I,G ideal;
+RETURN:  the transformationmatrix Z for the ideal i mod p and the groebner base for i mod p
+EXAMPLE: example transmit; shows an example
+"
+{
+  def r=basering;
+  int n=nvars(r);
+  list rl=ringlist(r);
+  rl[1]=p;
+  def r1=ring(rl);
+  setring r1;
+  ideal i=fetch(r,i);
+  ideal G=fetch(r,G);
+  attrib(G,"isSB",1);
+  ring rhelp=p,x(1..n),dp;
+  list lhelp=ringlist(rhelp);
+  list l=lhelp[3];
+  setring r;
+  rl[3]=l;
+  def r2=ring(rl);
+  setring r2;
+  ideal i=fetch(r,i);
+  option(redSB);
+  ideal j=std(i);
+  matrix T=lift(i,j);
+  setring r1;
+  matrix T=fetch(r2,T);
+  ideal j=fetch(r2,j);
+  matrix M=lift(j,G);
+  matrix Z=transpose(T*M);
+  setring r;
+  matrix Z=fetch(r1,Z);
+  return(Z);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),dp;
+   ideal i=3x3+x2+1,11y5+y3+2,5z4+z2+4;
+   ideal g=x3-60x2-60, z4-36z2+37, y5+33y3+66;
+   int p=181;
+   matrix Z=transmat(p,i,g);
+   Z;
+}
+
+///////////////////////////////////////////////////////////////////////////
+proc gstrich1(int p, matrix Z, ideal i, ideal gp)
+"USAGE:  gstrich1 (p,Z,i,gp); p integer, Z matrix, i,gp ideals;
+RETURN:  a matrix G such that (Z*F-GP)/p, where F and GP are the matrices of the ideals i and gp
+"
+{
+  matrix F=transpose(matrix(i));
+  matrix GP=transpose(matrix(gp));
+  matrix G=(Z*F-GP)/p;
+  return(G);
+}
+///////////////////////////////////////////////////////////////////////////
+proc gstrich2(number p, matrix Z, ideal i, ideal gp, int n)
+"USAGE:  gstrich2 (p,Z,i,gp,n); p,n integer, Z matrix, i,gp ideals;
+RETURN:  a matrix G such that (Z*F-GP)/(p^(n-1)), where F and GP are the matrices of the ideals i and gp
+"
+{
+  matrix F=transpose(matrix(i));
+  matrix GP=transpose(matrix(gp));
+  matrix G=(Z*F-GP)/(p^(n-1));
+  return(G);
+}
+///////////////////////////////////////////////////////////////////////////
+proc redmat(ideal i, matrix h, matrix g)
+"USAGE:  redmat(i,h,g); i ideal , h,g matrices;
+RETURN:  a matrix M such that i=M*h+g
+"
+{
+  matrix c=h-g;
+  ideal f=transpose(c);
+  matrix N=lift(i,f);
+  matrix M=transpose(N);
+  return(M);
+}
+///////////////////////////////////////////////////////////////////////////
+proc fareyMatrix(matrix m,number N)
+"USAGE:  fareyMatrix(m,y); m matrix, y integer;
+RETURN:  a matrix k of the matrix m with Farey rational numbers a/b as coefficients
+EXAMPLE: example fareyMatrix; shows an example
+"
+{
+  ideal I=m;
+  poly result,p;
+  int i,j;
+  number n;
+  for(i=1;i<=size(I);i++)
+  {
+    p=I[i];
+    result=lead(p);
+    while(1)
+    {
+      if (p==0) {break;}
+      p=p-lead(p);
+      n=Farey(N,leadcoef(p));
+      result=result+n*leadmonom(p);
+    }
+    I[i]=result;
+  }
+  matrix k=transpose(I);
+  return(k);
+}
+example
+{"EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),dp;
+   matrix m[3][1]=x3+682794673x2+682794673,z4+204838402z2+819353608,    y5+186216729y3+372433458;
+   int p=32003;
+   matrix b=fareyMatrix(m,p^2);
+   b;
+}
+///////////////////////////////////////////////////////////////////////////
+proc MmodN(matrix Z,number N)
+"USAGE:  MmodN(Z,N);Z matrix, N number;
+RETURN:  the matrix Z mod N
+EXAMPLE: example MmodN;
+"
+{
+  int i,j,k;
+  poly m,p;
+  number c;
+  for(i=1;i<=nrows(Z);i++)
+  {
+    for(j=1;j<=ncols(Z);j++)
+    {
+      for(k=1;k<=size(Z[i,j]);k++)
+      {
+        m=leadmonom(Z[i,j][k]);
+        c=leadcoef(Z[i,j][k]) mod N;
+        p=p+c*m;
+      }
+      Z[i,j]=p;
+      p=0;
+    }
+  }
+  return(Z);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(x,y,z),dp;
+   matrix m[3][1]= x3+10668x2+10668, z4-12801z2+12802, y5-8728y3+14547;
+   number p=32003;
+   matrix b=MmodN(m,p^2);
+   b;
+}
+///////////////////////////////////////////////////////////////////////////////
+/*
+ring r=0,(x,y,z),lp;
+poly s1 = 5x3y2z+3y3x2z+7xy2z2;
+poly s2 = 3xy2z2+x5+11y2z2;
+poly s3 = 4xyz+7x3+12y3+1;
+poly s4 = 3x3-4y3+yz2;
+ideal i =  s1, s2, s3, s4;
+
+ring r=0,(x,y,z),lp;
+poly s1 = 2xy4z2+x3y2z-x2y3z+2xyz2+7y3+7;
+poly s2 = 2x2y4z+x2yz2-xy2z2+2x2yz-12x+12y;
+poly s3 = 2y5z+x2y2z-xy3z-xy3+y4+2y2z;
+poly s4 = 3xy4z3+x2y2z-xy3z+4y3z2+3xyz3+4z2-x+y;
+ideal i =  s1, s2, s3, s4;
+
+ring r=0,(x,y,z),lp;
+poly s1 = 8x2y2 + 5xy3 + 3x3z + x2yz;
+poly s2 = x5 + 2y3z2 + 13y2z3 + 5yz4;
+poly s3 = 8x3 + 12y3 + xz2 + 3;
+poly s4 = 7x2y4 + 18xy3z2 +  y3z3;
+ideal i =  s1, s2, s3, s4;
+
+int n = 6;
+ring r = 0,(x(1..n)),lp;
+ideal i = cyclic(n);
+ring s=0,(x(1..n),t),lp;
+ideal i=imap(r,i);
+i=homog(i,t);
+
+ring r=0,(x(1..4),s),(dp(4),dp);
+poly s1 =1 + s^2*x(1)*x(3) + s^8*x(2)*x(3) + s^19*x(1)*x(2)*x(4);
+poly s2 = x(1) + s^8 *x(1)* x(2)* x(3) + s^19* x(2)* x(4);
+poly s3 = x(2) + s^10*x(3)*x(4) + s^11*x(1)*x(4);
+poly s4 = x(3) + s^4*x(1)*x(2) + s^19*x(1)*x(3)*x(4) +s^24*x(2)*x(3)*x(4);
+poly s5 = x(4) + s^31* x(1)* x(2)* x(3)* x(4);
+ideal i =  s1, s2, s3, s4, s5;
+
+ring r=0,(x,y,z),ds;
+int a =16;
+int b =15;
+int c =4;
+int t =1;
+poly f =x^a+y^b+z^(3*c)+x^(c+2)*y^(c-1)+x^(c-1)*y^(c-1)*z3+x^(c-2)*y^c*(y2+t*x)^2;
+ideal i= jacob(f);
+
+ring r=0,(x,y,z),ds;
+int a =25;
+int b =25;
+int c =5;
+int t =1;
+poly f =x^a+y^b+z^(3*c)+x^(c+2)*y^(c-1)+x^(c-1)*y^(c-1)*z3+x^(c-2)*y^c*(y2+t*x)^2;
+ideal i= jacob(f),f;
+
+ring r=0,(x,y,z),ds;
+int a=10;
+poly f =xyz*(x+y+z)^2 +(x+y+z)^3 +x^a+y^a+z^a;
+ideal i= jacob(f);
+
+ring r=0,(x,y,z),ds;
+int a =6;
+int b =8;
+int c =10;
+int alpha =5;
+int beta= 5;
+int t= 1;
+poly f =x^a+y^b+z^c+x^alpha*y^(beta-5)+x^(alpha-2)*y^(beta-3)+x^(alpha-3)*y^(beta-4)*z^2+x^(alpha-4)*y^(beta-4)*(y^2+t*x)^2;
+ideal i= jacob(f);
+
+*/
+
 /*
 ring r=0,(x,y,z),lp;
 poly s1 = 5x3y2z+3y3x2z+7xy2z2;
