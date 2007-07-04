@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.3 2007-07-03 14:45:56 Singular Exp $ */
+/* $Id: gnumpfl.cc,v 1.4 2007-07-04 09:58:40 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -449,7 +449,12 @@ char * ngfRead (char * s, number * a)
     if ( *(gmp_float**)a == NULL ) (*(gmp_float**)a)= new gmp_float();
     (*(gmp_float**)a)->setFromStr(start);
     *start2=c;
-    (**(gmp_float**)a) /= divisor;
+    if (divisor.isZero())
+    {
+      WerrorS(nDivBy0);
+    }
+    else
+      (**(gmp_float**)a) /= divisor;
   }
 
   return s;

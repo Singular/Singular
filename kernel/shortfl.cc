@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shortfl.cc,v 1.3 2007-07-03 14:45:57 Singular Exp $ */
+/* $Id: shortfl.cc,v 1.4 2007-07-04 09:58:40 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -236,7 +236,10 @@ char * nrRead (char *s, number *a)
   {
     s++;
     s = nrEatr(s, &z2);
-    z1 /= z2;
+    if (z2==0.0)
+      WerrorS(nDivBy0);
+    else
+      z1 /= z2;
   }
   else if (*s =='.')
   {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat0.cc,v 1.3 2006-02-01 13:51:05 Singular Exp $ */
+/* $Id: longrat0.cc,v 1.4 2007-07-04 09:58:40 Singular Exp $ */
 /*
 * ABSTRACT -
 * IO for long rational numbers (Hubert Grassmann)
@@ -14,6 +14,7 @@
 #include "omalloc.h"
 #include "febase.h"
 #include "longrat.h"
+#include "numbers.h"
 
 #define SR_HDL(A) ((long)(A))
 //#define SR_INT    1 // already in longrat.h
@@ -71,7 +72,7 @@ char * nlRead (char *s, number *a)
       s = nlEatLong(s, n);
       if (mpz_cmp_si(n,(long)0)==0)
       {
-        WerrorS("Zero Denominator");
+        WerrorS(nDivBy0);
         mpz_clear(n);
         (*a)->s = 3;
       }

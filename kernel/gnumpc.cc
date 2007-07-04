@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.4 2007-07-03 14:45:56 Singular Exp $ */
+/* $Id: gnumpc.cc,v 1.5 2007-07-04 09:58:40 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -132,7 +132,8 @@ int ngcInt(number &i)
 */
 void ngcDelete (number * a, const ring r)
 {
-  if ( *a != NULL ) {
+  if ( *a != NULL )
+  {
     delete *(gmp_complex**)a;
     *a=NULL;
   }
@@ -350,14 +351,14 @@ BOOLEAN ngcIsZero (number a)
 
 number ngcRePart(number a)
 {
-  if (((gmp_complex*)a)->real().isZero()) return NULL;
+  if ((a==NULL) || ((gmp_complex*)a)->real().isZero()) return NULL;
   gmp_complex* n = new gmp_complex(((gmp_complex*)a)->real());
   return (number)n;
 }
 
 number ngcImPart(number a)
 {
-  if (((gmp_complex*)a)->imag().isZero()) return NULL;
+  if ((a==NULL) || ((gmp_complex*)a)->imag().isZero()) return NULL;
   gmp_complex* n = new gmp_complex(((gmp_complex*)a)->imag());
   return (number)n;
 }
