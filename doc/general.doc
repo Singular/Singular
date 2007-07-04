@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.209 2007-06-22 15:42:28 Singular Exp $
+@comment $Id: general.doc,v 1.210 2007-07-04 12:42:17 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -140,9 +140,9 @@ manual. Furthermore, topic may contain wildcard characters.
 @cindex browsers
 @cindex help browsers
 Online help information can be displayed in various help browsers. The
-following table lists a summary of the supported browsers. See below for
-more details about particular browsers. A complete, customizable list
-can be found in the file @code{LIB/help.cnf}.
+following table lists a summary of the browsers which are always present.
+Usually, external browsers are much more convienent:
+A complete, customizable list can be found in the file @code{LIB/help.cnf}.
 
 @multitable @columnfractions .2 .2 .6
 @item @strong{Browser} @tab @strong{Platform}
@@ -153,31 +153,6 @@ can be found in the file @code{LIB/help.cnf}.
 @cindex html, default help
 @tab Windows
 @tab displays html version of manual in your default html browser
-
-@item netscape
-@cindex netscape
-@cindex help browsers, netscape
-@tab Unix, Windows
-@tab uses @code{netscape} to display html version of manual
-
-@item tkinfo
-@cindex tkinfo
-@cindex help browsers, tkinfo
-@tab Unix
-@tab uses the @code{tkinfo} program to display texinfo version of manual
-
-@item xinfo
-@cindex xinfo
-@cindex help browsers, xinfo
-@tab Unix, Windows
-@tab uses the @code{info} program to display texinfo version of manual in an
-extra @code{xterm}
-
-@item info
-@cindex info
-@cindex help browsers, info
-@tab Unix, Windows
-@tab uses the @code{info} program to display texinfo version of manual
 
 @item builtin
 @cindex help browsers, dummy
@@ -195,6 +170,21 @@ extra @code{xterm}
 @cindex help browsers, dummy
 @tab displays error message about no available help browser
 @end multitable
+
+External browsers depend on your system and the contents os @code{LIB/help.cnf},
+the default includes: 
+@code{htmlview} (displays HTML help pages via @code{htlmview}),@*
+@code{mac} (displays HTML help pages via @code{open}),@*
+@code{mac-net} (displays HTML help pages via @code{open}),@*
+@code{mozilla} (displays HTML help pages via @code{mozilla}),@*
+@code{firefox} (displays HTML help pages via @code{firefox}),@*
+@code{konqueror} (displays HTML help pages via @code{konqueror}),@*
+@code{galeon} (displays HTML help pages via @code{galeon}),@*
+@code{netscape} (displays HTML help pages via @code{netscape}),@*
+@code{tkinfo} (displays INFO help pages via @code{tkinfo}),@*
+@code{xinfo} (displays INFO help pages via @code{info}),@*
+@code{info} (displays INFO help pages via @code{info}),@*
+@code{lynx} (displays HTML help pages via @code{lynx}).
 
 The browser which is used to display the help information, can be either
 set at startup time with the command line option  (@pxref{Command line
@@ -247,7 +237,7 @@ or goes wrong, here are some tips for troubleshooting the help system:
 @cindex DISPLAY environment variable
 @cindex environment variable, DISPLAY
 Under Unix, the environment variable @code{DISPLAY} has to be set for
-the browsers all X11 browsers like @code{netscape}, @code{tkinfo}, and @code{xinfo} to work.
+the browsers all X11 browsers to work.
 
 @item
 @cindex help browsers, setting command to use
@@ -274,7 +264,7 @@ can be specified by setting the environment variable
 @c TBC (@xref{Setting environment variables}).
 
 @item
-The help browsers @code{tkinfo}, @code{xinfo}, @code{info}, and
+The @code{info} based help browsers @code{tkinfo}, @code{xinfo}, @code{info}, and
 @code{builtin} need the (info) file @code{singular.hlp} which it looks
 for at @code{$RootDir/info/singular.hlp} (see @ref{Loading of a library}
 for more info on @code{$RootDir}).  An alternative
