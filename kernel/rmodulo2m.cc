@@ -1,13 +1,15 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.12 2007-06-20 09:39:25 wienand Exp $ */
+/* $Id: rmodulo2m.cc,v 1.13 2007-07-04 13:51:02 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
 
 #include <string.h>
 #include "mod2.h"
+
+#ifdef HAVE_RING2TOM
 #include <mylimits.h>
 #include "structs.h"
 #include "febase.h"
@@ -18,7 +20,6 @@
 #include "ring.h"
 #include "rmodulo2m.h"
 
-#ifdef HAVE_RING2TOM
 int nr2mExp;
 NATNUMBER nr2mModul;
 
