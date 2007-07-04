@@ -26,8 +26,8 @@ example primary_char0_random; newline;
 example primary_charp_random; newline;
 example primary_char0_no_molien_random; newline;
 example primary_charp_no_molien_random; newline;
-// the following randomized example often fails:
-example primary_charp_without_random; newline;
+// the following randomized example is interactive
+// example primary_charp_without_random; newline;
 example power_products; newline;
 example secondary_char0; newline;
 example irred_secondary_char0; newline;
