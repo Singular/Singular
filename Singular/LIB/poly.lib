@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: poly.lib,v 1.44 2007-05-10 08:47:51 Singular Exp $";
+version="$Id: poly.lib,v 1.45 2007-07-05 12:32:12 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  poly.lib      Procedures for Manipulating Polys, Ideals, Modules
@@ -677,7 +677,7 @@ EXAMPLE: example rad_con; shows an example
   }
   else
   {
-    execute("ring R=("+charstr(br)+"),(@z,@x(1..n)),(dp(1),"+ordstring(br)+");");
+    execute("ring R=("+charstr(br)+"),(@z,@x(1..n)),(dp(1),"+ordstr(br)+");");
   }
   execute("minpoly=number("+mp+");");
   ideal irrel=@x(1..n);
