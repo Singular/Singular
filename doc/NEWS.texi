@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.86 2007-06-22 15:43:26 Singular Exp $
+@comment $Id: NEWS.texi,v 1.87 2007-07-05 15:57:48 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -42,17 +42,17 @@ new command: (@nref{chinrem}): lifting via chinese remainder theorem
 @item
 new command: (@nref{interpolation}): ideal of points with given multiplicities
 @item
-non-commutative kernel subsystem was rewritten in order to support specific algebras more efficiently. 
+non-commutative kernel subsystem was rewritten in order to support specific algebras more efficiently.
 Implemented algebras at the moment: super-commutative algebras (in particular exterior algebras).
 @item
 @nref{std} et al.: new selection strategy for reductions (@nref{option} (length)).
 @item
 @nref{simplify} slightly changed: does not omit zero polynomial unless
 specified.
-@item 
+@item
 new library: compregb.lib (@nref{compregb_lib}): comprehensive Groebner base system
 @item
-new library: kskernel.lib (@nref{kskernel_lib}): kernel of the kodaira-spencer map
+new library: kskernel.lib (@nref{kskernel_lib}): kernel of the kodaira-spencer map for irreducible plane curve singularities
 @item
 new library: modstd.lib (@nref{modstd_lib}): Groebner base computations
 over the rational numbers via modular computations
@@ -70,33 +70,35 @@ new library: resgraph.lib (@nref{resgraph_lib}): visualization of resolution dat
 new library: realrad.lib (@nref{realrad_lib}): computation of the real radical
 over the rational numbers and extensions thereof
 @item
-new library: hyperel.lib (@nref{hyperel_lib}): divisors in the jacobian of hyperelliptic curves.
+new library: hyperel.lib (@nref{hyperel_lib}): divisors in the jacobian of hyperelliptic curves
 @item
-new library: curvepar.lib (@nref{curvepar_lib}): space curves.
+new library: curvepar.lib (@nref{curvepar_lib}): space curves
 @item
-@nref{sheafcoh_lib}: new experimental functions, in particular @nref{sheafCohBGG2}.
+new library: sagbi.lib (@nref{sagbi_lib}): Subalgebras bases Analogous to Groebner bases for ideals
 @item
-@nref{nctools_lib}: new functions for super-commutative algebras (i.e. @nref{SuperCommutative}, @nref{IsSCA}, @nref{AltVarStart}, @nref{AltVarEnd}). 
+@nref{sheafcoh_lib}: new experimental functions, in particular @nref{sheafCohBGG2}
 @item
-resolve.lib: blow ups revised (@nref{resolve_lib}).
+@nref{nctools_lib}: new functions for super-commutative algebras (i.e. @nref{SuperCommutative}, @nref{IsSCA}, @nref{AltVarStart}, @nref{AltVarEnd})
+@item
+resolve.lib: blow ups revised (@nref{resolve_lib})
 @item
 new algorithms in primdec.lib (@nref{primdec_lib}): radical et al.
 @item
 improved version of @nref{slimgb}, incorporated into @nref{groebner},
-strategy change in groebner.
+strategy change in groebner
 @item
 finvar.lib: the algorithm of @nref{secondary_char0} is now used in general in the
-non-modular case (@nref{finvar_lib}).
+non-modular case (@nref{finvar_lib})
 @item
-finvar.lib: new algorithm for @nref{irred_secondary_char0} (@nref{finvar_lib}). 
+finvar.lib: new algorithm for @nref{irred_secondary_char0} (@nref{finvar_lib})
 @item
-finvar.lib: new function @nref{irred_secondary_no_molien} (@nref{finvar_lib}).
+finvar.lib: new function @nref{irred_secondary_no_molien} (@nref{finvar_lib})
 @item
 finvar.lib: new functions for computing minimal generating sets of
-invariant rings of finite groups in the non-modular case: @nref{invariant_algebra_reynolds} for finite 
-matrix groups and @nref{invariant_algebra_perm} for permutation groups (@nref{finvar_lib}). 
+invariant rings of finite groups in the non-modular case: @nref{invariant_algebra_reynolds} for finite
+matrix groups and @nref{invariant_algebra_perm} for permutation groups (@nref{finvar_lib})
 @item
-operation for sparse matrices improved: multiplication, prune, conversion to module.
+operation for sparse matrices improved: multiplication, prune, conversion to module
 @item
 experimental: @code{python} / @code{ipython} interface
 @end itemize
@@ -128,7 +130,7 @@ finvar.lib: new algorithm for @nref{secondary_char0}, which is a drastic improve
 @item
 finvar.lib: new function @nref{irred_secondary_char0} (@nref{finvar_lib}).
 @item
-finvar.lib: new function @nref{rel_orbit_variety}, complementing @nref{relative_orbit_variety} 
+finvar.lib: new function @nref{rel_orbit_variety}, complementing @nref{relative_orbit_variety}
 (@nref{finvar_lib}).
 @item
 improved module generator (@code{modgen})
@@ -165,7 +167,7 @@ arithmetic in Z/pZ for architecture x84_64 improved (by 25 %)
 @heading NEWS in version 3-0-0
 
 The version 3-0-0 is the first in the new
-release series version 3-0. 
+release series version 3-0.
 
 Singular version 3 has a greater functionality and an improved architecture.
 Major new features are:
@@ -208,13 +210,13 @@ now also works over algebraic extension fields.
 @heading New @sc{Singular} libraries
 
 @table @asis
-@item @nref{control_lib} 
+@item @nref{control_lib}
 algebraic analysis tools for System and Control Theory
-@item @nref{mregular_lib}    
+@item @nref{mregular_lib}
 procedures for computing the Castelnuovo-Mumford regularity
-@item @nref{mprimdec_lib}    
+@item @nref{mprimdec_lib}
 procedures for primary decomposition of modules
-@item @nref{gmspoly_lib}, @nref{gmssing_lib}   
+@item @nref{gmspoly_lib}, @nref{gmssing_lib}
 procedures for the Gauss-Manin connection of a singularity
 @item @nref{resolve_lib}, @nref{reszeta_lib}
 resolution of singularities and applications
@@ -265,7 +267,7 @@ new attribute: @code{rowShift}
 @heading Noncommutative Extension @sc{Plural}
 
 Starting with version 3-0-0, @sc{Singular} features a
-noncommutative extension @sc{Plural}. It allows to 
+noncommutative extension @sc{Plural}. It allows to
 set and to compute within noncommutative algebras
  with PBW basis. Among available algorithms are Groebner
 bases for left modules, syzygies and resolutions.
@@ -302,7 +304,7 @@ procedures, related to quantum matrices and minors
 @heading Porting
 
 @itemize @bullet
-@item Singular is available for ix86-Linux, 
+@item Singular is available for ix86-Linux,
 SunOS-5, IRIX-6, ix86-Win (runs on Windows 95/98/NT4/2000/XP),
 FreeBSD, MacOS X, DecAlpha-Linux, x86_64-Linux (AMD64/Opteron/EM64T),
 IA64-Linux

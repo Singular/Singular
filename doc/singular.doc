@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.161 2007-06-22 15:43:37 Singular Exp $
+@comment $Id: singular.doc,v 1.162 2007-07-05 15:57:48 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -334,6 +334,7 @@ LIB "all.lib";
 * reesclos_lib:: Rees Algebra and integral closure of an ideal
 * resolve_lib:: Resolution of Singularities
 * reszeta_lib:: Applications of Resolution of Singularities
+* sagbi_lib:: Subalgebras bases Analogous to Groebner bases for ideals
 * sheafcoh_lib:: Procedures for Computing Sheaf Cohomology
 * toric_lib:: toric ideals
 @end menu
@@ -407,11 +408,15 @@ LIB "all.lib";
 @subsection resolve_lib
 @c lib resolve.lib
 @c ---------------------------------------------------------
-@node reszeta_lib, sheafcoh_lib , resolve_lib, Commutative algebra
+@node reszeta_lib, sagbi_lib , resolve_lib, Commutative algebra
 @subsection reszeta_lib
 @c lib reszeta.lib
 @c ---------------------------------------------------------
-@node sheafcoh_lib, toric_lib, reszeta_lib, Commutative algebra
+@node sagbi_lib, sheafcoh_lib , reszeta_lib, Commutative algebra
+@subsection sagbi_lib
+@c lib sagbi.lib
+@c ---------------------------------------------------------
+@node sheafcoh_lib, toric_lib, sagbi_lib, Commutative algebra
 @subsection sheafcoh_lib
 @c lib sheafcoh.lib
 @c ---------------------------------------------------------
