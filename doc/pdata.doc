@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pdata.doc,v 1.23 2006-07-17 14:32:21 Singular Exp $
+@comment $Id: pdata.doc,v 1.24 2007-07-05 09:23:35 Singular Exp $
 @comment this file contains the "Polynomial data" appendix.
 
 @c The following directives are necessary for proper compilation
@@ -1237,15 +1237,14 @@ $n$
 @ifinfo
 n
 @end ifinfo
-variables and the matrix contains less than
+variables and the matrix does not contain
 @tex
 $n \times n$
 @end tex
 @ifinfo
 n x n
 @end ifinfo
-entries an error message is given, if there are more entries,
-the last ones are ignored.
+entries, an error message is given.
 
 @strong{WARNING:} @sc{Singular}
 does not check whether the matrix has full rank.   In such a case some
