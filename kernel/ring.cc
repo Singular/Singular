@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.62 2007-05-24 14:19:04 Singular Exp $ */
+/* $Id: ring.cc,v 1.63 2007-07-05 09:40:41 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -193,7 +193,11 @@ int rTypeOfMatrixOrder(intvec * order)
 {
   int i=0,j,typ=1;
   int sz = (int)sqrt((double)(order->length()-2));
-
+  if ((sz*sz)!=(order->length()-2))
+  {
+    WerrorS("Matrix order is not a square matrix");
+    typ=0;
+  }
   while ((i<sz) && (typ==1))
   {
     j=0;
