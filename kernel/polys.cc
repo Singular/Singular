@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.21 2007-06-20 09:59:47 wienand Exp $ */
+/* $Id: polys.cc,v 1.22 2007-07-05 08:35:10 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -266,6 +266,7 @@ poly pmInit(char *st, BOOLEAN &ok)
 
 /*2
 *make p homogeneous by multiplying the monomials by powers of x_varnum
+*assume: deg(var(varnum))==1
 */
 poly pHomogen (poly p, int varnum)
 {
