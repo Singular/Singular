@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.63 2007-07-05 09:40:41 Singular Exp $ */
+/* $Id: ring.cc,v 1.64 2007-07-05 16:14:16 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1241,7 +1241,7 @@ int rSum(ring r1, ring r2, ring &sum)
     // !!!! BUG? C1 and C2 might live in different baserings!!!
     // it cannot be both the currRing! :)
     // the currRing is sum!
-    
+
     int l = rVar(R1) + rVar(R2);
     matrix C  = mpNew(l,l);
     matrix D  = mpNew(l,l);
@@ -2552,7 +2552,7 @@ static void rSetFirstWv(ring r, int i, int* order, int* block1, int** wvhdl)
   r->firstwv = wvhdl[i];
   if ((order[i]== ringorder_ws)
   || (order[i]==ringorder_Ws)
-  || (order[i]== ringorder_wp) 
+  || (order[i]== ringorder_wp)
   || (order[i]==ringorder_Wp)
   || (order[i]== ringorder_a)
    /*|| (order[i]==ringorder_A)*/)
@@ -2645,10 +2645,10 @@ static void rSetDegStuff(ring r)
       r->pLDeg = pLDeg1c;
       r->pFDeg = pTotaldegree;
     }
-    if ((order[0] == ringorder_a) 
-    || (order[0] == ringorder_wp) 
-    || (order[0] == ringorder_Wp) 
-    || (order[0] == ringorder_ws) 
+    if ((order[0] == ringorder_a)
+    || (order[0] == ringorder_wp)
+    || (order[0] == ringorder_Wp)
+    || (order[0] == ringorder_ws)
     || (order[0] == ringorder_Ws))
       r->pFDeg = pWFirstTotalDegree;
     r->firstBlockEnds=block1[0];
@@ -2676,10 +2676,10 @@ static void rSetDegStuff(ring r)
     }
     r->firstBlockEnds=block1[1];
     r->firstwv = wvhdl[1];
-    if ((order[1] == ringorder_a) 
-    || (order[1] == ringorder_wp) 
-    || (order[1] == ringorder_Wp) 
-    || (order[1] == ringorder_ws) 
+    if ((order[1] == ringorder_a)
+    || (order[1] == ringorder_wp)
+    || (order[1] == ringorder_Wp)
+    || (order[1] == ringorder_ws)
     || (order[1] == ringorder_Ws))
       r->pFDeg = pWFirstTotalDegree;
   }
@@ -2869,7 +2869,7 @@ BOOLEAN rComplete(ring r, int force)
         break;
 
       case ringorder_rp:
-        rO_LexVars_neg(j, j_bits, r->block1[i],r->block0[i], prev_ordsgn,
+        rO_LexVars(j, j_bits, r->block1[i],r->block0[i], prev_ordsgn,
                        tmp_ordsgn,v, bits, -1);
         break;
 
