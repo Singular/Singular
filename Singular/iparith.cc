@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.447 2007-06-26 18:52:11 Singular Exp $ */
+/* $Id: iparith.cc,v 1.448 2007-07-05 08:37:06 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2201,8 +2201,12 @@ static BOOLEAN jjHOMOG_P(leftv res, leftv u, leftv v)
     WerrorS("ringvar expected");
     return TRUE;
   }
-  res->data = (char *)pHomogen((poly)u->Data(),i);
-  return FALSE;
+  poly p=pOne(); pSetExp(p,i,1); pSetm(p);
+  int d=pWTotaldegree(p);
+  pLmDelete(p);
+  if (d==1)
+    res->data = (char *)pHomogen((poly)u->Data(),i);
+  return (d!=1);
 }
 static BOOLEAN jjHOMOG_ID(leftv res, leftv u, leftv v)
 {
@@ -2212,8 +2216,12 @@ static BOOLEAN jjHOMOG_ID(leftv res, leftv u, leftv v)
     WerrorS("ringvar expected");
     return TRUE;
   }
-  res->data = (char *)idHomogen((ideal)u->Data(),i);
-  return FALSE;
+  poly p=pOne(); pSetExp(p,i,1); pSetm(p);
+  int d=pWTotaldegree(p);
+  pLmDelete(p);
+  if (d==1)
+    res->data = (char *)idHomogen((ideal)u->Data(),i);
+  return (d!=1);
 }
 static BOOLEAN jjINDEPSET2(leftv res, leftv u, leftv v)
 {
