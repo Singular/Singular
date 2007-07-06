@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: interpolation.cc,v 1.4 2007-01-11 11:24:58 Singular Exp $ */
+/* $Id: interpolation.cc,v 1.5 2007-07-06 07:32:03 Singular Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -1487,7 +1487,7 @@ ideal interpolation(lists L, intvec *v)
   bool data_ok=true;
 
   // reading the ring data ***************************************************
-  if ((!rField_is_Zp ())&&(!rField_is_Q ()))
+  if ((currRing==NULL) || ((!rField_is_Zp ())&&(!rField_is_Q ())))
   {
      WerrorS("coefficient field should be Zp or Q!");
      return NULL;
