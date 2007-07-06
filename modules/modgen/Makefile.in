@@ -114,9 +114,9 @@ pathnames.h:
 	echo "#define EXEC_PREFIX	\"$(exec_prefix)\"" >> pathnames.h
 
 scanner.cc: scanner.l mod_grammar.h modgen.h
-	$(LEX) -oscanner.cc scanner.l
+	$(LEX) scanner.l > scanner.cc
 
-#	$(LEX) -Pyymod -oscanner.cc scanner.l
+#	$(LEX) -Pyymod scanner.l > scanner.cc
 
 ############################################################
 ###
