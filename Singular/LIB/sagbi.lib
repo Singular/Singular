@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: sagbi.lib,v 1.9 2007-01-23 18:27:17 Singular Exp $";
+version="$Id: sagbi.lib,v 1.10 2007-07-06 10:35:05 Singular Exp $";
 category="Commutative Algebra";
 info="
-LIBRARY:  SAGBI.lib  Compute Subalgebras bases Analogous to Groebner bases for ideals
+LIBRARY:  sagbi.lib  Compute Subalgebras bases Analogous to Groebner bases for ideals
 AUTHORS: Gerhard Pfister,        pfister@mathematik.uni-kl.de,
 @*       Anen Lakhal,            alakhal@mathematik.uni-kl.de
 
@@ -40,7 +40,6 @@ EXAMPLE: example sagbiSPoly; show an example "
   ideal B=ideal(bsr);//when the basering is quotient ring this "type casting"
                     //gives th quotient ideal.
   int b=size(B);
-
 
   //In quotient rings,SINGULAR does not reduce polynomials w.r.t the
   //quotient ideal,therefore we should first 'reduce';if it is necessary for
@@ -87,13 +86,11 @@ EXAMPLE: example sagbiSPoly; show an example "
                         // R1----->bsr ;y(z)----> lead(id[z]).
                         //"kern" is the ideal of algebraic relations between
                         // lead(id[z]).
-
     export kern,A;// we export:
                   // * the ideal A  to avoid useless computations
                   //   between 2 steps in sagbi procedure.
                   // * the ideal kern : some times we can get intresting
                   //   informations from this ideal.
-
     setring bsr;
     map phi=R1,vars,id;
 
@@ -132,7 +129,6 @@ example
  def S= L[2]; setring S; kern;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 static proc std1(ideal J,ideal I,list #)
   // I is contained in J, and it is assumed to be a standard bases!
@@ -142,7 +138,6 @@ static proc std1(ideal J,ideal I,list #)
   def br=basering;
   int tt;
   ideal Res,@result;
-
 
   if(size(#)>0) {tt=#[1];}
 
@@ -200,7 +195,6 @@ static proc Spoly1(list l,ideal I,ideal J,int a)
     ideal J=fetch(br,J);
 
     //================create a new ring with extra variables==============
-
     execute("ring R1=("+charstr(R)+"),("+varstr(R)+",@y((ii+1)..(ii+jj))),(dp(n),dp(kk+jj-n));");
     // *levandov: would it not be easier and better to use
     // ring @Y = char(R),(@y((ii+1)..(ii+jj))),dp;
