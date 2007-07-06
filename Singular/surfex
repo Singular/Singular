@@ -1,0 +1,18 @@
+#!/bin/bash
+surfex_dir="$1"
+shift
+tmp_dir=/tmp
+surfex_call="java surfex"
+std_eqn="x^3+y^3+z^3+1-0.25*(x+y+z+1)^3"
+allargs=""
+if [ -z $1 ] ; then 
+    allargs="-e $std_eqn"
+else 
+    allargs=$*
+fi
+echo "$PWD" | sed -e 's/ /\\ /g' > $tmp_dir/tmp.$$.txt
+read surfexstartdir <$tmp_dir/tmp.$$.txt
+/bin/rm $tmp_dir/tmp.$$.txt
+cd "$surfex_dir"
+str_exe=$surfex_call$allargs
+java surfex -d "$surfexstartdir" -t "$tmp_dir" $allargs

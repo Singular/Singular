@@ -479,6 +479,7 @@ installbin: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}
 	-${INSTALL_PROGRAM} *.so ${bindir}
 	${INSTALL_PROGRAM} libparse ${RUN_SINGULARS} ${bindir}
 	${INSTALL_PROGRAM} ESingular TSingular ${DL_LIBS} ${bindir}
+	${INSTALL_PROGRAM} surfex ${bindir}
 	chmod a+x ${SINGULAR}
 	rm -f ${bindir}/${SING_EXEC}${EXEC_EXT}
 	cd ${bindir}; ${LN_S} ${SINGULAR} Singular${EXEC_EXT};
