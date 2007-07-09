@@ -560,6 +560,7 @@ install-bindist: $(HEADERS) $(SOURCES) Makefile depend
 	${INSTALL_PROGRAM} -s  ${SING_EXEC} ${install_bindir}/Singular
 	-${INSTALL_PROGRAM} *.so ${install_bindir}
 	${INSTALL_PROGRAM} -s  libparse ${RUN_SINGULARS} ESingular TSingular ${DL_LIBS} ${install_bindir}
+	${INSTALL_PROGRAM} surfex ${install_bindir}
 	echo "#undef MAKE_DISTRIBUTION " > distrib.h
 
 install-bindist-plural: install-bindist
@@ -571,6 +572,8 @@ install-sharedist: ${SLIBS_FILES} LIB/gftables
 	cp ${SLIBS_FILES} ${install_slibdir}
 	${MKINSTALLDIRS} ${install_slibdir}/gftables
 	cp ${GFTABLES} ${install_slibdir}/gftables
+	${MKINSTALLDIRS} ${install_slibdir}/surfex
+	cp -r surfex ${install_slibdir}/surfex
 	chmod -R +rX ${install_slibdir}/*
 
 tar:
