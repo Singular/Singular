@@ -1,0 +1,55 @@
+# the temporary directory in which surfex stores temporary image files etc.:
+tmp_dir=/tmp
+
+# the java call needed to call surfex from within $surfex_dir:
+surfex_call="java surfex"
+
+# the standard equation which will be displayed 
+# if the user does not specify an equation or filename:
+std_eqn="x^3+y^3+z^3+1-0.25*(x+y+z+1)^3"
+
+#
+# end of variables section
+#
+###################################################################################
+
+###################################################################################
+#
+# the program
+#
+# you should not change anything in this part
+#
+
+allargs=""
+if [ -z $1 ] ; then 
+    # if the user does not specify any argument, then we use the standard equation:
+    allargs="-e $std_eqn"
+else 
+    # if the user has given some arguments then we want to pass all these 
+    # to the java program surfex. 
+    # therefore, we store them all in one string here:
+    allargs=$*
+fi
+
+# get the current working directory to be able to expand the relative paths correctly:
+echo "$PWD" | sed -e 's/ /\\ /g' > $tmp_dir/tmp.txt
+read surfexstartdir <$tmp_dir/tmp.txt
+#echo "dir:"
+#echo $surfexstartdir
+
+# build up the string of all arguments to be passed to the java program surfex:
+#allargs=" -d $surfexstartdir -t $tmp_dir $allargs";
+
+# change to the directory in which the surfex-code is located
+cd "$surfex_dir"
+
+# call the java program surfex:
+str_exe=$surfex_call$allargs
+# print the result of this call to the shell:
+#echo $str_exe
+java surfex -d "$surfexstartdir" -t "$tmp_dir" $allargs
+
+#
+# end of the surfex startscript
+#
+###################################################################################

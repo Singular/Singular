@@ -1,0 +1,2 @@
+# computing an image from a .sux-file without opening a window:
+surfex --inch --dpi 300 --size 3 3 --outfile example_cayley.jpg --antialiasing --quit --nowindow example_cayley.sux

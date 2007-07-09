@@ -1,0 +1,315 @@
+#!/bin/bash
+# surfex install script and documentation
+# ---------------------------------------
+#
+# Short Version of the Installation Intructions:
+# ----------------------------------------------
+# (For longer installation instructions, see further down.)
+# 
+# Run this script by typing the following into a shell:
+# ./INSTALL_LINUX
+# This writes a script called "surfex" to a directory contained in your bash path.
+# You can then start surfex by typing:
+# surfex
+#
+
+#
+# surfex:
+# -------
+#
+# visualizing real algebraic surfaces using several visualization tools:
+# - raytracing: surf
+# - triangulation: (display: JavaView)
+#
+# main features:
+# - high quality output for printed publications and for the internet
+# - interactivity, in particular: intuitive rotation/scaling
+#
+# @version 0.89.07, 2006 / 11 / 23
+#
+# @author Stephan Holzer, Oliver Labs
+#         idea: Oliver Labs (2001) during the Dagstuhl workshop Algebra, Geometry, and Software Systems
+#         this version is based on some older code by Richard Morris and Oliver Labs
+#
+# @address previous versions: 
+#          - (until Oct. 2005): department of mathematics, University of Mainz, Germany
+#          - (until March 2006): RICAM at Linz, Austria
+#          - since then: University of the Saarland (Saarbruecken, Germany)
+#
+# @web	   www.surfex.algebraicsurface.net
+#
+
+
+#
+# install surfex on Linux/Unix/Mac OS X
+# -------------------------------------
+#
+# - Requisites to be able to run "surfex" (all are freely available):
+#   - required: Java, version >= 1.4.2 (www.java.sun.com)
+#   - required: surf (www.surf.sourceforge.net)
+#   - optional (for movies): convert (www.imagemagick.org)
+#
+# - Download surfex_<version>.tar.gz to a directory of your choice.
+#   In the sequel, we will call this directory install_dir.
+#   The current version of surfex should always be available from:
+#   www.surfex.algebraicsurface.net
+#
+# - Uncompress the file, e.g. by typing the following into a shell:
+#   tar -xzf surfex_<version>.tar.gz
+#
+# - This should have created a sub-directory called surfex_<version>.
+#   Change to this directory, e.g. by typing the following into the shell:
+#   cd surfex_<version>
+#
+# - Run the INSTALL_LINUX script, e.g. by typing the following into the shell:
+#   ./INSTALL_LINUX
+#
+# - This produces a script, called "surfex" and copies it to a directory contained in your bash path. 
+#
+
+#
+# The installation program:
+# -------------------------
+
+echo
+
+mytmp=/tmp/tmp.txt
+failmsg=""
+
+my_java_prg=java
+my_surf_prg=surf
+my_convert_prg=convert
+
+#
+# try to locate the helper tools we need:
+#
+
+function findbinpath() {
+    mybinpath=""
+
+    # first, try to use the user's private bin directory for surfex:
+    tstbinpath=~/bin
+    echo $PATH | grep "$tstbinpath" >$mytmp
+    if [ -s $mytmp ] && [ -a $tstbinpath ]; then return 0; fi
+    
+    echo
+    echo
+    echo ">>> $tstbinpath is not contained in your bash path."
+    echo
+    echo "This is the standard location for surfex."
+    echo "Should INSTALL_LINUX add this directory to the bash path for you now?"
+    echo "(Please, type 'yes' or 'no' and then press ENTER.)"
+    read
+    answer="$REPLY"
+    echo 
+    echo "REPLY:$answer."
+    echo 
+    if [ "$answer" == "yes" ] && ! [ -d $tstbinpath ]; then mkdir $tstbinpath; fi
+    failmsg="$tstbinpath could not be created. 
+Please solve this problem (probably you have to login as superuser (root), and then rerun INSTALL_LINUX."
+    if [ "$answer" == "yes" ] && ! [ -d $tstbinpath ]; then failexit; fi
+    if [ "$answer" == "yes" ] && [ -d $tstbinpath ]; then echo "export PATH=$tstbinpath:\$PATH" >>~/.bashrc ; fi
+    if [ "$answer" == "yes" ] && [ -d $tstbinpath ]; then echo "export PATH=$tstbinpath:\$PATH" >>~/.profile ; fi
+    if [ "$answer" == "yes" ] && [ -d $tstbinpath ]; then export PATH=$tstbinpath:$PATH; fi
+    if [ "$answer" == "yes" ] && [ -d $tstbinpath ]; then return 0; fi
+
+    #
+    # if the user did not want to use the user's private bin directory:
+    #
+    tstbinpath=/usr/local/bin
+    echo $PATH | grep "$tstbinpath" >$mytmp
+    if [ -s $mytmp ]; then return 0; fi
+
+    tstbinpath=""
+    failmsg="We could not find a nice path in your bash path.
+You chose not to create ~/bin. 
+So, please, solve the problem on your own."
+    failexit
+}
+
+function copytopath() {
+#    echo "copytopath()"
+    echo "searching for $tstprg (this may take some time)..."
+    find / -name $tstprg | sed 1q >$mytmp
+    failmsg=""
+    if [ -s $mytmp ]; then echo "$tstprg found"; else failexit; fi
+    srcpath=`cat $mytmp`
+    # just in case the x-bit is not set yet:
+    chmod + $srcpath
+    rm $mytmp
+    echo "at: $srcpath."
+#    echo "look for a directory which is contained in your path:"
+    # search for a nice path in the $PATH:
+    findbinpath
+    # if we found a writable one, then copy the program to that path:
+    if [ -w $tstbinpath ]; then cp $srcpath $tstbinpath/; fi
+    if [ -w $tstbinpath ]; then return 0; fi
+
+    failmsg=">>> The directory '$tstbinpath' to which INSTALL_LINUX wants to copy $tstprg is not writable!
+Maybe you have to login as a superuser (root) to have the right to write to this directory.
+In that case, type 'su', enter the superuser password and rerun INSTALL_LINUX.
+"
+    failexit
+}
+
+function maybecopytopath() {
+    echo "How do you want to proceed? Type '1' or '2', followed by ENTER.";
+    REPLY=""
+    read
+    answer="$REPLY"
+    echo
+    failmsg="Okay, you chose to exit INSTALL_LINUX, solve the problem on your own, and rerun INSTALL_LINUX then again."
+    if [ "$answer" == "3" ]; then return 0; fi
+    if [ "$answer" == "2" ]; then copytopath; else failexit; fi
+}
+
+function failexit() {
+    echo 
+    # if a message was specified, then display it and exit:
+    if [ -n "$failmsg" ]; then echo $failmsg; fi
+    if [ -n "$failmsg" ]; then exit; fi
+
+    # else display the standard message:
+    echo ">>> surfex needs to find $tstprg to be able to work."
+    echo ">>> Please install $tstprg and copy it to a directory"
+    echo ">>> which is contained in your bash path."
+    echo ">>> Your current path is:
+$PATH
+"
+    echo ">>> Then run INSTALL_LINUX again."
+#    rm $mytmp
+    exit
+}
+
+#
+# test if java is usable:
+#
+
+tstprg=$my_java_prg
+
+which $tstprg >$mytmp 2>/dev/null
+if [ -s $mytmp ]; then echo "$tstprg found."; else echo "
+
+>>> $tstprg not found!
+
+This problem might be caused by two reasons: 
+
+(1) Either you have not installed java (e.g. from www.java.sun.com) yet.
+In that case, quit INSTALL_LINUX, install java, and rerun INSTALL_LINUX.
+
+(2) Or $tstprg is not contained in your path yet.
+In that case, INSTALL_LINUX can try to solve this problem for you by copying $tstprg to a directory 
+which is contained in your path.
+"; fi
+if ! [ -s $mytmp ]; then maybecopytopath; fi
+
+
+#
+# test if surf is usable:
+#
+
+tstprg=$my_surf_prg
+
+which $tstprg >$mytmp 2>/dev/null
+if [ -s $mytmp ]; then echo "$tstprg found."; else echo "
+
+>>> $tstprg not found!
+
+If you have already installed surf then this problem might be caused by two reasons: 
+
+(1) Either the surf program has a different name (e.g. surf-1.0.5). 
+In that case, quit INSTALL_LINUX, rename the surf program to $tstprg, and rerun INSTALL_LINUX.
+
+(2) Or $tstprg is the correct filename, but $tstprg is not contained in your bash path. 
+In that case, INSTALL_LINUX can try to solve the problem for you. 
+"; fi
+
+if ! [ -s $mytmp ]; then maybecopytopath; fi
+
+
+#
+# test if convert is usable:
+#
+
+tstprg=$my_convert_prg
+
+which $tstprg >$mytmp 2>/dev/null
+if [ -s $mytmp ]; then echo "convert found."; else echo "
+
+>>> $tstprg not found!
+
+If you want to produce movies using surfex, 
+then $tstprg has to be contained in your bash path.
+One of the following options should apply:
+
+(1) I have not installed convert yet and I want to do that now.
+In that case, quit INSTALL_LINUX, install convert, and rerun INSTALL_LINUX.
+
+(2) convert is installed, but $tstprg is not contained in the bash path yet.
+In that case, INSTALL_LINUX can try to solve this problem for you by copying $tstprg to a directory 
+which is contained in your path.
+
+(3) I do not want to produce movies using surfex.
+So, continue with the INSTALL_LINUX process without finding $tstprg.
+
+"; fi
+if ! [ -s $mytmp ]; then maybecopytopath; fi
+
+
+#
+# build the start script:
+#
+
+cat surfex_start_part1 >surfex
+echo "surfex_dir=\"$PWD\"" >>surfex
+cat surfex_start_part2 >>surfex
+chmod +x surfex
+
+# copy surfex to a directory which is contained in the user's $PATH:
+findbinpath
+# if we found a writable one, then copy the program to that path:
+if [ -w $tstbinpath ]; then cp ./surfex $tstbinpath; fi
+failmsg="surfex could not be copied to $tstbinpath.
+Maybe you have to login as a superuser (root) to have the right to write to this directory.
+In that case, type 'su', enter the superuser password and then rerun INSTALL_LINUX.
+"
+if ! [ -w $tstbinpath ]; then failexit; fi
+
+echo "
+-------------------------------------------------------------------------------
+This INSTALL_LINUX script has written the script \"surfex\" the directory $tstbinpath.
+This directory is contained in your bash path.
+
+To start surfex, you can now type:
+surfex
+or something like
+surfex -e \"x^3+(y-z)*(y+z)\"
+if you want to envoke surfex with a particular equation.
+Once you have done that, three windows should open up.
+To rotate the surface which you see in one of them, drag your mouse pointer
+over the green sphere.
+
+If this does not work, you might have to edit the file \"surfex\".
+Please, contact us if you do not manage to get surfex run on your system.
+"
+
+echo "We are happy to receive any kind of feedback, 
+
+Stephan Holzer and Oliver Labs
+
+
+surfex comes without any warranty. For download, documentation, examples, etc., see:
+www.surfex.AlgebraicSurface.net
+-------------------------------------------------------------------------------
+"
+#
+# Disclaimer:
+# -----------
+#
+# surfex comes without any warranty. 
+# Feel free to use and distribute surfex. 
+#
+
+rm $mytmp
+
+bash

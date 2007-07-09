@@ -1,0 +1,9 @@
+# computing an image from a .sux-file without opening a window:
+surfex --inch --dpi 300 --size 3 3 --outfile example_cayley.jpg --antialiasing --quit --nowindow example_cayley.sux
+
+# computing a movie which shows a rotating surface from a .sux-file without opening a window:
+surfex --inch --dpi 300 --size 1 1 --outfile example_cayley_rotate.mng --antialiasing --movie --fps 10 --length 5 --rot 1 2 0 --nowindow example_cayley.sux
+
+# computing a movie which shows a deformation from a .sux-file without opening a window,
+# to make the movie slower around the interesting parts, you may transform the parameters:
+surfex --inch --dpi 300 --size 1 1 --outfile example_cayley_deform.mng --movie --fps 15 --length 3 --rot 0 0 0 --runningParameter p1 --nowindow --showMoviePreview example_cayley.sux
