@@ -1,6 +1,6 @@
 //last change: 2007/07/06 (Oliver Labs)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surfex.lib,v 1.1 2007-07-09 12:52:50 Singular Exp $";
+version="$Id: surfex.lib,v 1.2 2007-07-11 17:02:16 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: surfex.lib
@@ -31,24 +31,15 @@ NOTE:
  Oliver Labs
 
 PROCEDURES:
-proc plotRotated(poly p, list coords, list #)
-               Plot the surface given by the polynomial p
-               with the coordinates coords.
-proc plotRot(poly p, list #)
-               Similar to plotRotated, but tries to guess automatically
-               which coordinates should be used.
-proc plotRotatedList(list varieties, list coords, list #);
-               Plot the varieties given by the list varieties
-               with the coordinates coords.
-proc plotRotatedDirect(list varietiesList, list #);
-               Plot the varieties given by the list varietiesList.
-               varietiesList has a complicated format.
-               The procedure passes the data directly to surfex.
-               Thus, the coordinates have to be x,y,z.
-               Parameters are allowed; their names have to be p1, p2, ...
-proc plotRotatedListFromSpecifyList(list varietiesList, list #) ;
-               Plot the varieties given by the list varietiesList.
-               varietiesList has a complicated format; see the example.
+plotRotated(poly,coord); Plot the surface given by the polynomial p
+               with the coordinates coords(list)
+plotRot(poly);           Similar to plotRotated,
+                         but tries to guess automatically
+                         which coordinates should be used
+plotRotatedList(varieties, coords); Plot the varieties given by the list varieties
+                                    with the coordinates coords
+plotRotatedDirect(varieties);       Plot the varieties given by the list varietiesList
+plotRotatedListFromSpecifyList(varietiesList);  Plot the varieties given by the list varietiesList
 ";
 
 LIB "solve.lib";
