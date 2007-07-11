@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.162 2007-07-05 15:57:48 Singular Exp $
+@comment $Id: singular.doc,v 1.163 2007-07-11 16:50:03 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -582,7 +582,8 @@ LIB "all.lib";
 * graphics_lib:: procedures to draw  with Mathematica
 * latex_lib:: procedures for typesetting in TeX
 * resgraph_lib:: visualization of resolution data
-* surf_lib:: interface to the surf programm::
+* surf_lib:: interface to the surf programm
+* surfex_lib:: Procedures for Visualizing Surfaces
 @end menu
 
 @c ---------------------------------------------------------
@@ -598,9 +599,13 @@ LIB "all.lib";
 @subsection resgraph_lib
 @c lib resgraph.lib
 @c ---------------------------------------------------------
-@node surf_lib,, resgraph_lib, Visualization
+@node surf_lib,surfex_lib, resgraph_lib, Visualization
 @subsection surf_lib
 @c lib surf.lib no_ex
+@c ---------------------------------------------------------
+@node surfex_lib,, surf_lib, Visualization
+@subsection surfex_lib
+@c lib surfex.lib no_ex
 
 @c ----------------------------------------------------------------------------
 @node Coding theory, System and Control theory, Visualization, SINGULAR libraries
