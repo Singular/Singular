@@ -1,34 +1,24 @@
 //last change: 2007/07/06 (Oliver Labs)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surfex.lib,v 1.2 2007-07-11 17:02:16 Singular Exp $";
+version="$Id: surfex.lib,v 1.3 2007-07-12 12:19:14 Singular Exp $";
 category="Visualization";
 info="
-LIBRARY: surfex.lib
-         Procedures for Visualizing Surfaces.
-         This is still an alpha version! Please, send me any comments
-         or suggestions via http://www.AlgebraicSurface.net
-         Thank you!!!
+LIBRARY: surfex.lib      Procedures for visualizing Surfaces.
+         This is still an alpha version (see http://www.AlgebraicSurface.net)
 AUTHOR: Oliver Labs
-        This library uses the program surfex.
-        surfex is written by Oliver Labs and others,
-        mainly Stephan Holzer.
-        It is based on some other tools, mainly
-        surf which was written by Stefan Endrass and others.
-        Some of the code is based on the code in surf.lib
+        This library uses the program surf and surfex.
+        surfex was written by Oliver Labs and others, mainly Stephan Holzer.
+        surf was written by Stefan Endrass and others.
 
 NOTE:
- Many procedures of this library require the program surfex
- to be installed.
+ This library requires the program surfex to be installed.
  This software is used for producing raytraced images of the surfaces.
  You can download @code{surfex} from @uref{http://www.surfex.AlgebraicSurface.net}.
 
  surfex is a front-end for surf which aims to be easier to use than
- the original tool. In the future, we plan to extend it to a tool which
- can use other appropriate programs for producing the best visualization.
- Please, contact me via @uref{http://www.surfex.AlgebraicSurface.net}
- if you have any questions or suggestions,
+ the original tool.
 
- Oliver Labs
+SEE ALSO: surf_lib
 
 PROCEDURES:
 plotRotated(poly,coord); Plot the surface given by the polynomial p
