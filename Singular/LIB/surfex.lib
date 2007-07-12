@@ -1,6 +1,6 @@
 //last change: 2007/07/06 (Oliver Labs)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surfex.lib,v 1.3 2007-07-12 12:19:14 Singular Exp $";
+version="$Id: surfex.lib,v 1.4 2007-07-12 12:35:44 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: surfex.lib      Procedures for visualizing Surfaces.
@@ -60,7 +60,7 @@ ASSUME: The basering is characteristic zero and without parameters.
     {
         execute("coords = "+string_of_vars(p)+";");
     }
-    elses
+    else
     {
         if(num_vars_id(p)<3)
         {
