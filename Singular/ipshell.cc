@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.161 2007-07-03 13:21:21 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.162 2007-07-12 13:46:04 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1702,6 +1702,7 @@ lists rDecompose(const ring r)
     if (r->block1[i]-r->block0[i] >=0 )
     {
       j=r->block1[i]-r->block0[i];
+      if (r->order[i]==ringorder_M)  j=(j+1)*(j+1)-1; 
       iv=new intvec(j+1);
       if ((r->wvhdl!=NULL) && (r->wvhdl[i]!=NULL))
       {
@@ -1915,6 +1916,11 @@ ring rCompose(const lists  L)
            R->wvhdl[j] =( int *)omAlloc((iv->length())*sizeof(int));
            for (i=0; i<iv->length();i++) R->wvhdl[j][i]=(*iv)[i];
            break;
+         case ringorder_M:
+           R->wvhdl[j] =( int *)omAlloc((iv->length())*sizeof(int));
+           for (i=0; i<iv->length();i++) R->wvhdl[j][i]=(*iv)[i];
+           R->block1[j]=si_max(R->block0[j],R->block0[j]+sqrt(iv->length()-1));
+           break;
          case ringorder_ls:
          case ringorder_ds:
          case ringorder_Ds:
@@ -1930,9 +1936,6 @@ ring rCompose(const lists  L)
          case ringorder_c:
          case ringorder_C:
            R->block1[j]=R->block0[j]-1;
-           break;
-         case ringorder_M:
-         // todo
            break;
          case 0:
          case ringorder_unspec:
