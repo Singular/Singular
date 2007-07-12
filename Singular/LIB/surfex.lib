@@ -1,19 +1,19 @@
 //last change: 2007/07/06 (Oliver Labs)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surfex.lib,v 1.4 2007-07-12 12:35:44 Singular Exp $";
+version="$Id: surfex.lib,v 1.5 2007-07-12 14:36:35 Singular Exp $";
 category="Visualization";
 info="
-LIBRARY: surfex.lib      Procedures for visualizing Surfaces.
-         This is still an alpha version (see http://www.AlgebraicSurface.net)
+LIBRARY: surfex.lib      Procedures for visualizing and rotating surfaces.
+@*         It is still an alpha version (see http://www.AlgebraicSurface.net)
 AUTHOR: Oliver Labs
-        This library uses the program surf and surfex.
-        surfex was written by Oliver Labs and others, mainly Stephan Holzer.
-        surf was written by Stefan Endrass and others.
+        This library uses the program surf
+        (written by Stefan Endrass and others)
+        and surfex (written by Oliver Labs and others, mainly Stephan Holzer).
 
 NOTE:
- This library requires the program surfex to be installed.
- This software is used for producing raytraced images of the surfaces.
- You can download @code{surfex} from @uref{http://www.surfex.AlgebraicSurface.net}.
+ This library requires the program surfex, surf and java to be installed.
+ The software is used for producing raytraced images of surfaces.
+ You can download @code{surfex} from http://www.surfex.AlgebraicSurface.net
 
  surfex is a front-end for surf which aims to be easier to use than
  the original tool.
@@ -24,7 +24,7 @@ PROCEDURES:
 plotRotated(poly,coord); Plot the surface given by the polynomial p
                with the coordinates coords(list)
 plotRot(poly);           Similar to plotRotated,
-                         but tries to guess automatically
+                         but guesses automatically
                          which coordinates should be used
 plotRotatedList(varieties, coords); Plot the varieties given by the list varieties
                                     with the coordinates coords
@@ -44,15 +44,13 @@ LIB "sing.lib";
 proc plotRot(poly p, list #)
 "
 USAGE: plotRot(poly p, list #)
-Similar to plotRotated, but tries to guess automatically
+Similar to plotRotated, but guesses automatically
 which coordinates should be used.
 
 It opens the external program surfex for drawing the surface given by p,
 seen as a surface in the real affine space with coordinates coords.
 
-RETURN: the return code of the system command which executes surfex.
-
-ASSUME: The basering is characteristic zero and without parameters.
+ASSUME: The basering is of characteristic zero and without parameters.
 "
 {
     list coords = list();
@@ -88,7 +86,8 @@ ASSUME: The basering is characteristic zero and without parameters.
     }
     return(plotRotatedList(list(p), coords, #));
 }
-example {
+example
+{
     "Example:"; echo=2;
 
     // More variables in the basering, but only 3 variables in the polynomial:
@@ -113,7 +112,6 @@ example {
     // Use the additional parameter 3 to ask singular
     // to compute the singular locus before calling surfex.
     poly swallowtail = -4*y^2*z^3-16*x*z^4+27*y^4+144*x*y^2*z+128*x^2*z^2-256*x^3;
-    plotRot(swallowtail, 3);
 }
 
 proc plotRotated(poly p, list coords, list #)
@@ -122,15 +120,14 @@ USAGE: plotRotated(poly p, list coords, list #)
 This opens the external program surfex for drawing the surface given by p,
 seen as a surface in the real affine space with coordinates coords.
 
-RETURN: the return code of the system command which executes surfex.
-
 ASSUME: coords is a list of three variables.
-The basering is characteristic zero and without parameters.
+The basering is of characteristic zero and without parameters.
 "
 {
     return(plotRotatedList(list(p), coords, #));
 }
-example {
+example
+{
     "Example:"; echo=2;
 
     // An easy example: a surface with four conical nodes.
@@ -138,10 +135,11 @@ example {
     poly cayley_cubic = x^3+y^3+z^3+1^3-1/4*(x+y+z+1)^3;
 //     plotRotated(cayley_cubic, list(x,y,z));
 
-    // An difficult example: a surface with a one-dimensional real component!
+    // A difficult example: a surface with a one-dimensional real component!
     poly whitney_umbrella = x^2*z-y^2;
     // The Whitney Umbrella without its handle:
     plotRotated(whitney_umbrella, list(x,y,z));
+
     // The Whitney Umbrella together with its handle:
     plotRotated(whitney_umbrella, list(x,y,z), 2);
 }
@@ -153,11 +151,9 @@ USAGE: plotRotatedList(list varieties, list coords, list #)
 This opens the external program surfex for drawing the surfaces given by varieties,
 seen as a surface in the real affine space with coordinates coords.
 
-RETURN: the return code of the system command which executes surfex.
-
-ASSUME: coords is a list of three variables,
-varieties is a list of ideals discribing the varieties to be shown.
-The basering is characteristic zero and without parameters.
+ASSUME: coords is a list of three variables, varieties is a list of ideals
+describing the varieties to be shown.
+The basering is of characteristic zero and without parameters.
 "
 {
     def oring = basering;
@@ -401,9 +397,7 @@ USAGE: plotRotatedListFromSpecifyList(list varietiesList, list #);
 varietiesList has a complicated format (not documented yet);
 see the example.
 
-RETURN: the return code of the system command which executes surfex.
-
-ASSUME: The basering is characteristic zero.
+ASSUME: The basering is of characteristic zero.
 
 EXAMPLE: example plotRotatedListFromSpecifyList;
 "
@@ -413,7 +407,8 @@ EXAMPLE: example plotRotatedListFromSpecifyList;
 
     return(plotRotatedFromCode(str, #));
 }
-example {
+example
+{
     "Example:"; echo=2;
 
     // A cubic surface depending on a parameter:
@@ -453,13 +448,11 @@ USAGE: plotRotatedDirect(list varieties, list #)
 This opens the external program surfex for drawing the surfaces given by varieties,
 seen as a surface in the real affine space with coordinates x,y,z.
 The format for the list varieties is not fully documented yet;
-please, try to adapt the examples to your needs.
-
-RETURN: the return code of the system command which executes surfex.
+please, see the examples below and try to adapt the examples to your needs.
 
 ASSUME:
-Passes the equations directly to surfex,
-i.e., the variable names should be correct, i.e. x,y,z.
+Passes the equations directly to surfex, i.e., the variable names should
+be x,y,z.
 The advantage is that one can use parameters p1, p2, ...;
 these will be passed to surfex.
 "
@@ -468,7 +461,8 @@ these will be passed to surfex.
 
     return(plotRotatedFromCode(str, #));
 }
-example {
+example
+{
     "Example:"; echo=2;
 
     // A cubic surface depending on a parameter:
@@ -501,7 +495,6 @@ USAGE: plotRotatedFromCode(string str, list #);
 This procedure is only for internal usage;
 it takes the surfex-code as a string and calls surfex.
 
-RETURN: the return code of the system command which executes surfex.
 "
 {
      // we need a temporary .sux file for surfex
