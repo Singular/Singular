@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.87 2007-07-05 15:57:48 Singular Exp $
+@comment $Id: NEWS.texi,v 1.88 2007-07-12 16:42:50 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -74,7 +74,9 @@ new library: hyperel.lib (@nref{hyperel_lib}): divisors in the jacobian of hyper
 @item
 new library: curvepar.lib (@nref{curvepar_lib}): space curves
 @item
-new library: sagbi.lib (@nref{sagbi_lib}): Subalgebras bases Analogous to Groebner bases for ideals
+new library: sagbi.lib (@nref{sagbi_lib}): subalgebras bases analogous to Groebner bases for ideals
+@item
+new library: surfex.lib (@nref{surfex_lib}): visualizing and rotating surfaces
 @item
 @nref{sheafcoh_lib}: new experimental functions, in particular @nref{sheafCohBGG2}
 @item

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.292 2007-07-05 09:24:48 Singular Exp $
+@comment $Id: reference.doc,v 1.293 2007-07-12 16:42:48 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1727,7 +1727,7 @@ can be much faster than computing a lexicographical Groebner basis
 directly.
 @item @strong{Assume:}
 The ideal must be zero-dimensional and given as a reduced Groebner
-basis in the given ring.
+basis in the given ring. The monomial ordering must be global.
 @item @strong{Note:}
 The only permissible differences between the given ring and the current ring
 are the monomial ordering and a permutation of the variables,
@@ -4379,6 +4379,7 @@ progress during the following computations:
 @code{minres},
 @code{mstd},
 @code{res},
+@code{slimgb},
 @code{sres},
 @code{std},
 @code{stdfglm},
@@ -4522,7 +4523,7 @@ shows correct usage in error messages (set by default).
 @item @tab @tab @tab all other characters: like the output of @code{std}
 @item @tab @tab @tab
 @item @tab @code{slimgb}
-@tab @code{M[n,m]} @tab 	parallel reduction of n elements with m non-zero output elements
+@tab @code{M[n,m]} @tab parallel reduction of n elements with m non-zero output elements
 @item @tab @tab @code{.} @tab postponed a reduction of a pair/S-polynomial
 @item @tab @tab @code{b} @tab exchange of a reductor by a 'better' one
 @item @tab @tab @code{e} @tab a new reductor with non-minimal leading term
@@ -5763,13 +5764,13 @@ ideal or module
 @ref{slim Groebner bases}
 
 
-Returns a Groebner basis of an ideal or module with respect to the monomial 
+Returns a Groebner basis of an ideal or module with respect to the monomial
 ordering of the basering (which has to be global).
 @item @strong{Note:}
 The algorithm is designed to keep polynomials slim (short with small coefficients). For details see @code{http://www.mathematik.uni-kl.de/~zca/Reports_on_ca/35/paper_35_full.ps.gz}.
-A reduced Groebner basis is returned if option(redSB) is set 
+A reduced Groebner basis is returned if option(redSB) is set
 (see @ref{option(redSB)}).
-To view the progress of long running computations, use option(prot) 
+To view the progress of long running computations, use option(prot)
 (see @ref{option(prot)}).
 
 
