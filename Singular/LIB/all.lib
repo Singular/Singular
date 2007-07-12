@@ -1,6 +1,6 @@
-// $Id: all.lib,v 1.55 2007-07-06 15:16:34 Singular Exp $
+// $Id: all.lib,v 1.56 2007-07-12 16:01:52 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.55 2007-07-06 15:16:34 Singular Exp $";
+version="$Id: all.lib,v 1.56 2007-07-12 16:01:52 Singular Exp $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries (commutative case)
@@ -76,9 +76,19 @@ LIB "spectrum.lib";
 LIB "standard.lib";
 LIB "stratify.lib";
 LIB "surf.lib";
+LIB "surfex.lib";
 LIB "teachstd.lib";
 LIB "toric.lib";
 LIB "triang.lib";
 LIB "rootsur.lib";
 LIB "weierstr.lib";
 LIB "zeroset.lib";
+LIB "center.lib";
+LIB "dmod.lib";
+LIB "gkdim.lib";
+LIB "involut.lib";
+LIB "ncalg.lib";
+LIB "ncdecomp.lib";
+LIB "nctools.lib";
+LIB "perron.lib";
+LIB "qmatrix.lib";

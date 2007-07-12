@@ -209,7 +209,6 @@ Use the @code{LIB} command for loading of single libraries.
 * dmod_lib::
 * involut_lib::
 * gkdim_lib::
-* ncall_lib::
 * ncalg_lib::
 * ncdecomp_lib::
 * nctools_lib::
@@ -242,7 +241,7 @@ Use the @code{LIB} command for loading of single libraries.
 @c lib involut.lib
 
 @c ----------------------------------------------------------
-@node gkdim_lib, ncall_lib, involut_lib, PLURAL libraries
+@node gkdim_lib, ncalg_lib, involut_lib, PLURAL libraries
 @section gkdim_lib
 @cindex gkdim_lib
 @cindex gkdim.lib
@@ -250,24 +249,7 @@ Use the @code{LIB} command for loading of single libraries.
 @c lib gkdim.lib
 
 @c ----------------------------------------------------------
-@node ncall_lib, ncalg_lib, gkdim_lib, PLURAL libraries
-@section ncall_lib
-@cindex ncall_lib
-@cindex ncall.lib
-
-The library @code{ncall.lib} provides a convenient way to load all
-libraries, featuring noncommutative algorithms of the @sc{Singular} distribution.
-
-@strong{Example:}
-@smallexample
-@c example
-option(loadLib);
-LIB "ncall.lib";
-@c example
-@end smallexample
-
-@c ----------------------------------------------------------
-@node ncalg_lib, ncdecomp_lib, ncall_lib, PLURAL libraries
+@node ncalg_lib, ncdecomp_lib, gkdim_lib, PLURAL libraries
 @section ncalg_lib
 @cindex ncalg_lib
 @cindex ncalg.lib
