@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.90 1995-12-31 23:44:10 Singular Exp $
+@comment $Id: NEWS.texi,v 1.91 1995-12-31 23:46:50 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -123,7 +123,7 @@ new library: dmod.lib (@nref{dmod_lib})
 @item
 new library: perron.lib (@nref{perron_lib})
 @item
-improved center.lib (@nref{center_lib}): revised implementation, new functions (sa_reduce etc.)
+improved center.lib: revised implementation, new functions (sa_reduce etc.)
 @item
 revised ncalg.lib (@nref{ncalg_lib}): new algebras, U(sl_n) and U(g_2) changed to conform GAP.
 @item
@@ -281,7 +281,7 @@ bases for left modules, syzygies and resolutions.
 Together with @sc{Plural} come the following libraries:
 
 @table @asis
-@item @nref{center_lib}
+@item @code{center.lib}
 computes generators of the center and centralizer subalgebras up
 to a given degree resp. up to a given number of generators
 @item @nref{involut_lib}
