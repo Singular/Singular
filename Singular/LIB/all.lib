@@ -1,6 +1,6 @@
-// $Id: all.lib,v 1.56 2007-07-12 16:01:52 Singular Exp $
+// $Id: all.lib,v 1.57 2007-07-13 16:27:33 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.56 2007-07-12 16:01:52 Singular Exp $";
+version="$Id: all.lib,v 1.57 2007-07-13 16:27:33 Singular Exp $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries (commutative case)
@@ -83,7 +83,7 @@ LIB "triang.lib";
 LIB "rootsur.lib";
 LIB "weierstr.lib";
 LIB "zeroset.lib";
-LIB "center.lib";
+LIB "central.lib";
 LIB "dmod.lib";
 LIB "gkdim.lib";
 LIB "involut.lib";

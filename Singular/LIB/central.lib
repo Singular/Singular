@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: center.lib,v 1.25 2007-01-23 15:03:28 Singular Exp $"
+version="$Id: central.lib,v 1.1 2007-07-13 16:27:34 Singular Exp $"
 category="Noncommutative"
 info="
-LIBRARY:  center.lib      Computation of central elements of GR-algebras
+LIBRARY:  central.lib      Computation of central elements of GR-algebras
 
 AUTHOR:  Oleksandr Motsak, email: motsak@mathematik.uni-kl.de
 
@@ -2140,7 +2140,7 @@ setring Usl3;
 // show current ring:
 basering;
 
-LIB "center.lib";
+LIB "central.lib";
 
 // easy example(few seconds), must compute two polynomials of degrees 2 and 3.
 center(3);
