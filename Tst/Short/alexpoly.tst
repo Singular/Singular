@@ -234,8 +234,8 @@ w[16]=intvec(21,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,1,1);
 // ------------ test of resolutiongraph: -------------------
 resolutiongraph(f[1]);
 resolutiongraph(f[2]);
-list hne=develop(f[6]);
-resolutiongraph(hne);
+list Hne=develop(f[6]);
+resolutiongraph(Hne);
 resolutiongraph(f[36]);
 resolutiongraph(FF[37]);
 intvec v=6,9,16;

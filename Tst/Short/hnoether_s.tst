@@ -16,8 +16,8 @@ param(develop(p_3));
 develop(p_3,-1);
 develop(p_3,4);
 poly heme=xy8+y8+x4y6+4x3y6+2x5y5+6x6y4+4x8y3+x10y2+4x9y2+2x11y+x12;
-list hne=develop(heme);
-print(hne[1]);
+list Hne=develop(heme);
+print(Hne[1]);
 kill r;
 ring r=2,(x,y,t),ds;
 poly f=y2+x7y+x9+x8;
@@ -46,7 +46,8 @@ poly f=(x3-xy2+y3)*(x2+y2)*(x4-x3y+xy3+y4);
 list L=hnexpansion(f);
 def HNring = L[1]; setring HNring;  displayHNE(hne);
 map T; int i;
-for (i=1; i<=size(hne); i++) {
+for (i=1; i<=size(hne); i++)
+{
  T=basering,param(hne[i]);
  T(f);
 }
@@ -54,11 +55,11 @@ kill hne,HNring,F3,L;
 
 // ------------ test of extdevelop: -------------------
 setring r;
-list hne=develop(x2+y3+y4-y5,-1);
-extdevelop(hne,2);
-extdevelop(hne,4);
-extdevelop(hne,10);
-kill hne;
+list Hne=develop(x2+y3+y4-y5,-1);
+extdevelop(Hne,2);
+extdevelop(Hne,4);
+extdevelop(Hne,10);
+kill Hne;
 // ------------ test of essdevelop:  ------------------
 setring R;
 list L=essdevelop(x6+y4);
