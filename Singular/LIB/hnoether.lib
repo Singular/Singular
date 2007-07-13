@@ -1,4 +1,4 @@
-version="$Id: hnoether.lib,v 1.53 2006-08-02 15:40:51 Singular Exp $";
+version="$Id: hnoether.lib,v 1.54 2007-07-13 12:08:34 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  hnoether.lib   Hamburger-Noether (Puiseux) Expansion
@@ -891,8 +891,8 @@ EXAMPLES: example develop;         shows an example
 example
 { "EXAMPLE:"; echo = 2;
   ring exring = 7,(x,y),ds;
-  list hne=develop(4x98+2x49y7+x11y14+2y14);
-  print(hne[1]);
+  list Hne=develop(4x98+2x49y7+x11y14+2y14);
+  print(Hne[1]);
   // therefore the HNE is:
   // z(-1)= 3*z(0)^7 + z(0)^7*z(1),
   // z(0) = z(1)*z(2),       (there is 1 zero in the 2nd row before x)
@@ -901,10 +901,10 @@ example
   // z(3) = -z(4)^2 + 0*z(4)^3 +...+ 0*z(4)^8 + ?*z(4)^9 + ...
   // (the missing x in the last line indicates that it is not complete.)
   hne[2];
-  param(hne);
+  param(Hne);
   // parametrization:   x(t)= -t^14+O(t^21),  y(t)= -3t^98+O(t^105)
   // (the term -t^109 in y may have a wrong coefficient)
-  displayHNE(hne);
+  displayHNE(Hne);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1058,13 +1058,13 @@ example
 { "EXAMPLE:"; echo = 2;
  ring exring=0,(x,y,t),ds;
  poly f=x3+2xy2+y2;
- list hne=develop(f);
- list hne_extended=extdevelop(hne,10);
+ list Hne=develop(f);
+ list hne_extended=extdevelop(Hne,10);
             //   compare the HNE matrices ...
- print(hne[1]);
- print(hne_extended[1]);
+ print(Hne[1]);
+ print(Hne_extended[1]);
             // ... and the resulting parametrizations:
- param(hne);
+ param(Hne);
  param(hne_extended);
  param(hne_extended,0);
 
@@ -1256,15 +1256,15 @@ EXAMPLE:  example invariants; shows an example
 example
 { "EXAMPLE:"; echo = 2;
  ring exring=0,(x,y),dp;
- list hne=develop(y4+2x3y2+x6+x5y);
- list INV=invariants(hne);
+ list Hne=develop(y4+2x3y2+x6+x5y);
+ list INV=invariants(Hne);
  INV[1];                   // the characteristic exponents
  INV[2];                   // the generators of the semigroup of values
  INV[3],INV[4];            // the Puiseux pairs in packed form
  INV[5] / 2;               // the delta-invariant
  INV[6];                   // the sequence of multiplicities
                            // To display the invariants more 'nicely':
- displayInvariants(hne);
+ displayInvariants(Hne);
  /////////////////////////////
  INV=invariants((x2-y3)*(x3-y5));
  INV[1][1];                // the characteristic exponents of the first branch
@@ -1421,8 +1421,8 @@ EXAMPLE: example displayInvariants;  shows an example
 example
 { "EXAMPLE:"; echo = 2;
  ring exring=0,(x,y),dp;
- list hne=develop(y4+2x3y2+x6+x5y);
- displayInvariants(hne);
+ list Hne=develop(y4+2x3y2+x6+x5y);
+ displayInvariants(Hne);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1604,8 +1604,8 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r=0,(x,y),dp;
-  list hne=hnexpansion((x2-y3)*(x2+y3));
-  intersection(hne[1],hne[2]);
+  list Hne=hnexpansion((x2-y3)*(x2+y3));
+  intersection(Hne[1],Hne[2]);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1760,12 +1760,12 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r=0,(x,y),dp;
-  list hne=hnexpansion((x6-y10)*(x+y2-y3)*(x+y2+y3));
-  multsequence(hne[1]),"  |  ",multsequence(hne[2]),"  |  ",
-  multsequence(hne[3]),"  |  ",multsequence(hne[4]);
-  multsequence(hne);
+  list Hne=hnexpansion((x6-y10)*(x+y2-y3)*(x+y2+y3));
+  multsequence(Hne[1]),"  |  ",multsequence(Hne[2]),"  |  ",
+  multsequence(Hne[3]),"  |  ",multsequence(Hne[4]);
+  multsequence(Hne);
   // The meaning of the entries of the 2nd matrix is as follows:
-  displayMultsequence(hne);
+  displayMultsequence(Hne);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -2541,13 +2541,13 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring exring=0,(x,y),dp;
-  list hne=hnexpansion(x14-3y2x11-y3x10-y2x9+3y4x8+y5x7+3y4x6+x5*(-y6+y5)
+  list Hne=hnexpansion(x14-3y2x11-y3x10-y2x9+3y4x8+y5x7+3y4x6+x5*(-y6+y5)
                       -3y6x3-y7x2+y8);
-  displayHNE(hne);    // HNE of 1st,3rd branch is finite
-  print(extdevelop(hne[1],5)[1]);
-  list ehne=extdevelop(hne[2],5);
+  displayHNE(Hne);    // HNE of 1st,3rd branch is finite
+  print(extdevelop(Hne[1],5)[1]);
+  list ehne=extdevelop(Hne[2],5);
   displayHNE(ehne);
-  param(hne[2]);
+  param(Hne[2]);
   param(ehne);
 
 }
@@ -2584,9 +2584,9 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r=0,(x,y),dp;
-  list hne=develop(x2+y3+y4);
-  hne;
-  stripHNE(hne);
+  list Hne=develop(x2+y3+y4);
+  Hne;
+  stripHNE(Hne);
 }
 ///////////////////////////////////////////////////////////////////////////////
 static proc extractHNEs(list HNEs, int transvers)
@@ -2853,11 +2853,11 @@ example
   "EXAMPLE:"; echo = 2;
   ring r=0,(x,y),dp;
   // First, an example which requires no field extension:
-  list hne=hnexpansion(x4-y6);
-  size(hne);           // number of branches
-  displayHNE(hne);     // HN expansion of branches
-  param(hne[1]);       // parametrization of 1st branch
-  param(hne[2]);       // parametrization of 2nd branch
+  list Hne=hnexpansion(x4-y6);
+  size(Hne);           // number of branches
+  displayHNE(Hne);     // HN expansion of branches
+  param(Hne[1]);       // parametrization of 1st branch
+  param(Hne[2]);       // parametrization of 2nd branch
 
   // An example which requires a field extension:
   list L=hnexpansion((x4-y6)*(y2+x4));
