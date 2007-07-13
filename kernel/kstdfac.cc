@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.9 2007-06-19 09:16:34 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.10 2007-07-13 14:19:26 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -873,7 +873,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
       ecartWeights=NULL;
     }
   }
-  if (TEST_OPT_PROT) messageStat(srmax,lrmax,0,strat);
+  if (TEST_OPT_PROT) { PrintLn(); messageStat(srmax,lrmax,0,strat); }
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
   return (strat->Shdl);
 }

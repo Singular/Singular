@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.44 2007-02-16 11:07:11 motsak Exp $
+ *  Version: $Id: gring.cc,v 1.45 2007-07-13 14:19:25 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -40,7 +40,7 @@
 // some forward declarations:
 
 
-// polynomial multiplication functions for p_Procs : 
+// polynomial multiplication functions for p_Procs :
 poly gnc_pp_Mult_mm(const poly p, const poly m, const ring r, poly &last);
 poly gnc_p_Mult_mm(poly p, const poly m, const ring r);
 poly gnc_mm_Mult_p(const poly m, poly p, const ring r);
@@ -69,7 +69,7 @@ void gnc_kBucketPolyRed_ZOld(kBucket_pt b, poly p, number *c);
 // poly gnc_ReduceSpolyNew(poly p1, poly p2, poly spNoether, const ring r);
 // void gnc_ReduceSpolyTail(poly p1, poly q, poly q2, poly spNoether, const ring r);
 
-// void nc_kBucketPolyRed(kBucket_pt b, poly p); 
+// void nc_kBucketPolyRed(kBucket_pt b, poly p);
 
 ideal gnc_gr_mora(const ideal, const ideal, const intvec *, const intvec *, kStrategy); // Not yet!
 ideal gnc_gr_bba (const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat);
@@ -1967,7 +1967,7 @@ ideal twostd(ideal I)
     flag = true; // nothing new!
     K    = NULL;
     s    = idElem(J);
-    
+
     for (i=0;i<=s-1;i++)
     {
       p=J->m[i];
@@ -1985,7 +1985,7 @@ ideal twostd(ideal I)
         varj = pOne();
         pSetExp(varj,j,1);
         pSetm(varj);
-        q = pp_Mult_mm(p,varj,currRing); // q = J[i] * var(j), 
+        q = pp_Mult_mm(p,varj,currRing); // q = J[i] * var(j),
         pDelete(&varj);
 
         #ifdef PDEBUG
@@ -1999,7 +1999,7 @@ ideal twostd(ideal I)
           p_Write(q, currRing);
         #endif
         #endif
-        
+
         q = nc_ReduceSpoly(p,q,currRing);
 
         #ifdef PDEBUG
@@ -2008,7 +2008,7 @@ ideal twostd(ideal I)
           Print("Reducing q: "); // !
           p_Write(q, currRing);
 
-          Print("With J!\n"); 
+          Print("With J!\n");
         #endif
         #endif
 
@@ -2033,7 +2033,7 @@ ideal twostd(ideal I)
             if (K!=NULL) idDelete(&K);
             return(Q);
           }
-          
+
           flag=false;
           Q=idInit(1,1);
           Q->m[0]=q;
@@ -2059,7 +2059,7 @@ ideal twostd(ideal I)
     idPrint(J);
     PrintLn();
   #endif // debug
-  #endif  
+  #endif
 
 
 
@@ -2070,28 +2070,28 @@ ideal twostd(ideal I)
     idPrint(K);
     PrintLn();
   #endif // debug
-  #endif  
+  #endif
 
 
     iSize=idElem(J);
     id_tmp=idSimpleAdd(J,K);
     idDelete(&K);
     idDelete(&J);
-    
+
     BITSET save_test=test;
 
     #if 1
       test|=Sy_bit(OPT_SB_1);
-      J = kStd(id_tmp, currQuotient, testHomog, NULL, NULL, 0, iSize); // J = J + K, J - std    
+      J = kStd(id_tmp, currQuotient, testHomog, NULL, NULL, 0, iSize); // J = J + K, J - std
     #else
       J=kStd(id_tmp, currQuotient,testHomog,NULL,NULL,0,0,NULL);
     #endif
     test = save_test;
-    
+
     idDelete(&id_tmp); // !!!
 
     idSkipZeroes(J);
-        
+
   #ifdef PDEBUG
     idTest(J);
   #if 0
@@ -2099,7 +2099,7 @@ ideal twostd(ideal I)
     idPrint(J);
     PrintLn();
   #endif // debug
-  #endif  
+  #endif
 
 // bug:
 
@@ -2125,7 +2125,7 @@ ideal twostd(ideal I)
 
 
 
-    
+
   }
 }
 
@@ -2215,19 +2215,19 @@ void ncKill(ring r)
   }
   id_Delete((ideal *)&(r->nc->C),r->nc->basering);
   id_Delete((ideal *)&(r->nc->D),r->nc->basering);
-  
+
   if( rIsSCA(r) && (r->nc->SCAQuotient() != NULL) )
   {
-    id_Delete(&r->nc->SCAQuotient(), r->nc->basering);    
+    id_Delete(&r->nc->SCAQuotient(), r->nc->basering);
   }
 
   r->nc->basering->ref--;
-  
+
   if ((r->nc->basering->ref<=0)&&(r->nc->basering->nc==NULL))
   {
     rKill(r->nc->basering);
   }
-  
+
   ncCleanUp(r);
 }
 
@@ -2366,7 +2366,7 @@ BOOLEAN nc_CheckOrdCondition(matrix D, ring r)
     p_Setm(q,r);
     if (p_LmCmp(q,p,r) != 1) /* i.e. lm(p)==xy < lm(q)==D_ij  */
     {
-      Print("Bad ordering at %d,%d\n",i,j);
+      Werror("Bad ordering at %d,%d\n",i,j);
 #ifdef PDEBUG
       p_Write(p,r);
       p_Write(q,r);
@@ -2608,7 +2608,7 @@ BOOLEAN nc_InitMultiplication(ring r)
     rChangeCurrRing(r);
     WeChangeRing = 1;
   }
-  assume( (currRing == r->nc->basering) 
+  assume( (currRing == r->nc->basering)
        || ((currRing->nc!=NULL) && (currRing->nc->basering==r->nc->basering)) );   // otherwise we cannot work with all these matrices!
 
   int i,j;
@@ -3045,9 +3045,9 @@ ring nc_rCreateNCcomm(ring r)
   r->nc->basering = r;
   ncRingType(r, nc_comm);
   r->nc->IsSkewConstant = 1;
-  
+
   // no reference increment to the base commutative ring???
-  
+
   matrix C = mpNew(r->N,r->N);
   matrix D = mpNew(r->N,r->N);
   int i,j;
@@ -3191,7 +3191,7 @@ BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate)
 
 bool nc_SetupQuotient(ring rGR, const ring rG)
 {
-  // currently only super-commutative extension deals with factors. 
+  // currently only super-commutative extension deals with factors.
   return sca_SetupQuotient(rGR, rG);
 }
 

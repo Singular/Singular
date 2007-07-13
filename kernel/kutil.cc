@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.61 2007-06-24 16:44:40 levandov Exp $ */
+/* $Id: kutil.cc,v 1.62 2007-07-13 14:19:26 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -4351,7 +4351,7 @@ void messageStat (int srmax,int lrmax,int hilbcount,kStrategy strat)
   //PrintS("\nUsage/Allocation of temporary storage:\n");
   //Print("%d/%d polynomials in standard base\n",srmax,IDELEMS(Shdl));
   //Print("%d/%d polynomials in set L (for lazy alg.)",lrmax+1,strat->Lmax);
-  Print("\nproduct criterion:%d chain criterion:%d\n",strat->cp,strat->c3);
+  Print("product criterion:%d chain criterion:%d\n",strat->cp,strat->c3);
   if (hilbcount!=0) Print("hilbert series criterion:%d\n",hilbcount);
   /*mflush();*/
 }
@@ -5645,6 +5645,7 @@ void completeReduce (kStrategy strat)
     if (TEST_OPT_PROT)
       PrintS("-");
   }
+  if (TEST_OPT_PROT) PrintLn();
 #ifdef KDEBUG
   sloppy_max = FALSE;
 #endif

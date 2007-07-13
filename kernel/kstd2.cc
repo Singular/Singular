@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.45 2007-06-24 16:44:40 levandov Exp $ */
+/* $Id: kstd2.cc,v 1.46 2007-07-13 14:19:26 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1305,6 +1305,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       completeReduce(strat);
     }
   }
+  else if (TEST_OPT_PROT) PrintLn();
 
   /* release temp data-------------------------------- */
   exitBuchMora(strat);
@@ -1663,6 +1664,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
       completeReduce(strat);
     }
   }
+  else if (TEST_OPT_PROT) PrintLn();
 
   /* release temp data-------------------------------- */
   exitBuchMora(strat);

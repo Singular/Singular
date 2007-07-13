@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.21 2007-05-22 16:14:09 wienand Exp $ */
+/* $Id: kstd1.cc,v 1.22 2007-07-13 14:19:25 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1307,6 +1307,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   }
   /*- complete reduction of the standard basis------------------------ -*/
   if (TEST_OPT_REDSB) completeReduce(strat);
+  else if (TEST_OPT_PROT) PrintLn();
   /*- release temp data------------------------------- -*/
   exitBuchMora(strat);
   /*- polynomials used for HECKE: HC, noether -*/
@@ -2079,6 +2080,7 @@ ideal kInterRed (ideal F, ideal Q)
       completeReduce(strat);
     }
   }
+  else if (TEST_OPT_PROT) PrintLn();
 
   /* release temp data-------------------------------- */
   if (TEST_OPT_PROT) messageStat(srmax,lrmax,0,strat);
@@ -2150,6 +2152,7 @@ ideal kInterRed (ideal F, ideal Q)
   updateS(TRUE,strat);
   if (TEST_OPT_REDSB && TEST_OPT_INTSTRATEGY)
     completeReduce(strat);
+  //else if (TEST_OPT_PROT) PrintLn();
   pDelete(&strat->kHEdge);
   omFreeSize((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
   omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
@@ -2166,7 +2169,6 @@ ideal kInterRed (ideal F, ideal Q)
       if(strat->fromQ[j]) pDelete(&strat->Shdl->m[j]);
     }
     omFreeSize((ADDRESS)strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
-    strat->fromQ=NULL;
   }
 //  if (TEST_OPT_PROT)
 //  {
@@ -2175,6 +2177,13 @@ ideal kInterRed (ideal F, ideal Q)
 //  }
   ideal shdl=strat->Shdl;
   idSkipZeroes(shdl);
+  if (strat->fromQ)
+  {
+    strat->fromQ=NULL;
+    ideal res=kInterRed(shdl,NULL);
+    idDelete(&shdl);
+    shdl=res;
+  }
   delete(strat);
   return shdl;
 }
