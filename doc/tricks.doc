@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: tricks.doc,v 1.13 2007-05-23 13:17:59 Singular Exp $
+@comment $Id: tricks.doc,v 1.14 2007-07-13 16:31:25 Singular Exp $
 @comment this file contains the "Tricks and pittfalls" sections
 
 @c The following directives are necessary for proper compilation
@@ -401,13 +401,25 @@ problem does only occur for divisions of numerical constants.
 @item monomials and precedence
 @cindex monomials and precedence
 
-The computation of a monomial has precedence over all operators:
+The formation of a monomial has precedence over all operators:
 @smallexample
 @c example
   ring r=0,(x,y),dp;
   2xy^2 == (2*x*y)^2;
   2xy^2 == 2x*y^2;
   2x*y^2 == 2*x * (y^2);
+@c example
+@end smallexample
+During that formation no operator is involvedr: in the non-commutative
+case, we have
+@smallexample
+@c example
+  LIB "nctools.lib";
+  ring r = 0,(x,y),dp;
+  def S = SuperCommutative();
+  xy == yx;
+  x*y == x*y;
+  x*y, y*x;
 @c example
 @end smallexample
 
