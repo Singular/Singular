@@ -1,12 +1,12 @@
-// $Id: ncall.lib,v 1.6 2006-11-27 13:30:30 levandov Exp $
+// $Id: ncall.lib,v 1.7 2007-07-13 16:35:43 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncall.lib,v 1.6 2006-11-27 13:30:30 levandov Exp $";
+version="$Id: ncall.lib,v 1.7 2007-07-13 16:35:43 Singular Exp $";
 category = "Noncommutative";
 info="
 LIBRARY:  ncall.lib   Load all noncommutative libraries
 
 @format
-  center.lib:      Computation of central elements of G- and GR-algebras
+  central.lib:     Computation of central elements of G- and GR-algebras
   ncalg.lib:       Definitions of important GR-algebras
   ncdecomp.lib:    Central character decomposition of a module
   nctools.lib:     General tools for noncommutative algebras
@@ -20,7 +20,7 @@ LIBRARY:  ncall.lib   Load all noncommutative libraries
 //  nchomolog.lib:   Noncommutative homological algebra
 ///////////////////////////////////////////////////////////////////////////////
 
-LIB "center.lib";
+LIB "central.lib";
 LIB "ncalg.lib";
 LIB "ncdecomp.lib";
 LIB "nctools.lib";
