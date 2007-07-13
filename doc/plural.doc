@@ -205,7 +205,7 @@ Use the @code{LIB} command for loading of single libraries.
 @c @sc{Singular} and @sc{Plural} together.
 
 @menu
-* center_lib::
+* central_lib::
 * dmod_lib::
 * involut_lib::
 * gkdim_lib::
@@ -217,15 +217,15 @@ Use the @code{LIB} command for loading of single libraries.
 @end menu
 
 @c ----------------------------------------------------------
-@node center_lib, dmod_lib, PLURAL libraries, PLURAL libraries
-@section center_lib
-@cindex center_lib
-@cindex center.lib
+@node central_lib, dmod_lib, PLURAL libraries, PLURAL libraries
+@section central_lib
+@cindex central_lib
+@cindex central.lib
 
-@c lib center.lib
+@c lib central.lib
 
 @c ----------------------------------------------------------
-@node dmod_lib, involut_lib, center_lib, PLURAL libraries
+@node dmod_lib, involut_lib, central_lib, PLURAL libraries
 @section dmod_lib
 @cindex dmod_lib
 @cindex dmod.lib

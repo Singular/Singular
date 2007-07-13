@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.88 2007-07-12 16:42:50 Singular Exp $
+@comment $Id: NEWS.texi,v 1.89 2007-07-13 16:31:52 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -79,6 +79,10 @@ new library: sagbi.lib (@nref{sagbi_lib}): subalgebras bases analogous to Groebn
 new library: surfex.lib (@nref{surfex_lib}): visualizing and rotating surfaces
 @item
 @nref{sheafcoh_lib}: new experimental functions, in particular @nref{sheafCohBGG2}
+@item
+library @code{ncall.lib} merged into @nref{all_lib}
+@item
+library center.lib (@code{center_lib}) renamed to @nref{centra_lib}
 @item
 @nref{nctools_lib}: new functions for super-commutative algebras (i.e. @nref{SuperCommutative}, @nref{IsSCA}, @nref{AltVarStart}, @nref{AltVarEnd})
 @item
