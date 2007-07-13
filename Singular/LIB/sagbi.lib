@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: sagbi.lib,v 1.10 2007-07-06 10:35:05 Singular Exp $";
+version="$Id: sagbi.lib,v 1.11 2007-07-13 12:31:06 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  sagbi.lib  Compute Subalgebras bases Analogous to Groebner bases for ideals
@@ -247,15 +247,15 @@ static proc Spoly1(list l,ideal I,ideal J,int a)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc sagbiReduction(poly p,ideal dom,list #)//one step Subalgebra reduction
+proc sagbiReduction(poly p,ideal dom,list #)
 "USAGE: sagbiReduction(p,dom[,n]); p poly , dom  ideal
-RETURN: a polynomial
+RETURN: a polynomial, after one step subalgebra reduction
 @format
     Three algorithm variants are used to perform subalgebra reduction.
-    The positive interger n determine which variant should be used.
-    n may take the values (0 or default),1 or 2.
+    The positive interger n determines which variant should be used.
+    n may take the values 0 (default), 1 or 2.
 @end format
-EXAMPLE: sagbiReduction; show an example"
+EXAMPLE: sagbiReduction; shows an example"
 {
   def bsr=basering;
   ideal B=ideal(bsr);//When the basering is quotient ring  this type casting

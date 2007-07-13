@@ -1,6 +1,6 @@
 // last modified 21.07.2005, Oliver Wienand
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.27 2006-07-18 15:53:58 Singular Exp $";
+version="$Id: surf.lib,v 1.28 2007-07-13 12:31:06 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: surf.lib    Procedures for Graphics with Surf
@@ -15,6 +15,8 @@ NOTE:
   @uref{http://sourceforge.net/projects/surf}
   or from @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/}.
  @end texinfo
+
+SEE ALSO: surfex_lib
 
 PROCEDURES:
  plot(I);  plots plane curves and surfaces
