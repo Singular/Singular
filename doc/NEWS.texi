@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.89 2007-07-13 16:31:52 Singular Exp $
+@comment $Id: NEWS.texi,v 1.90 1995-12-31 23:44:10 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -82,7 +82,7 @@ new library: surfex.lib (@nref{surfex_lib}): visualizing and rotating surfaces
 @item
 library @code{ncall.lib} merged into @nref{all_lib}
 @item
-library center.lib (@code{center_lib}) renamed to @nref{centra_lib}
+library center.lib (@code{center_lib}) renamed to @code{central.lib} (@nref{central_lib})
 @item
 @nref{nctools_lib}: new functions for super-commutative algebras (i.e. @nref{SuperCommutative}, @nref{IsSCA}, @nref{AltVarStart}, @nref{AltVarEnd})
 @item
