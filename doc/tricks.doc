@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: tricks.doc,v 1.14 2007-07-13 16:31:25 Singular Exp $
+@comment $Id: tricks.doc,v 1.15 2007-07-14 13:31:30 Singular Exp $
 @comment this file contains the "Tricks and pittfalls" sections
 
 @c The following directives are necessary for proper compilation
@@ -410,7 +410,7 @@ The formation of a monomial has precedence over all operators:
   2x*y^2 == 2*x * (y^2);
 @c example
 @end smallexample
-During that formation no operator is involvedr: in the non-commutative
+During that formation no operator is involved: in the non-commutative
 case, we have
 @smallexample
 @c example
@@ -418,7 +418,7 @@ case, we have
   ring r = 0,(x,y),dp;
   def S = SuperCommutative();
   xy == yx;
-  x*y == x*y;
+  x*y == y*x;
   x*y, y*x;
 @c example
 @end smallexample
