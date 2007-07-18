@@ -1,7 +1,7 @@
 LIB "tst.lib";
 tst_init();
 
-========================== example 1.9.20  ==================================
+// ========================== example 1.9.20  ==================================
 
 LIB "ncalg.lib"; 
 // load the library with the definition of U((sl_2)

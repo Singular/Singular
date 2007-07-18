@@ -1,7 +1,7 @@
 LIB "tst.lib";
 tst_init();
 
-================================== example 1.9.28 ====================
+// ================================== example 1.9.28 ====================
 
 LIB "ncalg.lib";
 def  U = makeUsl2(); // U(sl_2) over the rationals

@@ -1,7 +1,7 @@
 LIB "tst.lib";
 tst_init();
 
-================================= example B.5.10 ==========================
+// ================================= example B.5.10 ==========================
 ring R=2,(z,x,y),lp;
 poly f=x2+x+1;          //minimal polynomial of the field
                         //extension

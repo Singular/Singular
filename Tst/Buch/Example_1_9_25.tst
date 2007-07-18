@@ -1,10 +1,10 @@
 LIB "tst.lib";
 tst_init();
 
-============================= example 1.9.25  ===============================
+// ============================= example 1.9.25  ===============================
 
 LIB "ncalg.lib";
-LIB "center.lib";
+LIB "central.lib";
 def A0 = makeUsl2(); // U(sl_2) over the rationals
 setring A0;
 // compute the centralizer of f^2 up to degree 6
