@@ -3,7 +3,7 @@
 version = "$Id: CIMonomialCurve.lib";
 category="Commutative Algebra";
 info="
-LIBRARY: compintcurve.lib   Determines if the toric ideal of an affine monomial curve is a complete intersection
+LIBRARY: cimonom.lib   Determines if the toric ideal of an affine monomial curve is a complete intersection
 
 AUTHORS: I.Bermejo,               ibermejo@ull.es
 @*       I.Garcia-Marco,          iggarcia@ull.es
