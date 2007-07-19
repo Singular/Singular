@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.7 2007-05-10 08:12:42 wienand Exp $
+ *  Version: $Id: pDebug.cc,v 1.8 2007-07-19 11:54:50 Singular Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -81,7 +81,7 @@ BOOLEAN p_LmCheckIsFromRing(poly p, ring r)
                            (r->qideal != NULL &&
                             omIsBinPageAddr(p) &&
                             omSizeWOfAddr(p)==r->PolyBin->sizeW) ||
-                           rEqual((ring) custom, r, FALSE),
+                           rSamePolyRep((ring) custom, r),
                            "monomial not from specified ring");
       return TRUE;
     }

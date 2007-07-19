@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.64 2007-07-05 16:14:16 Singular Exp $ */
+/* $Id: ring.cc,v 1.65 2007-07-19 11:54:50 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1451,9 +1451,9 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
 {
   int i, j;
 
-  if (r1 == r2) return 1;
+  if (r1 == r2) return TRUE;
 
-  if (r1 == NULL || r2 == NULL) return 0;
+  if (r1 == NULL || r2 == NULL) return FALSE;
 
   if ((rInternalChar(r1) != rInternalChar(r2))
   || (r1->float_len != r2->float_len)
@@ -1461,55 +1461,55 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
   || (rVar(r1) != rVar(r2))
   || (r1->OrdSgn != r2->OrdSgn)
   || (rPar(r1) != rPar(r2)))
-    return 0;
+    return FALSE;
 
   for (i=0; i<rVar(r1); i++)
   {
     if (r1->names[i] != NULL && r2->names[i] != NULL)
     {
-      if (strcmp(r1->names[i], r2->names[i])) return 0;
+      if (strcmp(r1->names[i], r2->names[i])) return FALSE;
     }
     else if ((r1->names[i] != NULL) ^ (r2->names[i] != NULL))
     {
-      return 0;
+      return FALSE;
     }
   }
 
   i=0;
   while (r1->order[i] != 0)
   {
-    if (r2->order[i] == 0) return 0;
+    if (r2->order[i] == 0) return FALSE;
     if ((r1->order[i] != r2->order[i])
     || (r1->block0[i] != r2->block0[i])
     || (r2->block0[i] != r1->block0[i]))
-      return 0;
+      return FALSE;
     if (r1->wvhdl[i] != NULL)
     {
       if (r2->wvhdl[i] == NULL)
-        return 0;
+        return FALSE;
       for (j=0; j<r1->block1[i]-r1->block0[i]+1; j++)
         if (r2->wvhdl[i][j] != r1->wvhdl[i][j])
-          return 0;
+          return FALSE;
     }
-    else if (r2->wvhdl[i] != NULL) return 0;
+    else if (r2->wvhdl[i] != NULL) return FALSE;
     i++;
   }
 
   for (i=0; i<rPar(r1);i++)
   {
       if (strcmp(r1->parameter[i], r2->parameter[i])!=0)
-        return 0;
+        return FALSE;
   }
 
   if (r1->minpoly != NULL)
   {
-    if (r2->minpoly == NULL) return 0;
+    if (r2->minpoly == NULL) return FALSE;
     if (currRing == r1 || currRing == r2)
     {
-      if (! nEqual(r1->minpoly, r2->minpoly)) return 0;
+      if (! nEqual(r1->minpoly, r2->minpoly)) return FALSE;
     }
   }
-  else if (r2->minpoly != NULL) return 0;
+  else if (r2->minpoly != NULL) return FALSE;
 
   if (qr)
   {
@@ -1519,21 +1519,69 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
       int i, n;
       poly *m1, *m2;
 
-      if (id2 == NULL) return 0;
-      if ((n = IDELEMS(id1)) != IDELEMS(id2)) return 0;
+      if (id2 == NULL) return FALSE;
+      if ((n = IDELEMS(id1)) != IDELEMS(id2)) return FALSE;
 
       if (currRing == r1 || currRing == r2)
       {
         m1 = id1->m;
         m2 = id2->m;
         for (i=0; i<n; i++)
-          if (! pEqualPolys(m1[i],m2[i])) return 0;
+          if (! pEqualPolys(m1[i],m2[i])) return FALSE;
       }
     }
-    else if (r2->qideal != NULL) return 0;
+    else if (r2->qideal != NULL) return FALSE;
   }
 
-  return 1;
+  return TRUE;
+}
+
+// returns TRUE, if r1 and r2 represents the monomials in the same way
+// FALSE, otherwise
+// this is an analogue to rEqual but not so strict
+BOOLEAN rSamePolyRep(ring r1, ring r2)
+{
+  int i, j;
+
+  if (r1 == r2) return TRUE;
+
+  if (r1 == NULL || r2 == NULL) return FALSE;
+
+  if ((rInternalChar(r1) != rInternalChar(r2))
+  || (r1->float_len != r2->float_len)
+  || (r1->float_len2 != r2->float_len2)
+  || (rVar(r1) != rVar(r2))
+  || (r1->OrdSgn != r2->OrdSgn)
+  || (rPar(r1) != rPar(r2)))
+    return FALSE;
+
+  if (r1->N!=r2->N) return FALSE;
+  if (r1->P!=r2->P) return FALSE;
+
+  i=0;
+  while (r1->order[i] != 0)
+  {
+    if (r2->order[i] == 0) return FALSE;
+    if ((r1->order[i] != r2->order[i])
+    || (r1->block0[i] != r2->block0[i])
+    || (r2->block0[i] != r1->block0[i]))
+      return FALSE;
+    if (r1->wvhdl[i] != NULL)
+    {
+      if (r2->wvhdl[i] == NULL)
+        return FALSE;
+      for (j=0; j<r1->block1[i]-r1->block0[i]+1; j++)
+        if (r2->wvhdl[i][j] != r1->wvhdl[i][j])
+          return FALSE;
+    }
+    else if (r2->wvhdl[i] != NULL) return FALSE;
+    i++;
+  }
+
+  // we do not check minpoly
+  // we do not check qideal
+
+  return TRUE;
 }
 
 rOrderType_t rGetOrderType(ring r)

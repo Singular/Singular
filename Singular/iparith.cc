@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.449 2007-07-18 12:06:38 Singular Exp $ */
+/* $Id: iparith.cc,v 1.450 2007-07-19 11:54:51 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3843,7 +3843,7 @@ static BOOLEAN jjIDEAL_R(leftv res, leftv v)
   if (currRing!=NULL)
   {
     ring q=(ring)v->Data();
-    if (rEqual(currRing, q, 0))
+    if (rSamePolyRep(currRing, q))
     {
       if (q->qideal==NULL)
         res->data=(char *)idInit(1,1);
