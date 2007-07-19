@@ -2,7 +2,7 @@
 //major revision Jan/Feb. 2007, GMG
 //groebner mit Optionen versehen
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.93 2007-06-01 13:17:23 Singular Exp $";
+version="$Id: standard.lib,v 1.94 2007-07-19 16:23:52 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -704,6 +704,7 @@ EXAMPLE: example qslimgb; shows an example"
   if (find(option(),"redSB") > 0)
   {
     if (p_opt) { "//interreduction"; }
+    i=reduce(i,std(0));
     i=interred(i);
   }
   attrib(i, "isSB", 1);
