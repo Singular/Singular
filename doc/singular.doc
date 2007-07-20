@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.163 2007-07-11 16:50:03 Singular Exp $
+@comment $Id: singular.doc,v 1.164 2007-07-20 14:13:52 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -318,6 +318,7 @@ LIB "all.lib";
 @menu
 * absfact_lib:: absolute factorization for characteristic 0
 * algebra_lib:: procedures for computing with algebras and maps
+* cimonom_lib:  is the toric ideal of an affine monomial curve a complete intersection ?
 * elim_lib:: procedures for elimination, saturation and blowing up
 * grwalk_lib:: Groebner walk and Fraktal walk
 * homolog_lib:: procedures for homological algebra
@@ -344,11 +345,15 @@ LIB "all.lib";
 @subsection absfact_lib
 @c lib absfact.lib
 @c ---------------------------------------------------------
-@node algebra_lib, elim_lib, absfact_lib, Commutative algebra
+@node algebra_lib, cimonom_lib, absfact_lib, Commutative algebra
 @subsection algebra_lib
 @c lib algebra.lib
+@c ---------------------------------------------------------
+@node cimonom_lib, elim_lib, algebra_lib, Commutative algebra
+@subsection cimonom_lib
+@c lib cimonom.lib
 @c ----------------------------------------------------------
-@node elim_lib, grwalk_lib, algebra_lib, Commutative algebra
+@node elim_lib, grwalk_lib, cimonom_lib, Commutative algebra
 @subsection elim_lib
 @c lib elim.lib
 @c ----------------------------------------------------------
