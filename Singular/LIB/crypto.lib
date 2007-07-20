@@ -1,6 +1,6 @@
 //GP, last modified 28.6.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: crypto.lib,v 1.1 2007-01-09 10:31:49 Singular Exp $";
+version="$Id: crypto.lib,v 1.2 2007-07-20 10:02:38 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY:  crypto.lib     Procedures for teaching cryptography
@@ -2062,3 +2062,4 @@ factorize(G);
 //pi(0)=1,pi(1)=2,pi(2)=3,pi(3)=0 gives:  (1101)
 
 */
+

@@ -1,13 +1,12 @@
 //GP, last modified 23.10.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: modstd.lib,v 1.13 2007-07-04 13:14:43 Singular Exp $";
+version="$Id: modstd.lib,v 1.14 2007-07-20 10:02:38 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: modstd.lib  Grobner basis of ideals
 AUTHORS: A. Hashemi,     Amir.Hashemi@lip6.fr
 @*       G. Pfister      pfister@mathematik.uni-kl.de
 @*       H. Schoenemann  hannes@mathematik.uni-kl.de
-@*       Cindy Magin,    c.magin@web.de
 
 NOTE:
  A library for computing the Grobner basis of an ideal in the polynomial
@@ -23,7 +22,6 @@ PROCEDURES:
 modStd(I);     compute a standard basis of I using modular methods
 modS(I,L);     liftings to Q of standard bases of I mod p for p in L
 primeList(n);  intvec of n primes  <= 2134567879 in decreasing order
-pStd(p,i);     compute a standard basis of i using p-adic methods
 ";
 
 LIB "poly.lib";
@@ -886,3 +884,4 @@ poly f =x^a+y^b+z^c+x^alpha*y^(beta-5)+x^(alpha-2)*y^(beta-3)+x^(alpha-3)*y^(bet
 ideal i= jacob(f);
 
 */
+

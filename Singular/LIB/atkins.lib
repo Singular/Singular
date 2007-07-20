@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: atkins.lib,v 1.2 2007-01-09 12:42:22 pfister Exp $";
+version="$Id: atkins.lib,v 1.3 2007-07-20 10:02:38 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY:  atkins.lib     Procedures for teaching cryptography
@@ -13,21 +13,19 @@ NOTE: The library contains auxiliary procedures to compute the elliptic
 
 
 PROCEDURES:
-  new(L,D)                     checks if number D already exists in list L
-  bubblesort(L)                sorts elements of the list L
-  disc(N,k)                    generates a list of negative discriminants
-  Cornacchia(d,p)              computes solution (x,y) for x^2+d*y^2=p
-  CornacchiaModified(D,p)      computes solution (x,y) for x^2+|D|*y^2=4p
-  maximum(L)                   computes the maximal number contained in L
-  cmod(x,y)                    computes x mod y
-  sqr(w,k)                     computes the square root of w
-  e(z,k)                       computes exp(z)
-  jot(t,k)                     computes the j-invariant of t
-  round(r)                     rounds r to the nearest number out of Z
-  HilbertClassPolynomial(D,k)  computes the Hilbert Class Polynomial
-  RootsModp(p,P)               computes roots of the polynomial P modulo p
-  w(D)                         computes the number of units in Q(sqr(D))
-  Atkin(N,K,B)                 tries to prove that N is prime
+  newTest(L,D)              checks if number D already exists in list L
+  bubblesort(L)             sorts elements of the list L
+  disc(N,k)                 generates a list of negative discriminants
+  Cornacchia(d,p)           computes solution (x,y) for x^2+d*y^2=p
+  CornacchiaModified(D,p)   computes solution (x,y) for x^2+|D|*y^2=4p
+  maximum(L)                computes the maximal number contained in L
+  expo(z,k)                 computes exp(z)
+  jOft(t,k)                 computes the j-invariant of t
+  round(r)                  rounds r to the nearest number out of Z
+  HilbertClassPoly(D,k)     computes the Hilbert Class Polynomial
+  rootsModp(p,P)            computes roots of the polynomial P modulo p
+  wUnit(D)                  computes the number of units in Q(sqr(D))
+  Atkin(N,K,B)              tries to prove that N is prime
 
 ";
 
@@ -38,8 +36,8 @@ LIB "inout.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc new(list L, number D)
-"USAGE: new(L,D);
+proc newTest(list L, number D)
+"USAGE: newTest(L,D);
 RETURN:  1, if D does not already exist in L,
         -1, if D does already exist in L
 EXAMPLE:example new; shows an example
@@ -62,7 +60,7 @@ example
     ring r = 0,x,dp;
     list L=8976,-223456,556,-778,3,-55603,45,766677;
     number D=-55603;
-    new(L,D);
+    newTest(L,D);
 }
 
 proc bubblesort(list L)
@@ -117,7 +115,7 @@ EXAMPLE:example disc; shows an example
     for(a=int(intPart(B/4))+1;a<=k;a++)
     {
       D=-4*a+B;
-      if((D<0)&&((D mod 4)!=2)&&((D mod 4)!=3)&&(absValue(D)<4*N)&&(new(L,D)==1))
+      if((D<0)&&((D mod 4)!=2)&&((D mod 4)!=3)&&(absValue(D)<4*N)&&(newTest(L,D)==1))
       {
         L[size(L)+1]=D;
       }
@@ -341,7 +339,7 @@ example
 
 
 
-proc cmod(number x, number y)
+static proc cmod(number x, number y)
 "USAGE: cmod(x,y);
 RETURN: x mod y
 ASSUME: x,y out of Z and x,y<=2147483647
@@ -368,7 +366,7 @@ example
 
 
 
-proc sqr(number w, int k)
+static proc sqr(number w, int k)
 "USAGE: sqr(w,k);
 RETURN: the square root of w
 ASSUME: w>=0
@@ -396,8 +394,8 @@ example
 
 
 
-proc e(number z, int k)
-"USAGE: e(z,k);
+proc expo(number z, int k)
+"USAGE: expo(z,k);
 RETURN: e^z to the order k
 NOTE:   k describes the number of summands being calculated in the exponential power series
 EXAMPLE:example e; shows an example
@@ -419,13 +417,13 @@ example
 { "EXAMPLE:"; echo = 2;
     ring r = (real,30),x,dp;
     number z=40.35;
-    e(z,1000);
+    expo(z,1000);
 }
 
 
 
-proc jot(number t, int k)
-"USAGE: jot(t,k);
+proc jOft(number t, int k)
+"USAGE: jOft(t,k);
 RETURN: the j-invariant of t
 ASSUME: t is a complex number with positive imaginary part
 NOTE:   k describes the number of summands being calculated in the power series,
@@ -444,10 +442,10 @@ EXAMPLE:example jot; shows an example
       if((tr!=-1/2)&&(tr!=0))
          {
            tr=tr-round(tr);
-           qr1=e(2*i*pi*tr,10*k);
+           qr1=expo(2*i*pi*tr,10*k);
          }
 
-      qi1=e(-pi*ti,10*k);
+      qi1=expo(-pi*ti,10*k);
       q1=qr1*qi1^2;
       q2=q1^2;
 
@@ -469,7 +467,7 @@ example
 { "EXAMPLE:"; echo = 2;
     ring r = (complex,30,i),x,dp;
     number t=(-7+i*sqr(7,250))/2;
-    jot(t,50);
+    jOft(t,50);
 }
 
 
@@ -529,9 +527,9 @@ example
 
 
 
-proc HilbertClassPolynomial(number D, int k)
-"USAGE: HilbertClassPolynomial(D,k);
-RETURN: the monic polynomial of degree h(D) in Z[X] of which jot((D+sqr(D))/2) is a root
+proc HilbertClassPoly(number D, int k)
+"USAGE: HilbertClassPoly(D,k);
+RETURN: the monic polynomial of degree h(D) in Z[X] of which jOft((D+sqr(D))/2) is a root
 ASSUME: D is a negative discriminant
 NOTE:   k is input for the procedure "jot",
         5*k is input for the procedure "sqr",
@@ -604,7 +602,7 @@ EXAMPLE:example HilbertClassPolynomial; shows an example
                           else
                              {
                                tau=(-b+i*sqr(absValue(D),5*k))/(2*a);
-                               j=jot(tau,k);
+                               j=jOft(tau,k);
                                if((a==b)||(a^2==t)||(b==0))
                                   {
                                     P=P*(var(1)-repart(j));
@@ -676,18 +674,18 @@ example
 { "EXAMPLE:"; echo = 2;
     ring r = 0,x,dp;
     number D=-23;
-    HilbertClassPolynomial(D,50);
+    HilbertClassPoly(D,50);
 }
 
 
 
-proc RootsModp(int p, poly P)
-"USAGE: RootsModp(p,P);
+proc rootsModp(int p, poly P)
+"USAGE: rootsModp(p,P);
 RETURN: list of roots of the polynomial P modulo p with p prime
 ASSUME: p>=3
 NOTE:   this algorithm will be called recursively, and it is understood
         that all the operations are done in Z/pZ (excepting sqareRoot(d,p))
-EXAMPLE:example RootsModp; shows an example
+EXAMPLE:example rootsModp; shows an example
 "
 {
       if(p<3)                                                              // (0)[Test if assumptions well-defined]
@@ -756,7 +754,7 @@ EXAMPLE:example RootsModp; shows an example
            setring S;                                                      // (4)[Recurse]
            poly B=imap(R,B);
            poly C=imap(R,C);
-           list l=L+RootsModp(p,B)+RootsModp(p,C);
+           list l=L+rootsModp(p,B)+rootsModp(p,C);
            return(l);
          }
 }
@@ -764,15 +762,15 @@ example
 { "EXAMPLE:"; echo = 2;
     ring r = 0,x,dp;
     poly f=x4+2x3-5x2+x;
-    RootsModp(7,f);
+    rootsModp(7,f);
     poly g=x5+112x4+655x3+551x2+1129x+831;
-    RootsModp(1223,g);
+    rootsModp(1223,g);
 }
 
 
 
-proc w(number D)
-"USAGE: w(D);
+proc wUnit(number D)
+"USAGE: wUnit(D);
 RETURN: the number of roots of unity in the quadratic order of discriminant D
 ASSUME: D<0 a discriminant kongruent to 0 or 1 modulo 4
 EXAMPLE:example w; shows an example
@@ -793,7 +791,7 @@ example
 { "EXAMPLE:"; echo = 2;
     ring r = 0,x,dp;
     number D=-3;
-    w(D);
+    wUnit(D);
 }
 
 
@@ -842,7 +840,7 @@ EXAMPLE:example Atkin; shows an example
     number m,q;                        // m=|E(Z/N(i)Z)| and q|m
     number a,b,j,c;                    // characterize E(Z/N(i)Z)
     number g,u;                        // g out of Z/N(i)Z, u=Jacobi(g,N(i))
-    poly T;                            // T=HilbertClassPolynomial(D,K)
+    poly T;                            // T=HilbertClassPoly(D,K)
     matrix M;                          // M contains the coefficients of T
 
     if(printlevel>=1) {"Liste H der moeglichen geeigneten Diskriminanten wird berechnet.";}
@@ -1012,7 +1010,7 @@ EXAMPLE:example Atkin; shows an example
         if(D<-4)
         {
           if(printlevel>=1) {"Das Minimalpolynom T von j((D+sqr(D))/2) aus Z[X] fuer D="+string(D)+" wird berechnet.";}
-          T=HilbertClassPolynomial(D,K);
+          T=HilbertClassPoly(D,K);
           if(printlevel>=1) {"T="+string(T);pause();}
 
           M=coeffs(T,var(1));
@@ -1025,7 +1023,7 @@ EXAMPLE:example Atkin; shows an example
           }
           if(printlevel>=1) {"Setze T=T mod N("+string(i)+").";"T="+string(T);pause();}
 
-          R=RootsModp(int(N(i)),T);
+          R=rootsModp(int(N(i)),T);
           if(deg(T)>size(R))
           {
             ERROR("Das Polynom T zerfaellt modulo N("+string(i)+") nicht vollstaendig in Linearfaktoren."
@@ -1116,9 +1114,9 @@ EXAMPLE:example Atkin; shows an example
       if(step==10)                 // (10)[Change coefficients]
       {
         k=k+1;
-        if(k>=w(D))
+        if(k>=wUnit(D))
         {
-          if(printlevel>=1) {"Da k=w(D)="+string(k)+", ist N("+string(i)+")="+string(N(i))+" nicht prim.";pause();}
+          if(printlevel>=1) {"Da k=wUnit(D)="+string(k)+", ist N("+string(i)+")="+string(N(i))+" nicht prim.";pause();}
           step=14;
         }
         else
@@ -1219,7 +1217,7 @@ EXAMPLE:example Atkin; shows an example
         }
         else
         {
-          if(printlevel>=1) {"N(0)=N="+string(N)+" und daher ist N nicht prim.";pause();}
+          if(printlevel>=1) {"N(0)=N="+string(N)+" und daher ist N nicht prim.";pause(n);}
           return(-1);
         }
       }
@@ -1236,3 +1234,4 @@ example
     Atkin(100019,100,5);
     Atkin(10000079,100,2);
 }
+
