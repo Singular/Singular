@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.451 2007-07-23 14:44:50 motsak Exp $ */
+/* $Id: iparith.cc,v 1.452 2007-07-23 16:46:29 motsak Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2550,8 +2550,8 @@ static BOOLEAN jjREDUCE_P(leftv res, leftv u, leftv v)
   ideal Q = currQuotient;
 
 #ifdef HAVE_PLURAL
-  if(rIsSCA(currRing))
-    Q = currRing->nc->SCAQuotient();
+//   if(rIsSCA(currRing))
+//     Q = currRing->nc->SCAQuotient();
 #endif
   
   res->data = (char *)kNF((ideal)v->Data(),Q,(poly)u->Data());
@@ -2567,8 +2567,8 @@ static BOOLEAN jjREDUCE_ID(leftv res, leftv u, leftv v)
   ideal Q = currQuotient;
 
 #ifdef HAVE_PLURAL
-  if(rIsSCA(currRing))
-    Q = currRing->nc->SCAQuotient();
+//   if(rIsSCA(currRing))
+//     Q = currRing->nc->SCAQuotient();
 #endif
   
   res->data = (char *)kNF(vi,Q,ui);
@@ -2982,8 +2982,8 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   ideal Q = currQuotient;
 
 #ifdef HAVE_PLURAL
-  if(rIsSCA(currRing))
-    Q = currRing->nc->SCAQuotient();
+//   if(rIsSCA(currRing))
+//     Q = currRing->nc->SCAQuotient();
 #endif
 
   result=kStd(i1,Q,hom,&w,NULL,0,IDELEMS(i1)-ii0);
@@ -3901,8 +3901,8 @@ static BOOLEAN jjINTERRED(leftv res, leftv v)
   ideal Q = currQuotient;
   
 #ifdef HAVE_PLURAL
-  if(rIsSCA(currRing))
-    Q = currRing->nc->SCAQuotient();
+//   if(rIsSCA(currRing))
+//     Q = currRing->nc->SCAQuotient();
 #endif
   
   ideal result=kInterRed((ideal)(v->Data()), Q);
@@ -4084,8 +4084,8 @@ static BOOLEAN jjMSTD(leftv res, leftv v)
   ideal Q = currQuotient;
 
 #ifdef HAVE_PLURAL
-  if(rIsSCA(currRing))
-    Q = currRing->nc->SCAQuotient();
+//   if(rIsSCA(currRing))
+//     Q = currRing->nc->SCAQuotient();
 #endif
   
   r=kMin_std((ideal)v->Data(),Q,testHomog,NULL,m);
@@ -4381,8 +4381,8 @@ static BOOLEAN jjSTD(leftv res, leftv v)
   ideal Q = currQuotient;
 
 #ifdef HAVE_PLURAL
-  if(rIsSCA(currRing))
-    Q = currRing->nc->SCAQuotient();
+//   if(rIsSCA(currRing))
+//     Q = currRing->nc->SCAQuotient();
 #endif
   
   result=kStd(v_id,Q,hom,&w);
@@ -5806,8 +5806,8 @@ static BOOLEAN jjREDUCE3_P(leftv res, leftv u, leftv v, leftv w)
   ideal Q = currQuotient;
 
 #ifdef HAVE_PLURAL
-  if(rIsSCA(currRing))
-    Q = currRing->nc->SCAQuotient();
+//   if(rIsSCA(currRing))
+//     Q = currRing->nc->SCAQuotient();
 #endif
   
   res->data = (char *)kNF((ideal)v->Data(),Q,(poly)u->Data(),
@@ -5820,8 +5820,8 @@ static BOOLEAN jjREDUCE3_ID(leftv res, leftv u, leftv v, leftv w)
   ideal Q = currQuotient;
 
 #ifdef HAVE_PLURAL
-  if(rIsSCA(currRing))
-    Q = currRing->nc->SCAQuotient();
+//   if(rIsSCA(currRing))
+//     Q = currRing->nc->SCAQuotient();
 #endif
 
   
