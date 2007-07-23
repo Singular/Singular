@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.23 2007-07-23 13:58:56 Singular Exp $ */
+/* $Id: polys.cc,v 1.24 2007-07-23 14:01:27 motsak Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -227,7 +227,7 @@ char * p_Read(char *st, poly &rc, ring r)
       s = eati(s,&i);
       if (((unsigned long)i) >  r->bitmask)
       {
-	// exponent to large: it is not a monomial
+        // exponent to large: it is not a monomial
         p_DeleteLm(&rc,r);
         return s_save;
       }
@@ -245,8 +245,26 @@ done:
   if (r->cf->nIsZero(pGetCoeff(rc))) p_DeleteLm(&rc,r);
   else
   {
+    // in super-commutative ring
+    // squares of anti-commutative variables are zeroes!
+    if(rIsSCA(r))
+    {
+      const unsigned int iFirstAltVar = scaFirstAltVar(r);
+      const unsigned int iLastAltVar  = scaLastAltVar(r);
+
+      assume(rc != NULL);
+
+      for(unsigned int k = iFirstAltVar; k <= iLastAltVar; k++)
+        if( p_GetExp(rc, k, r) > 1 )
+        {
+          p_DeleteLm(&rc, r);
+          goto finish;
+        }
+      }
+    
     p_Setm(rc,r);
   }
+finish:  
   return s;
 }
 
