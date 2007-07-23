@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.450 2007-07-19 11:54:51 Singular Exp $ */
+/* $Id: iparith.cc,v 1.451 2007-07-23 14:44:50 motsak Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2547,7 +2547,14 @@ static BOOLEAN jjREAD2(leftv res, leftv u, leftv v)
 static BOOLEAN jjREDUCE_P(leftv res, leftv u, leftv v)
 {
   assumeStdFlag(v);
-  res->data = (char *)kNF((ideal)v->Data(),currQuotient,(poly)u->Data());
+  ideal Q = currQuotient;
+
+#ifdef HAVE_PLURAL
+  if(rIsSCA(currRing))
+    Q = currRing->nc->SCAQuotient();
+#endif
+  
+  res->data = (char *)kNF((ideal)v->Data(),Q,(poly)u->Data());
   return FALSE;
 }
 static BOOLEAN jjREDUCE_ID(leftv res, leftv u, leftv v)
@@ -2557,7 +2564,14 @@ static BOOLEAN jjREDUCE_ID(leftv res, leftv u, leftv v)
   idTest(ui);
   ideal vi=(ideal)v->Data();
   idTest(vi);
-  res->data = (char *)kNF(vi,currQuotient,ui);
+  ideal Q = currQuotient;
+
+#ifdef HAVE_PLURAL
+  if(rIsSCA(currRing))
+    Q = currRing->nc->SCAQuotient();
+#endif
+  
+  res->data = (char *)kNF(vi,Q,ui);
   return FALSE;
 }
 #if 0
@@ -2947,6 +2961,7 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   idDelete(&i0);
   intvec *w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   tHomog hom=testHomog;
+
   if (w!=NULL)
   {
     if (!idTestHomModule(i1,currQuotient,w))
@@ -2963,7 +2978,15 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   }
   BITSET save_test=test;
   test|=Sy_bit(OPT_SB_1);
-  result=kStd(i1,currQuotient,hom,&w,NULL,0,IDELEMS(i1)-ii0);
+
+  ideal Q = currQuotient;
+
+#ifdef HAVE_PLURAL
+  if(rIsSCA(currRing))
+    Q = currRing->nc->SCAQuotient();
+#endif
+
+  result=kStd(i1,Q,hom,&w,NULL,0,IDELEMS(i1)-ii0);
   test=save_test;
   idDelete(&i1);
   idSkipZeroes(result);
@@ -3875,7 +3898,14 @@ static BOOLEAN jjINDEPSET(leftv res, leftv v)
 }
 static BOOLEAN jjINTERRED(leftv res, leftv v)
 {
-  ideal result=kInterRed((ideal)(v->Data()),currQuotient);
+  ideal Q = currQuotient;
+  
+#ifdef HAVE_PLURAL
+  if(rIsSCA(currRing))
+    Q = currRing->nc->SCAQuotient();
+#endif
+  
+  ideal result=kInterRed((ideal)(v->Data()), Q);
   if (TEST_OPT_PROT) { PrintLn(); mflush(); }
   res->data = result;
   return FALSE;
@@ -4051,7 +4081,14 @@ static BOOLEAN jjMSTD(leftv res, leftv v)
 {
   int t=v->Typ();
   ideal r,m;
-  r=kMin_std((ideal)v->Data(),currQuotient,testHomog,NULL,m);
+  ideal Q = currQuotient;
+
+#ifdef HAVE_PLURAL
+  if(rIsSCA(currRing))
+    Q = currRing->nc->SCAQuotient();
+#endif
+  
+  r=kMin_std((ideal)v->Data(),Q,testHomog,NULL,m);
   lists l=(lists)omAllocBin(slists_bin);
   l->Init(2);
   l->m[0].rtyp=t;
@@ -4341,7 +4378,14 @@ static BOOLEAN jjSTD(leftv res, leftv v)
       w=ivCopy(w);
     }
   }
-  result=kStd(v_id,currQuotient,hom,&w);
+  ideal Q = currQuotient;
+
+#ifdef HAVE_PLURAL
+  if(rIsSCA(currRing))
+    Q = currRing->nc->SCAQuotient();
+#endif
+  
+  result=kStd(v_id,Q,hom,&w);
   idSkipZeroes(result);
   res->data = (char *)result;
   if(!TEST_OPT_DEGBOUND) setFlag(res,FLAG_STD);
@@ -5759,14 +5803,29 @@ static BOOLEAN jjREDUCE3_CID(leftv res, leftv u, leftv v, leftv w)
 static BOOLEAN jjREDUCE3_P(leftv res, leftv u, leftv v, leftv w)
 {
   assumeStdFlag(v);
-  res->data = (char *)kNF((ideal)v->Data(),currQuotient,(poly)u->Data(),
+  ideal Q = currQuotient;
+
+#ifdef HAVE_PLURAL
+  if(rIsSCA(currRing))
+    Q = currRing->nc->SCAQuotient();
+#endif
+  
+  res->data = (char *)kNF((ideal)v->Data(),Q,(poly)u->Data(),
     0,(int)(long)w->Data());
   return FALSE;
 }
 static BOOLEAN jjREDUCE3_ID(leftv res, leftv u, leftv v, leftv w)
 {
   assumeStdFlag(v);
-  res->data = (char *)kNF((ideal)v->Data(),currQuotient,(ideal)u->Data(),
+  ideal Q = currQuotient;
+
+#ifdef HAVE_PLURAL
+  if(rIsSCA(currRing))
+    Q = currRing->nc->SCAQuotient();
+#endif
+
+  
+  res->data = (char *)kNF((ideal)v->Data(),Q,(ideal)u->Data(),
     0,(int)(long)w->Data());
   return FALSE;
 }
