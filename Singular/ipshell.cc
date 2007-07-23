@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.162 2007-07-12 13:46:04 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.163 2007-07-23 18:23:19 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1935,7 +1935,7 @@ ring rCompose(const lists  L)
            break;
          case ringorder_c:
          case ringorder_C:
-           R->block1[j]=R->block0[j]-1;
+           R->block1[j]=R->block0[j]=0;
            break;
          case 0:
          case ringorder_unspec:
