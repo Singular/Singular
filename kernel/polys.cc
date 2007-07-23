@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.22 2007-07-05 08:35:10 Singular Exp $ */
+/* $Id: polys.cc,v 1.23 2007-07-23 13:58:56 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -227,12 +227,16 @@ char * p_Read(char *st, poly &rc, ring r)
       s = eati(s,&i);
       if (((unsigned long)i) >  r->bitmask)
       {
+	// exponent to large: it is not a monomial
+        p_DeleteLm(&rc,r);
         return s_save;
       }
       p_AddExp(rc,1+j, (Exponent_t)i, r);
     }
     else
     {
+      // 1st char of is not a varname
+      p_DeleteLm(&rc,r);
       s--;
       return s;
     }
