@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.46 2007-07-13 14:19:26 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.47 2007-07-23 10:46:57 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -994,6 +994,11 @@ poly redNF (poly h,int &max_ind,kStrategy strat)
       j=kFindDivisibleByInS(strat,&max_ind,&P);
     if (j>=0)
     {
+      if (!nIsOne(pGetCoeff(strat->S[j])))
+      {
+         pNorm(strat->S[j]);
+         //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
+      }
       nNormalize(pGetCoeff(P.p));
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG)
@@ -1343,18 +1348,21 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   /*Shdl=*/initS(F,Q,strat);
   /*- compute------------------------------------------------------- -*/
   //if ((TEST_OPT_INTSTRATEGY)&&(lazyReduce==0))
-  {
-    for (i=strat->sl;i>=0;i--)
-      pNorm(strat->S[i]);
-  }
+  //{
+  //  for (i=strat->sl;i>=0;i--)
+  //    pNorm(strat->S[i]);
+  //}
   kTest(strat);
   if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
   int max_ind;
   p = redNF(pCopy(q),max_ind,strat);
   if ((p!=NULL)&&(lazyReduce==0))
   {
+    BITSET save=test;
+    test &= ~Sy_bit(OPT_INTSTRATEGY);
     if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
     p = redtailBba(p,max_ind,strat);
+    test=save;
   }
   /*- release temp data------------------------------- -*/
   omfree(strat->sevS);
