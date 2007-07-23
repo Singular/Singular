@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.47 2007-07-23 10:46:57 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.48 2007-07-23 10:50:02 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1404,11 +1404,6 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   /*Shdl=*/initS(F,Q,strat);
   /*- compute------------------------------------------------------- -*/
   res=idInit(IDELEMS(q),q->rank);
-  //if ((TEST_OPT_INTSTRATEGY)&&(lazyReduce==0))
-  {
-    for (i=strat->sl;i>=0;i--)
-      pNorm(strat->S[i]);
-  }
   for (i=IDELEMS(q)-1; i>=0; i--)
   {
     if (q->m[i]!=NULL)
@@ -1417,8 +1412,11 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
       p = redNF(pCopy(q->m[i]),max_ind,strat);
       if ((p!=NULL)&&(lazyReduce==0))
       {
+        BITSET save=test;
+        test &= ~Sy_bit(OPT_INTSTRATEGY);
         if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
         p = redtailBba(p,max_ind,strat);
+        test=save;
       }
       res->m[i]=p;
     }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.62 2007-07-13 14:19:26 Singular Exp $ */
+/* $Id: kutil.cc,v 1.63 2007-07-23 10:46:57 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2529,7 +2529,7 @@ ideal createG0()
   while ( nextZeroSimplexExponent(exp, ind, cexp, cind, &cabsind, step, bound, currRing->N) );
   idSkipZeroes(G0);
   return G0;
-}   
+}
 #endif
 
 #ifdef HAVE_RINGS
@@ -4266,19 +4266,24 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
         With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
         if (With == NULL) break;
       }
+      if ((!TEST_OPT_INTSTRATEGY) && (!nIsOne(pGetCoeff(With->p))))
+      {
+        With->pNorm();
+        //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
+      }
       strat->redTailChange=TRUE;
       if (ksReducePolyTail(L, With, &Ln))
       {
         // reducing the tail would violate the exp bound
-	//  set a flag and hope for a retry (in bba)
-	strat->completeReduce_retry=TRUE;
+        //  set a flag and hope for a retry (in bba)
+        strat->completeReduce_retry=TRUE;
         do
         {
           pNext(h) = Ln.LmExtractAndIter();
           pIter(h);
           L->pLength++;
         } while (!Ln.IsNull());
-	goto all_done;
+        goto all_done;
       }
       if (Ln.IsNull()) goto all_done;
       if (! withT) With_s.Init(currRing);
@@ -4493,7 +4498,7 @@ void initS (ideal F, ideal Q,kStrategy strat)
     }
   }
   /*- test, if a unit is in F -*/
-  if ((strat->sl>=0) 
+  if ((strat->sl>=0)
 #ifdef HAVE_RINGS
        && !rField_is_Ring(currRing)
 #endif
@@ -5476,7 +5481,7 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   strat->kIdeal = NULL;
   strat->fromT = FALSE;
   strat->noTailReduction = !TEST_OPT_REDTAIL;
-  if (!TEST_OPT_SB_1) 
+  if (!TEST_OPT_SB_1)
   {
     updateS(TRUE,strat);
   }
@@ -6369,7 +6374,7 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
         {
           enterOnePair(j,h,ecart,isFromQ,strat, atR);
         }
-	/* HERE we put (h, s*h) pairs */
+        /* HERE we put (h, s*h) pairs */
       }
     }
     else
