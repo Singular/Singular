@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.65 2007-07-19 11:54:50 Singular Exp $ */
+/* $Id: ring.cc,v 1.66 2007-07-23 18:00:29 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1481,7 +1481,7 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
     if (r2->order[i] == 0) return FALSE;
     if ((r1->order[i] != r2->order[i])
     || (r1->block0[i] != r2->block0[i])
-    || (r2->block0[i] != r1->block0[i]))
+    || (r1->block1[i] != r2->block1[i]))
       return FALSE;
     if (r1->wvhdl[i] != NULL)
     {
@@ -1494,6 +1494,7 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
     else if (r2->wvhdl[i] != NULL) return FALSE;
     i++;
   }
+  if (r2->order[i] != 0) return FALSE;
 
   for (i=0; i<rPar(r1);i++)
   {
@@ -1564,7 +1565,7 @@ BOOLEAN rSamePolyRep(ring r1, ring r2)
     if (r2->order[i] == 0) return FALSE;
     if ((r1->order[i] != r2->order[i])
     || (r1->block0[i] != r2->block0[i])
-    || (r2->block0[i] != r1->block0[i]))
+    || (r1->block1[i] != r2->block1[i]))
       return FALSE;
     if (r1->wvhdl[i] != NULL)
     {
@@ -1577,6 +1578,7 @@ BOOLEAN rSamePolyRep(ring r1, ring r2)
     else if (r2->wvhdl[i] != NULL) return FALSE;
     i++;
   }
+  if (r2->order[i] != 0) return FALSE;
 
   // we do not check minpoly
   // we do not check qideal
