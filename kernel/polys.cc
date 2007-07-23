@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.24 2007-07-23 14:01:27 motsak Exp $ */
+/* $Id: polys.cc,v 1.25 2007-07-23 14:11:04 motsak Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -21,6 +21,7 @@
 
 #ifdef HAVE_PLURAL
 #include "gring.h"
+#include "sca.h"
 #endif
 
 /* ----------- global variables, set by pSetGlobals --------------------- */
@@ -245,6 +246,7 @@ done:
   if (r->cf->nIsZero(pGetCoeff(rc))) p_DeleteLm(&rc,r);
   else
   {
+#ifdef HAVE_PLURAL
     // in super-commutative ring
     // squares of anti-commutative variables are zeroes!
     if(rIsSCA(r))
@@ -260,7 +262,8 @@ done:
           p_DeleteLm(&rc, r);
           goto finish;
         }
-      }
+    }
+#endif
     
     p_Setm(rc,r);
   }
