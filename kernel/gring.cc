@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.45 2007-07-13 14:19:25 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.46 2007-07-24 11:17:03 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -2012,7 +2012,7 @@ ideal twostd(ideal I)
         #endif
         #endif
 
-        q = kNF(J,currQuotient,q,0,0);
+        q = kNF(J,currQuotient,q,0,4);
 
         #ifdef PDEBUG
           p_Test(q, currRing);
