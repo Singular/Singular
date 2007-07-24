@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmcomb.cc,v 1.1.1.1 2003-10-06 12:15:52 Singular Exp $
+// $Id: fglmcomb.cc,v 1.2 2007-07-24 15:10:51 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -30,17 +30,6 @@
 #ifndef NOSTREAMIO
 #include <iostream.h>
 #endif
-// nur fuer debug-Ausgaben:
-static int
-pSize( poly p )
-{
-    int count = 0;
-    while ( p != NULL ) {
-        count+= nSize( pGetCoeff( p ) );
-        pIter( p );
-    }
-    return count;
-}
 
 static void
 fglmEliminateMonomials( poly * pptr, fglmVector & v, polyset monomials, int numMonoms )
