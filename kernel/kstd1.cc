@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.24 2007-07-24 12:29:30 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.25 2007-07-24 16:19:09 motsak Exp $ */
 /*
 * ABSTRACT:
 */
@@ -30,6 +30,11 @@
 #include "timer.h"
 
 //#include "ipprint.h"
+
+#ifdef HAVE_PLURAL
+#include "sca.h"
+#endif
+
 
 /* the list of all options which give a warning by test */
 BITSET kOptions=Sy_bit(OPT_PROT)           /*  0 */
@@ -2124,6 +2129,27 @@ ideal kInterRed (ideal F, ideal Q)
   int j;
   kStrategy strat = new skStrategy;
 
+  ideal tempF = F;
+  ideal tempQ = Q;
+
+#ifdef HAVE_PLURAL
+  if(rIsSCA(currRing))
+  {
+
+    const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
+    const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
+    tempF = id_KillSquares(F, m_iFirstAltVar, m_iLastAltVar, currRing);
+
+    // this should be done on the upper level!!! :
+    //    tempQ = currRing->nc->SCAQuotient();
+
+    if(Q == currQuotient)
+      tempQ = currRing->nc->SCAQuotient();
+  }
+#endif
+  
+//  assume(!rIsSCA(currRing));
+  
 //  if (TEST_OPT_PROT)
 //  {
 //    writeTime("start InterRed:");
@@ -2132,7 +2158,7 @@ ideal kInterRed (ideal F, ideal Q)
   //strat->syzComp     = 0;
   strat->kHEdgeFound = ppNoether != NULL;
   strat->kNoether=pCopy(ppNoether);
-  strat->ak = idRankFreeModule(F);
+  strat->ak = idRankFreeModule(tempF);
   initBuchMoraCrit(strat);
   strat->NotUsedAxis = (BOOLEAN *)omAlloc((pVariables+1)*sizeof(BOOLEAN));
   for (j=pVariables; j>0; j--) strat->NotUsedAxis[j] = TRUE;
@@ -2146,7 +2172,7 @@ ideal kInterRed (ideal F, ideal Q)
   strat->R           = initR();
   strat->sevT        = initsevT();
   if (pOrdSgn == -1)   strat->honey = TRUE;
-  initS(F,Q,strat);
+  initS(tempF, tempQ, strat);
   if (TEST_OPT_REDSB)
     strat->noTailReduction=FALSE;
   updateS(TRUE,strat);
@@ -2185,6 +2211,12 @@ ideal kInterRed (ideal F, ideal Q)
     shdl=res;
   }
   delete(strat);
+
+#ifdef HAVE_PLURAL
+  if( tempF != F )
+    id_Delete( &tempF, currRing);
+#endif
+  
   return shdl;
 }
 #endif
