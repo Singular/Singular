@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.452 2007-07-23 16:46:29 motsak Exp $ */
+/* $Id: iparith.cc,v 1.453 2007-07-24 09:58:47 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -62,11 +62,8 @@
 #include "interpolation.h"
 #endif
 
-
 #include "ipshell.h"
-
 #include "mpr_inout.h"
-
 
 #ifdef HAVE_PLURAL
 #include "gring.h"
@@ -147,14 +144,12 @@ struct sValCmdM
 typedef struct
 {
   cmdnames *sCmds;             /**< array of existing commands */
-
 #ifndef GENTABLE
   struct sValCmd1 *psValCmd1;
   struct sValCmd2 *psValCmd2;
   struct sValCmd3 *psValCmd3;
   struct sValCmdM *psValCmdM;
 #endif /* GENTABLE */
-
   int nCmdUsed;      /**< number of commands used */
   int nCmdAllocated; /**< number of commands-slots allocated */
   int nLastIdentifier; /**< valid indentifieres are slot 1..nLastIdentifier */
@@ -806,7 +801,6 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
 {
 #ifdef HAVE_NS
   idhdl packhdl;
-
   switch(u->Typ())
   {
       case 0:
@@ -818,7 +812,6 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
         }
         syMake(u,u->name,NULL);
         // else: use next case !!! no break !!!
-
       case PACKAGE_CMD:
         packhdl = (idhdl)u->data;
         if((!IDPACKAGE(packhdl)->loaded)
@@ -839,10 +832,8 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
         memcpy(res, v, sizeof(sleftv));
         memset(v, 0, sizeof(sleftv));
         break;
-
       case DEF_CMD:
         break;
-
       default:
         WerrorS("<package>::<id> expected");
         return TRUE;
@@ -1008,7 +999,6 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
 {
   poly a;
   poly b;
-
   if (v->next==NULL)
   {
     a=(poly)u->CopyD(POLY_CMD); // works also for VECTOR_CMD
@@ -1392,7 +1382,6 @@ static BOOLEAN jjINDEX_IV(leftv res, leftv u, leftv v)
   leftv p=NULL;
   int i;
   sleftv t;
-
   memset(&t,0,sizeof(t));
   t.rtyp=INT_CMD;
   for (i=0;i<iv->length(); i++)
@@ -1720,7 +1709,7 @@ static BOOLEAN jjCHINREM_P(leftv res, leftv u, leftv v)
     {
       h=((poly)c->m[i].Data());
       if (pLmCmp(r,h)==0)
-      { 
+      {
         x[i]=pGetCoeff(h);
         h=pLmFreeAndNext(h);
         c->m[i].data=(char*)h;
@@ -1751,7 +1740,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   lists c=(lists)u->CopyD(); // list of ideal
   intvec* p=(intvec*)v->Data();
   int rl=p->length();
-  poly r=NULL,h; 
+  poly r=NULL,h;
   ideal result;
   ideal *x=(ideal *)omAlloc(rl*sizeof(ideal));
   int i;
@@ -1801,7 +1790,6 @@ static BOOLEAN jjCOEFFS2_KB(leftv res, leftv u, leftv v)
 {
   poly p = pInit();
   int i;
-
   for (i=1; i<=pVariables; i++)
   {
     pSetExp(p, i, 1);
@@ -2124,7 +2112,6 @@ static BOOLEAN jjGCD_I(leftv res, leftv u, leftv v)
   int uu=(int)(long)u->Data();int vv=(int)(long)v->Data();
   int p0=ABS(uu),p1=ABS(vv);
   int r;
-
   while ( p1!=0 )
   {
     r=p0 % p1;
@@ -2403,28 +2390,23 @@ static BOOLEAN jjPARSTR2(leftv res, leftv u, leftv v)
   }
   return FALSE;
 }
-
 #ifdef HAVE_PLURAL
 static BOOLEAN jjPlural_num_poly(leftv res, leftv a, leftv b)
 {
   return nc_CallPlural(NULL,NULL,(poly)a->Data(),(poly)b->Data(),currRing);
 }
-
 static BOOLEAN jjPlural_num_mat(leftv res, leftv a, leftv b)
 {
   return nc_CallPlural(NULL,(matrix)b->Data(),(poly)a->Data(),NULL,currRing);
 }
-
 static BOOLEAN jjPlural_mat_poly(leftv res, leftv a, leftv b)
 {
   return nc_CallPlural((matrix)a->Data(),NULL,NULL,(poly)b->Data(),currRing);
 }
-
 static BOOLEAN jjPlural_mat_mat(leftv res, leftv a, leftv b)
 {
   return nc_CallPlural((matrix)a->Data(),(matrix)b->Data(),NULL,NULL,currRing);
 }
-
 static BOOLEAN jjBRACKET(leftv res, leftv a, leftv b)
 {
   if (rIsPluralRing(currRing))
@@ -2436,7 +2418,6 @@ static BOOLEAN jjBRACKET(leftv res, leftv a, leftv b)
   else res->data=NULL;
   return FALSE;
 }
-
 static BOOLEAN jjOPPOSE(leftv res, leftv a, leftv b)
 {
   /* number, poly, vector, ideal, module, matrix */
@@ -2547,14 +2528,7 @@ static BOOLEAN jjREAD2(leftv res, leftv u, leftv v)
 static BOOLEAN jjREDUCE_P(leftv res, leftv u, leftv v)
 {
   assumeStdFlag(v);
-  ideal Q = currQuotient;
-
-#ifdef HAVE_PLURAL
-//   if(rIsSCA(currRing))
-//     Q = currRing->nc->SCAQuotient();
-#endif
-  
-  res->data = (char *)kNF((ideal)v->Data(),Q,(poly)u->Data());
+  res->data = (char *)kNF((ideal)v->Data(),currQuotient,(poly)u->Data());
   return FALSE;
 }
 static BOOLEAN jjREDUCE_ID(leftv res, leftv u, leftv v)
@@ -2564,14 +2538,7 @@ static BOOLEAN jjREDUCE_ID(leftv res, leftv u, leftv v)
   idTest(ui);
   ideal vi=(ideal)v->Data();
   idTest(vi);
-  ideal Q = currQuotient;
-
-#ifdef HAVE_PLURAL
-//   if(rIsSCA(currRing))
-//     Q = currRing->nc->SCAQuotient();
-#endif
-  
-  res->data = (char *)kNF(vi,Q,ui);
+  res->data = (char *)kNF(vi,currQuotient,ui);
   return FALSE;
 }
 #if 0
@@ -2610,7 +2577,6 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
       weights=NULL;
     }
   }
-
   intvec *ww=NULL;
   int add_row_shift=0;
   if (weights!=NULL)
@@ -2736,7 +2702,6 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
      add_row_shift = ww->min_in();
      (*ww) -= add_row_shift;
   }
-
   if ((iiOp == RES_CMD) || (iiOp == MRES_CMD))
   {
     r=syResolution(u_id,maxl, ww, iiOp==MRES_CMD);
@@ -2978,15 +2943,7 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   }
   BITSET save_test=test;
   test|=Sy_bit(OPT_SB_1);
-
-  ideal Q = currQuotient;
-
-#ifdef HAVE_PLURAL
-//   if(rIsSCA(currRing))
-//     Q = currRing->nc->SCAQuotient();
-#endif
-
-  result=kStd(i1,Q,hom,&w,NULL,0,IDELEMS(i1)-ii0);
+  result=kStd(i1,currQuotient,hom,&w,NULL,0,IDELEMS(i1)-ii0);
   test=save_test;
   idDelete(&i1);
   idSkipZeroes(result);
@@ -3254,7 +3211,6 @@ struct sValCmd2 dArith2[]=
 #endif
 ,{jjFIND2,     FIND_CMD,       INT_CMD,        STRING_CMD, STRING_CMD ALLOW_PLURAL}
 ,{jjFWALK,     FWALK_CMD,      IDEAL_CMD,      RING_CMD,   DEF_CMD NO_PLURAL}
-
 ,{jjGCD_I,     GCD_CMD,        INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
 ,{jjGCD_N,     GCD_CMD,        NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD ALLOW_PLURAL}
 ,{jjGCD_BI,    GCD_CMD,        BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
@@ -3486,7 +3442,7 @@ static BOOLEAN jjBI2N(leftv res, leftv u)
     }
     nlDelete(&n,NULL);
     return bo;
-  } 
+  }
 }
 static BOOLEAN jjBI2P(leftv res, leftv u)
 {
@@ -3898,14 +3854,7 @@ static BOOLEAN jjINDEPSET(leftv res, leftv v)
 }
 static BOOLEAN jjINTERRED(leftv res, leftv v)
 {
-  ideal Q = currQuotient;
-  
-#ifdef HAVE_PLURAL
-//   if(rIsSCA(currRing))
-//     Q = currRing->nc->SCAQuotient();
-#endif
-  
-  ideal result=kInterRed((ideal)(v->Data()), Q);
+  ideal result=kInterRed((ideal)(v->Data()), currQuotient);
   if (TEST_OPT_PROT) { PrintLn(); mflush(); }
   res->data = result;
   return FALSE;
@@ -4048,7 +3997,6 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
   case 2:
     res->data = (char *)jjLONG2N(om_Info.MaxBytesSystem);
     break;
-
   default:
     omPrintStats(stdout);
     omPrintInfo(stdout);
@@ -4081,14 +4029,7 @@ static BOOLEAN jjMSTD(leftv res, leftv v)
 {
   int t=v->Typ();
   ideal r,m;
-  ideal Q = currQuotient;
-
-#ifdef HAVE_PLURAL
-//   if(rIsSCA(currRing))
-//     Q = currRing->nc->SCAQuotient();
-#endif
-  
-  r=kMin_std((ideal)v->Data(),Q,testHomog,NULL,m);
+  r=kMin_std((ideal)v->Data(),currQuotient,testHomog,NULL,m);
   lists l=(lists)omAllocBin(slists_bin);
   l->Init(2);
   l->m[0].rtyp=t;
@@ -4321,8 +4262,8 @@ static BOOLEAN jjSLIM_GB(leftv res, leftv u)
   const bool bIsSCA = rIsSCA(currRing);
 #else
   const bool bIsSCA = false;
-#endif 
-   
+#endif
+
   if ((currQuotient!=NULL) && !bIsSCA)
   {
     Werror("qring not supported by slimgb at the moment");
@@ -4378,14 +4319,7 @@ static BOOLEAN jjSTD(leftv res, leftv v)
       w=ivCopy(w);
     }
   }
-  ideal Q = currQuotient;
-
-#ifdef HAVE_PLURAL
-//   if(rIsSCA(currRing))
-//     Q = currRing->nc->SCAQuotient();
-#endif
-  
-  result=kStd(v_id,Q,hom,&w);
+  result=kStd(v_id,currQuotient,hom,&w);
   idSkipZeroes(result);
   res->data = (char *)result;
   if(!TEST_OPT_DEGBOUND) setFlag(res,FLAG_STD);
@@ -4445,9 +4379,7 @@ static BOOLEAN jjTRANSP_IV(leftv res, leftv v)
   res->data = (char *)ivTranp((intvec*)(v->Data()));
   return FALSE;
 }
-
 #ifdef HAVE_PLURAL
-
 static BOOLEAN jjOPPOSITE(leftv res, leftv a)
 {
   ring    r = (ring)a->Data();
@@ -4458,7 +4390,6 @@ static BOOLEAN jjOPPOSITE(leftv res, leftv a)
   else res->data = rCopy(r);
   return FALSE;
 }
-
 static BOOLEAN jjENVELOPE(leftv res, leftv a)
 {
   ring    r = (ring)a->Data();
@@ -4482,7 +4413,6 @@ static BOOLEAN jjENVELOPE(leftv res, leftv a)
   else  res->data = rCopy(r);
   return FALSE;
 }
-
 static BOOLEAN jjTWOSTD(leftv res, leftv a)
 {
   if (rIsPluralRing(currRing))  res->data=(ideal)twostd((ideal)a->Data());
@@ -5803,29 +5733,14 @@ static BOOLEAN jjREDUCE3_CID(leftv res, leftv u, leftv v, leftv w)
 static BOOLEAN jjREDUCE3_P(leftv res, leftv u, leftv v, leftv w)
 {
   assumeStdFlag(v);
-  ideal Q = currQuotient;
-
-#ifdef HAVE_PLURAL
-//   if(rIsSCA(currRing))
-//     Q = currRing->nc->SCAQuotient();
-#endif
-  
-  res->data = (char *)kNF((ideal)v->Data(),Q,(poly)u->Data(),
+  res->data = (char *)kNF((ideal)v->Data(),currQuotient,(poly)u->Data(),
     0,(int)(long)w->Data());
   return FALSE;
 }
 static BOOLEAN jjREDUCE3_ID(leftv res, leftv u, leftv v, leftv w)
 {
   assumeStdFlag(v);
-  ideal Q = currQuotient;
-
-#ifdef HAVE_PLURAL
-//   if(rIsSCA(currRing))
-//     Q = currRing->nc->SCAQuotient();
-#endif
-
-  
-  res->data = (char *)kNF((ideal)v->Data(),Q,(ideal)u->Data(),
+  res->data = (char *)kNF((ideal)v->Data(),currQuotient,(ideal)u->Data(),
     0,(int)(long)w->Data());
   return FALSE;
 }
@@ -7951,15 +7866,15 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
           case 2:
             memcpy(&d->arg2,a->next,sizeof(sleftv));
             a->next->Init();
-	    a->next->next=d->arg2.next;
+            a->next->next=d->arg2.next;
             d->arg2.next=NULL;
             /* no break */
           case 1:
             a->Init();
-	    a->next=d->arg1.next;
+            a->next=d->arg1.next;
             d->arg1.next=NULL;
         }
-	if (d->argc>3) a->next=NULL;
+        if (d->argc>3) a->next=NULL;
         a->name=NULL;
         a->rtyp=0;
         a->data=NULL;
