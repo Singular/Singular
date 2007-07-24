@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.7 2007-05-23 09:23:02 wienand Exp $
+ *  Version: $Id: kInline.cc,v 1.8 2007-07-24 11:20:32 Singular Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -600,7 +600,7 @@ KINLINE poly sLObject::LmExtractAndIter()
 
 KINLINE poly sLObject::CanonicalizeP()
 {
-  kTest_L(this);
+  //kTest_L(this);
   int i = -1;
 
   if (bucket != NULL)
@@ -615,7 +615,7 @@ KINLINE poly sLObject::CanonicalizeP()
 
 KINLINE poly sLObject::GetTP()
 {
-  kTest_L(this);
+  //kTest_L(this);
   poly tp = GetLmTailRing();
   assume(tp != NULL);
 
@@ -631,7 +631,7 @@ KINLINE poly sLObject::GetTP()
 
 KINLINE poly sLObject::GetP(omBin lmBin)
 {
-  kTest_L(this);
+  //kTest_L(this);
   if (p == NULL)
   {
     p = k_LmInit_tailRing_2_currRing(t_p, tailRing,
@@ -651,7 +651,7 @@ KINLINE poly sLObject::GetP(omBin lmBin)
     pLength++;
     if (t_p != NULL) pNext(t_p) = pNext(p);
   }
-  kTest_L(this);
+  //kTest_L(this);
   return p;
 }
 
@@ -1079,19 +1079,19 @@ void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether, ring r)
   ksReducePolyTail(&L, &T, q2, spNoether);
 }
 
-KINLINE poly redtailBba (poly p,int pos,kStrategy strat)
+KINLINE poly redtailBba (poly p,int pos,kStrategy strat,BOOLEAN normalize)
 {
   LObject L(p, currRing, strat->tailRing);
-  return redtailBba(&L, pos, strat);
+  return redtailBba(&L, pos, strat,FALSE, normalize);
 }
 
-KINLINE poly redtailBba(TObject *T, int pos,kStrategy strat, BOOLEAN withT)
+KINLINE poly redtailBba(TObject *T, int pos,kStrategy strat)
 {
   LObject L;
   L = *T;
   poly p = redtailBba(&L, pos, strat, FALSE);
   *T = L;
-  kTest_T(T);
+  //kTest_T(T);
   assume( p == T->p);
   return p;
 }

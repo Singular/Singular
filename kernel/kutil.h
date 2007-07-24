@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.25 2007-06-24 16:44:41 levandov Exp $ */
+/* $Id: kutil.h,v 1.26 2007-07-24 11:20:32 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -387,9 +387,10 @@ int posInL17 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
 int posInL10 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
-KINLINE poly redtailBba (poly p,int pos,kStrategy strat);
-poly redtailBba (LObject *L, int pos,kStrategy strat, BOOLEAN withT = FALSE);
-poly redtailBba (TObject *T, int pos,kStrategy strat, BOOLEAN withT = FALSE);
+KINLINE poly redtailBba (poly p,int pos,kStrategy strat,BOOLEAN normalize=FALSE);
+poly redtailBba (LObject *L, int pos,kStrategy strat,
+                 BOOLEAN withT = FALSE,BOOLEAN normalize=FALSE);
+poly redtailBba (TObject *T, int pos,kStrategy strat);
 poly redtail (poly p,int pos,kStrategy strat);
 poly redtail (LObject *L,int pos,kStrategy strat);
 poly redNF (poly h,int & max_ind,kStrategy strat);

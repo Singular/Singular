@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.63 2007-07-23 10:46:57 Singular Exp $ */
+/* $Id: kutil.cc,v 1.64 2007-07-24 11:20:32 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -4227,7 +4227,7 @@ poly redtail (poly p, int pos, kStrategy strat)
   return redtail(&L, pos, strat);
 }
 
-poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
+poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN normalize)
 {
   strat->redTailChange=FALSE;
   if (strat->noTailReduction) return L->GetLmCurrRing();
@@ -4266,10 +4266,10 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
         With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
         if (With == NULL) break;
       }
-      if ((!TEST_OPT_INTSTRATEGY) && (!nIsOne(pGetCoeff(With->p))))
+      if (normalize && (!TEST_OPT_INTSTRATEGY) && (!nIsOne(pGetCoeff(With->p))))
       {
         With->pNorm();
-        //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
+        if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
       }
       strat->redTailChange=TRUE;
       if (ksReducePolyTail(L, With, &Ln))
