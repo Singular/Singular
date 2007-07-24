@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.46 2007-07-24 11:17:03 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.47 2007-07-24 16:22:36 motsak Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -1567,6 +1567,7 @@ void gnc_kBucketPolyRedOld(kBucket_pt b, poly p, number *c)
   pTest(m);
 #endif
   poly pp= nc_mm_Mult_pp(m,p,currRing);
+  assume(pp!=NULL);
   pDelete(&m);
   number n=nCopy(pGetCoeff(pp));
   number MinusOne=nInit(-1);
@@ -1724,6 +1725,8 @@ inline void nc_PolyPolyRedOld(poly &b, poly p, number *c)
   pTest(m);
 #endif
   poly pp=nc_mm_Mult_pp(m,p,currRing);
+  assume(pp!=NULL);
+  
   pDelete(&m);
   number n=nCopy(pGetCoeff(pp));
   number MinusOne=nInit(-1);
@@ -1743,24 +1746,85 @@ inline void nc_PolyPolyRedOld(poly &b, poly p, number *c)
 }
 
 
+#define MYTEST 0
 
 inline void nc_PolyPolyRedNew(poly &b, poly p, number *c)
   // reduces b with p, do not delete both
 {
+#ifdef PDEBUG
+  pTest(b);
+  pTest(p);
+#endif
+
+#if MYTEST
+  PrintS("nc_PolyPolyRedNew(");
+  pWrite0(b);
+  PrintS(", ");
+  pWrite0(p);
+  PrintS(", *c): ");  
+#endif 
+  
   // b will not by multiplied by any constant in this impl.
   // ==> *c=1
   *c=nInit(1);
-  poly m=pOne();
 
-  poly pLmB = pHead(b);
-  pExpVectorDiff(m, pLmB, p);
-  pDelete(&pLmB);
+  poly pp = NULL;
+
+  // there is a problem when p is a square(=>0!)
+
+  while((b != NULL) && (pp == NULL))
+  {
+
+//    poly pLmB = pHead(b);
+    poly m = pOne();    
+    pExpVectorDiff(m, b, p);
+//    pDelete(&pLmB);
   //pSetm(m);
+    
 #ifdef PDEBUG
-  pTest(m);
+    pTest(m);
+    pTest(b);
 #endif
-  poly pp=nc_mm_Mult_pp(m, p, currRing);
-  pDelete(&m);
+
+    pp = nc_mm_Mult_pp(m, p, currRing);  
+
+#if MYTEST
+    PrintS("\n{b': ");  
+    pWrite0(b);
+    PrintS(", m: ");  
+    pWrite0(m);
+    PrintS(", pp: ");  
+    pWrite0(pp);  
+    PrintS(" }\n");
+#endif     
+
+    pDelete(&m); // one m for all tries!
+
+//    assume( pp != NULL );
+    
+    if( pp == NULL )
+    {
+      b = p_LmDeleteAndNext(b, currRing);
+
+      if( !p_DivisibleBy(p, b, currRing) )
+        return;      
+      
+    }
+  }
+
+#if MYTEST
+  PrintS("{b': ");  
+  pWrite0(b);
+  PrintS(", pp: ");  
+  pWrite0(pp);  
+  PrintS(" }\n");
+#endif     
+
+
+  if(b == NULL) return;
+
+
+  assume(pp != NULL);
 
   const number n = pGetCoeff(pp); // no new copy
 
@@ -2272,6 +2336,7 @@ poly nc_p_CopyPut(poly a, const ring r)
 #endif
     return(NULL);
   }
+
   if (!rIsPluralRing(r)) return(p_Copy(a,r));
   if (r==r->nc->basering) return(p_Copy(a,r));
   else
@@ -2391,7 +2456,17 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
   /* analyze inputs, check them for consistency */
   /* detects nc_type, DO NOT initialize multiplication but call for it at the end*/
   /* checks the ordering condition and evtl. NDC */
+// NOTE: all the data from the currRing, we change r, which is has the
+// same representation!
 {
+
+#ifndef NDEBUG
+  idTest((ideal)CCC);
+  idTest((ideal)DDD);
+  pTest(CCN);
+  pTest(DDN);
+#endif
+  
   matrix CC = NULL;
   matrix DD = NULL;
   poly CN = NULL;
@@ -2401,6 +2476,8 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
   number nN,pN,qN;
   int tmpIsSkewConstant;
   int i,j;
+
+
   if (r->nc != NULL)
   {
     WarnS("redefining algebra structure");
@@ -2414,18 +2491,32 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
     }
   }
   ring save = currRing;
-  int WeChangeRing = 0;
+  bool WeChangeRing = false;
+  
   if (currRing!=r)
   {
+    assume( rSamePolyRep(r, currRing) );
     rChangeCurrRing(r);
-    WeChangeRing = 1;
+    WeChangeRing = true;
   }
+                   
   r->nc = (nc_struct *)omAlloc0(sizeof(nc_struct));
   r->nc->ref = 1;
-  r->nc->basering = r;
+  r->nc->basering = r; // !?
   r->ref++;
   ncRingType(r, nc_undef);
 
+#ifndef NDEBUG
+  idTest((ideal)CCC);
+  idTest((ideal)DDD);
+  pTest(CCN);
+  pTest(DDN);
+#endif
+
+  // there must be:
+  assume( (CCC != NULL) != (CCN != NULL) ); // exactly one data about coeffs (C).
+  assume( !((DDD != NULL) && (DDN != NULL)) ); // at most one data about tails (D).
+  
   /* initialition of the matrix C */
   /* check the correctness of arguments */
 
@@ -2440,11 +2531,11 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
       Werror("Square %d x %d  matrix expected",r->N,r->N);
       ncCleanUp(r);
       if (WeChangeRing)
-    rChangeCurrRing(save);
+        rChangeCurrRing(save);
       return TRUE;
     }
   }
-  if (( CCC != NULL) && (CC == NULL)) CC = mpCopy(CCC);
+  if (( CCC != NULL) && (CC == NULL)) CC = CCC; // mpCopy(CCC); // bug!?
   if (( CCN != NULL) && (CN == NULL)) CN = CCN;
 
   /* initialition of the matrix D */
@@ -2461,27 +2552,29 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
       Werror("Square %d x %d  matrix expected",r->N,r->N);
       ncCleanUp(r);
       if (WeChangeRing)
-    rChangeCurrRing(save);
+        rChangeCurrRing(save);
       return TRUE;
     }
   }
-  if (( DDD != NULL) && (DD == NULL)) DD = mpCopy(DDD);
+  if (( DDD != NULL) && (DD == NULL)) DD = DDD; // mpCopy(DDD); // ???
   if (( DDN != NULL) && (DN == NULL)) DN = DDN;
 
   /* further checks */
 
+  // all data in 'save'!
+
   if (CN != NULL)       /* create matrix C = CN * Id */
   {
-    nN = p_GetCoeff(CN,r);
-    if (n_IsZero(nN,r))
+    nN = p_GetCoeff(CN,save);
+    if (n_IsZero(nN,save))
     {
       Werror("Incorrect input : zero coefficients are not allowed");
       ncCleanUp(r);
       if (WeChangeRing)
-    rChangeCurrRing(save);
+        rChangeCurrRing(save);
       return TRUE;
     }
-    if (nIsOne(nN))
+    if (n_IsOne(nN, save))
     {
       ncRingType(r, nc_lie);
     }
@@ -2490,12 +2583,12 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
       ncRingType(r, nc_general);
     }
     r->nc->IsSkewConstant = 1;
-    C = mpNew(r->N,r->N);
+    C = mpNew(r->N,r->N); // ring independent!
     for(i=1; i<r->N; i++)
     {
       for(j=i+1; j<=r->N; j++)
       {
-    MATELEM(C,i,j) = nc_p_CopyPut(CN,r);
+        MATELEM(C,i,j) = nc_p_CopyPut(CN, r); // copy CN from r into r->nc->basering
       }
     }
   }
@@ -2512,20 +2605,21 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
     {
       for(j=i+1; j<=r->N; j++)
       {
-    if (MATELEM(C,i,j) == NULL)
-      qN = NULL;
-    else
-      qN = p_GetCoeff(MATELEM(C,i,j),r);
-    if ( qN == NULL )   /* check the consistency: Cij!=0 */
-        // find also illegal pN
-    {
-      Werror("Incorrect input : matrix of coefficients contains zeros in the upper triangle");
-      ncCleanUp(r);
-      if (WeChangeRing)
-        rChangeCurrRing(save);
-      return TRUE;
-    }
-    if (!nEqual(pN,qN)) tmpIsSkewConstant = 0;
+        if (MATELEM(C,i,j) == NULL)
+          qN = NULL;
+        else
+          qN = p_GetCoeff(MATELEM(C,i,j),r);
+        
+        if ( qN == NULL )   /* check the consistency: Cij!=0 */
+          // find also illegal pN
+        {
+          Werror("Incorrect input : matrix of coefficients contains zeros in the upper triangle");
+          ncCleanUp(r);
+          if (WeChangeRing)
+            rChangeCurrRing(save);
+          return TRUE;
+        }
+        if (!n_Equal(pN,qN, r)) tmpIsSkewConstant = 0;
       }
     }
     r->nc->IsSkewConstant=tmpIsSkewConstant;
@@ -2559,16 +2653,16 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
     {
       for(i=1; i<r->N; i++)
       {
-    for(j=i+1; j<=r->N; j++)
-    {
-      MATELEM(D,i,j) = nc_p_CopyPut(DN,r);
-    }
+        for(j=i+1; j<=r->N; j++)
+        {
+          MATELEM(D,i,j) = nc_p_CopyPut(DN,r); // project DN into r->nc->basering!
+        }
       }
     }
   }
   else /* DD != NULL */
   {
-    D = mpCopy(DD);
+    D = mpCopy(DD); // Copy DD into r!!!
   }
   /* analyze D */
   /* check the ordering condition for D (both matrix and poly cases) */
@@ -2581,10 +2675,12 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
     Werror("Matrix of polynomials violates the ordering condition");
     return TRUE;
   }
-  r->nc->C = C;
-  r->nc->D = D;
+  r->nc->C = C; // if C and D were given by matrices at the beginning they are in r 
+  r->nc->D = D; // otherwise they should be in r->nc->basering(polynomial * Id_{N})
+  
   if (WeChangeRing)
     rChangeCurrRing(save);
+  
   return nc_InitMultiplication(r);
 }
 
