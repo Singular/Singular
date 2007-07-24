@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.25 2007-07-23 14:11:04 motsak Exp $ */
+/* $Id: polys.cc,v 1.26 2007-07-24 12:29:31 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -764,7 +764,10 @@ void pNorm(poly p1)
       while (h!=NULL)
       {
         c=nDiv(pGetCoeff(h),k);
-        if (!nIsOne(c)) nNormalize(c);
+        // no need to normalize: Z/p, R
+        // normalize already in nDiv: Q_a, Z/p_a
+        // remains: Q
+        if (rField_is_Q() && (!nIsOne(c))) nNormalize(c);
         pSetCoeff(h,c);
         pIter(h);
       }
@@ -1037,3 +1040,15 @@ BOOLEAN pCompareChain (poly p,poly p1,poly p2,poly lcm)
   }
   return FALSE;
 }
+
+int pSize(poly p)
+{
+  int count = 0;
+  while ( p != NULL )
+  {
+    count+= nSize( pGetCoeff( p ) );
+    pIter( p );
+  }
+  return count;
+}
+

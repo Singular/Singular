@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.49 2007-07-24 11:20:32 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.50 2007-07-24 12:29:30 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -100,6 +100,34 @@ int kFindDivisibleByInS(const kStrategy strat, int* max_ind, LObject* L)
   int ende=strat->sl;
 #endif
   (*max_ind)=ende;
+  loop
+  {
+    if (j > ende) return -1;
+#if defined(PDEBUG) || defined(PDIV_DEBUG)
+    if (p_LmShortDivisibleBy(strat->S[j], strat->sevS[j],
+                             p, not_sev, currRing))
+        return j;
+#else
+    if ( !(strat->sevS[j] & not_sev) &&
+         p_LmDivisibleBy(strat->S[j], p, currRing))
+      return j;
+#endif
+    j++;
+  }
+}
+
+int kFindNextDivisibleByInS(const kStrategy strat, int start,int max_ind, LObject* L)
+{
+  unsigned long not_sev = ~L->sev;
+  poly p = L->GetLmCurrRing();
+  int j = start;
+
+  pAssume(~not_sev == p_GetShortExpVector(p, currRing));
+#if 1
+  int ende=max_ind;
+#else
+  int ende=strat->sl;
+#endif
   loop
   {
     if (j > ende) return -1;
@@ -994,10 +1022,24 @@ poly redNF (poly h,int &max_ind,kStrategy strat)
       j=kFindDivisibleByInS(strat,&max_ind,&P);
     if (j>=0)
     {
+      int sl=pSize(strat->S[j]);
+      int jj;
+      loop
+      {
+        int sll;
+        jj=kFindNextDivisibleByInS(strat,j+1,max_ind,&P);
+        if (jj<0) break;
+        sll=pSize(strat->S[jj]);
+        if (sll<sl)
+        {
+          j=jj;
+          sl=sll;
+        }
+      }
       if (!nIsOne(pGetCoeff(strat->S[j])))
       {
-         pNorm(strat->S[j]);
-         //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
+        pNorm(strat->S[j]);
+        //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
       }
       nNormalize(pGetCoeff(P.p));
 #ifdef KDEBUG
@@ -1615,7 +1657,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
       // posInS only depends on the leading term
       if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
       {
-	strat->enterS(strat->P, pos, strat, strat->tl);
+        strat->enterS(strat->P, pos, strat, strat->tl);
       }
       else
       {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.23 2007-07-23 14:41:33 motsak Exp $ */
+/* $Id: kstd1.cc,v 1.24 2007-07-24 12:29:30 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -28,10 +28,6 @@
 #include "ideals.h"
 //#include "../Singular/ipid.h"
 #include "timer.h"
-
-#ifdef HAVE_PLURAL
-#include "sca.h"
-#endif
 
 //#include "ipprint.h"
 
@@ -2123,38 +2119,11 @@ ideal kInterRed (ideal F, ideal Q)
 }
 #else
 // old version
-
-// NOTE: be carefull with Q in non-commutative case
-// and with F in SCA case!
 ideal kInterRed (ideal F, ideal Q)
 {
-#ifndef NDEBUG
-  idTest(F);
-  idTest(Q);  
-#endif
-
   int j;
   kStrategy strat = new skStrategy;
 
-
-  ideal tempF = F;
-  const ideal tempQ = Q;
-
-#ifdef HAVE_PLURAL
-  if(rIsSCA(currRing))
-  {
-
-    const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
-    const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
-    tempF = id_KillSquares(F, m_iFirstAltVar, m_iLastAltVar, currRing);
-
-    // this should be done on the upper level!!! :
-    //    tempQ = currRing->nc->SCAQuotient();
-  }
-#endif
-  
-//  assume(!rIsSCA(currRing));
-  
 //  if (TEST_OPT_PROT)
 //  {
 //    writeTime("start InterRed:");
@@ -2163,7 +2132,7 @@ ideal kInterRed (ideal F, ideal Q)
   //strat->syzComp     = 0;
   strat->kHEdgeFound = ppNoether != NULL;
   strat->kNoether=pCopy(ppNoether);
-  strat->ak = idRankFreeModule(tempF);
+  strat->ak = idRankFreeModule(F);
   initBuchMoraCrit(strat);
   strat->NotUsedAxis = (BOOLEAN *)omAlloc((pVariables+1)*sizeof(BOOLEAN));
   for (j=pVariables; j>0; j--) strat->NotUsedAxis[j] = TRUE;
@@ -2177,10 +2146,7 @@ ideal kInterRed (ideal F, ideal Q)
   strat->R           = initR();
   strat->sevT        = initsevT();
   if (pOrdSgn == -1)   strat->honey = TRUE;
-
-  
-  initS(tempF,tempQ,strat);
-  
+  initS(F,Q,strat);
   if (TEST_OPT_REDSB)
     strat->noTailReduction=FALSE;
   updateS(TRUE,strat);
@@ -2219,12 +2185,6 @@ ideal kInterRed (ideal F, ideal Q)
     shdl=res;
   }
   delete(strat);
-
-  if( F != tempF )
-  {
-    id_Delete( &tempF, currRing);
-  }
-  
   return shdl;
 }
 #endif

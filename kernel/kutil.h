@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.26 2007-07-24 11:20:32 Singular Exp $ */
+/* $Id: kutil.h,v 1.27 2007-07-24 12:29:31 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -450,6 +450,7 @@ int kFindDivisibleByInT(const TSet &T, const unsigned long* sevT,
 // same with S
 int kFindDivisibleByInS(const kStrategy strat, int *max_ind, LObject* L);
 
+int kFindNextDivisibleByInS(const kStrategy strat, int start,int max_ind, LObject* L);
 TObject*
 kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
                     long ecart = LONG_MAX);
