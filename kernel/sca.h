@@ -1,10 +1,10 @@
-#ifndef GRING_SUPER_COMMUTATIVE_ALGEBRA_H
-#define GRING_SUPER_COMMUTATIVE_ALGEBRA_H
+#ifndef SCA_H
+#define SCA_H
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sca.h,v 1.9 2007-02-23 14:39:41 motsak Exp $ */
+/* $Id: sca.h,v 1.10 2007-07-24 11:15:26 Singular Exp $ */
 
 #include <ring.h>
 #include <gring.h>
@@ -195,4 +195,4 @@ bool sca_SetupQuotient(ring rGR, const ring rG);
 // #define scaFirstAltVar(R) 0
 // #define scaLastAltVar(R) 0
 #endif
-#endif // #ifndef GRING_SUPER_COMMUTATIVE_ALGEBRA_H
+#endif // #ifndef SCA_H
