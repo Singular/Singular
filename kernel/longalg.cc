@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.29 2007-07-24 12:29:31 Singular Exp $ */
+/* $Id: longalg.cc,v 1.30 2007-07-24 16:55:07 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1716,6 +1716,7 @@ number naGcd(number a, number b, const ring r)
 //#define FACTORY_GCD_TEST
 void naNormalize(number &pp)
 {
+
   //naTest(pp); // input may not be "normal"
   lnumber p = (lnumber)pp;
 
@@ -1724,25 +1725,22 @@ void naNormalize(number &pp)
   p->s = 2; p->cnt=0;
   napoly x = p->z;
   napoly y = p->n;
-  if (naMinimalPoly!=NULL)
+  if ((y!=NULL) && (naMinimalPoly!=NULL))
   {
-    if (y!=NULL)
-    {
-      y = napInvers(y, naMinimalPoly);
-      x = napMult(x, y);
-      if (napGetExp(x,1) >= napGetExp(naMinimalPoly,1))
-        x = napRemainder(x, naMinimalPoly);
-      p->z = x;
-      p->n = y = NULL;
-    }
-    /* check for degree of x too high: */
-    if ((x!=NULL) && (x!=naMinimalPoly)
-    && (napGetExp(x,1)>napGetExp(naMinimalPoly,1)))
-    // DO NOT REDUCE naMinimalPoly with itself
-    {
+    y = napInvers(y, naMinimalPoly);
+    x = napMult(x, y);
+    if (napGetExp(x,1) >= napGetExp(naMinimalPoly,1))
       x = napRemainder(x, naMinimalPoly);
-      p->z = x;
-    }
+    p->z = x;
+    p->n = y = NULL;
+  }
+  /* check for degree of x too high: */
+  if ((x!=NULL) && (naMinimalPoly!=NULL) && (x!=naMinimalPoly)
+  && (napGetExp(x,1)>napGetExp(naMinimalPoly,1)))
+  // DO NOT REDUCE naMinimalPoly with itself
+  {
+    x = napRemainder(x, naMinimalPoly);
+    p->z = x;
   }
   /* normalize all coefficients in n and z (if in Q) */
   if (naIsChar0)
@@ -1882,7 +1880,7 @@ void naNormalize(number &pp)
     {
       if (nacIsOne(napGetCoeff(y)))
       {
-        if (napIsConstant(y))
+        if (napGetExp(y,1)==0)
         {
           napDelete1(&y);
           p->n = NULL;
@@ -1906,26 +1904,6 @@ void naNormalize(number &pp)
       p->n=yy;
       napDelete(&x);
       napDelete(&y);
-      x=xx;
-      y=yy;
-      if (napNext(y)==NULL)
-      {
-        if(!nacGreaterZero(napGetCoeff(y)))
-        {
-          x=napNeg(x);
-          y=napNeg(y);
-        }
-        if (nacIsOne(napGetCoeff(y)))
-        {
-          if (napIsConstant(y))
-          {
-            napDelete1(&y);
-            p->n = NULL;
-          }
-          naTest(pp);
-          return;
-        }
-      }
     }
   }
 #endif
