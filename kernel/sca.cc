@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.11 2007-03-02 14:26:54 motsak Exp $
+ *  Version: $Id: sca.cc,v 1.12 2007-07-24 16:34:00 motsak Exp $
  *******************************************************************/
 
 // #define PDEBUG 2
@@ -988,7 +988,10 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
   
   ideal tempF = id_KillSquares(F, m_iFirstAltVar, m_iLastAltVar, currRing);
-  const ideal tempQ = currRing->nc->SCAQuotient();
+  ideal tempQ = Q;
+
+  if(Q == currQuotient)
+    tempQ = currRing->nc->SCAQuotient();
 
   bool bIdHomog = id_IsSCAHomogeneous(tempF, NULL, NULL, currRing); // wCx == wCy == NULL!
 
@@ -1445,6 +1448,13 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 
   ideal tempF = id_KillSquares(F, m_iFirstAltVar, m_iLastAltVar, currRing);
 
+  ideal tempQ = Q;
+
+  if(Q == currQuotient)
+    tempQ = currRing->nc->SCAQuotient();
+
+  // Q or tempQ will not be used below :(((  
+
   bool bIdHomog = id_IsSCAHomogeneous(tempF, NULL, NULL, currRing); // wCx == wCy == NULL!
 
   assume( !bIdHomog || strat->homog ); //  bIdHomog =====[implies]>>>>> strat->homog
@@ -1858,7 +1868,10 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
   
   ideal tempF = id_KillSquares(F, m_iFirstAltVar, m_iLastAltVar, currRing);
   
-  const ideal tempQ = currRing->nc->SCAQuotient();
+  ideal tempQ = Q;
+
+  if(Q == currQuotient)
+    tempQ = currRing->nc->SCAQuotient();
 
   bool bIdHomog = id_IsSCAHomogeneous(tempF, NULL, NULL, currRing); // wCx == wCy == NULL!
 
@@ -2145,7 +2158,7 @@ void sca_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
   rGR->nc->p_Procs.mm_Mult_pp  = sca_mm_Mult_pp;
 
 
-  if (pOrdSgn==-1)
+  if (rGR->OrdSgn==-1)
   {
 #ifdef PDEBUG
 //           Print("Local case => GB == mora!\n");
