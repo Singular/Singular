@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.50 2007-07-24 12:29:30 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.51 2007-07-24 13:12:26 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1023,11 +1023,11 @@ poly redNF (poly h,int &max_ind,kStrategy strat)
     if (j>=0)
     {
       int sl=pSize(strat->S[j]);
-      int jj;
+      int jj=j;
       loop
       {
         int sll;
-        jj=kFindNextDivisibleByInS(strat,j+1,max_ind,&P);
+        jj=kFindNextDivisibleByInS(strat,jj+1,max_ind,&P);
         if (jj<0) break;
         sll=pSize(strat->S[jj]);
         if (sll<sl)
