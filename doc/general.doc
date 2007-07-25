@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.210 2007-07-04 12:42:17 Singular Exp $
+@comment $Id: general.doc,v 1.211 2007-07-25 07:53:52 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -215,7 +215,7 @@ to set your default browser. Recall that if a file
 @code{$HOME/.singularrc} exists on your system, then the content of this
 file is executed before the first user input. Hence, putting
 @smallexample
-if (! system("--emacs")
+if (! system("--emacs"))
 @{
   // only set help browser if not running within emacs
   system("--browser", "info");
