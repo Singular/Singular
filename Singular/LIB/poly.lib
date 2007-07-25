@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: poly.lib,v 1.45 2007-07-05 12:32:12 Singular Exp $";
+version="$Id: poly.lib,v 1.46 2007-07-25 10:02:08 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  poly.lib      Procedures for Manipulating Polys, Ideals, Modules
@@ -130,21 +130,18 @@ EXAMPLE: example substitute; shows an example
   {
     ideal v = #[1];
     ideal f = #[2];
-    int mi = size(v);
+    int mi = ncols(v);
     if(ncols(f)<mi)
     {
       mi = ncols(f);
     }
-    m[rvar(v[1])]=f[1];
-    map phi = bas,m;
-    def J = phi(I);
-    for (ii=2; ii<=mi; ii++)
+    def J = I;
+    for (ii=1; ii<=mi; ii++)
     {
-      m = maxideal(1);
       m[rvar(v[ii])]=f[ii];
-      phi = bas,m;
-      J = phi(J);
     }
+    map phi = bas,m;
+    J = phi(I);
     return(J);
   }
 }
