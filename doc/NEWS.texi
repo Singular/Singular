@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.91 1995-12-31 23:46:50 Singular Exp $
+@comment $Id: NEWS.texi,v 1.92 2007-07-25 11:02:07 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -26,7 +26,7 @@ The current version @value{VERSION} is stabilyzing release,
 a result of a long beta test and the integration of a lot of small
 fixes which were on our waiting list for integration.
 
-It contains also some new features:
+It contains also  a lot of new features:
 @itemize @bullet
 @item
 licence changed: omalloc and MP are now (also) available under GPL;
@@ -34,7 +34,9 @@ that means that all parts of @sc{Singular} are licenced under GPL (resp. LGPL).
 @item
 factory, libfac, Singular updated for gcc 4.1.x
 @item
-kernel updated for the optional use of boost
+kernel updated for the optional use of boost.
+@item
+can now be built as a library.
 @item
 new operator @code{a:b} gives an @code{intvec} of length @code{b} with constant entries @code{a}
 @item
@@ -46,6 +48,8 @@ non-commutative kernel subsystem was rewritten in order to support specific alge
 Implemented algebras at the moment: super-commutative algebras (in particular exterior algebras).
 @item
 @nref{std} et al.: new selection strategy for reductions (@nref{option} (length)).
+@item
+@nref(reduce}: new strategy for selection and normalization.
 @item
 @nref{simplify} slightly changed: does not omit zero polynomial unless
 specified.
@@ -77,6 +81,8 @@ new library: curvepar.lib (@nref{curvepar_lib}): space curves
 new library: sagbi.lib (@nref{sagbi_lib}): subalgebras bases analogous to Groebner bases for ideals
 @item
 new library: surfex.lib (@nref{surfex_lib}): visualizing and rotating surfaces
+@item
+new library: cimon.lib (@nref{cimon_lib}): determines if the toric ideal of an affine monomial curve is a complete intersection.
 @item
 @nref{sheafcoh_lib}: new experimental functions, in particular @nref{sheafCohBGG2}
 @item
