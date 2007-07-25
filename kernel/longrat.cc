@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.18 2007-07-03 14:45:56 Singular Exp $ */
+/* $Id: longrat.cc,v 1.19 2007-07-25 10:53:37 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -400,9 +400,20 @@ int nlSize(number a)
   if (SR_HDL(a) & SR_INT)
      return 1; /* immidiate int */
   int s=a->z._mp_alloc;
+  while (a->z._mp_d[s]==0L) s--; 
+#if SIZEOF_LONG == 8
+  s *=2;
+  if (a->z._mp_d[s] < (unsigned long)0x100000000L) s--;
+#endif
   if (a->s<2)
   {
-    s+=a->n._mp_alloc;
+    int d=a->n._mp_alloc;
+    while (a->n._mp_d[d]==0L) d--; 
+#if SIZEOF_LONG == 8
+    d *=2;
+    if (a->n._mp_d[d] < (unsigned long)0x100000000L) d--;
+#endif
+    s+=d;
   }
   return s;
 }
