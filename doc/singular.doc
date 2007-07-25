@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.164 2007-07-20 14:13:52 Singular Exp $
+@comment $Id: singular.doc,v 1.165 2007-07-25 10:55:53 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -236,6 +236,18 @@ with the @code{--no-stdlib} command line option (see
 @ref{Command line options}).
 
 @c lib standard.lib:LibInfo lib_fun lib_ex section
+@c ----------------------------------------------------------------------
+@c and now some routines from standard.lib:
+@c ---------------------------------------------------------
+@node qslimgb,par2varRing,standard_lib, standard_lib
+@subsection qslimgb
+@cindex qslimgb
+@c lib standard.lib:qslimgb lib_fun lib_ex subsection
+@c ---------------------------------------------------------
+@node par2varRing,,qslimgb, standard_lib
+@subsection par2varRing
+@cindex par2varRing
+@c lib standard.lib:par2varRing lib_fun lib_ex subsection
 
 @c ----------------------------------------------------------------------------
 @node General purpose, Linear algebra, standard_lib, SINGULAR libraries
@@ -318,7 +330,7 @@ LIB "all.lib";
 @menu
 * absfact_lib:: absolute factorization for characteristic 0
 * algebra_lib:: procedures for computing with algebras and maps
-* cimonom_lib:  is the toric ideal of an affine monomial curve a complete intersection ?
+* cimonom_lib:: is the toric ideal of an affine monomial curve a complete intersection ?
 * elim_lib:: procedures for elimination, saturation and blowing up
 * grwalk_lib:: Groebner walk and Fraktal walk
 * homolog_lib:: procedures for homological algebra
