@@ -37,4 +37,5 @@ I;
 
 matrix m= lift(I, h(1,4)*h(1,2));
 m;
+matrix(h(1,4)*h(1,2))-matrix(I)*m;
 tst_status(1);$
