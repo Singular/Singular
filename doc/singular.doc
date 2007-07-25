@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.165 2007-07-25 10:55:53 Singular Exp $
+@comment $Id: singular.doc,v 1.166 2007-07-25 16:10:45 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -242,12 +242,12 @@ with the @code{--no-stdlib} command line option (see
 @node qslimgb,par2varRing,standard_lib, standard_lib
 @subsection qslimgb
 @cindex qslimgb
-@c lib standard.lib:qslimgb lib_fun lib_ex subsection
+@c lib standard.lib:qslimgb Fun subsection
 @c ---------------------------------------------------------
 @node par2varRing,,qslimgb, standard_lib
 @subsection par2varRing
 @cindex par2varRing
-@c lib standard.lib:par2varRing lib_fun lib_ex subsection
+@c lib standard.lib:par2varRing Fun subsection
 
 @c ----------------------------------------------------------------------------
 @node General purpose, Linear algebra, standard_lib, SINGULAR libraries

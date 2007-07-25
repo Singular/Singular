@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.28 2005-07-04 14:50:16 Singular Exp $
+# $Id: doc2tex.pl,v 1.29 2007-07-25 16:10:45 Singular Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -39,13 +39,14 @@
 #    the text before first @ref.
 #
 ####
-# @c lib libname.lib[:proc] [no_ex, no_fun, (\w*)section]
+# @c lib libname.lib[:proc] [no_ex, no_fun, Fun, (\w*)section]
 #   --> replaced by @include $texfile where 
 #        $texfile = $subdir/libname_lib[_noFun,_noEx].tex
 #   --> if $make, calls "make $texfile" 
 #   --> Error, if $tex_file does not exist
 #   --> if [:proc] is given, then includes only of respective
 #       proc body
+#   --> Fun overwrites global no_fun
 #   --> if (\w*)section is given, replaces @subsubsection by @$1section
 #       and pastes in content of tex file directly
 # 
@@ -517,13 +518,14 @@ sub HandleRef
 
 ###################################################################
 #
-# @c lib libname.lib[:proc] [no_ex, no_fun, (\w*)section]
+# @c lib libname.lib[:proc] [no_ex, no_fun, Fun, (\w*)section]
 #   --> replaced by @include $texfile where 
 #        $texfile = $subdir/libname_lib[_noFun,_noEx].tex
 #   --> if $make, calls "make $texfile" 
 #   --> Error, if $tex_file does not exist
 #   --> if [:proc] is given, then includes only of respective
 #       proc body
+#   --> Fun overwrites global no_fun
 #   --> if (\w*)section is given, replaces @subsubsection by @$1section
 #       and pastes in content of tex file directly
 
@@ -545,6 +547,7 @@ sub HandleLib
 
   $proc = $1 if (/^:(.*?) /);
   $n_fun = 1 if ($no_fun || /no_fun/);
+  $n_fun = 0 if (/Fun/);
   $n_ex = 1 if ($no_ex || /no_ex/ || (/unix_only/ && $Win32));
   $section = $1 if /(\w*)section/;
   
@@ -603,13 +606,13 @@ sub HandleLib
       }
       if ($found)
       {
-	Error("no end content found for lib proc docu for $lib.lib:$proc $doc_file:$line \n")
+	Error("no end content found for lib proc docu for $lib.lib:$proc $doc_file:$line in $tex_file\n")
 	  unless (/c ---end content $proc---/);
 	print TEX "\@c generated lib proc docu for $lib.lib:$proc $doc_file:$line \n";
       }
       else
       {
-	Error("did not find lib proc docu for $lib.lib:$proc $doc_file:$line \n");
+	Error("did not find lib proc docu for $lib.lib:$proc $doc_file:$line in $tex_file\n");
       }
     }
     else
