@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.h,v 1.1.1.1 2003-10-06 12:15:53 Singular Exp $ */
+/* $Id: kstd1.h,v 1.2 2007-07-25 10:53:15 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -15,6 +15,14 @@
 *output:*S: the standard base: a set (array) with <= *Smax+1 entries (0..*Smax)
 */
 ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
+
+// lazy_reduce flags: can be combined by |
+#define KSTD_NF_LAZY   1
+  // do only a reduction of the leading term
+#define KSTD_NF_ECART  2
+  // only local: recude even with bad ecart
+#define KSTD_NF_NONORM 4
+  // only global: avoid normamlization, return a multiply of NF
 
 poly kNF1(ideal F, ideal Q, poly q, kStrategy strat, int lazyReduce);
 ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce);

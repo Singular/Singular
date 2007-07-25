@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.47 2007-07-24 16:22:36 motsak Exp $
+ *  Version: $Id: gring.cc,v 1.48 2007-07-25 10:53:14 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -1726,7 +1726,7 @@ inline void nc_PolyPolyRedOld(poly &b, poly p, number *c)
 #endif
   poly pp=nc_mm_Mult_pp(m,p,currRing);
   assume(pp!=NULL);
-  
+
   pDelete(&m);
   number n=nCopy(pGetCoeff(pp));
   number MinusOne=nInit(-1);
@@ -1761,9 +1761,9 @@ inline void nc_PolyPolyRedNew(poly &b, poly p, number *c)
   pWrite0(b);
   PrintS(", ");
   pWrite0(p);
-  PrintS(", *c): ");  
-#endif 
-  
+  PrintS(", *c): ");
+#endif
+
   // b will not by multiplied by any constant in this impl.
   // ==> *c=1
   *c=nInit(1);
@@ -1776,49 +1776,49 @@ inline void nc_PolyPolyRedNew(poly &b, poly p, number *c)
   {
 
 //    poly pLmB = pHead(b);
-    poly m = pOne();    
+    poly m = pOne();
     pExpVectorDiff(m, b, p);
 //    pDelete(&pLmB);
   //pSetm(m);
-    
+
 #ifdef PDEBUG
     pTest(m);
     pTest(b);
 #endif
 
-    pp = nc_mm_Mult_pp(m, p, currRing);  
+    pp = nc_mm_Mult_pp(m, p, currRing);
 
 #if MYTEST
-    PrintS("\n{b': ");  
+    PrintS("\n{b': ");
     pWrite0(b);
-    PrintS(", m: ");  
+    PrintS(", m: ");
     pWrite0(m);
-    PrintS(", pp: ");  
-    pWrite0(pp);  
+    PrintS(", pp: ");
+    pWrite0(pp);
     PrintS(" }\n");
-#endif     
+#endif
 
     pDelete(&m); // one m for all tries!
 
 //    assume( pp != NULL );
-    
+
     if( pp == NULL )
     {
       b = p_LmDeleteAndNext(b, currRing);
 
       if( !p_DivisibleBy(p, b, currRing) )
-        return;      
-      
+        return;
+
     }
   }
 
 #if MYTEST
-  PrintS("{b': ");  
+  PrintS("{b': ");
   pWrite0(b);
-  PrintS(", pp: ");  
-  pWrite0(pp);  
+  PrintS(", pp: ");
+  pWrite0(pp);
   PrintS(" }\n");
-#endif     
+#endif
 
 
   if(b == NULL) return;
@@ -2076,7 +2076,7 @@ ideal twostd(ideal I)
         #endif
         #endif
 
-        q = kNF(J,currQuotient,q,0,4);
+        q = kNF(J,currQuotient,q,0,KSTD_NF_NONORM);
 
         #ifdef PDEBUG
           p_Test(q, currRing);
@@ -2466,7 +2466,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
   pTest(CCN);
   pTest(DDN);
 #endif
-  
+
   matrix CC = NULL;
   matrix DD = NULL;
   poly CN = NULL;
@@ -2492,14 +2492,14 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
   }
   ring save = currRing;
   bool WeChangeRing = false;
-  
+
   if (currRing!=r)
   {
     assume( rSamePolyRep(r, currRing) );
     rChangeCurrRing(r);
     WeChangeRing = true;
   }
-                   
+
   r->nc = (nc_struct *)omAlloc0(sizeof(nc_struct));
   r->nc->ref = 1;
   r->nc->basering = r; // !?
@@ -2516,7 +2516,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
   // there must be:
   assume( (CCC != NULL) != (CCN != NULL) ); // exactly one data about coeffs (C).
   assume( !((DDD != NULL) && (DDN != NULL)) ); // at most one data about tails (D).
-  
+
   /* initialition of the matrix C */
   /* check the correctness of arguments */
 
@@ -2609,7 +2609,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
           qN = NULL;
         else
           qN = p_GetCoeff(MATELEM(C,i,j),r);
-        
+
         if ( qN == NULL )   /* check the consistency: Cij!=0 */
           // find also illegal pN
         {
@@ -2675,12 +2675,12 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
     Werror("Matrix of polynomials violates the ordering condition");
     return TRUE;
   }
-  r->nc->C = C; // if C and D were given by matrices at the beginning they are in r 
+  r->nc->C = C; // if C and D were given by matrices at the beginning they are in r
   r->nc->D = D; // otherwise they should be in r->nc->basering(polynomial * Id_{N})
-  
+
   if (WeChangeRing)
     rChangeCurrRing(save);
-  
+
   return nc_InitMultiplication(r);
 }
 

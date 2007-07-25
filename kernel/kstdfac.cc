@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.10 2007-07-13 14:19:26 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.11 2007-07-25 10:53:15 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -432,7 +432,7 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
         {
           if (n->D->m[j]!=NULL)
           {
-            poly r=kNF(n->Shdl,NULL,n->D->m[j],0,TRUE);
+            poly r=kNF(n->Shdl,NULL,n->D->m[j],0,KSTD_NF_LAZY | KSTD_NF_NONORM);
             if (r==NULL)
             {
 #ifndef NDEBUG
@@ -486,7 +486,7 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
         {
           if ((n->sl>=0)&&(n->S[0]!=NULL))
           {
-            ideal r=kNF(n->Shdl,NULL,Lj->d,0,TRUE);
+            ideal r=kNF(n->Shdl,NULL,Lj->d,0,KSTD_NF_LAZY | KSTD_NF_NONORM);
 #ifndef NDEBUG
               if(strat_fac_debug)
               {
@@ -748,7 +748,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
           {
             if (n->D->m[j]!=NULL)
             {
-              poly r=kNF(n->Shdl,NULL,n->D->m[j],0,TRUE);
+              poly r=kNF(n->Shdl,NULL,n->D->m[j],0,KSTD_NF_LAZY | KSTD_NF_NONORM);
               if (r==NULL)
               {
 #ifndef NDEBUG
@@ -804,7 +804,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
           {
             if ((n->sl>=0)&&(n->S[0]!=NULL))
             {
-              ideal r=kNF(n->Shdl,NULL,Lj->d,0,TRUE);
+              ideal r=kNF(n->Shdl,NULL,Lj->d,0,KSTD_NF_LAZY | KSTD_NF_NONORM);
               if (idIs0(r))
               {
 #ifndef NDEBUG
@@ -975,7 +975,7 @@ ideal_list kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
       ideal_list Li=L;
       while(Li!=Lj)
       {
-        ideal r=kNF(Lj->d,NULL,Li->d,0,TRUE);
+        ideal r=kNF(Lj->d,NULL,Li->d,0,KSTD_NF_LAZY | KSTD_NF_NONORM);
         if (idIs0(r))
         {
 #ifndef NDEBUG

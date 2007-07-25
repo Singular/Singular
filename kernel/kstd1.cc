@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.25 2007-07-24 16:19:09 motsak Exp $ */
+/* $Id: kstd1.cc,v 1.26 2007-07-25 10:53:14 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1401,7 +1401,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
       p_LmFree(p,currRing);
     }
   }
-  if ((lazyReduce & 1)==0)
+  if ((lazyReduce & KSTD_NF_LAZY)==0)
   {
     for (i=strat->sl; i>=0; i--)
       pNorm(strat->S[i]);
@@ -1422,8 +1422,8 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   p = pCopy(q);
   deleteHC(&p,&o,&j,strat);
   if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
-  if (p!=NULL) p = redMoraNF(p,strat, lazyReduce & 2);
-  if ((p!=NULL)&&((lazyReduce & 1)==0))
+  if (p!=NULL) p = redMoraNF(p,strat, lazyReduce & KSTD_NF_ECART);
+  if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
   {
     if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
     p = redtail(p,strat->sl,strat);
@@ -1519,7 +1519,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
       p_LmFree(p,currRing);
     }
   }
-  if (TEST_OPT_INTSTRATEGY && ((lazyReduce & 1)==0))
+  if (TEST_OPT_INTSTRATEGY && ((lazyReduce & KSTD_NF_LAZY)==0))
   {
     for (i=strat->sl; i>=0; i--)
       pNorm(strat->S[i]);
@@ -1547,8 +1547,8 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
           enterT(h,strat);
         }
         if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
-        p = redMoraNF(p,strat, lazyReduce & 2);
-        if ((p!=NULL)&&((lazyReduce & 1)==0))
+        p = redMoraNF(p,strat, lazyReduce & KSTD_NF_ECART);
+        if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
         {
           if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
           p = redtail(p,strat->sl,strat);
@@ -2135,7 +2135,6 @@ ideal kInterRed (ideal F, ideal Q)
 #ifdef HAVE_PLURAL
   if(rIsSCA(currRing))
   {
-
     const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
     const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
     tempF = id_KillSquares(F, m_iFirstAltVar, m_iLastAltVar, currRing);
@@ -2147,9 +2146,7 @@ ideal kInterRed (ideal F, ideal Q)
       tempQ = currRing->nc->SCAQuotient();
   }
 #endif
-  
-//  assume(!rIsSCA(currRing));
-  
+
 //  if (TEST_OPT_PROT)
 //  {
 //    writeTime("start InterRed:");
@@ -2216,7 +2213,7 @@ ideal kInterRed (ideal F, ideal Q)
   if( tempF != F )
     id_Delete( &tempF, currRing);
 #endif
-  
+
   return shdl;
 }
 #endif

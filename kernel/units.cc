@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: units.cc,v 1.1.1.1 2003-10-06 12:16:04 Singular Exp $ */
+/* $Id: units.cc,v 1.2 2007-07-25 10:53:15 Singular Exp $ */
 /*
 * ABSTRACT: procedures to compute with units
 */
@@ -32,7 +32,7 @@ ideal redNF(ideal N,ideal M,matrix U,int d,intvec *w)
     }
   }
   ideal M0=idInit(IDELEMS(M),M->rank);
-  ideal M1=kNF(N,currQuotient,M,0,2);
+  ideal M1=kNF(N,currQuotient,M,0,KSTD_NF_ECART);
   while(idElem(M1)>0&&(d==-1||idMinDegW(M1,w)<=d))
   {
     for(int i=IDELEMS(M)-1;i>=0;i--)
@@ -45,7 +45,7 @@ ideal redNF(ideal N,ideal M,matrix U,int d,intvec *w)
         M->m[i]=pSub(M->m[i],pHead(pCopy(M1->m[i])));
     }
     idDelete(&M1);
-    M1=kNF(N,currQuotient,M,0,2);
+    M1=kNF(N,currQuotient,M,0,KSTD_NF_ECART);
   }
   idDelete(&M1);
   idDelete(&N);

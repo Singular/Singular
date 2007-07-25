@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.52 2007-07-25 10:03:20 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.53 2007-07-25 10:53:15 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1415,12 +1415,12 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
   int max_ind;
   p = redNF(pCopy(q),max_ind,strat);
-  if ((p!=NULL)&&((lazyReduce & 1)==0))
+  if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
   {
     BITSET save=test;
     test &= ~Sy_bit(OPT_INTSTRATEGY);
     if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
-    p = redtailBba(p,max_ind,strat,(lazyReduce & 4)==0);
+    p = redtailBba(p,max_ind,strat,(lazyReduce & KSTD_NF_NONORM)==0);
     test=save;
   }
   /*- release temp data------------------------------- -*/
@@ -1469,12 +1469,12 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
     {
       if (TEST_OPT_PROT) { PrintS("r");mflush(); }
       p = redNF(pCopy(q->m[i]),max_ind,strat);
-      if ((p!=NULL)&&((lazyReduce & 1)==0))
+      if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
       {
         BITSET save=test;
         test &= ~Sy_bit(OPT_INTSTRATEGY);
         if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
-        p = redtailBba(p,max_ind,strat,(lazyReduce & 4)==0);
+        p = redtailBba(p,max_ind,strat,(lazyReduce & KSTD_NF_NONORM)==0);
         test=save;
       }
       res->m[i]=p;
