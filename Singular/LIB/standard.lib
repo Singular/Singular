@@ -2,7 +2,7 @@
 //major revision Jan/Feb. 2007, GMG
 //groebner mit Optionen versehen
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.94 2007-07-19 16:23:52 Singular Exp $";
+version="$Id: standard.lib,v 1.95 2007-07-25 10:02:25 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -16,10 +16,10 @@ PROCEDURES:
  fprintf(link,fmt,..)   writes formatted string to link
  printf(fmt,...)        displays formatted string
  weightKB(stc,dd,vl)    degree dd part of a kbase wrt. some weigths
+ qslimgb(i)             computes a standard basis with slimgb in a qring
+ par2varRing([i])       create a ring with pars to vars together with i
 ";
-// qslimgb(i)             computes a standard basis with slimgb in a qring
 // hilbRing([i])          create a ring containing the homogenized i
-// par2varRing([i])       create a ring with pars to vars together with i
 // quotientList(L,...)    a list, say QL, s.t. ring(QL) creates a correct qring
 
 //////////////////////////////////////////////////////////////////////////////
@@ -660,9 +660,9 @@ example
 proc qslimgb (i)
 "USAGE:   qslimgb(i); i ideal or module
 RETURN:  same type as input, a standard basis of i computed with slimgb
-NOTE:    As long as slimgb does not know qrings qslimgb should be used in case
-         the basering is (possibly) a quotient ring. The quotient ideal is
-         added to the input and slimgb is applied.
+NOTE:    Only as long as slimgb does not know qrings qslimgb should be used 
+         in case the basering is (possibly) a quotient ring.
+         The quotient ideal is added to the input and slimgb is applied.
 EXAMPLE: example qslimgb; shows an example"
 {
   def P = basering;
