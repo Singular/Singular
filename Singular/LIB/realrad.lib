@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: realrad.lib,v 1.4 2007-06-20 15:39:45 Singular Exp $";
+version="$Id: realrad.lib,v 1.5 2007-07-26 12:35:23 spang Exp $";
 category="real algebra";
 info="
 LIBRARY:  realrad.lib   Computation of real radicals
@@ -512,13 +512,13 @@ EXAMPLE: decision shows an example
    }
    lfac=factorize(f,2);
    ideal factor=lfac[1];
-   intvec ex=lfac[2];
+   intvec @ex=lfac[2];
    factor=factor[1];
    zz=size(factor);
    f=1;
    for (@z=1;@z<=zz;@z++)
    {
-     if ((ex[@z] mod 2)==1)
+     if ((@ex[@z] mod 2)==1)
      {
         f=f*factor[@z];
      }
