@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.64 2007-07-24 11:20:32 Singular Exp $ */
+/* $Id: kutil.cc,v 1.65 2007-07-26 10:27:17 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -4269,7 +4269,7 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
       if (normalize && (!TEST_OPT_INTSTRATEGY) && (!nIsOne(pGetCoeff(With->p))))
       {
         With->pNorm();
-        if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
+        //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
       }
       strat->redTailChange=TRUE;
       if (ksReducePolyTail(L, With, &Ln))

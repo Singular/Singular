@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.53 2007-07-25 10:53:15 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.54 2007-07-26 10:27:17 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1035,19 +1035,19 @@ poly redNF (poly h,int &max_ind,kStrategy strat)
           if (!nIsOne(pGetCoeff(strat->S[j])))
           {
             pNorm(strat->S[j]);
-            if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
+            //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
 	    sl=pSize(strat->S[j]);
 	  }
           if (!nIsOne(pGetCoeff(strat->S[jj])))
           {
             pNorm(strat->S[jj]);
-            if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
+            //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
 	    sll=pSize(strat->S[jj]);
 	  }
 	  if (sll<sl)
 	  {
 	    if (TEST_OPT_DEBUG) Print("better(S%d:%d -> S%d:%d)\n",j,sl,jj,sll);
-            else if (TEST_OPT_PROT) { PrintS("b"); mflush(); }
+            //else if (TEST_OPT_PROT) { PrintS("b"); mflush(); }
             j=jj;
             sl=sll;
 	  }
@@ -1056,7 +1056,7 @@ poly redNF (poly h,int &max_ind,kStrategy strat)
       if (!nIsOne(pGetCoeff(strat->S[j])))
       {
         pNorm(strat->S[j]);
-        if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
+        //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
       }
       nNormalize(pGetCoeff(P.p));
 #ifdef KDEBUG

@@ -36,6 +36,6 @@ g(1), g(2), g(3), g(4), g(5), g(6), g(7), g(8), g(9);
 I;
 
 matrix m= lift(I, h(1,4)*h(1,2));
-m;
+//m;
 matrix(h(1,4)*h(1,2))-matrix(I)*m;
 tst_status(1);$
