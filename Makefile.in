@@ -159,7 +159,7 @@ CYGWIN_SETUP_VER      = 2.457.2.2
 CYGWIN_REP_DIR        = cygwin_pkg
 CYGWIN_AUX_FILES      = rpm/cygwin
 CYGWIN_PFW_DIR        = /cygdrive/c/Programme/InstallShield/PackageForTheWeb\ 4/
-CYGWIN_PFW_EXEC       = pftwwiz.exe
+CYGWIN_PFW_EXEC       = ./pftwwiz.exe
 CYGWIN_ORIG           = external-cygwin
 CYGWIN_SINGULAR_DIR   = Singular
 CYGWIN_SINGULAR_ROOT  = /usr/share/${CYGWIN_SINGULAR_DIR}
@@ -431,7 +431,7 @@ cygwin-dist-install: cygwin-dist-scripts ## ${BINDIST_NAME}.tar.gz
 	cp ${CYGWIN_AUX_FILES}/startxserver.bat ${CYGWIN_SINGULAR_BIN}/
 	unix2dos ${CYGWIN_SINGULAR_BIN}/startxserver.bat
 ##	Download setup exe
-	export xhttp_proxy=http://positron:3128; \
+	export http_proxy=http://positron.mathematik.uni-kl.de:3128; \
 	wget http://cygwin.com/setup.exe -O ${CYGWIN_SINGULAR_BIN}/cygwin-setup.exe
 ##	or copy from local folder
 #	cp ${CYGWIN_AUX_FILES}/cygwin-setup.exe ${CYGWIN_SINGULAR_BIN}/cygwin-setup.exe
@@ -487,6 +487,7 @@ cygwin-dist-pack: ## singular-base-${CYGWIN_PORT_VER}-src.tar.bz2
 	      /etc/postinstall/singular-icons.sh
 	touch ${CYGWIN_REP_DIR}/release/singular-helper/singular-helper-${CYGWIN_PORT_VER}.tar.bz2
 	cp singular-base-${CYGWIN_PORT_VER}-src.tar.bz2 ${CYGWIN_REP_DIR}/release/singular-base/
+	touch ${CYGWIN_AUX_FILES}/singular-surf-${CYGWIN_PORT_VER}-src.tar.bz2
 	cp ${CYGWIN_AUX_FILES}/singular-surf-${CYGWIN_PORT_VER}-src.tar.bz2 ${CYGWIN_REP_DIR}/release/singular-surf/
 	cp ${CYGWIN_AUX_FILES}/setup-base.hint ${CYGWIN_REP_DIR}/release/singular-base/setup.hint
 	cp ${CYGWIN_AUX_FILES}/setup-share.hint ${CYGWIN_REP_DIR}/release/singular-share/setup.hint
@@ -514,7 +515,7 @@ cygwin-setup-init:
 	cat ${CYGWIN_AUX_FILES}/setup.ini ${CYGWIN_REP_DIR}/setup.ini
 	@echo >> ${CYGWIN_REP_DIR}/setup.ini
 ##	Download setup exe
-	export xhttp_proxy=http://positron:3128; \
+	export http_proxy=http://positron.mathematik.uni-kl.de:3128; \
 	wget http://cygwin.com/setup.exe -O ${CYGWIN_REP_DIR}/setup.exe
 ##	or copy from local folder
 #	cp ${CYGWIN_AUX_FILES}/cygwin-setup.exe ${CYGWIN_REP_DIR}/setup.exe
