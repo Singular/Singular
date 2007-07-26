@@ -384,7 +384,7 @@ cygwin-dist-scripts:
 	@echo -e  "export SINGULAR_HTML_DIR=${CYGWIN_SINGULAR_DOC}/html" >> /usr/bin/ESingular
 	@echo -e  "export SINGULAR_CHM_FILE=${CYGWIN_SINGULAR_DOC}/doc/Manual.chm" >> /usr/bin/ESingular
 	@echo -e  "export SINGULAR_EXAMPLES_DIR=${CYGWIN_SINGULAR_DOC}/examples" >> /usr/bin/ESingular
-	@echo -e  'export PATH="${CYGWIN_SINGULAR_BIN}:/usr/X11R6/bin:$$PATH"' >> /usr/bin/ESingular
+	@echo -e  'export PATH="${CYGWIN_SINGULAR_BIN}:${CYGWIN_SINGULAR_BIN}:/usr/X11R6/bin:$$PATH"' >> /usr/bin/ESingular
 	@echo -e  'if [ -z $$DISPLAY ]; then export DISPLAY=:0.0; fi' >> /usr/bin/ESingular
 	@echo -e  "exec ${CYGWIN_SINGULAR_BIN}/ESingular.exe \$$*" >> /usr/bin/ESingular
 	@echo -e  Writing /usr/bin/Singular
@@ -396,7 +396,7 @@ cygwin-dist-scripts:
 	@echo -e  "export SINGULAR_HTML_DIR=${CYGWIN_SINGULAR_DOC}/html" >> /usr/bin/Singular
 	@echo -e  "export SINGULAR_CHM_FILE=${CYGWIN_SINGULAR_DOC}/doc/Manual.chm" >> /usr/bin/Singular
 	@echo -e  "export SINGULAR_EXAMPLES_DIR=${CYGWIN_SINGULAR_DOC}/examples" >> /usr/bin/Singular
-	@echo -e  'export PATH="${CYGWIN_SINGULAR_BIN}:$$PATH"' >> /usr/bin/Singular
+	@echo -e  'export PATH="${CYGWIN_SINGULAR_BIN}:${CYGWIN_SINGULAR_BIN}:$$PATH"' >> /usr/bin/Singular
 	@echo -e  'if [ -z $$DISPLAY ]; then export DISPLAY=:0.0; fi' >> /usr/bin/Singular
 	@echo -e  "exec ${CYGWIN_SINGULAR_BIN}/Singular.exe \$$*" >> /usr/bin/Singular
 
@@ -467,19 +467,23 @@ cygwin-dist-pack: ## singular-base-${CYGWIN_PORT_VER}-src.tar.bz2
 	      ${CYGWIN_SINGULAR_BIN}/LLL.exe          \
 	      ${CYGWIN_SINGULAR_BIN}/libparse.exe     \
 	      ${CYGWIN_SINGULAR_BIN}/gen_test.exe
-	tar cjf ${CYGWIN_REP_DIR}/release/singular-share/singular-share-${CYGWIN_PORT_VER}.tar.bz2 \
+	tar cjf ${CYGWIN_REP_DIR}/release/singular-surf/singular-surf-${CYGWIN_PORT_VER}.tar.bz2 \
+	      /usr/share/doc/Cygwin/singular-surf-${CYGWIN_SING_VER}.README \
+	      ${CYGWIN_SINGULAR_BIN}/surf.exe       \
+	      ${CYGWIN_SINGULAR_BIN}/SURF_AUTHORS   \
+	      ${CYGWIN_SINGULAR_BIN}/SURF_README    \
+	      ${CYGWIN_SINGULAR_BIN}/SURF_COPYING   \
+	      ${CYGWIN_SINGULAR_ROOT}/LIB/surfex/*  \
+	      ${CYGWIN_SINGULAR_ROOT}/LIB/surf.lib  \
+	      ${CYGWIN_SINGULAR_ROOT}/LIB/surfex.lib
+	tar -cj --exclude='surf*' -vf \
+	      ${CYGWIN_REP_DIR}/release/singular-share/singular-share-${CYGWIN_PORT_VER}.tar.bz2 \
 	      /usr/share/doc/Cygwin/singular-share-${CYGWIN_SING_VER}.README \
 	      ${CYGWIN_SINGULAR_ROOT}/*
 	tar cjf ${CYGWIN_REP_DIR}/release/singular-help/singular-help-${CYGWIN_PORT_VER}.tar.bz2 \
 	      /usr/share/doc/Cygwin/singular-help-${CYGWIN_SING_VER}.README \
 	      /usr/share/info/singular.info                                 \
 	      ${CYGWIN_SINGULAR_DOC}/*
-	tar cjf ${CYGWIN_REP_DIR}/release/singular-surf/singular-surf-${CYGWIN_PORT_VER}.tar.bz2 \
-	      /usr/share/doc/Cygwin/singular-surf-${CYGWIN_SING_VER}.README \
-	      ${CYGWIN_SINGULAR_BIN}/surf.exe       \
-	      ${CYGWIN_SINGULAR_BIN}/SURF_AUTHORS   \
-	      ${CYGWIN_SINGULAR_BIN}/SURF_README    \
-	      ${CYGWIN_SINGULAR_BIN}/SURF_COPYING
 	tar cjf ${CYGWIN_REP_DIR}/release/singular-icons/singular-icons-${CYGWIN_PORT_VER}.tar.bz2  \
 	      /usr/share/doc/Cygwin/singular-icons-${CYGWIN_SING_VER}.README \
 	      ${CYGWIN_SINGULAR_BIN}/cygwin-setup.exe                \
