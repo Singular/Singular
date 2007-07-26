@@ -573,7 +573,7 @@ install-sharedist: ${SLIBS_FILES} LIB/gftables
 	${MKINSTALLDIRS} ${install_slibdir}/gftables
 	cp ${GFTABLES} ${install_slibdir}/gftables
 	${MKINSTALLDIRS} ${install_slibdir}/surfex
-	cp -r LIB/surfex ${install_slibdir}/surfex
+	cp -r LIB/surfex ${install_slibdir}
 	chmod -R +rX ${install_slibdir}/*
 
 tar:
