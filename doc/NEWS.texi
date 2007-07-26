@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.93 2007-07-25 11:24:06 Singular Exp $
+@comment $Id: NEWS.texi,v 1.94 2007-07-26 08:04:55 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -82,7 +82,7 @@ new library: sagbi.lib (@nref{sagbi_lib}): subalgebras bases analogous to Groebn
 @item
 new library: surfex.lib (@nref{surfex_lib}): visualizing and rotating surfaces
 @item
-new library: cimon.lib (@nref{cimon_lib}): determines if the toric ideal of an affine monomial curve is a complete intersection.
+new library: cimonom.lib (@nref{cimonom_lib}): determines if the toric ideal of an affine monomial curve is a complete intersection.
 @item
 @nref{sheafcoh_lib}: new experimental functions, in particular @nref{sheafCohBGG2}
 @item
