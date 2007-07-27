@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.164 2007-07-24 12:21:26 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.165 2007-07-27 13:27:44 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1914,7 +1914,18 @@ ring rCompose(const lists  L)
          case ringorder_wp:
          case ringorder_Wp:
            R->wvhdl[j] =( int *)omAlloc((iv->length())*sizeof(int));
-           for (i=0; i<iv->length();i++) R->wvhdl[j][i]=(*iv)[i];
+           for (i=0; i<iv->length();i++) 
+	   {
+	     if (((R->order[j]==ringorder_wp)
+	       || (R->order[j]==ringorder_Wp))
+             && ((*iv)[i]<=0))
+	       // ERROR: wp/Wp entries have to be positive
+	     {
+               Werror("weight (var %d) for wp/Wp has to be positive: ",i+1,(*iv)[i]);
+               goto rCompose_err;
+	     }
+	     R->wvhdl[j][i]=(*iv)[i];
+	   }
            break;
          case ringorder_M:
            R->wvhdl[j] =( int *)omAlloc((iv->length())*sizeof(int));
