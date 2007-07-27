@@ -550,7 +550,7 @@ cygwin-setup-beta: cygwin-setup-init cygwin-setup-helper cygwin-setup-base cygwi
 	rm -rf ${CYGWIN_ORIG}/Full/release/singular-surf/singular-surf-*-src.tar.bz2
 	cp -r ${CYGWIN_REP_DIR}/release/* ${CYGWIN_ORIG}/Small/release
 	rm -rf ${CYGWIN_ORIG}/Small/release/singular-base/singular-base-*-src.tar.bz2
-	rm -rf ${CYGWIN_ORIG}/Small/release/singular-surf/singular-surf-*-src.tar.bz2
+	rm -rf ${CYGWIN_ORIG}/Small/release/singular-surf
 
 cygwin-setup: cygwin-setup-init cygwin-setup-helper
 	cp ${CYGWIN_REP_DIR}/setup.ini ${CYGWIN_REP_DIR}/setup
