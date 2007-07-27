@@ -91,9 +91,9 @@ ifneq ($(SINGUNAME),ix86-Win)
 LIBS		= -lm @NEED_LIBS@
 LIBSG		= -lm @NEED_LIBSG@
 else
-LIBS		= -lsingfac -lsingcf -lntl  -static -lreadline -lhtmlhelp -Xlinker -Bdynamic -lgmp -lomalloc_ndebug -lcygncurses6 
+LIBS		= -lsingfac -lsingcf -lntl  -static -lreadline -lhtmlhelp -Xlinker -Bdynamic -lgmp -lomalloc_ndebug -lncurses
 ## -lpython_module -lpython2.4 /usr/local/lib/libboost_python-gcc-d-1_32.dll
-LIBSG		= -lsingfac -lsingcf -lntl  -static -lreadline -lhtmlhelp -Xlinker -Bdynamic -lgmp -lcygncurses6 
+LIBSG		= -lsingfac -lsingcf -lntl  -static -lreadline -lhtmlhelp -Xlinker -Bdynamic -lgmp -lncurses
 endif
 MP_LIBS		= @MP_LIBS@
 HAVE_MPSR       = @HAVE_MPSR@
