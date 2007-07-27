@@ -384,7 +384,7 @@ cygwin-dist-scripts:
 	@echo -e  "export SINGULAR_HTML_DIR=${CYGWIN_SINGULAR_DOC}/html" >> /usr/bin/ESingular
 	@echo -e  "export SINGULAR_CHM_FILE=${CYGWIN_SINGULAR_DOC}/doc/Manual.chm" >> /usr/bin/ESingular
 	@echo -e  "export SINGULAR_EXAMPLES_DIR=${CYGWIN_SINGULAR_DOC}/examples" >> /usr/bin/ESingular
-	@echo -e  'export PATH="${CYGWIN_SINGULAR_BIN}:${CYGWIN_SINGULAR_BIN}:/usr/X11R6/bin:$$PATH"' >> /usr/bin/ESingular
+	@echo -e  'export PATH="${CYGWIN_SINGULAR_BIN}:/usr/X11R6/bin:$$PATH"' >> /usr/bin/ESingular
 	@echo -e  'if [ -z $$DISPLAY ]; then export DISPLAY=:0.0; fi' >> /usr/bin/ESingular
 	@echo -e  "exec ${CYGWIN_SINGULAR_BIN}/ESingular.exe \$$*" >> /usr/bin/ESingular
 	@echo -e  Writing /usr/bin/Singular
@@ -396,10 +396,23 @@ cygwin-dist-scripts:
 	@echo -e  "export SINGULAR_HTML_DIR=${CYGWIN_SINGULAR_DOC}/html" >> /usr/bin/Singular
 	@echo -e  "export SINGULAR_CHM_FILE=${CYGWIN_SINGULAR_DOC}/doc/Manual.chm" >> /usr/bin/Singular
 	@echo -e  "export SINGULAR_EXAMPLES_DIR=${CYGWIN_SINGULAR_DOC}/examples" >> /usr/bin/Singular
-	@echo -e  'export PATH="${CYGWIN_SINGULAR_BIN}:${CYGWIN_SINGULAR_BIN}:$$PATH"' >> /usr/bin/Singular
-	@echo -e  'if [ -z $$DISPLAY ]; then export DISPLAY=:0.0; fi' >> /usr/bin/Singular
+	@echo -e  'export PATH="${CYGWIN_SINGULAR_BIN}:$$PATH"' >> /usr/bin/Singular
 	@echo -e  "exec ${CYGWIN_SINGULAR_BIN}/Singular.exe \$$*" >> /usr/bin/Singular
-
+	@echo -e  Writing /usr/bin/surfex
+	@echo -e  "#! /bin/bash" > /usr/bin/surfex
+	@echo -e  "surfex_dir='/lib/surfex'" >> /usr/bin/surfex
+	@echo -e  "shift" >> /usr/bin/surfex
+	@echo -e  "tmp_dir=/tmp" >> /usr/bin/surfex
+	@echo -e  "std_eqn='x^3+y^3+z^3+1-0.25*(x+y+z+1)^3'" >> /usr/bin/surfex
+	@echo -e  "allargs=''" >> /usr/bin/surfex
+	@echo -e  'if [ -z $$1 ] ; then' >> /usr/bin/surfex
+	@echo -e  '    allargs="-e $$std_eqn"' >> /usr/bin/surfex
+	@echo -e  'else' >> /usr/bin/surfex
+	@echo -e  '    allargs=$$*' >> /usr/bin/surfex
+	@echo -e  'fi' >> /usr/bin/surfex
+	@echo -e  '/bin/rm -f $$tmp_dir/tmp.$$$$.txt' >> /usr/bin/surfex
+	@echo -e  'cd "$$surfex_dir"' >> /usr/bin/surfex
+	@echo -e  'java surfex -d "$$surfex_dir" -t "$$tmp_dir" $$allargs' >> /usr/bin/surfex
 
 cygwin-dist-install: cygwin-dist-scripts ## ${BINDIST_NAME}.tar.gz
 	if test -d ${TMPDIR}; then rm -fr ${TMPDIR}; fi
@@ -416,14 +429,17 @@ cygwin-dist-install: cygwin-dist-scripts ## ${BINDIST_NAME}.tar.gz
 	cp ${TMPDIR}/Singular/${S_VERSION}/NEWS /usr/share/doc/Singular-${CYGWIN_SING_VER}/
 	cp ${TMPDIR}/Singular/${S_VERSION}/GPL /usr/share/doc/Singular-${CYGWIN_SING_VER}/
 ## Install Cygwin specific structure
+	-rm -rf /lib/surfex
+	mv ${TMPDIR}/Singular/${S_VERSION}/LIB/surfex /lib/surfex
 	mv ${TMPDIR}/Singular/${S_VERSION}/ix86-Win/* ${CYGWIN_SINGULAR_BIN}/
 	-rmdir ${TMPDIR}/Singular/${S_VERSION}/ix86-Win
 	mv ${TMPDIR}/Singular/${S_VERSION}/LIB ${CYGWIN_SINGULAR_ROOT}/
 	mv ${TMPDIR}/Singular/${S_VERSION}/emacs ${CYGWIN_SINGULAR_ROOT}/
 	mv ${TMPDIR}/Singular/${S_VERSION}/* ${CYGWIN_SINGULAR_DOC}/
 	mv ${CYGWIN_SINGULAR_DOC}/info/singular.hlp /usr/share/info/singular.info
+	-rm -f ${CYGWIN_SINGULAR_BIN}/surfex
 ## Copy auxiliar files
-	cp ${CYGWIN_AUX_FILES}/surf.exe ${CYGWIN_SINGULAR_BIN}/
+	cp ${CYGWIN_AUX_FILES}/surf.exe /usr/bin/
 	cp ${CYGWIN_AUX_FILES}/SURF_AUTHORS ${CYGWIN_SINGULAR_BIN}/
 	cp ${CYGWIN_AUX_FILES}/SURF_README ${CYGWIN_SINGULAR_BIN}/
 	cp ${CYGWIN_AUX_FILES}/SURF_COPYING ${CYGWIN_SINGULAR_BIN}/
@@ -469,14 +485,15 @@ cygwin-dist-pack: ## singular-base-${CYGWIN_PORT_VER}-src.tar.bz2
 	      ${CYGWIN_SINGULAR_BIN}/gen_test.exe
 	tar cjf ${CYGWIN_REP_DIR}/release/singular-surf/singular-surf-${CYGWIN_PORT_VER}.tar.bz2 \
 	      /usr/share/doc/Cygwin/singular-surf-${CYGWIN_SING_VER}.README \
-	      ${CYGWIN_SINGULAR_BIN}/surf.exe       \
+	      /usr/bin/surf.exe                     \
+	      /usr/bin/surfex                       \
 	      ${CYGWIN_SINGULAR_BIN}/SURF_AUTHORS   \
 	      ${CYGWIN_SINGULAR_BIN}/SURF_README    \
 	      ${CYGWIN_SINGULAR_BIN}/SURF_COPYING   \
-	      ${CYGWIN_SINGULAR_ROOT}/LIB/surfex/*  \
+	      /lib/surfex/*                         \
 	      ${CYGWIN_SINGULAR_ROOT}/LIB/surf.lib  \
 	      ${CYGWIN_SINGULAR_ROOT}/LIB/surfex.lib
-	tar -cj --exclude='surf*' -vf \
+	tar -cj --exclude='surf*' -f \
 	      ${CYGWIN_REP_DIR}/release/singular-share/singular-share-${CYGWIN_PORT_VER}.tar.bz2 \
 	      /usr/share/doc/Cygwin/singular-share-${CYGWIN_SING_VER}.README \
 	      ${CYGWIN_SINGULAR_ROOT}/*
