@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.66 2007-07-23 18:00:29 Singular Exp $ */
+/* $Id: ring.cc,v 1.67 2007-07-27 14:09:52 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2846,14 +2846,14 @@ BOOLEAN rComplete(ring r, int force)
   r->divmask=rGetDivMask(bits);
 
   // will be used for ordsgn:
-  long *tmp_ordsgn=(long *)omAlloc0(2*(n+r->N)*sizeof(long));
+  long *tmp_ordsgn=(long *)omAlloc0(3*(n+r->N)*sizeof(long));
   // will be used for VarOffset:
   int *v=(int *)omAlloc((r->N+1)*sizeof(int));
   for(i=r->N; i>=0 ; i--)
   {
     v[i]=-1;
   }
-  sro_ord *tmp_typ=(sro_ord *)omAlloc0(2*(n+r->N)*sizeof(sro_ord));
+  sro_ord *tmp_typ=(sro_ord *)omAlloc0(3*(n+r->N)*sizeof(sro_ord));
   int typ_i=0;
   int prev_ordsgn=0;
 
@@ -2991,6 +2991,20 @@ BOOLEAN rComplete(ring r, int force)
         rO_WDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
                    tmp_typ[typ_i], r->wvhdl[i]);
         typ_i++;
+	{ // check for weights <=0
+	  int jj;
+	  BOOLEAN have_bad_weights=FALSE;
+	  for(jj=r->block1[i]-r->block0[i];jj>=0; jj--)
+	  {
+	    if (r->wvhdl[i][jj]<=0) have_bad_weights=TRUE;
+	  }
+	  if (have_bad_weights)
+	  {
+	     rO_TDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
+		                     tmp_typ[typ_i]);
+             typ_i++;
+	  }
+	}
         if (r->block1[i]!=r->block0[i])
         {
           rO_LexVars_neg(j, j_bits,r->block1[i],r->block0[i]+1, prev_ordsgn,
@@ -3002,6 +3016,20 @@ BOOLEAN rComplete(ring r, int force)
         rO_WDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
                    tmp_typ[typ_i], r->wvhdl[i]);
         typ_i++;
+	{ // check for weights <=0
+	  int j;
+	  BOOLEAN have_bad_weights=FALSE;
+	  for(j=r->block1[i]-r->block0[i];j>=0; j--)
+	  {
+	    if (r->wvhdl[i][j]<=0) have_bad_weights=TRUE;
+	  }
+	  if (have_bad_weights)
+	  {
+	     rO_TDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
+		                     tmp_typ[typ_i]);
+             typ_i++;
+	  }
+	}
         if (r->block1[i]!=r->block0[i])
         {
           rO_LexVars(j, j_bits,r->block0[i],r->block1[i]-1, prev_ordsgn,
@@ -3109,7 +3137,7 @@ BOOLEAN rComplete(ring r, int force)
     r->ordsgn[j] = tmp_ordsgn[j];
   }
 
-  omFreeSize((ADDRESS)tmp_ordsgn,(2*(n+r->N)*sizeof(long)));
+  omFreeSize((ADDRESS)tmp_ordsgn,(3*(n+r->N)*sizeof(long)));
 
   // ----------------------------
   // description of orderings for setm:
@@ -3121,7 +3149,7 @@ BOOLEAN rComplete(ring r, int force)
     r->typ=(sro_ord*)omAlloc(typ_i*sizeof(sro_ord));
     memcpy(r->typ,tmp_typ,typ_i*sizeof(sro_ord));
   }
-  omFreeSize((ADDRESS)tmp_typ,(2*(n+r->N)*sizeof(sro_ord)));
+  omFreeSize((ADDRESS)tmp_typ,(3*(n+r->N)*sizeof(sro_ord)));
 
   // ----------------------------
   // indices for (first copy of ) variable entries in exp.e vector (VarOffset):

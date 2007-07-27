@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.166 2007-07-27 13:37:21 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.167 2007-07-27 14:09:52 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1916,13 +1916,6 @@ ring rCompose(const lists  L)
            R->wvhdl[j] =( int *)omAlloc((iv->length())*sizeof(int));
            for (i=0; i<iv->length();i++)
            {
-             if (((R->order[j]==ringorder_wp)
-               || (R->order[j]==ringorder_Wp))
-             && ((*iv)[i]<=0))
-             {
-               Werror("weight (var %d) for wp/Wp has to be positive, but is %d",i+1,(*iv)[i]);
-               goto rCompose_err;
-             }
              R->wvhdl[j][i]=(*iv)[i];
            }
            break;
@@ -4240,13 +4233,6 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
             for (i=2; i<iv->length(); i++)
             {
               R->wvhdl[n][i-2] = (*iv)[i];
-              if (((R->order[n]==ringorder_wp)
-                || (R->order[n]==ringorder_Wp))
-              && ((*iv)[i]<=0))
-              {
-                Werror("weight (var %d) for wp/Wp has to be positive, but is %d ",i+1,(*iv)[i]);
-                return TRUE;
-              }
             }
             R->block0[n] = last+1;
             last += iv->length()-2;
