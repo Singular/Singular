@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.165 2007-07-27 13:27:44 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.166 2007-07-27 13:37:21 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1702,7 +1702,7 @@ lists rDecompose(const ring r)
     if (r->block1[i]-r->block0[i] >=0 )
     {
       j=r->block1[i]-r->block0[i];
-      if (r->order[i]==ringorder_M)  j=(j+1)*(j+1)-1; 
+      if (r->order[i]==ringorder_M)  j=(j+1)*(j+1)-1;
       iv=new intvec(j+1);
       if ((r->wvhdl!=NULL) && (r->wvhdl[i]!=NULL))
       {
@@ -1914,18 +1914,17 @@ ring rCompose(const lists  L)
          case ringorder_wp:
          case ringorder_Wp:
            R->wvhdl[j] =( int *)omAlloc((iv->length())*sizeof(int));
-           for (i=0; i<iv->length();i++) 
-	   {
-	     if (((R->order[j]==ringorder_wp)
-	       || (R->order[j]==ringorder_Wp))
+           for (i=0; i<iv->length();i++)
+           {
+             if (((R->order[j]==ringorder_wp)
+               || (R->order[j]==ringorder_Wp))
              && ((*iv)[i]<=0))
-	       // ERROR: wp/Wp entries have to be positive
-	     {
-               Werror("weight (var %d) for wp/Wp has to be positive: ",i+1,(*iv)[i]);
+             {
+               Werror("weight (var %d) for wp/Wp has to be positive, but is %d",i+1,(*iv)[i]);
                goto rCompose_err;
-	     }
-	     R->wvhdl[j][i]=(*iv)[i];
-	   }
+             }
+             R->wvhdl[j][i]=(*iv)[i];
+           }
            break;
          case ringorder_M:
            R->wvhdl[j] =( int *)omAlloc((iv->length())*sizeof(int));
@@ -4239,7 +4238,16 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
           case ringorder_Wp:
             R->wvhdl[n]=(int*)omAlloc((iv->length()-1)*sizeof(int));
             for (i=2; i<iv->length(); i++)
+            {
               R->wvhdl[n][i-2] = (*iv)[i];
+              if (((R->order[n]==ringorder_wp)
+                || (R->order[n]==ringorder_Wp))
+              && ((*iv)[i]<=0))
+              {
+                Werror("weight (var %d) for wp/Wp has to be positive, but is %d ",i+1,(*iv)[i]);
+                return TRUE;
+              }
+            }
             R->block0[n] = last+1;
             last += iv->length()-2;
             R->block1[n] = last;
