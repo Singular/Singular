@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.5 2007-07-31 15:25:48 Singular Exp $ */
+/* $Id: ffields.cc,v 1.6 2007-07-31 15:32:32 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -166,7 +166,7 @@ number nfInit (int i)
   while (i <  0)    i += nfCharP;
   while (i >= nfCharP) i -= nfCharP;
   if (i==0) return (number)nfCharQ;
-  int c=0;
+  CARDINAL c=0;
   while (i>1)
   {
     c=nfPlus1Table[c];
