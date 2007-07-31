@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.10 2007-07-03 14:45:57 Singular Exp $ */
+/* $Id: numbers.h,v 1.11 2007-07-31 15:25:48 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -36,7 +36,7 @@
 #define n_Size(n,r)           (r)->cf->nSize(n)
 
 /* variables */
-extern short fftable[];
+extern unsigned short fftable[];
 
 /* prototypes */
 extern numberfunc nMult, nSub ,nAdd ,nDiv, nIntDiv, nIntMod, nExactDiv;
