@@ -1,6 +1,6 @@
 // AH last modified:  01.07.2007
 //////////////////////////////////////////////////////////////////////////////
-version = "$Id: noether.lib,v 1.7 2007-08-01 14:36:12 Singular Exp $";
+version = "$Id: noether.lib,v 1.8 2007-08-01 14:45:01 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: noether.lib   Noether normalization of an ideal (not nessecary
@@ -26,10 +26,10 @@ Submitted to: ISSAC 2007.
 
 
 PROCEDURES:
- Npos_test(id);  checks whether monomial ideal id is in Noether position
- MNpos_test(id); the same as above using modular methods
- Npos(id);       Noether normalization of ideal id
- MNpos(id);      Noether normalization of ideal id by modular methods
+ NPos_test(id);  checks whether monomial ideal id is in Noether position
+ modNpos_test(id); the same as above using modular methods
+ NPos(id);       Noether normalization of ideal id
+ modNPos(id);      Noether normalization of ideal id by modular methods
  nsatiety(id); Satiety of ideal id
  modsatiety(id)  Satiety of ideal id by modular methods
  regCM(id);    Castelnuovo-Mumford regularity of ideal id
@@ -43,9 +43,9 @@ LIB "presolve.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc NP_test (ideal I)
+proc NPos_test (ideal I)
 "
-USAGE:  NP-test (I); I monomial ideal
+USAGE:  NPos_test (I); I monomial ideal
 RETURN: A list which first element is 1 if i is in Noether position
         0  otherwise. The second element of this list is the list of variable which
         its first part is the variable such that a power of this varaibles belong to the initial of i.
@@ -117,8 +117,8 @@ ASSUME: i is a nonzero monomial ideal.
    return(list(1,P1+P3));
 }
 //////////////////////////////////////////
-proc MNP_test (ideal i)
-"USAGE: MNP-test (i); i an ideal
+proc modNpos_test (ideal i)
+"USAGE: modNpos_test(i); i an ideal
 RETURN: 1 if i is in Noether position 0  otherwise.
 NOTE:   This test is a probabilistic test, and it computes the initial of the ideal modulo the prime number 2147483647 (the biggest prime less than 2^31).
 "
@@ -143,13 +143,13 @@ NOTE:   This test is a probabilistic test, and it computes the initial of the id
   I=fetch(oro,lsbi);
   I=simplify(I,1);
   attrib(I,"isSB",1);
-  return(NP_test(I));
+  return(NPos_test(I));
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-proc NP (ideal i)
-"USAGE:  NP (i); i ideal
+proc NPos (ideal i)
+"USAGE:  NPos(i); i ideal
 RETURN:  A linear map phi such that  phi(i) is in Noether position
 "
 {
@@ -170,7 +170,7 @@ RETURN:  A linear map phi such that  phi(i) is in Noether position
   system("--ticks-per-sec",10);
   i=std(i);
   sbi=sort(lead(i))[1];
-  #=NP_test(sbi);
+  #=NPos_test(sbi);
   if ( #[1]== 1 )
   {
     return ("The ideal is in Noether position and the time of this computation is:",rtimer-time,"/10 sec.");
@@ -185,7 +185,7 @@ RETURN:  A linear map phi such that  phi(i) is in Noether position
     }
     phi=r1,chcoord;
     sbi=phi(sbi);
-    if ( NP_test(sbi)[1] == 1 )
+    if ( NPos_test(sbi)[1] == 1 )
     {
       setring r0;
       chcoord=fetch(r1,chcoord);
@@ -213,7 +213,7 @@ RETURN:  A linear map phi such that  phi(i) is in Noether position
       P=0;
       phi=r1,chcoord;
       I=phi(I);
-      if ( NP_test(sort(lead(std(I)))[1])[1] == 1 )
+      if ( NPos_test(sort(lead(std(I)))[1])[1] == 1 )
       {
         K=x(ii..n);
         setring r0;
@@ -229,10 +229,10 @@ RETURN:  A linear map phi such that  phi(i) is in Noether position
   return (-1);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc MNP (ideal i)
-"USAGE:  MNP (i); i ideal
+proc modNPos (ideal i)
+"USAGE:  modNPos(i); i ideal
 RETURN:  A linear map phi such that  phi(i) is in Noether position
-NOTE:    It uses the procedure  MNP_test to test Noether position.
+NOTE:    It uses the procedure  modNPos_test to test Noether position.
 "
 {
 //--------------------------- initialisation ---------------------------------
@@ -250,7 +250,7 @@ NOTE:    It uses the procedure  MNP_test to test Noether position.
    i = fetch(r0,i);
    time=rtimer;
    system("--ticks-per-sec",10);
-   #=MNP_test(i);
+   #=modNPos_test(i);
    if ( #[1]== 1 )
    {
      return ("The ideal is in Noether position and the time of this computation is:",rtimer-time,"/10 sec.");
@@ -265,7 +265,7 @@ NOTE:    It uses the procedure  MNP_test to test Noether position.
      }
      phi=r1,chcoord;
      I=phi(i);
-     if ( MNP_test(I)[1] == 1 )
+     if ( modNPos_test(I)[1] == 1 )
      {
        setring r0;
        chcoord=fetch(r1,chcoord);
@@ -293,7 +293,7 @@ NOTE:    It uses the procedure  MNP_test to test Noether position.
        P=0;
        phi=r1,chcoord;
        I=phi(I);
-       if ( MNP_test(I)[1] == 1 )
+       if ( modNPos_test(I)[1] == 1 )
        {
          K=x(ii..n);
          setring r0;
@@ -415,8 +415,8 @@ THEORY:  The satiety, or saturation index, of a homogeneous ideal i is the
 
 
 //////////////////////////////////////////////////////////////////////////////
-proc msatiety (ideal i)
-"USAGE:   msatiety (i); i ideal,
+proc modsatiety (ideal i)
+"USAGE:   modsatiety(i); i ideal,
 RETURN:  an integer, the satiety of i.
          (returns -1 if i is not homogeneous)
 ASSUME:  i is a homogeneous ideal of the basering R=K[x(0)..x(n)].
@@ -747,8 +747,8 @@ ASSUME:  i is a homogeneous ideal.
 
 //////////////////////////////////////////////////////////////////////////////
 //
-proc mreg (ideal i)
-"USAGE:  mreg (i); i ideal
+proc modregCM(ideal i)
+"USAGE:  modregCM(i); i ideal
 RETURN:  an integer, the Castelnuovo-Mumford regularity of i.
          (returns -1 if i is not homogeneous)
 ASSUME:  i is a homogeneous ideal and the characteristic of base field is zero..
