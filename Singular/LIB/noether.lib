@@ -1,6 +1,6 @@
 // AH last modified:  01.07.2007
 //////////////////////////////////////////////////////////////////////////////
-version = "$Id: noether.lib,v 1.6 2007-01-23 15:03:37 Singular Exp $";
+version = "$Id: noether.lib,v 1.7 2007-08-01 14:36:12 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: noether.lib   Noether normalization of an ideal (not nessecary
@@ -26,14 +26,14 @@ Submitted to: ISSAC 2007.
 
 
 PROCEDURES:
- NP_test(id);  checks whether monomial ideal id is in Noether position
- MNP_test(id); the same as above using modular methods
- NP(id);       Noether normalization of ideal id
- MNP(id);      Noether normalization of ideal id by modular methods
+ Npos_test(id);  checks whether monomial ideal id is in Noether position
+ MNpos_test(id); the same as above using modular methods
+ Npos(id);       Noether normalization of ideal id
+ MNpos(id);      Noether normalization of ideal id by modular methods
  nsatiety(id); Satiety of ideal id
- msatiety(id)  Satiety of ideal id by modular methods
+ modsatiety(id)  Satiety of ideal id by modular methods
  regCM(id);    Castelnuovo-Mumford regularity of ideal id
- mregCM(id);   Castelnuovo-Mumford regularity of ideal id by modular methods
+ modregCM(id); Castelnuovo-Mumford regularity of ideal id by modular methods
 ";
 LIB "elim.lib";
 LIB "algebra.lib";
