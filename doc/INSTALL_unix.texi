@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.26 2006-08-03 09:53:02 Singular Exp $
+@comment $Id: INSTALL_unix.texi,v 1.27 2007-08-01 15:07:22 Singular Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on Unix
 @c
@@ -280,7 +280,7 @@ directories by starting up @sc{Singular} with the
 @cindex ESingular, no prompt
 @cindex bug, ESingular
 This is due to the very restrictive access rights of @code{/dev/pty*} of
-the standard @uref{http:/www.suse.de,SuSE} distribution (starting from
+the standard @uref{http://www.suse.de,SuSE} distribution (starting from
 version 6.3 on). As root, do one of the following: Either
 @example
 chmod 666 /dev/pty*
