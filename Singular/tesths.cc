@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.110 2007-08-03 11:32:04 Singular Exp $ */
+/* $Id: tesths.cc,v 1.111 2007-08-03 11:48:37 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -48,7 +48,7 @@ int siInit(char *name)
 }
 #endif
 
-#if not defined LIBSINGULAR or defined GENTABLE
+#if (! defined(LIBSINGULAR)) || defined(GENTABLE)
 /*0 implementation*/
 int main(          /* main entry to Singular */
     int argc,      /* number of parameter */
