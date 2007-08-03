@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.109 2006-09-27 17:46:12 Singular Exp $ */
+/* $Id: tesths.cc,v 1.110 2007-08-03 11:32:04 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -40,6 +40,15 @@ extern int iiInitArithmetic();
 
 const char *singular_date=__DATE__ " " __TIME__;
 
+#ifdef LIBSINGULAR
+int siInit(char *name)
+{
+  // hack such that all shared' libs in the bindir are loaded correctly
+  feInitResources(name);
+}
+#endif
+
+#if not defined LIBSINGULAR or defined GENTABLE
 /*0 implementation*/
 int main(          /* main entry to Singular */
     int argc,      /* number of parameter */
@@ -243,4 +252,5 @@ int main(          /* main entry to Singular */
 #endif
   return 0;
 }
+#endif // not LIBSINGULAR
 

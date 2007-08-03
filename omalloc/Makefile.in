@@ -3,7 +3,7 @@
 ### Purpose: Makefile for omalloc
 ### Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 ### Created: 11/99
-### Version: $Id: Makefile.in,v 1.20 2007-01-23 22:13:05 krueger Exp $
+### Version: $Id: Makefile.in,v 1.21 2007-08-03 11:32:05 Singular Exp $
 #################################################################
 
 SHELL		= /bin/sh
@@ -187,6 +187,12 @@ configure: configure.in
 ##
 ## install targets
 ##
+install-nolns: install
+
+install-libsingular:
+	$(MKINSTALLDIRS) $(includedir)/singular
+	$(INSTALL) omalloc.h $(includedir)/singular
+
 install: all libomalloc_p.a
 	$(MKINSTALLDIRS) $(libdir)
 	$(MKINSTALLDIRS) $(includedir)

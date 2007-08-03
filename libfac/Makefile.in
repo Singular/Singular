@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.11 2003-04-09 13:39:11 Singular Exp $
+# $Id: Makefile.in,v 1.12 2007-08-03 11:32:05 Singular Exp $
 #################################################
 SHELL		= /bin/sh
 RM		= -rm -f
@@ -145,6 +145,8 @@ libfac-g.a:	$(DEBFACTOROBJ) $(DEBCHARSETOBJ)
 libsingfac-g.a:	$(DEBFACTOROBJ1) $(DEBCHARSETOBJ)
 		$(AR) ${SINGLIBFACNAME}.a $(DEBFACTOROBJ1) $(DEBCHARSETOBJ)
 		$(RANLIB) ${SINGLIBFACNAME}.a
+
+install-nolns: install
 
 install:	all
 	${MKINSTALLDIRS} ${includedir}

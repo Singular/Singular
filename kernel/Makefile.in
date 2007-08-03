@@ -312,6 +312,12 @@ p_Procs_%.so: p_Procs_Lib_%.dl_o
 ##
 ## install targets
 ##
+install-nolns: install
+
+install-libsingular:
+	${MKINSTALLDIRS} ${includedir}/singular
+	${INSTALL} *.h ${includedir}/singular
+
 install: all installbin
 
 installbin: ${DL_LIBS} ${DL_LIBSG}

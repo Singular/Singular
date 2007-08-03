@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.48 2007-07-31 12:57:59 Singular Exp $
+# $Id: GNUmakefile.in,v 1.49 2007-08-03 11:32:04 Singular Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -580,6 +580,8 @@ installtest:	test_install
 # - install targets.
 #
 install:	$(installtargets)
+
+install-nolns: install
 
 installcf:	cf
 		$(MKINSTALLDIRS) $(libdir)

@@ -101,6 +101,7 @@ HAVE_MPSR       = @HAVE_MPSR@
 #
 # Handle libSINGULAR stuff
 #
+LIBSINGULAR_LIBS =-lsingfac -lsingcf -lntl -lreadline -lgmp -lomalloc_ndebug
 
 SO_SUFFIX = so
 LIBSINGULAR_FLAGS = -export-dynamic 
@@ -114,12 +115,17 @@ LIBSINGULAR_LD = $(LD)
 endif
 
 ifeq ($(SINGUNAME),ppcMac-darwin)
+MACOSX_DEPLOYMENT_TARGET=10.4
 SO_SUFFIX        = dylib
-LIBSINGULAR_FLAGS = -singule_module
+LIBSINGULAR_FLAGS = -single_module
 LIBSINGULAR_LD = $(LD)
 endif
 
-LIBSINGULAR_LIBS =-lsingfac -lsingcf -lntl -lreadline -lgmp -lomalloc_ndebug
+ifeq ($(SINGUNAME),ix86-Win)
+SO_SUFFIX = dll
+LIBSINGULAR_FLAGS = --shared
+LIBSINGULAR_LIBS = -lsingfac -lsingcf -lntl -lreadline -lgmp -lomalloc_ndebug  -lhtmlhelp
+endif
 
 #
 # End libSINGULAR
@@ -329,7 +335,7 @@ libsingular: mod2.h Makefile version.h $(WIN_LIBS) scanner.cc  ${OBJS} \
          iparith.o libsingular-tesths.o libparse.cc claptmpl.o mpsr_Tok.o $(DL_LIBS) 
 	$(LIBSINGULAR_LD) ${SLDFLAGS} ${LIBSINGULAR_FLAGS} -o libsingular.${SO_SUFFIX} \
 	libsingular-tesths.o iparith.o mpsr_Tok.o claptmpl.o \
-	${OBJS} -lkernel -L../kernel -L../factory -L../libfac -L${libdir} ${LIBSINGULAR_LIBS} ../kernel/mmalloc.o
+	${OBJS} -lkernel -L../kernel -L../factory -L../libfac -L${libdir} ${LIBSINGULAR_LIBS}
 
 libsingular-tesths.o: tesths.cc
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -DLIBSINGULAR \
@@ -498,7 +504,7 @@ installslib: LIB
 	test -r ${slibdir} || ${LN_S} `pwd`/LIB ${slibdir}
 
 installslib-nolns: LIB
-	test -r ${slibdir} || ${INSTALL} -d `pwd`/LIB ${slibdir}
+	${MKINSTALLDIRS} ${slibdir}
 	${INSTALL} `pwd`/LIB/*.lib ${slibdir}
 	${MKINSTALLDIRS} ${slibdir}/gftables
 	${INSTALL} `pwd`/LIB/gftables/* ${slibdir}/gftables/

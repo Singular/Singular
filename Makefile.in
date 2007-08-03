@@ -54,6 +54,33 @@ all install:
 	done
 	echo "* do not forget to install Singular-@SINGULAR_VERSION@-share.tar.gz"
 
+install-nolns:
+	@ for SUBDIR in ${BUILD1_SUBDIRS}; \
+	do \
+	  echo ${MAKE} $@ in $${SUBDIR}; \
+	  (cd $${SUBDIR} && ${MAKE} $@ )  || exit 1;\
+	  (if test "$${SUBDIR}" = Texinfo && test -d doc; then \
+	    for FILE in ${TEXINFO_TEX_FILES}; \
+	    do \
+	      if test "$@" = uninstall; then\
+	        echo rm -f doc/$${FILE};\
+	        rm -f doc/$${FILE}; \
+	      else \
+	        echo cp ${TEXINFO_TEX_DIR}/$${FILE} doc; \
+	        cp ${TEXINFO_TEX_DIR}/$${FILE} doc; \
+	      fi; \
+	    done;\
+	  fi;); \
+	done
+	echo "* do not forget to install Singular-@SINGULAR_VERSION@-share.tar.gz" 
+
+libsingular:
+	cd Singular; make libsingular
+
+install-libsingular: libsingular
+	(cd Singular && make install-libsingular);
+	(cd kernel && make install-libsingular);
+	(cd omalloc && make install-libsingular);
 
 maintainer-install uninstall:
 	@ for SUBDIR in ${BUILD_SUBDIRS}; \

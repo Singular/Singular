@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.32 2007-04-26 08:22:48 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.33 2007-08-03 11:32:04 Singular Exp $ */
 
 //{{{ docu
 //
@@ -120,7 +120,7 @@ void out_cf(char *s1,const CanonicalForm &f,char *s2)
       printf("+%d",f.intval());
     }
     else //printf("+...");
-       cout << f;
+       std::cout << f;
     //if (f.inZ()) printf("(Z)");
     //else if (f.inQ()) printf("(Q)");
     //else if (f.inFF()) printf("(FF)");
