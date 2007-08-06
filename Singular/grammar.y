@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.123 2007-04-04 12:38:07 Singular Exp $ */
+/* $Id: grammar.y,v 1.124 2007-08-06 08:42:08 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -178,6 +178,10 @@ void yyerror(char * fmt)
   {
     Werror("leaving %s",VoiceName());
   }
+  #ifdef HAVE_LIBFAC_P
+  extern int libfac_interruptflag;
+  libfac_interruptflag=0;
+  #endif
 }
 
 %}
