@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_iter.cc,v 1.3 1998-06-29 14:37:49 schmidt Exp $ */
+/* $Id: cf_iter.cc,v 1.4 2007-08-07 14:11:01 Singular Exp $ */
 
 #include <config.h>
 
@@ -27,14 +27,16 @@ CFIterator::CFIterator( const CFIterator & i )
 
 CFIterator::CFIterator( const CanonicalForm & f )
 {
-    if ( f.inBaseDomain() || f.inQuotDomain() ) {
-	data = f; cursor = 0;
-	ispoly = false; hasterms = true;
+    if ( f.inBaseDomain() || f.inQuotDomain() )
+    {
+        data = f; cursor = 0;
+        ispoly = false; hasterms = true;
     }
-    else {
-	data = f;
-	cursor = ((InternalPoly*)(f.value))->firstTerm;
-	ispoly = true; hasterms = true;
+    else
+    {
+        data = f;
+        cursor = ((InternalPoly*)(f.value))->firstTerm;
+        ispoly = true; hasterms = true;
     }
 }
 
@@ -42,31 +44,38 @@ CFIterator::CFIterator( const CanonicalForm & f, const Variable & v )
 {
     ASSERT( !f.inQuotDomain(), "illegal iterator" );
     ASSERT( v.level() > 0, "illegal iterator" );
-    if ( f.inBaseDomain() ) {
-	data = f; cursor = 0;
-	ispoly = false; hasterms = true;
+    if ( f.inBaseDomain() )
+    {
+        data = f; cursor = 0;
+        ispoly = false; hasterms = true;
     }
-    else {
-	if ( f.mvar() == v ) {
-	    data = f;
-	    cursor = ((InternalPoly*)(f.value))->firstTerm;
-	    ispoly = true; hasterms = true;
-	}
-	else  if ( v > f.mvar() ) {
-	    data = f; cursor = 0;
-	    ispoly = false; hasterms = true;
-	}
-	else {
-	    data = swapvar( f, v, f.mvar().next() );
-	    if ( data.mvar() == f.mvar().next() ) {
-		cursor = ((InternalPoly*)(data.value))->firstTerm;
-		ispoly = true; hasterms = true;
-	    }
-	    else {
-		cursor = 0;
-		ispoly = false; hasterms = true;
-	    }
-	}
+    else
+    {
+        if ( f.mvar() == v )
+        {
+            data = f;
+            cursor = ((InternalPoly*)(f.value))->firstTerm;
+            ispoly = true; hasterms = true;
+        }
+        else  if ( v > f.mvar() )
+        {
+            data = f; cursor = 0;
+            ispoly = false; hasterms = true;
+        }
+        else
+        {
+            data = swapvar( f, v, f.mvar().next() );
+            if ( data.mvar() == f.mvar().next() )
+            {
+                cursor = ((InternalPoly*)(data.value))->firstTerm;
+                ispoly = true; hasterms = true;
+            }
+            else
+            {
+                cursor = 0;
+                ispoly = false; hasterms = true;
+            }
+        }
     }
 }
 
@@ -78,11 +87,12 @@ CFIterator::~CFIterator()
 CFIterator&
 CFIterator::operator= ( const CFIterator & i )
 {
-    if ( this != &i ) {
-	data = i.data;
-	cursor = i.cursor;
-	ispoly = i.ispoly;
-	hasterms = i.hasterms;
+    if ( this != &i )
+    {
+        data = i.data;
+        cursor = i.cursor;
+        ispoly = i.ispoly;
+        hasterms = i.hasterms;
     }
     return *this;
 }
@@ -90,14 +100,16 @@ CFIterator::operator= ( const CFIterator & i )
 CFIterator&
 CFIterator::operator= ( const CanonicalForm & f )
 {
-    if ( f.inBaseDomain() || f.inQuotDomain() ) {
-	data = f; cursor = 0;
-	ispoly = false; hasterms = true;
+    if ( f.inBaseDomain() || f.inQuotDomain() )
+    {
+        data = f; cursor = 0;
+        ispoly = false; hasterms = true;
     }
-    else {
-	data = f;
-	cursor = ((InternalPoly*)(f.value))->firstTerm;
-	ispoly = true; hasterms = true;
+    else
+    {
+        data = f;
+        cursor = ((InternalPoly*)(f.value))->firstTerm;
+        ispoly = true; hasterms = true;
     }
     return *this;
 }
