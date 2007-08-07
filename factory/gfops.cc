@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gfops.cc,v 1.5 1998-06-12 14:33:41 schmidt Exp $ */
+/* $Id: gfops.cc,v 1.6 2007-08-07 14:11:18 Singular Exp $ */
 
 #include <config.h>
 
@@ -19,7 +19,7 @@
 #include "gfops.h"
 
 
-const int gf_maxtable = 32767;
+const int gf_maxtable = 63001;
 const int gf_maxbuffer = 200;
 
 const int gf_primes_len = 42;
@@ -30,7 +30,8 @@ static unsigned short gf_primes [] =
      59,  61,  67,  71,  73,  79,  83,  89,
      97, 101, 103, 107, 109, 113, 127, 131,
     137, 139, 149, 151, 157, 163, 167, 173,
-    179, 181
+    179, 181, 191, 193, 197, 199, 223, 211,
+    227, 229, 233, 239, 241, 251
 };
 
 int gf_q = 0;
@@ -49,7 +50,8 @@ intVec2CF ( int degree, int * coeffs, int level )
 {
     int i;
     CanonicalForm result;
-    for ( i = 0; i <= degree; i++ ) {
+    for ( i = 0; i <= degree; i++ )
+    {
 	result += CanonicalForm( coeffs[ i ] ) * power( Variable( level ), degree - i );
     }
     return result;
@@ -64,13 +66,15 @@ gf_get_table ( int p, int n )
 	gf_table = new unsigned short[gf_maxtable];
 
     // do not read the table a second time
-    if ( gf_q == q ) {
+    if ( gf_q == q )
+    {
 	return;
     }
 
 #ifdef SINGULAR
     // just copy the table if Singular already read it
-    if ( q == nfCharQ ) {
+    if ( q == nfCharQ )
+    {
 	gf_p = p; gf_n = n;
 	gf_q = q; gf_q1 = q - 1;
 	gf_m1 = nfM1;
@@ -111,7 +115,8 @@ gf_get_table ( int p, int n )
     sscanf( bufptr, "%d", &degree );
     bufptr = (char *)strchr( bufptr, ' ' ) + 1;
     int * mipo = new int[degree + 1];
-    for ( i = 0; i <= degree; i++ ) {
+    for ( i = 0; i <= degree; i++ )
+    {
 	sscanf( bufptr, "%d", mipo + i );
 	bufptr = (char *)strchr( bufptr, ' ' ) + 1;
     }
@@ -124,12 +129,14 @@ gf_get_table ( int p, int n )
     // now for the table
     int k, digs = gf_tab_numdigits62( gf_q );
     i = 1;
-    while ( i < gf_q ) {
+    while ( i < gf_q )
+    {
 	success = fgets( buffer, gf_maxbuffer, inputfile );
 	STICKYASSERT( strlen( buffer ) - 1 == (size_t)digs * 30, "illegal table" );
 	bufptr = buffer;
 	k = 0;
-	while ( i < gf_q && k < 30 ) {
+	while ( i < gf_q && k < 30 )
+        {
 	    gf_table[i] = convertback62( bufptr, digs );
 	    bufptr += digs;
             if ( gf_table[i] == gf_q )
@@ -153,10 +160,12 @@ gf_valid_combination ( int p, int n )
     while ( i < gf_primes_len && gf_primes[i] != p ) i++;
     if ( i == gf_primes_len )
 	return false;
-    else {
+    else
+    {
 	i = n;
 	int a = 1;
-	while ( a < gf_maxtable && i > 0 ) {
+	while ( a < gf_maxtable && i > 0 )
+        {
 	    a *= p;
 	    i--;
 	}
@@ -180,13 +189,15 @@ gf_gf2ff ( int a )
 {
     if ( gf_iszero( a ) )
 	return 0;
-    else {
+    else
+    {
 	// starting from z^0=1, step through the table
 	// counting the steps until we hit z^a or z^0
 	// again.  since we are working in char(p), the
 	// latter is guaranteed to be fulfilled.
 	int i = 0, ff = 1;
-	do {
+	do
+        {
 	    if ( i == a )
 		return ff;
 	    ff++;
@@ -201,7 +212,8 @@ gf_isff ( int a )
 {
     if ( gf_iszero( a ) )
 	return true;
-    else {
+    else
+    {
 	// z^a in GF(p) iff (z^a)^p-1=1
 	return gf_isone( gf_power( a, gf_p - 1 ) );
     }
