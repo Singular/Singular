@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.167 2007-07-27 14:09:52 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.168 2007-08-07 11:41:00 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1922,7 +1922,7 @@ ring rCompose(const lists  L)
          case ringorder_M:
            R->wvhdl[j] =( int *)omAlloc((iv->length())*sizeof(int));
            for (i=0; i<iv->length();i++) R->wvhdl[j][i]=(*iv)[i];
-           R->block1[j]=si_max(R->block0[j],R->block0[j]+(int)sqrt(iv->length()-1));
+           R->block1[j]=si_max(R->block0[j],R->block0[j]+(int)sqrt((double)(iv->length()-1)));
            break;
          case ringorder_ls:
          case ringorder_ds:

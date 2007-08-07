@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.8 2007-07-24 11:20:32 Singular Exp $
+ *  Version: $Id: kInline.cc,v 1.9 2007-08-07 11:36:46 Singular Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -28,9 +28,9 @@ KINLINE TObject* skStrategy::S_2_T(int i)
 {
   assume(i>= 0 && i<=sl);
   assume(S_2_R[i] >= 0 && S_2_R[i] <= tl);
-  TObject* T = R[S_2_R[i]];
-  assume(T != NULL && T->p == S[i]);
-  return T;
+  TObject* TT = R[S_2_R[i]];
+  assume(TT != NULL && TT->p == S[i]);
+  return TT;
 }
 
 KINLINE TObject* skStrategy::s_2_t(int i)
@@ -498,13 +498,13 @@ KINLINE void sLObject::PrepareRed(BOOLEAN use_bucket)
   }
 }
 
-KINLINE void sLObject::SetLmTail(poly lm, poly p_tail, int p_Length, int use_bucket, ring tailRing, poly _last)
+KINLINE void sLObject::SetLmTail(poly lm, poly p_tail, int p_Length, int use_bucket, ring _tailRing, poly _last)
 {
 
-  Set(lm, tailRing);
+  Set(lm, _tailRing);
   if (use_bucket)
   {
-    bucket = kBucketCreate(tailRing);
+    bucket = kBucketCreate(_tailRing);
     kBucketInit(bucket, p_tail, p_Length);
     pNext(lm) = NULL;
     pLength = 0;
@@ -797,11 +797,11 @@ KINLINE long sLObject::MinComp()
 }
 KINLINE long sLObject::Comp()
 {
-  poly p;
+  poly pp;
   ring r;
-  GetLm(p, r);
-  assume(p != NULL);
-  return p_GetComp(p, r);
+  GetLm(pp, r);
+  assume(pp != NULL);
+  return p_GetComp(pp, r);
 }
 
 KINLINE sLObject& sLObject::operator=(const sTObject& t)
