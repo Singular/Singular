@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.453 2007-07-24 09:58:47 Singular Exp $ */
+/* $Id: iparith.cc,v 1.454 2007-08-09 14:31:16 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2193,6 +2193,8 @@ static BOOLEAN jjHOMOG_P(leftv res, leftv u, leftv v)
   pLmDelete(p);
   if (d==1)
     res->data = (char *)pHomogen((poly)u->Data(),i);
+  else
+    WerrorS("variable must have weight 1");
   return (d!=1);
 }
 static BOOLEAN jjHOMOG_ID(leftv res, leftv u, leftv v)
@@ -2208,6 +2210,8 @@ static BOOLEAN jjHOMOG_ID(leftv res, leftv u, leftv v)
   pLmDelete(p);
   if (d==1)
     res->data = (char *)idHomogen((ideal)u->Data(),i);
+  else
+    WerrorS("variable must have weight 1");
   return (d!=1);
 }
 static BOOLEAN jjINDEPSET2(leftv res, leftv u, leftv v)
