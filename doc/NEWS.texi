@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.94 2007-07-26 08:04:55 Singular Exp $
+@comment $Id: NEWS.texi,v 1.95 2007-08-10 15:55:29 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -111,8 +111,8 @@ invariant rings of finite groups in the non-modular case: @nref{invariant_algebr
 matrix groups and @nref{invariant_algebra_perm} for permutation groups (@nref{finvar_lib})
 @item
 operation for sparse matrices improved: multiplication, prune, conversion to module
-@item
-experimental: @code{python} / @code{ipython} interface
+@c @item
+@c experimental: @code{python} / @code{ipython} interface
 @end itemize
 
 @heading News in version 3-0-2
