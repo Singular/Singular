@@ -1,5 +1,5 @@
 #!/bin/sh
-VERSION=`flex --version |sed -e "s/^.*version //"`
+VERSION=`flex --version |sed -e "s/^.*version //"|sed -e "s/^flex //"`
 LV=`echo $VERSION|sed -e s/\.[0-9]*\.[0-9]*\$//`
 MIDV=`echo $VERSION|sed -e "s/^[0-9]*\.//"|sed -e s/\.[0-9]*\$//`
 TV=`echo $VERSION|sed -e s/^[0-9]*\.[0-9]*\\.//`
