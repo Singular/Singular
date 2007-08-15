@@ -38,7 +38,7 @@ BOOLEAN evEigenvals(leftv res,leftv h);
 
 
 package="eigenval";
-version="$Id: eigenval.mod,v 1.1 2003-06-11 10:21:51 anne Exp $";
+version="$Id: eigenval.mod,v 1.2 2007-08-15 17:38:27 motsak Exp $";
 info="
 LIBRARY: EIGENVALUES AND HESSENBERG FORM
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
@@ -101,11 +101,11 @@ BOOLEAN evSwap(leftv res,leftv h)
       h=h->next;
       if(h&&h->Typ()==INT_CMD)
       {
-        int i=(int)h->Data();
+        int i=(int)(long)h->Data();
         h=h->next;
         if(h&&h->Typ()==INT_CMD)
         {
-          int j=(int)h->Data();
+          int j=(int)(long)h->Data();
           res->rtyp=MATRIX_CMD;
           res->data=(void *)evSwap(mpCopy(M),i,j);
           return FALSE;
@@ -155,15 +155,15 @@ BOOLEAN evRowElim(leftv res,leftv h)
       h=h->next;
       if(h&&h->Typ()==INT_CMD)
       {
-        int i=(int)h->Data();
+        int i=(int)(long)h->Data();
         h=h->next;
         if(h&&h->Typ()==INT_CMD)
         {
-          int j=(int)h->Data();
+          int j=(int)(long)h->Data();
           h=h->next;
           if(h&&h->Typ()==INT_CMD)
           {
-            int k=(int)h->Data();
+            int k=(int)(long)h->Data();
             res->rtyp=MATRIX_CMD;
             res->data=(void *)evRowElim(mpCopy(M),i,j,k);
             return FALSE;
@@ -214,15 +214,15 @@ BOOLEAN evColElim(leftv res,leftv h)
       h=h->next;
       if(h&&h->Typ()==INT_CMD)
       {
-        int i=(int)h->Data();
+        int i=(int)(long)h->Data();
         h=h->next;
         if(h&&h->Typ()==INT_CMD)
         {
-          int j=(int)h->Data();
+          int j=(int)(long)h->Data();
           h=h->next;
           if(h&&h->Typ()==INT_CMD)
           {
-            int k=(int)h->Data();
+            int k=(int)(long)h->Data();
             res->rtyp=MATRIX_CMD;
             res->data=(void *)evColElim(mpCopy(M),i,j,k);
             return FALSE;

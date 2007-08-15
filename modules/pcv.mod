@@ -1,6 +1,6 @@
 %{
 /*
- *  $Id: pcv.mod,v 1.2 2003-06-11 10:21:28 anne Exp $
+ *  $Id: pcv.mod,v 1.3 2007-08-15 17:38:27 motsak Exp $
  *
  *  Test mod fuer modgen
  */
@@ -58,7 +58,7 @@ BOOLEAN pcvBasis(leftv res,leftv h);
 // module="pcv";
 package="pcv";
 
-version="$Id: pcv.mod,v 1.2 2003-06-11 10:21:28 anne Exp $";
+version="$Id: pcv.mod,v 1.3 2007-08-15 17:38:27 motsak Exp $";
 info="
 LIBRARY: pcv.so  CONVERSION BETWEEN POLYS AND COEF VECTORS
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
@@ -445,11 +445,11 @@ BOOLEAN pcvP2CV(leftv res,leftv h)
       h=h->next;
       if(h&&h->Typ()==INT_CMD)
       {
-        int d0=(int)h->Data();
+        int d0=(int)(long)h->Data();
         h=h->next;
         if(h&&h->Typ()==INT_CMD)
         {
-          int d1=(int)h->Data();
+          int d1=(int)(long)h->Data();
           res->rtyp=LIST_CMD;
           res->data=(void*)pcvP2CV(p,d0,d1);
           return FALSE;
@@ -473,11 +473,11 @@ BOOLEAN pcvCV2P(leftv res,leftv h)
       h=h->next;
       if(h&&h->Typ()==INT_CMD)
       {
-        int d0=(int)h->Data();
+        int d0=(int)(long)h->Data();
         h=h->next;
         if(h&&h->Typ()==INT_CMD)
         {
-          int d1=(int)h->Data();
+          int d1=(int)(long)h->Data();
           res->rtyp=LIST_CMD;
           res->data=(void*)pcvCV2P(pl,d0,d1);
           return FALSE;
@@ -507,11 +507,11 @@ BOOLEAN pcvDim(leftv res,leftv h)
   {
     if(h&&h->Typ()==INT_CMD)
     {
-      int d0=(int)h->Data();
+      int d0=(int)(long)h->Data();
       h=h->next;
       if(h&&h->Typ()==INT_CMD)
       {
-        int d1=(int)h->Data();
+        int d1=(int)(long)h->Data();
         res->rtyp=INT_CMD;
         res->data=(void*)pcvDim(d0,d1);
         return FALSE;
@@ -563,11 +563,11 @@ BOOLEAN pcvBasis(leftv res,leftv h)
   {
     if(h&&h->Typ()==INT_CMD)
     {
-      int d0=(int)h->Data();
+      int d0=(int)(long)h->Data();
       h=h->next;
       if(h&&h->Typ()==INT_CMD)
       {
-        int d1=(int)h->Data();
+        int d1=(int)(long)h->Data();
         res->rtyp=LIST_CMD;
         res->data=(void*)pcvBasis(d0,d1);
         return FALSE;

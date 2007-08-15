@@ -1,5 +1,5 @@
 /*
- * $Id: proc.cc,v 1.26 2006-09-27 17:46:28 Singular Exp $
+ * $Id: proc.cc,v 1.27 2007-08-15 17:39:31 motsak Exp $
  */
 
 #include <stdio.h>
@@ -429,7 +429,7 @@ static void gen_func_param_check(
           pi->param[i].typname, pi->param[i].varname);
   fprintf(fp, "     goto mod_%s_error;\n", pi->procname);
   fprintf(fp, "  __v = __v_save;\n");
-  fprintf(fp, "  %s = (%s)__z%s->Data();\n", pi->param[i].varname,
+  fprintf(fp, "  %s = (%s)(long)__z%s->Data();\n", pi->param[i].varname,
           type_conv[pi->param[i].typ], pi->param[i].varname);
   
 }
