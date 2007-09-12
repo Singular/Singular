@@ -76,7 +76,7 @@ int debug = 0;
 int trace = 0;
 int do_create_makefile = 1;
 int do_create_srcdir = 1;
-char* inst_dir = EXEC_PREFIX;
+char* inst_dir = "${SINGULARROOT}/${SINGUNAME}";
 
 #ifdef IRIX_6
 struct option

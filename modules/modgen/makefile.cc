@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.28 2006-11-09 13:23:43 Singular Exp $ */
+/* $Id: makefile.cc,v 1.29 2007-09-12 09:31:40 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -96,15 +96,16 @@ void build_head_section(
 {
   fprintf(fp, "CC\t= gcc\n");
   fprintf(fp, "CXX\t= gcc\n");
+  fprintf(fp, "SINGULARROOT\t= ../..\n");
 #warning "PROBLEM: nice place for include file has to be found"
-  fprintf(fp, "CFLAGS\t= -DNDEBUG -DBUILD_MODULE -I. -I%s/kernel -I%s/Singular -I%s/include\n",PREFIX,PREFIX,EXEC_PREFIX);
-  fprintf(fp, "DCFLAGS\t= -DBUILD_MODULE -I. -I%s/kernel -I%s/Singular -I%s/include\n",PREFIX,PREFIX,EXEC_PREFIX);
+  fprintf(fp, "CFLAGS\t= -DNDEBUG -DBUILD_MODULE -I. -I${SINGULARROOT}/kernel -I${SINGULARROOT}/Singular -I${SINGULARROOT}/%s/include\n",SINGUNAME);
+  fprintf(fp, "DCFLAGS\t= -DBUILD_MODULE -I. -I${SINGULARROOT}/kernel -I${SINGULARROOT}/Singular -I${SINGULARROOT}/%s/include\n",SINGUNAME);
   fprintf(fp, "#LD\t=\n");
   fprintf(fp, "\n");
   fprintf(fp, "instdir          = %s\n", inst_dir );
-  fprintf(fp, "MKINSTALLDIRS\t\t= %s/modules/mkinstalldirs\n", PREFIX);
+  fprintf(fp, "MKINSTALLDIRS\t\t= ${SINGULARROOT}/modules/mkinstalldirs\n");
 #warning "PROBLEM: do we also install install-sh when installing Singular?"
-  fprintf(fp, "INSTALL\t\t= %s/Singular/install-sh -c\n", PREFIX);
+  fprintf(fp, "INSTALL\t\t= ${SINGULARROOT}/Singular/install-sh -c\n");
   fprintf(fp, "INSTALL_PROGRAM\t= ${INSTALL}\n");
   fprintf(fp, "INSTALL_DATA\t= ${INSTALL} -m 644\n");
 }

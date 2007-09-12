@@ -109,12 +109,19 @@ pathnames.h:
 	echo " */" >> pathnames.h
 	echo "" >> pathnames.h
 	echo "#define TOPSRCDIR \"$(topsrcdir)\"" >> pathnames.h
-	echo "#define LIBDIR    \"$(libdir)\"" >> pathnames.h
-	echo "#define PREFIX	\"$(prefix)\"" >> pathnames.h
-	echo "#define EXEC_PREFIX	\"$(exec_prefix)\"" >> pathnames.h
+	echo "#define SINGUNAME \"$(SINGUNAME)\"" >> pathnames.h
 
 scanner.cc: scanner.l mod_grammar.h modgen.h
-	$(LEX) scanner.l > scanner.cc
+	@if test -r scanner.cc; then \
+		touch scanner.cc ;\
+	else \
+	if test "x${LEX}" = x; then \
+		echo Error: no lex given, could not rebuilt scanner.cc;\
+                exit 1; \
+	fi\
+	fi
+	${LEX} -s -I -t scanner.l > scanner.cc.lmp
+	cp scanner.cc.lmp scanner.cc
 
 #	$(LEX) -Pyymod scanner.l > scanner.cc
 
