@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.7 2005-07-27 09:46:19 Singular Exp $ */
+/* $Id: feResource.cc,v 1.8 2007-09-12 09:33:33 Singular Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -561,7 +561,7 @@ static char* feCleanUpPath(char* path)
   for (; *path != '\0'; path++)
   {
     if (*path == fePathSep) n_comps++;
-    if (*path == ';')
+    else if (*path == ';')
     {
       *path = fePathSep;
       n_comps++;
@@ -635,14 +635,14 @@ static char* feCleanUpPath(char* path)
   // assemble everything again
   for (path=opath, i=0;i<n_comps-1;i++)
   {
-    strcpy(path, path_comps[i]);
+    mystrcpy(path, path_comps[i]);
     path += strlen(path);
     *path = fePathSep;
     path++;
   }
   if (n_comps)
   {
-    strcpy(path, path_comps[i]);
+    mystrcpy(path, path_comps[i]);
   }
   else
   {
