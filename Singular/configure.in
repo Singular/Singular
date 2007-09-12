@@ -293,7 +293,7 @@ if test "${with_lex+set}" != set; then
     LEX=flex
     AC_SUBST(LEX)
   else
-    AC_MSG_ERROR(can not find flex with version greater 2.4)
+    AC_MSG_ERROR(can not find flex with version 2.4.5-2.5.4)
   fi
 elif test "${with_lex}" = no; then
   AC_MSG_WARN(building without lex -- make might fail)
