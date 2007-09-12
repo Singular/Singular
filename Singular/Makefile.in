@@ -291,7 +291,10 @@ GFTABLES = $(wildcard LIB/gftables/[1-9]*)
 ## Build Targets
 ##
 .l.cc:
-	@if test "x${LEX}" = x; then \
+	@if test -r scanner.cc; then \
+		touch scanner.cc ;\
+	else \
+	if test "x${LEX}" = x; then \
 		echo Error: no lex given, could not rebuilt scanner.cc;\
                 exit 1; \
 	fi
@@ -299,13 +302,17 @@ GFTABLES = $(wildcard LIB/gftables/[1-9]*)
 	cp scanner.cc.lmp scanner.cc
 
 .y.cc:
-	@if test "x${BISON}" = x; then \
+	@if test -r grammar.cc; then \
+		touch grammar.cc ;\
+	else \
+	if test "x${BISON}" = x; then \
 		echo Error: no bison given, could not rebuilt grammar.cc;\
                 exit 1; \
+	fi;\
+	${BISON} -d -t -o grammar.cc $<;\
+	chmod +x testgh;\
+	./testgh;\
 	fi
-	${BISON} -d -t -o grammar.cc $<
-	chmod +x testgh
-	./testgh
 
 .cc.o:	
 	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} -c $<
