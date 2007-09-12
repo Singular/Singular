@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.454 2007-08-09 14:31:16 Singular Exp $ */
+/* $Id: iparith.cc,v 1.455 2007-09-12 09:53:00 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -991,6 +991,7 @@ static BOOLEAN jjTIMES_BI(leftv res, leftv u, leftv v)
 static BOOLEAN jjTIMES_N(leftv res, leftv u, leftv v)
 {
   res->data = (char *)(nMult( (number)u->Data(), (number)v->Data()));
+  nNormalize((number)res->data);
   if ((v->next!=NULL) || (u->next!=NULL))
     return jjOP_REST(res,u,v);
   return FALSE;
@@ -1006,22 +1007,26 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
     {
       b=(poly)v->CopyD(POLY_CMD); // works also for VECTOR_CMD
       res->data = (char *)(pMult( a, b));
+      pNormalize((poly)res->data);
       return FALSE;
     }
     // u->next exists: copy v
     b=pCopy((poly)v->Data());
     res->data = (char *)(pMult( a, b));
+    pNormalize((poly)res->data);
     return jjOP_REST(res,u,v);
   }
   // v->next exists: copy u
   a=pCopy((poly)u->Data());
   b=(poly)v->CopyD(POLY_CMD); // works also for VECTOR_CMD
   res->data = (char *)(pMult( a, b));
+  pNormalize((poly)res->data);
   return jjOP_REST(res,u,v);
 }
 static BOOLEAN jjTIMES_ID(leftv res, leftv u, leftv v)
 {
   res->data = (char *)idMult((ideal)u->Data(),(ideal)v->Data());
+  idNormalize((ideal)res->data);
   if ((v->next!=NULL) || (u->next!=NULL))
     return jjOP_REST(res,u,v);
   return FALSE;
@@ -1044,6 +1049,7 @@ static BOOLEAN jjTIMES_MA_P1(leftv res, leftv u, leftv v)
   int r=pMaxComp(p);/* recompute the rank for the case ideal*vector*/
   ideal I= (ideal)mpMultP((matrix)u->CopyD(MATRIX_CMD),p);
   if (r>0) I->rank=r;
+  idNormalize(I);
   res->data = (char *)I;
   return FALSE;
 }
@@ -1057,6 +1063,7 @@ static BOOLEAN jjTIMES_MA_N1(leftv res, leftv u, leftv v)
   poly p=pOne();
   pSetCoeff(p,n);
   res->data = (char *)mpMultP((matrix)u->CopyD(MATRIX_CMD),p);
+  idNormalize((ideal)res->data);
   return FALSE;
 }
 static BOOLEAN jjTIMES_MA_N2(leftv res, leftv u, leftv v)
@@ -1066,6 +1073,7 @@ static BOOLEAN jjTIMES_MA_N2(leftv res, leftv u, leftv v)
 static BOOLEAN jjTIMES_MA_I1(leftv res, leftv u, leftv v)
 {
   res->data = (char *)mpMultI((matrix)u->CopyD(MATRIX_CMD),(int)(long)v->Data());
+  idNormalize((ideal)res->data);
   return FALSE;
 }
 static BOOLEAN jjTIMES_MA_I2(leftv res, leftv u, leftv v)
@@ -1080,6 +1088,7 @@ static BOOLEAN jjTIMES_MA(leftv res, leftv u, leftv v)
      WerrorS("matrix size not compatible");
      return TRUE;
   }
+  idNormalize((ideal)res->data);
   if ((v->next!=NULL) || (u->next!=NULL))
     return jjOP_REST(res,u,v);
   return FALSE;
@@ -1264,6 +1273,7 @@ static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
   {
     res->data = (char *)pDivideM(pCopy(p),pHead(q));
   }
+  pNormalize((poly)res->data);
   return FALSE;
 }
 static BOOLEAN jjDIV_Ma(leftv res, leftv u, leftv v)
@@ -1297,6 +1307,7 @@ static BOOLEAN jjDIV_Ma(leftv res, leftv u, leftv v)
         MATELEM(mm,i,j) = pDivideM(pCopy(MATELEM(m,i,j)),pHead(q));
     }
   }
+  idNormalize((ideal)mm);
   res->data=(char *)mm;
   return FALSE;
 }

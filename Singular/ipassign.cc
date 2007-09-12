@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.90 2007-04-04 12:38:07 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.91 2007-09-12 09:53:01 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -433,7 +433,8 @@ static BOOLEAN jiA_IDEAL(leftv res, leftv a, Subexpr e)
 {
   if (res->data!=NULL) idDelete((ideal*)&res->data);
   res->data=(void *)a->CopyD(MATRIX_CMD);
-  idNormalize((ideal)res->data);
+  if (a->rtyp==IDHDL) idNormalize((ideal)a->Data());
+  else                idNormalize((ideal)res->data);
   jiAssignAttr(res,a);
   if (((res->rtyp==IDEAL_CMD)||(res->rtyp==MODUL_CMD))
   && (IDELEMS((ideal)(res->data))==1))
