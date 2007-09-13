@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.6 2007-07-31 15:32:32 Singular Exp $ */
+/* $Id: ffields.cc,v 1.7 2007-09-13 14:17:08 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -145,14 +145,14 @@ number nfMult (number a,number b)
   nfTest(b);
 #endif
   if (((long)a == (long)nfCharQ) || ((long)b == (long)nfCharQ))
-    return (number)nfCharQ;
+    return (number)(long)nfCharQ;
   /*else*/
   int i=(int)((long)a+(long)b);
   if (i>=nfCharQ1) i-=nfCharQ1;
 #ifdef LDEBUG
-  nfTest((number)i);
+  nfTest((number)(long)i);
 #endif
-  return (number)i;
+  return (number)(long)i;
 }
 
 /*2
@@ -162,10 +162,10 @@ number nfInit (int i)
 {
   // Hmm .. this is just to prevent initialization
   // from nfInitChar to go into an infinite loop
-  if (i==0) return (number)nfCharQ;
+  if (i==0) return (number)(long)nfCharQ;
   while (i <  0)    i += nfCharP;
   while (i >= nfCharP) i -= nfCharP;
-  if (i==0) return (number)nfCharQ;
+  if (i==0) return (number)(long)nfCharQ;
   CARDINAL c=0;
   while (i>1)
   {
@@ -173,9 +173,9 @@ number nfInit (int i)
     i--;
   }
 #ifdef LDEBUG
-  nfTest((number)c);
+  nfTest((number)(long)c);
 #endif
-  return (number)c;
+  return (number)(long)c;
 }
 
 /*
