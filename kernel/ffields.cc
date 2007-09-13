@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.7 2007-09-13 14:17:08 Singular Exp $ */
+/* $Id: ffields.cc,v 1.8 2007-09-13 14:19:05 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -497,7 +497,7 @@ char * nfRead (char *s, number *a)
     }
     else
       i=1;
-    z=(number)i;
+    z=(number)(long)i;
     *a=nfMult(*a,z);
   }
 #ifdef LDEBUG
