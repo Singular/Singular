@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.24 2007-08-03 11:32:05 Singular Exp $ */
+/* $Id: longrat.cc,v 1.25 2007-09-13 14:27:50 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -2223,7 +2223,7 @@ LINLINE number nlAdd (number a, number b)
   {
     int r=SR_HDL(a)+SR_HDL(b)-1;
     if ( ((r << 1) >> 1) == r )
-      return (number)r;
+      return (number)(long)r;
     else
       return nlRInit(SR_TO_INT(r));
   }
