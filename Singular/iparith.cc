@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.455 2007-09-12 09:53:00 Singular Exp $ */
+/* $Id: iparith.cc,v 1.456 2007-09-13 10:34:00 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -991,7 +991,9 @@ static BOOLEAN jjTIMES_BI(leftv res, leftv u, leftv v)
 static BOOLEAN jjTIMES_N(leftv res, leftv u, leftv v)
 {
   res->data = (char *)(nMult( (number)u->Data(), (number)v->Data()));
-  nNormalize((number)res->data);
+  number n=(number)res->data;
+  nNormalize(n);
+  res->data=(char *)n;
   if ((v->next!=NULL) || (u->next!=NULL))
     return jjOP_REST(res,u,v);
   return FALSE;
