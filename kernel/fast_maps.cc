@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.5 2006-05-02 14:15:46 Singular Exp $
+ *  Version: $Id: fast_maps.cc,v 1.6 2007-09-17 08:33:17 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -35,22 +35,21 @@ static poly maGetMaxExpP(poly* max_map_monomials,
 {
   int n = si_min(pi_r->N, n_max_map_monomials);
   int i, j;
-  Exponent_t e_i, e_j;
+  unsigned long e_i, e_j;
   poly m_i, map_j = p_Init(map_r);
 
   for (i=1; i <= n; i++)
   {
     e_i = p_GetExp(pi_m, i, pi_r);
+    if (e_i==0) e_i=1;
     m_i = max_map_monomials[i-1];
-    if (e_i > 0 && m_i != NULL && ! p_IsConstantComp(m_i, map_r))
+    if (m_i != NULL && ! p_IsConstantComp(m_i, map_r))
     {
       for (j = 1; j<= map_r->N; j++)
       {
         e_j = p_GetExp(m_i, j, map_r);
-        if (e_j > 0)
-        {
-          p_AddExp(map_j, j, e_j*e_i, map_r);
-        }
+        if (e_j == 0) e_j=1;
+        p_AddExp(map_j, j, e_j*e_i, map_r);
       }
     }
   }
@@ -58,9 +57,9 @@ static poly maGetMaxExpP(poly* max_map_monomials,
 }
 
 // returns maximal exponent if map_id is applied to pi_id
-static Exponent_t maGetMaxExp(ideal pi_id, ring pi_r, ideal map_id, ring map_r)
+static unsigned long maGetMaxExp(ideal pi_id, ring pi_r, ideal map_id, ring map_r)
 {
-  Exponent_t max=0;
+  unsigned long max=0;
   poly* max_map_monomials = (poly*) omAlloc(IDELEMS(map_id)*sizeof(poly));
   poly max_pi_i, max_map_i;
 
@@ -75,10 +74,8 @@ static Exponent_t maGetMaxExp(ideal pi_id, ring pi_r, ideal map_id, ring map_r)
     max_pi_i = p_GetMaxExpP(pi_id->m[i], pi_r);
     max_map_i = maGetMaxExpP(max_map_monomials, IDELEMS(map_id), map_r,
                               max_pi_i, pi_r);
-    Exponent_t temp = p_GetMaxExp(max_map_i, map_r);
-    if (temp > max){
-      max=temp;
-    }
+    unsigned long temp = p_GetMaxExp(max_map_i, map_r);
+    if (temp > max){ max=temp; }
 
     p_LmFree(max_pi_i, pi_r);
     p_LmFree(max_map_i, map_r);
@@ -291,10 +288,10 @@ void maMap_CreateRings(ideal map_id, ring map_r,
 #endif
 
 #if HAVE_DEST_R > 0
-  Exponent_t maxExp = maGetMaxExp(map_id, map_r, image_id, image_r);
+  unsigned long maxExp = maGetMaxExp(map_id, map_r, image_id, image_r);
   if (maxExp <=  1) maxExp = 2;
-  else if (maxExp > (Exponent_t) image_r->bitmask)
-    maxExp = (Exponent_t) image_r->bitmask;
+  else if (maxExp > (unsigned long) image_r->bitmask)
+    maxExp = (unsigned long) image_r->bitmask;
   dest_r = rModifyRing_Simple(image_r, TRUE, TRUE, maxExp,  simple);
 #else
   dest_r = image_r;
@@ -582,16 +579,18 @@ static poly maEggT(const poly m1, const poly m2, poly &q1, poly &q2,const ring r
   ggt=p_Init(r);
 
   for (i=1;i<=r->N;i++) {
-    Exponent_t e1 = p_GetExp(m1, i, r);
-    Exponent_t e2 = p_GetExp(m2, i, r);
-    if (e1 > 0 && e2 > 0){
-      Exponent_t em = (e1 > e2 ? e2 : e1);
+    unsigned long e1 = p_GetExp(m1, i, r);
+    unsigned long e2 = p_GetExp(m2, i, r);
+    if (e1 > 0 && e2 > 0)
+    {
+      unsigned long em = (e1 > e2 ? e2 : e1);
       dg += em;
       p_SetExp(ggt, i, em, r);
       p_SetExp(q1, i, e1 - em, r);
       p_SetExp(q2, i, e2 - em, r);
     }
-    else {
+    else
+    {
       p_SetExp(q1, i, e1, r);
       p_SetExp(q2, i, e2, r);
     }
@@ -601,10 +600,9 @@ static poly maEggT(const poly m1, const poly m2, poly &q1, poly &q2,const ring r
     p_Setm(ggt, r);
     p_Setm(q1, r);
     p_Setm(q2, r);
-
-
   }
-  else {
+  else
+  {
     p_LmFree(ggt, r);
     p_LmFree(q1, r);
     p_LmFree(q2, r);
@@ -663,15 +661,17 @@ static mapoly maFindBestggT(mapoly mp, mapoly & choice, mapoly & fp, mapoly & fq
     }
     iter=iter->next;
   }
-  if(ggT!=NULL){
-
+  if(ggT!=NULL)
+  {
     int dq =pTotaldegree(fq_p,r);
-    if (dq!=0){
+    if (dq!=0)
+    {
       fq=maPoly_InsertMonomial(mp, fq_p, r, NULL);
       fp=maPoly_InsertMonomial(mp, fp_p, r, NULL);
       return maPoly_InsertMonomial(mp, ggT, r, NULL);
     }
-    else {
+    else
+    {
       fq=NULL;
       p_LmFree(fq_p, r);
       p_LmFree(ggT, r);
@@ -680,11 +680,10 @@ static mapoly maFindBestggT(mapoly mp, mapoly & choice, mapoly & fp, mapoly & fq
       return choice;
     }
   }
-  else {
+  else
+  {
     return NULL;
   }
-
-
 }
 
 /********************************************************************
@@ -700,20 +699,23 @@ void maPoly_Optimize(mapoly mpoly, ring src_r){
   mapoly ggT=NULL;
   mapoly fp=NULL;
   mapoly fq=NULL;
-  while (iter->next!=NULL){
+  while (iter->next!=NULL)
+  {
     choice=iter->next;
-    if ((iter->f1==NULL)){
+    if ((iter->f1==NULL))
+    {
       ggT=maFindBestggT(iter, choice, fp, fq,src_r);
-      if (choice!=NULL){
+      if (choice!=NULL)
+      {
         iter->f1=fp;
         iter->f2=ggT;
-        if (fq!=NULL){
+        if (fq!=NULL)
+        {
           ggT->ref++;
           choice->f1=fq;
           choice->f2=ggT;
         }
       }
-
     }
     iter=iter->next;
   }

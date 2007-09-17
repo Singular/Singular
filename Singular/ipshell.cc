@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.168 2007-08-07 11:41:00 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.169 2007-09-17 08:33:16 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -715,12 +715,14 @@ leftv iiMap(map theMap, char * what)
         IDMAP(w)->preimage=0;
       }
       tmpW.data=IDDATA(w);
+      #if 0
       if (((tmpW.rtyp==IDEAL_CMD)||(tmpW.rtyp==MODUL_CMD)) && idIs0(IDIDEAL(w)))
       {
         v->rtyp=tmpW.rtyp;
         v->data=idInit(IDELEMS(IDIDEAL(w)),IDIDEAL(w)->rank);
       }
       else
+      #endif
       {
         #ifdef FAST_MAP
         if ((tmpW.rtyp==IDEAL_CMD) && (nMap==nCopy)

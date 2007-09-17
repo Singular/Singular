@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.67 2007-07-27 14:09:52 Singular Exp $ */
+/* $Id: ring.cc,v 1.68 2007-09-17 08:33:17 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1603,7 +1603,7 @@ rOrderType_t rGetOrderType(ring r)
           case ringorder_ls:
           case ringorder_unspec:
             if (r->order[1] == ringorder_C
-	    ||  r->order[0] == ringorder_unspec)
+            ||  r->order[0] == ringorder_unspec)
               return rOrderType_ExpComp;
             return rOrderType_Exp;
 
@@ -2991,20 +2991,20 @@ BOOLEAN rComplete(ring r, int force)
         rO_WDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
                    tmp_typ[typ_i], r->wvhdl[i]);
         typ_i++;
-	{ // check for weights <=0
-	  int jj;
-	  BOOLEAN have_bad_weights=FALSE;
-	  for(jj=r->block1[i]-r->block0[i];jj>=0; jj--)
-	  {
-	    if (r->wvhdl[i][jj]<=0) have_bad_weights=TRUE;
-	  }
-	  if (have_bad_weights)
-	  {
-	     rO_TDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
-		                     tmp_typ[typ_i]);
+        { // check for weights <=0
+          int jj;
+          BOOLEAN have_bad_weights=FALSE;
+          for(jj=r->block1[i]-r->block0[i];jj>=0; jj--)
+          {
+            if (r->wvhdl[i][jj]<=0) have_bad_weights=TRUE;
+          }
+          if (have_bad_weights)
+          {
+             rO_TDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
+                                     tmp_typ[typ_i]);
              typ_i++;
-	  }
-	}
+          }
+        }
         if (r->block1[i]!=r->block0[i])
         {
           rO_LexVars_neg(j, j_bits,r->block1[i],r->block0[i]+1, prev_ordsgn,
@@ -3016,20 +3016,20 @@ BOOLEAN rComplete(ring r, int force)
         rO_WDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
                    tmp_typ[typ_i], r->wvhdl[i]);
         typ_i++;
-	{ // check for weights <=0
-	  int j;
-	  BOOLEAN have_bad_weights=FALSE;
-	  for(j=r->block1[i]-r->block0[i];j>=0; j--)
-	  {
-	    if (r->wvhdl[i][j]<=0) have_bad_weights=TRUE;
-	  }
-	  if (have_bad_weights)
-	  {
-	     rO_TDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
-		                     tmp_typ[typ_i]);
+        { // check for weights <=0
+          int j;
+          BOOLEAN have_bad_weights=FALSE;
+          for(j=r->block1[i]-r->block0[i];j>=0; j--)
+          {
+            if (r->wvhdl[i][j]<=0) have_bad_weights=TRUE;
+          }
+          if (have_bad_weights)
+          {
+             rO_TDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
+                                     tmp_typ[typ_i]);
              typ_i++;
-	  }
-	}
+          }
+        }
         if (r->block1[i]!=r->block0[i])
         {
           rO_LexVars(j, j_bits,r->block0[i],r->block1[i]-1, prev_ordsgn,
@@ -3103,7 +3103,7 @@ BOOLEAN rComplete(ring r, int force)
     }
   }
   // the variables
-  for(i=1 ; i<r->N+1 ; i++)
+  for(i=1 ; i<=r->N ; i++)
   {
     if(v[i]==(-1))
     {
@@ -3296,13 +3296,13 @@ static void rRightAdjustVarOffset(ring r)
   for (i=0;i<r->ExpL_Size;i++)
     shifts[i] = BIT_SIZEOF_LONG;
 
-  // find minimal bit in each long var
+  // find minimal bit shift in each long exp entry
   for (i=1;i<=r->N;i++)
   {
     if (shifts[r->VarOffset[i] & 0xffffff] > r->VarOffset[i] >> 24)
       shifts[r->VarOffset[i] & 0xffffff] = r->VarOffset[i] >> 24;
   }
-  // reset r->VarOffset
+  // reset r->VarOffset: set the minimal shift to 0
   for (i=1;i<=r->N;i++)
   {
     if (shifts[r->VarOffset[i] & 0xffffff] != 0)
