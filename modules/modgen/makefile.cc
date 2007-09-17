@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.29 2007-09-12 09:31:40 Singular Exp $ */
+/* $Id: makefile.cc,v 1.30 2007-09-17 09:35:19 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -40,7 +40,7 @@ static char *object_name(char *p);
 /*========================================================================*/
 /*
   run mod_create_makefile();
-   
+
  */
 /*========================================================================*/
 
@@ -60,12 +60,12 @@ void mod_create_makefile(moddefv module)
   fp = fopen(build_filename(module, "Makefile", 0), "w");
   cfilesv cf = module->files;
   int i;
-  
+
   if(trace)printf("Creating Makefile  ...");fflush(stdout);
   write_header(fp, module->name, "#");
   build_head_section(fp, module);
   fprintf(fp, "SRCS\t= %s.cc", module->name);
-  
+
   for(i=0; i<module->filecnt; i++)
     fprintf(fp, " %s", cf[i].filename);
 
@@ -80,7 +80,7 @@ void mod_create_makefile(moddefv module)
   build_compile_section(fp, module);
   build_clean_section(fp, module);
   build_install_section(fp, module);
-  
+
   fprintf(fp, "\n");
   fprintf(fp, "\n");
 
@@ -118,9 +118,9 @@ void build_clean_section(
 {
   fprintf(fp, "clean:\n");
   fprintf(fp, "\trm -f *.o *.og *.lo *.so* *.sl *.la *~ core\n\n");
-  
+
   fprintf(fp, "distclean: clean\n");
-  fprintf(fp, "\trm -f %s.cc %s.h Makefile *.bin *.pl\n\n", 
+  fprintf(fp, "\trm -f %s.cc %s.h Makefile *.bin *.pl\n\n",
                module->name, module->name);
 }
 
@@ -130,14 +130,14 @@ void build_install_section(
   moddefv module
   )
 {
-  fprintf(fp, "install bindist:\n");
+  fprintf(fp, "install bindist: all\n");
   fprintf(fp, "\t${MKINSTALLDIRS} ${instdir}\n");
   fprintf(fp, "\t${MKINSTALLDIRS} ${instdir}/MOD\n");
   fprintf(fp, "\t${INSTALL_PROGRAM} %s.so ${instdir}/MOD/%s.so\n",
           module->targetname, module->targetname);
   fprintf(fp, "\t${INSTALL_PROGRAM} %s.bin ${instdir}/MOD/%s.bin\n",
           module->targetname, module->targetname);
-  fprintf(fp, "install-bindist:\n");
+  fprintf(fp, "install-bindist: all\n");
   fprintf(fp, "\t${MKINSTALLDIRS} ${install_bindir}\n");
   fprintf(fp, "\t${INSTALL_PROGRAM} %s.so ${install_bindir}/%s.so\n",
           module->targetname, module->targetname);
@@ -153,7 +153,7 @@ static char *object_name(char *p)
   *q = '\0';
   char *r = (char *)malloc(strlen(p)+4);
   sprintf(r, "%s.o", p);
-  
+
   *q = '.';
   return(r);
 }
@@ -211,7 +211,7 @@ void build_compile_section(
   fprintf(fp, "%%.og: %%.cc Makefile\n");
   fprintf(fp, "\t${CC} ${DCFLAGS} -g -c -fPIC -DPIC $< -o $*.og\n");
   fprintf(fp, "\n");
-  
+
   fprintf(fp, "%s.so: ${OBJS}\n", module->targetname);
   fprintf(fp, "\t${CC} ${CFLAGS} -shared -Wl,-soname -Wl,%s.so.%d \\\n",
           module->targetname, module->major);
@@ -228,7 +228,7 @@ void build_compile_section(
   fprintf(fp, "\t\t-o %s_g.so.%d.%d.%d ${DOBJS}\n", module->targetname,
           module->major, module->minor, module->level);
   fprintf(fp, "\trm -f %s_g.so\n", module->targetname);
-  fprintf(fp, "\tln -s %s_g.so.%d.%d.%d %s_g.so\n", module->targetname, 
+  fprintf(fp, "\tln -s %s_g.so.%d.%d.%d %s_g.so\n", module->targetname,
           module->major, module->minor, module->level, module->targetname);
   fprintf(fp, "\n");
 }
@@ -261,8 +261,8 @@ void build_compile_section(
   fprintf(fp, "all:\t\n");
   fprintf(fp, "\techo \"don't know how to build library\"\n");
 }
-#endif 
-#endif 
+#endif
+#endif
 
 //#  ifdef ix86_Win
 //void build_compile_section(
