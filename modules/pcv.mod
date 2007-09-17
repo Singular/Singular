@@ -1,6 +1,6 @@
 %{
 /*
- *  $Id: pcv.mod,v 1.3 2007-08-15 17:38:27 motsak Exp $
+ *  $Id: pcv.mod,v 1.4 2007-09-17 09:35:49 Singular Exp $
  *
  *  Test mod fuer modgen
  */
@@ -58,7 +58,7 @@ BOOLEAN pcvBasis(leftv res,leftv h);
 // module="pcv";
 package="pcv";
 
-version="$Id: pcv.mod,v 1.3 2007-08-15 17:38:27 motsak Exp $";
+version="$Id: pcv.mod,v 1.4 2007-09-17 09:35:49 Singular Exp $";
 info="
 LIBRARY: pcv.so  CONVERSION BETWEEN POLYS AND COEF VECTORS
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
@@ -328,7 +328,7 @@ int pcvM2N(poly m)
   {
     d+=pGetExp(m,i+1);
     dn=pcvIndex[i][d];
-    if(dn>MAX_COMPONENT-n)
+    if(dn>INT_MAX-n)
     {
       i=pVariables;
       WerrorS("component overflow");
