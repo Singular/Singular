@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.51 2007-09-26 14:31:12 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.52 2007-09-26 15:07:16 Singular Exp $ */
 
 #include <config.h>
 
@@ -32,7 +32,7 @@ void out_cf(char *s1,const CanonicalForm &f,char *s2);
 
 CanonicalForm
 chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG );
- 
+
 bool
 gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
 {
@@ -705,8 +705,8 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
                 while ((!fdivides(d,f)) || (!fdivides(d,g)));
 #else
                 while(1)
-                { 
-                  d = gcd_poly( f, g ); 
+                {
+                  d = gcd_poly( f, g );
                   if ((fdivides(d,f)) && (fdivides(d,g))) break;
                   printf("g"); fflush(stdout);
                 }
@@ -929,7 +929,7 @@ cf_prepgcd( const CanonicalForm & f, const CanonicalForm & g, int & cc, int & p1
     k = 0;
     for ( i = n-1; i > 0; i-- )
     {
-	if ( degsf[i] == 0 )
+        if ( degsf[i] == 0 )
         {
             if ( degsg[i] != 0 )
             {
@@ -952,7 +952,7 @@ cf_prepgcd( const CanonicalForm & f, const CanonicalForm & g, int & cc, int & p1
         optvalues( degsf, degsg, n, p1, pe );
     if ( ( pe != 1 ) && ( degsf[1] != 0 ) )
         pe = -pe;
-    
+
     delete [] degsf;
     delete [] degsg;
 }
@@ -975,7 +975,7 @@ balance_p ( const CanonicalForm & f, const CanonicalForm & q )
           else
             result += power( x, i.exp() ) * c;
         }
-        else 
+        else
           result += power( x, i.exp() ) * balance_p(c,q);
     }
     return result;
@@ -1035,7 +1035,7 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
         q = newq;
         D = newD;
       }
-      else if ( dp_deg > d_deg )
+      else if ( dp_deg < d_deg )
       {
         n=GCD_CHINES_MIN_TRIES;
         // all previous p's are bad primes
@@ -1043,17 +1043,17 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
         D = mapinto( Dp );
         d_deg=dp_deg;
       }
-      //else dp_deg < d_deg: bad prime
+      //else dp_deg > d_deg: bad prime
     }
     if ( i >= 0 )
     {
       if (n<=0)
       {
         CanonicalForm Dn= Farey(D,q);
-	int is_rat=isOn(SW_RATIONAL);
-	On(SW_RATIONAL);
+        int is_rat=isOn(SW_RATIONAL);
+        On(SW_RATIONAL);
         CanonicalForm cd = bCommonDen( Dn ); // we need On(SW_RATIONAL)
-	if (!is_rat) Off(SW_RATIONAL);
+        if (!is_rat) Off(SW_RATIONAL);
         Dn *=cd;
         //Dn /=vcontent(Dn,Variable(1));
         if ( fdivides( Dn, f ) && fdivides( Dn, g ) )
