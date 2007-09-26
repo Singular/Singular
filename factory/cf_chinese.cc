@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_chinese.cc,v 1.10 2005-02-08 10:28:46 Singular Exp $ */
+/* $Id: cf_chinese.cc,v 1.11 2007-09-26 09:17:39 Singular Exp $ */
 
 //{{{ docu
 //
@@ -17,6 +17,8 @@
 #include "debug.h"
 
 #include "canonicalform.h"
+#include "cf_iter.h"
+
 
 //{{{ void chineseRemainder ( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew )
 //{{{ docu
@@ -69,11 +71,12 @@ chineseRemainder ( const CanonicalForm & x1, const CanonicalForm & q1, const Can
     v1 = mod( x1, q1 );
     u = mod( v1, q2 );
     d = mod( x2-u, q2 );
-    if ( d.isZero() ) {
-	xnew = v1;
-	qnew = q1 * q2;
+    if ( d.isZero() )
+    {
+        xnew = v1;
+        qnew = q1 * q2;
         DEBDECLEVEL( cerr, "chineseRemainder" );
-	return;
+        return;
     }
     (void)bextgcd( q1, q2, s, dummy );
     v2 = mod( d*s, q2 );
@@ -119,28 +122,31 @@ chineseRemainder ( const CFArray & x, const CFArray & q, CanonicalForm & xnew, C
 
     DEBOUTLN( cerr, "array size = " << n );
 
-    while ( n != 1 ) {
-	i = j = start;
-	while ( i < start + n - 1 ) {
-	    // This is a little bit dangerous: X[i] and X[j] (and
-	    // Q[i] and Q[j]) may refer to the same object.  But
-	    // xnew and qnew in the above function are modified
-	    // at the very end of the function, so we do not
-	    // modify x1 and q1, resp., by accident.
-	    chineseRemainder( X[i], Q[i], X[i+1], Q[i+1], X[j], Q[j] );
-	    i += 2;
-	    j++;
-	}
+    while ( n != 1 )
+    {
+        i = j = start;
+        while ( i < start + n - 1 )
+        {
+            // This is a little bit dangerous: X[i] and X[j] (and
+            // Q[i] and Q[j]) may refer to the same object.  But
+            // xnew and qnew in the above function are modified
+            // at the very end of the function, so we do not
+            // modify x1 and q1, resp., by accident.
+            chineseRemainder( X[i], Q[i], X[i+1], Q[i+1], X[j], Q[j] );
+            i += 2;
+            j++;
+        }
 
-	if ( n & 1 ) {
-	    X[j] = X[i];
-	    Q[j] = Q[i];
-	}
-	// Maybe we would get some memory back at this point if
-	// we would set X[j+1, ..., n] and Q[j+1, ..., n] to zero
-	// at this point?
+        if ( n & 1 )
+        {
+            X[j] = X[i];
+            Q[j] = Q[i];
+        }
+        // Maybe we would get some memory back at this point if
+        // we would set X[j+1, ..., n] and Q[j+1, ..., n] to zero
+        // at this point?
 
-	n = ( n + 1) / 2;
+        n = ( n + 1) / 2;
     }
     xnew = X[start];
     qnew = Q[q.min()];
@@ -148,3 +154,49 @@ chineseRemainder ( const CFArray & x, const CFArray & q, CanonicalForm & xnew, C
     DEBDECLEVEL( cerr, "chineseRemainder( ... CFArray ... )" );
 }
 //}}}
+
+CanonicalForm Farey_n (CanonicalForm N, const CanonicalForm P)
+//"USAGE:  Farey_n (N,P); P, N number;
+//RETURN:  a rational number a/b such that a/b=N mod P
+//         and |a|,|b|<(P/2)^{1/2}
+{
+   //assume(P>0);
+   if (N<0){N=N+P;}
+   CanonicalForm A,B,C,D,E;
+   E=P;
+   B=1;
+   while (N!=0)
+   {
+        if (2*N*N<P)
+        {
+           return(N/B);
+        }
+        D=E % N;
+        C=A-(E-E % N)/N*B;
+        E=N;
+        N=D;
+        A=B;
+        B=C;
+   }
+   return(0);
+}
+
+CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
+{
+    Variable x = f.mvar();
+    CanonicalForm result = 0;
+    CanonicalForm c;
+    CFIterator i;
+    for ( i = f; i.hasTerms(); i++ )
+    {
+        c = i.coeff();
+        if ( c.inCoeffDomain())
+        {
+          result += power( x, i.exp() ) * Farey_n(c,q);
+        }
+        else
+          result += power( x, i.exp() ) * Farey(c,q);
+    }
+    return result;
+}
+

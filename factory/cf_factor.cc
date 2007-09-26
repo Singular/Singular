@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.33 2007-08-03 11:32:04 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.34 2007-09-26 09:17:39 Singular Exp $ */
 
 //{{{ docu
 //
@@ -80,7 +80,7 @@ int find_mvar(const CanonicalForm & f)
 }
 
 #if 1
-#ifndef NOSTREAMIO
+//#ifndef NOSTREAMIO
 void out_cf(char *s1,const CanonicalForm &f,char *s2)
 {
   printf("%s",s1);
@@ -119,8 +119,12 @@ void out_cf(char *s1,const CanonicalForm &f,char *s2)
     {
       printf("+%d",f.intval());
     }
-    else //printf("+...");
+    else 
+    #ifdef NOSTREAMIO
+      printf("+...");
+    #else
        std::cout << f;
+    #endif
     //if (f.inZ()) printf("(Z)");
     //else if (f.inQ()) printf("(Q)");
     //else if (f.inFF()) printf("(FF)");
@@ -160,9 +164,19 @@ void test_cff(CFFList &L,const CanonicalForm & f)
   }
   if ((f-t)!=0) { printf("problem:\n");out_cf("factor:",f," has problems\n");}
 }
-#endif
+//#endif
 #endif
 
+bool isPurePoly_m(const CanonicalForm & f)
+{
+  if (f.inBaseDomain()) return true;
+  if (f.level()<0) return false;
+  for (CFIterator i=f;i.hasTerms();i++)
+  {
+    if (!isPurePoly_m(i.coeff())) return false;
+  }
+  return true;
+}
 bool isPurePoly(const CanonicalForm & f)
 {
   if (f.level()<=0) return false;
@@ -172,6 +186,7 @@ bool isPurePoly(const CanonicalForm & f)
   }
   return true;
 }
+
 
 ///////////////////////////////////////////////////////////////
 // get_max_degree_Variable returns Variable with             //
