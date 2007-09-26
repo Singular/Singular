@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_chinese.cc,v 1.11 2007-09-26 09:17:39 Singular Exp $ */
+/* $Id: cf_chinese.cc,v 1.12 2007-09-26 14:31:12 Singular Exp $ */
 
 //{{{ docu
 //
@@ -161,18 +161,22 @@ CanonicalForm Farey_n (CanonicalForm N, const CanonicalForm P)
 //         and |a|,|b|<(P/2)^{1/2}
 {
    //assume(P>0);
-   if (N<0){N=N+P;}
+   // assume !isOn(SW_RATIONAL): mod is a no-op otherwise 
+   if (N<0) N +=P;
    CanonicalForm A,B,C,D,E;
    E=P;
    B=1;
-   while (N!=0)
+   while (!N.isZero())
    {
         if (2*N*N<P)
         {
-           return(N/B);
+	   On(SW_RATIONAL);
+	   N /=B;
+	   Off(SW_RATIONAL);
+           return(N);
         }
-        D=E % N;
-        C=A-(E-E % N)/N*B;
+        D=mod(E , N);
+        C=A-(E-mod(E , N))/N*B;
         E=N;
         N=D;
         A=B;
@@ -183,6 +187,8 @@ CanonicalForm Farey_n (CanonicalForm N, const CanonicalForm P)
 
 CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
 {
+    int is_rat=isOn(SW_RATIONAL);
+    Off(SW_RATIONAL);
     Variable x = f.mvar();
     CanonicalForm result = 0;
     CanonicalForm c;
@@ -197,6 +203,7 @@ CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
         else
           result += power( x, i.exp() ) * Farey(c,q);
     }
+    if (is_rat) On(SW_RATIONAL);
     return result;
 }
 
