@@ -95,13 +95,16 @@ install-bindist: modgen
 	$(CC) -c ${CFLAGS} $<
 
 .y.cc:
-	@if test "x${BISON}" = x; then \
-		echo Error: no bison given, could not rebuilt mod_grammar.cc;\
+	@if test -r mod_grammar.cc; then \
+                touch mod_grammar.cc ;\
+        else \
+        if test "x${BISON}" = x; then \
+                echo Error: no bison given, could not rebuilt grammar.cc;\
                 exit 1; \
-	fi
-	${BISON} -v -d -t -o mod_grammar.cc $<
-	#mv mod_grammar.hh mod_grammar.h
-	./mvbison
+        fi;\
+        ${BISON} -d -t -o mod_grammar.cc $<;\
+        ./mvbison;\
+        fi
 
 pathnames.h:
 	echo "/*" > pathnames.h
