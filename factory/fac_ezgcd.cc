@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_ezgcd.cc,v 1.27 2006-05-16 13:43:18 Singular Exp $ */
+/* $Id: fac_ezgcd.cc,v 1.28 2007-09-27 16:06:59 Singular Exp $ */
 
 #include <config.h>
 
@@ -208,8 +208,21 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
 static CanonicalForm
 ezgcd_specialcase ( const CanonicalForm & F, const CanonicalForm & G, REvaluation & b, const modpk & bound )
 {
+    CanonicalForm d;
+#if 1
+    Off(SW_USE_EZGCD);
+    //bool ntl0=isOn(SW_USE_NTL_GCD_0);
+    //Off(SW_USE_NTL_GCD_0);
+    //bool ntlp=isOn(SW_USE_NTL_GCD_P);
+    //Off(SW_USE_NTL_GCD_P);
+    d=gcd( F, G );
+    //if (ntl0) On(SW_USE_NTL_GCD_0);
+    //if (ntlp) On(SW_USE_NTL_GCD_P);
+    On(SW_USE_EZGCD);
+    return d;
+#else
     DEBOUTLN( cerr, "ezgcd: special case" );
-    CanonicalForm Ft, Gt, L, LL, Fb, Gb, Db, Lb, D, Ds, Dt, d;
+    CanonicalForm Ft, Gt, L, LL, Fb, Gb, Db, Lb, D, Ds, Dt;
     CFArray DD( 1, 2 ), lcDD( 1, 2 );
     Variable x = Variable( 1 );
     bool gcdfound;
@@ -228,18 +241,6 @@ ezgcd_specialcase ( const CanonicalForm & F, const CanonicalForm & G, REvaluatio
         b.nextpoint();
         return ezgcd( F, G, b, true );
     }
-#if 1
-    Off(SW_USE_EZGCD);
-    //bool ntl0=isOn(SW_USE_NTL_GCD_0);
-    //Off(SW_USE_NTL_GCD_0);
-    //bool ntlp=isOn(SW_USE_NTL_GCD_P);
-    //Off(SW_USE_NTL_GCD_P);
-    d=gcd( F, G );
-    //if (ntl0) On(SW_USE_NTL_GCD_0);
-    //if (ntlp) On(SW_USE_NTL_GCD_P);
-    On(SW_USE_EZGCD);
-    return d;
-#else
 
     DEBOUTLN( cerr, "ezgcdspec: (S1) done, Ft = " << Ft );
     L = F / Ft;
