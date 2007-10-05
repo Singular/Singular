@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.26 2006-09-27 17:46:27 Singular Exp $ */
+/* $Id: misc.cc,v 1.27 2007-10-05 14:30:43 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -621,6 +621,7 @@ void init_type_conv()
   strcpy(type_conv[LINK_CMD], "si_link");
   strcpy(type_conv[PACKAGE_CMD], "package");
   strcpy(type_conv[PROC_CMD], "procinfo *");
+  strcpy(type_conv[RESOLUTION_CMD], "syStrategy");
 /*
   strcpy(type_conv[], "");
   strcpy(type_conv[], "");
