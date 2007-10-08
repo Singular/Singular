@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: creat_top.cc,v 1.25 2006-09-27 17:46:27 Singular Exp $ */
+/* $Id: creat_top.cc,v 1.26 2007-10-08 16:04:55 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -27,14 +27,16 @@ void  mod_copy_tmp(
 {
   int nread;
   char buf[1024];
-  
+
   fseek(fp_in, 0L, 0);
-  do {
+  do
+  {
     memset(buf, 0, sizeof(buf));
     fgets(buf, sizeof(buf), fp_in);
     modlineno++;
     //nread = fread (buf, sizeof (char), sizeof(buf)-1, fp_in);
-    if(strncmp(buf, "#line @d ", 8)==0) {
+    if(strncmp(buf, "#line @d ", 8)==0)
+    {
       buf[6]='%';
       fprintf(fp_out, buf, modlineno);
     }
@@ -52,20 +54,23 @@ void write_enter_id(FILE *fp)
   fprintf(fp, "  idhdl h;\n");
   fprintf(fp, "\n");
   fprintf(fp, "  h=enterid(omStrDup(name),0, t, &(currPack->idroot), TRUE/*FALSE*/);\n");
-  fprintf(fp, "  if(h!=NULL) {\n");
-  fprintf(fp, "     switch(t) {\n");
-  fprintf(fp, "         case STRING_CMD: \n");
-  fprintf(fp, "              omFree(IDSTRING(h));\n");
-  fprintf(fp, "              IDSTRING(h) = omStrDup(value);\n");
-  fprintf(fp, "              break;\n");
-  fprintf(fp, "         case PACKAGE_CMD: break;\n");
-  fprintf(fp, "         case PROC_CMD: break;\n");
-  fprintf(fp, "     }\n");
-  fprintf(fp, "  } else \n");
-  fprintf(fp, "      Warn(\"Cannot create '%%s'\\n\", name);\n");
+  fprintf(fp, "  if(h!=NULL)\n");
+  fprintf(fp, "  {\n");
+  fprintf(fp, "    switch(t)\n");
+  fprintf(fp, "    {\n");
+  fprintf(fp, "      case STRING_CMD: \n");
+  fprintf(fp, "        omFree(IDSTRING(h));\n");
+  fprintf(fp, "        IDSTRING(h) = omStrDup(value);\n");
+  fprintf(fp, "        break;\n");
+  fprintf(fp, "      case PACKAGE_CMD: break;\n");
+  fprintf(fp, "      case PROC_CMD: break;\n");
+  fprintf(fp, "    }\n");
+  fprintf(fp, "  }\n");
+  fprintf(fp, "  else\n");
+  fprintf(fp, "    Warn(\"Cannot create '%%s'\\n\", name);\n");
   fprintf(fp, "  return(h);\n");
   fprintf(fp, "}\n");
-  modlineno+=16;
+  modlineno+=19;
 }
 
 /*========================================================================*/
@@ -113,10 +118,7 @@ void write_enter_id(FILE *fp)
  }
 
 /*========================================================================*/
-void write_mod_init(
-  moddefv module,
-  FILE *fp
-  )
+void write_mod_init( moddefv module, FILE *fp)
 {
   fprintf(fp, "\n\n");
   fprintf(fp, "#line @d \"%s.cc\"\n", module->name);
@@ -135,7 +137,7 @@ void write_mod_init(
   fprintf(fp, "  idhdl h;\n");
   fprintf(fp, "  char * tempstr;\n");
   fprintf(fp, "  char * tailstr;\n");
-  fprintf(fp, "  FILE * binfp; \n"); 
+  fprintf(fp, "  FILE * binfp; \n");
   fprintf(fp, "  int ret;\n");
   fprintf(fp, "  struct stat sb; \n\n");
   fprintf(fp, "  tempstr = (char *)omAlloc(strlen(currPack->libname)+5);\n");
@@ -144,8 +146,10 @@ void write_mod_init(
   fprintf(fp, "  memcpy(tempstr,currPack->libname,strlen(currPack->libname)-strlen(tailstr));\n");
   fprintf(fp, "  memcpy(tempstr+strlen(tempstr),\".bin\",4);\n");
   fprintf(fp, "  ret=stat(tempstr,&sb);\n");
-  fprintf(fp, "  if(ret==0) { \n");
-  fprintf(fp, "    if ((sb.st_mode & S_IFMT) == S_IFREG) { \n");
+  fprintf(fp, "  if(ret==0)\n");
+  fprintf(fp, "  {\n");
+  fprintf(fp, "    if ((sb.st_mode & S_IFMT) == S_IFREG)\n");
+  fprintf(fp, "    {\n");
   fprintf(fp, "      if (crccheck(tempstr)!=crcsum)\n");
   fprintf(fp, "      {   Warn(\"file %%s does not agree with module version - ignoring file\",tempstr);\n");
   fprintf(fp, "          ret=-1;\n      }\n");
@@ -164,7 +168,7 @@ int write_intro(
 
   if(do_create_srcdir) mkdir(module->name, 0755);
   strcpy(filename, build_filename(module, module->name, 1));
-  
+
   fflush(module->fmtfp);
 
   if( (module->modfp = fopen(filename, "w")) == NULL) {
@@ -181,7 +185,7 @@ int write_intro(
   if(create_tmpfile(module, 2)) return -1;
   if(module->fmtfp2 == NULL) { printf("Cannot write HELP\n"); return -1; }
   if(module->fmtfp3 == NULL) { printf("Cannot write EXAMPLE\n"); return -1; }
-  
+
   strcpy(filename, build_filename(module, module->name, 2));
   //sprintf(filename, "%s/%s.h", module->name, module->name);
   if( (module->modfp_h = fopen(filename, "w")) == NULL) {
