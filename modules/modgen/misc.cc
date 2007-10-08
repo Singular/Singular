@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.27 2007-10-05 14:30:43 Singular Exp $ */
+/* $Id: misc.cc,v 1.28 2007-10-08 16:59:59 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -56,7 +56,8 @@ typedef struct {
  *---------------------------------------------------------------------*/
 static SArithBase sArithBase;  /**< Base entry for arithmetic */
 
-char *DYNAinclude[] = {
+char *DYNAinclude[] =
+{
    "",
    "#include <dlfcn.h>",
    "#include <dl.h>",
@@ -108,19 +109,21 @@ int IsCmd(char *n, int & tok)
   int an=1;
   int i,v;
   int en=sArithBase.nLastIdentifier;
-  
-  if( strcmp(n, "SELF") == 0) {
+
+  if( strcmp(n, "SELF") == 0)
+  {
     tok = SELF_CMD;
     logx("IsCmd: [%d] %s\n", tok, n);
     return tok;
   }
-  
-  if( strcmp(n, "none") == 0) {
+
+  if( strcmp(n, "none") == 0)
+  {
     tok = NONE;
     logx("IsCmd: [%d] %s\n", tok, n);
     return tok;
   }
-  
+
   for(an=0; an<sArithBase.nCmdUsed; )
   {
     if(an>=en-1)
@@ -176,7 +179,7 @@ int IsCmd(char *n, int & tok)
   }
 
   logx("IsCmd: [%d] %s\n", tok, n);
-  
+
   if( (sArithBase.sCmds[i].toktype==ROOT_DECL) ||
       (sArithBase.sCmds[i].toktype==ROOT_DECL_LIST) ||
       (sArithBase.sCmds[i].toktype==RING_DECL) ||
@@ -184,7 +187,7 @@ int IsCmd(char *n, int & tok)
       (sArithBase.sCmds[i].toktype==INTMAT_CMD) ||
       (sArithBase.sCmds[i].toktype==MODUL_CMD) ||
       (sArithBase.sCmds[i].toktype==MATRIX_CMD))// ||
-//      ((csArithBase.sCds[i].toktype>=DRING_CMD) && (cmds[i].toktype<=VECTOR_CMD))) 
+//      ((csArithBase.sCds[i].toktype>=DRING_CMD) && (cmds[i].toktype<=VECTOR_CMD)))
     return sArithBase.sCmds[i].toktype;
   return 0;
 }
@@ -193,7 +196,7 @@ int IsCmd(char *n, int & tok)
 char * decl2str(int n, char *name)
 {
   switch(n)
-    {
+  {
 #   include "decl.inc"
 
     /* first and last entry of tok.h cannot be grepped */
@@ -205,14 +208,15 @@ char * decl2str(int n, char *name)
 }
 
 /*========================================================================*/
-struct valid_cmds_def 
+struct valid_cmds_def
 {
   char *name;
   void (*write_cmd)(moddefv module, procdefv pi, void *arg);
   cmd_token id;
   cmd_type  type;
   int args;
-} valid_cmds[] = {
+} valid_cmds[] =
+{
   { "declaration",  write_function_declaration, CMD_DECL,   CMDT_SINGLE, 0 },
   { "error",        write_function_error,       CMD_ERROR,  CMDT_ANY,    0 },
   { "nodeclaration",write_function_nodecl,      CMD_NODECL, CMDT_SINGLE, 0 },
@@ -234,31 +238,37 @@ cmd_token checkcmd(
 {
   int i;
   cmd_token rc = CMD_NONE;
-  
+
   for(i=0; valid_cmds[i].name!=NULL; i++)
-    if(strcmp(valid_cmds[i].name, cmdname)==0) {
+  {
+    if(strcmp(valid_cmds[i].name, cmdname)==0)
+    {
       rc = CMD_BADSYNTAX;
-      if(valid_cmds[i].type == type) {
+      if(valid_cmds[i].type == type)
+      {
         *write_cmd = valid_cmds[i].write_cmd;
         return valid_cmds[i].id;
       }
     }
+  }
   return rc;
 }
-  
+
 /*========================================================================*/
-struct valid_vars_def {
+struct valid_vars_def
+{
   char *name;
   var_type type;
   var_token id;
   void (*write_cmd)(moddefv module, var_token type,
                     idtyp t, void *arg1, void *arg2);
-} valid_vars[] = {
+} valid_vars[] =
+{
   { "help",         VAR_STRING,  VAR_HELP,     write_main_variable },
   { "info",         VAR_STRING,  VAR_INFO,     write_main_variable },
   { "package",      VAR_STRING,  VAR_MODULE,   0 },
   { "version",      VAR_STRING,  VAR_VERSION,  write_main_variable },
-  { "category",	    VAR_STRING,  VAR_CATEGORY, write_main_variable },
+  { "category",     VAR_STRING,  VAR_CATEGORY, write_main_variable },
   { NULL,           VAR_UNKNOWN, VAR_NONE, 0 }
 };
 
@@ -283,50 +293,54 @@ var_token checkvar(
 void write_main_variable(
   moddefv module,
   var_token type,
-  idtyp t, 
+  idtyp t,
   void *arg1,
   void *arg2
   )
 {
   enter_id(module->fmtfp, t, (char *)arg1, (char *)arg2, yylineno,
            module->filename);
-  switch(type) {
+  switch(type)
+  {
     case VAR_INFO:
           module->info = (char *)malloc(strlen((char *)arg2)+1);
-	  memset(module->info, '\0', strlen((char *)arg2)+1);
-	  memcpy(module->info,(char *)arg2,strlen((char *)arg2));
+          memset(module->info, '\0', strlen((char *)arg2)+1);
+          memcpy(module->info,(char *)arg2,strlen((char *)arg2));
           break;
     case VAR_VERSION:
           module->version = (char *)malloc(strlen((char *)arg2)+1);
-	  memset(module->version, '\0', strlen((char *)arg2)+1);
+          memset(module->version, '\0', strlen((char *)arg2)+1);
           memcpy(module->version,(char *)arg2,strlen((char *)arg2));
-	  break;
+          break;
     case VAR_CATEGORY:
           module->category = (char *)malloc(strlen((char *)arg2)+1);
-	  memset(module->category, '\0', strlen((char *)arg2)+1);
-	  memcpy(module->category,(char *)arg2,strlen((char *)arg2));
-	  break;
+          memset(module->category, '\0', strlen((char *)arg2)+1);
+          memcpy(module->category,(char *)arg2,strlen((char *)arg2));
+          break;
     default: break;
   }
 }
-  
+
 /*========================================================================*/
 void PrintProc(
   procdefv pi
   )
 {
   int i;
-  
+
   printf("%4d proc: %s(", pi->lineno, pi->procname);
-  
-  for(i=0; i<pi->paramcnt; i++) {
+
+  for(i=0; i<pi->paramcnt; i++)
+  {
     printf("%s (%s)", (pi->param[i]).name, (pi->param[i]).typname);
     if(i < (pi->paramcnt-1)) printf(",");
   }
   printf(")\n");
   if(pi->return_val.typ!=0)
+  {
     printf("\treturn = %s (%s)\n", pi->return_val.name,
            pi->return_val.typname);
+  }
   printf("{%s}\n", pi->c_code);
 }
 
@@ -336,16 +350,16 @@ void make_version(char *p, moddefv module)
   char ver[10];
   char date[16];
   char libnamebuf[128];
-  
+
   module->major = 0;
   module->minor = 0;
   module->level = 0;
-  
+
   ver[0]='0'; ver[1]='.'; ver[2]='0'; ver[3]='.'; ver[4]='0'; ver[5]='\0';
   date[0]='?'; date[1]='\0';
   sscanf(p,"%*s %*s %10s %16s",ver,date);
   sscanf(ver, "%d.%d.%d", &module->major, &module->minor, &module->level);
-  
+
   sprintf(libnamebuf,"(%s,%s)", ver, date);
   if(strcmp(libnamebuf, "(0.0.0,?)")==0)
   {
@@ -364,7 +378,9 @@ void make_module_name(char *p, moddefv module)
     module->targetname = (char *)malloc(strlen(p)+1);
     memset(module->targetname, '\0', strlen(p)+1);
     memcpy(module->targetname,p,strlen(p));
-  } else {
+  }
+  else
+  {
     module->targetname = (char *)malloc(strlen(module->name)+1);
     memset(module->targetname, '\0', strlen(module->name)+1);
     memcpy(module->targetname,module->name,strlen(module->name));
@@ -385,15 +401,17 @@ void Add2files(
   memset(cfnew.filename, '\0', strlen(name)+1);
   memcpy(cfnew.filename, name, strlen(name));
 
-  if(module->filecnt==0) {
+  if(module->filecnt==0)
+  {
     module->files = (cfilesv)malloc(sizeof(cfiles)+1);
   }
-  else {
+  else
+  {
     module->files = (cfilesv)realloc(module->files,
                                    (module->filecnt+1)*sizeof(cfiles));
   }
   if(module->files == NULL) { printf("ERROR\n"); return; }
-  
+
   memset((void *) &module->files[module->filecnt], '\0', sizeof(cfiles));
   memcpy((void *)(&(module->files[module->filecnt])),
          (void *)&cfnew, sizeof(cfiles));
@@ -403,11 +421,16 @@ void Add2files(
 /*========================================================================*/
 void init_system_type()
 {
-  if(strcmp(S_UNAME, "ix86-Linux") == 0) {
+  if(strcmp(S_UNAME, "ix86-Linux") == 0)
+  {
     systyp = SYSTYP_LINUX;
-  } else if (strcmp(S_UNAME, "HPUX-9")==0) {
+  }
+  else if (strcmp(S_UNAME, "HPUX-9")==0)
+  {
     systyp = SYSTYP_HPUX9;
-  } else if (strcmp(S_UNAME, "HPUX-10")==0) {
+  }
+  else if (strcmp(S_UNAME, "HPUX-10")==0)
+  {
     systyp = SYSTYP_HPUX10;
   }
 }
@@ -419,7 +442,8 @@ void PrintProclist(
 {
   logx("PrintProclist()\n");
   int j;
-  for(j=0; j<module->proccnt; j++) {
+  for(j=0; j<module->proccnt; j++)
+  {
     PrintProc(&(module->procs[j]));
   }
 }
@@ -435,36 +459,39 @@ void generate_mod(
   int proccnt;
   FILE *fp_h;
   char *filename;
-  
-  switch(section) {
+
+  switch(section)
+  {
       case 1:
         write_intro(module);
         return;
-        
+
       case 2:
         printf("Writing %s, section %d", filename, section);fflush(stdout);
         break;
   }
-  
+
   sprintf(filename, "%s.h", module->name);
   fp_h = fopen(filename, "w");
   write_header(fp_h, module->name);
   printf("%s  ...", filename);fflush(stdout);
-  
+
   /* building mod_init() */
-  
-  for(proccnt=0; proccnt<module->proccnt; proccnt++) {
+
+  for(proccnt=0; proccnt<module->proccnt; proccnt++)
+  {
     printf("->%s, %s\n", module->procs[proccnt].procname,
            module->procs[proccnt].funcname);
     fprintf(module->modfp, "  psModulFunctions->iiAddCproc(\"%s\",\"%s\",%s, mod_%s);\n",
-	    module->name, module->procs[proccnt].procname, 
-	    module->procs[proccnt].is_static ? "TRUE" : "FALSE",
+            module->name, module->procs[proccnt].procname,
+            module->procs[proccnt].is_static ? "TRUE" : "FALSE",
             module->procs[proccnt].funcname);
   }
   fprintf(module->modfp, "  return 0;\n}\n\n");
 
   /* building entry-functions */
-  for(proccnt=0; proccnt<module->proccnt; proccnt++) {
+  for(proccnt=0; proccnt<module->proccnt; proccnt++)
+  {
     //generate_function(&module->procs[proccnt], module->modfp);
     //generate_header(&module->procs[proccnt], fp_h);
   }
@@ -491,10 +518,13 @@ void  write_procedure_text(
   module->procs[module->proccnt-1].c_code = NULL;
 
 #if 0
-  if(pi->paramcnt>0) {
+  if(pi->paramcnt>0)
+  {
   }
-  else {
-    switch( pi->return_val.typ) {
+  else
+  {
+    switch( pi->return_val.typ)
+    {
         case SELF_CMD:
           fprintf(module->fmtfp, "  return(%s(res));", pi->funcname);
           break;
@@ -502,18 +532,18 @@ void  write_procedure_text(
         case NONE:
           fprintf(module->fmtfp, "  return FALSE;");
           break;
-            
+
         default:
-          fprintf(module->fmtfp, "  res->rtyp = %s;\n", 
+          fprintf(module->fmtfp, "  res->rtyp = %s;\n",
                   pi->return_val.typname);
-          fprintf(module->fmtfp, "  res->data = (void *)%s();\n", 
+          fprintf(module->fmtfp, "  res->data = (void *)%s();\n",
                   pi->funcname);
           fprintf(module->fmtfp, "  return FALSE;");
     }
   }
 #endif
   fprintf(module->fmtfp, "/*\n}\n\n*/");
-  
+
 }
 
 
@@ -523,7 +553,8 @@ void  mod_write_header(FILE *fp, char *module, char what)
 
   write_header(fp, module);
   fprintf(fp, "#line %d \"%s.cc\"\n", modlineno++, module);
-  if(what != 'h') {
+  if(what != 'h')
+  {
     fprintf(fp, "#include <stdlib.h>\n");
     fprintf(fp, "#include <stdio.h>\n");
     fprintf(fp, "#include <string.h>\n");
@@ -540,7 +571,7 @@ void  mod_write_header(FILE *fp, char *module, char what)
     fprintf(fp, "#include <omalloc.h>\n");
     fprintf(fp, "#include \"%s.h\"\n", module);
     modlineno+=8;
-    
+
     fprintf(fp, "#line %d \"%s.cc\"\n", modlineno++, module);
     write_enter_id(fp);
     fprintf(fp, "\n");    modlineno+=1;
@@ -548,13 +579,13 @@ void  mod_write_header(FILE *fp, char *module, char what)
     write_add_singular_proc(fp);
     write_crccheck(fp);
     fprintf(fp, "\n");
-    
+
     fprintf(fp, "void fill_help_package();\n");
     fprintf(fp, "void fill_example_package();\n");
     modlineno+=3;
   }
   fprintf(fp, "\n");
-  
+
 }
 
 /*========================================================================*/
@@ -572,7 +603,7 @@ void write_header(FILE *fp, char *module, char *comment)
 
 /*========================================================================*/
 void enter_id(
-  FILE *fp, 
+  FILE *fp,
   idtyp t,
   char *name,
   char *value,
@@ -582,25 +613,28 @@ void enter_id(
 {
   unsigned int i;
   char tname[32];
-  
+
   if(lineno)
     fprintf(fp, "#line %d \"%s\"\n", lineno, file);
-  if(strcmp(decl2str(t, tname),"STRING_CMD")==0) {
+  if(strcmp(decl2str(t, tname),"STRING_CMD")==0)
+  {
     fprintf(fp, "  enter_id(\"%s\",\"",name);
-    for(i=0;i<strlen(value);i++) {
+    for(i=0;i<strlen(value);i++)
+    {
        if(value[i]=='\n') fprintf(fp,"\\n");
        else fprintf(fp,"%c",value[i]);
     }
     fprintf(fp,"\", %s);\n",decl2str(t,tname));
   }
-  else {
-  fprintf(fp, "  enter_id(\"%s\",\"%s\", %s);\n",name, value,
+  else
+  {
+    fprintf(fp, "  enter_id(\"%s\",\"%s\", %s);\n",name, value,
           decl2str(t, tname));
   }
 }
 
 /*========================================================================*/
-void init_type_conv() 
+void init_type_conv()
 {
   strcpy(type_conv[NONE], "none");
 //  strcpy(type_conv[NONE], "void");
@@ -640,11 +674,11 @@ void init_type_conv()
 
 /*========================================================================*/
 /*---------------------------------------------------------------------*/
-/** 
+/**
  * @brief compares to entry of cmdsname-list
 
- @param[in] a   
- @param[in] b   
+ @param[in] a
+ @param[in] b
 
  @return <ReturnValue>
 **/
@@ -656,17 +690,17 @@ static int _gentable_sort_cmds(
 {
   cmdnames *pCmdL = (cmdnames*)a;
   cmdnames *pCmdR = (cmdnames*)b;
-  
+
   if(a==NULL || b==NULL)             return 0;
 
   /* empty entries goes to the end of the list for later reuse */
   if(pCmdL->name==NULL) return 1;
   if(pCmdR->name==NULL) return -1;
-  
+
   /* $INVALID$ must come first */
   if(strcmp(pCmdL->name, "$INVALID$")==0) return -1;
   if(strcmp(pCmdR->name, "$INVALID$")==0) return  1;
-  
+
   /* tokval=-1 are reserved names at the end */
   if( (pCmdL->tokval==-1) && pCmdR->tokval==-1)
     return strcmp(pCmdL->name, pCmdR->name);
@@ -680,7 +714,7 @@ static int _gentable_sort_cmds(
 }
 
 /*---------------------------------------------------------------------*/
-/** 
+/**
  * @brief initialisation of arithmetic structured data
 
  @retval 0 on success
@@ -705,12 +739,16 @@ int iiArithFindCmd(const char *szName)
 #ifndef GENTABLE
   int en=sArithBase.nLastIdentifier;
 
-  for(an=0; an<sArithBase.nCmdUsed; ) {
-    if(an>=en-1) {
-      if (strcmp(szName, sArithBase.sCmds[an].name) == 0) {
+  for(an=0; an<sArithBase.nCmdUsed; )
+  {
+    if(an>=en-1)
+    {
+      if (strcmp(szName, sArithBase.sCmds[an].name) == 0)
+      {
         //Print("RET-an=%d %s\n", an, sArithBase.sCmds[an].name);
         return an;
-      } else if (strcmp(szName, sArithBase.sCmds[en].name) == 0)
+      }
+      else if (strcmp(szName, sArithBase.sCmds[en].name) == 0)
       {
         //Print("RET-en=%d %s\n", en, sArithBase.sCmds[en].name);
         return en;
@@ -722,7 +760,8 @@ int iiArithFindCmd(const char *szName)
       }
     }
     i=(an+en)/2;
-    if (*szName < *(sArithBase.sCmds[i].name)) {
+    if (*szName < *(sArithBase.sCmds[i].name))
+    {
       en=i-1;
     }
     else if (*szName > *(sArithBase.sCmds[i].name))
@@ -766,7 +805,8 @@ int iiArithAddCmd(
 {
   //printf("AddCmd(%s, %d, %d, %d, %d)\n", szName, nAlias,
   //       nTokval, nToktype, nPos);
-  if(nPos>=0) {
+  if(nPos>=0)
+  {
     if(nPos>=sArithBase.nCmdAllocated) return -1;
     if(szName!=NULL) sArithBase.sCmds[nPos].name    = strdup(szName);
     else sArithBase.sCmds[nPos].name = NULL;
@@ -775,21 +815,25 @@ int iiArithAddCmd(
     sArithBase.sCmds[nPos].toktype = nToktype;
     sArithBase.nCmdUsed++;
     //if(nTokval>0) sArithBase.nLastIdentifier++;
-  } else {
+  }
+  else
+  {
     if(szName==NULL) return -1;
     int nIndex = iiArithFindCmd(szName);
-    if(nIndex>=0) {
+    if(nIndex>=0)
+    {
       printf("'%s' already exists at %d\n", szName, nIndex);
       return -1;
     }
-    
-    if(sArithBase.nCmdUsed>=sArithBase.nCmdAllocated) {
+
+    if(sArithBase.nCmdUsed>=sArithBase.nCmdAllocated)
+    {
       /* needs to create new slots */
       unsigned long nSize = (sArithBase.nCmdAllocated+1)*sizeof(cmdnames);
       sArithBase.sCmds = (cmdnames *)realloc(sArithBase.sCmds, nSize);
       if(sArithBase.sCmds==NULL) return -1;
       sArithBase.nCmdAllocated++;
-    } 
+    }
     /* still free slots available */
     sArithBase.sCmds[sArithBase.nCmdUsed].name    = strdup(szName);
     sArithBase.sCmds[sArithBase.nCmdUsed].alias   = nAlias;
@@ -799,8 +843,9 @@ int iiArithAddCmd(
 
     qsort(sArithBase.sCmds, sArithBase.nCmdUsed, sizeof(cmdnames),
           (&_gentable_sort_cmds));
-    for(sArithBase.nLastIdentifier=sArithBase.nCmdUsed-1; 
-        sArithBase.nLastIdentifier>0; sArithBase.nLastIdentifier--) {
+    for(sArithBase.nLastIdentifier=sArithBase.nCmdUsed-1;
+        sArithBase.nLastIdentifier>0; sArithBase.nLastIdentifier--)
+    {
       if(sArithBase.sCmds[sArithBase.nLastIdentifier].tokval>=0) break;
     }
     //Print("L=%d\n", sArithBase.nLastIdentifier);
