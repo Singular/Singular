@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.52 2007-09-26 15:07:16 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.53 2007-10-09 12:41:24 Singular Exp $ */
 
 #include <config.h>
 
@@ -500,12 +500,33 @@ gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
             fc = replacevar( gcd_poly_p( fc, gc ), Variable(mp), Variable(p1) );
         }
     }
-    else if (
-    isOn(SW_USE_CHINREM_GCD)
-    && (!fc.isUnivariate()) && (!gc.isUnivariate())
-    && (isPurePoly_m(fc)) && (isPurePoly_m(gc))
-    )
+    else if (!fc.isUnivariate())
     {
+      if ( isOn( SW_USE_EZGCD ) )
+      {
+        if ( pe == 1 )
+          fc = ezgcd( fc, gc );
+        else if ( pe > 0 )// no variable at position 1
+        {
+          fc = replacevar( fc, Variable(pe), Variable(1) );
+          gc = replacevar( gc, Variable(pe), Variable(1) );
+          fc = replacevar( ezgcd( fc, gc ), Variable(1), Variable(pe) );
+        }
+        else
+        {
+          pe = -pe;
+          fc = swapvar( fc, Variable(pe), Variable(1) );
+          gc = swapvar( gc, Variable(pe), Variable(1) );
+          fc = swapvar( ezgcd( fc, gc ), Variable(1), Variable(pe) );
+        }
+      }
+      else if (
+      isOn(SW_USE_CHINREM_GCD)
+      && (!gc.isUnivariate())
+      && (isPurePoly_m(fc)) && (isPurePoly_m(gc))
+      )
+      {
+      #if 0
         if ( p1 == fc.level() )
             fc = chinrem_gcd( fc, gc );
         else
@@ -514,32 +535,17 @@ gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
             gc = replacevar( gc, Variable(p1), Variable(mp) );
             fc = replacevar( chinrem_gcd( fc, gc ), Variable(mp), Variable(p1) );
         }
-      //fc = chinrem_gcd( fc, gc);
-    }
-    else if ( isOn( SW_USE_EZGCD ) && !fc.isUnivariate() )
-    {
-      if ( pe == 1 )
-          fc = ezgcd( fc, gc );
-      else if ( pe > 0 )// no variable at position 1
-      {
-          fc = replacevar( fc, Variable(pe), Variable(1) );
-          gc = replacevar( gc, Variable(pe), Variable(1) );
-          fc = replacevar( ezgcd( fc, gc ), Variable(1), Variable(pe) );
-      }
-      else
-      {
-          pe = -pe;
-          fc = swapvar( fc, Variable(pe), Variable(1) );
-          gc = swapvar( gc, Variable(pe), Variable(1) );
-          fc = swapvar( ezgcd( fc, gc ), Variable(1), Variable(pe) );
+      #else
+        fc = chinrem_gcd( fc, gc);
+      #endif
       }
     }
     else
     {
-        fc = gcd_poly_0( fc, gc );
+      fc = gcd_poly_0( fc, gc );
     }
     if ( d1.degree() > 0 )
-        fc *= d1;
+      fc *= d1;
     return fc;
 }
 //}}}
@@ -981,11 +987,10 @@ balance_p ( const CanonicalForm & f, const CanonicalForm & q )
     return result;
 }
 
-#define GCD_CHINES_MIN_TRIES 3
 CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
 {
   CanonicalForm f, g, cg, cl, q, Dp, newD, D, newq;
-  int p, i, n, dp_deg, d_deg;;
+  int p, i, dp_deg, d_deg;;
 
   CanonicalForm cd = bCommonDen( FF );
   f=cd*FF;
@@ -1003,7 +1008,6 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
   i = cf_getNumBigPrimes() - 1;
   cl =  f.lc()* g.lc();
 
-  n=GCD_CHINES_MIN_TRIES;
   while ( true )
   {
     p = cf_getBigPrime( i );
@@ -1014,7 +1018,6 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
       i--;
     }
     setCharacteristic( p );
-    n--;
     Dp = gcd( mapinto( f ), mapinto( g ) );
     Dp /=Dp.lc();
     setCharacteristic( 0 );
@@ -1037,7 +1040,6 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
       }
       else if ( dp_deg < d_deg )
       {
-        n=GCD_CHINES_MIN_TRIES;
         // all previous p's are bad primes
         q = p;
         D = mapinto( Dp );
@@ -1047,24 +1049,21 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     }
     if ( i >= 0 )
     {
-      if (n<=0)
+      CanonicalForm Dn= Farey(D,q);
+      int is_rat=isOn(SW_RATIONAL);
+      On(SW_RATIONAL);
+      CanonicalForm cd = bCommonDen( Dn ); // we need On(SW_RATIONAL)
+      if (!is_rat) Off(SW_RATIONAL);
+      Dn *=cd;
+      //Dn /=vcontent(Dn,Variable(1));
+      if ( fdivides( Dn, f ) && fdivides( Dn, g ) )
       {
-        CanonicalForm Dn= Farey(D,q);
-        int is_rat=isOn(SW_RATIONAL);
-        On(SW_RATIONAL);
-        CanonicalForm cd = bCommonDen( Dn ); // we need On(SW_RATIONAL)
-        if (!is_rat) Off(SW_RATIONAL);
-        Dn *=cd;
-        //Dn /=vcontent(Dn,Variable(1));
-        if ( fdivides( Dn, f ) && fdivides( Dn, g ) )
-        {
-          return Dn;
-        }
-      //else: try more primes
+        return Dn;
       }
+      //else: try more primes
     }
     else
-    {
+    { // try other method
       Off(SW_USE_CHINREM_GCD);
       D=gcd_poly( f, g );
       On(SW_USE_CHINREM_GCD);
