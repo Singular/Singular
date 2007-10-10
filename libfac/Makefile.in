@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.12 2007-08-03 11:32:05 Singular Exp $
+# $Id: Makefile.in,v 1.13 2007-10-10 17:52:39 Singular Exp $
 #################################################
 SHELL		= /bin/sh
 RM		= -rm -f
@@ -50,7 +50,7 @@ LIBS		= -lfac -lcf -lcfmem -lgmp @LIBS@
 
 FACTORSRC1 =	factor/SqrFree.cc factor/Factor.cc \
 		factor/MVMultiHensel.cc factor/Truefactor.cc \
-		factor/helpstuff.cc  factor/debug.cc factor/version.cc \
+		factor/helpstuff.cc  factor/version.cc \
 		factor/homogfactor.cc 
 FACTORSRC2 =	factor/tmpl_inst.cc
 FACTORSRC = 	$(FACTORSRC2) $(FACTORSRC1)
@@ -67,7 +67,7 @@ CHARSETINCL =	charset/csutil.h charset/charset.h charset/reorder.h \
 
 OPTFACTOROBJ1 =	OPTOBJ/SqrFree.o OPTOBJ/Factor.o OPTOBJ/MVMultiHensel.o \
 		OPTOBJ/Truefactor.o OPTOBJ/helpstuff.o OPTOBJ/version.o \
-		OPTOBJ/homogfactor.o OPTOBJ/debug.o
+		OPTOBJ/homogfactor.o
 OPTFACTOROBJ2 =	OPTOBJ/tmpl_inst.o
 OPTFACTOROBJ =	$(OPTFACTOROBJ2) $(OPTFACTOROBJ1)
 
@@ -76,7 +76,7 @@ OPTCHARSETOBJ =	OPTOBJ/csutil.o OPTOBJ/charset.o OPTOBJ/reorder.o \
 
 DEBFACTOROBJ1 =	DEBOBJ/SqrFree.o DEBOBJ/Factor.o DEBOBJ/MVMultiHensel.o \
 		DEBOBJ/Truefactor.o DEBOBJ/helpstuff.o DEBOBJ/version.o \
-		DEBOBJ/homogfactor.o DEBOBJ/debug.o
+		DEBOBJ/homogfactor.o
 DEBFACTOROBJ2 =	DEBOBJ/tmpl_inst.o
 DEBFACTOROBJ = 	$(DEBFACTOROBJ2) $(DEBFACTOROBJ1)
 

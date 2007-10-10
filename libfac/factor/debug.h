@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
-// static char * rcsid = "$Id: debug.h,v 1.4 2006-05-16 14:46:50 Singular Exp $" ;
+// static char * rcsid = "$Id: debug.h,v 1.5 2007-10-10 17:52:39 Singular Exp $" ;
 ////////////////////////////////////////////////////////////
 // It is possible to include this file multiple times for different 
 // settings of FACDEBUG and/or DEBUGOUTPUT
@@ -34,9 +34,9 @@
  message, file, line, expression ), abort(), 0 )
 
 #ifdef DEBUGOUTPUT
-void deb_inc_level();
-void deb_dec_level();
-extern char * deb_level_msg;
+void deb_inc_level(); // use this helper routines from factory
+void deb_dec_level(); // use this helper routines from factory
+extern char * deb_level_msg; // from factory
 #define DEBINCLEVEL(stream,msg) \
 (stream << "\n" << deb_level_msg << "entering << " << msg << " >>" << "\n", deb_inc_level())
 #define DEBDECLEVEL(stream,msg) \
@@ -63,6 +63,9 @@ extern char * deb_level_msg;
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  2006/05/16 14:46:50  Singular
+*hannes: gcc 4.1 fixes
+
 Revision 1.3  1997/09/12 07:19:55  Singular
 * hannes/michael: libfac-0.3.0
 
