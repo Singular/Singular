@@ -3,7 +3,7 @@
 ### Purpose: Makefile for omalloc
 ### Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 ### Created: 11/99
-### Version: $Id: Makefile.in,v 1.21 2007-08-03 11:32:05 Singular Exp $
+### Version: $Id: Makefile.in,v 1.22 2007-10-11 09:46:37 Singular Exp $
 #################################################################
 
 SHELL		= /bin/sh
@@ -202,9 +202,12 @@ install: all libomalloc_p.a
 	$(RANLIB) $(libdir)/libomalloc_ndebug.a
 	$(INSTALL_DATA) libomalloc_p.a $(libdir)
 	$(RANLIB) $(libdir)/libomalloc_p.a
-	$(INSTALL_DATA) omalloc.o omalloc_debug.o $(libdir)
-	$(INSTALL_DATA) omalloc.h omalloc.c $(includedir)
-	$(INSTALL_DATA) omlimits.h mylimits.h omalloc.c $(includedir)
+	$(INSTALL_DATA) omalloc.o $(libdir)
+	$(INSTALL_DATA) omalloc_debug.o $(libdir)
+	$(INSTALL_DATA) omalloc.h $(includedir)
+	$(INSTALL_DATA) omalloc.c $(includedir)
+	$(INSTALL_DATA) omlimits.h $(includedir)
+	$(INSTALL_DATA) mylimits.h $(includedir)
 
 install_min: libomalloc_ndebug.a omalloc.o
 	$(MKINSTALLDIRS) $(libdir)
@@ -212,8 +215,10 @@ install_min: libomalloc_ndebug.a omalloc.o
 	$(INSTALL_DATA) libomalloc_ndebug.a $(libdir)
 	$(RANLIB) $(libdir)/libomalloc_ndebug.a
 	$(INSTALL_DATA) omalloc.o $(libdir)
-	$(INSTALL_DATA) omalloc.h omalloc.c $(includedir)
-	$(INSTALL_DATA) omlimits.h mylimits.h omalloc.c $(includedir)
+	$(INSTALL_DATA) omalloc.h $(includedir)
+	$(INSTALL_DATA) omalloc.c $(includedir)
+	$(INSTALL_DATA) omlimits.h $(includedir)
+	$(INSTALL_DATA) mylimits.h $(includedir)
 
 uninstall:
 	rm -f $(includedir)/omalloc.h $(includedir)/omalloc.c

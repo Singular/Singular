@@ -104,7 +104,7 @@ HAVE_MPSR       = @HAVE_MPSR@
 LIBSINGULAR_LIBS =-lsingfac -lsingcf -lntl -lreadline -lgmp -lomalloc_ndebug
 
 SO_SUFFIX = so
-LIBSINGULAR_FLAGS = -export-dynamic 
+#LIBSINGULAR_FLAGS = -export-dynamic 
 LIBSINGULAR_LD = $(CXX)
 
 # correct suffix for dynamic linking
@@ -489,7 +489,9 @@ install-nolns: all installbin-nolns installslib-nolns
 installbin: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}
 	${MKINSTALLDIRS} ${bindir}
 	${INSTALL_PROGRAM} ${SING_EXEC} ${SINGULAR}
-	-${INSTALL_PROGRAM} *.so ${bindir}
+	-for file in *.so; do \
+	  ${INSTALL_PROGRAM} $$file ${bindir}; \
+	done
 	${INSTALL_PROGRAM} libparse ${RUN_SINGULARS} ${bindir}
 	${INSTALL_PROGRAM} ESingular TSingular ${DL_LIBS} ${bindir}
 	${INSTALL_PROGRAM} surfex ${bindir}
@@ -500,24 +502,30 @@ installbin: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}
 installbin-nolns: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}
 	${MKINSTALLDIRS} ${bindir}
 	${INSTALL_PROGRAM} ${SING_EXEC} ${SINGULAR}
-	-${INSTALL_PROGRAM} *.so ${bindir}
+	-for file in *.so; do \
+	  ${INSTALL_PROGRAM} $$file ${bindir}; \
+	done
 	${INSTALL_PROGRAM} libparse ${RUN_SINGULARS} ${bindir}
 	${INSTALL_PROGRAM} ESingular TSingular ${DL_LIBS} ${bindir}
 	chmod a+x ${SINGULAR}
 	rm -f ${bindir}/${SING_EXEC}${EXEC_EXT}
-	cd ${bindir}; ${INSTALL_PROGRAM} ${SINGULAR} Singular${EXEC_EXT};
+	${INSTALL_PROGRAM} ${SINGULAR} ${bindir}/Singular${EXEC_EXT};
 
 installslib: LIB
 	test -r ${slibdir} || ${LN_S} `pwd`/LIB ${slibdir}
 
 installslib-nolns: LIB
 	${MKINSTALLDIRS} ${slibdir}
-	${INSTALL} `pwd`/LIB/*.lib ${slibdir}
+	for file in `pwd`/LIB/*.lib; do \
+	  ${INSTALL}  $$file ${slibdir}; \
+	done
 	${MKINSTALLDIRS} ${slibdir}/gftables
 	${INSTALL} `pwd`/LIB/gftables/* ${slibdir}/gftables/
 
 install-libsingular: libsingular
-	${INSTALL_PROGRAM} *.$(SO_SUFFIX) ${libdir}
+	for file in *.$(SO_SUFFIX); do \
+	  ${INSTALL_PROGRAM}  $$file ${libdir}; \
+	done
 	${INSTALL_PROGRAM} libsingular.h ${includedir}
 
 

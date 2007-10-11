@@ -80,8 +80,14 @@ then
         exit 0
     elif (echo $uname_a | $egrep "SunOS" >$devnull)
     then
+      # NexentaOS ###############
+      if (echo $uname_a | $egrep "NexentaOS" > $devnull)
+      then
+        echo ${prefix}-nexentaos
+      else
         echo ix86-SunOS
-        exit 0
+      fi
+      exit 0
     else
         echo ${prefix}-Unknown
         exit 1
