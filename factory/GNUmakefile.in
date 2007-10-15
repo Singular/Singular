@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.49 2007-08-03 11:32:04 Singular Exp $
+# $Id: GNUmakefile.in,v 1.50 2007-10-15 12:07:39 Singular Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -469,7 +469,11 @@ ftmpl_inst.o:	ftmpl_inst.cc factoryconf.h factory.h \
 
 # note that this is a non-source file which is distributed!
 $(srcdir)/readcf.cc: readcf.y
-		$(BISON) $< -o $@
+		@if test -r $(srcdir)/readcf.cc; then \
+			touch $(srcdir)/readcf.cc;\
+		else \
+			$(BISON) $< -o $@ \;
+		fi
 
 # note that these are non-source file which are distributed!
 # We do not specify any dependencies except the most important ones.
