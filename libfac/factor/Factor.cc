@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.35 2007-06-14 14:16:35 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.36 2007-10-15 18:03:11 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -471,7 +471,7 @@ try_specializePoly(const CanonicalForm & f, const Variable & Extension, int deg,
     //    if ( ! ok ) return 0; // we failed
     //  }
       #ifndef NDEBUG
-        printf("libfac: try_specializePoly: extension level >0\n");
+        //printf("libfac: try_specializePoly: extension level >0\n");
       #endif
       return 0; // we failed
     }
@@ -1043,7 +1043,7 @@ static bool fdivides2(const CanonicalForm &F, const CanonicalForm &G, const Cano
 CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
 {
 #ifndef NDEBUG
-  printf("start Factorize2(int_flag=%d)\n",libfac_interruptflag);
+  //printf("start Factorize2(int_flag=%d)\n",libfac_interruptflag);
 #endif
   CFFList G,H;
   CanonicalForm fac;
@@ -1056,7 +1056,7 @@ CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
   else
   {
 #ifndef NDEBUG
-    printf("variant 2(int_flag=%d)\n",libfac_interruptflag);
+    //printf("variant 2(int_flag=%d)\n",libfac_interruptflag);
 #endif
     libfac_interruptflag=0;
     iF=Factorize(F);
@@ -1073,7 +1073,7 @@ CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
           {
 #ifndef NOSTREAMIO
 #ifndef NDEBUG
-            printf("append trivial factor\n");
+            //printf("append trivial factor\n");
 #endif
 #endif
             H.append( CFFactor( fac, d));
@@ -1095,7 +1095,7 @@ CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
                 {
 #ifndef NOSTREAMIO
 #ifndef NDEBUG
-                  out_cf("factor:",fac,"\n");
+                  //out_cf("factor:",fac,"\n");
 #endif
 #endif
                   e++;dd--;
@@ -1114,7 +1114,7 @@ CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
   //Outputlist = newfactoras( F, as, 1);
   if((isOn(SW_USE_NTL_SORT))&&(!H.isEmpty())) H.sort(cmpCF);
 #ifndef NDEBUG
-  printf("end Factorize2(%d)\n",libfac_interruptflag);
+  //printf("end Factorize2(%d)\n",libfac_interruptflag);
 #endif
   return H;
 }
@@ -1301,6 +1301,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.35  2007/06/14 14:16:35  Singular
+*hannes: Factorize2 etc.
+
 Revision 1.34  2007/06/02 10:21:57  Singular
 *hannes: fdivides2 again
 
