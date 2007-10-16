@@ -15,10 +15,14 @@ Changes with respect to 3-0-3:
   change SINGULARROOT in the generated Makefile if you dislike the default
 
 ----------------------------------------------------------
-Changes with respect to 3-0-3-1
+Tue Oct 16 18:58:18 CEST 2007 Singular-3-0-3-2
+Changes with respect to 3-0-3-1:
+
 - bison generated file integrated also for factory
 - modgen: target clean will no longer remove bison generated files
+          fixes wrt. %return
 - gcd in algebraic extensions: remove content wrt. K(alpha), not only wrt. K
 - EZGCD: special case is handled by CHINREM_GCD
-- heuristic for gcd in char 0: 1) EZGCD 2) CHINREM_GCD 3)Prem
-
+- heuristic for gcd in char 0: 1) EZGCD 2) CHINREM_GCD 3) Prem
+- NTL: update to version 5.4.1
+- doc/general.doc: description of algorithms updated
