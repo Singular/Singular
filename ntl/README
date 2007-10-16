@@ -1,5 +1,5 @@
-NTL  -- a library for doing numbery theory --  version 5.4
-Release date: 2005.03.25
+NTL  -- a library for doing numbery theory --  version 5.4.1
+Release date: 2007.05.09
 
 Author: Victor Shoup (victor@shoup.net)
 
@@ -18,7 +18,7 @@ documentation:
 
 The latest version of NTL is available at http://www.shoup.net.
 
-The sources have been modified for Singular-2-0-7 / Singular-3-0-1
+The sources have been modified for Singular-3-0-3
 - for errors blame singular@mathematik.uni-kl.de,
 not Victor Shoup (victor@shoup.net)
 

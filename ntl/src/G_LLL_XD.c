@@ -374,6 +374,8 @@ static void inc_red_fudge()
    red_fudge = red_fudge * 2;
    log_red--;
 
+   //cerr << "G_LLL_XD: warning--relaxing reduction (" << log_red << ")\n";
+
    if (log_red < 4)
       Error("G_LLL_XD: can not continue...sorry");
 }
@@ -440,6 +442,11 @@ long ll_G_LLL_XD(mat_ZZ& B, mat_ZZ* U, xdouble delta, long deep,
          // size reduction
 
          counter++;
+         if (counter > 10000) {
+            Error("G_LLL_XD: warning--possible infinite loop\n");
+            counter = 0;
+         }
+
 
          Fc1 = 0;
    
@@ -640,19 +647,19 @@ long G_LLL_XD(mat_ZZ& B, mat_ZZ* U, xdouble delta, long deep,
 
    // clean-up
 
-   for (i = 1; i <= m; i++) {
+   for (i = 1; i <= m+dep; i++) {
       delete [] B1[i];
    }
 
    delete [] B1;
 
-   for (i = 1; i <= m; i++) {
+   for (i = 1; i <= m+dep; i++) {
       delete [] mu[i];
    }
 
    delete [] mu;
 
-   for (i = 1; i <= m; i++) {
+   for (i = 1; i <= m+dep; i++) {
       delete [] aux[i];
    }
 
@@ -668,10 +675,6 @@ long G_LLL_XD(mat_ZZ& B, double delta, long deep,
 {
    verbose = verb;
    NumSwaps = 0;
-   if (verbose) {
-      StartTime = GetTime();
-      LastTime = StartTime;
-   }
 
    if (delta < 0.50 || delta >= 1) Error("G_LLL_XD: bad delta");
    if (deep < 0) Error("G_LLL_XD: bad deep");
@@ -683,11 +686,6 @@ long G_LLL_XD(mat_ZZ& B, mat_ZZ& U, double delta, long deep,
 {
    verbose = verb;
    NumSwaps = 0;
-   if (verbose) {
-      StartTime = GetTime();
-      LastTime = StartTime;
-   }
-
 
    if (delta < 0.50 || delta >= 1) Error("G_LLL_XD: bad delta");
    if (deep < 0) Error("G_LLL_XD: bad deep");
@@ -940,10 +938,6 @@ long G_BKZ_XD(mat_ZZ& BB, mat_ZZ* UU, xdouble delta,
 
          double tt1;
 
-         if (verb) {
-            tt1 = GetTime();
-         }
-
          for (i = jj; i <= kk; i++)
             c[i] = mu[i][i]*mu[i][i];
 
@@ -1019,11 +1013,6 @@ long G_BKZ_XD(mat_ZZ& BB, mat_ZZ* UU, xdouble delta,
             }
          }
          
-         if (verb) {
-            tt1 = GetTime() - tt1;
-            enum_time += tt1;
-         }
-
          NumIterations++;
 
          h = min(kk+1, m);
@@ -1181,19 +1170,19 @@ long G_BKZ_XD(mat_ZZ& BB, mat_ZZ* UU, xdouble delta,
       *UU = *U;
    }
 
-   for (i = 1; i <= m+1; i++) {
+   for (i = 1; i <= m_orig+1; i++) {
       delete [] B1[i];
    }
 
    delete [] B1;
 
-   for (i = 1; i <= m+1; i++) {
+   for (i = 1; i <= m_orig+1; i++) {
       delete [] mu[i];
    }
 
    delete [] mu;
 
-   for (i = 1; i <= m+1; i++) {
+   for (i = 1; i <= m_orig+1; i++) {
       delete [] aux[i];
    }
 
@@ -1217,11 +1206,6 @@ long G_BKZ_XD(mat_ZZ& BB, mat_ZZ& UU, double delta,
 {
    verbose = verb;
    NumSwaps = 0;
-   if (verbose) {
-      StartTime = GetTime();
-      LastTime = StartTime;
-   }
-
 
    if (delta < 0.50 || delta >= 1) Error("G_BKZ_XD: bad delta");
    if (beta < 2) Error("G_BKZ_XD: bad block size");
@@ -1234,12 +1218,6 @@ long G_BKZ_XD(mat_ZZ& BB, double delta,
 {
    verbose = verb;
    NumSwaps = 0;
-   if (verbose) {
-      StartTime = GetTime();
-      LastTime = StartTime;
-   }
-
-
 
    if (delta < 0.50 || delta >= 1) Error("G_BKZ_XD: bad delta");
    if (beta < 2) Error("G_BKZ_XD: bad block size");

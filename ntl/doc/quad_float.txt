@@ -292,6 +292,7 @@ library;  see his web page above for the latest version and more information.
 Here is a brief annotated bibliography (compiled by Priest) of papers 
 dealing with DP and similar techniques, arranged chronologically.
 
+
 Kahan, W., Further Remarks on Reducing Truncation Errors,
   {\it Comm.\ ACM\/} {\bf 8} (1965), 40.
 
@@ -364,6 +365,14 @@ Priest, D., On Properties of Floating Point Arithmetics: Numerical Stability
 
   More examples, organizes proofs in terms of common properties of fp
   addition/subtraction, gives other summation algorithms.
+
+Another relevant paper: 
+
+X. S. Li, et al.
+Design, implementation, and testing of extended and mixed 
+precision BLAS.  ACM Trans. Math. Soft., 28:152-205, 2002.
+
+
 
 \***********************************************************************/
 

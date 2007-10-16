@@ -80,8 +80,8 @@ int main()
    }
    
 
-   n = 5*NTL_BITS_PER_LONG;
-   s = 64;
+   n = 16;
+   s = 56;
 
    GF2X *a = new GF2X[s];
    GF2X *b = new GF2X[s];
@@ -89,8 +89,8 @@ int main()
    GF2X c;
 
    for (k = 0; k < s; k++) {
-      random(a[k], n);
-      random(b[k], n);
+      random(a[k], (n + (k % 7))*NTL_BITS_PER_LONG);
+      random(b[k], (n + (k % 8))*NTL_BITS_PER_LONG);
    }
 
    for (k = 0; k < s; k++) mul(c, a[k], b[k]);
@@ -101,7 +101,7 @@ int main()
    do {
      t = GetTime();
      for (i = 0; i < iter; i++) {
-        for (j = 0; j < 50; j++) for (k = 0; k < s; k++) mul(c, a[k], b[k]);
+        for (j = 0; j < 1; j++) for (k = 0; k < s; k++) mul(c, a[k], b[k]);
      }
      t = GetTime() - t;
      iter = 2*iter;
@@ -117,7 +117,7 @@ int main()
    for (w = 0; w < 5; w++) {
      t = GetTime();
      for (i = 0; i < iter; i++) {
-        for (j = 0; j < 50; j++) for (k = 0; k < s; k++) mul(c, a[k], b[k]);
+        for (j = 0; j < 1; j++) for (k = 0; k < s; k++) mul(c, a[k], b[k]);
      }
      t = GetTime() - t;
      tvec[w] = t;

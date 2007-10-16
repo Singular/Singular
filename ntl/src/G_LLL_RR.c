@@ -405,7 +405,7 @@ static void inc_red_fudge()
    mul(red_fudge, red_fudge, 2);
    log_red--;
 
-   cerr << "G_LLL_RR: warning--relaxing reduction (" << log_red << ")\n";
+   //cerr << "G_LLL_RR: warning--relaxing reduction (" << log_red << ")\n";
 
    if (log_red < 4)
       Error("G_LLL_RR: can not continue...sorry");
@@ -473,7 +473,7 @@ long ll_G_LLL_RR(mat_ZZ& B, mat_ZZ* U, const RR& delta, long deep,
 
          counter++;
          if (counter > 10000) {
-            cerr << "G_LLL_XD: warning--possible infinite loop\n";
+            Error("G_LLL_XD: warning--possible infinite loop\n");
             counter = 0;
          }
 
@@ -668,10 +668,6 @@ long G_LLL_RR(mat_ZZ& B, double delta, long deep,
 {
    verbose = verb;
    NumSwaps = 0;
-   if (verbose) {
-      StartTime = GetTime();
-      LastTime = StartTime;
-   }
 
    if (delta < 0.50 || delta >= 1) Error("G_LLL_RR: bad delta");
    if (deep < 0) Error("G_LLL_RR: bad deep");
@@ -685,10 +681,6 @@ long G_LLL_RR(mat_ZZ& B, mat_ZZ& U, double delta, long deep,
 {
    verbose = verb;
    NumSwaps = 0;
-   if (verbose) {
-      StartTime = GetTime();
-      LastTime = StartTime;
-   }
 
    if (delta < 0.50 || delta >= 1) Error("G_LLL_RR: bad delta");
    if (deep < 0) Error("G_LLL_RR: bad deep");
@@ -915,10 +907,6 @@ long G_BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
 
          double tt1;
 
-         if (verb) {
-            tt1 = GetTime();
-         }
-
          for (i = jj; i <= kk; i++)
             sqr(c(i), mu(i,i));
 
@@ -1010,11 +998,6 @@ long G_BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
             }
          }
          
-         if (verb) {
-            tt1 = GetTime() - tt1;
-            enum_time += tt1;
-         }
-
          NumIterations++;
    
          h = min(kk+1, m);
@@ -1183,10 +1166,6 @@ long G_BKZ_RR(mat_ZZ& BB, mat_ZZ& UU, double delta,
 {
    verbose = verb;
    NumSwaps = 0;
-   if (verbose) {
-      StartTime = GetTime();
-      LastTime = StartTime;
-   }
 
    if (delta < 0.50 || delta >= 1) Error("G_BKZ_RR: bad delta");
    if (beta < 2) Error("G_BKZ_RR: bad block size");
@@ -1202,10 +1181,6 @@ long G_BKZ_RR(mat_ZZ& BB, double delta,
 {
    verbose = verb;
    NumSwaps = 0;
-   if (verbose) {
-      StartTime = GetTime();
-      LastTime = StartTime;
-   }
 
    if (delta < 0.50 || delta >= 1) Error("G_BKZ_RR: bad delta");
    if (beta < 2) Error("G_BKZ_RR: bad block size");

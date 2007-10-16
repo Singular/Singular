@@ -418,6 +418,7 @@ static long log_red = 0;
 
 static long verbose = 0;
 
+double LLLStatusInterval = 900.0;
 char *LLLDumpFile = 0;
 
 static unsigned long NumSwaps = 0;
@@ -445,10 +446,25 @@ static void inc_red_fudge()
    log_red--;
 
    
+   //cerr << "LLL_FP: warning--relaxing reduction (" << log_red << ")\n";
+
    if (log_red < 4)
       Error("LLL_FP: too much loss of precision...stop!");
 }
 
+
+#if 0
+
+static void print_mus(double **mu, long k)
+{
+   long i;
+
+   for (i = k-1; i >= 1; i--)
+      cerr << mu[k][i] << " ";
+   cerr << "\n";
+}
+
+#endif
 
 void ComputeGS(const mat_ZZ& B, mat_RR& B1, 
                mat_RR& mu, vec_RR& b,
@@ -465,6 +481,7 @@ static void RR_GS(mat_ZZ& B, double **B1, double **mu,
 {
    double tt;
 
+   //cerr << "LLL_FP: RR refresh " << rr_st << "..." << k << "...";
    tt = GetTime();
 
    if (rr_st > k) Error("LLL_FP: can not continue!!!");
@@ -533,6 +550,7 @@ static void RR_GS(mat_ZZ& B, double **B1, double **mu,
 
    tt = GetTime()-tt;
    RR_GS_time += tt;
+   //cerr << tt << " (" << RR_GS_time << ")\n";
 }
 
 void ComputeGS(const mat_ZZ& B, mat_RR& mu, vec_RR& c)
@@ -685,6 +703,7 @@ long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
       st[k] = k;
 
       if (swap_cnt > 200000) {
+         Error("LLL_FP: swap loop?\n");
          RR_GS(B, B1, mu, b, c, buf, prec,
                rr_st, k, m_orig, rr_B1, rr_mu, rr_b, rr_c);
          if (rr_st < st[k+1]) st[k+1] = rr_st;
@@ -716,6 +735,9 @@ long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
 
             if ((counter >> 7) == 1 || new_sz < sz) {
                sz = new_sz;
+            }
+            else {
+               Error("LLL_FP: warning--infinite loop?\n");
             }
          }
 
@@ -989,13 +1011,13 @@ long LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
 
    // clean-up
 
-   for (i = 1; i <= m; i++) {
+   for (i = 1; i <= m+dep; i++) {
       delete [] B1[i];
    }
 
    delete [] B1;
 
-   for (i = 1; i <= m; i++) {
+   for (i = 1; i <= m+dep; i++) {
       delete [] mu[i];
    }
 
@@ -1016,10 +1038,6 @@ long LLL_FP(mat_ZZ& B, double delta, long deep, LLLCheckFct check,
    verbose = verb;
    RR_GS_time = 0;
    NumSwaps = 0;
-   if (verbose) {
-      StartTime = GetTime();
-      LastTime = StartTime;
-   }
 
    if (delta < 0.50 || delta >= 1) Error("LLL_FP: bad delta");
    if (deep < 0) Error("LLL_FP: bad deep");
@@ -1032,10 +1050,6 @@ long LLL_FP(mat_ZZ& B, mat_ZZ& U, double delta, long deep,
    verbose = verb;
    RR_GS_time = 0;
    NumSwaps = 0;
-   if (verbose) {
-      StartTime = GetTime();
-      LastTime = StartTime;
-   }
 
    if (delta < 0.50 || delta >= 1) Error("LLL_FP: bad delta");
    if (deep < 0) Error("LLL_FP: bad deep");
@@ -1289,11 +1303,6 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
 
          double tt1;
 
-         if (verb) {
-            tt1 = GetTime();
-         }
-
-
          if (prune > 0)
             ComputeBKZThresh(&c[jj], kk-jj+1);
 
@@ -1321,6 +1330,8 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
 
             ctilda[t] = ctilda[t+1] + 
                (yvec[t]+utildavec[t])*(yvec[t]+utildavec[t])*c[t];
+
+            ForceToMem(&ctilda[t]);  // prevents an infinite loop
    
             if (prune > 0 && t > jj) {
                eta = BKZThresh(t-jj);
@@ -1363,11 +1374,6 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
             }
          }
 
-         if (verb) {
-            tt1 = GetTime() - tt1;
-            enum_time += tt1;
-         }
-         
          NumIterations++;
    
          h = min(kk+1, m);
@@ -1532,13 +1538,13 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
       *UU = *U;
    }
 
-   for (i = 1; i <= m+1; i++) {
+   for (i = 1; i <= m_orig+1; i++) {
       delete [] B1[i];
    }
 
    delete [] B1;
 
-   for (i = 1; i <= m+1; i++) {
+   for (i = 1; i <= m_orig+1; i++) {
       delete [] mu[i];
    }
 
@@ -1563,10 +1569,6 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ& UU, double delta,
    verbose = verb;
    RR_GS_time = 0;
    NumSwaps = 0;
-   if (verbose) {
-      StartTime = GetTime();
-      LastTime = StartTime;
-   }
 
    if (delta < 0.50 || delta >= 1) Error("BKZ_FP: bad delta");
    if (beta < 2) Error("BKZ_FP: bad block size");
@@ -1580,10 +1582,6 @@ long BKZ_FP(mat_ZZ& BB, double delta,
    verbose = verb;
    RR_GS_time = 0;
    NumSwaps = 0;
-   if (verbose) {
-      StartTime = GetTime();
-      LastTime = StartTime;
-   }
 
    if (delta < 0.50 || delta >= 1) Error("BKZ_FP: bad delta");
    if (beta < 2) Error("BKZ_FP: bad block size");

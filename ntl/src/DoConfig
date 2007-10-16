@@ -76,7 +76,7 @@
 
 foreach $arg (@ARGV) {
 
-   if ($arg =~ '^-h|help|-help|--help') {
+   if ($arg =~ '-h|help|-help|--help') {
       system("more ../doc/config.txt");
       exit;
    }

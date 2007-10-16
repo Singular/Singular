@@ -608,6 +608,8 @@ static void inc_red_fudge()
    red_fudge = red_fudge * 2;
    log_red--;
 
+   //cerr << "G_LLL_QP: warning--relaxing reduction (" << log_red << ")\n";
+
    if (log_red < 4)
       Error("G_LLL_QP: too much loss of precision...stop!");
 }
@@ -679,6 +681,10 @@ long ll_G_LLL_QP(mat_ZZ& B, mat_ZZ* U, quad_float delta, long deep,
          // size reduction
 
          counter++;
+         if (counter > 10000) {
+            Error("G_LLL_QP: warning--possible infinite loop\n");
+            counter = 0;
+         }
 
 
          Fc1 = 0;
@@ -890,19 +896,19 @@ long G_LLL_QP(mat_ZZ& B, mat_ZZ* U, quad_float delta, long deep,
 
    // clean-up
 
-   for (i = 1; i <= m; i++) {
+   for (i = 1; i <= m+dep; i++) {
       delete [] B1[i];
    }
 
    delete [] B1;
 
-   for (i = 1; i <= m; i++) {
+   for (i = 1; i <= m+dep; i++) {
       delete [] mu[i];
    }
 
    delete [] mu;
 
-   for (i = 1; i <= m; i++) {
+   for (i = 1; i <= m+dep; i++) {
       delete [] aux[i];
    }
 
@@ -918,10 +924,6 @@ long G_LLL_QP(mat_ZZ& B, double delta, long deep, LLLCheckFct check,
 {
    verbose = verb;
    NumSwaps = 0;
-   if (verbose) {
-      StartTime = GetTime();
-      LastTime = StartTime;
-   }
 
    if (delta < 0.50 || delta >= 1) Error("G_LLL_QP: bad delta");
    if (deep < 0) Error("G_LLL_QP: bad deep");
@@ -933,11 +935,6 @@ long G_LLL_QP(mat_ZZ& B, mat_ZZ& U, double delta, long deep,
 {
    verbose = verb;
    NumSwaps = 0;
-   if (verbose) {
-      StartTime = GetTime();
-      LastTime = StartTime;
-   }
-
 
    if (delta < 0.50 || delta >= 1) Error("G_LLL_QP: bad delta");
    if (deep < 0) Error("G_LLL_QP: bad deep");
@@ -1187,14 +1184,9 @@ long G_BKZ_QP(mat_ZZ& BB, mat_ZZ* UU, quad_float delta,
             clean = 1;
          }
 
-   
          // ENUM
 
          double tt1;
-
-         if (verb) {
-            tt1 = GetTime();
-         }
 
          for (i = jj; i <= kk; i++) {
             c[i] = mu[i][i]*mu[i][i];
@@ -1272,11 +1264,6 @@ long G_BKZ_QP(mat_ZZ& BB, mat_ZZ* UU, quad_float delta,
                if (Deltavec[t]*deltavec[t] >= 0) Deltavec[t] += deltavec[t];
                utildavec[t] = vvec[t] + Deltavec[t];
             }
-         }
-
-         if (verb) {
-            tt1 = GetTime() - tt1;
-            enum_time += tt1;
          }
 
          NumIterations++;
@@ -1441,19 +1428,19 @@ long G_BKZ_QP(mat_ZZ& BB, mat_ZZ* UU, quad_float delta,
       *UU = *U;
    }
 
-   for (i = 1; i <= m+1; i++) {
+   for (i = 1; i <= m_orig+1; i++) {
       delete [] B1[i];
    }
 
    delete [] B1;
 
-   for (i = 1; i <= m+1; i++) {
+   for (i = 1; i <= m_orig+1; i++) {
       delete [] mu[i];
    }
 
    delete [] mu;
 
-   for (i = 1; i <= m+1; i++) {
+   for (i = 1; i <= m_orig+1; i++) {
       delete [] aux[i];
    }
 
@@ -1477,10 +1464,6 @@ long G_BKZ_QP(mat_ZZ& BB, mat_ZZ& UU, double delta,
 {
    verbose = verb;
    NumSwaps = 0;
-   if (verbose) {
-      StartTime = GetTime();
-      LastTime = StartTime;
-   }
 
 
    if (delta < 0.50 || delta >= 1) Error("G_BKZ_QP: bad delta");
@@ -1494,12 +1477,6 @@ long G_BKZ_QP(mat_ZZ& BB, double delta,
 {
    verbose = verb;
    NumSwaps = 0;
-   if (verbose) {
-      StartTime = GetTime();
-      LastTime = StartTime;
-   }
-
-
 
    if (delta < 0.50 || delta >= 1) Error("G_BKZ_QP: bad delta");
    if (beta < 2) Error("G_BKZ_QP: bad block size");
@@ -1678,10 +1655,6 @@ long G_BKZ_QP1(mat_ZZ& BB, mat_ZZ* UU, quad_float delta,
 
          double tt1;
 
-         if (verb) {
-            tt1 = GetTime();
-         }
-
          for (i = jj; i <= kk; i++) {
             c[i] = mu[i][i]*mu[i][i];
             CheckFinite(&c[i]);
@@ -1714,6 +1687,8 @@ long G_BKZ_QP1(mat_ZZ& BB, mat_ZZ* UU, quad_float delta,
 
             ctilda[t] = ctilda[t+1] + 
                (yvec[t]+utildavec[t])*(yvec[t]+utildavec[t])*to_double(c[t]);
+
+            ForceToMem(&ctilda[t]); // prevents an infinite loop
    
             if (prune > 0 && t > jj) {
                eta = to_double(G_BKZThresh(t-jj));
@@ -1760,11 +1735,6 @@ long G_BKZ_QP1(mat_ZZ& BB, mat_ZZ* UU, quad_float delta,
                if (Deltavec[t]*deltavec[t] >= 0) Deltavec[t] += deltavec[t];
                utildavec[t] = vvec[t] + Deltavec[t];
             }
-         }
-
-         if (verb) {
-            tt1 = GetTime() - tt1;
-            enum_time += tt1;
          }
 
          NumIterations++;
@@ -1906,7 +1876,6 @@ long G_BKZ_QP1(mat_ZZ& BB, mat_ZZ* UU, quad_float delta,
    }
 
 
-
    // clean up
 
 
@@ -1932,19 +1901,19 @@ long G_BKZ_QP1(mat_ZZ& BB, mat_ZZ* UU, quad_float delta,
       *UU = *U;
    }
 
-   for (i = 1; i <= m+1; i++) {
+   for (i = 1; i <= m_orig+1; i++) {
       delete [] B1[i];
    }
 
    delete [] B1;
 
-   for (i = 1; i <= m+1; i++) {
+   for (i = 1; i <= m_orig+1; i++) {
       delete [] mu[i];
    }
 
    delete [] mu;
 
-   for (i = 1; i <= m+1; i++) {
+   for (i = 1; i <= m_orig+1; i++) {
       delete [] aux[i];
    }
 
@@ -1968,11 +1937,6 @@ long G_BKZ_QP1(mat_ZZ& BB, mat_ZZ& UU, double delta,
 {
    verbose = verb;
    NumSwaps = 0;
-   if (verbose) {
-      StartTime = GetTime();
-      LastTime = StartTime;
-   }
-
 
    if (delta < 0.50 || delta >= 1) Error("G_BKZ_QP: bad delta");
    if (beta < 2) Error("G_BKZ_QP: bad block size");
@@ -1985,12 +1949,6 @@ long G_BKZ_QP1(mat_ZZ& BB, double delta,
 {
    verbose = verb;
    NumSwaps = 0;
-   if (verbose) {
-      StartTime = GetTime();
-      LastTime = StartTime;
-   }
-
-
 
    if (delta < 0.50 || delta >= 1) Error("G_BKZ_QP: bad delta");
    if (beta < 2) Error("G_BKZ_QP: bad block size");

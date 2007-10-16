@@ -19,6 +19,27 @@ A Tour of NTL: Summary of Changes
 
 <p> <hr> <p>
 <h3>
+2007.05.09: Changes between NTL 5.4 and 5.4.1
+</h3>
+
+<ul>
+<li>
+Fixed rounding bug in <tt>expm1</tt> (reported by Paul Zimmerman).
+
+<li>
+Fixed memory leak in several LLL routines (reported by Friedrich Bahr).
+
+<li>
+Fixed infinite loop in several LLL routines
+(this only occurred on machines, like x86, with double rounding).
+
+<li>
+Improved <tt>GF2X</tt> timing tests (suggested by Paul Zimmerman).
+
+</ul>
+
+<p> <hr> <p>
+<h3>
 2005.03.24: Changes between NTL 5.3.2 and 5.4  
 </h3>
 
