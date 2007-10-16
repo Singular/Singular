@@ -1389,14 +1389,17 @@ void log10(RR& res, const RR& x)
 
 void expm1(RR& res, const RR& x)
 {
+   long p = RR::precision();
+
    if (x < -0.5 || x > 0.5) {
       RR t;
+      RR::SetPrecision(p + 10);
       exp(t, x);
+      RR::SetPrecision(p);
       sub(res, t, 1);
       return;
    }
 
-   long p = RR::precision();
 
    RR::SetPrecision(p + NumBits(p) + 10);
 
