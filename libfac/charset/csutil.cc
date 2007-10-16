@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: csutil.cc,v 1.14 2007-05-15 14:46:48 Singular Exp $";
+static char * rcsid = "$Id: csutil.cc,v 1.15 2007-10-16 15:49:49 Singular Exp $";
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -23,13 +23,15 @@ lowerRank ( const CanonicalForm & f, const CanonicalForm & g, int & ind )
   int df, dg;
   Variable vf = f.mvar(), vg = g.mvar();
 
-  if ( f.inCoeffDomain() ) {
+  if ( f.inCoeffDomain() )
+  {
     if ( g.inCoeffDomain() ) ind= 1;
     return true;//( vg > vf );
   }
   else if ( g.inCoeffDomain() ) return false;
   else if ( vf < vg ) return true;
-  else if ( vf == vg ) {
+  else if ( vf == vg )
+  {
     df = degree( f ); dg = degree( g );
     if ( df < dg ) return true;
     else if ( df == dg ) return lowerRank( LC( f ), LC( g ) , ind);
@@ -46,11 +48,14 @@ lowestRank( const CFList & F )
   int ind=0;
   if ( ! i.hasItem() )        return f;
   f = i.getItem(); ++i;
-  while ( i.hasItem() ) {
+  while ( i.hasItem() )
+  {
     //CERR << "comparing " << f << "  and " << i.getItem()
     // << " == " << lowerRank( i.getItem(), f, ind ) << "\n";
-    if ( lowerRank( i.getItem(), f, ind ) ) {
-      if ( ind ){
+    if ( lowerRank( i.getItem(), f, ind ) )
+    {
+      if ( ind )
+      {
         CFList Itemlist= get_Terms(i.getItem());
         CFList Flist= get_Terms(f);
 
@@ -60,7 +65,8 @@ lowestRank( const CFList & F )
         if ( Itemlist.length() < Flist.length()) f = i.getItem();
         ind=0;
       }
-      else{
+      else
+      {
         f = i.getItem();
       }
     }
@@ -104,20 +110,24 @@ lowestRank( const CFList & F )
 // }
 
 CanonicalForm
-Prem ( const CanonicalForm &f, const CanonicalForm &g ){
+Prem ( const CanonicalForm &f, const CanonicalForm &g )
+{
   CanonicalForm ff, gg, l, test, lu, lv, t, retvalue;
   int df, dg;
   bool reord;
   Variable vf, vg, v;
 
   if ( (vf = f.mvar()) < (vg = g.mvar()) ) return f;
-  else {
-    if ( vf == vg ) {
+  else
+  {
+    if ( vf == vg )
+    {
       ff = f; gg = g;
       reord = false;
       v = vg;
     }
-    else {
+    else
+    {
       v = Variable(level(f.mvar()) + 1);
       ff = swapvar(f,vg,v);
       gg = swapvar(g,vg,v);
@@ -127,7 +137,8 @@ Prem ( const CanonicalForm &f, const CanonicalForm &g ){
     df = degree( ff, v );
     if (dg <= df) {l=LC(gg); gg = gg -LC(gg)*power(v,dg);}
     else { l = 1; }
-    while ( ( dg <= df  ) && ( ff != ff.genZero()) ){
+    while ( ( dg <= df  ) && ( ff != ff.genZero()) )
+    {
       // CERR << "Start gcd..." << "\n";
       test = gcd(l,LC(ff));
       //CERR << "gcd(" << l << "," << LC(ff) << ")= " << test << "\n";
@@ -138,34 +149,41 @@ Prem ( const CanonicalForm &f, const CanonicalForm &g ){
       ff = lu*ff - t;
       df = degree( ff, v );
     }
-    if ( reord ) {
-     retvalue= swapvar( ff, vg, v );
+    if ( reord )
+    {
+      retvalue= swapvar( ff, vg, v );
     }
-    else {
-     retvalue= ff;
+    else
+    {
+      retvalue= ff;
     }
     return retvalue;
   }
 }
 
 static CanonicalForm
-Sprem ( const CanonicalForm &f, const CanonicalForm &g, CanonicalForm & m, CanonicalForm & q ){
+Sprem ( const CanonicalForm &f, const CanonicalForm &g, CanonicalForm & m, CanonicalForm & q )
+{
   CanonicalForm ff, gg, l, test, retvalue;
   int df, dg,n;
   bool reord;
   Variable vf, vg, v;
 
-  if ( (vf = f.mvar()) < (vg = g.mvar()) ) {
+  if ( (vf = f.mvar()) < (vg = g.mvar()) )
+  {
     m=CanonicalForm(0); q=CanonicalForm(0);
     return f;
   }
-  else {
-    if ( vf == vg ) {
+  else
+  {
+    if ( vf == vg )
+    {
       ff = f; gg = g;
       reord = false;
       v = vg; // == x
     }
-    else {
+    else
+    {
       v = Variable(level(f.mvar()) + 1);
       ff = swapvar(f,vg,v); // == r
       gg = swapvar(g,vg,v); // == v
@@ -176,7 +194,8 @@ Sprem ( const CanonicalForm &f, const CanonicalForm &g, CanonicalForm & m, Canon
     if (dg <= df) {l=LC(gg); gg = gg -LC(gg)*power(v,dg);}
     else { l = 1; }
     n= 0;
-    while ( ( dg <= df  ) && ( ff != ff.genZero()) ){
+    while ( ( dg <= df  ) && ( ff != ff.genZero()) )
+    {
       test= power(v,df-dg) * gg * LC(ff);
       if ( df == 0 ){ff= ff.genZero();}
       else {ff= ff - LC(ff)*power(v,df);}
@@ -184,18 +203,19 @@ Sprem ( const CanonicalForm &f, const CanonicalForm &g, CanonicalForm & m, Canon
       df= degree(ff,v);
       n++;
     }
-    if ( reord ) {
-     retvalue= swapvar( ff, vg, v );
+    if ( reord )
+    {
+      retvalue= swapvar( ff, vg, v );
     }
-    else {
-     retvalue= ff;
+    else
+    {
+      retvalue= ff;
     }
     m= power(l,n);
     if ( fdivides(g,m*f-retvalue) )
       q= (m*f-retvalue)/g;
-    else {
+    else
       q= CanonicalForm(0);
-    }
     return retvalue;
   }
 }
@@ -209,11 +229,11 @@ divide( const CanonicalForm & ff, const CanonicalForm & f, const CFList & as)
   //out_cf("divide g=",f,"\n");
   if (f.inCoeffDomain())
   {
-    bool b=false;	  
-    if (!isOn(SW_RATIONAL)) { b=true;On(SW_RATIONAL); }
+    bool b=!isOn(SW_RATIONAL);
+    On(SW_RATIONAL);
     q=ff/f;
     if (b) Off(SW_RATIONAL);
-  }  
+  }
   else
     r= Sprem(ff,f,m,q); //result in q, ignore r,m
   //CERR << "r= " << r << "  , m= " << m << "  , q= " << q << "\n";
@@ -223,8 +243,10 @@ divide( const CanonicalForm & ff, const CanonicalForm & f, const CFList & as)
   return r;
 }
 
+// This function allows as to be empty; in that case, it is equivalent
+// to the previous version (treating no variables as algebraic).
 static CanonicalForm
-myfitting( const CanonicalForm &f )
+myfitting( const CanonicalForm &f, const CFList &as )
 {
  CanonicalForm rem=f;
 
@@ -240,6 +262,34 @@ myfitting( const CanonicalForm &f )
 //      CERR << "lc(temp)= " << lc(temp) << "\n";
 //      CERR << "temp/lc(temp)= " << temp/lc(temp) << "\n";
 //      CERR << "num(rem/lc(rem))= " << num(rem/lc(rem)) << "\n";
+
+     // If as is of length 1, and its polynomial is level 1, then
+     // we treat the first variable as algebraic and invert the leading
+     // coefficient where this variable is part of the coefficient domain.
+
+     if (as.length() == 1 && level(as.getFirst()) == 1)
+     {
+       CanonicalForm lcoeff = temp;
+       while (level(lcoeff) > 1)
+       {
+         lcoeff = LC(lcoeff);
+       }
+       // out_cf("myfitting: lcoeff = ", lcoeff, "\n");
+
+       CanonicalForm p = as.getFirst();
+       // out_cf("myfitting: p = ", p, "\n");
+
+       CanonicalForm unused, inverse;
+
+       extgcd(lcoeff, p, inverse, unused);
+       // out_cf("myfitting: inverse = ", inverse, "\n");
+
+       // This may leave temp with non-integral coefficients,
+       // which will be cleaned up below.
+       temp = temp * inverse;
+       // out_cf("myfitting: temp = ", temp, "\n");
+     }
+
      temp= bCommonDen(temp/lc(temp))*(temp/lc(temp));
      Off(SW_RATIONAL);
      rem= mapinto(temp);
@@ -251,19 +301,36 @@ myfitting( const CanonicalForm &f )
 }
 
 CanonicalForm
-Prem( const CanonicalForm &f, const CFList &L ){
+Prem( const CanonicalForm &f, const CFList &L )
+{
   CanonicalForm rem = f;
   CFListIterator i = L;
-  for ( i.lastItem(); i.hasItem(); i-- ){
-//CERR << "   PREM: Prem(" << rem << "," ;
+  for ( i.lastItem(); i.hasItem(); i-- )
+  {
+    //CERR << "   PREM: Prem(" << rem << "," ;
     rem = Prem( rem, i.getItem() );
-//CERR << "   PREM: Prem(" << rem << "," << i.getItem() << ")  = " << rem << "\n";
+    //CERR << "   PREM: Prem(" << rem << "," << i.getItem() << ")  = " << rem << "\n";
   }
-  return myfitting(rem);
+  return myfitting(rem, CFList());
+}
+
+CanonicalForm
+Prem( const CanonicalForm &f, const CFList &L, const CFList &as )
+{
+  CanonicalForm rem = f;
+  CFListIterator i = L;
+  for ( i.lastItem(); i.hasItem(); i-- )
+  {
+    //CERR << "   PREM: Prem(" << rem << "," ;
+    rem = Prem( rem, i.getItem() );
+    //CERR << "   PREM: Prem(" << rem << "," << i.getItem() << ")  = " << rem << "\n";
+  }
+  return myfitting(rem, as);
 }
 
 CFList
-Prem( const CFList &AS, const CFList &L ){
+Prem( const CFList &AS, const CFList &L )
+{
   CFList Output;
 
   for ( CFListIterator i=AS; i.hasItem(); i++ )
@@ -321,7 +388,7 @@ nopower( const CanonicalForm & init )
   int count=0;
 
   for ( CFIterator j=init; j.hasTerms(); j++ )
-    if (!(j.coeff().isOne()) ) count += 1;
+    if (!(j.coeff().isOne()) ) count++;
   //  if ( init != 1 ){
   //  CERR << "nopower: f is " << init << "\n";
   //  CERR << "nopower: count is " << count << "\n";}
@@ -367,7 +434,8 @@ removecontent ( const CFList & PS, PremForm & Remembern )
 // remove possible factors in Remember.FS1 from poly r
 // Remember.FS2 contains all factors removed before
 void
-removefactor( CanonicalForm & r , PremForm & Remembern){
+removefactor( CanonicalForm & r , PremForm & Remembern)
+{
   int test;
   CanonicalForm a,b,testelem;
   CFList testlist;
@@ -437,7 +505,7 @@ factorps( const CFList &ps )
     {
       elem = j.getItem().factor();
       if ( getNumVars(elem) > 0 )
-        qs= Union(qs, CFList(myfitting(elem)));
+        qs= Union(qs, CFList(myfitting(elem, CFList())));
     }
   }
   return qs;
@@ -454,7 +522,7 @@ inital( const CanonicalForm &f )
   {
     leadcoeff = LC(f,lvar(f));
     //    if ( leadcoeff != 0 )
-    return myfitting(leadcoeff); //num(leadcoeff/lc(leadcoeff));
+    return myfitting(leadcoeff, CFList()); //num(leadcoeff/lc(leadcoeff));
     //    else return leadcoeff;
   }
 }
@@ -480,15 +548,18 @@ inital( const CanonicalForm &f )
 // the set of nonconstant initials of Cset
 // with certain repeated factors cancelled
 CFList
-initalset1(const CFList & Cset){
+initalset1(const CFList & Cset)
+{
   CFList temp;
   CFList initals;
   CanonicalForm init;
 
-  for ( CFListIterator i = Cset ; i.hasItem(); i++ ){
+  for ( CFListIterator i = Cset ; i.hasItem(); i++ )
+  {
     initals= nopower( inital(i.getItem()) );
     //    init= inital(i.getItem());
-    for ( CFListIterator j = initals; j.hasItem(); j++){
+    for ( CFListIterator j = initals; j.hasItem(); j++)
+    {
       init = j.getItem();
       if ( cls(init) > 0 )
         temp= Union(temp, CFList(init));
@@ -501,18 +572,22 @@ initalset1(const CFList & Cset){
 // not having their cls higher than reducible
 // with certain repeated factors cancelled
 CFList
-initalset2(const CFList & Cset, const CanonicalForm & reducible){
+initalset2(const CFList & Cset, const CanonicalForm & reducible)
+{
   CFList temp;
   CFList initals;
   CanonicalForm init;
   int clsred = cls(reducible);
 
-  for ( CFListIterator i = Cset ; i.hasItem(); i++ ){
+  for ( CFListIterator i = Cset ; i.hasItem(); i++ )
+  {
     init = i.getItem();
-    if ( cls(init) < clsred ){
+    if ( cls(init) < clsred )
+    {
       initals= nopower( inital(init) );
       //    init= inital(i.getItem());
-      for ( CFListIterator j = initals; j.hasItem(); j++){
+      for ( CFListIterator j = initals; j.hasItem(); j++)
+      {
         init = j.getItem();
         if ( cls(init) > 0 )
           temp= Union(temp, CFList(init));
@@ -549,14 +624,17 @@ initalset2(const CFList & Cset, const CanonicalForm & reducible){
 #include "debug.h"
 // examine the irreducibility of as for IrrCharSeries
 int
-irreducible( const CFList & AS){
+irreducible( const CFList & AS)
+{
 // AS is given by AS = { A1, A2, .. Ar }, d_i = degree(Ai)
 
   DEBOUTMSG(CERR, rcsid);
 // 1) we test: if d_i > 1, d_j =1 for all j<>i, then AS is irreducible.
-  bool deg1=1;
-  for ( CFListIterator i = AS ; i.hasItem(); i++ ){
-    if ( degree(i.getItem()) > 1 ){
+  bool deg1=true;
+  for ( CFListIterator i = AS ; i.hasItem(); i++ )
+  {
+    if ( degree(i.getItem()) > 1 )
+    {
       if ( deg1 ) deg1=0;
       else return 0; // found 2nd poly with deg > 1
     }
@@ -567,16 +645,18 @@ irreducible( const CFList & AS){
 
 // select an item from PS for irras
 CFList
-select( const ListCFList & PS){
-
+select( const ListCFList & PS)
+{
   return PS.getFirst();
 }
 
 // divide list ppi in elems having length <= and > length
 void
-select( const ListCFList & ppi, int length, ListCFList & ppi1, ListCFList & ppi2){
+select( const ListCFList & ppi, int length, ListCFList & ppi1, ListCFList & ppi2)
+{
   CFList elem;
-  for ( ListCFListIterator i=ppi ; i.hasItem(); i++ ){
+  for ( ListCFListIterator i=ppi ; i.hasItem(); i++ )
+  {
     elem = i.getItem();
     if ( ! elem.isEmpty() )
       if ( length <= elem.length() ){ ppi2.append(elem); }
@@ -590,8 +670,8 @@ select( const ListCFList & ppi, int length, ListCFList & ppi1, ListCFList & ppi2
 
 // is f in F ?
 static bool
-member( const CanonicalForm &f, const CFList &F){
-
+member( const CanonicalForm &f, const CFList &F)
+{
   for ( CFListIterator i=F; i.hasItem(); i++ )
     if ( i.getItem() == f ) return 1;
   return 0;
@@ -599,7 +679,8 @@ member( const CanonicalForm &f, const CFList &F){
 
 // are list A and B the same?
 bool
-same( const CFList &A, const CFList &B ){
+same( const CFList &A, const CFList &B )
+{
   CFListIterator i;
 
   for (i = A; i.hasItem(); i++)
@@ -612,11 +693,13 @@ same( const CFList &A, const CFList &B ){
 
 // is List cs contained in List of lists pi?
 bool
-member( const CFList & cs, const ListCFList & pi ){
+member( const CFList & cs, const ListCFList & pi )
+{
   ListCFListIterator i;
   CFList elem;
 
-  for ( i=pi; i.hasItem(); i++){
+  for ( i=pi; i.hasItem(); i++)
+  {
     elem = i.getItem();
     if ( same(cs,elem) ) return 1;
   }
@@ -625,11 +708,12 @@ member( const CFList & cs, const ListCFList & pi ){
 
 // is PS a subset of Cset ?
 bool
-subset( const CFList &PS, const CFList &Cset ){
-
+subset( const CFList &PS, const CFList &Cset )
+{
   //  CERR << "subset: called with: " << PS << "   " << Cset << "\n";
   for ( CFListIterator i=PS; i.hasItem(); i++ )
-    if ( ! member(i.getItem(), Cset) ) {
+    if ( ! member(i.getItem(), Cset) )
+    {
       //      CERR << "subset: " << i.getItem() << "  is not a member of " << Cset << "\n";
       return 0;
     }
@@ -638,23 +722,26 @@ subset( const CFList &PS, const CFList &Cset ){
 
 // Union of two List of Lists
 ListCFList
-MyUnion( const ListCFList & a, const ListCFList &b ){
+MyUnion( const ListCFList & a, const ListCFList &b )
+{
   ListCFList output;
   ListCFListIterator i;
   CFList elem;
 
-  for ( i = a ; i.hasItem(); i++ ){
+  for ( i = a ; i.hasItem(); i++ )
+  {
     elem=i.getItem();
-    // if ( ! member(elem,output) ){
-    if ( (! elem.isEmpty()) && ( ! member(elem,output)) ){
+    if ( (! elem.isEmpty()) && ( ! member(elem,output)) )
+    {
       output.append(elem);
     }
   }
 
-  for ( i = b ; i.hasItem(); i++ ){
+  for ( i = b ; i.hasItem(); i++ )
+  {
     elem=i.getItem();
-    // if ( ! member(elem,output) ){
-    if ( (! elem.isEmpty()) && ( ! member(elem,output)) ){
+    if ( (! elem.isEmpty()) && ( ! member(elem,output)) )
+    {
       output.append(elem);
     }
   }
@@ -663,14 +750,17 @@ MyUnion( const ListCFList & a, const ListCFList &b ){
 
 //if list b is member of the list of lists remove b and return the rest
 ListCFList
-MyDifference( const ListCFList & a, const CFList &b){
+MyDifference( const ListCFList & a, const CFList &b)
+{
   ListCFList output;
   ListCFListIterator i;
   CFList elem;
 
-  for ( i = a ; i.hasItem(); i++ ){
+  for ( i = a ; i.hasItem(); i++ )
+  {
     elem=i.getItem();
-    if ( (! elem.isEmpty()) && ( ! same(elem,b)) ){
+    if ( (! elem.isEmpty()) && ( ! same(elem,b)) )
+    {
       output.append(elem);
     }
   }
@@ -679,7 +769,8 @@ return output;
 
 // remove all elements of b from list of lists a and return the rest
 ListCFList
-Minus( const ListCFList & a, const ListCFList & b){
+Minus( const ListCFList & a, const ListCFList & b)
+{
   ListCFList output=a;
 
   for ( ListCFListIterator i=b; i.hasItem(); i++ )
@@ -799,7 +890,7 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
   //f/=c_gcd;
   //g/=c_gcd;
   if (!c_gcd.isOne())
-  {	  
+  {
     f=divide(f,c_gcd,as);
     g=divide(g,c_gcd,as);
   }
@@ -824,26 +915,26 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
           f_gcd=alg_gcd(i.coeff(),f_gcd,as);
           if (f_gcd.inBaseDomain()) break;
           i++;
-        }  
-	//out_cf("g=0 -> f:",f,"\n");
-	//out_cf("f_gcd:",f_gcd,"\n");
-	//out_cf("c_gcd:",c_gcd,"\n");
-        //f/=f_gcd;  
-	f=divide(f,f_gcd,as);
-	//out_cf("f/f_gcd:",f,"\n");
-	f*=c_gcd;
-	//out_cf("f*c_gcd:",f,"\n");
+        }
+        //out_cf("g=0 -> f:",f,"\n");
+        //out_cf("f_gcd:",f_gcd,"\n");
+        //out_cf("c_gcd:",c_gcd,"\n");
+        //f/=f_gcd;
+        f=divide(f,f_gcd,as);
+        //out_cf("f/f_gcd:",f,"\n");
+        f*=c_gcd;
+        //out_cf("f*c_gcd:",f,"\n");
         CanonicalForm r_lc=alg_lc(f);
-	//out_cf("r_lc:",r_lc,"\n");
-	//f/=r_lc;
-	f=divide(f,r_lc,as);
-	//out_cf(" -> gcd:",f,"\n");
+        //out_cf("r_lc:",r_lc,"\n");
+        //f/=r_lc;
+        f=divide(f,r_lc,as);
+        //out_cf(" -> gcd:",f,"\n");
         return f;
       }
-      else { //printf("c\n"); 
-	return c_gcd;}
-    }  
-    else if (g.level()==f.level()) r=Prem(f,gg);
+      else { //printf("c\n");
+        return c_gcd;}
+    }
+    else if (g.level()==f.level()) r=Prem(f,gg,as);
     else
     {
       //printf("diff. level: %d, %d\n", f.level(), g.level());
@@ -896,6 +987,9 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.14  2007/05/15 14:46:48  Singular
+*hannes: factorize in Zp(a)[x...]
+
 Revision 1.13  2006/06/19 13:37:47  Singular
 *hannes: more CS renamed
 
