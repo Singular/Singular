@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.211 2007-07-25 07:53:52 Singular Exp $
+@comment $Id: general.doc,v 1.212 2007-10-16 11:27:14 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -172,7 +172,7 @@ A complete, customizable list can be found in the file @code{LIB/help.cnf}.
 @end multitable
 
 External browsers depend on your system and the contents os @code{LIB/help.cnf},
-the default includes: 
+the default includes:
 @code{htmlview} (displays HTML help pages via @code{htlmview}),@*
 @code{mac} (displays HTML help pages via @code{open}),@*
 @code{mac-net} (displays HTML help pages via @code{open}),@*
@@ -208,7 +208,7 @@ returns the currently used browser.
 
 If no browser is explicitely set by the user, then the first (w.r.t. the
 order of the browsers in the file @code{LIB/help.cnf}) available browser is
-chosen. 
+chosen.
 
 The @code{.singularrc} (@pxref{Startup sequence}) file is a good place
 to set your default browser. Recall that if a file
@@ -2096,18 +2096,19 @@ factorization in any characteristic, the problem is reduced to the
 univariate case first, then a multivariate Hensel-lifting is used to
 lift the univariate factorization.
 
-Note that there is no factorization of polynomials over algebraic
-extensions of Q.
+Factorization of polynomials over algebraic extensions is provided by
+factoring the norm for univariate polynomials f (the gcd of f and the
+factors of the norm is a factorization of f) resp. by the extended Zassenhaus
+algorithm for multivariate polynomials.
+
 @item gcd
 @ref{gcd}@*
 computes greatest common divisors of univariate and multivariate polynomials.
 
-For prime characteristic, a subresultant gcd is used.  In characteristic 0, a
-modular algorithm is used for the univariate case.  For the multivariate case,
-the EZGCD is used.
+In the univariate case NTL is used.
+For prime characteristic, a subresultant gcd is used.  In characteristic 0,
+the EZGCD is used, except for a special case where a modular algorithm is used.
 
-Note that there is no gcd calculation for polynomials over algebraic
-extensions of Q.
 @item resultant
 @ref{resultant}@*
 computes the resultant of two univariate polynomials using the subresultant
