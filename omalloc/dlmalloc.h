@@ -3,7 +3,7 @@
  *  Purpose: declarations for dlmalloc
  *  This was obtained by taking cutting out the beginning of malloc.c
  *
- *  Version: $Id: dlmalloc.h,v 1.11 2007-10-16 08:45:35 Singular Exp $
+ *  Version: $Id: dlmalloc.h,v 1.12 2007-10-16 08:56:57 Singular Exp $
  *******************************************************************/
 #ifndef DL_MALLOC_H
 #define DL_MALLOC_H
@@ -406,9 +406,11 @@ extern "C" {
 #if __STD_C
 void* memset(void*, int, size_t);
 void* memcpy(void*, const void*, size_t);
+void *memmove(void*, const void *, size_t);
 #else
 Void_t* memset();
 Void_t* memcpy();
+Void_t* memmove();
 #endif
 #endif
 
