@@ -3,7 +3,7 @@
  *  Purpose: implementation of Doug Lea's malloc
  *  This was obtained by taking cutting out the end of malloc.c
  *
- *  Version: $Id: dlmalloc.c,v 1.4 2001-04-30 09:01:57 Singular Exp $
+ *  Version: $Id: dlmalloc.c,v 1.5 2007-10-16 08:45:35 Singular Exp $
  *******************************************************************/
 #ifdef HAVE_CONFIG_H
 #include "omMalloc.h"
@@ -1658,7 +1658,7 @@ Void_t* rEALLOc(oldmem, bytes) Void_t* oldmem; size_t bytes;
             newp = prev;
             newsize += prevsize + nextsize;
             newmem = chunk2mem(newp);
-            MALLOC_COPY(newmem, oldmem, oldsize - SIZE_SZ);
+            MALLOC_MOVE(newmem, oldmem, oldsize - SIZE_SZ);
             top = chunk_at_offset(newp, nb);
             set_head(top, (newsize - nb) | PREV_INUSE);
             set_head_size(newp, nb);
@@ -1674,7 +1674,7 @@ Void_t* rEALLOc(oldmem, bytes) Void_t* oldmem; size_t bytes;
           newp = prev;
           newsize += nextsize + prevsize;
           newmem = chunk2mem(newp);
-          MALLOC_COPY(newmem, oldmem, oldsize - SIZE_SZ);
+          MALLOC_MOVE(newmem, oldmem, oldsize - SIZE_SZ);
           goto split;
         }
       }
@@ -1686,7 +1686,7 @@ Void_t* rEALLOc(oldmem, bytes) Void_t* oldmem; size_t bytes;
         newp = prev;
         newsize += prevsize;
         newmem = chunk2mem(newp);
-        MALLOC_COPY(newmem, oldmem, oldsize - SIZE_SZ);
+        MALLOC_MOVE(newmem, oldmem, oldsize - SIZE_SZ);
         goto split;
       }
     }

@@ -3,7 +3,7 @@
  *  Purpose: declarations for dlmalloc
  *  This was obtained by taking cutting out the beginning of malloc.c
  *
- *  Version: $Id: dlmalloc.h,v 1.10 2005-11-08 13:53:37 bricken Exp $
+ *  Version: $Id: dlmalloc.h,v 1.11 2007-10-16 08:45:35 Singular Exp $
  *******************************************************************/
 #ifndef DL_MALLOC_H
 #define DL_MALLOC_H
@@ -453,6 +453,24 @@ do {                                                                          \
   } else memcpy(dest, src, mcsz);                                             \
 } while(0)
 
+#define MALLOC_MOVE(dest,src,nbytes)                                          \
+do {                                                                          \
+  INTERNAL_SIZE_T mcsz = (nbytes);                                            \
+  if(mcsz <= 9*sizeof(mcsz)) {                                                \
+    INTERNAL_SIZE_T* mcsrc = (INTERNAL_SIZE_T*) (src);                        \
+    INTERNAL_SIZE_T* mcdst = (INTERNAL_SIZE_T*) (dest);                       \
+    if(mcsz >= 5*sizeof(mcsz)) {     *mcdst++ = *mcsrc++;                     \
+                                     *mcdst++ = *mcsrc++;                     \
+      if(mcsz >= 7*sizeof(mcsz)) {   *mcdst++ = *mcsrc++;                     \
+                                     *mcdst++ = *mcsrc++;                     \
+        if(mcsz >= 9*sizeof(mcsz)) { *mcdst++ = *mcsrc++;                     \
+                                     *mcdst++ = *mcsrc++; }}}                 \
+                                     *mcdst++ = *mcsrc++;                     \
+                                     *mcdst++ = *mcsrc++;                     \
+                                     *mcdst   = *mcsrc  ;                     \
+  } else memmove(dest, src, mcsz);                                            \
+} while(0)
+
 #else /* !USE_MEMCPY */
 
 /* Use Duff's device for good zeroing/copying performance. */
@@ -491,6 +509,8 @@ do {                                                                          \
     case 1:           *mcdst++ = *mcsrc++; if(mcn <= 0) break; mcn--; }       \
   }                                                                           \
 } while(0)
+
+#define MALLOC_MOVE(dest,src,nbytes) MALLOC_COPY(dest,src,nbytes)
 
 #endif
 
@@ -847,9 +867,9 @@ Void_t *(*__morecore)() = __default_morecore_init;
 #else /* INTERNAL_LINUX_C_LIB */
 
 #if __STD_C
-  #ifndef __MACH__ 
+  #ifndef __MACH__
     extern Void_t*     sbrk(ptrdiff_t);
-  #else 
+  #else
     extern void    *sbrk(int);
   #endif
 #else
