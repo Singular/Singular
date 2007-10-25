@@ -1,6 +1,6 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
-// static char * rcsid = "$Id: homogfactor.cc,v 1.7 2006-05-16 14:46:50 Singular Exp $ ";
+// static char * rcsid = "$Id: homogfactor.cc,v 1.8 2007-10-25 14:45:41 Singular Exp $ ";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -23,6 +23,10 @@
 #include "Factor.h"
 // some CC's need it:
 #include "homogfactor.h"
+
+void out_cf(char *s1,const CanonicalForm &f,char *s2);
+
+CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly );
 
 #ifdef HFACTORDEBUG
 #  define DEBUGOUTPUT
@@ -133,12 +137,12 @@ homogenize( const CanonicalForm & f, const Variable & x){
 
 // we assume g is square-free
 CFFList
-HomogFactor( const CanonicalForm & g, const CanonicalForm  & minpoly, const int Mainvar ){
+HomogFactor( const CanonicalForm & g, const CanonicalForm  & minpoly, const int Mainvar )
+{
   DEBINCLEVEL(CERR, "HomogFactor");
   Variable xn = get_max_degree_Variable(g);
   int d_xn = degree(g,xn);
-  CFMap n;
-  CanonicalForm F = compress(g(1,xn),n); // must compress F! 
+  CanonicalForm F = g(1,xn);
 
   DEBOUTLN(CERR, "xn= ", xn);
   DEBOUTLN(CERR, "d_xn=   ", d_xn);
@@ -147,24 +151,44 @@ HomogFactor( const CanonicalForm & g, const CanonicalForm  & minpoly, const int 
   // should we do this for low degree polys g ? e.g. quadratic?
   // 
   CFFList Intermediatelist;
-  if ( getCharacteristic() > 0 )
-     Intermediatelist = Factorized(F, minpoly, Mainvar);
-  else
-     Intermediatelist = factorize(F); // what support for char==0 ?
   CFFList Homoglist;
   CFFListIterator j;
-  for ( j=Intermediatelist; j.hasItem(); j++ )
-    Homoglist.append(CFFactor( n(j.getItem().factor()), j.getItem().exp()) );
+  if ( getCharacteristic() > 0 )
+  {
+     CFMap n;
+     Intermediatelist = Factorized(compress(F,n), minpoly, Mainvar);
+     for ( j=Intermediatelist; j.hasItem(); j++ )
+       Homoglist.append(CFFactor( n(j.getItem().factor()), j.getItem().exp()) );
+  }
+  else
+     Homoglist = Factorize2(F, minpoly);
   // Now we have uncompressed factors in Homoglist
   DEBOUTLN(CERR, "F factors as: ", Homoglist);
   CFFList Unhomoglist;
   CanonicalForm unhomogelem;
-  for ( j=Homoglist; j.hasItem(); j++ ){
-    DEBOUTLN(CERR, "Homogenizing ",j.getItem().factor()); 
-    unhomogelem= homogenize(j.getItem().factor(),xn);
-    DEBOUTLN(CERR, "      that is ", unhomogelem);
-    Unhomoglist.append(CFFactor(unhomogelem,j.getItem().exp()));
-    d_xn -= degree(unhomogelem,xn)*j.getItem().exp();
+  if ((!minpoly.isZero()) &&(getCharacteristic() == 0) )
+  {
+    for ( j=Homoglist; j.hasItem(); j++ )
+    {
+      // assume that minpoly.level() < level of all "real" variables of g
+      DEBOUTLN(CERR, "Homogenizing ",j.getItem().factor()); 
+      unhomogelem= homogenize(j.getItem().factor(),xn,
+                         Variable(minpoly.level()+1),g.mvar());
+      DEBOUTLN(CERR, "      that is ", unhomogelem);
+      Unhomoglist.append(CFFactor(unhomogelem,j.getItem().exp()));
+      d_xn -= degree(unhomogelem,xn)*j.getItem().exp();
+    }
+  }
+  else
+  {
+    for ( j=Homoglist; j.hasItem(); j++ )
+    {
+      DEBOUTLN(CERR, "Homogenizing ",j.getItem().factor()); 
+      unhomogelem= homogenize(j.getItem().factor(),xn);
+      DEBOUTLN(CERR, "      that is ", unhomogelem);
+      Unhomoglist.append(CFFactor(unhomogelem,j.getItem().exp()));
+      d_xn -= degree(unhomogelem,xn)*j.getItem().exp();
+    }
   }
   DEBOUTLN(CERR, "Power of xn to append is ", d_xn);
   if ( d_xn != 0 ) // have to append xn^(d_xn)
@@ -176,6 +200,9 @@ HomogFactor( const CanonicalForm & g, const CanonicalForm  & minpoly, const int 
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.7  2006/05/16 14:46:50  Singular
+*hannes: gcc 4.1 fixes
+
 Revision 1.6  2005/12/09 08:36:11  Singular
 *hannes: stuff for homog. polys ->factory
 

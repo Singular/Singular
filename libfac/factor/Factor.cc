@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.36 2007-10-15 18:03:11 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.37 2007-10-25 14:45:41 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -28,6 +28,9 @@ static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) mi
 #include "Factor.h"
 
 #include "alg_factor.h"
+void out_cf(char *s1,const CanonicalForm &f,char *s2);
+void out_cff(CFFList &L);
+
 
 #ifdef SINGULAR
 #define HAVE_SINGULAR_ERROR
@@ -52,8 +55,6 @@ TIMING_DEFINE_PRINT(discr_time);
 TIMING_DEFINE_PRINT(evaluate_time);
 TIMING_DEFINE_PRINT(hensel_time);
 TIMING_DEFINE_PRINT(truefactor_time);
-
-void out_cf(char *s1,const CanonicalForm &f,char *s2);
 
 /*
 * a wrapper for factorize over algebraic extensions:
@@ -1122,6 +1123,8 @@ CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
 CFFList
 Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree )
 {
+  //out_cf("Factorize: F=",F,"\n");
+  //out_cf("           minpoly:",minpoly,"\n");
   CFFList Outputlist,SqrFreeList,Intermediatelist,Outputlist2;
   ListIterator<CFFactor> i,j;
   CanonicalForm g=1,unit=1,r=1;
@@ -1146,26 +1149,37 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
     #else
     if (minpoly!=0)
     {
-      CFList as(minpoly);
-      CFFList sqF=sqrFree(F); // sqrFreeZ
-      CFFList G,H;
-      CanonicalForm fac;
-      int d;
-      ListIterator<CFFactor> i,k;
-      for ( i = sqF; i.hasItem(); ++i )
+      if ( F.isHomogeneous() )
       {
-        d = i.getItem().exp();
-        fac = i.getItem().factor();
-        G = newfactoras( fac, as, 1);
-        for ( k = G; k.hasItem(); ++k )
-        {
-          fac = k.getItem().factor();
-          int dd = k.getItem().exp();
-          H.append( CFFactor( fac , d*dd ) );
-        }
+        DEBOUTLN(CERR, "Poly is homogeneous! : ", F);
+        // Now we can substitute one variable to 1, factorize and then
+        // look on the resulting factors and their monomials for
+        // backsubstitution of the substituted variable.
+        Outputlist=HomogFactor(F, minpoly, 0);
       }
-      //Outputlist = newfactoras( F, as, 1);
-      Outputlist = H;
+      else
+      {
+        CFList as(minpoly);
+        CFFList sqF=sqrFree(F); // sqrFreeZ
+        CFFList G,H;
+        CanonicalForm fac;
+        int d;
+        ListIterator<CFFactor> i,k;
+        for ( i = sqF; i.hasItem(); ++i )
+        {
+          d = i.getItem().exp();
+          fac = i.getItem().factor();
+          G = newfactoras( fac, as, 1);
+          for ( k = G; k.hasItem(); ++k )
+          {
+            fac = k.getItem().factor();
+            int dd = k.getItem().exp();
+            H.append( CFFactor( fac , d*dd ) );
+          }
+        }
+        //Outputlist = newfactoras( F, as, 1);
+        Outputlist = H;
+      }
     }
     else
       Outputlist=factorize(F);
@@ -1177,6 +1191,7 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
     TIMING_END(factorize_time);
     DEBDECLEVEL(CERR, "Factorize");
     TIMING_PRINT(factorize_time, "\ntime used for factorization   : ");
+    //out_cff(Outputlist);
     return Outputlist;
   }
   TIMING_START(factorize_time);
@@ -1296,11 +1311,15 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
   if(isOn(SW_USE_NTL_SORT)) Outputlist2.sort(cmpCF);
 
+  //out_cff(Outputlist2);
   return Outputlist2;
 }
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.36  2007/10/15 18:03:11  Singular
+*hannes: // debug stuff
+
 Revision 1.35  2007/06/14 14:16:35  Singular
 *hannes: Factorize2 etc.
 

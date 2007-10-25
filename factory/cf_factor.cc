@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.34 2007-09-26 09:17:39 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.35 2007-10-25 14:45:41 Singular Exp $ */
 
 //{{{ docu
 //
@@ -270,9 +270,50 @@ homogenize( const CanonicalForm & f, const Variable & x)
   CFListIterator i;
   CanonicalForm elem, result(0);
 
-  for (i=Termlist; i.hasItem(); i++){
+  for (i=Termlist; i.hasItem(); i++)
+  {
     elem= i.getItem();
     deg = totaldegree(elem);
+    if ( deg < maxdeg )
+      Newlist.append(elem * power(x,maxdeg-deg));
+    else
+      Newlist.append(elem);
+  }
+  for (i=Newlist; i.hasItem(); i++) // rebuild
+    result += i.getItem();
+
+  return result;
+#endif
+}
+
+CanonicalForm
+homogenize( const CanonicalForm & f, const Variable & x, const Variable & v1, const Variable & v2)
+{
+#if 0
+  int maxdeg=totaldegree(f), deg;
+  CFIterator i;
+  CanonicalForm elem, result(0);
+  
+  for (i=f; i.hasTerms(); i++)
+  {
+    elem= i.coeff()*power(f.mvar(),i.exp());
+    deg = totaldegree(elem);
+    if ( deg < maxdeg )
+      result += elem * power(x,maxdeg-deg);
+    else 
+      result+=elem;
+  }
+  return result;
+#else
+  CFList Newlist, Termlist= get_Terms(f);
+  int maxdeg=totaldegree(f), deg;
+  CFListIterator i;
+  CanonicalForm elem, result(0);
+
+  for (i=Termlist; i.hasItem(); i++)
+  {
+    elem= i.getItem();
+    deg = totaldegree(elem,v1,v2);
     if ( deg < maxdeg )
       Newlist.append(elem * power(x,maxdeg-deg));
     else
