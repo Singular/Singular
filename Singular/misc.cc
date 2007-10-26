@@ -483,8 +483,8 @@ char * showOption()
 char * versionString()
 {
   char* str = StringSetS("");
-  StringAppend("Singular for %s version %s  (%lu)  %s\nwith\n",
-               S_UNAME, S_VERSION1,
+  StringAppend("Singular for %s version %s (%d-%lu)  %s\nwith\n",
+               S_UNAME, S_VERSION1, SINGULAR_VERSION,
                feVersionId,singular_date);
   StringAppend("\t");
 #ifdef HAVE_FACTORY
