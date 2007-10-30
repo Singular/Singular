@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.48 2007-07-25 10:53:14 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.49 2007-10-30 15:22:44 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -2456,8 +2456,8 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
   /* analyze inputs, check them for consistency */
   /* detects nc_type, DO NOT initialize multiplication but call for it at the end*/
   /* checks the ordering condition and evtl. NDC */
-// NOTE: all the data from the currRing, we change r, which is has the
-// same representation!
+// NOTE: all the data are READ_ONLY from the currRing, we change r,
+// which is a DIFFERENT ring, but has the same representation!
 {
 
 #ifndef NDEBUG
@@ -2491,14 +2491,10 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
     }
   }
   ring save = currRing;
-  bool WeChangeRing = false;
 
-  if (currRing!=r)
-  {
-    assume( rSamePolyRep(r, currRing) );
-    rChangeCurrRing(r);
-    WeChangeRing = true;
-  }
+  asume(currRing!=r);
+  assume( rSamePolyRep(r, currRing) );
+  rChangeCurrRing(r);
 
   r->nc = (nc_struct *)omAlloc0(sizeof(nc_struct));
   r->nc->ref = 1;
@@ -2530,8 +2526,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
     {
       Werror("Square %d x %d  matrix expected",r->N,r->N);
       ncCleanUp(r);
-      if (WeChangeRing)
-        rChangeCurrRing(save);
+      rChangeCurrRing(save);
       return TRUE;
     }
   }
@@ -2551,8 +2546,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
     {
       Werror("Square %d x %d  matrix expected",r->N,r->N);
       ncCleanUp(r);
-      if (WeChangeRing)
-        rChangeCurrRing(save);
+      rChangeCurrRing(save);
       return TRUE;
     }
   }
@@ -2570,8 +2564,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
     {
       Werror("Incorrect input : zero coefficients are not allowed");
       ncCleanUp(r);
-      if (WeChangeRing)
-        rChangeCurrRing(save);
+      rChangeCurrRing(save);
       return TRUE;
     }
     if (n_IsOne(nN, save))
@@ -2615,8 +2608,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
         {
           Werror("Incorrect input : matrix of coefficients contains zeros in the upper triangle");
           ncCleanUp(r);
-          if (WeChangeRing)
-            rChangeCurrRing(save);
+          rChangeCurrRing(save);
           return TRUE;
         }
         if (!n_Equal(pN,qN, r)) tmpIsSkewConstant = 0;
@@ -2670,16 +2662,14 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
   if ( nc_CheckOrdCondition(D, r) )
   {
     ncCleanUp(r);
-    if (WeChangeRing)
-      rChangeCurrRing(save);
+    rChangeCurrRing(save);
     Werror("Matrix of polynomials violates the ordering condition");
     return TRUE;
   }
   r->nc->C = C; // if C and D were given by matrices at the beginning they are in r
   r->nc->D = D; // otherwise they should be in r->nc->basering(polynomial * Id_{N})
 
-  if (WeChangeRing)
-    rChangeCurrRing(save);
+  rChangeCurrRing(save);
 
   return nc_InitMultiplication(r);
 }

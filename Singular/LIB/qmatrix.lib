@@ -1,4 +1,4 @@
-version="$Id: qmatrix.lib,v 1.13 2006-07-18 15:48:29 Singular Exp $";
+version="$Id: qmatrix.lib,v 1.14 2007-10-30 15:22:44 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: qmatrix.lib     Quantum matrices, quantum minors and symmetric groups
@@ -193,8 +193,8 @@ EXAMPLE: example quantMat; shows examples
         }
       }
     }
-    ncalgebra(C,D);
-    return (@rrr);
+    def @@rrr=ncalgebra(C,D);
+    return (@@rrr);
   }
   else
   {

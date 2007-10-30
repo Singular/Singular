@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.456 2007-09-13 10:34:00 Singular Exp $ */
+/* $Id: iparith.cc,v 1.457 2007-10-30 15:22:42 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2410,19 +2410,35 @@ static BOOLEAN jjPARSTR2(leftv res, leftv u, leftv v)
 #ifdef HAVE_PLURAL
 static BOOLEAN jjPlural_num_poly(leftv res, leftv a, leftv b)
 {
-  return nc_CallPlural(NULL,NULL,(poly)a->Data(),(poly)b->Data(),currRing);
+  ring r=rCopy(currRing);
+  BOOLEAN result=nc_CallPlural(NULL,NULL,(poly)a->Data(),(poly)b->Data(),r);
+  res->data=r;
+  if (r->qideal!=NULL) res->rtyp=QRING;
+  return result;
 }
 static BOOLEAN jjPlural_num_mat(leftv res, leftv a, leftv b)
 {
-  return nc_CallPlural(NULL,(matrix)b->Data(),(poly)a->Data(),NULL,currRing);
+  ring r=rCopy(currRing);
+  BOOLEAN result=nc_CallPlural(NULL,(matrix)b->Data(),(poly)a->Data(),NULL,r);
+  res->data=r;
+  if (r->qideal!=NULL) res->rtyp=QRING;
+  return result;
 }
 static BOOLEAN jjPlural_mat_poly(leftv res, leftv a, leftv b)
 {
-  return nc_CallPlural((matrix)a->Data(),NULL,NULL,(poly)b->Data(),currRing);
+  ring r=rCopy(currRing);
+  BOOLEAN result=nc_CallPlural((matrix)a->Data(),NULL,NULL,(poly)b->Data(),r);
+  res->data=r;
+  if (r->qideal!=NULL) res->rtyp=QRING;
+  return result;
 }
 static BOOLEAN jjPlural_mat_mat(leftv res, leftv a, leftv b)
 {
-  return nc_CallPlural((matrix)a->Data(),(matrix)b->Data(),NULL,NULL,currRing);
+  ring r=rCopy(currRing);
+  BOOLEAN result=nc_CallPlural((matrix)a->Data(),(matrix)b->Data(),NULL,NULL,r);
+  res->data=r;
+  if (r->qideal!=NULL) res->rtyp=QRING;
+  return result;
 }
 static BOOLEAN jjBRACKET(leftv res, leftv a, leftv b)
 {
@@ -3285,10 +3301,10 @@ struct sValCmd2 dArith2[]=
 ,{jjRES,       MRES_CMD,       RESOLUTION_CMD, MODUL_CMD,  INT_CMD ALLOW_PLURAL}
 //,{nuMPResMat,  MPRES_CMD,      MODUL_CMD,      IDEAL_CMD,  INT_CMD NO_PLURAL}
 #ifdef HAVE_PLURAL
-,{jjPlural_num_poly, NCALGEBRA_CMD,  NONE,  POLY_CMD,   POLY_CMD   NO_PLURAL}
-,{jjPlural_num_mat,  NCALGEBRA_CMD,  NONE,  POLY_CMD,   MATRIX_CMD NO_PLURAL}
-,{jjPlural_mat_poly, NCALGEBRA_CMD,  NONE,  MATRIX_CMD, POLY_CMD   NO_PLURAL}
-,{jjPlural_mat_mat,  NCALGEBRA_CMD,  NONE,  MATRIX_CMD, MATRIX_CMD NO_PLURAL}
+,{jjPlural_num_poly, NCALGEBRA_CMD,RING_CMD,  POLY_CMD,   POLY_CMD   NO_PLURAL}
+,{jjPlural_num_mat,  NCALGEBRA_CMD,RING_CMD,  POLY_CMD,   MATRIX_CMD NO_PLURAL}
+,{jjPlural_mat_poly, NCALGEBRA_CMD,RING_CMD,  MATRIX_CMD, POLY_CMD   NO_PLURAL}
+,{jjPlural_mat_mat,  NCALGEBRA_CMD,RING_CMD,  MATRIX_CMD, MATRIX_CMD NO_PLURAL}
 #endif
 #ifdef HAVE_PLURAL
 ,{jjOPPOSE,    OPPOSE_CMD,     ANY_TYPE/*set by p*/, RING_CMD,   DEF_CMD ALLOW_PLURAL}

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: ratgb.lib,v 1.4 2007-07-11 20:20:54 levandov Exp $";
+version="$Id: ratgb.lib,v 1.5 2007-10-30 15:22:44 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: ratgb.lib  Groebner bases in Ore localizations
@@ -200,7 +200,7 @@ example
   matrix D[4][4];
   D[1,3] = K;
   D[2,4] = N;
-  ncalgebra(1,D);
+  def S=ncalgebra(1,D);setring S;
   ideal I = (k+1)*K - (n-k), (n-k+1)*N - (n+1);
   int is = 2;
   def A  = ratstd(I,is);
@@ -215,7 +215,7 @@ static proc exParam()
   ring r = (0,a,b,c,d),(x,y,Dx,Dy),(a(0,0,1,1),dp);
   matrix @D[4][4];
   @D[1,3]=1; @D[2,4]=1;
-  ncalgebra(1,@D);
+  def S=ncalgebra(1,@D);setring S;
   ideal I =
     x*Dx*(x*Dx+c-1) - x*(x*Dx+y*Dy+a)*(x*Dx+y*Dy+b),
     y*Dy*(y*Dy+d-1) - y*(x*Dx+y*Dy+a)*(x*Dx+y*Dy+b);
