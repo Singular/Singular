@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.31 2007-10-30 17:12:37 Singular Exp $";
+version="$Id: nctools.lib,v 1.32 2007-10-30 17:17:43 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -1176,7 +1176,8 @@ EXAMPLE: example Exterior; shows examples
   execute(NewRing);
   matrix @E = UpOneMatrix(N);
   @E = -1*(@E);
-  ncalgebra(@E,0);
+  def @@RR=ncalgebra(@E,0);
+  setring @@RR;
   int i;
   ideal Q;
   for ( i=1; i<=N; i++ )
