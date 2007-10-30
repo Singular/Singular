@@ -732,12 +732,12 @@ matrix C[6][6];
 for (i=1; i<=6; i++) { for (j=i+1; j<=6; j++) { C[i,j] = 1; } }
 matrix H[6][6];
 H[1,4] = 1;  H[2,5] = 1;  H[3,6] = 1;
-ncalgebra(C,H);
+def @S=ncalgebra(C,H); setring @S;
 
 kill D3;   // ---- Alternatively:
 if (not(defined(Exterior))){ LIB "nctools.lib"; }
 ring D3 = 0, (x(1..3),d(1..3)), dp;
-Weyl();
+def @S3=Weyl(); setring @S3;
 
 basering;
 //->   //   characteristic : 0
@@ -803,7 +803,7 @@ int i,j;
 matrix C[3][3];
 for (i=1; i<=3; i++) { for (j=i+1; j<=3; j++) { C[i,j] = -1; } }
 matrix H[3][3];
-ncalgebra(C,H);
+def @S=ncalgebra(C,H); setring @S;
 ideal Q = x(1)^2, x(2)^2, x(3)^2;
 Q = twostd(Q);     // compute two-sided Groebner basis
 qring E3 = Q;
