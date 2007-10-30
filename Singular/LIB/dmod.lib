@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.18 2007-07-06 10:58:41 levandov Exp $";
+version="$Id: dmod.lib,v 1.19 2007-10-30 16:13:10 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -20,7 +20,7 @@ THEORY: Given a polynomial ring R = K[x_1,...,x_n] and a polynomial F in R,
 @* - global Bernstein polynomial in K[s], denoted by bs, its minimal integer root s0 and
 @*   the list of all roots of bs, which are rational, with their multiplicities is denoted by BS
 @* - Ann F^s0 = I(F^s0) in D(R), denoted by LD0 in the output (LD0 is a holonomic ideal in D(R))
-@* - Ann^(1) F^s in D(R)[s], denoted by LD1 (logarithmic derivations) 
+@* - Ann^(1) F^s in D(R)[s], denoted by LD1 (logarithmic derivations)
 @* - an operator in D(R)[s], denoted by PS, such that PS*F^(s+1) = bs*F^s holds in K[x_1,...,x_n,1/F^s].
 
 @* We provide the following implementations:
@@ -132,7 +132,7 @@ proc annfs(poly F, list #)
 "USAGE:  annfs(f [,S,eng]);  f a poly, S a string, eng an optional int
 RETURN:  ring
 PURPOSE: compute the D-module structure of basering[1/f]*f^s with the algorithm given in S and with the Groebner basis engine given in 'eng'
-NOTE:    activate the output ring with the @code{setring} command. 
+NOTE:    activate the output ring with the @code{setring} command.
 @*       The value of a string S can be
 @*       'bm' (default) - for the algorithm of Briancon and Maisonobe,
 @*       'ot'  - for the algorithm of Oaku and Takayama,
@@ -183,12 +183,12 @@ EXAMPLE: example annfs; shows examples
        // exists 2nd arg
        if ( typeof(#[2]) == "int" )
        {
-	 // the case: given alg, given engine
-	 eng = int(#[2]);
+         // the case: given alg, given engine
+         eng = int(#[2]);
        }
        else
        {
-	 eng = 0;
+         eng = 0;
        }
      }
      else
@@ -257,9 +257,9 @@ proc Sannfs(poly F, list #)
 RETURN:  ring
 PURPOSE: compute the D-module structure of basering[f^s] with the algorithm given in S and with the
 Groebner basis engine given in eng
-NOTE:    activate the output ring with the @code{setring} command. 
+NOTE:    activate the output ring with the @code{setring} command.
 @*       The value of a string S can be
-@*       'bm' (default) - for the algorithm of  Briancon and Maisonobe, 
+@*       'bm' (default) - for the algorithm of  Briancon and Maisonobe,
 @*       'lot' - for the Levandovskyy's modification of the algorithm of Oaku and Takayama,
 @*       'ot'  - for the algorithm of Oaku and Takayama.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
@@ -283,17 +283,17 @@ EXAMPLE: example Sannfs; shows examples
      if ( (st == "BM") || (st == "Bm") || (st == "bM") ||(st == "bm"))
      {
        algo = "bm";
-       chs  = 1; 
+       chs  = 1;
      }
      if ( (st == "OT") || (st == "Ot") || (st == "oT") || (st == "ot"))
      {
        algo = "ot";
-       chs  = 1; 
+       chs  = 1;
      }
      if ( (st == "LOT") || (st == "lOT") || (st == "Lot") || (st == "lot"))
      {
        algo = "lot";
-       chs  = 1; 
+       chs  = 1;
      }
      if (chs != 1)
      {
@@ -304,15 +304,15 @@ EXAMPLE: example Sannfs; shows examples
      // second arg
      if (size(#)>1)
      {
-       // exists 2nd arg 
+       // exists 2nd arg
        if ( typeof(#[2]) == "int" )
        {
-	 // the case: given alg, given engine
-	 eng = int(#[2]);
+         // the case: given alg, given engine
+         eng = int(#[2]);
        }
        else
        {
-	 eng = 0;
+         eng = 0;
        }
      }
      else
@@ -450,7 +450,7 @@ EXAMPLE: example Sannfslog; shows examples
     iv[2*i]   = 1;
     tmp[2]    = iv;  iv = 0;  // intvec
     Lord[i]   = tmp;
-  } 
+  }
   //list("dp",intvec(1,1,1,1,1,...))
   s = "iv=";
   for (i=1; i<=Nnew; i++)
@@ -932,8 +932,8 @@ PURPOSE: compute the D-module structure of basering[1/f]*f^s, according
 to the algorithm by Briancon and Maisonobe
 NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the ideal LD (which is a Groebner basis) is the needed D-module structure,
-@*         which is obtained by substituting the minimal integer root of a Bernstein 
-@*         polynomial into the s-parametric ideal; 
+@*         which is obtained by substituting the minimal integer root of a Bernstein
+@*         polynomial into the s-parametric ideal;
 @*       - the list BS is the list of roots and multiplicities of a Bernstein polynomial of f.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise, and by default @code{slimgb} is used.
@@ -1715,7 +1715,7 @@ EXAMPLE: example annfsParamBM; shows examples
   ncalgebra(1,@D);
   dbprint(ppl,"// -3-1- the ring @R2(_x,_Dx,s) is ready");
   dbprint(ppl-1, @R2);
-  ideal K = imap(@R,K);	
+  ideal K = imap(@R,K);
   kill @R;
   option(redSB);
   dbprint(ppl,"// -3-2- the final cosmetic std");
@@ -2088,8 +2088,8 @@ PURPOSE: compute the D-module structure of basering[1/f]*f^s, according
 to the algorithm by Oaku and Takayama
 NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the ideal LD (which is a Groebner basis) is the needed D-module structure,
-@*         which is obtained by substituting the minimal integer root of a Bernstein 
-@*         polynomial into the s-parametric ideal; 
+@*         which is obtained by substituting the minimal integer root of a Bernstein
+@*         polynomial into the s-parametric ideal;
 @*       - the list BS contains roots with multiplicities of a Bernstein polynomial of f.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise, and by default @code{slimgb} is used.
@@ -2829,7 +2829,7 @@ EXAMPLE: example SannfsBM; shows examples
   }
   //  L[5] = matrix(UpOneMatrix(Nnew));
   //  L[6] = @D;
-  ncalgebra(1,@D);
+  def S=ncalgebra(1,@D);setring S;
   dbprint(ppl,"// -1-1- the ring @R(t,s,_x,_Dx) is ready");
   dbprint(ppl-1, @R);
   // create the ideal I
@@ -2852,7 +2852,7 @@ EXAMPLE: example SannfsBM; shows examples
   K = engine(K,eng);  // std does the job too
   // now, we must change the ordering
   // and create a ring without t, Dt
-  setring save;
+  setring S;
   // ----------- the ring @R3 ------------
   // _x, _Dx,s;  elim.ord for _x,_Dx.
   // keep: N, i,j,s, tmp, RL
@@ -2860,6 +2860,8 @@ EXAMPLE: example SannfsBM; shows examples
   kill Lord, tmp, iv, RName;
   list Lord, tmp;
   intvec iv;
+  list L=imap(save,L);
+  list RL=imap(save,RL);
   L[1] = RL[1];
   L[4] = RL[4];  // char, minpoly
   // check whether vars hava admissible names -> done earlier
@@ -2900,12 +2902,12 @@ EXAMPLE: example SannfsBM; shows examples
   {
     @D[i,N+i]=1;
   }
-  ncalgebra(1,@D);
+  def S2=ncalgebra(1,@D);setring S2;
   dbprint(ppl,"//  -2-1- the ring @R2(_x,_Dx,s) is ready");
   dbprint(ppl-1, @R2);
   ideal MM = maxideal(1);
   MM = 0,s,MM;
-  map R01 = @R, MM;
+  map R01 = S, MM;
   ideal K = R01(K);
   // total cleanup
   ideal LD = K;
@@ -2919,7 +2921,7 @@ EXAMPLE: example SannfsBM; shows examples
   }
   export LD;
   kill @R;
-  return(@R2);
+  return(S2);
 }
 example
 {
@@ -3158,8 +3160,8 @@ RETURN:  ring
 PURPOSE: compute the D-module structure of basering[1/f]*f^s, according to the Levandovskyy's modification of the algorithm by Oaku and Takayama
 NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the ideal LD (which is a Groebner basis) is the needed D-module structure,
-@*         which is obtained by substituting the minimal integer root of a Bernstein 
-@*         polynomial into the s-parametric ideal; 
+@*         which is obtained by substituting the minimal integer root of a Bernstein
+@*         polynomial into the s-parametric ideal;
 @*       - the list BS contains the roots with multiplicities of a Bernstein polynomial of f.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise and by default @code{slimgb} is used.
@@ -3686,11 +3688,11 @@ example
 }
 
 proc annfspecial(ideal I, poly F, int mir, number n)
-"USAGE:  annfspecial(I,F,mir,s0);  I an ideal, F a poly, int mir, number s0 
+"USAGE:  annfspecial(I,F,mir,s0);  I an ideal, F a poly, int mir, number s0
 RETURN:  ideal
 PURPOSE: compute the annihilator ideal of f^s0 in the Weyl Algebra for a rational number s0
 ASSUME:  the basering contains 's' as a variable
-NOTE:    We assume that the basering is D[s], I is the Ann F^s in D[s], 
+NOTE:    We assume that the basering is D[s], I is the Ann F^s in D[s],
 @*          integer 'mir' is the minimal integer root of the Bernstein polynomial of F
 @*          and a number s0 is rational.
 @*       We compute the real annihilator for any value of s0 (both generic and exceptional).
@@ -3706,7 +3708,7 @@ EXAMPLE: example annfspecial; shows examples
   {
     ERROR("Variable s expected in the ideal AnnFs");
   }
-  int d;  
+  int d;
   ideal P = subst(I,var(ns),n);
   if (denominator(n) == 1)
   {
@@ -4114,7 +4116,7 @@ EXAMPLE: example checkRoot1; shows examples
   {
     ERROR("the last variable of basering should be s");
   }
-  // now, create the new vars  
+  // now, create the new vars
   list NName;
   for (i=1; i<=Nnew; i++)
   {
@@ -4148,9 +4150,9 @@ EXAMPLE: example checkRoot1; shows examples
   {
     @D[i,i+n]=1;
   }
-  ncalgebra(1,@D);
+  def S=ncalgebra(1,@D);
   dbprint(ppl,"// -1-1- the ring @R(_x,_Dx) is ready");
-  dbprint(ppl-1, @R);
+  dbprint(ppl-1, S);
   // create the ideal K = ann_D[s](f^s)_{s=-alpha} + < f >
   setring save;
   ideal K = subst(I,s,-a);
@@ -4270,7 +4272,7 @@ EXAMPLE: example checkRoot1; shows examples
   // now, continue with the algorithm
   ideal I = imap(save,I);
   poly F = imap(save,F);
-  number a = imap(save,a); 
+  number a = imap(save,a);
   ideal II = NF(I,std(F));
   // make leadcoeffs positive
   for (i=1; i<=ncols(II); i++)
