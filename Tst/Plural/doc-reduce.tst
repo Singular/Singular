@@ -5,7 +5,7 @@ matrix d[3][3];
 d[1,2]=-h;
 d[1,3]=2e;
 d[2,3]=-2f;
-ncalgebra(1,d);
+def S=ncalgebra(1,d); setring S;
 // it is parametric U(sl_2)
 ideal I=e2,f2,h2-1;
 I=std(I);

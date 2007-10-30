@@ -7,11 +7,11 @@ matrix d[3][3];
 d[1,2]=-z;
 d[1,3]=y;
 d[2,3]=-x;
-ncalgebra(1,d); //U(so_3)
+def S=ncalgebra(1,d); setring S; //U(so_3)
 ideal I=x3+4x,y2-z2,z3+z;
 I=std(I);
 I;
-kill R;
+kill R,S;
 ring Rq3=(0,Q),(x,y,z),dp; //U'_q(so_3)
 minpoly=Q^4+Q^2+1; // at the 3rd root of unity
 matrix C[3][3];
@@ -22,7 +22,7 @@ C[2,3]=Q2;
 D[1,2]=-Q*z;
 D[1,3]=1/Q*y;
 D[2,3]=-Q*x; 
-ncalgebra(C,D);
+def S2=ncalgebra(C,D); setring S2;
 ideal J=x3+4x,y2-z2,z3+z;
 J=std(J);
 J;

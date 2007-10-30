@@ -18,7 +18,7 @@ A[6,7]=Q2;
 B[5,6]=-Q*z;
 B[5,7]=1/Q*y;
 B[6,7]=-Q*x;
-ncalgebra(A,B);
+def S=ncalgebra(A,B);setring S;
 poly Cq=Q^4*x2+y2+Q^4*z2+Q*(1-Q^4)*x*y*z;
 poly C1=1/3*(x^3+x);
 poly C2=1/3*(y^3+y);

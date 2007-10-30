@@ -5,7 +5,7 @@ matrix d[3][3];
 d[1,2]=-z;
 d[1,3]=2x;
 d[2,3]=-2y;
-ncalgebra(1,d);
+def S=ncalgebra(1,d); setring S;
 ideal i=x,y,z;
 i=std(i);
 resolution F=nres(i,0);

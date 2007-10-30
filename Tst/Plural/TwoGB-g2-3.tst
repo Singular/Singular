@@ -58,7 +58,7 @@ D[10,13]=-y(4);
 D[11,13]=-3*y(5);
 D[11,14]=y(5);
 D[12,14]=-y(6);
-ncalgebra(1,D);
+def S=ncalgebra(1,D);setring S;
 ideal i=x(1)^3;
 option(redSB);
 option(redTail);

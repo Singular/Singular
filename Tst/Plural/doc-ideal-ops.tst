@@ -5,7 +5,7 @@ matrix D[3][3];
 D[1,2]=-z;
 D[1,3]=y;
 D[2,3]=x;
-ncalgebra(1,D); 
+def S=ncalgebra(1,D); setring S;
 ideal I = 0,x,0,1;
 I;
 I + 0;    // simplification

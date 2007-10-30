@@ -1,8 +1,8 @@
 LIB "tst.lib";
 tst_init();
 ring r = 32003,(x,y,z),dp;
-ncalgebra(-1,1);
-r;
+def S=ncalgebra(-1,1); setring S;
+S;
 // ring of some differential-like operators 
 poly s1  = x3y2+151x5y+186xy6+169y9;
 poly s2  = 1*x^2*y^2*z^2+3z8;

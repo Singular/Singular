@@ -12,9 +12,9 @@ poly(i);
 typeof(_);
 kill r;
 ring r=0,(x,y),dp;
-ncalgebra(1,1);
+def S=ncalgebra(1,1); setring S;
 // it is a Weyl algebra 
-r;
+S;
 yx;      // not correct input
 y*x;     // correct input
 tst_status(1);$

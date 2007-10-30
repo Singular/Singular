@@ -5,7 +5,7 @@ matrix C[3][3];
 C[1,2]=q1;
 C[1,3]=q2;
 C[2,3]=q3;
-ncalgebra(C,0);
+def S=ncalgebra(C,0);setring S;
 int N=15;
 poly f;
 poly g;

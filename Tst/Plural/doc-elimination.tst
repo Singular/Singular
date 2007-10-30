@@ -6,7 +6,7 @@ matrix d[4][4];
 d[1,2]=-h;
 d[1,3]=2*e;
 d[2,3]=-2*f;
-ncalgebra(1,d);
+def S=ncalgebra(1,d);setring S;
 // it is U(sl_2)+K[a]
 option(redSB);
 option(redTail);

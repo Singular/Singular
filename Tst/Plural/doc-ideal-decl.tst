@@ -1,7 +1,7 @@
 LIB "tst.lib";
 tst_init();
 ring r=0,(x,y,z),dp;
-ncalgebra(-1,0);
+def S=ncalgebra(-1,0);setring S;
 poly s1 = x2;
 poly s2 = y3;
 poly s3 = z;
