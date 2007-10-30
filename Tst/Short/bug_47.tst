@@ -3,7 +3,7 @@ tst_init();
 
 LIB "nctools.lib";
 ring r = 0,(x,d),dp;
-Weyl();
+def S=Weyl(); setring S;
 matrix E[2][2]=[-x,d],[x2,-x*d+1];
 matrix T[2][2]=[d,d2],[x,x*d-1];
 matrix A = E*T;
