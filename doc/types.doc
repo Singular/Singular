@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.136 2007-03-12 13:07:45 Singular Exp $
+@comment $Id: types.doc,v 1.137 2007-10-30 13:07:17 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -3619,7 +3619,7 @@ For the definition of the 'coefficient_field', see @ref{Rings and orderings}.
 'ordering' is a list of block orderings where each block ordering is either
 @enumerate
 @item
-@code{lp}, @code{dp}, @code{Dp}, @code{ls}, @code{ds}, or @code{Ds}
+@code{lp}, @code{dp}, @code{Dp}, @code{rp}, @code{ls}, @code{ds}, or @code{Ds}
 optionally followed by a size parameter in parentheses.
 
 @item
