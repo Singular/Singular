@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.30 2007-10-30 16:31:49 Singular Exp $";
+version="$Id: nctools.lib,v 1.31 2007-10-30 17:12:37 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -608,8 +608,8 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc Weyl(list #)
 "USAGE:   Weyl([p]); p an optional integer
-RETURN:  nothing
-PURPOSE: create a Weyl algebra structure on a basering
+RETURN:  ring
+PURPOSE: create a Weyl algebra structure from the basering
 NOTE: suppose the number of variables of a basering is 2k.
 (if this number is odd, an error message will be returned)
 @*    by default, the procedure treats first k variables as coordinates x_i and the last k as differentials d_i
@@ -657,19 +657,18 @@ EXAMPLE: example Weyl; shows examples
       @D[2*i-1,2*i]=1;
     }
   }
-  ncalgebra(1,@D);
-  return();
+  return(ncalgebra(1,@D));
 }
 example
 {
   "EXAMPLE:";echo=2;
   ring A1=0,(x(1..2),d(1..2)),dp;
-  Weyl();
-  A1;
-  kill A1;
+  def S=Weyl();setring S;
+  S;
+  kill A1,S;
   ring B1=0,(x1,d1,x2,d2),dp;
-  Weyl(1);
-  B1;
+  def S=Weyl(1);
+  setring S; S;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
