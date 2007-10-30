@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.457 2007-10-30 15:22:42 Singular Exp $ */
+/* $Id: iparith.cc,v 1.458 2007-10-30 15:25:01 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2413,7 +2413,7 @@ static BOOLEAN jjPlural_num_poly(leftv res, leftv a, leftv b)
   ring r=rCopy(currRing);
   BOOLEAN result=nc_CallPlural(NULL,NULL,(poly)a->Data(),(poly)b->Data(),r);
   res->data=r;
-  if (r->qideal!=NULL) res->rtyp=QRING;
+  if (r->qideal!=NULL) res->rtyp=QRING_CMD;
   return result;
 }
 static BOOLEAN jjPlural_num_mat(leftv res, leftv a, leftv b)
@@ -2421,7 +2421,7 @@ static BOOLEAN jjPlural_num_mat(leftv res, leftv a, leftv b)
   ring r=rCopy(currRing);
   BOOLEAN result=nc_CallPlural(NULL,(matrix)b->Data(),(poly)a->Data(),NULL,r);
   res->data=r;
-  if (r->qideal!=NULL) res->rtyp=QRING;
+  if (r->qideal!=NULL) res->rtyp=QRING_CMD;
   return result;
 }
 static BOOLEAN jjPlural_mat_poly(leftv res, leftv a, leftv b)
@@ -2429,7 +2429,7 @@ static BOOLEAN jjPlural_mat_poly(leftv res, leftv a, leftv b)
   ring r=rCopy(currRing);
   BOOLEAN result=nc_CallPlural((matrix)a->Data(),NULL,NULL,(poly)b->Data(),r);
   res->data=r;
-  if (r->qideal!=NULL) res->rtyp=QRING;
+  if (r->qideal!=NULL) res->rtyp=QRING_CMD;
   return result;
 }
 static BOOLEAN jjPlural_mat_mat(leftv res, leftv a, leftv b)
@@ -2437,7 +2437,7 @@ static BOOLEAN jjPlural_mat_mat(leftv res, leftv a, leftv b)
   ring r=rCopy(currRing);
   BOOLEAN result=nc_CallPlural((matrix)a->Data(),(matrix)b->Data(),NULL,NULL,r);
   res->data=r;
-  if (r->qideal!=NULL) res->rtyp=QRING;
+  if (r->qideal!=NULL) res->rtyp=QRING_CMD;
   return result;
 }
 static BOOLEAN jjBRACKET(leftv res, leftv a, leftv b)
