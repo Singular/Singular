@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.49 2007-10-30 15:22:44 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.50 2007-10-30 15:23:26 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -2492,7 +2492,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
   }
   ring save = currRing;
 
-  asume(currRing!=r);
+  assume(currRing!=r);
   assume( rSamePolyRep(r, currRing) );
   rChangeCurrRing(r);
 
