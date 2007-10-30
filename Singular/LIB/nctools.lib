@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.34 2007-10-30 21:04:42 motsak Exp $";
+version="$Id: nctools.lib,v 1.35 2007-10-30 21:27:15 motsak Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -1160,7 +1160,7 @@ example
     { "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "]."; }
   else
     { "Not a supercommutative algebra!!!"; }
-  kill R;
+  kill R, S;
 /////////////////////////////////////////////////////////////////////
   ring R = 0,(x(1..4)),dp;
   list CurrRing = ringlist(R);
@@ -1185,8 +1185,7 @@ example
     { "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "]."; }
   else
     { "Not a supercommutative algebra!!!"; }
-  kill R;
-  kill ER;
+  kill R, ER, S;
 /////////////////////////////////////////////////////////////////////
   ring R = 0,(x(1..4)),dp;
   def ER = SuperCommutative(2); // (b = 2, e = N)
@@ -1195,9 +1194,7 @@ example
     { "This is a SCA! Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "]."; }
   else
     { "Not a supercommutative algebra!!!"; }
-  kill R;
-  kill ER;
-
+  kill R, ER;
 }
 
 
