@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.29 2007-10-30 15:22:43 Singular Exp $";
+version="$Id: nctools.lib,v 1.30 2007-10-30 16:31:49 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -53,16 +53,17 @@ THEORY:   @code{Gweights} returns a vector, which must be used to redefine the G
 EXAMPLE: example Gweights; shows examples
 SEE ALSO: weightedRing
 "{
-  matrix tails;
   int novalid=0;
   if (typeof(r)=="ring") //a ring is admissible as input
   {
     setring r;
+    matrix tails;
     def l = ncRelations(r);
     tails = l[2]; // l=C,D we need D, the tails of the relations
   }
   else
   {
+    matrix tails;
     if ( (typeof(r)=="matrix") || (typeof(r)=="intmat") )
     {
       if ( nrows(r)==ncols(r) ) //the input is a square matrix
@@ -115,7 +116,7 @@ example
   matrix D[4][4];
   D[1,4]=(q-1/q)*b*c;
   def S=ncalgebra(C,D);
-  S;
+  setring S;S;
   Gweights(S);
   def D=fetch(r,D);
   Gweights(D);
