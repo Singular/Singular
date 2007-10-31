@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.43 2007-10-31 07:52:52 Singular Exp $
+@comment $Id: plureference.doc,v 1.44 2007-10-31 17:29:41 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -56,7 +56,7 @@ Note, that both @strong{Control structures} and @strong{System variables} of
 * minres @value{PSUFFIX}::
 * modulo @value{PSUFFIX}::
 * mres @value{PSUFFIX}::
-* ncalgebra::
+* nc_algebra::
 * nres @value{PSUFFIX}::
 * oppose::
 * opposite::
@@ -133,7 +133,7 @@ ring r=0,(x(1..N),d(1..N),q(1..N)),Dp;
 matrix D[3*N][3*N];
 for (i=1;i<=N;i++)
 { D[i,N+i]=q(i)^2; }
-def W=ncalgebra(1,D); setring W;
+def W=nc_algebra(1,D); setring W;
 // this algebra is a kind of homogenized Weyl algebra
 W;
 ideal I = x(1),x(2),d(1),d(2),q(1),q(2);
@@ -168,7 +168,7 @@ minpoly=Q^2-Q+1;
 matrix C[3][3];  matrix D[3][3];
 C[1,2]=Q2;    C[1,3]=1/Q2;  C[2,3]=Q2;
 D[1,2]=-Q*z;  D[1,3]=1/Q*y; D[2,3]=-Q*x;
-def R=ncalgebra(C,D); setring R;
+def R=nc_algebra(C,D); setring R;
 // this is a quantum deformation of U(so_3),
 // where Q is a 6th root of unity
 poly p=Q^4*x2+y2+Q^4*z2+Q*(1-Q^4)*x*y*z;
@@ -212,7 +212,7 @@ In these situations error messages will be reported.
 ring r=0,(e,f,h,a),Dp;
 matrix d[4][4];
 d[1,2]=-h; d[1,3]=2*e; d[2,3]=-2*f;
-def R=ncalgebra(1,d); setring R;
+def R=nc_algebra(1,d); setring R;
 // this algebra is U(sl_2), tensored with K[a] over K
 option(redSB);
 option(redTail);
@@ -424,7 +424,7 @@ computes the intersection of ideals, resp. modules.
 @smallexample
 @c example
 ring r=0,(x,y),dp;
-def R=ncalgebra(-1,0);
+def R=nc_algebra(-1,0);
 setring R;
 module M=[x,x],[y,0];
 module N=[0,y^2],[y,x];
@@ -481,7 +481,7 @@ if and only if the ideal is two-sided.
 ring r=0,(x,y,z),dp;
 matrix d[3][3];
 d[1,2]=-z;  d[1,3]=2x;  d[2,3]=-2y;
-def R=ncalgebra(1,d); // this algebra is U(sl_2)
+def R=nc_algebra(1,d); // this algebra is U(sl_2)
 setring R;
 ideal i=x2,y2,z2-1;
 i=std(i);
@@ -532,7 +532,7 @@ Gives a warning if @code{sm} is not a submodule.
 ring r = (0,a),(e,f,h),(c,dp);
 matrix D[3][3];
 D[1,2]=-h;  D[1,3]=2*e;  D[2,3]=-2*f;
-def R=ncalgebra(1,D); // this algebra is a parametric U(sl_2)
+def R=nc_algebra(1,D); // this algebra is a parametric U(sl_2)
 setring R;
 ideal i = e,h-a; // consider this parametric ideal
 i = std(i);
@@ -746,7 +746,7 @@ See also
 
 
 @c ---------------------------------------
-@node  mres @value{PSUFFIX}, ncalgebra, modulo @value{PSUFFIX}, Functions @value{PSUFFIX}
+@node  mres @value{PSUFFIX}, nc_algebra, modulo @value{PSUFFIX}, Functions @value{PSUFFIX}
 @section mres @value{PSUFFIX}
 @cindex mres @value{PSUFFIX}
 @table @code
@@ -838,16 +838,16 @@ See
 
 
 @c -----------------------------
-@node ncalgebra, nres @value{PSUFFIX}, mres @value{PSUFFIX}, Functions @value{PSUFFIX}
-@section ncalgebra
-@cindex ncalgebra
+@node nc_algebra, nres @value{PSUFFIX}, mres @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section nc_algebra
+@cindex nc_algebra
 
 @table @code
 @item @strong{Syntax:}
-@*@code{ncalgebra(} matrix_expression C, matrix_expression D @code{)}
-@*@code{ncalgebra(} number_expression n, matrix_expression D @code{)}
-@*@code{ncalgebra(} matrix_expression C, poly_expression p @code{)}
-@*@code{ncalgebra(} number_expression n, poly_expression p @code{)}
+@*@code{nc_algebra(} matrix_expression C, matrix_expression D @code{)}
+@*@code{nc_algebra(} number_expression n, matrix_expression D @code{)}
+@*@code{nc_algebra(} matrix_expression C, poly_expression p @code{)}
+@*@code{nc_algebra(} number_expression n, poly_expression p @code{)}
 @item @strong{Type:}
 ring
 @item @strong{Purpose:}
@@ -858,7 +858,7 @@ $ x_1, \ldots, x_k ,\;$
 @ifinfo
  x_1,... ,x_k,
 @end ifinfo
-@code{ncalgebra} creates the
+@code{nc_algebra} creates the
 noncommutative extension of @code{r} subject to relations
 @tex
 $ \{ x_j x_i=c_{ij} \cdot x_i x_j + d_{ij}, 1 \leq i <j \leq k \}, $
@@ -915,7 +915,7 @@ matrix C[3][3];
 matrix D[3][3];
 C[1,2]=Q2;   C[1,3]=1/Q2;  C[2,3]=Q2;
 D[1,2]=-Q*z; D[1,3]=1/Q*y; D[2,3]=-Q*x;
-def S=ncalgebra(C,D);
+def S=nc_algebra(C,D);
 // this algebra is a quantum deformation U'_q(so_3),
 // where Q is a 6th root of unity
 setring S;S;
@@ -929,7 +929,7 @@ d[2,8]=2*Xb; d[3,4]=Xb; d[3,5]=-Xa; d[3,6]=-Ha-Hb;
 d[3,7]=Xc;   d[3,8]=Xc; d[4,5]=Yc; d[4,7]=-2*Ya;
 d[4,8]=Ya;  d[5,7]=Yb; d[5,8]=-2*Yb;
 d[6,7]=-Yc; d[6,8]=-Yc;
-def S=ncalgebra(1,d);  // this algebra is U(sl_3)
+def S=nc_algebra(1,d);  // this algebra is U(sl_3)
 setring S;S;
 kill r2,S;
 // ---- third example: C is a matrix, p=0 is a poly
@@ -937,12 +937,12 @@ ring r3=0,(a,b,c,d),lp;
 matrix c[4][4];
 c[1,2]=1; c[1,3]=3; c[1,4]=-2;
 c[2,3]=-1; c[2,4]=-3; c[3,4]=1;
-def S=ncalgebra(c,0); // it is a quasi--commutative algebra
+def S=nc_algebra(c,0); // it is a quasi--commutative algebra
 setring S;S;
 kill r3,S;
 // -- fourth example : number n = -1, poly p = 3w
 ring r4=0,(u,v,w),dp;
-def S=ncalgebra(-1,3w);
+def S=nc_algebra(-1,3w);
 setring S;S;
 kill r4,S;
 @c example
@@ -957,7 +957,7 @@ See also
 
 
 @c ---------------------------------------
-@node  nres @value{PSUFFIX}, oppose, ncalgebra, Functions @value{PSUFFIX}
+@node  nres @value{PSUFFIX}, oppose, nc_algebra, Functions @value{PSUFFIX}
 @section nres @value{PSUFFIX}
 @cindex nres @value{PSUFFIX}
 @table @code
@@ -1223,7 +1223,7 @@ result may have no meaning.
 @c example
 //------ a very easy example ------------
 ring r=(0,q),(x,y),Dp;
-def R=ncalgebra(q,0); // this algebra is a quantum plane
+def R=nc_algebra(q,0); // this algebra is a quantum plane
 setring R;
 option(returnSB);
 poly f1  = x^3+2*x*y^2+2*x^2*y;
@@ -1295,7 +1295,7 @@ The commands @code{reduce} and @code{NF} are synonymous.
 ring r=(0,a),(e,f,h),Dp;
 matrix d[3][3];
 d[1,2]=-h;  d[1,3]=2e;  d[2,3]=-2f;
-def R=ncalgebra(1,d);
+def R=nc_algebra(1,d);
 setring R;
 // this algebra is a parametric U(sl_2)
 ideal I = e2, f2, h2-1;
@@ -1351,7 +1351,7 @@ matrix C from the definition of @ref{G-algebras})
 @c example
 // consider the quantized Weyl algebra
 ring r = (0,q),(x,d),Dp;
-def RS=ncalgebra(q,1);
+def RS=nc_algebra(q,1);
 setring RS;
 list l = ringlist(RS);
 l;
@@ -1659,7 +1659,7 @@ In the noncommutative case, a ring modulo an ideal has a ring stucture if and on
 ring R=0,(x,y,z),dp;
 matrix d[3][3];
 d[1,2]=-z;  d[1,3]=2x;  d[2,3]=-2y;
-def RS=ncalgebra(1,d); //U(sl_2)
+def RS=nc_algebra(1,d); //U(sl_2)
 setring RS;
 option(redSB); option(redTail);
 ideal I=x3,y3,z3-z;

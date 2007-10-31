@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.100 2007-01-29 08:28:16 bricken Exp $
+@comment $Id: examples.doc,v 1.101 2007-10-31 17:29:39 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -3264,7 +3264,7 @@ the displayed symbols).
   ring A = 0,(e,f,h),dp;
   matrix D[3][3];
   D[1,2]=-h; D[1,3]=2*e; D[2,3]=-2*f;
-  ncalgebra(1,D);
+  def S=nc_algebra(1,D); setring S;
 // ----- equivalently, you may use the following:
 //  LIB "ncalg.lib";
 //  def A = makeUsl2();
@@ -3318,10 +3318,10 @@ LIB "ncalg.lib";
 def A = makeUsl2();
 setring A; A;
 // ----- equivalently, you may use
-// ring A = 0,(e,f,h),dp;
+// ring AA = 0,(e,f,h),dp;
 // matrix D[3][3];
 // D[1,2]=-h; D[1,3]=2*e; D[2,3]=-2*f;
-// ncalgebra(1,D);
+// def A=nc_algebra(1,D); setring A;
 option(redSB);
 option(redTail);
 matrix T;
