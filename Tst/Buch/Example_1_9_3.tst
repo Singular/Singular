@@ -11,7 +11,7 @@ matrix D[3][3];
 D[1,2] = -Q*z;
 D[1,3] = 1/Q*y;
 D[2,3] = -Q*x;
-def S=ncalgebra(C,D); setring S;
+def S=nc_algebra(C,D); setring S;
 S;
 
 tst_status(1);$

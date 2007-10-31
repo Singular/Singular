@@ -7,7 +7,7 @@ matrix D[3][3];
 D[1,2]=-z;
 D[1,3]=2x;
 D[2,3]=-2y;
-def S=ncalgebra(1,D);setring S;
+def S=nc_algebra(1,D);setring S;
 int N=11;
 poly f;
 poly g;

@@ -5,7 +5,7 @@ matrix d[3][3];
 d[1,2]=-z;
 d[1,3]=2x;
 d[2,3]=-2y;
-def S=ncalgebra(1,d);setring S;
+def S=nc_algebra(1,d);setring S;
 int N=4;
 poly f=1;
 for(int n=0;n<=N;n++)

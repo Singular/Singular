@@ -1,7 +1,7 @@
 LIB "tst.lib";
 tst_init();
 ring r=0,(x,y,z,u,v,w),dp;
-def S=ncalgebra(-1,0); setring S;
+def S=nc_algebra(-1,0); setring S;
 // anticommutative algebra
 option(redSB);
 option(redTail);

@@ -6,7 +6,7 @@ tst_init();
 ring r = 0,(x,d,q),dp;
 matrix D[3][3];
 D[1,2]=q^2;
-def S=ncalgebra(1,D); setring S;
+def S=nc_algebra(1,D); setring S;
 ideal I = x,d,q;
 option(redSB); option(redTail);
 resolution R = mres(I,0);

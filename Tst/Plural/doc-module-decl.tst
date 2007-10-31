@@ -5,7 +5,7 @@ matrix D[3][3];
 D[1,2]=-z;
 D[1,3]=y;
 D[2,3]=x;
-def S=ncalgebra(1,D); setring S;
+def S=nc_algebra(1,D); setring S;
 // it is U(so_3)
 vector s1 = [x2,y3,z];
 vector s2 = [xy,1,0];
