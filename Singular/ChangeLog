@@ -27,3 +27,12 @@ Changes with respect to 3-0-3-1:
 - NTL: update to version 5.4.1
 - doc/general.doc: description of algorithms updated
 - omalloc: areas may overlap: use memmove instead of memcpy
+---------------------------------------------------------
+
+Wed Oct 31 18:57:21 CET 2007 Singular-3-0-4-beta
+Changes with respect to 3-0-3-2
+- more modgen fixes
+- Weyl, Exterior, findimAlgebra, nc_algebra do not change the current ring but
+  return the new structure
+- ncalgebra is now depreciated, use the new command nc_algebra
+- libraries changes to use nc_algebra
