@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.30 2007-09-17 09:35:19 Singular Exp $ */
+/* $Id: makefile.cc,v 1.31 2007-10-31 17:56:16 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -97,9 +97,10 @@ void build_head_section(
   fprintf(fp, "CC\t= gcc\n");
   fprintf(fp, "CXX\t= gcc\n");
   fprintf(fp, "SINGULARROOT\t= ../..\n");
+  fprintf(fp, "SINGUNAME\t= %s\n",SINGUNAME);
 #warning "PROBLEM: nice place for include file has to be found"
-  fprintf(fp, "CFLAGS\t= -DNDEBUG -DBUILD_MODULE -I. -I${SINGULARROOT}/kernel -I${SINGULARROOT}/Singular -I${SINGULARROOT}/%s/include\n",SINGUNAME);
-  fprintf(fp, "DCFLAGS\t= -DBUILD_MODULE -I. -I${SINGULARROOT}/kernel -I${SINGULARROOT}/Singular -I${SINGULARROOT}/%s/include\n",SINGUNAME);
+  fprintf(fp, "CFLAGS\t= -DNDEBUG -DBUILD_MODULE -I. -I${SINGULARROOT}/kernel -I${SINGULARROOT}/Singular -I${SINGULARROOT}/${SINGUNAME}/include\n");
+  fprintf(fp, "DCFLAGS\t= -DBUILD_MODULE -I. -I${SINGULARROOT}/kernel -I${SINGULARROOT}/Singular -I${SINGULARROOT}/${SINGUNAME}/include\n");
   fprintf(fp, "#LD\t=\n");
   fprintf(fp, "\n");
   fprintf(fp, "instdir          = %s\n", inst_dir );
