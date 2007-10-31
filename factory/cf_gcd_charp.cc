@@ -10,7 +10,7 @@ static int degWRT(const CanonicalForm & F, const int lev);
 static CanonicalForm lcoefWRT( const CanonicalForm & F, const int lev);
 static CanonicalForm newtonInterp(CFList &alpha, CFList &u, const Variable & x);
 static CanonicalForm simpleGCD(const CanonicalForm & A, const CanonicalForm & B);
-static CanonicalForm newGCD(const CanonicalForm & A, const CanonicalForm & B);
+CanonicalForm newGCD(CanonicalForm A, CanonicalForm B);
 static CanonicalForm GFPowDown(const CanonicalForm & A, int k);
 static CanonicalForm GFPowUp(const CanonicalForm & A, int k);
 static CanonicalForm GFMapUp(const CanonicalForm & A, int k);
@@ -240,8 +240,8 @@ GFMapDown(const CanonicalForm & A, int k)
   return(GFPowDown(A, extExp));
 }
 
-static CanonicalForm
-newGCD(const CanonicalForm & A, const CanonicalForm & B)
+CanonicalForm
+newGCD(CanonicalForm A, CanonicalForm B)
 // Computes the GCD of two polynomials over a prime field.
 // Based on Algorithm 7.2 from "Algorithms for Computer Algebra"
 {
