@@ -762,8 +762,8 @@ LSI;
 //->   LSI[5]=x(2)^2
 //->   LSI[6]=x(1)*x(2)
 //->   LSI[7]=x(1)^2
-def D3_opp = opposite(D3);
-setring D3_opp;   // active ring is the opposite algebra of D3
+def D3_opp = opposite(@S3);
+setring D3_opp;   // active ring is the opposite algebra of @S3
 basering;
 //->   //   characteristic : 0
 //->   //   number of vars : 6
@@ -777,9 +777,9 @@ basering;
 //->   //    X(3)D(3)=D(3)*X(3)+1
 //->   //    X(2)D(2)=D(2)*X(2)+1
 //->   //    X(1)D(1)=D(1)*X(1)+1
-ideal I = oppose(D3,I);   // map I to opposite algebra
+ideal I = oppose(@S3,I);   // map I to opposite algebra
 ideal RSI_opp = std(I);
-setring D3;
+setring @S3;
 ideal RSI = oppose(D3_opp,RSI_opp);
 RSI;
 //->   RSI[1]=x(1)*d(2)+x(3)
@@ -796,14 +796,14 @@ SI;
 //->   SI[1]=1
 
 
-kill i,j,D3,D3_opp;
+kill i,j,D3,D3_opp,@S3;
 //====================== Example 3.40(2) (new Session) ===============
 ring R = 0, x(1..3), dp;
 int i,j;
 matrix C[3][3];
 for (i=1; i<=3; i++) { for (j=i+1; j<=3; j++) { C[i,j] = -1; } }
 matrix H[3][3];
-def @S=ncalgebra(C,H); setring @S;
+def @SS=ncalgebra(C,H); setring @SS;
 ideal Q = x(1)^2, x(2)^2, x(3)^2;
 Q = twostd(Q);     // compute two-sided Groebner basis
 qring E3 = Q;
