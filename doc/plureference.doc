@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.42 2007-10-30 16:32:55 Singular Exp $
+@comment $Id: plureference.doc,v 1.43 2007-10-31 07:52:52 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -133,9 +133,9 @@ ring r=0,(x(1..N),d(1..N),q(1..N)),Dp;
 matrix D[3*N][3*N];
 for (i=1;i<=N;i++)
 { D[i,N+i]=q(i)^2; }
-ncalgebra(1,D);
+def W=ncalgebra(1,D); setring W;
 // this algebra is a kind of homogenized Weyl algebra
-r;
+W;
 ideal I = x(1),x(2),d(1),d(2),q(1),q(2);
 option(redSB);
 option(redTail);
@@ -168,7 +168,7 @@ minpoly=Q^2-Q+1;
 matrix C[3][3];  matrix D[3][3];
 C[1,2]=Q2;    C[1,3]=1/Q2;  C[2,3]=Q2;
 D[1,2]=-Q*z;  D[1,3]=1/Q*y; D[2,3]=-Q*x;
-ncalgebra(C,D);
+def R=ncalgebra(C,D); setring R;
 // this is a quantum deformation of U(so_3),
 // where Q is a 6th root of unity
 poly p=Q^4*x2+y2+Q^4*z2+Q*(1-Q^4)*x*y*z;
@@ -212,7 +212,7 @@ In these situations error messages will be reported.
 ring r=0,(e,f,h,a),Dp;
 matrix d[4][4];
 d[1,2]=-h; d[1,3]=2*e; d[2,3]=-2*f;
-ncalgebra(1,d);
+def R=ncalgebra(1,d); setring R;
 // this algebra is U(sl_2), tensored with K[a] over K
 option(redSB);
 option(redTail);
@@ -424,18 +424,20 @@ computes the intersection of ideals, resp. modules.
 @smallexample
 @c example
 ring r=0,(x,y),dp;
-ncalgebra(-1,0);
+def R=ncalgebra(-1,0);
+setring R;
 module M=[x,x],[y,0];
 module N=[0,y^2],[y,x];
 option(redSB);
 module Res;
 Res=intersect(M,N);
 print(Res);
-kill r;
+kill r,R;
 //--------------------------------
 LIB "ncalg.lib";
 ring r=0,(x,d),dp;
-Weyl(); // make r into Weyl algebra
+def RR=Weyl(); // make r into Weyl algebra
+setring RR;
 ideal I = x+d^2;
 ideal J = d-1;
 ideal H = intersect(I,J);
@@ -479,7 +481,8 @@ if and only if the ideal is two-sided.
 ring r=0,(x,y,z),dp;
 matrix d[3][3];
 d[1,2]=-z;  d[1,3]=2x;  d[2,3]=-2y;
-ncalgebra(1,d); // this algebra is U(sl_2)
+def R=ncalgebra(1,d); // this algebra is U(sl_2)
+setring R;
 ideal i=x2,y2,z2-1;
 i=std(i);
 print(matrix(i));  // print a compact presentation of i
@@ -529,7 +532,8 @@ Gives a warning if @code{sm} is not a submodule.
 ring r = (0,a),(e,f,h),(c,dp);
 matrix D[3][3];
 D[1,2]=-h;  D[1,3]=2*e;  D[2,3]=-2*f;
-ncalgebra(1,D); // this algebra is a parametric U(sl_2)
+def R=ncalgebra(1,D); // this algebra is a parametric U(sl_2)
+setring R;
 ideal i = e,h-a; // consider this parametric ideal
 i = std(i);
 print(matrix(i)); // print a compact presentation of i
@@ -1219,7 +1223,8 @@ result may have no meaning.
 @c example
 //------ a very easy example ------------
 ring r=(0,q),(x,y),Dp;
-ncalgebra(q,0); // this algebra is a quantum plane
+def R=ncalgebra(q,0); // this algebra is a quantum plane
+setring R;
 option(returnSB);
 poly f1  = x^3+2*x*y^2+2*x^2*y;
 poly f2  = y;
@@ -1230,7 +1235,7 @@ ideal I = twostd(i);
 ideal j = f1',f2';
 ideal J = twostd(j);
 quotient(I,J);
-kill r;
+kill r,R;
 //------- a bit more complicated example
 LIB "ncalg.lib";
 def Usl2 = makeUsl2();
@@ -1290,7 +1295,8 @@ The commands @code{reduce} and @code{NF} are synonymous.
 ring r=(0,a),(e,f,h),Dp;
 matrix d[3][3];
 d[1,2]=-h;  d[1,3]=2e;  d[2,3]=-2f;
-ncalgebra(1,d);
+def R=ncalgebra(1,d);
+setring R;
 // this algebra is a parametric U(sl_2)
 ideal I = e2, f2, h2-1;
 I = std(I);
@@ -1653,7 +1659,8 @@ In the noncommutative case, a ring modulo an ideal has a ring stucture if and on
 ring R=0,(x,y,z),dp;
 matrix d[3][3];
 d[1,2]=-z;  d[1,3]=2x;  d[2,3]=-2y;
-ncalgebra(1,d); //U(sl_2)
+def RS=ncalgebra(1,d); //U(sl_2)
+setring RS;
 option(redSB); option(redTail);
 ideal I=x3,y3,z3-z;
 I=std(I);

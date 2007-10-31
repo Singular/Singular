@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.33 2006-07-17 14:32:23 Singular Exp $
+@comment $Id: plutypes.doc,v 1.34 2007-10-31 07:52:52 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -94,7 +94,8 @@ defines a left ideal.
 @smallexample
 @c example
 ring r=0,(x,y,z),dp;
-ncalgebra(-1,0); // an anticommutative algebra
+def R=ncalgebra(-1,0); // an anticommutative algebra
+setring R;
 poly s1 = x2;
 poly s2 = y3;
 poly s3 = z;
@@ -136,7 +137,8 @@ a type cast to ideal
 @smallexample
 @c example
 ring r=0,(x,y,z),dp;
-ncalgebra(-1,0); // an anticommutative algebra
+def R=ncalgebra(-1,0); // an anticommutative algebra
+setring R;
 ideal m = maxideal(1);
 m;
 poly f = x2;
@@ -193,7 +195,8 @@ in @sc{Singular} manual.
 ring r=0,(x,y,z),dp;
 matrix D[3][3];
 D[1,2]=-z;  D[1,3]=y;  D[2,3]=x;
-ncalgebra(1,D); // this algebra is U(so_3)
+def R=ncalgebra(1,D); // this algebra is U(so_3)
+setring R;
 ideal I = 0,x,0,1;
 I;
 I + 0;    // simplification
@@ -473,7 +476,8 @@ by names (no evaluation in the preimage ring is possible).
 ring r1 = 0,(a,b),dp; // a commutative ring
 poly P = a^2+ab+b^3;
 ring r2 = 0,(x,y),dp;
-ncalgebra(1,-1); // a Weyl algebra
+def W=ncalgebra(1,-1); // a Weyl algebra
+setring W;
 map M = r1, x^2, -y^3;
 // note: M is a map and not a morphism
 M(P);
@@ -485,7 +489,8 @@ setring Usl2;
 poly  P  = 4*e*f+h^2-2*h; // the central el-t of Usl2
 poly  Q  = e^3*f-h^4;     // some polynomial
 ring W1  = 0,(D,X),dp;
-ncalgebra(1,-1);
+def W2=ncalgebra(1,-1);
+setring W2;
 // this algebra is the opposite Weyl algebra
 option(redSB);
 option(redTail);
@@ -672,7 +677,8 @@ defines a left  module.
 ring r=0,(x,y,z),(c,dp);
 matrix D[3][3];
 D[1,2]=-z;  D[1,3]=y;  D[2,3]=x;
-ncalgebra(1,D); // this algebra is U(so_3)
+def R=ncalgebra(1,D); // this algebra is U(so_3)
+setring R;
 vector s1 = [x2,y3,z];
 vector s2 = [xy,1,0];
 vector s3 = [0,x2-y2,z];
@@ -733,7 +739,8 @@ is a vector, where the index indicates the column (generator)
 ring A=0,(x,y,z),Dp;
 matrix D[3][3];
 D[1,2]=-z;  D[1,3]=y;  D[2,3]=x;  // this algebra is U(so_3)
-ncalgebra(1,D);
+def B=ncalgebra(1,D);
+setring B;
 module M = [x,y],[0,0,x*z];
 module N = (x+y-z)*M - M*(x+y-z);
 print(-N);
@@ -859,9 +866,10 @@ defines a polynomial.
 @smallexample
 @c example
 ring r = 32003,(x,y,z),dp;
-ncalgebra(-1,1);
+def R=ncalgebra(-1,1);
+setring R;
 // ring of some differential-like operators
-r;
+R;
 yx;      // not correct input
 y*x;     // correct input
 poly s1  = x3y2+151x5y+186xy6+169y9;
@@ -910,8 +918,9 @@ a type cast to poly
 @smallexample
 @c example
 ring r=0,(x,y),dp;
-ncalgebra(1,1);  // make it a Weyl algebra
-r;
+def R=ncalgebra(1,1);  // make it a Weyl algebra
+setring R;
+R;
 yx;      // not correct input
 y*x;     // correct input
 poly f = 10x2*y3 + 2y2*x^2 - 2*x*y + y - x + 2;
@@ -1034,13 +1043,14 @@ reports error if an ideal is not a two-sided Groebner basis.
 @smallexample
 @c example error
 ring r=0,(z,u,v,w),dp;
-ncalgebra(-1,0); // an anticommutative algebra
+def R=ncalgebra(-1,0); // an anticommutative algebra
+setring R;
 option(redSB);
 option(redTail);
 ideal i=z^2,u^2,v^2,w^2;
 qring Q = i;  // incorrect call produces error
 kill Q;
-setring r;  // go back to the ring r
+setring R;  // go back to the ring R
 qring q=twostd(i); // now it is an exterior algebra
 q;
 poly k = (v-u)*(zv+u-w);
@@ -1113,7 +1123,8 @@ none
 ring r=0,(x,y,z),dp;
 matrix D[3][3];
 D[1,2]=z;
-ncalgebra(1,D); // it is a Heisenberg algebra
+def R=ncalgebra(1,D); // it is a Heisenberg algebra
+setring R;
 ideal i=z2+z,x+y;
 resolution re=nres(i,0);
 re;
