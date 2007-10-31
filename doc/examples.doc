@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.101 2007-10-31 17:29:39 Singular Exp $
+@comment $Id: examples.doc,v 1.102 2007-10-31 17:43:42 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -3261,10 +3261,10 @@ the displayed symbols).
 @smallexample
 @c example
 // ----- 1.  setting up the algebra
-  ring A = 0,(e,f,h),dp;
+  ring R = 0,(e,f,h),dp;
   matrix D[3][3];
   D[1,2]=-h; D[1,3]=2*e; D[2,3]=-2*f;
-  def S=nc_algebra(1,D); setring S;
+  def A=nc_algebra(1,D); setring A;
 // ----- equivalently, you may use the following:
 //  LIB "ncalg.lib";
 //  def A = makeUsl2();
