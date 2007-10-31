@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.53 2007-10-09 12:41:24 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.54 2007-10-31 08:40:52 Singular Exp $ */
 
 #include <config.h>
 
@@ -30,8 +30,8 @@ static void cf_prepgcd( const CanonicalForm &, const CanonicalForm &, int &, int
 
 void out_cf(char *s1,const CanonicalForm &f,char *s2);
 
-CanonicalForm
-chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG );
+CanonicalForm chinrem_gcd(const CanonicalForm & FF,const CanonicalForm & GG);
+CanonicalForm newGCD(CanonicalForm A, CanonicalForm B);
 
 bool
 gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
@@ -337,13 +337,13 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
     C = gcd( Ci, Ci1 );
     if ( !( pi.isUnivariate() && pi1.isUnivariate() ) )
     {
-#if 0
-        CanonicalForm newGCD(CanonicalForm A, CanonicalForm B);
         //out_cf("F:",f,"\n");
         //out_cf("G:",g,"\n");
         //out_cf("newGCD:",newGCD(f,g),"\n");
-        return newGCD(f,g);
-#endif
+        if (isOn(SW_USE_GCD_P) && (getCharacteristic()>0))
+        {
+          return newGCD(f,g);
+        }
         if ( gcd_test_one( pi1, pi, true ) )
         {
           C=abs(C);
@@ -466,87 +466,91 @@ int si_factor_reminder=1;
 static CanonicalForm
 gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
 {
-    CanonicalForm fc, gc, d1;
-    int mp, cc, p1, pe;
-    mp = f.level()+1;
-    cf_prepgcd( f, g, cc, p1, pe);
-    if ( cc != 0 )
+  CanonicalForm fc, gc, d1;
+  int mp, cc, p1, pe;
+  mp = f.level()+1;
+  cf_prepgcd( f, g, cc, p1, pe);
+  if ( cc != 0 )
+  {
+    if ( cc > 0 )
     {
-        if ( cc > 0 )
-        {
-            fc = replacevar( f, Variable(cc), Variable(mp) );
-            gc = g;
-        }
-        else
-        {
-            fc = replacevar( g, Variable(-cc), Variable(mp) );
-            gc = f;
-        }
-        return cf_content( fc, gc );
-    }
-// now each appearing variable is in f and g
-    fc = f;
-    gc = g;
-    if( gcd_avoid_mtaildegree ( fc, gc, d1 ) )
-        return d1;
-    if ( getCharacteristic() != 0 )
-    {
-        if ( p1 == fc.level() )
-            fc = gcd_poly_p( fc, gc );
-        else
-        {
-            fc = replacevar( fc, Variable(p1), Variable(mp) );
-            gc = replacevar( gc, Variable(p1), Variable(mp) );
-            fc = replacevar( gcd_poly_p( fc, gc ), Variable(mp), Variable(p1) );
-        }
-    }
-    else if (!fc.isUnivariate())
-    {
-      if ( isOn( SW_USE_EZGCD ) )
-      {
-        if ( pe == 1 )
-          fc = ezgcd( fc, gc );
-        else if ( pe > 0 )// no variable at position 1
-        {
-          fc = replacevar( fc, Variable(pe), Variable(1) );
-          gc = replacevar( gc, Variable(pe), Variable(1) );
-          fc = replacevar( ezgcd( fc, gc ), Variable(1), Variable(pe) );
-        }
-        else
-        {
-          pe = -pe;
-          fc = swapvar( fc, Variable(pe), Variable(1) );
-          gc = swapvar( gc, Variable(pe), Variable(1) );
-          fc = swapvar( ezgcd( fc, gc ), Variable(1), Variable(pe) );
-        }
-      }
-      else if (
-      isOn(SW_USE_CHINREM_GCD)
-      && (!gc.isUnivariate())
-      && (isPurePoly_m(fc)) && (isPurePoly_m(gc))
-      )
-      {
-      #if 0
-        if ( p1 == fc.level() )
-            fc = chinrem_gcd( fc, gc );
-        else
-        {
-            fc = replacevar( fc, Variable(p1), Variable(mp) );
-            gc = replacevar( gc, Variable(p1), Variable(mp) );
-            fc = replacevar( chinrem_gcd( fc, gc ), Variable(mp), Variable(p1) );
-        }
-      #else
-        fc = chinrem_gcd( fc, gc);
-      #endif
-      }
+      fc = replacevar( f, Variable(cc), Variable(mp) );
+      gc = g;
     }
     else
     {
-      fc = gcd_poly_0( fc, gc );
+      fc = replacevar( g, Variable(-cc), Variable(mp) );
+      gc = f;
     }
-    if ( d1.degree() > 0 )
-      fc *= d1;
-    return fc;
+    return cf_content( fc, gc );
+  }
+// now each appearing variable is in f and g
+  fc = f;
+  gc = g;
+  if( gcd_avoid_mtaildegree ( fc, gc, d1 ) )
+      return d1;
+  if ( getCharacteristic() != 0 )
+  {
+    if (isOn(SW_USE_GCD_P))
+    {
+      fc=newGCD(fc,gc);
+    }
+    else if ( p1 == fc.level() )
+      fc = gcd_poly_p( fc, gc );
+    else
+    {
+      fc = replacevar( fc, Variable(p1), Variable(mp) );
+      gc = replacevar( gc, Variable(p1), Variable(mp) );
+      fc = replacevar( gcd_poly_p( fc, gc ), Variable(mp), Variable(p1) );
+    }
+  }
+  else if (!fc.isUnivariate())
+  {
+    if ( isOn( SW_USE_EZGCD ) )
+    {
+      if ( pe == 1 )
+        fc = ezgcd( fc, gc );
+      else if ( pe > 0 )// no variable at position 1
+      {
+        fc = replacevar( fc, Variable(pe), Variable(1) );
+        gc = replacevar( gc, Variable(pe), Variable(1) );
+        fc = replacevar( ezgcd( fc, gc ), Variable(1), Variable(pe) );
+      }
+      else
+      {
+        pe = -pe;
+        fc = swapvar( fc, Variable(pe), Variable(1) );
+        gc = swapvar( gc, Variable(pe), Variable(1) );
+        fc = swapvar( ezgcd( fc, gc ), Variable(1), Variable(pe) );
+      }
+    }
+    else if (
+    isOn(SW_USE_CHINREM_GCD)
+    && (!gc.isUnivariate())
+    && (isPurePoly_m(fc)) && (isPurePoly_m(gc))
+    )
+    {
+    #if 0
+      if ( p1 == fc.level() )
+        fc = chinrem_gcd( fc, gc );
+      else
+      {
+        fc = replacevar( fc, Variable(p1), Variable(mp) );
+        gc = replacevar( gc, Variable(p1), Variable(mp) );
+        fc = replacevar( chinrem_gcd( fc, gc ), Variable(mp), Variable(p1) );
+      }
+    #else
+      fc = chinrem_gcd( fc, gc);
+    #endif
+    }
+  }
+  else
+  {
+    fc = gcd_poly_0( fc, gc );
+  }
+  if ( d1.degree() > 0 )
+    fc *= d1;
+  return fc;
 }
 //}}}
 

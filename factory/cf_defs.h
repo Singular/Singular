@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_defs.h,v 1.11 2007-09-26 09:17:39 Singular Exp $ */
+/* $Id: cf_defs.h,v 1.12 2007-10-31 08:40:52 Singular Exp $ */
 
 #ifndef INCL_CF_DEFS_H
 #define INCL_CF_DEFS_H
@@ -39,6 +39,7 @@ const int SW_USE_NTL_GCD_0=9;
 const int SW_USE_NTL_GCD_P=10;
 const int SW_USE_NTL_SORT=11;
 const int SW_USE_CHINREM_GCD=12;
+const int SW_USE_GCD_P=13;
 //}}}
 
 /*ENDPUBLIC*/

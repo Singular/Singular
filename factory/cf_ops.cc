@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_ops.cc,v 1.9 2003-02-18 13:02:23 Singular Exp $ */
+/* $Id: cf_ops.cc,v 1.10 2007-10-31 08:40:53 Singular Exp $ */
 
 //{{{ docu
 //
@@ -520,7 +520,8 @@ totaldegree ( const CanonicalForm & f )
 	return -1;
     else if ( f.inCoeffDomain() )
 	return 0;
-    else {
+    else
+    {
 	CFIterator i;
 	int cdeg = 0, dummy;
 	// calculate maximum over all coefficients of f, taking
