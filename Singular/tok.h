@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.66 2007-03-15 14:36:33 Singular Exp $ */
+/* $Id: tok.h,v 1.67 2007-10-31 17:24:10 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -102,6 +102,7 @@ enum {
   NAMEOF_CMD,
   NAMES_CMD,
   NCALGEBRA_CMD,
+  NC_ALGEBRA_CMD,
   NEWTONPOLY_CMD,
   NPARS_CMD,
   NVARS_CMD,

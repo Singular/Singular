@@ -1,4 +1,4 @@
-version="$Id: involut.lib,v 1.12 2007-01-23 15:03:30 Singular Exp $";
+version="$Id: involut.lib,v 1.13 2007-10-31 17:23:43 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  involut.lib  Procedures for Computations and Operations with Involutions
@@ -163,19 +163,19 @@ example
   ring r=0,(x,y,z,D(1..3)),dp;
   matrix D[6][6];
   D[1,4]=1; D[2,5]=1;  D[3,6]=1;
-  ncalgebra(1,D);
+  nc_algebra(1,D);
   ncdetection();
   kill r;
   //----------------------------------------
   ring r=0,(x,S),dp;
-  ncalgebra(1,-S);
+  nc_algebra(1,-S);
   ncdetection();
   kill r;
   //----------------------------------------
   ring r=0,(x,D(1),S),dp;
   matrix D[3][3];
   D[1,2]=1;  D[1,3]=-S;
-  ncalgebra(1,D);
+  nc_algebra(1,D);
   ncdetection();
 }
 
@@ -339,7 +339,7 @@ example
 {
   "EXAMPLE:";echo = 2;
   ring r = 0,(x,d),dp;
-  ncalgebra(1,1); // Weyl-Algebra
+  nc_algebra(1,1); // Weyl-Algebra
   map F = r,x,-d;
   poly f =  x*d^2+d;
   poly If = involution(f,F);
@@ -460,7 +460,7 @@ EXAMPLE: example findInvo; shows examples
     };
   };
 
-  ncalgebra(1, M); //now new ring @@K become a noncommutative ring
+  nc_algebra(1, M); //now new ring @@K become a noncommutative ring
 
   list l; //list to define an involution
   poly @@F;
@@ -586,7 +586,7 @@ EXAMPLE: example findInvoDiag; shows examples
     };
   };
 
-  ncalgebra(1, M); //now new ring @@K become a noncommutative ring
+  nc_algebra(1, M); //now new ring @@K become a noncommutative ring
 
   list l; //list to define an involution
 
@@ -720,7 +720,7 @@ EXAMPLE: example findAuto; shows examples
     };
   };
 
-  ncalgebra(1, M); //now new ring @@K become a noncommutative ring
+  nc_algebra(1, M); //now new ring @@K become a noncommutative ring
 
   list l; //list to define a homomorphism(isomorphism)
   poly @@F;
@@ -820,7 +820,7 @@ example
   //----------- find all the linear automorphisms --------------------
   //----------- use the call findAuto(0)          --------------------
   ring r = 0,(x,s),dp;
-  ncalgebra(1,s); // the shift algebra
+  nc_algebra(1,s); // the shift algebra
   s*x; // the only relation in the algebra is:
   def Y = findAuto(0);
   setring Y;

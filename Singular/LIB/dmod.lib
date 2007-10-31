@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.19 2007-10-30 16:13:10 Singular Exp $";
+version="$Id: dmod.lib,v 1.20 2007-10-31 17:23:42 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -479,7 +479,7 @@ EXAMPLE: example Sannfslog; shows examples
     @D[2*i-1,2*i]=1;
     //@D[2*i-1,2*i]=-1;
   }
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -2-1- the ring @R(_x,_Dx,s) is ready");
   dbprint(ppl-1, @R);
   matrix M = imap(save,M);
@@ -614,7 +614,7 @@ EXAMPLE: example annfsBM; shows examples
   }
   // L[5] = matrix(UpOneMatrix(Nnew));
   // L[6] = @D;
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -1-1- the ring @R(t,s,_x,_Dx) is ready");
   dbprint(ppl-1, @R);
   // create the ideal I
@@ -681,7 +681,7 @@ EXAMPLE: example annfsBM; shows examples
   {
     @D[i,N+i]=1;
   }
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -2-1- the ring @R2(_x,_Dx,s) is ready");
   dbprint(ppl-1, @R2);
   ideal K = imap(@R,K);
@@ -799,7 +799,7 @@ EXAMPLE: example bernsteinBM; shows examples
   }
   // L[5] = matrix(UpOneMatrix(Nnew));
   // L[6] = @D;
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -1-1- the ring @R(t,s,_x,_Dx) is ready");
   dbprint(ppl-1, @R);
   // create the ideal I
@@ -871,7 +871,7 @@ EXAMPLE: example bernsteinBM; shows examples
   {
     @D[i,N+i]=1;
   }
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -2-1- the ring @R2(_x,_Dx,s) is ready");
   dbprint(ppl-1, @R2);
   ideal MM = maxideal(1);
@@ -1025,7 +1025,7 @@ EXAMPLE: example annfsBM; shows examples
   }
   // L[5] = matrix(UpOneMatrix(Nnew));
   // L[6] = @D;
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -1-1- the ring @R(t,s,_x,_Dx) is ready");
   dbprint(ppl-1, @R);
   // create the ideal I
@@ -1097,7 +1097,7 @@ EXAMPLE: example annfsBM; shows examples
   {
     @D[i,N+i]=1;
   }
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -2-1- the ring @R2(_x,_Dx,s) is ready");
   dbprint(ppl-1, @R2);
   ideal MM = maxideal(1);
@@ -1185,7 +1185,7 @@ EXAMPLE: example annfsBM; shows examples
   {
     @D[i,N+i]=1;
   }
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -4-1- the ring @R4(_x,_Dx) is ready");
   dbprint(ppl-1, @R4);
   ideal K4 = imap(@R,K2);
@@ -1315,7 +1315,7 @@ EXAMPLE: example operatorBM; shows examples
   }
   // L[5] = matrix(UpOneMatrix(Nnew));
   // L[6] = @D;
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -1-1- the ring @R(t,s,_x,_Dx) is ready");
   dbprint(ppl-1, @R);
   // create the ideal I
@@ -1387,7 +1387,7 @@ EXAMPLE: example operatorBM; shows examples
   {
     @D[i,N+i]=1;
   }
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -2-1- the ring @R2(_x,_Dx,s) is ready");
   dbprint(ppl-1, @R2);
   ideal MM = maxideal(1);
@@ -1476,7 +1476,7 @@ EXAMPLE: example operatorBM; shows examples
   {
     @D[i,N+i]=1;
   }
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -4-1- the ring @R4(_x,_Dx,s) is ready");
   dbprint(ppl-1, @R4);
   ideal LD0 = imap(@R,K2);
@@ -1620,7 +1620,7 @@ EXAMPLE: example annfsParamBM; shows examples
   }
   // L[5] = matrix(UpOneMatrix(Nnew));
   // L[6] = @D;
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -1-1- the ring @R(t,s,_x,_Dx) is ready");
   dbprint(ppl-1, @R);
   // create the ideal I
@@ -1712,7 +1712,7 @@ EXAMPLE: example annfsParamBM; shows examples
   {
     @D[i,N+i]=1;
   }
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -3-1- the ring @R2(_x,_Dx,s) is ready");
   dbprint(ppl-1, @R2);
   ideal K = imap(@R,K);
@@ -1865,7 +1865,7 @@ EXAMPLE: example annfsBMI; shows examples
   }
   // L[5] = matrix(UpOneMatrix(Nnew));
   // L[6] = @D;
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -1-1- the ring @R(_t,_s,_x,_Dx) is ready");
   dbprint(ppl-1, @R);
   // create the ideal I
@@ -1953,7 +1953,7 @@ EXAMPLE: example annfsBMI; shows examples
   {
     @D[i,N+i]=1;
   }
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -2-1- the ring @R2(_x,_Dx,_s) is ready");
   dbprint(ppl-1, @R2);
 //  ideal MM = maxideal(1);
@@ -2052,7 +2052,7 @@ EXAMPLE: example annfsBMI; shows examples
   {
     @D[i,N+i]=1;
   }
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -4-1- the ring @R4i(_x,_Dx,_s) is ready");
   dbprint(ppl-1, @R4);
   ideal K4 = imap(@R,K);
@@ -2189,7 +2189,7 @@ EXAMPLE: example annfsOT; shows examples
   //  @D[N+3,2*(N+2)]=1; old t,Dt stuff
   //  L[5] = matrix(UpOneMatrix(Nnew));
   //  L[6] = @D;
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -1-1- the ring @R(u,v,t,Dt,_x,_Dx) is ready");
   dbprint(ppl-1, @R);
   // create the ideal I
@@ -2262,7 +2262,7 @@ EXAMPLE: example annfsOT; shows examples
   {
     @D[2+i,2+N+i] = 1;
   }
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -2-1- the ring @R2(t,Dt,_x,_Dx,s) is ready");
   dbprint(ppl-1, @R2);
   ideal MM = maxideal(1);
@@ -2331,7 +2331,7 @@ EXAMPLE: example annfsOT; shows examples
   {
     @D[i,N+i]=1;
   }
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -3-1- the ring @R3(_x,_Dx,s) is ready");
   dbprint(ppl-1, @R3);
   ideal MM = maxideal(1);
@@ -2423,7 +2423,7 @@ EXAMPLE: example annfsOT; shows examples
   {
     @D[i,N+i]=1;
   }
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -5-1- the ring @R5 is ready");
   dbprint(ppl-1, @R5);
   ideal K5 = imap(@R2,K3);
@@ -2559,7 +2559,7 @@ EXAMPLE: example SannfsOT; shows examples
   //  @D[N+3,2*(N+2)]=1; old t,Dt stuff
   //  L[5] = matrix(UpOneMatrix(Nnew));
   //  L[6] = @D;
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -1-1- the ring @R(u,v,t,Dt,_x,_Dx) is ready");
   dbprint(ppl-1, @R);
   // create the ideal I
@@ -2634,7 +2634,7 @@ EXAMPLE: example SannfsOT; shows examples
   {
     @D[2+i,2+N+i] = 1;
   }
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -2-1- the ring @R2(t,Dt,_x,_Dx,s) is ready");
   dbprint(ppl-1, @R2);
   ideal MM = maxideal(1);
@@ -2700,7 +2700,7 @@ EXAMPLE: example SannfsOT; shows examples
   {
     @D[i,N+i]=1;
   }
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -3-1- the ring @R3(_x,_Dx,s) is ready");
   dbprint(ppl-1, @R3);
   ideal MM = maxideal(1);
@@ -2829,7 +2829,7 @@ EXAMPLE: example SannfsBM; shows examples
   }
   //  L[5] = matrix(UpOneMatrix(Nnew));
   //  L[6] = @D;
-  def S=ncalgebra(1,@D);setring S;
+  def S=nc_algebra(1,@D);setring S;
   dbprint(ppl,"// -1-1- the ring @R(t,s,_x,_Dx) is ready");
   dbprint(ppl-1, @R);
   // create the ideal I
@@ -2902,7 +2902,7 @@ EXAMPLE: example SannfsBM; shows examples
   {
     @D[i,N+i]=1;
   }
-  def S2=ncalgebra(1,@D);setring S2;
+  def S2=nc_algebra(1,@D);setring S2;
   dbprint(ppl,"//  -2-1- the ring @R2(_x,_Dx,s) is ready");
   dbprint(ppl-1, @R2);
   ideal MM = maxideal(1);
@@ -3044,7 +3044,7 @@ EXAMPLE: example SannfsLOT; shows examples
   //  @D[N+3,2*(N+2)]=1; old t,Dt stuff
   //  L[5] = matrix(UpOneMatrix(Nnew));
   //  L[6] = @D;
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -1-1- the ring @R(t,Dt,_x,_Dx,s) is ready");
   dbprint(ppl-1, @R);
   // create the ideal I
@@ -3121,7 +3121,7 @@ EXAMPLE: example SannfsLOT; shows examples
   {
     @D[i,N+i]=1;
   }
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"//  -2-1- the ring @R2(_x,_Dx,s) is ready");
   dbprint(ppl-1, @R2);
   ideal MM = maxideal(1);
@@ -3320,7 +3320,7 @@ EXAMPLE: example annfs0; shows examples
   {
     @D[i,N+i]=1;
   }
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -3-1- the ring @R4 is ready");
   dbprint(ppl-1, @R4);
   ideal K4 = imap(@R2,K2);
@@ -3471,7 +3471,7 @@ example
 //   }
 //   //  L[5] = matrix(UpOneMatrix(Nnew));
 //   //  L[6] = @D;
-//   ncalgebra(1,@D);
+//   nc_algebra(1,@D);
 //   dbprint(ppl,"// -1-1- the ring @R is ready");
 //   dbprint(ppl-1,@R);
 //   // create the ideal
@@ -3548,7 +3548,7 @@ example
 //   {
 //     @D[2+i,2+N+i]=1;
 //   }
-//   ncalgebra(1,@D);
+//   nc_algebra(1,@D);
 //   dbprint(ppl,"// -2-1- the ring @R2 is ready");
 //   dbprint(ppl-1,@R2);
 //   ideal MM = maxideal(1);
@@ -3612,7 +3612,7 @@ example
 //   {
 //     @D[i,N+i]=1;
 //   }
-//   ncalgebra(1,@D);
+//   nc_algebra(1,@D);
 //   dbprint(ppl,"// -3-1- the ring @R5 is ready");
 //   dbprint(ppl-1,@R5);
 //   ideal K5 = imap(@R2,K);
@@ -4150,7 +4150,7 @@ EXAMPLE: example checkRoot1; shows examples
   {
     @D[i,i+n]=1;
   }
-  def S=ncalgebra(1,@D);
+  def S=nc_algebra(1,@D);
   dbprint(ppl,"// -1-1- the ring @R(_x,_Dx) is ready");
   dbprint(ppl-1, S);
   // create the ideal K = ann_D[s](f^s)_{s=-alpha} + < f >
@@ -4266,7 +4266,7 @@ EXAMPLE: example checkRoot1; shows examples
   {
     @D[i,i+n]=1;
   }
-  ncalgebra(1,@D);
+  nc_algebra(1,@D);
   dbprint(ppl,"// -1-1- the ring @R(_x,_Dx,s) is ready");
   dbprint(ppl-1, @R);
   // now, continue with the algorithm

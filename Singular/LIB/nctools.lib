@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.35 2007-10-30 21:27:15 motsak Exp $";
+version="$Id: nctools.lib,v 1.36 2007-10-31 17:23:49 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -115,7 +115,7 @@ example
   C[1,2]=q; C[1,3]=q; C[1,4]=1; C[2,3]=1; C[2,4]=q; C[3,4]=q;
   matrix D[4][4];
   D[1,4]=(q-1/q)*b*c;
-  def S = ncalgebra(C,D); setring S; S;
+  def S = nc_algebra(C,D); setring S; S;
   Gweights(S);
   def D=fetch(r,D);
   Gweights(D);
@@ -155,7 +155,7 @@ SEE ALSO: Gweights
     string newringstring="ring newring=("+charstr(r)+"),("+varstr(r)+"),M("+string(m)+")";
     execute (newringstring);
     def lnewring=imap(r,lr);
-    return( ncalgebra(lnewring[1],lnewring[2]) ); 
+    return( nc_algebra(lnewring[1],lnewring[2]) ); 
   }
   else
   {
@@ -171,7 +171,7 @@ example
   C[1,2]=q; C[1,3]=q; C[1,4]=1; C[2,3]=1; C[2,4]=q; C[3,4]=q;
   matrix D[4][4];
   D[1,4]=(q-1/q)*b*c;
-  def S = ncalgebra(C,D); setring S; S;
+  def S = nc_algebra(C,D); setring S; S;
   def t=weightedRing(S);
   setring t; t;
 }
@@ -376,7 +376,7 @@ example
   print(C);
   matrix D[3][3]=0,1,2y,0,0,-2x+y+1;
   print(D);
-  def S=ncalgebra(C,D);setring S; S;
+  def S=nc_algebra(C,D);setring S; S;
   def l=ncRelations(S);
   print (l[1]);
   print (l[2]);
@@ -437,7 +437,7 @@ EXAMPLE: example findimAlgebra; shows examples
     }
   }
   def save = basering;
-  def S = ncalgebra(C,D); setring S;
+  def S = nc_algebra(C,D); setring S;
   ideal fdQuot = fetch(save,D);
   export fdQuot;
 }
@@ -489,7 +489,7 @@ example
   D[1,2]=-z;
   D[1,3]=2*x;
   D[2,3]=-2*y;
-  def S = ncalgebra(1,D); setring S; 
+  def S = nc_algebra(1,D); setring S; 
   S; // this is U(sl_2)
   poly c = 4*x*y+z^2-2*z;
   printlevel = 0;
@@ -527,7 +527,7 @@ example
   matrix C = UpOneMatrix(3);
   C[1,3]   = q;
   print(C);
-  def S = ncalgebra(C,0); serring S;
+  def S = nc_algebra(C,0); serring S;
   S;
 }
 
@@ -593,7 +593,7 @@ example
   C[1,2]=q2; C[1,3]=q1; C[2,3]=1;
   matrix D[3][3];
   D[1,2]=x; D[1,3]=z;
-  def S = ncalgebra(C,D); setring S; 
+  def S = nc_algebra(C,D); setring S; 
   S;
   ideal j=ndcond(); // the silent version
   j;
@@ -655,7 +655,7 @@ EXAMPLE: example Weyl; shows examples
       @D[2*i-1,2*i]=1;
     }
   }
-  return(ncalgebra(1,@D));
+  return(nc_algebra(1,@D));
 }
 example
 {
@@ -703,7 +703,7 @@ EXAMPLE: example makeHeisenberg; shows examples
   {
     D[i,N+i]=h^@deg;
   }
-  return(ncalgebra(1,D));
+  return(nc_algebra(1,D));
 }
 example
 {
@@ -826,7 +826,7 @@ EXAMPLE: example SuperCommutative; shows examples
 
 /*
   // Singular'(H.S.) politics: no ring copies! 
-  // in future ncalgebra() should return a new ring!!!
+  // in future nc_algebra() should return a new ring!!!
   list CurrRing = ringlist(basering);
   def @R = ring(CurrRing);
   setring @R; // @R;
@@ -859,7 +859,7 @@ EXAMPLE: example SuperCommutative; shows examples
   
   if( (b == 1) && (e == N) ) // just an exterior algebra?
   {  
-    def S = ncalgebra(-1, 0); // define ground G-algebra!
+    def S = nc_algebra(-1, 0); // define ground G-algebra!
     setring S;  
   } else
   {
@@ -872,7 +872,7 @@ EXAMPLE: example SuperCommutative; shows examples
         @E[i, j] = -1;
       }
     }
-    def S = ncalgebra(@E, 0); // define ground G-algebra!
+    def S = nc_algebra(@E, 0); // define ground G-algebra!
     setring S;
   }
 
@@ -1155,7 +1155,7 @@ example
   kill R;
 /////////////////////////////////////////////////////////////////////
   ring R = 0,(x(1..4)),dp;
-  def S = ncalgebra(1, 0); setring S; S; // still commutative!
+  def S = nc_algebra(1, 0); setring S; S; // still commutative!
   if(IsSCA())
     { "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "]."; }
   else
@@ -1179,7 +1179,7 @@ example
     }
   }
 
-  def S = ncalgebra(E,0); setring S; S;
+  def S = nc_algebra(E,0); setring S; S;
   
   if(IsSCA())
     { "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "]."; }
@@ -1221,7 +1221,7 @@ EXAMPLE: example Exterior; shows examples
   execute(NewRing);
   matrix @E = UpOneMatrix(N);
   @E = -1*(@E);
-  def @@RR = ncalgebra(@E,0); setring @@RR;
+  def @@RR = nc_algebra(@E,0); setring @@RR;
   int i;
   ideal Q;
   for ( i=1; i<=N; i++ )
@@ -1372,7 +1372,7 @@ EXAMPLE: example rightSyz; shows examples
 example
 { "EXAMPLE:"; echo = 2;
   ring r = 0,(x,d),dp;
-  def S = ncalgebra(1,1); setring S; // the first Weyl algebra
+  def S = nc_algebra(1,1); setring S; // the first Weyl algebra
   ideal I = x,d;
   module LS = syz(I);
   print(LS);
@@ -1404,7 +1404,7 @@ example
 { "EXAMPLE:"; echo = 2;
   LIB "ncalg.lib";
   ring r = 0,(x,d),dp;
-  def S = ncalgebra(1,1); setring S; // Weyl algebra
+  def S = nc_algebra(1,1); setring S; // Weyl algebra
   ideal I = x; I = std(I);
   poly  p = x*d+1;
   NF(p,I); // left normal form
