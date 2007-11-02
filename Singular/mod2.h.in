@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.119 2007-10-16 16:59:46 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.120 2007-11-02 13:18:53 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -109,6 +109,8 @@
 #undef HAVE_SIGINTERRUPT
 /* define for boost includes and lib */
 #undef HAVE_BOOST_DYNAMIC_BITSET_HPP
+/* define for std:vector includes */
+#undef USE_STDVECBOOL
 /* Define sizeof(char) */
 #define SIZEOF_CHAR 1
 /* Define sizeof(short) */
@@ -238,7 +240,8 @@
 
 #define BIT_SIZEOF_LONG CHAR_BIT*SIZEOF_LONG
 
-#define SINGULAR_VERSION ((SINGULAR_MAJOR_VERSION*1000 + SINGULAR_MINOR_VERSION*100 + SINGULAR_SUB_VERSION*10)+2)
+#define SINGULAR_PATCHLEVEL 2
+#define SINGULAR_VERSION ((SINGULAR_MAJOR_VERSION*1000 + SINGULAR_MINOR_VERSION*100 + SINGULAR_SUB_VERSION*10)+SINGULAR_PATCHLEVEL)
 
 /*******************************************************************
  * Miscellanous Defines

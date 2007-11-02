@@ -355,7 +355,7 @@ case "$ac_cv_singuname" in
           if test "$ac_cv_lib_dl_dlopen" = yes; then
 	  	LD_DYN_FLAGS="-ldl -rdynamic"
 	  	SFLAGS="-fpic -DPIC"
-	  	SLDFLAGS=-shared 
+	  	SLDFLAGS=-shared
 		LD=ld
 	        ac_lib_dl=yes
 	  fi
@@ -543,8 +543,14 @@ AC_ARG_WITH(
   [  --with-lex=[LEX,no]     uses LEX as lex program, default is flex])
 AC_ARG_WITH(
   readline,
-  [  --with-readline=[dynamic,static,no]          
+  [  --with-readline=[dynamic,static,no]
                           do use dynamic/static/no readline for fancy display])
+AC_ARG_WITH(
+  Boost,
+  [  --without-Boost         do not use Boost ])
+AC_ARG_WITH(
+  stdvec,
+  [  --with-stdvec           use std::vector ])
 AC_ARG_WITH(
   MP,
   [  --without-MP            do not use MP (no MP links)])
@@ -565,10 +571,10 @@ AC_ARG_WITH(
   [  --without-dl            do not use dynamic linking, modules, and kernel])
 AC_ARG_WITH(
   dynamic-modules,
-  [  --with-dynamic-modules  do compile with dynamic modules support]) 
+  [  --with-dynamic-modules  do compile with dynamic modules support])
 AC_ARG_WITH(
   dynamic-kernel,
-  [  --without-dynamic-kernel               
+  [  --without-dynamic-kernel
                           do not compile with dynamic kernel parts])
 AC_ARG_WITH(apint,
   [  --with-apint=PACKAGE    use PACKAGE for arbitary integer arithmetic])
@@ -693,7 +699,7 @@ else
   AC_MSG_RESULT(none)
   AC_MSG_WARN(building without readline: disabling fancy display)
 fi
-  
+
 NEED_LIBS=$LIBS
 
 # gmp, MP, MPT, factory, libfac
@@ -711,10 +717,25 @@ AC_CHECK_LIB(ntl,main)
 AC_CHECK_HEADERS(gmp.h MP.h  MPT.h factory.h factor.h omalloc.h \
  omalloc.c)
 
-AC_LANG_SAVE
-AC_LANG_CPLUSPLUS
-AC_CHECK_HEADERS(boost/dynamic_bitset.hpp)
-AC_LANG_RESTORE
+AC_MSG_CHECKING(whether to use Boost)
+if test "$with_Boost" != no; then
+  AC_MSG_RESULT(yes)
+  AC_LANG_SAVE
+  AC_LANG_CPLUSPLUS
+  AC_CHECK_HEADERS(boost/dynamic_bitset.hpp)
+  AC_LANG_RESTORE
+else
+  AC_MSG_RESULT(no)
+  AC_MSG_CHECKING(whether to use std::vector)
+  if test "$with_stdvec" != yes; then
+    AC_MSG_RESULT(no)
+  else
+    AC_MSG_RESULT(yes)
+    AC_DEFINE(USE_STDVECBOOL)
+    USE_STDVECBOOL=1
+  fi
+fi
+AC_SUBST(USE_STDVECBOOL)
 
 if test "$ac_cv_lib_gmp_main" = yes && \
  test "$ac_cv_header_gmp_h" = yes; then
@@ -752,7 +773,7 @@ fi
 # evaluate results
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl make sure that omalloc is there
-dnl 
+dnl
 if test "$ac_cv_omalloc_ok" != yes && test "$enable_omalloc" != yes; then
   AC_MSG_ERROR(can not build without omalloc)
 fi
