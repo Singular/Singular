@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.44 2007-10-31 17:29:41 Singular Exp $
+@comment $Id: plureference.doc,v 1.45 2007-11-05 14:45:57 motsak Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -57,6 +57,7 @@ Note, that both @strong{Control structures} and @strong{System variables} of
 * modulo @value{PSUFFIX}::
 * mres @value{PSUFFIX}::
 * nc_algebra::
+* ncalgebra::
 * nres @value{PSUFFIX}::
 * oppose::
 * opposite::
@@ -838,7 +839,7 @@ See
 
 
 @c -----------------------------
-@node nc_algebra, nres @value{PSUFFIX}, mres @value{PSUFFIX}, Functions @value{PSUFFIX}
+@node nc_algebra, ncalgebra, mres @value{PSUFFIX}, Functions @value{PSUFFIX}
 @section nc_algebra
 @cindex nc_algebra
 
@@ -956,8 +957,39 @@ See also
 @c ref
 
 
+@c -----------------------------
+@node ncalgebra, nres @value{PSUFFIX}, nc_algebra, Functions @value{PSUFFIX}
+@section ncalgebra
+@cindex ncalgebra
+
+@table @code
+@item @strong{Syntax:}
+@*@code{ncalgebra(} matrix_expression C, matrix_expression D @code{)}
+@*@code{ncalgebra(} number_expression n, matrix_expression D @code{)}
+@*@code{ncalgebra(} matrix_expression C, poly_expression p @code{)}
+@*@code{ncalgebra(} number_expression n, poly_expression p @code{)}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+Works as @ref{nc_algebra} but chages the basering.
+
+@item @strong{Remark:}
+At present, this function is DEPRECIATED and NO LONGER SUPPORTED 
+since it violates the general @sc{Singular} policy: only @ref{ring} and @ref{setring} can change the basering.
+Please use @ref{nc_algebra} instead.
+
+@end table
+@c ref
+See also
+@ref{nc_algebra};
+@ref{nctools_lib};
+@c ref
+
+
+
+
 @c ---------------------------------------
-@node  nres @value{PSUFFIX}, oppose, nc_algebra, Functions @value{PSUFFIX}
+@node  nres @value{PSUFFIX}, oppose, ncalgebra, Functions @value{PSUFFIX}
 @section nres @value{PSUFFIX}
 @cindex nres @value{PSUFFIX}
 @table @code
