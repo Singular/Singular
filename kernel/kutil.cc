@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.65 2007-07-26 10:27:17 Singular Exp $ */
+/* $Id: kutil.cc,v 1.66 2007-11-05 12:40:19 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -6434,8 +6434,13 @@ int redFirstShift (LObject* h,kStrategy strat)
         PrintS(" with ");
         wrp(strat->S[j]);
       }
-      (*h).p = nc_ReduceSpoly(strat->S[j],(*h).p, currRing);
-      //spSpolyRed(strat->T[j].p,(*h).p,strat->kNoether);
+      #ifdef HAVE_PLURAL
+      if (rIsPluralRing(currRing))
+        (*h).p = nc_ReduceSpoly(strat->S[j],(*h).p, currRing);
+      else
+      #else
+        spSpolyRed(strat->T[j].p,(*h).p,strat->kNoether);
+      #endif
 
       if (TEST_OPT_DEBUG)
       {
