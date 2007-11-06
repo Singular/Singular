@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.97 2007-03-10 13:02:00 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.98 2007-11-06 14:56:24 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -1347,7 +1347,12 @@ void syMake(leftv v,char * id, idhdl packhdl)
         {
           v->data = (void *)nInit(0);
           v->rtyp = NUMBER_CMD;
+          #ifdef HAVE_PLURAL
+          // in this case we may have monomials equal to 0 in p_Read
+          v->name = id;
+          #else
           omFree((ADDRESS)id);
+          #endif
         }
         else
         if (pIsConstant(p))
@@ -1381,7 +1386,12 @@ void syMake(leftv v,char * id, idhdl packhdl)
         {
           v->data = (void *)nInit(0);
           v->rtyp = NUMBER_CMD;
+          #ifdef HAVE_PLURAL
+          // in this case we may have monomials equal to 0 in p_Read
+          v->name = id;
+          #else
           omFree((ADDRESS)id);
+          #endif
         }
         else
         if (pIsConstant(p))

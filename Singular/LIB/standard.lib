@@ -2,7 +2,7 @@
 //major revision Jan/Feb. 2007, GMG
 //groebner mit Optionen versehen
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.96 2007-11-06 10:40:54 king Exp $";
+version="$Id: standard.lib,v 1.97 2007-11-06 14:56:24 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -660,7 +660,7 @@ example
 proc qslimgb (i)
 "USAGE:   qslimgb(i); i ideal or module
 RETURN:  same type as input, a standard basis of i computed with slimgb
-NOTE:    Only as long as slimgb does not know qrings qslimgb should be used 
+NOTE:    Only as long as slimgb does not know qrings qslimgb should be used
          in case the basering is (possibly) a quotient ring.
          The quotient ideal is added to the input and slimgb is applied.
 EXAMPLE: example qslimgb; shows an example"
@@ -1866,6 +1866,7 @@ EXAMPLE: example weightKB; shows an example
     stdtop=stc;
     ideal out=widkbase(dd);
     delkbclass();
+    out=simplify(out,2); // delete 0
     return(out);
   }
   list mbase=kbprepare(stc);
@@ -1881,6 +1882,7 @@ EXAMPLE: example weightKB; shows an example
     mout=mout+widkbase(ii)*gen(im);
   }
   delkbclass();
+  mout=simplify(mout,2); // delete 0
   return(mout);
 }
 example
@@ -1897,15 +1899,12 @@ static proc kbclass()
   export (wwtop,mmtop);
   ideal stdtop,kbtop;
   export (stdtop,kbtop);
-  int kbsize;
-  export (kbsize);
 }
 // delete global values
 static proc delkbclass()
 {
   kill wwtop,mmtop;
   kill stdtop,kbtop;
-  kill kbsize;
 }
 //  select parts of the modul
 static proc kbprepare(module mstc)
@@ -1984,8 +1983,7 @@ static proc widkbase(int dd)
     {
       if((mo!=0) and (reduce(mo,stdtop)==mo))
       {
-        kbsize++;
-        kbtop[kbsize]=mo;
+        kbtop[ncols(kbtop)+1]=mo;
         return(kbtop);
       }
     }
@@ -2013,8 +2011,8 @@ static proc weightmon(int va, int drest, poly mm)
     {
       mm=var(1)^m2*mm;
       if ((mm!=0) and (reduce(mm,stdtop)==mm))
-      { kbsize++;
-        kbtop[kbsize]=mm;
+      {
+        kbtop[ncols(kbtop)+1]=mm;
       }
     }
     return();
@@ -2029,8 +2027,7 @@ static proc weightmon(int va, int drest, poly mm)
     {
       if ((mm!=0) and (reduce(mm,stdtop)==mm))
       {
-        kbsize++;
-        kbtop[kbsize]=mm;
+        kbtop[ncols(kbtop)+1]=mm;
         return();
       }
     }
