@@ -2,7 +2,7 @@
 //major revision Jan/Feb. 2007, GMG
 //groebner mit Optionen versehen
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.97 2007-11-06 14:56:24 Singular Exp $";
+version="$Id: standard.lib,v 1.98 2007-11-06 20:14:04 king Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -2018,7 +2018,10 @@ static proc weightmon(int va, int drest, poly mm)
     return();
   }
   m2=drest;
-  weightmon(va-1,m2,mm);
+  if ((mm!=0) and (reduce(mm,stdtop)==mm))
+  {
+    weightmon(va-1,m2,mm);
+  }
   while(m2>=wwtop[va])
   {
     m2=m2-wwtop[va];
@@ -2031,7 +2034,10 @@ static proc weightmon(int va, int drest, poly mm)
         return();
       }
     }
-    weightmon(va-1,m2,mm);
+     if ((mm!=0) and (reduce(mm,stdtop)==mm))
+     {
+       weightmon(va-1,m2,mm);
+     }
   }
   return();
 }
