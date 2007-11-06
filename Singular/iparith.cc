@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.459 2007-10-31 17:24:08 Singular Exp $ */
+/* $Id: iparith.cc,v 1.460 2007-11-06 14:58:18 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -317,7 +317,7 @@ cmdnames cmds[] =
   { "nameof",      0, NAMEOF_CMD ,        CMD_1},
   { "names",       0, NAMES_CMD ,         CMD_M},
   #ifdef HAVE_PLURAL
-  { "ncalgebra",   0, NCALGEBRA_CMD ,     CMD_2},
+  { "ncalgebra",   2, NCALGEBRA_CMD ,     CMD_2},
   { "nc_algebra",  0, NC_ALGEBRA_CMD ,    CMD_2},
   #endif
   { "ncols",       0, COLS_CMD ,          CMD_1},
@@ -2413,8 +2413,6 @@ static BOOLEAN jjPlural_num_poly(leftv res, leftv a, leftv b)
 {
   if (iiOp==NCALGEBRA_CMD)
   {
-    WarnS("`ncalgebra` is depreciated (basering will be changed),\n");
-    WarnS("please update to `nc_algebra`");
     return nc_CallPlural(NULL,NULL,(poly)a->Data(),(poly)b->Data(),currRing);
   }
   else
@@ -2430,8 +2428,6 @@ static BOOLEAN jjPlural_num_mat(leftv res, leftv a, leftv b)
 {
   if (iiOp==NCALGEBRA_CMD)
   {
-    WarnS("`ncalgebra` is depreciated (basering will be changed),\n");
-    WarnS("please update to `nc_algebra`");
     return nc_CallPlural(NULL,(matrix)b->Data(),(poly)a->Data(),NULL,currRing);
   }
   else
@@ -2447,8 +2443,6 @@ static BOOLEAN jjPlural_mat_poly(leftv res, leftv a, leftv b)
 {
   if (iiOp==NCALGEBRA_CMD)
   {
-    WarnS("`ncalgebra` is depreciated (basering will be changed),\n");
-    WarnS("please update to `nc_algebra`");
     return nc_CallPlural((matrix)a->Data(),NULL,NULL,(poly)b->Data(),currRing);
   }
   else
@@ -2464,8 +2458,6 @@ static BOOLEAN jjPlural_mat_mat(leftv res, leftv a, leftv b)
 {
   if (iiOp==NCALGEBRA_CMD)
   {
-    WarnS("`ncalgebra` is depreciated (basering will be changed),\n");
-    WarnS("please update to `nc_algebra`");
     return nc_CallPlural((matrix)a->Data(),(matrix)b->Data(),NULL,NULL,currRing);
   }
   else
@@ -6426,12 +6418,13 @@ static BOOLEAN jjLIST_PL(leftv res, leftv v)
     L->Init(sl);
     for (i=0;i<sl;i++)
     {
-      if (h!=NULL) { /* e.g. not in the first step:
-                     * h is the pointer to the old sleftv,
-                     * v is the pointer to the next sleftv
-                     * (in this moment) */
-                     h->next=v;
-                   }
+      if (h!=NULL)
+      { /* e.g. not in the first step:
+         * h is the pointer to the old sleftv,
+         * v is the pointer to the next sleftv
+         * (in this moment) */
+         h->next=v;
+      }
       h=v;
       v=v->next;
       h->next=NULL;
@@ -7082,7 +7075,7 @@ void ttGen2b()
     "#ifdef MODULE_GENERATOR\n"
     "#define omAlloc0(A) malloc(A)\n"
     "#endif\n"
-    "void iiInitCmdName() {\n"
+    "void iiInitCmdName()\n{\n"
     "  sArithBase.nCmdUsed      = 0;\n"
     "  sArithBase.nCmdAllocated = %d;\n"
     "  sArithBase.sCmds = (cmdnames*)omAlloc0(sArithBase.nCmdAllocated*sizeof(cmdnames));\n"
@@ -7094,14 +7087,16 @@ void ttGen2b()
 
   qsort(&cmds, cmd_size, sizeof(cmdnames), (&_gentable_sort_cmds));
 
-  for(m=0; m<cmd_size; m++) {
+  for(m=0; m<cmd_size; m++)
+  {
     if(cmds[m].tokval>0) id_nr++;
     if(cmds[m].tokval==VRTIMER) fprintf(outfile,"#ifdef HAVE_RTIMER\n");
     fprintf(outfile,"  iiArithAddCmd(\"%s\", %*d, %3d, ",cmds[m].name,
             20-strlen(cmds[m].name),
             cmds[m].alias,
             cmds[m].tokval);
-    switch(cmds[m].toktype) {
+    switch(cmds[m].toktype)
+    {
         case CMD_1:            fprintf(outfile,"CMD_1"); break;
         case CMD_2:            fprintf(outfile,"CMD_2"); break;
         case CMD_3:            fprintf(outfile,"CMD_3"); break;
@@ -7115,9 +7110,12 @@ void ttGen2b()
         case RING_DECL:        fprintf(outfile,"RING_DECL"); break;
         case NONE:             fprintf(outfile,"NONE"); break;
         default:
-          if((cmds[m].toktype>' ') &&(cmds[m].toktype<127)) {
+          if((cmds[m].toktype>' ') &&(cmds[m].toktype<127))
+          {
             fprintf(outfile,"'%c'",cmds[m].toktype);
-          } else {
+          }
+          else
+          {
             fprintf(outfile,"%d",cmds[m].toktype);
           }
           break;
