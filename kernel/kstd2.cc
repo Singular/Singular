@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.54 2007-07-26 10:27:17 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.55 2007-11-06 12:58:34 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1503,6 +1503,8 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
 // static int bba_count = 0;
 // #endif
 
+#ifdef HAVE_PLURAL
+
 ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int uptodeg, int lV)
 {
 #ifdef KDEBUG
@@ -1761,4 +1763,4 @@ ideal freegb(ideal I, int uptodeg, int lVblock)
   ideal RS = bbaShift(I,NULL, NULL, NULL, strat, uptodeg, lVblock);
   return(RS);
 }
-
+#endif

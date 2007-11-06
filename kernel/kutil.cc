@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.66 2007-11-05 12:40:19 Singular Exp $ */
+/* $Id: kutil.cc,v 1.67 2007-11-06 12:58:34 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -6051,6 +6051,7 @@ int posInT_pLength(const TSet set,const int length,LObject &p)
 
 #endif
 
+#ifdef HAVE_PLURAL
 /* including the self pairs? */
 
 /*1
@@ -6108,15 +6109,9 @@ void enterOnePairShift (int i, poly p, int ecart, int isFromQ, kStrategy strat, 
   }
 
 
-#ifdef HAVE_PLURAL
   const BOOLEAN bIsPluralRing = rIsPluralRing(currRing);
   const BOOLEAN bIsSCA        = rIsSCA(currRing) && strat->homog; // for prod-crit
   const BOOLEAN bNCProdCrit   = ( !bIsPluralRing || bIsSCA ); // commutative or homogeneous SCA
-#else
-  const BOOLEAN bIsPluralRing = FALSE;
-  const BOOLEAN bIsSCA        = FALSE;
-  const BOOLEAN bNCProdCrit   = TRUE;
-#endif
 
   if (strat->sugarCrit && bNCProdCrit)
   {
@@ -6258,7 +6253,6 @@ void enterOnePairShift (int i, poly p, int ecart, int isFromQ, kStrategy strat, 
     Lp.p=NULL;
   else
   {
-    #ifdef HAVE_PLURAL
     if ( bIsPluralRing )
     {
       if(pHasNotCF(p, strat->S[i]))
@@ -6282,7 +6276,6 @@ void enterOnePairShift (int i, poly p, int ecart, int isFromQ, kStrategy strat, 
       else  Lp.p = nc_CreateSpoly(strat->S[i],p,currRing);
     }
     else
-    #endif
     {
       Lp.p = ksCreateShortSpoly(strat->S[i],p, strat->tailRing);
     }
@@ -6396,15 +6389,18 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
 
   }
 }
+#endif
 
 
 
+#ifdef HAVE_PLURAL
 /*2
 *reduces h with elements from T choosing  the first possible
 * element in t with respect to the given pDivisibleBy
 */
 int redFirstShift (LObject* h,kStrategy strat)
 {
+  assume(rIsPluralRing(currRing));
   int at,reddeg,d,i;
   int pass = 0;
   int j = 0;
@@ -6434,13 +6430,8 @@ int redFirstShift (LObject* h,kStrategy strat)
         PrintS(" with ");
         wrp(strat->S[j]);
       }
-      #ifdef HAVE_PLURAL
-      if (rIsPluralRing(currRing))
-        (*h).p = nc_ReduceSpoly(strat->S[j],(*h).p, currRing);
-      else
-      #else
-        spSpolyRed(strat->T[j].p,(*h).p,strat->kNoether);
-      #endif
+      (*h).p = nc_ReduceSpoly(strat->S[j],(*h).p, currRing);
+      //  spSpolyRed(strat->T[j].p,(*h).p,strat->kNoether);
 
       if (TEST_OPT_DEBUG)
       {
@@ -6510,6 +6501,7 @@ int redFirstShift (LObject* h,kStrategy strat)
     }
   }
 }
+#endif
 
 
 /*2

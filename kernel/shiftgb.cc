@@ -1,12 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shiftgb.cc,v 1.2 2007-06-24 16:44:41 levandov Exp $ */
+/* $Id: shiftgb.cc,v 1.3 2007-11-06 12:58:35 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for shift GB and free GB
 */
 
 #include "mod2.h"
+
+#ifdef HAVE_PLURAL
 #include "febase.h"
 #include "ring.h"
 #include "polys.h"
@@ -246,4 +248,4 @@ void initBbaShift(ideal F,kStrategy strat)
     }
   }
 }
-
+#endif
