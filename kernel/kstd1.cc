@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.26 2007-07-25 10:53:14 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.27 2007-11-06 16:30:19 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -936,12 +936,14 @@ void enterSMora (LObject p,int atS,kStrategy strat, int atR = -1)
 {
   int i;
   enterSBba(p, atS, strat, atR);
+  #ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
     Print("new s%d:",atS);
     wrp(p.p);
     PrintLn();
   }
+  #endif
   if ((!strat->kHEdgeFound) || (strat->kNoether!=NULL)) HEckeTest(p.p,strat);
   if (strat->kHEdgeFound)
   {
@@ -1143,6 +1145,14 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
   strat->update = TRUE;
   /*- setting global variables ------------------- -*/
+  {
+    int i;
+    currRing->weight_all_1=TRUE;
+    for(i=currRing->N; i>0; i--)
+    {
+      if (pWeight(i)!=1) { currRing->weight_all_1=FALSE; break; }
+    }
+  }
   initBuchMoraCrit(strat);
   initHilbCrit(F,Q,&hilb,strat);
   initMora(F,strat);
@@ -1186,7 +1196,9 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
     if (lrmax< strat->Ll) lrmax=strat->Ll; /*stat*/
     //test_int_std(strat->kIdeal);
+    #ifdef KDEBUG
     if (TEST_OPT_DEBUG) messageSets(strat);
+    #endif
     if (TEST_OPT_DEGBOUND
     && (strat->L[strat->Ll].ecart+strat->L[strat->Ll].GetpFDeg()> Kstd1_deg))
     {
@@ -1941,9 +1953,9 @@ ideal kInterRed (ideal F, ideal Q)
   while (strat->Ll >= 0)
   {
     if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
-#ifdef KDEBUG
+    #ifdef KDEBUG
     if (TEST_OPT_DEBUG) messageSets(strat);
-#endif
+    #endif
     if (strat->Ll== 0) strat->interpt=TRUE;
     /* picks the last element from the lazyset L */
     strat->P = strat->L[strat->Ll];

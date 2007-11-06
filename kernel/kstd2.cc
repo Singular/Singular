@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.55 2007-11-06 12:58:34 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.56 2007-11-06 16:30:20 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1036,21 +1036,23 @@ poly redNF (poly h,int &max_ind,kStrategy strat)
           {
             pNorm(strat->S[j]);
             //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
-	    sl=pSize(strat->S[j]);
-	  }
+            sl=pSize(strat->S[j]);
+          }
           if (!nIsOne(pGetCoeff(strat->S[jj])))
           {
             pNorm(strat->S[jj]);
             //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
-	    sll=pSize(strat->S[jj]);
-	  }
-	  if (sll<sl)
-	  {
-	    if (TEST_OPT_DEBUG) Print("better(S%d:%d -> S%d:%d)\n",j,sl,jj,sll);
+            sll=pSize(strat->S[jj]);
+          }
+          if (sll<sl)
+          {
+            #ifdef KDEBUG
+            if (TEST_OPT_DEBUG) Print("better(S%d:%d -> S%d:%d)\n",j,sl,jj,sll);
+            #endif
             //else if (TEST_OPT_PROT) { PrintS("b"); mflush(); }
             j=jj;
             sl=sll;
-	  }
+          }
         }
       }
       if (!nIsOne(pGetCoeff(strat->S[j])))
@@ -1157,13 +1159,13 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   while (strat->Ll >= 0)
   {
     if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
-#ifdef KDEBUG
-    loop_count++;
-#ifdef HAVE_RINGS
-    if (TEST_OPT_DEBUG) PrintS("--- next step ---\n");
-#endif
-    if (TEST_OPT_DEBUG) messageSets(strat);
-#endif
+    #ifdef KDEBUG
+      loop_count++;
+      #ifdef HAVE_RINGS
+        if (TEST_OPT_DEBUG) PrintS("--- next step ---\n");
+      #endif
+      if (TEST_OPT_DEBUG) messageSets(strat);
+    #endif
     if (strat->Ll== 0) strat->interpt=TRUE;
     if (TEST_OPT_DEGBOUND
         && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))

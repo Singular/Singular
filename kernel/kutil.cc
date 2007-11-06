@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.67 2007-11-06 12:58:34 Singular Exp $ */
+/* $Id: kutil.cc,v 1.68 2007-11-06 16:30:20 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -4953,11 +4953,13 @@ void updateS(BOOLEAN toT,kStrategy strat)
           {
             change=TRUE;
             any_change=TRUE;
+            #ifdef KDEBUG
             if (TEST_OPT_DEBUG)
             {
               PrintS("reduce:");
               wrp(redSi);PrintS(" to ");p_wrp(strat->S[i], currRing, strat->tailRing);PrintLn();
             }
+            #endif
             if (TEST_OPT_PROT)
             {
               if (strat->S[i]==NULL)
@@ -5313,7 +5315,7 @@ void initBuchMoraCrit(kStrategy strat)
     strat->honey = FALSE;
   }
 #endif
-  if (TEST_OPT_DEBUG)
+  if (TEST_OPT_DEBUG || TEST_OPT_PROT)
   {
     if (strat->homog) PrintS("ideal/module is homogeneous\n");
     else              PrintS("ideal/module is not homogeneous\n");
@@ -5666,7 +5668,10 @@ BOOLEAN newHEdge(polyset S, kStrategy strat)
   int i,j;
   poly newNoether;
 
-  scComputeHC(strat->Shdl,NULL,strat->ak,strat->kHEdge, strat->tailRing);
+  if (currRing->weight_all_1)
+    scComputeHC(strat->Shdl,NULL,strat->ak,strat->kHEdge, strat->tailRing);
+  else
+    scComputeHCw(strat->Shdl,NULL,strat->ak,strat->kHEdge, strat->tailRing);
   if (strat->t_kHEdge != NULL) p_LmFree(strat->t_kHEdge, strat->tailRing);
   if (strat->tailRing != currRing)
     strat->t_kHEdge = k_LmInit_currRing_2_tailRing(strat->kHEdge, strat->tailRing);
@@ -5686,12 +5691,14 @@ BOOLEAN newHEdge(polyset S, kStrategy strat)
       mflush();
     }
     strat->HCord=j;
+    #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
       Print("H(%d):",j);
       wrp(strat->kHEdge);
       PrintLn();
     }
+    #endif
   }
   if (pCmp(strat->kNoether,newNoether)!=1)
   {
@@ -6411,33 +6418,43 @@ int redFirstShift (LObject* h,kStrategy strat)
   {
     if (j > strat->sl)
     {
+      #ifdef KDEBUG
       if (TEST_OPT_DEBUG) PrintLn();
+      #endif
       return 0;
     }
+    #ifdef KDEBUG
     if (TEST_OPT_DEBUG) Print("%d",j);
+    #endif
     if (pDivisibleBy(strat->S[j],(*h).p))
     {
+      #ifdef KDEBUG
       if (TEST_OPT_DEBUG) PrintS("+\n");
+      #endif
       /*
       * the polynomial to reduce with is;
       * T[j].p
       */
       if (!TEST_OPT_INTSTRATEGY)
         pNorm(strat->S[j]);
+      #ifdef KDEBUG
       if (TEST_OPT_DEBUG)
       {
         wrp(h->p);
         PrintS(" with ");
         wrp(strat->S[j]);
       }
+      #endif
       (*h).p = nc_ReduceSpoly(strat->S[j],(*h).p, currRing);
       //  spSpolyRed(strat->T[j].p,(*h).p,strat->kNoether);
 
+      #ifdef KDEBUG
       if (TEST_OPT_DEBUG)
       {
         PrintS(" to ");
         wrp(h->p);
       }
+      #endif
       if ((*h).p == NULL)
       {
         if (h->lcm!=NULL) p_LmFree((*h).lcm, currRing);
@@ -6456,7 +6473,9 @@ int redFirstShift (LObject* h,kStrategy strat)
       {
         if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
         {
+          #ifdef KDEBUG
           if (TEST_OPT_DEBUG) PrintS(" > sysComp\n");
+          #endif
           return 0;
         }
       }
@@ -6481,7 +6500,9 @@ int redFirstShift (LObject* h,kStrategy strat)
             if (i<0) return 0;
           } while (!pDivisibleBy(strat->S[i],(*h).p));
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+          #ifdef KDEBUG
           if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
+          #endif
           (*h).p = NULL;
           return 0;
         }
@@ -6492,11 +6513,15 @@ int redFirstShift (LObject* h,kStrategy strat)
         Print(".%d",d);mflush();
       }
       j = 0;
-      if TEST_OPT_DEBUG PrintLn();
+      #ifdef KDEBUG
+      if (TEST_OPT_DEBUG) PrintLn();
+      #endif
     }
     else
     {
+      #ifdef KDEBUG
       if (TEST_OPT_DEBUG) PrintS("-");
+      #endif
       j++;
     }
   }
