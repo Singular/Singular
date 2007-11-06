@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.258 2007-09-26 09:18:42 Singular Exp $ */
+/* $Id: extra.cc,v 1.259 2007-11-06 15:02:14 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -375,10 +375,17 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     {
       res->rtyp=STRING_CMD;
       char *r=feResource("Singular");
-      if (r != NULL)
-        res->data = (void*) omStrDup( r );
-      else
-        res->data = (void*) omStrDup("");
+      if (r == NULL) r="";
+      res->data = (void*) omStrDup( r );
+      return FALSE;
+    }
+    else
+    if (strcmp(sys_cmd, "SingularLib") == 0)
+    {
+      res->rtyp=STRING_CMD;
+      char *r=feResource("SearchPath");
+      if (r == NULL) r="";
+      res->data = (void*) omStrDup( r );
       return FALSE;
     }
     else
@@ -412,10 +419,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         if (feOptSpec[opt].type == feOptString)
         {
           res->rtyp = STRING_CMD;
-          if (feOptSpec[opt].value != NULL)
-            res->data = omStrDup((char*) feOptSpec[opt].value);
-          else
-            res->data = omStrDup("");
+          char *r=(char*)feOptSpec[opt].value;
+          if (r == NULL) r="";
+          res->data = omStrDup(r);
         }
         else
         {
