@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.68 2007-11-06 16:30:20 Singular Exp $ */
+/* $Id: kutil.cc,v 1.69 2007-11-06 17:55:58 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -5315,7 +5315,7 @@ void initBuchMoraCrit(kStrategy strat)
     strat->honey = FALSE;
   }
 #endif
-  if (TEST_OPT_DEBUG || TEST_OPT_PROT)
+  if (TEST_OPT_DEBUG)
   {
     if (strat->homog) PrintS("ideal/module is homogeneous\n");
     else              PrintS("ideal/module is not homogeneous\n");

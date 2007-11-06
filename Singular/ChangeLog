@@ -36,3 +36,14 @@ Changes with respect to 3-0-3-2
   return the new structure
 - ncalgebra is now depreciated, use the new command nc_algebra
 - libraries changes to use nc_algebra
+
+Fri Nov  2 14:31:22 CET 2007 Singular-3-0-4-beta
+more Changes with respect to 3-0-3-2
+- use of boost and std::vector can be changed via configure
+  (--without-Boost, --with-stdvec)
+
+Tue Nov  6 16:02:29 CET 2007 Singular-3-0-4-beta
+more Changes with respect to 3-0-3-2
+- new system("SingularLib"): return SINGULAR_PATH after evaluation
+- standard.lib:weightKB improved
+- highest corner and weights fixed (was wrong in ring with ordering Ws/ws)

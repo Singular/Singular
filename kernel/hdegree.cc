@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.7 2006-09-20 16:47:14 Singular Exp $ */
+/* $Id: hdegree.cc,v 1.8 2007-11-06 17:55:57 Singular Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
@@ -1014,6 +1014,7 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
 }
 
 
+
 //  kbase
 
 static poly last;
@@ -1294,7 +1295,7 @@ static ideal scIdKbase()
   return res;
 }
 
-extern ideal scKBase(int deg, ideal s, ideal Q)
+ideal scKBase(int deg, ideal s, ideal Q)
 {
   int  i, di;
   poly p;
@@ -1357,4 +1358,82 @@ ende:
   }
 }
 
+void scComputeHCw(ideal ss, ideal Q, int ak, poly &hEdge, ring tailRing)
+{
+  int  i, di;
+  poly p;
 
+  if (hEdge!=NULL)
+    pLmFree(hEdge);
+
+  ideal s=idInit(IDELEMS(ss),ak);
+  for(i=IDELEMS(ss)-1;i>=0;i--)
+  {
+    if (ss->m[i]!=NULL) s->m[i]=pHead(ss->m[i]);
+  }
+  di = scDimInt(s, Q);
+  stcmem = hCreate(pVariables - 1);
+  hexist = hInit(s, Q, &hNexist);
+  p = last = pInit();
+  /*pNext(p) = NULL;*/
+  act = (scmon)omAlloc((pVariables + 1) * sizeof(int));
+  *act = 0;
+  if (!hNexist)
+  {
+    scAll(pVariables, -1);
+    goto ende;
+  }
+  if (!hisModule)
+  {
+    scInKbase(hexist, hNexist, pVariables);
+  }
+  else
+  {
+    hstc = (scfmon)omAlloc(hNexist * sizeof(scmon));
+    for (i = 1; i <= hisModule; i++)
+    {
+      *act = i;
+      hComp(hexist, hNexist, i, hstc, &hNstc);
+      if (hNstc)
+      {
+        scInKbase(hstc, hNstc, pVariables);
+      }
+      else
+        scAll(pVariables, -1);
+    }
+    omFreeSize((ADDRESS)hstc, hNexist * sizeof(scmon));
+  }
+ende:
+  hDelete(hexist, hNexist);
+  omFreeSize((ADDRESS)act, (pVariables + 1) * sizeof(int));
+  hKill(stcmem, pVariables - 1);
+  pDeleteLm(&p);
+  idDelete(&s);
+  if (p == NULL)
+  {
+    return; // no HEdge
+  }
+  else
+  {
+    last = p;
+    ideal res=scIdKbase();
+    res->rank=ss->rank;
+    poly p_ind=NULL; int ind=-2;
+    for(i=IDELEMS(res)-1;i>=0;i--)
+    {
+      if (pCmp(res->m[i],p_ind)==1) { p_ind=res->m[i]; ind=i; }
+    }
+    assume(p_ind!=NULL);
+    assume(res->m[ind]==p_ind);
+    hEdge=p_ind; 
+    res->m[ind]=NULL;
+    nDelete(&pGetCoeff(hEdge));
+    pGetCoeff(hEdge)=NULL;
+    for(i=pVariables;i>0;i--)
+      pIncrExp(hEdge,i);
+    pSetm(hEdge);
+    
+    idDelete(&res);
+    return;
+  }
+}
