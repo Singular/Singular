@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.11 2007-05-25 16:47:32 Singular Exp $ */
+/* $Id: febase.cc,v 1.12 2007-11-07 16:14:32 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -1052,8 +1052,7 @@ void PrintS(const char *s)
     SPrintS(s);
     return;
   }
-
-  if (feOut) /* do not print when option --no-out was given */
+  else if (feOut) /* do not print when option --no-out was given */
   {
 
 #ifdef HAVE_TCL
@@ -1083,19 +1082,19 @@ void Print(const char *fmt, ...)
 {
   if (sprint != NULL)
   {
-    int ls = strlen(fmt);
     va_list ap;
     va_start(ap, fmt);
     omCheckAddr(sprint);
+    int ls = strlen(fmt);
     if (fmt != NULL && ls > 0)
     {
       char* ns;
       int l = strlen(sprint);
-      ns = (char*) omAlloc(sizeof(char)*(ls + l + 256));
+      ns = (char*) omAlloc(sizeof(char)*(ls + l + 512));
       if (l > 0)  strcpy(ns, sprint);
 
 #ifdef HAVE_VSNPRINTF
-      l = vsnprintf(&(ns[l]), ls+255, fmt, ap);
+      l = vsnprintf(&(ns[l]), ls+511, fmt, ap);
       assume(l != -1);
 #else
       vsprintf(&(ns[l]), fmt, ap);
@@ -1107,33 +1106,21 @@ void Print(const char *fmt, ...)
     va_end(ap);
     return;
   }
-  if (feOut)
+  else if (feOut)
   {
     va_list ap;
     va_start(ap, fmt);
-#ifdef HAVE_TCL
-    if(tclmode)
+    int ls=strlen(fmt);
+    char *s=(char *)omAlloc(ls+512);
+    int l;
+#ifdef HAVE_VSNPRINTF
+    l = vsnprintf(ns, ls+511, fmt, ap);
+    assume(l != -1);
+#else
+    vsprintf(ns, fmt, ap);
 #endif
-#if defined(HAVE_TCL)
-    {
-      char *s=(char *)omAlloc(strlen(fmt)+256);
-      vsprintf(s,fmt, ap);
-#ifdef HAVE_TCL
-      PrintTCLS('N',s);
-#endif
-    }
-#endif
-#ifdef HAVE_TCL
-    else
-#endif
-    {
-      vfprintf(stdout, fmt, ap);
-      fflush(stdout);
-      if (feProt&PROT_O)
-      {
-        vfprintf(feProtFile,fmt,ap);
-      }
-    }
+    PrintS(s);
+    omFree(s);
     va_end(ap);
   }
 }
