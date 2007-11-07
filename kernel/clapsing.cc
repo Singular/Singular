@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.22 2007-06-19 15:24:05 Singular Exp $
+// $Id: clapsing.cc,v 1.23 2007-11-07 17:11:53 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -213,9 +213,16 @@ poly singclap_gcd ( poly f, poly g )
   if (( nGetChar() == 0 || nGetChar() > 1 )
   && (currRing->parameter==NULL))
   {
+    CanonicalForm newGCD(const CanonicalForm & A, const CanonicalForm & B);
     setCharacteristic( nGetChar() );
     CanonicalForm F( convSingPClapP( f ) ), G( convSingPClapP( g ) );
-    res=convClapPSingP( gcd( F, G ) );
+    //if (nGetChar() > 1 )
+    //{
+    //  res=convClapPSingP( newGCD( F,G ));
+    //  if (!nGreaterZero(pGetCoeff(res))) res=pNeg(res);
+    //}
+    //else
+      res=convClapPSingP( gcd( F, G ) );
   }
   // and over Q(a) / Fp(a)
   else if (( nGetChar()==1 ) /* Q(a) */
