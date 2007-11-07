@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.12 2007-11-07 16:14:32 Singular Exp $ */
+/* $Id: febase.cc,v 1.13 2007-11-07 16:16:26 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -1110,14 +1110,14 @@ void Print(const char *fmt, ...)
   {
     va_list ap;
     va_start(ap, fmt);
+    int l;
     int ls=strlen(fmt);
     char *s=(char *)omAlloc(ls+512);
-    int l;
 #ifdef HAVE_VSNPRINTF
-    l = vsnprintf(ns, ls+511, fmt, ap);
+    l = vsnprintf(s, ls+511, fmt, ap);
     assume(l != -1);
 #else
-    vsprintf(ns, fmt, ap);
+    vsprintf(s, fmt, ap);
 #endif
     PrintS(s);
     omFree(s);
