@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.69 2007-11-06 17:55:58 Singular Exp $ */
+/* $Id: kutil.cc,v 1.70 2007-11-07 14:28:46 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -4894,13 +4894,11 @@ static poly redMora (poly h,int maxIndex,kStrategy strat)
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG)
           {PrintS("reduce ");wrp(h);Print(" with S[%d] (",j);wrp(strat->S[j]);}
-
 #endif
         h = ksOldSpolyRed(strat->S[j],h,strat->kNoetherTail());
 #ifdef KDEBUG
         if(TEST_OPT_DEBUG)
           {PrintS(")\nto "); wrp(h); PrintLn();}
-
 #endif
         // pDelete(&h);
         if (h == NULL) return NULL;
@@ -4953,13 +4951,13 @@ void updateS(BOOLEAN toT,kStrategy strat)
           {
             change=TRUE;
             any_change=TRUE;
-            #ifdef KDEBUG
+	    #ifdef KDEBUG
             if (TEST_OPT_DEBUG)
             {
               PrintS("reduce:");
               wrp(redSi);PrintS(" to ");p_wrp(strat->S[i], currRing, strat->tailRing);PrintLn();
             }
-            #endif
+	    #endif
             if (TEST_OPT_PROT)
             {
               if (strat->S[i]==NULL)
@@ -5315,11 +5313,13 @@ void initBuchMoraCrit(kStrategy strat)
     strat->honey = FALSE;
   }
 #endif
+  #ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
     if (strat->homog) PrintS("ideal/module is homogeneous\n");
     else              PrintS("ideal/module is not homogeneous\n");
   }
+  #endif
 }
 
 BOOLEAN kPosInLDependsOnLength(int (*pos_in_l)
@@ -5668,10 +5668,14 @@ BOOLEAN newHEdge(polyset S, kStrategy strat)
   int i,j;
   poly newNoether;
 
+#if 0
   if (currRing->weight_all_1)
     scComputeHC(strat->Shdl,NULL,strat->ak,strat->kHEdge, strat->tailRing);
   else
     scComputeHCw(strat->Shdl,NULL,strat->ak,strat->kHEdge, strat->tailRing);
+#else    
+  scComputeHC(strat->Shdl,NULL,strat->ak,strat->kHEdge, strat->tailRing);
+#endif  
   if (strat->t_kHEdge != NULL) p_LmFree(strat->t_kHEdge, strat->tailRing);
   if (strat->tailRing != currRing)
     strat->t_kHEdge = k_LmInit_currRing_2_tailRing(strat->kHEdge, strat->tailRing);
@@ -6055,7 +6059,6 @@ int posInT_pLength(const TSet set,const int length,LObject &p)
     else                        an=i;
   }
 }
-
 #endif
 
 #ifdef HAVE_PLURAL
@@ -6064,7 +6067,6 @@ int posInT_pLength(const TSet set,const int length,LObject &p)
 /*1
 * put the pairs (s[i],sh \dot p)  into the set B, ecart=ecart(p)
 */
-
 void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV)
 {
   atR = -1;
@@ -6077,12 +6079,12 @@ void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy st
     enterOnePairShift(i, q, ecart, isFromQ, strat, -1, uptodeg, lV);
   }
 }
+#endif
 
+#ifdef HAVE_PLURAL
 /*2
 * put the pair (s[i],p)  into the set B, ecart=ecart(p)
 */
-
-
 void enterOnePairShift (int i, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV)
 {
 
@@ -6336,9 +6338,9 @@ void enterOnePairShift (int i, poly p, int ecart, int isFromQ, kStrategy strat, 
     enterL(&strat->B,&strat->Bl,&strat->Bmax,Lp,l);
   }
 }
+#endif
 
-
-
+#ifdef HAVE_PLURAL
 /*3
 *(s[0],h),...,(s[k],h) will be put to the pairset L
 * additionally we put the pairs (h, s \sdot h) for s>=1 to L
@@ -6398,8 +6400,6 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
 }
 #endif
 
-
-
 #ifdef HAVE_PLURAL
 /*2
 *reduces h with elements from T choosing  the first possible
@@ -6407,7 +6407,6 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
 */
 int redFirstShift (LObject* h,kStrategy strat)
 {
-  assume(rIsPluralRing(currRing));
   int at,reddeg,d,i;
   int pass = 0;
   int j = 0;
@@ -6446,7 +6445,7 @@ int redFirstShift (LObject* h,kStrategy strat)
       }
       #endif
       (*h).p = nc_ReduceSpoly(strat->S[j],(*h).p, currRing);
-      //  spSpolyRed(strat->T[j].p,(*h).p,strat->kNoether);
+      //spSpolyRed(strat->T[j].p,(*h).p,strat->kNoether);
 
       #ifdef KDEBUG
       if (TEST_OPT_DEBUG)
@@ -6475,7 +6474,7 @@ int redFirstShift (LObject* h,kStrategy strat)
         {
           #ifdef KDEBUG
           if (TEST_OPT_DEBUG) PrintS(" > sysComp\n");
-          #endif
+	  #endif
           return 0;
         }
       }
@@ -6502,7 +6501,7 @@ int redFirstShift (LObject* h,kStrategy strat)
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           #ifdef KDEBUG
           if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
-          #endif
+	  #endif
           (*h).p = NULL;
           return 0;
         }
@@ -6526,7 +6525,6 @@ int redFirstShift (LObject* h,kStrategy strat)
     }
   }
 }
-#endif
 
 
 /*2
@@ -6649,5 +6647,6 @@ int redHomogShift (LObject* h,kStrategy strat)
     }
   }
 }
+#endif // HAVE_PLURAL
 
 #endif // KUTIL_CC

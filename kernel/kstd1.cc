@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.28 2007-11-06 17:55:57 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.29 2007-11-07 14:28:46 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1145,15 +1145,6 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
   strat->update = TRUE;
   /*- setting global variables ------------------- -*/
-  {
-    int i;
-    currRing->weight_all_1=TRUE;
-    for(i=currRing->N; i>0; i--)
-    {
-      if (pWeight(i)!=1) { currRing->weight_all_1=FALSE; break; }
-    }
-    if ((currRing->weight_all_1==0) && TEST_OPT_PROT) PrintS("not all weights are 1\n");
-  }
   initBuchMoraCrit(strat);
   initHilbCrit(F,Q,&hilb,strat);
   initMora(F,strat);
