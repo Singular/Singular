@@ -606,9 +606,9 @@ VERSION_SEP="-"
 
 SINGULAR_MAJOR_VERSION=${SINGULAR_MAJOR_VERSION:-3}
 SINGULAR_MINOR_VERSION=${SINGULAR_MINOR_VERSION:-0}
-SINGULAR_SUB_VERSION=${SINGULAR_SUB_VERSION:-3}
+SINGULAR_SUB_VERSION=${SINGULAR_SUB_VERSION:-4}
 SINGULAR_VERSION="${SINGULAR_VERSION:-$SINGULAR_MAJOR_VERSION${VERSION_SEP}$SINGULAR_MINOR_VERSION${VERSION_SEP}$SINGULAR_SUB_VERSION}"
-VERSION_DATE=${VERSION_DATE:-"May 2007"}
+VERSION_DATE=${VERSION_DATE:-"Nov 2007"}
 
 
 
@@ -5287,9 +5287,7 @@ fi
 
 echo $ac_n "checking whether to have Plural""... $ac_c" 1>&6
 echo "configure:5290: checking whether to have Plural" >&5
-if test "$with_Plural" != yes && test "$enable_Plural" != yes; then
-  echo "$ac_t""no" 1>&6
-else
+if test "$with_Plural" != no && test "$enable_Plural" != no; then
   cat >> confdefs.h <<\EOF
 #define HAVE_PLURAL 1
 EOF
@@ -5297,6 +5295,8 @@ EOF
   echo "$ac_t""yes" 1>&6
   PLURAL=1
   
+else
+  echo "$ac_t""no" 1>&6
 fi
 
 
