@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.13 2007-11-07 16:16:26 Singular Exp $ */
+/* $Id: febase.cc,v 1.14 2007-11-08 09:47:13 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -1115,7 +1115,10 @@ void Print(const char *fmt, ...)
     char *s=(char *)omAlloc(ls+512);
 #ifdef HAVE_VSNPRINTF
     l = vsnprintf(s, ls+511, fmt, ap);
-    assume(l != -1);
+    if ((l==-1)||(s[l]!='\0')||(l!=strlen(s)))
+    {
+      printf("Print problem: l=%d, fmt=>>%s<<\n",l,fmt);
+    }
 #else
     vsprintf(s, fmt, ap);
 #endif
@@ -1123,6 +1126,11 @@ void Print(const char *fmt, ...)
     omFree(s);
     va_end(ap);
   }
+}
+void PrintNSpaces(const int n)
+{
+  int l=n-1;
+  while(l>=0) { PrintS(" "); l--; }
 }
 
 /* end extern "C" */

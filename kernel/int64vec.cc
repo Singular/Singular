@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: int64vec.cc,v 1.3 2005-05-09 13:47:29 Singular Exp $ */
+/* $Id: int64vec.cc,v 1.4 2007-11-08 09:47:13 Singular Exp $ */
 /*
 * ABSTRACT: class int64vec: lists/vectors of int64
 */
@@ -103,7 +103,10 @@ char * int64vec::String(int dim)
 void int64vec::show(int mat,int spaces)
 {
   if (spaces>0)
-    Print("%-*.*s%s",spaces,spaces," ",iv64String(mat,spaces));
+  {
+    PrintNSpaces(spaces);
+    PrintS(iv64String(mat,spaces));
+  }
   else
     PrintS(iv64String(mat,0));
 }

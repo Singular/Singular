@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: intvec.cc,v 1.3 2005-05-20 15:33:18 Singular Exp $ */
+/* $Id: intvec.cc,v 1.4 2007-11-08 09:47:13 Singular Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -127,7 +127,10 @@ char * intvec::String(int dim)
 void intvec::show(int notmat,int spaces)
 {
   if (spaces>0)
-    Print("%-*.*s%s",spaces,spaces," ",ivString(notmat,spaces));
+  {
+    PrintNSpaces(spaces);
+    PrintS(ivString(notmat,spaces));
+  }
   else
     PrintS(ivString(notmat,0));
 }
