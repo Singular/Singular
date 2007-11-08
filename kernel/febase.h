@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.6 2006-04-27 12:52:43 Singular Exp $ */
+/* $Id: febase.h,v 1.7 2007-11-08 09:20:33 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -115,6 +115,9 @@ void    Werror(const char *fmt, ...);
 void    WerrorS(const char *s);
 void    WarnS(const char *s);
 void    Print(const char* fmt, ...);
+/* Print should not produce more than strlen(fmt)+510 characters! */
+
+void    PrintNSpaces(const int n);
 void    PrintLn();
 #ifdef HAVE_TCL
 void    PrintTCLS(const char c, const char * s);

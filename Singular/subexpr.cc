@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.98 2007-11-06 14:56:24 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.99 2007-11-08 09:20:33 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -108,10 +108,9 @@ void sleftv::Print(leftv store, int spaces)
       {
         case UNKNOWN:
         case DEF_CMD:
-          ::Print("%-*.*s`%s`",spaces,spaces," ",n);
-          break;
         case PACKAGE_CMD:
-          ::Print("%-*.*s`%s`",spaces,spaces," ",n);
+          PrintNSpaces(spaces);
+          PrintS("`");PrintS(n);PrintS("`");
           break;
         case NONE:
           return;
@@ -121,7 +120,7 @@ void sleftv::Print(leftv store, int spaces)
           break;
         case RING_CMD:
         case QRING_CMD:
-          ::Print("%-*.*s",spaces,spaces," ");
+          PrintNSpaces(spaces);
           rWrite((ring)d);
           break;
         case MATRIX_CMD:
@@ -134,60 +133,72 @@ void sleftv::Print(leftv store, int spaces)
           break;
         case POLY_CMD:
         case VECTOR_CMD:
-          ::Print("%-*.*s",spaces,spaces," ");
+          PrintNSpaces(spaces);
           pWrite0((poly)d);
           break;
         case RESOLUTION_CMD:
           syPrint((syStrategy)d);
           break;
         case STRING_CMD:
-          ::Print("%-*.*s%s",spaces,spaces," ",(char *)d);
+          PrintNSpaces(spaces);
+          PrintS((char *)d);
           break;
        case INT_CMD:
-          ::Print("%-*.*s%d",spaces,spaces," ",(int)(long)d);
+          PrintNSpaces(spaces);
+          ::Print("%d",(int)(long)d);
           break;
        case PROC_CMD:
          {
            procinfov pi=(procinfov)d;
-           ::Print("%-*.*s// libname  : %s\n",spaces,spaces," ",
-                   piProcinfo(pi, "libname"));
-           ::Print("%-*.*s// procname : %s\n",spaces,spaces," ",
-                   piProcinfo(pi, "procname"));
-           ::Print("%-*.*s// type     : %s",spaces,spaces," ",
-                   piProcinfo(pi, "type"));
+
+           PrintNSpaces(spaces);
+           PrintS("// libname  : ");
+           PrintS(piProcinfo(pi, "libname"));
+	   PrintLn();
+
+           PrintNSpaces(spaces);
+           PrintS("// procname : ");
+           PrintS(piProcinfo(pi, "procname"));
+	   PrintLn();
+
+           PrintNSpaces(spaces);
+           PrintS("// type     : ");
+           PrintS(piProcinfo(pi, "type"));
            //           ::Print("%-*.*s// ref      : %s",spaces,spaces," ",
            //   piProcinfo(pi, "ref"));
            break;
          }
        case POINTER_CMD:
          { package pack = (package)d;
-         ::Print("%-*.*s// %s\n",spaces,spaces," ","PointerTest");
-         ::Print("%-*.*s// %s",spaces,spaces," ",IDID(pack->idroot));
+	 PrintNSpaces(spaces);
+         PrintS("// PointerTest\n");
+	 PrintNSpaces(spaces);
+         ::Print("// %s\n",IDID(pack->idroot));
          //::Print(((char *)(pack->idroot)->data), spaces);
          break;
          }
        case LINK_CMD:
           {
             si_link l=(si_link)d;
-            ::Print("%-*.*s// type : %s\n",spaces,spaces," ",
-                    slStatus(l, "type"));
-            ::Print("%-*.*s// mode : %s\n",spaces,spaces," ",
-                    slStatus(l, "mode"));
-            ::Print("%-*.*s// name : %s\n",spaces,spaces," ",
-                    slStatus(l, "name"));
-            ::Print("%-*.*s// open : %s\n",spaces,spaces," ",
-                    slStatus(l, "open"));
-            ::Print("%-*.*s// read : %s\n",spaces,spaces," ",
-                    slStatus(l, "read"));
-            ::Print("%-*.*s// write: %s",spaces,spaces," ",
-                    slStatus(l, "write"));
+	    PrintNSpaces(spaces);
+            ::Print("// type : %s\n", slStatus(l, "type"));
+	    PrintNSpaces(spaces);
+            ::Print("// mode : %s\n", slStatus(l, "mode"));
+	    PrintNSpaces(spaces);
+            ::Print("// name : %s\n", slStatus(l, "name"));
+	    PrintNSpaces(spaces);
+            ::Print("// open : %s\n", slStatus(l, "open"));
+	    PrintNSpaces(spaces);
+            ::Print("// read : %s\n", slStatus(l, "read"));
+	    PrintNSpaces(spaces);
+            ::Print("// write: %s", slStatus(l, "write"));
           break;
           }
         case NUMBER_CMD:
         case BIGINT_CMD:
           s=String(d);
           if (s==NULL) return;
-          ::Print("%-*.*s",spaces,spaces," ");
+	  PrintNSpaces(spaces);
           PrintS(s);
           omFree((ADDRESS)s);
           break;
@@ -195,7 +206,10 @@ void sleftv::Print(leftv store, int spaces)
         {
           lists l=(lists)d;
           if (l->nr<0)
-             ::Print("%-*.*sempty list\n",spaces,spaces," ");
+	  {
+	     PrintNSpaces(spaces);
+             PrintS("empty list\n");
+	  }
           else
           {
             int i=0;
@@ -203,7 +217,8 @@ void sleftv::Print(leftv store, int spaces)
             {
               if (l->m[i].rtyp!=DEF_CMD)
               {
-                ::Print("%-*.*s[%d]:\n",spaces,spaces," ",i+1);
+	        PrintNSpaces(spaces);
+                ::Print("[%d]:\n",i+1);
                 l->m[i].Print(NULL,spaces+3);
               }
             }
