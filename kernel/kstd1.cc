@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.29 2007-11-07 14:28:46 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.30 2007-11-09 11:31:52 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -457,7 +457,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
   int z = 10;
   int o = H.SetpFDeg();
   H.ecart = pLDeg(H.p,&H.length,currRing)-o;
-  if ((flag & 2) == 0) cancelunit(&H);
+  if ((flag & 2) == 0) cancelunit(&H,TRUE);
   H.sev = pGetShortExpVector(H.p);
   unsigned long not_sev = ~ H.sev;
   loop
@@ -534,7 +534,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
       }
       /*- try to reduce the s-polynomial -*/
       o = H.SetpFDeg();
-      if ((flag &2 ) == 0) cancelunit(&H);
+      if ((flag &2 ) == 0) cancelunit(&H,TRUE);
       H.ecart = pLDeg(H.p,&(H.length),currRing)-o;
       j = 0;
       H.sev = pGetShortExpVector(H.p);

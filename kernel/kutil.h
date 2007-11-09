@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.27 2007-07-24 12:29:31 Singular Exp $ */
+/* $Id: kutil.h,v 1.28 2007-11-09 11:31:53 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -428,7 +428,7 @@ void initS (ideal F, ideal Q,kStrategy strat);
 void initSL (ideal F, ideal Q,kStrategy strat);
 void updateS(BOOLEAN toT,kStrategy strat);
 void enterT (LObject p,kStrategy strat, int atT = -1);
-void cancelunit (LObject* p);
+void cancelunit (LObject* p,BOOLEAN inNF=FALSE);
 void HEckeTest (poly pp,kStrategy strat);
 void initBuchMoraCrit(kStrategy strat);
 void initHilbCrit(ideal F, ideal Q, intvec **hilb,kStrategy strat);

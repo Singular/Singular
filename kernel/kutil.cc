@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.70 2007-11-07 14:28:46 Singular Exp $ */
+/* $Id: kutil.cc,v 1.71 2007-11-09 11:31:53 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -292,7 +292,7 @@ void deleteHC(poly* p, int* e, int* l,kStrategy strat)
 /*2
 *tests if p.p=monomial*unit and cancels the unit
 */
-void cancelunit (LObject* L)
+void cancelunit (LObject* L,BOOLEAN inNF)
 {
   int  i;
   poly h;
@@ -317,10 +317,13 @@ void cancelunit (LObject* L)
       if (h==NULL)
       {
         p_Delete(&pNext(p), r);
-        number eins=nInit(1);
-        if (L->p != NULL)  pSetCoeff(L->p,eins);
-        else if (L->t_p != NULL) nDelete(&pGetCoeff(L->t_p));
-        if (L->t_p != NULL) pSetCoeff0(L->t_p,eins);
+	if (!inNF)
+	{
+          number eins=nInit(1);
+          if (L->p != NULL)  pSetCoeff(L->p,eins);
+          else if (L->t_p != NULL) nDelete(&pGetCoeff(L->t_p));
+          if (L->t_p != NULL) pSetCoeff0(L->t_p,eins);
+	}
         L->ecart = 0;
         L->length = 1;
         //if (L->pLength > 0)
