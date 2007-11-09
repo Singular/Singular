@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: stairc.h,v 1.4 2007-11-09 11:29:44 Singular Exp $ */
+/* $Id: stairc.h,v 1.5 2007-11-09 12:50:44 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -11,7 +11,7 @@
 #include "structs.h"
 
 void scComputeHC(ideal s,ideal Q, int  k,poly &hEdge, ring tailRing = currRing);
-#if 0 - alternative implementation for tests
+#if 0 // - alternative implementation for tests
 void scComputeHCw(ideal s,ideal Q, int  k,poly &hEdge, ring tailRing = currRing);
 #endif
 

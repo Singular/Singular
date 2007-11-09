@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.9 2007-11-09 11:29:45 Singular Exp $ */
+/* $Id: hdegree.cc,v 1.10 2007-11-09 12:50:44 Singular Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
@@ -1358,7 +1358,7 @@ ende:
   }
 }
 
-#if 0 -- alternative implementation of scComputeHC
+#if 0 //-- alternative implementation of scComputeHC
 void scComputeHCw(ideal ss, ideal Q, int ak, poly &hEdge, ring tailRing)
 {
   int  i, di;
