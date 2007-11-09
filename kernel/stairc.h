@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: stairc.h,v 1.3 2007-11-06 17:55:59 Singular Exp $ */
+/* $Id: stairc.h,v 1.4 2007-11-09 11:29:44 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -11,7 +11,9 @@
 #include "structs.h"
 
 void scComputeHC(ideal s,ideal Q, int  k,poly &hEdge, ring tailRing = currRing);
+#if 0 - alternative implementation for tests
 void scComputeHCw(ideal s,ideal Q, int  k,poly &hEdge, ring tailRing = currRing);
+#endif
 
 intvec * scIndIntvec(ideal S, ideal Q=NULL);
 lists scIndIndset(ideal S, BOOLEAN all, ideal Q=NULL);

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.40 2007-11-06 17:55:59 Singular Exp $ */
+/* $Id: structs.h,v 1.41 2007-11-09 11:29:44 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -573,7 +573,6 @@ struct sip_sring
   BOOLEAN   MixedOrder;
   // 1 for lex ordering (except ls), -1 otherwise
   BOOLEAN   ComponentOrder;
-  BOOLEAN   weight_all_1; // 1 if all weights are 1
 
 
   // what follows below here should be set by rComplete, _only_
