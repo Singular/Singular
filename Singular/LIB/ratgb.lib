@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: ratgb.lib,v 1.6 2007-10-31 17:23:50 Singular Exp $";
+version="$Id: ratgb.lib,v 1.7 2007-11-09 14:48:57 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: ratgb.lib  Groebner bases in Ore localizations
@@ -10,6 +10,36 @@ ratstd(ideal I, int n);   compute Groebner basis in Ore localization of the base
 
 SUPPORT: SpezialForschungsBereich F1301 of the Austrian FWF
 "
+
+LIB "poly.lib";
+
+static proc rm_content_id(ideal J)
+"USAGE:  rm_content_id(I);  I an ideal
+RETURN:  ideal
+PURPOSE: remove the content of every generator of I
+EXAMPLE: example rm_content_id; shows examples
+"
+{
+  ideal I = J;
+  int i;
+  int s = size(I);
+  for (i=1; i<=s; i++)
+  {
+    if (I[i]!=0)
+    {
+      I[i] = I[i]/content(I[i]);
+    }
+  }
+  return(I);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = (0,k,n),(K,N),dp;
+  ideal I = n*((k+1)*K - (n-k)), k*((n-k+1)*N - (n+1));
+  I;
+  rm_content_id(I);
+}
 
 proc ratstd(ideal I, int is)
 "USAGE:  ratstd(I, n);  I an ideal, n an integer
@@ -34,23 +64,9 @@ EXAMPLE: example ratstd; shows examples
   // and the block of X's is on the left
   // its length is 'is'
 
-  // 1. compute G = GB(I) wrt. the elim. ord. for D
-
-  option(redSB);
-  option(redTail);
-  ideal G = groebner(I); // although slimgb looks better
-  G = simplify(G,2); // to be sure there are no 0's
-  int sG  = ncols(G);
-  // 2. create L(G) with X's as coeffs
-
-  ideal LG;
   int i,j,k;
-  for (i=1; i<= sG; i++)
-  {
-    LG[i] = lead(G[i]);
-  }
 
-  // 3. create K(x)[D], commutative
+  // 1. create K(x)[D], commutative
   def save = basering;
   list L = ringlist(save);
   list RL, tmp1,tmp2,tmp3,tmp4;
@@ -128,36 +144,52 @@ EXAMPLE: example ratstd; shows examples
   // factor ideal is ignored
   RL[4] = ideal(0);
 
-  //  RL;
-
-  // 3. map L(G) to K(X)[D]
-
   def @RAT = ring(RL);
+
+  // 2. preprocess input with rm_content_id
   setring @RAT;
+  ideal CI = imap(save,I);
+  CI = rm_content_id(CI);
 
-  ideal LG = imap(save, LG);
-  // do not do groebner at this place,
-  // it may cause misordering!
+  // 3. compute G = GB(I) wrt. the elim. ord. for D
+  setring save;
+  ideal CI = imap(@RAT,CI);
+  option(redSB);
+  option(redTail);
+  ideal G = groebner(CI); // although slimgb looks better
+  G = simplify(G,2); // to be sure there are no 0's
 
-  // 4. run simplify
+  // 4. postprocess the output with 1) rm_content_id,  2) lm-minimization;
+  setring @RAT;
+  ideal CG = imap(save,G);
+  CG = rm_content_id(CG);
+  CG = simplify(CG,2+32);
 
-  ideal SLG = simplify(LG,8+32); //contains zeros
-  intvec islg;
-  if (SLG[1] == 0)
-  {  islg = 0;  }
-  else
-  {    islg = 1;  }
-  for (i=2; i<= ncols(SLG); i++)
+  // 4b. create L(G) with X's as coeffs (for minimization)
+  int sG  = ncols(CG);
+  ideal LG;
+  for (i=1; i<= sG; i++)
   {
-    if (SLG[i] == 0)
-    {
-      islg = islg, 0;
-    }
-    else
-    {
-      islg = islg, 1;
-    }
+    LG[i] = lead(CG[i]);
   }
+
+//   ideal SLG = simplify(LG,8+32); //contains zeros
+//   intvec islg;
+//   if (SLG[1] == 0)
+//   {  islg = 0;  }
+//   else
+//   {    islg = 1;  }
+//   for (i=2; i<= ncols(SLG); i++)
+//   {
+//     if (SLG[i] == 0)
+//     {
+//       islg = islg, 0;
+//     }
+//     else
+//     {
+//       islg = islg, 1;
+//     }
+//   }
 
   // compute the D-dimension of the ideal
 
@@ -172,21 +204,24 @@ EXAMPLE: example ratstd; shows examples
     printf("the K-dimension is %s",d);
   }
   setring save;
-  for (i=1; i<= ncols(LG); i++)
-  {
-    if (islg[i] == 0)
-    {
-      G[i] = 0;
-    }
-  }
-  G = simplify(G,2); // ready!
+//   for (i=1; i<= ncols(LG); i++)
+//   {
+//     if (islg[i] == 0)
+//     {
+//       G[i] = 0;
+//     }
+//   }
+//   G = simplify(G,2); // ready!
+
+  G = imap(@RAT,CG);
   // return the result
   ideal pGBid = G;
   export pGBid;
   //  export Ddim;
   //  export Dvdim;
   setring @RAT;
-  ideal rGBid = imap(save,G);
+  ideal rGBid = CG;
+  //imap(save,G);
   export rGBid;
   setring save;
   return(@RAT);
@@ -212,10 +247,12 @@ example
 static proc exParam()
 {
   // Appel F4
+  LIB "ratgb.lib";
   ring r = (0,a,b,c,d),(x,y,Dx,Dy),(a(0,0,1,1),dp);
   matrix @D[4][4];
   @D[1,3]=1; @D[2,4]=1;
-  def S=nc_algebra(1,@D);setring S;
+  def S=nc_algebra(1,@D);
+  setring S;
   ideal I =
     x*Dx*(x*Dx+c-1) - x*(x*Dx+y*Dy+a)*(x*Dx+y*Dy+b),
     y*Dy*(y*Dy+d-1) - y*(x*Dx+y*Dy+a)*(x*Dx+y*Dy+b);
