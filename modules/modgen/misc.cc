@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.28 2007-10-08 16:59:59 Singular Exp $ */
+/* $Id: misc.cc,v 1.29 2007-11-09 11:05:47 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -644,7 +644,7 @@ void init_type_conv()
   strcpy(type_conv[POLY_CMD], "poly");
   strcpy(type_conv[NUMBER_CMD], "number");
   strcpy(type_conv[MODUL_CMD], "ideal");
-  strcpy(type_conv[VECTOR_CMD], "ideal");
+  strcpy(type_conv[VECTOR_CMD], "poly");
   strcpy(type_conv[IDEAL_CMD], "ideal");
   strcpy(type_conv[MAP_CMD], "map");
   strcpy(type_conv[MATRIX_CMD], "matrix");
