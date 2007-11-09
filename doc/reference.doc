@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.293 2007-07-12 16:42:48 Singular Exp $
+@comment $Id: reference.doc,v 1.294 2007-11-09 14:04:13 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5975,6 +5975,8 @@ returns @code{"ready"} or @code{"not ready"}
 @item @code{"mode"}
 returns (depending on the type of the link and its status)
 @code{"","w","a","r"} or @code{"rw"}
+@item @code{"exists"}
+returns @code{"yes"} or @code{"no"}: existence of the filename for ASCII/MPfile links
 @end table
 @item @strong{Example:}
 @smallexample

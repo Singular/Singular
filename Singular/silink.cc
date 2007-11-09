@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.45 2005-03-25 17:13:05 levandov Exp $ */
+/* $Id: silink.cc,v 1.46 2007-11-09 14:04:45 Singular Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -9,6 +9,10 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include "mod2.h"
 #include "tok.h"
 #include <omalloc.h>
@@ -155,6 +159,12 @@ char* slStatus(si_link l, char *request)
   else if (strcmp(request, "type") == 0) return l->m->type;
   else if (strcmp(request, "mode") == 0) return l->mode;
   else if (strcmp(request, "name") == 0) return l->name;
+  else if (strcmp(request, "exists") ==0)
+  {
+    struct stat buf;
+    if (lstat(l->name,&buf)==0) return "yes";
+    else return "no";
+  }
   else if (strcmp(request, "open") == 0)
   {
     if (SI_LINK_OPEN_P(l)) return "yes";
