@@ -440,7 +440,7 @@ AC_TYPE_SIGNAL
 AC_FUNC_VPRINTF
 AC_SEARCH_LIBS(setenv, bsd)
 AC_CHECK_FUNCS(gettimeofday atexit bcopy getcwd getwd vsnprintf readlink \
- sleep usleep getpwnam popen setenv siginterrupt)
+ sleep usleep getpwnam popen setenv siginterrupt sysconf)
 
 
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
