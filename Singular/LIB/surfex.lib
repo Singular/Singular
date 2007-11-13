@@ -1,6 +1,6 @@
 //last change: 2007/07/06 (Oliver Labs)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surfex.lib,v 1.5 2007-07-12 14:36:35 Singular Exp $";
+version="$Id: surfex.lib,v 1.6 2007-11-13 17:26:14 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: surfex.lib      Procedures for visualizing and rotating surfaces.
@@ -508,6 +508,19 @@ it takes the surfex-code as a string and calls surfex.
     string surfex_path=system("Singular");
     while(surfex_path[size(surfex_path)]!="/") { surfex_path=surfex_path[1..size(surfex_path)-1]; }
     surfex_path=surfex_path+"../LIB/surfex";
+    if (status(surfex_path,"exists")=="no")
+    {
+    // search in SINGULAR_PATH:
+       string surfex_path1=system("SingularLib");
+       string surfex_path2=surfex_path1;
+       while (find(surfex_path1,":")!=0)
+       {
+         surfex_path2=surfex_path1[1..find(surfex_path1,":")-1];
+         if (status(surfex_path2+"/surfex","exists")=="yes") break;
+         surfex_path1=surfex_path1[find(surfex_path1,":")+1,size(surfex_path1)];
+       }
+       surfex_path=surfex_path2;
+    }
 
     int i=system("sh","surfex \""+surfex_path+"\" -d "+tmpd+" -i " + l +" >"+erg+" 2>/dev/null");
 
