@@ -1,15 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: timer.cc,v 1.3 2007-02-07 10:44:44 Singular Exp $ */
+/* $Id: timer.cc,v 1.4 2007-11-14 14:46:08 Singular Exp $ */
 
 /*
 *  ABSTRACT - get the computing time
 */
 
 #include "mod2.h"
-
-//the mpw timer is quite the same as the dos timer:
 
 int        timerv = 0;
 static double timer_resolution = TIMER_RESOLUTION;
@@ -29,7 +27,6 @@ void SetMinDisplayTime(double mtime)
 
 #ifndef MSDOS
 
-/*tested on HP9000/700, HP9000/300, Linux 0.99, SUN Sparc*/
 #include <stdio.h>
 #include <math.h>
 #include <unistd.h>
@@ -49,6 +46,7 @@ void SetMinDisplayTime(double mtime)
 #   include <time.h>
 # endif
 #endif
+
 #ifdef HAVE_SYS_TIMES_H
 #include <sys/times.h>
 #endif
@@ -58,18 +56,26 @@ void SetMinDisplayTime(double mtime)
 #ifndef HZ
 #include <sys/param.h>
 #endif
+
 #if !defined(HZ) && defined(CLOCKS_PER_SEC)
 #define HZ CLOCKS_PER_SEC
 #endif
+
 #if !defined(HZ) && defined(CLK_TCK)
 #define HZ CLK_TCK
 #endif
-#ifndef HZ
-#ifdef sun
-#define HZ 60.0
-#else
-#define HZ 100.0
+
+#if !defined(HZ) && defined(HAVE_SYSCONF)
+#define HZ sysconf(_SC_CLK_TCK)
 #endif
+
+#ifndef HZ
+  // last resort
+  #ifdef sun
+  #define HZ 60.0
+  #else
+  #define HZ 100.0
+  #endif
 #endif
 
 #include "timer.h"
