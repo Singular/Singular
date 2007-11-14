@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gengftables-conway.cc,v 1.1 2007-07-31 12:57:59 Singular Exp $ */
+/* $Id: gengftables-conway.cc,v 1.2 2007-11-14 16:02:45 Singular Exp $ */
 
 //{{{ docu
 //
@@ -13,6 +13,7 @@
 #include <iostream.h>
 #include <fstream.h>
 #include <strstream>
+#include <string>
 
 #include <factory.h>
 
@@ -286,7 +287,7 @@ static CanonicalForm findGenNew(int n, int q)
 	getline(in,LineSe); // For the first line
 
 	string err="END"; //to check if we are at the end of the file
-	while((flag) and (err != LineSe))
+	while((flag) && (err != LineSe))
 	{
 		getline(in,LineSe); //for the line: allConwayPolynomials := [	
 		if(LineSe == err){
