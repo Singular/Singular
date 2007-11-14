@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.51 2007-10-16 16:44:09 Singular Exp $
+# $Id: GNUmakefile.in,v 1.52 2007-11-14 16:00:28 Singular Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -368,7 +368,7 @@ distsrc :=	\
 		$(addprefix templates/,$(templatesrc)) \
 		$(addprefix ftest/,$(ftestsrc)) \
 		readcf.cc ftmpl_inst.cc \
-		gengftables.cc test_install.cc
+		gengftables.cc gengftables-conway.cc test_install.cc
 
 # all the C/C++ include files in the distribution
 distincl :=	\
@@ -395,7 +395,7 @@ distfiles :=	\
 		examples/factorize.cc examples/gcd.cc \
 		bin/folding.el bin/fold-docu.el \
 		bin/install-sh bin/mkinstalldirs \
-		bin/makeheader
+		bin/makeheader bin/gen-readcf
 
 #
 # - phony targets.
@@ -469,15 +469,7 @@ ftmpl_inst.o:	ftmpl_inst.cc factoryconf.h factory.h \
 
 # note that this is a non-source file which is distributed!
 $(srcdir)/readcf.cc: readcf.y
-		@if test -r $(srcdir)/readcf.cc; then \
-			touch $(srcdir)/readcf.cc;\
-		else \
-		if test "${BISON}" = where-is-your-bison; then \
-			echo Error: no bison given, could not rebuilt readcf.cc;\
-			exit 1; \
-		fi; \
-		$(BISON) $< -o $@ \;
-		fi
+		@./bin/gen-readcf "${BISON}"
 
 # note that these are non-source file which are distributed!
 # We do not specify any dependencies except the most important ones.
@@ -544,7 +536,7 @@ ftestdistclean:
 #
 
 # these are not all dependencies, but the most important ones
-gengftables.o:	gengftables.cc conftest factory.h gf_tabutil.h
+gengftables.o:	gengftables-conway.cc conftest factory.h gf_tabutil.h
 		$(CXX) -c $< $(TESTCXXFLAGS) -o $@
 
 gengftables:	gengftables.o libcf.a libcfmem.a ftmpl_inst.o

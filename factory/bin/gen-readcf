@@ -1,0 +1,14 @@
+#!/bin/sh
+BISON=$1
+if test -r readcf.cc
+then
+   touch readcf.cc
+else
+   if test "$BISON" = where-is-your-bison
+   then
+      echo Error: no bison given, could not rebuilt readcf.cc
+      exit 1
+   fi
+   $BISON readcf.y -o readcf.cc
+fi
+
