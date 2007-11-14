@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.169 2007-09-17 08:33:16 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.170 2007-11-14 16:42:28 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -3686,13 +3686,13 @@ BOOLEAN nuMPResMat( leftv res, leftv arg1, leftv arg2 )
   }
 
   uResultant *resMat= new uResultant( gls, mtype, false );
-
-  res->rtyp = MODUL_CMD;
-  res->data= (void*)resMat->accessResMat()->getMatrix();
-
-  delete resMat;
-
-  return FALSE;
+  if (resMat!=NULL)
+  {
+    res->rtyp = MODUL_CMD;
+    res->data= (void*)resMat->accessResMat()->getMatrix();
+    if (!errorreported) delete resMat;
+  }
+  return errorreported;
 }
 
 BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
