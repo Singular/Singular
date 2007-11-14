@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.8 2007-07-05 16:14:37 Singular Exp $
+ *  Version: $Id: p_polys.cc,v 1.9 2007-11-14 14:45:47 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -891,6 +891,31 @@ int p_IsPurePower(const poly p, const ring r)
       if(k!=0) return 0;
       k=i;
     }
+  }
+  return k;
+}
+
+/*2
+*test if a polynomial is univariate
+* return -1 for constant,
+* 0 for not univariate,s
+* i if dep. on var(i)
+*/
+int p_IsUnivariate(poly p, const ring r)
+{
+  int i,k=-1;
+
+  while (p!=NULL)
+  {
+    for (i=r->N;i;i--)
+    {
+      if (p_GetExp(p,i, r)!=0)
+      {
+        if((k!=-1)&&(k!=i)) return 0;
+        k=i;
+      }
+    }
+    pIter(p);
   }
   return k;
 }

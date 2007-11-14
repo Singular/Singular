@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.4 2007-03-02 09:30:06 Singular Exp $
+ *  Version: $Id: p_polys.h,v 1.5 2007-11-14 14:45:47 Singular Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -221,10 +221,16 @@ PINLINE0 BOOLEAN p_IsConstantPoly(const poly p, const ring r);
 
 // return TRUE if all monoms have the same component
 BOOLEAN   p_OneComp(poly p, ring r);
+
+// return i, if head depends only on var(i)
 int       p_IsPurePower(const poly p, const ring r);
+
+// return i, if poly depends only on var(i)
+int       p_IsUnivariate(poly p, const ring r);
 
 // returns the poly representing the integer i
 poly      p_ISet(int i, ring r);
+
 // returns the poly representing the number n, destroys n
 poly      p_NSet(number n, ring r);
 
