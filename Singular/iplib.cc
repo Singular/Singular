@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.122 2006-09-27 17:46:11 Singular Exp $ */
+/* $Id: iplib.cc,v 1.123 2007-11-15 11:35:29 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -22,6 +22,12 @@
 #include "subexpr.h"
 #include "ipshell.h"
 #include "lists.h"
+
+#if SIZEOF_LONG == 8
+#define SI_MAX_NEST 500
+#else
+#define SI_MAX_NEST 1000
+#endif
 
 #ifdef HAVE_DYNAMIC_LOADING
 BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport);
@@ -290,7 +296,6 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
 */
 BOOLEAN iiPStart(idhdl pn, sleftv  * v)
 {
-  char * str;
   BOOLEAN err=FALSE;
   int old_echo=si_echo;
   char save_flags=0;
@@ -329,9 +334,9 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   }
   /* start interpreter ======================================*/
   myynest++;
-  if (myynest > 1000)
+  if (myynest > SI_MAX_NEST)
   {
-    WerrorS("nesting too deep (>1000)");
+    WerrorS("nesting too deep");
     err=TRUE;
   }
   else
