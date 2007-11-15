@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: tricks.doc,v 1.15 2007-07-14 13:31:30 Singular Exp $
+@comment $Id: tricks.doc,v 1.16 2007-11-15 09:59:20 Singular Exp $
 @comment this file contains the "Tricks and pittfalls" sections
 
 @c The following directives are necessary for proper compilation
@@ -37,6 +37,8 @@
 @itemize @bullet
 @item
 the characteristic of a prime field must be less or equal than 2147483629
+@item
+the number of elements in GF(p,n) must be less than 65536
 @item
 the (weighted) degree of a monomial must be less or equal  than 2147483647
 @item

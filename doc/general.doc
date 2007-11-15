@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.212 2007-10-16 11:27:14 Singular Exp $
+@comment $Id: general.doc,v 1.213 2007-11-15 09:59:20 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1395,10 +1395,10 @@ finite fields Z/p, p a prime <= 2147483629,
 @end ifinfo
 @item
 @tex
-finite fields $\hbox{GF}(p^n)$ with $p^n$ elements, $p$ a prime, $p^n \le 2^{15}$,
+finite fields $\hbox{GF}(p^n)$ with $p^n$ elements, $p$ a prime, $p^n \le 2^{16}$,
 @end tex
 @ifinfo
-finite fields GF(p^n) with p^n elements, p a prime, p^n <= 2^15,
+finite fields GF(p^n) with p^n elements, p a prime, p^n <= 2^16,
 @end ifinfo
 @item
 transcendental extension of @math{Q} or @math{Z/p},
