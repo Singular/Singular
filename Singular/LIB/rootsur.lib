@@ -1,4 +1,4 @@
-// $Id: rootsur.lib,v 1.5 2006-12-18 18:36:24 Singular Exp $
+// $Id: rootsur.lib,v 1.6 2007-11-16 18:38:24 Singular Exp $
 // E. Tobis  12.Nov.2004, April 2004
 // last change 5. May 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
@@ -129,28 +129,10 @@ RETURN:    poly: if p is a univariate polynomial, it returns the variable. If
 SEE ALSO:  whichvariable
 EXAMPLE:   example isuni; shows an example"
 {
-  poly variable;
-  poly g;
-  int i;
-  int sofarsogood;
-
-  variable = whichvariable(leadmonom(p));
-
-  if (variable != 0) {
-    i = 1;
-    sofarsogood = 1;
-    while (sofarsogood && i <= size(p)) {
-      g = p[i]/(variable^(deg(p[i])));
-      sofarsogood = sofarsogood && deg(g) == 0;
-      i++;
-    }
-  }
-
-  if (sofarsogood) {
-    return (variable);
-  } else {
-    return (0);
-  }
+  int v=univariate(p);
+  if (v== -1) { v=1; }
+  if (v>0) { return(var(v)); }
+  else     { return(0); }
 }
 example
 {
@@ -168,42 +150,12 @@ ASSUME:    p is a monomial
 SEE ALSO:  isuni
 EXAMPLE:   example whichvariable; shows an example"
 {
-  int i;
-  int found;
-  poly g;
-  poly variable;
-
-  if (size(p) != 1) {
-    ERROR("p must be a monomial");
-  }
-
-  found = 0;
-
-  i = 1;
-  while (!found && i <= nvars(basering)) {
-    g = diff(p,var(i));
-    if (deg(g) == deg(p) - 1) {
-      // We suspect p is a polynomial in var(i)
-      variable = var(i);
-      found = 1;
-    }
-    i++;
-  }
-
-  // We now have to confirm our suspicion
-  if (found) {
-    if (leadmonom(p/(variable^deg(p))) == 1) { //If p is a monomial on variable
-      return (variable);
-    } else { if (deg(p) <= 0) { // If we received a constant polynomial
-      return (var(1));
-    } else {
-      return (0);
-    }}
-  } else { if (deg(p) <= 0) { // If we received a constant polynomial
-    return (var(1));
-  } else {
-    return (0);
-  }}
+  if (size(p) != 1)
+  { ERROR("p must be a monomial"); }
+  int v=univariate(p);
+  if (v== -1) { v=1; }
+  if (v>0) { return(var(v)); }
+  else     { return(0); }
 }
 example
 {

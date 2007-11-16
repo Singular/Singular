@@ -47,3 +47,11 @@ more Changes with respect to 3-0-3-2
 - new system("SingularLib"): return SINGULAR_PATH after evaluation
 - standard.lib:weightKB improved
 - highest corner and weights fixed (was wrong in ring with ordering Ws/ws)
+
+Tue Nov 13 18:26:32 CET 2007 Singular-3-0-4-beta
+- surfex.lib: find path to surfex via system("Singular"),
+              if this fails, try also all directorories in system("SingularLib")
+- timer: find clock ticks:
+    - try HZ (traditional)
+    - try CLK_TCK (POSIX-1)
+    - try sysconf(_SC_CLK_TCK) (POSIX-2)

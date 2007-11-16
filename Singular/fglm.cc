@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.27 2005-06-07 10:01:18 Singular Exp $
+// $Id: fglm.cc,v 1.28 2007-11-16 18:38:44 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -60,13 +60,16 @@ ideal fglmUpdatesource( const ideal sourceIdeal )
     for ( k= IDELEMS( sourceIdeal )-1; k >=0; k-- )
         (newSource->m)[k]= pCopy( (sourceIdeal->m)[k] );
     offset= IDELEMS( sourceIdeal );
-    for ( l= IDELEMS( currQuotient )-1; l >= 0; l-- ) {
-        if ( (currQuotient->m)[l] != NULL ) {
+    for ( l= IDELEMS( currQuotient )-1; l >= 0; l-- )
+    {
+        if ( (currQuotient->m)[l] != NULL )
+        {
             found= FALSE;
             for ( k= IDELEMS( sourceIdeal )-1; (k >= 0) && (found == FALSE); k-- )
                 if ( pDivisibleBy( (sourceIdeal->m)[k], (currQuotient->m)[l] ) )
                     found= TRUE;
-            if ( ! found ) {
+            if ( ! found )
+            {
                 (newSource->m)[offset]= pCopy( (currQuotient->m)[l] );
                 offset++;
             }
@@ -85,8 +88,10 @@ fglmUpdateresult( ideal & result )
 {
     int k, l;
     BOOLEAN found;
-    for ( k= IDELEMS( result )-1; k >=0; k-- ) {
-        if ( (result->m)[k] != NULL ) {
+    for ( k= IDELEMS( result )-1; k >=0; k-- )
+    {
+        if ( (result->m)[k] != NULL )
+        {
             found= FALSE;
             for ( l= IDELEMS( currQuotient )-1; (l >= 0) && ( found == FALSE ); l-- )
                 if ( pDivisibleBy( (currQuotient->m)[l], (result->m)[k] ) )
@@ -118,11 +123,13 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
     ring dring = IDRING( dringHdl );
     ring sring = IDRING( sringHdl );
 
-    if ( rChar(sring) != rChar(dring) ) {
+    if ( rChar(sring) != rChar(dring) )
+    {
         WerrorS( "rings must have same characteristic" );
         state= FglmIncompatibleRings;
     }
-    if ( (sring->OrdSgn != 1) || (dring->OrdSgn != 1) ) {
+    if ( (sring->OrdSgn != 1) || (dring->OrdSgn != 1) )
+    {
         WerrorS( "only works for global orderings" );
         state= FglmIncompatibleRings;
     }
@@ -150,12 +157,14 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
                 dring->names, nvar, dring->parameter, npar, vperm, pperm,
                 dring->ch);
     for ( k= nvar; (k > 0) && (state == FglmOk); k-- )
-        if ( vperm[k] <= 0 ) {
+        if ( vperm[k] <= 0 )
+        {
             WerrorS( "variable names do not agree" );
             state= FglmIncompatibleRings;
         }
     for ( k= npar-1; (k >= 0) && (state == FglmOk); k-- )
-        if ( pperm[k] >= 0 ) {
+        if ( pperm[k] >= 0 )
+        {
             WerrorS( "paramater names do not agree" );
             state= FglmIncompatibleRings;
         }
@@ -163,8 +172,10 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
       omFreeSize( (ADDRESS)pperm, (npar+1)*sizeof( int ) );
     if ( state != FglmOk ) return state;
     // check if both rings are qrings or not
-    if ( sring->qideal != NULL ) {
-        if ( dring->qideal == NULL ) {
+    if ( sring->qideal != NULL )
+    {
+        if ( dring->qideal == NULL )
+        {
             Werror( "%s is a qring, current ring not", sringHdl->id );
             return FglmIncompatibleRings;
         }
@@ -176,7 +187,8 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         for ( k= IDELEMS( sring->qideal )-1; k >= 0; k-- )
           (sqind->m)[k]= pPermPoly( (sring->qideal->m)[k], vperm, sring, nMap);
         ideal sqindred = kNF( dring->qideal, NULL, sqind );
-        if ( ! idIs0( sqindred ) ) {
+        if ( ! idIs0( sqindred ) )
+        {
             WerrorS( "the quotients do not agree" );
             state= FglmIncompatibleRings;
         }
@@ -193,7 +205,8 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         for ( k= IDELEMS( dring->qideal )-1; k >= 0; k-- )
           (dqins->m)[k]=pPermPoly( (dring->qideal->m)[k], dsvperm, sring, nMap);
         ideal dqinsred = kNF( sring->qideal, NULL, dqins );
-        if ( ! idIs0( dqinsred ) ) {
+        if ( ! idIs0( dqinsred ) )
+        {
             WerrorS( "the quotients do not agree" );
             state= FglmIncompatibleRings;
         }
@@ -202,8 +215,10 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         omFreeSize( (ADDRESS)dsvperm, (nvar+1)*sizeof( int ) );
         if ( state != FglmOk ) return state;
     }
-    else {
-        if ( dring->qideal != NULL ) {
+    else
+    {
+        if ( dring->qideal != NULL )
+        {
             Werror( "current ring is a qring, %s not", sringHdl->id );
             return FglmIncompatibleRings;
         }
@@ -225,14 +240,14 @@ fglmIdealcheck( const ideal theIdeal )
     FglmState state = FglmOk;
     int power;
     int k;
-    BOOLEAN * purePowers = (BOOLEAN *)omAlloc( pVariables*sizeof( BOOLEAN ) );
-    for ( k= pVariables-1; k >= 0; k-- )
-        purePowers[k]= FALSE;
+    BOOLEAN * purePowers = (BOOLEAN *)omAlloc0( pVariables*sizeof( BOOLEAN ) );
 
-    for ( k= IDELEMS( theIdeal ) - 1; (state == FglmOk) && (k >= 0); k-- ) {
+    for ( k= IDELEMS( theIdeal ) - 1; (state == FglmOk) && (k >= 0); k-- )
+    {
         poly p = (theIdeal->m)[k];
         if ( pIsConstant( p ) ) state= FglmHasOne;
-        else if ( (power= pIsPurePower( p )) > 0 ) {
+        else if ( (power= pIsPurePower( p )) > 0 )
+        {
             fglmASSERT( 0 < power && power <= pVariables, "illegal power" );
             if ( purePowers[power-1] == TRUE  ) state= FglmNotReduced;
             else purePowers[power-1]= TRUE;
@@ -241,7 +256,8 @@ fglmIdealcheck( const ideal theIdeal )
             if ( (k != l) && pDivisibleBy( p, (theIdeal->m)[l] ) )
                 state= FglmNotReduced;
     }
-    if ( state == FglmOk ) {
+    if ( state == FglmOk )
+    {
         for ( k= pVariables-1 ; (state == FglmOk) && (k >= 0); k-- )
             if ( purePowers[k] == FALSE ) state= FglmNotZeroDim;
     }
@@ -268,7 +284,8 @@ fglmProc( leftv result, leftv first, leftv second )
     state= fglmConsistency( sourceRingHdl, destRingHdl, vperm );
     omFreeSize( (ADDRESS)vperm, (pVariables+1)*sizeof(int) );
 
-    if ( state == FglmOk ) {
+    if ( state == FglmOk )
+    {
         idhdl ih = currRing->idroot->get( second->Name(), myynest );
         if ( (ih != NULL) && (IDTYP(ih)==IDEAL_CMD) ) {
             ideal sourceIdeal;
@@ -277,7 +294,8 @@ fglmProc( leftv result, leftv first, leftv second )
             else
                 sourceIdeal = IDIDEAL( ih );
             state= fglmIdealcheck( sourceIdeal );
-            if ( state == FglmOk ) {
+            if ( state == FglmOk )
+            {
                 // Now the settings are compatible with FGLM
                 assumeStdFlag( (leftv)ih );
                 if ( fglmzero( sourceRingHdl, sourceIdeal, destRingHdl, destIdeal, FALSE, (currQuotient != NULL) ) == FALSE )
@@ -287,7 +305,8 @@ fglmProc( leftv result, leftv first, leftv second )
     }
     if ( currRingHdl != destRingHdl )
         rSetHdl( destRingHdl );
-    switch (state) {
+    switch (state)
+    {
         case FglmOk:
             if ( currQuotient != NULL ) fglmUpdateresult( destIdeal );
             break;
@@ -336,18 +355,21 @@ fglmQuotProc( leftv result, leftv first, leftv second )
     ideal destIdeal = NULL;
 
     state = fglmIdealcheck( sourceIdeal );
-    if ( state == FglmOk ) {
+    if ( state == FglmOk )
+    {
       if ( quot == NULL ) state= FglmPolyIsZero;
       else if ( pIsConstant( quot ) ) state= FglmPolyIsOne;
     }
 
-    if ( state == FglmOk ) {
+    if ( state == FglmOk )
+    {
       assumeStdFlag( first );
       if ( fglmquot( sourceIdeal, quot, destIdeal ) == FALSE )
         state= FglmNotReduced;
     }
 
-    switch (state) {
+    switch (state)
+    {
         case FglmOk:
             break;
         case FglmHasOne:
@@ -364,14 +386,14 @@ fglmQuotProc( leftv result, leftv first, leftv second )
             destIdeal= idInit(0,0);
             break;
         case FglmPolyIsOne:
-	    int k;
-     	    destIdeal= idInit( IDELEMS(sourceIdeal), 1 );
-	    for ( k= IDELEMS( sourceIdeal )-1; k >=0; k-- )
-	      (destIdeal->m)[k]= pCopy( (sourceIdeal->m)[k] );
+            int k;
+            destIdeal= idInit( IDELEMS(sourceIdeal), 1 );
+            for ( k= IDELEMS( sourceIdeal )-1; k >=0; k-- )
+              (destIdeal->m)[k]= pCopy( (sourceIdeal->m)[k] );
             state= FglmOk;
             break;
         case FglmPolyIsZero:
-     	    destIdeal= idInit(1,1);
+            destIdeal= idInit(1,1);
             (destIdeal->m)[0]= pOne();
             state= FglmOk;
             break;
@@ -402,11 +424,38 @@ findUniProc( leftv result, leftv first )
 
     assumeStdFlag( first );
     state= fglmIdealcheck( sourceIdeal );
-    if ( state == FglmOk ) {
-        if ( FindUnivariateWrapper( sourceIdeal, destIdeal ) == FALSE )
+    if ( state == FglmOk )
+    {
+      // check for special cases: if the input contains
+      // univariate polys, try to reduce the problem
+      int i,k;
+      int count=0;
+      BOOLEAN * purePowers = (BOOLEAN *)omAlloc0( pVariables*sizeof( BOOLEAN ) );
+      for ( k= IDELEMS( sourceIdeal ) - 1; k >= 0; k-- )
+      {
+        if((i=pIsUnivariate(sourceIdeal->m[k]))>0)
+        { 
+          if (purePowers[i-1]==0)
+          {
+            purePowers[i-1]=k;
+            count++;
+            if (count==pVariables) break;
+          }
+        }
+      }
+      if (count==pVariables)
+      {
+        destIdeal=idInit(pVariables,1);
+        for(k=pVariables-1; k>=0; k--) destIdeal->m[k]=pCopy(sourceIdeal->m[purePowers[k]]);
+      }
+      omFreeSize((ADDRESS)purePowers, pVariables*sizeof( BOOLEAN ) );
+      if (destIdeal!=NULL)
+            state = FglmOk; 
+      else if ( FindUnivariateWrapper( sourceIdeal, destIdeal ) == FALSE )
             state = FglmNotReduced;
     }
-    switch (state) {
+    switch (state)
+    {
         case FglmOk:
             break;
         case FglmHasOne:
