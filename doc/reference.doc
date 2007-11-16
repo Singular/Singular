@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.295 2007-11-16 18:37:31 Singular Exp $
+@comment $Id: reference.doc,v 1.296 2007-11-16 19:15:42 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -193,6 +193,7 @@ and @code{LIB} no brackets are allowed.
 * uressolve::
 * vandermonde::
 * var::
+* variables::
 * varstr::
 * vdim::
 * wedge::
