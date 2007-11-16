@@ -1,4 +1,4 @@
-                        SINGULAR version 3-0-2
+                        SINGULAR version 3-0-4
 
                      University of Kaiserslautern
 
@@ -6,7 +6,7 @@
 
            Authors: G.-M. Greuel, G. Pfister, H. Schoenemann
 
-                        Copyright (C) 1986-2006
+                        Copyright (C) 1986-2007
 
 
 
@@ -14,19 +14,18 @@
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
-Free Software Foundation ( version 2 of the License );
-with the following additional restrictions
-(which override any conflicting restrictions in the GPL):
+Free Software Foundation ( version 2 or version 3 of the License ).
 
 The following software used with SINGULAR have their own copyright: the
 omalloc library, the readline library, the Gnu Multiple Precision
-Library (GMP), the Multi Protocol library (MP), the Singular-Factory
-library, the Singular-libfac library, and, for the Windows 9X/NT
-distributions the Cygwin DLL and the Cygwin tools (Cygwin), and the
-XEmacs editor (XEmacs).
+Library (GMP), NTL: A Library for doing Number Theory (NTL), the Multi
+Protocol library (MP), the Singular-Factory library, the
+Singular-libfac library, and, for the Windows distributions the Cygwin
+DLL and the Cygwin tools (Cygwin), and the XEmacs editor (XEmacs).
 
-Their copyrights and licences can be found in the accompanying files
-which are distributed along with these packages.
+Their copyrights and licenses can be found in the accompanying files
+which are distributed along with these packages.  (Since version 3-0-3
+of SINGULAR, all parts have GPL or LGPL as (one of) their licences.)
 
 This program is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -40,14 +39,20 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 Please send any comments or bug reports to
 <singular@mathematik.uni-kl.de>.
 
-Please register yourself as a SINGULAR user by sending email to
-<singular@mathematik.uni-kl.de> with the subject line `register'.
+If you want to be informed of new releases,  please register yourself
+as a SINGULAR user by using the registration form on the SINGULAR
+homepage               `http://www.singular.uni-kl.de'.  If for some
+reason you cannot access the registration form, you can also register
+by sending an email to               <singular@mathematik.uni-kl.de>
+with subject line `register' and body containing the following data:
+ your name, email address, organisation, country and platform(s).
 
-If you use Singular or parts thereof in a project and/or publish
-results that were partly obtained using SINGULAR, we ask you to cite
-SINGULAR and inform us thereof - see
+For the citation of SINGULAR see
 `http://www.singular.uni-kl.de/how_to_cite.html', for information on
 how to cite Singular.
+
+You can also support SINGULAR by informing us about your result
+obtained by using SINGULAR.
 
 Availability
 ============
@@ -62,24 +67,24 @@ The development of SINGULAR is directed and coordinated by Gert-Martin
 Greuel, Gerhard Pfister, and Hans Scho"nemann.
 
 Currently, the SINGULAR team has the following members: Michael
-Brickenstein, Wolfram Decker, Anne Fru"hbis-Kru"ger, Kai Kru"ger,
-Christoph Lossen, Viktor Levandovskyy, Wilfred Pohl and Oliver Wienand.  
+Brickenstein, Wolfram Decker, Alexander Dreyer, Anne Fru"hbis-Kru"ger,
+Kai Kru"ger, Viktor Levandovskyy, Oleksandr Motsak, and Oliver Wienand.
 
-Former members of the SINGULAR team are: Olaf Bachmann, Wolfgang
-Neumann, Jens Schmidt, Mathias Schulze, Thomas Siebert, Ru"diger Stobbe,
-Eric Westenberger and Tim Wichmann.  
+Former members of the SINGULAR team are: Olaf Bachmann, Christoph
+Lossen, Wolfgang Neumann, Wilfred Pohl, Jens Schmidt, Mathias Schulze,
+Thomas Siebert, Ru"diger Stobbe, Eric Westenberger and Tim Wichmann.
 
 Further contributions to SINGULAR were made by: Thomas Bayer, Isabelle
-Bermejo, Markus Becker, Kai Dehmann, Alexander Dreyer, Stephan Endrass,
-Jose Ignacio Farran, Vladimir Gerdt, Philippe Gimenez, Christian Gorzel,
-Hubert Grassmann, Fernando Hernando, Agnes Heydtmann, Dietmar
-Hillebrand, Tobias Hirsch, Thomas Keilen, Simon King, Anen Lakhal,
-Martin Lamm, Santiago Laplagne, Francisco Javier Lobillo, Bernd Martin,
-Michael Messollen, Andrea Mindnich, Jorge Martin Morales, Oleksandr
-Motsak, Thomas Nu"ssler, Carlos Rabelo, Alfredo Sanchez-Navarro, Henrik
-Strohmayer, Christian Stussak, Imade Sulandra, Christine Theis, Enrique
-Tobis, Alberto Vigneron-Tenorio, Moritz Wenk, Denis Yanovich, Oleksandr
-Yena.  
+Bermejo, Markus Becker, Stas Bulygin, Kai Dehmann, Marcin Dumnicki,
+Stephan Endrass, Jose Ignacio Farran, Vladimir Gerdt, Philippe Gimenez,
+Christian Gorzel, Hubert Grassmann, Fernando Hernando, Agnes Heydtmann,
+Dietmar Hillebrand, Tobias Hirsch, Manuel Kauers, Simon King, Anen
+Lakhal, Martin Lamm, Santiago Laplagne, Gregoire Lecerf, Francisco
+Javier Lobillo, Thomas Markwig, Bernd Martin, Michael Messollen, Andrea
+Mindnich, Jorge Martin Morales, Thomas Nu"ssler, Carlos Rabelo, Alfredo
+Sanchez-Navarro, Henrik Strohmayer, Christian Stussak, Imade Sulandra,
+Christine Theis, Enrique Tobis, Alberto Vigneron-Tenorio, Moritz Wenk,
+Denis Yanovich, Oleksandr Yena.
 
 We should like to acknowledge the financial support given by the
 Volkswagen-Stiftung, the Deutsche Forschungsgemeinschaft and the
