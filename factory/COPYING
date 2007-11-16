@@ -1,4 +1,4 @@
-                        SINGULAR version 3-0-3
+                        SINGULAR version 3-0-4
 			   Singular-Factory
 
                      University of Kaiserslautern
@@ -15,9 +15,8 @@
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
-Free Software Foundation ( version 2 of the License );
-with the following additional restrictions
-(which override any conflicting restrictions in the GPL):
+Free Software Foundation ( version 2 or version 3 of the License );
+with the following additional remarks:
 
 This package is part of the software SINGULAR. The GPL is valid for
 this package, other packages may have other copyrights.
@@ -36,12 +35,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 Please send any comments or bug reports to
 <singular@mathematik.uni-kl.de>.
-
-If you use Singular or parts thereof in a project and/or publish
-results that were partly obtained using SINGULAR, we ask you to cite
-SINGULAR and inform us thereof - see
-`http://www.singular.uni-kl.de/how_to_cite.html', for information on
-how to cite Singular.
 
 Availability
 ============
