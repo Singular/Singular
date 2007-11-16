@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.95 2007-08-10 15:55:29 Singular Exp $
+@comment $Id: NEWS.texi,v 1.96 2007-11-16 18:42:18 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -20,9 +20,30 @@
 @end macro
 @end ifset
 
-@heading Updates for version @value{VERSION}
+@heading News for version @value{VERSION}
 
-The current version @value{VERSION} is stabilyzing release,
+@itemize @bullet
+@item
+licence changed: due to the need to use stuff under (L)GPL3,
+all parts of @sc{Singular} are licenced under GPL (resp. LGPL) version 2, or (at your option) version 3
+@item
+new command: (@nref{univariate}): test polynomials for being univariate.
+@item
+new command: (@nref{variables}): list of all variables occuring in a polynomial, ideal or matrix.
+@item
+syntax change: @nref(ncalgebra} should be substituted by @nref(nc_algebra}.
+@code(ncalgebra} is now depreciated, but still supported
+@item 
+library @nref(nctools_lib} updated to use @code{nc_algebra},@*
+@nref{Weyl}, @nref{Exterior}, @nref{findimAlgebra} do not change the current ring
+but return the new structure
+@item
+kernel: use Conway polynomials and support more finite fields
+@end itemize
+
+@heading News in version 3-0-3
+
+The version 3-0-3 is stabilyzing release,
 a result of a long beta test and the integration of a lot of small
 fixes which were on our waiting list for integration.
 
@@ -318,7 +339,7 @@ procedures, related to quantum matrices and minors
 @itemize @bullet
 @item Singular is available for ix86-Linux,
 SunOS-5, IRIX-6, ix86-Win (runs on Windows 95/98/NT4/2000/XP),
-FreeBSD, MacOS X, DecAlpha-Linux, x86_64-Linux (AMD64/Opteron/EM64T),
+FreeBSD, MacOS X, x86_64-Linux (AMD64/Opteron/EM64T),
 IA64-Linux
 @end itemize
 

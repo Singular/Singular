@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.46 2007-11-06 13:45:58 Singular Exp $
+@comment $Id: plureference.doc,v 1.47 2007-11-16 18:42:18 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -974,7 +974,7 @@ none
 Works like @ref{nc_algebra} but changes the basering.
 
 @item @strong{Remark:}
-This function is DEPRECIATED and should be substituted by @code{nc_algebra},
+This function is @strong{depreciated} and should be substituted by @code{nc_algebra},
 since it violates the general @sc{Singular} policy: only @ref{ring} and @ref{setring} can change the basering.
 
 @end table
