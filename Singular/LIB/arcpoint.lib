@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: arcpoint.lib,v 1.1 2007-01-09 10:31:48 Singular Exp $";
+version="$Id: arcpoint.lib,v 1.2 2007-11-16 18:55:57 Singular Exp $";
 //-*- mode:C++;-*-
 
 category="Singularities";
@@ -293,13 +293,13 @@ RETURN:  ring, extends basering by variables t and
           #(variables of basering)*i new variables"
 {
   def R=changevar(""+varstr(basering)+",t,"
-  +variables(nvars(basering),i)+"");
+  +variables_str(nvars(basering),i)+"");
   return(R);
 }
 
 /////////////////////////////////////////////////////////////////////
-static proc variables (int k,int i)
-"USAGE:   variables(k,i); k,i integer
+static proc variables_str (int k,int i)
+"USAGE:   variables_str(k,i); k,i integer
 ASSUME:  1<=k<=26, i>=1
 RETURN:  string of names of variables added in ringchange
 NOTE:    called from ringchange, we use this procedure to

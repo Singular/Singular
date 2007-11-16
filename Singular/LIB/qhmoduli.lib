@@ -480,7 +480,7 @@ GLOBAL: varSubsList, contains the index j s.t. t(i) -> t(i)t(j) ...
 "
 {
   int i, j, c, k, r, nrVars, offset, n, sln, dbPrt;
-  list variables, rd, temp, sList, varSubsList;
+  list Variables, rd, temp, sList, varSubsList;
   poly mPoly;
   string ringSTR, ringSTR1, varString, parString;
 
@@ -489,10 +489,10 @@ GLOBAL: varSubsList, contains the index j s.t. t(i) -> t(i)t(j) ...
 
   export(varSubsList);
   n = nvars(basering);
-  variables = StabVar(wt);    // possible quasihomogeneous substitutions
+  Variables = StabVar(wt);    // possible quasihomogeneous substitutions
   nrVars = 0;
   for(i = 1; i <= size(wt); i = i + 1) {
-    nrVars = nrVars + size(variables[i]);
+    nrVars = nrVars + size(Variables[i]);
   }
 
   // set the new basering needed for the substitutions
@@ -527,13 +527,13 @@ GLOBAL: varSubsList, contains the index j s.t. t(i) -> t(i)t(j) ...
   nrVars = 0;
   offset = 0;
   for(i = 1; i <= size(wt); i = i + 1) {    // build the substitution t(i) -> ...
-    if(i > 1) { offset = offset + size(variables[i - 1]); }
+    if(i > 1) { offset = offset + size(Variables[i - 1]); }
     g = 0;
-    for(j = 1; j <= size(variables[i]); j = j + 1) {
+    for(j = 1; j <= size(Variables[i]); j = j + 1) {
       pp = 1;
-      for(k = 2; k <= size(variables[i][j]); k = k + 1) {
-        pp = pp * var(variables[i][j][k]);
-        if(variables[i][j][k] == i) { varSubsList[i] = offset + j;}
+      for(k = 2; k <= size(Variables[i][j]); k = k + 1) {
+        pp = pp * var(Variables[i][j][k]);
+        if(Variables[i][j][k] == i) { varSubsList[i] = offset + j;}
       }
       g = g + s(offset + j) * pp;
     }
@@ -1076,7 +1076,7 @@ GLOBAL:  'varSubsList', contains the index j s.t. x(i) -> x(i)t(j) ...
 "
 {
   int i, j, k, uw, ic;
-  list varList, variables, subs;
+  list varList, Variables, subs;
   string str, varString;
 
   varList = StabVarComb(wt);
@@ -1087,7 +1087,7 @@ GLOBAL:  'varSubsList', contains the index j s.t. x(i) -> x(i)t(j) ...
     for(j = 1; j <= size(varList[1][i]); j = j + 1) {
       subs[j] = list(i) + list(varList[1][i][j]);
     }
-    variables[i] = subs;
+    Variables[i] = subs;
     if(size(varList[2][i]) > 0) {
 
       // built nonlinear substituitons
@@ -1095,10 +1095,10 @@ GLOBAL:  'varSubsList', contains the index j s.t. x(i) -> x(i)t(j) ...
       for(j = 1; j <= size(varList[2][i]); j = j + 1) {
         subs[j] = list(i) + varList[2][i][j];
       }
-      variables[i] = variables[i] + subs;
+      Variables[i] = Variables[i] + subs;
     }
   }
-  return(variables);
+  return(Variables);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
