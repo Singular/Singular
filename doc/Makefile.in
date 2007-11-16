@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.100 2005-07-08 14:36:30 Singular Exp $
+### $Id: Makefile.in,v 1.101 2007-11-16 18:40:34 Singular Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -375,7 +375,8 @@ install-sharedist: singular.hlp html singular.idx \
 	chmod -R +rX ${install_htmldir}
 	${MKINSTALLDIRS} ${install_docdir}
 	${INSTALL_DATA} singular.idx ${install_docdir}
-	${INSTALL_DATA} ../GPL ${install_prefix}/GPL
+	${INSTALL_DATA} ../GPL2 ${install_prefix}/GPL2
+	${INSTALL_DATA} ../GPL3 ${install_prefix}/GPL3
 	${INSTALL_DATA} COPYING.txt ${install_prefix}/COPYING
 	${INSTALL_DATA} COPYING.html ${install_prefix}
 	${INSTALL_DATA} NEWS.txt ${install_prefix}/NEWS
@@ -406,7 +407,8 @@ install-sharedist-plural: plural.hlp plu_html plural.idx \
 	chmod -R +rX ${install_htmldir}
 	${MKINSTALLDIRS} ${install_docdir}
 	${INSTALL_DATA} plural.idx ${install_docdir}/singular.idx
-	${INSTALL_DATA} ../GPL ${install_prefix}/GPL
+	${INSTALL_DATA} ../GPL2 ${install_prefix}/GPL2
+	${INSTALL_DATA} ../GPL3 ${install_prefix}/GPL3
 	${INSTALL_DATA} COPYING.plural.txt ${install_prefix}/COPYING
 	${INSTALL_DATA} COPYING.plural.html ${install_prefix}/COPYING.html
 	${INSTALL_DATA} NEWS.plural.txt ${install_prefix}/NEWS

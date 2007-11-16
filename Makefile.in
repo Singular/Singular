@@ -454,7 +454,7 @@ cygwin-dist-install: cygwin-dist-scripts ## ${BINDIST_NAME}.tar.gz
 	cp ${TMPDIR}/Singular/${S_VERSION}/INSTALL /usr/share/doc/Singular-${CYGWIN_SING_VER}/
 	cp ${TMPDIR}/Singular/${S_VERSION}/COPYING /usr/share/doc/Singular-${CYGWIN_SING_VER}/
 	cp ${TMPDIR}/Singular/${S_VERSION}/NEWS /usr/share/doc/Singular-${CYGWIN_SING_VER}/
-	cp ${TMPDIR}/Singular/${S_VERSION}/GPL /usr/share/doc/Singular-${CYGWIN_SING_VER}/
+	cp ${TMPDIR}/Singular/${S_VERSION}/GPL* /usr/share/doc/Singular-${CYGWIN_SING_VER}/
 ## Install Cygwin specific structure
 	-rm -rf /lib/surfex
 	mv ${TMPDIR}/Singular/${S_VERSION}/LIB/surfex /lib/surfex
@@ -500,7 +500,7 @@ cygwin-dist-pack: ## singular-base-${CYGWIN_PORT_VER}-src.tar.bz2
 	      /usr/share/doc/Singular-${CYGWIN_SING_VER}/INSTALL  \
 	      /usr/share/doc/Singular-${CYGWIN_SING_VER}/NEWS     \
 	      /usr/share/doc/Singular-${CYGWIN_SING_VER}/README   \
-	      /usr/share/doc/Singular-${CYGWIN_SING_VER}/GPL   \
+	      /usr/share/doc/Singular-${CYGWIN_SING_VER}/GPL*  \
 	      /usr/bin/Singular                  \
 	      /usr/bin/ESingular                 \
 	      ${CYGWIN_SINGULAR_BIN}/*Singular*       \
