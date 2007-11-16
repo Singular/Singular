@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.10 2007-11-16 17:25:10 Singular Exp $
+ *  Version: $Id: p_polys.cc,v 1.11 2007-11-16 17:26:14 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -927,7 +927,7 @@ void  p_GetVariables(poly p, int * e, const ring r)
   BOOLEAN done=TRUE;
   while(p!=NULL)
   {
-    for(i=r->N; i>0 i--)
+    for(i=r->N; i>0; i--)
     {
       if(e[i]==0)
       {
