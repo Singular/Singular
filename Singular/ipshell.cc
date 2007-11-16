@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.170 2007-11-14 16:42:28 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.171 2007-11-16 18:37:30 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -4829,4 +4829,48 @@ ideal kGroebner(ideal F, ideal Q)
   u.CleanUp();
   v.CleanUp();
   return resid;
+}
+
+void jjINT_S_TO_LIST(int n,int *e, leftv res)
+{
+  lists l=(lists)omAlloc0Bin(slists_bin);
+  l->Init(n);
+  int i;
+  poly p;
+  for(i=pVariables;i>0;i--)
+  {
+    if (e[i]>0)
+    {
+      n--;
+      l->m[n].rtyp=POLY_CMD;
+      p=pOne();
+      pSetExp(p,i,1);
+      pSetm(p);
+      l->m[n].data=(char *)p;
+      if (n==0) break;
+    }
+  }
+  res->data=(char*)l;
+  omFreeSize((ADDRESS)e,(pVariables+1)*sizeof(int));
+}
+BOOLEAN jjVARIABLES_P(leftv res, leftv u)
+{
+  int *e=(int *)omAlloc0((pVariables+1)*sizeof(int));
+  int n=pGetVariables((poly)u->Data(),e);
+  jjINT_S_TO_LIST(n,e,res);
+  return FALSE;
+}
+  
+BOOLEAN jjVARIABLES_ID(leftv res, leftv u)
+{
+  int *e=(int *)omAlloc0((pVariables+1)*sizeof(int));
+  ideal I=(ideal)u->Data();
+  int i;
+  int n=0;
+  for(i=I->nrows*I->ncols-1;i>=0;i--)
+  {
+    n=pGetVariables(I->m[i],e);
+  }
+  jjINT_S_TO_LIST(n,e,res);
+  return FALSE;
 }

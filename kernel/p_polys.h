@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.6 2007-11-16 17:25:10 Singular Exp $
+ *  Version: $Id: p_polys.h,v 1.7 2007-11-16 18:37:28 Singular Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -229,7 +229,8 @@ int       p_IsPurePower(const poly p, const ring r);
 int       p_IsUnivariate(poly p, const ring r);
 
 // set entry e[i] to 1 if var(i) occurs in p, ignore var(j) if e[j]>0
-void      p_GetVariables(poly p, int * e, const ring r);
+// return #(e[i]>0)
+int      p_GetVariables(poly p, int * e, const ring r);
 
 // returns the poly representing the integer i
 poly      p_ISet(int i, ring r);

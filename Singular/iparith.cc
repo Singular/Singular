@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.460 2007-11-06 14:58:18 Singular Exp $ */
+/* $Id: iparith.cc,v 1.461 2007-11-16 18:37:28 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -393,9 +393,11 @@ cmdnames cmds[] =
 #endif /* HAVE_PLURAL */
   { "type",        0, TYPE_CMD ,          TYPE_CMD},
   { "typeof",      0, TYPEOF_CMD ,        CMD_1},
+  { "univariate",  0, UNIVARIATE_CMD,     CMD_1},
   { "uressolve",   0, URSOLVE_CMD,        CMD_M},
   { "vandermonde", 0, VANDER_CMD,         CMD_3},
   { "var",         0, VAR_CMD ,           CMD_1},
+  { "variables",   0, VARIABLES_CMD,      CMD_1},
   { "varstr",      0, VARSTR_CMD ,        CMD_12},
   { "vdim",        0, VDIM_CMD ,          CMD_1},
   { "vector",      0, VECTOR_CMD ,        RING_DECL},
@@ -1595,13 +1597,13 @@ static BOOLEAN jjKLAMMER_rest(leftv res, leftv u, leftv v)
 }
 BOOLEAN jjPROC(leftv res, leftv u, leftv v)
 {
-  idrec tmp_proc;
-  Subexpr e;
   void *d;
+  Subexpr e;
   int typ;
   BOOLEAN t=FALSE;
   if (u->rtyp!=IDHDL)
   {
+    idrec tmp_proc;
     tmp_proc.id="_auto";
     tmp_proc.typ=PROC_CMD;
     tmp_proc.data.pinf=(procinfo *)u->Data();
@@ -4518,6 +4520,11 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
   }
   return FALSE;
 }
+static BOOLEAN jjUNIVARIATE(leftv res, leftv v)
+{
+  res->data=(char *)pIsUnivariate((poly)v->Data());
+  return FALSE;
+}
 static BOOLEAN jjVAR1(leftv res, leftv v)
 {
   int i=(int)(long)v->Data();
@@ -5081,6 +5088,10 @@ struct sValCmd1 dArith1[]=
 ,{jjmpTransp,   TRANSPOSE_CMD,   XS(MATRIX_CMD), MATRIX_CMD     ALLOW_PLURAL}
 ,{jjidTransp,   TRANSPOSE_CMD,   XS(MODUL_CMD),  MODUL_CMD      ALLOW_PLURAL}
 ,{jjTYPEOF,     TYPEOF_CMD,      STRING_CMD,     ANY_TYPE       ALLOW_PLURAL}
+,{jjUNIVARIATE, UNIVARIATE_CMD,  INT_CMD,        POLY_CMD       ALLOW_PLURAL}
+,{jjVARIABLES_P,VARIABLES_CMD,   LIST_CMD,       POLY_CMD       ALLOW_PLURAL}
+,{jjVARIABLES_ID,VARIABLES_CMD,  LIST_CMD,       IDEAL_CMD       ALLOW_PLURAL}
+,{jjVARIABLES_ID,VARIABLES_CMD,  LIST_CMD,       MATRIX_CMD       ALLOW_PLURAL}
 ,{jjDUMMY,      VECTOR_CMD,      VECTOR_CMD,     VECTOR_CMD     ALLOW_PLURAL}
 ,{jjVDIM,       VDIM_CMD,        INT_CMD,        IDEAL_CMD      ALLOW_PLURAL}
 ,{jjVDIM,       VDIM_CMD,        INT_CMD,        MODUL_CMD      ALLOW_PLURAL}

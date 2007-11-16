@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.11 2007-11-16 17:26:14 Singular Exp $
+ *  Version: $Id: p_polys.cc,v 1.12 2007-11-16 18:37:28 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -921,25 +921,30 @@ int p_IsUnivariate(poly p, const ring r)
 }
 
 // set entry e[i] to 1 if var(i) occurs in p, ignore var(j) if e[j]>0
-void  p_GetVariables(poly p, int * e, const ring r)
+int  p_GetVariables(poly p, int * e, const ring r)
 {
   int i;
-  BOOLEAN done=TRUE;
+  int n=0;
   while(p!=NULL)
   {
+    n=0;
     for(i=r->N; i>0; i--)
     {
       if(e[i]==0)
       {
         if (p_GetExp(p,i,r)>0)
+        {
           e[i]=1;
-        else
-          done=FALSE;
+          n++;
+        }
       }
+      else
+        n++;
     }
-    if (done) break;
+    if (n==r->N) break;
     pIter(p);
   }
+  return n;
 }
 
 

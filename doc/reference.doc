@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.294 2007-11-09 14:04:13 Singular Exp $
+@comment $Id: reference.doc,v 1.295 2007-11-16 18:37:31 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -189,6 +189,7 @@ and @code{LIB} no brackets are allowed.
 * transpose::
 * type::
 * typeof::
+* univariate::
 * uressolve::
 * vandermonde::
 * var::
@@ -6390,7 +6391,7 @@ See
 @ref{Data types}.
 @c ref
 @c ---------------------------------------
-@node typeof, uressolve, type, Functions
+@node typeof, univariate, type, Functions
 @subsection typeof
 @cindex typeof
 @table @code
@@ -6450,7 +6451,37 @@ See
 @ref{Data types}.
 @c ref
 @c ---------------------------------------
-@node uressolve, vandermonde, typeof, Functions
+@node univariate, uressolve, typeof, Functions
+@subsection univariate
+@cindex univariate
+@table @code
+@item @strong{Syntax:}
+@code{univariate (} poly_expression @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+returns 0 for not univariate, -1 for a constant or the number of the variable
+of the univariate polynomial.
+
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=0,(x,y,z),dp;
+  univariate(x2+1);
+  univariate(x2+y+1);
+  univariate(1);
+  univariate(var(2));
+  var(univariate(z));
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{var};
+@ref{leadexp}.
+@c ref
+@c ---------------------------------------
+@node uressolve, vandermonde, univariate, Functions
 @subsection uressolve
 @cindex uressolve
 @table @code
@@ -6564,7 +6595,7 @@ subst(subst(ip,x,2^8),y,3^8);
 @c ref
 @c ref
 @c ---------------------------------------
-@node var, varstr, vandermonde, Functions
+@node var, variables, vandermonde, Functions
 @subsection var
 @cindex var
 @table @code
@@ -6586,11 +6617,44 @@ poly
 See
 @ref{ring};
 @ref{int};
+@ref{univariate};
 @ref{nvars};
 @ref{varstr}.
 @c ref
 @c ---------------------------------------
-@node varstr, vdim, var, Functions
+@node variables, varstr, var, Functions
+@subsection variables
+@cindex variables
+@table @code
+@item @strong{Syntax:}
+@code{variables (} poly_expression @code{)}
+@*@code{variables (} ideal_expression @code{)}
+@*@code{variables (} matrix_expression @code{)}
+@item @strong{Type:}
+list
+@item @strong{Purpose:}
+@code{var(p)} returns the list of all ring variables the arguments depends on.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=0,(x,y,z),dp;
+  variables(2);
+  variables(x+y2);
+  variables(ideal(x+y2,x3y,z));
+  string(variables(ideal(x+y2,x3y,z)));
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{var};
+@ref{univariate};
+@ref{leadexp};
+@ref{nvars};
+@ref{varstr}.
+@c ref
+@c ---------------------------------------
+@node varstr, vdim, variables, Functions
 @subsection varstr
 @cindex varstr
 @table @code
