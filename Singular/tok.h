@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.67 2007-10-31 17:24:10 Singular Exp $ */
+/* $Id: tok.h,v 1.68 2007-11-16 15:33:51 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -136,9 +136,11 @@ enum {
   TRACE_CMD,
   TWOSTD_CMD,
   TYPEOF_CMD,
+  UNIVARIATE_CMD,
   UNLOAD_CMD,
   URSOLVE_CMD,
   VANDER_CMD,
+  VARIABLES_CMD,
   VARSTR_CMD,
   WRITE_CMD,
   /* start system var section: VECHO */
