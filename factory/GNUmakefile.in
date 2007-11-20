@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.52 2007-11-14 16:00:28 Singular Exp $
+# $Id: GNUmakefile.in,v 1.53 2007-11-20 10:08:02 Singular Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -160,6 +160,7 @@ basefactorysrc := \
 		fac_univar.cc \
 		fac_util.cc \
 		ffops.cc \
+		ffreval.cc \
 		gf_tabutil.cc \
 		gfops.cc \
 		imm.cc \
@@ -228,6 +229,7 @@ basefactoryincl := \
 		fac_univar.h \
 		fac_util.h \
 		ffops.h \
+		ffreval.h \
 		ftmpl_array.h \
 		ftmpl_factor.h \
 		ftmpl_functions.h \

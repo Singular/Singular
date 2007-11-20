@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_switches.cc,v 1.8 2007-09-26 09:17:40 Singular Exp $ */
+/* $Id: cf_switches.cc,v 1.9 2007-11-20 10:08:03 Singular Exp $ */
 
 //{{{ docu
 //
@@ -35,5 +35,6 @@ CFSwitches::CFSwitches ()
   //Off(SW_USE_NTL_SORT);
 #endif
   On(SW_USE_EZGCD);
+  //On(SW_USE_EZGCD_P); // still testing
 }
 //}}}

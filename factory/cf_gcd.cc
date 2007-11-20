@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.54 2007-10-31 08:40:52 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.55 2007-11-20 10:08:03 Singular Exp $ */
 
 #include <config.h>
 
@@ -14,6 +14,7 @@
 #include "cf_algorithm.h"
 #include "fac_util.h"
 #include "ftmpl_functions.h"
+#include "ffreval.h"
 
 #ifdef HAVE_NTL
 #include <NTL/ZZX.h>
@@ -489,9 +490,28 @@ gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
   gc = g;
   if( gcd_avoid_mtaildegree ( fc, gc, d1 ) )
       return d1;
+  bool fc_isUnivariate=fc.isUnivariate();
   if ( getCharacteristic() != 0 )
   {
-    if (isOn(SW_USE_GCD_P))
+    if (isOn( SW_USE_EZGCD_P ) && (!fc_isUnivariate))
+    {
+      if ( pe == 1 )
+        fc = fin_ezgcd( fc, gc );
+      else if ( pe > 0 )// no variable at position 1
+      {
+        fc = replacevar( fc, Variable(pe), Variable(1) );
+        gc = replacevar( gc, Variable(pe), Variable(1) );
+        fc = replacevar( fin_ezgcd( fc, gc ), Variable(1), Variable(pe) );
+      }
+      else
+      {
+        pe = -pe;
+        fc = swapvar( fc, Variable(pe), Variable(1) );
+        gc = swapvar( gc, Variable(pe), Variable(1) );
+        fc = swapvar( fin_ezgcd( fc, gc ), Variable(1), Variable(pe) );
+      }
+    } 
+    else if (isOn(SW_USE_GCD_P))
     {
       fc=newGCD(fc,gc);
     }
@@ -504,7 +524,7 @@ gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
       fc = replacevar( gcd_poly_p( fc, gc ), Variable(mp), Variable(p1) );
     }
   }
-  else if (!fc.isUnivariate())
+  else if (!fc_isUnivariate)
   {
     if ( isOn( SW_USE_EZGCD ) )
     {

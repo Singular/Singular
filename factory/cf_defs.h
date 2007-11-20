@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_defs.h,v 1.12 2007-10-31 08:40:52 Singular Exp $ */
+/* $Id: cf_defs.h,v 1.13 2007-11-20 10:08:02 Singular Exp $ */
 
 #ifndef INCL_CF_DEFS_H
 #define INCL_CF_DEFS_H
@@ -33,13 +33,14 @@ const int SW_BERLEKAMP = 3;
 const int SW_FAC_USE_BIG_PRIMES = 4;
 const int SW_FAC_QUADRATICLIFT = 5;
 const int SW_USE_EZGCD = 6;
-const int SW_USE_SPARSEMOD = 7;
-const int SW_USE_NTL=8;
-const int SW_USE_NTL_GCD_0=9;
-const int SW_USE_NTL_GCD_P=10;
-const int SW_USE_NTL_SORT=11;
-const int SW_USE_CHINREM_GCD=12;
-const int SW_USE_GCD_P=13;
+const int SW_USE_EZGCD_P = 7;
+const int SW_USE_SPARSEMOD = 8;
+const int SW_USE_NTL=9;
+const int SW_USE_NTL_GCD_0=10;
+const int SW_USE_NTL_GCD_P=11;
+const int SW_USE_NTL_SORT=12;
+const int SW_USE_CHINREM_GCD=13;
+const int SW_USE_GCD_P=14;
 //}}}
 
 /*ENDPUBLIC*/

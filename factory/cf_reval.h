@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_reval.h,v 1.5 2005-11-18 10:03:49 pohl Exp $ */
+/* $Id: cf_reval.h,v 1.6 2007-11-20 10:08:03 Singular Exp $ */
 
 #ifndef INCL_CF_REVAL_H
 #define INCL_CF_REVAL_H
@@ -14,7 +14,7 @@
 
 class REvaluation : public Evaluation
 {
-private:
+protected: // neeeded in FFREvaluation
     CFRandom * gen;
 public:
     REvaluation() : Evaluation(), gen(0) {}
