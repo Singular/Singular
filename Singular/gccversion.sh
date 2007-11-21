@@ -25,10 +25,10 @@ printf("unknown\n");
 exit(0); }
 EOF
 $CC tmp.c
-if test -e ./a.out; then
+if test -f ./a.out; then
   ./a.out
   /bin/rm -f a.out tmp.c
-elif test -e a.exe; then
+elif test -f a.exe; then
   ./a.exe
   /bin/rm -f tmp.c a.exe
 else
