@@ -2,7 +2,7 @@
 ###
 ### Makefile for Singular-modules
 ###
-### $Id: Makefile.in,v 1.20 2007-11-21 17:42:06 Singular Exp $
+### $Id: Makefile.in,v 1.21 2007-11-21 18:23:00 Singular Exp $
 ###
 #################################################################
 
@@ -80,7 +80,7 @@ mod_prepare: modgen/modgen
 		if test -d $${file}; then \
 	  	  echo Directory $${file} exists! Ignoring $${file}; \
 		  echo Use make mod_clean or remove directory by hand; \
-		elif test -f $${file}.mod \
+		elif test -f $${file}.mod; then \
 		  ${MODGEN} $${file}.mod >$${file}.log ;\
 		fi; \
 	done
