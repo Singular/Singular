@@ -28,7 +28,6 @@ BISON		= bison
 INSTALL		= @INSTALL@
 INSTALL_PROGRAM	= @INSTALL_PROGRAM@ 
 INSTALL_DATA	= @INSTALL_DATA@
-LN_S		= @LN_S@
 
 SINGUNAME	= @SINGUNAME@
 SING_UNAME	= @SING_UNAME@
@@ -68,19 +67,13 @@ install bindist: modgen
 	${MKINSTALLDIRS} ${bindir}
 	${INSTALL_PROGRAM} modgen ${bindir}/modgen-${SINGULAR_VERSION}
 	rm -f ${bindir}/modgen
-	cd ${bindir}; ${LN_S} modgen-${SINGULAR_VERSION} modgen;\
-	if test ! -x ${MODGEN}; then \
-		${LN_S} modgen-${SINGULAR_VERSION} ${MODGEN};\
-	fi
+	cd ${bindir}; ${LN_S} modgen-${SINGULAR_VERSION} modgen
 
 install-bindist: modgen
 	${MKINSTALLDIRS} ${install_bindir}
 	${INSTALL_PROGRAM} modgen ${install_bindir}/modgen-${SINGULAR_VERSION}
 	rm -f ${install_bindir}/modgen
-	cd ${install_bindir}; ${LN_S} modgen-${SINGULAR_VERSION} modgen;\
-	if test ! -x ${MODGEN}; then \
-		${LN_S} modgen-${SINGULAR_VERSION} ${MODGEN};\
-	fi
+	cd ${install_bindir}; ${LN_S} modgen-${SINGULAR_VERSION} modgen
 
 ############################################################
 ###
