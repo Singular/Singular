@@ -59,7 +59,7 @@ FFREvaluation& FFREvaluation::operator= ( const FFREvaluation & e )
       gen = e.gen->clone();
   }
   return *this;
-}    
+}
 
 /* forward declarations:*/
 static CanonicalForm fin_ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, FFREvaluation & b, bool internal );
@@ -116,7 +116,12 @@ static CanonicalForm fin_ezgcd ( const CanonicalForm & FF, const CanonicalForm &
         DEBOUTLN( cerr, "F = " << F );
         DEBOUTLN( cerr, "G = " << G );
         if( ! fin_findeval( F, G, Fb, Gb, Db, b, delta, degF, degG ) )
-           return 0;
+        {
+           Off(SW_USE_EZGCD_P);
+           d *= gcd_poly_p(F,G);
+           On(SW_USE_EZGCD_P);
+           return d;
+        }
 
         DEBOUTLN( cerr, "found evaluation b = " << b );
         DEBOUTLN( cerr, "F(b) = " << Fb );
@@ -134,7 +139,12 @@ static CanonicalForm fin_ezgcd ( const CanonicalForm & FF, const CanonicalForm &
         while ( 1 ) {
             bt = b;
             if( ! fin_findeval( F, G, Fbt, Gbt, Dbt, bt, delta + 1, degF, degG ) )
-               return 0;
+            {
+              Off(SW_USE_EZGCD_P);
+              d *= gcd_poly_p(F,G);
+              On(SW_USE_EZGCD_P);
+              return d;
+            }
 
             int dd=degree( Dbt );
             if ( dd /*degree( Dbt )*/ == 0 )
@@ -178,7 +188,7 @@ static CanonicalForm fin_ezgcd ( const CanonicalForm & FF, const CanonicalForm &
                 lcDD[1] = lcF;
                 lcDD[2] = lcF;
                 B *= lcF;
-		B_is_F=true;
+                B_is_F=true;
             }
             //else  if ( gcd( (DD[1] = Gb / Db), Db ) == 1 ) {
             else
@@ -195,7 +205,7 @@ static CanonicalForm fin_ezgcd ( const CanonicalForm & FF, const CanonicalForm &
                 lcDD[1] = lcG;
                 lcDD[2] = lcG;
                 B *= lcG;
-		B_is_F=false;
+                B_is_F=false;
               }
               else
               {
@@ -278,8 +288,12 @@ static CanonicalForm fin_ezgcd_specialcase ( const CanonicalForm & F, const Cano
         //     '(16*B^8-208*B^6*C+927*B^4*C^2-1512*B^2*C^3+432*C^4)' \
         //     '(4*B^7*C^2-50*B^5*C^3+208*B^3*C^4-288*B*C^5)'
         if( ! b.step() ) // Error: run out of points
-           return 0;
-
+        {
+          Off(SW_USE_EZGCD_P);
+          d = gcd_poly_p(F,G);
+          On(SW_USE_EZGCD_P);
+          return d;
+        }
         return fin_ezgcd( F, G, b, true );
     }
     DEBOUTLN( cerr, "fin_ezgcdspec: (S1) done, Ft = " << Ft );
