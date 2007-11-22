@@ -114,7 +114,7 @@ scanner.cc: scanner.l mod_grammar.h modgen.h
 	if test "x${LEX}" = x; then \
 		echo Error: no lex given, could not rebuilt scanner.cc;\
                 exit 1; \
-	fi\
+	fi;\
 	fi
 	${LEX} -s -I -t scanner.l > scanner.cc.lmp
 	cp scanner.cc.lmp scanner.cc
