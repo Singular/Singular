@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.297 2007-11-23 09:42:27 Singular Exp $
+@comment $Id: reference.doc,v 1.298 2007-11-23 10:08:53 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -6212,6 +6212,10 @@ is int.
 @cindex Singular
 @cindex system, Singular
 returns the absolute (path) name of the running @sc{Singular} as string.
+@item @code{system("SingularLib")}
+@cindex SingularLib
+@cindex system, SingularLib
+returns the colon seperated library search path name as string.
 @item @code{system("}--@code{")}
 @cindex system, --
 @cindex command-line options, print all values of
