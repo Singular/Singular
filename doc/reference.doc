@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.296 2007-11-16 19:15:42 Singular Exp $
+@comment $Id: reference.doc,v 1.297 2007-11-23 09:42:27 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -7056,7 +7056,8 @@ See
 @*@code{export} list_of_names @code{;}
 @item @strong{Purpose:}
 converts a local variable of a procedure to a global one, that is the
-identifier is moved from the current package to the package @code{Top}.
+identifier is not removed at the end of the procedure.
+However, the package the variable belongs to, is not changed.
 @item @strong{Note:}
 Objects defined in a ring are not automatically exported
 when exporting the ring.
