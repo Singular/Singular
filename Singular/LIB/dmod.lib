@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.22 2007-11-27 11:08:51 Singular Exp $";
+version="$Id: dmod.lib,v 1.23 2007-11-27 14:40:11 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -40,6 +40,7 @@ GUIDE:
 MAIN PROCEDURES:
 
 annfs(F[,S,eng]);       compute Ann F^s0 in D and Bernstein poly for a poly F
+annfspecial(I, F, m, n);  compute Ann F^n from Ann F^s for a poly F and a number n
 Sannfs(F[,S,eng]);      compute Ann F^s in D[s] for a poly F
 Sannfslog(F[,eng]);     compute Ann^(1) F^s in D[s] for a poly F
 bernsteinBM(F[,eng]);   compute global Bernstein poly for a poly F (algorithm of Briancon-Maisonobe)
@@ -3744,15 +3745,15 @@ example
 }
 
 proc annfspecial(ideal I, poly F, int mir, number n)
-"USAGE:  annfspecial(I,F,mir,s0);  I an ideal, F a poly, int mir, number s0
+"USAGE:  annfspecial(I,F,mir,n);  I an ideal, F a poly, int mir, number n
 RETURN:  ideal
-PURPOSE: compute the annihilator ideal of f^s0 in the Weyl Algebra for a rational number s0
+PURPOSE: compute the annihilator ideal of F^n in the Weyl Algebra for a rational number n
 ASSUME:  the basering contains 's' as a variable
 NOTE:    We assume that the basering is D[s],
 @*          ideal I is the Ann F^s in D[s] (obtained with e.g. SannfsBM, SannfsLOT, SannfsOT)
 @*          integer 'mir' is the minimal integer root of the Bernstein polynomial of F
-@*          and the number s0 is rational.
-@*       We compute the real annihilator for any value of s0 (both generic and exceptional).
+@*          and the number n is rational.
+@*       We compute the real annihilator for any rational value of n (both generic and exceptional).
 @*       The implementation goes along the lines of Saito-Sturmfels-Takayama, Alg. 5.3.15
 @*       If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
