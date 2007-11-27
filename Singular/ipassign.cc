@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.91 2007-09-12 09:53:01 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.92 2007-11-27 11:55:57 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -961,7 +961,7 @@ static BOOLEAN jiA_VECTOR_L(leftv l,leftv r)
   return FALSE;
 }
 static BOOLEAN jjA_L_LIST(leftv l, leftv r)
-/* left side: list, has to be a "real" variable
+/* left side: list/def, has to be a "real" variable
 *  right side: expression list
 */
 {
@@ -1007,15 +1007,19 @@ static BOOLEAN jjA_L_LIST(leftv l, leftv r)
         goto err;
       }
   }
-  oldL=(lists)l->Data(); oldL->Clean();
+  oldL=(lists)l->Data(); 
+  if (oldL!=NULL) oldL->Clean();
   if (l->rtyp==IDHDL)
   {
     IDLIST((idhdl)l->data)=L;
+    IDTYP((idhdl)l->data)=LIST_CMD; // was possibly DEF_CMD
     ipMoveId((idhdl)l->data);
   }
   else
   {
     l->LData()->data=L;
+    if ((l->e!=NULL) && (l->rtyp==DEF_CMD))
+      l->rtyp=LIST_CMD;
   }
 err:
   o_r->CleanUp();
@@ -1585,6 +1589,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
     case STRING_CMD:
       nok=jjA_L_STRING(l,r);
       break;
+    case DEF_CMD:
     case LIST_CMD:
       nok=jjA_L_LIST(l,r);
       break;
