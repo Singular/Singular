@@ -55,3 +55,10 @@ Tue Nov 13 18:26:32 CET 2007 Singular-3-0-4-beta
     - try HZ (traditional)
     - try CLK_TCK (POSIX-1)
     - try sysconf(_SC_CLK_TCK) (POSIX-2)
+---------------------------------------------------------
+Tue Nov 27 12:16:36 CET 2007 Singular-3-0-4-1
+Changes with respect to 3-0-4
+- dmod.lib: fixes wrt. nc_algebra and documentation
+- allow assignments like: def l=1,2,3;
+
+-
