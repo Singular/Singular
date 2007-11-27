@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.21 2007-11-26 20:10:00 levandov Exp $";
+version="$Id: dmod.lib,v 1.22 2007-11-27 11:08:51 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -254,7 +254,7 @@ example
 
 
 proc Sannfs(poly F, list #)
-"USAGE:  annfs(f [,S,eng]);  f a poly, S a string, eng an optional int
+"USAGE:  Sannfs(f [,S,eng]);  f a poly, S a string, eng an optional int
 RETURN:  ring
 PURPOSE: compute the D-module structure of basering[f^s] with the algorithm given in S and with the Groebner basis engine given in eng
 NOTE:    activate the output ring with the @code{setring} command.
@@ -521,7 +521,7 @@ example
 // alternative code for SannfsBM, renamed from annfsBM to ALTannfsBM
 // is superfluos - will not be included in the official documentation
 proc ALTannfsBM (poly F, list #)
-"USAGE:  annfsBM(f [,eng]);  f a poly, eng an optional int
+"USAGE:  ALTannfsBM(f [,eng]);  f a poly, eng an optional int
 RETURN:  ring
 PURPOSE: compute the annihilator ideal of f^s in D[s], where D is the Weyl Algebra, according to the algorithm by Briancon and Maisonobe
 NOTE:    activate this ring with the @code{setring} command. In this ring,
@@ -530,7 +530,7 @@ NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       otherwise, and by default @code{slimgb} is used.
 @*       If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
-EXAMPLE: example annfsBM; shows examples
+EXAMPLE: example ALTannfsBM; shows examples
 "
 {
   int eng = 0;
@@ -3748,7 +3748,7 @@ proc annfspecial(ideal I, poly F, int mir, number n)
 RETURN:  ideal
 PURPOSE: compute the annihilator ideal of f^s0 in the Weyl Algebra for a rational number s0
 ASSUME:  the basering contains 's' as a variable
-NOTE:    We assume that the basering is D[s], 
+NOTE:    We assume that the basering is D[s],
 @*          ideal I is the Ann F^s in D[s] (obtained with e.g. SannfsBM, SannfsLOT, SannfsOT)
 @*          integer 'mir' is the minimal integer root of the Bernstein polynomial of F
 @*          and the number s0 is rational.
@@ -3824,19 +3824,19 @@ example
 
 static proc new_ex_annfspecial()
 {
-//another example for annfspecial: x3+y3+z3
-ring r = 0,(x,y,z),dp;
-poly F =  x3+y3+z3;
-def  B = annfs(F);  setring B;
-minIntRoot(BS[1],0);
-// So, the minimal integer root is -1
-setring r;
-def  A = SannfsBM(F);
-setring A;
-poly F =  x3+y3+z3;
-annfspecial(LD,F,-1,3/4); // generic root
-annfspecial(LD,F,-1,-2);  // integer but still generic root
-annfspecial(LD,F,-1,1);   // exceptional root
+  //another example for annfspecial: x3+y3+z3
+  ring r = 0,(x,y,z),dp;
+  poly F =  x3+y3+z3;
+  def  B = annfs(F);  setring B;
+  minIntRoot(BS[1],0);
+  // So, the minimal integer root is -1
+  setring r;
+  def  A = SannfsBM(F);
+  setring A;
+  poly F =  x3+y3+z3;
+  annfspecial(LD,F,-1,3/4); // generic root
+  annfspecial(LD,F,-1,-2);  // integer but still generic root
+  annfspecial(LD,F,-1,1);   // exceptional root
 }
 
 proc minIntRoot(ideal P, int fact)
@@ -4292,7 +4292,7 @@ NOTE:    If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise (and by default) @code{slimgb} is used.
 @*       If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
-EXAMPLE: example checkRoot1; shows examples
+EXAMPLE: example checkRoot2; shows examples
 "
 {
   int eng = 0;
