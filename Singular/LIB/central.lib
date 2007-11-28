@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: central.lib,v 1.2 2007-10-31 17:23:42 Singular Exp $"
+version="$Id: central.lib,v 1.3 2007-11-28 16:36:45 motsak Exp $"
 category="Noncommutative"
 info="
 LIBRARY:  central.lib      Computation of central elements of GR-algebras
@@ -329,10 +329,11 @@ NOTE: unit is omitted. Weights are ignored!
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring A = 0,(e,f,h),dp;
+  ring AA = 0,(e,f,h),dp;
   matrix D[3][3]=0;
   D[1,2]=-h;  D[1,3]=2*e;  D[2,3]=-2*f;
-  nc_algebra(1,D); // this algebra is U(sl_2)
+  def A = nc_algebra(1,D); // this algebra is U(sl_2)
+  setring A;
 
   // PBW Basis of A_2 - monomials of degree <= 2, without unit:
   PBW_maxDeg( 2 );
@@ -358,10 +359,10 @@ NOTE: Unit is omitted. Weights are ignored!
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring A = 0,(e,f,h),dp;
+  ring AA = 0,(e,f,h),dp;
   matrix D[3][3]=0;
   D[1,2]=-h;  D[1,3]=2*e;  D[2,3]=-2*f;
-  nc_algebra(1,D); // this algebra is U(sl_2)
+  def A = nc_algebra(1,D); setring A; // this algebra is U(sl_2)
 
   // PBW Basis of A_2 \ A_1 - monomials of degree == 2:
   PBW_eqDeg( 2 );
@@ -403,10 +404,11 @@ NOTE: Unit is omitted. Weights are ignored!
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring A = 0,(e,f,h),dp;
+  ring AA = 0,(e,f,h),dp;
   matrix D[3][3]=0;
   D[1,2]=-h;  D[1,3]=2*e;  D[2,3]=-2*f;
-  nc_algebra(1,D); // this algebra is U(sl_2)
+  def A = nc_algebra(1,D); // this algebra is U(sl_2)
+  setring A;
 
   // At most 1st degree in e, h and at most 2nd degree in f, unit is omitted:
   PBW_maxMonom( e*(f^2)* h );
@@ -449,10 +451,10 @@ SEE ALSO:   linearMapKernel; linearMapKernel
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring A = 0,(e,f,h),dp;
+  ring AA = 0,(e,f,h),dp;
   matrix D[3][3]=0;
   D[1,2]=-h;  D[1,3]=2*e;  D[2,3]=-2*f;
-  nc_algebra(1,D); // this algebra is U(sl_2)
+  def A = nc_algebra(1,D); setring A; // this algebra is U(sl_2)
 
   // Let us consider the linear map Ad_{e} from A_2 into A.
 
@@ -570,10 +572,11 @@ SEE ALSO:   applyAdF; linearMapKernel
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring A = 0,(e,f,h),dp;
+  ring AA = 0,(e,f,h),dp;
   matrix D[3][3]=0;
   D[1,2]=-h;  D[1,3]=2*e;  D[2,3]=-2*f;
-  nc_algebra(1,D); // this algebra is U(sl_2)
+  def A = nc_algebra(1,D); // this algebra is U(sl_2)
+  setring A;
 
   // Let us consider the linear map Ad_{e} from A_2 into A.
 
@@ -652,10 +655,10 @@ SEE ALSO:   linearMapKernel; applyAdF
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring A = 0,(e,f,h),dp;
+  ring AA = 0,(e,f,h),dp;
   matrix D[3][3]=0;
   D[1,2]=-h;  D[1,3]=2*e;  D[2,3]=-2*f;
-  nc_algebra(1,D); // this algebra is U(sl_2)
+  def A = nc_algebra(1,D); setring A; // this algebra is U(sl_2)
 
   // Let us consider the linear map Ad_{e} from A_2 into A.
 
@@ -777,10 +780,10 @@ EXAMPLE:    example variablesStandard; shows an example
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring A = 0,(x,y,z),dp;
+  ring AA = 0,(x,y,z),dp;
   matrix D[3][3]=0;
   D[1,2]=-z;  D[1,3]=2*x;  D[2,3]=-2*y;
-  nc_algebra(1,D); // this algebra is U(sl_2)
+  def A = nc_algebra(1,D); setring A; // this algebra is U(sl_2)
   // Variables in their natural order:
   variablesStandard();
 }
@@ -832,10 +835,10 @@ EXAMPLE:    example variablesSorted; shows an example
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring A = 0,(x,y,z),dp;
+  ring AA = 0,(x,y,z),dp;
   matrix D[3][3]=0;
   D[1,2]=-z;  D[1,3]=2*x;  D[2,3]=-2*y;
-  nc_algebra(1,D); // this algebra is U(sl_2)
+  def A = nc_algebra(1,D); setring A; // this algebra is U(sl_2)
   // There is only one Cartan variable - z in U(sl_2),
   // it must go 1st:
   variablesSorted();
@@ -908,12 +911,12 @@ EXAMPLE:    example centralizeSet; shows an example
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring A_4_1 = 0,(e(1..4)),dp;
+  ring A = 0,(e(1..4)),dp;
   matrix D[4][4]=0;
   D[2,4] = -e(1);
   D[3,4] = -e(2);
   // This is A_4_1 - the first real Lie algebra of dimension 4.
-  nc_algebra(1,D);
+  def A_4_1 = nc_algebra(1,D); setring A_4_1;
 
   ideal F = variablesSorted(); F;
 
@@ -961,10 +964,10 @@ EXAMPLE:    example centralizerVS; shows an example
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring A = 0,(x,y,z),dp;
+  ring AA = 0,(x,y,z),dp;
   matrix D[3][3]=0;
   D[1,2]=-z;  D[1,3]=2*x;  D[2,3]=-2*y;
-  nc_algebra(1,D); // this algebra is U(sl_2)
+  def A = nc_algebra(1,D); setring A; // this algebra is U(sl_2)
   ideal F = x, y;
   // find generators of the vector space of elements
   // of degree <= 4 commuting with x and y:
@@ -1016,10 +1019,10 @@ EXAMPLE:    example centerVS; shows an example
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring A = 0,(x,y,z),dp;
+  ring AA = 0,(x,y,z),dp;
   matrix D[3][3]=0;
   D[1,2]=-z;  D[1,3]=2*x;  D[2,3]=-2*y;
-  nc_algebra(1,D); // this algebra is U(sl_2)
+  def A = nc_algebra(1,D); setring A; // this algebra is U(sl_2)
   // find a basis of the vector space of all
   // central elements of degree <= 4:
   ideal Z = centerVS(4);
@@ -1295,10 +1298,10 @@ EXAMPLE:    example centralizerRed; shows an example
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring A = 0,(x,y,z),dp;
+  ring AA = 0,(x,y,z),dp;
   matrix D[3][3]=0;
   D[1,2]=-z;  D[1,3]=2*x;  D[2,3]=-2*y;
-  nc_algebra(1,D); // this algebra is U(sl_2)
+  def A = nc_algebra(1,D); setring A; // this algebra is U(sl_2)
   ideal F = x, y;
   // find subalgebra generators of degree <= 4 of the subalgebra of
   // all elements commuting with x and y:
@@ -1342,10 +1345,10 @@ EXAMPLE:    example centerRed; shows an example
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring A = 0,(x,y,z),dp;
+  ring AA = 0,(x,y,z),dp;
   matrix D[3][3]=0;
   D[1,2]=z;
-  nc_algebra(1,D); // it is a Heisenberg algebra
+  def A = nc_algebra(1,D); setring A; // it is a Heisenberg algebra
   // find a basis of the vector space of
   // central elements of degree <= 3:
   ideal VSZ = centerVS(3);
@@ -1643,10 +1646,10 @@ EXAMPLE:    example sa_reduce; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
- ring A = 0,(x,y,z),dp;
+ ring AA = 0,(x,y,z),dp;
  matrix D[3][3]=0;
  D[1,2]=-z; D[1,3]=2*x; D[2,3]=-2*y;
- nc_algebra(1,D); // this algebra is U(sl_2)
+ def A = nc_algebra(1,D); setring A; // this algebra is U(sl_2)
  poly f = 4*x*y+z^2-2*z; // a central polynomial
  ideal I = f, f*f, f*f*f - 10*f*f, f+3*z^3; I;
  sa_reduce(I); // should be just f and z^3
@@ -1755,10 +1758,10 @@ EXAMPLE:    example sa_poly_reduce; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
- ring A = 0,(x,y,z),dp;
+ ring AA = 0,(x,y,z),dp;
  matrix D[3][3]=0;
  D[1,2]=-z; D[1,3]=2*x; D[2,3]=-2*y;
- nc_algebra(1,D); // this algebra is U(sl_2)
+ def A = nc_algebra(1,D); setring A; // this algebra is U(sl_2)
  poly f = 4*x*y+z^2-2*z; // a central polynomial
  sa_poly_reduce(f + 3*f*f + x, ideal(f) ); // should be just 'x'
 }
@@ -1870,10 +1873,10 @@ EXAMPLE: example inCentralizer; shows examples
 example
 {
   "EXAMPLE:";echo=2;
-  ring r=0,(x,y,z),dp;
+  ring R = 0,(x,y,z),dp;
   matrix D[3][3]=0;
   D[1,2]=-z;
-  nc_algebra(1,D); // the Heisenberg algebra
+  def r = nc_algebra(1,D); setring r; // the Heisenberg algebra
   poly f = x^2;
   poly a = z; // 'z' is central => it lies in every centralizer!
   poly b = y^2;
@@ -1914,12 +1917,12 @@ EXAMPLE: example inCenter; shows examples
 example
 {
   "EXAMPLE:";echo=2;
-  ring r=0,(x,y,z),dp;
+  ring R=0,(x,y,z),dp;
   matrix D[3][3]=0;
   D[1,2]=-z;
   D[1,3]=2*x;
   D[2,3]=-2*y;
-  nc_algebra(1,D); // this is U(sl_2)
+  def r = nc_algebra(1,D); setring r; // this is U(sl_2)
   poly p=4*x*y+z^2-2*z;
   inCenter(p);
   poly f=4*x*y;
@@ -1984,12 +1987,12 @@ NOTE:        f is a Cartan element of the algebra A
 example
 {
   "EXAMPLE:";echo=2;
-  ring r=0,(x,y,z),dp;
+  ring R=0,(x,y,z),dp;
   matrix D[3][3]=0;
   D[1,2]=-z;
   D[1,3]=2*x;
   D[2,3]=-2*y;
-  nc_algebra(1,D); // this is U(sl_2) with cartan - z
+  def r = nc_algebra(1,D); setring r; // this is U(sl_2) with cartan - z
   isCartan(z); // yes!
   poly p=4*x*y+z^2-2*z;
   isCartan(p); // central elements are Cartan elements!
@@ -2049,10 +2052,10 @@ EXAMPLE:    example center; shows an example
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring A = 0,(x,y,z,t),dp;
+  ring AA = 0,(x,y,z,t),dp;
   matrix D[4][4]=0;
   D[1,2]=-z;  D[1,3]=2*x;  D[2,3]=-2*y;
-  nc_algebra(1,D); // this algebra is U(sl_2) tensored with K[t]
+  def A = nc_algebra(1,D); setring A; // this algebra is U(sl_2) tensored with K[t]
   // find generators of the center of degree <= 3:
   ideal Z = center(3);
   Z;
@@ -2102,10 +2105,10 @@ EXAMPLE:    example centralizer; shows an example
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring A = 0,(x,y,z),dp;
+  ring AA = 0,(x,y,z),dp;
   matrix D[3][3]=0;
   D[1,2]=-z; D[1,3]=2*x; D[2,3]=-2*y;
-  nc_algebra(1,D); // this algebra is U(sl_2)
+  def A = nc_algebra(1,D); setring A; // this algebra is U(sl_2)
   poly f = 4*x*y+z^2-2*z; // a central polynomial
   f;
   // find generators of the centralizer of f of degree <= 2:

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncdecomp.lib,v 1.12 2007-10-31 17:23:49 Singular Exp $";
+version="$Id: ncdecomp.lib,v 1.13 2007-11-28 16:36:46 motsak Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  ncdecomp.lib     Decomposition of a module into its central characters
@@ -392,12 +392,12 @@ EXAMPLE: example IntersectWithSub; shows an example
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring r=(0,a),(e,f,h),Dp;
+  ring R=(0,a),(e,f,h),Dp;
   matrix @d[3][3];
   @d[1,2]=-h;
   @d[1,3]=2e;
   @d[2,3]=-2f;
-  nc_algebra(1,@d); // parametric U(sl_2)
+  def r = nc_algebra(1,@d); setring r; // parametric U(sl_2)
   ideal I = e,h-a;
   ideal C;
   C[1] = h^2-2*h+4*e*f; // the center of U(sl_2)

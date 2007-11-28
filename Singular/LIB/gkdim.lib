@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gkdim.lib,v 1.10 2007-10-31 17:23:43 Singular Exp $";
+version="$Id: gkdim.lib,v 1.11 2007-11-28 16:36:45 motsak Exp $";
 category="Noncommutative";
 info="
 LIBRARY: GKdim.lib     Procedures for calculating the Gelfand-Kirillov dimension
@@ -102,10 +102,10 @@ EXAMPLE: example GKdim; shows examples
 example
 {
   "EXAMPLE:";echo=2;
-  ring r = 0,(x,y,z),Dp;
+  ring R = 0,(x,y,z),Dp;
   matrix C[3][3]=0,1,1,0,0,-1,0,0,0;
   matrix D[3][3]=0,0,0,0,0,x;
-  nc_algebra(C,D);
+  def r = nc_algebra(C,D); setring r;
   r;
   ideal I=x;
   GKdim(I);
