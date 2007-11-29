@@ -1,6 +1,6 @@
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: inout.lib,v 1.29 2007-11-29 12:54:43 king Exp $";
+version="$Id: inout.lib,v 1.30 2007-11-29 13:27:48 king Exp $";
 category="General purpose";
 info="
 LIBRARY:  inout.lib     Printing and Manipulating In- and Output
@@ -110,9 +110,10 @@ example
 
 proc pmat (matrix m, list #)
 "USAGE:   pmat(M[,n]);  M matrix, n integer
-DISPLAY: display M in array format if it fits into pagewidth; if n is given,
-         only the first n characters of each colum are shown (n>1 required)
-RETURN:  no return value
+RETURN: A string representing M in array format if it fits into 
+        pagewidth; if n is given, only the first n characters of 
+        each column are shown (n>1 required), where a truncation 
+        of a column is indicated by two dots (\'..\')
 EXAMPLE: example pmat; shows an example
 "
 {
