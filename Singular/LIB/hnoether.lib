@@ -1,4 +1,4 @@
-version="$Id: hnoether.lib,v 1.55 2007-07-13 13:41:15 Singular Exp $";
+version="$Id: hnoether.lib,v 1.56 2007-12-04 18:03:43 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  hnoether.lib   Hamburger-Noether (Puiseux) Expansion
@@ -273,6 +273,8 @@ EXAMPLE: example squarefree; shows some examples.
   int e;
   int gcd_ok=1;
   string mipl="0";
+  if (nvars(basering)!=2)
+  { ERROR("basering must have exactly 2 variables for Hnoether::squarefree"); }
   if (size(parstr(altring))==1) { mipl=string(minpoly); }
  //---- test: char = (p^k,a) (-> gcd not implemented) or (p,a) (gcd works) ----
   if ((char(basering)!=0) and (charstr(basering)!=string(char(basering)))) {
