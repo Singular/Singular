@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.40 2006-05-15 09:03:04 Singular Exp $ */
+/* $Id: canonicalform.cc,v 1.41 2007-12-04 15:24:53 Singular Exp $ */
 
 #include <config.h>
 
@@ -1436,11 +1436,13 @@ bgcd ( const CanonicalForm & f, const CanonicalForm & g )
 {
     // check immediate cases
     int what = is_imm( g.value );
-    if ( is_imm( f.value ) ) {
+    if ( is_imm( f.value ) )
+    {
         ASSERT( ! what || (what == is_imm( f.value )), "incompatible operands" );
         if ( what == 0 )
             return g.value->bgcdcoeff( f.value );
-        else if ( what == INTMARK && ! cf_glob_switches.isOn( SW_RATIONAL ) ) {
+        else if ( what == INTMARK && ! cf_glob_switches.isOn( SW_RATIONAL ) )
+	{
             // calculate gcd using standard integer
             // arithmetic
             int fInt = imm2int( f.value );
@@ -1449,14 +1451,16 @@ bgcd ( const CanonicalForm & f, const CanonicalForm & g )
             if ( fInt < 0 ) fInt = -fInt;
             if ( gInt < 0 ) gInt = -gInt;
             // swap fInt and gInt
-            if ( gInt > fInt ) {
+            if ( gInt > fInt )
+	    {
                 int swap = gInt;
                 gInt = fInt;
                 fInt = swap;
             }
 
             // now, 0 <= gInt <= fInt.  Start the loop.
-            while ( gInt ) {
+            while ( gInt )
+	    {
                 // calculate (fInt, gInt) = (gInt, fInt%gInt)
                 int r = fInt % gInt;
                 fInt = gInt;
@@ -1464,7 +1468,8 @@ bgcd ( const CanonicalForm & f, const CanonicalForm & g )
             }
 
             return CanonicalForm( fInt );
-        } else
+        }
+	else
             // we do not go for maximal speed for these stupid
             // special cases
             return CanonicalForm( f.isZero() && g.isZero() ? 0 : 1 );
@@ -1476,7 +1481,8 @@ bgcd ( const CanonicalForm & f, const CanonicalForm & g )
     int gLevel = g.value->level();
 
     // check levels
-    if ( fLevel == gLevel ) {
+    if ( fLevel == gLevel )
+    {
         fLevel = f.value->levelcoeff();
         gLevel = g.value->levelcoeff();
 

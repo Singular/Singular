@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_int.cc,v 1.18 2006-05-15 09:03:06 Singular Exp $ */
+/* $Id: int_int.cc,v 1.19 2007-12-04 15:24:53 Singular Exp $ */
 
 #include <config.h>
 
@@ -383,7 +383,8 @@ InternalInteger::bextgcdsame( InternalCF * c, CanonicalForm & a, CanonicalForm &
     ASSERT( ! ::is_imm( c ) && c->levelcoeff() == IntegerDomain, "incompatible base coefficients" );
 
     // simply return 1 if we are calculating over the rationals
-    if ( cf_glob_switches.isOn( SW_RATIONAL ) ) {
+    if ( cf_glob_switches.isOn( SW_RATIONAL ) )
+    {
         a = 1/CanonicalForm( copyObject() ); b = 0;
         return int2imm( 1 );
     }
@@ -398,24 +399,30 @@ InternalInteger::bextgcdsame( InternalCF * c, CanonicalForm & a, CanonicalForm &
     mpz_gcdext( &result, &aMPI, &bMPI, &thempi, &MPI( c ) );
 
     // check and modify signs
-    if ( mpz_sgn( &result ) < 0 ) {
+    if ( mpz_sgn( &result ) < 0 )
+    {
         mpz_neg( &result, &result );
         mpz_neg( &aMPI, &aMPI );
         mpz_neg( &bMPI, &bMPI );
     }
 
     // postconditioning of result
-    if ( mpz_is_imm( &aMPI ) ) {
+    if ( mpz_is_imm( &aMPI ) )
+    {
         a = CanonicalForm( int2imm( mpz_get_si( &aMPI ) ) );
         mpz_clear( &aMPI );
-    } else
+    }
+    else
         a = CanonicalForm( new InternalInteger( aMPI ) );
-    if ( mpz_is_imm( &bMPI ) ) {
+    if ( mpz_is_imm( &bMPI ) )
+    {
         b = CanonicalForm( int2imm( mpz_get_si( &bMPI ) ) );
         mpz_clear( &bMPI );
-    } else
+    }
+    else
         b = CanonicalForm( new InternalInteger( bMPI ) );
-    if ( mpz_is_imm( &result ) ) {
+    if ( mpz_is_imm( &result ) )
+    {
         InternalCF * res = int2imm( mpz_get_si( &result ) );
         mpz_clear( &result );
         return res;
@@ -430,7 +437,8 @@ InternalInteger::bextgcdcoeff( InternalCF * c, CanonicalForm & a, CanonicalForm 
     ASSERT( ::is_imm( c ) == INTMARK, "incompatible base coefficients" );
 
     // simply return 1 if we are calculating over the rationals
-    if ( cf_glob_switches.isOn( SW_RATIONAL ) ) {
+    if ( cf_glob_switches.isOn( SW_RATIONAL ) )
+    {
         a = 1/CanonicalForm( copyObject() ); b = 0;
         return int2imm( 1 );
     }
@@ -438,10 +446,13 @@ InternalInteger::bextgcdcoeff( InternalCF * c, CanonicalForm & a, CanonicalForm 
     int cInt = imm2int( c );
 
     // trivial cases
-    if ( cInt == 1 || cInt == -1 ) {
+    if ( cInt == 1 || cInt == -1 )
+    {
         a = 0; b = cInt;
         return int2imm( 1 );
-    } else if ( cInt == 0 ) {
+    }
+    else if ( cInt == 0 )
+    {
         a = 1; b = 0;
         return copyObject();
     }
@@ -492,7 +503,8 @@ InternalInteger::sqrt ()
     MP_INT result;
     mpz_init( &result );
     mpz_sqrt( &result, &thempi );
-    if ( mpz_is_imm( &result ) ) {
+    if ( mpz_is_imm( &result ) )
+    {
         InternalCF * res = int2imm( mpz_get_si( &result ) );
         mpz_clear( &result );
         return res;
