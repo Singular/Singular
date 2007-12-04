@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.37 2007-10-31 17:49:54 Singular Exp $";
+version="$Id: nctools.lib,v 1.38 2007-12-04 19:56:51 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -656,18 +656,19 @@ EXAMPLE: example Weyl; shows examples
       @D[2*i-1,2*i]=1;
     }
   }
-  return(nc_algebra(1,@D));
+  def @R = nc_algebra(1,@D);
+  return(@R);
 }
 example
 {
   "EXAMPLE:";echo=2;
   ring A1=0,(x(1..2),d(1..2)),dp;
-  def S=Weyl();setring S;
-  S;
+  def S=Weyl();  
+  setring S;  S;
   kill A1,S;
   ring B1=0,(x1,d1,x2,d2),dp;
   def S=Weyl(1);
-  setring S; S;
+  setring S;  S;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1275,8 +1276,8 @@ EXAMPLE: example makeWeyl; shows examples
     ring @rr = @p,(x(1..n),D(1..n)),dp;
   }
   setring @rr;
-  Weyl();
-  return(@rr);
+  def @rrr = Weyl();
+  return(@rrr);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -1322,7 +1323,7 @@ example
    kill r;
 }
 
-
+///////////////////////////////////////////////////////////////////////////////
 proc rightStd(def I)
 "USAGE:  rightStd(I); I an ideal/ module
 PURPOSE: compute a right Groebner basis of I
@@ -1353,7 +1354,7 @@ example
   RI;
 }
 
-
+///////////////////////////////////////////////////////////////////////////////
 proc rightSyz(def I)
 "USAGE:  rightSyz(I); I an ideal/ module
 PURPOSE: compute a right syzygy module of I
@@ -1381,7 +1382,7 @@ example
   print(RS);
 }
 
-
+///////////////////////////////////////////////////////////////////////////////
 proc rightNF(def v, def M)
 "USAGE:  rightNF(I); v a poly/vector, M an ideal/module
 PURPOSE: compute a right normal form of v w.r.t. M
@@ -1420,6 +1421,7 @@ example
 // print(NF(v,M));
 // print(rightNF(v,M));
 
+///////////////////////////////////////////////////////////////////////////////
 proc rightModulo(def M, def N)
 "USAGE:  rightModulo(M,N); M,N are ideals/modules
 PURPOSE: compute a right representation of the module (M+N)/N
