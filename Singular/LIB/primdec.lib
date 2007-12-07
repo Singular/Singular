@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.135 2007-04-20 09:53:27 Singular Exp $";
+version="$Id: primdec.lib,v 1.136 2007-12-07 10:20:34 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -5723,12 +5723,13 @@ static proc radicalSL(ideal I, list #)
 
 static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
 {
-// allMaximal                1 -> Indicates that the reduction to the zerodim case
-//                       must be done for all indep set of the leading terms ideal
-//                                        0 -> Otherwise
-// ideal ser                Only for radicalKL. (Same as in radicalKL)
-// list #                        Only for radicalKL (If #[1] = 1, only equiradical is required.
-//                  It is used to set the value of done.)
+// allMaximal      1 -> Indicates that the reduction to the zerodim case
+//                    must be done for all indep set of the leading terms ideal
+//                 0 -> Otherwise
+// ideal ser       Only for radicalKL. (Same as in radicalKL)
+// list #          Only for radicalKL (If #[1] = 1, 
+//                    only equiradical is required.
+//                    It is used to set the value of done.)
 
   attrib(I, "isSB", 1);   // I needs to be a reduced standard basis
   list indep, fett;
@@ -5785,10 +5786,10 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
   //indep[1] is the new varstring, indep[2] the string for the block-ordering
   //-------------------------------------------------------------------------
 
-  // SL 2006-04-24 1         If allIndep = 0, then it only computes one maximal
-  //                                        independent set.
-  //                                        This looks better for the new algorithm but not for KL
-  //                                        algorithm
+  // SL 2006-04-24 1   If allIndep = 0, then it only computes one maximal
+  //                     independent set.
+  //                     This looks better for the new algorithm but not for KL
+  //                     algorithm
   list parameters = allIndep;
   indep = newMaxIndependSetDp(I, parameters);
   // SL 2006-04-24 2
@@ -5872,8 +5873,7 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
       }
       op = option(get);
       option(redSB);
-      @j = interred(@j);  //to obtain a reduced standardbasis
-      attrib(@j, "isSB", 1);
+      @j = std(@j);  //to obtain a reduced standardbasis
       option(set, op);
 
       // SL 1 Debug messages
@@ -5973,9 +5973,9 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
   dbprint (printlevel-voice, "// Dimension:", dim(groebner(rad)));
   // SL 2006.04.11 2 Debug messages
 
-  // SL 2006.04.21 1         New variable "done".
-  //                                        It tells if the radical is already computed or
-  //                                        if it still has to be computed the radical of the new ideal I
+  // SL 2006.04.21 1    New variable "done".
+  //                      It tells if the radical is already computed or
+  //                      if it still has to be computed the radical of the new ideal I
   int done;
   if(((@wr == 1) && (dim(I)<jdim)) || (deg(I[1])==0) || (size(te) == 0))
   {
@@ -5987,13 +5987,11 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
   }
   // SL 2006.04.21 2
 
-  // SL 2006.04.21 1         See details of the output at the beggining of this proc.
+  // SL 2006.04.21 1     See details of the output at the beginning of this proc.
   list result = rad, I, done;
   return(result);
   // SL 2006.04.21 2
 }
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Given an ideal I and an ideal P (intersection of some minimal prime ideals
@@ -6005,8 +6003,8 @@ static proc radicalSLIteration (ideal I, ideal P);
 //        P, ideal. Intersection of some prime ideals of I.
 // Output: ideal. Intersection of some primes of I different from the ones in P.
 {
-  int k = 1;                                // Counter
-  int good  = 0;                        // Checks if an element of P is in rad(I)
+  int k = 1;                     // Counter
+  int good  = 0;                 // Checks if an element of P is in rad(I)
 
   dbprint (printlevel-voice, "// We search for an element in P - sqrt(I).");
   while ((k <= size(P)) and (good == 0))
@@ -6026,7 +6024,11 @@ static proc radicalSLIteration (ideal I, ideal P);
   dbprint(printlevel - voice, "// We saturate I with respect to this element.");
   if (P[k] != 1)
   {
+    intvec oo=option(get);
+    option(redSB);
     ideal J = sat(I, P[k])[1];
+    option(set,oo);
+
   }
   else
   {
@@ -6039,9 +6041,11 @@ static proc radicalSLIteration (ideal I, ideal P);
   dbprint(printlevel - voice, "// The ideal is ", J);
   dbprint(printlevel - voice, "// The dimension is ", dim(groebner(J)));
 
-  int allMaximal = 0;                   // Compute the zerodim reduction for only one indep set.
-  ideal re = 1;                           // No reduction is need, there are not redundant components.
-  list emptyList = list();   // Look for primes of any dimension, not only of max dimension.
+  int allMaximal = 0;   // Compute the zerodim reduction for only one indep set.
+  ideal re = 1;         // No reduction is need,
+                        //    there are not redundant components.
+  list emptyList = list();   // Look for primes of any dimension,
+                             //   not only of max dimension.
   list result = radicalReduction(J, re, allMaximal, emptyList);
 
   return(result[1]);
