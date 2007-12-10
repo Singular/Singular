@@ -592,6 +592,40 @@ char * versionString()
               return str;
 }
 
+#ifdef PDEBUG
+#if (OM_TRACK > 2) && defined(OM_TRACK_CUSTOM)
+void p_SetRingOfLeftv(leftv l, ring r)
+{
+  switch(l->rtyp)
+  {
+    case POLY_CMD:
+    case VECTOR_CMD:
+    {
+      poly p=(poly)l->data;
+      while(p!=NULL) { p_SetRingOfLm(p,r); pIter(p); }
+      break;
+    }
+    case IDEAL_CMD:
+    case MODUL_CMD:
+    case MATRIX_CMD:
+    {
+      ideal I=(ideal)l->data;
+      int i;
+      for(i=IDELEMS(I)-1;i>=0;i--)
+      {
+        poly p=I->m[i];
+        while(p!=NULL) { p_SetRingOfLm(p,r); pIter(p); }
+      }
+      break;
+    }
+    default:
+     printf("type %d not yet implementd in p_SetRingOfLeftv\n",l->rtyp);
+     break
+  }
+}
+#endif
+#endif
+
 #ifdef HAVE_NS
 void listall(int showproc)
 {
