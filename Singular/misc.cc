@@ -29,6 +29,10 @@
 #include "ring.h"
 #include "omSingularConfig.h"
 #include "p_Procs.h"
+/* Needed for debug Version of p_SetRingOfLeftv, Oliver */
+#ifdef PDEBUG
+#include "p_polys.h"
+#endif
 #include "version.h"
 
 #include "static.h"
@@ -620,7 +624,7 @@ void p_SetRingOfLeftv(leftv l, ring r)
     }
     default:
      printf("type %d not yet implementd in p_SetRingOfLeftv\n",l->rtyp);
-     break
+     break;
   }
 }
 #endif
