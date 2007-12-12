@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.69 2007-06-25 18:14:48 king Exp $"
+version="$Id: finvar.lib,v 1.70 2007-12-12 15:02:46 king Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -1590,6 +1590,7 @@ EXAMPLE: example invariant_basis; shows an example
     return();
   }
   def br=basering;
+  ideal vars = maxideal(1);
   ideal mon=sort(maxideal(g))[1];      // needed for constructing a general
   int m=ncols(mon);                    // homogeneous polynomial of degree g
   mon=sort(mon,intvec(m..1))[1];
@@ -1616,7 +1617,7 @@ EXAMPLE: example invariant_basis; shows an example
  //----------------------------------------------------------------------------
   execute("ring T=("+charstr(br)+"),("+varstr(br)+",p(1..m)),lp;");
   // p(1..m) are the general coefficients of the general polynomial of degree g
-  execute("ideal vars="+varstr(br)+";");
+  ideal vars = fetch(br,vars);
   map f;
   ideal mon=imap(br,mon);
   poly P=0;
@@ -6950,7 +6951,7 @@ proc secondary_not_cohen_macaulay (matrix P, list #)
          generating a finite matrix group, v: an optional <int>
 ASSUME:  n is the number of variables of the basering
 RETURN:  secondary invariants of the invariant ring (type <matrix>)
-DISPLAY: information if v does not equal 0
+DISPLAY: information on the progress of computation if v does not equal 0
 THEORY:  Secondary invariants are generated following \"Generating Invariant
          Rings of Finite Groups over Arbitrary Fields\" by Kemper (1996).
 EXAMPLE: example secondary_not_cohen_macaulay; shows an example
@@ -7009,9 +7010,9 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
   { "";
   }
   ring alskdfalkdsj=0,x,dp;
-  matrix M[1][2]=1,(1-x)^n;            // we look at our primary invariants as
+  matrix M[1][2]=1,(1-x)^n;            
   export alskdfalkdsj;
-  export M;
+  export M;                            // we look at our primary invariants as
   setring br;                          // such of the subgroup that only
   matrix REY=matrix(maxideal(1));      // contains the identity, this means that
                                        // ch does not divide the order anymore,
@@ -7028,8 +7029,8 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
     "  invariants found previously.";
     "";
   }
-  matrix trivialS, trivialSI=secondary_charp(P,REY,"alskdfalkdsj",v);
-  kill trivialSI;
+  matrix trivialS, trivialIS=secondary_charp(P,REY,"alskdfalkdsj",v);
+  kill trivialIS;
   kill alskdfalkdsj;
   // now we have those secondary invariants
   int k=ncols(trivialS);               // k is the number of the secondary
@@ -7065,10 +7066,10 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
                                        // elimination
   execute("ring R=("+charstr(br)+"),(x(1..n),y(1..n),h),dp;");
   execute("minpoly=number("+mp+");");
-  map f=br,maxideal(1);                // canonical mapping
+  // map f=br,maxideal(1);                // canonical mapping
   matrix M[k][m+k*n];
-  M[1..k,1..m]=matrix(f(M(2)));        // will contain a module -
-  matrix P=f(P);                       // primary invariants in the new ring
+  M[1..k,1..m]=matrix(fetch(br,M(2)));        // will contain a module -
+  matrix P=fetch(br,P);                       // primary invariants in the new ring
   for (i=1;i<=n;i++)
   { for (j=1;j<=k;j++)
     { M[j,m+(i-1)*k+j]=y(i)-P[1,i];
@@ -7081,7 +7082,7 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
   setring br;
   ideal substitute=maxideal(1),ideal(P),1;
   f=R,substitute;                      // replacing y(1..n) by primary
-                                       // invariants -
+                                       // invariants and h by 1 -
   M(2)=f(M);                           // M(2) is the new module
   m=ncols(M(2));
   matrix S[1][m];
