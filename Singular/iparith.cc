@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.461 2007-11-16 18:37:28 Singular Exp $ */
+/* $Id: iparith.cc,v 1.462 2007-12-13 10:00:33 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -5937,6 +5937,7 @@ struct sValCmd3 dArith3[]=
 ,{jjCOEFFS3_KB,     COEFFS_CMD, MATRIX_CMD, IDEAL_CMD,  IDEAL_CMD,  POLY_CMD ALLOW_PLURAL}
 ,{jjCOEFFS3_KB,     COEFFS_CMD, MATRIX_CMD, MODUL_CMD,  MODUL_CMD,  POLY_CMD ALLOW_PLURAL}
 ,{jjELIMIN_HILB,    ELIMINATION_CMD,IDEAL_CMD, IDEAL_CMD, POLY_CMD, INTVEC_CMD NO_PLURAL}
+,{jjELIMIN_HILB,    ELIMINATION_CMD,MODUL_CMD, MODUL_CMD, POLY_CMD, INTVEC_CMD NO_PLURAL}
 ,{jjFIND3,          FIND_CMD,   INT_CMD,    STRING_CMD, STRING_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjFWALK3,         FWALK_CMD,  IDEAL_CMD,  RING_CMD,   DEF_CMD,    INT_CMD NO_PLURAL}
 ,{jjHILBERT3,       HILBERT_CMD,INTVEC_CMD, IDEAL_CMD,  INT_CMD,    INTVEC_CMD NO_PLURAL}
