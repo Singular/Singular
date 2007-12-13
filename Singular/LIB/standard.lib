@@ -2,7 +2,7 @@
 //major revision Jan/Feb. 2007, GMG
 //groebner mit Optionen versehen
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.98 2007-11-06 20:14:04 king Exp $";
+version="$Id: standard.lib,v 1.99 2007-12-13 14:32:05 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -271,12 +271,14 @@ EXAMPLE: example stdhilb;  shows an example"
     algorithm = "stdorslimgb";
   }
 
-  if ( algorithm=="std" || ( algorithm=="stdorslimgb" && char(P)>0 ) )
+  if (( algorithm=="std" || ( algorithm=="stdorslimgb" && char(P)>0 ) )
+  && (defined(hi)!=voice))
   {
     if (p_opt) {"std in ring " + string(Philb);}
     intvec hi = hilb( std(Id(1)),1,W );
   }
-  if ( algorithm=="slimgb" || ( algorithm=="stdorslimgb" && char(P)==0 ) )
+  if (( algorithm=="slimgb" || ( algorithm=="stdorslimgb" && char(P)==0 ) )
+  && (defined(hi)!=voice))
   {
     intvec hi = hilb(qslimgb(Id(1)),1,W);
   }
