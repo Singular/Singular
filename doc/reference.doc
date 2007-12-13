@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.298 2007-11-23 10:08:53 Singular Exp $
+@comment $Id: reference.doc,v 1.299 2007-12-13 09:59:12 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1378,6 +1378,8 @@ first to compute the Hilbert function of the ideal (first
 argument) with a fast ordering (e.g., @code{dp}). Then make use of it to speed
 up the computation: a Hilbert-driven elimination uses the intvec
 provided as the third argument.
+@*If the ideal (resp. module) is not homogeneous with weights 1,
+this intvec will be silently ignored.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -1387,8 +1389,9 @@ provided as the third argument.
   ring R=0,(x,y,t,s,z),dp;
   ideal i=x-t,y-t2,z-t3,s-x+y3;
   eliminate(i,ts);
-  intvec v=hilb(std(i),1);
-  eliminate(i,ts,v);
+  ideal j=x2,xy,y2;
+  intvec v=hilb(std(j),1);
+  eliminate(j,y,v);
 @c example
 @end smallexample
 @end table
