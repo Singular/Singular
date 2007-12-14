@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.53 2007-03-13 18:54:15 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.54 2007-12-14 15:26:28 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -123,9 +123,7 @@ si_hdl_typ si_set_signal (
 
 /*---------------------------------------------------------------------*/
 #if defined(ix86_Linux)
-  #if defined(HAVE_SIGCONTEXT) || defined(HAVE_ASM_SIGCONTEXT_H)
-  #include <asm/sigcontext.h>
-  #else
+  #if !defined(HAVE_SIGCONTEXT) && !defined(HAVE_ASM_SIGCONTEXT_H)
 struct sigcontext_struct {
         unsigned short gs, __gsh;
         unsigned short fs, __fsh;
