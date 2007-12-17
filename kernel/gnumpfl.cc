@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.4 2007-07-04 09:58:40 Singular Exp $ */
+/* $Id: gnumpfl.cc,v 1.5 2007-12-17 18:16:43 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -393,10 +393,11 @@ char * ngfEatFloatNExp( char * s )
 
   // eat the exponent, starts with 'e' followed by '+', '-'
   // and digits, like:
-  //   e-202, e+393
-  if ( (s != start) && (*s == 'e') && ((*(s+1) == '+') || (*(s+1) == '-')) )
+  //   e-202, e+393, accept also E7
+  if ( (s != start) && ((*s == 'e')||(*s=='E')))
   {
-    s=s+2; // eat e and sign
+    s++; // skip 'e'/'E'
+    if ((*s == '+') || (*s == '-')) s++;
     while ((*s >= '0' && *s <= '9')) s++;
   }
 
