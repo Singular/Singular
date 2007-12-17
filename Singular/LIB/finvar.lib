@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.71 2007-12-14 10:12:31 king Exp $"
+version="$Id: finvar.lib,v 1.72 2007-12-17 13:16:31 king Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -1615,7 +1615,10 @@ EXAMPLE: example invariant_basis; shows an example
     }
   }
  //----------------------------------------------------------------------------
-  execute("ring T=("+charstr(br)+"),("+varstr(br)+",p(1..m)),lp;");
+  ring tmpR = char(br),(p(1..m)),dp;
+  def T = br+tmpR;
+  setring T;
+  // execute("ring T=("+charstr(br)+"),("+varstr(br)+",p(1..m)),lp;");
   // p(1..m) are the general coefficients of the general polynomial of degree g
   ideal vars = fetch(br,vars);
   map f;
@@ -6946,19 +6949,18 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc secondary_not_cohen_macaulay (matrix P, list #)
-"USAGE:   secondary_not_cohen_macaulay(P,G1,G2,...[,v,h]);
+"USAGE:   secondary_not_cohen_macaulay(P,G1,G2,...[,v]);
          P: a 1xn <matrix> with primary invariants, G1,G2,...: nxn <matrices>
-         generating a finite matrix group, v,h: optional <int>
+         generating a finite matrix group, v: optional <int>
 ASSUME:  n is the number of variables of the basering
 RETURN:  secondary invariants of the invariant ring (type <matrix>)
 DISPLAY: information on the progress of computation if v does not equal 0
 THEORY:  Secondary invariants are generated following \"Generating Invariant
          Rings of Finite Groups over Arbitrary Fields\" by Kemper (1996).
-         Hilbert driven computation is used if h does not equal 0
 EXAMPLE: example secondary_not_cohen_macaulay; shows an example
 "
 { int i, j;
-  int v, useH;
+  int v;
   degBound=0;
   def br=basering;
   int n=nvars(br);                     // n is the number of variables, as well
@@ -6967,15 +6969,8 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
                                        // we should get -
   if (size(#)>0)                       // checking input and setting verbose
   { if (typeof(#[size(#)])=="int")
-    { if ((size(#)>1) and (typeof(#[size(#)-1])=="int"))
-      { int gen_num=size(#)-2;
-        v=#[size(#)-1];
-        useH=#[size(#)];
-      }
-      else
-      { int gen_num=size(#)-1;
-        v=#[size(#)];
-      }
+    { int gen_num=size(#)-1;
+      v=#[size(#)];
       if (gen_num==0)
       { "ERROR:   There are no generators of the finite matrix group given.";
         return();
@@ -7108,42 +7103,9 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
     }
   }
 
-  if (not useH)                             
-  { M=elim(module(M),1,n);               // eliminating x(1..n), std-calculation
+  M=elim(module(M),1,n);               // eliminating x(1..n), std-calculation
                                          // is done internally -
-    M=homog(module(M),h);            // homogenize for 'minbase'
-  }
-  else
-  {
-    // Manually, as long as Hilbert driven eliminations are not supported for modules.
-    // ----- Compute the Hilbert function, using an "easy" ordering ----
-    if (v)
-    { "   Compute Hilbert Function"; }
-    setring RHilb;
-    matrix M=imap(R,M);
-    module GM=groebner(module(M));
-    intvec hv = hilb(GM,1,degvec(maxideal(1)));
-    setring R;
-    module GM=imap(RHilb,GM);
-    kill RHilb; 
-    // ----- Hilbert driven standard basis is hopefully reasonably fast ----
-    if (v)
-    { "   Hilbert driven standard basis computation"; }
-    module MGb = std(module(GM),hv,degvec(maxideal(1)));
-    ideal vars;
-    vars[n]=0;
-    vars=vars,y(1..n),h;
-    map emb=R,vars;
-    module MElim=emb(MGb);
-    MGb = MGb - MElim;
-    for (j=1;j<=ncols(MGb);j++)
-    { if (MGb[j]<>0)
-      { MElim[j]=0;
-      }
-    }
-    M=homog(module(MElim),h);                // homogenize for 'minbase'
-  }
-
+  M=homog(module(M),h);            // homogenize for 'minbase'
   M=minbase(module(M));
   ideal substitute;
   for (i=1;i<=n;i++)
