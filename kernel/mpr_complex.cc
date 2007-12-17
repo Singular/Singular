@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.4 2006-10-11 15:57:00 Singular Exp $ */
+/* $Id: mpr_complex.cc,v 1.5 2007-12-17 14:24:58 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -79,6 +79,14 @@ size_t getGMPFloatDigits()
 
 void gmp_float::setFromStr( char * in )
 {
+  BOOLEAN neg=false;
+  if (*in == '-') { in++; neg=TRUE; }
+  char *s;
+  if ((s=strchr(in,'E')) !=NULL)
+  {
+    *s='e';
+  }
+
   // gmp doesn't understand number which begin with "." -- it needs 0.
   // so, insert the zero
   if (*in == '.')
@@ -95,6 +103,7 @@ void gmp_float::setFromStr( char * in )
   {
     mpf_set_str( t, in, 10 );
   }
+  if (neg)  mpf_neg( t, t );
 }
 
 
