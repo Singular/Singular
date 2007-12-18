@@ -61,4 +61,12 @@ Changes with respect to 3-0-4
 - dmod.lib: fixes wrt. nc_algebra and documentation
 - allow assignments like: def l=1,2,3;
 
--
+---------------------------------------------------------
+Tue Dec 18 14:12:46 MET 2007
+Changes with respect to 3-0-4-1
+- could not include bits/sigcontext.h and asm/sigcontext.h:
+  include signal.h and hope for the best
+- glibc 2.6/2.7 does not have a dynamic fstat - use our own from
+  Singular/misc.cc: singular_fstat
+- fixed LIB/involut.lib: problems with ring change : nc_algebra
+
