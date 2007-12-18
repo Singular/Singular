@@ -123,7 +123,6 @@ void m2_end(int i)
 * works only on unix machines,
 * testet on : linux, HP 9.0
 *
-*#ifndef MSDOS
 *#include <sys/times.h>
 *#include <sys/resource.h>
 *extern "C" int setpriority(int,int,int);
@@ -134,9 +133,6 @@ void m2_end(int i)
 *#endif
 *  sleep(10);
 *}
-*#else
-*void very_nice(){}
-*#endif
 */
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/

@@ -97,7 +97,6 @@ int inits(void)
 * works only on unix machines,
 * testet on : linux, HP 9.0
 *
-*#ifndef MSDOS
 *#include <sys/times.h>
 *#include <sys/resource.h>
 *extern "C" int setpriority(int,int,int);
@@ -108,9 +107,6 @@ int inits(void)
 *#endif
 *  sleep(10);
 *}
-*#else
-*void very_nice(){}
-*#endif
 */
 
 void singular_example(char *str)

@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.123 2007-11-27 11:55:57 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.124 2007-12-18 09:56:57 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -219,11 +219,7 @@
 
 /* Undefine to disable real time measurments  */
 #ifdef HAVE_GETTIMEOFDAY
-#if ! defined(MSDOS)
 #define HAVE_RTIMER
-#else
-#undef HAVE_RTIMER
-#endif
 #endif
 
 #if SIZEOF_VOIDP == 8

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.260 2007-11-20 13:22:59 Singular Exp $ */
+/* $Id: extra.cc,v 1.261 2007-12-18 09:55:26 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -319,11 +319,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     if (strcmp(sys_cmd,"pid")==0)
     {
       res->rtyp=INT_CMD;
-    #ifndef MSDOS
       res->data=(void *)(long) getpid();
-    #else
-      res->data=(void *)1;
-    #endif
       return FALSE;
     }
     else
@@ -2110,8 +2106,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     else
 #endif
 /*==================== alarm ==================================*/
-#ifndef MSDOS
-#ifndef atarist
 #ifdef unix
     if(strcmp(sys_cmd,"alarm")==0)
     {
@@ -2130,8 +2124,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         WerrorS("int expected");
     }
     else
-#endif
-#endif
 #endif
 /*==================== red =============================*/
 #if 0

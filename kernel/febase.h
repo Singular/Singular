@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.7 2007-11-08 09:20:33 Singular Exp $ */
+/* $Id: febase.h,v 1.8 2007-12-18 09:56:22 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -283,7 +283,6 @@ char * fe_fgets_stdin_drl(char *pr,char *s, int size);
 
 extern "C" void fe_reset_input_mode();
 
-#ifndef MSDOS
 extern "C" {
 #ifndef HAVE_ATEXIT
 void fe_reset_fe (int i, void *v);
@@ -291,7 +290,6 @@ void fe_reset_fe (int i, void *v);
 void fe_reset_fe (void);
 #endif
 }
-#endif
 
 
 /* possible implementations: */
