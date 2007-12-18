@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: ndbm.cc,v 1.17 2007-12-18 09:53:26 Singular Exp $
+// $Id: ndbm.cc,v 1.18 2007-12-18 12:22:31 Singular Exp $
 //
 //**************************************************************************/
 // 'ndbm.cc' containes all low-level functions to manipulate dbm-files
@@ -92,7 +92,11 @@ DBM * dbm_open(char *file, int flags, int mode)
   db->dbm_dirf = open(db->dbm_pagbuf, flags, mode);
   if (db->dbm_dirf < 0)
     goto bad1;
+  #if HAVE_FSTAT
   fstat(db->dbm_dirf, &statb);
+  #else
+  stat(db->dbm_pagbuf, &statb);
+  #endif
   db->dbm_maxbno = statb.st_size*BYTESIZ-1;
   db->dbm_pagbno = db->dbm_dirbno = -1;
   return (db);
@@ -270,7 +274,11 @@ datum dbm_nextkey(register DBM *db)
   struct stat statb;
   datum item;
 
-  if (dbm_error(db) || fstat(db->dbm_pagf, &statb) < 0)
+  if (dbm_error(db) 
+  #ifdef HAVE_FSTAT
+       || fstat(db->dbm_pagf, &statb) < 0
+  #endif
+  )
                 goto err;
   statb.st_size /= PBLKSIZ;
   for (;;)
