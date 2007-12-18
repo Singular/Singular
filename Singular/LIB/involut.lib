@@ -1,4 +1,4 @@
-version="$Id: involut.lib,v 1.14 2007-11-28 16:36:46 motsak Exp $";
+version="$Id: involut.lib,v 1.15 2007-12-18 11:18:36 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  involut.lib  Procedures for Computations and Operations with Involutions
@@ -474,7 +474,7 @@ EXAMPLE: example findInvo; shows examples
     l=l+list(@@F);
   };
 
-  matrix N = Rel; //imap(@B,Rel);
+  matrix N = imap(@@@KK,Rel);
 
   for(i=1; i<NVars; i++)//get matrix by applying the involution to relations
   {
@@ -595,7 +595,7 @@ EXAMPLE: example findInvoDiag; shows examples
     execute( "l["+string(i)+"]="+NVAR(i,i)+"*"+string( var(i) )+";" );
 
   };
-  matrix N = Rel; //imap(@B,Rel);
+  matrix N = imap(@@@KK,Rel);
 
   for(i=1; i<NVars; i++)//get matrix by applying the involution to relations
   {
@@ -734,7 +734,7 @@ EXAMPLE: example findAuto; shows examples
     l=l+list(@@F);
   };
 
-  matrix N = Rel; //imap(@B,Rel);
+  matrix N = imap(@@@K,Rel);
 
   for(i=1; i<NVars; i++)//get matrix by applying the homomorphism  to relations
   {
