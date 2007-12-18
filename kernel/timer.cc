@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: timer.cc,v 1.4 2007-11-14 14:46:08 Singular Exp $ */
+/* $Id: timer.cc,v 1.5 2007-12-18 10:19:35 Singular Exp $ */
 
 /*
 *  ABSTRACT - get the computing time
@@ -23,9 +23,6 @@ void SetMinDisplayTime(double mtime)
 {
   mintime = mtime;
 }
-
-
-#ifndef MSDOS
 
 #include <stdio.h>
 #include <math.h>
@@ -208,59 +205,3 @@ void writeRTime(char* v)
    Print("//%s %.2f sec \n" ,v ,f);
 }
 #endif
-
-#else /* #defined MSDOS */
-
-/*tested on MSDOS-GCC, Macintosh*/
-#include <time.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-
-#include "timer.h"
-#include "febase.h"
-
-/*3
-* the start time of the timer
-*/
-static clock_t startl;
-static clock_t siStartTime;
-
-/*2
-* starts the timer; used with getTime
-*/
-int initTimer()
-{
-  siStartTime = clock();
-  return (int)siStartTime;
-}
-
-/*2
-* starts the timer; used with writeTime
-*/
-void startTimer()
-{
-  startl = clock();
-}
-
-/*2
-* returns the time since a fixed point in seconds
-*/
-int getTimer()
-{
-  clock_t curr = clock() - siStartTime;
-  double f =  ((double)curr)*timer_resolution/ (double)CLOCKS_PER_SEC;
-  return (int)(f+0.5);
-}
-/*2
-* stops timer, writes string s and the time since last call of startTimer
-* if this time is > 0.5 sec
-*/
-void writeTime(void* v)
-{
-  clock_t curr = clock() - startl;
-  double f =  ((double)curr) / CLOCKS_PER_SEC;
-  if (f > mintime)
-    Print("//%s %.1f sec\n" ,v ,f);
-}
-#endif /* MSDOS */
