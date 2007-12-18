@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: ndbm.cc,v 1.18 2007-12-18 12:22:31 Singular Exp $
+// $Id: ndbm.cc,v 1.19 2007-12-18 13:08:38 Singular Exp $
 //
 //**************************************************************************/
 // 'ndbm.cc' containes all low-level functions to manipulate dbm-files
@@ -64,6 +64,7 @@ static  long dcalchash(datum item);
 static  int delitem(char buf[PBLKSIZ], int n);
 static  int additem(char buf[PBLKSIZ], datum item, datum item1);
 extern  int errno;
+extern  int singular_fstat(int fd, struct stat *buf);
 
 DBM * dbm_open(char *file, int flags, int mode)
 {
@@ -92,11 +93,7 @@ DBM * dbm_open(char *file, int flags, int mode)
   db->dbm_dirf = open(db->dbm_pagbuf, flags, mode);
   if (db->dbm_dirf < 0)
     goto bad1;
-  #if HAVE_FSTAT
-  fstat(db->dbm_dirf, &statb);
-  #else
-  stat(db->dbm_pagbuf, &statb);
-  #endif
+  singular_fstat(db->dbm_dirf, &statb);
   db->dbm_maxbno = statb.st_size*BYTESIZ-1;
   db->dbm_pagbno = db->dbm_dirbno = -1;
   return (db);
@@ -275,9 +272,7 @@ datum dbm_nextkey(register DBM *db)
   datum item;
 
   if (dbm_error(db) 
-  #ifdef HAVE_FSTAT
-       || fstat(db->dbm_pagf, &statb) < 0
-  #endif
+       || singular_fstat(db->dbm_pagf, &statb) < 0
   )
                 goto err;
   statb.st_size /= PBLKSIZ;

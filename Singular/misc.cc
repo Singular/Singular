@@ -711,3 +711,13 @@ void checkall()
 }
 #endif
 #endif
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+int singular_fstat(int fd, struct stat *buf)
+{
+  return fstat(fd,buf);
+}
+
