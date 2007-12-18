@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.54 2007-12-14 15:26:28 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.55 2007-12-18 10:27:06 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -87,10 +87,7 @@ typedef void (*si_hdl_typ)(int);
  * Functions declarations
  *
  *---------------------------------------------------------------------*/
-#ifndef MSDOS
-/* signals are not implemented in DJGCC */
 void sigint_handler(int sig);
-#endif /* MSDOS */
 
 si_hdl_typ si_set_signal ( int sig, si_hdl_typ signal_handler);
 
@@ -124,6 +121,10 @@ si_hdl_typ si_set_signal (
 /*---------------------------------------------------------------------*/
 #if defined(ix86_Linux)
   #if !defined(HAVE_SIGCONTEXT) && !defined(HAVE_ASM_SIGCONTEXT_H)
+// we need the following structure sigcontext_struct.
+// if configure finds asm/singcontext.h we assume
+// that this file contains the structure and is included
+// via signal.h
 struct sigcontext_struct {
         unsigned short gs, __gsh;
         unsigned short fs, __fsh;
@@ -174,12 +175,12 @@ void sigsegv_handler(int sig, sigcontext s)
   {
     fprintf(stderr,"Segment fault/Bus error occurred at %lx because of %lx (r:%d)\n"
                    "please inform the authors\n",
-		   #ifdef __i386__
+                   #ifdef __i386__
                    (long)s.eip,
-		   #else /* x86_64*/
+                   #else /* x86_64*/
                    (long)s.rip,
-		   #endif
-		   (long)s.cr2,siRandomStart);
+                   #endif
+                   (long)s.cr2,siRandomStart);
   }
 #ifdef __OPTIMIZE__
   if(si_restart<3)
@@ -315,9 +316,7 @@ void sigsegv_handler(int sig)
   #if defined(unix) && !defined(hpux)
   /* debug(..) does not work under HPUX (because ptrace does not work..) */
   #ifdef CALL_GDB
-  #ifndef MSDOS
   if (sig!=SIGINT) debug(STACK_TRACE);
-  #endif /* MSDOS */
   #endif /* CALL_GDB */
   #endif /* unix */
   exit(0);
@@ -328,8 +327,6 @@ void sigsegv_handler(int sig)
 */
 void init_signals()
 {
-  #ifndef MSDOS
-/* signals are not implemented in DJGCC */
 /*4 signal handler:*/
   si_set_signal(SIGSEGV,(void (*) (int))sigsegv_handler);
   #ifdef SIGBUS
@@ -351,12 +348,10 @@ void init_signals()
   #if defined(HPUX_9) || defined(HPUX_10)
   si_set_signal(SIGCHLD, (void (*)(int))SIG_IGN);
   #endif
-  #endif /* !MSDOS */
 }
 #endif
 
 
-#ifndef MSDOS
 /*2
 * signal handler for SIGINT
 */
@@ -405,9 +400,7 @@ void sigint_handler(int sig)
     if(cnt>5) m2_end(2);
   }
 }
-#endif /* !MSDOS */
 
-#ifndef MSDOS
 //void test_int()
 //{
 //  if (siCntrlc!=0)
@@ -419,12 +412,10 @@ void sigint_handler(int sig)
 //    si_echo = saveecho;
 //  }
 //}
-#endif /* !MSDOS */
 
 #ifdef unix
 # ifndef hpux
 #  ifndef __OPTIMIZE__
-#   ifndef MSDOS
 int si_stop_stack_trace_x;
 #    ifdef CALL_GDB
 static void debug (int method)
@@ -592,7 +583,6 @@ static void stack_trace_sigchld (int signum)
   stack_trace_done = 1;
 }
 
-#   endif /* !MSDOS */
 #  endif /* !__OPTIMIZE__ */
 # endif /* !hpux */
 #endif /* unix */
