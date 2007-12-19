@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.38 2007-12-19 11:37:31 king Exp $";
+version="$Id: matrix.lib,v 1.39 2007-12-19 18:05:57 king Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -29,6 +29,7 @@ PROCEDURES:
  permrow(A,i,j);        permute i-th and j-th rows
  rowred(A[,any]);       reduction of matrix A with elementary row-operations
  colred(A[,any]);       reduction of matrix A with elementary col-operations
+ linear_relations(E);   find linear relations between homogeneous vectors 
  rm_unitrow(A);         remove unit rows and associated columns of A
  rm_unitcol(A);         remove unit columns and associated rows of A
  headStand(A);          A[n-i+1,m-j+1]:=A[i,j]
@@ -898,6 +899,56 @@ example
    print(L[1]);
    print(L[2]);
 }
+//////////////////////////////////////////////////////////////////////////////
+
+proc linear_relations(module M)
+"USAGE:   linear_relations(M);
+         M: a module
+ASSUME:  All non-zero entries of M are homogeneous polynomials of the same 
+         degree. The base field must be an exact field (not real or complex).
+         It is not checked whether these assumptions hold.
+RETURN:  a maximal module R such that M*R is formed by zero vectors.
+EXAMPLE: example linear_relations; shows an example.
+"
+{ int n = ncols(M);
+  module RED = M;
+  module T = module(unitmat(n));
+  number a;
+  module REL;
+  poly lm;
+  int i,j, sizerel;
+  for (i=1;i<=n;i++) {
+    if (RED[i]==0) { //-- an obvious relation found
+      sizerel++;
+      REL[sizerel]=T[i];
+    }
+  }
+  for (i=1;i<n;i++) {
+    if (RED[i]<>0) {
+      lm = lead(RED[i][nrows(RED[i])]);
+      for (j=i+1; j<=n; j++) {
+	a = leadcoef(RED[j][nrows(RED[i])]/lm);
+	RED[j] = RED[j] - (a*RED[i]);
+	T[j] = T[j] - (a*T[i]);
+	if (RED[j]==0) { //-- new relation found
+	  sizerel++;
+	  REL[sizerel]=T[j];
+	}
+      }
+    }
+  }
+  return(minbase(REL));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r = (3,w), (a,b,c,d),dp;
+  minpoly = w2-w-1;
+  module M = [a2,b2],[wab,w2c2+2b2],[(w-2)*a2+wab,wb2+w2c2];
+  module REL = linear_relations(M);
+  pmat(REL);
+  pmat(M*REL);
+}  
+
 //////////////////////////////////////////////////////////////////////////////
 
 static proc findfirst (ideal i,int t)
