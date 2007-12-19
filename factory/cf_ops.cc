@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_ops.cc,v 1.10 2007-10-31 08:40:53 Singular Exp $ */
+/* $Id: cf_ops.cc,v 1.11 2007-12-19 14:26:20 Singular Exp $ */
 
 //{{{ docu
 //
@@ -59,38 +59,40 @@ static void
 swapvar_between ( const CanonicalForm & f, CanonicalForm & result, const CanonicalForm & term, int expx2 )
 {
     if ( f.inCoeffDomain() || f.mvar() < sv_x1 )
-	// in this case, we do not have to replace anything
-	result += term * power( sv_x1, expx2 ) * f;
+        // in this case, we do not have to replace anything
+        result += term * power( sv_x1, expx2 ) * f;
     else  if ( f.mvar() == sv_x1 )
-	// this is where the real work is done: this iterator
-	// replaces sv_x1 with sv_x2
-	for ( CFIterator i = f; i.hasTerms(); i++ )
-	    result += power( sv_x2, i.exp() ) * term * power( sv_x1, expx2 ) * i.coeff();
+        // this is where the real work is done: this iterator
+        // replaces sv_x1 with sv_x2
+        for ( CFIterator i = f; i.hasTerms(); i++ )
+            result += power( sv_x2, i.exp() ) * term * power( sv_x1, expx2 ) * i.coeff();
     else
-	// f's level is larger than sv_x1: descend down
-	for ( CFIterator i = f; i.hasTerms(); i++ )
-	    swapvar_between( i.coeff(), result, term * power( f.mvar(), i.exp() ), expx2 );
+        // f's level is larger than sv_x1: descend down
+        for ( CFIterator i = f; i.hasTerms(); i++ )
+            swapvar_between( i.coeff(), result, term * power( f.mvar(), i.exp() ), expx2 );
 }
 static CanonicalForm
 swapvar_between1 ( const CanonicalForm & f )
 {
     if ( f.inCoeffDomain() || f.mvar() < sv_x1 )
-	// in this case, we do not have to replace anything
-	return f;
-    else  if ( f.mvar() == sv_x1 ) {
-	// this is where the real work is done: this iterator
-	// replaces sv_x1 with sv_x2
-	CanonicalForm result;
-	for ( CFIterator i = f; i.hasTerms(); i++ )
-	    result += power( sv_x2, i.exp() ) * i.coeff();
-	return result;
+        // in this case, we do not have to replace anything
+        return f;
+    else  if ( f.mvar() == sv_x1 )
+    {
+        // this is where the real work is done: this iterator
+        // replaces sv_x1 with sv_x2
+        CanonicalForm result;
+        for ( CFIterator i = f; i.hasTerms(); i++ )
+            result += power( sv_x2, i.exp() ) * i.coeff();
+        return result;
     }
-    else {
-	// f's level is larger than sv_x1: descend down
-	CanonicalForm result;
-	for ( CFIterator i = f; i.hasTerms(); i++ )
-	    result += swapvar_between1( i.coeff() ) * power( f.mvar(), i.exp() );
-	return result;
+    else
+    {
+        // f's level is larger than sv_x1: descend down
+        CanonicalForm result;
+        for ( CFIterator i = f; i.hasTerms(); i++ )
+            result += swapvar_between1( i.coeff() ) * power( f.mvar(), i.exp() );
+        return result;
     }
 }
 //}}}
@@ -112,41 +114,43 @@ static void
 swapvar_rec ( const CanonicalForm & f, CanonicalForm & result, const CanonicalForm & term )
 {
     if ( f.inCoeffDomain() || f.mvar() < sv_x1 )
-	// in this case, we do not have to swap anything
-	result += term * f;
+        // in this case, we do not have to swap anything
+        result += term * f;
     else  if ( f.mvar() == sv_x2 )
-	// this is where the real work is done: this iterator
-	// replaces sv_x1 with sv_x2 in the coefficients of f and
-	// remembers the exponents of sv_x2 in the last argument
-	// of the call to swapvar_between()
-	for ( CFIterator i = f; i.hasTerms(); i++ )
-	    swapvar_between( i.coeff(), result, term, i.exp() );
+        // this is where the real work is done: this iterator
+        // replaces sv_x1 with sv_x2 in the coefficients of f and
+        // remembers the exponents of sv_x2 in the last argument
+        // of the call to swapvar_between()
+        for ( CFIterator i = f; i.hasTerms(); i++ )
+            swapvar_between( i.coeff(), result, term, i.exp() );
     else  if ( f.mvar() < sv_x2 )
-	// sv_x2 does not occur in f, but sv_x1 does.  Replace it.
-	swapvar_between( f, result, term, 0 );
+        // sv_x2 does not occur in f, but sv_x1 does.  Replace it.
+        swapvar_between( f, result, term, 0 );
     else
-	// f's level is larger than sv_x2: descend down
-	for ( CFIterator i = f; i.hasTerms(); i++ )
-	    swapvar_rec( i.coeff(), result, term * power( f.mvar(), i.exp() ) );
+        // f's level is larger than sv_x2: descend down
+        for ( CFIterator i = f; i.hasTerms(); i++ )
+            swapvar_rec( i.coeff(), result, term * power( f.mvar(), i.exp() ) );
 }
 static CanonicalForm
 swapvar_rec1 ( const CanonicalForm & f )
 {
     if ( f.inCoeffDomain() || f.mvar() < sv_x1 )
-	return f;
-    else  if ( f.mvar() == sv_x2 ) {
-	CanonicalForm result;
-	for ( CFIterator i = f; i.hasTerms(); i++ )
-	    result += swapvar_between1( i.coeff() ) * power( sv_x1, i.exp() );
-	return result;
+        return f;
+    else  if ( f.mvar() == sv_x2 )
+    {
+        CanonicalForm result;
+        for ( CFIterator i = f; i.hasTerms(); i++ )
+            result += swapvar_between1( i.coeff() ) * power( sv_x1, i.exp() );
+        return result;
     }
     else  if ( f.mvar() < sv_x2 )
-	return swapvar_between1( f );
-    else {
-	CanonicalForm result;
-	for ( CFIterator i = f; i.hasTerms(); i++ )
-	    result += swapvar_rec1( i.coeff() ) * power( f.mvar(), i.exp() );
-	return result;
+        return swapvar_between1( f );
+    else
+    {
+        CanonicalForm result;
+        for ( CFIterator i = f; i.hasTerms(); i++ )
+            result += swapvar_rec1( i.coeff() ) * power( f.mvar(), i.exp() );
+        return result;
     }
 }
 //}}}
@@ -166,22 +170,25 @@ swapvar ( const CanonicalForm & f, const Variable & x1, const Variable & x2 )
 {
     ASSERT( x1.level() > 0 && x2.level() > 0, "cannot swap algebraic Variables" );
     if ( f.inCoeffDomain() || x1 == x2 || ( x1 > f.mvar() && x2 > f.mvar() ) )
-	return f;
-    else {
-	CanonicalForm result = 0;
-	if ( x1 > x2 ) {
-	    sv_x1 = x2; sv_x2 = x1;
-	}
-	else {
-	    sv_x1 = x1; sv_x2 = x2;
-	}
-	if ( f.mvar() < sv_x2 )
-	    // we only have to replace sv_x1 by sv_x2
-	    swapvar_between( f, result, 1, 0 );
-	else
-	    // we really have to swap variables
-	    swapvar_rec( f, result, 1 );
-	return result;
+        return f;
+    else
+    {
+        CanonicalForm result = 0;
+        if ( x1 > x2 )
+        {
+            sv_x1 = x2; sv_x2 = x1;
+        }
+        else
+        {
+            sv_x1 = x1; sv_x2 = x2;
+        }
+        if ( f.mvar() < sv_x2 )
+            // we only have to replace sv_x1 by sv_x2
+            swapvar_between( f, result, 1, 0 );
+        else
+            // we really have to swap variables
+            swapvar_rec( f, result, 1 );
+        return result;
     }
 }
 CanonicalForm
@@ -189,21 +196,23 @@ swapvar1 ( const CanonicalForm & f, const Variable & x1, const Variable & x2 )
 {
     ASSERT( x1.level() > 0 && x2.level() > 0, "cannot swap algebraic variables" );
     if ( f.inCoeffDomain() || x1 == x2 || ( x1 > f.mvar() && x2 > f.mvar() ) )
-	return f;
-    else {
-	CanonicalForm result = 0;
-	if ( x1 > x2 ) {
-	    sv_x1 = x2; sv_x2 = x1;
-	}
-	else {
-	    sv_x1 = x1; sv_x2 = x2;
-	}
-	if ( f.mvar() < sv_x2 )
-	    // we only have to replace sv_x1 by sv_x2
-	    return swapvar_between1( f );
-	else
-	    // we really have to swap variables
-	    return swapvar_rec1( f );
+        return f;
+    else
+    {
+        CanonicalForm result = 0;
+        if ( x1 > x2 ) {
+            sv_x1 = x2; sv_x2 = x1;
+        }
+        else
+        {
+            sv_x1 = x1; sv_x2 = x2;
+        }
+        if ( f.mvar() < sv_x2 )
+            // we only have to replace sv_x1 by sv_x2
+            return swapvar_between1( f );
+        else
+            // we really have to swap variables
+            return swapvar_rec1( f );
     }
 }
 //}}}
@@ -225,27 +234,29 @@ static CanonicalForm
 replacevar_between ( const CanonicalForm & f )
 {
     if ( f.inBaseDomain() )
-	return f;
+        return f;
 
     Variable x = f.mvar();
 
     if ( x < sv_x1 )
-	// in this case, we do not have to replace anything
-	return f;
-    else  if ( x == sv_x1 ) {
-	// this is where the real work is done: this iterator
-	// replaces sv_x1 with sv_x2
-	CanonicalForm result;
-	for ( CFIterator i = f; i.hasTerms(); i++ )
-	    result += power( sv_x2, i.exp() ) * i.coeff();
-	return result;
+        // in this case, we do not have to replace anything
+        return f;
+    else  if ( x == sv_x1 )
+    {
+        // this is where the real work is done: this iterator
+        // replaces sv_x1 with sv_x2
+        CanonicalForm result;
+        for ( CFIterator i = f; i.hasTerms(); i++ )
+            result += power( sv_x2, i.exp() ) * i.coeff();
+        return result;
     }
-    else {
-	// f's level is larger than sv_x1: descend down
-	CanonicalForm result;
-	for ( CFIterator i = f; i.hasTerms(); i++ )
-	    result += replacevar_between( i.coeff() ) * power( x, i.exp() );
-	return result;
+    else
+    {
+        // f's level is larger than sv_x1: descend down
+        CanonicalForm result;
+        for ( CFIterator i = f; i.hasTerms(); i++ )
+            result += replacevar_between( i.coeff() ) * power( x, i.exp() );
+        return result;
     }
 }
 //}}}
@@ -264,11 +275,12 @@ replacevar ( const CanonicalForm & f, const Variable & x1, const Variable & x2 )
 {
     //ASSERT( x2.level() > 0, "cannot replace with algebraic variable" );
     if ( f.inBaseDomain() || x1 == x2 || ( x1 > f.mvar() ) )
-	return f;
-    else {
-	sv_x1 = x1;
-	sv_x2 = x2;
-	return replacevar_between( f );
+        return f;
+    else
+    {
+        sv_x1 = x1;
+        sv_x2 = x2;
+        return replacevar_between( f );
     }
 }
 //}}}
@@ -289,11 +301,12 @@ static void
 fillVarsRec ( const CanonicalForm & f, int * vars )
 {
     int n;
-    if ( (n = f.level()) > 0 ) {
-	vars[n] = 1;
-	CFIterator i;
-	for ( i = f; i.hasTerms(); ++i )
-	    fillVarsRec( i.coeff(), vars );
+    if ( (n = f.level()) > 0 )
+    {
+        vars[n] = 1;
+        CFIterator i;
+        for ( i = f; i.hasTerms(); ++i )
+            fillVarsRec( i.coeff(), vars );
     }
 }
 //}}}
@@ -309,26 +322,27 @@ getNumVars ( const CanonicalForm & f )
 {
     int n;
     if ( f.inCoeffDomain() )
-	return 0;
+        return 0;
     else  if ( (n = f.level()) == 1 )
-	return 1;
-    else {
-	int * vars = new int[ n+1 ];
-	int i;
-	for ( i = 0; i < n; i++ ) vars[i] = 0;
+        return 1;
+    else
+    {
+        int * vars = new int[ n+1 ];
+        int i;
+        for ( i = 0; i < n; i++ ) vars[i] = 0;
 
-	// look for variables
-	for ( CFIterator I = f; I.hasTerms(); ++I )
-	    fillVarsRec( I.coeff(), vars );
+        // look for variables
+        for ( CFIterator I = f; I.hasTerms(); ++I )
+            fillVarsRec( I.coeff(), vars );
 
-	// count them
-	int m = 0;
-	for ( i = 1; i < n; i++ )
-	    if ( vars[i] != 0 ) m++;
+        // count them
+        int m = 0;
+        for ( i = 1; i < n; i++ )
+            if ( vars[i] != 0 ) m++;
 
-	delete [] vars;
-	// do not forget to count our own variable
-	return m+1;
+        delete [] vars;
+        // do not forget to count our own variable
+        return m+1;
     }
 }
 //}}}
@@ -346,26 +360,27 @@ getVars ( const CanonicalForm & f )
 {
     int n;
     if ( f.inCoeffDomain() )
-	return 1;
+        return 1;
     else  if ( (n = f.level()) == 1 )
-	return Variable( 1 );
-    else {
-	int * vars = new int[ n+1 ];
-	int i;
-	for ( i = 0; i <= n; i++ ) vars[i] = 0;
+        return Variable( 1 );
+    else
+    {
+        int * vars = new int[ n+1 ];
+        int i;
+        for ( i = 0; i <= n; i++ ) vars[i] = 0;
 
-	// look for variables
-	for ( CFIterator I = f; I.hasTerms(); ++I )
-	    fillVarsRec( I.coeff(), vars );
+        // look for variables
+        for ( CFIterator I = f; I.hasTerms(); ++I )
+            fillVarsRec( I.coeff(), vars );
 
-	// multiply them all
-	CanonicalForm result = 1;
-	for ( i = n; i > 0; i-- )
-	    if ( vars[i] != 0 ) result *= Variable( i );
+        // multiply them all
+        CanonicalForm result = 1;
+        for ( i = n; i > 0; i-- )
+            if ( vars[i] != 0 ) result *= Variable( i );
 
-	delete [] vars;
-	// do not forget our own variable
-	return f.mvar() * result;
+        delete [] vars;
+        // do not forget our own variable
+        return f.mvar() * result;
     }
 }
 //}}}
@@ -396,26 +411,29 @@ getVars ( const CanonicalForm & f )
 CanonicalForm
 apply ( const CanonicalForm & f, void (*mf)( CanonicalForm &, int & ) )
 {
-    if ( f.inCoeffDomain() ) {
-	int exp = 0;
-	CanonicalForm result = f;
-	mf( result, exp );
-	ASSERT( exp == 0, "illegal result, do not know what variable to use" );
-	return result;
+    if ( f.inCoeffDomain() )
+    {
+        int exp = 0;
+        CanonicalForm result = f;
+        mf( result, exp );
+        ASSERT( exp == 0, "illegal result, do not know what variable to use" );
+        return result;
     }
-    else {
-	CanonicalForm result, coeff;
-	CFIterator i;
-	int exp;
-	Variable x = f.mvar();
-	for ( i = f; i.hasTerms(); i++ ) {
-	    coeff = i.coeff();
-	    exp = i.exp();
-	    mf( coeff, exp );
-	    if ( ! coeff.isZero() )
-		result += power( x, exp ) * coeff;
-	}
-	return result;
+    else
+    {
+        CanonicalForm result, coeff;
+        CFIterator i;
+        int exp;
+        Variable x = f.mvar();
+        for ( i = f; i.hasTerms(); i++ )
+        {
+            coeff = i.coeff();
+            exp = i.exp();
+            mf( coeff, exp );
+            if ( ! coeff.isZero() )
+                result += power( x, exp ) * coeff;
+        }
+        return result;
     }
 }
 //}}}
@@ -434,14 +452,15 @@ CanonicalForm
 mapdomain ( const CanonicalForm & f, CanonicalForm (*mf)( const CanonicalForm & ) )
 {
     if ( f.inCoeffDomain() )
-	return mf( f );
-    else {
-	CanonicalForm result = 0;
-	CFIterator i;
-	Variable x = f.mvar();
-	for ( i = f; i.hasTerms(); i++ )
-	    result += power( x, i.exp() ) * mapdomain( i.coeff(), mf );
-	return result;
+        return mf( f );
+    else
+    {
+        CanonicalForm result = 0;
+        CFIterator i;
+        Variable x = f.mvar();
+        for ( i = f; i.hasTerms(); i++ )
+            result += power( x, i.exp() ) * mapdomain( i.coeff(), mf );
+        return result;
     }
 }
 //}}}
@@ -457,15 +476,16 @@ mapdomain ( const CanonicalForm & f, CanonicalForm (*mf)( const CanonicalForm & 
 static void
 degreesRec ( const CanonicalForm & f, int * degs )
 {
-    if ( ! f.inCoeffDomain() ) {
-	int level = f.level();
-	int deg = f.degree();
-	// calculate the maximum degree of all coefficients which
-	// are in the same level
-	if ( degs[level] < deg )
-	    degs[level] = f.degree();
-	for ( CFIterator i = f; i.hasTerms(); i++ )
-	    degreesRec( i.coeff(), degs );
+    if ( ! f.inCoeffDomain() )
+    {
+        int level = f.level();
+        int deg = f.degree();
+        // calculate the maximum degree of all coefficients which
+        // are in the same level
+        if ( degs[level] < deg )
+            degs[level] = f.degree();
+        for ( CFIterator i = f; i.hasTerms(); i++ )
+            degreesRec( i.coeff(), degs );
     }
 }
 //}}}
@@ -490,15 +510,16 @@ int *
 degrees ( const CanonicalForm & f, int * degs )
 {
     if ( f.inCoeffDomain() )
-	return 0;
-    else {
-	int level = f.level();
-	if ( degs == 0 )
-	    degs = new int[level+1];
-	for ( int i = 0; i <= level; i++ )
-	    degs[i] = 0;
-	degreesRec( f, degs );
-	return degs;
+        return 0;
+    else
+    {
+        int level = f.level();
+        if ( degs == 0 )
+            degs = new int[level+1];
+        for ( int i = 0; i <= level; i++ )
+            degs[i] = 0;
+        degreesRec( f, degs );
+        return degs;
     }
 }
 //}}}
@@ -517,19 +538,19 @@ int
 totaldegree ( const CanonicalForm & f )
 {
     if ( f.isZero() )
-	return -1;
+        return -1;
     else if ( f.inCoeffDomain() )
-	return 0;
+        return 0;
     else
     {
-	CFIterator i;
-	int cdeg = 0, dummy;
-	// calculate maximum over all coefficients of f, taking
-	// in account our own exponent
-	for ( i = f; i.hasTerms(); i++ )
-	    if ( (dummy = totaldegree( i.coeff() ) + i.exp()) > cdeg )
-		cdeg = dummy;
-	return cdeg;
+        CFIterator i;
+        int cdeg = 0, dummy;
+        // calculate maximum over all coefficients of f, taking
+        // in account our own exponent
+        for ( i = f; i.hasTerms(); i++ )
+            if ( (dummy = totaldegree( i.coeff() ) + i.exp()) > cdeg )
+                cdeg = dummy;
+        return cdeg;
     }
 }
 //}}}
@@ -550,35 +571,37 @@ int
 totaldegree ( const CanonicalForm & f, const Variable & v1, const Variable & v2 )
 {
     if ( f.isZero() )
-	return -1;
+        return -1;
     else if ( v1 > v2 )
-	return 0;
+        return 0;
     else if ( f.inCoeffDomain() )
-	return 0;
+        return 0;
     else if ( f.mvar() < v1 )
-	return 0;
+        return 0;
     else if ( f.mvar() == v1 )
-	return f.degree();
-    else if ( f.mvar() > v2 ) {
-	// v2's level is larger than f's level, descend down
-	CFIterator i;
-	int cdeg = 0, dummy;
-	// calculate maximum over all coefficients of f
-	for ( i = f; i.hasTerms(); i++ )
-	    if ( (dummy = totaldegree( i.coeff(), v1, v2 )) > cdeg )
-		cdeg = dummy;
-	return cdeg;
+        return f.degree();
+    else if ( f.mvar() > v2 )
+    {
+        // v2's level is larger than f's level, descend down
+        CFIterator i;
+        int cdeg = 0, dummy;
+        // calculate maximum over all coefficients of f
+        for ( i = f; i.hasTerms(); i++ )
+            if ( (dummy = totaldegree( i.coeff(), v1, v2 )) > cdeg )
+                cdeg = dummy;
+        return cdeg;
     }
-    else {
-	// v1 < f.mvar() <= v2
-	CFIterator i;
-	int cdeg = 0, dummy;
-	// calculate maximum over all coefficients of f, taking
-	// in account our own exponent
-	for ( i = f; i.hasTerms(); i++ )
-	    if ( (dummy = totaldegree( i.coeff(), v1, v2 ) + i.exp()) > cdeg )
-		cdeg = dummy;
-	return cdeg;
+    else
+    {
+        // v1 < f.mvar() <= v2
+        CFIterator i;
+        int cdeg = 0, dummy;
+        // calculate maximum over all coefficients of f, taking
+        // in account our own exponent
+        for ( i = f; i.hasTerms(); i++ )
+            if ( (dummy = totaldegree( i.coeff(), v1, v2 ) + i.exp()) > cdeg )
+                cdeg = dummy;
+        return cdeg;
     }
 }
 //}}}
@@ -596,18 +619,19 @@ int
 size ( const CanonicalForm & f, const Variable & v )
 {
     if ( f.inBaseDomain() )
-	return 1;
+        return 1;
 
-    int result = 0;
-    CFIterator i;
     if ( f.mvar() < v )
-	// polynomials with level < v1 are counted as coefficients
-	return 1;
-    else {
-	// polynomials with level > v2 are not counted al all
-	for ( i = f; i.hasTerms(); i++ )
-	    result += size( i.coeff(), v );
-	return result;
+        // polynomials with level < v1 are counted as coefficients
+        return 1;
+    else
+    {
+        CFIterator i;
+        int result = 0;
+        // polynomials with level > v2 are not counted al all
+        for ( i = f; i.hasTerms(); i++ )
+            result += size( i.coeff(), v );
+        return result;
     }
 }
 //}}}
@@ -625,13 +649,14 @@ int
 size ( const CanonicalForm & f )
 {
     if ( f.inCoeffDomain() )
-	return 1;
-    else {
-	int result = 0;
-	CFIterator i;
-	for ( i = f; i.hasTerms(); i++ )
-	    result += size( i.coeff() );
-	return result;
+        return 1;
+    else
+    {
+        int result = 0;
+        CFIterator i;
+        for ( i = f; i.hasTerms(); i++ )
+            result += size( i.coeff() );
+        return result;
     }
 }
 //}}}
