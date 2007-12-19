@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.37 2007-04-20 12:27:17 Singular Exp $";
+version="$Id: matrix.lib,v 1.38 2007-12-19 11:37:31 king Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -775,6 +775,8 @@ RETURN:  - a matrix B, being the row reduced form of A, if rowred is called
 @*       - a list L of two matrices, such that L[1] = L[2] * A with L[1]
            the row-reduced form of A and L[2] the transformation matrix
            (if rowred is called with two arguments).
+ASSUME:  The entries of A are in the base field. It is not verified whether
+         this assumption holds.
 NOTE:    * This procedure is designed for teaching purposes mainly.
 @*       * The straight forward Gaussian algorithm is implemented in the
            library (no standard basis computation).
@@ -803,7 +805,7 @@ EXAMPLE: example rowred; shows an example
    matrix b = A;
    if (size(#) != 0) { b = concat(b,unitmat(m)); }
       for (l=1;l<=n;l=l+1)
-   {
+   {  pmat(d);
       k  = findfirst(ideal(d[l]),rk+1);
       if (k)
       {  rk = rk+1;
@@ -860,6 +862,8 @@ RETURN:  - a matrix B, being the column reduced form of A, if colred is
 @*       - a list L of two matrices, such that L[1] = A * L[2] with L[1]
            the column-reduced form of A and L[2] the transformation matrix
            (if colred is called with two arguments).
+ASSUME:  The entries of A are in the base field. It is not verified whether
+         this assumption holds.
 NOTE:    * This procedure is designed for teaching purposes mainly.
 @*       * It applies rowred to the transposed matrix.
            proc gauss_col should be faster.
