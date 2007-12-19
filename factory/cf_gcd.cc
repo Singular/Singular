@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.57 2007-12-07 11:26:57 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.58 2007-12-19 14:27:14 Singular Exp $ */
 
 #include <config.h>
 
@@ -88,9 +88,15 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
 static CanonicalForm
 icontent ( const CanonicalForm & f, const CanonicalForm & c )
 {
-    if ( f.inCoeffDomain() )
-        return gcd( f, c );
-    else {
+    if ( f.inBaseDomain() )
+    {
+      if (c.isZero()) return abs(f);
+      return bgcd( f, c );
+    }
+    else if ( f.inCoeffDomain() )
+       return gcd(f,c);
+    else
+    {
         CanonicalForm g = c;
         for ( CFIterator i = f; i.hasTerms() && ! g.isOne(); i++ )
             g = icontent( i.coeff(), g );
@@ -468,6 +474,20 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
   CanonicalForm fc, gc, d1;
   int mp, cc, p1, pe;
   mp = f.level()+1;
+#if 0
+  if (( getCharacteristic() == 0 )
+  && (f.level() >4)
+  && (g.level() >4)
+  && isOn( SW_USE_CHINREM_GCD)
+  && (!f.isUnivariate())
+  && (!g.isUnivariate())
+  && (isPurePoly_m(f))
+  && (isPurePoly_m(g))
+  )
+  {
+      return chinrem_gcd( f, g );
+  }
+#endif
   cf_prepgcd( f, g, cc, p1, pe);
   if ( cc != 0 )
   {
@@ -489,9 +509,10 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
   if( gcd_avoid_mtaildegree ( fc, gc, d1 ) )
       return d1;
   bool fc_isUnivariate=fc.isUnivariate();
+  bool fc_and_gc_Univariate=fc_isUnivariate && gc.isUnivariate();
   if ( getCharacteristic() != 0 )
   {
-    if (isOn( SW_USE_EZGCD_P ) && (!fc_isUnivariate))
+    if (isOn( SW_USE_EZGCD_P ) && (!fc_and_gc_Univariate))
     {
       if ( pe == 1 )
         fc = fin_ezgcd( fc, gc );
@@ -508,7 +529,7 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
         gc = swapvar( gc, Variable(pe), Variable(1) );
         fc = swapvar( fin_ezgcd( fc, gc ), Variable(1), Variable(pe) );
       }
-    } 
+    }
     else if (isOn(SW_USE_GCD_P))
     {
       fc=newGCD(fc,gc);
@@ -522,8 +543,28 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
       fc = replacevar( gcd_poly_p( fc, gc ), Variable(mp), Variable(p1) );
     }
   }
-  else if (!fc_isUnivariate)
+  else if (!fc_and_gc_Univariate)
   {
+    if (
+    isOn(SW_USE_CHINREM_GCD)
+    && (gc.level() >5)
+    && (fc.level() >5)
+    && (isPurePoly_m(fc)) && (isPurePoly_m(gc))
+    )
+    {
+    #if 0
+      if ( p1 == fc.level() )
+        fc = chinrem_gcd( fc, gc );
+      else
+      {
+        fc = replacevar( fc, Variable(p1), Variable(mp) );
+        gc = replacevar( gc, Variable(p1), Variable(mp) );
+        fc = replacevar( chinrem_gcd( fc, gc ), Variable(mp), Variable(p1) );
+      }
+    #else
+      fc = chinrem_gcd( fc, gc);
+    #endif
+    }
     if ( isOn( SW_USE_EZGCD ) )
     {
       if ( pe == 1 )
@@ -544,7 +585,6 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     }
     else if (
     isOn(SW_USE_CHINREM_GCD)
-    && (!gc.isUnivariate())
     && (isPurePoly_m(fc)) && (isPurePoly_m(gc))
     )
     {
@@ -560,6 +600,10 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     #else
       fc = chinrem_gcd( fc, gc);
     #endif
+    }
+    else
+    {
+       fc = gcd_poly_0( fc, gc );
     }
   }
   else
@@ -1039,13 +1083,17 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
       p = cf_getBigPrime( i );
       i--;
     }
+    //printf("try p=%d\n",p);
     setCharacteristic( p );
-    Dp = gcd( mapinto( f ), mapinto( g ) );
+    Dp = gcd_poly( mapinto( f ), mapinto( g ) );
     Dp /=Dp.lc();
     setCharacteristic( 0 );
     dp_deg=totaldegree(Dp);
     if ( dp_deg == 0 )
+    {
+      //printf(" -> 1\n");
       return CanonicalForm(1);
+    }
     if ( q.isZero() )
     {
       D = mapinto( Dp );
@@ -1062,10 +1110,15 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
       }
       else if ( dp_deg < d_deg )
       {
+        //printf(" were all bad, try more\n");
         // all previous p's are bad primes
         q = p;
         D = mapinto( Dp );
         d_deg=dp_deg;
+      }
+      else
+      {
+        //printf(" was bad, try more\n");
       }
       //else dp_deg > d_deg: bad prime
     }
@@ -1080,12 +1133,14 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
       //Dn /=vcontent(Dn,Variable(1));
       if ( fdivides( Dn, f ) && fdivides( Dn, g ) )
       {
+        //printf(" -> success\n");
         return Dn;
       }
       //else: try more primes
     }
     else
     { // try other method
+      //printf("try other gcd\n");
       Off(SW_USE_CHINREM_GCD);
       D=gcd_poly( f, g );
       On(SW_USE_CHINREM_GCD);
