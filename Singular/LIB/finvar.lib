@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.72 2007-12-17 13:16:31 king Exp $"
+version="$Id: finvar.lib,v 1.73 2007-12-19 17:25:54 king Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -313,20 +313,20 @@ EXAMPLE: example group_reynolds; shows an example
       }
       kill REY;
       matrix REY[1][1]=0;
-      return(REY,G(1..g));
+      return(list(REY,G(1..g)));
     }
     if (minpoly==0)
     { if (i>1)
-      { return(REY,o1,G(1..g));
+      { return(list(REY,o1,G(1..g)));
       }
-      return(REY,G(1..g));
+      return(list(REY,G(1..g)));
     }
   }
   if (v)
   { "  Done generating the group and the Reynolds operator.";
     "";
   }
-  return(REY,G(1..g));
+  return(list(REY,G(1..g)));
 }
 example
 { "EXAMPLE: Sturmfels: Algorithms in Invariant Theory 2.3.7:"; echo=2;
@@ -1597,6 +1597,7 @@ EXAMPLE: example invariant_basis; shows an example
   int a=size(#);
   int i;
   int n=nvars(br);
+  int DGB = degBound;
  //---------------------- checking that the input is ok -----------------------
   for (i=1;i<=a;i++)
   { if (typeof(#[i])=="matrix")
@@ -1650,6 +1651,7 @@ EXAMPLE: example invariant_basis; shows an example
   setring br;
   map f=T,ideal(0);
   matrix S=f(S);
+  degBound=1;
   matrix s=matrix(syz(S));             // s contains a basis of the space of
                                        // solutions -
   ideal I=ideal(matrix(mon)*s);        // I contains a basis of homogeneous
@@ -1658,6 +1660,7 @@ EXAMPLE: example invariant_basis; shows an example
     { I[i]=I[i]/leadcoef(I[i]);        // setting leading coefficients to 1
     }
   }
+  degBound=DGB;
   return(I);
 }
 example
@@ -7318,7 +7321,7 @@ EXAMPLE: example invariant_ring; shows an example
         }
         matrix P=primary_charp_without(#[1..gen_num],v);
         matrix S=secondary_not_cohen_macaulay(P,#[1..gen_num],v);
-        return(L[1],S);
+        return(P,S);
       }
     }
   }
