@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.74 2007-12-19 18:04:15 king Exp $"
+version="$Id: finvar.lib,v 1.75 2007-12-20 13:56:21 king Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -77,6 +77,7 @@ LIB "matrix.lib";
 LIB "elim.lib";
 LIB "general.lib";
 LIB "algebra.lib";
+LIB "ring.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Checks whether the last parameter, being a matrix, is among the previous
@@ -6992,20 +6993,13 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
   if (v && voice==2)
   { "";
   }
-  // ring alskdfalkdsj=0,x,dp;
-  // matrix M[1][2]=1,(1-x)^n;            
-  // export alskdfalkdsj;
-  // export M;                            // we look at our primary invariants as
-  // setring br;                          // such of the subgroup that only
-  // matrix REY=matrix(maxideal(1));      // contains the identity, this means that
-                                       // ch does not divide the order anymore,
-                                       // this means that we can make use of the
-                                       // Molien series again - M[1,1]/M[1,2] is
-                                       // the Molien series of that group, we
-                                       // now calculate the secondary invariants
-                                       // of this subgroup in the usual fashion
-                                       // where the primary invariants are the
-                                       // ones from the bigger group
+  
+  // we look at our primary invariants as such of the subgroup that only
+  // contains the identity, this means that ch does not divide the order anymore,
+  // this means that we can make use of the Molien series again - M[1,1]/M[1,2] is
+  // the Molien series of that group, we now calculate the secondary invariants
+  // of this subgroup in the usual fashion where the primary invariants are the
+  // ones from the bigger group.
   if (v)
   { "  First, get secondary invariants for the trivial action, with respect to";
     "  the primary invariants found previously.";
@@ -7017,12 +7011,9 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
     "         always is of dimension zero.";
     return();
   }
-  matrix trivialS = matrix(kbase(GP));// , trivialIS=secondary_charp(P,REY,"alskdfalkdsj",v);
-  // kill trivialIS;
-  // kill alskdfalkdsj;
-  // now we have those secondary invariants
-  int k=ncols(trivialS);               // k is the number of the secondary
-                                       // invariants, we just calculated
+  matrix trivialS = matrix(kbase(GP)); // Now we have those secondary invariants!
+                                       // Simply they are standard monomials.
+  int k=ncols(trivialS);               // k is the number of trivial s.i.
   if (v)
   { "  We calculate secondary invariants from the ones found for the trivial";
     "  subgroup.";
@@ -7040,10 +7031,6 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
     B=f(trivialS)-trivialS;            // these relations should be 0 -
     M(1)[i,1..k]=B[1..k];              // we will look for the syzygies of M(1)
   }
-//  intvec save_opts=option(get);
-//  option(returnSB,redSB);
-//  module M(2)=syz(M(1));               // nres(M(1),2)[2];
-//  option(set,save_opts);
   if (v) 
   { "  Compute syzygies of the \"trivial\" secondaries"; }
   module M(2)=nres(M(1),2)[2];
@@ -7059,30 +7046,35 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
   { "  By elimination: Intersect syzygies with the algebra of primary invariants"; }
   intvec dv = degvec(ideal(P)),1;
   ring newR = char(br), (y(1..n),h),(a(dv),dp);
-  def R = br + newR;
+  def tmpR = br + newR;
+  setring tmpR;
+  intvec newdv=degvec(maxideal(1));
+  def R = changeord("a("+string(newdv)+"),dp");
   setring R;
+  kill tmpR;
   matrix P=fetch(br,P);                       // primary invariants in the new ring
   ideal ElimP;
   for (i=1;i<=n;i++)
   { ElimP[i]=y(i)-P[1,i]; }
-  def RHilb = newR+br; // the new variables only appear linearly, so that block order wouldn't hurt
-  setring RHilb;
-  ideal ElimP=imap(R,ElimP);
-  intvec EPvec = hilb(groebner(ElimP),1,degvec(maxideal(1)));
-  setring R;
-  ideal GElimP = std(ElimP,EPvec,degvec(maxideal(1)));
-  attrib(GElimP,"isSB",1);
-  int newN = ncols(GElimP);  
+  // def RHilb = newR+br; // the new variables only appear linearly, so that block order wouldn't hurt
+  // setring RHilb;
+  // ideal ElimP=imap(R,ElimP);
+  // intvec EPvec = hilb(groebner(ElimP),1,degvec(maxideal(1)));
+  // setring R;
+  // ideal GElimP = std(ElimP,EPvec,degvec(maxideal(1)));
+  // attrib(GElimP,"isSB",1);
+  // int newN = ncols(GElimP);  
+  int newN = ncols(ElimP);  
   matrix M[k][m+k*newN];
   M[1..k,1..m]=matrix(imap(br,M(2)));        // will contain a module -
-  for (i=1;i<=newN;i++)
-  { for (j=1;j<=k;j++)
-    { M[j,m+(i-1)*k+j]=GElimP[i]; // y(i)-P[1,i];
+  for (i=1;i<=newN;i++){
+    for (j=1;j<=k;j++) {
+    // M[j,m+(i-1)*k+j]=GElimP[i]; // y(i)-P[1,i];
+      M[j,m+(i-1)*k+j]=ElimP[i];
     }
   }
 
-  M=elim(module(M),1,n);               // eliminating x(1..n), std-calculation
-                                         // is done internally -
+  M=elim(module(M),1,n);           // eliminating x(1..n), std-calculation is done internally -
   M=homog(module(M),h);            // homogenize for 'minbase'
   M=minbase(module(M));
   ideal substitute;
@@ -7090,11 +7082,11 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
   { substitute[i]=var(i);
   }
   substitute = substitute,ideal(P),1;
-  map f=R,substitute;                      // replacing y(1..n) by primary
+  map f=R,substitute;                  // replacing y(1..n) by primary
                                        // invariants and h by 1 -
   M=f(M);                              // we can't directly map from R to br
   setring br;                          // if there is a minpoly.
-  module M(3)=imap(R,M);                     // M(2) is the new module
+  module M(3)=imap(R,M);               // M(2) is the new module
   m=ncols(M(3));
   matrix S[1][m];
   S=matrix(trivialS)*matrix(M(3));     // S now contains the secondary
