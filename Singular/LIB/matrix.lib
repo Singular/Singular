@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.39 2007-12-19 18:05:57 king Exp $";
+version="$Id: matrix.lib,v 1.40 2007-12-21 23:16:35 king Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -911,33 +911,33 @@ RETURN:  a maximal module R such that M*R is formed by zero vectors.
 EXAMPLE: example linear_relations; shows an example.
 "
 { int n = ncols(M);
-  module RED = M;
-  module T = module(unitmat(n));
-  number a;
-  module REL;
-  poly lm;
-  int i,j, sizerel;
-  for (i=1;i<=n;i++) {
-    if (RED[i]==0) { //-- an obvious relation found
-      sizerel++;
-      REL[sizerel]=T[i];
-    }
+  def br = basering;
+  ideal vars = maxideal(1);
+  ring tmpR = 0, ('y(1..n)), dp;
+  def newR = br + tmpR;
+  setring newR;
+  module M = imap(br,M);
+  ideal vars = imap(br,vars);
+  attrib(vars,"isSB",1);
+  for (int i = 1; i<=n; i++) {
+    M[i] = M[i] + 'y(i)*gen(1);
   }
-  for (i=1;i<n;i++) {
-    if (RED[i]<>0) {
-      lm = lead(RED[i][nrows(RED[i])]);
-      for (j=i+1; j<=n; j++) {
-	a = leadcoef(RED[j][nrows(RED[i])]/lm);
-	RED[j] = RED[j] - (a*RED[i]);
-	T[j] = T[j] - (a*T[i]);
-	if (RED[j]==0) { //-- new relation found
-	  sizerel++;
-	  REL[sizerel]=T[j];
-	}
+  M = interred(M);
+  module redM = NF(M,vars);
+  module REL;
+  int sizeREL;
+  int j;
+  for (i=1; i<=n; i++) {
+    if (M[i][1]==redM[i][1]) { //-- relation found!
+      sizeREL++;
+      REL[sizeREL]=0;
+      for (j=1; j<=n; j++) {
+        REL[sizeREL] = REL[sizeREL] + (M[i][1]/'y(j))*gen(j);
       }
     }
   }
-  return(minbase(REL));
+  setring br;
+  return(minbase(imap(newR,REL)));
 }
 example
 { "EXAMPLE:"; echo = 2;
