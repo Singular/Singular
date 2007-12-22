@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.40 2007-12-21 23:16:35 king Exp $";
+version="$Id: matrix.lib,v 1.41 2007-12-22 10:42:14 king Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -905,13 +905,17 @@ proc linear_relations(module M)
 "USAGE:   linear_relations(M);
          M: a module
 ASSUME:  All non-zero entries of M are homogeneous polynomials of the same 
-         degree. The base field must be an exact field (not real or complex).
+         positife degree. The base field must be an exact field (not real 
+         or complex).
          It is not checked whether these assumptions hold.
 RETURN:  a maximal module R such that M*R is formed by zero vectors.
 EXAMPLE: example linear_relations; shows an example.
 "
 { int n = ncols(M);
-  def br = basering;
+  def BaseR = basering;
+  def br = changeord("dp",basering);
+  setring br;
+  module M = imap(BaseR,M);
   ideal vars = maxideal(1);
   ring tmpR = 0, ('y(1..n)), dp;
   def newR = br + tmpR;
@@ -936,7 +940,7 @@ EXAMPLE: example linear_relations; shows an example.
       }
     }
   }
-  setring br;
+  setring BaseR;
   return(minbase(imap(newR,REL)));
 }
 example
