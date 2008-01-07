@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.9 2007-05-03 13:27:45 Singular Exp $
+// $Id: clapconv.cc,v 1.10 2008-01-07 13:36:16 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -20,13 +20,13 @@
 #include "polys.h"
 #include "febase.h"
 #include "ring.h"
+#include "sbuckets.h"
 
 static void convRec( const CanonicalForm & f, int * exp, poly & result );
 
 static void convRecAlg( const CanonicalForm & f, int * exp, napoly & result );
 
-static void convRecPP ( const CanonicalForm & f, int * exp, poly & result );
-static void conv_RecPP ( const CanonicalForm & f, int * exp, poly & result, ring r );
+static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, ring r );
 
 static void convRecPTr ( const CanonicalForm & f, int * exp, napoly & result );
 
@@ -34,10 +34,9 @@ static void convRecTrP ( const CanonicalForm & f, int * exp, poly & result, int 
 
 static void convRecGFGF ( const CanonicalForm & f, int * exp, poly & result );
 
-static number convClapNSingAN( const CanonicalForm &f);
+static number convFactoryNSingAN( const CanonicalForm &f);
 
-CanonicalForm
-convSingNClapN( number n )
+CanonicalForm convSingNFactoryN( number n )
 {
   CanonicalForm term;
   /* does only work for Zp, Q */
@@ -47,9 +46,9 @@ convSingNClapN( number n )
   }
   else
   {
-    if ( ((long)n) & 1L )
+    if ( SR_HDL(n) & SR_INT )
     {
-      term = ((long)n) >>2;
+      term = SR_TO_INT(n);
     }
     else
     {
@@ -59,28 +58,21 @@ convSingNClapN( number n )
         mpz_init_set( &dummy, &(n->z) );
         term = make_cf( dummy );
       }
-      else  if ( n->s == 1 )
+      else
       {
+        // assume s==0 or s==1
         MP_INT num, den;
         On(SW_RATIONAL);
         mpz_init_set( &num, &(n->z) );
         mpz_init_set( &den, &(n->n) );
-        term = make_cf( num, den, false );
-      }
-      else
-      { // assume s == 0
-        MP_INT num, den;
-        mpz_init_set( &num, &(n->z) );
-        mpz_init_set( &den, &(n->n) );
-        term = make_cf( num, den, true );
+        term = make_cf( num, den, ( n->s != 1 ));
       }
     }
   }
   return term;
 }
 
-number
-convClapNSingN( const CanonicalForm & n)
+number convFactoryNSingN( const CanonicalForm & n)
 {
   if (n.isImm())
     return nInit(n.intval());
@@ -91,7 +83,7 @@ convClapNSingN( const CanonicalForm & n)
     z->debug=123456;
 #endif
     z->z = gmp_numerator( n );
-    if ( n.den() == 1 )
+    if ( n.den().isOne() )
       z->s = 3;
     else
     {
@@ -102,25 +94,35 @@ convClapNSingN( const CanonicalForm & n)
   }
 }
 
-CanonicalForm conv_SingPClapP( poly p, ring r )
+CanonicalForm conv_SingPFactoryP( poly p, ring r )
 {
   CanonicalForm result = 0;
   int e, n = r->N;
   assume( rPar(r)==0);
 
-  while ( p != NULL )
+  if ( getCharacteristic() != 0 )
   {
-    CanonicalForm term;
-    /* does only work for finite fields */
-    if ( getCharacteristic() != 0 )
+    /* does only work for finite fields Z/p*/
+    while ( p != NULL )
     {
-      term = npInt( pGetCoeff( p ) );
-    }
-    else
-    {
-      if ( (long)(pGetCoeff( p )) & 1 )
+      CanonicalForm term = npInt( pGetCoeff( p ) );
+      for ( int i = n; i >0; i-- )
       {
-        term = ((long)( pGetCoeff( p ) )>>2);
+        if ( (e = p_GetExp( p, i, r )) != 0 )
+           term *= power( Variable( i ), e );
+      }
+      result += term;
+      pIter( p );
+    }
+  }
+  else
+  {
+    while ( p != NULL )
+    {
+      CanonicalForm term;
+      if ( SR_HDL(pGetCoeff( p )) & SR_INT )
+      {
+        term = SR_TO_INT( pGetCoeff( p ) );
       }
       else
       {
@@ -130,125 +132,45 @@ CanonicalForm conv_SingPClapP( poly p, ring r )
           mpz_init_set( &dummy, &(pGetCoeff( p )->z) );
           term = make_cf( dummy );
         }
-        else  if ( pGetCoeff( p )->s == 1 )
+        else
         {
+          // assume s==1 or s==0
           MP_INT num, den;
           On(SW_RATIONAL);
           mpz_init_set( &num, &(pGetCoeff( p )->z) );
           mpz_init_set( &den, &(pGetCoeff( p )->n) );
-          term = make_cf( num, den, false );
-        }
-        else
-        { // assume s == 0
-          MP_INT num, den;
-          mpz_init_set( &num, &(pGetCoeff( p )->z) );
-          mpz_init_set( &den, &(pGetCoeff( p )->n) );
-          term = make_cf( num, den, true );
+          term = make_cf( num, den, ( pGetCoeff( p )->s != 1 ));
         }
       }
-    }
-    for ( int i = 1; i <= n; i++ )
-    {
-      if ( (e = p_GetExp( p, i, r )) != 0 )
-         term *= power( Variable( i ), e );
-    }
-    result += term;
-    p = pNext( p );
-  }
-  return result;
-}
-
-poly convClapPSingP ( const CanonicalForm & f )
-{
-//    cerr << " f = " << f << endl;
-  int n = pVariables+1;
-  /* ASSERT( level( f ) <= pVariables, "illegal number of variables" ); */
-  int * exp = new int[n];
-  //for ( int i = 0; i < n; i++ ) exp[i] = 0;
-  memset(exp,0,n*sizeof(int));
-  poly result = NULL;
-  convRecPP( f, exp, result );
-  delete [] exp;
-  return result;
-}
-
-static void convRecPP ( const CanonicalForm & f, int * exp, poly & result )
-{
-  if (f == 0)
-    return;
-  if ( ! f.inCoeffDomain() )
-  {
-    int l = f.level();
-    for ( CFIterator i = f; i.hasTerms(); i++ )
-    {
-      exp[l] = i.exp();
-      convRecPP( i.coeff(), exp, result );
-    }
-    exp[l] = 0;
-  }
-  else
-  {
-    poly term = pInit();
-    pNext( term ) = NULL;
-    for ( int i = 1; i <= pVariables; i++ )
-      pSetExp( term, i, exp[i]);
-    pSetComp(term, 0);
-    if ( getCharacteristic() != 0 )
-    {
-      pGetCoeff( term ) = nInit( f.intval() );
-    }
-    else
-    {
-      if ( f.isImm() )
-        pGetCoeff( term ) = nInit( f.intval() );
-      else
+      for ( int i = n; i >0; i-- )
       {
-        number z=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG)
-        z->debug=123456;
-#endif
-        z->z = gmp_numerator( f );
-        if ( f.den() == 1 )
-          z->s = 3;
-        else
-        {
-          z->n = gmp_denominator( f );
-          z->s = 0;
-        }
-        nlNormalize(z);
-        pGetCoeff( term ) = z;
+        if ( (e = p_GetExp( p, i, r )) != 0 )
+           term *= power( Variable( i ), e );
       }
-    }
-    pSetm( term );
-    if ( nIsZero(pGetCoeff(term)) )
-    {
-      pDelete(&term);
-    }
-    else
-    {
-      result = pAdd( result, term );
+      result += term;
+      pIter( p );
     }
   }
+  return result;
 }
 
-poly conv_ClapPSingP ( const CanonicalForm & f, ring r )
+poly conv_FactoryPSingP ( const CanonicalForm & f, ring r )
 {
 //    cerr << " f = " << f << endl;
   int n = r->N+1;
   /* ASSERT( level( f ) <= pVariables, "illegal number of variables" ); */
-  int * exp = new int[n];
-  //for ( int i = 0; i < n; i++ ) exp[i] = 0;
-  memset(exp,0,n*sizeof(int));
-  poly result = NULL;
-  conv_RecPP( f, exp, result, r );
-  delete [] exp;
+  int * exp = (int*)omAlloc0(n*sizeof(int));
+  sBucket_pt result_bucket=sBucketCreate(r);
+  conv_RecPP( f, exp, result_bucket, r );
+  poly result; int dummy;
+  sBucketDestroyMerge(result_bucket,&result,&dummy);
+  omFreeSize((ADDRESS)exp,n*sizeof(int));
   return result;
 }
 
-static void
-conv_RecPP ( const CanonicalForm & f, int * exp, poly & result, ring r )
+static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, ring r )
 {
-  if (f == 0)
+  if (f.isZero())
     return;
   if ( ! f.inCoeffDomain() )
   {
@@ -267,31 +189,24 @@ conv_RecPP ( const CanonicalForm & f, int * exp, poly & result, ring r )
     for ( int i = 1; i <= r->N; i++ )
       p_SetExp( term, i, exp[i], r);
     if (rRing_has_Comp(r)) p_SetComp(term, 0, r);
-    if ( getCharacteristic() != 0 )
-    {
+    if ( f.isImm() )
       pGetCoeff( term ) = n_Init( f.intval(), r );
-    }
     else
     {
-      if ( f.isImm() )
-        pGetCoeff( term ) = n_Init( f.intval(), r );
+      number z=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG)
+      z->debug=123456;
+#endif
+      z->z = gmp_numerator( f );
+      if ( f.den().isOne() )
+        z->s = 3;
       else
       {
-        number z=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG)
-        z->debug=123456;
-#endif
-        z->z = gmp_numerator( f );
-        if ( f.den() == 1 )
-          z->s = 3;
-        else
-        {
-          z->n = gmp_denominator( f );
-          z->s = 0;
-        }
-        pGetCoeff( term ) = z;
+        z->n = gmp_denominator( f );
+        z->s = 0;
         nlNormalize(z);
       }
+      pGetCoeff( term ) = z;
     }
     p_Setm( term, r );
     if ( n_IsZero(pGetCoeff(term), r) )
@@ -300,14 +215,13 @@ conv_RecPP ( const CanonicalForm & f, int * exp, poly & result, ring r )
     }
     else
     {
-      result = p_Add_q( result, term, r );
+      sBucket_Merge_p(result,term,1);
     }
   }
 }
 
 
-CanonicalForm
-convSingTrClapP( napoly p )
+CanonicalForm convSingTrFactoryP( napoly p )
 {
   CanonicalForm result = 0;
   int e, n = napVariables;
@@ -322,11 +236,8 @@ convSingTrClapP( napoly p )
     }
     else
     {
-      //if ( (!(int)(napGetCoeff( p )) & 1 )
-      //&&  ( napGetCoeff( p )->s == 0))
-      //  naNormalize( naGetCoeff( p ) );
-      if ( (long)(napGetCoeff( p )) & 1L )
-        term = nlInt( napGetCoeff( p ) );
+      if ( SR_HDL(napGetCoeff( p )) & SR_INT )
+        term = SR_TO_INT( napGetCoeff( p ) );
       else
       {
         if ( napGetCoeff( p )->s == 3 )
@@ -335,25 +246,18 @@ convSingTrClapP( napoly p )
           mpz_init_set( &dummy, &(napGetCoeff( p )->z) );
           term = make_cf( dummy );
         }
-        else  if ( napGetCoeff( p )->s == 1 )
-        {
-          MP_INT num, den;
-          On(SW_RATIONAL);
-          mpz_init_set( &num, &(napGetCoeff( p )->z) );
-          mpz_init_set( &den, &(napGetCoeff( p )->n) );
-          term = make_cf( num, den, false );
-        }
         else
-        { // assume s == 0
+        {
+          // assume s==0 or s==1
           MP_INT num, den;
           On(SW_RATIONAL);
           mpz_init_set( &num, &(napGetCoeff( p )->z) );
           mpz_init_set( &den, &(napGetCoeff( p )->n) );
-          term = make_cf( num, den, true );
+          term = make_cf( num, den, ( napGetCoeff( p )->s != 1 ));
         }
       }
     }
-    for ( int i = 1; i <= n; i++ )
+    for ( int i = n; i >0; i-- )
     {
       if ( (e = napGetExp( p, i )) != 0 )
         term *= power( Variable( i ), e );
@@ -364,25 +268,21 @@ convSingTrClapP( napoly p )
   return result;
 }
 
-napoly
-convClapPSingTr ( const CanonicalForm & f )
+napoly convFactoryPSingTr ( const CanonicalForm & f )
 {
 //    cerr << " f = " << f << endl;
   int n = napVariables+1;
   /* ASSERT( level( f ) <= napVariables, "illegal number of variables" ); */
-  int * exp = new int[n];
-  // for ( int i = 0; i < n; i++ ) exp[i] = 0;
-  memset(exp,0,n*sizeof(int));
+  int * exp = (int *)omAlloc0(n*sizeof(int));
   napoly result = NULL;
   convRecPTr( f, exp, result );
-  delete [] exp;
+  omFreeSize((ADDRESS)exp,n*sizeof(int));
   return result;
 }
 
-static void
-convRecPTr ( const CanonicalForm & f, int * exp, napoly & result )
+static void convRecPTr ( const CanonicalForm & f, int * exp, napoly & result )
 {
-  if (f == 0)
+  if (f.isZero())
     return;
   if ( ! f.inCoeffDomain() )
   {
@@ -400,41 +300,34 @@ convRecPTr ( const CanonicalForm & f, int * exp, napoly & result )
     // napNext( term ) = NULL; //already done by napNew
     for ( int i = 1; i <= napVariables; i++ )
       napSetExp( term, i , exp[i]);
-    if ( getCharacteristic() != 0 )
-    {
-      napGetCoeff( term ) = npInit( f.intval() );
-    }
+    if ( f.isImm() )
+      napGetCoeff( term ) = nacInit( f.intval() );
     else
     {
-      if ( f.isImm() )
-        napGetCoeff( term ) = nlInit( f.intval() );
+      number z=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG)
+      z->debug=123456;
+#endif
+      z->z = gmp_numerator( f );
+      if ( f.den().isOne() )
+      {
+        z->s = 3;
+      }
       else
       {
-        number z=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG)
-        z->debug=123456;
-#endif
-        z->z = gmp_numerator( f );
-        if ( f.den() == 1 )
+        z->n = gmp_denominator( f );
+        if (mpz_cmp_si(&z->n,(long)1)==0)
         {
-          z->s = 3;
+          mpz_clear(&z->n);
+          z->s=3;
         }
         else
         {
-          z->n = gmp_denominator( f );
-          if (mpz_cmp_si(&z->n,(long)1)==0)
-          {
-            mpz_clear(&z->n);
-            z->s=3;
-          }
-          else
-          {
-            z->s = 0;
-          }
+          z->s = 0;
           nacNormalize(z);
         }
-        napGetCoeff( term ) = z;
       }
+      napGetCoeff( term ) = z;
     }
     if (nacIsZero(pGetCoeff(term)))
     {
@@ -447,7 +340,7 @@ convRecPTr ( const CanonicalForm & f, int * exp, napoly & result )
   }
 }
 
-CanonicalForm convSingAPClapAP ( poly p , const Variable & a)
+CanonicalForm convSingAPFactoryAP ( poly p , const Variable & a)
 {
   CanonicalForm result = 0;
   int e, n = pVariables;
@@ -456,14 +349,14 @@ CanonicalForm convSingAPClapAP ( poly p , const Variable & a)
   On(SW_RATIONAL);
   while ( p!=NULL)
   {
-    CanonicalForm term=convSingAClapA(((lnumber)pGetCoeff(p))->z,a);
+    CanonicalForm term=convSingAFactoryA(((lnumber)pGetCoeff(p))->z,a);
     for ( int i = 1; i <= n; i++ )
     {
       if ( (e = pGetExp( p, i )) != 0 )
         term *= power( Variable( i + off), e );
     }
     result += term;
-    p = pNext( p );
+    pIter( p );
   }
   return result;
 }
@@ -471,26 +364,24 @@ CanonicalForm convSingAPClapAP ( poly p , const Variable & a)
 static void
 convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int par_start, int var_start) ;
 
-poly convClapAPSingAP_R ( const CanonicalForm & f, int par_start, int var_start )
+poly convFactoryAPSingAP_R ( const CanonicalForm & f, int par_start, int var_start )
 {
   int n = pVariables+1+rPar(currRing);
-  int * exp = new int[n];
-  // for ( int i = 0; i < n; i++ ) exp[i] = 0;
-  memset(exp,0,n*sizeof(int));
+  int * exp = (int *)omAlloc0(n*sizeof(int));
   poly result = NULL;
   convRecAP_R( f, exp, result,par_start, var_start );
-  delete [] exp;
+  omFreeSize((ADDRESS)exp,n*sizeof(int));
   return result;
 }
-poly convClapAPSingAP ( const CanonicalForm & f )
+
+poly convFactoryAPSingAP ( const CanonicalForm & f )
 {
-  return convClapAPSingAP_R(f,0,rPar(currRing));
+  return convFactoryAPSingAP_R(f,0,rPar(currRing));
 }
 
-static void
-convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int par_start, int var_start )
+static void convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int par_start, int var_start )
 {
-  if (f == 0)
+  if (f.isZero())
     return;
   if ( ! f.inCoeffDomain() )
   {
@@ -504,7 +395,7 @@ convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int par_start, 
   }
   else
   {
-    napoly z=(napoly)convClapASingA( f );
+    napoly z=(napoly)convFactoryASingA( f );
     if (z!=NULL)
     {
       poly term = pInit();
@@ -512,7 +403,8 @@ convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int par_start, 
       int i;
       for ( i = 1; i <= pVariables; i++ )
         pSetExp( term, i , exp[i+var_start]);
-      pSetComp(term, 0);
+      if (rRing_has_Comp(currRing->algring))
+        p_SetComp(term, 0, currRing->algring);
       if (par_start==0)
       {
         for ( i = 1; i <= var_start; i++ )
@@ -533,7 +425,7 @@ convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int par_start, 
   }
 }
 
-CanonicalForm convSingAClapA ( napoly p , const Variable & a )
+CanonicalForm convSingAFactoryA ( napoly p , const Variable & a )
 {
   CanonicalForm result = 0;
   int e;
@@ -548,12 +440,8 @@ CanonicalForm convSingAClapA ( napoly p , const Variable & a )
     }
     else
     {
-      //if ( (!(int)(napGetCoeff( p )) & 1 )
-      //&&  ( napGetCoeff( p )->s == 0))
-      //  naNormalize( naGetCoeff( p ) );
-      if ( (long)(napGetCoeff( p )) & SR_INT )
-        term = nlInt( napGetCoeff( p ) );
-        //term = SR_TO_INT(napGetCoeff( p )) ;
+      if ( SR_HDL(napGetCoeff( p )) & SR_INT )
+        term = SR_TO_INT(napGetCoeff( p )) ;
       else
       {
         if ( napGetCoeff( p )->s == 3 )
@@ -562,21 +450,14 @@ CanonicalForm convSingAClapA ( napoly p , const Variable & a )
           mpz_init_set( &dummy, &(napGetCoeff( p )->z) );
           term = make_cf( dummy );
         }
-        else  if ( napGetCoeff( p )->s == 1 )
-        {
-          MP_INT num, den;
-          On(SW_RATIONAL);
-          mpz_init_set( &num, &(napGetCoeff( p )->z) );
-          mpz_init_set( &den, &(napGetCoeff( p )->n) );
-          term = make_cf( num, den, false );
-        }
         else
-        { // assume s == 0
+        {
+          // assume s==0 or s==1
           MP_INT num, den;
           On(SW_RATIONAL);
           mpz_init_set( &num, &(napGetCoeff( p )->z) );
           mpz_init_set( &den, &(napGetCoeff( p )->n) );
-          term = make_cf( num, den, true );
+          term = make_cf( num, den, ( napGetCoeff( p )->s != 1 ));
         }
       }
     }
@@ -588,9 +469,9 @@ CanonicalForm convSingAClapA ( napoly p , const Variable & a )
   return result;
 }
 
-static number convClapNSingAN( const CanonicalForm &f)
+static number convFactoryNSingAN( const CanonicalForm &f)
 {
-  if ((getCharacteristic() != 0) || ( f.isImm() ))
+  if ( f.isImm() )
     return nacInit( f.intval() );
   else
   {
@@ -599,7 +480,7 @@ static number convClapNSingAN( const CanonicalForm &f)
     z->debug=123456;
 #endif
     z->z = gmp_numerator( f );
-    if ( f.den() == 1 )
+    if ( f.den().isOne() )
     {
       z->s = 3;
     }
@@ -607,8 +488,8 @@ static number convClapNSingAN( const CanonicalForm &f)
     {
       z->n = gmp_denominator( f );
       z->s = 0;
+      nlNormalize(z);
     }
-    nlNormalize(z);
     #ifdef LDEBUG
     nlDBTest(z,__FILE__,__LINE__);
     #endif
@@ -616,7 +497,7 @@ static number convClapNSingAN( const CanonicalForm &f)
   }
 }
 
-napoly convClapASingA ( const CanonicalForm & f )
+napoly convFactoryASingA ( const CanonicalForm & f )
 {
   napoly a=NULL;
   napoly t;
@@ -624,7 +505,7 @@ napoly convClapASingA ( const CanonicalForm & f )
   {
     t=napNew();
     // napNext( t ) = NULL; //already done by napNew
-    napGetCoeff(t)=convClapNSingAN( i.coeff() );
+    napGetCoeff(t)=convFactoryNSingAN( i.coeff() );
     if (nacIsZero(napGetCoeff(t)))
     {
       napDelete(&t);
@@ -646,7 +527,7 @@ napoly convClapASingA ( const CanonicalForm & f )
   return a;
 }
 
-CanonicalForm convSingTrPClapP ( poly p )
+CanonicalForm convSingTrPFactoryP ( poly p )
 {
   CanonicalForm result = 0;
   int e, n = pVariables;
@@ -655,7 +536,7 @@ CanonicalForm convSingTrPClapP ( poly p )
   while ( p!=NULL )
   {
     nNormalize(pGetCoeff(p));
-    CanonicalForm term=convSingTrClapP(((lnumber)pGetCoeff(p))->z);
+    CanonicalForm term=convSingTrFactoryP(((lnumber)pGetCoeff(p))->z);
 
     if ((((lnumber)pGetCoeff(p))->n!=NULL)
     && (!errorreported))
@@ -663,7 +544,7 @@ CanonicalForm convSingTrPClapP ( poly p )
       WerrorS("conversion error: denominator!= 1");
     }
 
-    for ( int i = 1; i <= n; i++ )
+    for ( int i = n; i > 0; i-- )
     {
       if ( (e = pGetExp( p, i )) != 0 )
         term = term * power( Variable( i + offs ), e );
@@ -674,22 +555,20 @@ CanonicalForm convSingTrPClapP ( poly p )
   return result;
 }
 
-poly convClapPSingTrP ( const CanonicalForm & f )
+poly convFactoryPSingTrP ( const CanonicalForm & f )
 {
   int n = pVariables+1;
-  int * exp = new int[n];
-  // for ( int i = 0; i < n; i++ ) exp[i] = 0;
-  memset(exp,0,n*sizeof(int));
+  int * exp = (int*)omAlloc0(n*sizeof(int));
   poly result = NULL;
   convRecTrP( f, exp, result , rPar(currRing) );
-  delete [] exp;
+  omFreeSize((ADDRESS)exp,n*sizeof(int));
   return result;
 }
 
 static void
 convRecTrP ( const CanonicalForm & f, int * exp, poly & result , int offs)
 {
-  if (f == 0)
+  if (f.isZero())
     return;
   if ( f.level() > offs )
   {
@@ -707,9 +586,10 @@ convRecTrP ( const CanonicalForm & f, int * exp, poly & result , int offs)
     pNext( term ) = NULL;
     for ( int i = 1; i <= pVariables; i++ )
       pSetExp( term, i ,exp[i]);
-    pSetComp(term, 0);
+    if (rRing_has_Comp(currRing))
+        p_SetComp(term, 0, currRing);
     pGetCoeff(term)=(number)omAlloc0Bin(rnumber_bin);
-    ((lnumber)pGetCoeff(term))->z=convClapPSingTr( f );
+    ((lnumber)pGetCoeff(term))->z=convFactoryPSingTr( f );
     pSetm( term );
     result = pAdd( result, term );
   }
@@ -728,8 +608,8 @@ number   nlChineseRemainder(number *x, number *q,int rl)
   }
   CanonicalForm xnew,qnew;
   chineseRemainder(X,Q,xnew,qnew);
-  number n=convClapNSingN(xnew);
-  number p=convClapNSingN(qnew);
+  number n=convFactoryNSingN(xnew);
+  number p=convFactoryNSingN(qnew);
   number p2=nlIntDiv(p,nlInit(2));
   if (nlGreater(n,p2))
   {
@@ -748,7 +628,7 @@ number   nlChineseRemainder(number *x, number *q,int rl)
 
 #if 0
 CanonicalForm
-convSingGFClapGF( poly p )
+convSingGFFactoryGF( poly p )
 {
   CanonicalForm result = 0;
   int e, n = pVariables;
@@ -769,24 +649,22 @@ convSingGFClapGF( poly p )
 }
 
 poly
-convClapGFSingGF ( const CanonicalForm & f )
+convFactoryGFSingGF ( const CanonicalForm & f )
 {
 //    cerr << " f = " << f << endl;
   int n = pVariables+1;
   /* ASSERT( level( f ) <= pVariables, "illegal number of variables" ); */
-  int * exp = new int[n];
-  //for ( int i = 0; i < n; i++ ) exp[i] = 0;
-  memset(exp,0,n*sizeof(int));
+  int * exp = (int*)omAlloc0(n*sizeof(int));
   poly result = NULL;
   convRecGFGF( f, exp, result );
-  delete [] exp;
+  omFreeSize((ADDRESS)exp,n*sizeof(int));
   return result;
 }
 
 static void
 convRecGFGF ( const CanonicalForm & f, int * exp, poly & result )
 {
-  if (f == 0)
+  if (f.isZero())
     return;
   if ( ! f.inCoeffDomain() )
   {
@@ -804,7 +682,8 @@ convRecGFGF ( const CanonicalForm & f, int * exp, poly & result )
     pNext( term ) = NULL;
     for ( int i = 1; i <= pVariables; i++ )
       pSetExp( term, i, exp[i]);
-    pSetComp(term, 0);
+    if (rRing_has_Comp(currRing))
+        p_SetComp(term, 0, currRing);
     pGetCoeff( term ) = (number) gf_value (f);
     pSetm( term );
     result = pAdd( result, term );
@@ -812,7 +691,7 @@ convRecGFGF ( const CanonicalForm & f, int * exp, poly & result )
 }
 #endif
 
-int convClapISingI( const CanonicalForm & f)
+int convFactoryISingI( const CanonicalForm & f)
 {
   if (!f.isImm()) WerrorS("int overflow in det");
   return f.intval();

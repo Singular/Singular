@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.23 2007-11-07 17:11:53 Singular Exp $
+// $Id: clapsing.cc,v 1.24 2008-01-07 13:36:16 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -137,7 +137,7 @@ TIMING_DEFINE_PRINT( algLcmTimer );
 // CanonicalForm f, represents transcendent extension
 #define FACTORY_CFTROUT_POLY( tag, f ) \
   { \
-    napoly F=convClapPSingTr( f ); \
+    napoly F=convFactoryPSingTr( f ); \
     StringSetS( tag ); \
     napWrite( F ); \
     PrintS(StringAppendS("\n")); \
@@ -146,7 +146,7 @@ TIMING_DEFINE_PRINT( algLcmTimer );
 // CanonicalForm f, represents algebraic extension
 #define FACTORY_CFAOUT_POLY( tag, f ) \
   { \
-    napoly F=convClapASingA( f ); \
+    napoly F=convFactoryASingA( f ); \
     StringSetS( tag ); \
     napWrite( F ); \
     PrintS(StringAppendS("\n")); \
@@ -163,13 +163,13 @@ TIMING_DEFINE_PRINT( algLcmTimer );
 #define FACTORY_ALGOUT_PAT( tag, f ) \
   if (currRing->minpoly!=NULL) \
   { \
-    CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z); \
+    CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z); \
     Variable a=rootOf(mipo); \
-    printPolyPattern( tag, convSingAClapA( f,a ), rPar( currRing ) ); \
+    printPolyPattern( tag, convSingAFactoryA( f,a ), rPar( currRing ) ); \
   } \
   else \
   { \
-    printPolyPattern( tag, convSingTrClapP( f ), rPar( currRing ) ); \
+    printPolyPattern( tag, convSingTrFactoryP( f ), rPar( currRing ) ); \
   }
 // CanonicalForm f, represents transcendent extension
 #define FACTORY_CFTROUT_PAT( tag, f ) printPolyPattern( tag, f, rPar( currRing ) )
@@ -215,14 +215,14 @@ poly singclap_gcd ( poly f, poly g )
   {
     CanonicalForm newGCD(const CanonicalForm & A, const CanonicalForm & B);
     setCharacteristic( nGetChar() );
-    CanonicalForm F( convSingPClapP( f ) ), G( convSingPClapP( g ) );
+    CanonicalForm F( convSingPFactoryP( f ) ), G( convSingPFactoryP( g ) );
     //if (nGetChar() > 1 )
     //{
-    //  res=convClapPSingP( newGCD( F,G ));
+    //  res=convFactoryPSingP( newGCD( F,G ));
     //  if (!nGreaterZero(pGetCoeff(res))) res=pNeg(res);
     //}
     //else
-      res=convClapPSingP( gcd( F, G ) );
+      res=convFactoryPSingP( gcd( F, G ) );
   }
   // and over Q(a) / Fp(a)
   else if (( nGetChar()==1 ) /* Q(a) */
@@ -236,30 +236,30 @@ poly singclap_gcd ( poly f, poly g )
       if ( nGetChar()==1 ) /* Q(a) */
       {
       //  WerrorS( feNotImplemented );
-        CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
+        CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
         //Varlist ord;
         //ord.append(mipo.mvar());
         CFList as(mipo);
         Variable a=rootOf(mipo);
-        //CanonicalForm F( convSingAPClapAP( f,a ) ), G( convSingAPClapAP( g,a ) );
-        CanonicalForm F( convSingTrPClapP(f) ), G( convSingTrPClapP(g) );
-        //res= convClapAPSingAP( algcd( F, G, as, ord) );
-        //res= convClapAPSingAP( alg_gcd( F, G, as) );
-        res= convClapAPSingAP( alg_gcd( F, G, as) );
+        //CanonicalForm F( convSingAPFactoryAP( f,a ) ), G( convSingAPFactoryAP( g,a ) );
+        CanonicalForm F( convSingTrPFactoryP(f) ), G( convSingTrPFactoryP(g) );
+        //res= convFactoryAPSingAP( algcd( F, G, as, ord) );
+        //res= convFactoryAPSingAP( alg_gcd( F, G, as) );
+        res= convFactoryAPSingAP( alg_gcd( F, G, as) );
       }
       else
       #endif
       {
-        CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
+        CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
         Variable a=rootOf(mipo);
-        CanonicalForm F( convSingAPClapAP( f,a ) ), G( convSingAPClapAP( g,a ) );
-        res= convClapAPSingAP( gcd( F, G ) );
+        CanonicalForm F( convSingAPFactoryAP( f,a ) ), G( convSingAPFactoryAP( g,a ) );
+        res= convFactoryAPSingAP( gcd( F, G ) );
       }
     }
     else
     {
-      CanonicalForm F( convSingTrPClapP( f ) ), G( convSingTrPClapP( g ) );
-      res= convClapPSingTrP( gcd( F, G ) );
+      CanonicalForm F( convSingTrPFactoryP( f ) ), G( convSingTrPFactoryP( g ) );
+      res= convFactoryPSingTrP( gcd( F, G ) );
     }
   }
   #if 0
@@ -270,8 +270,8 @@ poly singclap_gcd ( poly f, poly g )
     int t=p*p;
     while (t!=nChar) { t*=p;n++; }
     setCharacteristic(p,n,'a');
-    CanonicalForm F( convSingGFClapGF( f ) ), G( convSingGFClapGF( g ) );
-    res= convClapGFSingGF( gcd( F, G ) );
+    CanonicalForm F( convSingGFFactoryGF( f ) ), G( convSingGFFactoryGF( g ) );
+    res= convFactoryGFSingGF( gcd( F, G ) );
   }
   #endif
   else
@@ -315,8 +315,8 @@ poly singclap_resultant ( poly f, poly g , poly x)
   {
     Variable X(i);
     setCharacteristic( nGetChar() );
-    CanonicalForm F( convSingPClapP( f ) ), G( convSingPClapP( g ) );
-    poly res=convClapPSingP( resultant( F, G, X ) );
+    CanonicalForm F( convSingPFactoryP( f ) ), G( convSingPFactoryP( g ) );
+    poly res=convFactoryPSingP( resultant( F, G, X ) );
     Off(SW_RATIONAL);
     return res;
   }
@@ -331,10 +331,10 @@ poly singclap_resultant ( poly f, poly g , poly x)
     if (currRing->minpoly!=NULL)
     {
       //Variable X(i);
-      CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
+      CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
       Variable a=rootOf(mipo);
-      CanonicalForm F( convSingAPClapAP( f,a ) ), G( convSingAPClapAP( g,a ) );
-      res= convClapAPSingAP( resultant( F, G, X ) );
+      CanonicalForm F( convSingAPFactoryAP( f,a ) ), G( convSingAPFactoryAP( g,a ) );
+      res= convFactoryAPSingAP( resultant( F, G, X ) );
     }
     else
     {
@@ -344,8 +344,8 @@ poly singclap_resultant ( poly f, poly g , poly x)
       int ef,eg;
       ef=pGetExp_Var(f,i);
       eg=pGetExp_Var(g,i);
-      CanonicalForm F( convSingTrPClapP( f ) ), G( convSingTrPClapP( g ) );
-      res= convClapPSingTrP( resultant( F, G, X ) );
+      CanonicalForm F( convSingTrPFactoryP( f ) ), G( convSingTrPFactoryP( g ) );
+      res= convFactoryPSingTrP( resultant( F, G, X ) );
       if ((nf!=NULL)&&(!nIsOne(nf))&&(!nIsZero(nf)))
       {
         number n=nInvers(nf);
@@ -447,7 +447,7 @@ BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb )
   && (currRing->parameter==NULL))
   {
     setCharacteristic( nGetChar() );
-    CanonicalForm F( convSingPClapP( f ) ), G( convSingPClapP( g ) );
+    CanonicalForm F( convSingPFactoryP( f ) ), G( convSingPFactoryP( g ) );
     CanonicalForm FpG=F+G;
     if (!(FpG.isUnivariate()|| FpG.inCoeffDomain()))
     //if (!F.isUnivariate() || !G.isUnivariate() || F.mvar()!=G.mvar())
@@ -458,9 +458,9 @@ BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb )
     }
     CanonicalForm Fa,Gb;
     On(SW_RATIONAL);
-    res=convClapPSingP( extgcd( F, G, Fa, Gb ) );
-    pa=convClapPSingP(Fa);
-    pb=convClapPSingP(Gb);
+    res=convFactoryPSingP( extgcd( F, G, Fa, Gb ) );
+    pa=convFactoryPSingP(Fa);
+    pb=convFactoryPSingP(Gb);
     Off(SW_RATIONAL);
   }
   // and over Q(a) / Fp(a)
@@ -472,9 +472,9 @@ BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb )
     CanonicalForm Fa,Gb;
     if (currRing->minpoly!=NULL)
     {
-      CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
+      CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
       Variable a=rootOf(mipo);
-      CanonicalForm F( convSingAPClapAP( f,a ) ), G( convSingAPClapAP( g,a ) );
+      CanonicalForm F( convSingAPFactoryAP( f,a ) ), G( convSingAPFactoryAP( g,a ) );
       CanonicalForm FpG=F+G;
       if (!(FpG.isUnivariate()|| FpG.inCoeffDomain()))
       //if (!F.isUnivariate() || !G.isUnivariate() || F.mvar()!=G.mvar())
@@ -482,13 +482,13 @@ BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb )
         WerrorS("not univariate");
         return TRUE;
       }
-      res= convClapAPSingAP( extgcd( F, G, Fa, Gb ) );
-      pa=convClapAPSingAP(Fa);
-      pb=convClapAPSingAP(Gb);
+      res= convFactoryAPSingAP( extgcd( F, G, Fa, Gb ) );
+      pa=convFactoryAPSingAP(Fa);
+      pb=convFactoryAPSingAP(Gb);
     }
     else
     {
-      CanonicalForm F( convSingTrPClapP( f ) ), G( convSingTrPClapP( g ) );
+      CanonicalForm F( convSingTrPFactoryP( f ) ), G( convSingTrPFactoryP( g ) );
       CanonicalForm FpG=F+G;
       if (!(FpG.isUnivariate()|| FpG.inCoeffDomain()))
       //if (!F.isUnivariate() || !G.isUnivariate() || F.mvar()!=G.mvar())
@@ -497,9 +497,9 @@ BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb )
         WerrorS("not univariate");
         return TRUE;
       }
-      res= convClapPSingTrP( extgcd( F, G, Fa, Gb ) );
-      pa=convClapPSingTrP(Fa);
-      pb=convClapPSingTrP(Gb);
+      res= convFactoryPSingTrP( extgcd( F, G, Fa, Gb ) );
+      pa=convFactoryPSingTrP(Fa);
+      pb=convFactoryPSingTrP(Gb);
     }
     Off(SW_RATIONAL);
   }
@@ -521,8 +521,8 @@ poly singclap_pdivide ( poly f, poly g )
   && (currRing->parameter==NULL))
   {
     setCharacteristic( nGetChar() );
-    CanonicalForm F( convSingPClapP( f ) ), G( convSingPClapP( g ) );
-    res = convClapPSingP( F / G );
+    CanonicalForm F( convSingPFactoryP( f ) ), G( convSingPFactoryP( g ) );
+    res = convFactoryPSingP( F / G );
   }
   // and over Q(a) / Fp(a)
   else if (( nGetChar()==1 ) /* Q(a) */
@@ -532,15 +532,15 @@ poly singclap_pdivide ( poly f, poly g )
     else               setCharacteristic( -nGetChar() );
     if (currRing->minpoly!=NULL)
     {
-      CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
+      CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
       Variable a=rootOf(mipo);
-      CanonicalForm F( convSingAPClapAP( f,a ) ), G( convSingAPClapAP( g,a ) );
-      res= convClapAPSingAP(  F / G  );
+      CanonicalForm F( convSingAPFactoryAP( f,a ) ), G( convSingAPFactoryAP( g,a ) );
+      res= convFactoryAPSingAP(  F / G  );
     }
     else
     {
-      CanonicalForm F( convSingTrPClapP( f ) ), G( convSingTrPClapP( g ) );
-      res= convClapPSingTrP(  F / G  );
+      CanonicalForm F( convSingTrPFactoryP( f ) ), G( convSingTrPFactoryP( g ) );
+      res= convFactoryPSingTrP(  F / G  );
     }
   }
   else
@@ -611,8 +611,8 @@ void singclap_divide_content ( poly f )
       pIter(p);
     }
     FACTORY_ALGOUT( "G", ((lnumber)g1)->z );
-    g = convSingTrClapP( ((lnumber)g1)->z );
-    g = gcd( g, convSingTrClapP( ((lnumber)g2)->z ));
+    g = convSingTrFactoryP( ((lnumber)g1)->z );
+    g = gcd( g, convSingTrFactoryP( ((lnumber)g2)->z ));
 
     // second run: gcd's
 
@@ -621,7 +621,7 @@ void singclap_divide_content ( poly f )
     while ( (p != NULL) && (g != 1)  && ( g != 0))
     {
       FACTORY_ALGOUT( "h", (((lnumber)pGetCoeff(p))->z) );
-      h = convSingTrClapP( ((lnumber)pGetCoeff(p))->z );
+      h = convSingTrFactoryP( ((lnumber)pGetCoeff(p))->z );
       pIter( p );
 #ifdef FACTORY_GCD_STAT
       // save g
@@ -652,7 +652,7 @@ void singclap_divide_content ( poly f )
       {
         lnumber c=(lnumber)pGetCoeff(p);
         napDelete(&c->z);
-        c->z=convClapPSingTr( i.getItem() / g );
+        c->z=convFactoryPSingTr( i.getItem() / g );
         //nTest((number)c);
         //#ifdef LDEBUG
         //number cn=(number)c;
@@ -690,8 +690,8 @@ BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac)
     if (( nGetChar() == 0 || nGetChar() > 1 )
     && (currRing->parameter==NULL))
     {
-      F=convSingPClapP( f );
-      FAC=convSingPClapP( fac );
+      F=convSingPFactoryP( f );
+      FAC=convSingPFactoryP( fac );
     }
     // and over Q(a) / Fp(a)
     else if (( nGetChar()==1 ) /* Q(a) */
@@ -699,15 +699,15 @@ BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac)
     {
       if (currRing->minpoly!=NULL)
       {
-        CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
+        CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
         a=rootOf(mipo);
-        F=convSingAPClapAP( f,a );
-        FAC=convSingAPClapAP( fac,a );
+        F=convSingAPFactoryAP( f,a );
+        FAC=convSingAPFactoryAP( fac,a );
       }
       else
       {
-        F=convSingTrPClapP( f );
-        FAC=convSingTrPClapP( fac );
+        F=convSingTrPFactoryP( f );
+        FAC=convSingTrPFactoryP( fac );
       }
     }
     else
@@ -726,18 +726,18 @@ BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac)
         if (( nGetChar() == 0 || nGetChar() > 1 )
         && (currRing->parameter==NULL))
         {
-          q = convClapPSingP( Q );
+          q = convFactoryPSingP( Q );
         }
         else if (( nGetChar()==1 ) /* Q(a) */
         || (nGetChar() <-1))       /* Fp(a) */
         {
           if (currRing->minpoly!=NULL)
           {
-            q= convClapAPSingAP(  Q  );
+            q= convFactoryAPSingAP(  Q  );
           }
           else
           {
-            q= convClapPSingTrP(  Q  );
+            q= convFactoryPSingTrP(  Q  );
           }
         }
         e++; pDelete(&f); f=q; q=NULL; F=Q;
@@ -886,7 +886,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   if (rField_is_Q() || rField_is_Zp())
   {
     setCharacteristic( nGetChar() );
-    CanonicalForm F( convSingPClapP( f ) );
+    CanonicalForm F( convSingPFactoryP( f ) );
     if (nGetChar()==0) /* Q */
     {
       L = factorize( F );
@@ -910,7 +910,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   {
     int c=rChar(currRing);
     setCharacteristic( c, primepower(c) );
-    CanonicalForm F( convSingGFClapGF( f ) );
+    CanonicalForm F( convSingGFFactoryGF( f ) );
     if (F.isUnivariate())
     {
       L = factorize( F );
@@ -928,9 +928,9 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     else                 setCharacteristic( -nGetChar() );
     if (currRing->minpoly!=NULL)
     {
-      CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
+      CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
       Variable a=rootOf(mipo);
-      CanonicalForm F( convSingAPClapAP( f,a ) );
+      CanonicalForm F( convSingAPFactoryAP( f,a ) );
       L.insert(F);
       if (rField_is_Zp_a() && F.isUnivariate())
       {
@@ -938,7 +938,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       }
       else
       {
-        CanonicalForm G( convSingTrPClapP( f ) );
+        CanonicalForm G( convSingTrPFactoryP( f ) );
 #ifdef HAVE_LIBFAC_P
         //  over Q(a) / multivariate over Fp(a)
         do
@@ -968,7 +968,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     }
     else
     {
-      CanonicalForm F( convSingTrPClapP( f ) );
+      CanonicalForm F( convSingTrPFactoryP( f ) );
       if (rField_is_Q_a())
       {
         L = factorize( F );
@@ -1011,20 +1011,20 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       poly p;
       if (with_exps!=1) (**v)[j] = J.getItem().exp();
       if (rField_is_Zp() || rField_is_Q())           /* Q, Fp */
-        //count_Factors(res,*v,f, j, convClapPSingP( J.getItem().factor() );
-        res->m[j] = convClapPSingP( J.getItem().factor() );
+        //count_Factors(res,*v,f, j, convFactoryPSingP( J.getItem().factor() );
+        res->m[j] = convFactoryPSingP( J.getItem().factor() );
       #if 0
       else if (rField_is_GF())
-        res->m[j] = convClapGFSingGF( J.getItem().factor() );
+        res->m[j] = convFactoryGFSingGF( J.getItem().factor() );
       #endif
       else if (rField_is_Extension())     /* Q(a), Fp(a) */
       {
         intvec *w=NULL;
         if (v!=NULL) w=*v;
         if (currRing->minpoly==NULL)
-          count_Factors(res,w,j,ff,convClapPSingTrP( J.getItem().factor() ));
+          count_Factors(res,w,j,ff,convFactoryPSingTrP( J.getItem().factor() ));
         else
-          count_Factors(res,w,j,ff,convClapAPSingAP( J.getItem().factor() ));
+          count_Factors(res,w,j,ff,convFactoryAPSingAP( J.getItem().factor() ));
       }
     }
     if (rField_is_Extension() && (!pIsConstantPoly(ff)))
@@ -1185,7 +1185,7 @@ matrix singclap_irrCharSeries ( ideal I)
       {
         p=pCopy(p);
         pCleardenom(p);
-        L.append(convSingPClapP(p));
+        L.append(convSingPFactoryP(p));
       }
     }
   }
@@ -1202,7 +1202,7 @@ matrix singclap_irrCharSeries ( ideal I)
       {
         p=pCopy(p);
         pCleardenom(p);
-        L.append(convSingTrPClapP(p));
+        L.append(convSingTrPFactoryP(p));
       }
     }
   }
@@ -1245,9 +1245,9 @@ matrix singclap_irrCharSeries ( ideal I)
     for (n=1, Li = LLi.getItem(); Li.hasItem(); Li++, n++)
     {
       if ( (nGetChar() == 0) || (nGetChar() > 1) )
-        MATELEM(res,m,n)=convClapPSingP(Li.getItem());
+        MATELEM(res,m,n)=convFactoryPSingP(Li.getItem());
       else
-        MATELEM(res,m,n)=convClapPSingTrP(Li.getItem());
+        MATELEM(res,m,n)=convFactoryPSingTrP(Li.getItem());
     }
   }
   Off(SW_RATIONAL);
@@ -1270,7 +1270,7 @@ char* singclap_neworder ( ideal I)
     setCharacteristic( nGetChar() );
     for(i=0;i<IDELEMS(I);i++)
     {
-      L.append(convSingPClapP(I->m[i]));
+      L.append(convSingPFactoryP(I->m[i]));
     }
   }
   // and over Q(a) / Fp(a)
@@ -1281,7 +1281,7 @@ char* singclap_neworder ( ideal I)
     else               setCharacteristic( -nGetChar() );
     for(i=0;i<IDELEMS(I);i++)
     {
-      L.append(convSingTrPClapP(I->m[i]));
+      L.append(convSingTrPFactoryP(I->m[i]));
     }
   }
   else
@@ -1353,7 +1353,7 @@ BOOLEAN singclap_isSqrFree(poly f)
   &&(currRing->parameter==NULL))
   {
     setCharacteristic( nGetChar() );
-    CanonicalForm F( convSingPClapP( f ) );
+    CanonicalForm F( convSingPFactoryP( f ) );
     if((nGetChar()>1)&&(!F.isUnivariate()))
       goto err;
     b=(BOOLEAN)isSqrFree(F);
@@ -1366,14 +1366,14 @@ BOOLEAN singclap_isSqrFree(poly f)
     else               setCharacteristic( -nGetChar() );
     //if (currRing->minpoly!=NULL)
     //{
-    //  CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
+    //  CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
     //  Variable a=rootOf(mipo);
-    //  CanonicalForm F( convSingAPClapAP( f,a ) );
+    //  CanonicalForm F( convSingAPFactoryAP( f,a ) );
     //  ...
     //}
     //else
     {
-      CanonicalForm F( convSingTrPClapP( f ) );
+      CanonicalForm F( convSingTrPFactoryP( f ) );
       b=(BOOLEAN)isSqrFree(F);
     }
     Off(SW_RATIONAL);
@@ -1405,10 +1405,10 @@ poly singclap_det( const matrix m )
     {
       for(j=r;j>0;j--)
       {
-        M(i,j)=convSingPClapP(MATELEM(m,i,j));
+        M(i,j)=convSingPFactoryP(MATELEM(m,i,j));
       }
     }
-    res= convClapPSingP( determinant(M,r) ) ;
+    res= convFactoryPSingP( determinant(M,r) ) ;
   }
   // and over Q(a) / Fp(a)
   else if (( nGetChar()==1 ) /* Q(a) */
@@ -1420,17 +1420,17 @@ poly singclap_det( const matrix m )
     poly res;
     if (currRing->minpoly!=NULL)
     {
-      CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
+      CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
       Variable a=rootOf(mipo);
       int i,j;
       for(i=r;i>0;i--)
       {
         for(j=r;j>0;j--)
         {
-          M(i,j)=convSingAPClapAP(MATELEM(m,i,j),a);
+          M(i,j)=convSingAPFactoryAP(MATELEM(m,i,j),a);
         }
       }
-      res= convClapAPSingAP( determinant(M,r) ) ;
+      res= convFactoryAPSingAP( determinant(M,r) ) ;
     }
     else
     {
@@ -1439,10 +1439,10 @@ poly singclap_det( const matrix m )
       {
         for(j=r;j>0;j--)
         {
-          M(i,j)=convSingTrPClapP(MATELEM(m,i,j));
+          M(i,j)=convSingTrPFactoryP(MATELEM(m,i,j));
         }
       }
-      res= convClapPSingTrP( determinant(M,r) );
+      res= convFactoryPSingTrP( determinant(M,r) );
     }
   }
   else
@@ -1463,7 +1463,7 @@ int singclap_det_i( intvec * m )
       M(i,j)=IMATELEM(*m,i,j);
     }
   }
-  int res= convClapISingI( determinant(M,m->rows())) ;
+  int res= convFactoryISingI( determinant(M,m->rows())) ;
   Off(SW_RATIONAL);
   return res;
 }
@@ -1479,9 +1479,9 @@ napoly singclap_alglcm ( napoly f, napoly g )
 
  if (currRing->minpoly!=NULL)
  {
-   CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
+   CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
    Variable a=rootOf(mipo);
-   CanonicalForm F( convSingAClapA( f,a ) ), G( convSingAClapA( g,a ) );
+   CanonicalForm F( convSingAFactoryA( f,a ) ), G( convSingAFactoryA( g,a ) );
    CanonicalForm GCD;
 
    TIMING_START( algLcmTimer );
@@ -1497,11 +1497,11 @@ napoly singclap_alglcm ( napoly f, napoly g )
    FACTORY_GCDSTAT( "alcm:", F, G, GCD );
 
    // calculate lcm
-   res= convClapASingA( (F/GCD)*G );
+   res= convFactoryASingA( (F/GCD)*G );
  }
  else
  {
-   CanonicalForm F( convSingTrClapP( f ) ), G( convSingTrClapP( g ) );
+   CanonicalForm F( convSingTrFactoryP( f ) ), G( convSingTrFactoryP( g ) );
    CanonicalForm GCD;
    TIMING_START( algLcmTimer );
    // calculate gcd
@@ -1516,7 +1516,7 @@ napoly singclap_alglcm ( napoly f, napoly g )
    FACTORY_GCDSTAT( "alcm:", F, G, GCD );
 
    // calculate lcm
-   res= convClapPSingTr( (F/GCD)*G );
+   res= convFactoryPSingTr( (F/GCD)*G );
  }
 
  Off(SW_RATIONAL);
@@ -1536,9 +1536,9 @@ void singclap_algdividecontent ( napoly f, napoly g, napoly &ff, napoly &gg )
 
  if (currRing->minpoly!=NULL)
  {
-   CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
+   CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
    Variable a=rootOf(mipo);
-   CanonicalForm F( convSingAClapA( f,a ) ), G( convSingAClapA( g,a ) );
+   CanonicalForm F( convSingAFactoryA( f,a ) ), G( convSingAFactoryA( g,a ) );
    CanonicalForm GCD;
 
    TIMING_START( algContentTimer );
@@ -1554,13 +1554,13 @@ void singclap_algdividecontent ( napoly f, napoly g, napoly &ff, napoly &gg )
 
    if ((GCD!=1) && (GCD!=0))
    {
-     ff= convClapASingA( F/ GCD );
-     gg= convClapASingA( G/ GCD );
+     ff= convFactoryASingA( F/ GCD );
+     gg= convFactoryASingA( G/ GCD );
    }
  }
  else
  {
-   CanonicalForm F( convSingTrClapP( f ) ), G( convSingTrClapP( g ) );
+   CanonicalForm F( convSingTrFactoryP( f ) ), G( convSingTrFactoryP( g ) );
    CanonicalForm GCD;
 
    TIMING_START( algContentTimer );
@@ -1576,8 +1576,8 @@ void singclap_algdividecontent ( napoly f, napoly g, napoly &ff, napoly &gg )
 
    if ((GCD!=1) && (GCD!=0))
    {
-     ff= convClapPSingTr( F/ GCD );
-     gg= convClapPSingTr( G/ GCD );
+     ff= convFactoryPSingTr( F/ GCD );
+     gg= convFactoryPSingTr( G/ GCD );
    }
  }
 
@@ -1607,7 +1607,7 @@ lists singclap_chineseRemainder(lists x, lists q)
     else if (x->m[i-1].Typ()==NUMBER_CMD)
     {
       number N=(number)x->m[i-1].Data();
-      X[i]=convSingNClapN(N);
+      X[i]=convSingNFactoryN(N);
     }
     else
     {
@@ -1622,7 +1622,7 @@ lists singclap_chineseRemainder(lists x, lists q)
     else if (q->m[i-1].Typ()==NUMBER_CMD)
     {
       number N=(number)x->m[i-1].Data();
-      Q[i]=convSingNClapN(N);
+      Q[i]=convSingNFactoryN(N);
     }
     else
     {
@@ -1636,8 +1636,8 @@ lists singclap_chineseRemainder(lists x, lists q)
   res->Init(2);
   res->m[0].rtyp=NUMBER_CMD;
   res->m[1].rtyp=NUMBER_CMD;
-  res->m[0].data=(char *)convClapNSingN( r );
-  res->m[1].data=(char *)convClapNSingN( prod );
+  res->m[0].data=(char *)convFactoryNSingN( r );
+  res->m[1].data=(char *)convFactoryNSingN( prod );
   return res;
 }
 #endif

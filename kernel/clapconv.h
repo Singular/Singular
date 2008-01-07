@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.h,v 1.2 2005-06-13 16:23:30 Singular Exp $
+// $Id: clapconv.h,v 1.3 2008-01-07 13:36:16 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -15,32 +15,33 @@
 #include "longalg.h"
 #include <factory.h>
 
-napoly convClapPSingTr ( const CanonicalForm & f );
-CanonicalForm convSingTrClapP( napoly p );
+napoly convFactoryPSingTr ( const CanonicalForm & f );
+CanonicalForm convSingTrFactoryP( napoly p );
 
-poly convClapPSingP ( const CanonicalForm & f );
-#define  convSingPClapP(p) conv_SingPClapP(p,currRing)
+#define  convSingPFactoryP(p) conv_SingPFactoryP(p,currRing)
 
-poly conv_ClapPSingP ( const CanonicalForm & f, ring r );
-CanonicalForm conv_SingPClapP( poly p, ring r );
+poly conv_FactoryPSingP ( const CanonicalForm & f, ring r );
+CanonicalForm conv_SingPFactoryP( poly p, ring r );
 
-CanonicalForm convSingAPClapAP ( poly p , const Variable & a );
-poly convClapAPSingAP ( const CanonicalForm & f );
-poly convClapAPSingAP_R ( const CanonicalForm & f, int par_start, int var_start );
+#define  convFactoryPSingP(p) conv_FactoryPSingP(p,currRing)
 
-CanonicalForm convSingGFClapGF ( poly p );
-poly convClapGFSingGF ( const CanonicalForm & f );
+CanonicalForm convSingAPFactoryAP ( poly p , const Variable & a );
+poly convFactoryAPSingAP ( const CanonicalForm & f );
+poly convFactoryAPSingAP_R ( const CanonicalForm & f, int par_start, int var_start );
 
-CanonicalForm convSingAClapA ( napoly p , const Variable & a );
-napoly convClapASingA ( const CanonicalForm & f );
+CanonicalForm convSingGFFactoryGF ( poly p );
+poly convFactoryGFSingGF ( const CanonicalForm & f );
 
-CanonicalForm convSingTrPClapP ( poly p );
-poly convClapPSingTrP ( const CanonicalForm & f );
+CanonicalForm convSingAFactoryA ( napoly p , const Variable & a );
+napoly convFactoryASingA ( const CanonicalForm & f );
 
-CanonicalForm convSingNClapN( number n );
-number convClapNSingN( const CanonicalForm & n);
+CanonicalForm convSingTrPFactoryP ( poly p );
+poly convFactoryPSingTrP ( const CanonicalForm & f );
+
+CanonicalForm convSingNFactoryN( number n );
+number convFactoryNSingN( const CanonicalForm & n);
 
 
-// CanonicalForm convSingIClapI( int i);a <- by constructor of CanonicalForm
-int convClapISingI( const CanonicalForm & f);
+// CanonicalForm convSingIFactoryI( int i);a <- by constructor of CanonicalForm
+int convFactoryISingI( const CanonicalForm & f);
 #endif /* INCL_SINGCONV_H */

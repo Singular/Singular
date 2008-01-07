@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.25 2007-09-13 14:27:50 Singular Exp $ */
+/* $Id: longrat.cc,v 1.26 2008-01-07 13:36:16 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -63,7 +63,7 @@
 **  NULL represents only deleted values
 */
 #define SR_HDL(A) ((long)(A))
-/*#define SR_INT    1*/
+/*#define SR_INT    1L*/
 /*#define INT_TO_SR(INT)  ((number) (((long)INT << 2) + SR_INT))*/
 // #define SR_TO_INT(SR)   (((long)SR) >> 2)
 

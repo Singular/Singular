@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.30 2007-07-24 16:55:07 Singular Exp $ */
+/* $Id: longalg.cc,v 1.31 2008-01-07 13:36:16 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1678,18 +1678,18 @@ number naGcd(number a, number b, const ring r)
   {
     napoly rz=napGcd(x->z, y->z);
     CanonicalForm F, G, R;
-    R=convSingTrClapP(rz); 
+    R=convSingTrFactoryP(rz); 
     napNormalize(x->z);
-    F=convSingTrClapP(x->z)/R; 
+    F=convSingTrFactoryP(x->z)/R; 
     napNormalize(y->z);
-    G=convSingTrClapP(y->z)/R; 
+    G=convSingTrFactoryP(y->z)/R; 
     F = gcd( F, G );
     if (F.isOne()) 
       result->z= rz;
     else
     {
       napDelete(&rz);
-      result->z=convClapPSingTr( F*R );
+      result->z=convFactoryPSingTr( F*R );
       napNormalize(result->z);
     }
   }
