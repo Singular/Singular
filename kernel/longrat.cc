@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.26 2008-01-07 13:36:16 Singular Exp $ */
+/* $Id: longrat.cc,v 1.27 2008-01-07 13:38:55 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -1156,6 +1156,7 @@ void nlNormalize (number &x)
         MPZ_EXACTDIV(&r,&x->n,&gcd);
         mpz_set(&x->n,&r);
         mpz_clear(&r);
+        mpz_clear(&gcd);
         if (mpz_cmp_si(&x->n,(long)1)==0)
         {
           mpz_clear(&x->n);
@@ -1177,7 +1178,6 @@ void nlNormalize (number &x)
           x->s=3;
         }
       }
-      mpz_clear(&gcd);
     }
   }
 #ifdef LDEBUG
