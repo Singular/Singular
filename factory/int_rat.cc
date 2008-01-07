@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_rat.cc,v 1.14 2007-12-04 15:24:53 Singular Exp $ */
+/* $Id: int_rat.cc,v 1.15 2008-01-07 13:33:11 Singular Exp $ */
 
 #include <config.h>
 
@@ -20,7 +20,8 @@ static int intgcd( int a, int b )
 
     int c;
 
-    while ( b != 0 ) {
+    while ( b != 0 )
+    {
         c = a % b;
         a = b;
         b = c;
@@ -44,17 +45,21 @@ InternalRational::InternalRational( const int i )
 InternalRational::InternalRational( const int n, const int d )
 {
     ASSERT( d != 0, "divide by zero" );
-    if ( n == 0 ) {
+    if ( n == 0 )
+    {
         mpz_init_set_si( &_num, 0 );
         mpz_init_set_si( &_den, 1 );
     }
-    else {
+    else
+    {
         int g = intgcd( n, d );
-        if ( d < 0 ) {
+        if ( d < 0 )
+        {
             mpz_init_set_si( &_num, -n / g );
             mpz_init_set_si( &_den, -d / g );
         }
-        else {
+        else
+        {
             mpz_init_set_si( &_num, n / g );
             mpz_init_set_si( &_den, d / g );
         }
@@ -132,11 +137,13 @@ InternalCF* InternalRational::genOne()
 // docu: see CanonicalForm::num(), den()
 InternalCF * InternalRational::num ()
 {
-    if ( mpz_is_imm( &_num ) ) {
+    if ( mpz_is_imm( &_num ) )
+    {
         InternalCF * res = int2imm( mpz_get_si( &_num ) );
         return res;
     }
-    else {
+    else
+    {
         MP_INT dummy;
         mpz_init_set( &dummy, &_num );
         return new InternalInteger( dummy );
@@ -145,11 +152,13 @@ InternalCF * InternalRational::num ()
 
 InternalCF * InternalRational::den ()
 {
-    if ( mpz_is_imm( &_den ) ) {
+    if ( mpz_is_imm( &_den ) )
+    {
         InternalCF * res = int2imm( mpz_get_si( &_den ) );
         return res;
     }
-    else {
+    else
+    {
         MP_INT dummy;
         mpz_init_set( &dummy, &_den );
         return new InternalInteger( dummy );
@@ -162,7 +171,8 @@ InternalCF * InternalRational::den ()
 InternalCF *
 InternalRational::neg ()
 {
-    if ( getRefCount() > 1 ) {
+    if ( getRefCount() > 1 )
+    {
         decRefCount();
         MP_INT dummy_num;
         MP_INT dummy_den;
@@ -170,7 +180,9 @@ InternalRational::neg ()
         mpz_init_set( &dummy_den, &_den );
         mpz_neg( &dummy_num, &dummy_num );
         return new InternalRational( dummy_num, dummy_den );
-    } else {
+    }
+    else
+    {
         mpz_neg( &_num, &_num );
         return this;
     }
@@ -185,13 +197,15 @@ InternalCF* InternalRational::addsame( InternalCF * c )
     mpz_init( &g ); mpz_init( &n ); mpz_init( &d );
     mpz_gcd( &g, &_den, &MPQDEN( c ) );
 
-    if ( mpz_cmp_si( &g, 1 ) == 0 ) {
+    if ( mpz_cmp_si( &g, 1 ) == 0 )
+    {
         mpz_mul( &n, &_den, &MPQNUM( c ) );
         mpz_mul( &g, &_num, &MPQDEN( c ) );
         mpz_add( &n, &n, &g );
         mpz_mul( &d, &_den, &MPQDEN( c ) );
     }
-    else {
+    else
+    {
         MP_INT tmp1;
         MP_INT tmp2;
         mpz_init( &tmp1 );
@@ -203,7 +217,8 @@ InternalCF* InternalRational::addsame( InternalCF * c )
         mpz_mul( &tmp1, &tmp1, &MPQNUM( c ) );
         mpz_add( &n, &tmp1, &tmp2 );
         mpz_gcd( &g, &n, &d );
-        if ( mpz_cmp_si( &g, 1 ) != 0 ) {
+        if ( mpz_cmp_si( &g, 1 ) != 0 )
+        {
             mpz_div( &n, &n, &g );
             mpz_div( &d, &d, &g );
         }
@@ -212,13 +227,16 @@ InternalCF* InternalRational::addsame( InternalCF * c )
     }
     mpz_clear( &g );
     if ( deleteObject() ) delete this;
-    if ( mpz_cmp_si( &d, 1 ) == 0 ) {
-        if ( mpz_is_imm( &n ) ) {
+    if ( mpz_cmp_si( &d, 1 ) == 0 )
+    {
+        if ( mpz_is_imm( &n ) )
+        {
             InternalCF * res = int2imm( mpz_get_si( &n ) );
             mpz_clear( &n ); mpz_clear( &d );
             return res;
         }
-        else {
+        else
+        {
             mpz_clear( &d );
             return new InternalInteger( n );
         }
@@ -235,13 +253,15 @@ InternalCF* InternalRational::subsame( InternalCF * c )
     mpz_init( &g ); mpz_init( &n ); mpz_init( &d );
     mpz_gcd( &g, &_den, &MPQDEN( c ) );
 
-    if ( mpz_cmp_si( &g, 1 ) == 0 ) {
+    if ( mpz_cmp_si( &g, 1 ) == 0 )
+    {
         mpz_mul( &n, &_den, &MPQNUM( c ) );
         mpz_mul( &g, &_num, &MPQDEN( c ) );
         mpz_sub( &n, &g, &n );
         mpz_mul( &d, &_den, &MPQDEN( c ) );
     }
-    else {
+    else
+    {
         MP_INT tmp1;
         MP_INT tmp2;
         mpz_init( &tmp1 );
@@ -253,7 +273,8 @@ InternalCF* InternalRational::subsame( InternalCF * c )
         mpz_mul( &tmp1, &tmp1, &MPQNUM( c ) );
         mpz_sub( &n, &tmp2, &tmp1 );
         mpz_gcd( &g, &n, &d );
-        if ( mpz_cmp_si( &g, 1 ) != 0 ) {
+        if ( mpz_cmp_si( &g, 1 ) != 0 )
+        {
             mpz_div( &n, &n, &g );
             mpz_div( &d, &d, &g );
         }
@@ -262,13 +283,16 @@ InternalCF* InternalRational::subsame( InternalCF * c )
     }
     mpz_clear( &g );
     if ( deleteObject() ) delete this;
-    if ( mpz_cmp_si( &d, 1 ) == 0 ) {
-        if ( mpz_is_imm( &n ) ) {
+    if ( mpz_cmp_si( &d, 1 ) == 0 )
+    {
+        if ( mpz_is_imm( &n ) )
+        {
             InternalCF * res = int2imm( mpz_get_si( &n ) );
             mpz_clear( &n ); mpz_clear( &d );
             return res;
         }
-        else {
+        else
+        {
             mpz_clear( &d );
             return new InternalInteger( n );
         }
@@ -282,12 +306,14 @@ InternalCF* InternalRational::mulsame( InternalCF * c )
     ASSERT( ! ::is_imm( c ) && c->levelcoeff() == RationalDomain, "illegal domain" );
     MP_INT n, d;
 
-    if ( this == c ) {
+    if ( this == c )
+    {
         mpz_init( &n ); mpz_init( &d );
         mpz_mul( &n, &_num, &_num );
         mpz_mul( &d, &_den, &_den );
     }
-    else {
+    else
+    {
         MP_INT g1, g2, tmp1, tmp2;
         mpz_init( &g1 ); mpz_init( &g2 );
         mpz_init( &n ); mpz_init( &d );
@@ -318,13 +344,16 @@ InternalCF* InternalRational::mulsame( InternalCF * c )
         mpz_clear( &g1 ); mpz_clear( &g2 );
     }
     if ( deleteObject() ) delete this;
-    if ( mpz_cmp_si( &d, 1 ) == 0 ) {
-        if ( mpz_is_imm( &n ) ) {
+    if ( mpz_cmp_si( &d, 1 ) == 0 )
+    {
+        if ( mpz_is_imm( &n ) )
+        {
             InternalCF * res = int2imm( mpz_get_si( &n ) );
             mpz_clear( &n ); mpz_clear( &d );
             return res;
         }
-        else {
+        else
+        {
             mpz_clear( &d );
             return new InternalInteger( n );
         }
@@ -337,11 +366,13 @@ InternalCF* InternalRational::dividesame( InternalCF * c )
 {
     ASSERT( ! ::is_imm( c ) && c->levelcoeff() == RationalDomain, "illegal domain" );
 
-    if ( this == c ) {
+    if ( this == c )
+    {
         if ( deleteObject() ) delete this;
         return CFFactory::basic( 1 );
     }
-    else {
+    else
+    {
         MP_INT n, d;
         MP_INT g1, g2, tmp1, tmp2;
         mpz_init( &n ); mpz_init( &d );
@@ -376,13 +407,16 @@ InternalCF* InternalRational::dividesame( InternalCF * c )
             mpz_neg( &d, &d );
             mpz_neg( &n, &n );
         }
-        if ( mpz_cmp_si( &d, 1 ) == 0 ) {
-            if ( mpz_is_imm( &n ) ) {
+        if ( mpz_cmp_si( &d, 1 ) == 0 )
+        {
+            if ( mpz_is_imm( &n ) )
+            {
                 InternalCF * res = int2imm( mpz_get_si( &n ) );
                 mpz_clear( &n ); mpz_clear( &d );
                 return res;
             }
-            else {
+            else
+            {
                 mpz_clear( &d );
                 return new InternalInteger( n );
             }
@@ -455,7 +489,8 @@ InternalRational::comparesame ( InternalCF * c )
 int
 InternalRational::comparecoeff ( InternalCF* c )
 {
-    if ( ::is_imm( c ) ) {
+    if ( ::is_imm( c ) )
+    {
         ASSERT( ::is_imm( c ) == INTMARK, "incompatible base coefficients" );
         MP_INT dummy;
         mpz_init_set_si( &dummy, imm2int( c ) );
@@ -464,7 +499,8 @@ InternalRational::comparecoeff ( InternalCF* c )
         mpz_clear( &dummy );
         return result;
     }
-    else {
+    else
+    {
         ASSERT( c->levelcoeff() == IntegerDomain, "incompatible base coefficients" );
         MP_INT dummy;
         mpz_init( &dummy );
@@ -480,22 +516,26 @@ InternalCF* InternalRational::addcoeff( InternalCF* c )
 {
     ASSERT( ::is_imm( c ) == INTMARK || ! ::is_imm( c ), "expected integer" );
     MP_INT n, d;
-    if ( ::is_imm( c ) ) {
+    if ( ::is_imm( c ) )
+    {
         int cc = imm2int( c );
         if ( cc == 0 )
             return this;
-        else  if ( cc < 0 ) {
+        else  if ( cc < 0 )
+        {
             mpz_init( &n );
             mpz_mul_ui( &n, &_den, -cc );
             mpz_sub( &n, &_num, &n );
         }
-        else {
+        else
+        {
             mpz_init( &n );
             mpz_mul_ui( &n, &_den, cc );
             mpz_add( &n, &_num, &n );
         }
     }
-    else {
+    else
+    {
         ASSERT( c->levelcoeff() == IntegerDomain, "expected integer" );
         mpz_init( &n );
         mpz_mul( &n, &_den, &InternalInteger::MPI( c ) );
@@ -511,15 +551,19 @@ InternalCF* InternalRational::subcoeff( InternalCF* c, bool negate )
 {
     ASSERT( ::is_imm( c ) == INTMARK || ! ::is_imm( c ), "expected integer" );
     MP_INT n, d;
-    if ( ::is_imm( c ) ) {
+    if ( ::is_imm( c ) )
+    {
         int cc = imm2int( c );
         if ( cc == 0 )
-            if ( negate ) {
-                if ( getRefCount() == 1 ) {
+            if ( negate )
+            {
+                if ( getRefCount() == 1 )
+                {
                     mpz_neg( &_num, &_num );
                     return this;
                 }
-                else {
+                else
+                {
                     decRefCount();
                     mpz_init_set( &d, &_den );
                     mpz_init_set( &n, &_num );
@@ -530,7 +574,8 @@ InternalCF* InternalRational::subcoeff( InternalCF* c, bool negate )
             else
                 return this;
         mpz_init( &n );
-        if ( cc < 0 ) {
+        if ( cc < 0 )
+        {
             mpz_mul_ui( &n, &_den, -cc );
             mpz_neg( &n, &n );
         }
@@ -541,7 +586,8 @@ InternalCF* InternalRational::subcoeff( InternalCF* c, bool negate )
         else
             mpz_sub( &n, &_num, &n );
     }
-    else {
+    else
+    {
         ASSERT( c->levelcoeff() == IntegerDomain, "expected integer" );
         mpz_init( &n );
         mpz_mul( &n, &_den, &InternalInteger::MPI( c ) );
@@ -560,25 +606,30 @@ InternalCF* InternalRational::mulcoeff( InternalCF* c )
 {
     ASSERT( ::is_imm( c ) == INTMARK || ! ::is_imm( c ), "expected integer" );
     MP_INT n, d, g;
-    if ( ::is_imm( c ) ) {
+    if ( ::is_imm( c ) )
+    {
         int cc = imm2int( c );
-        if ( cc == 0 ) {
+        if ( cc == 0 )
+        {
             if ( deleteObject() ) delete this;
             return CFFactory::basic( 0 );
         }
         mpz_init_set_si( &n, cc );
     }
-    else {
+    else
+    {
         ASSERT( c->levelcoeff() == IntegerDomain, "expected integer" );
         mpz_init_set( &n, &InternalInteger::MPI( c ) );
     }
     mpz_init( &g );
     mpz_gcd( &g, &n, &_den );
-    if ( mpz_cmp_si( &g, 1 ) == 0 ) {
+    if ( mpz_cmp_si( &g, 1 ) == 0 )
+    {
         mpz_mul( &n, &n, &_num );
         mpz_init_set( &d, &_den );
     }
-    else {
+    else
+    {
         mpz_div( &n, &n, &g );
         mpz_mul( &n, &n, &_num );
         mpz_init( &d );
@@ -586,13 +637,16 @@ InternalCF* InternalRational::mulcoeff( InternalCF* c )
     }
     mpz_clear( &g );
     if ( deleteObject() ) delete this;
-    if ( mpz_cmp_si( &d, 1 ) == 0 ) {
-        if ( mpz_is_imm( &n ) ) {
+    if ( mpz_cmp_si( &d, 1 ) == 0 )
+    {
+        if ( mpz_is_imm( &n ) )
+        {
             InternalCF * res = int2imm( mpz_get_si( &n ) );
             mpz_clear( &n ); mpz_clear( &d );
             return res;
         }
-        else {
+        else
+        {
             mpz_clear( &d );
             return new InternalInteger( n );
         }
@@ -605,61 +659,74 @@ InternalCF* InternalRational::dividecoeff( InternalCF* c, bool invert )
 {
     ASSERT( ::is_imm( c ) == INTMARK || ! ::is_imm( c ), "expected integer" );
     MP_INT n, d, g;
-    if ( ::is_imm( c ) ) {
+    if ( ::is_imm( c ) )
+    {
         int cc = imm2int( c );
         ASSERT( c != 0 || invert, "divide by zero" );
-        if ( cc == 0 ) {
+        if ( cc == 0 )
+        {
             // => invert
             if ( deleteObject() ) delete this;
             return CFFactory::basic( 0 );
         }
-        if ( invert ) {
+        if ( invert )
+        {
             mpz_init_set_si( &n, cc );
             mpz_mul( &n, &n, &_den );
             mpz_init_set( &d, &_num );
         }
-        else {
+        else
+        {
             mpz_init_set_si( &d, cc );
             mpz_mul( &d, &d, &_den );
             mpz_init_set( &n, &_num );
         }
     }
-    else {
+    else
+    {
         ASSERT( c->levelcoeff() == IntegerDomain, "expected integer" );
-        if ( invert ) {
+        if ( invert )
+        {
             mpz_init_set( &n, &InternalInteger::MPI( c ) );
             mpz_mul( &n, &n, &_den );
             mpz_init_set( &d, &_num );
         }
-        else {
+        else
+        {
             mpz_init_set( &d, &InternalInteger::MPI( c ) );
             mpz_mul( &d, &d, &_den );
             mpz_init_set( &n, &_num );
         }
     }
-    if ( mpz_cmp_si( &d, 0 ) < 0 ) {
+    if ( mpz_cmp_si( &d, 0 ) < 0 )
+    {
         mpz_neg( &d, &d );
         mpz_neg( &n, &n );
     }
     mpz_init( &g );
     mpz_gcd( &g, &n, &d );
-    if ( mpz_cmp_si( &g, 1 ) != 0 ) {
+    if ( mpz_cmp_si( &g, 1 ) != 0 )
+    {
         mpz_div( &d, &d, &g );
         mpz_div( &n, &n, &g );
     }
     mpz_clear( &g );
     if ( deleteObject() ) delete this;
-    if ( ! invert ) {
+    if ( ! invert )
+    {
         // then there was no way for the result to become an integer
         return new InternalRational( n, d );
     }
-    if ( mpz_cmp_si( &d, 1 ) == 0 ) {
-        if ( mpz_is_imm( &n ) ) {
+    if ( mpz_cmp_si( &d, 1 ) == 0 )
+    {
+        if ( mpz_is_imm( &n ) )
+        {
             InternalCF * res = int2imm( mpz_get_si( &n ) );
             mpz_clear( &n ); mpz_clear( &d );
             return res;
         }
-        else {
+        else
+        {
             mpz_clear( &d );
             return new InternalInteger( n );
         }
@@ -750,6 +817,7 @@ InternalCF * InternalRational::normalize_myself()
         mpz_neg( &_den, &_den );
     }
     if ( mpz_cmp_si( &_den, 1 ) == 0 )
+    {
         if ( mpz_is_imm( &_num ) )
         {
             InternalCF * res = int2imm( mpz_get_si( &_num ) );
@@ -763,6 +831,7 @@ InternalCF * InternalRational::normalize_myself()
             delete this;
             return new InternalInteger( res );
         }
+    }
     else
         return this;
 }

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_int.cc,v 1.19 2007-12-04 15:24:53 Singular Exp $ */
+/* $Id: int_int.cc,v 1.20 2008-01-07 13:33:10 Singular Exp $ */
 
 #include <config.h>
 
@@ -85,13 +85,16 @@ InternalCF* InternalInteger::genOne()
 InternalCF *
 InternalInteger::neg ()
 {
-    if ( getRefCount() > 1 ) {
+    if ( getRefCount() > 1 )
+    {
         decRefCount();
         MP_INT dummy;
         mpz_init_set( &dummy, &thempi );
         mpz_neg( &dummy, &dummy );
         return new InternalInteger( dummy );
-    } else {
+    }
+    else
+    {
         mpz_neg( &thempi, &thempi );
         return this;
     }
@@ -101,12 +104,14 @@ InternalInteger::neg ()
 
 InternalCF* InternalInteger::addsame( InternalCF * c )
 {
-    if ( getRefCount() > 1 ) {
+    if ( getRefCount() > 1 )
+    {
         decRefCount();
         MP_INT dummy;
         mpz_init( &dummy );
         mpz_add( &dummy, &thempi, &MPI( c ) );
-        if ( mpz_is_imm( &dummy ) ) {
+        if ( mpz_is_imm( &dummy ) )
+        {
             InternalCF * res = int2imm( mpz_get_si( &dummy ) );
             mpz_clear( &dummy );
             return res;
@@ -114,9 +119,11 @@ InternalCF* InternalInteger::addsame( InternalCF * c )
         else
             return new InternalInteger( dummy );
     }
-    else {
+    else
+    {
         mpz_add( &thempi, &thempi, &MPI( c ) );
-        if ( mpz_is_imm( &thempi ) ) {
+        if ( mpz_is_imm( &thempi ) )
+        {
             InternalCF * res = int2imm( mpz_get_si( &thempi ) );
             delete this;
             return res;
@@ -128,12 +135,14 @@ InternalCF* InternalInteger::addsame( InternalCF * c )
 
 InternalCF* InternalInteger::subsame( InternalCF * c )
 {
-    if ( getRefCount() > 1 ) {
+    if ( getRefCount() > 1 )
+    {
         decRefCount();
         MP_INT dummy;
         mpz_init( &dummy );
         mpz_sub( &dummy, &thempi, &MPI( c ) );
-        if ( mpz_is_imm( &dummy ) ) {
+        if ( mpz_is_imm( &dummy ) )
+        {
             InternalCF * res = int2imm( mpz_get_si( &dummy ) );
             mpz_clear( &dummy );
             return res;
@@ -141,9 +150,11 @@ InternalCF* InternalInteger::subsame( InternalCF * c )
         else
             return new InternalInteger( dummy );
     }
-    else {
+    else
+    {
         mpz_sub( &thempi, &thempi, &MPI( c ) );
-        if ( mpz_is_imm( &thempi ) ) {
+        if ( mpz_is_imm( &thempi ) )
+        {
             InternalCF * res = int2imm( mpz_get_si( &thempi ) );
             delete this;
             return res;
@@ -155,12 +166,15 @@ InternalCF* InternalInteger::subsame( InternalCF * c )
 
 InternalCF* InternalInteger::mulsame( InternalCF * c )
 {
-    if ( getRefCount() > 1 ) {
+    if ( getRefCount() > 1 )
+    {
         decRefCount();
         MP_INT dummy;
         mpz_init( &dummy );
         mpz_mul( &dummy, &thempi, &MPI( c ) );
-        if ( mpz_is_imm( &dummy ) ) {
+        if ( mpz_is_imm( &dummy ) )
+        {
+        // can this happen ???
             InternalCF * res = int2imm( mpz_get_si( &dummy ) );
             mpz_clear( &dummy );
             return res;
@@ -168,9 +182,12 @@ InternalCF* InternalInteger::mulsame( InternalCF * c )
         else
             return new InternalInteger( dummy );
     }
-    else {
+    else
+    {
         mpz_mul( &thempi, &thempi, &MPI( c ) );
-        if ( mpz_is_imm( &thempi ) ) {
+        if ( mpz_is_imm( &thempi ) )
+        {
+        // can this happen ???
             InternalCF * res = int2imm( mpz_get_si( &thempi ) );
             delete this;
             return res;
@@ -201,7 +218,8 @@ InternalCF* InternalInteger::addcoeff( InternalCF* c )
 {
     ASSERT( ::is_imm( c ) == INTMARK, "incompatible base coefficients" );
     int cc = imm2int( c );
-    if ( getRefCount() > 1 ) {
+    if ( getRefCount() > 1 )
+    {
         decRefCount();
         MP_INT dummy;
         mpz_init( &dummy );
@@ -209,7 +227,8 @@ InternalCF* InternalInteger::addcoeff( InternalCF* c )
             mpz_sub_ui( &dummy, &thempi, -cc );
         else
             mpz_add_ui( &dummy, &thempi, cc );
-        if ( mpz_is_imm( &dummy ) ) {
+        if ( mpz_is_imm( &dummy ) )
+        {
             InternalCF * res = int2imm( mpz_get_si( &dummy ) );
             mpz_clear( &dummy );
             return res;

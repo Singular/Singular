@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.35 2007-10-25 14:45:41 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.36 2008-01-07 13:33:10 Singular Exp $ */
 
 //{{{ docu
 //
@@ -84,7 +84,7 @@ int find_mvar(const CanonicalForm & f)
 void out_cf(char *s1,const CanonicalForm &f,char *s2)
 {
   printf("%s",s1);
-  if (f==0) printf("+0");
+  if (f.isZero()) printf("+0");
   //else if (! f.inCoeffDomain() )
   else if (! f.inBaseDomain() )
   {

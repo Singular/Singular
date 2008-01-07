@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.cc,v 1.22 2007-04-26 08:22:48 Singular Exp $ */
+/* $Id: NTLconvert.cc,v 1.23 2008-01-07 13:33:09 Singular Exp $ */
 #include <config.h>
 
 #ifdef HAVE_SINGULAR
@@ -70,7 +70,7 @@ NTL_CLIENT
 void out_cf(char *s1,const CanonicalForm &f,char *s2)
 {
   printf("%s",s1);
-  if (f==0) printf("+0");
+  if (f.isZero()) printf("+0");
   else if (! f.inCoeffDomain() )
   {
     int l = f.level();

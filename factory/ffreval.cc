@@ -19,7 +19,11 @@ void FFREvaluation::init()
   int n = values.max();
 
   for( int i=values.min(); i<=n; i++ )
-    values[i] = offset[i] = gen->generate(); // generate random point
+  {
+    CanonicalForm tmp=gen->generate();
+    values[i] = tmp; // generate random point
+    offset[i] = tmp; // generate random point
+  }
 }
 
 bool FFREvaluation::step()
@@ -49,12 +53,12 @@ FFREvaluation& FFREvaluation::operator= ( const FFREvaluation & e )
 {
   if( this != &e )
   {
-    if( gen != 0 )
+    if( gen != NULL )
       delete gen;
     values = e.values;
     offset = e.offset;
-    if( e.gen == 0 )
-      gen = 0;
+    if( e.gen == NULL )
+      gen = NULL;
     else
       gen = e.gen->clone();
   }
@@ -111,7 +115,8 @@ static CanonicalForm fin_ezgcd ( const CanonicalForm & FF, const CanonicalForm &
         b = FFREvaluation( 2, t, FFRandom() );
         b.init(); // choose random point
     }
-    while ( ! gcdfound ) {
+    while ( ! gcdfound )
+    {
         /// ---> A2
         DEBOUTLN( cerr, "search for evaluation, delta = " << delta );
         DEBOUTLN( cerr, "F = " << F );
@@ -137,7 +142,8 @@ static CanonicalForm fin_ezgcd ( const CanonicalForm & FF, const CanonicalForm &
         }
         /// ---> A4
         //deltaold = delta;
-        while ( 1 ) {
+        while ( 1 )
+        {
             bt = b;
             if( ! fin_findeval( F, G, Fbt, Gbt, Dbt, bt, delta + 1, degF, degG ) )
             {
@@ -155,7 +161,8 @@ static CanonicalForm fin_ezgcd ( const CanonicalForm & FF, const CanonicalForm &
             }
             if ( dd /*degree( Dbt )*/ == delta )
                 break;
-            else  if ( dd /*degree( Dbt )*/ < delta ) {
+            else  if ( dd /*degree( Dbt )*/ < delta )
+            {
                 delta = dd /*degree( Dbt )*/;
                 b = bt;
                 Db = Dbt; Fb = Fbt; Gb = Gbt;
@@ -173,7 +180,8 @@ static CanonicalForm fin_ezgcd ( const CanonicalForm & FF, const CanonicalForm &
             DEBDECLEVEL( cerr, "fin_ezgcd" );
             return d*G;
         }
-        if ( delta != degF && delta != degG ) {
+        if ( delta != degF && delta != degG )
+        {
             bool B_is_F;
             /// ---> A6
             CanonicalForm xxx;
@@ -183,7 +191,8 @@ static CanonicalForm fin_ezgcd ( const CanonicalForm & FF, const CanonicalForm &
             DEBOUTLN( cerr, "gcd((Fb/Db),Db) = " << xxx );
             DEBOUTLN( cerr, "Fb/Db = " << DD[1] );
             DEBOUTLN( cerr, "Db = " << Db );
-            if (xxx.inCoeffDomain()) {
+            if (xxx.inCoeffDomain())
+            {
                 B = F;
                 DD[2] = Db;
                 lcDD[1] = lcF;
@@ -260,94 +269,10 @@ static CanonicalForm fin_ezgcd ( const CanonicalForm & FF, const CanonicalForm &
 static CanonicalForm fin_ezgcd_specialcase ( const CanonicalForm & F, const CanonicalForm & G, FFREvaluation & b, const modpk & bound )
 {
     CanonicalForm d;
-#if 1
-    Off(SW_USE_EZGCD);
-    //bool ntl0=isOn(SW_USE_NTL_GCD_0);
-    //Off(SW_USE_NTL_GCD_0);
-    //bool ntlp=isOn(SW_USE_NTL_GCD_P);
-    //Off(SW_USE_NTL_GCD_P);
+    Off(SW_USE_EZGCD_P);
     d=gcd_poly( F, G );
-    //if (ntl0) On(SW_USE_NTL_GCD_0);
-    //if (ntlp) On(SW_USE_NTL_GCD_P);
-    On(SW_USE_EZGCD);
+    On(SW_USE_EZGCD_P);
     return d;
-#else
-    DEBOUTLN( cerr, "fin_ezgcd: special case" );
-    CanonicalForm Ft, Gt, L, LL, Fb, Gb, Db, Lb, D, Ds, Dt;
-    CFArray DD( 1, 2 ), lcDD( 1, 2 );
-    Variable x = Variable( 1 );
-    bool gcdfound;
-    Dt = 1;
-    /// ---> S1
-    DEBOUTLN( cerr, "fin_ezgcdspec: (S1)" );
-    Ft = fin_ezgcd( F, F.deriv( x ) );
-    if ( Ft.isOne() ) {
-        // In this case F is squarefree and we came here by bad chance
-        // (means: bad evaluation point).  Try again with another
-        // evaluation point.  Bug fix (?) by JS.  The bad example was
-        // gcd.debug -ocr /+USE_EZGCD/@12/CB \
-        //     '(16*B^8-208*B^6*C+927*B^4*C^2-1512*B^2*C^3+432*C^4)' \
-        //     '(4*B^7*C^2-50*B^5*C^3+208*B^3*C^4-288*B*C^5)'
-        if( ! b.step() ) // Error: run out of points
-        {
-          Off(SW_USE_EZGCD_P);
-          d = gcd_poly(F,G);
-          On(SW_USE_EZGCD_P);
-          return d;
-        }
-        return fin_ezgcd( F, G, b, true );
-    }
-    DEBOUTLN( cerr, "fin_ezgcdspec: (S1) done, Ft = " << Ft );
-    L = F / Ft;
-    /// ---> S2
-    DEBOUTLN( cerr, "fin_ezgcdspec: (S2)" );
-    L = fin_ezgcd( L, G, b, true );
-    DEBOUTLN( cerr, "fin_ezgcdspec: (S2) done, Ds = " << Ds );
-    Gt = G / L;
-    Ds = L; Dt = L;
-    Lb = b( L ); Gb = b( Gt ); Fb = b( Ft );
-    d = gcd( LC( L, x ), gcd( LC( Ft, x ), LC( Gt, x ) ) );
-    while ( true ) {
-        /// ---> S3
-        DEBOUTLN( cerr, "fin_ezgcdspec: (S3)" );
-        DEBOUTLN( cerr, "fin_ezgcdspec: Fb = " << Fb );
-        DEBOUTLN( cerr, "fin_ezgcdspec: Gb = " << Gb );
-        DD[1] = gcd( Lb, gcd( Fb, Gb ) );
-        /// ---> S4
-        DEBOUTLN( cerr, "fin_ezgcdspec: (S4)" );
-        if ( degree( DD[1] ) == 0 )
-            return Ds;
-        /// ---> S5
-        DEBOUTLN( cerr, "fin_ezgcdspec: (S5)" );
-        DEBOUTLN( cerr, "fin_ezgcdspec: Lb = " << Lb );
-        DEBOUTLN( cerr, "fin_ezgcdspec: Db = " << DD[1] );
-        Db = DD[1];
-        if ( ! (DD[2] = Lb/DD[1]).isOne() ) {
-            DEBOUTLN( cerr, "fin_ezgcdspec: (S55)" );
-            lcDD[2] = LC( L, x );
-            lcDD[1] = d;
-            DD[1] = ( DD[1] * b( d ) ) / lc( DD[1] );
-            DD[2] = ( DD[2] * b( lcDD[2] ) ) / lc( DD[2] );
-            LL = L * d;
-            DEBOUTLN( cerr, "fin_ezgcdspec: begin with lift." );
-            DEBOUTLN( cerr, "fin_ezgcdspec: B     = " << LL );
-            DEBOUTLN( cerr, "fin_ezgcdspec: DD    = " << DD );
-            DEBOUTLN( cerr, "fin_ezgcdspec: lcDD  = " << lcDD );
-            DEBOUTLN( cerr, "fin_ezgcdspec: b     = " << b );
-            DEBOUTLN( cerr, "fin_ezgcdspec: lc(B) = " << LC( LL, x ) );
-            DEBOUTLN( cerr, "fin_ezgcdspec: test  = " << b( LL ) - DD[1] * DD[2] );
-            gcdfound = Hensel( LL, DD, lcDD, b, p, x );
-            ASSERT( gcdfound, "fatal error in algorithm" );
-            Dt = pp( DD[1] );
-        }
-        DEBOUTLN( cerr, "fin_ezgcdspec: (S7)" );
-        Ds = Ds * Dt;
-        Fb = Fb / Db;
-        Gb = Gb / Db;
-    }
-    // this point is never reached, but to avoid compiler warnings let's return a value
-    return 0;
-#endif
 }
 
 static bool fin_findeval( const CanonicalForm & F, const CanonicalForm & G, CanonicalForm & Fb, CanonicalForm & Gb, CanonicalForm & Db, FFREvaluation & b, int delta, int degF, int degG )
@@ -356,11 +281,13 @@ static bool fin_findeval( const CanonicalForm & F, const CanonicalForm & G, Cano
     bool ok;
     DEBOUTLN( cerr, "fin_ezgcd: (fin_findeval) F = " << F  <<", G="<< G);
     DEBOUTLN( cerr, "fin_ezgcd: (fin_findeval) degF = " << degF << ", degG="<<degG );
-    while(1) {
+    while(1)
+    {
         DEBOUTLN( cerr, "fin_ezgcd: (fin_findeval) b = " << b );
         Fb = b( F );
         ok = degree( Fb ) == degF;
-        if ( ok ) {
+        if ( ok )
+        {
             Gb = b( G );
             ok = degree( Gb ) == degG;
         }

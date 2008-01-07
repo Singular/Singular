@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.cc,v 1.19 2006-09-15 10:15:48 Singular Exp $ */
+/* $Id: int_poly.cc,v 1.20 2008-01-07 13:33:10 Singular Exp $ */
 
 #include <config.h>
 
@@ -1139,12 +1139,14 @@ InternalPoly::copyTermList ( termList aTermList, termList& theLastTerm, bool neg
 {
     if ( aTermList == 0 )
         return 0;
-    else  if ( negate ) {
+    else  if ( negate )
+    {
         termList sourceCursor = aTermList;
         termList dummy = new term;
         termList targetCursor = dummy;
 
-        while ( sourceCursor ) {
+        while ( sourceCursor )
+        {
             targetCursor->next = new term( 0, -sourceCursor->coeff, sourceCursor->exp );
             targetCursor = targetCursor->next;
             sourceCursor = sourceCursor->next;
@@ -1155,12 +1157,14 @@ InternalPoly::copyTermList ( termList aTermList, termList& theLastTerm, bool neg
         delete dummy;
         return targetCursor;
     }
-    else {
+    else
+    {
         termList sourceCursor = aTermList;
         termList dummy = new term;
         termList targetCursor = dummy;
 
-        while ( sourceCursor ) {
+        while ( sourceCursor )
+        {
             targetCursor->next = new term( 0, sourceCursor->coeff, sourceCursor->exp );
             targetCursor = targetCursor->next;
             sourceCursor = sourceCursor->next;
@@ -1178,12 +1182,14 @@ InternalPoly::deepCopyTermList ( termList aTermList, termList& theLastTerm )
 {
     if ( aTermList == 0 )
         return 0;
-    else {
+    else
+    {
         termList sourceCursor = aTermList;
         termList dummy = new term;
         termList targetCursor = dummy;
 
-        while ( sourceCursor ) {
+        while ( sourceCursor )
+        {
             targetCursor->next = new term( 0, sourceCursor->coeff.deepCopy(), sourceCursor->exp );
             targetCursor = targetCursor->next;
             sourceCursor = sourceCursor->next;
@@ -1201,7 +1207,8 @@ InternalPoly::freeTermList ( termList aTermList )
 {
     termList cursor = aTermList;
 
-    while ( cursor ) {
+    while ( cursor )
+    {
         cursor = cursor->next;
         delete aTermList;
         aTermList = cursor;
@@ -1212,7 +1219,8 @@ void
 InternalPoly::negateTermList ( termList terms )
 {
     termList cursor = terms;
-    while ( cursor ) {
+    while ( cursor )
+    {
         cursor->coeff = -cursor->coeff;
         cursor = cursor->next;
     }
@@ -1225,57 +1233,70 @@ InternalPoly::addTermList ( termList theList, termList aList, termList& lastTerm
     termList aCursor = aList;
     termList predCursor = 0;
 
-    while ( theCursor && aCursor ) {
-        if ( theCursor->exp == aCursor->exp ) {
+    while ( theCursor && aCursor )
+    {
+        if ( theCursor->exp == aCursor->exp )
+        {
             if ( negate )
                 theCursor->coeff -= aCursor->coeff;
             else
                 theCursor->coeff += aCursor->coeff;
-            if ( theCursor->coeff.isZero() ) {
-                if ( predCursor ) {
+            if ( theCursor->coeff.isZero() )
+            {
+                if ( predCursor )
+                {
                     predCursor->next = theCursor->next;
                     delete theCursor;
                     theCursor = predCursor->next;
                 }
-                else {
+                else
+                {
                     theList = theList->next;
                     delete theCursor;
                     theCursor = theList;
                 }
             }
-            else {
+            else
+            {
                 predCursor = theCursor;
                 theCursor = theCursor->next;
             }
             aCursor = aCursor->next;
         }
-        else if ( theCursor->exp < aCursor->exp ) {
+        else if ( theCursor->exp < aCursor->exp )
+        {
             if ( negate )
-                if ( predCursor ) {
+                if ( predCursor )
+                {
                     predCursor->next = new term( theCursor, -aCursor->coeff, aCursor->exp );
                     predCursor = predCursor->next;
                 }
-                else {
+                else
+                {
                     theList = new term( theCursor, -aCursor->coeff, aCursor->exp );
                     predCursor = theList;
                 }
             else
-                if ( predCursor ) {
+                if ( predCursor )
+                {
                     predCursor->next = new term( theCursor, aCursor->coeff, aCursor->exp );
                     predCursor = predCursor->next;
                 }
-                else {
+                else
+                {
                     theList = new term( theCursor, aCursor->coeff, aCursor->exp );
                     predCursor = theList;
                 }
             aCursor = aCursor->next;
         }
-        else {
+        else
+        {
             predCursor = theCursor;
             theCursor = theCursor->next;
         }
     }
-    if ( aCursor ) {
+    if ( aCursor )
+    {
         if ( predCursor )
             predCursor->next = copyTermList( aCursor, lastTerm, negate );
         else
@@ -1290,7 +1311,8 @@ InternalPoly::addTermList ( termList theList, termList aList, termList& lastTerm
 void
 InternalPoly::mulTermList ( termList theCursor, const CanonicalForm& coeff, const int exp )
 {
-    while ( theCursor ) {
+    while ( theCursor )
+    {
         theCursor->coeff *= coeff;
         theCursor->exp += exp;
         theCursor = theCursor->next;
@@ -1304,9 +1326,11 @@ InternalPoly::divideTermList ( termList firstTerm, const CanonicalForm& coeff, t
     lastTerm = 0;
     termList dummy;
 
-    while ( theCursor ) {
+    while ( theCursor )
+    {
         theCursor->coeff /= coeff;
-        if ( theCursor->coeff.isZero() ) {
+        if ( theCursor->coeff.isZero() )
+        {
             if ( theCursor == firstTerm )
                 firstTerm = theCursor->next;
             else
@@ -1315,7 +1339,8 @@ InternalPoly::divideTermList ( termList firstTerm, const CanonicalForm& coeff, t
             theCursor = theCursor->next;
             delete dummy;
         }
-        else {
+        else
+        {
             lastTerm = theCursor;
             theCursor = theCursor->next;
         }
@@ -1330,9 +1355,11 @@ InternalPoly::divTermList ( termList firstTerm, const CanonicalForm& coeff, term
     lastTerm = 0;
     termList dummy;
 
-    while ( theCursor ) {
+    while ( theCursor )
+    {
         theCursor->coeff.div( coeff );
-        if ( theCursor->coeff.isZero() ) {
+        if ( theCursor->coeff.isZero() )
+        {
             if ( theCursor == firstTerm )
                 firstTerm = theCursor->next;
             else
@@ -1341,7 +1368,8 @@ InternalPoly::divTermList ( termList firstTerm, const CanonicalForm& coeff, term
             theCursor = theCursor->next;
             delete dummy;
         }
-        else {
+        else
+        {
             lastTerm = theCursor;
             theCursor = theCursor->next;
         }
@@ -1356,9 +1384,11 @@ InternalPoly::modTermList ( termList firstTerm, const CanonicalForm& coeff, term
     lastTerm = 0;
     termList dummy;
 
-    while ( theCursor ) {
+    while ( theCursor )
+    {
         theCursor->coeff.mod( coeff );
-        if ( theCursor->coeff.isZero() ) {
+        if ( theCursor->coeff.isZero() )
+        {
             if ( theCursor == firstTerm )
                 firstTerm = theCursor->next;
             else
@@ -1367,7 +1397,8 @@ InternalPoly::modTermList ( termList firstTerm, const CanonicalForm& coeff, term
             theCursor = theCursor-> next;
             delete dummy;
         }
-        else {
+        else
+        {
             lastTerm = theCursor;
             theCursor = theCursor->next;
         }
@@ -1378,11 +1409,13 @@ InternalPoly::modTermList ( termList firstTerm, const CanonicalForm& coeff, term
 void
 InternalPoly::appendTermList ( termList& first, termList& last, const CanonicalForm& coeff, const int exp )
 {
-    if ( last ) {
+    if ( last )
+    {
         last->next = new term( 0, coeff, exp );
         last = last->next;
     }
-    else {
+    else
+    {
         first = new term( 0, coeff, exp );
         last = first;
     }
@@ -1401,53 +1434,67 @@ InternalPoly::mulAddTermList ( termList theList, termList aList, const Canonical
     else
         coeff = c;
 
-    while ( theCursor && aCursor ) {
-        if ( theCursor->exp == aCursor->exp + exp ) {
+    while ( theCursor && aCursor )
+    {
+        if ( theCursor->exp == aCursor->exp + exp )
+        {
             theCursor->coeff += aCursor->coeff * coeff;
-            if ( theCursor->coeff.isZero() ) {
-                if ( predCursor ) {
+            if ( theCursor->coeff.isZero() )
+            {
+                if ( predCursor )
+                {
                     predCursor->next = theCursor->next;
                     delete theCursor;
                     theCursor = predCursor->next;
                 }
-                else {
+                else
+                {
                     theList = theList->next;
                     delete theCursor;
                     theCursor = theList;
                 }
             }
-            else {
+            else
+            {
                 predCursor = theCursor;
                 theCursor = theCursor->next;
             }
             aCursor = aCursor->next;
         }
-        else if ( theCursor->exp < aCursor->exp + exp ) {
-            if ( predCursor ) {
+        else if ( theCursor->exp < aCursor->exp + exp )
+        {
+            if ( predCursor )
+            {
                 predCursor->next = new term( theCursor, aCursor->coeff * coeff, aCursor->exp + exp );
                 predCursor = predCursor->next;
             }
-            else {
+            else
+            {
                 theList = new term( theCursor, aCursor->coeff * coeff, aCursor->exp + exp );
                 predCursor = theList;
             }
             aCursor = aCursor->next;
         }
-        else {
+        else
+        {
             predCursor = theCursor;
             theCursor = theCursor->next;
         }
     }
-    if ( aCursor ) {
-        if ( predCursor ) {
+    if ( aCursor )
+    {
+        if ( predCursor )
+        {
             predCursor->next = copyTermList( aCursor, lastTerm );
             predCursor = predCursor->next;
         }
-        else {
+        else
+        {
             theList = copyTermList( aCursor, lastTerm );
             predCursor = theList;
         }
-        while ( predCursor ) {
+        while ( predCursor )
+        {
             predCursor->exp += exp;
             predCursor->coeff *= coeff;
             predCursor = predCursor->next;
@@ -1466,7 +1513,8 @@ InternalPoly::reduceTermList ( termList first, termList redterms, termList & las
     int newexp;
     int exp = redterms->exp;
     termList dummy;
-    while ( first && ( first->exp >= exp ) ) {
+    while ( first && ( first->exp >= exp ) )
+    {
         newcoeff = first->coeff / coeff;
         newexp = first->exp - exp;
         dummy = first;
