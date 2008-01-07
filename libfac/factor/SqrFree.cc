@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: SqrFree.cc,v 1.11 2007-05-15 14:46:49 Singular Exp $";
+static char * rcsid = "$Id: SqrFree.cc,v 1.12 2008-01-07 13:34:56 Singular Exp $";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de .\n Please include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -303,10 +303,13 @@ SqrFreed( const CanonicalForm & r , const CanonicalForm &mipo=0){
     DEBDECLEVEL(CERR, "SqrFreed");
     return Outputlist ;
   }
-  else { // we can split into two nontrivial pieces
+  else  // we can split into two nontrivial pieces
+  {
     f /= h; // Now we have split the poly into f and h
     g = lc(f);
-    if ( g != f.genOne() && getNumVars(g) == 0 ){
+    //if ( g != f.genOne() && getNumVars(g) == 0 ){
+    if ( (!g.isOne()) && getNumVars(g) == 0 )
+    {
        Outputlist= myappend(Outputlist,CFFactor(g,1)) ;
        f /= g;
     }
@@ -414,6 +417,9 @@ SqrFree(const CanonicalForm & r ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.11  2007/05/15 14:46:49  Singular
+*hannes: factorize in Zp(a)[x...]
+
 Revision 1.10  2006/05/16 14:46:50  Singular
 *hannes: gcc 4.1 fixes
 

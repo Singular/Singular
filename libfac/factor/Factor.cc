@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.37 2007-10-25 14:45:41 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.38 2008-01-07 13:34:56 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -115,7 +115,8 @@ choose_main_variable( const CanonicalForm & f, int Mainvar=0){
   remlc= LC(f,n); mainvar = n;
   if ( totaldegree(remlc)==0 ){ remlc=f.genOne() ; }
   DEBOUTLN(CERR, "remlc= " , remlc);
-  for ( int i=n-1; i>=1; i-- ){
+  for ( int i=n-1; i>=1; i-- )
+  {
     newlc= LC(f,i);
     if ( totaldegree(newlc)==0 ){ newlc=f.genOne() ; }
     DEBOUTLN(CERR, "newlc= " , newlc);
@@ -221,7 +222,7 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
   Variable x(level(F));
   int test1;
 
-  if ( lt == lt.genOne() ) return TheList; // the poly was already monic
+  if ( lt.isOne() ) return TheList; // the poly was already monic
   if ( TheList.length() <= 1 ) // only one factor to substitute back
   {
     if ( totaldegree(lt) == 0 ) // lt is type numeric
@@ -355,13 +356,14 @@ substitutePoly( const CanonicalForm & F, const SFormList & Substitutionlist){
 // is CF g ok?                                               //
 ///////////////////////////////////////////////////////////////
 static int
-various_tests( const CanonicalForm & g, int deg, int vars_left){
+various_tests( const CanonicalForm & g, int deg, int vars_left)
+{
   CFMap m;
 
   if ( degree(g) == deg ) // degrees match
     if ( level(compress(g,m)) == (vars_left) ) // exactly one variable less
       if ( SqrFreeTest(g,1) ) // poly is sqrfree
-        if ( gcd(g,g.deriv()) == 1 ) // Discriminante != 0
+        if ( gcd(g,g.deriv()).isOne() ) // Discriminante != 0
            return 1;
   return 0;
 }
@@ -578,40 +580,45 @@ evaluate( int maxtries, int sametries, int failtries, const CanonicalForm &f , c
       {
         unilist = factorize2(g,Extension,mipo);
       }
-      if (unilist.length() <= minfactors ) {
+      if (unilist.length() <= minfactors )
+      {
         minfactors=unilist.length();
         minEvaluation=Substitutionlist;
         minFactorisation=unilist;
       }
       else samefactors +=1;
 
-      if (unilist.length() == 1 ){ // wow! we found f is irreducible!
+      if (unilist.length() == 1 ) // wow! we found f is irreducible!
+      {
         BestEvaluationpoint=minEvaluation;
         BestFactorisation=minFactorisation;
         return 1;
       }
 
-      if ( samefactors >= sametries ){ // now we stop ( maybe polynomial *has*
-                                       // minfactors factors? )
+      if ( samefactors >= sametries ) // now we stop ( maybe polynomial *has*
+                                      // minfactors factors? )
+      {
         BestEvaluationpoint=minEvaluation;
         BestFactorisation=minFactorisation;
         return minfactors;
       }
 
     }
-    else failedfactor += 1;
+    else
+      failedfactor += 1;
 
-    if ( failedfactor >= failtries ){ // now we stop ( perhaps Extension isn't
-                                      // big enough )
+    if ( failedfactor >= failtries ) // now we stop ( perhaps Extension isn't
+                                     // big enough )
+    {
       if ( tried == 0 )
         return 0;
-      else{
+      else
+      {
         BestEvaluationpoint=minEvaluation;
         BestFactorisation=minFactorisation;
         return minfactors;
       }
     }
-
   }
   BestEvaluationpoint=minEvaluation;
   BestFactorisation=minFactorisation;
@@ -724,16 +731,21 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar)
 
   // Check special cases
   for ( int i=1; i<=level(F); i++)
-    if ( degree(f,Variable(i) ) == 1 ) { //test trivial case; only true iff F is primitiv w.r.t every variable; else check (if F=ax+b) gcd(a,b)=1 ?
+  {
+    if ( degree(f,Variable(i) ) == 1 ) 
+    //test trivial case; only true iff F is primitiv w.r.t every variable; else check (if F=ax+b) gcd(a,b)=1 ?
+    {
       DEBOUTLN(CERR, "Trivial case: ", F);
       Outputlist.append(CFFactor(F,1));
       return Outputlist;
     }
+  }
 
   // Look at the leading term:
   lt = LC(f);
   DEBOUTLN(CERR, "Leading term: ", lt);
-  if ( lt != f.genOne() )
+  //if ( lt != f.genOne() )
+  if ( !lt.isOne() )
   {
     // make the polynomial monic in the main variable
     ff = make_monic(f,lt); ffuni = ff;
@@ -835,7 +847,8 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar)
     if ( interrupt_handle() ) return CFFList() ;
     // INTERRUPTHANDLER
 
-    if ( lt != f.genOne() )
+    //if ( lt != f.genOne() )
+    if ( !lt.isOne() )
     {
       Outputlist = not_monic(Outputlist,lt,ff,level(ff));
       DEBOUTLN(CERR, "not_monic returned: ", Outputlist);
@@ -1317,6 +1330,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.37  2007/10/25 14:45:41  Singular
+*hannes: homgfactor for alg.ext of Q
+
 Revision 1.36  2007/10/15 18:03:11  Singular
 *hannes: // debug stuff
 

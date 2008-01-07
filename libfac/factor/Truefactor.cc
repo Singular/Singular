@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.10 2006-05-16 14:46:50 Singular Exp $";
+//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.11 2008-01-07 13:34:56 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // Factory - Includes
 #include <factory.h>
@@ -277,12 +277,14 @@ Truefactors( const CanonicalForm Ua, int levelU, const SFormList & SubstitutionL
 
   onemore=1;
 // steps 3 to 6
-  while (1){
+  while (1)
+  {
     // step 3 iff onemore == 1
     if ( onemore ) M+= 1;  else onemore = 1;
     // step 4
-    if ( U == U.genOne() ) break; // Return FAC
-    if ( ( r == 1 ) || ( M >= ( r-1 ) ) || ( M > degU ) ) {
+    if ( U.isOne() ) break; // Return FAC
+    if ( ( r == 1 ) || ( M >= ( r-1 ) ) || ( M > degU ) )
+    {
       FAC.append( CFFactor(U,1) );
       break; // Return FAC union {U}
     }
@@ -292,17 +294,20 @@ Truefactors( const CanonicalForm Ua, int levelU, const SFormList & SubstitutionL
     // select combinations with the degree not to exceed degU:
     E_all = Rightdegree( E_all, degU, levelU );
     DEBOUTLN(CERR,"Truefactors: (step5) E_all(Rightdegree)= ", E_all);
-    if ( E_all.length() == 0 ){
+    if ( E_all.length() == 0 )
+    {
       FAC.append( CFFactor(U,1) );
       break; // Return FAC union {U}
     }
-    for ( i=E_all; i.hasItem(); i++){
+    for ( i=E_all; i.hasItem(); i++)
+    {
       factor = i.getItem();
       Y = Multmod_power( factor.factor(), SubstitutionList, h, levelU);
       DEBOUTLN(CERR, "Truefactors: (step6) Testing Y  = ", Y);
       c = mydivremt(U,Y,a,b);
       //      if (  c  && b == U.genZero()) { // Y divides U
-      if ( c && b.isZero() ){
+      if ( c && b.isZero() )
+      {
         DEBOUT(CERR,"Truefactors: (step6): ",Y );
         DEBOUTLN(CERR, "  divides  ",U);
         U = a;
@@ -319,21 +324,22 @@ Truefactors( const CanonicalForm Ua, int levelU, const SFormList & SubstitutionL
       }
     }
   }
-
   return FAC;
 }
 
 ///////////////////////////////////////////////////////////////
 // Check if poly f is in Fp (returns true) or in Fp(a)       //
 ///////////////////////////////////////////////////////////////
-static bool
-is_in_Fp( const CanonicalForm & f ){
+static bool is_in_Fp( const CanonicalForm & f )
+{
   if ( f.inCoeffDomain() )
     return f.inBaseDomain() ;
-  else {
+  else
+  {
     CFIterator i=f;
     bool ok=true;
-    while ( ok && i.hasTerms() ){
+    while ( ok && i.hasTerms() )
+    {
       ok = is_in_Fp( i.coeff() );
       i++ ;
     }
@@ -347,8 +353,8 @@ is_in_Fp( const CanonicalForm & f ){
 // find its norm by (the theoretically handicapped method    //
 // of) multiplying by other elements.                        //
 ///////////////////////////////////////////////////////////////
-CFFList
-TakeNorms(const CFFList & PiList){
+CFFList TakeNorms(const CFFList & PiList)
+{
   CFFList CopyPossibleFactors, PossibleFactors, TrueFactors;
   CFFListIterator i;
   CFFactor Factor;
@@ -358,7 +364,8 @@ TakeNorms(const CFFList & PiList){
   IntListIterator k;
 
   // First check if the factors in PiList already lie in Fp-Domain
-  for ( i=PiList; i.hasItem(); i++ ){
+  for ( i=PiList; i.hasItem(); i++ )
+  {
     Factor = i.getItem();
     if ( is_in_Fp( Factor.factor() ) )
       TrueFactors.append(Factor);
@@ -367,9 +374,11 @@ TakeNorms(const CFFList & PiList){
   }
   // Now we have to check if combinations of the remaining factors
   // (now in PossibleFactors) do lie in Fp-Domain
-  if ( PossibleFactors.length() > 0 ){ // there are (at least two) items
+  if ( PossibleFactors.length() > 0 ) // there are (at least two) items
+  {
     int n=2;
-    if ( PossibleFactors.length() < n ) { // a little check
+    if ( PossibleFactors.length() < n )  // a little check
+    {
 #ifdef HAVE_SINGULAR_ERROR
       WerrorS("libfac: ERROR: TakeNorms less then two items remaining!");
 #else
@@ -381,14 +390,17 @@ TakeNorms(const CFFList & PiList){
 #endif
 #endif
     }
-    while ( n < PossibleFactors.length() ){
+    while ( n < PossibleFactors.length() )
+    {
       // generate all combinations of n elements
       combinat(n, PossibleFactors.length(), CombinatList);
-      for ( j=CombinatList ; j.hasItem(); j++ ){
+      for ( j=CombinatList ; j.hasItem(); j++ )
+      {
         intermediate=1;
         for ( k=j.getItem(); k.hasItem(); k++ )
           intermediate *= getItemNr( k.getItem(), PossibleFactors );
-        if ( is_in_Fp( intermediate ) ){
+        if ( is_in_Fp( intermediate ) )
+        {
           TrueFactors.append(intermediate); // found a true factor
           CopyPossibleFactors=PossibleFactors; // save list
           for ( k=j.getItem(); k.hasItem(); k++ )
@@ -398,7 +410,8 @@ TakeNorms(const CFFList & PiList){
           n-=1; // look for the same number of combined factors:
           break;
         }
-        else {
+        else
+        {
           //CERR << "Schade!" << "\n";
         }
         DEBOUT(CERR, "Truefactor: Combined ", n);
@@ -408,14 +421,17 @@ TakeNorms(const CFFList & PiList){
     }
   // All remaining factors in PossibleFactors multiplied
   // should lie in Fp domain
-    if ( PossibleFactors.length() >=1 ){
+    if ( PossibleFactors.length() >=1 )
+    {
       for ( i=PossibleFactors; i.hasItem(); i++ )
         intermediate *= i.getItem().factor();
       // a last check:
-      if ( is_in_Fp(intermediate) ){
+      if ( is_in_Fp(intermediate) )
+      {
         TrueFactors.append(CFFactor(intermediate,1));
       }
-      else{
+      else
+      {
 #ifdef HAVE_SINGULAR_ERROR
         WerrorS("libfac: TakeNorms: somethings wrong with remaining factors!");
 #else
@@ -433,6 +449,9 @@ TakeNorms(const CFFList & PiList){
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.10  2006/05/16 14:46:50  Singular
+*hannes: gcc 4.1 fixes
+
 Revision 1.9  2001/08/08 14:26:56  Singular
 *hannes: Dan's HAVE_SINGULAR_ERROR
 
