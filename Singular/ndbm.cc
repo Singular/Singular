@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: ndbm.cc,v 1.19 2007-12-18 13:08:38 Singular Exp $
+// $Id: ndbm.cc,v 1.20 2008-01-07 13:54:11 Singular Exp $
 //
 //**************************************************************************/
 // 'ndbm.cc' containes all low-level functions to manipulate dbm-files
@@ -27,7 +27,7 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)ndbm.c        5.3 (Berkeley) 3/9/86";
-#endif LIBC_SCCS and not lint
+#endif
 
 //**************************************************************************/
 
