@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.462 2007-12-13 10:00:33 Singular Exp $ */
+/* $Id: iparith.cc,v 1.463 2008-01-08 12:10:40 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4334,12 +4334,12 @@ static BOOLEAN jjSLIM_GB(leftv res, leftv u)
 
   if ((currQuotient!=NULL) && !bIsSCA)
   {
-    Werror("qring not supported by slimgb at the moment");
+    WerrorS("qring not supported by slimgb at the moment");
     return TRUE;
   }
   if (pOrdSgn!=1)
   {
-    Werror("ordering must be global for slimgb");
+    WerrorS("ordering must be global for slimgb");
     return TRUE;
   }
   intvec *w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
