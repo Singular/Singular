@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_int.cc,v 1.20 2008-01-07 13:33:10 Singular Exp $ */
+/* $Id: int_int.cc,v 1.21 2008-01-08 14:23:35 Singular Exp $ */
 
 #include <config.h>
 
@@ -172,6 +172,7 @@ InternalCF* InternalInteger::mulsame( InternalCF * c )
         MP_INT dummy;
         mpz_init( &dummy );
         mpz_mul( &dummy, &thempi, &MPI( c ) );
+        #if 0
         if ( mpz_is_imm( &dummy ) )
         {
         // can this happen ???
@@ -180,11 +181,13 @@ InternalCF* InternalInteger::mulsame( InternalCF * c )
             return res;
         }
         else
+        #endif
             return new InternalInteger( dummy );
     }
     else
     {
         mpz_mul( &thempi, &thempi, &MPI( c ) );
+        #if 0
         if ( mpz_is_imm( &thempi ) )
         {
         // can this happen ???
@@ -193,6 +196,7 @@ InternalCF* InternalInteger::mulsame( InternalCF * c )
             return res;
         }
         else
+        #endif
             return this;
     }
 }
@@ -241,7 +245,8 @@ InternalCF* InternalInteger::addcoeff( InternalCF* c )
             mpz_sub_ui( &thempi, &thempi, -cc );
         else
             mpz_add_ui( &thempi, &thempi, cc );
-        if ( mpz_is_imm( &thempi ) ) {
+        if ( mpz_is_imm( &thempi ) )
+        {
             InternalCF * res = int2imm( mpz_get_si( &thempi ) );
             delete this;
             return res;
@@ -255,21 +260,25 @@ InternalCF* InternalInteger::subcoeff( InternalCF* c, bool negate )
 {
     ASSERT( ::is_imm( c ) == INTMARK, "incompatible base coefficients" );
     int cc = imm2int( c );
-    if ( getRefCount() > 1 ) {
+    if ( getRefCount() > 1 )
+    {
         decRefCount();
         MP_INT dummy;
-        if ( negate ) {
+        if ( negate )
+        {
             mpz_init_set_si( &dummy, cc );
             mpz_sub( &dummy, &dummy, &thempi );
         }
-        else {
+        else
+        {
             mpz_init( &dummy );
             if ( cc < 0 )
                 mpz_add_ui( &dummy, &thempi, -cc );
             else
                 mpz_sub_ui( &dummy, &thempi, cc );
         }
-        if ( mpz_is_imm( &dummy ) ) {
+        if ( mpz_is_imm( &dummy ) )
+        {
             InternalCF * res = int2imm( mpz_get_si( &dummy ) );
             mpz_clear( &dummy );
             return res;
@@ -277,8 +286,10 @@ InternalCF* InternalInteger::subcoeff( InternalCF* c, bool negate )
         else
             return new InternalInteger( dummy );
     }
-    else {
-        if ( negate ) {
+    else
+    {
+        if ( negate )
+        {
             MP_INT dummy;
             mpz_init_set_si( &dummy, cc );
             mpz_sub( &thempi, &dummy, &thempi );
@@ -289,7 +300,8 @@ InternalCF* InternalInteger::subcoeff( InternalCF* c, bool negate )
                 mpz_add_ui( &thempi, &thempi, -cc );
             else
                 mpz_sub_ui( &thempi, &thempi, cc );
-        if ( mpz_is_imm( &thempi ) ) {
+        if ( mpz_is_imm( &thempi ) )
+        {
             InternalCF * res = int2imm( mpz_get_si( &thempi ) );
             delete this;
             return res;
@@ -303,17 +315,20 @@ InternalCF* InternalInteger::mulcoeff( InternalCF* c )
 {
     ASSERT( ::is_imm( c ) == INTMARK, "incompatible base coefficients" );
     int cc = imm2int( c );
-    if ( getRefCount() > 1 ) {
+    if ( getRefCount() > 1 )
+    {
         decRefCount();
         MP_INT dummy;
-         mpz_init( &dummy );
-         if ( cc < 0 ) {
-             mpz_mul_ui( &dummy, &thempi, -cc );
-             mpz_neg( &dummy, &dummy );
-         }
-         else
-             mpz_mul_ui( &dummy, &thempi, cc );
-        if ( mpz_is_imm( &dummy ) ) {
+        mpz_init( &dummy );
+        if ( cc < 0 )
+        {
+            mpz_mul_ui( &dummy, &thempi, -cc );
+            mpz_neg( &dummy, &dummy );
+        }
+        else
+            mpz_mul_ui( &dummy, &thempi, cc );
+        if ( mpz_is_imm( &dummy ) )
+        {
             InternalCF * res = int2imm( mpz_get_si( &dummy ) );
             mpz_clear( &dummy );
             return res;
@@ -321,14 +336,17 @@ InternalCF* InternalInteger::mulcoeff( InternalCF* c )
         else
             return new InternalInteger( dummy );
     }
-    else {
-        if ( cc < 0 ) {
+    else
+    {
+        if ( cc < 0 )
+        {
             mpz_mul_ui( &thempi, &thempi, -cc );
             mpz_neg( &thempi, &thempi );
         }
         else
             mpz_mul_ui( &thempi, &thempi, cc );
-        if ( mpz_is_imm( &thempi ) ) {
+        if ( mpz_is_imm( &thempi ) )
+        {
             InternalCF * res = int2imm( mpz_get_si( &thempi ) );
             delete this;
             return res;
@@ -356,7 +374,8 @@ InternalInteger::bgcdsame ( const InternalCF * const c ) const
     mpz_abs( &result, &result );
 
     // check for immediate result
-    if ( mpz_is_imm( &result ) ) {
+    if ( mpz_is_imm( &result ) )
+    {
         InternalCF * res = int2imm( mpz_get_si( &result ) );
         mpz_clear( &result );
         return res;
