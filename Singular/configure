@@ -5094,13 +5094,69 @@ if test "$ac_cv_lib_ntl_main" = yes; then
   ac_cv_ntl_ok=yes
 fi
 
+SAVE_LIBS=$LIBS
+echo $ac_n "checking for  in -lc_nonshared""... $ac_c" 1>&6
+echo "configure:5100: checking for  in -lc_nonshared" >&5
+ac_lib_var=`echo c_nonshared'_' | sed 'y%./+-%__p_%'`
+if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  ac_save_LIBS="$LIBS"
+LIBS="-lc_nonshared  $LIBS"
+cat > conftest.$ac_ext <<EOF
+#line 5108 "configure"
+#include "confdefs.h"
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char ();
+
+int main() {
+()
+; return 0; }
+EOF
+if { (eval echo configure:5119: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+  rm -rf conftest*
+  eval "ac_cv_lib_$ac_lib_var=yes"
+else
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+  rm -rf conftest*
+  eval "ac_cv_lib_$ac_lib_var=no"
+fi
+rm -f conftest*
+LIBS="$ac_save_LIBS"
+
+fi
+if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
+  echo "$ac_t""yes" 1>&6
+    ac_tr_lib=HAVE_LIB`echo c_nonshared | sed -e 's/[^a-zA-Z0-9_]/_/g' \
+    -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
+  cat >> confdefs.h <<EOF
+#define $ac_tr_lib 1
+EOF
+
+  LIBS="-lc_nonshared $LIBS"
+
+else
+  echo "$ac_t""no" 1>&6
+fi
+
+LIBS=$SAVE_LIBS
+if test "$ac_cv_lib_c_nonshared" = yes; then
+GLIBC_DYN_FIX="-lc_nonshared"
+else
+GLIBC_DYN_FIX=""
+fi
+
+
 # evaluate results
 if test "$ac_cv_omalloc_ok" != yes && test "$enable_omalloc" != yes; then
   { echo "configure: error: can not build without omalloc" 1>&2; exit 1; }
 fi
 
 echo $ac_n "checking which apint package to use""... $ac_c" 1>&6
-echo "configure:5104: checking which apint package to use" >&5
+echo "configure:5160: checking which apint package to use" >&5
 if test "${with_apint}" != gmp; then
   if test "$ac_gmp_ok" = yes || test "$enable_gmp" = yes; then
     echo "$ac_t""gmp" 1>&6
@@ -5123,7 +5179,7 @@ fi
 
 #
 echo $ac_n "checking whether to have MP""... $ac_c" 1>&6
-echo "configure:5127: checking whether to have MP" >&5
+echo "configure:5183: checking whether to have MP" >&5
 if test "${with_MP}" != yes && test "${with_MP}" != no; then
   if (test "${will_have_gmp}" = yes) && \
      (test "$ac_MP_ok" =  yes || test "$enable_MP" = yes); then
@@ -5158,7 +5214,7 @@ fi
 
 
 echo $ac_n "checking whether to have NTL""... $ac_c" 1>&6
-echo "configure:5162: checking whether to have NTL" >&5
+echo "configure:5218: checking whether to have NTL" >&5
 if test "${with_NTL}" = yes ; then
   echo "$ac_t""yes" 1>&6
   NEED_LIBS="-lntl ${NEED_LIBS}"
@@ -5167,7 +5223,7 @@ else
 fi
 
 echo $ac_n "checking whether to have factory""... $ac_c" 1>&6
-echo "configure:5171: checking whether to have factory" >&5
+echo "configure:5227: checking whether to have factory" >&5
 if test "${with_factory}" != yes && test "${with_factory}" != no; then
   if test "$ac_factory_ok" =  yes || test "$enable_factory" = yes; then
     echo "$ac_t""yes" 1>&6
@@ -5198,7 +5254,7 @@ else
 fi
 
 echo $ac_n "checking whether to have libfac""... $ac_c" 1>&6
-echo "configure:5202: checking whether to have libfac" >&5
+echo "configure:5258: checking whether to have libfac" >&5
 if test "${with_libfac}" != yes && test "${with_libfac}" != no; then
   if (test "${will_have_factory}" = yes) && \
      (test "$ac_libfac_ok" =  yes || test "$enable_libfac" = yes); then
@@ -5240,7 +5296,7 @@ fi
 
 
 echo $ac_n "checking whether to have dbm links""... $ac_c" 1>&6
-echo "configure:5244: checking whether to have dbm links" >&5
+echo "configure:5300: checking whether to have dbm links" >&5
 if test "$with_dbm" != no; then
   cat >> confdefs.h <<\EOF
 #define HAVE_DBM 1
@@ -5252,7 +5308,7 @@ else
 fi
 
 echo $ac_n "checking whether to have namespaces""... $ac_c" 1>&6
-echo "configure:5256: checking whether to have namespaces" >&5
+echo "configure:5312: checking whether to have namespaces" >&5
 if test "$with_namespaces" != no; then
   echo "$ac_t""yes" 1>&6
   cat >> confdefs.h <<\EOF
@@ -5264,7 +5320,7 @@ else
 fi
 
 echo $ac_n "checking whether to have dynamic modules""... $ac_c" 1>&6
-echo "configure:5268: checking whether to have dynamic modules" >&5
+echo "configure:5324: checking whether to have dynamic modules" >&5
 if test "$with_dynamic_modules" = no || test "$ac_have_dl" != yes; then
   echo "$ac_t""no" 1>&6
 else
@@ -5276,7 +5332,7 @@ EOF
 fi
 
 echo $ac_n "checking whether to have dynamic kernel""... $ac_c" 1>&6
-echo "configure:5280: checking whether to have dynamic kernel" >&5
+echo "configure:5336: checking whether to have dynamic kernel" >&5
 if test "$with_dynamic_kernel" != no && test "$ac_lib_dl" = yes; then
   DL_KERNEL=1
   
@@ -5286,7 +5342,7 @@ else
 fi
 
 echo $ac_n "checking whether to have Plural""... $ac_c" 1>&6
-echo "configure:5290: checking whether to have Plural" >&5
+echo "configure:5346: checking whether to have Plural" >&5
 if test "$with_Plural" != no && test "$enable_Plural" != no; then
   cat >> confdefs.h <<\EOF
 #define HAVE_PLURAL 1
@@ -5470,6 +5526,7 @@ s%@LD@%$LD%g
 s%@ALLOCA@%$ALLOCA%g
 s%@CXXCPP@%$CXXCPP%g
 s%@USE_STDVECBOOL@%$USE_STDVECBOOL%g
+s%@GLIBC_DYN_FIX@%$GLIBC_DYN_FIX%g
 s%@HAVE_MPSR@%$HAVE_MPSR%g
 s%@MP_LIBS@%$MP_LIBS%g
 s%@NEED_LIBS@%$NEED_LIBS%g

@@ -770,6 +770,16 @@ if test "$ac_cv_lib_ntl_main" = yes; then
   ac_cv_ntl_ok=yes
 fi
 
+SAVE_LIBS=$LIBS
+AC_CHECK_LIB(c_nonshared)
+LIBS=$SAVE_LIBS
+if test "$ac_cv_lib_c_nonshared" = yes; then
+GLIBC_DYN_FIX="-lc_nonshared"
+else
+GLIBC_DYN_FIX=""
+fi
+AC_SUBST(GLIBC_DYN_FIX)
+
 # evaluate results
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl make sure that omalloc is there
