@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_rat.cc,v 1.15 2008-01-07 13:33:11 Singular Exp $ */
+/* $Id: int_rat.cc,v 1.16 2008-01-08 14:33:36 Singular Exp $ */
 
 #include <config.h>
 
@@ -229,15 +229,15 @@ InternalCF* InternalRational::addsame( InternalCF * c )
     if ( deleteObject() ) delete this;
     if ( mpz_cmp_si( &d, 1 ) == 0 )
     {
+        mpz_clear( &d );
         if ( mpz_is_imm( &n ) )
         {
             InternalCF * res = int2imm( mpz_get_si( &n ) );
-            mpz_clear( &n ); mpz_clear( &d );
+            mpz_clear( &n );
             return res;
         }
         else
         {
-            mpz_clear( &d );
             return new InternalInteger( n );
         }
     }
@@ -285,15 +285,15 @@ InternalCF* InternalRational::subsame( InternalCF * c )
     if ( deleteObject() ) delete this;
     if ( mpz_cmp_si( &d, 1 ) == 0 )
     {
+        mpz_clear( &d );
         if ( mpz_is_imm( &n ) )
         {
             InternalCF * res = int2imm( mpz_get_si( &n ) );
-            mpz_clear( &n ); mpz_clear( &d );
+            mpz_clear( &n );
             return res;
         }
         else
         {
-            mpz_clear( &d );
             return new InternalInteger( n );
         }
     }
@@ -346,15 +346,15 @@ InternalCF* InternalRational::mulsame( InternalCF * c )
     if ( deleteObject() ) delete this;
     if ( mpz_cmp_si( &d, 1 ) == 0 )
     {
+        mpz_clear( &d );
         if ( mpz_is_imm( &n ) )
         {
             InternalCF * res = int2imm( mpz_get_si( &n ) );
-            mpz_clear( &n ); mpz_clear( &d );
+            mpz_clear( &n );
             return res;
         }
         else
         {
-            mpz_clear( &d );
             return new InternalInteger( n );
         }
     }
@@ -403,21 +403,22 @@ InternalCF* InternalRational::dividesame( InternalCF * c )
         mpz_clear( &tmp1 ); mpz_clear( &tmp2 );
         mpz_clear( &g1 ); mpz_clear( &g2 );
         if ( deleteObject() ) delete this;
-        if ( mpz_cmp_si( &d, 0 ) < 0 ) {
+        if ( mpz_cmp_si( &d, 0 ) < 0 )
+        {
             mpz_neg( &d, &d );
             mpz_neg( &n, &n );
         }
         if ( mpz_cmp_si( &d, 1 ) == 0 )
         {
+            mpz_clear( &d );
             if ( mpz_is_imm( &n ) )
             {
                 InternalCF * res = int2imm( mpz_get_si( &n ) );
-                mpz_clear( &n ); mpz_clear( &d );
+                mpz_clear( &n );
                 return res;
             }
             else
             {
-                mpz_clear( &d );
                 return new InternalInteger( n );
             }
         }
@@ -639,15 +640,15 @@ InternalCF* InternalRational::mulcoeff( InternalCF* c )
     if ( deleteObject() ) delete this;
     if ( mpz_cmp_si( &d, 1 ) == 0 )
     {
+        mpz_clear( &d );
         if ( mpz_is_imm( &n ) )
         {
             InternalCF * res = int2imm( mpz_get_si( &n ) );
-            mpz_clear( &n ); mpz_clear( &d );
+            mpz_clear( &n );
             return res;
         }
         else
         {
-            mpz_clear( &d );
             return new InternalInteger( n );
         }
     }
@@ -719,15 +720,15 @@ InternalCF* InternalRational::dividecoeff( InternalCF* c, bool invert )
     }
     if ( mpz_cmp_si( &d, 1 ) == 0 )
     {
+        mpz_clear( &d );
         if ( mpz_is_imm( &n ) )
         {
             InternalCF * res = int2imm( mpz_get_si( &n ) );
-            mpz_clear( &n ); mpz_clear( &d );
+            mpz_clear( &n );
             return res;
         }
         else
         {
-            mpz_clear( &d );
             return new InternalInteger( n );
         }
     }
