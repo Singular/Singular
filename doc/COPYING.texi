@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.33 2007-11-16 15:07:05 Singular Exp $
+@comment $Id: COPYING.texi,v 1.34 2008-01-09 18:10:27 Singular Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -124,6 +124,7 @@ Anne Fr@"uhbis-Kr@"uger,
 Kai Kr@"uger,
 Viktor Levandovskyy,
 Oleksandr Motsak,
+Mathias Schulze,
 and
 Oliver Wienand.
 @cindex Brickenstein, Michael 
@@ -133,6 +134,7 @@ Oliver Wienand.
 @cindex Kr@"uger, Kai
 @cindex Levandovskyy, Viktor
 @cindex Motsak, Oleksandr 
+@cindex Schulze, Mathias
 @cindex Wienand, Oliver
 
 Former members of the @sc{Singular} team are:
@@ -141,7 +143,6 @@ Christoph Lossen,
 Wolfgang Neumann,
 Wilfred Pohl,
 Jens Schmidt,
-Mathias Schulze,
 Thomas Siebert,
 R@"udiger Stobbe,
 Eric Westenberger
@@ -152,7 +153,6 @@ Tim Wichmann.
 @cindex Neumann, Wolfgang
 @cindex Pohl, Wilfred
 @cindex Schmidt, Jens
-@cindex Schulze, Mathias
 @cindex Siebert, Thomas
 @cindex Stobbe, R@"udiger
 @cindex Westenberger, Eric
