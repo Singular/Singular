@@ -5,6 +5,7 @@
 #ifndef BINOMIAL_CC
 #define BINOMIAL_CC
 
+#include <climits>
 #include "binomial__term_ordering.h"
 
 ///////////////////////// constructors and destructor //////////////////////

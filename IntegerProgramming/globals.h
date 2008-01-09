@@ -13,15 +13,25 @@
 
 // Include facilities needed by several files:
 
+//#define HAVE_IOSTREAM_H
 #include <stdio.h>
+#ifndef HAVE_IOSTREAM_H
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <limits>
+#else
 #include <iostream.h>
 #include <fstream.h>
 #include <iomanip.h>
+#include <limits.h>
+#endif
 #include <stddef.h>
 #include <stdlib.h>
 #include <math.h>
-#include <limits.h>
 #include <string.h>
+
+using namespace std;
 
 // Include a BigInt class from a foreign library:
 // This is needed by the LLL algorithm. If no such class is included,
