@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.213 2007-11-15 09:59:20 Singular Exp $
+@comment $Id: general.doc,v 1.214 2008-01-09 17:59:18 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -2462,6 +2462,10 @@ terminates @sc{Singular}
 @node Names, Objects, Special characters, The SINGULAR language
 @subsection Names
 @cindex Names
+@cindex Names, indexed
+@cindex indexed names
+@cindex Variables, indexed
+@cindex multi indices
 @cindex Identifiers, syntax of
 
 @sc{Singular} is a strongly typed language.  This means that all names
@@ -2496,6 +2500,8 @@ be used as part of a name, too.  Capital and small letters are
 distinguished.  Indexed names are built as a name followed by an
 int_expression in parentheses.  A list of indexed names can be built as
 a name followed by an intvec_expression in parentheses.
+For multi-indices, append an int_expression in parentheses to an
+indexed name.
 
 @smallexample
 @c example
@@ -2505,6 +2511,8 @@ a name followed by an intvec_expression in parentheses.
   ideal j(n);     // is equivalent to the above
   ideal j(2)=x;
   j(2..3);
+  ring r=0,(x(1..2)(1..3)(1..2)),dp;
+  r;
 @c example
 @end smallexample
 
