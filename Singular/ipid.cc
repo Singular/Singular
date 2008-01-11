@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.81 2007-04-19 12:05:39 Singular Exp $ */
+/* $Id: ipid.cc,v 1.82 2008-01-11 10:56:45 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -550,32 +550,8 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
   // ring / qring  --------------------------------------------------------
   if ((IDTYP(h) == RING_CMD) || (IDTYP(h) == QRING_CMD))
   {
-    // any objects defined for this ring ?
-    // Hmm ... why only for rings and not for qrings??
-    // if (((IDTYP(h)==RING_CMD) && (IDRING(h)->ref<=0))
-    if ((IDRING(h)->ref<=0)  &&  (IDRING(h)->idroot!=NULL))
-    {
-      idhdl * hd = &IDRING(h)->idroot;
-      idhdl  hdh = IDNEXT(*hd);
-      idhdl  temp;
-      if (IDRING(h)==currRing) //we are not killing the base ring, so switch
-      {
-        // we are killing the basering, so: make sure that
-        // sLastPrinted is killed before this ring is destroyed
-        if (((sLastPrinted.rtyp>BEGIN_RING) && (sLastPrinted.rtyp<END_RING))
-        || ((sLastPrinted.rtyp==LIST_CMD)&&(lRingDependend((lists)sLastPrinted.data))))
-        {
-          sLastPrinted.CleanUp();
-        }
-      }
-      while (hdh!=NULL)
-      {
-        temp = IDNEXT(hdh);
-        killhdl2(hdh,&(IDRING(h)->idroot),IDRING(h));
-        hdh = temp;
-      }
-      killhdl2(*hd,hd,IDRING(h));
-    }
+    // any objects defined for this ring ? -> done by rKill
+    
     rKill(h);
   }
 #ifdef HAVE_NS

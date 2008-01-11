@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.171 2007-11-16 18:37:30 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.172 2008-01-11 10:56:45 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -4733,6 +4733,11 @@ void rKill(ring r)
       }
     }
 #endif /* USE_IILOCALRING */
+// any variables depending on r ?
+    while (r->idroot!=NULL)
+    {
+      killhdl2(r->idroot,&(r->idroot),r);
+    }
 
     /* nKillChar(r); will be called from inside of rDelete */
     rDelete(r);
