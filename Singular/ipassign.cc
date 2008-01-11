@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.92 2007-11-27 11:55:57 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.93 2008-01-11 11:01:12 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -609,7 +609,7 @@ static BOOLEAN jiA_RING(leftv res, leftv a, Subexpr e)
   if (have_id)
   {
     idhdl rl=(idhdl)res->data;
-    if (&IDRING(rl)!=NULL) rKill(rl);
+    if (IDRING(rl)!=NULL) rKill(rl);
     IDRING(rl)=r;
     if ((IDLEV((idhdl)a->data)!=myynest) && (r==currRing))
       currRingHdl=(idhdl)res->data;
