@@ -1,6 +1,6 @@
 // AH last modified:  01.07.2007
 //////////////////////////////////////////////////////////////////////////////
-version = "$Id: noether.lib,v 1.8 2007-08-01 14:45:01 Singular Exp $";
+version = "$Id: noether.lib,v 1.9 2008-01-14 13:01:04 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: noether.lib   Noether normalization of an ideal (not nessecary
@@ -15,14 +15,13 @@ It checks whether an ideal is in Noether position.  A modular version of
 these algorithms is also provided.
 The procedures are based on a paper of Amir Hashemi 'Efficient Algorithms for
 Computing Noether Normalization'
-Submitted to: Special Issue of Mathematics in Computer Science on Symbolic
-and Numeric Computation.
+(presented in ASCM 2007)
 
 This library computes also Castelnuovo-Mumford regularity and satiety of an
 ideal.  A modular version of these algorithms is also provided.
 The procedures are based on a paper of Amir Hashemi 'Computation of
 Castelnuovo-Mumford regularity and satiety'
-Submitted to: ISSAC 2007.
+(preprint 2007)
 
 
 PROCEDURES:
