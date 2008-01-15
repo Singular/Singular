@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.36 2008-01-07 13:33:10 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.37 2008-01-15 12:36:50 Singular Exp $ */
 
 //{{{ docu
 //
@@ -396,84 +396,91 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
   CFFList F;
   if ( getCharacteristic() > 0 )
   {
-    ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
-    #ifdef HAVE_NTL
-    if (isOn(SW_USE_NTL) && (isPurePoly(f)))
+    if ( f.isUnivariate() )
     {
-      // USE NTL
-      if (getCharacteristic()!=2)
+      #ifdef HAVE_NTL
+      if (isOn(SW_USE_NTL) && (isPurePoly(f)))
       {
-        // set remainder
-        if (fac_NTL_char!=getCharacteristic())
+        // USE NTL
+        if (getCharacteristic()!=2)
         {
-          fac_NTL_char=getCharacteristic();
+          // set remainder
+          if (fac_NTL_char!=getCharacteristic())
+          {
+            fac_NTL_char=getCharacteristic();
+            #ifdef NTL_ZZ
+            ZZ r;
+            r=getCharacteristic();
+            ZZ_pContext ccc(r);
+            #else
+            zz_pContext ccc(getCharacteristic());
+            #endif
+            ccc.restore();
+            #ifdef NTL_ZZ
+            ZZ_p::init(r);
+            #else
+            zz_p::init(getCharacteristic());
+            #endif
+          }
+          // convert to NTL
           #ifdef NTL_ZZ
-          ZZ r;
-          r=getCharacteristic();
-          ZZ_pContext ccc(r);
+          ZZ_pX f1=convertFacCF2NTLZZpX(f);
+          ZZ_p leadcoeff = LeadCoeff(f1);
           #else
-          zz_pContext ccc(getCharacteristic());
+          zz_pX f1=convertFacCF2NTLzzpX(f);
+          zz_p leadcoeff = LeadCoeff(f1);
           #endif
-          ccc.restore();
+          //make monic
+          f1=f1 / LeadCoeff(f1);
+
+          // factorize
           #ifdef NTL_ZZ
-          ZZ_p::init(r);
+          vec_pair_ZZ_pX_long factors;
           #else
-          zz_p::init(getCharacteristic());
+          vec_pair_zz_pX_long factors;
           #endif
+          CanZass(factors,f1);
+
+          // convert back to factory
+          #ifdef NTL_ZZ
+          F=convertNTLvec_pair_ZZpX_long2FacCFFList(factors,leadcoeff,f.mvar());
+          #else
+          F=convertNTLvec_pair_zzpX_long2FacCFFList(factors,leadcoeff,f.mvar());
+          #endif
+          //test_cff(F,f);
         }
-        // convert to NTL
-        #ifdef NTL_ZZ
-        ZZ_pX f1=convertFacCF2NTLZZpX(f);
-        ZZ_p leadcoeff = LeadCoeff(f1);
-        #else
-        zz_pX f1=convertFacCF2NTLzzpX(f);
-        zz_p leadcoeff = LeadCoeff(f1);
-        #endif
-        //make monic
-        f1=f1 / LeadCoeff(f1);
+        else
+        {
+          // Specialcase characteristic==2
+          if (fac_NTL_char!=2)
+          {
+            fac_NTL_char=2;
+            zz_p::init(2);
+          }
+          // convert to NTL using the faster conversion routine for characteristic 2
+          GF2X f1=convertFacCF2NTLGF2X(f);
+          // no make monic necessary in GF2
+          //factorize
+          vec_pair_GF2X_long factors;
+          CanZass(factors,f1);
 
-        // factorize
-        #ifdef NTL_ZZ
-        vec_pair_ZZ_pX_long factors;
-        #else
-        vec_pair_zz_pX_long factors;
-        #endif
-        CanZass(factors,f1);
-
-        // convert back to factory
-        #ifdef NTL_ZZ
-        F=convertNTLvec_pair_ZZpX_long2FacCFFList(factors,leadcoeff,f.mvar());
-        #else
-        F=convertNTLvec_pair_zzpX_long2FacCFFList(factors,leadcoeff,f.mvar());
-        #endif
-        //test_cff(F,f);
+          // convert back to factory again using the faster conversion routine for vectors over GF2X
+          F=convertNTLvec_pair_GF2X_long2FacCFFList(factors,LeadCoeff(f1),f.mvar());
+        }
       }
       else
-      {
-        // Specialcase characteristic==2
-        if (fac_NTL_char!=2)
-        {
-          fac_NTL_char=2;
-          zz_p::init(2);
-        }
-        // convert to NTL using the faster conversion routine for characteristic 2
-        GF2X f1=convertFacCF2NTLGF2X(f);
-        // no make monic necessary in GF2
-        //factorize
-        vec_pair_GF2X_long factors;
-        CanZass(factors,f1);
-
-        // convert back to factory again using the faster conversion routine for vectors over GF2X
-        F=convertNTLvec_pair_GF2X_long2FacCFFList(factors,LeadCoeff(f1),f.mvar());
+      #endif
+      {  // Use Factory without NTL
+        if ( isOn( SW_BERLEKAMP ) )
+          F=FpFactorizeUnivariateB( f, issqrfree );
+        else
+          F=FpFactorizeUnivariateCZ( f, issqrfree, 0, Variable(), Variable() );
       }
     }
     else
-    #endif
-    {  // Use Factory without NTL
-      if ( isOn( SW_BERLEKAMP ) )
-         F=FpFactorizeUnivariateB( f, issqrfree );
-      else
-        F=FpFactorizeUnivariateCZ( f, issqrfree, 0, Variable(), Variable() );
+    {
+        // char p, not univariate
+        printf("factorize char p, not univariate\n");
     }
   }
   else
