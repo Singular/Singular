@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.23 2007-11-27 14:40:11 levandov Exp $";
+version="$Id: dmod.lib,v 1.24 2008-01-17 21:05:31 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -1227,6 +1227,166 @@ example
   printlevel = 0;
   def A = annfsBM(F);
   setring A;
+  LD;
+  BS;
+}
+
+
+// try to replace s with -s-1 => data is shorter
+// analogue of annfs0
+proc annfs2(ideal I, poly F, list #)
+"USAGE:  annfs2(I, F [,eng]);  I an ideal, F a poly, eng an optional int
+RETURN:  ring
+PURPOSE: compute the annihilator ideal of f^s in the Weyl Algebra, based on the
+output of procedures SannfsBM, SannfsOT or SannfsLOT
+NOTE:    activate this ring with the @code{setring} command. In this ring,
+@*       - the ideal LD (which is a Groebner basis) is the annihilator of f^s,
+@*       - the list BS contains the roots with multiplicities of a Bernstein polynomial of f.
+@*       If eng <>0, @code{std} is used for Groebner basis computations,
+@*       otherwise and by default @code{slimgb} is used.
+@*       Uses the shorter form of expressions in the variable s (the idea of Noro).
+@*       If printlevel=1, progress debug messages will be printed,
+@*       if printlevel>=2, all the debug messages will be printed.
+EXAMPLE: example annfs2; shows examples
+"
+{
+  int eng = 0;
+  if ( size(#)>0 )
+  {
+    if ( typeof(#[1]) == "int" )
+    {
+      eng = int(#[1]);
+    }
+  }
+  def @R2 = basering;
+  // we're in D_n[s], where the elim ord for s is set
+  ideal J = NF(I,std(F));
+  // make leadcoeffs positive
+  int i;
+  J = subst(J,s,-s-1);
+  for (i=1; i<= ncols(J); i++)
+  {
+    if (leadcoef(J[i]) <0 )
+    {
+      J[i] = -J[i];
+    }
+  }
+  J = J,F;
+  ideal M = engine(J,eng);
+  int Nnew = nvars(@R2);
+  ideal K2 = nselect(M,1,Nnew-1);
+  int ppl = printlevel-voice+2;
+  dbprint(ppl,"// -1-1- _x,_Dx are eliminated in basering");
+  dbprint(ppl-1, K2);
+  // the ring @R3 and the search for minimal negative int s
+  ring @R3 = 0,s,dp;
+  dbprint(ppl,"// -2-1- the ring @R3 i.e. K[s] is ready");
+  ideal K3 = imap(@R2,K2);
+  poly p = K3[1];
+  dbprint(ppl,"// -2-2- factorization");
+  //  ideal P = factorize(p,1);  //without constants and multiplicities
+  //  "--------- b-function factorizes into ---------";   P;
+  // convert factors to the list of their roots with mults
+  // assume all factors are linear
+  //  ideal BS = normalize(P);
+  //  BS = subst(BS,s,0);
+  //  BS = -BS;
+  list P = factorize(p);          //with constants and multiplicities
+  ideal bs; intvec m;             //the Bernstein polynomial is monic, so we are not interested in constants
+  for (i=2; i<= size(P[1]); i++)  //we delete P[1][1] and P[2][1]
+  {
+    bs[i-1] = P[1][i]; bs[i-1] = subst(bs[i-1],s,-s-1);
+    m[i-1]  = P[2][i]; 
+  }
+  int sP = minIntRoot(bs,1);
+  bs =  normalize(bs);
+  bs = -subst(bs,s,0);
+  dbprint(ppl,"// -2-3- minimal integer root found");
+  dbprint(ppl-1, sP);
+ //TODO: sort BS!
+  // --------- substitute s found in the ideal ---------
+  // --------- going back to @R and substitute ---------
+  setring @R2;
+  K2 = subst(I,s,sP);
+  // create the ordinary Weyl algebra and put the result into it,
+  // thus creating the ring @R5
+  // keep: N, i,j,s, tmp, RL
+  Nnew = Nnew - 1; // former 2*N;
+  // list RL = ringlist(save);  // is defined earlier
+  //  kill Lord, tmp, iv;
+  list L = 0;
+  list Lord, tmp;
+  intvec iv;
+  list RL = ringlist(basering);
+  L[1] = RL[1];
+  L[4] = RL[4];  //char, minpoly
+  // check whether vars have admissible names -> done earlier
+  // list Name = RL[2]M
+  // DName is defined earlier
+  list NName; // = RL[2]; // skip the last var 's'
+  for (i=1; i<=Nnew; i++)
+  {
+    NName[i] =  RL[2][i];
+  }
+  L[2] = NName;
+  // dp ordering;
+  string s = "iv=";
+  for (i=1; i<=Nnew; i++)
+  {
+    s = s+"1,";
+  }
+  s[size(s)] = ";";
+  execute(s);
+  tmp     = 0;
+  tmp[1]  = "dp";  // string
+  tmp[2]  = iv;  // intvec
+  Lord[1] = tmp;
+  kill s;
+  tmp[1]  = "C";
+  iv = 0;
+  tmp[2]  = iv;
+  Lord[2] = tmp;
+  tmp     = 0;
+  L[3]    = Lord;
+  // we are done with the list
+  // Add: Plural part
+  def @R4@ = ring(L);
+  setring @R4@;
+  int N = Nnew/2;
+  matrix @D[Nnew][Nnew];
+  for (i=1; i<=N; i++)
+  {
+    @D[i,N+i]=1;
+  }
+  def @R4 = nc_algebra(1,@D);
+  setring @R4;
+  kill @R4@;
+  dbprint(ppl,"// -3-1- the ring @R4 is ready");
+  dbprint(ppl-1, @R4);
+  ideal K4 = imap(@R2,K2);
+  option(redSB);
+  dbprint(ppl,"// -3-2- the final cosmetic std");
+  K4 = engine(K4,eng);  // std does the job too
+  // total cleanup
+  ideal bs = imap(@R3,bs);
+  kill @R3;
+  list BS = bs,m;
+  export BS;
+  ideal LD = K4;
+  export LD;
+  return(@R4);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),Dp;
+  poly F = x^3+y^3+z^3;
+  printlevel = 0;
+  def A = SannfsBM(F);
+  setring A;
+  LD;
+  poly F = imap(r,F);
+  def B  = annfs2(LD,F);
+  setring B;
   LD;
   BS;
 }
