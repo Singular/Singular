@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: central.lib,v 1.3 2007-11-28 16:36:45 motsak Exp $"
+version="$Id: central.lib,v 1.4 2008-01-17 21:04:46 levandov Exp $"
 category="Noncommutative"
 info="
 LIBRARY:  central.lib      Computation of central elements of GR-algebras
@@ -559,7 +559,7 @@ SEE ALSO:   applyAdF; linearMapKernel
   option( redTail );
 
   // compute everything in a right form
-  MD = simplify( std( syz(MD) ), 1 + 2 + 8 );
+  MD = simplify( groebner( syz(MD) ), 1 + 2 + 8 );
   // note that MD is a matrix of numbers - no polynomials...
 
   // restore options
