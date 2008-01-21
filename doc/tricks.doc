@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: tricks.doc,v 1.16 2007-11-15 09:59:20 Singular Exp $
+@comment $Id: tricks.doc,v 1.17 2008-01-21 14:34:55 Singular Exp $
 @comment this file contains the "Tricks and pittfalls" sections
 
 @c The following directives are necessary for proper compilation
@@ -120,6 +120,7 @@ differences. Most notably:
 * Usage of brackets::
 * Behavior of continue::
 * Return type of procedures::
+* First index ist 1::
 @end menu
 @c ---------------------------------------
 @node No rvalue of increments and assignments, Evaluation of logical expressions,,Major differences to the C programming language
@@ -309,7 +310,7 @@ for (int i = 1 ; i<=10; i=i+1)
 @expansion{} 10
 @end smallexample
 @c ---------------------------------------
-@node Return type of procedures,,Behavior of continue, Major differences to the C programming language
+@node Return type of procedures,First index is 1,Behavior of continue, Major differences to the C programming language
 @subsection Return type of procedures
 @cindex return type of procedures
 
@@ -362,6 +363,28 @@ proc tworeturn () @{ return (1,2); @}
 int i,j = tworeturn();
 @end smallexample
 
+@c ---------------------------------------
+@node First index is 1,,Return type of procedures, Major differences to the C programming language
+@subsection First index is 1
+@cindex first index is 1
+
+Although the @sc{Singular} language is C like,
+the indices of all objects which may have an index start at 1.
+
+@smallexample
+@c example
+  ring r;
+  ideal i=1,x,z;
+  i[2];
+  intvec v=1,2,3;
+  v[1];
+  poly p=x+y+z;
+  p[2];
+  vector h=[x+y,x,z];
+  h[1];
+  h[1][1];
+@c example
+@end smallexample
 
 @c -------------------------------------------------------------------------
 @node Miscellaneous oddities, Identifier resolution, Major differences to the C programming language, Tricks and pitfalls
