@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.464 2008-01-21 11:19:52 Singular Exp $ */
+/* $Id: iparith.cc,v 1.465 2008-01-21 18:04:48 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -7505,12 +7505,12 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
         s = iiTwoOps(op);
         if (proccall)
         {
-          Werror("%s(`%s`,`%s`) is not supported"
+          Werror("%s(`%s`,`%s`) failed"
                 ,s,Tok2Cmdname(at),Tok2Cmdname(bt));
         }
         else
         {
-          Werror("`%s` %s `%s` is not supported"
+          Werror("`%s` %s `%s` failed"
                 ,Tok2Cmdname(at),s,Tok2Cmdname(bt));
         }
         if (BVERBOSE(V_SHOW_USE))
@@ -7695,7 +7695,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
       {
         i=ti;
         char *s = iiTwoOps(op);
-        Werror("%s(`%s`) is not supported"
+        Werror("%s(`%s`) failed"
                 ,s,Tok2Cmdname(at));
         if (BVERBOSE(V_SHOW_USE))
         {
@@ -7879,7 +7879,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
         i=0;
         while ((dArith3[i].cmd!=op)&&(dArith3[i].cmd!=0)) i++;
         char *s = iiTwoOps(op);
-        Werror("%s(`%s`,`%s`,`%s`) is not supported"
+        Werror("%s(`%s`,`%s`,`%s`) failed"
                 ,s,Tok2Cmdname(at),Tok2Cmdname(bt),Tok2Cmdname(ct));
         if (BVERBOSE(V_SHOW_USE))
         {
@@ -8024,7 +8024,7 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
       else
       {
         char *s = iiTwoOps(op);
-        Werror("%s(...) is not supported",s);
+        Werror("%s(...) failed",s);
       }
     }
     res->rtyp = UNKNOWN;
