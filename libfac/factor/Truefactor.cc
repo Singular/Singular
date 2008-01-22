@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.11 2008-01-07 13:34:56 Singular Exp $";
+//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.12 2008-01-22 09:51:37 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // Factory - Includes
 #include <factory.h>
@@ -228,7 +228,7 @@ Truefactors( const CanonicalForm Ua, int levelU, const SFormList & SubstitutionL
   CanonicalForm U=Ua,a,b,Y;
   CFFactor factor;
   CFFList L,FAC,E_all;
-  int c,r = PiList.length(),degU, onemore,M, h = subvardegree(Ua,levelU) + 1;
+  int c,r = PiList.length(),degU, onemore,M, h = totaldegree(Ua,1,levelU) + 1;
   ListIterator<CFFactor> i;
 
   //CERR << "SubstitutionList="<< SubstitutionList<<"\n";
@@ -449,6 +449,9 @@ CFFList TakeNorms(const CFFList & PiList)
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.11  2008/01/07 13:34:56  Singular
+*hannes: omse optiomzations(isOne)
+
 Revision 1.10  2006/05/16 14:46:50  Singular
 *hannes: gcc 4.1 fixes
 

@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.14 2007-06-14 14:16:35 Singular Exp $";
+// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.15 2008-01-22 09:51:37 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -333,7 +333,7 @@ mvhensel( const CanonicalForm & U , const CanonicalForm & F ,
           const CanonicalForm &alpha)
 {
   CanonicalForm V,Fk=F,Gk=G,Rk,W,D,S;
-  int  levelU=level(U), degU=subvardegree(U,levelU); // degree(U,{x_1,..,x_(level(U)-1)})
+  int  levelU=level(U), degU=totaldegree(U,1,levelU); // degree(U,{x_1,..,x_(level(U)-1)})
   DiophantForm Retvalue;
   RememberArray A(degree(F,levelU)+degree(G,levelU)+1);
   RememberArray B(degree(F,levelU)+degree(G,levelU)+1);
@@ -519,6 +519,9 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.14  2007/06/14 14:16:35  Singular
+*hannes: Factorize2 etc.
+
 Revision 1.13  2007/05/25 16:02:02  Singular
 *hannes: removed diophant_error, format
 

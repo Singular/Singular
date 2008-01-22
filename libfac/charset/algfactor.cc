@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: algfactor.cc,v 1.8 2006-06-19 13:37:46 Singular Exp $";
+static char * rcsid = "$Id: algfactor.cc,v 1.9 2008-01-22 09:51:37 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -428,7 +428,7 @@ cfactor(const CanonicalForm & f, const CFList & as, int success ){
     CFFList CERR=factoras(i.getItem().factor(),as,csuccess);
     success= min(success,csuccess);
     for ( CFFListIterator j=CERR; j.hasItem(); j++)
-      Output = myappend(Output,CFFactor(j.getItem().factor(),j.getItem().exp()*i.getItem().exp()));
+      Output = appendCFFL(Output,CFFactor(j.getItem().factor(),j.getItem().exp()*i.getItem().exp()));
   }
   return Output;
 }
@@ -449,6 +449,9 @@ cfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.8  2006/06/19 13:37:46  Singular
+*hannes: more CS renamed
+
 Revision 1.7  2006/05/16 14:46:48  Singular
 *hannes: gcc 4.1 fixes
 

@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.38 2008-01-07 13:34:56 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.39 2008-01-22 09:51:37 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -311,7 +311,7 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
           // We have to multiply one of the factors with
           // the multiplicity of the save_denumerator <-> lc
           // the following will do what we want
-          Returnlist= myUnion( CFFList(CFFactor(1/a,1)),Returnlist) ;
+          Returnlist= UnionCFFL( CFFList(CFFactor(1/a,1)),Returnlist) ;
         else
         {
 #ifdef HAVE_SINGULAR_ERROR
@@ -718,7 +718,7 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar)
       DEBOUTLN(CERR, "Outputlist_a = ", Outputlist_a);
       Outputlist_b = Factorized(ffuni,alpha);
       DEBOUTLN(CERR, "Outputlist_b = ", Outputlist_b);
-      Outputlist = myUnion(Outputlist_a, Outputlist_b);
+      Outputlist = UnionCFFL(Outputlist_a, Outputlist_b);
       // have to back-swapvar the factors....
       for ( CFFListIterator i=Outputlist; i.hasItem(); i++ ){
         copy=i.getItem();
@@ -927,9 +927,8 @@ CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
   if ( ! is_SqrFree )
   {
     TIMING_START(sqrfree_time);
-    SqrFreeList = InternalSqrFree(F) ; // first sqrfree the polynomial
-    // don't use sqrFree(F), factory's internal sqrFree for multiv.
-    // Polynomials; it's wrong!! Ex.: char=p   f= x^p*(y+1);
+    SqrFreeList = sqrFree(F,0,false) ; // first sqrfree the polynomial
+    // Ex.: char=p   f= x^p*(y+1);
     // InternalSqrFree(f)= ( y+1, (x)^p ), sqrFree(f)= ( y+1 ) .
     TIMING_END(sqrfree_time);
 
@@ -940,7 +939,7 @@ CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
   }
   else
     SqrFreeList.append(CFFactor(F,1));
-  DEBOUTLN(CERR, "InternalSqrFreeList= ", SqrFreeList);
+  DEBOUTLN(CERR, "SqrFreeList= ", SqrFreeList);
   for ( i=SqrFreeList; i.hasItem(); i++ )
   {
     DEBOUTLN(CERR, "Factor under consideration: ", i.getItem().factor());
@@ -976,7 +975,7 @@ CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
 
         for ( j=Intermediatelist; j.hasItem(); j++ )
           //Normally j.getItem().exp() should be 1
-          Outputlist= myappend( Outputlist, CFFactor(m(j.getItem().factor()),exp*j.getItem().exp()));
+          Outputlist= appendCFFL( Outputlist, CFFactor(m(j.getItem().factor()),exp*j.getItem().exp()));
       }
   }
   g=1; unit=1;
@@ -1173,7 +1172,7 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
       else
       {
         CFList as(minpoly);
-        CFFList sqF=sqrFree(F); // sqrFreeZ
+        CFFList sqF=sqrFree(F,0,false); // sqrFreeZ
         CFFList G,H;
         CanonicalForm fac;
         int d;
@@ -1227,9 +1226,8 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
   if ( ! is_SqrFree )
   {
     TIMING_START(sqrfree_time);
-    SqrFreeList = InternalSqrFree(F, minpoly) ; // first sqrfree the polynomial
-    // don't use sqrFree(F), factory's internal sqrFree for multiv.
-    // Polynomials; it's wrong!! Ex.: char=p   f= x^p*(y+1);
+    SqrFreeList = sqrFree(F, minpoly) ; // first sqrfree the polynomial
+    // Ex.: char=p   f= x^p*(y+1);
     // InternalSqrFree(f)= ( y+1, (x)^p ), sqrFree(f)= ( y+1 ) .
     TIMING_END(sqrfree_time);
 
@@ -1240,7 +1238,7 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
   }
   else
     SqrFreeList.append(CFFactor(F,1));
-  DEBOUTLN(CERR, "InternalSqrFreeList= ", SqrFreeList);
+  DEBOUTLN(CERR, "SqrFreeList= ", SqrFreeList);
   for ( i=SqrFreeList; i.hasItem(); i++ )
   {
     DEBOUTLN(CERR, "Factor under consideration: ", i.getItem().factor());
@@ -1280,7 +1278,7 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
         for ( j=Intermediatelist; j.hasItem(); j++ )
           //Normally j.getItem().exp() should be 1
-          Outputlist= myappend( Outputlist, CFFactor(m(j.getItem().factor()),exp*j.getItem().exp()));
+          Outputlist= appendCFFL( Outputlist, CFFactor(m(j.getItem().factor()),exp*j.getItem().exp()));
       }
     }
   }
@@ -1330,6 +1328,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.38  2008/01/07 13:34:56  Singular
+*hannes: omse optiomzations(isOne)
+
 Revision 1.37  2007/10/25 14:45:41  Singular
 *hannes: homgfactor for alg.ext of Q
 

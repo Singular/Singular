@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: alg_factor.cc,v 1.17 2007-05-15 14:46:48 Singular Exp $";
+static char * rcsid = "$Id: alg_factor.cc,v 1.18 2008-01-22 09:51:36 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -753,7 +753,7 @@ newfactoras( const CanonicalForm & f, const CFList & as, int success){
     DEBOUTLN(CERR, "         and ", Ggcd);
     Fgcd= pp(Fgcd); Ggcd= pp(Ggcd);
     DEBDECLEVEL(CERR,"newfactoras");
-    return myUnion(newfactoras(Fgcd,as,success) , newfactoras(Ggcd,as,success));
+    return UnionCFFL(newfactoras(Fgcd,as,success) , newfactoras(Ggcd,as,success));
   }
   if ( getCharacteristic() > 0 ){
 
@@ -822,13 +822,16 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
   for ( CFFListIterator i=Factors; i.hasItem(); i++ ){
     output=newfactoras(i.getItem().factor(),as, success);
     for ( CFFListIterator j=output; j.hasItem(); j++)
-      Output = myappend(Output,CFFactor(j.getItem().factor(),j.getItem().exp()*i.getItem().exp()));
+      Output = appendCFFL(Output,CFFactor(j.getItem().factor(),j.getItem().exp()*i.getItem().exp()));
   }
   return Output;
 }
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.17  2007/05/15 14:46:48  Singular
+*hannes: factorize in Zp(a)[x...]
+
 Revision 1.16  2006/05/16 14:46:48  Singular
 *hannes: gcc 4.1 fixes
 
