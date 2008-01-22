@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.299 2007-12-13 09:59:12 Singular Exp $
+@comment $Id: reference.doc,v 1.300 2008-01-22 10:47:31 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -176,6 +176,7 @@ and @code{LIB} no brackets are allowed.
 * size::
 * slimgb::
 * sortvec::
+* sqrfree::
 * sprintf::
 * sres::
 * status::
@@ -5804,7 +5805,7 @@ See
 @c ref
 
 @c ---------------------------------------
-@node sortvec, sprintf, slimgb, Functions
+@node sortvec, sqrfree, slimgb, Functions
 @subsection sortvec
 @cindex sortvec
 @table @code
@@ -5840,7 +5841,31 @@ See
 @ref{general_lib}.
 @c ref
 @c ---------------------------------------
-@node sprintf, sres, sortvec, Functions
+@node sqrfree, sprintf, sortvec, Functions
+@subsection sqrfree
+@cindex sqrfree
+@table @code
+@item @strong{Syntax:}
+@code{sqrfree (} poly_expression @code{)}
+@item @strong{Type:}
+ideal
+@item @strong{Purpose:}
+computes a squarefree decomposition of the given polynomial.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=3,(x,y,z),dp;
+  poly f=(x-y)^3*(x+z)*(y-z);
+  sqrfree(f);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{factorize}.
+@c ref
+@c ---------------------------------------
+@node sprintf, sres, sqrfree, Functions
 @subsection sprintf
 @cindex sprintf
 @c lib standard.lib:sprintf lib_fun lib_ex subsection
