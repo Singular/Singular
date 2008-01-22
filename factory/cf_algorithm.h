@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.h,v 1.16 2007-10-25 14:45:41 Singular Exp $ */
+/* $Id: cf_algorithm.h,v 1.17 2008-01-22 09:30:31 Singular Exp $ */
 
 #ifndef INCL_CF_ALGORITHM_H
 #define INCL_CF_ALGORITHM_H
@@ -63,7 +63,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree = false );
 
 CFFList factorize ( const CanonicalForm & f, const Variable & alpha );
 
-CFFList sqrFree ( const CanonicalForm & f, bool sort = false );
+CFFList sqrFree ( const CanonicalForm & f,  const CanonicalForm & mipo, bool sort=false );
 
 bool isSqrFree ( const CanonicalForm & f );
 

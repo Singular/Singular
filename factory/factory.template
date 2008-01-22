@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: factory.template,v 1.18 2006-05-15 09:03:04 Singular Exp $ */
+/* $Id: factory.template,v 1.19 2008-01-22 09:30:32 Singular Exp $ */
 
 #ifndef INCL_FACTORY_H
 #define INCL_FACTORY_H
@@ -97,6 +97,9 @@
 
 /*MAKEHEADER PUBLIC ONLY*/
 #include "cf_reval.h"
+
+/*MAKEHEADER PUBLIC ONLY*/
+#include "fac_sqrfree.h"
 
 #ifdef SINGULAR
 
