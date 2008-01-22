@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.37 2008-01-15 12:36:50 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.38 2008-01-22 09:28:22 Singular Exp $ */
 
 //{{{ docu
 //
@@ -480,10 +480,11 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
     else
     {
         // char p, not univariate
-        printf("factorize char p, not univariate\n");
+        //printf("factorize char p, not univariate\n");
+        F = FpFactorizeMultivariate( f, issqrfree );
     }
   }
-  else
+  else // char 0
   {
     bool on_rational = isOn(SW_RATIONAL);
     On(SW_RATIONAL);
@@ -700,15 +701,26 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
   return F;
 }
 
-CFFList sqrFree ( const CanonicalForm & f, bool sort )
+CFFList sqrFree ( const CanonicalForm & f, const CanonicalForm & mipo, bool sort )
 {
-//    ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
+    if ( getNumVars(f) == 0 )
+      return CFFactor(f,1);
+
     CFFList result;
+    CanonicalForm c;
+    if (getCharacteristic() == 0 ) c=icontent(f);
+    else                           c=f.lc();
+    CanonicalForm g=f;
+    if (!c.isOne())
+    {
+       result=CFFactor(c,1);
+       g/=c;
+    }
 
     if ( getCharacteristic() == 0 )
-        result = sqrFreeZ( f );
+        result=Union(result,sqrFreeZ( g, mipo ));
     else
-        result = sqrFreeFp( f );
+        result=Union(result,sqrFreeFp( g, mipo ));
 
     return ( sort ? sortCFFList( result ) : result );
 }
