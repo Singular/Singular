@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.465 2008-01-21 18:04:48 Singular Exp $ */
+/* $Id: iparith.cc,v 1.466 2008-01-22 09:40:03 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -374,6 +374,7 @@ cmdnames cmds[] =
   { "size",        0, COUNT_CMD ,         CMD_1},
   { "slimgb",      0, SLIM_GB_CMD ,       CMD_1},
   { "sortvec",     0, SORTVEC_CMD ,       CMD_1},
+  { "sqrfree",     0, SQR_FREE_CMD ,      CMD_1},
 #ifdef OLD_RES
   { "sres",        0, SRES_CMD ,          CMD_23},
 #else /* OLD_RES */
@@ -1979,6 +1980,54 @@ static BOOLEAN jjEXTGCD_P(leftv res, leftv u, leftv v)
   L->m[2].rtyp=POLY_CMD;
   return FALSE;
 }
+extern int singclap_factorize_retry;
+static BOOLEAN jjFAC_P2(leftv res, leftv u,leftv dummy)
+{
+  intvec *v=NULL;
+  int sw=(int)(long)dummy->Data();
+  int fac_sw=sw;
+  if ((sw<0)||(sw>2)) fac_sw=1;
+  singclap_factorize_retry=0;
+  ideal f=singclap_factorize((poly)(u->CopyD()), &v, fac_sw);
+  if (f==NULL)
+    return TRUE;
+  switch(sw)
+  {
+    case 0:
+    case 2:
+    {
+      lists l=(lists)omAllocBin(slists_bin);
+      l->Init(2);
+      l->m[0].rtyp=IDEAL_CMD;
+      l->m[0].data=(void *)f;
+      l->m[1].rtyp=INTVEC_CMD;
+      l->m[1].data=(void *)v;
+      res->data=(void *)l;
+      res->rtyp=LIST_CMD;
+      return FALSE;
+    }
+    case 1:
+      res->data=(void *)f;
+      return FALSE;
+    case 3:
+      {
+        poly p=f->m[0];
+        int i=IDELEMS(f);
+        f->m[0]=NULL;
+        while(i>1)
+        {
+          i--;
+          p=pMult(p,f->m[i]);
+          f->m[i]=NULL;
+        }
+        res->data=(void *)p;
+        res->rtyp=POLY_CMD;
+      }
+      return FALSE;
+  }
+  WerrorS("invalid switch");
+  return TRUE;
+}
 static BOOLEAN jjFACSTD2(leftv res, leftv v, leftv w)
 {
   ideal_list p,h;
@@ -2875,56 +2924,6 @@ static BOOLEAN jjSIMPL_ID(leftv res, leftv u, leftv v)
   res->data = (char * )id;
   return FALSE;
 }
-#ifdef HAVE_FACTORY
-extern int singclap_factorize_retry;
-static BOOLEAN jjSQR_FREE_DEC(leftv res, leftv u,leftv dummy)
-{
-  intvec *v=NULL;
-  int sw=(int)(long)dummy->Data();
-  int fac_sw=sw;
-  if ((sw<0)||(sw>2)) fac_sw=1;
-  singclap_factorize_retry=0;
-  ideal f=singclap_factorize((poly)(u->CopyD()), &v, fac_sw);
-  if (f==NULL)
-    return TRUE;
-  switch(sw)
-  {
-    case 0:
-    case 2:
-    {
-      lists l=(lists)omAllocBin(slists_bin);
-      l->Init(2);
-      l->m[0].rtyp=IDEAL_CMD;
-      l->m[0].data=(void *)f;
-      l->m[1].rtyp=INTVEC_CMD;
-      l->m[1].data=(void *)v;
-      res->data=(void *)l;
-      res->rtyp=LIST_CMD;
-      return FALSE;
-    }
-    case 1:
-      res->data=(void *)f;
-      return FALSE;
-    case 3:
-      {
-        poly p=f->m[0];
-        int i=IDELEMS(f);
-        f->m[0]=NULL;
-        while(i>1)
-        {
-          i--;
-          p=pMult(p,f->m[i]);
-          f->m[i]=NULL;
-        }
-        res->data=(void *)p;
-        res->rtyp=POLY_CMD;
-      }
-      return FALSE;
-  }
-  WerrorS("invalid switch");
-  return TRUE;
-}
-#endif
 static BOOLEAN jjSTATUS2(leftv res, leftv u, leftv v)
 {
   res->data = omStrDup(slStatus((si_link) u->Data(), (char *) v->Data()));
@@ -3255,8 +3254,8 @@ struct sValCmd2 dArith2[]=
 ,{jjEXTGCD_I,  EXTGCD_CMD,     LIST_CMD,       INT_CMD,    INT_CMD ALLOW_PLURAL}
 #ifdef HAVE_FACTORY
 ,{jjEXTGCD_P,  EXTGCD_CMD,     LIST_CMD,       POLY_CMD,   POLY_CMD NO_PLURAL}
-,{jjSQR_FREE_DEC,FAC_CMD,      IDEAL_CMD,      POLY_CMD,   INT_CMD NO_PLURAL}
-,{jjFACSTD2,    FACSTD_CMD,    LIST_CMD,       IDEAL_CMD,  IDEAL_CMD NO_PLURAL}
+,{jjFAC_P2,     FAC_CMD,        IDEAL_CMD,      POLY_CMD,   INT_CMD NO_PLURAL}
+,{jjFACSTD2,   FACSTD_CMD,     LIST_CMD,       IDEAL_CMD,  IDEAL_CMD NO_PLURAL}
 #else
 ,{jjWRONG2,    EXTGCD_CMD,     LIST_CMD,       POLY_CMD,   POLY_CMD NO_PLURAL}
 ,{jjWRONG2,    FAC_CMD,        IDEAL_CMD,      POLY_CMD,   INT_CMD NO_PLURAL}
@@ -4403,6 +4402,19 @@ static BOOLEAN jjSort_Id(leftv res, leftv v)
   res->data = (char *)idSort((ideal)v->Data());
   return FALSE;
 }
+#ifdef HAVE_FACTORY
+extern int singclap_factorize_retry;
+static BOOLEAN jjSQR_FREE(leftv res, leftv u)
+{
+  intvec *v=NULL;
+  singclap_factorize_retry=0;
+  ideal f=singclap_sqrfree((poly)(u->CopyD()));
+  if (f==NULL)
+    return TRUE;
+  res->data=(void *)f;
+  return FALSE;
+}
+#endif
 #if 1
 static BOOLEAN jjSYZYGY(leftv res, leftv v)
 {
@@ -4412,7 +4424,7 @@ static BOOLEAN jjSYZYGY(leftv res, leftv v)
   return FALSE;
 }
 #else
-// activate, if idSyz hadle moduke weights correctly !
+// activate, if idSyz handle module weights correctly !
 static BOOLEAN jjSYZYGY(leftv res, leftv v)
 {
   intvec *w=(intvec *)atGet(v,"isHomog",INTVEC_CMD);
@@ -5070,6 +5082,7 @@ struct sValCmd1 dArith1[]=
 ,{jjSLIM_GB,    SLIM_GB_CMD,     MODUL_CMD,      MODUL_CMD      ALLOW_PLURAL}
 ,{jjSort_Id,    SORTVEC_CMD,     INTVEC_CMD,     IDEAL_CMD      ALLOW_PLURAL}
 ,{jjSort_Id,    SORTVEC_CMD,     INTVEC_CMD,     MODUL_CMD      ALLOW_PLURAL}
+,{jjSQR_FREE,   SQR_FREE_CMD,    IDEAL_CMD,      POLY_CMD       NO_PLURAL}
 ,{jjSTD,        STD_CMD,         IDEAL_CMD,      IDEAL_CMD      ALLOW_PLURAL}
 ,{jjSTD,        STD_CMD,         MODUL_CMD,      MODUL_CMD      ALLOW_PLURAL}
 ,{jjDUMMY,      STRING_CMD,      STRING_CMD,     STRING_CMD     ALLOW_PLURAL}

@@ -70,3 +70,9 @@ Changes with respect to 3-0-4-1
   Singular/misc.cc: singular_fstat
 - fixed LIB/involut.lib: problems with ring change : nc_algebra
 
+---------------------------------------------------------
+Tue Jan 22 10:40:39 CET 2008
+more Changes with respect to 3-0-4-1
+- sqrFree moved from libfac to factory
+- new command sqrfree
+
