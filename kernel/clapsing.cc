@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.25 2008-01-15 15:25:44 Singular Exp $
+// $Id: clapsing.cc,v 1.26 2008-01-23 15:42:10 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -1160,6 +1160,163 @@ notImpl:
   }
   //if (f!=NULL) pDelete(&f);
   //PrintS("......S\n");
+  return res;
+}
+ideal singclap_sqrfree ( poly f)
+{
+  pTest(f);
+#ifdef FACTORIZE2_DEBUG
+  printf("singclap_sqrfree, degree %d\n",pTotaldegree(f));
+#endif
+  // with_exps: 3,1 return only true factors, no exponents
+  //            2 return true factors and exponents
+  //            0 return coeff, factors and exponents
+  BOOLEAN save_errorreported=errorreported;
+
+  ideal res=NULL;
+
+  // handle factorize(0) =========================================
+  if (f==NULL)
+  {
+    res=idInit(1,1);
+    return res;
+  }
+  // handle factorize(mon) =========================================
+  if (pNext(f)==NULL)
+  {
+    int i=0;
+    int n=0;
+    int e;
+    for(i=pVariables;i>0;i--) if(pGetExp(f,i)!=0) n++;
+    n++; // with coeff
+    res=idInit(si_max(n,1),1);
+    res->m[0]=pOne();
+    pSetCoeff(res->m[0],nCopy(pGetCoeff(f)));
+    if (n==0)
+    {
+      res->m[0]=pOne();
+      // (**v)[0]=1; is already done
+      return res;
+    }
+    for(i=pVariables;i>0;i--)
+    {
+      e=pGetExp(f,i);
+      if(e!=0)
+      {
+        n--;
+        poly p=pOne();
+        pSetExp(p,i,1);
+        pSetm(p);
+        res->m[n]=p;
+      }
+    }
+    return res;
+  }
+  //PrintS("S:");pWrite(f);PrintLn();
+  // use factory/libfac in general ==============================
+  Off(SW_RATIONAL);
+  On(SW_SYMMETRIC_FF);
+  #ifdef HAVE_NTL
+  extern int prime_number;
+  if(rField_is_Q()) prime_number=0;
+  #endif
+  CFFList L;
+
+  if (!rField_is_Zp() && !rField_is_Zp_a()) /* Q, Q(a) */
+  {
+    //if (f!=NULL) // already tested at start of routine
+    {
+      pCleardenom(f);
+    }
+  }
+  else if (rField_is_Zp_a())
+  {
+    //if (f!=NULL) // already tested at start of routine
+    if (singclap_factorize_retry==0)
+    {
+      pNorm(f);
+      pCleardenom(f);
+    }
+  }
+  if (rField_is_Q() || rField_is_Zp())
+  {
+    setCharacteristic( nGetChar() );
+    CanonicalForm F( convSingPFactoryP( f ) );
+    L = sqrFree( F, 0 );
+  }
+  #if 0
+  else if (rField_is_GF())
+  {
+    int c=rChar(currRing);
+    setCharacteristic( c, primepower(c) );
+    CanonicalForm F( convSingGFFactoryGF( f ) );
+    if (F.isUnivariate())
+    {
+      L = factorize( F );
+    }
+    else
+    {
+      goto notImpl;
+    }
+  }
+  #endif
+  // and over Q(a) / Fp(a)
+  else if (rField_is_Extension())
+  {
+    if (rField_is_Q_a()) setCharacteristic( 0 );
+    else                 setCharacteristic( -nGetChar() );
+    if (currRing->minpoly!=NULL)
+    {
+      CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
+      Variable a=rootOf(mipo);
+      CanonicalForm F( convSingAPFactoryAP( f,a ) );
+      L = sqrFree( F,mipo );
+    }
+    else
+    {
+      CanonicalForm F( convSingTrPFactoryP( f ) );
+      L = sqrFree( F, 0 );
+    }
+  }
+  else
+  {
+    goto notImpl;
+  }
+  {
+    poly ff=pCopy(f); // a copy for the retry stuff
+    // convert into ideal
+    int n = L.length();
+    if (n==0) n=1;
+    CFFListIterator J=L;
+    int j=0;
+    res = idInit( n ,1);
+    for ( ; J.hasItem(); J++, j++ )
+    {
+      poly p;
+      if (rField_is_Zp() || rField_is_Q())           /* Q, Fp */
+        //count_Factors(res,*v,f, j, convFactoryPSingP( J.getItem().factor() );
+        res->m[j] = convFactoryPSingP( J.getItem().factor() );
+      #if 0
+      else if (rField_is_GF())
+        res->m[j] = convFactoryGFSingGF( J.getItem().factor() );
+      #endif
+      else if (rField_is_Extension())     /* Q(a), Fp(a) */
+      {
+        if (currRing->minpoly==NULL)
+          res->m[j]=convFactoryPSingTrP( J.getItem().factor() );
+        else
+          res->m[j]=convFactoryAPSingAP( J.getItem().factor() );
+      }
+    }
+    if (res->m[0]==NULL)
+    {
+      res->m[0]=pOne();
+    }
+  }
+  errorreported=save_errorreported;
+notImpl:
+  if (res==NULL)
+    WerrorS( feNotImplemented );
   return res;
 }
 matrix singclap_irrCharSeries ( ideal I)

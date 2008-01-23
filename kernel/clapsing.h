@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.h,v 1.1.1.1 2003-10-06 12:15:50 Singular Exp $
+// $Id: clapsing.h,v 1.2 2008-01-23 15:42:10 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -30,6 +30,8 @@ poly singclap_pdivide ( poly f, poly g );
 void singclap_divide_content ( poly f );
 
 ideal singclap_factorize ( poly f, intvec ** v , int with_exps);
+
+ideal singclap_sqrfree ( poly f );
 
 matrix singclap_irrCharSeries ( ideal I);
 
