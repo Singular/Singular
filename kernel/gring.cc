@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.50 2007-10-30 15:23:26 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.51 2008-01-24 10:07:14 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -2064,28 +2064,30 @@ ideal twostd(ideal I)
         #endif
         #endif
 
-        q = nc_ReduceSpoly(p,q,currRing);
+        if (q!=NULL)
+        {
+          q = nc_ReduceSpoly(p,q,currRing);
 
-        #ifdef PDEBUG
-          p_Test(q, currRing);
-        #if 0
-          Print("Reducing q: "); // !
-          p_Write(q, currRing);
+          #ifdef PDEBUG
+            p_Test(q, currRing);
+          #if 0
+            Print("Reducing q: "); // !
+            p_Write(q, currRing);
 
-          Print("With J!\n");
-        #endif
-        #endif
+            Print("With J!\n");
+          #endif
+          #endif
 
-        q = kNF(J,currQuotient,q,0,KSTD_NF_NONORM);
+          if (q!=NULL) q = kNF(J,currQuotient,q,0,KSTD_NF_NONORM);
 
-        #ifdef PDEBUG
-          p_Test(q, currRing);
-        #if 0
-          Print("=> q: "); // !
-          p_Write(q, currRing);
-        #endif
-        #endif
-
+          #ifdef PDEBUG
+            p_Test(q, currRing);
+          #if 0
+            Print("=> q: "); // !
+            p_Write(q, currRing);
+          #endif
+          #endif
+        }
         if (q!=NULL)
         {
           if (pIsConstant(q)) // => return (1)!
