@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_sqrfree.cc,v 1.8 2008-01-22 09:30:31 Singular Exp $ */
+/* $Id: fac_sqrfree.cc,v 1.9 2008-01-25 14:17:59 Singular Exp $ */
 
 #include <config.h>
 
@@ -340,17 +340,6 @@ CFFList sqrFreeFp ( const CanonicalForm & r, const CanonicalForm &mipo )
     return Outputlist ;
   }
   return Outputlist; // for safety purpose
-}
-
-bool isSqrFreeFp( const CanonicalForm & f )
-{
-  CFFList F = sqrFreeFp( f );
-  return ( F.length() == 1 && F.getFirst().exp() == 1 );
-}
-
-bool isSqrFreeZ ( const CanonicalForm & f )
-{
-    return gcd( f, f.deriv() ).degree() == 0;
 }
 
 /*

@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: alg_factor.cc,v 1.18 2008-01-22 09:51:36 Singular Exp $";
+static char * rcsid = "$Id: alg_factor.cc,v 1.19 2008-01-25 14:19:39 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -198,8 +198,8 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       DEBOUTLN(CERR, "sqrf_norm_sub: sqfreetest= ", sqfreetest);
     }
     else{
-      DEBOUTMSG(CERR, "Starting SqrFreeTest(R)!");
-      // Look at SqrFreeTest!
+      DEBOUTMSG(CERR, "Starting isSqrFree(R)!");
+      // Look at isSqrFree!
       // (z+a^5+w)^4 with z<w<a should not give sqfreetest=1 !
       // for now we use this workaround with Factorize...
       // ...but it should go away soon!!!!
@@ -218,7 +218,7 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       sqfreetest=1;
       for ( i=testlist; i.hasItem(); i++)
         if ( i.getItem().exp() > 1 && degree(i.getItem().factor(), R.mvar()) > 0) { sqfreetest=0; break; }
-      DEBOUTLN(CERR, "SqrFreeTest(R)= ", sqfreetest);
+      DEBOUTLN(CERR, "isSqrFree(R)= ", sqfreetest);
     }
     if ( ! sqfreetest ){
       myrandom.next();
@@ -263,8 +263,8 @@ sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       DEBOUTLN(CERR, "sqrf_norm_sub: sqfreetest= ", sqfreetest);
     }
     else{
-      DEBOUTMSG(CERR, "Starting SqrFreeTest(R)!");
-      // Look at SqrFreeTest!
+      DEBOUTMSG(CERR, "Starting isSqrFree(R)!");
+      // Look at isSqrFree!
       // (z+a^5+w)^4 with z<w<a should not give sqfreetest=1 !
       // for now we use this workaround with Factorize...
       // ...but it should go away soon!!!!
@@ -283,7 +283,7 @@ sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       sqfreetest=1;
       for ( i=testlist; i.hasItem(); i++)
         if ( i.getItem().exp() > 1 && degree(i.getItem().factor(), R.mvar()) > 0) { sqfreetest=0; break; }
-      DEBOUTLN(CERR, "SqrFreeTest(R)= ", sqfreetest);
+      DEBOUTLN(CERR, "isSqrFree(R)= ", sqfreetest);
     }
     if ( ! sqfreetest ){
       myrandom.next();
@@ -829,6 +829,9 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.18  2008/01/22 09:51:36  Singular
+*hannes: sqrFree/InternalSqrFree -> factory
+
 Revision 1.17  2007/05/15 14:46:48  Singular
 *hannes: factorize in Zp(a)[x...]
 

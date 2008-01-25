@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.39 2008-01-22 09:51:37 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.40 2008-01-25 14:19:40 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -362,7 +362,7 @@ various_tests( const CanonicalForm & g, int deg, int vars_left)
 
   if ( degree(g) == deg ) // degrees match
     if ( level(compress(g,m)) == (vars_left) ) // exactly one variable less
-      if ( SqrFreeTest(g,1) ) // poly is sqrfree
+      if ( isSqrFree(g) ) // poly is sqrfree
         if ( gcd(g,g.deriv()).isOne() ) // Discriminante != 0
            return 1;
   return 0;
@@ -923,7 +923,7 @@ CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
   // Maybe it`s better to add a sqrfree-test before?
   // (If gcd is fast...)
   ///////
-  //  if ( ! SqrFreeTest(F) ){
+  //  if ( ! isSqrFree(F) ){
   if ( ! is_SqrFree )
   {
     TIMING_START(sqrfree_time);
@@ -1222,7 +1222,7 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
   // Maybe it`s better to add a sqrfree-test before?
   // (If gcd is fast...)
   ///////
-  //  if ( ! SqrFreeTest(F) ){
+  //  if ( ! isSqrFree(F) ){
   if ( ! is_SqrFree )
   {
     TIMING_START(sqrfree_time);
@@ -1328,6 +1328,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.39  2008/01/22 09:51:37  Singular
+*hannes: sqrFree/InternalSqrFree -> factory
+
 Revision 1.38  2008/01/07 13:34:56  Singular
 *hannes: omse optiomzations(isOne)
 

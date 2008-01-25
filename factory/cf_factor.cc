@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.38 2008-01-22 09:28:22 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.39 2008-01-25 14:17:59 Singular Exp $ */
 
 //{{{ docu
 //
@@ -725,12 +725,73 @@ CFFList sqrFree ( const CanonicalForm & f, const CanonicalForm & mipo, bool sort
     return ( sort ? sortCFFList( result ) : result );
 }
 
-bool isSqrFree ( const CanonicalForm & f )
+///////////////////////////////////////////////////////////////
+// A uni/multivariate SqrFreeTest routine.                   //
+// Cheaper to run if all you want is a test.                 //
+// Works for charcteristic 0 and q=p^m                       //
+// Returns 1 if poly r is SqrFree, 0 if SqrFree will do some //
+// kind of factorization.                                    //
+// Would be much more effcient iff we had *good*             //
+//  uni/multivariate gcd's and/or gcdtest's                  //
+///////////////////////////////////////////////////////////////
+bool isSqrFree ( const CanonicalForm & r )
 {
-//    ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
-    if ( getCharacteristic() == 0 )
-        return isSqrFreeZ( f );
+  CanonicalForm f=r, g;
+  int n=level(f);
+
+  if (getNumVars(f)==0) return 1 ; // a constant is SqrFree
+  if ( f.isUnivariate() )
+  {
+    g= f.deriv();
+    if ( getCharacteristic() > 0 && g.isZero() ) return 0 ;
+    // Next: it would be best to have a *univariate* gcd-test which returns
+    // 0 iff gcdtest(f,g) == 1 or a constant ( for real Polynomials )
+    g = gcd(f,g);
+    if ( g.isOne() || (-g).isOne() ) return 1;
     else
-        return isSqrFreeFp( f );
+      if ( getNumVars(g) == 0 ) return 1;// <- totaldegree!!!
+      else return 0 ;
+  }
+  else
+  { // multivariate case
+    for ( int k=1; k<=n; k++ )
+    {
+      g = swapvar(f,k,n); g = content(g);
+      // g = 1 || -1 : sqr-free, g poly : not sqr-free, g number : ..
+      if ( ! (g.isOne() || (-g).isOne() || getNumVars(g)==0 ) )
+      {
+        if ( isSqrFree(g) == 0 ) return 0;
+        g = swapvar(g,k,n);
+        f /=g ;
+      }
+    }
+    // Now f is primitive
+    n = level(f); // maybe less indeterminants
+    //    if ( totaldegree(f) <= 1 ) return 1;
+
+    // Let`s look if it is a Pth root
+    if ( getCharacteristic() > 0 )
+      for (int k=1; k<=n; k++ )
+      {
+        g=swapvar(f,k,n); g=g.deriv();
+        if ( ! g.isZero() ) break ;
+        else if ( k==n) return 0 ; // really is Pth root
+      }
+    g = f.deriv() ;
+    // Next: it would be best to have a *multivariate* gcd-test which returns
+    // 0 iff gcdtest(f,g) == 1 or a constant ( for real Polynomials )
+    g= gcd(f,g);
+    if ( g.isOne() || (-g).isOne() || (g==f) || (getNumVars(g)==0) ) return 1 ;
+    else return 0 ;
+  }
+#ifdef HAVE_SINGULAR_ERROR
+  WerrorS("libfac: ERROR: isSqrFree: we should never fall trough here!");
+#else
+#ifndef NOSTREAMIO
+  CERR << "\nlibfac: ERROR: isSqrFree: we should never fall trough here!\n"
+       << rcsid << errmsg << "\n";
+#endif
+#endif
+  return 0;
 }
 

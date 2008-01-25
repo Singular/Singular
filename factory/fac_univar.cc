@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_univar.cc,v 1.20 2008-01-22 09:30:31 Singular Exp $ */
+/* $Id: fac_univar.cc,v 1.21 2008-01-25 14:17:59 Singular Exp $ */
 
 #include <config.h>
 
@@ -213,19 +213,21 @@ liftDegreeFactRec( CFArray & theFactors, CanonicalForm & F, const CanonicalForm 
 }
 
 
-static int
-choosePrimes ( int * p, const CanonicalForm & f )
+static int choosePrimes ( int * p, const CanonicalForm & f )
 {
     int ptr = 0;
     int i = 0;
     int maxp = cf_getNumPrimes();
     int prime;
 
-    while ( ptr < maxp && i < max_fp_fac ) {
+    while ( ptr < maxp && i < max_fp_fac )
+    {
 	prime = cf_getPrime( ptr );
-	if ( mod( lc( f ), prime ) != 0 ) {
+	if ( mod( lc( f ), prime ) != 0 )
+	{
 	    setCharacteristic( prime );
-	    if ( isSqrFreeFp( mapinto( f ) ) ) {
+	    if ( isSqrFree( mapinto( f ) ) )
+	    {
 		p[i] = prime;
 		i++;
 	    }
