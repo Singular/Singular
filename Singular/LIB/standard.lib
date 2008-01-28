@@ -2,7 +2,7 @@
 //major revision Jan/Feb. 2007, GMG
 //groebner mit Optionen versehen
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.100 2008-01-28 10:45:25 Singular Exp $";
+version="$Id: standard.lib,v 1.101 2008-01-28 11:42:30 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -39,7 +39,7 @@ SEE ALSO: fglm, groebner, std, slimgb, stdhilb
 KEYWORDS: fglm
 EXAMPLE: example stdfglm; shows an example"
 {
-  if (nrows(i) > 1)
+  if (typeof(i)!="ideal")
   {
     ERROR("first argument of 'stdfglm' must be an ideal");
   }
@@ -513,7 +513,14 @@ EXAMPLE: example par2varRing; shows an example"
     for( ii = 1; ii <= s; ii++)
     {
       def Id(ii) = imap(P,Id(ii));
-      Id(ii) = Id(ii),Minpoly*freemodule(nrows(Id(ii)));
+      if (typeof(Id(ii))=="module")
+      {
+        Id(ii) = Id(ii),Minpoly*freemodule(nrows(Id(ii)));
+      }
+      else
+      {
+        Id(ii) = Id(ii),Minpoly;
+      }
       export (Id(ii));
     }
   }
@@ -577,7 +584,10 @@ EXAMPLE: example hilbRing; shows an example
   for(k = 1; k <= s; k++)
   {
     def Id(k) = #[k];
-    int nr(k) = nrows(Id(k));
+    if (typeof(Id(k))=="module")
+    {
+      int nr(k) = nrows(Id(k));
+    }
   }
 
   // a homogenizing variable is added:
@@ -627,7 +637,14 @@ EXAMPLE: example hilbRing; shows an example
     for(k = 1; k <= s; k++)
     {  //homogenize
       def Id(k) =  homog( imap(P,Id(k)), `homvar` );
-      Id(k) =  Id(k),@Qidealhilb@*freemodule(nr(k)) ;
+      if (typeof(Id(k))=="module")
+      {
+        Id(k) =  Id(k),@Qidealhilb@*freemodule(nr(k)) ;
+      }
+      else
+      {
+        Id(k) =  Id(k),@Qidealhilb@ ;
+      }
       export(Id(k));
     }
   }
