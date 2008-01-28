@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.466 2008-01-22 09:40:03 Singular Exp $ */
+/* $Id: iparith.cc,v 1.467 2008-01-28 13:43:35 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4970,12 +4970,12 @@ struct sValCmd1 dArith1[]=
 ,{jjHILBERT_IV, HILBERT_CMD,     INTVEC_CMD,     INTVEC_CMD     NO_PLURAL}
 ,{jjHOMOG1,     HOMOG_CMD,       INT_CMD,        IDEAL_CMD      ALLOW_PLURAL}
 ,{jjHOMOG1,     HOMOG_CMD,       INT_CMD,        MODUL_CMD      ALLOW_PLURAL}
+,{jjDUMMY,      IDEAL_CMD,       IDEAL_CMD,      IDEAL_CMD      ALLOW_PLURAL}
 ,{jjidVec2Ideal,IDEAL_CMD,       XS(IDEAL_CMD),  VECTOR_CMD     ALLOW_PLURAL}
 ,{jjIDEAL_Ma,   IDEAL_CMD,       IDEAL_CMD,      MATRIX_CMD     ALLOW_PLURAL}
 ,{jjIDEAL_R,    IDEAL_CMD,       IDEAL_CMD,      QRING_CMD      ALLOW_PLURAL}
 ,{jjIDEAL_R,    IDEAL_CMD,       IDEAL_CMD,      RING_CMD       ALLOW_PLURAL}
 ,{jjIDEAL_Map,  IDEAL_CMD,       IDEAL_CMD,      MAP_CMD        ALLOW_PLURAL}
-,{jjDUMMY,      IDEAL_CMD,       IDEAL_CMD,      IDEAL_CMD      ALLOW_PLURAL}
 ,{jjIMPART,     IMPART_CMD,      NUMBER_CMD,     NUMBER_CMD     ALLOW_PLURAL}
 ,{jjINDEPSET,   INDEPSET_CMD,    INTVEC_CMD,     IDEAL_CMD      NO_PLURAL}
 ,{jjDUMMY,      INT_CMD,         INT_CMD,        INT_CMD        ALLOW_PLURAL}
