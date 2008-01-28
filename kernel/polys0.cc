@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys0.cc,v 1.2 2008-01-28 11:28:20 Singular Exp $ */
+/* $Id: polys0.cc,v 1.3 2008-01-28 13:44:59 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to convert polynomials to strings
@@ -168,7 +168,7 @@ void p_wrp0(poly p, ring ri)
     }
   }
 }
-#ifndef __OPTIMIZE__
+//#if !defined(__OPTIMIZE__) || defined(KDEBUG): used in list1
 #if 1
 void p_wrp(poly p, ring lmRing, ring tailRing)
 {
@@ -205,4 +205,4 @@ void p_wrp(poly p, ring lmRing, ring tailRing)
   }
 }
 #endif
-#endif
+//#endif
