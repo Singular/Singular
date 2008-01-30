@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.4 2008-01-30 10:21:53 wienand Exp $ */
+/* $Id: rintegers.cc,v 1.5 2008-01-30 13:03:41 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -16,7 +16,7 @@
 #include "longrat.h"
 #include "mpr_complex.h"
 #include "ring.h"
-#include "rmodulon.h"
+#include "rintegers.h"
 #include "gmp.h"
 
 #ifdef HAVE_RINGZ
@@ -142,9 +142,7 @@ BOOLEAN nrzIsZero (number  a)
 
 BOOLEAN nrzIsOne (number a)
 {
-  int x = mpz_cmp_si((int_number) a, 1);
-  bool tmp = (0 == x);
-  return tmp;
+  return 0 == mpz_cmp_si((int_number) a, 1);
 }
 
 BOOLEAN nrzIsMOne (number a)
@@ -169,15 +167,15 @@ BOOLEAN nrzGreaterZero (number k)
 
 int nrzComp(number a, number b)
 {
-  if (nrnEqual(a, b)) return 0;
-  if (nrnDivBy(a, b)) return -1;
-  if (nrnDivBy(b, a)) return 1;
+  if (nrzEqual(a, b)) return 0;
+  if (nrzDivBy(a, b)) return -1;
+  if (nrzDivBy(b, a)) return 1;
   return 2;
 }
 
 BOOLEAN nrzDivBy (number a,number b)
 {
-  return mpz_divisible_p((int_number) a, (int_number) b) > 0;//TODO
+  return mpz_divisible_p((int_number) a, (int_number) b) != 0;
 }
 
 number nrzDiv (number a,number b)

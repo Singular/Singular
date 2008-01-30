@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.8 2008-01-30 10:21:53 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.9 2008-01-30 13:03:41 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -17,58 +17,28 @@
 #include "mpr_complex.h"
 #include "ring.h"
 #include "rmodulon.h"
+#include "gmp.h"
 
 #ifdef HAVE_RINGMODN
 
-NATNUMBER nrnModul;
+typedef MP_INT *int_number;
 
-NATNUMBER XSGCD3(NATNUMBER a, NATNUMBER b, NATNUMBER c)
-{
-  while ((a != 0 && b != 0) || (a != 0 && c != 0) || (b != 0 && c != 0))
-  {
-    if (a > b)
-    {
-      if (b > c) a = a % b;       // a > b > c
-      else
-      {
-        if (a > c) a = a % c;     // a > b, c > b, a > c ==> a > c > b
-        else c = c % a;           // c > a > b
-      }
-    }
-    else
-    {
-      if (a > c) b = b % a;       // a > b > c
-      else
-      {
-        if (b > c) b = b % c;     // a > b, c > b, a > c ==> a > c > b
-        else c = c % b;           // c > a > b
-      }
-    }
-  }
-  return a + b + c;
-}
+int_number nrnModul;
+int_number nrnMinusOne;
 
-NATNUMBER XSGCD2(NATNUMBER a, NATNUMBER b)
-{
-  NATNUMBER TMP;
-  while (a != 0 && b != 0)
-  {
-     TMP = a % b;
-     a = b;
-     b = TMP;
-  }
-  return a;
-}
+// int_number nrnModul;
+// int_number nrnMinusOne;
 
 /*
  * Multiply two numbers
  */
-number nrnMult (number a,number b)
+number nrnMult (number a, number b)
 {
-  if (((NATNUMBER)a == 0) || ((NATNUMBER)b == 0))
-    return (number)0;
-  else
-    return nrnMultM(a,b);
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_mul(erg, (int_number) a, (int_number) b);
+  mpz_mod(erg, erg, nrnModul);
+  return (number) erg;
 }
 
 /*
@@ -76,8 +46,10 @@ number nrnMult (number a,number b)
  */
 number nrnLcm (number a,number b,ring r)
 {
-  NATNUMBER erg = XSGCD2(nrnModul, (NATNUMBER) a) * XSGCD2(nrnModul, (NATNUMBER) b) / XSGCD3(nrnModul, (NATNUMBER) a, (NATNUMBER) b);
-  if (erg == nrnModul) return NULL;   // Schneller als return erg % nrnModul ?
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_lcm(erg, (int_number) a, (int_number) b);
+  mpz_mod(erg, erg, nrnModul);
   return (number) erg;
 }
 
@@ -87,180 +59,11 @@ number nrnLcm (number a,number b,ring r)
  */
 number nrnGcd (number a,number b,ring r)
 {
-  return (number) XSGCD3(nrnModul, (NATNUMBER) a, (NATNUMBER) b);
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_gcd(erg, (int_number) a, (int_number) b);
+  return (number) erg;
 }
-
-void nrnPower (number a, int i, number * result)
-{
-  if (i==0)
-  {
-    //npInit(1,result);
-    *(NATNUMBER *)result = 1;
-  }
-  else if (i==1)
-  {
-    *result = a;
-  }
-  else
-  {
-    nrnPower(a,i-1,result);
-    *result = nrnMultM(a,*result);
-  }
-}
-
-/*
- * create a number from int
- */
-number nrnInit (int i)
-{
-  long ii = i;
-  while (ii < 0) ii += nrnModul;
-  while ((ii>1) && (ii >= nrnModul)) ii -= nrnModul;
-  return (number) ii;
-}
-
-/*
- * convert a number to int (-p/2 .. p/2)
- */
-int nrnInt(number &n)
-{
-  if ((NATNUMBER)n > (nrnModul >>1)) return (int)((NATNUMBER)n - nrnModul);
-  else return (int)((NATNUMBER)n);
-}
-
-number nrnAdd (number a, number b)
-{
-  return nrnAddM(a,b);
-}
-
-number nrnSub (number a, number b)
-{
-  return nrnSubM(a,b);
-}
-
-number  nrnGetUnit (number k)
-{
-  number unit = nrnIntDiv(k, nrnGcd(k, 0, currRing));
-  number gcd = nrnGcd(unit, 0, currRing);
-  if (!nrnIsOne(gcd))
-  {
-    number tmp = nrnMult(unit, unit);
-    number gcd_new = nrnGcd(tmp, 0, currRing);
-    while (gcd_new != gcd)
-    {
-      gcd = gcd_new;
-      tmp = nrnMult(tmp, unit);
-      gcd_new = nrnGcd(tmp, 0, currRing);
-    }
-    unit = nrnAdd(unit, nrnIntDiv(0, gcd_new));
-  }
-//  Print("k = %d ; unit = %d ; gcd = %d", k, unit, gcd);
-  return unit;
-}
-
-BOOLEAN nrnIsZero (number  a)
-{
-  return 0 == (NATNUMBER)a;
-}
-
-BOOLEAN nrnIsOne (number a)
-{
-  return 1 == (NATNUMBER)a;
-}
-
-BOOLEAN nrnIsUnit (number a)
-{
-  return nrnIsOne(nrnGcd(0, a, currRing));
-}
-
-BOOLEAN nrnIsMOne (number a)
-{
-  return (nrnModul == (NATNUMBER)a + 1)  && (nrnModul != 2);
-}
-
-BOOLEAN nrnEqual (number a,number b)
-{
-  return nrnEqualM(a,b);
-}
-
-BOOLEAN nrnGreater (number a,number b)
-{
-  nrnDivBy(a, b);
-}
-
-int nrnComp(number a, number b)
-{
-   NATNUMBER bs = XSGCD2((NATNUMBER) b, nrnModul);
-   NATNUMBER as = XSGCD2((NATNUMBER) a, nrnModul);
-   if (bs == as) return 0;
-   if (as % bs == 0) return -1;
-   if (bs % as == 0) return 1;
-   return 2;
-}
-
-BOOLEAN nrnDivBy (number a,number b)
-{
-  return (XSGCD2((NATNUMBER) b / XSGCD2((NATNUMBER) a, (NATNUMBER) b), nrnModul) == 1);
-}
-
-BOOLEAN nrnGreaterZero (number k)
-{
-  return (((NATNUMBER) k) != 0) && ((NATNUMBER) k <= (nrnModul>>1));
-}
-
-//#ifdef HAVE_DIV_MOD
-#if 1 //ifdef HAVE_NTL // in ntl.a
-//extern void XGCD(long& d, long& s, long& t, long a, long b);
-#include <NTL/ZZ.h>
-#ifdef NTL_CLIENT
-NTL_CLIENT
-#endif
-#else
-void XGCD(long& d, long& s, long& t, long a, long b)
-{
-   long  u, v, u0, v0, u1, v1, u2, v2, q, r;
-
-   long aneg = 0, bneg = 0;
-
-   if (a < 0) {
-      a = -a;
-      aneg = 1;
-   }
-
-   if (b < 0) {
-      b = -b;
-      bneg = 1;
-   }
-
-   u1=1; v1=0;
-   u2=0; v2=1;
-   u = a; v = b;
-
-   while (v != 0) {
-      q = u / v;
-      r = u % v;
-      u = v;
-      v = r;
-      u0 = u2;
-      v0 = v2;
-      u2 =  u1 - q*u2;
-      v2 = v1- q*v2;
-      u1 = u0;
-      v1 = v0;
-   }
-
-   if (aneg)
-      u1 = -u1;
-
-   if (bneg)
-      v1 = -v1;
-
-   d = u;
-   s = u1;
-   t = v1;
-}
-#endif
-//#endif
 
 /*
  * Give the largest non unit k, such that a = x * k, b = y * k has
@@ -268,116 +71,192 @@ void XGCD(long& d, long& s, long& t, long a, long b)
  */
 number  nrnExtGcd (number a, number b, number *s, number *t)
 {
-  long bs;
-  long bt;
-  long d;
-  XGCD(d, bs, bt, (long) a, (long) b);
-  *s = nrnInit(bs);
-  *t = nrnInit(bt);
-  return (number) d;
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  int_number bs = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  int_number bt = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_init(bs);
+  mpz_init(bt);
+  mpz_gcdext(erg, bs, bt, (int_number) a, (int_number) b);
+  *s = (number) bs;
+  *t = (number) bt;
+  return (number) erg;
 }
 
-NATNUMBER InvModN(NATNUMBER a)
+void nrnPower (number a, int i, number * result)
 {
-   long d, s, t;
-
-   // TODO in chain wird XSGCD2 aufgerufen
-   XGCD(d, s, t, a, nrnModul);
-   assume (d == 1);
-   if (s < 0)
-      return s + nrnModul;
-   else
-      return s;
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_pow_ui(erg, (int_number) a, i);
+  mpz_mod(erg, erg, nrnModul);
+  *result = (number) erg;
 }
 
-inline number nrnInversM (number c)
+/*
+ * create a number from int
+ */
+number nrnInit (int i)
 {
-  // Table !!!
-  NATNUMBER inv;
-  inv = InvModN((NATNUMBER)c);
-  return (number) inv;
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init_set_si(erg, i);
+  return (number) erg;
+}
+
+void nrnDelete(number *a, const ring r)
+{
+  mpz_clear((int_number) *a);
+  omFree((ADDRESS) *a);
+}
+
+/*
+ * convert a number to int (-p/2 .. p/2)
+ */
+int nrnInt(number &n)
+{
+  return (int) mpz_get_si( (int_number) &n);
+}
+
+number nrnAdd (number a, number b)
+{
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_add(erg, (int_number) a, (int_number) b);
+  mpz_mod(erg, erg, nrnModul);
+  return (number) erg;
+}
+
+number nrnSub (number a, number b)
+{
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_sub(erg, (int_number) a, (int_number) b);
+  mpz_mod(erg, erg, nrnModul);
+  return (number) erg;
+}
+
+number  nrnGetUnit (number a)
+{
+  return nrnDiv((number) nrnModul, nrnGcd(a, (number) nrnModul, NULL));
+}
+
+BOOLEAN nrnIsUnit (number a)
+{
+  return nrnIsOne(nrnGcd(a, (number) nrnModul, NULL));
+}
+
+BOOLEAN nrnIsZero (number  a)
+{
+  return 0 == mpz_cmpabs_ui((int_number) a, 0);
+}
+
+BOOLEAN nrnIsOne (number a)
+{
+  return 0 == mpz_cmp_si((int_number) a, 1);
+}
+
+BOOLEAN nrnIsMOne (number a)
+{
+  return 0 == mpz_cmp((int_number) a, nrnMinusOne);
+}
+
+BOOLEAN nrnEqual (number a,number b)
+{
+  return 0 == mpz_cmp((int_number) a, (int_number) b);
+}
+
+BOOLEAN nrnGreater (number a,number b)
+{
+  return 0 < mpz_cmp((int_number) a, (int_number) b);
+}
+
+BOOLEAN nrnGreaterZero (number k)
+{
+  return 0 <= mpz_cmp_si((int_number) k, 0);
+}
+
+int nrnComp(number a, number b)
+{
+  if (nrnEqual(a, b)) return 0;
+  if (nrnDivBy(a, b)) return -1;
+  if (nrnDivBy(b, a)) return 1;
+  return 2;
+}
+
+BOOLEAN nrnDivBy (number a,number b)
+{
+  return mpz_divisible_p((int_number) a, (int_number) b) != 0;
 }
 
 number nrnDiv (number a,number b)
 {
-  NATNUMBER tmp = XSGCD3(nrnModul, (NATNUMBER) a, (NATNUMBER) b);
-  a = (number) ((NATNUMBER) a / tmp);
-  b = (number) ((NATNUMBER) b / tmp);
-  if (XSGCD2(nrnModul, (NATNUMBER) b) == 1)
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  if (nrnDivBy(a, b))
   {
-    return (number) nrnMult(a, nrnInversM(b));
+    mpz_divexact(erg, (int_number) a, (int_number) b);
+    return (number) erg;
   }
   else
   {
-    WerrorS("div by zero divisor");
-    return (number)0;
+    int_number gcd = (int_number) nrnGcd(a, b, NULL);
+    int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+    mpz_init(erg);
+    mpz_divexact(erg, (int_number) b, gcd);
+    if (!nrnIsUnit((number) erg))
+    {
+      WarnS("Division by non divisible element.");
+      WarnS("Result is zero.");
+    }
+    gcd = (int_number) nrnInvers((number) erg);
+    mpz_divexact(erg, (int_number) a, gcd);
+    mpz_mul(erg, erg, gcd);
+    mpz_clear(gcd);
+    omFree(gcd);
+    mpz_mod(erg, erg, nrnModul);
+    return (number) erg;
   }
 }
 
 number nrnIntDiv (number a,number b)
 {
-  if ((NATNUMBER)a==0)
-  {
-    if ((NATNUMBER)b==0)
-      return (number) 1;
-    if ((NATNUMBER)b==1)
-      return (number) 0;
-    return (number) ( nrnModul / (NATNUMBER) b);
-  }
-  else
-  {
-    if ((NATNUMBER)b==0)
-      return (number) 0;
-    return (number) ((NATNUMBER) a / (NATNUMBER) b);
-  }
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_tdiv_q(erg, (int_number) a, (int_number) b);
+  return (number) erg;
 }
 
 number  nrnInvers (number c)
 {
-  if (XSGCD2(nrnModul, (NATNUMBER) c) != 1)
+  number s;
+  number t;
+  number k;
+/*
+ * Give the largest non unit k, such that a = x * k, b = y * k has
+ * a solution and r, s, s.t. k = s*a + t*b
+ */
+  k = nrnExtGcd((number) nrnModul, c, &s, &t);
+  if (!nrnIsOne((number) k))
   {
-    WerrorS("division by zero divisor");
-    return (number)0;
+    WarnS("Non invertible element.");
+    return nrnInit(0);                                   //TODO
   }
-  return nrnInversM(c);
+  mpz_clear((int_number) k);
+  omFree((ADDRESS) k);
+  mpz_clear((int_number) s);
+  omFree((ADDRESS) s);
+  return (number) t;
 }
 
 number nrnNeg (number c)
 {
-  if ((NATNUMBER)c==0) return c;
-  return nrnNegM(c);
-}
-
-NATNUMBER nrnMapModul;
-NATNUMBER nrnMapCoef;
-
-number nrnMapModN(number from)
-{
-  NATNUMBER i = (nrnMapCoef * (NATNUMBER) from) % nrnModul;
-  return (number) i;
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_sub(erg, nrnModul, (int_number) c);
+  return (number) erg;
 }
 
 nMapFunc nrnSetMap(ring src, ring dst)
 {
-  if (rField_is_Ring_ModN(src))
-  {
-    if (src->ringflaga == dst->ringflaga) return ndCopy;
-    else
-    {
-      nrnMapModul = (NATNUMBER) src->ringflaga;
-      if (nrnModul % nrnMapModul == 0)
-      {
-        nrnMapCoef = (nrnModul / nrnMapModul);
-        NATNUMBER tmp = nrnModul;
-        nrnModul = nrnMapModul;
-        nrnMapCoef *= (NATNUMBER) nrnInvers((number) (nrnMapCoef % nrnMapModul));
-        nrnModul = tmp;
-      }
-      else
-        nrnMapCoef = 1;
-      return nrnMapModN;
-    }
-  }
   return NULL;      /* default */
 }
 
@@ -388,15 +267,21 @@ nMapFunc nrnSetMap(ring src, ring dst)
 
 void nrnSetExp(int m, ring r)
 {
-  nrnModul = m;
+  nrnModul = (int_number) nrnInit(m);
+  nrnMinusOne = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(nrnMinusOne);
+  mpz_sub_ui(nrnMinusOne, nrnModul, 1);
+
 //  PrintS("Modul: ");
 //  Print("%d\n", nrnModul);
 }
 
 void nrnInitExp(int m, ring r)
 {
-  nrnModul = m;
-
+  nrnModul = (int_number) nrnInit(m);
+  nrnMinusOne = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(nrnMinusOne);
+  mpz_sub_ui(nrnMinusOne, nrnModul, 1);
   if (m < 2)
   {
     WarnS("nInitChar failed");
@@ -406,7 +291,7 @@ void nrnInitExp(int m, ring r)
 #ifdef LDEBUG
 BOOLEAN nrnDBTest (number a, char *f, int l)
 {
-  if (((NATNUMBER)a<0) || ((NATNUMBER)a>nrnModul))
+  if ( (mpz_cmp_si((int_number) a, 0) < 0) || (mpz_cmp((int_number) a, nrnModul) > 0) )
   {
     return FALSE;
   }
@@ -416,44 +301,53 @@ BOOLEAN nrnDBTest (number a, char *f, int l)
 
 void nrnWrite (number &a)
 {
-  if ((NATNUMBER)a > (nrnModul >>1)) StringAppend("-%d",(int)(nrnModul-((NATNUMBER)a)));
-  else                          StringAppend("%d",(int)((NATNUMBER)a));
+  char *s,*z;
+  if (a==NULL)
+  {
+    StringAppendS("o");
+  }
+  else
+  {
+    int l=mpz_sizeinbase((int_number) a, 10);
+    if (a->s<2) l=si_max(l,mpz_sizeinbase((int_number) a,10));
+    l+=2;
+    s=(char*)omAlloc(l);
+    z=mpz_get_str(s,10,(int_number) a);
+    StringAppendS(z);
+    omFreeSize((ADDRESS)s,l);
+  }
 }
 
-char* nrnEati(char *s, int *i)
+/*2
+* extracts a long integer from s, returns the rest    (COPY FROM longrat0.cc)
+*/
+char * nlCPEatLongC(char *s, MP_INT *i)
 {
+  char * start=s;
 
-  if (((*s) >= '0') && ((*s) <= '9'))
+  while (*s >= '0' && *s <= '9') s++;
+  if (*s=='\0')
   {
-    (*i) = 0;
-    do
-    {
-      (*i) *= 10;
-      (*i) += *s++ - '0';
-      if ((*i) >= (MAX_INT_VAL / 10)) (*i) = (*i) % nrnModul;
-    }
-    while (((*s) >= '0') && ((*s) <= '9'));
-    if ((*i) >= nrnModul) (*i) = (*i) % nrnModul;
+    mpz_set_str(i,start,10);
   }
-  else (*i) = 1;
+  else
+  {
+    char c=*s;
+    *s='\0';
+    mpz_set_str(i,start,10);
+    *s=c;
+  }
   return s;
 }
 
 char * nrnRead (char *s, number *a)
 {
-  int z;
-  int n=1;
-
-  s = nrnEati(s, &z);
-  if ((*s) == '/')
+  int_number z = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
   {
-    s++;
-    s = nrnEati(s, &n);
+    mpz_init(z);
+    s = nlCPEatLongC(s, z);
   }
-  if (n == 1)
-    *a = (number)z;
-  else
-      *a = nrnDiv((number)z,(number)n);
+  *a = (number) z;
   return s;
 }
 #endif

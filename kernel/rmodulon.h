@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.h,v 1.4 2007-06-20 09:39:25 wienand Exp $ */
+/* $Id: rmodulon.h,v 1.5 2008-01-30 13:03:41 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -13,9 +13,6 @@
 #ifndef NATNUMBER
 #define NATNUMBER unsigned long
 #endif
-
-extern int nrnExp;
-extern NATNUMBER nrnModul;
 
 BOOLEAN nrnGreaterZero (number k);
 number  nrnMult        (number a, number b);
@@ -49,28 +46,6 @@ BOOLEAN nrnDBTest      (number a, char *f, int l);
 #endif
 void    nrnSetExp(int c, ring r);
 void    nrnInitExp(int c, ring r);
-
-
-static inline number nrnMultM(number a, number b)
-{
-  return (number) 
-    ((((NATNUMBER) a)*((NATNUMBER) b)) % ((NATNUMBER) nrnModul));
-}
-
-static inline number nrnAddM(number a, number b)
-{
-  NATNUMBER r = (NATNUMBER)a + (NATNUMBER)b;
-  return (number) (r >= nrnModul ? r - nrnModul : r);
-}
-
-static inline number nrnSubM(number a, number b)
-{
-  return (number)((NATNUMBER)a<(NATNUMBER)b ?
-                       nrnModul-(NATNUMBER)b+(NATNUMBER)a : (NATNUMBER)a-(NATNUMBER)b);
-}
-
-#define nrnNegM(A) (number)(nrnModul-(NATNUMBER)(A))
-#define nrnEqualM(A,B)  ((A)==(B))
 
 #endif
 #endif
