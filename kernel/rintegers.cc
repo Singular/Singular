@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.3 2007-06-20 13:19:41 wienand Exp $ */
+/* $Id: rintegers.cc,v 1.4 2008-01-30 10:21:53 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -142,7 +142,14 @@ BOOLEAN nrzIsZero (number  a)
 
 BOOLEAN nrzIsOne (number a)
 {
-  return 0 == mpz_cmp_si((int_number) a, 1);
+  int x = mpz_cmp_si((int_number) a, 1);
+  bool tmp = (0 == x);
+  return tmp;
+}
+
+BOOLEAN nrzIsMOne (number a)
+{
+  return 0 == mpz_cmp_si((int_number) a, -1);
 }
 
 BOOLEAN nrzEqual (number a,number b)
@@ -153,6 +160,11 @@ BOOLEAN nrzEqual (number a,number b)
 BOOLEAN nrzGreater (number a,number b)
 {
   return 0 < mpz_cmp((int_number) a, (int_number) b);
+}
+
+BOOLEAN nrzGreaterZero (number k)
+{
+  return 0 <= mpz_cmp_si((int_number) k, 0);
 }
 
 int nrzComp(number a, number b)
@@ -166,16 +178,6 @@ int nrzComp(number a, number b)
 BOOLEAN nrzDivBy (number a,number b)
 {
   return mpz_divisible_p((int_number) a, (int_number) b) > 0;//TODO
-}
-
-BOOLEAN nrzGreaterZero (number k)
-{
-  return 0 <= mpz_cmp_si((int_number) k, 0);
-}
-
-BOOLEAN nrzIsMOne (number a)
-{
-  return 0 == mpz_cmp_si((int_number) a, 1);
 }
 
 number nrzDiv (number a,number b)

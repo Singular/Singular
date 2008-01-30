@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.13 2007-07-04 13:51:02 Singular Exp $ */
+/* $Id: rmodulo2m.cc,v 1.14 2008-01-30 10:21:53 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -183,7 +183,7 @@ BOOLEAN nr2mIsOne (number a)
 
 BOOLEAN nr2mIsMOne (number a)
 {
-  return nr2mModul == (NATNUMBER)a + 1;
+  return (nr2mModul == (NATNUMBER)a + 1) && (nr2mModul != 2);
 }
 
 BOOLEAN nr2mEqual (number a,number b)

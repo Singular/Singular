@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.7 2007-06-26 18:34:16 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.8 2008-01-30 10:21:53 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -175,7 +175,7 @@ BOOLEAN nrnIsUnit (number a)
 
 BOOLEAN nrnIsMOne (number a)
 {
-  return nrnModul == (NATNUMBER)a + 1;
+  return (nrnModul == (NATNUMBER)a + 1)  && (nrnModul != 2);
 }
 
 BOOLEAN nrnEqual (number a,number b)
