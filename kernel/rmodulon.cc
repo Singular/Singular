@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.11 2008-01-30 18:49:43 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.12 2008-01-30 19:10:46 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -150,7 +150,6 @@ number nrnSub (number a, number b)
 
 number  nrnGetUnit (number k)
 {
-  return nrnInit(1);
   number unit = nrnIntDiv(k, nrnGcd(k, 0, currRing));
   number gcd = nrnGcd(unit, 0, currRing);
   if (!nrnIsOne(gcd))
