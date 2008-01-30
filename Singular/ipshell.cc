@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.173 2008-01-30 08:14:45 wienand Exp $ */
+/* $Id: ipshell.cc,v 1.174 2008-01-30 14:28:16 wienand Exp $ */
 /*
 * ABSTRACT:
 */
@@ -4438,6 +4438,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     ch = module;
     ringtype = 2;
     ringflaga = module;
+    ringflagb = 1;
     WarnS("Z/n not yet fully tested");
   }
 #endif
@@ -4463,7 +4464,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       goto rInitError;
     }
     ch = exp;
-    if (base == 2)
+    if ((base == 2) && (exp + 2 <= 8*sizeof(NATNUMBER)))
     {
       ringtype = 1; // Use Z/2^ch
       ringflaga = 2;
@@ -4472,12 +4473,15 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     }
     else
     {
+      if ((base == 2) && (exp + 2 > 8*sizeof(NATNUMBER)))
+      {
+        Print("// exponent+2 is larger then number of bits in 'NATNUMBER' (%d bits)\n", 8*sizeof(NATNUMBER));
+        WarnS("==> using generic gmp implementation (restriction from design and NTL)");
+      }
       ringtype = 3;
       ringflaga = base;
       ringflagb = exp;
-      // ch = base**exp
-      Werror("p^n not yet implemented");
-      goto rInitError;
+      WarnS("Z/p^n not yet fully tested");
     }
   }
 #endif
