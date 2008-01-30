@@ -295,11 +295,8 @@ BOOLEAN setOption(leftv res, leftv v)
 #if 0
         if (TEST_OPT_INTSTRATEGY && (currRing!=NULL)
         && rField_has_simple_inverse()
-#ifdef HAVE_RING2TOM
-        && !rField_is_Ring_2toM(currRing)
-#endif
-#ifdef HAVE_RINGMODN
-        && !rField_is_Ring_ModN(currRing)
+#ifdef HAVE_RINGS
+        && !rField_is_Ring(currRing)
 #endif
         ) {
           test &=~Sy_bit(OPT_INTSTRATEGY);
@@ -330,11 +327,8 @@ BOOLEAN setOption(leftv res, leftv v)
 #if 0
         if (TEST_OPT_INTSTRATEGY && (currRing!=NULL)
         && rField_has_simple_inverse()
-#ifdef HAVE_RING2TOM
-        && !rField_is_Ring_2toM(currRing)
-#endif
-#ifdef HAVE_RINGMODN
-        && !rField_is_Ring_ModN(currRing)
+#ifdef HAVE_RINGS
+        && !rField_is_Ring(currRing)
 #endif
         ) {
           test &=~Sy_bit(OPT_INTSTRATEGY);

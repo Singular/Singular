@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.172 2008-01-11 10:56:45 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.173 2008-01-30 08:14:45 wienand Exp $ */
 /*
 * ABSTRACT:
 */
@@ -552,24 +552,6 @@ int exprlist_length(leftv v)
   }
   return rc;
 }
-
-#ifdef HAVE_RING2TOM_OLD
-// avoid to test the "special" char: -1, 0, 1, 2
-int Is2toM(int p)  /* brute force !!!! */
-{
-  if (p <= 2) return 0;
-  int test = p;
-  int i = 0;
-  while (p%2 == 0) {
-    p = p / 2;
-    i++;
-  }
-  if (p == 1) {
-    return i;
-  }
-  return 0;
-}
-#endif
 
 int IsPrime(int p)  /* brute force !!!! */
 {
@@ -4484,7 +4466,8 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     if (base == 2)
     {
       ringtype = 1; // Use Z/2^ch
-      ringflaga = exp;
+      ringflaga = 2;
+      ringflagb = exp;
       WarnS("Z/2^n not yet fully tested");
     }
     else
