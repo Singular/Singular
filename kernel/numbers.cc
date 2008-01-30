@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.11 2007-07-03 14:45:57 Singular Exp $ */
+/* $Id: numbers.cc,v 1.12 2008-01-30 16:14:24 wienand Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -146,6 +146,13 @@ void nSetChar(ring r)
 #ifdef HAVE_RINGMODN
   /*----------------------ring Z / n----------------*/
   else if (rField_is_Ring_ModN(r))
+  {
+    nrnSetExp(c, r);
+  }
+#endif
+#ifdef HAVE_RINGMODN
+  /*----------------------ring Z / n----------------*/
+  else if (rField_is_Ring_PtoM(r))
   {
     nrnSetExp(c, r);
   }
@@ -369,7 +376,8 @@ void nInitChar(ring r)
 #endif
 #ifdef HAVE_RINGMODN
   /* -------------- Z/n ----------------------- */
-  else if (rField_is_Ring_ModN(r))
+  else if (rField_is_Ring_ModN(r) || rField_is_Ring_PtoM(r)
+  )
   {
      nrnInitExp(c,r);
      n->nInit  = nrnInit;

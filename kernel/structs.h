@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.41 2007-11-09 11:29:44 Singular Exp $ */
+/* $Id: structs.h,v 1.42 2008-01-30 16:14:25 wienand Exp $ */
 /*
 * ABSTRACT
 */
@@ -549,8 +549,8 @@ struct sip_sring
   int        ch;     /* characteristic */
 #ifdef HAVE_RINGS
   unsigned int ringtype;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
-  unsigned long ringflaga;
-  unsigned int ringflagb;
+  unsigned long long ringflaga;
+  unsigned long ringflagb;
 #endif
   int        ref; /* reference counter to the ring */
 

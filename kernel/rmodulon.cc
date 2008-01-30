@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.9 2008-01-30 13:03:41 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.10 2008-01-30 16:14:25 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -23,11 +23,10 @@
 
 typedef MP_INT *int_number;
 
-int_number nrnModul;
-int_number nrnMinusOne;
-
-// int_number nrnModul;
-// int_number nrnMinusOne;
+int_number nrnModul = NULL;
+int_number nrnMinusOne = NULL;
+unsigned long nrnExponent = 0;
+unsigned long long nrnBase = 0;
 
 /*
  * Multiply two numbers
@@ -89,6 +88,11 @@ void nrnPower (number a, int i, number * result)
   mpz_init(erg);
   mpz_pow_ui(erg, (int_number) a, i);
   mpz_mod(erg, erg, nrnModul);
+//  int_number tmp = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+//  mpz_init(tmp);
+//  mpz_clear(erg);
+//  omFree(erg);
+//  erg = tmp;
   *result = (number) erg;
 }
 
@@ -204,14 +208,22 @@ number nrnDiv (number a,number b)
     mpz_divexact(erg, (int_number) b, gcd);
     if (!nrnIsUnit((number) erg))
     {
-      WarnS("Division by non divisible element.");
+      WarnS("Division not possible, even by cancelling zero divisors.");
       WarnS("Result is zero.");
+      mpz_set_ui(erg, 0);
+      mpz_clear(gcd);
+      omFree(gcd);
+      return (number) erg;
     }
-    gcd = (int_number) nrnInvers((number) erg);
+    int_number tmp = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+    mpz_init(tmp);
+    tmp = (int_number) nrnInvers((number) erg);
     mpz_divexact(erg, (int_number) a, gcd);
-    mpz_mul(erg, erg, gcd);
+    mpz_mul(erg, erg, tmp);
     mpz_clear(gcd);
     omFree(gcd);
+    mpz_clear(tmp);
+    omFree(tmp);
     mpz_mod(erg, erg, nrnModul);
     return (number) erg;
   }
@@ -227,24 +239,10 @@ number nrnIntDiv (number a,number b)
 
 number  nrnInvers (number c)
 {
-  number s;
-  number t;
-  number k;
-/*
- * Give the largest non unit k, such that a = x * k, b = y * k has
- * a solution and r, s, s.t. k = s*a + t*b
- */
-  k = nrnExtGcd((number) nrnModul, c, &s, &t);
-  if (!nrnIsOne((number) k))
-  {
-    WarnS("Non invertible element.");
-    return nrnInit(0);                                   //TODO
-  }
-  mpz_clear((int_number) k);
-  omFree((ADDRESS) k);
-  mpz_clear((int_number) s);
-  omFree((ADDRESS) s);
-  return (number) t;
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_invert(erg, (int_number) c, nrnModul);
+  return (number) erg;
 }
 
 number nrnNeg (number c)
@@ -265,24 +263,40 @@ nMapFunc nrnSetMap(ring src, ring dst)
  * set the exponent (allocate and init tables) (TODO)
  */
 
+void mpz_set_ull(int_number res, unsigned long long xx)
+{
+  unsigned long h = xx >> 32;
+  mpz_set_ui (res, h);
+  mpz_mul_2exp (res, res, 32);
+  mpz_add_ui (res, res, (unsigned long) xx);
+}
+
 void nrnSetExp(int m, ring r)
 {
-  nrnModul = (int_number) nrnInit(m);
+  if ((nrnBase == r->ringflaga) && (nrnExponent == r->ringflagb)) return;
+  nrnBase = r->ringflaga;
+  nrnExponent = r->ringflagb;
+  if (nrnModul != NULL)
+  {
+    mpz_clear(nrnModul);
+    omFree(nrnModul);
+    mpz_clear(nrnMinusOne);
+    omFree(nrnMinusOne);
+  }
+  nrnModul = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(nrnModul);
+  mpz_set_ull(nrnModul, nrnBase);
+  mpz_pow_ui(nrnModul, nrnModul, nrnExponent);
+
   nrnMinusOne = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
   mpz_init(nrnMinusOne);
   mpz_sub_ui(nrnMinusOne, nrnModul, 1);
-
-//  PrintS("Modul: ");
-//  Print("%d\n", nrnModul);
 }
 
 void nrnInitExp(int m, ring r)
 {
-  nrnModul = (int_number) nrnInit(m);
-  nrnMinusOne = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
-  mpz_init(nrnMinusOne);
-  mpz_sub_ui(nrnMinusOne, nrnModul, 1);
-  if (m < 2)
+  nrnSetExp(m, r);
+  if (mpz_cmp_ui(nrnModul,2) <= 0)
   {
     WarnS("nInitChar failed");
   }
