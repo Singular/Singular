@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.5 2008-01-30 13:03:41 wienand Exp $ */
+/* $Id: rintegers.cc,v 1.6 2008-01-30 18:49:43 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -273,7 +273,12 @@ void nrzWrite (number &a)
 char * nlEatLongC(char *s, MP_INT *i)
 {
   char * start=s;
-
+  if (!(*s >= '0' && *s <= '9'))
+  {
+    mpz_init_set_si(i, 1);
+    return s;
+  }
+  mpz_init(i);
   while (*s >= '0' && *s <= '9') s++;
   if (*s=='\0')
   {
@@ -288,6 +293,7 @@ char * nlEatLongC(char *s, MP_INT *i)
   }
   return s;
 }
+
 
 char * nrzRead (char *s, number *a)
 {

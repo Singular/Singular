@@ -6,7 +6,7 @@
  *  Purpose: template for p_Minus_m_Mult_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Minus_mm_Mult_qq__T.cc,v 1.6 2007-05-10 08:12:42 wienand Exp $
+ *  Version: $Id: p_Minus_mm_Mult_qq__T.cc,v 1.7 2008-01-30 18:49:43 wienand Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -67,7 +67,7 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
   Equal:   // qm equals p
   tb = n_Mult(pGetCoeff(q), tm, r);
 #ifdef HAVE_ZERODIVISORS
-  if ((long) tb != 0) {
+  if (!nIsZero(tb)) {
 #endif
   tc = pGetCoeff(p);
   if (!n_Equal(tc, tb, r))
@@ -98,7 +98,7 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
   Greater:
 #ifdef HAVE_ZERODIVISORS
   tb = n_Mult(pGetCoeff(q), tneg, r);
-  if ((long) tb != 0)
+  if (!nIsZero(tb))
   {
 #endif
     pSetCoeff0(qm, n_Mult(pGetCoeff(q), tneg, r));
