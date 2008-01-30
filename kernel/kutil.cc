@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.74 2008-01-30 18:49:42 wienand Exp $ */
+/* $Id: kutil.cc,v 1.75 2008-01-30 18:56:36 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1244,11 +1244,6 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
 /*2
 * put the  lcm(s[i],p)  into the set B
 */
-
-#include <NTL/ZZ.h>
-#ifdef NTL_CLIENT
-NTL_CLIENT
-#endif
 
 BOOLEAN enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR = -1)
 {

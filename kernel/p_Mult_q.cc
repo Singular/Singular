@@ -6,7 +6,7 @@
  *  Purpose: multiplication of polynomials
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Mult_q.cc,v 1.5 2007-05-10 10:29:28 wienand Exp $
+ *  Version: $Id: p_Mult_q.cc,v 1.6 2008-01-30 18:56:37 wienand Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -192,7 +192,7 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
 {
   assume(p != NULL && pNext(p) != NULL && q != NULL && pNext(q) != NULL);
 #ifdef HAVE_RINGS
-  assume(!(rField_is_Ring(r)));
+  assume(rField_is_Domain(r));
 #endif
   pAssume1(! pHaveCommonMonoms(p, q));
   p_Test(p, r);
@@ -284,7 +284,7 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
   }
   if (lq < MIN_LENGTH_BUCKET || TEST_OPT_NOT_BUCKETS)
 #ifdef HAVE_RINGS
-    if (rField_is_Ring(currRing))
+    if (!rField_is_Domain(currRing))
       return _p_Mult_q_Normal_ZeroDiv(p, q, copy, r);
     else
 #endif
