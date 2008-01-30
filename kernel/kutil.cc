@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.72 2008-01-30 09:01:36 wienand Exp $ */
+/* $Id: kutil.cc,v 1.73 2008-01-30 09:14:04 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -4430,7 +4430,7 @@ void initS (ideal F, ideal Q,kStrategy strat)
   /*- test, if a unit is in F -*/
   if ((strat->sl>=0)
 #ifdef HAVE_RINGS
-       && nIsUnit(pGetCoef(strat->L[strat->Ll].p)
+       && nIsUnit(pGetCoeff(strat->L[strat->Ll].p))
 #endif
        && pIsConstant(strat->S[0]))
   {
@@ -4529,7 +4529,7 @@ void initSL (ideal F, ideal Q,kStrategy strat)
 
   if ((strat->Ll>=0) 
 #ifdef HAVE_RINGS
-       && nIsUnit(pGetCoef(strat->L[strat->Ll].p)
+       && nIsUnit(pGetCoeff(strat->L[strat->Ll].p))
 #endif
        && pIsConstant(strat->L[strat->Ll].p))
   {
