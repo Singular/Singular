@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.174 2008-01-30 14:28:16 wienand Exp $ */
+/* $Id: ipshell.cc,v 1.175 2008-01-30 16:10:37 wienand Exp $ */
 /*
 * ABSTRACT:
 */
@@ -4370,8 +4370,8 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 {
   int ch;
 #ifdef HAVE_RINGS
-  int ringtype = 0;
-  unsigned long ringflaga = 0;
+  unsigned int ringtype = 0;
+  unsigned long long ringflaga = 0;
   unsigned int ringflagb = 0;
 #endif
   int float_len=0;
@@ -4424,15 +4424,15 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   else if ((pn->name != NULL)
   && (strcmp(pn->name,"modnat")==0))
   {
-    long module = 0;
-    if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
+    unsigned long long module = 1;
+    while ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
     {
-      module =(unsigned long) pn->next->Data();
+      module *= (unsigned long long) pn->next->Data();
       pn=pn->next;
     }
     if ((module < 2))
     {
-      Werror("Wrong ground ring specification");
+      Werror("Wrong ground ring specification (modnat)");
       goto rInitError;
     }
     ch = module;
