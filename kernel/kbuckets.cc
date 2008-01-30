@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.33 2007-05-11 10:48:03 wienand Exp $ */
+/* $Id: kbuckets.cc,v 1.34 2008-01-30 09:01:36 wienand Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -594,13 +594,6 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
       if (bucket->coef[i]!=NULL)
       {
         bucket->coef[i] = p_Mult_nn(bucket->coef[i],n,r);
-#ifdef HAVE_RING2TOM_OLD
-        if (r->cring == 1 && (long) bucket->coef[i] == 0) {
-          bucket->coef[i] = NULL;
-          bucket->buckets[i] = NULL;
-          bucket->buckets_length[i] = 0;
-        }
-#endif
       }
       else
       {
@@ -620,9 +613,6 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
   kbTest(bucket);
 #else
   bucket->p = p_Mult_nn(bucket->p, n, bucket->bucket_ring);
-#ifdef HAVE_RING2TOM_OLD
-  if (r->cring == 1) bucket->buckets_length[i] = pLength(bucket->buckets[i]);
-#endif
 #endif
 }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.56 2007-11-06 16:30:20 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.57 2008-01-30 09:01:36 wienand Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -145,79 +145,6 @@ int kFindNextDivisibleByInS(const kStrategy strat, int start,int max_ind, LObjec
 }
 
 #ifdef HAVE_RING2TOM
-/*        Obsolute since changes to pLmDiv
-// return -1 if no divisor is found
-//        number of first divisor, otherwise
-int kRingFindDivisibleByInT(const TSet &T, const unsigned long* sevT,
-                        const int tl, const LObject* L, const int start)
-{
-  unsigned long not_sev = ~L->sev;
-  int j = start;
-  poly p;
-  ring r;
-  L->GetLm(p, r);
-
-  pAssume(~not_sev == p_GetShortExpVector(p, r));
-
-  {
-    loop
-    {
-      if (j > tl) return -1;
-#if defined(PDEBUG) || defined(PDIV_DEBUG)
-      if (p_LmRingShortDivisibleBy(T[j].p, sevT[j],
-                               p, not_sev, r))
-        return j;
-#else
-      if ( !(sevT[j] & not_sev) &&
-           p_LmRingDivisibleBy(T[j].p, p, r) )
-        return j;
-#endif
-      j++;
-    }
-  }
-  return -1;
-}
-
-// same as above, only with set S
-int kRingFindDivisibleByInS(const polyset &S, const unsigned long* sev, const int sl, LObject* L)
-{
-  unsigned long not_sev = ~L->sev;
-  poly p = L->GetLmCurrRing();
-  int j = 0;
-  //PrintS("FindDiv: p="); wrp(p); PrintLn();
-  pAssume(~not_sev == p_GetShortExpVector(p, currRing));
-  loop
-  {
-    //PrintS("FindDiv: S[j]="); wrp(S[j]); PrintLn();
-    if (j > sl) return -1;
-#if defined(PDEBUG) || defined(PDIV_DEBUG)
-    if (p_LmRingShortDivisibleBy(S[j], sev[j],
-                             p, not_sev, currRing))
-        return j;
-#else
-    if ( !(sev[j] & not_sev) &&
-         p_LmRingDivisibleBy(S[j], p, currRing) )
-      return j;
-#endif
-    j++;
-  }
-}
-*/
-
-/* now in kutil.cc
-long twoPow(long arg)
-{
-  long t = arg;
-  long result = 1;
-  while (t > 0)
-  {
-    result = 2 * result;
-    t--;
-  }
-  return result;
-}
-*/
-
 NATNUMBER factorial(NATNUMBER arg)
 {
    NATNUMBER tmp = 1; arg++;
@@ -1010,16 +937,7 @@ poly redNF (poly h,int &max_ind,kStrategy strat)
   kbTest(P.bucket);
   loop
   {
-/* Obsolete since change in pLmDiv
-#ifdef HAVE_RING2TOM
-    if (currRing->cring == 1)
-    {
-      j=kRingFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P);
-    }
-    else
-#endif
-*/
-      j=kFindDivisibleByInS(strat,&max_ind,&P);
+    j=kFindDivisibleByInS(strat,&max_ind,&P);
     if (j>=0)
     {
       int sl=pSize(strat->S[j]);

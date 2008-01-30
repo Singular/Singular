@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Impl.h,v 1.7 2007-05-10 08:12:42 wienand Exp $
+ *  Version: $Id: p_Procs_Impl.h,v 1.8 2008-01-30 09:01:38 wienand Exp $
  *******************************************************************/
 #ifndef P_PROCS_IMPL_H
 #define P_PROCS_IMPL_H
@@ -88,10 +88,10 @@
 
 
 // Predicate which returns true if alloc/copy/free of numbers is
-// like that of Zp
+// like that of Zp (rings should use GMP in future)
 #ifdef HAVE_RINGS
 #define ZP_COPY_FIELD(field) \
-  (field == FieldZp || field == FieldGF || field == FieldR || field == RingGeneral)
+  (field == FieldZp || field == FieldGF || field == FieldR)
 #else
 #define ZP_COPY_FIELD(field) \
   (field == FieldZp || field == FieldGF || field == FieldR)

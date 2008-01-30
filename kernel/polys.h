@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.14 2007-11-16 17:25:10 Singular Exp $ */
+/* $Id: polys.h,v 1.15 2008-01-30 09:01:38 wienand Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -251,15 +251,6 @@ extern poly pHeadProc(poly p);
 #define   pIsUnivariate(p)  p_IsUnivariate(p, currRing)
 #define   pIsVector(p)      (pGetComp(p)>0)
 #define   pGetVariables(p,e)  p_GetVariables(p, e, currRing)
-
-#ifdef HAVE_RINGS
-/*
- * Test stuff for dev OLIVER
- */
- 
-// number nGetUnit(number k);
-#endif
-
 
 /***************************************************************
  *

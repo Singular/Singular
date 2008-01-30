@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.28 2007-11-09 11:31:53 Singular Exp $ */
+/* $Id: kutil.h,v 1.29 2008-01-30 09:01:37 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -279,9 +279,6 @@ public:
   poly    t_kNoether;
   BOOLEAN * NotUsedAxis;
   BOOLEAN * pairtest;/*used for enterOnePair*/
-#ifdef HAVE_RING2TOM
-//  unsigned int * lmcomp;/*used for enterOnePairRing and chainCritRing*/
-#endif
   poly tail;
   leftv kIdeal;
   intvec * kModW;
@@ -455,20 +452,6 @@ TObject*
 kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
                     long ecart = LONG_MAX);
 
-/*Obsolete since changes to pLmDiv
-#ifdef HAVE_RING2TOM
-// same for rings
-int kRingFindDivisibleByInT(const TSet &T, const unsigned long* sevT,
-                        const int tl, const LObject* L, const int start=0);
-int kRingFindDivisibleByInS(const polyset &S, const unsigned long* sev,
-                        const int sl, LObject* L);
-
-
-TObject*
-kRingFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
-                    long ecart = LONG_MAX);
-#endif
-*/
 /***************************************************************
  *
  * stuff to be inlined
@@ -554,15 +537,6 @@ int ksReducePoly(LObject* PR,
                  poly spNoether = NULL,
                  number *coef = NULL,
                  kStrategy strat = NULL);
-
-#ifdef HAVE_RING2TOM_OLD
-// same for rings
-int ksRingReducePoly(LObject* PR,
-                 TObject* PW,
-                 poly spNoether = NULL,
-                 number *coef = NULL,
-                 kStrategy strat = NULL);
-#endif
 
 // Reduces PR at Current->next with PW
 // Assumes PR != NULL, Current contained in PR

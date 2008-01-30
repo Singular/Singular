@@ -3,10 +3,10 @@
 ****************************************/
 /***************************************************************
  *  File:    p_Numbers.h
- *  Purpose: macros/inline functions for number oerations
+ *  Purpose: macros/inline functions for number operations
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Numbers.h,v 1.2 2007-05-10 08:12:42 wienand Exp $
+ *  Version: $Id: p_Numbers.h,v 1.3 2008-01-30 09:01:37 wienand Exp $
  *******************************************************************/
 #ifndef P_NUMBERS_H
 #define P_NUMBERS_H

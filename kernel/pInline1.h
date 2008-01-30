@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.13 2007-05-24 10:02:43 wienand Exp $
+ *  Version: $Id: pInline1.h,v 1.14 2008-01-30 09:01:37 wienand Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -19,9 +19,6 @@
 #include "p_MemCmp.h"
 #include "structs.h"
 #include "numbers.h"
-#ifdef HAVE_RINGMODN
-// #include "febase.h"
-#endif
 
 #if PDEBUG > 0 || defined(NO_PINLINE1)
 
@@ -398,37 +395,6 @@ static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, poly b, ring r)
 #endif
 }
 
-#ifdef HAVE_RING2TOM_OLD
-/***************************************************************
- *
- * divisibility for rings (considers coefficients)
- *
- ***************************************************************/
-// return: FALSE, if there exists i, such that a->exp[i] > b->exp[i]
-//         TRUE, otherwise
-// (1) Consider long vars, instead of single exponents
-// (2) Clearly, if la > lb, then FALSE
-// (3) Suppose la <= lb, and consider first bits of single exponents in l:
-//     if TRUE, then value of these bits is la ^ lb
-//     if FALSE, then la-lb causes an "overflow" into one of those bits, i.e.,
-//               la ^ lb != la - lb
-static inline BOOLEAN _p_LmRingDivisibleByNoComp(poly a, poly b, ring r)
-{
-  BOOLEAN mDiv = _p_LmDivisibleByNoComp(a, b, r);
-  if (mDiv) {
-    long lside = (long) p_GetCoeff(a,r);
-    long rside = (long) p_GetCoeff(b,r);
-    // Später durch bitvergleiche viel schneller  TODO OLIVER
-    while (lside%2 == 0 && rside%2 == 0) {
-      lside = lside / 2;
-      rside = rside / 2;
-    }
-    return (lside%2 != 0);     // Is lside, i.e. LC(a), a unit?
-  }
-  return FALSE;
-}
-#endif
-
 static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, ring r_a, poly b, ring r_b)
 {
   int i=r_a->N;
@@ -447,24 +413,6 @@ static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, ring r_a, poly b, ring r_b)
   return TRUE;
 #endif
 }
-
-#ifdef HAVE_RING2TOM_OLD
-static inline BOOLEAN _p_LmRingDivisibleByNoComp(poly a, ring r_a, poly b, ring r_b)
-{
-  BOOLEAN mDiv = _p_LmDivisibleByNoComp(a, r_a, b, r_b);
-  if (mDiv) {
-    long lside = (long) p_GetCoeff(a, r_a);
-    long rside = (long) p_GetCoeff(b, r_b);
-    // Später durch bitvergleiche viel schneller TODO OLIVER
-    while (lside%2 == 0 && rside%2 == 0) {
-      lside = lside / 2;
-      rside = rside / 2;
-    }
-    return (lside%2 != 0);
-  }
-  return FALSE;
-}
-#endif
 
 static inline BOOLEAN _p_LmDivisibleBy(poly a, poly b, ring r)
 {
@@ -492,17 +440,6 @@ PINLINE1 BOOLEAN p_LmDivisibleBy(poly a, poly b, ring r)
     return _p_LmDivisibleByNoComp(a, b, r);
   return FALSE;
 }
-
-#ifdef HAVE_RING2TOM_OLD
-PINLINE1 BOOLEAN p_LmRingDivisibleBy(poly a, poly b, ring r)
-{
-  p_LmCheckPolyRing1(b, r);
-  pIfThen1(a != NULL, p_LmCheckPolyRing1(b, r));
-  if (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r))
-    return _p_LmRingDivisibleByNoComp(a, b, r);
-  return FALSE;
-}
-#endif
 
 PINLINE1 BOOLEAN p_DivisibleBy(poly a, poly b, ring r)
 {
@@ -547,28 +484,6 @@ PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a,
   return pDebugLmShortDivisibleBy(a, sev_a, r, b, not_sev_b, r);
 #endif
 }
-
-#ifdef HAVE_RING2TOM_OLD
-PINLINE1 BOOLEAN p_LmRingShortDivisibleBy(poly a, unsigned long sev_a,
-                                          poly b, unsigned long not_sev_b, ring r)
-{
-  p_LmCheckPolyRing1(a, r);
-  p_LmCheckPolyRing1(b, r);
-#ifndef PDIV_DEBUG
-  _pPolyAssume2(p_GetShortExpVector(a, r) == sev_a, a, r);
-  _pPolyAssume2(p_GetShortExpVector(b, r) == ~ not_sev_b, b, r);
-
-  if (sev_a & not_sev_b)
-  {
-    pAssume1(_p_LmRingDivisibleByNoComp(a, b, r) == FALSE);
-    return FALSE;
-  }
-  return p_LmRingDivisibleBy(a, b, r);
-#else
-  return pDebugLmShortDivisibleBy(a, sev_a, r, b, not_sev_b, r);
-#endif
-}
-#endif
 
 PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, ring r_a,
                                       poly b, unsigned long not_sev_b, ring r_b)

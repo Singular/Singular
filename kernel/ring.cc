@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.70 2007-11-09 11:29:44 Singular Exp $ */
+/* $Id: ring.cc,v 1.71 2008-01-30 09:01:38 wienand Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -268,6 +268,24 @@ void rWrite(ring r)
       nfShowMipo();PrintS(StringAppendS("\n"));
     }
   }
+#ifdef HAVE_RINGS
+  else if (rField_is_Ring(r))
+  {
+    PrintS("//   coeff. ring is : ");
+#ifdef HAVE_RINGZ
+    if (rField_is_Ring_Z(r)) PrintS("Integers\n");
+#endif
+#ifdef HAVE_RINGMODN
+    if (rField_is_Ring_ModN(r)) Print("Z/%d\n", r->ringflaga);
+#endif
+#ifdef HAVE_RING2TOM
+    if (rField_is_Ring_2toM(r)) Print("Z/2^%d\n", r->ringflagb);
+#endif
+#ifdef HAVE_RINGPTOM
+    if (rField_is_Ring_PtoM(r)) Print("Z/%d^%d\n", r->ringflaga, r->ringflagb);
+#endif
+  }
+#endif
   else
   {
     PrintS("//   characteristic : ");
