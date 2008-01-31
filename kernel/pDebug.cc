@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.8 2007-07-19 11:54:50 Singular Exp $
+ *  Version: $Id: pDebug.cc,v 1.9 2008-01-31 13:22:02 Singular Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -208,15 +208,19 @@ BOOLEAN _p_Test(poly p, ring r, int level)
 
   poly p_prev = NULL;
 
+  #ifndef OM_NDEBUG
   // check addr with level+1 so as to check bin/page of addr
   pPolyAssumeReturnMsg(omTestBinAddrSize(p, (r->PolyBin->sizeW)*SIZEOF_LONG, level+1)
                         == omError_NoError, "memory error");
+  #endif
 
   pFalseReturn(p_CheckRing(r));
 
   // this checks that p does not contain a loop: rather expensive O(length^2)
+  #ifndef OM_NDEBUG
   if (level > 1)
     pFalseReturn(omTestList(p, level) == omError_NoError);
+  #endif
 
   int ismod = p_GetComp(p, r) > 0;
 
@@ -224,9 +228,11 @@ BOOLEAN _p_Test(poly p, ring r, int level)
   {
     // ring check
     pFalseReturn(p_LmCheckIsFromRing(p, r));
+    #ifndef OM_NDEBUG
     // omAddr check
     pPolyAssumeReturnMsg(omTestBinAddrSize(p, (r->PolyBin->sizeW)*SIZEOF_LONG, 1)
                      == omError_NoError, "memory error");
+    #endif
     // number/coef check
     pPolyAssumeReturnMsg(p->coef != NULL || (n_GetChar(r) >= 2), "NULL coef");
     #ifdef LDEBUG
