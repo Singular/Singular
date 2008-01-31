@@ -6,12 +6,12 @@
  *  Purpose: Ore-noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: ratgring.cc,v 1.8 2008-01-31 13:22:24 Singular Exp $
+ *  Version: $Id: ratgring.cc,v 1.9 2008-01-31 13:23:25 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
+#include "ratgring.h"
 #ifdef HAVE_RATGRING
 #include "gring.h"
-#include "ratgring.h"
 #include "febase.h"
 #include "ring.h"
 #include "polys.h"

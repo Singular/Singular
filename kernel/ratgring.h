@@ -3,12 +3,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ratgring.h,v 1.4 2007-03-10 15:41:49 levandov Exp $ */
+/* $Id: ratgring.h,v 1.5 2008-01-31 13:23:25 Singular Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
+// #define HAVE_RATGRING to activate
 
-#ifdef HAVE_PLURAL
+#ifdef HAVE_RATGRING
 #include "structs.h"
 
 /* MACROS */
