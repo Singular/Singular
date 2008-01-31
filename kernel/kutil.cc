@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.75 2008-01-30 18:56:36 wienand Exp $ */
+/* $Id: kutil.cc,v 1.76 2008-01-31 16:13:54 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2650,12 +2650,14 @@ void enterExtendedSpoly(poly h,kStrategy strat)
         PrintS(" ---> ");
       }
 #endif
-      poly tmp = p_ISet((long) ((p)->coef), currRing);
+      poly tmp = pInit();
+      pSetCoeff0(tmp, pGetCoeff(p));
       for (int i = 1; i <= currRing->N; i++)
       {
         pSetExp(tmp, i, p_GetExp(p, i, strat->tailRing));
       }
       p_Setm(tmp, currRing);
+      pSetCoeff0(p, NULL);
       p = p_LmDeleteAndNext(p, strat->tailRing);
       pNext(tmp) = p;
 
@@ -4419,7 +4421,7 @@ void initS (ideal F, ideal Q,kStrategy strat)
   /*- test, if a unit is in F -*/
   if ((strat->sl>=0)
 #ifdef HAVE_RINGS
-       && nIsUnit(pGetCoeff(strat->L[strat->Ll].p))
+       && nIsUnit(pGetCoeff(strat->S[0]))
 #endif
        && pIsConstant(strat->S[0]))
   {

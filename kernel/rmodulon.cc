@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.12 2008-01-30 19:10:46 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.13 2008-01-31 16:13:55 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -28,82 +28,6 @@ int_number nrnMinusOne = NULL;
 unsigned long nrnExponent = 0;
 unsigned long long nrnBase = 0;
 
-/*
- * Multiply two numbers
- */
-number nrnMult (number a, number b)
-{
-  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
-  mpz_init(erg);
-  mpz_mul(erg, (int_number) a, (int_number) b);
-  mpz_mod(erg, erg, nrnModul);
-  return (number) erg;
-}
-
-/*
- * Give the smallest non unit k, such that a * x = k = b * y has a solution
- */
-number nrnLcm (number a,number b,ring r)
-{
-  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
-  mpz_init(erg);
-  mpz_lcm(erg, (int_number) a, (int_number) b);
-  mpz_mod(erg, erg, nrnModul);
-  return (number) erg;
-}
-
-/*
- * Give the largest non unit k, such that a = x * k, b = y * k has
- * a solution.
- */
-number nrnGcd (number a,number b,ring r)
-{
-  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
-  mpz_init(erg);
-  if (a == NULL) a = (number) nrnModul;
-  if (b == NULL) b = (number) nrnModul;
-  mpz_gcd(erg, (int_number) a, (int_number) b);
-  return (number) erg;
-}
-
-number nrnGcd3 (number a,number b, number c,ring r)
-{
-  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
-  mpz_init(erg);
-  if (a == NULL) a = (number) nrnModul;
-  if (b == NULL) b = (number) nrnModul;
-  if (c == NULL) c = (number) nrnModul;
-  mpz_gcd(erg, (int_number) a, (int_number) b);
-  mpz_gcd(erg, erg, (int_number) c);
-  return (number) erg;
-}
-
-
-/*
- * Give the largest non unit k, such that a = x * k, b = y * k has
- * a solution and r, s, s.t. k = s*a + t*b
- */
-number  nrnExtGcd (number a, number b, number *s, number *t)
-{
-  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
-  int_number bs = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
-  int_number bt = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
-  mpz_init(erg);
-  mpz_init(bs);
-  mpz_init(bt);
-  mpz_gcdext(erg, bs, bt, (int_number) a, (int_number) b);
-  *s = (number) bs;
-  *t = (number) bt;
-  return (number) erg;
-}
-
-void nrnPower (number a, int i, number * result)
-{
-  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
-  mpz_init(erg);
-  mpz_powm_ui(erg, (int_number) a, i, nrnModul);
-  *result = (number) erg;
-}
 
 /*
  * create a number from int
@@ -130,6 +54,26 @@ int nrnInt(number &n)
   return (int) mpz_get_si( (int_number) &n);
 }
 
+/*
+ * Multiply two numbers
+ */
+number nrnMult (number a, number b)
+{
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_mul(erg, (int_number) a, (int_number) b);
+  mpz_mod(erg, erg, nrnModul);
+  return (number) erg;
+}
+
+void nrnPower (number a, int i, number * result)
+{
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_powm_ui(erg, (int_number) a, i, nrnModul);
+  *result = (number) erg;
+}
+
 number nrnAdd (number a, number b)
 {
   int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
@@ -148,34 +92,83 @@ number nrnSub (number a, number b)
   return (number) erg;
 }
 
-number  nrnGetUnit (number k)
+number nrnNeg (number c)
 {
-  number unit = nrnIntDiv(k, nrnGcd(k, 0, currRing));
-  number gcd = nrnGcd(unit, 0, currRing);
-  if (!nrnIsOne(gcd))
-  {
-    number tmp = nrnMult(unit, unit);
-    number gcd_new = nrnGcd(tmp, 0, currRing);
-    while (!nrnEqual(gcd_new, gcd))
-    {
-      nrnDelete(&gcd, NULL);
-      gcd = gcd_new;
-      tmp = nrnMult(tmp, unit);
-      gcd_new = nrnGcd(tmp, 0, currRing);
-    }
-    unit = nrnAdd(unit, nrnIntDiv(0, gcd_new));
-    nrnDelete(&gcd_new, NULL);
-  }
-  nrnDelete(&gcd, NULL);
-  return unit;
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_sub(erg, nrnModul, (int_number) c);
+  return (number) erg;
 }
 
-BOOLEAN nrnIsUnit (number a)
+number  nrnInvers (number c)
 {
-  number tmp = nrnGcd(a, (number) nrnModul, NULL);
-  bool res = nrnIsOne(tmp);
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_invert(erg, (int_number) c, nrnModul);
+  return (number) erg;
+}
+
+/*
+ * Give the smallest non unit k, such that a * x = k = b * y has a solution
+ * TODO: lcm(gcd,gcd) besser als gcd(lcm) ?
+ */
+number nrnLcm (number a,number b,ring r)
+{
+  number erg = nrnGcd(NULL, a, NULL);
+  number tmp = nrnGcd(NULL, b, NULL);
+  mpz_lcm((int_number) erg, (int_number) erg, (int_number) tmp);
   nrnDelete(&tmp, NULL);
-  return res;
+  return (number) erg;
+}
+
+/*
+ * Give the largest non unit k, such that a = x * k, b = y * k has
+ * a solution.
+ */
+number nrnGcd (number a,number b,ring r)
+{
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  if (a == NULL) a = (number) nrnModul;
+  if (b == NULL) b = (number) nrnModul;
+  mpz_gcd(erg, (int_number) a, (int_number) b);
+  mpz_gcd(erg, erg, nrnModul);
+  return (number) erg;
+}
+
+/* Not needed any more, but may have room for improvement
+number nrnGcd3 (number a,number b, number c,ring r)
+{
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  if (a == NULL) a = (number) nrnModul;
+  if (b == NULL) b = (number) nrnModul;
+  if (c == NULL) c = (number) nrnModul;
+  mpz_gcd(erg, (int_number) a, (int_number) b);
+  mpz_gcd(erg, erg, (int_number) c);
+  mpz_gcd(erg, erg, nrnModul);
+  return (number) erg;
+}
+*/
+
+/*
+ * Give the largest non unit k, such that a = x * k, b = y * k has
+ * a solution and r, s, s.t. k = s*a + t*b
+ */
+number  nrnExtGcd (number a, number b, number *s, number *t)
+{
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  int_number bs = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  int_number bt = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_init(bs);
+  mpz_init(bt);
+  mpz_gcdext(erg, bs, bt, (int_number) a, (int_number) b);
+  mpz_mod(bs, bs, nrnModul);
+  mpz_mod(bt, bt, nrnModul);
+  *s = (number) bs;
+  *t = (number) bt;
+  return (number) erg;
 }
 
 BOOLEAN nrnIsZero (number  a)
@@ -208,12 +201,34 @@ BOOLEAN nrnGreaterZero (number k)
   return 0 <= mpz_cmp_si((int_number) k, 0);
 }
 
-int nrnComp(number a, number b)
+BOOLEAN nrnIsUnit (number a)
 {
-  if (nrnEqual(a, b)) return 0;
-  if (nrnDivBy(a, b)) return -1;
-  if (nrnDivBy(b, a)) return 1;
-  return 2;
+  number tmp = nrnGcd(a, (number) nrnModul, NULL);
+  bool res = nrnIsOne(tmp);
+  nrnDelete(&tmp, NULL);
+  return res;
+}
+
+number  nrnGetUnit (number k)
+{
+  number unit = nrnIntDiv(k, nrnGcd(k, 0, currRing));
+  number gcd = nrnGcd(unit, 0, currRing);
+  if (!nrnIsOne(gcd))
+  {
+    number tmp = nrnMult(unit, unit);
+    number gcd_new = nrnGcd(tmp, 0, currRing);
+    while (!nrnEqual(gcd_new, gcd))
+    {
+      nrnDelete(&gcd, NULL);
+      gcd = gcd_new;
+      tmp = nrnMult(tmp, unit);
+      gcd_new = nrnGcd(tmp, 0, currRing);
+    }
+    unit = nrnAdd(unit, nrnIntDiv(0, gcd_new));
+    nrnDelete(&gcd_new, NULL);
+  }
+  nrnDelete(&gcd, NULL);
+  return unit;
 }
 
 BOOLEAN nrnDivBy (number a,number b)
@@ -222,6 +237,14 @@ BOOLEAN nrnDivBy (number a,number b)
   bool res = nrnIsUnit(bs);
   nrnDelete(&bs, NULL);
   return res;
+}
+
+int nrnComp(number a, number b)
+{
+  if (nrnEqual(a, b)) return 0;
+  if (nrnDivBy(a, b)) return -1;
+  if (nrnDivBy(b, a)) return 1;
+  return 2;
 }
 
 number nrnDiv (number a,number b)
@@ -272,27 +295,10 @@ number nrnIntDiv (number a,number b)
   return (number) erg;
 }
 
-number  nrnInvers (number c)
-{
-  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
-  mpz_init(erg);
-  mpz_invert(erg, (int_number) c, nrnModul);
-  return (number) erg;
-}
-
-number nrnNeg (number c)
-{
-  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
-  mpz_init(erg);
-  mpz_sub(erg, nrnModul, (int_number) c);
-  return (number) erg;
-}
-
 nMapFunc nrnSetMap(ring src, ring dst)
 {
   return NULL;      /* default */
 }
-
 
 /*
  * set the exponent (allocate and init tables) (TODO)
