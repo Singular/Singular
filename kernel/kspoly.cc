@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.11 2007-05-11 10:48:03 wienand Exp $ */
+/* $Id: kspoly.cc,v 1.12 2008-02-01 15:11:33 wienand Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -398,7 +398,7 @@ x2:
       p_Setm(m2, currRing);
 #ifdef HAVE_RINGS
       if (rField_is_Ring(currRing))
-          pSetCoeff(m2, t1);
+          pSetCoeff0(m2, t1);
       else
 #endif
         nNew(&(pGetCoeff(m2)));
@@ -434,7 +434,7 @@ x1:
     p_Setm(m1, currRing);
 #ifdef HAVE_RINGS
       if (rField_is_Ring(currRing))
-        pSetCoeff(m1, t2);
+        pSetCoeff0(m1, t2);
     else
 #endif
       nNew(&(pGetCoeff(m1)));
@@ -486,7 +486,7 @@ x1:
         p_LmFree(m2,currRing);
 #ifdef HAVE_RINGS
         if (rField_is_Ring(currRing))
-          pSetCoeff(m1, t2);
+          pSetCoeff0(m1, t2);
         else
 #endif
           nNew(&(pGetCoeff(m1)));
@@ -497,7 +497,7 @@ x1:
         p_LmFree(m1,currRing);
 #ifdef HAVE_RINGS
         if (rField_is_Ring(currRing))
-            pSetCoeff(m2, t1);
+            pSetCoeff0(m2, t1);
         else
 #endif
           nNew(&(pGetCoeff(m2)));
@@ -525,7 +525,7 @@ x1:
       p_LmFree(m2,currRing);
 #ifdef HAVE_RINGS
       if (rField_is_Ring(currRing))
-          pSetCoeff(m1, t1);
+          pSetCoeff0(m1, t1);
       else
 #endif
         nNew(&(pGetCoeff(m1)));

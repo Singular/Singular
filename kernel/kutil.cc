@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.76 2008-01-31 16:13:54 wienand Exp $ */
+/* $Id: kutil.cc,v 1.77 2008-02-01 15:11:33 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -916,12 +916,22 @@ void deleteInS (int i,kStrategy strat)
 void deleteInL (LSet set, int *length, int j,kStrategy strat)
 {
   if (set[j].lcm!=NULL)
-    pLmFree(set[j].lcm);
+#ifdef HAVE_RINGS_OLD
+    if (pGetCoeff(set[j].lcm) != NULL)
+      pLmDelete(set[j].lcm);
+    else
+#endif
+      pLmFree(set[j].lcm);
   if (set[j].p!=NULL)
   {
     if (pNext(set[j].p) == strat->tail)
     {
-      pLmFree(set[j].p);
+#ifdef HAVE_RINGS_OLD
+      if (pGetCoeff(set[j].p) != NULL)
+        pLmDelete(set[j].p);
+      else
+#endif
+        pLmFree(set[j].p);
       /*- tail belongs to several int spolys -*/
     }
     else
@@ -1036,9 +1046,9 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
 #endif
   /*- computes the lcm(s[i],p) -*/
   Lp.lcm = pInit();
-  pSetCoeff(Lp.lcm, nLcm(pGetCoeff(p), pGetCoeff(strat->S[i]), currRing));
+  pSetCoeff0(Lp.lcm, nLcm(pGetCoeff(p), pGetCoeff(strat->S[i]), currRing));
   // Lp.lcm == 0
-  if (pGetCoeff(Lp.lcm) == NULL)
+  if (nIsZero(pGetCoeff(Lp.lcm)))
   {
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG)
@@ -1052,7 +1062,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
       }
 #endif
       strat->cp++;
-      pLmFree(Lp.lcm);
+      pLmDelete(Lp.lcm);
       Lp.lcm=NULL;
       return;
   }
@@ -1074,7 +1084,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
       }
 #endif
       strat->cp++;
-      pLmFree(Lp.lcm);
+      pLmDelete(Lp.lcm);
       Lp.lcm=NULL;
       return;
   }
@@ -1107,7 +1117,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
 #endif
         if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
         {
-          pLmFree(Lp.lcm);
+          pLmDelete(Lp.lcm);
           return;
         }
         break;
@@ -1148,7 +1158,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
         strat->c3++;
         if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
         {
-          pLmFree(Lp.lcm);
+          pLmDelete(Lp.lcm);
           return;
         }
         break;
@@ -1219,7 +1229,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
     *the case lcm(s,p) == lcm(s,r) is not covered in chainCrit)
     *the first case is handeled in chainCrit
     */
-    if (Lp.lcm!=NULL) pLmFree(Lp.lcm);
+    if (Lp.lcm!=NULL) pLmDelete(Lp.lcm);
   }
   else
   {
@@ -2186,7 +2196,7 @@ void enterOneZeroPairRing (poly f, poly t_p, poly p, int ecart, kStrategy strat,
       if (compare == 1)
       {
         strat->c3++;
-        pLmFree(Lp.lcm);
+        pLmDelete(Lp.lcm);
         return;
       }
       else
@@ -2202,7 +2212,7 @@ void enterOneZeroPairRing (poly f, poly t_p, poly p, int ecart, kStrategy strat,
       if (compareCoeff == 1)
       {
         strat->c3++;
-        pLmFree(Lp.lcm);
+        pLmDelete(Lp.lcm);
         return;
       }
       else
@@ -2238,7 +2248,7 @@ void enterOneZeroPairRing (poly f, poly t_p, poly p, int ecart, kStrategy strat,
     *the case lcm(s,p) == lcm(s,r) is not covered in chainCrit)
     *the first case is handeled in chainCrit
     */
-    if (Lp.lcm!=NULL) pLmFree(Lp.lcm);
+    if (Lp.lcm!=NULL) pLmDelete(Lp.lcm);
   }
   else
   {
@@ -2657,10 +2667,8 @@ void enterExtendedSpoly(poly h,kStrategy strat)
         pSetExp(tmp, i, p_GetExp(p, i, strat->tailRing));
       }
       p_Setm(tmp, currRing);
-      pSetCoeff0(p, NULL);
-      p = p_LmDeleteAndNext(p, strat->tailRing);
+      p = p_LmFreeAndNext(p, strat->tailRing);
       pNext(tmp) = p;
-
       LObject h;
       h.p = tmp;
       h.tailRing = strat->tailRing;

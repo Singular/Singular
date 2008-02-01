@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.h,v 1.2 2007-06-20 09:39:25 wienand Exp $ */
+/* $Id: rintegers.h,v 1.3 2008-02-01 15:11:34 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -13,6 +13,10 @@
 extern int nrzExp;
 extern NATNUMBER nrzModul;
 
+number  nrzCopy        (number a);
+number  cfrzCopy       (number a, const ring r);
+int     nrzSize        (number a);
+void    nrzDelete      (number *a, const ring r);
 BOOLEAN nrzGreaterZero (number k);
 number  nrzMult        (number a, number b);
 number  nrzInit        (int i);

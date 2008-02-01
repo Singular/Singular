@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.12 2008-01-30 16:14:24 wienand Exp $ */
+/* $Id: numbers.cc,v 1.13 2008-02-01 15:11:34 wienand Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -381,13 +381,16 @@ void nInitChar(ring r)
   {
      nrnInitExp(c,r);
      n->nInit  = nrnInit;
-     n->nCopy  = ndCopy;
+     n->cfDelete= nrnDelete;
+     n->nCopy  = nrnCopy;
+     n->cfCopy = cfrnCopy;
+     n->nSize  = nrnSize;
      n->nInt   = nrnInt;
      n->nAdd   = nrnAdd;
      n->nSub   = nrnSub;
      n->nMult  = nrnMult;
      n->nDiv   = nrnDiv;
-     n->nIntDiv       = nrnIntDiv;
+     n->nIntDiv= nrnIntDiv;
      n->nExactDiv= nrnDiv;
      n->nNeg   = nrnNeg;
      n->nInvers= nrnInvers;
@@ -420,7 +423,10 @@ void nInitChar(ring r)
   else if (rField_is_Ring_Z(r))
   {
      n->nInit  = nrzInit;
-     n->nCopy  = ndCopy;
+     n->cfDelete= nrzDelete;
+     n->nCopy  = nrzCopy;
+     n->cfCopy = cfrzCopy;
+     n->nSize  = nrzSize;
      n->nInt   = nrzInt;
      n->nAdd   = nrzAdd;
      n->nSub   = nrzSub;

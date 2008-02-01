@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.h,v 1.5 2008-01-30 13:03:41 wienand Exp $ */
+/* $Id: rmodulon.h,v 1.6 2008-02-01 15:11:34 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -14,6 +14,10 @@
 #define NATNUMBER unsigned long
 #endif
 
+number  nrnCopy        (number a);
+number  cfrnCopy       (number a, const ring r);
+int     nrnSize        (number a);
+void    nrnDelete      (number *a, const ring r);
 BOOLEAN nrnGreaterZero (number k);
 number  nrnMult        (number a, number b);
 number  nrnInit        (int i);

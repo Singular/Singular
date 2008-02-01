@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.25 2008-02-01 13:46:08 Singular Exp $ */
+/* $Id: ring.h,v 1.26 2008-02-01 15:11:34 wienand Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -229,9 +229,6 @@ inline BOOLEAN rField_has_simple_Alloc(ring r=currRing)
        || rField_is_GF(r)
 #ifdef HAVE_RING2TOM
        || rField_is_Ring_2toM(r)
-#endif
-#ifdef HAVE_RINGMODN
-       || rField_is_Ring_ModN(r)
 #endif
        || rField_is_R(r)); }
 
