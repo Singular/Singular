@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.45 2007-06-14 14:56:40 Singular Exp $ */
+/* $Id: ideals.cc,v 1.46 2008-02-01 13:45:37 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1028,32 +1028,40 @@ ideal idFreeModule (int i)
 */
 ideal idSect (ideal h1,ideal h2)
 {
-  ideal first=h2,second=h1,temp,temp1,result;
-  int i,j,k,flength,slength,length,rank=si_min(h1->rank,h2->rank);
+  int i,j,k,length;
+  int flength = idRankFreeModule(h1);
+  int slength = idRankFreeModule(h2);
+  int rank=si_min(flength,slength);
+  if ((idIs0(h1)) || (idIs0(h2)))  return idInit(1,rank);
+
+  ideal first,second,temp,temp1,result;
   intvec *w;
   poly p,q;
 
-  if ((idIs0(h1)) && (idIs0(h2)))  return idInit(1,rank);
   if (IDELEMS(h1)<IDELEMS(h2))
   {
     first = h1;
     second = h2;
   }
-  flength = idRankFreeModule(first);
-  slength = idRankFreeModule(second);
+  else
+  {
+    first = h2;
+    second = h1;
+    int t=flength; flength=slength; slength=t;
+  }
   length  = si_max(flength,slength);
   if (length==0)
   {
     length = 1;
   }
   j = IDELEMS(first);
-  temp = idInit(j /*IDELEMS(first)*/,length+j);
 
   ring orig_ring=currRing;
   ring syz_ring=rCurrRingAssure_SyzComp();
   rSetSyzComp(length);
 
   while ((j>0) && (first->m[j-1]==NULL)) j--;
+  temp = idInit(j /*IDELEMS(first)*/+IDELEMS(second),length+j);
   k = 0;
   for (i=0;i<j;i++)
   {
@@ -1073,8 +1081,6 @@ ideal idSect (ideal h1,ideal h2)
       k++;
     }
   }
-  pEnlargeSet(&(temp->m),IDELEMS(temp),j+IDELEMS(second)-IDELEMS(temp));
-  IDELEMS(temp) = j+IDELEMS(second);
   for (i=0;i<IDELEMS(second);i++)
   {
     if (second->m[i]!=NULL)
@@ -1102,9 +1108,14 @@ ideal idSect (ideal h1,ideal h2)
     && (p_GetComp(temp1->m[i],syz_ring)>length))
     {
       if(syz_ring==orig_ring)
-        p = pCopy(temp1->m[i]);
+      {
+        p = temp1->m[i];
+      }
       else
-        p = prCopyR(temp1->m[i], syz_ring);
+      {
+        p = prMoveR(temp1->m[i], syz_ring);
+      }
+      temp1->m[i]=NULL;
       while (p!=NULL)
       {
         q = pNext(p);
