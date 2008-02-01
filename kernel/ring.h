@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.24 2008-01-30 16:14:25 wienand Exp $ */
+/* $Id: ring.h,v 1.25 2008-02-01 13:46:08 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -324,6 +324,7 @@ inline int rGetCurrSyzLimit(ring r = currRing)
           r->typ[0].data.syz.limit : 0);}
 
 // Ring Manipulations
+ring   rAssure_HasComp(ring r);
 ring   rCurrRingAssure_SyzComp();
 void   rSetSyzComp(int k);
 ring   rCurrRingAssure_dp_S();

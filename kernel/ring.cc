@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.72 2008-01-30 16:14:24 wienand Exp $ */
+/* $Id: ring.cc,v 1.73 2008-02-01 13:46:09 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3575,6 +3575,45 @@ static ring rAssure_SyzComp(ring r, BOOLEAN complete)
 
   if (complete) rComplete(res, 1);
   return res;
+}
+
+ring rAssure_HasComp(ring r)
+{
+  int last_block = rBlocks(r) - 2;
+  int i=last_block;
+  do
+  { 
+     if (r->order[i] == ringorder_c ||
+        r->order[i] == ringorder_C) return r;
+     i--;
+  } while (i>=0);
+  
+  ring new_r = rCopy0(r, FALSE, FALSE);
+  i=last_block+3;
+  new_r->wvhdl=(int **)omAlloc(i * sizeof(int_ptr));
+  new_r->order   = (int *) omAlloc(i * sizeof(int));
+  new_r->block0   = (int *) omAlloc(i * sizeof(int));
+  new_r->block1   = (int *) omAlloc(i * sizeof(int));
+  memcpy4(new_r->order,r->order,(i-1) * sizeof(int));
+  memcpy4(new_r->block0,r->block0,(i-1) * sizeof(int));
+  memcpy4(new_r->block1,r->block1,(i-1) * sizeof(int));
+  for (int j=0; j<=last_block; j++)
+  {
+    if (r->wvhdl[j]!=NULL)
+    {
+      new_r->wvhdl[j] = (int*) omMemDup(r->wvhdl[j]);
+    }
+    else
+      new_r->wvhdl[j]=NULL;
+  }
+  last_block++;
+  new_r->order[last_block]=ringorder_C;
+  new_r->block0[last_block]=0;
+  new_r->block1[last_block]=0;
+  new_r->wvhdl[last_block]=NULL;
+
+  rComplete(new_r, 1);
+  return new_r;
 }
 
 static ring rAssure_CompLastBlock(ring r, BOOLEAN complete = TRUE)
