@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.7 2008-02-01 15:11:34 wienand Exp $ */
+/* $Id: rintegers.cc,v 1.8 2008-02-01 15:16:14 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -97,8 +97,10 @@ number nrzInit (int i)
 
 void nrzDelete(number *a, const ring r)
 {
+  if (*a == NULL) return;
   mpz_clear((int_number) *a);
   omFreeBin((ADDRESS) *a, gmp_nrz_bin);
+  *a = NULL;
 }
 
 number nrzCopy(number a)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.15 2008-02-01 15:11:34 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.16 2008-02-01 15:16:15 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -42,6 +42,7 @@ number nrnInit (int i)
 
 void nrnDelete(number *a, const ring r)
 {
+  if (*a == NULL) return;
   mpz_clear((int_number) *a);
   omFreeBin((ADDRESS) *a, gmp_nrn_bin);
   *a = NULL;
