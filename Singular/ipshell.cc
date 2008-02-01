@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.175 2008-01-30 16:10:37 wienand Exp $ */
+/* $Id: ipshell.cc,v 1.176 2008-02-01 13:47:10 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -4135,6 +4135,17 @@ void rSetHdl(idhdl h)
     memset(&sLastPrinted,0,sizeof(sleftv));
   }
 
+  // test for valid "currRing": 
+  if ((rg!=NULL) && (rg->idroot==NULL))
+  {
+    ring old=rg;
+    rg=rAssure_HasComp(rg);
+    if (old!=rg)
+    {
+      rKill(old);
+      IDRING(h)=rg;
+    }
+  }
    /*------------ change the global ring -----------------------*/
   rChangeCurrRing(rg);
   currRingHdl = h;
