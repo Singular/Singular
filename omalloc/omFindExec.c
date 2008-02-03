@@ -3,7 +3,7 @@
  *  Purpose: routine which determines absolute pathname of executable
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omFindExec.c,v 1.10 2001-04-30 09:02:06 Singular Exp $
+ *  Version: $Id: omFindExec.c,v 1.11 2008-02-03 20:03:14 wienand Exp $
  *******************************************************************/
 
 #ifdef HAVE_CONFIG_H
@@ -58,6 +58,9 @@ static char * omFindExec_link (const char *name, char* executable)
       if (! access (name, X_OK))
       {
         strcpy(executable, name);
+#ifdef __CYGWIN__
+        strcat(executable, ".exe");
+#endif
         return executable;
       }
   }
@@ -80,6 +83,9 @@ static char * omFindExec_link (const char *name, char* executable)
       if (! access(tbuf, X_OK))
       {
         strcpy(executable, tbuf);
+#ifdef __CYGWIN__
+        strcat(executable, ".exe");
+#endif
         return executable;
       }
     }
@@ -136,6 +142,9 @@ static char * omFindExec_link (const char *name, char* executable)
             omFree(extra);
 #endif
           strcpy(executable, tbuf);
+#ifdef __CYGWIN__
+          strcat(executable, ".exe");
+#endif
           return executable;
         }
 
