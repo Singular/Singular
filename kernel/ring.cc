@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.74 2008-02-04 09:41:44 Singular Exp $ */
+/* $Id: ring.cc,v 1.75 2008-02-04 13:18:02 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3579,21 +3579,24 @@ static ring rAssure_SyzComp(ring r, BOOLEAN complete)
 
 ring rAssure_HasComp(ring r)
 {
-  int last_block = rBlocks(r) - 2;
-  int i=last_block;
+  int last_block;
+  int i=0;
   do
   { 
      if (r->order[i] == ringorder_c ||
         r->order[i] == ringorder_C) return r;
-     i--;
-  } while (i>=0);
+     if (r->order[i] == 0)
+        break;
+     i++;
+  } while (1);
+  last_block=i-1;
   
   ring new_r = rCopy0(r, FALSE, FALSE);
-  i=last_block+3;
+  i+=2;
   new_r->wvhdl=(int **)omAlloc0(i * sizeof(int_ptr));
-  new_r->order   = (int *) omAlloc(i * sizeof(int));
-  new_r->block0   = (int *) omAlloc(i * sizeof(int));
-  new_r->block1   = (int *) omAlloc(i * sizeof(int));
+  new_r->order   = (int *) omAlloc0(i * sizeof(int));
+  new_r->block0   = (int *) omAlloc0(i * sizeof(int));
+  new_r->block1   = (int *) omAlloc0(i * sizeof(int));
   memcpy4(new_r->order,r->order,(i-1) * sizeof(int));
   memcpy4(new_r->block0,r->block0,(i-1) * sizeof(int));
   memcpy4(new_r->block1,r->block1,(i-1) * sizeof(int));
