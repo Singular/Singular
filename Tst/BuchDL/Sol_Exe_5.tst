@@ -266,7 +266,7 @@ ideal B(3) = sat(I',L')[1];
 
 ideal L'' = jet(std(intersect(Adj_LS_3,B(3))),3);
 L'' = simplify(L'',6);  L'';
-poly f''(1),f''(2) = L'';
+poly f''(1),f''(2) = L''[1..2];
 
 ring R_t = (0,t), (x,y,z), dp;
 poly f'' = imap(R,f''(1)) + t*imap(R,f''(2));
