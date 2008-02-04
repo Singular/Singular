@@ -75,4 +75,9 @@ Tue Jan 22 10:40:39 CET 2008
 more Changes with respect to 3-0-4-1
 - sqrFree moved from libfac to factory
 - new command sqrfree
-
+---------------------------------------------------------
+Mon Feb  4 14:32:43 MET 2008
+more Changes with respect to 3-0-4-1
+- rSetHdl test now if the ring has an entry for module comp:
+  to many routines rely on that.
+  If the ring has not, it is changed: see kernel/ring.cc:rAssure_HasComp
