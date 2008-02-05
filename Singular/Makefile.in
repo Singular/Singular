@@ -427,7 +427,7 @@ mpsr.so: $(MPSR_SOURCES:.cc=.dl_o)
 	$(LD) ${SLDFLAGS} -o $@ $^ -L${libdir} ${MP_LIBS} ${GLIBC_DYN_FIX}
 
 dbmsr.so: $(DBMSR_SOURCES:.cc=.dl_o)
-	$(LD) ${SLDFLAGS} -o $@ $^
+	$(LD) ${SLDFLAGS} -o $@ $^ ${GLIBC_DYN_FIX}
 
 src: scanner.cc grammar.h grammar.cc libparse.cc
 
