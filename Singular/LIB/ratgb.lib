@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: ratgb.lib,v 1.9 2008-01-17 21:05:04 levandov Exp $";
+version="$Id: ratgb.lib,v 1.10 2008-02-05 22:44:30 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: ratgb.lib  Groebner bases in Ore localizations
@@ -13,7 +13,8 @@ SUPPORT: SpezialForschungsBereich F1301 of the Austrian FWF
 
 LIB "poly.lib";
 
-static proc rm_content_id(ideal J)
+//static 
+proc rm_content_id(ideal J)
 "USAGE:  rm_content_id(I);  I an ideal
 RETURN:  ideal
 PURPOSE: remove the content of every generator of I
@@ -169,65 +170,71 @@ EXAMPLE: example ratstd; shows examples
   setring @RAT;
   ideal CG = imap(save,G);
   CG = rm_content_id(CG);
-  CG = simplify(CG,2+32);
+  CG = simplify(CG,2);
+
+  // warning: a bugfarm! in this ring, the ordering might change!!! (see appelF4)
+  // so, simplify(32) should take place in the orig. ring! and NOT here
+  //  CG = simplify(CG,2+32);
 
   // 4b. create L(G) with X's as coeffs (for minimization)
-  int sG  = ncols(CG);
+  setring save;
+  G = imap(@RAT,CG);
+  int sG  = ncols(G);
   ideal LG;
   for (i=1; i<= sG; i++)
   {
-    LG[i] = lead(CG[i]);
+    LG[i] = lead(G[i]);
   }
-
-//   ideal SLG = simplify(LG,8+32); //contains zeros
-//   intvec islg;
-//   if (SLG[1] == 0)
-//   {  islg = 0;  }
-//   else
-//   {    islg = 1;  }
-//   for (i=2; i<= ncols(SLG); i++)
-//   {
-//     if (SLG[i] == 0)
-//     {
-//       islg = islg, 0;
-//     }
-//     else
-//     {
-//       islg = islg, 1;
-//     }
-//   }
-
-  // compute the D-dimension of the ideal
-
-  LG = groebner(LG); // cosmetics
-  int d = dim(LG);
+  // compute the D-dimension of the ideal in the ring @RAT
+  setring @RAT;
+  ideal LG = imap(save,LG);
+  ideal LGG = groebner(LG); // cosmetics
+  int d = dim(LGG);
   int Ddim = d;
   printf("the D-dimension is %s",d);
   if (d==0)
   {
-    d = vdim(LG);
+    d = vdim(LGG);
     int Dvdim = d;
     printf("the K-dimension is %s",d);
   }
+  ideal SLG = simplify(LG,8+32); //contains zeros
   setring save;
-//   for (i=1; i<= ncols(LG); i++)
-//   {
-//     if (islg[i] == 0)
-//     {
-//       G[i] = 0;
-//     }
-//   }
-//   G = simplify(G,2); // ready!
-
-  G = imap(@RAT,CG);
+  ideal SLG = imap(@RAT,SLG);
+  // simplify(LG,8+32); //contains zeros
+  intvec islg;
+  if (SLG[1] == 0)
+  {  islg = 0;  }
+  else
+  {    islg = 1;  }
+  for (i=2; i<= ncols(SLG); i++)
+  {
+    if (SLG[i] == 0)
+    {
+      islg = islg, 0;
+    }
+    else
+    {
+      islg = islg, 1;
+    }
+  }
+  for (i=1; i<= ncols(LG); i++)
+  {
+    if (islg[i] == 0)
+    {
+      G[i] = 0;
+    }
+  }
+  G = simplify(G,2); // ready!
+  //  G = imap(@RAT,CG);
   // return the result
   ideal pGBid = G;
   export pGBid;
   //  export Ddim;
   //  export Dvdim;
   setring @RAT;
-  ideal rGBid = CG;
-  //imap(save,G);
+  ideal rGBid = imap(save,G);
+  // CG;
   export rGBid;
   setring save;
   return(@RAT);

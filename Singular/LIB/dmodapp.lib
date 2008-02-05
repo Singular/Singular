@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmodapp.lib,v 1.1 2007-12-11 12:00:01 levandov Exp $";
+version="$Id: dmodapp.lib,v 1.2 2008-02-05 22:44:29 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmodapp.lib     Applications of algebraic D-modules
@@ -37,7 +37,7 @@ LIB "dmod.lib"; // loads e.g. nctools.lib
 proc charVariety(ideal I)
 "USAGE:  charVariety(I);  I an ideal
 RETURN:  ring
-PURPOSE: compute the D-module structure of basering[1/f]*f^s with the algorithm given in S and with the Groebner basis engine given in 'eng'
+PURPOSE: compute the characteristic variety of a D-module D/I
 ASSUME: the ground ring is the Weyl algebra with x's before d's
 NOTE:    activate the output ring with the @code{setring} command.
 @*       In the output (in a commutative ring):
@@ -72,6 +72,9 @@ EXAMPLE: example annfs; shows examples
     NEW[i] = OLD[i-1];
   }
   L[3] = NEW;
+  list ncr =ncRelations(save);
+  matrix @C = ncr[1];
+  matrix @D = ncr[2];
   def @U = ring(L);
   // 2. create the commutative ring  
   setring save;
@@ -84,12 +87,17 @@ EXAMPLE: example annfs; shows examples
   def @CU = ring(CL);
   // comm ring is ready
   setring @U;
+  // make @U noncommutative
+  //  matrix @C = imap(save,@C);
+  matrix @D = imap(save,@D);
+  def @@U = nc_algebra(@C,@D);
+  setring @@U; kill @U;
   // 2. compute Groebner basis
   ideal I = imap(save,I);
   //  I = groebner(I);
-  I = slimgb(I);
+  I = slimgb(I); // a bug?
   setring @CU;
-  ideal CV = imap(@U,I);
+  ideal CV = imap(@@U,I);
   //  CV = groebner(CV); // cosmetics
   CV = slimgb(CV);
   export CV;

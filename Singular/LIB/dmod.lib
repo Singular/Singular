@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.24 2008-01-17 21:05:31 levandov Exp $";
+version="$Id: dmod.lib,v 1.25 2008-02-05 22:44:28 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -2782,8 +2782,6 @@ EXAMPLE: example SannfsOT; shows examples
   ideal K = nselect(J,1,2);
   dbprint(ppl,"// -1-3- u,v are eliminated");
   dbprint(ppl-1, K);  // K is without u,v
-
-
   setring save;
   // ------------ new ring @R2 ------------------
   // without u,v and with the elim.ord for t,Dt
@@ -3145,7 +3143,239 @@ example
   LD;
 }
 
+// use a finer ordering
+
 proc SannfsLOT(poly F, list #)
+"USAGE:  SannfsLOT(f [,eng]);  f a poly, eng an optional int
+RETURN:  ring
+PURPOSE: compute the D-module structure of basering[1/f]*f^s, according to the Levandovskyy's modification of the algorithm by Oaku and Takayama in the ring D[s], where D is the Weyl algebra
+NOTE:    activate this ring with the @code{setring} command.
+@*       In the ring D[s], the ideal LD (which is NOT a Groebner basis) is the needed D-module structure.
+@*       If eng <>0, @code{std} is used for Groebner basis computations,
+@*       otherwise, and by default @code{slimgb} is used.
+@*       If printlevel=1, progress debug messages will be printed,
+@*       if printlevel>=2, all the debug messages will be printed.
+EXAMPLE: example SannfsLOT; shows examples
+"
+{
+  int eng = 0;
+  if ( size(#)>0 )
+  {
+    if ( typeof(#[1]) == "int" )
+    {
+      eng = int(#[1]);
+    }
+  }
+  // returns a list with a ring and an ideal LD in it
+  int ppl = printlevel-voice+2;
+  //  printf("plevel :%s, voice: %s",printlevel,voice);
+  def save = basering;
+  int N = nvars(basering);
+  //  int Nnew = 2*(N+2);
+  int Nnew = 2*(N+1)+1; //removed u,v; added s
+  int i,j;
+  string s;
+  list RL = ringlist(basering);
+  list L, Lord;
+  list tmp;
+  intvec iv;
+  L[1] = RL[1]; // char
+  L[4] = RL[4]; // char, minpoly
+  // check whether vars have admissible names
+  list Name  = RL[2];
+  list RName;
+//   RName[1] = "u";
+//   RName[2] = "v";
+  RName[1] = "t";
+  RName[2] = "Dt";
+  for(i=1;i<=N;i++)
+  {
+    for(j=1; j<=size(RName);j++)
+    {
+      if (Name[i] == RName[j])
+      {
+        ERROR("Variable names should not include t,Dt");
+      }
+    }
+  }
+  // now, create the names for new vars
+//   tmp[1]     = "u";
+//   tmp[2]     = "v";
+//   list UName = tmp;
+  list DName;
+  for(i=1;i<=N;i++)
+  {
+    DName[i] = "D"+Name[i]; // concat
+  }
+  tmp    =  0;
+  tmp[1] = "t";
+  tmp[2] = "Dt";
+  list SName ; SName[1] = "s";
+  //  list NName = tmp + Name + DName + SName;
+  list NName = tmp + SName + Name + DName;
+  L[2]   = NName;
+  tmp    = 0;
+  // Name, Dname will be used further
+  //  kill UName;
+  kill NName;
+  // block ord (a(1,1),dp);
+  tmp[1]  = "a"; // string
+  iv      = 1,1;
+  tmp[2]  = iv; //intvec
+  Lord[1] = tmp;
+  // continue with a(0,0,1)
+  tmp[1]  = "a"; // string
+  iv      = 0,0,1;
+  tmp[2]  = iv; //intvec
+  Lord[2] = tmp;
+  // continue with dp 1,1,1,1...
+  tmp[1]  = "dp"; // string
+  s       = "iv=";
+  for(i=1;i<=Nnew;i++)
+  {
+    s = s+"1,";
+  }
+  s[size(s)]= ";";
+  execute(s);
+  tmp[2]    = iv;
+  Lord[3]   = tmp;
+  tmp[1]    = "C";
+  iv        = 0;
+  tmp[2]    = iv;
+  Lord[4]   = tmp;
+  tmp       = 0;
+  L[3]      = Lord;
+  // we are done with the list
+  def @R@ = ring(L);
+  setring @R@;
+  matrix @D[Nnew][Nnew];
+  @D[1,2]=1;
+  for(i=1; i<=N; i++)
+  {
+    @D[3+i,N+3+i]=1;
+  }
+  // ADD [s,t]=-t, [s,Dt]=Dt
+  @D[1,3] = -var(1);
+  @D[2,3] = var(2);
+  //  @D[N+3,2*(N+2)]=1; old t,Dt stuff
+  //  L[5] = matrix(UpOneMatrix(Nnew));
+  //  L[6] = @D;
+  def @R = nc_algebra(1,@D);
+  setring @R;
+  kill @R@;
+  dbprint(ppl,"// -1-1- the ring @R(t,Dt,s,_x,_Dx) is ready");
+  dbprint(ppl-1, @R);
+  // create the ideal I
+  poly  F = imap(save,F);
+  //  ideal I = u*F-t,u*v-1;
+  ideal I = F-t;
+  poly p;
+  for(i=1; i<=N; i++)
+  {
+    //    p = u*Dt; // u*Dt
+    p = Dt;
+    p = diff(F,var(3+i))*p;
+    I = I, var(N+3+i) + p;
+  }
+  //  I = I, var(1)*var(2) + var(Nnew) +1; // reduce it with t-f!!!
+  // t*Dt + s +1 reduced with t-f gives f*Dt + s
+  I = I, F*var(2) + var(3);
+  // -------- the ideal I is ready ----------
+  dbprint(ppl,"// -1-2- starting the elimination of t,Dt in @R");
+  dbprint(ppl-1, I);
+  ideal J = engine(I,eng);
+  ideal K = nselect(J,1,2);
+  dbprint(ppl,"// -1-3- t,Dt are eliminated");
+  dbprint(ppl-1, K);  // K is without t, Dt
+  K = engine(K,eng);  // std does the job too
+  // now, we must change the ordering
+  // and create a ring without t, Dt
+  setring save;
+  // ----------- the ring @R3 ------------
+  // _x, _Dx,s;  elim.ord for _x,_Dx.
+  // keep: N, i,j,s, tmp, RL
+  Nnew = 2*N+1;
+  kill Lord, tmp, iv, RName;
+  list Lord, tmp;
+  intvec iv;
+  L[1] = RL[1];
+  L[4] = RL[4];  // char, minpoly
+  // check whether vars hava admissible names -> done earlier
+  // now, create the names for new var
+  tmp[1] = "s";
+  // DName is defined earlier
+  list NName = Name + DName + tmp;
+  L[2] = NName;
+  tmp = 0;
+  // block ord (dp(N),dp);
+  // string s is already defined
+  s = "iv=";
+  for (i=1; i<=Nnew-1; i++)
+  {
+    s = s+"1,";
+  }
+  s[size(s)]=";";
+  execute(s);
+  tmp[1] = "dp";  // string
+  tmp[2] = iv;   // intvec
+  Lord[1] = tmp;
+  // continue with dp 1,1,1,1...
+  tmp[1] = "dp";  // string
+  s[size(s)] = ",";
+  s = s+"1;";
+  execute(s);
+  kill s;
+  kill NName;
+  tmp[2]      = iv;
+  Lord[2]     = tmp;
+  tmp[1]      = "C";  iv  = 0;  tmp[2]=iv;
+  Lord[3]     = tmp;  tmp = 0;
+  L[3]        = Lord;
+  // we are done with the list. Now add a Plural part
+  def @R2@ = ring(L);
+  setring @R2@;
+  matrix @D[Nnew][Nnew];
+  for (i=1; i<=N; i++)
+  {
+    @D[i,N+i]=1;
+  }
+  def @R2 = nc_algebra(1,@D);
+  setring @R2;
+  kill @R2@;
+  dbprint(ppl,"//  -2-1- the ring @R2(_x,_Dx,s) is ready");
+  dbprint(ppl-1, @R2);
+  ideal MM = maxideal(1);
+  //  MM = 0,s,MM;
+  MM = 0,0,s,MM[1..size(MM)-1];
+  map R01 = @R, MM;
+  ideal K = R01(K);
+  // total cleanup
+  ideal LD = K;
+  // make leadcoeffs positive
+  for (i=1; i<= ncols(LD); i++)
+  {
+    if (leadcoef(LD[i]) <0 )
+    {
+      LD[i] = -LD[i];
+    }
+  }
+  export LD;
+  kill @R;
+  return(@R2);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),Dp;
+  poly F = x^3+y^3+z^3;
+  printlevel = 0;
+  def A  = SannfsLOT(F);
+  setring A;
+  LD;
+}
+
+
+proc SannfsLOTold(poly F, list #)
 "USAGE:  SannfsLOT(f [,eng]);  f a poly, eng an optional int
 RETURN:  ring
 PURPOSE: compute the D-module structure of basering[1/f]*f^s, according to the Levandovskyy's modification of the algorithm by Oaku and Takayama in the ring D[s], where D is the Weyl algebra
@@ -3363,7 +3593,7 @@ example
   ring r = 0,(x,y,z),Dp;
   poly F = x^3+y^3+z^3;
   printlevel = 0;
-  def A  = SannfsLOT(F);
+  def A  = SannfsLOTold(F);
   setring A;
   LD;
 }
