@@ -71,6 +71,21 @@ Changes with respect to 3-0-4-1
 - fixed LIB/involut.lib: problems with ring change : nc_algebra
 
 ---------------------------------------------------------
+Jan 01 2008
+more Changes with respect to 3-0-4-1
+- adaption of the default modules to GLIBC changes
+  (does not apply to static versions):
+  Unfortunately, the GLIBC developpers decided to omit some functions from
+  the dynamic version of libc (starting from GLIBC 2.4/2.5).
+  Some of these function are now provided in the Singular executable
+  (singular_fstat for fstat), for others we have to link with
+  libc_nonshared  (for stack_chk_fail*)
+  (maybe, -fno-stack-protector -fno-stack-protector-all
+  could also fix this...but some libraries could use it also..).
+  Currently, this applies to mpsr.so, dbmsr.so
+
+- conversion of polynomials Singular <--> factory optimized: uses sbuckets
+---------------------------------------------------------
 Tue Jan 22 10:40:39 CET 2008
 more Changes with respect to 3-0-4-1
 - sqrFree moved from libfac to factory
@@ -81,3 +96,4 @@ more Changes with respect to 3-0-4-1
 - rSetHdl test now if the ring has an entry for module comp:
   to many routines rely on that.
   If the ring has not, it is changed: see kernel/ring.cc:rAssure_HasComp
+
