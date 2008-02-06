@@ -5,10 +5,14 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.124 2007-12-18 09:56:57 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.125 2008-02-06 20:22:41 wienand Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
+#define HAVE_RINGS
+#define HAVE_RING2TOM
+#define HAVE_RINGMODN
+#define HAVE_RINGZ
 
 /*******************************************************************
  * Defines which are set by configure

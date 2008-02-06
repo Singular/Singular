@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.176 2008-02-01 13:47:10 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.177 2008-02-06 20:22:41 wienand Exp $ */
 /*
 * ABSTRACT:
 */
@@ -4428,7 +4428,6 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   {
     ch = 0;
     ringtype = 4;
-    WarnS("integers not yet fully tested");
   }
 #endif
 #ifdef HAVE_RINGMODN
@@ -4450,7 +4449,6 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     ringtype = 2;
     ringflaga = module;
     ringflagb = 1;
-    WarnS("Z/n not yet fully tested");
   }
 #endif
 #ifdef HAVE_RING2TOM
@@ -4492,7 +4490,6 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       ringtype = 3;
       ringflaga = base;
       ringflagb = exp;
-      WarnS("Z/p^n not yet fully tested");
     }
   }
 #endif
@@ -4502,6 +4499,17 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     goto rInitError;
   }
   pn=pn->next;
+
+#ifdef HAVE_RINGS
+  if (ringtype > 0)
+  {
+    WarnS("You are using a preview implementation of coefficients rings.");
+    WarnS("Please note that only the following commands are meant to work:");
+    WarnS("- basic polynomial arithmetic");
+    WarnS("- std");
+    WarnS("- reduce");
+  }
+#endif
 
   int l, last;
   sleftv * sl;
