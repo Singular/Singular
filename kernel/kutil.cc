@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.78 2008-02-06 09:12:46 wienand Exp $ */
+/* $Id: kutil.cc,v 1.79 2008-02-06 10:39:41 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1300,6 +1300,8 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat,
 
   erg = p_Add_q(pp_Mult_mm(pNext(p), m1, strat->tailRing), pp_Mult_mm(pNext(strat->S[i]), m2, strat->tailRing), strat->tailRing);
   pNext(gcd) = erg;
+  pLmDelete(m1);
+  pLmDelete(m2);
 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
