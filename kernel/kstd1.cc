@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.30 2007-11-09 11:31:52 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.31 2008-02-06 09:12:46 wienand Exp $ */
 /*
 * ABSTRACT:
 */
@@ -747,7 +747,13 @@ void updateL(kStrategy strat)
       if (j<0) break;
       if (pNext(strat->L[j].p) == strat->tail)
       {
-        pLmFree(strat->L[j].p);    /*deletes the short spoly and computes*/
+#ifdef HAVE_RINGS
+        if (rField_is_Ring(currRing))
+          pLmDelete(strat->L[j].p);    /*deletes the short spoly and computes*/
+        else
+#else
+          pLmFree(strat->L[j].p);    /*deletes the short spoly and computes*/
+#endif
         strat->L[j].p = NULL;
         poly m1 = NULL, m2 = NULL;
         // check that spoly creation is ok

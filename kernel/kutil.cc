@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.77 2008-02-01 15:11:33 wienand Exp $ */
+/* $Id: kutil.cc,v 1.78 2008-02-06 09:12:46 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -916,7 +916,7 @@ void deleteInS (int i,kStrategy strat)
 void deleteInL (LSet set, int *length, int j,kStrategy strat)
 {
   if (set[j].lcm!=NULL)
-#ifdef HAVE_RINGS_OLD
+#ifdef HAVE_RINGS
     if (pGetCoeff(set[j].lcm) != NULL)
       pLmDelete(set[j].lcm);
     else
@@ -926,7 +926,7 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
   {
     if (pNext(set[j].p) == strat->tail)
     {
-#ifdef HAVE_RINGS_OLD
+#ifdef HAVE_RINGS
       if (pGetCoeff(set[j].p) != NULL)
         pLmDelete(set[j].p);
       else
@@ -1063,7 +1063,6 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
 #endif
       strat->cp++;
       pLmDelete(Lp.lcm);
-      Lp.lcm=NULL;
       return;
   }
   // basic product criterion
@@ -1085,7 +1084,6 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
 #endif
       strat->cp++;
       pLmDelete(Lp.lcm);
-      Lp.lcm=NULL;
       return;
   }
   assume(!strat->fromT);
@@ -1194,6 +1192,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
       PrintS("--- spoly = NULL\n");
     }
 #endif
+    pLmDelete(Lp.lcm);
     return;
   }
   pNorm(p);
@@ -1201,6 +1200,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   {
     // Is from a previous computed GB, therefore we know that spoly will
     // reduce to zero. Oliver.
+    WarnS("Could we come here? 8738947389");
     Lp.p=NULL;
   }
   else
@@ -1229,7 +1229,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
     *the case lcm(s,p) == lcm(s,r) is not covered in chainCrit)
     *the first case is handeled in chainCrit
     */
-    if (Lp.lcm!=NULL) pLmDelete(Lp.lcm);
+    pLmDelete(Lp.lcm);
   }
   else
   {
@@ -2642,7 +2642,9 @@ void enterExtendedSpoly(poly h,kStrategy strat)
   if (!nIsOne(gcd))
   {
     poly p = p_Copy(h->next, strat->tailRing);
+    number tmp = gcd;
     gcd = nIntDiv(0, gcd);
+    nDelete(&tmp);
     p = p_Mult_nn(p, gcd, strat->tailRing);
     nDelete(&gcd);
 
@@ -2710,6 +2712,7 @@ void enterExtendedSpoly(poly h,kStrategy strat)
       }
     }
   }
+  nDelete(&gcd);
 }
 
 void clearSbatch (poly h,int k,int pos,kStrategy strat)

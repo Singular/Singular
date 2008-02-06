@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.30 2008-01-30 09:01:38 wienand Exp $ */
+/* $Id: polys1.cc,v 1.31 2008-02-06 09:12:47 wienand Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -481,23 +481,25 @@ number pInitContent_a(poly ph);
 void pContent(poly ph)
 {
 #ifdef HAVE_RINGS
-  if (rField_is_Ring(currRing)) 
+  if (rField_is_Ring(currRing))
   {
     if ((ph!=NULL) && rField_has_Units(currRing))
     {
       number k = nGetUnit(pGetCoeff(ph));
       if (!nIsOne(k))
       {
+        number tmpGMP = k;
         k = nInvers(k);
+        nDelete(&tmpGMP);
         poly h = pNext(ph);
-        pSetCoeff0(ph, nMult(pGetCoeff(ph), k));
+        pSetCoeff(ph, nMult(pGetCoeff(ph), k));
         while (h != NULL)
         {
           pSetCoeff(h, nMult(pGetCoeff(h), k));
           pIter(h);
         }
-        nDelete(&k);
       }
+      nDelete(&k);
     }
     return;
   }

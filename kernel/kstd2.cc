@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.57 2008-01-30 09:01:36 wienand Exp $ */
+/* $Id: kstd2.cc,v 1.58 2008-02-06 09:12:46 wienand Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -364,7 +364,7 @@ int redRing2toM (LObject* h,kStrategy strat)
 
     if (h->GetLmTailRing() == NULL)
     {
-      if (h->lcm!=NULL) pLmFree(h->lcm);
+      if (h->lcm!=NULL) pLmDelete(h->lcm);
 #ifdef KDEBUG
       h->lcm=NULL;
 #endif
@@ -381,10 +381,6 @@ int redRing2toM (LObject* h,kStrategy strat)
       at = strat->posInL(strat->L,strat->Ll,h,strat);
       if (at <= strat->Ll)
       {
-#if 0
-        if (kRingFindDivisibleByInS(strat->S, strat->sevS, strat->sl, h) < 0)
-          return 1;
-#endif
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG) Print(" ->L[%d]\n",at);
 #endif
@@ -1110,7 +1106,12 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     if (pNext(strat->P.p) == strat->tail)
     {
       // deletes the short spoly
-      pLmFree(strat->P.p);
+#ifdef HAVE_RINGS
+      if (rField_is_Ring(currRing))
+        pLmDelete(strat->P.p);
+      else
+#endif
+        pLmFree(strat->P.p);
       strat->P.p = NULL;
       poly m1 = NULL, m2 = NULL;
 
@@ -1242,13 +1243,19 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 //      Print("[%d]",hilbeledeg);
-      if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
       if (strat->sl>srmax) srmax = strat->sl;
     }
     else if (strat->P.p1 == NULL && strat->minim > 0)
     {
       p_Delete(&strat->P.p2, currRing, strat->tailRing);
     }
+
+    if (strat->P.lcm!=NULL)
+#ifdef HAVE_RINGS
+      pLmDelete(strat->P.lcm);
+#else
+      pLmFree(strat->P.lcm);
+#endif
 #ifdef KDEBUG
     memset(&(strat->P), 0, sizeof(strat->P));
 #endif

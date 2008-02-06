@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.16 2008-02-01 15:16:15 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.17 2008-02-06 09:12:47 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -114,10 +114,11 @@ number nrnSub (number a, number b)
 
 number nrnNeg (number c)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
-  mpz_init(erg);
-  mpz_sub(erg, nrnModul, (int_number) c);
-  return (number) erg;
+// nNeg inplace !!! TODO
+//  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+//  mpz_init(erg);
+  mpz_sub((int_number) c, nrnModul, (int_number) c);
+  return c;
 }
 
 number  nrnInvers (number c)

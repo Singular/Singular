@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.8 2008-02-01 15:16:14 wienand Exp $ */
+/* $Id: rintegers.cc,v 1.9 2008-02-06 09:12:47 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -234,10 +234,11 @@ number  nrzInvers (number c)
 
 number nrzNeg (number c)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrz_bin); // evtl. spaeter mit bin
-  mpz_init(erg);
-  mpz_mul_si(erg, (int_number) c, -1);
-  return (number) erg;
+// nNeg inplace !!! TODO
+//  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+//  mpz_init(erg);
+  mpz_mul_si((int_number) c, (int_number) c, -1);
+  return c;
 }
 
 nMapFunc nrzSetMap(ring src, ring dst)
