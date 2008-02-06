@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.17 2008-02-06 09:12:47 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.18 2008-02-06 12:51:41 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -345,18 +345,15 @@ void nrnSetExp(int m, ring r)
   if ((nrnBase == r->ringflaga) && (nrnExponent == r->ringflagb)) return;
   nrnBase = r->ringflaga;
   nrnExponent = r->ringflagb;
-  if (nrnModul != NULL)
+  if (nrnModul == NULL)
   {
-    nrnDelete((number*) &nrnModul, NULL);
-    nrnDelete((number*) &nrnMinusOne, NULL);
+    nrnModul = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+    mpz_init(nrnModul);
+    nrnMinusOne = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+    mpz_init(nrnMinusOne);
   }
-  nrnModul = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
-  mpz_init(nrnModul);
   mpz_set_ull(nrnModul, nrnBase);
   mpz_pow_ui(nrnModul, nrnModul, nrnExponent);
-
-  nrnMinusOne = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
-  mpz_init(nrnMinusOne);
   mpz_sub_ui(nrnMinusOne, nrnModul, 1);
 }
 
@@ -365,7 +362,7 @@ void nrnInitExp(int m, ring r)
   nrnSetExp(m, r);
   if (mpz_cmp_ui(nrnModul,2) <= 0)
   {
-    WarnS("nInitChar failed");
+    WarnS("nInitExp failed");
   }
 }
 

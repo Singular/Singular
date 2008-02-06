@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Mult_mm__T.cc,v 1.6 2007-05-10 08:12:42 wienand Exp $
+ *  Version: $Id: p_Mult_mm__T.cc,v 1.7 2008-02-06 12:51:41 wienand Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -18,7 +18,6 @@
  ***************************************************************/
 LINKAGE poly p_Mult_mm(poly p, const poly m, const ring ri)
 {
-  poly before = p;
   p_Test(p, ri);
   p_LmTest(m, ri);
   if (p == NULL) return NULL;
@@ -30,6 +29,9 @@ LINKAGE poly p_Mult_mm(poly p, const poly m, const ring ri)
   const unsigned long* m_e = m->exp;
   pAssume(!n_IsZero(ln,ri));
 
+#ifdef HAVE_ZERODIVISORS
+  poly before = p;
+#endif
   while (p != NULL)
   {
     pn = pGetCoeff(p);
@@ -37,17 +39,17 @@ LINKAGE poly p_Mult_mm(poly p, const poly m, const ring ri)
 #ifdef HAVE_ZERODIVISORS
     if (n_IsZero(tmp, ri))
     {
+      n_Delete(&tmp, ri);
       if (before == p)
       {
-        p = pNext(p);
+        p = p_LmDeleteAndNext(p, ri);
         before = p;
         q = p;
       }
       else
       {
-        pNext(before) = pNext(p);
-        p_LmFree(p, ri);
-        p = pNext(before);
+        p = p_LmDeleteAndNext(p, ri);
+        pNext(before) = p;
       }
     }
     else
