@@ -6,7 +6,7 @@
  *  Purpose: template for pp_Mult_nn
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_nn__T.cc,v 1.7 2008-01-31 16:13:55 wienand Exp $
+ *  Version: $Id: pp_Mult_nn__T.cc,v 1.8 2008-02-07 08:41:00 wienand Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -21,6 +21,9 @@ LINKAGE poly pp_Mult_nn(poly p, const number n, const ring r)
   p_Test(p, r);
   if (p == NULL) return NULL;
   spolyrec rp;
+#ifdef HAVE_ZERODIVISORS
+  rp.next = NULL;
+#endif
   poly q = &rp;
   omBin bin = r->PolyBin;
   DECLARE_LENGTH(const unsigned long length = r->ExpL_Size);
@@ -36,7 +39,7 @@ LINKAGE poly pp_Mult_nn(poly p, const number n, const ring r)
 #else
     number nc = pGetCoeff(p);
     number tmp = n_Mult(n, nc, r);
-    if (nIsZero(tmp))
+    if (! nIsZero(tmp))
     {
       p_AllocBin(pNext(q), bin, r);
       q = pNext(q);

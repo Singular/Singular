@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.79 2008-02-06 10:39:41 wienand Exp $ */
+/* $Id: kutil.cc,v 1.80 2008-02-07 08:40:59 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2643,11 +2643,11 @@ void enterExtendedSpoly(poly h,kStrategy strat)
   number gcd = nGcd((number) 0, pGetCoeff(h), strat->tailRing);
   if (!nIsOne(gcd))
   {
-    poly p = p_Copy(h->next, strat->tailRing);
+    poly p = h->next;
     number tmp = gcd;
     gcd = nIntDiv(0, gcd);
     nDelete(&tmp);
-    p = p_Mult_nn(p, gcd, strat->tailRing);
+    p = pp_Mult_nn(p, gcd, strat->tailRing);
     nDelete(&gcd);
 
     if (p != NULL)

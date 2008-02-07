@@ -6,7 +6,7 @@
  *  Purpose: template for p_Minus_m_Mult_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Minus_mm_Mult_qq__T.cc,v 1.7 2008-01-30 18:49:43 wienand Exp $
+ *  Version: $Id: p_Minus_mm_Mult_qq__T.cc,v 1.8 2008-02-07 08:41:00 wienand Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -87,6 +87,10 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
   }
 #ifdef HAVE_ZERODIVISORS
   }
+  else
+  { // coeff itself is zero
+    shorter += 1;
+  }
 #endif
   n_Delete(&tb, r);
   pIter(q);
@@ -144,7 +148,15 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
       shorter += ll;
     }
     else
+    {
       pNext(a) = r->p_Procs->pp_Mult_mm(q, m, r, last);
+#ifdef HAVE_RINGS
+      if (! rField_is_Domain(r))
+      {
+        shorter += pLength(q) - pLength(pNext(a));
+      }
+#endif
+    }
     pSetCoeff0(m, tm);
   }
 

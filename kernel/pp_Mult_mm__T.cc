@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_mm__T.cc,v 1.5 2007-05-10 08:12:43 wienand Exp $
+ *  Version: $Id: pp_Mult_mm__T.cc,v 1.6 2008-02-07 08:41:00 wienand Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -25,6 +25,9 @@ LINKAGE poly pp_Mult_mm(poly p, const poly m, const ring ri, poly &last)
     return NULL;
   }
   spolyrec rp;
+#ifdef HAVE_ZERODIVISORS
+  rp.next = NULL;
+#endif
   poly q = &rp, r;
   number ln = pGetCoeff(m);
   omBin bin = ri->PolyBin;
