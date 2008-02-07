@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.58 2008-02-06 09:12:46 wienand Exp $ */
+/* $Id: kstd2.cc,v 1.59 2008-02-07 09:36:17 wienand Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1243,6 +1243,12 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 //      Print("[%d]",hilbeledeg);
+      if (strat->P.lcm!=NULL)
+#ifdef HAVE_RINGS
+        pLmDelete(strat->P.lcm);
+#else
+        pLmFree(strat->P.lcm);
+#endif
       if (strat->sl>srmax) srmax = strat->sl;
     }
     else if (strat->P.p1 == NULL && strat->minim > 0)
@@ -1250,12 +1256,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       p_Delete(&strat->P.p2, currRing, strat->tailRing);
     }
 
-    if (strat->P.lcm!=NULL)
-#ifdef HAVE_RINGS
-      pLmDelete(strat->P.lcm);
-#else
-      pLmFree(strat->P.lcm);
-#endif
 #ifdef KDEBUG
     memset(&(strat->P), 0, sizeof(strat->P));
 #endif
