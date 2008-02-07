@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.20 2008-02-07 13:43:55 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.21 2008-02-07 13:48:05 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -231,7 +231,7 @@ BOOLEAN nrnIsUnit (number a)
 
 number  nrnGetUnit (number k)
 {
-  if (mpz_divisible_p(nrnModul, (int_number) k)) return nrnInt(1);
+  if (mpz_divisible_p(nrnModul, (int_number) k)) return nrnInit(1);
 
   int_number unit = (int_number) nrnGcd(k, 0, currRing);
   mpz_tdiv_q(unit, (int_number) k, unit);
