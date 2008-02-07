@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.14 2008-01-30 10:21:53 wienand Exp $ */
+/* $Id: rmodulo2m.cc,v 1.15 2008-02-07 13:30:37 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -198,6 +198,8 @@ BOOLEAN nr2mGreater (number a,number b)
 
 BOOLEAN nr2mDivBy (number a,number b)
 {
+  return ((NATNUMBER) a % (NATNUMBER) b) == 0;
+  /*
   if ((NATNUMBER) a == 0) return TRUE;
   if ((NATNUMBER) b == 0) return FALSE;
   while ((NATNUMBER) a % 2 == 0 && (NATNUMBER) b % 2 == 0)
@@ -206,6 +208,7 @@ BOOLEAN nr2mDivBy (number a,number b)
     b = (number) ((NATNUMBER) b / 2);
 }
   return ((NATNUMBER) b % 2 == 1);
+  */
 }
 
 int nr2mComp(number as, number bs)
