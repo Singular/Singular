@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.9 2008-02-06 09:12:47 wienand Exp $ */
+/* $Id: rintegers.cc,v 1.10 2008-02-07 13:43:55 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -23,7 +23,6 @@
 
 typedef MP_INT *int_number;
 omBin gmp_nrz_bin = omGetSpecBin(sizeof(MP_INT));
-number nrzOne = nrzInit(1);
 
 /*
  * Multiply two numbers
@@ -147,7 +146,7 @@ number nrzSub (number a, number b)
 
 number  nrzGetUnit (number a)
 {
-  return nrzOne;
+  return nrzInit(1);
 }
 
 BOOLEAN nrzIsUnit (number a)

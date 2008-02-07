@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.80 2008-02-07 08:40:59 wienand Exp $ */
+/* $Id: kutil.cc,v 1.81 2008-02-07 13:43:54 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2640,7 +2640,11 @@ ideal I=12xz-133y, 2xy-z;
 */
 void enterExtendedSpoly(poly h,kStrategy strat)
 {
-  number gcd = nGcd((number) 0, pGetCoeff(h), strat->tailRing);
+  number gcd;
+  if (nDivBy((number) 0, pGetCoeff(h)))
+    gcd = nIntDiv((number) 0, pGetCoeff(h));
+  else
+    gcd = nGcd((number) 0, pGetCoeff(h), strat->tailRing);
   if (!nIsOne(gcd))
   {
     poly p = h->next;
