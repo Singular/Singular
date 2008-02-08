@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.59 2008-02-07 09:36:17 wienand Exp $ */
+/* $Id: kstd2.cc,v 1.60 2008-02-08 10:11:29 wienand Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -274,7 +274,7 @@ poly kFindDivisibleByZeroPoly(LObject* h)
 /*2
 *  reduction procedure for the ring Z/2^m
 */
-int redRing2toM (LObject* h,kStrategy strat)
+int redRing (LObject* h,kStrategy strat)
 {
   if (h->p == NULL && h->t_p == NULL) return 0; // spoly is zero (can only occure with zero divisors)
 

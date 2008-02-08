@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.29 2008-01-30 09:01:37 wienand Exp $ */
+/* $Id: kutil.h,v 1.30 2008-02-08 10:11:30 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -395,7 +395,7 @@ int redNF0 (LObject *P,kStrategy strat);
 poly redNFTail (poly h,const int sl,kStrategy strat);
 int redHoney (LObject* h, kStrategy strat);
 #ifdef HAVE_RINGS
-int redRing2toM (LObject* h,kStrategy strat);
+int redRing (LObject* h,kStrategy strat);
 void enterExtendedSpoly(poly h,kStrategy strat);
 void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR = -1);
 poly kCreateZeroPoly(long exp[], long cabsind, poly* t_p, ring leadRing, ring tailRing);

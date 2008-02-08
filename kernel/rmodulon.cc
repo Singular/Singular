@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.21 2008-02-07 13:48:05 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.22 2008-02-08 10:11:30 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -368,9 +368,10 @@ void nrnSetExp(int m, ring r)
 void nrnInitExp(int m, ring r)
 {
   nrnSetExp(m, r);
+
   if (mpz_cmp_ui(nrnModul,2) <= 0)
   {
-    WarnS("nInitExp failed");
+    WarnS("nrnInitExp failed");
   }
 }
 

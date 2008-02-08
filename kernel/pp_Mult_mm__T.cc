@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_mm__T.cc,v 1.6 2008-02-07 08:41:00 wienand Exp $
+ *  Version: $Id: pp_Mult_mm__T.cc,v 1.7 2008-02-08 10:11:30 wienand Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -51,6 +51,7 @@ LINKAGE poly pp_Mult_mm(poly p, const poly m, const ring ri, poly &last)
       p_MemAddAdjust(q, ri);
 #ifdef HAVE_ZERODIVISORS
     }
+    else n_Delete(&tmp, ri);
 #endif
     p = pNext(p);
   }

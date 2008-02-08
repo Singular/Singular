@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.31 2008-02-06 09:12:46 wienand Exp $ */
+/* $Id: kstd1.cc,v 1.32 2008-02-08 10:11:28 wienand Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1022,7 +1022,7 @@ void initBba(ideal F,kStrategy strat)
   }
 #ifdef HAVE_RINGS  //TODO Oliver
   if (rField_is_Ring(currRing)) {
-    strat->red = redRing2toM;
+    strat->red = redRing;
   }
 #endif
   if (pLexOrder && strat->honey)
@@ -1083,7 +1083,7 @@ void initMora(ideal F,kStrategy strat)
     strat->red = redFirst;  /*take the first possible in T*/
 #ifdef HAVE_RINGS  //TODO Oliver
   else if (rField_is_Ring(currRing))
-    strat->red = redRing2toM;
+    strat->red = redRing;
 #endif
   else
     strat->red = redEcart;/*take the first possible in under ecart-restriction*/
@@ -1924,7 +1924,7 @@ ideal kInterRed (ideal F, ideal Q)
   strat->red         = redLazy;
 #ifdef HAVE_RINGS  //TODO Oliver
   if (rField_is_Ring(currRing)) {
-    strat->red = redRing2toM;
+    strat->red = redRing;
   }
 #endif
   strat->tailRing    = currRing;

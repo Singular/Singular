@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.15 2008-02-07 13:30:37 wienand Exp $ */
+/* $Id: rmodulo2m.cc,v 1.16 2008-02-08 10:11:30 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -198,7 +198,10 @@ BOOLEAN nr2mGreater (number a,number b)
 
 BOOLEAN nr2mDivBy (number a,number b)
 {
-  return ((NATNUMBER) a % (NATNUMBER) b) == 0;
+  if (a == NULL)
+    return (nr2mModul % (NATNUMBER) b) == 0;
+  else
+    return ((NATNUMBER) a % (NATNUMBER) b) == 0;
   /*
   if ((NATNUMBER) a == 0) return TRUE;
   if ((NATNUMBER) b == 0) return FALSE;
@@ -396,30 +399,15 @@ void nr2mSetExp(int m, ring r)
   }
   else
   {
-    nr2mExp=0;
-    nr2mModul=0;
+    nr2mExp=2;
+    nr2mModul=4;
   }
-//  PrintS("Modul: ");
-//  Print("%d\n", nr2mModul);
 }
 
 void nr2mInitExp(int m, ring r)
 {
-  int i, w;
-
-  if (m>1)
-  {
-    nr2mExp = m;
-    nr2mModul = 2;
-    for (int i = 1; i < m; i++) {
-      nr2mModul = nr2mModul * 2;
-
-    }
-  }
-  else
-  {
-    WarnS("nInitExp failed");
-  }
+  nr2mSetExp(m, r);
+  if (m<2) WarnS("nInitExp failed: using Z/2^2");
 }
 
 #ifdef LDEBUG
