@@ -1,4 +1,4 @@
-version="$Id: nchomolog.lib,v 1.6 2007-12-11 12:00:01 levandov Exp $";
+version="$Id: nchomolog.lib,v 1.7 2008-02-08 23:28:01 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  nchomolog.lib   Procedures for Noncommutative Homological Algebra
@@ -257,19 +257,20 @@ EXAMPLE: example ncExt_R; shows an example
 example
 { "EXAMPLE:"; echo = 2;
   ring R     = 0,(x,y),dp;
-  poly F    = x2-y3;
+  poly F    = x2-y2;
   def A = annfs(F);
   setring A;
   matrix M[1][size(LD)] = LD;
-  int i = 1;
-  matrix Ps = M;
-  module E1  = ncExt_R(1,M);
-  E1;
+  print(ncExt_R(1,M)); // hence the Ext^1 is zero
+  module E  = ncExt_R(2,M); // right module
+  print(E);
   def Aop = opposite(A);
   setring Aop;
-  module Psop = oppose(A,Ps);
-  module T1  = ncExt_R(1,Psop);
-  T1;
+  module Eop = oppose(A,E);
+  module T1  = ncExt_R(2,Eop);
+  setring A;
+  module T1 = oppose(Aop,T1);
+  print(T1); // this is a left module Ext^2(Ext^2(M,A),A)
 }
 
 proc nctors(matrix M)
@@ -540,14 +541,36 @@ example
 
 
 proc dmodoublext(module M, list #)
+"USAGE:   dmodoublext(M [,i]);  M module, i optional int 
+COMPUTE:  a presentation of Ext^i(Ext^i(M,D),D); for basering D
+RETURN:   left module
+NOTE: by default, i is set to the integer part of the half of number of variables of D
+@* for holonomic modules over Weyl algebra, the double ext is known to be holonomic
+EXAMPLE: example dmodoublext; shows an example
+"
 {
-  // if a list is nonempty and contains an integer N, n = N; otherwise n = nvars/2
-  // assume: basering is a Weyl algebra
-  // returns Ext^n_D(Ext^n_D(M,D),D), that is 
-  // computes the "dual" of the "dual" of a d-mod M (for n = nvars/2)
+  // assume: basering is a Weyl algebra?
   def save = basering; 
   setring save;
-  int n = nvars(save); n = n div 2;
+  // if a list is nonempty and contains an integer N, n = N; otherwise n = nvars/2
+  int n;
+  if (size(#) > 0)
+  {
+    //    if (typeof(#) == "int")
+    //    {
+      n = int(#[1]);
+      //    }
+//     else
+//     {
+//       ERROR("the optional argument expected to have type int");
+//     }
+  }
+  else
+  {
+    n = nvars(save); n = n div 2;
+  }
+  // returns Ext^i_D(Ext^i_D(M,D),D), that is 
+  // computes the "dual" of the "dual" of a d-mod M (for n = nvars/2)
   module Md = ncExt_R(n,M); // right module
   // no prune yet!
   def saveop = opposite(save);
@@ -580,7 +603,8 @@ example
   setring A;
   ideal I = Dx*(x2-y3),Dy*(x2-y3);
   I = groebner(I);
-  print(dmodoublext(I));
+  print(dmodoublext(I,1));
+  print(dmodoublext(I,2));
 }
 
 static proc part_Ext_R(matrix M)

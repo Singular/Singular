@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmodapp.lib,v 1.2 2008-02-05 22:44:29 levandov Exp $";
+version="$Id: dmodapp.lib,v 1.3 2008-02-08 23:28:01 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmodapp.lib     Applications of algebraic D-modules
@@ -24,7 +24,9 @@ foo();                    dummy prototype for a future procedure
 
 AUXILIARY PROCEDURES:
 
-Appell(a,b,c,d);      create an ideal annihilating Appel F4 function
+AppelF1();      create an ideal annihilating Appel F1 function
+AppelF2();      create an ideal annihilating Appel F2 function
+AppelF4();      create an ideal annihilating Appel F4 function
 
 SEE ALSO: dmod_lib, gmssing_lib
 ";
@@ -142,17 +144,20 @@ EXAMPLE: example annfs; shows examples
 }
 
 
-proc Appel(number a,b,c,d)
+proc AppelF1()
+//(number a,b,c,d)
 {
-  ring @r = (0,a,b,c,d),(x,y,Dx,Dy),(a(0,0,1,1),dp);
+  // Appel F1, d = b', SST p.48
+  ring @r = (0,a,b,c),(x,y,Dx,Dy),(a(0,0,1,1),dp);
   matrix @D[4][4];
   @D[1,3]=1; @D[2,4]=1;
   def @S = nc_algebra(1,@D);
   setring @S;
-  ideal IAppel =
-    Dx*(x*Dx+c-1) - x*(x*Dx+y*Dy+a)*(x*Dx+y*Dy+b),
-    Dy*(y*Dy+d-1) - y*(x*Dx+y*Dy+a)*(x*Dx+y*Dy+b);
-  export IAppel;
+  ideal IAppel1 =
+    (x*Dx)*(x*Dx+y*Dy+c-1) - x*(x*Dx+y*Dy+a)*(x*Dx+b),
+    (y*Dy)*(x*Dx+y*Dy+c-1) - y*(x*Dx+y*Dy+a)*(x*Dx+d),
+    (x-y)*Dx*Dy - d*Dx + b*Dy;
+  export IAppel1;
   kill @r;
   return(@S);
 }
@@ -160,9 +165,59 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,x,dp;
-  def Ap = Appel(1,2,3,4);
-  setring Ap;
-  IAppel;
+  def A = AppelF1(); //(1,2,3,4);
+  setring A;
+  IAppel1;
+}
+
+proc AppelF2()
+//(number a,b,c)
+{
+  // Appel F2, c = b', SST p.85
+  ring @r = (0,a,b,c),(x,y,Dx,Dy),(a(0,0,1,1),dp);
+  matrix @D[4][4];
+  @D[1,3]=1; @D[2,4]=1;
+  def @S = nc_algebra(1,@D);
+  setring @S;
+  ideal IAppel2 =
+    (x*Dx)^2 - x*(x*Dx+y*Dy+a)*(x*Dx+b),
+    (y*Dy)^2 - y*(x*Dx+y*Dy+a)*(y*Dy+c);
+  export IAppel2;
+  kill @r;
+  return(@S);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,x,dp;
+  def A = AppelF2(); //(1,2,3,4);
+  setring A;
+  IAppel2;
+}
+
+proc AppelF4()
+//number a,b,c,d - ?
+{
+  // Appel F4, d = c', SST, p. 39
+  ring @r = (0,a,b,c,d),(x,y,Dx,Dy),(a(0,0,1,1),dp);
+  matrix @D[4][4];
+  @D[1,3]=1; @D[2,4]=1;
+  def @S = nc_algebra(1,@D);
+  setring @S;
+  ideal IAppel4 =
+    Dx*(x*Dx+c-1) - x*(x*Dx+y*Dy+a)*(x*Dx+y*Dy+b),
+    Dy*(y*Dy+d-1) - y*(x*Dx+y*Dy+a)*(x*Dx+y*Dy+b);
+  export IAppel4;
+  kill @r;
+  return(@S);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,x,dp;
+  def A = AppelF4(); //(1,2,3,4);
+  setring A;
+  IAppel4;
 }
 
 proc isFsat(ideal I, poly F)
@@ -171,7 +226,10 @@ proc isFsat(ideal I, poly F)
   /* works in any algebra */
   /*  for simplicity : later check attrib */
   /* returns -1 if true */
-  I = groebner(I);
+  if (attrib(I,"isSB")!=1)
+  {
+    I = groebner(I);
+  }
   matrix @M = matrix(I);
   matrix @F[1][1] = F;
   module S = modulo(@F,@M);
@@ -195,7 +253,7 @@ example
 proc DLoc(ideal I, poly F)
 "USAGE:  DLoc(I, F);  I an ideal, F a poly
 RETURN: nothing (exports objects instead)
-ASSUME: the basering is a Weyl algebra
+ASSUME: the basering is a Weyl algebra and I is F-saturated
 PURPOSE: compute the presentation of the localization of D/I w.r.t. f^s
 NOTE:    In the basering, the following objects are exported:
 @*       - the ideal LD0 (which is a Groebner basis) is the presentation of the localization
