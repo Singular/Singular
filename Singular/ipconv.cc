@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.35 2007-01-29 18:19:59 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.36 2008-02-15 17:11:49 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -127,6 +127,25 @@ static void * iiI2BI(void *data)
   return (void *)n;
 }
 
+extern number ngfMapQ(number from); // gnumpfl.cc
+extern number ngcMapQ(number from); // gnumpc.cc
+extern number nrMapQ(number from);  // shortfl.cc
+
+static void * iiBI2N(void *data)
+{
+  if (currRing==NULL) return NULL;
+  // a bigint is really a number from char 0, with diffrent operations...
+  if (rField_is_Q())      return (void*)nlCopy((number)data);
+  if (rField_is_Zp())     return (void*)npMap0((number)data);
+  if (rField_is_long_R()) return (void*)ngfMapQ((number)data);
+  if (rField_is_long_C()) return (void*)ngcMapQ((number)data);
+  if (rField_is_R())      return (void*)nrMapQ((number)data);
+  if (rField_is_Q_a())    return (void*)naMap00((number)data);
+  if (rField_is_Zp_a())   return (void*)naMap0P((number)data);
+  WerrorS("cannot convert bigint to this ring");
+  return NULL;
+}
+
 static void * iiIm2Ma(void *data)
 {
   int i, j;
@@ -225,6 +244,8 @@ struct sConvertTypes dConvertTypes[] =
    { INT_CMD,         MATRIX_CMD,     iiI2Id , NULL },
 //  int -> intvec
    { INT_CMD,         INTVEC_CMD,     iiI2Iv , NULL },
+//  bigint -> number
+   { BIGINT_CMD,      NUMBER_CMD,     iiBI2N , NULL },
 //  intvec -> intmat
    { INTVEC_CMD,      INTMAT_CMD,     iiDummy, NULL },
 //  intvec -> matrix
