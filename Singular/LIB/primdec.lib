@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.136 2007-12-07 10:20:34 Singular Exp $";
+version="$Id: primdec.lib,v 1.137 2008-02-15 10:01:29 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -2125,9 +2125,11 @@ EXAMPLE: example minAssPrimes; shows an example
     {
       J = fglm(P, i);
     }
-    list pr = triangMH(J, 2);
+//    list pr = triangMH(J,2); HIER KOENNEN verschiedene Mengen zu gleichen
+//                             asoziierten Primidealen fuehren
+// Aenderung
+    list pr = triangMH(J);
     list qr, re;
-
     for(k = 1; k <= size(pr); k++)
     {
       if(primT(pr[k]))
