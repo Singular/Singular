@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.6 2007-12-18 09:33:20 Singular Exp $ */
+/* $Id: gnumpfl.cc,v 1.7 2008-02-15 17:13:14 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -28,7 +28,7 @@ static number ngfMapP(number from)
   else
     return NULL;
 }
-static number ngfMapQ(number from)
+number ngfMapQ(number from)
 {
   if ( from != NULL )
   {

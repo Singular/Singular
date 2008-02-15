@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.5 2007-07-04 09:58:40 Singular Exp $ */
+/* $Id: gnumpc.cc,v 1.6 2008-02-15 17:13:14 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -22,7 +22,7 @@
 extern size_t gmp_output_digits;
 
 
-static number ngcMapQ(number from)
+number ngcMapQ(number from)
 {
   if ( from != NULL )
   {

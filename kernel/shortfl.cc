@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shortfl.cc,v 1.4 2007-07-04 09:58:40 Singular Exp $ */
+/* $Id: shortfl.cc,v 1.5 2008-02-15 17:13:14 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -313,7 +313,7 @@ typedef MP_INT lint;
 #define MPZ_INIT mpz_init
 #define MPZ_CLEAR mpz_clear
 
-static number nrMapQ(number from)
+number nrMapQ(number from)
 {
   lint h,*g,*z,*n;
   int i,j,t,s;
