@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: freegb.lib,v 1.4 2008-01-17 21:05:04 levandov Exp $";
+version="$Id: freegb.lib,v 1.5 2008-02-15 17:12:41 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: ratgb.lib  Twosided Noncommutative Groebner bases in Free Algebras
@@ -974,12 +974,12 @@ proc ex_shift()
   I;
   poly p = I[2]; // I[8];
   p;
-  system("stest",p,7,7,3); // error
+  system("stest",p,7,7,3); // error -> the world is ok
   poly q1 = system("stest",p,1,7,3); //ok
   poly q6 = system("stest",p,6,7,3); //ok
-  system("btest",p,3);
-  system("btest",q1,3);
-  system("btest",q6,3);
+  system("btest",p,3); //ok
+  system("btest",q1,3); //ok
+  system("btest",q6,3); //ok
 }
 
 proc ex2()
@@ -1084,4 +1084,83 @@ proc ex_densep_2()
   lst2str(M);
   list U = freegb(M,5);
   lst2str(U);
+}
+
+
+proc freegbRing(int d)
+"USAGE:  freegbRing(d); d an integer
+RETURN:  ring
+PURPOSE: creates a d-shifted ring
+EXAMPLE: example freegbRing; shows examples
+"
+{
+  // d = up to degree, will be shifted to d+1
+  if (d<1) {"bad d"; return(0);}
+
+  int ppl = printlevel-voice+2;
+  string err = "";
+
+  int i,j,s;
+  def save = basering;
+  int D = d-1;
+  list LR  = ringlist(save);
+  list L, tmp;
+  L[1] = LR[1]; // ground field
+  L[4] = LR[4]; // quotient ideal
+  tmp  = LR[2]; // varnames
+  s = size(LR[2]);
+  for (i=1; i<=D; i++)
+  {
+    for (j=1; j<=s; j++)
+    {
+      tmp[i*s+j] = string(tmp[j])+"("+string(i+1)+")";
+    }
+  }
+  for (i=1; i<=s; i++)
+  {
+    tmp[i] = string(tmp[i])+"("+string(1)+")";
+  }
+  L[2] = tmp;
+  list OrigNames = LR[2];
+  // ordering: d blocks of the ord on r
+  // try to get whether the ord on r is blockord itself
+  // TODO: make L(2) ordering! exponent is maximally 2
+  s = size(LR[3]);
+  if (s==2)
+  {
+    // not a blockord, 1 block + module ord
+    tmp = LR[3][s]; // module ord
+    for (i=1; i<=D; i++)
+    {
+      LR[3][s-1+i] = LR[3][1];
+    }
+    LR[3][s+D] = tmp;
+  }
+  if (s>2)
+  {
+    // there are s-1 blocks
+    int nb = s-1;
+    tmp = LR[3][s]; // module ord
+    for (i=1; i<=D; i++)
+    {
+      for (j=1; j<=nb; j++)
+      {
+	LR[3][i*nb+j] = LR[3][j];
+      }
+    }
+    //    size(LR[3]);
+    LR[3][nb*(D+1)+1] = tmp;
+  }
+  L[3] = LR[3];
+  def @R = ring(L);
+  //  setring @R;
+  return (@R);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),(dp(1),dp(2));
+  def A = freegbRing(2);
+  setring A;
+  A;
 }
