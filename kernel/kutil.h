@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.30 2008-02-08 10:11:30 wienand Exp $ */
+/* $Id: kutil.h,v 1.31 2008-02-15 17:14:23 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -617,15 +617,28 @@ KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
 
 /* shiftgb stuff */
 #include "shiftgb.h"
-void enterOnePairShift(int i, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV);
 
-void enterOnePairManyShifts(int i, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV);
+void enterTShift(LObject p, kStrategy strat, int atT, int uptodeg, int lV);
 
-void initenterpairsShift (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR);
+void initBuchMoraShift (ideal F,ideal Q,kStrategy strat);
+
+void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV); // ok
+
+void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV);
+
+void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int uptodeg, int lV); // ok
+
+void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR,int uptodeg, int lV);
+
+void initenterpairsShift (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR,int uptodeg, int lV); 
+
+void updateSShift(kStrategy strat,int uptodeg,int lV);
 
 void initBbaShift(ideal F,kStrategy strat);
 
-int redFirstShift (LObject* h,kStrategy strat);
+poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN normalize);
+
+int redFirstShift (LObject* h,kStrategy strat); // ok
 
 ideal freegb(ideal I, int uptodeg, int lVblock);
 #endif

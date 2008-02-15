@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.60 2008-02-08 10:11:29 wienand Exp $ */
+/* $Id: kstd2.cc,v 1.61 2008-02-15 17:14:21 levandov Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1426,11 +1426,8 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
 }
 
 /* shiftgb stuff */
-// #ifdef KDEBUG
-// static int bba_count = 0;
-// #endif
 
-#ifdef HAVE_PLURAL
+
 
 ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int uptodeg, int lV)
 {
@@ -1442,14 +1439,16 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
   int   srmax,lrmax, red_result = 1;
   int   olddeg,reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
-  BOOLEAN withT = FALSE;
+  BOOLEAN withT = TRUE; //FALSE;
 
-  initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
-  initBuchMoraPos(strat);
-  initHilbCrit(F,Q,&hilb,strat);
-  initBbaShift(F,strat); /* TODOING */
+  initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit, NO CHANGES */
+  initBuchMoraPos(strat); /*NO CHANGES YET: perhaps later*/
+  initHilbCrit(F,Q,&hilb,strat); /*NO CHANGES*/
+  initBbaShift(F,strat); /* DONE */
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
-  /*Shdl=*/initBuchMora(F, Q,strat);
+  /*Shdl=*/initBuchMoraShift(F, Q,strat); /* updateS with no toT, i.e. no init for T */
+  updateSShift(strat,uptodeg,lV); /* initializes T */
+
   if (strat->minim>0) strat->M=idInit(IDELEMS(F),F->rank);
   srmax = strat->sl;
   reduc = olddeg = lrmax = 0;
@@ -1460,8 +1459,8 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
 #endif
 
   // redtailBBa against T for inhomogenous input
-  if (!K_TEST_OPT_OLDSTD)
-    withT = ! strat->homog;
+  //  if (!K_TEST_OPT_OLDSTD)
+  //    withT = ! strat->homog;
 
   // strat->posInT = posInT_pLength;
   kTest_TS(strat);
@@ -1598,8 +1597,11 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
 
       // enter into S, L, and T
       //if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
-        enterT(strat->P, strat);
-        enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
+      //        enterT(strat->P, strat); // this was here before Shift stuff
+      //enterTShift(LObject p, kStrategy strat, int atT, int uptodeg, int lV); // syntax
+      // the default value for atT = -1
+      enterTShift(strat->P,strat,-1,uptodeg, lV);
+      enterpairsShift(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl,uptodeg,lV);
       // posInS only depends on the leading term
       if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
       {
@@ -1680,14 +1682,185 @@ ideal freegb(ideal I, int uptodeg, int lVblock)
 {
   /* todo main call */
 
+  /* assume: ring is prepared, ideal is copied into shifted ring */
+  /* uptodeg and lVblock are correct - test them! */
+
   kStrategy strat = new skStrategy;
   /* ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int uptodeg, int lV) */
   /* at the moment:
 - no quotient (check)
 - no *w, no *hilb
   */
-
   ideal RS = bbaShift(I,NULL, NULL, NULL, strat, uptodeg, lVblock);
   return(RS);
 }
+
+/*2
+*reduces h with elements from T choosing  the first possible
+* element in t with respect to the given pDivisibleBy
+*/
+int redFirstShift (LObject* h,kStrategy strat)
+{
+  if (h->IsNull()) return 0;
+
+  int at, reddeg,d;
+  int pass = 0;
+  int j = 0;
+
+  if (! strat->homog)
+  {
+    d = h->GetpFDeg() + h->ecart;
+    reddeg = strat->LazyDegree+d;
+  }
+  h->SetShortExpVector();
+  loop
+  {
+    j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
+    if (j < 0)
+    {
+      h->SetDegStuffReturnLDeg(strat->LDegLast);
+      return 1;
+    }
+
+    if (!TEST_OPT_INTSTRATEGY)
+      strat->T[j].pNorm();
+#ifdef KDEBUG
+    if (TEST_OPT_DEBUG)
+    {
+      PrintS("reduce ");
+      h->wrp();
+      PrintS(" with ");
+      strat->T[j].wrp();
+    }
 #endif
+    ksReducePoly(h, &(strat->T[j]), strat->kNoetherTail(), NULL, strat);
+#ifdef KDEBUG
+    if (TEST_OPT_DEBUG)
+    {
+      PrintS(" to ");
+      wrp(h->p);
+      PrintLn();
+    }
+#endif
+    if (h->IsNull())
+    {
+      if (h->lcm!=NULL) pLmFree(h->lcm);
+      h->Clear();
+      return 0;
+    }
+    h->SetShortExpVector();
+
+#if 0
+    if ((strat->syzComp!=0) && !strat->honey)
+    {
+      if ((strat->syzComp>0) &&
+          (h->Comp() > strat->syzComp))
+      {
+        assume(h->MinComp() > strat->syzComp);
+#ifdef KDEBUG
+        if (TEST_OPT_DEBUG) PrintS(" > syzComp\n");
+#endif
+        if (strat->homog)
+          h->SetDegStuffReturnLDeg(strat->LDegLast);
+        return -2;
+      }
+    }
+#endif
+    if (!strat->homog)
+    {
+      if (!K_TEST_OPT_OLDSTD && strat->honey)
+      {
+        h->SetpFDeg();
+        if (strat->T[j].ecart <= h->ecart)
+          h->ecart = d - h->GetpFDeg();
+        else
+          h->ecart = d - h->GetpFDeg() + strat->T[j].ecart - h->ecart;
+
+        d = h->GetpFDeg() + h->ecart;
+      }
+      else
+        d = h->SetDegStuffReturnLDeg(strat->LDegLast);
+      /*- try to reduce the s-polynomial -*/
+      pass++;
+      /*
+       *test whether the polynomial should go to the lazyset L
+       *-if the degree jumps
+       *-if the number of pre-defined reductions jumps
+       */
+      if (!K_TEST_OPT_REDTHROUGH && (strat->Ll >= 0)
+          && ((d >= reddeg) || (pass > strat->LazyPass)))
+      {
+        h->SetLmCurrRing();
+        if (strat->posInLDependsOnLength)
+          h->SetLength(strat->length_pLength);
+        at = strat->posInL(strat->L,strat->Ll,h,strat);
+        if (at <= strat->Ll)
+        {
+          int dummy=strat->sl;
+	  /*          if (kFindDivisibleByInS(strat,&dummy, h) < 0) */
+          if (kFindDivisibleByInT(strat->T,strat->sevT, dummy, h) < 0)
+            return 1;
+          enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+#ifdef KDEBUG
+          if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
+#endif
+          h->Clear();
+          return -1;
+        }
+      }
+      if ((TEST_OPT_PROT) && (strat->Ll < 0) && (d >= reddeg))
+      {
+        reddeg = d+1;
+        Print(".%d",d);mflush();
+      }
+    }
+  }
+}
+
+void initBbaShift(ideal F,kStrategy strat)
+{
+  int i;
+  idhdl h;
+ /* setting global variables ------------------- */
+  strat->enterS = enterSBba; /* remains as is, we change enterT! */
+
+  strat->red = redFirstShift; /* no redHomog ! */
+
+  if (pLexOrder && strat->honey)
+    strat->initEcart = initEcartNormal;
+  else
+    strat->initEcart = initEcartBBA;
+  if (strat->honey)
+    strat->initEcartPair = initEcartPairMora;
+  else
+    strat->initEcartPair = initEcartPairBba;
+  strat->kIdeal = NULL;
+  //if (strat->ak==0) strat->kIdeal->rtyp=IDEAL_CMD;
+  //else              strat->kIdeal->rtyp=MODUL_CMD;
+  //strat->kIdeal->data=(void *)strat->Shdl;
+  if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
+  {
+    //interred  machen   Aenderung
+    pFDegOld=pFDeg;
+    pLDegOld=pLDeg;
+    //h=ggetid("ecart");
+    //if ((h!=NULL) /*&& (IDTYP(h)==INTVEC_CMD)*/)
+    //{
+    //  ecartWeights=iv2array(IDINTVEC(h));
+    //}
+    //else
+    {
+      ecartWeights=(short *)omAlloc((pVariables+1)*sizeof(short));
+      /*uses automatic computation of the ecartWeights to set them*/
+      kEcartWeights(F->m,IDELEMS(F)-1,ecartWeights);
+    }
+    pRestoreDegProcs(totaldegreeWecart, maxdegreeWecart);
+    if (TEST_OPT_PROT)
+    {
+      for(i=1; i<=pVariables; i++)
+        Print(" %d",ecartWeights[i]);
+      PrintLn();
+      mflush();
+    }
+  }
+}

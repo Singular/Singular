@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shiftgb.cc,v 1.3 2007-11-06 12:58:35 Singular Exp $ */
+/* $Id: shiftgb.cc,v 1.4 2008-02-15 17:14:23 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for shift GB and free GB
 */
@@ -42,13 +42,14 @@ poly pLPshift(poly p, int sh, int uptodeg, int lV)
 {
   /* assume shift takes place */
   /* shifts the poly p by sh */
+  /* deletes p */
 
   /* assume sh and uptodeg agree */
 
   if (sh == 0) return(p); /* the zero shift */
 
   poly q  = NULL;
-  poly pp = pCopy(p);
+  poly pp = p; // pCopy(p);
   while (pp!=NULL)
   {
     q = p_Add_q(q, pmLPshift(pp,sh,uptodeg,lV),currRing);
@@ -96,6 +97,7 @@ poly pmLPshift(poly p, int sh, int uptodeg, int lV)
   poly m = pOne();
   pSetExpV(m,s);
   /*  pSetm(m); */ /* done in the pSetExpV */
+  /* think on the component */
   pSetCoeff0(m,c);
   freeT(e, currRing->N);
   freeT(s, currRing->N);
@@ -106,7 +108,8 @@ int pLastVblock(poly p, int lV)
 {
   /* returns the number of maximal block */
   /* appearing among the monomials of p */
-  poly q = pCopy(p); /* need it ? */
+  /* the 0th block is the 1st one */
+  poly q = p_Copy(p,currRing); /* need it ? */
   int ans = 0; 
   int ansnew = 0;
   while (q!=NULL)
@@ -131,7 +134,8 @@ int pmLastVblock(poly p, int lV)
   if (j==0) 
   {
 #ifdef PDEBUG
-    Print("pmLastVblock: unexpected zero exponent");
+    Print("pmLastVblock: unexpected zero exponent vector");
+    PrintLn();
 #endif   
     return(j);
   }
@@ -160,7 +164,12 @@ int isInV(poly p, int lV)
     }
   }
   j = b;
-  while ( (!B[j]) && (j>=1)) j--;
+  //  while ( (!B[j]) && (j>=1)) j--;
+  for (j=b; j>=1; j--)
+  {
+    if (B[j]!=0) break;
+  }
+
   if (j==0)
   {
     /* it is a zero exp vector, which is in V */
@@ -179,73 +188,8 @@ int isInV(poly p, int lV)
 
 /* shiftgb stuff */
 
-void initBbaShift(ideal F,kStrategy strat)
-{
-  int i;
-  idhdl h;
- /* setting global variables ------------------- */
-  strat->enterS = enterSBba;
 
-  strat->red = redFirstShift;
+/* remarks: cleanT : just deletion
+enlargeT: just reallocation */
 
-  /* perhaps the following?
-   *    strat->LazyPass *=4;
-   *    strat->red = redHomogShift;
-   */
-
-  /*    strat->red = redHoney;
-   *  if (strat->honey)
-   *    strat->red = redHoney;
-   *  else if (pLexOrder && !strat->homog)
-   *    strat->red = redLazy;
-   *  else
-   *  {
-   *    strat->LazyPass *=4;
-   *    strat->red = redHomog;
-   *  }
-   *#ifdef HAVE_RINGS  //TODO Oliver
-   *  if (rField_is_Ring(currRing)) {
-   *    strat->red = redRing2toM;
-   *  }
-   *#endif
-  */
-
-  if (pLexOrder && strat->honey)
-    strat->initEcart = initEcartNormal;
-  else
-    strat->initEcart = initEcartBBA;
-  if (strat->honey)
-    strat->initEcartPair = initEcartPairMora;
-  else
-    strat->initEcartPair = initEcartPairBba;
-  strat->kIdeal = NULL;
-  //if (strat->ak==0) strat->kIdeal->rtyp=IDEAL_CMD;
-  //else              strat->kIdeal->rtyp=MODUL_CMD;
-  //strat->kIdeal->data=(void *)strat->Shdl;
-  if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
-  {
-    //interred  machen   Aenderung
-    pFDegOld=pFDeg;
-    pLDegOld=pLDeg;
-    //h=ggetid("ecart");
-    //if ((h!=NULL) /*&& (IDTYP(h)==INTVEC_CMD)*/)
-    //{
-    //  ecartWeights=iv2array(IDINTVEC(h));
-    //}
-    //else
-    {
-      ecartWeights=(short *)omAlloc((pVariables+1)*sizeof(short));
-      /*uses automatic computation of the ecartWeights to set them*/
-      kEcartWeights(F->m,IDELEMS(F)-1,ecartWeights);
-    }
-    pRestoreDegProcs(totaldegreeWecart, maxdegreeWecart);
-    if (TEST_OPT_PROT)
-    {
-      for(i=1; i<=pVariables; i++)
-        Print(" %d",ecartWeights[i]);
-      PrintLn();
-      mflush();
-    }
-  }
-}
 #endif

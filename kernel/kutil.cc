@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.83 2008-02-08 10:11:29 wienand Exp $ */
+/* $Id: kutil.cc,v 1.84 2008-02-15 17:14:22 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1349,6 +1349,7 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat,
 /*2
 * put the pair (s[i],p)  into the set B, ecart=ecart(p)
 */
+
 
 void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR = -1)
 {
@@ -6010,35 +6011,190 @@ int posInT_pLength(const TSet set,const int length,LObject &p)
 #ifdef HAVE_PLURAL
 /* including the self pairs? */
 
+void updateSShift(kStrategy strat,int uptodeg,int lV)
+{
+  /* to use after updateS(toT=FALSE,strat) */
+  /* fills T with shifted elt's of S */
+  int i;
+  LObject h;
+  int atT = -1; // or figure out smth better
+  strat->tl = -1; // init
+  for (i=0; i<=strat->sl; i++)
+  {
+    h.p =  strat->S[i];
+    strat->initEcart(&h);
+    h.sev = strat->sevS[i];
+    /*puts the elements of S with their shifts to T*/
+    //    int atT, int uptodeg, int lV)
+    enterTShift(h,strat,atT,uptodeg,lV);
+  }
+  /* what about setting strat->tl? */
+}
+
+void initBuchMoraShift (ideal F,ideal Q,kStrategy strat)
+{
+  strat->interpt = BTEST1(OPT_INTERRUPT);
+  strat->kHEdge=NULL;
+  if (pOrdSgn==1) strat->kHEdgeFound=FALSE;
+  /*- creating temp data structures------------------- -*/
+  strat->cp = 0;
+  strat->c3 = 0;
+  strat->tail = pInit();
+  /*- set s -*/
+  strat->sl = -1;
+  /*- set L -*/
+  strat->Lmax = setmaxL;
+  strat->Ll = -1;
+  strat->L = initL();
+  /*- set B -*/
+  strat->Bmax = setmaxL;
+  strat->Bl = -1;
+  strat->B = initL();
+  /*- set T -*/
+  strat->tl = -1;
+  strat->tmax = setmaxT;
+  strat->T = initT();
+  strat->R = initR();
+  strat->sevT = initsevT();
+  /*- init local data struct.---------------------------------------- -*/
+  strat->P.ecart=0;
+  strat->P.length=0;
+  if (pOrdSgn==-1)
+  {
+    if (strat->kHEdge!=NULL) pSetComp(strat->kHEdge, strat->ak);
+    if (strat->kNoether!=NULL) pSetComp(strat->kNoetherTail(), strat->ak);
+  }
+  if(TEST_OPT_SB_1)
+  {
+    int i;
+    ideal P=idInit(IDELEMS(F)-strat->newIdeal,F->rank);
+    for (i=strat->newIdeal;i<IDELEMS(F);i++)
+    {
+      P->m[i-strat->newIdeal] = F->m[i];
+      F->m[i] = NULL;
+    }
+    initSSpecial(F,Q,P,strat);
+    for (i=strat->newIdeal;i<IDELEMS(F);i++)
+    {
+      F->m[i] = P->m[i-strat->newIdeal];
+      P->m[i-strat->newIdeal] = NULL;
+    }
+    idDelete(&P);
+  }
+  else
+  {
+    /*Shdl=*/initSL(F, Q,strat); /*sets also S, ecartS, fromQ */
+    // /*Shdl=*/initS(F, Q,strat); /*sets also S, ecartS, fromQ */
+  }
+  strat->kIdeal = NULL;
+  strat->fromT = FALSE;
+  strat->noTailReduction = !TEST_OPT_REDTAIL;
+  if (!TEST_OPT_SB_1)
+  {
+    /* the only change: do not fill the set T*/
+    updateS(FALSE,strat);
+  }
+  if (strat->fromQ!=NULL) omFreeSize(strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
+  strat->fromQ=NULL;
+  /* more changes: fill the set T with all the shifts of elts of S*/
+  /* is done by other procedure */
+}
+
+// void initBuchMoraShift(ideal F,ideal Q,kStrategy strat)
+// {
+//   initBuchMora(F,Q,strat);
+//   strat->fromT = TRUE;
+// }
+
 /*1
-* put the pairs (s[i],sh \dot p)  into the set B, ecart=ecart(p)
+* put the pairs (sh \dot s[i],p)  into the set B, ecart=ecart(p)
 */
 void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV)
 {
-  atR = -1;
-  int j;
-  int lb = pLastVblock(p,lV);
-  poly q;
-  for (j=0; j<= uptodeg - lb; j++)
-  {
-    q = pLPshift(p,j,uptodeg,lV);
-    enterOnePairShift(i, q, ecart, isFromQ, strat, -1, uptodeg, lV);
-  }
-}
-#endif
 
-#ifdef HAVE_PLURAL
-/*2
-* put the pair (s[i],p)  into the set B, ecart=ecart(p)
+  /* should cycle through all shifts of s[i] until uptodeg - lastVblock(s[i]) */
+  /* that is create the pairs (f, s \dot g)  */
+
+  poly q;
+  q = pCopy(strat->S[i]); // zero shift
+
+ /* determine how many elements we have to insert for a given s[i] */
+  /* x(0)y(1)z(2) : lastVblock-1=2, to add until lastVblock=uptodeg-1 */
+  /* hence, a total number of elt's to add is: */
+  /*  int toInsert = 1 + (uptodeg-1) - (pLastVblock(p.p, lV) -1);  */
+  int toInsert = uptodeg  - pLastVblock(q, lV) +1; 
+
+  assume(i<=strat->sl); // from OnePair
+  if (strat->interred_flag) return; // ?
+
+  /* these vars hold for all shifts of s[i] */
+  int ecartq = 0; //Hans says it's ok; we're in the homog case, no ecart
+  int qfromQ = strat->fromQ[i]; 
+
+  int j;
+
+  for (j=1; j<= toInsert -1; j++)
+  {
+    //    q = pLPshift(strat->S[i],j,uptodeg,lV);
+    /* we increase shifts by one; must delete q there*/
+    q = pLPshift(q,1,uptodeg,lV);
+    /* here we need to call enterOnePair with two polys ... */
+    enterOnePairShift(q, p, ecart, isFromQ, strat, -1, ecartq, qfromQ, uptodeg, lV);
+  }
+  /* delete q? */
+  pDelete(&q);
+}
+
+/*1
+* put the pairs (sh \dot qq,p)  into the set B, ecart=ecart(p)
 */
-void enterOnePairShift (int i, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV)
+void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV)
 {
 
+  /* should cycle through all shifts of q until uptodeg - lastVblock(q) */
+  /* that is create the pairs (f, s \dot g)  */
+
+ /* determine how many elements we have to insert for a given s[i] */
+  /* x(0)y(1)z(2) : lastVblock-1=2, to add until lastVblock=uptodeg-1 */
+  /* hence, a total number of elt's to add is: */
+  /*  int toInsert = 1 + (uptodeg-1) - (pLastVblock(p.p, lV) -1);  */
+  int toInsert = uptodeg  - pLastVblock(qq, lV) +1; 
+
+  //  assume(i<=strat->sl); // from OnePair
+  if (strat->interred_flag) return; // ?
+
+  /* these vars hold for all shifts of s[i] */
+  int ecartq = 0; //Hans says it's ok; we're in the homog case, no ecart
+  int qfromQ = 0; // strat->fromQ[i]; 
+
+  int j;
+  poly q = pCopy(qq);   // q has zero shift
+  for (j=1; j<= toInsert -1; j++)
+  {
+    //    q = pLPshift(strat->S[i],j,uptodeg,lV);
+    /* we increase shifts by one; must delete q there*/
+    q = pLPshift(q,1,uptodeg,lV);
+    /* here we need to call enterOnePair with two polys ... */
+    enterOnePairShift(q, p, ecart, isFromQ, strat, -1, ecartq, qfromQ, uptodeg, lV);
+  }
+  /* delete q? */
+  pDelete(&q);
+}
+
+/*2
+* put the pair (q,p)  into the set B, ecart=ecart(p), q is the shift of some s[i]
+*/
+void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int uptodeg, int lV)
+{
+
+  /* poly q stays for s[i], ecartq = ecart(q), qisFromQ = applies to q */
+
+  int qfromQ = qisFromQ;
+
   /* need additionally: int up_to_degree, poly V0 with the variables in (0)  or just the number lV = the length of the first block */
-  /* should cycle through all shifts of s[i] until up_to_degree - lastVblock(s[i]) */
-  /* that is create the pairs (f, s \dot g) for deg(s\dot g)= */
+
   atR = -1;
-  assume(i<=strat->sl);
+  //  assume(i<=strat->sl); // satisfied automatically
   if (strat->interred_flag) return;
 
   int      l,j,compare;
@@ -6051,18 +6207,29 @@ void enterOnePairShift (int i, poly p, int ecart, int isFromQ, kStrategy strat, 
   /*- computes the lcm(s[i],p) -*/
   Lp.lcm = pInit();
 
-  pLcm(p,strat->S[i],Lp.lcm);
+  pLcm(p,q,Lp.lcm);
   pSetm(Lp.lcm);
 
   /* apply the V criterion */
+  /* or do it in ManyShifts? */
   if (!isInV(Lp.lcm, lV))
   {
+#ifdef KDEBUG
+    if (TEST_OPT_DEBUG)
+    {
+      PrintS("V crit applied to q = ");
+      wrp(pHead(q));
+      PrintS(", p = ");
+      wrp(pHead(p)); 
+      PrintLn();
+    }
+#endif
     pLmFree(Lp.lcm);
     Lp.lcm=NULL;
     return;
     /* + add the counter for applying the V criterion */
+    /* like strat->cv */
   }
-
 
   const BOOLEAN bIsPluralRing = rIsPluralRing(currRing);
   const BOOLEAN bIsSCA        = rIsSCA(currRing) && strat->homog; // for prod-crit
@@ -6070,8 +6237,8 @@ void enterOnePairShift (int i, poly p, int ecart, int isFromQ, kStrategy strat, 
 
   if (strat->sugarCrit && bNCProdCrit)
   {
-    if((!((strat->ecartS[i]>0)&&(ecart>0)))
-    && pHasNotCF(p,strat->S[i]))
+    if((!((ecartq>0)&&(ecart>0)))
+    && pHasNotCF(p,q))
     {
     /*
     *the product criterion has applied for (s,p),
@@ -6093,8 +6260,8 @@ void enterOnePairShift (int i, poly p, int ecart, int isFromQ, kStrategy strat, 
       return;
     }
     else
-      Lp.ecart = si_max(ecart,strat->ecartS[i]);
-    if (strat->fromT && (strat->ecartS[i]>ecart))
+      Lp.ecart = si_max(ecart,ecartq);
+    if (strat->fromT && (ecartq>ecart))
     {
       pLmFree(Lp.lcm);
       Lp.lcm=NULL;
@@ -6117,7 +6284,7 @@ void enterOnePairShift (int i, poly p, int ecart, int isFromQ, kStrategy strat, 
         &&(sugarDivisibleBy(strat->B[j].ecart,Lp.ecart)))
         {
           strat->c3++;
-          if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
+          if ((strat->fromQ==NULL) || (isFromQ==0) || (qfromQ==0))
           {
             pLmFree(Lp.lcm);
             return;
@@ -6142,7 +6309,7 @@ void enterOnePairShift (int i, poly p, int ecart, int isFromQ, kStrategy strat, 
       // if currRing->nc_type!=quasi (or skew)
       // TODO: enable productCrit for super commutative algebras...
       if(/*(strat->ak==0) && productCrit(p,strat->S[i])*/
-      pHasNotCF(p,strat->S[i]))
+      pHasNotCF(p,q))
       {
       /*
       *the product criterion has applied for (s,p),
@@ -6161,7 +6328,7 @@ void enterOnePairShift (int i, poly p, int ecart, int isFromQ, kStrategy strat, 
           Lp.lcm=NULL;
           return;
       }
-      if (strat->fromT && (strat->ecartS[i]>ecart))
+      if (strat->fromT && (ecartq>ecart))
       {
         pLmFree(Lp.lcm);
         Lp.lcm=NULL;
@@ -6180,7 +6347,7 @@ void enterOnePairShift (int i, poly p, int ecart, int isFromQ, kStrategy strat, 
         if (compare==1)
         {
           strat->c3++;
-          if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
+          if ((strat->fromQ==NULL) || (isFromQ==0) || (qfromQ==0))
           {
             pLmFree(Lp.lcm);
             return;
@@ -6202,45 +6369,47 @@ void enterOnePairShift (int i, poly p, int ecart, int isFromQ, kStrategy strat, 
   /*-  compute the short s-polynomial -*/
   if (strat->fromT && !TEST_OPT_INTSTRATEGY)
     pNorm(p);
-  if ((strat->S[i]==NULL) || (p==NULL))
+  if ((q==NULL) || (p==NULL))
     return;
-  if ((strat->fromQ!=NULL) && (isFromQ!=0) && (strat->fromQ[i]!=0))
+  if ((strat->fromQ!=NULL) && (isFromQ!=0) && (qfromQ!=0))
     Lp.p=NULL;
   else
   {
-    if ( bIsPluralRing )
-    {
-      if(pHasNotCF(p, strat->S[i]))
-      {
-        if(ncRingType(currRing) == nc_lie)
-        {
-            // generalized prod-crit for lie-type
-            strat->cp++;
-            Lp.p = nc_p_Bracket_qq(pCopy(p),strat->S[i]);
-        }
-        else
-        if( bIsSCA )
-        {
-            // product criterion for homogeneous case in SCA
-            strat->cp++;
-            Lp.p = NULL;
-        }
-        else
-          Lp.p = nc_CreateSpoly(strat->S[i],p,currRing); // ?
-      }
-      else  Lp.p = nc_CreateSpoly(strat->S[i],p,currRing);
-    }
-    else
-    {
-      Lp.p = ksCreateShortSpoly(strat->S[i],p, strat->tailRing);
-    }
+//     if ( bIsPluralRing )
+//     {
+//       if(pHasNotCF(p, q))
+//       {
+//         if(ncRingType(currRing) == nc_lie)
+//         {
+//             // generalized prod-crit for lie-type
+//             strat->cp++;
+//             Lp.p = nc_p_Bracket_qq(pCopy(p),q);
+//         }
+//         else
+//         if( bIsSCA )
+//         {
+//             // product criterion for homogeneous case in SCA
+//             strat->cp++;
+//             Lp.p = NULL;
+//         }
+//         else
+//           Lp.p = nc_CreateSpoly(q,p,currRing); // ?
+//       }
+//       else  Lp.p = nc_CreateSpoly(q,p,currRing);
+//     }
+//     else
+//     {
+    Lp.p = ksCreateShortSpoly(q,p, strat->tailRing);
+      //  }
   }
   if (Lp.p == NULL)
   {
     /*- the case that the s-poly is 0 -*/
-    if (strat->pairtest==NULL) initPairtest(strat);
-    strat->pairtest[i] = TRUE;/*- hint for spoly(S^[i],p)=0 -*/
-    strat->pairtest[strat->sl+1] = TRUE;
+    /* TEMPORARILY DISABLED FOR SHIFTS */
+//     if (strat->pairtest==NULL) initPairtest(strat);
+//     strat->pairtest[i] = TRUE;/*- hint for spoly(S^[i],p)=0 -*/
+//     strat->pairtest[strat->sl+1] = TRUE;
+    /* END _ TEMPORARILY DISABLED FOR SHIFTS */
     /*hint for spoly(S[i],p) == 0 for some i,0 <= i <= sl*/
     /*
     *suppose we have (s,r),(r,p),(s,p) and spoly(s,p) == 0 and (r,p) is
@@ -6256,23 +6425,26 @@ void enterOnePairShift (int i, poly p, int ecart, int isFromQ, kStrategy strat, 
   else
   {
     /*- the pair (S[i],p) enters B -*/
-    Lp.p1 = strat->S[i];
+    Lp.p1 = q;
     Lp.p2 = p;
 
     if ( !bIsPluralRing )
       pNext(Lp.p) = strat->tail;
 
-    if (atR >= 0)
-    {
-      Lp.i_r1 = strat->S_2_R[i];
-      Lp.i_r2 = atR;
-    }
-    else
-    {
+    /* TEMPORARILY DISABLED FOR SHIFTS */
+    /* at the beginning we set atR = -1 */
+//     if (atR >= 0)
+//     {
+      /*      Lp.i_r1 = strat->S_2_R[i]; */
+//       Lp.i_r2 = atR;
+//     }
+//     else
+//     {
+    /* END _ TEMPORARILY DISABLED FOR SHIFTS */
       Lp.i_r1 = -1;
       Lp.i_r2 = -1;
-    }
-    strat->initEcartPair(&Lp,strat->S[i],p,strat->ecartS[i],ecart);
+      //    }
+    strat->initEcartPair(&Lp,q,p,ecartq,ecart);
 
     if (TEST_OPT_INTSTRATEGY)
     {
@@ -6284,14 +6456,43 @@ void enterOnePairShift (int i, poly p, int ecart, int isFromQ, kStrategy strat, 
     enterL(&strat->B,&strat->Bl,&strat->Bmax,Lp,l);
   }
 }
-#endif
 
-#ifdef HAVE_PLURAL
+
+/*2
+*(s[0],h),...,(s[k],h) will be put to the pairset L(via initenterpairs)
+*superfluous elements in S will be deleted
+*/
+void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR,int uptodeg, int lV)
+{
+  /* Q: what is exactly the strat->fromT ? */
+  int j=pos;
+
+#ifdef HAVE_RINGS
+  assume (!rField_is_Ring(currRing));
+#endif
+  initenterpairsShift(h,k,ecart,0,strat, atR,uptodeg,lV);
+  if ( (!strat->fromT)
+  && ((strat->syzComp==0)
+    ||(pGetComp(h)<=strat->syzComp)))
+  {
+    //Print("start clearS k=%d, pos=%d, sl=%d\n",k,pos,strat->sl);
+    unsigned long h_sev = pGetShortExpVector(h);
+    loop
+    {
+      if (j > k) break;
+      clearS(h,h_sev, &j,&k,strat);
+      j++;
+    }
+    //Print("end clearS sl=%d\n",strat->sl);
+  }
+ // PrintS("end enterpairs\n");
+}
+
 /*3
 *(s[0],h),...,(s[k],h) will be put to the pairset L
 * additionally we put the pairs (h, s \sdot h) for s>=1 to L
 */
-void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, int atR)
+void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, int atR, int uptodeg, int lV)
 {
   atR = -1;
   if ((strat->syzComp==0)
@@ -6310,7 +6511,7 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
           if (!strat->fromQ[j])
           {
             new_pair=TRUE;
-            enterOnePair(j,h,ecart,isFromQ,strat, atR);
+            enterOnePairManyShifts(j,h,ecart,isFromQ,strat, atR,uptodeg,lV);
           //Print("j:%d, Ll:%d\n",j,strat->Ll);
           }
         }
@@ -6320,9 +6521,11 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
         new_pair=TRUE;
         for (j=0; j<=k; j++)
         {
-          enterOnePair(j,h,ecart,isFromQ,strat, atR);
+          enterOnePairManyShifts(j,h,ecart,isFromQ,strat, atR,uptodeg,lV);
         }
         /* HERE we put (h, s*h) pairs */
+       /* enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV); */
+       enterOnePairSelfShifts (h, h, ecart, isFromQ, strat, atR, uptodeg, lV);
       }
     }
     else
@@ -6333,11 +6536,12 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
         || (pGetComp(strat->S[j])==0))
         {
           new_pair=TRUE;
-          enterOnePair(j,h,ecart,isFromQ,strat, atR);
+          enterOnePairManyShifts(j,h,ecart,isFromQ,strat, atR, uptodeg, lV);
         //Print("j:%d, Ll:%d\n",j,strat->Ll);
         }
       }
       /* HERE we put (h, s*h) pairs TOO */
+      enterOnePairSelfShifts (h, h, ecart, isFromQ, strat, atR, uptodeg, lV);
     }
 
     if (new_pair) chainCrit(h,ecart,strat);
@@ -6346,253 +6550,133 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
 }
 #endif
 
-#ifdef HAVE_PLURAL
+
+
+
 /*2
-*reduces h with elements from T choosing  the first possible
-* element in t with respect to the given pDivisibleBy
+* puts p to the set T, starting with the at position atT
+* and inserts all admissible shifts of p
 */
-int redFirstShift (LObject* h,kStrategy strat)
+void enterTShift(LObject p, kStrategy strat, int atT, int uptodeg, int lV)
 {
-  int at,reddeg,d,i;
-  int pass = 0;
-  int j = 0;
+  /* determine how many elements we have to insert */
+  /* x(0)y(1)z(2) : lastVblock-1=2, to add until lastVblock=uptodeg-1 */
+  /* hence, a total number of elt's to add is: */
+  /*  int toInsert = 1 + (uptodeg-1) - (pLastVblock(p.p, lV) -1);  */
 
-  d = pFDeg((*h).p,currRing)+(*h).ecart;
-  reddeg = strat->LazyDegree+d;
-  loop
+  pp_Test(p.p, currRing, p.tailRing);
+
+  int toInsert = uptodeg  - pLastVblock(pCopy(p.p), lV) +1; 
+
+  int i;
+
+  if (atT < 0)
+    atT = strat->posInT(strat->T, strat->tl, p);
+  
+  LObject q;
+  poly s;
+  /* can call enterT in a sequence, e.g. */
+  for (i=0; i<=toInsert-1; i++)
   {
-    if (j > strat->sl)
-    {
-      #ifdef KDEBUG
-      if (TEST_OPT_DEBUG) PrintLn();
-      #endif
-      return 0;
-    }
-    #ifdef KDEBUG
-    if (TEST_OPT_DEBUG) Print("%d",j);
-    #endif
-    if (pDivisibleBy(strat->S[j],(*h).p))
-    {
-      #ifdef KDEBUG
-      if (TEST_OPT_DEBUG) PrintS("+\n");
-      #endif
-      /*
-      * the polynomial to reduce with is;
-      * T[j].p
-      */
-      if (!TEST_OPT_INTSTRATEGY)
-        pNorm(strat->S[j]);
-      #ifdef KDEBUG
-      if (TEST_OPT_DEBUG)
-      {
-        wrp(h->p);
-        PrintS(" with ");
-        wrp(strat->S[j]);
-      }
-      #endif
-      (*h).p = nc_ReduceSpoly(strat->S[j],(*h).p, currRing);
-      //spSpolyRed(strat->T[j].p,(*h).p,strat->kNoether);
-
-      #ifdef KDEBUG
-      if (TEST_OPT_DEBUG)
-      {
-        PrintS(" to ");
-        wrp(h->p);
-      }
-      #endif
-      if ((*h).p == NULL)
-      {
-        if (h->lcm!=NULL) p_LmFree((*h).lcm, currRing);
-        return 0;
-      }
-      if (TEST_OPT_INTSTRATEGY)
-      {
-        if (rField_is_Zp_a()) pContent(h->p);
-        else pCleardenom(h->p);// also does a pContent
-      }
-      /*computes the ecart*/
-      d = pLDeg((*h).p,&((*h).length),currRing);
-      (*h).FDeg=pFDeg((*h).p,currRing);
-      (*h).ecart = d-(*h).FDeg; /*pFDeg((*h).p);*/
-      if ((strat->syzComp!=0) && !strat->honey)
-      {
-        if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
-        {
-          #ifdef KDEBUG
-          if (TEST_OPT_DEBUG) PrintS(" > sysComp\n");
-	  #endif
-          return 0;
-        }
-      }
-      /*- try to reduce the s-polynomial -*/
-      pass++;
-      /*
-      *test whether the polynomial should go to the lazyset L
-      *-if the degree jumps
-      *-if the number of pre-defined reductions jumps
-      */
-      if ((strat->Ll >= 0)
-      && ((d >= reddeg) || (pass > strat->LazyPass))
-      && !strat->homog)
-      {
-        at = strat->posInL(strat->L,strat->Ll,h,strat);
-        if (at <= strat->Ll)
-        {
-          i=strat->sl+1;
-          do
-          {
-            i--;
-            if (i<0) return 0;
-          } while (!pDivisibleBy(strat->S[i],(*h).p));
-          enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
-          #ifdef KDEBUG
-          if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
-	  #endif
-          (*h).p = NULL;
-          return 0;
-        }
-      }
-      if ((TEST_OPT_PROT) && (strat->Ll < 0) && (d >= reddeg))
-      {
-        reddeg = d+1;
-        Print(".%d",d);mflush();
-      }
-      j = 0;
-      #ifdef KDEBUG
-      if (TEST_OPT_DEBUG) PrintLn();
-      #endif
-    }
-    else
-    {
-      #ifdef KDEBUG
-      if (TEST_OPT_DEBUG) PrintS("-");
-      #endif
-      j++;
-    }
+    q = p;
+    /* shift p, that is create another LObject and shift its poly */
+    /* change: p.p, p.t_p, */
+    /* change: i_r (must be -1 because we're not yet in T ? */
+    q.Copy(); // following
+    /*   pLPshift(poly p, int sh, int uptodeg, int lV); */
+    s = pLPshift(pCopy(q.p), i, uptodeg, lV); // deletes 1st arg, hence pCopy
+    q.p = pCopy(s); pDelete(&s);
+    if (q.t_p != NULL) pNext(q.t_p) = pNext(q.p); // from enterT
+    /* enter it into T */
+    enterT(q,strat,atT+i);
   }
+
+/* Q: what to do with this one in the orig enterT ? */
+/*  strat->R[strat->tl] = &(strat->T[atT]); */
+/* Solution: it is done by enterT each time separately */
 }
 
 
-/*2
-*  reduction procedure for the homogeneous case
-*  and the case of a degree-ordering
-*/
-int redHomogShift (LObject* h,kStrategy strat)
+
+poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN normalize)
 {
-  if (strat->tl<0) return 1;
-  //if (h->GetLmTailRing()==NULL) return 0; // HS: SHOULD NOT BE NEEDED!
-  assume(h->FDeg == h->pFDeg());
+  /* for the shift case need to run it with withT = TRUE */
+  strat->redTailChange=FALSE;
+  if (strat->noTailReduction) return L->GetLmCurrRing();
+  poly h, p;
+  p = h = L->GetLmTailRing();
+  if ((h==NULL) || (pNext(h)==NULL))
+    return L->GetLmCurrRing();
 
-  poly h_p;
-  int i,j,at,pass, ii;
-  unsigned long not_sev;
-  long reddeg,d;
+  TObject* With;
+  // placeholder in case strat->tl < 0
+  TObject  With_s(strat->tailRing);
 
-  pass = j = 0;
-  d = reddeg = h->GetpFDeg();
-  h->SetShortExpVector();
-  int li;
-  h_p = h->GetLmTailRing();
-  not_sev = ~ h->sev;
-  loop
+  LObject Ln(pNext(h), strat->tailRing);
+  Ln.pLength = L->GetpLength() - 1;
+
+  pNext(h) = NULL;
+  if (L->p != NULL) pNext(L->p) = NULL;
+  L->pLength = 1;
+
+  Ln.PrepareRed(strat->use_buckets);
+
+  while(!Ln.IsNull())
   {
-    j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
-    if (j < 0) return 1;
-
-    li = strat->T[j].pLength;
-    ii = j;
-    /*
-     * the polynomial to reduce with (up to the moment) is;
-     * pi with length li
-     */
-    i = j;
-#if 1
-    if (TEST_OPT_LENGTH)
     loop
     {
-      /*- search the shortest possible with respect to length -*/
-      i++;
-      if (i > strat->tl)
-        break;
-      if (li<=1)
-        break;
-      if ((strat->T[i].pLength < li)
-         &&
-          p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i],
-                               h_p, not_sev, strat->tailRing))
+      Ln.SetShortExpVector();
+      if (withT)
       {
-        /*
-         * the polynomial to reduce with is now;
-         */
-        li = strat->T[i].pLength;
-        ii = i;
+        int j;
+        j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, &Ln);
+        if (j < 0) break;
+        With = &(strat->T[j]);
       }
-    }
-#endif
-
-    /*
-     * end of search: have to reduce with pi
-     */
-#ifdef KDEBUG
-    if (TEST_OPT_DEBUG)
-    {
-      PrintS("red:");
-      h->wrp();
-      PrintS(" with ");
-      strat->T[ii].wrp();
-    }
-#endif
-    assume(strat->fromT == FALSE);
-
-    ksReducePoly(h, &(strat->T[ii]), NULL, NULL, strat);
-
-#ifdef KDEBUG
-    if (TEST_OPT_DEBUG)
-    {
-      PrintS("\nto ");
-      h->wrp();
-      PrintLn();
-    }
-#endif
-
-    h_p = h->GetLmTailRing();
-    if (h_p == NULL)
-    {
-      if (h->lcm!=NULL) pLmFree(h->lcm);
-#ifdef KDEBUG
-      h->lcm=NULL;
-#endif
-      return 0;
-    }
-    h->SetShortExpVector();
-    not_sev = ~ h->sev;
-    /*
-     * try to reduce the s-polynomial h
-     *test first whether h should go to the lazyset L
-     *-if the degree jumps
-     *-if the number of pre-defined reductions jumps
-     */
-    pass++;
-    if (!K_TEST_OPT_REDTHROUGH && (strat->Ll >= 0) && (pass > strat->LazyPass))
-    {
-      h->SetLmCurrRing();
-      at = strat->posInL(strat->L,strat->Ll,h,strat);
-      if (at <= strat->Ll)
+      else
       {
-        int dummy=strat->sl;
-        if (kFindDivisibleByInS(strat, &dummy, h) < 0)
-          return 1;
-        enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
-#ifdef KDEBUG
-        if (TEST_OPT_DEBUG)
-          Print(" lazy: -> L%d\n",at);
-#endif
-        h->Clear();
-        return -1;
+        With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
+        if (With == NULL) break;
       }
+      if (normalize && (!TEST_OPT_INTSTRATEGY) && (!nIsOne(pGetCoeff(With->p))))
+      {
+        With->pNorm();
+        //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
+      }
+      strat->redTailChange=TRUE;
+      if (ksReducePolyTail(L, With, &Ln))
+      {
+        // reducing the tail would violate the exp bound
+        //  set a flag and hope for a retry (in bba)
+        strat->completeReduce_retry=TRUE;
+        do
+        {
+          pNext(h) = Ln.LmExtractAndIter();
+          pIter(h);
+          L->pLength++;
+        } while (!Ln.IsNull());
+        goto all_done;
+      }
+      if (Ln.IsNull()) goto all_done;
+      if (! withT) With_s.Init(currRing);
     }
+    pNext(h) = Ln.LmExtractAndIter();
+    pIter(h);
+    L->pLength++;
   }
+
+  all_done:
+  Ln.Delete();
+  if (L->p != NULL) pNext(L->p) = pNext(p);
+
+  if (strat->redTailChange)
+  {
+    L->last = NULL;
+    L->length = 0;
+  }
+  L->Normalize(); // HANNES: should have a test
+  kTest_L(L);
+  return L->GetLmCurrRing();
 }
-#endif // HAVE_PLURAL
 
 #endif // KUTIL_CC
