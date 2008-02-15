@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.262 2008-01-31 13:24:28 Singular Exp $ */
+/* $Id: extra.cc,v 1.263 2008-02-15 17:12:09 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1871,6 +1871,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #include "mpsr.h"
 #include "mod_raw.h"
 #include "ratgring.h"
+#include "shiftgb.h"
 
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {
@@ -2616,6 +2617,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
+#ifdef HAVE_PLURAL
 #ifdef HAVE_RATGRING
 /*==================== RatNF, noncomm rational coeffs =================*/
     if (strcmp(sys_cmd, "intratNF") == 0)
@@ -2703,8 +2705,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
-#endif
-#ifdef HAVE_PLURAL
+#endif // HAVE_RATGRING
 /*==================== freeGB, twosided GB in free algebra =================*/
     if (strcmp(sys_cmd, "freegb") == 0)
     {
@@ -2725,8 +2726,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       if ((h!=NULL) && (h->Typ()==INT_CMD))
       {
 	lVblock=(int)((long)(h->Data()));
-	//	res->data = freegb(I,uptodeg,lVblock);
-	//	res->rtyp = IDEAL_CMD;
+	res->data = freegb(I,uptodeg,lVblock);
+	res->rtyp = IDEAL_CMD;
       }
       else return TRUE;
       return FALSE;
