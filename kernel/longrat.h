@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.7 2007-08-03 11:32:05 Singular Exp $ */
+/* $Id: longrat.h,v 1.8 2008-02-20 13:58:34 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
@@ -66,6 +66,7 @@ number   nlLcm(number a, number b, const ring r);   /*special routine !*/
 BOOLEAN  nlGreater(number a, number b);
 BOOLEAN  nlIsMOne(number a);
 int      nlInt(number &n);
+number   nlBigInt(number &n);
 BOOLEAN  nlGreaterZero(number za);
 number   nlInvers(number a);
 void     nlNormalize(number &x);
