@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.25 2008-02-05 22:44:28 levandov Exp $";
+version="$Id: dmod.lib,v 1.26 2008-02-20 15:56:57 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -246,7 +246,6 @@ example
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z),Dp;
   poly F = z*x^2+y^3;
-  printlevel = 0;
   def A  = annfs(F); // here, the default BM algorithm will be used
   setring A;
   LD;
