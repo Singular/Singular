@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.137 2008-02-15 10:01:29 Singular Exp $";
+version="$Id: primdec.lib,v 1.138 2008-02-20 13:40:03 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -2056,7 +2056,7 @@ EXAMPLE: example minAssPrimes; shows an example
 
   // Set input parameters
   algorithm = "SL";         // Default: SL algorithm
-  facstdOption = "noFacstd";    // Default: facstd is not used
+  facstdOption = "Facstd";    // Default: facstd is not used
   if(size(#) > 0)
   {
     int valid;
@@ -2132,7 +2132,7 @@ EXAMPLE: example minAssPrimes; shows an example
     list qr, re;
     for(k = 1; k <= size(pr); k++)
     {
-      if(primT(pr[k]))
+      if(primT(pr[k])&&(0))
       {
         re[size(re) + 1] = pr[k];
       }
@@ -2150,7 +2150,7 @@ EXAMPLE: example minAssPrimes; shows an example
         }
         for(j = 1; j <= size(qr) / 2; j++)
         {
-          re[size(re) + 1] = qr[2 * j];
+          re[size(re) + 1] = std(qr[2 * j]);
         }
       }
     }
