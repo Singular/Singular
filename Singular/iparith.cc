@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.467 2008-01-28 13:43:35 Singular Exp $ */
+/* $Id: iparith.cc,v 1.468 2008-02-20 13:41:30 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3135,40 +3135,41 @@ struct sValCmd2 dArith2[]=
 ,{jjPOWER_P,   '^',            POLY_CMD,       POLY_CMD,   INT_CMD ALLOW_PLURAL}
 ,{jjPOWER_ID,  '^',            IDEAL_CMD,      IDEAL_CMD,  INT_CMD ALLOW_PLURAL}
 ,{jjLE_I,      LE,             INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
+,{jjLE_BI,     LE,             INT_CMD,        BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjLE_N,      LE,             INT_CMD,        NUMBER_CMD, NUMBER_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_S, LE,             INT_CMD,        STRING_CMD, STRING_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_IV_I,LE,           INT_CMD,        INTVEC_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_IV,LE,             INT_CMD,        INTVEC_CMD, INTVEC_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_P, LE,             INT_CMD,        POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_P, LE,             INT_CMD,        VECTOR_CMD, VECTOR_CMD ALLOW_PLURAL}
-,{jjLE_BI,     LE,             INT_CMD,        BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjLT_I,      '<',            INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
+,{jjLT_BI,     '<',            INT_CMD,        BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjLT_N,      '<',            INT_CMD,        NUMBER_CMD, NUMBER_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_IV_I,'<',           INT_CMD,        INTVEC_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_IV,'<',            INT_CMD,        INTVEC_CMD, INTVEC_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_S, '<',            INT_CMD,        STRING_CMD, STRING_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_P, '<',            INT_CMD,        POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_P, '<',            INT_CMD,        VECTOR_CMD, VECTOR_CMD ALLOW_PLURAL}
-,{jjLT_BI,     '<',            INT_CMD,        BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjGE_I,      GE,             INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
+,{jjGE_BI,     GE,             INT_CMD,        BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjGE_N,      GE,             INT_CMD,        NUMBER_CMD, NUMBER_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_S, GE,             INT_CMD,        STRING_CMD, STRING_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_IV_I,GE,           INT_CMD,        INTVEC_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_IV,GE,             INT_CMD,        INTVEC_CMD, INTVEC_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_P, GE,             INT_CMD,        POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_P, GE,             INT_CMD,        VECTOR_CMD, VECTOR_CMD ALLOW_PLURAL}
-,{jjGE_BI,     GE,             INT_CMD,        BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjGT_I,      '>',            INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
+,{jjGT_BI,     '>',            INT_CMD,        BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjGT_N,      '>',            INT_CMD,        NUMBER_CMD, NUMBER_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_S, '>',            INT_CMD,        STRING_CMD, STRING_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_IV_I,'>',          INT_CMD,        INTVEC_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_IV,'>',            INT_CMD,        INTVEC_CMD, INTVEC_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_P, '>',            INT_CMD,        POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_P, '>',            INT_CMD,        VECTOR_CMD, VECTOR_CMD ALLOW_PLURAL}
-,{jjGT_BI,     '>',            INT_CMD,        BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjAND_I,     '&',            INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
 ,{jjOR_I,      '|',            INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
 ,{jjEQUAL_I,   EQUAL_EQUAL,    INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
+,{jjEQUAL_BI,  EQUAL_EQUAL,    INT_CMD,        BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjEQUAL_N,   EQUAL_EQUAL,    INT_CMD,        NUMBER_CMD, NUMBER_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_S, EQUAL_EQUAL,    INT_CMD,        STRING_CMD, STRING_CMD ALLOW_PLURAL}
 ,{jjEQUAL_P,   EQUAL_EQUAL,    INT_CMD,        POLY_CMD,   POLY_CMD ALLOW_PLURAL}
@@ -3176,13 +3177,13 @@ struct sValCmd2 dArith2[]=
 ,{jjCOMPARE_IV_I,EQUAL_EQUAL,  INT_CMD,        INTVEC_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_IV,EQUAL_EQUAL,    INT_CMD,        INTVEC_CMD, INTVEC_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_IV,EQUAL_EQUAL,    INT_CMD,        INTMAT_CMD, INTMAT_CMD ALLOW_PLURAL}
-,{jjEQUAL_BI,  EQUAL_EQUAL,    INT_CMD,        BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjEQUAL_Ma,  EQUAL_EQUAL,    INT_CMD,        MATRIX_CMD, MATRIX_CMD ALLOW_PLURAL}
 ,{jjWRONG2,    EQUAL_EQUAL,    0,              IDEAL_CMD,  IDEAL_CMD ALLOW_PLURAL}
 ,{jjWRONG2,    EQUAL_EQUAL,    0,              MODUL_CMD,  MODUL_CMD ALLOW_PLURAL}
 ,{jjWRONG2,    EQUAL_EQUAL,    0,              IDEAL_CMD,  MODUL_CMD ALLOW_PLURAL}
 ,{jjWRONG2,    EQUAL_EQUAL,    0,              MODUL_CMD,  IDEAL_CMD ALLOW_PLURAL}
 ,{jjEQUAL_I,   NOTEQUAL,       INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
+,{jjEQUAL_BI,  NOTEQUAL,       INT_CMD,        BIGINT_CMD, BIGINT_CMD ALLOW_PLURAL}
 ,{jjEQUAL_N,   NOTEQUAL,       INT_CMD,        NUMBER_CMD, NUMBER_CMD ALLOW_PLURAL}
 ,{jjCOMPARE_S, NOTEQUAL,       INT_CMD,        STRING_CMD, STRING_CMD ALLOW_PLURAL}
 ,{jjEQUAL_P,   NOTEQUAL,       INT_CMD,        POLY_CMD,   POLY_CMD ALLOW_PLURAL}
@@ -4128,13 +4129,14 @@ static BOOLEAN jjMINRES_R(leftv res, leftv v)
 static BOOLEAN jjN2BI(leftv res, leftv v)
 {
   number n,i; i=(number)v->Data();
-  if (rField_is_Zp())     n=nlInit((int)(long)i);
-  else if (rField_is_Q())
+  if (rField_is_Zp())
   {
-    if ((SR_HDL(i)&SR_INT)==SR_INT) n=nlInit((int)SR_TO_INT(i));
-    else if (i->s==3)               n=nlCopy(i);
-    else goto err;
+     if (((long)i)>(npPrimeM>>1))
+       n=nlInit((int)(((long)i)-npPrimeM));
+     else
+       n=nlInit((int)(long)i);
   }
+  else if (rField_is_Q()) n=nlBigInt(i);
   else goto err;
   res->data=(void *)n;
   return FALSE;
