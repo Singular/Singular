@@ -2,7 +2,7 @@
 //anne, added deleteSublist and watchdog 12.12.2000
 //eric, added absValue 11.04.2002
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.54 2007-01-08 09:33:55 Singular Exp $";
+version="$Id: general.lib,v 1.55 2008-02-21 15:14:44 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -11,9 +11,9 @@ PROCEDURES:
  A_Z(\"a\",n);          string a,b,... of n comma separated letters
  ASCII([n,m]);          string of printable ASCII characters (number n to m)
  absValue(c);           absolute value of c
- binomial(n,m[,../..]); n choose m (type int), [type string/type number]
+ binomial(n,m[,../..]); n choose m (type int), [type bigint]
  deleteSublist(iv,l);   delete entries given by iv from list l
- factorial(n[,../..]);  n factorial (=n!) (type int), [type string/number]
+ factorial(n[,../..]);  n factorial (=n!) (type int), [type bigint]
  fibonacci(n[,p]);      nth Fibonacci number [char p]
  kmemory([n[,v]]);      active [allocated] memory in kilobyte
  killall();             kill all user-defined variables
@@ -169,89 +169,37 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc binomial (int n, int k, list #)
-"USAGE:   binomial(n,k[,p]); n,k,p integers
+proc binomial (int n, int k)
+"USAGE:   binomial(n,k); n,k integers
 RETURN:  binomial(n,k); binomial coefficient n choose k
-@*       - of type string (computed in characteristic 0)
-@*       binomial(n,k,p); n choose k, computed in characteristic 0 or prime(p)
-@*       - of type number if a basering, say R, is present and p=0=char(R)
-           or if prime(p)=char(R)
-@*       - of type string else
+@*       - of type bigint (computed in characteristic 0)
 NOTE:    In any characteristic, binomial(n,k) = coefficient of x^k in (1+x)^n
 SEE ALSO: prime
 EXAMPLE: example binomial; shows an example
 "
 {
-   int str,p;
-//---------------------------- initialization -------------------------------
-   if ( size(#) == 0 )
-   {  str = 1;
-      ring bin = 0,x,dp;
-      number r=1;
-   }
-   if ( size(#) > 0 )
+   bigint l;
+   bigint r=1;
+   bigint kk=k;
+   bigint nn=n;
+   if ( k > n-k )
+   { k = n-k; }
+   if ( k<=0 or k>n )               //trivial cases
+   { r = (k==0)*r; }
+   for (l=1; l<=kk; l=l+1 )
    {
-      p = (#[1]!=0)*prime(#[1]);
-      if ( defined(basering) )
-      {
-         if ( p == char(basering) )
-         {  number r=1;
-         }
-         else
-         {  str = 1;
-            ring bin = p,x,dp;
-            number r=1;
-         }
-      }
-      else
-      {  str = 1;
-         ring bin = p,x,dp;
-         number r=1;
-      }
+      r=r*(nn+1-l)/l;
    }
-//-------------------------------- char 0 -----------------------------------
-   if ( p==0 )
-   {
-      r = binom0(n,k);
-   }
-//-------------------------------- char p -----------------------------------
-   else
-   {
-      r = binomp(n,k,p);
-   }
-//-------------------------------- return -----------------------------------
-   if ( str==1 ) { return(string(r)); }
-   else { return(r); }
- }
+   return(r);
+}
 example
 { "EXAMPLE:"; echo = 2;
    binomial(200,100);"";                   //type string, computed in char 0
-   binomial(200,100,3);"";                 //type string, computed in char 3
    int n,k = 200,100;
    ring r = 0,x,dp;
    number b1 = binomial(n,k,0);            //type number, computed in ring r
    poly b2 = coeffs((x+1)^n,x)[k+1,1];     //coefficient of x^k in (x+1)^n
    b1-b2;                                  //b1 and b2 should coincide
-}
-///////////////////////////////////////////////////////////////////////////////
-
-static proc binom0 (int n, int k)
- //computes binomial coefficient n choose k in basering, assume 0<k<=n
- //and char(basering) = 0 or n < char(basering)
-{
-   int l;
-   number r=1;
-   if ( k > n-k )
-   { k = n-k;
-   }
-   if ( k<=0 or k>n )               //trivial cases
-   { r = (k==0)*r;
-   }
-   for (l=1; l<=k; l++ )
-   {
-      r=r*(n+1-l)/l;
-   }
-   return(r);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -295,105 +243,42 @@ static proc binomp (int n, int k, int p)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc factorial (int n, list #)
-"USAGE:    factorial(n[,p]);  n,p integers
-RETURN:   factorial(n):   n! (computed in characteristic 0), of type string.
-@*        factorial(n,p): n! computed in characteristic 0 or prime(p)
-@*        - of type number if a basering is present and 0=p=char(basering)
-            or if prime(p)=char(basering)
-@*        - of type string else
+proc factorial (int n)
+"USAGE:    factorial(n);  n integer
+RETURN:   factorial(n):   n! of type bigint.
 SEE ALSO: prime
 EXAMPLE:  example factorial; shows an example
 "
-{   int str,l,p;
-//---------------------------- initialization -------------------------------
-   if ( size(#) == 0 )
-   {  str = 1;
-      ring bin = 0,x,dp;
-      number r=1;
-   }
-   if ( size(#) > 0 )
-   {
-      p = (#[1]!=0)*prime(#[1]);
-      if ( defined(basering) )
-      {
-         if ( p == char(basering) )
-         {  number r=1;
-         }
-         else
-         {  str = 1;
-            ring bin = p,x,dp;
-            number r=1;
-         }
-      }
-      else
-      {  str = 1;
-         ring bin = p,x,dp;
-         number r=1;
-      }
-   }
+{
+   bigint r=1;
 //------------------------------ computation --------------------------------
    for (l=2; l<=n; l++)
    {
       r=r*l;
    }
-   if ( str==1 ) { return(string(r)); }
-   else { return(r); }
+   return(r);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   factorial(37);"";                 //37! of type string (as long integer)
-   ring r1 = 0,x,dp;
-   number p = factorial(37,0);       //37! of type number, computed in r1
-   p;
+   factorial(37);"";                 //37! (as long integer)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc fibonacci (int n, list #)
-"USAGE:    fibonacci(n[,p]);  n,p integers
+proc fibonacci (int n)
+"USAGE:    fibonacci(n);  n,p integers
 RETURN:   fibonacci(n): nth Fibonacci number, f(0)=f(1)=1, f(i+1)=f(i-1)+f(i)
-@*        - computed in characteristic 0, of type string
-@*        fibonacci(n,p): f(n) computed in characteristic 0 or prime(p)
-@*        - of type number if a basering is present and p=0=char(basering)
-            or if prime(p)=char(basering)
-@*        - of type string else
+@*        - computed in characteristic 0, of type bigint
 SEE ALSO: prime
 EXAMPLE: example fibonacci; shows an example
 "
-{   int str,ii,p;
-//---------------------------- initialization -------------------------------
-   if ( size(#) == 0 )
-   {  str = 1;
-      ring bin = 0,x,dp;
-      number f,g,h=1,1,1;
-   }
-   if ( size(#) > 0 )
-   {
-      p = (#[1]!=0)*prime(#[1]);
-      if ( defined(basering) )
-      {
-         if ( p == char(basering) )
-         {  number f,g,h=1,1,1;
-         }
-         else
-         {  str = 1;
-            ring bin = p,x,dp;
-            number f,g,h=1,1,1;
-         }
-      }
-      else
-      {  str = 1;
-         ring bin = p,x,dp;
-         number f,g,h=1,1,1;
-      }
-   }
+{
+  bigint f,g,h=1,1,1;
 //------------------------------ computation --------------------------------
    for (ii=3; ii<=n; ii=ii+1)
    {
       h = f+g; f = g; g = h;
-    }
-   if ( str==1 ) { return(string(h)); }
-   else { return(h); }
+   }
+   return(h);
 }
 example
 { "EXAMPLE:"; echo = 2;
