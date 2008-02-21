@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.31 2008-02-15 17:14:23 levandov Exp $ */
+/* $Id: kutil.h,v 1.32 2008-02-21 18:20:06 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -161,7 +161,8 @@ class sLObject : public sTObject
 
 public:
   unsigned long sev;
-  poly  p1,p2; /*- the pair p comes from -*/
+  poly  p1,p2; /*- the pair p comes from,
+                 lm(pi) in currRing, tail(pi) in tailring -*/
 
   poly  lcm;   /*- the lcm of p1,p2 -*/
   poly last;   // pLast(p) during reductions
