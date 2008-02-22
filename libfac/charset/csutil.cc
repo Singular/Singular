@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: csutil.cc,v 1.15 2007-10-16 15:49:49 Singular Exp $";
+static char * rcsid = "$Id: csutil.cc,v 1.16 2008-02-22 12:16:02 Singular Exp $";
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -137,7 +137,7 @@ Prem ( const CanonicalForm &f, const CanonicalForm &g )
     df = degree( ff, v );
     if (dg <= df) {l=LC(gg); gg = gg -LC(gg)*power(v,dg);}
     else { l = 1; }
-    while ( ( dg <= df  ) && ( ff != ff.genZero()) )
+    while ( ( dg <= df  ) && ( !ff.isZero()) )
     {
       // CERR << "Start gcd..." << "\n";
       test = gcd(l,LC(ff));
@@ -194,7 +194,7 @@ Sprem ( const CanonicalForm &f, const CanonicalForm &g, CanonicalForm & m, Canon
     if (dg <= df) {l=LC(gg); gg = gg -LC(gg)*power(v,dg);}
     else { l = 1; }
     n= 0;
-    while ( ( dg <= df  ) && ( ff != ff.genZero()) )
+    while ( ( dg <= df  ) && ( !ff.isZero()) )
     {
       test= power(v,df-dg) * gg * LC(ff);
       if ( df == 0 ){ff= ff.genZero();}
@@ -371,7 +371,7 @@ remsetb( const CFList & ps, const CFList & as)
   for (CFListIterator i=ps; i.hasItem(); i++)
   {
     elem= premasb(i.getItem(),as);
-    if ( elem != elem.genZero() ) output.append(elem);
+    if ( !elem.isZero() ) output.append(elem);
   }
   return output;
 }
@@ -456,7 +456,7 @@ removefactor( CanonicalForm & r , PremForm & Remembern)
     while ( 1 )
     {
       test = mydivremt(r,testelem,a,b);
-      if ( test && b == r.genZero() ) r = a;
+      if ( test && b.isZero() ) r = a;
       else break;
     }
   }
@@ -471,7 +471,7 @@ removefactor( CanonicalForm & r , PremForm & Remembern)
       while ( 1 )
       {
         test = divremt(r,testelem,a,b);
-        if ( test && b == r.genZero() )
+        if ( test && b.isZero() )
         {
           Remembern.FS2= Union(Remembern.FS2, CFList(testelem));
           r = a;
@@ -987,6 +987,9 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.15  2007/10/16 15:49:49  Singular
+SAGE: remove alg content in myfitting
+
 Revision 1.14  2007/05/15 14:46:48  Singular
 *hannes: factorize in Zp(a)[x...]
 

@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: alg_factor.cc,v 1.19 2008-01-25 14:19:39 Singular Exp $";
+static char * rcsid = "$Id: alg_factor.cc,v 1.20 2008-02-22 12:16:02 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -93,7 +93,8 @@ mypsr ( const CanonicalForm &rr, const CanonicalForm &vv, const Variable & x ){
   if (dv <= dr) {l=LC(v,x); v = v -l*power(x,dv);}
   else { l = 1; }
   d= dr-dv+1;
-  while ( ( dv <= dr  ) && ( r != r.genZero()) ){
+  while ( ( dv <= dr  ) && ( !r.isZero()) )
+  {
     test = power(x,dr-dv)*v*LC(r,x);
     if ( dr == 0 ) { r= CanonicalForm(0); }
     else { r= r - LC(r,x)*power(x,dr); }
@@ -140,7 +141,8 @@ return resultant(fz,gz,v);
    else { G = f; F = g; }
 
   h = CanonicalForm(1);
-  while ( G != G.genZero() ) {
+  while ( !G.isZero() )
+  {
      delta= degree(F,v) -degree(G,v);
      beta = power(CanonicalForm(-1), delta+1) * LC(F,v)* power(h, delta);
      h= (h * power(LC(G,v), delta)) / power(h, delta);
@@ -193,7 +195,7 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
     {
       temp= gcd(R, R.deriv(vf));
       DEBOUTLN(CERR, "sqrf_norm_sub: temp= ", temp);
-      if (degree(temp,vf) != 0 || temp == temp.genZero() ){ sqfreetest= 0; }
+      if (degree(temp,vf) != 0 || temp.isZero() ){ sqfreetest= 0; }
       else { sqfreetest= 1; }
       DEBOUTLN(CERR, "sqrf_norm_sub: sqfreetest= ", sqfreetest);
     }
@@ -258,7 +260,7 @@ sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
     {
       temp= gcd(R, R.deriv(vf));
       DEBOUTLN(CERR, "sqrf_norm_sub: temp= ", temp);
-      if (degree(temp,vf) != 0 || temp == temp.genZero() ){ sqfreetest= 0; }
+      if (degree(temp,vf) != 0 || temp.isZero() ){ sqfreetest= 0; }
       else { sqfreetest= 1; }
       DEBOUTLN(CERR, "sqrf_norm_sub: sqfreetest= ", sqfreetest);
     }
@@ -354,9 +356,10 @@ inseperable(const CFList & Astar){
   int Counter= 1;
 
   if ( Astar.length() == 0 ) return 0;
-  for ( CFListIterator i=Astar; i.hasItem(); i++){
+  for ( CFListIterator i=Astar; i.hasItem(); i++)
+  {
     elem= i.getItem();
-    if ( elem.deriv() == elem.genZero() ) return Counter;
+    if ( elem.deriv().isZero() ) return Counter;
     else Counter += 1;
   }
   return 0;
@@ -829,6 +832,9 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.19  2008/01/25 14:19:39  Singular
+*hannes: SqrFreeTest -> isSqrFree
+
 Revision 1.18  2008/01/22 09:51:36  Singular
 *hannes: sqrFree/InternalSqrFree -> factory
 

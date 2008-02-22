@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.12 2008-01-22 09:51:37 Singular Exp $";
+//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.13 2008-02-22 12:16:03 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // Factory - Includes
 #include <factory.h>
@@ -240,7 +240,7 @@ Truefactors( const CanonicalForm Ua, int levelU, const SFormList & SubstitutionL
     //CERR <<"f:" << factor.factor() << " -> test_f:"<<test_f <<"\n";
     //CERR << "           1:" << change_poly(factor.factor(),SubstitutionList,1) <<"\n";
     c= mydivremt(U,test_f,a,b);
-    if (  c  && b == U.genZero() && !hasAlgVar(test_f))
+    if (  c  && b.isZero() && !hasAlgVar(test_f))
     // factor.getFactor() divides U
     {
       //CERR << " teilt:" << test_f <<"\n";
@@ -449,6 +449,9 @@ CFFList TakeNorms(const CFFList & PiList)
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.12  2008/01/22 09:51:37  Singular
+*hannes: sqrFree/InternalSqrFree -> factory
+
 Revision 1.11  2008/01/07 13:34:56  Singular
 *hannes: omse optiomzations(isOne)
 

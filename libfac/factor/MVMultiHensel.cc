@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.15 2008-01-22 09:51:37 Singular Exp $";
+// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.16 2008-02-22 12:16:03 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -501,9 +501,9 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
       // divison test for intermediat.One and intermediat.Two ?
       CanonicalForm a,b;
       // we add a division test now for intermediat.One and intermediat.Two
-      if ( mydivremt (mF,intermediat.One,a,b) && b == mF.genZero() )
+      if ( mydivremt (mF,intermediat.One,a,b) && b.isZero() )
         Retlistinter.append(CFFactor(intermediat.One,1) );
-      if ( mydivremt (mF,intermediat.Two,a,b) && b == mF.genZero() )
+      if ( mydivremt (mF,intermediat.Two,a,b) && b.isZero() )
         Retlistinter.append(CFFactor(intermediat.Two,1)  );
 
       Ll = MultiHensel(intermediat.One, Ll, Substitutionlist,alpha);
@@ -519,6 +519,9 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.15  2008/01/22 09:51:37  Singular
+*hannes: sqrFree/InternalSqrFree -> factory
+
 Revision 1.14  2007/06/14 14:16:35  Singular
 *hannes: Factorize2 etc.
 

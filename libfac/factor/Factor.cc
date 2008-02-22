@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.40 2008-01-25 14:19:40 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.41 2008-02-22 12:16:03 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -189,7 +189,7 @@ is_rational( const CanonicalForm & num, const CanonicalForm & denum ){
   int retvalue;
 
   retvalue= mydivremt(num,denum,a,b);
-  if ( retvalue && b == num.genZero() ) // num/denum from FFdomain
+  if ( retvalue && b.isZero() ) // num/denum from FFdomain
     return a;
   else // num/denum is rational
     return num.genZero();
@@ -256,7 +256,7 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
           numerator= i.getItem().factor();
           numerator= numerator(x*lt,levelF); // x <- x*lt
           denumerator= power(lt,degree(F,levelF)-1); // == lt^(1-degree(F,x)
-          while (numerator.genZero() == is_rational(numerator, denumerator))
+          while (is_rational(numerator, denumerator).isZero())
             numerator*= lt;
           intermediate= is_rational(numerator,denumerator);
 
@@ -269,7 +269,7 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
         for ( CFFListIterator j=IntermediateList; j.hasItem(); j++)
           intermediate*= j.getItem().factor();
         test1= mydivremt( intermediate,F,a,b);
-        if ( test1 && b == intermediate.genZero() ) // Yupp!
+        if ( test1 && b.isZero() ) // Yupp!
         {
           IntermediateList.append(CFFactor(1/a,1));
           Returnlist= IntermediateList;
@@ -287,7 +287,7 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
           denumerator= power(lt,degree(numerator,levelF)); // == lt^(-degree(numerator,x)
           test= content(numerator,x);
           test1= mydivremt(denumerator,test,a,b);
-          if ( test1 && b == numerator.genZero() ) // Yupp!
+          if ( test1 && b.isZero() ) // Yupp!
           {
             save_denumerator*= a;
             Returnlist.append(CFFactor(numerator/test ,1));
@@ -307,7 +307,7 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
         // Now we add a test if we did the right thing:
         // save_denumerator should be a multiple of the leading coeff
         test1= mydivremt(save_denumerator,lt,a,b);
-        if ( test1 && b == save_denumerator.genZero() ) // Yupp!
+        if ( test1 && b.isZero() ) // Yupp!
           // We have to multiply one of the factors with
           // the multiplicity of the save_denumerator <-> lc
           // the following will do what we want
@@ -439,6 +439,7 @@ generate_mipo( int degree_of_Extension , const Variable & Extension ){
   }
   return find_irreducible( degree_of_Extension, gen, Variable(1) );
 }
+
 
 ///////////////////////////////////////////////////////////////
 // Try to find a specialization for f over the field of char //
@@ -1328,6 +1329,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.40  2008/01/25 14:19:40  Singular
+*hannes: SqrFreeTest -> isSqrFree
+
 Revision 1.39  2008/01/22 09:51:37  Singular
 *hannes: sqrFree/InternalSqrFree -> factory
 
