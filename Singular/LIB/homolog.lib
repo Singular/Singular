@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: homolog.lib,v 1.23 2007-06-06 12:39:51 Singular Exp $";
+version="$Id: homolog.lib,v 1.24 2008-02-22 10:25:06 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  homolog.lib   Procedures for Homological Algebra
@@ -1654,9 +1654,9 @@ example
 
 static proc binom_int(int n, int p)
 {
-  string s = binomial(n,p);
-  if (size(s) > 9) { return(-1); } // result too large for integer
-  execute("int a ="+s);
+  bigint s = binomial(n,p);
+  int a=int(s);
+  if ((s!=0)&&(a==0)) { return(-1); }
   return(a);
 }
 
