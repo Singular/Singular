@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: resolve.lib,v 1.9 2006-12-08 09:37:33 Singular Exp $";
+version="$Id: resolve.lib,v 1.10 2008-02-22 14:17:21 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  resolve.lib      Resolution of singularities (Desingularization)
@@ -3108,8 +3108,7 @@ proc SpecialCoeff(list BO,int b,poly f)
 // Coeff with given hypersurface -- no checks of the hypersurface performed
 //----------------------------------------------------------------------------
    int i,ch;
-   ch=char(basering);
-   int e=int(factorial(b,ch));
+   int e=int(factorial(b));
    ideal C;
    list L=DeltaList(BO);
    int d=size(L);
@@ -3501,7 +3500,6 @@ proc powerI(ideal I,int n,int m)
 //--- compute (n!/m)-th power of I, more efficient variant
    int i;
    int mon=1;
-   int ch=char(basering);
    for(i=1;i<=size(I);i++)
    {
      if(size(I[i])>1){mon=0;break;}
@@ -3512,7 +3510,7 @@ proc powerI(ideal I,int n,int m)
    }
    if((mon)&&(size(I)>3))
    {
-      int e=int(factorial(n,ch))/m;
+      int e=int(factorial(n))/m;
       ideal J=1;
       poly p=I[1];
       I=I[2..size(I)];
@@ -3561,7 +3559,6 @@ EXAMPLE: example Coeff;    shows an example
 //---------------------------------------------------------------------------
 // Initialization  and sanity checks
 //---------------------------------------------------------------------------
-   int ch=char(basering);
    int i,k,dummy,errtype;
    int ma=size(BO[4]);
    intvec merk;
@@ -3600,10 +3597,10 @@ EXAMPLE: example Coeff;    shows an example
       "!!!!!! BO might not have been ord ~ 1 or wrong b          !!!!!!";
    }
    if(b>=6){return(0);}              // b is too big
-   int e=int(factorial(b,ch));       // b of Coeff-Ideal
+   int e=int(factorial(b));          // b of Coeff-Ideal
    if(e==0)
    {
-     ERROR( "// characteristic too small for forming b! .");
+     ERROR( "// integer size too small for forming b! .");
    }
    if(b==0)
    {
