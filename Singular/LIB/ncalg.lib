@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncalg.lib,v 1.26 2007-10-31 17:23:43 Singular Exp $";
+version="$Id: ncalg.lib,v 1.27 2008-02-22 14:12:23 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  ncalg.lib      Definitions of important GR-algebras
@@ -408,7 +408,7 @@ EXAMPLE: example Qso3Casimir; shows examples
   p=var(1);
   for(j=0; j<=N; j++)
   {
-    k1 = binomial(n-j,j,0);
+    k1 = binomial(n-j,j);
     k1=k1/(n-j);
     k1=k1*((-1)^j);
     k2=((Q^2)/(Q^4-1))^(2*j);

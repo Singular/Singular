@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: realrad.lib,v 1.5 2007-07-26 12:35:23 spang Exp $";
+version="$Id: realrad.lib,v 1.6 2008-02-22 14:12:29 Singular Exp $";
 category="real algebra";
 info="
 LIBRARY:  realrad.lib   Computation of real radicals
@@ -728,7 +728,7 @@ EXAMPLE: example isolset; shows an example"
  c=coeffs(seppart,var(1));
  for (i=1;i<=s;i++)
  {
-   bern[i]=number(c[s+1-i,1])/binomial(s-1,i-1,0);
+   bern[i]=number(c[s+1-i,1])/binomial(s-1,i-1);
  }
  bernsteincoeffs=bern,list(-zweihochN,zweihochN);
  list POS;
