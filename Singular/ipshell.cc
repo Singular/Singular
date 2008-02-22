@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.177 2008-02-06 20:22:41 wienand Exp $ */
+/* $Id: ipshell.cc,v 1.178 2008-02-22 11:14:16 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -4194,6 +4194,8 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
   R->block1=(int *)omAlloc0(n*sizeof(int));
   R->wvhdl=(int**)omAlloc0(n*sizeof(int_ptr));
 
+  int *weights=(int*)omAlloc0((R->N+1)*sizeof(int));
+
   // init order, so that rBlocks works correctly
   for (j=0; j < n-1; j++)
     R->order[j] = (int) ringorder_unspec;
@@ -4217,6 +4219,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
        *  iv[2..end]: weights
        */
       R->order[n] = (*iv)[1];
+      typ=1;
       switch ((*iv)[1])
       {
           case ringorder_ws:
@@ -4225,12 +4228,13 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
           case ringorder_wp:
           case ringorder_Wp:
             R->wvhdl[n]=(int*)omAlloc((iv->length()-1)*sizeof(int));
+            R->block0[n] = last+1;
             for (i=2; i<iv->length(); i++)
             {
               R->wvhdl[n][i-2] = (*iv)[i];
+              last++;
+              if (weights[last]==0) weights[last]=(*iv)[i]*typ;
             }
-            R->block0[n] = last+1;
-            last += iv->length()-2;
             R->block1[n] = last;
             break;
           case ringorder_ls:
@@ -4248,6 +4252,10 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
             R->block1[n] = last;
             if (R->block0[n]>R->block1[n]) return TRUE;
             if (rCheckIV(iv)) return TRUE;
+            for(i=R->block0[n];i<=R->block1[n];i++)
+            {
+              if (weights[i]==0) weights[i]=typ;
+            }
             break;
           case ringorder_S:
           case ringorder_c:
@@ -4262,8 +4270,10 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
             for (i=2; i<iv->length(); i++)
             {
               R->wvhdl[n][i-2]=(*iv)[i];
-              if ((*iv)[i]<0) typ=-1;
+              last++;
+              if (weights[last]==0) weights[last]=(*iv)[i]*typ;
             }
+            last=R->block0[n]-1;
             break;
           case ringorder_a64:
           {
@@ -4274,8 +4284,10 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
             for (i=2; i<iv->length(); i++)
             {
               w[i-2]=(*iv)[i];
-              if ((*iv)[i]<0) typ=-1;
+              last++;
+              if (weights[last]==0) weights[last]=(*iv)[i]*typ;
             }
+            last=R->block0[n]-1;
             break;
           }
           case ringorder_M:
@@ -4283,6 +4295,10 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
             int Mtyp=rTypeOfMatrixOrder(iv);
             if (Mtyp==0) return TRUE;
             if (Mtyp==-1) typ = -1;
+            for(i=R->block0[n];i<=R->block1[n];i++)
+            {
+              if (weights[i]==0) weights[i]=typ;
+            }
 
             R->wvhdl[n] =( int *)omAlloc((iv->length()-1)*sizeof(int));
             for (i=2; i<iv->length();i++)
@@ -4331,7 +4347,11 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
       return TRUE;
     }
   }
-  R->OrdSgn = typ;
+  // find OrdSgn:
+  R->OrdSgn = 1;
+  for(i=1;i<=R->N;i++)
+  { if (weights[i]<0) { R->OrdSgn=-1;break; }}
+  omFree(weights);
   return FALSE;
 }
 
