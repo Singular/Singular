@@ -6,7 +6,7 @@
  *  Purpose: implementation of sl_link routines for MP
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: mpsr_sl.cc,v 1.7 2008-02-23 17:27:25 Singular Exp $
+ *  Version: $Id: mpsr_sl.cc,v 1.8 2008-02-23 17:55:46 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -39,9 +39,12 @@ static int Batch_ReadEval(si_link silink);
 #define MP_SET_LINK_OPTIONS(link) ((void *) 0)
 #endif
 
-extern MP_Env_pt mp_Env;
+static MP_Env_pt mp_Env=NULL;
+extern void (*MP_Exit_Env_Ptr)();
 
 /* =============== general utilities ====================================== */
+static void MP_Exit_Env_sl()
+{ MP_ReleaseEnv(mp_Env); mp_Env=NULL; }
 static void FreeCmdArgs(int argc, char** argv)
 {
   int i;
@@ -153,6 +156,8 @@ LINKAGE BOOLEAN slOpenMPFile(si_link l, short flag)
     WerrorS("Open: Error in initialization of MP environment");
     return TRUE;
   }
+  MP_Exit_Env_Ptr=MP_Exit_Env_sl;
+
 
   if ((link = MP_OpenLink(mp_Env, 6, argv)) == NULL)
     return TRUE;
@@ -313,6 +318,7 @@ LINKAGE BOOLEAN slOpenMPTcp(si_link l, short flag)
     WerrorS("Open: Error in initialization of MP environment");
     return TRUE;
   }
+  MP_Exit_Env_Ptr=MP_Exit_Env_sl;
 
   if (strcmp(l->mode, "connect") == 0) link = slOpenMPConnect(argc, argv);
   else if (strcmp(l->mode, "listen") == 0) link = slOpenMPListen(argc, argv);
