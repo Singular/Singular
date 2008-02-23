@@ -13,6 +13,9 @@
 #include <time.h>
 
 #include "mod2.h"
+#ifdef HAVE_MPSR
+#include<MP.h>
+#endif
 #include <mylimits.h>
 #include "omalloc.h"
 #include "structs.h"
@@ -74,6 +77,10 @@ omBin ip_sring_bin = omGetSpecBin(sizeof(ip_sring));
 * the global exit routine of Singular
 */
 extern "C" {
+#ifdef HAVE_MPSR
+MP_Env_pt mp_Env = NULL;
+#endif
+
 void m2_end(int i)
 {
   fe_reset_input_mode();
@@ -114,6 +121,9 @@ void m2_end(int i)
     #endif
       printf("\nhalt %d\n",i);
   }
+  #ifdef HAVE_MPSR
+  /* if (mp_Env!=NULL)*/ MP_ReleaseEnv(mp_Env);
+  #endif
   exit(i);
 }
 }
