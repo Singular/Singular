@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.13 2008-02-06 09:12:45 wienand Exp $ */
+/* $Id: kspoly.cc,v 1.14 2008-02-23 20:13:30 levandov Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -199,8 +199,22 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
 
   if (R != NULL)
   {
-    l1 = (R[Pair->i_r1])->GetpLength() - 1;
-    l2 = (R[Pair->i_r2])->GetpLength() - 1;
+    if (Pair->i_r1 == -1)
+    {
+      l1 = pLength(p1) - 1;
+    }
+    else
+    {
+      l1 = (R[Pair->i_r1])->GetpLength() - 1;
+    }
+    if (Pair->i_r2 == -1)
+    {
+      l2 = pLength(p2) - 1;
+    }
+    else
+    {
+      l2 = (R[Pair->i_r2])->GetpLength() - 1;
+    }
   }
 
   // get m2 * a2
