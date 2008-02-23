@@ -6,7 +6,7 @@
  *  Purpose: implementation of sl_link routines for MP
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: mpsr_sl.cc,v 1.6 2002-11-26 14:25:38 Singular Exp $
+ *  Version: $Id: mpsr_sl.cc,v 1.7 2008-02-23 17:27:25 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -39,7 +39,7 @@ static int Batch_ReadEval(si_link silink);
 #define MP_SET_LINK_OPTIONS(link) ((void *) 0)
 #endif
 
-static MP_Env_pt mp_Env = NULL;
+extern MP_Env_pt mp_Env;
 
 /* =============== general utilities ====================================== */
 static void FreeCmdArgs(int argc, char** argv)
