@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.61 2008-02-15 17:14:21 levandov Exp $ */
+/* $Id: kstd2.cc,v 1.62 2008-02-23 20:12:51 levandov Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1599,9 +1599,21 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
       //if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
       //        enterT(strat->P, strat); // this was here before Shift stuff
       //enterTShift(LObject p, kStrategy strat, int atT, int uptodeg, int lV); // syntax
-      // the default value for atT = -1
+      // the default value for atT = -1 as in bba
+      strat->P.GetP(); // because shifts are counted with .p structure
       enterTShift(strat->P,strat,-1,uptodeg, lV);
+//       poly vw;
+//       if (strat->P.t_p!=NULL)
+//       {
+//          vw = pCopyL2p(strat->P,strat);	
+//       }
+//       else
+//       {
+//          vw = pCopy(strat->P.p);
+//       }
       enterpairsShift(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl,uptodeg,lV);
+      //      enterpairsShift(vw,strat->sl,strat->P.ecart,pos,strat, strat->tl,uptodeg,lV);
+      // delete vw ?
       // posInS only depends on the leading term
       if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
       {
@@ -1692,6 +1704,7 @@ ideal freegb(ideal I, int uptodeg, int lVblock)
 - no *w, no *hilb
   */
   ideal RS = bbaShift(I,NULL, NULL, NULL, strat, uptodeg, lVblock);
+  idSkipZeroes(RS);
   return(RS);
 }
 

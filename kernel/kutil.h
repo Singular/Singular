@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.32 2008-02-21 18:20:06 Singular Exp $ */
+/* $Id: kutil.h,v 1.33 2008-02-23 20:12:52 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -619,6 +619,12 @@ KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
 /* shiftgb stuff */
 #include "shiftgb.h"
 
+poly pMove2CurrTail(poly p, kStrategy strat);
+
+poly pMoveCurrTail2poly(poly p, kStrategy strat);
+
+poly pCopyL2p(LObject h, kStrategy strat);
+
 void enterTShift(LObject p, kStrategy strat, int atT, int uptodeg, int lV);
 
 void initBuchMoraShift (ideal F,ideal Q,kStrategy strat);
@@ -627,7 +633,7 @@ void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy st
 
 void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV);
 
-void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int uptodeg, int lV); // ok
+void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS, int uptodeg, int lV); // ok
 
 void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR,int uptodeg, int lV);
 

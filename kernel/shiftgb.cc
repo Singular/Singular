@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shiftgb.cc,v 1.4 2008-02-15 17:14:23 levandov Exp $ */
+/* $Id: shiftgb.cc,v 1.5 2008-02-23 20:12:53 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for shift GB and free GB
 */
@@ -38,6 +38,117 @@
 
 #define freeT(A,v) omFreeSize((ADDRESS)A,(v+1)*sizeof(int))
 
+
+/* TODO: write p* stuff as instances of p_* for all the functions */
+
+poly p_LPshiftT(poly p, int sh, int uptodeg, int lV, kStrategy strat, const ring r)
+{
+  /* assume shift takes place, shifts the poly p by sh */
+  /* p is like TObject: lm in currRing = r, tail in tailRing  */
+
+  if (p==NULL) return(p);
+
+  assume(p_LmCheckIsFromRing(p,r));
+  assume(p_CheckIsFromRing(pNext(p),strat->tailRing));
+
+  /* assume sh and uptodeg agree */
+
+  if (sh == 0) return(p); /* the zero shift */
+
+  poly q   = NULL;
+  poly s   = p_mLPshift(p, sh, uptodeg, lV, r); // lm in currRing
+  poly pp = pNext(p);
+  
+  while (pp != NULL)
+  {
+    q = p_Add_q(q, p_mLPshift(pp,sh,uptodeg,lV,strat->tailRing),strat->tailRing);
+    pIter(pp);
+  }
+  pNext(s) = q;
+  /* int version: returns TRUE if it was successful */
+  return(s);
+}
+
+
+poly p_LPshift(poly p, int sh, int uptodeg, int lV, const ring r)
+{
+  /* assume shift takes place */
+  /* shifts the poly p by sh */
+  /* deletes p */
+
+  /* assume sh and uptodeg agree */
+
+  if (p==NULL) return(p);
+  if (sh == 0) return(p); /* the zero shift */
+
+  poly q  = NULL;
+  poly pp = p; // pCopy(p);
+  while (pp!=NULL)
+  {
+    q = p_Add_q(q, p_mLPshift(pp,sh,uptodeg,lV,r),r);
+    pIter(pp);
+  }
+  /* delete pp? */
+  /* int version: returns TRUE if it was successful */
+  return(q);
+}
+
+poly p_mLPshift(poly p, int sh, int uptodeg, int lV, const ring r)
+{
+  /* pm is a monomial */
+
+  if (sh == 0) return(p); /* the zero shift */
+
+  if (sh < 0 )
+  {
+#ifdef PDEBUG
+    Print("pmLPshift: negative shift requested");
+#endif
+    return(NULL); /* violation, 2check */
+  }
+
+  int L = p_mLastVblock(p,lV,r);
+  if (L+sh-1 > uptodeg)
+  {
+#ifdef PDEBUG
+    Print("p_mLPshift: too big shift requested");
+#endif
+    return(NULL); /* violation, 2check */
+  }
+  int *e=(int *)omAlloc0((r->N+1)*sizeof(int));
+  int *s=(int *)omAlloc0((r->N+1)*sizeof(int));
+  p_GetExpV(p,e,r);
+  number c = pGetCoeff(p);
+  int j;
+  //  for (j=1; j<=r->N; j++) 
+  // L*lV gives the last position of the last block
+  for (j=1; j<= L*lV ; j++)
+  {
+    if (e[j]==1)
+    {
+      s[j + (sh*lV)] = e[j]; /* actually 1 */
+      omCheckAddr(s);
+    }
+    else 
+    {
+      if (e[j]!=0)
+      {
+#ifdef PDEBUG
+         Print("p_mLPshift: ex[%d]=%d\n",j,e[j]);
+#endif
+      }
+    }
+  }
+  poly m = p_ISet(1,r);
+  p_SetExpV(m,s,r);
+  /*  pSetm(m); */ /* done in the pSetExpV */
+  /* think on the component */
+  pSetCoeff0(m,c);
+  freeT(e, r->N);
+  freeT(s, r->N);
+  return(m);
+}
+
 poly pLPshift(poly p, int sh, int uptodeg, int lV)
 {
   /* assume shift takes place */
@@ -62,6 +173,7 @@ poly pLPshift(poly p, int sh, int uptodeg, int lV)
 
 poly pmLPshift(poly p, int sh, int uptodeg, int lV)
 {
+  /* TODO: use a shortcut with p_ version */
   /* pm is a monomial */
 
   if (sh == 0) return(p); /* the zero shift */
@@ -109,7 +221,7 @@ int pLastVblock(poly p, int lV)
   /* returns the number of maximal block */
   /* appearing among the monomials of p */
   /* the 0th block is the 1st one */
-  poly q = p_Copy(p,currRing); /* need it ? */
+  poly q = p; //p_Copy(p,currRing); /* need it ? */
   int ans = 0; 
   int ansnew = 0;
   while (q!=NULL)
@@ -126,6 +238,10 @@ int pmLastVblock(poly p, int lV)
 {
   /* for a monomial p, returns the number of the last block */
   /* where a nonzero exponent is sitting */
+  if (pIsConstantPoly(p))
+  {
+    return(int(0));
+  }
   int *e=(int *)omAlloc0((currRing->N+1)*sizeof(int));
   pGetExpV(p,e);
   int j,b;
@@ -142,6 +258,117 @@ int pmLastVblock(poly p, int lV)
   b = (int)(j/lV) + 1; /* the number of the block, >=1 */
   return (b);
 }
+
+int p_LastVblockT(poly p, int lV, kStrategy strat, const ring r)
+{
+  /* returns the number of maximal block */
+  /* appearing among the monomials of p */
+  /* the 0th block is the 1st one */
+
+  /* p is like TObject: lm in currRing = r, tail in tailRing  */
+  assume(p_LmCheckIsFromRing(p,r));
+  assume(p_CheckIsFromRing(pNext(p),strat->tailRing));
+
+  int ans = p_mLastVblock(p, lV, r); // Block of LM
+  poly q = pNext(p); 
+  int ansnew = 0;
+  while (q != NULL)
+  {
+    ansnew = p_mLastVblock(q, lV, strat->tailRing);
+    ans       = si_max(ans,ansnew);
+    pIter(q);
+  }
+  /* do not need to delete q */
+  return(ans);
+}
+
+int p_LastVblock(poly p, int lV, const ring r)
+{
+  /* returns the number of maximal block */
+  /* appearing among the monomials of p */
+  /* the 0th block is the 1st one */
+  poly q = p; //p_Copy(p,currRing); /* need it ? */
+  int ans = 0; 
+  int ansnew = 0;
+  while (q!=NULL)
+  {
+    ansnew = p_mLastVblock(q, lV, r);
+    ans    = si_max(ans,ansnew);
+    pIter(q);
+  }
+  /* do not need to delete q */
+  return(ans);
+}
+
+int p_mLastVblock(poly p, int lV, const ring r)
+{
+  /* for a monomial p, returns the number of the last block */
+  /* where a nonzero exponent is sitting */
+  if (p_LmIsConstant(p,r))
+  {
+    return(0);
+  }
+  int *e=(int *)omAlloc0((r->N+1)*sizeof(int));
+  p_GetExpV(p,e,r);
+  int j,b;
+  j = r->N;
+  while ( (!e[j]) && (j>=1) ) j--;
+  if (j==0) 
+  {
+#ifdef PDEBUG
+    Print("pmLastVblock: unexpected zero exponent vector");
+    PrintLn();
+#endif   
+    return(j);
+  }
+  b = (int)((j+lV-1)/lV); /* the number of the block, >=1 */
+  freeT(e,r->N);
+  return (b);
+}
+
+int pFirstVblock(poly p, int lV)
+{
+  /* returns the number of maximal block */
+  /* appearing among the monomials of p */
+  /* the 0th block is the 1st one */
+  poly q = p; //p_Copy(p,currRing); /* need it ? */
+  int ans = 0; 
+  int ansnew = 0;
+  while (q!=NULL)
+  {
+    ansnew = pmFirstVblock(q,lV);
+    ans    = si_min(ans,ansnew);
+    pIter(q);
+  }
+  /* do not need to delete q */
+  return(ans);
+}
+
+int pmFirstVblock(poly p, int lV)
+{
+  if (pIsConstantPoly(p))
+  {
+    return(int(0));
+  }
+  /* for a monomial p, returns the number of the first block */
+  /* where a nonzero exponent is sitting */
+  int *e=(int *)omAlloc0((currRing->N+1)*sizeof(int));
+  pGetExpV(p,e);
+  int j,b;
+  j = 1;
+  while ( (!e[j]) && (j<=currRing->N-1) ) j++;
+  if (j==currRing->N + 1) 
+  {
+#ifdef PDEBUG
+    Print("pmFirstVblock: unexpected zero exponent vector");
+    PrintLn();
+#endif   
+    return(j);
+  }
+  b = (int)(j/lV)+1; /* the number of the block, 1<= N <= currRing->N  */
+  return (b);
+}
+
 
 int isInV(poly p, int lV)
 {
@@ -160,7 +387,7 @@ int isInV(poly p, int lV)
     /* by blocks in lV vars */
     for (i=(j-1)*lV + 1; i<= j*lV; i++)
     {
-      if (!e[i]) B[j] = B[j]+1;
+      if (e[i]) B[j] = B[j]+1;
     }
   }
   j = b;
@@ -185,6 +412,28 @@ int isInV(poly p, int lV)
   }
   return(1);
 }
+
+int itoInsert(poly p, int uptodeg, int lV, const ring r)
+{
+  /* for poly in lmCR/tailTR presentation */
+  /* the below situation might happen! */
+//   if (r == currRing)
+//   {
+//     "Current ring is not expected in toInsert";
+//     return(0);
+//   }
+  /* compute the number of insertions */
+  int i = p_mLastVblock(p, lV, currRing);
+  if (pNext(p) != NULL)
+  {
+    i = si_max(i, p_LastVblock(pNext(p), lV, r) );
+  }
+  //  i = uptodeg  - i +1; 
+  i = uptodeg  - i; 
+  p_wrp(p,currRing,r); Print("----i:%d",i); PrintLn();
+  return(i);
+}
+
 
 /* shiftgb stuff */
 
