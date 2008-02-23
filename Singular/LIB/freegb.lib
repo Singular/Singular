@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: freegb.lib,v 1.5 2008-02-15 17:12:41 levandov Exp $";
+version="$Id: freegb.lib,v 1.6 2008-02-23 20:14:12 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: ratgb.lib  Twosided Noncommutative Groebner bases in Free Algebras
@@ -1163,4 +1163,95 @@ example
   def A = freegbRing(2);
   setring A;
   A;
+}
+
+static proc checkCeq()
+{
+  ring r = 0,(x,y),Dp;
+  def A = freegbRing(4);
+  setring A;
+  A;
+  // I = x2-xy
+  ideal I = x(1)*x(2) - x(1)*y(2), x(2)*x(3) - x(2)*y(3), x(3)*x(4) - x(3)*y(4);
+  ideal C = x(2)-x(1),x(3)-x(2),x(4)-x(3),y(2)-y(1),y(3)-y(2),y(4)-y(3);
+  ideal K = I,C;
+  groebner(K);
+}
+
+
+proc exHom1()
+{
+  // we start with
+  // z*y - x, z*x - y, y*x - z
+  LIB "freegb.lib";
+  LIB "elim.lib";
+  ring r = 0,(x,y,z,h),dp;
+  list L;
+  module M;
+  M = [1,z,y],[-1,x,h]; // zy - xh
+  L[1] = M;
+  M = [1,z,x],[-1,y,h]; // zx - yh
+  L[2] = M;
+  M = [1,y,x],[-1,z,h]; // yx - zh
+  L[3] = M;
+  lst2str(L);
+  def U = crs(L,4);
+  setring U;
+  I = I, 
+    y(2)*h(3)+z(2)*x(3),     y(3)*h(4)+z(3)*x(4), 
+    y(2)*x(3)-z(2)*h(3),     y(3)*x(4)-z(3)*h(4);
+  I = simplify(I,2);
+  ring r2 = 0,(x(0..4),y(0..4),z(0..4),h(0..4)),dp;
+  ideal J = imap(U,I);
+  //  ideal K = homog(J,h);
+  option(redSB);
+  option(redTail);
+  ideal L = groebner(J); //(K);
+  ideal LL = sat(L,ideal(h))[1];
+  ideal M = subst(LL,h,1);
+  M = simplify(M,2);
+  setring U;
+  ideal M = imap(r2,M);
+  lst2str(U);
+}
+
+static proc test1()
+{
+  LIB "freegb.lib";
+  ring r = 0,(x,y),Dp;
+  int d = 10; // degree
+  def R = freegbRing(d);
+  setring R;
+  ideal I = x(1)*x(2) - y(1)*y(2);
+  option(prot);
+  option(teach);
+  ideal J = system("freegb",I,d,2);
+  J;
+}
+
+static proc test2()
+{
+  LIB "freegb.lib";
+  ring r = 0,(x,y),Dp;
+  int d = 10; // degree
+  def R = freegbRing(d);
+  setring R;
+  ideal I = x(1)*x(2) - x(1)*y(2);
+  option(prot);
+  option(teach);
+  ideal J = system("freegb",I,d,2);
+  J;
+}
+
+static proc test3()
+{
+  LIB "freegb.lib";
+  ring r = 0,(x,y,z),dp;
+  int d =5; // degree
+  def R = freegbRing(d);
+  setring R;
+  ideal I = x(1)*y(2), y(1)*x(2)+z(1)*z(2);
+  option(prot);
+  option(teach);
+  ideal J = system("freegb",I,d,3);
 }
