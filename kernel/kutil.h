@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.33 2008-02-23 20:12:52 levandov Exp $ */
+/* $Id: kutil.h,v 1.34 2008-02-24 17:41:32 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -297,6 +297,7 @@ public:
   int nr;
 #endif
   int cp,c3;
+  int cv; // in shift bases: counting V criterion
   int sl,mu;
   int tl,tmax;
   int Ll,Lmax;
@@ -648,4 +649,6 @@ poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLE
 int redFirstShift (LObject* h,kStrategy strat); // ok
 
 ideal freegb(ideal I, int uptodeg, int lVblock);
+
+ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int uptodeg, int lV);
 #endif

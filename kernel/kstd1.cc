@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.32 2008-02-08 10:11:28 wienand Exp $ */
+/* $Id: kstd1.cc,v 1.33 2008-02-24 17:41:31 levandov Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1714,6 +1714,98 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
       else
         r=bba(F,Q,NULL,hilb,strat);
     }
+  }
+#ifdef KDEBUG
+  idTest(r);
+#endif
+  if (toReset)
+  {
+    kModW = NULL;
+    pRestoreDegProcs(pFDegOld, pLDegOld);
+  }
+  pLexOrder = b;
+//Print("%d reductions canceled \n",strat->cel);
+  HCord=strat->HCord;
+  delete(strat);
+  if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
+  return r;
+}
+
+ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
+		int newIdeal, intvec *vw, int uptodeg, int lV)
+{
+  ideal r;
+  BOOLEAN b=pLexOrder,toReset=FALSE;
+  BOOLEAN delete_w=(w==NULL);
+  kStrategy strat=new skStrategy;
+
+  if(!TEST_OPT_RETURN_SB)
+    strat->syzComp = syzComp;
+  if (TEST_OPT_SB_1)
+    strat->newIdeal = newIdeal;
+  if (rField_has_simple_inverse())
+    strat->LazyPass=20;
+  else
+    strat->LazyPass=2;
+  strat->LazyDegree = 1;
+  strat->ak = idRankFreeModule(F);
+  strat->kModW=kModW=NULL;
+  strat->kHomW=kHomW=NULL;
+  if (vw != NULL)
+  {
+    pLexOrder=FALSE;
+    strat->kHomW=kHomW=vw;
+    pFDegOld = pFDeg;
+    pLDegOld = pLDeg;
+    pSetDegProcs(kHomModDeg);
+    toReset = TRUE;
+  }
+  if (h==testHomog)
+  {
+    if (strat->ak == 0)
+    {
+      h = (tHomog)idHomIdeal(F,Q);
+      w=NULL;
+    }
+    else if (!TEST_OPT_DEGBOUND)
+    {
+      h = (tHomog)idHomModule(F,Q,w);
+    }
+  }
+  pLexOrder=b;
+  if (h==isHomog)
+  {
+    if (strat->ak > 0 && (w!=NULL) && (*w!=NULL))
+    {
+      strat->kModW = kModW = *w;
+      if (vw == NULL)
+      {
+        pFDegOld = pFDeg;
+        pLDegOld = pLDeg;
+        pSetDegProcs(kModDeg);
+        toReset = TRUE;
+      }
+    }
+    pLexOrder = TRUE;
+    if (hilb==NULL) strat->LazyPass*=2;
+  }
+  strat->homog=h;
+#ifdef KDEBUG
+  idTest(F);
+#endif
+  if (pOrdSgn==-1)
+  {
+    /* error: no local ord yet with shifts */
+    Print("No local ordering possible for shifts");
+    return(NULL);
+  }
+  else
+  {
+    /* global ordering */
+    if (w!=NULL)
+      r=bbaShift(F,Q,*w,hilb,strat,uptodeg,lV);
+    else
+      r=bbaShift(F,Q,NULL,hilb,strat,uptodeg,lV);
   }
 #ifdef KDEBUG
   idTest(r);

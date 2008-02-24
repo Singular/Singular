@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.62 2008-02-23 20:12:51 levandov Exp $ */
+/* $Id: kstd2.cc,v 1.63 2008-02-24 17:41:31 levandov Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1690,6 +1690,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
   return (strat->Shdl);
 }
 
+
 ideal freegb(ideal I, int uptodeg, int lVblock)
 {
   /* todo main call */
@@ -1697,13 +1698,16 @@ ideal freegb(ideal I, int uptodeg, int lVblock)
   /* assume: ring is prepared, ideal is copied into shifted ring */
   /* uptodeg and lVblock are correct - test them! */
 
-  kStrategy strat = new skStrategy;
+  //  kStrategy strat = new skStrategy;
   /* ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int uptodeg, int lV) */
   /* at the moment:
 - no quotient (check)
 - no *w, no *hilb
   */
-  ideal RS = bbaShift(I,NULL, NULL, NULL, strat, uptodeg, lVblock);
+  /* ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
+     int newIdeal, intvec *vw) */
+  ideal RS = kStdShift(I,NULL, testHomog, NULL,NULL,0,0,NULL, uptodeg, lVblock);
+    //bbaShift(I,NULL, NULL, NULL, strat, uptodeg, lVblock);
   idSkipZeroes(RS);
   return(RS);
 }

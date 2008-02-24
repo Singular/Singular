@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shiftgb.cc,v 1.5 2008-02-23 20:12:53 levandov Exp $ */
+/* $Id: shiftgb.cc,v 1.6 2008-02-24 17:41:32 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for shift GB and free GB
 */
@@ -369,9 +369,13 @@ int pmFirstVblock(poly p, int lV)
   return (b);
 }
 
+  /* there should be two routines: */
+  /* 1. tests squarefreeness: in homog this suffices */
+  /* 2. test the presence of a hole -> in the tail??? */
 
 int isInV(poly p, int lV)
 {
+
   if (lV <= 0) return(0);
   /* returns 1 iff p is in V */
   /* that is in each block up to a certain one there is only one nonzero exponent */
@@ -430,7 +434,7 @@ int itoInsert(poly p, int uptodeg, int lV, const ring r)
   }
   //  i = uptodeg  - i +1; 
   i = uptodeg  - i; 
-  p_wrp(p,currRing,r); Print("----i:%d",i); PrintLn();
+  //  p_wrp(p,currRing,r); Print("----i:%d",i); PrintLn();
   return(i);
 }
 

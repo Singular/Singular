@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.85 2008-02-23 20:12:52 levandov Exp $ */
+/* $Id: kutil.cc,v 1.86 2008-02-24 17:41:31 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -4306,6 +4306,8 @@ void messageStat (int srmax,int lrmax,int hilbcount,kStrategy strat)
   //Print("%d/%d polynomials in set L (for lazy alg.)",lrmax+1,strat->Lmax);
   Print("product criterion:%d chain criterion:%d\n",strat->cp,strat->c3);
   if (hilbcount!=0) Print("hilbert series criterion:%d\n",hilbcount);
+  /* in usual case strat->cv is 0, it gets changed only in shift routines */
+  if (strat->cv!=0) Print("shift V criterion:%d\n",strat->cv);
   /*mflush();*/
 }
 
@@ -6169,6 +6171,7 @@ void initBuchMoraShift (ideal F,ideal Q,kStrategy strat)
   /*- creating temp data structures------------------- -*/
   strat->cp = 0;
   strat->c3 = 0;
+  strat->cv = 0;
   strat->tail = pInit();
   /*- set s -*/
   strat->sl = -1;
@@ -6243,9 +6246,7 @@ void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy st
   /* cycles through all shifts of s[i] until uptodeg - lastVblock(s[i]) */
   /* that is create the pairs (f, s \dot g)  */
 
-  poly qq = strat->S[i]; // previously thought and now again: lm in currRing, tail in tailRing
-// elt's of S are compl. in currRing 
-// previously thought: lm in currRing, tail in tailRing
+  poly qq = strat->S[i]; //  lm in currRing, tail in tailRing
 
   //  poly q = pCopy(pHead(strat->S[i])); // lm in currRing
   //  pNext(q) = prCopyR(pNext(strat->S[i]),strat->tailRing,currRing); // zero shift
@@ -6254,7 +6255,6 @@ void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy st
   /* x(0)y(1)z(2) : lastVblock-1=2, to add until lastVblock=uptodeg-1 */
   /* hence, a total number of elt's to add is: */
   /*  int toInsert = 1 + (uptodeg-1) - (pLastVblock(p.p, lV) -1);  */
-  //  int toInsert = uptodeg  - pLastVblock(q, lV) +1; 
   int toInsert =  itoInsert(qq, uptodeg,  lV, strat->tailRing);
 
 #ifdef KDEBUG
@@ -6285,19 +6285,15 @@ void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy st
   poly q, s;
 
   // for the 0th shift: insert the orig. pair
-
   enterOnePairShift(qq, p, ecart, isFromQ, strat, -1, ecartq, qfromQ, j, i, uptodeg, lV);
 
-  for (j=1; j<= toInsert; j++) // toIns - 1?
+  for (j=1; j<= toInsert; j++) 
   {
     //    q = pLPshift(strat->S[i],j,uptodeg,lV);
     q = p_LPshiftT(qq, j, uptodeg, lV, strat, currRing); 
     //    q = p_mLPshift(qq,j,uptodeg,lV,currRing); // lm in currRing, shift this monomial
     //    s = p_LPshift(pNext(qq), j, uptodeg, lV, strat->tailRing); // from tailRing
     //    pNext(q) = s; // in tailRing
-    //    qq = pLPshift(q,j,uptodeg,lV); // need move
-    // ??? no move needed: in currRing
-    //    qq = pMoveCurrTail2poly(qq,strat);
     /* here we need to call enterOnePair with two polys ... */
 
 #ifdef KDEBUG
@@ -6312,19 +6308,18 @@ void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy st
 #endif
     enterOnePairShift(q, p, ecart, isFromQ, strat, -1, ecartq, qfromQ, j, i, uptodeg, lV);
   }
-  /* delete qq */
-  //  pDelete(&qq);
 }
 
 /*1
 * put the pairs (sh \dot qq,p)  into the set B, ecart=ecart(p)
+* despite the name, not only self shifts
 */
 void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int uptodeg, int lV)
 {
 
   /* format: p,qq are in LObject form: lm in CR, tail in TR */
   /* for true self pairs qq ==p  */
-  /* we test both */
+  /* we test both qq and p */
   assume(p_LmCheckIsFromRing(qq,currRing));
   assume(p_CheckIsFromRing(pNext(qq),strat->tailRing));
   assume(p_LmCheckIsFromRing(p,currRing));
@@ -6332,20 +6327,11 @@ void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy 
 
   int j = 0;
 
-  /* for such pairs start with 1, not with 0 */
+  /* for such self pairs start with 1, not with 0 */
   if (qq == p) j=1;
 
   /* should cycle through all shifts of q until uptodeg - lastVblock(q) */
   /* that is create the pairs (f, s \dot g)  */
-
- /* determine how many elements we have to insert for a given s[i] */
-  /* x(0)y(1)z(2) : lastVblock-1=2, to add until lastVblock=uptodeg-1 */
-  /* hence, a total number of elt's to add is: */
-  /*  int toInsert = 1 + (uptodeg-1) - (pLastVblock(p.p, lV) -1);  */
-
-  //  poly q = pHead(qq); // lm in currRing
-  //  pNext(q) = prCopyR(pNext(qq), strat->tailRing, currRing);
-  //  pTest(q);
 
   int toInsert =  itoInsert(qq, uptodeg,  lV, strat->tailRing);
 
@@ -6356,23 +6342,15 @@ void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy 
     }
 #endif
 
-//   int toInsert = p_mLastVblock(qq, lV,currRing);
-//   if (pNext(qq) != NULL)
-//   {
-//     toInsert = si_max(toInsert, p_LastVblock(pNext(qq), lV,strat->tailRing) );
-//   }
-//   toInsert = uptodeg  - toInsert +1; 
-
   poly q, s;
 
-  //  assume(i<=strat->sl); // from OnePair
   if (strat->interred_flag) return; // ?
 
   /* these vars hold for all shifts of s[i] */
   int ecartq = 0; //Hans says it's ok; we're in the homog case, no ecart
   int qfromQ = 0; // strat->fromQ[i]; 
 
-  for (; j<= toInsert; j++) // toIns - 1?
+  for (; j<= toInsert; j++)
   {
     //    q = pLPshift(strat->S[i],j,uptodeg,lV);
     /* we increase shifts by one; must delete q there*/
@@ -6382,7 +6360,6 @@ void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy 
     //    q = p_mLPshift(qq,j,uptodeg,lV,currRing); // lm in currRing, shift this monomial
     //    s = p_LPshift(pNext(qq), j, uptodeg, lV, strat->tailRing); // from tailRing
     //    pNext(q) = s; // in tailRing
-    //prMoveR(s,strat->tailRing,currRing); // in currRing
     /* here we need to call enterOnePair with two polys ... */
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
@@ -6396,8 +6373,6 @@ void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy 
 #endif
     enterOnePairShift(q, p, ecart, isFromQ, strat, -1, ecartq, qfromQ, j, -1, uptodeg, lV);
   }
-  /* delete q? */
-  //  pDelete(&q);
 }
 
 /*2
@@ -6406,11 +6381,9 @@ void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy 
 void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat, int atR, int ecartq, int qisFromQ, int shiftcount, int ifromS, int uptodeg, int lV)
 {
 
-  /* New Format: q and p are like strat->P.p, so lm in CR, tail in TR */
-  /* Format: q is a poly compl. in currRing, p is like strat->P.p, so lm in CR, tail in TR */
+  /* Format: q and p are like strat->P.p, so lm in CR, tail in TR */
 
   /* check this Formats: */
-  //  assume(p_CheckIsFromRing(q,currRing));
   assume(p_LmCheckIsFromRing(q,currRing));
   assume(p_CheckIsFromRing(pNext(q),strat->tailRing));
   assume(p_LmCheckIsFromRing(p,currRing));
@@ -6427,15 +6400,12 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
     }
 #endif
 
-  /* indeed we need LM only before real spoly */
   /* poly q stays for s[i], ecartq = ecart(q), qisFromQ = applies to q */
 
   int qfromQ = qisFromQ;
 
   /* need additionally: int up_to_degree, poly V0 with the variables in (0)  or just the number lV = the length of the first block */
 
-  //  atR = -1;
-  //  assume(i<=strat->sl); // satisfied automatically
   if (strat->interred_flag) return;
 
   int      l,j,compare;
@@ -6452,7 +6422,6 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
   pSetm(Lp.lcm);
 
   /* apply the V criterion */
-  /* or do it in ManyShifts? */
   if (!isInV(Lp.lcm, lV))
   {
 #ifdef KDEBUG
@@ -6467,9 +6436,9 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 #endif
     pLmFree(Lp.lcm);
     Lp.lcm=NULL;
+    /* + counter for applying the V criterion */
+    strat->cv++;
     return;
-    /* + add the counter for applying the V criterion */
-    /* like strat->cv */
   }
 
   const BOOLEAN bIsPluralRing = rIsPluralRing(currRing);
@@ -6671,7 +6640,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
   {
     /*- the pair (S[i],p) enters B -*/
     /* both of them should have their LM in currRing and TAIL in tailring */
-    Lp.p1 = q;  // already converted with pMove2CurrTail(q,strat);
+    Lp.p1 = q;  // already in the needed form 
     Lp.p2 = p; // already in the needed form 
 
     if ( !bIsPluralRing )
@@ -6819,9 +6788,6 @@ void enterTShift(LObject p, kStrategy strat, int atT, int uptodeg, int lV)
   /* hence, a total number of elt's to add is: */
   /*  int toInsert = 1 + (uptodeg-1) - (pLastVblock(p.p, lV) -1);  */
 
-  //  int toInsert = uptodeg  - pLastVblock(pCopy(p.p), lV) +1; 
-  //  int toInsert = uptodeg  - pLastVblock(p.p, lV) +1; 
-  
   int toInsert =  itoInsert(p.p, uptodeg,  lV, strat->tailRing);
 
 #ifdef PDEBUG
@@ -6832,25 +6798,8 @@ void enterTShift(LObject p, kStrategy strat, int atT, int uptodeg, int lV)
   if (atT < 0)
     atT = strat->posInT(strat->T, strat->tl, p);
   
-  //  LObject q;
-  //  poly s;
   /* can call enterT in a sequence, e.g. */
 
-  /* first we create the 0th shift */
-  //  q = p;
-//   if (q.t_p!=NULL)
-//   {
-//     q.p = pHead(s); // in currRing
-//     q.t_p = prMoveR(s, /* sourcering: */currRing, /* destring: */ strat->tailRing);
-//     if (pNext(q.t_p)!=NULL)
-//     {
-//       pNext(q.p)=pNext(q.t_p);
-//     }
-//   }
-//   else
-//   {
-//     q.p=s;
-//   }
   /* shift0 = it's our model for further shifts */
   enterT(p,strat,atT);
   LObject qq;
@@ -6860,22 +6809,6 @@ void enterTShift(LObject p, kStrategy strat, int atT, int uptodeg, int lV)
     qq.p    = NULL; 
     qq.t_p = p_LPshift(p.t_p, i, uptodeg, lV, strat->tailRing); // direct shift
     qq.GetP();
-    /* shift p, that is create another LObject and shift its poly */
-    /* change: p.p, p.t_p, */
-    /* change: i_r (must be -1 because we're not yet in T ? */
-    //    s = pLPshift(pCopyL2p(q,strat), i, uptodeg, lV); // deletes 1st arg, hence pCopy
-    //    q.p = pLPshift(q.p, 1, uptodeg, lV);
-//       qq.p = pHead(s); // in currRing
-//       qq.t_p = prMoveR(s, /* sourcering: */currRing, /* destring: */ strat->tailRing);
-//       if (pNext(q.t_p)!=NULL)
-//       {
-//         pNext(q.p)=pNext(q.t_p);
-//       }
-//     }
-//     else
-//     {
-//       q.p=s;
-//     }
     // update q.sev
     qq.sev = pGetShortExpVector(qq.p);
     /* enter it into T, first el't is with the shift 0 */
@@ -6883,7 +6816,6 @@ void enterTShift(LObject p, kStrategy strat, int atT, int uptodeg, int lV)
     atT = strat->posInT(strat->T, strat->tl, qq);
     enterT(qq,strat,atT);
   }
-
 /* Q: what to do with this one in the orig enterT ? */
 /*  strat->R[strat->tl] = &(strat->T[atT]); */
 /* Solution: it is done by enterT each time separately */

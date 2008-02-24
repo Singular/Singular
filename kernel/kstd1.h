@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.h,v 1.2 2007-07-25 10:53:15 Singular Exp $ */
+/* $Id: kstd1.h,v 1.3 2008-02-24 17:41:31 levandov Exp $ */
 /*
 * ABSTRACT
 */
@@ -32,6 +32,9 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp=0, int lazyReduce=0);
 
 ideal kStd(ideal F, ideal Q, tHomog h, intvec ** mw,intvec *hilb=NULL,
           int syzComp=0,int newIdeal=0, intvec *vw=NULL);
+
+ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
+		int newIdeal, intvec *vw, int uptodeg, int lVblock);
 
 /* the following global data are defined in kutil.cc */
 //extern int syzComp;
