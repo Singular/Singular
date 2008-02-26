@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.86 2008-02-24 17:41:31 levandov Exp $ */
+/* $Id: kutil.cc,v 1.87 2008-02-26 23:35:30 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -5544,7 +5544,7 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
   idSkipZeroes(r);
 }
 
-void completeReduce (kStrategy strat)
+void completeReduce (kStrategy strat, BOOLEAN withT)
 {
   int i;
   int low = (pOrdSgn == 1 ? 1 : 0);
@@ -5574,7 +5574,7 @@ void completeReduce (kStrategy strat)
       L = *T_j;
       poly p;
       if (pOrdSgn == 1)
-        strat->S[i] = redtailBba(&L, i-1, strat, FALSE);
+        strat->S[i] = redtailBba(&L, i-1, strat, withT);
       else
         strat->S[i] = redtail(&L, strat->sl, strat);
 
@@ -5593,7 +5593,7 @@ void completeReduce (kStrategy strat)
     {
       assume(currRing == strat->tailRing);
       if (pOrdSgn == 1)
-        strat->S[i] = redtailBba(strat->S[i], i-1, strat);
+        strat->S[i] = redtailBba(strat->S[i], i-1, strat, withT);
       else
         strat->S[i] = redtail(strat->S[i], strat->sl, strat);
       if (TEST_OPT_INTSTRATEGY)
@@ -6325,7 +6325,10 @@ void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy 
   assume(p_LmCheckIsFromRing(p,currRing));
   assume(p_CheckIsFromRing(pNext(p),strat->tailRing));
 
-  int j = 0;
+  /* since this proc is applied twice for (h, s*g) and (g,s*h), init j with 1 only */
+
+  //  int j = 0;
+  int j = 1;
 
   /* for such self pairs start with 1, not with 0 */
   if (qq == p) j=1;

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.34 2008-02-24 17:41:32 levandov Exp $ */
+/* $Id: kutil.h,v 1.35 2008-02-26 23:35:31 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -435,7 +435,7 @@ void initBuchMoraPos(kStrategy strat);
 void initBuchMora (ideal F, ideal Q,kStrategy strat);
 void exitBuchMora (kStrategy strat);
 void updateResult(ideal r,ideal Q,kStrategy strat);
-void completeReduce (kStrategy strat);
+void completeReduce (kStrategy strat, BOOLEAN withT=FALSE);
 void kFreeStrat(kStrategy strat);
 BOOLEAN homogTest(polyset F, int Fmax);
 BOOLEAN newHEdge(polyset S, kStrategy strat);

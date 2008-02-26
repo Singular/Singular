@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.63 2008-02-24 17:41:31 levandov Exp $ */
+/* $Id: kstd2.cc,v 1.64 2008-02-26 23:35:30 levandov Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1439,7 +1439,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
   int   srmax,lrmax, red_result = 1;
   int   olddeg,reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
-  BOOLEAN withT = TRUE; //FALSE;
+  BOOLEAN withT = TRUE; // very important for shifts
 
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit, NO CHANGES */
   initBuchMoraPos(strat); /*NO CHANGES YET: perhaps later*/
@@ -1660,7 +1660,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
 
   if (TEST_OPT_REDSB)
   {
-    completeReduce(strat);
+    completeReduce(strat, TRUE); //shift: withT = TRUE
     if (strat->completeReduce_retry)
     {
       // completeReduce needed larger exponents, retry
@@ -1669,7 +1669,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
       cleanT(strat);strat->tailRing=currRing;
       int i;
       for(i=strat->sl;i>=0;i--) strat->S_2_R[i]=-1;
-      completeReduce(strat);
+      completeReduce(strat, TRUE);
     }
   }
   else if (TEST_OPT_PROT) PrintLn();
