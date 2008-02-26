@@ -1,12 +1,12 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: freegb.lib,v 1.6 2008-02-23 20:14:12 levandov Exp $";
+version="$Id: freegb.lib,v 1.7 2008-02-26 23:36:12 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: ratgb.lib  Twosided Noncommutative Groebner bases in Free Algebras
 AUTHOR: Viktor Levandovskyy,     levandov@math.rwth-aachen.de
 
 PROCEDURES:
-freegb(list L, int n);   compute two-sided Groebner basis of ideal, encoded via L, up to degree n
+freegbasis(list L, int n);   compute two-sided Groebner basis of ideal, encoded via L, up to degree n
 lst2str(list L);         convert a list (of modules) into polynomials in free algebra
 mod2str(module M);       convert a module into a polynomial in free algebra
 "
@@ -277,6 +277,58 @@ example
   IsVar(i);
 }
 
+// new conversion routines
+
+proc id2words(ideal I, int d)
+{
+  // input: ideal I of polys in letter-place notation
+  // in the ring with d real vars
+  // output: the list of strings: associative words
+  // extract names of vars
+  int i,m,n; string s; string place = "(1)";
+  list lv;
+  for(i=1; i<=d; i++)
+  {
+    s = string(var(i));
+    // get rid of place
+    n = find(s, place);
+    if (n>0)
+    {
+      s = s[1..n-1];
+    }
+    lv[i] = s;
+  }
+  poly p,q;
+  for (i=1; i<=ncols(I); i++)
+  {
+    if (I[i] != 0)
+    {
+      p = I[i];
+      while (p!=0)
+      {
+         q = leadmonom(p);
+         
+      }
+    }
+  }
+
+  return(lv);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x(1),y(1),z(1)),dp;
+  ideal I = x(1)*y(2) -z(1)*x(2);
+  id2words(I,3);
+}
+
+
+
+proc mono2word(poly p, int d)
+{
+  
+}
+
 // given the element -7xy^2x, it is represented as [-7,x,y^2,x] or as [-7,x,y,y,x]
 // use the orig ord on (x,y,z) and expand it blockwise to (x(i),y(i),z(i))
 
@@ -287,18 +339,647 @@ example
 
 
 // 1. form a new ring
+// 2. NOP
+// 3. compute GB -> with the kernel stuff
+// 4. skip shifted elts (check that no such exist?)
+// 5. go back to orig vars, produce strings/modules
+// 6. return the result
+
+proc freegbasis(list LM, int d)
+"USAGE:  freegbasis(L, d);  L a list of modules, d an integer
+RETURN:  ring
+PURPOSE: compute the two-sided Groebner basis of an ideal, encoded by L in
+the free associative algebra, up to degree d
+EXAMPLE: example freegbasis; shows examples
+"
+{
+  // d = up to degree, will be shifted to d+1
+  if (d<1) {"bad d"; return(0);}
+
+  int ppl = printlevel-voice+2;
+  string err = "";
+
+  int i,j,s;
+  def save = basering;
+  // determine max no of places in the input
+  int slm = size(LM); // numbers of polys in the ideal
+  int sm;
+  intvec iv;
+  module M;
+  for (i=1; i<=slm; i++)
+  {
+    // modules, e.g. free polynomials
+    M  = LM[i];
+    sm = ncols(M);
+    for (j=1; j<=sm; j++)
+    {
+      //vectors, e.g. free monomials
+      iv = iv, size(M[j])-1; // 1 place is reserved by the coeff
+    }
+  }
+  int D = Max(iv); // max size of input words
+  if (d<D) {"bad d"; return(LM);}
+  D = D + d-1;
+  //  D = d;
+  list LR  = ringlist(save);
+  list L, tmp;
+  L[1] = LR[1]; // ground field
+  L[4] = LR[4]; // quotient ideal
+  tmp  = LR[2]; // varnames
+  s = size(LR[2]);
+  for (i=1; i<=D; i++)
+  {
+    for (j=1; j<=s; j++)
+    {
+      tmp[i*s+j] = string(tmp[j])+"("+string(i+1)+")";
+    }
+  }
+  for (i=1; i<=s; i++)
+  {
+    tmp[i] = string(tmp[i])+"("+string(1)+")";
+  }
+  L[2] = tmp;
+  list OrigNames = LR[2];
+  // ordering: d blocks of the ord on r
+  // try to get whether the ord on r is blockord itself
+  s = size(LR[3]);
+  if (s==2)
+  {
+    // not a blockord, 1 block + module ord
+    tmp = LR[3][s]; // module ord
+    for (i=1; i<=D; i++)
+    {
+      LR[3][s-1+i] = LR[3][1];
+    }
+    LR[3][s+D] = tmp;
+  }
+  if (s>2)
+  {
+    // there are s-1 blocks
+    int nb = s-1;
+    tmp = LR[3][s]; // module ord
+    for (i=1; i<=D; i++)
+    {
+      for (j=1; j<=nb; j++)
+      {
+	LR[3][i*nb+j] = LR[3][j];
+      }
+    }
+    //    size(LR[3]);
+    LR[3][nb*(D+1)+1] = tmp;
+  }
+  L[3] = LR[3];
+  def @R = ring(L);
+  setring @R;
+  ideal I;
+  poly @p;
+  s = size(OrigNames);
+  //  "s:";s;
+  // convert LM to canonical vectors (no powers)
+  setring save;
+  kill M; // M was defined earlier
+  module M;
+  slm = size(LM); // numbers of polys in the ideal
+  int sv,k,l;
+  vector v;
+  //  poly p;
+  string sp;
+  setring @R;
+  poly @@p=0;
+  setring save;
+  for (l=1; l<=slm; l++)
+  {
+    // modules, e.g. free polynomials
+    M  = LM[l];
+    sm = ncols(M); // in intvec iv the sizes are stored
+    // modules, e.g. free polynomials
+    for (j=1; j<=sm; j++)
+    {
+      //vectors, e.g. free monomials
+      v  = M[j];
+      sv = size(v);
+      //	"sv:";sv;
+      sp = "@@p = @@p + ";
+      for (k=2; k<=sv; k++)
+      {
+	sp = sp + string(v[k])+"("+string(k-1)+")*";
+      }
+      sp = sp + string(v[1])+";"; // coef;
+      setring @R;
+      execute(sp);
+      setring save;
+    }
+    setring @R;
+    //      "@@p:"; @@p;
+    I = I,@@p;
+    @@p = 0;
+    setring save;
+  }
+  kill sp;
+  // 3. compute GB
+  setring @R;
+  dbprint(ppl,"computing GB");
+  ideal J = system("freegb",I,d,nvars(save));
+  //  ideal J = slimgb(I); 
+  dbprint(ppl,J);
+  // 4. skip shifted elts
+  ideal K = select1(J,1,s); // s = size(OrigNames)
+  dbprint(ppl,K);
+  dbprint(ppl, "done with GB");
+  // K contains vars x(1),...z(1) = images of originals
+  // 5. go back to orig vars, produce strings/modules
+  if (K[1] == 0)
+  {
+    "no reasonable output, GB gives 0";
+    return(0);
+  }
+  int sk = size(K);
+  int sp, sx, a, b;
+  intvec x;
+  poly p,q;
+  poly pn;
+  // vars in 'save'
+  setring save;
+  module N;
+  list LN;
+  vector V;
+  poly pn;
+  // test and skip exponents >=2
+  setring @R;
+  for(i=1; i<=sk; i++)
+  {
+    p  = K[i];
+    while (p!=0)
+    {
+      q  = lead(p);
+      //      "processing q:";q;
+      x  = leadexp(q);
+      sx = size(x);
+      for(k=1; k<=sx; k++)
+      {
+	if ( x[k] >= 2 )
+	{
+	  err = "skip: the value x[k] is " + string(x[k]);
+	  dbprint(ppl,err);
+	  //	    return(0);
+	  K[i] = 0;
+	  p    = 0;
+	  q    = 0;
+	  break;
+	}
+      }
+      p  = p - q;
+    }
+  }
+  K  = simplify(K,2);
+  sk = size(K);
+  for(i=1; i<=sk; i++)
+  {
+    //    setring save;
+    //    V  = 0;
+    setring @R;
+    p  = K[i];
+    while (p!=0)
+    {
+      q  = lead(p);
+      err =  "processing q:" + string(q);
+      dbprint(ppl,err);
+      x  = leadexp(q);
+      sx = size(x);
+      pn = leadcoef(q);
+      setring save;
+      pn = imap(@R,pn);
+      V  = V + leadcoef(pn)*gen(1);
+      for(k=1; k<=sx; k++)
+      {
+	if (x[k] ==1)
+	{
+	  a = k / s; // block number=a+1, a!=0
+	  b = k % s; // remainder
+	  //	  printf("a: %s, b: %s",a,b);
+	  if (b == 0)
+	  {
+	    // that is it's the last var in the block
+	    b = s;
+	    a = a-1;
+	  }
+	  V = V + var(b)*gen(a+2);
+	}
+// 	else
+// 	{
+// 	  printf("error: the value x[k] is %s", x[k]);
+// 	  return(0);
+// 	}
+      }
+      err = "V: " + string(V);
+      dbprint(ppl,err);
+      //      printf("V: %s", string(V));
+      N = N,V;
+      V  = 0;
+      setring @R;
+      p  = p - q;
+      pn = 0;
+    }
+    setring save;
+    LN[i] = simplify(N,2);
+    N     = 0;
+  }
+  setring save;
+  return(LN);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),(dp(1),dp(2));
+  module M = [-1,x,y],[-7,y,y],[3,x,x];
+  module N = [1,x,y,x],[-1,y,x,y];
+  list L; L[1] = M; L[2] = N;
+  lst2str(L);
+  def U = freegbasis(L,5);
+  lst2str(U);
+}
+
+proc crs(list LM, int d)
+"USAGE:  crs(L, d);  L a list of modules, d an integer
+RETURN:  ring
+PURPOSE: create a ring and shift the ideal
+EXAMPLE: example crs; shows examples
+"
+{
+  // d = up to degree, will be shifted to d+1
+  if (d<1) {"bad d"; return(0);}
+
+  int ppl = printlevel-voice+2;
+  string err = "";
+
+  int i,j,s;
+  def save = basering;
+  // determine max no of places in the input
+  int slm = size(LM); // numbers of polys in the ideal
+  int sm;
+  intvec iv;
+  module M;
+  for (i=1; i<=slm; i++)
+  {
+    // modules, e.g. free polynomials
+    M  = LM[i];
+    sm = ncols(M);
+    for (j=1; j<=sm; j++)
+    {
+      //vectors, e.g. free monomials
+      iv = iv, size(M[j])-1; // 1 place is reserved by the coeff
+    }
+  }
+  int D = Max(iv); // max size of input words
+  if (d<D) {"bad d"; return(LM);}
+  D = D + d-1;
+  //  D = d;
+  list LR  = ringlist(save);
+  list L, tmp;
+  L[1] = LR[1]; // ground field
+  L[4] = LR[4]; // quotient ideal
+  tmp  = LR[2]; // varnames
+  s = size(LR[2]);
+  for (i=1; i<=D; i++)
+  {
+    for (j=1; j<=s; j++)
+    {
+      tmp[i*s+j] = string(tmp[j])+"("+string(i)+")";
+    }
+  }
+  for (i=1; i<=s; i++)
+  {
+    tmp[i] = string(tmp[i])+"("+string(0)+")";
+  }
+  L[2] = tmp;
+  list OrigNames = LR[2];
+  // ordering: d blocks of the ord on r
+  // try to get whether the ord on r is blockord itself
+  s = size(LR[3]);
+  if (s==2)
+  {
+    // not a blockord, 1 block + module ord
+    tmp = LR[3][s]; // module ord
+    for (i=1; i<=D; i++)
+    {
+      LR[3][s-1+i] = LR[3][1];
+    }
+    LR[3][s+D] = tmp;
+  }
+  if (s>2)
+  {
+    // there are s-1 blocks
+    int nb = s-1;
+    tmp = LR[3][s]; // module ord
+    for (i=1; i<=D; i++)
+    {
+      for (j=1; j<=nb; j++)
+      {
+	LR[3][i*nb+j] = LR[3][j];
+      }
+    }
+    //    size(LR[3]);
+    LR[3][nb*(D+1)+1] = tmp;
+  }
+  L[3] = LR[3];
+  def @R = ring(L);
+  setring @R;
+  ideal I;
+  poly @p;
+  s = size(OrigNames);
+  //  "s:";s;
+  // convert LM to canonical vectors (no powers)
+  setring save;
+  kill M; // M was defined earlier
+  module M;
+  slm = size(LM); // numbers of polys in the ideal
+  int sv,k,l;
+  vector v;
+  //  poly p;
+  string sp;
+  setring @R;
+  poly @@p=0;
+  setring save;
+  for (l=1; l<=slm; l++)
+  {
+    // modules, e.g. free polynomials
+    M  = LM[l];
+    sm = ncols(M); // in intvec iv the sizes are stored
+    for (i=0; i<=d-iv[l]; i++)
+    {
+      // modules, e.g. free polynomials
+      for (j=1; j<=sm; j++)
+      {
+	//vectors, e.g. free monomials
+	v  = M[j];
+	sv = size(v);
+	//	"sv:";sv;
+	sp = "@@p = @@p + ";
+	for (k=2; k<=sv; k++)
+	{
+	  sp = sp + string(v[k])+"("+string(k-2+i)+")*";
+	}
+	sp = sp + string(v[1])+";"; // coef;
+	setring @R;
+	execute(sp);
+	setring save;
+      }
+      setring @R;
+      //      "@@p:"; @@p;
+      I = I,@@p;
+      @@p = 0;
+      setring save;
+    }
+  }
+  setring @R;
+  export I;
+  return(@R);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),(dp(1),dp(2));
+  module M = [-1,x,y],[-7,y,y],[3,x,x];
+  module N = [1,x,y,x],[-1,y,x,y];
+  list L; L[1] = M; L[2] = N;
+  lst2str(L);
+  def U = crs(L,5);
+  setring U; U;
+  I;
+}
+
+proc polylen(ideal I)
+{
+  // returns the ideal of length of polys
+  int i;
+  intvec J;
+  number s = 0;
+  for(i=1;i<=ncols(I);i++)
+  {
+    J[i] = size(I[i]);
+    s = s + J[i];
+  }
+  printf("the sum of length %s",s);
+  //  print(s);
+  return(J);
+}
+
+proc freegbRing(int d)
+"USAGE:  freegbRing(d); d an integer
+RETURN:  ring
+PURPOSE: creates a ring with d blocks of shifted original variables
+EXAMPLE: example freegbRing; shows examples
+"
+{
+  // d = up to degree, will be shifted to d+1
+  if (d<1) {"bad d"; return(0);}
+
+  int ppl = printlevel-voice+2;
+  string err = "";
+
+  int i,j,s;
+  def save = basering;
+  int D = d-1;
+  list LR  = ringlist(save);
+  list L, tmp;
+  L[1] = LR[1]; // ground field
+  L[4] = LR[4]; // quotient ideal
+  tmp  = LR[2]; // varnames
+  s = size(LR[2]);
+  for (i=1; i<=D; i++)
+  {
+    for (j=1; j<=s; j++)
+    {
+      tmp[i*s+j] = string(tmp[j])+"("+string(i+1)+")";
+    }
+  }
+  for (i=1; i<=s; i++)
+  {
+    tmp[i] = string(tmp[i])+"("+string(1)+")";
+  }
+  L[2] = tmp;
+  list OrigNames = LR[2];
+  // ordering: d blocks of the ord on r
+  // try to get whether the ord on r is blockord itself
+  // TODO: make L(2) ordering! exponent is maximally 2
+  s = size(LR[3]);
+  if (s==2)
+  {
+    // not a blockord, 1 block + module ord
+    tmp = LR[3][s]; // module ord
+    for (i=1; i<=D; i++)
+    {
+      LR[3][s-1+i] = LR[3][1];
+    }
+    LR[3][s+D] = tmp;
+  }
+  if (s>2)
+  {
+    // there are s-1 blocks
+    int nb = s-1;
+    tmp = LR[3][s]; // module ord
+    for (i=1; i<=D; i++)
+    {
+      for (j=1; j<=nb; j++)
+      {
+	LR[3][i*nb+j] = LR[3][j];
+      }
+    }
+    //    size(LR[3]);
+    LR[3][nb*(D+1)+1] = tmp;
+  }
+  L[3] = LR[3];
+  def @R = ring(L);
+  //  setring @R;
+  return (@R);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),(dp(1),dp(2));
+  def A = freegbRing(2);
+  setring A;
+  A;
+}
+
+
+proc ex_shift()
+{
+  LIB "freegb.lib";
+  ring r = 0,(x,y,z),(dp(1),dp(2));
+  module M = [-1,x,y],[-7,y,y],[3,x,x];
+  module N = [1,x,y,x],[-1,y,x,y];
+  list L; L[1] = M; L[2] = N;
+  lst2str(L);
+  def U = crs(L,5);
+  setring U; U;
+  I;
+  poly p = I[2]; // I[8];
+  p;
+  system("stest",p,7,7,3); // error -> the world is ok
+  poly q1 = system("stest",p,1,7,3); //ok
+  poly q6 = system("stest",p,6,7,3); //ok
+  system("btest",p,3); //ok
+  system("btest",q1,3); //ok
+  system("btest",q6,3); //ok
+}
+
+proc ex2()
+{
+  option(prot);
+  LIB "freegb.lib";
+  ring r = 0,(x,y),dp;
+  module M = [-1,x,y],[3,x,x]; // 3x^2 - xy
+  def U = freegb(M,7);
+  lst2str(U);
+}
+
+proc ex_nonhomog()
+{
+  option(prot);
+  LIB "freegb.lib";
+  ring r = 0,(x,y,h),dp;
+  list L;
+  module M;
+  M = [-1,y,y],[1,x,x,x];  // x3-y2
+  L[1] = M;
+  M = [1,x,h],[-1,h,x];  // xh-hx
+  L[2] = M;
+  M = [1,y,h],[-1,h,y];  // yh-hy
+  L[3] = M;
+  def U = freegb(L,4);
+  lst2str(U);
+  // strange elements in the basis
+}
+
+proc ex_nonhomog_comm()
+{
+  option(prot);
+  LIB "freegb.lib";
+  ring r = 0,(x,y),dp;
+  module M = [-1,y,y],[1,x,x,x];
+  def U = freegb(M,5);
+  lst2str(U);
+}
+
+proc ex_nonhomog_h()
+{
+  option(prot);
+  LIB "freegb.lib";
+  ring r = 0,(x,y,h),(a(1,1),dp);
+  module M = [-1,y,y,h],[1,x,x,x]; // x3 - y2h
+  def U = freegb(M,6);
+  lst2str(U);
+}
+
+proc ex_nonhomog_h2()
+{
+  option(prot);
+  LIB "freegb.lib";
+  ring r = 0,(x,y,h),(dp);
+  list L;
+  module M;
+  M = [-1,y,y,h],[1,x,x,x]; // x3 - y2h
+  L[1] = M;
+  M = [1,x,h],[-1,h,x]; // xh - hx
+  L[2] = M;
+  M = [1,y,h],[-1,h,y]; // yh - hy
+  L[3] = M;
+  def U = freegbasis(L,3);
+  lst2str(U);
+  // strange answer CHECK
+}
+
+
+proc ex_nonhomog_3()
+{
+  option(prot);
+  LIB "./freegb.lib";
+  ring r = 0,(x,y,z),(dp);
+  list L;
+  module M;
+  M = [1,z,y],[-1,x]; // zy - x
+  L[1] = M;
+  M = [1,z,x],[-1,y]; // zx - y
+  L[2] = M;
+  M = [1,y,x],[-1,z]; // yx - z
+  L[3] = M;
+  lst2str(L);
+  list U = freegb(L,4);
+  lst2str(U);
+  // strange answer CHECK
+}
+
+proc ex_densep_2()
+{
+  option(prot);
+  LIB "freegb.lib";
+  ring r = (0,a,b,c),(x,y),(Dp); // deglex
+  module M = [1,x,x], [a,x,y], [b,y,x], [c,y,y];
+  lst2str(M);
+  list U = freegb(M,5);
+  lst2str(U);
+  // a=b is important -> finite basis!!!
+  module M = [1,x,x], [a,x,y], [a,y,x], [c,y,y];
+  lst2str(M);
+  list U = freegb(M,5);
+  lst2str(U);
+}
+
+
+// 1. form a new ring
 // 2. produce shifted generators
 // 3. compute GB
 // 4. skip shifted elts
 // 5. go back to orig vars, produce strings/modules
 // 6. return the result
 
-proc freegb(list LM, int d)
-"USAGE:  freegb(L, d);  L a list of modules, d an integer
+proc freegbold(list LM, int d)
+"USAGE:  freegbold(L, d);  L a list of modules, d an integer
 RETURN:  ring
 PURPOSE: compute the two-sided Groebner basis of an ideal, encoded by L in
 the free associative algebra, up to degree d
-EXAMPLE: example freegb; shows examples
+EXAMPLE: example freegbold; shows examples
 "
 {
   // d = up to degree, will be shifted to d+1
@@ -547,623 +1228,34 @@ example
   module N = [1,x,y,x],[-1,y,x,y];
   list L; L[1] = M; L[2] = N;
   lst2str(L);
-  def U = freegb(L,5);
+  def U = freegbold(L,5);
   lst2str(U);
 }
 
-// 1. form a new ring
-// 2. NOP
-// 3. compute GB -> with the kernel stuff
-// 4. skip shifted elts (check that no such exist?)
-// 5. go back to orig vars, produce strings/modules
-// 6. return the result
-
-proc freegbnew(list LM, int d)
-"USAGE:  freegb(L, d);  L a list of modules, d an integer
-RETURN:  ring
-PURPOSE: compute the two-sided Groebner basis of an ideal, encoded by L in
-the free associative algebra, up to degree d
-EXAMPLE: example freegb; shows examples
-"
+proc sgb(ideal I, int d)
 {
-  // d = up to degree, will be shifted to d+1
-  if (d<1) {"bad d"; return(0);}
-
-  int ppl = printlevel-voice+2;
-  string err = "";
-
-  int i,j,s;
+  // new code
+  // map x_i to x_i(1) via map()
+  //LIB "freegb.lib";
   def save = basering;
-  // determine max no of places in the input
-  int slm = size(LM); // numbers of polys in the ideal
-  int sm;
-  intvec iv;
-  module M;
-  for (i=1; i<=slm; i++)
+  //int d =7;// degree
+  int nv = nvars(save);
+  def R = freegbRing(d);
+  setring R;
+  int i;
+  ideal Imap;
+  for (i=1; i<=nv; i++)
   {
-    // modules, e.g. free polynomials
-    M  = LM[i];
-    sm = ncols(M);
-    for (j=1; j<=sm; j++)
-    {
-      //vectors, e.g. free monomials
-      iv = iv, size(M[j])-1; // 1 place is reserved by the coeff
-    }
+    Imap[i] = var(i);
   }
-  int D = Max(iv); // max size of input words
-  if (d<D) {"bad d"; return(LM);}
-  D = D + d-1;
-  //  D = d;
-  list LR  = ringlist(save);
-  list L, tmp;
-  L[1] = LR[1]; // ground field
-  L[4] = LR[4]; // quotient ideal
-  tmp  = LR[2]; // varnames
-  s = size(LR[2]);
-  for (i=1; i<=D; i++)
-  {
-    for (j=1; j<=s; j++)
-    {
-      tmp[i*s+j] = string(tmp[j])+"("+string(i+1)+")";
-    }
-  }
-  for (i=1; i<=s; i++)
-  {
-    tmp[i] = string(tmp[i])+"("+string(1)+")";
-  }
-  L[2] = tmp;
-  list OrigNames = LR[2];
-  // ordering: d blocks of the ord on r
-  // try to get whether the ord on r is blockord itself
-  s = size(LR[3]);
-  if (s==2)
-  {
-    // not a blockord, 1 block + module ord
-    tmp = LR[3][s]; // module ord
-    for (i=1; i<=D; i++)
-    {
-      LR[3][s-1+i] = LR[3][1];
-    }
-    LR[3][s+D] = tmp;
-  }
-  if (s>2)
-  {
-    // there are s-1 blocks
-    int nb = s-1;
-    tmp = LR[3][s]; // module ord
-    for (i=1; i<=D; i++)
-    {
-      for (j=1; j<=nb; j++)
-      {
-	LR[3][i*nb+j] = LR[3][j];
-      }
-    }
-    //    size(LR[3]);
-    LR[3][nb*(D+1)+1] = tmp;
-  }
-  L[3] = LR[3];
-  def @R = ring(L);
-  setring @R;
-  ideal I;
-  poly @p;
-  s = size(OrigNames);
-  //  "s:";s;
-  // convert LM to canonical vectors (no powers)
-  setring save;
-  kill M; // M was defined earlier
-  module M;
-  slm = size(LM); // numbers of polys in the ideal
-  int sv,k,l;
-  vector v;
-  //  poly p;
-  string sp;
-  setring @R;
-  poly @@p=0;
-  setring save;
-  for (l=1; l<=slm; l++)
-  {
-    // modules, e.g. free polynomials
-    M  = LM[l];
-    sm = ncols(M); // in intvec iv the sizes are stored
-    // modules, e.g. free polynomials
-    for (j=1; j<=sm; j++)
-    {
-      //vectors, e.g. free monomials
-      v  = M[j];
-      sv = size(v);
-      //	"sv:";sv;
-      sp = "@@p = @@p + ";
-      for (k=2; k<=sv; k++)
-      {
-	sp = sp + string(v[k])+"("+string(k-1)+")*";
-      }
-      sp = sp + string(v[1])+";"; // coef;
-      setring @R;
-      execute(sp);
-      setring save;
-    }
-    setring @R;
-    //      "@@p:"; @@p;
-    I = I,@@p;
-    @@p = 0;
-    setring save;
-  }
-  kill sp;
-  // 3. compute GB
-  setring @R;
-  dbprint(ppl,"computing GB");
-  //  ideal J = system("",I);
-  ideal J = slimgb(I); 
-  dbprint(ppl,J);
-  // 4. skip shifted elts
-  ideal K = select1(J,1,s); // s = size(OrigNames)
-  dbprint(ppl,K);
-  dbprint(ppl, "done with GB");
-  // K contains vars x(1),...z(1) = images of originals
-  // 5. go back to orig vars, produce strings/modules
-  if (K[1] == 0)
-  {
-    "no reasonable output, GB gives 0";
-    return(0);
-  }
-  int sk = size(K);
-  int sp, sx, a, b;
-  intvec x;
-  poly p,q;
-  poly pn;
-  // vars in 'save'
-  setring save;
-  module N;
-  list LN;
-  vector V;
-  poly pn;
-  // test and skip exponents >=2
-  setring @R;
-  for(i=1; i<=sk; i++)
-  {
-    p  = K[i];
-    while (p!=0)
-    {
-      q  = lead(p);
-      //      "processing q:";q;
-      x  = leadexp(q);
-      sx = size(x);
-      for(k=1; k<=sx; k++)
-      {
-	if ( x[k] >= 2 )
-	{
-	  err = "skip: the value x[k] is " + string(x[k]);
-	  dbprint(ppl,err);
-	  //	    return(0);
-	  K[i] = 0;
-	  p    = 0;
-	  q    = 0;
-	  break;
-	}
-      }
-      p  = p - q;
-    }
-  }
-  K  = simplify(K,2);
-  sk = size(K);
-  for(i=1; i<=sk; i++)
-  {
-    //    setring save;
-    //    V  = 0;
-    setring @R;
-    p  = K[i];
-    while (p!=0)
-    {
-      q  = lead(p);
-      err =  "processing q:" + string(q);
-      dbprint(ppl,err);
-      x  = leadexp(q);
-      sx = size(x);
-      pn = leadcoef(q);
-      setring save;
-      pn = imap(@R,pn);
-      V  = V + leadcoef(pn)*gen(1);
-      for(k=1; k<=sx; k++)
-      {
-	if (x[k] ==1)
-	{
-	  a = k / s; // block number=a+1, a!=0
-	  b = k % s; // remainder
-	  //	  printf("a: %s, b: %s",a,b);
-	  if (b == 0)
-	  {
-	    // that is it's the last var in the block
-	    b = s;
-	    a = a-1;
-	  }
-	  V = V + var(b)*gen(a+2);
-	}
-// 	else
-// 	{
-// 	  printf("error: the value x[k] is %s", x[k]);
-// 	  return(0);
-// 	}
-      }
-      err = "V: " + string(V);
-      dbprint(ppl,err);
-      //      printf("V: %s", string(V));
-      N = N,V;
-      V  = 0;
-      setring @R;
-      p  = p - q;
-      pn = 0;
-    }
-    setring save;
-    LN[i] = simplify(N,2);
-    N     = 0;
-  }
-  setring save;
-  return(LN);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y,z),(dp(1),dp(2));
-  module M = [-1,x,y],[-7,y,y],[3,x,x];
-  module N = [1,x,y,x],[-1,y,x,y];
-  list L; L[1] = M; L[2] = N;
-  lst2str(L);
-  def U = freegbnew(L,5);
-  lst2str(U);
-}
-
-proc crs(list LM, int d)
-"USAGE:  crs(L, d);  L a list of modules, d an integer
-RETURN:  ring
-PURPOSE: create a ring and shift the ideal
-EXAMPLE: example crs; shows examples
-"
-{
-  // d = up to degree, will be shifted to d+1
-  if (d<1) {"bad d"; return(0);}
-
-  int ppl = printlevel-voice+2;
-  string err = "";
-
-  int i,j,s;
-  def save = basering;
-  // determine max no of places in the input
-  int slm = size(LM); // numbers of polys in the ideal
-  int sm;
-  intvec iv;
-  module M;
-  for (i=1; i<=slm; i++)
-  {
-    // modules, e.g. free polynomials
-    M  = LM[i];
-    sm = ncols(M);
-    for (j=1; j<=sm; j++)
-    {
-      //vectors, e.g. free monomials
-      iv = iv, size(M[j])-1; // 1 place is reserved by the coeff
-    }
-  }
-  int D = Max(iv); // max size of input words
-  if (d<D) {"bad d"; return(LM);}
-  D = D + d-1;
-  //  D = d;
-  list LR  = ringlist(save);
-  list L, tmp;
-  L[1] = LR[1]; // ground field
-  L[4] = LR[4]; // quotient ideal
-  tmp  = LR[2]; // varnames
-  s = size(LR[2]);
-  for (i=1; i<=D; i++)
-  {
-    for (j=1; j<=s; j++)
-    {
-      tmp[i*s+j] = string(tmp[j])+"("+string(i)+")";
-    }
-  }
-  for (i=1; i<=s; i++)
-  {
-    tmp[i] = string(tmp[i])+"("+string(0)+")";
-  }
-  L[2] = tmp;
-  list OrigNames = LR[2];
-  // ordering: d blocks of the ord on r
-  // try to get whether the ord on r is blockord itself
-  s = size(LR[3]);
-  if (s==2)
-  {
-    // not a blockord, 1 block + module ord
-    tmp = LR[3][s]; // module ord
-    for (i=1; i<=D; i++)
-    {
-      LR[3][s-1+i] = LR[3][1];
-    }
-    LR[3][s+D] = tmp;
-  }
-  if (s>2)
-  {
-    // there are s-1 blocks
-    int nb = s-1;
-    tmp = LR[3][s]; // module ord
-    for (i=1; i<=D; i++)
-    {
-      for (j=1; j<=nb; j++)
-      {
-	LR[3][i*nb+j] = LR[3][j];
-      }
-    }
-    //    size(LR[3]);
-    LR[3][nb*(D+1)+1] = tmp;
-  }
-  L[3] = LR[3];
-  def @R = ring(L);
-  setring @R;
-  ideal I;
-  poly @p;
-  s = size(OrigNames);
-  //  "s:";s;
-  // convert LM to canonical vectors (no powers)
-  setring save;
-  kill M; // M was defined earlier
-  module M;
-  slm = size(LM); // numbers of polys in the ideal
-  int sv,k,l;
-  vector v;
-  //  poly p;
-  string sp;
-  setring @R;
-  poly @@p=0;
-  setring save;
-  for (l=1; l<=slm; l++)
-  {
-    // modules, e.g. free polynomials
-    M  = LM[l];
-    sm = ncols(M); // in intvec iv the sizes are stored
-    for (i=0; i<=d-iv[l]; i++)
-    {
-      // modules, e.g. free polynomials
-      for (j=1; j<=sm; j++)
-      {
-	//vectors, e.g. free monomials
-	v  = M[j];
-	sv = size(v);
-	//	"sv:";sv;
-	sp = "@@p = @@p + ";
-	for (k=2; k<=sv; k++)
-	{
-	  sp = sp + string(v[k])+"("+string(k-2+i)+")*";
-	}
-	sp = sp + string(v[1])+";"; // coef;
-	setring @R;
-	execute(sp);
-	setring save;
-      }
-      setring @R;
-      //      "@@p:"; @@p;
-      I = I,@@p;
-      @@p = 0;
-      setring save;
-    }
-  }
-  setring @R;
-  export I;
-  return(@R);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y,z),(dp(1),dp(2));
-  module M = [-1,x,y],[-7,y,y],[3,x,x];
-  module N = [1,x,y,x],[-1,y,x,y];
-  list L; L[1] = M; L[2] = N;
-  lst2str(L);
-  def U = crs(L,5);
-  setring U; U;
-  I;
-}
-
-proc ex_shift()
-{
-  LIB "freegb.lib";
-  ring r = 0,(x,y,z),(dp(1),dp(2));
-  module M = [-1,x,y],[-7,y,y],[3,x,x];
-  module N = [1,x,y,x],[-1,y,x,y];
-  list L; L[1] = M; L[2] = N;
-  lst2str(L);
-  def U = crs(L,5);
-  setring U; U;
-  I;
-  poly p = I[2]; // I[8];
-  p;
-  system("stest",p,7,7,3); // error -> the world is ok
-  poly q1 = system("stest",p,1,7,3); //ok
-  poly q6 = system("stest",p,6,7,3); //ok
-  system("btest",p,3); //ok
-  system("btest",q1,3); //ok
-  system("btest",q6,3); //ok
-}
-
-proc ex2()
-{
+  //ideal I = x(1)*y(2), y(1)*x(2)+z(1)*z(2);
+  ideal I = x(1)*x(2),x(1)*y(2) + z(1)*x(2);
   option(prot);
-  LIB "freegb.lib";
-  ring r = 0,(x,y),dp;
-  module M = [-1,x,y],[3,x,x]; // 3x^2 - xy
-  def U = freegb(M,7);
-  lst2str(U);
-}
-
-proc ex_nonhomog()
-{
-  option(prot);
-  LIB "freegb.lib";
-  ring r = 0,(x,y,h),dp;
-  list L;
-  module M;
-  M = [-1,y,y],[1,x,x,x];  // x3-y2
-  L[1] = M;
-  M = [1,x,h],[-1,h,x];  // xh-hx
-  L[2] = M;
-  M = [1,y,h],[-1,h,y];  // yh-hy
-  L[3] = M;
-  def U = freegb(L,4);
-  lst2str(U);
-  // strange elements in the basis
-}
-
-proc ex_nonhomog_comm()
-{
-  option(prot);
-  LIB "freegb.lib";
-  ring r = 0,(x,y),dp;
-  module M = [-1,y,y],[1,x,x,x];
-  def U = freegb(M,5);
-  lst2str(U);
-}
-
-proc ex_nonhomog_h()
-{
-  option(prot);
-  LIB "freegb.lib";
-  ring r = 0,(x,y,h),(a(1,1),dp);
-  module M = [-1,y,y,h],[1,x,x,x]; // x3 - y2h
-  def U = freegb(M,6);
-  lst2str(U);
-}
-
-proc ex_nonhomog_h2()
-{
-  option(prot);
-  LIB "freegb.lib";
-  ring r = 0,(x,y,h),(dp);
-  list L;
-  module M;
-  M = [-1,y,y,h],[1,x,x,x]; // x3 - y2h
-  L[1] = M;
-  M = [1,x,h],[-1,h,x]; // xh - hx
-  L[2] = M;
-  M = [1,y,h],[-1,h,y]; // yh - hy
-  L[3] = M;
-  def U = freegb(L,3);
-  lst2str(U);
-  // strange answer CHECK
+  //option(teach);
+  ideal J = system("freegb",I,d,nv);
 }
 
 
-proc ex_nonhomog_3()
-{
-  option(prot);
-  LIB "./freegb.lib";
-  ring r = 0,(x,y,z),(dp);
-  list L;
-  module M;
-  M = [1,z,y],[-1,x]; // zy - x
-  L[1] = M;
-  M = [1,z,x],[-1,y]; // zx - y
-  L[2] = M;
-  M = [1,y,x],[-1,z]; // yx - z
-  L[3] = M;
-  lst2str(L);
-  list U = freegb(L,4);
-  lst2str(U);
-  // strange answer CHECK
-}
-
-
-
-proc ex_densep_2()
-{
-  option(prot);
-  LIB "freegb.lib";
-  ring r = (0,a,b,c),(x,y),(Dp); // deglex
-  module M = [1,x,x], [a,x,y], [b,y,x], [c,y,y];
-  lst2str(M);
-  list U = freegb(M,5);
-  lst2str(U);
-  // a=b is important -> finite basis!!!
-  module M = [1,x,x], [a,x,y], [a,y,x], [c,y,y];
-  lst2str(M);
-  list U = freegb(M,5);
-  lst2str(U);
-}
-
-
-proc freegbRing(int d)
-"USAGE:  freegbRing(d); d an integer
-RETURN:  ring
-PURPOSE: creates a d-shifted ring
-EXAMPLE: example freegbRing; shows examples
-"
-{
-  // d = up to degree, will be shifted to d+1
-  if (d<1) {"bad d"; return(0);}
-
-  int ppl = printlevel-voice+2;
-  string err = "";
-
-  int i,j,s;
-  def save = basering;
-  int D = d-1;
-  list LR  = ringlist(save);
-  list L, tmp;
-  L[1] = LR[1]; // ground field
-  L[4] = LR[4]; // quotient ideal
-  tmp  = LR[2]; // varnames
-  s = size(LR[2]);
-  for (i=1; i<=D; i++)
-  {
-    for (j=1; j<=s; j++)
-    {
-      tmp[i*s+j] = string(tmp[j])+"("+string(i+1)+")";
-    }
-  }
-  for (i=1; i<=s; i++)
-  {
-    tmp[i] = string(tmp[i])+"("+string(1)+")";
-  }
-  L[2] = tmp;
-  list OrigNames = LR[2];
-  // ordering: d blocks of the ord on r
-  // try to get whether the ord on r is blockord itself
-  // TODO: make L(2) ordering! exponent is maximally 2
-  s = size(LR[3]);
-  if (s==2)
-  {
-    // not a blockord, 1 block + module ord
-    tmp = LR[3][s]; // module ord
-    for (i=1; i<=D; i++)
-    {
-      LR[3][s-1+i] = LR[3][1];
-    }
-    LR[3][s+D] = tmp;
-  }
-  if (s>2)
-  {
-    // there are s-1 blocks
-    int nb = s-1;
-    tmp = LR[3][s]; // module ord
-    for (i=1; i<=D; i++)
-    {
-      for (j=1; j<=nb; j++)
-      {
-	LR[3][i*nb+j] = LR[3][j];
-      }
-    }
-    //    size(LR[3]);
-    LR[3][nb*(D+1)+1] = tmp;
-  }
-  L[3] = LR[3];
-  def @R = ring(L);
-  //  setring @R;
-  return (@R);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y,z),(dp(1),dp(2));
-  def A = freegbRing(2);
-  setring A;
-  A;
-}
 
 static proc checkCeq()
 {
@@ -1254,4 +1346,13 @@ static proc test3()
   option(prot);
   option(teach);
   ideal J = system("freegb",I,d,3);
+}
+
+proc schur2-3()
+{
+  // nonhomog:
+  //  h^4-10*h^2+9,f*e-e*f+h, h*2-e*h-2*e,h*f-f*h+2*f
+  // homogenized with t
+  //  h^4-10*h^2*t^2+9*t^4,f*e-e*f+h*t, h*2-e*h-2*e*t,h*f-f*h+2*f*t,
+  // t*h - h*t, t*f - f*t, t*e - e*t
 }

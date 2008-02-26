@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmodapp.lib,v 1.3 2008-02-08 23:28:01 levandov Exp $";
+version="$Id: dmodapp.lib,v 1.4 2008-02-26 23:36:12 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmodapp.lib     Applications of algebraic D-modules
@@ -90,7 +90,7 @@ EXAMPLE: example annfs; shows examples
   // comm ring is ready
   setring @U;
   // make @U noncommutative
-  //  matrix @C = imap(save,@C);
+  matrix @C = imap(save,@C);
   matrix @D = imap(save,@D);
   def @@U = nc_algebra(@C,@D);
   setring @@U; kill @U;
@@ -103,7 +103,6 @@ EXAMPLE: example annfs; shows examples
   //  CV = groebner(CV); // cosmetics
   CV = slimgb(CV);
   export CV;
-  kill @U;
   return(@CU);
 }
 example
