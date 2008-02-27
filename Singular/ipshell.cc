@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.178 2008-02-22 11:14:16 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.179 2008-02-27 15:15:35 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -4696,6 +4696,163 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   if (pn != NULL) pn->CleanUp();
   if (rv != NULL) rv->CleanUp();
   if (ord != NULL) ord->CleanUp();
+  return NULL;
+}
+
+ring rSubring(ring org_ring, sleftv* rv)
+{
+  ring R = rCopy0(org_ring);
+  int *perm=(int *)omAlloc0((org_ring->N+1)*sizeof(int));
+  int last = 0, o=0, n = rBlocks(org_ring), i=0, typ = 1, j;
+
+  /* names and number of variables-------------------------------------*/
+  {
+    int l=rv->listLength();
+    if (l>MAX_SHORT)
+    {
+      Werror("too many ring variables(%d), max is %d",l,MAX_SHORT);
+       goto rInitError;
+    }
+    R->N = l; /*rv->listLength();*/
+  }
+  omFree(R->names);
+  R->names   = (char **)omAlloc0(R->N * sizeof(char_ptr));
+  if (rSleftvList2StringArray(rv, R->names))
+  {
+    WerrorS("name of ring variable expected");
+    goto rInitError;
+  }
+
+  /* check names for subring in org_ring ------------------------- */
+  {
+    i=0;
+    
+    for(j=0;j<R->N;j++)
+    {
+      for(;i<org_ring->N;i++)
+      {
+        if (strcmp(org_ring->names[i],R->names[j])==0)
+        {
+          perm[i+1]=j+1;
+          break;
+        }
+      }
+      if (i>org_ring->N)
+      {
+        Werror("variable %d (%s) not in basering",j+1,R->names[j]);
+        break;
+      }
+    }
+  }
+  /* ordering -------------------------------------------------------------*/
+
+  for(i=0;i<n;i++)
+  {
+    int min_var=-1;
+    int max_var=-1;
+    for(j=R->block0[i];j<=R->block1[i];j++)
+    {
+      if (perm[j]>0)
+      {
+        if (min_var==-1) min_var=perm[j];
+        max_var=perm[j];
+      }
+    }
+    if (min_var!=-1)
+    {
+      //Print("block %d: old %d..%d, now:%d..%d\n",
+      //      i,R->block0[i],R->block1[i],min_var,max_var);
+      R->block0[i]=min_var;
+      R->block1[i]=max_var;
+      if (R->wvhdl[i]!=NULL)
+      {
+        omFree(R->wvhdl[i]);
+        R->wvhdl[i]=(int*)omAlloc0((max_var-min_var+1)*sizeof(int));
+        for(j=R->block0[i];j<=R->block1[i];j++)
+        {
+          if (perm[j]>0)
+            R->wvhdl[i][j-R->block0[i]]=
+                org_ring->wvhdl[i][perm[j]-org_ring->block0[i]]; 
+        }
+      }
+    }
+    else
+    {
+      if(R->block0[i]>0)
+      { 
+        //Print("skip block %d\n",i);
+        R->order[i]=ringorder_unspec;
+        if (R->wvhdl[i] !=NULL) omFree(R->wvhdl[i]);
+        R->wvhdl[i]=NULL;
+      }
+      //else Print("keep block %d\n",i);
+    }
+  }   
+  i=n-1;
+  while(i>0)
+  {
+    // removed unneded blocks
+    if(R->order[i-1]==ringorder_unspec)
+    {
+      for(j=i;j<=n;j++)
+      {
+        R->order[j-1]=R->order[j];
+        R->block0[j-1]=R->block0[j];
+        R->block1[j-1]=R->block1[j];
+        if (R->wvhdl[j-1] !=NULL) omFree(R->wvhdl[j-1]);
+        R->wvhdl[j-1]=R->wvhdl[j];
+      }
+      R->order[n]=ringorder_unspec;
+      n--;
+    }
+    i--;
+  }
+  n=rBlocks(org_ring)-1; 
+  while (R->order[n]==0)  n--;
+  while (R->order[n]==ringorder_unspec)  n--;
+  if ((R->order[n]==ringorder_c) ||  (R->order[n]==ringorder_C)) n--;
+  if (R->block1[n] != R->N)
+  {
+    if (((R->order[n]==ringorder_dp) ||
+         (R->order[n]==ringorder_ds) ||
+         (R->order[n]==ringorder_Dp) ||
+         (R->order[n]==ringorder_Ds) ||
+         (R->order[n]==ringorder_rp) ||
+         (R->order[n]==ringorder_rs) ||
+         (R->order[n]==ringorder_lp) ||
+         (R->order[n]==ringorder_ls))
+        &&
+        R->block0[n] <= R->N)
+    {
+      R->block1[n] = R->N;
+    }
+    else
+    {
+      Werror("mismatch of number of vars (%d) and ordering (%d vars) in block %d",
+             R->N,R->block1[n],n);
+      return NULL;
+    }
+  }
+  omFree(perm);
+  // find OrdSgn:
+  R->OrdSgn = org_ring->OrdSgn; // IMPROVE!
+  //for(i=1;i<=R->N;i++)
+  //{ if (weights[i]<0) { R->OrdSgn=-1;break; }}
+  //omFree(weights);
+  // Complete the initialization
+  if (rComplete(R,1))
+    goto rInitError;
+
+  rTest(R);
+
+  if (rv != NULL) rv->CleanUp();
+
+  return R;
+
+  // error case:
+  rInitError:
+  if  (R != NULL) rDelete(R);
+  if (rv != NULL) rv->CleanUp();
   return NULL;
 }
 
