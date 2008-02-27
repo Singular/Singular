@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.263 2008-02-15 17:12:09 levandov Exp $ */
+/* $Id: extra.cc,v 1.264 2008-02-27 15:05:58 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -3000,6 +3000,19 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
+/*==================== subring =================*/
+    if (strcmp(sys_cmd, "subring") == 0)
+    {
+      if (h!=NULL)
+      {
+	extern ring rSubring(ring r,leftv v); /* ipshell.cc*/
+	res->data=(char *)rSubring(currRing,h);
+	res->rtyp=RING_CMD;
+        return res->data==NULL;
+      }
+      else return TRUE;
+    }
+    else
 #ifdef ix86_Win
 /*==================== Python Singular =================*/
     if (strcmp(sys_cmd, "python") == 0)
