@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.75 2008-02-04 13:18:02 Singular Exp $ */
+/* $Id: ring.cc,v 1.76 2008-03-04 15:43:50 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -173,6 +173,7 @@ ring rDefault(int ch, int N, char **n)
 //
 // rInit: define a new ring from sleftv's
 //
+//-> ipshell.cc
 
 /////////////////////////////
 // Auxillary functions
