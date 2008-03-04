@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.47 2008-03-04 14:58:35 Singular Exp $ */
+/* $Id: ideals.cc,v 1.48 2008-03-04 15:31:54 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2339,43 +2339,35 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   h3=idInit(16,h1->rank);
   for (k=0;; k++)
   {
-    if (currRing->order[k]!=0) ordersize++;
+    if (origR->order[k]!=0) ordersize++;
     else break;
   }
   ord=(int*)omAlloc0(ordersize*sizeof(int));
   block0=(int*)omAlloc(ordersize*sizeof(int));
   block1=(int*)omAlloc(ordersize*sizeof(int));
-  for (k=0;; k++)
+  for (k=0;k<ordersize-1; k++)
   {
-    if (currRing->order[k]!=0)
-    {
-      block0[k+1] = currRing->block0[k];
-      block1[k+1] = currRing->block1[k];
-      ord[k+1] = currRing->order[k];
-    }
-    else
-      break;
+    block0[k+1] = origR->block0[k];
+    block1[k+1] = origR->block1[k];
+    ord[k+1] = origR->order[k];
   }
   block0[0] = 1;
-  block1[0] = pVariables;
+  block1[0] = rVar(origR);
   wv=(int**) omAlloc0(ordersize*sizeof(int**));
   memcpy4(wv+1,currRing->wvhdl,(ordersize-1)*sizeof(int**));
   wv[0]=(int*)omAlloc((pVariables+1)*sizeof(int));
   memset(wv[0],0,(pVariables+1)*sizeof(int));
-  for (j=0;j<pVariables;j++)
+  for (j=0;j<rVar(origR);j++)
     if (pGetExp(delVar,j+1)!=0) wv[0][j]=1;
   // use this special ordering: like ringorder_a, except that pFDeg, pWeights
   // ignore it
   ord[0] = ringorder_aa;
 
   // fill in tmp ring to get back the data later on
-  tmpR  = rCopy0(origR);
-  omFree(tmpR->order); tmpR->order = ord;
-  omFree(tmpR->block0); tmpR->block0 = block0;
-  omFree(tmpR->block1); tmpR->block1 = block0;
-  for(k=rBlocks(origR); k>=0; k--)
-  { if (tmpR->wvhdl[k]!=NULL) omFree(tmpR->wvhdl[k]); }
-  omFree(tmpR->wvhdl);
+  tmpR  = rCopy0(origR,FALSE,FALSE); // qring==NULL
+  tmpR->order = ord;
+  tmpR->block0 = block0;
+  tmpR->block1 = block1;
   tmpR->wvhdl = wv;
   rComplete(tmpR, 1);
 
