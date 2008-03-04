@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.46 2008-02-01 13:45:37 Singular Exp $ */
+/* $Id: ideals.cc,v 1.47 2008-03-04 14:58:35 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2307,7 +2307,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   int    **wv;
   tHomog hom;
   intvec * w;
-  sip_sring tmpR;
+  ring tmpR;
   ring origR = currRing;
 
   if (delVar==NULL)
@@ -2369,19 +2369,22 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   ord[0] = ringorder_aa;
 
   // fill in tmp ring to get back the data later on
-  tmpR  = *origR;
-  tmpR.order = ord;
-  tmpR.block0 = block0;
-  tmpR.block1 = block1;
-  tmpR.wvhdl = wv;
-  rComplete(&tmpR, 1);
+  tmpR  = rCopy0(origR);
+  omFree(tmpR->order); tmpR->order = ord;
+  omFree(tmpR->block0); tmpR->block0 = block0;
+  omFree(tmpR->block1); tmpR->block1 = block0;
+  for(k=rBlocks(origR); k>=0; k--)
+  { if (tmpR->wvhdl[k]!=NULL) omFree(tmpR->wvhdl[k]); }
+  omFree(tmpR->wvhdl);
+  tmpR->wvhdl = wv;
+  rComplete(tmpR, 1);
 
 #ifdef HAVE_PLURAL
   /* update nc structure on tmpR */
   if (rIsPluralRing(currRing))
   {
     BOOLEAN bBAD = FALSE;
-    if ( nc_rComplete(origR, &tmpR) )
+    if ( nc_rComplete(origR, tmpR) )
     {
       Werror("error in nc_rComplete");
       bBAD = TRUE;
@@ -2389,7 +2392,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
     if (!bBAD)
     {
       /* tests the admissibility of the new elim. ordering */
-      if ( nc_CheckOrdCondition( (&tmpR)->nc->D, &tmpR) )
+      if ( nc_CheckOrdCondition( tmpR->nc->D, tmpR) )
       {
         Werror("no elimination is possible: ordering condition is violated");
         bBAD = TRUE;
@@ -2398,12 +2401,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
     if (bBAD)
     {
       // cleanup
-      omFree((ADDRESS)wv[0]);
-      omFreeSize((ADDRESS)wv,ordersize*sizeof(int**));
-      omFreeSize((ADDRESS)ord,ordersize*sizeof(int));
-      omFreeSize((ADDRESS)block0,ordersize*sizeof(int));
-      omFreeSize((ADDRESS)block1,ordersize*sizeof(int));
-      rUnComplete(&tmpR);
+      rDelete(tmpR);
       if (w!=NULL)
       {
         delete w;
@@ -2414,7 +2412,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
 #endif
   // change into the new ring
   //pChangeRing(pVariables,currRing->OrdSgn,ord,block0,block1,wv);
-  rChangeCurrRing(&tmpR);
+  rChangeCurrRing(tmpR);
 
   h = idInit(IDELEMS(h1),h1->rank);
   // fetch data from the old ring
@@ -2436,7 +2434,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   for (k=0; k<=i; k++)
   {
     l=pVariables;
-    while ((l>0) && (p_GetExp( hh->m[k],l,&tmpR)*pGetExp(delVar,l)==0)) l--;
+    while ((l>0) && (p_GetExp( hh->m[k],l,tmpR)*pGetExp(delVar,l)==0)) l--;
     if (l==0)
     {
       j++;
@@ -2445,17 +2443,12 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
         pEnlargeSet(&(h3->m),IDELEMS(h3),16);
         IDELEMS(h3) += 16;
       }
-      h3->m[j] = prCopyR( hh->m[k], &tmpR);
+      h3->m[j] = prCopyR( hh->m[k], tmpR);
     }
   }
-  id_Delete(&hh, &tmpR);
+  id_Delete(&hh, tmpR);
   idSkipZeroes(h3);
-  omFree((ADDRESS)wv[0]);
-  omFreeSize((ADDRESS)wv,ordersize*sizeof(int**));
-  omFreeSize((ADDRESS)ord,ordersize*sizeof(int));
-  omFreeSize((ADDRESS)block0,ordersize*sizeof(int));
-  omFreeSize((ADDRESS)block1,ordersize*sizeof(int));
-  rUnComplete(&tmpR);
+  rDelete(tmpR);
   if (w!=NULL)
     delete w;
   return h3;
