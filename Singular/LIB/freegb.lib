@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: freegb.lib,v 1.7 2008-02-26 23:36:12 levandov Exp $";
+version="$Id: freegb.lib,v 1.8 2008-03-13 19:26:16 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: ratgb.lib  Twosided Noncommutative Groebner bases in Free Algebras
@@ -862,6 +862,33 @@ proc ex_shift()
   system("btest",p,3); //ok
   system("btest",q1,3); //ok
   system("btest",q6,3); //ok
+}
+
+proc test_shrink()
+{
+  LIB "freegb.lib";
+  ring r =0,(x,y,z),dp;
+  int d = 5;
+  def R = freegbRing(d);
+  setring R;
+  poly p1 = x(1)*y(2)*z(3);
+  poly p2 = x(1)*y(4)*z(5);
+  poly p3 = x(1)*y(1)*z(3);
+  poly p4 = x(1)*y(2)*z(2);
+  poly p5 = x(3)*z(5);
+  poly p6 = x(1)*y(1)*x(3)*z(5);
+  poly p7 = x(1)*y(2)*x(3)*y(4)*z(5);
+  poly p8 = p1+p2+p3+p4+p5 + p6 + p7;
+  p1; system("shrinktest",p1,3);
+  p2; system("shrinktest",p2,3);
+  p3; system("shrinktest",p3,3);
+  p4; system("shrinktest",p4,3);
+  p5; system("shrinktest",p5,3);
+  p6; system("shrinktest",p6,3);
+  p7; system("shrinktest",p7,3);
+  p8; system("shrinktest",p8,3);
+  poly p9 = p1 + 2*p2 + 5*p5 + 7*p7;
+  p9; system("shrinktest",p9,3);
 }
 
 proc ex2()
