@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shiftgb.cc,v 1.6 2008-02-24 17:41:32 levandov Exp $ */
+/* $Id: shiftgb.cc,v 1.7 2008-03-13 19:25:49 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for shift GB and free GB
 */
@@ -40,6 +40,7 @@
 
 
 /* TODO: write p* stuff as instances of p_* for all the functions */
+/* p_* functions are new, p* are old */
 
 poly p_LPshiftT(poly p, int sh, int uptodeg, int lV, kStrategy strat, const ring r)
 {
@@ -51,7 +52,7 @@ poly p_LPshiftT(poly p, int sh, int uptodeg, int lV, kStrategy strat, const ring
   assume(p_LmCheckIsFromRing(p,r));
   assume(p_CheckIsFromRing(pNext(p),strat->tailRing));
 
-  /* assume sh and uptodeg agree */
+  /* assume sh and uptodeg agree  TODO check */
 
   if (sh == 0) return(p); /* the zero shift */
 
@@ -73,29 +74,26 @@ poly p_LPshiftT(poly p, int sh, int uptodeg, int lV, kStrategy strat, const ring
 poly p_LPshift(poly p, int sh, int uptodeg, int lV, const ring r)
 {
   /* assume shift takes place */
-  /* shifts the poly p by sh */
-  /* deletes p */
+  /* shifts the poly p from the ring r by sh */
 
-  /* assume sh and uptodeg agree */
+  /* assume sh and uptodeg agree TODO check */
 
   if (p==NULL) return(p);
   if (sh == 0) return(p); /* the zero shift */
 
   poly q  = NULL;
-  poly pp = p; // pCopy(p);
+  poly pp = p; // do not take copies
   while (pp!=NULL)
   {
     q = p_Add_q(q, p_mLPshift(pp,sh,uptodeg,lV,r),r);
     pIter(pp);
   }
-  /* delete pp? */
-  /* int version: returns TRUE if it was successful */
   return(q);
 }
 
 poly p_mLPshift(poly p, int sh, int uptodeg, int lV, const ring r)
 {
-  /* pm is a monomial */
+  /* p is a monomial from the ring r */
 
   if (sh == 0) return(p); /* the zero shift */
 
@@ -118,7 +116,7 @@ poly p_mLPshift(poly p, int sh, int uptodeg, int lV, const ring r)
   int *e=(int *)omAlloc0((r->N+1)*sizeof(int));
   int *s=(int *)omAlloc0((r->N+1)*sizeof(int));
   p_GetExpV(p,e,r);
-  number c = pGetCoeff(p);
+
   int j;
   //  for (j=1; j<=r->N; j++) 
   // L*lV gives the last position of the last block
@@ -127,25 +125,30 @@ poly p_mLPshift(poly p, int sh, int uptodeg, int lV, const ring r)
     if (e[j]==1)
     {
       s[j + (sh*lV)] = e[j]; /* actually 1 */
+#ifdef PDEBUG
       omCheckAddr(s);
+#endif
     }
+#ifdef PDEBUG
     else 
     {
       if (e[j]!=0)
       {
-#ifdef PDEBUG
-         Print("p_mLPshift: ex[%d]=%d\n",j,e[j]);
-#endif
+	//         Print("p_mLPshift: ex[%d]=%d\n",j,e[j]);
       }
     }
+#endif
   }
   poly m = p_ISet(1,r);
   p_SetExpV(m,s,r);
-  /*  pSetm(m); */ /* done in the pSetExpV */
-  /* think on the component */
-  pSetCoeff0(m,c);
   freeT(e, r->N);
   freeT(s, r->N);
+  /*  pSetm(m); */ /* done in the pSetExpV */
+  /* think on the component and coefficient */
+  //  number c = pGetCoeff(p);
+  //  p_SetCoeff0(m,p_GetCoeff(p,r),r);
+  p_SetComp(m,p_GetComp(p,r),r); // component is preserved
+  p_SetCoeff0(m,p_GetCoeff(p,r),r);  // coeff is preserved 
   return(m);
 }
 
@@ -201,7 +204,7 @@ poly pmLPshift(poly p, int sh, int uptodeg, int lV)
   int j;
   for (j=1; j<=currRing->N; j++)
   {
-    if (e[j])
+    if (e[j]==1)
     {
       s[j + (sh*lV)] = e[j]; /* actually 1 */
     }
@@ -370,18 +373,19 @@ int pmFirstVblock(poly p, int lV)
 }
 
   /* there should be two routines: */
-  /* 1. tests squarefreeness: in homog this suffices */
+  /* 1. test place-squarefreeness: in homog this suffices: isInV */
   /* 2. test the presence of a hole -> in the tail??? */
 
 int isInV(poly p, int lV)
 {
-
+  /* investigate only the leading monomial of p in currRing */
   if (lV <= 0) return(0);
   /* returns 1 iff p is in V */
   /* that is in each block up to a certain one there is only one nonzero exponent */
   /* lV = the length of V = the number of orig vars */
   int *e = (int *)omAlloc0((currRing->N+1)*sizeof(int));
-  int  b = (int)(currRing->N)/lV; /* the number of blocks */
+  int  b = (int)((currRing->N +lV-1)/lV); /* the number of blocks */
+  //int b  = (int)(currRing->N)/lV; 
   int *B = (int *)omAlloc0((b+1)*sizeof(int)); /* the num of elements in a block */
   pGetExpV(p,e);
   int i,j;
@@ -394,33 +398,39 @@ int isInV(poly p, int lV)
       if (e[i]) B[j] = B[j]+1;
     }
   }
-  j = b;
+  //  j = b;
   //  while ( (!B[j]) && (j>=1)) j--;
   for (j=b; j>=1; j--)
   {
     if (B[j]!=0) break;
   }
+  /* do not need e anymore */
+  freeT(e, currRing->N);
 
-  if (j==0)
-  {
-    /* it is a zero exp vector, which is in V */
-    return(1);
-  }
-  /* now B[j] != 0 */
+  if (j==0) goto ret_true;
+//   {
+//     /* it is a zero exp vector, which is in V */
+//     freeT(B, b);
+//     return(1);
+//   }
+  /* now B[j] != 0 and we test place-squarefreeness */
   for (j; j>=1; j--)
   {
     if (B[j]!=1)
     {
+      freeT(B, b);
       return(0);
     }
   }
+ ret_true:
+  freeT(B, b);
   return(1);
 }
 
 int itoInsert(poly p, int uptodeg, int lV, const ring r)
 {
   /* for poly in lmCR/tailTR presentation */
-  /* the below situation might happen! */
+  /* the below situation (commented out) might happen! */
 //   if (r == currRing)
 //   {
 //     "Current ring is not expected in toInsert";
@@ -438,6 +448,102 @@ int itoInsert(poly p, int uptodeg, int lV, const ring r)
   return(i);
 }
 
+poly p_ShrinkT(poly p, int lV, kStrategy strat, const ring r)
+//poly p_Shrink(poly p, int uptodeg, int lV, kStrategy strat, const ring r)
+{
+  /* p is like TObject: lm in currRing = r, tail in tailRing  */
+  /* proc shrinks the poly p in ring r */
+  /* lV = the length of V = the number of orig vars */
+  /* check assumes/exceptions */
+  /* r->N is a multiple of lV */
+
+  if (p==NULL) return(p);
+
+  assume(p_LmCheckIsFromRing(p,r));
+  assume(p_CheckIsFromRing(pNext(p),strat->tailRing));
+
+  poly q   = NULL;
+  poly s   = p_mShrink(p, lV, r); // lm in currRing
+  poly pp = pNext(p);
+  
+  while (pp != NULL)
+  {
+    //    q = p_Add_q(q, p_mShrink(pp,uptodeg,lV,strat->tailRing),strat->tailRing);
+    q = p_Add_q(q, p_mShrink(pp,lV,strat->tailRing),strat->tailRing);
+    pIter(pp);
+  }
+  pNext(s) = q;
+  return(s);
+}
+
+poly p_Shrink(poly p, int lV, const ring r)
+{
+  /* proc shrinks the poly p in ring r */
+  /* lV = the length of V = the number of orig vars */
+  /* check assumes/exceptions */
+  /* r->N is a multiple of lV */
+
+  if (p==NULL) return(p);
+  assume(p_CheckIsFromRing(p,r));
+  poly q = NULL;
+  poly pp = p;
+  
+  while (pp != NULL)
+  {
+    q = p_Add_q(q, p_mShrink(pp,lV,r),r);
+    pIter(pp);
+  }
+  return(q);
+}
+
+poly p_mShrink(poly p, int lV, const ring r)
+{
+  /* shrinks the monomial p in ring r */
+  /* lV = the length of V = the number of orig vars */
+
+  /* check assumes/exceptions */
+  /* r->N is a multiple of lV */
+
+  int *e = (int *)omAlloc0((r->N+1)*sizeof(int));
+  int  b = (int)((r->N +lV-1)/lV); /* the number of blocks */
+  //  int *B = (int *)omAlloc0((b+1)*sizeof(int)); /* the num of elements in a block */
+  int *S = (int *)omAlloc0((r->N+1)*sizeof(int)); /* the shrinked exponent */
+  p_GetExpV(p,e,r);
+  int i,j; int cnt = 1; //counter for blocks in S
+  for (j=1; j<=b; j++)
+  {
+    /* we go through all the vars */
+    /* by blocks in lV vars */
+    for (i=(j-1)*lV + 1; i<= j*lV; i++)
+    {
+      if (e[i]==1) 
+      {
+	//      B[j] = B[j]+1; // for control in V?
+         S[(cnt-1)*lV + (i - (j-1)*lV)] = e[i];
+         /* assuming we are in V, can interrupt here */
+         cnt++;
+         //  break; //results in incomplete shrink!
+         i = j*lV; // manual break under assumption p is in V
+      }
+    }
+  }
+#ifdef PDEBUG
+  //  Print("p_mShrink: cnt = [%d], b = %d\n",cnt,b);
+#endif
+  // cnt -1 <= b  must hold!
+  //  freeT(B, b);
+  poly s = p_ISet(1,r);
+  p_SetExpV(s,S,r);
+  freeT(e, r->N);
+  freeT(S, r->N);
+  /*  p_Setm(s,r); // done by p_SetExpV */
+  p_SetComp(s,p_GetComp(p,r),r); // component is preserved
+  p_SetCoeff(s,p_GetCoeff(p,r),r);  // coeff is preserved 
+#ifdef PDEBUG
+  //  Print("p_mShrink: from "); p_wrp(p,r); Print(" to "); p_wrp(s,r); PrintLn();
+#endif
+  return(s);
+}
 
 /* shiftgb stuff */
 

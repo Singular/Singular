@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shiftgb.h,v 1.3 2008-02-23 20:12:53 levandov Exp $ */
+/* $Id: shiftgb.h,v 1.4 2008-03-13 19:25:49 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -13,6 +13,12 @@
 
 poly p_LPshiftT(poly p, int sh, int uptodeg, int lV, kStrategy strat, const ring r);
 int p_LastVblockT(poly p, int lV, kStrategy strat, const ring r);
+
+poly p_ShrinkT(poly p, int lV, kStrategy strat, const ring r);
+poly p_Shrink(poly p, int lV, const ring r);
+poly p_mShrink(poly p, int lV, const ring r);
+//poly p_Shrink(poly p, int uptodeg, int lV, kStrategy strat, const ring r);
+//poly p_mShrink(poly p, int uptodeg, int lV, const ring r);
 
 poly p_LPshift(poly p, int sh, int uptodeg, int lV,const ring r);
 poly p_mLPshift(poly p, int sh, int uptodeg, int lV,const ring r);

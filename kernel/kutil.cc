@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.87 2008-02-26 23:35:30 levandov Exp $ */
+/* $Id: kutil.cc,v 1.88 2008-03-13 19:25:48 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -6260,7 +6260,7 @@ void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy st
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
-      Print("entered ManyShifts: with toInsert=%d",toInsert); PrintLn();
+      //      Print("entered ManyShifts: with toInsert=%d",toInsert); PrintLn();
     }
 #endif
 
@@ -6299,11 +6299,7 @@ void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy st
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
-      PrintS("ManyShifts: calling enterOnePairShift(q,p)");
-//       wrp(q); //     wrp(pHead(q));
-//       PrintS(", p = ");
-//       wrp(p); //wrp(pHead(p)); 
-      PrintLn();
+      //      PrintS("ManyShifts: calling enterOnePairShift(q,p)");      PrintLn();
     }
 #endif
     enterOnePairShift(q, p, ecart, isFromQ, strat, -1, ecartq, qfromQ, j, i, uptodeg, lV);
@@ -6341,7 +6337,7 @@ void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
-      Print("entered SelfShifts: with toInsert=%d",toInsert); PrintLn();
+      //      Print("entered SelfShifts: with toInsert=%d",toInsert); PrintLn();
     }
 #endif
 
@@ -6367,11 +6363,7 @@ void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
-      PrintS("SelfShifts: calling enterOnePairShift(q,p)");
-//       wrp(q); //     wrp(pHead(q));
-//       PrintS(", p = ");
-//       wrp(p); //wrp(pHead(p)); 
-      PrintLn();
+      //      PrintS("SelfShifts: calling enterOnePairShift(q,p)");      PrintLn();
     }
 #endif
     enterOnePairShift(q, p, ecart, isFromQ, strat, -1, ecartq, qfromQ, j, -1, uptodeg, lV);
@@ -6395,11 +6387,11 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
-      PrintS("enterOnePairShift(q,p) invoked with q = ");
-      wrp(q); //      wrp(pHead(q));
-      PrintS(", p = ");
-      wrp(p); //wrp(pHead(p)); 
-      PrintLn();
+//       PrintS("enterOnePairShift(q,p) invoked with q = ");
+//       wrp(q); //      wrp(pHead(q));
+//       PrintS(", p = ");
+//       wrp(p); //wrp(pHead(p)); 
+//       PrintLn();
     }
 #endif
 
@@ -6794,7 +6786,7 @@ void enterTShift(LObject p, kStrategy strat, int atT, int uptodeg, int lV)
   int toInsert =  itoInsert(p.p, uptodeg,  lV, strat->tailRing);
 
 #ifdef PDEBUG
-  Print("enterTShift uses toInsert: %d", toInsert);  PrintLn();
+  //  Print("enterTShift uses toInsert: %d", toInsert);  PrintLn();
 #endif
   int i;
 
