@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.179 2008-02-27 15:15:35 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.180 2008-03-14 15:48:34 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -4295,10 +4295,6 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
             int Mtyp=rTypeOfMatrixOrder(iv);
             if (Mtyp==0) return TRUE;
             if (Mtyp==-1) typ = -1;
-            for(i=R->block0[n];i<=R->block1[n];i++)
-            {
-              if (weights[i]==0) weights[i]=typ;
-            }
 
             R->wvhdl[n] =( int *)omAlloc((iv->length()-1)*sizeof(int));
             for (i=2; i<iv->length();i++)
@@ -4307,6 +4303,10 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
             R->block0[n] = last+1;
             last += (int)sqrt((double)(iv->length()-2));
             R->block1[n] = last;
+            for(i=R->block0[n];i<=R->block1[n];i++)
+            {
+              if (weights[i]==0) weights[i]=typ;
+            }
             break;
           }
 
