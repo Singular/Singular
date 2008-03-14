@@ -1,4 +1,4 @@
-# Singular help browser file $Id: help.cnf,v 1.12 2007-07-13 12:31:06 Singular Exp $
+# Singular help browser file $Id: help.cnf,v 1.13 2008-03-14 15:48:13 Singular Exp $
 # each line which start with an # is a comment
 # each other line defines a (possible) help browser
 # the format of the entries is: <name>!<requirements>!<shell command>
@@ -10,6 +10,8 @@
 #  D- requires the enviroment variable DISPLAY
 #  C- requires Windows-help: Manual.chm
 #  E:executable:- requires the named exectable
+#  O:singuname:- requires the named uname
+#  (ubuntu has an open completely different from open on OsX)
 #----------------------------------------------------
 # shell commands substitute the following:
 #  %h: the local html file (in the form file://localhost/some/dir/sing_123.htm)
@@ -25,8 +27,10 @@
 #   also not mentioned here
 #----------------------------------------------------
 htmlview!xDhE:htmlview:!htmlview %h &
-mac!xhE:open:!open %f &
-mac-net!xE:open:!open %H &
+mac!xhE:open:O:ix86Mac-darwin:!open %f &
+mac!xhE:open:O:ppcMac-darwin:!open %f &
+mac-net!xE:open:O:ix86Mac-darwin:!open %H &
+mac-net!xE:open:O:ppcMac-darwin:!open %H &
 mozilla!xDhE:mozilla:!(mozilla -remote "openURL(%h)")||(mozilla %h) &
 firefox!xDhE:firefox:!firefox %h &
 konqueror!xDhE:konqueror:!konqueror %h &

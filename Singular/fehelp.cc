@@ -3,7 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
-* versin $Id: fehelp.cc,v 1.50 2007-03-06 10:21:51 Singular Exp $
+* versin $Id: fehelp.cc,v 1.51 2008-03-14 15:48:12 Singular Exp $
 */
 
 #include <string.h>
@@ -915,9 +915,11 @@ static BOOLEAN heGenInit(int warn, int br)
                }
                break;
       case 'E': /* executable: E:xterm: */
+      case 'O': /* OS: O:ix86Mac-darwin/ppcMac-darwin: */
                {
                  char name[128];
                  char exec[128];
+	         char op=*p;
                  memset(name,0,128);
                  int i=0;
                  p++;
@@ -927,7 +929,10 @@ static BOOLEAN heGenInit(int warn, int br)
                    name[i]=*p; p++; i++;
                  }
                  if (i==0) return FALSE;
-                 if (omFindExec(name,exec)==NULL)
+                 
+                 if ((op=='O') && (strcmp(name,S_UNAME)!=0))
+		   return FALSE;
+                 if ((op=='E') && (omFindExec(name,exec)==NULL))
                  {
                    if (warn) Warn("executable `%s` not found",name);
                    return FALSE;
