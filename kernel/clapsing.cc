@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.26 2008-01-23 15:42:10 Singular Exp $
+// $Id: clapsing.cc,v 1.27 2008-03-17 18:33:55 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -1242,7 +1242,7 @@ ideal singclap_sqrfree ( poly f)
   {
     setCharacteristic( nGetChar() );
     CanonicalForm F( convSingPFactoryP( f ) );
-    L = sqrFree( F, 0 );
+    L = sqrFree( F );
   }
   #if 0
   else if (rField_is_GF())
@@ -1270,12 +1270,16 @@ ideal singclap_sqrfree ( poly f)
       CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPFactoryAP( f,a ) );
-      L = sqrFree( F,mipo );
+      CFFList SqrFreeMV( const CanonicalForm & f , const CanonicalForm & mipo=0) ;
+
+      L = SqrFreeMV( F,mipo );
+      //WarnS("L = sqrFree( F,mipo );");
+      //L = sqrFree( F );
     }
     else
     {
       CanonicalForm F( convSingTrPFactoryP( f ) );
-      L = sqrFree( F, 0 );
+      L = sqrFree( F );
     }
   }
   else
