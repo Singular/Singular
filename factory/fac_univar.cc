@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_univar.cc,v 1.21 2008-01-25 14:17:59 Singular Exp $ */
+/* $Id: fac_univar.cc,v 1.22 2008-03-17 17:44:04 Singular Exp $ */
 
 #include <config.h>
 
@@ -390,7 +390,7 @@ ZFactorizeUnivariate( const CanonicalForm& ff, bool issqrfree )
     if ( issqrfree )
 	H.append( CFFactor( g, 1 ) );
     else
-	H = sqrFree( g, 0, false );
+	H = sqrFree( g );
 
     DEBOUTLN( cerr, "H = " << H );
 

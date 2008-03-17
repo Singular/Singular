@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.13 2008-02-22 12:16:03 Singular Exp $";
+//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.14 2008-03-17 17:44:16 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // Factory - Includes
 #include <factory.h>
@@ -228,7 +228,7 @@ Truefactors( const CanonicalForm Ua, int levelU, const SFormList & SubstitutionL
   CanonicalForm U=Ua,a,b,Y;
   CFFactor factor;
   CFFList L,FAC,E_all;
-  int c,r = PiList.length(),degU, onemore,M, h = totaldegree(Ua,1,levelU) + 1;
+  int c,r = PiList.length(),degU, onemore,M, h = subvardegree(Ua,levelU) + 1;
   ListIterator<CFFactor> i;
 
   //CERR << "SubstitutionList="<< SubstitutionList<<"\n";
@@ -240,7 +240,7 @@ Truefactors( const CanonicalForm Ua, int levelU, const SFormList & SubstitutionL
     //CERR <<"f:" << factor.factor() << " -> test_f:"<<test_f <<"\n";
     //CERR << "           1:" << change_poly(factor.factor(),SubstitutionList,1) <<"\n";
     c= mydivremt(U,test_f,a,b);
-    if (  c  && b.isZero() && !hasAlgVar(test_f))
+    if (  c  && b == U.genZero() && !hasAlgVar(test_f))
     // factor.getFactor() divides U
     {
       //CERR << " teilt:" << test_f <<"\n";
@@ -449,9 +449,6 @@ CFFList TakeNorms(const CFFList & PiList)
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
-Revision 1.12  2008/01/22 09:51:37  Singular
-*hannes: sqrFree/InternalSqrFree -> factory
-
 Revision 1.11  2008/01/07 13:34:56  Singular
 *hannes: omse optiomzations(isOne)
 

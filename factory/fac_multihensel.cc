@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_multihensel.cc,v 1.9 2008-01-22 09:29:08 Singular Exp $ */
+/* $Id: fac_multihensel.cc,v 1.10 2008-03-17 17:44:04 Singular Exp $ */
 
 #include <config.h>
 
@@ -311,13 +311,11 @@ Hensel ( const CanonicalForm & U, CFArray & G, const CFArray & lcG, const Evalua
     int * n = new int[t+1];
 
     Uk[t] = U;
-    for ( k = t-1; k > 1; k-- )
-    {
+    for ( k = t-1; k > 1; k-- ) {
         Uk[k] = Uk[k+1]( A[k+1], Variable( k+1 ) );
         n[k] = degree( Uk[k], Variable( k ) );
     }
-    for ( k = A.min(); goodeval && (k <= t); k++ )
-    {
+    for ( k = A.min(); goodeval && (k <= t); k++ ) {
         h = totaldegree( Uk[k], Variable(A.min()), Variable(k-1) );
         for ( i = A.min(); i <= k; i++ )
             n[i] = degree( Uk[k], Variable(i) );

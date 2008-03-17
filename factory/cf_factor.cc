@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.39 2008-01-25 14:17:59 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.40 2008-03-17 17:44:04 Singular Exp $ */
 
 //{{{ docu
 //
@@ -396,95 +396,87 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
   CFFList F;
   if ( getCharacteristic() > 0 )
   {
-    if ( f.isUnivariate() )
+    ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
+    #ifdef HAVE_NTL
+    if (isOn(SW_USE_NTL) && (isPurePoly(f)))
     {
-      #ifdef HAVE_NTL
-      if (isOn(SW_USE_NTL) && (isPurePoly(f)))
+      // USE NTL
+      if (getCharacteristic()!=2)
       {
-        // USE NTL
-        if (getCharacteristic()!=2)
+        // set remainder
+        if (fac_NTL_char!=getCharacteristic())
         {
-          // set remainder
-          if (fac_NTL_char!=getCharacteristic())
-          {
-            fac_NTL_char=getCharacteristic();
-            #ifdef NTL_ZZ
-            ZZ r;
-            r=getCharacteristic();
-            ZZ_pContext ccc(r);
-            #else
-            zz_pContext ccc(getCharacteristic());
-            #endif
-            ccc.restore();
-            #ifdef NTL_ZZ
-            ZZ_p::init(r);
-            #else
-            zz_p::init(getCharacteristic());
-            #endif
-          }
-          // convert to NTL
+          fac_NTL_char=getCharacteristic();
           #ifdef NTL_ZZ
-          ZZ_pX f1=convertFacCF2NTLZZpX(f);
-          ZZ_p leadcoeff = LeadCoeff(f1);
+          ZZ r;
+          r=getCharacteristic();
+          ZZ_pContext ccc(r);
           #else
-          zz_pX f1=convertFacCF2NTLzzpX(f);
-          zz_p leadcoeff = LeadCoeff(f1);
+          zz_pContext ccc(getCharacteristic());
           #endif
-          //make monic
-          f1=f1 / LeadCoeff(f1);
-
-          // factorize
+          ccc.restore();
           #ifdef NTL_ZZ
-          vec_pair_ZZ_pX_long factors;
+          ZZ_p::init(r);
           #else
-          vec_pair_zz_pX_long factors;
+          zz_p::init(getCharacteristic());
           #endif
-          CanZass(factors,f1);
-
-          // convert back to factory
-          #ifdef NTL_ZZ
-          F=convertNTLvec_pair_ZZpX_long2FacCFFList(factors,leadcoeff,f.mvar());
-          #else
-          F=convertNTLvec_pair_zzpX_long2FacCFFList(factors,leadcoeff,f.mvar());
-          #endif
-          //test_cff(F,f);
         }
-        else
-        {
-          // Specialcase characteristic==2
-          if (fac_NTL_char!=2)
-          {
-            fac_NTL_char=2;
-            zz_p::init(2);
-          }
-          // convert to NTL using the faster conversion routine for characteristic 2
-          GF2X f1=convertFacCF2NTLGF2X(f);
-          // no make monic necessary in GF2
-          //factorize
-          vec_pair_GF2X_long factors;
-          CanZass(factors,f1);
+        // convert to NTL
+        #ifdef NTL_ZZ
+        ZZ_pX f1=convertFacCF2NTLZZpX(f);
+        ZZ_p leadcoeff = LeadCoeff(f1);
+        #else
+        zz_pX f1=convertFacCF2NTLzzpX(f);
+        zz_p leadcoeff = LeadCoeff(f1);
+        #endif
+        //make monic
+        f1=f1 / LeadCoeff(f1);
 
-          // convert back to factory again using the faster conversion routine for vectors over GF2X
-          F=convertNTLvec_pair_GF2X_long2FacCFFList(factors,LeadCoeff(f1),f.mvar());
-        }
+        // factorize
+        #ifdef NTL_ZZ
+        vec_pair_ZZ_pX_long factors;
+        #else
+        vec_pair_zz_pX_long factors;
+        #endif
+        CanZass(factors,f1);
+
+        // convert back to factory
+        #ifdef NTL_ZZ
+        F=convertNTLvec_pair_ZZpX_long2FacCFFList(factors,leadcoeff,f.mvar());
+        #else
+        F=convertNTLvec_pair_zzpX_long2FacCFFList(factors,leadcoeff,f.mvar());
+        #endif
+        //test_cff(F,f);
       }
       else
-      #endif
-      {  // Use Factory without NTL
-        if ( isOn( SW_BERLEKAMP ) )
-          F=FpFactorizeUnivariateB( f, issqrfree );
-        else
-          F=FpFactorizeUnivariateCZ( f, issqrfree, 0, Variable(), Variable() );
+      {
+        // Specialcase characteristic==2
+        if (fac_NTL_char!=2)
+        {
+          fac_NTL_char=2;
+          zz_p::init(2);
+        }
+        // convert to NTL using the faster conversion routine for characteristic 2
+        GF2X f1=convertFacCF2NTLGF2X(f);
+        // no make monic necessary in GF2
+        //factorize
+        vec_pair_GF2X_long factors;
+        CanZass(factors,f1);
+
+        // convert back to factory again using the faster conversion routine for vectors over GF2X
+        F=convertNTLvec_pair_GF2X_long2FacCFFList(factors,LeadCoeff(f1),f.mvar());
       }
     }
     else
-    {
-        // char p, not univariate
-        //printf("factorize char p, not univariate\n");
-        F = FpFactorizeMultivariate( f, issqrfree );
+    #endif
+    {  // Use Factory without NTL
+      if ( isOn( SW_BERLEKAMP ) )
+         F=FpFactorizeUnivariateB( f, issqrfree );
+      else
+        F=FpFactorizeUnivariateCZ( f, issqrfree, 0, Variable(), Variable() );
     }
   }
-  else // char 0
+  else
   {
     bool on_rational = isOn(SW_RATIONAL);
     On(SW_RATIONAL);
@@ -701,97 +693,26 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
   return F;
 }
 
-CFFList sqrFree ( const CanonicalForm & f, const CanonicalForm & mipo, bool sort )
+CFFList sqrFree ( const CanonicalForm & f )
 {
-    if ( getNumVars(f) == 0 )
-      return CFFactor(f,1);
-
+//    ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
     CFFList result;
-    CanonicalForm c;
-    if (getCharacteristic() == 0 ) c=icontent(f);
-    else                           c=f.lc();
-    CanonicalForm g=f;
-    if (!c.isOne())
-    {
-       result=CFFactor(c,1);
-       g/=c;
-    }
 
     if ( getCharacteristic() == 0 )
-        result=Union(result,sqrFreeZ( g, mipo ));
+        result = sqrFreeZ( f );
     else
-        result=Union(result,sqrFreeFp( g, mipo ));
+        result = sqrFreeFp( f );
 
-    return ( sort ? sortCFFList( result ) : result );
+    //return ( sort ? sortCFFList( result ) : result );
+    return result;
 }
 
-///////////////////////////////////////////////////////////////
-// A uni/multivariate SqrFreeTest routine.                   //
-// Cheaper to run if all you want is a test.                 //
-// Works for charcteristic 0 and q=p^m                       //
-// Returns 1 if poly r is SqrFree, 0 if SqrFree will do some //
-// kind of factorization.                                    //
-// Would be much more effcient iff we had *good*             //
-//  uni/multivariate gcd's and/or gcdtest's                  //
-///////////////////////////////////////////////////////////////
-bool isSqrFree ( const CanonicalForm & r )
+bool isSqrFree ( const CanonicalForm & f )
 {
-  CanonicalForm f=r, g;
-  int n=level(f);
-
-  if (getNumVars(f)==0) return 1 ; // a constant is SqrFree
-  if ( f.isUnivariate() )
-  {
-    g= f.deriv();
-    if ( getCharacteristic() > 0 && g.isZero() ) return 0 ;
-    // Next: it would be best to have a *univariate* gcd-test which returns
-    // 0 iff gcdtest(f,g) == 1 or a constant ( for real Polynomials )
-    g = gcd(f,g);
-    if ( g.isOne() || (-g).isOne() ) return 1;
+//    ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
+    if ( getCharacteristic() == 0 )
+        return isSqrFreeZ( f );
     else
-      if ( getNumVars(g) == 0 ) return 1;// <- totaldegree!!!
-      else return 0 ;
-  }
-  else
-  { // multivariate case
-    for ( int k=1; k<=n; k++ )
-    {
-      g = swapvar(f,k,n); g = content(g);
-      // g = 1 || -1 : sqr-free, g poly : not sqr-free, g number : ..
-      if ( ! (g.isOne() || (-g).isOne() || getNumVars(g)==0 ) )
-      {
-        if ( isSqrFree(g) == 0 ) return 0;
-        g = swapvar(g,k,n);
-        f /=g ;
-      }
-    }
-    // Now f is primitive
-    n = level(f); // maybe less indeterminants
-    //    if ( totaldegree(f) <= 1 ) return 1;
-
-    // Let`s look if it is a Pth root
-    if ( getCharacteristic() > 0 )
-      for (int k=1; k<=n; k++ )
-      {
-        g=swapvar(f,k,n); g=g.deriv();
-        if ( ! g.isZero() ) break ;
-        else if ( k==n) return 0 ; // really is Pth root
-      }
-    g = f.deriv() ;
-    // Next: it would be best to have a *multivariate* gcd-test which returns
-    // 0 iff gcdtest(f,g) == 1 or a constant ( for real Polynomials )
-    g= gcd(f,g);
-    if ( g.isOne() || (-g).isOne() || (g==f) || (getNumVars(g)==0) ) return 1 ;
-    else return 0 ;
-  }
-#ifdef HAVE_SINGULAR_ERROR
-  WerrorS("libfac: ERROR: isSqrFree: we should never fall trough here!");
-#else
-#ifndef NOSTREAMIO
-  CERR << "\nlibfac: ERROR: isSqrFree: we should never fall trough here!\n"
-       << rcsid << errmsg << "\n";
-#endif
-#endif
-  return 0;
+        return isSqrFreeFp( f );
 }
 

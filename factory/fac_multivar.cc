@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_multivar.cc,v 1.13 2008-01-22 09:29:56 Singular Exp $ */
+/* $Id: fac_multivar.cc,v 1.14 2008-03-17 17:44:04 Singular Exp $ */
 
 #include <config.h>
 
@@ -347,7 +347,7 @@ CFFList ZFactorizeMultivariate ( const CanonicalForm & f, bool issqrfree )
     if ( issqrfree )
         F = CFFactor( f, 1 );
     else
-        F = sqrFree( f, 0, false );
+        F = sqrFree( f );
 
     for ( i = F; i.hasItem(); i++ )
     {
@@ -497,7 +497,7 @@ CFFList FpFactorizeMultivariate ( const CanonicalForm & f, bool issqrfree )
     if ( issqrfree )
         F = CFFactor( f, 1 );
     else
-        F = sqrFree( f, 0, false );
+        F = sqrFree( f );
 
     printf("nach sqrFree:\n");
     out_cff(F);

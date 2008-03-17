@@ -1,7 +1,7 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: helpstuff.cc,v 1.6 2008-01-22 09:51:37 Singular Exp $";
+// static char * rcsid = "$Id: helpstuff.cc,v 1.7 2008-03-17 17:44:17 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -11,8 +11,7 @@
 #include "helpstuff.h"
 
 bool
-mydivremt ( const CanonicalForm& f, const CanonicalForm& g, CanonicalForm& a, CanonicalForm& b )
-{
+mydivremt ( const CanonicalForm& f, const CanonicalForm& g, CanonicalForm& a, CanonicalForm& b ){
   bool retvalue;
   CanonicalForm aa,bb;
   retvalue = divremt(f,g,a,bb);
@@ -23,14 +22,61 @@ mydivremt ( const CanonicalForm& f, const CanonicalForm& g, CanonicalForm& a, Ca
 }
 
 void
-mydivrem( const CanonicalForm& f, const CanonicalForm& g, CanonicalForm& a, CanonicalForm& b )
-{
+mydivrem( const CanonicalForm& f, const CanonicalForm& g, CanonicalForm& a, CanonicalForm& b ){
   bool retvalue;
   CanonicalForm aa,bb;
   retvalue = divremt(f,g,a,bb);
   aa= f-g*a;
   if ( aa==bb ) { b=bb; }
   else { b=aa; }
+}
+
+// Now some procedures used in SqrFree and in Factor
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+// We have to include a version of <CFFList>.append(CFFactor)//
+// and Union( CFFList, CFFList)                              //
+// because we have to look for multiplicities in SqrFree.    //
+// e.g.: SqrFree( f^3 ) with char <> 3                       //
+///////////////////////////////////////////////////////////////
+CFFList
+myappend( const CFFList & Inputlist, const CFFactor & TheFactor){
+  CFFList Outputlist ;
+  CFFactor copy;
+  CFFListIterator i;
+  int exp=0;
+
+  for ( i=Inputlist ; i.hasItem() ; i++ ){
+    copy = i.getItem();
+    if ( copy.factor() == TheFactor.factor() )
+      exp += copy.exp();
+    else
+      Outputlist.append(copy);
+  }
+  Outputlist.append( CFFactor(TheFactor.factor(), exp + TheFactor.exp()));
+  return Outputlist;
+}
+
+CFFList
+myUnion(const CFFList & Inputlist1,const CFFList & Inputlist2){
+  CFFList Outputlist;
+  CFFListIterator i;
+
+  for ( i=Inputlist1 ; i.hasItem() ; i++ )
+    Outputlist = myappend(Outputlist, i.getItem() );
+  for ( i=Inputlist2 ; i.hasItem() ; i++ )
+    Outputlist = myappend(Outputlist, i.getItem() );
+
+  return Outputlist;
+}
+
+int
+Powerup( const int base , const int exp){
+  int retvalue=1;
+  if ( exp == 0 )  return retvalue ;
+  else for ( int i=1 ; i <= exp; i++ ) retvalue *= base ;
+
+  return retvalue;
 }
 
 // Now some procedures used in MVMultiHensel and in Truefactors
@@ -79,6 +125,20 @@ mod_power( const CanonicalForm & f, int k, int levelU){
 }
 
 ///////////////////////////////////////////////////////////////
+// Return the deg of F in the Variables x_1,..,x_(levelF-1)  //
+///////////////////////////////////////////////////////////////
+int
+subvardegree( const CanonicalForm & F, int levelF ){
+  int n=0,m=degree(F,levelF),newn=0;
+
+  for ( int k=0; k<=m; k++ ){
+    newn = totaldegree( F[k] );
+    if ( newn > n ) n=newn;
+  }
+  return n;
+}
+
+///////////////////////////////////////////////////////////////
 // Change poly:  x_i <- x_i +- a_i    for i= 1,..,level(f)-1 //
 ///////////////////////////////////////////////////////////////
 CanonicalForm
@@ -114,9 +174,6 @@ change_poly( const CanonicalForm & f , const SFormList & Substitutionlist ,int d
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
-Revision 1.5  2007/05/25 12:59:05  Singular
-*hannes: fdivides2
-
 Revision 1.4  2001/06/19 15:29:04  Singular
 *hannes: optim.
 

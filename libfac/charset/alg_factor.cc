@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: alg_factor.cc,v 1.20 2008-02-22 12:16:02 Singular Exp $";
+static char * rcsid = "$Id: alg_factor.cc,v 1.21 2008-03-17 17:44:15 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -93,8 +93,7 @@ mypsr ( const CanonicalForm &rr, const CanonicalForm &vv, const Variable & x ){
   if (dv <= dr) {l=LC(v,x); v = v -l*power(x,dv);}
   else { l = 1; }
   d= dr-dv+1;
-  while ( ( dv <= dr  ) && ( !r.isZero()) )
-  {
+  while ( ( dv <= dr  ) && ( r != r.genZero()) ){
     test = power(x,dr-dv)*v*LC(r,x);
     if ( dr == 0 ) { r= CanonicalForm(0); }
     else { r= r - LC(r,x)*power(x,dr); }
@@ -141,8 +140,7 @@ return resultant(fz,gz,v);
    else { G = f; F = g; }
 
   h = CanonicalForm(1);
-  while ( !G.isZero() )
-  {
+  while ( G != G.genZero() ) {
      delta= degree(F,v) -degree(G,v);
      beta = power(CanonicalForm(-1), delta+1) * LC(F,v)* power(h, delta);
      h= (h * power(LC(G,v), delta)) / power(h, delta);
@@ -195,13 +193,13 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
     {
       temp= gcd(R, R.deriv(vf));
       DEBOUTLN(CERR, "sqrf_norm_sub: temp= ", temp);
-      if (degree(temp,vf) != 0 || temp.isZero() ){ sqfreetest= 0; }
+      if (degree(temp,vf) != 0 || temp == temp.genZero() ){ sqfreetest= 0; }
       else { sqfreetest= 1; }
       DEBOUTLN(CERR, "sqrf_norm_sub: sqfreetest= ", sqfreetest);
     }
     else{
-      DEBOUTMSG(CERR, "Starting isSqrFree(R)!");
-      // Look at isSqrFree!
+      DEBOUTMSG(CERR, "Starting SqrFreeTest(R)!");
+      // Look at SqrFreeTest!
       // (z+a^5+w)^4 with z<w<a should not give sqfreetest=1 !
       // for now we use this workaround with Factorize...
       // ...but it should go away soon!!!!
@@ -220,7 +218,7 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       sqfreetest=1;
       for ( i=testlist; i.hasItem(); i++)
         if ( i.getItem().exp() > 1 && degree(i.getItem().factor(), R.mvar()) > 0) { sqfreetest=0; break; }
-      DEBOUTLN(CERR, "isSqrFree(R)= ", sqfreetest);
+      DEBOUTLN(CERR, "SqrFreeTest(R)= ", sqfreetest);
     }
     if ( ! sqfreetest ){
       myrandom.next();
@@ -260,13 +258,13 @@ sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
     {
       temp= gcd(R, R.deriv(vf));
       DEBOUTLN(CERR, "sqrf_norm_sub: temp= ", temp);
-      if (degree(temp,vf) != 0 || temp.isZero() ){ sqfreetest= 0; }
+      if (degree(temp,vf) != 0 || temp == temp.genZero() ){ sqfreetest= 0; }
       else { sqfreetest= 1; }
       DEBOUTLN(CERR, "sqrf_norm_sub: sqfreetest= ", sqfreetest);
     }
     else{
-      DEBOUTMSG(CERR, "Starting isSqrFree(R)!");
-      // Look at isSqrFree!
+      DEBOUTMSG(CERR, "Starting SqrFreeTest(R)!");
+      // Look at SqrFreeTest!
       // (z+a^5+w)^4 with z<w<a should not give sqfreetest=1 !
       // for now we use this workaround with Factorize...
       // ...but it should go away soon!!!!
@@ -285,7 +283,7 @@ sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       sqfreetest=1;
       for ( i=testlist; i.hasItem(); i++)
         if ( i.getItem().exp() > 1 && degree(i.getItem().factor(), R.mvar()) > 0) { sqfreetest=0; break; }
-      DEBOUTLN(CERR, "isSqrFree(R)= ", sqfreetest);
+      DEBOUTLN(CERR, "SqrFreeTest(R)= ", sqfreetest);
     }
     if ( ! sqfreetest ){
       myrandom.next();
@@ -356,10 +354,9 @@ inseperable(const CFList & Astar){
   int Counter= 1;
 
   if ( Astar.length() == 0 ) return 0;
-  for ( CFListIterator i=Astar; i.hasItem(); i++)
-  {
+  for ( CFListIterator i=Astar; i.hasItem(); i++){
     elem= i.getItem();
-    if ( elem.deriv().isZero() ) return Counter;
+    if ( elem.deriv() == elem.genZero() ) return Counter;
     else Counter += 1;
   }
   return 0;
@@ -756,7 +753,7 @@ newfactoras( const CanonicalForm & f, const CFList & as, int success){
     DEBOUTLN(CERR, "         and ", Ggcd);
     Fgcd= pp(Fgcd); Ggcd= pp(Ggcd);
     DEBDECLEVEL(CERR,"newfactoras");
-    return UnionCFFL(newfactoras(Fgcd,as,success) , newfactoras(Ggcd,as,success));
+    return myUnion(newfactoras(Fgcd,as,success) , newfactoras(Ggcd,as,success));
   }
   if ( getCharacteristic() > 0 ){
 
@@ -825,19 +822,13 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
   for ( CFFListIterator i=Factors; i.hasItem(); i++ ){
     output=newfactoras(i.getItem().factor(),as, success);
     for ( CFFListIterator j=output; j.hasItem(); j++)
-      Output = appendCFFL(Output,CFFactor(j.getItem().factor(),j.getItem().exp()*i.getItem().exp()));
+      Output = myappend(Output,CFFactor(j.getItem().factor(),j.getItem().exp()*i.getItem().exp()));
   }
   return Output;
 }
 
 /*
 $Log: not supported by cvs2svn $
-Revision 1.19  2008/01/25 14:19:39  Singular
-*hannes: SqrFreeTest -> isSqrFree
-
-Revision 1.18  2008/01/22 09:51:36  Singular
-*hannes: sqrFree/InternalSqrFree -> factory
-
 Revision 1.17  2007/05/15 14:46:48  Singular
 *hannes: factorize in Zp(a)[x...]
 

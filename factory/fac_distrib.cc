@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_distrib.cc,v 1.9 2008-01-22 09:28:39 Singular Exp $ */
+/* $Id: fac_distrib.cc,v 1.10 2008-03-17 17:44:04 Singular Exp $ */
 
 #include <config.h>
 
@@ -68,47 +68,39 @@ distributeLeadingCoeffs ( CanonicalForm & U, CFArray & G, CFArray & lcG, const C
     for ( j = 1; j <= r; j ++ )
         lcG[j] = 1;
 
-    for ( I = F, i = 1; I.hasItem(); I++, i++ )
-    {
+    for ( I = F, i = 1; I.hasItem(); I++, i++ ) {
         ft = I.getItem().factor();
         m = I.getItem().exp();
         DEBOUTLN( cerr, "trying to distribute " << ft );
         DEBOUTLN( cerr, "which is tested with " << D[i] );
         DEBOUTLN( cerr, "and contained to the power of " << m );
         j = 1;
-        while ( m > 0 && j <= r )
-        {
+        while ( m > 0 && j <= r ) {
             ut = lc( G[j] );
             DEBOUTLN( cerr, "checking with " << ut );
-            while ( m > 0 && fdivides( D[i], ut ) )
-            {
+            while ( m > 0 && fdivides( D[i], ut ) ) {
                 DEBOUTLN( cerr, "match found" );
                 m--; ut /= D[i];
                 lcG[j] *= ft;
             }
             j++;
         }
-        if (m != 0)
-        {
+        if (m != 0) {
             DEBDECLEVEL( cerr, "distributeLeadingCoeffs" );
             return false;
         }
     }
     DEBOUTLN( cerr, "the leading coeffs before omega and delta correction: " << lcG );
-    if ( omega != 1 )
-    {
-        for ( j = 1; j <= r; j++ )
-        {
+    if ( omega != 1 ) {
+        for ( j = 1; j <= r; j++ ) {
 //            G[j] *= omega;
             lcG[j] *= omega;
             G[j] = G[j] * ( A( lcG[j] ) / lc( G[j] ) );
         }
         U *= power( omega, r-1 );
     }
-    if ( delta != 1 )
-    {
-        for ( j = 1; j <= r; j++ )
-        {
+    if ( delta != 1 ) {
+        for ( j = 1; j <= r; j++ ) {
             lcG[j] *= delta;
             G[j] = G[j] * ( A( lcG[j] ) / lc( G[j] ) );
         }
