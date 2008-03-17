@@ -1540,7 +1540,7 @@ fi
     LEX=flex
     
   else
-    { echo "configure: error: can not find flex with version 2.4.5-2.5.4" 1>&2; exit 1; }
+    echo "configure: warning: can not find flex with version 2.4.5-2.5.4" 1>&2
   fi
 elif test "${with_lex}" = no; then
   echo "configure: warning: building without lex -- make might fail" 1>&2
