@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmspoly.lib,v 1.15 2006-11-09 08:59:53 Singular Exp $";
+version="$Id: gmspoly.lib,v 1.16 2008-03-18 15:50:14 Singular Exp $";
 category="Singularities";
 
 info="
@@ -516,9 +516,8 @@ EXAMPLE:  example goodBasis; shows examples
 
         B=pidbasis(K2,L2);
       }
-
-      B0=std(coeffs(reduce(matrix(K)*B,JS),b0));
-      b=matrix(K)*B;
+      B0=std(coeffs(reduce(matrix(K,nrows(K),nrows(B))*B,JS),b0));
+      b=matrix(K,nrows(K),nrows(B))*B;
     }
 
     A=lift(B,reduce(coeffs(f*b+var(1)^2*diff(b,var(1)),M,product(X)),L1));
