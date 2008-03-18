@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.27 2008-03-17 18:33:55 Singular Exp $
+// $Id: clapsing.cc,v 1.28 2008-03-18 10:11:04 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -931,7 +931,6 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPFactoryAP( f,a ) );
-      L.insert(F);
       if (rField_is_Zp_a() && F.isUnivariate())
       {
         L = factorize( F, a );
@@ -1114,8 +1113,8 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
         if ((v!=NULL) && ((*v)!=NULL))
         {
           intvec *w=*v;
-          int len=si_max(n-j,1);
-          *v = new intvec( len /*si_max(n-j,1)*/ );
+          int len=IDELEMS(res);
+          *v = new intvec( len );
           for (i=0,j=0;i<si_min(w->length(),len);i++)
           {
             if((*w)[i]!=0)
