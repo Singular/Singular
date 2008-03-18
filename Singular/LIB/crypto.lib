@@ -1,6 +1,6 @@
 //GP, last modified 28.6.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: crypto.lib,v 1.2 2007-07-20 10:02:38 Singular Exp $";
+version="$Id: crypto.lib,v 1.3 2008-03-18 16:32:22 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY:  crypto.lib     Procedures for teaching cryptography
@@ -70,9 +70,10 @@ EXAMPLE:example decimal; shows an example
 {
    int n=size(s);
    int i;
-   number m,k;
-   number t=16;
-   for(i=n;i>0;i--)
+   bigint k;
+   bigint t=16;
+   bigint m=0;
+   for(i=1;ii<=n;i++)
    {
       if(s[i]=="1"){k=1;}
       if(s[i]=="2"){k=2;}
@@ -89,13 +90,12 @@ EXAMPLE:example decimal; shows an example
       if(s[i]=="d"){k=13;}
       if(s[i]=="e"){k=14;}
       if(s[i]=="f"){k=15;}
-      m=m+k*t^(n-i);
+      m=m*t+k;
    }
    return(m);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring R = 0,x,dp;
    string s  ="8edfe37dae96cfd2466d77d3884d4196";
    decimal(s);
 }
@@ -284,7 +284,7 @@ EXAMPLE:example primList; shows an example
    list re;
    re[1]=2;
    re[2]=3;
-   for(i=4;i<=n;i++)
+   for(i=5;i<=n;i=i+2)
    {
      j=1;
      while(j<=size(re))
