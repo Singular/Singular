@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.42 2008-03-17 17:44:16 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.43 2008-03-18 10:12:21 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -732,7 +732,7 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar)
   // Check special cases
   for ( int i=1; i<=level(F); i++)
   {
-    if ( degree(f,Variable(i) ) == 1 ) 
+    if ( degree(f,Variable(i) ) == 1 )
     //test trivial case; only true iff F is primitiv w.r.t every variable; else check (if F=ax+b) gcd(a,b)=1 ?
     {
       DEBOUTLN(CERR, "Trivial case: ", F);
@@ -1034,7 +1034,7 @@ CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
 ///////////////////////////////////////////////////////////////
 static bool fdivides2(const CanonicalForm &F, const CanonicalForm &G, const CanonicalForm &minpoly)
 {
-  if (minpoly!=0)
+  if (!minpoly.isZero())
   {
   #if 0
     Variable Alpha=minpoly.mvar();
@@ -1160,7 +1160,7 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
     // SHOULD: Outputlist= factorize(F,minpoly);
     Outputlist= factorize(F);
     #else
-    if (minpoly!=0)
+    if (!minpoly.isZero())
     {
       if ( F.isHomogeneous() )
       {
@@ -1173,7 +1173,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
       else
       {
         CFList as(minpoly);
-        CFFList sqF=sqrFree(F); // sqrFreeZ
+        //CFFList sqF=sqrFree(F); // sqrFreeZ
+        CFFList sqF=SqrFreeMV(F,minpoly);
+	if (sqF.isEmpty()) sqF=sqrFree(F);
         CFFList G,H;
         CanonicalForm fac;
         int d;
@@ -1194,7 +1196,7 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
         Outputlist = H;
       }
     }
-    else
+    else // minpoly==0
       Outputlist=factorize(F);
     #endif
     // Factorization in char=0 doesn't sometimes return at least two elements!!!
@@ -1287,13 +1289,15 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
   g=1; unit=1;
   DEBOUTLN(CERR, "Outputlist is ", Outputlist);
   for ( i=Outputlist; i.hasItem(); i++ )
-    if ( level(i.getItem().factor()) > 0 ){
+    if ( level(i.getItem().factor()) > 0 )
+    {
       unit = lc(i.getItem().factor());
       if ( getNumVars(unit) == 0 ){ // a constant; possibly 1
         Outputlist2.append(CFFactor(i.getItem().factor()/unit , i.getItem().exp()));
         g *=power(i.getItem().factor()/unit,i.getItem().exp());
       }
-      else{
+      else
+      {
         Outputlist2.append(i.getItem());
         g *=power(i.getItem().factor(),i.getItem().exp());
       }
@@ -1330,6 +1334,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.42  2008/03/17 17:44:16  Singular
+*hannes: fact.tst
+
 Revision 1.38  2008/01/07 13:34:56  Singular
 *hannes: omse optiomzations(isOne)
 
