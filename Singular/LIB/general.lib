@@ -2,7 +2,7 @@
 //anne, added deleteSublist and watchdog 12.12.2000
 //eric, added absValue 11.04.2002
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.55 2008-02-21 15:14:44 Singular Exp $";
+version="$Id: general.lib,v 1.56 2008-03-18 14:57:15 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -252,7 +252,7 @@ EXAMPLE:  example factorial; shows an example
 {
    bigint r=1;
 //------------------------------ computation --------------------------------
-   for (l=2; l<=n; l++)
+   for (int l=2; l<=n; l++)
    {
       r=r*l;
    }
