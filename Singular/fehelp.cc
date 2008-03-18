@@ -3,7 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
-* versin $Id: fehelp.cc,v 1.51 2008-03-14 15:48:12 Singular Exp $
+* versin $Id: fehelp.cc,v 1.52 2008-03-18 17:31:50 Singular Exp $
 */
 
 #include <string.h>
@@ -243,7 +243,7 @@ static void feBrowserFile()
         char *req=strtok(NULL,"!");
         char *cmd=strtok(NULL,"!");
         if ((name!=NULL) && (req!=NULL) && (cmd!=NULL))
-        { 
+        {
           while ((cmd[0]!='\0') && (cmd[strlen(cmd)-1]<=' '))
             cmd[strlen(cmd)-1]='\0';
           //Print("name %d >>%s<<\n\treq:>>%s<<\n\tcmd:>>%s<<\n",br,name,req,cmd);
@@ -919,7 +919,7 @@ static BOOLEAN heGenInit(int warn, int br)
                {
                  char name[128];
                  char exec[128];
-	         char op=*p;
+                 char op=*p;
                  memset(name,0,128);
                  int i=0;
                  p++;
@@ -929,9 +929,9 @@ static BOOLEAN heGenInit(int warn, int br)
                    name[i]=*p; p++; i++;
                  }
                  if (i==0) return FALSE;
-                 
+
                  if ((op=='O') && (strcmp(name,S_UNAME)!=0))
-		   return FALSE;
+                   return FALSE;
                  if ((op=='E') && (omFindExec(name,exec)==NULL))
                  {
                    if (warn) Warn("executable `%s` not found",name);
