@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: tricks.doc,v 1.17 2008-01-21 14:34:55 Singular Exp $
+@comment $Id: tricks.doc,v 1.18 2008-03-18 15:58:00 Singular Exp $
 @comment this file contains the "Tricks and pittfalls" sections
 
 @c The following directives are necessary for proper compilation
@@ -120,7 +120,7 @@ differences. Most notably:
 * Usage of brackets::
 * Behavior of continue::
 * Return type of procedures::
-* First index ist 1::
+* First index is 1::
 @end menu
 @c ---------------------------------------
 @node No rvalue of increments and assignments, Evaluation of logical expressions,,Major differences to the C programming language
