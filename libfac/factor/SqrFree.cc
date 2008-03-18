@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: SqrFree.cc,v 1.15 2008-03-17 17:44:16 Singular Exp $";
+static char * rcsid = "$Id: SqrFree.cc,v 1.16 2008-03-18 10:12:59 Singular Exp $";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de .\n Please include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -251,7 +251,7 @@ SqrFreed( const CanonicalForm & r , const CanonicalForm &mipo=0)
   if ( f.isUnivariate() )
   {
     DEBOUTLN(CERR, "f is univariate: ", f);
-    g = content(g);
+    g = content(f);
     if ( ! (g.isOne() || (-g).isOne() ) )
     {
       Outputlist= myappend(Outputlist,CFFactor(g,1)) ;
@@ -439,6 +439,9 @@ CFFList SqrFree(const CanonicalForm & r )
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.15  2008/03/17 17:44:16  Singular
+*hannes: fact.tst
+
 Revision 1.10  2006/05/16 14:46:50  Singular
 *hannes: gcc 4.1 fixes
 
