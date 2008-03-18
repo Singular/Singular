@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.14 2008-03-17 17:44:16 Singular Exp $";
+// $Id: Truefactor.cc,v 1.15 2008-03-18 17:46:15 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // Factory - Includes
 #include <factory.h>
@@ -31,7 +31,7 @@
 #endif
 
 #ifdef HAVE_SINGULAR_ERROR
-   extern "C" { void WerrorS(char *); }
+   extern "C" { void WerrorS(const char *); }
 #endif
 
 #ifdef TRUEFACTORDEBUG
@@ -449,6 +449,9 @@ CFFList TakeNorms(const CFFList & PiList)
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.14  2008/03/17 17:44:16  Singular
+*hannes: fact.tst
+
 Revision 1.11  2008/01/07 13:34:56  Singular
 *hannes: omse optiomzations(isOne)
 

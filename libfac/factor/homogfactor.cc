@@ -1,6 +1,6 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
-// static char * rcsid = "$Id: homogfactor.cc,v 1.8 2007-10-25 14:45:41 Singular Exp $ ";
+// $Id: homogfactor.cc,v 1.9 2008-03-18 17:46:16 Singular Exp $ 
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -200,6 +200,9 @@ HomogFactor( const CanonicalForm & g, const CanonicalForm  & minpoly, const int 
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.8  2007/10/25 14:45:41  Singular
+*hannes: homgfactor for alg.ext of Q
+
 Revision 1.7  2006/05/16 14:46:50  Singular
 *hannes: gcc 4.1 fixes
 

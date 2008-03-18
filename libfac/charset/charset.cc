@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: charset.cc,v 1.12 2006-06-14 15:35:08 Singular Exp $";
+/* $Id: charset.cc,v 1.13 2008-03-18 17:46:14 Singular Exp $ */
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -47,7 +47,7 @@ static CFList     irras(CFList & AS, int &ja, CanonicalForm & reducible);
 #endif
 
 #ifdef HAVE_SINGULAR_ERROR
-   extern "C" { void WerrorS(char *); }
+   extern "C" { void WerrorS(const char *); }
    extern "C" { void WarnS(const char *); }
 #endif
 
@@ -598,6 +598,9 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
 ///////////////////////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.12  2006/06/14 15:35:08  Singular
+*hannes: CS renamed
+
 Revision 1.11  2006/05/16 14:46:49  Singular
 *hannes: gcc 4.1 fixes
 

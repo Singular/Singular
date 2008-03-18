@@ -1,8 +1,8 @@
-//static char rcsid[] = "@(#) $Id: test.cc,v 1.3 2007-05-15 14:46:49 Singular Exp $";
+// $Id: test.cc,v 1.4 2008-03-18 17:46:16 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-// CLAP - Includes
+// factory - Includes
 //       (x+y+z)*(x+y-z)*(x-y+z)*(x-y-z)*x*y;
-#include <clap.h>
+#include <factory.h>
 // Factor - Includes
 #include "tmpl_inst.h"
 #include "Factor.h"

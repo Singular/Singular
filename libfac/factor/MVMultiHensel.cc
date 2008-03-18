@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.17 2008-03-17 17:44:16 Singular Exp $";
+// $Id: MVMultiHensel.cc,v 1.18 2008-03-18 17:46:15 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -37,7 +37,7 @@ void out_cf(char *s1,const CanonicalForm &f,char *s2);
 extern int libfac_interruptflag;
    extern "C"
    {
-     void WerrorS(char *);
+     void WerrorS(const char *);
      void Werror(const char *fmt, ...);
    }
 #endif
@@ -519,6 +519,9 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.17  2008/03/17 17:44:16  Singular
+*hannes: fact.tst
+
 Revision 1.14  2007/06/14 14:16:35  Singular
 *hannes: Factorize2 etc.
 

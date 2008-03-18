@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: algfactor.cc,v 1.10 2008-03-17 17:44:16 Singular Exp $";
+/* $Id: algfactor.cc,v 1.11 2008-03-18 17:46:14 Singular Exp $ */
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -449,6 +449,9 @@ cfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.10  2008/03/17 17:44:16  Singular
+*hannes: fact.tst
+
 Revision 1.8  2006/06/19 13:37:46  Singular
 *hannes: more CS renamed
 

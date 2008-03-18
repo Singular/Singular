@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: alg_factor.cc,v 1.21 2008-03-17 17:44:15 Singular Exp $";
+/* $Id: alg_factor.cc,v 1.22 2008-03-18 17:46:14 Singular Exp $ */
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -829,6 +829,9 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.21  2008/03/17 17:44:15  Singular
+*hannes: fact.tst
+
 Revision 1.17  2007/05/15 14:46:48  Singular
 *hannes: factorize in Zp(a)[x...]
 

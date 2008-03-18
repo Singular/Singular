@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.43 2008-03-18 10:12:21 Singular Exp $ ";
-static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
+/* $Id: Factor.cc,v 1.44 2008-03-18 17:46:15 Singular Exp $ */
+static const char * errmsg = "\nYou found a bug!\nPlease inform singular@mathematik.uni-kl.de\nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -37,7 +37,7 @@ void out_cff(CFFList &L);
 #endif
 
 #ifdef HAVE_SINGULAR_ERROR
-   extern "C" { void WerrorS(char *); }
+   extern "C" { void WerrorS(const char *); }
    extern "C" { void WarnS(const char *); }
 #endif
 
@@ -1334,6 +1334,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.43  2008/03/18 10:12:21  Singular
+*hannes: format
+
 Revision 1.42  2008/03/17 17:44:16  Singular
 *hannes: fact.tst
 

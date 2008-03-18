@@ -1,7 +1,7 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: helpstuff.cc,v 1.7 2008-03-17 17:44:17 Singular Exp $";
+// $Id: helpstuff.cc,v 1.8 2008-03-18 17:46:16 Singular Exp $
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -174,6 +174,9 @@ change_poly( const CanonicalForm & f , const SFormList & Substitutionlist ,int d
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.7  2008/03/17 17:44:17  Singular
+*hannes: fact.tst
+
 Revision 1.4  2001/06/19 15:29:04  Singular
 *hannes: optim.
 

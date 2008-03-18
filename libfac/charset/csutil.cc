@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: csutil.cc,v 1.16 2008-02-22 12:16:02 Singular Exp $";
+/* $Id: csutil.cc,v 1.17 2008-03-18 17:46:15 Singular Exp $ */
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -987,6 +987,9 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.16  2008/02/22 12:16:02  Singular
+hannes: genZero ->isZero
+
 Revision 1.15  2007/10/16 15:49:49  Singular
 SAGE: remove alg content in myfitting
 

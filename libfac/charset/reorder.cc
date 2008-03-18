@@ -11,7 +11,7 @@
 // computing time for your example!
 /////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: reorder.cc,v 1.4 2006-05-16 14:46:49 Singular Exp $";
+/* $Id: reorder.cc,v 1.5 2008-03-18 17:46:15 Singular Exp $ */
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -407,6 +407,9 @@ reorder(const Varlist & betterorder, const ListCFList & Q){
 }
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  2006/05/16 14:46:49  Singular
+*hannes: gcc 4.1 fixes
+
 Revision 1.3  1997/09/12 07:19:44  Singular
 * hannes/michael: libfac-0.3.0
 
