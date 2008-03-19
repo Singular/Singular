@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.h,v 1.1.1.1 2003-10-06 12:15:53 Singular Exp $ */
+/* $Id: gnumpfl.h,v 1.2 2008-03-19 17:44:08 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 */
@@ -27,11 +27,11 @@ number   ngfDiv(number a, number b);
 void     ngfPower(number x, int exp, number *lu);
 number   ngfCopy(number a);
 number   ngf_Copy(number a, ring r);
-char *   ngfRead (char *s, number *a);
+const char *   ngfRead (const char *s, number *a);
 void     ngfWrite(number &a);
 
 #ifdef LDEBUG
-BOOLEAN  ngfDBTest(number a, char *f, int l);
+BOOLEAN  ngfDBTest(number a, const char *f, const int l);
 #endif
 void     ngfDelete(number *a, const ring r);
 

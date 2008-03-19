@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.12 2007-02-16 10:54:07 motsak Exp $ */
+/* $Id: syz1.cc,v 1.13 2008-03-19 17:44:12 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -2065,7 +2065,7 @@ void syPrint(syStrategy syzstr)
       }
     }
   }
-  char *sn=currRingHdl->id;
+  const char *sn=currRingHdl->id;
   int sl=strlen(sn);
   syPrintEmptySpaces1(sl);
   l = 0;

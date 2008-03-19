@@ -11,7 +11,7 @@
  *           have to be defined before this file is included
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Set.h,v 1.13 2007-05-10 08:12:42 wienand Exp $
+ *  Version: $Id: p_Procs_Set.h,v 1.14 2008-03-19 17:44:10 Singular Exp $
  *******************************************************************/
 #include "modulop.h"
 
@@ -189,7 +189,7 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
 }
 
 #ifdef RDEBUG
-void p_Debug_GetSpecNames(const ring r, char* &field, char* &length, char* &ord)
+void p_Debug_GetSpecNames(const ring r, const char* &field, const char* &length, const char* &ord)
 {
   p_Field     e_field = p_FieldIs(r);
   p_Length    e_length = p_LengthIs(r);

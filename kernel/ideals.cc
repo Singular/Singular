@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.49 2008-03-04 15:42:56 Singular Exp $ */
+/* $Id: ideals.cc,v 1.50 2008-03-19 17:44:08 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -41,7 +41,7 @@ static poly * givenideal;
 * initialise an ideal
 */
 #ifdef PDEBUG
-ideal idDBInit(int idsize, int rank, char *f, int l)
+ideal idDBInit(int idsize, int rank, const char *f, int l)
 #else
 ideal idInit(int idsize, int rank)
 #endif
@@ -307,7 +307,7 @@ BOOLEAN idIsConstant(ideal id)
 * copy an ideal
 */
 #ifdef PDEBUG
-ideal idDBCopy(ideal h1,char *f,int l)
+ideal idDBCopy(ideal h1,const char *f,int l)
 {
   int i;
   ideal h2;
@@ -350,7 +350,7 @@ ideal id_Copy (ideal h1, const ring r)
 }
 
 #ifdef PDEBUG
-void idDBTest(ideal h1, int level, char *f,int l)
+void idDBTest(ideal h1, int level, const char *f,const int l)
 {
   int i;
 

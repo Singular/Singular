@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.123 2007-11-15 11:35:29 Singular Exp $ */
+/* $Id: iplib.cc,v 1.124 2008-03-19 17:44:34 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -42,7 +42,7 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport);
 #endif /* HAVE_LIBPARSER */
 #define NS_LRING (procstack->cRing)
 
-extern int iiArithAddCmd(char *szName, short nAlias, short nTokval,
+extern int iiArithAddCmd(const char *szName, short nAlias, short nTokval,
                          short nToktype, short nPos);
 
 #include "mod_raw.h"
@@ -522,8 +522,8 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
         && (lRingDependend((lists)iiRETURNEXPR[myynest+1].Data()))))
       {
         //idhdl hn;
-        char *n;
-        char *o;
+        const char *n;
+        const char *o;
         idhdl nh=NULL, oh=NULL;
         if (iiLocalRing[myynest]!=NULL)
           oh=rFindHdl(iiLocalRing[myynest],NULL, NULL);
@@ -688,13 +688,13 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-BOOLEAN iiTryLoadLib(leftv v, char *id)
+BOOLEAN iiTryLoadLib(leftv v, const char *id)
 {
   BOOLEAN LoadResult = TRUE;
 #ifdef HAVE_NS
   char libnamebuf[128];
   char *libname = (char *)omAlloc(strlen(id)+5);
-  char *suffix[] = { "", ".lib", ".so", ".sl", NULL };
+  const char *suffix[] = { "", ".lib", ".so", ".sl", NULL };
   int i = 0;
   FILE *fp;
   package pack;
@@ -1008,8 +1008,8 @@ BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
 
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-procinfo *iiInitSingularProcinfo(procinfov pi, char *libname, char *procname,
-                                 int line, long pos, BOOLEAN pstatic)
+procinfo *iiInitSingularProcinfo(procinfov pi, const char *libname,
+              const char *procname, int line, long pos, BOOLEAN pstatic)
 {
   pi->libname = omStrDup(libname);
 

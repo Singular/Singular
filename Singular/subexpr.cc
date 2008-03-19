@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.99 2007-11-08 09:20:33 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.100 2008-03-19 17:44:37 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -78,7 +78,7 @@ void sleftv::Print(leftv store, int spaces)
     command c=(command)data;
     char ch[2];
     ch[0]=c->op;ch[1]='\0';
-    char *s=ch;
+    const char *s=ch;
     if (c->op>127) s=iiTwoOps(c->op);
     ::Print("##command %d(%s), %d args\n",
       c->op, s, c->argc);
@@ -785,7 +785,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           if((pi->language == LANG_SINGULAR) && (pi->data.s.body!=NULL))
             s = (pi->data.s.body);
           else
-            s = "";
+            s = (char *)"";
           if (typed)
           {
             char* ns = (char*) omAlloc(strlen(s) + 4);
@@ -1230,7 +1230,7 @@ BOOLEAN assumeStdFlag(leftv h)
 * into an expression (sleftv), deletes the string
 * utility for grammar and iparith
 */
-void syMake(leftv v,char * id, idhdl packhdl)
+void syMake(leftv v,const char * id, idhdl packhdl)
 {
   /* resolv an identifier: (to DEF_CMD, if siq>0)
   * 1) reserved id: done by scanner
@@ -1525,15 +1525,15 @@ int sleftv::Eval()
       }
       if (!nok)
       {
-        char *n=d->arg1.name;
+        const char *n=d->arg1.name;
         nok=(n == NULL) || d->arg2.Eval();
         if (!nok)
         {
           int save_typ=d->arg1.rtyp;
-          omCheckAddr(n);
+          omCheckAddr((ADDRESS)n);
           if (d->arg1.rtyp!=IDHDL)
           syMake(&d->arg1,n);
-          omCheckAddr(d->arg1.name);
+          omCheckAddr((ADDRESS)d->arg1.name);
           if (d->arg1.rtyp==IDHDL)
           {
             n=omStrDup(IDID((idhdl)d->arg1.data));
@@ -1550,10 +1550,10 @@ int sleftv::Eval()
           else
             nok=iiDeclCommand(&t,&d->arg1,0,save_typ,&IDROOT);
           memcpy(&d->arg1,&t,sizeof(sleftv));
-          omCheckAddr(d->arg1.name);
+          omCheckAddr((ADDRESS)d->arg1.name);
           nok=nok||iiAssign(&d->arg1,&d->arg2);
           omCheckIf(d->arg1.name != NULL,  // OB: ????
-                    omCheckAddr(d->arg1.name));
+                    omCheckAddr((ADDRESS)d->arg1.name));
           if (!nok)
           {
             memset(&d->arg1,0,sizeof(sleftv));
@@ -1630,7 +1630,7 @@ int sleftv::Eval()
   return nok;
 }
 
-char *iiSleftv2name(leftv v)
+const char *iiSleftv2name(leftv v)
 {
   return(v->name);
 }

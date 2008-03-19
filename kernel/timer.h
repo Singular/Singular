@@ -6,11 +6,11 @@
 /*
 *  ABSTRACT - get the computing time
 */
-/* $Id: timer.h,v 1.1.1.1 2003-10-06 12:16:04 Singular Exp $ */
+/* $Id: timer.h,v 1.2 2008-03-19 17:44:13 Singular Exp $ */
 
 extern int timerv;
 void startTimer(void);
-void writeTime(char* s);
+void writeTime(const char* s);
 
 int initTimer();
 int  getTimer();
@@ -18,7 +18,7 @@ int  getTimer();
 #ifdef HAVE_RTIMER
 extern int rtimerv;
 void startRTimer(void);
-void writeRTime(char* s);
+void writeRTime(const char* s);
 
 void initRTimer();
 int  getRTimer();

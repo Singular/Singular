@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.8 2007-12-18 09:56:22 Singular Exp $ */
+/* $Id: febase.h,v 1.9 2008-03-19 17:44:08 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -205,8 +205,8 @@ void feStringAppendBrowsers(int warn = -1);
  * File Stuff
  *
  *****************************************************************/
-FILE *  feFopen(char *path, char *mode, char *where=NULL, int useWerror=FALSE,
-                int path_only=FALSE);
+FILE *  feFopen(const char *path, const char *mode, char *where=NULL,
+                int useWerror=FALSE, int path_only=FALSE);
 
 #ifdef HAVE_TCL
 
@@ -228,7 +228,7 @@ const  char * VoiceName();
 void    VoiceBackTrack();
 void    Warn(const char *fmt, ...);
 BOOLEAN contBuffer(feBufferTypes typ);
-char *  eati(char *s, int *i);
+const char *  eati(const char *s, int *i);
 BOOLEAN exitBuffer(feBufferTypes typ);
 BOOLEAN exitVoice();
 void    monitor(char* s,int mode);

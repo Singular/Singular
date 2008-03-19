@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.7 2007-02-21 16:15:34 Singular Exp $ */
+/* $Id: longalg.h,v 1.8 2008-03-19 17:44:09 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -56,14 +56,14 @@ number  naSub(number la, number li);               /* lu := la-li */
 void    naNormalize(number &p);
 number  naGcd(number a, number b, const ring r);
 number  naLcm(number a, number b, const ring r);
-char *  naRead(char * s, number * p);
+const char *  naRead(const char * s, number * p);
 void    naWrite(number &p);
 char *  naName(number n);
 nMapFunc naSetMap(ring src, ring dst);
 number naMap0P(number c);
 number naMap00(number c);
 #ifdef LDEBUG
-BOOLEAN naDBTest(number a, char *f,int l);
+BOOLEAN naDBTest(number a, const char *f,const int l);
 #endif
 
 void    naSetIdeal(ideal I);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sdb.cc,v 1.16 2001-08-27 14:47:38 Singular Exp $ */
+/* $Id: sdb.cc,v 1.17 2008-03-19 17:44:37 Singular Exp $ */
 /*
 * ABSTRACT: Singular debugger
 */
@@ -121,7 +121,7 @@ void sdb_edit(procinfo *pi)
   }
   else
   {
-    char *editor=getenv("EDITOR");
+    const char *editor=getenv("EDITOR");
     if (editor==NULL)
       editor=getenv("VISUAL");
     if (editor==NULL)

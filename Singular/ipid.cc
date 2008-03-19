@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.82 2008-01-11 10:56:45 Singular Exp $ */
+/* $Id: ipid.cc,v 1.83 2008-03-19 17:44:34 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -51,7 +51,7 @@ package basePack =NULL;
 idhdl currRingHdl = NULL;
 ring  currRing = NULL;
 ideal currQuotient = NULL;
-char* iiNoName="_";
+const char* iiNoName="_";
 
 void paCleanUp(package pack);
 
@@ -84,7 +84,7 @@ idhdl idrec::get(const char * s, int lev)
   idhdl h = this;
   idhdl found=NULL;
   int l;
-  char *id;
+  const char *id;
 #ifndef HAVE_IDI
   if (s[1]=='\0')
   {
@@ -241,7 +241,7 @@ idhdl idrec::get(const char * s, int lev)
   int less4=(i < (1<<24));
   while (h!=NULL)
   {
-    omCheckAddr(IDID(h));
+    omCheckAddr((ADDRESS)IDID(h));
     l=IDLEV(h);
     if ((l==0)||(l==lev))
     {
@@ -271,7 +271,7 @@ idhdl idrec::get(const char * s, int lev)
 //  /* much more !! */
 //}
 
-idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
+idhdl idrec::set(const char * s, int lev, idtyp t, BOOLEAN init)
 {
   //printf("define %s, %x, lev: %d, typ: %d\n", s,s,lev,t);
   idhdl h = (idrec *)omAlloc0Bin(idrec_bin);
@@ -373,7 +373,7 @@ char * idrec::String()
 }
 
 //#define KAI
-idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
+idhdl enterid(const char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
 {
   idhdl h;
   s=omStrDup(s);
@@ -450,11 +450,11 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
 #ifdef HAVE_NS
     //listall();
 #endif
-    omFree(s);
+    omFree((ADDRESS)s);
     return NULL;
 }
 
-void killid(char * id, idhdl * ih)
+void killid(const char * id, idhdl * ih)
 {
   if (id!=NULL)
   {
@@ -807,7 +807,7 @@ void  ipMoveId(idhdl tomove)
   }
 }
 
-char * piProcinfo(procinfov pi, char *request)
+const char * piProcinfo(procinfov pi, const char *request)
 {
   if(pi == NULL) return "empty proc";
   else if (strcmp(request, "libname")  == 0) return pi->libname;

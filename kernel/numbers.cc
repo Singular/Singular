@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.13 2008-02-01 15:11:34 wienand Exp $ */
+/* $Id: numbers.cc,v 1.14 2008-03-19 17:44:10 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -62,7 +62,7 @@ BOOLEAN (*nIsOne)(number a);
 BOOLEAN (*nIsMOne)(number a);
 BOOLEAN (*nGreaterZero)(number a);
 void    (*nWrite)(number &a);
-char *  (*nRead)(char *s,number *a);
+const char* (*nRead)(const char *s,number *a);
 void    (*nPower)(number a, int i, number * result);
 number  (*nGcd)(number a, number b, const ring r);
 number  (*nLcm)(number a, number b, const ring r);
@@ -85,6 +85,10 @@ void   ndInpMult(number &a, number b, const ring r)
 
 #ifdef LDEBUG
 void   nDBDummy1(number* d,char *f, int l) { *d=NULL; }
+BOOLEAN ndDBTest(number a, const char *f, const int l)
+{
+  return TRUE;
+}
 #endif
 
 void   nDummy2(number& d) { }
@@ -456,7 +460,7 @@ void nInitChar(ring r)
      n->nExtGcd = nrzExtGcd;
      n->nName= ndName;
 #ifdef LDEBUG
-     n->nDBTest=nrzDBTest;
+     n->nDBTest=ndDBTest; // not yet implemented: nrzDBTest;
 #endif
   }
 #endif
@@ -594,7 +598,7 @@ void nInitChar(ring r)
     /* nName= ndName; */
     /*nSize  = ndSize;*/
 #ifdef LDEBUG
-    n->nDBTest=nrDBTest;
+    n->nDBTest=ndDBTest; // not yet implemented: nrDBTest;
 #endif
   }
   /* -------------- long R -----------------------*/
@@ -625,7 +629,7 @@ void nInitChar(ring r)
     n->nName= ndName;
     n->nSize  = ndSize;
 #ifdef LDEBUG
-    n->nDBTest=ngfDBTest;
+    n->nDBTest=ndDBTest; // not yet implemented: ngfDBTest
 #endif
   }
   /* -------------- long C -----------------------*/
@@ -659,7 +663,7 @@ void nInitChar(ring r)
     n->nImPart=ngcImPart;
     /*nSize  = ndSize;*/
 #ifdef LDEBUG
-    n->nDBTest=ngcDBTest;
+    n->nDBTest=ndDBTest; // not yet implemented: ngcDBTest
 #endif
   }
 #ifdef TEST

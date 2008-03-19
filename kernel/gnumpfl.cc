@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.7 2008-02-15 17:13:14 Singular Exp $ */
+/* $Id: gnumpfl.cc,v 1.8 2008-03-19 17:44:08 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -383,7 +383,7 @@ number ngfGcd(number a, number b)
   return (number)result;
 }
 
-char * ngfEatFloatNExp( char * s )
+static char * ngfEatFloatNExp(char * s )
 {
   char *start= s;
 
@@ -409,9 +409,9 @@ char * ngfEatFloatNExp( char * s )
 /*2
 * extracts the number a from s, returns the rest
 */
-char * ngfRead (char * s, number * a)
+const char * ngfRead (const char * start, number * a)
 {
-  char *start= s;
+  char *s= (char *)start;
 
   //Print("%s\n",s);
 
@@ -434,7 +434,7 @@ char * ngfRead (char * s, number * a)
     if ( *s == '/' )
     {
       s++;
-      s= ngfEatFloatNExp( s );
+      s= ngfEatFloatNExp( (char *)s );
       if (s!= start2+1)
       {
         char tmp_c=*s;
@@ -483,10 +483,10 @@ void ngfWrite (number &a)
 }
 
 #ifdef LDEBUG
-BOOLEAN ngfDBTest(number a, char *f, int l)
-{
-  return TRUE;
-}
+//BOOLEAN ngfDBTest(number a, const char *f, const int l)
+//{
+//  return TRUE;
+//}
 #endif
 
 // local Variables: ***

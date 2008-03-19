@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.46 2007-11-09 14:04:45 Singular Exp $ */
+/* $Id: silink.cc,v 1.47 2008-03-19 17:44:37 Singular Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -41,9 +41,9 @@ omBin ip_link_bin = omGetSpecBin(sizeof(ip_link));
 /* declarations */
 static BOOLEAN DumpAscii(FILE *fd, idhdl h);
 static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h);
-static char* GetIdString(idhdl h);
+static const char* GetIdString(idhdl h);
 static int DumpRhs(FILE *fd, idhdl h);
-static BOOLEAN DumpQring(FILE *fd, idhdl h, char *type_str);
+static BOOLEAN DumpQring(FILE *fd, idhdl h, const char *type_str);
 static BOOLEAN DumpAsciiMaps(FILE *fd, idhdl h, idhdl rhdl);
 static si_link_extension slTypeInit(si_link_extension s, const char* type);
 
@@ -152,7 +152,7 @@ void slKill(si_link l)
     omFreeBin((ADDRESS)l,  ip_link_bin);
 }
 
-char* slStatus(si_link l, char *request)
+const char* slStatus(si_link l, char *request)
 {
   if (l == NULL) return "empty link";
   else if (l->m == NULL) return "unknown link type";
@@ -372,7 +372,7 @@ BOOLEAN slGetDump(si_link l)
 /* =============== ASCII ============================================= */
 BOOLEAN slOpenAscii(si_link l, short flag)
 {
-  char *mode;
+  const char *mode;
   if (flag & SI_LINK_OPEN)
   {
     if (l->mode[0] != '\0' && (strcmp(l->mode, "r") == 0))
@@ -519,7 +519,7 @@ BOOLEAN slWriteAscii(si_link l, leftv v)
   return err;
 }
 
-char* slStatusAscii(si_link l, char* request)
+const char* slStatusAscii(si_link l, char* request)
 {
   if (strcmp(request, "read") == 0)
   {
@@ -603,7 +603,7 @@ static BOOLEAN DumpAsciiMaps(FILE *fd, idhdl h, idhdl rhdl)
 
 static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
 {
-  char *type_str = GetIdString(h);
+  const char *type_str = GetIdString(h);
   idtyp type_id = IDTYP(h);
 
 #ifdef HAVE_NS
@@ -659,7 +659,7 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
   return FALSE;
 }
 
-static char* GetIdString(idhdl h)
+static const char* GetIdString(idhdl h)
 {
   idtyp type = IDTYP(h);
 
@@ -700,7 +700,7 @@ static char* GetIdString(idhdl h)
   }
 }
 
-static BOOLEAN DumpQring(FILE *fd, idhdl h, char *type_str)
+static BOOLEAN DumpQring(FILE *fd, idhdl h, const char *type_str)
 {
   char *ring_str = h->String();
   if (fprintf(fd, "%s temp_ring = %s;\n", Tok2Cmdname(RING_CMD), ring_str)

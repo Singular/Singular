@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.55 2007-12-18 10:27:06 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.56 2008-03-19 17:44:29 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -60,11 +60,11 @@
 
  #ifdef CALL_GDB
    static void debug (int);
-   static void debug_stop (char **);
+   static void debug_stop (char * const *args);
  #endif
  #ifndef __OPTIMIZE__
-   static void stack_trace (char **);
    static void stack_trace_sigchld (int);
+   static void stack_trace (char * const *args);
  #endif
 #endif
 
@@ -427,7 +427,7 @@ static void debug (int method)
   }
   int pid;
   char buf[16];
-  char *args[4] = { "gdb", "Singularg", NULL, NULL };
+  char * args[4] = { "gdb", "Singularg", NULL, NULL };
 
   #ifdef HAVE_FEREAD
   if (fe_is_raw_tty) fe_temp_reset();
@@ -446,10 +446,12 @@ static void debug (int method)
         fprintf (stderr, "debug_stop\n");
         debug_stop (args);
         break;
+      #ifndef __OPTIMIZE__
       case STACK_TRACE:
         fprintf (stderr, "stack_trace\n");
         stack_trace (args);
         break;
+      #endif
       default:
         // should not be reached:
         exit(1);
@@ -465,7 +467,7 @@ static void debug (int method)
   while (si_stop_stack_trace_x) ;
 }
 
-static void debug_stop ( char **args)
+static void debug_stop (char * const *args)
 {
   execvp (args[0], args);
   perror ("exec failed");
@@ -475,7 +477,7 @@ static void debug_stop ( char **args)
 
 static int stack_trace_done;
 
-static void stack_trace (char **args)
+static void stack_trace (char * const *args)
 {
   int pid;
   int in_fd[2];

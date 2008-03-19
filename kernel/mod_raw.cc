@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.13 2007-03-17 16:38:42 Singular Exp $ */
+/* $Id: mod_raw.cc,v 1.14 2008-03-19 17:44:10 Singular Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -130,7 +130,7 @@ void* dynl_open_binary_warn(char* binary_name, const char* msg)
   return  handle;
 }
 
-void* dynl_sym_warn(void* handle, char* proc, const char* msg)
+void* dynl_sym_warn(void* handle, const char* proc, const char* msg)
 {
   void *proc_ptr = NULL;
   if (handle != NULL)
@@ -219,7 +219,7 @@ void *dynl_open(
   return(dlopen(filename, RTLD_NOW|RTLD_GLOBAL));
 }
 
-void *dynl_sym(void *handle, char *symbol)
+void *dynl_sym(void *handle, const char *symbol)
 {
   if (handle == DYNL_KERNEL_HANDLE)
   {
@@ -256,7 +256,7 @@ void *dynl_open(char *filename)
   return ((void *) handle);
 }
 
-void *dynl_sym(void *handle, char *symbol)
+void *dynl_sym(void *handle, const char *symbol)
 {
   func_ptr        f;
   
@@ -318,7 +318,7 @@ void *dynl_open(char *filename)
   return(NULL);
 }
 
-void *dynl_sym(void *handle, char *symbol)
+void *dynl_sym(void *handle, const char *symbol)
 {
   return(NULL);
 }

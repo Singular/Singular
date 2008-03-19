@@ -187,7 +187,7 @@ void singular_example(char *str)
 
 struct soptionStruct
 {
-  char * name;
+  const char * name;
   unsigned   setval;
   unsigned   resetval;
 };
@@ -250,12 +250,12 @@ struct soptionStruct verboseStruct[]=
 
 BOOLEAN setOption(leftv res, leftv v)
 {
-  char *n;
+  const char *n;
   do
   {
     if (v->Typ()==STRING_CMD)
     {
-      n=(char *)v->CopyD(STRING_CMD);
+      n=(const char *)v->CopyD(STRING_CMD);
     }
     else
     {
@@ -682,7 +682,7 @@ void checkall()
       while (hh!=NULL)
       {
         omCheckAddr(hh);
-        omCheckAddr(IDID(hh));
+        omCheckAddr((ADDRESS)IDID(hh));
         if (RingDependend(IDTYP(hh))) Print("%s typ %d in Top\n",IDID(hh),IDTYP(hh));
         hh=IDNEXT(hh);
       }
@@ -695,7 +695,7 @@ void checkall()
           while (h2!=NULL)
           {
             omCheckAddr(h2);
-            omCheckAddr(IDID(h2));
+            omCheckAddr((ADDRESS)IDID(h2));
             if (RingDependend(IDTYP(h2))) Print("%s typ %d in %s\n",IDID(h2),IDTYP(h2),IDID(hh));
             h2=IDNEXT(h2);
           }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.27 2006-09-22 10:32:11 Singular Exp $ */
+/* $Id: attrib.cc,v 1.28 2008-03-19 17:44:29 Singular Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -74,7 +74,7 @@ void * sattr::CopyA()
   return NULL;
 }
 
-attr sattr::set(char * s, void * data, int t)
+attr sattr::set(const char * s, void * data, int t)
 {
   attr h = get(s);
   if (h!=NULL)
@@ -120,7 +120,7 @@ attr sattr::set(char * s, void * data, int t)
   return  this;
 }
 
-attr sattr::get(char * s)
+attr sattr::get(const char * s)
 {
   attr h = this;
   while (h!=NULL)
@@ -131,7 +131,7 @@ attr sattr::get(char * s)
   return NULL;
 }
 
-void * atGet(idhdl root,char * name)
+void * atGet(idhdl root,const char * name)
 {
   attr temp = root->attribute->get(name);
   if (temp!=NULL)
@@ -140,7 +140,7 @@ void * atGet(idhdl root,char * name)
     return NULL;
 }
 
-void * atGet(leftv root,char * name)
+void * atGet(leftv root,const char * name)
 {
   attr temp;
   if (root->e==NULL)
@@ -158,7 +158,7 @@ void * atGet(leftv root,char * name)
     return NULL;
 }
 
-void * atGet(idhdl root,char * name, int t)
+void * atGet(idhdl root,const char * name, int t)
 {
   attr temp = root->attribute->get(name);
   if ((temp!=NULL) && (temp->atyp==t))
@@ -167,7 +167,7 @@ void * atGet(idhdl root,char * name, int t)
     return NULL;
 }
 
-void * atGet(leftv root,char * name, int t)
+void * atGet(leftv root,const char * name, int t)
 {
   attr temp = root->attribute->get(name);
   if ((temp==NULL) && (root->rtyp==IDHDL))
@@ -181,7 +181,7 @@ void * atGet(leftv root,char * name, int t)
     return NULL;
 }
 
-void atSet(idhdl root,char * name,void * data,int typ)
+void atSet(idhdl root,const char * name,void * data,int typ)
 {
   if (root!=NULL)
   {
@@ -189,7 +189,7 @@ void atSet(idhdl root,char * name,void * data,int typ)
   }
 }
 
-void atSet(leftv root,char * name,void * data,int typ)
+void atSet(leftv root,const char * name,void * data,int typ)
 {
   if (root!=NULL)
   {
@@ -257,7 +257,7 @@ void sattr::killAll()
   }
 }
 
-void atKill(idhdl root,char * name)
+void atKill(idhdl root,const char * name)
 {
   attr temp = root->attribute->get(name);
   if (temp!=NULL)

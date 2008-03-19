@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.h,v 1.3 2008-02-01 15:11:34 wienand Exp $ */
+/* $Id: rintegers.h,v 1.4 2008-03-19 17:44:11 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -45,7 +45,7 @@ void    nrzWrite       (number &a);
 char *  nrzRead        (char *s, number *a);
 char *  nrzName        (number n);
 #ifdef LDEBUG
-BOOLEAN nrzDBTest      (number a, char *f, int l);
+BOOLEAN nrzDBTest      (number a, const char *f, const int l);
 #endif
 void    nrzSetExp(int c, ring r);
 void    nrzInitExp(int c, ring r);

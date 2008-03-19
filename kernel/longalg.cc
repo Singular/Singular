@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.31 2008-01-07 13:36:16 Singular Exp $ */
+/* $Id: longalg.cc,v 1.32 2008-03-19 17:44:09 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -36,7 +36,7 @@ static int naPrimeM;
 
 #ifdef LDEBUG
 #define naTest(a) naDBTest(a,__FILE__,__LINE__)
-BOOLEAN naDBTest(number a, char *f,int l);
+BOOLEAN naDBTest(number a, const char *f,const int l);
 #else
 #define naTest(a)
 #endif
@@ -59,7 +59,7 @@ static number   (*nacInvers)(number a);
 static BOOLEAN  (*nacIsOne)(number a);
 static BOOLEAN  (*nacIsMOne)(number a);
 static BOOLEAN  (*nacGreaterZero)(number a);
-static char   * (*nacRead) (char *s, number *a);
+static const char   * (*nacRead) (const char *s, number *a);
 static napoly napRedp(napoly q);
 static napoly napTailred(napoly q);
 static BOOLEAN napDivPoly(napoly p, napoly q);
@@ -493,7 +493,7 @@ void napWrite(napoly p,const BOOLEAN has_denom)
 }
 
 
-static char *napHandleMons(char *s, int i, napoly ex)
+static const char *napHandleMons(const char *s, int i, napoly ex)
 {
   int  j;
   if (strncmp(s,naParNames[i],strlen(naParNames[i]))==0)
@@ -509,7 +509,7 @@ static char *napHandleMons(char *s, int i, napoly ex)
   }
   return s;
 }
-static char *napHandlePars(char *s, int i, napoly ex)
+static const char *napHandlePars(const char *s, int i, napoly ex)
 {
   int  j;
   if (strcmp(s,naParNames[i])==0)
@@ -521,7 +521,7 @@ static char *napHandlePars(char *s, int i, napoly ex)
 }
 
 /*3  reads a monomial  */
-static char  *napRead(char *s, napoly *b)
+static const char  *napRead(const char *s, napoly *b)
 {
   napoly a;
   int  i;
@@ -539,7 +539,7 @@ static char  *napRead(char *s, napoly *b)
   else
     napGetCoeff(a) = nacInit(1);
   i = 0;
-  char  *olds=s;
+  const char  *olds=s;
   loop
   {
     s = napHandlePars(s, i, a);
@@ -1462,7 +1462,7 @@ BOOLEAN naGreater (number a, number b)
 /*2
 * reads a number
 */
-char  *naRead(char *s, number *p)
+const char  *naRead(const char *s, number *p)
 {
   napoly x;
   lnumber a;
@@ -2445,7 +2445,7 @@ number   naGetDenom(number &n, const ring r)
 }
 
 #ifdef LDEBUG
-BOOLEAN naDBTest(number a, char *f,int l)
+BOOLEAN naDBTest(number a, const char *f,const int l)
 {
   lnumber x=(lnumber)a;
   if (x == NULL)

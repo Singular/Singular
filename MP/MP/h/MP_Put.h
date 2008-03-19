@@ -94,7 +94,7 @@ EXTERN MP_Status_t  MP_PutCommonConstantPacket _ANSI_ARGS_((MP_Link_pt link,
 
 EXTERN MP_Status_t  MP_PutIdentifierPacket _ANSI_ARGS_((MP_Link_pt link,
                                                         MP_DictTag_t dtag,
-                                                        char *id,
+                                                        const char *id,
                                                         MP_NumAnnot_t num_annots));
 
 EXTERN MP_Status_t  MP_PutCommonLatinIdentifierPacket _ANSI_ARGS_((MP_Link_pt link,

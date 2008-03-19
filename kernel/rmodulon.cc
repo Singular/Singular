@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.22 2008-02-08 10:11:30 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.23 2008-03-19 17:44:12 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -376,7 +376,7 @@ void nrnInitExp(int m, ring r)
 }
 
 #ifdef LDEBUG
-BOOLEAN nrnDBTest (number a, char *f, int l)
+BOOLEAN nrnDBTest (number a, const char *f, const int l)
 {
   if ( (mpz_cmp_si((int_number) a, 0) < 0) || (mpz_cmp((int_number) a, nrnModul) > 0) )
   {
@@ -408,9 +408,9 @@ void nrnWrite (number &a)
 /*2
 * extracts a long integer from s, returns the rest    (COPY FROM longrat0.cc)
 */
-char * nlCPEatLongC(char *s, MP_INT *i)
+static const char * nlCPEatLongC(char *s, MP_INT *i)
 {
-  char * start=s;
+  const char * start=s;
   if (!(*s >= '0' && *s <= '9'))
   {
     mpz_init_set_si(i, 1);
@@ -432,11 +432,11 @@ char * nlCPEatLongC(char *s, MP_INT *i)
   return s;
 }
 
-char * nrnRead (char *s, number *a)
+const char * nrnRead (const char *s, number *a)
 {
   int_number z = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
   {
-    s = nlCPEatLongC(s, z);
+    s = nlCPEatLongC((char *)s, z);
   }
   *a = (number) z;
   return s;

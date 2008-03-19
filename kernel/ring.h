@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.26 2008-02-01 15:11:34 wienand Exp $ */
+/* $Id: ring.h,v 1.27 2008-03-19 17:44:11 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -19,7 +19,7 @@
 void   rChangeCurrRing(ring r);
 void   rSetHdl(idhdl h);
 ring   rInit(sleftv* pn, sleftv* rv, sleftv* ord);
-idhdl  rDefault(char *s);
+idhdl  rDefault(const char *s);
 ring   rDefault(int ch, int N, char **n);
 #define rIsRingVar(A) r_IsRingVar(A,currRing)
 int    r_IsRingVar(const char *n, ring r);
@@ -356,7 +356,7 @@ inline BOOLEAN rOrd_is_Comp_dp(ring r)
 
 #ifdef RDEBUG
 #define rTest(r)    rDBTest(r, __FILE__, __LINE__)
-extern BOOLEAN rDBTest(ring r, char* fn, int l);
+extern BOOLEAN rDBTest(ring r, const char* fn, const int l);
 #else
 #define rTest(r)
 #endif

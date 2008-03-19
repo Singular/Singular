@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Impl.h,v 1.8 2008-01-30 09:01:38 wienand Exp $
+ *  Version: $Id: p_Procs_Impl.h,v 1.9 2008-03-19 17:44:10 Singular Exp $
  *******************************************************************/
 #ifndef P_PROCS_IMPL_H
 #define P_PROCS_IMPL_H
@@ -201,7 +201,7 @@ typedef enum p_Proc
   p_Unknown_Proc
 } p_Proc;
 
-static inline char* p_FieldEnum_2_String(p_Field field)
+static inline const char* p_FieldEnum_2_String(p_Field field)
 {
   switch(field)
   {
@@ -224,7 +224,7 @@ static inline char* p_FieldEnum_2_String(p_Field field)
   return "NoField_2_String";
 }
 
-static inline char* p_LengthEnum_2_String(p_Length length)
+static inline const char* p_LengthEnum_2_String(p_Length length)
 {
   switch(length)
   {
@@ -242,7 +242,7 @@ static inline char* p_LengthEnum_2_String(p_Length length)
   return "NoLength_2_String";
 }
 
-static inline char* p_OrdEnum_2_String(p_Ord ord)
+static inline const char* p_OrdEnum_2_String(p_Ord ord)
 {
   switch(ord)
   {
@@ -272,7 +272,7 @@ static inline char* p_OrdEnum_2_String(p_Ord ord)
   return "NoOrd_2_String";
 }
 
-static inline char* p_ProcEnum_2_String(p_Proc proc)
+static inline const char* p_ProcEnum_2_String(p_Proc proc)
 {
   switch(proc)
   {

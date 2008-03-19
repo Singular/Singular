@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.16 2008-02-08 10:11:30 wienand Exp $ */
+/* $Id: rmodulo2m.cc,v 1.17 2008-03-19 17:44:11 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -411,7 +411,7 @@ void nr2mInitExp(int m, ring r)
 }
 
 #ifdef LDEBUG
-BOOLEAN nr2mDBTest (number a, char *f, int l)
+BOOLEAN nr2mDBTest (number a, const char *f, const int l)
 {
   if (((NATNUMBER)a<0) || ((NATNUMBER)a>nr2mModul))
   {
@@ -427,7 +427,7 @@ void nr2mWrite (number &a)
   else                          StringAppend("%d",(int)((NATNUMBER)a));
 }
 
-char* nr2mEati(char *s, int *i)
+static const char* nr2mEati(const char *s, int *i)
 {
 
   if (((*s) >= '0') && ((*s) <= '9'))
@@ -446,7 +446,7 @@ char* nr2mEati(char *s, int *i)
   return s;
 }
 
-char * nr2mRead (char *s, number *a)
+const char * nr2mRead (const char *s, number *a)
 {
   int z;
   int n=1;

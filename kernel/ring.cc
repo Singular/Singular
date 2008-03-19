@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.76 2008-03-04 15:43:50 Singular Exp $ */
+/* $Id: ring.cc,v 1.77 2008-03-19 17:44:11 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1804,7 +1804,7 @@ BOOLEAN rIsPolyVar(int v, ring r)
 
 #ifdef RDEBUG
 // This should eventually become a full-fledge ring check, like pTest
-BOOLEAN rDBTest(ring r, char* fn, int l)
+BOOLEAN rDBTest(ring r, const char* fn, const int l)
 {
   int i,j;
 
@@ -3354,8 +3354,9 @@ void rDebugPrint(ring r)
     PrintS("NULL ?\n");
     return;
   }
-  char *TYP[]={"ro_dp","ro_wp","ro_wp64","ro_wp_neg","ro_cp",
-               "ro_syzcomp", "ro_syz", "ro_none"};
+  // corresponds to ro_typ from ring.h:
+  const char *TYP[]={"ro_dp","ro_wp","ro_wp64","ro_wp_neg","ro_cp",
+                     "ro_syzcomp", "ro_syz", "ro_none"};
   int i,j;
 
   Print("ExpL_Size:%d ",r->ExpL_Size);
@@ -3436,9 +3437,9 @@ void rDebugPrint(ring r)
 
   // p_Procs stuff
   p_Procs_s proc_names;
-  char* field;
-  char* length;
-  char* ord;
+  const char* field;
+  const char* length;
+  const char* ord;
   p_Debug_GetProcNames(r, &proc_names);
   p_Debug_GetSpecNames(r, field, length, ord);
 

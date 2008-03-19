@@ -6,7 +6,7 @@
 /*
 * ABSTRACT
 */
-/* $Id: shortfl.h,v 1.1.1.1 2003-10-06 12:16:03 Singular Exp $ */
+/* $Id: shortfl.h,v 1.2 2008-03-19 17:44:12 Singular Exp $ */
 #include "structs.h"
 
 BOOLEAN nrGreaterZero (number k);
@@ -25,10 +25,10 @@ number  nrInvers      (number c);
 BOOLEAN nrGreater     (number a, number b);
 BOOLEAN nrEqual       (number a, number b);
 void    nrWrite       (number &a);
-char *  nrRead        (char *s, number *a);
+const char *  nrRead  (const char *s, number *a);
 int     nrGetChar();
 #ifdef LDEBUG
-BOOLEAN nrDBTest(number a, char *f, int l);
+BOOLEAN nrDBTest(number a, const char *f, const int l);
 #endif
 
 nMapFunc nrSetMap(ring src, ring dst);

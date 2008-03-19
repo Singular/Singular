@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.8 2007-09-12 09:33:33 Singular Exp $ */
+/* $Id: feResource.cc,v 1.9 2008-03-19 17:44:08 Singular Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -53,12 +53,12 @@ typedef enum {feResUndef = 0, feResBinary, feResDir, feResFile, feResUrl, feResP
 
 typedef struct feResourceConfig_s
 {
-  char*           key;   // key to identify resource
-  char            id;    // char id to identify resource
+  const char*           key;   // key to identify resource
+  const char            id;    // char id to identify resource
   feResourceType  type;  // type of Resource
-  char*           env;   // env variable to look for
-  char*           fmt;   // format string -- see below for epxlaination
-  char*                        value; // what it was set to
+  const char*           env;   // env variable to look for
+  const char*           fmt;   // format string -- see below for epxlaination
+  char*     value; // what it was set to
 } feResourceConfig_s;
 typedef feResourceConfig_s * feResourceConfig;
 

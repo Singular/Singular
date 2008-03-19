@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.42 2006-09-25 14:22:15 Singular Exp $ */
+/* $Id: ipid.h,v 1.43 2008-03-19 17:44:34 Singular Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -63,7 +63,7 @@ typedef struct
 {
   int (*iiAddCproc)(char *libname, char *procname, BOOLEAN pstatic,
                     BOOLEAN(*func)(leftv res, leftv v));
-  int (*iiArithAddCmd)(char *szName, short nAlias, short nTokval,
+  int (*iiArithAddCmd)(const char *szName, short nAlias, short nTokval,
                        short nToktype, short nPos);
 
 } SModulFunctions;
@@ -75,10 +75,10 @@ typedef struct
 
 char *idhdl2id(idhdl pck, idhdl h);
 void  iiname2hdl(const char *name, idhdl *pck, idhdl *id);
-idhdl enterid(char * a, int lev, idtyp t, idhdl* root, BOOLEAN init=TRUE);
+idhdl enterid(const char * a, int lev, idtyp t, idhdl* root, BOOLEAN init=TRUE);
 idhdl ggetid(const char *n, BOOLEAN local = FALSE);
 idhdl ggetid(const char *n, BOOLEAN local, idhdl *packhdl);
-void  killid(char * a, idhdl * i);
+void  killid(const char * a, idhdl * i);
 #ifdef HAVE_NS
 void killhdl(idhdl h, package prooti=currPack);
 #else

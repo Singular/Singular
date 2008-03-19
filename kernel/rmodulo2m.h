@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.h,v 1.7 2007-06-20 09:39:25 wienand Exp $ */
+/* $Id: rmodulo2m.h,v 1.8 2008-03-19 17:44:12 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -38,10 +38,10 @@ number  nr2mGcd         (number a,number b,ring r);
 number  nr2mExtGcd      (number a, number b, number *s, number *t);
 nMapFunc nr2mSetMap     (ring src, ring dst);
 void    nr2mWrite       (number &a);
-char *  nr2mRead        (char *s, number *a);
+const char *  nr2mRead  (const char *s, number *a);
 char *  nr2mName        (number n);
 #ifdef LDEBUG
-BOOLEAN nr2mDBTest      (number a, char *f, int l);
+BOOLEAN nr2mDBTest      (number a, const char *f, const int l);
 #endif
 void    nr2mSetExp(int c, ring r);
 void    nr2mInitExp(int c, ring r);

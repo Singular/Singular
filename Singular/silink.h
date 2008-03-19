@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.h,v 1.15 2000-12-12 08:44:53 obachman Exp $ */
+/* $Id: silink.h,v 1.16 2008-03-19 17:44:37 Singular Exp $ */
 /*
 * ABSTRACT: general interface to links
 */
@@ -19,7 +19,7 @@ typedef leftv      (*slReadProc)(si_link l);
 typedef leftv      (*slRead2Proc)(si_link l, leftv a);
 typedef BOOLEAN    (*slDumpProc)(si_link l);
 typedef BOOLEAN    (*slGetDumpProc)(si_link l);
-typedef char*      (*slStatusProc)(si_link l, char *request);
+typedef const char* (*slStatusProc)(si_link l, char *request);
 
 struct s_si_link_extension
 {
@@ -71,8 +71,8 @@ leftv   slRead(si_link l,leftv a=NULL);
 BOOLEAN slWrite(si_link l, leftv v);
 BOOLEAN slDump(si_link l);
 BOOLEAN slGetDump(si_link l);
-char* slStatus(si_link l, char *request);
-char* slStatusAscii(si_link l, char* request);
+const char* slStatus(si_link l, char *request);
+const char* slStatusAscii(si_link l, char* request);
 BOOLEAN slInit(si_link l, char *str);
 void slKill(si_link l);
 void slCleanUp(si_link l);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shortfl.cc,v 1.5 2008-02-15 17:13:14 Singular Exp $ */
+/* $Id: shortfl.cc,v 1.6 2008-03-19 17:44:12 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -206,7 +206,7 @@ void nrPower (number a, int i, number * result)
   *result = nf(nf(a).F() * nf(*result).F()).N();
 }
 
-char* nrEatr(char *s, float *r)
+static const char* nrEatr(const char *s, float *r)
 {
   int i;
 
@@ -225,9 +225,9 @@ char* nrEatr(char *s, float *r)
   return s;
 }
 
-char * nrRead (char *s, number *a)
+const char * nrRead (const char *s, number *a)
 {
-  char *t;
+  const char *t;
   float z1,z2;
   float n=1.0;
 
@@ -290,10 +290,10 @@ int nrGetChar()
 /*2
 * test valid numbers: not implemented yet
 */
-BOOLEAN nrDBTest(number a, char *f, int l)
-{
-  return TRUE;
-}
+//BOOLEAN nrDBTest(number a, const char *f, const int l)
+//{
+//  return TRUE;
+//}
 #endif
 
 /* in longrat.h

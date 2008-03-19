@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.h,v 1.1.1.1 2003-10-06 12:15:52 Singular Exp $ */
+/* $Id: ffields.h,v 1.2 2008-03-19 17:44:08 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -28,9 +28,9 @@ number  nfInvers      (number c);
 BOOLEAN nfGreater     (number a, number b);
 BOOLEAN nfEqual       (number a, number b);
 void    nfWrite       (number &a);
-char *  nfRead        (char *s, number *a);
+const char *  nfRead  (const char *s, number *a);
 #ifdef LDEBUG
-BOOLEAN nfDBTest      (number a, char *f, int l);
+BOOLEAN nfDBTest      (number a, const char *f, const int l);
 #endif
 void    nfSetChar     (int c, char ** param);
 

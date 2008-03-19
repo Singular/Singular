@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.51 2007-11-16 18:37:30 Singular Exp $ */
+/* $Id: ipshell.h,v 1.52 2008-03-19 17:44:35 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -22,14 +22,14 @@ extern int  traceit ;
 extern leftv iiCurrArgs;
 extern int iiOp; /* the current operation*/
 extern int  myynest;
-extern char *  currid;
+extern const char *  currid;
 extern int     iiRETURNEXPR_len;
 extern sleftv *iiRETURNEXPR;
 #ifdef USE_IILOCALRING
 extern ring   *iiLocalRing;
 #endif
 extern cmdnames cmds[];
-extern char *lastreserved;
+extern const char *lastreserved;
 extern const char *singular_date;
 
 extern BOOLEAN yyInRingConstruction; /* 1: during ring construction */
@@ -46,8 +46,8 @@ void    list_cmd(int typ, const char* what, const char * prefix,
 //char *  iiStringMatrix(matrix im, int dim, char ch=',');
 void    killlocals(int v);
 int     exprlist_length(leftv v);
-char *  Tok2Cmdname(int i);
-char *  iiTwoOps(int t);
+const char *  Tok2Cmdname(int i);
+const char *  iiTwoOps(int t);
 int     IsPrime(int i);
 
 BOOLEAN iiWRITE(leftv res,leftv exprlist);
@@ -66,7 +66,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN f
    if  no, returns FALSE
 */
 BOOLEAN iiLocateLib(const char* lib, char* where);
-leftv   iiMap(map theMap, char * what);
+leftv   iiMap(map theMap, const char * what);
 void    iiMakeResolv(resolvente r, int length, int rlen, char * name, int typ0,
            intvec ** weights=NULL);
 BOOLEAN jjMINRES(leftv res, leftv v);
@@ -197,7 +197,7 @@ char * versionString();
 /* ================================================================== */
 void  singular_example(char *str);
 
-BOOLEAN iiTryLoadLib(leftv v, char *id);
+BOOLEAN iiTryLoadLib(leftv v, const char *id);
 
 #ifdef HAVE_NS
 void listall(int showproc=1);

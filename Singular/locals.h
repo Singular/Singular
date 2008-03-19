@@ -1,5 +1,5 @@
 /*
- * $Id: locals.h,v 1.1 2002-06-25 08:50:49 anne Exp $
+ * $Id: locals.h,v 1.2 2008-03-19 17:44:36 Singular Exp $
  */
 
 #include <mod2.h>
@@ -28,4 +28,4 @@ extern "C"
 }
 #endif
 
-char *Tok2Cmdname( int tok);
+const char *Tok2Cmdname( int tok);

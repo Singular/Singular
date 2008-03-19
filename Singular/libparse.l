@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.61 2006-03-06 14:11:20 Singular Exp $ */
+/* $Id: libparse.l,v 1.62 2008-03-19 17:44:36 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -59,7 +59,7 @@ int found_info=0,
     found_oldhelp = 0,
     found_proc_in_proc = 0;
 
-char *yylp_errlist[]= {
+const char *yylp_errlist[]= {
    "",
    "missing close bracket ')' for proc definition in line %d.",  /*  1 */
    "missing close bracket ')' for procbody in line %d.",         /*  2 */

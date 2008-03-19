@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.152 2007-04-26 05:40:59 bricken Exp $ */
+/* $Id: tgb.cc,v 1.153 2008-03-19 17:44:12 Singular Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1134,12 +1134,14 @@ static void replace_pair(int & i, int & j,slimgb_alg* c)
 }
 
 
-static void add_later(poly p, char* prot, slimgb_alg* c){
+static void add_later(poly p, const char* prot, slimgb_alg* c)
+{
     int i=0;
     //check, if it is already in the queue
 
 
-    while(c->add_later->m[i]!=NULL){
+    while(c->add_later->m[i]!=NULL)
+    {
         if (p_LmEqual(c->add_later->m[i],p,c->r))
             return;
         i++;

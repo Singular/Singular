@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.264 2008-02-27 15:05:58 Singular Exp $ */
+/* $Id: extra.cc,v 1.265 2008-03-19 17:44:29 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -329,7 +329,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       if ((h!=NULL) && (h->Typ()==STRING_CMD))
       {
         res->rtyp=STRING_CMD;
-        char *r=getenv((char *)h->Data());
+        const char *r=getenv((char *)h->Data());
         if (r==NULL) r="";
         res->data=(void *)omStrDup(r);
         return FALSE;
@@ -370,7 +370,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     if (strcmp(sys_cmd, "Singular") == 0)
     {
       res->rtyp=STRING_CMD;
-      char *r=feResource("Singular");
+      const char *r=feResource("Singular");
       if (r == NULL) r="";
       res->data = (void*) omStrDup( r );
       return FALSE;
@@ -379,7 +379,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     if (strcmp(sys_cmd, "SingularLib") == 0)
     {
       res->rtyp=STRING_CMD;
-      char *r=feResource("SearchPath");
+      const char *r=feResource("SearchPath");
       if (r == NULL) r="";
       res->data = (void*) omStrDup( r );
       return FALSE;
@@ -415,7 +415,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         if (feOptSpec[opt].type == feOptString)
         {
           res->rtyp = STRING_CMD;
-          char *r=(char*)feOptSpec[opt].value;
+          const char *r=(const char*)feOptSpec[opt].value;
           if (r == NULL) r="";
           res->data = omStrDup(r);
         }

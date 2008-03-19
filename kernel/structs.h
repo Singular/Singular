@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.42 2008-01-30 16:14:25 wienand Exp $ */
+/* $Id: structs.h,v 1.43 2008-03-19 17:44:12 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -283,7 +283,7 @@ struct n_Procs_s
    number  (*nRePart)(number a);
    number  (*nImPart)(number a);
    void    (*nWrite)(number &a);
-   char *  (*nRead)(char * s, number * a);
+   const char *  (*nRead)(const char * s, number * a);
    void    (*nNormalize)(number &a);
    BOOLEAN (*nGreater)(number a,number b),
 #ifdef HAVE_RINGS
@@ -303,7 +303,7 @@ struct n_Procs_s
    char *  (*nName)(number n);
    void    (*nInpMult)(number &a, number b, ring r);
 #ifdef LDEBUG
-   BOOLEAN (*nDBTest)(number a, char *f,int l);
+   BOOLEAN (*nDBTest)(number a, const char *f,const int l);
 #endif
 //extern number  (*nMap)(number from);
 
@@ -869,7 +869,7 @@ class idrec
   public:
   /* !! do not change the first 6 entries !! (see subexpr.h: sleftv) */
   idhdl      next;
-  char *     id;
+  const char *id;
   utypes     data;
   attr       attribute;
   BITSET     flag;
@@ -906,7 +906,7 @@ class idrec
 
   idrec() { memset(this,0,sizeof(*this)); }
   idhdl get(const char * s, int lev);
-  idhdl set(char * s, int lev, idtyp t, BOOLEAN init=TRUE);
+  idhdl set(const char * s, int lev, idtyp t, BOOLEAN init=TRUE);
   char * String();
 //  ~idrec();
 };

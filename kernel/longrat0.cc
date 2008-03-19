@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat0.cc,v 1.4 2007-07-04 09:58:40 Singular Exp $ */
+/* $Id: longrat0.cc,v 1.5 2008-03-19 17:44:10 Singular Exp $ */
 /*
 * ABSTRACT -
 * IO for long rational numbers (Hubert Grassmann)
@@ -25,9 +25,9 @@
 /*2
 * extracts a long integer from s, returns the rest
 */
-char * nlEatLong(char *s, MP_INT *i)
+static const char * nlEatLong(char *s, MP_INT *i)
 {
-  char * start=s;
+  const char * start=s;
 
   while (*s >= '0' && *s <= '9') s++;
   if (*s=='\0')
@@ -47,7 +47,7 @@ char * nlEatLong(char *s, MP_INT *i)
 /*2
 * extracts the number a from s, returns the rest
 */
-char * nlRead (char *s, number *a)
+const char * nlRead (const char *s, number *a)
 {
   if (*s<'0' || *s>'9')
   {
@@ -63,13 +63,13 @@ char * nlRead (char *s, number *a)
     MP_INT *z=&((*a)->z);
     MP_INT *n=&((*a)->n);
     mpz_init(z);
-    s = nlEatLong(s, z);
+    s = nlEatLong((char *)s, z);
     if (*s == '/')
     {
       mpz_init(n);
       (*a)->s = 0;
       s++;
-      s = nlEatLong(s, n);
+      s = nlEatLong((char *)s, n);
       if (mpz_cmp_si(n,(long)0)==0)
       {
         WerrorS(nDivBy0);

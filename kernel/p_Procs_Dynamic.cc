@@ -6,7 +6,7 @@
  *  Purpose: source for dynamically loaded version of p_Procs
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Dynamic.cc,v 1.2 2007-02-07 10:42:54 Singular Exp $
+ *  Version: $Id: p_Procs_Dynamic.cc,v 1.3 2008-03-19 17:44:10 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "structs.h"
@@ -120,7 +120,7 @@ static void* GetGeneralProc(p_Proc proc)
 #ifdef RDEBUG
 #include "omalloc.h"
 
-static char* GetGeneralProcName(p_Proc proc)
+static const char* GetGeneralProcName(p_Proc proc)
 {
   switch(proc)
   {

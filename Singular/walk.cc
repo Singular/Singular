@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: walk.cc,v 1.12 2006-08-21 16:53:53 Singular Exp $ */
+/* $Id: walk.cc,v 1.13 2008-03-19 17:44:37 Singular Exp $ */
 /*
 * ABSTRACT: Implementation of the Groebner walk
 */
@@ -470,7 +470,7 @@ static void idElements(ideal L, char* st)
 
 
 
-static void ivString(intvec* iv, char* ch)
+static void ivString(intvec* iv, const char* ch)
 {
   int nV = iv->length()-1;
   //Print("\n// vector %s =  (", ch);

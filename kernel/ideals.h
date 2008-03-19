@@ -3,14 +3,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.9 2007-05-15 09:28:08 Singular Exp $ */
+/* $Id: ideals.h,v 1.10 2008-03-19 17:44:09 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
 #include "structs.h"
 
 #ifdef PDEBUG
-ideal idDBInit (int size, int rank, char *f, int l);
+ideal idDBInit (int size, int rank, const char *f, int l);
 #define idInit(A,B) idDBInit(A,B,__FILE__,__LINE__)
 #else
 /*- creates an ideal -*/
@@ -35,7 +35,7 @@ void idDelDiv(ideal id);
 BOOLEAN idIsConstant(ideal id);
 
 #ifdef PDEBUG
-void idDBTest(ideal h1, int level, char *f,int l);
+void idDBTest(ideal h1, int level, const char *f,const int l);
 #define idTest(A) idDBTest(A, PDEBUG, __FILE__,__LINE__)
 #define idPrint(id) idShow(id)
 #else
@@ -45,7 +45,7 @@ void idDBTest(ideal h1, int level, char *f,int l);
 
 ideal id_Copy (ideal h1,const ring r);
 #ifdef PDEBUG
-ideal idDBCopy(ideal h1,char *f,int l);
+ideal idDBCopy(ideal h1,const char *f,int l);
 #define idCopy(A) idDBCopy(A,__FILE__,__LINE__)
 #else
 #define idCopy(A) id_Copy(A,currRing)

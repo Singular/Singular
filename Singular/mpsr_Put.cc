@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.cc,v 1.30 2004-02-23 19:04:04 Singular Exp $ */
+/* $Id: mpsr_Put.cc,v 1.31 2008-03-19 17:44:37 Singular Exp $ */
 
 /***************************************************************
  *
@@ -217,7 +217,7 @@ mpsr_Status_t mpsr_PutRing(MP_Link_pt link, ring cring)
   return mpsr_PutRingAnnots(link, cring, 1);
 }
 
-mpsr_Status_t mpsr_PutProc(MP_Link_pt link, char* pname, procinfov proc)
+mpsr_Status_t mpsr_PutProc(MP_Link_pt link, const char* pname, procinfov proc)
 {
   MP_DictTag_t dict;
   MP_Common_t  cop;

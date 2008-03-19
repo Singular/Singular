@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.468 2008-02-20 13:41:30 Singular Exp $ */
+/* $Id: iparith.cc,v 1.469 2008-03-19 17:44:31 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -168,7 +168,7 @@ static SArithBase sArithBase;  /**< Base entry for arithmetic */
  *---------------------------------------------------------------------*/
 static int _gentable_sort_cmds(const void *a, const void *b);
 extern int iiArithRemoveCmd(char *szName);
-extern int iiArithAddCmd(char *szName, short nAlias, short nTokval,
+extern int iiArithAddCmd(const char *szName, short nAlias, short nTokval,
                          short nToktype, short nPos=-1);
 
 /*============= proc =======================*/
@@ -176,7 +176,7 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport = FALSE);
 static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op);
 #ifdef MDEBUG
 #define jjMakeSub(A) jjDBMakeSub(A,__FILE__,__LINE__)
-static Subexpr jjDBMakeSub(leftv e,char *f, int l);
+static Subexpr jjDBMakeSub(leftv e,const char *f,const  int l);
 #else
 static Subexpr jjMakeSub(leftv e);
 #endif
@@ -6779,7 +6779,7 @@ struct sValCmdM dArithM[]=
 ,{NULL,        0,               0,                   0       NO_PLURAL}
 };
 #ifdef MDEBUG
-static Subexpr jjDBMakeSub(leftv e,char *f, int l)
+static Subexpr jjDBMakeSub(leftv e,const char *f,const int l)
 #else
 static Subexpr jjMakeSub(leftv e)
 #endif
@@ -6819,7 +6819,7 @@ void ttGen1()
   {
     if (dArith1[i].p==jjWRONG)
       fprintf(outfile,"// DUMMY ");
-    char *s = iiTwoOps(op);
+    const char *s = iiTwoOps(op);
     fprintf(outfile,"// operation: %s (%s)  ->  %s\n",
           s,
           Tok2Cmdname(dArith1[i].arg),
@@ -6832,7 +6832,7 @@ void ttGen1()
   {
     if (dArith2[i].p==jjWRONG2)
       fprintf(outfile,"// DUMMY ");
-    char *s = iiTwoOps(op);
+    const char *s = iiTwoOps(op);
     fprintf(outfile,"// operation: %s (%s, %s)  ->  %s\n",
           s,
           Tok2Cmdname(dArith2[i].arg1),
@@ -6844,7 +6844,7 @@ void ttGen1()
   i=0;
   while ((op=dArith3[i].cmd)!=0)
   {
-    char *s = iiTwoOps(op);
+    const char *s = iiTwoOps(op);
     if (dArith3[i].p==jjWRONG3)
       fprintf(outfile,"// DUMMY ");
     fprintf(outfile,"// operation: %s (%s, %s, %s)  ->  %s\n",
@@ -6859,7 +6859,7 @@ void ttGen1()
   i=0;
   while ((op=dArithM[i].cmd)!=0)
   {
-    char *s = iiTwoOps(op);
+    const char *s = iiTwoOps(op);
     fprintf(outfile,"// operation: %s (...)  ->  %s",
           s,
           Tok2Cmdname(dArithM[i].res));
@@ -6907,7 +6907,7 @@ void ttGen1()
     fprintf(outfile,"// token %d : %c\n", (int)ops[i], ops[i]);
   for (i=257;i<=MAX_TOK;i++)
   {
-    char *s=iiTwoOps(i);
+    const char *s=iiTwoOps(i);
     if (s[0]!='$')
     {
       fprintf(outfile,"// token %d : %s\n", i, s);
@@ -7250,7 +7250,7 @@ void ttGen4()
 {
   FILE *outfile = myfopen("plural_cmd.inc","w");
   int i;
-  char *old_s="";
+  const char *old_s="";
   fprintf(outfile,
   "@c *****************************************\n"
   "@c *  Computer Algebra System SINGULAR     *\n"
@@ -7263,7 +7263,7 @@ void ttGen4()
   {
     if (dArith1[i].p!=jjWRONG)
     {
-      char *s = iiTwoOps(op);
+      const char *s = iiTwoOps(op);
       if ((s!=NULL) && (isalpha(s[0])) && (strcmp(s,old_s)!=0))
       {
         old_s=s;
@@ -7291,7 +7291,7 @@ void ttGen4()
   {
     if (dArith2[i].p!=jjWRONG2)
     {
-      char *s = iiTwoOps(op);
+      const char *s = iiTwoOps(op);
       if ((s!=NULL) && (isalpha(s[0])) && (strcmp(s,old_s)!=0))
       {
         old_s=s;
@@ -7317,7 +7317,7 @@ void ttGen4()
   i=0;
   while ((op=dArith3[i].cmd)!=0)
   {
-    char *s = iiTwoOps(op);
+    const char *s = iiTwoOps(op);
     if (dArith3[i].p!=jjWRONG3)
     {
       if ((s!=NULL) && (isalpha(s[0])) && (strcmp(s,old_s)!=0))
@@ -7345,7 +7345,7 @@ void ttGen4()
   i=0;
   while ((op=dArithM[i].cmd)!=0)
   {
-    char *s = iiTwoOps(op);
+    const char *s = iiTwoOps(op);
     if ((s!=NULL) && (isalpha(s[0])) && (strcmp(s,old_s)!=0))
     {
         old_s=s;
@@ -7709,7 +7709,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
       else
       {
         i=ti;
-        char *s = iiTwoOps(op);
+        const char *s = iiTwoOps(op);
         Werror("%s(`%s`) failed"
                 ,s,Tok2Cmdname(at));
         if (BVERBOSE(V_SHOW_USE))
@@ -7893,7 +7893,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
       {
         i=0;
         while ((dArith3[i].cmd!=op)&&(dArith3[i].cmd!=0)) i++;
-        char *s = iiTwoOps(op);
+        const char *s = iiTwoOps(op);
         Werror("%s(`%s`,`%s`,`%s`) failed"
                 ,s,Tok2Cmdname(at),Tok2Cmdname(bt),Tok2Cmdname(ct));
         if (BVERBOSE(V_SHOW_USE))
@@ -8038,7 +8038,7 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
       }
       else
       {
-        char *s = iiTwoOps(op);
+        const char *s = iiTwoOps(op);
         Werror("%s(...) failed",s);
       }
     }
@@ -8171,7 +8171,7 @@ static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op)
 }
 
 #ifdef GENTABLE
-char * Tok2Cmdname(int tok)
+const char * Tok2Cmdname(int tok)
 {
   int i = 0;
   if (tok < 0)
@@ -8198,7 +8198,7 @@ char * Tok2Cmdname(int tok)
   return cmds[0].name;
 }
 #else /* GENTABLE */
-char * Tok2Cmdname(int tok)
+const char * Tok2Cmdname(int tok)
 {
   int i = 0;
   if (tok <= 0)
@@ -8457,7 +8457,7 @@ int iiArithRemoveCmd( char *szName)
 }
 
 int iiArithAddCmd(
-  char *szName,
+  const char *szName,
   short nAlias,
   short nTokval,
   short nToktype,

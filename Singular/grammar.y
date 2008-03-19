@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.124 2007-08-06 08:42:08 Singular Exp $ */
+/* $Id: grammar.y,v 1.125 2008-03-19 17:44:31 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -101,7 +101,7 @@ extern int   yylineno;
 extern FILE* yyin;
 
 char       my_yylinebuf[80];
-char *     currid;
+const  char *  currid;
 BOOLEAN    yyInRingConstruction=FALSE;
 BOOLEAN    expected_parms;
 int        cmdtok;
@@ -117,7 +117,7 @@ int        inerror = 0;
 
 #define MYYERROR(a) { WerrorS(a); YYERROR; }
 
-void yyerror(char * fmt)
+void yyerror(const char * fmt)
 {
 
   BOOLEAN old_errorreported=errorreported;
@@ -152,7 +152,7 @@ void yyerror(char * fmt)
     }
     if (cmdtok!=0)
     {
-      char *s=Tok2Cmdname(cmdtok);
+      const char *s=Tok2Cmdname(cmdtok);
       if (expected_parms)
       {
         Werror("expected %s-expression. type \'help %s;\'",s,s);
@@ -1341,7 +1341,7 @@ ringcmd:
           ordering           /* list of (multiplier ordering (weight(s))) */
           {
             BOOLEAN do_pop = FALSE;
-            char *ring_name = $2.name;
+            const char *ring_name = $2.name;
             ring b=
             rInit(&$4,            /* characteristik and list of parameters*/
                   &$6,            /* names of ringvariables */
@@ -1380,7 +1380,7 @@ ringcmd:
         | ringcmd1 elemexpr
           {
             BOOLEAN do_pop = FALSE;
-            char *ring_name = $2.name;
+            const char *ring_name = $2.name;
             if (!inerror) rDefault(ring_name);
             yyInRingConstruction = FALSE;
             $2.CleanUp();

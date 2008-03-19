@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.9 2007-07-03 14:45:56 Singular Exp $ */
+/* $Id: modulop.cc,v 1.10 2008-03-19 17:44:10 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -238,7 +238,7 @@ void npPower (number a, int i, number * result)
   }
 }
 
-char* npEati(char *s, int *i)
+static const char* npEati(const char *s, int *i)
 {
 
   if (((*s) >= '0') && ((*s) <= '9'))
@@ -257,7 +257,7 @@ char* npEati(char *s, int *i)
   return s;
 }
 
-char * npRead (char *s, number *a)
+const char * npRead (const char *s, number *a)
 {
   int z;
   int n=1;
@@ -383,7 +383,7 @@ void npInitChar(int c, ring r)
 }
 
 #ifdef LDEBUG
-BOOLEAN npDBTest (number a, char *f, int l)
+BOOLEAN npDBTest (number a, const char *f, const int l)
 {
   if (((long)a<0) || ((long)a>npPrimeM))
   {

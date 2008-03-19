@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.5 2007-12-17 14:24:58 Singular Exp $ */
+/* $Id: mpr_complex.cc,v 1.6 2008-03-19 17:44:10 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -77,7 +77,7 @@ size_t getGMPFloatDigits()
   return gmp_output_digits;
 }
 
-void gmp_float::setFromStr( char * in )
+void gmp_float::setFromStr(const char * in )
 {
   BOOLEAN neg=false;
   if (*in == '-') { in++; neg=TRUE; }

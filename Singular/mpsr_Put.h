@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.h,v 1.12 2000-02-01 15:30:26 Singular Exp $ */
+/* $Id: mpsr_Put.h,v 1.13 2008-03-19 17:44:37 Singular Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Put.h
@@ -77,7 +77,7 @@ inline mpsr_Status_t mpsr_PutString(MP_Link_pt link, char *str)
     mp_return(MP_PutStringPacket(link, str, 0));
 }
 extern mpsr_Status_t mpsr_PutRing(MP_Link_pt link, ring r);
-extern mpsr_Status_t mpsr_PutProc(MP_Link_pt link, char *pname,procinfov proc);
+extern mpsr_Status_t mpsr_PutProc(MP_Link_pt link, const char *pname,procinfov proc);
 extern mpsr_Status_t mpsr_PutPackage(MP_Link_pt link, package pack);
 inline mpsr_Status_t mpsr_PutDef(MP_Link_pt link, char *name)
 {

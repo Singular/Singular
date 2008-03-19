@@ -491,7 +491,7 @@ MP_Status_t MP_PutCommonGreekIdentifierPacket(link, dtag, id, num_annots)
 #ifdef __STDC__
 MP_Status_t MP_PutIdentifierPacket(MP_Link_pt     link,
                                    MP_DictTag_t   dtag,
-                                   char          *id,
+                                   const char     *id,
                                    MP_NumAnnot_t  num_annots)
 #else
 MP_Status_t MP_PutIdentifierPacket(link, dtag, id, num_annots)

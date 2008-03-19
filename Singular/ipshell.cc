@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.180 2008-03-14 15:48:34 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.181 2008-03-19 17:44:35 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -59,7 +59,7 @@
 
 leftv iiCurrArgs=NULL;
 int  traceit = 0;
-char *lastreserved=NULL;
+const char *lastreserved=NULL;
 
 int  myynest = -1;
 
@@ -67,7 +67,7 @@ static BOOLEAN iiNoKeepRing=TRUE;
 
 /*0 implementation*/
 
-char * iiTwoOps(int t)
+const char * iiTwoOps(int t)
 {
   if (t<127)
   {
@@ -633,7 +633,7 @@ BOOLEAN iiWRITE(leftv res,leftv v)
   return b;
 }
 
-leftv iiMap(map theMap, char * what)
+leftv iiMap(map theMap, const char * what)
 {
   idhdl w,r;
   leftv v;
@@ -1083,7 +1083,7 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
 int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isring, BOOLEAN init_b)
 {
   BOOLEAN res=FALSE;
-  char *id = name->name;
+  const char *id = name->name;
 
   memset(sy,0,sizeof(sleftv));
   if ((name->name==NULL)||(isdigit(name->name[0])))
@@ -1410,7 +1410,7 @@ void iiCheckPack(package &p)
 }
 #endif
 
-idhdl rDefault(char *s)
+idhdl rDefault(const char *s)
 {
   idhdl tmp=NULL;
 

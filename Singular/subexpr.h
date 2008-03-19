@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.35 2005-05-12 12:46:42 Singular Exp $ */
+/* $Id: subexpr.h,v 1.36 2008-03-19 17:44:37 Singular Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
@@ -24,7 +24,7 @@ typedef sSubexpr * Subexpr;
 
 extern const char sNoName[];
 extern BOOLEAN siq;
-extern char *iiSleftv2name(leftv v);
+extern const char *iiSleftv2name(leftv v);
 
 class sleftv;
 typedef sleftv * leftv;
@@ -33,7 +33,7 @@ class sleftv
   public:
   /* !! do not change the first 6 entries !! (see ipid.h: idrec) */
     leftv       next;
-    char *      name;
+    const char *name;
     void *      data;
     attr        attribute;
     BITSET      flag;
@@ -99,7 +99,7 @@ struct _sssym
 typedef struct _sssym ssym;
 typedef ssym * sym;
 
-void syMake(leftv v,char * name, idhdl packhdl = NULL);
+void syMake(leftv v,const char * name, idhdl packhdl = NULL);
 BOOLEAN assumeStdFlag(leftv h);
 
 inline procinfov piCopy(procinfov pi)
@@ -108,7 +108,7 @@ inline procinfov piCopy(procinfov pi)
   return pi;
 }
 BOOLEAN piKill(procinfov l);
-char *piProcinfo(procinfov pi, char *request);
+const char *piProcinfo(procinfov pi, const char *request);
 void piShowProcinfo(procinfov pi, char *txt);
 #ifdef HAVE_LIBPARSER
 class libstack

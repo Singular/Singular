@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.8 2007-09-13 14:19:05 Singular Exp $ */
+/* $Id: ffields.cc,v 1.9 2008-03-19 17:44:08 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -88,7 +88,7 @@ unsigned short fftable[]={
   54289, /*233^2*/
   57121, /*239^2*/
   58081, /*241^2*/
-  63001, /*251^2*/  
+  63001, /*251^2*/
   0 };
 
 /*1
@@ -102,7 +102,7 @@ unsigned short fftable[]={
 /*2
 * debugging: is a a valid representation of a number ?
 */
-BOOLEAN nfDBTest (number a, char *f, int l)
+BOOLEAN nfDBTest (number a, const char *f, const int l)
 {
   if (((long)a<0L) || ((long)a>(long)nfCharQ))
   {
@@ -450,7 +450,7 @@ void nfPower (number a, int i, number * result)
 /*4
 * read an integer (with reduction mod p)
 */
-static char* nfEati(char *s, int *i)
+static const char* nfEati(const char *s, int *i)
 {
   if (*s >= '0' && *s <= '9')
   {
@@ -471,7 +471,7 @@ static char* nfEati(char *s, int *i)
 /*2
 * read a number
 */
-char * nfRead (char *s, number *a)
+const char * nfRead (const char *s, number *a)
 {
   int i;
   number z;
@@ -673,6 +673,29 @@ number nfMapP(number c)
 }
 
 /*2
+* map GF(p,n1) -> GF(p,n2), n1 < n2, n1 | n2
+*/
+int nfMapGG_factor;
+number nfMapGG(number c)
+{
+  int i=(long)c;
+  i*= nfMapGG_factor;
+  while (i >nfCharQ1) i-=nfCharQ1;
+  return (number)((long)i);
+}
+/*2
+* map GF(p,n1) -> GF(p,n2), n1 > n2, n2 | n1
+*/
+number nfMapGGrev(number c)
+{
+  int ex=(int)((long)c);
+  if ((ex % nfMapGG_factor)==0)
+    return (number)(((long)ex) / ((long)nfMapGG_factor));
+  else
+    return (number)(long)nfCharQ; /* 0 */
+}
+
+/*2
 * set map function nMap ... -> GF(p,n)
 */
 nMapFunc nfSetMap(ring src, ring dst)
@@ -680,6 +703,39 @@ nMapFunc nfSetMap(ring src, ring dst)
   if (rField_is_GF(src,nfCharQ))
   {
     return ndCopy;   /* GF(p,n) -> GF(p,n) */
+  }
+  if (rField_is_GF(src))
+  {
+    int q=src->ch;
+    if ((nfCharQ % q)==0) /* GF(p,n1) -> GF(p,n2), n2 > n1 */
+    {
+      // check if n2 is a multiple of n1
+      int n1=1;
+      int qq=nfCharP;
+      while(qq!=q) { qq *= nfCharP; n1++; }
+      int n2=1;
+      qq=nfCharP;
+      while(qq!=nfCharQ) { qq *= nfCharP; n2++; }
+      Print("map %d^%d -> %d^%d\n",nfCharP,n1,nfCharP,n2);
+      if ((n2 % n1)==0)
+      {
+        int save_ch=currRing->ch;
+        char **save_par=currRing->parameter;
+        nfSetChar(src->ch,src->parameter);
+        int nn=nfPlus1Table[0];
+        nfSetChar(save_ch,save_par);
+        nfMapGG_factor= nfPlus1Table[0] / nn;
+        Print("nfMapGG_factor=%d (%d / %d)\n",nfMapGG_factor, nfPlus1Table[0], nn);
+        return nfMapGG;
+      }
+      else if ((n1 % n2)==0)
+      {
+        nfMapGG_factor= (n1/n2);
+        return nfMapGGrev;
+      }
+      else
+        return NULL;
+    }
   }
   if (rField_is_Zp(src,nfCharP))
   {

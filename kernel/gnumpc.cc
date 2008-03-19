@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.6 2008-02-15 17:13:14 Singular Exp $ */
+/* $Id: gnumpc.cc,v 1.7 2008-03-19 17:44:08 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -430,9 +430,9 @@ BOOLEAN ngcIsMOne (number a)
 /*2
 * extracts the number a from s, returns the rest
 */
-char * ngcRead (char * s, number * a)
+const char * ngcRead (const char * s, number * a)
 {
-  char *start= s;
+  const char *start= s;
   if ((*s >= '0') && (*s <= '9'))
   {
     gmp_float *re=NULL;
@@ -472,10 +472,11 @@ void ngcWrite (number &a)
 }
 
 #ifdef LDEBUG
-BOOLEAN ngcDBTest(number a, char *f, int l)
-{
-  return TRUE;
-}
+// not yet implemented
+//BOOLEAN ngcDBTest(number a, const char *f, const int l)
+//{
+//  return TRUE;
+//}
 #endif
 
 // local Variables: ***

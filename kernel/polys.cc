@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.27 2008-01-30 18:49:43 wienand Exp $ */
+/* $Id: polys.cc,v 1.28 2008-03-19 17:44:10 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -199,12 +199,12 @@ void pLcm(poly a, poly b, poly m)
 /*2
 * convert monomial given as string to poly, e.g. 1x3y5z
 */
-char * p_Read(char *st, poly &rc, ring r)
+const char * p_Read(const char *st, poly &rc, ring r)
 {
   if (r==NULL) { rc=NULL;return st;}
   int i,j;
   rc = p_Init(r);
-  char *s = r->cf->nRead(st,&(rc->coef));
+  const char *s = r->cf->nRead(st,&(rc->coef));
   if (s==st)
   /* i.e. it does not start with a coeff: test if it is a ringvar*/
   {
@@ -224,7 +224,7 @@ char * p_Read(char *st, poly &rc, ring r)
     j = r_IsRingVar(ss,r);
     if (j >= 0)
     {
-      char *s_save=s;
+      const char *s_save=s;
       s = eati(s,&i);
       if (((unsigned long)i) >  r->bitmask)
       {
@@ -271,10 +271,10 @@ finish:
   return s;
 }
 
-poly pmInit(char *st, BOOLEAN &ok)
+poly pmInit(const char *st, BOOLEAN &ok)
 {
   poly p;
-  char *s=p_Read(st,p,currRing);
+  const char *s=p_Read(st,p,currRing);
   if (*s!='\0')
   {
     if ((s!=st)&&isdigit(st[0]))

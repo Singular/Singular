@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.h,v 1.5 2007-07-03 14:45:57 Singular Exp $ */
+/* $Id: mpr_complex.h,v 1.6 2008-03-19 17:44:10 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -121,7 +121,7 @@ public:
   bool isOne();   // t == 1 ?
   bool isMOne();  // t == -1 ?
 
-  void setFromStr( char * in );
+  void setFromStr(const char * in );
 
   // access
   inline const mpf_t *mpfp() const { return &t; };

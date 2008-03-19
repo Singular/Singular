@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.28 2008-02-20 13:58:34 Singular Exp $ */
+/* $Id: longrat.cc,v 1.29 2008-03-19 17:44:09 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -137,7 +137,7 @@ nMapFunc nlSetMap(ring src, ring dst)
 }
 
 #ifdef LDEBUG
-BOOLEAN nlDBTest(number a, char *f,int l)
+BOOLEAN nlDBTest(number a, const char *f,const int l)
 {
   if (a==NULL)
   {

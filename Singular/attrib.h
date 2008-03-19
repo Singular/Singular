@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.h,v 1.7 2004-06-16 12:18:12 Singular Exp $ */
+/* $Id: attrib.h,v 1.8 2008-03-19 17:44:29 Singular Exp $ */
 /*
 * ABSTRACT: attributes to leftv and idhdl
 */
@@ -16,7 +16,7 @@ class sattr
 {
   public:
     void Init() { memset(this,0,sizeof(*this)); }
-    char *  name;
+    const char *  name;
     void *  data;
     attr    next;
     int     atyp; /* the type of the attribut, describes the data field
@@ -25,20 +25,20 @@ class sattr
     void Print();
     attr Copy(); /* copy all arguments */
     void * CopyA(); /* copy the data of this attribute */
-    attr set(char * s, void * data, int t);
-    attr get(char * s);
+    attr set(const char * s, void * data, int t);
+    attr get(const char * s);
     void kill();
     void killAll();
 };
 
-void * atGet(idhdl root,char * name);
-void * atGet(leftv root,char * name);
-void * atGet(idhdl root,char * name, int t);
-void * atGet(leftv root,char * name, int t);
-void atSet(idhdl root,char * name,void * data,int typ);
-void atSet(leftv root,char * name,void * data,int typ);
+void * atGet(idhdl root,const char * name);
+void * atGet(leftv root,const char * name);
+void * atGet(idhdl root,const char * name, int t);
+void * atGet(leftv root,const char * name, int t);
+void atSet(idhdl root,const char * name,void * data,int typ);
+void atSet(leftv root,const char * name,void * data,int typ);
 void atKillAll(idhdl root);
-void atKill(idhdl root,char * name);
+void atKill(idhdl root,const char * name);
 
 BOOLEAN atATTRIB1(leftv res,leftv a);
 BOOLEAN atATTRIB2(leftv res,leftv a,leftv b);

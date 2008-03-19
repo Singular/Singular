@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.h,v 1.6 2008-02-01 15:11:34 wienand Exp $ */
+/* $Id: rmodulon.h,v 1.7 2008-03-19 17:44:12 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -43,10 +43,10 @@ number  nrnGcd         (number a,number b,ring r);
 number  nrnExtGcd      (number a, number b, number *s, number *t);
 nMapFunc nrnSetMap     (ring src, ring dst);
 void    nrnWrite       (number &a);
-char *  nrnRead        (char *s, number *a);
+const char *  nrnRead  (const char *s, number *a);
 char *  nrnName        (number n);
 #ifdef LDEBUG
-BOOLEAN nrnDBTest      (number a, char *f, int l);
+BOOLEAN nrnDBTest      (number a, const char *f, const int l);
 #endif
 void    nrnSetExp(int c, ring r);
 void    nrnInitExp(int c, ring r);

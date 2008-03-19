@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.15 2008-01-30 09:01:38 wienand Exp $ */
+/* $Id: polys.h,v 1.16 2008-03-19 17:44:11 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -324,8 +324,8 @@ void pSetModDeg(intvec *w);
 
 
 
-poly      pmInit(char *s, BOOLEAN &ok);     /* monom -> poly, interpreter */
-char *    p_Read(char *s, poly &p, ring r); /* monom -> poly */
+poly      pmInit(const char *s, BOOLEAN &ok); /* monom -> poly, interpreter */
+const char *    p_Read(const char *s, poly &p, ring r); /* monom -> poly */
 void      ppDelete(poly * a, ring r);
 
 /*-------------operations on polynomials:------------*/

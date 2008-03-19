@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.14 2007-11-08 09:47:13 Singular Exp $ */
+/* $Id: febase.cc,v 1.15 2008-03-19 17:44:08 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -93,8 +93,8 @@ int    yy_blocklineno; // to get the lineno of the block start from scanner
 Voice  *currentVoice = NULL;
 FILE   *feFilePending; /*temp. storage for grammar.y */
 
-static char * BT_name[]={"BT_none","BT_break","BT_proc","BT_example",
-                       "BT_file","BT_execute","BT_if","BT_else"};
+static const char * BT_name[]={"BT_none","BT_break","BT_proc","BT_example",
+                               "BT_file","BT_execute","BT_if","BT_else"};
 /*2
 * the name of the current 'Voice': the procname (or filename)
 */
@@ -654,7 +654,7 @@ int feReadLine(char* b, int l)
   }
   /* else if (s==NULL) */
   {
-    char *err;
+    const char *err;
     switch(yy_noeof)
     {
       case noeof_brace:
@@ -717,15 +717,15 @@ Voice * feInitStdin(Voice *pp)
  *
  *****************************************************************/
 
-FILE * feFopen(char *path, char *mode, char *where,int useWerror,
-               int path_only)
+FILE * feFopen(const char *path, const char *mode, char *where,
+               int useWerror, int path_only)
 {
   char longpath[MAXPATHLEN];
   if (path[0]=='~')
   {
     if (path[1] == DIR_SEP)
     {
-      char* home = getenv("HOME");
+      const char* home = getenv("HOME");
 #ifdef ix86_Win
       if ((home==NULL)||(!access(home,X_OK)))
         home = getenv("SINGHOME");
@@ -1157,7 +1157,7 @@ void monitor(char* s, int mode)
 }
 
 
-char* eati(char *s, int *i)
+const char* eati(const char *s, int *i)
 {
   int l=0;
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.10 2008-02-07 13:43:55 wienand Exp $ */
+/* $Id: rintegers.cc,v 1.11 2008-03-19 17:44:11 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -259,10 +259,10 @@ void nrzInitExp(int m, ring r)
 }
 
 #ifdef LDEBUG
-BOOLEAN nrzDBTest (number a, char *f, int l)
-{
-  return TRUE;//TODO
-}
+//BOOLEAN nrzDBTest (number a, const char *f, const int l)
+//{
+//  return TRUE;//TODO
+//}
 #endif
 
 void nrzWrite (number &a)
