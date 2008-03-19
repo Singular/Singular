@@ -224,7 +224,7 @@ extern int   yylineno;
 extern FILE* yyin;
 
 char       my_yylinebuf[80];
-char *     currid;
+const  char *  currid;
 BOOLEAN    yyInRingConstruction=FALSE;
 BOOLEAN    expected_parms;
 int        cmdtok;
@@ -240,7 +240,7 @@ int        inerror = 0;
 
 #define MYYERROR(a) { WerrorS(a); YYERROR; }
 
-void yyerror(char * fmt)
+void yyerror(const char * fmt)
 {
 
   BOOLEAN old_errorreported=errorreported;
@@ -275,7 +275,7 @@ void yyerror(char * fmt)
     }
     if (cmdtok!=0)
     {
-      char *s=Tok2Cmdname(cmdtok);
+      const char *s=Tok2Cmdname(cmdtok);
       if (expected_parms)
       {
         Werror("expected %s-expression. type \'help %s;\'",s,s);
@@ -2672,7 +2672,7 @@ case 145:
 #line 1342 "grammar.y"
 {
             BOOLEAN do_pop = FALSE;
-            char *ring_name = yyvsp[-6].lv.name;
+            const char *ring_name = yyvsp[-6].lv.name;
             ring b=
             rInit(&yyvsp[-4].lv,            /* characteristik and list of parameters*/
                   &yyvsp[-2].lv,            /* names of ringvariables */
@@ -2713,7 +2713,7 @@ case 146:
 #line 1381 "grammar.y"
 {
             BOOLEAN do_pop = FALSE;
-            char *ring_name = yyvsp[0].lv.name;
+            const char *ring_name = yyvsp[0].lv.name;
             if (!inerror) rDefault(ring_name);
             yyInRingConstruction = FALSE;
             yyvsp[0].lv.CleanUp();
