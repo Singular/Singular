@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.470 2008-03-20 10:23:25 Singular Exp $ */
+/* $Id: iparith.cc,v 1.471 2008-03-20 10:24:53 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -6110,7 +6110,7 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
   int i2=iiTestConvert(v2->Typ(),MODUL_CMD);
 
   if((i1==0)||(i2==0)
-  ||(v3->Typ()!=INT_CMD)||((v4!=NULL)&&i(v4->Typ()!=INTVEC_CMD)))
+  ||(v3->Typ()!=INT_CMD)||((v4!=NULL)&&(v4->Typ()!=INTVEC_CMD)))
   {
     WarnS("<module>,<module>,<int>[,<intvec>] expected!");
     return TRUE;
