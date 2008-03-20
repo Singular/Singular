@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.33 2008-02-24 17:41:31 levandov Exp $ */
+/* $Id: kstd1.cc,v 1.34 2008-03-20 11:22:44 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1021,7 +1021,8 @@ void initBba(ideal F,kStrategy strat)
     strat->red = redHomog;
   }
 #ifdef HAVE_RINGS  //TODO Oliver
-  if (rField_is_Ring(currRing)) {
+  if (rField_is_Ring(currRing))
+  {
     strat->red = redRing;
   }
 #endif
