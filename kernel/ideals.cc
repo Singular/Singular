@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.50 2008-03-19 17:44:08 Singular Exp $ */
+/* $Id: ideals.cc,v 1.51 2008-03-20 10:58:24 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1884,7 +1884,7 @@ void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R,short *w)
         else
           p=pJetW(pSub(p,ppMult_mm(Q->m[j],p0)),N,w);
         pNormalize(p);
-        if(w==NULL&&pDeg(p0)>n||w!=NULL&&pDegW(p0,w)>n)
+        if((w==NULL)&&(pDeg(p0)>n)||(w!=NULL)&&(pDegW(p0,w)>n))
           pDelete(&p0);
         else
           MATELEM(T,j+1,i+1)=pAdd(MATELEM(T,j+1,i+1),p0);
@@ -1897,7 +1897,8 @@ void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R,short *w)
           poly p0=p;
           pIter(p);
           pNext(p0)=NULL;
-          if(w==NULL&&pDeg(p0)>n||w!=NULL&&pDegW(p0,w)>n)
+          if(((w==NULL)&&(pDeg(p0)>n))
+          ||((w!=NULL)&&(pDegW(p0,w)>n)))
             pDelete(&p0);
           else
             R->m[i]=pAdd(R->m[i],p0);
