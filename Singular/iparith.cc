@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.469 2008-03-19 17:44:31 Singular Exp $ */
+/* $Id: iparith.cc,v 1.470 2008-03-20 10:23:25 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -6109,7 +6109,8 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
   int i1=iiTestConvert(v1->Typ(),MODUL_CMD);
   int i2=iiTestConvert(v2->Typ(),MODUL_CMD);
 
-  if(i1==0||i2==0||v3->Typ()!=INT_CMD||(v4!=NULL&&v4->Typ()!=INTVEC_CMD))
+  if((i1==0)||(i2==0)
+  ||(v3->Typ()!=INT_CMD)||((v4!=NULL)&&i(v4->Typ()!=INTVEC_CMD)))
   {
     WarnS("<module>,<module>,<int>[,<intvec>] expected!");
     return TRUE;
@@ -6141,8 +6142,11 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
   ideal R;
   idLiftW(P,Q,n,T,R,w);
 
+  w1.CleanUp();
+  w2.CleanUp();
   if(w!=NULL)
     omFree(w);
+
   lists L=(lists) omAllocBin(slists_bin);
   L->Init(2);
   L->m[1].rtyp=v1->Typ();
@@ -6154,11 +6158,13 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
     R->m[0]=NULL;
     idDelete(&R);
   }
-  else
-  if(v1->Typ()==IDEAL_CMD||v1->Typ()==MATRIX_CMD)
+  else if(v1->Typ()==IDEAL_CMD||v1->Typ()==MATRIX_CMD)
     L->m[1].data=(void *)idModule2Matrix(R);
   else
+  {
     L->m[1].rtyp=MODUL_CMD;
+    L->m[1].data=(void *)R;
+  }
   L->m[0].rtyp=MATRIX_CMD;
   L->m[0].data=(char *)T;
 
@@ -8429,7 +8435,7 @@ char *iiArithGetCmd( int nPos )
   return NULL;
 }
 
-int iiArithRemoveCmd( char *szName)
+int iiArithRemoveCmd(const char *szName)
 {
   int nIndex;
   if(szName==NULL) return -1;
@@ -8441,7 +8447,7 @@ int iiArithRemoveCmd( char *szName)
     return -1;
   }
   omFree(sArithBase.sCmds[nIndex].name);
-  sArithBase.sCmds[nIndex].name=0;
+  sArithBase.sCmds[nIndex].name=NULL;
   qsort(sArithBase.sCmds, sArithBase.nCmdUsed, sizeof(cmdnames),
         (&_gentable_sort_cmds));
   sArithBase.nCmdUsed--;
