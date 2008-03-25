@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.100 2008-03-19 17:44:37 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.101 2008-03-25 14:19:20 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -154,12 +154,12 @@ void sleftv::Print(leftv store, int spaces)
            PrintNSpaces(spaces);
            PrintS("// libname  : ");
            PrintS(piProcinfo(pi, "libname"));
-	   PrintLn();
+           PrintLn();
 
            PrintNSpaces(spaces);
            PrintS("// procname : ");
            PrintS(piProcinfo(pi, "procname"));
-	   PrintLn();
+           PrintLn();
 
            PrintNSpaces(spaces);
            PrintS("// type     : ");
@@ -170,9 +170,9 @@ void sleftv::Print(leftv store, int spaces)
          }
        case POINTER_CMD:
          { package pack = (package)d;
-	 PrintNSpaces(spaces);
+         PrintNSpaces(spaces);
          PrintS("// PointerTest\n");
-	 PrintNSpaces(spaces);
+         PrintNSpaces(spaces);
          ::Print("// %s\n",IDID(pack->idroot));
          //::Print(((char *)(pack->idroot)->data), spaces);
          break;
@@ -180,17 +180,17 @@ void sleftv::Print(leftv store, int spaces)
        case LINK_CMD:
           {
             si_link l=(si_link)d;
-	    PrintNSpaces(spaces);
+            PrintNSpaces(spaces);
             ::Print("// type : %s\n", slStatus(l, "type"));
-	    PrintNSpaces(spaces);
+            PrintNSpaces(spaces);
             ::Print("// mode : %s\n", slStatus(l, "mode"));
-	    PrintNSpaces(spaces);
+            PrintNSpaces(spaces);
             ::Print("// name : %s\n", slStatus(l, "name"));
-	    PrintNSpaces(spaces);
+            PrintNSpaces(spaces);
             ::Print("// open : %s\n", slStatus(l, "open"));
-	    PrintNSpaces(spaces);
+            PrintNSpaces(spaces);
             ::Print("// read : %s\n", slStatus(l, "read"));
-	    PrintNSpaces(spaces);
+            PrintNSpaces(spaces);
             ::Print("// write: %s", slStatus(l, "write"));
           break;
           }
@@ -198,7 +198,7 @@ void sleftv::Print(leftv store, int spaces)
         case BIGINT_CMD:
           s=String(d);
           if (s==NULL) return;
-	  PrintNSpaces(spaces);
+          PrintNSpaces(spaces);
           PrintS(s);
           omFree((ADDRESS)s);
           break;
@@ -206,10 +206,10 @@ void sleftv::Print(leftv store, int spaces)
         {
           lists l=(lists)d;
           if (l->nr<0)
-	  {
-	     PrintNSpaces(spaces);
+          {
+             PrintNSpaces(spaces);
              PrintS("empty list\n");
-	  }
+          }
           else
           {
             int i=0;
@@ -217,7 +217,7 @@ void sleftv::Print(leftv store, int spaces)
             {
               if (l->m[i].rtyp!=DEF_CMD)
               {
-	        PrintNSpaces(spaces);
+                PrintNSpaces(spaces);
                 ::Print("[%d]:\n",i+1);
                 l->m[i].Print(NULL,spaces+3);
               }
@@ -297,10 +297,10 @@ void sleftv::CleanUp(ring r)
       case MATRIX_CMD:
       case MODUL_CMD:
       case IDEAL_CMD:
-	if ((((long)data) & 3)==0)
-	{
+        if ((((long)data) & 3)==0)
+        {
           if(r!=NULL) id_Delete((ideal *)(&data),r);
-	}
+        }
         break;
       case STRING_CMD:
         omFree((ADDRESS)data);
@@ -942,7 +942,7 @@ void sleftv::SetData(void* what)
 
 void * sleftv::Data()
 {
-  if (rtyp!=IDHDL && iiCheckRing(rtyp))
+  if ((rtyp!=IDHDL) && iiCheckRing(rtyp))
      return NULL;
   if (e==NULL)
   {
@@ -1067,7 +1067,9 @@ void * sleftv::Data()
       if ((rtyp==IDHDL)||(rtyp==STRING_CMD))
       {
         tmp.next=next; next=NULL;
-        data=NULL; d=NULL;
+        //if (rtyp==STRING_CMD) { omFree((ADDRESS)data); }
+        //data=NULL;
+        d=NULL;
         CleanUp();
         memcpy(this,&tmp,sizeof(tmp));
       }
