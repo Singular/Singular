@@ -1,6 +1,6 @@
 //GP, last modified 28.6.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: crypto.lib,v 1.3 2008-03-18 16:32:22 Singular Exp $";
+version="$Id: crypto.lib,v 1.4 2008-03-25 15:54:04 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY:  crypto.lib     Procedures for teaching cryptography
@@ -73,7 +73,7 @@ EXAMPLE:example decimal; shows an example
    bigint k;
    bigint t=16;
    bigint m=0;
-   for(i=1;ii<=n;i++)
+   for(i=1;i<=n;i++)
    {
       if(s[i]=="1"){k=1;}
       if(s[i]=="2"){k=2;}
