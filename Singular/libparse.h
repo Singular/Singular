@@ -3,14 +3,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.h,v 1.17 2008-03-25 14:51:58 Singular Exp $ */
+/* $Id: libparse.h,v 1.18 2008-03-25 15:04:42 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
-#ifndef STANDALONE_PARSER
 #  include "structs.h"
 #  include "subexpr.h"
-#endif
 typedef enum { LOAD_LIB, GET_INFO } lp_modes;
 typedef enum { OLD_LIBSTYLE, NEW_LIBSTYLE } lib_style_types;
 

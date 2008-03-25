@@ -2,7 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include "mod2.h"
 #include "fegetopt.h"
+#include "libparse.h"
 #include "utils.h"
 
 extern FILE *yylpin;
@@ -105,9 +107,9 @@ void main_result(char *libname)
 }
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
-procinfo *iiInitSingularProcinfo(procinfov pi, char *libname,
-                                 char *procname, int line, long pos,
-                                 BOOLEAN pstatic = FALSE)
+procinfo *iiInitSingularProcinfo(procinfov pi, const char *libname,
+                                 const char *procname, int line, long pos,
+                                 BOOLEAN pstatic /*= FALSE*/)
 {
   pi->libname = (char *)malloc(strlen(libname)+1);
   memcpy(pi->libname, libname, strlen(libname));
