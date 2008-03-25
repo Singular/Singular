@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ring.lib,v 1.31 2006-12-15 14:15:51 Singular Exp $";
+version="$Id: ring.lib,v 1.32 2008-03-25 15:20:08 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -604,61 +604,34 @@ RETURN:  ring R whose variables are the variables from all rings r1,r2,...
          respective monomial orderings of r1,r2,... . Hence, R
          is the tensor product of the rings r1,r2,... with ordering matrix
          equal to the direct sum of the ordering matrices of r1,r2,...
-NOTE:    The characteristic of the new ring will be that of r1. The names of
-         variables in the rings r1,r2,... should differ (if a name, say x,
-         occurs in r1 and r2, then, in the new ring r, x always refers to the
-         variable with name x in r1, there is no access to x in r2).
+NOTE:    The characteristic of the new ring will be p if one ring has
+         characteristic p. The names of variables in the rings r1,r2,...
+         must differ.
          The procedure works also for quotient rings ri, if the characteristic
-         of ri is compatible with the characteristic of r1 (i.e. if imap from
-         ri to r1 is implemented)
-         This proc uses 'execute' or calls a procedure using 'execute'.
+         of ri is compatible with the characteristic of the result
+         (i.e. if imap from ri to the result is implemented)
+SEE ALSO: ring operations
 EXAMPLE: example ringtensor; shows an example
 "
 {
-   int @ii,@q;
+   int @i;
    int @n = size(#);
-   string @vars,@order,@oi,@s1;
-//---- gather variables, orderings and ideals (of qrings) from given rings ----
-   for(@ii=1; @ii<=@n; @ii=@ii+1)
+   if (@n<=1) { ERROR("at least 2 rings required"); }
+   def @s=#[1]+#[2];
+   for (@i=3; @i<=@n;@i++)
    {
-      if( ordstr(#[@ii])[1]=="C" or ordstr(#[@ii])[1]=="c" )
-           { @oi=ordstr(#[@ii])[3,size(ordstr(#[@ii]))-2]; }
-      else { @oi=ordstr(#[@ii])[1,size(ordstr(#[@ii]))-2]; }
-      @vars = @vars+varstr(#[@ii])+",";
-      @order= @order+@oi+",";
-      def @r(@ii)=#[@ii];
-      setring @r(@ii);
-      ideal i(@ii)=ideal(@r(@ii));
-      int @q(@ii)=size(i(@ii));
-      @q=@q+@q(@ii);
-   }
-   if( @q!=0 ) { @s1 = "@newr"; }   // @q=0 iff none of the rings ri is a qring
-   else {  @s1 = "s"; }
-//------------------------------- create new ring -----------------------------
-   string @newring ="=("+charstr(#[1])+"),("+@vars[1,size(@vars)-1]+"),("
-                  +@order[1,size(@order)-1]+");";
-   execute("ring "+@s1+@newring);
-//------ create ideal for new ring if one of the given rings is a qring -------
-   if( @q!=0 )
-   {
-      ideal i;
-      for(@ii=1; @ii<=@n; @ii=@ii+1)
-      {
-         if( @q(@ii)!=0 )
-         {
-            i=i+imap(@r(@ii),i(@ii));
-         }
-      }
-      i=std(i);
-      qring s=i;
+     def @ss=@s+#[@i];
+     kill @s;
+     def @s=@ss;
+     kill @ss;
    }
    dbprint(printlevel-voice+2,"
 // 'ringtensor' created a ring. To see the ring, type (if the name R was
 // assigned to the return value):
-    show R;
+    show(R);
 // To make the ring the active basering, type
     setring R; ");
-   return(s);
+   return(@s);
 }
 example
 { "EXAMPLE:"; echo = 2;
