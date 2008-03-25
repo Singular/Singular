@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.124 2008-03-19 17:44:34 Singular Exp $ */
+/* $Id: iplib.cc,v 1.125 2008-03-25 14:51:59 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -36,9 +36,8 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport);
 #ifdef HAVE_LIBPARSER
 #  include "libparse.h"
 #else /* HAVE_LIBPARSER */
-   procinfo *iiInitSingularProcinfo(procinfov pi, char *libname,
-                                    char *procname, int line, long pos,
-                                    BOOLEAN pstatic = FALSE);
+procinfo *iiInitSingularProcinfo(procinfov pi, const char *libname,
+              const char *procname, int line, long pos, BOOLEAN pstatic=FALSE);
 #endif /* HAVE_LIBPARSER */
 #define NS_LRING (procstack->cRing)
 
