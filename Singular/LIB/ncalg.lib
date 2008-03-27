@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncalg.lib,v 1.27 2008-02-22 14:12:23 Singular Exp $";
+version="$Id: ncalg.lib,v 1.28 2008-03-27 18:16:27 motsak Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  ncalg.lib      Definitions of important GR-algebras
@@ -584,7 +584,7 @@ PURPOSE: define a ring (Weyl algebra) and create a Gelfand-Kapranov-Zelevinsky (
 @*        @code{alg}  is a string, saying which algorithm to use (exactly like in toric_lib),
 @*        @code{v}    is an optional intvec.
 @* In addition, the ideal called @code{GKZid} containing actual equations is calculated and exported to the ring.
-NOTE:    activate the ring with the @code{setring} command. This procedure is elaborated by Oleksandr Yena
+NOTE:    activate the ring with the @code{setring} command. This procedure is elaborated by Oleksandr Iena
 ASSUME: This procedure uses toric_lib and therefore inherits its input requirements:
 @*        possible values for input variable @code{alg} are: \"ect\",\"pt\",\"blr\", \"hs\", \"du\".
 @*        As for the term ordering, it should be a string @code{sord} in Singular format like \"lp\",\"dp\", etc.

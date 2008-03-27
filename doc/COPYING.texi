@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.34 2008-01-09 18:10:27 Singular Exp $
+@comment $Id: COPYING.texi,v 1.35 2008-03-27 18:15:40 motsak Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -198,7 +198,7 @@ Enrique Tobis,
 Alberto Vigneron-Tenorio,
 Moritz Wenk,
 Denis Yanovich,
-Oleksandr Yena.
+Oleksandr Iena.
 @cindex Bayer, Thomas
 @cindex Bermejo, Isabelle
 @cindex Becker, Markus 
@@ -215,6 +215,7 @@ Oleksandr Yena.
 @cindex Heydtmann, Agnes
 @cindex Hillebrand, Dietmar
 @cindex Hirsch, Tobias
+@cindex Iena, Oleksandr 
 @cindex Kauers, Manuel
 @cindex King, Simon
 @cindex Lakhal, Anen
@@ -238,7 +239,6 @@ Oleksandr Yena.
 @cindex Vigneron-Tenorio, Alberto 
 @cindex Wenk, Moritz
 @cindex Yanovich, Denis
-@cindex Yena, Oleksandr 
 
 We should like to acknowledge the financial support given by
 the Volkswagen-Stiftung,
