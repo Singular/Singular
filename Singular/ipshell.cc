@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.181 2008-03-19 17:44:35 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.182 2008-03-28 11:01:56 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1928,6 +1928,7 @@ ring rCompose(const lists  L)
          case ringorder_unspec:
            break;
       }
+      delete iv;
     }
     // sanity check
     j=n-2;
