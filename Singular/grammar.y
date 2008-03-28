@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.125 2008-03-19 17:44:31 Singular Exp $ */
+/* $Id: grammar.y,v 1.126 2008-03-28 15:58:30 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1340,7 +1340,6 @@ ringcmd:
           rlist     ','      /* var names */
           ordering           /* list of (multiplier ordering (weight(s))) */
           {
-            BOOLEAN do_pop = FALSE;
             const char *ring_name = $2.name;
             ring b=
             rInit(&$4,            /* characteristik and list of parameters*/
@@ -1379,7 +1378,6 @@ ringcmd:
           }
         | ringcmd1 elemexpr
           {
-            BOOLEAN do_pop = FALSE;
             const char *ring_name = $2.name;
             if (!inerror) rDefault(ring_name);
             yyInRingConstruction = FALSE;
