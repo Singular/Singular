@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.15 2008-03-19 17:44:08 Singular Exp $ */
+/* $Id: febase.cc,v 1.16 2008-03-31 12:14:44 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -1188,7 +1188,7 @@ const char* eati(const char *s, int *i)
 
 #ifdef ix86_Win
 // Make sure that mode contains binary option
-FILE* myfopen(char *path, char *mode)
+FILE* myfopen(const char *path, const char *mode)
 {
   char mmode[4];
   int i;

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.9 2008-03-19 17:44:08 Singular Exp $ */
+/* $Id: febase.h,v 1.10 2008-03-31 12:14:44 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -71,7 +71,7 @@ extern "C"
 // do never use fopen and fread
 */
 #ifdef ix86_Win
-FILE *myfopen(char *path, char *mode);
+FILE *myfopen(const char *path, const char *mode);
 #else
 #define myfopen fopen
 #endif
