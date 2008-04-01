@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.95 2008-04-01 15:21:47 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.96 2008-04-01 16:32:40 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -154,7 +154,7 @@ static void jjMINPOLY_red(idhdl h)
         jjMINPOLY_red((idhdl)&(L->m[i]));
       }
     }
-    default: 
+    default:
     //case RESOLUTION_CMD:
        Werror("type %d too complex...set minpoly before",IDTYP(h)); break;
   }
@@ -520,43 +520,6 @@ static BOOLEAN jiA_MAP_ID(leftv res, leftv a, Subexpr e)
   f->preimage = rn;
   return FALSE;
 }
-#if 0
-static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
-{
-  // the follwing can only happen, if:
-  //   - the left side is of type qring AND not an id
-  if ((e!=NULL)||(res->rtyp!=IDHDL))
-  {
-    WerrorS("qring_id expected");
-    return TRUE;
-  }
-  ring qr;
-  int i,j;
-  int *pi;
-
-  assumeStdFlag(a);
-  #ifdef HAVE_PLURAL
-  if(rIsPluralRing(currRing))
-  {
-    if (!hasFlag(a,FLAG_TWOSTD))
-    {
-      Warn("%s is no twosided standard basis",a->Name());
-    }
-  }
-  #endif
-  qr=(ring)res->Data();
-  ring qrr=rCopy(currRing);
-  memcpy4(qr,qrr,sizeof(ip_sring));
-  omFreeBin((ADDRESS)qrr, ip_sring_bin);
-  if (qr->qideal!=NULL) idDelete(&qr->qideal);
-  qr->qideal = (ideal)a->CopyD(IDEAL_CMD);
-  //currRing=qr;
-  //currRingHdl=(idhdl)res->data;
-  //currQuotient=qr->qideal;
-  rSetHdl((idhdl)res->data);
-  return FALSE;
-}
-#endif
 static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
 {
   // the follwing can only happen, if:
@@ -568,20 +531,21 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
   }
 
   ring qr=(ring)res->Data(); // the declaration allocated space
-  ring qrr=rCopy(currRing); 
+  ring qrr=rCopy(currRing);
                  // we have to fill it, but the copy also allocates space
   memcpy4(qr,qrr,sizeof(ip_sring));
   omFreeBin((ADDRESS)qrr, ip_sring_bin);
   if (qr->qideal!=NULL) idDelete(&qr->qideal);
   ideal id=(ideal)a->CopyD(IDEAL_CMD);
   if (idElem(id)>1) assumeStdFlag(a);
-  qr->qideal = id;
   if (currRing->qideal!=NULL) /* we are already in a qring! */
   {
-    ideal tmp=idAdd(id,currRing->qideal);
+    ideal tmp=idSimpleAdd(id,currRing->qideal);
+    // both ideals should be GB, so dSimpleAdd is sufficient
     idDelete(&id);
     id=tmp;
   }
+  qr->qideal = id;
 
   // qr is a copy of currRing with the new qideal!
   #ifdef HAVE_PLURAL
@@ -592,7 +556,7 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
       Warn("%s is no twosided standard basis",a->Name());
     }
 
-    nc_SetupQuotient(qr, currRing); 
+    nc_SetupQuotient(qr, currRing);
   }
   #endif
   //currRing=qr;
@@ -805,7 +769,7 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
     {
       if ((l->rtyp==IDHDL) && (l->e==NULL))
         Werror("`%s`(%s) = `%s` is not supported",
-	  Tok2Cmdname(lt),l->Name(),Tok2Cmdname(rt));
+          Tok2Cmdname(lt),l->Name(),Tok2Cmdname(rt));
       else
          Werror("`%s` = `%s` is not supported"
              ,Tok2Cmdname(lt),Tok2Cmdname(rt));
@@ -1013,7 +977,7 @@ static BOOLEAN jjA_L_LIST(leftv l, leftv r)
         goto err;
       }
   }
-  oldL=(lists)l->Data(); 
+  oldL=(lists)l->Data();
   if (oldL!=NULL) oldL->Clean();
   if (l->rtyp==IDHDL)
   {
