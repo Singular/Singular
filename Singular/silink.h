@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.h,v 1.16 2008-03-19 17:44:37 Singular Exp $ */
+/* $Id: silink.h,v 1.17 2008-04-01 17:32:36 wienand Exp $ */
 /*
 * ABSTRACT: general interface to links
 */
@@ -33,7 +33,7 @@ struct s_si_link_extension
   slDumpProc       Dump;
   slGetDumpProc    GetDump;
   slStatusProc     Status;
-  char             *type;
+  const char       *type;
 };
 
 struct sip_link
