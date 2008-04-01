@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.126 2008-02-06 20:25:24 wienand Exp $
+ *  Version: $Id: mod2.h.in,v 1.127 2008-04-01 15:58:51 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -238,7 +238,7 @@
 
 #define BIT_SIZEOF_LONG CHAR_BIT*SIZEOF_LONG
 
-#define SINGULAR_PATCHLEVEL 1
+#define SINGULAR_PATCHLEVEL 2
 #define SINGULAR_VERSION ((SINGULAR_MAJOR_VERSION*1000 + SINGULAR_MINOR_VERSION*100 + SINGULAR_SUB_VERSION*10)+SINGULAR_PATCHLEVEL)
 
 /*******************************************************************
