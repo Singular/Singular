@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.94 2008-03-19 17:44:33 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.95 2008-04-01 15:21:47 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -576,6 +576,12 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
   ideal id=(ideal)a->CopyD(IDEAL_CMD);
   if (idElem(id)>1) assumeStdFlag(a);
   qr->qideal = id;
+  if (currRing->qideal!=NULL) /* we are already in a qring! */
+  {
+    ideal tmp=idAdd(id,currRing->qideal);
+    idDelete(&id);
+    id=tmp;
+  }
 
   // qr is a copy of currRing with the new qideal!
   #ifdef HAVE_PLURAL
