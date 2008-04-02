@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.53 2008-04-02 08:22:36 Singular Exp $ */
+/* $Id: ideals.cc,v 1.54 2008-04-02 09:47:06 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1035,7 +1035,6 @@ ideal idSect (ideal h1,ideal h2)
   if ((idIs0(h1)) || (idIs0(h2)))  return idInit(1,rank);
 
   ideal first,second,temp,temp1,result;
-  intvec *w;
   poly p,q;
 
   if (IDELEMS(h1)<IDELEMS(h2))
@@ -1093,7 +1092,7 @@ ideal idSect (ideal h1,ideal h2)
       k++;
     }
   }
-  w=NULL;
+  intvec *w=NULL;
   temp1 = kStd(temp,currQuotient,testHomog,&w,NULL,length);
   if (w!=NULL) delete w;
   idDelete(&temp);
@@ -1146,6 +1145,7 @@ ideal idSect (ideal h1,ideal h2)
   idSkipZeroes(result);
   if (TEST_OPT_RETURN_SB)
   {
+     w=NULL;
      temp1=kStd(result,currQuotient,testHomog,&w);
      if (w!=NULL) delete w;
      idDelete(&result);
