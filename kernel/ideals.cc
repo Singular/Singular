@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.51 2008-03-20 10:58:24 Singular Exp $ */
+/* $Id: ideals.cc,v 1.52 2008-04-02 08:09:32 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1143,7 +1143,15 @@ ideal idSect (ideal h1,ideal h2)
   }
 
   idSkipZeroes(result);
-  return result;
+  if (TEST_OPT_RETURN_SB)
+  {
+     temp1=kStd(result,currQuotient,testHomog,&w);
+     if (w!=NULL) delete w;
+     idDelete(&result);
+     return temp1;
+  }
+  else //temp1=kInterRed(result,currQuotient);
+    return result;
 }
 
 /*2
@@ -1232,17 +1240,12 @@ ideal idMultSect(resolvente arg, int length)
     rChangeCurrRing(orig_ring);
 
   /* interprete result ----------------------------------------*/
-  result = idInit(8,maxrk);
+  result = idInit(IDELEMS(tempstd),maxrk);
   k = 0;
   for (j=0;j<IDELEMS(tempstd);j++)
   {
     if ((tempstd->m[j]!=NULL) && (p_GetComp(tempstd->m[j],syz_ring)>syzComp))
     {
-      if (k>=IDELEMS(result))
-      {
-        pEnlargeSet(&(result->m),IDELEMS(result),8);
-        IDELEMS(result) += 8;
-      }
       if (syz_ring==orig_ring)
         p = pCopy(tempstd->m[j]);
       else
