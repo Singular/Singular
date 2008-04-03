@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: tricks.doc,v 1.18 2008-03-18 15:58:00 Singular Exp $
+@comment $Id: tricks.doc,v 1.19 2008-04-03 16:26:38 Singular Exp $
 @comment this file contains the "Tricks and pittfalls" sections
 
 @c The following directives are necessary for proper compilation
@@ -36,7 +36,8 @@
 @sc{Singular} has the following limitations:
 @itemize @bullet
 @item
-the characteristic of a prime field must be less or equal than 2147483629
+the characteristic of a prime field must be less or equal than 2147483629 (2^31)
+@* (the characteristic of a prime field in the factory routines must be  be less than 536870912 (2^29))
 @item
 the number of elements in GF(p,n) must be less than 65536
 @item
