@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.88 2008-03-13 19:25:48 levandov Exp $ */
+/* $Id: kutil.cc,v 1.89 2008-04-04 10:30:09 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -318,13 +318,13 @@ void cancelunit (LObject* L,BOOLEAN inNF)
       if (h==NULL)
       {
         p_Delete(&pNext(p), r);
-	if (!inNF)
-	{
+        if (!inNF)
+        {
           number eins=nInit(1);
           if (L->p != NULL)  pSetCoeff(L->p,eins);
           else if (L->t_p != NULL) nDelete(&pGetCoeff(L->t_p));
           if (L->t_p != NULL) pSetCoeff0(L->t_p,eins);
-	}
+        }
         L->ecart = 0;
         L->length = 1;
         //if (L->pLength > 0)
@@ -4177,6 +4177,7 @@ poly redtail (poly p, int pos, kStrategy strat)
 
 poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN normalize)
 {
+#define REDTAIL_CANONICALIZE 100
   strat->redTailChange=FALSE;
   if (strat->noTailReduction) return L->GetLmCurrRing();
   poly h, p;
@@ -4197,6 +4198,7 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
 
   Ln.PrepareRed(strat->use_buckets);
 
+  int cnt=REDTAIL_CANONICALIZE;
   while(!Ln.IsNull())
   {
     loop
@@ -4214,10 +4216,21 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
         With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
         if (With == NULL) break;
       }
+      cnt--;
+      if (cnt==0)
+      {
+        cnt=REDTAIL_CANONICALIZE; 
+        poly tmp=Ln.CanonicalizeP(); 
+        if (normalize) 
+        {
+          Ln.Normalize();
+          //pNormalize(tmp);
+          //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
+        }
+      }
       if (normalize && (!TEST_OPT_INTSTRATEGY) && (!nIsOne(pGetCoeff(With->p))))
       {
         With->pNorm();
-        //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
       }
       strat->redTailChange=TRUE;
       if (ksReducePolyTail(L, With, &Ln))
@@ -4238,6 +4251,7 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
     }
     pNext(h) = Ln.LmExtractAndIter();
     pIter(h);
+    pNormalize(h);
     L->pLength++;
   }
 
@@ -4250,7 +4264,9 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
     L->last = NULL;
     L->length = 0;
   }
-  L->Normalize(); // HANNES: should have a test
+
+  //if (TEST_OPT_PROT) { PrintS("N"); mflush(); }
+  //L->Normalize(); // HANNES: should have a test
   kTest_L(L);
   return L->GetLmCurrRing();
 }
@@ -4901,13 +4917,13 @@ void updateS(BOOLEAN toT,kStrategy strat)
           {
             change=TRUE;
             any_change=TRUE;
-	    #ifdef KDEBUG
+            #ifdef KDEBUG
             if (TEST_OPT_DEBUG)
             {
               PrintS("reduce:");
               wrp(redSi);PrintS(" to ");p_wrp(strat->S[i], currRing, strat->tailRing);PrintLn();
             }
-	    #endif
+            #endif
             if (TEST_OPT_PROT)
             {
               if (strat->S[i]==NULL)

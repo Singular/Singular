@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.34 2008-01-30 09:01:36 wienand Exp $ */
+/* $Id: kbuckets.cc,v 1.35 2008-04-04 10:30:09 Singular Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -428,6 +428,7 @@ int kBucketCanonicalize(kBucket_pt bucket)
     assume(bucket->coef[i]==NULL);
   #endif
   assume(pLength(p) == (int) pl);
+  //if (TEST_OPT_PROT) { Print("C(%d)",pl); }
   kbTest(bucket);
   return i;
 }
@@ -440,7 +441,7 @@ void kBucketClear(kBucket_pt bucket, poly *p, int *length)
   #ifdef USE_COEF_BUCKETS
     MULTIPLY_BUCKET(bucket,i);
     //bucket->coef[i]=NULL;
-#endif
+  #endif
     *p = bucket->buckets[i];
     *length = bucket->buckets_length[i];
     bucket->buckets[i] = NULL;

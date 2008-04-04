@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.65 2008-03-13 19:25:48 levandov Exp $ */
+/* $Id: kstd2.cc,v 1.66 2008-04-04 10:30:09 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1328,6 +1328,9 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   initBuchMoraCrit(strat);
   strat->initEcart = initEcartBBA;
   strat->enterS = enterSBba;
+#ifndef NO_BUCKETS
+  strat->use_buckets = (!TEST_OPT_NOT_BUCKETS) && (!rIsPluralRing(currRing));
+#endif
   /*- set S -*/
   strat->sl = -1;
   /*- init local data struct.---------------------------------------- -*/
@@ -1386,6 +1389,9 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   strat->enterS = enterSBba;
   /*- set S -*/
   strat->sl = -1;
+#ifndef NO_BUCKETS
+  strat->use_buckets = (!TEST_OPT_NOT_BUCKETS) && (!rIsPluralRing(currRing));
+#endif
   /*- init local data struct.---------------------------------------- -*/
   /*Shdl=*/initS(F,Q,strat);
   /*- compute------------------------------------------------------- -*/
