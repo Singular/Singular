@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-/* $Id: SqrFree.cc,v 1.17 2008-03-18 17:46:15 Singular Exp $ */
+/* $Id: SqrFree.cc,v 1.18 2008-04-08 16:19:10 Singular Exp $ */
 static const char * errmsg = "\nYou found a bug!\nPlease inform singular@mathematik.uni-kl.de\n Please include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -199,7 +199,7 @@ SqrFreeTest( const CanonicalForm & r, int opt)
 #else
 #ifndef NOSTREAMIO
   CERR << "\nlibfac: ERROR: SqrFreeTest: we should never fall trough here!\n"
-       << rcsid << errmsg << "\n";
+       << errmsg << "\n";
 #endif
 #endif
   return 0;
@@ -351,7 +351,7 @@ SqrFreed( const CanonicalForm & r , const CanonicalForm &mipo=0)
 #else
 #ifndef NOSTREAMIO
   CERR << "\nlibfac: ERROR: SqrFreed: we should never fall trough here!\n"
-       << rcsid << errmsg << "\n";
+       << errmsg << "\n";
 #endif
 #endif
   DEBDECLEVEL(CERR, "SqrFreed");
@@ -369,7 +369,6 @@ SqrFreeMV( const CanonicalForm & r , const CanonicalForm & mipo )
   CFFList Outputlist, Outputlist2;
 
   DEBINCLEVEL(CERR, "SqrFreeMV");
-  DEBOUTMSG(CERR, rcsid);
   DEBOUTLN(CERR,"Called with f= ", f);
 
   // Take care of stupid users giving us constants
@@ -439,6 +438,9 @@ CFFList SqrFree(const CanonicalForm & r )
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.17  2008/03/18 17:46:15  Singular
+*hannes: gcc 4.2
+
 Revision 1.16  2008/03/18 10:12:59  Singular
 *hannes: typo
 

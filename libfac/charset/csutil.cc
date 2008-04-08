@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-/* $Id: csutil.cc,v 1.17 2008-03-18 17:46:15 Singular Exp $ */
+/* $Id: csutil.cc,v 1.18 2008-04-08 16:19:10 Singular Exp $ */
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -628,7 +628,6 @@ irreducible( const CFList & AS)
 {
 // AS is given by AS = { A1, A2, .. Ar }, d_i = degree(Ai)
 
-  DEBOUTMSG(CERR, rcsid);
 // 1) we test: if d_i > 1, d_j =1 for all j<>i, then AS is irreducible.
   bool deg1=true;
   for ( CFListIterator i = AS ; i.hasItem(); i++ )
@@ -987,6 +986,9 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.17  2008/03/18 17:46:15  Singular
+*hannes: gcc 4.2
+
 Revision 1.16  2008/02/22 12:16:02  Singular
 hannes: genZero ->isZero
 

@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-/* $Id: charset.cc,v 1.13 2008-03-18 17:46:14 Singular Exp $ */
+/* $Id: charset.cc,v 1.14 2008-04-08 16:19:09 Singular Exp $ */
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -383,7 +383,6 @@ IrrCharSeries( const CFList &PS, int opt ){
   int choice=1;;
 #endif
 
-  DEBOUTMSG(CERR, rcsid);
 //  CERR << getCharacteristic() << "\n";
   for ( CFListIterator Ps=PS; Ps.hasItem(); Ps++ )
     if ( level(Ps.getItem() ) > highestlevel ) highestlevel = level(Ps.getItem()) ;
@@ -598,6 +597,9 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
 ///////////////////////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.13  2008/03/18 17:46:14  Singular
+*hannes: gcc 4.2
+
 Revision 1.12  2006/06/14 15:35:08  Singular
 *hannes: CS renamed
 

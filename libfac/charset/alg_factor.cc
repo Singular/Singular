@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-/* $Id: alg_factor.cc,v 1.22 2008-03-18 17:46:14 Singular Exp $ */
+/* $Id: alg_factor.cc,v 1.23 2008-04-08 16:19:09 Singular Exp $ */
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -677,7 +677,6 @@ newfactoras( const CanonicalForm & f, const CFList & as, int success){
 
   success=1;
   DEBINCLEVEL(CERR, "newfactoras");
-  DEBOUTMSG(CERR, rcsid);
   DEBOUTLN(CERR, "newfactoras called with f= ", f);
   DEBOUTLN(CERR, "               content(f)= ", content(f));
   DEBOUTLN(CERR, "                       as= ", as);
@@ -829,6 +828,9 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.22  2008/03/18 17:46:14  Singular
+*hannes: gcc 4.2
+
 Revision 1.21  2008/03/17 17:44:15  Singular
 *hannes: fact.tst
 

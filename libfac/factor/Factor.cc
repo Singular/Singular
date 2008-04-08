@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-/* $Id: Factor.cc,v 1.44 2008-03-18 17:46:15 Singular Exp $ */
+/* $Id: Factor.cc,v 1.45 2008-04-08 16:19:10 Singular Exp $ */
 static const char * errmsg = "\nYou found a bug!\nPlease inform singular@mathematik.uni-kl.de\nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -299,7 +299,7 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
 #else
 #ifndef NOSTREAMIO
             CERR << "libfac: ERROR: not_monic1: case lt is a sum.\n"
-                 << rcsid << errmsg << "\n";
+                 << errmsg << "\n";
 #endif
 #endif
           }
@@ -319,7 +319,7 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
 #else
 #ifndef NOSTREAMIO
           CERR << "libfac: ERROR: not_monic2: case lt is a sum.\n"
-               << rcsid << errmsg << "\n";
+               << errmsg << "\n";
 #endif
 #endif
         }
@@ -523,7 +523,7 @@ specializePoly(const CanonicalForm & f, Variable & Extension, int deg, SFormList
 #else
 #ifndef NOSTREAMIO
       CERR << "libfac: spezializePoly ERROR: Working over given extension-field not yet implemented!\n"
-           << rcsid << errmsg << "\n";
+           << errmsg << "\n";
 #endif
 #endif
       return 0;
@@ -773,7 +773,7 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar)
 #else
 #ifndef NOSTREAMIO
       CERR << "libfac: Factorize: ERROR: Not able to find a valid specialization!\n"
-           << rcsid << errmsg << "\n";
+           << errmsg << "\n";
 #else
        ;
 #endif
@@ -891,7 +891,6 @@ CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
   // INTERRUPTHANDLER
 
   DEBINCLEVEL(CERR, "Factorize");
-  DEBOUTMSG(CERR, rcsid);
   DEBOUTLN(CERR, "Called with F= ", F);
   if ( getCharacteristic() == 0 )
   { // char == 0
@@ -910,7 +909,7 @@ CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
   TIMING_START(factorize_time);
   // search an "optimal" main variavble
   int mv=F.level();
-  if (mv != LEVELBASE && ! F.isUnivariate() )
+  if ((mv != LEVELBASE) && (! F.isUnivariate()) )
   {
      mv=find_mvar(F);
      if (mv!=F.level())
@@ -1150,7 +1149,6 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
   // INTERRUPTHANDLER
 
   DEBINCLEVEL(CERR, "Factorize");
-  DEBOUTMSG(CERR, rcsid);
   DEBOUTLN(CERR, "Called with F= ", F);
   if ( getCharacteristic() == 0 )
   { // char == 0
@@ -1334,6 +1332,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.44  2008/03/18 17:46:15  Singular
+*hannes: gcc 4.2
+
 Revision 1.43  2008/03/18 10:12:21  Singular
 *hannes: format
 

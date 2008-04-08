@@ -1,6 +1,6 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
-// $Id: homogfactor.cc,v 1.9 2008-03-18 17:46:16 Singular Exp $ 
+// $Id: homogfactor.cc,v 1.10 2008-04-08 16:19:10 Singular Exp $ 
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -141,12 +141,14 @@ HomogFactor( const CanonicalForm & g, const CanonicalForm  & minpoly, const int 
 {
   DEBINCLEVEL(CERR, "HomogFactor");
   Variable xn = get_max_degree_Variable(g);
+  out_cf("HomogFactor:",g,"\n");
   int d_xn = degree(g,xn);
   CanonicalForm F = g(1,xn);
 
   DEBOUTLN(CERR, "xn= ", xn);
   DEBOUTLN(CERR, "d_xn=   ", d_xn);
   DEBOUTLN(CERR, "F= ", F);  
+  out_cf("HomogFactor:subst ",F,"\n");
 
   // should we do this for low degree polys g ? e.g. quadratic?
   // 
@@ -156,17 +158,25 @@ HomogFactor( const CanonicalForm & g, const CanonicalForm  & minpoly, const int 
   if ( getCharacteristic() > 0 )
   {
      CFMap n;
-     Intermediatelist = Factorized(compress(F,n), minpoly, Mainvar);
+     if (minpoly.isZero())
+       Intermediatelist = Factorize(compress(F,n), 1);
+     else
+       Intermediatelist = Factorized(compress(F,n), minpoly, Mainvar);
      for ( j=Intermediatelist; j.hasItem(); j++ )
        Homoglist.append(CFFactor( n(j.getItem().factor()), j.getItem().exp()) );
   }
   else
-     Homoglist = Factorize2(F, minpoly);
+  {
+     if (minpoly.isZero())
+       Homoglist = factorize(F);
+     else
+       Homoglist = Factorize2(F,minpoly);
+  }
   // Now we have uncompressed factors in Homoglist
   DEBOUTLN(CERR, "F factors as: ", Homoglist);
   CFFList Unhomoglist;
   CanonicalForm unhomogelem;
-  if ((!minpoly.isZero()) &&(getCharacteristic() == 0) )
+  if ((!(minpoly.isZero())) &&(getCharacteristic() == 0) )
   {
     for ( j=Homoglist; j.hasItem(); j++ )
     {
@@ -186,6 +196,7 @@ HomogFactor( const CanonicalForm & g, const CanonicalForm  & minpoly, const int 
       DEBOUTLN(CERR, "Homogenizing ",j.getItem().factor()); 
       unhomogelem= homogenize(j.getItem().factor(),xn);
       DEBOUTLN(CERR, "      that is ", unhomogelem);
+      out_cf("unhomogelem:",unhomogelem,"\n");
       Unhomoglist.append(CFFactor(unhomogelem,j.getItem().exp()));
       d_xn -= degree(unhomogelem,xn)*j.getItem().exp();
     }
@@ -200,6 +211,9 @@ HomogFactor( const CanonicalForm & g, const CanonicalForm  & minpoly, const int 
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.9  2008/03/18 17:46:16  Singular
+*hannes: gcc 4.2
+
 Revision 1.8  2007/10/25 14:45:41  Singular
 *hannes: homgfactor for alg.ext of Q
 

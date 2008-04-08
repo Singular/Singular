@@ -11,7 +11,7 @@
 // computing time for your example!
 /////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-/* $Id: reorder.cc,v 1.5 2008-03-18 17:46:15 Singular Exp $ */
+/* $Id: reorder.cc,v 1.6 2008-04-08 16:19:10 Singular Exp $ */
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -273,7 +273,6 @@ neworder( const CFList & PolyList ){
   Varlist oldorder, reorder, difference;
 
   DEBINCLEVEL(CERR, "neworder");
-  DEBOUTMSG(CERR, rcsid);
   TIMING_START(neworder_time);
 
   int highest_level= level(get_max_var(PS));
@@ -407,6 +406,9 @@ reorder(const Varlist & betterorder, const ListCFList & Q){
 }
 /*
 $Log: not supported by cvs2svn $
+Revision 1.5  2008/03/18 17:46:15  Singular
+*hannes: gcc 4.2
+
 Revision 1.4  2006/05/16 14:46:49  Singular
 *hannes: gcc 4.1 fixes
 
