@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.10 2008-01-07 13:36:16 Singular Exp $
+// $Id: clapconv.cc,v 1.11 2008-04-08 16:59:53 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -188,7 +188,7 @@ static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, 
     pNext( term ) = NULL;
     for ( int i = 1; i <= r->N; i++ )
       p_SetExp( term, i, exp[i], r);
-    if (rRing_has_Comp(r)) p_SetComp(term, 0, r);
+    //if (rRing_has_Comp(r)) p_SetComp(term, 0, r); // done by p_Init
     if ( f.isImm() )
       pGetCoeff( term ) = n_Init( f.intval(), r );
     else
@@ -403,8 +403,7 @@ static void convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int
       int i;
       for ( i = 1; i <= pVariables; i++ )
         pSetExp( term, i , exp[i+var_start]);
-      if (rRing_has_Comp(currRing->algring))
-        p_SetComp(term, 0, currRing->algring);
+      //if (rRing_has_Comp(currRing->algring)) p_SetComp(term, 0, currRing->algring); // done by pInit
       if (par_start==0)
       {
         for ( i = 1; i <= var_start; i++ )
@@ -586,8 +585,7 @@ convRecTrP ( const CanonicalForm & f, int * exp, poly & result , int offs)
     pNext( term ) = NULL;
     for ( int i = 1; i <= pVariables; i++ )
       pSetExp( term, i ,exp[i]);
-    if (rRing_has_Comp(currRing))
-        p_SetComp(term, 0, currRing);
+    //if (rRing_has_Comp(currRing)) p_SetComp(term, 0, currRing); // done by pInit
     pGetCoeff(term)=(number)omAlloc0Bin(rnumber_bin);
     ((lnumber)pGetCoeff(term))->z=convFactoryPSingTr( f );
     pSetm( term );
@@ -682,8 +680,7 @@ convRecGFGF ( const CanonicalForm & f, int * exp, poly & result )
     pNext( term ) = NULL;
     for ( int i = 1; i <= pVariables; i++ )
       pSetExp( term, i, exp[i]);
-    if (rRing_has_Comp(currRing))
-        p_SetComp(term, 0, currRing);
+    //if (rRing_has_Comp(currRing)) p_SetComp(term, 0, currRing); // done by pInit
     pGetCoeff( term ) = (number) gf_value (f);
     pSetm( term );
     result = pAdd( result, term );
