@@ -1,6 +1,6 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
-// $Id: homogfactor.cc,v 1.10 2008-04-08 16:19:10 Singular Exp $ 
+// $Id: homogfactor.cc,v 1.11 2008-04-09 09:41:48 Singular Exp $ 
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -141,14 +141,14 @@ HomogFactor( const CanonicalForm & g, const CanonicalForm  & minpoly, const int 
 {
   DEBINCLEVEL(CERR, "HomogFactor");
   Variable xn = get_max_degree_Variable(g);
-  out_cf("HomogFactor:",g,"\n");
+  //out_cf("HomogFactor:",g,"\n");
   int d_xn = degree(g,xn);
   CanonicalForm F = g(1,xn);
 
   DEBOUTLN(CERR, "xn= ", xn);
   DEBOUTLN(CERR, "d_xn=   ", d_xn);
   DEBOUTLN(CERR, "F= ", F);  
-  out_cf("HomogFactor:subst ",F,"\n");
+  //out_cf("HomogFactor:subst ",F,"\n");
 
   // should we do this for low degree polys g ? e.g. quadratic?
   // 
@@ -196,7 +196,7 @@ HomogFactor( const CanonicalForm & g, const CanonicalForm  & minpoly, const int 
       DEBOUTLN(CERR, "Homogenizing ",j.getItem().factor()); 
       unhomogelem= homogenize(j.getItem().factor(),xn);
       DEBOUTLN(CERR, "      that is ", unhomogelem);
-      out_cf("unhomogelem:",unhomogelem,"\n");
+      //out_cf("unhomogelem:",unhomogelem,"\n");
       Unhomoglist.append(CFFactor(unhomogelem,j.getItem().exp()));
       d_xn -= degree(unhomogelem,xn)*j.getItem().exp();
     }
@@ -211,6 +211,9 @@ HomogFactor( const CanonicalForm & g, const CanonicalForm  & minpoly, const int 
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.10  2008/04/08 16:19:10  Singular
+*hannes: removed rcsid
+
 Revision 1.9  2008/03/18 17:46:16  Singular
 *hannes: gcc 4.2
 
