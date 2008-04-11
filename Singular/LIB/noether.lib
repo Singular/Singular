@@ -1,6 +1,6 @@
 // AH last modified:  01.07.2007
 //////////////////////////////////////////////////////////////////////////////
-version = "$Id: noether.lib,v 1.9 2008-01-14 13:01:04 Singular Exp $";
+version = "$Id: noether.lib,v 1.10 2008-04-11 14:04:40 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: noether.lib   Noether normalization of an ideal (not nessecary
@@ -21,7 +21,7 @@ This library computes also Castelnuovo-Mumford regularity and satiety of an
 ideal.  A modular version of these algorithms is also provided.
 The procedures are based on a paper of Amir Hashemi 'Computation of
 Castelnuovo-Mumford regularity and satiety'
-(preprint 2007)
+(preprint 2008)
 
 
 PROCEDURES:
