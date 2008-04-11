@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: tricks.doc,v 1.19 2008-04-03 16:26:38 Singular Exp $
+@comment $Id: tricks.doc,v 1.20 2008-04-11 14:09:47 Singular Exp $
 @comment this file contains the "Tricks and pittfalls" sections
 
 @c The following directives are necessary for proper compilation
@@ -38,6 +38,7 @@
 @item
 the characteristic of a prime field must be less or equal than 2147483629 (2^31)
 @* (the characteristic of a prime field in the factory routines must be  be less than 536870912 (2^29))
+@* (the characteristic of a prime field in the NTL routines must be  be less than NTL_SP_BOUND (2^30) on 32bit machines - alway the case, as currently only factory uses NTL)
 @item
 the number of elements in GF(p,n) must be less than 65536
 @item
