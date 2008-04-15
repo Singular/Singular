@@ -1,7 +1,17 @@
 #include "config.h"
 #include <stdio.h>
 #ifndef NOSTREAMIO
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#define ISTREAM std::istream
+#define OSTREAM std::ostream
+#define CERR std::cerr
+#elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
+#define ISTREAM istream
+#define OSTREAM ostream
+#define CERR cerr
+#endif
 #endif
 #include <math.h>
 #include <cf_factory.h>

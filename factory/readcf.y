@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: readcf.y,v 1.10 2006-05-15 09:03:07 Singular Exp $ */
+/* $Id: readcf.y,v 1.11 2008-04-15 12:04:31 Singular Exp $ */
 
 %{
 
@@ -9,6 +9,7 @@
 #define alloca _alloca
 #endif
 
+#include <cstring> // we need this for gcc 4.3
 #include <config.h>
 
 #include <ctype.h>
