@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.265 2008-03-19 17:44:29 Singular Exp $ */
+/* $Id: extra.cc,v 1.266 2008-04-17 12:32:13 wienand Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -56,6 +56,10 @@
 
 #ifdef HAVE_RINGS
 #include "ringgb.h"
+#endif
+
+#ifdef HAVE_F5
+#include "f5gb.h"
 #endif
 
 #ifdef HAVE_WALK
@@ -2550,6 +2554,18 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       ideal G = (ideal) h->Data();
       res->rtyp=POLY_CMD;
       res->data=(poly) ringRedNF(f, G, r);
+      return(FALSE);
+    }
+    else
+#endif
+#ifdef HAVE_F5
+/*==================== F5 Implementation =================*/
+    if (strcmp(sys_cmd, "F5")==0)
+    {
+      ring r = currRing;
+      ideal G = (ideal) h->Data();
+      res->rtyp=IDEAL_CMD;
+      res->data=(ideal) computeF5(G, r);
       return(FALSE);
     }
     else
