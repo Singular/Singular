@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.51 2008-01-24 10:07:14 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.52 2008-04-18 12:11:40 motsak Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -2009,191 +2009,185 @@ poly nc_mm_Bracket_nn(poly m1, poly m2)
   return(res);
 }
 
-ideal twostd(ideal I)
+ideal twostd(ideal I) // works in currRing only!
 {
-  int i;
-  int j;
-  int s;
-  bool flag;
-  poly p=NULL;
-  poly q=NULL;
-  ideal J=kStd(I, currQuotient,testHomog,NULL,NULL,0,0,NULL);
-  idSkipZeroes(J);
-  ideal K=NULL;
-  poly varj=NULL;
-  ideal Q=NULL;
-  ideal id_tmp=NULL;
-  int rN=currRing->N;
-  int iSize=0;
+  ideal J = kStd(I, currQuotient, testHomog, NULL, NULL, 0, 0, NULL); // in currRing!!!
+  idSkipZeroes(J); // ring independent!
+
+  const int rN = currRing->N;
 
   loop
   {
-    flag = true; // nothing new!
-    K    = NULL;
-    s    = idElem(J);
+    ideal     K    = NULL;
+    const int s    = idElem(J); // ring independent
 
-    for (i=0;i<=s-1;i++)
+    for(int i = 0; i < s; i++)
     {
-      p=J->m[i];
+      const poly p = J->m[i];
 
-        #ifdef PDEBUG
-          p_Test(p, currRing);
-        #if 0
-          Print("p: "); // !
-          p_Write(p, currRing);
-        #endif
-        #endif
+#ifdef PDEBUG
+      p_Test(p, currRing);
+#if 0
+      Print("p: "); // !
+      p_Write(p, currRing);
+#endif
+#endif
 
-      for (j=1;j<=rN;j++) // for all j = 1..N
+      for (int j = 1; j <= rN; j++) // for all j = 1..N
       {
-        varj = pOne();
-        pSetExp(varj,j,1);
-        pSetm(varj);
-        q = pp_Mult_mm(p,varj,currRing); // q = J[i] * var(j),
-        pDelete(&varj);
+        poly varj = p_ISet(1, currRing);
+        p_SetExp(varj, j, 1, currRing); 
+        p_Setm(varj, currRing);
 
-        #ifdef PDEBUG
-          p_Test(p, currRing);
-          p_Test(q, currRing);
-        #if 0
-          Print("Reducing p: "); // !
+        poly q = pp_Mult_mm(p, varj, currRing); // q = J[i] * var(j),
+
+#ifdef PDEBUG
+        p_Test(varj, currRing);
+        p_Test(p, currRing);
+        p_Test(q, currRing);
+#if 0
+        Print("Reducing p: "); // !
+        p_Write(p, currRing);
+
+        Print("With q: "); // !
+        p_Write(q, currRing);
+#endif
+#endif
+
+        p_Delete(&varj, currRing);
+
+        if (q != NULL)
+        {
+#ifdef PDEBUG          
+#if 0
+          Print("Reducing q[j = %d]: ", j); // !
+          p_Write(q, currRing);
+
+          Print("With p:");
           p_Write(p, currRing);
 
-          Print("With q: "); // !
+#endif
+#endif
+
+          // bug: lm(p) may not divide lm(p * var(i)) in a SCA!
+          if( p_LmDivisibleBy(p, q, currRing) )
+            q = nc_ReduceSpoly(p, q, currRing);
+
+
+#ifdef PDEBUG
+          p_Test(q, currRing);
+#if 0
+          Print("reductum q/p: ");
           p_Write(q, currRing);
-        #endif
-        #endif
 
-        if (q!=NULL)
-        {
-          q = nc_ReduceSpoly(p,q,currRing);
+          // Print("With J!\n");
+#endif
+#endif
+          
+//          if( q != NULL)
+          q = kNF(J, currQuotient, q, 0, KSTD_NF_NONORM); // in currRing!!!
 
-          #ifdef PDEBUG
-            p_Test(q, currRing);
-          #if 0
-            Print("Reducing q: "); // !
-            p_Write(q, currRing);
-
-            Print("With J!\n");
-          #endif
-          #endif
-
-          if (q!=NULL) q = kNF(J,currQuotient,q,0,KSTD_NF_NONORM);
-
-          #ifdef PDEBUG
-            p_Test(q, currRing);
-          #if 0
-            Print("=> q: "); // !
-            p_Write(q, currRing);
-          #endif
-          #endif
-        }
-        if (q!=NULL)
-        {
-          if (pIsConstant(q)) // => return (1)!
+#ifdef PDEBUG
+          p_Test(q, currRing);
+#if 0
+          Print("NF(J/currQuotient)=> q: "); // !
+          p_Write(q, currRing);
+#endif
+#endif
+          if (q!=NULL)
           {
-            Q=idInit(1,1);
-            Q->m[0]=pOne();
-            idDelete(&J);
-            pDelete(&q);
-            if (K!=NULL) idDelete(&K);
-            return(Q);
+            if (p_IsConstant(q, currRing)) // => return (1)!
+            {
+              p_Delete(&q, currRing);
+              id_Delete(&J, currRing);
+
+              if (K != NULL)
+                id_Delete(&K, currRing);
+
+              ideal Q = idInit(1,1); // ring independent!
+              Q->m[0] = p_ISet(1,currRing);
+
+              return(Q);
+            }
+
+//            flag = false;
+
+            // K += q:
+
+            ideal Q = idInit(1,1); // ring independent
+            Q->m[0]=q;
+
+            if( K == NULL )
+              K = Q;
+            else
+            {
+              ideal id_tmp = idSimpleAdd(K, Q); // in currRing
+              id_Delete(&K, currRing);
+              id_Delete(&Q, currRing);
+              K = id_tmp; // K += Q
+            }
           }
 
-          flag=false;
-          Q=idInit(1,1);
-          Q->m[0]=q;
-          id_tmp=idSimpleAdd(K,Q);
-          idDelete(&K);
-          K=id_tmp;
-          idDelete(&Q);
-        }
-      }
+
+        } // if q != NULL
+      } // for all variables
+
     }
-    if (flag) // nothing new!
-      /* i.e. all elements are two-sided */
-    {
-//      idDelete(&K);
+    
+    if (K == NULL) // nothing new: i.e. all elements are two-sided
       return(J);
-    }
     /* now we update GrBasis J with K */
     //    iSize=IDELEMS(J);
-  #ifdef PDEBUG
-    idTest(J);
-  #if 0
+#ifdef PDEBUG
+    idTest(J); // in currRing!
+#if 0
     Print("J:");
     idPrint(J);
     PrintLn();
-  #endif // debug
-  #endif
+#endif // debug
+#endif
 
 
 
-  #ifdef PDEBUG
-    idTest(K);
-  #if 0
+#ifdef PDEBUG
+    idTest(K); // in currRing!
+#if 0
     Print("+K:");
     idPrint(K);
     PrintLn();
-  #endif // debug
-  #endif
+#endif // debug
+#endif
 
 
-    iSize=idElem(J);
-    id_tmp=idSimpleAdd(J,K);
-    idDelete(&K);
-    idDelete(&J);
+    int iSize = idElem(J); // ring independent
 
+    // J += K:    
+    ideal id_tmp = idSimpleAdd(J,K); // in currRing
+    id_Delete(&K, currRing); id_Delete(&J, currRing);
+
+#if 1
     BITSET save_test=test;
-
-    #if 1
-      test|=Sy_bit(OPT_SB_1);
-      J = kStd(id_tmp, currQuotient, testHomog, NULL, NULL, 0, iSize); // J = J + K, J - std
-    #else
-      J=kStd(id_tmp, currQuotient,testHomog,NULL,NULL,0,0,NULL);
-    #endif
+    test|=Sy_bit(OPT_SB_1); // ring independent
+    J = kStd(id_tmp, currQuotient, testHomog, NULL, NULL, 0, iSize); // J = J + K, J - std // in currRing!
     test = save_test;
+#else
+    J=kStd(id_tmp, currQuotient,testHomog,NULL,NULL,0,0,NULL);
+#endif
 
-    idDelete(&id_tmp); // !!!
+    id_Delete(&id_tmp, currRing);
+    idSkipZeroes(J); // ring independent
 
-    idSkipZeroes(J);
-
-  #ifdef PDEBUG
-    idTest(J);
-  #if 0
+#ifdef PDEBUG
+    idTest(J); // in currRing!
+#if 0
     Print("J:");
     idPrint(J);
     PrintLn();
-  #endif // debug
-  #endif
-
-// bug:
-
-//J:Module of rank 1,real rank 0 and 4 generators.
-//generator 0: f
-//generator 1: h2+h
-//generator 2: eh+e
-//generator 3: e2
-
-//+K:Module of rank 1,real rank 0 and 2 generators.
-//generator 0: h
-//generator 1: e
-
-// =>>>>
-
-//J:Module of rank 1,real rank 0 and 6 generators.
-//generator 0: h
-//generator 1: f
-//generator 2: e
-//generator 3: h2+h
-//generator 4: eh+e
-//generator 5: e2
-
-
-
-
-  }
+#endif // debug
+#endif
+  } // loop
 }
+
 
 matrix nc_PrintMat(int a, int b, ring r, int metric)
   /* returns matrix with the info on noncomm multiplication */
