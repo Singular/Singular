@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.1 2008-04-17 12:32:13 wienand Exp $ */
+/* $Id: f5gb.h,v 1.2 2008-04-18 13:32:53 wienand Exp $ */
 /*
 * ABSTRACT: ringgb interface
 */
@@ -13,5 +13,4 @@
 ideal computeF5(ideal I, ring r);
 #endif
 
-#endif
 #endif

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.11 2008-03-19 17:44:11 Singular Exp $ */
+/* $Id: rintegers.cc,v 1.12 2008-04-18 13:32:53 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -287,15 +287,10 @@ void nrzWrite (number &a)
 /*2
 * extracts a long integer from s, returns the rest    (COPY FROM longrat0.cc)
 */
-char * nlEatLongC(char *s, MP_INT *i)
+static const char * nlEatLongC(char *s, MP_INT *i)
 {
-  char * start=s;
-  if (!(*s >= '0' && *s <= '9'))
-  {
-    mpz_init_set_si(i, 1);
-    return s;
-  }
-  mpz_init(i);
+  const char * start=s;
+
   while (*s >= '0' && *s <= '9') s++;
   if (*s=='\0')
   {
@@ -311,13 +306,12 @@ char * nlEatLongC(char *s, MP_INT *i)
   return s;
 }
 
-
-char * nrzRead (char *s, number *a)
+const char * nrzRead (const char *s, number *a)
 {
   int_number z = (int_number) omAllocBin(gmp_nrz_bin); // evtl. spaeter mit bin
   {
     mpz_init(z);
-    s = nlEatLongC(s, z);
+    s = nlEatLongC((char *) s, z);
   }
   *a = (number) z;
   return s;
