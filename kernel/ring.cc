@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.77 2008-03-19 17:44:11 Singular Exp $ */
+/* $Id: ring.cc,v 1.78 2008-04-21 11:23:12 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -723,17 +723,13 @@ int rChar(ring r)
 
 /*2
  *returns -1 for not compatible, (sum is undefined)
- *         0 for equal, (and sum)
  *         1 for compatible (and sum)
  */
-int rSum(ring r1, ring r2, ring &sum)
+/* vartest: test for variable/paramter names
+* dp_dp: for comm. rings: use block order dp,dp
+*/
+int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 {
-  if (r1==r2)
-  {
-    sum=r1;
-    r1->ref++;
-    return 0;
-  }
   ring save=currRing;
   ip_sring tmpR;
   memset(&tmpR,0,sizeof(tmpR));
@@ -745,7 +741,7 @@ int rSum(ring r1, ring r2, ring &sum)
     {
       if (r1->parameter!=NULL)
       {
-        if (strcmp(r1->parameter[0],r2->parameter[0])==0) /* 1 char */
+        if (!vartest || (strcmp(r1->parameter[0],r2->parameter[0])==0)) /* 1 par */
         {
           tmpR.parameter=(char **)omAllocBin(char_ptr_bin);
           tmpR.parameter[0]=omStrDup(r1->parameter[0]);
@@ -766,7 +762,7 @@ int rSum(ring r1, ring r2, ring &sum)
         {
           // HANNES: TODO: delete nSetChar
           rChangeCurrRing(r1);
-          if ((strcmp(r1->parameter[0],r2->parameter[0])==0) /* 1 char */
+          if ((!vartest || (strcmp(r1->parameter[0],r2->parameter[0])==0)) /* 1 par */
               && n_Equal(r1->minpoly,r2->minpoly, r1))
           {
             tmpR.parameter=(char **)omAllocBin(char_ptr_bin);
@@ -786,7 +782,7 @@ int rSum(ring r1, ring r2, ring &sum)
         }
         else
         {
-          if ((strcmp(r1->parameter[0],r2->parameter[0])==0) /* 1 char */
+          if ((!vartest || (strcmp(r1->parameter[0],r2->parameter[0])==0)) /* 1 par */
               && (rPar(r2)==1))
           {
             tmpR.parameter=(char **)omAllocBin(char_ptr_bin);
@@ -805,7 +801,7 @@ int rSum(ring r1, ring r2, ring &sum)
       {
         if (r2->minpoly!=NULL)
         {
-          if ((strcmp(r1->parameter[0],r2->parameter[0])==0) /* 1 char */
+          if ((!vartest || (strcmp(r1->parameter[0],r2->parameter[0])==0)) /* 1 par */
               && (rPar(r1)==1))
           {
             tmpR.parameter=(char **)omAllocBin(char_ptr_bin);
@@ -831,11 +827,16 @@ int rSum(ring r1, ring r2, ring &sum)
           int j,l;
           for(j=0;j<rPar(r2);j++)
           {
-            for(l=0;l<i;l++)
+            if (vartest)
             {
-              if(strcmp(tmpR.parameter[l],r2->parameter[j])==0)
-                break;
+              for(l=0;l<i;l++)
+              {
+                if(strcmp(tmpR.parameter[l],r2->parameter[j])==0)
+                  break;
+              }
             }
+            else
+              l=i;
             if (l==i)
             {
               tmpR.parameter[i]=omStrDup(r2->parameter[j]);
@@ -982,12 +983,15 @@ int rSum(ring r1, ring r2, ring &sum)
       b = FALSE;
     else if ((r2->parameter!=NULL) && (strlen(r1->names[i])==1))
     {
-      for(j=0;j<rPar(r2);j++)
+      if (vartest)
       {
-        if (strcmp(r1->names[i],r2->parameter[j])==0)
+        for(j=0;j<rPar(r2);j++)
         {
-          b=FALSE;
-          break;
+          if (strcmp(r1->names[i],r2->parameter[j])==0)
+          {
+            b=FALSE;
+            break;
+          }
         }
       }
     }
@@ -1011,24 +1015,30 @@ int rSum(ring r1, ring r2, ring &sum)
       b = FALSE;
     else if ((r1->parameter!=NULL) && (strlen(r2->names[i])==1))
     {
-      for(j=0;j<rPar(r1);j++)
+      if (vartest)
       {
-        if (strcmp(r2->names[i],r1->parameter[j])==0)
+        for(j=0;j<rPar(r1);j++)
         {
-          b=FALSE;
-          break;
+          if (strcmp(r2->names[i],r1->parameter[j])==0)
+          {
+            b=FALSE;
+            break;
+          }
         }
       }
     }
 
     if (b)
     {
-      for(j=0;j<r1->N;j++)
+      if (vartest)
       {
-        if (strcmp(r1->names[j],r2->names[i])==0)
+        for(j=0;j<r1->N;j++)
         {
-          b=FALSE;
-          break;
+          if (strcmp(r1->names[j],r2->names[i])==0)
+          {
+            b=FALSE;
+            break;
+          }
         }
       }
       if (b)
@@ -1365,6 +1375,22 @@ int rSum(ring r1, ring r2, ring &sum)
   }
   sum->qideal = Q;
   return 1;
+}
+
+/*2
+ *returns -1 for not compatible, (sum is undefined)
+ *         0 for equal, (and sum)
+ *         1 for compatible (and sum)
+ */
+int rSum(ring r1, ring r2, ring &sum)
+{
+  if (r1==r2)
+  {
+    sum=r1;
+    r1->ref++;
+    return 0;
+  }
+  return rTensor(r1,r2,sum,TRUE,FALSE);
 }
 
 /*2
@@ -3591,6 +3617,7 @@ ring rAssure_HasComp(ring r)
         break;
      i++;
   } while (1);
+  WarnS("re-creating ring with comps");
   last_block=i-1;
   
   ring new_r = rCopy0(r, FALSE, FALSE);

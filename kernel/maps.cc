@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.6 2007-01-31 23:51:24 motsak Exp $ */
+/* $Id: maps.cc,v 1.7 2008-04-21 11:23:11 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -197,80 +197,29 @@ static poly pChangeSizeOfPoly(ring p_ring, poly p,int minvar,int maxvar)
 ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
 {
   int i,j;
-  int ordersize = rBlocks(currRing) + 1;
   poly p,pp,q;
   ideal temp1;
   ideal temp2;
-  int *orders = (int*) omAlloc0(sizeof(int)*(ordersize));
-  int *block0 = (int*) omAlloc0(sizeof(int)*(ordersize));
-  int *block1 = (int*) omAlloc0(sizeof(int)*(ordersize));
-  int **wv = (int **) omAlloc0(ordersize * sizeof(int *));
 
   int imagepvariables = theImageRing->N;
   ring sourcering = currRing;
   int N = pVariables+imagepvariables;
-  char** names = (char**) omAlloc0(N*sizeof(char*));
 
-  memcpy(names, currRing->names, currRing->N*sizeof(char*));
-  memcpy(&(names[currRing->N]), theImageRing->names,
-          (theImageRing->N*sizeof(char*)));
-  sip_sring tmpR;
-
-  //if (theImageRing->OrdSgn == 1)s
-     orders[0] = ringorder_dp;
-  //else orders[0] = ringorder_ls;
-  block1[0] = imagepvariables;
-  block0[0] = 1;
-  /*
-  *if (sourcering->order[blockmax])
-  *{
-  *  if (sourcering->OrdSgn == 1) orders[1] = ringorder_dp;
-  *  else orders[1] = ringorder_ls;
-  *  block1[1] = N;
-  *}
-  *else
-  */
-  for (i=0; i<ordersize - 1; i++)
+  ring tmpR;
+  if (rTensor(theImageRing,sourcering,tmpR,FALSE,TRUE)!=1)
   {
-    orders[i+1] = sourcering->order[i];
-    block0[i+1] = sourcering->block0[i]+imagepvariables;
-    block1[i+1] = sourcering->block1[i]+imagepvariables;
-    wv[i+1] = sourcering->wvhdl[i];
+     WerrorS("rTensor error");
+     return NULL;
   }
-  tmpR = *currRing;
-  tmpR.N = N;
-  tmpR.order = orders;
-  tmpR.block0 = block0;
-  tmpR.block1 = block1;
-  tmpR.wvhdl = wv;
-  tmpR.names = names;
-  rComplete(&tmpR, 1);
-  rTest(&tmpR);
 
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(theImageRing))
   {
-    rUnComplete(&tmpR);
-    omFreeSize(orders, sizeof(int)*(ordersize));orders=NULL;
-    omFreeSize(block0, sizeof(int)*(ordersize));block0=NULL;
-    omFreeSize(block1, sizeof(int)*(ordersize));block1=NULL;
-    omFreeSize(wv, sizeof(int*)*(ordersize)); wv=NULL;
-    omFreeSize(names, (currRing->N)*sizeof(char*)); names=NULL;
-    memset(&tmpR,0,sizeof(tmpR));
     if ((rIsPluralRing(sourcering)) && (ncRingType(sourcering)!=nc_comm)) 
     {
       Werror("Sorry, not yet implemented for noncomm. rings");
       return NULL;
     }    
-    ring tmpR_ptr;
-    if ( rSum(theImageRing, sourcering, tmpR_ptr ) !=1 )
-    {
-      /* something is wrong with the rings... */
-      Werror("Error in rSum");
-      return NULL;
-    }
-    memcpy(&tmpR,tmpR_ptr,sizeof(tmpR));
-    // Action!
   }
   if (nSetMap(theImageRing) != nCopy)
   {
@@ -280,7 +229,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
 #endif
 
   // change to new ring
-  rChangeCurrRing(&tmpR);
+  rChangeCurrRing(tmpR);
   if (id==NULL)
     j = 0;
   else
@@ -333,7 +282,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
     p = temp2->m[i];
     if (p!=NULL)
     {
-      q = pChangeSizeOfPoly(&tmpR, p,imagepvariables+1,N);
+      q = pChangeSizeOfPoly(tmpR, p,imagepvariables+1,N);
       if (j>=IDELEMS(temp1))
       {
         pEnlargeSet(&(temp1->m),IDELEMS(temp1),5);
@@ -343,17 +292,9 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
       j++;
     }
   }
-  id_Delete(&temp2, &tmpR);
+  id_Delete(&temp2, tmpR);
   idSkipZeroes(temp1);
-  rUnComplete(&tmpR);
-  if (orders!=NULL)
-  {
-    omFreeSize(orders, sizeof(int)*(ordersize));
-    omFreeSize(block0, sizeof(int)*(ordersize));
-    omFreeSize(block1, sizeof(int)*(ordersize));
-    omFreeSize(wv, sizeof(int*)*(ordersize));
-    omFreeSize(names, (currRing->N)*sizeof(char*));
-  }
+  rKill(tmpR);
   return temp1;
 }
 
