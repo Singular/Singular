@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.78 2008-04-21 11:23:12 Singular Exp $ */
+/* $Id: ring.cc,v 1.79 2008-04-21 14:18:16 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1063,124 +1063,143 @@ int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
   tmpR.names=names;
   /* ordering *======================================================== */
   tmpR.OrdSgn=1;
-  if ((r1->order[0]==ringorder_unspec)
-      && (r2->order[0]==ringorder_unspec))
+  if (dp_dp && (r1->OrdSgn==1) && (r2->OrdSgn==1) 
+  && !rIsPluralRing(r1) && !rIsPluralRing(r2))
   {
-    tmpR.order=(int*)omAlloc(3*sizeof(int));
-    tmpR.block0=(int*)omAlloc(3*sizeof(int));
-    tmpR.block1=(int*)omAlloc(3*sizeof(int));
-    tmpR.wvhdl=(int**)omAlloc0(3*sizeof(int_ptr));
-    tmpR.order[0]=ringorder_unspec;
-    tmpR.order[1]=ringorder_C;
-    tmpR.order[2]=0;
+    tmpR.order=(int*)omAlloc(4*sizeof(int));
+    tmpR.block0=(int*)omAlloc0(4*sizeof(int));
+    tmpR.block1=(int*)omAlloc0(4*sizeof(int));
+    tmpR.wvhdl=(int**)omAlloc0(4*sizeof(int_ptr));
+    tmpR.order[0]=ringorder_dp;
     tmpR.block0[0]=1;
-    tmpR.block1[0]=tmpR.N;
+    tmpR.block1[0]=rVar(r1);
+    tmpR.order[1]=ringorder_dp;
+    tmpR.block0[1]=rVar(r1)+1;
+    tmpR.block1[1]=rVar(r1)+rVar(r2);
+    tmpR.order[2]=ringorder_C;
+    tmpR.order[3]=0;
   }
-  else if (l==k) /* r3=r1+r2 */
+  else
   {
-    int b;
-    ring rb;
-    if (r1->order[0]==ringorder_unspec)
+    if ((r1->order[0]==ringorder_unspec)
+        && (r2->order[0]==ringorder_unspec))
     {
-      /* extend order of r2 to r3 */
-      b=rBlocks(r2);
-      rb=r2;
-      tmpR.OrdSgn=r2->OrdSgn;
-    }
-    else if (r2->order[0]==ringorder_unspec)
-    {
-      /* extend order of r1 to r3 */
-      b=rBlocks(r1);
-      rb=r1;
-      tmpR.OrdSgn=r1->OrdSgn;
-    }
-    else
-    {
-      b=rBlocks(r1)+rBlocks(r2)-2; /* for only one order C, only one 0 */
-      rb=NULL;
-    }
-    tmpR.order=(int*)omAlloc0(b*sizeof(int));
-    tmpR.block0=(int*)omAlloc0(b*sizeof(int));
-    tmpR.block1=(int*)omAlloc0(b*sizeof(int));
-    tmpR.wvhdl=(int**)omAlloc0(b*sizeof(int_ptr));
-    /* weights not implemented yet ...*/
-    if (rb!=NULL)
-    {
-      for (i=0;i<b;i++)
-      {
-        tmpR.order[i]=rb->order[i];
-        tmpR.block0[i]=rb->block0[i];
-        tmpR.block1[i]=rb->block1[i];
-        if (rb->wvhdl[i]!=NULL)
-          WarnS("rSum: weights not implemented");
-      }
+      tmpR.order=(int*)omAlloc(3*sizeof(int));
+      tmpR.block0=(int*)omAlloc(3*sizeof(int));
+      tmpR.block1=(int*)omAlloc(3*sizeof(int));
+      tmpR.wvhdl=(int**)omAlloc0(3*sizeof(int_ptr));
+      tmpR.order[0]=ringorder_unspec;
+      tmpR.order[1]=ringorder_C;
+      tmpR.order[2]=0;
       tmpR.block0[0]=1;
+      tmpR.block1[0]=tmpR.N;
     }
-    else /* ring sum for complete rings */
+    else if (l==k) /* r3=r1+r2 */
     {
-      for (i=0;r1->order[i]!=0;i++)
+      int b;
+      ring rb;
+      if (r1->order[0]==ringorder_unspec)
+      {
+        /* extend order of r2 to r3 */
+        b=rBlocks(r2);
+        rb=r2;
+        tmpR.OrdSgn=r2->OrdSgn;
+      }
+      else if (r2->order[0]==ringorder_unspec)
+      {
+        /* extend order of r1 to r3 */
+        b=rBlocks(r1);
+        rb=r1;
+        tmpR.OrdSgn=r1->OrdSgn;
+      }
+      else
+      {
+        b=rBlocks(r1)+rBlocks(r2)-2; /* for only one order C, only one 0 */
+        rb=NULL;
+      }
+      tmpR.order=(int*)omAlloc0(b*sizeof(int));
+      tmpR.block0=(int*)omAlloc0(b*sizeof(int));
+      tmpR.block1=(int*)omAlloc0(b*sizeof(int));
+      tmpR.wvhdl=(int**)omAlloc0(b*sizeof(int_ptr));
+      /* weights not implemented yet ...*/
+      if (rb!=NULL)
+      {
+        for (i=0;i<b;i++)
+        {
+          tmpR.order[i]=rb->order[i];
+          tmpR.block0[i]=rb->block0[i];
+          tmpR.block1[i]=rb->block1[i];
+          if (rb->wvhdl[i]!=NULL)
+            WarnS("rSum: weights not implemented");
+        }
+        tmpR.block0[0]=1;
+      }
+      else /* ring sum for complete rings */
+      {
+        for (i=0;r1->order[i]!=0;i++)
+        {
+          tmpR.order[i]=r1->order[i];
+          tmpR.block0[i]=r1->block0[i];
+          tmpR.block1[i]=r1->block1[i];
+          if (r1->wvhdl[i]!=NULL)
+            tmpR.wvhdl[i] = (int*) omMemDup(r1->wvhdl[i]);
+        }
+        j=i;
+        i--;
+        if ((r1->order[i]==ringorder_c)
+            ||(r1->order[i]==ringorder_C))
+        {
+          j--;
+          tmpR.order[b-2]=r1->order[i];
+        }
+        for (i=0;r2->order[i]!=0;i++)
+        {
+          if ((r2->order[i]!=ringorder_c)
+              &&(r2->order[i]!=ringorder_C))
+          {
+            tmpR.order[j]=r2->order[i];
+            tmpR.block0[j]=r2->block0[i]+rVar(r1);
+            tmpR.block1[j]=r2->block1[i]+rVar(r1);
+            if (r2->wvhdl[i]!=NULL)
+            {
+              tmpR.wvhdl[j] = (int*) omMemDup(r2->wvhdl[i]);
+            }
+            j++;
+          }
+        }
+        if((r1->OrdSgn==-1)||(r2->OrdSgn==-1))
+          tmpR.OrdSgn=-1;
+      }
+    }
+    else if ((k==rVar(r1)) && (k==rVar(r2))) /* r1 and r2 are "quite" the same ring */
+      /* copy r1, because we have the variables from r1 */
+    {
+      int b=rBlocks(r1);
+  
+      tmpR.order=(int*)omAlloc0(b*sizeof(int));
+      tmpR.block0=(int*)omAlloc0(b*sizeof(int));
+      tmpR.block1=(int*)omAlloc0(b*sizeof(int));
+      tmpR.wvhdl=(int**)omAlloc0(b*sizeof(int_ptr));
+      /* weights not implemented yet ...*/
+      for (i=0;i<b;i++)
       {
         tmpR.order[i]=r1->order[i];
         tmpR.block0[i]=r1->block0[i];
         tmpR.block1[i]=r1->block1[i];
         if (r1->wvhdl[i]!=NULL)
-          tmpR.wvhdl[i] = (int*) omMemDup(r1->wvhdl[i]);
-      }
-      j=i;
-      i--;
-      if ((r1->order[i]==ringorder_c)
-          ||(r1->order[i]==ringorder_C))
-      {
-        j--;
-        tmpR.order[b-2]=r1->order[i];
-      }
-      for (i=0;r2->order[i]!=0;i++)
-      {
-        if ((r2->order[i]!=ringorder_c)
-            &&(r2->order[i]!=ringorder_C))
         {
-          tmpR.order[j]=r2->order[i];
-          tmpR.block0[j]=r2->block0[i]+r1->N;
-          tmpR.block1[j]=r2->block1[i]+r1->N;
-          if (r2->wvhdl[i]!=NULL)
-          {
-            tmpR.wvhdl[j] = (int*) omMemDup(r2->wvhdl[i]);
-          }
-          j++;
+          tmpR.wvhdl[i] = (int*) omMemDup(r1->wvhdl[i]);
         }
       }
-      if((r1->OrdSgn==-1)||(r2->OrdSgn==-1))
-        tmpR.OrdSgn=-1;
+      tmpR.OrdSgn=r1->OrdSgn;
     }
-  }
-  else if ((k==r1->N) && (k==r2->N)) /* r1 and r2 are "quite" the same ring */
-    /* copy r1, because we have the variables from r1 */
-  {
-    int b=rBlocks(r1);
-
-    tmpR.order=(int*)omAlloc0(b*sizeof(int));
-    tmpR.block0=(int*)omAlloc0(b*sizeof(int));
-    tmpR.block1=(int*)omAlloc0(b*sizeof(int));
-    tmpR.wvhdl=(int**)omAlloc0(b*sizeof(int_ptr));
-    /* weights not implemented yet ...*/
-    for (i=0;i<b;i++)
+    else
     {
-      tmpR.order[i]=r1->order[i];
-      tmpR.block0[i]=r1->block0[i];
-      tmpR.block1[i]=r1->block1[i];
-      if (r1->wvhdl[i]!=NULL)
-      {
-        tmpR.wvhdl[i] = (int*) omMemDup(r1->wvhdl[i]);
-      }
+      for(i=0;i<k;i++) omFree((ADDRESS)tmpR.names[i]);
+      omFreeSize((ADDRESS)names,tmpR.N*sizeof(char_ptr));
+      Werror("difficulties with variables: %d,%d -> %d",rVar(r1),rVar(r2),k);
+      return -1;
     }
-    tmpR.OrdSgn=r1->OrdSgn;
-  }
-  else
-  {
-    for(i=0;i<k;i++) omFree((ADDRESS)tmpR.names[i]);
-    omFreeSize((ADDRESS)names,tmpR.N*sizeof(char_ptr));
-    Werror("difficulties with variables: %d,%d -> %d",rVar(r1),rVar(r2),k);
-    return -1;
   }
   sum=(ring)omAllocBin(ip_sring_bin);
   memcpy(sum,&tmpR,sizeof(ip_sring));
@@ -1455,7 +1474,7 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   }
 
   res->names   = (char **)omAlloc0(rVar(r) * sizeof(char_ptr));
-  for (i=0; i<res->N; i++)
+  for (i=0; i<rVar(res); i++)
   {
     res->names[i] = omStrDup(r->names[i]);
   }
@@ -1601,8 +1620,8 @@ BOOLEAN rSamePolyRep(ring r1, ring r2)
   || (rPar(r1) != rPar(r2)))
     return FALSE;
 
-  if (r1->N!=r2->N) return FALSE;
-  if (r1->P!=r2->P) return FALSE;
+  if (rVar(r1)!=rVar(r2)) return FALSE;
+  if (rPar(r1)!=rPar(r2)) return FALSE;
 
   i=0;
   while (r1->order[i] != 0)

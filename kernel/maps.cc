@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.7 2008-04-21 11:23:11 Singular Exp $ */
+/* $Id: maps.cc,v 1.8 2008-04-21 14:18:16 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -282,7 +282,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
     p = temp2->m[i];
     if (p!=NULL)
     {
-      q = pChangeSizeOfPoly(tmpR, p,imagepvariables+1,N);
+      q = pSort(pChangeSizeOfPoly(tmpR, p,imagepvariables+1,N));
       if (j>=IDELEMS(temp1))
       {
         pEnlargeSet(&(temp1->m),IDELEMS(temp1),5);
