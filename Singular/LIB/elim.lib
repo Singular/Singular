@@ -1,7 +1,7 @@
-// $Id: elim.lib,v 1.21 2006-08-03 09:00:41 Singular Exp $
+// $Id: elim.lib,v 1.22 2008-04-22 17:20:51 Singular Exp $
 // (GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: elim.lib,v 1.21 2006-08-03 09:00:41 Singular Exp $";
+version="$Id: elim.lib,v 1.22 2008-04-22 17:20:51 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      Elimination, Saturation and Blowing up
@@ -200,11 +200,9 @@ EXAMPLE: example elim; shows examples
 {
 //---- get variables to be eliminated and create string for new ordering ------
    int ii; poly vars=1;
-   for( ii=n; ii<=m; ii=ii+1 ) { vars=vars*var(ii); }
-   if( n>1 ) { poly p = 1+var(1); }
-   else { poly p = 1+var(m+1); }
-   if( ord(p)==0 ) { string ordering = "),ls;"; }
-   if( ord(p)>0 ) { string ordering = "),dp;"; }
+   for( ii=n; ii<=m; ii++ ) { vars=vars*var(ii); }
+   if(  attrib(basering,"global")) { string ordering = "),dp;"; }
+   else { string ordering = "),ls;"; }
    string mpoly=string(minpoly);
 //-------------- create new ring and map objects to new ring ------------------
    def br = basering;
@@ -241,7 +239,7 @@ EXAMPLE: example elim1; shows examples
 {
 //---- get variables to be eliminated and create string for new ordering ------
    int ii;
-   for( ii=1; ii<=nvars(basering); ii=ii+1 )
+   for( ii=1; ii<=nvars(basering); ii++ )
    {
       if( vars/var(ii)==0 ) { poly p = 1+var(ii); break;}
    }
@@ -276,8 +274,8 @@ EXAMPLE: example nselect; shows examples
 "{
    int j,k;
    if( size(#)==0 ) { #[1]=n; }
-   for( k=1; k<=ncols(id); k=k+1 )
-   {  for( j=n; j<=#[1]; j=j+1 )
+   for( k=1; k<=ncols(id); k++ )
+   {  for( j=n; j<=#[1]; j++ )
       {  if( size(id[k]/var(j))!=0) { id[k]=0; break; }
       }
    }
@@ -311,11 +309,11 @@ EXAMPLE: example sat; shows an example
    {
       dbprint(p-1,"// compute quotient "+string(kk+1));
       i=quotient(id,j);
-      for( ii=1; ii<=size(i); ii=ii+1 )
+      for( ii=1; ii<=size(i); ii++ )
       {
          if( reduce(i[ii],id,1)!=0 ) break;
       }
-      id=std(i); kk=kk+1;
+      id=std(i); kk++;
    }
    dbprint(p-1,"// saturation becomes stable after "+string(kk-1)+" iteration(s)","");
    list L = id,kk-1;
@@ -344,8 +342,8 @@ EXAMPLE: example select; shows examples
 "{
    if( size(#)==0 ) { #[1]=n; }
    int j,k;
-   for( k=1; k<=ncols(id); k=k+1 )
-   {  for( j=n; j<=#[1]; j=j+1 )
+   for( k=1; k<=ncols(id); k++ )
+   {  for( j=n; j<=#[1]; j++ )
       {   if( size(id[k]/var(j))==0) { id[k]=0; break; }
       }
    }
@@ -375,8 +373,8 @@ EXAMPLE: example select1; shows examples
    if( size(#)==0 ) { #[1]=n; }
    int j,k;
    execute (typeof(id)+" I;");
-   for( k=1; k<=ncols(id); k=k+1 )
-   {  for( j=n; j<=#[1]; j=j+1 )
+   for( k=1; k<=ncols(id); k++ )
+   {  for( j=n; j<=#[1]; j++ )
       {
          if( size(subst(id[k],var(j),0)) != size(id[k]) )
          { I=I,id[k]; break; }
