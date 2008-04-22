@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.79 2008-04-21 14:18:16 Singular Exp $ */
+/* $Id: ring.cc,v 1.80 2008-04-22 08:40:07 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -726,7 +726,7 @@ int rChar(ring r)
  *         1 for compatible (and sum)
  */
 /* vartest: test for variable/paramter names
-* dp_dp: for comm. rings: use block order dp,dp
+* dp_dp: for comm. rings: use block order dp,dp/ds
 */
 int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 {
@@ -1063,7 +1063,7 @@ int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
   tmpR.names=names;
   /* ordering *======================================================== */
   tmpR.OrdSgn=1;
-  if (dp_dp && (r1->OrdSgn==1) && (r2->OrdSgn==1) 
+  if (dp_dp
   && !rIsPluralRing(r1) && !rIsPluralRing(r2))
   {
     tmpR.order=(int*)omAlloc(4*sizeof(int));
@@ -1073,7 +1073,13 @@ int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     tmpR.order[0]=ringorder_dp;
     tmpR.block0[0]=1;
     tmpR.block1[0]=rVar(r1);
-    tmpR.order[1]=ringorder_dp;
+    if (r2->OrdSgn==1)
+      tmpR.order[1]=ringorder_dp;
+    else
+    {
+      tmpR.order[1]=ringorder_ds;
+      tmpR.OrdSgn=-1;
+    }
     tmpR.block0[1]=rVar(r1)+1;
     tmpR.block1[1]=rVar(r1)+rVar(r2);
     tmpR.order[2]=ringorder_C;
