@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.80 2008-04-22 08:40:07 Singular Exp $ */
+/* $Id: ring.cc,v 1.81 2008-04-22 16:14:14 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -726,7 +726,7 @@ int rChar(ring r)
  *         1 for compatible (and sum)
  */
 /* vartest: test for variable/paramter names
-* dp_dp: for comm. rings: use block order dp,dp/ds
+* dp_dp: for comm. rings: use block order dp + dp/ds/wp
 */
 int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 {
@@ -1074,7 +1074,21 @@ int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     tmpR.block0[0]=1;
     tmpR.block1[0]=rVar(r1);
     if (r2->OrdSgn==1)
-      tmpR.order[1]=ringorder_dp;
+    {
+      if ((r2->block0[0]==1)
+      && (r2->block1[0]==rVar(r2))
+      && ((r2->order[0]==ringorder_wp)
+        || (r2->order[0]==ringorder_Wp)
+        || (r2->order[0]==ringorder_Dp))
+     )
+     {
+       tmpR.order[1]=r2->order[0];
+       if (r2->wvhdl[0]!=NULL)
+         tmpR.wvhdl[1]=(int *)omMemDup(r2->wvhdl[0]);
+     }
+     else
+        tmpR.order[1]=ringorder_dp;
+    }
     else
     {
       tmpR.order[1]=ringorder_ds;
@@ -3642,7 +3656,7 @@ ring rAssure_HasComp(ring r)
         break;
      i++;
   } while (1);
-  WarnS("re-creating ring with comps");
+  //WarnS("re-creating ring with comps");
   last_block=i-1;
   
   ring new_r = rCopy0(r, FALSE, FALSE);
