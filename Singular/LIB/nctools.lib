@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.38 2007-12-04 19:56:51 levandov Exp $";
+version="$Id: nctools.lib,v 1.39 2008-04-23 14:06:10 motsak Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
 AUTHORS:   Levandovskyy V.,     levandov@mathematik.uni-kl.de,
 @*         Lobillo, F.J.,       jlobillo@ugr.es,
 @*         Rabelo, C.,          crabelo@ugr.es,
-@*         Motsak, O.,          motsak@mathematik.uni-kl.de.
+@*         Motsak, O.,          {U@D}, where U={motsak}, D={mathematik.uni-kl.de}.
 
 
 
