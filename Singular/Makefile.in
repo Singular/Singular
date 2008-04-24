@@ -346,6 +346,22 @@ libsingular: mod2.h Makefile version.h $(WIN_LIBS) scanner.cc  ${OBJS} \
 	libsingular-tesths.o iparith.o mpsr_Tok.o claptmpl.o \
 	${OBJS} -lkernel -L../kernel -L../factory -L../libfac -L${libdir} ${LIBSINGULAR_LIBS}
 
+libsingular.a: mod2.h Makefile version.h $(WIN_LIBS) scanner.cc  ${OBJS} \
+         iparith.o libsingular-tesths.o libparse.cc claptmpl.o mpsr_Tok.o
+	mkdir libsingular.tmp
+	(cd  libsingular.tmp; \
+	ar x ../../kernel/libkernel.a; \
+	ar x ../../$(SINGUNAME)/lib/libsingfac.a; \
+	ar x ../../$(SINGUNAME)/lib/libsingcf.a; \
+	ar x ../../$(SINGUNAME)/lib/libsingcf.a; \
+	ar x ../../$(SINGUNAME)/lib/libntl.a; \
+	ar x ../../$(SINGUNAME)/lib/libomalloc_ndebug.a; \
+	cd ..)
+	ar cr libsingular.a \
+	iparith.o mpsr_Tok.o claptmpl.o \
+	${OBJS} libsingular.tmp/* 
+	rm -rf libsingular.tmp
+
 libsingular-tesths.o: tesths.cc
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -DLIBSINGULAR \
 	  ${SLDFLAGS} -o libsingular-tesths.o \
