@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.266 2008-04-17 12:32:13 wienand Exp $ */
+/* $Id: extra.cc,v 1.267 2008-04-25 13:14:02 ederc Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -57,6 +57,7 @@
 #ifdef HAVE_RINGS
 #include "ringgb.h"
 #endif
+
 
 #ifdef HAVE_F5
 #include "f5gb.h"
@@ -2560,13 +2561,19 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 #endif
 #ifdef HAVE_F5
 /*==================== F5 Implementation =================*/
-    if (strcmp(sys_cmd, "F5")==0)
+    if (strcmp(sys_cmd, "f5")==0)
     {
+      if (h->Typ()!=IDEAL_CMD)
+      {
+        WerrorS("ideal expected");
+        return TRUE;
+      } 
+      
       ring r = currRing;
       ideal G = (ideal) h->Data();
       res->rtyp=IDEAL_CMD;
-      res->data=(ideal) computeF5(G, r);
-      return(FALSE);
+      res->data=(ideal) computeF5(G,r);
+      return TRUE;
     }
     else
 #endif
