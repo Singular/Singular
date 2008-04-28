@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.29 2007-11-09 11:05:47 Singular Exp $ */
+/* $Id: misc.cc,v 1.30 2008-04-28 10:15:23 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -73,7 +73,7 @@ int systyp = SYSTYP_NONE;
 BOOLEAN    expected_parms;
 int        cmdtok;
 BOOLEAN siq=FALSE;
-char *lastreserved=NULL;
+const char *lastreserved=NULL;
 #define SELF_CMD MAX_TOK+1
 
 /*---------------------------------------------------------------------*
