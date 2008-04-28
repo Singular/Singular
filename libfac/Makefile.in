@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.13 2007-10-10 17:52:39 Singular Exp $
+# $Id: Makefile.in,v 1.14 2008-04-28 08:16:06 Singular Exp $
 #################################################
 SHELL		= /bin/sh
 RM		= -rm -f
@@ -152,7 +152,7 @@ install:	all
 	${MKINSTALLDIRS} ${includedir}
 	${MKINSTALLDIRS} ${libdir}
 	${INSTALL_DATA} ${LIBFACINCLUDE} ${includedir}
-	${INSTALL_PROGRAM} ${TARGETNAME}.a ${libdir}
+	${INSTALL_DATA} ${TARGETNAME}.a ${libdir}
 	$(RANLIB) ${libdir}/${TARGETNAME}.a
 
 uninstall: 
