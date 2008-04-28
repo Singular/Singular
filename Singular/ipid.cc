@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.83 2008-03-19 17:44:34 Singular Exp $ */
+/* $Id: ipid.cc,v 1.84 2008-04-28 13:54:16 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -382,20 +382,20 @@ idhdl enterid(const char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
   {
     if (IDLEV(h)==lev)
     {
-    if ((IDTYP(h) == t)||(t==DEF_CMD))
-    {
-      if ((IDTYP(h)==PACKAGE_CMD)
-      && (strcmp(s,"Top")==0))
+      if ((IDTYP(h) == t)||(t==DEF_CMD))
       {
-        goto errlabel;
+        if ((IDTYP(h)==PACKAGE_CMD)
+        && (strcmp(s,"Top")==0))
+        {
+          goto errlabel;
+        }
+        if (BVERBOSE(V_REDEFINE))
+          Warn("redefining %s **",s);
+        if (s==IDID(h)) IDID(h)=NULL;
+        killhdl2(h,root,currRing);
       }
-      if (BVERBOSE(V_REDEFINE))
-        Warn("redefining %s **",s);
-      if (s==IDID(h)) IDID(h)=NULL;
-      killhdl2(h,root,currRing);
-    }
-    else
-      goto errlabel;
+      else
+        goto errlabel;
     }
   }
   // is it already defined in idroot ?
@@ -405,15 +405,15 @@ idhdl enterid(const char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
     {
       if (IDLEV(h)==lev)
       {
-      if ((IDTYP(h) == t)||(t==DEF_CMD))
-      {
-        if (BVERBOSE(V_REDEFINE))
-          Warn("redefining %s **",s);
-        if (s==IDID(h)) IDID(h)=NULL;
-        killhdl2(h,&IDROOT,NULL);
-      }
-      else
-        goto errlabel;
+        if ((IDTYP(h) == t)||(t==DEF_CMD))
+        {
+          if (BVERBOSE(V_REDEFINE))
+            Warn("redefining %s **",s);
+          if (s==IDID(h)) IDID(h)=NULL;
+          killhdl2(h,&IDROOT,NULL);
+        }
+        else
+          goto errlabel;
       }
     }
   }
@@ -424,15 +424,15 @@ idhdl enterid(const char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
     {
       if (IDLEV(h)==lev)
       {
-      if ((IDTYP(h) == t)||(t==DEF_CMD))
-      {
-        if (BVERBOSE(V_REDEFINE))
-          Warn("redefining %s **",s);
-        IDID(h)=NULL;
-        killhdl2(h,&currRing->idroot,currRing);
-      }
-      else
-        goto errlabel;
+        if ((IDTYP(h) == t)||(t==DEF_CMD))
+        {
+          if (BVERBOSE(V_REDEFINE))
+            Warn("redefining %s **",s);
+          IDID(h)=NULL;
+          killhdl2(h,&currRing->idroot,currRing);
+        }
+        else
+          goto errlabel;
       }
     }
   }
