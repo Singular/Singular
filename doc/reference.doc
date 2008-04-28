@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.301 2008-04-04 10:21:53 Singular Exp $
+@comment $Id: reference.doc,v 1.302 2008-04-28 13:50:06 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2667,7 +2667,7 @@ L(g_i)<>L(g_j) for all i<>j
 $L(g_i)\neq L(g_j)$ for all $i\neq j$
 @end tex
 @item
-in the case of a global ordering (polynomial ring) and @code(option*redSB);}:
+in the case of a global ordering (polynomial ring) and @code{option(redSB);}:
 @*
 @ifinfo
 L(g_i)
@@ -2683,7 +2683,7 @@ $L(g_i)$
 $\{g_1,\dots,g_{i-1},g_{i+1},\dots,g_s\}$
 @end tex
 @item
-in the case of a local or mixed ordering (localization of polynomial ring) and @code(option*redSB);}:
+in the case of a local or mixed ordering (localization of polynomial ring) and @code{option(redSB);}:
 @* if
 @ifinfo
 L(g_i) | L(g_j) for any i<>j,
