@@ -535,10 +535,10 @@ installslib: LIB
 installslib-nolns: LIB
 	${MKINSTALLDIRS} ${slibdir}
 	for file in `pwd`/LIB/*.lib; do \
-	  ${INSTALL}  $$file ${slibdir}; \
+	  ${INSTALL_DATA}  $$file ${slibdir}; \
 	done
 	${MKINSTALLDIRS} ${slibdir}/gftables
-	${INSTALL} `pwd`/LIB/gftables/* ${slibdir}/gftables/
+	${INSTALL_DATA} `pwd`/LIB/gftables/* ${slibdir}/gftables/
 
 install-libsingular: libsingular
 	for file in *.$(SO_SUFFIX); do \
