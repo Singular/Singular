@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.101 2007-11-16 18:40:34 Singular Exp $
+### $Id: Makefile.in,v 1.102 2008-04-28 13:55:10 Singular Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -189,7 +189,7 @@ usercard.dvi: usercard.tex singcard.tex
 	${TEX} $<
 
 # postscript stuff
-ps: manual.ps usercard.ps
+ps: dvi manual.ps usercard.ps
 
 usercard.ps: usercard.dvi
 	${DVIPS} -t landscape -t a4 $< -o $@
