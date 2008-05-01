@@ -1,0 +1,186 @@
+How to compile SINGULAR from sources
+************************************
+
+SINGULAR is a Computer Algebra system for polynomial computations with
+special emphasize on the needs of commutative algebra, algebraic
+geometry, singularity theory and polynomial system solving. For a more
+detailed overview of SINGULAR, see
+     `http://www.singular.uni-kl.de/Overview/'
+
+So far, there are only versions for Linux, HPUX, SunOS, IRIX, AIX,
+FreeBSD 4.x/5.x, MacOS X, and Windows 95/98/NT/2K/XP.
+
+Version 2-0-2 was the last version for MacOS 9.
+
+The Windows version also runs on Windows Vista, provided
+that "rebase all" was done after installing Cygwin.
+
+Note for Singular-3-0-x:
+Currently, there are only only "complete" archives: Singular-3-0-x-x.tar.gz
+which contain all needed files. 
+
+Compiling SINGULAR for a Unix platform
+======================================
+
+Make sure that you have approximately 120 MByte of free disk space and
+follow these steps.
+(the "optional" for bison applies to version 3-0-3-1 and later)
+
+  1. Make sure that you have the following software (the list may be
+     incomplete):
+       1.   general unix utilities: grep, test, sed, cp, mv, gzip,
+          uudecode, ...
+
+       2.   autoconf
+
+       3.   gnu-make
+
+       4.   gcc, g++ (version 2.95.3 preferred,   but gcc version 2.7.2
+          to 2.95.4, egcs 1.0.3 and 1.1.2 should work,   gcc 2.96 does
+          not work)
+          gcc 3.0 does not work, gcc 3.1.x, gcc 3.2.x, gcc 3.3.x/3.4.x should
+          gcc 4.x: beginnig with Singular-3-0-0-4, for some architectures
+                   beginning with Singular-3-0-2: for all architectures
+
+       5.  optional: if you want to change Singular/grammar.y:
+            bison (version >= 1.2.2)
+            (bison (GNU Bison) 1.75 seems not to work)
+            (version 1.75 is supported in Singular 2-0-4a and newer)
+            
+            Remark: 
+              bison 1.875 on solaris produces code which gcc does not accept
+
+       6.    optional: if you want to change Singular/scanner.l
+             or modules/modgen/scanner.l:
+             flex (version >=2.4, <=2.5.4)
+
+       7.   perl (version >=5)
+
+       8.   library gmp (version >=3.1.1)
+            (version 4.x.x is supported in Singular 2-0-4 and newer)
+
+       9.   library libncurses or libtermcap or libcurses
+
+      10.   (optional) library libreadline
+            (required on linux glibc systems)
+
+      11.   (optional, required to build the documentation:)
+          latex2html, tex, texi2html, texinfo
+          (your latex2html should produce gif files, not png files)
+
+  2. (optional, required for MP:)
+     make sure that you can log in to your computer via rsh/remsh or
+     ssh without a password (check .rhosts/.shosts);
+     (in versions before 3-0-0: the
+     configure script stops while checking this: if you cannot fix it,
+     simply kill the rsh/ssh-processes - the configure will then
+     disable this particulare feature)
+     The following should work:
+     rsh localhost uname
+     ssh localhost uname
+     rsh `hostname` uname
+     ssh `hostname` uname
+
+  3. You need to download all of the .tar.gz-files
+     (since 3-0-0 we have only one large source .tar.gz-file)
+
+  4. create a new working directory
+
+  5. unpack all packages into that working directory
+
+  6. (optional, for porting to a unknown machine:) fix ./singuname.sh
+     not to report something unknown, but to recognize the machine
+
+  7. run ./configure
+     (try ./configure -help, ./omalloc/configure -help, ./MP/configure
+     -help, ./factory/configure -help, ./Singular/configure -help for a
+     list of all options of configure)
+
+     BEWARE: some of the option are for testing only,
+     they will usually not work in general:
+     --with-Plural,--with-plural (you need a Singuilar version > 2.1.2 for this)
+       (standard since  version 3-0-0)
+     --with-sgroup (you need the sgroup programs for this)
+     --with-smallgmp (not maintained), removed in 3-0-0
+     --with-namespaces (you need a Singuilar version > 2.1.x for this)
+       (standard since  version 3-0-0)
+     
+
+  8. make install (resp. gmake install - the make program must be
+     GNU-Make) the make process will (hopefully) build:
+       1.   omalloc: the memry management routines (required)
+
+       2.   MP: Multi-Protocoll (optional)
+
+       3.   NTL (optional, but strongly recommended)
+
+       4.   factory (optional, but strongly recommended)
+
+       5.   libfac (optional, but strongly recommended)
+
+       6.   kernel, Singular (Kernel, required)
+
+       7.   only for share-dist: doc (only possible, if all optional packages are included)
+
+       8.   only for share-dist: emacs (only possible, if doc was build)
+
+       9.   IntegerProgramming
+
+  9. if you want to make any change in the directory Singular, run make
+     depend there
+
+ 10. to install the resulting files at any other place in the system,
+     run
+     make bindist sharedist
+     (sharedist can only be build if doc was build sucessfully) and
+     install the resulting .tar.gz files as explained for the binary
+     distribution
+     The sharedist-result does not depend on your machine:
+     so you can also download our version of it
+
+ 11. if you compiled Singular for a non-standard architecture and you
+     are willing to share your porting effort, upload the changed
+     sources and the resulting binaries to
+     `ftp://www.mathematik.uni-kl.de/pub/Incoming' and send us an email
+     about it (Singular@mathematik.uni-kl.de)
+
+ 12. bug-fixes or other improvements to the source code are welcome
+
+Notes for specific platforms
+============================
+
+   - Windows (Cygwin):
+     ./configure -with-malloc=system
+     Windows Vista:
+     run         
+       rebaseall
+     before trying anything else
+
+   - MacOS X:
+     you need a file values.h where MP can find it (we copied one from
+     Linux)
+     ./configure -with-malloc=system
+
+   - FreeBSD 4.x/5.x:
+     you need a file values.h where MP can find it (we copied one from
+     Linux)
+     ./configure -with-malloc=system
+
+   - Solaris with CC/cc
+     - you need to set CONFIG_SHELL to /bin/bash
+      (/bin/sh misses some substitutions in the generated Makefiles)
+     - set CC = "cc -xarch=v9"
+          CXX = "CC -xarch=v9"
+          CFLAGS          = -O
+          CXXFLAGS        = -O2
+     - configure with
+      ./configure  --without-dynamic-kernel --without-MP
+      
+
+Compiling SINGULAR for a Non-Unix platform
+==========================================
+
+This is a non-trivial task. Please contact us directly.
+(`mailto:Singular@mathematik.uni-kl.de')
+
+GOOD LUCK and ENJOY!  Your SINGULAR team.
