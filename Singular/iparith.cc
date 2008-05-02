@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.471 2008-03-20 10:24:53 Singular Exp $ */
+/* $Id: iparith.cc,v 1.472 2008-05-02 15:41:07 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -40,7 +40,6 @@
 #include "weight.h"
 #include "ipconv.h"
 #include "ipprint.h"
-#include "sing_dld.h"
 #include "attrib.h"
 #include "silink.h"
 #include "sparsmat.h"
