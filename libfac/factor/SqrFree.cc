@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-/* $Id: SqrFree.cc,v 1.18 2008-04-08 16:19:10 Singular Exp $ */
+/* $Id: SqrFree.cc,v 1.19 2008-05-05 14:54:29 Singular Exp $ */
 static const char * errmsg = "\nYou found a bug!\nPlease inform singular@mathematik.uni-kl.de\n Please include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -366,7 +366,7 @@ CFFList
 SqrFreeMV( const CanonicalForm & r , const CanonicalForm & mipo )
 {
   CanonicalForm g=icontent(r), f = r;
-  CFFList Outputlist, Outputlist2;
+  CFFList Outputlist, Outputlist2,tmpOutputlist;
 
   DEBINCLEVEL(CERR, "SqrFreeMV");
   DEBOUTLN(CERR,"Called with f= ", f);
@@ -386,7 +386,23 @@ SqrFreeMV( const CanonicalForm & r , const CanonicalForm & mipo )
       if ( getNumVars(f) != 0 ) // a real polynomial
       {
         if (!mipo.isZero())
+        {
+          #if 1
+          Variable alpha=rootOf(mipo);
+          CanonicalForm ff=swapvar(f,mipo.mvar(),alpha);
+          tmpOutputlist=SqrFreeMV(ff,0);
+          ff=swapvar(f,alpha,mipo.mvar());
+          for ( CFFListIterator i=tmpOutputlist; i.hasItem(); i++ )
+          {
+            ff=i.getItem().factor();
+            ff /= ff.Lc();
+            ff=swapvar(ff,alpha,mipo.mvar());
+            Outputlist=myappend(Outputlist,CFFactor(ff,1));
+          }
+          #else
           Outputlist=myUnion(SqrFreed(f,mipo),Outputlist) ;
+          #endif
+        }
         else
           Outputlist=myUnion(SqrFreed(f),Outputlist) ;
       }
@@ -438,6 +454,9 @@ CFFList SqrFree(const CanonicalForm & r )
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.18  2008/04/08 16:19:10  Singular
+*hannes: removed rcsid
+
 Revision 1.17  2008/03/18 17:46:15  Singular
 *hannes: gcc 4.2
 
