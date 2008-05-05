@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "mod2.h"
 
+#define HAVE_SVD
 #ifdef HAVE_SVD
 
 #include "ap.h"
