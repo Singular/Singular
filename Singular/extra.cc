@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.267 2008-04-25 13:14:02 ederc Exp $ */
+/* $Id: extra.cc,v 1.268 2008-05-05 12:13:10 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2451,6 +2451,17 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+/*==================== SVD =================*/
+#ifdef HAVE_SVD
+     if (strcmp(sys_cmd, "svd") == 0)
+     {
+          extern lists testsvd(matrix M);
+            res->rtyp=LIST_CMD;
+          res->data=(char*)(testsvd((matrix)h->Data()));
+          return FALSE;
+     }
+     else
+#endif
 #ifdef ix86_Win
 #ifdef HAVE_DL
 /*==================== DLL =================*/
