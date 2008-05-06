@@ -503,7 +503,7 @@ void sub(ZZ_pEX& x, const ZZ_pE& b, const ZZ_pEX& a)
    }
    else if (x.rep.MaxLength() == 0) {
       negate(x, a);
-      add(x.rep[0], a.rep[0], b);
+      add(x.rep[0], x.rep[0], b);
       x.normalize();
    }
    else {

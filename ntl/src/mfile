@@ -436,27 +436,26 @@ clean:
 #################################################################
 
 
-DIRNAME=ntl-5.4.1
-WINDIR=WinNTL-5_4_1
-
 package:
-	sh unixify "$(SFILES)" "$(INCL)" "$(DOC)" 
-	-rm -r $(DIRNAME)
-	mv unix $(DIRNAME)
-	chmod -R a+rX $(DIRNAME)
-	tar -cvf $(DIRNAME).tar $(DIRNAME)
-	gzip $(DIRNAME).tar
-	- rm -r $(DIRNAME)
+	sh unixify "$(SFILES) DIRNAME WINDIR" "$(INCL)" "$(DOC)" 
+	-rm -rf `cat DIRNAME`
+	- rm -f `cat DIRNAME`.tar
+	- rm -f `cat DIRNAME`.tar.gz
+	mv unix `cat DIRNAME`
+	chmod -R a+rX `cat DIRNAME`
+	tar -cvf `cat DIRNAME`.tar `cat DIRNAME`
+	gzip `cat DIRNAME`.tar
+	- rm -rf `cat DIRNAME`
 
 winpack:
 	sh dosify "$(SRC)" "$(INCL)" "$(DOC)" "$(TS)" "$(TD)" "$(SINC)"
-	- rm -r $(WINDIR)
-	mv dos $(WINDIR)
-	chmod -R a+rX $(WINDIR)
-	find ./$(WINDIR) '!' -name '*.gif' -print | zip -l $(WINDIR) -@
-	find ./$(WINDIR) -name '*.gif' -print | zip -u $(WINDIR) -@
-	rm -r $(WINDIR)
-
+	- rm -rf `cat WINDIR`
+	- rm -f `cat WINDIR`.zip 
+	mv dos `cat WINDIR`
+	chmod -R a+rX `cat WINDIR`
+	find ./`cat WINDIR` '!' -name '*.gif' -print | zip -l `cat WINDIR` -@
+	find ./`cat WINDIR` -name '*.gif' -print | zip -u `cat WINDIR` -@
+	rm -rf `cat WINDIR`
 
 
 ######################################################################
@@ -497,3 +496,26 @@ InitSettings:
 
 DispSettings:
 	$(LINK_CXX) -o DispSettings DispSettings.c $(LDLIBS_CXX)
+
+
+
+################################################################
+#
+# Notes on making a new distribution
+#
+#  - change version numbers in ../include/NTL/version.h, DIRNAME, and WINDIR
+#
+#  - if changes were made to makefile or ../include/NTL/config.h, 
+#    make sure these changes are implemented in the template files 
+#    mfile and cfile, and then run:
+#      ./configure
+#      cp makefile def_makefile
+#      cp ../include/NTL/config.h ../include/NTL/def_config.h
+#
+#  - run:  
+#      make package
+#      make winpack
+#
+################################################################
+
+
