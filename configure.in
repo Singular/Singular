@@ -856,6 +856,16 @@ dnl    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" modules/Makefile"
    BUILD_SUBDIRS=$BUILD_SUBDIRS" modules"
 fi
   
+AC_MSG_CHECKING(whether to use libsvd)
+if test "$with_svd" = yes; then
+  AC_MSG_RESULT(yes)
+dnl    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" modules/Makefile"
+   CONFIG_SUBDIRS=$CONFIG_SUBDIRS" svd"
+   BUILD_SUBDIRS=$BUILD_SUBDIRS" svd"
+else
+  AC_MSG_RESULT(no)
+fi
+
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Enough -- wrap it up
 dnl

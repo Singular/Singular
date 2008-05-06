@@ -3042,8 +3042,18 @@ if test -d "modules"; then
    BUILD_SUBDIRS=$BUILD_SUBDIRS" modules"
 fi
   
+echo $ac_n "checking whether to use libsvd""... $ac_c" 1>&6
+echo "configure:3047: checking whether to use libsvd" >&5
+if test "$with_svd" = yes; then
+  echo "$ac_t""yes" 1>&6
+   CONFIG_SUBDIRS=$CONFIG_SUBDIRS" svd"
+   BUILD_SUBDIRS=$BUILD_SUBDIRS" svd"
+else
+  echo "$ac_t""no" 1>&6
+fi
+
 echo $ac_n "checking whether ${MAKE-make} sets \${MAKE}""... $ac_c" 1>&6
-echo "configure:3047: checking whether ${MAKE-make} sets \${MAKE}" >&5
+echo "configure:3057: checking whether ${MAKE-make} sets \${MAKE}" >&5
 set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_prog_make_${ac_make}_set'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6

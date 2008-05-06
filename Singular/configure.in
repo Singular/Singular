@@ -578,6 +578,8 @@ AC_ARG_WITH(
                           do not compile with dynamic kernel parts])
 AC_ARG_WITH(apint,
   [  --with-apint=PACKAGE    use PACKAGE for arbitary integer arithmetic])
+AC_ARG_WITH(svd,
+  [  --with-svd              use libsvd])
 AC_ARG_WITH(
   Plural,
   [  --without-Plural        do compile without Plural support])
@@ -803,6 +805,16 @@ else
     AC_MSG_ERROR(can not build with gmp)
   fi
 fi
+
+AC_MSG_CHECKING(whether to use libsvd)
+if test "$with_svd" = yes; then
+  AC_MSG_RESULT(yes)
+  AC_DEFINE(HAVE_SVD)
+  NEED_LIBS="-lsvd -lmpfr ${NEED_LIBS}"
+else
+  AC_MSG_RESULT(no)
+fi
+AC_SUBST(HAVE_SVD)
 
 #
 AC_MSG_CHECKING(whether to have MP)
