@@ -1,24 +1,16 @@
 #include <stdio.h>
 #include "mod2.h"
 
-#define HAVE_SVD
 #ifdef HAVE_SVD
 
-#include "ap.h"
-#include "amp.h"
-#include "reflections.h"
-#include "bidiagonal.h"
-#include "qr.h"
-#include "lq.h"
-#include "blas.h"
-#include "rotations.h"
-#include "bdsvd.h"
-#include "svd.h"
+#include "svd_si.h"
 #include "structs.h"
 #include "polys.h"
 #include "matpol.h"
 #include "lists.h"
 #include "febase.h"
+
+template class std::vector< amp::mpfr_record* >;
 
 poly p_svdInit(char *s)
 {
