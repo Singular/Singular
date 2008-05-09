@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.13 2007-07-25 10:53:15 Singular Exp $
+ *  Version: $Id: sca.cc,v 1.14 2008-05-09 09:27:24 Singular Exp $
  *******************************************************************/
 
 // #define PDEBUG 2
@@ -707,9 +707,9 @@ inline poly p_Lcm(const poly a, const poly b, const long lCompM, const ring r)
 {
   poly m = p_ISet(1, r);
 
-  const int pVariables = r->N;
+  const int N = r->N;
 
-  for (int i = pVariables; i; i--)
+  for (int i = N; i>0; i--)
   {
     const int lExpA = p_GetExp (a, i, r);
     const int lExpB = p_GetExp (b, i, r);
