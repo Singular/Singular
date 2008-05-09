@@ -1,0 +1,683 @@
+//////////////////////////////////////////////////////////////////////////////
+version="$Id: bfct.lib,v 1.1 2008-05-09 15:47:02 levandov Exp $";
+category="Noncommutative";
+info="
+LIBRARY: bfct.lib     M. Noro's Algorithm for Bernstein-Sato polynomial
+AUTHORS: Daniel Andres, wolf.daniel.andres@rwth-aachen.de
+@* Viktor Levandovskyy,     levandov@math.rwth-aachen.de
+
+THEORY: Given a polynomial ring R = K[x_1,...,x_n] and a polynomial F in R,
+@*      one is interested in the global Bernstein-Sato polynomial b(s) in K[s],
+@*      defined to be the monic polynomial, satisfying a functional identity
+@*             L * f^{s+1} = b(s) f^s,   for some operator L in D[s].
+@* Here, D stands for an n-th Weyl algebra K<x_1,...,x_n,d_1,...,d_n | d_j x_j = x_j d_j +1>
+@* One is interested in the following data:
+@*   global Bernstein polynomial in K[s] and
+@*   the list of all roots of b(s), which are known to be rational, with their multiplicities.
+
+MAIN PROCEDURES:
+
+bfct(); 
+
+AUXILIARY PROCEDURES:
+
+";
+
+
+LIB "qhmoduli.lib"; // for Max
+LIB "nctools.lib";
+
+//--------------- help procedures ---------------------------------------------------------
+
+proc polylist (poly f)
+"USAGE:  polylist(f);  f a poly
+RETURN:  list of exponents and corresponding terms of f
+PURPOSE: convert a polynomial to a list of exponents and corresponding term
+EXAMPLE: example polylist; shows examples
+"
+{
+  list l;
+  int i = 1;
+  if (f==0) // just for the zero polynomial
+  {
+    l[1] = list(leadexp(f), lead(f));
+  }
+  while (f!=0)
+  {
+    l[i] = list(leadexp(f), lead(f));
+    f = f-lead(f);
+    i++;
+  }
+  return(l);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x),Dp;
+  poly F = x;
+  polylist(F);
+  ring r = 0,(x,y),Dp;
+  poly F = x2y+x*y2;
+  polylist(F);
+}
+
+proc ispositive (intvec v)
+"USAGE:  ispositive(v);  v an intvec
+RETURN:  1 if all components of v are bigger than 0, or 0 otherwise
+PURPOSE: check whether all components of an intvec are positive
+EXAMPLE: example ispositive; shows an example
+"
+{
+  int i;
+  for (i=1; i<=size(v); i++)
+  {
+    if (v[i]<=0)
+    {
+      return(0);
+      break;
+    }
+  }
+  return(1);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intvec v = 1,2,3;
+  ispositive(v);
+  intvec w = 1,-2,3;
+  ispositive(w);
+}
+
+proc isin (list l, i)
+"USAGE:  isin(l,i);  l a list, i an argument of any type
+RETURN:  1 if i is a member of l, or 0 otherwise
+PURPOSE: check whether the second argument is a member of a list
+EXAMPLE: example isin; shows an example
+"
+{
+  int j;
+  for (j=1; j<=size(l); j++)
+  {
+    if (l[j]==i)
+    {
+      return(1);
+      break;
+    }
+  }
+  return(0);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  list l = 1,2,3;
+  isin(l,4);
+  isin(l,2);
+}
+
+proc scalarprod (intvec v, intvec w)
+"USAGE:  scalarprod(v,w);  v,w intvecs
+RETURN:  an int, the scalarprod of v and w
+PURPOSE: compute the scalarprod of two intvecs
+EXAMPLE: example scalarprod; shows examples
+NOTE:    the arguments must have the same size
+"
+{
+  int i; int sp;
+  if (size(v)!=size(w))
+    {
+      ERROR("non-matching dimensions");
+    }
+  else
+  {
+    for (i=1; i<=size(v);i++)
+    {
+      sp = sp + v[i]*w[i];
+    }
+  }
+  return(sp);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intvec v = 1,2,3;
+  intvec w = 4,5,6;
+  scalarprod(v,w);
+}
+
+proc InForm (list #)
+"USAGE:  InForm(f,w) or InForm(I,w);  f a poly, I an ideal, w an intvec
+RETURN:  the initial of f or I w.r.t. to the weight w
+PURPOSE: compute the initial form of a poly or ideal w.r.t a given weight
+NOTE:    the size of the weight vector must be equal to the number of variables of the basering
+EXAMPLE: example InForm; shows examples
+"
+{
+  if (size(#)<2)
+  {
+    ERROR("InForm needs two arguments of type  poly/ideal,intvec");
+  }
+  if (typeof(#[1])=="poly" || typeof(#[1])=="ideal")
+  {
+    ideal I = #[1];
+  }
+  else
+  {
+    ERROR("first argument must be of type poly or ideal");
+  }
+  if (typeof(#[2])=="intvec")
+  {
+    def w = #[2];
+  }
+  else
+  {
+    ERROR("second argument must be of type intvec");
+  }
+  if (size(w) != nvars(basering))
+  {
+    ERROR("weight vector has wrong dimension");
+  }
+  int j,i,s,m;
+  list l;
+  poly g;
+  ideal J;
+  for (j=1; j<=ncols(I); j++)
+  {
+    l = polylist(I[j]);
+    m = scalarprod(w,l[1][1]);
+    g = 0;
+    for (i=2; i<=size(l); i++)
+    {
+      s = scalarprod(w,l[i][1]);
+      m = Max(list(s,m));
+    }
+    for (i=1; i<=size(l); i++)
+    {
+      if (scalarprod(w,l[i][1]) == m)
+      {
+        g = g+l[i][2];
+      }
+    }
+    J[j] = g;
+    
+  }
+  if (typeof(#[1])=="poly")
+  {
+    return(J[1]);  // if the input was a poly, return a poly
+  }
+  else
+  {
+    return(J);     // otherwise, return an ideal
+  }
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  // todo: create example
+}
+
+//-------------- main procedures -------------------------------------------------------
+
+proc ncsolve (ideal I, list #)
+"USAGE:  ncsolve(I[,s]);  I an ideal, s an optional int
+RETURN:  coefficient vector of a linear combination of 0 in the elements of I
+PURPOSE: compute a linear dependency between the elements of an ideal if such one exists
+NOTE:    If s<>0, @code{std} is used for Groebner basis computations,
+@*       otherwise, and by default, @code{slimgb} is used.
+@*       If printlevel=1, progress debug messages will be printed,
+@*       if printlevel>=2, all the debug messages will be printed.
+EXAMPLE: example ncsolve; shows examples
+"
+{
+  int whichengine = 0; //default
+  if (size(#)>0)
+  {
+    if (typeof(#[1])=="int" || typeof(#[1])=="number")
+    {
+      whichengine = int( #[1]);
+    }
+  }
+  int ppl = printlevel - voice +2;
+  int sI = ncols(I);
+  // check if we are done
+  if (I[sI]==0)
+  {
+    vector v = gen(sI);
+  }
+  else
+  {
+    // 1. introduce undefined coeffs
+    def save = basering;
+    int p = char(save);
+    ring @A = p,(@a(1..sI)),lp;
+    ring @aA = (p,@a(1..sI)), (@z),dp;
+    def @B = save + @aA;
+    setring @B;
+    ideal I = imap(save,I);
+    // 2. form the linear system for the undef coeffs
+    int i;   poly W;  ideal QQ;
+    for (i=1; i<=sI; i++)
+    {
+      W = W + @a(i)*I[i];
+    }
+    while (W!=0)
+    {
+      QQ = QQ,leadcoef(W);
+      W = W - lead(W);
+    }
+    // QQ consists of polynomial expressions in @a(i) of type number
+    setring @A;
+    ideal QQ = imap(@B,QQ);
+    // this QQ is a polynomial ideal, so "solve" the system
+    //    QQ = groebner(QQ);
+    dbprint(ppl, "ncsolve: starting Groebner basis computation with engine:", whichengine);
+    QQ = engine(QQ,whichengine);
+    dbprint(ppl, "QQ after groebner:", QQ);
+    //    "QQ after groebner:"; QQ;
+    if (dim(QQ) == -1)
+    {
+      dbprint(ppl+1, "no solutions by ncsolve");
+      //      "no solutions by ncsolve";
+      // output zeroes
+      setring save;
+      kill @A,@aA,@B;
+      return(v);
+    }
+    // in order to get the numeric values
+    matrix AA = matrix(maxideal(1));
+    attrib(QQ,"isSB",1); // to suppress NF warnings
+    AA = NF(AA,QQ);
+    dbprint(ppl, "AA after NF:",AA);
+    //    "AA after NF:"; print(AA);
+    for(i=1; i<=sI; i++)
+    {
+      AA = subst(AA,var(i),1);
+    }
+    dbprint(ppl, "AA after subst:",AA);
+    //    "AA after subst: "; print(AA);
+    vector v = (module(transpose(AA)))[1];
+    setring save;
+    vector v = imap(@A,v);
+    //    "v before output:";  v;
+    kill @A,@aA,@B;
+  }
+  return(v);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,x,dp;
+  ideal I = x,2x;
+  ncsolve(I);
+  ideal J = x,x2;
+  ncsolve(J);
+}
+
+proc minpol (poly s, ideal II, list #)
+"USAGE:  minpol(f, I [,t,n]);  f a poly, I an ideal, t,n optional ints
+RETURN:  coefficient vector of the minimal polynomial of f in basering modulo I
+PURPOSE: compute the minimal polynomial of an element in a factor Weyl algebra
+NOTE:    If s<>0, @code{std} is used for Groebner basis computations,
+@*       otherwise, and by default, @code{slimgb} is used.
+@*       If n>0, the algorithm only searches for polynomials of degree n
+@*       otherwise and by default, it searches for all degrees.
+@*       If printlevel=1, progress debug messages will be printed,
+@*       if printlevel>=2, all the debug messages will be printed.
+EXAMPLE: example minpol; shows examples
+"
+{
+  // in # can be the degree of the minimal polynomial if it's known
+  // assume I is given in Groebner basis
+  ideal I = II;
+  attrib(I,"isSB",1); // set attribute for suppressing NF messages
+  int ppl = printlevel-voice+2;
+  int whichengine = 0; // default
+  int validdeg    = 0; // default
+  if (size(#)>0)
+  {
+    if (typeof(#[1])=="int" || typeof(#[1])=="number")
+    {
+      whichengine = int( #[1]);
+    }
+    if (size(#)>1)
+    {
+      if (typeof(#[2])=="int" || typeof(#[2])=="number")
+      {
+        if (#[2]>0)
+        {
+	  validdeg = int( #[2]);
+	}
+      }
+    }
+  }
+  int j;
+  vector v;
+  poly p;
+  ideal NI = 1;
+  if (validdeg != 0)
+  {
+    for (j=1; j<=validdeg; j++)
+    {
+      NI[j+1] = NF(s^j,I);
+    }
+    v = ncsolve(NI,whichengine);
+  }
+  else
+  {
+    int i = 1;
+    dbprint(ppl+1,"minpolynomial starts...");
+    dbprint(ppl+1,"with ideal I=", I);
+    string st;
+    // while (1)
+    while (i<=63) // todo: remove this when NF is working properly
+    {
+      dbprint(ppl,"i:"+string(i));
+      NI[i+1] = NF(s^i,I);
+      // look for a solution
+      dbprint(ppl,"ncsolve starts with: "+string(matrix(NI)));
+      v = ncsolve(NI,whichengine); 
+      matrix MM[1][nrows(v)]=matrix(v);
+      dbprint(ppl,"ncsolve ready  with: "+string(MM));
+      kill MM;
+      //  "ncsolve ready with"; print(v);
+      if (v!=0)
+      {
+        // a solution:
+        //check for the reality of the solution
+        p = 0;
+        for (j=1; j<=i+1; j++)
+        {
+          p = p + v[j]*NI[j];
+        }
+        if (p!=0)
+        {
+          dbprint(ppl,"ncsolve: bad solution!");
+        }
+        else
+        {
+          dbprint(ppl,"ncsolve: got solution!");
+	  // "got solution!";
+          break;
+        }
+      }
+      // no solution:
+      i++;
+    }
+  }
+  dbprint(ppl+1,"minpol finished");
+  return(v);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  // todo: create example
+}
+
+
+proc bfct (poly f, list #)
+"USAGE:  bfct(f [,r,s,t,v]);  f a poly, r,s,t optional ints, v an optional intvec
+RETURN:  list of roots of the Bernstein polynomial bs(f) and its multiplicies
+PURPOSE: compute the global Bernstein-Sato polynomial for a hypersurface, defined by f, according to the algorithm by Masayuki Noro
+NOTE:    If r<>0, @code{std} is used for Groebner basis computations,
+@*       otherwise, and by default, @code{slimgb} is used. 
+@*       If s<>0, a composed ordering is used for Groebner basis computations,
+@*       otherwise, and by default, a matrix ordering is used.
+@*       If t<>0, the minimal polynomial computation is solely performed over charasteristic 0,
+@*       otherwise and by default, a modular method is used.
+@*       If v is a positive weight vector, v is used for homogenization computations,
+@*       otherwise and by default, no weights are used.
+@*       If printlevel=1, progress debug messages will be printed,
+@*       if printlevel>=2, all the debug messages will be printed.
+EXAMPLE: example bfct; shows examples
+"
+{
+  int ppl = printlevel - voice +2;
+  int i,j;
+  // in # we have three switches:
+  // one for the engine used for Groebner basis computations,
+  // one for  M() ordering or its realization
+  // and one for a modular method when computing the minimal polynomial
+  // in # can also be the optional weight vector
+  def save = basering;
+  int n = nvars(save);
+  int whichengine  = 0; // default
+  int methodord    = 0; // default
+  int methodminpol = 0; // default
+  int validweight  = 0; // default
+  if (size(#)>0)
+  {
+    if (typeof(#[1])=="int" || typeof(#[1])=="number")
+    {
+      whichengine = int(#[1]);
+    }
+    if (size(#)>1)
+    {
+      if (typeof(#[2])=="int" || typeof(#[2])=="number")
+      {
+        methodord = int(#[2]);
+      }
+      if (size(#)>2)
+      {
+         if (typeof(#[3])=="int" || typeof(#[3])=="number")
+         {
+           methodminpol = int(#[3]);
+	 }
+         if (size(#)>3)
+         {
+           if (typeof(#[4])=="intvec" && size(#[4])==n && ispositive(#[4])==1)
+           {
+             validweight = 1;
+	   }
+	 }
+      }
+    }
+  }
+  intvec u0;
+  if (validweight==1)
+  {
+    u0 = #[4];
+  }
+  else // no valid weight vector specified, using no weight
+  {
+    for (i=1; i<=n; i++)
+    {
+      u0[i] = 1;
+    }
+  }
+  ring r = 0,(x(1..n)),wp(u0);
+  poly f = fetch(save,f);
+  int d = deg(f); // weighted degree
+  // setting up the weighted homogenized Weyl-Algebra:
+  intvec u = d;
+  for (i=1; i<=n; i++)
+  {
+    u[i+1] = u0[n-i+1];
+  }
+  intvec v = 1;
+  for (i=1; i<=n; i++)
+  {
+    v[i+1] = d+1-u0[n-i+1];
+  }
+  intvec uv = u,v; // length 2*n + 2
+  intvec w = -1; w[n+2] = 1; w[2*n+2] = 0;
+  // try with the matrix ord
+  if (methodord == 0) // default
+  {
+    intmat @Ord[2*n+3][2*n+3];  // the ordering matrix
+    //   for (i=1; i<=2*n+2; i++)
+    //   {
+    //     @Ord[1,i] = uv[i];
+    //     @Ord[2,i] = w[i];
+    //     @Ord[3,i] = 1;
+    //   }
+    //   for (j=1; j<=2*n-1;j++)
+    //   {
+    //     @Ord[3+j,2*n+3 - j] = -1;
+    //   }
+    //   @Ord[1,2*n+3] = 1;
+    // new idea: use 1st row as the a() and the full square matrix
+    // is appended as M() block
+    intvec toa = uv,1;
+    for (i=1; i<=2*n+2; i++)
+    {
+      @Ord[1,i] = w[i];
+      @Ord[2,i] = 1;
+    }
+    for (j=1; j<=2*n+1;j++)
+    {
+      @Ord[2+j,2*n+3 - j] = -1;
+    }
+    dbprint(ppl,"the ordering matrix is",@Ord);
+    //    ring Dh = 0,(t,x(n..1),dt,d(n..1),h),M(@Ord);
+    ring Dh = 0,(t,x(n..1),dt,d(n..1),h),(a(toa),M(@Ord));
+  }
+  else
+  {
+    ring Dh = 0,(t,x(n..1),dt,d(n..1),h),(a(uv,1),a(w,0),dp(2*n+2),lp(1));
+  }
+  matrix @rel[2*n+3][2*n+3]; // non-commutative relations
+  for (i=1; i<=n+1; i++)
+  {
+    @rel[i,n+1+i] = h^(u[i]+v[i]);
+  }
+  def DDh = nc_algebra(1,@rel);
+  setring DDh;
+  poly f = imap(r,f);
+  kill r;
+  f = homog(f,h);
+  ideal I = t-f;  // defining the Malgrange ideal
+  for (i=1; i<=n; i++)
+  {
+    I = I, d(i)+diff(f,x(i))*dt;
+  }
+  dbprint(ppl, "starting Groebner basis computation with engine:", whichengine);
+  I = engine(I, whichengine);
+  dbprint(ppl, "finished Groebner basis computation");
+  I = subst(I,h,1); // dehomogenizantion
+  ring D = 0,(t,x(n..1),dt,d(n..1)),dp;
+  def DD = Weyl(D);
+  setring DD;
+  ideal I = imap(DDh,I);
+  kill Dh, DDh;
+  ideal inI = InForm(I,w); // we are only interested in the initial form w.r.t. w
+  dbprint(ppl, "starting cosmetic Groebner basis computation with engine:", whichengine);
+  inI = engine(inI, whichengine); // just for the NF
+  dbprint(ppl, "finished cosmetic Groebner basis computation");
+  dbprint(ppl, "inI is:", string(matrix(inI)));
+  poly s = t*dt;
+  vector b;
+  // try it modular
+  if (methodminpol == 0) //default
+  {
+    int lb = 2;         // todo: define better bounds
+    int ub = 2147483647;
+    i=1;
+    list usedprimes;
+    list useddegs;
+    while (b == 0)
+    {
+      dbprint(ppl,"number of run in the loop: "+string(i));
+      int q = prime(random(lb,ub));
+      if (isin(usedprimes,q)==0) // if q was not already used
+      {
+	usedprimes = usedprimes,q;
+	dbprint(ppl,"used prime is: "+string(q));
+        // change the characteristic of DD
+        ring Dq = q,(t,x(n..1),dt,d(n..1)),dp;
+        def DDq = Weyl(Dq);
+        setring DDq;
+        map phi = DD,maxideal(1);
+        poly s = phi(s);
+        ideal inI = phi(inI);
+        int sinI1 = size(inI);
+	inI = simplify(inI,2);
+        int sinI2 = size(inI);
+	if (sinI1 == sinI2) // if they differ, q was unlucky
+	{
+	  vector bq = minpol(s,inI,whichengine);
+          int degb = nrows(bq) - 1;
+          dbprint(ppl,"found modular solution "+string(bq));
+          dbprint(ppl,"of degree "+string(degb));
+          setring DD; 
+          kill Dq,DDq;
+          // if q was lucky, then degb is the degree of the 
+	  // minimal polynomial in char zero
+          if (isin(useddegs,degb)==0) // if degb was not already used 
+          {
+	    useddegs = useddegs,degb;
+	    b = minpol(s,inI,whichengine,degb);
+	  }
+	}
+	i++;
+      }
+    }
+  }
+  else // non modular 
+  {
+    b = minpol(s,inI,whichengine);
+  }
+  ring @S = 0,(@s),dp;
+  vector b = imap(DD,b);
+  kill DD;
+  poly p = 0;
+  for (i=1; i<=nrows(b); i++)
+  {
+    p = p + b[i]*(@s)^(i-1);
+  }
+  p = subst(p,@s,-@s-1);
+  // the rest of this proc is nicked from bernsteinBM from dmod.lib
+  list P = factorize(p);//with constants and multiplicities
+  ideal bs; intvec m;   //the Bernstein polynomial is monic, so we are not interested in constants
+  for (i=2; i<= size(P[1]); i++)  //we delete P[1][1] and P[2][1]
+  {
+    bs[i-1] = P[1][i];
+    m[i-1]  = P[2][i];
+  }
+  bs =  normalize(bs);
+  bs = -subst(bs,@s,0);
+  setring save;
+  ideal bs = imap(@S,bs);
+  kill @S;
+  list BS = bs,m;
+  return(BS); 
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x),dp;
+  poly F = x;
+  bfct(F);
+  ring r = 0,(x,y),dp;
+  poly F = x2*y+x*y2;
+  bfct(F);
+}
+
+static proc engine(ideal I, int i)
+{
+  /* std - slimgb mix */
+  ideal J;
+  if (i==0)
+  {
+    J = slimgb(I);
+  }
+  else
+  {
+    // without options -> strange! (ringlist?)
+    option(redSB);
+    option(redTail);
+    J = std(I);
+  }
+  return(J);
+}
+
+static proc test_slim_vs_std()
+{
+  LIB "bfct.lib";
+  //  ring r=0,(x,y),dp;
+  //  poly f = x^4+x*y^7+y^8;
+  //  poly f = x^5+x*y^4+y^5;
+  ring r=0,(x1,x2,x3,x4,x5,x6),dp; 
+  poly f = (x1*x2)^3 + (x3*x4)^2 + (x5*x6)^2; 
+  option(prot);
+  printlevel = 3;
+  list Lslim = bfct(f);
+}
