@@ -220,7 +220,7 @@ void getTaun64(ideal G,intvec* targm,int pertdeg, int64vec** v64, int64 & i64)
     {
       temp64=iv64Copy(taun64);
       (*taun64)*=inveps64;
-      for(int i=0; i<currRing->N;i++)
+      for(int i=0; i<rVar(currRing);i++)
       {
         if((*temp64)[i]!=0 && (((*taun64)[i])/((*temp64)[i]))!=inveps64)
         overflow_error=12;
@@ -230,7 +230,7 @@ void getTaun64(ideal G,intvec* targm,int pertdeg, int64vec** v64, int64 & i64)
     temp64=iv64Copy(taun64);
     add64=getNthRow64(targm,n);
     taun64=iv64Add(add64,taun64);
-    for(int i=0; i<currRing->N;i++)
+    for(int i=0; i<rVar(currRing);i++)
     {
       if( ( ((*temp64)[i]) > 0 ) && ( ((*add64)[i]) > 0 ) )
       {
@@ -405,7 +405,7 @@ intvec* DIFF(ideal G)
   intvec  *v,*w;
   poly p;
   int s=idealSize(G);
-  int n=currRing->N;
+  int n=rVar(currRing);
   int m=DIFFspy(G);
   intvec* diffm=new intvec(m,n,0);
   int j,l;
@@ -581,7 +581,7 @@ int64vec* nextw64(int64vec* currw, int64vec* targw,
   //to test overflow
   tempv=iv64Copy(a);
   *a *= (nexttvec0);
-  for(int i=0; i<currRing->N; i++)
+  for(int i=0; i<rVar(currRing); i++)
   {
     if( (nexttvec0) !=0 &&
         (((*a)[i])/(nexttvec0))!=((*tempv)[i]) )
@@ -594,7 +594,7 @@ int64vec* nextw64(int64vec* currw, int64vec* targw,
   int64vec* b=currw;
   tempv=iv64Copy(b);
   *b *= (nexttvec1);
-  for(int i=0; i<currRing->N; i++)
+  for(int i=0; i<rVar(currRing); i++)
   {
     if( (nexttvec1) !=0 &&
         (((*b)[i])/(nexttvec1))!=((*tempv)[i]) )
@@ -606,7 +606,8 @@ int64vec* nextw64(int64vec* currw, int64vec* targw,
   delete tempv;
   nextweight=iv64Add(a,b);
 
-  for(int i=0; i<currRing->N; i++){
+  for(int i=0; i<rVar(currRing); i++)
+  {
     if( (((*a)[i])>=0 && ((*b)[i])>=0) ||
         (((*a)[i])<0 && ((*b)[i])<0) )
     {
@@ -712,7 +713,7 @@ poly getNthPolyOfId(ideal I,int n)
 
 intvec* leadExp(poly p)
 {
-  int N=currRing->N;
+  int N=rVar(currRing);
   int *e=(int*)omAlloc((N+1)*sizeof(int));
   pGetExpV(p,e);
   intvec* iv=new intvec(N);
@@ -735,7 +736,7 @@ intvec* leadExp(poly p)
 
 int64vec* leadExp64(poly p)
 {
-  int N=currRing->N;
+  int N=rVar(currRing);
   int *e=(int*)omAlloc((N+1)*sizeof(int));
   pGetExpV(p,e);
   int64vec* iv64=new int64vec(N);
@@ -1067,7 +1068,7 @@ ring rCopy0AndAddA(ring r, int64vec *wv64, BOOLEAN copy_qideal,
   res->order[0]=ringorder_a64;
   int length=wv64->rows();
   int64 *A=(int64 *)omAlloc(length*sizeof(int64));
-  for(j=0;j<length;j++)
+  for(j=length-1;j>=0;j--)
   {
     A[j]=(*wv64)[j];
   }
@@ -1075,8 +1076,8 @@ ring rCopy0AndAddA(ring r, int64vec *wv64, BOOLEAN copy_qideal,
   res->block0[0]=1;
   res->block1[0]=length;
 
-  res->names   = (char **)omAlloc0(r->N * sizeof(char_ptr));
-  for (i=0; i<res->N; i++)
+  res->names   = (char **)omAlloc0(rVar(r) * sizeof(char_ptr));
+  for (i=rVar(res)-1;i>=0; i--)
   {
     res->names[i] = omStrDup(r->names[i]);
   }
@@ -1106,7 +1107,7 @@ ring rCopy0AndAddA(ring r, int64vec *wv64, BOOLEAN copy_qideal,
 
 int64vec* rGetGlobalOrderMatrix(ring r)
 {
-  int n=r->N;
+  int n=rVar(r);
   int64vec* res=new int64vec(n,n,(int64)0);
   if (r->OrdSgn != 1) return res;
   int pos1=0;
@@ -1183,7 +1184,7 @@ int64vec* rGetGlobalOrderMatrix(ring r)
 
 int64vec* rGetGlobalOrderWeightVec(ring r)
 {
-  int n=r->N;
+  int n=rVar(r);
   int64vec* res=new int64vec(n);
 
   if (r->OrdSgn != 1) return res;
