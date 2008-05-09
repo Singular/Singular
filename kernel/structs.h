@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.43 2008-03-19 17:44:12 Singular Exp $ */
+/* $Id: structs.h,v 1.44 2008-05-09 09:17:57 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -469,9 +469,9 @@ struct nc_struct
   ring basering; // the ring C,D,.. live in
   matrix C;
   matrix D;
-  matrix *MT;
+  matrix *MT; // size 0.. (rVar()*rVar()-1)/2
   matrix COM;
-  int *MTsize;
+  int *MTsize; // size 0.. (rVar()*rVar()-1)/2
 
   // IsSkewConstantindicates whethere coeffs C_ij are all equal, effective together with nc_type=nc_skew
   int IsSkewConstant;
