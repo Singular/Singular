@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-/* $Id: SqrFree.cc,v 1.19 2008-05-05 14:54:29 Singular Exp $ */
+/* $Id: SqrFree.cc,v 1.20 2008-05-14 12:38:26 Singular Exp $ */
 static const char * errmsg = "\nYou found a bug!\nPlease inform singular@mathematik.uni-kl.de\n Please include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -389,14 +389,14 @@ SqrFreeMV( const CanonicalForm & r , const CanonicalForm & mipo )
         {
           #if 1
           Variable alpha=rootOf(mipo);
-          CanonicalForm ff=swapvar(f,mipo.mvar(),alpha);
+          CanonicalForm ff=replacevar(f,mipo.mvar(),alpha);
           tmpOutputlist=SqrFreeMV(ff,0);
-          ff=swapvar(f,alpha,mipo.mvar());
+          ff=replacevar(f,alpha,mipo.mvar());
           for ( CFFListIterator i=tmpOutputlist; i.hasItem(); i++ )
           {
             ff=i.getItem().factor();
             ff /= ff.Lc();
-            ff=swapvar(ff,alpha,mipo.mvar());
+            ff=replacevar(ff,alpha,mipo.mvar());
             Outputlist=myappend(Outputlist,CFFactor(ff,1));
           }
           #else
@@ -454,6 +454,9 @@ CFFList SqrFree(const CanonicalForm & r )
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.19  2008/05/05 14:54:29  Singular
+*hannes: switch representation and normalize in SqrFreeMV
+
 Revision 1.18  2008/04/08 16:19:10  Singular
 *hannes: removed rcsid
 
