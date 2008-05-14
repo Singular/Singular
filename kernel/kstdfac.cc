@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.12 2008-05-14 08:59:22 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.13 2008-05-14 12:53:17 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -372,6 +372,7 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
         pNorm(n->P.p);
         n->P.p = redtailBba(n->P.p,pos-1,n);
       }
+      n->P.pLength=0;
       if (TEST_OPT_DEBUG)
       {
         PrintS("new s:");
