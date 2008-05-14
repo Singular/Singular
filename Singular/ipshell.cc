@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.182 2008-03-28 11:01:56 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.183 2008-05-14 14:08:41 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1643,6 +1643,42 @@ lists rDecompose(const ring r)
   {
     if (r->algring!=NULL)
       rDecomposeCF(&(L->m[0]),r->algring,r);
+    else
+    {
+      lists Lc=(lists)omAlloc0Bin(slists_bin); 
+      Lc->Init(4);
+      // char:
+      Lc->m[0].rtyp=INT_CMD;
+      Lc->m[0].data=(void*)r->ch;
+      // var:
+      lists Lv=(lists)omAlloc0Bin(slists_bin);
+      Lv->Init(1);
+      Lv->m[0].rtyp=STRING_CMD;
+      Lv->m[0].data=(void *)omStrDup(r->parameter[0]);
+      Lc->m[1].rtyp=LIST_CMD;
+      Lc->m[1].data=(void*)Lv;
+      // ord:
+      lists Lo=(lists)omAlloc0Bin(slists_bin);
+      Lo->Init(1);
+      lists Loo=(lists)omAlloc0Bin(slists_bin);
+      Loo->Init(2);
+      Loo->m[0].rtyp=STRING_CMD;
+      Loo->m[0].data=(void *)omStrDup(rSimpleOrdStr(ringorder_lp));
+      intvec *iv=new intvec(1); (*iv)[0]=1;
+      Loo->m[1].rtyp=INTVEC_CMD;
+      Loo->m[1].data=(void *)iv;
+      Lo->m[0].rtyp=LIST_CMD;
+      Lo->m[0].data=(void*)Loo;
+
+      Lc->m[2].rtyp=LIST_CMD;
+      Lc->m[2].data=(void*)Lo;
+      // q-ideal:
+      Lc->m[3].rtyp=IDEAL_CMD;
+      Lc->m[3].data=(void *)idInit(1,1);
+      // ----------------------
+      L->m[0].rtyp=LIST_CMD;
+      L->m[0].data=(void*)Lc;
+    }
     if (L->m[0].rtyp==0)
     {
       //omFreeBin(slists_bin,(void *)L);
@@ -1786,6 +1822,7 @@ ring rCompose(const lists  L)
 #endif
   )
     return NULL;
+  int is_gf_char=0;
   // 0: char/ cf - ring
   // 1: list (var)
   // 2: list (ord)
@@ -1970,7 +2007,7 @@ ring rCompose(const lists  L)
     if (R->ch!=-1)
     {
       int l;
-      if (((R->ch!=0) && (R->ch<2))
+      if (((R->ch!=0) && (R->ch<2) && (is_gf_char=-1))
       #ifndef NV_OPS
       || (R->ch > 32003)
       #endif
@@ -1989,35 +2026,51 @@ ring rCompose(const lists  L)
       rComposeC(LL,R); /* R, long_R, long_C */
     else
     {
-      R->algring=rCompose((lists)L->m[0].Data());
-      if (R->algring==NULL)
+      if (LL->m[0].Typ()==INT_CMD)
       {
-        WerrorS("could not create rational function coefficient field");
-        goto rCompose_err;
+        int ch=(int)(long)LL->m[0].Data();
+        while ((ch!=fftable[is_gf_char]) && (fftable[is_gf_char])) is_gf_char++;
+        if (fftable[is_gf_char]==0) is_gf_char=-1;
       }
-      if (R->algring->ch>0)
-         R->ch= -R->algring->ch;
-      else
-         R->ch=1;
-      R->P=R->algring->N;
-      R->parameter=(char**)omAlloc0(R->P*sizeof(char_ptr));
-      int i;
-      for(i=R->P-1;i>=0;i--)
-        R->parameter[i]=omStrDup(R->algring->names[i]);
-      if (R->algring->qideal!=NULL)
+      if (is_gf_char==-1)
       {
-        if (IDELEMS(R->algring->qideal)==1)
+        R->algring=rCompose((lists)L->m[0].Data());
+        if (R->algring==NULL)
         {
-          R->minpoly=naInit(1);
-          lnumber n=(lnumber)R->minpoly;
-          n->z=R->algring->qideal->m[0];
-          R->algring->qideal->m[0]=NULL;
-          idDelete(&(R->algring->qideal));
+          WerrorS("could not create rational function coefficient field");
+          goto rCompose_err;
         }
+        if (R->algring->ch>0)
+          R->ch= -R->algring->ch;
         else
+          R->ch=1;
+        R->P=R->algring->N;
+        R->parameter=(char**)omAlloc0(R->P*sizeof(char_ptr));
+        int i;
+        for(i=R->P-1;i>=0;i--)
+          R->parameter[i]=omStrDup(R->algring->names[i]);
+        if (R->algring->qideal!=NULL)
         {
-          WerrorS("not implemented yet.");
+          if (IDELEMS(R->algring->qideal)==1)
+          {
+            R->minpoly=naInit(1);
+            lnumber n=(lnumber)R->minpoly;
+            n->z=R->algring->qideal->m[0];
+            R->algring->qideal->m[0]=NULL;
+            idDelete(&(R->algring->qideal));
+          }
+          else
+          {
+            WerrorS("not implemented yet.");
+          }
         }
+      }
+      else
+      { // gf-char
+        R->ch=fftable[is_gf_char];
+	R->P=1;
+        R->parameter=(char**)omAlloc0(1*sizeof(char_ptr));
+        R->parameter[0]=omStrDup((char*)((lists)(LL->m[1].Data()))->m[0].Data());
       }
     }
   }
