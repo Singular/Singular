@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.268 2008-05-05 12:13:10 Singular Exp $ */
+/* $Id: extra.cc,v 1.269 2008-05-15 17:31:04 motsak Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -225,6 +225,10 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
+
+
+
+
 /*==================== gen ==================================*/
     if(strcmp(sys_cmd,"gen")==0)
     {
@@ -773,6 +777,58 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       else res->data=NULL;
       return FALSE;
     }
+    if(strcmp(sys_cmd,"NCUseExtensions")==0)
+    {
+      extern bool bUseExtensions;
+      res->rtyp=INT_CMD;
+      res->data=(void *)bUseExtensions;
+      
+      if ((h!=NULL) && (h->Typ()==INT_CMD))
+        bUseExtensions = (bool)((long)(h->Data()));
+      
+      return FALSE;
+    }    
+    if(strcmp(sys_cmd,"NCGetType")==0)
+    {
+      res->rtyp=INT_CMD;
+      
+      if( rIsPluralRing(currRing) )
+        res->data=(void *)ncRingType(currRing);
+      else
+        res->data=(void *)(-1);
+      
+      return FALSE;
+    }
+
+    if(strcmp(sys_cmd,"ForceSCA")==0)
+    {
+      if( !rIsPluralRing(currRing) )
+        return TRUE;
+
+      int b, e;
+      
+      if ((h!=NULL) && (h->Typ()==INT_CMD))
+      {
+        b = (int)((long)(h->Data()));
+        h=h->next;
+      } 
+      else return TRUE;
+ 
+      if ((h!=NULL) && (h->Typ()==INT_CMD))
+      {
+        e = (int)((long)(h->Data()));
+      } 
+      else return TRUE;
+
+
+      if( !sca_ForceCommutative( currRing, b, e ) )
+        return TRUE;
+
+      return FALSE;
+    }
+
+//    sca_ForceCommutative
+    
 /*==================== PLURAL =================*/
 #if 0
     if (strcmp(sys_cmd, "PLURAL") == 0)
