@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.52 2008-04-18 12:11:40 motsak Exp $
+ *  Version: $Id: gring.cc,v 1.53 2008-05-15 17:24:36 motsak Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -30,6 +30,8 @@
 
 // dirty tricks:
 #include "p_MemAdd.h"
+
+bool bUseExtensions = true;
 
 /* global nc_macros : */
 
@@ -2834,7 +2836,7 @@ void nc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
 
   gnc_p_ProcsSet(rGR, p_Procs);
 
-  if(rIsSCA(rGR))
+  if(rIsSCA(rGR) && bUseExtensions)
   {
     sca_p_ProcsSet(rGR, p_Procs);
   }
@@ -3274,7 +3276,10 @@ BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate)
 bool nc_SetupQuotient(ring rGR, const ring rG)
 {
   // currently only super-commutative extension deals with factors.
-  return sca_SetupQuotient(rGR, rG);
+  if( bUseExtensions ) 
+    return sca_SetupQuotient(rGR, rG);
+  
+  return false;    
 }
 
 

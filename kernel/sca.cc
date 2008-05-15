@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.14 2008-05-09 09:27:24 Singular Exp $
+ *  Version: $Id: sca.cc,v 1.15 2008-05-15 17:24:36 motsak Exp $
  *******************************************************************/
 
 // #define PDEBUG 2
@@ -1252,8 +1252,13 @@ bool sca_SetupQuotient(ring rGR, const ring rG)
   if(N < 2)
     return false;
 
-  if(ncRingType(rG) != nc_skew)
-    return false;
+#if MYTEST
+   PrintS("sca_SetupQuotient(rGR, rG)");
+#endif
+
+
+//  if( (ncRingType(rG) != nc_skew) || (ncRingType(rG) != nc_comm) )
+//    return false;
 
   if(rGR->qideal == NULL) // there will be a factor!
     return false;
@@ -1286,8 +1291,8 @@ bool sca_SetupQuotient(ring rGR, const ring rG)
       {
         if( !n_IsOne(c, rBase) )
         {
-#ifdef PDEBUG
-//           Print("Wrong Coeff at: [%d, %d]\n", i, j);
+#if MYTEST
+           Print("Wrong Coeff at: [%d, %d]\n", i, j);
 #endif
           return false;
         }
@@ -1309,8 +1314,8 @@ bool sca_SetupQuotient(ring rGR, const ring rG)
       { // anticommutative part
         if( !n_IsMOne(c, rBase) )
         {
-#ifdef PDEBUG
-//           Print("Wrong Coeff at: [%d, %d]\n", i, j);
+#if MYTEST
+           Print("Wrong Coeff at: [%d, %d]\n", i, j);
 #endif
           return false;
         }
@@ -1318,8 +1323,8 @@ bool sca_SetupQuotient(ring rGR, const ring rG)
       { // should commute
         if( !n_IsOne(c, rBase) )
         {
-#ifdef PDEBUG
-//           Print("Wrong Coeff at: [%d, %d]\n", i, j);
+#if MYTEST
+           Print("Wrong Coeff at: [%d, %d]\n", i, j);
 #endif
           return false;
         }
@@ -1380,8 +1385,8 @@ bool sca_SetupQuotient(ring rGR, const ring rG)
 
 
 
-#ifdef PDEBUG
-//  Print("AltVars: [%d, %d]\n", iAltVarStart, iAltVarEnd);
+#if MYTEST
+  Print("AltVars: [%d, %d]\n", iAltVarStart, iAltVarEnd);
 #endif
 
 
@@ -1403,11 +1408,54 @@ bool sca_SetupQuotient(ring rGR, const ring rG)
   scaLastAltVar( rGR, iAltVarEnd );
 
 
-
   sca_p_ProcsSet(rGR, rGR->p_Procs);
 
 
   return true;
+}
+
+
+bool sca_ForceCommutative(ring rGR, int b, int e)
+{
+  assume(rGR != NULL);
+  assume(rIsPluralRing(rGR));
+  assume(!rIsSCA(rGR));
+  
+  const int N = rGR->N;
+
+  ring rSaveRing = currRing;
+
+  if(rSaveRing != rGR)
+    rChangeCurrRing(rGR);
+
+  const ideal idQuotient = rGR->qideal;
+
+  
+  ideal tempQ = idQuotient;
+
+  if( b <= N && e >= 1 )
+    tempQ = id_KillSquares(idQuotient, b, e, rGR); 
+
+  idSkipZeroes( tempQ );
+
+  if( idIs0(tempQ) )
+    rGR->nc->SCAQuotient() = NULL;
+  else
+    rGR->nc->SCAQuotient() = tempQ;
+  
+  ncRingType( rGR, nc_exterior );
+
+  scaFirstAltVar( rGR, b );
+  scaLastAltVar( rGR, e );
+
+
+  sca_p_ProcsSet(rGR, rGR->p_Procs);
+
+  if(rSaveRing != rGR)
+    rChangeCurrRing(rSaveRing);
+  
+  return true;
+  
 }
 
 // return x_i * pPoly; preserve pPoly.
@@ -2377,6 +2425,7 @@ inline poly m_KillSquares(const poly m,
 {
 #ifdef PDEBUG
   p_Test(m, r);
+  assume( (iFirstAltVar >= 1) && (iLastAltVar <= r->N) && (iFirstAltVar <= iLastAltVar) );
 
 #if 0
   Print("m_KillSquares, m = "); // !
@@ -2401,6 +2450,8 @@ poly p_KillSquares(const poly p,
 {
 #ifdef PDEBUG
   p_Test(p, r);
+
+  assume( (iFirstAltVar >= 1) && (iLastAltVar <= r->N) && (iFirstAltVar <= iLastAltVar) );
 
 #if 0
   Print("p_KillSquares, p = "); // !
@@ -2454,6 +2505,8 @@ ideal id_KillSquares(const ideal id,
 {
   if (id == NULL) return id; // zero ideal
 
+  assume( (iFirstAltVar >= 1) && (iLastAltVar <= r->N) && (iFirstAltVar <= iLastAltVar) );
+  
   const int iSize = id->idelems();
 
   if (iSize == 0) return id;

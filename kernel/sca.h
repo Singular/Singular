@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sca.h,v 1.10 2007-07-24 11:15:26 Singular Exp $ */
+/* $Id: sca.h,v 1.11 2008-05-15 17:24:37 motsak Exp $ */
 
 #include <ring.h>
 #include <gring.h>
@@ -174,6 +174,9 @@ poly p_KillSquares(const poly p,
 ideal id_KillSquares(const ideal id, 
   const unsigned int iFirstAltVar, const unsigned int iLastAltVar, 
   const ring r); 
+
+// for benchmarking
+bool sca_ForceCommutative(ring rGR, int b, int e);
 
 
 #ifdef PLURAL_INTERNAL_DECLARATIONS
