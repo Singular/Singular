@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.h,v 1.18 2008-03-17 17:44:04 Singular Exp $ */
+/* $Id: cf_algorithm.h,v 1.19 2008-05-16 13:10:43 Singular Exp $ */
 
 #ifndef INCL_CF_ALGORITHM_H
 #define INCL_CF_ALGORITHM_H
@@ -113,9 +113,9 @@ abs ( const CanonicalForm & f )
     // it is not only more general to use `sign()' instead of a
     // direct comparison `f < 0', it is faster, too
     if ( sign( f ) < 0 )
-	return -f;
+        return -f;
     else
-	return f;
+        return f;
 }
 //}}}
 

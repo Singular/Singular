@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.cc,v 1.11 2006-05-16 13:43:18 Singular Exp $ */
+/* $Id: cf_algorithm.cc,v 1.12 2008-05-16 13:10:14 Singular Exp $ */
 
 //{{{ docu
 //
@@ -85,7 +85,7 @@ CanonicalForm
 #if 0
 psr ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 {
-    
+
     ASSERT( x.level() > 0, "type error: polynomial variable expected" );
     ASSERT( ! g.isZero(), "math error: division by zero" );
 
@@ -100,11 +100,11 @@ psr ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
     int fDegree = degree( F, X );
     int gDegree = degree( G, X );
     if ( fDegree < 0 || fDegree < gDegree )
-	return f;
+        return f;
     else {
-	CanonicalForm xresult = (power( LC( G, X ), fDegree-gDegree+1 ) * F) ;
-	CanonicalForm result = xresult -(xresult/G)*G;
-	return swapvar( result, x, X );
+        CanonicalForm xresult = (power( LC( G, X ), fDegree-gDegree+1 ) * F) ;
+        CanonicalForm result = xresult -(xresult/G)*G;
+        return swapvar( result, x, X );
     }
 }
 #else
@@ -173,10 +173,10 @@ psq ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
     int fDegree = degree( F, X );
     int gDegree = degree( G, X );
     if ( fDegree < 0 || fDegree < gDegree )
-	return 0;
+        return 0;
     else {
-	CanonicalForm result = (power( LC( G, X ), fDegree-gDegree+1 ) * F) / G;
-	return swapvar( result, x, X );
+        CanonicalForm result = (power( LC( G, X ), fDegree-gDegree+1 ) * F) / G;
+        return swapvar( result, x, X );
     }
 }
 //}}}
@@ -223,11 +223,11 @@ psqr ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, Cano
     int fDegree = degree( F, X );
     int gDegree = degree( G, X );
     if ( fDegree < 0 || fDegree < gDegree ) {
-	q = 0; r = f;
+        q = 0; r = f;
     } else {
-	divrem( power( LC( G, X ), fDegree-gDegree+1 ) * F, G, q, r );
-	q = swapvar( q, x, X );
-	r = swapvar( r, x, X );
+        divrem( power( LC( G, X ), fDegree-gDegree+1 ) * F, G, q, r );
+        q = swapvar( q, x, X );
+        r = swapvar( r, x, X );
     }
 }
 //}}}
@@ -250,12 +250,12 @@ static CanonicalForm
 internalBCommonDen ( const CanonicalForm & f )
 {
     if ( f.inBaseDomain() )
-	return f.den();
+        return f.den();
     else {
-	CanonicalForm result = 1;
-	for ( CFIterator i = f; i.hasTerms(); i++ )
-	    result = blcm( result, internalBCommonDen( i.coeff() ) );
-	return result;
+        CanonicalForm result = 1;
+        for ( CFIterator i = f; i.hasTerms(); i++ )
+            result = blcm( result, internalBCommonDen( i.coeff() ) );
+        return result;
     }
 }
 //}}}
@@ -282,13 +282,13 @@ CanonicalForm
 bCommonDen ( const CanonicalForm & f )
 {
     if ( getCharacteristic() == 0 && isOn( SW_RATIONAL ) ) {
-	// otherwise `bgcd()' returns one
-	Off( SW_RATIONAL );
-	CanonicalForm result = internalBCommonDen( f );
-	On( SW_RATIONAL );
-	return result;
+        // otherwise `bgcd()' returns one
+        Off( SW_RATIONAL );
+        CanonicalForm result = internalBCommonDen( f );
+        On( SW_RATIONAL );
+        return result;
     } else
-	return CanonicalForm( 1 );
+        return CanonicalForm( 1 );
 }
 //}}}
 
@@ -329,43 +329,43 @@ fdivides ( const CanonicalForm & f, const CanonicalForm & g )
 {
     // trivial cases
     if ( g.isZero() )
-	return true;
+        return true;
     else if ( f.isZero() )
-	return false;
+        return false;
 
     if ( (f.inCoeffDomain() || g.inCoeffDomain())
-	 && ((getCharacteristic() == 0 && isOn( SW_RATIONAL ))
-	     || (getCharacteristic() > 0 && CFFactory::gettype() != PrimePowerDomain)) )
-	// if we are in a field all elements not equal to zero are units
-	if ( f.inCoeffDomain() )
-	    return true;
-	else
-	    // g.inCoeffDomain()
-	    return false;
+         && ((getCharacteristic() == 0 && isOn( SW_RATIONAL ))
+             || (getCharacteristic() > 0 && CFFactory::gettype() != PrimePowerDomain)) )
+        // if we are in a field all elements not equal to zero are units
+        if ( f.inCoeffDomain() )
+            return true;
+        else
+            // g.inCoeffDomain()
+            return false;
 
     // we may assume now that both levels either equal LEVELBASE
     // or are greater zero
     int fLevel = f.level();
     int gLevel = g.level();
     if ( gLevel > 0 && fLevel == gLevel )
-	// f and g are polynomials in the same main variable
-	if ( degree( f ) <= degree( g )
-	     && fdivides( f.tailcoeff(), g.tailcoeff() )
-	     && fdivides( f.LC(), g.LC() ) ) {
-	    CanonicalForm q, r;
-	    return divremt( g, f, q, r ) && r.isZero();
-	}
-	else
-	    return false;
+        // f and g are polynomials in the same main variable
+        if ( degree( f ) <= degree( g )
+             && fdivides( f.tailcoeff(), g.tailcoeff() )
+             && fdivides( f.LC(), g.LC() ) ) {
+            CanonicalForm q, r;
+            return divremt( g, f, q, r ) && r.isZero();
+        }
+        else
+            return false;
     else if ( gLevel < fLevel )
-	// g is a coefficient w.r.t. f
-	return false;
+        // g is a coefficient w.r.t. f
+        return false;
     else {
-	// either f is a coefficient w.r.t. polynomial g or both
-	// f and g are from a base domain (should be Z or Z/p^n,
-	// then)
-	CanonicalForm q, r;
-	return divremt( g, f, q, r ) && r.isZero();
+        // either f is a coefficient w.r.t. polynomial g or both
+        // f and g are from a base domain (should be Z or Z/p^n,
+        // then)
+        CanonicalForm q, r;
+        return divremt( g, f, q, r ) && r.isZero();
     }
 }
 //}}}
@@ -390,15 +390,15 @@ CanonicalForm
 maxNorm ( const CanonicalForm & f )
 {
     if ( f.inBaseDomain() )
-	return abs( f );
+        return abs( f );
     else {
-	CanonicalForm result = 0;
-	for ( CFIterator i = f; i.hasTerms(); i++ ) {
-	    CanonicalForm coeffMaxNorm = maxNorm( i.coeff() );
-	    if ( coeffMaxNorm > result )
-		result = coeffMaxNorm;
-	}
-	return result;
+        CanonicalForm result = 0;
+        for ( CFIterator i = f; i.hasTerms(); i++ ) {
+            CanonicalForm coeffMaxNorm = maxNorm( i.coeff() );
+            if ( coeffMaxNorm > result )
+                result = coeffMaxNorm;
+        }
+        return result;
     }
 }
 //}}}
@@ -420,12 +420,12 @@ CanonicalForm
 euclideanNorm ( const CanonicalForm & f )
 {
     ASSERT( (f.inBaseDomain() || f.isUnivariate()) && f.LC().inZ(),
-	    "type error: univariate poly over Z expected" );
+            "type error: univariate poly over Z expected" );
 
     CanonicalForm result = 0;
     for ( CFIterator i = f; i.hasTerms(); i++ ) {
-	CanonicalForm coeff = i.coeff();
-	result += coeff*coeff;
+        CanonicalForm coeff = i.coeff();
+        result += coeff*coeff;
     }
     return sqrt( result );
 }
