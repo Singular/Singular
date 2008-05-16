@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.60 2008-01-11 11:09:04 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.61 2008-05-16 13:11:31 Singular Exp $ */
 
 #include <config.h>
 
@@ -93,8 +93,8 @@ icontent ( const CanonicalForm & f, const CanonicalForm & c )
       if (c.isZero()) return abs(f);
       return bgcd( f, c );
     }
-    else if ( f.inCoeffDomain() )
-       return gcd(f,c);
+    //else if ( f.inCoeffDomain() )
+    //   return gcd(f,c);
     else
     {
         CanonicalForm g = c;
