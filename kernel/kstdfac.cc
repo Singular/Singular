@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.13 2008-05-14 12:53:17 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.14 2008-05-20 14:41:02 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -662,12 +662,20 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
         if (TEST_OPT_INTSTRATEGY)
         {
           n->P.p = redtailBba(n->P.p,pos-1,n);
-          if (n->redTailChange) pCleardenom(n->P.p);
+          if (n->redTailChange)
+          {
+            pCleardenom(n->P.p);
+            n->P.pLength=0;
+          }
         }
         else
         {
           pNorm(n->P.p);
           n->P.p = redtailBba(n->P.p,pos-1,n);
+          if (n->redTailChange)
+          {
+            n->P.pLength=0;
+          }
         }
         kTest_TS(n);
 
@@ -677,7 +685,6 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
           wrp(n->P.p);
           PrintLn();
         }
-        n->P.pLength=0;
         enterpairs(n->P.p,n->sl,n->P.ecart,pos,n);
         enterT(n->P,n);
         n->enterS(n->P,pos,n, n->tl);
