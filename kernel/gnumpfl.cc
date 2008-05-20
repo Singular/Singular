@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.8 2008-03-19 17:44:08 Singular Exp $ */
+/* $Id: gnumpfl.cc,v 1.9 2008-05-20 14:40:00 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -284,7 +284,13 @@ void ngfPower ( number x, int exp, number * u )
     *u=(number)n;
     return;
   }
-  if ( exp == 1 )
+  else if ( ngfIsZero(x) ) // 0^e, e>0
+  {
+    gmp_float* n = NULL;
+    *u=(number)n;
+    return;
+  }
+  else if ( exp == 1 )
   {
     nNew(u);
     if ( x == NULL )
