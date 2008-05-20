@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.29 2008-03-19 17:44:09 Singular Exp $ */
+/* $Id: longrat.cc,v 1.30 2008-05-20 15:30:49 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -932,6 +932,7 @@ number nlDiv (number a, number b)
 */
 void nlPower (number x,int exp,number * u)
 {
+  *u = INT_TO_SR(0); // 0^e, e!=0
   if (!nlIsZero(x))
   {
 #ifdef LDEBUG
@@ -982,8 +983,8 @@ void nlPower (number x,int exp,number * u)
       omFreeBin((ADDRESS)aa, rnumber_bin);
     }
   }
-  else
-    *u = INT_TO_SR(0);
+  else if (exp==0)
+    *u = INT_TO_SR(1); // 0^0
 #ifdef LDEBUG
   nlTest(*u);
 #endif
