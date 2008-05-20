@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.183 2008-05-14 14:08:41 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.184 2008-05-20 11:34:33 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1645,7 +1645,7 @@ lists rDecompose(const ring r)
       rDecomposeCF(&(L->m[0]),r->algring,r);
     else
     {
-      lists Lc=(lists)omAlloc0Bin(slists_bin); 
+      lists Lc=(lists)omAlloc0Bin(slists_bin);
       Lc->Init(4);
       // char:
       Lc->m[0].rtyp=INT_CMD;
@@ -2068,7 +2068,7 @@ ring rCompose(const lists  L)
       else
       { // gf-char
         R->ch=fftable[is_gf_char];
-	R->P=1;
+        R->P=1;
         R->parameter=(char**)omAlloc0(1*sizeof(char_ptr));
         R->parameter[0]=omStrDup((char*)((lists)(LL->m[1].Data()))->m[0].Data());
       }
@@ -4189,7 +4189,7 @@ void rSetHdl(idhdl h)
     memset(&sLastPrinted,0,sizeof(sleftv));
   }
 
-  // test for valid "currRing": 
+  // test for valid "currRing":
   if ((rg!=NULL) && (rg->idroot==NULL))
   {
     ring old=rg;
@@ -4780,7 +4780,7 @@ ring rSubring(ring org_ring, sleftv* rv)
   /* check names for subring in org_ring ------------------------- */
   {
     i=0;
-    
+
     for(j=0;j<R->N;j++)
     {
       for(;i<org_ring->N;i++)
@@ -4798,6 +4798,8 @@ ring rSubring(ring org_ring, sleftv* rv)
       }
     }
   }
+  //Print("perm=");
+  //for(i=1;i<org_ring->N;i++) Print("v%d -> v%d\n",i,perm[i]);
   /* ordering -------------------------------------------------------------*/
 
   for(i=0;i<n;i++)
@@ -4822,18 +4824,21 @@ ring rSubring(ring org_ring, sleftv* rv)
       {
         omFree(R->wvhdl[i]);
         R->wvhdl[i]=(int*)omAlloc0((max_var-min_var+1)*sizeof(int));
-        for(j=R->block0[i];j<=R->block1[i];j++)
+        for(j=org_ring->block0[i];j<=org_ring->block1[i];j++)
         {
           if (perm[j]>0)
-            R->wvhdl[i][j-R->block0[i]]=
-                org_ring->wvhdl[i][perm[j]-org_ring->block0[i]]; 
+          {
+            R->wvhdl[i][perm[j]-R->block0[i]]=
+                org_ring->wvhdl[i][j-org_ring->block0[i]];
+            //Print("w%d=%d (orig_w%d)\n",perm[j],R->wvhdl[i][perm[j]-R->block0[i]],j);
+          }
         }
       }
     }
     else
     {
       if(R->block0[i]>0)
-      { 
+      {
         //Print("skip block %d\n",i);
         R->order[i]=ringorder_unspec;
         if (R->wvhdl[i] !=NULL) omFree(R->wvhdl[i]);
@@ -4841,7 +4846,7 @@ ring rSubring(ring org_ring, sleftv* rv)
       }
       //else Print("keep block %d\n",i);
     }
-  }   
+  }
   i=n-1;
   while(i>0)
   {
@@ -4861,7 +4866,7 @@ ring rSubring(ring org_ring, sleftv* rv)
     }
     i--;
   }
-  n=rBlocks(org_ring)-1; 
+  n=rBlocks(org_ring)-1;
   while (R->order[n]==0)  n--;
   while (R->order[n]==ringorder_unspec)  n--;
   if ((R->order[n]==ringorder_c) ||  (R->order[n]==ringorder_C)) n--;
@@ -5102,7 +5107,7 @@ BOOLEAN jjVARIABLES_P(leftv res, leftv u)
   jjINT_S_TO_LIST(n,e,res);
   return FALSE;
 }
-  
+
 BOOLEAN jjVARIABLES_ID(leftv res, leftv u)
 {
   int *e=(int *)omAlloc0((pVariables+1)*sizeof(int));
