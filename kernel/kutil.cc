@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.89 2008-04-04 10:30:09 Singular Exp $ */
+/* $Id: kutil.cc,v 1.90 2008-05-20 15:30:00 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -667,8 +667,10 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
 
   if (i >= 0 && T->pLength != 0 && T->pLength != pLength(p))
   {
+    int l=T->pLength;
+    T->pLength=pLength(p);
     return dReportError("%c[%d] pLength error: has %d, specified to have %d",
-                        TN, i , pLength(p), T->pLength);
+                        TN, i , pLength(p), l);
   }
 
   // check FDeg,  for elements in L and T
@@ -676,8 +678,12 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
   {
     // FDeg has ir element from T of L set
     if (T->FDeg  != T->pFDeg())
+    {
+      int d=T->FDeg;
+      T->FDeg=T->pFDeg();
       return dReportError("%c[%d] FDeg error: has %d, specified to have %d",
-                          TN, i , T->pFDeg(), T->FDeg);
+                          TN, i , T->pFDeg(), d);
+    }
   }
 
   // check is_normalized for elements in T
