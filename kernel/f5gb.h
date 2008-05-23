@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.2 2008-04-18 13:32:53 wienand Exp $ */
+/* $Id: f5gb.h,v 1.3 2008-05-23 19:47:39 ederc Exp $ */
 /*
 * ABSTRACT: ringgb interface
 */
@@ -10,7 +10,7 @@
 #include "mod2.h"
 
 #ifdef HAVE_F5
-ideal computeF5(ideal I, ring r);
+ideal F5main(ideal i, ring r);
+#endif
 #endif
 
-#endif
