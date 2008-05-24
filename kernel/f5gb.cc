@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.cc,v 1.3 2008-05-23 19:47:39 ederc Exp $ */
+/* $Id: f5gb.cc,v 1.4 2008-05-24 07:39:22 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -36,16 +36,11 @@ ideal F5main(ideal i, ring r)
       iTmp->m[j] = i->m[j];
     }
   }
-  
+   
   iTmp = kInterRed(i,0);  
   idShow(i);
   idShow(iTmp);
-  /*for(j=0; j<IDELEMS(res); j++)
-  {
-    
-
-  return res;
-  }
-  */
+  idShow(iTmp);
+  return iTmp;
 }
 #endif
