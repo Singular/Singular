@@ -1,5 +1,5 @@
 // version string automatically expanded by CVS
-version="$Id: powers.lib,v 1.1 2008-05-29 16:57:53 motsak Exp $";
+version="$Id: powers.lib,v 1.2 2008-05-29 16:59:32 motsak Exp $";
 category="Linear algebra";
 
 info="
@@ -9,11 +9,11 @@ AUTHOR:    Oleksandr Motsak, email: {U@D}, where U={motsak}, D={mathematik.uni-k
 KEYWORDS: symmetric power, exterior power
 
 PROCEDURES:
-    SymmetricPower(module,int)     return k-th symmetric power of a matrix
     SymmetricBasis(int, int)       return a basis of a k-th symmetric power
+    SymmetricPower(module,int)     return k-th symmetric power of a matrix
 
+    ExteriorBasis(int, int)        return a basis of a k-th exterior power
     ExteriorPower(module,int)      return k-th exterior power of a matrix
-    ExteriorPower(int, int)        return a basis of a k-th exteriorPower power
        
 ";
     
