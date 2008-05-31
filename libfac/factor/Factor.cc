@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-/* $Id: Factor.cc,v 1.45 2008-04-08 16:19:10 Singular Exp $ */
+/* $Id: Factor.cc,v 1.46 2008-05-31 17:20:10 Singular Exp $ */
 static const char * errmsg = "\nYou found a bug!\nPlease inform singular@mathematik.uni-kl.de\nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -879,6 +879,7 @@ int cmpCF( const CFFactor & f, const CFFactor & g );
 int find_mvar(const CanonicalForm &f);
 CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
 {
+  out_cf("Factorize ",F,"\n");
   CFFList Outputlist,SqrFreeList,Intermediatelist,Outputlist2;
   ListIterator<CFFactor> i,j;
   CanonicalForm g=1,unit=1,r=1;
@@ -892,7 +893,7 @@ CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
 
   DEBINCLEVEL(CERR, "Factorize");
   DEBOUTLN(CERR, "Called with F= ", F);
-  if ( getCharacteristic() == 0 )
+  if (( getCharacteristic() == 0 ) || (F.isUnivariate()))
   { // char == 0
     TIMING_START(factorize_time);
     //CERR << "Factoring in char=0 of " << F << " = " << Outputlist << "\n";
@@ -909,7 +910,7 @@ CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
   TIMING_START(factorize_time);
   // search an "optimal" main variavble
   int mv=F.level();
-  if ((mv != LEVELBASE) && (! F.isUnivariate()) )
+  if ((mv != LEVELBASE) /* && (! F.isUnivariate()) */)
   {
      mv=find_mvar(F);
      if (mv!=F.level())
@@ -939,6 +940,7 @@ CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
   }
   else
     SqrFreeList.append(CFFactor(F,1));
+
   DEBOUTLN(CERR, "SqrFreeMV= ", SqrFreeList);
   for ( i=SqrFreeList; i.hasItem(); i++ )
   {
@@ -951,6 +953,7 @@ CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
     else// a real polynomial
       if ( g.isUnivariate() )
       {
+        out_cf("univ. poly: ",g,"\n");
         Intermediatelist=factorize(g,1); // poly is sqr-free!
         for ( j=Intermediatelist; j.hasItem(); j++ )
           //Normally j.getItem().exp() should be 1
@@ -1008,7 +1011,6 @@ CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
     }
     swapvar(F,Variable(mv),F.mvar());
   }
-
   DEBDECLEVEL(CERR, "Factorize");
   TIMING_END(factorize_time);
 
@@ -1332,6 +1334,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.45  2008/04/08 16:19:10  Singular
+*hannes: removed rcsid
+
 Revision 1.44  2008/03/18 17:46:15  Singular
 *hannes: gcc 4.2
 

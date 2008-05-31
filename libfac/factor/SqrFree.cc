@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-/* $Id: SqrFree.cc,v 1.20 2008-05-14 12:38:26 Singular Exp $ */
+/* $Id: SqrFree.cc,v 1.21 2008-05-31 17:20:10 Singular Exp $ */
 static const char * errmsg = "\nYou found a bug!\nPlease inform singular@mathematik.uni-kl.de\n Please include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -387,7 +387,7 @@ SqrFreeMV( const CanonicalForm & r , const CanonicalForm & mipo )
       {
         if (!mipo.isZero())
         {
-          #if 1
+          #if 0
           Variable alpha=rootOf(mipo);
           CanonicalForm ff=replacevar(f,mipo.mvar(),alpha);
           tmpOutputlist=SqrFreeMV(ff,0);
@@ -454,6 +454,9 @@ CFFList SqrFree(const CanonicalForm & r )
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.20  2008/05/14 12:38:26  Singular
+*hannes: swapvar ->replacevar
+
 Revision 1.19  2008/05/05 14:54:29  Singular
 *hannes: switch representation and normalize in SqrFreeMV
 

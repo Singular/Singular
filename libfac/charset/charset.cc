@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-/* $Id: charset.cc,v 1.14 2008-04-08 16:19:09 Singular Exp $ */
+/* $Id: charset.cc,v 1.15 2008-05-31 17:20:10 Singular Exp $ */
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -529,7 +529,8 @@ IrrCharSeries( const CFList &PS, int opt ){
 #include "debug.h"
 
 static CFList
-irras( CFList & AS, int & ja, CanonicalForm & reducible){
+irras( CFList & AS, int & ja, CanonicalForm & reducible)
+{
   CFFList qs;
   CFList ts,as;
   CanonicalForm elem;
@@ -538,24 +539,29 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
 
   ja = 0;
   DEBOUTLN(CERR, "irras: called with: AS= ", AS);
-  for ( i=AS; i.hasItem(); i++ ){
+  for ( i=AS; i.hasItem(); i++ )
+  {
     elem = i.getItem();
     nr += 1;
     DEBOUT(CERR, "irras: factoring: ", elem);
     if ( degree(elem) > 1 ) // linear poly's are irreduzible
     {
+      //qs = Factorize2(elem,CanonicalForm(0));
       qs = Factorize(elem);
+      // remove a constant
+      if (qs.getFirst().factor().degree()==0) qs.removeFirst();
     }
-    else{
+    else
+    {
       qs=(CFFactor(elem,1));
-      qs.insert(CFFactor(CanonicalForm(1),1));
     }
     DEBOUTLN(CERR, "  = ", qs);
     // INTERRUPTHANDLER
     if ( interrupt_handle() ) return CFList() ;
     // INTERRUPTHANDLER
-    qs.removeFirst();
-    if ( (qs.length() >= 2 ) || (qs.getFirst().exp() > 1)){
+
+    if ( (qs.length() >= 2 ) || (qs.getFirst().exp() > 1))
+    {
       DEBOUTLN(CERR, "irras: Setting ind=0, ja= ", nr);
       ja=nr; ind=0; reducible= elem;
       break;
@@ -563,25 +569,29 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
     //    else{ as.append(elem) ; }
   }
   //  CERR << "ind= " << ind << "\n";
-  if ( (ind == 1) ){ //&& ( as.length() > 1) ){
-    if ( irreducible(AS) ){ // as quasilinear? => irreducible!
+  if ( (ind == 1) ) //&& ( as.length() > 1) )
+  {
+    if ( irreducible(AS) )
+    { // as quasilinear? => irreducible!
       ja = 0;
       DEBOUTLN(CERR, "as is irreducible. as= ", AS);
     }
-    else {
+    else
+    {
       i=AS;
-      for ( nr=1; nr< AS.length(); nr++){
+      for ( nr=1; nr< AS.length(); nr++)
+      {
         as.append(i.getItem());
         i++;
-        if ( degree(i.getItem()) > 1 ){// search for a non linear elem
+        if ( degree(i.getItem()) > 1 )
+        {  // search for a non linear elem
           elem=i.getItem();
-//          CERR << "f=  " << elem << "\n";
-//        CERR << "as= " << as << "\n";
-          qs= newfactoras(elem,as,success);
-//          CERR << "irras:newfactoras    qs= " << qs << "\n";
-//          qs= factoras(elem,as,success);
-//          CERR << "irras:factoras qs= " << qs << "\n";
-          if ( qs.length() > 1 || qs.getFirst().exp() > 1 ){ //found elem is reducible
+          if (as.length()==1)
+            qs = Factorize2(elem,as.getFirst());
+          else
+            qs= newfactoras(elem,as,success);
+          if ( qs.length() > 1 || qs.getFirst().exp() > 1 )
+          { //found elem is reducible
             reducible=elem;
             ja=nr+1;
             break;
@@ -594,9 +604,13 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
     ts.append(k.getItem().factor());
   return ts;
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.14  2008/04/08 16:19:09  Singular
+*hannes: removed rcsid
+
 Revision 1.13  2008/03/18 17:46:14  Singular
 *hannes: gcc 4.2
 
