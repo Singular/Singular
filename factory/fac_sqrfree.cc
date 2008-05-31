@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_sqrfree.cc,v 1.10 2008-03-17 17:44:04 Singular Exp $ */
+/* $Id: fac_sqrfree.cc,v 1.11 2008-05-31 17:21:11 Singular Exp $ */
 
 #include <config.h>
 
@@ -59,13 +59,16 @@ CFFList sqrFreeFp ( const CanonicalForm & f )
 	t0 /= leadcf;
 
     divexp = p;
-    while ( t0.degree(x) > 0 ) {
+    while ( t0.degree(x) > 0 )
+    {
 	t = gcd( t0, t0.deriv() );
 	v = t0 / t;
 	k = 0;
-	while ( v.degree(x) > 0 ) {
+	while ( v.degree(x) > 0 )
+        {
 	    k = k+1;
-	    if ( k % p == 0 ) {
+	    if ( k % p == 0 )
+            {
 		t /= v;
 		k = k+1;
 	    }
@@ -79,8 +82,10 @@ CFFList sqrFreeFp ( const CanonicalForm & f )
 	t0 = apply( t, divexpfunc );
 	e = p * e;
     }
-    if ( ! leadcf.isOne() ) {
-	if ( F.getFirst().exp() == 1 ) {
+    if ( ! leadcf.isOne() )
+    {
+	if ( !F.isEmpty() && (F.getFirst().exp() == 1) )
+        {
 	    leadcf = F.getFirst().factor() * leadcf;
 	    F.removeFirst();
 	}
