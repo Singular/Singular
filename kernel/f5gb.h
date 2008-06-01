@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.4 2008-06-01 12:50:03 ederc Exp $ */
+/* $Id: f5gb.h,v 1.5 2008-06-01 15:15:00 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -26,6 +26,7 @@ class lpoly {
                 void setIndex(long* i);
                 long* getIndex();
 };
+
 
 
 

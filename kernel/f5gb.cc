@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.cc,v 1.5 2008-06-01 12:49:42 ederc Exp $ */
+/* $Id: f5gb.cc,v 1.6 2008-06-01 15:14:37 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -21,8 +21,33 @@
 #include "intvec.h"
 #include "pInline1.h"
 #include "f5gb.h"
-#include "lpoly.h"
 #ifdef HAVE_F5
+
+
+
+void lpoly::setPoly(poly* p){
+        p_ptr = p;
+}
+
+void lpoly::setTerm(poly* t){
+        t_ptr = t;
+}
+
+void lpoly::setIndex(long* i){
+        i_ptr = i;
+}
+
+poly* lpoly::getPoly(){
+        return p_ptr;
+}
+
+poly* lpoly::getTerm(){
+        return t_ptr;
+}
+
+long* lpoly::getIndex(){
+        return i_ptr;
+}
 
 
 
@@ -90,6 +115,7 @@ ideal F5main(ideal i, ring r)
       lp = new lpoly[IDELEMS(iTmp)];
       for(j=0; j <IDELEMS(iTmp); j++){
                 lp[j].setPoly(&iTmp->m[j]);
+                Print("Labeled Polynomial %d: ",j+1);
                 pWrite(*(lp[j].getPoly()));
       }
                 
