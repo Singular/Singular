@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-/* $Id: SqrFree.cc,v 1.21 2008-05-31 17:20:10 Singular Exp $ */
+/* $Id: SqrFree.cc,v 1.22 2008-06-01 17:48:14 Singular Exp $ */
 static const char * errmsg = "\nYou found a bug!\nPlease inform singular@mathematik.uni-kl.de\n Please include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -149,7 +149,8 @@ SqrFreeTest( const CanonicalForm & r, int opt)
   int n=level(f);
 
   if (getNumVars(f)==0) return 1 ; // a constant is SqrFree
-  if ( f.isUnivariate() ) {
+  if ( f.isUnivariate() )
+  {
     g= f.deriv();
     if ( getCharacteristic() > 0 && g.isZero() ) return 0 ;
     // Next: it would be best to have a *univariate* gcd-test which returns
@@ -223,7 +224,7 @@ SqrFreed( const CanonicalForm & r , const CanonicalForm &mipo=0)
   DEBOUTLN(CERR, "Called with r= ", r);
   if (getNumVars(f)==0 )
   { // just a constant; return it
-    Outputlist= myappend(Outputlist,CFFactor(f,1));
+    Outputlist= CFFactor(f,1);
     return Outputlist ;
   }
 
@@ -234,7 +235,7 @@ SqrFreed( const CanonicalForm & r , const CanonicalForm &mipo=0)
     if ((mipo.isZero())/*||(k!=1)*/)
     {
       g = swapvar(f,k,n); g = content(g);
-      if ( ! (g.isOne() || (-g).isOne() || degree(g)==0 ))
+      if ( ! (g.isOne() || (-g).isOne() || (degree(g)==0) ))
       {
         g = swapvar(g,k,n);
         DEBOUTLN(CERR, "We have a content: ", g);
@@ -324,7 +325,7 @@ SqrFreed( const CanonicalForm & r , const CanonicalForm &mipo=0)
   { // we can split into two nontrivial pieces
     f /= h; // Now we have split the poly into f and h
     g = lc(f);
-    if ( g != f.genOne() && getNumVars(g) == 0 )
+    if ( !g.isOne() && getNumVars(g) == 0 )
     {
        Outputlist= myappend(Outputlist,CFFactor(g,1)) ;
        f /= g;
@@ -454,6 +455,9 @@ CFFList SqrFree(const CanonicalForm & r )
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.21  2008/05/31 17:20:10  Singular
+hannes: minor irras changes
+
 Revision 1.20  2008/05/14 12:38:26  Singular
 *hannes: swapvar ->replacevar
 

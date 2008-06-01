@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_sqrfree.cc,v 1.11 2008-05-31 17:21:11 Singular Exp $ */
+/* $Id: fac_sqrfree.cc,v 1.12 2008-06-01 17:49:05 Singular Exp $ */
 
 #include <config.h>
 
@@ -114,7 +114,8 @@ CFFList sqrFreeZ ( const CanonicalForm & a )
     int i = 1;
     CFFList F;
 
-    while ( ! c.degree() == 0 ) {
+    while ( ! c.degree() == 0 )
+    {
 	y = gcd( w, c ); z = w / y;
 	if ( degree( z ) > 0 )
 	    if ( lc( z ).sign() < 0 )
@@ -144,7 +145,8 @@ CFFList sqrFreeZ ( const CanonicalForm & a )
     int i = 1;
     CFFList F;
     Variable v = aa.mvar();
-    while ( ! c.degree(v) == 0 ) {
+    while ( ! c.degree(v) == 0 )
+    {
 	y = gcd( w, c ); z = w / y;
 	if ( degree( z, v ) > 0 )
 	    if ( lc( z ).sign() < 0 )
@@ -161,8 +163,10 @@ CFFList sqrFreeZ ( const CanonicalForm & a )
 	    F.append( CFFactor( w, i ) );
     if ( ! cont.isOne() )
 	F = Union( F, sqrFreeZ( cont ) );
-    if ( lc( a ).sign() < 0 ) {
-	if ( F.getFirst().exp() == 1 ) {
+    if ( lc( a ).sign() < 0 )
+    {
+	if ( F.getFirst().exp() == 1 )
+        {
 	    CanonicalForm f = F.getFirst().factor();
 	    CFFListIterator(F).getItem() = CFFactor( -f, 1 );
 	}

@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-/* $Id: charset.cc,v 1.15 2008-05-31 17:20:10 Singular Exp $ */
+/* $Id: charset.cc,v 1.16 2008-06-01 17:48:13 Singular Exp $ */
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -546,7 +546,6 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible)
     DEBOUT(CERR, "irras: factoring: ", elem);
     if ( degree(elem) > 1 ) // linear poly's are irreduzible
     {
-      //qs = Factorize2(elem,CanonicalForm(0));
       qs = Factorize(elem);
       // remove a constant
       if (qs.getFirst().factor().degree()==0) qs.removeFirst();
@@ -586,9 +585,9 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible)
         if ( degree(i.getItem()) > 1 )
         {  // search for a non linear elem
           elem=i.getItem();
-          if (as.length()==1)
-            qs = Factorize2(elem,as.getFirst());
-          else
+          //if (as.length()==1)
+          //  qs = Factorize2(elem,as.getFirst());
+          //else
             qs= newfactoras(elem,as,success);
           if ( qs.length() > 1 || qs.getFirst().exp() > 1 )
           { //found elem is reducible
@@ -608,6 +607,9 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible)
 ///////////////////////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.15  2008/05/31 17:20:10  Singular
+hannes: minor irras changes
+
 Revision 1.14  2008/04/08 16:19:09  Singular
 *hannes: removed rcsid
 

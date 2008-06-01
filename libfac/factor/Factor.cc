@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-/* $Id: Factor.cc,v 1.46 2008-05-31 17:20:10 Singular Exp $ */
+/* $Id: Factor.cc,v 1.47 2008-06-01 17:48:14 Singular Exp $ */
 static const char * errmsg = "\nYou found a bug!\nPlease inform singular@mathematik.uni-kl.de\nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -879,7 +879,7 @@ int cmpCF( const CFFactor & f, const CFFactor & g );
 int find_mvar(const CanonicalForm &f);
 CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
 {
-  out_cf("Factorize ",F,"\n");
+  //out_cf("Factorize ",F,"\n");
   CFFList Outputlist,SqrFreeList,Intermediatelist,Outputlist2;
   ListIterator<CFFactor> i,j;
   CanonicalForm g=1,unit=1,r=1;
@@ -953,7 +953,7 @@ CFFList Factorize(const CanonicalForm & F, int is_SqrFree )
     else// a real polynomial
       if ( g.isUnivariate() )
       {
-        out_cf("univ. poly: ",g,"\n");
+        //out_cf("univ. poly: ",g,"\n");
         Intermediatelist=factorize(g,1); // poly is sqr-free!
         for ( j=Intermediatelist; j.hasItem(); j++ )
           //Normally j.getItem().exp() should be 1
@@ -1334,6 +1334,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.46  2008/05/31 17:20:10  Singular
+hannes: minor irras changes
+
 Revision 1.45  2008/04/08 16:19:10  Singular
 *hannes: removed rcsid
 
