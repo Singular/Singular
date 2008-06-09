@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.153 2008-03-19 17:44:12 Singular Exp $ */
+/* $Id: tgb.cc,v 1.154 2008-06-09 06:16:03 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -350,7 +350,28 @@ static BOOLEAN elength_is_normal_length(poly p, slimgb_alg* c){
     }else
     return FALSE;
 }
-static BOOLEAN get_last_dp_block_start(ring r){
+
+static BOOLEAN lies_in_last_dp_block(poly p, slimgb_alg* c){
+    ring r=c->r;
+    if (p_GetComp(p,r)!=0) return FALSE;
+    if (c->lastDpBlockStart<=pVariables){
+        int i;
+        for(i=1;i<c->lastDpBlockStart;i++){
+            if (p_GetExp(p,i,r)!=0){
+                break;
+            }
+        }
+        if (i>=c->lastDpBlockStart) {
+        //wrp(p);
+        //PrintS("\n");
+        return TRUE;
+        }
+        else return FALSE;
+    }else
+    return FALSE;
+}
+
+static int get_last_dp_block_start(ring r){
     //ring r=c->r;
     int last_block;
 
@@ -1134,14 +1155,12 @@ static void replace_pair(int & i, int & j,slimgb_alg* c)
 }
 
 
-static void add_later(poly p, const char* prot, slimgb_alg* c)
-{
+static void add_later(poly p, char* prot, slimgb_alg* c){
     int i=0;
     //check, if it is already in the queue
 
 
-    while(c->add_later->m[i]!=NULL)
-    {
+    while(c->add_later->m[i]!=NULL){
         if (p_LmEqual(c->add_later->m[i],p,c->r))
             return;
         i++;
@@ -2367,11 +2386,11 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
   assume(tc==reduced_sum);
   qsort(terms,reduced_sum,sizeof(poly),terms_sort_crit);
   int nterms=reduced_sum;
-  if (TEST_OPT_PROT)
-    Print("orig estimation:%i\n",reduced_sum);
+  //if (TEST_OPT_PROT)
+  //Print("orig estimation:%i\n",reduced_sum);
   unify_terms(terms,nterms);
-  if (TEST_OPT_PROT)
-    Print("actual number of columns:%i\n",nterms);
+  //if (TEST_OPT_PROT)
+  //    Print("actual number of columns:%i\n",nterms);
   int rank=reduced_c;
   linalg_step_modp(reduced, p,rank,terms,nterms,c);
   omfree(terms);
@@ -2393,7 +2412,7 @@ static void go_on (slimgb_alg* c){
   //programming reasons
   #ifdef USE_NORO
   //Print("module rank%d\n",c->S->rank);
-  const BOOLEAN use_noro=((!(c->nc))&&(c->S->rank<=1)&&(rField_is_Zp(c->r)) &&(!(c->eliminationProblem))&&(npPrimeM<=32003));
+    const BOOLEAN use_noro=c->use_noro;
   #else
   const BOOLEAN use_noro=FALSE;
   #endif
@@ -2405,8 +2424,11 @@ static void go_on (slimgb_alg* c){
   c->average_length=c->average_length/c->n;
   i=0;
   int max_pairs=bundle_size;
-  if (use_noro)
+  
+  #ifdef USE_NORO
+  if ((use_noro)||(c->use_noro_last_block))
     max_pairs=bundle_size_noro;
+  #endif
   poly* p=(poly*) omalloc((max_pairs+1)*sizeof(poly));//nullterminated
 
   int curr_deg=-1;
@@ -2499,9 +2521,9 @@ static void go_on (slimgb_alg* c){
       
     }
     
-    if (TEST_OPT_PROT){
-      Print("reported rank:%i\n",pn);
-    }
+    //if (TEST_OPT_PROT){
+    //  Print("reported rank:%i\n",pn);
+    //}
     mass_add(p,pn,c);
     omfree(p);
     return;
@@ -2579,7 +2601,7 @@ static void go_on (slimgb_alg* c){
     kBucketDestroy(&buf[j].bucket);
 
     //if (!c->nc) {
-      if (c->tailReductions){
+      if ((c->tailReductions) ||(lies_in_last_dp_block(p,c))){
       p=redNFTail(p,c->strat->sl,c->strat, 0);
       } else {
       p=redTailShort(p, c->strat);
@@ -2971,6 +2993,17 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
   }
   idDelete(&I);
   add_later=idInit(ADD_LATER_SIZE,S->rank);
+  #ifdef USE_NORO
+  use_noro=((!(nc))&&(S->rank<=1)&&(rField_is_Zp(r)) &&(!(eliminationProblem))&&(npPrimeM<=32003));
+  use_noro_last_block=false;
+  if ((!(use_noro))&&(lastDpBlockStart<=pVariables)){
+      use_noro_last_block=((!(nc))&&(S->rank<=1)&&(rField_is_Zp(r)) &&(npPrimeM<=32003));
+  }
+  #else
+  use_noro=false;
+  use_noro_last_block=false;
+  #endif
+  //Print("NORO last block %i",use_noro_last_block);
   memset(add_later->m,0,ADD_LATER_SIZE*sizeof(poly));
 }
 slimgb_alg::~slimgb_alg(){
@@ -4122,13 +4155,48 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
 //  nicht reduzierbare eintr�e in ergebnisliste schreiben
   // nullen loeschen
   while(curr_pos>=0){
+    if ((c->use_noro_last_block)&&(lies_in_last_dp_block(los[curr_pos].p,c))){
+        PrintS("L");
+        int pn_noro=curr_pos+1;
+        poly* p_noro=(poly*) omalloc(pn_noro*sizeof(poly));
+        for(i=0;i<pn_noro;i++){
+            int dummy_len;
+            poly p;
+            los[i].p=NULL;
+            kBucketClear(los[i].bucket,&p,&dummy_len);
+            p_noro[i]=p;
+        }
 
+    
+        if (npPrimeM<255){
+          noro_step<tgb_uint8>(p_noro,pn_noro,c);
+        } else {
+          if (npPrimeM<65000){
+            noro_step<tgb_uint16>(p_noro,pn_noro,c);
+          } else{
+            noro_step<tgb_uint32>(p_noro,pn_noro,c);
+          }
+        }
+        for(i=0;i<pn_noro;i++){
+            los[i].p=p_noro[i];
+            los[i].sev=pGetShortExpVector(los[i].p);
+            //ignore quality
+            kBucketInit(los[i].bucket,los[i].p,pLength(los[i].p));
+            
+        }
+        qsort(los,pn_noro,sizeof(red_object),red_object_better_gen);
+        int deleted=multi_reduction_clear_zeroes(los, losl, pn_noro, curr_pos);
+        losl -= deleted;
+        curr_pos -= deleted;
+        break;
+    }
     find_erg erg;
+    
     multi_reduction_find(los, losl,c,curr_pos,erg);//last argument should be curr_pos
     if(erg.reduce_by<0) break;
 
-
-
+   
+    
     erg.expand=NULL;
     int d=erg.to_reduce_u-erg.to_reduce_l+1;
 

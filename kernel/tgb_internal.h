@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.69 2007-02-27 10:40:57 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.70 2008-06-09 06:16:04 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -18,7 +18,7 @@
 #include "polys.h"
 #include "stdlib.h"
 #include <modulop.h>
-//#define USE_NORO 1
+#define USE_NORO 1
 
 
 #ifdef USE_NORO
@@ -240,6 +240,8 @@ class slimgb_alg
   int average_length;
   int lastDpBlockStart;
   int lastCleanedDeg;
+  BOOLEAN use_noro;
+  BOOLEAN use_noro_last_block;
   BOOLEAN isDifficultField;
   BOOLEAN completed;
   BOOLEAN is_homog;
@@ -1528,8 +1530,8 @@ public:
 };
 template <class number_type > void simplest_gauss_modp(number_type* a, int nrows,int ncols){
   //use memmoves for changing rows
-  if (TEST_OPT_PROT)
-    PrintS("StartGauss\n");
+  //if (TEST_OPT_PROT)
+  //    PrintS("StartGauss\n");
   ModPMatrixProxyOnArray<number_type> mat(a,nrows,ncols);
   
   int c=0;
@@ -1543,8 +1545,8 @@ template <class number_type > void simplest_gauss_modp(number_type* a, int nrows
   ModPMatrixBackSubstProxyOnArray<number_type> backmat(mat);
   backmat.backwardSubstitute();
   //backward substitutions
-  if (TEST_OPT_PROT)
-    PrintS("StopGauss\n");
+  //if (TEST_OPT_PROT)
+  //PrintS("StopGauss\n");
 }
 //int term_nodes_sort_crit(const void* a, const void* b);
 template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
