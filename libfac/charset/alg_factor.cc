@@ -1,8 +1,7 @@
-/* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-/* $Id: alg_factor.cc,v 1.23 2008-04-08 16:19:09 Singular Exp $ */
+/* $Id: alg_factor.cc,v 1.24 2008-06-10 14:49:14 Singular Exp $ */
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -828,6 +827,9 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.23  2008/04/08 16:19:09  Singular
+*hannes: removed rcsid
+
 Revision 1.22  2008/03/18 17:46:14  Singular
 *hannes: gcc 4.2
 

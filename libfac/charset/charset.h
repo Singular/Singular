@@ -1,7 +1,6 @@
-/* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: charset.h,v 1.3 1997-09-12 07:19:41 Singular Exp $
+// $Id: charset.h,v 1.4 2008-06-10 14:49:15 Singular Exp $
 ////////////////////////////////////////////////////////////
 
 #ifndef INCL_CHARSET_H
@@ -24,6 +23,9 @@ ListCFList IrrCharSeries( const CFList &PS, int opt=0 );
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1997/09/12 07:19:41  Singular
+* hannes/michael: libfac-0.3.0
+
 Revision 1.2  1997/04/25 22:42:10  michael
 Version for libfac-0.2.1
 

@@ -1,7 +1,6 @@
-/* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: csutil.h,v 1.5 2006-06-14 15:35:08 Singular Exp $
+// $Id: csutil.h,v 1.6 2008-06-10 14:49:15 Singular Exp $
 ////////////////////////////////////////////////////////////
 
 #ifndef INCL_CSUTIL_H
@@ -80,6 +79,9 @@ ListCFList     Minus( const ListCFList & a, const ListCFList &b);
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.5  2006/06/14 15:35:08  Singular
+*hannes: CS renamed
+
 Revision 1.4  2002/08/19 11:11:32  Singular
 * hannes/pfister: alg_gcd etc.
 

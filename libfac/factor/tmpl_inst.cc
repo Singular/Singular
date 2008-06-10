@@ -1,7 +1,6 @@
-/* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: tmpl_inst.cc,v 1.7 2006-05-16 14:58:54 hannes Exp $
+// $Id: tmpl_inst.cc,v 1.8 2008-06-10 14:49:16 Singular Exp $
 ////////////////////////////////////////////////////////////
 
 
@@ -95,6 +94,9 @@ template class ListIterator<CFFList>;
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.7  2006/05/16 14:58:54  hannes
+*hannes: gcc-4.1 fixes
+
 Revision 1.6  2003/04/09 13:39:12  Singular
 * hannes/Cornelsen: integrated stand-allone fixes
 

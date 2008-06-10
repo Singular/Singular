@@ -1,7 +1,6 @@
-/** Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: reorder.h,v 1.3 1997-09-12 07:19:45 Singular Exp $
+// $Id: reorder.h,v 1.4 2008-06-10 14:49:15 Singular Exp $
 ////////////////////////////////////////////////////////////
 #ifndef INCL_REORDER_H
 #define INCL_REORDER_H
@@ -46,6 +45,9 @@ ListCFList reorder(const Varlist & betterorder, const ListCFList & Q);
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1997/09/12 07:19:45  Singular
+* hannes/michael: libfac-0.3.0
+
 Revision 1.1  1997/04/25 22:50:41  michael
 Initial revision
 

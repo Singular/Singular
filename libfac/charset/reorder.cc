@@ -1,4 +1,3 @@
-/* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // This is really experimental. What is the best order of the variables for
 // an ideal? Clearly, if a variable only occures in one and only one polynomial
@@ -11,7 +10,7 @@
 // computing time for your example!
 /////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-/* $Id: reorder.cc,v 1.6 2008-04-08 16:19:10 Singular Exp $ */
+/* $Id: reorder.cc,v 1.7 2008-06-10 14:49:15 Singular Exp $ */
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -406,6 +405,9 @@ reorder(const Varlist & betterorder, const ListCFList & Q){
 }
 /*
 $Log: not supported by cvs2svn $
+Revision 1.6  2008/04/08 16:19:10  Singular
+*hannes: removed rcsid
+
 Revision 1.5  2008/03/18 17:46:15  Singular
 *hannes: gcc 4.2
 

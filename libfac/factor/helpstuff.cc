@@ -1,7 +1,6 @@
-/* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: helpstuff.cc,v 1.8 2008-03-18 17:46:16 Singular Exp $
+// $Id: helpstuff.cc,v 1.9 2008-06-10 14:49:16 Singular Exp $
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -174,6 +173,9 @@ change_poly( const CanonicalForm & f , const SFormList & Substitutionlist ,int d
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.8  2008/03/18 17:46:16  Singular
+*hannes: gcc 4.2
+
 Revision 1.7  2008/03/17 17:44:17  Singular
 *hannes: fact.tst
 

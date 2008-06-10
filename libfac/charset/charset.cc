@@ -1,7 +1,6 @@
-/* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-/* $Id: charset.cc,v 1.16 2008-06-01 17:48:13 Singular Exp $ */
+/* $Id: charset.cc,v 1.17 2008-06-10 14:49:14 Singular Exp $ */
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -607,6 +606,9 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible)
 ///////////////////////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.16  2008/06/01 17:48:13  Singular
+*hannes: sqrfree etc
+
 Revision 1.15  2008/05/31 17:20:10  Singular
 hannes: minor irras changes
 

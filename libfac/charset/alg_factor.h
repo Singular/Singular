@@ -1,8 +1,7 @@
-/* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-// $Id: alg_factor.h,v 1.2 1997-09-12 07:19:37 Singular Exp $
+// $Id: alg_factor.h,v 1.3 2008-06-10 14:49:14 Singular Exp $
 ////////////////////////////////////////////////////////////
 
 #ifndef INCL_NEW_ALGFACTOR_H

@@ -1,7 +1,6 @@
-/* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-/* $Id: csutil.cc,v 1.18 2008-04-08 16:19:10 Singular Exp $ */
+/* $Id: csutil.cc,v 1.19 2008-06-10 14:49:15 Singular Exp $ */
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -986,6 +985,9 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.18  2008/04/08 16:19:10  Singular
+*hannes: removed rcsid
+
 Revision 1.17  2008/03/18 17:46:15  Singular
 *hannes: gcc 4.2
 

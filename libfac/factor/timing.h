@@ -1,7 +1,6 @@
-/* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: timing.h,v 1.4 2006-05-16 14:46:50 Singular Exp $";
+// static char * rcsid = "$Id: timing.h,v 1.5 2008-06-10 14:49:16 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // It is possible to include this file multiple times for different 
 // settings of TIMING (but now this isn't used)
@@ -43,6 +42,9 @@ void timing_print_ ## t ( char * msg ) { CERR.setf( ios::fixed, ios::floatfield)
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  2006/05/16 14:46:50  Singular
+*hannes: gcc 4.1 fixes
+
 Revision 1.3  1997/09/12 07:19:59  Singular
 * hannes/michael: libfac-0.3.0
 

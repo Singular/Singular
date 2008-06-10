@@ -1,7 +1,6 @@
-/* Copyright 1997 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: version.cc,v 1.9 2008-03-18 17:46:16 Singular Exp $
+// $Id: version.cc,v 1.10 2008-06-10 14:49:16 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
 const char * libfac_name = "Factorization and characteristic sets library";

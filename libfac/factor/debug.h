@@ -1,6 +1,5 @@
-/* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
-// static char * rcsid = "$Id: debug.h,v 1.5 2007-10-10 17:52:39 Singular Exp $" ;
+// static char * rcsid = "$Id: debug.h,v 1.6 2008-06-10 14:49:16 Singular Exp $" ;
 ////////////////////////////////////////////////////////////
 // It is possible to include this file multiple times for different 
 // settings of FACDEBUG and/or DEBUGOUTPUT
@@ -63,6 +62,9 @@ extern char * deb_level_msg; // from factory
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.5  2007/10/10 17:52:39  Singular
+*hannes: use debug stuf from factory
+
 Revision 1.4  2006/05/16 14:46:50  Singular
 *hannes: gcc 4.1 fixes
 

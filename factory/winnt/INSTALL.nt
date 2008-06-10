@@ -6,8 +6,8 @@
 		 INSTALL file for Factory on Windows NT 4.0
 		 ==========================================
 
-NOTE: The copyright state of Factory is still unclear.  Sooner or later it
-will be free software, but by now please do *not* distribute the sources.
+NOTE: The copyright state of Factory is given in the file COPYING
+in the top level directory of Factory.
 
 NOTE: Please read also the file INSTALL in the factory root directory.
 

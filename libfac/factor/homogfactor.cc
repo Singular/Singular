@@ -1,6 +1,5 @@
-/* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
-// $Id: homogfactor.cc,v 1.11 2008-04-09 09:41:48 Singular Exp $ 
+// $Id: homogfactor.cc,v 1.12 2008-06-10 14:49:16 Singular Exp $ 
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -211,6 +210,9 @@ HomogFactor( const CanonicalForm & g, const CanonicalForm  & minpoly, const int 
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.11  2008/04/09 09:41:48  Singular
+*hannes: removed debug code
+
 Revision 1.10  2008/04/08 16:19:10  Singular
 *hannes: removed rcsid
 

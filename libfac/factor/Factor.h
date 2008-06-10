@@ -1,7 +1,6 @@
-/* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: Factor.h,v 1.6 2008-05-31 17:20:10 Singular Exp $
+// $Id: Factor.h,v 1.7 2008-06-10 14:49:15 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef FACTOR_H
 #define FACTOR_H
@@ -18,6 +17,9 @@ CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly );
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.6  2008/05/31 17:20:10  Singular
+hannes: minor irras changes
+
 Revision 1.5  2002/08/19 11:11:33  Singular
 * hannes/pfister: alg_gcd etc.
 

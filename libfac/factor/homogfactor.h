@@ -1,7 +1,6 @@
-/* Copyright 1997 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: homogfactor.h,v 1.5 2005-12-05 15:47:32 Singular Exp $
+// $Id: homogfactor.h,v 1.6 2008-06-10 14:49:16 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef HFACTOR_H
 #define HFACTOR_H
@@ -12,6 +11,9 @@ CFFList HomogFactor( const CanonicalForm & g, const CanonicalForm  & minpoly, co
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.5  2005/12/05 15:47:32  Singular
+*hannes: is_homogeneous -> factory: isHomogeneous
+
 Revision 1.4  2002/08/19 11:11:34  Singular
 * hannes/pfister: alg_gcd etc.
 

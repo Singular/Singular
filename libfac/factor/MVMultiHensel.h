@@ -1,7 +1,6 @@
-/* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: MVMultiHensel.h,v 1.4 2007-05-21 16:40:12 Singular Exp $
+// $Id: MVMultiHensel.h,v 1.5 2008-06-10 14:49:15 Singular Exp $
 /////////////////////////////////////////////////////////////
 #ifndef MULTIHENSEL_H
 #define MULTIHENSEL_H
@@ -19,6 +18,9 @@ CFFList MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  2007/05/21 16:40:12  Singular
+*hannes: Factorize2
+
 Revision 1.3  1997/09/12 07:19:48  Singular
 * hannes/michael: libfac-0.3.0
 

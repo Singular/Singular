@@ -1,4 +1,3 @@
-/* Copyright 1997 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef INTERRUPT_H
 #define INTERRUPT_H
@@ -23,6 +22,9 @@ interrupt_handle( )
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  2007/05/25 16:02:02  Singular
+*hannes: removed diophant_error, format
+
 Revision 1.2  1997/09/12 07:19:58  Singular
 * hannes/michael: libfac-0.3.0
 

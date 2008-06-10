@@ -1,7 +1,6 @@
-/** Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: helpstuff.h,v 1.6 2008-03-17 17:44:17 Singular Exp $
+// $Id: helpstuff.h,v 1.7 2008-06-10 14:49:16 Singular Exp $
 ////////////////////////////////////////////////////////////
 #ifndef HELPSTUFF_H
 #define HELPSTUFF_H
@@ -32,6 +31,9 @@ inline int max ( const int a, const int b ){
 ///////////////////////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.6  2008/03/17 17:44:17  Singular
+*hannes: fact.tst
+
 Revision 1.3  1997/09/12 07:19:57  Singular
 * hannes/michael: libfac-0.3.0
 

@@ -1,7 +1,6 @@
-/* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-/* $Id: SqrFree.cc,v 1.22 2008-06-01 17:48:14 Singular Exp $ */
+/* $Id: SqrFree.cc,v 1.23 2008-06-10 14:49:15 Singular Exp $ */
 static const char * errmsg = "\nYou found a bug!\nPlease inform singular@mathematik.uni-kl.de\n Please include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -455,6 +454,9 @@ CFFList SqrFree(const CanonicalForm & r )
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.22  2008/06/01 17:48:14  Singular
+*hannes: sqrfree etc
+
 Revision 1.21  2008/05/31 17:20:10  Singular
 hannes: minor irras changes
 

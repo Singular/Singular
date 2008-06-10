@@ -1,7 +1,6 @@
-/* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: class.h,v 1.6 2006-05-16 14:46:50 Singular Exp $
+// $Id: class.h,v 1.7 2008-06-10 14:49:16 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef INCL_CLASS_H
 #define INCL_CLASS_H
@@ -60,6 +59,9 @@ int operator== ( const Substitution<T>&, const Substitution<T>& );
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.6  2006/05/16 14:46:50  Singular
+*hannes: gcc 4.1 fixes
+
 Revision 1.5  2000/05/29 08:06:47  pohl
 no artificial friend
 
