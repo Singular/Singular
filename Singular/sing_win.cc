@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_win.cc,v 1.6 2007-04-25 16:56:11 Singular Exp $ */
+/* $Id: sing_win.cc,v 1.7 2008-06-10 14:39:43 wienand Exp $ */
 
 /*
 * ABSTRACT: Windows specific routines
@@ -29,8 +29,8 @@ void heOpenWinHtmlHelp(const char* keyw, char* helppath )
 #ifdef TEST
   printf("path:%s\n", path);
 #endif
-HH_AKLINK link;
-   link.cbStruct =     sizeof(HH_AKLINK) ;
+HH_ALINKA link;
+   link.cbStruct =     sizeof(HH_ALINKA) ;
    link.fReserved =    FALSE ;
    link.pszKeywords =  keyw;
    link.pszUrl =       NULL ;
@@ -38,7 +38,7 @@ HH_AKLINK link;
    link.pszMsgTitle =  NULL ;
    link.pszWindow =    NULL ;
    link.fIndexOnFail = TRUE ;
-  HtmlHelp(NULL, path, HH_KEYWORD_LOOKUP, (DWORD)&link);
+  HtmlHelpA(NULL, path, HH_KEYWORD_LOOKUP, (DWORD)&link);
 }
 
 void heOpenWinntHlp(const char* keyw, char* helppath )
