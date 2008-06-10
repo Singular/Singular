@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.21 2008-06-10 10:17:31 motsak Exp $ */
+/* $Id: gring.h,v 1.22 2008-06-10 14:35:41 motsak Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -110,10 +110,12 @@ ideal idOppose(ring Rop, ideal I);
 
 
 
-// returns the LCM of the head terms of a and b with given component
+// returns the LCM of the head terms of a and b with the given component 
+// NOTE: coeff will be created but remains undefined(zero?) 
 poly p_Lcm(const poly a, const poly b, const long lCompM, const ring r);
 
 // returns the LCM of the head terms of a and b with component = max comp. of a & b
+// NOTE: coeff will be created but remains undefined(zero?) 
 poly p_Lcm(const poly a, const poly b, const ring r);
 
 

@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.54 2008-06-10 10:17:31 motsak Exp $
+ *  Version: $Id: gring.cc,v 1.55 2008-06-10 14:35:40 motsak Exp $
  *******************************************************************/
 
 #define OM_CHECK 4
@@ -100,10 +100,12 @@ ideal gnc_gr_bba (const ideal F, const ideal Q, const intvec *, const intvec *, 
 
 /*2
 * returns the LCM of the head terms of a and b
+* without coefficient!!!
 */
 poly p_Lcm(const poly a, const poly b, const long lCompM, const ring r)
 {
-  poly m = p_ISet(1, r);
+  poly m = // p_ISet(1, r);
+          p_Init(r); 
 
   const int pVariables = r->N;
 
@@ -120,8 +122,10 @@ poly p_Lcm(const poly a, const poly b, const long lCompM, const ring r)
   p_Setm(m,r);
 
 #ifdef PDEBUG
-  p_Test(m,r);
+//  p_Test(m,r);
 #endif
+
+  n_New(&(p_GetCoeff(m, r)), r);  
 
   return(m);
 };
@@ -139,7 +143,7 @@ poly p_Lcm(const poly a, const poly b, const ring r)
   const poly m = p_Lcm(a, b, si_max(lCompP1, lCompP2), r);
   
 #ifdef PDEBUG
-  p_Test(m,r);
+//  p_Test(m,r);
 #endif
   return(m);
 };
@@ -1469,10 +1473,9 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
 
   poly pL = p_Lcm(p1,p2,r);                               // pL = lcm( lm(p1), lm(p2) )
 
-//  p_Setm(pL,r);
 
 #ifdef PDEBUG
-  p_Test(pL,r);
+//  p_Test(pL,r);
 #endif
 
   p_ExpVectorDiff(m1, pL, p1, r);                  // m1 = pL / lm(p1)
@@ -1531,8 +1534,6 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
 #endif
 #endif
   
-
-
   p_Delete(&pL,r);
 
   /* zero exponents !? */
@@ -1767,18 +1768,18 @@ poly nc_CreateShortSpoly(poly p1, poly p2, const ring r)
   if ((lCompP1!=lCompP2) && (lCompP1!=0) && (lCompP2!=0))
   {
 #ifdef PDEBUG
-    Werror("nc_CreateShortSpoly: exponent mismatch!"); // !!!!
+    Werror("nc_CreateShortSpoly: wrong module components!"); // !!!!
 #endif
     return(NULL);
   }
   
-  const poly m = p_Lcm(p1, p2, si_max(lCompP1, lCompP2), r);
+  poly m = p_Lcm(p1, p2, si_max(lCompP1, lCompP2), r);
 
-  n_Delete(&p_GetCoeff(m, r), r);
-  pSetCoeff0(m, NULL);
+//  n_Delete(&p_GetCoeff(m, r), r);
+//  pSetCoeff0(m, NULL);
 
 #ifdef PDEBUG
-  p_Test(m,r);
+//  p_Test(m,r);
 #endif
   
   return(m);

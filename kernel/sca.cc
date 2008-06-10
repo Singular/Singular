@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.16 2008-06-10 10:17:33 motsak Exp $
+ *  Version: $Id: sca.cc,v 1.17 2008-06-10 14:35:41 motsak Exp $
  *******************************************************************/
 
 #define OM_CHECK 4
@@ -733,6 +733,7 @@ poly sca_SPoly( const poly p1, const poly p2, const ring r )
 
   poly m1 = p_ISet(1, r);
   p_ExpVectorDiff(m1, pL, p1, r);                  // m1 = pL / lm(p1)
+
   //p_SetComp(m1,0,r);
   //p_Setm(m1,r);
 #ifdef PDEBUG
@@ -1656,33 +1657,11 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
       pLmFree(strat->P.p);
 
       strat->P.p = nc_CreateSpoly(strat->P.p1, strat->P.p2, currRing);
-
-/*      
-      strat->P.p = NULL;
-
-
-      poly m1 = NULL, m2 = NULL;
-
-      // check that spoly creation is ok
-      while (strat->tailRing != currRing &&
-             !kCheckSpolyCreation(&(strat->P), strat, m1, m2))
-      {
-        assume(m1 == NULL && m2 == NULL);
-        // if not, change to a ring where exponents are at least
-        // large enough
-        kStratChangeTailRing(strat);
-      }
-
-#ifdef PDEBUG
-      Print("ksCreateSpoly!#?");
-#endif
-
-      // create the real one
-      ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
-                    strat->tailRing, m1, m2, strat->R); //?????????
-*/                    
     }//    else
 
+
+    if(strat->P.IsNull()) continue;
+    
     if (strat->P.p1 == NULL)
     {
 //       if (strat->minim > 0)
@@ -1690,7 +1669,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 
 
       // for input polys, prepare reduction
-      strat->P.PrepareRed(strat->use_buckets);
+        strat->P.PrepareRed(strat->use_buckets);
     }
 
     if (TEST_OPT_PROT)

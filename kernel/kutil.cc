@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.91 2008-06-10 10:17:32 motsak Exp $ */
+/* $Id: kutil.cc,v 1.92 2008-06-10 14:35:41 motsak Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1551,11 +1551,12 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
             Lp.p = NULL;
         }
         else
-          Lp.p = nc_CreateSpoly(strat->S[i],p,currRing); 
-// nc_CreateShortSpoly(strat->S[i], p, strat->tailRing); // how to mark a short spoly?
+          Lp.p = // nc_CreateSpoly(strat->S[i],p,currRing); 
+                 nc_CreateShortSpoly(strat->S[i], p, currRing); 
       }
-      else  Lp.p = nc_CreateSpoly(strat->S[i],p,currRing); 
-// nc_CreateShortSpoly(strat->S[i], p, strat->tailRing); // how to mark a short spoly?
+      else
+        Lp.p = // nc_CreateSpoly(strat->S[i],p,currRing); 
+                nc_CreateShortSpoly(strat->S[i], p, currRing); 
 
       
 #if MYTEST
@@ -1572,7 +1573,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
     #endif
     {
       assume(!rIsPluralRing(currRing));
-      Lp.p = ksCreateShortSpoly(strat->S[i],p, strat->tailRing);
+      Lp.p = ksCreateShortSpoly(strat->S[i], p, strat->tailRing);
 #if MYTEST
       if (TEST_OPT_DEBUG)
       {
@@ -1608,8 +1609,9 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
     Lp.p1 = strat->S[i];
     Lp.p2 = p;
 
-    if ( !bIsPluralRing )
-      pNext(Lp.p) = strat->tail;
+//    if ( !bIsPluralRing ) // !!!!
+    assume(pNext(Lp.p)==NULL);
+    pNext(Lp.p) = strat->tail; // !!!
 
     if (atR >= 0)
     {
@@ -1645,7 +1647,7 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
   {
     //PrintS("prod-crit\n");
     #ifdef HAVE_PLURAL
-    if(!rIsPluralRing(currRing) || (rIsSCA(currRing) && strat->homog))
+    if((!rIsPluralRing(currRing)) || (rIsSCA(currRing) && strat->homog))
     #endif
     {
       //PrintS("prod-crit\n");
@@ -1709,6 +1711,7 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
       Lp.i_r1 = -1;
       Lp.i_r2 = -1;
     }
+    assume(pNext(Lp.p) == NULL);
     pNext(Lp.p) = strat->tail;
     strat->initEcartPair(&Lp,strat->S[i],p,strat->ecartS[i],ecart);
     if (TEST_OPT_INTSTRATEGY)
