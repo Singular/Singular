@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.28 2008-04-21 11:23:12 Singular Exp $ */
+/* $Id: ring.h,v 1.29 2008-06-10 10:17:33 motsak Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -36,7 +36,7 @@ ring   rEnvelope(ring r);
 inline bool rIsPluralRing(const ring r)
 {
 #ifdef HAVE_PLURAL
-  return (r != NULL) && (r->nc != NULL) && (r->nc->type != nc_error); 
+  return (r != NULL) && (r->GetNC() != NULL) && (r->GetNC()->type != nc_error); 
 #else
   return false;
 #endif
@@ -246,9 +246,6 @@ n_coeffType rFieldType(ring r);
 BOOLEAN rComplete(ring r, int force = 0);
 // use this to free fields created by rComplete
 
-BOOLEAN nc_rComplete(ring src, ring dest);
-
-void rUnComplete(ring r);
 inline int rBlocks(ring r)
 {
   int i=0;
@@ -378,6 +375,7 @@ void rKillModifiedRing_Simple(ring r);
 
 void rDebugPrint(ring r);
 void pDebugPrint(poly p);
+void pDebugPrintR(poly p, const ring r);
 
 int64 * rGetWeightVec(ring r);
 void rSetWeightVec(ring r, int64 *wv);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.13 2007-02-07 10:49:39 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.14 2008-06-10 10:17:31 motsak Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -499,7 +499,7 @@ static int nc_redHoney (LObject*  h,kStrategy strat)
       if (strat->fromT)
       {
         strat->fromT=FALSE;
-        (*h).p = gnc_ReduceSpolyNew(pi,(*h).p,strat->kNoether,currRing);
+        (*h).p = nc_ReduceSpoly(pi,(*h).p,strat->kNoether,currRing);
       }
       else
         (*h).p = nc_ReduceSpoly(pi,(*h).p,strat->kNoether,currRing);
@@ -813,8 +813,31 @@ void nc_gr_initBba(ideal F, kStrategy strat)
   }
 }
 
+#define MYTEST 0
+
 ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat)
 {
+#if MYTEST
+   PrintS("<gnc_gr_bba>\n");
+#endif
+
+#ifdef HAVE_PLURAL
+#if MYTEST
+   PrintS("currRing: \n");
+   rWrite(currRing);
+#ifdef RDEBUG
+   rDebugPrint(currRing);
+#endif
+
+   PrintS("F: \n");
+   idPrint(F);  
+   PrintS("Q: \n");  
+   idPrint(Q);
+#endif
+#endif
+
+
+   
   assume(pOrdSgn != -1); // no mora!!! it terminates only for global ordering!!! (?)
 
   intvec *w=NULL;
@@ -834,11 +857,14 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   strat->posInT=posInT110;
   srmax = strat->sl;
   reduc = olddeg = lrmax = 0;
+
   /* compute------------------------------------------------------- */
   while (strat->Ll >= 0)
   {
     if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
+
     if (TEST_OPT_DEBUG) messageSets(strat);
+
     if (strat->Ll== 0) strat->interpt=TRUE;
     if (TEST_OPT_DEGBOUND
     && ((strat->honey
@@ -857,25 +883,62 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
     strat->P = strat->L[strat->Ll];
     strat->Ll--;
     //kTest(strat);
+
+    if (strat->P.p != NULL)
     if (pNext(strat->P.p) == strat->tail)
     {
       /* deletes the short spoly and computes */
       pLmFree(strat->P.p);
       /* the real one */
-      if ((ncRingType(currRing)==nc_lie) && pHasNotCF(strat->P.p1,strat->P.p2)) /* prod crit */
-      {
-        strat->cp++;
-        /* prod.crit itself in nc_CreateSpoly */
-      }
+      if (ncRingType(currRing)==nc_lie) /* prod crit */
+        if(pHasNotCF(strat->P.p1,strat->P.p2))
+        {
+//          strat->cp++;
+          /* prod.crit itself in nc_CreateSpoly */
+        }
+      
       strat->P.p = nc_CreateSpoly(strat->P.p1,strat->P.p2,currRing);
+
+#ifdef PDEBUG
+      p_Test(strat->P.p, currRing);
+#endif
+
+#if MYTEST
+      if (TEST_OPT_DEBUG)
+      {
+        PrintS("p1: "); pWrite(strat->P.p1);
+        PrintS("p2: "); pWrite(strat->P.p2);
+        PrintS("SPoly: "); pWrite(strat->P.p);
+      }
+#endif      
     }
+
+    
     if (strat->P.p != NULL)
     {
       if (TEST_OPT_PROT)
-      message((strat->honey ? strat->P.ecart : 0) + strat->P.pFDeg(),
+        message((strat->honey ? strat->P.ecart : 0) + strat->P.pFDeg(),
               &olddeg,&reduc,strat, red_result);
+
+#if MYTEST
+      if (TEST_OPT_DEBUG)
+      {
+        PrintS("p1: "); pWrite(strat->P.p1);
+        PrintS("p2: "); pWrite(strat->P.p2);
+        PrintS("SPoly before: "); pWrite(strat->P.p);
+      }
+#endif
+
       /* reduction of the element chosen from L */
       strat->red(&strat->P,strat);
+
+#if MYTEST
+      if (TEST_OPT_DEBUG)
+      {
+        PrintS("red SPoly: "); pWrite(strat->P.p);
+      }
+#endif
+
     }
     if (strat->P.p != NULL)
     {
@@ -912,15 +975,20 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 
               if (TEST_OPT_DEBUG)
               {
-                PrintS("new s:");
-                wrp(strat->P.p);
+                PrintS("new s:"); wrp(strat->P.p);
                 PrintLn();
+#if MYTEST
+                Print("s: "); pWrite(strat->P.p);
+#endif
+                
               }
               // kTest(strat);
               //
               enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
+              
               if (strat->sl==-1) pos=0;
               else pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
+              
               strat->enterS(strat->P,pos,strat,-1);
             }
 //            if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
@@ -976,6 +1044,11 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 /*   extern int zaehler; */
 /*   Print("Total pairs considered:%d\n",zaehler); zaehler=0; */
 #endif /*PDEBUG*/
+
+#if MYTEST
+  PrintS("</gnc_gr_bba>\n");
+#endif
+
   return (strat->Shdl);
 }
 

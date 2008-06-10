@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.h,v 1.1.1.1 2003-10-06 12:15:57 Singular Exp $ */
+/* $Id: matpol.h,v 1.2 2008-06-10 10:17:32 motsak Exp $ */
 /*
 * ABSTRACT
 */
@@ -29,7 +29,9 @@ class ip_smatrix
 };
 
 matrix mpNew(int r, int c);
-matrix mpCopy (matrix a);
+matrix mpCopy(matrix a);
+void   mpDelete(matrix* a, const ring r = currRing);
+matrix mpCopy(const matrix a, const ring rSrc, const ring rDst = currRing);
 matrix mpInitP(int r, int c, poly p);
 matrix mpInitI(int r, int c, int v);
 matrix mpMultI(matrix a, int f);

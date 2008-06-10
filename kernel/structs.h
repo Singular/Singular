@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.44 2008-05-09 09:17:57 Singular Exp $ */
+/* $Id: structs.h,v 1.45 2008-06-10 10:17:33 motsak Exp $ */
 /*
 * ABSTRACT
 */
@@ -473,7 +473,8 @@ struct nc_struct
   matrix COM;
   int *MTsize; // size 0.. (rVar()*rVar()-1)/2
 
-  // IsSkewConstantindicates whethere coeffs C_ij are all equal, effective together with nc_type=nc_skew
+  // IsSkewConstant indicates whethere coeffs C_ij are all equal, 
+  // effective together with nc_type=nc_skew
   int IsSkewConstant;
 
   private:
@@ -630,7 +631,11 @@ struct sip_sring
   n_Procs_s*    cf;
   ring          algring;
 #ifdef HAVE_PLURAL
-  nc_struct     *nc;
+  private:
+    nc_struct*    _nc; // private
+  public:
+    inline const nc_struct* GetNC() const { return _nc; }; // public!!!
+    inline nc_struct*& GetNC() { return _nc; }; // public!!!
 #endif
 };
 

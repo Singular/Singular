@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.55 2008-04-04 09:51:37 Singular Exp $ */
+/* $Id: ideals.cc,v 1.56 2008-06-10 10:17:31 motsak Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -23,6 +23,9 @@
 #include "sparsmat.h"
 #include "ideals.h"
 #include "prCopy.h"
+
+
+#define MYTEST 0
 
 
 /* #define WITH_OLD_MINOR */
@@ -64,13 +67,18 @@ ideal idInit(int idsize, int rank)
 // this is mainly for outputting an ideal within the debugger
 void idShow(ideal id)
 {
-  Print("Module of rank %d,real rank %d and %d generators.\n",
-         id->rank,idRankFreeModule(id),IDELEMS(id));
-  for (int i=0;i<id->ncols*id->nrows;i++)
+  if( id == NULL )
+    Print("(NULL)");
+  else
   {
-    if (id->m[i]!=NULL)
+    Print("Module of rank %d,real rank %d and %d generators.\n",
+           id->rank,idRankFreeModule(id),IDELEMS(id));
+    for (int i=0;i<id->ncols*id->nrows;i++)
     {
-      Print("generator %d: ",i);pWrite(id->m[i]);
+      if (id->m[i]!=NULL)
+      {
+        Print("generator %d: ",i);pWrite(id->m[i]);
+      }
     }
   }
 }
@@ -1298,6 +1306,14 @@ static ideal idPrepare (ideal  h1, tHomog h, int syzcomp, intvec **w)
     rSetSyzComp(k);
   }
   h2->rank = syzcomp+i+1;
+
+#if MYTEST
+#ifdef RDEBUG
+  Print("Prepare::h2: ");
+  idPrint(h2);
+#endif  
+#endif
+  
   for (j=0; j<=i; j++)
   {
     p = h2->m[j];
@@ -1315,8 +1331,21 @@ static ideal idPrepare (ideal  h1, tHomog h, int syzcomp, intvec **w)
 
 #ifdef PDEBUG
   for(j=0;j<IDELEMS(h2);j++) pTest(h2->m[j]);
+
+#if MYTEST
+#ifdef RDEBUG
+  Print("Prepare::Input: ");
+  idPrint(h2);
+
+  Print("Prepare::currQuotient: ");
+  idPrint(currQuotient);
+#endif  
 #endif
-  h3=kStd(h2,currQuotient,h,w,NULL,syzcomp);
+  
+#endif
+
+  
+  h3 = kStd(h2,currQuotient,h,w,NULL,syzcomp);
   idDelete(&h2);
   return h3;
 }
@@ -1527,10 +1556,18 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
 
   if (k==1) verbose |=Sy_bit(V_IDLIFT);
 
-  ring orig_ring=currRing;
-  ring syz_ring=rCurrRingAssure_SyzComp();
+  ring orig_ring = currRing;
+  ring syz_ring = rCurrRingAssure_SyzComp();
   rSetSyzComp(k);
 
+  
+#if MYTEST
+#ifdef RDEBUG
+  rWrite(syz_ring);
+  rDebugPrint(syz_ring);
+#endif  
+#endif
+  
   ideal s_h1=h1;
 
   if (orig_ring != syz_ring)
@@ -1538,11 +1575,35 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
   else
     s_h1 = h1;
 
+#if MYTEST
+#ifdef RDEBUG
+  Print("Input: ");
+  idPrint(s_h1);
+#endif  
+#endif
+ 
+
   ideal s_h3=idPrepare(s_h1,h,k,&w);
+
+#if MYTEST
+#ifdef RDEBUG
+  Print("Prepare: ");
+  idPrint(s_h3);
+#endif  
+#endif
+
   ideal s_h2 = idInit(IDELEMS(s_h3), s_h3->rank);
 
+#if MYTEST
+#ifdef RDEBUG
+  Print("Temp: ");
+  idPrint(s_h2);
+#endif  
+#endif
+  
   if (w!=NULL) delete w;
   i = 0;
+
   for (j=0; j<IDELEMS(s_h3); j++)
   {
     if ((s_h3->m[j] != NULL) && (p_MinComp(s_h3->m[j],syz_ring) <= k))
@@ -1570,8 +1631,25 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
   }
 
   idSkipZeroes(s_h3);
+
+#if MYTEST
+#ifdef RDEBUG
+  Print("Input'': ");
+  idPrint(s_h3);
+#endif  
+#endif
+
   j = IDELEMS(s_h1);
 
+
+#if MYTEST
+#ifdef RDEBUG
+  Print("Temp Result: ");
+  idPrint(s_h2);
+#endif  
+#endif
+
+  
   if (syz_ring!=orig_ring)
   {
     idDelete(&s_h1);
@@ -1608,6 +1686,17 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
   {
     s_h3->m[i] = prMoveR_NoSort(s_h3->m[i], syz_ring);
   }
+
+#if MYTEST
+#ifdef RDEBUG
+  Print("Output STD Ideal: ");
+  idPrint(s_h3);
+
+  Print("Output Matrix: ");
+  iiWriteMatrix(*ma, "ma", 2, 4);
+#endif  
+#endif
+  
 
   if (syz_ring!=orig_ring) rKill(syz_ring);
   verbose = save_verbose;
@@ -2327,13 +2416,13 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   }
   if (idIs0(h1)) return idInit(1,h1->rank);
 #ifdef HAVE_PLURAL
-  if (rIsPluralRing(currRing))
+  if (rIsPluralRing(origR))
     /* in the NC case, we have to check the admissibility of */
     /* the subalgebra to be intersected with */
   {
-    if (ncRingType(currRing)!=nc_skew) /* in (quasi)-commutative algebras every subalgebra is admissible */
+    if ((ncRingType(origR) != nc_skew) && (ncRingType(origR) != nc_exterior)) /* in (quasi)-commutative algebras every subalgebra is admissible */
     {
-      if (nc_CheckSubalgebra(delVar,currRing))
+      if (nc_CheckSubalgebra(delVar,origR))
       {
         WerrorS("no elimination is possible: subalgebra is not admissible");
         return idCopy(h1);
@@ -2361,8 +2450,8 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   }
   block0[0] = 1;
   block1[0] = rVar(origR);
-  wv[0]=(int*)omAlloc((pVariables+1)*sizeof(int));
-  memset(wv[0],0,(pVariables+1)*sizeof(int));
+  wv[0]=(int*)omAlloc((rVar(origR) + 1)*sizeof(int));
+  memset(wv[0],0,(rVar(origR) + 1)*sizeof(int));
   for (j=0;j<rVar(origR);j++)
     if (pGetExp(delVar,j+1)!=0) wv[0][j]=1;
   // use this special ordering: like ringorder_a, except that pFDeg, pWeights
@@ -2375,35 +2464,20 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   tmpR->block0 = block0;
   tmpR->block1 = block1;
   tmpR->wvhdl = wv;
+
   rComplete(tmpR, 1);
 
 #ifdef HAVE_PLURAL
   /* update nc structure on tmpR */
-  if (rIsPluralRing(currRing))
+  if (rIsPluralRing(origR))
   {
-    BOOLEAN bBAD = FALSE;
-    if ( nc_rComplete(origR, tmpR) )
+    if ( nc_rComplete(origR, tmpR, false) ) // no quotient ideal!
     {
       Werror("error in nc_rComplete");
-      bBAD = TRUE;
-    }
-    if (!bBAD)
-    {
-      /* tests the admissibility of the new elim. ordering */
-      if ( nc_CheckOrdCondition( tmpR->nc->D, tmpR) )
-      {
-        Werror("no elimination is possible: ordering condition is violated");
-        bBAD = TRUE;
-      }
-    }
-    if (bBAD)
-    {
       // cleanup
       rDelete(tmpR);
       if (w!=NULL)
-      {
         delete w;
-      }
       return idCopy(h1);
     }
   }

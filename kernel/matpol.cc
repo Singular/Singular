@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.13 2006-11-20 11:10:39 Singular Exp $ */
+/* $Id: matpol.cc,v 1.14 2008-06-10 10:17:32 motsak Exp $ */
 
 /*
 * ABSTRACT:
@@ -23,7 +23,7 @@
 #include "ring.h"
 #include "sparsmat.h"
 #include "matpol.h"
-
+#include "prCopy.h"
 
 //omBin ip_smatrix_bin = omGetSpecBin(sizeof(ip_smatrix));
 #define ip_smatrix_bin sip_sideal_bin
@@ -100,6 +100,46 @@ matrix mpCopy (matrix a)
   b->rank=a->rank;
   return b;
 }
+
+/*2
+*copies matrix a from rSrc into rDst
+*/
+matrix mpCopy(const matrix a, const ring rSrc, const ring rDst)
+{
+  const ring save = currRing;
+
+  if( save != currRing )
+    rChangeCurrRing(rSrc);
+
+  idTest((ideal)a);
+
+  rChangeCurrRing(rDst);
+
+  poly t;
+  int i, m=MATROWS(a), n=MATCOLS(a);
+
+  matrix b = mpNew(m, n);
+
+  for (i=m*n-1; i>=0; i--)
+  {
+    t = a->m[i];
+    if (t!=NULL)
+    {
+      b->m[i] = prCopyR_NoSort(t, rSrc, rDst);
+      p_Normalize(b->m[i], rDst);
+    }
+  }
+  b->rank=a->rank;
+
+  idTest((ideal)b);
+
+  if( save != currRing )
+    rChangeCurrRing(save);
+
+  return b;
+}
+
+
 
 /*2
 * make it a p * unit matrix
@@ -415,7 +455,7 @@ void mpRecMin(int ar,ideal result,int &elems,matrix a,int lr,int lc,
   {
 /*--- look for an optimal row and bring it to last position ------------*/
     if(mpPrepareRow(a,lr,lc)==0) break;
-/*--- now take all pivot´s from the last row ------------*/
+/*--- now take all pivots from the last row ------------*/
     k = lc;
     loop
     {
@@ -1876,3 +1916,7 @@ char * iiStringMatrix(matrix im, int dim,char ch)
   return s;
 }
 
+void   mpDelete(matrix* a, const ring r)
+{
+  id_Delete((ideal *) a, r);
+}

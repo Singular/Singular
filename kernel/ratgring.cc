@@ -6,7 +6,7 @@
  *  Purpose: Ore-noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: ratgring.cc,v 1.9 2008-01-31 13:23:25 Singular Exp $
+ *  Version: $Id: ratgring.cc,v 1.10 2008-06-10 10:17:32 motsak Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "ratgring.h"
@@ -378,7 +378,8 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
   poly HH = NULL;
   poly H  = NULL;
   HH = p_Copy(p_HeadRat(p1,is,r),r); // lm_D(g)
-  H  = r->nc->p_Procs.mm_Mult_p(m, p_Copy(HH, r), r); // d^aplha lm_D(g)
+//  H  = r->nc->p_Procs.mm_Mult_p(m, p_Copy(HH, r), r); // d^aplha lm_D(g)
+  H  = nc_mm_Mult_pp(m, HH, r); // d^aplha lm_D(g)
 
   poly K  = p_Copy( p_GetCoeffRat(H,  is, r), r);
   Print("k: "); p_wrp(K,r); PrintS("\n");
@@ -426,7 +427,9 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
 
   Print("k' t_f: "); p_wrp(p2,r);
 
-  out = r->nc->p_Procs.mm_Mult_p(m, out, r); // d^aplha t_g
+//  out = r->nc->p_Procs.mm_Mult_p(m, out, r); // d^aplha t_g
+  out = nc_mm_Mult_p(m, out, r); // d^aplha t_g  
+  
   p_Delete(&m,r);
 
   Print("d^a t_g: "); p_wrp(out,r);

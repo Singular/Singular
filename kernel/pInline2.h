@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.12 2007-03-10 15:41:49 levandov Exp $
+ *  Version: $Id: pInline2.h,v 1.13 2008-06-10 10:17:32 motsak Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -127,6 +127,23 @@ PINLINE2 unsigned long p_SubComp(poly p, unsigned long v, ring r)
   pPolyAssume2(__p_GetComp(p,r) >= v);
   return __p_GetComp(p,r) -= v;
 }
+PINLINE2 int p_Comp_k_n(poly a, poly b, int k, ring r)
+{
+  if ((a==NULL) || (b==NULL) ) return FALSE;
+  p_LmCheckPolyRing2(a, r);
+  p_LmCheckPolyRing2(b, r);
+  pAssume2(k > 0 && k <= r->N);
+  int i=k;
+  for(;i<=r->N;i++)
+  {
+    if (p_GetExp(a,i,r) != p_GetExp(b,i,r)) return FALSE;
+    //    if (a->exp[(r->VarOffset[i] & 0xffffff)] != b->exp[(r->VarOffset[i] & 0xffffff)]) return FALSE;
+  }
+  return TRUE;
+}
+
+
+#ifndef HAVE_EXPSIZES
 
 // exponent
 // r->VarOffset encodes the position in p->exp (lower 24 bits)
@@ -146,23 +163,10 @@ PINLINE2 int p_GetExp(poly p, int v, ring r)
           & r->bitmask);
 #endif
 }
+
 // partial compare exponent
 // r->VarOffset encodes the position in p->exp (lower 24 bits)
 // and number of bits to shift to the right in the upper 8 bits
-PINLINE2 int p_Comp_k_n(poly a, poly b, int k, ring r)
-{
-  if ((a==NULL) || (b==NULL) ) return FALSE;
-  p_LmCheckPolyRing2(a, r);
-  p_LmCheckPolyRing2(b, r);
-  pAssume2(k > 0 && k <= r->N);
-  int i=k;
-  for(;i<=r->N;i++)
-  {
-    if (p_GetExp(a,i,r) != p_GetExp(b,i,r)) return FALSE;
-    //    if (a->exp[(r->VarOffset[i] & 0xffffff)] != b->exp[(r->VarOffset[i] & 0xffffff)]) return FALSE;
-  }
-  return TRUE;
-}
 PINLINE2 int p_SetExp(poly p, int v, int e, ring r)
 {
   p_LmCheckPolyRing2(p, r);
@@ -181,6 +185,65 @@ PINLINE2 int p_SetExp(poly p, int v, int e, ring r)
   p->exp[ offset ] |= ee;
   return e;
 }
+
+#else // #ifdef HAVE_EXPSIZES
+
+inline int BitMask(int bitmask, int twobits)
+{
+  // bitmask = 00000111111111111
+  // 0 must give bitmask!
+  // 1, 2, 3 - anything like 00011..11
+  pAssume2((twobits >> 2) == 0);
+  const int _bitmasks[4] = {0xffffffff, 0x7fff, 0x7f, 0x3}; 
+  return bitmask & _bitmasks[twobits]; 
+}
+
+PINLINE2 int p_GetExp(poly p, int v, ring r)
+{
+  p_LmCheckPolyRing2(p, r);
+  pAssume2(v > 0 && v <= r->N);
+#if 1 // new!!
+  int pos  =(r->VarOffset[v] & 0xffffff);
+  int hbyte= (r->VarOffset[v] >> 24); // the highest byte
+  int bitpos = hbyte & 0x3f; // last 6 bits
+  int bitmask = BitMask(r->bitmask, hbyte >> 6); 
+
+  int exp=(p->exp[pos] >> bitpos) & bitmask;
+  return exp;
+#else
+  // old
+  return (int)
+      ((p->exp[(r->VarOffset[v] & 0xffffff)] >> (r->VarOffset[v] >> 24))
+       & r->bitmask;
+#endif
+}
+
+
+// partial compare exponent
+// r->VarOffset encodes the position in p->exp (lower 24 bits)
+// and number of bits to shift to the right in the upper 8 bits
+PINLINE2 int p_SetExp(poly p, int v, int e, ring r)
+{
+  p_LmCheckPolyRing2(p, r);
+  pAssume2(v>0 && v <= r->N);
+  pAssume2(e>=0);
+  pAssume2((unsigned int) e <= BitMask(r->bitmask, r->VarOffset[v] >> 30));
+
+  // shift e to the left:
+  register int hbyte = r->VarOffset[v] >> 24;
+  int bitmask = BitMask(r->bitmask, hbyte >> 6);
+  register int shift = hbyte & 0x3f;
+  unsigned long ee = ((unsigned long)e) << shift;
+  // find the bits in the exponent vector
+  register int offset = (r->VarOffset[v] & 0xffffff);
+  // clear the bits in the exponent vector:
+  p->exp[offset]  &= ~( bitmask << shift );
+  // insert e with |
+  p->exp[ offset ] |= ee;
+  return e;
+}
+
+#endif // #ifndef HAVE_EXPSIZES
 
 // the following should be implemented more efficiently
 PINLINE2  int p_IncrExp(poly p, int v, ring r)

@@ -3,22 +3,34 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.20 2007-02-16 11:07:10 motsak Exp $ */
+/* $Id: gring.h,v 1.21 2008-06-10 10:17:31 motsak Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
 
 #ifdef HAVE_PLURAL
 
+
 #include <structs.h>
 #include <ring.h>
 
-/* the part, related to the interface */
-BOOLEAN nc_CallPlural(matrix CC, matrix DD, poly CN, poly DN, ring r);
+// the part, related to the interface
+// Changes r, Assumes that all other input belongs to currRing
+BOOLEAN nc_CallPlural(matrix CC, matrix DD, poly CN, poly DN, ring r,
+                      bool bSetupQuotient = false,
+                      bool bCopyInput = true,
+                      bool bBeQuiet = false,
+                      ring curr = currRing);
 
-BOOLEAN nc_CheckOrdCondition(matrix D, ring r);
+// BOOLEAN nc_CheckOrdCondition(matrix D, ring r);
+// BOOLEAN nc_CheckOrdCondition(ring r); // with D == r->GetNC()->D
+
 BOOLEAN nc_CheckSubalgebra(poly PolyVar, ring r);
-BOOLEAN nc_InitMultiplication(ring r); // should call nc_p_ProcsSet!
+
+// BOOLEAN nc_InitMultiplication(ring r); // should call nc_p_ProcsSet!
+// NOTE: instead of constructing nc_struct and calling nc_InitMultiplication yourself - just create C, D and call nc_CallPlural!!!
+
+
 BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate);
 
 
@@ -28,7 +40,7 @@ void nc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs);
 
 // this function should be used inside QRing definition!
 // we go from rG into factor ring rGR with factor ideal rGR->qideal.
-bool nc_SetupQuotient(ring rGR, const ring rG);
+bool nc_SetupQuotient(ring rGR, const ring rG = NULL); // rG == NULL means that there is no base G-algebra
 
 
 // used by "rSum" from ring.cc only! 
@@ -36,9 +48,17 @@ bool nc_SetupQuotient(ring rGR, const ring rG);
 // "creates a commutative nc extension; "converts" comm.ring to a Plural ring"
 ring nc_rCreateNCcomm(ring r); 
 
-void ncCleanUp(ring r); /* smaller than kill */
-void ncKill(ring r);
+void ncCleanUp(nc_struct* p); // just free memory!
+void ncCleanUp(ring r); // smaller than kill: just free mem
+void ncKill(ring r); // complete destructor
 
+BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient = true); // in ring.cc
+
+
+// share the same nc-structure with a new copy ``res'' of ``r''.
+// used by rCopy only.
+// additionally inits multipication on ``res''!
+void nc_rCopy0(ring res, const ring r);
 
 // for p_Minus_mm_Mult_qq in pInline2.h
 poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp,
@@ -89,23 +109,40 @@ ideal idOppose(ring Rop, ideal I);
 
 
 
+
+// returns the LCM of the head terms of a and b with given component
+poly p_Lcm(const poly a, const poly b, const long lCompM, const ring r);
+
+// returns the LCM of the head terms of a and b with component = max comp. of a & b
+poly p_Lcm(const poly a, const poly b, const ring r);
+
+
+
 // //////////////////////////////////////////////////////////////////////// //
 // NC inlines
 
-
-
-inline void ncRingType(ring r, nc_type t)
+inline nc_type& ncRingType(nc_struct* p)
 {
-  assume((r != NULL) && (r->nc != NULL));
-  r->nc->type = t;
+  assume(p!=NULL);
+  return (p->type);
 };
 
-inline nc_type ncRingType(ring r)
+inline nc_type& ncRingType(ring r) // get and set
 {
   assume(rIsPluralRing(r));
-
-  return (r->nc->type);
+  return (ncRingType(r->GetNC()));
 };
+
+inline void ncRingType(ring r, nc_type t) // Set
+{
+  assume((r != NULL) && (r->GetNC() != NULL));
+  ncRingType(r) = t;
+};
+
+inline nc_struct*& GetNC(ring r)
+{
+  return r->GetNC();
+}; 
 
 
 
@@ -116,8 +153,8 @@ inline nc_type ncRingType(ring r)
 inline poly nc_mm_Mult_pp(const poly m, const poly p, const ring r)
 {
   assume(rIsPluralRing(r));
-  assume(r->nc->p_Procs.mm_Mult_pp!=NULL);
-  return r->nc->p_Procs.mm_Mult_pp(m, p, r);
+  assume(r->GetNC()->p_Procs.mm_Mult_pp!=NULL);
+  return r->GetNC()->p_Procs.mm_Mult_pp(m, p, r);
 //  return pp_Mult_mm( p, m, r);
 }
 
@@ -126,31 +163,34 @@ inline poly nc_mm_Mult_pp(const poly m, const poly p, const ring r)
 inline poly nc_mm_Mult_p(const poly m, poly p, const ring r)
 {
   assume(rIsPluralRing(r));
-  assume(r->nc->p_Procs.mm_Mult_p!=NULL);
-  return r->nc->p_Procs.mm_Mult_p(m, p, r);
+  assume(r->GetNC()->p_Procs.mm_Mult_p!=NULL);
+  return r->GetNC()->p_Procs.mm_Mult_p(m, p, r);
 //   return p_Mult_mm( p, m, r);
 }
 
 inline poly nc_CreateSpoly(const poly p1, const poly p2, const ring r)
 {
   assume(rIsPluralRing(r));
-  assume(r->nc->p_Procs.SPoly!=NULL);
-  return r->nc->p_Procs.SPoly(p1, p2, r);
+  assume(r->GetNC()->p_Procs.SPoly!=NULL);
+  return r->GetNC()->p_Procs.SPoly(p1, p2, r);
 }
 
 inline poly nc_ReduceSpoly(const poly p1, poly p2, const ring r)
 {
   assume(rIsPluralRing(r));
-  assume(r->nc->p_Procs.ReduceSPoly!=NULL);
-  return r->nc->p_Procs.ReduceSPoly(p1, p2, r);
+  assume(r->GetNC()->p_Procs.ReduceSPoly!=NULL);
+#ifdef PDEBUG
+//  assume(p_LmDivisibleBy(p1, p2, r));
+#endif
+  return r->GetNC()->p_Procs.ReduceSPoly(p1, p2, r);
 }
 
 /*
 inline void nc_PolyReduce(poly &b, const poly p, number *c, const ring r) // nc_PolyPolyRed
 {
   assume(rIsPluralRing(r));
-//  assume(r->nc->p_Procs.PolyReduce!=NULL);
-//  r->nc->p_Procs.PolyReduce(b, p, c, r);
+//  assume(r->GetNC()->p_Procs.PolyReduce!=NULL);
+//  r->GetNC()->p_Procs.PolyReduce(b, p, c, r);
 }
 */
 
@@ -160,8 +200,8 @@ inline void nc_kBucketPolyRed(kBucket_pt b, poly p, number *c)
 
 //   return gnc_kBucketPolyRedNew(b, p, c);
 
-  assume(currRing->nc->p_Procs.BucketPolyRed!=NULL);
-  return currRing->nc->p_Procs.BucketPolyRed(b, p, c);
+  assume(currRing->GetNC()->p_Procs.BucketPolyRed!=NULL);
+  return currRing->GetNC()->p_Procs.BucketPolyRed(b, p, c);
 }
 
 inline void nc_BucketPolyRed_Z(kBucket_pt b, poly p, number *c)
@@ -170,8 +210,8 @@ inline void nc_BucketPolyRed_Z(kBucket_pt b, poly p, number *c)
 
 //   return gnc_kBucketPolyRed_ZNew(b, p, c);
 
-  assume(currRing->nc->p_Procs.BucketPolyRed_Z!=NULL);
-  return currRing->nc->p_Procs.BucketPolyRed_Z(b, p, c);
+  assume(currRing->GetNC()->p_Procs.BucketPolyRed_Z!=NULL);
+  return currRing->GetNC()->p_Procs.BucketPolyRed_Z(b, p, c);
 
 }
 
@@ -179,18 +219,18 @@ inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const intvec *
 {
   assume(rIsPluralRing(currRing));
 
-  assume(currRing->nc->p_Procs.GB!=NULL);
-  return currRing->nc->p_Procs.GB(F, Q, w, hilb, strat);
+  assume(currRing->GetNC()->p_Procs.GB!=NULL);
+  return currRing->GetNC()->p_Procs.GB(F, Q, w, hilb, strat);
 
 /*
   if (pOrdSgn==-1)
   {
-    assume(currRing->nc->p_Procs.LocalGB!=NULL);
-    return currRing->nc->p_Procs.LocalGB(F, Q, w, hilb, strat);
+    assume(currRing->GetNC()->p_Procs.LocalGB!=NULL);
+    return currRing->GetNC()->p_Procs.LocalGB(F, Q, w, hilb, strat);
   } else
   {
-    assume(currRing->nc->p_Procs.GlobalGB!=NULL);
-    return currRing->nc->p_Procs.GlobalGB(F, Q, w, hilb, strat);
+    assume(currRing->GetNC()->p_Procs.GlobalGB!=NULL);
+    return currRing->GetNC()->p_Procs.GlobalGB(F, Q, w, hilb, strat);
   }
 */
 }
@@ -204,6 +244,7 @@ inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const intvec *
 
 // we need nc_gr_initBba for sca_gr_bba and gr_bba.
 void nc_gr_initBba(ideal F,kStrategy strat); 
+BOOLEAN gnc_InitMultiplication(ring r, bool bSetupQuotient = false); // just for a moment
 
 #endif // PLURAL_INTERNAL_DECLARATIONS
 

@@ -6,8 +6,11 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.15 2008-05-15 17:24:36 motsak Exp $
+ *  Version: $Id: sca.cc,v 1.16 2008-06-10 10:17:33 motsak Exp $
  *******************************************************************/
+
+#define OM_CHECK 4
+#define OM_TRACK 5
 
 // #define PDEBUG 2
 #include "mod2.h"
@@ -16,6 +19,7 @@
 // for
 #define PLURAL_INTERNAL_DECLARATIONS
 #include "sca.h"
+#include "gring.h"
 
 
 #include "febase.h"
@@ -383,7 +387,7 @@ poly sca_p_Mult_mm(poly pPoly, const poly pMonom, const ring rRing)
 #ifdef PDEBUG
       if(iComponentMonomM==0 )
       {
-        WarnS("Multiplication in the left module from the right");
+        WarnS("sca_p_Mult_mm: Multiplication in the left module from the right");
       }
 #endif
     }
@@ -465,7 +469,7 @@ poly sca_pp_Mult_mm(const poly pPoly, const poly pMonom, const ring rRing, poly 
 #ifdef PDEBUG
       if(iComponentMonomM==0 )
       {
-        WarnS("Multiplication in the left module from the right");
+        WarnS("sca_pp_Mult_mm: Multiplication in the left module from the right");
       }
 #endif
     }
@@ -575,7 +579,10 @@ poly sca_mm_Mult_pp(const poly pMonom, const poly pPoly, const ring rRing)
 #ifdef PDEBUG
       if(iComponent==0 )
       {
-        WarnS("Multiplication in the left module from the right");
+        WarnS("sca_mm_Mult_pp: Multiplication in the left module from the right!");
+//        PrintS("mm = "); p_Write(pMonom, rRing);
+//        PrintS("pp = "); p_Write(pPoly, rRing);
+//        assume(iComponent!=0);        
       }
 #endif
     }
@@ -636,7 +643,7 @@ poly sca_mm_Mult_p(const poly pMonom, poly pPoly, const ring rRing) // !!!!! the
 
     if( iComponentMonomM!=0 )
     {
-      if( iComponent!=0 ) // TODO: make global if on iComponentMonomM =?= 0
+      if( iComponent!=0 ) 
       {
         // REPORT_ERROR
         Werror("sca_mm_Mult_p: exponent mismatch %d and %d\n", iComponent, iComponentMonomM);
@@ -646,9 +653,12 @@ poly sca_mm_Mult_p(const poly pMonom, poly pPoly, const ring rRing) // !!!!! the
         return NULL;
       }
 #ifdef PDEBUG
-      if(iComponent==0 )
+      if(iComponent==0)
       {
-        WarnS("Multiplication in the left module from the right");
+        WarnS("sca_mm_Mult_p: Multiplication in the left module from the right!");
+//        PrintS("mm = "); p_Write(pMonom, rRing);
+//        PrintS("p = "); p_Write(pPoly, rRing);
+//        assume(iComponent!=0);        
       }
 #endif
     }
@@ -699,34 +709,6 @@ poly sca_mm_Mult_p(const poly pMonom, poly pPoly, const ring rRing) // !!!!! the
 //-----------------------------------------------------------------------------------//
 
 // GB computation routines:
-
-/*2
-* returns the LCM of the head terms of a and b
-*/
-inline poly p_Lcm(const poly a, const poly b, const long lCompM, const ring r)
-{
-  poly m = p_ISet(1, r);
-
-  const int N = r->N;
-
-  for (int i = N; i>0; i--)
-  {
-    const int lExpA = p_GetExp (a, i, r);
-    const int lExpB = p_GetExp (b, i, r);
-
-    p_SetExp (m, i, si_max(lExpA, lExpB), r);
-  }
-
-  p_SetComp (m, lCompM, r);
-
-  p_Setm(m,r);
-
-#ifdef PDEBUG
-  p_Test(m,r);
-#endif
-
-  return(m);
-}
 
 /*4
 * creates the S-polynomial of p1 and p2
@@ -969,12 +951,13 @@ void addLObject(LObject& h, kStrategy& strat)
 
 #endif
 
+#define OUTPUT 0
 
 
 ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat)
 {
 #if MYTEST
-   PrintS("<sca_gr_bba>\n");
+//   PrintS("<sca_gr_bba>\n");
 #endif
 
   assume(rIsSCA(currRing));
@@ -984,6 +967,22 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   idTest(Q);
 #endif
 
+#ifdef HAVE_PLURAL
+#if MYTEST
+  PrintS("currRing: \n");
+  rWrite(currRing);
+#ifdef RDEBUG
+  rDebugPrint(currRing);
+#endif
+
+  PrintS("F: \n");
+  idPrint(F);  
+  PrintS("Q: \n");  
+  idPrint(Q);
+#endif
+#endif
+
+  
   const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
   const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
 
@@ -991,7 +990,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   ideal tempQ = Q;
 
   if(Q == currQuotient)
-    tempQ = currRing->nc->SCAQuotient();
+    tempQ = SCAQuotient(currRing);
 
   bool bIdHomog = id_IsSCAHomogeneous(tempF, NULL, NULL, currRing); // wCx == wCy == NULL!
 
@@ -999,24 +998,16 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 
   strat->homog = strat->homog && bIdHomog;
 
-
   assume( strat->homog == bIdHomog );
 
-
 #if MYTEST
-/*
   {
-    Print("ideal F: \n");
-    idPrint(F);
     Print("ideal tempF: \n");
-    idPrint(F);
+    idPrint(tempF);
+    Print("ideal tempQ: \n");
+    idPrint(tempQ);
   }
-*/
 #endif
-
-
-
-
 
   int srmax, lrmax;
   int olddeg, reduc;
@@ -1033,7 +1024,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 
   // ?? set spSpolyShort, reduce ???
 
-  initBuchMora(tempF, tempQ, strat); // currRing->nc->SCAQuotient() instead of Q == squares!!!!!!!
+  initBuchMora(tempF, tempQ, strat); // SCAQuotient(currRing) instead of Q == squares!!!!!!!
 
   strat->posInT=posInT110; // !!!
 
@@ -1075,14 +1066,16 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 
     //kTest(strat);
 
-    assume(pNext(strat->P.p) != strat->tail);
+//    assume(pNext(strat->P.p) != strat->tail); // !???
+    if(strat->P.IsNull()) continue;
 
-//     if( pNext(strat->P.p) == strat->tail )
-//     {
-//       // deletes the int spoly and computes SPoly
-//       pLmFree(strat->P.p); // ???
-//       strat->P.p = sca_SPoly(strat->P.p1, strat->P.p2, currRing);
-//     }
+    
+    if( pNext(strat->P.p) == strat->tail )
+    {
+      // deletes the int spoly and computes SPoly
+      pLmFree(strat->P.p); // ???
+      strat->P.p = nc_CreateSpoly(strat->P.p1, strat->P.p2, currRing);
+    }
 
     if(strat->P.IsNull()) continue;
 
@@ -1221,7 +1214,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 
 
 #if MYTEST
-   PrintS("</sca_gr_bba>\n");
+//   PrintS("</sca_gr_bba>\n");
 #endif
 
   return (strat->Shdl);
@@ -1235,44 +1228,61 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 //
 // if yes, make rGR a super-commutative algebra!
 // NOTE: Factors of SuperCommutative Algebras are supported this way!
-bool sca_SetupQuotient(ring rGR, const ring rG)
+//
+//  rG == NULL means that there is no separate base G-algebra in this case take rGR == rG
+bool sca_SetupQuotient(ring rGR, ring rG)
 {
 //   return false; // test Plural
 
   //////////////////////////////////////////////////////////////////////////
   // checks...
   //////////////////////////////////////////////////////////////////////////
+  if( rG == NULL ) 
+    rG = rGR;
+
   assume(rGR != NULL);
   assume(rG  != NULL);
-
   assume(rIsPluralRing(rG));
+  
+
+#if MYTEST
+   PrintS("sca_SetupQuotient(rGR, rG)");
+#endif
 
   const int N = rG->N;
 
   if(N < 2)
     return false;
 
-#if MYTEST
-   PrintS("sca_SetupQuotient(rGR, rG)");
-#endif
-
-
+  
 //  if( (ncRingType(rG) != nc_skew) || (ncRingType(rG) != nc_comm) )
 //    return false;
+
+#if OUTPUT
+  PrintS("sca_SetupQuotient: qring?\n");
+#endif
 
   if(rGR->qideal == NULL) // there will be a factor!
     return false;
 
-  if(rG->qideal != NULL) // we cannot change from factor to factor!
+#if OUTPUT
+  PrintS("sca_SetupQuotient: qideal!!!\n");
+#endif
+  
+  if((rG->qideal != NULL) && (rG != rGR) ) // we cannot change from factor to factor at the time, sorry!
     return false;
 
 
   int iAltVarEnd = -1;
   int iAltVarStart   = N+1;
 
-  const ring rBase = rG->nc->basering;
-  const matrix C   = rG->nc->C; // live in rBase!
+  const ring rBase = rG->GetNC()->basering;
+  const matrix C   = rG->GetNC()->C; // live in rBase!
 
+#if OUTPUT
+  PrintS("sca_SetupQuotient: AltVars?!\n");
+#endif
+  
   for(int i = 1; i < N; i++)
   {
     for(int j = i + 1; j <= N; j++)
@@ -1291,6 +1301,9 @@ bool sca_SetupQuotient(ring rGR, const ring rG)
       {
         if( !n_IsOne(c, rBase) )
         {
+#if OUTPUT
+          Print("Wrong Coeff at: [%d, %d]\n", i, j);
+#endif
 #if MYTEST
            Print("Wrong Coeff at: [%d, %d]\n", i, j);
 #endif
@@ -1300,9 +1313,15 @@ bool sca_SetupQuotient(ring rGR, const ring rG)
     }
   }
 
+#if MYTEST
+  Print("AltVars?1: [%d, %d]\n", iAltVarStart, iAltVarEnd);
+#endif
+
+  
   if( (iAltVarEnd == -1) || (iAltVarStart == (N+1)) )
     return false; // either no alternating varables, or a single one => we are in commutative case!
 
+  
   for(int i = 1; i < N; i++)
   {
     for(int j = i + 1; j <= N; j++)
@@ -1314,6 +1333,12 @@ bool sca_SetupQuotient(ring rGR, const ring rG)
       { // anticommutative part
         if( !n_IsMOne(c, rBase) )
         {
+#ifdef PDEBUG
+#if OUTPUT
+           Print("Wrong Coeff at: [%d, %d]\n", i, j);
+#endif
+#endif
+
 #if MYTEST
            Print("Wrong Coeff at: [%d, %d]\n", i, j);
 #endif
@@ -1323,6 +1348,11 @@ bool sca_SetupQuotient(ring rGR, const ring rG)
       { // should commute
         if( !n_IsOne(c, rBase) )
         {
+#ifdef PDEBUG
+#if OUTPUT
+          Print("Wrong Coeff at: [%d, %d]\n", i, j);
+#endif
+#endif
 #if MYTEST
            Print("Wrong Coeff at: [%d, %d]\n", i, j);
 #endif
@@ -1332,9 +1362,15 @@ bool sca_SetupQuotient(ring rGR, const ring rG)
     }
   }
 
+#if MYTEST
+  Print("AltVars!?: [%d, %d]\n", iAltVarStart, iAltVarEnd);
+#endif
+
   assume( 1            <= iAltVarStart );
   assume( iAltVarStart < iAltVarEnd   );
   assume( iAltVarEnd   <= N            );
+
+
 
   bool bWeChangeRing = false;
   // for sanity
@@ -1346,11 +1382,19 @@ bool sca_SetupQuotient(ring rGR, const ring rG)
     bWeChangeRing = true;
   }
 
+  
   assume(rGR->qideal != NULL);
-  assume(rG->qideal == NULL);
+//  assume(rG->qideal == NULL); // ?
 
   const ideal idQuotient = rGR->qideal;
 
+
+#if MYTEST
+  Print("Analyzing quotient ideal:\n");
+  idPrint(idQuotient); // in rG!!!
+#endif
+
+  
   // check for
   // y_{iAltVarStart}^2, y_{iAltVarStart+1}^2, \ldots, y_{iAltVarEnd}^2  (iAltVarEnd > iAltVarStart)
   // to be within quotient ideal.
@@ -1359,18 +1403,18 @@ bool sca_SetupQuotient(ring rGR, const ring rG)
 
   for ( int i = iAltVarStart; (i <= iAltVarEnd) && bSCA; i++ )
   {
-    poly square = p_ISet(1, rSaveRing);
-    p_SetExp(square, i, 2, rSaveRing); // square = var(i)^2.
-    p_Setm(square, rSaveRing);
+    poly square = p_ISet(1, rG);
+    p_SetExp(square, i, 2, rG); // square = var(i)^2.
+    p_Setm(square, rG);
 
     // square = NF( var(i)^2 | Q )
     // NOTE: rSaveRing == currRing now!
     // NOTE: there is no better way to check this in general!
-    square = kNF(idQuotient, NULL, square, 0, 0);
+    square = kNF(idQuotient, NULL, square, 0, 0); // must ran in currRing == rG!
 
     if( square != NULL ) // var(i)^2 is not in Q?
     {
-      p_Delete(&square, rSaveRing);
+      p_Delete(&square, rG);
       bSCA = false;
     }
   }
@@ -1384,11 +1428,12 @@ bool sca_SetupQuotient(ring rGR, const ring rG)
   if(!bSCA) return false;
 
 
-
-#if MYTEST
-  Print("AltVars: [%d, %d]\n", iAltVarStart, iAltVarEnd);
+#ifdef PDEBUG
+#if OUTPUT
+  Print("ScaVars!: [%d, %d]\n", iAltVarStart, iAltVarEnd);
 #endif
-
+#endif
+  
 
   //////////////////////////////////////////////////////////////////////////
   // ok... here we go. let's setup it!!!
@@ -1398,9 +1443,9 @@ bool sca_SetupQuotient(ring rGR, const ring rG)
   idSkipZeroes( tempQ );
 
   if( idIs0(tempQ) )
-    rGR->nc->SCAQuotient() = NULL;
+    rGR->GetNC()->SCAQuotient() = NULL;
   else
-    rGR->nc->SCAQuotient() = idrMoveR(tempQ, rG, rGR); // deletes tempQ!
+    rGR->GetNC()->SCAQuotient() = idrMoveR(tempQ, rG, rGR); // deletes tempQ!
 
   ncRingType( rGR, nc_exterior );
 
@@ -1408,8 +1453,7 @@ bool sca_SetupQuotient(ring rGR, const ring rG)
   scaLastAltVar( rGR, iAltVarEnd );
 
 
-  sca_p_ProcsSet(rGR, rGR->p_Procs);
-
+  nc_p_ProcsSet(rGR, rGR->p_Procs); // !!!!!!!!!!!!!!!!!
 
   return true;
 }
@@ -1439,9 +1483,9 @@ bool sca_ForceCommutative(ring rGR, int b, int e)
   idSkipZeroes( tempQ );
 
   if( idIs0(tempQ) )
-    rGR->nc->SCAQuotient() = NULL;
+    rGR->GetNC()->SCAQuotient() = NULL;
   else
-    rGR->nc->SCAQuotient() = tempQ;
+    rGR->GetNC()->SCAQuotient() = tempQ;
   
   ncRingType( rGR, nc_exterior );
 
@@ -1449,7 +1493,7 @@ bool sca_ForceCommutative(ring rGR, int b, int e)
   scaLastAltVar( rGR, e );
 
 
-  sca_p_ProcsSet(rGR, rGR->p_Procs);
+  nc_p_ProcsSet(rGR, rGR->p_Procs);
 
   if(rSaveRing != rGR)
     rChangeCurrRing(rSaveRing);
@@ -1499,7 +1543,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
   ideal tempQ = Q;
 
   if(Q == currQuotient)
-    tempQ = currRing->nc->SCAQuotient();
+    tempQ = SCAQuotient(currRing);
 
   // Q or tempQ will not be used below :(((
 
@@ -1602,13 +1646,21 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
     strat->Ll--;
 
 
-    assume(pNext(strat->P.p) != strat->tail);
+//    assume(pNext(strat->P.p) != strat->tail);
 
-/*    if (pNext(strat->P.p) == strat->tail)
+    if(strat->P.IsNull()) continue;
+
+    if (pNext(strat->P.p) == strat->tail)
     {
       // deletes the short spoly
       pLmFree(strat->P.p);
+
+      strat->P.p = nc_CreateSpoly(strat->P.p1, strat->P.p2, currRing);
+
+/*      
       strat->P.p = NULL;
+
+
       poly m1 = NULL, m2 = NULL;
 
       // check that spoly creation is ok
@@ -1628,8 +1680,8 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
       // create the real one
       ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
                     strat->tailRing, m1, m2, strat->R); //?????????
-    }
-    else */
+*/                    
+    }//    else
 
     if (strat->P.p1 == NULL)
     {
@@ -1919,7 +1971,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
   ideal tempQ = Q;
 
   if(Q == currQuotient)
-    tempQ = currRing->nc->SCAQuotient();
+    tempQ = SCAQuotient(currRing);
 
   bool bIdHomog = id_IsSCAHomogeneous(tempF, NULL, NULL, currRing); // wCx == wCy == NULL!
 
@@ -2027,7 +2079,19 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
     strat->Ll--;
 
     // create the real Spoly
-    assume(pNext(strat->P.p) != strat->tail);
+//    assume(pNext(strat->P.p) != strat->tail);
+
+    if(strat->P.IsNull()) continue;
+
+
+    if( pNext(strat->P.p) == strat->tail )
+    {
+      // deletes the int spoly and computes SPoly
+      pLmFree(strat->P.p); // ???
+      strat->P.p = nc_CreateSpoly(strat->P.p1, strat->P.p2, currRing);
+    }
+    
+    
 
     if (strat->P.p1 == NULL)
     {
@@ -2202,8 +2266,8 @@ void sca_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
   p_Procs->pp_Mult_mm         = sca_pp_Mult_mm;
 
   // non-commutaitve
-  rGR->nc->p_Procs.mm_Mult_p   = sca_mm_Mult_p;
-  rGR->nc->p_Procs.mm_Mult_pp  = sca_mm_Mult_pp;
+  rGR->GetNC()->p_Procs.mm_Mult_p   = sca_mm_Mult_p;
+  rGR->GetNC()->p_Procs.mm_Mult_pp  = sca_mm_Mult_pp;
 
 
   if (rGR->OrdSgn==-1)
@@ -2211,23 +2275,23 @@ void sca_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
 #ifdef PDEBUG
 //           Print("Local case => GB == mora!\n");
 #endif
-    rGR->nc->p_Procs.GB          = sca_mora; // local ordering => Mora, otherwise - Buchberger!
+    rGR->GetNC()->p_Procs.GB          = sca_mora; // local ordering => Mora, otherwise - Buchberger!
   }
   else
   {
 #ifdef PDEBUG
 //           Print("Global case => GB == bba!\n");
 #endif
-    rGR->nc->p_Procs.GB          = sca_gr_bba; // sca_bba?
+    rGR->GetNC()->p_Procs.GB          = sca_bba; // sca_gr_bba; // sca_bba? // sca_bba;
   }
 
 
-//   rGR->nc->p_Procs.GlobalGB    = sca_gr_bba;
-//   rGR->nc->p_Procs.LocalGB     = sca_mora;
+//   rGR->GetNC()->p_Procs.GlobalGB    = sca_gr_bba;
+//   rGR->GetNC()->p_Procs.LocalGB     = sca_mora;
 
 
-//   rGR->nc->p_Procs.SPoly         = sca_SPoly;
-//   rGR->nc->p_Procs.ReduceSPoly   = sca_ReduceSpoly;
+//   rGR->GetNC()->p_Procs.SPoly         = sca_SPoly;
+//   rGR->GetNC()->p_Procs.ReduceSPoly   = sca_ReduceSpoly;
 
 #if 0
 
@@ -2239,17 +2303,17 @@ void sca_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
         p_Procs->pp_Mult_mm  = sca_pp_Mult_mm;
         _p_procs->pp_Mult_mm = sca_pp_Mult_mm;
 
-        r->nc->mmMultP()     = sca_mm_Mult_p;
-        r->nc->mmMultPP()    = sca_mm_Mult_pp;
+        r->GetNC()->mmMultP()     = sca_mm_Mult_p;
+        r->GetNC()->mmMultPP()    = sca_mm_Mult_pp;
 
-        r->nc->GB()            = sca_gr_bba;
+        r->GetNC()->GB()            = sca_gr_bba;
 /*
         // ??????????????????????????????????????? coefficients swell...
-        r->nc->SPoly()         = sca_SPoly;
-        r->nc->ReduceSPoly()   = sca_ReduceSpoly;
+        r->GetNC()->SPoly()         = sca_SPoly;
+        r->GetNC()->ReduceSPoly()   = sca_ReduceSpoly;
 */
-//         r->nc->BucketPolyRed() = gnc_kBucketPolyRed;
-//         r->nc->BucketPolyRed_Z()= gnc_kBucketPolyRed_Z;
+//         r->GetNC()->BucketPolyRed() = gnc_kBucketPolyRed;
+//         r->GetNC()->BucketPolyRed_Z()= gnc_kBucketPolyRed_Z;
 
 #endif
 }

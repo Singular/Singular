@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.34 2008-03-20 11:22:44 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.35 2008-06-10 10:17:31 motsak Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1958,12 +1958,35 @@ poly kNF(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
      return NULL;
   kStrategy strat=new skStrategy;
   strat->syzComp = syzComp;
+
+  poly pp = p;
+  
+#ifdef HAVE_PLURAL
+  if(rIsSCA(currRing))
+  {
+    const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
+    const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
+    pp = p_KillSquares(pp, m_iFirstAltVar, m_iLastAltVar, currRing);
+
+    if(Q == currQuotient)
+      Q = SCAQuotient(currRing);
+  }
+#endif
+  
+  poly res;
+
   if (pOrdSgn==-1)
-    p=kNF1(F,Q,p,strat,lazyReduce);
+    res=kNF1(F,Q,pp,strat,lazyReduce);
   else
-    p=kNF2(F,Q,p,strat,lazyReduce);
+    res=kNF2(F,Q,pp,strat,lazyReduce);
   delete(strat);
-  return p;
+
+#ifdef HAVE_PLURAL
+  if(pp != p)
+    p_Delete(&pp, currRing);
+#endif
+  
+  return res;
 }
 
 ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
@@ -1975,11 +1998,32 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
   }
   kStrategy strat=new skStrategy;
   strat->syzComp = syzComp;
+
+  ideal pp = p;
+#ifdef HAVE_PLURAL
+  if(rIsSCA(currRing))
+  {
+    const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
+    const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
+    pp = id_KillSquares(pp, m_iFirstAltVar, m_iLastAltVar, currRing);
+
+    if(Q == currQuotient)
+      Q = SCAQuotient(currRing);
+  }
+#endif
+
   if (pOrdSgn==-1)
-    res=kNF1(F,Q,p,strat,lazyReduce);
+    res=kNF1(F,Q,pp,strat,lazyReduce);
   else
-    res=kNF2(F,Q,p,strat,lazyReduce);
+    res=kNF2(F,Q,pp,strat,lazyReduce);
   delete(strat);
+
+#ifdef HAVE_PLURAL
+  if(pp != p)
+    id_Delete(&pp, currRing);
+#endif
+
+  
   return res;
 }
 
@@ -2243,10 +2287,10 @@ ideal kInterRed (ideal F, ideal Q)
     tempF = id_KillSquares(F, m_iFirstAltVar, m_iLastAltVar, currRing);
 
     // this should be done on the upper level!!! :
-    //    tempQ = currRing->nc->SCAQuotient();
+    //    tempQ = SCAQuotient(currRing);
 
     if(Q == currQuotient)
-      tempQ = currRing->nc->SCAQuotient();
+      tempQ = SCAQuotient(currRing);
   }
 #endif
 

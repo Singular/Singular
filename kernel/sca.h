@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sca.h,v 1.11 2008-05-15 17:24:37 motsak Exp $ */
+/* $Id: sca.h,v 1.12 2008-06-10 10:17:33 motsak Exp $ */
 
 #include <ring.h>
 #include <gring.h>
@@ -31,7 +31,7 @@ inline ideal SCAQuotient(const ring r)
 
   // SCA!
 #ifdef HAVE_PLURAL
-  return r->nc->SCAQuotient();
+  return r->GetNC()->SCAQuotient();
 #else
   // for sainity
   return NULL;
@@ -47,14 +47,14 @@ inline unsigned int scaFirstAltVar(ring r)
 {
   assume(rIsSCA(r));
 
-  return (r->nc->FirstAltVar());
+  return (r->GetNC()->FirstAltVar());
 };
 
 inline unsigned int scaLastAltVar(ring r)
 {
   assume(rIsSCA(r));
 
-  return (r->nc->LastAltVar());
+  return (r->GetNC()->LastAltVar());
 };
 
 
@@ -63,14 +63,14 @@ inline void scaFirstAltVar(ring r, int n)
 {
   assume(rIsSCA(r));
 
-  r->nc->FirstAltVar() = n;
+  r->GetNC()->FirstAltVar() = n;
 };
 
 inline void scaLastAltVar(ring r, int n)
 {
   assume(rIsSCA(r));
 
-  r->nc->LastAltVar() = n;
+  r->GetNC()->LastAltVar() = n;
 };
 
 
@@ -183,12 +183,14 @@ bool sca_ForceCommutative(ring rGR, int b, int e);
 
 // should be used only inside nc_SetupQuotient!
 // Check whether this our case:
-//  1. rG is  a commutative polynomial ring \otimes anticommutative algebra
+//  1. rG is  a commutative polynomial ring \otimes anticommutative algebra 
 //  2. factor ideal rGR->qideal contains squares of all alternating variables.
 // 
 // if yes, make rGR a super-commutative algebra!
 // NOTE: Factors of SuperCommutative Algebras are supported this way!
-bool sca_SetupQuotient(ring rGR, const ring rG);
+//
+//  rG == NULL means that there is no separate base G-algebra in this case take rGR == rG
+bool sca_SetupQuotient(ring rGR, ring rG);
 
 #endif // PLURAL_INTERNAL_DECLARATIONS
 

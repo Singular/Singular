@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.32 2008-03-19 17:44:09 Singular Exp $ */
+/* $Id: longalg.cc,v 1.33 2008-06-10 10:17:32 motsak Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1672,7 +1672,7 @@ number naGcd(number a, number b, const ring r)
       result->z = napGcd0(x->z, y->z);
   }
   else
-#if 0
+#ifndef HAVE_FACTORY
     result->z = napGcd(x->z, y->z); // change from napGcd0
 #else
   {

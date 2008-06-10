@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.90 2008-05-20 15:30:00 Singular Exp $ */
+/* $Id: kutil.cc,v 1.91 2008-06-10 10:17:32 motsak Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1376,15 +1376,19 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
   pLcm(p,strat->S[i],Lp.lcm);
   pSetm(Lp.lcm);
 
+#define MYTEST 0
+
 #ifdef HAVE_PLURAL
   const BOOLEAN bIsPluralRing = rIsPluralRing(currRing);
   const BOOLEAN bIsSCA        = rIsSCA(currRing) && strat->homog; // for prod-crit
   const BOOLEAN bNCProdCrit   = ( !bIsPluralRing || bIsSCA ); // commutative or homogeneous SCA
+
 #else
   const BOOLEAN bIsPluralRing = FALSE;
   const BOOLEAN bIsSCA        = FALSE;
   const BOOLEAN bNCProdCrit   = TRUE;
 #endif
+
 
   if (strat->sugarCrit && bNCProdCrit)
   {
@@ -1520,8 +1524,10 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
   /*-  compute the short s-polynomial -*/
   if (strat->fromT && !TEST_OPT_INTSTRATEGY)
     pNorm(p);
+
   if ((strat->S[i]==NULL) || (p==NULL))
     return;
+
   if ((strat->fromQ!=NULL) && (isFromQ!=0) && (strat->fromQ[i]!=0))
     Lp.p=NULL;
   else
@@ -1531,13 +1537,13 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
     {
       if(pHasNotCF(p, strat->S[i]))
       {
-        if(ncRingType(currRing) == nc_lie)
-        {
-            // generalized prod-crit for lie-type
-            strat->cp++;
-            Lp.p = nc_p_Bracket_qq(pCopy(p),strat->S[i]);
-        }
-        else
+//         if(ncRingType(currRing) == nc_lie)
+//         {
+//             // generalized prod-crit for lie-type
+//             strat->cp++;
+//             Lp.p = nc_p_Bracket_qq(pCopy(p),strat->S[i]);
+//         }
+//         else
         if( bIsSCA )
         {
             // product criterion for homogeneous case in SCA
@@ -1545,15 +1551,38 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
             Lp.p = NULL;
         }
         else
-          Lp.p = nc_CreateSpoly(strat->S[i],p,currRing); // ?
+          Lp.p = nc_CreateSpoly(strat->S[i],p,currRing); 
+// nc_CreateShortSpoly(strat->S[i], p, strat->tailRing); // how to mark a short spoly?
       }
-      else  Lp.p = nc_CreateSpoly(strat->S[i],p,currRing);
+      else  Lp.p = nc_CreateSpoly(strat->S[i],p,currRing); 
+// nc_CreateShortSpoly(strat->S[i], p, strat->tailRing); // how to mark a short spoly?
+
+      
+#if MYTEST
+      if (TEST_OPT_DEBUG)
+      {
+        PrintS("strat->S[i]: "); pWrite(strat->S[i]);
+        PrintS("p: "); pWrite(p);
+        PrintS("SPoly: "); pWrite(Lp.p);
+      }
+#endif      
+      
     }
     else
     #endif
     {
+      assume(!rIsPluralRing(currRing));
       Lp.p = ksCreateShortSpoly(strat->S[i],p, strat->tailRing);
-    }
+#if MYTEST
+      if (TEST_OPT_DEBUG)
+      {
+        PrintS("strat->S[i]: "); pWrite(strat->S[i]);
+        PrintS("p: "); pWrite(p);
+        PrintS("commutative SPoly: "); pWrite(Lp.p);
+      }
+#endif      
+
+      }
   }
   if (Lp.p == NULL)
   {
@@ -1654,7 +1683,7 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
   #ifdef HAVE_PLURAL
   if (rIsPluralRing(currRing))
   {
-    Lp.p = nc_CreateShortSpoly(strat->S[i],p); // ???
+    Lp.p = nc_CreateShortSpoly(strat->S[i],p); // ??? strat->tailRing?
   }
   else
   #endif
@@ -2783,6 +2812,7 @@ void enterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 #ifdef HAVE_RINGS
   assume (!rField_is_Ring(currRing));
 #endif
+
   initenterpairs(h,k,ecart,0,strat, atR);
   if ( (!strat->fromT)
   && ((strat->syzComp==0)
@@ -4072,8 +4102,9 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
     }
     else
     {
-      assume (j >= 0 && j <= strat->tl && strat->S_2_T(j) != NULL &&
-              strat->S_2_T(j)->p == strat->S[j]);
+/////      assume (j >= 0 && j <= strat->tl && strat->S_2_T(j) != NULL
+/////      && strat->S_2_T(j)->p == strat->S[j]); // wrong?
+//      assume (j >= 0 && j <= strat->sl && strat->S_2_T(j) != NULL && strat->S_2_T(j)->p == strat->S[j]);
       return strat->S_2_T(j);
     }
   }

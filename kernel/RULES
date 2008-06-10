@@ -1,6 +1,8 @@
 * never use fopen, but myfopen, in order to open text files
 
-* call rComplete after constructing a ring
+* call rComplete after constructing a ring (returns purely commutative ring!)
+
+** call nc_CallPlural to make a newly constucted commutative ring (see above) noncommutative 
 
 * never allocate memory with 0 as size request
 

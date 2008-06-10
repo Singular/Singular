@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.12 2007-02-02 15:19:46 motsak Exp $ */
+/* $Id: syz.cc,v 1.13 2008-06-10 10:17:33 motsak Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -620,7 +620,7 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
   ideal idSaveCurrRingQuotient = currRing->qideal;
   if( rIsSCA(currRing) )
   {
-    currQuotient = currRing->nc->SCAQuotient();
+    currQuotient = SCAQuotient(currRing);
     currRing->qideal = currQuotient;
 
     const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);

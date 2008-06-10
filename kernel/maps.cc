@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.8 2008-04-21 14:18:16 Singular Exp $ */
+/* $Id: maps.cc,v 1.9 2008-06-10 10:17:32 motsak Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -19,6 +19,10 @@
 #include "longalg.h"
 #include "maps.h"
 #include "prCopy.h"
+
+#ifdef HAVE_PLURAL
+#include "gring.h"
+#endif
 
 // This is a very dirty way to "normalize" numbers w.r.t. a
 // MinPoly
@@ -196,13 +200,25 @@ static poly pChangeSizeOfPoly(ring p_ring, poly p,int minvar,int maxvar)
 */
 ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
 {
+  ring sourcering = currRing;
+
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(theImageRing))
+  {
+    if ((rIsPluralRing(sourcering)) && (ncRingType(sourcering)!=nc_comm)) 
+    {
+      Werror("Sorry, not yet implemented for noncomm. rings");
+      return NULL;
+    }
+  }
+#endif
+  
   int i,j;
   poly p,pp,q;
   ideal temp1;
   ideal temp2;
 
   int imagepvariables = theImageRing->N;
-  ring sourcering = currRing;
   int N = pVariables+imagepvariables;
 
   ring tmpR;
@@ -212,21 +228,11 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
      return NULL;
   }
 
-#ifdef HAVE_PLURAL
-  if (rIsPluralRing(theImageRing))
-  {
-    if ((rIsPluralRing(sourcering)) && (ncRingType(sourcering)!=nc_comm)) 
-    {
-      Werror("Sorry, not yet implemented for noncomm. rings");
-      return NULL;
-    }    
-  }
   if (nSetMap(theImageRing) != nCopy)
   {
     Werror("Coefficient fields must be equal");
     return NULL;
   }
-#endif
 
   // change to new ring
   rChangeCurrRing(tmpR);

@@ -11,7 +11,7 @@
  *           have to be defined before this file is included
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Set.h,v 1.14 2008-03-19 17:44:10 Singular Exp $
+ *  Version: $Id: p_Procs_Set.h,v 1.15 2008-06-10 10:17:32 motsak Exp $
  *******************************************************************/
 #include "modulop.h"
 
@@ -184,7 +184,10 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
 */
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(r))
-    nc_p_ProcsSet(r, _p_procs); // Setup non-commutative p_Procs table!
+  {
+     WarnS("Setting pProcs in p_ProcsSet (rDebugPrint!?)!!!");
+     nc_p_ProcsSet(r, _p_procs); // Setup non-commutative p_Procs table!
+  }
 #endif
 }
 
@@ -203,7 +206,7 @@ void p_Debug_GetSpecNames(const ring r, const char* &field, const char* &length,
 void p_Debug_GetProcNames(const ring r, p_Procs_s* p_Procs)
 {
   set_names = 1;
-  p_ProcsSet(r, p_Procs);
+  p_ProcsSet(r, p_Procs); // changes p_Procs!!!
   set_names = 0;
 }
 #endif // RDEBUG
