@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.96 2008-04-01 16:32:40 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.97 2008-06-10 10:32:10 motsak Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -535,9 +535,15 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
                  // we have to fill it, but the copy also allocates space
   memcpy4(qr,qrr,sizeof(ip_sring));
   omFreeBin((ADDRESS)qrr, ip_sring_bin);
-  if (qr->qideal!=NULL) idDelete(&qr->qideal);
+
+  // delete the qr copy of quotient ideal!!!
+  if (qr->qideal!=NULL) idDelete(&qr->qideal); 
+
   ideal id=(ideal)a->CopyD(IDEAL_CMD);
-  if (idElem(id)>1) assumeStdFlag(a);
+
+  if ((idElem(id)>1) || rIsSCA(currRing) || (currRing->qideal!=NULL)) 
+    assumeStdFlag(a);
+
   if (currRing->qideal!=NULL) /* we are already in a qring! */
   {
     ideal tmp=idSimpleAdd(id,currRing->qideal);
