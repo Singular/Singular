@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.82 2008-06-10 10:17:32 motsak Exp $ */
+/* $Id: ring.cc,v 1.83 2008-06-10 11:50:07 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -4529,11 +4529,15 @@ BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient)
 
   if (nc_CallPlural(C, D, NULL, NULL, dest, bSetupQuotient, false, true, dest)) // also takes care about quotient ideal
   {
-    WarnS("Error transferring non-commutative structure");
+    //WarnS("Error transferring non-commutative structure"); 
+    // error message should be in the interpreter interface
 
     mpDelete(&C, dest);
     mpDelete(&D, dest);
 
+    if (currRing != save)
+       rChangeCurrRing(save);
+    
     return TRUE;
   }
   

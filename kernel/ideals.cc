@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.56 2008-06-10 10:17:31 motsak Exp $ */
+/* $Id: ideals.cc,v 1.57 2008-06-10 11:50:07 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2473,7 +2473,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   {
     if ( nc_rComplete(origR, tmpR, false) ) // no quotient ideal!
     {
-      Werror("error in nc_rComplete");
+      Werror("no elimination is possible: ordering condition is violated");
       // cleanup
       rDelete(tmpR);
       if (w!=NULL)
