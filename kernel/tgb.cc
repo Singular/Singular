@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.154 2008-06-09 06:16:03 bricken Exp $ */
+/* $Id: tgb.cc,v 1.155 2008-06-10 13:10:23 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -4425,6 +4425,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
     // poly m=pOne();
     poly m=c->tmp_lm;
     pSetCoeff(m,nInit(1));
+    pSetComp(m,0);
     for(int i=1;i<=pVariables;i++)
       pSetExp(m,i,(pGetExp(r[erg.to_reduce_l].p, i)-pGetExp(red,i)));
     pSetm(m);
