@@ -7,6 +7,11 @@ dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl determine singuname
 dnl
 
+AC_MSG_CHECKING(CPU for singular)
+ac_cv_singcpuname=`uname -p`
+if test "$ac_cv_ac_cv_singcpuname" = sparc; then
+  AC_DEFINE(SI_CPU_SPARC)
+fi
 AC_MSG_CHECKING(uname for singular)
 AC_CACHE_VAL(ac_cv_singuname,
 ac_cv_singuname="unknown"
@@ -32,8 +37,21 @@ AC_SUBST(SINGUNAME)
 
 if test "$ac_cv_singuname" = ix86-Win; then
   EXEC_EXT=".exe"
+  AC_DEFINE(SI_CPU_I386)
 fi
 AC_SUBST(EXEC_EXT)
+if test "$ac_cv_singuname" = x86_64-Linux; then
+  AC_DEFINE(SI_CPU_X86_64)
+fi
+if test "$ac_cv_singuname" = IA64-Linux; then
+  AC_DEFINE(SI_CPU_IA64)
+fi
+if test "$ac_cv_singuname" = ppc-Linux; then
+  AC_DEFINE(SI_CPU_PPC)
+fi
+if test "$ac_cv_singuname" = ppcMac-darwin; then
+  AC_DEFINE(SI_CPU_PPC)
+fi
 
 SING_UNAME=`echo $SINGUNAME | tr '-' '_' `
 AC_SUBST(SING_UNAME)
