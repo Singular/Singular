@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.184 2008-05-20 11:34:33 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.185 2008-06-10 10:33:15 motsak Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1758,13 +1758,13 @@ lists rDecompose(const ring r)
   else
     L->m[3].data=(void *)idCopy(r->qideal);
   // ----------------------------------------
-  #ifdef HAVE_PLURAL
-  if (rIsPluralRing(r))
+  #ifdef HAVE_PLURAL // NC! in rDecompose
+  if (rIsPluralRing(r)) 
   {
     L->m[4].rtyp=MATRIX_CMD;
-    L->m[4].data=(void *)mpCopy(r->nc->C);
+    L->m[4].data=(void *)mpCopy(r->GetNC()->C);
     L->m[5].rtyp=MATRIX_CMD;
-    L->m[5].data=(void *)mpCopy(r->nc->D);
+    L->m[5].data=(void *)mpCopy(r->GetNC()->D);
   }
   #endif
   return L;
@@ -2179,9 +2179,8 @@ ring rCompose(const lists  L)
   #ifdef HAVE_PLURAL
   if (L->nr==5)
   {
-    if (nc_CallPlural((matrix)L->m[4].Data(),(matrix)L->m[5].Data(),
-        NULL,NULL,R))
-      goto rCompose_err;
+    if (nc_CallPlural((matrix)L->m[4].Data(),(matrix)L->m[5].Data(),NULL,NULL,R, true)) goto rCompose_err;
+    // takes care about non-comm. quotient! i.e. calls "nc_SetupQuotient" due to last true
   }
   #endif
   return R;
