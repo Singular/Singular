@@ -187,8 +187,6 @@ typedef struct tagHH_POPUPW {
     LPCWSTR   pszFont;
 } HH_POPUPW;
 
-DECL_WINELIB_TYPE_AW(HH_POPUP)
-
 typedef struct tagHH_ALINKA {
     int    cbStruct;
     BOOL   fReserved;
@@ -210,8 +208,6 @@ typedef struct tagHH_ALINKW {
     LPCWSTR pszWindow;
     BOOL    fIndexOnFail;
 } HH_ALINKW;
-
-DECL_WINELIB_TYPE_AW(HH_ALINK)
 
 enum {
     HHWIN_NAVTYPE_TOC,
@@ -295,7 +291,6 @@ typedef struct tagHH_FTS_QUERYW {
     LPCWSTR pszWindow;
 } HH_FTS_QUERYW;
 
-DECL_WINELIB_TYPE_AW(HH_FTS_QUERY)
 
 typedef struct tagHH_WINTYPEA {
     int          cbStruct;
@@ -375,7 +370,6 @@ typedef struct tagHH_WINTYPEW {
     LPCWSTR      pszCustomTabs;
 } HH_WINTYPEW, *PHH_WINTYPEW;
 
-DECL_WINELIB_TYPE_AW(HH_WINTYPE)
 
 enum {
     HHACT_TAB_CONTENTS,
@@ -418,7 +412,6 @@ typedef struct tagHH_NTRACKW {
     PHH_WINTYPEW phhWinType;
 } HH_NTRACKW;
 
-DECL_WINELIB_TYPE_AW(HH_NTRACK)
 
 HWND WINAPI HtmlHelpA(HWND,LPCSTR,UINT,DWORD_PTR);
 HWND WINAPI HtmlHelpW(HWND,LPCWSTR,UINT,DWORD_PTR);
