@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.45 2008-06-10 10:17:33 motsak Exp $ */
+/* $Id: structs.h,v 1.46 2008-06-10 15:43:08 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -36,7 +36,7 @@ typedef void * Sy_reference;
 
 #define HAVE_IDI 1
 
-#if defined(i386) || defined(x86_64_Linux) || defined(ix86_SunOS)
+#if defined(SI_CPU_I386) || defined(SI_CPU_X86_64)
   // the following settings seems to be better on i386 and x86_64 processors
   // define if a*b is with mod instead of tables
   #define HAVE_MULT_MOD
@@ -44,20 +44,20 @@ typedef void * Sy_reference;
   // #ifdef HAVE_MULT_MOD
   // #define HAVE_DIV_MOD
   // #endif
-#elif defined(IA64_Linux)
+#elif defined(SI_CPU_IA64)
   // the following settings seems to be better on itanium processors
   // #define HAVE_MULT_MOD
   #define HAVE_GENERIC_ADD
   // #ifdef HAVE_MULT_MOD
   // #define HAVE_DIV_MOD
   // #endif
-#elif defined(SunOS_5)
+#elif defined(SI_CPU_SPARC)
   // #define HAVE_GENERIC_ADD
   #define HAVE_MULT_MOD
   #ifdef HAVE_MULT_MOD
   #define HAVE_DIV_MOD
   #endif
-#elif defined(ppc_Linux) || defined(ppcMac_darwin)
+#elif defined(SI_CPU_PPC)
   // the following settings seems to be better on ppc processors
   // testet on: ppc_Linux, 740/750 PowerMac G3, 512k L2 cache
   #define HAVE_MULT_MOD
