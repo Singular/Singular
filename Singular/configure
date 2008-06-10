@@ -566,14 +566,8 @@ fi
 echo $ac_n "checking CPU for singular""... $ac_c" 1>&6
 echo "configure:568: checking CPU for singular" >&5
 ac_cv_singcpuname=`uname -p`
-if test "$ac_cv_ac_cv_singcpuname" = sparc; then
-  cat >> confdefs.h <<\EOF
-#define SI_CPU_SPARC 1
-EOF
-
-fi
 echo $ac_n "checking uname for singular""... $ac_c" 1>&6
-echo "configure:577: checking uname for singular" >&5
+echo "configure:571: checking uname for singular" >&5
 if eval "test \"`echo '$''{'ac_cv_singuname'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -611,6 +605,12 @@ EOF
 
 fi
 
+if test "$ac_cv_ac_cv_singcpuname" = sparc; then
+  cat >> confdefs.h <<\EOF
+#define SI_CPU_SPARC 1
+EOF
+
+fi
 if test "$ac_cv_singuname" = x86_64-Linux; then
   cat >> confdefs.h <<\EOF
 #define SI_CPU_X86_64 1

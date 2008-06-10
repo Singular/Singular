@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.18 2008-04-01 15:58:51 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.19 2008-06-10 15:37:48 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -148,6 +148,16 @@
 #undef HAVE_DYNAMIC_LOADING
 /* Define to enable plural */
 #undef HAVE_PLURAL
+/* CPU type: i[3456]86: */
+#undef SI_CPU_I386
+/* CPU type: sparc: */
+#undef SI_CPU_SPARC
+/* CPU type: ppc: */
+#undef SI_CPU_PPC
+/* CPU type: IA64: */
+#undef SI_CPU_IA64
+/* CPU type: x86_64: */
+#undef SI_CPU_X86_64
 
 /*******************************************************************
  * Defines which are not set by configure

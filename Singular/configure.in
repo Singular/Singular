@@ -9,9 +9,6 @@ dnl
 
 AC_MSG_CHECKING(CPU for singular)
 ac_cv_singcpuname=`uname -p`
-if test "$ac_cv_ac_cv_singcpuname" = sparc; then
-  AC_DEFINE(SI_CPU_SPARC)
-fi
 AC_MSG_CHECKING(uname for singular)
 AC_CACHE_VAL(ac_cv_singuname,
 ac_cv_singuname="unknown"
@@ -40,6 +37,9 @@ if test "$ac_cv_singuname" = ix86-Win; then
   AC_DEFINE(SI_CPU_I386)
 fi
 AC_SUBST(EXEC_EXT)
+if test "$ac_cv_ac_cv_singcpuname" = sparc; then
+  AC_DEFINE(SI_CPU_SPARC)
+fi
 if test "$ac_cv_singuname" = x86_64-Linux; then
   AC_DEFINE(SI_CPU_X86_64)
 fi
