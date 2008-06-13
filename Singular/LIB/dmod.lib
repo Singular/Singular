@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.27 2008-06-13 17:56:31 levandov Exp $";
+version="$Id: dmod.lib,v 1.28 2008-06-13 18:04:38 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -5147,15 +5147,16 @@ example
 }
 
 proc annRat(poly g, poly f)
-"USAGE:  annRat  (g,f);  f, g polynomials
+"USAGE:  annRat(g,f);  f, g polynomials
 RETURN:  ring
-PURPOSE: compute the ideal in Weyl algebra, annihilating the rational function g/f
+PURPOSE: compute the ideal in Weyl algebra, annihilating the rational function g*f^{-1}
 NOTE:    activate the output ring with the @code{setring} command.
 @*       In the output ring:
 @*       - the ideal RLD (which is given in a Groebner basis) is the annihilator.
 @*       If @code{printlevel}=1, progress debug messages will be printed,
 @*       if @code{printlevel}>=2, all the debug messages will be printed.
 EXAMPLE: example annRat; shows examples
+"
 {
   // computes the annihilator of g/f
   def save = basering;
