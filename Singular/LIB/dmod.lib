@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.26 2008-02-20 15:56:57 Singular Exp $";
+version="$Id: dmod.lib,v 1.27 2008-06-13 17:56:31 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -31,7 +31,7 @@ THEORY: Given a polynomial ring R = K[x_1,...,x_n] and a polynomial F in R,
         l'ideal de Bernstein associe a des polynomes, preprint, 2002)
 
 GUIDE:
-@* - Ann F^s = I = I(F^s) = LD in D(R)[s] can be computed by SannfsBM, SannfsOT, SannfsLOT
+@* - Ann F^s = I = I(F^s) = LD in D(R)[s] can be computed by SannfsBM SannfsOT, SannfsLOT
 @* - Ann^(1) F^s in D(R)[s] can be computed by Sannfslog
 @* - global Bernstein polynomial bs resp. BS in K[s] can be computed by bernsteinBM
 @* - Ann F^s0 = I(F^s0) = LD0 in D(R) can be computed by annfs0, annfsBM, annfsOT, annfsLOT
@@ -74,6 +74,7 @@ varnum(s);          the number of the variable with the name s
 SEE ALSO: gmssing_lib
 ";
 
+LIB "matrix.lib"; // for submat
 LIB "nctools.lib";
 LIB "elim.lib";
 LIB "qhmoduli.lib"; // for Max
@@ -1385,6 +1386,202 @@ example
   LD;
   poly F = imap(r,F);
   def B  = annfs2(LD,F);
+  setring B;
+  LD;
+  BS;
+}
+
+
+// try to replace s with -s-1 => data is shorter as in annfs2
+// and use Macaulay's reduceB strategy, that is add
+// not F but <F,dF/dx1,...,dF/dxN>; the resulting B-function
+// has to be multiplied with (s+1) at the very end
+proc annfsRB(ideal I, poly F, list #)
+"USAGE:  annfsRB(I, F [,eng]);  I an ideal, F a poly, eng an optional int
+RETURN:  ring
+PURPOSE: compute the annihilator ideal of f^s in the Weyl Algebra, based on the
+output of Sannfs like procedure
+NOTE:    activate this ring with the @code{setring} command. In this ring,
+@*       - the ideal LD (which is a Groebner basis) is the annihilator of f^s,
+@*       - the list BS contains the roots with multiplicities of a Bernstein polynomial of f.
+@*       If eng <>0, @code{std} is used for Groebner basis computations,
+@*       otherwise and by default @code{slimgb} is used.
+@*       Uses the shorter form of expressions in the variable s (the idea of Noro).
+@*       If printlevel=1, progress debug messages will be printed,
+@*       if printlevel>=2, all the debug messages will be printed.
+EXAMPLE: example annfsRB; shows examples
+"
+{
+  int eng = 0;
+  if ( size(#)>0 )
+  {
+    if ( typeof(#[1]) == "int" )
+    {
+      eng = int(#[1]);
+    }
+  }
+  def @R2 = basering;
+  int ppl = printlevel-voice+2;
+  // we're in D_n[s], where the elim ord for s is set
+  // switch to comm. ring in X's and compute the GB of Tjurina ideal
+  dbprint(ppl,"// -1-0- creating K[x] and Tjurina ideal");
+  list nL = ringlist(@R2);
+  list temp,t2;
+  temp[1] = nL[1];
+  temp[4] = nL[4];
+  int @n = int((nvars(@R2)-1)/2); // # of x's
+  int i;
+  for (i=1; i<=@n; i++)
+  {
+    t2[i] = nL[2][i];
+  }
+  temp[2] = t2;
+  t2 = 0;
+  t2[1] = nL[3][1]; // more weights than vars?
+  t2[2] = nL[3][3];
+  temp[3] = t2;
+  def @R22 = ring(temp);
+  setring @R22;
+  poly F = imap(@R2,F);
+  ideal J = F;
+  for (i=1; i<=@n; i++)
+  {
+    J = J, diff(F,var(i));
+  }
+  J = engine(J,eng);
+  dbprint(ppl,"// -1-1- finished computing the GB of Tjurina ideal");
+  dbprint(ppl-1, J);
+  setring @R2;
+  ideal JF = imap(@R22,J);
+  kill @R22;
+  attrib(JF,"isSB",1); // embedded comm ring is used
+  ideal J = NF(I,JF);
+  dbprint(ppl,"// -1-2- finished computing the NF of I wrt Tjurina ideal");
+  dbprint(ppl-1, J2);
+  // make leadcoeffs positive
+  J = subst(J,s,-s-1);
+  for (i=1; i<= ncols(J); i++)
+  {
+    if (leadcoef(J[i]) <0 )
+    {
+      J[i] = -J[i];
+    }
+  }
+  J = J,JF;
+  ideal M = engine(J,eng);
+  int Nnew = nvars(@R2);
+  ideal K2 = nselect(M,1,Nnew-1);
+  dbprint(ppl,"// -2-0- _x,_Dx are eliminated in basering");
+  dbprint(ppl-1, K2);
+  // the ring @R3 and the search for minimal negative int s
+  ring @R3 = 0,s,dp;
+  dbprint(ppl,"// -2-1- the ring @R3 i.e. K[s] is ready");
+  ideal K3 = imap(@R2,K2);
+  poly p = K3[1]; 
+  p = s*p; // mult with the lost (s+1) factor
+  dbprint(ppl,"// -2-2- factorization");
+  //  ideal P = factorize(p,1);  //without constants and multiplicities
+  //  "--------- b-function factorizes into ---------";   P;
+  // convert factors to the list of their roots with mults
+  // assume all factors are linear
+  //  ideal BS = normalize(P);
+  //  BS = subst(BS,s,0);
+  //  BS = -BS;
+  list P = factorize(p);          //with constants and multiplicities
+  ideal bs; intvec m;             //the Bernstein polynomial is monic, so we are not interested in constants
+  for (i=2; i<= size(P[1]); i++)  //we delete P[1][1] and P[2][1]
+  {
+    bs[i-1] = P[1][i]; bs[i-1] = subst(bs[i-1],s,-s-1);
+    m[i-1]  = P[2][i]; 
+  }
+  int sP = minIntRoot(bs,1);
+  bs =  normalize(bs);
+  bs = -subst(bs,s,0);
+  dbprint(ppl,"// -2-3- minimal integer root found");
+  dbprint(ppl-1, sP);
+ //TODO: sort BS!
+  // --------- substitute s found in the ideal ---------
+  // --------- going back to @R and substitute ---------
+  setring @R2;
+  K2 = subst(I,s,sP);
+  // create the ordinary Weyl algebra and put the result into it,
+  // thus creating the ring @R5
+  // keep: N, i,j,s, tmp, RL
+  Nnew = Nnew - 1; // former 2*N;
+  // list RL = ringlist(save);  // is defined earlier
+  //  kill Lord, tmp, iv;
+  list L = 0;
+  list Lord, tmp;
+  intvec iv;
+  list RL = ringlist(basering);
+  L[1] = RL[1];
+  L[4] = RL[4];  //char, minpoly
+  // check whether vars have admissible names -> done earlier
+  // list Name = RL[2]M
+  // DName is defined earlier
+  list NName; // = RL[2]; // skip the last var 's'
+  for (i=1; i<=Nnew; i++)
+  {
+    NName[i] =  RL[2][i];
+  }
+  L[2] = NName;
+  // dp ordering;
+  string s = "iv=";
+  for (i=1; i<=Nnew; i++)
+  {
+    s = s+"1,";
+  }
+  s[size(s)] = ";";
+  execute(s);
+  tmp     = 0;
+  tmp[1]  = "dp";  // string
+  tmp[2]  = iv;  // intvec
+  Lord[1] = tmp;
+  kill s;
+  tmp[1]  = "C";
+  iv = 0;
+  tmp[2]  = iv;
+  Lord[2] = tmp;
+  tmp     = 0;
+  L[3]    = Lord;
+  // we are done with the list
+  // Add: Plural part
+  def @R4@ = ring(L);
+  setring @R4@;
+  int N = Nnew/2;
+  matrix @D[Nnew][Nnew];
+  for (i=1; i<=N; i++)
+  {
+    @D[i,N+i]=1;
+  }
+  def @R4 = nc_algebra(1,@D);
+  setring @R4;
+  kill @R4@;
+  dbprint(ppl,"// -3-1- the ring @R4 is ready");
+  dbprint(ppl-1, @R4);
+  ideal K4 = imap(@R2,K2);
+  option(redSB);
+  dbprint(ppl,"// -3-2- the final cosmetic std");
+  K4 = engine(K4,eng);  // std does the job too
+  // total cleanup
+  ideal bs = imap(@R3,bs);
+  kill @R3;
+  list BS = bs,m;
+  export BS;
+  ideal LD = K4;
+  export LD;
+  return(@R4);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),Dp;
+  poly F = x^3+y^3+z^3;
+  printlevel = 0;
+  def A = SannfsBM(F);
+  setring A;
+  LD;
+  poly F = imap(r,F);
+  def B  = annfsRB(LD,F);
   setring B;
   LD;
   BS;
@@ -4948,6 +5145,128 @@ example
   M = indAR(M,4);
   M;
 }
+
+proc annRat(poly g, poly f)
+"USAGE:  annRat  (g,f);  f, g polynomials
+RETURN:  ring
+PURPOSE: compute the ideal in Weyl algebra, annihilating the rational function g/f
+NOTE:    activate the output ring with the @code{setring} command.
+@*       In the output ring:
+@*       - the ideal RLD (which is given in a Groebner basis) is the annihilator.
+@*       If @code{printlevel}=1, progress debug messages will be printed,
+@*       if @code{printlevel}>=2, all the debug messages will be printed.
+EXAMPLE: example annRat; shows examples
+{
+  // computes the annihilator of g/f
+  def save = basering;
+  int ppl = printlevel-voice+2;
+  dbprint(ppl,"// -1-[annRat] computing the ann f^s");
+  def  @R1 = SannfsBM(f);
+  setring @R1;
+  poly f = imap(save,f);
+  int i,mir;
+  int isr = 0; // checkRoot1(LD,f,1); // roots are negative, have to enter positive int
+  if (!isr)
+  {
+    // -1 is not the root
+    // find the m.i.r iteratively
+    mir = 0;
+    for(i=nvars(save)+1; i>=1; i--)
+    {
+      isr =  checkRoot1(LD,f,i);
+      if (isr) { mir =-i; break; }
+    }
+    if (mir ==0)
+    {
+      "No integer root found! Aborting computations, inform the authors!";
+      return(0);
+    }
+    // now mir == i is m.i.r.
+  }
+  else
+  {
+    // -1 is the m.i.r
+    mir = -1;
+  }
+  dbprint(ppl,"// -2-[annRat] the minimal integer root is ");
+  dbprint(ppl-1, mir);
+  // use annfspecial
+  dbprint(ppl,"// -3-[annRat] running annfspecial ");
+  ideal AF = annfspecial(LD,f,mir,-1); // ann f^{-1}
+  //  LD = subst(LD,s,j);
+  //  LD = engine(LD,0);
+  // modify the ring: throw s away
+  // output ring comes from SannfsBM
+  list U = ringlist(@R1);
+  list tmp; // variables
+  for(i=1; i<=size(U[2])-1; i++)
+  {
+    tmp[i] = U[2][i];
+  }
+  U[2] = tmp;
+  tmp = 0;
+  tmp[1] = U[3][1]; // x,Dx block
+  tmp[2] = U[3][3]; // module block
+  U[3] = tmp;
+  tmp = 0;
+  tmp = U[1],U[2],U[3],U[4];
+  def @R2 = ring(tmp);
+  setring @R2;
+  // now supply with Weyl algebra relations
+  int N = nvars(@R2)/2;
+  matrix @D[2*N][2*N];
+  for(i=1; i<=N; i++)
+  {
+    @D[i,N+i]=1;
+  }
+  def @R3 = nc_algebra(1,@D);
+  setring @R3;
+  dbprint(ppl,"// - -[annRat] ring without s is ready:");
+  dbprint(ppl-1,@R3);
+  poly g = imap(save,g);
+  matrix G[1][1] = g;
+  matrix LL = matrix(imap(@R1,AF));
+  kill @R1;   kill @R2;
+  dbprint(ppl,"// -4-[annRat] running modulo");
+  ideal RLD  = modulo(G,LL);
+  dbprint(ppl,"// -4-[annRat] running GB on the final result");
+  RLD  = engine(RLD,0);
+  export RLD;
+  return(@R3);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  poly g = 2*x*y;
+  poly f = x^2 - y^3;
+  def B = annRat(g,f);
+  setring B;
+  RLD;
+  // Now, compare with the output of Macaulay2:
+ ideal tst = 3*x*Dx + 2*y*Dy + 1, y^3*Dy^2 - x^2*Dy^2 + 6*y^2*Dy + 6*y, 9*y^2*Dx^2*Dy - 4*y*Dy^3 + 27*y*Dx^2 + 2*Dy^2, 9*y^3*Dx^2 - 4*y^2*Dy^2 + 10*y*Dy -10;
+ option(redSB);
+ option(redTail);
+ RLD = groebner(RLD);
+ tst = groebner(tst);
+ print(matrix(NF(RLD,tst)));  print(matrix(NF(tst,RLD)));
+}
+
+static proc ex_annRat()
+{
+  // more complicated example
+  ring r = 0,(x,y,z),dp;
+  poly f = x3+y3+z3; // mir = -2
+  poly g = x*y*z;
+  def A = annRat(g,f);
+  setring A;
+}
+
+proc annPoly(poly f)
+{
+  // computes a system of linear PDEs with polynomial coeffs for f
+}
+
 
 static proc exCheckGenericity()
 {
