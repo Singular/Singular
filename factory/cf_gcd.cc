@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.61 2008-05-16 13:11:31 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.62 2008-06-16 12:55:41 Singular Exp $ */
 
 #include <config.h>
 
@@ -15,6 +15,7 @@
 #include "fac_util.h"
 #include "ftmpl_functions.h"
 #include "ffreval.h"
+#include "algext.h"
 
 #ifdef HAVE_NTL
 #include <NTL/ZZX.h>
@@ -761,8 +762,19 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
             else
                 return cf_content( g, f );
         }
+        if (isOn(SW_USE_QGCD))
+        {
+          Variable m;
+          if ((hasFirstAlgVar(f,m) || hasFirstAlgVar(g,m))
+          //&& f.isUnivariate()
+          //&& g.isUnivariate()
+          && (getCharacteristic() == 0)
+          )
+            return QGCD(f,g);
+        }
+            
         if ( f.inExtension() && getReduce( f.mvar() ) )
-            return 1;
+            return CanonicalForm(1);
         else
         {
             if ( fdivides( f, g ) )
@@ -1148,3 +1160,4 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     }
   }
 }
+#include "algext.cc"

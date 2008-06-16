@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_switches.h,v 1.12 2007-11-20 10:08:03 Singular Exp $ */
+/* $Id: cf_switches.h,v 1.13 2008-06-16 12:54:05 Singular Exp $ */
 
 #ifndef INCL_CF_SWITCHES_H
 #define INCL_CF_SWITCHES_H
@@ -18,7 +18,7 @@
 // const CFSwitchesMax - maximum number of switches.
 //
 //}}}
-const int CFSwitchesMax = 15;
+const int CFSwitchesMax = 16;
 //}}}
 
 //{{{ class CFSwitches
