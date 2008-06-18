@@ -124,7 +124,7 @@ fi
 AC_SUBST(PIPE)
 
 AC_CHECK_PROGS(PERL, perl5 perl)
-AC_CHECK_PROGS(UUDECODE, uudecode "uudeview -i")
+AC_CHECK_PROGS(UUDECODE, uudecode "uudeview -i",${pwd}/warn_not_found.sh uudecode)
 AC_CHECK_PROGS(GUNZIP, gunzip,  ${pwd}/warn_not_found.sh gunzip)
 # don't use GZIP this breaks configure
 AC_CHECK_PROGS(MYGZIP, gzip, ${pwd}/warn_not_found.sh gzip)
@@ -673,6 +673,9 @@ else
  AC_CHECK_PROG(TEXI2HTML, texi2html, texi2html)
 fi
 
+if test "${UUDECODE+set}" != set; then
+AC_MSG_WARN(uudecode not found. HTML doc generation will fail)
+fi
 if test "${TEXI2HTML+set}" != set; then
 AC_MSG_WARN(texi2html not found. HTML doc generation will fail)
 fi
