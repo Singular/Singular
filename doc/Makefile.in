@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.102 2008-04-28 13:55:10 Singular Exp $
+### $Id: Makefile.in,v 1.103 2008-06-18 14:48:56 wienand Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -57,7 +57,11 @@ VERBOSE         = 1 # override this with make VERBOSE=2
 # d2t stuff
 SINGULAR        = @SINGULAR@
 SINGULAR_LIB_DIR= ../Singular/LIB
+ifeq ($(SINGUNAME),"ix86-Win")
+LIBPARSE        = ${bindir}/libparse.exe
+else
 LIBPARSE        = ${bindir}/libparse
+endif
 DOC_SUBDIR      = ./d2t_singular
 EX_SUBDIR       = ./examples
 CHKSUM_DB       = ${DOC_SUBDIR}/chksum
