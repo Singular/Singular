@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.41 2007-12-04 15:24:53 Singular Exp $ */
+/* $Id: canonicalform.cc,v 1.42 2008-06-19 15:57:37 Singular Exp $ */
 
 #include <config.h>
 
@@ -251,14 +251,16 @@ CanonicalForm::mapinto () const
                 return CFFactory::basic( getmpi( value, true ) );
             else
                 return *this;
-        else  if ( CFFactory::gettype() == PrimePowerDomain ) {
+        else  if ( CFFactory::gettype() == PrimePowerDomain )
+        {
             ASSERT( value->levelcoeff() == PrimePowerDomain || value->levelcoeff() == IntegerDomain, "no proper map defined" );
             if ( value->levelcoeff() == PrimePowerDomain )
                 return *this;
             else
                 return CFFactory::basic( getmpi( value ) );
         }
-        else {
+        else
+        {
             int val;
             if ( value->levelcoeff() == IntegerDomain )
                 val = value->intmod( ff_prime );
@@ -273,11 +275,12 @@ CanonicalForm::mapinto () const
             else
                 return CanonicalForm( int2imm_p( val ) );
         }
-    else {
+    else
+    {
         Variable x = value->variable();
         CanonicalForm result;
         for ( CFIterator i = *this; i.hasTerms(); i++ )
-            result += power( x, i.exp() ) * i.coeff().mapinto();
+            result += (power( x, i.exp() ) * i.coeff().mapinto());
         return result;
     }
 }

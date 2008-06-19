@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.cc,v 1.12 2008-05-16 13:10:14 Singular Exp $ */
+/* $Id: cf_algorithm.cc,v 1.13 2008-06-19 15:58:18 Singular Exp $ */
 
 //{{{ docu
 //
@@ -347,11 +347,12 @@ fdivides ( const CanonicalForm & f, const CanonicalForm & g )
     // or are greater zero
     int fLevel = f.level();
     int gLevel = g.level();
-    if ( gLevel > 0 && fLevel == gLevel )
+    if ( (gLevel > 0) && (fLevel == gLevel) )
         // f and g are polynomials in the same main variable
         if ( degree( f ) <= degree( g )
              && fdivides( f.tailcoeff(), g.tailcoeff() )
-             && fdivides( f.LC(), g.LC() ) ) {
+             && fdivides( f.LC(), g.LC() ) )
+        {
             CanonicalForm q, r;
             return divremt( g, f, q, r ) && r.isZero();
         }
@@ -360,7 +361,8 @@ fdivides ( const CanonicalForm & f, const CanonicalForm & g )
     else if ( gLevel < fLevel )
         // g is a coefficient w.r.t. f
         return false;
-    else {
+    else
+    {
         // either f is a coefficient w.r.t. polynomial g or both
         // f and g are from a base domain (should be Z or Z/p^n,
         // then)
