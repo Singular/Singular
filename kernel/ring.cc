@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.83 2008-06-10 11:50:07 Singular Exp $ */
+/* $Id: ring.cc,v 1.84 2008-06-19 12:39:56 wienand Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -280,10 +280,10 @@ void rWrite(ring r)
     if (rField_is_Ring_ModN(r)) Print("Z/%llu\n", r->ringflaga);
 #endif
 #ifdef HAVE_RING2TOM
-    if (rField_is_Ring_2toM(r)) Print("Z/2^%llu\n", r->ringflagb);
+    if (rField_is_Ring_2toM(r)) Print("Z/2^%d\n", r->ringflagb);
 #endif
 #ifdef HAVE_RINGMODN
-    if (rField_is_Ring_PtoM(r)) Print("Z/%llu^%u\n", r->ringflaga, r->ringflagb);
+    if (rField_is_Ring_PtoM(r)) Print("Z/%d^%u\n", r->ringflaga, r->ringflagb);
 #endif
   }
 #endif
