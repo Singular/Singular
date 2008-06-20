@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.18 2008-06-20 12:28:17 Singular Exp $
+ *  Version: $Id: sca.cc,v 1.19 2008-06-20 16:54:45 Singular Exp $
  *******************************************************************/
 
 #define OM_CHECK 4
@@ -387,7 +387,7 @@ poly sca_p_Mult_mm(poly pPoly, const poly pMonom, const ring rRing)
 #ifdef PDEBUG
       if(iComponentMonomM==0 )
       {
-        WarnS("sca_p_Mult_mm: Multiplication in the left module from the right");
+        dReportError("sca_p_Mult_mm: Multiplication in the left module from the right");
       }
 #endif
     }
@@ -469,7 +469,7 @@ poly sca_pp_Mult_mm(const poly pPoly, const poly pMonom, const ring rRing, poly 
 #ifdef PDEBUG
       if(iComponentMonomM==0 )
       {
-        WarnS("sca_pp_Mult_mm: Multiplication in the left module from the right");
+        dReportError("sca_pp_Mult_mm: Multiplication in the left module from the right");
       }
 #endif
     }
@@ -579,10 +579,10 @@ poly sca_mm_Mult_pp(const poly pMonom, const poly pPoly, const ring rRing)
 #ifdef PDEBUG
       if(iComponent==0 )
       {
-        WarnS("sca_mm_Mult_pp: Multiplication in the left module from the right!");
+        dReportError("sca_mm_Mult_pp: Multiplication in the left module from the right!");
 //        PrintS("mm = "); p_Write(pMonom, rRing);
 //        PrintS("pp = "); p_Write(pPoly, rRing);
-//        assume(iComponent!=0);        
+//        assume(iComponent!=0);
       }
 #endif
     }
@@ -643,7 +643,7 @@ poly sca_mm_Mult_p(const poly pMonom, poly pPoly, const ring rRing) // !!!!! the
 
     if( iComponentMonomM!=0 )
     {
-      if( iComponent!=0 ) 
+      if( iComponent!=0 )
       {
         // REPORT_ERROR
         Werror("sca_mm_Mult_p: exponent mismatch %d and %d\n", iComponent, iComponentMonomM);
@@ -655,10 +655,10 @@ poly sca_mm_Mult_p(const poly pMonom, poly pPoly, const ring rRing) // !!!!! the
 #ifdef PDEBUG
       if(iComponent==0)
       {
-        WarnS("sca_mm_Mult_p: Multiplication in the left module from the right!");
+        dReportError("sca_mm_Mult_p: Multiplication in the left module from the right!");
 //        PrintS("mm = "); p_Write(pMonom, rRing);
 //        PrintS("p = "); p_Write(pPoly, rRing);
-//        assume(iComponent!=0);        
+//        assume(iComponent!=0);
       }
 #endif
     }
@@ -724,7 +724,7 @@ poly sca_SPoly( const poly p1, const poly p2, const ring r )
   if ((lCompP1!=lCompP2) && (lCompP1!=0) && (lCompP2!=0))
   {
 #ifdef PDEBUG
-    Print("sca_SPoly: different non-zero components!\n");
+    dReportError("sca_SPoly: different non-zero components!\n");
 #endif
     return(NULL);
   }
@@ -814,7 +814,7 @@ poly sca_ReduceSpoly(const poly p1, poly p2, const ring r)
   if ((lCompP1!=lCompP2) && (lCompP1!=0) && (lCompP2!=0))
   {
 #ifdef PDEBUG
-    Print("sca_ReduceSpoly: different non-zero components!");
+    dReportError("sca_ReduceSpoly: different non-zero components!");
 #endif
     return(NULL);
   }
@@ -920,12 +920,14 @@ void addLObject(LObject& h, kStrategy& strat)
       PrintS("s\n");
     }
 
+#ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
       PrintS("new s:");
       wrp(h.p);
       PrintLn();
     }
+#endif
 
     enterpairs(h.p, strat->sl, h.ecart, 0, strat);
 
@@ -977,13 +979,13 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 #endif
 
   PrintS("F: \n");
-  idPrint(F);  
-  PrintS("Q: \n");  
+  idPrint(F);
+  PrintS("Q: \n");
   idPrint(Q);
 #endif
 #endif
 
-  
+
   const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
   const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
 
@@ -1043,7 +1045,9 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   {
     if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
 
+#ifdef KDEBUG
     if (TEST_OPT_DEBUG) messageSets(strat);
+#endif
 
     if (strat->Ll== 0) strat->interpt=TRUE;
 
@@ -1070,7 +1074,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 //    assume(pNext(strat->P.p) != strat->tail); // !???
     if(strat->P.IsNull()) continue;
 
-    
+
     if( pNext(strat->P.p) == strat->tail )
     {
       // deletes the int spoly and computes SPoly
@@ -1179,7 +1183,9 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   } // for(;;)
 
 
+#ifdef KDEBUG
   if (TEST_OPT_DEBUG) messageSets(strat);
+#endif
 
   /* release temp data-------------------------------- */
   exitBuchMora(strat);
@@ -1238,13 +1244,13 @@ bool sca_SetupQuotient(ring rGR, ring rG)
   //////////////////////////////////////////////////////////////////////////
   // checks...
   //////////////////////////////////////////////////////////////////////////
-  if( rG == NULL ) 
+  if( rG == NULL )
     rG = rGR;
 
   assume(rGR != NULL);
   assume(rG  != NULL);
   assume(rIsPluralRing(rG));
-  
+
 
 #if MYTEST
    PrintS("sca_SetupQuotient(rGR, rG)");
@@ -1255,7 +1261,7 @@ bool sca_SetupQuotient(ring rGR, ring rG)
   if(N < 2)
     return false;
 
-  
+
 //  if( (ncRingType(rG) != nc_skew) || (ncRingType(rG) != nc_comm) )
 //    return false;
 
@@ -1269,7 +1275,7 @@ bool sca_SetupQuotient(ring rGR, ring rG)
 #if OUTPUT
   PrintS("sca_SetupQuotient: qideal!!!\n");
 #endif
-  
+
   if((rG->qideal != NULL) && (rG != rGR) ) // we cannot change from factor to factor at the time, sorry!
     return false;
 
@@ -1283,7 +1289,7 @@ bool sca_SetupQuotient(ring rGR, ring rG)
 #if OUTPUT
   PrintS("sca_SetupQuotient: AltVars?!\n");
 #endif
-  
+
   for(int i = 1; i < N; i++)
   {
     for(int j = i + 1; j <= N; j++)
@@ -1318,11 +1324,11 @@ bool sca_SetupQuotient(ring rGR, ring rG)
   Print("AltVars?1: [%d, %d]\n", iAltVarStart, iAltVarEnd);
 #endif
 
-  
+
   if( (iAltVarEnd == -1) || (iAltVarStart == (N+1)) )
     return false; // either no alternating varables, or a single one => we are in commutative case!
 
-  
+
   for(int i = 1; i < N; i++)
   {
     for(int j = i + 1; j <= N; j++)
@@ -1383,7 +1389,7 @@ bool sca_SetupQuotient(ring rGR, ring rG)
     bWeChangeRing = true;
   }
 
-  
+
   assume(rGR->qideal != NULL);
 //  assume(rG->qideal == NULL); // ?
 
@@ -1395,7 +1401,7 @@ bool sca_SetupQuotient(ring rGR, ring rG)
   idPrint(idQuotient); // in rG!!!
 #endif
 
-  
+
   // check for
   // y_{iAltVarStart}^2, y_{iAltVarStart+1}^2, \ldots, y_{iAltVarEnd}^2  (iAltVarEnd > iAltVarStart)
   // to be within quotient ideal.
@@ -1434,7 +1440,7 @@ bool sca_SetupQuotient(ring rGR, ring rG)
   Print("ScaVars!: [%d, %d]\n", iAltVarStart, iAltVarEnd);
 #endif
 #endif
-  
+
 
   //////////////////////////////////////////////////////////////////////////
   // ok... here we go. let's setup it!!!
@@ -1465,7 +1471,7 @@ bool sca_ForceCommutative(ring rGR, int b, int e)
   assume(rGR != NULL);
   assume(rIsPluralRing(rGR));
   assume(!rIsSCA(rGR));
-  
+
   const int N = rGR->N;
 
   ring rSaveRing = currRing;
@@ -1475,11 +1481,11 @@ bool sca_ForceCommutative(ring rGR, int b, int e)
 
   const ideal idQuotient = rGR->qideal;
 
-  
+
   ideal tempQ = idQuotient;
 
   if( b <= N && e >= 1 )
-    tempQ = id_KillSquares(idQuotient, b, e, rGR); 
+    tempQ = id_KillSquares(idQuotient, b, e, rGR);
 
   idSkipZeroes( tempQ );
 
@@ -1487,7 +1493,7 @@ bool sca_ForceCommutative(ring rGR, int b, int e)
     rGR->GetNC()->SCAQuotient() = NULL;
   else
     rGR->GetNC()->SCAQuotient() = tempQ;
-  
+
   ncRingType( rGR, nc_exterior );
 
   scaFirstAltVar( rGR, b );
@@ -1498,9 +1504,9 @@ bool sca_ForceCommutative(ring rGR, int b, int e)
 
   if(rSaveRing != rGR)
     rChangeCurrRing(rSaveRing);
-  
+
   return true;
-  
+
 }
 
 // return x_i * pPoly; preserve pPoly.
@@ -1657,11 +1663,12 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
       pLmFree(strat->P.p);
 
       strat->P.p = nc_CreateSpoly(strat->P.p1, strat->P.p2, currRing);
+      if (strat->P.p!=NULL) strat->initEcart(&strat->P);
     }//    else
 
 
     if(strat->P.IsNull()) continue;
-    
+
     if (strat->P.p1 == NULL)
     {
 //       if (strat->minim > 0)
@@ -1763,96 +1770,88 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
       if( p_GetExp(pSave, i, currRing) != 0 )
       {
         assume(p_GetExp(pSave, i, currRing) == 1);
-
-        const poly pNew = sca_pp_Mult_xi_pp(i, pNext, currRing);
+        if (pNext!=NULL)
+        {
+          const poly pNew = sca_pp_Mult_xi_pp(i, pNext, currRing);
 
 #ifdef PDEBUG
-        p_Test(pNew, currRing);
+          p_Test(pNew, currRing);
 #endif
 
-        if( pNew == NULL) continue;
+          if( pNew == NULL) continue;
 
-        LObject h(pNew); // h = x_i * strat->P
+          LObject h(pNew); // h = x_i * strat->P
 
-        if (TEST_OPT_INTSTRATEGY)
-        {
-//           h.pCleardenom(); // also does a pContent
-          pContent(h.p);
-        }
-        else
-        {
-          h.pNorm();
-        }
-
-        strat->initEcart(&h);
-        h.sev = pGetShortExpVector(h.p);
-
-        int pos;
-
-        if (strat->Ll==-1)
-          pos =0;
-        else
-          pos = strat->posInL(strat->L,strat->Ll,&h,strat);
-
-        enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
-
-
-/*
-        h.sev = pGetShortExpVector(h.p);
-        strat->initEcart(&h);
-
-        h.PrepareRed(strat->use_buckets);
-
-        // reduction of the element choosen from L(?)
-        red_result = strat->red(&h,strat);
-
-        // reduction to non-zero new poly
-        if (red_result != 1) continue;
-
-
-        int pos = posInS(strat,strat->sl,h.p,h.ecart);
-
-        // reduce the tail and normalize poly
-        if (TEST_OPT_INTSTRATEGY)
-        {
-          h.pCleardenom();
-          if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+          if (TEST_OPT_INTSTRATEGY)
           {
-            h.p = redtailBba(&(h),pos-1,strat, withT); // !!!
-            h.pCleardenom();
+//            h.pCleardenom(); // also does a pContent
+            pContent(h.p);
           }
+          else
+          {
+            h.pNorm();
+          }
+
+          strat->initEcart(&h);
+          h.sev = pGetShortExpVector(h.p);
+
+          int pos;
+          if (strat->Ll==-1)
+            pos =0;
+          else
+            pos = strat->posInL(strat->L,strat->Ll,&h,strat);
+
+          enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
+/*
+          h.sev = pGetShortExpVector(h.p);
+          strat->initEcart(&h);
+
+          h.PrepareRed(strat->use_buckets);
+
+          // reduction of the element choosen from L(?)
+          red_result = strat->red(&h,strat);
+
+          // reduction to non-zero new poly
+          if (red_result != 1) continue;
+
+
+          int pos = posInS(strat,strat->sl,h.p,h.ecart);
+
+          // reduce the tail and normalize poly
+          if (TEST_OPT_INTSTRATEGY)
+          {
+            h.pCleardenom();
+            if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+            {
+              h.p = redtailBba(&(h),pos-1,strat, withT); // !!!
+              h.pCleardenom();
+            }
+          }
+          else
+          {
+            h.pNorm();
+            if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+              h.p = redtailBba(&(h),pos-1,strat, withT);
+          }
+
+#ifdef KDEBUG
+          if (TEST_OPT_DEBUG){PrintS(" N:");h.wrp();PrintLn();}
+#endif
+
+//          h.PrepareRed(strat->use_buckets); // ???
+
+          h.sev = pGetShortExpVector(h.p);
+          strat->initEcart(&h);
+
+          if (strat->Ll==-1)
+            pos = 0;
+          else
+            pos = strat->posInL(strat->L,strat->Ll,&h,strat);
+
+           enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);*/
+
         }
-        else
-        {
-
-          h.pNorm();
-          if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
-            h.p = redtailBba(&(h),pos-1,strat, withT);
-        }
-
-
-  #ifdef KDEBUG
-        if (TEST_OPT_DEBUG){PrintS(" N:");h.wrp();PrintLn();}
-  #endif
-
-//         h.PrepareRed(strat->use_buckets); // ???
-
-        h.sev = pGetShortExpVector(h.p);
-        strat->initEcart(&h);
-
-        if (strat->Ll==-1)
-          pos = 0;
-        else
-          pos = strat->posInL(strat->L,strat->Ll,&h,strat);
-
-         enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);*/
-
       } // for all x_i \in Ann(lm(P))
-
-
-
-
-
     } // if red(P) != NULL
 
 //     else if (strat->P.p1 == NULL && strat->minim > 0)
@@ -1895,7 +1894,6 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
   if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
 
 //   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
-
 //    PrintS("</sca>\n");
 
   return (strat->Shdl);
@@ -2030,7 +2028,9 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
 #endif
     if (lrmax< strat->Ll) lrmax=strat->Ll; /*stat*/
     //test_int_std(strat->kIdeal);
+#ifdef KDEBUG
     if (TEST_OPT_DEBUG) messageSets(strat);
+#endif
     if (TEST_OPT_DEGBOUND
     && (strat->L[strat->Ll].ecart+strat->L[strat->Ll].GetpFDeg()> Kstd1_deg))
     {
@@ -2069,8 +2069,8 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
       pLmFree(strat->P.p); // ???
       strat->P.p = nc_CreateSpoly(strat->P.p1, strat->P.p2, currRing);
     }
-    
-    
+
+
 
     if (strat->P.p1 == NULL)
     {
@@ -2549,7 +2549,7 @@ ideal id_KillSquares(const ideal id,
   if (id == NULL) return id; // zero ideal
 
   assume( (iFirstAltVar >= 1) && (iLastAltVar <= r->N) && (iFirstAltVar <= iLastAltVar) );
-  
+
   const int iSize = id->idelems();
 
   if (iSize == 0) return id;
