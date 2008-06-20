@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.14 2008-06-18 15:43:34 motsak Exp $ */
+/* $Id: syz.cc,v 1.15 2008-06-20 16:15:13 Singular Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -195,7 +195,7 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
           Unit2 = pTakeOutComp(&(syz->m[k]), ModComp);
 //Print("element %d: ",k);pWrite(syz->m[k]);
 //PrintS("Unit2: ");pWrite(Unit2);
-          syz->m[k] = pMult(syz->m[k],pCopy(Unit1));
+          syz->m[k] = pMult(pCopy(Unit1),syz->m[k]);
           syz->m[k] = pSub(syz->m[k],
             pMult(Unit2,pCopy(actWith)));
           if (syz->m[k]==NULL)
