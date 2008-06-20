@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.17 2008-06-10 14:35:41 motsak Exp $
+ *  Version: $Id: sca.cc,v 1.18 2008-06-20 12:28:17 Singular Exp $
  *******************************************************************/
 
 #define OM_CHECK 4
@@ -1864,7 +1864,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
     memset(&(strat->P), 0, sizeof(strat->P));
 // #endif
 
-    kTest_TS(strat);
+    //kTest_TS(strat); // T is not used: cannot use this test
 
 //     Print("\n$\n");
 
