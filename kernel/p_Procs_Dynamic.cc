@@ -6,7 +6,7 @@
  *  Purpose: source for dynamically loaded version of p_Procs
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Dynamic.cc,v 1.3 2008-03-19 17:44:10 Singular Exp $
+ *  Version: $Id: p_Procs_Dynamic.cc,v 1.4 2008-06-20 12:29:09 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "structs.h"
@@ -20,6 +20,7 @@
 #include "kbuckets.h"
 #include "dError.h"
 
+#ifdef HAVE_DL
 BOOLEAN p_procs_dynamic = TRUE;
 
 #define WARN_MSG "Singular will work properly, but much slower."
@@ -224,6 +225,4 @@ while(0)
 
 #include "p_Procs_Set.h"
 
-
-
-
+#endif
