@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.19 2008-06-20 16:54:45 Singular Exp $
+ *  Version: $Id: sca.cc,v 1.20 2008-06-21 11:34:31 Singular Exp $
  *******************************************************************/
 
 #define OM_CHECK 4
@@ -1706,17 +1706,15 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
         {
           strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT); // !!!
           strat->P.pCleardenom();
-
         }
       }
       else
       {
-
         strat->P.pNorm();
         if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
           strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT);
       }
-
+      strat->P.is_normalized=nIsOne(pGetCoeff(strat->P.p));
 
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG){PrintS(" ns:");strat->P.wrp();PrintLn();}
