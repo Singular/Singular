@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.21 2008-06-23 08:45:22 Singular Exp $
+ *  Version: $Id: sca.cc,v 1.22 2008-06-23 11:00:47 Singular Exp $
  *******************************************************************/
 
 #define OM_CHECK 4
@@ -1417,12 +1417,13 @@ bool sca_SetupQuotient(ring rGR, ring rG)
     // square = NF( var(i)^2 | Q )
     // NOTE: rSaveRing == currRing now!
     // NOTE: there is no better way to check this in general!
-    square = kNF(idQuotient, NULL, square, 0, 0); // must ran in currRing == rG!
+    square = kNF(idQuotient, NULL, square, 0, 1); // must ran in currRing == rG!
 
     if( square != NULL ) // var(i)^2 is not in Q?
     {
       p_Delete(&square, rG);
       bSCA = false;
+      break;
     }
   }
 
