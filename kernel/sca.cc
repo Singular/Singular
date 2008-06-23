@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.20 2008-06-21 11:34:31 Singular Exp $
+ *  Version: $Id: sca.cc,v 1.21 2008-06-23 08:45:22 Singular Exp $
  *******************************************************************/
 
 #define OM_CHECK 4
@@ -1113,15 +1113,15 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
     // SCA Specials:
 
     {
-      const poly pNext = pNext(save);
+      const poly p_next = pNext(save);
 
-      if( pNext != NULL )
+      if( p_next != NULL )
       for( unsigned int i = m_iFirstAltVar; i <= m_iLastAltVar; i++ )
       if( p_GetExp(save, i, currRing) != 0 )
       {
         assume(p_GetExp(save, i, currRing) == 1);
 
-        const poly tt = sca_pp_Mult_xi_pp(i, pNext, currRing);
+        const poly tt = sca_pp_Mult_xi_pp(i, p_next, currRing);
 
 #ifdef PDEBUG
         p_Test(tt, currRing);
@@ -1761,94 +1761,92 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
       // //////////////////////////////////////////////////////////
       // SCA:
       const poly pSave = strat->P.p;
-      const poly pNext = pNext(pSave);
+      const poly p_next = pNext(pSave);
 
 //       if(0)
+      if( p_next != NULL )
       for( unsigned int i = m_iFirstAltVar; i <= m_iLastAltVar; i++ )
       if( p_GetExp(pSave, i, currRing) != 0 )
       {
         assume(p_GetExp(pSave, i, currRing) == 1);
-        if (pNext!=NULL)
-        {
-          const poly pNew = sca_pp_Mult_xi_pp(i, pNext, currRing);
+        const poly p_new = sca_pp_Mult_xi_pp(i, p_next, currRing);
 
 #ifdef PDEBUG
-          p_Test(pNew, currRing);
+        p_Test(p_new, currRing);
 #endif
 
-          if( pNew == NULL) continue;
+        if( p_new == NULL) continue;
 
-          LObject h(pNew); // h = x_i * strat->P
+        LObject h(p_new); // h = x_i * strat->P
 
-          if (TEST_OPT_INTSTRATEGY)
-          {
-//            h.pCleardenom(); // also does a pContent
-            pContent(h.p);
-          }
-          else
-          {
-            h.pNorm();
-          }
+        if (TEST_OPT_INTSTRATEGY)
+        {
+//          h.pCleardenom(); // also does a pContent
+          pContent(h.p);
+        }
+        else
+        {
+          h.pNorm();
+        }
 
-          strat->initEcart(&h);
-          h.sev = pGetShortExpVector(h.p);
+        strat->initEcart(&h);
+        h.sev = pGetShortExpVector(h.p);
 
-          int pos;
-          if (strat->Ll==-1)
-            pos =0;
-          else
-            pos = strat->posInL(strat->L,strat->Ll,&h,strat);
+        int pos;
+        if (strat->Ll==-1)
+          pos =0;
+        else
+          pos = strat->posInL(strat->L,strat->Ll,&h,strat);
 
-          enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
+        enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
 /*
-          h.sev = pGetShortExpVector(h.p);
-          strat->initEcart(&h);
+        h.sev = pGetShortExpVector(h.p);
+        strat->initEcart(&h);
 
-          h.PrepareRed(strat->use_buckets);
+        h.PrepareRed(strat->use_buckets);
 
-          // reduction of the element choosen from L(?)
-          red_result = strat->red(&h,strat);
+        // reduction of the element choosen from L(?)
+        red_result = strat->red(&h,strat);
 
-          // reduction to non-zero new poly
-          if (red_result != 1) continue;
+        // reduction to non-zero new poly
+        if (red_result != 1) continue;
 
 
-          int pos = posInS(strat,strat->sl,h.p,h.ecart);
+        int pos = posInS(strat,strat->sl,h.p,h.ecart);
 
-          // reduce the tail and normalize poly
-          if (TEST_OPT_INTSTRATEGY)
+        // reduce the tail and normalize poly
+        if (TEST_OPT_INTSTRATEGY)
+        {
+          h.pCleardenom();
+          if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
           {
+            h.p = redtailBba(&(h),pos-1,strat, withT); // !!!
             h.pCleardenom();
-            if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
-            {
-              h.p = redtailBba(&(h),pos-1,strat, withT); // !!!
-              h.pCleardenom();
-            }
           }
-          else
-          {
-            h.pNorm();
-            if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
-              h.p = redtailBba(&(h),pos-1,strat, withT);
-          }
+        }
+        else
+        {
+          h.pNorm();
+          if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+            h.p = redtailBba(&(h),pos-1,strat, withT);
+        }
 
 #ifdef KDEBUG
-          if (TEST_OPT_DEBUG){PrintS(" N:");h.wrp();PrintLn();}
+        if (TEST_OPT_DEBUG){PrintS(" N:");h.wrp();PrintLn();}
 #endif
 
-//          h.PrepareRed(strat->use_buckets); // ???
+//        h.PrepareRed(strat->use_buckets); // ???
 
-          h.sev = pGetShortExpVector(h.p);
-          strat->initEcart(&h);
+        h.sev = pGetShortExpVector(h.p);
+        strat->initEcart(&h);
 
-          if (strat->Ll==-1)
-            pos = 0;
-          else
-            pos = strat->posInL(strat->L,strat->Ll,&h,strat);
+        if (strat->Ll==-1)
+          pos = 0;
+        else
+          pos = strat->posInL(strat->L,strat->Ll,&h,strat);
 
-           enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);*/
+         enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);*/
 
-        }
       } // for all x_i \in Ann(lm(P))
     } // if red(P) != NULL
 
@@ -2127,24 +2125,24 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
       // //////////////////////////////////////////////////////////
       // SCA:
       const poly pSave = strat->P.p;
-      const poly pNext = pNext(pSave);
+      const poly p_next = pNext(pSave);
 
-      if(pNext != NULL)
+      if(p_next != NULL)
       for( unsigned int i = m_iFirstAltVar; i <= m_iLastAltVar; i++ )
       if( p_GetExp(pSave, i, currRing) != 0 )
       {
 
         assume(p_GetExp(pSave, i, currRing) == 1);
 
-        const poly pNew = sca_pp_Mult_xi_pp(i, pNext, currRing);
+        const poly p_new = sca_pp_Mult_xi_pp(i, p_next, currRing);
 
 #ifdef PDEBUG
-        p_Test(pNew, currRing);
+        p_Test(p_new, currRing);
 #endif
 
-        if( pNew == NULL) continue;
+        if( p_new == NULL) continue;
 
-        LObject h(pNew); // h = x_i * strat->P
+        LObject h(p_new); // h = x_i * strat->P
 
         if (TEST_OPT_INTSTRATEGY)
            h.pCleardenom(); // also does a pContent
