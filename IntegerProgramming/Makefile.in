@@ -47,7 +47,7 @@ OBJECTS4:= $(MAIN4).o
 LLL   := LLL
 OBJECTS_LLL:= LLL_lattice_to_send.o
 
-%.o: %.cc
+%.o: %.cc si_gcc_v.h
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 all: $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4) $(LLL)
@@ -75,7 +75,7 @@ install-bindist: $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4)
 install-bindist-plural: install-bindist
 
 clean: 
-	rm -f *.o *~  $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4) $(LLL)
+	rm -f *.o *~  $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4) $(LLL) si_gcc_v.h
 
 distclean: clean
 	-rm -f ${bindir}/$(MAIN1)
@@ -83,6 +83,9 @@ distclean: clean
 	-rm -f ${bindir}/$(MAIN3)
 	-rm -f ${bindir}/$(MAIN4)
 	-rm -f ${bindir}/$(LLL)
+
+si_gcc_v.h:
+	./gccversion.sh
 
 $(MAIN1): term_ordering.o binomial.o list.o BigInt.o LLL.o matrix.o \
 	ideal.o \

@@ -10,10 +10,13 @@
 
 #ifndef GLOBALS_H
 #define GLOBALS_H
-
 // Include facilities needed by several files:
 
-//#define HAVE_IOSTREAM_H
+#include "si_gcc_v.h"
+#ifdef SI_GCC2
+#define HAVE_IOSTREAM_H
+#endif
+
 #include <stdio.h>
 #ifndef HAVE_IOSTREAM_H
 #include <iostream>
