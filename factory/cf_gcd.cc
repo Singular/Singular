@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.62 2008-06-16 12:55:41 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.63 2008-06-24 12:55:23 Singular Exp $ */
 
 #include <config.h>
 
@@ -770,7 +770,12 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
           //&& g.isUnivariate()
           && (getCharacteristic() == 0)
           )
-            return QGCD(f,g);
+          {
+            if ((f.level()==g.level()) && f.isUnivariate() && g.isUnivariate())
+              return univarQGCD(f,g);
+            else
+              return QGCD(f,g);
+          }
         }
             
         if ( f.inExtension() && getReduce( f.mvar() ) )
