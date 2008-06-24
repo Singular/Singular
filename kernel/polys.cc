@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.28 2008-03-19 17:44:10 Singular Exp $ */
+/* $Id: polys.cc,v 1.29 2008-06-24 16:25:02 wienand Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -176,8 +176,8 @@ poly pDivideM(poly a, poly b)
   pDiv_nn(result,inv);
 #else
   pMult_nn(result,inv);
-#endif
   nDelete(&inv);
+#endif
   pDelete(&b);
   return result;
 }
