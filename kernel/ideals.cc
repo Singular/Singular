@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.57 2008-06-10 11:50:07 Singular Exp $ */
+/* $Id: ideals.cc,v 1.58 2008-06-24 08:19:54 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1431,7 +1431,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
 
   ideal e = idInit(IDELEMS(s_h3), s_h3->rank);
 
-  for (j=0; j<IDELEMS(s_h3); j++)
+  for (j=IDELEMS(s_h3)-1; j>=0; j--)
   {
     if (s_h3->m[j] != NULL)
     {
