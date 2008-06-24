@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.h,v 1.3 2008-02-24 17:41:31 levandov Exp $ */
+/* $Id: kstd1.h,v 1.4 2008-06-24 08:20:31 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -22,7 +22,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
 #define KSTD_NF_ECART  2
   // only local: recude even with bad ecart
 #define KSTD_NF_NONORM 4
-  // only global: avoid normamlization, return a multiply of NF
+  // only global: avoid normalization, return a multiply of NF
 
 poly kNF1(ideal F, ideal Q, poly q, kStrategy strat, int lazyReduce);
 ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce);
