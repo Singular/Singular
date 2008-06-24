@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.22 2008-06-23 11:00:47 Singular Exp $
+ *  Version: $Id: sca.cc,v 1.23 2008-06-24 08:18:05 Singular Exp $
  *******************************************************************/
 
 #define OM_CHECK 4
@@ -934,7 +934,6 @@ void addLObject(LObject& h, kStrategy& strat)
     pos=0;
 
     if (strat->sl!=-1) pos = posInS(strat, strat->sl, h.p, h.ecart);
-
     strat->enterS(h, pos, strat, -1);
 
     if (h.lcm!=NULL) pLmFree(h.lcm);
@@ -1718,7 +1717,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
       strat->P.is_normalized=nIsOne(pGetCoeff(strat->P.p));
 
 #ifdef KDEBUG
-      if (TEST_OPT_DEBUG){PrintS(" ns:");strat->P.wrp();PrintLn();}
+      if (TEST_OPT_DEBUG){PrintS(" ns:");p_wrp(strat->P.p,currRing);PrintLn();}
 #endif
 
 //       // min_std stuff
@@ -1743,7 +1742,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 //       }
 
       // enter into S, L, and T
-      if(withT)
+      //if(withT)
         enterT(strat->P, strat);
 
       // L
@@ -1782,7 +1781,6 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 
         if (TEST_OPT_INTSTRATEGY)
         {
-//          h.pCleardenom(); // also does a pContent
           pContent(h.p);
         }
         else
