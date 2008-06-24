@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.92 2008-06-10 14:35:41 motsak Exp $ */
+/* $Id: kutil.cc,v 1.93 2008-06-24 08:21:15 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -5233,6 +5233,17 @@ void enterT(LObject p, kStrategy strat, int atT)
   assume(p.FDeg == p.pFDeg());
   assume(!p.is_normalized || nIsOne(pGetCoeff(p.p)));
 
+#ifdef KDEBUG  
+  // do not put an LObject twice into T:
+  for(i=strat->tl;i>=0;i--)
+  {
+    if (p.p==strat->T[i].p) 
+    {
+      printf("already in T at pos %d of %d, atT=%d\n",i,strat->tl,atT);
+      return;
+    }
+  }
+#endif  
   strat->newt = TRUE;
   if (atT < 0)
     atT = strat->posInT(strat->T, strat->tl, p);
