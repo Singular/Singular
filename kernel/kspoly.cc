@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.14 2008-02-23 20:13:30 levandov Exp $ */
+/* $Id: kspoly.cc,v 1.15 2008-06-25 11:27:31 Singular Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -227,7 +227,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   else
     a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, tailRing,last);
 #ifdef HAVE_RINGS
-  if (rField_is_Ring(currRing) && !(rField_is_Domain(currRing))) l2 = pLength(a2);
+  if (!(rField_is_Domain(currRing))) l2 = pLength(a2);
 #endif
 
   Pair->SetLmTail(m2, a2, l2, use_buckets, tailRing, last);
@@ -364,8 +364,9 @@ poly ksCreateShortSpoly(poly p1, poly p2, ring tailRing)
   BOOLEAN equal;
 
 #ifdef HAVE_RINGS
+  BOOLEAN is_Ring=rField_is_Ring(currRing);
   number lc1 = pGetCoeff(p1), lc2 = pGetCoeff(p2);
-  if (rField_is_Ring(currRing))
+  if (is_Ring)
   {
     ksCheckCoeff(&lc1, &lc2); // gcd and zero divisors
     if (a1 != NULL) t2 = nMult(pGetCoeff(a1),lc2);
@@ -413,7 +414,7 @@ x2:
       }
       p_Setm(m2, currRing);
 #ifdef HAVE_RINGS
-      if (rField_is_Ring(currRing))
+      if (is_Ring)
       {
           nDelete(&lc1);
           nDelete(&lc2);
@@ -428,7 +429,7 @@ x2:
     else
     {
 #ifdef HAVE_RINGS
-    if (rField_is_Ring(currRing))
+    if (is_Ring)
     {
       nDelete(&lc1);
       nDelete(&lc2);
@@ -465,7 +466,7 @@ x1:
     }
     p_Setm(m1, currRing);
 #ifdef HAVE_RINGS
-    if (rField_is_Ring(currRing))
+    if (is_Ring)
     {
       pSetCoeff0(m1, t2);
       nDelete(&lc1);
@@ -522,7 +523,7 @@ x1:
       {
         p_LmFree(m2,currRing);
 #ifdef HAVE_RINGS
-        if (rField_is_Ring(currRing))
+        if (is_Ring)
         {
           pSetCoeff0(m1, t2);
           nDelete(&lc1);
@@ -538,7 +539,7 @@ x1:
       {
         p_LmFree(m1,currRing);
 #ifdef HAVE_RINGS
-        if (rField_is_Ring(currRing))
+        if (is_Ring)
         {
           pSetCoeff0(m2, t1);
           nDelete(&lc1);
@@ -552,7 +553,7 @@ x1:
       }
     }
 #ifdef HAVE_RINGS
-    if (rField_is_Ring(currRing))
+    if (is_Ring)
     {
       equal = nEqual(t1,t2);
     }
@@ -569,7 +570,7 @@ x1:
     {
       p_LmFree(m2,currRing);
 #ifdef HAVE_RINGS
-      if (rField_is_Ring(currRing))
+      if (is_Ring)
       {
           pSetCoeff0(m1, nSub(t1, t2));
           nDelete(&lc1);
@@ -585,7 +586,7 @@ x1:
     pIter(a1);
     pIter(a2);
 #ifdef HAVE_RINGS
-    if (rField_is_Ring(currRing))
+    if (is_Ring)
     {
       if (a2 != NULL)
       {
@@ -597,7 +598,7 @@ x1:
         nDelete(&t2);
         t2 = nMult(pGetCoeff(a1),lc2);
       }
-      while (a1 != NULL && nIsZero(t2))
+      while ((a1 != NULL) && nIsZero(t2))
       {
         pIter(a1);
         if (a1 != NULL)
@@ -606,7 +607,7 @@ x1:
           t2 = nMult(pGetCoeff(a1),lc2);
         }
       }
-      while (a2 != NULL && nIsZero(t1))
+      while ((a2 != NULL) && nIsZero(t1))
       {
         pIter(a2);
         if (a2 != NULL)
@@ -623,7 +624,7 @@ x1:
       if (a1==NULL)
       {
 #ifdef HAVE_RINGS
-        if (rField_is_Ring(currRing))
+        if (is_Ring)
         {
           nDelete(&lc1);
           nDelete(&lc2);

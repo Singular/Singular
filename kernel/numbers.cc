@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.15 2008-06-25 10:00:23 Singular Exp $ */
+/* $Id: numbers.cc,v 1.16 2008-06-25 11:27:31 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -113,9 +113,9 @@ number ndCopy(number a) { return a; }
 number nd_Copy(number a,const ring r) { return r->cf->nCopy(a); }
 
 #ifdef HAVE_RINGS
-BOOLEAN ndDivBy(number a, number b) { return TRUE; }
+BOOLEAN ndDivBy(number a, number b) { return TRUE; } // assume a,b !=0
 int ndComp(number a, number b) { return 0; }
-BOOLEAN ndIsUnit(number a) { return TRUE; }
+BOOLEAN ndIsUnit(number a) { return !nIsZero(a); }
 number  ndExtGcd (number a, number b, number *s, number *t) { return nInit(1); }
 #endif
 
