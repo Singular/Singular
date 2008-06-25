@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.93 2008-06-24 08:21:15 Singular Exp $ */
+/* $Id: kutil.cc,v 1.94 2008-06-25 12:03:56 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -923,12 +923,14 @@ void deleteInS (int i,kStrategy strat)
 void deleteInL (LSet set, int *length, int j,kStrategy strat)
 {
   if (set[j].lcm!=NULL)
+  {
 #ifdef HAVE_RINGS
     if (pGetCoeff(set[j].lcm) != NULL)
       pLmDelete(set[j].lcm);
     else
 #endif
       pLmFree(set[j].lcm);
+  }
   if (set[j].p!=NULL)
   {
     if (pNext(set[j].p) == strat->tail)
