@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.84 2008-06-19 12:39:56 wienand Exp $ */
+/* $Id: ring.cc,v 1.85 2008-06-25 15:37:25 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1057,7 +1057,7 @@ int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
   if (dp_dp
 #ifdef HAVE_PLURAL
       && !rIsPluralRing(r1) && !rIsPluralRing(r2)
-#endif      
+#endif
      )
   {
     tmpR.order=(int*)omAlloc(4*sizeof(int));
@@ -1189,7 +1189,7 @@ int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       /* copy r1, because we have the variables from r1 */
     {
       int b=rBlocks(r1);
-  
+
       tmpR.order=(int*)omAlloc0(b*sizeof(int));
       tmpR.block0=(int*)omAlloc0(b*sizeof(int));
       tmpR.block1=(int*)omAlloc0(b*sizeof(int));
@@ -1312,7 +1312,7 @@ int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       idTest((ideal)C);
       idTest((ideal)D);
 
- 
+
       for (i=1; i<= rVar(R2); i++)
         for (j=i+1; j<=rVar(R2); j++)
         {
@@ -1338,11 +1338,11 @@ int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       rDebugPrint(sum);
 
       Print("\nRefs: R1: %d, R2: %d\n", R1->GetNC()->ref, R2->GetNC()->ref);
-      
+
 #endif
 #endif
 
-          
+
       rDelete(R1);
       rDelete(R2);
 
@@ -1354,7 +1354,7 @@ int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 
       rChangeCurrRing(old_ring);
     }
-  
+
   }
 #endif
 
@@ -2444,7 +2444,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
 #ifdef HAVE_PLURAL
   res->GetNC() = NULL;
 #endif
-  
+
   // res->qideal, res->idroot ???
   res->wvhdl=wvhdl;
   res->order=order;
@@ -2495,7 +2495,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
     {
       WarnS("error in nc_rComplete");
       // cleanup?
-      
+
 //      rDelete(res);
 //      return r;
 
@@ -2503,7 +2503,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
     }
   }
 #endif
-  
+
   return res;
 }
 
@@ -2515,7 +2515,7 @@ ring rModifyRing_Wp(ring r, int* weights)
 #ifdef HAVE_PLURAL
   res->GetNC() = NULL;
 #endif
-  
+
   /*weights: entries for 3 blocks: NULL*/
   res->wvhdl = (int **)omAlloc0(3 * sizeof(int_ptr));
   /*order: Wp,C,0*/
@@ -2586,7 +2586,7 @@ ring rModifyRing_Simple(ring r, BOOLEAN ommit_degree, BOOLEAN ommit_comp, unsign
     *res = *r;
 #ifdef HAVE_PLURAL
     res->GetNC() = NULL;
-#endif    
+#endif
     // res->qideal, res->idroot ???
     res->wvhdl=wvhdl;
     res->order=order;
@@ -3692,7 +3692,7 @@ ring rCurrRingAssure_SyzComp()
 #endif
 #endif
 #endif
-    
+
 
     if (old_ring->qideal != NULL)
     {
@@ -3703,7 +3703,7 @@ ring rCurrRingAssure_SyzComp()
 #ifdef HAVE_PLURAL
       if( rIsPluralRing(r) )
         nc_SetupQuotient(r);
-#endif      
+#endif
     }
   }
 
@@ -3717,7 +3717,7 @@ ring rCurrRingAssure_SyzComp()
 #endif
 #endif
 #endif
-      
+
   return r;
 }
 
@@ -3728,24 +3728,22 @@ static ring rAssure_SyzComp(ring r, BOOLEAN complete)
   int i=rBlocks(r);
   int j;
 
-  res->order=(int *)omAlloc0((i+1)*sizeof(int));
-  for(j=i;j>0;j--) res->order[j]=r->order[j-1];
-  res->order[0]=ringorder_s;
-
+  res->order=(int *)omAlloc((i+1)*sizeof(int));
   res->block0=(int *)omAlloc0((i+1)*sizeof(int));
-  for(j=i;j>0;j--) res->block0[j]=r->block0[j-1];
-
   res->block1=(int *)omAlloc0((i+1)*sizeof(int));
-  for(j=i;j>0;j--) res->block1[j]=r->block1[j-1];
-
   int ** wvhdl =(int **)omAlloc0((i+1)*sizeof(int**));
   for(j=i;j>0;j--)
   {
+    res->order[j]=r->order[j-1];
+    res->block0[j]=r->block0[j-1];
+    res->block1[j]=r->block1[j-1];
     if (r->wvhdl[j-1] != NULL)
     {
       wvhdl[j] = (int*) omMemDup(r->wvhdl[j-1]);
     }
   }
+  res->order[0]=ringorder_s;
+
   res->wvhdl = wvhdl;
 
   if (complete)
@@ -3767,8 +3765,70 @@ static ring rAssure_SyzComp(ring r, BOOLEAN complete)
       }
     }
 #endif
-    
+
   }
+  return res;
+}
+
+ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
+{
+  int i;
+  for(i=r->OrdSize;i>=0;i--)
+  {
+    if ((r->typ[i].ord_typ==ro_dp)
+    && (r->typ[i].data.dp.start==start_var)
+    && (r->typ[i].data.dp.end==end_var))
+    {
+      pos=r->typ[i].data.dp.place;
+      return r;
+    }
+  }
+  ring res=rCopy0(r, FALSE, FALSE);
+  i=rBlocks(r);
+  int j;
+
+  res->order=(int *)omMemDup(r->order);
+  res->block0=(int *)omMemDup(r->block0);
+  res->block1=(int *)omMemDup(r->block1);
+  int ** wvhdl =(int **)omAlloc0(i*sizeof(int**));
+  for(j=i-1;j>=0;j--)
+  {
+    if (r->wvhdl[j] != NULL)
+    {
+      wvhdl[j] = (int*) omMemDup(r->wvhdl[j-1]);
+    }
+  }
+  res->wvhdl = wvhdl;
+
+  res->ExpL_Size=r->ExpL_Size+1; // one word more in each monom
+  res->CmpL_Size=r->CmpL_Size;
+  res->PolyBin=omGetSpecBin(POLYSIZE + (res->ExpL_Size)*sizeof(long));
+  res->ordsgn=(long *)omAlloc0(res->ExpL_Size*sizeof(long));
+  for(j=0;j<r->CmpL_Size;j++)
+  {
+    res->ordsgn[j] = r->ordsgn[j];
+  }
+  res->OrdSize=r->OrdSize+1;   // one block more for pSetm
+  res->typ=(sro_ord*)omAlloc(res->OrdSize*sizeof(sro_ord));
+  if (r->typ!=NULL)
+    memcpy(res->typ,r->typ,r->OrdSize*sizeof(sro_ord));
+  // the additionla block for pSetm: total degree at the last word
+  // but not included in the compare part
+  res->typ[res->OrdSize].ord_typ=ro_dp;
+  res->typ[res->OrdSize].data.dp.start=start_var;
+  res->typ[res->OrdSize].data.dp.end=end_var;
+  res->typ[res->OrdSize].data.dp.place=res->ExpL_Size-1;
+  pos=res->ExpL_Size-1;
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(res))
+  {
+    if ( nc_rComplete(r, res, false) ) // no qideal!
+    {
+      WarnS("error in nc_rComplete");
+    // just go on..
+    }
+  }
+#endif
   return res;
 }
 
@@ -3777,7 +3837,7 @@ ring rAssure_HasComp(ring r)
   int last_block;
   int i=0;
   do
-  { 
+  {
      if (r->order[i] == ringorder_c ||
         r->order[i] == ringorder_C) return r;
      if (r->order[i] == 0)
@@ -3786,7 +3846,7 @@ ring rAssure_HasComp(ring r)
   } while (1);
   //WarnS("re-creating ring with comps");
   last_block=i-1;
-  
+
   ring new_r = rCopy0(r, FALSE, FALSE);
   i+=2;
   new_r->wvhdl=(int **)omAlloc0(i * sizeof(int_ptr));
@@ -3805,8 +3865,8 @@ ring rAssure_HasComp(ring r)
   }
   last_block++;
   new_r->order[last_block]=ringorder_C;
-  new_r->block0[last_block]=0;
-  new_r->block1[last_block]=0;
+  //new_r->block0[last_block]=0;
+  //new_r->block1[last_block]=0;
   //new_r->wvhdl[last_block]=NULL;
 
   rComplete(new_r, 1);
@@ -3826,7 +3886,7 @@ ring rAssure_HasComp(ring r)
     }
   }
 #endif
-  
+
   return new_r;
 }
 
@@ -3880,7 +3940,7 @@ static ring rAssure_CompLastBlock(ring r, BOOLEAN complete = TRUE)
           }
         }
 #endif
-        
+
       }
       return new_r;
     }
@@ -3929,7 +3989,7 @@ ring rCurrRingAssure_SyzComp_CompLastBlock()
       }
     }
 #endif
-   
+
     rChangeCurrRing(new_r);
     if (old_r->qideal != NULL)
     {
@@ -3940,7 +4000,7 @@ ring rCurrRingAssure_SyzComp_CompLastBlock()
       if( rIsPluralRing(old_r) )
         nc_SetupQuotient( new_r );
 #endif
-      
+
     }
     rTest(new_r);
     rTest(old_r);
@@ -4170,7 +4230,7 @@ ring rOpposite(ring src)
   if (src == NULL) return(NULL);
   ring save = currRing;
   rChangeCurrRing(src);
-  
+
   ring r = rCopy0(src,TRUE); /* TRUE for copy the qideal */
   /*  rChangeCurrRing(r); */
   // change vars v1..vN -> vN..v1
@@ -4381,20 +4441,20 @@ ring rOpposite(ring src)
   }
   rComplete(r);
 
-  
+
 #ifdef RDEBUG
   //   rDebugPrint(r);
   rTest(r);
 #endif
 
-  rChangeCurrRing(r); 
+  rChangeCurrRing(r);
 
 #ifdef HAVE_PLURAL
   // now, we initialize a non-comm structure on r
   if (rIsPluralRing(src))
   {
     assume( currRing == r);
-    
+
     int *perm       = (int *)omAlloc0((rVar(r)+1)*sizeof(int));
     int *par_perm   = NULL;
     nMapFunc nMap   = nSetMap(src);
@@ -4433,8 +4493,8 @@ ring rOpposite(ring src)
 
     omFreeSize((ADDRESS)perm,(rVar(r)+1)*sizeof(int));
 
-    rChangeCurrRing(save); 
-  
+    rChangeCurrRing(save);
+
   }
 #endif /* HAVE_PLURAL */
 
@@ -4471,7 +4531,7 @@ ring rEnvelope(ring R)
 }
 
 #ifdef HAVE_PLURAL
-BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient) 
+BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient)
 /* returns TRUE is there were errors */
 /* dest is actualy equals src with the different ordering */
 /* we map src->nc correctly to dest->src */
@@ -4480,7 +4540,7 @@ BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient)
 // NOTE: Originally used only by idElimination to transfer NC structure to dest
 // ring created by dirty hack (without nc_CallPlural)
 
-  assume(!rIsPluralRing(dest)); // destination must be a newly constructed commutative ring 
+  assume(!rIsPluralRing(dest)); // destination must be a newly constructed commutative ring
 
   if (!rIsPluralRing(src))
   {
@@ -4497,9 +4557,9 @@ BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient)
     rChangeCurrRing(dest);
 
   const ring srcBase = src->GetNC()->basering;
-  
+
   assume( nSetMap(srcBase) == nSetMap(currRing) ); // currRing is important here!
-  
+
   matrix C = mpNew(N,N); // ring independent
   matrix D = mpNew(N,N);
 
@@ -4519,17 +4579,17 @@ BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient)
       const poly   p = p_NSet(n, dest);
       MATELEM(C,i,j) = p;
       if (MATELEM(D0,i,j) != NULL)
-        MATELEM(D,i,j) = prCopyR(MATELEM(D0,i,j), srcBase, dest); // ? 
+        MATELEM(D,i,j) = prCopyR(MATELEM(D0,i,j), srcBase, dest); // ?
     }
   }
   /* One must test C and D _only_ in r->GetNC()->basering!!! not in r!!! */
-  
+
   idTest((ideal)C); // in dest!
   idTest((ideal)D);
 
   if (nc_CallPlural(C, D, NULL, NULL, dest, bSetupQuotient, false, true, dest)) // also takes care about quotient ideal
   {
-    //WarnS("Error transferring non-commutative structure"); 
+    //WarnS("Error transferring non-commutative structure");
     // error message should be in the interpreter interface
 
     mpDelete(&C, dest);
@@ -4537,16 +4597,16 @@ BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient)
 
     if (currRing != save)
        rChangeCurrRing(save);
-    
+
     return TRUE;
   }
-  
+
 //  mpDelete(&C, dest); // used by nc_CallPlural!
 //  mpDelete(&D, dest);
 
   if (dest != save)
     rChangeCurrRing(save);
-  
+
   return FALSE;
 }
 #endif
