@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.14 2008-03-19 17:44:10 Singular Exp $ */
+/* $Id: numbers.cc,v 1.15 2008-06-25 10:00:23 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -116,7 +116,6 @@ number nd_Copy(number a,const ring r) { return r->cf->nCopy(a); }
 BOOLEAN ndDivBy(number a, number b) { return TRUE; }
 int ndComp(number a, number b) { return 0; }
 BOOLEAN ndIsUnit(number a) { return TRUE; }
-number  ndGetUnit (number a) { return nCopy(a); }
 number  ndExtGcd (number a, number b, number *s, number *t) { return nInit(1); }
 #endif
 
@@ -296,8 +295,8 @@ void nInitChar(ring r)
   n->nComp = ndComp;
   n->nDivBy = ndDivBy;
   n->nIsUnit = ndIsUnit;
-  n->nGetUnit = ndGetUnit;
   n->nExtGcd = ndExtGcd;
+  n->nGetUnit = (nMapFunc)NULL;
 #endif
   if (rField_is_Extension(r))
   {
@@ -671,6 +670,9 @@ void nInitChar(ring r)
   {
     WerrorS("unknown field");
   }
+#endif
+#ifdef HAVE_RINGS
+  if (n->nGetUnit==(nMapFunc)NULL) n->nGetUnit=n->nCopy;
 #endif
   if (!errorreported)
   {
