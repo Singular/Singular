@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.155 2008-06-10 13:10:23 bricken Exp $ */
+/* $Id: tgb.cc,v 1.156 2008-06-25 08:49:21 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -392,13 +392,13 @@ static wlen_type do_pELength(poly p, slimgb_alg* c, int dlm=-1){
   wlen_type s=0;
   poly pi=p;
   if(dlm<0){
-    dlm=pTotaldegree(p,c->r);
+    dlm=c->pTotaldegree(p);
     s=1;
     pi=p->next;
   }
 
   while(pi){
-    int d=pTotaldegree(pi,c->r);
+    int d=c->pTotaldegree(pi);
     if(d>dlm)
       s+=1+d-dlm;
     else
@@ -408,18 +408,18 @@ static wlen_type do_pELength(poly p, slimgb_alg* c, int dlm=-1){
   return s;
 }
 
-wlen_type pELength(poly p, ring r){
+wlen_type pELength(poly p, slimgb_alg* c, ring r){
   if(p==NULL) return 0;
   wlen_type s=0;
   poly pi=p;
   int dlm;
-    dlm=pTotaldegree(p,r);
+    dlm=c->pTotaldegree(p);
     s=1;
     pi=p->next;
 
 
   while(pi){
-    int d=pTotaldegree(pi,r);
+    int d=c->pTotaldegree(pi);
     if(d>dlm)
       s+=1+d-dlm;
     else
@@ -439,7 +439,7 @@ wlen_type kEBucketLength(kBucket* b, poly lm,int sugar,slimgb_alg* ca)
   if(elength_is_normal_length(lm,ca)) {
     return bucket_guess(b);
   }
-  int d=pTotaldegree(lm,ca->r);
+  int d=ca->pTotaldegree(lm);
   #if 1
   assume(sugar>=d);
   s=1+(bucket_guess(b)-1)*(sugar-d+1);
@@ -1118,7 +1118,7 @@ static void replace_pair(int & i, int & j,slimgb_alg* c)
 //     }
  // }
 
-  int sugar=pTotaldegree(lm);
+  int sugar=c->pTotaldegree(lm);
   p_Delete(&lm, c->r);
     if(c->T_deg_full)//Sugar
     {
@@ -1329,9 +1329,9 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
   pEnlargeSet(&c->S->m,c->n-1,1);
   if (c->T_deg_full)
     ENLARGE(c->T_deg_full,int);
-  sugar=c->T_deg[i]=pTotaldegree(h);
+  sugar=c->T_deg[i]=c->pTotaldegree(h);
   if(c->T_deg_full){
-    sugar=c->T_deg_full[i]=pTotaldegree_full(h);
+    sugar=c->T_deg_full[i]=c->pTotaldegree_full(h);
     ecart=sugar-c->T_deg[i];
     assume(ecart>=0);
   }
@@ -1476,7 +1476,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
 
     pLcm(c->S->m[i], c->S->m[j], lm);
     pSetm(lm);
-    s->deg=pTotaldegree(lm);
+    s->deg=c->pTotaldegree(lm);
 
     if(c->T_deg_full)//Sugar
     {
@@ -2539,7 +2539,7 @@ static void go_on (slimgb_alg* c){
     buf[j].sev=pGetShortExpVector(p[j]);
     buf[j].bucket = kBucketCreate(currRing);
     if (c->eliminationProblem){
-        buf[j].sugar=pTotaldegree_full(p[j]);
+        buf[j].sugar=c->pTotaldegree_full(p[j]);
     }
     int len=pLength(p[j]);
     kBucketInit(buf[j].bucket,buf[j].p,len);
@@ -2808,7 +2808,7 @@ void slimgb_alg::introduceDelayedPairs(poly* pa,int s){
         poly p=pa[i];
         simplify_poly(p,r);
         si->expected_length=pQuality(p,this,pLength(p));
-        si->deg=pTotaldegree_full(p);
+        si->deg=this->pTotaldegree_full(p);
         /*if (!rField_is_Zp(r)){
           pContent(p);
           pCleardenom(p);
@@ -2839,11 +2839,11 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
     int hzz;
     for(hzz=0;hzz<IDELEMS(I);hzz++){
       assume(I->m[hzz]!=NULL);
-      int d=pTotaldegree(I->m[hzz]);
+      int d=this->pTotaldegree(I->m[hzz]);
       poly t=I->m[hzz]->next;
       while(t)
       {
-        if (d!=pTotaldegree(t,r))
+        if (d!=this->pTotaldegree(t))
         {
           is_homog=FALSE;
           break;
@@ -3833,7 +3833,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
     int old_length=c->strat->lenS[j];// in view of S
     los[bp].p=p;
     if (c->eliminationProblem){
-        los[bp].sugar=pTotaldegree_full(p);
+        los[bp].sugar=c->pTotaldegree_full(p);
     }
     kBucketInit(los[bp].bucket,p,old_length);
     wlen_type qal=pQuality(clear_into,c,new_length);
@@ -3866,13 +3866,13 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
       if (c->gcd_of_terms[pos_in_c]==NULL)
         c->gcd_of_terms[pos_in_c]=gcd_of_terms(clear_into,c->r);
       if (c->T_deg_full)
-        tdeg_full=c->T_deg_full[pos_in_c]=pTotaldegree_full(clear_into);
+        tdeg_full=c->T_deg_full[pos_in_c]=c->pTotaldegree_full(clear_into);
       else tdeg_full=tdeg;
       c_S_element_changed_hook(pos_in_c,c);
     } else {
       if (c->eliminationProblem){
-        tdeg_full=pTotaldegree_full(clear_into);
-        tdeg=pTotaldegree(clear_into);
+        tdeg_full=c->pTotaldegree_full(clear_into);
+        tdeg=c->pTotaldegree(clear_into);
       }
     }
     c->strat->S[j]=clear_into;
@@ -3979,7 +3979,7 @@ static void multi_reduction_find(red_object* los, int losl,slimgb_alg* c,int sta
   while(i>=0){
     assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)<=0));
     assume(is_valid_ro(los[i]));
-    assume((!(c->eliminationProblem))||(los[i].sugar>=pTotaldegree(los[i].p)));
+    assume((!(c->eliminationProblem))||(los[i].sugar>=c->pTotaldegree(los[i].p)));
     j=kFindDivisibleByInS_easy(strat,los[i]);
     if(j>=0){
 
@@ -4266,7 +4266,7 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
 #else
       int ecart=0;
       if (c->eliminationProblem){
-        ecart=pTotaldegree_full(erg.expand)-pTotaldegree(erg.expand);
+        ecart=c->pTotaldegree_full(erg.expand)-c->pTotaldegree(erg.expand);
       }
       add_to_reductors(c,erg.expand,erg.expand_length,ecart);
 #endif
@@ -4410,7 +4410,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
     }
     pNormalize(red);
     if (c->eliminationProblem){
-        r[rn].sugar=pTotaldegree_full(red);
+        r[rn].sugar=c->pTotaldegree_full(red);
     }
 
     if ((!(erg.fromS))&&(TEST_V_UPTORADICAL)){
@@ -4463,12 +4463,12 @@ void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
 
   int reducer_deg=0;
   if (c->eliminationProblem){
-     int lm_deg=pTotaldegree(r[erg.to_reduce_l].p);
+     int lm_deg=c->pTotaldegree(r[erg.to_reduce_l].p);
      int ecart;
      if (erg.fromS){
        ecart=c->strat->ecartS[erg.reduce_by];
      } else {
-       ecart=pTotaldegree_full(red)-lm_deg;
+       ecart=c->pTotaldegree_full(red)-lm_deg;
      }
      reducer_deg=lm_deg+ecart;
   }

@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.70 2008-06-09 06:16:04 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.71 2008-06-25 08:49:22 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -252,6 +252,18 @@ class slimgb_alg
   #ifdef TGB_RESORT_PAIRS
   BOOLEAN used_b;
   #endif
+  unsigned long pTotaldegree(poly p){
+      return ::pTotaldegree(p,this->r);
+  }
+  int pTotaldegree_full(poly p){
+    int r=0;
+    while(p){
+      int d=this->pTotaldegree(p);
+      r=si_max(r,d);
+      pIter(p);
+    }
+    return r;
+  }
 };
 class red_object{
  public:
