@@ -19,7 +19,7 @@ FILE *f=fopen("si_gcc_v.h","w");
 #ifdef __GNUC__
 char *p=__VERSION__;
 if (p[0]=='2') fprintf(f,"#define SI_GCC2\n");
-else if ((p[0]=='3')||(p[0]=='4')) fprintf(f,"SI_GCC3\n");
+else if ((p[0]=='3')||(p[0]=='4')) fprintf(f,"#define SI_GCC3\n");
 #endif
 fclose(f);
 exit(0); }
