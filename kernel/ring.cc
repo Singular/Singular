@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.86 2008-06-26 12:47:23 Singular Exp $ */
+/* $Id: ring.cc,v 1.87 2008-06-26 13:32:56 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3802,6 +3802,7 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
     }
   }
   res->wvhdl = wvhdl;
+  res->VarOffset=(int*)omMemDup(r->VarOffset);
 
   res->ExpL_Size=r->ExpL_Size+1; // one word more in each monom
   res->CmpL_Size=r->CmpL_Size;
