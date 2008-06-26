@@ -1,5 +1,5 @@
 // version string automatically expanded by CVS
-version="$Id: powers.lib,v 1.2 2008-05-29 16:59:32 motsak Exp $";
+version="$Id: powers.lib,v 1.3 2008-06-26 13:17:43 motsak Exp $";
 category="Linear algebra";
 
 info="
@@ -9,11 +9,11 @@ AUTHOR:    Oleksandr Motsak, email: {U@D}, where U={motsak}, D={mathematik.uni-k
 KEYWORDS: symmetric power, exterior power
 
 PROCEDURES:
-    SymmetricBasis(int, int)       return a basis of a k-th symmetric power
-    SymmetricPower(module,int)     return k-th symmetric power of a matrix
+    symmetricBasis(int, int)       return a basis of a k-th symmetric power
+    symmetricPower(module,int)     return k-th symmetric power of a matrix
 
-    ExteriorBasis(int, int)        return a basis of a k-th exterior power
-    ExteriorPower(module,int)      return k-th exterior power of a matrix
+    exteriorBasis(int, int)        return a basis of a k-th exterior power
+    exteriorPower(module,int)      return k-th exterior power of a matrix
        
 ";
     
@@ -21,18 +21,17 @@ PROCEDURES:
 LIB "general.lib"; // for sort
 LIB "nctools.lib"; // for SuperCommutative
 
-
 // thanks to Oleksandr Iena for his persistence ;-)
 
-proc SymmetricBasis(int n, int k)
-"USAGE:    SymmetricBasis(n, k); n int, k int
+proc symmetricBasis(int n, int k)
+"USAGE:    symmetricBasis(n, k); n int, k int
 RETURN:   ring: the basis of the k-th symmetric power of a n-dim vector space
 NOTE:     The output consists of a polynomial ring in n variables, together with the ideal called I.
           The ideal I is the basis of the k-th symmetric power of a n-dim vector space (ordered lexicographically).
           The char. of the returned ring is the same as of current basis ring or zero.
-SEE ALSO: ExteriorBasis
+SEE ALSO: exteriorBasis
 KEYWORDS: symmetric basis
-EXAMPLE:  example SymmetricBasis; shows an example"
+EXAMPLE:  example symmetricBasis; shows an example"
 {
   int p = 0;
   if( nameof(basering) != "basering" )
@@ -52,29 +51,29 @@ EXAMPLE:  example SymmetricBasis; shows an example"
 example
 { "EXAMPLE:"; echo = 2;
 
-def r = SymmetricBasis(2, 3); setring r; r;
+def r = symmetricBasis(2, 3); setring r; r;
 I; // basis of 3rd sym. power of a 2-dim v.s.
 kill r;
 
 ring r = (0),(a, b, c, d), dp; r;
-def g = SymmetricBasis(3, 2); setring g; g; I;
+def g = symmetricBasis(3, 2); setring g; g; I;
 
 kill g, r;
 
 ring r = (32003),(a, b, c, d), dp; r;
-def g = SymmetricBasis(4, 2); setring g; g; I;
+def g = symmetricBasis(4, 2); setring g; g; I;
 }
 
-proc ExteriorBasis(int n, int k)
-"USAGE:    ExteriorBasis(n, k); n int, k int
+proc exteriorBasis(int n, int k)
+"USAGE:    exteriorBasis(n, k); n int, k int
 RETURN:   ring: the basis of the k-th exterior power of a n-dim vector space
 NOTE:     The output consists of a polynomial ring in n variables, together with the ideal called I.
           The ideal I is the basis of the k-th exterior power of a n-dim vector space (ordered lexicographically).
           The char. of the returned ring is the same as of current basis ring or zero.
 
-SEE ALSO: SymmetricBasis
+SEE ALSO: symmetricBasis
 KEYWORDS: exterior basis
-EXAMPLE:  example ExteriorBasis; shows an example"
+EXAMPLE:  example exteriorBasis; shows an example"
 {
   int p = 0;
   if( nameof(basering) != "basering" )
@@ -95,29 +94,29 @@ EXAMPLE:  example ExteriorBasis; shows an example"
 example
 { "EXAMPLE:"; echo = 2;
 
-def r = ExteriorBasis(2, 3); setring r; r;
+def r = exteriorBasis(2, 3); setring r; r;
 "Basis: ", I; // basis of 3rd sym. power of a 2-dim v.s.
 kill r;
 
 ring r = (0),(a, b, c, d), dp; r;
-def g = ExteriorBasis(3, 2); setring g; g; "Basis: ", I;
+def g = exteriorBasis(3, 2); setring g; g; "Basis: ", I;
 
 kill g, r;
 
 ring r = (32003),(a, b, c, d), dp; r;
-def g = ExteriorBasis(4, 2); setring g; g; "Basis: ", I;
+def g = exteriorBasis(4, 2); setring g; g; "Basis: ", I;
 }
 
 
 
-proc SymmetricPower(module A, int k)
-"USAGE:    SymmetricPower(A, k); A module, k int
+proc symmetricPower(module A, int k)
+"USAGE:    symmetricPower(A, k); A module, k int
 RETURN:   module: the k-th symmetric power of A
 NOTE:     the chosen bases (ordered lexicographically) and
           temporary data  may be shown if printlevel is big enough
-SEE ALSO: ExteriorPower
+SEE ALSO: exteriorPower
 KEYWORDS: symmetric power
-EXAMPLE:  example SymmetricPower; shows an example"
+EXAMPLE:  example symmetricPower; shows an example"
 {
   int p = printlevel - voice + 2;
   def save = basering;
@@ -128,13 +127,13 @@ EXAMPLE:  example SymmetricPower; shows an example"
   int i, j;
 
   /////////////////////////////////////////////////////////////////
-  def Tn = SymmetricBasis(N, k); setring Tn;
+  def Tn = symmetricBasis(N, k); setring Tn;
   ideal Ink = I;
   dbprint(p-3, "Temporary Source Ring", basering);
   dbprint(p, "S^k(Source Basis)", Ink);
 
   /////////////////////////////////////////////////////////////////
-  def Tm = SymmetricBasis(M, k); setring Tm;
+  def Tm = symmetricBasis(M, k); setring Tm;
   ideal Imk = I;
   dbprint(p-3, "Temporary Image Ring", basering);
   dbprint(p, "S^k(Image Basis)", Imk);
@@ -222,26 +221,26 @@ ring r = (0),(a, b, c, d), dp; r;
 
 module A = a*gen(1), b * gen(1), c*gen(1), d * gen(1);
 
-print(SymmetricPower(A, 2));
-print(SymmetricPower(A, 3));
+print(symmetricPower(A, 2));
+print(symmetricPower(A, 3));
 
 module B = a*gen(1) + c* gen(2), b * gen(1) + d * gen(2);
 
-print(SymmetricPower(B, 2));
-print(SymmetricPower(B, 3));
+print(symmetricPower(B, 2));
+print(symmetricPower(B, 3));
 
 kill r;
 ring r = (0),(a, b, c, d), dp;def g = SuperCommutative();setring g;
 
 module A = a*gen(1), b * gen(1), c*gen(1), d * gen(1);
 
-print(SymmetricPower(A, 2));
-print(SymmetricPower(A, 3));
+print(symmetricPower(A, 2));
+print(symmetricPower(A, 3));
 
 module B = a*gen(1) + c* gen(2), b * gen(1) + d * gen(2);
 
-print(SymmetricPower(B, 2));
-print(SymmetricPower(B, 3));
+print(symmetricPower(B, 2));
+print(symmetricPower(B, 3));
 
 kill r;
 
@@ -250,15 +249,15 @@ printlevel = save;
 
 
 
-proc ExteriorPower(module A, int k)
-"USAGE:    ExteriorPower(A, k); A module, k int
+proc exteriorPower(module A, int k)
+"USAGE:    exteriorPower(A, k); A module, k int
 RETURN:   module: the k-th exterior power of A
 NOTE:     the chosen bases and temporary data
           may be shown if printlevel is big enough.
           Last rows may be invisible if zero.
-SEE ALSO: SymmetricPower
+SEE ALSO: symmetricPower
 KEYWORDS: exterior power
-EXAMPLE:  example ExteriorPower; shows an example"
+EXAMPLE:  example exteriorPower; shows an example"
 {
   int p = printlevel - voice + 2;
   def save = basering;
@@ -269,13 +268,13 @@ EXAMPLE:  example ExteriorPower; shows an example"
   int i, j;
 
   /////////////////////////////////////////////////////////////////
-  def Tn = ExteriorBasis(N, k); setring Tn;
+  def Tn = exteriorBasis(N, k); setring Tn;
   ideal Ink = I;
   dbprint(p-3, "Temporary Source Ring", basering);
   dbprint(p, "E^k(Source Basis)", Ink);
 
   /////////////////////////////////////////////////////////////////
-  def Tm = ExteriorBasis(M, k); setring Tm;
+  def Tm = exteriorBasis(M, k); setring Tm;
   ideal Imk = I;
   dbprint(p-3, "Temporary Image Ring", basering);
   dbprint(p, "E^k(Image Basis)", Imk);
@@ -363,26 +362,26 @@ example
 
   module A = a*gen(1), b * gen(1), c*gen(1), d * gen(1);
 
-  print(ExteriorPower(A, 2));
-  print(ExteriorPower(A, 3));
+  print(exteriorPower(A, 2));
+  print(exteriorPower(A, 3));
 
   module B = a*gen(1) + c* gen(2), b * gen(1) + d * gen(2);
 
-  print(ExteriorPower(B, 2));
-  print(ExteriorPower(B, 3));
+  print(exteriorPower(B, 2));
+  print(exteriorPower(B, 3));
 
   kill r;
   ring r = (0),(a, b, c, d), dp;def g = SuperCommutative();setring g;
 
   module A = a*gen(1), b * gen(1), c*gen(1), d * gen(1);
 
-  print(ExteriorPower(A, 2));
-  print(ExteriorPower(A, 3));
+  print(exteriorPower(A, 2));
+  print(exteriorPower(A, 3));
 
   module B = a*gen(1) + c* gen(2), b * gen(1) + d * gen(2);
 
-  print(ExteriorPower(B, 2));
-  print(ExteriorPower(B, 3));
+  print(exteriorPower(B, 2));
+  print(exteriorPower(B, 3));
 
   kill r;
 
