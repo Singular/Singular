@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.33 2008-06-10 10:17:32 motsak Exp $ */
+/* $Id: longalg.cc,v 1.34 2008-06-26 16:22:30 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1123,10 +1123,16 @@ number naSub(number la, number lb)
   }
   if (x!=NULL)
   {
-    assume(!napIsConstant(x));
+    if (napIsConstant(x))
+    {
+      number inv=nacInvers(napGetCoeff(x));
+      napMultN(lu->z,inv);
+      nacDelete(&inv,nacRing);
+      napDelete(&x);
+    }
   }
   lu->n = x;
-  lu->s = 0;
+  lu->s = (x==NULL);
   lu->cnt=si_max(a->cnt,b->cnt)+1;
   if (lu->n!=NULL)
   {
