@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.85 2008-06-25 15:37:25 Singular Exp $ */
+/* $Id: ring.cc,v 1.86 2008-06-26 12:47:23 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3773,14 +3773,17 @@ static ring rAssure_SyzComp(ring r, BOOLEAN complete)
 ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
 {
   int i;
-  for(i=r->OrdSize;i>=0;i--)
+  if (r->typ!=NULL)
   {
-    if ((r->typ[i].ord_typ==ro_dp)
-    && (r->typ[i].data.dp.start==start_var)
-    && (r->typ[i].data.dp.end==end_var))
+    for(i=r->OrdSize-1;i>=0;i--)
     {
-      pos=r->typ[i].data.dp.place;
-      return r;
+      if ((r->typ[i].ord_typ==ro_dp)
+      && (r->typ[i].data.dp.start==start_var)
+      && (r->typ[i].data.dp.end==end_var))
+      {
+        pos=r->typ[i].data.dp.place;
+        return r;
+      }
     }
   }
   ring res=rCopy0(r, FALSE, FALSE);
@@ -3819,6 +3822,7 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
   res->typ[res->OrdSize].data.dp.end=end_var;
   res->typ[res->OrdSize].data.dp.place=res->ExpL_Size-1;
   pos=res->ExpL_Size-1;
+  if ((start_var==1) && (end_var==res->N)) res->pOrdIndex=pos;
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(res))
   {
