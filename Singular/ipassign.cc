@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.97 2008-06-10 10:32:10 motsak Exp $ */
+/* $Id: ipassign.cc,v 1.98 2008-06-26 18:35:11 motsak Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -536,6 +536,14 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
   memcpy4(qr,qrr,sizeof(ip_sring));
   omFreeBin((ADDRESS)qrr, ip_sring_bin);
 
+#ifdef HAVE_PLURAL
+  // we must correct the above dirty hack...
+  if(rIsPluralRing(qr))
+  {
+    qr->GetNC()->basering = qr;
+  }
+#endif
+
   // delete the qr copy of quotient ideal!!!
   if (qr->qideal!=NULL) idDelete(&qr->qideal); 
 
@@ -562,7 +570,10 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
       Warn("%s is no twosided standard basis",a->Name());
     }
 
-    nc_SetupQuotient(qr, currRing);
+    if( nc_SetupQuotient(qr, currRing) )
+    {
+//      WarnS("error in nc_SetupQuotient"); 
+    }
   }
   #endif
   //currRing=qr;

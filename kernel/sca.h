@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sca.h,v 1.12 2008-06-10 10:17:33 motsak Exp $ */
+/* $Id: sca.h,v 1.13 2008-06-26 18:35:45 motsak Exp $ */
 
 #include <ring.h>
 #include <gring.h>
@@ -26,16 +26,8 @@ inline bool rIsSCA(const ring r)
 // we must always have this test!
 inline ideal SCAQuotient(const ring r)
 {
-  if( !rIsSCA(r) ) 
-    return currQuotient;
-
-  // SCA!
-#ifdef HAVE_PLURAL
+  assume(rIsSCA(r));
   return r->GetNC()->SCAQuotient();
-#else
-  // for sainity
-  return NULL;
-#endif
 }
 
 
@@ -176,7 +168,7 @@ ideal id_KillSquares(const ideal id,
   const ring r); 
 
 // for benchmarking
-bool sca_ForceCommutative(ring rGR, int b, int e);
+bool sca_Force(ring rGR, int b, int e);
 
 
 #ifdef PLURAL_INTERNAL_DECLARATIONS
@@ -189,8 +181,13 @@ bool sca_ForceCommutative(ring rGR, int b, int e);
 // if yes, make rGR a super-commutative algebra!
 // NOTE: Factors of SuperCommutative Algebras are supported this way!
 //
-//  rG == NULL means that there is no separate base G-algebra in this case take rGR == rG
-bool sca_SetupQuotient(ring rGR, ring rG);
+//  rG == NULL means that there is no separate base G-algebra in this
+//  case take rGR == rG
+
+// special case: bCopy == true (default value: false)
+// meaning: rGR copies structure from rG
+// (maybe with some minor changes, which don't change the type!)
+bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy);
 
 #endif // PLURAL_INTERNAL_DECLARATIONS
 

@@ -6,11 +6,16 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.56 2008-06-20 16:54:45 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.57 2008-06-26 18:35:45 motsak Exp $
  *******************************************************************/
 
+#define MYTEST 0
+#define OUTPUT 0
+
+#if MYTEST
 #define OM_CHECK 4
 #define OM_TRACK 5
+#endif
 
 #include "mod2.h"
 
@@ -33,8 +38,6 @@
 #include "gring.h"
 #include "sca.h"
 
-#define MYTEST 0
-#define OUTPUT 0
 
 
 // dirty tricks:
@@ -84,6 +87,10 @@ void gnc_kBucketPolyRed_ZOld(kBucket_pt b, poly p, number *c);
 
 ideal gnc_gr_mora(const ideal, const ideal, const intvec *, const intvec *, kStrategy); // Not yet!
 ideal gnc_gr_bba (const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat);
+
+
+void nc_CleanUp(nc_struct* p); // just free memory!
+void nc_rCleanUp(ring r); // smaller than kill: just free mem
 
 
 #if 0
@@ -2491,7 +2498,21 @@ matrix nc_PrintMat(int a, int b, ring r, int metric)
   return(res);
 }
 
-void ncKill(ring r)
+inline void nc_CleanUp(nc_struct* p)
+{
+  assume(p != NULL);
+  omFreeSize((ADDRESS)p,sizeof(nc_struct));
+}
+
+inline void nc_CleanUp(ring r)
+{
+  /* small CleanUp of r->GetNC() */
+  assume(r != NULL);
+  nc_CleanUp(r->GetNC());
+  r->GetNC() = NULL;
+}
+
+void nc_rKill(ring r)
 // kills the nc extension of ring r
 {
   if (r->GetNC()->ref >= 1) /* in use by somebody else */
@@ -2524,34 +2545,30 @@ void ncKill(ring r)
 
   if( rIsSCA(r) && (r->GetNC()->SCAQuotient() != NULL) )
   {
-    id_Delete(&r->GetNC()->SCAQuotient(), r->GetNC()->basering);
+    id_Delete(&r->GetNC()->SCAQuotient(), r->GetNC()->basering); // Custom SCA destructor!!!
   }
 
   r->GetNC()->basering->ref--;
 
   if ((r->GetNC()->basering->ref<=0)&&(r->GetNC()->basering->GetNC()==NULL))
   {
+    WarnS("Killing a base ring!");
+//    rWrite(r->GetNC()->basering);
     rKill(r->GetNC()->basering);
   }
 
-  ncCleanUp(r);
+  nc_CleanUp(r);
 }
 
-inline void ncCleanUp(nc_struct* p)
-{
-  assume(p != NULL);
-  omFreeSize((ADDRESS)p,sizeof(nc_struct));
-}
 
-inline void ncCleanUp(ring r)
-{
-  /* small CleanUp of r->GetNC() */
-  assume(r != NULL);
-  ncCleanUp(r->GetNC());
-  r->GetNC() = NULL;
-}
+////////////////////////////////////////////////////////////////////////////////////////////////
 
-// inline
+// share the same nc-structure with a new copy ``res'' of ``r''.
+// used by rCopy only.
+// additionally inits multipication on ``res''!
+// NOTE: update nc structure on res: share NC structure of r with res since they are the same!!!
+// i.e. no data copy!!! Multiplications will be setuped as well!
+inline
 void nc_rCopy0(ring res, const ring r)
 {
   assume(rIsPluralRing(r));
@@ -2563,6 +2580,16 @@ void nc_rCopy0(ring res, const ring r)
 }
 
 
+
+
+inline void nc_rClean0(ring r) // inverse to nc_rCopy0! ps: no real deletion!
+{
+  assume(rIsPluralRing(r));
+
+  r->GetNC()->ref--;
+  r->GetNC() = NULL;
+// p_ProcsSet(res, r->p_Procs); // ???
+}
 
 poly nc_p_CopyGet(poly a, const ring r)
 /* for use in getting the mult. matrix elements*/
@@ -2711,7 +2738,6 @@ BOOLEAN gnc_CheckOrdCondition(matrix D, ring r)
     rChangeCurrRing(save);
   return(report);
 }
-
 
 
 BOOLEAN nc_CallPlural(
@@ -3019,7 +3045,7 @@ BOOLEAN nc_CallPlural(
 
   // Setup new NC structure!!!
   if (r->GetNC() != NULL)
-    ncKill(r);
+    nc_rKill(r);
 
   r->ref++; // ?
   r->GetNC() = nc_new;
@@ -3028,6 +3054,19 @@ BOOLEAN nc_CallPlural(
     rChangeCurrRing(save);
 
   return gnc_InitMultiplication(r, bSetupQuotient);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+bool nc_rCopy(ring res, const ring r, bool bSetupQuotient)
+{
+  if (nc_CallPlural(r->GetNC()->C, r->GetNC()->D, NULL, NULL, res, bSetupQuotient, true, true, r)) 
+  {
+    WarnS("Error occured while coping/setuping the NC structure!"); // No reaction!???
+    return true; // error
+  }
+
+  return false;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -3611,13 +3650,31 @@ BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate)
 
 
 
-bool nc_SetupQuotient(ring rGR, const ring rG)
+bool nc_SetupQuotient(ring rGR, const ring rG, bool bCopy)
 {
-  // currently only super-commutative extension deals with factors.
-  if( bUseExtensions )
-    return sca_SetupQuotient(rGR, rG);
+  if( rGR->qideal == NULL )
+    return false; // no quotient = no work! done!?
 
-  return false;
+  bool ret = true;
+  // currently only super-commutative extension deals with factors.
+
+  if( bUseExtensions )
+  {
+    bool sca_ret = sca_SetupQuotient(rGR, rG, bCopy);
+
+    if(sca_ret) // yes it was dealt with!
+      ret = false;
+  }
+
+  if( bCopy )
+  {
+    assume(rIsPluralRing(rGR) == rIsPluralRing(rG));
+    assume((rGR->qideal==NULL) == (rG->qideal==NULL));
+    assume(rIsSCA(rGR) == rIsSCA(rG));
+    assume(ncRingType(rGR) == ncRingType(rG));
+  }
+
+  return ret;
 }
 
 

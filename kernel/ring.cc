@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.87 2008-06-26 13:32:56 Singular Exp $ */
+/* $Id: ring.cc,v 1.88 2008-06-26 18:35:45 motsak Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -401,12 +401,12 @@ void rWrite(ring r)
       {
         for (j = i+1; j<=r->N; j++)
         {
-          nl = nIsOne(p_GetCoeff(MATELEM(r->GetNC()->C,i,j),r));
+          nl = nIsOne(p_GetCoeff(MATELEM(r->GetNC()->C,i,j),r->GetNC()->basering));
           if ( (MATELEM(r->GetNC()->D,i,j)!=NULL) || (!nl) )
           {
             Print("\n//    %s%s=",r->names[j-1],r->names[i-1]);
             pl = MATELEM(r->GetNC()->MT[UPMATELEM(i,j,r->N)],1,1);
-            pWrite0(pl);
+            p_Write0(pl, r->GetNC()->basering, r->GetNC()->basering);
           }
         }
       }
@@ -414,23 +414,28 @@ void rWrite(ring r)
     else PrintS(" ...");
 #ifdef PDEBUG
     Print("\n//   noncommutative type:%d", (int)ncRingType(r));
-    Print("\n//   is skew constant:%d",r->GetNC()->IsSkewConstant);
+    Print("\n//      is skew constant:%d",r->GetNC()->IsSkewConstant);
+    Print("\n//                 ncref:%d",r->GetNC()->ref);
+    Print("\n//               commref:%d",r->ref);
+    Print("\n//               baseref:%d",r->GetNC()->basering->ref);
     if( rIsSCA(r) )
     {
       Print("\n//   alternating variables: [%d, %d]", scaFirstAltVar(r), scaLastAltVar(r));
       const ideal Q = SCAQuotient(r); // resides within r!
+      Print("\n//   quotient of sca by ideal");
+
       if (Q!=NULL)
       {
-        PrintS("\n//   quotient of sca by ideal");
         if (r==currRing)
         {
           PrintLn();
-          iiWriteMatrix((matrix)Q,"__",1);
+          iiWriteMatrix((matrix)Q,"scaQ",1);
         }
         else PrintS(" ...");
-      }
+      } else
+        PrintS(" (NULL)");
+        
     }
-    Print("\n//   ref:%d",r->GetNC()->ref);
 #endif
   }
 #endif
@@ -454,7 +459,7 @@ void rDelete(ring r)
 
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(r))
-    ncKill(r);
+    nc_rKill(r);
 #endif
 
   nKillChar(r);
@@ -1524,10 +1529,8 @@ ring rCopy(ring r)
   rComplete(res, 1); // res is purely commutative so far
 
 #ifdef HAVE_PLURAL
-  // update nc structure on res: share NC structure of r with res since they are the same!!!
-  // i.e. no data copy!!! Multiplications will be setuped as well!
   if (rIsPluralRing(r))
-    nc_rCopy0(res, r);
+    if( nc_rCopy(res, r, true) );
 #endif
 
   return res;
@@ -3702,12 +3705,25 @@ ring rCurrRingAssure_SyzComp()
 
 #ifdef HAVE_PLURAL
       if( rIsPluralRing(r) )
-        nc_SetupQuotient(r);
-#endif
+        if( nc_SetupQuotient(r, old_ring, true) )
+        {
+//          WarnS("error in nc_SetupQuotient"); // cleanup?      rDelete(res);       return r;  // just go on...?
+        }
+#endif      
     }
+
+#ifdef HAVE_PLURAL
+    assume((r->qideal==NULL) == (old_ring->qideal==NULL));
+    assume(rIsPluralRing(r) == rIsPluralRing(old_ring));
+    assume(rIsSCA(r) == rIsSCA(old_ring));
+    assume(ncRingType(r) == ncRingType(old_ring));
+#endif      
+
   }
 
   assume(currRing == r);
+  
+ 
 #ifdef HAVE_PLURAL
 #if MYTEST
   PrintS("\nrCurrRingAssure_SyzComp(): new currRing: \n");
@@ -3755,17 +3771,11 @@ static ring rAssure_SyzComp(ring r, BOOLEAN complete)
     {
       if ( nc_rComplete(r, res, false) ) // no qideal!
       {
-        WarnS("error in nc_rComplete");
-      // cleanup?
-
-//      rDelete(res);
-//      return r;
-
-      // just go on..
+        WarnS("error in nc_rComplete");      // cleanup?//      rDelete(res);//      return r;      // just go on..
       }
-    }
-#endif
-
+    }    
+    assume(rIsPluralRing(r) == rIsPluralRing(res));
+#endif      
   }
   return res;
 }
@@ -3881,15 +3891,10 @@ ring rAssure_HasComp(ring r)
   {
     if ( nc_rComplete(r, new_r, false) ) // no qideal!
     {
-      WarnS("error in nc_rComplete");
-      // cleanup?
-
-//      rDelete(res);
-//      return r;
-
-      // just go on..
+      WarnS("error in nc_rComplete");      // cleanup?//      rDelete(res);//      return r;      // just go on..
     }
   }
+  assume(rIsPluralRing(r) == rIsPluralRing(new_r));
 #endif
 
   return new_r;
@@ -3935,17 +3940,11 @@ static ring rAssure_CompLastBlock(ring r, BOOLEAN complete = TRUE)
         {
           if ( nc_rComplete(r, new_r, false) ) // no qideal!
           {
-            WarnS("error in nc_rComplete");
-      // cleanup?
-
-//      rDelete(res);
-//      return r;
-
-      // just go on..
+            WarnS("error in nc_rComplete");   // cleanup?//      rDelete(res);//      return r;      // just go on..
           }
         }
-#endif
-
+        assume(rIsPluralRing(r) == rIsPluralRing(new_r));
+#endif      
       }
       return new_r;
     }
@@ -3964,8 +3963,21 @@ ring rCurrRingAssure_CompLastBlock()
     {
       new_r->qideal = idrCopyR(old_r->qideal, old_r);
       currQuotient = new_r->qideal;
+#ifdef HAVE_PLURAL
+      if( rIsPluralRing(new_r) )
+        if( nc_SetupQuotient(new_r, old_r, true) )
+        {
+          WarnS("error in nc_SetupQuotient"); // cleanup?      rDelete(res);       return r;  // just go on...?
+        }
+      assume((new_r->qideal==NULL) == (old_r->qideal==NULL));
+      assume(rIsPluralRing(new_r) == rIsPluralRing(old_r));
+      assume(rIsSCA(new_r) == rIsSCA(old_r));
+      assume(ncRingType(new_r) == ncRingType(old_r));
+#endif      
     }
-  }
+    rTest(new_r);
+    rTest(old_r);    
+  }  
   return new_r;
 }
 
@@ -3984,17 +3996,11 @@ ring rCurrRingAssure_SyzComp_CompLastBlock()
     {
       if ( nc_rComplete(old_r, new_r, false) ) // no qideal!
       {
-        WarnS("error in nc_rComplete");
-      // cleanup?
-
-//      rDelete(res);
-//      return r;
-
-      // just go on..
+        WarnS("error in nc_rComplete"); // cleanup?      rDelete(res);       return r;  // just go on...?
       }
     }
-#endif
-
+    assume(rIsPluralRing(new_r) == rIsPluralRing(old_r));
+#endif      
     rChangeCurrRing(new_r);
     if (old_r->qideal != NULL)
     {
@@ -4003,9 +4009,15 @@ ring rCurrRingAssure_SyzComp_CompLastBlock()
 
 #ifdef HAVE_PLURAL
       if( rIsPluralRing(old_r) )
-        nc_SetupQuotient( new_r );
-#endif
-
+        if( nc_SetupQuotient(new_r, old_r, true) )
+        {
+          WarnS("error in nc_SetupQuotient"); // cleanup?      rDelete(res);       return r;  // just go on...?
+        }
+      assume((new_r->qideal==NULL) == (old_r->qideal==NULL));
+      assume(rIsPluralRing(new_r) == rIsPluralRing(old_r));
+      assume(rIsSCA(new_r) == rIsSCA(old_r));
+      assume(ncRingType(new_r) == ncRingType(old_r));
+#endif      
     }
     rTest(new_r);
     rTest(old_r);
@@ -4544,6 +4556,7 @@ BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient)
 {
 // NOTE: Originally used only by idElimination to transfer NC structure to dest
 // ring created by dirty hack (without nc_CallPlural)
+  rTest(src);
 
   assume(!rIsPluralRing(dest)); // destination must be a newly constructed commutative ring
 
@@ -4612,6 +4625,7 @@ BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient)
   if (dest != save)
     rChangeCurrRing(save);
 
+  assume(rIsPluralRing(dest));
   return FALSE;
 }
 #endif

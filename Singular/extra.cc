@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.271 2008-06-10 10:20:11 motsak Exp $ */
+/* $Id: extra.cc,v 1.272 2008-06-26 18:35:11 motsak Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -821,14 +821,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       else return TRUE;
 
 
-      if( !sca_ForceCommutative( currRing, b, e ) )
+      if( !sca_Force(currRing, b, e) )
         return TRUE;
 
       return FALSE;
     }
-
-//    sca_ForceCommutative
-    
 /*==================== PLURAL =================*/
 /*==================== opp ==================================*/
     if (strcmp(sys_cmd, "opp")==0)

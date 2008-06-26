@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.22 2008-06-10 14:35:41 motsak Exp $ */
+/* $Id: gring.h,v 1.23 2008-06-26 18:35:45 motsak Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -40,7 +40,7 @@ void nc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs);
 
 // this function should be used inside QRing definition!
 // we go from rG into factor ring rGR with factor ideal rGR->qideal.
-bool nc_SetupQuotient(ring rGR, const ring rG = NULL); // rG == NULL means that there is no base G-algebra
+bool nc_SetupQuotient(ring rGR, const ring rG = NULL, bool bCopy = false); // rG == NULL means that there is no base G-algebra
 
 
 // used by "rSum" from ring.cc only! 
@@ -48,17 +48,11 @@ bool nc_SetupQuotient(ring rGR, const ring rG = NULL); // rG == NULL means that 
 // "creates a commutative nc extension; "converts" comm.ring to a Plural ring"
 ring nc_rCreateNCcomm(ring r); 
 
-void ncCleanUp(nc_struct* p); // just free memory!
-void ncCleanUp(ring r); // smaller than kill: just free mem
-void ncKill(ring r); // complete destructor
+void nc_rKill(ring r); // complete destructor
 
 BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient = true); // in ring.cc
 
-
-// share the same nc-structure with a new copy ``res'' of ``r''.
-// used by rCopy only.
-// additionally inits multipication on ``res''!
-void nc_rCopy0(ring res, const ring r);
+bool nc_rCopy(ring res, const ring r, bool bSetupQuotient);
 
 // for p_Minus_mm_Mult_qq in pInline2.h
 poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp,
@@ -126,7 +120,7 @@ poly p_Lcm(const poly a, const poly b, const ring r);
 inline nc_type& ncRingType(nc_struct* p)
 {
   assume(p!=NULL);
-  return (p->type);
+  return (p->ncRingType());
 };
 
 inline nc_type& ncRingType(ring r) // get and set

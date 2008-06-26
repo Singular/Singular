@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.46 2008-06-10 15:43:08 Singular Exp $ */
+/* $Id: structs.h,v 1.47 2008-06-26 18:35:45 motsak Exp $ */
 /*
 * ABSTRACT
 */
@@ -467,8 +467,12 @@ struct nc_struct
   short ref;
   nc_type type;
   ring basering; // the ring C,D,.. live in
+
+  // initial data:
   matrix C;
   matrix D;
+
+  // computed data:
   matrix *MT; // size 0.. (rVar()*rVar()-1)/2
   matrix COM;
   int *MTsize; // size 0.. (rVar()*rVar()-1)/2
@@ -478,24 +482,38 @@ struct nc_struct
   int IsSkewConstant;
 
   private:
-    // treat variables from iAltVarsStart till iAltVarsEnd as alternating vars.
-    // these variables should have odd degree, though that will not be checked
-    // iAltVarsStart, iAltVarsEnd are only used together with nc_type=nc_exterior
-    // 1 <= iAltVarsStart <= iAltVarsEnd <= r->N
-    unsigned int iFirstAltVar, iLastAltVar; // = 0 by default
-    
-    // for factors of super-commutative algebras we need 
-    // the part of general quotient ideal modulo squares!    
-    ideal idSCAQuotient; // = NULL by default.
+    // internal data for different implementations
+    // if dynamic => must be deallocated in destructor (nc_rKill!)
+    union {
+      struct {
+        // treat variables from iAltVarsStart till iAltVarsEnd as alternating vars.
+        // these variables should have odd degree, though that will not be checked
+        // iAltVarsStart, iAltVarsEnd are only used together with nc_type=nc_exterior
+        // 1 <= iAltVarsStart <= iAltVarsEnd <= r->N
+        unsigned int iFirstAltVar, iLastAltVar; // = 0 by default
+
+        // for factors of super-commutative algebras we need 
+        // the part of general quotient ideal modulo squares!    
+        ideal idSCAQuotient; // = NULL by default. // must be deleted in Kill!
+      } sca;
+    } data;
 
   public:
-    inline unsigned int& FirstAltVar() { return (iFirstAltVar); };
-    inline unsigned int& LastAltVar () { return (iLastAltVar ); };
+    inline nc_type& ncRingType() { return (type); };
+    inline nc_type ncRingType() const { return (type); };
 
-    inline unsigned int FirstAltVar() const { return (iFirstAltVar); };
-    inline unsigned int LastAltVar () const { return (iLastAltVar ); };
+    inline unsigned int& FirstAltVar() 
+        { assume(ncRingType() == nc_exterior); return (data.sca.iFirstAltVar); };
+    inline unsigned int& LastAltVar () 
+        { assume(ncRingType() == nc_exterior); return (data.sca.iLastAltVar ); };
 
-    inline ideal& SCAQuotient() { return (idSCAQuotient); };
+    inline unsigned int FirstAltVar() const 
+        { assume(ncRingType() == nc_exterior); return (data.sca.iFirstAltVar); };
+    inline unsigned int LastAltVar () const 
+        { assume(ncRingType() == nc_exterior); return (data.sca.iLastAltVar ); };
+
+    inline ideal& SCAQuotient() 
+        { assume(ncRingType() == nc_exterior); return (data.sca.idSCAQuotient); };
 
   public:
     nc_pProcs p_Procs; // NC procedures.

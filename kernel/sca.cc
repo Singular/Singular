@@ -6,11 +6,17 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.23 2008-06-24 08:18:05 Singular Exp $
+ *  Version: $Id: sca.cc,v 1.24 2008-06-26 18:35:45 motsak Exp $
  *******************************************************************/
 
+// set it here if needed.
+#define OUTPUT 0
+#define MYTEST 0
+
+#if MYTEST
 #define OM_CHECK 4
 #define OM_TRACK 5
+#endif
 
 // #define PDEBUG 2
 #include "mod2.h"
@@ -81,6 +87,15 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+inline ring AssureCurrentRing(ring r)
+{
+  ring save = currRing;
+
+  if( currRing != r )
+    rChangeCurrRing(r);
+
+  return save;
+}
 
 
 
@@ -935,6 +950,7 @@ void addLObject(LObject& h, kStrategy& strat)
 
     if (strat->sl!=-1) pos = posInS(strat, strat->sl, h.p, h.ecart);
     strat->enterS(h, pos, strat, -1);
+//    enterT(h, strat); // ?!
 
     if (h.lcm!=NULL) pLmFree(h.lcm);
   }
@@ -942,24 +958,14 @@ void addLObject(LObject& h, kStrategy& strat)
 
 }
 
-#ifndef NDEBUG
 
-// set it here if needed.
-#define MYTEST 0
 
-#else
-
-#define MYTEST 0
-
-#endif
-
-#define OUTPUT 0
 
 
 ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat)
 {
 #if MYTEST
-//   PrintS("<sca_gr_bba>\n");
+   PrintS("<sca_gr_bba>\n");
 #endif
 
   assume(rIsSCA(currRing));
@@ -1009,6 +1015,10 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
     Print("ideal tempQ: \n");
     idPrint(tempQ);
   }
+#endif
+
+#ifdef KDEBUG
+  om_Opts.MinTrack = 5;
 #endif
 
   int srmax, lrmax;
@@ -1236,9 +1246,12 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 // NOTE: Factors of SuperCommutative Algebras are supported this way!
 //
 //  rG == NULL means that there is no separate base G-algebra in this case take rGR == rG
-bool sca_SetupQuotient(ring rGR, ring rG)
+
+// special case: bCopy == true (default value: false)
+// meaning: rGR copies structure from rG
+// (maybe with some minor changes, which don't change the type!)
+bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
 {
-//   return false; // test Plural
 
   //////////////////////////////////////////////////////////////////////////
   // checks...
@@ -1250,11 +1263,35 @@ bool sca_SetupQuotient(ring rGR, ring rG)
   assume(rG  != NULL);
   assume(rIsPluralRing(rG));
 
-
 #if MYTEST
-   PrintS("sca_SetupQuotient(rGR, rG)");
-#endif
+  PrintS("sca_SetupQuotient(rGR, rG, bCopy)");
 
+  {
+    ring rSaveRing = AssureCurrentRing(rG);
+
+    PrintS("\nrG: \n"); rWrite(rG);
+
+    AssureCurrentRing(rGR);
+
+    PrintS("\nrGR: \n"); rWrite(rGR);
+
+    PrintLn();
+    
+    AssureCurrentRing(rSaveRing);
+  }  
+#endif
+  
+
+  if(bCopy)
+  {
+    if(rIsSCA(rG) && (rG != rGR))
+      return sca_Force(rGR, scaFirstAltVar(rG), scaLastAltVar(rG));
+    else
+      return false;
+  }
+
+  assume(!bCopy);
+   
   const int N = rG->N;
 
   if(N < 2)
@@ -1268,15 +1305,15 @@ bool sca_SetupQuotient(ring rGR, ring rG)
   PrintS("sca_SetupQuotient: qring?\n");
 #endif
 
-  if(rGR->qideal == NULL) // there will be a factor!
+  if(rGR->qideal == NULL) // there should be a factor!
     return false;
 
 #if OUTPUT
   PrintS("sca_SetupQuotient: qideal!!!\n");
 #endif
 
-  if((rG->qideal != NULL) && (rG != rGR) ) // we cannot change from factor to factor at the time, sorry!
-    return false;
+//  if((rG->qideal != NULL) && (rG != rGR) ) // we cannot change from factor to factor at the time, sorry!
+//    return false;
 
 
   int iAltVarEnd = -1;
@@ -1296,7 +1333,7 @@ bool sca_SetupQuotient(ring rGR, ring rG)
       assume(MATELEM(C,i,j) != NULL); // after CallPlural!
       number c = p_GetCoeff(MATELEM(C,i,j), rBase);
 
-      if( n_IsMOne(c, rBase) )
+      if( n_IsMOne(c, rBase) ) // !!!???
       {
         if( i < iAltVarStart)
           iAltVarStart = i;
@@ -1377,19 +1414,11 @@ bool sca_SetupQuotient(ring rGR, ring rG)
   assume( iAltVarEnd   <= N            );
 
 
-
-  bool bWeChangeRing = false;
-  // for sanity
-  ring rSaveRing = currRing;
-
-  if(rSaveRing != rG)
-  {
-    rChangeCurrRing(rG);
-    bWeChangeRing = true;
-  }
+  ring rSaveRing = AssureCurrentRing(rG);
 
 
   assume(rGR->qideal != NULL);
+  assume(rGR->N == rG->N);
 //  assume(rG->qideal == NULL); // ?
 
   const ideal idQuotient = rGR->qideal;
@@ -1407,7 +1436,23 @@ bool sca_SetupQuotient(ring rGR, ring rG)
 
   bool bSCA = true;
 
+  int b = 1;
+  int e = N;  
+
+  if(rIsSCA(rG))
+  {
+    b = si_max(b, scaFirstAltVar(rG));
+    e = si_min(e, scaLastAltVar(rG));
+
+#if MYTEST
+    Print("AltVars!?: [%d, %d]\n", b, e);
+#endif
+    
+  }
+
+  
   for ( int i = iAltVarStart; (i <= iAltVarEnd) && bSCA; i++ )
+    if( (i < b) || (i > e) ) // otherwise it's ok since rG is an SCA!
   {
     poly square = p_ISet(1, rG);
     p_SetExp(square, i, 2, rG); // square = var(i)^2.
@@ -1426,12 +1471,8 @@ bool sca_SetupQuotient(ring rGR, ring rG)
     }
   }
 
-
-  if (bWeChangeRing)
-  {
-    rChangeCurrRing(rSaveRing);
-  }
-
+  AssureCurrentRing(rSaveRing);
+  
   if(!bSCA) return false;
 
 
@@ -1447,26 +1488,46 @@ bool sca_SetupQuotient(ring rGR, ring rG)
   //////////////////////////////////////////////////////////////////////////
   ideal tempQ = id_KillSquares(idQuotient, iAltVarStart, iAltVarEnd, rG); // in rG!!!
 
-  idSkipZeroes( tempQ );
 
-  if( idIs0(tempQ) )
-    rGR->GetNC()->SCAQuotient() = NULL;
-  else
-    rGR->GetNC()->SCAQuotient() = idrMoveR(tempQ, rG, rGR); // deletes tempQ!
+#ifdef PDEBUG
+#if OUTPUT
+  Print("Quotient: \n");
+  iiWriteMatrix((matrix)idQuotient,"__",1);
+  Print("tempSCAQuotient: \n");
+  iiWriteMatrix((matrix)tempQ,"__",1);
+#endif
+#endif
+  
+  idSkipZeroes( tempQ );
 
   ncRingType( rGR, nc_exterior );
 
   scaFirstAltVar( rGR, iAltVarStart );
   scaLastAltVar( rGR, iAltVarEnd );
-
+  
+  if( idIs0(tempQ) )
+    rGR->GetNC()->SCAQuotient() = NULL;
+  else
+    rGR->GetNC()->SCAQuotient() = idrMoveR(tempQ, rG, rGR); // deletes tempQ!
 
   nc_p_ProcsSet(rGR, rGR->p_Procs); // !!!!!!!!!!!!!!!!!
 
+
+#ifdef PDEBUG
+#if OUTPUT
+  Print("SCAQuotient: \n");
+  if(tempQ != NULL)
+    iiWriteMatrix((matrix)tempQ,"__",1);
+  else
+    Print("(NULL)\n");
+#endif
+#endif
+  
   return true;
 }
 
 
-bool sca_ForceCommutative(ring rGR, int b, int e)
+bool sca_Force(ring rGR, int b, int e)
 {
   assume(rGR != NULL);
   assume(rIsPluralRing(rGR));
@@ -1480,7 +1541,6 @@ bool sca_ForceCommutative(ring rGR, int b, int e)
     rChangeCurrRing(rGR);
 
   const ideal idQuotient = rGR->qideal;
-
 
   ideal tempQ = idQuotient;
 
@@ -1506,7 +1566,6 @@ bool sca_ForceCommutative(ring rGR, int b, int e)
     rChangeCurrRing(rSaveRing);
 
   return true;
-
 }
 
 // return x_i * pPoly; preserve pPoly.
@@ -1540,7 +1599,32 @@ poly sca_pp_Mult_xi_pp(unsigned int i, const poly pPoly, const ring rRing)
 // Under development!!!
 ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*hilb*/, kStrategy strat)
 {
+#if MYTEST
+  PrintS("\n\n<sca_bba>\n\n");
+#endif
+
   assume(rIsSCA(currRing));
+
+#ifndef NDEBUG
+  idTest(F);
+  idTest(Q);
+#endif
+
+#if MYTEST
+  PrintS("\ncurrRing: \n");
+  rWrite(currRing);
+#ifdef RDEBUG
+//  rDebugPrint(currRing);
+#endif
+
+  PrintS("\n\nF: \n");
+  idPrint(F);
+  PrintS("\n\nQ: \n");
+  idPrint(Q);
+
+  PrintLn();
+#endif
+  
 
   const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
   const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
@@ -1554,6 +1638,15 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 
   // Q or tempQ will not be used below :(((
 
+
+#if MYTEST
+
+  PrintS("tempF: \n");
+  idPrint(tempF);
+  PrintS("tempQ: \n");
+  idPrint(tempQ);
+#endif
+  
   bool bIdHomog = id_IsSCAHomogeneous(tempF, NULL, NULL, currRing); // wCx == wCy == NULL!
 
   assume( !bIdHomog || strat->homog ); //  bIdHomog =====[implies]>>>>> strat->homog
@@ -1565,10 +1658,11 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 #endif /*PDEBUG*/
 
 
-//    PrintS("<sca>\n");
-
-  om_Opts.MinTrack = 5; // ???
-
+  
+#ifdef KDEBUG
+  om_Opts.MinTrack = 5;
+#endif
+  
   int   srmax, lrmax, red_result = 1;
   int   olddeg, reduc;
 
@@ -1587,7 +1681,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
   // ?? set spSpolyShort, reduce ???
-  initBuchMora(tempF, NULL, strat); // Q = squares!!!
+  initBuchMora(tempF, tempQ, strat); // tempQ = Q - squares!!!
 
 //   if (strat->minim>0) strat->M = idInit(IDELEMS(F),F->rank);
 
@@ -1854,11 +1948,13 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 //       p_Delete(&strat->P.p2, currRing, strat->tailRing);
 //     }
 
-// #ifdef KDEBUG
-    memset(&(strat->P), 0, sizeof(strat->P));
-// #endif
 
-    //kTest_TS(strat); // T is not used: cannot use this test
+    
+#ifdef KDEBUG
+//    memset(&(strat->P), 0, sizeof(strat->P));
+#endif
+
+    kTest_TS(strat); // even of T is not used!
 
 //     Print("\n$\n");
 
@@ -1888,9 +1984,12 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 
   if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
 
-//   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
-//    PrintS("</sca>\n");
+  if (tempQ!=NULL) updateResult(strat->Shdl,tempQ,strat);
 
+#if MYTEST
+  PrintS("\n\n</sca_bba>\n\n");
+#endif
+  
   return (strat->Shdl);
 }
 
@@ -1963,6 +2062,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
 #ifdef KDEBUG
   om_Opts.MinTrack = 5;
 #endif
+
   int srmax;
   int lrmax = 0;
   int olddeg = 0;
