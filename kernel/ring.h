@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.29 2008-06-10 10:17:33 motsak Exp $ */
+/* $Id: ring.h,v 1.30 2008-06-26 13:07:27 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -329,6 +329,7 @@ ring   rCurrRingAssure_C_dp();
 ring   rCurrRingAssure_CompLastBlock();
 // makes sure that c/C ordering is last ordering and SyzIndex is first
 ring   rCurrRingAssure_SyzComp_CompLastBlock();
+ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos);
 
 // return the max-comonent wchich has syzIndex i
 // Assume: i<= syzIndex_limit
