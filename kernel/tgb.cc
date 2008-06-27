@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.156 2008-06-25 08:49:21 bricken Exp $ */
+/* $Id: tgb.cc,v 1.157 2008-06-27 12:10:58 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -23,7 +23,7 @@
 #include "digitech.h"
 #include "gring.h"
 #include "sca.h"
-
+#include "prCopy.h"
 #include "longrat.h"
 #include "modulop.h"
 #include <stdlib.h>
@@ -440,7 +440,7 @@ wlen_type kEBucketLength(kBucket* b, poly lm,int sugar,slimgb_alg* ca)
     return bucket_guess(b);
   }
   int d=ca->pTotaldegree(lm);
-  #if 1
+  #if 0
   assume(sugar>=d);
   s=1+(bucket_guess(b)-1)*(sugar-d+1);
   return s;
@@ -453,7 +453,7 @@ wlen_type kEBucketLength(kBucket* b, poly lm,int sugar,slimgb_alg* ca)
   {
     if(b->buckets[i]==NULL) continue;
 
-    if ((pTotaldegree(b->buckets[i])<=d) &&(elength_is_normal_length(b->buckets[i],ca))){
+    if ((ca->pTotaldegree(b->buckets[i])<=d) &&(elength_is_normal_length(b->buckets[i],ca))){
         s+=b->buckets_length[i];
     } else
     {
@@ -1271,7 +1271,7 @@ static wlen_type pair_weighted_length(int i, int j, slimgb_alg* c){
 }
 sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
 {
-
+  p_Test(h,c->r);
   assume(h!=NULL);
   poly got=gcd_of_terms(h,c->r);
   if((got!=NULL) &&(TEST_V_UPTORADICAL)) {
@@ -1476,6 +1476,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
 
     pLcm(c->S->m[i], c->S->m[j], lm);
     pSetm(lm);
+    p_Test(lm,c->r);
     s->deg=c->pTotaldegree(lm);
 
     if(c->T_deg_full)//Sugar
@@ -1485,6 +1486,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
       s->deg+=si_max(t_i,t_j);
       //Print("\n max: %d\n",max(t_i,t_j));
     }
+    p_Test(lm,c->r);
     s->lcm_of_lm=lm;
     //          pDelete(&short_s);
     //assume(lm!=NULL);
@@ -1550,6 +1552,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
     }
     else
     {
+      p_Test(nodes[lower]->lcm_of_lm,c->r);
       nodes[lower]->lcm_of_lm=pCopy(nodes[lower]->lcm_of_lm);
       assume(_p_GetComp(c->S->m[nodes[lower]->i],c->r)==_p_GetComp(c->S->m[nodes[lower]->j],c->r));
       nodes_final[spc_final]=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
@@ -1943,6 +1946,7 @@ static void mass_add(poly* p, int pn,slimgb_alg* c){
     int* ibuf=(int*) omalloc(pn*sizeof(int));
     sorted_pair_node*** sbuf=(sorted_pair_node***) omalloc(pn*sizeof(sorted_pair_node**));
     for(j=0;j<pn;j++){
+      p_Test(p[j],c->r);
       sbuf[j]=add_to_basis_ideal_quotient(p[j],c,ibuf+j);
     }
     int sum=0;
@@ -2461,24 +2465,30 @@ static void go_on (slimgb_alg* c){
 #ifdef HAVE_PLURAL
       if (c->nc){
         h= nc_CreateSpoly(c->S->m[s->i], c->S->m[s->j]/*, NULL*/, c->r);
+        
         if (h!=NULL)
           pCleardenom(h);
       }
       else
 #endif
         h=ksOldCreateSpoly(c->S->m[s->i], c->S->m[s->j], NULL, c->r);
+    p_Test(h,c->r);
     }
-    else
+    else{
       h=s->lcm_of_lm;
+      p_Test(h,c->r);
+  }
     // if(s->i>=0)
 //       now_t_rep(s->j,s->i,c);
     number coef;
     int mlen=pLength(h);
+    p_Test(h,c->r);
     if ((!c->nc)&(!(use_noro))){
       h=redNF2(h,c,mlen,coef,2);
       redTailShort(h,c->strat);
       nDelete(&coef);
     }
+    p_Test(h,c->r);
     free_sorted_pair_node(s,c->r);
     if(!h) continue;
     int len=pLength(h);
@@ -2535,9 +2545,11 @@ static void go_on (slimgb_alg* c){
 #endif
   red_object* buf=(red_object*) omalloc(i*sizeof(red_object));
   for(j=0;j<i;j++){
+    p_Test(p[j],c->r);
     buf[j].p=p[j];
     buf[j].sev=pGetShortExpVector(p[j]);
     buf[j].bucket = kBucketCreate(currRing);
+    p_Test(p[j],c->r);
     if (c->eliminationProblem){
         buf[j].sugar=c->pTotaldegree_full(p[j]);
     }
@@ -2599,7 +2611,7 @@ static void go_on (slimgb_alg* c){
     buf[j].flatten();
     kBucketClear(buf[j].bucket,&p, &len);
     kBucketDestroy(&buf[j].bucket);
-
+    p_Test(p,c->r);
     //if (!c->nc) {
       if ((c->tailReductions) ||(lies_in_last_dp_block(p,c))){
       p=redNFTail(p,c->strat->sl,c->strat, 0);
@@ -2607,6 +2619,7 @@ static void go_on (slimgb_alg* c){
       p=redTailShort(p, c->strat);
       }
       //}
+      p_Test(p,c->r);
       add_those[j]=p;
 
     //sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
@@ -2808,11 +2821,13 @@ void slimgb_alg::introduceDelayedPairs(poly* pa,int s){
         poly p=pa[i];
         simplify_poly(p,r);
         si->expected_length=pQuality(p,this,pLength(p));
+        p_Test(p,r);
         si->deg=this->pTotaldegree_full(p);
         /*if (!rField_is_Zp(r)){
           pContent(p);
           pCleardenom(p);
         }*/
+        
         si->lcm_of_lm=p;
 
         //      c->apairs[n-1-i]=si;
@@ -2825,8 +2840,8 @@ void slimgb_alg::introduceDelayedPairs(poly* pa,int s){
   pair_top+=s;
   omfree(si_array);
 }
-slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4){
-
+slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4,int deg_pos){
+  this->deg_pos=deg_pos;
   lastCleanedDeg=-1;
   completed=FALSE;
   this->syz_comp=syz_comp;
@@ -3190,6 +3205,57 @@ slimgb_alg::~slimgb_alg(){
 }
 ideal t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode){
 
+    assume(r==currRing);
+    ring orig_ring=r;
+    int pos;
+    ring new_ring=rAssure_TDeg(orig_ring,1,rVar(orig_ring),pos);
+
+
+    ideal s_h;
+    if (orig_ring != new_ring)
+    {
+        rChangeCurrRing(new_ring);
+        s_h=idrCopyR_NoSort(arg_I,orig_ring);
+        idTest(s_h);
+        /*int i;
+        
+        for(i=0;i<IDELEMS(s_h);i++){
+            poly p=s_h->m[i];
+            while(p){
+                p_Setm(p,new_ring);
+                pIter(p);
+            }
+        }*/
+    }
+    else
+    {
+        s_h = id_Copy(arg_I,orig_ring);
+    }
+
+    ideal s_result=do_t_rep_gb(new_ring,s_h,syz_comp,F4_mode,pos);
+    ideal result;
+    if(orig_ring != new_ring)
+    {   
+        
+        idTest(s_result);
+        rChangeCurrRing(orig_ring);
+        result = idrMoveR_NoSort(s_result, new_ring);
+        
+        idTest(result);
+        //rChangeCurrRing(new_ring);
+        rKill(new_ring);
+        //rChangeCurrRing(orig_ring);
+    }
+    else 
+        result=s_result;
+    idTest(result);
+    return result;
+}
+    
+ 
+
+ideal do_t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode,int deg_pos){
+
   //  Print("QlogSize(0) %d, QlogSize(1) %d,QlogSize(-2) %d, QlogSize(5) %d\n", QlogSize(nlInit(0)),QlogSize(nlInit(1)),QlogSize(nlInit(-2)),QlogSize(nlInit(5)));
 
   if (TEST_OPT_PROT)
@@ -3199,7 +3265,7 @@ ideal t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode){
   //debug_Ideal=arg_debug_Ideal;
   //if (debug_Ideal) PrintS("DebugIdeal received\n");
   // Print("Idelems %i \n----------\n",IDELEMS(arg_I));
-  ideal I=idCopy(arg_I);
+  ideal I=arg_I;
   idCompactify(I);
   if (idIs0(I)) return I;
   int i;
@@ -3214,7 +3280,7 @@ ideal t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode){
   //Print("Idelems %i \n----------\n",IDELEMS(I));
   //slimgb_alg* c=(slimgb_alg*) omalloc(sizeof(slimgb_alg));
   //int syz_comp=arg_I->rank;
-  slimgb_alg* c=new slimgb_alg(I, syz_comp,F4_mode);
+  slimgb_alg* c=new slimgb_alg(I, syz_comp,F4_mode,deg_pos);
 
 
   while ((c->pair_top>=0) && ((!(TEST_OPT_DEGBOUND)) || (c->apairs[c->pair_top]->deg<=Kstd1_deg)))
@@ -3565,7 +3631,7 @@ static poly gcd_of_terms(poly p, ring r){
     }
     t=t->next;
   }
-
+  p_Setm(m,r);
   if (max_g_0>0)
     return m;
   pDelete(&m);

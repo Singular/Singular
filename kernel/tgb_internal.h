@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.71 2008-06-25 08:49:22 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.72 2008-06-27 12:10:58 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -180,7 +180,7 @@ struct poly_array_list{
 class slimgb_alg
 {
   public:
-    slimgb_alg(ideal I, int syz_comp,BOOLEAN F4);
+    slimgb_alg(ideal I, int syz_comp,BOOLEAN F4,int deg_pos);
 		void introduceDelayedPairs(poly* pa,int s);
     virtual ~slimgb_alg();
     void cleanDegs(int lower, int upper);
@@ -240,6 +240,7 @@ class slimgb_alg
   int average_length;
   int lastDpBlockStart;
   int lastCleanedDeg;
+  int deg_pos;
   BOOLEAN use_noro;
   BOOLEAN use_noro_last_block;
   BOOLEAN isDifficultField;
@@ -253,7 +254,11 @@ class slimgb_alg
   BOOLEAN used_b;
   #endif
   unsigned long pTotaldegree(poly p){
-      return ::pTotaldegree(p,this->r);
+      pTest(p);
+      //assume(pDeg(p,r)==::pTotaldegree(p,r));
+      assume(::pTotaldegree(p,r)==p->exp[deg_pos]);
+      return p->exp[deg_pos];
+      //return ::pTotaldegree(p,this->r);
   }
   int pTotaldegree_full(poly p){
     int r=0;
@@ -300,6 +305,7 @@ static void replace_pair(int & i, int & j, slimgb_alg* c);
 //static sorted_pair_node** add_to_basis(poly h, int i, int j,slimgb_alg* c, int* ip=NULL);
 static void do_this_spoly_stuff(int i,int j,slimgb_alg* c);
 //ideal t_rep_gb(ring r,ideal arg_I);
+ideal do_t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode,int deg_pos);
 static BOOLEAN has_t_rep(const int & arg_i, const int & arg_j, slimgb_alg* state);
 static int* make_connections(int from, poly bound, slimgb_alg* c);
 static int* make_connections(int from, int to, poly bound, slimgb_alg* c);
