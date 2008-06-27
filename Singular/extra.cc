@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.272 2008-06-26 18:35:11 motsak Exp $ */
+/* $Id: extra.cc,v 1.273 2008-06-27 08:15:37 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2834,6 +2834,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         Print("EZGCD_P:%d (use EZGCD_P for gcd of polynomials in char p)\n",isOn(SW_USE_EZGCD_P));
         Print("CRGCD:%d (use chinese Remainder for gcd of polynomials in char 0)\n",isOn(SW_USE_CHINREM_GCD));
         Print("SPARSEMOD:%d (use SPARSEMOD for gcd of polynomials in char 0)\n",isOn(SW_USE_SPARSEMOD));
+        Print("QGCD:%d (use QGCD for gcd of polynomials in alg. ext.)\n",isOn(SW_USE_QGCD));
+        Print("FGCD:%d (use fieldGCD for gcd of polynomials in Z/p)\n",isOn(SW_USE_fieldGCD));
         Print("homog:%d (use homog. test for factorization of polynomials)\n",singular_homog_flag);
         return FALSE;
       }
@@ -2849,6 +2851,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         if (strcmp(s,"EZGCD_P")==0) { if (d) On(SW_USE_EZGCD_P); else Off(SW_USE_EZGCD_P); } else
         if (strcmp(s,"CRGCD")==0) { if (d) On(SW_USE_CHINREM_GCD); else Off(SW_USE_CHINREM_GCD); } else
         if (strcmp(s,"SPARSEMOD")==0) { if (d) On(SW_USE_SPARSEMOD); else Off(SW_USE_SPARSEMOD); } else
+        if (strcmp(s,"QGCD")==0) { if (d) On(SW_USE_QGCD); else Off(SW_USE_QGCD); } else
+        if (strcmp(s,"FGCD")==0) { if (d) On(SW_USE_fieldGCD); else Off(SW_USE_fieldGCD); } else
         if (strcmp(s,"homog")==0) { if (d) singular_homog_flag=1; else singular_homog_flag=0; } else
         return TRUE;
         return FALSE;
