@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.88 2008-06-26 18:35:45 motsak Exp $ */
+/* $Id: ring.cc,v 1.89 2008-06-27 12:06:07 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -434,7 +434,6 @@ void rWrite(ring r)
         else PrintS(" ...");
       } else
         PrintS(" (NULL)");
-        
     }
 #endif
   }
@@ -3709,7 +3708,7 @@ ring rCurrRingAssure_SyzComp()
         {
 //          WarnS("error in nc_SetupQuotient"); // cleanup?      rDelete(res);       return r;  // just go on...?
         }
-#endif      
+#endif
     }
 
 #ifdef HAVE_PLURAL
@@ -3717,13 +3716,13 @@ ring rCurrRingAssure_SyzComp()
     assume(rIsPluralRing(r) == rIsPluralRing(old_ring));
     assume(rIsSCA(r) == rIsSCA(old_ring));
     assume(ncRingType(r) == ncRingType(old_ring));
-#endif      
+#endif
 
   }
 
   assume(currRing == r);
-  
- 
+
+
 #ifdef HAVE_PLURAL
 #if MYTEST
   PrintS("\nrCurrRingAssure_SyzComp(): new currRing: \n");
@@ -3773,9 +3772,9 @@ static ring rAssure_SyzComp(ring r, BOOLEAN complete)
       {
         WarnS("error in nc_rComplete");      // cleanup?//      rDelete(res);//      return r;      // just go on..
       }
-    }    
+    }
     assume(rIsPluralRing(r) == rIsPluralRing(res));
-#endif      
+#endif
   }
   return res;
 }
@@ -3792,51 +3791,48 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
       && (r->typ[i].data.dp.end==end_var))
       {
         pos=r->typ[i].data.dp.place;
+        printf("no change, pos=%d\n",pos);
         return r;
       }
     }
   }
-  ring res=rCopy0(r, FALSE, FALSE);
+  ring res=rCopy(r);
   i=rBlocks(r);
   int j;
 
-  res->order=(int *)omMemDup(r->order);
-  res->block0=(int *)omMemDup(r->block0);
-  res->block1=(int *)omMemDup(r->block1);
-  int ** wvhdl =(int **)omAlloc0(i*sizeof(int**));
-  for(j=i-1;j>=0;j--)
-  {
-    if (r->wvhdl[j] != NULL)
-    {
-      wvhdl[j] = (int*) omMemDup(r->wvhdl[j-1]);
-    }
-  }
-  res->wvhdl = wvhdl;
-  res->VarOffset=(int*)omMemDup(r->VarOffset);
-
   res->ExpL_Size=r->ExpL_Size+1; // one word more in each monom
-  res->CmpL_Size=r->CmpL_Size;
   res->PolyBin=omGetSpecBin(POLYSIZE + (res->ExpL_Size)*sizeof(long));
+  omFree((ADDRESS)res->ordsgn);
   res->ordsgn=(long *)omAlloc0(res->ExpL_Size*sizeof(long));
   for(j=0;j<r->CmpL_Size;j++)
   {
     res->ordsgn[j] = r->ordsgn[j];
   }
   res->OrdSize=r->OrdSize+1;   // one block more for pSetm
-  res->typ=(sro_ord*)omAlloc(res->OrdSize*sizeof(sro_ord));
+  if (r->typ!=NULL)
+    omFree((ADDRESS)res->typ);
+  res->typ=(sro_ord*)omAlloc0(res->OrdSize*sizeof(sro_ord));
   if (r->typ!=NULL)
     memcpy(res->typ,r->typ,r->OrdSize*sizeof(sro_ord));
-  // the additionla block for pSetm: total degree at the last word
+  // the additional block for pSetm: total degree at the last word
   // but not included in the compare part
-  res->typ[res->OrdSize].ord_typ=ro_dp;
-  res->typ[res->OrdSize].data.dp.start=start_var;
-  res->typ[res->OrdSize].data.dp.end=end_var;
-  res->typ[res->OrdSize].data.dp.place=res->ExpL_Size-1;
+  res->typ[res->OrdSize-1].ord_typ=ro_dp;
+  res->typ[res->OrdSize-1].data.dp.start=start_var;
+  res->typ[res->OrdSize-1].data.dp.end=end_var;
+  res->typ[res->OrdSize-1].data.dp.place=res->ExpL_Size-1;
   pos=res->ExpL_Size-1;
-  if ((start_var==1) && (end_var==res->N)) res->pOrdIndex=pos;
+  //if ((start_var==1) && (end_var==res->N)) res->pOrdIndex=pos;
+  extern void p_Setm_General(poly p, ring r);
+  res->p_Setm=p_Setm_General;
+  // ----------------------------
+  omFree((ADDRESS)res->p_Procs);
+  res->p_Procs = (p_Procs_s*)omAlloc(sizeof(p_Procs_s));
+  p_ProcsSet(res, res->p_Procs);
+  if (res->qideal!=NULL) id_Delete(&res->qideal,res);
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(res))
   {
+    nc_rKill(res);
     if ( nc_rComplete(r, res, false) ) // no qideal!
     {
       WarnS("error in nc_rComplete");
@@ -3844,6 +3840,7 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
     }
   }
 #endif
+  if (r->qideal!=NULL) res->qideal=idrCopyR_NoSort(r->qideal,r);
   return res;
 }
 
@@ -3944,7 +3941,7 @@ static ring rAssure_CompLastBlock(ring r, BOOLEAN complete = TRUE)
           }
         }
         assume(rIsPluralRing(r) == rIsPluralRing(new_r));
-#endif      
+#endif
       }
       return new_r;
     }
@@ -3973,11 +3970,11 @@ ring rCurrRingAssure_CompLastBlock()
       assume(rIsPluralRing(new_r) == rIsPluralRing(old_r));
       assume(rIsSCA(new_r) == rIsSCA(old_r));
       assume(ncRingType(new_r) == ncRingType(old_r));
-#endif      
+#endif
     }
     rTest(new_r);
-    rTest(old_r);    
-  }  
+    rTest(old_r);
+  }
   return new_r;
 }
 
@@ -4000,7 +3997,7 @@ ring rCurrRingAssure_SyzComp_CompLastBlock()
       }
     }
     assume(rIsPluralRing(new_r) == rIsPluralRing(old_r));
-#endif      
+#endif
     rChangeCurrRing(new_r);
     if (old_r->qideal != NULL)
     {
@@ -4017,7 +4014,7 @@ ring rCurrRingAssure_SyzComp_CompLastBlock()
       assume(rIsPluralRing(new_r) == rIsPluralRing(old_r));
       assume(rIsSCA(new_r) == rIsSCA(old_r));
       assume(ncRingType(new_r) == ncRingType(old_r));
-#endif      
+#endif
     }
     rTest(new_r);
     rTest(old_r);
