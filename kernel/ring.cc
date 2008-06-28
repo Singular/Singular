@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.89 2008-06-27 12:06:07 Singular Exp $ */
+/* $Id: ring.cc,v 1.90 2008-06-28 08:55:43 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3791,7 +3791,7 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
       && (r->typ[i].data.dp.end==end_var))
       {
         pos=r->typ[i].data.dp.place;
-        printf("no change, pos=%d\n",pos);
+        //printf("no change, pos=%d\n",pos);
         return r;
       }
     }
