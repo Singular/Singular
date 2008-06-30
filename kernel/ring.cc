@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.90 2008-06-28 08:55:43 Singular Exp $ */
+/* $Id: ring.cc,v 1.91 2008-06-30 08:03:37 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3840,7 +3840,16 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
     }
   }
 #endif
-  if (r->qideal!=NULL) res->qideal=idrCopyR_NoSort(r->qideal,r);
+  if (r->qideal!=NULL)
+  {
+     res->qideal=idrCopyR_NoSort(r->qideal,r);
+#ifdef HAVE_PLURAL
+     if (rIsPluralRing(res) )
+     {
+       nc_SetupQuotient(res, currRing);
+     }
+#endif
+  }
   return res;
 }
 
