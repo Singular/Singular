@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.cc,v 1.23 2008-01-07 13:33:09 Singular Exp $ */
+/* $Id: NTLconvert.cc,v 1.24 2008-06-30 09:31:21 Singular Exp $ */
 #include <config.h>
 
 #ifdef HAVE_SINGULAR
@@ -47,6 +47,9 @@
 #define Alloc(L) malloc(L)
 #define Free(A,L) free(A)
 #endif
+ 
+void out_cf(char *s1,const CanonicalForm &f,char *s2);
+	
 
 int fac_NTL_char=-1;            // the current characterstic for NTL calls
                                 // -1: undefined
@@ -122,7 +125,7 @@ ZZ_pX convertFacCF2NTLZZpX(CanonicalForm f)
     NTLcurrentExp=i.exp();
 
     CanonicalForm c=i.coeff();
-    if (!c.isImm()) c.mapinto(); //c%= getCharacteristic();
+    if (!c.isImm()) c=c.mapinto(); //c%= getCharacteristic();
     if (!c.isImm())
     {  //This case will never happen if the characteristic is in fact a prime
        // number, since all coefficients are represented as immediates
