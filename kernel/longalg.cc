@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.35 2008-06-26 16:25:59 Singular Exp $ */
+/* $Id: longalg.cc,v 1.36 2008-06-30 07:55:57 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1061,15 +1061,18 @@ number naAdd(number la, number lb)
     if (b->n!=NULL) x = napCopy(b->n);
     else            x = NULL;
   }
-  if (x!=NULL)
-  {
-    number inv=nacInvers(napGetCoeff(x));
-    napMultN(lu->z,inv);
-    nacDelete(&inv,nacRing);
-    napDelete(&x);
-  }
+  //if (x!=NULL)
+  //{
+  //  if (napIsConstant(x))
+  //  {
+  //    number inv=nacInvers(napGetCoeff(x));
+  //    napMultN(lu->z,inv);
+  //    nacDelete(&inv,nacRing);
+  //    napDelete(&x);
+  //  }
+  //}
   lu->n = x;
-  lu->s = (x==NULL);
+  lu->s = FALSE;
   lu->cnt=si_max(a->cnt,b->cnt)+1;
   if (lu->n!=NULL)
   {
@@ -1124,18 +1127,18 @@ number naSub(number la, number lb)
     if (b->n!=NULL) x = napCopy(b->n);
     else            x = NULL;
   }
-  if (x!=NULL)
-  {
-    if (napIsConstant(x))
-    {
-      number inv=nacInvers(napGetCoeff(x));
-      napMultN(lu->z,inv);
-      nacDelete(&inv,nacRing);
-      napDelete(&x);
-    }
-  }
+  //if (x!=NULL)
+  //{
+  //  if (napIsConstant(x))
+  //  {
+  //    number inv=nacInvers(napGetCoeff(x));
+  //    napMultN(lu->z,inv);
+  //    nacDelete(&inv,nacRing);
+  //    napDelete(&x);
+  //  }
+  //}
   lu->n = x;
-  lu->s = (x==NULL);
+  lu->s = FALSE;
   lu->cnt=si_max(a->cnt,b->cnt)+1;
   if (lu->n!=NULL)
   {
