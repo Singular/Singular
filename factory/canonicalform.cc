@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.42 2008-06-19 15:57:37 Singular Exp $ */
+/* $Id: canonicalform.cc,v 1.43 2008-06-30 09:27:52 Singular Exp $ */
 
 #include <config.h>
 
@@ -230,7 +230,7 @@ CanonicalForm::intval() const
 CanonicalForm
 CanonicalForm::mapinto () const
 {
-    ASSERT( is_imm( value ) ||  ! value->inExtension(), "cannot map into different Extension" );
+    //ASSERT( is_imm( value ) ||  ! value->inExtension(), "cannot map into different Extension" );
     if ( is_imm( value ) )
         if ( getCharacteristic() == 0 )
             if ( is_imm( value ) == FFMARK )
@@ -1747,7 +1747,7 @@ power ( const Variable & v, int n )
         return 1;
     else  if ( n == 1 )
         return v;
-    else  if ( v.level() < 0 )
+    else  if (( v.level() < 0 ) && (!getMipo(v).isZero())
     {
         CanonicalForm result( v, n-1 );
         return result * v;
