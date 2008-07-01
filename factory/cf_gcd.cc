@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.63 2008-06-24 12:55:23 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.64 2008-07-01 16:54:34 Singular Exp $ */
 
 #include <config.h>
 
@@ -16,6 +16,7 @@
 #include "ftmpl_functions.h"
 #include "ffreval.h"
 #include "algext.h"
+#include "fieldGCD.h"
 
 #ifdef HAVE_NTL
 #include <NTL/ZZX.h>
@@ -513,7 +514,13 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
       return d1;
   if ( getCharacteristic() != 0 )
   {
-    if (isOn( SW_USE_EZGCD_P ) && (!fc_and_gc_Univariate))
+    if (isOn(SW_USE_fieldGCD)
+    && (!fc_and_gc_Univariate)
+    && (getCharacteristic() >100))
+    {
+      fc=fieldGCD(fc,gc);
+    }
+    else if (isOn( SW_USE_EZGCD_P ) && (!fc_and_gc_Univariate))
     {
       if ( pe == 1 )
         fc = fin_ezgcd( fc, gc );
