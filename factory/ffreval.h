@@ -10,14 +10,19 @@
 class FFREvaluation : public REvaluation
 {
   private:
-    CFArray offset; // random point
+    CFArray start; // random point
   public:
-    FFREvaluation( ) : REvaluation() {}
-    FFREvaluation( int min, int max ) : offset( min, max ) {}
-    FFREvaluation( int min, int max, const FFRandom & sample ) : REvaluation( min, max, sample ) {}
-    void init();
-    bool step();
+    FFREvaluation( ) : REvaluation(), start() {}
+    FFREvaluation( int min, int max, const FFRandom & sample ) : REvaluation( min, max, sample ), start( min, max )
+    {
+      for( int i=min; i<=max; i++ )
+        values[i] = start[i] = gen->generate();  //generate random point
+
+      nextpoint();
+    }
     FFREvaluation& operator= ( const FFREvaluation & e );
+    void nextpoint();
+    bool hasNext();
 };
 
 CanonicalForm fin_ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG );

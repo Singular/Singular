@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.40 2008-03-17 17:44:04 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.41 2008-07-01 13:45:44 Singular Exp $ */
 
 //{{{ docu
 //
@@ -119,12 +119,38 @@ void out_cf(char *s1,const CanonicalForm &f,char *s2)
     {
       printf("+%d",f.intval());
     }
-    else 
+    else
+    {
     #ifdef NOSTREAMIO
+      #ifdef SINGULAR
+      if (f.inZ())
+      {
+        MP_INT m=gmp_numerator(f);
+        char * str = new char[mpz_sizeinbase( &m, 10 ) + 2];
+        str = mpz_get_str( str, 10, &m );
+        printf("%s",str);
+        delete[] str;
+      }
+      else if (f.inQ())
+      {
+        MP_INT m=gmp_numerator(f);
+        char * str = new char[mpz_sizeinbase( &m, 10 ) + 2];
+        str = mpz_get_str( str, 10, &m );
+        printf("%s/",str);
+        delete[] str;
+        m=gmp_denominator(f);
+        str = new char[mpz_sizeinbase( &m, 10 ) + 2];
+        str = mpz_get_str( str, 10, &m );
+        printf("%s",str);
+        delete[] str;
+      }
+      #else
       printf("+...");
+      #endif
     #else
        std::cout << f;
     #endif
+    }
     //if (f.inZ()) printf("(Z)");
     //else if (f.inQ()) printf("(Q)");
     //else if (f.inFF()) printf("(FF)");
@@ -253,14 +279,14 @@ homogenize( const CanonicalForm & f, const Variable & x)
   int maxdeg=totaldegree(f), deg;
   CFIterator i;
   CanonicalForm elem, result(0);
-  
+
   for (i=f; i.hasTerms(); i++)
   {
     elem= i.coeff()*power(f.mvar(),i.exp());
     deg = totaldegree(elem);
     if ( deg < maxdeg )
       result += elem * power(x,maxdeg-deg);
-    else 
+    else
       result+=elem;
   }
   return result;
@@ -293,14 +319,14 @@ homogenize( const CanonicalForm & f, const Variable & x, const Variable & v1, co
   int maxdeg=totaldegree(f), deg;
   CFIterator i;
   CanonicalForm elem, result(0);
-  
+
   for (i=f; i.hasTerms(); i++)
   {
     elem= i.coeff()*power(f.mvar(),i.exp());
     deg = totaldegree(elem);
     if ( deg < maxdeg )
       result += elem * power(x,maxdeg-deg);
-    else 
+    else
       result+=elem;
   }
   return result;
@@ -372,8 +398,8 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
         d_xn -= (degree(unhomogelem,xn)*j.getItem().exp());
       }
       if ( d_xn != 0 ) // have to append xn^(d_xn)
-        Unhomoglist.append(CFFactor(CanonicalForm(xn),d_xn));  
-      if(isOn(SW_USE_NTL_SORT)) Unhomoglist.sort(cmpCF); 
+        Unhomoglist.append(CFFactor(CanonicalForm(xn),d_xn));
+      if(isOn(SW_USE_NTL_SORT)) Unhomoglist.sort(cmpCF);
       return Unhomoglist;
     }
     mv=find_mvar(f);
@@ -403,49 +429,77 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       // USE NTL
       if (getCharacteristic()!=2)
       {
-        // set remainder
         if (fac_NTL_char!=getCharacteristic())
         {
           fac_NTL_char=getCharacteristic();
-          #ifdef NTL_ZZ
-          ZZ r;
-          r=getCharacteristic();
-          ZZ_pContext ccc(r);
-          #else
-          zz_pContext ccc(getCharacteristic());
+          #ifndef NTL_ZZ
+          if (fac_NTL_char >NTL_SP_BOUND)
+          {
+            ZZ r;
+            r=getCharacteristic();
+            ZZ_pContext ccc(r);
+            ccc.restore();
+            ZZ_p::init(r);
+          }
+          else
           #endif
-          ccc.restore();
+          {
+            #ifdef NTL_ZZ
+            ZZ r;
+            r=getCharacteristic();
+            ZZ_pContext ccc(r);
+            #else
+            zz_pContext ccc(getCharacteristic());
+            #endif
+            ccc.restore();
+            #ifdef NTL_ZZ
+            ZZ_p::init(r);
+            #else
+            zz_p::init(getCharacteristic());
+            #endif
+          }
+        }
+       #ifndef NTL_ZZ
+       if (fac_NTL_char >NTL_SP_BOUND)
+       {
+          // convert to NTL
+          ZZ_pX f1=convertFacCF2NTLZZpX(f);
+          ZZ_p leadcoeff = LeadCoeff(f1);
+          //make monic
+          f1=f1 / LeadCoeff(f1);
+          // factorize
+          vec_pair_ZZ_pX_long factors;
+          CanZass(factors,f1);
+          // convert back to factory
+          F=convertNTLvec_pair_ZZpX_long2FacCFFList(factors,leadcoeff,f.mvar());
+        }
+        else
+        #endif
+        {
+          // convert to NTL
           #ifdef NTL_ZZ
-          ZZ_p::init(r);
+          ZZ_pX f1=convertFacCF2NTLZZpX(f);
+          ZZ_p leadcoeff = LeadCoeff(f1);
           #else
-          zz_p::init(getCharacteristic());
+          zz_pX f1=convertFacCF2NTLzzpX(f);
+          zz_p leadcoeff = LeadCoeff(f1);
+          #endif
+          //make monic
+          f1=f1 / LeadCoeff(f1);
+          // factorize
+          #ifdef NTL_ZZ
+          vec_pair_ZZ_pX_long factors;
+          #else
+          vec_pair_zz_pX_long factors;
+          #endif
+          CanZass(factors,f1);
+          // convert back to factory
+          #ifdef NTL_ZZ
+          F=convertNTLvec_pair_ZZpX_long2FacCFFList(factors,leadcoeff,f.mvar());
+          #else
+          F=convertNTLvec_pair_zzpX_long2FacCFFList(factors,leadcoeff,f.mvar());
           #endif
         }
-        // convert to NTL
-        #ifdef NTL_ZZ
-        ZZ_pX f1=convertFacCF2NTLZZpX(f);
-        ZZ_p leadcoeff = LeadCoeff(f1);
-        #else
-        zz_pX f1=convertFacCF2NTLzzpX(f);
-        zz_p leadcoeff = LeadCoeff(f1);
-        #endif
-        //make monic
-        f1=f1 / LeadCoeff(f1);
-
-        // factorize
-        #ifdef NTL_ZZ
-        vec_pair_ZZ_pX_long factors;
-        #else
-        vec_pair_zz_pX_long factors;
-        #endif
-        CanZass(factors,f1);
-
-        // convert back to factory
-        #ifdef NTL_ZZ
-        F=convertNTLvec_pair_ZZpX_long2FacCFFList(factors,leadcoeff,f.mvar());
-        #else
-        F=convertNTLvec_pair_zzpX_long2FacCFFList(factors,leadcoeff,f.mvar());
-        #endif
         //test_cff(F,f);
       }
       else
@@ -564,7 +618,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
     swapvar(f,Variable(mv),Variable(org_v));
   }
   //out_cff(F);
-  if(isOn(SW_USE_NTL_SORT)) F.sort(cmpCF); 
+  if(isOn(SW_USE_NTL_SORT)) F.sort(cmpCF);
   return F;
 }
 
