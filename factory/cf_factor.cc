@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.41 2008-07-01 13:45:44 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.42 2008-07-01 13:53:02 Singular Exp $ */
 
 //{{{ docu
 //
@@ -31,6 +31,10 @@
 #include "int_int.h"
 #ifdef HAVE_NTL
 #include "NTLconvert.h"
+#endif
+
+#ifdef SINGULAR
+#include "singext.h"
 #endif
 
 int getExp(); /* cf_char.cc */
