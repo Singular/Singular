@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: variable.h,v 1.7 2006-05-15 09:03:07 Singular Exp $ */
+/* $Id: variable.h,v 1.8 2008-07-01 14:17:49 Singular Exp $ */
 
 #ifndef INCL_VARIABLE_H
 #define INCL_VARIABLE_H
@@ -79,6 +79,7 @@ inline int level( const Variable & v ) { return v.level(); }
 inline char name( const Variable & v ) { return v.name(); }
 
 CanonicalForm getMipo( const Variable & alpha, const Variable & x );
+bool hasMipo( const Variable & alpha );
 
 char getDefaultVarName();
 char getDefaultExtName();

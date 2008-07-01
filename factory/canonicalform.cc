@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.44 2008-07-01 13:50:03 Singular Exp $ */
+/* $Id: canonicalform.cc,v 1.45 2008-07-01 14:17:49 Singular Exp $ */
 
 #include <config.h>
 
@@ -1747,7 +1747,7 @@ power ( const Variable & v, int n )
         return 1;
     else  if ( n == 1 )
         return v;
-    else  if (( v.level() < 0 ) && (!getMipo(v).isZero()))
+    else  if (( v.level() < 0 ) && (hasMipo(v)))
     {
         CanonicalForm result( v, n-1 );
         return result * v;
