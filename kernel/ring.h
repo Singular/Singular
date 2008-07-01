@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.30 2008-06-26 13:07:27 Singular Exp $ */
+/* $Id: ring.h,v 1.31 2008-07-01 12:49:09 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -36,7 +36,8 @@ ring   rEnvelope(ring r);
 inline bool rIsPluralRing(const ring r)
 {
 #ifdef HAVE_PLURAL
-  return (r != NULL) && (r->GetNC() != NULL) && (r->GetNC()->type != nc_error); 
+  nc_struct *n;
+  return (r != NULL) && ((n=r->GetNC()) != NULL) && (n->type != nc_error); 
 #else
   return false;
 #endif
