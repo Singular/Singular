@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.24 2008-06-26 18:35:45 motsak Exp $
+ *  Version: $Id: sca.cc,v 1.25 2008-07-02 18:07:11 motsak Exp $
  *******************************************************************/
 
 // set it here if needed.
@@ -1196,6 +1196,10 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   if (TEST_OPT_DEBUG) messageSets(strat);
 #endif
 
+  if (TEST_OPT_REDSB){
+    completeReduce(strat); // ???
+  }
+  
   /* release temp data-------------------------------- */
   exitBuchMora(strat);
 
@@ -1219,8 +1223,6 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 
   /* complete reduction of the standard basis--------- */
   if (TEST_OPT_REDSB){
-//     completeReduce(strat); // ???
-
     ideal I = strat->Shdl;
     ideal erg = kInterRed(I,tempQ);
     assume(I!=erg);
@@ -1549,13 +1551,14 @@ bool sca_Force(ring rGR, int b, int e)
 
   idSkipZeroes( tempQ );
 
+  ncRingType( rGR, nc_exterior );
+
   if( idIs0(tempQ) )
     rGR->GetNC()->SCAQuotient() = NULL;
   else
     rGR->GetNC()->SCAQuotient() = tempQ;
 
-  ncRingType( rGR, nc_exterior );
-
+  
   scaFirstAltVar( rGR, b );
   scaLastAltVar( rGR, e );
 
@@ -1965,13 +1968,18 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 #endif
 
   /* complete reduction of the standard basis--------- */
-  if (TEST_OPT_REDSB) completeReduce(strat);
 
+  if (TEST_OPT_REDSB){
+    completeReduce(strat);
+  }
+
+  
   /* release temp data-------------------------------- */
+
+  exitBuchMora(strat); // cleanT!
+
   id_Delete(&tempF, currRing);
-
-  exitBuchMora(strat);
-
+  
   if (TEST_OPT_WEIGHTM)
   {
     pRestoreDegProcs(pFDegOld, pLDegOld);
@@ -1984,8 +1992,22 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 
   if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
 
+
+  
   if (tempQ!=NULL) updateResult(strat->Shdl,tempQ,strat);
 
+
+  if (TEST_OPT_REDSB) // ???
+  {
+    // must be at the very end (after exitBuchMora) as it changes the S set!!!
+    ideal I = strat->Shdl;
+    ideal erg = kInterRed(I,tempQ);
+    assume(I!=erg);
+    id_Delete(&I, currRing);
+    strat->Shdl = erg;
+  }
+  
+  
 #if MYTEST
   PrintS("\n\n</sca_bba>\n\n");
 #endif

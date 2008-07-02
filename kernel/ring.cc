@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.92 2008-07-01 12:49:09 Singular Exp $ */
+/* $Id: ring.cc,v 1.93 2008-07-02 18:07:11 motsak Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3796,7 +3796,16 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
       }
     }
   }
+
+#ifdef HAVE_PLURAL
+  nc_struct* save=r->GetNC();
+  r->GetNC()=NULL;
+#endif
   ring res=rCopy(r);
+#ifdef HAVE_PLURAL
+  r->GetNC()=save;
+#endif
+
   i=rBlocks(r);
   int j;
 
@@ -3827,17 +3836,12 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
   // ----------------------------
   omFree((ADDRESS)res->p_Procs);
   res->p_Procs = (p_Procs_s*)omAlloc(sizeof(p_Procs_s));
-#ifdef HAVE_PLURAL
-  nc_struct* save=res->GetNC();
-  res->GetNC()=NULL;
-#endif
+
   p_ProcsSet(res, res->p_Procs);
   if (res->qideal!=NULL) id_Delete(&res->qideal,res);
 #ifdef HAVE_PLURAL
-  if (rIsPluralRing(res))
+  if (rIsPluralRing(r))
   {
-    res->GetNC()=save;
-    nc_rKill(res);
     if ( nc_rComplete(r, res, false) ) // no qideal!
     {
       WarnS("error in nc_rComplete");
@@ -3849,12 +3853,20 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
   {
      res->qideal=idrCopyR_NoSort(r->qideal,r);
 #ifdef HAVE_PLURAL
-     if (rIsPluralRing(res) )
+     if (rIsPluralRing(res))
      {
        nc_SetupQuotient(res, currRing);
      }
+     assume((res->qideal==NULL) == (r->qideal==NULL));
 #endif
   }
+
+#ifdef HAVE_PLURAL
+  assume(rIsPluralRing(res) == rIsPluralRing(r));
+  assume(rIsSCA(res) == rIsSCA(r));
+  assume(ncRingType(res) == ncRingType(r));
+#endif
+  
   return res;
 }
 

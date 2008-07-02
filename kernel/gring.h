@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.23 2008-06-26 18:35:45 motsak Exp $ */
+/* $Id: gring.h,v 1.24 2008-07-02 18:07:10 motsak Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -117,28 +117,38 @@ poly p_Lcm(const poly a, const poly b, const ring r);
 // //////////////////////////////////////////////////////////////////////// //
 // NC inlines
 
+inline nc_struct*& GetNC(ring r)
+{
+  return r->GetNC();
+}; 
+
 inline nc_type& ncRingType(nc_struct* p)
 {
   assume(p!=NULL);
   return (p->ncRingType());
 };
 
-inline nc_type& ncRingType(ring r) // get and set
+inline nc_type ncRingType(ring r) // Get
 {
-  assume(rIsPluralRing(r));
-  return (ncRingType(r->GetNC()));
+  if(rIsPluralRing(r))
+    return (ncRingType(r->GetNC()));
+  else
+    return (nc_error);
 };
 
 inline void ncRingType(ring r, nc_type t) // Set
 {
   assume((r != NULL) && (r->GetNC() != NULL));
-  ncRingType(r) = t;
+  ncRingType(r->GetNC()) = t;
 };
 
-inline nc_struct*& GetNC(ring r)
+
+inline void ncRingType(nc_struct* p, nc_type t) // Set
 {
-  return r->GetNC();
-}; 
+  assume(p!=NULL);
+  ncRingType(p) = t;
+};
+
 
 
 

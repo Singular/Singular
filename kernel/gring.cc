@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.57 2008-06-26 18:35:45 motsak Exp $
+ *  Version: $Id: gring.cc,v 1.58 2008-07-02 18:07:10 motsak Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -3033,7 +3033,7 @@ BOOLEAN nc_CallPlural(
   // create new non-commutative structure
   nc_struct *nc_new = (nc_struct *)omAlloc0(sizeof(nc_struct));
 
-  ncRingType(nc_new) = nctype;
+  ncRingType(nc_new, nctype);
 
   nc_new->C = C; // if C and D were given by matrices at the beginning they are in r
   nc_new->D = D; // otherwise they should be in r->GetNC()->basering(polynomial * Id_{N})
