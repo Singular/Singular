@@ -296,8 +296,7 @@ GFTABLES = $(wildcard LIB/gftables/[1-9]*)
 .l.cc:
 	@if test -r scanner.cc; then \
 		touch scanner.cc ;\
-	else \
-	if test "x${LEX}" = x; then \
+	elif test "x${LEX}" = x; then \
 		echo Error: no lex given, could not rebuilt scanner.cc;\
                 exit 1; \
 	fi
