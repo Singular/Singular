@@ -12,6 +12,9 @@
 #include "cf_map.h"
 #include "cf_generator.h"
 
+void out_cf(char *s1,const CanonicalForm &f,char *s2);
+
+
 CanonicalForm fieldGCD( const CanonicalForm & F, const CanonicalForm & G );
 void CRA(const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew);
 int * leadDeg(const CanonicalForm & f, int *degs);
@@ -23,7 +26,7 @@ CanonicalForm firstLC(const CanonicalForm & f);
 CanonicalForm fieldGCD( const CanonicalForm & F, const CanonicalForm & G )
 {// this is the modular method by Brown
  // assume F,G are multivariate polys over Z/p for big prime p
- if(F.isZero())
+  if(F.isZero())
   {
     if(G.isZero())
       return G; // G is zero
@@ -39,6 +42,8 @@ CanonicalForm fieldGCD( const CanonicalForm & F, const CanonicalForm & G )
   }
   if(F.inCoeffDomain() || G.inCoeffDomain())
     return CanonicalForm(1);
+  //out_cf("F=",F,"\n");
+  //out_cf("G=",G,"\n");
   CFMap MM,NN;
   CFArray ps(1,2);
   ps[1] = F;
@@ -61,7 +66,10 @@ CanonicalForm fieldGCD( const CanonicalForm & F, const CanonicalForm & G )
   f/=cf;
   g/=cg;
   if(f.inCoeffDomain() || g.inCoeffDomain())
+  {
+    //printf("=============== inCoeffDomain\n");
     return NN(c);
+  }
   int *L = new int[mv+1]; // L is addressed by i from 2 to mv
   int *M = new int[mv+1];
   for(int i=2; i<=mv; i++)
@@ -86,9 +94,12 @@ CanonicalForm fieldGCD( const CanonicalForm & F, const CanonicalForm & G )
     gamma_image = gamma(alpha, Variable(1)); // plug in alpha for var(1)
     if(gamma_image.isZero()) // skip lc-bad points var(1)-alpha
       continue;
-    g_image = fieldGCD( f(alpha, Variable(1)), g(alpha, Variable(1)) ); // recursive call with one var less
+    g_image = gcd( f(alpha, Variable(1)), g(alpha, Variable(1)) ); // recursive call with one var less
     if(g_image.inCoeffDomain()) // early termination
+    {
+      //printf("================== inCoeffDomain\n");
       return NN(c);
+    }
     for(int i=2; i<=mv; i++)
       dg_im[i] = 0; // reset (this is necessary, because some entries may not be updated by call to leadDeg)
     dg_im = leadDeg(g_image, dg_im); // dg_im cannot be NIL-pointer
@@ -104,8 +115,12 @@ CanonicalForm fieldGCD( const CanonicalForm & F, const CanonicalForm & G )
       if(gnew == gm) // gnew did not change
       {
         g_image = gm / vcontent(gm, Variable(2));
+	//out_cf("=========== try ",g_image,"\n");
         if(fdivides(g_image,f) && fdivides(g_image,g)) // trial division
+	{
+	  //printf("=========== okay\n");
           return NN(c*g_image);
+	}
       }
       gm = gnew;
       continue;
@@ -116,6 +131,7 @@ CanonicalForm fieldGCD( const CanonicalForm & F, const CanonicalForm & G )
 
     if(isLess(dg_im, L, 2, mv)) // dg_im < L --> all previous points were unlucky
     {
+      //printf("=========== reset\n");
       m = CanonicalForm(1); // reset
       gm = 0; // reset
       for(int i=2; i<=mv; i++) // tighten bound
