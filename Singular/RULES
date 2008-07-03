@@ -1,3 +1,48 @@
+Naming conventions(variables):
+-----------------------------
+- global name start with a prefix in small letters, describing the general field of that routine
+  and have capital initial letters.
+  Example: pGetExp
+- local names should be short and, if they coantain a capital letter, start with a capital 
+  letter.
+  Example: i
+- macros (which do not substitute procedures) should be all in capital letters.
+  Example: INT_MAX
+
+Naming conventions(filenames, libraries):
+-----------------------------------------
+- to avoid confusion on poor file systems, filenames should be all in small letters
+
+Error messages:
+--------------
+- allways test for wrong input from the user,
+  report errors via Werror/WerrorS, warnings via Warn/WarnS
+- trust other parts of Singular:
+  - only very fast tests
+  - have a complete test of the input in debug mode (#ifndef NDEBUG)
+- report internal errors via dReportError
+
+Indentiation:
+-------------
+- matching  { } should be in the same line (for very short staements) 
+  or in the same column
+
+System dependicies:
+------------------
+- for code specific for certain cpu types, use the following macros
+  CPU type: i[3456]86:  SI_CPU_I386 
+  CPU type: sparc:      SI_CPU_SPARC 
+  CPU type: ppc:        SI_CPU_PPC 
+  CPU type: IA64:       SI_CPU_IA64
+  CPU type: x86_64:     SI_CPU_X86_64 
+- always provide a general version also
+- if NTL is included, one may also use:
+  NTL_AVOID_BRANCHING (currently not used, substituted by SI_CPU_*)
+- only for dependicies on the OS, use
+  the result of  singuname (#ifdef ix86_Linux etc.)
+
+Misc. remarks:
+--------------
 * never use fopen, but myfopen, in order to open text files
 
 * call rComplete after constructing a ring 
