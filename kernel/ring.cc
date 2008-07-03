@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.93 2008-07-02 18:07:11 motsak Exp $ */
+/* $Id: ring.cc,v 1.94 2008-07-03 13:55:04 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3802,9 +3802,6 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
   r->GetNC()=NULL;
 #endif
   ring res=rCopy(r);
-#ifdef HAVE_PLURAL
-  r->GetNC()=save;
-#endif
 
   i=rBlocks(r);
   int j;
@@ -3840,6 +3837,7 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
   p_ProcsSet(res, res->p_Procs);
   if (res->qideal!=NULL) id_Delete(&res->qideal,res);
 #ifdef HAVE_PLURAL
+  r->GetNC()=save;
   if (rIsPluralRing(r))
   {
     if ( nc_rComplete(r, res, false) ) // no qideal!
@@ -3866,7 +3864,7 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
   assume(rIsSCA(res) == rIsSCA(r));
   assume(ncRingType(res) == ncRingType(r));
 #endif
-  
+
   return res;
 }
 

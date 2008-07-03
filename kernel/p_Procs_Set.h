@@ -11,7 +11,7 @@
  *           have to be defined before this file is included
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Set.h,v 1.16 2008-07-02 18:07:11 motsak Exp $
+ *  Version: $Id: p_Procs_Set.h,v 1.17 2008-07-03 13:55:04 Singular Exp $
  *******************************************************************/
 #include "modulop.h"
 
@@ -186,7 +186,7 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
 #ifndef NDEBUG
   if (rIsPluralRing(r))
   {
-     WarnS("Setting pProcs in p_ProcsSet (rDebugPrint!?)!!!");
+     dReportError("Setting pProcs in p_ProcsSet (rDebugPrint!?)!!!");
      nc_p_ProcsSet(r, _p_procs); // Setup non-commutative p_Procs table!
   }
 #endif
