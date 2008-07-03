@@ -1,17 +1,39 @@
-Naming conventions(variables):
------------------------------
-- global name start with a prefix in small letters, describing the general field of that routine
+C++ conventions
+---------------
+- struct are used in sense of C, otherwise use a class
+- a class must have a constructor and destruction, do not rely on the default ones
+- avoid virtual methods, if possible
+- under all circumstances, avoid multiple inheritance
+- remember, that Singular has C and C++ parts, i.e. ia C compiler must be able
+  to comple your .h file (wrap C++-only parts in #ifdef)
+- use // comments only in C++-parts
+
+
+Compiler conventions
+--------------------
+- should compile with gcc/g++ version 2.9.3 to 4.x
+- should create correct code with gcc/g++ version 2.9.3 to 4.x : with
+  well known exeptions
+  ( IA64: gcc 4.0.x, 4.1.x produce wrong code,
+    OsX: ..., etc.)
+ 
+Naming conventions(variables/functions/methods):
+------------------------------------------------
+- global names start with a prefix in small letters,
+  describing the general field of that routine
   and have capital initial letters.
   Example: pGetExp
-- local names should be short and, if they coantain a capital letter, start with a capital 
-  letter.
+- local names should be short and,
+  if they coantain a capital letter, start with a capital letter.
   Example: i
 - macros (which do not substitute procedures) should be all in capital letters.
   Example: INT_MAX
 
 Naming conventions(filenames, libraries):
 -----------------------------------------
-- to avoid confusion on poor file systems, filenames should be all in small letters
+- to avoid confusion on poor file systems, 
+  filenames should be all in small letters, or, at least, be unique if converted
+  to small letters
 
 Error messages:
 --------------
