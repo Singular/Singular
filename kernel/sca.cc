@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.25 2008-07-02 18:07:11 motsak Exp $
+ *  Version: $Id: sca.cc,v 1.26 2008-07-04 16:17:16 motsak Exp $
  *******************************************************************/
 
 // set it here if needed.
@@ -1000,13 +1000,9 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   if(Q == currQuotient)
     tempQ = SCAQuotient(currRing);
 
-  bool bIdHomog = id_IsSCAHomogeneous(tempF, NULL, NULL, currRing); // wCx == wCy == NULL!
+  strat->z2homog = id_IsSCAHomogeneous(tempF, NULL, NULL, currRing); // wCx == wCy == NULL!
 
-  assume( !bIdHomog || strat->homog ); //  bIdHomog =====[implies]>>>>> strat->homog
-
-  strat->homog = strat->homog && bIdHomog;
-
-  assume( strat->homog == bIdHomog );
+//  strat->homog = strat->homog && strat->z2homog; // ?
 
 #if MYTEST
   {
@@ -1650,15 +1646,9 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
   idPrint(tempQ);
 #endif
   
-  bool bIdHomog = id_IsSCAHomogeneous(tempF, NULL, NULL, currRing); // wCx == wCy == NULL!
+  strat->z2homog = id_IsSCAHomogeneous(tempF, NULL, NULL, currRing); // wCx == wCy == NULL!
 
-  assume( !bIdHomog || strat->homog ); //  bIdHomog =====[implies]>>>>> strat->homog
-
-  strat->homog = strat->homog && bIdHomog;
-
-#ifdef PDEBUG
-  assume( strat->homog == bIdHomog );
-#endif /*PDEBUG*/
+//  strat->homog = strat->homog && strat->z2homog; // ?
 
 
   
@@ -2530,11 +2520,12 @@ intvec *ivGetSCAXVarWeights(const ring r)
 {
   const unsigned int N  = r->N;
 
-  const int CommutativeVariable = 1;
+  const int CommutativeVariable = 0; // bug correction!
   const int AntiCommutativeVariable = 0;
 
   intvec* w = new intvec(N, 1, CommutativeVariable);
 
+  if(AntiCommutativeVariable != CommutativeVariable)
   if( rIsSCA(r) )
   {
     const unsigned int m_iFirstAltVar = scaFirstAltVar(r);
@@ -2545,6 +2536,7 @@ intvec *ivGetSCAXVarWeights(const ring r)
       (*w)[i-1] = AntiCommutativeVariable;
     }
   }
+
   return w;
 }
 
@@ -2561,6 +2553,7 @@ intvec *ivGetSCAYVarWeights(const ring r)
 
   intvec* w = new intvec(N, 1, CommutativeVariable);
 
+  if(AntiCommutativeVariable != CommutativeVariable)
   if( rIsSCA(r) )
   {
     const unsigned int m_iFirstAltVar = scaFirstAltVar(r);

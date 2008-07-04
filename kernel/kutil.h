@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.35 2008-02-26 23:35:31 levandov Exp $ */
+/* $Id: kutil.h,v 1.36 2008-07-04 16:17:15 motsak Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -310,6 +310,9 @@ public:
   int minim;
   BOOLEAN interpt;
   BOOLEAN homog;
+#ifdef HAVE_PLURAL
+  BOOLEAN z2homog; // Z_2 - homogeneous input allows product criterion in commutative and SCA cases!
+#endif
   BOOLEAN kHEdgeFound;
   BOOLEAN honey,sugarCrit;
   BOOLEAN Gebauer,noTailReduction;

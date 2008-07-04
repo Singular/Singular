@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.94 2008-06-25 12:03:56 Singular Exp $ */
+/* $Id: kutil.cc,v 1.95 2008-07-04 16:17:15 motsak Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1382,7 +1382,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
 
 #ifdef HAVE_PLURAL
   const BOOLEAN bIsPluralRing = rIsPluralRing(currRing);
-  const BOOLEAN bIsSCA        = rIsSCA(currRing) && strat->homog; // for prod-crit
+  const BOOLEAN bIsSCA        = rIsSCA(currRing) && strat->z2homog; // for Z_2 prod-crit
   const BOOLEAN bNCProdCrit   = ( !bIsPluralRing || bIsSCA ); // commutative or homogeneous SCA
 
 #else
@@ -1649,7 +1649,7 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
   {
     //PrintS("prod-crit\n");
     #ifdef HAVE_PLURAL
-    if((!rIsPluralRing(currRing)) || (rIsSCA(currRing) && strat->homog))
+    if((!rIsPluralRing(currRing)) || (rIsSCA(currRing) && strat->z2homog))
     #endif
     {
       //PrintS("prod-crit\n");
@@ -5315,7 +5315,7 @@ void initBuchMoraCrit(kStrategy strat)
 
 #ifdef HAVE_PLURAL
   // and r is plural_ring
-  if( rIsPluralRing(currRing) || (rIsSCA(currRing) && !strat->homog) )
+  if( rIsPluralRing(currRing) || (rIsSCA(currRing) && !strat->z2homog) )
   {    //or it has non-quasi-comm type... later
     strat->sugarCrit = FALSE;
     strat->Gebauer = FALSE;
@@ -6506,7 +6506,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
   }
 
   const BOOLEAN bIsPluralRing = rIsPluralRing(currRing);
-  const BOOLEAN bIsSCA        = rIsSCA(currRing) && strat->homog; // for prod-crit
+  const BOOLEAN bIsSCA        = rIsSCA(currRing) && strat->z2homog; // for prod-crit
   const BOOLEAN bNCProdCrit   = ( !bIsPluralRing || bIsSCA ); // commutative or homogeneous SCA
 
   if (strat->sugarCrit && bNCProdCrit)
