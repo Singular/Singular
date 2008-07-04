@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.58 2008-07-02 18:07:10 motsak Exp $
+ *  Version: $Id: gring.cc,v 1.59 2008-07-04 14:21:53 motsak Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -35,13 +35,13 @@
 #include "p_Mult_q.h"
 #include "pInline1.h"
 
-#include "gring.h"
-#include "sca.h"
-
-
-
 // dirty tricks:
 #include "p_MemAdd.h"
+
+#include "gring.h"
+#include "sca.h"
+#include <summator.h>
+
 
 bool bUseExtensions = true;
 
@@ -193,7 +193,7 @@ poly gnc_p_Minus_mm_Mult_qq_ign(poly p, const poly m, poly q, int & d1, poly d2,
 
 
 //----------- auxiliary routines--------------------------
-poly _gnc_p_Mult_q(poly p, poly q, const int copy, const ring r)
+poly _gnc_p_Mult_q(poly p, poly q, const int copy, const ring r) // not used anymore!
   /* destroy p,q unless copy=1 */
 {
   poly res=NULL;
@@ -222,40 +222,74 @@ poly _gnc_p_Mult_q(poly p, poly q, const int copy, const ring r)
 poly _nc_p_Mult_q(poly pPolyP, poly pPolyQ, const ring rRing)
 {
   assume( rIsPluralRing(rRing) );
-
-  poly pResult = NULL;
-
-  // always length(q) times "p * q[j]"
-  for( ; pPolyQ!=NULL; pPolyQ  = p_LmDeleteAndNext( pPolyQ, rRing ) )
-    pResult = p_Add_q( pResult, pp_Mult_mm( pPolyP, pPolyQ, rRing), rRing );
-    // rRing->p_Procs->pp_Mult_mm() <--> sca_nc_pp_Mult_mm
-
-  p_Delete( &pPolyP, rRing );
-
 #ifdef PDEBUG
-  p_Test(pResult,rRing);
+  p_Test(pPolyP, rRing);
+  p_Test(pPolyQ, rRing);
 #endif
+#ifdef RDEBUG
+  rTest(rRing);
+#endif
+  
+  int lp, lq;
 
-  return(pResult);
+  pqLength(pPolyP, pPolyQ, lp, lq, MIN_LENGTH_BUCKET);
+
+  bool bUsePolynomial = TEST_OPT_NOT_BUCKETS || (si_max(lp, lq) < MIN_LENGTH_BUCKET); // ???
+
+  CPolynomialSummator sum(rRing, bUsePolynomial);
+  
+  if (lq <= lp) // ?
+  {
+    // always length(q) times "p * q[j]"
+    for( ; pPolyQ!=NULL; pPolyQ  = p_LmDeleteAndNext( pPolyQ, rRing ) )
+      sum += pp_Mult_mm( pPolyP, pPolyQ, rRing);
+
+    p_Delete( &pPolyP, rRing );
+  } else
+  {
+    // always length(p) times "p[i] * q"
+    for( ; pPolyP!=NULL; pPolyP  = p_LmDeleteAndNext( pPolyP, rRing ) )
+      sum += nc_mm_Mult_pp( pPolyP, pPolyQ, rRing);
+
+    p_Delete( &pPolyQ, rRing );
+  }
+
+  return(sum);
 }
-
 
 // return pPolyP * pPolyQ; preserve pPolyP and pPolyQ
 poly _nc_pp_Mult_qq(const poly pPolyP, const poly pPolyQ, const ring rRing)
 {
   assume( rIsPluralRing(rRing) );
-
-  poly pResult = NULL;
-
-  // always length(q) times "p * q[j]"
-  for( poly q = pPolyQ; q !=NULL; q = pNext(q) )
-    pResult = p_Add_q( pResult, pp_Mult_mm(pPolyP, q, rRing), rRing );
-
 #ifdef PDEBUG
-  p_Test(pResult,rRing);
+  p_Test(pPolyP, rRing);
+  p_Test(pPolyQ, rRing);
+#endif
+#ifdef RDEBUG
+  rTest(rRing);
 #endif
 
-  return(pResult);
+  int lp, lq;
+
+  pqLength(pPolyP, pPolyQ, lp, lq, MIN_LENGTH_BUCKET);
+
+  bool bUsePolynomial = TEST_OPT_NOT_BUCKETS || (si_max(lp, lq) < MIN_LENGTH_BUCKET); // ???
+
+  CPolynomialSummator sum(rRing, bUsePolynomial);
+
+  if (lq <= lp) // ?
+  {
+    // always length(q) times "p * q[j]"
+    for( poly q = pPolyQ; q !=NULL; q = pNext(q) )
+      sum += pp_Mult_mm(pPolyP, q, rRing);
+  } else
+  {
+    // always length(p) times "p[i] * q"
+    for( poly p = pPolyP; p !=NULL; p = pNext(p) )
+      sum += nc_mm_Mult_pp( p, pPolyQ, rRing);
+  }
+  
+  return(sum);
 }
 
 
@@ -299,9 +333,8 @@ poly gnc_p_Mult_mm_Common(poly p, const poly m, int side, const ring r)
   /* bucket constraints: */
   int UseBuckets=1;
   if (pLength(p)< MIN_LENGTH_BUCKET || TEST_OPT_NOT_BUCKETS) UseBuckets=0;
-  sBucket_pt bu_out;
-  poly out=NULL;
-  if (UseBuckets) bu_out=sBucketCreate(r);
+
+  CPolynomialSummator sum(r, UseBuckets == 0);
 
   while (p!=NULL)
   {
@@ -350,22 +383,15 @@ poly gnc_p_Mult_mm_Common(poly p, const poly m, int side, const ring r)
     }
     v = p_Mult_nn(v,cOut,r);
     p_SetCompP(v,expOut,r);
-    if (UseBuckets) sBucket_Add_p(bu_out,v,pLength(v));
-    else out = p_Add_q(out,v,r);
+
+    sum += v;
+
     p_DeleteLm(&p,r);
   }
   freeT(P,rN);
   freeT(M,rN);
-  if (UseBuckets)
-  {
-    out = NULL;
-    int len = pLength(out);
-    sBucketDestroyAdd(bu_out, &out, &len);
-  }
-#ifdef PDEBUG
-  p_Test(out,r);
-#endif
-  return(out);
+
+  return(sum);
 }
 
 /* poly functions defined in p_Procs : */
@@ -2114,8 +2140,10 @@ poly nc_p_Bracket_qq(poly p, poly q)
   poly pres=NULL;
   int UseBuckets=1;
   if ((pLength(p)< MIN_LENGTH_BUCKET/2) && (pLength(q)< MIN_LENGTH_BUCKET/2) || TEST_OPT_NOT_BUCKETS) UseBuckets=0;
-  sBucket_pt bu_out;
-  if (UseBuckets) bu_out=sBucketCreate(currRing);
+
+
+  CPolynomialSummator sum(currRing, UseBuckets == 0);
+  
   while (p!=NULL)
   {
     Q=q;
@@ -2126,21 +2154,15 @@ poly nc_p_Bracket_qq(poly p, poly q)
       {
         coef = nMult(pGetCoeff(p),pGetCoeff(Q));
         pres = p_Mult_nn(pres,coef,currRing);
-    if (UseBuckets) sBucket_Add_p(bu_out,pres,pLength(pres));
-    else res=p_Add_q(res,pres,currRing);
+
+        sum += pres;
         nDelete(&coef);
       }
       pIter(Q);
     }
     p=pLmDeleteAndNext(p);
   }
-  if (UseBuckets)
-  {
-    res = NULL;
-    int len = pLength(res);
-    sBucketDestroyAdd(bu_out, &res, &len);
-  }
-  return(res);
+  return(sum);
 }
 
 poly nc_mm_Bracket_nn(poly m1, poly m2)

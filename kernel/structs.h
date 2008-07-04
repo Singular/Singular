@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.47 2008-06-26 18:35:45 motsak Exp $ */
+/* $Id: structs.h,v 1.48 2008-07-04 14:19:55 motsak Exp $ */
 /*
 * ABSTRACT
 */
@@ -138,6 +138,7 @@ class procinfo;
 class namerec;
 class kBucket;
 class sBucket;
+class CPolynomialSummator;
 #endif
 
 struct n_Procs_s;
