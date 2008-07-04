@@ -9,7 +9,7 @@
  *           use kbuckets, instead.
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: sbuckets.h,v 1.1.1.1 2003-10-06 12:16:02 Singular Exp $
+ *  Version: $Id: sbuckets.h,v 1.2 2008-07-04 14:17:15 motsak Exp $
  *******************************************************************/
 #ifndef S_BUCKETS_H
 #define S_BUCKETS_H
@@ -29,10 +29,10 @@ void          sBucketDestroy(sBucket_pt *bucket);
 
 // Converts p into a bucket poly (SBpoly) and destroys p
 // Assumes length <= 0 || pLength(p) == length
-void sBucketInit(sBucket_pt bucket, poly p, int length);
+// void sBucketInit(sBucket_pt bucket, poly p, int length);
 
 // creates and returns new bucket, initializes it with p
-sBucket_pt  sBucketInit( poly p, int length, ring r = currRing);
+// sBucket_pt sBucketInit( poly p, int length, ring r = currRing);
 
 // Converts SBpoly into a poly and clears bucket
 // i.e., afterwards SBpoly == 0
