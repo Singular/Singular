@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.h,v 1.8 2008-03-19 17:44:12 Singular Exp $ */
+/* $Id: rmodulo2m.h,v 1.9 2008-07-07 12:21:43 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -31,7 +31,7 @@ number  nr2mNeg         (number c);
 number  nr2mInvers      (number c);
 BOOLEAN nr2mGreater     (number a, number b);
 BOOLEAN nr2mDivBy       (number a, number b);
-int     nr2mComp        (number a, number b);
+int     nr2mDivComp     (number a, number b);
 BOOLEAN nr2mEqual       (number a, number b);
 number  nr2mLcm         (number a,number b, ring r);
 number  nr2mGcd         (number a,number b,ring r);

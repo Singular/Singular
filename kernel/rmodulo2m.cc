@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.17 2008-03-19 17:44:11 Singular Exp $ */
+/* $Id: rmodulo2m.cc,v 1.18 2008-07-07 12:21:43 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -214,7 +214,7 @@ BOOLEAN nr2mDivBy (number a,number b)
   */
 }
 
-int nr2mComp(number as, number bs)
+int nr2mDivComp(number as, number bs)
 {
   NATNUMBER a = (NATNUMBER) as;
   NATNUMBER b = (NATNUMBER) bs;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.185 2008-06-10 10:33:15 motsak Exp $ */
+/* $Id: ipshell.cc,v 1.186 2008-07-07 12:21:43 wienand Exp $ */
 /*
 * ABSTRACT:
 */
@@ -4495,74 +4495,56 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       pn->next->name=omStrDup("i");
     }
   }
-#ifdef HAVE_RINGZ
-  else if ((pn->name != NULL)
-  && (strcmp(pn->name,"integers")==0))
+#ifdef HAVE_RINGS
+  else if ((pn->name != NULL) && (strcmp(pn->name, "integer") == 0))
   {
-    ch = 0;
-    ringtype = 4;
-  }
-#endif
-#ifdef HAVE_RINGMODN
-  else if ((pn->name != NULL)
-  && (strcmp(pn->name,"modnat")==0))
-  {
-    unsigned long long module = 1;
-    while ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
-    {
-      module *= (unsigned long long) pn->next->Data();
-      pn=pn->next;
-    }
-    if ((module < 2))
-    {
-      Werror("Wrong ground ring specification (modnat)");
-      goto rInitError;
-    }
-    ch = module;
-    ringtype = 2;
-    ringflaga = module;
-    ringflagb = 1;
-  }
-#endif
-#ifdef HAVE_RING2TOM
-  else if ((pn->name != NULL)
-  && (strcmp(pn->name,"modpow")==0))
-  {
-    unsigned long base = 0;
-    unsigned int exp = 0;
     if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
     {
-      base =(unsigned long) pn->next->Data();
+      ringflaga = (unsigned long long) pn->next->Data();
       pn=pn->next;
+      ringflagb = 1;
       if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
       {
-        exp = (unsigned int) (unsigned long) pn->next->Data();
+        ringflagb = (unsigned int) (unsigned long) pn->next->Data();
         pn=pn->next;
       }
-    }
-    if ((base < 2) || (exp < 1))
-    {
-      Werror("Wrong ground ring specification");
-      goto rInitError;
-    }
-    ch = exp;
-    if ((base == 2) && (exp + 2 <= 8*sizeof(NATNUMBER)))
-    {
-      ringtype = 1; // Use Z/2^ch
-      ringflaga = 2;
-      ringflagb = exp;
-      WarnS("Z/2^n not yet fully tested");
+      while ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
+      {
+        ringflaga *= (unsigned long long) pn->next->Data();
+        pn=pn->next;
+      }
+      if (ringflaga < 2)
+      {
+        Werror("Wrong ground ring specification (module smallet than 2)");
+        goto rInitError;
+      }
+      if (ringflagb < 1)
+      {
+        Werror("Wrong ground ring specification (exponent smaller than 1");
+        goto rInitError;
+      }
+      if (ringflagb > 1)
+      {
+        ch = ringflagb;
+        if ((ringflaga == 2) && (ringflagb + 2 <= 8*sizeof(NATNUMBER)))
+        {
+          ringtype = 1;       // Use Z/2^ch
+        }
+        else
+        {
+          ringtype = 3;
+        }
+      }
+      else
+      {
+        ringtype = 2;
+        ch = ringflaga;
+      }
     }
     else
     {
-      if ((base == 2) && (exp + 2 > 8*sizeof(NATNUMBER)))
-      {
-        Print("// exponent+2 is larger then number of bits in 'NATNUMBER' (%d bits)\n", 8*sizeof(NATNUMBER));
-        WarnS("==> using generic gmp implementation (restriction from design and NTL)");
-      }
-      ringtype = 3;
-      ringflaga = base;
-      ringflagb = exp;
+      ch = 0;
+      ringtype = 4;
     }
   }
 #endif
@@ -4576,8 +4558,11 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 #ifdef HAVE_RINGS
   if (ringtype > 0)
   {
-    WarnS("You are using a preview implementation of coefficients rings.");
-    WarnS("Please note that only the following commands are meant to work:");
+    WarnS("You are using coefficients rings which are not fields.");
+    WarnS("Please note that only limited functionality is available");
+    WarnS("for these coefficients.");
+    WarnS("");
+    WarnS("The following commands are meant to work:");
     WarnS("- basic polynomial arithmetic");
     WarnS("- std");
     WarnS("- reduce");

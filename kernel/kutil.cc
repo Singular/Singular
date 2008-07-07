@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.95 2008-07-04 16:17:15 motsak Exp $ */
+/* $Id: kutil.cc,v 1.96 2008-07-07 12:21:42 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1105,7 +1105,7 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
   for(j = strat->Bl;j>=0;j--)
   {
     compare=pDivCompRing(strat->B[j].lcm,Lp.lcm);
-    compareCoeff = nComp(pGetCoeff(strat->B[j].lcm), pGetCoeff(Lp.lcm));
+    compareCoeff = nDivComp(pGetCoeff(strat->B[j].lcm), pGetCoeff(Lp.lcm));
     if (compareCoeff == 0 || compare == compareCoeff)
     {
       if (compare == 1)
@@ -2234,7 +2234,7 @@ void enterOneZeroPairRing (poly f, poly t_p, poly p, int ecart, kStrategy strat,
   for(j = strat->Bl;j>=0;j--)
   {
     compare=pDivCompRing(strat->B[j].lcm,Lp.lcm);
-    compareCoeff = nComp(pGetCoeff(strat->B[j].lcm), pGetCoeff(Lp.lcm));
+    compareCoeff = nDivComp(pGetCoeff(strat->B[j].lcm), pGetCoeff(Lp.lcm));
     if (compareCoeff == 0 || compare == compareCoeff)
     {
       if (compare == 1)
@@ -5887,6 +5887,11 @@ void kStratInitChangeTailRing(kStrategy strat)
   {
     // Hmm ... this we could do in one Step
     l = p_GetMaxExpL(strat->T[i].p, currRing, l);
+  }
+  if (rField_is_Ring(currRing))
+  {
+    l += 20; // TEMP, TODO OLI
+    l *= 2;
   }
   e = p_GetMaxExp(l, currRing);
   if (e <= 1) e = 2;

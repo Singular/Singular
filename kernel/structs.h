@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.48 2008-07-04 14:19:55 motsak Exp $ */
+/* $Id: structs.h,v 1.49 2008-07-07 12:21:43 wienand Exp $ */
 /*
 * ABSTRACT
 */
@@ -272,7 +272,7 @@ struct n_Procs_s
    int     (*nSize)(number n);
    int     (*nInt)(number &n);
 #ifdef HAVE_RINGS
-   int     (*nComp)(number a,number b);
+   int     (*nDivComp)(number a,number b);
    BOOLEAN (*nIsUnit)(number a);
    number  (*nGetUnit)(number a);
    number  (*nExtGcd)(number a, number b, number *s, number *t);

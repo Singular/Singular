@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.16 2008-06-25 11:27:31 Singular Exp $ */
+/* $Id: numbers.cc,v 1.17 2008-07-07 12:21:43 wienand Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -50,7 +50,7 @@ number (*nRePart)(number a);
 number (*nImPart)(number a);
 #ifdef HAVE_RINGS
 BOOLEAN (*nDivBy)(number a,number b);
-int     (*nComp)(number a,number b);
+int     (*nDivComp)(number a,number b);
 BOOLEAN (*nIsUnit)(number a);
 number  (*nGetUnit)(number a);
 number  (*nExtGcd)(number a, number b, number *s, number *t);
@@ -114,7 +114,7 @@ number nd_Copy(number a,const ring r) { return r->cf->nCopy(a); }
 
 #ifdef HAVE_RINGS
 BOOLEAN ndDivBy(number a, number b) { return TRUE; } // assume a,b !=0
-int ndComp(number a, number b) { return 0; }
+int ndDivComp(number a, number b) { return 0; }
 BOOLEAN ndIsUnit(number a) { return !nIsZero(a); }
 number  ndExtGcd (number a, number b, number *s, number *t) { return nInit(1); }
 #endif
@@ -207,7 +207,7 @@ void nSetChar(ring r)
   nInvers= r->cf->nInvers;
   nCopy  = r->cf->nCopy;
 #ifdef HAVE_RINGS
-  nComp  = r->cf->nComp;
+  nDivComp  = r->cf->nDivComp;
   nDivBy = r->cf->nDivBy;
   nIsUnit = r->cf->nIsUnit;
   nGetUnit = r->cf->nGetUnit;
@@ -292,7 +292,7 @@ void nInitChar(ring r)
   n->nGcd  = ndGcd;
   n->nLcm  = ndGcd; /* tricky, isn't it ?*/
 #ifdef HAVE_RINGS
-  n->nComp = ndComp;
+  n->nDivComp = ndDivComp;
   n->nDivBy = ndDivBy;
   n->nIsUnit = ndIsUnit;
   n->nExtGcd = ndExtGcd;
@@ -354,7 +354,7 @@ void nInitChar(ring r)
      n->nNeg   = nr2mNeg;
      n->nInvers= nr2mInvers;
      n->nDivBy = nr2mDivBy;
-     n->nComp = nr2mComp;
+     n->nDivComp = nr2mDivComp;
      n->nGreater = nr2mGreater;
      n->nEqual = nr2mEqual;
      n->nIsZero = nr2mIsZero;
@@ -398,7 +398,7 @@ void nInitChar(ring r)
      n->nNeg   = nrnNeg;
      n->nInvers= nrnInvers;
      n->nDivBy = nrnDivBy;
-     n->nComp = nrnComp;
+     n->nDivComp = nrnDivComp;
      n->nGreater = nrnGreater;
      n->nEqual = nrnEqual;
      n->nIsZero = nrnIsZero;
@@ -440,7 +440,7 @@ void nInitChar(ring r)
      n->nNeg   = nrzNeg;
      n->nInvers= nrzInvers;
      n->nDivBy = nrzDivBy;
-     n->nComp = nrzComp;
+     n->nDivComp = nrzDivComp;
      n->nGreater = nrzGreater;
      n->nEqual = nrzEqual;
      n->nIsZero = nrzIsZero;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.23 2008-03-19 17:44:12 Singular Exp $ */
+/* $Id: rmodulon.cc,v 1.24 2008-07-07 12:21:43 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -281,7 +281,7 @@ BOOLEAN nrnDivBy (number a,number b)
   */
 }
 
-int nrnComp(number a, number b)
+int nrnDivComp(number a, number b)
 {
   if (nrnEqual(a, b)) return 0;
   if (mpz_divisible_p((int_number) a, (int_number) b)) return -1;
@@ -331,9 +331,38 @@ number nrnIntDiv (number a,number b)
   return (number) erg;
 }
 
+NATNUMBER nrnMapModul;
+NATNUMBER nrnMapCoef;
+/*
+number nrnMapModN(number from)
+{
+  NATNUMBER i = (nrnMapCoef * (NATNUMBER) from) % nrnModul;
+  return (number) i;
+}
+  */
 nMapFunc nrnSetMap(ring src, ring dst)
 {
-  return NULL;      /* default */
+/*  if (rField_is_Ring_ModN(src))
+  {
+    if (src->ringflaga == dst->ringflaga) return nrnCopy;
+    else
+    {
+      nrnMapModul = (NATNUMBER) src->ringflaga;
+      if (nrnModul % nrnMapModul == 0)
+      {
+        nrnMapCoef = (nrnModul / nrnMapModul);
+        NATNUMBER tmp = nrnModul;
+        nrnModul = nrnMm;
+        nrnMapCoef *= (NATNUMBER) nrnInvers((number) (nrnMapCoef % nrnMapModul));
+        nrnModul = tmp;
+      }
+      else
+        nrnMapCoef = 1;
+      return nrnMapModN;
+    }
+  }
+*/
+  return NULL;      // default
 }
 
 /*

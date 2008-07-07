@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.h,v 1.5 2008-04-18 13:32:53 wienand Exp $ */
+/* $Id: rintegers.h,v 1.6 2008-07-07 12:21:43 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -35,7 +35,7 @@ number  nrzNeg         (number c);
 number  nrzInvers      (number c);
 BOOLEAN nrzGreater     (number a, number b);
 BOOLEAN nrzDivBy       (number a, number b);
-int     nrzComp        (number a, number b);
+int     nrzDivComp     (number a, number b);
 BOOLEAN nrzEqual       (number a, number b);
 number  nrzLcm         (number a,number b, ring r);
 number  nrzGcd         (number a,number b,ring r);

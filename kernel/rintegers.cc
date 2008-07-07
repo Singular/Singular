@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.12 2008-04-18 13:32:53 wienand Exp $ */
+/* $Id: rintegers.cc,v 1.13 2008-07-07 12:21:43 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -184,7 +184,7 @@ BOOLEAN nrzGreaterZero (number k)
   return 0 <= mpz_cmp_si((int_number) k, 0);
 }
 
-int nrzComp(number a, number b)
+int nrzDivComp(number a, number b)
 {
   if (nrzEqual(a, b)) return 0;
   if (nrzDivBy(a, b)) return -1;
