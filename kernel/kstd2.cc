@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.66 2008-04-04 10:30:09 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.67 2008-07-07 13:18:56 wienand Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1162,7 +1162,9 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
 
       // reduce the tail and normalize poly
-      if (TEST_OPT_INTSTRATEGY)
+      // in the ring case we cannot expect LC(f) = 1,
+      // therefore we call pContent instead of pNorm
+      if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
       {
         strat->P.pCleardenom();
         if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.96 2008-07-07 12:21:42 wienand Exp $ */
+/* $Id: kutil.cc,v 1.97 2008-07-07 13:18:56 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1204,7 +1204,6 @@ void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int 
     pLmDelete(Lp.lcm);
     return;
   }
-  pNorm(p);
   if ((strat->fromQ!=NULL) && (isFromQ!=0) && (strat->fromQ[i]!=0))
   {
     // Is from a previous computed GB, therefore we know that spoly will
@@ -2175,11 +2174,6 @@ void chainCritRing (poly p,int ecart,kStrategy strat)
 #endif
 
 #ifdef HAVE_RING2TOM
-long twoPow(long arg)
-{
-  return 1L << arg;
-}
-
 long ind2(long arg)
 {
   long ind = 0;
@@ -2203,6 +2197,13 @@ long ind_fact_2(long arg)
     arg = arg - 2;
   }
   return ind;
+}
+#endif
+
+#ifdef HAVE_VANIDEAL
+long twoPow(long arg)
+{
+  return 1L << arg;
 }
 
 /*2

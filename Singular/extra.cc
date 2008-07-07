@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.273 2008-06-27 08:15:37 Singular Exp $ */
+/* $Id: extra.cc,v 1.274 2008-07-07 13:18:56 wienand Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2373,6 +2373,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return(FALSE);
     }
     else
+#ifdef HAVE_VANIDEAL
 /*==================== Creating zero polynomials =================*/
     if (strcmp(sys_cmd, "createG0")==0)
     {
@@ -2397,6 +2398,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return(FALSE);
     }
     else
+#endif
     if (strcmp(sys_cmd, "redNF_ring")==0)
     {
       ring r = currRing;

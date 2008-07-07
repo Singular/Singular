@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.29 2008-06-24 16:25:02 wienand Exp $ */
+/* $Id: polys.cc,v 1.30 2008-07-07 13:18:57 wienand Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -719,32 +719,10 @@ BOOLEAN pHasNotCF(poly p1, poly p2)
 */
 void pNorm(poly p1)
 {
-  poly h;
-  number k, c;
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
-    if ((p1!=NULL) && rField_has_Units(currRing))
-    {
-      k = nGetUnit(pGetCoeff(p1));
-      if (!nIsOne(k))
-      {
-        k = nInvers(k);
-        c = nMult(pGetCoeff(p1), k);  
-        nDelete(&pGetCoeff(p1));
-        pSetCoeff0(p1, c);
-        h = pNext(p1);
-        while (h != NULL)
-        {
-          c = nMult(pGetCoeff(h), k);
-          nDelete(&pGetCoeff(h));
-          pSetCoeff0(h, c);
-          pIter(h);
-        }
-      }
-      nDelete(&k);
-    }
-    return;
+    Werror("pNorm not possible in the case of coefficient rings.");
   }
   else
 #endif
@@ -755,8 +733,10 @@ void pNorm(poly p1)
       pSetCoeff(p1,nInit(1));
       return;
     }
+    poly h;
     if (!nIsOne(pGetCoeff(p1)))
     {
+      number k, c;
       nNormalize(pGetCoeff(p1));
       k = pGetCoeff(p1);
       c = nInit(1);
