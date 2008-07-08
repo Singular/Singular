@@ -6,7 +6,7 @@
  *  Purpose: simple Summator usecase implementation
  *  Author:  motsak
  *  Created:
- *  Version: $Id: summator.cc,v 1.2 2008-07-08 08:18:27 Singular Exp $
+ *  Version: $Id: summator.cc,v 1.3 2008-07-08 13:30:54 Singular Exp $
  *******************************************************************/
 
 
@@ -20,10 +20,10 @@
 
 #include "mod2.h"
 #ifdef HAVE_PLURAL
-#include <summator.h> // for CPolynomialSummator class
-#include <ring.h>
-#include <p_polys.h>
-#include <sbuckets.h>
+#include "summator.h" // for CPolynomialSummator class
+#include "ring.h"
+#include "p_polys.h"
+#include "sbuckets.h"
 
 
 CPolynomialSummator::CPolynomialSummator(ring rBaseRing, bool bUsePolynomial):

@@ -1,13 +1,10 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.98 2008-07-08 13:02:21 Singular Exp $ */
+/* $Id: kutil.cc,v 1.99 2008-07-08 13:29:46 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
-
-#ifndef KUTIL_CC
-#define KUTIL_CC
 
 // #define PDEBUG 2
 // #define PDIV_DEBUG
@@ -38,6 +35,7 @@
 // #define ENTER_USE_MYMEMMOVE
 
 #include "kutil.h"
+#include "kbuckets.h"
 #include "febase.h"
 #include "omalloc.h"
 #include "numbers.h"
@@ -6092,8 +6090,7 @@ int posInT_pLength(const TSet set,const int length,LObject &p)
 }
 #endif
 
-#ifdef HAVE_PLURAL
-
+#ifdef HAVE_SHIFTBBA
 poly pMove2CurrTail(poly p, kStrategy strat)
 {
   /* assume: p is completely in currRing */
@@ -6105,7 +6102,9 @@ poly pMove2CurrTail(poly p, kStrategy strat)
   }
   return(p);
 }
+#endif
 
+#ifdef HAVE_SHIFTBBA
 poly pMoveCurrTail2poly(poly p, kStrategy strat)
 {
   /* assume: p has  LM in curring and TAIL in tailring */
@@ -6120,7 +6119,9 @@ poly pMoveCurrTail2poly(poly p, kStrategy strat)
   }
   return(p);
 }
+#endif
 
+#ifdef HAVE_SHIFTBBA
 poly pCopyL2p(LObject H, kStrategy strat)
 {
     /* restores a poly in currRing from LObject */
@@ -6156,6 +6157,7 @@ poly pCopyL2p(LObject H, kStrategy strat)
      // no need to clean h: we re-used the polys
     return(p);
 }
+#endif
 
 //LObject pCopyp2L(poly p, kStrategy strat)
 //{
@@ -6238,7 +6240,9 @@ void updateSShift(kStrategy strat,int uptodeg,int lV)
   }
   /* what about setting strat->tl? */
 }
+#endif
 
+#ifdef HAVE_SHIFTBBA
 void initBuchMoraShift (ideal F,ideal Q,kStrategy strat)
 {
   strat->interpt = BTEST1(OPT_INTERRUPT);
@@ -6308,7 +6312,9 @@ void initBuchMoraShift (ideal F,ideal Q,kStrategy strat)
   /* more changes: fill the set T with all the shifts of elts of S*/
   /* is done by other procedure */
 }
+#endif
 
+#ifdef HAVE_SHIFTBBA
 /*1
 * put the pairs (sh \dot s[i],p)  into the set B, ecart=ecart(p)
 */
@@ -6381,7 +6387,9 @@ void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy st
     enterOnePairShift(q, p, ecart, isFromQ, strat, -1, ecartq, qfromQ, j, i, uptodeg, lV);
   }
 }
+#endif
 
+#ifdef HAVE_SHIFTBBA
 /*1
 * put the pairs (sh \dot qq,p)  into the set B, ecart=ecart(p)
 * despite the name, not only self shifts
@@ -6445,7 +6453,9 @@ void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy 
     enterOnePairShift(q, p, ecart, isFromQ, strat, -1, ecartq, qfromQ, j, -1, uptodeg, lV);
   }
 }
+#endif
 
+#ifdef HAVE_SHIFTBBA
 /*2
 * put the pair (q,p)  into the set B, ecart=ecart(p), q is the shift of some s[i]
 */
@@ -6742,8 +6752,9 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
     enterL(&strat->B,&strat->Bl,&strat->Bmax,Lp,l);
   }
 }
+#endif
 
-
+#ifdef HAVE_SHIFTBBA
 /*2
 *(s[0],h),...,(s[k],h) will be put to the pairset L(via initenterpairs)
 *superfluous elements in S will be deleted
@@ -6774,7 +6785,9 @@ void enterpairsShift (poly h,int k,int ecart,int pos,kStrategy strat, int atR,in
   }
  // PrintS("end enterpairs\n");
 }
+#endif
 
+#ifdef HAVE_SHIFTBBA
 /*3
 *(s[0], s \dot h),...,(s[k],s \dot h) will be put to the pairset L
 * also the pairs (h, s\dot s[0]), ..., (h, s\dot s[k]) enter L
@@ -6845,9 +6858,7 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
 }
 #endif
 
-
-
-
+#ifdef HAVE_SHIFTBBA
 /*2
 * puts p to the set T, starting with the at position atT
 * and inserts all admissible shifts of p
@@ -6891,9 +6902,9 @@ void enterTShift(LObject p, kStrategy strat, int atT, int uptodeg, int lV)
 /*  strat->R[strat->tl] = &(strat->T[atT]); */
 /* Solution: it is done by enterT each time separately */
 }
+#endif
 
-
-
+#ifdef HAVE_SHIFTBBA
 poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN normalize)
 {
   /* for the shift case need to run it with withT = TRUE */
@@ -6974,6 +6985,4 @@ poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLE
   kTest_L(L);
   return L->GetLmCurrRing();
 }
-
-#endif // HAVE_SHIFTBBA
-#endif // KUTIL_CC
+#endif
