@@ -3,12 +3,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shiftgb.h,v 1.4 2008-03-13 19:25:49 levandov Exp $ */
+/* $Id: shiftgb.h,v 1.5 2008-07-08 13:02:21 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
 
 #include "structs.h"
+#ifdef HAVE_SHIFTBBA
 #include "gring.h"
 
 poly p_LPshiftT(poly p, int sh, int uptodeg, int lV, kStrategy strat, const ring r);
@@ -39,4 +40,5 @@ int isInV(poly p, int lV);
 
 int itoInsert(poly p, int uptodeg, int lV, const ring r);
 
+#endif
 #endif

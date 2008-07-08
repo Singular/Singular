@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.35 2008-06-10 10:17:31 motsak Exp $ */
+/* $Id: kstd1.cc,v 1.36 2008-07-08 13:02:21 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1732,6 +1732,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   return r;
 }
 
+#ifdef HAVE_SHIFTBBA
 ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 		int newIdeal, intvec *vw, int uptodeg, int lV)
 {
@@ -1823,6 +1824,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
   if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
   return r;
 }
+#endif
 
 //##############################################################
 //##############################################################

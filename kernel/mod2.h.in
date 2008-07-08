@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.21 2008-06-24 09:02:16 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.22 2008-07-08 13:02:21 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -148,6 +148,8 @@
 #undef HAVE_DYNAMIC_LOADING
 /* Define to enable plural */
 #undef HAVE_PLURAL
+/* Define to enable shiftbba */
+#undef HAVE_SHIFTBBA
 /* Define to enable libsvd */
 #undef HAVE_SVD
 /* CPU type: i[3456]86: */

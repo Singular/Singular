@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.97 2008-07-07 13:18:56 wienand Exp $ */
+/* $Id: kutil.cc,v 1.98 2008-07-08 13:02:21 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -6211,6 +6211,7 @@ poly pCopyL2p(LObject H, kStrategy strat)
 //   return(p);
 // }
 
+#ifdef HAVE_SHIFTBBA
 /* including the self pairs */
 void updateSShift(kStrategy strat,int uptodeg,int lV)
 {
@@ -6974,4 +6975,5 @@ poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLE
   return L->GetLmCurrRing();
 }
 
+#endif // HAVE_SHIFTBBA
 #endif // KUTIL_CC

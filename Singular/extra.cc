@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.274 2008-07-07 13:18:56 wienand Exp $ */
+/* $Id: extra.cc,v 1.275 2008-07-08 13:03:18 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2582,6 +2582,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     else
 #endif // HAVE_RATGRING
 /*==================== freeGB, twosided GB in free algebra =================*/
+#ifdef HAVE_SHIFTBBA
     if (strcmp(sys_cmd, "freegb") == 0)
     {
       ideal I;
@@ -2608,7 +2609,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+#endif
 /*==================== shift-test for freeGB  =================*/
+#ifdef HAVE_SHIFTBBA
     if (strcmp(sys_cmd, "stest") == 0)
     {
       poly p;
@@ -2642,7 +2645,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+#endif
 /*==================== block-test for freeGB  =================*/
+#ifdef HAVE_SHIFTBBA
     if (strcmp(sys_cmd, "btest") == 0)
     {
       poly p;
@@ -2663,6 +2668,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+#endif
 #endif
 /*==================== t-rep-GB ==================================*/
     if (strcmp(sys_cmd, "unifastmult")==0)

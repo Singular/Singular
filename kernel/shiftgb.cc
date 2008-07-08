@@ -1,14 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shiftgb.cc,v 1.7 2008-03-13 19:25:49 levandov Exp $ */
+/* $Id: shiftgb.cc,v 1.8 2008-07-08 13:02:21 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for shift GB and free GB
 */
 
 #include "mod2.h"
 
-#ifdef HAVE_PLURAL
+#ifdef HAVE_SHIFTBBA
 #include "febase.h"
 #include "ring.h"
 #include "polys.h"
