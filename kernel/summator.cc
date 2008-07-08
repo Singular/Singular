@@ -5,8 +5,8 @@
  *  File:    summator.cc
  *  Purpose: simple Summator usecase implementation
  *  Author:  motsak
- *  Created: 
- *  Version: $Id: summator.cc,v 1.1 2008-07-04 14:19:38 motsak Exp $
+ *  Created:
+ *  Version: $Id: summator.cc,v 1.2 2008-07-08 08:18:27 Singular Exp $
  *******************************************************************/
 
 
@@ -19,7 +19,7 @@
 #endif
 
 #include "mod2.h"
-
+#ifdef HAVE_PLURAL
 #include <summator.h> // for CPolynomialSummator class
 #include <ring.h>
 #include <p_polys.h>
@@ -40,7 +40,7 @@ CPolynomialSummator::CPolynomialSummator(ring rBaseRing, bool bUsePolynomial):
     assume(!TEST_OPT_NOT_BUCKETS);
     m_temp.m_bucket = sBucketCreate(rBaseRing);
   }
-};
+}
 
 /*
 // no sBucketInit defined :(((
@@ -49,7 +49,7 @@ CPolynomialSummator::CPolynomialSummator(ring rBaseRing, poly pInitialSum, int i
 {
 #ifdef PDEBUG
   p_Test(pInitialSum, rBaseRing);
-#endif    
+#endif
 
   if(bUsePolynomial)
   {
@@ -75,8 +75,7 @@ CPolynomialSummator::~CPolynomialSummator()
     {
 #ifdef PDEBUG
       p_Test(m_temp.m_poly, m_basering);
-#endif    
-      
+#endif
       p_Delete(&m_temp.m_poly, m_basering);
 //      m_temp.m_poly = NULL;
     }
@@ -86,8 +85,8 @@ void CPolynomialSummator::AddAndDelete(poly pSummand, int iLength)
 {
 #ifdef PDEBUG
   p_Test(pSummand, m_basering);
-#endif    
-  
+#endif
+
   if(m_bUsePolynomial)
     m_temp.m_poly = p_Add_q(m_temp.m_poly, pSummand, m_basering);
   else
@@ -98,7 +97,7 @@ void CPolynomialSummator::AddAndDelete(poly pSummand)
 {
 #ifdef PDEBUG
   p_Test(pSummand, m_basering);
-#endif    
+#endif
 
   if(m_bUsePolynomial)
     m_temp.m_poly = p_Add_q(m_temp.m_poly, pSummand, m_basering);
@@ -109,12 +108,13 @@ void CPolynomialSummator::AddAndDelete(poly pSummand)
 poly CPolynomialSummator::AddUpAndClear()
 {
   poly out = NULL;
-  
+
   if(m_bUsePolynomial)
   {
     out = m_temp.m_poly;
     m_temp.m_poly = NULL;
-  } else
+  }
+  else
   {
     int pLength;
     sBucketClearAdd(m_temp.m_bucket, &out, &pLength);
@@ -122,8 +122,8 @@ poly CPolynomialSummator::AddUpAndClear()
 
 #ifdef PDEBUG
   p_Test(out, m_basering);
-#endif    
-  
+#endif
+
   return out;
 }
 
@@ -131,13 +131,14 @@ poly CPolynomialSummator::AddUpAndClear()
 poly CPolynomialSummator::AddUpAndClear(int *piLength)
 {
   poly out = NULL;
-  
+
   if(m_bUsePolynomial)
   {
     out = m_temp.m_poly;
     m_temp.m_poly = NULL;
     *piLength = pLength(out);
-  } else
+  }
+  else
   {
     *piLength = 0;
     sBucketClearAdd(m_temp.m_bucket, &out, piLength);
@@ -146,8 +147,8 @@ poly CPolynomialSummator::AddUpAndClear(int *piLength)
 #ifdef PDEBUG
   p_Test(out, m_basering);
   assume(pLength(out) == *piLength);
-#endif    
-  
+#endif
+
   return out;
 }
 
@@ -156,11 +157,11 @@ poly CPolynomialSummator::AddUpAndClear(int *piLength)
 void CPolynomialSummator::Add(poly pSummand, int iLength)
 {
   AddAndDelete(p_Copy(pSummand, m_basering), iLength);
-};
+}
 
 void CPolynomialSummator::Add(poly pSummand)
 {
   AddAndDelete(p_Copy(pSummand, m_basering));
-};
+}
 
-
+#endif
