@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.59 2008-07-04 14:21:53 motsak Exp $
+ *  Version: $Id: gring.cc,v 1.60 2008-07-08 11:28:21 Singular Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -1643,7 +1643,6 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
 #endif
 #endif
 
-#endif
 
   M2=p_Add_q(M1,M2,r);                             // M1 is killed, M2 = spoly(lt(p1), lt(p2)) = C2*M1 - C1*M2
 
@@ -3724,3 +3723,4 @@ bool nc_SetupQuotient(ring rGR, const ring rG, bool bCopy)
 //   }
 //   return(TRUE);
 // }
+#endif

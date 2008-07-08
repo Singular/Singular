@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight.cc,v 1.5 2008-05-09 09:23:59 Singular Exp $ */
+/* $Id: weight.cc,v 1.6 2008-07-08 11:26:50 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -15,6 +15,7 @@
 #include "intvec.h"
 #include "febase.h"
 #include "ideals.h"
+#include "ring.h"
 #include "weight.h"
 
 /*0 implementation*/

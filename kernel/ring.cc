@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.95 2008-07-07 12:21:43 wienand Exp $ */
+/* $Id: ring.cc,v 1.96 2008-07-08 11:26:50 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -4541,7 +4541,12 @@ ring rOpposite(ring src)
   if (src->qideal != NULL)
   {
     idDelete(&(r->qideal));
+#ifdef HAVE_PLURAL
     r->qideal = idOppose(src, src->qideal);
+#else
+    r->qideal = idCopy( src->qideal);
+#endif
+
 
 #ifdef HAVE_PLURAL
     if( rIsPluralRing(r) )
