@@ -1,4 +1,4 @@
-version="$Id: hnoether.lib,v 1.56 2007-12-04 18:03:43 Singular Exp $";
+version="$Id: hnoether.lib,v 1.57 2008-07-08 12:33:46 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  hnoether.lib   Hamburger-Noether (Puiseux) Expansion
@@ -3277,7 +3277,7 @@ RETURN: list: first entry = list of HNErings,
 {
  //---------- Variablendefinitionen fuer den unverzweigten Teil: --------------
  if (defined(HNDebugOn)) {"procedure HN",Aufruf_Ebene;}
- int Abbruch,ende,i,j,k,e,M,N,Q,R,zeiger,zeile,zeilevorher,dd;
+ int Abbruch,ende,i,j,k,e,M,N,Q,R,zeiger,zeile,zeilevorher,dd,ii;
  intvec hqs;
  int field_ext;
  int ring_changed, hneshift;
@@ -3802,8 +3802,8 @@ RETURN: list: first entry = list of HNErings,
        if (defined(HNDebugOn))
           {" ring change in HN(",Aufruf_Ebene+1,") detected";}
        EXTHNEnumber = HNerg[1][3];
-       for (i=lastRingnumber+1; i<=EXTHNEnumber; i++) {
-         def EXTHNEring(i)=HNerg[1][4][i];
+       for (ii=lastRingnumber+1; ii<=EXTHNEnumber; ii++) {
+         def EXTHNEring(ii)=HNerg[1][4][ii];
        }
        if (HNerg[2]==0) { setring HNEring; }
        else             { setring EXTHNEring(HNerg[2]); }
