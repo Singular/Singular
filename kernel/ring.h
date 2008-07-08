@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.31 2008-07-01 12:49:09 Singular Exp $ */
+/* $Id: ring.h,v 1.32 2008-07-08 08:05:37 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -118,6 +118,8 @@ inline BOOLEAN rField_is_Domain(ring r=currRing)
 
 inline BOOLEAN rField_has_Units(ring r=currRing)
 { return ((r->ringtype == 1) || (r->ringtype == 2) || (r->ringtype == 3)); }
+#else
+#define rField_is_Ring(A) (0)
 #endif
 
 #ifdef HAVE_RINGS
