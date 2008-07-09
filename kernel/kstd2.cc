@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.68 2008-07-08 13:02:21 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.69 2008-07-09 08:26:29 wienand Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -296,34 +296,6 @@ int redRing (LObject* h,kStrategy strat)
   h->SetShortExpVector();
   loop
   {
-#ifdef HAVE_VANGB
-#ifdef HAVE_RING2TOM
-    zeroPoly = kFindDivisibleByZeroPoly(h);
-    if (zeroPoly != NULL)
-    {
-      if (TEST_OPT_PROT)
-      {
-        PrintS("z");
-      }
-#ifdef KDEBUG
-      if (TEST_OPT_DEBUG)
-      {
-        PrintS("zero red: ");
-      }
-#endif
-      LObject tmp_h(zeroPoly, currRing, strat->tailRing);
-      tmp_h.SetShortExpVector();
-      strat->initEcart(&tmp_h);
-      tmp_h.sev = pGetShortExpVector(tmp_h.p);
-      tmp_h.SetpFDeg();
-
-      enterT(tmp_h, strat, strat->tl + 1);
-      j = strat->tl;
-    }
-    else
-#endif
-#endif
-    {
       j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
       if (j < 0) return 1;
 #ifdef KDEBUG
@@ -332,7 +304,6 @@ int redRing (LObject* h,kStrategy strat)
         PrintS("T red:");
       }
 #endif
-    }
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
@@ -343,15 +314,6 @@ int redRing (LObject* h,kStrategy strat)
 #endif
 
     ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
-#ifdef HAVE_VANGB
-#ifdef HAVE_RING2TOM
-    if (zeroPoly != NULL)
-    {
-      // TODO Free memory of zeropoly and last element of L
-      strat->tl--;
-    }
-#endif
-#endif
 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
@@ -1209,9 +1171,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       //if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
         enterT(strat->P, strat);
 #ifdef HAVE_RINGS
-#ifdef HAVE_VANGB
-      int at_R = strat->tl;
-#endif
       if (rField_is_Ring(currRing))
         superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
       else
@@ -1220,11 +1179,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // posInS only depends on the leading term
       if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
       {
-#ifdef HAVE_VANGB
-      strat->enterS(strat->P, pos, strat, at_R);
-#else
       strat->enterS(strat->P, pos, strat, strat->tl);
-#endif
       }
       else
       {

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.36 2008-07-04 16:17:15 motsak Exp $ */
+/* $Id: kutil.h,v 1.37 2008-07-09 08:26:30 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -603,6 +603,12 @@ KINLINE void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether, ring r = c
 //             exponent bound of strat->tailRing
 //      FALSE, otherwise
 BOOLEAN kCheckSpolyCreation(LObject* L, kStrategy strat, poly &m1, poly &m2);
+#ifdef HAVE_RINGS
+// return TRUE if gcdpoly creation of R[atR] and S[atS] does not violate
+//             exponent bound of strat->tailRing
+//      FALSE, otherwise
+BOOLEAN kCheckStrongCreation(int atR, poly m1, int atS, poly m2, kStrategy strat);
+#endif
 // change strat->tailRing and adjust all data in strat, L, and T:
 // new tailRing has larger exponent bound
 // do nothing and return FALSE if exponent bound increase would result in

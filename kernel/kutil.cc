@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.99 2008-07-08 13:29:46 Singular Exp $ */
+/* $Id: kutil.cc,v 1.100 2008-07-09 08:26:30 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1265,8 +1265,8 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat,
 {
   number d, s, t;
   assume(i<=strat->sl);
-  LObject  Lp;
-  poly m1, m2, erg, gcd;
+  assume(atR >= 0);
+  poly m1, m2, gcd;
 
   d = nExtGcd(pGetCoeff(p), pGetCoeff(strat->S[i]), &s, &t);
 
@@ -1279,11 +1279,19 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat,
   }
 
   k_GetStrongLeadTerms(p, strat->S[i], currRing, m1, m2, gcd, strat->tailRing);
-
+  while (! kCheckStrongCreation(atR, m1, i, m2, strat) )
+  {
+    memset(&(strat->P), 0, sizeof(strat->P));
+    kStratChangeTailRing(strat);
+    strat->P = *(strat->R[atR]);
+    p_LmFree(m1, strat->tailRing);
+    p_LmFree(m2, strat->tailRing);
+    p_LmFree(gcd, currRing);
+    k_GetStrongLeadTerms(p, strat->S[i], currRing, m1, m2, gcd, strat->tailRing);
+  }
   pSetCoeff0(m1, s);
   pSetCoeff0(m2, t);
   pSetCoeff0(gcd, d);
-
 
 #ifdef KDEBUG
   if (TEST_OPT_DEBUG)
@@ -1304,10 +1312,9 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat,
   }
 #endif
 
-  erg = p_Add_q(pp_Mult_mm(pNext(p), m1, strat->tailRing), pp_Mult_mm(pNext(strat->S[i]), m2, strat->tailRing), strat->tailRing);
-  pNext(gcd) = erg;
-  pLmDelete(m1);
-  pLmDelete(m2);
+  pNext(gcd) = p_Add_q(pp_Mult_mm(pNext(p), m1, strat->tailRing), pp_Mult_mm(pNext(strat->S[i]), m2, strat->tailRing), strat->tailRing);
+  p_LmDelete(m1, strat->tailRing);
+  p_LmDelete(m2, strat->tailRing);
 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
@@ -1321,16 +1328,7 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat,
   h.p = gcd;
   h.tailRing = strat->tailRing;
   int posx;
-  if (h.p!=NULL)
-  {
-    if (TEST_OPT_INTSTRATEGY)
-    {
-      h.pCleardenom(); // also does a pContent
-    }
-    else
-    {
-      h.pNorm();
-    }
+  h.pCleardenom();
     strat->initEcart(&h);
     if (strat->Ll==-1)
       posx =0;
@@ -1338,16 +1336,7 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat,
       posx = strat->posInL(strat->L,strat->Ll,&h,strat);
     h.sev = pGetShortExpVector(h.p);
     h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
-    if (pNext(p) != NULL)
-    {
-      // What does this? (Oliver)
-      // pShallowCopyDeleteProc p_shallow_copy_delete
-      //      = pGetShallowCopyDeleteProc(strat->tailRing, new_tailRing);
-      // pNext(p) = p_shallow_copy_delete(pNext(p),
-      //              currRing, strat->tailRing, strat->tailRing->PolyBin);
-    }
     enterL(&strat->L,&strat->Ll,&strat->Lmax,h,posx);
-  }
   return TRUE;
 }
 #endif
@@ -2632,10 +2621,6 @@ void initenterpairsRing (poly h,int k,int ecart,int isFromQ,kStrategy strat, int
         }
       }
     }
-
-#ifdef HAVE_VANGB
-    // initenterzeropairsRing(h, ecart, strat, atR);
-#endif
 
     if (new_pair) chainCritRing(h,ecart,strat);
 
@@ -5771,6 +5756,30 @@ BOOLEAN kCheckSpolyCreation(LObject *L, kStrategy strat, poly &m1, poly &m2)
   return TRUE;
 }
 
+#ifdef HAVE_RINGS
+/***************************************************************
+ *
+ * Checks, if we can compute the gcd poly / strong pair
+ * gcd-poly = m1 * R[atR] + m2 * S[atS]
+ *
+ ***************************************************************/
+BOOLEAN kCheckStrongCreation(int atR, poly m1, int atS, poly m2, kStrategy strat)
+{
+  assume(strat->S_2_R[atS] >= -1 && strat->S_2_R[atS] <= strat->tl);
+  assume(strat->tailRing != currRing);
+
+  poly p1_max = (strat->R[atR])->max;
+  poly p2_max = (strat->R[strat->S_2_R[atS]])->max;
+
+  if ((p1_max != NULL && !p_LmExpVectorAddIsOk(m1, p1_max, strat->tailRing)) ||
+      (p2_max != NULL && !p_LmExpVectorAddIsOk(m2, p2_max, strat->tailRing)))
+  {
+    return FALSE;
+  }
+  return TRUE;
+}
+#endif
+
 BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned long expbound)
 {
   if (expbound == 0) expbound = strat->tailRing->bitmask << 1;
@@ -5889,7 +5898,6 @@ void kStratInitChangeTailRing(kStrategy strat)
   }
   if (rField_is_Ring(currRing))
   {
-    l += 20; // TEMP, TODO OLI
     l *= 2;
   }
   e = p_GetMaxExp(l, currRing);
