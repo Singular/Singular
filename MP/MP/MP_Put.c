@@ -19,6 +19,7 @@
  *  is" and without any warranty of any kind and without even the implied  
  *  warranty of merchantability or fitness for a particular purpose. 
  *
+ *    IMPORTANT ADDITION: as of September 2006, MP is also licenced under GPL
  *
  *   IMPLEMENTATION FILE:  MP_Put.c 
  * 

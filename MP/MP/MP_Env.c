@@ -20,6 +20,7 @@
  *  is" and without any warranty of any kind and without even the implied  
  *  warranty of merchantability or fitness for a particular purpose. 
  *
+ *    IMPORTANT ADDITION: as of September 2006, MP is also licenced under GPL
  * 
  *   IMPLEMENTATION FILE:  MP_Env.c
  *                                
@@ -56,7 +57,7 @@
  ***************************************************************************/
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_Env.c,v 1.8 2005-01-25 10:48:21 Singular Exp $";
+static char vcid[] = "@(#) $Id: MP_Env.c,v 1.9 2008-07-09 07:42:23 Singular Exp $";
 #endif /*lint */
 
 #include <values.h>  /* to figure out if we use IEEE or not */

@@ -19,6 +19,7 @@
  *  is" and without any warranty of any kind and without even the implied
  *  warranty of merchantability or fitness for a particular purpose.
  *
+ *    IMPORTANT ADDITION: as of September 2006, MP is also licenced under GPL
  *
  *   IMPLEMENTATION FILE:  MP_TcpTransp.c
  *
@@ -73,7 +74,7 @@
 
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_TcpTransp.c,v 1.12 2004-09-23 10:03:29 Singular Exp $";
+static char vcid[] = "@(#) $Id: MP_TcpTransp.c,v 1.13 2008-07-09 07:42:23 Singular Exp $";
 #endif /* lint */
 
 #include "MP.h"

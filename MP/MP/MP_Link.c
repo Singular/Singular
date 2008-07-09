@@ -19,6 +19,7 @@
  *  is" and without any warranty of any kind and without even the implied  
  *  warranty of merchantability or fitness for a particular purpose. 
  *
+ *    IMPORTANT ADDITION: as of September 2006, MP is also licenced under GPL
  *
  *   IMPLEMENTATION FILE:  MP_Link.c
  *
@@ -138,7 +139,7 @@
  */
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_Link.c,v 1.5 1999-04-09 12:14:52 Singular Exp $";
+static char vcid[] = "@(#) $Id: MP_Link.c,v 1.6 2008-07-09 07:42:23 Singular Exp $";
 #endif /* lint */
 
 #include "MP.h"

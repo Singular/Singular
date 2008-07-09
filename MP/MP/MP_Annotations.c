@@ -19,15 +19,13 @@
  *  is" and without any warranty of any kind and without even the implied  
  *  warranty of merchantability or fitness for a particular purpose. 
  *
- *   Change Log:
- *        3/28/97  sgray - these are the annotations defined in MP_MpDict.h
- *                         and MP_ProtoDict.h
+ *  IMPORTANT ADDITION: as of September 2006, MP is also licenced under GPL
  *
  ***************************************************************************/
 
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_Annotations.c,v 1.1.1.1 1997-05-25 20:31:46 obachman Exp $";
+static char vcid[] = "@(#) $Id: MP_Annotations.c,v 1.2 2008-07-09 07:42:23 Singular Exp $";
 #endif /* lint */
 
 /* MP_MpDict.h - the Multi Protocol dictionary for protocol-specific 
