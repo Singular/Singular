@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.13 2008-07-07 12:21:43 wienand Exp $ */
+/* $Id: rintegers.cc,v 1.14 2008-07-11 20:33:20 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -240,9 +240,25 @@ number nrzNeg (number c)
   return c;
 }
 
+number nrzMapMachineInt(number from)
+{
+  int_number erg = (int_number) omAllocBin(gmp_nrz_bin); // evtl. spaeter mit bin
+  mpz_init_set_ui(erg, (NATNUMBER) from);
+  return (number) erg;
+}
+
 nMapFunc nrzSetMap(ring src, ring dst)
 {
-  return NULL;      /* default */
+  /* dst = currRing */
+  if (rField_is_Ring_Z(src) || rField_is_Ring_ModN(src) || rField_is_Ring_PtoM(src))
+  {
+    return nrzCopy;
+  }
+  if (rField_is_Ring_2toM(src))
+  {
+    return nrzMapMachineInt;
+  }
+  return NULL;      // default
 }
 
 

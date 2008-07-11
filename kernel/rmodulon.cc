@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.24 2008-07-07 12:21:43 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.25 2008-07-11 20:33:20 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -331,42 +331,8 @@ number nrnIntDiv (number a,number b)
   return (number) erg;
 }
 
-NATNUMBER nrnMapModul;
-NATNUMBER nrnMapCoef;
 /*
-number nrnMapModN(number from)
-{
-  NATNUMBER i = (nrnMapCoef * (NATNUMBER) from) % nrnModul;
-  return (number) i;
-}
-  */
-nMapFunc nrnSetMap(ring src, ring dst)
-{
-/*  if (rField_is_Ring_ModN(src))
-  {
-    if (src->ringflaga == dst->ringflaga) return nrnCopy;
-    else
-    {
-      nrnMapModul = (NATNUMBER) src->ringflaga;
-      if (nrnModul % nrnMapModul == 0)
-      {
-        nrnMapCoef = (nrnModul / nrnMapModul);
-        NATNUMBER tmp = nrnModul;
-        nrnModul = nrnMm;
-        nrnMapCoef *= (NATNUMBER) nrnInvers((number) (nrnMapCoef % nrnMapModul));
-        nrnModul = tmp;
-      }
-      else
-        nrnMapCoef = 1;
-      return nrnMapModN;
-    }
-  }
-*/
-  return NULL;      // default
-}
-
-/*
- * set the exponent (allocate and init tables) (TODO)
+ * Helper function for computing the module
  */
 
 void mpz_set_ull(int_number res, unsigned long long xx)
@@ -376,6 +342,87 @@ void mpz_set_ull(int_number res, unsigned long long xx)
   mpz_mul_2exp (res, res, 32);
   mpz_add_ui (res, res, (unsigned long) xx);
 }
+
+int_number nrnMapCoef = NULL;
+
+number nrnMapModN(number from)
+{
+  return nrnMult(from, (number) nrnMapCoef);
+}
+
+number nrnMap2toM(number from)
+{
+  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_mul_ui(erg, nrnMapCoef, (NATNUMBER) from);
+  mpz_mod(erg, erg, nrnModul);
+  return (number) erg;
+}
+
+number nrnMapInteger(number from)
+{
+  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_mod(erg, (int_number) from, nrnModul);
+  return (number) erg;
+}
+
+nMapFunc nrnSetMap(ring src, ring dst)
+{
+  /* dst = currRing */
+  if (rField_is_Ring_Z(src))
+  {
+    return nrnMapInteger;
+  }
+  if (rField_is_Ring_ModN(src) || rField_is_Ring_PtoM(src) || rField_is_Ring_2toM(src))
+  {
+    if ((src->ringflaga == dst->ringflaga)
+        && (src->ringflagb == dst->ringflagb)) return nrnCopy;
+    else
+    {
+      int_number nrnMapModul = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+      mpz_init(nrnMapModul);
+      if (nrnMapCoef == NULL)
+      {
+        nrnMapCoef = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+        mpz_init(nrnMapCoef);
+      }
+      mpz_set_ull(nrnMapModul, src->ringflaga);
+      mpz_pow_ui(nrnMapModul, nrnMapModul, src->ringflagb);
+      if (nrnDivBy(NULL, (number) nrnMapModul))
+      {
+        mpz_divexact(nrnMapCoef, nrnModul, nrnMapModul);
+        int_number tmp = nrnModul;
+        nrnModul = nrnMapModul;
+        int_number inv = (int_number) nrnInvers((number) nrnMapCoef);
+        nrnModul = tmp;
+        mpz_mul(nrnMapCoef, nrnMapCoef, inv);
+        mpz_mod(nrnMapCoef, nrnMapCoef, nrnModul);
+        nrnDelete((number*) &inv, currRing);
+      }
+      else
+      if (mpz_divisible_p(nrnMapModul, nrnModul))
+      {
+        mpz_set_si(nrnMapCoef, 1);
+      }
+      else
+      {
+        nrnDelete((number*) &nrnMapModul, currRing);
+        return NULL;
+      }
+      nrnDelete((number*) &nrnMapModul, currRing);
+      if (rField_is_Ring_2toM(src))
+        return nrnMap2toM;
+      else
+        return nrnMapModN;
+    }
+  }
+  return NULL;      // default
+}
+
+/*
+ * set the exponent (allocate and init tables) (TODO)
+ */
 
 void nrnSetExp(int m, ring r)
 {
