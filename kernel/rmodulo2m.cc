@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.18 2008-07-07 12:21:43 wienand Exp $ */
+/* $Id: rmodulo2m.cc,v 1.19 2008-07-14 08:07:11 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -19,6 +19,9 @@
 #include "mpr_complex.h"
 #include "ring.h"
 #include "rmodulo2m.h"
+#include "gmp.h"
+
+typedef MP_INT *int_number;
 
 int nr2mExp;
 NATNUMBER nr2mModul;
@@ -377,11 +380,86 @@ number nr2mNeg (number c)
   return nr2mNegM(c);
 }
 
-nMapFunc nr2mSetMap(ring src, ring dst)
+number nr2mMapMachineInt(number from)
 {
-  return NULL;      /* default */
+  NATNUMBER i = ((NATNUMBER) from) % nr2mModul;
+  return (number) i;
 }
 
+number nr2mMapZp(number from)
+{
+  long ii = (long) from;
+  while (ii < 0) ii += nr2mModul;
+  while ((ii>1) && (ii >= nr2mModul)) ii -= nr2mModul;
+  return (number) ii;
+}
+
+number nr2mMapQ(number from)
+{
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+
+  nlGMP(from, (number) erg);
+  mpz_mod_ui(erg, erg, nr2mModul);
+  number r = (number) mpz_get_ui(erg);
+
+  mpz_clear(erg);
+  omFree((ADDRESS) erg);
+  return (number) r;
+}
+
+number nr2mMapGMP(number from)
+{
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+
+  mpz_mod_ui(erg, (int_number) from, nr2mModul);
+  number r = (number) mpz_get_ui(erg);
+
+  mpz_clear(erg);
+  omFree((ADDRESS) erg);
+  return (number) r;
+}
+
+nMapFunc nr2mSetMap(ring src, ring dst)
+{
+  if (rField_is_Ring_2toM(src)
+     && (src->ringflagb >= dst->ringflagb))
+  {
+    return nr2mMapMachineInt;
+  }
+  if (rField_is_Ring_Z(src))
+  {
+    return nr2mMapGMP;
+  }
+  if (rField_is_Q)
+  {
+    return nr2mMapQ;
+  }
+  if (rField_is_Zp(src)
+     && (src->ch == 2)
+     && (dst->ringflagb == 1))
+  {
+    return nr2mMapZp;
+  }
+  if (rField_is_Ring_PtoM(src) || rField_is_Ring_ModN(src))
+  {
+    // Computing the n of Z/n
+    int_number modul = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+    mpz_init(modul);
+    mpz_set_ui(modul, src->ringflaga);
+    mpz_pow_ui(modul, modul, src->ringflagb);
+    if (mpz_divisible_2exp_p(modul, dst->ringflagb))
+    {
+      mpz_clear(modul);
+      omFree((ADDRESS) modul);
+      return nr2mMapGMP;
+    }
+    mpz_clear(modul);
+    omFree((ADDRESS) modul);
+  }
+  return NULL;      // default
+}
 
 /*
  * set the exponent (allocate and init tables) (TODO)

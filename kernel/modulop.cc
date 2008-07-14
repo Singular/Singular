@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.10 2008-03-19 17:44:10 Singular Exp $ */
+/* $Id: modulop.cc,v 1.11 2008-07-14 08:07:11 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -16,6 +16,10 @@
 #include "longrat.h"
 #include "mpr_complex.h"
 #include "ring.h"
+#ifdef HAVE_RINGS
+#include "gmp.h"
+typedef MP_INT *int_number;
+#endif
 #include "modulop.h"
 
 long npPrimeM=0;
@@ -482,8 +486,45 @@ static number npMapLongR(number from)
   return (number)iz;
 }
 
+#ifdef HAVE_RINGS
+/*2
+* convert from a GMP integer
+*/
+number npMapGMP(number from)
+{
+  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  mpz_init(erg);
+
+  mpz_mod_ui(erg, (int_number) from, npPrimeM);
+  number r = (number) mpz_get_si(erg);
+
+  mpz_clear(erg);
+  omFree((ADDRESS) erg);
+  return (number) r;
+}
+
+/*2
+* convert from an machine long
+*/
+number npMapMachineInt(number from)
+{
+  long i = (long) (((unsigned long) from) % npPrimeM);
+  return (number) i;
+}
+#endif
+
 nMapFunc npSetMap(ring src, ring dst)
 {
+#ifdef HAVE_RINGS
+  if (rField_is_Ring_2toM(src))
+  {
+    return npMapMachineInt;
+  }
+  if (rField_is_Ring_Z(src) || rField_is_Ring_PtoM(src) || rField_is_Ring_ModN(src))
+  {
+    return npMapGMP;
+  }
+#endif
   if (rField_is_Q(src))
   {
     return npMap0;

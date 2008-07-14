@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.31 2008-07-08 12:49:12 Singular Exp $ */
+/* $Id: longrat.cc,v 1.32 2008-07-14 08:07:11 wienand Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -114,6 +114,38 @@ static number nlMapP(number from)
 static number nlMapLongR(number from);
 static number nlMapR(number from);
 
+#ifdef HAVE_RINGS
+/*2
+* convert from a GMP integer
+*/
+number nlMapGMP(number from)
+{
+  number z=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG)
+  z->debug=123456;
+#endif
+  mpz_init_set(&z->z,(MP_INT*) from);
+  mpz_init_set_ui(&z->n,1);
+  z->s = 3;
+  return z;
+}
+
+/*2
+* convert from an machine long
+*/
+number nlMapMachineInt(number from)
+{
+  number z=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG)
+  z->debug=123456;
+#endif
+  mpz_init_set_ui(&z->z,(unsigned long) from);
+  mpz_init_set_ui(&z->n,1);
+  z->s = 3;
+  return z;
+}
+#endif
+
 nMapFunc nlSetMap(ring src, ring dst)
 {
   if (rField_is_Q(src))
@@ -133,6 +165,16 @@ nMapFunc nlSetMap(ring src, ring dst)
   {
     return nlMapLongR; /* long R -> Q */
   }
+#ifdef HAVE_RINGS
+  if (rField_is_Ring_Z(src) || rField_is_Ring_PtoM(src) || rField_is_Ring_ModN(src))
+  {
+    return nlMapGMP;
+  }
+  if (rField_is_Ring_2toM(src))
+  {
+    return nlMapMachineInt;
+  }
+#endif
   return NULL;
 }
 
@@ -1289,6 +1331,29 @@ int nlModP(number n, int p)
   }
   return iz;
 }
+
+#ifdef HAVE_RINGS
+/*2
+* convert number to GMP and warn if denom != 1
+*/
+number nlGMP(number &i, number n)
+{
+  // Hier brauche ich einfach die GMP Zahl
+#ifdef LDEBUG
+  nlTest(i);
+#endif
+  nlNormalize(i);
+  if (SR_HDL(i) & SR_INT)
+  {
+    mpz_set_si((MP_INT*) n, (long) &i);
+  }
+  if (i->s!=3)
+  {
+     WarnS("Omitted denominator during coefficient mapping !");
+  }
+  mpz_set((MP_INT*) n, &i->z);
+}
+#endif
 
 /*2
 * acces to denominator, other 1 for integers

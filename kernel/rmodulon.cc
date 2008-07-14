@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.25 2008-07-11 20:33:20 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.26 2008-07-14 08:07:11 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -359,11 +359,29 @@ number nrnMap2toM(number from)
   return (number) erg;
 }
 
-number nrnMapInteger(number from)
+number nrnMapZp(number from)
+{
+  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+  mpz_init(erg);
+  mpz_mul_si(erg, nrnMapCoef, (NATNUMBER) from);
+  mpz_mod(erg, erg, nrnModul);
+  return (number) erg;
+}
+
+number nrnMapGMP(number from)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
   mpz_init(erg);
   mpz_mod(erg, (int_number) from, nrnModul);
+  return (number) erg;
+}
+
+number nrnMapQ(number from)
+{
+  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+  mpz_init(erg);
+  nlGMP(from, (number) erg);
+  mpz_mod(erg, erg, nrnModul);
   return (number) erg;
 }
 
@@ -372,23 +390,44 @@ nMapFunc nrnSetMap(ring src, ring dst)
   /* dst = currRing */
   if (rField_is_Ring_Z(src))
   {
-    return nrnMapInteger;
+    return nrnMapGMP;
   }
-  if (rField_is_Ring_ModN(src) || rField_is_Ring_PtoM(src) || rField_is_Ring_2toM(src))
+  if (rField_is_Q(src))
   {
-    if ((src->ringflaga == dst->ringflaga)
-        && (src->ringflagb == dst->ringflagb)) return nrnCopy;
+    return nrnMapQ;
+  }
+  // Some type of Z/n ring / field
+  if (rField_is_Ring_ModN(src) || rField_is_Ring_PtoM(src) || rField_is_Ring_2toM(src) || rField_is_Zp(src))
+  {
+    if (   (src->ringtype > 0)
+        && (src->ringflaga == dst->ringflaga)
+        && (src->ringflagb == dst->ringflagb)) return nrnMapGMP;
     else
     {
       int_number nrnMapModul = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
-      mpz_init(nrnMapModul);
+      // Computing the n of Z/n
+      if (rField_is_Zp(src))
+      {
+        mpz_init_set_si(nrnMapModul, src->ch);
+      }
+      else
+      {
+        mpz_init(nrnMapModul);
+        mpz_set_ull(nrnMapModul, src->ringflaga);
+        mpz_pow_ui(nrnMapModul, nrnMapModul, src->ringflagb);
+      }
+      // nrnMapCoef = 1 in dst       if dst is a subring of src
+      // nrnMapCoef = 0 in dst / src if src is a subring of dst
       if (nrnMapCoef == NULL)
       {
         nrnMapCoef = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
         mpz_init(nrnMapCoef);
       }
-      mpz_set_ull(nrnMapModul, src->ringflaga);
-      mpz_pow_ui(nrnMapModul, nrnMapModul, src->ringflagb);
+      if (mpz_divisible_p(nrnMapModul, nrnModul))
+      {
+        mpz_set_si(nrnMapCoef, 1);
+      }
+      else
       if (nrnDivBy(NULL, (number) nrnMapModul))
       {
         mpz_divexact(nrnMapCoef, nrnModul, nrnMapModul);
@@ -401,11 +440,6 @@ nMapFunc nrnSetMap(ring src, ring dst)
         nrnDelete((number*) &inv, currRing);
       }
       else
-      if (mpz_divisible_p(nrnMapModul, nrnModul))
-      {
-        mpz_set_si(nrnMapCoef, 1);
-      }
-      else
       {
         nrnDelete((number*) &nrnMapModul, currRing);
         return NULL;
@@ -413,6 +447,8 @@ nMapFunc nrnSetMap(ring src, ring dst)
       nrnDelete((number*) &nrnMapModul, currRing);
       if (rField_is_Ring_2toM(src))
         return nrnMap2toM;
+      else if (rField_is_Zp(src))
+        return nrnMapZp;
       else
         return nrnMapModN;
     }
