@@ -1,13 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.100 2008-07-09 08:26:30 wienand Exp $ */
+/* $Id: kutil.cc,v 1.101 2008-07-14 10:59:39 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
 
 // #define PDEBUG 2
 // #define PDIV_DEBUG
+#define KUTIL_CC
 #include <stdlib.h>
 #include <string.h>
 #include "mod2.h"
