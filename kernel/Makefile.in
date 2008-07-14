@@ -112,7 +112,7 @@ CXXSOURCES=clapconv.cc \
     mpr_inout.cc mpr_base.cc mpr_numeric.cc \
     prCopy.cc p_Mult_q.cc \
     pDebug.cc pInline2.cc pInline1.cc pInline0.cc \
-    pShallowCopyDelete.cc fast_mult.cc digitech.cc summator.cc\
+    pShallowCopyDelete.cc fast_mult.cc digitech.cc \
     tgb.cc tgbgauss.cc ringgb.cc f5gb.cc ratgring.cc shiftgb.cc 
 
 # normal C source files
@@ -166,7 +166,7 @@ HEADERS=hutil.h stairc.h ideals.h \
         GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h multicnt.h \
 	eigenval.h units.h mod_raw.h kbuckets.h sbuckets.h\
 	mpr_global.h mpr_inout.h mpr_base.h mpr_numeric.h \
-	fegetopt.h distrib.h summator.h\
+	fegetopt.h distrib.h \
 	ratgring.h shiftgb.h prCopy.h prCopyMacros.h \
         p_MemAdd.h p_MemCopy.h p_MemCmp.h p_Numbers.h \
         pInline2.h pInline1.h pInline0.h mmalloc.h \
