@@ -1,0 +1,2399 @@
+version="$Id: polymake.lib,v 1.1 2008-07-14 15:59:17 keilen Exp $";
+category="Tropical Geometry";
+info="
+   LIBRARY:         polymake.lib
+
+   AUTHORS:         Thomas Markwig,  email: keilen@mathematik.uni-kl.de
+
+   KEYWORDS:        polytope, fan, secondary fan, secondary polytope, polymake,
+                    Newton polytope, Groebner fan 
+
+   IMPORTANT NOTE:
+     Even though this is a Singular library for computing polytopes and fans such 
+     as the Newton polytope or the Groebner fan of a polynomial, most of the hard 
+     computations are NOT done by Singular but by the program 
+     -  polymake by Ewgenij Gawrilow, TU Berlin and Michael Joswig, TU Darmstadt
+        (see http://www.math.tu-berlin.de/polymake/),  
+     respectively (only in the procedure triangularions) by the program
+     -  topcom by Joerg Rambau, Universitaet Bayreuth
+        (see http://www.uni-bayreuth.de/departments/wirtschaftsmathematik/rambau/TOPCOM);
+     this library should rather be seen as an interface which allows to use a (very limited) 
+     number of options which polymake respectively topcom offers to compute with polytopes 
+     and fans and to make the results available in Singular for further computations; 
+     moreover, the user familiar with Singular does not have to learn the syntax of polymake
+     or topcom, if the options offered here are sufficient for his purposes
+     Note, though, that the procedures concerned with planar polygons are independent of
+     both, polymake and topcom.
+
+   PROCEDURES USING POLYMAKE:
+     polymakePolytope(list)            computes the vertices of a polytope using polymake
+     newtonPolytope(poly)              computes the Newton polytope of the polynomial
+     newtonPolytopeLP(poly)            computes the lattice points of the Newton polytope of the polynomial
+     normalFan(intmat,intmat,list)     computes the normal fan of a polytope
+     groebnerFan(poly)                 computes the Groebner fan of a polynomial
+     intmatToPolymake(intmat,string)   transforms an integer matrix into polymake format
+     polymakeToIntmat(string,string)   transforms polymake output into an integer matrix 
+
+   PROCEDURES USING TOPCOM:
+     triangulations(list)          computes all triangulations of a marked polytope
+     secondaryPolytope(list)       computes the secondary polytope of a marked polytope
+
+   PROCEDURES CONERNED WITH PLANAR POLYGONS:
+     cycleLength(list,intvec)      computes the cycleLength of cycle dual to list with interior point intvec
+     splitPolygon(list)            splits a marked polygon into vertices, facets and interior points
+     eta(list,list)                computes the eta-vector of a triangulation
+     findOrientedBoundary(list)    computes the boundary of the convex hull of a list of lattice points
+     cyclePoints(list,list,int)    computes lattice points connected to a lattice point in a triangulation
+     latticeArea(list)             computes the lattice area of a polygon
+     picksFormula(list)            computes the ingrediants of Pick's formula for a polygon
+     ellipticNF(list)              computes the normal form of an elliptic polygon
+     ellipticNFDB(int)             displays the 16 normal forms of elliptic polygons
+";
+
+////////////////////////////////////////////////////////////////////////////////////
+/// Auxilary Static Procedures in this Library
+////////////////////////////////////////////////////////////////////////////////////
+/// - scalarproduct
+/// - intmatcoldelete
+/// - intmatconcat
+/// - sortlist
+/// - minInList
+/// - stringdelete
+/// - abs
+/// - commondenominator
+/// - maxPosInIntvec
+/// - maxPosInIntmat
+/// - sortintvec
+/// - matrixtointmat
+/////////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////////
+LIB "poly.lib";
+LIB "linalg.lib";
+LIB "random.lib";
+////////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////////////
+/// PROCEDURES USING POLYMAKE
+////////////////////////////////////////////////////////////////////////////////////////
+
+proc polymakePolytope (intmat polytope,list #)
+"USAGE:  polymakePolytope(polytope[,#]);   polytope list, # string
+ASSUME:  each row of polytope gives the coordinates of a lattice point of a polytope
+         with their affine coordinates as given by the output of secondaryPolytope
+PURPOSE: the procedure calls polymake to compute the vertices of the polytope as well
+         as its dimension and information on its facets
+RETURN:  list, L with four entries
+              L[1] : an integer matrix whose rows are the coordinates of vertices
+                     of the polytope 
+              L[2] : the dimension of the polytope
+              L[3] : a list whose ith entry explains to which vertices the ith vertex
+                     of the Newton polytope is connected -- i.e. L[3][i] is an integer
+                     vector and an entry k in there means that the vertex L[1][i] is
+                     connected to the vertex L[1][k]
+              L[4] : an integer matrix whose rows mulitplied by (1,var(1),...,var(nvar)) give
+                     a linear system of equations describing the affine hull of the polytope,
+                     i.e. the smallest affine space containing the polytope
+NOTE: -  for its computations the procedure calls the program polymake by Ewgenij Gawrilow,
+         TU Berlin and Michael Joswig, TU Darmstadt; it therefore is necessary that 
+         this program is installed in order to use this procedure;
+         see http://www.math.tu-berlin.de/polymake/
+      -  note that in the vertex edge graph we have changed the polymake convention which
+         starts indexing its vertices by zero while we start with one !
+      -  the procedure creates the file  /tmp/polytope.polymake which contains the polytope
+         in polymake format and which can be used for further computations with polymake
+      -  moreover, the procedure creates the file /tmp/polytope.output which it deletes 
+         again before ending
+      -  it is possible to give as an optional second argument as string which then will be
+         used instead of 'polytope' in the name of the polymake output file
+EXAMPLE: example polymakePolytope;   shows an example"
+{
+  // the header for the file secendarypolytope.polymake
+  string sp="_application polytope
+_version 2.2
+_type RationalPolytope
+
+POINTS
+";
+  int i,j;
+  // set the name for the polymake output file
+  if (size(#)>0)
+  {
+    if (typeof(#[1])=="string")
+    {
+      string dateiname=#[1];
+    }
+    else
+    {
+      string dateiname="polytope";
+    }
+  }
+  else
+  {
+    string dateiname="polytope";
+  }
+  // create the lattice point list for polymake
+  sp=sp+intmatToPolymake(polytope,"points");
+  // initialise dateiname.polymake and compute the vertices
+  write(":w /tmp/"+dateiname+".polymake",sp);
+  system("sh","cd /tmp; polymake "+dateiname+".polymake VERTICES > "+dateiname+".output");
+  string vertices=read("/tmp/"+dateiname+".output");
+  system("sh","/bin/rm /tmp/"+dateiname+".output");
+  intmat np=polymakeToIntmat(vertices,"affine");
+  // compute the dimension
+  system("sh","cd /tmp; polymake "+dateiname+".polymake DIM > "+dateiname+".output");
+  string pdim=read("/tmp/"+dateiname+".output");
+  system("sh","/bin/rm /tmp/"+dateiname+".output");
+  pdim=pdim[5,size(pdim)-6];
+  execute("int nd="+pdim+";");
+  // compute the vertex-edge graph
+  system("sh","cd /tmp; polymake "+dateiname+".polymake GRAPH > "+dateiname+".output");
+  string vertexedgegraph=read("/tmp/"+dateiname+".output");
+  system("sh","/bin/rm /tmp/"+dateiname+".output");
+  vertexedgegraph=vertexedgegraph[7,size(vertexedgegraph)-8];
+  string newveg;
+  for (i=1;i<=size(vertexedgegraph);i++)
+  {
+    if (vertexedgegraph[i]=="{")
+    {
+      newveg=newveg+"intvec(";
+    }
+    else
+    {
+      if (vertexedgegraph[i]=="}")
+      {
+        newveg=newveg+"),";
+      }
+      else
+      {
+        if (vertexedgegraph[i]==" ")
+        {
+          newveg=newveg+",";
+        }
+        else
+        {
+          newveg=newveg+vertexedgegraph[i];
+        }
+      }
+    }
+  }  
+  newveg=newveg[1,size(newveg)-1];
+  execute("list nveg="+newveg+";");
+  // raise each entry in nveg by one
+  for (i=1;i<=size(nveg);i++)
+  {
+    for (j=1;j<=size(nveg[i]);j++)
+    {
+      nveg[i][j]=nveg[i][j]+1;
+    }
+  }
+  // compute the affine hull
+  system("sh","cd /tmp; polymake "+dateiname+".polymake AFFINE_HULL > "+dateiname+".output");
+  string equations=read("/tmp/"+dateiname+".output");
+  system("sh","/bin/rm /tmp/"+dateiname+".output");
+  if (size(equations)>14)
+  {
+    intmat neq=polymakeToIntmat(equations,"cleardenom");
+  }
+  else
+  {
+    intmat neq[1][ncols(polytope)+1];
+  }
+  return(list(np,nd,nveg,neq));
+}
+example
+{
+   "EXAMPLE:";
+   echo=2;
+   // the lattice points of the unit square in the plane 
+   list points=intvec(0,0),intvec(0,1),intvec(1,0),intvec(1,1);
+   // the secondary polytope of this lattice point configuration is computed
+   intmat secpoly=secondaryPolytope(points)[1];
+   list np=polymakePolytope(secpoly);
+   // the vertices of the Newton polytope are:
+   np[1];
+   // its dimension is
+   np[2];
+   // np[3] contains information how the vertices are connected to each other,
+   // e.g. the first vertex (number 0) is connected to the second one
+   np[3][1];
+   // the affine hull has the equation
+   ring r=0,x(1..4),dp;
+   matrix M[5][1]=1,x(1),x(2),x(3),x(4);
+   np[4]*M;
+}
+
+proc newtonPolytope (poly f,list #)
+"USAGE: newtonPolytope(f[,#]);  f poly, # string
+RETURN: list, L with four entries
+              L[1] : an integer matrix whose rows are the coordinates of vertices
+                     of the Newton polytope of f
+              L[2] : the dimension of the Newton polytope of f
+              L[3] : a list whose ith entry explains to which vertices the ith vertex
+                     of the Newton polytope is connected -- i.e. L[3][i] is an integer
+                     vector and an entry k in there means that the vertex L[1][i] is
+                     connected to the vertex L[1][k]
+              L[4] : an integer matrix whose rows mulitplied by (1,var(1),...,var(nvar)) give
+                     a linear system of equations describing the affine hull of the Newton
+                     polytope, i.e. the smallest affine space containing the Newton polytope
+NOTE: -  if we replace the first column of L[4] by zeros, i.e. if we move the affine hull to
+         the origin, then we get the equations for the orthogonal comploment of the linearity
+         space of the normal fan dual to the Newton polytope, i.e. we get the EQUATIONS that
+         we need as input for polymake when computing the normal fan
+      -  the procedure calls for its computation polymake by Ewgenij Gawrilow,
+         TU Berlin and Michael Joswig, so it only works if polymake is installed;
+         see http://www.math.tu-berlin.de/polymake/
+      -  the procedure creates the file  /tmp/newtonPolytope.polymake which contains the polytope
+         in polymake format and which can be used for further computations with polymake
+      -  moreover, the procedure creates the file /tmp/newtonPolytope.output which it deletes 
+         again before ending
+      -  it is possible to give as an optional second argument as string which then will be
+         used instead of 'newtonPolytope' in the name of the polymake output file
+EXAMPLE: example newtonPolytope;   shows an example"
+{
+  int i,j;
+  // compute the list of exponent vectors of the polynomial, which are the lattice points
+  // whose convex hull is the Newton polytope of f
+  intmat exponents[size(f)][nvars(basering)];
+  while (f!=0)
+  {
+    i++;
+    exponents[i,1..nvars(basering)]=leadexp(f);
+    f=f-lead(f);
+  }
+  if (size(#)==0)
+  {
+    #[1]="newtonPolytope";
+  }
+  // call polymakePolytope with exponents
+  return(polymakePolytope(exponents,#));
+}
+example
+{
+   "EXAMPLE:";
+   echo=2;
+   ring r=0,(x,y,z),dp;
+   matrix M[4][1]=1,x,y,z;
+   poly f=y3+x2+xy+2xz+yz+z2+1;
+   // the Newton polytope of f is
+   list np=newtonPolytope(f);
+   // the vertices of the Newton polytope are:
+   np[1];
+   // its dimension is
+   np[2];
+   // np[3] contains information how the vertices are connected to each other,
+   // e.g. the first vertex (number 0) is connected to the second, third and 
+   //      fourth vertex
+   np[3][1];
+   //////////////////////////
+   f=x2-y3;
+   // the Newton polytope of f is
+   np=newtonPolytope(f);
+   // the vertices of the Newton polytope are:
+   np[1];
+   // its dimension is
+   np[2];   
+   // the Newton polytope is contained in the affine space given by the equations
+   np[4]*M;
+}
+
+proc newtonPolytopeLP (poly f)
+"USAGE:  newtonPolytopeLP(f);  f poly
+RETURN: list, the exponent vectors of the monomials occuring in f, i.e. the lattice
+              points of the Newton polytope of f
+EXAMPLE: example normalFan;   shows an example"
+{
+  list np;
+  int i=1;
+  while (f!=0)
+  {
+    np[i]=leadexp(f);
+    f=f-lead(f);
+    i++;
+  }
+  return(np);
+}
+example
+{
+   "EXAMPLE:";
+   echo=2;
+   ring r=0,(x,y,z),dp;
+   poly f=y3+x2+xy+2xz+yz+z2+1;
+   // the lattice points of the Newton polytope of f are
+   newtonPolytopeLP(f);
+}
+
+proc normalFan (intmat vertices,intmat affinehull,list graph,int er,list #)
+"USAGE:  normalFan (vert,aff,graph,rays,[,#]);   vert,aff intmat,  graph list, rays int, # string
+ASSUME:  - vert is an integer matrix whose rows are the coordinate of the vertices of
+           a convex lattice polygon; 
+         - aff describes the affine hull of this polytope, i.e.
+           the smallest affine space containing it, in the following sense: 
+           denote by n the number of columns of vert, then multiply aff by (1,x(1),...,x(n)) 
+           and set the resulting terms to zero in order to get the equations for the affine hull;
+         - the ith entry of graph is an integer vector describing to which vertices
+           the ith vertex is connected, i.e. a k as entry means that the vertex vert[i] is
+           connected to vert[k];
+         - the integer rays is either one (if the extreme rays should be computed) or zero (otherwise)
+RETURN:  list, the ith entry of L[1] contains information about the cone in the normal fan 
+               dual to the ith vertex of the polytope 
+               L[1][i][1] = integer matrix representing the inequalities which describe the
+                            cone dual to the ith vertex
+               L[1][i][2] = a list which contains the inequalities represented by L[i][1]
+                            as a list of strings, where we use the variables x(1),...,x(n)
+               L[1][i][3] = only present if 'er' is set to 1; in that case it is an interger matrix
+                            whose rows are the extreme rays of the cone
+               L[2] = is an integer matrix whose rows span the linearity space of the fan,
+                      i.e. the linear space which is contained in each cone
+NOTE:    - the procedure calls for its computation polymake by Ewgenij Gawrilow,
+           TU Berlin and Michael Joswig, so it only works if polymake is installed;
+           see http://www.math.tu-berlin.de/polymake/
+         - in the optional argument # it is possible to hand over other names for the 
+           variables to be used -- be carful, the format must be correct and that is
+           not tested, e.g. if you want the variable names to be u00,u10,u01,u11
+           then you must hand over the string u11,u10,u01,u11
+EXAMPLE: example normalFan;   shows an example"
+{
+  list ineq; // stores the inequalities of the cones
+  int i,j,k;
+  // we work over the following ring  
+  execute("ring ineqring=0,x(1.."+string(ncols(vertices))+"),lp;");
+  string greatersign=">";
+  // create the variable names 
+  if (size(#)>0)
+  {
+    if (typeof(#[1])=="string")
+    {
+      kill ineqring;
+      execute("ring ineqring=0,("+#[1]+"),lp;");
+    }
+    if (size(#)>1)
+    {
+      greatersign="<";
+    }
+  }
+  //////////////////////////////////////////////////////////////////
+  // Compute first the inequalities of the cones
+  //////////////////////////////////////////////////////////////////
+  matrix VAR[1][ncols(vertices)]=maxideal(1);
+  matrix EXP[ncols(vertices)][1];
+  poly p,pl,pr;
+  // consider all vertices of the polytope
+  for (i=1;i<=nrows(vertices);i++)
+  {
+    // first we produce for each vertex in the polytope 
+    // the inequalities describing the dual cone in the normal fan
+    list pp;  // contain strings representing the inequalities describing the normal cone
+    intmat ie[size(graph[i])][ncols(vertices)]; // contains the inequalities as rows
+    // consider all the vertices to which the ith vertex in the polytope is connected by an edge
+    for (j=1;j<=size(graph[i]);j++)
+    {
+      // produce the vector ie_j pointing from the jth vertex to the ith vertex;
+      // this will be the jth inequality for the cone in the normal fan dual to the ith vertex
+      ie[j,1..ncols(vertices)]=vertices[i,1..ncols(vertices)]-vertices[graph[i][j],1..ncols(vertices)];
+      EXP=ie[j,1..ncols(vertices)];
+      // build a linear polynomial with the entries of ie_j as coefficients
+      p=(VAR*EXP)[1,1];
+      pl,pr=0,0;
+      // separate the terms with positive coefficients in p from those with negative coefficients
+      for (k=1;k<=size(p);k++)
+      {
+        if (leadcoef(p[k])<0)
+        {
+          pr=pr-p[k];
+        }
+        else
+        {
+          pl=pl+p[k];
+        }
+      }
+      // build the string which represents the jth inequality for the cone dual to the ith vertex
+      // as polynomial inequality of type string, and store this in the list pp as jth entry
+      pp[j]=string(pl)+" "+greatersign+" "+string(pr);
+    }
+    // all inequalities for the ith vertex are stored in the list ineq
+    ineq[i]=list(ie,pp);
+    kill ie,pp; // kill certain lists
+  }
+  // remove the first column of affine hull to compute the linearity space
+  intmat linearity=intmatcoldelete(affinehull,1);
+  //////////////////////////////////////////////////////////////////
+  // Compute next the extreme rays of the cones
+  //////////////////////////////////////////////////////////////////
+  if (er==1)
+  {
+    list extremerays; // keeps the result
+    string polymake; // keeps polymake output
+    // the header for ineq.polymake
+    string head="_application polytope
+_version 2.2
+_type RationalPolytope
+
+INEQUALITIES
+";
+    // the tail for both polymake files
+    string tail="
+EQUATIONS
+";
+    tail=tail+intmatToPolymake(linearity,"rays");
+    string ungleichungen; // keeps the inequalities for the polymake code
+    intmat M; // the matrix keeping the inequalities
+    // create the file ineq.output
+    write(":w /tmp/ineq.output","");
+    int dimension; // keeps the dimension of the intersection the bad cones with the u11tobeseencone
+    for (i=1;i<=size(ineq);i++)
+    {
+      i,". Cone of ",nrows(vertices); // indicate how many vertices have been dealt with
+      ungleichungen=intmatToPolymake(ineq[i][1],"rays");
+      // write the inequalities to ineq.polymake and call polymake
+      write(":w /tmp/ineq.polymake",head+ungleichungen+tail);
+      ungleichungen=""; // clear ungleichungen
+      system("sh","cd /tmp; /bin/rm ineq.output; polymake ineq.polymake VERTICES > ineq.output");
+      // read the result of polymake
+      polymake=read("/tmp/ineq.output");
+      intmat VERT=polymakeToIntmat(polymake,"affine");
+      extremerays[i]=VERT;
+      kill VERT;
+    }
+    for (i=1;i<=size(ineq);i++)
+    {
+      ineq[i]=ineq[i]+list(extremerays[i]);
+    }
+  }
+  // get the linearity space
+  return(list(ineq,linearity)); 
+}
+example
+{
+   "EXAMPLE:";
+   echo=2;
+   ring r=0,(x,y,z),dp;
+   matrix M[4][1]=1,x,y,z;
+   poly f=y3+x2+xy+2xz+yz+z2+1;
+   // the Newton polytope of f is
+   list np=newtonPolytope(f);
+   // the Groebner fan of f, i.e. the normal fan of the Newton polytope
+   list gf=normalFan(np[1],np[4],np[3],1,"x,y,z");
+   // the number of cones in the Groebner fan of f is:
+   size(gf[1]);
+   // the inequalities of the first cone as matrix are:
+   print(gf[1][1][1]);
+   // the inequalities of the first cone as string are:
+   print(gf[1][1][2]);
+   // the rows of the following matrix are the extreme rays of the first cone:
+   print(gf[1][1][3]);
+   // each cone contains the linearity space spanned by:
+   print(gf[2]);
+}
+
+proc groebnerFan (poly f,list #)
+"USAGE:  groebnerFan(f[,#]);  f poly, # string
+RETURN:  list, the ith entry of L[1] contains information about the ith cone in the Groebner fan 
+               dual to the ith vertex in the Newton polytope of the f
+               L[1][i][1] = integer matrix representing the inequalities which describe the cone         
+               L[1][i][2] = a list which contains the inequalities represented by L[i][1]
+                            as a list of strings
+               L[1][i][3] = an interger matrix whose rows are the extreme rays of the cone
+               L[2] = is an integer matrix whose rows span the linearity space of the fan,
+                      i.e. the linear space which is contained in each cone               
+               L[3] = the Newton polytope of f in the format of the procedure newtonPolytope
+NOTE:    - if you have alread computed the Newton polytope of f then you might want
+           to use the procedure normalFan instead in order to avoid doing costly computation
+           twice
+         - the procedure calls for its computation polymake by Ewgenij Gawrilow,
+           TU Berlin and Michael Joswig, so it only works if polymake is installed;
+           see http://www.math.tu-berlin.de/polymake/
+         - the procedure creates the file  /tmp/newtonPolytope.polymake which contains the 
+           Newton polytope of f in polymake format and which can be used for further 
+           computations with polymake
+         - it is possible to give as an optional second argument as string which then will be
+           used instead of 'newtonPolytope' in the name of the polymake output file
+EXAMPLE: example groebnerFan;   shows an example"
+{
+  int i,j;
+  // compute the list of exponent vectors of the polynomial, which are the lattice points
+  // whose convex hull is the Newton polytope of f
+  intmat exponents[size(f)][nvars(basering)];
+  while (f!=0)
+  {
+    i++;
+    exponents[i,1..nvars(basering)]=leadexp(f);
+    f=f-lead(f);
+  }
+  if (size(#)==0)
+  {
+    #[1]="newtonPolytope";
+  }
+  // call polymakePolytope with exponents
+  list newtonp=polymakePolytope(exponents,"newtonPolytope");
+  // get the variables as string
+  string variablen;
+  for (i=1;i<=nvars(basering);i++)
+  {
+    variablen=variablen+string(var(i))+",";
+  }
+  variablen=variablen[1,size(variablen)-1];
+  // call normalFan in order to compute the Groebner fan
+  list gf=normalFan(newtonp[1],newtonp[4],newtonp[3],1,variablen);
+  // append newtonp to gf
+  gf[3]=newtonp;
+  // append newtonp the exponent vectors to gt
+  gf[4]=exponents;
+  return(gf);
+}
+example
+{
+   "EXAMPLE:";
+   echo=2;
+   ring r=0,(x,y,z),dp;
+   matrix M[4][1]=1,x,y,z;
+   poly f=y3+x2+xy+2xz+yz+z2+1;
+   // the Newton polytope of f is
+   list gf=groebnerFan(f);
+   // the exponent vectors of f are ordered as follows
+   gf[4];
+   // the first cone of the groebner fan has the inequalities
+   gf[1][1][1];
+   // as a string they look like
+   gf[1][1][2];
+   // and it has the extreme rays
+   print(gf[1][1][3]);
+   // the linearity space is spanned by
+   print(gf[2]);
+   // the vertices of the Newton polytope are:
+   gf[3][1];
+   // its dimension is
+   gf[3][2];
+   // np[3] contains information how the vertices are connected to each other,
+   // e.g. the first vertex is connected to the second, third and fourth vertex
+   gf[3][3][1];
+}
+
+
+
+proc intmatToPolymake (intmat M,string art)
+"USAGE:  intmatToPolymake(M,art);  M intmat, art string
+ASSUME:  - M is an integer matrix which should be transformed into polymake format;
+         - art is one of the following strings
+           - 'rays'   : indicating that a first column of 0's should be added 
+           - 'points' : indicating that a first column of 1's should be added 
+RETURN:  string, the matrix is transformed in a string and a first column has been added
+EXAMPLE: example intmatToPolymake;   shows an example"
+{
+  if (art=="rays")
+  {
+    string anf="0 ";
+  }
+  else 
+  {
+    string anf="1 ";
+  }
+  string sp;
+  int i,j;
+  // create the lattice point list for polymake
+  for (i=1;i<=nrows(M);i++)
+  {
+    sp=sp+anf;
+    for (j=1;j<=ncols(M);j++)
+    {
+      sp=sp+string(M[i,j])+" ";
+      if (j==ncols(M))
+      {
+        sp=sp+"
+";
+      }
+    }
+  }
+  return(sp);
+}
+example
+{
+   "EXAMPLE:";
+   echo=2;
+   intmat M[3][4]=1,2,3,4,5,6,7,8,9,10,11,12;
+   intmatToPolymake(M,"rays");
+   intmatToPolymake(M,"points");
+}
+
+proc polymakeToIntmat (string pm,string art)
+"USAGE:  polymakeToIntmat(pm,art);  pm, art string
+ASSUME:  pm is the result of calling polymake with one 'argument' like VERTICES, AFFINE_HULL, etc.,
+         so that the first row of the string is the name of the corresponding 'argument' and
+         the further rows contain the result which consists of vectors either over the integers
+         or over the rationals
+RETURN:  intmat, the rows of the matrix are basically the vectors in pm from the second row on
+                 where each row has been multiplied with the lowest common multiple of the
+                 denominators of its entries so as to be an integer matrix; moreover,
+                 if art=='affine', then the first column is omitted since we only want affine 
+                 coordinates
+EXAMPLE: example polymakeToIntmat;   shows an example"
+{
+  // we need a line break
+  string zeilenumbruch="
+";
+  // remove the 'argment' name, i.e. the first row of pm
+  while (pm[1]!=zeilenumbruch)
+  {
+    pm=stringdelete(pm,1);
+  }
+  pm=stringdelete(pm,1);  
+  // find out how many entries each vector has, namely one more than 'spaces' in a row
+  int i=1;
+  int s=1;
+  int z=1;
+  while (pm[i]!=zeilenumbruch)
+  {
+    if (pm[i]==" ")
+    {
+      s++;
+    }
+    i++;
+  }
+  // if we want to have affine coordinates
+  if (art=="affine")
+  {    
+    s--; // then there is one column less
+    // and the entry of the first column (in the first row) has to be removed
+    while (pm[1]!=" ")
+    {
+      pm=stringdelete(pm,1);
+    }
+    pm=stringdelete(pm,1);
+  }
+  // we add two line breaks at the end in order to have this as a stopping criterion
+  pm=pm+zeilenumbruch+zeilenumbruch;
+  // we now have to work through each row
+  for (i=1;i<=size(pm);i++)
+  {
+    // if there are two consecutive line breaks we are done
+    if ((pm[i]==zeilenumbruch) and (pm[i+1]==zeilenumbruch))
+    {
+      i=size(pm)+1;
+    }
+    else
+    {
+      // a line break has to be replaced by a comma
+      if (pm[i]==zeilenumbruch)
+      {
+        z++;
+        pm[i]=",";
+        // if we want to have affine coordinates, then we have to delete the first entry in each row
+        if (art=="affine")
+        {
+         while (pm[i+1]!=" ")
+         {
+           pm=stringdelete(pm,i+1);
+         }
+         pm=stringdelete(pm,i+1);
+        }
+      }
+      // a space has to be replaced by a comma
+      if (pm[i]==" ")
+      {
+        pm[i]=",";      
+      }
+    }
+  }
+  // if we have introduced superflous commata at the end, they should be removed
+  while (pm[size(pm)]==",")
+  {
+    pm=stringdelete(pm,size(pm));
+  }
+  // since the matrix could be over the rationals, we need a ring with rational coefficients
+  ring zwischering=0,x,lp;    
+  // create the matrix with the elements of pm as entries
+  execute("matrix mm["+string(z)+"]["+string(s)+"]="+pm+";");
+  // transform this into an integer matrix
+  matrix M[1][ncols(mm)]; // takes a row of mm
+  int cm;  // takes a lowest common multiple
+  // multiply each row by an integer such that its entries are integers
+  for (int j=1;j<=nrows(mm);j++)
+  {
+    M=mm[j,1..ncols(mm)];
+    cm=commondenominator(M);
+    for (i=1;i<=ncols(mm);i++)
+    {
+      mm[j,i]=cm*mm[j,i];
+    }
+  }
+  // transform the matrix mm into an integer matrix
+  execute("intmat im["+string(z)+"]["+string(s)+"]="+string(mm)+";");
+  return(im);
+}
+example
+{
+   "EXAMPLE:";
+   echo=2;
+   // this is the usual output of some polymake computation
+   string pm="VERTICES
+0 1 3 5/3 1/3 -1 -23/3 -1/3 5/3 1/3 1
+0 1 3 -23/3 5/3 1 5/3 1/3 1/3 -1/3 -1
+0 1 1 1/3 -1/3 -1 5/3 1/3 -23/3 5/3 3
+0 1 1 5/3 -23/3 3 1/3 5/3 -1/3 1/3 -1
+0 1 -1 1/3 5/3 3 -1/3 -23/3 1/3 5/3 1
+0 1 -1 -1/3 1/3 1 1/3 5/3 5/3 -23/3 3
+0 1 -1 1 3 -5 -1 3 -1 1 -1
+0 1 -1 -1 -1 -1 1 1 3 3 -5
+0 1 -5 3 1 -1 3 -1 1 -1 -1
+
+";
+   intmat PM=polymakeToIntmat(pm,"affine");
+   // note that the first column has been removed, since we asked for
+   // affine coordinates, and the denominators have been cleared
+   print(PM);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+/// PROCEDURES USING TOPCOM
+////////////////////////////////////////////////////////////////////////////////////////
+
+proc triangulations (list polygon)
+"USAGE:  triangulations(polygon); list polygon
+ASSUME:  polygon is a list of integer vectors of the same size representing the affine
+         coordinates of the lattice points 
+PURPOSE: the procedure considers the marked polytope given as the convex hull of
+         the lattice points and with these lattice points as markings; it then
+         computes all possible triangulations of this marked polytope 
+RETURN:  list, each entry corresponds to one triangulation and the ith entry is
+               itself a list of integer vectors of size three, where each integer
+               vector defines one triangle in the triangulation by telling which
+               points of the input are the vertices of the triangle
+NOTE:  - the procedure calls for its computations the program points2triangs
+         from the program topcom by Joerg Rambau, Universitaet Bayreuth; it
+         therefore is necessary that this program is installed in order to use this 
+         procedure;
+         see http://www.uni-bayreuth.de/departments/wirtschaftsmathematik/rambau/TOPCOM
+       - the procedure creates the files /tmp/triangulationsinput and /tmp/triangulationsoutput;
+         the former is used as input for points2triangs and the latter is its output
+         containing the triangulations of corresponding to points in the format
+         of points2triangs; this can be use for further computations with topcom
+       - note that an integer i in an integer vector representing a triangle refers to
+         the ith lattice point, i.e. polygon[i]; this convention is different from 
+         TOPCOM's convention, where i would refer to the i-1st lattice point
+EXAMPLE: example triangulations;   shows an example"
+{
+  int i,j;
+  // prepare the input for points2triangs by writing the input polygon in the 
+  // necessary format
+  string spi="[";
+  for (i=1;i<=size(polygon);i++)
+  {
+    polygon[i][size(polygon[i])+1]=1;
+    spi=spi+"["+string(polygon[i])+"]";
+    if (i<size(polygon))
+    {
+      spi=spi+",";
+    }
+  }
+  spi=spi+"]";
+  write(":w /tmp/triangulationsinput",spi);
+  // call points2triangs
+  system("sh","cd /tmp; points2triangs < triangulationsinput > triangulationsoutput");
+  string p2t=read("/tmp/triangulationsoutput"); // takes the result of points2triangs
+  string np2t; // takes the triangulations in Singular format
+  // transform the points2triangs output into Singular format
+  for (i=1;i<=size(p2t);i++)
+  {
+    if (p2t[i]=="=")
+    {
+      np2t=np2t+p2t[i]+"list(";
+      i++;
+    }
+    else
+    {
+      if (p2t[i]!=":")
+      {
+        if ((p2t[i]=="}") and (p2t[i+1]=="}"))
+        {
+          np2t=np2t+"))";
+          i++;
+        }     
+        else
+        {
+          if (p2t[i]=="{")
+          {
+            np2t=np2t+"intvec(";
+          }
+          else
+          {
+            if (p2t[i]=="}")
+            {
+              np2t=np2t+")";
+            }
+            else
+            {
+              np2t=np2t+p2t[i];
+            }
+          }
+        }
+      }
+    }
+  }
+  list T;
+  execute(np2t);
+  // raise each index by one
+  for (i=1;i<=size(T);i++)
+  {
+    for (j=1;j<=size(T[i]);j++)
+    {
+      T[i][j]=T[i][j]+1;
+    }
+  }
+  return(T);
+}
+example
+{
+   "EXAMPLE:";
+   echo=2;
+   // the lattice points of the unit square in the plane 
+   list polygon=intvec(0,0),intvec(0,1),intvec(1,0),intvec(1,1);
+   // the triangulations of this lattice point configuration are computed
+   list triang=triangulations(polygon);
+   triang;
+}
+
+proc secondaryPolytope (list polygon,list #)
+"USAGE:  secondaryPolytope(polygon[,#]); list polygon, list #
+ASSUME:  - polygon is a list of integer vectors of the same size representing the affine
+           coordinates of lattice points
+         - if the triangulations of the corresponding polygon have already been computed
+           with the procedure triangulations then these can be given as a second (optional)
+           argument in order to avoid doing this computation again
+PURPOSE: the procedure considers the marked polytope given as the convex hull of
+         the lattice points and with these lattice points as markings; it then
+         computes the lattice points of the secondary polytope given by this 
+         marked polytope which correspond to the triangulations computed by
+         the procedure triangulations
+RETURN:  list, say L, such that:
+               L[1] = intmat, each row gives the affine coordinates of a lattice point 
+                      in the secondary polytope given by the marked
+                      polytope corresponding to polygon
+               L[2] = the list of corresponding triangulations
+NOTE:    if the triangluations are not handed over as optional argument the procedure calls 
+         for its computation of these triangulations the program points2triangs
+         from the program topcom by Joerg Rambau, Universitaet Bayreuth; it
+         therefore is necessary that this program is installed in order to use this 
+         procedure;
+         see http://www.uni-bayreuth.de/departments/wirtschaftsmathematik/rambau/TOPCOM
+EXAMPLE: example secondaryPolytope;   shows an example"
+{
+  // compute the triangulations of the point configuration with points2triangs
+  if (size(#)==0)
+  {
+    list triangs=triangulations(polygon);
+  }
+  else
+  {
+    list triangs=#;
+  }
+  int i,j,k,l;
+  intmat N[2][2]; // is used to compute areas of triangles
+  intvec vertex;  // stores a point in the secondary polytope as intermediate result
+  int eintrag;
+  int halt;
+  intmat secpoly[size(triangs)][size(polygon)];   // stores all lattice points of the secondary polytope
+  // consider each triangulation and compute the corresponding point in the secondary polytope
+  for (i=1;i<=size(triangs);i++)
+  {
+    // for each triangulation we have to compute the coordinates corresponding to each marked point
+    for (j=1;j<=size(polygon);j++)
+    {
+      eintrag=0;
+      // for each marked point we have to consider all triangles in the triangulation
+      // which involve this particular point
+      for (k=1;k<=size(triangs[i]);k++)
+      {
+        halt=0;
+        for (l=1;(l<=3) and (halt==0);l++)
+        {
+          if (triangs[i][k][l]==j)
+          {
+            halt=1;
+            N[1,1]=polygon[triangs[i][k][3]][1]-polygon[triangs[i][k][1]][1];
+            N[1,2]=polygon[triangs[i][k][2]][1]-polygon[triangs[i][k][1]][1];
+            N[2,1]=polygon[triangs[i][k][3]][2]-polygon[triangs[i][k][1]][2];
+            N[2,2]=polygon[triangs[i][k][2]][2]-polygon[triangs[i][k][1]][2];
+            eintrag=eintrag+abs(det(N));
+          }
+        }
+      }
+      vertex[j]=eintrag;
+    }
+    secpoly[i,1..size(polygon)]=vertex;
+  }
+  return(list(secpoly,triangs));          
+}
+example
+{
+   "EXAMPLE:";
+   echo=2;
+   // the lattice points of the unit square in the plane
+   list polygon=intvec(0,0),intvec(0,1),intvec(1,0),intvec(1,1);
+   // the secondary polytope of this lattice point configuration is computed
+   list secpoly=secondaryPolytope(polygon);
+   // the points in the secondary polytope
+   print(secpoly[1]);
+   // the corresponding triangulations
+   secpoly[2];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+/// PROCEDURES CONCERNED WITH PLANAR POLYGONS
+////////////////////////////////////////////////////////////////////////////////////////
+
+proc cycleLength (list boundary,intvec interior)
+"USAGE:  cycleLength(boundary,interior); list boundary, intvec interior
+ASSUME:  boundary is a list of integer vectors describing a cycle in some convex lattice
+         polygon around the lattice point interior ordered clock wise
+RETURN:  string, the cycle length of the corresponding cycle in the dual tropical curve
+EXAMPLE: example cycleLength;   shows an example"
+{
+  int j;
+  // create a ring whose variables are indexed by the points in boundary resp. by interior
+  string rst="ring cyclering=0,(u"+string(interior[1])+string(interior[2]);
+  for (j=1;j<=size(boundary);j++)
+  {
+    rst=rst+",u"+string(boundary[j][1])+string(boundary[j][2]);
+  }
+  rst=rst+"),lp;";
+  execute(rst);
+  // add the first and second point at the end of boundary
+  boundary[size(boundary)+1]=boundary[1];
+  boundary[size(boundary)+1]=boundary[2];
+  poly cl,summand; // takes the cycle length
+  matrix N1[2][2]; // used to compute the area of a triangle
+  matrix N2[2][2]; // used to compute the area of a triangle
+  matrix N3[2][2]; // used to compute the area of a triangle
+  // for each original point in the boundary compute its contribution to the cycle
+  for (j=2;j<=size(boundary)-1;j++)
+  {
+    N1=boundary[j-1]-interior,boundary[j]-interior;
+    N2=boundary[j]-interior,boundary[j+1]-interior;
+    N3=boundary[j+1]-interior,boundary[j-1]-interior;
+    execute("summand=-u"+string(boundary[j][1])+string(boundary[j][2])+"+u"+string(interior[1])+string(interior[2])+";");
+    summand=summand*(det(N1)+det(N2)+det(N3))/(det(N1)*det(N2));
+    cl=cl+summand;
+  }
+  return(string(cl));
+}
+example
+{
+   "EXAMPLE:";
+   echo=2;
+   // the integer vectors in boundary are lattice points on the boundary
+   // of a convex lattice polygon in the plane
+   list boundary=intvec(0,0),intvec(0,1),intvec(0,2),intvec(2,2),intvec(2,1),intvec(2,0);
+   // interior is a lattice point in the interior of this lattice polygon
+   intvec interior=1,1;
+   // compute the general cycle length of a cycle of the corresponding cycle 
+   // in the dual tropical curve -- note that (0,1) and (2,1) do not contribute
+   cycleLength(boundary,interior);
+}
+
+proc splitPolygon (list markings)
+"USAGE:  splitPolygon (markings);  markings list
+ASSUME:  markings is a list of integer vectors representing lattice points in the plane
+         which we consider as the marked points of the convex lattice polytope spanned by them
+PURPOSE: split the marked points in the vertices, the points on the facets which are not vertices,
+         and the interior points
+RETURN:  list, L consisting of three lists
+               L[1]    : represents the vertices the polygon ordered clockwise
+                         L[1][i][1] = intvec, the coordinates of the ith vertex
+                         L[1][i][2] = int, the position of L[1][i][1] in markings
+               L[2][i] : represents the lattice points on the facet of the polygon with
+                         endpoints L[1][i] and L[1][i+1] (i considered modulo size(L[1]))
+                         L[2][i][j][1] = intvec, the coordinates of the jth lattice point on that facet
+                         L[2][i][j][2] = int, the position of L[2][i][j][1] in markings
+               L[3]    : represents the interior lattice points of the polygon 
+                         L[3][i][1] = intvec, the coordinates of the ith interior point
+                         L[3][i][2] = int, the position of L[3][i][1] in markings
+EXAMPLE: example splitPolygon;   shows an example"
+{
+  list vert; // stores the result
+  // compute the boundary of the polygon in an oriented way
+  list pb=findOrientedBoundary(markings);
+  // the vertices are just the second entry of pb
+  vert[1]=pb[2];
+  int i,j,k;      // indices
+  list boundary;  // stores the points on the facets of the polygon which are not vertices
+  // append to the boundary points as well as to the vertices the first vertex a second time
+  pb[1]=pb[1]+list(pb[1][1]);
+  pb[2]=pb[2]+list(pb[2][1]);
+  // for each vertex find all points on the facet of the polygon with this vertex
+  // and the next vertex as endpoints
+  int z=2;
+  for (i=1;i<=size(vert[1]);i++)
+  {
+    j=1;
+    list facet; // stores the points on this facet which are not vertices
+    // while the next vertex is not reached, store the boundary lattice point
+    while (pb[1][z]!=pb[2][i+1])
+    {
+      facet[j]=pb[1][z];
+      j++;
+      z++;
+    }
+    // store the points on the ith facet as boundary[i]
+    boundary[i]=facet;
+    kill facet;
+    z++;
+  }
+  // store the information on the boundary in vert[2]
+  vert[2]=boundary;
+  // find the remaining points in the input which are not on the boundary by checking
+  // for each point in markings if it is contained in pb[1]
+  list interior=markings;
+  for (i=size(interior);i>=1;i--)
+  {
+    for (j=1;j<=size(pb[1])-1;j++)
+    {
+      if (interior[i]==pb[1][j])
+      {
+        interior=delete(interior,i);
+        j=size(pb[1]);
+      }
+    }
+  }
+  // store the interior points in vert[3]
+  vert[3]=interior;
+  // add to each point in vert the index which it gets from its position in the input markings;
+  // do so for ver[1]
+  for (i=1;i<=size(vert[1]);i++)
+  {
+    j=1;
+    while (markings[j]!=vert[1][i])
+    {
+      j++;
+    }
+    vert[1][i]=list(vert[1][i],j);
+  }
+  // do so for ver[2]
+  for (i=1;i<=size(vert[2]);i++)
+  {
+    for (k=1;k<=size(vert[2][i]);k++)
+    {
+      j=1;
+      while (markings[j]!=vert[2][i][k])
+      {
+        j++;
+      }
+      vert[2][i][k]=list(vert[2][i][k],j);
+    }
+  }
+  // do so for ver[3]
+  for (i=1;i<=size(vert[3]);i++)
+  {
+    j=1;
+    while (markings[j]!=vert[3][i])
+    {
+      j++;
+    }
+    vert[3][i]=list(vert[3][i],j);
+  }  
+  return(vert);
+}
+example
+{
+   "EXAMPLE:";
+   echo=2;
+   // the lattice polygon spanned by the points (0,0), (3,0) and (0,3) 
+   // with all integer points as markings
+   list polygon=intvec(1,1),intvec(3,0),intvec(2,0),intvec(1,0),intvec(0,0),intvec(2,1),intvec(0,1),intvec(1,2),intvec(0,2),intvec(0,3);
+   // split the polygon in its vertices, its facets and its interior points
+   list sp=splitPolygon(polygon);
+   // the vertices
+   sp[1];
+   // the points on facets which are not vertices
+   sp[2];
+   // the interior points
+   sp[3];
+}
+
+
+proc eta (list triang,list polygon)
+"USAGE:  eta(triang,polygon);  triang, polygon list
+ASSUME:  polygon has the format of the output of splitPolygon, i.e. it is a list with three 
+         entries describing a convex lattice polygon in the following way:
+         polygon[1] : is a list of lists; for each i the entry polygon[1][i][1] is a lattice point which is
+                      a vertex of the lattice polygon, and polygon[1][i][2] is an integer assigned to
+                      this lattice point as identifying index
+         polygon[2] : is a list of lists; for each vertex of the polygon, i.e. for each entry in polygon[1],
+                      it contains a list polygon[2][i], which contains the lattice points on the facet
+                      with endpoints polygon[1][i] and polygon[1][i+1] - i considered mod size(polygon[1]);
+                      each such lattice point contributes an entry polygon[2][i][j][1] which is an integer
+                      vector giving the coordinate of the lattice point and an entry polygon[2][i][j][2]
+                      which is the identifying index
+         polygon[3] : is a list of lists, where each entry corresponds to a lattice point in the
+                      interior of the polygon, with polygon[3][j][1] being the coordinates of the point
+                      and polygon[3][j][2] being the identifying index;
+         triang is a list of integer vectors all of size three describing a triangulation of the
+         polygon described by polygon; if an entry of triang is the vector (i,j,k) then the triangle
+         is build by the vertices with indices i, j and k
+RETURN:  intvec, the integer vector eta describing that vertex of the Newton polytope discriminant 
+                 of the polygone whose dual cone in the Groebner fan contains the cone of the 
+                 secondary fan of the polygon corresponding to the given triangulation
+NOTE:    for a better description of eta see either Gelfand, Kapranov, Zelevinski: Discriminants, 
+         Resultants and multidimensional Determinants. Chapter 10.
+EXAMPLE: example eta;   shows an example"
+{
+  int i,j,k,l,m,n; // index variables
+  list ordpolygon;   // stores the lattice points in the order used in the triangulation
+  list triangarea; // stores the areas of the triangulations
+  intmat N[2][2];  // used to compute triangle areas
+  // 1) store the lattice points in the order used in the triangulation
+  // go first through all vertices of the polytope
+  for (j=1;j<=size(polygon[1]);j++)
+  {
+    ordpolygon[polygon[1][j][2]]=polygon[1][j][1];
+  }
+  // then consider all inner points
+  for (j=1;j<=size(polygon[3]);j++)
+  {
+    ordpolygon[polygon[3][j][2]]=polygon[3][j][1];
+  }
+  // finally consider all lattice points on the boundary which are not vertices
+  for (j=1;j<=size(polygon[2]);j++)
+  {
+    for (i=1;i<=size(polygon[2][j]);i++)
+    {
+      ordpolygon[polygon[2][j][i][2]]=polygon[2][j][i][1];
+    }
+  }
+  // 2) compute for each triangle in the triangulation the area of the triangle
+  for (i=1;i<=size(triang);i++)
+  {
+    // Note that the ith lattice point in orderedpolygon has the number i-1 in the triangulation!
+    N=ordpolygon[triang[i][1]]-ordpolygon[triang[i][2]],ordpolygon[triang[i][1]]-ordpolygon[triang[i][3]];
+    triangarea[i]=abs(det(N));
+  }
+  intvec ETA;        // stores the eta_ij
+  int etaij;         // stores the part of eta_ij during computations which comes from triangle areas
+  int seitenlaenge;  // stores the part of eta_ij during computations which comes from boundary facets
+  list seiten;       // stores the lattice points on facets of the polygon
+  intvec v;          // used to compute a facet length
+  // 3) store first in seiten[i] all lattice points on the facet connecting the ith vertex,
+  //    i.e. polygon[1][i], with the i+1st vertex, i.e. polygon[1][i+1], where we replace i+1
+  //    1 if i=size(polygon[1]);
+  //    then append the last entry of seiten once more at the very beginning of seiten, so
+  //    that the index is shifted by one
+  for (i=1;i<=size(polygon[1]);i++)
+  {
+    if (i<size(polygon[1]))
+    {
+      seiten[i]=list(polygon[1][i])+polygon[2][i]+list(polygon[1][i+1]);
+    }
+    else
+    {
+      seiten[i]=list(polygon[1][i])+polygon[2][i]+list(polygon[1][1]);
+    }
+  }
+  seiten=insert(seiten,seiten[size(seiten)],0);
+  // 4) compute the eta_ij for all vertices of the polygon
+  for (j=1;j<=size(polygon[1]);j++)
+  {
+    // the vertex itself contributes a 1
+    etaij=1;
+    // check for each triangle in the triangulation ...
+    for (k=1;k<=size(triang);k++)
+    {
+      // ... if the vertex is actually a vertex of the triangle ...
+      if ((polygon[1][j][2]==triang[k][1]) or (polygon[1][j][2]==triang[k][2]) or (polygon[1][j][2]==triang[k][3]))
+      {
+        // ... if so, add the area of the triangle to etaij 
+        etaij=etaij+triangarea[k];
+        // then check if that triangle has a facet which is contained in one of the 
+        // two facets of the polygon which are adjecent to the given vertex ...
+        // these two facets are seiten[j] and seiten[j+1]
+        for (n=j;n<=j+1;n++)
+        {
+          // check for each lattice point in the facet of the polygon ...
+          for (l=1;l<=size(seiten[n]);l++)
+          {
+            // ... and for each lattice point in the triangle ...
+            for (m=1;m<=size(triang[k]);m++)
+            {
+              // ... if they coincide and are not the vertex itself ...
+              if ((seiten[n][l][2]==triang[k][m]) and (seiten[n][l][2]!=polygon[1][j][2]))
+              {
+                // if so, then compute the vector pointing from this lattice point to the vertex
+                v=polygon[1][j][1]-seiten[n][l][1];
+                // and the lattice length of this vector has to be subtracted from etaij
+                etaij=etaij-abs(gcd(v[1],v[2]));
+              }
+            }
+          }
+        }
+      }
+    }
+    // store etaij in the list
+    ETA[polygon[1][j][2]]=etaij;
+  }
+  // 5) compute the eta_ij for all lattice points on the facets of the polygon which are not vertices,
+  //    these are the lattice points in polygon[2][1] to polygon[2][size(polygon[1])]
+  for (i=1;i<=size(polygon[2]);i++)
+  {
+    for (j=1;j<=size(polygon[2][i]);j++)
+    {      
+      // initialise etaij
+      etaij=0;
+      // initialise seitenlaenge
+      seitenlaenge=0;
+      // check for each triangle in the triangulation ...
+      for (k=1;k<=size(triang);k++)
+      {
+        // ... if the vertex is actually a vertex of the triangle ...
+        if ((polygon[2][i][j][2]==triang[k][1]) or (polygon[2][i][j][2]==triang[k][2]) or (polygon[2][i][j][2]==triang[k][3]))
+        {
+          // ... if so, add the area of the triangle to etaij 
+          etaij=etaij+triangarea[k];
+          // then check if that triangle has a facet which is contained in the 
+          // facet of the polygon which contains the lattice point in question,
+          // this is the facet seiten[i+1];
+          // check for each lattice point in the facet of the polygon ...
+          for (l=1;l<=size(seiten[i+1]);l++)
+          {
+            // ... and for each lattice point in the triangle ...
+            for (m=1;m<=size(triang[k]);m++)
+            {            
+              // ... if they coincide and are not the vertex itself ...
+              if ((seiten[i+1][l][2]==triang[k][m]) and (seiten[i+1][l][2]!=polygon[2][i][j][2]))
+              {
+                // if so, then compute the vector pointing from this lattice point to the vertex
+                v=polygon[2][i][j][1]-seiten[i+1][l][1];
+                // and the lattice length of this vector contributes to seitenlaenge
+                seitenlaenge=seitenlaenge+abs(gcd(v[1],v[2]));
+              }
+            }
+          }
+        }
+      }
+      // if the lattice point was a vertex of any triangle in the triangulation ...
+      if (etaij!=0)
+      {
+        // then eta_ij is the sum of the triangle areas minus seitenlaenge
+        ETA[polygon[2][i][j][2]]=etaij-seitenlaenge;
+      }
+      else
+      {
+        // otherwise it is just zero
+        ETA[polygon[2][i][j][2]]=0;
+      }
+    }
+  }
+  // 4) compute the eta_ij for all inner lattice points of the polygon
+  for (j=1;j<=size(polygon[3]);j++)
+  {
+    // initialise etaij
+    etaij=0;
+    // check for each triangle in the triangulation ...
+    for (k=1;k<=size(triang);k++)
+    {
+      // ... if the vertex is actually a vertex of the triangle ...
+      if ((polygon[3][j][2]==triang[k][1]) or (polygon[3][j][2]==triang[k][2]) or (polygon[3][j][2]==triang[k][3]))
+      {
+        // ... if so, add the area of the triangle to etaij 
+        etaij=etaij+triangarea[k];
+      }
+    }
+    // store etaij in ETA
+    ETA[polygon[3][j][2]]=etaij;
+  }
+  return(ETA);
+}
+example
+{
+   "EXAMPLE:";
+   echo=2;
+   // the lattice polygon spanned by the points (0,0), (3,0) and (0,3) 
+   // with all integer points as markings
+   list polygon=intvec(1,1),intvec(3,0),intvec(2,0),intvec(1,0),intvec(0,0),intvec(2,1),intvec(0,1),intvec(1,2),intvec(0,2),intvec(0,3);
+   // split the polygon in its vertices, its facets and its interior points
+   list sp=splitPolygon(polygon);
+   // define a triangulation by connecting the only interior point with the vertices
+   list triang=intvec(1,2,5),intvec(1,5,10),intvec(1,5,10);
+   // compute the eta-vector of this triangulation
+   eta(triang,sp);
+}
+ 
+proc findOrientedBoundary (list polygon)
+"USAGE:      findOrientedBoundary(polygon); polygon list
+ASSUME:      polygon is a list of integer vectors defining integer lattice points in the plane
+RETURN:      list, l[1] = list of integer vectors such that the polygonal path defined by
+                          these is the boundary of the convex hull of the lattice points in polygon
+                   l[2] = list, the redundant points in l[1] have been removed
+EXAMPLE:     example findOrientedBoundary;   shows an example"
+{
+  // Order the vertices such that passing from one to the next we travel along
+  // the boundary of the convex hull of the vertices clock wise
+  int d,k,i,j;
+  intmat D[2][2];
+  /////////////////////////////////////
+  // Treat first the pathological cases that the polygon is not two-dimensional:
+  /////////////////////////////////////
+  // if the polygon is empty or only one point or a line segment of two points
+  if (size(polygon)<=2)
+  {
+    return(list(polygon,polygon));
+  }
+  // check is the polygon is only a line segment given by more than two points;
+  // for this first compute sum of the absolute values of the determinants of the matrices whose
+  // rows are the vectors pointing from the first to the second point and from the
+  // the first point to the ith point for i=3,...,size(polygon); if this sum is zero
+  // then the polygon is a line segment and we have to find its end points
+  d=0;
+  for (i=3;i<=size(polygon);i++)
+  {
+    D=polygon[2]-polygon[1],polygon[i]-polygon[1];
+    d=d+abs(det(D));
+  }
+  if (d==0) // then polygon is a line segment
+  {
+    intmat laenge[size(polygon)][size(polygon)];
+    intvec mp;
+    //   for this collect first all vectors pointing from one lattice point to the next,
+    //   compute their pairwise angles and their lengths
+    for (i=1;i<=size(polygon)-1;i++)
+    {      
+      for (j=i+1;j<=size(polygon);j++)
+      {
+        mp=polygon[i]-polygon[j];
+        laenge[i,j]=abs(gcd(mp[1],mp[2]));
+      }
+    }
+    mp=maxPosInIntmat(laenge);
+    list endpoints=polygon[mp[1]],polygon[mp[2]];
+    intvec abstand;
+    for (i=1;i<=size(polygon);i++)
+    {
+      abstand[i]=0;
+      if (i<mp[1])
+      {
+        abstand[i]=laenge[i,mp[1]];
+      }
+      if (i>mp[1])
+      {
+        abstand[i]=laenge[mp[1],i];
+      }
+    }
+    polygon=sortlistbyintvec(polygon,abstand);
+    return(list(polygon,endpoints));
+  }  
+  ///////////////////////////////////////////////////////////////
+  list orderedvertices;  // stores the vertices in an ordered way
+  list minimisedorderedvertices;  // stores the vertices in an ordered way; redundant ones removed
+  list comparevertices; // stores vertices which should be compared to the testvertex
+  orderedvertices[1]=polygon[1]; // set the starting vertex
+  minimisedorderedvertices[1]=polygon[1]; // set the starting vertex
+  intvec testvertex=polygon[1];  // the vertex to which the others have to be compared
+  intvec startvertex=polygon[1]; // keep the starting vertex to test, when the end is reached
+  int endtest;                    // is set to one, when the end is reached
+  int startvertexfound;// is 1, once for some testvertex a candidate for the next vertex has been found 
+  polygon=delete(polygon,1);    // delete the testvertex
+  intvec v,w;
+  int l=1;  // counts the vertices
+  // the basic idea is that a vertex can be the next one on the boundary if all other vertices
+  // ly to the right of the vector v pointing from the testvertex to this one; this can be tested
+  // by checking if the determinant of the 2x2-matrix with first column v and second column the vector w,
+  // pointing from the testvertex to the new vertex, is non-positive; if this is the case for all
+  // new vertices, then the one in consideration is a possible choice for the next vertex on the boundary
+  // and it is stored in naechste; we can then order the candidates according to their distance from
+  // the testvertex; then they occur on the boundary in that order!
+  while (endtest==0)
+  {
+    list naechste;  // stores the possible choices for the next vertex
+    k=1;
+    for (i=1;i<=size(polygon);i++)
+    {
+      d=0;  // stores the value of the determinant of (v,w)
+      v=polygon[i]-testvertex; // points from the testvertex to the ith vertex
+      comparevertices=delete(polygon,i); // we needn't compare v to itself
+      // we should compare v to the startvertex-testvertex; in the first calling of the loop
+      // this is irrelevant since the difference will be zero; however, later on it will
+      // be vital, since we delete the vertices which we have already tested from the list
+      // of all vertices, and when all vertices on the boundary have been found we would
+      // therefore find a vertex in the interior as candidate; but always testing against
+      // the starting vertex, this can not happen
+      comparevertices[size(comparevertices)+1]=startvertex; 
+      for (j=1;(j<=size(comparevertices)) and (d<=0);j++)
+      {
+        w=comparevertices[j]-testvertex; // points form the testvertex to the jth vertex
+        D=v,w;
+        d=det(D);
+      }
+      if (d<=0) // if all determinants are non-positive, then the ith vertex is a candidate
+      {
+        naechste[k]=list(polygon[i],i,scalarproduct(v,v)); // we store the vertex, its position, and its
+        k++;                                                // distance from the testvertex
+      }
+    }
+    if (size(naechste)>0) // then a candidate for the next vertex has been found
+    {      
+      startvertexfound=1; // at least once a candidate has been found
+      naechste=sortlist(naechste,3);  //we order the candidates according to their distance from testvertex;
+      for (j=1;j<=size(naechste);j++) // then we store them in this order in orderedvertices
+      {
+        l++;
+        orderedvertices[l]=naechste[j][1];
+      }
+      testvertex=naechste[size(naechste)][1];  // we store the last one as next testvertex;
+      minimisedorderedvertices[size(minimisedorderedvertices)+1]=testvertex; // store the next corner of NSD
+      naechste=sortlist(naechste,2);           // then we reorder the vertices according to their position
+      for (j=size(naechste);j>=1;j--)          // and we delete them from the vertices
+      {
+        polygon=delete(polygon,naechste[j][2]);
+      }
+    }
+    else // that means either that the vertex was inside the polygon, 
+    {    // or that we have reached the last vertex on the boundary of the polytope
+      if (startvertexfound==0) // the vertex was in the interior; we delete it and start all over again
+      {        
+        orderedvertices[1]=polygon[1]; 
+        minimisedorderedvertices[1]=polygon[1]; 
+        testvertex=polygon[1];
+        startvertex=polygon[1];
+        polygon=delete(polygon,1);
+      }
+      else // we have reached the last vertex on the boundary of the polytope and can stop
+      {
+        endtest=1;
+      }
+    }
+    kill naechste;
+  }
+  // test if the first vertex in minimisedorderedvertices is on the same line with the second and
+  // the last, i.e. if we started our search in the middle of a face; if so, delete it
+  v=minimisedorderedvertices[2]-minimisedorderedvertices[1];
+  w=minimisedorderedvertices[size(minimisedorderedvertices)]-minimisedorderedvertices[1];
+  D=v,w;
+  if (det(D)==0)
+  {
+    minimisedorderedvertices=delete(minimisedorderedvertices,1);
+  }
+  // test if the first vertex in minimisedorderedvertices is on the same line with the two
+  // last ones, i.e. if we started our search at the end of a face; if so, delete it
+  v=minimisedorderedvertices[size(minimisedorderedvertices)-1]-minimisedorderedvertices[1];
+  w=minimisedorderedvertices[size(minimisedorderedvertices)]-minimisedorderedvertices[1];
+  D=v,w;
+  if (det(D)==0)
+  {
+    minimisedorderedvertices=delete(minimisedorderedvertices,size(minimisedorderedvertices));
+  }
+  return(list(orderedvertices,minimisedorderedvertices));
+}
+example
+{
+   "EXAMPLE:";
+   echo=2;
+// the following lattice points in the plane define a polygon
+   list polygon=intvec(0,0),intvec(3,1),intvec(1,0),intvec(2,0),intvec(1,1),intvec(3,2),intvec(1,2),intvec(2,3),intvec(2,4);
+// we compute its boundary
+   list boundarypolygon=findOrientedBoundary(polygon);
+// the points on the boundary ordered clockwise are boundarypolygon[1]
+   boundarypolygon[1];
+// the vertices of the boundary are boundarypolygon[2]
+   boundarypolygon[2];
+}
+
+
+proc cyclePoints (list triang,list points,int pt)
+"USAGE:      cyclePoints(triang,points,pt)  triang,points list, pt int
+ASSUME:      points is a list of integer vectors describing the lattice points of a marked polygon;
+             triang is a list of integer vectors describing a triangulation of the marked polygon
+             in the sense that an integer vector of the form (i,j,k) describes the triangle formed
+             by polygon[i], polygon[j] and polygon[k];
+             pt is an integer between 1 and size(points), singling out a lattice point among
+             the marked points
+PURPOSE:     consider the convex lattice polygon, say P, spanned by all lattice points in points which
+             in the triangulation triang are connected to the point points[pt]; the procedure
+             computes all marked points in points which ly on the boundary of that polygon, ordered
+             clockwise
+RETURN:      list, of integer vectors which are the coordinates of the lattice points on 
+                   the boundary of the above mentioned polygon P, if this polygon is not the
+                   empty set (that would be the case if points[pt] is not a vertex of any  
+                   triangle in the triangulation); otherwise return the empty list
+EXAMPLE:     example cyclePoints;   shows an example"
+{
+  int i,j; // indices
+  list v;  // saves the indices of lattice points connected to the interior point in the triangulation
+  // save all points in triangulations containing pt in v
+  for (i=1;i<=size(triang);i++)
+  {
+    if ((triang[i][1]==pt) or (triang[i][2]==pt) or (triang[i][3]==pt))
+    {
+      j++;
+      v[3*j-2]=triang[i][1];
+      v[3*j-1]=triang[i][2];
+      v[3*j]=triang[i][3];
+    }
+  }
+  if (size(v)==0)
+  {
+    return(list());
+  }
+  // remove pt itself and redundancies in v
+  for (i=size(v);i>=1;i--)
+  {
+    j=1;
+    while ((j<i) and (v[i]!=v[j]))
+    {
+      j++;
+    }
+    if ((j<i) or (v[i]==pt))
+    {
+      v=delete(v,i);
+    }
+  }
+  // save in pts the coordinates of the points with indices in v
+  list pts;
+  for (i=1;i<=size(v);i++)
+  {
+    pts[i]=points[v[i]];
+  }
+  // consider the convex polytope spanned by the points in pts, find the points on the
+  // boundary and order them clockwise
+  return(findOrientedBoundary(pts)[1]);
+}
+example
+{
+   "EXAMPLE:";
+   echo=2;
+   // the lattice polygon spanned by the points (0,0), (3,0) and (0,3) 
+   // with all integer points as markings
+   list points=intvec(1,1),intvec(3,0),intvec(2,0),intvec(1,0),intvec(0,0),intvec(2,1),intvec(0,1),intvec(1,2),intvec(0,2),intvec(0,3);
+   // define a triangulation 
+   list triang=intvec(1,2,5),intvec(1,5,7),intvec(1,7,9),intvec(8,9,10),intvec(1,8,9),intvec(1,2,8);
+   // compute the points connected to (1,1) in triang
+   cyclePoints(triang,points,1);
+}
+
+proc latticeArea (list polygon)
+"USAGE:  latticeArea(polygon);   polygon list
+ASSUME:  polygon is a list of integer vectors in the plane
+RETURN:  int, the lattice area of the convex hull of the lattice points in polygon,
+              i.e. twice the Euclidean area
+EXAMPLE: example polygonlatticeArea;   shows an example"
+{
+  list pg=findOrientedBoundary(polygon)[2];
+  int area;
+  intmat M[2][2];
+  for (int i=2;i<=size(pg)-1;i++)
+  {
+    M[1,1..2]=pg[i]-pg[1];
+    M[2,1..2]=pg[i+1]-pg[1];
+    area=area+abs(det(M));
+  }
+  return(area);
+}
+example
+{
+   "EXAMPLE:";
+   echo=2;
+   // define a polygon with lattice area 5
+   list polygon=intvec(1,2),intvec(1,0),intvec(2,0),intvec(1,1),intvec(2,1),intvec(0,0);
+   latticeArea(polygon);
+}
+
+proc picksFormula (list polygon)
+"USAGE:  picksFormula(polygon);   polygon list
+ASSUME:  polygon is a list of integer vectors in the plane and consider their convex hull C 
+RETURN:  list, L of three integersthe 
+               L[1] : the lattice area of C, i.e. twice the Euclidean area
+               L[2] : the number of lattice points on the boundary of C
+               L[3] : the number of interior lattice points of C
+NOTE:    the integers in L are related by Pick's formula, namely: L[1]=L[2]+2*L[3]-2
+EXAMPLE: example picksFormula;   shows an example"
+{
+  list pg=findOrientedBoundary(polygon)[2];
+  int area,bdpts,i;
+  intmat M[2][2];
+  // compute the lattice area of the polygon, i.e. twice the Euclidean area
+  for (i=2;i<=size(pg)-1;i++)
+  {
+    M[1,1..2]=pg[i]-pg[1];
+    M[2,1..2]=pg[i+1]-pg[1];
+    area=area+abs(det(M));
+  }
+  // compute the number of lattice points on the boundary
+  intvec edge;
+  pg[size(pg)+1]=pg[1];
+  for (i=1;i<=size(pg)-1;i++)
+  {
+    edge=pg[i]-pg[i+1];
+    bdpts=bdpts+abs(gcd(edge[1],edge[2]));
+  }
+  // Pick's formula says that the lattice area A, the number g of interior points and
+  // the number b of boundary points are connected by the formula: A=b+2g-2
+  return(list(area,bdpts,(area-bdpts+2)/2));
+}
+example
+{
+   "EXAMPLE:";
+   echo=2;
+   // define a polygon with lattice area 5
+   list polygon=intvec(1,2),intvec(1,0),intvec(2,0),intvec(1,1),intvec(2,1),intvec(0,0);
+   list pick=picksFormula(polygon);
+   // the lattice area of the polygon is:
+   pick[1];
+   // the number of lattice points on the boundary is:
+   pick[2];
+   // the number of interior lattice points is:
+   pick[3];
+   // the number's are related by Pick's formula:
+   pick[1]-pick[2]-2*pick[3]+2;
+}
+
+proc ellipticNF (list polygon)
+"USAGE:  ellipticNF(polygon);   polygon list
+ASSUME:  polygon is a list of integer vectors in the plane such that their convex hull C 
+         has precisely one interior lattice point; i.e. C is the Newton polygon of an
+         elliptic curve
+PURPOSE: compute the normal form of the polygon with respect to the unimodular affine
+         transformations T=A*x+v; there are sixteen different normal forms 
+         (see e.g. Bjorn Poonen, Fernando Rodriguez-Villegas: Lattice Polygons and
+                   the number 12.  Amer. Math. Monthly  107  (2000),  no. 3, 238--250.)
+RETURN:  list, L such that
+               L[1] : list whose entries are the vertices of the normal form of the polygon
+               L[2] : the matrix A of the unimodular transformation
+               L[3] : the translation vector v of the unimodular transformation
+               L[4] : list such that the ith entry is the image of polygon[i] under the
+                      unimodular transformation T
+EXAMPLE: example ellipticNF;   shows an example"
+{
+  int i;            // index
+  intvec edge;      // stores the vector of an edge
+  intvec boundary;  // stores the lattice lengths of the edges of the Newton cylce
+  // find the vertices of the Newton cycle and order it clockwise
+  list pg=findOrientedBoundary(polygon)[2];
+  // check if there is precisely one interior point in the Newton polygon
+  if (picksFormula(pg)[3]!=1)
+  {
+    ERROR("The polygon has not precisely one interior point!");
+  }
+  // insert the first vertex at the end once again
+  pg[size(pg)+1]=pg[1];
+  // compute the number of lattice points on each edge
+  for (i=1;i<=size(pg)-1;i++)
+  {
+    edge=pg[i]-pg[i+1];
+    boundary[i]=1+abs(gcd(edge[1],edge[2]));
+  }
+  // store the values of boundary once more adding the first two at the end
+  intvec tboundary=boundary,boundary[1],boundary[2];
+  // sort boundary in an asecending way
+  intvec sbd=sortintvec(boundary);
+  // find the first edge having the maximal number of lattice points
+  int max=maxPosInIntvec(boundary);
+  // some computations have to be done over the rationals
+  ring transformationring=0,x,lp;
+  intvec trans;    // stores the vector by which we have to translate the polygon
+  intmat A[2][2];  // stores the matrix by which we have to transform the polygon
+  matrix M[3][3];  // stores the projective coordinates of the points which are to be transformed
+  matrix N[3][3];  // stores the projective coordinates of the points to which M is to be transformed
+  intmat T[3][3];  // stores the unimodular affine transformation in projective form
+  // add the second point of pg once again at the end
+  pg=insert(pg,pg[2],size(pg));
+  // if there is only one edge which has the maximal number of lattice points, then M should be:
+  M=pg[max],1,pg[max+1],1,pg[max+2],1;
+  // consider the 16 different cases which can occur:
+  // Case 1:
+  if (sbd==intvec(2,2,2))
+  {
+    N=0,1,1,1,2,1,2,0,1;
+  }
+  // Case 2:
+  if (sbd==intvec(2,2,3))
+  {
+    N=2,0,1,0,0,1,1,2,1;
+  }
+  // Case 3:
+  if (sbd==intvec(2,3,4))
+  {
+    // here the orientation of the Newton polygon is important !
+    if (tboundary[max+1]==3)
+    {
+      N=3,0,1,0,0,1,0,2,1;
+    }
+    else
+    {
+      N=0,0,1,3,0,1,0,2,1;
+    }
+  }
+  // Case 4:
+  if (sbd==intvec(3,3,5))
+  {
+    N=4,0,1,0,0,1,0,2,1;
+  }
+  // Case 5:
+  if (sbd==intvec(4,4,4))
+  {
+    N=3,0,1,0,0,1,0,3,1;
+  }
+  // Case 6+7:
+  if (sbd==intvec(2,2,2,2))
+  {
+    // there are two different polygons which has four edges all of length 2,
+    // but only one of them has two edges whose direction vectors form a matrix
+    // of determinant 3
+    A=pg[1]-pg[2],pg[3]-pg[2];
+    while ((max<4) and (det(A)!=3))
+    {
+      max++;
+      A=pg[max]-pg[max+1],pg[max+2]-pg[max+1];
+    }
+    // Case 6:
+    if (det(A)==3)
+    {
+      M=pg[max],1,pg[max+1],1,pg[max+2],1;
+      N=1,0,1,0,2,1,2,1,1;
+    }
+    // Case 7:
+    else
+    {
+      N=2,1,1,1,0,1,0,1,1;
+    }
+  }
+  // Case 8:
+  if (sbd==intvec(2,2,2,3))
+  {
+    // the orientation of the polygon is important
+    A=pg[max]-pg[max+1],pg[max+2]-pg[max+1];
+    if (det(A)==2)
+    {
+      N=2,0,1,0,0,1,0,1,1;
+    }
+    else
+    {
+      N=0,0,1,2,0,1,1,2,1;
+    }
+  }
+  // Case 9:
+  if (sbd==intvec(2,2,3,3))
+  {
+    // if max==1, then the 5th entry in tboundary is the same as the first
+    if (max==1)
+    {
+      max=5;
+    }
+    // if boundary=3,2,2,3 then set max=4
+    if (tboundary[max+1]!=3)
+    {
+      max=4;
+    }
+    M=pg[max],1,pg[max+1],1,pg[max+2],1;
+    // the orientation of the polygon matters
+    A=pg[max-1]-pg[max],pg[max+1]-pg[max];    
+    if (det(A)==4)
+    {
+      N=2,0,1,0,0,1,0,2,1;
+    }
+    else
+    {
+      N=0,2,1,0,0,1,2,0,1;
+    }
+  }
+  // Case 10:
+  if (sbd==intvec(2,2,3,4))
+  {
+    // the orientation of the polygon matters
+    if (tboundary[max+1]==3)
+    {
+      N=3,0,1,0,0,1,0,2,1;
+    }
+    else
+    {
+      N=0,0,1,3,0,1,2,1,1;
+    }
+  }
+  // Case 11:
+  if (sbd==intvec(2,3,3,4))
+  {
+    N=3,0,1,0,0,1,0,2,1;
+  }
+  // Case 12:
+  if (sbd==intvec(3,3,3,3))
+  {
+    N=2,0,1,0,0,1,0,2,1;
+  }
+  // Case 13:
+  if (sbd==intvec(2,2,2,2,2))
+  {
+    // compute the angles of the polygon vertices
+    intvec dt;
+    for (i=1;i<=5;i++)
+    {
+      A=pg[i]-pg[i+1],pg[i+2]-pg[i+1];
+      dt[i]=det(A);
+    }
+    dt[6]=dt[1];
+    // find the vertex to be mapped to (0,1)
+    max=1;
+    while ((dt[max]!=2) or (dt[max+1]!=2))
+    {
+      max++;
+    }    
+    M=pg[max],1,pg[max+1],1,pg[max+2],1;
+    N=0,1,1,1,2,1,2,1,1;
+  }
+  // Case 14:
+  if (sbd==intvec(2,2,2,2,3))
+  {
+    N=2,0,1,0,0,1,0,1,1;
+  }
+  // Case 15:
+  if (sbd==intvec(2,2,2,3,3))
+  {
+    // find the vertix to be mapped to (2,0)
+    if (tboundary[max+1]!=3)
+    {
+      max=5;
+      M=pg[max],1,pg[max+1],1,pg[max+2],1;
+    }
+    N=2,0,1,0,0,1,0,2,1;
+  }
+  // Case 16:
+  if (sbd==intvec(2,2,2,2,2,2))
+  {
+    N=2,0,1,1,0,1,0,1,1;
+  }
+  // we have to transpose the matrices M and N
+  M=transpose(M);
+  N=transpose(N);
+  // compute the unimodular affine transformation, which is of the form
+  // A11 A12 | T1
+  // A21 A22 | T2
+  //  0   0  | 1
+  T=matrixtointmat(N*inverse(M));
+  // the upper-left 2x2-block is A
+  A=T[1..2,1..2];
+  // the upper-right 2x1-block is the translation vector
+  trans=T[1,3],T[2,3];
+  // transform now the lattice points of the polygon with respect to A and T
+  list nf;
+  for (i=1;i<=size(polygon);i++)
+  {
+    intmat V[2][1]=polygon[i];
+    V=A*V;
+    nf[i]=intvec(V[1,1]+trans[1],V[2,1]+trans[2]);
+    kill V;
+  }
+  return(list(findOrientedBoundary(nf)[2],A,trans,nf));
+}
+example
+{
+   "EXAMPLE:";
+   echo=2;
+   ring r=0,(x,y),dp;
+   // the Newton polygon of the following polynomial has precisely one interior point
+   poly f=x22y11+x19y10+x17y9+x16y9+x12y7+x9y6+x7y5+x2y3;
+   list polygon=newtonPolytopeLP(f);
+   // its lattice points are
+   polygon;
+   // find its normal form
+   list nf=ellipticNF(polygon);
+   // the vertices of the normal form are
+   nf[1];
+   // it has been transformed by the unimodular affine transformation A*x+v 
+   // with matrix A
+   nf[2];
+   // and translation vector v
+   nf[3];
+   // the 3rd lattice point ...
+   polygon[3];
+   // ... has been transformed to
+   nf[4][3];
+}
+
+
+proc ellipticNFDB (int n,list #)
+"USAGE:  ellipticNFDB(n[,#]);   n int, # list
+ASSUME:  n is an intger between 1 and 16
+PURPOSE: this is a database storing the 16 normal forms of planar polygons with 
+         precisely one interior point up to unimodular affine transformations
+         (see e.g. Bjorn Poonen, Fernando Rodriguez-Villegas: Lattice Polygons and
+                   the number 12.  Amer. Math. Monthly  107  (2000),  no. 3, 238--250.)
+RETURN:  list, L such that
+               L[1] : list whose entries are the vertices of the nth normal form 
+               L[2] : list whose entries are all the lattice points of the nth normal form 
+               L[3] : only present if the optional parameter # is present, and then
+                      it is a polynomial in the variables (x,y) whose Newton polygon 
+                      is the nth normal form
+NOTE:    the optional parameter is only allowed if the basering has the variables x and y
+EXAMPLE: example ellipticNFDB;   shows an example"
+{
+  if ((n<1) or (n>16))
+  {
+    ERROR("n is not between 1 and 16.");
+  }
+  if (size(#)>0)
+  {
+    if ((defined(x)==0) or (defined(y)==0))
+    {
+      ERROR("The variables x and y are not defined.");
+    }
+  }
+  if ((defined(x)==0) or (defined(y)==0))
+  {
+    ring nfring=0,(x,y),dp;
+  }
+  // store the normal forms as polynomials
+  list nf=x2+y+xy2,x2+x+1+xy2,x3+x2+x+1+y2+y,x4+x3+x2+x+1+y2+y+x2y,x3+x2+x+1+x2y+y+xy2+y2+y3,
+    x2+x+x2y+y2,x2y+x+y+xy2,x2+x+1+y+xy2,x2+x+1+y+xy2+y2,x3+x2+x+1+x2y+y+y2,x3+x2+x+1+x2y+y+xy2+y2,
+    x2+x+1+x2y+y+x2y2+xy2+y2,x+1+x2y+y+xy2,x2+x+1+x2y+y+xy2,x2+x+1+x2y+y+xy2+y2,x2+x+x2y+y+xy2+y2;
+  list pg=newtonPolytopeLP(nf[n]);
+  if (size(#)==0)
+  {
+    return(list(findOrientedBoundary(pg)[2],pg));
+  }
+  else
+  {
+    return(list(findOrientedBoundary(pg)[2],pg,nf[n]));
+  }
+}
+example
+{
+   "EXAMPLE:";
+   echo=2;
+   list nf=ellipticNFDB(5);
+   // the vertices of the 5th normal form are
+   nf[1];
+   // its lattice points are
+   nf[2];
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+/// AUXILARY PROCEDURES, WHICH ARE DECLARED STATIC
+/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+/// - scalarproduct
+/// - intmatcoldelete
+/// - intmatconcat
+/// - sortlist
+/// - minInList
+/// - stringdelete
+/// - abs
+/// - commondenominator
+/// - maxPosInIntvec
+/// - maxPosInIntmat
+/// - sortintvec
+/// - matrixtointmat
+/////////////////////////////////////////////////////////////////////////////////
+
+static proc scalarproduct (intvec w,intvec v)
+"USAGE:      scalarproduct(w,v); w,v intvec
+ASSUME:      w and v are integer vectors of the same length 
+RETURN:      int, the scalarproduct of v and w
+NOTE:        the procedure is called by findOrientedBoundary"
+{
+  int sp;
+  for (int i=1;i<=size(w);i++)
+  {
+    sp=sp+v[i]*w[i];
+  }
+  return(sp);
+}
+
+static proc intmatcoldelete (intmat w,int i)
+"USAGE:      intmatcoldelete(w,i); w intmat, i int
+RETURN:      intmat, the integer matrix w with the ith comlumn deleted
+NOTE:        the procedure is called by intmatsort and normalFan"
+{
+  if ((i<1) or (i>ncols(w)) or (ncols(w)==1))
+  {
+    return(w);
+  }
+  if (i==1)
+  {
+    intmat M[nrows(w)][ncols(w)-1]=w[1..nrows(w),2..ncols(w)];
+    return(M);
+  }
+  if (i==ncols(w))
+  {
+    intmat M[nrows(w)][ncols(w)-1]=w[1..nrows(w),1..ncols(w)-1];
+    return(M);
+  }
+  else
+  {
+    intmat M[nrows(w)][i-1]=w[1..nrows(w),1..i-1];
+    intmat N[nrows(w)][ncols(w)-i]=w[1..nrows(w),i+1..ncols(w)];
+    return(intmatconcat(M,N));
+  }
+}
+
+static proc intmatconcat (intmat M,intmat N)
+"USAGE:      intmatconcat(M,N); M,N intmat
+RETURN:      intmat, M and N concatenated
+NOTE:        the procedure is called by intmatcoldelete and sortintmat"
+{
+  if (nrows(M)>=nrows(N))
+  {
+    int m=nrows(M);
+    
+  }
+  else
+  {
+    int m=nrows(N);
+  }
+  intmat P[m][ncols(M)+ncols(N)];
+  P[1..nrows(M),1..ncols(M)]=M[1..nrows(M),1..ncols(M)];
+  P[1..nrows(N),ncols(M)+1..ncols(M)+ncols(N)]=N[1..nrows(N),1..ncols(N)];
+  return(P);
+}
+
+static proc sortlist (list v,int pos)
+"USAGE:      sortlist(v,pos); v list, pos int
+RETURN:      list, the list L ordered in an ascending way according to the pos-th entries
+NOTE:        called by tropicalCurve"
+{
+  if(size(v)==1)
+  {
+    return(v);
+  }
+  list w=minInList(v,pos);
+  v=delete(v,w[2]);
+  v=sortlist(v,pos);
+  v=list(w[1])+v;
+  return(v);
+}
+
+static proc minInList (list v,int pos)
+"USAGE:      minInList(v,pos); v list, pos int
+RETURN:      list, (v[i],i) such that v[i][pos] is minimal
+NOTE:        called by sortlist"
+{
+  int min=v[1][pos];
+  int minpos=1;
+  for (int i=2;i<=size(v);i++)
+  {
+    if (v[i][pos]<min)
+    {
+      min=v[i][pos];
+      minpos=i;
+    }
+  }
+  return(list(v[minpos],minpos));
+}
+
+static proc stringdelete (string w,int i)
+"USAGE:      stringdelete(w,i); w string, i int
+RETURN:      string, the string w with the ith component deleted
+NOTE:        the procedure is called by texnumber and choosegfanvector"
+{
+  if ((i>size(w)) or (i<=0))
+  {
+    return(w);
+  }
+  if ((size(w)==1) and (i==1))
+  {
+    return("");
+    
+  }
+  if (i==1)
+  {
+    return(w[2..size(w)]);
+  }
+  if (i==size(w))
+  {
+    return(w[1..size(w)-1]);
+  }
+  else
+  {
+    string erg=w[1..i-1],w[i+1..size(w)];
+    return(erg);
+  }
+}
+
+static proc abs (def n)
+"USAGE:      abs(n); n poly or int
+RETURN:      poly or int, the absolute value of n"
+{
+  if (n>=0)
+  {
+    return(n);
+  }
+  else
+  {
+    return(-n);
+  }
+}
+
+static proc commondenominator (matrix M)
+"USAGE:   commondenominator(M);  M matrix
+ASSUME:   the base ring has characteristic zero
+RETURN:   int, the lowest common multiple of the denominators of the leading coefficients
+               of the entries in M
+NOTE:        the procedure is called from polymakeToIntmat"
+{
+  int i,j;
+  int kgV=1;
+  // successively build the lowest common multiple of the denominators of the leading coefficients
+  // of the entries in M
+  for (i=1;i<=nrows(M);i++)
+  {
+    for (j=1;j<=ncols(M);j++)
+    {
+      kgV=lcm(kgV,int(denominator(leadcoef(M[i,j]))));
+    }
+  }
+  return(kgV);
+}
+
+static proc maxPosInIntvec (intvec v)
+"USAGE:      maxPosInIntvec(v); v intvec
+RETURN:      int, the first position of a maximal entry in v
+NOTE:        called by sortintmat"
+{
+  int max=v[1];
+  int maxpos=1;
+  for (int i=2;i<=size(v);i++)
+  {
+    if (v[i]>max)
+    {
+      max=v[i];
+      maxpos=i;
+    }
+  }
+  return(maxpos);
+}
+
+static proc maxPosInIntmat (intmat v)
+"USAGE:      maxPosInIntmat(v); v intmat
+ASSUME:      v has a unique maximal entry
+RETURN:      intvec, the position (i,j) of the maximal entry in v
+NOTE:        called by findOrientedBoundary"
+{
+  int max=v[1,1];
+  intvec maxpos=1,1;
+  int i,j;
+  for (i=1;i<=nrows(v);i++)
+  {
+    for (j=1;j<=ncols(v);j++)
+    {
+      if (v[i,j]>max)
+      {
+        max=v[i,j];
+        maxpos=i,j;
+      }
+    }
+  }
+  return(maxpos);
+}
+
+static proc sortintvec (intvec w)
+"USAGE:      sortintvec(v); v intvec
+RETURN:      intvec, the entries of v are ordered in an ascending way
+NOTE:        called from ellipticNF"
+{
+  int j,k,stop;
+  intvec v=w[1];
+  for (j=2;j<=size(w);j++)
+  {
+    k=1;
+    stop=0;
+    while ((k<=size(v)) and (stop==0))
+    {
+      if (v[k]<w[j])
+      {
+        k++;
+      }
+      else 
+      {
+        stop=1;
+      }
+    }
+    if (k==size(v)+1)
+    {
+      v=v,w[j];
+    }
+    else
+    {
+      if (k==1)
+      {
+        v=w[j],v;
+      }
+      else
+      {
+        v=v[1..k-1],w[j],v[k..size(v)];
+      }
+    }
+  }
+  return(v);
+}
+
+static proc sortlistbyintvec (list L,intvec w)
+"USAGE:      sortlistbyintvec(L,w); L list, w intvec
+RETURN:      list, the entries of L are ordered such that the corresponding reordering of
+                   w would order w in an ascending way
+NOTE:        called from ellipticNF"
+{
+  int j,k,stop;
+  intvec v=w[1];
+  list LL=L[1];
+  for (j=2;j<=size(w);j++)
+  {
+    k=1;
+    stop=0;
+    while ((k<=size(v)) and (stop==0))
+    {
+      if (v[k]<w[j])
+      {
+        k++;
+      }
+      else 
+      {
+        stop=1;
+      }
+    }
+    if (k==size(v)+1)
+    {
+      v=v,w[j];
+      LL=insert(LL,L[j],size(LL));
+    }
+    else
+    {
+      if (k==1)
+      {
+        v=w[j],v;
+        LL=insert(LL,L[j]);
+      }
+      else
+      {
+        v=v[1..k-1],w[j],v[k..size(v)];
+        LL=insert(LL,L[j],k-1);
+      }
+    }
+  }
+  return(LL);
+}
+
+static proc matrixtointmat (matrix MM)
+"USAGE:      matrixtointmat(v); MM matrix
+ASSUME:      MM is a matrix with only integers as entries
+RETURN:      intmat, the matrix MM has been transformed to type intmat
+NOTE:        called from ellipticNF"
+{
+  intmat M[nrows(MM)][ncols(MM)]=M;
+  int i,j;
+  for (i=1;i<=nrows(M);i++)
+  {
+    for (j=1;j<=ncols(M);j++)
+    {
+      execute("M["+string(i)+","+string(j)+"]="+string(MM[i,j])+";");
+    }
+  }
+  return(M);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+static proc polygonToCoordinates (list points)
+"USAGE:      polygonToCoordinates(points);   points list
+ASSUME:      points is a list of integer vectors each of size two describing the 
+             marked points of a convex lattice polygon like the output of polygonDB
+RETURN:      list, the first entry is a string representing the coordinates corresponding 
+                   to the latticpoints seperated by commata
+                   the second entry is a list where the ith entry is a string representing
+                   the coordinate of corresponding to the ith lattice point
+                   the third entry is the latex format of the first entry
+NOTE:        the procedure is called by fan"
+{
+  string coord;
+  list coords;
+  string latex;
+  for (int i=1;i<=size(points);i++)
+  {
+    coords[i]="u"+string(points[i][1])+string(points[i][2]);
+    coord=coord+coords[i]+",";
+    latex=latex+"u_{"+string(points[i][1])+string(points[i][2])+"},";
+  }
+  coord=coord[1,size(coord)-1];
+  latex=latex[1,size(latex)-1];
+  return(list(coord,coords,latex));
+}
+
+
+/*
+proc ADeterminant (list polygon,list #)
+{
+  list triangs=triangulations(polygon);
+  list sppg=splitPolygon(polygon);
+  list etavectors;
+  int i,j;
+  int stop;
+  for (i=1;i<=size(triangs);i++)
+  {
+    etavectors[i]=eta(triangs[i],sppg);
+  }
+  size(etavectors);
+  
+  for (i=size(etavectors);i>=2;i--)
+  {
+    stop=0;
+    for (j=1;(j<i) and (stop==0);j++)
+    {
+      if (etavectors[i]==etavectors[j])
+      {
+        etavectors=delete(etavectors,i);
+        stop=1;
+      }
+    }
+  }
+  size(etavectors);
+  if (size(#)>0)
+  {
+    execute("ring ADring=(0,a(1.."+string(size(etavectors))+")),("+polygonToCoordinates(polygon)[1]+"),lp;");
+    list terme;
+    poly ad,term;
+    matrix XE[1][1];
+    for (i=1;i<=size(etavectors);i++)
+    {
+      term=1;
+      for (j=1;j<=nvars(basering);j++)
+      {
+        term=term*var(j)^etavectors[i][j];
+      }
+      terme[i]=term;
+      ad=ad+a(i)*term;
+    }
+    matrix M[size(etavectors)][nvars(basering)];
+    for (i=1;i<=size(etavectors);i++)
+    {
+    }
+    return(list(etavectors,string(ad)));
+    
+    
+  }
+  
+  return(etavectors);
+}
+
+proc adsub ()
+{
+  ring r=0,(x,y,u00,u10,u20,u01,u11,u02,a(1..5)),dp;
+  poly f1=(3x-y+1)*(2x+y+1);
+  poly f2=(7x+2y-1)*(x+y);
+  poly f3=(x-y-2)*(x+y+3);
+  poly f4=(17x-11y+3)*(x+7y-2);
+  poly f5=(x+2y-7)*(3x+3y-1);
+  poly f6=(2x+12y-17)*(33x-3y-1);
+  matrix M1=coeffs(f1,ideal(1,x,x2,y,xy,y2));
+  matrix M2=coeffs(f2,ideal(1,x,x2,y,xy,y2));
+  matrix M3=coeffs(f3,ideal(1,x,x2,y,xy,y2));
+  matrix M4=coeffs(f4,ideal(1,x,x2,y,xy,y2));
+  matrix M5=coeffs(f5,ideal(1,x,x2,y,xy,y2));
+  matrix M6=coeffs(f6,ideal(1,x,x2,y,xy,y2));
+  poly f=(a(5))*u00*u20*u02+(a(3))*u00*u11^2+(a(4))*u10^2*u02+(a(2))*u10*u01*u11+(a(1))*u20*u01^2;
+  poly g1=substitute(f,u00,M1[1,1],u10,M1[2,1],u20,M1[3,1],u01,M1[4,1],u11,M1[5,1],u02,M1[6,1]);
+  poly g2=substitute(f,u00,M2[1,1],u10,M2[2,1],u20,M2[3,1],u01,M2[4,1],u11,M2[5,1],u02,M2[6,1]);
+  poly g3=substitute(f,u00,M3[1,1],u10,M3[2,1],u20,M3[3,1],u01,M3[4,1],u11,M3[5,1],u02,M3[6,1]);
+  poly g4=substitute(f,u00,M4[1,1],u10,M4[2,1],u20,M4[3,1],u01,M4[4,1],u11,M4[5,1],u02,M4[6,1]);
+  poly g5=substitute(f,u00,M5[1,1],u10,M5[2,1],u20,M5[3,1],u01,M5[4,1],u11,M5[5,1],u02,M5[6,1]);
+  poly g6=substitute(f,u00,M6[1,1],u10,M6[2,1],u20,M6[3,1],u01,M6[4,1],u11,M6[5,1],u02,M6[6,1]);
+  ideal i=g1,g2,g3,g4,g5,g6;
+  option(redSB);
+  ideal j=std(i);
+  poly ff=substitute(f,a(5),4,a(4),-1,a(3),-1,a(2),1,a(1),-1);
+  return(string(ff));
+}
+
+*/ 
