@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.20 2008-07-15 07:24:10 wienand Exp $ */
+/* $Id: rmodulo2m.cc,v 1.21 2008-07-15 15:29:15 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -339,8 +339,9 @@ number nr2mDiv (number a,number b)
     }
     if ((NATNUMBER) b%2 == 0)
     {
-      WerrorS("div by zero divisor");
-      return (number)0;
+      WarnS("Division not possible, even by cancelling zero divisors.");
+      WarnS("Result is integer division without remainder.");
+      return (number) ((NATNUMBER) a / (NATNUMBER) b);
     }
   }
   return (number) nr2mMult(a, nr2mInversM(b));

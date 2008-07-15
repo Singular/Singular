@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.32 2008-07-15 07:29:18 wienand Exp $ */
+/* $Id: polys.cc,v 1.33 2008-07-15 15:29:15 wienand Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -877,11 +877,21 @@ static poly pSubst2 (poly p,int n, number e)
     qq->next = NULL;
     nPower(e, pGetExp(qq, n), &nn);
     nm = nMult(nn, pGetCoeff(qq));
-    pSetCoeff(qq, nm);
+#ifdef HAVE_RINGS
+    if (nIsZero(nm))
+    {
+      pLmFree(&qq);
+      nDelete(&nm);
+    }
+    else
+#endif
+    {
+      pSetCoeff(qq, nm);
+      pSetExp(qq, n, 0);
+      pSetm(qq);
+      result = pAdd(result,qq);
+    }
     nDelete(&nn);
-    pSetExp(qq, n, 0);
-    pSetm(qq);
-    result = pAdd(result,qq);
   }
   p = pAdd(result, zero);
   pTest(p);

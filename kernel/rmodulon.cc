@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.27 2008-07-15 07:24:10 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.28 2008-07-15 15:29:15 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -306,8 +306,8 @@ number nrnDiv (number a,number b)
     if (!nrnIsUnit((number) erg))
     {
       WarnS("Division not possible, even by cancelling zero divisors.");
-      WarnS("Result is zero.");
-      mpz_set_ui(erg, 0);
+      WarnS("Result is integer division without remainder.");
+      mpz_tdiv_q(erg, (int_number) a, (int_number) b);
       nrnDelete((number*) &gcd, NULL);
       return (number) erg;
     }
