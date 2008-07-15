@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.31 2008-07-07 13:22:39 wienand Exp $ */
+/* $Id: polys.cc,v 1.32 2008-07-15 07:29:18 wienand Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -175,6 +175,7 @@ poly pDivideM(poly a, poly b)
 #ifdef HAVE_RINGS
   if (nIsUnit(inv))
   {
+    inv = nInvers(inv);
     pMult_nn(result,inv);
     nDelete(&inv);
   }
