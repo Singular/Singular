@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.33 2008-07-14 16:03:27 Singular Exp $ */
+/* $Id: longrat.cc,v 1.34 2008-07-15 07:24:10 wienand Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -1336,7 +1336,7 @@ int nlModP(number n, int p)
 /*2
 * convert number to GMP and warn if denom != 1
 */
-number nlGMP(number &i, number n)
+void nlGMP(number &i, number n)
 {
   // Hier brauche ich einfach die GMP Zahl
 #ifdef LDEBUG
@@ -1346,6 +1346,7 @@ number nlGMP(number &i, number n)
   if (SR_HDL(i) & SR_INT)
   {
     mpz_set_si((MP_INT*) n, (long) SR_TO_INT(i));
+    return;
   }
   if (i->s!=3)
   {

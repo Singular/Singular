@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.19 2008-07-14 08:07:11 wienand Exp $ */
+/* $Id: rmodulo2m.cc,v 1.20 2008-07-15 07:24:10 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -432,7 +432,7 @@ nMapFunc nr2mSetMap(ring src, ring dst)
   {
     return nr2mMapGMP;
   }
-  if (rField_is_Q)
+  if (rField_is_Q(src))
   {
     return nr2mMapQ;
   }

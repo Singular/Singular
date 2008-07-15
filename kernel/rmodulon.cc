@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.26 2008-07-14 08:07:11 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.27 2008-07-15 07:24:10 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -433,6 +433,12 @@ nMapFunc nrnSetMap(ring src, ring dst)
         mpz_divexact(nrnMapCoef, nrnModul, nrnMapModul);
         int_number tmp = nrnModul;
         nrnModul = nrnMapModul;
+        if (!nrnIsUnit((number) nrnMapCoef))
+        {
+          nrnModul = tmp;
+          nrnDelete((number*) &nrnMapModul, currRing);
+          return NULL;
+        }
         int_number inv = (int_number) nrnInvers((number) nrnMapCoef);
         nrnModul = tmp;
         mpz_mul(nrnMapCoef, nrnMapCoef, inv);
@@ -550,6 +556,7 @@ const char * nrnRead (const char *s, number *a)
   {
     s = nlCPEatLongC((char *)s, z);
   }
+  mpz_mod(z, z, nrnModul);
   *a = (number) z;
   return s;
 }

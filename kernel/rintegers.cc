@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.15 2008-07-14 08:07:11 wienand Exp $ */
+/* $Id: rintegers.cc,v 1.16 2008-07-15 07:24:10 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -330,6 +330,11 @@ static const char * nlEatLongC(char *s, MP_INT *i)
 {
   const char * start=s;
 
+  if (*s<'0' || *s>'9')
+  {
+    mpz_set_si(i,1);
+    return s;
+  }
   while (*s >= '0' && *s <= '9') s++;
   if (*s=='\0')
   {

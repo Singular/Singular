@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.10 2008-07-14 08:07:11 wienand Exp $ */
+/* $Id: longrat.h,v 1.11 2008-07-15 07:24:10 wienand Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
@@ -68,7 +68,7 @@ BOOLEAN  nlIsMOne(number a);
 int      nlInt(number &n);
 number   nlBigInt(number &n);
 #ifdef HAVE_RINGS
-number   nlGMP(number &i, number n);
+void     nlGMP(number &i, number n);
 #endif
 BOOLEAN  nlGreaterZero(number za);
 number   nlInvers(number a);
