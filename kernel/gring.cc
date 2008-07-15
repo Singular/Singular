@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.60 2008-07-08 11:28:21 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.61 2008-07-15 16:27:58 motsak Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -41,6 +41,8 @@
 #include "gring.h"
 #include "sca.h"
 #include <summator.h>
+
+#include <ncSAMult.h> // for CMultiplier etc classes
 
 
 bool bUseExtensions = true;
@@ -2545,6 +2547,12 @@ void nc_rKill(ring r)
   /* otherwise kill the previous nc data */
 
   assume( r->GetNC()->ref == 0 );
+
+  if( rIsSCA(r) && (r->GetNC()->GetGlobalMultiplier() != NULL) )
+  {
+    delete r->GetNC()->GetGlobalMultiplier();
+    r->GetNC()->GetGlobalMultiplier() = NULL;
+  }
 
   int i,j;
   int rN=r->N;

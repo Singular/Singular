@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.49 2008-07-07 12:21:43 wienand Exp $ */
+/* $Id: structs.h,v 1.50 2008-07-15 16:27:58 motsak Exp $ */
 /*
 * ABSTRACT
 */
@@ -139,6 +139,7 @@ class namerec;
 class kBucket;
 class sBucket;
 class CPolynomialSummator;
+class CGlobalMultiplier;
 #endif
 
 struct n_Procs_s;
@@ -467,10 +468,12 @@ struct nc_struct
 {
   short ref;
   nc_type type;
-  ring basering; // the ring C,D,.. live in
+  ring basering; // the ring C,D,.. live in (commutative ring with this NC structure!)
 
-  // initial data:
-  matrix C;
+  // initial data: square matrices rVar() x rVar()
+  // logically: upper triangular!!!
+  // TODO: eliminate this waste of memory!!!!
+  matrix C; 
   matrix D;
 
   // computed data:
@@ -497,9 +500,13 @@ struct nc_struct
         // the part of general quotient ideal modulo squares!    
         ideal idSCAQuotient; // = NULL by default. // must be deleted in Kill!
       } sca;
+
     } data;
 
+    CGlobalMultiplier* m_Multiplier;
+
   public:
+    
     inline nc_type& ncRingType() { return (type); };
     inline nc_type ncRingType() const { return (type); };
 
@@ -516,6 +523,12 @@ struct nc_struct
     inline ideal& SCAQuotient() 
         { assume(ncRingType() == nc_exterior); return (data.sca.idSCAQuotient); };
 
+    inline CGlobalMultiplier* GetGlobalMultiplier() const
+        { assume(ncRingType() != nc_exterior); return (m_Multiplier); };
+
+    inline CGlobalMultiplier*& GetGlobalMultiplier()
+        { assume(ncRingType() != nc_exterior); return (m_Multiplier); };
+    
   public:
     nc_pProcs p_Procs; // NC procedures.
 

@@ -3,7 +3,7 @@
 /*****************************************
  *  Computer Algebra System SINGULAR     *
  *****************************************/
-/* $Id: ncSAMult.h,v 1.3 2008-07-11 15:53:28 motsak Exp $ */
+/* $Id: ncSAMult.h,v 1.4 2008-07-15 16:27:58 motsak Exp $ */
 #ifdef HAVE_PLURAL
 
 // #include <ncSAMult.h> // for CMultiplier etc classes
@@ -11,6 +11,9 @@
 #include <structs.h>
 #include <ring.h>
 #include <summator.h> // for CPolynomialSummator class
+#include <febase.h> // for Print!
+#include <p_polys.h>
+#include <p_Mult_q.h>
 
 #include <ncSACache.h> // for CCacheHash etc classes
 
@@ -25,11 +28,15 @@ class CMultiplier
 {
   protected:
     ring m_basering;
+    int  m_NVars; // N = number of variables
 
   public:
-    CMultiplier(ring rBaseRing): m_basering(rBaseRing) {};
+    CMultiplier(ring rBaseRing): m_basering(rBaseRing), m_NVars(rBaseRing->N) {};
+    virtual ~CMultiplier() {};
 
     const ring GetBasering() const { return m_basering; };
+    inline int NVars() const { return m_NVars; }
+
 
 
     // Term * Exponent -> Monom * Exponent
@@ -40,9 +47,7 @@ class CMultiplier
     inline poly MultiplyET(const CExponent expLeft, const poly pTerm)
     { return p_Mult_nn(MultiplyEM(expLeft, pTerm), p_GetCoeff(pTerm, GetBasering()), GetBasering()); }
 
-//
-// Main templates!
-//
+    // Main templates:
 
     // Poly * Exponent
     inline poly MultiplyPE(const poly pPoly, const CExponent expRight)
@@ -93,7 +98,7 @@ class CMultiplier
     }
 
 
-  protected:
+//  protected:
 
     // Exponent * Exponent
     virtual poly MultiplyEE(const CExponent expLeft, const CExponent expRight) = 0;    
@@ -106,7 +111,9 @@ class CMultiplier
       
   private: // no copy constuctors!
     CMultiplier();
-    operator =(CMultiplier&);
+    CMultiplier(const CMultiplier&);
+    CMultiplier& operator=(const CMultiplier&);
+    
 };
 
 
@@ -115,37 +122,126 @@ class CSpecialPairMultiplier: public CMultiplier<int>
   private:
     int m_i;
     int m_j;
+
+    poly m_c_ij;
+    poly m_d_ij;
+    
     
   public:
+    // 1 <= i < j <= NVars()
     CSpecialPairMultiplier(ring r, int i, int j);
-  protected:    
+    virtual ~CSpecialPairMultiplier(){}
+
+    inline int GetI() const { return m_i; }
+    inline int GetJ() const { return m_j; }
+
+//  protected:
     typedef int CExponent;
 
     // Exponent * Exponent
-    virtual poly MultiplyEE(const poly expLeft, const CExponent expRight);    
+    // Computes: var(j)^{expLeft} * var(i)^{expRight}
+    virtual poly MultiplyEE(const CExponent expLeft, const CExponent expRight) = 0;
 
     // Monom * Exponent
+    // pMonom must be of the form: var(j)^{n}
     virtual poly MultiplyME(const poly pMonom, const CExponent expRight);
 
     // Exponent * Monom
+    // pMonom must be of the form: var(i)^{m}
     virtual poly MultiplyEM(const CExponent expLeft, const poly pMonom);
 
 };
 
-/*
+
 class CCommutativeSpecialPairMultiplier: public CSpecialPairMultiplier
 {
   public:
+    CCommutativeSpecialPairMultiplier(ring r, int i, int j):
+        CSpecialPairMultiplier(r, i, j){};
+    virtual ~CCommutativeSpecialPairMultiplier() {}
+    
     // Exponent * Exponent
-    virtual poly MultiplyEE(const poly expLeft, const CExponent expRight);    
+    virtual poly MultiplyEE(const int expLeft, const int expRight);    
 
     // Monom * Exponent
+    virtual poly MultiplyME(const poly pMonom, const int expRight);
+
+    // Exponent * Monom
+    virtual poly MultiplyEM(const int expLeft, const poly pMonom);
+};
+
+
+
+
+
+struct CPower // represents var(iVar)^{iPower}
+{
+  int Var;
+  int Power;
+
+  CPower(int i, int n): Var(i), Power(n) {};
+
+  inline poly GetPoly(const ring r, int c = 1) const
+  {
+    poly p = p_ISet(c, r);
+    p_SetExp(p, Var, Power, r);
+    return p;
+  };
+ 
+};
+
+
+
+
+
+
+class CPowerMultiplier: public CMultiplier<CPower>
+{
+  private:
+    CSpecialPairMultiplier** m_specialpairs; // upper triangular submatrix of pairs 1 <= i < j <= N of a N x N matrix.
+
+
+  public:
+    CPowerMultiplier(ring r);
+    virtual ~CPowerMultiplier();
+
+    inline CSpecialPairMultiplier* GetPair(int i, int j) const
+    {
+      assume( m_specialpairs != NULL );
+      assume( i > 0 );
+      assume( i < j );
+      assume( j <= NVars() );
+
+      return m_specialpairs[( (NVars() * ((i)-1) - ((i) * ((i)-1))/2 + (j)-1) - (i) )];
+    }
+
+    inline CSpecialPairMultiplier*& GetPair(int i, int j)
+    {
+      assume( m_specialpairs != NULL );
+      assume( i > 0 );
+      assume( i < j );
+      assume( j <= NVars() );
+
+      return m_specialpairs[( (NVars() * ((i)-1) - ((i) * ((i)-1))/2 + (j)-1) - (i) )];
+    }
+    
+//  protected:
+    typedef CPower CExponent;
+
+    // Exponent * Exponent
+    // Computes: var(j)^{expLeft} * var(i)^{expRight}
+    virtual poly MultiplyEE(const CExponent expLeft, const CExponent expRight);
+
+    // Monom * Exponent
+    // pMonom may NOT be of the form: var(j)^{n}!
     virtual poly MultiplyME(const poly pMonom, const CExponent expRight);
 
     // Exponent * Monom
+    // pMonom may NOT be of the form: var(i)^{m}!
     virtual poly MultiplyEM(const CExponent expLeft, const poly pMonom);
-}
-*/
+
+
+};
 
 
 
@@ -153,33 +249,25 @@ class CCommutativeSpecialPairMultiplier: public CSpecialPairMultiplier
 class CGlobalMultiplier: public CMultiplier<poly>
 {
   private:
-    CSpecialPairMultiplier** m_specialpairs; // upper triangular submatrix of pairs 1 <= i < j <= N of a N x N matrix.
-    int m_NVars; // N = number of variables
     CGlobalCacheHash* m_cache;
+    CPowerMultiplier* m_powers;
 
   public:
+    typedef CMultiplier<poly> CBaseType;
+    
     CGlobalMultiplier(ring r);
+    virtual ~CGlobalMultiplier();
 
-    inline int NVars() const { return m_NVars; }
-
-    inline CSpecialPairMultiplier* GetPair(int i, int j) const
-    {
-      assume( m_specialpairs != NULL );
-      assume( i > 0 );
-      assume( i < j );
-      assume( j <= iNVars );
-
-      return m_specialpairs + ( (NVars() * ((i)-1) - ((i) * ((i)-1))/2 + (j)-1) - (i) );
-    }
-
-
-  protected:    
+    
+  
+//  protected:    
     typedef poly CExponent;
 
     // the following methods are literally equal!
     
     // Exponent * Exponent
-    virtual poly MultiplyEE(const poly expLeft, const CExponent expRight);    
+    // TODO: handle components!!!
+    virtual poly MultiplyEE(const CExponent expLeft, const CExponent expRight);    
 
     // Monom * Exponent
     virtual poly MultiplyME(const poly pMonom, const CExponent expRight);
@@ -187,9 +275,6 @@ class CGlobalMultiplier: public CMultiplier<poly>
     // Exponent * Monom
     virtual poly MultiplyEM(const CExponent expLeft, const poly pMonom);
 
-
-    CSpecialPairMultiplier* AnalyzePair(const ring r, int j, int i);
-    
 };
 
 

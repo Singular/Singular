@@ -2,16 +2,16 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /***************************************************************
- *  File:    ncSAMult.cc
- *  Purpose: implementation of multiplication in simple NC subalgebras
+ *  File:    ncSACache.cc
+ *  Purpose: implementation of special Cache+Hash for Multiplier 
  *  Author:  motsak
  *  Created: 
- *  Version: $Id: ncSACache.cc,v 1.1 2008-07-11 15:53:28 motsak Exp $
+ *  Version: $Id: ncSACache.cc,v 1.2 2008-07-15 16:27:58 motsak Exp $
  *******************************************************************/
 
 
-#define MYTEST 0
-#define OUTPUT 0
+#define MYTEST 1
+#define OUTPUT 1
 
 #if MYTEST
 #define OM_CHECK 4
@@ -27,13 +27,16 @@
 
 
 
-virtual void CGlobalCacheHash::History(const CGlobalCacheHash::CExponent a, const CGlobalCacheHash::CExponent b, const EHistoryType t)
+void CGlobalCacheHash::History(const CGlobalCacheHash::CExponent a, const CGlobalCacheHash::CExponent b, const EHistoryType t)
 {
-  Print("GlobalPair!");
+  Print("History: GlobalPair!");
+  PrintS("Left : "); p_Write(a, GetBasering());
+  PrintS("Right: "); p_Write(b, GetBasering());    
 }
 
 
-virtual void CSpecialPairCacheHash::History(const CSpecialPairCacheHash::CExponent a, const CSpecialPairCacheHash::CExponent b, const EHistoryType t)
+void CSpecialPairCacheHash::History(const CSpecialPairCacheHash::CExponent a, const CSpecialPairCacheHash::CExponent b, const EHistoryType t)
 {
   Print("SpecialPair!\n");
+  Print("Left : %d, Right: %d\n", a, b);
 }

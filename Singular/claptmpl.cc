@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.42 2007-02-23 13:17:55 bricken Exp $
+// $Id: claptmpl.cc,v 1.43 2008-07-15 16:27:11 motsak Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -201,6 +201,21 @@ template    static  void    print_rational( ostream&,int,const Rational& );
 //  kmatrix.cc
 //  end of file
 // ----------------------------------------------------------------------------
+
+#ifdef HAVE_PLURAL
+
+#include <ncSACache.h> // for CCacheHash etc classes
+#include <ncSAMult.h> // for CMultiplier etc classes
+
+template class CMultiplier<int>;
+template class CMultiplier<poly>;
+template class CMultiplier<CPower>;
+
+template class CCacheHash<poly>;
+template class CCacheHash<int>;
+
+#endif
+
 #include "tgb_internal.h"
 #ifdef HAVE_BOOST
 #include <boost/dynamic_bitset.hpp>

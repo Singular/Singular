@@ -93,7 +93,7 @@ CXXSOURCES=clapconv.cc \
     clapsing.cc mminit.cc\
     febase.cc feread.cc feResource.cc \
     ffields.cc hdegree.cc hilb.cc hutil.cc \
-    sca.cc gring.cc gr_kstd2.cc summator.cc\
+    sca.cc gring.cc gr_kstd2.cc summator.cc ncSAMult.cc ncSACache.cc \
     ideals.cc intvec.cc int64vec.cc \
     khstd.cc kstdfac.cc \
     kstd1.cc kstd2.cc kutil.cc \
@@ -154,7 +154,7 @@ HEADERS=hutil.h stairc.h ideals.h \
 	clapsing.h matpol.h polys.h p_polys.h syz.h \
 	ring.h timer.h dError.h fast_maps.h \
 	febase.h shortfl.h mpr_complex.h mpr_global.h \
-	summator.h sca.h gring.h \
+	summator.h ncSAMult.h ncSACache.h sca.h gring.h \
 	walkProc.h walkMain.h walkSupport.h\
 	ffields.h khstd.h sparsmat.h gnumpfl.h gnumpc.h \
 	fglm.h kstd1.h \

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.275 2008-07-08 13:03:18 Singular Exp $ */
+/* $Id: extra.cc,v 1.276 2008-07-15 16:27:11 motsak Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -87,6 +87,7 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 #include "ring.h"
 #include "gring.h"
 #include "sca.h"
+#include <ncSAMult.h> // for CMultiplier etc classes
 #include "ipconv.h"
 #include "ratgring.h"
 #endif
@@ -787,7 +788,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         bUseExtensions = (bool)((long)(h->Data()));
       
       return FALSE;
-    }    
+    }
+
+    
     if(strcmp(sys_cmd,"NCGetType")==0)
     {
       res->rtyp=INT_CMD;
@@ -800,6 +803,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
 
+    
     if(strcmp(sys_cmd,"ForceSCA")==0)
     {
       if( !rIsPluralRing(currRing) )
@@ -826,7 +830,19 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
       return FALSE;
     }
-/*==================== PLURAL =================*/
+
+    if(strcmp(sys_cmd,"ForceNewNCMultiplication")==0)
+    {
+      if( !rIsPluralRing(currRing) )
+        return TRUE;
+
+      if( !ncInitSpecialPairMultiplication(currRing) )
+        return TRUE;
+
+      return FALSE;
+    }
+
+    /*==================== PLURAL =================*/
 /*==================== opp ==================================*/
     if (strcmp(sys_cmd, "opp")==0)
     {
