@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.38 2008-07-16 12:41:32 wienand Exp $ */
+/* $Id: ipconv.cc,v 1.39 2008-07-16 12:51:26 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -49,9 +49,27 @@ static void * iiI2P(void *data)
   return (void *)p;
 }
 
+static void * iiBI2N(void *data);
+static void * iiBI2P(void *data)
+{
+  number n=(number)iiBI2N(data);
+  nlDelete((number *)&data,NULL);
+  poly p=pNSet(n);
+  return (void *)p;
+}
+
 static void * iiI2V(void *data)
 {
   poly p=pISet((int)(long)data);
+  if (p!=NULL) pSetComp(p,1);
+  return (void *)p;
+}
+
+static void * iiBI2V(void *data)
+{
+  number n=(number)iiBI2N(data);
+  nlDelete((number *)&data,NULL);
+  poly p=pNSet(n);
   if (p!=NULL) pSetComp(p,1);
   return (void *)p;
 }
@@ -63,6 +81,15 @@ static void * iiI2Id(void *data)
   return (void *)I;
 }
 
+static void * iiBI2Id(void *data)
+{
+  ideal I=idInit(1,1);
+  number n=(number)iiBI2N(data);
+  nlDelete((number *)&data,NULL);
+  poly p=pNSet(n);
+  I->m[0]=p;
+  return (void *)I;
+}
 static void * iiP2V(void *data)
 {
   poly p=(poly)data;
@@ -245,18 +272,21 @@ struct sConvertTypes dConvertTypes[] =
    { INT_CMD,         BIGINT_CMD,     iiI2BI , NULL },
 //  int -> number
    { INT_CMD,         NUMBER_CMD,     iiI2N , NULL },
+   { BIGINT_CMD,      NUMBER_CMD,     iiBI2N , NULL },
 //  int -> poly
    { INT_CMD,         POLY_CMD,       iiI2P , NULL },
+   { BIGINT_CMD,      POLY_CMD,       iiBI2P , NULL },
 //  int -> vector
    { INT_CMD,         VECTOR_CMD,     iiI2V , NULL },
+   { BIGINT_CMD,      VECTOR_CMD,     iiBI2V , NULL },
 //  int -> ideal
    { INT_CMD,         IDEAL_CMD,      iiI2Id , NULL },
+   { BIGINT_CMD,      IDEAL_CMD,      iiBI2Id , NULL },
 //  int -> matrix
    { INT_CMD,         MATRIX_CMD,     iiI2Id , NULL },
+   { BIGINT_CMD,      MATRIX_CMD,     iiBI2Id , NULL },
 //  int -> intvec
    { INT_CMD,         INTVEC_CMD,     iiI2Iv , NULL },
-//  bigint -> number
-   { BIGINT_CMD,      NUMBER_CMD,     iiBI2N , NULL },
 //  intvec -> intmat
    { INTVEC_CMD,      INTMAT_CMD,     iiDummy, NULL },
 //  intvec -> matrix

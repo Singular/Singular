@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.126 2008-03-28 15:58:30 Singular Exp $ */
+/* $Id: grammar.y,v 1.127 2008-07-16 12:51:26 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -37,6 +37,7 @@
 #include "maps.h"
 #include "syz.h"
 #include "lists.h"
+#include "longrat.h"
 #include "libparse.h"
 
 #if 0
@@ -570,20 +571,16 @@ elemexpr:
 
             /* check: out of range input */
             int l = strlen($1)+2;
+            number n;
             if (l >= MAX_INT_LEN)
             {
               char tmp[MAX_INT_LEN+5];
               sprintf(tmp,"%d",i);
               if (strcmp(tmp,$1)!=0)
               {
-                if (currRing==NULL)
-                {
-                  Werror("`%s` greater than %d(max. integer representation)"
-                         ,$1,MAX_INT_VAL);
-                  YYERROR;
-                }
-                char *t1=omStrDup($1);
-                syMake(&$$,t1);
+                nlRead($1,&n);
+                $$.rtyp=BIGINT_CMD;
+                $$.data = n;
               }
             }
           }
