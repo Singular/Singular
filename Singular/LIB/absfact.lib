@@ -1,4 +1,4 @@
-version="$Id: absfact.lib,v 1.6 2007-07-13 12:31:06 Singular Exp $";
+version="$Id: absfact.lib,v 1.7 2008-07-16 12:39:51 Singular Exp $";
 category="Factorization";
 info="
 LIBRARY: absfact.lib   Absolute factorization for characteristic 0
@@ -84,10 +84,12 @@ RETURN: poly:  a proper irreducible simple factor of p of smallest
   poly q = 0;
   poly f;
   int e;
-  for(int i = 1; i <= s; i = i + 1) {
+  for(int i = 1; i <= s; i++)
+  {
     f = p_facts[1][i];
     e = deg(f);
-    if (e >= 1 and e < d and p_facts[2][i] == 1) {
+    if (e >= 1 and e < d and p_facts[2][i] == 1)
+    {
       q = f / leadcoef(f);
       d = e;
     }
@@ -107,10 +109,12 @@ RETURN: poly:  a proper irreducible factor of p of smallest degree.
   poly q = 0;
   poly f;
   int e;
-  for(int i = 1; i <= s; i = i + 1) {
+  for(int i = 1; i <= s; i++)
+  {
     f = p_facts[1][i];
     e = deg(f);
-    if (e >= 1 and e < d) {
+    if (e >= 1 and e < d)
+    {
       q = f / leadcoef(f);
       d = e;
     }
@@ -136,16 +140,20 @@ RETURN: poly:  an irreducible univariate polynomial that defines an
   int e = 1;
   int nbtrial = 0;
   map h;
-  while (q == 0) {
+  while (q == 0)
+  {
     h = basering, a[1..n+1];
     q = smallestProperSimpleFactor(h(p));
-    for(i = 1; i  <= n ; i = i + 1) {
-      if (i != m) {
+    for(i = 1; i  <= n ; i = i + 1)
+    {
+      if (i != m)
+      {
         a[i] = random(-e, e);
       }
     }
     nbtrial++;
-    if (nbtrial >= 10 * n) {
+    if (nbtrial >= 10 * n)
+    {
       e = e + 1;
       nbtrial = 0;
     }
@@ -171,21 +179,26 @@ NOTE:   To be called by the RothsteinTrager procedure only.
   int e = 1;
   int nbtrial = 0;
   map h;
-  while (q == 0) {
+  while (q == 0)
+  {
     h = MPz, a[1..n+1];
     q = resultant(h(f), h(df) * var(n+1) - h(g), var(m));
-    if (deg(q) == d) {
+    if (deg(q) == d)
+    {
       return(q/leadcoef(q));
     }
     q = 0;
-    for(i = 1; i  <= n ; i = i + 1) {
-      if (i != m) {
+    for(i = 1; i  <= n ; i++)
+    {
+      if (i != m)
+      {
         a[i] = random(-e, e);
       }
     }
     nbtrial++;
-    if (nbtrial >= 10 * n) {
-      e = e + 1;
+    if (nbtrial >= 10 * n)
+    {
+      e++;
       nbtrial = 0;
     }
   }
@@ -233,12 +246,14 @@ NOTE:   the return value is the Rothstein-Trager partial fraction
       setring(MPz);
       return(list(q, imap(MPq, f)));
     }
-    for(i = 1; i  <= r ; i++) {
+    for(i = 1; i  <= r ; i++)
+    {
       a[i] = random(-e, e);
     }
     nbtrial++;
-    if (nbtrial >= 10 * r) {
-      e = e + 1;
+    if (nbtrial >= 10 * r)
+    {
+      e++;
       nbtrial = 0;
     }
   }
@@ -259,7 +274,8 @@ RETURN:  list L of two polynomials: q=L[1] is an irreducible polynomial of
   int d = deg(p);
   int n = nvars(MPz) - 1;
 
-  if (d < 1) {
+  if (d < 1)
+  {
     return(list(var(n+1), p));
   }
   int m = variableWithSmallestPositiveDegree(p);
@@ -267,7 +283,8 @@ RETURN:  list L of two polynomials: q=L[1] is an irreducible polynomial of
 
   poly q = extensionContainingSmoothPoint(p, m);
   int r = deg(q);
-  if (r == 1) {
+  if (r == 1)
+  {
     return(list(var(n+1), p));
   }
 
@@ -285,12 +302,14 @@ RETURN:  list L of two polynomials: q=L[1] is an irreducible polynomial of
   poly f = smallestProperSimpleFactor(p_loc);
   int degf = deg(f);
 
-  if (degf == d) {
+  if (degf == d)
+  {
     setring(MPz);
     return(list(var(n+1), p));
   }
 
-  if (degf * r == d) {
+  if (degf * r == d)
+  {
     setring(MPz);
     return(list(q, imap(MPq, f)));
   }
@@ -350,11 +369,13 @@ EXAMPLE: example absFactorize; shows an example
   dbprint(dblevel,"Entering absfact.lib::absFactorize with ",p);
   def MP = basering;
   int i;
-  if (char(MP) != 0) {
+  if (char(MP) != 0)
+  {
     ERROR("// absfact.lib::absFactorize is only implemented for "+
           "characteristic 0");
   }
-  if(minpoly!=0) {
+  if(minpoly!=0)
+  {
     ERROR("// absfact.lib::absFactorize is not implemented for algebraic "
           +"extensions");
   }
@@ -371,10 +392,12 @@ EXAMPLE: example absFactorize; shows an example
   if(pa>0)
   {
     poly qh=cleardenom(p);
-    if (p==0) {
+    if (p==0)
+    {
       number cok=0;
     }
-    else {
+    else
+    {
       number cok=leadcoef(p)/leadcoef(qh);
     }
     p=qh;
@@ -395,29 +418,30 @@ EXAMPLE: example absFactorize; shows an example
   // All the above subroutines work in MPz
   string newvar;
   if(size(#)>0)
+  {
+    if(typeof(#[1])=="string")
     {
-      if(typeof(#[1])=="string")
-	{
-	  newvar=#[1];
-	}
-      else
-      {
-        newvar = "a";
-      }
+      newvar=#[1];
     }
-  else
+    else
     {
       newvar = "a";
     }
+  }
+  else
+  {
+    newvar = "a";
+  }
   if (newvar=="a")
+  {
+    if(belongTo(newvar, lMP[2])||defined(a)){newvar = "b";}
+    if(belongTo(newvar, lMP[2])||defined(b)){newvar = "c";}
+    if(belongTo(newvar, lMP[2])||defined(c)){newvar = "@c";}
+    while(belongTo(newvar, lMP[2]))
     {
-      if(belongTo(newvar, lMP[2])||defined(a)){newvar = "b";}
-      if(belongTo(newvar, lMP[2])||defined(b)){newvar = "c";}
-      if(belongTo(newvar, lMP[2])||defined(c)){newvar = "@c";}
-      while(belongTo(newvar, lMP[2])) {
        newvar = "@" + newvar;
-      }
     }
+  }
   lMP[2][n+1] = newvar;
 
   // new ordering
@@ -435,11 +459,11 @@ EXAMPLE: example absFactorize; shows an example
   // by substituting the first variable by 1
   int ho=homog(p);
   if(ho)
-    {
-      int dh=deg(p);
-      p=subst(p,var(1),1);
-      int di=deg(p);
-    }
+  {
+    int dh=deg(p);
+    p=subst(p,var(1),1);
+    int di=deg(p);
+  }
   list rat_facts = factorize(p);
   int s = size(rat_facts[1]);
   list tmpf; // absolute factors
@@ -447,7 +471,8 @@ EXAMPLE: example absFactorize; shows an example
   tmpf[1] = list(var(n+1), leadcoef(imap(MP,p)));
   tmpm[1] = 1;
   poly tmp;
-  for(i = 2; i <= s; i++) {
+  for(i = 2; i <= s; i++)
+  {
     tmp = rat_facts[1][i];
     tmp = tmp / leadcoef(tmp);
     tmpf[i] = absFactorizeIrreducible(tmp);
@@ -457,59 +482,59 @@ EXAMPLE: example absFactorize; shows an example
   // the new variable has to have degree 0
   // need to change the ring
   if(ho)
+  {
+    list ll=ringlist(MPz);
+    vv[size(vv)]=0;
+    ll[3][1][2]=vv;
+    def MPhelp=ring(ll);
+    setring(MPhelp);
+    list tmpf=imap(MPz,tmpf);
+    for(i=2;i<=size(tmpf);i++)
     {
-      list ll=ringlist(MPz);
-      vv[size(vv)]=0;
-      ll[3][1][2]=vv;
-      def MPhelp=ring(ll);
-      setring(MPhelp);
-      list tmpf=imap(MPz,tmpf);
-      for(i=2;i<=size(tmpf);i++)
-	{
-	  tmpf[i][2]=homog(tmpf[i][2],var(1));
-	}
-      if(dh>di)
-	{
-	  tmpf[size(tmpf)+1]=list(var(n+1),var(1));
-	  tmpm[size(tmpm)+1]=dh-di;
-	}
-      setring(MPz);
-      tmpf=imap(MPhelp,tmpf);
+      tmpf[i][2]=homog(tmpf[i][2],var(1));
     }
+    if(dh>di)
+    {
+      tmpf[size(tmpf)+1]=list(var(n+1),var(1));
+      tmpm[size(tmpm)+1]=dh-di;
+    }
+    setring(MPz);
+    tmpf=imap(MPhelp,tmpf);
+  }
   // in case of parameters we have to go back to the old ring
   // taking care about constant factors
   if(pa)
-    {
-      n=nvars(MP);
-      list lM=ringlist(MP);
-      orst[1]=list("wp",vk);
-      orst[2]=list("C",0);
-      lM[2][n+1] = newvar;
-      lM[3]=orst;
-      def MPout=ring(lM);
-      setring(MPout);
-      list tmpf=imap(MPz,tmpf);
-      number cok=imap(MP,cok);
-      tmpf[1][2]=cok*tmpf[1][2];
-    }
+  {
+    n=nvars(MP);
+    list lM=ringlist(MP);
+    orst[1]=list("wp",vk);
+    orst[2]=list("C",0);
+    lM[2][n+1] = newvar;
+    lM[3]=orst;
+    def MPout=ring(lM);
+    setring(MPout);
+    list tmpf=imap(MPz,tmpf);
+    number cok=imap(MP,cok);
+    tmpf[1][2]=cok*tmpf[1][2];
+  }
   else
-    {
-      def MPout=MPz;
-    }
+  {
+    def MPout=MPz;
+  }
   // if we want the output as string
   if(size(#)>0)
+  {
+    if(typeof(#[1])=="int")
     {
-      if(typeof(#[1])=="int")
-	{
-	  if(#[1]==77)
-	    {  // undocumented feature for Gerhard's absPrimdecGTZ
-              if (size(tmpf)<2){ list abs_fac = list(var(n+1),poly(1)); }
-              else { list abs_fac=tmpf[2..size(tmpf)]; }
-              abs_fac=abs_fac,newvar;
-	      return(string(abs_fac));
-	    }
-	}
+      if(#[1]==77)
+      {  // undocumented feature for Gerhard's absPrimdecGTZ
+        if (size(tmpf)<2){ list abs_fac = list(var(n+1),poly(1)); }
+        else { list abs_fac=tmpf[2..size(tmpf)]; }
+        abs_fac=abs_fac,newvar;
+        return(string(abs_fac));
+      }
     }
+  }
   // preparing the output for SINGULAR standard
   // a list: factors(ideal),multiplicities(intvec),minpolys(ideal),
   // number of factors in the absolute factorization
@@ -522,37 +547,37 @@ EXAMPLE: example absFactorize; shows an example
   minpols[1]=tmpf[1][1];
   facts[1]=tmpf[1][2];     //the coefficient
   for(i=2;i<=size(tmpf);i++)
-    {
-      minpols[i]=cleardenom(tmpf[i][1]);
-      facts[i]=cleardenom(tmpf[i][2]);
-      co=co*(leadcoef(tmpf[i][2])/leadcoef(facts[i]))^(deg(minpols[i])*tmpm[i]);
-    }
+  {
+    minpols[i]=cleardenom(tmpf[i][1]);
+    facts[i]=cleardenom(tmpf[i][2]);
+    co=co*(leadcoef(tmpf[i][2])/leadcoef(facts[i]))^(deg(minpols[i])*tmpm[i]);
+  }
   facts[1]=facts[1]*co;
   for(i=1;i<=size(tmpm);i++)
-    {
-      mults[i]=tmpm[i];
-    }
+  {
+    mults[i]=tmpm[i];
+  }
   for(i=2;i<=size(mults);i++)
-    {
-      nfacts=nfacts+mults[i]*deg(minpols[i]);
-    }
+  {
+    nfacts=nfacts+mults[i]*deg(minpols[i]);
+  }
   list absolute_factors=facts,mults,minpols,nfacts;
 
   // create ring with extra parameter `newvar` for output:
   setring(MP);
   list Lout=ringlist(MP);
   if(!pa)
-    {
-      list Lpar=list(char(MP),list(newvar),list(list("lp",intvec(1))),ideal(0));
-    }
+  {
+    list Lpar=list(char(MP),list(newvar),list(list("lp",intvec(1))),ideal(0));
+  }
   else
-    {
-      list Lpar=Lout[1];
-      Lpar[2][size(Lpar[2])+1]=newvar;
-      vv=Lpar[3][1][2];
-      vv=vv,1;
-      Lpar[3][1][2]=vv;
-    }
+  {
+    list Lpar=Lout[1];
+    Lpar[2][size(Lpar[2])+1]=newvar;
+    vv=Lpar[3][1][2];
+    vv=vv,1;
+    Lpar[3][1][2]=vv;
+  }
   Lout[1]=Lpar;
   def MPo=ring(Lout);
   setring(MPo);
