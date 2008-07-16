@@ -145,7 +145,7 @@ AC_MSG_RESULT($ac_cv_c_cpp)
 # not overwrite it explicitely
 if test "${GXX}" = yes && test "${ac_cxx_set}" = no; then
   if test "${ac_cv_c_cpp}" = gcc2; then
-    CXX=g++
+    CXX=gcc
   elif test "${ac_cv_c_cpp}" = gcc3; then
     CXX=g++
   fi
