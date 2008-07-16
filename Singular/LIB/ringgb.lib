@@ -139,7 +139,8 @@ proc getZeroCoef(poly f)
   int j = 2;
   bigint g;
   bigint G = 1;
-  bigint B = char(basering);
+  bigint B = noElements(basering);
+
   for (; exp[i] < 2; i++) {if (i == size(exp)) break;}
   for (; i <= size(exp); i++)
   {
@@ -206,11 +207,11 @@ proc testZero(poly f)
   poly g;
   int j;
   bigint i = 0;
-  bigint modul = char(basering);
+  bigint modul = noElements(basering);
   printf("Teste %s Belegungen ...", modul^nvars(basering));
   for (; i < modul^nvars(basering); i = i + 1)
   {
-    if (i % char(basering) == 0)
+    if (i % modul == 0)
     {
       printf("bisher: %s", i);
     }
@@ -230,4 +231,10 @@ proc testZero(poly f)
     }
   }
   return(1);
+}
+
+proc noElements(def r)
+{
+  list l = ringlist(basering);
+  return(l[1][2][1]^l[1][2][2]);
 }
