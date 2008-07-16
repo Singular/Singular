@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.29 2008-07-16 12:41:33 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.30 2008-07-16 15:04:26 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -26,7 +26,6 @@ omBin gmp_nrn_bin = omGetSpecBin(sizeof(MP_INT));
 int_number nrnModul = NULL;
 int_number nrnMinusOne = NULL;
 unsigned long nrnExponent = 0;
-int_number nrnBase = NULL;
 
 /*
  * create a number from int
@@ -459,8 +458,8 @@ nMapFunc nrnSetMap(ring src, ring dst)
 
 void nrnSetExp(int m, ring r)
 {
-  if ((nrnBase != NULL) && (mpz_cmp(nrnBase, r->ringflaga) == 0) && (nrnExponent == r->ringflagb)) return;
-  nrnBase = r->ringflaga;
+  if ((nrnModul != NULL) && (mpz_cmp(nrnModul, r->ringflaga) == 0) && (nrnExponent == r->ringflagb)) return;
+
   nrnExponent = r->ringflagb;
   if (nrnModul == NULL)
   {
@@ -469,7 +468,7 @@ void nrnSetExp(int m, ring r)
     nrnMinusOne = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
     mpz_init(nrnMinusOne);
   }
-  mpz_set(nrnModul, nrnBase);
+  mpz_set(nrnModul, r->ringflaga);
   mpz_pow_ui(nrnModul, nrnModul, nrnExponent);
   mpz_sub_ui(nrnMinusOne, nrnModul, 1);
 }

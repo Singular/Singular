@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.187 2008-07-16 12:41:32 wienand Exp $ */
+/* $Id: ipshell.cc,v 1.188 2008-07-16 15:04:26 wienand Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1613,7 +1613,7 @@ void rDecomposeRing(leftv h,const ring R)
 {
   lists L=(lists)omAlloc0Bin(slists_bin);
   if (rField_is_Ring_Z(R)) L->Init(1);
-  else                L->Init(2);
+  else                     L->Init(2);
   h->rtyp=LIST_CMD;
   h->data=(void *)L;
   // 0: char/ cf - ring
@@ -1850,6 +1850,70 @@ void rComposeC(lists L, ring R)
   }
   // ----------------------------------------
 }
+
+#ifdef HAVE_RINGS
+void rComposeRing(lists L, ring R)
+/* field is R or C */
+{
+  // ----------------------------------------
+  // 0: string: integer
+  // no further entries --> Z
+  R->ringflaga = (int_number) omAlloc(sizeof(MP_INT));
+  if (L->nr == 0)
+  {
+    mpz_init_set_ui(R->ringflaga,0);
+    R->ringflagb = 1;
+  }
+  // ----------------------------------------
+  // 1:
+  else 
+  {
+    if (L->m[1].rtyp!=LIST_CMD) Werror("invald data, expecting list of two numbers");
+    lists LL=(lists)L->m[1].data;
+    number ringflaga = (number) LL->m[0].data;
+    mpz_init(R->ringflaga);
+    nlGMP(ringflaga, (number) R->ringflaga);
+    R->ringflagb = (unsigned long) LL->m[1].data;
+  }
+  // ----------------------------------------
+  if ((mpz_cmp_ui(R->ringflaga, 1) == 0) && (mpz_cmp_ui(R->ringflaga, 0) < 0))
+  {
+    Werror("Wrong ground ring specification (module is 1)");
+    return;
+  }
+  if (R->ringflagb < 1)
+  {
+    Werror("Wrong ground ring specification (exponent smaller than 1");
+    return;
+  }
+  // module is 0 ---> integers
+  if (mpz_cmp_ui(R->ringflaga, 0) == 0)
+  {
+    R->ch = 0;
+    R->ringtype = 4;
+  }
+  // we have an exponent
+  else if (R->ringflagb > 1)
+  {
+    R->ch = R->ringflagb;
+    if ((mpz_cmp_ui(R->ringflaga, 2) == 0) && (R->ringflagb + 2 <= 8*sizeof(NATNUMBER)))
+    {
+      R->ringtype = 1;       // Use Z/2^ch
+    }
+    else
+    {
+      R->ringtype = 3;
+    }
+  }
+  // just a module m > 1
+  else
+  {
+    R->ringtype = 2;
+    R->ch = mpz_get_ui(R->ringflaga);
+  }
+}
+#endif
+
 ring rCompose(const lists  L)
 {
   if ((L->nr!=3)
@@ -2058,6 +2122,13 @@ ring rCompose(const lists  L)
   else if (L->m[0].Typ()==LIST_CMD)
   {
     lists LL=(lists)L->m[0].Data();
+#ifdef HAVE_RINGS
+    if (LL->m[0].Typ() == STRING_CMD)
+    {
+      rComposeRing(LL,R); /* Ring */
+    }
+    else
+#endif
     if (LL->nr<3)
       rComposeC(LL,R); /* R, long_R, long_C */
     else
@@ -4491,8 +4562,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   int ch;
 #ifdef HAVE_RINGS
   unsigned int ringtype = 0;
-  int_number ringflaga = (int_number) omAlloc(sizeof(MP_INT));
-  mpz_init_set_si(ringflaga, 0);
+  int_number ringflaga = NULL;
   unsigned int ringflagb = 1;
 #endif
   int float_len=0;
@@ -4535,6 +4605,8 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 #ifdef HAVE_RINGS
   else if ((pn->name != NULL) && (strcmp(pn->name, "integer") == 0))
   {
+    ringflaga = (int_number) omAlloc(sizeof(MP_INT));
+    mpz_init_set_si(ringflaga, 0);
     if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
     {
       mpz_set_ui(ringflaga, (unsigned int) pn->next->Data());

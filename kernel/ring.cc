@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.97 2008-07-16 12:41:33 wienand Exp $ */
+/* $Id: ring.cc,v 1.98 2008-07-16 15:04:26 wienand Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -283,7 +283,7 @@ void rWrite(ring r)
     if (rField_is_Ring_ModN(r)) Print("Z/%s\n", s);
 #endif
 #ifdef HAVE_RING2TOM
-    if (rField_is_Ring_2toM(r)) Print("Z/2^%s\n", s);
+    if (rField_is_Ring_2toM(r)) Print("Z/2^%lu\n", r->ringflagb);
 #endif
 #ifdef HAVE_RINGMODN
     if (rField_is_Ring_PtoM(r)) Print("Z/%s^%lu\n", s, r->ringflagb);
@@ -513,7 +513,8 @@ void rDelete(ring r)
     omFreeSize((ADDRESS)r->parameter,rPar(r)*sizeof(char_ptr));
   }
 #ifdef HAVE_RINGS
-  omFree((ADDRESS) r->ringflaga);
+  if (r->ringflaga != NULL)
+    omFree((ADDRESS) r->ringflaga);
 #endif
   omFreeBin(r, ip_sring_bin);
 }
