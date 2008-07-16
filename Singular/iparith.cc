@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.473 2008-05-20 16:50:29 Singular Exp $ */
+/* $Id: iparith.cc,v 1.474 2008-07-16 12:41:32 wienand Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -32,6 +32,11 @@
 #include "lists.h"
 #include "longalg.h"
 #include "modulop.h"
+#ifdef HAVE_RINGS
+#include "rmodulon.h"
+#include "rmodulo2m.h"
+#include "rintegers.h"
+#endif
 #include "numbers.h"
 #include "stairc.h"
 #include "maps.h"
@@ -3502,6 +3507,24 @@ static BOOLEAN jjBI2N(leftv res, leftv u)
     {
       res->data=(void *)naMap0P(n);
     }
+#ifdef HAVE_RINGS
+    else if (rField_is_Ring_Z())
+    {
+      res->data=(void *)nrzMapQ(n);
+    }
+    else if (rField_is_Ring_ModN())
+    {
+      res->data=(void *)nrnMapQ(n);
+    }
+    else if (rField_is_Ring_PtoM())
+    {
+      res->data=(void *)nrnMapQ(n);
+    }
+    else if (rField_is_Ring_2toM())
+    {
+      res->data=(void *)nr2mMapQ(n);
+    }
+#endif
     else
     {
       WerrorS("cannot convert bigint to this field");
@@ -4136,6 +4159,10 @@ static BOOLEAN jjN2BI(leftv res, leftv v)
        n=nlInit((int)(long)i);
   }
   else if (rField_is_Q()) n=nlBigInt(i);
+#ifdef HAVE_RINGS
+  else if (rField_is_Ring_Z() || rField_is_Ring_ModN() || rField_is_Ring_PtoM()) n=nlMapGMP(i);
+  else if (rField_is_Ring_2toM()) n=nlInit((unsigned long) i);
+#endif
   else goto err;
   res->data=(void *)n;
   return FALSE;

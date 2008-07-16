@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.h,v 1.8 2008-07-07 12:21:43 wienand Exp $ */
+/* $Id: rmodulon.h,v 1.9 2008-07-16 12:41:33 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -51,5 +51,6 @@ BOOLEAN nrnDBTest      (number a, const char *f, const int l);
 void    nrnSetExp(int c, ring r);
 void    nrnInitExp(int c, ring r);
 
+number nrnMapQ(number from);
 #endif
 #endif

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.37 2008-03-19 17:44:34 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.38 2008-07-16 12:41:32 wienand Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -19,6 +19,11 @@
 #include "modulop.h"
 #include "longrat.h"
 #include "longalg.h"
+#ifdef HAVE_RINGS
+#include "rmodulon.h"
+#include "rmodulo2m.h"
+#include "rintegers.h"
+#endif
 #include "matpol.h"
 #include "silink.h"
 #include "syz.h"
@@ -142,6 +147,12 @@ static void * iiBI2N(void *data)
   if (rField_is_R())      return (void*)nrMapQ((number)data);
   if (rField_is_Q_a())    return (void*)naMap00((number)data);
   if (rField_is_Zp_a())   return (void*)naMap0P((number)data);
+#ifdef HAVE_RINGS
+  if (rField_is_Ring_Z())   return (void*)nrzMapQ((number)data);
+  if (rField_is_Ring_ModN())   return (void*)nrnMapQ((number)data);
+  if (rField_is_Ring_PtoM())   return (void*)nrnMapQ((number)data);
+  if (rField_is_Ring_2toM())   return (void*)nr2mMapQ((number)data);
+#endif
   WerrorS("cannot convert bigint to this ring");
   return NULL;
 }

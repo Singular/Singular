@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.186 2008-07-07 12:21:43 wienand Exp $ */
+/* $Id: ipshell.cc,v 1.187 2008-07-16 12:41:32 wienand Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1607,6 +1607,36 @@ void rDecomposeC(leftv h,const ring R)
   // ----------------------------------------
 }
 
+#ifdef HAVE_RINGS
+void rDecomposeRing(leftv h,const ring R)
+/* field is R or C */
+{
+  lists L=(lists)omAlloc0Bin(slists_bin);
+  if (rField_is_Ring_Z(R)) L->Init(1);
+  else                L->Init(2);
+  h->rtyp=LIST_CMD;
+  h->data=(void *)L;
+  // 0: char/ cf - ring
+  // 1: list (module)
+  // ----------------------------------------
+  // 0: char/ cf - ring
+  L->m[0].rtyp=STRING_CMD;
+  L->m[0].data=(void *)omStrDup("integer");
+  // ----------------------------------------
+  // 1: module
+  if (rField_is_Ring_Z(R)) return;
+  lists LL=(lists)omAlloc0Bin(slists_bin);
+  LL->Init(2);
+  LL->m[0].rtyp=BIGINT_CMD;
+  LL->m[0].data=nlMapGMP((number) R->ringflaga);
+  LL->m[1].rtyp=INT_CMD;
+  LL->m[1].data=(void *) R->ringflagb;
+  L->m[1].rtyp=LIST_CMD;
+  L->m[1].data=(void *)LL;
+}
+#endif
+
+
 lists rDecompose(const ring r)
 {
   // sanity check: require currRing==r for rings with polynomial data
@@ -1639,6 +1669,12 @@ lists rDecompose(const ring r)
   {
     rDecomposeC(&(L->m[0]),r);
   }
+#ifdef HAVE_RINGS
+  else if (rField_is_Ring(r))
+  {
+    rDecomposeRing(&(L->m[0]),r);
+  }
+#endif
   else if (rIsExtension(r))
   {
     if (r->algring!=NULL)
@@ -4455,8 +4491,9 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   int ch;
 #ifdef HAVE_RINGS
   unsigned int ringtype = 0;
-  unsigned long long ringflaga = 0;
-  unsigned int ringflagb = 0;
+  int_number ringflaga = (int_number) omAlloc(sizeof(MP_INT));
+  mpz_init_set_si(ringflaga, 0);
+  unsigned int ringflagb = 1;
 #endif
   int float_len=0;
   int float_len2=0;
@@ -4500,51 +4537,53 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   {
     if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
     {
-      ringflaga = (unsigned long long) pn->next->Data();
+      mpz_set_ui(ringflaga, (unsigned int) pn->next->Data());
       pn=pn->next;
-      ringflagb = 1;
       if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
       {
-        ringflagb = (unsigned int) (unsigned long) pn->next->Data();
+        ringflagb = (unsigned int) pn->next->Data();
         pn=pn->next;
       }
       while ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
       {
-        ringflaga *= (unsigned long long) pn->next->Data();
+        mpz_mul_ui(ringflaga, ringflaga, (unsigned int) pn->next->Data());
         pn=pn->next;
       }
-      if (ringflaga < 2)
-      {
-        Werror("Wrong ground ring specification (module smallet than 2)");
-        goto rInitError;
-      }
-      if (ringflagb < 1)
-      {
-        Werror("Wrong ground ring specification (exponent smaller than 1");
-        goto rInitError;
-      }
-      if (ringflagb > 1)
-      {
-        ch = ringflagb;
-        if ((ringflaga == 2) && (ringflagb + 2 <= 8*sizeof(NATNUMBER)))
-        {
-          ringtype = 1;       // Use Z/2^ch
-        }
-        else
-        {
-          ringtype = 3;
-        }
-      }
-      else
-      {
-        ringtype = 2;
-        ch = ringflaga;
-      }
     }
-    else
+    if ((mpz_cmp_ui(ringflaga, 1) == 0) && (mpz_cmp_ui(ringflaga, 0) < 0))
+    {
+      Werror("Wrong ground ring specification (module is 1)");
+      goto rInitError;
+    }
+    if (ringflagb < 1)
+    {
+      Werror("Wrong ground ring specification (exponent smaller than 1");
+      goto rInitError;
+    }
+    // module is 0 ---> integers
+    if (mpz_cmp_ui(ringflaga, 0) == 0)
     {
       ch = 0;
       ringtype = 4;
+    }
+    // we have an exponent
+    else if (ringflagb > 1)
+    {
+      ch = ringflagb;
+      if ((mpz_cmp_ui(ringflaga, 2) == 0) && (ringflagb + 2 <= 8*sizeof(NATNUMBER)))
+      {
+        ringtype = 1;       // Use Z/2^ch
+      }
+      else
+      {
+        ringtype = 3;
+      }
+    }
+    // just a module m > 1
+    else
+    {
+      ringtype = 2;
+      ch = mpz_get_ui(ringflaga);
     }
   }
 #endif

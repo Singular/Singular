@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.11 2008-07-15 07:24:10 wienand Exp $ */
+/* $Id: longrat.h,v 1.12 2008-07-16 12:41:33 wienand Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
@@ -91,6 +91,9 @@ BOOLEAN  nlDBTest(number a, const char *f, const int l);
 extern number nlOne;
 
 nMapFunc nlSetMap(ring src, ring dst);
+#ifdef HAVE_RINGS
+number nlMapGMP(number from);
+#endif
 
 #ifndef OM_ALLOC_H
 struct omBin_s;

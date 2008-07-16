@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.11 2008-07-14 08:07:11 wienand Exp $ */
+/* $Id: modulop.cc,v 1.12 2008-07-16 12:41:33 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -17,8 +17,7 @@
 #include "mpr_complex.h"
 #include "ring.h"
 #ifdef HAVE_RINGS
-#include "gmp.h"
-typedef MP_INT *int_number;
+#include <gmp.h>
 #endif
 #include "modulop.h"
 

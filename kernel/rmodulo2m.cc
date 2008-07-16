@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.21 2008-07-15 15:29:15 wienand Exp $ */
+/* $Id: rmodulo2m.cc,v 1.22 2008-07-16 12:41:33 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -20,8 +20,6 @@
 #include "ring.h"
 #include "rmodulo2m.h"
 #include "gmp.h"
-
-typedef MP_INT *int_number;
 
 int nr2mExp;
 NATNUMBER nr2mModul;
@@ -448,7 +446,7 @@ nMapFunc nr2mSetMap(ring src, ring dst)
     // Computing the n of Z/n
     int_number modul = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
     mpz_init(modul);
-    mpz_set_ui(modul, src->ringflaga);
+    mpz_set(modul, src->ringflaga);
     mpz_pow_ui(modul, modul, src->ringflagb);
     if (mpz_divisible_2exp_p(modul, dst->ringflagb))
     {

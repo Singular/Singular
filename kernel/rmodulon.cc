@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.28 2008-07-15 15:29:15 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.29 2008-07-16 12:41:33 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -21,13 +21,12 @@
 
 #ifdef HAVE_RINGMODN
 
-typedef MP_INT *int_number;
 omBin gmp_nrn_bin = omGetSpecBin(sizeof(MP_INT));
 
 int_number nrnModul = NULL;
 int_number nrnMinusOne = NULL;
 unsigned long nrnExponent = 0;
-unsigned long long nrnBase = 0;
+int_number nrnBase = NULL;
 
 /*
  * create a number from int
@@ -335,14 +334,6 @@ number nrnIntDiv (number a,number b)
  * Helper function for computing the module
  */
 
-void mpz_set_ull(int_number res, unsigned long long xx)
-{
-  unsigned long h = xx >> 32;
-  mpz_set_ui (res, h);
-  mpz_mul_2exp (res, res, 32);
-  mpz_add_ui (res, res, (unsigned long) xx);
-}
-
 int_number nrnMapCoef = NULL;
 
 number nrnMapModN(number from)
@@ -400,7 +391,7 @@ nMapFunc nrnSetMap(ring src, ring dst)
   if (rField_is_Ring_ModN(src) || rField_is_Ring_PtoM(src) || rField_is_Ring_2toM(src) || rField_is_Zp(src))
   {
     if (   (src->ringtype > 0)
-        && (src->ringflaga == dst->ringflaga)
+        && (mpz_cmp(src->ringflaga, dst->ringflaga) == 0)
         && (src->ringflagb == dst->ringflagb)) return nrnMapGMP;
     else
     {
@@ -413,7 +404,7 @@ nMapFunc nrnSetMap(ring src, ring dst)
       else
       {
         mpz_init(nrnMapModul);
-        mpz_set_ull(nrnMapModul, src->ringflaga);
+        mpz_set(nrnMapModul, src->ringflaga);
         mpz_pow_ui(nrnMapModul, nrnMapModul, src->ringflagb);
       }
       // nrnMapCoef = 1 in dst       if dst is a subring of src
@@ -468,7 +459,7 @@ nMapFunc nrnSetMap(ring src, ring dst)
 
 void nrnSetExp(int m, ring r)
 {
-  if ((nrnBase == r->ringflaga) && (nrnExponent == r->ringflagb)) return;
+  if ((nrnBase != NULL) && (mpz_cmp(nrnBase, r->ringflaga) == 0) && (nrnExponent == r->ringflagb)) return;
   nrnBase = r->ringflaga;
   nrnExponent = r->ringflagb;
   if (nrnModul == NULL)
@@ -478,7 +469,7 @@ void nrnSetExp(int m, ring r)
     nrnMinusOne = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
     mpz_init(nrnMinusOne);
   }
-  mpz_set_ull(nrnModul, nrnBase);
+  mpz_set(nrnModul, nrnBase);
   mpz_pow_ui(nrnModul, nrnModul, nrnExponent);
   mpz_sub_ui(nrnMinusOne, nrnModul, 1);
 }

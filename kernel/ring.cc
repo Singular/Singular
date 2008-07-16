@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.96 2008-07-08 11:26:50 Singular Exp $ */
+/* $Id: ring.cc,v 1.97 2008-07-16 12:41:33 wienand Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -276,15 +276,19 @@ void rWrite(ring r)
 #ifdef HAVE_RINGZ
     if (rField_is_Ring_Z(r)) PrintS("Integers\n");
 #endif
+    int l = mpz_sizeinbase(r->ringflaga, 10) + 2;
+    char* s = (char*) omAlloc(l);
+    mpz_get_str(s,10,r->ringflaga);
 #ifdef HAVE_RINGMODN
-    if (rField_is_Ring_ModN(r)) Print("Z/%llu\n", r->ringflaga);
+    if (rField_is_Ring_ModN(r)) Print("Z/%s\n", s);
 #endif
 #ifdef HAVE_RING2TOM
-    if (rField_is_Ring_2toM(r)) Print("Z/2^%lu\n", r->ringflagb);
+    if (rField_is_Ring_2toM(r)) Print("Z/2^%s\n", s);
 #endif
 #ifdef HAVE_RINGMODN
-    if (rField_is_Ring_PtoM(r)) Print("Z/%llu^%lu\n", r->ringflaga, r->ringflagb);
+    if (rField_is_Ring_PtoM(r)) Print("Z/%s^%lu\n", s, r->ringflagb);
 #endif
+    omFreeSize((ADDRESS)s, l);
   }
 #endif
   else
@@ -508,6 +512,9 @@ void rDelete(ring r)
     }
     omFreeSize((ADDRESS)r->parameter,rPar(r)*sizeof(char_ptr));
   }
+#ifdef HAVE_RINGS
+  omFree((ADDRESS) r->ringflaga);
+#endif
   omFreeBin(r, ip_sring_bin);
 }
 

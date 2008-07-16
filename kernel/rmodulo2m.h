@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.h,v 1.9 2008-07-07 12:21:43 wienand Exp $ */
+/* $Id: rmodulo2m.h,v 1.10 2008-07-16 12:41:33 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -68,5 +68,6 @@ static inline number nr2mSubM(number a, number b)
 #define nr2mNegM(A) (number)(nr2mModul-(NATNUMBER)(A))
 #define nr2mEqualM(A,B)  ((A)==(B))
 
+number nr2mMapQ(number from);
 #endif
 #endif

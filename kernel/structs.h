@@ -3,12 +3,15 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.50 2008-07-15 16:27:58 motsak Exp $ */
+/* $Id: structs.h,v 1.51 2008-07-16 12:41:33 wienand Exp $ */
 /*
 * ABSTRACT
 */
 
 #include <string.h> /* for memset */
+#ifdef HAVE_RINGS
+#include <gmp.h>
+#endif
 
 #ifndef NATNUMBER
 #define NATNUMBER unsigned long
@@ -17,6 +20,9 @@
 /* standard types */
 typedef unsigned char  uchar;
 typedef unsigned short CARDINAL;
+#ifdef HAVE_RINGS
+typedef MP_INT *int_number;
+#endif
 #if (SIZEOF_LONG == 8)
 typedef int BOOLEAN;
 /* testet on x86_64, gcc 3.4.6: 2 % */
@@ -581,8 +587,8 @@ struct sip_sring
   struct omBin_s*   PolyBin; /* Bin from where monoms are allocated */
   int        ch;     /* characteristic */
 #ifdef HAVE_RINGS
-  unsigned int ringtype;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
-  unsigned long long ringflaga;
+  unsigned int  ringtype;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
+  int_number    ringflaga;
   unsigned long ringflagb;
 #endif
   int        ref; /* reference counter to the ring */

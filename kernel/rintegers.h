@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.h,v 1.6 2008-07-07 12:21:43 wienand Exp $ */
+/* $Id: rintegers.h,v 1.7 2008-07-16 12:41:33 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -51,5 +51,6 @@ void    nrzSetExp(int c, ring r);
 void    nrzInitExp(int c, ring r);
 void    nrzDelete(number *a, const ring r);
 
+number nrzMapQ(number from);
 #endif
 #endif

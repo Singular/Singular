@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.16 2008-07-15 07:24:10 wienand Exp $ */
+/* $Id: rintegers.cc,v 1.17 2008-07-16 12:41:33 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -21,7 +21,6 @@
 
 #ifdef HAVE_RINGZ
 
-typedef MP_INT *int_number;
 omBin gmp_nrz_bin = omGetSpecBin(sizeof(MP_INT));
 
 /*
@@ -313,9 +312,7 @@ void nrzWrite (number &a)
   }
   else
   {
-    int l=mpz_sizeinbase((int_number) a, 10);
-    if (a->s<2) l=si_max(l,mpz_sizeinbase((int_number) a,10));
-    l+=2;
+    int l=mpz_sizeinbase((int_number) a, 10) + 2;
     s=(char*)omAlloc(l);
     z=mpz_get_str(s,10,(int_number) a);
     StringAppendS(z);
