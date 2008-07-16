@@ -15,13 +15,42 @@ LIB "general.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc findZeroPoly (poly f)
-"USAGE:   findZeroPoly(f); f - a polynomial
+"USAGE:   findZeroPolyWrap(f); f - a polynomial
 RETURN:  zero polynomial with the same leading term as f if exists, otherwise 0
-NOTE:    just a wrapper
+NOTE:    just a wrapper, work only in Z/2^n with n < int_machine_size - 1
 EXAMPLE: example findZeroPoly; shows an example
 "
 {
-   return(system("findZeroPoly", f));
+  return(system("findZeroPoly", f));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  option(teach);
+  ring r = 65536, (y,x), dp;
+  poly f = 1024*x^8*y^2+11264*x^8*y+28672*x^8+45056*x^7*y^2+36864*x^7*y+16384*x^7+40960*x^6*y^2+57344*x^6*y+32768*x^6+30720*x^5*y^2+10240*x^5*y+8192*x^5+35840*x^4*y^2+1024*x^4*y+20480*x^4+30720*x^3*y^2+10240*x^3*y+8192*x^3+4096*x^2*y^2+45056*x^2*y+49152*x^2+40960*x*y^2+57344*x*y+32768*x;
+  findZeroPoly(f);
+}
+
+proc findZeroPoly (poly f)
+"USAGE:   findZeroPoly(f); f - a polynomial
+RETURN:  zero polynomial with the same leading term as f if exists, otherwise 0
+EXAMPLE: example findZeroPoly; shows an example
+"
+{
+  list data = getZeroCoef(f);
+  if (data[1] == 0)
+  {
+    return(0);
+  }
+  number q = leadcoef(f) / data[1];
+  if (q == 0)
+  {
+    return(0);
+  }
+  poly g = getZeroPolyRaw(data[2]);
+  g = leadmonom(f) / leadmonom(g) * g;
+  return(q * data[1] * g);
+  //return(system("findZeroPoly", f));
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -94,4 +123,111 @@ example
   ring r = 65536, (y,x), dp;
   poly f = 1024*x^8*y^2+11264*x^8*y+28672*x^8+45056*x^7*y^2+36864*x^7*y+16384*x^7+40960*x^6*y^2+57344*x^6*y+32768*x^6+30720*x^5*y^2+10240*x^5*y+8192*x^5+35840*x^4*y^2+1024*x^4*y+20480*x^4+30720*x^3*y^2+10240*x^3*y+8192*x^3+4096*x^2*y^2+45056*x^2*y+49152*x^2+40960*x*y^2+57344*x*y+32768*x;
   zeroReduceProt(f);
+}
+
+proc getZeroCoef(poly f)
+{
+  if (f == 0)
+  {
+    return(0, leadexp(f))
+  }
+  list data = sort(leadexp(f));
+  intvec exp = data[1];
+  intvec index = data[2];
+  intvec nec = 0:size(exp);
+  int i = 1;
+  int j = 2;
+  bigint g;
+  bigint G = 1;
+  bigint B = char(basering);
+  for (; exp[i] < 2; i++) {if (i == size(exp)) break;}
+  for (; i <= size(exp); i++)
+  {
+    g = gcd(B, G);
+    G = G * g;
+    B = B / g;
+    if (g != 1)
+    {
+      nec[index[i]] = j - 1;
+    }
+    if (B == 1)
+    {
+      return(B, nec);
+    }
+    for (; j <= exp[i]; j++)
+    {
+      g = gcd(B, bigint(j));
+      G = G * g;
+      B = B / g;
+      if (g != 1)
+      {
+        nec[index[i]] = j;
+      }
+      if (B == 1)
+      {
+        return(B, nec);
+      }
+    }
+  }
+  return(B, nec);
+}
+
+proc getZeroPolyRaw(intvec fexp)
+{
+  list data = sort(fexp);
+  intvec exp = data[1];
+  intvec index = data[2];
+  int j = 0;
+  poly res = 1;
+  poly tillnow = 1;
+  int i = 1;
+  for (; exp[i] < 2; i++) {if (i == size(exp)) break;}
+  for (; i <= size(exp); i++)
+  {
+    for (; j < exp[i]; j++)
+    {
+      tillnow = tillnow * (var(1) - j);
+    }
+    res = res * subst(tillnow, var(1), var(index[i]));
+  }
+  return(res);
+}
+
+proc getZeroPoly(poly f)
+{
+  list data = getZeroCoef(f);
+  poly g = getZeroPolyRaw(data[2]);
+  g = leadmonom(f) / leadmonom(g) * g;
+  return(data[1] * g);
+}
+
+proc testZero(poly f)
+{
+  poly g;
+  int j;
+  bigint i = 0;
+  bigint modul = char(basering);
+  printf("Teste %s Belegungen ...", modul^nvars(basering));
+  for (; i < modul^nvars(basering); i = i + 1)
+  {
+    if (i % char(basering) == 0)
+    {
+      printf("bisher: %s", i);
+    }
+    g = f;
+    for (j = 1; j <= nvars(basering); j++)
+    {
+      g = subst(g, var(j), number((i / modul^(j-1)) % modul));
+    }
+    if (g != 0)
+    {
+      list counter = g;
+      for (j = 1; j <= nvars(basering); j++)
+      {
+        counter = insert(counter, (i / modul^(j-1)) % modul);
+      }
+      return(counter);
+    }
+  }
+  return(1);
 }
