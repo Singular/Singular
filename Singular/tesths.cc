@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.113 2008-05-02 15:41:08 Singular Exp $ */
+/* $Id: tesths.cc,v 1.114 2008-07-16 12:51:19 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -60,6 +60,9 @@ int main(          /* main entry to Singular */
   On(SW_USE_NTL_GCD_P); // On -> cyle in Short/brnoeth_s: fixed
   On(SW_USE_EZGCD);
   On(SW_USE_CHINREM_GCD);
+  //On(SW_USE_fieldGCD);
+  //On(SW_USE_EZGCD_P);
+  //On(SW_USE_QGCD);
   Off(SW_USE_NTL_SORT); // may be changed by an command line option
 #endif
 
