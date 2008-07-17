@@ -27,6 +27,9 @@ Their copyrights and licenses can be found in the accompanying files
 which are distributed along with these packages.  (Since version 3-0-3
 of SINGULAR, all parts have GPL or LGPL as (one of) their licences.)
 
+Some single files a copyright given within the file:
+Singular/ndbm.* (BSD), kernel/htmlhelp.h (LGPL 2.1+)
+
 This program is distributed in the hope that it will be useful, but
 WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
