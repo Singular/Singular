@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.98 2008-07-16 15:04:26 wienand Exp $ */
+/* $Id: ring.cc,v 1.99 2008-07-17 07:32:02 wienand Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -617,6 +617,13 @@ char * rCharStr(ring r)
   char *s;
   int i;
 
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(r))
+  {
+    s=omStrDup("coefficient ring");                   /* Z */
+    return s;
+  }
+#endif
   if (r->parameter==NULL)
   {
     i=r->ch;
