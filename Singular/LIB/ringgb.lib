@@ -1,35 +1,23 @@
-//(GMG/BM, last modified 22.06.96)
+// Singular-library
 ///////////////////////////////////////////////////////////////////////////////
+// version string automatically expanded by CVS
 version="$Id: ringgb.lib,v 1.16 2001/01/16 13:48:40 Singular Exp $";
-category="Beta Testing";
+category="Miscellaneous";
 info="
-LIBRARY:  ringgb.lib     Examples and tests for ringgb development
+LIBRARY:  ringgb.lib     Functions for coefficient rings
+AUTHOR:  Oliver Wienand, email: wienand@mathematik.uni-kl.de
+
+KEYWORDS: vanishing polynomial; zeroreduce; polynomial functions; library, ringgb.lib; ringgb.lib, functions for coefficient rings
 
 PROCEDURES:
- findZeroPoly(f);        finds a zero polynomial for reducing f
- zeroReduce(f);          normal form of f concerning the ideal of zero polynomials
- zeroReduceProt(f);          normal form of f concerning the ideal of zero polynomials
+ findZeroPoly(f);        finds a vanishing polynomial for reducing f
+ zeroReduce(f);          normal form of f concerning the ideal of vanishing polynomials
+ testZero(poly f);       tests f defines the constant zero function
+ noElements(def r);      the number of elements of the coefficient ring, if of type (integer, ...)
 ";
 
 LIB "general.lib";
 ///////////////////////////////////////////////////////////////////////////////
-
-proc findZeroPoly (poly f)
-"USAGE:   findZeroPolyWrap(f); f - a polynomial
-RETURN:  zero polynomial with the same leading term as f if exists, otherwise 0
-NOTE:    just a wrapper, work only in Z/2^n with n < int_machine_size - 1
-EXAMPLE: example findZeroPoly; shows an example
-"
-{
-  return(system("findZeroPoly", f));
-}
-example
-{ "EXAMPLE:"; echo = 2;
-  option(teach);
-  ring r = 65536, (y,x), dp;
-  poly f = 1024*x^8*y^2+11264*x^8*y+28672*x^8+45056*x^7*y^2+36864*x^7*y+16384*x^7+40960*x^6*y^2+57344*x^6*y+32768*x^6+30720*x^5*y^2+10240*x^5*y+8192*x^5+35840*x^4*y^2+1024*x^4*y+20480*x^4+30720*x^3*y^2+10240*x^3*y+8192*x^3+4096*x^2*y^2+45056*x^2*y+49152*x^2+40960*x*y^2+57344*x*y+32768*x;
-  findZeroPoly(f);
-}
 
 proc findZeroPoly (poly f)
 "USAGE:   findZeroPoly(f); f - a polynomial
@@ -54,31 +42,43 @@ EXAMPLE: example findZeroPoly; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-  option(teach);
-  ring r = 65536, (y,x), dp;
+  ring r = (integer, 65536), (y,x), dp;
   poly f = 1024*x^8*y^2+11264*x^8*y+28672*x^8+45056*x^7*y^2+36864*x^7*y+16384*x^7+40960*x^6*y^2+57344*x^6*y+32768*x^6+30720*x^5*y^2+10240*x^5*y+8192*x^5+35840*x^4*y^2+1024*x^4*y+20480*x^4+30720*x^3*y^2+10240*x^3*y+8192*x^3+4096*x^2*y^2+45056*x^2*y+49152*x^2+40960*x*y^2+57344*x*y+32768*x;
   findZeroPoly(f);
 }
 
-proc zeroReduceExt (poly f , int i)
-"USAGE:   zeroReduceExt(f, i); f - a polynomial, i - noisy level
+proc zeroReduce(poly f, list #)
+"USAGE:   zeroReduce(f, [i = 0]); f - a polynomial, i - noise level (if != 0 prints all steps)
 RETURN:  reduced normal form of f modulo zero polynomials
-EXAMPLE: example zeroReduceExt; shows an example
+EXAMPLE: example zeroReduce; shows an example
 "
 {
+   int i = 0;
+   if (size(#) > 0)
+   {
+     i = #[1];
+   }
    poly h = f;
    poly n = 0;
    poly g = findZeroPoly(h);
+   if (i <> 0) {
+     printf("reducing polyfct  : %s", h);
+   }
    while ( h <> 0 ) {
       while ( g <> 0 ) {
          h = h - g;
-         if (i == 1) {
-            printf("reduce with: %s", g);
-            printf("to: %s", h);
+         if (i <> 0) {
+            printf(" reduce with: %s", g);
+            printf(" to: %s", h);
          }
          g = findZeroPoly(h);
       }
       n = lead(h) + n;
+      if (i <> 0) {
+         printf("head irreducible  : %s", lead(h));
+         printf("irreducible start : %s", n);
+         printf("remains to check  : %s", h - lead(h));
+      }
       h = h - lead(h);
       g = findZeroPoly(h);
    }
@@ -86,46 +86,80 @@ EXAMPLE: example zeroReduceExt; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-  option(teach);
-  ring r = 65536, (y,x), dp;
-  poly f = 1024*x^8*y^2+11264*x^8*y+28672*x^8+45056*x^7*y^2+36864*x^7*y+16384*x^7+40960*x^6*y^2+57344*x^6*y+32768*x^6+30720*x^5*y^2+10240*x^5*y+8192*x^5+35840*x^4*y^2+1024*x^4*y+20480*x^4+30720*x^3*y^2+10240*x^3*y+8192*x^3+4096*x^2*y^2+45056*x^2*y+49152*x^2+40960*x*y^2+57344*x*y+32768*x;
-  zeroReduceExt(f,0);
-  zeroReduceExt(f,1);
-}
-
-proc zeroReduce (poly f)
-"USAGE:   zeroReduce(f); f - a polynomial
-RETURN:  reduced normal form of f modulo zero polynomials
-EXAMPLE: example zeroReduce; shows an example
-"
-{
-   return(zeroReduceExt(f, 0));
-}
-example
-{ "EXAMPLE:"; echo = 2;
-  option(teach);
-  ring r = 65536, (y,x), dp;
+  ring r = (integer, 65536), (y,x), dp;
   poly f = 1024*x^8*y^2+11264*x^8*y+28672*x^8+45056*x^7*y^2+36864*x^7*y+16384*x^7+40960*x^6*y^2+57344*x^6*y+32768*x^6+30720*x^5*y^2+10240*x^5*y+8192*x^5+35840*x^4*y^2+1024*x^4*y+20480*x^4+30720*x^3*y^2+10240*x^3*y+8192*x^3+4096*x^2*y^2+45056*x^2*y+49152*x^2+40960*x*y^2+57344*x*y+32768*x;
   zeroReduce(f);
+  kill r;
+  ring r = (integer, 2, 32), (x,y,z), dp;
+  // Polynomial 1:
+  poly p1 = 3795162112*x^3+587202566*x^2*y+2936012853*x*y*z+2281701376*x+548767119*y^3+16777216*y^2+268435456*y*z+1107296256*y+4244635648*z^3+4244635648*z^2+16777216*z;
+  // Polynomial 2:
+  poly p2 = 1647678464*x^3+587202566*x^2*y+2936012853*x*y*z+134217728*x+548767119*y^3+16777216*y^2+268435456*y*z+1107296256*y+2097152000*z^3+2097152000*z^2+16777216*z;
+  zeroReduce(p1-p2);
 }
 
-proc zeroReduceProt (poly f)
-"USAGE:   zeroReduceProt(f); f - a polynomial
-RETURN:  reduced normal form of f modulo zero polynomials and describes the way *g*
-EXAMPLE: example zeroReduceProt; shows an example
+proc testZero(poly f)
+"USAGE:   testZero(f); f - a polynomial
+RETURN:  returns 1 if f is zero as a function and otherwise a counterexample as a list [f(x_1, ..., x_n), x_1, ..., x_n]
+EXAMPLE: example testZero; shows an example
 "
 {
-   return(zeroReduceExt(f, 1));
+  poly g;
+  int j;
+  bigint i = 0;
+  bigint modul = noElements(basering);
+  printf("Teste %s Belegungen ...", modul^nvars(basering));
+  for (; i < modul^nvars(basering); i = i + 1)
+  {
+    if ((i + 1) % modul^(nvars(basering)/2) == 0)
+    {
+      printf("bisher: %s", i);
+    }
+    g = f;
+    for (j = 1; j <= nvars(basering); j++)
+    {
+      g = subst(g, var(j), number((i / modul^(j-1)) % modul));
+    }
+    if (g != 0)
+    {
+      list counter = g;
+      for (j = 1; j <= nvars(basering); j++)
+      {
+        counter = insert(counter, (i / modul^(j-1)) % modul);
+      }
+      return(counter);
+    }
+  }
+  return(1);
 }
 example
 { "EXAMPLE:"; echo = 2;
-  option(teach);
-  ring r = 65536, (y,x), dp;
+  ring r = (integer, 12), (y,x), dp;
   poly f = 1024*x^8*y^2+11264*x^8*y+28672*x^8+45056*x^7*y^2+36864*x^7*y+16384*x^7+40960*x^6*y^2+57344*x^6*y+32768*x^6+30720*x^5*y^2+10240*x^5*y+8192*x^5+35840*x^4*y^2+1024*x^4*y+20480*x^4+30720*x^3*y^2+10240*x^3*y+8192*x^3+4096*x^2*y^2+45056*x^2*y+49152*x^2+40960*x*y^2+57344*x*y+32768*x;
-  zeroReduceProt(f);
+  zeroReduce(f);
+  testZero(f);
+  poly g = findZeroPoly(x2y3);
+  g;
+  testZero(g);
 }
 
-proc getZeroCoef(poly f)
+proc noElements(def r)
+"USAGE:   noElements(r); r - a ring with a finite coefficient ring of type integer
+RETURN:  returns the number of elements of the coefficient ring of r
+EXAMPLE: example noElements; shows an example
+"
+
+{
+  list l = ringlist(basering);
+  return(l[1][2][1]^l[1][2][2]);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r = (integer, 233,6), (y,x), dp;
+  noElements(r);
+}
+
+static proc getZeroCoef(poly f)
 {
   if (f == 0)
   {
@@ -139,7 +173,8 @@ proc getZeroCoef(poly f)
   int j = 2;
   bigint g;
   bigint G = 1;
-  bigint B = noElements(basering);
+  bigint modul = noElements(basering);
+  bigint B = modul;
 
   for (; exp[i] < 2; i++) {if (i == size(exp)) break;}
   for (; i <= size(exp); i++)
@@ -170,10 +205,15 @@ proc getZeroCoef(poly f)
       }
     }
   }
+  if (B == modul)
+  {
+    nec = 0;
+    return(0, nec);
+  }
   return(B, nec);
 }
 
-proc getZeroPolyRaw(intvec fexp)
+static proc getZeroPolyRaw(intvec fexp)
 {
   list data = sort(fexp);
   intvec exp = data[1];
@@ -194,7 +234,7 @@ proc getZeroPolyRaw(intvec fexp)
   return(res);
 }
 
-proc getZeroPoly(poly f)
+static proc getZeroPoly(poly f)
 {
   list data = getZeroCoef(f);
   poly g = getZeroPolyRaw(data[2]);
@@ -202,39 +242,18 @@ proc getZeroPoly(poly f)
   return(data[1] * g);
 }
 
-proc testZero(poly f)
+static proc findZeroPolyWrap (poly f)
+"USAGE:   findZeroPolyWrap(f); f - a polynomial
+RETURN:  zero polynomial with the same leading term as f if exists, otherwise 0
+NOTE:    just a wrapper, work only in Z/2^n with n < int_machine_size - 1
+EXAMPLE: example findZeroPoly; shows an example
+"
 {
-  poly g;
-  int j;
-  bigint i = 0;
-  bigint modul = noElements(basering);
-  printf("Teste %s Belegungen ...", modul^nvars(basering));
-  for (; i < modul^nvars(basering); i = i + 1)
-  {
-    if (i % modul == 0)
-    {
-      printf("bisher: %s", i);
-    }
-    g = f;
-    for (j = 1; j <= nvars(basering); j++)
-    {
-      g = subst(g, var(j), number((i / modul^(j-1)) % modul));
-    }
-    if (g != 0)
-    {
-      list counter = g;
-      for (j = 1; j <= nvars(basering); j++)
-      {
-        counter = insert(counter, (i / modul^(j-1)) % modul);
-      }
-      return(counter);
-    }
-  }
-  return(1);
+  return(system("findZeroPoly", f));
 }
-
-proc noElements(def r)
-{
-  list l = ringlist(basering);
-  return(l[1][2][1]^l[1][2][2]);
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r = (integer, 2, 16), (y,x), dp;
+  poly f = 1024*x^8*y^2+11264*x^8*y+28672*x^8+45056*x^7*y^2+36864*x^7*y+16384*x^7+40960*x^6*y^2+57344*x^6*y+32768*x^6+30720*x^5*y^2+10240*x^5*y+8192*x^5+35840*x^4*y^2+1024*x^4*y+20480*x^4+30720*x^3*y^2+10240*x^3*y+8192*x^3+4096*x^2*y^2+45056*x^2*y+49152*x^2+40960*x*y^2+57344*x*y+32768*x;
+  findZeroPoly(f);
 }
