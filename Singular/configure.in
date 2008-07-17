@@ -129,7 +129,7 @@ AC_PROG_CXX
 AC_PROG_INSTALL
 AC_AIX
 
-# test for gcc-version: gcc2: prefer CC=gcc, CXX=gcc
+# test for gcc-version: gcc2: prefer CC=gcc, CXX=gcc (if not with boost)
 #                       gcc3:        CC=gcc  CXX=g++
 #                       other:       CC=cc   CXX=c++
 AC_MSG_CHECKING(gcc version)
@@ -145,7 +145,7 @@ AC_MSG_RESULT($ac_cv_c_cpp)
 # not overwrite it explicitely
 if test "${GXX}" = yes && test "${ac_cxx_set}" = no; then
   if test "${ac_cv_c_cpp}" = gcc2; then
-    CXX=gcc
+    CXX=g++
   elif test "${ac_cv_c_cpp}" = gcc3; then
     CXX=g++
   fi
