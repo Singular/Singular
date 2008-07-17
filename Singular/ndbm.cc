@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: ndbm.cc,v 1.21 2008-06-10 15:44:50 Singular Exp $
+// $Id: ndbm.cc,v 1.22 2008-07-17 13:11:34 Singular Exp $
 //
 //**************************************************************************/
 // 'ndbm.cc' containes all low-level functions to manipulate dbm-files
@@ -65,7 +65,7 @@ static  long dcalchash(datum item);
 static  int delitem(char buf[PBLKSIZ], int n);
 static  int additem(char buf[PBLKSIZ], datum item, datum item1);
 extern  int errno;
-extern  int singular_fstat(int fd, struct stat *buf);
+extern "C" int singular_fstat(int fd, struct stat *buf);
 
 DBM * dbm_open(char *file, int flags, int mode)
 {

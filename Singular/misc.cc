@@ -710,6 +710,7 @@ void checkall()
 #include <sys/stat.h>
 #include <unistd.h>
 
+extern "C"
 int singular_fstat(int fd, struct stat *buf)
 {
   return fstat(fd,buf);
