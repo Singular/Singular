@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.188 2008-07-16 15:04:26 wienand Exp $ */
+/* $Id: ipshell.cc,v 1.189 2008-07-17 08:17:03 wienand Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1866,14 +1866,32 @@ void rComposeRing(lists L, ring R)
   }
   // ----------------------------------------
   // 1:
-  else 
+  else
   {
-    if (L->m[1].rtyp!=LIST_CMD) Werror("invald data, expecting list of two numbers");
+    if (L->m[1].rtyp!=LIST_CMD) Werror("invald data, expecting list of numbers");
     lists LL=(lists)L->m[1].data;
-    number ringflaga = (number) LL->m[0].data;
     mpz_init(R->ringflaga);
-    nlGMP(ringflaga, (number) R->ringflaga);
-    R->ringflagb = (unsigned long) LL->m[1].data;
+    if ((LL->nr >= 0) and LL->m[0].rtyp == BIGINT_CMD)
+    {
+      number ringflaga = (number) LL->m[0].data;
+      nlGMP(ringflaga, (number) R->ringflaga);
+    }
+    else if ((LL->nr >= 0) and LL->m[0].rtyp == INT_CMD)
+    {
+      mpz_init_set_ui(R->ringflaga,(unsigned long) LL->m[0].data);
+    }
+    else
+    {
+      mpz_init_set_ui(R->ringflaga,0);
+    }
+    if (LL->nr >= 1)
+    {
+      R->ringflagb = (unsigned long) LL->m[1].data;
+    }
+    else
+    {
+      R->ringflagb = 1;
+    }
   }
   // ----------------------------------------
   if ((mpz_cmp_ui(R->ringflaga, 1) == 0) && (mpz_cmp_ui(R->ringflaga, 0) < 0))
