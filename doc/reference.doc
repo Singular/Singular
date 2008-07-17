@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.302 2008-04-28 13:50:06 Singular Exp $
+@comment $Id: reference.doc,v 1.303 2008-07-17 12:27:38 wienand Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5417,6 +5417,9 @@ the field description in the following format:
   L[1] the characteristic, L[2] the names of the parameters, L[3] the monomial
   ordering for the ring of parameters (default: lp), L[4] the minimal
   polynomial (as ideal))
+  @item for Z, Z/n, Z/n^m a list ["integer", [n, m]] with:@*
+  the base n is of type int or bigint (if not given n = 0, Z/0 = Z)@*
+  the exponent m is of type int (if not given m = 1)@*
   @end itemize
 @item
 the names of the variables (a list L of strings: L[i] is the name of the i-th

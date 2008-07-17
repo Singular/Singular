@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.214 2008-01-09 17:59:18 Singular Exp $
+@comment $Id: general.doc,v 1.215 2008-07-17 12:27:38 wienand Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1367,6 +1367,8 @@ a ring. Such a ring can be
 @item
 a polynomial ring over a field,
 @item
+a polynomial ring over a ring
+@item
 a localization of a polynomial ring,
 @item
 a quotient ring by an ideal of one of 1.@: or 2.,
@@ -1406,11 +1408,29 @@ transcendental extension of @math{Q} or @math{Z/p},
 simple algebraic extension of @math{Q} or @math{Z/p},
 @item
 the field of real numbers represented by floating point
-numbers of a user defined precision.
+numbers of a user defined precision,
 @item
 the field of complex numbers represented by (pairs of) floating point
-numbers of a user defined precision.
+numbers of a user defined precision,
+@item
+the ring of integers,
+@item
+finite rings @math{Z/m} with @math{m\in Z}.
 @end enumerate
+
+In case of coefficient rings, which are not fields, only the following functions
+are guaranteed to work:
+
+@itemize
+@item
+basic polynomial arithmetic, i.e. addition, multiplication, division, exponentation
+@item
+std, i.e. computing standard bases
+@item
+interred
+@item
+reduce
+@end itemize
 
 @cindex basering
 Throughout this manual, the current active ring in @sc{Singular} is
@@ -1433,6 +1453,7 @@ procedure.  @xref{Procedures}, @ref{keepring}.
 * Examples of ring declarations::
 * General syntax of a ring declaration::
 * Term orderings::
+* Coefficient rings::
 @end menu
 
 @c --------------------------------------
@@ -1606,6 +1627,28 @@ ideal @math{(x,y,z)}:
 ring R = 7,(x,y,z), dp;
 qring r = std(maxideal(2));
 @end smallexample
+
+@item
+the ring @math{Z[x,y,z]}:
+
+@smallexample
+ring R = integer,(x,y,z), dp;
+@end smallexample
+
+@item
+the ring @math{Z/6^3[x,y,z]}:
+
+@smallexample
+ring R = (integer, 6, 3),(x,y,z), dp;
+@end smallexample
+
+@item
+the ring @math{Z/100[x,y,z]}:
+
+@smallexample
+ring R = (integer, 100),(x,y,z), dp;
+@end smallexample
+
 @end itemize
 
 @c ---------------------------------------------------------------------------
@@ -1621,7 +1664,7 @@ qring r = std(maxideal(2));
 @c ------------------------------------------------------------
 @table @strong
 @item Syntax:
-@code{ring} name @code{=} @code{(}coefficient_field@code{),}
+@code{ring} name @code{=} @code{(}coefficients@code{),}
   @code{(} names_of_ring_variables @code{),}
   @code{(} ordering @code{);}
 @item Default:
@@ -1630,7 +1673,7 @@ qring r = std(maxideal(2));
 declares a ring and sets it as the current basering.
 @end table
 
-The coefficient_field is given by one of the following:
+The coefficients are given by one of the following:
 @enumerate
 @item
 a non-negative int_expression less or equal 2147483629.
@@ -1688,6 +1731,19 @@ numbers with a precision similar to @code{real}. An expression_list
 without int_expression defines a precision and rest with length 6.
 The name of the imaginary unit is given by the last parameter.
 Note that computations over these fields are not exact.
+
+@item
+an expression_list of the name @code{integer}. This specifies the ring of integers.
+
+@item
+an expression_list of the name @code{integer} and following int_expressions.
+This specifies the ring of integers modulo the product of the given int_expressions.
+
+@item
+an expression_list of the name @code{integer} and two int_expressions @code{b} and @code{e}.
+This specifies the ring of integers modulo b^e. If @code{b = 2} and @code{e < int_bit_size}
+an optimized implementation is used.
+
 @end enumerate
 
 'names_of_ring_variables' is a list of names or indexed names.
@@ -1712,7 +1768,7 @@ weight vector given as an intvec_expression in parentheses.
 
 For the definition of the orderings, see @ref{Monomial orderings}.
 
-If one of coefficient_field, names_of_ring_variables, and ordering
+If one of coefficients, names_of_ring_variables, and ordering
 consists of only one entry, the parentheses around this entry may be
 omitted.
 @c ------------------------------------------------------------
@@ -1766,7 +1822,7 @@ the command @code{reduce(f, std(0))} (@pxref{reduce}).
 @c ------------------------------------------------------------
 
 @c ---------------------------------------------------------------------------
-@node Term orderings,  , General syntax of a ring declaration, Rings and orderings
+@node Term orderings,  Coefficient rings, General syntax of a ring declaration, Rings and orderings
 @subsection Term orderings
 @cindex Monomial orderings, Term orderings
 
@@ -1905,6 +1961,23 @@ all monomial block orderings following after it have lower precedence.
 
 For a mathematical description of these orderings, see
 @ref{Polynomial data}.
+
+@c ---------------------------------------------------------------------------
+@node Coefficient rings,  , Term orderings, Rings and orderings
+@subsection Coefficient rings
+@cindex coefficient rings, ring of integers, zero divisors, p-adic numbers
+
+@sc{Singular} supports coefficient ranges which are not fields, i.e. the 
+integers @math{Z} and the finite rings @math{Z/n} for a number @code{n}. These 
+coefficient rings were implemented in @sc{Singular} 3.0.5 and at the moment 
+only limited functionality is available.
+
+@subheading p-adic numbers
+@cindex p-adic numbers, l-adic numbers, projective limes
+
+The p-adic integers @math{Z_p} are the projective limit of the finite
+rings @math{Z/p^n} for @code{n} to infinity. Therefore compuations in this ring 
+can be approximated by computations in @math{Z/p^n} for large @code{n}.
 
 @c ---------------------------------------------------------------------------
 @node Implemented algorithms, The SINGULAR language, Rings and orderings, General concepts

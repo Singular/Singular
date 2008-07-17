@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_win.texi,v 1.14 2006-08-03 08:18:27 Singular Exp $
+@comment $Id: INSTALL_win.texi,v 1.15 2008-07-17 12:27:38 wienand Exp $
 @c FILE:    INSTALL.texi
 @c PURPOSE: Installation instructions for Singular on MSWindows
 @c          This file is displayed during installation and copied to
@@ -16,10 +16,7 @@
 @heading For the impatient (with only one file download):
 @itemize
 @item
-If you run Windows NT/2000/XP, make sure you are logged in with the
-@code{Administrator} rights.
-@item
-If you have @code{Cygwin} or @code{XEmacs} installed, please read the information below.
+If you have @code{Cygwin} installed, please read the information below.
 @item
 Execute the self-extracting installation archive and
 @strong{carefully} follow the instructions given there.
@@ -39,18 +36,14 @@ you will find the packages related to @sc{Singular} under
 @itemize
 @item a.Category Math
 singular-base, singular-share,
-singular-help (optional,recommended),
+singular-help (optional, recommended),
 singular-icons(optional),
-singular-surf (optional,recommended)
+singular-surf (optional, recommended)
 @item b.Category Editors
-emacs or xemacs (optional,needed if you wish to use Singular (Emacs) or ESingular) 
+emacs or xemacs (optional, needed if you wish to use @sc{Singular (Emacs)} or @sc{ESingular})
 @item c.Category Shells
-rxvt (optional,strongly recommended) 
+rxvt (optional, strongly recommended)
 @end itemize
-
-To run @sc{ESingular} (i.e. @sc{Singular} within its Emacs interface) on
-MS Windows requires furthermore that the XEmacs editor is installed on
-your system.
 
 Complete installation informations for Windows are available from
 @display

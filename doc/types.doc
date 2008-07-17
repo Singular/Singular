@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.137 2007-10-30 13:07:17 Singular Exp $
+@comment $Id: types.doc,v 1.138 2008-07-17 12:27:39 wienand Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -3588,7 +3588,7 @@ For a detailed description of the concept of rings see
 
 @table @strong
 @item Syntax:
-@code{ring} name @code{= (} coefficient_field @code{),}
+@code{ring} name @code{= (} coefficients @code{),}
   @code{(} names_of_ring_variables @code{),}
   @code{(} ordering @code{);}
 @item Default:
@@ -3597,7 +3597,7 @@ For a detailed description of the concept of rings see
 declares a ring and sets it as the actual basering.
 @end table
 
-The coefficient_field is given by one of the following:
+The coefficients are given by one of the following:
 @enumerate
 @item
 a non-negative int_expression less or equal 2147483629.
@@ -3610,9 +3610,16 @@ an expression_list of the name @code{real} and an  int_expression.
 @item
 an expression_list of the name @code{complex}, an optional int_expression
 and a name.
+@item
+an expression_list of the name @code{integer}.
+@item
+an expression_list of the name @code{integer} and following int_expressions.
+@item
+an expression_list of the name @code{integer} and two int_expressions.
+
 @end enumerate
 
-For the definition of the 'coefficient_field', see @ref{Rings and orderings}.
+For the definition of the 'coefficients', see @ref{Rings and orderings}.
 
 'names_of_ring_variables' must be a list of names or (multi-)indexed names.
 
@@ -3636,7 +3643,7 @@ weight vector given as an intvec_expression in parentheses.
 For the definition of the orderings, see @ref{Term orderings},
 @ref{Monomial orderings}.
 
-If one of coefficient_field, names_of_ring_variables, and ordering
+If one of coefficients, names_of_ring_variables, and ordering
 consists of only one entry, the parentheses around this entry may be
 omitted.
 

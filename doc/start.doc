@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.51 2006-07-17 14:40:31 Singular Exp $
+@comment $Id: start.doc,v 1.52 2008-07-17 12:27:39 wienand Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added changes by GMG.
 
@@ -476,6 +476,19 @@ variable names @code{a} and @code{b}.
 complex floating point numbers with extended precision of 50 digits
 and imaginary unit @code{i},
 variable names @code{a} and @code{b}.
+
+@item ring r8=integer,(a,b),lp;
+the ring of integers (see @ref{Coefficient rings}),
+variable names @code{a} and @code{b}.
+
+@item ring r9=(integer, 60),(a,b),lp;
+the ring of integers modulo 60 (see @ref{Coefficient rings}),
+variable names @code{a} and @code{b}.
+
+@item ring r10=(integer, 2, 10),(a,b),lp;
+the ring of integers modulo 2^10 (see @ref{Coefficient rings}),
+variable names @code{a} and @code{b}.
+
 @end table
 
 @c Another valid characteristic would be, for example, a prime number less
@@ -487,14 +500,15 @@ variable names @code{a} and @code{b}.
 @c @code{dp} in the example above. Another important example is the
 @c lexicographical ordering called @code{lp}.
 @c
+
 Typing the name of a ring prints its definition. The example below
-shows that the default ring in @sc{Singular} is @math{Z/32003[x,y,z]}
-with degree reverse lexicographical ordering:
+shows that the default ring in @sc{Singular} is @math{Z/32003[x,y,z]} with 
+degree reverse lexicographical ordering:
 
 @smallexample
 @c example
-ring r8;
-r8;
+ring r11;
+r11;
 @c example
 @end smallexample
 
@@ -508,7 +522,7 @@ in @sc{Singular} is discussed in detail in
 the chapter "Rings and orderings" of the @sc{Singular} manual.
 @end ifclear
 
-The basering is now @code{r8}. Since we want to calculate in the ring
+The basering is now @code{r11}. Since we want to calculate in the ring
 @code{r}, which we defined first, we have to switch back to it. This can
 be done using the function @code{setring}:
 
