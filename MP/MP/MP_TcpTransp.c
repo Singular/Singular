@@ -73,7 +73,7 @@
  ***************************************************************************/
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_TcpTransp.c,v 1.14 2008-07-17 10:26:55 Singular Exp $";
+static char vcid[] = "@(#) $Id: MP_TcpTransp.c,v 1.15 2008-07-18 09:04:04 Singular Exp $";
 #endif /* lint */
 
 #include "MP.h"
@@ -771,7 +771,6 @@ MP_Status_t open_tcp_fork_mode(link, argc, argv)
     sprintf(log_msg, "open_tcp_fork:  child starti (pid=%d)",getpid());
 #endif
     /* establish connection */
-    sleep(1); /* wait for the parent to listen */
     stat = open_tcp_connect_mode(link, 8, argv);
 
 #ifndef NO_LOGGING
