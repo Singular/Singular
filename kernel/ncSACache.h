@@ -3,7 +3,7 @@
 /*****************************************
  *  Computer Algebra System SINGULAR     *
  *****************************************/
-/* $Id: ncSACache.h,v 1.2 2008-07-15 16:27:58 motsak Exp $ */
+/* $Id: ncSACache.h,v 1.3 2008-07-18 17:12:37 motsak Exp $ */
 
 // #include <ncSACache.h> // for CCacheHash etc classes
 
@@ -28,9 +28,11 @@ class CCacheHash
     inline int NVars() const { return m_NVars; }
     
     virtual ~CCacheHash(){};
+
     
     enum EHistoryType {
-      MULT_LOOKUP
+      MULT_LOOKUP = 0,
+      MULT_STORE  = 1
     };
 
     struct CCacheItem
@@ -55,20 +57,34 @@ class CCacheHash
     // -1 means no hits!
     int LookupEE(CExponent a, CExponent b, CCacheItem*& pItems)
     {
-      History(a, b, MULT_LOOKUP);
+      Print("//////////////////////////////////////////////////////////////////////////////////////////////");
+      PrintLn();
+      Print("CCacheHash::LookupEE(a, b, *results)!");
+      PrintLn();
+
+      History(MULT_LOOKUP, a, b);
+      
       pItems = NULL;
       return -1;
     }
 
     bool StoreEE(CExponent a, CExponent b, poly pProduct)
     {
-      Print("StoreEE!\n");
+      Print("CCacheHash::StoreEE(a, b, Product)!");
+      PrintLn();
+
+      History(MULT_STORE, a, b, pProduct);
+
+      Print("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\");
+      PrintLn();
+
       return false; // the pair was not stored!
     };
     
-    virtual void History(const CExponent a, const CExponent b, const EHistoryType t)
+    virtual void History(const EHistoryType t, const CExponent a, const CExponent b, const poly p = NULL)
     {
-      Print("MultHistory!\n");
+      Print("CCacheHash::History(a, b, [p])!");
+      PrintLn();
     }
 
   private: // no copy constuctors!
@@ -88,7 +104,7 @@ class CGlobalCacheHash: public CCacheHash<poly>
     virtual ~CGlobalCacheHash() {};
 
   protected:
-    virtual void History(CExponent a, CExponent b, const EHistoryType t);
+    virtual void History(const EHistoryType t, const CExponent a, const CExponent b, const poly p = NULL);
 };
 
 class CSpecialPairCacheHash: public CCacheHash<int>
@@ -101,7 +117,7 @@ class CSpecialPairCacheHash: public CCacheHash<int>
     virtual ~CSpecialPairCacheHash() {};
 
   protected:
-    virtual void History(const CExponent a, const CExponent b, const EHistoryType t);
+    virtual void History(const EHistoryType t, const CExponent a, const CExponent b, const poly p = NULL);
 };
 
 

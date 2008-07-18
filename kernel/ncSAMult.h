@@ -3,7 +3,7 @@
 /*****************************************
  *  Computer Algebra System SINGULAR     *
  *****************************************/
-/* $Id: ncSAMult.h,v 1.4 2008-07-15 16:27:58 motsak Exp $ */
+/* $Id: ncSAMult.h,v 1.5 2008-07-18 17:12:37 motsak Exp $ */
 #ifdef HAVE_PLURAL
 
 // #include <ncSAMult.h> // for CMultiplier etc classes
@@ -38,14 +38,40 @@ class CMultiplier
     inline int NVars() const { return m_NVars; }
 
 
+    inline poly LM(const poly pTerm, const ring r, int i = 1) const
+    {
+      poly pMonom = p_LmInit(pTerm, r);
+      pSetCoeff0(pMonom, n_Init(i, r));
+      return pMonom;
+    }
 
     // Term * Exponent -> Monom * Exponent
     inline poly MultiplyTE(const poly pTerm, const CExponent expRight)
-    { return p_Mult_nn(MultiplyME(pTerm, expRight), p_GetCoeff(pTerm, GetBasering()), GetBasering()); }
+    {
+      const ring r = GetBasering();
+      poly pMonom = LM(pTerm, r);
+      
+      poly result = p_Mult_nn(MultiplyME(pMonom, expRight), p_GetCoeff(pTerm, r), r);
+
+      p_Delete(&pMonom, r);
+
+      return result;
+    }
+    
 
     // Exponent * Term -> Exponent * Monom
     inline poly MultiplyET(const CExponent expLeft, const poly pTerm)
-    { return p_Mult_nn(MultiplyEM(expLeft, pTerm), p_GetCoeff(pTerm, GetBasering()), GetBasering()); }
+    {
+      const ring r = GetBasering();
+      poly pMonom = LM(pTerm, r);
+
+      poly result = p_Mult_nn(MultiplyEM(expLeft, pMonom), p_GetCoeff(pTerm, r), r);
+
+      p_Delete(&pMonom, r);
+      return result;
+      
+
+    }
 
     // Main templates:
 
@@ -130,7 +156,7 @@ class CSpecialPairMultiplier: public CMultiplier<int>
   public:
     // 1 <= i < j <= NVars()
     CSpecialPairMultiplier(ring r, int i, int j);
-    virtual ~CSpecialPairMultiplier(){}
+    virtual ~CSpecialPairMultiplier();
 
     inline int GetI() const { return m_i; }
     inline int GetJ() const { return m_j; }
@@ -156,18 +182,11 @@ class CSpecialPairMultiplier: public CMultiplier<int>
 class CCommutativeSpecialPairMultiplier: public CSpecialPairMultiplier
 {
   public:
-    CCommutativeSpecialPairMultiplier(ring r, int i, int j):
-        CSpecialPairMultiplier(r, i, j){};
-    virtual ~CCommutativeSpecialPairMultiplier() {}
+    CCommutativeSpecialPairMultiplier(ring r, int i, int j);
+    virtual ~CCommutativeSpecialPairMultiplier();
     
     // Exponent * Exponent
     virtual poly MultiplyEE(const int expLeft, const int expRight);    
-
-    // Monom * Exponent
-    virtual poly MultiplyME(const poly pMonom, const int expRight);
-
-    // Exponent * Monom
-    virtual poly MultiplyEM(const int expLeft, const poly pMonom);
 };
 
 
@@ -185,6 +204,7 @@ struct CPower // represents var(iVar)^{iPower}
   {
     poly p = p_ISet(c, r);
     p_SetExp(p, Var, Power, r);
+    p_Setm(p, r);
     return p;
   };
  

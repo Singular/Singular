@@ -6,7 +6,7 @@
  *  Purpose: implementation of special Cache+Hash for Multiplier 
  *  Author:  motsak
  *  Created: 
- *  Version: $Id: ncSACache.cc,v 1.2 2008-07-15 16:27:58 motsak Exp $
+ *  Version: $Id: ncSACache.cc,v 1.3 2008-07-18 17:12:37 motsak Exp $
  *******************************************************************/
 
 
@@ -25,18 +25,33 @@
 #include <ring.h>
 #include <p_polys.h>
 
+static const char* m_Typenames[2] = {"lookup", "store"};
 
-
-void CGlobalCacheHash::History(const CGlobalCacheHash::CExponent a, const CGlobalCacheHash::CExponent b, const EHistoryType t)
+void CGlobalCacheHash::History(const EHistoryType t, const CGlobalCacheHash::CExponent a, const CGlobalCacheHash::CExponent b, const poly p)
 {
-  Print("History: GlobalPair!");
+#if OUTPUT
+  Print("History: GlobalPair, Action: %s", m_Typenames[(int)(t)]);
+  PrintLn();
   PrintS("Left : "); p_Write(a, GetBasering());
-  PrintS("Right: "); p_Write(b, GetBasering());    
+  PrintS("Right: "); p_Write(b, GetBasering());
+  if( t == MULT_STORE )
+  {
+    PrintS("Result: "); p_Write(p, GetBasering());
+  }
+#endif
 }
 
 
-void CSpecialPairCacheHash::History(const CSpecialPairCacheHash::CExponent a, const CSpecialPairCacheHash::CExponent b, const EHistoryType t)
+void  CSpecialPairCacheHash::History(const EHistoryType t, const CSpecialPairCacheHash::CExponent a, const CSpecialPairCacheHash::CExponent b, const poly p)
 {
-  Print("SpecialPair!\n");
-  Print("Left : %d, Right: %d\n", a, b);
+#if OUTPUT
+  Print("History: SpecialPair, Action: %s", m_Typenames[(int)(t)]);
+  PrintLn();
+  Print("Left : %d, Right: %d", a, b);
+  PrintLn();
+  if( t == MULT_STORE )
+  {
+    PrintS("Result: "); p_Write(p, GetBasering());
+  }
+#endif
 }
