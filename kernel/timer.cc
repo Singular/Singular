@@ -1,13 +1,19 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: timer.cc,v 1.6 2008-03-19 17:44:13 Singular Exp $ */
+/* $Id: timer.cc,v 1.7 2008-07-18 15:02:17 Singular Exp $ */
 
 /*
 *  ABSTRACT - get the computing time
 */
 
 #include "mod2.h"
+//#define GETRUSAGE
+#ifdef GETRUSAGE
+       #include <sys/time.h>
+       #include <sys/resource.h>
+       #include <unistd.h>
+#endif
 
 int        timerv = 0;
 static double timer_resolution = TIMER_RESOLUTION;
@@ -86,21 +92,38 @@ static clock_t siStartTime;
 /*3
 * temp structure to get the time
 */
+#ifdef GETRUSAGE
+static struct rusage t_rec;
+#else
 static struct tms t_rec;
-
+#endif
 /*0 implementation*/
 
 int initTimer()
 {
+#ifdef GETRUSAGE
+  getrusage(RUSAGE_SELF,&t_rec); 
+  siStartTime = (t_rec.ru_utime.tv_sec*1000000+t_rec.ru_utime.tv_usec
+               +t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
+               +5000)/10000; // unit is 1/100 sec
+#else
   times(&t_rec);
   siStartTime = t_rec.tms_utime+t_rec.tms_stime;
+#endif
   return (int)time(NULL);
 }
 
 void startTimer()
 {
+#ifdef GETRUSAGE
+  getrusage(RUSAGE_SELF,&t_rec); 
+  startl = (t_rec.ru_utime.tv_sec*1000000+t_rec.ru_utime.tv_usec
+               +t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
+               +5000)/10000; // unit is 1/100 sec
+#else
   times(&t_rec);
   startl = t_rec.tms_utime+t_rec.tms_stime;
+#endif
 }
 
 /*2
@@ -109,11 +132,20 @@ void startTimer()
 int getTimer()
 {
   clock_t curr;
+#ifdef GETRUSAGE
+  getrusage(RUSAGE_SELF,&t_rec); 
+  curr = (t_rec.ru_utime.tv_sec*1000000+t_rec.ru_utime.tv_usec
+               +t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
+               +5000)/10000; // unit is 1/100 sec
+  curr -= siStartTime;
+  double f =  ((double)curr) * timer_resolution / (double)100;
+#else
 
   times(&t_rec);
   curr = t_rec.tms_utime+t_rec.tms_stime - siStartTime;
 
   double f =  ((double)curr) * timer_resolution / (double)HZ;
+#endif
   return (int)(f+0.5);
 }
 
@@ -128,10 +160,19 @@ void writeTime(const char* v)
 {
   clock_t curr;
 
+#ifdef GETRUSAGE
+  getrusage(RUSAGE_SELF,&t_rec); 
+  curr = (t_rec.ru_utime.tv_sec*1000000+t_rec.ru_utime.tv_usec
+               +t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
+               +5000)/10000; // unit is 1/100 sec
+  curr -= startl;
+  double f =  ((double)curr) * timer_resolution / (double)100;
+#else
   times(&t_rec);
   curr = t_rec.tms_utime+t_rec.tms_stime - startl;
 
   double f =  ((double)curr) / (double)HZ;
+#endif
   if (f > mintime)
   {
 #ifdef EXTEND_TIMER_D
