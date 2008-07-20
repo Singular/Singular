@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.61 2008-07-15 16:27:58 motsak Exp $
+ *  Version: $Id: gring.cc,v 1.62 2008-07-20 15:12:35 Singular Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -1547,19 +1547,19 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
 
 #ifdef RDEBUG
     PrintS("m1 = "); p_Write(m1, r);
-    pDebugPrintR(m1, r);
+    p_DebugPrint(m1, r);
 
     PrintS("m2 = "); p_Write(m2, r);
-    pDebugPrintR(m2, r);
+    p_DebugPrint(m2, r);
 
     PrintS("p1 = "); p_Write(p1, r);
-    pDebugPrintR(p1, r);
+    p_DebugPrint(p1, r);
 
     PrintS("p2 = "); p_Write(p2, r);
-    pDebugPrintR(p2, r);
+    p_DebugPrint(p2, r);
 
     PrintS("pL = "); p_Write(pL, r);
-    pDebugPrintR(pL, r);
+    p_DebugPrint(pL, r);
 #endif
 
   }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.99 2008-07-17 07:32:02 wienand Exp $ */
+/* $Id: ring.cc,v 1.100 2008-07-20 15:12:35 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3426,7 +3426,8 @@ static void rSetVarL(ring r)
     }
   }
 
-  r->VarL_Size = j;
+  r->VarL_Size = j; // number of long with exp. entries in
+                    //  in p->exp
   r->VarL_Offset = (int*) omAlloc(r->VarL_Size*sizeof(int));
   r->VarL_LowIndex = 0;
 
@@ -3598,7 +3599,7 @@ void rDebugPrint(ring r)
   }
 }
 
-void pDebugPrintR(poly p, const ring r)
+void p_DebugPrint(poly p, const ring r)
 {
   int i,j;
   p_Write(p,r);
@@ -3620,7 +3621,7 @@ void pDebugPrintR(poly p, const ring r)
 
 void pDebugPrint(poly p)
 {
-  pDebugPrintR(p, currRing);
+  p_DebugPrint(p, currRing);
 }
 #endif // RDEBUG
 
