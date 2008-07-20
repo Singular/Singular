@@ -3,7 +3,7 @@
 /*****************************************
  *  Computer Algebra System SINGULAR     *
  *****************************************/
-/* $Id: ncSAMult.h,v 1.5 2008-07-18 17:12:37 motsak Exp $ */
+/* $Id: ncSAMult.h,v 1.6 2008-07-20 10:00:14 motsak Exp $ */
 #ifdef HAVE_PLURAL
 
 // #include <ncSAMult.h> // for CMultiplier etc classes
@@ -179,17 +179,6 @@ class CSpecialPairMultiplier: public CMultiplier<int>
 };
 
 
-class CCommutativeSpecialPairMultiplier: public CSpecialPairMultiplier
-{
-  public:
-    CCommutativeSpecialPairMultiplier(ring r, int i, int j);
-    virtual ~CCommutativeSpecialPairMultiplier();
-    
-    // Exponent * Exponent
-    virtual poly MultiplyEE(const int expLeft, const int expRight);    
-};
-
-
 
 
 
@@ -297,6 +286,47 @@ class CGlobalMultiplier: public CMultiplier<poly>
 
 };
 
+
+
+//////////////////////////////////////////////////////////////////////////
+class CCommutativeSpecialPairMultiplier: public CSpecialPairMultiplier
+{
+	public:
+		CCommutativeSpecialPairMultiplier(ring r, int i, int j);
+		virtual ~CCommutativeSpecialPairMultiplier();
+
+		// Exponent * Exponent
+		virtual poly MultiplyEE(const int expLeft, const int expRight);    
+};
+
+//////////////////////////////////////////////////////////////////////////
+class CAntiCommutativeSpecialPairMultiplier: public CSpecialPairMultiplier
+{
+	public:
+		CAntiCommutativeSpecialPairMultiplier(ring r, int i, int j);
+		virtual ~CAntiCommutativeSpecialPairMultiplier();
+
+		// Exponent * Exponent
+		virtual poly MultiplyEE(const int expLeft, const int expRight);    
+};
+
+
+//////////////////////////////////////////////////////////////////////////
+class CQuasiCommutativeSpecialPairMultiplier: public CSpecialPairMultiplier
+{
+	private:
+		const number m_q;
+		// TODO: make cache for some 'good' powers!?
+
+  public:
+		CQuasiCommutativeSpecialPairMultiplier(ring r, int i, int j, number q);
+		virtual ~CQuasiCommutativeSpecialPairMultiplier();
+
+		number GetPower(int power);
+
+		// Exponent * Exponent
+		virtual poly MultiplyEE(const int expLeft, const int expRight);    
+};
 
 
 #endif // HAVE_PLURAL :(

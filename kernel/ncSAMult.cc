@@ -6,7 +6,7 @@
  *  Purpose: implementation of multiplication in simple NC subalgebras
  *  Author:  motsak
  *  Created: 
- *  Version: $Id: ncSAMult.cc,v 1.3 2008-07-18 17:12:37 motsak Exp $
+ *  Version: $Id: ncSAMult.cc,v 1.4 2008-07-20 10:00:14 motsak Exp $
  *******************************************************************/
 
 
@@ -408,6 +408,7 @@ poly CGlobalMultiplier::MultiplyEM(const CGlobalMultiplier::CExponent expLeft, c
 }
 
 
+///////////////////////////////////////////////////////////////////////////////////////////
 CCommutativeSpecialPairMultiplier::CCommutativeSpecialPairMultiplier(ring r, int i, int j):
     CSpecialPairMultiplier(r, i, j)
 {
@@ -446,6 +447,110 @@ poly CCommutativeSpecialPairMultiplier::MultiplyEE(const int expLeft, const int 
   return p;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////
+CAntiCommutativeSpecialPairMultiplier::CAntiCommutativeSpecialPairMultiplier(ring r, int i, int j):
+		CSpecialPairMultiplier(r, i, j)
+{
+#if OUTPUT  
+	Print("CAntiCommutativeSpecialPairMultiplier::CAntiCommutativeSpecialPairMultiplier(ring, i: %d, j: %d)!", i, j);
+	PrintLn();
+#endif
+};
+
+
+CAntiCommutativeSpecialPairMultiplier::~CAntiCommutativeSpecialPairMultiplier()
+{
+#if OUTPUT  
+	Print("CAntiCommutativeSpecialPairMultiplier::~CAntiCommutativeSpecialPairMultiplier()");
+	PrintLn();
+#endif
+}
+
+
+
+// Exponent * Exponent
+poly CAntiCommutativeSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRight)
+{
+#if OUTPUT  
+	Print("CAntiCommutativeSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);  
+	PrintLn();
+#endif
+
+	const ring r = GetBasering();
+	const int  sign = 1 - 2*((expLeft * expRight) % 2);
+	poly p = p_ISet(sign, r);
+	p_SetExp(p, GetJ(), expLeft, r);
+	p_SetExp(p, GetI(), expRight, r);
+	p_Setm(p, r);
+
+	return p;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+CQuasiCommutativeSpecialPairMultiplier::CQuasiCommutativeSpecialPairMultiplier(ring r, int i, int j, number q):
+		CSpecialPairMultiplier(r, i, j), m_q(q)
+{
+#if OUTPUT  
+	Print("CQuasiCommutativeSpecialPairMultiplier::CQuasiCommutativeSpecialPairMultiplier(ring, i: %d, j: %d, q)!", i, j);
+	PrintLn();
+	PrintS("Parameter q: ");
+	n_Write(q, r);
+#endif
+};
+
+
+CQuasiCommutativeSpecialPairMultiplier::~CQuasiCommutativeSpecialPairMultiplier()
+{
+#if OUTPUT  
+	Print("CQuasiCommutativeSpecialPairMultiplier::~CQuasiCommutativeSpecialPairMultiplier()");
+	PrintLn();
+#endif
+}
+
+
+number CQuasiCommutativeSpecialPairMultiplier::GetPower(int power)
+{
+#if OUTPUT  
+	Print("CQuasiCommutativeSpecialPairMultiplier::~CQuasiCommutativeSpecialPairMultiplier()");
+	PrintLn();
+#endif
+
+	number qN;
+	n_Power(m_q, power, &qN, GetBasering());
+
+	// TODO: make it more intelegently!!! maybe dynamic cache for
+	// previously computed powers of 2!?
+
+	return qN;
+}
+
+
+// Exponent * Exponent
+poly CQuasiCommutativeSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRight)
+{
+#if OUTPUT  
+	Print("CQuasiCommutativeSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);  
+	PrintLn();
+#endif
+
+	const ring r = GetBasering();
+
+	const int  power = (expLeft * expRight);
+
+	number qN = GetPower(power);
+	
+	poly p = p_NSet(qN, r);
+	p_SetExp(p, GetJ(), expLeft, r);
+	p_SetExp(p, GetI(), expRight, r);
+	p_Setm(p, r);
+
+	return p;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
 // factory method!
 CSpecialPairMultiplier* AnalyzePair(const ring r, int i, int j)
 {
@@ -469,10 +574,23 @@ CSpecialPairMultiplier* AnalyzePair(const ring r, int i, int j)
   Print("D_{%d, %d} = ", i, j); p_Write(d, r);
 #endif
 
-  if( (d == NULL) && n_IsOne(p_GetCoeff(c, r), r) )
-    return new CCommutativeSpecialPairMultiplier(r, i, j);
+	number q = p_GetCoeff(c, r);
+	
+	if( d == NULL)
+	{
+		
+	  if( n_IsOne(q, r) )
+			return new CCommutativeSpecialPairMultiplier(r, i, j);
 
-  return NULL;
+		if( n_IsMOne(q, r) )
+			return new CAntiCommutativeSpecialPairMultiplier(r, i, j);
+
+		return new CQuasiCommutativeSpecialPairMultiplier(r, i, j, q);
+	}
+
+
+
+	return NULL;
 }
 
 
