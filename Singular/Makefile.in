@@ -247,9 +247,13 @@ DL_LIBS := 	$(DL_LIBS) $(MPSR_SO)
 endif
 else
 ifndef LD_STATIC
+ifeq ($(HAVE_MPSR), 1)
 LIBS := $(MP_LIBS) $(LIBS)
+LIBSG := $(MP_LIBS) $(LIBSG)
+endif
 endif
 OBJS := $(OBJS) $(STATIC_SOURCES:.cc=.o) $(COMMON_SOURCES:.cc=.o)
+OBJSG := $(OBJSG) $(STATIC_SOURCES:.cc=.og) $(COMMON_SOURCES:.cc=.og)
 DL_LIBS=
 endif
 
