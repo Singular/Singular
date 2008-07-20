@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.36 2008-06-30 07:55:57 Singular Exp $ */
+/* $Id: longalg.cc,v 1.37 2008-07-20 10:19:02 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1671,6 +1671,9 @@ void naPower(number p, int i, number *rc)
 */
 number naGcd(number a, number b, const ring r)
 {
+  if (a==NULL)  return naCopy(b);
+  if (b==NULL)  return naCopy(a);
+  
   lnumber x, y;
   lnumber result = (lnumber)omAlloc0Bin(rnumber_bin);
 
