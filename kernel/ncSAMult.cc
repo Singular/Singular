@@ -6,9 +6,13 @@
  *  Purpose: implementation of multiplication in simple NC subalgebras
  *  Author:  motsak
  *  Created: 
- *  Version: $Id: ncSAMult.cc,v 1.4 2008-07-20 10:00:14 motsak Exp $
+ *  Version: $Id: ncSAMult.cc,v 1.5 2008-07-21 00:05:09 motsak Exp $
  *******************************************************************/
 
+
+#include "mod2.h"
+
+#ifndef NDEBUG
 
 #define MYTEST 1
 #define OUTPUT 1
@@ -18,7 +22,13 @@
 #define OM_TRACK 5
 #endif
 
-#include "mod2.h"
+#else
+
+#define MYTEST 0
+#define OUTPUT 0
+
+#endif
+
 
 #include <ncSAMult.h> // for CMultiplier etc classes
 #include <sca.h> // for SCA
@@ -42,8 +52,11 @@ static poly gnc_pp_Mult_mm(const poly p, const poly m, const ring r, poly& last)
   CGlobalMultiplier* const pMultiplier = r->GetNC()->GetGlobalMultiplier();
   assume( pMultiplier != NULL );
 
-  const poly pResult = pMultiplier->MultiplyPE(p, m);
-
+  poly pMonom = pMultiplier->LM(m, r);
+  poly pResult = pMultiplier->MultiplyPE(p, pMonom);
+  p_Delete(&pMonom, r);
+  p_Test(pResult, r);
+  pResult = p_Mult_nn(pResult, p_GetCoeff(m, r), r);
   p_Test(pResult, r);
 
 #if OUTPUT  
@@ -74,13 +87,16 @@ static poly gnc_p_Mult_mm(poly p, const poly m, const ring r)
   CGlobalMultiplier* const pMultiplier = r->GetNC()->GetGlobalMultiplier();
   assume( pMultiplier != NULL );
 
-  const poly pResult = pMultiplier->MultiplyPEDestroy(p, m);
-
+  poly pMonom = pMultiplier->LM(m, r);
+  poly pResult = pMultiplier->MultiplyPEDestroy(p, pMonom);
+  p_Delete(&pMonom, r);
+  p_Test(pResult, r);
+  pResult = p_Mult_nn(pResult, p_GetCoeff(m, r), r);
   p_Test(pResult, r);
 
 #if OUTPUT  
   Print("gnc_p_Mult_mm(p, m) => "); p_Write(pResult, r);      
-  PrintS("p: "); p_Write(p, r);    
+//  PrintS("p: "); p_Write(p, r);    
   PrintS("m: "); p_Write(m, r);      
   Print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ");
   PrintLn();
@@ -106,13 +122,17 @@ static poly gnc_mm_Mult_p(const poly m, poly p, const ring r)
   CGlobalMultiplier* const pMultiplier = r->GetNC()->GetGlobalMultiplier();
   assume( pMultiplier != NULL );
 
-  const poly pResult = pMultiplier->MultiplyEPDestroy(m, p);
-
+  poly pMonom = pMultiplier->LM(m, r);
+  poly pResult = pMultiplier->MultiplyEPDestroy(pMonom, p);
+  p_Delete(&pMonom, r);
+  p_Test(pResult, r);
+  pResult = p_Mult_nn(pResult, p_GetCoeff(m, r), r);
   p_Test(pResult, r);
 
+  
 #if OUTPUT  
   Print("gnc_mm_Mult_p(m, p) => "); p_Write(pResult, r);      
-  PrintS("p: "); p_Write(p, r);    
+//  PrintS("p: "); p_Write(p, r);    
   PrintS("m: "); p_Write(m, r);      
   Print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ");
   PrintLn();
@@ -139,8 +159,11 @@ static poly gnc_mm_Mult_pp(const poly m, const poly p, const ring r)
   CGlobalMultiplier* const pMultiplier = r->GetNC()->GetGlobalMultiplier();
   assume( pMultiplier != NULL );
 
-  const poly pResult = pMultiplier->MultiplyEP(m, p);
-
+  poly pMonom = pMultiplier->LM(m, r);
+  poly pResult = pMultiplier->MultiplyEP(pMonom, p);
+  p_Delete(&pMonom, r);
+  p_Test(pResult, r);
+  pResult = p_Mult_nn(pResult, p_GetCoeff(m, r), r);
   p_Test(pResult, r);
 
 #if OUTPUT  
@@ -296,15 +319,21 @@ poly CGlobalMultiplier::MultiplyEE(const CGlobalMultiplier::CExponent expLeft, c
   // |<<<< ej 0....0| , |0..00 ei >>>>|
   // |<<<<  j i <<<N| , |1>>>j  i >>>>|
 
+    if(i > j)
+    {
+      --i;
+      ei = 0;
+    }
+      
     if( i == j )
     {
       if( ej != 0 )
         p_SetExp(product, i, ei + ej, r);
-    } // i > j? => nothing to do, just decrement!
-      else
-        --i;
+    }
 
-    for(--i; i > 0; --i)
+    --i;
+
+    for(; i > 0; --i)
     {
       const int e = p_GetExp(expLeft, i, r);
 
@@ -405,6 +434,24 @@ poly CGlobalMultiplier::MultiplyEM(const CGlobalMultiplier::CExponent expLeft, c
 #endif
 
   return MultiplyEE(expLeft, pMonom);
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+
+static inline void CorrectPolyWRTOrdering(poly &pResult, const ring r)
+{
+  if( pNext(pResult) != NULL )
+  {
+    const int cmp = p_LmCmp(pResult, pNext(pResult), r);
+    assume( cmp != 0 ); // must not be equal!!!
+    if( cmp != 1 ) // Wrong order!!!
+      pResult = pReverse(pResult); // Reverse!!!
+  }
+
+  p_Test(pResult, r);
 }
 
 
@@ -512,7 +559,7 @@ CQuasiCommutativeSpecialPairMultiplier::~CQuasiCommutativeSpecialPairMultiplier(
 number CQuasiCommutativeSpecialPairMultiplier::GetPower(int power)
 {
 #if OUTPUT  
-	Print("CQuasiCommutativeSpecialPairMultiplier::~CQuasiCommutativeSpecialPairMultiplier()");
+  Print("CQuasiCommutativeSpecialPairMultiplier::~GetPower(%d)", power);
 	PrintLn();
 #endif
 
@@ -541,12 +588,270 @@ poly CQuasiCommutativeSpecialPairMultiplier::MultiplyEE(const int expLeft, const
 	number qN = GetPower(power);
 	
 	poly p = p_NSet(qN, r);
-	p_SetExp(p, GetJ(), expLeft, r);
-	p_SetExp(p, GetI(), expRight, r);
+	p_SetExp(p, GetJ(), expLeft, r);  // y^{expLeft}
+	p_SetExp(p, GetI(), expRight, r); // x^{expRight}
 	p_Setm(p, r);
 
 	return p;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+CWeylSpecialPairMultiplier::CWeylSpecialPairMultiplier(ring r, int i, int j, number g):
+    CSpecialPairMultiplier(r, i, j), m_g(g)
+{
+#if OUTPUT  
+  Print("CWeylSpecialPairMultiplier::CWeylSpecialPairMultiplier(ring, i: %d, j: %d, g)!", i, j);
+  PrintLn();
+  PrintS("Parameter g: ");
+  n_Write(g, r);
+#endif
+};
+
+
+CWeylSpecialPairMultiplier::~CWeylSpecialPairMultiplier()
+{
+#if OUTPUT  
+  Print("CWeylSpecialPairMultiplier::~CWeylSpecialPairMultiplier()");
+  PrintLn();
+#endif
+}
+
+
+// Exponent * Exponent
+poly CWeylSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRight)
+{
+#if OUTPUT  
+  Print("CWeylSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);  
+  PrintLn();
+#endif
+  // Char == 0, otherwise - problem!
+
+  
+  const ring r = GetBasering();
+  const int m = expLeft;
+  const int n = expRight;
+
+  assume( n*m > 0 );
+
+  int kn = n;
+  int km = m;
+
+  number c = n_Init(1, r);
+
+  poly p = p_ISet(1, r);
+
+  p_SetExp(p, GetJ(), km--, r); // y ^ (m-k)
+  p_SetExp(p, GetI(), kn--, r); // x ^ (n-k)
+
+  p_Setm(p, r); // pResult = x^n * y^m
+
+  
+  poly pResult = p;
+  poly pLast = p;
+
+  int min = si_min(m, n);
+
+  int k = 1;
+  
+  for(; k < min; k++ )
+  {
+    number t = n_Init(km + 1, r);
+    n_InpMult(t, m_g, r); // t = ((m - k) + 1) * gamma
+    n_InpMult(c, t, r);   // c = c'* ((m - k) + 1) * gamma
+    n_Delete(&t, r);
+
+    t = n_Init(kn + 1, r);
+    n_InpMult(c, t, r);   // c = (c'* ((m - k) + 1) * gamma) * ((n - k) + 1)
+    n_Delete(&t, r);
+    
+    t = n_Init(k, r);
+    c = n_Div(c, t, r);
+    n_Delete(&t, r);
+
+//    n_Normalize(c, r);
+
+    t = n_Copy(c, r); // not the last!
+
+    p = p_NSet(t, r);
+
+    p_SetExp(p, GetJ(), km--, r); // y ^ (m-k)
+    p_SetExp(p, GetI(), kn--, r); // x ^ (n-k)
+
+    p_Setm(p, r); // pResult = x^n * y^m
+
+    pNext(pLast) = p;
+    pLast = p;
+  }
+
+  assume(k == min);
+  assume((km == 0) || (kn == 0) );
+
+  {
+    n_InpMult(c, m_g, r);   // c = c'* gamma
+
+    if( km > 0 )
+    {
+      number t = n_Init(km + 1, r);
+      n_InpMult(c, t, r);   // c = (c'* gamma) * (m - k + 1)
+      n_Delete(&t, r);
+    }
+    
+    if( kn > 0 )
+    {
+      number t = n_Init(kn + 1, r);
+      n_InpMult(c, t, r);   // c = (c'* gamma) * (n - k + 1)
+      n_Delete(&t, r);
+    }
+
+    number t = n_Init(k, r); // c = ((c'* gamma) * ((n - k + 1) * (m - k + 1))) / k;
+    c = n_Div(c, t, r);
+    n_Delete(&t, r);
+  }
+  
+  p = p_NSet(c, r);
+
+  p_SetExp(p, GetJ(), km, r); // y ^ (m-k)
+  p_SetExp(p, GetI(), kn, r); // x ^ (n-k)
+
+  p_Setm(p, r); // 
+
+  pNext(pLast) = p;
+
+  CorrectPolyWRTOrdering(pResult, r);
+
+  return pResult;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+CShiftSpecialPairMultiplier::CShiftSpecialPairMultiplier(ring r, int i, int j, int s, number c):
+    CSpecialPairMultiplier(r, i, j), m_shiftCoef(c), m_shiftVar(s)
+{
+#if OUTPUT  
+  Print("CShiftSpecialPairMultiplier::CShiftSpecialPairMultiplier(ring, i: %d, j: %d, s: %d, c)!", i, j, s);
+  PrintLn();
+  PrintS("Parameter c: "); n_Write(c, r);
+#endif
+};
+
+
+CShiftSpecialPairMultiplier::~CShiftSpecialPairMultiplier()
+{
+#if OUTPUT  
+  Print("CShiftSpecialPairMultiplier::~CShiftSpecialPairMultiplier()");
+  PrintLn();
+#endif
+}
+
+
+// Exponent * Exponent
+poly CShiftSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRight)
+{
+#if OUTPUT  
+  Print("CShiftSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);  
+  PrintLn();
+#endif
+  // Char == 0, otherwise - problem!
+
+  assume( expLeft*expRight > 0 );
+
+  const ring r = GetBasering();
+
+  int m, n, i, j;
+
+  if( m_shiftVar != GetI() ) // YX = XY + a*X
+  {
+    m = expRight; // case: (1, 0, beta, 0, 0)
+    n = expLeft;
+
+    i = GetJ();
+    j = GetI();
+  } else
+  {
+    m = expLeft; // case: (1, alpha, 0, 0)
+    n = expRight;
+
+    i = GetI();
+    j = GetJ();
+  }
+
+    
+  int k = m; // to 0
+  
+  number c = n_Init(1, r); // k = m, C_k = 1
+  poly p = p_ISet(1, r);
+
+  p_SetExp(p, j, k, r); // Y^{k}
+  p_SetExp(p, i, n, r); 
+
+  p_Setm(p, r); // pResult = C_k * x^n * y^k, k == m
+
+
+  poly pResult = p;
+  poly pLast = p;
+
+  number nn =  n_Init(n, r); // number(n)!
+  n_InpMult(nn, m_shiftCoef, r); // nn = (alpha*n)
+
+  --k;
+  
+  int mk = 1; // mk = (m - k)
+
+  for(; k > 0; k-- )
+  {
+    number t = n_Init(k + 1, r);  // t = k+1
+    n_InpMult(c, t, r);           // c = c' * (k+1) 
+    n_InpMult(c, nn, r);          // c = (c' * (k+1)) * (alpha * n)
+
+    n_Delete(&t, r);
+    t = n_Init(mk++, r);         
+    c = n_Div(c, t, r);           // c = ((c' * (k+1))  * (alpha * n)) / (m-k);
+    n_Delete(&t, r);
+
+//    n_Normalize(c, r);
+
+    t = n_Copy(c, r); // not the last!
+
+    p = p_NSet(t, r);
+
+    p_SetExp(p, j, k, r); // y^k
+    p_SetExp(p, i, n, r); // x^n
+
+    p_Setm(p, r); // pResult = x^n * y^m
+
+    pNext(pLast) = p;
+    pLast = p;
+  }
+
+  assume(k == 0);
+
+  {
+    n_InpMult(c, nn, r);          // c = (c' * (0+1)) * (alpha * n)
+
+    number t = n_Init(m, r);         
+    c = n_Div(c, t, r);           // c = ((c' * (0+1))  * (alpha * n)) / (m-0);
+    n_Delete(&t, r);
+  }
+
+  n_Delete(&nn, r);
+  
+  p = p_NSet(c, r);
+
+  p_SetExp(p, j, k, r); // y^k
+  p_SetExp(p, i, n, r); // x^n
+
+  p_Setm(p, r); // 
+
+  pNext(pLast) = p;
+
+  CorrectPolyWRTOrdering(pResult, r);
+ 
+  return pResult;
+}
+
+
+
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -574,7 +879,7 @@ CSpecialPairMultiplier* AnalyzePair(const ring r, int i, int j)
   Print("D_{%d, %d} = ", i, j); p_Write(d, r);
 #endif
 
-	number q = p_GetCoeff(c, r);
+	const number q = p_GetCoeff(c, r);
 	
 	if( d == NULL)
 	{
@@ -586,7 +891,27 @@ CSpecialPairMultiplier* AnalyzePair(const ring r, int i, int j)
 			return new CAntiCommutativeSpecialPairMultiplier(r, i, j);
 
 		return new CQuasiCommutativeSpecialPairMultiplier(r, i, j, q);
-	}
+  } else
+  {
+    if( n_IsOne(q, r) ) // "Lie" case
+    {
+      if( pNext(d) == NULL ) // Our Main Special Case! 
+      {
+        const number g = p_GetCoeff(d, r);
+
+        if( p_LmIsConstantComp(d, r) ) // Weyl
+          return new CWeylSpecialPairMultiplier(r, i, j, g);          
+
+        const int k = p_IsPurePower(d, r); // k if not pure power
+
+        if( k > 0 )
+          if( p_GetExp(d, k, r) == 1 )
+            if( (k == i) || (k == j) )
+              return new CShiftSpecialPairMultiplier(r, i, j, k, g);
+      }
+    }
+  }
+    
 
 
 

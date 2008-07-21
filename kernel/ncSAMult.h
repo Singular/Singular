@@ -3,7 +3,7 @@
 /*****************************************
  *  Computer Algebra System SINGULAR     *
  *****************************************/
-/* $Id: ncSAMult.h,v 1.6 2008-07-20 10:00:14 motsak Exp $ */
+/* $Id: ncSAMult.h,v 1.7 2008-07-21 00:05:09 motsak Exp $ */
 #ifdef HAVE_PLURAL
 
 // #include <ncSAMult.h> // for CMultiplier etc classes
@@ -149,8 +149,8 @@ class CSpecialPairMultiplier: public CMultiplier<int>
     int m_i;
     int m_j;
 
-    poly m_c_ij;
-    poly m_d_ij;
+//    poly m_c_ij;
+//    poly m_d_ij;
     
     
   public:
@@ -158,8 +158,8 @@ class CSpecialPairMultiplier: public CMultiplier<int>
     CSpecialPairMultiplier(ring r, int i, int j);
     virtual ~CSpecialPairMultiplier();
 
-    inline int GetI() const { return m_i; }
-    inline int GetJ() const { return m_j; }
+    inline int GetI() const { return m_i; } // X 
+    inline int GetJ() const { return m_j; } // Y > X!
 
 //  protected:
     typedef int CExponent;
@@ -326,6 +326,39 @@ class CQuasiCommutativeSpecialPairMultiplier: public CSpecialPairMultiplier
 
 		// Exponent * Exponent
 		virtual poly MultiplyEE(const int expLeft, const int expRight);    
+};
+
+
+//////////////////////////////////////////////////////////////////////////
+class CWeylSpecialPairMultiplier: public CSpecialPairMultiplier
+{
+  private:
+    const number m_g;
+    // TODO: make cache for some 'good' powers!?
+
+  public:
+    CWeylSpecialPairMultiplier(ring r, int i, int j, number g);
+    virtual ~CWeylSpecialPairMultiplier();
+
+    // Exponent * Exponent
+    virtual poly MultiplyEE(const int expLeft, const int expRight);    
+};
+
+
+//////////////////////////////////////////////////////////////////////////
+class CShiftSpecialPairMultiplier: public CSpecialPairMultiplier
+{
+  private:    
+    const number m_shiftCoef;
+    const int m_shiftVar;
+    // TODO: make cache for some 'good' powers!?
+
+  public:
+    CShiftSpecialPairMultiplier(ring r, int i, int j, int s, number c);
+    virtual ~CShiftSpecialPairMultiplier();
+
+    // Exponent * Exponent
+    virtual poly MultiplyEE(const int expLeft, const int expRight);    
 };
 
 

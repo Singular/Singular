@@ -3,7 +3,7 @@
 /*****************************************
  *  Computer Algebra System SINGULAR     *
  *****************************************/
-/* $Id: ncSACache.h,v 1.3 2008-07-18 17:12:37 motsak Exp $ */
+/* $Id: ncSACache.h,v 1.4 2008-07-21 00:05:09 motsak Exp $ */
 
 // #include <ncSACache.h> // for CCacheHash etc classes
 
@@ -57,11 +57,12 @@ class CCacheHash
     // -1 means no hits!
     int LookupEE(CExponent a, CExponent b, CCacheItem*& pItems)
     {
+/*
       Print("//////////////////////////////////////////////////////////////////////////////////////////////");
       PrintLn();
       Print("CCacheHash::LookupEE(a, b, *results)!");
       PrintLn();
-
+*/
       History(MULT_LOOKUP, a, b);
       
       pItems = NULL;
@@ -70,14 +71,18 @@ class CCacheHash
 
     bool StoreEE(CExponent a, CExponent b, poly pProduct)
     {
+/*
       Print("CCacheHash::StoreEE(a, b, Product)!");
       PrintLn();
-
+*/
+      
       History(MULT_STORE, a, b, pProduct);
 
+/*
       Print("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\");
       PrintLn();
-
+*/
+      
       return false; // the pair was not stored!
     };
     

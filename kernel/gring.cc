@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.62 2008-07-20 15:12:35 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.63 2008-07-21 00:05:09 motsak Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -1039,7 +1039,7 @@ poly gnc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
     {
       for (m=1;m<=cMTsize;m++)
       {
-    out = MATELEM(r->GetNC()->MT[UPMATELEM(j,i,rN)],k,m);
+        out = MATELEM(r->GetNC()->MT[UPMATELEM(j,i,rN)],k,m);
         if ( out != NULL )
         {
           MATELEM(tmp,k,m) = out;/*MATELEM(r->GetNC()->MT[UPMATELEM(j,i,rN)],k,m)*/

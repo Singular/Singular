@@ -6,9 +6,13 @@
  *  Purpose: implementation of special Cache+Hash for Multiplier 
  *  Author:  motsak
  *  Created: 
- *  Version: $Id: ncSACache.cc,v 1.3 2008-07-18 17:12:37 motsak Exp $
+ *  Version: $Id: ncSACache.cc,v 1.4 2008-07-21 00:05:09 motsak Exp $
  *******************************************************************/
 
+
+#include "mod2.h"
+
+#ifndef NDEBUG
 
 #define MYTEST 1
 #define OUTPUT 1
@@ -18,7 +22,13 @@
 #define OM_TRACK 5
 #endif
 
-#include "mod2.h"
+#else
+
+#define MYTEST 0
+#define OUTPUT 0
+
+#endif
+
 
 #include <ncSACache.h> // for CCacheHash etc classes
 
