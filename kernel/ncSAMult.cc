@@ -6,7 +6,7 @@
  *  Purpose: implementation of multiplication in simple NC subalgebras
  *  Author:  motsak
  *  Created: 
- *  Version: $Id: ncSAMult.cc,v 1.5 2008-07-21 00:05:09 motsak Exp $
+ *  Version: $Id: ncSAMult.cc,v 1.6 2008-07-21 09:12:34 motsak Exp $
  *******************************************************************/
 
 
@@ -525,7 +525,7 @@ poly CAntiCommutativeSpecialPairMultiplier::MultiplyEE(const int expLeft, const 
 #endif
 
 	const ring r = GetBasering();
-	const int  sign = 1 - 2*((expLeft * expRight) % 2);
+	const int  sign = 1 - 2 * (expLeft & (expRight & 1));
 	poly p = p_ISet(sign, r);
 	p_SetExp(p, GetJ(), expLeft, r);
 	p_SetExp(p, GetI(), expRight, r);
