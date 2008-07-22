@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.36 2008-07-08 13:02:21 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.37 2008-07-22 15:15:21 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1482,7 +1482,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   ideal res;
   BITSET save_test=test;
 
-  if (idIs0(q)) return idInit(IDELEMS(q),q->rank);
+  if (idIs0(q)) return idInit(IDELEMS(q),si_max(q->rank,F->rank));
   if ((idIs0(F))&&(Q==NULL))
     return idCopy(q); /*F=0*/
   strat->ak = si_max(idRankFreeModule(F),idRankFreeModule(q));
@@ -1536,7 +1536,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
       pNorm(strat->S[i]);
   }
   /*- compute------------------------------------------- -*/
-  res=idInit(IDELEMS(q),q->rank);
+  res=idInit(IDELEMS(q),strat->ak);
   for (i=0; i<IDELEMS(q); i++)
   {
     if (q->m[i]!=NULL)
