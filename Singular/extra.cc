@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.276 2008-07-15 16:27:11 motsak Exp $ */
+/* $Id: extra.cc,v 1.277 2008-07-23 07:10:50 motsak Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -842,6 +842,17 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
 
+    if(strcmp(sys_cmd,"ForceNewOldNCMultiplication")==0)
+    {
+      if( !rIsPluralRing(currRing) )
+        return TRUE;
+
+      if( !ncInitSpecialPowersMultiplication(currRing) )
+        return TRUE;
+
+      return FALSE;
+    }
+    
     /*==================== PLURAL =================*/
 /*==================== opp ==================================*/
     if (strcmp(sys_cmd, "opp")==0)
