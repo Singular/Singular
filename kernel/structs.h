@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.51 2008-07-16 12:41:33 wienand Exp $ */
+/* $Id: structs.h,v 1.52 2008-07-23 07:09:46 motsak Exp $ */
 /*
 * ABSTRACT
 */
@@ -146,6 +146,7 @@ class kBucket;
 class sBucket;
 class CPolynomialSummator;
 class CGlobalMultiplier;
+class CFormulaPowerMultiplier;
 #endif
 
 struct n_Procs_s;
@@ -510,6 +511,7 @@ struct nc_struct
     } data;
 
     CGlobalMultiplier* m_Multiplier;
+    CFormulaPowerMultiplier* m_PowerMultiplier;
 
   public:
     
@@ -534,6 +536,13 @@ struct nc_struct
 
     inline CGlobalMultiplier*& GetGlobalMultiplier()
         { assume(ncRingType() != nc_exterior); return (m_Multiplier); };
+
+
+    inline CFormulaPowerMultiplier* GetFormulaPowerMultiplier() const
+        { assume(ncRingType() != nc_exterior); return (m_PowerMultiplier); };
+
+    inline CFormulaPowerMultiplier*& GetFormulaPowerMultiplier()
+        { assume(ncRingType() != nc_exterior); return (m_PowerMultiplier); };
     
   public:
     nc_pProcs p_Procs; // NC procedures.

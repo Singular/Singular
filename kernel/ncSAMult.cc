@@ -6,27 +6,24 @@
  *  Purpose: implementation of multiplication in simple NC subalgebras
  *  Author:  motsak
  *  Created: 
- *  Version: $Id: ncSAMult.cc,v 1.6 2008-07-21 09:12:34 motsak Exp $
+ *  Version: $Id: ncSAMult.cc,v 1.7 2008-07-23 07:09:46 motsak Exp $
  *******************************************************************/
+
+#define MYTEST 0
+
+#if MYTEST
+#define OM_CHECK 4
+#define OM_TRACK 5
+// these settings must be before "mod2.h" in order to work!!!
+#endif
 
 
 #include "mod2.h"
 
 #ifndef NDEBUG
-
-#define MYTEST 1
 #define OUTPUT 1
-
-#if MYTEST
-#define OM_CHECK 4
-#define OM_TRACK 5
-#endif
-
 #else
-
-#define MYTEST 0
 #define OUTPUT 0
-
 #endif
 
 
@@ -177,9 +174,6 @@ static poly gnc_mm_Mult_pp(const poly m, const poly p, const ring r)
   return pResult;
 }
 
-
-
-
 static void gnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs = NULL)
 {
 #if OUTPUT  
@@ -201,12 +195,6 @@ static void gnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs = NULL)
   rGR->GetNC()->p_Procs.mm_Mult_pp  = gnc_mm_Mult_pp;
 
 }
-
-
-
-
-
-
 
 bool ncInitSpecialPairMultiplication(ring r)
 {
@@ -438,21 +426,6 @@ poly CGlobalMultiplier::MultiplyEM(const CGlobalMultiplier::CExponent expLeft, c
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////
-
-
-static inline void CorrectPolyWRTOrdering(poly &pResult, const ring r)
-{
-  if( pNext(pResult) != NULL )
-  {
-    const int cmp = p_LmCmp(pResult, pNext(pResult), r);
-    assume( cmp != 0 ); // must not be equal!!!
-    if( cmp != 1 ) // Wrong order!!!
-      pResult = pReverse(pResult); // Reverse!!!
-  }
-
-  p_Test(pResult, r);
-}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -474,8 +447,6 @@ CCommutativeSpecialPairMultiplier::~CCommutativeSpecialPairMultiplier()
 #endif
 }
 
-
-
 // Exponent * Exponent
 poly CCommutativeSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRight)
 {
@@ -486,14 +457,8 @@ poly CCommutativeSpecialPairMultiplier::MultiplyEE(const int expLeft, const int 
 
   const ring r = GetBasering();
 
-  poly p = p_ISet(1, r);
-  p_SetExp(p, GetJ(), expLeft, r);
-  p_SetExp(p, GetI(), expRight, r);
-  p_Setm(p, r);
-
-  return p;
+  return CFormulaPowerMultiplier::ncSA_1xy0x0y0(GetI(), GetJ(), expRight, expLeft, r);
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 CAntiCommutativeSpecialPairMultiplier::CAntiCommutativeSpecialPairMultiplier(ring r, int i, int j):
@@ -514,8 +479,6 @@ CAntiCommutativeSpecialPairMultiplier::~CAntiCommutativeSpecialPairMultiplier()
 #endif
 }
 
-
-
 // Exponent * Exponent
 poly CAntiCommutativeSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRight)
 {
@@ -525,13 +488,8 @@ poly CAntiCommutativeSpecialPairMultiplier::MultiplyEE(const int expLeft, const 
 #endif
 
 	const ring r = GetBasering();
-	const int  sign = 1 - 2 * (expLeft & (expRight & 1));
-	poly p = p_ISet(sign, r);
-	p_SetExp(p, GetJ(), expLeft, r);
-	p_SetExp(p, GetI(), expRight, r);
-	p_Setm(p, r);
 
-	return p;
+	return CFormulaPowerMultiplier::ncSA_Mxy0x0y0(GetI(), GetJ(), expRight, expLeft, r);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -555,24 +513,6 @@ CQuasiCommutativeSpecialPairMultiplier::~CQuasiCommutativeSpecialPairMultiplier(
 #endif
 }
 
-
-number CQuasiCommutativeSpecialPairMultiplier::GetPower(int power)
-{
-#if OUTPUT  
-  Print("CQuasiCommutativeSpecialPairMultiplier::~GetPower(%d)", power);
-	PrintLn();
-#endif
-
-	number qN;
-	n_Power(m_q, power, &qN, GetBasering());
-
-	// TODO: make it more intelegently!!! maybe dynamic cache for
-	// previously computed powers of 2!?
-
-	return qN;
-}
-
-
 // Exponent * Exponent
 poly CQuasiCommutativeSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRight)
 {
@@ -583,16 +523,7 @@ poly CQuasiCommutativeSpecialPairMultiplier::MultiplyEE(const int expLeft, const
 
 	const ring r = GetBasering();
 
-	const int  power = (expLeft * expRight);
-
-	number qN = GetPower(power);
-	
-	poly p = p_NSet(qN, r);
-	p_SetExp(p, GetJ(), expLeft, r);  // y^{expLeft}
-	p_SetExp(p, GetI(), expRight, r); // x^{expRight}
-	p_Setm(p, r);
-
-	return p;
+	return CFormulaPowerMultiplier::ncSA_Qxy0x0y0(GetI(), GetJ(), expRight, expLeft, m_q, r);
 }
 
 
@@ -617,7 +548,6 @@ CWeylSpecialPairMultiplier::~CWeylSpecialPairMultiplier()
 #endif
 }
 
-
 // Exponent * Exponent
 poly CWeylSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRight)
 {
@@ -629,98 +559,10 @@ poly CWeylSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRigh
 
   
   const ring r = GetBasering();
-  const int m = expLeft;
-  const int n = expRight;
 
-  assume( n*m > 0 );
+  assume( expLeft*expRight > 0 );
 
-  int kn = n;
-  int km = m;
-
-  number c = n_Init(1, r);
-
-  poly p = p_ISet(1, r);
-
-  p_SetExp(p, GetJ(), km--, r); // y ^ (m-k)
-  p_SetExp(p, GetI(), kn--, r); // x ^ (n-k)
-
-  p_Setm(p, r); // pResult = x^n * y^m
-
-  
-  poly pResult = p;
-  poly pLast = p;
-
-  int min = si_min(m, n);
-
-  int k = 1;
-  
-  for(; k < min; k++ )
-  {
-    number t = n_Init(km + 1, r);
-    n_InpMult(t, m_g, r); // t = ((m - k) + 1) * gamma
-    n_InpMult(c, t, r);   // c = c'* ((m - k) + 1) * gamma
-    n_Delete(&t, r);
-
-    t = n_Init(kn + 1, r);
-    n_InpMult(c, t, r);   // c = (c'* ((m - k) + 1) * gamma) * ((n - k) + 1)
-    n_Delete(&t, r);
-    
-    t = n_Init(k, r);
-    c = n_Div(c, t, r);
-    n_Delete(&t, r);
-
-//    n_Normalize(c, r);
-
-    t = n_Copy(c, r); // not the last!
-
-    p = p_NSet(t, r);
-
-    p_SetExp(p, GetJ(), km--, r); // y ^ (m-k)
-    p_SetExp(p, GetI(), kn--, r); // x ^ (n-k)
-
-    p_Setm(p, r); // pResult = x^n * y^m
-
-    pNext(pLast) = p;
-    pLast = p;
-  }
-
-  assume(k == min);
-  assume((km == 0) || (kn == 0) );
-
-  {
-    n_InpMult(c, m_g, r);   // c = c'* gamma
-
-    if( km > 0 )
-    {
-      number t = n_Init(km + 1, r);
-      n_InpMult(c, t, r);   // c = (c'* gamma) * (m - k + 1)
-      n_Delete(&t, r);
-    }
-    
-    if( kn > 0 )
-    {
-      number t = n_Init(kn + 1, r);
-      n_InpMult(c, t, r);   // c = (c'* gamma) * (n - k + 1)
-      n_Delete(&t, r);
-    }
-
-    number t = n_Init(k, r); // c = ((c'* gamma) * ((n - k + 1) * (m - k + 1))) / k;
-    c = n_Div(c, t, r);
-    n_Delete(&t, r);
-  }
-  
-  p = p_NSet(c, r);
-
-  p_SetExp(p, GetJ(), km, r); // y ^ (m-k)
-  p_SetExp(p, GetI(), kn, r); // x ^ (n-k)
-
-  p_Setm(p, r); // 
-
-  pNext(pLast) = p;
-
-  CorrectPolyWRTOrdering(pResult, r);
-
-  return pResult;
+  return CFormulaPowerMultiplier::ncSA_1xy0x0yG(GetI(), GetJ(), expRight, expLeft, m_g, r);
 }
 
 
@@ -744,7 +586,6 @@ CShiftSpecialPairMultiplier::~CShiftSpecialPairMultiplier()
 #endif
 }
 
-
 // Exponent * Exponent
 poly CShiftSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRight)
 {
@@ -758,99 +599,50 @@ poly CShiftSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRig
 
   const ring r = GetBasering();
 
-  int m, n, i, j;
+  if( m_shiftVar != GetI() ) // YX = XY + b*Y?
+    return CFormulaPowerMultiplier::ncSA_1xy0xBy0(GetI(), GetJ(), expRight, expLeft, m_shiftCoef, r); // case: (1, 0, beta, 0, 0)
+  else
+    return CFormulaPowerMultiplier::ncSA_1xyAx0y0(GetI(), GetJ(), expRight, expLeft, m_shiftCoef, r); // case: (1, alpha, 0, 0)
 
-  if( m_shiftVar != GetI() ) // YX = XY + a*X
-  {
-    m = expRight; // case: (1, 0, beta, 0, 0)
-    n = expLeft;
-
-    i = GetJ();
-    j = GetI();
-  } else
-  {
-    m = expLeft; // case: (1, alpha, 0, 0)
-    n = expRight;
-
-    i = GetI();
-    j = GetJ();
-  }
-
-    
-  int k = m; // to 0
-  
-  number c = n_Init(1, r); // k = m, C_k = 1
-  poly p = p_ISet(1, r);
-
-  p_SetExp(p, j, k, r); // Y^{k}
-  p_SetExp(p, i, n, r); 
-
-  p_Setm(p, r); // pResult = C_k * x^n * y^k, k == m
-
-
-  poly pResult = p;
-  poly pLast = p;
-
-  number nn =  n_Init(n, r); // number(n)!
-  n_InpMult(nn, m_shiftCoef, r); // nn = (alpha*n)
-
-  --k;
-  
-  int mk = 1; // mk = (m - k)
-
-  for(; k > 0; k-- )
-  {
-    number t = n_Init(k + 1, r);  // t = k+1
-    n_InpMult(c, t, r);           // c = c' * (k+1) 
-    n_InpMult(c, nn, r);          // c = (c' * (k+1)) * (alpha * n)
-
-    n_Delete(&t, r);
-    t = n_Init(mk++, r);         
-    c = n_Div(c, t, r);           // c = ((c' * (k+1))  * (alpha * n)) / (m-k);
-    n_Delete(&t, r);
-
-//    n_Normalize(c, r);
-
-    t = n_Copy(c, r); // not the last!
-
-    p = p_NSet(t, r);
-
-    p_SetExp(p, j, k, r); // y^k
-    p_SetExp(p, i, n, r); // x^n
-
-    p_Setm(p, r); // pResult = x^n * y^m
-
-    pNext(pLast) = p;
-    pLast = p;
-  }
-
-  assume(k == 0);
-
-  {
-    n_InpMult(c, nn, r);          // c = (c' * (0+1)) * (alpha * n)
-
-    number t = n_Init(m, r);         
-    c = n_Div(c, t, r);           // c = ((c' * (0+1))  * (alpha * n)) / (m-0);
-    n_Delete(&t, r);
-  }
-
-  n_Delete(&nn, r);
-  
-  p = p_NSet(c, r);
-
-  p_SetExp(p, j, k, r); // y^k
-  p_SetExp(p, i, n, r); // x^n
-
-  p_Setm(p, r); // 
-
-  pNext(pLast) = p;
-
-  CorrectPolyWRTOrdering(pResult, r);
- 
-  return pResult;
 }
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////
+CExternalSpecialPairMultiplier::CExternalSpecialPairMultiplier(ring r, int i, int j, Enum_ncSAType type):
+    CSpecialPairMultiplier(r, i, j), m_ncSAtype(type)
+{
+#if OUTPUT  
+  Print("CExternalSpecialPairMultiplier::CExternalSpecialPairMultiplier(ring, i: %d, j: %d, type: %d, c)!", i, j, (int)type);
+  PrintLn();
+#endif
+};
+
+
+CExternalSpecialPairMultiplier::~CExternalSpecialPairMultiplier()
+{
+#if OUTPUT  
+  Print("CExternalSpecialPairMultiplier::~CExternalSpecialPairMultiplier()");
+  PrintLn();
+#endif
+}
+
+// Exponent * Exponent
+poly CExternalSpecialPairMultiplier::MultiplyEE(const int expLeft, const int expRight)
+{
+#if OUTPUT  
+  Print("CExternalSpecialPairMultiplier::MultiplyEE(var(%d)^{%d}, var(%d)^{%d})!", GetJ(), expLeft, GetI(), expRight);  
+  PrintLn();
+#endif
+  // Char == 0, otherwise - problem!
+
+  assume( expLeft*expRight > 0 );
+
+  const ring r = GetBasering();
+
+  return CFormulaPowerMultiplier::Multiply(m_ncSAtype, GetI(), GetJ(), expRight, expLeft, r); 
+
+}
 
 
 
@@ -864,58 +656,43 @@ CSpecialPairMultiplier* AnalyzePair(const ring r, int i, int j)
   PrintLn();
 #endif
 
-  const int N = r->N;
+  Enum_ncSAType type = CFormulaPowerMultiplier::AnalyzePair(r, i, j);
 
-  assume(i < j);
-  assume(i > 0);
-  assume(j <= N);
+  if( type == _ncSA_notImplemented ) return NULL;
 
 
-  const poly c = GetC(r, i, j);
-  const poly d = GetD(r, i, j);
+  // last possibility:
+  return new CExternalSpecialPairMultiplier(r, i, j, type); // For tests!
 
-#if OUTPUT  
-  Print("C_{%d, %d} = ", i, j); p_Write(c, r);
-  Print("D_{%d, %d} = ", i, j); p_Write(d, r);
-#endif
+  
+  if( type == _ncSA_1xy0x0y0 )
+    return new CCommutativeSpecialPairMultiplier(r, i, j);
 
-	const number q = p_GetCoeff(c, r);
-	
-	if( d == NULL)
-	{
-		
-	  if( n_IsOne(q, r) )
-			return new CCommutativeSpecialPairMultiplier(r, i, j);
+  if( type == _ncSA_Mxy0x0y0 )
+    return new CAntiCommutativeSpecialPairMultiplier(r, i, j);
 
-		if( n_IsMOne(q, r) )
-			return new CAntiCommutativeSpecialPairMultiplier(r, i, j);
-
-		return new CQuasiCommutativeSpecialPairMultiplier(r, i, j, q);
-  } else
+  if( type == _ncSA_Qxy0x0y0 )
   {
-    if( n_IsOne(q, r) ) // "Lie" case
-    {
-      if( pNext(d) == NULL ) // Our Main Special Case! 
-      {
-        const number g = p_GetCoeff(d, r);
-
-        if( p_LmIsConstantComp(d, r) ) // Weyl
-          return new CWeylSpecialPairMultiplier(r, i, j, g);          
-
-        const int k = p_IsPurePower(d, r); // k if not pure power
-
-        if( k > 0 )
-          if( p_GetExp(d, k, r) == 1 )
-            if( (k == i) || (k == j) )
-              return new CShiftSpecialPairMultiplier(r, i, j, k, g);
-      }
-    }
+    const number q = p_GetCoeff(GetC(r, i, j), r);
+    return new CQuasiCommutativeSpecialPairMultiplier(r, i, j, q);
   }
-    
+  
+  const poly d = GetD(r, i, j);
+  
+  assume( d != NULL );
+  assume( pNext(d) == NULL );
 
+  const number g = p_GetCoeff(d, r);
 
+  if( type == _ncSA_1xy0x0yG ) // Weyl
+    return new CWeylSpecialPairMultiplier(r, i, j, g);          
 
-	return NULL;
+  if( type == _ncSA_1xyAx0y0 ) // Shift 1
+    return new CShiftSpecialPairMultiplier(r, i, j, i, g);
+
+  if( type == _ncSA_1xy0xBy0 ) // Shift 2
+    return new CShiftSpecialPairMultiplier(r, i, j, j, g);
+
 }
 
 

@@ -6,28 +6,26 @@
  *  Purpose: implementation of special Cache+Hash for Multiplier 
  *  Author:  motsak
  *  Created: 
- *  Version: $Id: ncSACache.cc,v 1.4 2008-07-21 00:05:09 motsak Exp $
+ *  Version: $Id: ncSACache.cc,v 1.5 2008-07-23 07:09:45 motsak Exp $
  *******************************************************************/
+
+#define MYTEST 0
+
+#if MYTEST
+#define OM_CHECK 4
+#define OM_TRACK 5
+// these settings must be before "mod2.h" in order to work!!!
+#endif
 
 
 #include "mod2.h"
 
 #ifndef NDEBUG
-
-#define MYTEST 1
 #define OUTPUT 1
-
-#if MYTEST
-#define OM_CHECK 4
-#define OM_TRACK 5
-#endif
-
 #else
-
-#define MYTEST 0
 #define OUTPUT 0
-
 #endif
+
 
 
 #include <ncSACache.h> // for CCacheHash etc classes

@@ -3,7 +3,7 @@
 /*****************************************
  *  Computer Algebra System SINGULAR     *
  *****************************************/
-/* $Id: ncSAMult.h,v 1.7 2008-07-21 00:05:09 motsak Exp $ */
+/* $Id: ncSAMult.h,v 1.8 2008-07-23 07:09:46 motsak Exp $ */
 #ifdef HAVE_PLURAL
 
 // #include <ncSAMult.h> // for CMultiplier etc classes
@@ -16,6 +16,7 @@
 #include <p_Mult_q.h>
 
 #include <ncSACache.h> // for CCacheHash etc classes
+#include <ncSAFormula.h> // for CFormulaPowerMultiplier and enum Enum_ncSAType
 
 // //////////////////////////////////////////////////////////////////////// //
 //
@@ -254,7 +255,6 @@ class CPowerMultiplier: public CMultiplier<CPower>
 
 
 
-
 class CGlobalMultiplier: public CMultiplier<poly>
 {
   private:
@@ -322,8 +322,6 @@ class CQuasiCommutativeSpecialPairMultiplier: public CSpecialPairMultiplier
 		CQuasiCommutativeSpecialPairMultiplier(ring r, int i, int j, number q);
 		virtual ~CQuasiCommutativeSpecialPairMultiplier();
 
-		number GetPower(int power);
-
 		// Exponent * Exponent
 		virtual poly MultiplyEE(const int expLeft, const int expRight);    
 };
@@ -356,6 +354,24 @@ class CShiftSpecialPairMultiplier: public CSpecialPairMultiplier
   public:
     CShiftSpecialPairMultiplier(ring r, int i, int j, int s, number c);
     virtual ~CShiftSpecialPairMultiplier();
+
+    // Exponent * Exponent
+    virtual poly MultiplyEE(const int expLeft, const int expRight);    
+};
+
+
+
+// need: enum Enum_ncSAType;
+
+//////////////////////////////////////////////////////////////////////////
+// Using external 'formula' routins
+class CExternalSpecialPairMultiplier: public CSpecialPairMultiplier
+{
+  private:
+    Enum_ncSAType m_ncSAtype;
+  public:
+    CExternalSpecialPairMultiplier(ring r, int i, int j, Enum_ncSAType type);
+    virtual ~CExternalSpecialPairMultiplier();
 
     // Exponent * Exponent
     virtual poly MultiplyEE(const int expLeft, const int expRight);    

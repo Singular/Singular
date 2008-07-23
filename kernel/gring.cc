@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.64 2008-07-21 12:40:04 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.65 2008-07-23 07:09:45 motsak Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -43,6 +43,7 @@
 #include <summator.h>
 
 #include <ncSAMult.h> // for CMultiplier etc classes
+#include <ncSAFormula.h> // for CFormulaPowerMultiplier and enum Enum_ncSAType
 
 
 bool bUseExtensions = true;
@@ -969,11 +970,44 @@ poly gnc_uu_Mult_ww_vert (int i, int a, int j, int b, const ring r)
   p_Delete(&x,r);
   p_Delete(&y,r);
   //  t=MATELEM(cMT,a,b);
-  t= nc_p_CopyGet(MATELEM(cMT,a,b),r);
+  t= nc_p_CopyGet(MATELEM(cMT,a,b),r); 
   //  return(p_Copy(t,r));
   /* since the last computed element was cMT[a,b] */
   return(t);
 }
+
+
+
+inline poly gnc_uu_Mult_ww_formula (int i, int a, int j, int b, const ring r)
+{
+
+  CFormulaPowerMultiplier* FormulaMultiplier = GetFormulaPowerMultiplier(r);
+  Enum_ncSAType PairType = _ncSA_notImplemented;
+  
+  if( FormulaMultiplier != NULL )
+    PairType = FormulaMultiplier->GetPair(j, i);
+   
+
+  if( PairType == _ncSA_notImplemented )
+    return gnc_uu_Mult_ww_vert(i, a, j, b, r);
+
+  
+ //    return FormulaMultiplier->Multiply(j, i, b, a);
+  poly t = CFormulaPowerMultiplier::Multiply( PairType, j, i, b, a, r);
+  
+  int rN=r->N;
+  matrix cMT = r->GetNC()->MT[UPMATELEM(j,i,rN)];         /* cMT=current MT */
+
+
+  MATELEM(cMT, a, b) = nc_p_CopyPut(t,r);
+  
+  //  t=MATELEM(cMT,a,b);
+//  t= nc_p_CopyGet(MATELEM(cMT,a,b),r);
+  //  return(p_Copy(t,r));
+  /* since the last computed element was cMT[a,b] */
+  return(t);
+}
+
 
 poly gnc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
   /* (x_i)^a times (x_j)^b */
@@ -1005,12 +1039,23 @@ poly gnc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
     else
     {
       number tmp_number=p_GetCoeff(MATELEM(r->GetNC()->COM,j,i),r); /* quasicommutative case */
-      nPower(tmp_number,a*b,&tmp_number);
+      nPower(tmp_number,a*b,&tmp_number); // BUG! ;-(
       p_SetCoeff(out,tmp_number,r);
       return(out);
     }
   }/* end_of commutative or quasicommutative case */
   p_Delete(&out,r);
+
+//   CFormulaPowerMultiplier* FormulaMultiplier = GetFormulaPowerMultiplier(r);
+// 
+//   if( FormulaMultiplier != NULL )
+//   {
+//     Enum_ncSAType PairType = FormulaMultiplier->GetPair(j, i);
+// 
+//     if( PairType != _ncSA_notImplemented )
+// //    return FormulaMultiplier->Multiply(j, i, b, a);
+//       return CFormulaPowerMultiplier::Multiply( PairType, j, i, b, a, r);
+//   }
 
   /* we are here if  i>j and variables do not commute or quasicommute */
   /* in fact, now a>=1 and b>=1; and j<i */
@@ -1056,9 +1101,13 @@ poly gnc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
     r->GetNC()->MTsize[UPMATELEM(j,i,rN)] = newcMTsize;
   }
   /* The update of multiplication matrix is finished */
-    out = gnc_uu_Mult_ww_vert(i, a, j, b, r);
-    //    out = nc_uu_Mult_ww_horvert(i, a, j, b, r);
-    return(out);
+
+
+  return gnc_uu_Mult_ww_formula(i, a, j, b, r);
+
+  out = gnc_uu_Mult_ww_vert(i, a, j, b, r);
+  //    out = nc_uu_Mult_ww_horvert(i, a, j, b, r);
+  return(out);
 }
 
 poly gnc_uu_Mult_ww_horvert (int i, int a, int j, int b, const ring r)
@@ -2548,12 +2597,19 @@ void nc_rKill(ring r)
 
   assume( r->GetNC()->ref == 0 );
 
-  if( rIsSCA(r) && (r->GetNC()->GetGlobalMultiplier() != NULL) )
+  if( r->GetNC()->GetGlobalMultiplier() != NULL )
   {
     delete r->GetNC()->GetGlobalMultiplier();
     r->GetNC()->GetGlobalMultiplier() = NULL;
   }
 
+  if( r->GetNC()->GetFormulaPowerMultiplier() != NULL )
+  {
+    delete r->GetNC()->GetFormulaPowerMultiplier();
+    r->GetNC()->GetFormulaPowerMultiplier() = NULL;
+  }
+  
+  
   int i,j;
   int rN=r->N;
   if ( rN > 1 )
@@ -3189,6 +3245,8 @@ BOOLEAN gnc_InitMultiplication(ring r, bool bSetupQuotient)
   {
     nc_SetupQuotient(r);
   }
+
+//  ncInitSpecialPowersMultiplication(r);
 
   if (save != currRing)
     rChangeCurrRing(save);
