@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.65 2008-07-23 07:09:45 motsak Exp $
+ *  Version: $Id: gring.cc,v 1.66 2008-07-24 09:45:53 motsak Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -44,6 +44,13 @@
 
 #include <ncSAMult.h> // for CMultiplier etc classes
 #include <ncSAFormula.h> // for CFormulaPowerMultiplier and enum Enum_ncSAType
+
+
+static const bool bNoPluralMultiplication = false;  // use only formula shortcuts in my OOP Multiplier
+
+// the following make sense only if bNoPluralMultiplication is false:
+static const bool bNoFormula = true;  // don't use any formula shortcuts
+static const bool bNoCache   = false; // only formula whenever possible, only make sanse if bNoFormula is false!
 
 
 bool bUseExtensions = true;
@@ -977,10 +984,11 @@ poly gnc_uu_Mult_ww_vert (int i, int a, int j, int b, const ring r)
 }
 
 
-
-inline poly gnc_uu_Mult_ww_formula (int i, int a, int j, int b, const ring r)
+static inline poly gnc_uu_Mult_ww_formula (int i, int a, int j, int b, const ring r)
 {
-
+  if(bNoFormula)
+    return gnc_uu_Mult_ww_vert(i, a, j, b, r);
+  
   CFormulaPowerMultiplier* FormulaMultiplier = GetFormulaPowerMultiplier(r);
   Enum_ncSAType PairType = _ncSA_notImplemented;
   
@@ -1046,17 +1054,21 @@ poly gnc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
   }/* end_of commutative or quasicommutative case */
   p_Delete(&out,r);
 
-//   CFormulaPowerMultiplier* FormulaMultiplier = GetFormulaPowerMultiplier(r);
-// 
-//   if( FormulaMultiplier != NULL )
-//   {
-//     Enum_ncSAType PairType = FormulaMultiplier->GetPair(j, i);
-// 
-//     if( PairType != _ncSA_notImplemented )
-// //    return FormulaMultiplier->Multiply(j, i, b, a);
-//       return CFormulaPowerMultiplier::Multiply( PairType, j, i, b, a, r);
-//   }
 
+  if(bNoCache && !bNoFormula)
+  { // without cache!?
+    CFormulaPowerMultiplier* FormulaMultiplier = GetFormulaPowerMultiplier(r);
+    Enum_ncSAType PairType = _ncSA_notImplemented;
+
+     if( FormulaMultiplier != NULL )
+       PairType = FormulaMultiplier->GetPair(j, i);
+
+     if( PairType != _ncSA_notImplemented )
+  // //    return FormulaMultiplier->Multiply(j, i, b, a);
+       return CFormulaPowerMultiplier::Multiply( PairType, j, i, b, a, r);
+  }
+
+  
   /* we are here if  i>j and variables do not commute or quasicommute */
   /* in fact, now a>=1 and b>=1; and j<i */
   /* now check whether the polynomial is already computed */
@@ -3246,8 +3258,17 @@ BOOLEAN gnc_InitMultiplication(ring r, bool bSetupQuotient)
     nc_SetupQuotient(r);
   }
 
-//  ncInitSpecialPowersMultiplication(r);
 
+  bool newmult = false;
+  if( bNoPluralMultiplication )
+    newmult = ncInitSpecialPairMultiplication(r);
+
+
+  if( !newmult )
+    if(!rIsSCA(r) && !bNoFormula)
+        newmult = ncInitSpecialPowersMultiplication(r);
+  
+  
   if (save != currRing)
     rChangeCurrRing(save);
 
