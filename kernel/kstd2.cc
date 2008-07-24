@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.70 2008-07-22 15:15:04 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.71 2008-07-24 10:27:17 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1494,7 +1494,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
     poly qq;
 
     /* here in the nonhomog case we shrink the new spoly */
-    
+
     if ( ! strat->homog)
     {
       strat->P.GetP(strat->lmBin); // because shifts are counted with .p structure
@@ -1506,7 +1506,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
       {
          /* we're here if Shrink is nonzero */
         //         strat->P.p =  NULL;
-	//        strat->P.Delete(); /* deletes P.p and P.t_p */ //error
+        //        strat->P.Delete(); /* deletes P.p and P.t_p */ //error
         strat->P.p   =  NULL; // is not set by Delete
         strat->P.t_p =  qq;
         strat->P.GetP(strat->lmBin);
@@ -1523,9 +1523,9 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
 #ifdef KDEBUG
          if (TEST_OPT_DEBUG){PrintS("nonzero s shrinks to 0");PrintLn();}
 #endif
-	 //	 strat->P.Delete();  // cause error
-	 strat->P.p = NULL;
-	 strat->P.t_p = NULL;
+         //         strat->P.Delete();  // cause error
+         strat->P.p = NULL;
+         strat->P.t_p = NULL;
            //         strat->P.p = NULL; // or delete strat->P.p ?
        }
     }
@@ -1602,7 +1602,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
       }
 
     /* here in the nonhomog case we shrink the reduced poly AGAIN */
-    
+
     if ( ! strat->homog)
     {
       strat->P.GetP(strat->lmBin); // because shifts are counted with .p structure
@@ -1614,7 +1614,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
       {
          /* we're here if Shrink is nonzero */
         //         strat->P.p =  NULL;
-	//        strat->P.Delete(); /* deletes P.p and P.t_p */ //error
+        //        strat->P.Delete(); /* deletes P.p and P.t_p */ //error
         strat->P.p   =  NULL; // is not set by Delete
         strat->P.t_p =  qq;
         strat->P.GetP(strat->lmBin);
@@ -1628,11 +1628,11 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
 #ifdef PDEBUG
          if (TEST_OPT_DEBUG){PrintS("nonzero s shrinks to 0");PrintLn();}
 #endif
-	 //	 strat->P.Delete();  // cause error
-	 strat->P.p = NULL;
-	 strat->P.t_p = NULL;
+         //         strat->P.Delete();  // cause error
+         strat->P.p = NULL;
+         strat->P.t_p = NULL;
            //         strat->P.p = NULL; // or delete strat->P.p ?
-	 goto     red_shrink2zero;
+         goto     red_shrink2zero;
        }
     }
       /* end shrinking poly AGAIN in the nonhomog case */
@@ -1643,7 +1643,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
       //        enterT(strat->P, strat); // this was here before Shift stuff
       //enterTShift(LObject p, kStrategy strat, int atT, int uptodeg, int lV); // syntax
       // the default value for atT = -1 as in bba
-      /*   strat->P.GetP(); */ 
+      /*   strat->P.GetP(); */
       // because shifts are counted with .p structure // done before, but ?
       enterTShift(strat->P,strat,-1,uptodeg, lV);
       enterpairsShift(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl,uptodeg,lV);
@@ -1663,12 +1663,12 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
       if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
       if (strat->sl>srmax) srmax = strat->sl;
     }
-    else 
+    else
     {
     red_shrink2zero:
       if (strat->P.p1 == NULL && strat->minim > 0)
       {
-	p_Delete(&strat->P.p2, currRing, strat->tailRing);
+        p_Delete(&strat->P.p2, currRing, strat->tailRing);
       }
     }
 #ifdef KDEBUG
@@ -1853,7 +1853,7 @@ int redFirstShift (LObject* h,kStrategy strat)
         if (at <= strat->Ll)
         {
           int dummy=strat->sl;
-	  /*          if (kFindDivisibleByInS(strat,&dummy, h) < 0) */
+          /*          if (kFindDivisibleByInS(strat,&dummy, h) < 0) */
           if (kFindDivisibleByInT(strat->T,strat->sevT, dummy, h) < 0)
             return 1;
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
