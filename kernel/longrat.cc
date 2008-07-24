@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.36 2008-07-16 15:04:26 wienand Exp $ */
+/* $Id: longrat.cc,v 1.37 2008-07-24 13:36:16 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -1030,6 +1030,7 @@ void nlPower (number x,int exp,number * u)
   else if (exp==0)
     *u = INT_TO_SR(1); // 0^0
 #ifdef LDEBUG
+  if (exp<0) Print("nlPower: neg. exp. %d\n",exp);
   nlTest(*u);
 #endif
 }
