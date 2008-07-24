@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.101 2008-07-14 10:59:39 Singular Exp $ */
+/* $Id: kutil.cc,v 1.102 2008-07-24 10:26:21 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -443,7 +443,9 @@ void cleanT (kStrategy strat)
     p = strat->T[j].p;
     strat->T[j].p=NULL;
     if (strat->T[j].max != NULL)
+    {
       p_LmFree(strat->T[j].max, strat->tailRing);
+    }
     i = -1;
     loop
     {
@@ -6896,9 +6898,10 @@ void enterTShift(LObject p, kStrategy strat, int atT, int uptodeg, int lV)
   LObject qq;
   for (i=1; i<=toInsert; i++) // toIns - 1?
   {
-    qq       = p; //qq.Copy();
+    qq      = p; //qq.Copy();
     qq.p    = NULL; 
-    qq.t_p = p_LPshift(p.t_p, i, uptodeg, lV, strat->tailRing); // direct shift
+    qq.max  = NULL;
+    qq.t_p = p_LPshift(p_Copy(p.t_p,strat->tailRing), i, uptodeg, lV, strat->tailRing); // direct shift
     qq.GetP();
     // update q.sev
     qq.sev = pGetShortExpVector(qq.p);
