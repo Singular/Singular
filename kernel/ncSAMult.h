@@ -3,7 +3,7 @@
 /*****************************************
  *  Computer Algebra System SINGULAR     *
  *****************************************/
-/* $Id: ncSAMult.h,v 1.8 2008-07-23 07:09:46 motsak Exp $ */
+/* $Id: ncSAMult.h,v 1.9 2008-07-25 16:06:18 motsak Exp $ */
 #ifdef HAVE_PLURAL
 
 // #include <ncSAMult.h> // for CMultiplier etc classes
@@ -73,57 +73,6 @@ class CMultiplier
       
 
     }
-
-    // Main templates:
-
-    // Poly * Exponent
-    inline poly MultiplyPE(const poly pPoly, const CExponent expRight)
-    {
-      bool bUsePolynomial = TEST_OPT_NOT_BUCKETS || (pLength(pPoly) < MIN_LENGTH_BUCKET);
-      CPolynomialSummator sum(GetBasering(), bUsePolynomial);
-
-      for( poly q = pPoly; q !=NULL; q = pNext(q) )
-        sum += MultiplyTE(q, expRight); 
-
-      return sum;
-    }
-
-    // Exponent * Poly 
-    inline poly MultiplyEP(const CExponent expLeft, const poly pPoly)
-    {
-      bool bUsePolynomial = TEST_OPT_NOT_BUCKETS || (pLength(pPoly) < MIN_LENGTH_BUCKET);
-      CPolynomialSummator sum(GetBasering(), bUsePolynomial);
-
-      for( poly q = pPoly; q !=NULL; q = pNext(q) )
-        sum += MultiplyET(expLeft, q); 
-
-      return sum;
-    }
-
-    // Poly * Exponent
-    inline poly MultiplyPEDestroy(poly pPoly, const CExponent expRight)
-    {
-      bool bUsePolynomial = TEST_OPT_NOT_BUCKETS || (pLength(pPoly) < MIN_LENGTH_BUCKET);
-      CPolynomialSummator sum(GetBasering(), bUsePolynomial);
-
-      for( ; pPoly!=NULL; pPoly  = p_LmDeleteAndNext(pPoly, GetBasering()) )
-        sum += MultiplyTE(pPoly, expRight); 
-
-      return sum;
-    }
-
-    // Exponent * Poly 
-    inline poly MultiplyEPDestroy(const CExponent expLeft, poly pPoly)
-    {
-      bool bUsePolynomial = TEST_OPT_NOT_BUCKETS || (pLength(pPoly) < MIN_LENGTH_BUCKET);
-      CPolynomialSummator sum(GetBasering(), bUsePolynomial);
-
-      for( ; pPoly!=NULL; pPoly  = p_LmDeleteAndNext(pPoly, GetBasering()) )
-        sum += MultiplyET(expLeft, pPoly); 
-
-      return sum;
-    }
-
 
 //  protected:
 
@@ -250,7 +199,57 @@ class CPowerMultiplier: public CMultiplier<CPower>
     // pMonom may NOT be of the form: var(i)^{m}!
     virtual poly MultiplyEM(const CExponent expLeft, const poly pMonom);
 
+    // Main templates:
 
+    // Poly * Exponent
+    inline poly MultiplyPE(const poly pPoly, const CExponent expRight)
+    {
+      bool bUsePolynomial = TEST_OPT_NOT_BUCKETS || (pLength(pPoly) < MIN_LENGTH_BUCKET);
+      CPolynomialSummator sum(GetBasering(), bUsePolynomial);
+
+      for( poly q = pPoly; q !=NULL; q = pNext(q) )
+        sum += MultiplyTE(q, expRight); 
+
+      return sum;
+    }
+
+    // Exponent * Poly 
+    inline poly MultiplyEP(const CExponent expLeft, const poly pPoly)
+    {
+      bool bUsePolynomial = TEST_OPT_NOT_BUCKETS || (pLength(pPoly) < MIN_LENGTH_BUCKET);
+      CPolynomialSummator sum(GetBasering(), bUsePolynomial);
+
+      for( poly q = pPoly; q !=NULL; q = pNext(q) )
+        sum += MultiplyET(expLeft, q); 
+
+      return sum;
+    }
+
+    // Poly * Exponent
+    inline poly MultiplyPEDestroy(poly pPoly, const CExponent expRight)
+    {
+      bool bUsePolynomial = TEST_OPT_NOT_BUCKETS || (pLength(pPoly) < MIN_LENGTH_BUCKET);
+      CPolynomialSummator sum(GetBasering(), bUsePolynomial);
+
+      for( ; pPoly!=NULL; pPoly  = p_LmDeleteAndNext(pPoly, GetBasering()) )
+        sum += MultiplyTE(pPoly, expRight); 
+
+      return sum;
+    }
+
+    // Exponent * Poly 
+    inline poly MultiplyEPDestroy(const CExponent expLeft, poly pPoly)
+    {
+      bool bUsePolynomial = TEST_OPT_NOT_BUCKETS || (pLength(pPoly) < MIN_LENGTH_BUCKET);
+      CPolynomialSummator sum(GetBasering(), bUsePolynomial);
+
+      for( ; pPoly!=NULL; pPoly  = p_LmDeleteAndNext(pPoly, GetBasering()) )
+        sum += MultiplyET(expLeft, pPoly); 
+
+      return sum;
+    }
+
+    
 };
 
 
@@ -267,8 +266,7 @@ class CGlobalMultiplier: public CMultiplier<poly>
     CGlobalMultiplier(ring r);
     virtual ~CGlobalMultiplier();
 
-    
-  
+
 //  protected:    
     typedef poly CExponent;
 
@@ -283,6 +281,209 @@ class CGlobalMultiplier: public CMultiplier<poly>
 
     // Exponent * Monom
     virtual poly MultiplyEM(const CExponent expLeft, const poly pMonom);
+
+
+    // Main templates:
+
+    // Poly * Exponent
+    inline poly MultiplyPE(const poly pPoly, const CExponent expRight)
+    {
+      assume( pPoly != NULL );      assume( expRight != NULL );
+      const int iComponentMonom = p_GetComp(expRight, GetBasering());
+
+      bool bUsePolynomial = TEST_OPT_NOT_BUCKETS || (pLength(pPoly) < MIN_LENGTH_BUCKET);
+      CPolynomialSummator sum(GetBasering(), bUsePolynomial);
+
+
+      if( iComponentMonom!=0 )
+      {
+        for( poly q = pPoly; q !=NULL; q = pNext(q) )
+        {
+#ifdef PDEBUG
+          {
+            const int iComponent = p_GetComp(q, GetBasering());
+            assume(iComponent == 0);          
+            if( iComponent!=0 )
+            {
+              Werror("MultiplyPE: both sides have non-zero components: %d and %d!\n", iComponent, iComponentMonom);
+              // what should we do further?!?
+              return NULL;
+            }
+
+          }
+#endif                    
+          sum += MultiplyTE(q, expRight); // NO Component!!!
+        }
+        poly t = sum; p_SetCompP(t, iComponentMonom, GetBasering());
+        return t;
+      } // iComponentMonom != 0!
+      else
+      { // iComponentMonom == 0!
+        for( poly q = pPoly; q !=NULL; q = pNext(q) )
+        {
+          const int iComponent = p_GetComp(q, GetBasering());
+
+#ifdef PDEBUG          
+          if( iComponent!=0 )
+          {
+            Warn("MultiplyPE: Multiplication in the left module from the right by component %d!\n", iComponent);
+            // what should we do further?!?
+          }
+#endif
+          poly t = MultiplyTE(q, expRight); // NO Component!!!
+          p_SetCompP(t, iComponent, GetBasering());          
+          sum += t;          
+        }        
+        return sum;
+      } // iComponentMonom == 0!
+    }
+
+    // Exponent * Poly 
+    inline poly MultiplyEP(const CExponent expLeft, const poly pPoly)
+    {
+      assume( pPoly != NULL );      assume( expLeft != NULL );
+      const int iComponentMonom = p_GetComp(expLeft, GetBasering());
+
+      bool bUsePolynomial = TEST_OPT_NOT_BUCKETS || (pLength(pPoly) < MIN_LENGTH_BUCKET);
+      CPolynomialSummator sum(GetBasering(), bUsePolynomial);
+
+      if( iComponentMonom!=0 )
+      {
+        for( poly q = pPoly; q !=NULL; q = pNext(q) )
+        {
+#ifdef PDEBUG
+          {
+            const int iComponent = p_GetComp(q, GetBasering());
+            assume(iComponent == 0);          
+            if( iComponent!=0 )
+            {
+              Werror("MultiplyEP: both sides have non-zero components: %d and %d!\n", iComponent, iComponentMonom);
+                // what should we do further?!?
+              return NULL;
+            }
+          }
+#endif                    
+          sum += MultiplyET(expLeft, q);
+        }
+        poly t = sum; p_SetCompP(t, iComponentMonom, GetBasering());
+        return t;
+      } // iComponentMonom != 0!
+      else
+      { // iComponentMonom == 0!
+        for( poly q = pPoly; q !=NULL; q = pNext(q) )
+        {
+          const int iComponent = p_GetComp(q, GetBasering());
+
+          poly t = MultiplyET(expLeft, q); // NO Component!!!
+          p_SetCompP(t, iComponent, GetBasering());          
+          sum += t;          
+        }        
+        return sum;
+      } // iComponentMonom == 0!
+    }
+
+    // Poly * Exponent
+    inline poly MultiplyPEDestroy(poly pPoly, const CExponent expRight)
+    {
+      assume( pPoly != NULL );      assume( expRight != NULL );
+      const int iComponentMonom = p_GetComp(expRight, GetBasering());
+
+      bool bUsePolynomial = TEST_OPT_NOT_BUCKETS || (pLength(pPoly) < MIN_LENGTH_BUCKET);
+      CPolynomialSummator sum(GetBasering(), bUsePolynomial);
+
+
+      if( iComponentMonom!=0 )
+      {
+        for(poly q = pPoly ; q!=NULL; q = p_LmDeleteAndNext(q, GetBasering()) )
+        {
+#ifdef PDEBUG
+          {
+            const int iComponent = p_GetComp(q, GetBasering());
+            assume(iComponent == 0);          
+            if( iComponent!=0 )
+            {
+              Werror("MultiplyPEDestroy: both sides have non-zero components: %d and %d!\n", iComponent, iComponentMonom);
+              // what should we do further?!?
+              return NULL;
+            }
+
+          }
+#endif                    
+          sum += MultiplyTE(q, expRight); // NO Component!!!
+        }
+        poly t = sum; p_SetCompP(t, iComponentMonom, GetBasering());
+        return t;
+      } // iComponentMonom != 0!
+      else
+      { // iComponentMonom == 0!
+        for(poly q = pPoly ; q!=NULL; q = p_LmDeleteAndNext(q, GetBasering()) )
+        {
+          const int iComponent = p_GetComp(q, GetBasering());
+
+#ifdef PDEBUG          
+          if( iComponent!=0 )
+          {
+            Warn("MultiplyPEDestroy: Multiplication in the left module from the right by component %d!\n", iComponent);
+            // what should we do further?!?
+          }
+#endif
+          poly t = MultiplyTE(q, expRight); // NO Component!!!
+          p_SetCompP(t, iComponent, GetBasering());          
+          sum += t;          
+        }        
+        return sum;
+      } // iComponentMonom == 0!
+
+    }
+
+    // Exponent * Poly 
+    inline poly MultiplyEPDestroy(const CExponent expLeft, poly pPoly)
+    {
+
+      assume( pPoly != NULL );      assume( expLeft != NULL );
+      const int iComponentMonom = p_GetComp(expLeft, GetBasering());
+
+      bool bUsePolynomial = TEST_OPT_NOT_BUCKETS || (pLength(pPoly) < MIN_LENGTH_BUCKET);
+      CPolynomialSummator sum(GetBasering(), bUsePolynomial);
+
+      if( iComponentMonom!=0 )
+      {
+        for(poly q = pPoly ; q!=NULL; q = p_LmDeleteAndNext(q, GetBasering()) )
+        {
+#ifdef PDEBUG
+          {
+            const int iComponent = p_GetComp(q, GetBasering());
+            assume(iComponent == 0);          
+            if( iComponent!=0 )
+            {
+              Werror("MultiplyEPDestroy: both sides have non-zero components: %d and %d!\n", iComponent, iComponentMonom);
+                // what should we do further?!?
+              return NULL;
+            }
+          }
+#endif                    
+          sum += MultiplyET(expLeft, q);
+        }
+        poly t = sum; p_SetCompP(t, iComponentMonom, GetBasering());
+        return t;
+      } // iComponentMonom != 0!
+      else
+      { // iComponentMonom == 0!
+        for(poly q = pPoly ; q!=NULL; q = p_LmDeleteAndNext(q, GetBasering()) )
+        {
+          const int iComponent = p_GetComp(q, GetBasering());
+
+          poly t = MultiplyET(expLeft, q); // NO Component!!!
+          p_SetCompP(t, iComponent, GetBasering());          
+          sum += t;          
+        }        
+        return sum;
+      } // iComponentMonom == 0!
+
+    }
+
+
+    
 
 };
 

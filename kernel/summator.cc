@@ -6,7 +6,7 @@
  *  Purpose: simple Summator usecase implementation
  *  Author:  motsak
  *  Created:
- *  Version: $Id: summator.cc,v 1.3 2008-07-08 13:30:54 Singular Exp $
+ *  Version: $Id: summator.cc,v 1.4 2008-07-25 16:06:18 motsak Exp $
  *******************************************************************/
 
 
@@ -67,7 +67,14 @@ CPolynomialSummator::~CPolynomialSummator()
 {
   if(!m_bUsePolynomial)
   {
+    poly out;
+    int pLength;
+    
+    sBucketClearAdd(m_temp.m_bucket, &out, &pLength);
     sBucketDestroy(&m_temp.m_bucket);
+
+    if(out != NULL)
+      p_Delete(&out, m_basering);    
 //    m_temp.m_bucket = NULL;
   }
   else

@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.66 2008-07-24 09:45:53 motsak Exp $
+ *  Version: $Id: gring.cc,v 1.67 2008-07-25 16:06:18 motsak Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -52,6 +52,11 @@ static const bool bNoPluralMultiplication = false;  // use only formula shortcut
 static const bool bNoFormula = true;  // don't use any formula shortcuts
 static const bool bNoCache   = false; // only formula whenever possible, only make sanse if bNoFormula is false!
 
+
+// false, true, false == old "good" Plural
+// false, false ==>> Plural + Cache + Direct Formula - not much
+// false, false, true ==>> Plural Mult + Direct Formula (no ~cache)
+// true, *, *  == new OOP multiplication!
 
 bool bUseExtensions = true;
 
@@ -494,7 +499,7 @@ poly gnc_mm_Mult_nn(int *F0, int *G0, const ring r)
           {
             cpower = cpower + F[i];
           }
-          cpower = cpower*G[j];
+          cpower = cpower*G[j]; // bug! here may happen an arithmetic overflow!!!
           tpower = tpower + cpower;
         }
       }
@@ -515,7 +520,7 @@ poly gnc_mm_Mult_nn(int *F0, int *G0, const ring r)
           {
             if (F[i]!=0)
             {
-              cpower = F[i]*G[j];
+              cpower = F[i]*G[j]; // bug! overflow danger!!!
               cff = n_Copy(p_GetCoeff(MATELEM(r->GetNC()->COM,j,i),r),r);
               nPower(cff,cpower,&tmp_num);
               cff = nMult(totcff,tmp_num);
@@ -765,6 +770,7 @@ poly gnc_mm_Mult_uu(int *F,int jG,int bG, const ring r)
   int *Prv=(int*)omAlloc0((rN+1)*sizeof(int));
   int *Nxt=(int*)omAlloc0((rN+1)*sizeof(int));
   int *lF=(int *)omAlloc0((rN+1)*sizeof(int));
+  
   int cnt=0; int cnf=0;
   /* splitting F wrt jG */
   for (i=1;i<=jG;i++) /* mult at the very end */
@@ -772,7 +778,12 @@ poly gnc_mm_Mult_uu(int *F,int jG,int bG, const ring r)
     Prv[i]=F[i]; Nxt[i]=0;
     if (F[i]!=0) cnf++;
   }
-  if (cnf==0)  freeT(Prv,rN);
+  
+  if (cnf==0)
+  {
+    freeT(Prv,rN); Prv = NULL;
+  }
+  
   for (i=jG+1;i<=rN;i++)
   {
     Nxt[i]=F[i];
@@ -789,22 +800,34 @@ poly gnc_mm_Mult_uu(int *F,int jG,int bG, const ring r)
     int q=lF[1];
     poly Rout=pOne();
     out=gnc_uu_Mult_ww(q,Nxt[q],jG,bG,r);
-    freeT(Nxt,rN);
+
+    freeT(Nxt,rN);  Nxt = NULL;
 
     if (cnf!=0)
     {
        Prv[0]=0;
        p_SetExpV(Rout,Prv,r);
        p_Setm(Rout,r);
+
 #ifdef PDEBUG
        p_Test(Rout,r);
 #endif
+       
        freeT(Prv,rN);
+       Prv = NULL;
+       
        out=gnc_mm_Mult_p(Rout,out,r); /* getting the final result */
     }
 
-    omFreeSize((ADDRESS)lF,(rN+1)*sizeof(int));
+    freeT(lF,rN);
+    lF = NULL;
+    
     p_Delete(&Rout,r);
+
+    assume(Nxt == NULL);
+    assume(lF == NULL);
+    assume(Prv == NULL);
+    
     return (out);
   }
 /* -------------------- MAIN ACTION --------------------- */
@@ -815,6 +838,7 @@ poly gnc_mm_Mult_uu(int *F,int jG,int bG, const ring r)
   c[cnt+1]=n_Init(1,r);
   i=cnt+2;         /* later in freeN */
   int *Op=Nxt;
+
   int *On=(int *)omAlloc0((rN+1)*sizeof(int));
   int *U=(int *)omAlloc0((rN+1)*sizeof(int));
 
@@ -903,25 +927,30 @@ poly gnc_mm_Mult_uu(int *F,int jG,int bG, const ring r)
 /*  U[jG]=U[jG]+bG;  */
 /* make leadterm */
 /* ??????????? we have done it already :-0 */
+
   Rout=pOne();
   p_SetExpV(Rout,U,r);
   p_Setm(Rout,r);  /* use again this name */
   p_SetCoeff(Rout,c[cnt+1],r);  /* last computed coef */
+
   out=p_Add_q(out,Rout,r);
+
   Rout=NULL;
-  freeT(U,rN);
-  freeN(c,i);
-  omFreeSize((ADDRESS)lF,(rN+1)*sizeof(int));
+
+  freeT(U, rN);
+  freeN(c, i);
+  freeT(lF, rN);
 
   if (cnf!=0)
   {
     Rout=pOne();
     p_SetExpV(Rout,Prv,r);
     p_Setm(Rout,r);
-    freeT(Prv,rN);
+    freeT(Prv, rN);
     out=gnc_mm_Mult_p(Rout,out,r); /* getting the final result */
     p_Delete(&Rout,r);
   }
+  
   return (out);
 }
 
