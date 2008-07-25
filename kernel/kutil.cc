@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.103 2008-07-25 14:37:55 Singular Exp $ */
+/* $Id: kutil.cc,v 1.104 2008-07-25 15:40:59 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2239,8 +2239,15 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
       }
     }
 
-    if (new_pair) chainCrit(h,ecart,strat);
-
+    if (new_pair) 
+    {
+#ifdef HAVE_PLURAL
+      if (currRing->real_var_start>0)
+        chainCritPart(h,ecart,strat);
+      else
+#endif
+      chainCrit(h,ecart,strat);
+    }
   }
 }
 
@@ -7105,7 +7112,15 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
       enterOnePairSelfShifts (h, h, ecart, isFromQ, strat, atR, uptodeg, lV);
     }
 
-    if (new_pair) chainCrit(h,ecart,strat);
+    if (new_pair)
+    {
+#ifdef HAVE_PLURAL
+      if (currRing->real_var_start>0)
+        chainCritPart(h,ecart,strat);
+      else
+#endif
+      chainCrit(h,ecart,strat);
+    }
 
   }
 }
