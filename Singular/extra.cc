@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.277 2008-07-23 07:10:50 motsak Exp $ */
+/* $Id: extra.cc,v 1.278 2008-07-25 12:41:43 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2608,6 +2608,28 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif // HAVE_RATGRING
+/*==================== Rat def =================*/
+    if (strcmp(sys_cmd, "ratVar") == 0)
+    {
+      int start,end;
+      int is;
+      if ((h!=NULL) && (h->Typ()==POLY_CMD))
+      {
+	start=pIsPurePower((poly)h->Data());
+	h=h->next;
+      }
+      else return TRUE;
+      if ((h!=NULL) && (h->Typ()==POLY_CMD))
+      {
+	end=pIsPurePower((poly)h->Data());
+	h=h->next;
+      }
+      else return TRUE;
+      currRing->real_var_start=start;
+      currRing->real_var_end=end;
+      return (start==0)||(end==0);
+    }
+    else
 /*==================== freeGB, twosided GB in free algebra =================*/
 #ifdef HAVE_SHIFTBBA
     if (strcmp(sys_cmd, "freegb") == 0)
