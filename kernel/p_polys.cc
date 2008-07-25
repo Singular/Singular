@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.12 2007-11-16 18:37:28 Singular Exp $
+ *  Version: $Id: p_polys.cc,v 1.13 2008-07-25 14:37:55 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -229,14 +229,14 @@ p_SetmProc p_GetSetmProc(ring r)
 * compute the degree of the leading monomial of p
 * the ordering is compatible with degree, use a->order
 */
-inline long _pDeg(poly a, ring r)
+inline long _pDeg(poly a, const ring r)
 {
   p_LmCheckPolyRing(a, r);
   assume(p_GetOrder(a, r) == pWTotaldegree(a, r));
   return p_GetOrder(a, r);
 }
 
-long pDeg(poly a, ring r)
+long pDeg(poly a, const ring r)
 {
   return _pDeg(a, r);
 }
@@ -247,19 +247,19 @@ long pDeg(poly a, ring r)
 * (all are 1 so save multiplications or they are of different signs)
 * the ordering is not compatible with degree so do not use p->Order
 */
-inline long _pTotaldegree(poly p, ring r)
+inline long _pTotaldegree(poly p, const ring r)
 {
   p_LmCheckPolyRing(p, r);
   return (long) p_ExpVectorQuerSum(p, r);
 }
-long pTotaldegree(poly p, ring r)
+long pTotaldegree(poly p, const ring r)
 {
   return (long) _pTotaldegree(p, r);
 }
 
 // pWTotalDegree for weighted orderings
 // whose first block covers all variables
-inline long _pWFirstTotalDegree(poly p, ring r)
+inline long _pWFirstTotalDegree(poly p, const ring r)
 {
   int i;
   long sum = 0;
@@ -271,7 +271,7 @@ inline long _pWFirstTotalDegree(poly p, ring r)
   return sum;
 }
 
-long pWFirstTotalDegree(poly p, ring r)
+long pWFirstTotalDegree(poly p, const ring r)
 {
   return (long) _pWFirstTotalDegree(p, r);
 }
@@ -281,7 +281,7 @@ long pWFirstTotalDegree(poly p, ring r)
 * with respect to weigths from the ordering
 * the ordering is not compatible with degree so do not use p->Order
 */
-long pWTotaldegree(poly p, ring r)
+long pWTotaldegree(poly p, const ring r)
 {
   p_LmCheckPolyRing(p, r);
   int i, k;
@@ -365,7 +365,7 @@ int pWeight(int i, const ring r)
   return r->firstwv[i-1];
 }
 
-long pWDegree(poly p, ring r)
+long pWDegree(poly p, const ring r)
 {
   if (r->firstwv==NULL) return pTotaldegree(p, r);
   p_LmCheckPolyRing(p, r);
@@ -390,7 +390,7 @@ long pWDegree(poly p, ring r)
 * compute the length of a polynomial (in l)
 * and the degree of the monomial with maximal degree: the last one
 */
-long pLDeg0(poly p,int *l, ring r)
+long pLDeg0(poly p,int *l, const ring r)
 {
   p_CheckPolyRing(p, r);
   Exponent_t k= p_GetComp(p, r);
@@ -421,7 +421,7 @@ long pLDeg0(poly p,int *l, ring r)
 * and the degree of the monomial with maximal degree: the last one
 * but search in all components before syzcomp
 */
-long pLDeg0c(poly p,int *l, ring r)
+long pLDeg0c(poly p,int *l, const ring r)
 {
   assume(p!=NULL);
 #ifdef PDEBUG
@@ -466,7 +466,7 @@ long pLDeg0c(poly p,int *l, ring r)
 * this works for the polynomial case with degree orderings
 * (both c,dp and dp,c)
 */
-long pLDegb(poly p,int *l, ring r)
+long pLDegb(poly p,int *l, const ring r)
 {
   p_CheckPolyRing(p, r);
   Exponent_t k= p_GetComp(p, r);
@@ -496,7 +496,7 @@ long pLDegb(poly p,int *l, ring r)
 * and the degree of the monomial with maximal degree:
 * this is NOT the last one, we have to look for it
 */
-long pLDeg1(poly p,int *l, ring r)
+long pLDeg1(poly p,int *l, const ring r)
 {
   p_CheckPolyRing(p, r);
   Exponent_t k= p_GetComp(p, r);
@@ -532,7 +532,7 @@ long pLDeg1(poly p,int *l, ring r)
 * this is NOT the last one, we have to look for it
 * in all components
 */
-long pLDeg1c(poly p,int *l, ring r)
+long pLDeg1c(poly p,int *l, const ring r)
 {
   p_CheckPolyRing(p, r);
   int ll=1;
@@ -565,7 +565,7 @@ long pLDeg1c(poly p,int *l, ring r)
 }
 
 // like pLDeg1, only pFDeg == pDeg
-long pLDeg1_Deg(poly p,int *l, ring r)
+long pLDeg1_Deg(poly p,int *l, const ring r)
 {
   assume(r->pFDeg == pDeg);
   p_CheckPolyRing(p, r);
@@ -596,7 +596,7 @@ long pLDeg1_Deg(poly p,int *l, ring r)
   return max;
 }
 
-long pLDeg1c_Deg(poly p,int *l, ring r)
+long pLDeg1c_Deg(poly p,int *l, const ring r)
 {
   assume(r->pFDeg == pDeg);
   p_CheckPolyRing(p, r);
@@ -630,7 +630,7 @@ long pLDeg1c_Deg(poly p,int *l, ring r)
 }
 
 // like pLDeg1, only pFDeg == pTotoalDegree
-long pLDeg1_Totaldegree(poly p,int *l, ring r)
+long pLDeg1_Totaldegree(poly p,int *l, const ring r)
 {
   p_CheckPolyRing(p, r);
   Exponent_t k= p_GetComp(p, r);
@@ -660,7 +660,7 @@ long pLDeg1_Totaldegree(poly p,int *l, ring r)
   return max;
 }
 
-long pLDeg1c_Totaldegree(poly p,int *l, ring r)
+long pLDeg1c_Totaldegree(poly p,int *l, const ring r)
 {
   p_CheckPolyRing(p, r);
   int ll=1;
@@ -693,7 +693,7 @@ long pLDeg1c_Totaldegree(poly p,int *l, ring r)
 }
 
 // like pLDeg1, only pFDeg == pWFirstTotalDegree
-long pLDeg1_WFirstTotalDegree(poly p,int *l, ring r)
+long pLDeg1_WFirstTotalDegree(poly p,int *l, const ring r)
 {
   p_CheckPolyRing(p, r);
   Exponent_t k= p_GetComp(p, r);
@@ -723,7 +723,7 @@ long pLDeg1_WFirstTotalDegree(poly p,int *l, ring r)
   return max;
 }
 
-long pLDeg1c_WFirstTotalDegree(poly p,int *l, ring r)
+long pLDeg1c_WFirstTotalDegree(poly p,int *l, const ring r)
 {
   p_CheckPolyRing(p, r);
   int ll=1;
@@ -762,7 +762,7 @@ long pLDeg1c_WFirstTotalDegree(poly p,int *l, ring r)
  ***************************************************************/
 
 static inline unsigned long
-p_GetMaxExpL2(unsigned long l1, unsigned long l2, ring r,
+p_GetMaxExpL2(unsigned long l1, unsigned long l2, const ring r,
               unsigned long number_of_exp)
 {
   const unsigned long bitmask = r->bitmask;
@@ -788,12 +788,12 @@ p_GetMaxExpL2(unsigned long l1, unsigned long l2, ring r,
 }
 
 static inline unsigned long
-p_GetMaxExpL2(unsigned long l1, unsigned long l2, ring r)
+p_GetMaxExpL2(unsigned long l1, unsigned long l2, const ring r)
 {
   return p_GetMaxExpL2(l1, l2, r, r->ExpPerLong);
 }
 
-poly p_GetMaxExpP(poly p, ring r)
+poly p_GetMaxExpP(poly p, const ring r)
 {
   p_CheckPolyRing(p, r);
   if (p == NULL) return p_Init(r);
@@ -830,7 +830,7 @@ poly p_GetMaxExpP(poly p, ring r)
   return max;
 }
 
-unsigned long p_GetMaxExpL(poly p, ring r, unsigned long l_max)
+unsigned long p_GetMaxExpL(poly p, const ring r, unsigned long l_max)
 {
   unsigned long l_p, divmask = r->divmask;
   int i;
@@ -863,7 +863,7 @@ unsigned long p_GetMaxExpL(poly p, ring r, unsigned long l_max)
  *
  ***************************************************************/
 // returns TRUE, if all monoms have the same component
-BOOLEAN p_OneComp(poly p, ring r)
+BOOLEAN p_OneComp(poly p, const ring r)
 {
   if(p!=NULL)
   {
@@ -951,7 +951,7 @@ int  p_GetVariables(poly p, int * e, const ring r)
 /*2
 * returns a polynomial representing the integer i
 */
-poly p_ISet(int i, ring r)
+poly p_ISet(int i, const ring r)
 {
   poly rc = NULL;
   if (i!=0)
@@ -968,7 +968,7 @@ poly p_ISet(int i, ring r)
 * returns a polynomial representing the number n
 * destroys n
 */
-poly p_NSet(number n, ring r)
+poly p_NSet(number n, const ring r)
 {
   if (r->cf->nIsZero(n))
   {

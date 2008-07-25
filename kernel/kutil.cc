@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.102 2008-07-24 10:26:21 Singular Exp $ */
+/* $Id: kutil.cc,v 1.103 2008-07-25 14:37:55 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -158,6 +158,16 @@ static inline int pDivComp(poly p, poly q)
 {
   if (pGetComp(p) == pGetComp(q))
   {
+#ifdef HAVE_PLURAL
+    if (currRing->real_var_start>0)
+    {
+      if (_p_LmDivisibleByPart(p,currRing,
+                           q,currRing,
+                           currRing->real_var_start, currRing->real_var_end))
+        return 0; 
+      return pLmCmp(q,p); // ONLY FOR GLOBAL ORDER!
+    }
+#endif
     BOOLEAN a=FALSE, b=FALSE;
     int i;
     unsigned long la, lb;
@@ -184,8 +194,9 @@ static inline int pDivComp(poly p, poly q)
         }
       }
     }
-    if (a) return 1;
-    if (b) return -1;
+    if (a) { /*assume(pLmCmp(q,p)==1);*/ return 1; }
+    if (b) { /*assume(pLmCmp(q,p)==-1);*/return -1; }
+    /*assume(pLmCmp(q,p)==0);*/
   }
   return 0;
 }
@@ -1913,6 +1924,237 @@ void chainCrit (poly p,int ecart,kStrategy strat)
             && (pNext(strat->L[l].p) == strat->tail)
             && (!pLmEqual(strat->L[i].p,strat->L[l].p))
             && pDivisibleBy(p,strat->L[l].lcm))
+            {
+              /*
+              *"NOT equal(...)" because in case of "equal" the element L[l]
+              *is "older" and has to be from theoretical point of view behind
+              *L[i], but we do not want to reorder L
+              */
+              strat->L[i].p2 = strat->tail;
+              /*
+              *L[l] will be canceled, we cannot cancel L[i] later on,
+              *so we mark it with "tail"
+              */
+              deleteInL(strat->L,&strat->Ll,l,strat);
+              i--;
+            }
+            else
+            {
+              deleteInL(strat->L,&strat->Ll,i,strat);
+            }
+            j--;
+          }
+          i--;
+        }
+      }
+      else if (strat->L[j].p2 == strat->tail)
+      {
+        /*now L[j] cannot be canceled any more and the tail can be removed*/
+        strat->L[j].p2 = p;
+      }
+      j--;
+    }
+  }
+}
+void chainCritPart (poly p,int ecart,kStrategy strat)
+{
+  int i,j,l;
+
+  /*
+  *pairtest[i] is TRUE if spoly(S[i],p) == 0.
+  *In this case all elements in B such
+  *that their lcm is divisible by the leading term of S[i] can be canceled
+  */
+  if (strat->pairtest!=NULL)
+  {
+    {
+      /*- i.e. there is an i with pairtest[i]==TRUE -*/
+      for (j=0; j<=strat->sl; j++)
+      {
+        if (strat->pairtest[j])
+        {
+          for (i=strat->Bl; i>=0; i--)
+          {
+            if (_p_LmDivisibleByPart(strat->S[j],currRing,
+               strat->B[i].lcm,currRing,
+               currRing->real_var_start,currRing->real_var_end))
+            {
+              deleteInL(strat->B,&strat->Bl,i,strat);
+              strat->c3++;
+            }
+          }
+        }
+      }
+    }
+    omFreeSize(strat->pairtest,(strat->sl+2)*sizeof(BOOLEAN));
+    strat->pairtest=NULL;
+  }
+  if (strat->Gebauer || strat->fromT)
+  {
+    if (strat->sugarCrit)
+    {
+    /*
+    *suppose L[j] == (s,r) and p/lcm(s,r)
+    *and lcm(s,r)#lcm(s,p) and lcm(s,r)#lcm(r,p)
+    *and in case the sugar is o.k. then L[j] can be canceled
+    */
+      for (j=strat->Ll; j>=0; j--)
+      {
+        if (sugarDivisibleBy(ecart,strat->L[j].ecart)
+        && ((pNext(strat->L[j].p) == strat->tail) || (pOrdSgn==1))
+        && pCompareChainPart(p,strat->L[j].p1,strat->L[j].p2,strat->L[j].lcm))
+        {
+          if (strat->L[j].p == strat->tail)
+          {
+              deleteInL(strat->L,&strat->Ll,j,strat);
+              strat->c3++;
+          }
+        }
+      }
+      /*
+      *this is GEBAUER-MOELLER:
+      *in B all elements with the same lcm except the "best"
+      *(i.e. the last one in B with this property) will be canceled
+      */
+      j = strat->Bl;
+      loop /*cannot be changed into a for !!! */
+      {
+        if (j <= 0) break;
+        i = j-1;
+        loop
+        {
+          if (i <  0) break;
+          if (pLmEqual(strat->B[j].lcm,strat->B[i].lcm))
+          {
+            strat->c3++;
+            if (sugarDivisibleBy(strat->B[j].ecart,strat->B[i].ecart))
+            {
+              deleteInL(strat->B,&strat->Bl,i,strat);
+              j--;
+            }
+            else
+            {
+              deleteInL(strat->B,&strat->Bl,j,strat);
+              break;
+            }
+          }
+          i--;
+        }
+        j--;
+      }
+    }
+    else /*sugarCrit*/
+    {
+      /*
+      *suppose L[j] == (s,r) and p/lcm(s,r)
+      *and lcm(s,r)#lcm(s,p) and lcm(s,r)#lcm(r,p)
+      *and in case the sugar is o.k. then L[j] can be canceled
+      */
+      for (j=strat->Ll; j>=0; j--)
+      {
+        if (pCompareChainPart(p,strat->L[j].p1,strat->L[j].p2,strat->L[j].lcm))
+        {
+          if ((pNext(strat->L[j].p) == strat->tail)||(pOrdSgn==1))
+          {
+            deleteInL(strat->L,&strat->Ll,j,strat);
+            strat->c3++;
+          }
+        }
+      }
+      /*
+      *this is GEBAUER-MOELLER:
+      *in B all elements with the same lcm except the "best"
+      *(i.e. the last one in B with this property) will be canceled
+      */
+      j = strat->Bl;
+      loop   /*cannot be changed into a for !!! */
+      {
+        if (j <= 0) break;
+        for(i=j-1; i>=0; i--)
+        {
+          if (pLmEqual(strat->B[j].lcm,strat->B[i].lcm))
+          {
+            strat->c3++;
+            deleteInL(strat->B,&strat->Bl,i,strat);
+            j--;
+          }
+        }
+        j--;
+      }
+    }
+    /*
+    *the elements of B enter L/their order with respect to B is kept
+    *j = posInL(L,j,B[i]) would permutate the order
+    *if once B is ordered different from L
+    *then one should use j = posInL(L,Ll,B[i])
+    */
+    j = strat->Ll+1;
+    for (i=strat->Bl; i>=0; i--)
+    {
+      j = strat->posInL(strat->L,j-1,&(strat->B[i]),strat);
+      enterL(&strat->L,&strat->Ll,&strat->Lmax,strat->B[i],j);
+    }
+    strat->Bl = -1;
+  }
+  else
+  {
+    for (j=strat->Ll; j>=0; j--)
+    {
+      if (pCompareChainPart(p,strat->L[j].p1,strat->L[j].p2,strat->L[j].lcm))
+      {
+        if ((pNext(strat->L[j].p) == strat->tail)||(pOrdSgn==1))
+        {
+          deleteInL(strat->L,&strat->Ll,j,strat);
+          strat->c3++;
+        }
+      }
+    }
+    /*
+    *this is our MODIFICATION of GEBAUER-MOELLER:
+    *First the elements of B enter L,
+    *then we fix a lcm and the "best" element in L
+    *(i.e the last in L with this lcm and of type (s,p))
+    *and cancel all the other elements of type (r,p) with this lcm
+    *except the case the element (s,r) has also the same lcm
+    *and is on the worst position with respect to (s,p) and (r,p)
+    */
+    /*
+    *B enters to L/their order with respect to B is permutated for elements
+    *B[i].p with the same leading term
+    */
+    j = strat->Ll;
+    for (i=strat->Bl; i>=0; i--)
+    {
+      j = strat->posInL(strat->L,j,&(strat->B[i]),strat);
+      enterL(&strat->L,&strat->Ll,&strat->Lmax,strat->B[i],j);
+    }
+    strat->Bl = -1;
+    j = strat->Ll;
+    loop  /*cannot be changed into a for !!! */
+    {
+      if (j <= 0)
+      {
+        /*now L[0] cannot be canceled any more and the tail can be removed*/
+        if (strat->L[0].p2 == strat->tail) strat->L[0].p2 = p;
+        break;
+      }
+      if (strat->L[j].p2 == p)
+      {
+        i = j-1;
+        loop
+        {
+          if (i < 0)  break;
+          if ((strat->L[i].p2 == p) && pLmEqual(strat->L[j].lcm,strat->L[i].lcm))
+          {
+            /*L[i] could be canceled but we search for a better one to cancel*/
+            strat->c3++;
+            if (isInPairsetL(i-1,strat->L[j].p1,strat->L[i].p1,&l,strat)
+            && (pNext(strat->L[l].p) == strat->tail)
+            && (!pLmEqual(strat->L[i].p,strat->L[l].p))
+            && _p_LmDivisibleByPart(p,currRing,
+                           strat->L[l].lcm,currRing,
+                           currRing->real_var_start, currRing->real_var_end))
+
             {
               /*
               *"NOT equal(...)" because in case of "equal" the element L[l]

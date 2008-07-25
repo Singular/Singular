@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.33 2008-07-15 15:29:15 wienand Exp $ */
+/* $Id: polys.cc,v 1.34 2008-07-25 14:37:55 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -208,7 +208,7 @@ void pLcm(poly a, poly b, poly m)
 /*2
 * convert monomial given as string to poly, e.g. 1x3y5z
 */
-const char * p_Read(const char *st, poly &rc, ring r)
+const char * p_Read(const char *st, poly &rc, const ring r)
 {
   if (r==NULL) { rc=NULL;return st;}
   int i,j;
@@ -781,7 +781,7 @@ void pNorm(poly p1)
 /*2
 *normalize all coefficients
 */
-void p_Normalize(poly p, ring r)
+void p_Normalize(poly p,const ring r)
 {
   if (rField_has_simple_inverse(r)) return; /* Z/p, GF(p,n), R, long R/C */
   while (p!=NULL)
@@ -1029,6 +1029,59 @@ BOOLEAN pCompareChain (poly p,poly p1,poly p2,poly lcm)
             return TRUE;
         }
         for (k=j-1; k!=0 ; k--)
+        {
+          if ((pGetExp(p,k)!=pGetExp(lcm,k))
+          && (pGetExp(p1,k)!=pGetExp(lcm,k)))
+            return TRUE;
+        }
+        return FALSE;
+      }
+    }
+  }
+  return FALSE;
+}
+BOOLEAN pCompareChainPart (poly p,poly p1,poly p2,poly lcm)
+{
+  int k, j;
+
+  if (lcm==NULL) return FALSE;
+
+  for (j=currRing->real_var_end; j>=currRing->real_var_start; j--)
+    if ( pGetExp(p,j) >  pGetExp(lcm,j)) return FALSE;
+  if ( pGetComp(p) !=  pGetComp(lcm)) return FALSE;
+  for (j=currRing->real_var_end; j>=currRing->real_var_start; j--)
+  {
+    if (pGetExp(p1,j)!=pGetExp(lcm,j))
+    {
+      if (pGetExp(p,j)!=pGetExp(lcm,j))
+      {
+        for (k=pVariables; k>j; k--)
+        for (k=currRing->real_var_end; k>j; k--)
+        {
+          if ((pGetExp(p,k)!=pGetExp(lcm,k))
+          && (pGetExp(p2,k)!=pGetExp(lcm,k)))
+            return TRUE;
+        }
+        for (k=j-1; k>=currRing->real_var_start; k--)
+        {
+          if ((pGetExp(p,k)!=pGetExp(lcm,k))
+          && (pGetExp(p2,k)!=pGetExp(lcm,k)))
+            return TRUE;
+        }
+        return FALSE;
+      }
+    }
+    else if (pGetExp(p2,j)!=pGetExp(lcm,j))
+    {
+      if (pGetExp(p,j)!=pGetExp(lcm,j))
+      {
+        for (k=currRing->real_var_end; k>j; k--)
+        {
+          if ((pGetExp(p,k)!=pGetExp(lcm,k))
+          && (pGetExp(p1,k)!=pGetExp(lcm,k)))
+            return TRUE;
+        }
+        for (k=j-1; k>=currRing->real_var_start; k--)
         {
           if ((pGetExp(p,k)!=pGetExp(lcm,k))
           && (pGetExp(p1,k)!=pGetExp(lcm,k)))

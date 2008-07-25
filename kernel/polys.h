@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.16 2008-03-19 17:44:11 Singular Exp $ */
+/* $Id: polys.h,v 1.17 2008-07-25 14:37:55 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -301,21 +301,21 @@ extern void pRestoreDegProcs(pFDegProc old_FDeg, pLDegProc old_lDeg);
 extern pLDegProc pLDeg;
 extern pFDegProc pFDeg;
 int  pWeight(int c, const ring r = currRing);
-long pDeg(poly p, ring r = currRing);
-long pTotaldegree(poly p, ring r = currRing);
-long pWTotaldegree(poly p, ring r = currRing);
-long pWDegree(poly p, ring r = currRing);
-long pLDeg0(poly p,int *l, ring r = currRing);
-long pLDeg0c(poly p,int *l, ring r = currRing);
-long pLDegb(poly p,int *l, ring r = currRing);
-long pLDeg1(poly p,int *l, ring r = currRing);
-long pLDeg1c(poly p,int *l, ring r = currRing);
-long pLDeg1_Deg(poly p,int *l, ring r = currRing);
-long pLDeg1c_Deg(poly p,int *l, ring r = currRing);
-long pLDeg1_Totaldegree(poly p,int *l, ring r = currRing);
-long pLDeg1c_Totaldegree(poly p,int *l, ring r = currRing);
-long pLDeg1_WFirstTotalDegree(poly p,int *l, ring r=currRing);
-long pLDeg1c_WFirstTotalDegree(poly p,int *l, ring r=currRing);
+long pDeg(poly p,const ring r = currRing);
+long pTotaldegree(poly p,const ring r = currRing);
+long pWTotaldegree(poly p,const ring r = currRing);
+long pWDegree(poly p,const ring r = currRing);
+long pLDeg0(poly p,int *l,const ring r = currRing);
+long pLDeg0c(poly p,int *l,const ring r = currRing);
+long pLDegb(poly p,int *l,const ring r = currRing);
+long pLDeg1(poly p,int *l,const ring r = currRing);
+long pLDeg1c(poly p,int *l,const ring r = currRing);
+long pLDeg1_Deg(poly p,int *l,const ring r = currRing);
+long pLDeg1c_Deg(poly p,int *l,const ring r = currRing);
+long pLDeg1_Totaldegree(poly p,int *l,const ring r = currRing);
+long pLDeg1c_Totaldegree(poly p,int *l,const ring r = currRing);
+long pLDeg1_WFirstTotalDegree(poly p,int *l,const ring r=currRing);
+long pLDeg1c_WFirstTotalDegree(poly p,int *l,const ring r=currRing);
 
 /*-------------pComp for syzygies:-------------------*/
 
@@ -325,8 +325,8 @@ void pSetModDeg(intvec *w);
 
 
 poly      pmInit(const char *s, BOOLEAN &ok); /* monom -> poly, interpreter */
-const char *    p_Read(const char *s, poly &p, ring r); /* monom -> poly */
-void      ppDelete(poly * a, ring r);
+const char *    p_Read(const char *s, poly &p,const ring r); /* monom -> poly */
+void      ppDelete(poly * a,const ring r);
 
 /*-------------operations on polynomials:------------*/
 poly      pSub(poly a, poly b);
@@ -363,7 +363,7 @@ void      pContent(poly p);
 void      pSimpleContent(poly p, int s);
 void      pCleardenom(poly p);
 void      pCleardenom_n(poly p,number &c);
-void      p_Normalize(poly p, ring r);
+void      p_Normalize(poly p,const ring r);
 #define   pNormalize(p) p_Normalize(p,currRing)
 int       pSize( poly p );
 
@@ -384,7 +384,7 @@ poly      pDivByMonom (poly p1,poly p2);
 // the leading monomial of p2 in p1
 void      pCancelPolyByMonom (poly p1,poly p2,polyset * P,int * SizeOfSet);
 
-poly      pPermPoly (poly p, int * perm, ring OldRing, nMapFunc nMap,
+poly      pPermPoly (poly p, int * perm,const ring OldRing, nMapFunc nMap,
                      int *par_perm=NULL, int OldPar=0);
 
 /*BOOLEAN   pVectorHasUnitM(poly p, int * k);*/
@@ -426,6 +426,7 @@ int   p_Var(poly mi,const ring r);
 
 /*-----------specials for spoly-computations--------------*/
 BOOLEAN pCompareChain (poly p,poly p1,poly p2,poly lcm);
+BOOLEAN pCompareChainPart (poly p,poly p1,poly p2,poly lcm);
 #define  pEqualPolys(p1,p2) p_EqualPolys(p1,p2,currRing)
 BOOLEAN pComparePolys(poly p1,poly p2);
 
