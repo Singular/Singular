@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.52 2008-07-23 07:09:46 motsak Exp $ */
+/* $Id: structs.h,v 1.53 2008-07-25 10:44:16 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -611,6 +611,9 @@ struct sip_sring
   short      OrdSgn; /* 1 for polynomial rings, -1 otherwise */
 
   short     firstBlockEnds;
+#ifdef HAVE_PLURAL
+  short     real_var_start, real_var_end;
+#endif
 
 
   BOOLEAN   VectorOut;
