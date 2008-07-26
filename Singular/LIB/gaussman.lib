@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.91 2005-05-06 14:38:29 hannes Exp $";
+version="$Id: gaussman.lib,v 1.92 2008-07-26 12:22:43 Singular Exp $";
 category="Singularities";
 
 info="
@@ -1021,7 +1021,7 @@ EXAMPLE:  example tmatrix; shows examples
       {
         U0=std(U0+I0);
         I[j]=I[j]+I0;
-        I0=reduce(N*I0,U0);
+        I0=reduce(N*matrix(I0,nrows(N),ncols(N)),U0);
         j++;
       }
     }
