@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmodapp.lib,v 1.4 2008-02-26 23:36:12 levandov Exp $";
+version="$Id: dmodapp.lib,v 1.5 2008-07-26 21:16:26 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmodapp.lib     Applications of algebraic D-modules
@@ -16,17 +16,22 @@ GUIDE:
 
 MAIN PROCEDURES:
 
-charVariety(I);       compute the characteristic variety of the ideal I
+DLoc(I,F); compute the presentation of the localization of D/I w.r.t. f^s
+annRat(f,g); compute the annihilator of a rational function f/g in a corr. Weyl algebra
+annPoly(f);  compute the annihilator of a polynomial f in a corr. Weyl algebra
 
 SECONDARY PROCEDURES FOR D-MODULES:
 
-foo();                    dummy prototype for a future procedure
+isFsat(I, F);            check whether the ideal I is F-saturated
+SDLoc(I, F); compute a generic presentation of the localization of D/I w.r.t. f^s, for D a Weyl algebra
+DLoc0(I, F); compute the localization of D/I w.r.t. f^s, based on the procedure SDLoc
 
 AUXILIARY PROCEDURES:
 
 AppelF1();      create an ideal annihilating Appel F1 function
 AppelF2();      create an ideal annihilating Appel F2 function
 AppelF4();      create an ideal annihilating Appel F4 function
+engine(I,i);   computes a Groebner basis with the algorithm given by i
 
 SEE ALSO: dmod_lib, gmssing_lib
 ";
@@ -35,6 +40,10 @@ LIB "poly.lib";
 LIB "sing.lib";
 LIB "primdec.lib";
 LIB "dmod.lib"; // loads e.g. nctools.lib
+
+// todo: complete and include into above list
+// charVariety(I);       compute the characteristic variety of the ideal I
+// charInfo(); ???
 
 proc charVariety(ideal I)
 "USAGE:  charVariety(I);  I an ideal
@@ -46,7 +55,7 @@ NOTE:    activate the output ring with the @code{setring} command.
 @*       - the ideal CV is the characteristic variety char(I)
 @*       If @code{printlevel}=1, progress debug messages will be printed,
 @*       if @code{printlevel}>=2, all the debug messages will be printed.
-EXAMPLE: example annfs; shows examples
+EXAMPLE: example charVariety; shows examples
 "
 {
   // 1. introduce the weights 0, 1
@@ -120,6 +129,7 @@ example
   dim(CV);
 }
 
+// TODO
 proc charInfo(ideal I)
 "USAGE:  charInfo(I);  I an ideal 
 RETURN:  ring
@@ -147,7 +157,7 @@ proc AppelF1()
 //(number a,b,c,d)
 {
   // Appel F1, d = b', SST p.48
-  ring @r = (0,a,b,c),(x,y,Dx,Dy),(a(0,0,1,1),dp);
+  ring @r = (0,a,b,c,d),(x,y,Dx,Dy),(a(0,0,1,1),dp);
   matrix @D[4][4];
   @D[1,3]=1; @D[2,4]=1;
   def @S = nc_algebra(1,@D);
@@ -220,6 +230,13 @@ example
 }
 
 proc isFsat(ideal I, poly F)
+"USAGE:  isFsat(I, F);  I an ideal, F a poly
+RETURN: int 
+PURPOSE: check whether the ideal I is F-saturated
+NOTE:    1 is returned if I is F-saturated, otherwise 0 is returned
+*   we check indeed that  Ker(D --F--> D/I) is (0)
+EXAMPLE: example isFsat; shows examples
+"
 {
   /* checks whether I is F-saturated, that is Ke  (D -F-> D/I) is 0 */
   /* works in any algebra */
@@ -294,7 +311,6 @@ example;
   LD0; 
   BS;
 }
-
 
 proc DLoc0(ideal I, poly F)
 "USAGE:  DLoc0(I, F);  I an ideal, F a poly
@@ -736,7 +752,175 @@ example;
   LD;
 }
 
-proc exCusp()
+proc annRat(poly g, poly f)
+"USAGE:  annRat(g,f);  f, g polynomials
+RETURN:  ring
+PURPOSE: compute the ideal in Weyl algebra, annihilating the rational function g*f^{-1}
+NOTE:    activate the output ring with the @code{setring} command.
+@*       In the output ring:
+@*       - the ideal RLD (which is given in a Groebner basis) is the annihilator.
+@*       If @code{printlevel}=1, progress debug messages will be printed,
+@*       if @code{printlevel}>=2, all the debug messages will be printed.
+EXAMPLE: example annRat; shows examples
+"
+{
+  // computes the annihilator of g/f
+  def save = basering;
+  int ppl = printlevel-voice+2;
+  dbprint(ppl,"// -1-[annRat] computing the ann f^s");
+  def  @R1 = SannfsBM(f);
+  setring @R1;
+  poly f = imap(save,f);
+  int i,mir;
+  int isr = 0; // checkRoot1(LD,f,1); // roots are negative, have to enter positive int
+  if (!isr)
+  {
+    // -1 is not the root
+    // find the m.i.r iteratively
+    mir = 0;
+    for(i=nvars(save)+1; i>=1; i--)
+    {
+      isr =  checkRoot1(LD,f,i);
+      if (isr) { mir =-i; break; }
+    }
+    if (mir ==0)
+    {
+      "No integer root found! Aborting computations, inform the authors!";
+      return(0);
+    }
+    // now mir == i is m.i.r.
+  }
+  else
+  {
+    // -1 is the m.i.r
+    mir = -1;
+  }
+  dbprint(ppl,"// -2-[annRat] the minimal integer root is ");
+  dbprint(ppl-1, mir);
+  // use annfspecial
+  dbprint(ppl,"// -3-[annRat] running annfspecial ");
+  ideal AF = annfspecial(LD,f,mir,-1); // ann f^{-1}
+  //  LD = subst(LD,s,j);
+  //  LD = engine(LD,0);
+  // modify the ring: throw s away
+  // output ring comes from SannfsBM
+  list U = ringlist(@R1);
+  list tmp; // variables
+  for(i=1; i<=size(U[2])-1; i++)
+  {
+    tmp[i] = U[2][i];
+  }
+  U[2] = tmp;
+  tmp = 0;
+  tmp[1] = U[3][1]; // x,Dx block
+  tmp[2] = U[3][3]; // module block
+  U[3] = tmp;
+  tmp = 0;
+  tmp = U[1],U[2],U[3],U[4];
+  def @R2 = ring(tmp);
+  setring @R2;
+  // now supply with Weyl algebra relations
+  int N = nvars(@R2)/2;
+  matrix @D[2*N][2*N];
+  for(i=1; i<=N; i++)
+  {
+    @D[i,N+i]=1;
+  }
+  def @R3 = nc_algebra(1,@D);
+  setring @R3;
+  dbprint(ppl,"// - -[annRat] ring without s is ready:");
+  dbprint(ppl-1,@R3);
+  poly g = imap(save,g);
+  matrix G[1][1] = g;
+  matrix LL = matrix(imap(@R1,AF));
+  kill @R1;   kill @R2;
+  dbprint(ppl,"// -4-[annRat] running modulo");
+  ideal RLD  = modulo(G,LL);
+  dbprint(ppl,"// -4-[annRat] running GB on the final result");
+  RLD  = engine(RLD,0);
+  export RLD;
+  return(@R3);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  poly g = 2*x*y;  poly f = x^2 - y^3;
+  def B = annRat(g,f);
+  setring B;
+  RLD;
+  // Now, compare with the output of Macaulay2:
+ ideal tst = 3*x*Dx + 2*y*Dy + 1, y^3*Dy^2 - x^2*Dy^2 + 6*y^2*Dy + 6*y, 9*y^2*Dx^2*Dy - 4*y*Dy^3 + 27*y*Dx^2 + 2*Dy^2, 9*y^3*Dx^2 - 4*y^2*Dy^2 + 10*y*Dy -10;
+ option(redSB);
+ option(redTail);
+ RLD = groebner(RLD);
+ tst = groebner(tst);
+ print(matrix(NF(RLD,tst)));  print(matrix(NF(tst,RLD)));
+}
+
+static proc ex_annRat()
+{
+  // more complicated example
+  ring r = 0,(x,y,z),dp;
+  poly f = x3+y3+z3; // mir = -2
+  poly g = x*y*z;
+  def A = annRat(g,f);
+  setring A;
+}
+
+proc annPoly(poly f)
+"USAGE:  annPoly(f);  f a poly
+RETURN:  ring
+PURPOSE: compute the ideal in Weyl algebra, annihilating the polynomial f
+NOTE:    activate the output ring with the @code{setring} command.
+@*       In the output ring:
+@*       - the ideal RLD (which is given in a Groebner basis) is the annihilator.
+@*       If @code{printlevel}=1, progress debug messages will be printed,
+@*       if @code{printlevel}>=2, all the debug messages will be printed.
+SEE ALSO: annRat
+EXAMPLE: example annPoly; shows examples
+"
+{
+  // computes a system of linear PDEs with polynomial coeffs for f
+  def save = basering;
+  list L = ringlist(save);
+  list Name = L[2];
+  int N = nvars(save);
+  int i;
+  for (i=1; i<=N; i++)
+  {
+    Name[N+i] = "D"+Name[i]; // concat
+  }
+  L[2] = Name;
+  def @R = ring(L);
+  setring @R;
+  def @@R = Weyl();
+  setring @@R;
+  kill @R;
+  matrix M[1][N];
+  for (i=1; i<=N; i++)
+  {
+    M[1,i] = var(N+i);
+  }
+  matrix F[1][1] = imap(save,f);
+  ideal I = modulo(F,M);
+  ideal LD = groebner(I);
+  export LD;
+  return(@@R);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  poly f = x^2*z - y^3;
+  def A = annPoly(f);
+  setring A;
+  LD;
+  gkdim(LD); // must be 3 since LD is holonomic
+  NF(Dy^4, LD); // must be 0 since Dy^4 clearly annihilates f
+}
+
+static proc exCusp()
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,Dx,Dy),dp;
@@ -755,7 +939,7 @@ proc exCusp()
   DLoc(I,F);
 }
 
-proc exWalther1()
+static proc exWalther1()
 {
   // p.18 Rem 3.10
   ring r = 0,(x,Dx),dp;
@@ -775,7 +959,7 @@ proc exWalther1()
   BS;
 }
 
-proc exWalther2()
+static proc exWalther2()
 {
   // p.19 Rem 3.10 cont'd
   ring r = 0,(x,Dx),dp;
@@ -799,7 +983,7 @@ proc exWalther2()
   LD0;  BS;
 }
 
-proc exWalther3()
+static proc exWalther3()
 {
   // can check with annFs too :-)
   // p.21 Ex 3.15
@@ -829,4 +1013,30 @@ proc exWalther3()
   setring R;
   DLoc(I,F);
   LD0;  BS;
+}
+
+proc engine(ideal I, int i)
+{
+  /* std - slimgb mix */
+  ideal J;
+  if (i==0)
+  {
+    J = slimgb(I);
+  }
+  else
+  {
+    // without options -> strange! (ringlist?)
+    option(redSB);
+    option(redTail);
+    J = std(I);
+  }
+  return(J);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),Dp;
+  ideal I  = y*(x3-y2),x*(x3-y2);
+  engine(I,0); // uses slimgb
+  engine(I,0); // uses std
 }
