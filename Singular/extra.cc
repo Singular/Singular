@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.278 2008-07-25 12:41:43 Singular Exp $ */
+/* $Id: extra.cc,v 1.279 2008-07-26 14:20:24 motsak Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -836,7 +836,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       if( !rIsPluralRing(currRing) )
         return TRUE;
 
-      if( !ncInitSpecialPairMultiplication(currRing) )
+      if( !ncInitSpecialPairMultiplication(currRing) ) // No Plural! 
         return TRUE;
 
       return FALSE;
@@ -847,7 +847,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       if( !rIsPluralRing(currRing) )
         return TRUE;
 
-      if( !ncInitSpecialPowersMultiplication(currRing) )
+      if( !ncInitSpecialPowersMultiplication(currRing) ) // Enable Formula for Plural (depends on swiches)!
         return TRUE;
 
       return FALSE;
