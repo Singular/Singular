@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.18 2008-07-26 09:40:41 Singular Exp $ */
+/* $Id: polys.h,v 1.19 2008-07-26 10:04:55 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -358,12 +358,13 @@ void      pEnlargeSet(polyset *p, int length, int increment);
 #define   pISet(i) p_ISet(i,currRing)
 #define   pNSet(n) p_NSet(n,currRing)
 //#define   pOne()   pISet(1)
-inline poly pOne()
+inline poly p_One(const ring r)
 {
-  poly rc = pInit();
-  pSetCoeff0(rc,nInit(1));
+  poly rc = p_Init(r);
+  pSetCoeff0(rc,r->cf->nInit(1));
   return rc;
 }
+#define   pOne()   p_One(currRing)
 
 void      pContent(poly p);
 void      pSimpleContent(poly p, int s);
