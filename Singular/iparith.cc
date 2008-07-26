@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.474 2008-07-16 12:41:32 wienand Exp $ */
+/* $Id: iparith.cc,v 1.475 2008-07-26 12:40:43 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -891,10 +891,12 @@ static BOOLEAN jjPLUS_IV(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjPLUS_MA(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)(mpAdd((matrix)u->Data() , (matrix)v->Data()));
+  matrix A=(matrix)u->Data(); matrix B=(matrix)v->Data();
+  res->data = (char *)(mpAdd(A , B));
   if (res->data==NULL)
   {
-     WerrorS("matrix size not compatible");
+     Werror("matrix size not compatible(%dx%d, %dx%d)",
+	     MATROWS(A),MATCOLS(A),MATROWS(B),MATCOLS(B));
      return TRUE;
   }
   return jjPLUSMINUS_Gen(res,u,v);
@@ -968,10 +970,12 @@ static BOOLEAN jjMINUS_IV(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjMINUS_MA(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)(mpSub((matrix)u->Data() , (matrix)v->Data()));
+  matrix A=(matrix)u->Data(); matrix B=(matrix)v->Data();
+  res->data = (char *)(mpSub(A , B));
   if (res->data==NULL)
   {
-     WerrorS("matrix size not compatible");
+     Werror("matrix size not compatible(%dx%d, %dx%d)",
+	     MATROWS(A),MATCOLS(A),MATROWS(B),MATCOLS(B));
      return TRUE;
   }
   return jjPLUSMINUS_Gen(res,u,v);
@@ -1092,10 +1096,12 @@ static BOOLEAN jjTIMES_MA_I2(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjTIMES_MA(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)mpMult((matrix)u->Data(),(matrix)v->Data());
+  matrix A=(matrix)u->Data(); matrix B=(matrix)v->Data();
+  res->data = (char *)mpMult(A,B);
   if (res->data==NULL)
   {
-     WerrorS("matrix size not compatible");
+     Werror("matrix size not compatible(%dx%d, %dx%d)",
+	     MATROWS(A),MATCOLS(A),MATROWS(B),MATCOLS(B));
      return TRUE;
   }
   idNormalize((ideal)res->data);
