@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.14 2008-06-10 10:17:31 motsak Exp $ */
+/* $Id: gr_kstd2.cc,v 1.15 2008-07-26 18:11:42 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -144,6 +144,159 @@ int redGrFirst (LObject* h,kStrategy strat)
       if (TEST_OPT_DEBUG) PrintS("-");
       j++;
     }
+  }
+}
+void ratGB_divide_out(poly p)
+{
+  if (p==NULL) return;
+  poly root=p;
+  assume(currRing->real_var_start>0);
+  poly f=pHead(p);
+  int i;
+  for (i=currRing->real_var_start;i<=currRing->real_var_end;i++)
+  {
+    pSetExp(f,i,0);
+  }
+  loop
+  {
+    pIter(p);
+    if (p==NULL) { pSetm(f); break;}
+    for (i=1;i<=rVar(currRing);i++)
+    {
+      pSetExp(f,i,si_min(pGetExp(f,i),pGetExp(p,i)));
+    }
+  }
+  if (!pIsConstant(f))
+  {
+    if (TEST_OPT_DEBUG)
+    {
+      PrintS("divide out:");p_wrp(f,currRing);
+      PrintS(" from ");pWrite(root);
+    }
+    p=root;
+    loop
+    {
+      if (p==NULL) break;
+      for (i=1;i<=rVar(currRing);i++)
+      {
+        pSetExp(p,i,pGetExp(p,i)-pGetExp(f,i));
+      }
+      pSetm(p);
+      pIter(p);
+    }
+  }
+  pDelete(&f);
+}
+/*2
+*reduces h with elements from T choosing  the first possible
+* element in t with respect to the given pDivisibleBy
+* for use in ratGB
+*/
+int redGrRatGB (LObject* h,kStrategy strat)
+{
+  int at,reddeg,d,i;
+  int pass = 0;
+  int j = 0;
+  int c_j=-1, c_e=-1;
+  poly c_p=NULL;
+  assume(strat->tailRing==currRing);
+
+  ratGB_divide_out((*h).p);
+  d = pFDeg((*h).p,currRing)+(*h).ecart;
+  reddeg = strat->LazyDegree+d;
+  if (!TEST_OPT_INTSTRATEGY)
+  {
+    if (rField_is_Zp_a()) pContent(h->p);
+    else pCleardenom(h->p);// also does a pContent
+  }
+  loop
+  {
+    if (j > strat->sl)
+    {
+      if (c_j>=0)
+      {
+        /*
+        * the polynomial to reduce with is;
+        * S[c_j]
+        */
+        if (!TEST_OPT_INTSTRATEGY)
+          pNorm(strat->S[c_j]);
+        if (TEST_OPT_DEBUG)
+        {
+          wrp(h->p);
+          PrintS(" with ");
+          wrp(strat->S[c_j]);
+        }
+        //poly hh = nc_CreateSpoly(strat->S[c_j],(*h).p, currRing);
+	poly hh=c_p; c_p=NULL;
+	pDelete(&((*h).p));
+	(*h).p=hh;
+        if (!TEST_OPT_INTSTRATEGY)
+        {
+          if (rField_is_Zp_a()) pContent(h->p);
+          else pCleardenom(h->p);// also does a pContent
+        }
+
+        if (TEST_OPT_DEBUG)
+        {
+          PrintS(" to ");
+          wrp(h->p);
+        }
+        if ((*h).p == NULL)
+        {
+          if (h->lcm!=NULL) p_LmFree((*h).lcm, currRing);
+          return 0;
+        }
+        ratGB_divide_out((*h).p);
+        d = pLDeg((*h).p,&((*h).length),currRing);
+        (*h).FDeg=pFDeg((*h).p,currRing);
+        (*h).ecart = d-(*h).FDeg; /*pFDeg((*h).p);*/
+        /*- try to reduce the s-polynomial again -*/
+        pass++;
+	j=0;
+      }
+      else
+      { // nothing found
+        return 0;
+      }
+    }
+    if (p_LmDivisibleByPart(strat->S[j],(*h).p,currRing,
+        currRing->real_var_start,currRing->real_var_end))
+    {
+      int a_e=(pTotaldegree(strat->S[j],currRing)-pFDeg(strat->S[j],currRing));
+      if (TEST_OPT_DEBUG) { Print("j=%d, e=%d\n",j,a_e); }
+      if ((c_e==-1)||(c_e>a_e))
+      {
+        c_e=a_e; c_j=j;
+	pDelete(&c_p);
+        c_p = nc_CreateSpoly(pCopy(strat->S[c_j]),pCopy((*h).p), currRing);
+      }
+      else if (c_e == a_e)
+      {
+	 poly cc_pp= nc_CreateSpoly(pCopy(strat->S[j]),pCopy((*h).p), currRing);
+	 if (((cc_pp==NULL)&&(c_p!=NULL)) || (pCmp(cc_pp,c_p)==-1))
+         {
+	   assume(pTotaldegree(cc_pp)<=pTotaldegree(c_p));
+           c_e=a_e; c_j=j;
+	   pDelete(&c_p);
+           c_p = cc_pp;
+	 }
+      }
+      /*computes the ecart*/
+      if ((strat->syzComp!=0) && !strat->honey)
+      {
+        if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
+        {
+          if (TEST_OPT_DEBUG) PrintS(" > sysComp\n");
+          return 0;
+        }
+      }
+    }
+    else
+    {
+      if (TEST_OPT_DEBUG) PrintS("-\n");
+    }
+    j++;
   }
 }
 
@@ -775,6 +928,8 @@ void nc_gr_initBba(ideal F, kStrategy strat)
 
 //   if (rIsPluralRing(currRing))
     strat->red = redGrFirst;
+  if (currRing->real_var_start>0)
+    strat->red=redGrRatGB;
 
   if (pLexOrder && strat->honey)
     strat->initEcart = initEcartNormal;
@@ -830,14 +985,14 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 #endif
 
    PrintS("F: \n");
-   idPrint(F);  
-   PrintS("Q: \n");  
+   idPrint(F);
+   PrintS("Q: \n");
    idPrint(Q);
 #endif
 #endif
 
 
-   
+
   assume(pOrdSgn != -1); // no mora!!! it terminates only for global ordering!!! (?)
 
   intvec *w=NULL;
@@ -896,7 +1051,7 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 //          strat->cp++;
           /* prod.crit itself in nc_CreateSpoly */
         }
-      
+
       strat->P.p = nc_CreateSpoly(strat->P.p1,strat->P.p2,currRing);
 
 #ifdef PDEBUG
@@ -910,10 +1065,10 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
         PrintS("p2: "); pWrite(strat->P.p2);
         PrintS("SPoly: "); pWrite(strat->P.p);
       }
-#endif      
+#endif
     }
 
-    
+
     if (strat->P.p != NULL)
     {
       if (TEST_OPT_PROT)
@@ -980,15 +1135,15 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 #if MYTEST
                 Print("s: "); pWrite(strat->P.p);
 #endif
-                
+
               }
               // kTest(strat);
               //
               enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
-              
+
               if (strat->sl==-1) pos=0;
               else pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
-              
+
               strat->enterS(strat->P,pos,strat,-1);
             }
 //            if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
