@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.101 2008-07-26 14:28:03 motsak Exp $ */
+/* $Id: ring.cc,v 1.102 2008-07-26 18:15:46 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1465,6 +1465,8 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
 
   memcpy4(res,r,sizeof(ip_sring));
   res->VarOffset = NULL;
+  res->p_Procs=NULL;
+  res->cf=NULL;
   res->ref=0;
   if (r->algring!=NULL)
     r->algring->ref++;
