@@ -6,7 +6,7 @@
  *  Purpose: implementation of multiplication in simple NC subalgebras
  *  Author:  motsak
  *  Created: 
- *  Version: $Id: ncSAMult.cc,v 1.8 2008-07-25 16:06:18 motsak Exp $
+ *  Version: $Id: ncSAMult.cc,v 1.9 2008-07-26 14:28:03 motsak Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -29,7 +29,7 @@
 
 #include <ncSAMult.h> // for CMultiplier etc classes
 #include <sca.h> // for SCA
-
+#include <polys.h> // for p_One
 
 
 
@@ -237,6 +237,12 @@ bool ncInitSpecialPairMultiplication(ring r)
   assume(rIsPluralRing(r));
   assume(!rIsSCA(r));
 
+  if( r->GetNC()->GetGlobalMultiplier() != NULL )
+  {
+    WarnS("Already defined!");
+    return false;
+  }
+
   r->GetNC()->GetGlobalMultiplier() = new CGlobalMultiplier(r);
 
   gnc_p_ProcsSet(r);
@@ -244,7 +250,8 @@ bool ncInitSpecialPairMultiplication(ring r)
 }
 
 
-CGlobalMultiplier::CGlobalMultiplier(ring r): CMultiplier<poly>(r)
+CGlobalMultiplier::CGlobalMultiplier(ring r):
+    CMultiplier<poly>(r), m_RingFormulaMultiplier(GetFormulaPowerMultiplier(r))
 {
 #if OUTPUT  
   Print("CGlobalMultiplier::CGlobalMultiplier(ring)!");
@@ -253,7 +260,6 @@ CGlobalMultiplier::CGlobalMultiplier(ring r): CMultiplier<poly>(r)
 
   m_cache = new CGlobalCacheHash(r);
   m_powers = new CPowerMultiplier(r);
-
 }
 
 
@@ -266,6 +272,8 @@ CGlobalMultiplier::~CGlobalMultiplier()
 
   delete m_cache;
   delete m_powers;
+
+  // we cannot delete m_RingFormulaMultiplier as it belongs to the ring!
 }
 
 
@@ -363,7 +371,20 @@ poly CGlobalMultiplier::MultiplyEE(const CGlobalMultiplier::CExponent expLeft, c
 
   } else
   { // i < j, ei != 0, ej != 0
-    product = m_powers->MultiplyEE( CPower(j, ej), CPower(i, ei) );
+
+    Enum_ncSAType PairType = _ncSA_notImplemented;
+
+    if( m_RingFormulaMultiplier != NULL )
+      PairType = m_RingFormulaMultiplier->GetPair(i, j);
+
+
+    if( PairType == _ncSA_notImplemented )
+      product = m_powers->MultiplyEE( CPower(j, ej), CPower(i, ei) );
+//    return gnc_uu_Mult_ww_vert(i, a, j, b, r);
+    else
+ //    return m_RingFormulaMultiplier->Multiply(j, i, b, a);
+      product = CFormulaPowerMultiplier::Multiply( PairType, i, j, ei, ej, GetBasering());
+    
 
 #if OUTPUT  
     Print("<CGlobalMultiplier::MultiplyEE> ==> ");
@@ -915,7 +936,7 @@ poly CPowerMultiplier::MultiplyEE(const CExponent expLeft, const CExponent expRi
   {
     const ring r = GetBasering();
 
-    poly product = p_ISet(1, r);
+    poly product = p_One(r);
     p_SetExp(product, j, ej, r);
     p_SetExp(product, i, ei, r);
     p_Setm(product, r);

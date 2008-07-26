@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.100 2008-07-20 15:12:35 Singular Exp $ */
+/* $Id: ring.cc,v 1.101 2008-07-26 14:28:03 motsak Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1313,7 +1313,7 @@ int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 
       for (i = 1; i <= rVar(R1); i++)
         for (j= rVar(R1)+1; j <= l; j++)
-          MATELEM(C,i,j) = p_ISet(1, sum); // in 'sum'
+          MATELEM(C,i,j) = p_One( sum); // in 'sum'
 
       idTest((ideal)C);
 

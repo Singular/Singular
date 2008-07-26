@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shiftgb.cc,v 1.8 2008-07-08 13:02:21 Singular Exp $ */
+/* $Id: shiftgb.cc,v 1.9 2008-07-26 14:28:03 motsak Exp $ */
 /*
 * ABSTRACT: kernel: utils for shift GB and free GB
 */
@@ -139,7 +139,7 @@ poly p_mLPshift(poly p, int sh, int uptodeg, int lV, const ring r)
     }
 #endif
   }
-  poly m = p_ISet(1,r);
+  poly m = p_One(r);
   p_SetExpV(m,s,r);
   freeT(e, r->N);
   freeT(s, r->N);
@@ -532,7 +532,7 @@ poly p_mShrink(poly p, int lV, const ring r)
 #endif
   // cnt -1 <= b  must hold!
   //  freeT(B, b);
-  poly s = p_ISet(1,r);
+  poly s = p_One(r);
   p_SetExpV(s,S,r);
   freeT(e, r->N);
   freeT(S, r->N);

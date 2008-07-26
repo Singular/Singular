@@ -6,7 +6,7 @@
  *  Purpose: implementation of multiplication by formulas in simple NC subalgebras
  *  Author:  motsak
  *  Created: 
- *  Version: $Id: ncSAFormula.cc,v 1.1 2008-07-23 07:09:45 motsak Exp $
+ *  Version: $Id: ncSAFormula.cc,v 1.2 2008-07-26 14:28:03 motsak Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -33,6 +33,7 @@
 #include <p_polys.h>
 #include <febase.h>
 #include <sca.h> // for SCA
+#include <polys.h> // for p_One
 
 
 
@@ -48,6 +49,14 @@ bool ncInitSpecialPowersMultiplication(ring r)
   assume(rIsPluralRing(r));
   assume(!rIsSCA(r));
 
+
+  if( r->GetNC()->GetFormulaPowerMultiplier() != NULL )
+  {
+    WarnS("Already defined!");
+    return false;
+  }
+
+  
   r->GetNC()->GetFormulaPowerMultiplier() = new CFormulaPowerMultiplier(r);
 
   return true;
@@ -173,7 +182,7 @@ static inline poly ncSA_1xy0x0y0(const int i, const int j, const int n, const in
   PrintLn();
 #endif
 
-  poly p = p_ISet(1, r);
+  poly p = p_One( r);
   p_SetExp(p, j, m, r);
   p_SetExp(p, i, n, r);
   p_Setm(p, r);
@@ -268,7 +277,7 @@ static inline poly ncSA_1xy0x0yG(const int i, const int j, const int n, const in
 
   number c = n_Init(1, r);
 
-  poly p = p_ISet(1, r);
+  poly p = p_One( r);
 
   p_SetExp(p, j, km--, r); // y ^ (m-k)
   p_SetExp(p, i, kn--, r); // x ^ (n-k)
@@ -360,7 +369,7 @@ static inline poly ncSA_ShiftAx(int i, int j, int n, int m, const number m_shift
   int k = m; // to 0
 
   number c = n_Init(1, r); // k = m, C_k = 1
-  poly p = p_ISet(1, r);
+  poly p = p_One( r);
 
   p_SetExp(p, j, k, r); // Y^{k}
   p_SetExp(p, i, n, r); 

@@ -3,7 +3,7 @@
 /*****************************************
  *  Computer Algebra System SINGULAR     *
  *****************************************/
-/* $Id: ncSAMult.h,v 1.9 2008-07-25 16:06:18 motsak Exp $ */
+/* $Id: ncSAMult.h,v 1.10 2008-07-26 14:28:03 motsak Exp $ */
 #ifdef HAVE_PLURAL
 
 // #include <ncSAMult.h> // for CMultiplier etc classes
@@ -139,14 +139,23 @@ struct CPower // represents var(iVar)^{iPower}
 
   CPower(int i, int n): Var(i), Power(n) {};
 
-  inline poly GetPoly(const ring r, int c = 1) const
+/*
+  inline poly GetPoly(const ring r) const // TODO: search for GetPoly(r, 1) and remove "1"!
+  {
+    poly p = p_One(r);
+    p_SetExp(p, Var, Power, r);
+    p_Setm(p, r);
+    return p;
+  };
+  inline poly GetPoly(const ring r, int c) const
   {
     poly p = p_ISet(c, r);
     p_SetExp(p, Var, Power, r);
     p_Setm(p, r);
     return p;
   };
- 
+*/
+  
 };
 
 
@@ -259,6 +268,7 @@ class CGlobalMultiplier: public CMultiplier<poly>
   private:
     CGlobalCacheHash* m_cache;
     CPowerMultiplier* m_powers;
+    const CFormulaPowerMultiplier* m_RingFormulaMultiplier;
 
   public:
     typedef CMultiplier<poly> CBaseType;

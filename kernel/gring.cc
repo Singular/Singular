@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.67 2008-07-25 16:06:18 motsak Exp $
+ *  Version: $Id: gring.cc,v 1.68 2008-07-26 14:28:03 motsak Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -124,7 +124,7 @@ void nc_rCleanUp(ring r); // smaller than kill: just free mem
 */
 poly p_Lcm(const poly a, const poly b, const long lCompM, const ring r)
 {
-  poly m = // p_ISet(1, r);
+  poly m = // p_One( r);
           p_Init(r);
 
   const int pVariables = r->N;
@@ -1084,7 +1084,7 @@ poly gnc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
   p_Delete(&out,r);
 
 
-  if(bNoCache && !bNoFormula)
+  if(bNoCache && !bNoFormula) // don't use cache whenever possible!
   { // without cache!?
     CFormulaPowerMultiplier* FormulaMultiplier = GetFormulaPowerMultiplier(r);
     Enum_ncSAType PairType = _ncSA_notImplemented;
@@ -1132,7 +1132,7 @@ poly gnc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
           //           omCheckAddr(tmp->m);
           MATELEM(r->GetNC()->MT[UPMATELEM(j,i,rN)],k,m)=NULL;
           //           omCheckAddr(r->GetNC()->MT[UPMATELEM(j,i,rN)]->m);
-	  out=NULL;
+          out=NULL;
         }
       }
     }
@@ -1589,10 +1589,10 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
 //     return(nc_p_Bracket_qq(pCopy(p2),p1));
 //   }
 
-//  poly pL=p_ISet(1, r);
+//  poly pL=p_One( r);
 
-  poly m1=p_ISet(1, r);
-  poly m2=p_ISet(1, r);
+  poly m1=p_One( r);
+  poly m2=p_One( r);
 
   poly pL = p_Lcm(p1,p2,r);                               // pL = lcm( lm(p1), lm(p2) )
 
@@ -2392,7 +2392,7 @@ ideal twostd(ideal I) // works in currRing only!
 
       for (int j = 1; j <= rN; j++) // for all j = 1..N
       {
-        poly varj = p_ISet(1, currRing);
+        poly varj = p_One( currRing);
         p_SetExp(varj, j, 1, currRing);
         p_Setm(varj, currRing);
 
@@ -2461,7 +2461,7 @@ ideal twostd(ideal I) // works in currRing only!
                 id_Delete(&K, currRing);
 
               ideal Q = idInit(1,1); // ring independent!
-              Q->m[0] = p_ISet(1,currRing);
+              Q->m[0] = p_One(currRing);
 
               return(Q);
             }
@@ -2841,7 +2841,7 @@ BOOLEAN gnc_CheckOrdCondition(matrix D, ring r)
       p = nc_p_CopyGet(MATELEM(D,i,j),r);
       if ( p != NULL)
       {
-    q = p_ISet(1,r); // replaces pOne();
+    q = p_One(r); // replaces pOne();
     p_SetExp(q,i,1,r);
     p_SetExp(q,j,1,r);
     p_Setm(q,r);
@@ -3250,7 +3250,7 @@ BOOLEAN gnc_InitMultiplication(ring r, bool bSetupQuotient)
         r->GetNC()->MT[UPMATELEM(i,j,r->N)] = mpNew(DefMTsize, DefMTsize);
       }
       /* set MT[i,j,1,1] to c_i_j*x_i*x_j + D_i_j */
-      p = p_ISet(1,r); /* instead of     p = pOne(); */
+      p = p_One(r); /* instead of     p = pOne(); */
       if (MATELEM(r->GetNC()->C,i,j)!=NULL)
         p_SetCoeff(p,n_Copy(pGetCoeff(MATELEM(r->GetNC()->C,i,j)),r),r);
       p_SetExp(p,i,1,r);
@@ -3288,14 +3288,13 @@ BOOLEAN gnc_InitMultiplication(ring r, bool bSetupQuotient)
   }
 
 
-  bool newmult = false;
+  // ???
   if( bNoPluralMultiplication )
-    newmult = ncInitSpecialPairMultiplication(r);
+    ncInitSpecialPairMultiplication(r);
 
 
-  if( !newmult )
-    if(!rIsSCA(r) && !bNoFormula)
-        newmult = ncInitSpecialPowersMultiplication(r);
+  if(!rIsSCA(r) && !bNoFormula)
+    ncInitSpecialPowersMultiplication(r);
   
   
   if (save != currRing)
@@ -3661,7 +3660,7 @@ ring nc_rCreateNCcomm(ring r)
 
   for(int i=1; i<r->N; i++)
     for(int j=i+1; j<=r->N; j++)
-      MATELEM(C,i,j) = p_ISet(1, r);
+      MATELEM(C,i,j) = p_One( r);
 
   if (nc_CallPlural(C, D, NULL, NULL, r)) // TODO: what about quotient ideal?
     WarnS("Error initializing multiplication!"); // No reaction!???

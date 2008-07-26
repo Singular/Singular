@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.26 2008-07-04 16:17:16 motsak Exp $
+ *  Version: $Id: sca.cc,v 1.27 2008-07-26 14:28:03 motsak Exp $
  *******************************************************************/
 
 // set it here if needed.
@@ -119,22 +119,30 @@ inline int sca_Sign_mm_Mult_mm( const poly pMonomM, const poly pMonomMM, const r
       const unsigned int iExpM  = p_GetExp(pMonomM,  j, rRing);
       const unsigned int iExpMM = p_GetExp(pMonomMM, j, rRing);
 
+#ifdef PDEBUG
+      assume( iExpM <= 1);
+      assume( iExpMM <= 1);
+#endif
+
       if( iExpMM != 0 )
       {
         if( iExpM != 0 )
         {
           return 0; // lm(pMonomM) * lm(pMonomMM) == 0
         }
-        tpower += cpower; // compute degree of (-1).
+        tpower ^= cpower; // compute degree of (-1).
       }
-
-      cpower += iExpM;
+      cpower ^= iExpM;
     }
 
-    if( (tpower&1) != 0 ) // degree is odd => negate coeff.
-      return -1;
+#ifdef PDEBUG
+    assume(tpower <= 1);
+#endif
 
-    return(1);
+    // 1 => -1  // degree is odd => negate coeff.
+    // 0 =>  1
+
+    return(1 - (tpower << 1) );
 }
 
 
@@ -162,6 +170,11 @@ inline poly sca_m_Mult_mm( poly pMonomM, const poly pMonomMM, const ring rRing )
       const unsigned int iExpM  = p_GetExp(pMonomM,  j, rRing);
       const unsigned int iExpMM = p_GetExp(pMonomMM, j, rRing);
 
+#ifdef PDEBUG
+      assume( iExpM <= 1);
+      assume( iExpMM <= 1);
+#endif
+
       if( iExpMM != 0 )
       {
         if( iExpM != 0 ) // result is zero!
@@ -169,17 +182,21 @@ inline poly sca_m_Mult_mm( poly pMonomM, const poly pMonomMM, const ring rRing )
           return NULL; // we do nothing with pMonomM in this case!
         }
 
-        tpower += cpower; // compute degree of (-1).
+        tpower ^= cpower; // compute degree of (-1).
       }
 
-      cpower += iExpM;
+      cpower ^= iExpM;
     }
 
+#ifdef PDEBUG
+    assume(tpower <= 1);
+#endif
+    
     p_ExpVectorAdd(pMonomM, pMonomMM, rRing); // "exponents" are additive!!!
 
     number nCoeffM = p_GetCoeff(pMonomM, rRing); // no new copy! should be deleted!
 
-    if( (tpower&1) != 0 ) // degree is odd => negate coeff.
+    if( (tpower) != 0 ) // degree is odd => negate coeff.
       nCoeffM = n_Neg(nCoeffM, rRing); // negate nCoeff (will destroy the original number)
 
     const number nCoeffMM = p_GetCoeff(pMonomMM, rRing); // no new copy!
@@ -217,6 +234,11 @@ inline poly sca_mm_Mult_m( const poly pMonomMM, poly pMonomM, const ring rRing )
       const unsigned int iExpMM = p_GetExp(pMonomMM, j, rRing);
       const unsigned int iExpM  = p_GetExp(pMonomM,  j, rRing);
 
+#ifdef PDEBUG
+      assume( iExpM <= 1);
+      assume( iExpMM <= 1);
+#endif
+
       if( iExpM != 0 )
       {
         if( iExpMM != 0 ) // result is zero!
@@ -224,17 +246,21 @@ inline poly sca_mm_Mult_m( const poly pMonomMM, poly pMonomM, const ring rRing )
           return NULL; // we do nothing with pMonomM in this case!
         }
 
-        tpower += cpower; // compute degree of (-1).
+        tpower ^= cpower; // compute degree of (-1).
       }
 
-      cpower += iExpMM;
+      cpower ^= iExpMM;
     }
+
+#ifdef PDEBUG
+    assume(tpower <= 1);
+#endif
 
     p_ExpVectorAdd(pMonomM, pMonomMM, rRing); // "exponents" are additive!!!
 
     number nCoeffM = p_GetCoeff(pMonomM, rRing); // no new copy! should be deleted!
 
-    if( (tpower&1) != 0 ) // degree is odd => negate coeff.
+    if( (tpower) != 0 ) // degree is odd => negate coeff.
       nCoeffM = n_Neg(nCoeffM, rRing); // negate nCoeff (will destroy the original number), creates new number!
 
     const number nCoeffMM = p_GetCoeff(pMonomMM, rRing); // no new copy!
@@ -273,6 +299,11 @@ inline poly sca_mm_Mult_mm( poly pMonom1, const poly pMonom2, const ring rRing )
       const unsigned int iExp1 = p_GetExp(pMonom1, j, rRing);
       const unsigned int iExp2 = p_GetExp(pMonom2, j, rRing);
 
+#ifdef PDEBUG
+      assume( iExp1 <= 1);
+      assume( iExp2 <= 1);
+#endif
+      
       if( iExp2 != 0 )
       {
         if( iExp1 != 0 ) // result is zero!
@@ -280,12 +311,16 @@ inline poly sca_mm_Mult_mm( poly pMonom1, const poly pMonom2, const ring rRing )
           return NULL;
         }
 
-        tpower += cpower; // compute degree of (-1).
+        tpower ^= cpower; // compute degree of (-1).
       }
 
-      cpower += iExp1;
+      cpower ^= iExp1;
     }
 
+#ifdef PDEBUG
+    assume(cpower <= 1);
+#endif
+    
     poly pResult;
     omTypeAllocBin(poly, pResult, rRing->PolyBin);
     p_SetRingOfLm(pResult, rRing);
@@ -299,7 +334,7 @@ inline poly sca_mm_Mult_mm( poly pMonom1, const poly pMonom2, const ring rRing )
 
     number nCoeff = n_Mult(nCoeff1, nCoeff2, rRing); // new number!
 
-    if( (tpower&1) != 0 ) // degree is odd => negate coeff.
+    if( (tpower) != 0 ) // degree is odd => negate coeff.
       nCoeff = n_Neg(nCoeff, rRing); // negate nCoeff (will destroy the original number)
 
     p_SetCoeff0(pResult, nCoeff, rRing); // set lc(pResult) = nCoeff, no destruction!
@@ -331,7 +366,11 @@ inline poly sca_xi_Mult_mm(unsigned int i, const poly pMonom, const ring rRing)
     unsigned int cpower = 0;
 
     for( unsigned int j = iFirstAltVar; j < i ; j++ )
-      cpower += p_GetExp(pMonom, j, rRing);
+      cpower ^= p_GetExp(pMonom, j, rRing);
+
+#ifdef PDEBUG
+    assume(cpower <= 1);
+#endif
 
     poly pResult = p_LmInit(pMonom, rRing);
 
@@ -340,7 +379,7 @@ inline poly sca_xi_Mult_mm(unsigned int i, const poly pMonom, const ring rRing)
 
     number nCoeff = n_Copy(p_GetCoeff(pMonom, rRing), rRing); // new number!
 
-    if( (cpower&1) != 0 ) // degree is odd => negate coeff.
+    if( cpower != 0 ) // degree is odd => negate coeff.
       nCoeff = n_Neg(nCoeff, rRing); // negate nCoeff (will destroy the original number)
 
     p_SetCoeff0(pResult, nCoeff, rRing); // set lc(pResult) = nCoeff, no destruction!
@@ -746,7 +785,7 @@ poly sca_SPoly( const poly p1, const poly p2, const ring r )
 
   poly pL = p_Lcm(p1, p2, si_max(lCompP1, lCompP2), r);       // pL = lcm( lm(p1), lm(p2) )
 
-  poly m1 = p_ISet(1, r);
+  poly m1 = p_One( r);
   p_ExpVectorDiff(m1, pL, p1, r);                  // m1 = pL / lm(p1)
 
   //p_SetComp(m1,0,r);
@@ -756,7 +795,7 @@ poly sca_SPoly( const poly p1, const poly p2, const ring r )
 #endif
 
 
-  poly m2 = p_ISet(1, r);
+  poly m2 = p_One( r);
   p_ExpVectorDiff (m2, pL, p2, r);                  // m2 = pL / lm(p2)
 
   //p_SetComp(m2,0,r);
@@ -1452,7 +1491,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
   for ( int i = iAltVarStart; (i <= iAltVarEnd) && bSCA; i++ )
     if( (i < b) || (i > e) ) // otherwise it's ok since rG is an SCA!
   {
-    poly square = p_ISet(1, rG);
+    poly square = p_One( rG);
     p_SetExp(square, i, 2, rG); // square = var(i)^2.
     p_Setm(square, rG);
 
@@ -1578,7 +1617,7 @@ poly sca_pp_Mult_xi_pp(unsigned int i, const poly pPoly, const ring rRing)
 
 
 
-  poly xi =  p_ISet(1, rRing);
+  poly xi =  p_One( rRing);
   p_SetExp(xi, i, 1, rRing);
   p_Setm(xi, rRing);
 
