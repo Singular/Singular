@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.104 2008-07-25 15:40:59 Singular Exp $ */
+/* $Id: kutil.cc,v 1.105 2008-07-27 10:21:59 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1979,6 +1979,14 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
                strat->B[i].lcm,currRing,
                currRing->real_var_start,currRing->real_var_end))
             {
+              if(TEST_OPT_DEBUG)
+              {
+		 Print("chain-crit-part: S[%d]=",j); 
+		 p_wrp(strat->S[j],currRing);
+		 Print(" divide B[%d].lcm=",i);
+		 p_wrp(strat->B[i].lcm,currRing);
+		 PrintLn();
+              }
               deleteInL(strat->B,&strat->Bl,i,strat);
               strat->c3++;
             }
@@ -2006,6 +2014,14 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
         {
           if (strat->L[j].p == strat->tail)
           {
+              if(TEST_OPT_DEBUG)
+              {
+		 PrintS("chain-crit-part: pCompareChainPart p="); 
+		 p_wrp(p,currRing);
+		 Print(" delete L[%d]",j);
+		 p_wrp(strat->L[j].lcm,currRing);
+		 PrintLn();
+              }
               deleteInL(strat->L,&strat->Ll,j,strat);
               strat->c3++;
           }
@@ -2029,11 +2045,27 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
             strat->c3++;
             if (sugarDivisibleBy(strat->B[j].ecart,strat->B[i].ecart))
             {
+              if(TEST_OPT_DEBUG)
+              {
+		 Print("chain-crit-part: sugar B[%d].lcm=",j); 
+		 p_wrp(strat->B[j].lcm,currRing);
+		 Print(" delete B[%d]",i);
+		 p_wrp(strat->B[i].lcm,currRing);
+		 PrintLn();
+              }
               deleteInL(strat->B,&strat->Bl,i,strat);
               j--;
             }
             else
             {
+              if(TEST_OPT_DEBUG)
+              {
+		 Print("chain-crit-part: sugar B[%d].lcm=",i); 
+		 p_wrp(strat->B[i].lcm,currRing);
+		 Print(" delete B[%d]",j);
+		 p_wrp(strat->B[j].lcm,currRing);
+		 PrintLn();
+              }
               deleteInL(strat->B,&strat->Bl,j,strat);
               break;
             }
@@ -2056,6 +2088,14 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
         {
           if ((pNext(strat->L[j].p) == strat->tail)||(pOrdSgn==1))
           {
+              if(TEST_OPT_DEBUG)
+              {
+		 PrintS("chain-crit-part: sugar:pCompareChainPart p="); 
+		 p_wrp(p,currRing);
+		 Print(" delete L[%d]",j);
+		 p_wrp(strat->L[j].lcm,currRing);
+		 PrintLn();
+              }
             deleteInL(strat->L,&strat->Ll,j,strat);
             strat->c3++;
           }
@@ -2074,6 +2114,12 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
         {
           if (pLmEqual(strat->B[j].lcm,strat->B[i].lcm))
           {
+              if(TEST_OPT_DEBUG)
+              {
+		 Print("chain-crit-part: equal lcm B[%d].lcm=",j); 
+		 p_wrp(strat->B[j].lcm,currRing);
+		 Print(" delete B[%d]\n",i);
+              }
             strat->c3++;
             deleteInL(strat->B,&strat->Bl,i,strat);
             j--;
@@ -2104,6 +2150,14 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
       {
         if ((pNext(strat->L[j].p) == strat->tail)||(pOrdSgn==1))
         {
+              if(TEST_OPT_DEBUG)
+              {
+		 PrintS("chain-crit-part: pCompareChainPart p="); 
+		 p_wrp(p,currRing);
+		 Print(" delete L[%d]",j);
+		 p_wrp(strat->L[j].lcm,currRing);
+		 PrintLn();
+              }
           deleteInL(strat->L,&strat->Ll,j,strat);
           strat->c3++;
         }
@@ -2166,11 +2220,27 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
               *L[l] will be canceled, we cannot cancel L[i] later on,
               *so we mark it with "tail"
               */
+              if(TEST_OPT_DEBUG)
+              {
+		 PrintS("chain-crit-part: divisible_by p="); 
+		 p_wrp(p,currRing);
+		 Print(" delete L[%d]",l);
+		 p_wrp(strat->L[l].lcm,currRing);
+		 PrintLn();
+              }
               deleteInL(strat->L,&strat->Ll,l,strat);
               i--;
             }
             else
             {
+              if(TEST_OPT_DEBUG)
+              {
+		 PrintS("chain-crit-part: divisible_by(2) p="); 
+		 p_wrp(p,currRing);
+		 Print(" delete L[%d]",i);
+		 p_wrp(strat->L[i].lcm,currRing);
+		 PrintLn();
+              }
               deleteInL(strat->L,&strat->Ll,i,strat);
             }
             j--;

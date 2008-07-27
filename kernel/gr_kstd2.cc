@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.15 2008-07-26 18:11:42 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.16 2008-07-27 10:21:59 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -228,9 +228,9 @@ int redGrRatGB (LObject* h,kStrategy strat)
           wrp(strat->S[c_j]);
         }
         //poly hh = nc_CreateSpoly(strat->S[c_j],(*h).p, currRing);
-	poly hh=c_p; c_p=NULL;
-	pDelete(&((*h).p));
-	(*h).p=hh;
+        poly hh=c_p; c_p=NULL;
+        pDelete(&((*h).p));
+        (*h).p=hh;
         if (!TEST_OPT_INTSTRATEGY)
         {
           if (rField_is_Zp_a()) pContent(h->p);
@@ -253,7 +253,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
         (*h).ecart = d-(*h).FDeg; /*pFDeg((*h).p);*/
         /*- try to reduce the s-polynomial again -*/
         pass++;
-	j=0;
+        j=0;
       }
       else
       { // nothing found
@@ -264,23 +264,27 @@ int redGrRatGB (LObject* h,kStrategy strat)
         currRing->real_var_start,currRing->real_var_end))
     {
       int a_e=(pTotaldegree(strat->S[j],currRing)-pFDeg(strat->S[j],currRing));
-      if (TEST_OPT_DEBUG) { Print("j=%d, e=%d\n",j,a_e); }
+      if(TEST_OPT_DEBUG)
+      {
+        p_wrp(h->p,currRing); Print(" divisibly by S[%d]=",j);
+        p_wrp(strat->S[j],currRing); Print(" e0%d\n",a_e);
+      }
       if ((c_e==-1)||(c_e>a_e))
       {
         c_e=a_e; c_j=j;
-	pDelete(&c_p);
+        pDelete(&c_p);
         c_p = nc_CreateSpoly(pCopy(strat->S[c_j]),pCopy((*h).p), currRing);
       }
       else if (c_e == a_e)
       {
-	 poly cc_pp= nc_CreateSpoly(pCopy(strat->S[j]),pCopy((*h).p), currRing);
-	 if (((cc_pp==NULL)&&(c_p!=NULL)) || (pCmp(cc_pp,c_p)==-1))
+         poly cc_pp= nc_CreateSpoly(pCopy(strat->S[j]),pCopy((*h).p), currRing);
+         if (((cc_pp==NULL)&&(c_p!=NULL)) || (pCmp(cc_pp,c_p)==-1))
          {
-	   assume(pTotaldegree(cc_pp)<=pTotaldegree(c_p));
+           assume(pTotaldegree(cc_pp)<=pTotaldegree(c_p));
            c_e=a_e; c_j=j;
-	   pDelete(&c_p);
+           pDelete(&c_p);
            c_p = cc_pp;
-	 }
+         }
       }
       /*computes the ecart*/
       if ((strat->syzComp!=0) && !strat->honey)
@@ -294,7 +298,11 @@ int redGrRatGB (LObject* h,kStrategy strat)
     }
     else
     {
-      if (TEST_OPT_DEBUG) PrintS("-\n");
+      if(TEST_OPT_DEBUG)
+      {
+        p_wrp(h->p,currRing); Print(" not divisibly by S[%d]=",j);
+        p_wrp(strat->S[j],currRing); PrintLn();
+      }
     }
     j++;
   }
