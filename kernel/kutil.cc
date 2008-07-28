@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.105 2008-07-27 10:21:59 Singular Exp $ */
+/* $Id: kutil.cc,v 1.106 2008-07-28 18:14:24 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -3242,6 +3242,7 @@ int posInS (const kStrategy strat, const int length,const poly p,
   int cmp_int = pOrdSgn;
   int pc=pGetComp(p);
   if ((currRing->MixedOrder)
+  && (currRing->real_var_start==0)
 #if 0
   || ((strat->ak>0) && ((currRing->order[0]==ringorder_c)||((currRing->order[0]==ringorder_C))))
 #endif
