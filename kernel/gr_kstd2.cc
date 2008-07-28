@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.18 2008-07-28 09:57:08 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.19 2008-07-28 18:18:34 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -938,7 +938,9 @@ void nc_gr_initBba(ideal F, kStrategy strat)
 //   if (rIsPluralRing(currRing))
     strat->red = redGrFirst;
   if (currRing->real_var_start>0)
+  {
     strat->red=redGrRatGB;
+  }
 
   if (pLexOrder && strat->honey)
     strat->initEcart = initEcartNormal;
@@ -1019,6 +1021,10 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
   /*Shdl=*/initBuchMora(F, Q,strat);
   strat->posInT=posInT110;
+  if (currRing->real_var_start>0)
+  {
+    strat->posInL=posInL0; // by pCmp of lcm
+  }
   srmax = strat->sl;
   reduc = olddeg = lrmax = 0;
 
