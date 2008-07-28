@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.17 2008-07-28 09:34:24 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.18 2008-07-28 09:57:08 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -240,7 +240,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
         if (TEST_OPT_DEBUG)
         {
           PrintS(" to ");
-          wrp(h->p);i
+          wrp(h->p);
           PrintLn();
         }
         if ((*h).p == NULL)
