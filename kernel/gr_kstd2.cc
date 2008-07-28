@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.16 2008-07-27 10:21:59 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.17 2008-07-28 09:34:24 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -224,7 +224,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
         if (TEST_OPT_DEBUG)
         {
           wrp(h->p);
-          PrintS(" with ");
+          Print(" with S[%d]= ",c_j);
           wrp(strat->S[c_j]);
         }
         //poly hh = nc_CreateSpoly(strat->S[c_j],(*h).p, currRing);
@@ -240,7 +240,8 @@ int redGrRatGB (LObject* h,kStrategy strat)
         if (TEST_OPT_DEBUG)
         {
           PrintS(" to ");
-          wrp(h->p);
+          wrp(h->p);i
+          PrintLn();
         }
         if ((*h).p == NULL)
         {
@@ -267,7 +268,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
       if(TEST_OPT_DEBUG)
       {
         p_wrp(h->p,currRing); Print(" divisibly by S[%d]=",j);
-        p_wrp(strat->S[j],currRing); Print(" e0%d\n",a_e);
+        p_wrp(strat->S[j],currRing); Print(" e=%d\n",a_e);
       }
       if ((c_e==-1)||(c_e>a_e))
       {
