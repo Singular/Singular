@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.279 2008-07-26 14:20:24 motsak Exp $ */
+/* $Id: extra.cc,v 1.280 2008-07-28 09:55:02 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2627,7 +2627,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else return TRUE;
       currRing->real_var_start=start;
       currRing->real_var_end=end;
-      return (start==0)||(end==0);
+      return (start==0)||(end==0)||(start>end);
     }
     else
 /*==================== freeGB, twosided GB in free algebra =================*/
