@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.19 2008-07-28 18:18:34 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.20 2008-07-29 07:39:57 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -197,7 +197,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
   int at,reddeg,d,i;
   int pass = 0;
   int j = 0;
-  int c_j=-1, c_e=-1;
+  int c_j=-1, c_e=-2;
   poly c_p=NULL;
   assume(strat->tailRing==currRing);
 
@@ -255,12 +255,29 @@ int redGrRatGB (LObject* h,kStrategy strat)
         /*- try to reduce the s-polynomial again -*/
         pass++;
         j=0;
+	c_j=-1; c_e=-2;
       }
       else
       { // nothing found
         return 0;
       }
     }
+    // first try usal division
+    if (p_LmDivisibleBy(strat->S[j],(*h).p,currRing))
+    {
+      if(TEST_OPT_DEBUG)
+      {
+        p_wrp(h->p,currRing); Print(" divisibly by S[%d]=",j);
+        p_wrp(strat->S[j],currRing); PrintS(" e=-1\n");
+      }
+      if ((c_j==-1)||(c_e>=0))
+      {
+        c_e=-1; c_j=j;
+        pDelete(&c_p);
+        c_p = nc_CreateSpoly(pCopy(strat->S[c_j]),pCopy((*h).p), currRing);
+      }
+    }
+    else
     if (p_LmDivisibleByPart(strat->S[j],(*h).p,currRing,
         currRing->real_var_start,currRing->real_var_end))
     {
@@ -1018,13 +1035,13 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   /* in plural we don't need Hilb yet */
   nc_gr_initBba(F,strat);
   initBuchMoraPos(strat);
-  /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
-  /*Shdl=*/initBuchMora(F, Q,strat);
-  strat->posInT=posInT110;
   if (currRing->real_var_start>0)
   {
     strat->posInL=posInL0; // by pCmp of lcm
   }
+  /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
+  /*Shdl=*/initBuchMora(F, Q,strat);
+  strat->posInT=posInT110;
   srmax = strat->sl;
   reduc = olddeg = lrmax = 0;
 
