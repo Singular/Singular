@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.21 2008-07-29 07:48:01 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.22 2008-07-29 12:38:52 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -27,6 +27,7 @@
 #include "structs.h"
 #include "gring.h"
 #include "sca.h"
+#include "ratgring.h"
 
 #if 0
 /*3
@@ -297,7 +298,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
         p_wrp(strat->S[j],currRing); PrintS(" e=-1\n");
       }
 #endif
-      if ((c_j==-1)||(c_e>=0))
+      if ((c_j<0)||(c_e>=0))
       {
         c_e=-1; c_j=j;
         pDelete(&c_p);
@@ -316,15 +317,17 @@ int redGrRatGB (LObject* h,kStrategy strat)
         p_wrp(strat->S[j],currRing); Print(" e=%d\n",a_e);
       }
 #endif
-      if ((c_e==-1)||(c_e>a_e))
+      if ((c_j<0)||(c_e>a_e))
       {
         c_e=a_e; c_j=j;
         pDelete(&c_p);
-        c_p = nc_CreateSpoly(pCopy(strat->S[c_j]),pCopy((*h).p), currRing);
+        //c_p = nc_CreateSpoly(pCopy(strat->S[c_j]),pCopy((*h).p), currRing);
+	c_p=nc_rat_ReduceSpolyNew(strat->S[c_j],(*h).p,currRing->real_var_start-1,currRing);
       }
       else if (c_e == a_e)
       {
-         poly cc_pp= nc_CreateSpoly(pCopy(strat->S[j]),pCopy((*h).p), currRing);
+         //poly cc_pp= nc_CreateSpoly(pCopy(strat->S[j]),pCopy((*h).p), currRing);
+	 poly cc_pp=nc_rat_ReduceSpolyNew(strat->S[c_j],(*h).p,currRing->real_var_start-1,currRing);
          if (((cc_pp==NULL)&&(c_p!=NULL)) || (pCmp(cc_pp,c_p)==-1))
          {
            assume(pTotaldegree(cc_pp)<=pTotaldegree(c_p));
