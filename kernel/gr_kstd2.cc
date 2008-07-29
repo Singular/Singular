@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.20 2008-07-29 07:39:57 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.21 2008-07-29 07:48:01 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -56,33 +56,43 @@ int redGrFirst (LObject* h,kStrategy strat)
   {
     if (j > strat->sl)
     {
+#ifdef KDEBUG
       if (TEST_OPT_DEBUG) PrintLn();
+#endif
       return 0;
     }
+#ifdef KDEBUG
     if (TEST_OPT_DEBUG) Print("%d",j);
+#endif
     if (pDivisibleBy(strat->S[j],(*h).p))
     {
+#ifdef KDEBUG
       if (TEST_OPT_DEBUG) PrintS("+\n");
+#endif
       /*
       * the polynomial to reduce with is;
       * T[j].p
       */
       if (!TEST_OPT_INTSTRATEGY)
         pNorm(strat->S[j]);
+#ifdef KDEBUG
       if (TEST_OPT_DEBUG)
       {
         wrp(h->p);
         PrintS(" with ");
         wrp(strat->S[j]);
       }
+#endif
       (*h).p = nc_ReduceSpoly(strat->S[j],(*h).p, currRing);
       //spSpolyRed(strat->T[j].p,(*h).p,strat->kNoether);
 
+#ifdef KDEBUG
       if (TEST_OPT_DEBUG)
       {
         PrintS(" to ");
         wrp(h->p);
       }
+#endif
       if ((*h).p == NULL)
       {
         if (h->lcm!=NULL) p_LmFree((*h).lcm, currRing);
@@ -101,7 +111,9 @@ int redGrFirst (LObject* h,kStrategy strat)
       {
         if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
         {
+#ifdef KDEBUG
           if (TEST_OPT_DEBUG) PrintS(" > sysComp\n");
+#endif
           return 0;
         }
       }
@@ -126,7 +138,9 @@ int redGrFirst (LObject* h,kStrategy strat)
             if (i<0) return 0;
           } while (!pDivisibleBy(strat->S[i],(*h).p));
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+#ifdef KDEBUG
           if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
+#endif
           (*h).p = NULL;
           return 0;
         }
@@ -137,11 +151,15 @@ int redGrFirst (LObject* h,kStrategy strat)
         Print(".%d",d);mflush();
       }
       j = 0;
+#ifdef KDEBUG
       if TEST_OPT_DEBUG PrintLn();
+#endif
     }
     else
     {
+#ifdef KDEBUG
       if (TEST_OPT_DEBUG) PrintS("-");
+#endif
       j++;
     }
   }
@@ -168,11 +186,13 @@ void ratGB_divide_out(poly p)
   }
   if (!pIsConstant(f))
   {
+#ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
       PrintS("divide out:");p_wrp(f,currRing);
       PrintS(" from ");pWrite(root);
     }
+#endif
     p=root;
     loop
     {
@@ -221,12 +241,15 @@ int redGrRatGB (LObject* h,kStrategy strat)
         */
         if (!TEST_OPT_INTSTRATEGY)
           pNorm(strat->S[c_j]);
+#ifdef KDEBUG
+    if (TEST_OPT_DEBUG)
         if (TEST_OPT_DEBUG)
         {
           wrp(h->p);
           Print(" with S[%d]= ",c_j);
           wrp(strat->S[c_j]);
         }
+#endif
         //poly hh = nc_CreateSpoly(strat->S[c_j],(*h).p, currRing);
         poly hh=c_p; c_p=NULL;
         pDelete(&((*h).p));
@@ -237,12 +260,14 @@ int redGrRatGB (LObject* h,kStrategy strat)
           else pCleardenom(h->p);// also does a pContent
         }
 
+#ifdef KDEBUG
         if (TEST_OPT_DEBUG)
         {
           PrintS(" to ");
           wrp(h->p);
           PrintLn();
         }
+#endif
         if ((*h).p == NULL)
         {
           if (h->lcm!=NULL) p_LmFree((*h).lcm, currRing);
@@ -255,7 +280,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
         /*- try to reduce the s-polynomial again -*/
         pass++;
         j=0;
-	c_j=-1; c_e=-2;
+        c_j=-1; c_e=-2;
       }
       else
       { // nothing found
@@ -265,11 +290,13 @@ int redGrRatGB (LObject* h,kStrategy strat)
     // first try usal division
     if (p_LmDivisibleBy(strat->S[j],(*h).p,currRing))
     {
+#ifdef KDEBUG
       if(TEST_OPT_DEBUG)
       {
         p_wrp(h->p,currRing); Print(" divisibly by S[%d]=",j);
         p_wrp(strat->S[j],currRing); PrintS(" e=-1\n");
       }
+#endif
       if ((c_j==-1)||(c_e>=0))
       {
         c_e=-1; c_j=j;
@@ -282,11 +309,13 @@ int redGrRatGB (LObject* h,kStrategy strat)
         currRing->real_var_start,currRing->real_var_end))
     {
       int a_e=(pTotaldegree(strat->S[j],currRing)-pFDeg(strat->S[j],currRing));
+#ifdef KDEBUG
       if(TEST_OPT_DEBUG)
       {
         p_wrp(h->p,currRing); Print(" divisibly by S[%d]=",j);
         p_wrp(strat->S[j],currRing); Print(" e=%d\n",a_e);
       }
+#endif
       if ((c_e==-1)||(c_e>a_e))
       {
         c_e=a_e; c_j=j;
@@ -309,18 +338,22 @@ int redGrRatGB (LObject* h,kStrategy strat)
       {
         if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
         {
+#ifdef KDEBUG
           if (TEST_OPT_DEBUG) PrintS(" > sysComp\n");
+#endif
           return 0;
         }
       }
     }
     else
     {
+#ifdef KDEBUG
       if(TEST_OPT_DEBUG)
       {
         p_wrp(h->p,currRing); Print(" not divisibly by S[%d]=",j);
         p_wrp(strat->S[j],currRing); PrintLn();
       }
+#endif
     }
     j++;
   }
