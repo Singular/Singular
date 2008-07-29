@@ -6,7 +6,7 @@
  *  Purpose: implementation of multiplication in simple NC subalgebras
  *  Author:  motsak
  *  Created: 
- *  Version: $Id: ncSAMult.cc,v 1.9 2008-07-26 14:28:03 motsak Exp $
+ *  Version: $Id: ncSAMult.cc,v 1.10 2008-07-29 13:28:21 motsak Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -36,6 +36,9 @@
 // poly functions defined in p_Procs: ;
 static poly gnc_pp_Mult_mm(const poly p, const poly m, const ring r, poly& last)
 {
+  if( (p == NULL) || (m == NULL) )
+    return NULL;
+
   assume( (p != NULL) && (m != NULL) && (r != NULL) );
 
 #if OUTPUT  
@@ -44,7 +47,6 @@ static poly gnc_pp_Mult_mm(const poly p, const poly m, const ring r, poly& last)
   PrintS("p: "); p_Write(p, r);    
   PrintS("m: "); p_Write(m, r);      
 #endif
-
   poly pResult;
   
   if (p_IsConstant(m, r))
@@ -77,6 +79,12 @@ static poly gnc_pp_Mult_mm(const poly p, const poly m, const ring r, poly& last)
 
 static poly gnc_p_Mult_mm(poly p, const poly m, const ring r)
 {
+  if( (p == NULL) || (m == NULL) )
+  {
+    p_Delete(&p, r);
+    return NULL;
+  }
+
   assume( (p != NULL) && (m != NULL) && (r != NULL) );
 
 #if OUTPUT  
@@ -120,6 +128,12 @@ static poly gnc_p_Mult_mm(poly p, const poly m, const ring r)
 
 static poly gnc_mm_Mult_p(const poly m, poly p, const ring r)
 {
+  if( (p == NULL) || (m == NULL) )
+  {
+    p_Delete(&p, r);
+    return NULL;
+  }
+
   assume( (p != NULL) && (m != NULL) && (r != NULL) );
 
   p_Test(m, r);
@@ -163,6 +177,11 @@ static poly gnc_mm_Mult_p(const poly m, poly p, const ring r)
 
 static poly gnc_mm_Mult_pp(const poly m, const poly p, const ring r)
 {
+  if( (p == NULL) || (m == NULL) )
+  {
+    return NULL;
+  }
+
   assume( (p != NULL) && (m != NULL) && (r != NULL) );
 
   p_Test(m, r);
