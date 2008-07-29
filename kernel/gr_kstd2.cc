@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.22 2008-07-29 12:38:52 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.23 2008-07-29 13:16:44 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -252,9 +252,13 @@ int redGrRatGB (LObject* h,kStrategy strat)
         }
 #endif
         //poly hh = nc_CreateSpoly(strat->S[c_j],(*h).p, currRing);
-        poly hh=c_p; c_p=NULL;
+	if(c_e==-1)
+          c_p = nc_CreateSpoly(pCopy(strat->S[c_j]),pCopy((*h).p), currRing);
+	else
+          c_p=nc_rat_ReduceSpolyNew(pCopy(strat->S[c_j]),
+               pCopy((*h).p),currRing->real_var_start-1,currRing);
         pDelete(&((*h).p));
-        (*h).p=hh;
+        (*h).p=c_p;
         if (!TEST_OPT_INTSTRATEGY)
         {
           if (rField_is_Zp_a()) pContent(h->p);
@@ -281,7 +285,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
         /*- try to reduce the s-polynomial again -*/
         pass++;
         j=0;
-        c_j=-1; c_e=-2;
+        c_j=-1; c_e=-2; c_p=NULL;
       }
       else
       { // nothing found
@@ -301,8 +305,6 @@ int redGrRatGB (LObject* h,kStrategy strat)
       if ((c_j<0)||(c_e>=0))
       {
         c_e=-1; c_j=j;
-        pDelete(&c_p);
-        c_p = nc_CreateSpoly(pCopy(strat->S[c_j]),pCopy((*h).p), currRing);
       }
     }
     else
@@ -320,21 +322,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
       if ((c_j<0)||(c_e>a_e))
       {
         c_e=a_e; c_j=j;
-        pDelete(&c_p);
         //c_p = nc_CreateSpoly(pCopy(strat->S[c_j]),pCopy((*h).p), currRing);
-	c_p=nc_rat_ReduceSpolyNew(strat->S[c_j],(*h).p,currRing->real_var_start-1,currRing);
-      }
-      else if (c_e == a_e)
-      {
-         //poly cc_pp= nc_CreateSpoly(pCopy(strat->S[j]),pCopy((*h).p), currRing);
-	 poly cc_pp=nc_rat_ReduceSpolyNew(strat->S[c_j],(*h).p,currRing->real_var_start-1,currRing);
-         if (((cc_pp==NULL)&&(c_p!=NULL)) || (pCmp(cc_pp,c_p)==-1))
-         {
-           assume(pTotaldegree(cc_pp)<=pTotaldegree(c_p));
-           c_e=a_e; c_j=j;
-           pDelete(&c_p);
-           c_p = cc_pp;
-         }
       }
       /*computes the ecart*/
       if ((strat->syzComp!=0) && !strat->honey)
@@ -992,7 +980,18 @@ void nc_gr_initBba(ideal F, kStrategy strat)
     strat->red = redGrFirst;
   if (currRing->real_var_start>0)
   {
-    strat->red=redGrRatGB;
+    int ii=IDELEMS(F)-1;
+    int jj;
+    BOOLEAN is_rat_id=FALSE;
+    for(;ii>=0;ii--)
+    {
+      for(jj=currRing->real_var_start;jj<=currRing->real_var_end;jj++)
+      {
+        if(pGetExp(F->m[ii],jj)>0) { is_rat_id=TRUE; break; }
+      }
+      if (is_rat_id) break;
+    }
+    if (is_rat_id) strat->red=redGrRatGB;
   }
 
   if (pLexOrder && strat->honey)
