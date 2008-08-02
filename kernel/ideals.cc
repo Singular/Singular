@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.58 2008-06-24 08:19:54 Singular Exp $ */
+/* $Id: ideals.cc,v 1.59 2008-08-02 14:20:22 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1861,7 +1861,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
               "// ** or second not a proper submodule");
           }
           else
-            WerrorS("2nd module does not lies in the first");
+            WerrorS("2nd module does not lie in the first");
           idDelete(&s_result);
           idDelete(&s_rest);
           s_result=idInit(IDELEMS(submod),submod->rank);
