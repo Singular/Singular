@@ -1,4 +1,4 @@
-version="$Id: tropical.lib,v 1.1 2008-07-14 15:58:51 keilen Exp $";
+version="$Id: tropical.lib,v 1.2 2008-08-04 15:46:26 keilen Exp $";
 category="Tropical Geometry";
 info="
    LIBRARY:         tropical.lib
@@ -8,6 +8,65 @@ info="
                     Thomas Markwig,  email: keilen@mathematik.uni-kl.de
 
    KEYWORDS:        tropical curves, tropical polynomials
+
+   WARNING: 
+     - tropicalLifting will only work under LINUX and if in addition gfan is installed.
+     - drawTropicalCurve and drawTropicalNewtonSubdivision will only display the tropical
+       curve under LINUX and if in addition latex and kghostview are installed.
+     - In tropicalLifting the basering needs the parameter t as a variable, while otherwise
+       it needs it as a parameter.
+
+   THEORY:
+     Fix some base field K and a bunch of lattice points v0,...,vm in the integer lattice Z^n,
+     then this defines a toric variety as the closure of (K*)^n in the projective space P^m, where
+     the torus is embedded via the map sending a point x in (K*)^n to the point (x^v0,...,x^vm).
+     The generic hyperplane sections are just the images of the hypersurfaces in (K*)^n defined by
+     the polynomials f=a0*x^v0+...+am*x^vm=0. Some properties of these hypersurfaces can be studied 
+     via tropicalisation. 
+
+     For this we suppose that K=C{{t}} is the field of Puiseux series over the field of complex 
+     numbers (or any other field with a valuation into the real numbers). One associates to the
+     hypersurface given by f=a0*x^v0+...+am*x^vm the tropical hypersurface defined by the tropicalisation
+     trop(f)=min{val(a0)+<v0,x>,...,val(am)+<vm,x>}. Here, <v,x> denotes the standard scalar product
+     of the integer vector v in Z^n with the vector x=(x1,...,xn) of variables, so that trop(f) is
+     a piecewise linear function on R^n. The corner locus of this function (i.e. the points at which
+     the minimum is attained a least twice) is the tropical hypersurface defined by trop(f). 
+     The theorem of Newton-Kapranov states that this tropical hypersurface is the same as if one
+     computes pointwise the valuation of the hypersurface given by f. The analogue holds true if one
+     replaces one equation f by an ideal I. A constructive proof of the theorem is given by an adapted 
+     version of the Newton-Puiseux algorithm. The hard part is to find a point in the variety over
+     C{{t}} which corresponds to a given point in the tropical variety.
+
+     It is the purpose of this library to provide basic means to deal with tropical varieties.
+     Of course we cannot represent the field of Puiseux series over C in its full strength, however,
+     in order to compute interesting examples it will be sufficient to replace the complex numbers C
+     by the rational numbers Q and to replace Puiseux series in t by rational functions in t, 
+     i.e. we replace C{{t}} by Q(t), or sometimes even by Q[t]. Note, that this in particular 
+     forbits rational exponents for the t's.
+     Moreover, in Singular no negative exponents of monomials are allowed, so that the integer vectors
+     vi will have to have non-negative entries. Shifting all exponents by a fixed integer vector does not
+     change the tropicalisation nor does it change the toric variety. Thus this does not cause any restriction.
+     If, however, for some reason you prefer to work with general vi, then you have to pass right away to
+     the tropicalisation of the equations, whereever this is allowed -- these are linear polynomials
+     where the constant coefficient correspond to the valuation of the original coefficient and where 
+     the non-constant coefficient correspond to the exponents of the monomials, thus they may be rational
+     numbers respectively negative numbers: 
+     e.g. if f=t^{1/2}*x^{-2}*y^3+2t*x*y+4  then  trop(f)=min{1/2-2x+3y,1+x+y,0}.
+
+     The main tools provided in this library are as follows:
+     - tropicalLifting    implements the constructive proof of the Theorem of Newton-Kapranov and constructs
+                          a point in the variety over C{{t}} corresponding to a given point in the
+                          corresponding tropical variety associated to an ideal I; the generators of
+                          I have to be in the polynomial ring Q[t,x1,...,xn] considered as a subring of
+                          C{{t}}[x1,...,xn]; a solution will be constructed up to given order; note that
+                          several field extensions of Q might be necessary thoughout the intermediate 
+                          computations; the procedures uses the external program gfan
+     - drawTropicalCurve  visualises a tropical plane curve either given by a polynomial in Q(t)[x,y]
+                          or by a list of linear polynomials of the form ax+by+c with a,b in Z and c in Q;
+                          latex must be installed on your computer
+     - tropicalJInvariant computes the tropical j-invaiant of a tropical elliptic curve
+     - jInvariant         computes the j-invariant of an elliptic curve
+     - weierstrassFom     computes the Weierstrass form of an elliptic curve     
 
    PROCEDURES CONCERNED WITH TROPICAL LIFTING:
      tropicalLifting(ideal,intvec,int) computes a point in the tropical variety of ideal over intvec
@@ -87,7 +146,10 @@ info="
 /// - sortlist
 /// - minInList
 /// - vergleiche
+/// - koeffizienten
 /// - minOfPolys
+/// - shorten
+/// - minOfStringDecimal
 /// - decimal
 /// - stringcontainment
 /// - stringdelete
@@ -129,7 +191,11 @@ ASSUME:  - i is an ideal in Q[t,x_1,...,x_n], w=(w_0,w_1,...,w_n)
            and (w_1/w_0,...,w_n/w_0) is in the tropical variety of i, 
            and ord is the order up to which a point in V(i) over Q{{t}} lying over 
            (w_1/w_0,...,w_n/w_0) shall be computed; w_0 may NOT be ZERO
-         - the first variable of your ring will be treated as t !!!!
+         - the basering should not have any parameters on its own 
+           and it should have a global monomial ordering --
+           e.g. ring r=0,(t,x(1..n)),dp;
+         - the first variable of the basering will be treated as the parameter t 
+           in the Puiseux series field !!!!
          - the optional parameter opt should be one or more strings among the following:
            'isZeroDimensional'  : the dimension i is zero (not to be checked);
            'isPrime'            : the ideal is prime over Q(t)[x_1,...,x_n]  (not to be checked);
@@ -137,7 +203,7 @@ ASSUME:  - i is an ideal in Q[t,x_1,...,x_n], w=(w_0,w_1,...,w_n)
            'oldGfan'            : uses gfan version 0.2.1 or less 
            'findAll'            : find all solutions of a zero-dimensional ideal over (w_1/w_0,...,w_n/w_0)
            'noAbs'              : do NOT use absolute primary decomposition
-           'noRestubst'         : avoids computing the resubstitution
+           'noResubst'         : avoids computing the resubstitution
 RETURN:  IF THE OPTION 'findAll' WAS NOT SET THEN:
          list, containing one lifting of the given point (w_1/w_0,...,w_n/w_0)
                in the tropical variety of i to a point in V(i) over Puiseux series field up to
@@ -774,13 +840,13 @@ example
 ////////////////////////////////////////////////////////////////////////////////////
 /// Procedures concerned with drawing a tropical curve or a Newton subdivision 
 ////////////////////////////////////////////////////////////////////////////////////
-
 proc tropicalCurve (def tp,list #)
 "USAGE:      tropicalCurve(tp[,#]); tp list, # optional list
-ASSUME:      tp is represents an ideal in Q+<x,y>N[x,y] representing a tropical polynomial 
-             (in the form of the output of the procedure tropicalise) defining a tropical plane curve;
+ASSUME:      tp is list of linear polynomials of the form ax+by+c with integers a, b and a rational number c 
+             representing a tropical Laurent polynomial defining a tropical plane curve;
              alternatively tp can be a polynomial in Q(t)[x,y] defining a tropical plane curve
-             via the valuation map 
+             via the valuation map; 
+             the basering must have a global monomial ordering, two variables and up to one parameter!
 RETURN:      list, each entry i=1,...,size(l)-1 corresponds to a vertex in the tropical plane 
                    curve defined by tp
                    l[i][1] = x-coordinate of the ith vertex
@@ -794,10 +860,14 @@ RETURN:      list, each entry i=1,...,size(l)-1 corresponds to a vertex in the t
                              of the unbounded edge
                    l[i][5] = a polynomial whose monomials mark the vertices in the Newton polygon
                              corresponding to the entries in tp which take the common minimum 
-                             at the ith vertex
+                             at the ith vertex -- if some coefficient a or b of the linear polynomials
+                             in the input was negative, then each monomial has to be shifted by
+                             the values in l[size(l)][3]
                    l[size(l)][1] = list, the entries describe the boundary points of the Newton subdivision
                    l[size(l)][2] = list, the entries are pairs of integer vectors defining an interior
                                    edge of the Newton subdivision
+                   l[size(l)][3] = intvec, the monmials occuring in l[i][5] have to be shifted by this
+                                   vector in order to represent marked vertices in the Newton polygon
 NOTE:        here the tropical polynomial is supposed to be the MINIMUM of the linear forms in tp,
              unless the optional input #[1] is the string 'max'
 EXAMPLE:     example tropicalCurve;   shows an example"
@@ -806,22 +876,61 @@ EXAMPLE:     example tropicalCurve;   shows an example"
   int i,j,k,l,d;
   intvec v,w,u;
   intmat D[2][2];
+  // the basering must have a global monomial ordering
+  if (1>var(1))
+  {
+    ERROR("The basering should have a global monomial ordering, e.g. ring r=(0,t),(x,y),dp;");
+  }
   // if you insert a single polynomial instead of an ideal representing a tropicalised polynomial,
   // then we compute first the tropicalisation of this polynomial -- this feature is not 
   // documented in the above help string
   if (typeof(tp)=="poly")
   {
+    // exclude the case that the basering has not precisely one parameter and two indeterminates
+    if ((npars(basering)!=1) or (nvars(basering)!=2))
+    {
+      ERROR("The basering should have precisely one parameter and two indeterminates!");      
+    }
     poly f=tp;
     kill tp;
     list tp=tropicalise(f,#);  // the tropicalisation of f
   }
-  // 0) Exclude the pathological case that the defining tropical polynomial has only one term,
+  // Exclude the case that the basering has more than 2 indeterminates
+  if (nvars(basering) != 2)
+  {
+    ERROR("The basering should have precisely two indeterminates!");      
+  }
+  // -1) Exclude the pathological case that the defining tropical polynomial has only one term,
   //    so that the tropical variety is not defined.
   if (size(tp)==1)
   {
+    ERROR("A monomial does not define a tropical curve!");
     intmat M[2][1]=0,0;
     return(list(list(0,0,M,list(),detropicalise(tp[1])),list(list(leadexp(detropicalise(tp[1]))),list())));
-  }         
+  }    
+  // 0) If the input was a list of linear polynomials, then some coefficient of x or y can be negative,
+  //    i.e. the input corresponds to the tropical curve of a Laurent polynomial. In that case we should
+  //    add some ax+by, so that all coefficients are positive. This does not change the tropical curve.
+  //    however, we have to save (a,b), since the Newton polygone has to be shifted by (-a,-b).
+  poly aa,bb; // koeffizienten
+  for (i=1;i<=size(tp);i++)
+  {
+    if (koeffizienten(tp[i],1)<aa)
+    {
+      aa=koeffizienten(tp[i],1);
+    }
+    if (koeffizienten(tp[i],2)<bb)
+    {
+      bb=koeffizienten(tp[i],2);
+    }    
+  }
+  if ((aa!=0) or (bb!=0))
+  {
+    for (i=1;i<=size(tp);i++)
+    {
+      tp[i]=tp[i]-aa*var(1)-bb*var(2);
+    }
+  }
   // 1) compute the vertices of the tropical curve defined by tp and the Newton subdivision
   list vtp=verticesTropicalCurve(tp,#);
   //    if vtp is empty, then the Newton polygone is just a line segment and constitutes a bunch of lines
@@ -842,7 +951,7 @@ EXAMPLE:     example tropicalCurve;   shows an example"
     k=1;
     nwt=vtp[i][3]; // the polynomial representing the ith part of the Newton subdivision
     // store the vertices of the ith part of the Newton subdivision in the list newton
-    list newton;    
+    list newton;  
     while (nwt!=0)
     {
       newton[k]=leadexp(nwt);
@@ -945,6 +1054,7 @@ EXAMPLE:     example tropicalCurve;   shows an example"
   //    unbounded edge is then the outward pointing primitive normal vector to the vector
   //    pointing from the first vertex in a pair to the second one.
   intvec normalvector;  // stores the outward pointing normal vector
+  intvec zwspp; // used for intermediate storage
   int zw,pos1,pos2; // stores the gcd of entries of the non-normalised normal vector, etc.
   int gestorben; // tests if unbounded edges are multiple
   for (i=1;i<=size(pairs);i++)
@@ -957,9 +1067,9 @@ EXAMPLE:     example tropicalCurve;   shows an example"
       pos2=positionInList(orderedvertices,pairs[i][j][2]); // pair in the list orderedvertices
       if (((pos1>pos2) and !((pos1==size(orderedvertices)) and (pos2==1))) or ((pos2==size(orderedvertices)) and (pos1==1)))  // reorders them if necessary
       {
-        zwsp=pairs[i][j][1];
+        zwspp=pairs[i][j][1];
         pairs[i][j][1]=pairs[i][j][2];
-        pairs[i][j][2]=zwsp;
+        pairs[i][j][2]=zwspp;
       }
       normalvector=pairs[i][j][2]-pairs[i][j][1]; // the vector pointing from vertex 1 in the pair to vertex2
       ggt=gcd(normalvector[1],normalvector[2]);   // the gcd of the entries
@@ -1004,9 +1114,25 @@ EXAMPLE:     example tropicalCurve;   shows an example"
     gr[5]=vtp[i][3];  // the vertices of the boundary of the ith part of the NSD 
     graph[i]=gr;
   }
-  // 9) Finally store the boundary vertices and the inner edges as last entry in the list graph.
-  //    This represents the NSD.
-  graph[size(vtp)+1]=list(boundaryNSD[2],inneredges);
+  // 9) Shift the Newton subdivision by (aa,bb) if necessary
+  intvec shiftvector=intvec(int(aa),int(bb));
+  if ((aa!=0) or (bb!=0))
+  {
+    for (i=1;i<=size(boundaryNSD[2]);i++)
+    {
+      boundaryNSD[2][i]=boundaryNSD[2][i]+shiftvector;
+    }
+    for (i=1;i<=size(inneredges);i++)
+    {
+      for (j=1;j<=size(inneredges[i]);j++)
+      {
+        inneredges[i][j]=inneredges[i][j]+shiftvector;
+      }
+    }
+  }
+  // 10) Finally store the boundary vertices and the inner edges as last entry in the list graph.
+  //     This represents the NSD.
+  graph[size(vtp)+1]=list(boundaryNSD[2],inneredges,shiftvector);
   return(graph);
 }
 example
@@ -1041,9 +1167,11 @@ example
 
 proc drawTropicalCurve (def f,list #)
 "USAGE:      drawTropicalCurve(f[,#]); f poly or list, # optional list
-ASSUME:      f is a polynomial in Q(t)[x,y] describing a plane curve over Q(t),
-             or f a tropical polynomial represented as a list as the output of tropicalise,
-             or the output of tropicalCurve
+ASSUME:      f is list of linear polynomials of the form ax+by+c with integers a, b and a rational number c 
+             representing a tropical Laurent polynomial defining a tropical plane curve;
+             alternatively f can be a polynomial in Q(t)[x,y] defining a tropical plane curve
+             via the valuation map; 
+             the basering must have a global monomial ordering, two variables and up to one parameter!
 RETURN:      NONE
 NOTE:        - the procedure produces the files /tmp/tropicalcurveNUMBER.tex, /tmp/tropicalcurveNUMBER.dvi and 
                /tmp/tropicalcurveNUMBER.ps, where NUMBER is a random four digit integer; 
@@ -1072,6 +1200,11 @@ EXAMPLE:     example drawTropicalCurve  shows an example"
   int j;
   if (typeof(f)=="poly")
   {
+    // exclude the case that the basering has not precisely one parameter and two indeterminates
+    if ((npars(basering)!=1) or (nvars(basering)!=2))
+    {
+      ERROR("The basering should have precisely one parameter and two indeterminates!");      
+    }
     texf=texPolynomial(f); // write the polynomial over Q(t)
     list graph=tropicalCurve(tropicalise(f,#),#); // the graph of the tropicalisation of f
   }
@@ -1189,7 +1322,11 @@ example
 
 proc drawNewtonSubdivision (def f,list #)
 "USAGE:   drawTropicalCurve(f[,#]); f poly, # optional list
-ASSUME:   f is a polynomial in Q(t)[x,y] describing a plane curve over Q(t)
+ASSUME:   f is list of linear polynomials of the form ax+by+c with integers a, b and a rational number c 
+          representing a tropical Laurent polynomial defining a tropical plane curve;
+          alternatively f can be a polynomial in Q(t)[x,y] defining a tropical plane curve
+          via the valuation map; 
+          the basering must have a global monomial ordering, two variables and up to one parameter!
 RETURN:   NONE
 NOTE:     - the procedure produces the files /tmp/newtonsubdivisionNUMBER.tex, 
             /tmp/newtonsubdivisionNUMBER.dvi and /tmp/newtonsubdivisionNUMBER.ps, 
@@ -1276,9 +1413,11 @@ example
 
 proc tropicalJInvariant (def f,list #)
 "USAGE:      tropicalJInvariant(f[,#]); f poly or list, # optional list
-ASSUME:      f is a polynomial in Q(t)[x,y] describing a plane curve over Q(t), 
-             or a tropical polynomial as in the output of tropicalise 
-             or the output of tropicalCurve
+ASSUME:      f is list of linear polynomials of the form ax+by+c with integers a, b and a rational number c 
+             representing a tropical Laurent polynomial defining a tropical plane curve;
+             alternatively f can be a polynomial in Q(t)[x,y] defining a tropical plane curve
+             via the valuation map; 
+             the basering must have a global monomial ordering, two variables and up to one parameter!
 RETURN:      number, if the graph underlying the tropical curve has precisely one loop then its weighted
                      lattice length is returned, otherwise the result will be -1
 NOTE:        - if the tropical curve is elliptic and its embedded graph has precisely one loop, 
@@ -1783,7 +1922,7 @@ example
 // conic[8] contains the latex code to draw the tropical conic and its tropicalised tangents;
 // it can written in a file, processed and displayed via kghostview -- to do so hit the return button
    write(":w /tmp/conic.tex",conic[8]);   
-   ~   system("sh","cd /tmp; latex /tmp/conic.tex; dvips /tmp/conic.dvi -o; kghostview conic.ps &");
+   system("sh","cd /tmp; latex /tmp/conic.tex; dvips /tmp/conic.dvi -o; kghostview conic.ps &");
 // with an optional argument the same information for the dual conic is computed and saved in conic[9]
    conic=conicWithTangents(points,1);
    conic[9][2]; // the equation of the dual conic
@@ -1837,9 +1976,9 @@ example
 
 
 proc tropicaliseSet (ideal i)
-"USAGE:      tropicalise(f); f polynomial
-ASSUME:      f is a polynomial in Q(t)[x_1,...,x_n]
-RETURN:      list, the ith entry is the tropicalisation of the ith generator of i
+"USAGE:      tropicaliseSet(i); i ideal
+ASSUME:      i is an ideal in Q(t)[x_1,...,x_n]
+RETURN:      list, the jth entry is the tropicalisation of the jth generator of i
 EXAMPLE:     example tropicaliseSet;   shows an example"
 {
   list tropicalid;
@@ -2312,6 +2451,7 @@ EXAMPLE:     example texDrawTropical;   shows an example"
     poly scalefactor=#[2];
   }
   // compute the texdrawoutput for the tropical curve given by f
+  list relxy;
   for (i=1;i<=size(graph)-1;i++)
   {
     if (bunchoflines==0) // if the curve is a bunch of lines no vertex has to be drawn
@@ -2334,8 +2474,10 @@ EXAMPLE:     example texDrawTropical;   shows an example"
     }
     for (j=1;j<=size(graph[i][4]);j++) // draw the unbounded edges emerging from the ith vertex
     {
+      // they should not be too long
+      relxy=shorten(list(decimal(3*graph[i][4][j][1][1]/scalefactor),decimal(3*graph[i][4][j][1][2]/scalefactor),"2.5"));
       texdrawtp=texdrawtp+"
-       \\move ("+decimal(graph[i][1]-centerx)+" "+decimal(graph[i][2]-centery)+") \\rlvec ("+decimal(3*graph[i][4][j][1][1]/scalefactor)+" "+decimal(3*graph[i][4][j][1][2]/scalefactor)+")";
+       \\move ("+decimal(graph[i][1]-centerx)+" "+decimal(graph[i][2]-centery)+") \\rlvec ("+relxy[1]+" "+relxy[2]+")";
       if (graph[i][4][j][2]>1) // if the multiplicity is more than one, denote it in the picture
       {
         texdrawtp=texdrawtp+"
@@ -2384,7 +2526,7 @@ example
 proc texDrawNewtonSubdivision (list graph,list #)
 "USAGE:      texDrawNewtonSubdivision(graph[,#]); graph list, # optional list
 ASSUME:      graph is the output of tropicalCurve
-RETURN:      string, the texdraw code of the Newton subdivision of the tropical plane curve encoded by ecken
+RETURN:      string, the texdraw code of the Newton subdivision of the tropical plane curve encoded by graph
 NOTE:        - the list # should contain as only entry a string; if this string is 'max', then
                the tropical curve is considered with respect to the maximum; otherwise the curve
                is considered with respect to the minimum and the string can be used to 
@@ -2397,6 +2539,7 @@ EXAMPLE:     example texDrawNewtonSubdivision;   shows an example"
   int i,j,k,l;
   list boundary=graph[size(graph)][1];
   list inneredges=graph[size(graph)][2];  
+  intvec shiftvector=graph[size(graph)][3];
   string subdivision;
   // find the maximal and minimal x- and y-coordinates and define the scalefactor
   poly maxx,maxy=1,1;
@@ -2432,13 +2575,18 @@ EXAMPLE:     example texDrawNewtonSubdivision;   shows an example"
   // add lattice points if the scalefactor is >= 1/2
   if (scalefactor>1/2)
   {
-    for (i=0;i<=int(maxx);i++)
+    for (i=shiftvector[1];i<=int(maxx);i++)
     {
-      for (j=0;j<=int(maxy);j++)
+      for (j=shiftvector[2];j<=int(maxy);j++)
       {
         subdivision=subdivision+"
         \\move ("+string(i)+" "+string(j)+") \\fcir f:0.6 r:"+decimal(2/(10*scalefactor),size(string(int(scalefactor)))+1);
       }
+    }
+    if ((shiftvector[1]!=0) or (shiftvector[2]!=0))
+    {
+      subdivision=subdivision+"
+        \\htext (-0.3 0.1){{\\tiny $(0,0)$}}";
     }
   }
   // deal with the pathological cases 
@@ -2475,7 +2623,7 @@ EXAMPLE:     example texDrawNewtonSubdivision;   shows an example"
     pg=graph[i][5];
     while (pg!=0)
     {
-      markings[k]=leadexp(pg);
+      markings[k]=leadexp(pg)+shiftvector;
       pg=pg-lead(pg);
       k++;
     }
@@ -4057,8 +4205,9 @@ NOTE:        the procedure is called by tInitialFormPar"
 {
   string denom=string(denominator(leadcoef(f)));
   string num=string(numerator(leadcoef(f)));
+  string PMet=string(par(1));
   def BASERING=basering;
-  execute("ring r=0,t,ls;");
+  execute("ring r=0,"+PMet+",ls;");
   execute("poly denomi="+denom+";");
   execute("poly numer="+num+";");
   int ordnung=ord(numer)-ord(denomi);
@@ -5202,6 +5351,7 @@ NOTE:        if a maximal ideal contains a variable, it is removed from the list
 /// - sortlist
 /// - minInList
 /// - vergleiche
+/// - koeffizienten
 ////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -5326,15 +5476,19 @@ NOTE:      - the information in l[i][3] represents the subdivision of the Newton
 
 static proc bunchOfLines (def tp,list #)
 "USAGE:      bunchOfLines(tp[,#]); tp list, # optional list
-ASSUME:      tp is represents an ideal in Z[x,y] representing a tropical polynomial (in the form of the
+ASSUME:      tp is represents an ideal in Q[x,y] representing a tropical polynomial (in the form of the
              output of the procedure tropicalise) defining a bunch of ordinary lines in the plane,
              i.e. the Newton polygone is a line segment
-RETURN:      list, each entry corresponds to a vertex in the tropical plane curve defined by tp
+RETURN:      list, see the procedure tropicalCurve for an explanation of the syntax of this list
+NOTE:      - the tropical curve defined by tp will consist of a bunch of parallel lines and
+             throughout the procedure a list with the name bunchoflines is computed, which 
+             represents these lines and has the following interpretation:
+             list, each entry corresponds to a vertex in the tropical plane curve defined by tp
                    l[i][1] = the equation of the ith line in the tropical curve
                    l[i][2] = a polynomial whose monimials mark the vertices in the Newton polygon
                              corresponding to the entries in tp which take the common minimum 
                              at the ith vertex
-NOTE:      - the information in l[i][2] represents the subdivision of the Newton polygon of tp 
+           - the information in l[i][2] represents the subdivision of the Newton polygon of tp 
              (respectively a polynomial which defines tp); 
            - if # is non-empty and #[1] is the string 'max', then in the computations minimum and 
              maximum are exchanged; 
@@ -5355,26 +5509,21 @@ NOTE:      - the information in l[i][2] represents the subdivision of the Newton
   int e=1;
   option(redSB);
   // find the direction of the line segment in the Newton polygon
-  i=1;
-  if (deg(tp[1])==0)
-  {
-    i=2;
-  }
-  intvec direction=leadexp(detropicalise(tp[i]));
+  intvec direction=leadexp(detropicalise(tp[1]))-leadexp(detropicalise(tp[2]));
   direction=direction/gcd(direction[1],direction[2]);
   // change the coordinates in such a way, that the Newton polygon lies on the x-axis
-  if (direction[1]==0) // there is no x-term - exchange x and y
+  if (direction[1]==0) // there is no x-term - exchange x and y and get rid of the new y part
   {
     for (i=1;i<=size(tp);i++)
     {
-      tp[i]=substitute(tp[i],y,x);
+      tp[i]=substitute(tp[i],var(1),0,var(2),var(1));
     }
   }
   else
   {
     for (i=1;i<=size(tp);i++)
     {
-      tp[i]=substitute(tp[i],x,x-direction[2]*y/direction[1]);
+      tp[i]=substitute(tp[i],var(2),0);
     }
   }
   // For all tuples (i,j) of entries in tp check if they attain at their point of intersection
@@ -5441,20 +5590,32 @@ NOTE:      - the information in l[i][2] represents the subdivision of the Newton
   list graph,gr;
   intmat M[2][1];
   intvec extrema;
+  poly xc,yc,cc;
   list NSD;
   NSD[1]=leadexp(bunchoflines[1][2][size(bunchoflines[1][2])]);
   for (i=1;i<=size(bunchoflines);i++)
   {
     NSD[i+1]=leadexp(bunchoflines[i][2]);
     extrema=leadexp(bunchoflines[i][2])-leadexp(bunchoflines[i][2][size(bunchoflines[i][2])]);
-    gr[1]=-substitute(bunchoflines[i][1],y,0,x,0);
-    gr[2]=0;
+    cc=substitute(bunchoflines[i][1],var(2),0,var(1),0);
+    xc=substitute(bunchoflines[i][1]-cc,var(2),0,var(1),1);
+    yc=substitute(bunchoflines[i][1]-cc,var(2),1,var(1),0);
+	if (xc!=0) // then there is a point on the line with y-coordinate zero
+    {
+      gr[1]=-cc/leadcoef(xc);
+      gr[2]=0;
+    }
+    else // if there is no point with y-coordinate zero, then there is point with x-coordinate zero
+    {
+      gr[1]=0;
+      gr[2]=-cc/leadcoef(yc);
+    }
     gr[3]=M;
     gr[4]=list(list(intvec(direction[2],-direction[1]),gcd(extrema[1],extrema[2])),list(intvec(-direction[2],direction[1]),1));
     gr[5]=bunchoflines[i][2];
     graph[i]=gr;
   }
-  graph=graph+list(list(NSD,list()));
+  graph=graph+list(list(NSD,list(),intvec(0,0)));
   return(graph);
 }
 
@@ -5685,10 +5846,36 @@ RETURN:      int, if list contains a string as first entry then 1 is returned if
   return(ergebnis);
 }
 
+static proc koeffizienten (poly f,int k)
+"USAGE:      koeffizienten(f,k)  f poly, k int
+ASSUME:      f=a*x+b*y+c is a linear polynomial in two variables, k is either 0, 1 or 2
+RETURN:      poly, one of the coefficients of f, depending on the value of k:
+                   k=0 : c is returned
+                   k=1 : a is returned
+                   k=2 : b is returned
+NOTE:        the procedure is called from tropicalCurve"
+{
+  poly c=substitute(f,var(1),0,var(2),0);
+  if (k==0)
+  {
+    return(c);
+  }
+  f=f-c;  
+  if (k==1)
+  {
+    return(substitute(f,var(1),1,var(2),0));
+  }    
+  else
+  {
+    return(substitute(f,var(1),0,var(2),1));
+  }    
+}
 
 ////////////////////////////////////////////////////////////////////////////////////
 /// Procedures used in tex-procedures and conicWithTangents:
 /// - minOfPolys
+/// - shorten
+/// - minOfStringDecimal
 /// - decimal
 /// - stringdelete
 /// - stringinsert
@@ -5710,6 +5897,56 @@ NOTE:        called by texDrawTropical"
     }
   }
   return(min);
+}
+
+proc shorten (list AA)
+"USAGE:      shorten(AA); AA list
+ASSUME:      AA has three entries representing decimal numbers a, b and c
+RETURN:      list, containing strings representing the numbers a and b scaled
+                   down so that the absolute maximum of the two is no larger than c
+NOTE:        the procedure is called by texDrawTropical"
+{
+  execute("ring REALRING=(real,50,100),x,lp;");
+  execute("number aa,bb,cc="+AA[1]+","+AA[2]+","+AA[3]+";");
+  number ascale,bscale=1,1;
+  if ((aa>cc) or (aa<-cc))
+  {
+    ascale=abs(cc/aa);
+  }
+  if ((bb>cc) or (bb<-cc))
+  {
+    bscale=abs(cc/bb);
+  }
+  if (ascale<bscale)
+  {
+    aa=aa*ascale;
+    bb=bb*ascale;
+  }
+  else
+  {
+    aa=aa*bscale;
+    bb=bb*bscale;
+  }
+  return(list(string(aa),string(bb)));
+}
+
+
+static proc minOfStringDecimal (string a, string b)
+"USAGE:      minOfStringDecimal(a,b); a,b string
+ASSUME:      a and b are strings representing decimal numbers
+RETURN:      string, the string representing the larger of the two numbers a or b
+NOTE:        the procedure is called by texDrawTropical"
+{
+  execute("ring REALRING=(real,50,100),x,lp;");
+  execute("poly aa,bb="+a+","+b+";");
+  if (aa<bb)
+  {
+    return(a);
+  }
+  else
+  {
+    return(b);
+  }
 }
 
 static proc decimal (poly n,list #)
@@ -6318,3 +6555,291 @@ NOTE:        the procedure is called by jInvariant"
   }
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////////////
+/// Further examples for testing the procedures
+///////////////////////////////////////////////////////////////////////////////////////
+/*
+
+/// Note, only the following procedures need further examples (the others are too simple):
+/// A) tropicalLifting (best tested via displayTropicalLifting)
+/// B) tropicalCurve   (best tested via drawTropicalCurve)
+/// C) tropicalJInvariant
+/// D) weierstrassForm
+/// E) jInvariant
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/// A) Examples tropicalLifting
+/////////////////////////////////////////////////////////////////////////////////////////////
+// -------------------------------------------------------
+// Example 1
+// -------------------------------------------------------
+ring r0=0,(t,x),dp;
+poly f=t7-6t4+3t3x+8t3-12t2x+6tx2-x3+t2;
+f;
+// The point -2/3 is in the tropical variety.
+list L=tropicalLifting(f,intvec(3,-2),4);
+L;
+displayTropicalLifting(L,"subst");
+// --------------------------------------------------------
+// Example 2 - a field extension is necessary
+// --------------------------------------------------------
+poly g=(1+t2)*x2+t5x+t2;
+g;
+// The poin -1 is in the tropical variety.
+displayTropicalLifting(tropicalLifting(g,intvec(1,-1),4),"subst");
+// --------------------------------------------------------
+// Example 3 - the ideal is not zero dimensional
+// --------------------------------------------------------
+ring r1=0,(t,x,y),dp; 
+poly f=(9t27-12t26-5t25+21t24+35t23-51t22-40t21+87t20+56t19-94t18-62t17+92t16+56t15-70t14-42t13+38t12+28t11+18t10-50t9-48t8+40t7+36t6-16t5-12t4+4t2)*x2+(-9t24+12t23-4t22-42t20+28t19+30t18-20t17-54t16+16t15+48t14-16t12+8t11-18t10-26t9+30t8+20t7-24t6+4t5+28t4-8t3-16t2+4)*xy+(6t16-10t15-2t14+16t13+4t12-18t11-10t10+24t9+6t8-20t7+8t6+8t5-20t4-4t3+12t2+4t-4)*y2+(-9t28+3t27+8t26-4t25-45t24-6t23+42t22+30t21-94t20-40t19+68t18+82t17-38t16-60t15+26t14+36t13-22t12-20t11+4t10+4t9+12t8+8t7-8t6-8t5+4t4)*x+(9t27-21t26+16t25+14t24+12t23-61t22+27t21+80t20-19t19-100t18+26t17+96t16-24t15-84t14+44t12-2t11-18t10+2t9+40t8+4t7-32t6-12t5+4t3+12t2-4)*y+(9t27-12t26+4t25+36t23-18t22-28t21-2t20+54t19+14t18-52t17-44t16+24t15+40t14-4t13-12t12+4t11-4t10-4t9+4t8);
+f;
+displayTropicalLifting(tropicalLifting(f,intvec(1,-1,-4),3),"subst");
+// --------------------------------------------------------
+// Example 4 - the ideal has even more equations
+// --------------------------------------------------------
+ring r2=0,(t,x,y,z),dp;
+ideal i=t-x3+3yz,t2xy-2x2z;
+i;
+displayTropicalLifting(tropicalLifting(i,intvec(1,1,3,0),2),"subst");
+// --------------------------------------------------------
+// Example 5-7 - testing some options
+// --------------------------------------------------------
+setring r0;
+poly f1=(x2-t3)*(x3-t5)*(x5-t7)*(x7-t11)*(x11-t13);
+f1;
+displayTropicalLifting(tropicalLifting(f1,intvec(7,-11),4,"noAbs"),"subst");
+poly f2=(1+t2)*x2+t5x+t2;
+f2;
+displayTropicalLifting(tropicalLifting(f2,intvec(1,-1),4,"isZeroDimensional","findAll"),"subst");
+poly f3=t7-6t4+3t3x+8t3-12t2x+6tx2-x3+t2;
+f3;
+displayTropicalLifting(tropicalLifting(f3,intvec(3,-2),4,"isInTrop","findAll"),"subst");
+// ---------------------------------------------------------
+// Even more examples
+// ---------------------------------------------------------
+ring r1=0,(t,x),dp;
+poly f1=(x2-t3)*(x3-t5)*(x5-t7)*(x7-t11)*(x11-t13);
+displayTropicalLifting(tropicalLifting(f1,intvec(7,-11),4,"noAbs"),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (7,-11)
+///////////////////////////////////////////////////////////////////
+// one field extension needed
+// x=(X(1))*t+(-1/2*X(1))*t^3+(3/8*X(1)-1/2)*t^5+(-5/16*X(1)+1/2)*t^7+(19/128*X(1)-1/2)*t^9+(-15/256*X(1)+1/2)*t^11+(-9/1024*X(1)-1/2)*t^13 where t->t and X(1)^2+1=0
+poly f2=(1+t2)*x2+t5x+t2;
+displayTropicalLifting(tropicalLifting(f2,intvec(1,-1),4,"isZeroDimensional","findAll"),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (1,-1)
+///////////////////////////////////////////////////////////////////
+// x=t2+2t3+t7   the result is exact
+poly f3=t7-6t4+3t3x+8t3-12t2x+6tx2-x3+t2;
+displayTropicalLifting(tropicalLifting(f3,intvec(3,-2),4,"isInTrop","findAll"),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (3,-2)
+///////////////////////////////////////////////////////////////////
+//  full parametrisation is given by t->t2+t3 and x=3t7+t9+4t11-t12, this however cannot be computed
+// so: t->t2 and x=-3t7-21/2t8-239/8t9-78t10-25589/128t11-506t12-1298967/1024t13-3159t14-256667105/32768t15-19371t16-12540259065/262144t17-118066t18-1222177873545/4194304t19-719423t20-59637294735495/33554432t21
+poly f4=t12-83t11-88t10-69t9+3t8x+153t8+298t7x-81t7+165t6x-402t5x+3t4x2+189t4x-131t3x2+213t2x2-86tx2+x3+9x2;
+displayTropicalLifting(tropicalLifting(f4,intvec(2,-7),4,"findAll"),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (2,-7)
+///////////////////////////////////////////////////////////////////
+// t->t6 and x=3t3+t7+4t11-t12
+poly f5=t12-4120t11+6t10x-1008t10-96t9x+15t8x2+4453t9-2016t8x-144t7x2+20t6x3-18t8-108t7x-1008t6x2-96t5x3+15t4x4-4681t7-36t6x-162t5x2-24t3x4+6t2x5+243t6-18t4x2-108t3x3+x6+1890t5+486t4x-27tx4+243t2x2-729t3;
+displayTropicalLifting(tropicalLifting(f5,intvec(2,-1),3,"isInTrop","isZeroDimensional","findAll"),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (2,-1)
+///////////////////////////////////////////////////////////////////
+ring r2=0,(t,x,y),dp;
+poly f7=(9t27-12t26-5t25+21t24+35t23-51t22-40t21+87t20+56t19-94t18-62t17+92t16+56t15-70t14-42t13+38t12+28t11+18t10-50t9-48t8+40t7+36t6-16t5-12t4+4t2)*x2+(-9t24+12t23-4t22-42t20+28t19+30t18-20t17-54t16+16t15+48t14-16t12+8t11-18t10-26t9+30t8+20t7-24t6+4t5+28t4-8t3-16t2+4)*xy+(6t16-10t15-2t14+16t13+4t12-18t11-10t10+24t9+6t8-20t7+8t6+8t5-20t4-4t3+12t2+4t-4)*y2+(-9t28+3t27+8t26-4t25-45t24-6t23+42t22+30t21-94t20-40t19+68t18+82t17-38t16-60t15+26t14+36t13-22t12-20t11+4t10+4t9+12t8+8t7-8t6-8t5+4t4)*x+(9t27-21t26+16t25+14t24+12t23-61t22+27t21+80t20-19t19-100t18+26t17+96t16-24t15-84t14+44t12-2t11-18t10+2t9+40t8+4t7-32t6-12t5+4t3+12t2-4)*y+(9t27-12t26+4t25+36t23-18t22-28t21-2t20+54t19+14t18-52t17-44t16+24t15+40t14-4t13-12t12+4t11-4t10-4t9+4t8);
+displayTropicalLifting(tropicalLifting(f7,intvec(1,-1,-4),4,"isPrime"),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (1,-1,-4)
+///////////////////////////////////////////////////////////////////
+ring r3=0,(t,x,y,z),dp;
+ideal i1=-y2t4+x2,yt3+xz+y;
+displayTropicalLifting(tropicalLifting(i1,intvec(1,-2,0,2),4,"findAll"),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (1,-2,0,2)
+///////////////////////////////////////////////////////////////////
+ideal i2=-y2t4+x2,yt3+yt2+xz;
+displayTropicalLifting(tropicalLifting(i2,intvec(1,-3,-1,0),4),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (1,-3,-1,0)
+////////////////////////////////////////////////////////////////
+ring r4=0,(t,x,y,z,u),dp;
+ideal i3=t3x+ty+u,tx+t2u+y;
+displayTropicalLifting(tropicalLifting(i3,intvec(1,-1,-2,-1,-3),6),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (1,-1,-2,-1,-3)
+/////////////////////////////////////////////////////////////////////
+setring r2;
+ideal i5=t3-t2y+t2-tx-ty+xy,t3-t2y+t2-2ty+y2,-t4+2t3x-t2x2-t3+3t2x-3tx2+x3+t2+t-x,-t4+2t3x-t2x2-t3+2t2x-tx2+t2y-2txy+x2y+t2+t-y;
+displayTropicalLifting(tropicalLifting(i5,intvec(1,-1,-1),3),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (1,-1,-1)
+////////////////////////////////////////////////////////////////////
+ring r5=0,(t,V,W,X,Y,Z),dp;
+ideal i5=VXt5+3VZt4-2VXt3+WXt3+V2t2+3WZt2-2WXt+VW,-4W2X4+V2t2;
+displayTropicalLifting(tropicalLifting(i5,intvec(2,-3,-3,-1,-1,-1),3),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (2,-3,-3,-1,-1,-1)
+///////////////////////////////////////////////////////////////////
+ring r6=0,(t,x,y,z),dp;
+ideal i6=t4xy-y3z3+3t2xy3-txy2+t4y;
+displayTropicalLifting(tropicalLifting(i6,intvec(3,0,-9,2),4),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (3,0,-9,2)
+////////////////////////////////////////////////////////////
+// very easy example stops after one loop with an exact result
+ideal i7=t2xy-2x2z;
+displayTropicalLifting(tropicalLifting(i7,intvec(1,1,3,0),4),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (1,1,3,0)
+/////////////////////////////////////////////////////////////
+displayTropicalLifting(tropicalLifting(i7,intvec(1,-3,-1,0),4),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (1,-3,-1,0)
+/////////////////////////////////////////////////////////////////
+// requires one field extension
+ideal i8=t-x3+3yz;
+displayTropicalLifting(tropicalLifting(i8,intvec(1,1,3,0),4),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (1,1,3,0)
+/////////////////////////////////////////////////////////////////
+displayTropicalLifting(tropicalLifting(i8,intvec(1,-3,-1,0),4),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (1,-3,-1,0)
+/////////////////////////////////////////////////////////////////
+// requires one field extension
+ideal i9=t-x3+3yz,t2xy-2x2z;
+displayTropicalLifting(tropicalLifting(i9,intvec(1,1,3,0),4),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (1,1,3,0)
+// takes too much time
+//displayTropicalLifting(tropicalLifting(i9,intvec(1,-3,-1,0),4),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (1,-3,-1,0)
+/////////////////////////////////////////////////////////////////////
+// too much for Gfan did not work on my computer
+//ideal i10=t2xy+t4-z2,t-2xy+z2+tz,z2-y;
+//displayTropicalLifting(tropicalLifting(i10,intvec(2,4,-6,-3),2),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (2,4,-6,-3)
+////////////////////////////////////////////////////////////////////
+ring r7=0,(t,x,y),dp;
+ideal i11=t4xy-y3+3t2xy3-txy2+t4y;
+displayTropicalLifting(tropicalLifting(i11,intvec(1,3,1),5),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (1,3,1)
+////////////////////////////////////////////////////////////////
+ring r8=0,(t,x),dp;
+ideal i12=x32+(16t6)*x30+(8t10)*x29+(120t12)*x28+(112t16)*x27+(32t20+560t18)*x26+(728t22)*x25+(388t26+1820t24)*x24+(80t30+2912t28)*x23+(2160t32+4368t30)*x22+(824t36+8008t34)*x21+(138t40+7304t38+8008t36)*x20+(3840t42+16016t40)*x19+(1180t46+16720t44+11440t42)*x18+(170t50+10680t48+24024t46)*x17+(4480t52+27324t50+12870t48)*x16+(1168t56+19680t54+27456t52)*x15+(152t60+9920t58+32736t56+11440t54)*x14+(3472t62+25200t60+24024t58)*x13+(804t66+14140t64+29040t62+8008t60)*x12+(96t70+5824t68+22848t66+16016t64)*x11+(1776t72+13496t70+19008t68+4368t66)*x10+(364t76+6020t74+14640t72+8008t70)*x9+(42t80+2112t78+8680t76+9020t74+1820t72)*x8+(544t82+3920t80+6480t78+2912t76)*x7+(104t86+1448t84+3680t82+2992t80+560t78)*x6+(12t90+400t88+1568t86+1880t84+728t82)*x5+(94t92+564t90+970t88+648t86+120t84)*x4+(16t96+144t94+352t92+320t90+112t88)*x3+(3t100+36t98+112t96+140t94+80t92+16t90)*x2+(6t102+20t100+34t98+24t96+8t94)*x+(t106+5t104+8t102+8t100+4t98+t96);
+displayTropicalLifting(tropicalLifting(i12,intvec(1,-3),2),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (1,-3)
+////////////////////////////////////////////////////////////////
+ring r9=3,(t,x),dp;
+ideal i13=imap(r8,i12);
+displayTropicalLifting(tropicalLifting(i13,intvec(1,-3),3,"noAbs"),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (1,-3)
+/////////////////////////////////////////////////////
+// without the option findAll we first get only a non-valid solution !!!
+ring r10=0,(t,x,y,z,u),dp;
+ideal i14=-y2t5-xyt4-2yzt3+yut2+xut+2zu;
+displayTropicalLifting(tropicalLifting(i14,intvec(1,-2,-1,-3,-3),3),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (1,-2,-1,-3,-3)
+///////////////////////////////////////////////////////
+// test for positive characteristic
+///////////////////////////////////////////////////////////////////
+ring r11=13,(t,x),dp;
+poly f1=(x2-t3)*(x3-t5)*(x5-t7)*(x7-t11)*(x11-t13);
+displayTropicalLifting(tropicalLifting(f1,intvec(7,-11),4,"findAll"),"subst");
+///////////////////////////////////////////////////////////////////
+// weight was: (7,-11)
+///////////////////////////////////////////////////////////////////
+// one field extension needed
+// x=(X(1))*t+(-1/2*X(1))*t^3+(3/8*X(1)-1/2)*t^5+(-5/16*X(1)+1/2)*t^7+(19/128*X(1)-1/2)*t^9+(-15/256*X(1)+1/2)*t^11+(-9/1024*X(1)-1/2)*t^13 where t->t and X(1)^2+1=0
+poly f2=(1+t2)*x2+t5x+t2;
+displayTropicalLifting(tropicalLifting(f2,intvec(1,-1),4,"isZeroDimensional","findAll"),"subst");
+///////////////////////////////////////////////////////////////////
+ring r12=5,(t,x,y),dp;
+ideal i11=t4xy-y3+3t2xy3-txy2+t4y;
+displayTropicalLifting(tropicalLifting(i11,intvec(1,3,1),5),"subst");
+///////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////
+/// B) Examples for tropicalCurve
+///////////////////////////////////////////////////////////////////
+ring r=(0,t),(x,y),dp;
+poly f=t*(x7+y7+1)+1/t*(x4+y4+x2+y2+x3y+xy3)+1/t7*x2y2;
+list graph=tropicalCurve(f);
+graph; 
+size(graph)-1;
+drawTropicalCurve(graph);
+poly g=t3*(x7+y7+1)+1/t3*(x4+y4+x2+y2+x3y+xy3)+1/t21*x2y2;
+list tropical_g=tropicalise(g);
+tropical_g;
+drawTropicalCurve(tropical_g);
+/// further examples
+poly f1=x+y;
+poly f2=xy+xy3+xy6+txy9;
+poly f3=xy+x2y3+x3y6+tx4y9;
+poly f4=t*(x3+y3+1)+1/t*(x2+y2+x+y+x2y+xy2)+1/t2*xy;
+poly f5=t8x3+t8y3+t8+t4x2y+t4xy2+t4x2+t4y2+t4x+t4y+t2xy;
+poly f6=x3+y3+1;
+poly f7=t*x70+t*y70+1/t*x40+1/t7*x20y20+1/t*y40+1/t*x30y+1/t*xy30+1/t*x20+1/t*y20+t;
+poly f8=t10*x7+t10*y7+1/t10*x4+1/t70*x2y2+1/t10*y4+1/t10*x3y+1/t10*xy3+1/t10*x2+1/t10*y2+t10;
+poly f9=x+y+x2y+xy2+1/t*xy;
+poly f10=1+x+y+xy+tx2y+txy2+t3x5+t3y5+tx2y2+t2xy4+t2yx4;
+poly f11=1/(t8)*x6y+1/(t16)*x5y2+1/(t9)*x4y3+(t4)*x2y5+1/(t11)*xy6+(t5)*y7+1/(t5)*x6+(t16)*x4y2+(t10)*x3y3+(t19)*xy5+(t14)*x5+1/(t17)*x3y2+(t10)*x2y3+1/(t20)*xy4+(t13)*y5+1/(t17)*x4+(t9)*x3y+(t11)*xy3+1/(t3)*xy2+(t7)*y3+1/(t18)*x2+(t16)*x;
+poly f12=-x3+(6t13+3t12+t5+3t4+3t3+1)/(t19)*x2+(2t5+1)/(t12)*xy+y2+(9t28-12t23-12t22+3t21+9t19+3t16-8t15-16t14-24t13-9t12-6t11-8t10-3t9-3t8-4t6-8t5-8t4-3t3-3t-2)/(t35)*x+(9t27+6t20-8t14-4t13-6t12-3t11-4t9-t8-4t5-4t4-2t3-1)/(t27)*y+(27t50+27t43-36t37-9t36-27t35-27t34-t32+12t31-18t30-11t29-54t28-36t27-12t25+13t24+28t23+61t22+27t21+18t20+16t19+3t18+14t17+3t16+16t15+26t14+44t13+34t12+21t11+27t10+12t9+7t8+t6+10t5+11t4+7t3+t2+2t+2)/(t50);
+poly f13=x3+(3t9+1)/(t8)*x2y+(3t10+2t+1)/(t8)*xy2+(t10+t7+t+1)/(t7)*y3+1/(t8)*x2+(2t5+1)/(t12)*xy+(t5+t3+1)/(t11)*y2+1/(t8)*x+(t+1)/(t8)*y+1;
+poly f14=x3+(3t9+3t6c+1)/(t8)*x2y+(3t12+6t9c+3t6c2+2t3+t2+2c)/(t10)*xy2+(t15+3t12c+t12+3t9c2+t6c3+t6+t5+2t3c+t2c+c2)/(t12)*y3+1/(t8)*x2+(2t5+2t2c+1)/(t12)*xy+(t8+t6+2t5c+t3+t2c2+c)/(t14)*y2+1/(t8)*x+(t3+t2+c)/(t10)*y+1;
+poly f15=x3+x2y+xy2+(t5)*y3+x2+1/(t4)*xy+y2+x+y+1;
+poly f16=t*(x7+y7+1)+1/t*(x4+y4+x2+y2+x3y+xy3)+1/t7*x2y2;
+
+///////////////////////////////////////////////////////////////////
+/// B) Examples for tropicalJInvariant
+///////////////////////////////////////////////////////////////////
+// tropcial_j_invariant computes the tropical j-invariant of the elliptic curve f
+tropicalJInvariant(t*(x3+y3+1)+1/t*(x2+y2+x+y+x2y+xy2)+1/t2*xy);
+// the Newton polygone need not be the standard simplex
+tropicalJInvariant(x+y+x2y+xy2+1/t*xy);
+// the curve can have arbitrary degree
+tropicalJInvariant(t*(x7+y7+1)+1/t*(x4+y4+x2+y2+x3y+xy3)+1/t7*x2y2);
+// the procedure does not realise, if the embedded graph of the tropical curve has
+// a loop that can be resolved
+tropicalJInvariant(1+x+y+xy+tx2y+txy2);
+// but it does realise, if the curve has no loop at all ...
+tropicalJInvariant(x+y+1);
+// or if the embedded graph has more than one loop - even if only one cannot be resolved
+tropicalJInvariant(1+x+y+xy+tx2y+txy2+t3x5+t3y5+tx2y2+t2xy4+t2yx4);
+// f is already in Weierstrass form
+weierstrassForm(y2+yx+3y-x3-2x2-4x-6);
+// g is not, but wg is
+g=x+y+x2y+xy2+1/t*xy;
+poly wg=weierstrassForm(g);
+wg;
+// ... but it is not yet a simple, since it still has an xy-term, unlike swg
+poly swg=weierstrassForm(g,1);
+swg;
+// the j-invariants of all three polynomials coincide ...
+jInvariant(g);
+jInvariant(wg);
+jInvariant(swg);
+// the following curve is elliptic as well
+poly h=x22y11+x19y10+x17y9+x16y9+x12y7+x9y6+x7y5+x2y3;
+// its Weierstrass form is
+weierstrassForm(h);
+jInvariant(x+y+x2y+y3+1/t*xy,"ord");
+// see also example f5-f16 in part B)
+
+
+*/
