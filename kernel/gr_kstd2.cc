@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.23 2008-07-29 13:16:44 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.24 2008-08-04 07:31:13 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -208,6 +208,7 @@ void ratGB_divide_out(poly p)
   }
   pDelete(&f);
 }
+#ifdef HAVE_RATGRING
 /*2
 *reduces h with elements from T choosing  the first possible
 * element in t with respect to the given pDivisibleBy
@@ -349,6 +350,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
     j++;
   }
 }
+#endif
 
 /*2
 *  reduction procedure for the homogeneous case
@@ -978,6 +980,7 @@ void nc_gr_initBba(ideal F, kStrategy strat)
 
 //   if (rIsPluralRing(currRing))
     strat->red = redGrFirst;
+#ifdef HAVE_RATGRING
   if (currRing->real_var_start>0)
   {
     int ii=IDELEMS(F)-1;
@@ -993,6 +996,7 @@ void nc_gr_initBba(ideal F, kStrategy strat)
     }
     if (is_rat_id) strat->red=redGrRatGB;
   }
+#endif
 
   if (pLexOrder && strat->honey)
     strat->initEcart = initEcartNormal;
