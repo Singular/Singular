@@ -1,4 +1,4 @@
-version="$Id: polymake.lib,v 1.2 2008-08-04 15:47:31 keilen Exp $";
+version="$Id: polymake.lib,v 1.3 2008-08-04 15:53:41 keilen Exp $";
 category="Tropical Geometry";
 info="
    LIBRARY:         polymake.lib
@@ -7,6 +7,12 @@ info="
 
    KEYWORDS:        polytope, fan, secondary fan, secondary polytope, polymake,
                     Newton polytope, Groebner fan 
+
+   WARNING:
+     Most procedures will not work unless polymake or topcom is installed and
+     if so, they will only work with the operating system LINUX! 
+     For more detailed information see IMPORTANT NOTE respectively consult the
+     help string of the procedures.
 
    IMPORTANT NOTE:
      Even though this is a Singular library for computing polytopes and fans such 
@@ -21,7 +27,7 @@ info="
      number of options which polymake respectively topcom offers to compute with polytopes 
      and fans and to make the results available in Singular for further computations; 
      moreover, the user familiar with Singular does not have to learn the syntax of polymake
-     or topcom, if the options offered here are sufficient for his purposes
+     or topcom, if the options offered here are sufficient for his purposes.
      Note, though, that the procedures concerned with planar polygons are independent of
      both, polymake and topcom.
 
