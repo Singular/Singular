@@ -1,4 +1,4 @@
-version="$Id: polymake.lib,v 1.1 2008-07-14 15:59:17 keilen Exp $";
+version="$Id: polymake.lib,v 1.2 2008-08-04 15:47:31 keilen Exp $";
 category="Tropical Geometry";
 info="
    LIBRARY:         polymake.lib
