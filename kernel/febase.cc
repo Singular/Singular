@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.16 2008-03-31 12:14:44 Singular Exp $ */
+/* $Id: febase.cc,v 1.17 2008-08-05 16:56:53 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -39,8 +39,8 @@ extern FILE *stdin;
 
 char fe_promptstr[] ="  ";
 
-#define INITIAL_PRINT_BUFFER 24*1024
-static int feBufferLength=INITIAL_PRINT_BUFFER;
+#define INITIAL_PRINT_BUFFER 24*1024L
+static long feBufferLength=INITIAL_PRINT_BUFFER;
 static char * feBuffer=(char *)omAlloc(INITIAL_PRINT_BUFFER);
 
 int     si_echo = 0;
@@ -211,7 +211,7 @@ void newBuffer(char* s, feBufferTypes t, procinfo* pi, int lineno)
   //  t,BT_name[t],pname,currentVoice);
   if (pi!=NULL)
   {
-    int l=strlen(pi->procname);
+    long l=strlen(pi->procname);
     if (pi->libname!=NULL) l+=strlen(pi->libname);
     currentVoice->filename = (char *)omAlloc(l+3);
     *currentVoice->filename='\0';
@@ -563,7 +563,7 @@ int feReadLine(char* b, int l)
         {
           char *anf=currentVoice->buffer;
           char *ss=strchr(anf,'\n');
-          int len;
+          long len;
           if (ss==NULL) len=strlen(anf);
           else          len=ss-anf;
           char *s=(char *)omAlloc(len+2);
@@ -577,7 +577,7 @@ int feReadLine(char* b, int l)
         {
           char *anf=currentVoice->buffer+startfptr;
           char *ss=strchr(anf,'\n');
-          int len;
+          long len;
           if (ss==NULL) len=strlen(anf);
           else          len=ss-anf;
           char *s=(char *)omAlloc(len+2);
@@ -822,7 +822,8 @@ char * StringAppend(const char *fmt, ...)
 {
   va_list ap;
   char *s = feBufferStart; /*feBuffer + strlen(feBuffer);*/
-  int more, vs;
+  int vs;
+  long more;
   va_start(ap, fmt);
   if ((more=feBufferStart-feBuffer+strlen(fmt)+100)>feBufferLength)
   {
@@ -865,7 +866,8 @@ char * StringAppend(const char *fmt, ...)
 char * StringAppendS(const char *st)
 {
   /* feBufferStart is feBuffer + strlen(feBuffer);*/
-  int more,l;
+  int l;
+  long more;
   int ll=feBufferStart-feBuffer;
   if ((more=ll+2+(l=strlen(st)))>feBufferLength)
   {
@@ -882,7 +884,8 @@ char * StringAppendS(const char *st)
 
 char * StringSetS(const char *st)
 {
-  int more,l;
+  int l;
+  long more;
   if ((l=strlen(st))>feBufferLength)
   {
     more = ((l + (4*1024-1))/(4*1024))*(4*1024);
@@ -1111,7 +1114,7 @@ void Print(const char *fmt, ...)
     va_list ap;
     va_start(ap, fmt);
     int l;
-    int ls=strlen(fmt);
+    long ls=strlen(fmt);
     char *s=(char *)omAlloc(ls+512);
 #ifdef HAVE_VSNPRINTF
     l = vsnprintf(s, ls+511, fmt, ap);
