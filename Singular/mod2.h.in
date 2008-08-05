@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.132 2008-07-09 11:59:39 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.133 2008-08-05 16:19:47 ederc Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -190,6 +190,9 @@
 
 /* linear algebra extensions from pcv.h/pcv.cc */
 #define HAVE_PCV 1
+
+// procedures to compute groebner bases with the f5 implementation
+#define HAVE_F5
 
 // procedures to compute with units
 #define HAVE_UNITS
