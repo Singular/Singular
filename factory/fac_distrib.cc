@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_distrib.cc,v 1.10 2008-03-17 17:44:04 Singular Exp $ */
+/* $Id: fac_distrib.cc,v 1.11 2008-08-05 15:16:56 Singular Exp $ */
 
 #include <config.h>
 
@@ -20,15 +20,19 @@ nonDivisors ( CanonicalForm omega, CanonicalForm delta, const CFArray & F, CFArr
     int k = F.size();
     d = CFArray( 0, k );
     d[0] = delta * omega;
-    for ( int i = 1; i <= k; i++ ) {
+    for ( int i = 1; i <= k; i++ )
+    {
         q = abs(F[i]);
-        for ( int j = i-1; j >= 0; j-- ) {
+        for ( int j = i-1; j >= 0; j-- )
+        {
             r = d[j];
-            do {
+            do
+            {
                 r = gcd( r, q );
                 q = q / r;
-            } while ( r != 1 );
-            if ( q == 1 ) {
+            } while ( !r.isOne() );
+            if ( q == 1 )
+            {
                 DEBDECLEVEL( cerr, "nonDivisors" );
                 return false;
             }
@@ -68,40 +72,50 @@ distributeLeadingCoeffs ( CanonicalForm & U, CFArray & G, CFArray & lcG, const C
     for ( j = 1; j <= r; j ++ )
         lcG[j] = 1;
 
-    for ( I = F, i = 1; I.hasItem(); I++, i++ ) {
+    for ( I = F, i = 1; I.hasItem(); I++, i++ )
+    {
         ft = I.getItem().factor();
         m = I.getItem().exp();
         DEBOUTLN( cerr, "trying to distribute " << ft );
         DEBOUTLN( cerr, "which is tested with " << D[i] );
         DEBOUTLN( cerr, "and contained to the power of " << m );
         j = 1;
-        while ( m > 0 && j <= r ) {
+        while ( m > 0 && j <= r )
+        {
             ut = lc( G[j] );
             DEBOUTLN( cerr, "checking with " << ut );
-            while ( m > 0 && fdivides( D[i], ut ) ) {
+            while ( m > 0 && fdivides( D[i], ut ) )
+            {
                 DEBOUTLN( cerr, "match found" );
                 m--; ut /= D[i];
                 lcG[j] *= ft;
             }
             j++;
         }
-        if (m != 0) {
+        if (m != 0)
+        {
             DEBDECLEVEL( cerr, "distributeLeadingCoeffs" );
             return false;
         }
     }
     DEBOUTLN( cerr, "the leading coeffs before omega and delta correction: " << lcG );
-    if ( omega != 1 ) {
-        for ( j = 1; j <= r; j++ ) {
+    if ( !omega.isOne() )
+    {
+        for ( j = 1; j <= r; j++ )
+        {
 //            G[j] *= omega;
             lcG[j] *= omega;
+            if(lc( G[j] ).isZero()) return false;
             G[j] = G[j] * ( A( lcG[j] ) / lc( G[j] ) );
         }
         U *= power( omega, r-1 );
     }
-    if ( delta != 1 ) {
-        for ( j = 1; j <= r; j++ ) {
+    if ( !delta.isOne() )
+    {
+        for ( j = 1; j <= r; j++ )
+        {
             lcG[j] *= delta;
+            if(lc( G[j] ).isZero()) return false;
             G[j] = G[j] * ( A( lcG[j] ) / lc( G[j] ) );
         }
         U *= power( delta, r );
@@ -116,15 +130,18 @@ gfbAdjoin ( const CanonicalForm & F, CFList & L )
 {
     if ( F.isOne() )
         return;
-    if ( L.isEmpty() ) {
+    if ( L.isEmpty() )
+    {
         L.append( F );
         return;
     }
     CanonicalForm h, f = F;
     CFListIterator i, j;
-    for ( i = L; i.hasItem() && ! f.isOne(); ) {
+    for ( i = L; i.hasItem() && ! f.isOne(); )
+    {
         h = gcd( f, i.getItem() );
-        if ( h.isOne() ) {
+        if ( h.isOne() )
+        {
             i++;
             continue;
         }
@@ -157,7 +174,8 @@ Univar2Bivar(const CanonicalForm & U, CFArray & G, const Evaluation & A, const m
     CanonicalForm l = LC( U, Variable(1) );
     int n = G.size();
     CFArray lcG(1,n);
-    for ( int i = 1; i <= n; i++ ) {
+    for ( int i = 1; i <= n; i++ )
+    {
         G[i] *= A(l)/lc(G[i]);
         lcG[i] = l;
     }
