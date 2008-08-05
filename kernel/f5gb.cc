@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.cc,v 1.7 2008-06-26 16:05:07 ederc Exp $ */
+/* $Id: f5gb.cc,v 1.8 2008-08-05 20:44:08 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -20,37 +20,8 @@
 #include "intvec.h"
 #include "pInline1.h"
 #include "f5gb.h"
+#include "lpolynom.h"
 #ifdef HAVE_F5
-
-/*2
-* all functions working on the class lpoly for labeled polynomials
-*/
-
-void lpoly::setPoly(poly p){
-        polynomial = p;
-}
-
-void lpoly::setTerm(poly t){
-        term = t;
-}
-
-void lpoly::setIndex(long i){
-        index = i;
-}
-
-poly lpoly::getPoly(){
-        return polynomial;
-}
-
-poly lpoly::getTerm(){
-        return term;
-}
-
-long lpoly::getIndex(){
-        return index;
-}
-
-
 
 
 /*2
@@ -92,7 +63,7 @@ void qsort_degree(poly* left, poly* right)
 * computes incrementally gbs of subsets of the input 
 * gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}
 */  
-lpoly* f5_inc(lpoly* lp, lpoly* g_prev)
+lpoly *f5_inc(lpoly* lp, lpoly* g_prev)
 {
         
         
