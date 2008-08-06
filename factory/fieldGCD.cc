@@ -17,10 +17,6 @@ void out_cf(char *s1,const CanonicalForm &f,char *s2);
 
 CanonicalForm fieldGCD( const CanonicalForm & F, const CanonicalForm & G );
 void CRA(const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew);
-int * leadDeg(const CanonicalForm & f, int *degs);
-bool isLess(int *a, int *b, int lower, int upper);
-bool isEqual(int *a, int *b, int lower, int upper);
-CanonicalForm firstLC(const CanonicalForm & f);
 
 
 CanonicalForm fieldGCD( const CanonicalForm & F, const CanonicalForm & G )
@@ -125,18 +121,15 @@ CanonicalForm fieldGCD( const CanonicalForm & F, const CanonicalForm & G )
       gm = gnew;
       continue;
     }
-
     if(isLess(L, dg_im, 2, mv)) // dg_im > L --> current point unlucky
       continue;
 
-    if(isLess(dg_im, L, 2, mv)) // dg_im < L --> all previous points were unlucky
-    {
-      //printf("=========== reset\n");
-      m = CanonicalForm(1); // reset
-      gm = 0; // reset
-      for(int i=2; i<=mv; i++) // tighten bound
-        L[i] = dg_im[i];
-    }
+    // here: dg_im < L --> all previous points were unlucky
+    //printf("=========== reset\n");
+    m = CanonicalForm(1); // reset
+    gm = 0; // reset
+    for(int i=2; i<=mv; i++) // tighten bound
+      L[i] = dg_im[i];
   }
   // hopefully, we never reach this point
   Off( SW_USE_fieldGCD );
@@ -244,50 +237,4 @@ void CRA(const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm
       j++;
     }
   }
-}
-
-
-int * leadDeg(const CanonicalForm & f, int *degs)
-{ // leading degree vector w.r.t. lex. monomial order x(i+1) > x(i)
-  // if f is in a coeff domain, the zero pointer is returned
-  // 'a' should point to an array of sufficient size level(f)+1
-  if(f.inCoeffDomain())
-    return 0;
-  CanonicalForm tmp = f;
-  do
-  {
-    degs[tmp.level()] = tmp.degree();
-    tmp = LC(tmp);
-  }
-  while(!tmp.inCoeffDomain());
-  return degs;
-}
-
-
-bool isLess(int *a, int *b, int lower, int upper)
-{ // compares the degree vectors a, b on the specified part. Note: x(i+1) > x(i)
-  for(int i=upper; i>=lower; i--)
-    if(a[i] == b[i])
-      continue;
-    else
-      return a[i] < b[i];
-  return true;
-}
-
-
-bool isEqual(int *a, int *b, int lower, int upper)
-{ // compares the degree vectors a, b on the specified part. Note: x(i+1) > x(i)
-  for(int i=lower; i<=upper; i++)
-    if(a[i] != b[i])
-      return false;
-  return true;
-}
-
-
-CanonicalForm firstLC(const CanonicalForm & f)
-{ // returns the leading coefficient (LC) of level <= 1
-  CanonicalForm ret = f;
-  while(ret.level() > 1)
-    ret = LC(ret);
-  return ret;
 }

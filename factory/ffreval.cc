@@ -1,8 +1,5 @@
 #include <config.h>
 
-#include "assert.h"
-#include "debug.h"
-
 #include "cf_defs.h"
 #include "canonicalform.h"
 #include "fac_util.h"
@@ -70,14 +67,15 @@ static CanonicalForm checkCombination_P ( const CanonicalForm & W, const Evaluat
 static CFArray findCorrCoeffs_P ( const CFArray & P, const CFArray & Q, const CFArray & P0, const CFArray & Q0, const CFArray & S, const CFArray & T, const CanonicalForm & C, const Evaluation & I, int r, int k, int h, int * n );
 static bool liftStep_P ( CFArray & P, int k, int r, int t, const Evaluation & A, const CFArray & lcG, const CanonicalForm & Uk, int * n, int h );
 static bool Hensel_P ( const CanonicalForm & U, CFArray & G, const CFArray & lcG, const Evaluation & A, const Variable & x );
+static bool hasFirstAlgVar( const CanonicalForm & f, Variable & a );
 
 CanonicalForm fin_ezgcd( const CanonicalForm & FF, const CanonicalForm & GG )
 {
   CanonicalForm F, G, f, g, d, Fb, Gb, Db, Fbt, Gbt, Dbt, B0, B, D0, lcF, lcG, lcD;
   CFArray DD( 1, 2 ), lcDD( 1, 2 );
   int degF, degG, delta, count, maxeval;
-  count = 0; // number of eval. used
   maxeval = getCharacteristic(); // bound on the number of eval. to use
+  count = 0; // number of eval. used
   REvaluation b, bt;
   bool gcdfound = false;
   Variable x = Variable(1);
@@ -96,7 +94,23 @@ CanonicalForm fin_ezgcd( const CanonicalForm & FF, const CanonicalForm & GG )
   lcD = gcd( lcF, lcG );
   delta = 0;
   degF = degree( F, x ); degG = degree( G, x );
-  b = REvaluation( 2, tmax(F.level(), G.level()), FFRandom() );
+  Variable a,bv;
+  if(hasFirstAlgVar(F,a))
+  {
+    if(hasFirstAlgVar(G,bv))
+    {
+      if(bv.level() > a.level())
+        a = bv;
+    }
+    b = REvaluation( 2, tmax(F.level(), G.level()), AlgExtRandomF( a ) );
+  }
+  else // F not in extension
+  {
+    if(hasFirstAlgVar(G,a))
+      b = REvaluation( 2, tmax(F.level(), G.level()), AlgExtRandomF( a ) );
+    else // both not in extension
+      b = REvaluation( 2, tmax(F.level(), G.level()), FFRandom() );
+  }
   while( !gcdfound )
   {
     if( !findeval_P( F, G, Fb, Gb, Db, b, delta, degF, degG, maxeval, count ))
@@ -188,6 +202,22 @@ CanonicalForm fin_ezgcd( const CanonicalForm & FF, const CanonicalForm & GG )
     delta++;
   }
   return d * DD[2] / content( DD[2],Variable(1) );
+}
+
+
+static bool hasFirstAlgVar( const CanonicalForm & f, Variable & a )
+{
+  if( f.inBaseDomain() ) // f has NO alg. variable
+    return false;
+  if( f.level()<0 ) // f has only alg. vars, so take the first one
+  {
+    a = f.mvar();
+    return true;
+  }
+  for(CFIterator i=f; i.hasTerms(); i++)
+    if( hasFirstAlgVar( i.coeff(), a ))
+      return true; // 'a' is already set
+  return false;
 }
 
 
@@ -306,7 +336,7 @@ static CFArray findCorrCoeffs_P ( const CFArray & P, const CFArray & Q, const CF
           {
             g = Dm;
             for ( i = k-1; i >= 2 && ! g.isZero(); i-- )
-            g = derivAndEval_P( g, e[i], Variable( i ), I[i] );
+              g = derivAndEval_P( g, e[i], Variable( i ), I[i] );
             if ( ! g.isZero() )
             {
               prodcomb = 1;
@@ -367,8 +397,9 @@ static bool liftStep_P ( CFArray & P, int k, int r, int t, const Evaluation & A,
     {
       C = derivAndEval_P( Rm, m, Variable( k ), A[k] );
       D = 1;
-      for ( i = 2; i <= m; i++ ) D *= i;
-        C /= D;
+      for ( i = 2; i <= m; i++ )
+        D *= i;
+      C /= D;
       alpha = findCorrCoeffs_P( P, Q, P0, Q0, S, T, C, A, r, k, h, n );
       for ( i = 1; i <= r; i++ )
         K[i] -= alpha[i] * xa1;
@@ -404,4 +435,3 @@ static bool Hensel_P ( const CanonicalForm & U, CFArray & G, const CFArray & lcG
   delete[] n;
   return goodeval;
 }
-

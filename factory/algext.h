@@ -5,7 +5,7 @@
 
 CanonicalForm QGCD( const CanonicalForm &, const CanonicalForm & );
 CanonicalForm univarQGCD( const CanonicalForm & F, const CanonicalForm & G );
-void tryEuclid( const CanonicalForm &, const CanonicalForm &, const CanonicalForm, CanonicalForm &, bool & );
+//void tryEuclid( const CanonicalForm &, const CanonicalForm &, const CanonicalForm, CanonicalForm &, bool & );
 void tryInvert( const CanonicalForm &, const CanonicalForm &, CanonicalForm &, bool & );
 bool hasFirstAlgVar( const CanonicalForm &, Variable & );
 void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const CanonicalForm & M, CanonicalForm & result, bool & fail );

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.64 2008-07-01 16:54:34 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.65 2008-08-06 13:53:15 Singular Exp $ */
 
 #include <config.h>
 
@@ -518,7 +518,7 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     && (!fc_and_gc_Univariate)
     && (getCharacteristic() >100))
     {
-      fc=fieldGCD(fc,gc);
+      return fieldGCD(f,g);
     }
     else if (isOn( SW_USE_EZGCD_P ) && (!fc_and_gc_Univariate))
     {
@@ -778,9 +778,9 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
           && (getCharacteristic() == 0)
           )
           {
-            if ((f.level()==g.level()) && f.isUnivariate() && g.isUnivariate())
-              return univarQGCD(f,g);
-            else
+            //if ((f.level()==g.level()) && f.isUnivariate() && g.isUnivariate())
+            //  return univarQGCD(f,g);
+            //else
               return QGCD(f,g);
           }
         }
