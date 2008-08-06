@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.72 2008-06-27 12:10:58 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.73 2008-08-06 17:08:17 Singular Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -71,33 +71,40 @@ using std::vector;
 //#define QUICK_SPOLY_TEST
 class PolySimple{
 public:
-  PolySimple(poly p){
+  PolySimple(poly p)
+  {
     impl=p;
   }
-  PolySimple(){
+  PolySimple()
+  {
     impl=NULL;
   }
-  PolySimple(const PolySimple& a){
+  PolySimple(const PolySimple& a)
+  {
     //impl=p_Copy(a.impl,currRing);
     impl=a.impl;
   }
-  PolySimple& operator=(const PolySimple& p2){
+  PolySimple& operator=(const PolySimple& p2)
+  {
     //p_Delete(&impl,currRing);
     //impl=p_Copy(p2.impl,currRing);
     impl=p2.impl;
     return *this;
   }
-  ~PolySimple(){
+  ~PolySimple()
+  {
     //p_Delete(&impl,currRing);
   }
-  bool operator< (const PolySimple& other) const{
+  bool operator< (const PolySimple& other) const
+  {
     return pLmCmp(impl,other.impl)<0;
   }
-  bool operator==(const PolySimple& other){
+  bool operator==(const PolySimple& other)
+  {
     return pLmEqual(impl,other.impl);
   }
   poly impl;
-  
+
 };
 template<class number_type> class DataNoroCacheNode;
 /*class MonRedRes{
@@ -119,29 +126,33 @@ public:
     p=NULL;
   }
 };*/
-template <class number_type> class MonRedResNP{
+template <class number_type> class MonRedResNP
+{
 public:
   number coef;
 
 
   DataNoroCacheNode<number_type>* ref;
-  MonRedResNP(){
+  MonRedResNP()
+  {
     ref=NULL;
   }
 };
-struct sorted_pair_node{
+struct sorted_pair_node
+{
   //criterium, which is stable 0. small lcm 1. small i 2. small j
   wlen_type expected_length;
   poly lcm_of_lm;
   int i;
   int j;
   int deg;
- 
-  
+
+
 };
 #ifdef NORO_CACHE
 #ifndef NORO_NON_POLY
-class NoroPlaceHolder{
+class NoroPlaceHolder
+{
 public:
   DataNoroCacheNode* ref;
   number coef;
@@ -151,28 +162,33 @@ public:
 //static ideal debug_Ideal;
 
 
-struct poly_list_node{
+struct poly_list_node
+{
   poly p;
   poly_list_node* next;
 };
 
-struct int_pair_node{
+struct int_pair_node
+{
   int_pair_node* next;
   int a;
   int b;
 };
-struct monom_poly{
+struct monom_poly
+{
   poly m;
   poly f;
 };
-struct mp_array_list{
+struct mp_array_list
+{
   monom_poly* mp;
   int size;
   mp_array_list* next;
 };
 
 
-struct poly_array_list{
+struct poly_array_list
+{
   poly* p;
   int size;
   poly_array_list* next;
@@ -181,7 +197,7 @@ class slimgb_alg
 {
   public:
     slimgb_alg(ideal I, int syz_comp,BOOLEAN F4,int deg_pos);
-		void introduceDelayedPairs(poly* pa,int s);
+                void introduceDelayedPairs(poly* pa,int s);
     virtual ~slimgb_alg();
     void cleanDegs(int lower, int upper);
 #ifndef HAVE_BOOST
@@ -228,7 +244,7 @@ class slimgb_alg
   int n;
   //! array_lengths should be greater equal n;
   int syz_comp;
-  int array_lengths; 
+  int array_lengths;
   int normal_forms;
   int current_degree;
   int Rcounter;
@@ -253,16 +269,19 @@ class slimgb_alg
   #ifdef TGB_RESORT_PAIRS
   BOOLEAN used_b;
   #endif
-  unsigned long pTotaldegree(poly p){
+  unsigned long pTotaldegree(poly p)
+  {
       pTest(p);
       //assume(pDeg(p,r)==::pTotaldegree(p,r));
-      assume(::pTotaldegree(p,r)==p->exp[deg_pos]);
+      assume(((unsigned long)::pTotaldegree(p,r))==p->exp[deg_pos]);
       return p->exp[deg_pos];
       //return ::pTotaldegree(p,this->r);
   }
-  int pTotaldegree_full(poly p){
+  int pTotaldegree_full(poly p)
+  {
     int r=0;
-    while(p){
+    while(p)
+    {
       int d=this->pTotaldegree(p);
       r=si_max(r,d);
       pIter(p);
@@ -270,7 +289,8 @@ class slimgb_alg
     return r;
   }
 };
-class red_object{
+class red_object
+{
  public:
   kBucket_pt bucket;
   poly p;
@@ -339,7 +359,8 @@ int kFindDivisibleByInS_easy(kStrategy strat,poly p, long sev);
 /**
    makes on each red_object in a region a single_step
  **/
-class reduction_step{
+class reduction_step
+{
  public:
   /// we assume hat all occuring red_objects have same lm, and all
   /// occ. lm's in r[l...u] are the same, only reductor does not occur
@@ -349,13 +370,15 @@ class reduction_step{
   slimgb_alg* c;
   int reduction_id;
 };
-class simple_reducer:public reduction_step{
+class simple_reducer:public reduction_step
+{
  public:
   poly p;
   kBucket_pt fill_back;
   int p_len;
   int reducer_deg;
-  simple_reducer(poly p, int p_len,int reducer_deg, slimgb_alg* c =NULL){
+  simple_reducer(poly p, int p_len,int reducer_deg, slimgb_alg* c =NULL)
+  {
     this->p=p;
     this->reducer_deg=reducer_deg;
     assume(p_len==pLength(p));
@@ -373,7 +396,8 @@ class simple_reducer:public reduction_step{
 //class sum_canceling_reducer:public reduction_step {
 //  void reduce(red_object* r, int l, int u);
 //};
-struct find_erg{
+struct find_erg
+{
   poly expand;
   int expand_length;
   int to_reduce_u;
@@ -386,7 +410,8 @@ struct find_erg{
 static void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c);
 static void finalize_reduction_step(reduction_step* r);
 
-template <class len_type, class set_type>  int pos_helper(kStrategy strat, poly p, len_type len, set_type setL, polyset set){
+template <class len_type, class set_type>  int pos_helper(kStrategy strat, poly p, len_type len, set_type setL, polyset set)
+{
   //Print("POSHELER:%d",sizeof(wlen_type));
   int length=strat->sl;
   int i;
@@ -420,33 +445,42 @@ template <class len_type, class set_type>  int pos_helper(kStrategy strat, poly 
 typedef unsigned short tgb_uint16;
 typedef unsigned char tgb_uint8;
 typedef unsigned int tgb_uint32;
-class NoroCacheNode{
+class NoroCacheNode
+{
 public:
   NoroCacheNode** branches;
   int branches_len;
 
-  
-  NoroCacheNode(){
+
+  NoroCacheNode()
+  {
     branches=NULL;
     branches_len=0;
-    
+
   }
-  NoroCacheNode* setNode(int branch, NoroCacheNode* node){
-    if (branch>=branches_len){
-      if (branches==NULL){
+  NoroCacheNode* setNode(int branch, NoroCacheNode* node)
+  {
+    if (branch>=branches_len)
+    {
+      if (branches==NULL)
+      {
         branches_len=branch+1;
         branches_len=si_max(branches_len,3);
         branches=(NoroCacheNode**) omalloc(branches_len*sizeof(NoroCacheNode*));
         int i;
-        for(i=0;i<branches_len;i++){
+        for(i=0;i<branches_len;i++)
+        {
           branches[i]=NULL;
         }
-      }else{
+      }
+      else
+      {
         int branches_len_old=branches_len;
         branches_len=branch+1;
         branches=(NoroCacheNode**) omrealloc(branches,branches_len*sizeof(NoroCacheNode*));
         int i;
-        for(i=branches_len_old;i<branches_len;i++){
+        for(i=branches_len_old;i<branches_len;i++)
+        {
           branches[i]=NULL;
         }
       }
@@ -455,21 +489,26 @@ public:
     branches[branch]=node;
     return node;
   }
-  NoroCacheNode* getBranch(int branch){
+  NoroCacheNode* getBranch(int branch)
+  {
     if (branch<branches_len) return branches[branch];
     return NULL;
   }
-  virtual ~NoroCacheNode(){
+  virtual ~NoroCacheNode()
+  {
     int i;
-    for(i=0;i<branches_len;i++){
+    for(i=0;i<branches_len;i++)
+    {
       delete branches[i];
     }
     omfree(branches);
   }
-  NoroCacheNode* getOrInsertBranch(int branch){
+  NoroCacheNode* getOrInsertBranch(int branch)
+  {
     if ((branch<branches_len)&&(branches[branch]))
       return branches[branch];
-    else{
+    else
+    {
       return setNode(branch,new NoroCacheNode());
     }
   }
@@ -479,43 +518,51 @@ public:
   number* array;
   int begin;
   int end;
-  DenseRow(){
+  DenseRow()
+  {
     array=NULL;
   }
-  ~DenseRow(){
+  ~DenseRow()
+  {
     omfree(array);
   }
 };
-template <class number_type> class SparseRow{
+template <class number_type> class SparseRow
+{
 public:
   int* idx_array;
   number_type* coef_array;
   int len;
-  SparseRow(){
+  SparseRow()
+  {
     len=0;
     idx_array=NULL;
     coef_array=NULL;
   }
-  SparseRow<number_type>(int n){
+  SparseRow<number_type>(int n)
+  {
     len=n;
     idx_array=(int*) omalloc(n*sizeof(int));
     coef_array=(number_type*) omalloc(n*sizeof(number_type));
   }
-  SparseRow<number_type>(int n, const number_type* source){
+  SparseRow<number_type>(int n, const number_type* source)
+  {
     len=n;
     idx_array=NULL;
     coef_array=(number_type*) omalloc(n*sizeof(number_type));
     memcpy(coef_array,source,n*sizeof(number_type));
   }
-  ~SparseRow<number_type>(){
+  ~SparseRow<number_type>()
+  {
     omfree(idx_array);
     omfree(coef_array);
   }
 };
 
-template <class number_type> class DataNoroCacheNode:public NoroCacheNode{
+template <class number_type> class DataNoroCacheNode:public NoroCacheNode
+{
 public:
-  
+
   int value_len;
   poly value_poly;
   #ifdef NORO_SPARSE_ROWS_PRE
@@ -524,14 +571,16 @@ public:
   DenseRow* row;
   #endif
   int term_index;
-  DataNoroCacheNode(poly p, int len){
+  DataNoroCacheNode(poly p, int len)
+  {
     value_len=len;
     value_poly=p;
     row=NULL;
     term_index=-1;
   }
   #ifdef NORO_SPARSE_ROWS_PRE
-  DataNoroCacheNode(SparseRow<number_type>* row){
+  DataNoroCacheNode(SparseRow<number_type>* row)
+  {
     if (row!=NULL)
       value_len=row->len;
     else
@@ -541,19 +590,21 @@ public:
     term_index=-1;
   }
   #endif
-  ~DataNoroCacheNode(
-  ){
+  ~DataNoroCacheNode()
+  {
     //p_Delete(&value_poly,currRing);
     if (row) delete row;
   }
 };
-template <class number_type> class TermNoroDataNode{
+template <class number_type> class TermNoroDataNode
+{
 public:
   DataNoroCacheNode<number_type>* node;
   poly t;
 };
 
-template <class number_type> class NoroCache{
+template <class number_type> class NoroCache
+{
 public:
   poly temp_term;
 #ifndef NORO_NON_POLY
@@ -569,43 +620,48 @@ public:
   poly* recursionPolyBuffer;
 #endif
   static const int backLinkCode=-222;
-  DataNoroCacheNode<number_type>* insert(poly term, poly nf, int len){
+  DataNoroCacheNode<number_type>* insert(poly term, poly nf, int len)
+  {
     //assume(impl.find(p_Copy(term,currRing))==impl.end());
     //assume(len==pLength(nf));
     assume(npIsOne(p_GetCoeff(term,currRing)));
-    if (term==nf){
+    if (term==nf)
+    {
       term=p_Copy(term,currRing);
 
       ressources.push_back(term);
       nIrreducibleMonomials++;
       return treeInsertBackLink(term);
-      
-    } else{
-      
-      if (nf){
+
+    }
+    else
+    {
+      if (nf)
+      {
         //nf=p_Copy(nf,currRing);
         assume(p_LmCmp(nf,term,currRing)==-1);
         ressources.push_back(nf);
       }
       return treeInsert(term,nf,len);
-      
+
     }
-    
+
     //impl[term]=std::pair<PolySimple,int> (nf,len);
   }
   #ifdef NORO_SPARSE_ROWS_PRE
-  DataNoroCacheNode<number_type>* insert(poly term, SparseRow<number_type>* srow){
+  DataNoroCacheNode<number_type>* insert(poly term, SparseRow<number_type>* srow)
+  {
     //assume(impl.find(p_Copy(term,currRing))==impl.end());
     //assume(len==pLength(nf));
 
       return treeInsert(term,srow);
-      
- 
+
+
     //impl[term]=std::pair<PolySimple,int> (nf,len);
   }
   #endif
-  DataNoroCacheNode<number_type>* insertAndTransferOwnerShip(poly t, ring r){
-    
+  DataNoroCacheNode<number_type>* insertAndTransferOwnerShip(poly t, ring r)
+  {
     ressources.push_back(t);
     DataNoroCacheNode<number_type>* res=treeInsertBackLink(t);
     res->term_index=nIrreducibleMonomials;
@@ -614,7 +670,8 @@ public:
   }
   poly lookup(poly term, BOOLEAN& succ, int & len);
   DataNoroCacheNode<number_type>* getCacheReference(poly term);
-  NoroCache(){
+  NoroCache()
+  {
     buffer=NULL;
 #ifdef NORO_RED_ARRAY_RESERVER
     reserved=0;
@@ -626,27 +683,33 @@ public:
     tempBufferSize=3000;
     tempBuffer=omalloc(tempBufferSize);
   }
-  void ensureTempBufferSize(size_t size){
-    if (tempBufferSize<size){
+  void ensureTempBufferSize(size_t size)
+  {
+    if (tempBufferSize<size)
+    {
       tempBufferSize=2*size;
       omfree(tempBuffer);
       tempBuffer=omalloc(tempBufferSize);
     }
   }
 #ifdef NORO_RED_ARRAY_RESERVER
-  poly* reserve(int n){
+  poly* reserve(int n)
+  {
     poly* res=recursionPolyBuffer+reserved;
     reserved+=n;
     return res;
   }
-  void free(int n){
+  void free(int n)
+  {
     reserved-=n;
   }
 #endif
-  ~NoroCache(){
+  ~NoroCache()
+  {
     int s=ressources.size();
     int i;
-    for(i=0;i<s;i++){
+    for(i=0;i<s;i++)
+    {
       p_Delete(&ressources[i].impl,currRing);
     }
     p_Delete(&temp_term,currRing);
@@ -655,44 +718,50 @@ public:
 #endif
    omfree(tempBuffer);
   }
-  
+
   int nIrreducibleMonomials;
   int nReducibleMonomials;
   void* tempBuffer;
   size_t tempBufferSize;
 protected:
-  DataNoroCacheNode<number_type>* treeInsert(poly term,poly nf,int len){
+  DataNoroCacheNode<number_type>* treeInsert(poly term,poly nf,int len)
+  {
     int i;
     nReducibleMonomials++;
     int nvars=pVariables;
     NoroCacheNode* parent=&root;
-    for(i=1;i<nvars;i++){
+    for(i=1;i<nvars;i++)
+    {
       parent=parent->getOrInsertBranch(p_GetExp(term,i,currRing));
     }
     return (DataNoroCacheNode<number_type>*) parent->setNode(p_GetExp(term,nvars,currRing),new DataNoroCacheNode<number_type>(nf,len));
   }
   #ifdef NORO_SPARSE_ROWS_PRE
-  DataNoroCacheNode<number_type>* treeInsert(poly term,SparseRow<number_type>* srow){
+  DataNoroCacheNode<number_type>* treeInsert(poly term,SparseRow<number_type>* srow)
+  {
     int i;
     nReducibleMonomials++;
     int nvars=pVariables;
     NoroCacheNode* parent=&root;
-    for(i=1;i<nvars;i++){
+    for(i=1;i<nvars;i++)
+    {
       parent=parent->getOrInsertBranch(p_GetExp(term,i,currRing));
     }
     return (DataNoroCacheNode<number_type>*) parent->setNode(p_GetExp(term,nvars,currRing),new DataNoroCacheNode<number_type>(srow));
   }
   #endif
-  DataNoroCacheNode<number_type>* treeInsertBackLink(poly term){
+  DataNoroCacheNode<number_type>* treeInsertBackLink(poly term)
+  {
     int i;
     int nvars=pVariables;
     NoroCacheNode* parent=&root;
-    for(i=1;i<nvars;i++){
+    for(i=1;i<nvars;i++)
+    {
       parent=parent->getOrInsertBranch(p_GetExp(term,i,currRing));
     }
     return (DataNoroCacheNode<number_type>*) parent->setNode(p_GetExp(term,nvars,currRing),new DataNoroCacheNode<number_type>(term,backLinkCode));
   }
-  
+
   //@TODO descruct nodes;
   typedef std::vector<PolySimple> poly_vec;
   poly_vec ressources;
@@ -708,19 +777,19 @@ template<class number_type> MonRedResNP<number_type> noro_red_mon_to_non_poly(po
 
 
     DataNoroCacheNode<number_type>* ref=cache->getCacheReference(t);
-    if (ref!=NULL){
-
-
+    if (ref!=NULL)
+    {
       res_holder.coef=p_GetCoeff(t,c->r);
-      
+
       res_holder.ref=ref;
       p_Delete(&t,c->r);
       return res_holder;
     }
- 
+
   unsigned long sev=p_GetShortExpVector(t,currRing);
   int i=kFindDivisibleByInS_easy(c->strat,t,sev);
-  if (i>=0){
+  if (i>=0)
+  {
     number coef_bak=p_GetCoeff(t,c->r);
 
     p_SetCoeff(t,npInit(1),c->r);
@@ -752,20 +821,22 @@ template<class number_type> MonRedResNP<number_type> noro_red_mon_to_non_poly(po
     number coef_bak=p_GetCoeff(t,c->r);
     number one=npInit(1);
     p_SetCoeff(t,one,c->r);
- 
+
     res_holder.ref=cache->insertAndTransferOwnerShip(t,c->r);
     assume(res_holder.ref!=NULL);
     res_holder.coef=coef_bak;
-   
+
     return res_holder;
-    
+
   }
 
 }
 /*
-poly tree_add(poly* a,int begin, int end,ring r){
+poly tree_add(poly* a,int begin, int end,ring r)
+{
   int d=end-begin;
-  switch(d){
+  switch(d)
+  {
     case 0:
       return NULL;
     case 1:
@@ -795,7 +866,7 @@ int* it_idx=res->idx_array;
 #if 0
 for(i=0;i<cache->nIrreducibleMonomials;i++){
   if (!(0==temp_array[i])){
-  
+
     res->idx_array[pos]=i;
     res->coef_array[pos]=temp_array[i];
 
@@ -803,7 +874,7 @@ for(i=0;i<cache->nIrreducibleMonomials;i++){
     non_zeros--;
     if (non_zeros==0) break;
   }
-  
+
 }
 #else
 int64* start=(int64*) ((void*)temp_array);
@@ -812,7 +883,7 @@ const int multiple=sizeof(int64)/sizeof(number_type);
 if (temp_size==0) end=start;
 
 else
-{ 
+{
   int temp_size_rounded=temp_size+(multiple-(temp_size%multiple));
   assume(temp_size_rounded>=temp_size);
   assume(temp_size_rounded%multiple==0);
@@ -821,25 +892,29 @@ else
   end=(int64*)((void*)nt_end);
 }
 int64* it=start;
-while(it!=end){
-  if UNLIKELY((*it)!=0){
+while(it!=end)
+{
+  if UNLIKELY((*it)!=0)
+  {
     int small_i;
     const int temp_index=((number_type*)((void*) it))-temp_array;
     const int bound=temp_index+multiple;
     number_type c;
-    for(small_i=temp_index;small_i<bound;small_i++){
-      if((c=temp_array[small_i])!=0){
+    for(small_i=temp_index;small_i<bound;small_i++)
+    {
+      if((c=temp_array[small_i])!=0)
+      {
         //res->idx_array[pos]=small_i;
         //res->coef_array[pos]=temp_array[small_i];
         (*(it_idx++))=small_i;
         (*(it_coef++))=c;
         //pos++;
         non_zeros--;
-        
+
       }
       if UNLIKELY(non_zeros==0) break;
     }
-    
+
   }
   ++it;
 }
@@ -847,7 +922,8 @@ while(it!=end){
 return res;
 }
 template <class number_type> void add_coef_times_sparse(number_type* const temp_array,
-int temp_size,SparseRow<number_type>* row, number coef){
+int temp_size,SparseRow<number_type>* row, number coef)
+{
   int j;
   number_type* const coef_array=row->coef_array;
   int* const idx_array=row->idx_array;
@@ -856,33 +932,39 @@ int temp_size,SparseRow<number_type>* row, number coef){
   const tgb_uint32 prime=npPrimeM;
   const tgb_uint32 c=F4mat_to_number_type(coef);
   assume(!(npIsZero(coef)));
-  for(j=0;j<len;j=j+256){
+  for(j=0;j<len;j=j+256)
+  {
     const int bound=std::min(j+256,len);
     int i;
     int bpos=0;
-    for(i=j;i<bound;i++){
+    for(i=j;i<bound;i++)
+    {
       buffer[bpos++]=coef_array[i];
     }
     int bpos_bound=bound-j;
-    for(i=0;i<bpos_bound;i++){
+    for(i=0;i<bpos_bound;i++)
+    {
        buffer[i]*=c;
      }
-    for(i=0;i<bpos_bound;i++){
+    for(i=0;i<bpos_bound;i++)
+    {
        buffer[i]=buffer[i]%prime;
     }
     bpos=0;
-    for(i=j;i<bound;i++){
+    for(i=j;i<bound;i++)
+    {
       int idx=idx_array[i];
       assume(bpos<256);
       assume(!(npIsZero((number) buffer[bpos])));
       temp_array[idx]=F4mat_to_number_type(npAddM((number) temp_array[idx], (number) buffer[bpos++]));
       assume(idx<temp_size);
     }
-    
+
   }
 }
 template <class number_type> void add_coef_times_dense(number_type* const temp_array,
-int temp_size,const number_type* row, int len,number coef){
+int temp_size,const number_type* row, int len,number coef)
+{
   int j;
   const number_type* const coef_array=row;
   //int* const idx_array=row->idx_array;
@@ -891,33 +973,39 @@ int temp_size,const number_type* row, int len,number coef){
   const tgb_uint32 prime=npPrimeM;
   const tgb_uint32 c=F4mat_to_number_type(coef);
   assume(!(npIsZero(coef)));
-  for(j=0;j<len;j=j+256){
+  for(j=0;j<len;j=j+256)
+  {
     const int bound=std::min(j+256,len);
     int i;
     int bpos=0;
-    for(i=j;i<bound;i++){
+    for(i=j;i<bound;i++)
+    {
       buffer[bpos++]=coef_array[i];
     }
     int bpos_bound=bound-j;
-    for(i=0;i<bpos_bound;i++){
+    for(i=0;i<bpos_bound;i++)
+    {
        buffer[i]*=c;
      }
-    for(i=0;i<bpos_bound;i++){
+    for(i=0;i<bpos_bound;i++)
+    {
        buffer[i]=buffer[i]%prime;
     }
     bpos=0;
-    for(i=j;i<bound;i++){
+    for(i=j;i<bound;i++)
+    {
       //int idx=idx_array[i];
       assume(bpos<256);
       //assume(!(npIsZero((number) buffer[bpos])));
       temp_array[i]=F4mat_to_number_type(npAddM((number) temp_array[i], (number) buffer[bpos++]));
       assume(i<temp_size);
     }
-    
+
   }
 }
 template <class number_type> void add_dense(number_type* const temp_array,
-int temp_size,const number_type* row, int len){
+int temp_size,const number_type* row, int len)
+{
   //int j;
   const number_type* const coef_array=row;
   //int* const idx_array=row->idx_array;
@@ -925,17 +1013,18 @@ int temp_size,const number_type* row, int len){
   tgb_uint32 buffer[256];
   const tgb_uint32 prime=npPrimeM;
   //const tgb_uint32 c=F4mat_to_number_type(coef);
-  
+
   int i;
-  for(i=0;i<len;i++){
-   
+  for(i=0;i<len;i++)
+  {
       temp_array[i]=F4mat_to_number_type(npAddM((number) temp_array[i], (number) row[i]));
       assume(i<temp_size);
-    }
-    
   }
+
+}
 template <class number_type> void sub_dense(number_type* const temp_array,
-int temp_size,const number_type* row, int len){
+int temp_size,const number_type* row, int len)
+{
   //int j;
   const number_type* const coef_array=row;
   //int* const idx_array=row->idx_array;
@@ -943,41 +1032,47 @@ int temp_size,const number_type* row, int len){
   tgb_uint32 buffer[256];
   const tgb_uint32 prime=npPrimeM;
   //const tgb_uint32 c=F4mat_to_number_type(coef);
-  
+
   int i;
-  for(i=0;i<len;i++){
-   
+  for(i=0;i<len;i++)
+  {
+
       temp_array[i]=F4mat_to_number_type(npSubM((number) temp_array[i], (number) row[i]));
       assume(i<temp_size);
-    }
-    
   }
 
-template <class number_type> void add_sparse(number_type* const temp_array,int temp_size,SparseRow<number_type>* row){
+}
+
+template <class number_type> void add_sparse(number_type* const temp_array,int temp_size,SparseRow<number_type>* row)
+{
   int j;
 
           number_type* const coef_array=row->coef_array;
           int* const idx_array=row->idx_array;
           const int len=row->len;
-        for(j=0;j<len;j++){
+        for(j=0;j<len;j++)
+        {
           int idx=idx_array[j];
           temp_array[idx]=F4mat_to_number_type(   npAddM((number) temp_array[idx],(number) coef_array[j]));
           assume(idx<temp_size);
         }
 }
-template <class number_type> void sub_sparse(number_type* const temp_array,int temp_size,SparseRow<number_type>* row){
+template <class number_type> void sub_sparse(number_type* const temp_array,int temp_size,SparseRow<number_type>* row)
+{
   int j;
 
           number_type* const coef_array=row->coef_array;
           int* const idx_array=row->idx_array;
           const int len=row->len;
-        for(j=0;j<len;j++){
+        for(j=0;j<len;j++)
+        {
           int idx=idx_array[j];
           temp_array[idx]=F4mat_to_number_type(   npSubM((number) temp_array[idx],(number) coef_array[j]));
           assume(idx<temp_size);
         }
 }
-template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_dense(MonRedResNP<number_type>* mon, int len,NoroCache<number_type>* cache){
+template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_dense(MonRedResNP<number_type>* mon, int len,NoroCache<number_type>* cache)
+{
   size_t temp_size_bytes=cache->nIrreducibleMonomials*sizeof(number_type)+8;//use 8bit int for testing
    assume(sizeof(int64)==8);
    cache->ensureTempBufferSize(temp_size_bytes);
@@ -986,53 +1081,68 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_dense(
    memset(temp_array,0,temp_size_bytes);
    number minus_one=npInit(-1);
    int i;
-   for(i=0;i<len;i++){
+   for(i=0;i<len;i++)
+   {
      MonRedResNP<number_type> red=mon[i];
-     if ((red.ref)){
-       if (red.ref->row){
+     if ((red.ref))
+     {
+       if (red.ref->row)
+       {
          SparseRow<number_type>* row=red.ref->row;
          number coef=red.coef;
          int j;
-         if (row->idx_array){
-         if (!((coef==(number) 1)||(coef==minus_one))){
-           add_coef_times_sparse(temp_array,temp_size,row,coef);
-
-
-
-         }else{
-           if (coef==(number) 1){
-              add_sparse(temp_array,temp_size,row);
-           } else {
-
-             sub_sparse(temp_array,temp_size,row);
+         if (row->idx_array)
+         {
+           if (!((coef==(number) 1)||(coef==minus_one)))
+           {
+             add_coef_times_sparse(temp_array,temp_size,row,coef);
+           }
+           else
+           {
+             if (coef==(number) 1)
+             {
+               add_sparse(temp_array,temp_size,row);
+             }
+             else
+             {
+               sub_sparse(temp_array,temp_size,row);
+             }
            }
          }
-       } else 
-       //TODO: treat, 1,-1
-       if (!((coef==(number) 1)||(coef==minus_one))){
-         add_coef_times_dense(temp_array,temp_size,row->coef_array,row->len,coef);
-       } else {
-         if (coef==(number)1)
-           add_dense(temp_array,temp_size,row->coef_array,row->len);
-         else{
-           assume(coef==minus_one);
-           sub_dense(temp_array,temp_size,row->coef_array,row->len);
-           //add_coef_times_dense(temp_array,temp_size,row->coef_array,row->len,coef);
+         else
+         //TODO: treat, 1,-1
+         if (!((coef==(number) 1)||(coef==minus_one)))
+         {
+          add_coef_times_dense(temp_array,temp_size,row->coef_array,row->len,coef);
+         }
+         else
+         {
+           if (coef==(number)1)
+             add_dense(temp_array,temp_size,row->coef_array,row->len);
+           else
+           {
+             assume(coef==minus_one);
+             sub_dense(temp_array,temp_size,row->coef_array,row->len);
+             //add_coef_times_dense(temp_array,temp_size,row->coef_array,row->len,coef);
+           }
          }
        }
-       }
-       
-       else{
-         if (red.ref->value_len==NoroCache<number_type>::backLinkCode){
+       else
+       {
+         if (red.ref->value_len==NoroCache<number_type>::backLinkCode)
+         {
            temp_array[red.ref->term_index]=F4mat_to_number_type( npAddM((number) temp_array[red.ref->term_index],red.coef));
-         } else {
+         }
+         else
+         {
            //PrintS("third case\n");
          }
        }
      }
    }
    int non_zeros=0;
-   for(i=0;i<cache->nIrreducibleMonomials;i++){
+   for(i=0;i<cache->nIrreducibleMonomials;i++)
+   {
      //if (!(temp_array[i]==0)){
      //  non_zeros++;
      //}
@@ -1040,7 +1150,8 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_dense(
      non_zeros+=(temp_array[i]!=0);
    }
 
-   if (non_zeros==0){
+   if (non_zeros==0)
+   {
      //omfree(mon);
      return NULL;
    }
@@ -1048,20 +1159,24 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_dense(
 
    //omfree(temp_array);
 
-   
+
    return res;
 }
-template<class number_type> class CoefIdx{
+template<class number_type> class CoefIdx
+{
 public:
   number_type coef;
   int idx;
-  bool operator<(const CoefIdx<number_type>& other) const{
+  bool operator<(const CoefIdx<number_type>& other) const
+  {
     return (idx<other.idx);
   }
 };
-template<class number_type> void write_coef_times_xx_idx_to_buffer(CoefIdx<number_type>* const pairs,int& pos,int* const idx_array, number_type* const coef_array,const int rlen, const number coef){
+template<class number_type> void write_coef_times_xx_idx_to_buffer(CoefIdx<number_type>* const pairs,int& pos,int* const idx_array, number_type* const coef_array,const int rlen, const number coef)
+{
   int j;
-  for(j=0;j<rlen;j++){
+  for(j=0;j<rlen;j++)
+  {
     assume(coef_array[j]!=0);
     CoefIdx<number_type> ci;
     ci.coef=F4mat_to_number_type(npMultM((number) coef,(number) coef_array[j]));
@@ -1069,52 +1184,63 @@ template<class number_type> void write_coef_times_xx_idx_to_buffer(CoefIdx<numbe
     pairs[pos++]=ci;
   }
 }
-template<class number_type> void write_coef_times_xx_idx_to_buffer_dense(CoefIdx<number_type>* const pairs,int& pos, number_type* const coef_array,const int rlen, const number coef){
+template<class number_type> void write_coef_times_xx_idx_to_buffer_dense(CoefIdx<number_type>* const pairs,int& pos, number_type* const coef_array,const int rlen, const number coef)
+{
   int j;
-  
-  for(j=0;j<rlen;j++){
-    if (coef_array[j]!=0){
-    assume(coef_array[j]!=0);
-    CoefIdx<number_type> ci;
-    ci.coef=F4mat_to_number_type(npMultM((number) coef,(number) coef_array[j]));
-    assume(ci.coef!=0);
-    ci.idx=j;
-    pairs[pos++]=ci;
-  }
+
+  for(j=0;j<rlen;j++)
+  {
+    if (coef_array[j]!=0)
+    {
+      assume(coef_array[j]!=0);
+      CoefIdx<number_type> ci;
+      ci.coef=F4mat_to_number_type(npMultM((number) coef,(number) coef_array[j]));
+      assume(ci.coef!=0);
+      ci.idx=j;
+      pairs[pos++]=ci;
+    }
   }
 }
-template<class number_type> void write_coef_idx_to_buffer_dense(CoefIdx<number_type>* const pairs,int& pos, number_type* const coef_array,const int rlen){
+template<class number_type> void write_coef_idx_to_buffer_dense(CoefIdx<number_type>* const pairs,int& pos, number_type* const coef_array,const int rlen)
+{
   int j;
-  
-  for(j=0;j<rlen;j++){
-    if (coef_array[j]!=0){
-    assume(coef_array[j]!=0);
-    CoefIdx<number_type> ci;
-    ci.coef=coef_array[j];
-    assume(ci.coef!=0);
-    ci.idx=j;
-    pairs[pos++]=ci;
-  }
+
+  for(j=0;j<rlen;j++)
+  {
+    if (coef_array[j]!=0)
+    {
+      assume(coef_array[j]!=0);
+      CoefIdx<number_type> ci;
+      ci.coef=coef_array[j];
+      assume(ci.coef!=0);
+      ci.idx=j;
+      pairs[pos++]=ci;
+    }
   }
 }
 
-template<class number_type> void write_minus_coef_idx_to_buffer_dense(CoefIdx<number_type>* const pairs,int& pos, number_type* const coef_array,const int rlen){
+template<class number_type> void write_minus_coef_idx_to_buffer_dense(CoefIdx<number_type>* const pairs,int& pos, number_type* const coef_array,const int rlen)
+{
   int j;
-  
-  for(j=0;j<rlen;j++){
-    if (coef_array[j]!=0){
-    assume(coef_array[j]!=0);
-    CoefIdx<number_type> ci;
-    ci.coef=F4mat_to_number_type(npNegM((number) coef_array[j]));
-    assume(ci.coef!=0);
-    ci.idx=j;
-    pairs[pos++]=ci;
-  }
+
+  for(j=0;j<rlen;j++)
+  {
+    if (coef_array[j]!=0)
+    {
+      assume(coef_array[j]!=0);
+      CoefIdx<number_type> ci;
+      ci.coef=F4mat_to_number_type(npNegM((number) coef_array[j]));
+      assume(ci.coef!=0);
+      ci.idx=j;
+      pairs[pos++]=ci;
+    }
   }
 }
-template<class number_type> void write_coef_idx_to_buffer(CoefIdx<number_type>* const pairs,int& pos,int* const idx_array, number_type* const coef_array,const int rlen){
+template<class number_type> void write_coef_idx_to_buffer(CoefIdx<number_type>* const pairs,int& pos,int* const idx_array, number_type* const coef_array,const int rlen)
+{
   int j;
-  for(j=0;j<rlen;j++){
+  for(j=0;j<rlen;j++)
+  {
     assume(coef_array[j]!=0);
     CoefIdx<number_type> ci;
     ci.coef=coef_array[j];
@@ -1123,9 +1249,11 @@ template<class number_type> void write_coef_idx_to_buffer(CoefIdx<number_type>* 
   }
 }
 
-template<class number_type> void write_minus_coef_idx_to_buffer(CoefIdx<number_type>* const pairs,int& pos,int* const idx_array, number_type* const coef_array,const int rlen){
+template<class number_type> void write_minus_coef_idx_to_buffer(CoefIdx<number_type>* const pairs,int& pos,int* const idx_array, number_type* const coef_array,const int rlen)
+{
   int j;
-  for(j=0;j<rlen;j++){
+  for(j=0;j<rlen;j++)
+  {
     assume(coef_array[j]!=0);
     CoefIdx<number_type> ci;
     ci.coef=F4mat_to_number_type(npNegM(coef_array[j]));
@@ -1133,63 +1261,83 @@ template<class number_type> void write_minus_coef_idx_to_buffer(CoefIdx<number_t
     pairs[pos++]=ci;
   }
 }
-template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_sparse(MonRedResNP<number_type>* mon, int len,NoroCache<number_type>* cache){
+template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_sparse(MonRedResNP<number_type>* mon, int len,NoroCache<number_type>* cache)
+{
   int i;
-int together=0;
-for(i=0;i<len;i++){
-  MonRedResNP<number_type> red=mon[i];
-  if ((red.ref) &&( red.ref->row)){
-    together+=red.ref->row->len;
-    } else {
+  int together=0;
+  for(i=0;i<len;i++)
+  {
+    MonRedResNP<number_type> red=mon[i];
+    if ((red.ref) &&( red.ref->row))
+    {
+      together+=red.ref->row->len;
+    }
+    else
+    {
       if ((red.ref) &&(red.ref->value_len==NoroCache<number_type>::backLinkCode))
       together++;
+    }
   }
-
-}
   //PrintS("here\n");
-if (together==0) return 0;
+  if (together==0) return 0;
   //PrintS("there\n");
-cache->ensureTempBufferSize(together*sizeof(CoefIdx<number_type>));
-CoefIdx<number_type>* pairs=(CoefIdx<number_type>*) cache->tempBuffer; //omalloc(together*sizeof(CoefIdx<number_type>));
-int pos=0;
-int j;
-const number one=npInit(1);
-const number minus_one=npInit(-1);
-for(i=0;i<len;i++){
-  MonRedResNP<number_type> red=mon[i];
-  if ((red.ref) &&( red.ref->row)){
+  cache->ensureTempBufferSize(together*sizeof(CoefIdx<number_type>));
+  CoefIdx<number_type>* pairs=(CoefIdx<number_type>*) cache->tempBuffer; //omalloc(together*sizeof(CoefIdx<number_type>));
+  int pos=0;
+  int j;
+  const number one=npInit(1);
+  const number minus_one=npInit(-1);
+  for(i=0;i<len;i++)
+  {
+    MonRedResNP<number_type> red=mon[i];
+    if ((red.ref) &&( red.ref->row))
+    {
       //together+=red.ref->row->len;
-    int* idx_array=red.ref->row->idx_array;
-    number_type* coef_array=red.ref->row->coef_array;
-    int rlen=red.ref->row->len;
-    number coef=red.coef;
-    if (idx_array){
-      if ((coef!=one)&&(coef!=minus_one)){
-        write_coef_times_xx_idx_to_buffer(pairs,pos,idx_array, coef_array,rlen, coef);
-        } else
+      int* idx_array=red.ref->row->idx_array;
+      number_type* coef_array=red.ref->row->coef_array;
+      int rlen=red.ref->row->len;
+      number coef=red.coef;
+      if (idx_array)
+      {
+        if ((coef!=one)&&(coef!=minus_one))
         {
-          if (coef==one){
+          write_coef_times_xx_idx_to_buffer(pairs,pos,idx_array, coef_array,rlen, coef);
+        }
+        else
+        {
+          if (coef==one)
+          {
             write_coef_idx_to_buffer(pairs,pos,idx_array, coef_array,rlen);
-          } else {
+          }
+          else
+          {
             assume(coef==minus_one);
             write_minus_coef_idx_to_buffer(pairs,pos,idx_array, coef_array,rlen);
           }
         }
-      } else{
-        if ((coef!=one)&&(coef!=minus_one)){ 
+      }
+      else
+      {
+        if ((coef!=one)&&(coef!=minus_one))
+        {
           write_coef_times_xx_idx_to_buffer_dense(pairs,pos,coef_array,rlen,coef);
-        } else{
+        }
+        else
+        {
           if (coef==one)
             write_coef_idx_to_buffer_dense(pairs,pos,coef_array,rlen);
-          else {
+          else
+          {
             assume(coef==minus_one);
             write_minus_coef_idx_to_buffer_dense(pairs,pos,coef_array,rlen);
           }
         }
       }
     }
-    else {
-      if ((red.ref) &&(red.ref->value_len==NoroCache<number_type>::backLinkCode)){
+    else
+    {
+      if ((red.ref) &&(red.ref->value_len==NoroCache<number_type>::backLinkCode))
+      {
         CoefIdx<number_type> ci;
         ci.coef=F4mat_to_number_type(red.coef);
         ci.idx=red.ref->term_index;
@@ -1205,19 +1353,24 @@ for(i=0;i<len;i++){
   int act=0;
 
   assume(pairs[0].coef!=0);
-  for(i=1;i<together;i++){
-    if (pairs[i].idx!=pairs[act].idx){
-      if (pairs[act].coef!=0){
+  for(i=1;i<together;i++)
+  {
+    if (pairs[i].idx!=pairs[act].idx)
+    {
+      if (pairs[act].coef!=0)
+      {
         act=act+1;
       }
       pairs[act]=pairs[i];
-    } else{
+    }
+    else
+    {
       pairs[act].coef=F4mat_to_number_type(npAddM((number)pairs[act].coef,(number)pairs[i].coef));
     }
   }
 
-  if (pairs[act].coef==0){
-
+  if (pairs[act].coef==0)
+  {
     act--;
   }
   int sparse_row_len=act+1;
@@ -1227,7 +1380,8 @@ for(i=0;i<len;i++){
   {
     number_type* coef_array=res->coef_array;
     int* idx_array=res->idx_array;
-    for(i=0;i<sparse_row_len;i++){
+    for(i=0;i<sparse_row_len;i++)
+    {
       idx_array[i]=pairs[i].idx;
       coef_array[i]=pairs[i].coef;
     }
@@ -1243,7 +1397,7 @@ template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly
     len=0;
     return NULL;
   }
-  
+
   number zero=npInit(0);
   MonRedResNP<number_type>* mon=(MonRedResNP<number_type>*) omalloc(len*sizeof(MonRedResNP<number_type>));
   int i=0;
@@ -1253,7 +1407,7 @@ template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly
     poly t=p;
     pIter(p);
     pNext(t)=NULL;
-    
+
 #ifndef NDEBUG
     number coef_debug=p_GetCoeff(t,currRing);
 #endif
@@ -1266,7 +1420,7 @@ template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly
     mon[i]=red;
     i++;
   }
-  
+
   assume(i==len);
   len=i;
   bool dense=true;
@@ -1281,7 +1435,7 @@ template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly
       return res;
     }
   //in the loop before nIrreducibleMonomials increases, so position here is important
- 
+
 }
 #endif
 static wlen_type pair_weighted_length(int i, int j, slimgb_alg* c);
@@ -1318,29 +1472,34 @@ template <class number_type > poly row_to_poly(number_type* row, poly* terms, in
       pNext(t)=h;
       h=t;
     }
-    
+
   }
   return h;
 }
-template <class number_type > int modP_lastIndexRow(number_type* row,int ncols){
+template <class number_type > int modP_lastIndexRow(number_type* row,int ncols)
+{
   int lastIndex;
   const number_type zero=0;//npInit(0);
-  for(lastIndex=ncols-1;lastIndex>=0;lastIndex--){
-    if (!(row[lastIndex]==zero)){
+  for(lastIndex=ncols-1;lastIndex>=0;lastIndex--)
+  {
+    if (!(row[lastIndex]==zero))
+    {
       return lastIndex;
     }
   }
   return -1;
 }
-template <class number_type> int term_nodes_sort_crit(const void* a, const void* b){
+template <class number_type> int term_nodes_sort_crit(const void* a, const void* b)
+{
   return -pLmCmp(((TermNoroDataNode<number_type>*) a)->t,((TermNoroDataNode<number_type>*) b)->t);
 }
 
 template <class number_type>class ModPMatrixBackSubstProxyOnArray;
-template <class number_type > class ModPMatrixProxyOnArray{
+template <class number_type > class ModPMatrixProxyOnArray
+{
 public:
   friend class ModPMatrixBackSubstProxyOnArray<number_type>;
-               
+
   int ncols,nrows;
   ModPMatrixProxyOnArray(number_type* array, int nrows, int ncols){
     this->ncols=ncols;
@@ -1348,17 +1507,20 @@ public:
     rows=(number_type**) omalloc(nrows*sizeof(number_type*));
     startIndices=(int*)omalloc(nrows*sizeof(int));
     int i;
-    for(i=0;i<nrows;i++){
+    for(i=0;i<nrows;i++)
+    {
       rows[i]=array+(i*ncols);
       updateStartIndex(i,-1);
     }
   }
-  ~ModPMatrixProxyOnArray(){
+  ~ModPMatrixProxyOnArray()
+  {
     omfree(rows);
     omfree(startIndices);
   }
-  
-  void permRows(int i, int j){
+
+  void permRows(int i, int j)
+  {
     number_type* h=rows[i];
     rows[i]=rows[j];
     rows[j]=h;
@@ -1366,15 +1528,17 @@ public:
     startIndices[i]=startIndices[j];
     startIndices[j]=hs;
   }
-  void multiplyRow(int row, number_type coef){
+  void multiplyRow(int row, number_type coef)
+  {
     int i;
     number_type* row_array=rows[row];
-    for(i=startIndices[row];i<ncols;i++){
+    for(i=startIndices[row];i<ncols;i++)
+    {
       row_array[i]=F4mat_to_number_type(npMult((number) row_array[i],(number) coef));
     }
   }
-  void reduceOtherRowsForward(int r){
-
+  void reduceOtherRowsForward(int r)
+  {
     //assume rows "under r" have bigger or equal start index
     number_type* row_array=rows[r];
     number_type zero=F4mat_to_number_type(npInit(0));
@@ -1388,20 +1552,27 @@ public:
     assume(npIsOne((number) row_array[start]));
     int lastIndex=modP_lastIndexRow(row_array, ncols);
     number minus_one=npInit(-1);
-    for (other_row=r+1;other_row<nrows;other_row++){
+    for (other_row=r+1;other_row<nrows;other_row++)
+    {
       assume(startIndices[other_row]>=start);
-      if (startIndices[other_row]==start){
+      if (startIndices[other_row]==start)
+      {
         int i;
         number_type* other_row_array=rows[other_row];
         number coef2=npNeg((number) other_row_array[start]);
-        if (coef2==minus_one){
-          for(i=start;i<=lastIndex;i++){
+        if (coef2==minus_one)
+        {
+          for(i=start;i<=lastIndex;i++)
+          {
             if (row_array[i]!=zero)
               other_row_array[i]=F4mat_to_number_type(npSubM((number) other_row_array[i], (number) row_array[i]));
           }
-      }else {
+      }
+      else
+      {
           //assume(FALSE);
-          for(i=start;i<=lastIndex;i++){
+          for(i=start;i<=lastIndex;i++)
+          {
             if (row_array[i]!=zero)
             other_row_array[i]=F4mat_to_number_type(npAddM(npMult(coef2,(number) row_array[i]),(number) other_row_array[i]));
           }
@@ -1411,28 +1582,35 @@ public:
       }
     }
   }
-  void updateStartIndex(int row,int lower_bound){
+  void updateStartIndex(int row,int lower_bound)
+  {
     number_type* row_array=rows[row];
     assume((lower_bound<0)||(npIsZero((number) row_array[lower_bound])));
     int i;
     //number_type zero=npInit(0);
-    for(i=lower_bound+1;i<ncols;i++){
+    for(i=lower_bound+1;i<ncols;i++)
+    {
       if (!(row_array[i]==0))
         break;
     }
     startIndices[row]=i;
   }
-  int getStartIndex(int row){
+  int getStartIndex(int row)
+  {
     return startIndices[row];
   }
-  BOOLEAN findPivot(int &r, int &c){
+  BOOLEAN findPivot(int &r, int &c)
+  {
     //row>=r, col>=c
-    
-    while(c<ncols){
+
+    while(c<ncols)
+    {
       int i;
-      for(i=r;i<nrows;i++){
+      for(i=r;i<nrows;i++)
+      {
         assume(startIndices[i]>=c);
-        if (startIndices[i]==c){
+        if (startIndices[i]==c)
+        {
           //r=i;
           if (r!=i)
             permRows(r,i);
@@ -1447,7 +1625,8 @@ protected:
   number_type** rows;
   int* startIndices;
 };
-template <class number_type > class ModPMatrixBackSubstProxyOnArray{
+template <class number_type > class ModPMatrixBackSubstProxyOnArray
+{
   int *startIndices;
   number_type** rows;
   int *lastReducibleIndices;
@@ -1455,14 +1634,17 @@ template <class number_type > class ModPMatrixBackSubstProxyOnArray{
   int nrows;
   int nonZeroUntil;
 public:
-  void multiplyRow(int row, number_type coef){
+  void multiplyRow(int row, number_type coef)
+  {
     int i;
     number_type* row_array=rows[row];
-    for(i=startIndices[row];i<ncols;i++){
+    for(i=startIndices[row];i<ncols;i++)
+    {
       row_array[i]=F4mat_to_number_type(npMult((number) row_array[i],(number) coef));
     }
   }
-  ModPMatrixBackSubstProxyOnArray<number_type> (ModPMatrixProxyOnArray<number_type> & p){
+  ModPMatrixBackSubstProxyOnArray<number_type> (ModPMatrixProxyOnArray<number_type> & p)
+  {
 //  (number_type* array, int nrows, int ncols, int* startIndices, number_type** rows){
     //we borrow some parameters ;-)
     //we assume, that nobody changes the order of the rows
@@ -1474,38 +1656,43 @@ public:
     nonZeroUntil=0;
     while(nonZeroUntil<nrows){
       if (startIndices[nonZeroUntil]<ncols){
-       
+
         nonZeroUntil++;
-      } else break;
-      
+      }
+      else break;
     }
     if (TEST_OPT_PROT)
       Print("rank:%i\n",nonZeroUntil);
     nonZeroUntil--;
     int i;
-    for(i=0;i<=nonZeroUntil;i++){
+    for(i=0;i<=nonZeroUntil;i++)
+    {
       assume(startIndices[i]<ncols);
       assume(!(npIsZero((number) rows[i][startIndices[i]])));
       assume(startIndices[i]>=i);
       updateLastReducibleIndex(i,nonZeroUntil+1);
     }
   }
-  void updateLastReducibleIndex(int r, int upper_bound){
+  void updateLastReducibleIndex(int r, int upper_bound)
+  {
     number_type* row_array=rows[r];
     if (upper_bound>nonZeroUntil) upper_bound=nonZeroUntil+1;
     int i;
     const number_type zero=0;//npInit(0);
-    for(i=upper_bound-1;i>r;i--){
+    for(i=upper_bound-1;i>r;i--)
+    {
       int start=startIndices[i];
       assume(start<ncols);
-      if (!(row_array[start]==zero)){
+      if (!(row_array[start]==zero))
+      {
         lastReducibleIndices[r]=start;
         return;
       }
     }
     lastReducibleIndices[r]=-1;
   }
-  void backwardSubstitute(int r){
+  void backwardSubstitute(int r)
+  {
     int start=startIndices[r];
     assume(start<ncols);
     number_type zero=0;//npInit(0);
@@ -1513,22 +1700,26 @@ public:
     assume((!(npIsZero((number) row_array[start]))));
     assume(start<ncols);
     int other_row;
-    if (!(npIsOne((number) row_array[r]))){
+    if (!(npIsOne((number) row_array[r])))
+    {
       //it should be one, but this safety is not expensive
       multiplyRow(r, F4mat_to_number_type(npInvers((number) row_array[start])));
     }
     int lastIndex=modP_lastIndexRow(row_array, ncols);
     assume(lastIndex<ncols);
     assume(lastIndex>=0);
-    for(other_row=r-1;other_row>=0;other_row--){
+    for(other_row=r-1;other_row>=0;other_row--)
+    {
       assume(lastReducibleIndices[other_row]<=start);
-      if (lastReducibleIndices[other_row]==start){
+      if (lastReducibleIndices[other_row]==start)
+      {
         number_type* other_row_array=rows[other_row];
         number coef=npNeg((number) other_row_array[start]);
         assume(!(npIsZero(coef)));
         int i;
         assume(start>startIndices[other_row]);
-        for(i=start;i<=lastIndex;i++){
+        for(i=start;i<=lastIndex;i++)
+        {
           if (row_array[i]!=zero)
             other_row_array[i]=F4mat_to_number_type(npAddM(npMult(coef,(number)row_array[i]),(number)other_row_array[i]));
         }
@@ -1536,22 +1727,26 @@ public:
       }
     }
   }
-  ~ModPMatrixBackSubstProxyOnArray<number_type>(){
+  ~ModPMatrixBackSubstProxyOnArray<number_type>()
+  {
     omfree(lastReducibleIndices);
   }
-  void backwardSubstitute(){
+  void backwardSubstitute()
+  {
     int i;
-    for(i=nonZeroUntil;i>0;i--){
+    for(i=nonZeroUntil;i>0;i--)
+    {
       backwardSubstitute(i);
     }
   }
 };
-template <class number_type > void simplest_gauss_modp(number_type* a, int nrows,int ncols){
+template <class number_type > void simplest_gauss_modp(number_type* a, int nrows,int ncols)
+{
   //use memmoves for changing rows
   //if (TEST_OPT_PROT)
   //    PrintS("StartGauss\n");
   ModPMatrixProxyOnArray<number_type> mat(a,nrows,ncols);
-  
+
   int c=0;
   int r=0;
   while(mat.findPivot(r,c)){
@@ -1579,7 +1774,7 @@ template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
   SparseRow<number_type> ** srows=(SparseRow<number_type>**) omalloc(pn*sizeof(SparseRow<number_type>*));
   int non_zeros=0;
   for(j=0;j<pn;j++){
-   
+
     poly h=p[j];
     int h_len=pLength(h);
 
@@ -1600,7 +1795,7 @@ template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
     Print("red Mon:%d\n",cache.nReducibleMonomials);
   }
   TermNoroDataNode<number_type>* term_nodes=(TermNoroDataNode<number_type>*) omalloc(n*sizeof(TermNoroDataNode<number_type>));
-  
+
   for(j=0;j<n;j++){
     assume(irr_nodes[j]!=NULL);
     assume(irr_nodes[j]->value_len==NoroCache<number_type>::backLinkCode);
@@ -1608,8 +1803,8 @@ template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
     assume(term_nodes[j].t!=NULL);
     term_nodes[j].node=irr_nodes[j];
   }
-  
-  
+
+
   qsort(term_nodes,n,sizeof(TermNoroDataNode<number_type>),term_nodes_sort_crit<number_type>);
   poly* terms=(poly*) omalloc(n*sizeof(poly));
 
@@ -1644,7 +1839,7 @@ template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
         for(i=0;i<len;i++){
          int idx=old_to_new_indices[idx_array[i]];
          row[idx]=F4mat_to_number_type(coef_array[i]);
-        } 
+        }
       }
       else {
         for(i=0;i<len;i++){
@@ -1654,7 +1849,7 @@ template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
       delete srow;
     }
   }
-  
+
   static int export_n=0;
   //export_mat(number_array,pn,n,"mat%i.py",++export_n);
   simplest_gauss_modp(number_array,pn,n);
@@ -1675,7 +1870,7 @@ template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
   omfree(old_to_new_indices);
   #endif
   //don't forget the rank
-  
+
 }
 
 template <class number_type> void NoroCache<number_type>::collectIrreducibleMonomials( std::vector<DataNoroCacheNode<number_type> *>& res){
@@ -1696,7 +1891,7 @@ template <class number_type> void NoroCache<number_type>::collectIrreducibleMono
     DataNoroCacheNode<number_type>* dn=(DataNoroCacheNode<number_type>*) node;
     if (dn->value_len==backLinkCode){
       res.push_back(dn);
-    } 
+    }
   }
 }
 
