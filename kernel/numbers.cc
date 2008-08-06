@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.17 2008-07-07 12:21:43 wienand Exp $ */
+/* $Id: numbers.cc,v 1.18 2008-08-06 13:55:42 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -81,6 +81,13 @@ void   ndInpMult(number &a, number b, const ring r)
   number n=n_Mult(a,b,r);
   n_Delete(&a,r);
   a=n;
+}
+number ndInpAdd(number &a, number b, const ring r)
+{
+  number n=n_Add(a,b,r);
+  n_Delete(&a,r);
+  a=n;
+  return a;
 }
 
 #ifdef LDEBUG

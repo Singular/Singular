@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.37 2008-07-24 13:36:16 Singular Exp $ */
+/* $Id: longrat.cc,v 1.38 2008-08-06 13:55:41 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -1154,6 +1154,15 @@ number nlGcd(number a, number b, const ring r)
   return result;
 }
 
+number nlShort(number x)
+{
+  if (mpz_cmp_ui(&x->z,(long)0)==0)
+  {
+    nlDelete(&x,currRing);
+    return INT_TO_SR(0);
+  }
+  return x;
+}
 /*2
 * simplify x
 */
@@ -1634,14 +1643,13 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
           case 1:
           {
             MP_INT x;
-            MP_INT y;
             mpz_init(&x);
-            mpz_init(&y);
+
             mpz_mul(&x,&b->z,&a->n);
-            mpz_mul(&y,&a->z,&b->n);
-            mpz_add(&u->z,&x,&y);
+            mpz_mul(&u->z,&a->z,&b->n);
+            mpz_add(&u->z,&u->z,&x);
             mpz_clear(&x);
-            mpz_clear(&y);
+
             if (mpz_cmp_ui(&u->z,(long)0)==0)
             {
               mpz_clear(&u->z);
@@ -1662,11 +1670,8 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
           }
           case 3: /* a:1 b:3 */
           {
-            MP_INT x;
-            mpz_init(&x);
-            mpz_mul(&x,&b->z,&a->n);
-            mpz_add(&u->z,&a->z,&x);
-            mpz_clear(&x);
+            mpz_mul(&u->z,&b->z,&a->n);
+            mpz_add(&u->z,&u->z,&a->z);
             if (mpz_cmp_ui(&u->z,(long)0)==0)
             {
               mpz_clear(&u->z);
@@ -1693,11 +1698,8 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
           case 0:
           case 1:/* a:3, b:1 */
           {
-            MP_INT x;
-            mpz_init(&x);
-            mpz_mul(&x,&a->z,&b->n);
-            mpz_add(&u->z,&b->z,&x);
-            mpz_clear(&x);
+            mpz_mul(&u->z,&a->z,&b->n);
+            mpz_add(&u->z,&u->z,&b->z);
             if (mpz_cmp_ui(&u->z,(long)0)==0)
             {
               mpz_clear(&u->z);
@@ -2248,6 +2250,7 @@ LINLINE BOOLEAN nlIsOne (number a)
 LINLINE BOOLEAN nlIsZero (number a)
 {
   return (a==INT_TO_SR(0));
+  //return (mpz_cmp_si(&a->z,(long)0)==0);
 }
 
 /*2
@@ -2321,6 +2324,163 @@ LINLINE number nlAdd (number a, number b)
   return _nlAdd_aNoImm_OR_bNoImm(a, b);
 }
 
+number nlShort(number x);
+
+LINLINE number nlInpAdd (number a, number b, const ring r)
+{
+  if (SR_HDL(a) & SR_HDL(b) & SR_INT)
+  {
+    int r=SR_HDL(a)+SR_HDL(b)-1;
+    if ( ((r << 1) >> 1) == r )
+      return (number)(long)r;
+    else
+      return nlRInit(SR_TO_INT(r));
+  }
+  // a=a+b
+  if (SR_HDL(b) & SR_INT)
+  {
+    switch (a->s)
+    {
+      case 0:
+      case 1:/* b:short, a:1 */
+      {
+        MP_INT x;
+        mpz_init(&x);
+        mpz_mul_si(&x,&a->n,SR_TO_INT(b));
+        mpz_add(&a->z,&a->z,&x);
+        mpz_clear(&x);
+        a->s = 0;
+        nlNormalize(a);
+        break;
+      }
+      case 3:
+      {
+        if ((long)b>0L)
+          mpz_add_ui(&a->z,&a->z,SR_TO_INT(b));
+        else
+          mpz_sub_ui(&a->z,&a->z,-SR_TO_INT(b));
+        a->s = 3;
+        a=nlShort(a);
+        break;
+      }
+    }
+    return a;
+  }
+  if (SR_HDL(a) & SR_INT)
+  {
+    number u=(number)omAllocBin(rnumber_bin);
+    #if defined(LDEBUG)
+    u->debug=123456;
+    #endif
+    mpz_init(&u->z);
+    switch (b->s)
+    {
+      case 0:
+      case 1:/* a:short, b:1 */
+      {
+        MP_INT x;
+        mpz_init(&x);
+
+        mpz_mul_si(&x,&b->n,SR_TO_INT(a));
+        mpz_add(&u->z,&b->z,&x);
+        mpz_clear(&x);
+        // result cannot be 0, if coeffs are normalized
+        mpz_init_set(&u->n,&b->n);
+        u->s = 0;
+        nlNormalize(u);
+        break;
+      }
+      case 3:
+      {
+        if ((long)a>0L)
+          mpz_add_ui(&u->z,&b->z,SR_TO_INT(a));
+        else
+          mpz_sub_ui(&u->z,&b->z,-SR_TO_INT(a));
+        // result cannot be 0, if coeffs are normalized
+        u->s = 3;
+        u=nlShort(u);
+        break;
+      }
+    }
+    #ifdef LDEBUG
+    nlTest(u);
+    #endif
+    return u;
+  }
+  else
+  {
+    switch (a->s)
+    {
+      case 0:
+      case 1:
+      {
+        switch(b->s)
+        {
+          case 0:
+          case 1: /* a:1 b:1 */
+          {
+            MP_INT x;
+            MP_INT y;
+            mpz_init(&x);
+            mpz_init(&y);
+            mpz_mul(&x,&b->z,&a->n);
+            mpz_mul(&y,&a->z,&b->n);
+            mpz_add(&a->z,&x,&y);
+            mpz_clear(&x);
+            mpz_clear(&y);
+            mpz_mul(&a->n,&a->n,&b->n);
+            a->s = 0;
+            break;
+          }
+          case 3: /* a:1 b:3 */
+          {
+            MP_INT x;
+            mpz_init(&x);
+            mpz_mul(&x,&b->z,&a->n);
+            mpz_add(&a->z,&a->z,&x);
+            mpz_clear(&x);
+            a->s = 0;
+            break;
+          }
+        } /*switch (b->s) */
+        nlNormalize(a);
+        break;
+      }
+      case 3:
+      {
+        switch(b->s)
+        {
+          case 0:
+          case 1:/* a:3, b:1 */
+          {
+            MP_INT x;
+            mpz_init(&x);
+            mpz_mul(&x,&a->z,&b->n);
+            mpz_add(&a->z,&b->z,&x);
+            mpz_clear(&x);
+            mpz_init_set(&a->n,&b->n);
+            a->s = 0;
+            nlNormalize(a);
+            break;
+          }
+          case 3:
+          {
+            mpz_add(&a->z,&a->z,&b->z);
+            a->s = 3;
+            a=nlShort(a);
+            break;
+          }
+        }
+        break;
+      }
+    }
+    #ifdef LDEBUG
+    nlTest(a);
+    #endif
+    return a;
+  }
+}
+
 LINLINE number nlMult (number a, number b)
 {
 #ifdef LDEBUG
@@ -2366,7 +2526,7 @@ LINLINE number nlSub (number a, number b)
 
 #ifndef P_NUMBERS_H
 
-void nlInpGcd(number &a, number b, ring r)
+void nlInpGcd(number &a, number b, const ring r)
 {
   if ((SR_HDL(b)|SR_HDL(a))&SR_INT)
   {
@@ -2390,7 +2550,7 @@ void nlInpGcd(number &a, number b, ring r)
     }
   }
 }
-void nlInpIntDiv(number &a, number b, ring r)
+void nlInpIntDiv(number &a, number b, const ring r)
 {
   if ((SR_HDL(b)|SR_HDL(a))&SR_INT)
   {
@@ -2438,7 +2598,7 @@ void nlInpIntDiv(number &a, number b, ring r)
     }
   }
 }
-void nlInpAdd(number &a, number b, ring r)
+void nlInpAdd_(number &a, number b, const ring r)
 {
   // TODO
   if ((SR_HDL(b)|SR_HDL(a))&SR_INT)
@@ -2463,7 +2623,7 @@ void nlInpAdd(number &a, number b, ring r)
     }
   }
 }
-void nlInpMult(number &a, number b, ring r)
+void nlInpMult(number &a, number b, const ring r)
 {
   if (((SR_HDL(b)|SR_HDL(a))&SR_INT)
   )

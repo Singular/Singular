@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.12 2008-07-16 12:41:33 wienand Exp $ */
+/* $Id: longrat.h,v 1.13 2008-08-06 13:55:42 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
@@ -101,9 +101,10 @@ struct omBin_s;
 extern omBin_s* rnumber_bin;
 
 // in-place operations
-void nlInpGcd(number &a, number b, ring r);
-void nlInpIntDiv(number &a, number b, ring r);
-void nlInpAdd(number &a, number b, ring r);
+void nlInpGcd(number &a, number b, const ring r);
+void nlInpIntDiv(number &a, number b, const ring r);
+void nlInpAdd_(number &a, number b, const ring r);
+LINLINE number   nlInpAdd(number la, number li, const ring r);
 void nlInpMult(number &a, number b, ring r);
 
 #ifdef LDEBUG

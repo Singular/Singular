@@ -6,7 +6,7 @@
  *  Purpose: macros/inline functions for number operations
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Numbers.h,v 1.3 2008-01-30 09:01:37 wienand Exp $
+ *  Version: $Id: p_Numbers.h,v 1.4 2008-08-06 13:55:42 Singular Exp $
  *******************************************************************/
 #ifndef P_NUMBERS_H
 #define P_NUMBERS_H
@@ -22,6 +22,7 @@
 #define n_Sub_FieldGeneral(n1, n2, r)       (r)->cf->nSub(n1, n2)
 //#define n_InpMult_FieldGeneral(n1, n2, r)   (r)->cf->nInpMult(n1, n2, r)
 #define n_InpMult_FieldGeneral(n1, n2, r)   ndInpMult(n1, n2, r)
+#define n_InpAdd_FieldGeneral(n1, n2, r)    n1=ndInpAdd(n1, n2, r)
 
 #ifdef HAVE_RINGS
 #define n_Copy_RingGeneral(n, r)           (r)->cf->cfCopy(n,r)
@@ -34,6 +35,7 @@
 #define n_Sub_RingGeneral(n1, n2, r)       (r)->cf->nSub(n1, n2)
 //#define n_InpMult_RingGeneral(n1, n2, r)   (r)->cf->nInpMult(n1, n2, r)
 #define n_InpMult_RingGeneral(n1, n2, r)   ndInpMult(n1, n2, r)
+#define n_InpAdd_FieldGeneral(n1, n2, r)    n1=ndInpAdd(n1, n2, r)
 #endif
 
 #include "modulop.h"
@@ -46,6 +48,7 @@
 #define n_Neg_FieldZp(n, r)         npNegM(n)
 #define n_Sub_FieldZp(n1, n2, r)    npSubM(n1, n2)
 #define n_InpMult_FieldZp(n1, n2, r) n1=npMultM(n1, n2)
+#define n_InpAdd_FieldZp(n1, n2, r)  n1=npAddM(n1, n2)
 
 #define DO_LINLINE
 #include "longrat.cc"
@@ -58,4 +61,5 @@
 #define n_Neg_FieldQ(n, r)         nlNeg(n)
 #define n_Sub_FieldQ(n1, n2, r)    nlSub(n1, n2)
 #define n_InpMult_FieldQ(n1, n2, r) nlInpMult(n1, n2, r)
+#define n_InpAdd_FieldQ(n1, n2, r)  n1=nlInpAdd(n1, n2, r)
 #endif
