@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shortfl.cc,v 1.6 2008-03-19 17:44:12 Singular Exp $ */
+/* $Id: shortfl.cc,v 1.7 2008-08-06 13:56:14 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -225,15 +225,19 @@ static const char* nrEatr(const char *s, float *r)
   return s;
 }
 
+const char *nIllegalChar="illegal character in number";
+
 const char * nrRead (const char *s, number *a)
 {
   const char *t;
+  const char *start=s;
   float z1,z2;
   float n=1.0;
 
   s = nrEatr(s, &z1);
   if (*s == '/')
   {
+    if (s==start) { WerrorS(nIllegalChar);return s; }
     s++;
     s = nrEatr(s, &z2);
     if (z2==0.0)
@@ -243,6 +247,7 @@ const char * nrRead (const char *s, number *a)
   }
   else if (*s =='.')
   {
+    if (s==start) { WerrorS(nIllegalChar);return s; }
     s++;
     t = s;
     while (*t >= '0' && *t <= '9')
