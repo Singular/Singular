@@ -257,3 +257,89 @@ example
   poly f = 1024*x^8*y^2+11264*x^8*y+28672*x^8+45056*x^7*y^2+36864*x^7*y+16384*x^7+40960*x^6*y^2+57344*x^6*y+32768*x^6+30720*x^5*y^2+10240*x^5*y+8192*x^5+35840*x^4*y^2+1024*x^4*y+20480*x^4+30720*x^3*y^2+10240*x^3*y+8192*x^3+4096*x^2*y^2+45056*x^2*y+49152*x^2+40960*x*y^2+57344*x*y+32768*x;
   findZeroPoly(f);
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+/*
+                           Examples:
+
+
+// POLYNOMIAL EXAMPLES (Singular ready)
+// ===================
+// 
+// For each of the examples below, there are three equivalent polynomials. 'm' indicates the bit-widths of the
+// input/output variables. For some of the polynomials, I have attached the RTL as well.
+// 
+// 
+// 1) VOLTERRA MODELS:
+// 
+//        A) CUBIC FILTER: (m = 32, 3 Vars)
+
+LIB "ringgb.lib";
+ring r = (integer, 2, 32), (x,y,z), dp;
+poly p1 = 3795162112*x^3+587202566*x^2*y+2936012853*x*y*z+2281701376*x+548767119*y^3+16777216*y^2+268435456*y*z \
+         +1107296256*y+4244635648*z^3+4244635648*z^2+16777216*z;
+poly p2 = 1647678464*x^3+587202566*x^2*y+2936012853*x*y*z+134217728*x+548767119*y^3+16777216*y^2+268435456*y*z \
+         +1107296256*y+2097152000*z^3+2097152000*z^2+16777216*z;
+poly p3 = 1647678464*x^3+587202566*x^2*y+2936012853*x*y*z+134217728*x+548767119*y^3+16777216*y^2+268435456*y*z \
+         +1107296256*y+2097152000*z^3+2097152000*z^2+16777216*z;
+zeroReduce(p1-p2);
+zeroReduce(p1-p3);
+zeroReduce(p2-p3);
+
+//        B) DEGREE-4 FILTER: (m=16 , 3 Vars)
+
+LIB "ringgb.lib";
+ring r = (integer, 2, 16), (x,y,z), dp;
+poly p1 = 16384*x^4+y^4+57344*z^4+64767*x*y^3+16127*y^2*z^2+8965*x^3*z+19275*x^2*y*z+51903*x*y*z+32768*x^2*y  \
+         +40960*z^2+32768*x*y^2+49152*x^2+4869*y;
+poly p2 = 8965*x^3*z+19275*x^2*y*z+31999*x*y^3+51903*x*y*z+32768*x*y+y^4+32768*y^3+16127*y^2*z^2+32768*y^2 \
+         +4869*y+57344*z^4+40960*z^2;
+poly p3 = 8965*x^3*z+19275*x^2*y*z+31999*x*y^3+51903*x*y*z+32768*x*y+y^4+16127*y^2*z^2+4869*y+16384*z^3+16384*z;
+zeroReduce(p1-p2);
+zeroReduce(p1-p3);
+zeroReduce(p2-p3);
+
+
+// 2) Savitzsky Golay filter(m=16,5 Vars)
+
+LIB "ringgb.lib";
+ring r = (integer, 2, 16), (v,w,x,y,z), dp;
+poly p1 = 25000*v^2*y+37322*v^2+22142*v*w*z+50356*w^3+58627*w^2+17797*w+17797*x^3+62500*x^2*z+41667*x \
+         +22142*y^3+23870*y^2+59464*y+41667*z+58627;
+poly p2 = 25000*v^2*y+4554*v^2+22142*v*w*z+32768*v+17588*w^3+25859*w^2+17797*w+17797*x^3+29732*x^2*z+32768*x^2 \
+         +32768*x*z+8899*x+22142*y^3+23870*y^2+59464*y+41667*z+58627;
+poly p3 = 25000*v^2*y+4554*v^2+22142*v*w*z+32768*v+17588*w^3+25859*w^2+17797*w+17797*x^3+29732*x^2*z+32768*x*z \
+         +41667*x+22142*y^3+23870*y^2+59464*y+41667*z+58627;
+zeroReduce(p1-p2);
+zeroReduce(p1-p3);
+zeroReduce(p2-p3);
+
+
+// 3) Anti-alias filter:(m=16, 1 Var)
+
+LIB "ringgb.lib";
+ring r = (integer, 2, 16), c, dp;
+poly p1 = 156*c^6+62724*c^5+17968*c^4+18661*c^3+43593*c^2+40224*c+13281;
+poly p2 = 156*c^6+5380*c^5+1584*c^4+43237*c^3+27209*c^2+40224*c+13281;
+poly p3 = 156*c^6+5380*c^5+1584*c^4+10469*c^3+27209*c^2+7456*c+13281;
+zeroReduce(p1-p2);
+zeroReduce(p1-p3);
+zeroReduce(p2-p3);
+
+
+// 4) PSK:(m=16, 2 Var)
+
+LIB "ringgb.lib";
+ring r = (integer, 2, 16), (x,y), dp;
+poly p1 = 4166*x^4+16666*x^3*y+25000*x^2*y^2+15536*x^2+16666*x*y^4+31072*x*y+4166*y^4+15536*y^2+34464;
+poly p2 = 4166*x^4+16666*x^3*y+8616*x^2*y^2+16384*x^2*y+15536*x^2+282*x*y^4+47456*x*y+53318*y^4+31920*y^2+34464;
+poly p3 = 4166*x^4+16666*x^3*y+8616*x^2*y^2+16384*x^2*y+15536*x^2+282*x*y^4+47456*x*y+4166*y^4+15536*y^2+34464;
+zeroReduce(p1-p2);
+zeroReduce(p1-p3);
+zeroReduce(p2-p3);
+
+// Ref: A. Peymandoust G. De Micheli, “Application of Symbolic Computer Algebra in High-Level Data-Flow
+// Synthesis,” IEEE Transactions on CAD/ICAS, Vol. 22, No. 9, September 2003, pp.1154-1165.
+
+*/
