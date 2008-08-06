@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_random.h,v 1.3 1997-07-01 12:27:34 schmidt Exp $ */
+/* $Id: cf_random.h,v 1.4 2008-08-06 14:16:57 Singular Exp $ */
 
 #ifndef INCL_CF_RANDOM_H
 #define INCL_CF_RANDOM_H
@@ -53,10 +53,10 @@ private:
     CFRandom * gen;
     int n;
     AlgExtRandomF();
-    AlgExtRandomF( const AlgExtRandomF & );
     AlgExtRandomF( const Variable & v, CFRandom * g, int nn );
     AlgExtRandomF& operator= ( const AlgExtRandomF & );
 public:
+    AlgExtRandomF( const AlgExtRandomF & );
     AlgExtRandomF( const Variable & v );
     AlgExtRandomF( const Variable & v1, const Variable & v2 );
     ~AlgExtRandomF();
