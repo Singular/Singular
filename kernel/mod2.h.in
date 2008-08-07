@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.24 2008-08-05 16:19:47 ederc Exp $
+ *  Version: $Id: mod2.h.in,v 1.25 2008-08-07 15:30:45 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -191,10 +191,21 @@
 /* linear algebra extensions from pcv.h/pcv.cc */
 #define HAVE_PCV 1
 
-// procedures to compute groebner bases with the f5 implementation
-#define HAVE_F5
+/* procedures to compute groebner bases with the f5 implementation */
+/* still testing */
+#undef HAVE_F5
 
-// procedures to compute with units
+
+/* rings as coefficients */
+#define HAVE_RINGS
+
+#ifdef HAVE_RINGS
+#define HAVE_RING2TOM
+#define HAVE_RINGMODN
+#define HAVE_RINGZ
+#endif
+
+/* procedures to compute with units */
 #define HAVE_UNITS
 
 /* Define to use old mechanismen for saving currRing with procedures
