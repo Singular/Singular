@@ -1,4 +1,4 @@
-version="$Id: nchomolog.lib,v 1.7 2008-02-08 23:28:01 levandov Exp $";
+version="$Id: nchomolog.lib,v 1.8 2008-08-07 21:15:02 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  nchomolog.lib   Procedures for Noncommutative Homological Algebra
@@ -7,19 +7,21 @@ AUTHORS:  Viktor Levandovskyy  levandov@math.rwth-aachen.de,
 
 PROCEDURES:
  ncExt_R(k,M);            Ext^k(M',R),    M module, R basering, M'=coker(M)
- ncExt(k,M,N);            Ext^k(M',N'),   M,N modules, M'=coker(M), N'=coker(N)
  ncHom(M,N);              Hom(M',N'),     M,N modules, M'=coker(M), N'=coker(N)
  coHom(A,k);            Hom(R^k,A),     A matrix over basering R
  contraHom(A,k);        Hom(A,R^k),     A matrix over basering R
- tensorMaps(M,N);       tensor product of  matrices
- ncTensorMod(M,N);        Tensor product of modules M'=coker(M), N'=coker(N)
- ncTor(k,M,N);            Tor_k(M',N'),   M,N modules, M'=coker(M), N'=coker(N)
+ dmodoublext(M, l);  computes Ext_D^i(Ext_D^i(M,D),D), where D is a basering
 ";
 
 LIB "dmod.lib";
 LIB "gkdim.lib";
 LIB "involut.lib";
 LIB "nctools.lib";
+
+//  ncExt(k,M,N);            Ext^k(M',N'),   M,N modules, M'=coker(M), N'=coker(N)
+//  ncTensorMod(M,N);        Tensor product of modules M'=coker(M), N'=coker(N)
+//  ncTor(k,M,N);            Tor_k(M',N'),   M,N modules, M'=coker(M), N'=coker(N)
+//  tensorMaps(M,N);       tensor product of  matrices
 
 proc contraHom(matrix M, int s)
 {
@@ -513,7 +515,7 @@ proc dmodualtest(module M, int n)
   setring save;
   module Md = ncExt_R(n,M); // right module
   // would be nice to use "prune"!
-  // NOOOOO! prune performs left sided operations!!!
+  // NO! prune performs left sided operations!!!
   //  Md = prune(Md);
   //  print(Md);
   def saveop = opposite(save);
@@ -584,9 +586,13 @@ EXAMPLE: example dmodoublext; shows an example
   kill saveop;
   M2 = prune(M2); // eligible since M2 is a left mod
   def M3;
-  if (nrows(M)==1)
+  if (nrows(M2)==1)
   {
     M3 = ideal(M2);
+  }
+  else
+  {
+    M3 = M2;
   }
   M3 = groebner(M3);
   return(M3);
