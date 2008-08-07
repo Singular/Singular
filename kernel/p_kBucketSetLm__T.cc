@@ -6,7 +6,7 @@
  *  Purpose: template for setting the Lm of a bucket
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_kBucketSetLm__T.cc,v 1.4 2006-02-13 17:12:42 bricken Exp $
+ *  Version: $Id: p_kBucketSetLm__T.cc,v 1.5 2008-08-07 15:08:22 Singular Exp $
  *******************************************************************/
 #undef USE_COEF_BUCKETS
 #ifdef HAVE_COEF_BUCKETS
@@ -71,8 +71,12 @@ LINKAGE void p_kBucketSetLm(kBucket_pt bucket)
         {
           MULTIPLY_BUCKET(bucket,i);
           number tn = pGetCoeff(p);
+          #if 0
           pSetCoeff0(p, n_Add(pGetCoeff(bucket->buckets[i]), tn, r));
           n_Delete(&tn, r);
+          #else
+          pSetCoeff0(p, n_InpAdd(tn,pGetCoeff(bucket->buckets[i]), r));
+          #endif
           p = bucket->buckets[i];
           pIter(bucket->buckets[i]);
           n_Delete(&pGetCoeff(p), r);

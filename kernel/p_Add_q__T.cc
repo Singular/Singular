@@ -6,7 +6,7 @@
  *  Purpose: template for p_Add_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Add_q__T.cc,v 1.2 2008-08-06 13:55:42 Singular Exp $
+ *  Version: $Id: p_Add_q__T.cc,v 1.3 2008-08-07 15:08:22 Singular Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -42,9 +42,12 @@ LINKAGE poly p_Add_q(poly p, poly q, int &Shorter, const ring r)
   Equal:
   n1 = pGetCoeff(p);
   n2 = pGetCoeff(q);
-  //t = n_Add(n1,n2, r);
-  //n_Delete(&n1, r);
+  #if 0
+  t = n_Add(n1,n2, r);
+  n_Delete(&n1, r);
+  #else
   t=n_InpAdd(n1,n2,r);
+  #endif
   n_Delete(&n2, r);
   q = p_LmFreeAndNext(q, r);
 

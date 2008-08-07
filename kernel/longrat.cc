@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.38 2008-08-06 13:55:41 Singular Exp $ */
+/* $Id: longrat.cc,v 1.39 2008-08-07 15:08:22 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -1154,12 +1154,45 @@ number nlGcd(number a, number b, const ring r)
   return result;
 }
 
-number nlShort(number x)
+number nlShort1(number x) // assume x->s==0/1
 {
+  assume(x->s<2);
   if (mpz_cmp_ui(&x->z,(long)0)==0)
   {
     nlDelete(&x,currRing);
     return INT_TO_SR(0);
+  }
+  if (x->s<2)
+  {
+    if (mpz_cmp(&x->z,&x->n)==0)
+    {
+      nlDelete(&x,currRing);
+      return INT_TO_SR(1);
+    }
+  }
+  return x;
+}
+number nlShort3(number x) // assume x->s==3
+{
+  assume(x->s==3);
+  if (mpz_cmp_ui(&x->z,(long)0)==0)
+  {
+    nlDelete(&x,currRing);
+    return INT_TO_SR(0);
+  }
+  if (mpz_size1(&x->z)<=MP_SMALL)
+  {
+    if (x->s==3)
+    {
+      int ui=(int)mpz_get_si(&x->z);
+      if ((((ui<<3)>>3)==ui)
+      && (mpz_cmp_si(&x->z,(long)ui)==0))
+      {
+        mpz_clear(&x->z);
+        omFreeBin((ADDRESS)x, rnumber_bin);
+        return INT_TO_SR(ui);
+      }
+    }
   }
   return x;
 }
@@ -1175,24 +1208,8 @@ void nlNormalize (number &x)
 #endif
   if (x->s==3)
   {
-    if (mpz_cmp_ui(&x->z,(long)0)==0)
-    {
-      nlDelete(&x,currRing);
-      x=INT_TO_SR(0);
-      return;
-    }
-    if (mpz_size1(&x->z)<=MP_SMALL)
-    {
-      int ui=(int)mpz_get_si(&x->z);
-      if ((((ui<<3)>>3)==ui)
-      && (mpz_cmp_si(&x->z,(long)ui)==0))
-      {
-        mpz_clear(&x->z);
-        omFreeBin((ADDRESS)x, rnumber_bin);
-        x=INT_TO_SR(ui);
-        return;
-      }
-    }
+    x=nlShort3(x);
+    return;
   }
   else if (x->s==0)
   {
@@ -2197,7 +2214,6 @@ number  _nlMult_aImm_bImm_rNoImm(number a, number b);
 
 #endif
 
-
 /***************************************************************
  *
  * Routines which might be inlined by p_Numbers.h
@@ -2324,7 +2340,8 @@ LINLINE number nlAdd (number a, number b)
   return _nlAdd_aNoImm_OR_bNoImm(a, b);
 }
 
-number nlShort(number x);
+number nlShort1(number a);
+number nlShort3(number a);
 
 LINLINE number nlInpAdd (number a, number b, const ring r)
 {
@@ -2350,7 +2367,7 @@ LINLINE number nlInpAdd (number a, number b, const ring r)
         mpz_add(&a->z,&a->z,&x);
         mpz_clear(&x);
         a->s = 0;
-        nlNormalize(a);
+        a=nlShort1(a);
         break;
       }
       case 3:
@@ -2360,7 +2377,8 @@ LINLINE number nlInpAdd (number a, number b, const ring r)
         else
           mpz_sub_ui(&a->z,&a->z,-SR_TO_INT(b));
         a->s = 3;
-        a=nlShort(a);
+        a=nlShort3(a);
+        //nlNormalize(a);
         break;
       }
     }
@@ -2387,7 +2405,7 @@ LINLINE number nlInpAdd (number a, number b, const ring r)
         // result cannot be 0, if coeffs are normalized
         mpz_init_set(&u->n,&b->n);
         u->s = 0;
-        nlNormalize(u);
+        u=nlShort1(u);
         break;
       }
       case 3:
@@ -2398,7 +2416,7 @@ LINLINE number nlInpAdd (number a, number b, const ring r)
           mpz_sub_ui(&u->z,&b->z,-SR_TO_INT(a));
         // result cannot be 0, if coeffs are normalized
         u->s = 3;
-        u=nlShort(u);
+        u=nlShort3(u);
         break;
       }
     }
@@ -2443,7 +2461,7 @@ LINLINE number nlInpAdd (number a, number b, const ring r)
             break;
           }
         } /*switch (b->s) */
-        nlNormalize(a);
+        a=nlShort1(a);
         break;
       }
       case 3:
@@ -2460,14 +2478,14 @@ LINLINE number nlInpAdd (number a, number b, const ring r)
             mpz_clear(&x);
             mpz_init_set(&a->n,&b->n);
             a->s = 0;
-            nlNormalize(a);
+            a=nlShort1(a);
             break;
           }
           case 3:
           {
             mpz_add(&a->z,&a->z,&b->z);
             a->s = 3;
-            a=nlShort(a);
+            a=nlShort3(a);
             break;
           }
         }
@@ -2585,31 +2603,6 @@ void nlInpIntDiv(number &a, number b, const ring r)
       mpz_sub_ui(&a->z,&a->z,1);
     }
     MPZ_DIV(&a->z,&a->z,&b->z);
-    if (mpz_size1(&a->z)<=MP_SMALL)
-    {
-      int ui=(int)mpz_get_si(&a->z);
-      if ((((ui<<3)>>3)==ui)
-      && (mpz_cmp_si(&a->z,(long)ui)==0))
-      {
-        mpz_clear(&a->z);
-        omFreeBin((ADDRESS)a, rnumber_bin);
-        a=INT_TO_SR(ui);
-      }
-    }
-  }
-}
-void nlInpAdd_(number &a, number b, const ring r)
-{
-  // TODO
-  if ((SR_HDL(b)|SR_HDL(a))&SR_INT)
-  {
-    number n=nlGcd(a,b,r);
-    nlDelete(&a,r);
-    a=n;
-  }
-  else
-  {
-    mpz_gcd(&a->z,&a->z,&b->z);
     if (mpz_size1(&a->z)<=MP_SMALL)
     {
       int ui=(int)mpz_get_si(&a->z);
