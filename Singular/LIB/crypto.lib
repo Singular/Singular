@@ -1,6 +1,6 @@
 //GP, last modified 28.6.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: crypto.lib,v 1.4 2008-03-25 15:54:04 Singular Exp $";
+version="$Id: crypto.lib,v 1.5 2008-08-07 16:00:50 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY:  crypto.lib     Procedures for teaching cryptography
@@ -1953,6 +1953,158 @@ example
    ECPP(N);
 }
 
+static proc wordToNumber(string s)
+{
+   int i;
+   intvec v;
+   number n;
+   number t=27;
+   for(i=size(s);i>0;i--)
+   {
+      if(s[i]=="a"){v[i]=0;}
+      if(s[i]=="b"){v[i]=1;}
+      if(s[i]=="c"){v[i]=2;}
+      if(s[i]=="d"){v[i]=3;}
+      if(s[i]=="e"){v[i]=4;}
+      if(s[i]=="f"){v[i]=5;}
+      if(s[i]=="g"){v[i]=6;}
+      if(s[i]=="h"){v[i]=7;}
+      if(s[i]=="i"){v[i]=8;}
+      if(s[i]=="j"){v[i]=9;}
+      if(s[i]=="k"){v[i]=10;}
+      if(s[i]=="l"){v[i]=11;}
+      if(s[i]=="m"){v[i]=12;}
+      if(s[i]=="n"){v[i]=13;}
+      if(s[i]=="o"){v[i]=14;}
+      if(s[i]=="p"){v[i]=15;}
+      if(s[i]=="q"){v[i]=16;}
+      if(s[i]=="r"){v[i]=17;}
+      if(s[i]=="s"){v[i]=18;}
+      if(s[i]=="t"){v[i]=19;}
+      if(s[i]=="u"){v[i]=20;}
+      if(s[i]=="v"){v[i]=21;}
+      if(s[i]=="w"){v[i]=22;}
+      if(s[i]=="x"){v[i]=23;}
+      if(s[i]=="y"){v[i]=24;}
+      if(s[i]=="z"){v[i]=25;}
+      if(s[i]==" "){v[i]=26;}
+   }
+   for(i=1;i<=size(s);i++)
+   {
+      n=n+v[i]*t^(i-1);
+   }
+   return(n);
+}
+
+static proc numberToWord(number n)
+{
+   int i,j;
+   string v;
+   list s;
+   number t=27;
+   number mm;
+   number nn=n;
+   while(nn>t)
+   {
+      j++;
+      mm=nn mod t;
+      s[j]=mm;
+      nn=(nn-mm)/t;
+   }
+   j++;
+   s[j]=nn;
+   for(i=1;i<=j;i++)
+   {
+      if(s[i]==0){v=v+"a";}
+      if(s[i]==1){v=v+"b";}
+      if(s[i]==2){v=v+"c";}
+      if(s[i]==3){v=v+"d";}
+      if(s[i]==4){v=v+"e";}
+      if(s[i]==5){v=v+"f";}
+      if(s[i]==6){v=v+"g";}
+      if(s[i]==7){v=v+"h";}
+      if(s[i]==8){v=v+"i";}
+      if(s[i]==9){v=v+"j";}
+      if(s[i]==10){v=v+"k";}
+      if(s[i]==11){v=v+"l";}
+      if(s[i]==12){v=v+"m";}
+      if(s[i]==13){v=v+"n";}
+      if(s[i]==14){v=v+"o";}
+      if(s[i]==15){v=v+"p";}
+      if(s[i]==16){v=v+"q";}
+      if(s[i]==17){v=v+"r";}
+      if(s[i]==18){v=v+"s";}
+      if(s[i]==19){v=v+"t";}
+      if(s[i]==20){v=v+"u";}
+      if(s[i]==21){v=v+"v";}
+      if(s[i]==22){v=v+"w";}
+      if(s[i]==23){v=v+"x";}
+      if(s[i]==24){v=v+"y";}
+      if(s[i]==25){v=v+"z";}
+      if(s[i]==26){v=v+" ";}
+   }
+   return(v);
+}
+
+proc code(string s)
+"USAGE:  code(s); s a string
+ASSUME:  s contains only small letters and space
+COMPUTE: a number, RSA-coding of the string s
+RETURN:  return RSA-coding of the string s as string
+EXAMPLE: code;  shows an example
+"
+{
+   ring r=0,x,dp;
+   number
+p=398075086424064937397125500550386491199064362342526708406385189575946388957261768583317;
+   number
+q=472772146107435302536223071973048224632914695302097116459852171130520711256363590397527;
+   number n=p*q;
+   number phi=(p-1)*(q-1);
+   number e=1234567891;
+   list L=exgcdN(e,phi);
+   number d=L[1];
+   number m=wordToNumber(s);
+   number c=powerN(m,e,n);
+   string cc=string(c);
+   return(cc);
+}
+example
+{"EXAMPLE:";  echo = 2;
+  string s="i go to school";
+  code(s);
+}
+
+proc decode(string g)
+"USAGE:  decode(s); s a string
+ASSUME:  s is a string of a number, the output of code
+COMPUTE: a string, RSA-decoding of the string s
+RETURN:  return RSA-decoding of the string s as string
+EXAMPLE: decode;  shows an example
+"
+{
+   ring r=0,x,dp;
+   number
+p=398075086424064937397125500550386491199064362342526708406385189575946388957261768583317;
+   number
+q=472772146107435302536223071973048224632914695302097116459852171130520711256363590397527;
+   number n=p*q;
+   number phi=(p-1)*(q-1);
+   number e=1234567891;
+   list L=exgcdN(e,phi);
+   number d=L[1];
+   execute("number c="+g+";");
+   number f=powerN(c,d,n);
+   string s=numberToWord(f);
+   return(s);
+}
+example
+{"EXAMPLE:";  echo = 2;
+  string
+s="78638618599886548153321853785991541374544958648147340831959482696082179852616053583234149080198937632782579537867262780982185252913122030800897193851413140758915381848932565";
+  string t=decode(s);
+  t;
+}
 
 /*
 //===============================================================
