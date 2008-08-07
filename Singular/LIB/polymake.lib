@@ -1,4 +1,4 @@
-version="$Id: polymake.lib,v 1.5 2008-08-07 14:40:28 Singular Exp $";
+version="$Id: polymake.lib,v 1.6 2008-08-07 15:05:35 keilen Exp $";
 category="Tropical Geometry";
 info="
 LIBRARY:         polymake.lib    Interface to polymake and TOPCOM
@@ -753,8 +753,8 @@ example
 /// PROCEDURES USING TOPCOM
 ////////////////////////////////////////////////////////////////////////////////////////
 
-proc triangulations (list polygon)
-"USAGE:  triangulations(polygon); list polygon
+proc triangulations (list polygon, list #)
+"USAGE:  triangulations(polygon[,#]); list polygon, list #
 ASSUME:  polygon is a list of integer vectors of the same size representing the affine
          coordinates of the lattice points 
 PURPOSE: the procedure considers the marked polytope given as the convex hull of
@@ -772,7 +772,9 @@ NOTE:  - the procedure calls for its computations the program points2triangs
        - the procedure creates the files /tmp/triangulationsinput and /tmp/triangulationsoutput;
          the former is used as input for points2triangs and the latter is its output
          containing the triangulations of corresponding to points in the format
-         of points2triangs; this can be use for further computations with topcom
+         of points2triangs; if you want to use these for further computations with topcom 
+         you have to hand an optional parameter (e.g. the number 1) to the procedure, 
+         since otherwise the files will be destroyed before leaving the procedure
        - note that an integer i in an integer vector representing a triangle refers to
          the ith lattice point, i.e. polygon[i]; this convention is different from 
          TOPCOM's convention, where i would refer to the i-1st lattice point
@@ -796,6 +798,10 @@ EXAMPLE: example triangulations;   shows an example"
   // call points2triangs
   system("sh","cd /tmp; points2triangs < triangulationsinput > triangulationsoutput");
   string p2t=read("/tmp/triangulationsoutput"); // takes the result of points2triangs
+  if (size(#)==0)
+  {
+    system("sh","cd /tmp; rm -f triangulationsinput; rm -f triangulationsoutput");
+  }
   // preprocessing of p2t if points2triangs is version >= 0.15 brings p2t to the format of version 0.14
   string np2t; // takes the triangulations in Singular format
   for (i=1;i<=size(p2t)-2;i++)
