@@ -1,17 +1,18 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: discretize.lib,v 1.2 2007-06-20 15:39:44 Singular Exp $";
+version="$Id: discretize.lib,v 1.3 2008-08-07 18:29:40 levandov Exp $";
 category="Applications";
 info="
 LIBRARY: discretize.lib  Tools for the finite difference schemes
 AUTHORS: Viktor Levandovskyy,     levandov@risc.uni-linz.ac.at
 
-THEORY: presentation of difference operator polys in a polynomial, semi-factorized and nodal form.
+THEORY: We provide the presentation of difference operators in a polynomial, semi-factorized and a nodal form. Running @code{example discr_example;} will show how we generate finite difference schemes of linear PDE's from given approximations.
 
 PROCEDURES:
 decoef(P,n);  decompose poly P into summands with respect to the number n
 difpoly2tex(S,P[,Q]); present the difference scheme in the nodal form
 
 AUXILIARY PROCEDURES:
+discr_example();  containes a guided explanation of our approach
 exp2pt(P[,L]); convert a polynomial M into the TeX format, in nodal form
 mon2pt(P[,L]); convert a monomial M into the TeX format, in nodal form
 texcoef(n);  converts the number n into TeX
@@ -106,7 +107,7 @@ proc replace(string s, string what, string with)
 "USAGE:  replace(s,what,with);  s,what,with strings
 RETURN:  string
 PURPOSE: replaces in 's' all the substrings 'what' with substring 'with'
-NOTE: the convention is the follopwing: Tx goes to T_x, dx to tri x (the same for t,y,z). Moreover, some parameters (theta,ro,A,V) are converted to greek letters.
+NOTE: 
 EXAMPLE: example replace; shows examples
 "{
   // clear: replace in s, "what" with "with"
@@ -132,7 +133,8 @@ EXAMPLE: example replace; shows examples
       tmp = s[gn..cn-1];
     }
 //    "tmp:";tmp;
-    out = out+tmp+" "+with;
+//    out = out+tmp+" "+with;
+    out = out+tmp+with;
 //    "out:";out;
     gn  = cn + sw;
     if (gn>ss)
@@ -148,7 +150,8 @@ EXAMPLE: example replace; shows examples
     cn  = find(s,what,gn);
   }
   // and now, append the rest of s
-  out = out + " "+ s[gn..ss];
+  //  out = out + " "+ s[gn..ss];
+  out = out + s[gn..ss];
   return(out);
 }
 example
@@ -654,4 +657,75 @@ proc simfrac(poly up, poly down)
   RT[1] =  LL[1][1,1]; // integer part
   RT[2] = L[2][1]; // new numerator
   return(RT);
+}
+
+proc discr_example()
+{
+  "* Equation: u_tt - A^2 u_xx -B^2 u_yy = 0; A,B are constants";
+  "* we employ three central differences";
+  "* the vector we act on is (u_xx, u_yy, u_tt, u)^T";
+  "* Set up the ring: ";
+  "ring r = (0,A,B,dt,dx,dy),(Tx,Ty,Tt),(c,dp);";
+  ring r = (0,A,B,dt,dx,dy),(Tx,Ty,Tt),(c,dp);
+  "* Set up the matrix with equation and approximations: ";
+  "matrix M[4][4] =";
+    "    // direct equation:";
+  "    -A^2, -B^2, 1, 0,";
+  "    // central difference u_tt";
+  "    0, 0,  -dt^2*Tt, (Tt-1)^2,";
+  "    // central difference u_xx";
+  "    -dx^2*Tx, 0, 0, (Tx-1)^2,";
+  "    // central difference u_yy";
+  "    0, -dy^2*Ty, 0, (Ty-1)^2;";
+  matrix M[4][4] =
+    // direct equation:
+    -A^2, -B^2, 1, 0,
+    // central difference u_tt
+    0, 0,  -dt^2*Tt, (Tt-1)^2,
+    // central difference u_xx
+    -dx^2*Tx, 0, 0, (Tx-1)^2,
+    // central difference u_yy
+    0, -dy^2*Ty, 0, (Ty-1)^2;
+//=========================================
+// CHECK THE CORRECTNESS OF EQUATIONS AS INPUT:
+ring rX = (0,A,B,dt,dx,dy,Tx,Ty,Tt),(Uxx, Uyy,Utt, U),(c,Dp);
+matrix M = imap(r,M);
+vector X = [Uxx, Uyy, Utt, U];
+ "* Print the differential form of equations: ";
+print(M*X);
+// END CHECK
+//=========================================
+ setring r;
+ "* Perform the elimination of module components:";
+ " module R = transpose(M);";
+ " module S = std(R);";
+ " poly   p = S[4,1];" ;
+ module R = transpose(M);
+ module S = std(R);
+ poly   p = S[4,1]; // by elimination of module components
+ list L; L[1]=A;L[2] = B;
+ ideal I = decoef(p,dt); // make splitting wrt the appearance of dt
+ "* Create the nodal of the scheme in TeX format: ";
+ " ideal I = decoef(p,dt);";
+ " difpoly2tex(I,L);";
+ difpoly2tex(I,L); // the nodal form of the scheme in TeX 
+ "* Preparations for the semi-factorized form: ";
+ poly pi1 = subst(I[2],B,0);
+ poly pi2 = I[2] - pi1;
+ " poly pi1 = subst(I[2],B,0);";
+ " poly pi2 = I[2] - pi1;";
+ "* Show the semi-factorized form of the scheme: 1st summand";
+ " factorize(I[1]); ";
+ factorize(I[1]); // semi-factorized form of the scheme: 1st summand
+ "* Show the semi-factorized form of the scheme: 2nd summand";
+ " factorize(pi1);";
+ factorize(pi1); // semi-factorized form of the scheme: 2nd summand
+ "* Show the semi-factorized form of the scheme: 3rd summand";
+ " factorize(pi1);";
+ factorize(pi2); // semi-factorized form of the scheme: 3rd summand
+}
+example
+{
+  "EXAMPLE:"; echo=1;
+ discr_example();
 }
