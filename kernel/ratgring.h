@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ratgring.h,v 1.5 2008-01-31 13:23:25 Singular Exp $ */
+/* $Id: ratgring.h,v 1.6 2008-08-07 21:15:56 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -30,7 +30,9 @@ void p_LmDeleteAndNextRat(poly *p, int ishift, ring r);
 
 void p_ExpVectorDiffRat(poly pr, poly p1, poly p2, int ishift, ring r);
 
-ideal ncGCD(poly p, poly q, ring r);
+ideal ncGCD2(poly p, poly q, ring r); // real nc stuff
+
+ideal ncGCD(poly p, poly q, ring r); // for p,q from a commutative ring
 
 //poly nc_rat_CreateSpoly(poly p1, poly p2, poly spNoether, int ishift, ring r);
 

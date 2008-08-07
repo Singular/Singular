@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.24 2008-08-04 07:31:13 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.25 2008-08-07 21:15:56 levandov Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -256,8 +256,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
 	if(c_e==-1)
           c_p = nc_CreateSpoly(pCopy(strat->S[c_j]),pCopy((*h).p), currRing);
 	else
-          c_p=nc_rat_ReduceSpolyNew(pCopy(strat->S[c_j]),
-               pCopy((*h).p),currRing->real_var_start-1,currRing);
+          c_p=nc_rat_ReduceSpolyNew(pCopy((*h).p), pCopy(strat->S[c_j]),currRing->real_var_start-1,currRing);
         pDelete(&((*h).p));
         (*h).p=c_p;
         if (!TEST_OPT_INTSTRATEGY)

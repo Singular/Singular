@@ -6,7 +6,7 @@
  *  Purpose: Ore-noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: ratgring.cc,v 1.10 2008-06-10 10:17:32 motsak Exp $
+ *  Version: $Id: ratgring.cc,v 1.11 2008-08-07 21:15:56 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "ratgring.h"
@@ -27,9 +27,9 @@
 
 void pLcmRat(poly a, poly b, poly m, int rat_shift)
 {
-  /* shift is the last exp one should count with */
+  /* rat_shift is the last exp one should count with */
   int i;
-  for (i=pVariables; i=rat_shift; i--)
+  for (i=pVariables; i>=rat_shift; i--)
   {
     pSetExp(m,i, si_max( pGetExp(a,i), pGetExp(b,i)));
   }
@@ -120,7 +120,7 @@ void p_ExpVectorDiffRat(poly pr, poly p1, poly p2, int ishift, ring r)
   int i;
   poly t=pr;
   Exponent_t e1,e2;
-  for (i=ishift+1 ; i<=r->N; i++)
+  for (i=ishift+1; i<=r->N; i++)
   {
     e1 = p_GetExp(p1, i, r);
     e2 = p_GetExp(p2, i, r);
@@ -141,12 +141,9 @@ void p_ExpVectorDiffRat(poly pr, poly p1, poly p2, int ishift, ring r)
   p_Setm(t,r);
 }
 
-
-
-
 /* returns ideal (u,v) s.t. up + vq = 0 */
 
-ideal ncGCD(poly p, poly q, const ring r)
+ideal ncGCD2(poly p, poly q, const ring r)
 {
   intvec *w = NULL;
   ideal h = idInit(2,1);
@@ -191,7 +188,27 @@ ideal ncGCD(poly p, poly q, const ring r)
   return(h);
 }
 
+/* returns ideal (u,v) s.t. up + vq = 0 */
 
+ideal ncGCD(poly p, poly q, const ring r)
+{
+  // assume: p,q are in the comm. ring
+  // to be used in the coeff business
+#ifdef PDEBUG
+  Print("G_start:");
+#endif
+  poly g = singclap_gcd(p_Copy(p,r),p_Copy(q,r));
+#ifdef PDEBUG
+  p_wrp(g,r);
+  Print("G_end;");
+#endif
+  poly u = singclap_pdivide(q,g); //q/g
+  poly v = singclap_pdivide(p,g); //p/g
+  ideal h = idInit(2,1);
+  h->m[0] = u; // p_Copy(u,r);
+  h->m[1] = v; // p_Copy(v,r);
+  return(h);
+}
 
 /* PINLINE1 void p_ExpVectorDiff 
    remains as is -> BUT we can do memory shift on smaller number of exp's */
@@ -367,7 +384,7 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
   int is = ishift; /* TODO */
 
   poly m = pOne();
-  p_ExpVectorDiffRat(m, p2, p1, ishift, r); // includes X and D parts
+  p_ExpVectorDiffRat(m, p1, p2, ishift, r); // includes X and D parts
   //p_Setm(m,r);
   //  m = p_GetExp_k_n(m,1,ishift,r); /* rat D-exp of m */
 #ifdef PDEBUG
@@ -379,11 +396,11 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
   poly H  = NULL;
   HH = p_Copy(p_HeadRat(p1,is,r),r); // lm_D(g)
 //  H  = r->nc->p_Procs.mm_Mult_p(m, p_Copy(HH, r), r); // d^aplha lm_D(g)
-  H  = nc_mm_Mult_pp(m, HH, r); // d^aplha lm_D(g)
+  H  = nc_mm_Mult_pp(m, HH, r); // d^aplha lm_D(g) == h_g in the paper
 
-  poly K  = p_Copy( p_GetCoeffRat(H,  is, r), r);
+  poly K  = p_Copy( p_GetCoeffRat(H,  is, r), r); // k in the paper
   Print("k: "); p_wrp(K,r); PrintS("\n");
-  poly P  = p_Copy( p_GetCoeffRat(p2, is, r), r);
+  poly P  = p_Copy( p_GetCoeffRat(p2, is, r), r); // lc_D(p_2) == lc_D(f)
   Print("p: "); p_wrp(P,r); PrintS("\n");
 
   //  HH = p_Neg(HH, r);
@@ -433,12 +450,12 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
   p_Delete(&m,r);
 
   Print("d^a t_g: "); p_wrp(out,r);
-  PrintS(" end reduction");
-  out = p_Add_q(H, out, r);
+  Print(" end reduction\n");
+  out = p_Add_q(H, out, r); // r_g + d^a t_g
   p_Test(out,r);
-  out  = p_Mult_q(PP, out, r);
+  out  = p_Mult_q(PP, out, r); // c' (r_g + d^a t_g)
 
-  out = p_Add_q(p2,out,r); // delete out, p2
+  out = p_Add_q(p2,out,r); // delete out, p2; // the sum
   p_Test(out,r);
   if ( out!=NULL ) pContent(out);
   return(out);
