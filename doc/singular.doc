@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.167 2008-08-07 14:41:35 Singular Exp $
+@comment $Id: singular.doc,v 1.168 2008-08-07 15:09:16 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -766,8 +766,6 @@ but not for serious computations.
 @node Tropical Geometry, , Teaching, SINGULAR libraries
 @section Tropical Geometry
 @cindex Tropical Geometry
-
-The libraries in this section are intended to as interface to gfan, polymake nad TOPCOM
 
 @menu
 * polymake_lib:: interface to polymake and TOPCOM
