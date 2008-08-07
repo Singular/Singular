@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.166 2007-07-25 16:10:45 Singular Exp $
+@comment $Id: singular.doc,v 1.167 2008-08-07 14:41:35 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -224,6 +224,7 @@ and the command @code{LIB "all.lib";} for loading all libraries.
 * Coding theory::
 * System and Control theory::
 * Teaching::
+* Tropical Geometry::
 @end menu
 @c ----------------------------------------------------------
 @node standard_lib, General purpose, SINGULAR libraries, SINGULAR libraries
@@ -704,7 +705,7 @@ of autonomy degrees.
 
 
 @c ----------------------------------------------------------------------------
-@node Teaching, ,System and Control theory, SINGULAR libraries
+@node Teaching, Tropical Geometry, System and Control theory, SINGULAR libraries
 @section Teaching
 @cindex Teaching
 
@@ -760,6 +761,27 @@ but not for serious computations.
 @node rootsur_lib,,rootsmr_lib, Teaching
 @subsection rootsur_lib
 @c lib rootsur.lib
+
+@c ----------------------------------------------------------------------------
+@node Tropical Geometry, , Teaching, SINGULAR libraries
+@section Tropical Geometry
+@cindex Tropical Geometry
+
+The libraries in this section are intended to as interface to gfan, polymake nad TOPCOM
+
+@menu
+* polymake_lib:: interface to polymake and TOPCOM
+* tropical_lib:: interface to gfan
+@end menu
+@c ----------------------------------------------------------
+@node polymake_lib,tropical_lib,Tropical Geometry, Tropical Geometry
+@subsection polymake_lib
+@c lib polymake.lib no_ex
+
+@c ----------------------------------------------------------
+@node tropical_lib,, polymake_lib, Tropical Geometry
+@subsection tropical_lib
+@c lib tropical.lib no_ex
 
 @c ----------------------------------------------------------
 @node Release Notes, Index, SINGULAR libraries, Top

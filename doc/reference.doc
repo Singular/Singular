@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.303 2008-07-17 12:27:38 wienand Exp $
+@comment $Id: reference.doc,v 1.304 2008-08-07 14:41:34 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -6761,7 +6761,8 @@ See
 @ref{dim};
 @ref{degree};
 @ref{mult};
-@ref{kbase}.
+@ref{kbase};
+@ref{codim}.
 @c ref
 @c ---------------------------------------
 @node wedge, weight, vdim, Functions
