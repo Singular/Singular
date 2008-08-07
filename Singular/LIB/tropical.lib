@@ -1,7 +1,7 @@
-version="$Id: tropical.lib,v 1.4 2008-08-07 15:02:54 keilen Exp $";
+version="$Id: tropical.lib,v 1.5 2008-08-07 15:52:58 keilen Exp $";
 category="Tropical Geometry";
 info="
-LIBRARY:         tropical.lib  Interface to gfan
+LIBRARY:         tropical.lib  Computations in Tropical Geometry
 
 AUTHORS:         Anders Jensen Needergard, email: jensen@math.tu-berlin.de
 @*               Hannah Markwig,  email: markwig@umich.edu
@@ -9,9 +9,9 @@ AUTHORS:         Anders Jensen Needergard, email: jensen@math.tu-berlin.de
 
 WARNING: 
      - tropicalLifting will only work under LINUX and if in addition gfan is installed.
-     - drawTropicalCurve and drawTropicalNewtonSubdivision will only display the tropical
+@*   - drawTropicalCurve and drawTropicalNewtonSubdivision will only display the tropical
        curve under LINUX and if in addition latex and kghostview are installed.
-     - In tropicalLifting the basering needs the parameter t as a variable, while otherwise
+@*   - In tropicalLifting the basering needs the parameter t as a variable, while otherwise
        it needs it as a parameter.
 
 THEORY:
@@ -41,6 +41,7 @@ THEORY:
      by the rational numbers Q and to replace Puiseux series in t by rational functions in t, 
      i.e. we replace C{{t}} by Q(t), or sometimes even by Q[t]. Note, that this in particular 
      forbits rational exponents for the t's.
+
      Moreover, in Singular no negative exponents of monomials are allowed, so that the integer vectors
      vi will have to have non-negative entries. Shifting all exponents by a fixed integer vector does not
      change the tropicalisation nor does it change the toric variety. Thus this does not cause any restriction.
@@ -52,19 +53,19 @@ THEORY:
      e.g. if f=t^{1/2}*x^{-2}*y^3+2t*x*y+4  then  trop(f)=min{1/2-2x+3y,1+x+y,0}.
 
      The main tools provided in this library are as follows:
-     - tropicalLifting    implements the constructive proof of the Theorem of Newton-Kapranov and constructs
+@*   - tropicalLifting    implements the constructive proof of the Theorem of Newton-Kapranov and constructs
                           a point in the variety over C{{t}} corresponding to a given point in the
                           corresponding tropical variety associated to an ideal I; the generators of
                           I have to be in the polynomial ring Q[t,x1,...,xn] considered as a subring of
                           C{{t}}[x1,...,xn]; a solution will be constructed up to given order; note that
                           several field extensions of Q might be necessary thoughout the intermediate 
                           computations; the procedures uses the external program gfan
-     - drawTropicalCurve  visualises a tropical plane curve either given by a polynomial in Q(t)[x,y]
+@*   - drawTropicalCurve  visualises a tropical plane curve either given by a polynomial in Q(t)[x,y]
                           or by a list of linear polynomials of the form ax+by+c with a,b in Z and c in Q;
                           latex must be installed on your computer
-     - tropicalJInvariant computes the tropical j-invaiant of a tropical elliptic curve
-     - jInvariant         computes the j-invariant of an elliptic curve
-     - weierstrassFom     computes the Weierstrass form of an elliptic curve     
+@*   - tropicalJInvariant computes the tropical j-invaiant of a tropical elliptic curve
+@*   - jInvariant         computes the j-invariant of an elliptic curve
+@*   - weierstrassFom     computes the Weierstrass form of an elliptic curve     
 
 PROCEDURES CONCERNED WITH TROPICAL LIFTING:
      tropicalLifting(ideal,intvec,int) computes a point in the tropical variety of ideal over intvec
@@ -192,81 +193,80 @@ ASSUME:  - i is an ideal in Q[t,x_1,...,x_n], w=(w_0,w_1,...,w_n)
            and (w_1/w_0,...,w_n/w_0) is in the tropical variety of i, 
            and ord is the order up to which a point in V(i) over Q{{t}} lying over 
            (w_1/w_0,...,w_n/w_0) shall be computed; w_0 may NOT be ZERO
-         - the basering should not have any parameters on its own 
-           and it should have a global monomial ordering --
-           e.g. ring r=0,(t,x(1..n)),dp;
-         - the first variable of the basering will be treated as the parameter t 
+@*       - the basering should not have any parameters on its own 
+           and it should have a global monomial ordering, e.g. ring r=0,(t,x(1..n)),dp;
+@*       - the first variable of the basering will be treated as the parameter t 
            in the Puiseux series field !!!!
-         - the optional parameter opt should be one or more strings among the following:
-           'isZeroDimensional'  : the dimension i is zero (not to be checked);
-           'isPrime'            : the ideal is prime over Q(t)[x_1,...,x_n]  (not to be checked);
-           'isInTrop'           : (w_1/w_0,...,w_n/w_0) is in the tropical variety (not to be checked);
-           'oldGfan'            : uses gfan version 0.2.1 or less 
-           'findAll'            : find all solutions of a zero-dimensional ideal over (w_1/w_0,...,w_n/w_0)
-           'noAbs'              : do NOT use absolute primary decomposition
-           'noResubst'         : avoids computing the resubstitution
+@*       - the optional parameter opt should be one or more strings among the following:
+@*         'isZeroDimensional'  : the dimension i is zero (not to be checked);
+@*         'isPrime'            : the ideal is prime over Q(t)[x_1,...,x_n]  (not to be checked);
+@*         'isInTrop'           : (w_1/w_0,...,w_n/w_0) is in the tropical variety (not to be checked);
+@*         'oldGfan'            : uses gfan version 0.2.1 or less 
+@*         'findAll'            : find all solutions of a zero-dimensional ideal over (w_1/w_0,...,w_n/w_0)
+@*         'noAbs'              : do NOT use absolute primary decomposition
+@*         'noResubst'         : avoids computing the resubstitution
 RETURN:  IF THE OPTION 'findAll' WAS NOT SET THEN:
-         list, containing one lifting of the given point (w_1/w_0,...,w_n/w_0)
+@*       list, containing one lifting of the given point (w_1/w_0,...,w_n/w_0)
                in the tropical variety of i to a point in V(i) over Puiseux series field up to
                the first ord terms; more precisely:
-               IF THE OPTION 'noAbs' WAS NOT SET THEN:
-               l[1] = ring Q[a]/m[[t]]
-               l[2] = int
-               l[3] = intvec
-               l[4] = list
-               IF THE OPTION 'noAbs' WAS SET THEN:
-               l[1] = ring Q[X(1),...,X(k)]/m[[t]]
-               l[2] = int
-               l[3] = intvec
-               l[4] = list
-               l[5] = string
-         IF THE OPITON 'findAll' WAS NOT SET THEN:
-         list, containing ALL liftings of the given point ((w_1/w_0,...,w_n/w_0)
+@*             IF THE OPTION 'noAbs' WAS NOT SET THEN:
+@*             l[1] = ring Q[a]/m[[t]]
+@*             l[2] = int
+@*             l[3] = intvec
+@*             l[4] = list
+@*             IF THE OPTION 'noAbs' WAS SET THEN:
+@*             l[1] = ring Q[X(1),...,X(k)]/m[[t]]
+@*             l[2] = int
+@*             l[3] = intvec
+@*             l[4] = list
+@*             l[5] = string
+@*       IF THE OPITON 'findAll' WAS NOT SET THEN:
+@*       list, containing ALL liftings of the given point ((w_1/w_0,...,w_n/w_0)
                in the tropical variety of i to a point in V(i) over Puiseux series field up to
                the first ord terms, if the ideal is zero-dimensional over Q{{t}};
                more precisely, each entry of the list is a list l as computed if 
                'find_all' was NOT set
-         WE NOW DESCRIBE THE LIST ENTRIES IF 'findAll' WAS NOT SET:
-         - the ring l[1] contains an ideal LIFT, which contains 
+@*       WE NOW DESCRIBE THE LIST ENTRIES IF 'findAll' WAS NOT SET:
+@*       - the ring l[1] contains an ideal LIFT, which contains 
            a point in V(i) lying over w up to the first ord terms;
-         - and if the integer l[2] is N then t has to be replaced by t^1/N in the
+@*       - and if the integer l[2] is N then t has to be replaced by t^1/N in the
            lift, or alternatively replace t by t^N in the defining ideal
-         - if the k+1st entry of l[3] is  non-zero, then the kth component of LIFT has to
+@*       - if the k+1st entry of l[3] is  non-zero, then the kth component of LIFT has to
            be multiplied t^(-l[3][k]/l[3][1]) AFTER substituting t by t^1/N
-         - unless the option 'noResubst' was set, the kth entry of list l[4] 
+@*       - unless the option 'noResubst' was set, the kth entry of list l[4] 
            is a string which represents the kth generator of
            the ideal i where the coordinates have been replaced by the result of the lift;
            the t-order of the kth entry should in principle be larger than the t-degree of LIFT
-         - if the option 'noAbs' was set, then the string in l[5] defines a maximal ideal in the
+@*       - if the option 'noAbs' was set, then the string in l[5] defines a maximal ideal in the
            field Q[X(1),...,X(k)], where X(1),...,X(k) are the parameters of the ring in l[1];
            the basefield of the ring in l[1] should be considered modulo this ideal
 REMARK:  - it is best to use the procedure displayTropicalLifting to display the result
-         - the option 'findAll' cannot be used if 'noAbs' is set
-         - if the parameter 'findAll' is set AND the ideal i is zero-dimensional in Q{{t}}[x_1,...,x_n]
+@*       - the option 'findAll' cannot be used if 'noAbs' is set
+@*       - if the parameter 'findAll' is set AND the ideal i is zero-dimensional in Q{{t}}[x_1,...,x_n]
            then ALL points in V(i) lying over w are computed up to order ord; if the ideal
            is not-zero dimenisonal, then only all points in the ideal after cutting down 
            to dimension zero will be computed
-         - the procedure REQUIRES that the program GFAN is installed on your computer;
+@*       - the procedure REQUIRES that the program GFAN is installed on your computer;
            if you have GFAN version less than 0.3.0 then you MUST use the optional
            parameter 'oldGfan'
-         - the procedure requires the Singular procedure absPrimdecGTZ to be present in
+@*       - the procedure requires the Singular procedure absPrimdecGTZ to be present in
            the package primdec.lib, unless the option 'noAbs' is set; but even if absPrimdecGTZ
            is present it might be necessary to set the option 'noAbs' in order to avoid
            the costly absolute primary decomposition; the side effect is that the field
            extension which is computed throughout the recursion might need more only one
            parameter to be described
-         - since Q is infinite, the procedure finishes with probability one
-         - you can call the procedure with Z/pZ as base field instead of Q, but there
+@*       - since Q is infinite, the procedure finishes with probability one
+@*       - you can call the procedure with Z/pZ as base field instead of Q, but there
            are some problems you should be aware of:
-           - the Puiseux series field over the algebraic closure of Z/pZ is NOT algebraicall closed,
+@*         + the Puiseux series field over the algebraic closure of Z/pZ is NOT algebraicall closed,
              and thus there may not exist a point in V(i) over the Puiseux series field
              with the desired valuation; so there is no chance that the procedure produced
              a sensible output - e.g. if i=tx^p-tx-1 
-           - if the dimension of i over Z/pZ(t) is not zero the process of reduction to 
+@*         + if the dimension of i over Z/pZ(t) is not zero the process of reduction to 
              zero might not work if the characteristic is small and you are unlucky
-           - the option 'noAbs' has to be used since absolute primary decomposition in 
+@*         + the option 'noAbs' has to be used since absolute primary decomposition in 
              Singular only works in characteristic zero
-         - the basefield should either be Q or Z/pZ for some prime p; field extensions 
+@*       - the basefield should either be Q or Z/pZ for some prime p; field extensions 
            will be computed where necessary; if you need parameters or field extensions
            from the beginning they should rather be simulated as variables possibly adding
            their relations to the ideal; the weights for the additional variables should be zero
@@ -716,7 +716,7 @@ ASSUME:      troplift is the output of tropicalLifting; the optional parameter
              # can be the string 'subst'
 RETURN:      none
 NOTE:        - the procedure displays the output of the procedure tropicalLifting
-             - if the optional parameter 'subst' is given, then the lifting is
+@*           - if the optional parameter 'subst' is given, then the lifting is
                substituted into the ideal and the result is displayed
 EXAMPLE:     example displayTropicalLifting;   shows an example"
 {
@@ -1147,22 +1147,27 @@ example
    size(graph)-1;
 // the coordinates of the first vertex are graph[1][1],graph[1][2];
    graph[1][1],graph[1][2];
-// the first vertex is connected to the vertices graph[1][3][1,1..ncols(graph[1][3])]
+// the first vertex is connected to the vertices 
+//     graph[1][3][1,1..ncols(graph[1][3])]
    intmat M=graph[1][3];
    M[1,1..ncols(graph[1][3])];
-// the weights of the edges to these vertices are graph[1][3][2,1..ncols(graph[1][3])]
+// the weights of the edges to these vertices are 
+//     graph[1][3][2,1..ncols(graph[1][3])]
    M[2,1..ncols(graph[1][3])];
 // from the first vertex emerge size(graph[1][4]) unbounded edges
    size(graph[1][4]);
-// the primitive integral direction vector of the first unbounded edge of the first vertex
+// the primitive integral direction vector of the first unbounded edge 
+//     of the first vertex
    graph[1][4][1][1];
 // the weight of the first unbounded edge of the first vertex
    graph[1][4][1][2];
-// the monomials in f which are part of the Newton subdivision of the first vertex 
+// the monomials which are part of the Newton subdivision of the first vertex 
    graph[1][5];
-// connecting the points in graph[size(graph)][1] we get the boundary of the Newton polytope
+// connecting the points in graph[size(graph)][1] we get 
+//     the boundary of the Newton polytope
    graph[size(graph)][1];
-// an entry in graph[size(graph)][2] is a pair of points in the Newton polytope bounding an inner edge
+// an entry in graph[size(graph)][2] is a pair of points 
+//     in the Newton polytope bounding an inner edge
    graph[size(graph)][2][1];
 }
 
@@ -1177,13 +1182,13 @@ RETURN:      NONE
 NOTE:        - the procedure produces the files /tmp/tropicalcurveNUMBER.tex, /tmp/tropicalcurveNUMBER.dvi and 
                /tmp/tropicalcurveNUMBER.ps, where NUMBER is a random four digit integer; 
                moreover it displays the tropical curve defined by f via kghostview;
-             - edges with multiplicity greater than one carry this multiplicity
-             - if # is empty, then the tropical curve is computed w.r.t. minimum, if #[1] is the
+@*           - edges with multiplicity greater than one carry this multiplicity
+@*           - if # is empty, then the tropical curve is computed w.r.t. minimum, if #[1] is the
                string 'max', then it is computed w.r.t. maximum 
-             - if the last optional argument is 'onlytexfile' then only the latex file
+@*           - if the last optional argument is 'onlytexfile' then only the latex file
                is produced; this option should be used if kghostview is not installed on
                your system
-             - note that lattice points in the Newton subdivision which are black correspond to markings
+@*           - note that lattice points in the Newton subdivision which are black correspond to markings
                of the marked subdivision, while lattice points in grey are not marked
 EXAMPLE:     example drawTropicalCurve  shows an example"
 {
@@ -1333,9 +1338,9 @@ NOTE:     - the procedure produces the files /tmp/newtonsubdivisionNUMBER.tex,
             /tmp/newtonsubdivisionNUMBER.dvi and /tmp/newtonsubdivisionNUMBER.ps, 
             where NUMBER is a random four digit integer; 
             moreover it desplays the tropical curve defined by f via kghostview;
-            if # is empty, then the tropical curve is computed w.r.t. minimum, if #[1] is the
+@*          if # is empty, then the tropical curve is computed w.r.t. minimum, if #[1] is the
             string 'max', then it is computed w.r.t. maximum 
-          - note that lattice points in the Newton subdivision which are black correspond to markings
+@*        - note that lattice points in the Newton subdivision which are black correspond to markings
             of the marked subdivision, while lattice points in grey are not marked
 EXAMPLE:     example drawNewtonSubdivision;   shows an example"
 {
@@ -1418,20 +1423,20 @@ ASSUME:      f is list of linear polynomials of the form ax+by+c with integers a
              representing a tropical Laurent polynomial defining a tropical plane curve;
              alternatively f can be a polynomial in Q(t)[x,y] defining a tropical plane curve
              via the valuation map; 
-             the basering must have a global monomial ordering, two variables and up to one parameter!
+@*           the basering must have a global monomial ordering, two variables and up to one parameter!
 RETURN:      number, if the graph underlying the tropical curve has precisely one loop then its weighted
                      lattice length is returned, otherwise the result will be -1
 NOTE:        - if the tropical curve is elliptic and its embedded graph has precisely one loop, 
                then the weigthed lattice length of the loop is its tropical j-invariant
-             - the procedure checks if the embedded graph of the tropical curve has genus one, 
+@*           - the procedure checks if the embedded graph of the tropical curve has genus one, 
                but it does NOT check if the loop can be resolved, so that the curve is not 
                a proper tropical elliptic curve 
-             - if the embedded graph of a tropical elliptic curve has more than one loop, then
+@*           - if the embedded graph of a tropical elliptic curve has more than one loop, then
                all but one can be resolved, but this is not observed by this procedure, so it
                will not compute the j-invariant
-             - if # is empty, then the tropical curve is computed w.r.t. minimum, if #[1] is the
+@*           - if # is empty, then the tropical curve is computed w.r.t. minimum, if #[1] is the
                string 'max', then it is computed w.r.t. maximum 
-             - the tropicalJInvariant of a plane tropical cubic is the 'cycle length' of the
+@*           - the tropicalJInvariant of a plane tropical cubic is the 'cycle length' of the
                cubic as introduced in the paper: 
                Erik Katz, Hannah Markwig, Thomas Markwig: The j-invariant of a cubic tropical plane curve.
 EXAMPLE:     example tropicalJInvariant;   shows an example"
@@ -1577,18 +1582,19 @@ example
    "EXAMPLE:";
    echo=2;
    ring r=(0,t),(x,y),dp;
-// tropcial_j_invariant computes the tropical j-invariant of the elliptic curve f
+// tropcialJInvariant computes the tropical j-invariant of an elliptic curve
    tropicalJInvariant(t*(x3+y3+1)+1/t*(x2+y2+x+y+x2y+xy2)+1/t2*xy);
 // the Newton polygone need not be the standard simplex
    tropicalJInvariant(x+y+x2y+xy2+1/t*xy);
 // the curve can have arbitrary degree
    tropicalJInvariant(t*(x7+y7+1)+1/t*(x4+y4+x2+y2+x3y+xy3)+1/t7*x2y2);
-// the procedure does not realise, if the embedded graph of the tropical curve has
-// a loop that can be resolved
+// the procedure does not realise, if the embedded graph of the tropical 
+//     curve has a loop that can be resolved
    tropicalJInvariant(1+x+y+xy+tx2y+txy2);
 // but it does realise, if the curve has no loop at all ...
    tropicalJInvariant(x+y+1);
-// or if the embedded graph has more than one loop - even if only one cannot be resolved
+// or if the embedded graph has more than one loop - even if only one 
+//     cannot be resolved
    tropicalJInvariant(1+x+y+xy+tx2y+txy2+t3x5+t3y5+tx2y2+t2xy4+t2yx4);
 }
 
@@ -1600,8 +1606,8 @@ ASSUME:      wf is a a polynomial whose Newton polygon has precisely one interio
 RETURN:      poly, the Weierstrass normal form of the polygon
 NOTE:        - the algorithm for the coefficients of the Weierstrass form is due to 
                Fernando Rodriguez Villegas, villegas@math.utexas.edu
-             - the characteristic of the base field should not be 2 or 3
-             - if an additional argument # is given, a simplified Weierstrass form
+@*           - the characteristic of the base field should not be 2 or 3
+@*           - if an additional argument # is given, a simplified Weierstrass form
                is computed
 EXAMPLE:     example weierstrassForm;   shows an example"
 {
@@ -1646,10 +1652,10 @@ example
    poly g=x+y+x2y+xy2+1/t*xy;
    poly wg=weierstrassForm(g);
    wg;
-// ... but it is not yet a simple, since it still has an xy-term, unlike swg
+// but it is not yet a simple, since it still has an xy-term, unlike swg
    poly swg=weierstrassForm(g,1);
    swg;
-// the j-invariants of all three polynomials coincide ...
+// the j-invariants of all three polynomials coincide
    jInvariant(g);
    jInvariant(wg);
    jInvariant(swg);
@@ -1664,10 +1670,10 @@ proc jInvariant (poly f,list #)
 ASSUME:      - f is a a polynomial whose Newton polygon has precisely one interior lattice
                point, so that it defines an elliptic curve on the toric surface corresponding
                to the Newton polygon
-             - it the optional argument # is present the base field should be Q(t) and 
+@*           - it the optional argument # is present the base field should be Q(t) and 
                the optional argument should be one of the following strings:
-               'ord'   : then the return value is of type integer, namely the order of the j-invariant
-               'split' : then the return value is a list of two polynomials, such that the quotient
+@*             'ord'   : then the return value is of type integer, namely the order of the j-invariant
+@*             'split' : then the return value is a list of two polynomials, such that the quotient
                          of these two is the j-invariant
 RETURN:      poly, the j-invariant of the elliptic curve defined by poly
 NOTE:        the characteristic of the base field should not be 2 or 3, unless the input is a plane cubic
@@ -1695,9 +1701,10 @@ example
    "EXAMPLE:";
    echo=2;
    ring r=(0,t),(x,y),dp;
-// jInvariant computes the j-invariant of a cubic independent of the ground field
+// jInvariant computes the j-invariant of a cubic 
    jInvariant(x+y+x2y+y3+1/t*xy);
-// if the ground field has one parameter t, then we can instead compute the order of the j-invariant
+// if the ground field has one parameter t, then we can instead 
+//    compute the order of the j-invariant
    jInvariant(x+y+x2y+y3+1/t*xy,"ord");
 // one can compare the order of the j-invariant to the tropical j-invariant
    tropicalJInvariant(x+y+x2y+y3+1/t*xy);
@@ -1717,15 +1724,15 @@ proc conicWithTangents (list points,list #)
 "USAGE:      conicWithTangents(points[,#]); points list, # optional list
 ASSUME:      points is a list of five points in the plane over K(t)
 RETURN:      list, l[1] = the list points of the five given points
-                   l[2] = the conic f passing through the five points
-                   l[3] = list of equations of the tangents to f in the given points
-                   l[4] = ideal, the tropicalisation of f (i.e. a list of linear forms)
-                   l[5] = a list of the tropicalisation of the tangents
-                   l[6] = a list containing the vertices of the tropical conic f
-                   l[7] = a list containing lists with the vertices of the tangents
-                   l[8] = a string which contains the latex-code to draw the tropical
+@*                 l[2] = the conic f passing through the five points
+@*                 l[3] = list of equations of the tangents to f in the given points
+@*                 l[4] = ideal, the tropicalisation of f (i.e. a list of linear forms)
+@*                 l[5] = a list of the tropicalisation of the tangents
+@*                 l[6] = a list containing the vertices of the tropical conic f
+@*                 l[7] = a list containing lists with the vertices of the tangents
+@*                 l[8] = a string which contains the latex-code to draw the tropical
                           conic and its tropicalised tangents
-                   l[9] = if # is non-empty, this is the same data for the dual conic
+@*                 l[9] = if # is non-empty, this is the same data for the dual conic
                           and the points dual to the computed tangents
 NOTE:        the points must be generic, i.e. no three on a line
 EXAMPLE:     example conicWithTangents;   shows an example"
@@ -1910,21 +1917,26 @@ example
    conic[1];
 // conic[2] is the equation of the conic f passing through the five points
    conic[2];
-// conic[3] is a list containing the equations of the tangents through the five points
+// conic[3] is a list containing the equations of the tangents 
+//          through the five points
    conic[3];
 // conic[4] is an ideal representing the tropicalisation of the conic f
    conic[4];
-// conic[5] is a list containing the tropicalisation of the five tangents in conic[3]
+// conic[5] is a list containing the tropicalisation 
+//          of the five tangents in conic[3]
    conic[5];
-// conic[6] is a list containing the vertices of the tropical conic defined by f
+// conic[6] is a list containing the vertices of the tropical conic 
    conic[6];
 // conic[7] is a list containing the vertices of the five tangents
    conic[7];
-// conic[8] contains the latex code to draw the tropical conic and its tropicalised tangents;
-// it can written in a file, processed and displayed via kghostview -- to do so hit the return button
+// conic[8] contains the latex code to draw the tropical conic and 
+//          its tropicalised tangents; it can written in a file, processed and 
+//          displayed via kghostview 
    write(":w /tmp/conic.tex",conic[8]);   
-   system("sh","cd /tmp; latex /tmp/conic.tex; dvips /tmp/conic.dvi -o; kghostview conic.ps &");
-// with an optional argument the same information for the dual conic is computed and saved in conic[9]
+   system("sh","cd /tmp; latex /tmp/conic.tex; dvips /tmp/conic.dvi -o; 
+            kghostview conic.ps &");
+// with an optional argument the same information for the dual conic is computed 
+//         and saved in conic[9]
    conic=conicWithTangents(points,1);
    conic[9][2]; // the equation of the dual conic
 }
@@ -1938,8 +1950,8 @@ proc tropicalise (poly f,list #)
 ASSUME:      f is a polynomial in Q(t)[x_1,...,x_n]
 RETURN:      list, the linear forms of the tropicalisation of f
 NOTE:        if # is empty, then the valuation of t will be 1, 
-             if # is the string 'max' it will be -1; the latter
-             supposes that we consider the maximum of the the computed 
+@*           if # is the string 'max' it will be -1; 
+@*           the latter supposes that we consider the maximum of the the computed 
              linear forms, the former that we consider their minimum
 EXAMPLE:     example tropicalise;   shows an example"
 {
@@ -2368,11 +2380,11 @@ NOTE:    - if the list # is non-empty, the first entry should be a string; if th
            is considered with respect to the minimum and the string can be used to 
            insert further texdraw commands (e.g. to have a lighter image as when called
            from inside conicWithTangents); 
-         - the procedure computes a scalefactor for the texdraw command which should
+@*       - the procedure computes a scalefactor for the texdraw command which should
            help to display the curve in the right way; this may, however, be a bad idea
            if several texDrawTropical outputs are put together to form one image; the
            scalefactor can be prescribed by a second optional entry of type poly
-         - the list # is optional and may as well be empty
+@*       - the list # is optional and may as well be empty
 EXAMPLE:     example texDrawTropical;   shows an example"
 {
   int i,j;
@@ -2533,7 +2545,7 @@ NOTE:        - the list # should contain as only entry a string; if this string 
                is considered with respect to the minimum and the string can be used to 
                insert further texdraw commands (e.g. to have a lighter image as when called
                from inside conicWithTangents); the list # is optional and may as well be empty
-             - note that lattice points in the Newton subdivision which are black correspond to markings
+@*           - note that lattice points in the Newton subdivision which are black correspond to markings
                of the marked subdivision, while lattice points in grey are not marked
 EXAMPLE:     example texDrawNewtonSubdivision;   shows an example"
 {
@@ -2665,7 +2677,7 @@ example
    ring r=(0,t),(x,y),dp;
    poly f=x+y+x2y+xy2+1/t*xy;
    list graph=tropicalCurve(f);
-// compute the texdraw code of the Newton subdivision of the tropical curve defined by f
+// compute the texdraw code of the Newton subdivision of the tropical curve 
    texDrawNewtonSubdivision(graph);
 }
 
@@ -2750,8 +2762,10 @@ example
    echo=2;
    // the lattice polygon spanned by the points (0,0), (3,0) and (0,3) 
    // with all integer points as markings
-   list polygon=intvec(1,1),intvec(3,0),intvec(2,0),intvec(1,0),intvec(0,0),intvec(2,1),intvec(0,1),intvec(1,2),intvec(0,2),intvec(0,3);
-   // define a triangulation by connecting the only interior point with the vertices
+   list polygon=intvec(1,1),intvec(3,0),intvec(2,0),intvec(1,0),intvec(0,0),
+                intvec(2,1),intvec(0,1),intvec(1,2),intvec(0,2),intvec(0,3);
+   // define a triangulation by connecting the only interior point 
+   //        with the vertices
    list triang=intvec(1,2,5),intvec(1,5,10),intvec(1,2,10);
    // produce the texdraw output of the triangulation triang
    texDrawTriangulation(triang,polygon);
