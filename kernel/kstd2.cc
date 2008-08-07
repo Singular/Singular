@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.73 2008-07-26 08:22:35 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.74 2008-08-07 18:08:37 levandov Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1741,6 +1741,13 @@ ideal freegb(ideal I, int uptodeg, int lVblock)
 
   /* assume: ring is prepared, ideal is copied into shifted ring */
   /* uptodeg and lVblock are correct - test them! */
+
+  /* check whether the ideal is in V */
+  if (! ideal_isInV(I,lVblock) )
+  {
+    PrintS("ERROR: The input ideal contains incorrectly encoded elements! ");
+    return(NULL);
+  }
 
   //  kStrategy strat = new skStrategy;
   /* ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int uptodeg, int lV) */

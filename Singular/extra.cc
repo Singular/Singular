@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.280 2008-07-28 09:55:02 Singular Exp $ */
+/* $Id: extra.cc,v 1.281 2008-08-07 18:08:36 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2652,6 +2652,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       {
 	lVblock=(int)((long)(h->Data()));
 	res->data = freegb(I,uptodeg,lVblock);
+	if (res->data == NULL)
+	{
+	  /* that is there were input errors */
+	  res->data = I;
+	}
 	res->rtyp = IDEAL_CMD;
       }
       else return TRUE;
@@ -2712,6 +2717,30 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 	lV=(int)((long)(h->Data()));
 	res->rtyp = INT_CMD;
 	res->data = (void*)pLastVblock(p, lV);
+      }
+      else return TRUE;
+      return FALSE;
+    }
+    else
+/*==================== shrink-test for freeGB  =================*/
+    if (strcmp(sys_cmd, "shrinktest") == 0)
+    {
+      poly p;
+      int lV;
+      if ((h!=NULL) && (h->Typ()==POLY_CMD))
+      {
+	p=(poly)h->CopyD();
+	h=h->next;
+      }
+      else return TRUE;
+      if ((h!=NULL) && (h->Typ()==INT_CMD))
+      {
+	lV=(int)((long)(h->Data()));
+	res->rtyp = POLY_CMD;
+	//	res->data = p_mShrink(p, lV, currRing);
+	//	kStrategy strat=new skStrategy;
+	//	strat->tailRing = currRing;
+	res->data = p_Shrink(p, lV, currRing);
       }
       else return TRUE;
       return FALSE;

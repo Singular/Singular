@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shiftgb.cc,v 1.9 2008-07-26 14:28:03 motsak Exp $ */
+/* $Id: shiftgb.cc,v 1.10 2008-08-07 18:08:37 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for shift GB and free GB
 */
@@ -379,6 +379,7 @@ int pmFirstVblock(poly p, int lV)
 int isInV(poly p, int lV)
 {
   /* investigate only the leading monomial of p in currRing */
+  if ( pIsConstant(p) ) return(1);
   if (lV <= 0) return(0);
   /* returns 1 iff p is in V */
   /* that is in each block up to a certain one there is only one nonzero exponent */
@@ -426,6 +427,37 @@ int isInV(poly p, int lV)
   freeT(B, b);
   return(1);
 }
+
+int poly_isInV(poly p, int lV)
+{
+  /* tests whether the whole polynomial p in in V */
+  poly q = p;
+  while (q!=NULL)
+  {
+    if ( !isInV(q,lV) )
+    {
+      return(0);
+    }
+    q = pNext(q);
+  }
+  return(1);
+}
+
+int ideal_isInV(ideal I, int lV)
+{
+  /* tests whether each polynomial of an ideal I lies in in V */
+  int i;
+  int s    = IDELEMS(I)-1;
+  for(i = 0; i <= s; i++)
+  {
+    if ( !poly_isInV(I->m[i],lV) )
+    {
+      return(0);
+    }
+  }
+  return(1);
+}
+
 
 int itoInsert(poly p, int uptodeg, int lV, const ring r)
 {

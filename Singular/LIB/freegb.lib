@@ -1,14 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: freegb.lib,v 1.9 2008-05-12 14:55:16 levandov Exp $";
+version="$Id: freegb.lib,v 1.10 2008-08-07 18:08:37 levandov Exp $";
 category="Noncommutative";
 info="
-LIBRARY: freegb.lib  Twosided Noncommutative Groebner bases in Free Algebras
+LIBRARY: freegb.lib   Twosided Noncommutative Groebner bases in Free Algebras
 AUTHOR: Viktor Levandovskyy,     levandov@math.rwth-aachen.de
 
 PROCEDURES:
-freegbasis(list L, int n);   compute two-sided Groebner basis of ideal, encoded via L, up to degree n
-
 freegbRing(int d);    creates a ring with d blocks of shifted original variables
+freegbasis(list L, int n);   compute two-sided Groebner basis of ideal, encoded via L, up to degree n
 
 CONVERSION ROUTINES:
 
@@ -28,11 +27,8 @@ vct2str(module M[,int n]);  convert a vector into a word in free algebra
 LIB "discretize.lib"; // for replace
 LIB "qhmoduli.lib"; // for Max
 
-proc vct2mono(vector v)
-{
-  // produces a monomial in new vars
-  // need a ring with new vars!!
-}
+
+// obsolete?
 
 proc lshift(module M, int s, string varing, def lpring)
 {
@@ -81,7 +77,7 @@ proc lshift(module M, int s, string varing, def lpring)
 
 proc skip0(vector v)
 {
-  // skips zeros in vector
+  // skips zeros in a vector, producing another vector
   int sv = nrows(v);
   int sw = size(v);
   if (sv == sw)
@@ -376,8 +372,7 @@ example
 }
 
 proc mono2word(poly p, int d)
-{
-  
+{ 
 }
 
 // given the element -7xy^2x, it is represented as [-7,x,y^2,x] or as [-7,x,y,y,x]
@@ -892,7 +887,6 @@ example
   setring A;
   A;
 }
-
 
 proc ex_shift()
 {
@@ -1683,6 +1677,7 @@ example
 
 proc sent2lplace(string s)
 {
+  // SENTence of words TO LetterPLACE
   list L =   stringpoly2lplace(s);
   int i; int ss = size(L);
   for(i=1; i<=ss; i++)
@@ -1936,25 +1931,44 @@ example
   strpower2rep("-a^2*x^4");  
 }
 
-proc Liebr(poly a, poly b)
+proc Liebr(poly a, poly b, list #)
 {
-  // alias ppLiebr
+  // alias ppLiebr; 
+  //if int N is given compute [a,[...[a,b]]]] left normed bracket
   poly q;
+  int N=1;
+  if (size(#)>0)
+  {
+    if (typeof(#[1])=="int")
+    {
+      N = int(#[1]);
+    }
+  }
+  if (N<=0) { return(q); }
   while (b!=0)
   {
     q = q + pmLiebr(a,lead(b));
     b = b - lead(b);
+  }
+  int i;
+  if (N >1)
+  {
+    for(i=1; i<=N; i++)
+    {
+      q = Liebr(a,q);
+    }
   }
   return(q);
 }
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring r = 0,(x(1),x(2),x(3),y(1),y(2),y(3)),dp;
+  ring r = 0,(x(1),y(1),x(2),y(2),x(3),y(3),x(4),y(4)),dp;
   poly a = x(1)*y(2); poly b = y(1);
-  int uptodeg=3; int lV=2;
+  int uptodeg=4; int lV=2;
   export uptodeg; export lV;
   Liebr(a,b);
+  Liebr(x(1),y(1),2);
 }
 
 proc pmLiebr(poly a, poly b)
@@ -2168,7 +2182,7 @@ example
   export uptodeg; export lV;
   def R = freegbRing(uptodeg);
   setring R;
-  ideal I = Serre(A);
+  ideal I = Serre(A,1);
   lp2lstr(I,r);
   setring r;
   lst2str(LN,1);
@@ -2217,10 +2231,11 @@ example
 
 proc file2lplace(string fname)
 {
+  // format: from the usual string to letterplace
   string s = read(fname);
   // assume: file is a comma-sep list of polys
   // the vars are declared before
-  // ends with ";"
+  // the file ends with ";"
   string t; int i;
   ideal I;
   list tst;
@@ -2285,3 +2300,27 @@ static proc get_ls3nilp()
   setring r;
   lst2str(LN,1); // agree!
 }
+
+static proc doc_example
+{
+  LIB "freegb.lib";
+  ring r = 0,(x,y,z),dp;
+  int d =4; // degree bound
+  def R = freegbRing(d);
+  setring R;
+  ideal I = x(1)*y(2) + y(1)*z(2), x(1)*x(2) + x(1)*y(2) - y(1)*x(2) - y(1)*y(2);
+  option(redSB);option(redTail);
+  ideal J = system("freegb",I,d,nvars(r));
+  J;
+  // visualization:
+  lp2lstr(J,r); // export an object called LN to the ring r
+  setring r;  // change to the ring r
+  lst2str(LN,1); // output the strings
+}
+
+
+
+// TODO: 
+// multiply two letterplace polynomials, lpMult
+// reduction/ Normalform? needs kernel stuff
+

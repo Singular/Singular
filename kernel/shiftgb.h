@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shiftgb.h,v 1.5 2008-07-08 13:02:21 Singular Exp $ */
+/* $Id: shiftgb.h,v 1.6 2008-08-07 18:08:37 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -37,6 +37,8 @@ int pFirstVblock(poly p, int lV);
 int pmFirstVblock(poly p, int lV);
 
 int isInV(poly p, int lV);
+int poly_isInV(poly p, int lV);
+int ideal_isInV(ideal I, int lV);
 
 int itoInsert(poly p, int uptodeg, int lV, const ring r);
 
