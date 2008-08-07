@@ -1,22 +1,20 @@
-version="$Id: tropical.lib,v 1.2 2008-08-04 15:46:26 keilen Exp $";
+version="$Id: tropical.lib,v 1.3 2008-08-07 14:40:28 Singular Exp $";
 category="Tropical Geometry";
 info="
-   LIBRARY:         tropical.lib
+LIBRARY:         tropical.lib  Interface to gfan
 
-   AUTHORS:         Anders Jensen Needergard, email: jensen@math.tu-berlin.de
-                    Hannah Markwig,  email: markwig@umich.edu
-                    Thomas Markwig,  email: keilen@mathematik.uni-kl.de
+AUTHORS:         Anders Jensen Needergard, email: jensen@math.tu-berlin.de
+@*               Hannah Markwig,  email: markwig@umich.edu
+@*               Thomas Markwig,  email: keilen@mathematik.uni-kl.de
 
-   KEYWORDS:        tropical curves, tropical polynomials
-
-   WARNING: 
+WARNING: 
      - tropicalLifting will only work under LINUX and if in addition gfan is installed.
      - drawTropicalCurve and drawTropicalNewtonSubdivision will only display the tropical
        curve under LINUX and if in addition latex and kghostview are installed.
      - In tropicalLifting the basering needs the parameter t as a variable, while otherwise
        it needs it as a parameter.
 
-   THEORY:
+THEORY:
      Fix some base field K and a bunch of lattice points v0,...,vm in the integer lattice Z^n,
      then this defines a toric variety as the closure of (K*)^n in the projective space P^m, where
      the torus is embedded via the map sending a point x in (K*)^n to the point (x^v0,...,x^vm).
@@ -68,21 +66,21 @@ info="
      - jInvariant         computes the j-invariant of an elliptic curve
      - weierstrassFom     computes the Weierstrass form of an elliptic curve     
 
-   PROCEDURES CONCERNED WITH TROPICAL LIFTING:
+PROCEDURES CONCERNED WITH TROPICAL LIFTING:
      tropicalLifting(ideal,intvec,int) computes a point in the tropical variety of ideal over intvec
      displayTropicalLifting(list)      displays the output of tropicalLifting
 
-   PROCEDURES CONCERNED WITH DRAWING TROPICAL CURVES:
+PROCEDURES CONCERNED WITH DRAWING TROPICAL CURVES:
      tropicalCurve(list)            computes a tropical curve and its Newton subdivision
      drawTropicalCurve(poly)        produces a post script image of the tropical curve defined by poly
      drawNewtonSubdivision(poly)    produces a post script image of the Newton subdivision a tropical curve
 
-   PROCEDURES CONCERNED WITH J-INVARIANTS:
+PROCEDURES CONCERNED WITH J-INVARIANTS:
      tropicalJInvariant(poly)       computes the tropical j-invariant of the tropical curve poly
      weierstrassForm(poly)          computes the Weierstrass form of a cubic polynomial
      jInvariant(poly)               computes the j-invariant of a cubic polynomial
 
-   GENERAL PROCEDURES:
+GENERAL PROCEDURES:
      conicWithTangents(list)        computes a conic through five points and the tangents in these points
      tropicalise(poly)              computes the tropicalisation of the polynomial
      tropicaliseSet(ideal)          computes the tropicalisation of all polynomials in the ideal
@@ -91,7 +89,7 @@ info="
      initialForm(poly,intvec)       computes the initial form of poly in Q[x_1,...,x_n] w.r.t. intvec
      initialIdeal(ideal,intvec)     computes the initial ideal of an ideal in Q[x_1,...,x_n] w.r.t. intvec
 
-   PROCEDURES CONCERNED WITH THE LATEX CONVERSION:
+PROCEDURES CONCERNED WITH THE LATEX CONVERSION:
      texNumber(poly)                  outputs the texcommand for the leading coefficient of poly
      texPolynomial(poly)              outputs the texcommand for the polynomial poly 
      texMatrix(matrix)                outputs the texcommand for the matrix
@@ -100,7 +98,7 @@ info="
      texDrawNewtonSubdivision(list)   computes the texdraw commands for a Newton subdivision 
      texDrawTriangulation(list,list)  computes the texdraw commands for a triangulation     
 
-   AUXILARY PROCEDURES:
+AUXILARY PROCEDURES:
      radicalMemberShip(poly,ideal)    checks if the poly is contained in the radical of ideal
      tInitialFormPar(poly,intvec)     computes the t-initial form of poly in Q(t)[x_1,...,x_n] w.r.t. intvec
      tInitialFormParMax(poly,intvec)  same as tInitialFormPar, but uses maximum instead of minimum
@@ -110,6 +108,9 @@ info="
      parameterSubstitute(poly,int)    substitutes in the poly the parameter t by t^N
      tropcialSubst(poly,int,list)     computes the tropical polynomial of poly with certain substitutions 
      randomPoly(int,int,int)          computes a polynomial with random coefficients
+
+KEYWORDS:        tropical curves; tropical polynomials
+
 ";
 
 ////////////////////////////////////////////////////////////////////////////////////

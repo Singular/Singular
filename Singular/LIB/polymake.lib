@@ -1,20 +1,16 @@
-version="$Id: polymake.lib,v 1.4 2008-08-06 13:14:56 keilen Exp $";
+version="$Id: polymake.lib,v 1.5 2008-08-07 14:40:28 Singular Exp $";
 category="Tropical Geometry";
 info="
-   LIBRARY:         polymake.lib
+LIBRARY:         polymake.lib    Interface to polymake and TOPCOM
+AUTHOR:         Thomas Markwig,  email: keilen@mathematik.uni-kl.de
 
-   AUTHORS:         Thomas Markwig,  email: keilen@mathematik.uni-kl.de
-
-   KEYWORDS:        polytope, fan, secondary fan, secondary polytope, polymake,
-                    Newton polytope, Groebner fan 
-
-   WARNING:
+WARNING:
      Most procedures will not work unless polymake or topcom is installed and
      if so, they will only work with the operating system LINUX! 
      For more detailed information see IMPORTANT NOTE respectively consult the
      help string of the procedures.
 
-   IMPORTANT NOTE:
+IMPORTANT NOTE:
      Even though this is a Singular library for computing polytopes and fans such 
      as the Newton polytope or the Groebner fan of a polynomial, most of the hard 
      computations are NOT done by Singular but by the program 
@@ -31,7 +27,7 @@ info="
      Note, though, that the procedures concerned with planar polygons are independent of
      both, polymake and topcom.
 
-   PROCEDURES USING POLYMAKE:
+PROCEDURES USING POLYMAKE:
      polymakePolytope(list)            computes the vertices of a polytope using polymake
      newtonPolytope(poly)              computes the Newton polytope of the polynomial
      newtonPolytopeLP(poly)            computes the lattice points of the Newton polytope of the polynomial
@@ -40,11 +36,11 @@ info="
      intmatToPolymake(intmat,string)   transforms an integer matrix into polymake format
      polymakeToIntmat(string,string)   transforms polymake output into an integer matrix 
 
-   PROCEDURES USING TOPCOM:
+PROCEDURES USING TOPCOM:
      triangulations(list)          computes all triangulations of a marked polytope
      secondaryPolytope(list)       computes the secondary polytope of a marked polytope
 
-   PROCEDURES CONERNED WITH PLANAR POLYGONS:
+PROCEDURES CONERNED WITH PLANAR POLYGONS:
      cycleLength(list,intvec)      computes the cycleLength of cycle dual to list with interior point intvec
      splitPolygon(list)            splits a marked polygon into vertices, facets and interior points
      eta(list,list)                computes the eta-vector of a triangulation
@@ -54,6 +50,10 @@ info="
      picksFormula(list)            computes the ingrediants of Pick's formula for a polygon
      ellipticNF(list)              computes the normal form of an elliptic polygon
      ellipticNFDB(int)             displays the 16 normal forms of elliptic polygons
+
+KEYWORDS:        polytope; fan; secondary fan; secondary polytope; polymake;
+                    Newton polytope; Groebner fan 
+
 ";
 
 ////////////////////////////////////////////////////////////////////////////////////
