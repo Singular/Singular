@@ -6,7 +6,7 @@
  *  Purpose: macros/inline functions for number operations
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Numbers.h,v 1.4 2008-08-06 13:55:42 Singular Exp $
+ *  Version: $Id: p_Numbers.h,v 1.5 2008-08-07 16:03:22 Singular Exp $
  *******************************************************************/
 #ifndef P_NUMBERS_H
 #define P_NUMBERS_H
@@ -35,7 +35,7 @@
 #define n_Sub_RingGeneral(n1, n2, r)       (r)->cf->nSub(n1, n2)
 //#define n_InpMult_RingGeneral(n1, n2, r)   (r)->cf->nInpMult(n1, n2, r)
 #define n_InpMult_RingGeneral(n1, n2, r)   ndInpMult(n1, n2, r)
-#define n_InpAdd_FieldGeneral(n1, n2, r)    n1=ndInpAdd(n1, n2, r)
+#define n_InpAdd_RingGeneral(n1, n2, r)    n1=ndInpAdd(n1, n2, r)
 #endif
 
 #include "modulop.h"
