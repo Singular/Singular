@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.29 2008-07-26 21:16:26 levandov Exp $";
+version="$Id: dmod.lib,v 1.30 2008-08-07 20:14:21 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -71,7 +71,7 @@ convloc(L);         replace global orderings with local in the ringlist L
 minIntRoot(P,fact); minimal integer root among the roots of a maximal ideal P
 varnum(s);          the number of the variable with the name s
 
-SEE ALSO: gmssing_lib
+SEE ALSO: gmssing_lib, bfct_lib, dmodapp_lib
 ";
 
 LIB "matrix.lib"; // for submat
@@ -83,7 +83,7 @@ LIB "gmssing.lib";
 LIB "control.lib";  // for genericity
 LIB "dmodapp.lib"; // for e.g. engine
 
-proc tstdmodlib()
+proc testdmodlib()
 {
   /* tests all procs for consistency */
   /* adding the new proc, add it here */
