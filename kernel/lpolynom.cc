@@ -1,11 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lpolynom.cc,v 1.1 2008-08-05 20:44:08 ederc Exp $ */
+/* $Id: lpolynom.cc,v 1.2 2008-08-07 13:18:36 Singular Exp $ */
 /*
 * ABSTRACT: lpolynomial definition 
 */
 #include "mod2.h"
+
+#ifdef HAVE_F5
 #include "kutil.h"
 #include "structs.h"
 #include "omalloc.h"
@@ -21,34 +23,39 @@
 #include "pInline1.h"
 #include "f5gb.h"
 #include "lpolynom.h"
-#ifdef HAVE_F5
 
 
 /*2
 * all functions working on the class lpoly for labeled polynomials
 */
 
-void lpoly::setPoly(poly p){
+void lpoly::setPoly(poly p)
+{
         polynomial = p;
 }
 
-void lpoly::setTerm(poly t){
+void lpoly::setTerm(poly t)
+{
         term = t;
 }
 
-void lpoly::setIndex(long i){
+void lpoly::setIndex(long i)
+{
         index = i;
 }
 
-poly lpoly::getPoly(){
+poly lpoly::getPoly()
+{
         return polynomial;
 }
 
-poly lpoly::getTerm(){
+poly lpoly::getTerm()
+{
         return term;
 }
 
-long lpoly::getIndex(){
+long lpoly::getIndex()
+{
         return index;
 }
 
