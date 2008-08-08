@@ -265,8 +265,8 @@ endif
 SLIB0 = absfact.lib  arcpoint.lib  atkins.lib    aksaka.lib    ainvar.lib\
 	alexpoly.lib algebra.lib   brnoeth.lib   curvepar.lib  classify.lib \
         compregb.lib \
-	control.lib  curvepar.lib   crypto.lib    deform.lib    elim.lib \
-        equising.lib \
+	control.lib  curvepar.lib   crypto.lib    deform.lib   elim.lib \
+        equising.lib freegb.lib \
 	finvar.lib   gmspoly.lib   gmssing.lib   general.lib   graphics.lib \
 	grwalk.lib   groups.lib    hnoether.lib  homolog.lib   hyperel.lib \
 	inout.lib    intprog.lib   kskernel.lib  latex.lib     linalg.lib \
@@ -282,7 +282,9 @@ SLIB0 = absfact.lib  arcpoint.lib  atkins.lib    aksaka.lib    ainvar.lib\
 	triang.lib   rootsur.lib  weierstr.lib  zeroset.lib
  
 
-PLIBS = central.lib dmod.lib gkdim.lib involut.lib ncalg.lib ncdecomp.lib nctools.lib perron.lib qmatrix.lib
+PLIBS = bfct.lib central.lib discretize.lib dmod.lib dmodapp.lib gkdim.lib \
+        involut.lib ncalg.lib ncdecomp.lib nchomolog.lib nctools.lib \
+        perron.lib qmatrix.lib
 
 ifdef HAVE_PLURAL
 SLIBS = COPYING ${SLIB0} ${PLIBS} all.lib help.cnf
