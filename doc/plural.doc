@@ -205,19 +205,31 @@ Use the @code{LIB} command for loading of single libraries.
 @c @sc{Singular} and @sc{Plural} together.
 
 @menu
+* bfct_lib::
 * central_lib::
+* discretize_lib::
 * dmod_lib::
+* dmodapp_lib::
 * involut_lib::
 * gkdim_lib::
 * ncalg_lib::
 * ncdecomp_lib::
+* nchomolog_lib::
 * nctools_lib::
 * perron_lib::
 * qmatrix_lib::
 @end menu
 
 @c ----------------------------------------------------------
-@node central_lib, dmod_lib, PLURAL libraries, PLURAL libraries
+@node bfct_lib, central_lib, PLURAL libraries, PLURAL libraries
+@section bfct_lib
+@cindex bfct_lib
+@cindex bfct.lib
+
+@c lib bfct.lib
+
+@c ----------------------------------------------------------
+@node central_lib, discretize_lib, bfct_lib, PLURAL libraries
 @section central_lib
 @cindex central_lib
 @cindex central.lib
@@ -225,7 +237,15 @@ Use the @code{LIB} command for loading of single libraries.
 @c lib central.lib
 
 @c ----------------------------------------------------------
-@node dmod_lib, involut_lib, central_lib, PLURAL libraries
+@node discretize_lib, dmod_lib, central_lib, PLURAL libraries
+@section discretize_lib
+@cindex discretize_lib
+@cindex discretize.lib
+
+@c lib discretize.lib
+
+@c ----------------------------------------------------------
+@node dmod_lib, dmodapp_lib, discretize_lib, PLURAL libraries
 @section dmod_lib
 @cindex dmod_lib
 @cindex dmod.lib
@@ -233,7 +253,15 @@ Use the @code{LIB} command for loading of single libraries.
 @c lib dmod.lib
 
 @c ----------------------------------------------------------
-@node involut_lib,  gkdim_lib, dmod_lib, PLURAL libraries
+@node dmodapp_lib, involut_lib, dmod_lib, PLURAL libraries
+@section dmodapp_lib
+@cindex dmodapp_lib
+@cindex dmodapp.lib
+
+@c lib dmodapp.lib
+
+@c ----------------------------------------------------------
+@node involut_lib,  gkdim_lib, dmodapp_lib, PLURAL libraries
 @section involut_lib
 @cindex involut_lib
 @cindex involut.lib
@@ -257,7 +285,7 @@ Use the @code{LIB} command for loading of single libraries.
 @c lib ncalg.lib
 
 @c ----------------------------------------------------------
-@node ncdecomp_lib, nctools_lib, ncalg_lib, PLURAL libraries
+@node ncdecomp_lib, nchomolog_lib, ncalg_lib, PLURAL libraries
 @section ncdecomp_lib
 @cindex ncdecomp_lib
 @cindex ncdecomp.lib
@@ -265,7 +293,15 @@ Use the @code{LIB} command for loading of single libraries.
 @c lib ncdecomp.lib
 
 @c ----------------------------------------------------------
-@node nctools_lib, perron_lib, ncdecomp_lib, PLURAL libraries
+@node nchomolog_lib, nctools_lib, ncdecomp_lib, PLURAL libraries
+@section nchomolog_lib
+@cindex nchomolog_lib
+@cindex nchomolog.lib
+
+@c lib nchomolog.lib
+
+@c ----------------------------------------------------------
+@node nctools_lib, perron_lib, nchomolog_lib, PLURAL libraries
 @section nctools_lib
 @cindex nctools_lib
 @cindex nctools.lib
