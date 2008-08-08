@@ -1,4 +1,4 @@
-version="$Id: polymake.lib,v 1.7 2008-08-07 16:04:01 keilen Exp $";
+version="$Id: polymake.lib,v 1.8 2008-08-08 10:30:35 keilen Exp $";
 category="Tropical Geometry";
 info="
 LIBRARY:        polymake.lib    Computations with polytopes and fans, interface to polymake and TOPCOM
@@ -40,6 +40,9 @@ PROCEDURES USING TOPCOM:
      triangulations(list)          computes all triangulations of a marked polytope
      secondaryPolytope(list)       computes the secondary polytope of a marked polytope
 
+PROCEDURES USING POLYMAKE AND TOPCOM:
+     secondaryFan(list)            computes the secondary fan of a marked polytope
+
 PROCEDURES CONERNED WITH PLANAR POLYGONS:
      cycleLength(list,intvec)      computes the cycleLength of cycle dual to list with interior point intvec
      splitPolygon(list)            splits a marked polygon into vertices, facets and interior points
@@ -51,8 +54,11 @@ PROCEDURES CONERNED WITH PLANAR POLYGONS:
      ellipticNF(list)              computes the normal form of an elliptic polygon
      ellipticNFDB(int)             displays the 16 normal forms of elliptic polygons
 
-KEYWORDS:        polytope; fan; secondary fan; secondary polytope; polymake;
-                    Newton polytope; Groebner fan 
+AUXILARY PROCEDURES:
+     polymakeKeepTmpFiles(int)     determines whether the files created in /tmp should be kept
+
+KEYWORDS:    polytope; fan; secondary fan; secondary polytope; polymake;
+             Newton polytope; Groebner fan 
 
 ";
 
@@ -78,6 +84,7 @@ LIB "poly.lib";
 LIB "linalg.lib";
 LIB "random.lib";
 ////////////////////////////////////////////////////////////////////////////////////
+
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// PROCEDURES USING POLYMAKE
@@ -107,7 +114,8 @@ NOTE: -  for its computations the procedure calls the program polymake by Ewgeni
 @*    -  note that in the vertex edge graph we have changed the polymake convention which
          starts indexing its vertices by zero while we start with one !
 @*    -  the procedure creates the file  /tmp/polytope.polymake which contains the polytope
-         in polymake format and which can be used for further computations with polymake
+         in polymake format; if you wish to use this for further computations with polymake,
+         you have to use the procedure polymakeKeepTmpFiles in before
 @*    -  moreover, the procedure creates the file /tmp/polytope.output which it deletes 
          again before ending
 @*    -  it is possible to give as an optional second argument as string which then will be
@@ -205,6 +213,12 @@ POINTS
   {
     intmat neq[1][ncols(polytope)+1];
   }
+  // delete the tmp-files, if polymakekeeptmpfiles is not set
+  if (defined(polymakekeeptmpfiles)==0)
+  {
+    system("sh","/bin/rm /tmp/"+dateiname+".polymake");
+  }
+  // return the files
   return(list(np,nd,nveg,neq));
 }
 example
@@ -466,6 +480,12 @@ EQUATIONS
     {
       ineq[i]=ineq[i]+list(extremerays[i]);
     }
+  }
+  // delete the tmp-files, if polymakekeeptmpfiles is not set
+  if (defined(polymakekeeptmpfiles)==0)
+  {
+    system("sh","/bin/rm /tmp/ineq.polymake");
+    system("sh","/bin/rm /tmp/ineq.output");
   }
   // get the linearity space
   return(list(ineq,linearity)); 
@@ -756,8 +776,8 @@ example
 /// PROCEDURES USING TOPCOM
 ////////////////////////////////////////////////////////////////////////////////////////
 
-proc triangulations (list polygon, list #)
-"USAGE:  triangulations(polygon[,#]); list polygon, list #
+proc triangulations (list polygon)
+"USAGE:  triangulations(polygon); list polygon
 ASSUME:  polygon is a list of integer vectors of the same size representing the affine
          coordinates of the lattice points 
 PURPOSE: the procedure considers the marked polytope given as the convex hull of
@@ -775,9 +795,8 @@ NOTE:  - the procedure calls for its computations the program points2triangs
 @*     - the procedure creates the files /tmp/triangulationsinput and /tmp/triangulationsoutput;
          the former is used as input for points2triangs and the latter is its output
          containing the triangulations of corresponding to points in the format
-         of points2triangs; if you want to use these for further computations with topcom 
-         you have to hand an optional parameter (e.g. the number 1) to the procedure, 
-         since otherwise the files will be destroyed before leaving the procedure
+         of points2triangs; if you wish to use this for further computations with topcom,
+         you have to use the procedure polymakeKeepTmpFiles in before
 @*     - note that an integer i in an integer vector representing a triangle refers to
          the ith lattice point, i.e. polygon[i]; this convention is different from 
          TOPCOM's convention, where i would refer to the i-1st lattice point
@@ -801,7 +820,8 @@ EXAMPLE: example triangulations;   shows an example"
   // call points2triangs
   system("sh","cd /tmp; points2triangs < triangulationsinput > triangulationsoutput");
   string p2t=read("/tmp/triangulationsoutput"); // takes the result of points2triangs
-  if (size(#)==0)
+  // delete the tmp-files, if polymakekeeptmpfiles is not set
+  if (defined(polymakekeeptmpfiles)==0)
   {
     system("sh","cd /tmp; rm -f triangulationsinput; rm -f triangulationsoutput");
   }
@@ -989,6 +1009,89 @@ example
    // the corresponding triangulations
    secpoly[2];
 }
+
+////////////////////////////////////////////////////////////////////////////////////////
+/// PROCEDURES USING POLYMAKE AND TOPCOM
+////////////////////////////////////////////////////////////////////////////////////////
+
+proc secondaryFan (list polygon,list #)
+"USAGE:  secondaryFan(polygon[,#]); list polygon, list #
+ASSUME:  - polygon is a list of integer vectors of the same size representing the affine
+           coordinates of lattice points
+@*       - if the triangulations of the corresponding polygon have already been computed
+           with the procedure triangulations then these can be given as a second (optional)
+           argument in order to avoid doing this computation again
+PURPOSE: the procedure considers the marked polytope given as the convex hull of
+         the lattice points and with these lattice points as markings; it then
+         computes the lattice points of the secondary polytope given by this 
+         marked polytope which correspond to the triangulations computed by
+         the procedure triangulations
+RETURN:  list, the ith entry of L[1] contains information about the ith cone in the 
+               secondary fan of the polygon, i.e. the cone dual to the ith vertex of the
+               secondary polytope
+@*             L[1][i][1] = integer matrix representing the inequalities which describe the
+                            cone dual to the ith vertex
+@*             L[1][i][2] = a list which contains the inequalities represented by L[i][1]
+                            as a list of strings, where we use the variables x(1),...,x(n)
+@*             L[1][i][3] = only present if 'er' is set to 1; in that case it is an interger matrix
+                            whose rows are the extreme rays of the cone
+@*             L[2] = is an integer matrix whose rows span the linearity space of the fan,
+                      i.e. the linear space which is contained in each cone
+@*             L[3] = the secondary polytope in the format of the procedure polymakePolytope
+@*             L[4] = the list of triangulations corresponding to the vertices 
+                      of the secondary polytope
+NOTE:    - the procedure calls for its computation polymake by Ewgenij Gawrilow,
+           TU Berlin and Michael Joswig, so it only works if polymake is installed;
+           see http://www.math.tu-berlin.de/polymake/
+@*       - in the optional argument # it is possible to hand over other names for the 
+           variables to be used -- be carful, the format must be correct and that is
+           not tested, e.g. if you want the variable names to be u00,u10,u01,u11
+           then you must hand over the string u11,u10,u01,u11
+@*       - if the triangluations are not handed over as optional argument the procedure calls 
+           for its computation of these triangulations the program points2triangs
+           from the program topcom by Joerg Rambau, Universitaet Bayreuth; it
+           therefore is necessary that this program is installed in order to use this 
+           procedure; see
+@*         http://www.uni-bayreuth.de/departments/wirtschaftsmathematik/rambau/TOPCOM
+EXAMPLE: example secondaryFan;   shows an example"
+{
+  if (size(#)==0)
+  {
+    list triang=triangulations(polygon);
+  }
+  else
+  {
+    list triang=#[1];
+  }
+  list sp=secondaryPolytope(polygon,triang);
+  list spp=polymakePolytope(sp[1]);
+  list sf=normalFan(spp[1],spp[4],spp[3],1);
+  return(list(sf[1],sf[2],spp,triang));
+}
+example
+{
+   "EXAMPLE:";
+   echo=2;
+   // the lattice points of the unit square in the plane
+   list polygon=intvec(0,0),intvec(0,1),intvec(1,0),intvec(1,1);
+   // the secondary polytope of this lattice point configuration is computed
+   list secfan=secondaryFan(polygon);
+   // the number of cones in the secondary fan of the polygon
+   size(secfan[1]);
+   // the inequalities of the first cone as matrix are:
+   print(secfan[1][1][1]);
+   // the inequalities of the first cone as string are:
+   print(secfan[1][1][2]);
+   // the rows of the following matrix are the extreme rays of the first cone:
+   print(secfan[1][1][3]);
+   // each cone contains the linearity space spanned by:
+   print(secfan[2]);
+   // the points in the secondary polytope
+   print(secfan[3][1]);
+   // the corresponding triangulations
+   secfan[4];
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// PROCEDURES CONCERNED WITH PLANAR POLYGONS
@@ -2027,6 +2130,37 @@ example
    // its lattice points are
    nf[2];
 }
+
+
+/////////////////////////////////////////////////////////////////////////////////
+/// AUXILARY PROCEDURES
+/////////////////////////////////////////////////////////////////////////////////
+
+proc polymakeKeepTmpFiles (int i)
+"USAGE:  polymakeKeepTmpFiles(int i);   i int
+PURPOSE: some procedures create files in the directory /tmp which are used for 
+         computations with polymake respectively topcom; these will be removed
+         when the corresponding procedure is left; however, it might be desireable
+         to keep them for further computations with either polymake or topcom; this
+         can be achieved by this procedure; call the procedure as:
+@*       - polymakeKeepTmpFiles(1);  - then the files will be kept
+@*       - polymakeKeepTmpFiles(0);  - then the files will be removed in the future
+RETURN:  none"
+{
+  if (i==1)
+  {
+    int polymakekeeptmpfiles;
+    export polymakekeeptmpfiles;
+  }
+  else
+  {
+    if (defined(polymakekeeptmpfiles))
+    {
+      kill polymakekeeptmpfiles;
+    }
+  }
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
