@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.97 2007-11-16 19:15:41 Singular Exp $
+@comment $Id: NEWS.texi,v 1.98 2008-08-08 13:07:50 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -21,6 +21,28 @@
 @end ifset
 
 @heading News for version @value{VERSION}
+
+@itemize @bullet
+@item
+new coeffient domains: Z, Z/m, Z/(2^n)
+@item
+new handling of default argument in libraries
+@item
+new library: tropical.lib (@nref{tropical_lib}: Computations in Tropical Geometry)
+@item
+new library: polymake.lib (@nref{polymake_lib}:
+Computations with polytopes and fans, interface to polymake and TOPCOM)
+@item
+new library: dmodapp.lib (@nref{dmodapp_lib}: applications of D-modules)
+@item
+new library: bfct.lib global (@nref{bfct_lib}: Bernstein-Sato polynomial)
+@item
+new library: discretize.lib @nref{discretize_lib}: tools for the generation of finite difference schemes)
+@item 
+new library: nchomolog.lib @nref{nchomolog_lib}: Noncommutative Homological Algebra)
+@end itemize
+
+@heading News for version 3-0-4
 
 @itemize @bullet
 @item
