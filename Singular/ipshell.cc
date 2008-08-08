@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.189 2008-07-17 08:17:03 wienand Exp $ */
+/* $Id: ipshell.cc,v 1.190 2008-08-08 08:51:54 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1871,12 +1871,12 @@ void rComposeRing(lists L, ring R)
     if (L->m[1].rtyp!=LIST_CMD) Werror("invald data, expecting list of numbers");
     lists LL=(lists)L->m[1].data;
     mpz_init(R->ringflaga);
-    if ((LL->nr >= 0) and LL->m[0].rtyp == BIGINT_CMD)
+    if ((LL->nr >= 0) && LL->m[0].rtyp == BIGINT_CMD)
     {
       number ringflaga = (number) LL->m[0].data;
       nlGMP(ringflaga, (number) R->ringflaga);
     }
-    else if ((LL->nr >= 0) and LL->m[0].rtyp == INT_CMD)
+    else if ((LL->nr >= 0) && LL->m[0].rtyp == INT_CMD)
     {
       mpz_init_set_ui(R->ringflaga,(unsigned long) LL->m[0].data);
     }
