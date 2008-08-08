@@ -1,4 +1,4 @@
-version="$Id: tropical.lib,v 1.5 2008-08-07 15:52:58 keilen Exp $";
+version="$Id: tropical.lib,v 1.6 2008-08-08 10:54:50 keilen Exp $";
 category="Tropical Geometry";
 info="
 LIBRARY:         tropical.lib  Computations in Tropical Geometry
@@ -109,6 +109,7 @@ AUXILARY PROCEDURES:
      parameterSubstitute(poly,int)    substitutes in the poly the parameter t by t^N
      tropcialSubst(poly,int,list)     computes the tropical polynomial of poly with certain substitutions 
      randomPoly(int,int,int)          computes a polynomial with random coefficients
+     cleanTmp()                       removes the latex and ps files from /tmp created by other procedures
 
 KEYWORDS:        tropical curves; tropical polynomials
 
@@ -1179,9 +1180,10 @@ ASSUME:      f is list of linear polynomials of the form ax+by+c with integers a
              via the valuation map; 
              the basering must have a global monomial ordering, two variables and up to one parameter!
 RETURN:      NONE
-NOTE:        - the procedure produces the files /tmp/tropicalcurveNUMBER.tex, /tmp/tropicalcurveNUMBER.dvi and 
+NOTE:        - the procedure produces the files /tmp/tropicalcurveNUMBER.tex and 
                /tmp/tropicalcurveNUMBER.ps, where NUMBER is a random four digit integer; 
                moreover it displays the tropical curve defined by f via kghostview;
+               if you wish to remove all these files from /tmp, call the procedure cleanTmp
 @*           - edges with multiplicity greater than one carry this multiplicity
 @*           - if # is empty, then the tropical curve is computed w.r.t. minimum, if #[1] is the
                string 'max', then it is computed w.r.t. maximum 
@@ -1303,7 +1305,7 @@ EXAMPLE:     example drawTropicalCurve  shows an example"
   {
     int rdnum=random(1000,9999);
     write(":w /tmp/tropicalcurve"+string(rdnum)+".tex",TEXBILD);
-    system("sh","cd /tmp; latex /tmp/tropicalcurve"+string(rdnum)+".tex; dvips /tmp/tropicalcurve"+string(rdnum)+".dvi -o; kghostview tropicalcurve"+string(rdnum)+".ps &");  
+    system("sh","cd /tmp; latex /tmp/tropicalcurve"+string(rdnum)+".tex; dvips /tmp/tropicalcurve"+string(rdnum)+".dvi -o; /bin/rm tropicalcurve"+string(rdnum)+".log;  /bin/rm tropicalcurve"+string(rdnum)+".aux;  /bin/rm tropicalcurve"+string(rdnum)+".ps?;  /bin/rm tropicalcurve"+string(rdnum)+".dvi; kghostview tropicalcurve"+string(rdnum)+".ps &");  
   }
   else
   {
@@ -1335,9 +1337,9 @@ ASSUME:   f is list of linear polynomials of the form ax+by+c with integers a, b
           the basering must have a global monomial ordering, two variables and up to one parameter!
 RETURN:   NONE
 NOTE:     - the procedure produces the files /tmp/newtonsubdivisionNUMBER.tex, 
-            /tmp/newtonsubdivisionNUMBER.dvi and /tmp/newtonsubdivisionNUMBER.ps, 
-            where NUMBER is a random four digit integer; 
+            and /tmp/newtonsubdivisionNUMBER.ps, where NUMBER is a random four digit integer; 
             moreover it desplays the tropical curve defined by f via kghostview;
+            if you wish to remove all these files from /tmp, call the procedure cleanTmp
 @*          if # is empty, then the tropical curve is computed w.r.t. minimum, if #[1] is the
             string 'max', then it is computed w.r.t. maximum 
 @*        - note that lattice points in the Newton subdivision which are black correspond to markings
@@ -1394,7 +1396,7 @@ EXAMPLE:     example drawNewtonSubdivision;   shows an example"
 \\end{document}";
   int rdnum=random(1000,9999);
   write(":w /tmp/newtonsubdivision"+string(rdnum)+".tex",TEXBILD);
-  system("sh","cd /tmp; latex /tmp/newtonsubdivision"+string(rdnum)+".tex; dvips /tmp/newtonsubdivision"+string(rdnum)+".dvi -o; kghostview newtonsubdivision"+string(rdnum)+".ps &");  
+  system("sh","cd /tmp; latex /tmp/newtonsubdivision"+string(rdnum)+".tex; dvips /tmp/newtonsubdivision"+string(rdnum)+".dvi -o; /bin/rm newtonsubdivision"+string(rdnum)+".log;  /bin/rm newtonsubdivision"+string(rdnum)+".aux;  /bin/rm newtonsubdivision"+string(rdnum)+".ps?;  /bin/rm newtonsubdivision"+string(rdnum)+".dvi; kghostview newtonsubdivision"+string(rdnum)+".ps &");  
 //  return(TEXBILD);
 }
 example
@@ -3118,6 +3120,14 @@ example
    randomPoly(3,-2,5,1);
 }
 
+proc cleanTmp ()
+"USAGE:  cleanTmp()
+PURPOSE: some procedures create latex and ps-files in the directory /tmp;
+         in order to remove them simply call cleanTmp();
+RETURN:  none"
+{
+  system("sh","cd /tmp; /bin/rm -f tropicalcurve*; /bin/rm -f tropicalnewtonsubdivision*");  
+}
 
 /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
@@ -3937,6 +3947,8 @@ NOTE:    - the procedure is also called recursively by itself, and
   {    
     export(PARA);
   }
+  // kill the gfan files in /tmp
+  system("sh","cd /tmp; /bin/rm gfaninput; /bin/rm gfanoutput");  
   // we return a list which contains the parametrisation ring (with the parametrisation ideal)
   // and the string representing the maximal ideal describing the necessary field extension
   return(list(PARARing,tweight,PARAm));
@@ -4890,6 +4902,8 @@ NOTE:    - the procedure is also called recursively by itself, and
     }
     kill TRRING;
   }
+  // kill the gfan files in /tmp
+  system("sh","cd /tmp; /bin/rm gfaninput; /bin/rm gfanoutput");  
   // we return a list which contains lists of the parametrisation rings (with the parametrisation ideal)
   // and an integer N such that t should be replaced by t^1/N
   return(liftings);
