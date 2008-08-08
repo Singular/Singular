@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmodapp.lib,v 1.6 2008-08-07 20:14:21 levandov Exp $";
+version="$Id: dmodapp.lib,v 1.7 2008-08-08 12:57:31 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmodapp.lib     Applications of algebraic D-modules
@@ -22,8 +22,7 @@ SECONDARY PROCEDURES FOR D-MODULES:
 isFsat(I, F);            check whether the ideal I is F-saturated
 SDLoc(I, F); compute a generic presentation of the localization of D/I w.r.t. f^s, for D a Weyl algebra
 DLoc0(I, F); compute the localization of D/I w.r.t. f^s, based on the procedure SDLoc
-InForm(f,w);     compute the initial form of a poly w.r.t. a given weight
-InForm(I,w);     compute the initial form of an ideal w.r.t. a given weight
+InForm(f,w);     compute the initial form of a poly/ideal w.r.t. a given weight
 
 
 AUXILIARY PROCEDURES:
