@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.190 2008-08-08 08:51:54 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.191 2008-08-08 10:34:53 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -4627,16 +4627,16 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     mpz_init_set_si(ringflaga, 0);
     if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
     {
-      mpz_set_ui(ringflaga, (unsigned int) pn->next->Data());
+      mpz_set_ui(ringflaga, (int)(long) pn->next->Data());
       pn=pn->next;
       if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
       {
-        ringflagb = (unsigned int) pn->next->Data();
+        ringflagb = (long) pn->next->Data();
         pn=pn->next;
       }
       while ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
       {
-        mpz_mul_ui(ringflaga, ringflaga, (unsigned int) pn->next->Data());
+        mpz_mul_ui(ringflaga, ringflaga, (int)(long) pn->next->Data());
         pn=pn->next;
       }
     }
