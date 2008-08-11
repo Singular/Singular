@@ -1,10 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: decodedistGB.lib,v 1.2 2008-08-11 08:31:56 bulygin Exp $";
+version="$Id: decodedistGB.lib,v 1.3 2008-08-11 09:34:55 bulygin Exp $";
 category="Coding theory";
 info="
 LIBRARY:   decodedistGB.lib     Generating and solving systems of polynomial equations for decoding and finding the minimum distance of linear codes
-AUTHORS:   Stanislav Bulygin,   bulygin@mathematik.uni-kl.de,
-           Ruud Pellikaan,      g.r.pellikaan@tue.nl           
+AUTHORS:   Stanislav Bulygin,   bulygin@mathematik.uni-kl.de                     
 
 OVERVIEW:
  In this library we generate several systems used for decoding cyclic codes. And finding the minimum distance
@@ -22,7 +21,7 @@ MAIN PROCEDURES:
  Bin(v,Q,n,#);  generates Bin system
  enc(x,g);  encodes given message with a given generator matrix
  syndrome(h, c);  computes a syndroem w.r.t. a given check matrix
- QE(check,y,t,fieldeq,formal); generates the system of quadratic equations
+ QE(check,y,t,fieldeq,formal); generates the system of quadratic equations as in the method of Pellikaan and Bulygin
  error(y,pos,val);  inserts errors in a word
  error_rand(y,num,e);  inserts random errors in a word
  random_check(m,n,e);  generates a random check matrix
