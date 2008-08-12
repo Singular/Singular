@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.134 2008-08-07 15:30:45 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.135 2008-08-12 10:08:52 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -195,6 +195,8 @@
 /* still testing */
 #undef HAVE_F5
 
+/* letterplace gb:*/
+#define HAVE_SHIFTGB
 
 /* rings as coefficients */
 #define HAVE_RINGS
@@ -266,7 +268,7 @@
 
 #define BIT_SIZEOF_LONG CHAR_BIT*SIZEOF_LONG
 
-#define SINGULAR_PATCHLEVEL 4
+#define SINGULAR_PATCHLEVEL 0
 #define SINGULAR_VERSION ((SINGULAR_MAJOR_VERSION*1000 + SINGULAR_MINOR_VERSION*100 + SINGULAR_SUB_VERSION*10)+SINGULAR_PATCHLEVEL)
 
 /*******************************************************************
