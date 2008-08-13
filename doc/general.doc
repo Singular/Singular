@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.215 2008-07-17 12:27:38 wienand Exp $
+@comment $Id: general.doc,v 1.216 2008-08-13 14:57:57 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1967,16 +1967,16 @@ For a mathematical description of these orderings, see
 @subsection Coefficient rings
 @cindex coefficient rings, ring of integers, zero divisors, p-adic numbers
 
-@sc{Singular} supports coefficient ranges which are not fields, i.e. the 
-integers @math{Z} and the finite rings @math{Z/n} for a number @code{n}. These 
-coefficient rings were implemented in @sc{Singular} 3.0.5 and at the moment 
+@sc{Singular} supports coefficient ranges which are not fields, i.e. the
+integers @math{Z} and the finite rings @math{Z/n} for a number @code{n}. These
+coefficient rings were implemented in @sc{Singular} 3.0.5 and at the moment
 only limited functionality is available.
 
 @subheading p-adic numbers
 @cindex p-adic numbers, l-adic numbers, projective limes
 
 The p-adic integers @math{Z_p} are the projective limit of the finite
-rings @math{Z/p^n} for @code{n} to infinity. Therefore compuations in this ring 
+rings @math{Z/p^n} for @code{n} to infinity. Therefore compuations in this ring
 can be approximated by computations in @math{Z/p^n} for large @code{n}.
 
 @c ---------------------------------------------------------------------------
@@ -3198,6 +3198,8 @@ execution of @code{xxx}.
 @node Parameter list, Procedure commands, Names in procedures, Procedures
 @subsection Parameter list
 @cindex Parameter list
+@cindex argument, optional
+@cindex argument, default
 @table @code
 @item @strong{Syntax:}
 @code{( )}
@@ -3208,6 +3210,9 @@ arguments to a @code{proc}.
 @*The parameter_list is optional.
 The default for a parameter_list is @code{(list #)}
 which means the arguments are referenced by @code{#[1], #[2]}, etc.
+@*If a procedure has optional parameters (i.e. @code{(list #)} appears
+in the declaration), the attribute @code{default_arg} gives the default values
+for this optional arguments.
 @item @strong{Example:}
 @smallexample
 proc x0
@@ -3241,6 +3246,9 @@ proc x5 (i,list #)
     // number of arguments: size(#)+1
 @}
 
+attrib(x5,"default_arg",3);
+x5(2); // is equivalent to
+x5(2,3);
 @end smallexample
 @item @strong{Note:}
 @* The parameter_list may stretch across multiple lines.
@@ -4270,5 +4278,4 @@ As this would be beyond the scope of the @code{Singular} manual,
 a separate, more detailed guide on how to write and use dynamic modules
 can be found
 at @code{http://www.singular.uni-kl.de/DynMod.ps}.
-
 
