@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.101 2008-03-25 14:19:20 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.102 2008-08-13 15:16:23 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -34,6 +34,7 @@
 #include "attrib.h"
 #include "silink.h"
 #include "syz.h"
+#include "attrib.h"
 #include "subexpr.h"
 
 
@@ -500,6 +501,8 @@ static inline void * s_internalCopy(const int t,  void *d)
   }
   return NULL;
 }
+
+
 
 void * slInternalCopy(leftv source, const int t, void *d, Subexpr e)
 {
@@ -1636,3 +1639,10 @@ const char *iiSleftv2name(leftv v)
 {
   return(v->name);
 }
+
+void * sattr::CopyA()
+{
+  omCheckAddrSize(this,sizeof(sattr));
+  return s_internalCopy(atyp,data);
+}
+

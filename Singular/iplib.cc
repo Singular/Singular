@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.125 2008-03-25 14:51:59 Singular Exp $ */
+/* $Id: iplib.cc,v 1.126 2008-08-13 15:16:23 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -331,6 +331,7 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   {
     iiCurrArgs=NULL;
   }
+  iiCurrProc=pn;
   /* start interpreter ======================================*/
   myynest++;
   if (myynest > SI_MAX_NEST)

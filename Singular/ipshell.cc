@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.191 2008-08-08 10:34:53 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.192 2008-08-13 15:16:23 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -58,6 +58,7 @@
 #endif
 
 leftv iiCurrArgs=NULL;
+idhdl iiCurrProc=NULL;
 int  traceit = 0;
 const char *lastreserved=NULL;
 
@@ -1118,11 +1119,25 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isrin
   return res;
 }
 
+BOOLEAN iiDefaultParameter(leftv p)
+{
+  attr at=NULL;
+  if (iiCurrProc!=NULL)
+     at=iiCurrProc->attribute->get("default_arg");
+  if (at==NULL)
+    return FALSE;
+  sleftv tmp;
+  memset(&tmp,0,sizeof(sleftv));
+  tmp.rtyp=at->atyp;
+  tmp.data=at->CopyA();
+  return iiAssign(p,&tmp);
+}
 BOOLEAN iiParameter(leftv p)
 {
   if (iiCurrArgs==NULL)
   {
-    if (strcmp(p->name,"#")==0) return FALSE;
+    if (strcmp(p->name,"#")==0)
+      return iiDefaultParameter(p);
     Werror("not enough arguments for proc %s",VoiceName());
     p->CleanUp();
     return TRUE;

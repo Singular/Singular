@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.28 2008-03-19 17:44:29 Singular Exp $ */
+/* $Id: attrib.cc,v 1.29 2008-08-13 15:16:23 Singular Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -47,32 +47,12 @@ attr sattr::Copy()
   return n;
 }
 
-void * sattr::CopyA()
-{
-  omCheckAddrSize(this,sizeof(sattr));
-  switch (atyp)
-  {
-    case INTVEC_CMD:
-      return (void *)ivCopy((intvec *)data);
-    case MATRIX_CMD:
-      return (void *)mpCopy((matrix)data);
-    case IDEAL_CMD:
-    case MODUL_CMD:
-      return (void *)idCopy((ideal)data);
-    case POLY_CMD:
-    case VECTOR_CMD:
-      return (void *)pCopy((poly)data);
-    case INT_CMD:
-      return (void *)data;
-    case STRING_CMD:
-      return (void *)omStrDup((char *)data);
-#ifdef TEST
-    default:
-      ::Print("CopyA: unknown type %d\n",atyp);  /* DEBUG */
-#endif
-  }
-  return NULL;
-}
+// in subexr.cc:
+//void * sattr::CopyA()
+//{
+//  omCheckAddrSize(this,sizeof(sattr));
+//  return s_internalCopy(atyp,data);
+//}
 
 attr sattr::set(const char * s, void * data, int t)
 {
