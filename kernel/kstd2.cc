@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.74 2008-08-07 18:08:37 levandov Exp $ */
+/* $Id: kstd2.cc,v 1.75 2008-08-14 13:00:34 wienand Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -896,11 +896,18 @@ poly redNF (poly h,int &max_ind,kStrategy strat)
   P.bucket = kBucketCreate(currRing);
   kBucketInit(P.bucket,P.p,pLength(P.p));
   kbTest(P.bucket);
+#ifdef HAVE_RINGS
+  BOOLEAN is_ring = rField_is_Ring(currRing);
+#endif
   loop
   {
     j=kFindDivisibleByInS(strat,&max_ind,&P);
     if (j>=0)
     {
+#ifdef HAVE_RINGS
+      if (!is_ring)
+      {
+#endif
       int sl=pSize(strat->S[j]);
       int jj=j;
       loop
@@ -939,6 +946,9 @@ poly redNF (poly h,int &max_ind,kStrategy strat)
         pNorm(strat->S[j]);
         //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
       }
+#ifdef HAVE_RINGS
+      }
+#endif
       nNormalize(pGetCoeff(P.p));
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG)
