@@ -274,8 +274,8 @@ SLIB0 = absfact.lib  arcpoint.lib  atkins.lib    aksaka.lib    ainvar.lib\
 	modstd.lib   mondromy.lib  mprimdec.lib  mregular.lib  rootsmr.lib \
 	noether.lib  normal.lib    ntsolve.lib  \
 	poly.lib     presolve.lib  primdec.lib   primitiv.lib   qhmoduli.lib \
-	random.lib   realrad.lib   reesclos.lib  resolve.lib    resgraph.lib \
-	reszeta.lib \
+	random.lib   realrad.lib   redcgs.lib    reesclos.lib   resolve.lib \
+	resgraph.lib reszeta.lib \
 	ring.lib     rinvar.lib    sagbi.lib     sheafcoh.lib   sing.lib \
 	solve.lib    signcond.lib  spcurve.lib   spectrum.lib   standard.lib \
 	stratify.lib surf.lib      surfex.lib    teachstd.lib   toric.lib \

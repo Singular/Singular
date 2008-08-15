@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.168 2008-08-07 15:09:16 Singular Exp $
+@comment $Id: singular.doc,v 1.169 2008-08-15 17:47:41 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -262,6 +262,7 @@ with the @code{--no-stdlib} command line option (see
 * inout_lib:: procedures for manipulating in- and output
 * poly_lib:: procedures for manipulating polynomials and ideals
 * random_lib:: procedures of random/sparse  matrix and poly operations
+* redcgs_lib:: procedures for reduced comprehesive Groebner systems
 * ring_lib:: procedures for manipulating rings and maps
 @end menu
 
@@ -298,11 +299,15 @@ LIB "all.lib";
 @subsection poly_lib
 @c lib poly.lib
 @c ----------------------------------------------------------
-@node random_lib, ring_lib, poly_lib, General purpose
+@node random_lib, redcgs_lib, poly_lib, General purpose
 @subsection random_lib
 @c lib random.lib
 @c ----------------------------------------------------------
-@node ring_lib, , random_lib, General purpose
+@node redcgs_lib, ring_lib, random_lib, General purpose
+@subsection redcgs_lib
+@c lib redcgs.lib
+@c ----------------------------------------------------------
+@node ring_lib, , redcgs_lib, General purpose
 @subsection ring_lib
 @c lib ring.lib
 @c ----------------------------------------------------------------------------

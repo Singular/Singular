@@ -1,6 +1,6 @@
-// $Id: all.lib,v 1.57 2007-07-13 16:27:33 Singular Exp $
+// $Id: all.lib,v 1.58 2008-08-15 17:44:06 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.57 2007-07-13 16:27:33 Singular Exp $";
+version="$Id: all.lib,v 1.58 2008-08-15 17:44:06 Singular Exp $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries (commutative case)
@@ -27,6 +27,7 @@ LIB "crypto.lib";
 LIB "deform.lib";
 LIB "elim.lib";
 LIB "equising.lib";
+LIB "freegb.lib";
 LIB "finvar.lib";
 LIB "gmspoly.lib";
 LIB "gmssing.lib";
@@ -60,6 +61,7 @@ LIB "primitiv.lib";
 LIB "qhmoduli.lib";
 LIB "random.lib";
 LIB "realrad.lib";
+LIB "redcgs.lib";
 LIB "reesclos.lib";
 LIB "resolve.lib";
 LIB "resgraph.lib";
@@ -83,12 +85,16 @@ LIB "triang.lib";
 LIB "rootsur.lib";
 LIB "weierstr.lib";
 LIB "zeroset.lib";
+LIB "bfct.lib";
 LIB "central.lib";
+LIB "discretize.lib";
 LIB "dmod.lib";
+LIB "dmodapp.lib";
 LIB "gkdim.lib";
 LIB "involut.lib";
 LIB "ncalg.lib";
 LIB "ncdecomp.lib";
+LIB "nchomolog.lib";
 LIB "nctools.lib";
 LIB "perron.lib";
 LIB "qmatrix.lib";

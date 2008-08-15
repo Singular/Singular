@@ -1,0 +1,3982 @@
+//////////////////////////////////////////////////////////////////////////////
+version="$Id: redcgs.lib,v 1.1 2008-08-15 17:44:06 Singular Exp $";
+category="General purpose";
+info="
+LIBRARY:  redcgs.lib      Reduced Comprehesive Groebner Systems.
+PURPOSE:  Comprehensive Groebner Systems. Canonical Forms.
+          The library contains Monte's algorithms to compute disjoint, reduced
+          Comprehensive Groebner Systems (CGS). A CGS is a set of pairs of 
+          (segment,basis). The segments S_i are subsets of the parameter space, 
+          and the bases B_i are sets of polynomials specializing to Groebner 
+          bases of the specialized ideal for every point in S_i.
+          
+          The purpose of the routines in this library is to obtain CGS with
+          better properties, namely disjoint segments forming a partition of
+          the parameter space and reduced bases. Reduced bases are sets of 
+          polynomials that specialize to the reduced Groebner basis of the 
+          specialized ideal preserving the leading power products (lpp). 
+          The lpp characterize the type of solution in each segment.
+          
+          A further objective is to summarize as much as possible the segments
+          with the same lpp into a single segment, and if possible to obtain
+          a final result that is canonical, i.e. independent of the algorithm
+          and only attached to the given ideal.
+          
+          There are three fundamental routines in the library: mrcgs, rcgs and 
+          crcgs. mrcgs (Minimal Reduced CGS) is an algorithm that packs so 
+          much as it is able to do (using algorithms adhoc) the segments with 
+          the same lpp, obtaining the minimal number of segments. The hypothesis 
+          is that the result is also canonical, but for the moment there is no 
+          proof of the uniqueness of this minimal packing. Moreover, the 
+          segments that are obtained are not locally closed, i.e. there are not 
+          difference of two varieties.
+          
+          On the other side, Michael Wibmer has proved that for homogeneous ideals,
+          all the segments with reduced bases having the same lpp admit a unique
+          basis specializing well. For this purpose it is necessary to extend the
+          description of the elements of the bases to functions, forming sheaves
+          of polynomials instead of simple polynomials, so that the polynomials in 
+          a sheaf either preserve the lpp of the corresponding polynomial of 
+          the specialized Groebner basis (and then it specializes well) or
+          it specializes to 0. Moreover, in a sheaf, for every point in the
+          corresponding segment, at least one of the polynomials specializes well.
+          specializes well. And moreover Wibmer's Theorem ensures that the packed
+          segments are locally closed, that is can be described as the difference of
+          two varieties.
+          
+          Using Wibmer's Theorem we proved that an affine ideal can be homogenized,
+          than discussed by mrcgs and finally de-homogenized. The bases so obtained
+          can be reduced and specialize well in the segment. If the theoretic
+          objective is reached, and all the segments of the homogenized ideal 
+          have been packed, locally closed segments will be obtained.
+          
+          If we only homogenize the given basis of the ideal, then we cannot ensure
+          the canonicity of the partition obtained, because there are many different
+          bases of the given ideal that can be homogenized, and the homogenized ideals
+          are not identical. This corresponds to the algorithm rcgs and is recommended
+          as the most practical routine. It provides locally closed segments and
+          is usually faster than mrcgs and crcgs. But the given partition is not
+          always canonical.
+          
+          Finally it is possible to homogenize the whole affine ideal, and then
+          the packing algorithm will provide canonical segments by dehomogenizing.
+          This corresponds to crcgs routine. It provides the best description
+          of the segments and bases. In contrast crcgs algorithm is usually much 
+          more time consuming and it will not always finish in a reasonable time. 
+          Moreover it will contain more segments than mrcgs and possibly also more 
+          than rcgs.
+          
+          But the actual algorithms in the library to pack segments have some lacks.
+          They are not theoretically always able to pack the segments that we know
+          that can be packed. Nevertheless, thanks to Wibmer's Theorem, the
+          algorithms rcgs and crcgs are able to detect if the objective has not been 
+          reached, and if so, to give a Warning. The warning does not invalidate the 
+          output, but it only recognizes that the theoretical objective is not 
+          completely reached by the actual campcting methods and that some segments 
+          that can be packed have not been packed with a single basis.
+          
+          The routine buildtree is the first algorithm used in all the previous
+          methods providing a first disjoint CGS, and can be used if none of the
+          three fundamental algorithms of the library finishes in a reasonable time.
+          
+          There are also routines to visualize better the output of the previous 
+          algorithms:
+          finalcases can be applied to the list provided by buildtree to obtain the
+          CGS. The list provided by buildtree contains the whole discussion, and
+          finalcases extracts the CGS.
+          The output of buildtree can also be transformed into a file using 
+          buildtreetoMaple routine that can be read in Maple. Using Monte's dpgb 
+          library in Maple the output can be plotted (with the routine tplot).
+          To plot the output of mrcgs, rcgs or crcgs in Maple, the library also
+          provides the routine cantreetoMaple. The file written using it
+          and read in Maple can then be plotted with the command plotcantree and
+          printed with printcantree from the Monte's dpgb library in Maple.
+          The output of mrcgs, rcgs and crcgs is given in form of tree using
+          prime ideals in a canonical form that is described in the papers.
+          Nevertheless this canonical form is somewhat uncomfortable to be
+          interpreted. When the segments are all locally closed (and this is 
+          always the case for rcgs and crcgs) the routine cantodiffcgs transforms
+          the output into a simpler form having only one list element for
+          each segment and providing the two varieties whose difference represent
+          the segment also in a canonical form.
+          
+AUTHORS:  Antonio Montes , Hans Schoenemann. 
+OVERVIEW: see \"Minimal Reduced Comprehensive Groebner Systems\" 
+          by Antonio Montes. (http://www-ma2.upc.edu/~montes/).
+
+NOTATIONS: All given and determined polynomials and ideals are in the
+@*         basering K[a][x]; (a=parameters, x=variables)
+@*         After defining the ring and calling setglobalrings(); the rings
+@*         @R   (K[a][x]),
+@*         @P   (K[a]),
+@*         @RP   (K[x,a]) are defined globally
+@*         They are used internally and can also be used by the user.
+@*         The fundamental routines are: buildtree, mrcgs, rcgs and crcgs
+
+PROCEDURES:
+
+setglobalrings();    It is called by the fundamental routines of the library:
+                     (buildtree, mrcgs, rcgs, crcgs).
+                     After calling it, the rings @R, @P and @RP are defined 
+                     globally.
+memberpos(f,J);      Returns the list of two integers: the value 0 or 1 depending 
+                     on if f belongs to J or not, and the position in J (0 if it 
+                     does not belong).
+subset(F,G);         If all elements of F belong to the ideal G it returns 1,
+                     and 0 otherwise. 
+pdivi(f,F);          Pseudodivision of a poly f by an ideal F in @R. Returns a 
+                     list (r,q,m) such that m*f=r+sum(q.G).
+facvar(ideal J)      Returns all the free-square factors of the elements 
+                     of ideal J (non repeated). Integer factors are ignored,
+                     even 0 is ignored. It can be called from ideal @R, but
+                     the given ideal J must only contain poynomials in the
+                     parameters.
+redspec(N,W);        Given null and non-null conditions depending only on the 
+                     parameters it returns a red-specification.
+pnormalform(f,N,W);  Reduces the poly f wrt to the null condition ideal N and the 
+                     non-null condition ideal W (both depending on the parameters).
+buildtree(F);        Returns a list T describing a first reduced CGS of the ideal 
+                     F in K[a][x].
+buildtreetoMaple(T); Writes into a file the output of buildtree in Maple readable 
+                     form.
+finalcases(T);       From the output of buildtree it provides the list
+                     of its terminal vertices. That list represents the dichotomic, 
+                     reduced CGS obtained by buildtree.
+mrcgs(F);            Returns a list T describing the Minimal Reduced CGS of the 
+                     ideal F of K[a][x]
+rcgs(F);             Returns a list T describing the Reduced CGS of the ideal F 
+                     of K[a][x] obtained by direct homogenizing and de-homogenizing 
+                     the basis of the given ideal.
+crcgs(F);            Returns a list T describing the Canonical Reduced CGS of the 
+                     ideal F of K[a][x] obtained by homogenizing and de-homogenizing 
+                     the initial ideal.
+cantreetoMaple)(M);  Writes into a file the output of mrcgs, rcgs or crcgs in Maple 
+                     readable form.
+cantodiffcgs(list L);From the output of rcgs or crcgs (or even of mrcgs when
+                     it is possible) it returns a simpler list where the segments
+                     are given as difference of varieties.                    
+
+SEE ALSO: compregb_lib 
+";
+
+// ************ Begin of the redCGS library *********************
+// Library redCGS 
+// (Reduced Comprehesive Groebner Systems): 
+// Initial data: 21-1-2008
+// Release 1:
+// Final data: 3_7-2008
+// All given and determined polynomials and ideals are in the 
+// basering K[a][x];
+// After calling setglobalrings(); the rings 
+//        @R   (K[a][x]),
+//        @P   (K[a]), 
+//        @RP   (K[x,a]) are globally defined
+//        They are used internally and can also be called by the user;
+//        setglobalrings() is called by buildtree, so it is not required to 
+//        call setglobalrings before using
+//        the fundamental routines of the library.
+
+// ************ Begin of buildtree ******************************
+
+LIB "primdec.lib";
+
+proc setglobalrings()
+"USAGE:   setglobalrings();
+          No arguments
+RETURN:   After its call the rings @R=K[a][x], @P=K[a], @RP=K[x,a] are 
+          defined as global variables.
+NOTE:     It is called by the fundamental routines of the library.
+          The user does not need to call it, except when none of
+          the fundamental routines have been called and some
+          other routines of the library are used.
+          The basering R, must be of the form K[a][x], a=parameters, 
+          x=variables, and should be defined previously.
+KEYWORDS: ring, rings
+EXAMPLE:  setglobalrings; shows an example"
+{
+  def @R=basering;  // must be of the form K[a][x], a=parameters, x=variables
+  def Rx=ringlist(@R);  
+  def @P=ring(Rx[1]);   
+  list Lx;
+  Lx[1]=0;
+  Lx[2]=Rx[2]+Rx[1][2];
+  Lx[3]=Rx[1][3];
+  Lx[4]=Rx[1][4];  
+  //def @K=ring(Lx);
+  //exportto(Top,@K);  //global ring K[x,a] with the order of x extended to x,a
+  Rx[1]=0;              
+  def D=ring(Rx);       
+  def @RP=D+@P; 
+  exportto(Top,@R);      // global ring K[a][x]          
+  exportto(Top,@P);      // global ring K[a]
+  exportto(Top,@RP);     // global ring K[x,a] with product order
+  setring(@R);
+};
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R=(0,a,b),(x,y,z),dp;
+  setglobalrings();
+  @R;
+  @P;
+  @RP;
+}
+
+//*************Auxilliary routines**************
+
+// cld : clears denominators of an ideal and normalizes to content 1
+//       can be used in @R or @P or @RP
+// input:
+//   ideal J (J can be also poly), but the output is an ideal;
+// output:
+//   ideal Jc (the new form of ideal J without denominators and 
+//       normalized to content 1)
+proc cld(ideal J)
+{
+  if (size(J)==0){return(ideal(0));}
+  def RR=basering;
+  setring(@RP);
+  def Ja=imap(RR,J);
+  ideal Jb;
+  if (size(Ja)==0){return(ideal(0));}
+  int i;
+  def j=0;
+  for (i=1;i<=ncols(Ja);i++){if (size(Ja[i])!=0){j++; Jb[j]=cleardenom(Ja[i]);}}
+  setring(RR);
+  def Jc=imap(@RP,Jb);
+  return(Jc);
+};
+
+proc memberpos(f,J)
+"USAGE:  memberpos(f,J);
+         (f,J) expected (polynomial,ideal)
+               or       (int,list(int))
+               or       (int,intvec)
+               or       (intvec,list(intvec))
+               or       (list(int),list(list(int)))
+               or       (ideal,list(ideal))
+               or       (list(intvec),  list(list(intvec))).
+         The ring can be @R or @P or @RP or any other.
+RETURN:  The list (t,pos) t int; pos int;
+         t is 1 if f belongs to J and 0 if not.
+         pos gives the position in J (or 0 if f does not belong).
+EXAMPLE: memberpos; shows an example"
+{
+  int pos=0;
+  int i=1;
+  int j;
+  int t=0;
+  int nt;
+  if (typeof(J)=="ideal"){nt=ncols(J);}
+  else{nt=size(J);}
+  if ((typeof(f)=="poly") or (typeof(f)=="int"))
+  { // (poly,ideal)  or
+    // (poly,list(poly))
+    // (int,list(int)) or
+    // (int,intvec)
+    i=1;
+    while(i<=nt)
+    {
+      if (f==J[i]){return(list(1,i));}
+      i++;
+    }
+    return(list(0,0));
+  }
+  else
+  {
+    if ((typeof(f)=="intvec") or ((typeof(f)=="list") and (typeof(f[1])=="int")))
+    { // (intvec,list(intvec)) or
+      // (list(int),list(list(int)))
+      i=1;
+      t=0;
+      pos=0;
+      while((i<=nt) and (t==0))
+      {
+        t=1;
+        j=1;
+        if (size(f)!=size(J[i])){t=0;}
+        else
+        {
+          while ((j<=size(f)) and t)
+          {
+            if (f[j]!=J[i][j]){t=0;}
+            j++;
+          }
+        }
+        if (t){pos=i;}
+        i++;
+      }
+      if (t){return(list(1,pos));}
+      else{return(list(0,0));}
+    }
+    else
+    {
+      if (typeof(f)=="ideal")
+      { // (ideal,list(ideal))
+        i=1;
+        t=0;
+        pos=0;
+        while((i<=nt) and (t==0))
+        {
+          t=1;
+          j=1;
+          if (ncols(f)!=ncols(J[i])){t=0;}
+          else
+          {
+            while ((j<=ncols(f)) and t)
+            {
+              if (f[j]!=J[i][j]){t=0;}
+              j++;
+            }
+          }
+          if (t){pos=i;}
+          i++;
+        }
+        if (t){return(list(1,pos));}
+        else{return(list(0,0));}
+      }
+      else
+      {
+        if ((typeof(f)=="list") and (typeof(f[1])=="intvec"))
+        { // (list(intvec),list(list(intvec)))
+          i=1;
+          t=0;
+          pos=0;
+          while((i<=nt) and (t==0))
+          {
+            t=1;
+            j=1;
+            if (size(f)!=size(J[i])){t=0;}
+            else
+            {
+              while ((j<=size(f)) and t)
+              {
+                if (f[j]!=J[i][j]){t=0;}
+                j++;
+              }
+            }
+            if (t){pos=i;}
+            i++;
+          }
+          if (t){return(list(1,pos));}
+          else{return(list(0,0));}
+        }
+      }
+    }
+  }
+} example
+{ "EXAMPLE:"; echo = 2;
+  list L=(7,4,5,1,1,4,9);
+  memberpos(1,L);
+}
+
+
+proc subset(J,K)
+"USAGE:   subset(J,K);
+          (J,K)  expected (ideal,ideal)
+                   or     (list, list)
+RETURN:   1 if all the elements of J are in K, 0 if not.
+EXAMPLE:  subset; shows an example;"
+{
+  int i=1;
+  int nt;
+  if (typeof(J)=="ideal"){nt=ncols(J);}
+  else{nt=size(J);}
+  if (size(J)==0){return(1);}
+  while(i<=nt)
+  {
+    if (memberpos(J[i],K)[1]){i++;}
+    else {return(0);}
+  }
+  return(1);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  list J=list(7,3,2); 
+  list K=list(1,2,3,5,7,8);
+  subset(J,K);
+}
+
+//*************Auxilliary routines**************
+
+
+// elimintfromideal: elimine the constant numbers from the ideal
+//     (designed for W, nonnull conditions)
+// input: ideal J in the ring @P
+// output:ideal K with the elements of J that are non constants, in the ring @P
+proc elimintfromideal(ideal J)
+{
+  int i;
+  int j=0;
+  ideal K;
+  if (size(J)==0){return(ideal(0));}
+  for (i=1;i<=ncols(J);i++){if (size(variables(J[i])) !=0){j++; K[j]=J[i];}}
+  return(K);
+};
+
+// simpqcoeffs : simplifies a quotient of two polynomials of @R
+//               for ring @R
+// input: two coeficients (or terms) of @R (that are considered as quotients)
+// output: the two coeficients reduced without common factors
+proc simpqcoeffs(poly n,poly m)
+{
+  def nc=content(n);
+  def mc=content(m);
+  def gc=gcd(nc,mc);
+  ideal s=n/gc,m/gc;
+  return (s);
+};
+
+
+// pdivi : pseudodivision of a poly f by an ideal F in @R
+//         in the ring @R
+// input:
+//   poly f0  (given in the ring @R)
+//   ideal F0 (given in the ring @R)
+// output:
+//   list (poly r, ideal q, poly mu)
+proc pdivi(poly f,ideal F)
+"USAGE:   pdivi(f,F);
+          poly f: the polynomial to be divided
+          ideal F: the divisor ideal
+RETURN:   A list (poly r, ideal q, poly m). r is the remainder of the 
+          pseudodivision, q is the ideal of quotients, and m is the 
+          factor by which f is to be multiplied.     
+NOTE:     Pseudodivision of a poly f by an ideal F in @R. Returns a 
+          list (r,q,m) such that m*f=r+sum(q.G).
+KEYWORDS: division, reduce
+EXAMPLE:  pdivi; shows an example"
+{
+  int i;
+  int j;
+  poly r=0;
+  poly mu=1;
+  def p=f;
+  ideal q;
+  for (i=1; i<=size(F); i++){q[i]=0;};
+  ideal lpf;
+  ideal lcf;
+  for (i=1;i<=size(F);i++){lpf[i]=leadmonom(F[i]);}
+  for (i=1;i<=size(F);i++){lcf[i]=leadcoef(F[i]);}
+  poly lpp;
+  poly lcp;
+  poly qlm;
+  poly nu;
+  poly rho;
+  int divoc=0;
+  ideal qlc;
+  while (p!=0)
+  {
+    i=1;
+    divoc=0;
+    lpp=leadmonom(p);
+    lcp=leadcoef(p);
+    while (divoc==0 and i<=size(F))
+    {
+      qlm=lpp/lpf[i];
+      if (qlm!=0)
+      {
+        qlc=simpqcoeffs(lcp,lcf[i]);
+        nu=qlc[2];
+        mu=mu*nu;
+        rho=qlc[1]*qlm;
+        p=nu*p-rho*F[i];
+        r=nu*r;
+        for (j=1;j<=size(F);j++){q[j]=nu*q[j];}
+        q[i]=q[i]+rho;
+        divoc=1;
+      }
+      else {i++;}
+    }
+    if (divoc==0)
+    {
+      r=r+lcp*lpp;
+      p=p-lcp*lpp;
+    }
+  }
+  list res=r,q,mu;
+  return(res);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R=(0,a,b,c),(x,y),dp;
+  setglobalrings();
+  poly f=(ab-ac)*xy+(ab)*x+(5c);
+  ideal F=ax+b,cy+a;
+  def r=pdivi(f,F);
+  r;
+  r[3]*f-(r[2][1]*F[1]+r[2][2]*F[2])-r[1];
+}
+
+// pspol : S-poly of two polynomials in @R
+// @R
+// input:
+//   poly f  (given in the ring @R)
+//   poly g (given in the ring @R)
+// output:
+//   list (S, red):  S is the S-poly(f,g) and red is a Boolean variable
+//                if red==1 then S reduces by Buchberger 1st criterion (not used)
+proc pspol(poly f,poly g)
+{
+  def lcf=leadcoef(f);
+  def lcg=leadcoef(g);
+  def lpf=leadmonom(f);
+  def lpg=leadmonom(g);
+  def v=gcd(lpf,lpg);
+  def s=simpqcoeffs(lcf,lcg);
+  def vf=lpf/v;
+  def vg=lpg/v;
+  poly S=s[2]*vg*f-s[1]*vf*g;
+  return(S);
+};
+
+// facvar: Returns all the free-square factors of the elements 
+//         of ideal J (non repeated). Integer factors are ignored,
+//         even 0 is ignored. It can be called from ideal @R, but
+//         the given ideal J must only contain poynomials in the
+//         parameters.
+//         Operates in the ring @P, but can be called from ring @R.
+// input:   ideal J
+// output:  ideal Jc: Returns all the free-square factors of the elements 
+//         of ideal J (non repeated). Integer factors are ignored,
+//         even 0 is ignored. It can be called from ideal @R, but
+//         the given ideal J must only contain poynomials in the
+//         parameters.
+proc facvar(ideal J)
+"USAGE:   facvar(J);
+          J: an ideal in the parameters
+RETURN:   all the free-square factors of the elements 
+          of ideal J (non repeated). Integer factors are ignored,
+          even 0 is ignored. It can be called from ideal @R, but
+          the given ideal J must only contain poynomials in the
+          parameters.          
+NOTE:     Operates in the ring @P, and the ideal J must contain only
+          polynomials in the parameters, but can be called from ring @R.  
+KEYWORDS: factor
+EXAMPLE:  facvar; shows an example"
+{
+  int i;
+  def RR=basering;
+  setring(@P);
+  def Ja=imap(RR,J);
+  if(size(Ja)==0){return(ideal(0));}
+  Ja=elimintfromideal(Ja); // also in ideal @P
+  ideal Jb;
+  if (size(Ja)==0){Jb=ideal(0);}
+  else
+  {
+    for (i=1;i<=ncols(Ja);i++){if(size(Ja[i])!=0){Jb=Jb,factorize(Ja[i],1);}}
+    Jb=simplify(Jb,2+4+8);
+    Jb=cld(Jb);
+    Jb=elimintfromideal(Jb); // also in ideal @P
+  }
+  setring(RR);
+  def Jc=imap(@P,Jb);
+  return(Jc);
+};
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R=(0,a,b,c),(x,y,z),dp;
+  setglobalrings();
+  ideal J=a2-b2,a2-2ab+b2,abc-bc;
+  facvar(J);
+}
+
+// Wred: eliminate the factors in the polynom f that are in W
+//       in ring @RP
+// input:
+//   poly f:
+//   ideal W  of non-null conditions (already supposed that it is facvar)
+// output:
+//   poly f2  where the non-null conditions in W have been dropped from f
+proc Wred(poly f, ideal W)
+{
+  if (f==0){return(f);}
+  def RR=basering;
+  setring(@RP);
+  def ff=imap(RR,f);
+  def RPW=imap(RR,W);
+  def l=factorize(ff,2);
+  int i;
+  poly f1=1;
+  for(i=1;i<=size(l[1]);i++)
+  {
+    if ((memberpos(l[1][i],RPW)[1]) or (memberpos(-l[1][i],RPW)[1])){;}
+    else{f1=f1*((l[1][i])^(l[2][i]));}
+  }
+  setring(RR);
+  def f2=imap(@RP,f1);
+  return(f2);
+};
+
+// pnormalform: reduces a polynomial wrt a red-spec dividing by N and eliminating factors in W.
+//              called in the ring @R
+//              operates in the ring @RP
+// input:
+//         poly  f
+//         ideal N  (depends only on the parameters)
+//         ideal W  (depends only on the parameters)
+//                   (N,W) must be a red-spec (depends only on the parameters)
+// output: poly f2 reduced wrt to the red-spec (N,W)
+// note:   for security a lot of work is done. If (N,W) is already a red-spec it should be simplified
+proc pnormalform(poly f, ideal N, ideal W)
+"USAGE:   pnormalform(f,N,W);
+          f: the polynomial to be reduced modulo N,W (in parameters and 
+             variables)
+          N: the null conditions ideal
+          W: the non-null conditions (set of irreducible polynomials, ideal)          
+RETURN:   a reduced polynomial g of f, whose coefficients are reduced
+          modulo N and having no factor in W.
+NOTE:     Should be called from ring @R. Ideals N and W must be polynomials 
+          in the parameters forming a red-specification (see definition)         the papers). 
+KEYWORDS: division, pdivi, reduce
+EXAMPLE:  pnormalform; shows an example"
+{
+    def RR=basering;
+    setring(@RP);
+    def fa=imap(RR,f);
+    def Na=imap(RR,N);
+    def Wa=imap(RR,W);
+    option(redSB);
+    Na=groebner(Na);
+    def r=cld(reduce(fa,Na));
+    def f1=Wred(r[1],Wa);
+    setring(RR);
+    def f2=imap(@RP,f1);
+    return(f2)
+};
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R=(0,a,b,c),(x,y),dp;
+  setglobalrings();
+  poly f=(b^2-1)*x^3*y+(c^2-1)*x*y^2+(c^2*b-b)*x+(a-bc)*y;
+  ideal N=(ab-c)*(a-b),(a-bc)*(a-b);
+  ideal W=a^2-b^2,bc;
+  def r=redspec(N,W);
+  pnormalform(f,r[1],r[2]);
+}
+
+// idint: ideal intersection
+//        in the ring @P.
+//        it works in an extended ring
+// input: two ideals in the ring @P
+// output the intersection of both (is not a GB)
+proc idint(ideal I, ideal J)
+{
+  def RR=basering;
+  ring T=0,t,lp;
+  def K=T+RR;
+  setring(K);
+  def Ia=imap(RR,I);
+  def Ja=imap(RR,J);
+  ideal IJ;
+  int i;
+  for(i=1;i<=size(Ia);i++){IJ[i]=t*Ia[i];}
+  for(i=1;i<=size(Ja);i++){IJ[size(Ia)+i]=(1-t)*Ja[i];}
+  ideal eIJ=eliminate(IJ,t);
+  setring(RR);
+  return(imap(K,eIJ));
+}
+
+
+// redspec: generates a red-specification
+//          called in any ring
+//          it changes to the ring @P
+// input:
+//   ideal N : the ideal of null-conditions
+//   ideal W : set of non-null polynomials: if W corresponds to no non null conditions then W=ideal(0)
+//             otherwise it should be given as an ideal.
+// returns: list (Na,Wa,DGN)
+// the completely reduced specification:
+//   Na = ideal reduced and radical of the red-spec
+//   facvar(Wa) = ideal the reduced non-null set of polynomials of the red-spec.
+//             if it corresponds to no non null conditions then it is ideal(0)
+//             otherwise the ideal is returned.
+//   DGN = the list of prime ideals associated to Na (uses primASSGTZ in "primdec.lib")
+//   none of the polynomials in facvar(Wa) are contained in none of the ideals in DGN
+//   If the given conditions are not compatible, then N=ideal(1) and DGN=list(ideal(1))
+proc redspec(ideal Ni, ideal Wi)
+"USAGE:   redspec(N,W);
+          N: null conditions ideal
+          W: set of non-null polynomials (ideal)
+RETURN:   a list (N1,W1,L1) containing a red-specification of the segment (N,W).
+          N1 is the radical reduced ideal characterizing the segment. 
+          V(N1) is the Zarisky closure of the segment (N,W). 
+          The segment S=V(N1) \ V(h), where h=prod(w in W1)
+          N1 is uniquely determined and no prime component of N1 contains none of
+          the polynomials in W1. The polynomials in W1 are prime and reduced
+          wrt N1, and are considered non-null on the segment.
+          L1 contains the list of prime components of N1.                     
+NOTE:     can be called from ring @R but it works in ring @P.     
+KEYWORDS: specification
+EXAMPLE:  redspec; shows an example"
+{
+  ideal Nc;
+  ideal Wc;
+  def RR=basering;
+  setring(@P);
+  def N=imap(RR,Ni);
+  def W=imap(RR,Wi);
+  ideal Wa;
+  ideal Wb;
+  if(size(W)==0){Wa=ideal(0);}
+     //when there are no non-null conditions then W=ideal(0)
+  else
+  {
+    Wa=facvar(W);
+  }
+  if (size(N)==0)
+  {
+    setring(RR);
+    Wc=imap(@P,Wa);
+    return(list(ideal(0), Wc, list(ideal(0))));
+  }
+  int i;
+  list LNb;
+  list LNa;
+  def LN=minAssGTZ(N);
+  for (i=1;i<=size(LN);i++)
+  {
+    option(redSB);
+    LNa[i]=groebner(LN[i]);
+  }
+  poly h=1;
+  if (size(Wa)!=0)
+  {
+    for(i=1;i<=size(Wa);i++){h=h*Wa[i];}
+  }
+  ideal Na;
+  intvec save_opt=option(get);
+  if (size(N)!=0 and (size(LNa)>0))
+  {
+    option(returnSB);
+    Na=intersect(LNa[1..size(LNa)]);
+    option(redSB);
+    Na=groebner(Na); // T_ is needed?
+    option(set,save_opt);
+  }
+  attrib(Na,"isSB",1);
+  if (reduce(h,Na,1)==0)
+  {
+    setring(RR);
+    Wc=imap(@P,Wa);
+    return(list (ideal(1),Wc,list(ideal(1))));
+  }
+  i=1;
+  while(i<=size(LNa))
+  {
+    if (reduce(h,LNa[i],1)==0){LNa=delete(LNa,i);}
+    else{ i++;}
+  }
+  if (size(LNa)==0)
+  {
+    setring(RR);
+    return(list(ideal(1),ideal(0),list(ideal(1))));
+  }
+  option(returnSB);
+  ideal Nb=intersect(LNa[1..size(LNa)]);
+  option(redSB);
+  Nb=groebner(Nb); // T_ is needed?
+  option(set,save_opt);
+  if (size(Wa)==0)
+  {
+    setring(RR);
+    Nc=imap(@P,Nb);
+    Wc=imap(@P,Wa);
+    LNb=imap(@P,LNa);
+    return(list(Nc,Wc,LNb));
+  }
+  Wb=ideal(0);
+  attrib(Nb,"isSB",1);
+  for (i=1;i<=size(Wa);i++){Wb[i]=reduce(Wa[i],Nb);}
+  Wb=facvar(Wb);
+  if (size(LNa)!=0)
+  {
+    setring(RR);
+    Nc=imap(@P,Nb);
+    Wc=imap(@P,Wb);
+    LNb=imap(@P,LNa);
+    return(list(Nc,Wc,LNb))
+  }
+  else
+  {
+    setring(RR);
+    Nd=imap(@P,Nb);
+    Wc=imap(@P,Wb);
+    kill LNb;
+    list LNb;
+    return(list(Nd,Wc,LNb))
+  }
+};
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=(0,a,b,c),(x,y),dp;
+  setglobalrings();
+  ideal N=(ab-c)*(a-b),(a-bc)*(a-b);
+  ideal W=a^2-b^2,bc;
+  redspec(N,W);
+}
+
+// lesspol: compare two polynomials by its leading power products
+// input:  two polynomials f,g in the ring @R
+// output: 0 if f<g,  1 if f>=g
+proc lesspol(poly f, poly g)
+{
+  if (leadmonom(f)<leadmonom(g)){return(1);}
+  else
+  {
+    if (leadmonom(g)<leadmonom(f)){return(0);}
+    else
+    {
+      if (leadcoef(f)<leadcoef(g)){return(1);}
+      else {return(0);}
+    }
+  }
+};
+
+// delfromideal: deletes the i-th polynomial from the ideal F
+proc delfromideal(ideal F, int i)
+{
+  int j;
+  ideal G;
+  if (size(F)<i){ERROR("delfromideal was called incorrect arguments");}
+  if (size(F)<=1){return(ideal(0));}
+  if (i==0){return(F)};
+  for (j=1;j<=size(F);j++)
+  {
+    if (j!=i){G[size(G)+1]=F[j];}
+  }
+  return(G);
+}
+
+// delidfromid: deletes the polynomials in J that are in I
+// input: ideals I,J
+// output: the ideal J without the polynomials in I
+proc delidfromid(ideal I, ideal J)
+{
+  int i; list r;
+  ideal JJ=J;
+  for (i=1;i<=size(I);i++)
+  {
+    r=memberpos(I[i],JJ);
+    if (r[1])
+    {
+      JJ=delfromideal(JJ,r[2]);
+    }
+  }
+  return(JJ);
+}
+
+// sortideal: sorts the polynomials in an ideal by lm in ascending order
+proc sortideal(ideal Fi)
+{
+  def RR=basering;
+  setring(@RP);
+  def F=imap(RR,Fi);
+  def H=F;
+  ideal G;
+  int i;
+  int j;
+  poly p;
+  while (size(H)!=0)
+  {
+    j=1;
+    p=H[1];
+    for (i=1;i<=size(H);i++)
+    {
+      if(lesspol(H[i],p)){j=i;p=H[j];}
+    }
+    G[size(G)+1]=p;
+    H=delfromideal(H,j);
+  }
+  setring(RR);
+  def GG=imap(@RP,G);
+  return(GG);
+};
+
+// mingb: given a basis (gb reducing) it
+// order the polynomials is ascending order and
+// eliminate the polynomials whose lpp is divisible by some
+// smaller one
+proc mingb(ideal F)
+{
+  int t; int i; int j;
+  def H=sortideal(F);
+  ideal G;
+  if (ncols(H)<=1){return(H);}
+  G=H[1];
+  for (i=2; i<=ncols(H); i++)
+  {
+    t=1;
+    j=1;
+    while (t and (j<i))
+    {
+      if((leadmonom(H[i])/leadmonom(H[j]))!=0) {t=0;}
+      j++;
+    }
+    if (t) {G[size(G)+1]=H[i];}
+  }
+  return(G);
+};
+
+
+// redgb: given a minimal bases (gb reducing) it
+// reduces each polynomial wrt to the others
+proc redgb(ideal F, ideal N, ideal W)
+{
+  ideal G;
+  ideal H;
+  int i;
+  if (size(F)==0){return(ideal(0));}
+  for (i=1;i<=size(F);i++)
+  {
+    H=delfromideal(F,i);
+    G[i]=pnormalform(pdivi(F[i],H)[1],N,W);
+  }
+  return(G);
+};
+
+
+//********************Main routines for buildtree******************
+
+
+// splitspec: a new leading coefficient f is given to a red-spec
+//            then splitspec computes the two new red-spec by
+//            considering it null, and non null.
+// in ring @P
+// given f, and the red-spec (N,W)
+//     it outputs the null and the non-null red-spec adding f.
+//     if some of the output specifications has N=1 then
+//     there must be no split and buildtree must continue on
+//     the compatible red-spec
+// input:  poly f coefficient to split if needed
+//         list r=(N,W,LN) redspec
+// output: list L = list(ideal N0, ideal W0), list(ideal N1, ideal W1), cond
+proc splitspec(poly fi, list ri)
+{
+  def RR=basering;
+  def Ni=ri[1];
+  def Wi=ri[2];
+  setring(@P);
+  def f=imap(RR,fi);
+  def N=imap(RR,Ni);
+  def W=imap(RR,Wi);
+  f=Wred(f,W);
+  def N0=N;
+  def W1=W;
+  N0[size(N0)+1]=f;
+  def r0=redspec(N0,W);
+  W1[size(W1)+1]=f;
+  def r1=redspec(N,W1);
+  setring(RR);
+  def ra0=imap(@P,r0);
+  def ra1=imap(@P,r1);
+  def cond=imap(@P,f);
+  return (list(ra0,ra1,cond));
+};
+
+// discusspolys: given a basis B and a red-spec (N,W), it analyzes the
+//               leadcoef of the polynomials in B until it finds
+//               that one of them can be either null or non null.
+//               If at the end only the non null option is compatible
+//               then the reduced B has all the leadcoef non null.
+//               Else recbuildtree must split.
+// ring @R
+// input:  ideal B
+//         ideal N
+//         ideal W (a reduced-specification)
+// output: list of ((N0,W0,LN0),(N1,W1,LN1),Br,cond)
+//         cond is the condition to branch
+proc discusspolys(ideal B, list r)
+{
+  poly f;     poly f1;    poly f2;
+  poly cond;
+  def N=r[1]; def W=r[2]; def LN=r[3];
+  def Ba=B;   def F=B;
+  ideal N0=1; def W0=W;   list LN0=ideal(1);
+  def N1=N;   def W1=W;   def LN1=LN;
+  list L;
+  list M;     list M0;    list M1;
+  list rr;
+  if (size(B)==0)
+  {
+    M0=N0,W0,LN0; // incompatible
+    M1=N1,W1,LN1;
+    M=M0,M1,B,poly(1);
+    return(M);
+  }
+  while ((size(F)!=0) and ((N0[1]==1) or (N1[1]==1)))
+  {
+    f=F[1];
+    F=delfromideal(F,1);
+    f1=pnormalform(f,N,W);
+    rr=memberpos(f,Ba);
+    if (f1!=0)
+    {
+      Ba[rr[2]]=f1;
+      if (pardeg(leadcoef(f1))!=0)
+      {
+        f2=Wred(leadcoef(f1),W);
+        L=splitspec(f2,list(N,W,LN));
+        N0=L[1][1]; W0=L[1][2]; LN0=L[1][3]; N1=L[2][1]; W1=L[2][2]; LN1=L[2][3];
+        cond=L[3];
+      }
+    }
+    else
+    {
+      Ba=delfromideal(Ba,rr[2]);
+      N0=ideal(1); //F=ideal(0);
+    }
+  }
+  M0=N0,W0,LN0;
+  M1=N1,W1,LN1;
+  M=M0,M1,Ba,cond;
+  return(M);
+};
+
+
+// lcmlmonoms: computes the lcm of the leading monomials
+//             of the polynomils f and g
+// ring @R
+proc lcmlmonoms(poly f,poly g)
+{
+  def lf=leadmonom(f);
+  def lg=leadmonom(g);
+  def gls=gcd(lf,lg);
+  return((lf*lg)/gls);
+};
+
+// placepairinlist
+// input:  given a new pair of the form (i,j,lmij)
+//         and a list of pairs of the same form
+// ring @R
+// output: it inserts the new pair in ascending order of lmij
+proc placepairinlist(list pair,list P)
+{
+  list Pr;
+  if (size(P)==0){Pr=insert(P,pair); return(Pr);}
+  if (pair[3]<P[1][3]){Pr=insert(P,pair); return(Pr);}
+  if (pair[3]>=P[size(P)][3]){Pr=insert(P,pair,size(P)); return(Pr);}
+  kill Pr;
+  list Pr;
+  int j;
+  int i=1;
+  int loc=0;
+  while((i<=size(P)) and (loc==0))
+  {
+    if (pair[3]>=P[i][3]){j=i; i++;}
+    else{loc=1; j=i-1};
+  }
+  Pr=insert(P,pair,j);
+  return(Pr);
+};
+
+// orderingpairs:
+// input:  ideal F
+// output: list of ordered pairs (i,j,lcmij) of F in ascending order of lcmij
+//         if a pair verifies Buchberger 1st criterion it is not stored
+// ring @R
+proc orderingpairs(ideal F)
+{
+  int i;
+  int j;
+  poly lm;
+  poly lpf;
+  poly lpg;
+  list P;
+  list pair;
+  if (size(F)<=1){return(P);}
+  for (i=1;i<=size(F)-1;i++)
+  {
+    for (j=i+1;j<=size(F);j++)
+    {
+      lm=lcmlmonoms(F[i],F[j]);
+      // Buchberger 1st criterion
+      lpf=leadmonom(F[i]);
+      lpg=leadmonom(F[j]);
+      if (lpf*lpg!=lm)
+      {
+        pair=(i,j,lm);
+        P=placepairinlist(pair,P);
+      }
+    }
+  }
+  return(P);
+};
+
+// Buchberger 2nd criterion
+// input:  integers i,j
+//         list P of pairs of the form (i,j) not yet verified
+// ring @R
+proc criterion(int i, int j, list P, ideal B)
+{
+  def lcmij=lcmlmonoms(B[i],B[j]);
+  int crit=0;
+  int k=1;
+  list ik; list jk;
+  while ((k<=size(B)) and (crit==0))
+  {
+    if ((k!=i) and (k!=j))
+    {
+      if (i<k){ik=i,k;} else{ik=k,i;}
+      if (j<k){jk=i,k;} else{jk=k,j;}
+      if (not((memberpos(ik,P)[1]) or (memberpos(jk,P)[1])))
+      {
+        if ((lcmij)/leadmonom(B[k])!=0){crit=1;}
+      }
+    }
+    k++;
+  }
+  return(crit);
+};
+
+// discussSpolys: given a basis B and a red-spec (N,W), it analyzes the
+//                leadcoef of the polynomials in B until it finds
+//                that one of them can be either null or non null.
+//                If at the end only the non null option is compatible
+//                then the reduced B has all the leadcoef non null.
+//                Else recbuildtree must split.
+// ring @R
+// input:  ideal B
+//         ideal N
+//         ideal W (a reduced-specification)
+//         list  P current set of pairs of polynomials from B to be tested.
+// output: list of (N0,W0,LN0),(N1,W1,LN1),Br,Pr,cond]
+//         list Pr the not checked list of pairs.
+proc discussSpolys(ideal B, list r, list P)
+{
+  int i; int j; int k;
+  int npols; int nSpols; int tt;
+  poly cond=1;
+  poly lm; poly lpf; poly lpg;
+  def F=B; def Pa=P; list Pa0;
+  def N=r[1]; def W=r[2]; def LN=r[3];
+  ideal N0=1; def W0=W; list LN0=ideal(1);
+  def N1=N; def W1=W; def LN1=LN;
+  ideal Bw;
+  poly S;
+  list L; list L0; list L1;
+  list M; list M0; list M1;
+  list pair;
+  list KK; int loc;
+  int crit;
+  poly h;
+  if (size(B)==0)
+  {
+    M0=N0,W0,LN0;
+    M1=N1,W1,LN1;
+    M=M0,M1,ideal(0),Pa,cond;
+    return(M);
+  }
+  tt=1;
+  i=1;
+  while ((tt) and (i<=size(B)))
+  {
+    h=B[i];
+    for (j=1;j<=npars(@R);j++)
+    {
+      h=subst(h,par(j),0);
+    }
+    if (h!=B[i]){tt=0;}
+    i++;
+  }
+  if (tt)
+  {
+    //"T_ a non parametric system occurred";
+    def RR=basering;
+    def RL=ringlist(RR);
+    RL[1]=0;
+    def LRR=ring(RL);
+    setring(LRR);
+    def BP=imap(RR,B);
+    option(redSB);
+    BP=groebner(BP);
+    setring(RR);
+    B=imap(LRR,BP);
+    M0=ideal(1),W0,LN0;
+    M1=N1,W1,LN1;
+    M=M0,M1,B,list(),cond;
+    return(M);
+  }
+  if (size(Pa)==0){npols=size(B); Pa=orderingpairs(F); nSpols=size(Pa);}
+  while ((size(Pa)!=0) and (N0[1]==1) or (N1[1]==1))
+  {
+    pair=Pa[1];
+    i=pair[1];
+    j=pair[2];
+    Pa=delete(Pa,1);
+    // Buchberger 1st criterion (not needed here, it is already eliminated
+    // when creating the list of pairs
+    //T_ lpf=leadmonom(F[i]);
+    //T_ lpg=leadmonom(F[j]);
+    //T_ if (lpf*lpg!=pair[3])
+    //T_ {
+      for (k=1;k<=size(Pa);k++){Pa0[k]=delete(Pa[k],3);}
+      //crit=criterion(i,j,Pa0,F); // produces errors?
+      crit=0;
+      if (not(crit))
+      {
+        S=pspol(F[i],F[j]);
+        KK=pdivi(S,F);
+        S=KK[1];
+        if (S!=0)
+        {
+          S=pnormalform(S,N,W);
+          if (S!=0)
+          {
+            L=discusspolys(ideal(S),list(N,W,LN));
+            N0=L[1][1];
+            W0=L[1][2];
+            LN0=L[1][3];
+            N1=L[2][1];
+            W1=L[2][2];
+            LN1=L[2][3];
+            S=L[3][1];
+            cond=L[4];
+            if (S==1)
+            {
+              M0=ideal(1),W0,list(ideal(1));
+              M1=N1,W1,LN1;
+              M=M0,M1,ideal(1),list(),cond;
+              return(M);
+            }
+            if (S!=0)
+            {
+              F[size(F)+1]=S;
+              npols=size(F);
+              //"T_ number of polynoms in the basis="; npols;
+              for (k=1;k<size(F);k++)
+              {
+                lm=lcmlmonoms(F[k],S);
+                // Buchberger 1st criterion
+                lpf=leadmonom(F[k]);
+                lpg=leadmonom(S);
+                if (lpf*lpg!=lm)
+                {
+                  pair=k,size(F),lm;
+                  Pa=placepairinlist(pair,Pa);
+                  nSpols=size(Pa);
+                  //"T_ number of S-polynoms to test="; nSpols;
+                }
+              }
+              if (N0[1]==1){N=N1; W=W1; LN=LN1;}
+            }
+          }
+        }
+      }
+    //T_ }
+  }
+  M0=N0,W0,LN0;
+  M1=N1,W1,LN1;
+  M=M0,M1,F,Pa,cond;
+  return(M);
+};
+
+
+// buildtree: Basic routine generating a first reduced CGS
+//     it will define the rings @R, @P and @RP as global rings
+//     and the list @T a global list that will be killed at the output
+// input:  ideal F in ring K[a][x];
+// output: list T of lists whose list elements are of the form
+//         T[i]=list(list lab, boolean terminal, ideal B, ideal N, ideal W, list of ideals decomp of N,
+//              ideal of monomials lpp);
+// all the ideals are in the ring K[a][x];
+proc buildtree(ideal F, list #)
+"USAGE:   buildtree(F);
+          F: ideal in K[a][x] (parameters and variables) to be discussed
+RETURN:   Returns a list T describing a dichotomic discussion tree, whose 
+          content is the first discussion of the ideal F of K[a][x].
+          The first element of the list is the root, and contains
+            [1] label: intvec(-1)
+            [2] number of children : int
+            [3] the ideal F
+            [4], [5], [6] the red-spec of the null and non-null conditions
+                given (as option). ideal (0), ideal (0), list(ideal(0)) if
+                no optional conditions are given.
+            [7] the set of lpp of ideal F
+            [8] condition that was taken to reach the vertex 
+                (poly 1, for the root).
+          The remaning elements of the list represent vertices of the tree:
+          with the same structure:
+            [1] label: intvec (1,0,0,1,...) gives its position in the tree:
+                first branch condition is taken non-null, second null,...
+            [2] number of children (0 if it is a terminal vertex)
+            [3] the specialized ideal with the previous assumed conditions
+                to reach the vertex
+            [4],[5],[6] the red-spec of the previous assumed conditions
+                to reach the vertex
+            [7] the set of lpp of the specialized ideal at this stage
+            [8] condition that was taken to reach the vertex from the 
+                father's vertex (that was taken non-null if the last
+                integer in the label is 1, and null if it is 0)
+          The terminal vertices form a disjoint partition of the parameter space
+          whose bases specialize to the reduced Groebner basis of the
+          specialized ideal on each point of the segment and preserve
+          the lpp. So they form a disjoint reduced CGS.
+NOTE:     The basering R, must be of the form K[a][x], a=parameters, 
+          x=variables, and should be defined previously. The ideal must
+          be defined on R.
+          The disjoint and reduced CGS built by buildtree can be obtained
+          from the output of buildtree by calling finalcases(T); this
+          selects the terminal vertices.
+          The content of buildtree can be written in a file that is readable
+          by Maple in order to plot its content using buildtreetoMaple;
+          The file written by buildtreetoMaple when readed in a Maple
+          worksheet can be plotted using the dbgb routine tplot;
+          
+KEYWORDS: CGS, disjoint, reduced, comprehensive Groebner system
+EXAMPLE:  buildtree; shows an example"
+{
+  list @T;
+  exportto(Top,@T);
+  def @R=basering;
+  setglobalrings();
+  int i;
+  int j;
+  ideal B;
+  poly f;
+  poly cond=1;
+  def N=ideal(0);
+  def W=ideal(0);
+  list LN;
+  LN[1]=ideal(0);
+  if (size(#)==2)
+  {
+    N=#[1];
+    W=#[2];
+    def LL=redspec(N,W);
+    N=LL[1];
+    W=LL[2];
+    LN=LL[3];
+    j=1;
+    for (i=1;i<=size(F);i++)
+    {
+      f=pnormalform(F[i],N,W);
+      if (f!=0){B[j]=f;j++;}
+    }
+  }
+  else {B=F;}
+  def lpp=ideal(0);
+  if (size(B)==0){lpp=ideal(0);}
+  else
+  {
+     for (i=1;i<=size(B);i++){lpp[i]=leadmonom(B[i]);}
+    // lpp=ideal of lead power product of the polys in B
+  }
+  intvec lab=-1;
+  int term=0;
+  list root;
+  root[1]=lab;
+  root[2]=term;
+  root[3]=B;
+  root[4]=N;
+  root[5]=W;
+  root[6]=LN;
+  root[7]=lpp;
+  root[8]=cond;
+  @T[1]=root;
+  list P;
+  recbuildtree(root,P);
+  def T=@T;
+  kill @T;
+  return(T)
+};
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R=(0,a1,a2,a3,a4),(x1,x2,x3,x4),dp;
+  ideal F=x4-a4+a2,
+    x1+x2+x3+x4-a1-a3-a4,
+    x1*x3*x4-a1*a3*a4,
+    x1*x3+x1*x4+x2*x3+x3*x4-a1*a4-a1*a3-a3*a4;
+  def T=buildtree(F);
+  finalcases(T);
+  buildtreetoMaple(T,"Tb","Tb.txt");
+}
+
+// recbuildtree: auxilliary recursive routine called by buildtree
+proc recbuildtree(list v, list P)
+{
+  def vertex=v;
+  int i;
+  int j;
+  int pos;
+  list P0;
+  list P1;
+  poly f;
+  def lab=vertex[1];
+  if ((size(lab)>1) and (lab[1]==-1))
+  {lab=lab[2..size(lab)];}
+  def term=vertex[2];
+  def B=vertex[3];
+  def N=vertex[4];
+  def W=vertex[5];
+  def LN=vertex[6];
+  def lpp=vertex[7];
+  def cond=vertex[8];
+  def lab0=lab;
+  def lab1=lab;
+  if ((size(lab)==1) and (lab[1]==-1))
+  {
+    lab0=0;
+    lab1=1;
+  }
+  else
+  {
+    lab0[size(lab)+1]=0;
+    lab1[size(lab)+1]=1;
+  }
+  list vertex0;
+  list vertex1;
+  ideal B0;
+  ideal lpp0;
+  ideal lpp1;
+  ideal N0=1;
+  def W0=ideal(0);
+  list LN0=ideal(1);
+  def B1=B;
+  def N1=N;
+  def W1=W;
+  list LN1=LN;
+  list L;
+  if (size(P)==0)
+  {
+    L=discusspolys(B,list(N,W,LN));
+    N0=L[1][1];
+    W0=L[1][2];
+    LN0=L[1][3];
+    N1=L[2][1];
+    W1=L[2][2];
+    LN1=L[2][3];
+    B1=L[3];
+    cond=L[4];
+  }
+  if ((size(B1)!=0) and (N0[1]==1))
+  {
+    L=discussSpolys(B1,list(N1,W1,LN1),P);
+    N0=L[1][1];
+    W0=L[1][2];
+    LN0=L[1][3];
+    N1=L[2][1];
+    W1=L[2][2];
+    LN1=L[2][3];
+    B1=L[3];
+    P1=L[4];
+    cond=L[5];
+    lpp=ideal(0);
+    for (i=1;i<=size(B1);i++){lpp[i]=leadmonom(B1[i]);}
+  }
+  vertex[3]=B1;
+  vertex[4]=N1; // unnecessary
+  vertex[5]=W1; // unnecessary
+  vertex[6]=LN1;// unnecessary
+  vertex[7]=lpp;
+  vertex[8]=cond;
+  if (size(@T)>0)
+  {
+    pos=size(@T)+1;
+    @T[pos]=vertex;
+  }
+  if ((N0[1]!=1) and (N1[1]!=1))
+  {
+    vertex1[1]=lab1;
+    vertex1[2]=0;
+    vertex1[3]=B1;
+    vertex1[4]=N1;
+    vertex1[5]=W1;
+    vertex1[6]=LN1;
+    vertex1[7]=lpp1;
+    vertex1[8]=cond;
+    if (size(B1)==0){B0=ideal(0); lpp0=ideal(0);}
+    else
+    {
+      j=1;
+      lpp0=ideal(0);
+      for (i=1;i<=size(B1);i++)
+      {
+        f=pnormalform(B1[i],N0,W0);
+        if (f!=0){B0[j]=f; lpp0[j]=leadmonom(f);j++;}
+      }
+    }
+    vertex0[1]=lab0;
+    vertex0[2]=0;
+    vertex0[3]=B0;
+    vertex0[4]=N0;
+    vertex0[5]=W0;
+    vertex0[6]=LN0;
+    vertex0[7]=lpp0;
+    vertex0[8]=cond;
+    recbuildtree(vertex0,P0);
+    recbuildtree(vertex1,P1);
+  }
+  else
+  {
+    vertex[2]=1;
+    B1=mingb(B1);
+    vertex[3]=redgb(B1,N1,W1);
+    vertex[4]=N1;
+    vertex[5]=W1;
+    vertex[6]=LN1;
+    lpp=ideal(0);
+    for (i=1;i<=size(vertex[3]);i++){lpp[i]=leadmonom(vertex[3][i]);}
+    vertex[7]=lpp;
+    vertex[8]=cond;
+    @T[pos]=vertex;
+  }
+};
+
+//****************End of BuildTree*************************************
+
+//****************Begin BuildTree To Maple*****************************
+
+// buildtreetoMaple: writes the list provided by buildtree to a file
+//    containing the table representing it in Maple
+
+// writes the list L=buildtree(F) to a file "writefile" that
+// is readable by Maple whith name T
+// input:
+//   L: the list output by buildtree
+//   T: the name (string) of the output table in Maple
+//   writefile: the name of the datafile where the output is to be stored
+// output:
+//   the result is written on the datafile "writefile" containig
+//   the assignement to the table with name "T"
+proc buildtreetoMaple(list L, string T, string writefile)
+"USAGE:   buildtreetoMaple(T, TM, writefile);
+          T: is the list provided by buildtree,
+          TM: is the name (string) of the table variable in Maple that will represent
+             the output of buildtree,
+          writefile: is the name (string) of the file where to write the content.
+RETURN:   writes the list provided by buildtree to a file
+          containing the table representing it in Maple.
+KEYWORDS: buildtree, Maple
+EXAMPLE:  buildtreetoMaple; shows an example"
+{
+  short=0;
+  poly cond;
+  int i;
+  link LLw=":w "+writefile;
+  string La=string("table(",T,");");
+  write(LLw, La);
+  close(LLw);
+  link LLa=":a "+writefile;
+  def RL=ringlist(@R);
+  list p=RL[1][2];
+  string param=string(p[1]);
+  if (size(p)>1)
+  {
+    for(i=2;i<=size(p);i++){param=string(param,",",p[i]);}
+  }
+  list v=RL[2];
+  string vars=string(v[1]);
+  if (size(v)>1)
+  {
+    for(i=2;i<=size(v);i++){vars=string(vars,",",v[i]);}
+  }
+  list xord;
+  list pord;
+  if (RL[1][3][1][1]=="dp"){pord=string("tdeg(",param);}
+  if (RL[1][3][1][1]=="lp"){pord=string("plex(",param);}
+  if (RL[3][1][1]=="dp"){xord=string("tdeg(",vars);}
+  if (RL[3][1][1]=="lp"){xord=string("plex(",vars);}
+  write(LLa,string(T,"[[9]]:=",xord,");"));
+  write(LLa,string(T,"[[10]]:=",pord,");"));
+  write(LLa,string(T,"[[11]]:=true; "));
+  list S;
+  for (i=1;i<=size(L);i++)
+  {
+    if (L[i][2]==0)
+    {
+      cond=L[i][8];
+      S=btcond(T,L[i],cond);
+      write(LLa,S[1]);
+      write(LLa,S[2]);
+    }
+    S=btbasis(T,L[i]);
+    write(LLa,S);
+    S=btN(T,L[i]);
+    write(LLa,S);
+    S=btW(T,L[i]);
+    write(LLa,S);
+    if (L[i][2]==1) {S=btterminal(T,L[i]); write(LLa,S);}
+    S=btlpp(T,L[i]);
+    write(LLa,S);
+  }
+  close(LLa);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R=(0,a1,a2,a3,a4),(x1,x2,x3,x4),dp;
+  ideal F=x4-a4+a2,
+   x1+x2+x3+x4-a1-a3-a4,
+   x1*x3*x4-a1*a3*a4,
+   x1*x3+x1*x4+x2*x3+x3*x4-a1*a4-a1*a3-a3*a4;
+  def T=buildtree(F);
+  finalcases(T);
+  buildtreetoMaple(T,"Tb","Tb.txt");
+}
+
+// auxiliary routine called by buildtreetoMaple
+// input:
+//   list L: element i of the list of buildtree(F)
+// output:
+//   the string of T[[lab,1]]:=label; in Maple
+proc btterminal(string T, list L)
+{
+  int i;
+  string Li;
+  string term;
+  string coma=",";
+  if (L[2]==0){term="false";} else {term="true";}
+  def lab=L[1];
+  string slab;
+  if ((size(lab)==1) and lab[1]==-1)
+  {slab="";coma="";} //if (size(lab)==0)
+  else
+  {
+    slab=string(lab[1]);
+    if (size(lab)>=1)
+    {
+      for (i=2;i<=size(lab);i++){slab=string(slab,",",lab[i]);}
+    }
+  }
+  Li=string(T,"[[",slab,coma,"6]]:=",term,"; ");
+  return(Li);
+}
+
+// auxiliary routine called by buildtreetoMaple
+// input:
+//   list L: element i of the list of buildtree(F)
+// output:
+//   the string of T[[lab,3]] (basis); in Maple
+proc btbasis(string T, list L)
+{
+  int i;
+  string Li;
+  string coma=",";
+  def lab=L[1];
+  string slab;
+  if ((size(lab)==1) and lab[1]==-1)
+  {slab="";coma="";} //if (size(lab)==0)
+  else
+  {
+    slab=string(lab[1]);
+    if (size(lab)>=1)
+    {
+      for (i=2;i<=size(lab);i++){slab=string(slab,",",lab[i]);}
+    }
+  }
+  Li=string(T,"[[",slab,coma,"3]]:=[",L[3],"]; ");
+  return(Li);
+}
+
+// auxiliary routine called by buildtreetoMaple
+// input:
+//   list L: element i of the list of buildtree(F)
+// output:
+//   the string of T[[lab,4]] (null conditions ideal); in Maple
+proc btN(string T, list L)
+{
+  int i;
+  string Li;
+  string coma=",";
+  def lab=L[1];
+  string slab;
+  if ((size(lab)==1) and lab[1]==-1)
+  {slab=""; coma="";}
+  else
+  {
+    slab=string(lab[1]);
+    if (size(lab)>=1)
+    {
+      for (i=2;i<=size(lab);i++){slab=string(slab,",",lab[i]);}
+    }
+  }
+  if ((size(lab)==1) and lab[1]==-1)
+    {Li=string(T,"[[",slab,coma,"4]]:=[ ]; ");}
+  else
+    {Li=string(T,"[[",slab,coma,"4]]:=[",L[4],"]; ");}
+  return(Li);
+}
+
+// auxiliary routine called by buildtreetoMaple
+// input:
+//   list L: element i of the list of buildtree(F)
+// output:
+//   the string of T[[lab,5]] (null conditions ideal); in Maple
+proc btW(string T, list L)
+{
+  int i;
+  string Li;
+  string coma=",";
+  def lab=L[1];
+  string slab;
+  if ((size(lab)==1) and lab[1]==-1)
+  {slab=""; coma="";}
+  else
+  {
+    slab=string(lab[1]);
+    if (size(lab)>=1)
+    {
+      for (i=2;i<=size(lab);i++){slab=string(slab,",",lab[i]);}
+    }
+  }
+  if (size(L[5])==0)
+    {Li=string(T,"[[",slab,coma,"5]]:={ }; ");}
+  else
+    {Li=string(T,"[[",slab,coma,"5]]:={",L[5],"}; ");}
+  return(Li);
+}
+
+// auxiliary routine called by buildtreetoMaple
+// input:
+//   list L: element i of the list of buildtree(F)
+// output:
+//   the string of T[[lab,12]] (lpp); in Maple
+proc btlpp(string T, list L)
+{
+  int i;
+  string Li;
+  string coma=",";;
+  def lab=L[1];
+  string slab;
+  if ((size(lab)==1) and lab[1]==-1)
+  {slab=""; coma="";}
+  else
+  {
+    slab=string(lab[1]);
+    if (size(lab)>=1)
+    {
+      for (i=2;i<=size(lab);i++){slab=string(slab,",",lab[i]);}
+    }
+  }
+  if (size(L[7])==0)
+  {
+    Li=string(T,"[[",slab,coma,"12]]:=[ ]; ");
+  }
+  else
+  {
+    Li=string(T,"[[",slab,coma,"12]]:=[",L[7],"]; ");
+  }
+  return(Li);
+}
+
+// auxiliary routine called by buildtreetoMaple
+// input:
+//   list L: element i of the list of buildtree(F)
+// output:
+//   the list of strings of (T[[lab,0]]=0,T[[lab,1]]<>0); in Maple
+proc btcond(string T, list L, poly cond)
+{
+  int i;
+  string Li1;
+  string Li2;
+  def lab=L[1];
+  string slab;
+  string coma=",";;
+    if ((size(lab)==1) and lab[1]==-1)
+    {slab=""; coma="";}
+  else
+  {
+    slab=string(lab[1]);
+    if (size(lab)>=1)
+    {
+      for (i=2;i<=size(lab);i++){slab=string(slab,",",lab[i]);}
+    }
+  }
+  Li1=string(T,"[[",slab+coma,"0]]:=",L[8],"=0; ");
+  Li2=string(T,"[[",slab+coma,"1]]:=",L[8],"<>0; ");
+  return(list(Li1,Li2));
+}
+
+//*****************End of BuildtreetoMaple*********************
+
+//*****************Begin of Selectcases************************
+
+// given an intvec with sum=n
+// it returns the list of intvect with the sum=n+1
+proc comp1(intvec l)
+{
+  list L;
+  int p=size(l);
+  int i;
+  if (p==0){return(l);}
+  if (p==1){return(list(intvec(l[1]+1)));}
+  L[1]=intvec((l[1]+1),l[2..p]);
+  L[p]=intvec(l[1..p-1],(l[p]+1));
+  for (i=2;i<p;i++)
+  {
+    L[i]=intvec(l[1..(i-1)],(l[i]+1),l[(i+1)..p]);
+  }
+  return(L);
+}
+
+// comp: p-compositions of n
+// input
+//   int n;
+//   int p;
+// return
+//   the list of all intvec (p-composition of n)
+proc comp(int n,int p)
+{
+  if (n<0){ERROR("comp was called with negative argument");}
+  if (n==0){return(list(0:p));}
+  int i;
+  int k;
+  list L1=comp(n-1,p);
+  list L=comp1(L1[1]);
+  list l;
+  list la;
+  for (i=2; i<=size(L1);i++)
+  {
+    l=comp1(L1[i]);
+    for (k=1;k<=size(l);k++)
+    {
+      if(not(memberpos(l[k],L)[1]))
+      {L[size(L)+1]=l[k];}
+    }
+  }
+  return(L);
+};
+
+// given the matrices of coefficients and monomials m amd m1 of
+// two polynomials (the first one contains all the terms of f
+// and the second only those of f
+// it returns the list with the comon monomials and the list of coefficients
+// of the polynomial f with zeroes if necessary.
+proc adaptcoef(matrix m, matrix m1)
+{
+  int i;
+  int j;
+  int ncm=ncols(m);
+  int ncm1=ncols(m1);
+  ideal T;
+  for (i=1;i<=ncm;i++){T[i]=m[1,i];}
+  ideal C;
+  for (i=1;i<=ncm;i++){C[i]=0;};
+  for (i=1;i<=ncm;i++)
+  {
+    j=1;
+    while((j<ncm1) and (m1[1,j]>m[1,i])){j++;}
+    if (m1[1,j]==m[1,i]){C[i]=m1[2,j];}
+  }
+  return(list(T,C));
+}
+
+// given teh ideal of non-null conditions and an intvec lambda
+// with the exponents of each w in W
+// it returns the polynomial prod (w_i)^(lambda_i).
+proc WW(ideal W, intvec lambda)
+{
+  if (size(W)==0){return(poly(1));}
+  poly w=1;
+  int i;
+  for (i=1;i<=ncols(W);i++)
+  {
+    w=w*(W[i])^(lambda[i]);
+  }
+  return(w);
+}
+
+// given a polynomial f and the non-null conditions W
+// WPred eliminates the factors in f that are in W
+// ring @PAB
+// input:
+//   poly f:
+//   ideal W  of non-null conditions (already supposed that it is facvar)
+// output:
+//   poly f2  where the non-null conditions in W have been dropped from f
+proc WPred(poly f, ideal W)
+{
+  if (f==0){return(f);}
+  def l=factorize(f,2);
+  int i;
+  poly f1=1;
+  for(i=1;i<=size(l[1]);i++)
+  {
+    if (memberpos(l[1][i],W)[1]){;}
+    else{f1=f1*((l[1][i])^(l[2][i]));}
+  }
+  return(f1);
+};
+
+//genimage
+// ring @R
+//input:
+//   poly f1, idel N1,ideal W1,poly f2, ideal N2, ideal W2
+//   corresponding to two polynomials having the same lpp
+//   f1 in the redspec given by N1,W1,  f2 in the redspec given by N2,W2
+//output:
+//   the list of (ideal GG, list(list r1, list r2))
+//   where g an ideal whose elements have the same lpp as f1 and f2
+//   that specialize well to f1 in N1,W1 and to f2 in N2,W2.
+//   If it doesn't exist a genimage, then g=ideal(0).
+proc genimage(poly f1, ideal N1, ideal W1, poly f2, ideal N2, ideal W2)
+{
+  int i; ideal W12;  poly ff1; poly g1=0; ideal GG;
+  int tt=1;
+  // detect weather f1 reduces to 0 on segment 2
+  ff1=pnormalform(f1,N2,W2);
+  if (ff1==0)
+  {
+    // detect weather N1 is included in N2
+    def RR=basering;
+    setring @P;
+    def NP1=imap(RR,N1);
+    def NP2=imap(RR,N2);
+    poly nr;
+    i=1;
+    while ((tt) and (i<=size(NP1)))
+    {
+      nr=reduce(NP1[i],NP2);
+      if (nr!=0){tt=0;}
+      i++;
+    }
+    setring(RR);
+  }
+  else{tt=0;}
+  if (tt==1)
+  {
+    // detect weather W1 intersect W2 is non-empty
+    for (i=1;i<=size(W1);i++)
+    { 
+      if (memberpos(W1[i],W2)[1])
+      {     
+        W12[size(W12)+1]=W1[i];
+      }
+      else
+      {
+        if (nonnull(W1[i],N2,W2)) 
+        {
+          W12[size(W12)+1]=W1[i];
+        }
+      }
+    }
+    for (i=1;i<=size(W2);i++)
+    {
+      if (not(memberpos(W2[i],W12)[1]))
+      {
+        W12[size(W12)+1]=W2[i];
+      }
+    }
+  }
+  if (tt==1){g1=extendpoly(f1,N1,W12);}
+  if (g1!=0)
+  {
+    //T_ "genimage has found a more generic basis (method 1)";
+    //T_ "f1:"; f1; "N1:"; N1; "W1:"; W1;
+    //T_ "f2:"; f2; "N2:"; N2; "W2:"; W2;
+    //T_ "g1:"; g1;
+    if (pnormalform(g1,N1,W1)==0)
+    {
+      GG=f1,g1;
+      //T_ "A sheaf has been found (method 2)";
+    }
+    else
+    {
+      GG=g1;
+    }
+    return(GG);
+  }
+
+  // begins the second step;
+  int bound=6;
+  // in ring @R
+  int j; int g=0; int alpha; int r1; int s1=1; int s2=1;
+  poly G;
+  matrix qT;
+  matrix T;
+  ideal N10;
+  poly GT;
+  ideal N12=N1,N2;
+  def varx=maxideal(1);
+  int nx=size(varx);
+  poly pvarx=1;
+  for (i=1;i<=nx;i++){pvarx=pvarx*varx[i];}
+  def m=coef(43*f1+157*f2,pvarx);
+  def m1=coef(f1,pvarx);
+  def m2=coef(f2,pvarx);
+  list L1=adaptcoef(m,m1);
+  list L2=adaptcoef(m,m2);
+  ideal Tm=L1[1];
+  ideal c1=L1[2];
+  ideal c2=L2[2];
+  poly ww1;
+  poly ww2;
+  poly cA1;
+  poly cB1;
+  matrix TT;
+  poly H;
+  list r;
+  ideal q;
+  poly mu;
+  ideal N;
+
+  // in ring @PAB
+  list Px=ringlist(@P);
+  list v="@A","@B";
+  Px[2]=Px[2]+v;
+  def npx=size(Px[3][1][2]);
+  Px[3][1][2]=1:(npx+size(v));
+  def @PAB=ring(Px);
+  setring(@PAB);
+
+  poly PH;
+  ideal NP;
+  list rP;
+  def PN1=imap(@R,N1);
+  def PW1=imap(@R,W1);
+  def PN2=imap(@R,N2);
+  def PW2=imap(@R,W2);
+  def a1=imap(@R,c1);
+  def a2=imap(@R,c2);
+  matrix PT;
+  ideal PN;
+  ideal PN12=PN1,PN2;
+  PN=liftstd(PN12,PT);
+  list compos1;
+  list compos2;
+  list compos0;
+  intvec comp0;
+  poly w1=0;
+  poly w2=0;
+  poly h;
+  poly cA=0;
+  poly cB=0;
+  int t=0;
+  list l;
+  poly h1;
+  g=0;
+  while ((g<=bound) and not(t))
+  {
+    compos0=comp(g,2);
+    r1=1;
+    while ((r1<=size(compos0)) and not(t))
+    {
+      comp0=compos0[r1];
+      if (comp0[1]<=bound/2)
+      {
+        compos1=comp(comp0[1],ncols(PW1));
+        s1=1;
+        while ((s1<=size(compos1)) and not(t))
+        {
+          if (comp0[2]<=bound/2)
+          {
+            compos2=comp(comp0[2],ncols(PW2));
+            s2=1;
+            while ((s2<=size(compos2)) and not(t))
+            {
+              w1=WW(PW1,compos1[s1]);
+              w2=WW(PW2,compos2[s2]);
+              h=@A*w1*a1[1]-@B*w2*a2[1];
+              h=reduce(h,PN);
+              if (h==0){cA=1;cB=-1;}
+              else
+              {
+                l=factorize(h,2);
+                h1=1;
+                for(i=1;i<=size(l[1]);i++)
+                {
+                  if ((memberpos(@A,variables(l[1][i]))[1]) or  (memberpos(@B,variables(l[1][i]))[1]))
+                  {h1=h1*l[1][i];}
+                }
+                cA=diff(h1,@B);
+                cB=diff(h1,@A);
+              }
+              if ((cA!=0) and (cB!=0) and (jet(cA,0)==cA) and (jet(cB,0)==cB))
+              {
+                t=1;
+                alpha=1;
+                while((t) and (alpha<=ncols(a1)))
+                {
+                  h=cA*w1*a1[alpha]+cB*w2*a2[alpha];
+                  if (not(reduce(h,PN,1)==0)){t=0;}
+                  alpha++;
+                }
+              }
+              else{t=0;}
+              s2++;
+            }
+          }
+          s1++;
+        }
+      }
+      r1++;
+    }
+    g++;
+  }
+  setring(@R);
+  ww1=imap(@PAB,w1);
+  ww2=imap(@PAB,w2);
+  T=imap(@PAB,PT);
+  N=imap(@PAB,PN);
+  cA1=imap(@PAB,cA);
+  cB1=imap(@PAB,cB);
+  if (t)
+  {
+    G=0;
+    for (alpha=1;alpha<=ncols(Tm);alpha++)
+    {
+      H=cA1*ww1*c1[alpha]+cB1*ww2*c2[alpha];
+      setring(@PAB);
+      PH=imap(@R,H);
+      PN=imap(@R,N);
+      rP=division(PH,PN);
+      setring(@R);
+      r=imap(@PAB,rP);
+      if (r[2][1]!=0){ERROR("the division is not null and it should be");}
+      q=r[1];
+      qT=transpose(matrix(q));
+      N10=N12;
+      for (i=size(N1)+1;i<=size(N1)+size(N2);i++){N10[i]=0;}
+      G=G+(cA1*ww1*c1[alpha]-(matrix(N10)*T*qT)[1,1])*Tm[alpha];
+    }
+    //T_ "genimage has found a more generic basis (method 2)";    
+    //T_ "f1:"; f1; "N1:"; N1; "W1:"; W1;
+    //T_ "f2:"; f2; "N2:"; N2; "W2:"; W2;
+    //T_ "G:"; G;
+    GG=ideal(G);
+  }
+  else{GG=ideal(0);} 
+  return(GG);
+};
+
+// purpose: given a polynomial f (in the reduced basis)
+//          the null-conditions ideal N in the segment
+//          end the set of non-null polynomials common to the segment and
+//          a new segment,
+//          to obtain an equivalent polynomial with a leading coefficient
+//          that is non-null in the second segment.
+// input:
+// poly f:    a polynomials of the reduced basis in the segment (N,W) 
+// ideal N:   the null-conditions ideal in the segment
+// ideal W12: the set of non-null polynomials common to the segment and 
+//            a second segment
+proc extendpoly(poly f, ideal N, ideal W12)
+{
+  int bound=4;
+  ideal cfs;
+  ideal cfsn;
+  ideal ppfs;
+  poly p=f;
+  poly fn;
+  poly lm; poly lc;
+  int tt=0;
+  int i;
+  while (p!=0)
+  {
+    lm=leadmonom(p);
+    lc=leadcoef(p);
+    cfs[size(cfs)+1]=lc;
+    ppfs[size(ppfs)+1]=lm;
+    p=p-lc*lm;
+  }
+  def lcf=cfs[1];
+  int r1=0; int s1;
+  def RR=basering;
+  setring @P;
+  list compos1;
+  poly w1;
+  ideal q;
+  def lcfp=imap(RR,lcf);
+  def W=imap(RR,W12);
+  def Np=imap(RR,N);
+  def cfsp=imap(RR,cfs);
+  ideal cfspn;
+  matrix T;
+  ideal H=lcfp,Np;
+  def G=liftstd(H,T);
+  list r;
+  while ((r1<=bound) and not(tt))
+  {
+    compos1=comp(r1,ncols(W));
+    s1=1;
+    while ((s1<=size(compos1)) and not(tt))
+    {
+      w1=WW(W,compos1[s1]);
+      cfspn=ideal(0);
+      cfspn[1]=w1;
+      tt=1;
+      i=2;
+      while ((i<=size(cfsp)) and (tt))
+      {
+        r=division(w1*cfsp[i],G);
+        if (r[2][1]!=0){tt=0;}
+        else
+        {
+          q=r[1];
+          cfspn[i]=(T*transpose(matrix(q)))[1,1];
+        }
+        i++;
+      }
+      s1++;
+    }
+    r1++;
+  }
+  setring RR;
+  if (tt)
+  {
+    cfsn=imap(@P,cfspn);
+    fn=0;
+    for (i=1;i<=size(ppfs);i++)
+    {
+      fn=fn+cfsn[i]*ppfs[i];
+    }
+  }
+  else{fn=0;}
+  return(fn);
+}
+
+// nonnull
+// ring @P (or @R)
+// input:
+//   poly f
+//   ideal N
+//   ideal W
+// output:
+//   1 if f is nonnull in the segment (N,W)
+//   0 if it can be zero
+proc nonnull(poly f, ideal N, ideal W)
+{
+  int tt;
+  ideal N0=N;
+  N0[size(N0)+1]=f;
+  poly h=1;
+  int i;
+  for (i=1;i<=size(W);i++){h=h*W[i];}
+  def RR=basering;
+  setring(@P);
+  list Px=ringlist(@P);
+  list v="@C";
+  Px[2]=Px[2]+v;
+  def npx=size(Px[3][1][2]);
+  Px[3][1][1]="dp";
+  Px[3][1][2]=1:(npx+size(v));
+  def @PC=ring(Px);
+  setring(@PC);
+  def N1=imap(RR,N0);
+  def h1=imap(RR,h);
+  ideal G=1-@C*h1;
+  G=G+N1;
+  option(redSB);
+  ideal G1=groebner(G);
+  if (G1[1]==1){tt=1;} else{tt=0;}
+  setring(RR);
+  return(tt);
+}
+
+// decide
+// input:
+//   given two corresponding polynomials g1 and g2 with the same lpp
+//   g1 belonging to the basis in the segment N1,W1
+//   g2 belonging to the basis in the segment N2,W2
+// output:
+//   an ideal (with a single polynomial of more if a sheaf is needed)
+//   that specializes well on both segments to g1 and g2 respectivelly.
+//   If ideal(0) is output, then no such polynomial nor sheaf exists.
+proc decide(poly g1, ideal N1, ideal W1, poly g2, ideal N2, ideal W2)
+{
+  poly S;
+  poly S1;
+  poly S2;
+  S=leadcoef(g2)*g1-leadcoef(g1)*g2;
+  def RR=basering;
+  setring(@RP);
+  def SR=imap(RR,S);
+  def N1R=imap(RR,N1);
+  def N2R=imap(RR,N2);
+  attrib(N1R,"isSB",1);
+  attrib(N2R,"isSB",1);
+  poly S1R=reduce(SR,N1R);
+  poly S2R=reduce(SR,N2R);
+  setring(RR);
+  S1=imap(@RP,S1R);
+  S2=imap(@RP,S2R);
+  if ((S2==0) and (nonnull(leadcoef(g1),N2,W2))){return(ideal(g1));}
+  if ((S1==0) and (nonnull(leadcoef(g2),N1,W1))){return(ideal(g2));}
+  if ((S1==0) and (S2==0))
+  {
+    //T_ "A sheaf has been found (method 1)";
+    return(ideal(g1,g2));
+  } 
+  return(ideal(genimage(g1,N1,W1,g2,N2,W2)));
+}
+
+// input:  the tree (list) from buildtree output
+// output: the list of terminal vertices.
+proc finalcases(list T)
+"USAGE:   finalcases(T);
+          T is the list provided by buildtree
+RETURN:   A list with the CGS determined by buildtree.
+          Each element of the list represents one segment
+          of the buildtree CGS.
+          The list elements have the following structure:
+           [1]: label (an intvec(1,0,..)) that indicates the position
+                in the buildtree but that is irrelevant for the CGS
+           [2]: 1 (integer) it is also irrelevant and indicates
+                that this was a terminal vertex in buildtree.
+           [3]: the reduced basis of the segment.
+           [4], [5], [6]: the red-spec of the null and non-null conditions
+                of the segment. 
+                [4] is the null-conditions radical ideal N,
+                [5] is the non-null polynomials set (ideal) W,
+                [6] is the set of prime components (ideals) of N.
+           [7]: is the set of lpp
+           [8]: poly 1 (irrelevant) is the condition to branch (but no
+                more branch is necessary in the discussion, so 1 is the result. 
+NOTE:     It can be called having as argument the list output by buildtree
+KEYWORDS: buildtree, buildtreetoMaple, CGS
+EXAMPLE:  finalcases; shows an example"
+{
+  int i;
+  list L;
+  for (i=1;i<=size(T);i++)
+  {
+    if (T[i][2])
+    {L[size(L)+1]=T[i];}
+  }
+  return(L);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R=(0,a1,a2,a3,a4),(x1,x2,x3,x4),dp;
+  ideal F=x4-a4+a2, x1+x2+x3+x4-a1-a3-a4, x1*x3*x4-a1*a3*a4, x1*x3+x1*x4+x2*x3+x3*x4-a1*a4-a1*a3-a3*a4;
+  def T=buildtree(F);
+  finalcases(T);
+}
+
+// input:  the list of terminal vertices of buildtree (output of finalcases)
+// output: the same terminal vertices grouped by lpp
+proc groupsegments(list T)
+{
+  int i;
+  list L;
+  list lpp;
+  list lp;
+  list ls;
+  int n=size(T);
+  lpp[1]=T[n][7];
+  L[1]=list(lpp[1],list(list(T[n][1],T[n][3],T[n][4],T[n][5],T[n][6])));
+  if (n>1)
+  {
+    for (i=1;i<=size(T)-1;i++)
+    {
+      lp=memberpos(T[n-i][7],lpp);
+      if(lp[1]==1)
+      {
+        ls=L[lp[2]][2];
+        ls[size(ls)+1]=list(T[n-i][1],T[n-i][3],T[n-i][4],T[n-i][5],T[n-i][6]);
+        L[lp[2]][2]=ls;
+      }
+      else
+      {
+        lpp[size(lpp)+1]=T[n-i][7];
+        L[size(L)+1]=list(T[n-i][7],list(list(T[n-i][1],T[n-i][3],T[n-i][4],T[n-i][5],T[n-i][6])));
+      }
+    }
+  }
+  return(L);
+}
+
+// eliminates repeated elements form an ideal
+proc elimrepeated(ideal F)
+{
+  int i;
+  int j;
+  ideal FF;
+  FF[1]=F[1];
+  for (i=2;i<=ncols(F);i++)
+  {
+    if (not(memberpos(F[i],FF)[1]))
+    {
+      FF[size(FF)+1]=F[i];
+    }
+  }
+  return(FF);
+}
+
+
+// decide F is the same as decide but allows as first element a sheaf F
+proc decideF(ideal F,ideal N,ideal W, poly f2, ideal N2, ideal W2)
+{
+  int i;
+  ideal G=F;
+  ideal g;
+  if (ncols(F)==1) {return(decide(F[1],N,W,f2,N2,W2));}
+  for (i=1;i<=ncols(F);i++)
+  {
+    G=G+decide(F[i],N,W,f2,N2,W2);
+  }
+  return(elimrepeated(G));
+}
+
+// newredspec
+// input:  two redspec in the form of N,W and Nj,Wj
+// output: a redspec representing the minimal redspec segment that contains
+//         both input segments.
+proc newredspec(ideal N,ideal W, ideal Nj, ideal Wj)
+{
+  ideal nN;
+  ideal nW;
+  int u;
+  def RR=basering;
+  setring(@P);
+  list r;
+  def Np=imap(RR,N);
+  def Wp=imap(RR,W);
+  def Njp=imap(RR,Nj);
+  def Wjp=imap(RR,Wj);
+  Np=intersect(Np,Njp);
+  ideal WR;
+  for(u=1;u<=size(Wjp);u++)
+  {
+    if(nonnull(Wjp[u],Np,Wp)){WR[size(WR)+1]=Wjp[u];}
+  }
+  for(u=1;u<=size(Wp);u++)
+  {
+    if((not(memberpos(Wp[u],WR)[1])) and (nonnull(Wp[u],Njp,Wjp)))
+    {
+      WR[size(WR)+1]=Wp[u];
+    }
+  }
+  r=redspec(Np,WR);
+  option(redSB);
+  Np=groebner(r[1]);
+  Wp=r[2];
+  setring(RR);
+  nN=imap(@P,Np);
+  nW=imap(@P,Wp);
+  return(list(nN,nW));
+}
+
+// selectcases
+// input:
+//   list bT: the list output by buildtree.
+// output:
+//   list L   it contins the list of segments allowing a common
+//            reduced basis. The elements of L are of the form
+//            list (lpp,B,list(list(N,W,L),..list(N,W,L)) )
+proc selectcases(list bT) 
+{
+  list T=groupsegments(finalcases(bT));
+  list T0=bT[1];
+             // first element of the list of buildtree
+  list TT0;
+  TT0[1]=list(T0[7],T0[3],list(list(T0[4],T0[5],T0[6])));
+             // first element of the output of selectcases
+  list T1=T; // the initial list; it is only actualized (split)
+             // when a segment is completly revised (all split are
+             // already be considered);
+             // ( (lpp, ((lab,B,N,W,L),.. ()) ), .. (..) )
+  list TT;   // the output list ( (lpp,B,((N,W,L),..()) ),.. (..) )
+  // case i
+  list S1;   // the segments in case i T1[i][2]; ( (lab,B,N,W,L),..() )
+  list S2;   // the segments in case i that are being summarized in
+             // actual segment ( (N,W,L),..() )
+  list S3;   // the segments in case i that cannot be summarized in
+             // the actual case. When the case is finished a new case
+             // is created with them ( (lab,B,N,W,L),..() )
+  list s3;   // list of integers s whose segment cannot be summarized
+             // in the actual case
+  ideal lpp; // the summarized lpp (can contain repetitions)
+  ideal lppi;// in proecess of sumarizing lpp (can contain repetitions)
+  ideal B;   // the summarized B (can contain polynomials with
+             // the same lpp (sheaves))
+  ideal Bi;  // in process of summarizing B (can contain polynomials with
+             // the same lpp (sheaves))
+  ideal N;   // the summarized N
+  ideal W;   // the summarized W
+  ideal F;   // the summarized poly j (can contain a sheaf instead of
+             // a single poly)
+  ideal FF;  // the same as F but it can be ideal(0)
+  poly lpj;
+  poly fj;
+  ideal Nj;
+  ideal Wj;
+  ideal G;
+  int i;     // the index of the case i in T1;
+  int j;     // the index of the polynomial j of the basis
+  int s;     // the index of the segment s in S1;
+  int u;
+  int tests; // true if al the polynomial in segment s have been generalized;
+  list r;
+  // initializing the new list
+  i=1;
+  while(i<=size(T1))
+  {
+    S1=T1[i][2]; // ((lab,B,N,W,L)..) of the segments in case i
+    if (size(S1)==1)
+    {
+      TT[i]=list(T1[i][1],S1[1][2],list(list(S1[1][3],S1[1][4],S1[1][5])));
+    }
+    else
+    {
+      S2=list();
+      S3=list(); // ((lab,B,N,W,L)..) of the segments in case i to
+                 // create another segment i+1
+      s3=list();
+      B=S1[1][2];
+      Bi=ideal(0);
+      lpp=T1[i][1];
+      j=1;
+      tests=1;
+      while (j<=size(S1[1][2]))
+      { // j desings the new j-th polynomial
+        N=S1[1][3];
+        W=S1[1][4];
+        F=ideal(S1[1][2][j]);
+        s=2;
+        while (s<=size(S1) and not(memberpos(s,s3)[1]))
+        { // s desings the new segment s
+          fj=S1[s][2][j];
+          Nj=S1[s][3];
+          Wj=S1[s][4];
+          FF=decideF(F,N,W,fj,Nj,Wj);
+          if (FF[1]==0)
+          {
+            if (@ish)
+            {
+              "Warning: Dealing with an homogeneous ideal";
+              "mrcgs was not able to summarize all lpp cases into a single segment";
+              "Please send a mail with your Problem to antonio.montes@upc.edu";
+              "You found a counterexample of the complete success of the actual mrcgs algorithm";
+              //"T_"; "f1:"; F; "N1:"; N; "W1:"; W; "f2:"; fj; "N2:"; Nj; "W2:"; Wj;
+            }
+            S3[size(S3)+1]=S1[s];
+            s3[size(s3)+1]=s;
+            tests=0;
+          }
+          else
+          {
+            F=FF;
+            lpj=leadmonom(fj);
+            r=newredspec(N,W,Nj,Wj);
+            N=r[1];
+            W=r[2];
+          }
+          s++;
+        }
+        if (Bi[1]==0){Bi=FF;}
+        else
+        {
+          Bi=Bi+FF;
+        }
+        j++;
+      }
+      if (tests)
+      {
+        B=Bi;
+        lpp=ideal(0);
+        for (u=1;u<=size(B);u++){lpp[u]=leadmonom(B[u]);}
+      }
+      for (s=1;s<=size(T1[i][2]);s++)
+      {
+        if (not(memberpos(s,s3)[1]))
+        {
+          S2[size(S2)+1]=list(S1[s][3],S1[s][4],S1[s][5]);
+        }
+      }
+      TT[i]=list(lpp,B,S2);
+      // for (s=1;s<=size(s3);s++){S1=delete(S1,s);}
+      T1[i][2]=S2;
+      if (size(S3)>0){T1=insert(T1,list(T1[i][1],S3),i);}
+    }
+    i++;
+  }
+  for (i=1;i<=size(TT);i++){TT0[i+1]=TT[i];}
+  return(TT0);
+}
+
+//*****************End of Selectcases**************************
+
+//*****************Begin of CanTree****************************
+
+// equalideals
+// input: 2 ideals F and G;
+// output: 1 if they are identical (the same polynomials in the same order)
+//         0 else
+proc equalideals(ideal F, ideal G)
+{
+  int i=1; int t=1;
+  if (size(F)!=size(G)){return(0);}
+  while ((i<=size(F)) and (t))
+  {
+    if (F[i]!=G[i]){t=0;}
+    i++;
+  }
+  return(t);
+}
+
+// delintvec
+// input: intvec V
+//        int i
+// output:
+//        intvec W (equal to V but the coordinate i is deleted
+proc delintvec(intvec V, int i)
+{
+  int j;
+  intvec W;
+  for (j=1;j<i;j++){W[j]=V[j];}
+  for (j=i+1;j<=size(V);j++){W[j-1]=V[j];}
+  return(W);
+}
+
+// redtocanspec
+// Computes the canonical specification of a redspec (N,W,L).
+// input:
+//    ideal N (null conditions, must be radical)
+//    ideal W (non-null conditions ideal)
+//    list L  must contain the radical decomposition of N.
+// output:
+//    the list of elements of the (ideal N1,list(ideal M11,..,ideal M1k))
+//    determining the canonical specification of the difference of
+//    V(N) \ V(h), where h=prod(w in W).
+proc redtocanspec(intvec lab, int child, list rs)
+{
+  ideal N=rs[1]; ideal W=rs[2]; list L=rs[3];
+  intvec labi; intvec labij;
+  int childi;
+  int i; int j; list L0;
+  L0[1]=list(lab,size(L));
+  if (W[1]==0)
+  {
+    for (i=1;i<=size(L);i++)
+    {
+      labi=lab,child+i;
+      L0[size(L0)+1]=list(labi,1,L[i]);
+      labij=labi,1;
+      L0[size(L0)+1]=list(labij,0,ideal(1));
+    }
+    return(L0);
+  }
+  if (N[1]==1)
+  {
+    L0[1]=list(lab,1);
+    labi=lab,child+1;
+    L0[size(L0)+1]=list(labi,1,ideal(1));
+    labij=labi,1;
+    L0[size(L0)+1]=list(labij,0,ideal(1));
+  }
+  def RR=basering;
+  setring(@P);
+  ideal Np=imap(RR,N);
+  ideal Wp=imap(RR,W);
+  poly h=1;
+  for (i=1;i<=size(Wp);i++){h=h*Wp[i];}
+  list Lp=imap(RR,L);
+  list r; list Ti; list LL;
+  LL[1]=list(lab,size(Lp));
+  for (i=1;i<=size(Lp);i++)
+  {
+    Ti=minAssGTZ(Lp[i]+h);
+    for(j=1;j<=size(Ti);j++)
+    {
+      option(redSB);
+      Ti[j]=groebner(Ti[j]);
+    }
+    labi=lab,child+i;
+    childi=size(Ti);
+    LL[size(LL)+1]=list(labi,childi,Lp[i]);
+    for (j=1;j<=childi;j++)
+    {
+      labij=labi,j;
+      LL[size(LL)+1]=list(labij,0,Ti[j]);
+    }
+  }
+  LL[1]=list(lab,size(Lp));
+  setring(RR);
+  return(imap(@P,LL));
+}
+
+// difftocanspec
+// Computes the canonical specification of a diffspec V(N) \ V(M)
+// input:
+//    intvec lab: label where to hang the canspec
+//    list  N ideal of null conditions.
+//    ideal M ideal of the variety to be substacted
+// output:
+//    the list of elements determining the canonical specification of
+//    the difference  V(N) \ V(M):
+//      ( (intvec(i),children), ...(lab, children, prime ideal),...)
+proc difftocanspec(intvec lab, int child, ideal N, ideal M)
+{
+  int i; int j; list LLL;
+  def RR=basering;
+  setring(@P);
+  ideal Np=imap(RR,N);
+  ideal Mp=imap(RR,M);
+  def L=minAssGTZ(Np);
+  for(j=1;j<=size(L);j++)
+  {
+    option(redSB);
+    L[j]=groebner(L[j]);
+  }
+  intvec labi; intvec labij;
+  int childi;
+  list LL;
+  if ((Mp[1]==0) or ((size(L)==1) and (L[1][1]==1)))
+  {
+    //LL[1]=list(lab,1);
+    //labi=lab,1;
+    //LL[2]=list(labi,1,ideal(1));
+    //labij=labi,1;
+    //LL[3]=list(labij,0,ideal(1));
+    setring(RR);
+    return(LLL);
+  }
+  list r; list Ti;
+  def k=0;
+  LL[1]=list(lab,0);
+  for (i=1;i<=size(L);i++)
+  {
+    Ti=minAssGTZ(L[i]+Mp);
+    for(j=1;j<=size(Ti);j++)
+    {
+      option(redSB);
+      Ti[j]=groebner(Ti[j]);
+    }
+    if (not((size(Ti)==1) and (equalideals(L[i],Ti[1]))))
+    {
+      k++;
+      labi=lab,child+k;
+      childi=size(Ti);
+      LL[size(LL)+1]=list(labi,childi,L[i]);
+      for (j=1;j<=childi;j++)
+      {
+        labij=labi,j;
+        LL[size(LL)+1]=list(labij,0,Ti[j]);
+      }
+    }
+    else{setring(RR); return(LLL);}
+  }
+  if (size(LL)>0)
+  {
+    LL[1]=list(lab,k);
+    setring(RR);
+    return(imap(@P,LL));
+  }
+  else {setring(RR); return(LLL);}
+}
+
+// tree
+// purpose: given a label and the list L of vertices of the tree,
+//          whose content
+//          are of the form list(intvec lab, int children, ideal P)
+//          to obtain the vertex and its position
+// input:
+//  intvec lab: label of the vertex
+//  list:  L    the list containing the vertices
+// output:
+//  list   V    the vertex list(lab, children, P)
+proc tree(intvec lab,list L)
+{
+  int i=0; int tt=1; list V; intvec labi;
+  while ((i<size(L)) and (tt))
+  {
+    i++;
+    labi=L[i][1];
+    if (labi==lab)
+    {
+      V=list(L[i],i);
+      tt=0;
+    }
+  }
+  if (tt==0){return(V);}
+  else{return(list(list(intvec(0)),0));}
+}
+
+// GCS (generalized canonical specification)
+// new structure of a GCS
+
+// L is a list of vertices V of the GCS.
+// first vertex=list(intvec lab, int children, ideal lpp, ideal B)
+// other vertices=list(intvec lab, int children, ideal P)
+// the individual vertices can be accessed with the function tree
+// by the call  V=tree(lab,L), that outputs the vertex if it exists
+// and its position in L, or nothing if it does not exist.
+// The first element of the list must be the root of the tree and has
+// label lab=i, and other information.
+
+// example:
+// the canonical specification
+// V(a^2-ac-ba+c-abc) \ (union( V(b,a), V(c,a), V(b,a-c), V(c,a-b)))
+// is represented by  the list
+// L=((intvec(i),children=1,lpp,B),(intvec(i,1),4,ideal(a^2-ac-ba+c-abc)),
+//    (intvec(i,1,1),0,ideal(b,a)),     (intvec(i,1,2),0,ideal(c,a)),
+//    (intvec(i,1,3),0,ideal(b,a-c)),   (intvec(i,1,4),0,ideal(c,a-b))
+//   )
+// example:
+// the canonical specification
+// (V(a)\(union(V(c,a),V(b+c,a),V(b,a)))) union
+// (V(b)\(union(V(b,a),V(b,a-c))))        union
+// (V(c)\(union(V(c,a),V(c,a-b))))
+// is represented by  the list
+// L=((i,children=3,lpp,B),
+//    (intvec(i,1),3,ideal(a)),
+//    (intvec(i,1,1),0,(c,a)),(intvec(i,1,2),0,(b+c,a)),(intvec(i,1,3),0,(b,a)),
+//    (intvec(i,2),2,ideal(b)),
+//    (intvec(i,2,1),0,(b,a)),(intvec(i,2,2),0,(b,a-c)),
+//    (intvec(i,3),2,ideal(c)),
+//    (intvec(i,3,1),0,(c,a)),(intvec(i,3,2),0,(c,a-b))
+//   )
+// If L is the list in the last example, the call
+// tree(intvec(i,2,1),L) will output   ((intvec(i,2,1),0,(b,a)),7)
+
+// GCS
+// input: list T is supposed to be an element L[i] of selectcases:
+//        T= list( ideal lpp, ideal B, list(N,W,L),.., list(N,W,L))
+// output: the list L of vertices being the GCS of the addition of
+//         all the segments in T.
+//         list(list(intvec lab, int children, ideal lpp, ideal B),
+//              list(intvec lab, int children, ideal P),..
+//         )
+proc GCS(intvec lab, list case)
+{
+  int i; int ii; int t;
+  list @L;
+  @L[1]=list(lab,0,case[1],case[2]);
+  exportto(Top,@L);
+  int j;
+  list u; intvec labu; int childu;
+  list v; intvec labv; int childv;
+  list T=case[3];
+  for (j=1;j<=size(T);j++)
+  {
+    t=addcase(lab,T[j]);
+    deletebrotherscontaining(lab);
+  }
+  relabelingindices(lab,lab);
+  list L=@L;
+  kill @L;
+  return(L);
+}
+
+// sorbylab:
+// pupose: given the list of mrcgs to order is by increasing label
+proc sortbylab(list L)
+{
+  int n=L[1][2];
+  int i; int j;
+  list H=L;
+  list LL;
+  list L1;
+  //LL[1]=L[1];
+  //H=delete(H,1);
+  while (size(H)!=0)
+  {
+    j=1;
+    L1=H[1];
+    for (i=1;i<=size(H);i++)
+    {
+      if(lesslab(H[i],L1)){j=i;L1=H[j];}
+    }
+    LL[size(LL)+1]=L1;
+    H=delete(H,j);
+  }
+  return(LL);
+}
+
+// lesslab
+// purpose: given two elements of the list of mrcgs it
+// returns 1 if the label of the first is less than that of the second
+proc lesslab(list l1, list l2)
+{
+  intvec lab1=l1[1];
+  intvec lab2=l2[1];
+  int n1=size(lab1);
+  int n2=size(lab2);
+  int n=n1;
+  if (n2<n1){n=n2;}
+  int tt=0;
+  int j=1;
+  while ((lab1[j]==lab2[j]) and (j<n)){j++;}
+  if (lab1[j]<lab2[j]){tt=1;}
+  if ((j==n) and (lab1[j]==lab2[j]) and (n2>n1)){tt=1;}
+  return(tt);
+}
+
+// cantree
+// input:  the list provided by selectcases
+// output: the list providing the canonicaltree
+proc cantree(list S)
+{
+  string method=" ";
+  list T0=S[1];
+    // first element of the list of selectcases
+  int i; int j;
+  list L;
+  list T;
+  L[1]=list(intvec(0),size(S)-1,T0[1],T0[2],T0[3][1],method);
+  for (i=2;i<=size(S);i++)
+  {
+    T=GCS(intvec(i-1),S[i]);
+    T=sortbylab(T);
+    for (j=1;j<=size(T);j++)
+    {L[size(L)+1]=T[j];}
+  }
+  return(L);
+}
+
+// addcase
+// recursive routine that adds to the list @L, (an alredy GCS)
+// a new redspec rs=(N,W,L);
+// and returns the test t whose value is
+// 0 if the new canspec is not to be hung to the fathers vertex,
+// 1 if yes.
+proc addcase(intvec labu, list rs)
+{
+  int i; int j; int childu; ideal Pu;
+  list T; int nchildu;
+  def N=rs[1]; def W=rs[2]; def PN=rs[3];
+  ideal NN; ideal MM;
+  int tt=1;
+  poly h=1; for (i=1;i<=size(W);i++){h=h*W[i];}
+  list u=tree(labu,@L); childu=u[1][2];
+  list v; intvec labv; int childv; list w; intvec labw;
+  if (childu>0)
+  {
+    v=firstchild(u[1][1]);
+    while(v[2][1]!=0)
+    {
+      labv=v[1][1];
+      w=firstchild(labv);
+      while(w[2][1]!=0)
+      {
+        labw=w[1][1];
+        if(addcase(labw,rs)==0)
+        {tt=0;}
+        w=nextbrother(labw);
+      }
+      u=tree(labu,@L);
+      childu=u[1][2];
+      v=nextbrother(v[1][1]);
+    }
+    deletebrotherscontaining(labu);
+    relabelingindices(labu,labu);
+  }
+  if (tt==1)
+  {
+    u=tree(labu,@L);
+    nchildu=lastchildrenindex(labu);
+    if (size(labu)==1)
+    {
+      T=redtocanspec(labu,nchildu,rs);
+      tt=0;
+    }
+    else
+    {
+      NN=N;
+      if (containedP(u[1][3],N)){tt=0;}
+      for (i=1;i<=size(u[1][3]);i++)
+      {
+        NN[size(NN)+1]=u[1][3][i];
+      }
+      MM=NN;
+      MM[size(MM)+1]=h;
+      T=difftocanspec(labu,nchildu,NN,MM);
+    }
+    if (size(T)>0)
+    {
+      @L[u[2]][2]=@L[u[2]][2]+T[1][2];
+      for (i=2;i<=size(T);i++){@L[size(@L)+1]=T[i];}
+      if (size(labu)>1)
+      {
+        simplifynewadded(labu);
+      }
+    }
+    else{tt=1;}
+  }
+  return(tt);
+}
+
+// reduceR
+// reduces the polynomial f wrt N, in the ring @P
+proc reduceR(poly f, ideal N)
+{
+  def RR=basering;
+  setring(@P);
+  def fP=imap(RR,f);
+  def NP=imap(RR,N);
+  attrib(NP,"isSB",1);
+  def rp=reduce(fP,NP);
+  setring(RR);
+  return(imap(@P,rp));
+}
+
+// containedP
+// returns 1 if ideal Pu is contained in ideal Pv
+// returns 0 if not
+// in ring @P
+proc containedP(ideal Pu,ideal Pv)
+{
+  int t=1;
+  int n=size(Pu);
+  int i=0;
+  poly r=0;
+  while ((t) and (i<n))
+  {
+    i++;
+    r=reduceR(Pu[i],Pv);
+    if (r!=0){t=0;}
+  }
+  return(t);
+}
+
+// simplifynewadded
+// auxiliary routine of addcase
+// when a new redspec is added to a non terminal vertex,
+// it is applied to simplify the addition.
+// When Pu==Pv, the children of w are hung from u fathers
+// and deleted the whole new addition.
+// Finally, deletebrotherscontaining is applied to u fathers
+// in order to eliminate branches contained.
+proc simplifynewadded(intvec labu)
+{
+  int t; int ii; int k; int kk; int j;
+  intvec labfu=delintvec(labu,size(labu)); list fu; int childfu;
+  list u=tree(labu,@L); int childu=u[1][2]; ideal Pu=u[1][3];
+  list v; intvec labv; int childv; ideal Pv;
+  list w; intvec labw; intvec nlab; list ww;
+  if (childu>0)
+  {
+    v=firstchild(u[1][1]); labv=v[1][1]; childv=v[1][2]; Pv=v[1][3];
+    ii=0;
+    t=0;
+    while ((not(t)) and (ii<childu))
+    {
+      ii++;
+      if (equalideals(Pu,Pv))
+      {
+        fu=tree(labfu,@L);
+        childfu=fu[1][2];
+        j=lastchildrenindex(fu[1][1])+1;
+        k=0;
+        w=firstchild(v[1][1]);
+        childv=v[1][2];
+        for (kk=1;kk<=childv;kk++)
+        {
+          if (kk<childv){ww=nextbrother(w[1][1]);}
+          nlab=labfu,j;
+          @L[w[2]][1]=nlab;
+          j++;
+          if (kk<childv){w=ww;}
+        }
+        childfu=fu[1][2]+childv-1;
+        @L[fu[2]][2]=childfu;
+        @L[v[2]][2]=0;
+        t=1;
+        deleteverts(labu);
+      }
+    }
+  }
+  deletebrotherscontaining(labfu);
+}
+
+// given the the label labfu of the vertex fu it returns the last 
+// int of the label of the last existing children.
+// if no child exists, then it ouputs 0.
+proc lastchildrenindex(intvec labfu)
+{
+  int i;
+  int lastlabi; intvec labi; intvec labfi;
+  int lastlab=0;
+  for (i=1;i<=size(@L);i++)
+  {
+    labi=@L[i][1];
+    if (size(labi)>1)
+    {
+      labfi=delintvec(labi,size(labi));
+      if (labfu==labfi)
+      {
+        lastlabi=labi[size(labi)];
+        if (lastlab<lastlabi)
+        {
+          lastlab=lastlabi;
+        }
+      }
+    }
+  }
+  return(lastlab);
+}
+
+// given the the vertex u it provides the next brother of u.
+// if it does not exist, then it ouputs v=list(list(intvec(0)),0)
+proc nextbrother(intvec labu)
+{
+  list L; int i; int j; list next;
+  int lastlabu=labu[size(labu)];
+  intvec labfu=delintvec(labu,size(labu));
+  int lastlabi; intvec labi; intvec labfi;
+  for (i=1;i<=size(@L);i++)
+  {
+    labi=@L[i][1];
+    if (size(labi)>1)
+    {
+      labfi=delintvec(labi,size(labi));
+      if (labfu==labfi)
+      {
+        lastlabi=labi[size(labi)];
+        if (lastlabu<lastlabi)
+        {L[size(L)+1]=list(lastlabi,list(@L[i],i));}
+      }
+    }
+  }
+  if (size(L)==0){return(list(intvec(0),0));}
+  next=L[1];
+  for (i=2;i<=size(L);i++)
+  {
+    if (L[i][1]<next[1]){next=L[i];}
+  }
+  return(next[2]);
+}
+
+// gives the first child of vertex fu
+proc firstchild(labfu)
+{
+  intvec labfu0=labfu;
+  labfu0[size(labfu0)+1]=0;
+  return(nextbrother(labfu0));
+}
+
+// purpose: eliminate the children vertices of fu and all its descendents
+// whose prime ideal Pu contains a prime ideal Pv of some brother vertex w.
+proc deletebrotherscontaining(intvec labfu)
+{
+  int i; int t;
+  list fu=tree(labfu,@L);
+  int childfu=fu[1][2];
+  list u; intvec labu; ideal Pu;
+  list v; intvec labv; ideal Pv;
+  u=firstchild(labfu);
+  for (i=1;i<=childfu;i++)
+  {
+    labu=u[1][1];
+    Pu=u[1][3];
+    v=firstchild(fu[1][1]);
+    t=1;
+    while ((t) and (v[2]!=0))
+    {
+      labv=v[1][1];
+      Pv=v[1][3];
+      if (labu!=labv)
+      {
+        if (containedP(Pv,Pu))
+        {
+          deleteverts(labu);
+          fu=tree(labfu,@L);
+          @L[fu[2]][2]=fu[1][2]-1;
+          t=0;
+        }
+      }
+      if (t!=0)
+      {
+        v=nextbrother(v[1][1]);
+      }
+    }
+    if (i<childfu)
+    {
+      u=nextbrother(u[1][1]);
+    }
+  }
+}
+
+// purpose: delete all descendent vertices from u included u
+// from the list @L.
+// It must be noted that after the operation, the number of children
+// in fathers vertex must be decreased in 1 unitity. This operation is not
+// performed inside this recursive routine.
+proc deleteverts(intvec labu)
+{
+  int i; int ii; list v; intvec labv;
+  list u=tree(labu,@L);
+  int childu=u[1][2];
+  @L=delete(@L,u[2]);
+  if (childu>0)
+  {
+    v=firstchild(labu);
+    labv=v[1][1];
+    for (ii=1;ii<=childu;ii++)
+    {
+      deleteverts(labv);
+      if (ii<childu)
+      {
+        v=nextbrother(v[1][1]);
+        labv=v[1][1];
+      }
+    }
+  }
+}
+
+// purpose: starting from vertex olab (initially nlab=olab)
+// relabels the vertices of @L to be consecutive
+proc relabelingindices(intvec olab, intvec nlab)
+{
+  int i;
+  intvec nlabi; intvec labv;
+  list u=tree(olab,@L);
+  int childu=u[1][2];
+  list v;
+  if (childu==0){@L[u[2]][1]=nlab;}
+  else
+  {
+    v=firstchild(u[1][1]);
+    @L[u[2]][1]=nlab;
+    i=1;
+    while(v[2]!=0)
+    {
+      labv=v[1][1];
+      nlabi=nlab,i;
+      relabelingindices(labv,nlabi);
+      v=nextbrother(labv);
+      i++;
+    }
+  }
+}
+
+// mrcgs
+// fundamental routine giving the
+// "Minimal Reduced Comprehensive Groebner System"
+// input: F = ideal in ring R=K[a][x]
+// output: a list L representing the tree of the mrcgs.
+proc mrcgs(ideal F, list #)
+"USAGE:   mrcgs(F);
+          F is the ideal from which to obtain the Minimal Reduced CGS.
+          Alternatively, as option:
+          mrcgs(F,L);
+          where L is a list of the null conditions ideal N, and W the set of
+          non-null polynomials (ideal). If this option is set, the ideals N and W
+          must depend only on the parameters and the parameter space is
+          reduced to V(N) \ V(h), where h=prod(w), for w in W.
+          A reduced specification of (N,W) will be computed and used to
+          restrict the parameter-space. The output will omit the known restrictions
+          given as option.
+RETURN:   The list representing the Minimal Reduced CGS.
+          The description given here is identical for rcgs and crcgs.
+          The elements of the list T computed by mrcgs are lists representing
+          a rooted tree. 
+          Each element has as the two first entries with the following content:
+           [1]: The label (intvec) representing the position in the rooted 
+                tree:  0 for the root (and this is a special element)
+                       i for the root of the segment i 
+                       (i,...) for the children of the segment i
+           [2]: the number of children (int) of the vertex.
+          There thus three kind of vertices:
+           1) the root (first element labelled 0),
+           2) the vertices labelled with a single integer i,
+           3) the rest of vertices labelled with more indices.
+          Description of the root. Vertex type 1)
+           There is a special vertex (the first one) whose content is 
+           the following:
+             [3] lpp of the given ideal
+             [4] the given ideal
+             [5] the red-spec of the (optional) given null and non-null conditions
+                 (see redspec for the description)
+             [6] MRCGS (to remember which algorithm has been used). If the
+                 algorithm used is rcgs of crcgs then this will be stated
+                 at this vertex (RCGS or CRCGS).
+           Description of vertices type 2). These are the vertices that
+           initiate a segment, and are labelled with a single integer.
+             [3] lpp (ideal) of the reduced basis. If they are repeated lpp's this
+                 will correspond to a sheaf.
+             [4] the reduced basis (ideal) of the segment.
+           Description of vertices type 3). These vertices have as first
+           label i and descend form vertex i in the position of the label
+           (i,...). They contain moreover a unique prime ideal in the parameters
+           and form ascending chains of ideals.
+          How is to be read the mrcgs tree? The vertices with an even number of
+          integers in the label are to be considered as additive and those
+          with an odd number of integers in the label are to be considered as
+          substraction. As an example consider the following vertices:
+          v1=((i),2,lpp,B), 
+          v2=((i,1),2,P_{(i,1)}), 
+          v3=((i,1,1),2,P_{(i,1,1)},
+          v4=((i,1,1,1),1,P_{(i,1,1,1)}, 
+          v5=((i,1,1,1,1),0,P_{(i,1,1,1,1)},
+          v6=((i,1,1,2),1,P_{(i,1,1,2)}, 
+          v7=((i,1,1,2,1),0,P_{(i,1,1,2,1)},
+          v8=((i,1,2),0,P_{(i,1,2)},
+          v9=((i,2),1,P_{(i,2)},
+          v10=((i,2,1),0,P_{(i,2,1)},
+          They represent the segment:
+          (V(i,1)\(((V(i,1,1) \ ((V(i,1,1,1) \ V(i,1,1,1,1)) u (V(i,1,1,2) \ V(i,1,1,2,1)))))
+          u V(i,1,2)) u (V(i,2) \ V(i,2,1))
+          and can also be represented by 
+          (V(i,1) \ (V(i,1,1) u V(i,1,2))) u
+          (V(i,1,1,1) \ V(i,1,1,1)) u
+          (V(i,1,1,2) \ V(i,1,1,2,1)) u 
+          (V(i,2) \ V(i,2,1))
+          where V(i,j,..) = V(P_{(i,j,..)}          
+NOTE:     There are three fundamental routines in the library: mrcgs, rcgs and crcgs.
+          mrcgs (Minimal Reduced CGS) is an algorithm that packs so much as it
+          is able to do (using algorithms adhoc) the segments with the same lpp, 
+          obtaining the minimal number of segments. The hypothesis is that this 
+          is also canonical, but for the moment there is no proof of the uniqueness 
+          of that minimal packing. Moreover, the segments that are obtained are not
+          locally closed, i.e. there are not always the difference of two varieties,
+          but can be a union of differences.
+          The output can be visualized using cantreetoMaple, that will
+          write a file with the content of mrcgs that can be read in Maple
+          and plotted using the Maple plotcantree routine of the Monte's dpgb library
+          You can also try the routine cantodiffcgs when the segments are all
+          difference of two varieties to have a simpler view of the output.
+          But it will give an error if the output is not locally closed.
+KEYWORDS: rcgs, crcgs, buildtree, cantreetoMaple, cantodiffcgs
+EXAMPLE:  mrcgs; shows an example"
+{
+  int i=1;
+  int @ish=1;
+  exportto(Top,@ish);
+  while((@ish) and (i<=size(F)))
+  {
+    @ish=ishomog(F[i]);
+    i++;
+  }
+  list L=buildtree(F, #);
+  list S=selectcases(L);
+  list T=cantree(S);
+  T[1][6]="MRCGS";
+  T[1][4]=F;
+  for (i=1;i<=size(F);i++)
+  {
+    T[1][3][i]=leadmonom(F[i]);
+  }
+  if (size(#)>0)
+  {
+    ideal N=#[1];
+    ideal W=#[2];
+    T=reduceconds(T,N,W);
+  }
+  kill @ish;
+  return(T);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R=(0,b,c,d,e,f),(x,y),dp;
+  ideal F=x^2+b*y^2+2*c*x*y+2*d*x+2*e*y+f, 2*x+2*c*y+2*d, 2*b*y+2*c*x+2*e;
+  def T=mrcgs(F);
+  T;
+  cantreetoMaple(T,"Tm","Tm.txt");
+  cantodiffcgs(T);
+  ring R=(0,a1,a2,a3,a4),(x1,x2,x3,x4),dp;
+  ideal F2=x4-a4+a2, x1+x2+x3+x4-a1-a3-a4, x1*x3*x4-a1*a3*a4, x1*x3+x1*x4+x2*x3+x3*x4-a1*a4-a1*a3-a3*a4;
+  def T2=mrcgs(F2);
+  T2;
+  cantreetoMaple(T2,"T2m","T2m.txt");
+  cantodiffcgs(T2);
+}
+
+// reduceconds: when null and nonnull conditions are specified it
+//              takes the output of cantree and reduces the tree
+//              assuming the null and nonnull conditions
+// input: list T (the output of cantree computed with null and nonull conditions
+//        ideal N: null conditions
+//        ideal W: non-null conditions
+// output: the list T assuming the null and non-null conditions
+proc reduceconds(list T,ideal N,ideal W)
+{
+  int i; intvec lab; intvec labfu; list fu; int j; int t;
+  list @L=T;
+  exportto(Top,@L);
+  int n=size(W);
+  for (i=2;i<=size(@L);i++)
+  {
+    t=0; j=0;
+    while ((not(t)) and (j<n))
+    {
+      j++;
+      if (size(@L[i][1])>1)
+      {
+        if (memberpos(W[j],@L[i][3])[1])
+        {
+          t=1;
+          @L[i][3]=ideal(1);
+        }
+      }
+    }
+  }
+  for (i=2;i<=size(@L);i++)
+  {
+    if (size(@L[i][1])>1)
+    { 
+      @L[i][3]=delidfromid(N,@L[i][3]);
+    }
+  }
+  for (i=2;i<=size(@L);i++)
+  {
+    if ((size(@L[i][1])>1) and (size(@L[i][1]) mod 2==1) and (equalideals(@L[i][3],ideal(0))))
+    { 
+      lab=@L[i][1];
+      labfu=delintvec(lab,size(lab));
+      fu=tree(labfu,@L);
+      @L[fu[2]][2]=@L[fu[2]][2]-1;
+      deleteverts(lab);
+    }
+  }
+  for (j=2; j<=size(@L); j++)
+  {
+    if (@L[j][2]>0)
+    {
+      deletebrotherscontaining(@L[j][1]);
+    }
+  }
+  for (i=1;i<=@L[1][2];i++)
+  {
+    relabelingindices(intvec(i),intvec(i));
+  }
+  list TT=@L;
+  kill @L;
+  return(TT);
+}
+
+//**************End of cantree******************************
+
+//**************Begin of CanTreeTo Maple********************
+
+// cantreetoMaple
+// input:  list L: the output of cantree
+//         string T: the name of the table of Maple that represents L
+//                   in Maple
+//         string writefile: the name of the file where the table T
+//                           is written
+proc cantreetoMaple(list L, string T, string writefile)
+"USAGE:   cantreetoMaple(T, TM, writefile);
+          T: is the list provided by mrcgs or crcgs or crcgs,
+          TM: is the name (string) of the table variable in Maple that will represent
+             the output of the fundamental routines,
+          writefile: is the name (string) of the file where to write the content.
+RETURN:   writes the list provided by mrcgs or crcgs or crcgs to a file
+          containing the table representing it in Maple.
+NOTE:     It can be called from the output of mrcgs or rcgs of crcgs
+KEYWORDS: mrcgs, rcgs, crcgs, Maple
+EXAMPLE:  cantreetoMaple; shows an example"
+{
+  short=0;
+  int i;
+  list L0=L[1];
+  int numcases=L0[2];
+  link LLw=":w "+writefile;
+  string La=string("table(",T,");");
+  write(LLw, La);
+  close(LLw);
+  link LLa=":a "+writefile;
+  def RL=ringlist(@R);
+  list p=RL[1][2];
+  string param=string(p[1]);
+  if (size(p)>1)
+  {
+    for(i=2;i<=size(p);i++){param=string(param,",",p[i]);}
+  }
+  list v=RL[2];
+  string vars=string(v[1]);
+  if (size(v)>1)
+  {
+    for(i=2;i<=size(v);i++){vars=string(vars,",",v[i]);}
+  }
+  list xord;
+  list pord;
+  if (RL[1][3][1][1]=="dp"){pord=string("tdeg(",param);}
+  else
+  {
+    if (RL[1][3][1][1]=="lp"){pord=string("plex(",param);}
+  }
+  if (RL[3][1][1]=="dp"){xord=string("tdeg(",vars);}
+  else
+  {
+    if (RL[3][1][1]=="lp"){xord=string("plex(",vars);}
+  }
+  write(LLa,string(T,"[[___xord]]:=",xord,");"));
+  write(LLa,string(T,"[[___pord]]:=",pord,");"));
+  //write(LLa,string(T,"[[11]]:=true; "));
+  list S;
+  S=string(T,"[[0]]:=",numcases,";");
+  write(LLa,S);
+  S=string(T,"[[___method]]:=",L[1][6],";");
+  // Method L[1][6];
+  write(LLa,S);
+  S=string(T,"[[___basis]]:=[",L0[4],"];");
+  write(LLa,S);
+  S=string(T,"[[___nullcond]]:=[",L0[5][1],"];");
+  write(LLa,S);
+  S=string(T,"[[___notnullcond]]:={",L0[5][2],"};");
+  write(LLa,S);
+  for (i=1;i<=numcases;i++)
+  {
+    S=ctlppbasis(T,L,intvec(i));
+    write(LLa,S[1]);
+    write(LLa,S[2]);
+    write(LLa,S[3]);
+    //write(LLa,S[4]);
+    ctrecwrite(LLa, L, T, intvec(i),S[4]);
+  }
+  close(LLa);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R=(0,b,c,d,e,f),(x,y),dp;
+  ideal F=x^2+b*y^2+2*c*x*y+2*d*x+2*e*y+f, 2*x+2*c*y+2*d, 2*b*y+2*c*x+2*e;
+  def T=mrcgs(F);
+  T;
+  cantreetoMaple(T,"Tm","Tm.txt");
+}
+
+// ctlppbasis: auxiliary cantreetoMaple routine
+// input:
+//   string T: the name of the table in Maple
+//   intvec lab: the label of the case
+//   ideal B: the basis of the case
+// output:
+//   the string of T[[lab]] (basis); in Maple
+proc ctlppbasis(string T, list L, intvec lab)
+{
+  list u;
+  intvec lab0=lab,0;
+  u=tree(lab,L);
+  list Li;
+  Li[1]=string(T,"[[",lab,",___lpp]]:=[",u[1][3],"]; ");
+  Li[2]=string(T,"[[",lab,"]]:=[",u[1][4],"]; ");
+  Li[3]=string(T,"[[",lab0,"]]:=",u[1][2],"; ");
+  Li[4]=u[1][2];
+  return(Li);
+}
+
+// ctlppbasis: auxiliary cantreetoMaple routine
+// recursive routine to write all elements
+proc ctrecwrite(LLa, list L, string T, intvec lab, int n)
+{
+  int i;
+  intvec labi; intvec labi0;
+  string S;
+  list u;
+  for (i=1;i<=n;i++)
+  {
+    labi=lab,i;
+    u=tree(labi,L);
+    S=string(T,"[[",labi,"]]:=[",u[1][3],"];");
+    write(LLa,S);
+    labi0=labi,0;
+    S=string(T,"[[",labi0,"]]:=",u[1][2],";");
+    write(LLa,S);
+    ctrecwrite(LLa, L, T, labi, u[1][2]);
+  }
+}
+
+//**************End of CanTreeTo Maple********************
+
+//**************Begin homogenizing************************
+
+// ishomog:
+// Purpose: test if a polynomial is homogeneous in the variables or not
+// input:  poly f
+// output  1 if f is homogeneous, 0 if not
+proc ishomog(f)
+{
+  int i; poly r; int d; int dr;
+  if (f==0){return(1);}
+  d=deg(f); dr=d; r=f;
+  while ((d==dr) and (r!=0))
+  {
+    r=r-lead(r);
+    dr=deg(r);
+  }
+  if (r==0){return(1);}
+  else{return(0);}
+}
+
+proc rcgs(ideal F, list #)
+"USAGE:   rcgs(F);
+          F is the ideal from which to obtain the Reduced CGS.
+          rcgs(F,L);
+          where L is a list of the null conditions ideal N, and W the set of
+          non-null polynomials (ideal). If this option is set, the ideals N and W
+          must depend only on the parameters and the parameter space is
+          reduced to V(N) \ V(h), where h=prod(w), for w in W.
+          A reduced specification of (N,W) will be computed and used to
+          restrict the parameter-space. The output will omit the known restrictions
+          given as option.
+RETURN:   The list representing the Reduced CGS.
+          The description given here is analogous as for mrcgs and crcgs.
+          The elements of the list T computed by rcgs are lists representing
+          a rooted tree. 
+          Each element has as the two first entries with the following content:
+           [1]: The label (intvec) representing the position in the rooted 
+                tree:  0 for the root (and this is a special element)
+                       i for the root of the segment i 
+                       (i,...) for the children of the segment i
+           [2]: the number of children (int) of the vertex.
+          There thus three kind of vertices:
+           1) the root (first element labelled 0),
+           2) the vertices labelled with a single integer i,
+           3) the rest of vertices labelled with more indices.
+          Description of the root. Vertex type 1)
+           There is a special vertex (the first one) whose content is 
+           the following:
+             [3] lpp of the given ideal
+             [4] the given ideal
+             [5] the red-spec of the (optional) given null and non-null conditions
+                 (see redspec for the description)
+             [6] RCGS (to remember which algorithm has been used). If the
+                 algorithm used is mrcgs or crcgs then this will be stated
+                 at this vertex (mrcgs or CRCGS).
+           Description of vertices type 2). These are the vertices that
+           initiate a segment, and are labelled with a single integer.
+             [3] lpp (ideal) of the reduced basis. If they are repeated lpp's this
+                 will correspond to a sheaf.
+             [4] the reduced basis (ideal) of the segment.
+           Description of vertices type 3). These vertices have as first
+           label i and descend form vertex i in the position of the label
+           (i,...). They contain moreover a unique prime ideal in the parameters
+           and form ascending chains of ideals.
+          How is to be read the rcgs tree? The vertices with an even number of
+          integers in the label are to be considered as additive and those
+          with an odd number of integers in the label are to be considered as
+          substraction. As an example consider the following vertices:
+          v1=((i),2,lpp,B), 
+          v2=((i,1),2,P_{(i,1)}), 
+          v3=((i,1,1),0,P_{(i,1,1)}, v4=((i,1,2),0,P_{(i,1,1)}),
+          v5=((i,2),2,P_{(i,2)},  
+          v6=((i,2,1),0,P_{(i,2,1)}, v7=((i,2,2),0,P_{(i,2,2)}
+          They represent the segment:
+          (V(i,1)\(V(i,1,1) u V(i,1,2))) u 
+          (V(i,2)\(V(i,2,1) u V(i,2,2)))
+          where V(i,j,..) = V(P_{(i,j,..)}          
+NOTE:     There are three fundamental routines in the library: mrcgs, rcgs and crcgs.
+          rcgs (Reduced CGS) is an algorithm that first homogenizes the
+          basis of the given ideal then applies mrcgs and finally de-homogenizes 
+          and reduces the resulting bases. (See the note of mrcgs).
+          As a result of Wibmer's Theorem, the resulting segments are
+          locally closed (i.e. difference of varieties). Nevertheless, the
+          output is not completely canonical as the homogeneous ideal considered
+          is not the homogenized ideal of the given ideal but only the ideal
+          obtained by homogenizing the given basis.
+          
+          The output can be visualized using cantreetoMaple, that will
+          write a file with the content of mrcgs that can be read in Maple
+          and plotted using the Maple plotcantree routine of the Monte's dpgb library
+          You can also use the routine cantodiffcgs as the segments are all
+          difference of two varieties to have a simpler view of the output.
+KEYWORDS: rcgs, crcgs, buildtree, cantreetoMaple, cantodiffcgs
+EXAMPLE:  rcgs; shows an example"
+{
+  ideal N;
+  ideal W;
+  int j; int i;
+  poly f;
+  if (size(#)==2)
+  {
+    N=#[1];
+    W=#[2];
+  }
+  i=1; int postred=0;
+  int ish=1;
+  while ((ish) and (i<=size(F)))
+  {
+    ish=ishomog(F[i]);
+    i++;
+  }
+  if (ish){return(mrcgs(F, #));}
+  def RR=basering;
+  list RRL=ringlist(RR);
+  if (RRL[3][1][1]!="dp"){ERROR("the order must be dp");}
+  poly @t;
+  ring H=0,@t,dp;
+  def RH=RR+H;
+  setring(RH);
+  setglobalrings();
+  def FH=imap(RR,F);
+  list u; ideal B; ideal lpp; intvec lab;
+  FH=homog(FH,@t);
+  def Nh=imap(RR,N);
+  def Wh=imap(RR,W);
+  list L;
+  if ((size(Nh)>0) or (size(Wh)>0))
+  {
+    L=mrcgs(FH,list(Nh,Wh));
+  }
+  else
+  {
+    L=mrcgs(FH);
+  }
+  L[1][3]=subst(L[1][3],@t,1);
+  L[1][4]=subst(L[1][4],@t,1);
+  for (i=1; i<=L[1][2]; i++)
+  {
+    lab=intvec(i);
+    u=tree(lab,L);
+    postred=difflpp(u[1][3]);
+    B=sortideal(subst(L[u[2]][4],@t,1));
+    lpp=sortideal(subst(L[u[2]][3],@t,1));
+    if (memberpos(1,B)[1]){B=ideal(1); lpp=ideal(1);}
+    if (postred)
+    {
+      lpp=ideal(0);
+      B=postredgb(mingb(B));
+      for (j=1;j<=size(B);j++){lpp[j]=leadmonom(B[j]);}
+    }
+    else{"Sheaves present, not reduced bases in the case with:";lpp;}
+    L[u[2]][4]=B;
+    L[u[2]][3]=lpp;
+  }
+  setring(RR);
+  setglobalrings();
+  list LL=imap(RH,L);
+  LL[1][6]="RCGS";
+  return(LL);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R=(0,b,c,d,e,f),(x,y),dp;
+  ideal F=x^2+b*y^2+2*c*x*y+2*d*x+2*e*y+f, 2*x+2*c*y+2*d, 2*b*y+2*c*x+2*e;
+  def T=rcgs(F);
+  T;
+  cantreetoMaple(T,"Tr","Tr.txt");
+  cantodiffcgs(T);
+}
+
+proc difflpp(ideal lpp)
+{
+  int t=1; int i;
+  poly lp1=lpp[1];
+  poly lp;
+  i=2;
+  while ((i<=size(lpp)) and (t))
+  {
+    lp=lpp[i];
+    if (lp==lp1){t=0;}
+    lp1=lp;
+    i++;
+  }
+  return(t);
+}
+
+// redgb: given a minimal bases (gb reducing) it
+// reduces each polynomial wrt to the others
+proc postredgb(ideal F)
+{
+  ideal G;
+  ideal H;
+  int i;
+  if (size(F)==0){return(ideal(0));}
+  for (i=1;i<=size(F);i++)
+  {
+    H=delfromideal(F,i);
+    G[i]=pdivi(F[i],H)[1];
+  }
+  return(G);
+}
+
+proc crcgs(ideal F, list #)
+"USAGE:   crcgs(F);
+          F is the ideal from which to obtain the Canonical Reduced CGS.
+          crcgs(F,L);
+          where L is a list of the null conditions ideal N, and W the set of
+          non-null polynomials (ideal). If this option is set, the ideals N and W
+          must depend only on the parameters and the parameter space is
+          reduced to V(N) \ V(h), where h=prod(w), for w in W.
+          A reduced specification of (N,W) will be computed and used to
+          restrict the parameter-space. The output will omit the known restrictions
+          given as option.
+RETURN:   The list representing the Canonical Reduced CGS.
+          The description given here is identical for mrcgs and rcgs.
+          The elements of the list T computed by crcgs are lists representing
+          a rooted tree. 
+          Each element has as the two first entries with the following content:
+           [1]: The label (intvec) representing the position in the rooted 
+                tree:  0 for the root (and this is a special element)
+                       i for the root of the segment i 
+                       (i,...) for the children of the segment i
+           [2]: the number of children (int) of the vertex.
+          There thus three kind of vertices:
+           1) the root (first element labelled 0),
+           2) the vertices labelled with a single integer i,
+           3) the rest of vertices labelled with more indices.
+          Description of the root. Vertex type 1)
+           There is a special vertex (the first one) whose content is 
+           the following:
+             [3] lpp of the given ideal
+             [4] the given ideal
+             [5] the red-spec of the (optional) given null and non-null conditions
+                 (see redspec for the description)
+             [6] mrcgs (to remember which algorithm has been used). If the
+                 algorithm used is rcgs of crcgs then this will be stated
+                 at this vertex (RCGS or CRCGS).
+           Description of vertices type 2). These are the vertices that
+           initiate a segment, and are labelled with a single integer.
+             [3] lpp (ideal) of the reduced basis. If they are repeated lpp's this
+                 will correspond to a sheaf.
+             [4] the reduced basis (ideal) of the segment.
+           Description of vertices type 3). These vertices have as first
+           label i and descend form vertex i in the position of the label
+           (i,...). They contain moreover a unique prime ideal in the parameters
+           and form ascending chains of ideals.
+          How is to be read the mrcgs tree? The vertices with an even number of
+          integers in the label are to be considered as additive and those
+          with an odd number of integers in the label are to be considered as
+          substraction. As an example consider the following vertices:
+          v1=((i),2,lpp,B), 
+          v2=((i,1),2,P_{(i,1)}), 
+          v3=((i,1,1),0,P_{(i,1,1)}, v4=((i,1,2),0,P_{(i,1,1)}),
+          v5=((i,2),2,P_{(i,2)},  
+          v6=((i,2,1),0,P_{(i,2,1)}, v7=((i,2,2),0,P_{(i,2,2)}
+          They represent the segment:
+          (V(i,1)\(V(i,1,1) u V(i,1,2))) u 
+          (V(i,2)\(V(i,2,1) u V(i,2,2)))
+          where V(i,j,..) = V(P_{(i,j,..)}          
+NOTE:     There are three fundamental routines in the library: mrcgs, rcgs and crcgs.
+          crcgs (Canonical Reduced CGS) is an algorithm that first homogenizes the
+          the given ideal then applies mrcgs and finally de-homogenizes 
+          and reduces the resulting bases. (See the note of mrcgs).
+          As a result of Wibmer's Theorem, the resulting segments are
+          locally closed (i.e. difference of varieties) and the partition is
+          canonical as the homogenized ideal is uniquely associated to the given 
+          ideal not depending of the given basis.
+          
+          Nevertheless the computations to do are usually more time consuming
+          and so it is preferable to compute first the rcgs and only if
+          it success you can try crcgs.
+          
+          The output can be visualized using cantreetoMaple, that will
+          write a file with the content of crcgs that can be read in Maple
+          and plotted using the Maple plotcantree routine of the Monte's dpgb library
+          You can also use the routine cantodiffcgs as the segments are all
+          difference of two varieties to have a simpler view of the output.
+KEYWORDS: mrcgs, rcgs, buildtree, cantreetoMaple, cantodiffcgs
+EXAMPLE:  mrcgs; shows an example"
+{
+  int ish=1; int i=1;
+  while ((ish) and (i<=size(F)))
+  {
+    ish=ishomog(F[i]);
+    i++;
+  }
+  if (ish){return(mrcgs(F, #));}
+  list L;
+  def RR=basering;
+  setglobalrings();
+  setring(@RP);
+  ideal FP=imap(RR,F);
+  option(redSB);
+  def G=groebner(FP);
+  setring(RR);
+  def GR=imap(@RP,G);
+  kill @RP;
+  kill @P;
+  L=rcgs(GR, #);
+  L[1][6]="CRCGS";
+  return(L);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R=(0,b,c,d,e,f),(x,y),dp;
+  ideal F=x^2+b*y^2+2*c*x*y+2*d*x+2*e*y+f, 2*x+2*c*y+2*d, 2*b*y+2*c*x+2*e;
+  def T=crcgs(F);
+  T;
+  cantreetoMaple(T,"Tc","Tc.txt");
+  cantodiffcgs(T);
+}
+
+//purpose ideal intersection called in @R and computed in @P
+proc idintR(ideal N, ideal M)
+{
+  def RR=basering;
+  setring(@P);
+  def Np=imap(RR,N);
+  def Mp=imap(RR,M);
+  def Jp=idint(Np,Mp);
+  setring(RR);
+  return(imap(@P,Jp));  
+}
+
+//purpose reduced groebner basis called in @R and computed in @P
+proc gbR(ideal N)
+{
+  def RR=basering;
+  setring(@P);
+  def Np=imap(RR,N);
+  option(redSB);
+  Np=groebner(Np);
+  setring(RR);
+  return(imap(@P,Np));
+}
+
+// purpose: given the output of a locally closed CGS (i.e. from rcgs or crcgs)
+//          it returns the segments as difference of varieties.
+proc cantodiffcgs(list L)
+"USAGE:   canttodiffcgs(T);
+          T: is the list provided by mrcgs or crcgs or crcgs,
+RETURN:   The list transforming the content of these routines to a simpler
+          output where each segment corresponds to a single element of the list
+          that is described as difference of two varieties.
+          
+          The first element of the list is identical to the first element
+          of the list provided by the corresponding cgs algorithm, and
+          contains general information on the call (see mrcgs).
+          The remaining elements are lists of 4 elements,
+          representing segments. These elements are
+           [1]: the lpp of the segment
+           [2]: the basis of the segment
+           [3]; the ideal of the first variety (radical)
+           [4]; the ideal of the second variety (radical)
+          The segment is V([3]) \ V([4]).
+          
+NOTE:     It can be called from the output of mrcgs or rcgs of crcgs
+KEYWORDS: mrcgs, rcgs, crcgs, Maple
+EXAMPLE:  cantodiffcgs; shows an example"
+{
+  int i; int j; int k; int depth; list LL; list u; list v; list w;
+  ideal N; ideal Nn; ideal M; ideal Mn; ideal N0; ideal W0;
+  LL[1]=L[1];
+  N0=L[1][5][1];
+  W0=L[1][5][2];
+  def RR=basering;
+  setring(@P);
+  def N0P=imap(RR,N0);
+  def W0P=imap(RR,N0);
+  ideal NP;
+  ideal MP;
+  setring(RR);
+  for (i=2;i<=size(L);i++)
+  {
+    depth=size(L[i][1]);
+    if (depth>3){ERROR("the given CGS has non locally closed segments");}
+  }
+  for (i=1;i<=L[1][2];i++)
+  {
+    N=ideal(1);
+    M=ideal(1);
+    u=tree(intvec(i),L);
+    for (j=1;j<=u[1][2];j++)
+    {
+      v=tree(intvec(i,j),L);
+      Nn=v[1][3];
+      N=idintR(N,Nn); 
+      for (k=1;k<=v[1][2];k++)
+      {
+        w=tree(intvec(i,j,k),L);
+        Mn=w[1][3];
+        M=idintR(M,Mn); 
+      }
+    }
+    setring(@P);
+    def NP=imap(RR,N);
+    def MP=imap(RR,M);
+    MP=MP+N0P;
+    for (j=1;j<=size(W0P);j++){MP=MP+ideal(W0P[j]);}
+    NP=NP+N0P;
+    NP=gbR(NP);
+    MP=gbR(MP);
+    setring(RR);
+    N=imap(@P,NP);     
+    M=imap(@P,MP);     
+    LL[i+1]=list(u[1][3],u[1][4],N,M);
+  }
+  return(LL);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R=(0,b,c,d,e,f),(x,y),dp;
+  ideal F=x^2+b*y^2+2*c*x*y+2*d*x+2*e*y+f, 2*x+2*c*y+2*d, 2*b*y+2*c*x+2*e;
+  def T=crcgs(F);
+  T;
+  cantreetoMaple(T,"Tc","Tc.txt");
+  cantodiffcgs(T);  
+}
+
+//**************End homogenizing************************
