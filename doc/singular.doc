@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.169 2008-08-15 17:47:41 Singular Exp $
+@comment $Id: singular.doc,v 1.170 2008-08-16 14:51:31 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -225,6 +225,7 @@ and the command @code{LIB "all.lib";} for loading all libraries.
 * System and Control theory::
 * Teaching::
 * Tropical Geometry::
+* Contributed::
 @end menu
 @c ----------------------------------------------------------
 @node standard_lib, General purpose, SINGULAR libraries, SINGULAR libraries
@@ -637,12 +638,17 @@ LIB "all.lib";
 
 @menu
 * brnoeth_lib:: Brill-Noether algorithm, Weierstrass semigroups and AG codes
+* decodegb_lib:: Generating and solving systems of polynomial equations for decoding and finding the minimum distance of linear codes
 @end menu
 
 @c ---------------------------------------------------------
-@node brnoeth_lib, , , Coding theory
+@node brnoeth_lib, decodegb_lib, , Coding theory
 @subsection brnoeth_lib
 @c lib brnoeth.lib
+@c ---------------------------------------------------------
+@node decodegb_lib, ,brnoeth_lib, Coding theory
+@subsection decodegb_lib
+@c lib decodegb.lib
 
 
 @c ----------------------------------------------------------------------------
@@ -768,7 +774,7 @@ but not for serious computations.
 @c lib rootsur.lib
 
 @c ----------------------------------------------------------------------------
-@node Tropical Geometry, , Teaching, SINGULAR libraries
+@node Tropical Geometry, Contributed, Teaching, SINGULAR libraries
 @section Tropical Geometry
 @cindex Tropical Geometry
 
@@ -779,12 +785,30 @@ but not for serious computations.
 @c ----------------------------------------------------------
 @node polymake_lib,tropical_lib,Tropical Geometry, Tropical Geometry
 @subsection polymake_lib
+@cindex polymake_lib
 @c lib polymake.lib no_ex
 
 @c ----------------------------------------------------------
 @node tropical_lib,, polymake_lib, Tropical Geometry
 @subsection tropical_lib
+@cindex tropical_lib
+
 @c lib tropical.lib no_ex
+
+@c ----------------------------------------------------------------------------
+@node Contributed,,Tropical Geometry, SINGULAR libraries
+@section Contributed
+@cindex Contributed libraries
+
+@menu
+* phindex_lib::
+@end menu
+@c ----------------------------------------------------------
+@node phindex_lib,,, Contributed
+@subsection phindex_lib
+@cindex phindex_lib
+
+@c lib phindex.lib
 
 @c ----------------------------------------------------------
 @node Release Notes, Index, SINGULAR libraries, Top

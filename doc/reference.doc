@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.304 2008-08-07 14:41:34 Singular Exp $
+@comment $Id: reference.doc,v 1.305 2008-08-16 14:51:31 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3747,8 +3747,8 @@ See
 @cindex monitor
 @table @code
 @item @strong{Syntax:}
-@code{monitor (} string_expression @code{)}
-@*@code{monitor (} string_expression@code{,} string_expression @code{)}
+@code{monitor (} link_expression @code{)}
+@*@code{monitor (} link_expression@code{,} string_expression @code{)}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
@@ -3772,6 +3772,10 @@ and opens the file given by the first string expression.
 @c example
 @end smallexample
 @end table
+@c ref
+See
+@ref{link expressions}.
+@c ref
 @c ---------------------------------------
 @node mpresmat, mres, monitor, Functions
 @subsection mpresmat
