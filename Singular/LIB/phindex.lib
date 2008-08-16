@@ -1,0 +1,646 @@
+//////////////////////////////////////////////////////////////////////////////
+version="$Id: phindex.lib,v 1.1 2008-08-16 14:18:32 Singular Exp $";
+category=" ";
+info="
+LIBRARY : phindex.lib Procedures to compute the index of real analytic vector fields
+
+signatureL(M[,n]);   signature of symmetric matrix M, method of Lagrange.
+signatureLqf(h[,n]); signature of quadratic form h, method of Lagrange.
+PH_ais(I)            P-H index of real analytic vector field I w. an a. i. s.
+PH_nais(I)           P-H index of real analytic vector field I w. a non a. i. s
+               [parameters in square brackets are optional]
+
+NOTE: To compute the Poincare-Hopf index of a real analytic vector field
+      with an algebraically isolated singularity at 0 (w. an a. i. s),
+      we use the algebraic formula for the degree of the real analytic map
+      germ  found by Eisenbud-Levine in 1997. This result was also proved by
+      Khimshiashvili. If the isolated singularity is non algebraically
+      isolated  and the vector field has a reduced complex zeroes of
+      codimension 1, we use a formula as the Eisenbud-Levine found by Victor
+      Castellanos, in both cases is necessary to use a local order (ds,...).
+      To compute the signature of a quadratic form (or symmetric matrix)
+      we use the method of Lagrange.
+";
+
+LIB "primdec.lib";
+LIB "zeroset.lib";
+
+/////////////////////////////////////////////////////////////////////////////
+proc signatureL(M,int #)
+"USAGE:    signatureL(M[,r]); M symmetric matrix, r int (optional).
+RETURN:   the signature of M of type int or if r is given and !=0 then
+          intvec with (signature, no of +, no of -) is returned.
+THEORY:   Given the matrix M we construct the quadratic form associated, after
+          we use the method of Lagrange to compute the signature. The law of
+          inertia for a real quadratic form A(x,x) say that in a
+          representation of A(x,x) as a sum of independent squares
+                            A(x,x)=sum_{i=1}^r a_iX_i^2.
+          The number of positive and the number of negative squares are
+          independent of the choice of representation. The signature -s- of
+          A(x,x) is the difference between the number -pi- of positive squares
+          and the number -nu- of negative squares in the representation of
+          A(x,x). The rank -r- of M (or A(x,x)) and the signature -s-
+          determine the numbers -pi- and -nu- uniquely, since
+                            r=pi+nu,   s=pi-nu.
+          The method of Lagrange is a procedure to reduce any real quadratic
+          form to a sum of squares.
+          Ref. Gantmacher, The theory of matrices, Vol. I, Chelsea Publishing
+               Company, NY 1960, page 299.
+EXAMPLE:  example signatureL; shows an example
+"
+{
+  if(typeof(M)!="matrix")
+  {
+    ERROR("** The argument is not a matrix type");
+  }
+  option(noprot);
+  option(noredefine);
+  int nv1=ncols(M);
+  matrix zero[nv1][nv1]=0;
+  if (transpose(M)!=M)
+    {
+      ERROR("** The matrix is non symmetric");
+    }
+  if (M==0)
+    {
+      ERROR("** The matrix is zero");
+    }
+  option(noprot);
+  option(noredefine);
+  def h=basering;
+  int chr=char(h);
+  ring signLagrange=chr,(x(1..nv1)), lp; //ring to compute the quadratic form associated to M
+  matrix Ma=fetch(h,M);
+  int nv=ncols(Ma);
+  matrix X[1][nv]=maxideal(1);
+  matrix Ax=X*Ma*transpose(X);
+  poly Axx=Ax[1,1]; //quadratic form associated to matrix M
+  if (size(#)==0)
+    {
+      def sal=SigntL(Axx);
+      return(sal[1]);
+    }
+  else
+    {
+      return(SigntL(Axx));
+    }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,(x),ds;
+  matrix M[5][5]=0,0,0,1,0,0,1,0,0,-1,0,0,1,0,0,1,0,0,3,0,0,-1,0,0,1;
+  signatureL(M,1); //The rank of M is 3+1=4
+  matrix H[5][5]=0,-7,0,1,0,-7,1,0,0,-1,0,0,1,0,0,1,0,0,-3,5,0,-1,0,5,1;
+  signatureL(H);
+}
+////////////////////////////////////////////////////////////////////////
+proc signatureLqf(h,int #)
+"USAGE:    signatureLqf(h); h quadratic form (poly type).
+RETURN:   the signature of h of type int or if r is given and !=0 then
+          intvec with (signature, no of +, no of -) is returned.
+THEORY:   To compute the signature we use the method of Lagrange. The law of
+          inertia for a real quadratic form h(x,x) say that in a
+          representation  of h(x,x) as a sum of independent squares
+                             h(x,x)=sum_{i=1}^r a_iX_i^ 2
+          the number of positive and the number of negative squares are
+          independent of the choice of representation. The signature -s- of
+          h(x,x) is the difference between the number -pi- of positive squares
+          and the number -nu- of negative squares in the representation of
+          h(x,x). The rank -r- of h(x,x) and the signature -s- determine the
+          numbers -pi- and -nu- uniquely, since
+                             r=pi+nu,   s=pi-nu.
+          The method of Lagrange is a procedure to reduce any real quadratic
+          form to a sum of squares.
+          Ref. Gantmacher, The theory of matrices, Vol. I, Chelsea Publishing
+               Company, NY 1960, page 299.
+EXAMPLE:  example signatureLqf; shows an example
+"
+{
+  if(typeof(h)!="poly")
+  {
+    ERROR("** The argument is not a poly type");
+  }
+  option(noprot);
+  option(noredefine);
+  poly M=h;
+  int nv1=nvars(basering);
+  if (M==0)
+   {
+     ERROR("** The quadratic form is zero");
+   }
+  poly Axx=M;
+  poly Bxx;
+  poly bxx1;
+  poly bxx2;
+  def coe1;
+  int i;
+  int jb;
+  int k;
+  int haycuadrados;
+  int haycruzados;
+  int positivo=0;
+  int negativo=0;
+  int lAxx;
+  while (Axx<>0) //Lagrange method to compute the signature
+    {
+      haycruzados=1;
+      haycuadrados=1;
+      lAxx=size(Axx);
+      i=1;
+      while (i<=lAxx and haycuadrados)
+    {
+      jb=1;
+      while (jb<=nv1 and haycuadrados)
+        {
+          if (leadmonom(Axx[i])/(x(jb)^2)==1) //there is squares
+        {
+          Bxx=Axx;
+          if (leadcoef(Axx[i])>0)
+            {
+              positivo=positivo+1;
+            }
+          else
+            {
+              negativo=negativo+1;
+            }
+          coe1=1/(4*leadcoef(Bxx[i]));
+          Axx=Bxx-coe1*(diff(Bxx,x(jb)))^2;
+          haycuadrados=0;
+        }
+          jb=jb+1;
+        }
+      i=i+1;
+    }
+      if (haycruzados) //there is no squares
+    {
+      int ia=1;
+      int ja=1;
+      int ka=1;
+      while (ia<=nv1 and haycruzados)
+        {
+          while (ja<=nv1 and haycruzados)
+        {
+          ka=ja+1;
+          while (ka<=nv1 and haycruzados)
+            {
+              if (leadmonom(Axx[ia])/leadmonom(x(ja)*x(ka))==1)
+            {
+              Bxx=Axx;
+              bxx1=diff(Bxx,x(ja))+diff(Bxx,x(ka));
+              bxx2=diff(Bxx,x(ja))-diff(Bxx,x(ka));
+              coe1=1/(4*leadcoef(Bxx[ia]));
+              Axx=Bxx-coe1*(bxx1^2-bxx2^2);
+              positivo=positivo+1;
+              negativo=negativo+1;
+              haycruzados=0;
+            }
+              ka=ka+1;
+            }
+          ja=ja+1;
+        }
+          ia=ia+1;
+        }
+    }
+    }
+ if (size(#)==0)
+    {
+      def sal=positivo-negativo;
+      return(sal);
+    }
+  else
+    {
+      int sig=positivo-negativo;
+      intvec dat=sig,positivo,negativo;
+      return(dat);
+    }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,(x(1..4)),ds;
+  poly Ax=4*x(1)^2+x(2)^2+x(3)^2+x(4)^2-4*x(1)*x(2)-4*x(1)*x(3)+4*x(1)*x(4)+4*x(2)*x(3)-4*x(2)*x(4);
+  signatureLqf(Ax,1); //The rank of Ax is 3+1=4
+  poly Bx=2*x(1)*x(4)+x(2)^2+x(3)^2;
+  signatureLqf(Bx);
+}
+/////////////////////////////////////////////////////////////////////////////
+proc PH_ais(I)
+"USAGE:    PH_ais(I); I ideal of coordinates of the vector field.
+RETURN:   the Poincare-Hopf index of type int.
+NOTE:     the isolated singularity must be algebraically isolated.
+THEORY:   The Poincare-Hopf index of a real vector field X at the isolated
+          singularity 0 is the degree of map
+                           (X/|X|) : S_epsilon ---> S,
+          where S is the unit sphere, and the spheres are oriented as
+          (n-1)-spheres in R^n. The degree depends only on the germ, X, of X
+          at 0. If the vector field X is real analytic, then an invariant of
+          the germ is its local ring
+                            Qx=R[[x1..xn]]/Ix
+          where R[[x1,..,xn]] is the ring of germs at 0 of real-valued analytic
+          functions on R^n, and Ix is the ideal generated by the components
+          of X. The isolated singularity of X is algebraically isolated if the
+          algebra Qx is finite dimensional as real vector space, geometrically
+          this mean that 0 is also an isolated singularity for the
+          complexified vector field. In this case the Poincare-Hopf index is
+          the signature of the non degenerate bilinear form <,> obtained by
+          composition of the product in the algebra Qx with a linear
+          functional map
+                                        .       L
+                       <,> : (Qx)x(Qx)----->Qx----->R
+          with L(Jo)>0, where Jo is the residue class of the Jacobian
+          determinant in Qx. Here, we use a natural linear functional defined
+          as follows. Suppose that E={E_1,..E_r} is a basis of Qx, then Jo is
+          writing as
+                      Jo=a_1E_{j1}+...+a_kE_{jk},  js\in {1...r}, s=1..k, k<=r.
+          where a_s are constant. The linear functional L:Qx--->R is defined as
+                                  L(E_{j1})=(a_1)/|a_1|=sign of a_1,
+          the other elements of the base are sent to 0.
+          Refs. -Eisenbud & Levine, An algebraic formula for the degree of
+                 a C^\infty map germ, Ann. Math., 106, (1977), 19-38.
+                -Khimshiashvili, On a local degree of a smooth map, trudi
+                 Tbilisi Math. Inst., (1980), 105-124.
+EXAMPLE:  example  PH_ais; shows an example.
+"
+{
+  if(typeof(I)!="ideal")
+  {
+    ERROR("** The argument is not of ideal type");
+  }
+  ideal A=I;
+  ideal qI=std(A);
+  int siono=vdim(qI);
+  int l;
+  if (siono==-1)
+    {
+      ERROR("** The vector field does not have an algebraically isolated singularity");
+    }
+  if (siono!=0)
+    {
+      option(noredefine);
+      option(noprot);
+      def oldr=basering;
+      def chr1=char(oldr);
+      int n=nvars(oldr);
+      ideal E=kbase(qI);
+      int m=size(E);
+      poly Jx=det(jacob(A));
+      poly Jo=reduce(Jx,qI);
+      ring newr=chr1,(x(1..m)),ds; //ring to compute the quadratic form
+      int nv=nvars(basering);
+      ideal E=fetch(oldr,E);
+      ideal qI=fetch(oldr,qI);
+      poly Jo=fetch(oldr,Jo);
+      attrib(qI,"isSB",1);
+      int scoef=1;
+      int multby;
+      poly Eik;
+      poly Axx=0;
+      int tEik;
+      int stEik;
+      def lcEik;
+      if (leadcoef(Jo[1])<0)
+    {
+      scoef=-1;
+    }
+      for (int si=1; si<=nv; si++)
+        {
+          for (int sk=si; sk<=nv; sk++)
+        {
+          Eik=reduce(E[si]*E[sk],qI);
+          tEik=size(Eik);
+          for(int stEik=1; stEik<=tEik; stEik++)
+        {
+          if (leadmonom(Eik[stEik])==leadmonom(Jo[1]))
+            {
+              if (si==sk)
+            {
+              multby=1;
+            }
+              else
+            {
+              multby=2;
+            }
+              lcEik=leadcoef(Eik[stEik]);
+              if (lcEik<0)
+            {
+              Axx=Axx-multby*scoef*lcEik*x(si)*x(sk);
+            }
+              else
+            {
+              Axx=Axx+multby*scoef*lcEik*x(si)*x(sk);
+            }
+            }
+        }
+        }
+        }
+      l=SignatLalt(Axx); //signature of billinear form
+      kill newr;
+    }
+  else
+    {
+      l=0;
+    }
+  return(l);
+}
+example
+{ "EXAMPLE"; echo = 2;
+  ring r=0,(x,y,z),ds;
+  ideal I=x3-3xy2,-y3+3yx2,z3;
+  PH_ais(I);
+}
+///////////////////////////////////////////////////////////////////////////
+proc PH_nais(I)
+"USAGE:    PH_nais(I); I ideal of coordinates of the vector field.
+RETURN:   the Poincare-Hopf index of type int.
+NOTE:     the vector field must be a non algebraically isolated singularity
+          at 0, with reduced complex zeros of codimension 1.
+THEORY:   Suppose that 0 is an algebraically isolated singularity of the real
+          analytic vector field X, geometrically its mean that the
+          complexified vector field has positive dimension singular locus,
+          algebraically this mean that the local ring
+                      Qx=R[[x1..xn]]/Ix
+          where R[[x1,..,xn]] is the ring of germs at 0 of real-valued analytic
+          functions on R^n, and Ix is the ideal generated by the components
+          of X is infinite dimensional as real vector space. In the case that
+          X has a reduced hypersurface as complex zeroes we have the next.
+          There exist a real analytic function f:R^n-->R, and a real analytic
+          vector field Y s. t. X=fY. The function f does not change of sign
+          out of 0 and
+                      Mx=R[[x1..xn]]/(Ix : radical(Ix))
+          is a finite dimensional sub-algebra of Qx. The Poincare-Hopf index
+          of X at 0 is the sign of f times the signature of the non degenerate
+          bilinear form <,> obtained by composition of the product in the
+          algebra Mx with a linear functional map
+                                        .       L
+                       <,> : (Mx)x(Mx)----->Mx----->R
+          with L(Jp)>0, where Jp is the residue class of the Jacobian
+          determinant of X, JX, over f^n, JX/(f^n) in Mx. Here, we use a
+          natural linear functional defined as follows. Suppose that
+          E={E_1,..E_r} is a basis of Mx, then Jp is writing as
+                      Jp=a_1E_{j1}+...+a_kE_{jk},  js\in {1...r}, s=1..k, k<=r.
+          where a_s are constant. The linear functional L:M--->R is defined as
+                                  L(E_{j1})=(a_1)/|a_1|=sign of a_1,
+          the other elements of the base are sent to 0.
+          Refs. -Castellanos-Vargas, V., Una formula algebraica del indice de
+                 Poincare-Hopf para campos vectoriales reales con una variedad
+                 de ceros complejos, Ph. D. thesis CIMAT (2000), chapther 1,
+                 Guanajuato Mexico.
+                -Castellanos -Vargas, V. The index of non algebraically
+                 isolated singularity, Bol. Soc. Mat. Mexicana, (3)
+                 Vol. 8, 2002, 141-147.
+
+EXAMPLE:  example  PH_nais; shows an example.
+"
+{
+  if(typeof(I)!="ideal")
+  {
+    ERROR("** The argument is not of ideal type");
+  }
+  ideal A=I;
+  int siono=vdim(std(A));
+  int l;
+  if (siono!=0)
+    {
+      if (siono!=-1)
+    {
+      ERROR("** The vector field has an algebraically isolated singularity, USE: PH_ais ");
+    }
+      option(noprot);
+      option(noredefine);
+      int n=nvars(basering);
+      def oldr=basering;
+      int chr1=char(oldr);
+      ring newring=chr1,(x(1..n)), dp; //ring to compute the radical
+      ideal A= fetch(oldr,A);
+      ideal rI=radical(A);
+      setring oldr;
+      ideal rI=fetch(newring,rI);
+      if (size(rI)!=1)
+    {
+      ERROR("** The vector field does not have a non algebraically isolated singularity of codimension 1");
+    }
+      ideal qI=std(quotient(A,rI));
+      ideal E=kbase(qI);
+      int m=size(E);
+      poly Jx=det(jacob(A));
+      poly Jy=Quotient(Jx,rI[1]^n)[1];
+      poly Jo=reduce(Jy,qI);
+      ring newr=chr1,(x(1..m)),ds; //ring to compute the quadratic form
+      int nv=nvars(basering);
+      ideal E=fetch(oldr,E);
+      ideal qI=fetch(oldr,qI);
+      poly Jo=fetch(oldr,Jo);
+      attrib(qI,"isSB",1);
+      int scoef=1;
+      if (leadcoef(Jo[1])<0)
+    {
+      scoef=-1;
+    }
+      int multby;
+      def lcEik;
+      poly Eik;
+      poly Axx=0;
+      int si=1;
+      int sk;
+      int tEik;
+      int stEik;
+      while (si<=nv)
+    {
+      sk=si;
+      while (sk<=nv)
+        {
+          Eik=reduce(E[si]*E[sk],qI);
+          tEik=size(Eik);
+          for(int stEik=1; stEik<=tEik; stEik++)
+        {
+          if (leadmonom(Eik[stEik])==leadmonom(Jo[1]))
+            {
+              if (si==sk)
+            {
+              multby=1;
+            }
+              else
+            {
+              multby=2;
+            }
+              lcEik=leadcoef(Eik[stEik]);
+              if (lcEik<0)
+            {
+              Axx=Axx-multby*lcEik*scoef*x(si)*x(sk);
+            }
+              else
+            {
+              Axx=Axx+multby*lcEik*scoef*x(si)*x(sk);
+            }
+            }
+        }
+          sk=sk+1;
+        }
+      si=si+1;
+    }
+      l=SignatLalt(Axx); //signature of bilinear form
+      return(l);
+    }
+  else
+    {
+      return(0);
+    }
+}
+example
+{"EXAMPLE:"; echo = 2;
+  ring r=0,(x,y,z),ds;
+  ideal I=x5-2x3y2-3xy4+x3z2-3xy2z2,-3x4y-2x2y3+y5-3x2yz2+y3z2,x2z3+y2z3+z5;
+  PH_nais(I);
+}
+//////////////////////////////////////////////////////////////////////
+static proc SigntL(poly M)  //static procedure to compute the signature of any quadratic form.
+"USAGE:    SigntL(M); M is a quadratic form.
+RETURN:   The signature of of M of type int.
+ASSUME:   M is a quadratic form (ply type).
+"
+{
+  int nv1=nvars(basering);
+  poly Axx=M;
+  poly Bxx;
+  poly bxx1;
+  poly bxx2;
+  def coe1;
+  int i;
+  int jb;
+  int k;
+  int haycuadrados;
+  int haycruzados;
+  int positivo=0;
+  int negativo=0;
+  int lAxx;
+  while (Axx<>0)
+    {
+      haycruzados=1;
+      haycuadrados=1;
+      lAxx=size(Axx);
+      i=1;
+      while (i<=lAxx and haycuadrados)
+    {
+      jb=1;
+      while (jb<=nv1 and haycuadrados)
+        {
+          if (leadmonom(Axx[i])/(x(jb)^2)==1)
+        {
+          Bxx=Axx;
+          if (leadcoef(Axx[i])>0)
+            {
+              positivo=positivo+1;
+            }
+          else
+            {
+              negativo=negativo+1;
+            }
+          coe1=1/(4*leadcoef(Bxx[i]));
+          Axx=Bxx-coe1*(diff(Bxx,x(jb)))^2;
+          haycuadrados=0;
+          haycruzados=0;
+        }
+          jb=jb+1;
+        }
+      i=i+1;
+    }
+      if (haycruzados)
+    {
+      int ia=1;
+      int ja=1;
+      int ka=1;
+      while (ia<=nv1 and haycruzados)
+        {
+          while (ja<=nv1 and haycruzados)
+        {
+          ka=ja+1;
+          while (ka<=nv1 and haycruzados)
+            {
+              if (leadmonom(Axx[ia])/leadmonom(x(ja)*x(ka))==1)
+            {
+              Bxx=Axx;
+              bxx1=diff(Bxx,x(ja))+diff(Bxx,x(ka));
+              bxx2=diff(Bxx,x(ja))-diff(Bxx,x(ka));
+              coe1=1/(4*leadcoef(Bxx[ia]));
+              Axx=Bxx-coe1*(bxx1^2-bxx2^2);
+              positivo=positivo+1;
+              negativo=negativo+1;
+              haycruzados=0;
+            }
+              ka=ka+1;
+            }
+          ja=ja+1;
+        }
+          ia=ia+1;
+        }
+    }
+    }
+  int dat1=positivo-negativo;
+  intvec dat=dat1,positivo,negativo;
+  return(dat);
+}
+////////////////////////////////////////////////////////////////////////////
+//NOTE: SignatLalt is a procedure to compute the signature of a special
+//      bilinear form that is necessary to compute the Poincare-Hopf index.
+static proc SignatLalt(poly M)
+"USAGE:    SignatLalt(M); M is a quadratic form (a polynomial).
+RETURN:   The signature of type int.
+"
+{
+ int nv1=nvars(basering);
+ if (M==0)
+   {
+     ERROR("** The quadratic form is zero");
+   }
+ poly Axx=M;
+ poly Bxx;
+ poly bxx1;
+ poly bxx2;
+ def coe1;
+ int i;
+ int jb;
+ int k;
+ int haycuadrados;
+ int sihay=1;
+ int positivo=0;
+ int negativo=0;
+ int variableactual=0;
+ int posicion=1;
+ int lAxx;
+ while (Axx<>0 and sihay)
+   {
+     haycuadrados=1;
+     lAxx=size(Axx);
+     i=posicion;
+     while (i<=lAxx and haycuadrados)
+       {
+     jb=variableactual+1;
+     while (jb<=nv1 and haycuadrados)
+       {
+         if (leadmonom(Axx[i])/(x(jb)^2)==1)
+           {
+         Bxx=Axx;
+         if (leadcoef(Axx[i])>0)
+           {
+             positivo=positivo+1;
+           }
+         else
+           {
+             negativo=negativo+1;
+           }
+         coe1=1/(4*leadcoef(Bxx[i]));
+         Axx=Bxx-coe1*(diff(Bxx,x(jb)))^2;
+         haycuadrados=0;
+         variableactual=jb;
+         posicion=i;
+           }
+         jb=jb+1;
+       }
+     if (i==lAxx and haycuadrados)
+       {
+         sihay=0;
+       }
+     i=i+1;
+       }
+   }
+ return(positivo-negativo);
+}
