@@ -30,7 +30,7 @@ BOOLEAN jInitBasis(ideal v, jList **TT,jList **QQ)
   jList *T=(jList *)GCM(sizeof(jList));
   T->root=NULL;
 
-  for (int i=0; i < v->idelems(); i++)
+  for (int i=0; i < IDELEMS(v); i++)
   {
     if (v->m[i]!=NULL)
     {
@@ -59,7 +59,7 @@ BOOLEAN jjStdJanetBasis(leftv res, leftv v, int flag)
   jList *Q;
   ideal I=(ideal)v->Data();
   BOOLEAN is_zero=TRUE;
-  for (int i=0; i < I->idelems(); i++)
+  for (int i=0; i < IDELEMS(I); i++)
   {
     if ((I->m[i]!=NULL)&& (pIsConstant(I->m[i])))
     {

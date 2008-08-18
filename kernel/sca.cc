@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.27 2008-07-26 14:28:03 motsak Exp $
+ *  Version: $Id: sca.cc,v 1.28 2008-08-18 12:25:35 Singular Exp $
  *******************************************************************/
 
 // set it here if needed.
@@ -2699,7 +2699,7 @@ ideal id_KillSquares(const ideal id,
 
   assume( (iFirstAltVar >= 1) && (iLastAltVar <= r->N) && (iFirstAltVar <= iLastAltVar) );
 
-  const int iSize = id->idelems();
+  const int iSize = IDELEMS(id);
 
   if (iSize == 0) return id;
 
@@ -2709,7 +2709,7 @@ ideal id_KillSquares(const ideal id,
    PrintS("<id_KillSquares>\n");
   {
     Print("ideal id: \n");
-    for (int i = 0; i < id->idelems(); i++)
+    for (int i = 0; i < IDELEMS(id); i++)
     {
       Print("; id[%d] = ", i+1);
       p_Write(id->m[i], r);
@@ -2729,7 +2729,7 @@ ideal id_KillSquares(const ideal id,
    PrintS("<id_KillSquares>\n");
   {
     Print("ideal temp: \n");
-    for (int i = 0; i < temp->idelems(); i++)
+    for (int i = 0; i < IDELEMS(temp); i++)
     {
       Print("; temp[%d] = ", i+1);
       p_Write(temp->m[i], r);

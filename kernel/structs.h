@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.54 2008-08-18 10:39:57 Singular Exp $ */
+/* $Id: structs.h,v 1.55 2008-08-18 12:25:35 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -696,7 +696,6 @@ struct sip_sideal
   int nrows;
   int ncols;
   #define IDELEMS(i) ((i)->ncols)
-  inline int& idelems(void) { return ncols; }
 };
 
 struct sip_smap
@@ -770,10 +769,10 @@ extern char     my_yylinebuf[80];
 #endif
 
 #if defined(__cplusplus)
-inline int si_max(const int a, const int b)  { return (a>b) ? a : b; }
-inline int si_min(const int a, const int b)  { return (a<b) ? a : b; }
-inline long si_max(const long a, const long b)  { return (a>b) ? a : b; }
-inline long si_min(const long a, const long b)  { return (a<b) ? a : b; }
+static inline int si_max(const int a, const int b)  { return (a>b) ? a : b; }
+static inline int si_min(const int a, const int b)  { return (a<b) ? a : b; }
+static inline long si_max(const long a, const long b)  { return (a>b) ? a : b; }
+static inline long si_min(const long a, const long b)  { return (a<b) ? a : b; }
 #else
 #define si_max(A,B) ((A) > (B) ? (A) : (B))
 #define si_min(A,B) ((A) < (B) ? (A) : (B))

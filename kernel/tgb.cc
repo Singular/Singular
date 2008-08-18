@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.157 2008-06-27 12:10:58 bricken Exp $ */
+/* $Id: tgb.cc,v 1.158 2008-08-18 12:25:35 Singular Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2900,12 +2900,12 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4,int deg_pos){
   normal_forms=0;
   current_degree=1;
 
-  max_pairs=5*I->idelems();
+  max_pairs=5*IDELEMS(I);
 
   apairs=(sorted_pair_node**) omalloc(sizeof(sorted_pair_node*)*max_pairs);
   pair_top=-1;
 
-  int n=I->idelems();
+  int n=IDELEMS(I);
   array_lengths=n;
 
 
@@ -2972,7 +2972,7 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4,int deg_pos){
   assume(n>0);
   add_to_basis_ideal_quotient(I->m[0],this,NULL);
 
-  assume(strat->sl==strat->Shdl->idelems()-1);
+  assume(strat->sl==IDELEMS(strat->Shdl)-1);
   if(!(F4_mode))
   {
         poly* array_arg=I->m;
@@ -3002,7 +3002,7 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4,int deg_pos){
     for (i=1;i<n;i++)//the 1 is wanted, because first element is added to basis
       add_to_basis_ideal_quotient(I->m[i],this,NULL);
   }
-  for(i=0;i<I->idelems();i++)
+  for(i=0;i<IDELEMS(I);i++)
   {
     I->m[i]=NULL;
   }
