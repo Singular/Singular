@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.216 2008-08-13 14:57:57 Singular Exp $
+@comment $Id: general.doc,v 1.217 2008-08-18 10:22:06 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1369,7 +1369,7 @@ a polynomial ring over a field,
 @item
 a polynomial ring over a ring
 @item
-a localization of a polynomial ring,
+a localization of 1.
 @item
 a quotient ring by an ideal of one of 1.@: or 2.,
 @item
