@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: redcgs.lib,v 1.1 2008-08-15 17:44:06 Singular Exp $";
+version="$Id: redcgs.lib,v 1.2 2008-08-18 10:42:50 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  redcgs.lib      Reduced Comprehesive Groebner Systems.
@@ -3354,7 +3354,7 @@ example
   def T=mrcgs(F);
   T;
   cantreetoMaple(T,"Tm","Tm.txt");
-  cantodiffcgs(T);
+  //cantodiffcgs(T); // has non locally closed segments
   ring R=(0,a1,a2,a3,a4),(x1,x2,x3,x4),dp;
   ideal F2=x4-a4+a2, x1+x2+x3+x4-a1-a3-a4, x1*x3*x4-a1*a3*a4, x1*x3+x1*x4+x2*x3+x3*x4-a1*a4-a1*a3-a3*a4;
   def T2=mrcgs(F2);
