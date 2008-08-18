@@ -1,14 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: phindex.lib,v 1.1 2008-08-16 14:18:32 Singular Exp $";
+version="$Id: phindex.lib,v 1.2 2008-08-18 10:42:27 Singular Exp $";
 category=" ";
 info="
 LIBRARY : phindex.lib Procedures to compute the index of real analytic vector fields
-
-signatureL(M[,n]);   signature of symmetric matrix M, method of Lagrange.
-signatureLqf(h[,n]); signature of quadratic form h, method of Lagrange.
-PH_ais(I)            P-H index of real analytic vector field I w. an a. i. s.
-PH_nais(I)           P-H index of real analytic vector field I w. a non a. i. s
-               [parameters in square brackets are optional]
 
 NOTE: To compute the Poincare-Hopf index of a real analytic vector field
       with an algebraically isolated singularity at 0 (w. an a. i. s),
@@ -20,6 +14,12 @@ NOTE: To compute the Poincare-Hopf index of a real analytic vector field
       Castellanos, in both cases is necessary to use a local order (ds,...).
       To compute the signature of a quadratic form (or symmetric matrix)
       we use the method of Lagrange.
+
+PROCEDURES:
+ signatureL(M[,n]);   signature of symmetric matrix M, method of Lagrange.
+ signatureLqf(h[,n]); signature of quadratic form h, method of Lagrange.
+ PH_ais(I)            P-H index of real analytic vector field I w. an a. i. s.
+ PH_nais(I)           P-H index of real analytic vector field I w. a non a. i. s
 ";
 
 LIB "primdec.lib";

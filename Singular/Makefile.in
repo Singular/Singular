@@ -279,7 +279,7 @@ SLIB0 = absfact.lib  arcpoint.lib  atkins.lib    aksaka.lib    ainvar.lib\
 	ring.lib     rinvar.lib    sagbi.lib     sheafcoh.lib   sing.lib \
 	solve.lib    signcond.lib  spcurve.lib   spectrum.lib   standard.lib \
 	stratify.lib surf.lib      surfex.lib    teachstd.lib   toric.lib \
-	triang.lib   rootsur.lib  weierstr.lib  zeroset.lib
+	triang.lib   rootsur.lib  weierstr.lib  zeroset.lib     phindex.lib
  
 
 PLIBS = bfct.lib central.lib discretize.lib dmod.lib dmodapp.lib gkdim.lib \
