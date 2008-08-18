@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_char.cc,v 1.7 2002-03-08 10:31:45 Singular Exp $ */
+/* $Id: cf_char.cc,v 1.8 2008-08-18 10:36:24 Singular Exp $ */
 
 #include <config.h>
 
@@ -24,18 +24,25 @@ int initializeCharacteristic ()
 
 void setCharacteristic( int c )
 {
-    if ( c == 0 ) {
-	theDegree = 0;
-	CFFactory::settype( IntegerDomain );
-	theCharacteristic = 0;
+    if ( c == 0 )
+    {
+        theDegree = 0;
+        CFFactory::settype( IntegerDomain );
+        theCharacteristic = 0;
     }
-    else {
-	theDegree = 1;
-	CFFactory::settype( FiniteFieldDomain );
-	theCharacteristic = c;
-	ff_big = c > cf_getSmallPrime( cf_getNumSmallPrimes()-1 );
-	ff_setprime( c );
-	resetFPT();
+    else
+    {
+        theDegree = 1;
+        CFFactory::settype( FiniteFieldDomain );
+        theCharacteristic = c;
+        ff_big = c > cf_getSmallPrime( cf_getNumSmallPrimes()-1 );
+#ifdef SINGULAR
+	extern int errorreported;
+	void    WerrorS(const char *s);
+	if (!errorreported && (c > 536870909)) WerrorS("characteristic too large(max is 2^29)");
+#endif
+        ff_setprime( c );
+        resetFPT();
     }
 }
 
