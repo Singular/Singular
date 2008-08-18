@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.53 2008-07-25 10:44:16 Singular Exp $ */
+/* $Id: structs.h,v 1.54 2008-08-18 10:39:57 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -772,10 +772,8 @@ extern char     my_yylinebuf[80];
 #if defined(__cplusplus)
 inline int si_max(const int a, const int b)  { return (a>b) ? a : b; }
 inline int si_min(const int a, const int b)  { return (a<b) ? a : b; }
-#if defined(DecAlpha_Linux) || defined(IA64_Linux)
 inline long si_max(const long a, const long b)  { return (a>b) ? a : b; }
 inline long si_min(const long a, const long b)  { return (a<b) ? a : b; }
-#endif
 #else
 #define si_max(A,B) ((A) > (B) ? (A) : (B))
 #define si_min(A,B) ((A) < (B) ? (A) : (B))
