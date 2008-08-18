@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.476 2008-08-07 07:46:58 Singular Exp $ */
+/* $Id: iparith.cc,v 1.477 2008-08-18 10:41:46 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2440,8 +2440,14 @@ static BOOLEAN jjMOD_N(leftv res, leftv u, leftv v)
   res->data =(char *) nIntMod((number)u->Data(),q);
   return FALSE;
 }
+static BOOLEAN jjMONITOR2(leftv res, leftv u,leftv v);
+static BOOLEAN jjMONITOR1(leftv res, leftv v)
+{
+  return jjMONITOR2(res,v,NULL);
+}
 static BOOLEAN jjMONITOR2(leftv res, leftv u,leftv v)
 {
+#if 0
   char *opt=(char *)v->Data();
   int mode=0;
   while(*opt!='\0')
@@ -2451,7 +2457,30 @@ static BOOLEAN jjMONITOR2(leftv res, leftv u,leftv v)
     opt++;
   }
   monitor((char *)(u->Data()),mode);
+#else
+  si_link l=(si_link)u->Data();
+  if (slOpen(l,SI_LINK_WRITE)) return TRUE;
+  if(strcmp(l->m->type,"ASCII")!=0)
+  {
+    Werror("ASCII link required, not >$s<",l->m->type);
+    slClose(l);
+    return TRUE;
+  }
+  SI_LINK_SET_CLOSE_P(l); // febase handles the FILE*
+  char *opt;
+  if (v==NULL) opt="i";
+  else         opt=(char *)v->Data();
+  int mode=0;
+  while(*opt!='\0')
+  {
+    if (*opt=='i') mode |= PROT_I;
+    else if (*opt=='o') mode |= PROT_O;
+    opt++;
+  }
+  if (((FILE*)l->data) == stdin) monitor(NULL,0);
+  else monitor((FILE *)l->data,mode);
   return FALSE;
+#endif
 }
 static BOOLEAN jjPARSTR2(leftv res, leftv u, leftv v)
 {
@@ -3334,7 +3363,7 @@ struct sValCmd2 dArith2[]=
 ,{jjCALL2MANY, MODUL_CMD,      MODUL_CMD,      DEF_CMD,    DEF_CMD ALLOW_PLURAL}
 ,{jjMODULO,    MODULO_CMD,     MODUL_CMD,      IDEAL_CMD,  IDEAL_CMD ALLOW_PLURAL}
 ,{jjMODULO,    MODULO_CMD,     MODUL_CMD,      MODUL_CMD,  MODUL_CMD ALLOW_PLURAL}
-,{jjMONITOR2,  MONITOR_CMD,    NONE,           STRING_CMD, STRING_CMD ALLOW_PLURAL}
+,{jjMONITOR2,  MONITOR_CMD,    NONE,           LINK_CMD, STRING_CMD ALLOW_PLURAL}
 //,{jjRES,       MRES_CMD,       LIST_CMD,       IDEAL_CMD,  INT_CMD NO_PLURAL}
 //,{jjRES,       MRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD NO_PLURAL}
 ,{nuMPResMat,  MPRES_CMD,      MODUL_CMD,      IDEAL_CMD,  INT_CMD NO_PLURAL}
@@ -4120,11 +4149,10 @@ static number jjBI2N(long d)
   }
 }
 #endif
-static BOOLEAN jjMONITOR1(leftv res, leftv v)
-{
-  monitor((char *)(v->Data()),PROT_I);
-  return FALSE;
-}
+//static BOOLEAN jjMONITOR1(leftv res, leftv v)
+//{
+//  return jjMONITOR2(res,v,NULL);
+//}
 static BOOLEAN jjMSTD(leftv res, leftv v)
 {
   int t=v->Typ();
@@ -5060,7 +5088,7 @@ struct sValCmd1 dArith1[]=
 ,{jjMINRES,     MINRES_CMD,      LIST_CMD,       LIST_CMD       ALLOW_PLURAL}
 ,{jjMINRES_R,   MINRES_CMD,      RESOLUTION_CMD, RESOLUTION_CMD ALLOW_PLURAL}
 ,{jjDUMMY,      MODUL_CMD,       MODUL_CMD,      MODUL_CMD      ALLOW_PLURAL}
-,{jjMONITOR1,   MONITOR_CMD,     NONE,           STRING_CMD     ALLOW_PLURAL}
+,{jjMONITOR1,   MONITOR_CMD,     NONE,           LINK_CMD     ALLOW_PLURAL}
 ,{jjMULT,       MULTIPLICITY_CMD,  INT_CMD,      IDEAL_CMD      NO_PLURAL}
 ,{jjMULT,       MULTIPLICITY_CMD,  INT_CMD,      MODUL_CMD      NO_PLURAL}
 ,{jjMSTD,       MSTD_CMD,        LIST_CMD,       IDEAL_CMD      NO_PLURAL}
