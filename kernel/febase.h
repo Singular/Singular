@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.10 2008-03-31 12:14:44 Singular Exp $ */
+/* $Id: febase.h,v 1.11 2008-08-18 10:39:03 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -231,7 +231,7 @@ BOOLEAN contBuffer(feBufferTypes typ);
 const char *  eati(const char *s, int *i);
 BOOLEAN exitBuffer(feBufferTypes typ);
 BOOLEAN exitVoice();
-void    monitor(char* s,int mode);
+void    monitor(void *F, int mode); /* FILE*, int */
 BOOLEAN newFile(char* fname, FILE *f=NULL);
 void    newBuffer(char* s, feBufferTypes t, procinfo *pname = NULL, int start_lineno = 0);
 void *  myynewbuffer();

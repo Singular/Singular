@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.17 2008-08-05 16:56:53 Singular Exp $ */
+/* $Id: febase.cc,v 1.18 2008-08-18 10:39:03 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -19,10 +19,6 @@
 #include <unistd.h>
 #ifdef NeXT
 #include <sys/file.h>
-#endif
-#ifdef ix86_Linux_libc5
-#undef stdin
-extern FILE *stdin;
 #endif
 
 #ifdef HAVE_PWD_H
@@ -1139,6 +1135,7 @@ void PrintNSpaces(const int n)
 /* end extern "C" */
 }
 
+#if 0
 void monitor(char* s, int mode)
 {
   if (feProt)
@@ -1158,6 +1155,21 @@ void monitor(char* s, int mode)
       feProt = mode;
   }
 }
+#else
+void monitor(void *F, int mode)
+{
+  if (feProt)
+  {
+    fclose(feProtFile);
+    feProt = 0;
+  }
+  if (F!=NULL)
+  {
+    feProtFile = (FILE *)F;
+    feProt = mode;
+  }
+}
+#endif
 
 
 const char* eati(const char *s, int *i)
