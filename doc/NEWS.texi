@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.101 2008-08-18 10:22:05 Singular Exp $
+@comment $Id: NEWS.texi,v 1.102 2008-08-19 18:04:02 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -24,9 +24,9 @@
 
 @itemize @bullet
 @item
-new coeffient domains: Z, Z/m, Z/(2^n) (@nref{Rings and orderings})
+new coefficients: Z, Z/m, Z/(2^n) (@nref{Rings and orderings})
 @item
-new handling of default argument in libraries (@nref{Parameter list})
+new handling of the default argument in libraries (@nref{Parameter list})
 @end itemize
 
 @heading New @sc{Singular} functions
@@ -34,15 +34,15 @@ new handling of default argument in libraries (@nref{Parameter list})
 @item
 new command: sqrfree (@nref{sqrfree})
 @item
-command changed: the first argumento to @code{monitor} should be an ASCII link.
+command changed: the first argument to to @code{monitor} should be an ASCII link.
 (@nref{monitor})
 @end itemize
 
 @heading Internal Changes
-@table @asis
+@table @bullet
 @item new build target: libsingular.a (for gfan etc.)
 @item code variants depend now on CPU typ, not OS
-@item better test for builin limits (@nref{Limitations})
+@item better test for builtin limits (@nref{Limitations})
 @end table
 
 @heading New @sc{Singular} libraries
@@ -77,7 +77,7 @@ all parts of @sc{Singular} are licenced under GPL (resp. LGPL) version 2, or (at
 @item
 new command: (@nref{univariate}): test polynomials for being univariate.
 @item
-new command: (@nref{variables}): list of all variables occuring in a polynomial, ideal or matrix.
+new command: (@nref{variables}): list of all variables occurring in a polynomial, ideal or matrix.
 @item
 syntax change: @nref{ncalgebra} should be substituted by @nref{nc_algebra}.
 @code{ncalgebra} is now depreciated, but still supported
@@ -91,7 +91,7 @@ kernel: use Conway polynomials and support more finite fields
 
 @heading News in version 3-0-3
 
-The version 3-0-3 is stabilyzing release,
+The version 3-0-3 is stabilizing release,
 a result of a long beta test and the integration of a lot of small
 fixes which were on our waiting list for integration.
 
