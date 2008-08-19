@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: singext.h,v 1.8 2008-03-19 18:12:18 Singular Exp $ */
+/* $Id: singext.h,v 1.9 2008-08-19 13:10:55 Singular Exp $ */
 
 #ifndef INCL_SINGEXT_H
 #define INCL_SINGEXT_H
@@ -15,6 +15,11 @@ extern int nfCharQ;
 extern int nfM1;
 extern int nfMinPoly[];
 extern short nfPlus1Table[];
+
+// to use Singular error reporting:
+
+extern int errorreported;
+extern "C" void  WerrorS(const char *s);
 
 // used to open the GF(q) tables from Singular
 extern FILE * feFopen ( const char * path, const char * mode, char *where = 0, int useWerror = 0, int path_only = 0);
