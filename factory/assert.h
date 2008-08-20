@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: assert.h,v 1.8 2008-08-20 12:39:00 Singular Exp $ */
+/* $Id: assert.h,v 1.9 2008-08-20 12:52:31 Singular Exp $ */
 
 /* This is for compatibility with standard assert.h */
 #if defined (NDEBUG) && ! defined (NOASSERT)
@@ -28,6 +28,9 @@
 #undef PVIRT_CHARCC
 /* }}} */
 
+#ifdef HAVE_CSTDIO
+#include <cstdio>
+#else
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -36,6 +39,7 @@ extern "C" {
 
 #ifdef __cplusplus
 }
+#endif
 #endif
 
 /* {{{ permanent macro definitions */
