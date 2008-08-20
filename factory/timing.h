@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: timing.h,v 1.7 1998-06-12 14:29:51 schmidt Exp $ */
+/* $Id: timing.h,v 1.8 2008-08-20 13:35:55 Singular Exp $ */
 
 /* It should be possible to include this file multiple times for different */
 /* settings of TIMING */
@@ -17,7 +17,11 @@
 #include <sys/times.h>
 #include <sys/param.h>
 #endif
+#ifdef HAVE_CSTDIO
+#include <cstdio>
+#else
 #include <stdio.h>
+#endif
 
 // need to be adjusted on your machine:
 // the number of ticks per second: HZ

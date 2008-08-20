@@ -1,6 +1,15 @@
+#include "factoryconf.h"
+
+#ifdef HAVE_CSTDIO
+#include <cstdio>
+#else
 #include <stdio.h>
+#endif
+#ifdef HAVE_IOSTREAM_H
 #include <iostream.h>
-#include <config.h>
+#else
+#include <iostream>
+#endif
 
 #include "cf_defs.h"
 #include "canonicalform.h"

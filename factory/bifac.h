@@ -20,7 +20,11 @@
 
 // === IO-Streams ===
 #ifndef NOSTREAMIO
+#ifdef HAVE_CSTDIO
+#include <cstdio>
+#else
 #include <stdio.h>
+#endif
 #ifdef HAVE_IOSTREAM
 #include <fstream>
 #include <iostream>
