@@ -1,12 +1,14 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gfops.cc,v 1.7 2008-08-20 13:35:55 Singular Exp $ */
+/* $Id: gfops.cc,v 1.8 2008-08-20 14:44:49 Singular Exp $ */
 
 #include <config.h>
 
 #ifdef HAVE_CSTDIO
 #include <cstdio>
+#include <cstdlib>
 #else
 #include <stdio.h>
+#include <stdlib.h>
 #endif
 #include <string.h>
 
