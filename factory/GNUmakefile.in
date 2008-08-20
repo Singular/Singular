@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.55 2008-06-30 09:23:52 Singular Exp $
+# $Id: GNUmakefile.in,v 1.56 2008-08-20 14:34:04 Singular Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -210,7 +210,6 @@ basefactoryincl := \
 		cf_factory.h \
 		cf_generator.h \
 		cf_globals.h \
-		cf_gmp.h \
 		cf_irred.h \
 		cf_iter.h \
 		cf_map.h \
@@ -739,3 +738,10 @@ ftest/GNUmakefile: ftest/GNUmakefile.in config.status
 
 config.status:	configure
 		./config.status --recheck
+
+# create cf_gmp.h
+cf_gmp.h: GNUmakefile gen_cf_gmp.template
+	echo "#!/bin/sh" >gen_cf_gmp.sh 
+	echo "GMP_H_T=\"`$(CXX) $(CPPFLAGS) -M t.cc|grep gmp.h` \"" >>gen_cf_gmp.sh 
+	cat gen_cf_gmp.template >>gen_cf_gmp.sh
+	$(SHELL) gen_cf_gmp.sh
