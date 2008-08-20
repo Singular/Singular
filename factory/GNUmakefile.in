@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.58 2008-08-20 14:40:31 Singular Exp $
+# $Id: GNUmakefile.in,v 1.59 2008-08-20 14:43:12 Singular Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -483,7 +483,7 @@ $(srcdir)/winnt/factoryconf.h: factoryconf.template winnt/config.h
 		$(MAKEHEADER) -I$(srcdir)/winnt $(MAKEHEADERFLAGS) $< $@
 
 # specify dependency in case user does not 'make depend'
-factoryconf.h:	config.h
+factoryconf.h:	config.h cf_gmp.h
 
 TAGS:
 		etags $(addprefix $(srcdir)/, $(distsrc) $(distincl))
@@ -677,7 +677,7 @@ dist:		$(srcdir)/readcf.cc $(srcdir)/configure \
 clean:		ftestclean
 		-rm -f $(libfactory) libcfmem.a \
 		  $(ftestexec) gengftables test_install \
-		  factoryconf.h factory.h *.o *.d *.dtmp
+		  factoryconf.h factory.h *.o *.d *.dtmp cf_gmp.h
 
 # remove gftables only if we built them
 mostlyclean:	clean doxyclean
