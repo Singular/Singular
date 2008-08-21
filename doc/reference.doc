@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.305 2008-08-16 14:51:31 Singular Exp $
+@comment $Id: reference.doc,v 1.306 2008-08-21 08:01:27 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -7921,7 +7921,7 @@ int
 @item @strong{Purpose:}
 shows the nesting level of procedures.
 @item @strong{Note:}
-@xref{Guidelines for writing a library}, for an small example how this is used
+@xref{Guidelines for writing a library}, for a small example how this is used
 for the display of comments while procedures are executed.
 @item @strong{Example:}
 @smallexample
