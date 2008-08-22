@@ -4,7 +4,7 @@
  *           -- the real version
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omalloc.c,v 1.12 2006-06-14 07:54:09 Singular Exp $
+ *  Version: $Id: omalloc.c,v 1.13 2008-08-22 10:32:19 wienand Exp $
  *******************************************************************/
 
 #include <stdlib.h>
@@ -57,7 +57,7 @@ void* valloc(size_t size)
 
 #if defined(sgi)
 void* memalign(size_t size_1, size_t size_2)
-#elif (defined(__sun) && (defined(__sparc) || defined(__i386) || defined(__x86_64)))
+#elif (defined(__sun) && (defined(__sparc) || defined(__i386) || defined(__x86_64)) || defined(__CYGWIN__))
 void* memalign(size_t size_1, size_t size_2)
 #else
 void* memalign(void* alignment, size_t size)
