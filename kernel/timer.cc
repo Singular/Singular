@@ -1,14 +1,15 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: timer.cc,v 1.7 2008-07-18 15:02:17 Singular Exp $ */
+/* $Id: timer.cc,v 1.8 2008-08-22 12:11:05 Singular Exp $ */
 
 /*
 *  ABSTRACT - get the computing time
 */
 
 #include "mod2.h"
-//#define GETRUSAGE
+// undef GETRUSAGE to get the original timer code (w.r.t. CLOCK_TICKS)
+#define GETRUSAGE
 #ifdef GETRUSAGE
        #include <sys/time.h>
        #include <sys/resource.h>
