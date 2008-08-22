@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.477 2008-08-18 10:41:46 Singular Exp $ */
+/* $Id: iparith.cc,v 1.478 2008-08-22 09:01:18 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -282,6 +282,7 @@ cmdnames cmds[] =
   { "jet",         0, JET_CMD ,           CMD_M},
   { "kbase",       0, KBASE_CMD ,         CMD_12},
   { "keepring",    0, KEEPRING_CMD ,      KEEPRING_CMD},
+  { "kernel",      0, KERNEL_CMD ,        CMD_2},
   { "kill",        0, KILL_CMD ,          KILL_CMD},
   { "killattrib",  0, KILLATTR_CMD ,      CMD_12},
   { "koszul",      0, KOSZUL_CMD ,        CMD_23},
@@ -2323,6 +2324,11 @@ static BOOLEAN jjKBASE2(leftv res, leftv u, leftv v)
                               (ideal)(u->Data()),currQuotient);
   return FALSE;
 }
+static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w);
+static BOOLEAN jjKERNEL(leftv res, leftv u, leftv v)
+{
+  return jjPREIMAGE(res,u,v,NULL);
+}
 static BOOLEAN jjKoszul(leftv res, leftv u, leftv v)
 {
   return mpKoszul(res, u,v);
@@ -3348,6 +3354,8 @@ struct sValCmd2 dArith2[]=
 ,{jjJET_ID,    JET_CMD,        MATRIX_CMD,     MATRIX_CMD,  INT_CMD ALLOW_PLURAL}
 ,{jjKBASE2,    KBASE_CMD,      IDEAL_CMD,      IDEAL_CMD,  INT_CMD ALLOW_PLURAL}
 ,{jjKBASE2,    KBASE_CMD,      MODUL_CMD,      MODUL_CMD,  INT_CMD ALLOW_PLURAL}
+,{jjKERNEL,    KERNEL_CMD,     IDEAL_CMD, RING_CMD,        ANY_TYPE ALLOW_PLURAL}
+,{jjKERNEL,    KERNEL_CMD,     IDEAL_CMD, QRING_CMD,       ANY_TYPE ALLOW_PLURAL}
 ,{atKILLATTR2, KILLATTR_CMD,   NONE,           IDHDL,      STRING_CMD ALLOW_PLURAL}
 ,{jjKoszul,    KOSZUL_CMD,     MATRIX_CMD,     INT_CMD,    INT_CMD NO_PLURAL}
 ,{jjKoszul_Id, KOSZUL_CMD,     MATRIX_CMD,     INT_CMD,    IDEAL_CMD NO_PLURAL}
@@ -5627,11 +5635,13 @@ static BOOLEAN jjMINOR3(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w)
 {
+  // handles preimage(r,phi,i) and kernel(r,phi)
   idhdl h;
   ring rr;
   map mapping;
+  BOOLEAN kernel_cmd= (iiOp==KERNEL_CMD);
 
-  if ((v->name==NULL) || (w->name==NULL))
+  if ((v->name==NULL) || (!kernel_cmd && (w->name==NULL)))
   {
     WerrorS("2nd/3rd arguments must have names");
     return TRUE;
@@ -5666,30 +5676,36 @@ static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w)
     Werror("`%s` is not defined in `%s`",v->name,ring_name);
     return TRUE;
   }
-  if ((h=rr->idroot->get(w->name,myynest))!=NULL)
+  ideal image;
+  if (kernel_cmd) image=idInit(1,1);
+  else
   {
-    if (h->typ==IDEAL_CMD)
+    if ((h=rr->idroot->get(w->name,myynest))!=NULL)
     {
-      if (((currRing->qideal!=NULL) && (pOrdSgn==-1))
-      || ((rr->qideal!=NULL) && (rr->OrdSgn==-1)))
+      if (h->typ==IDEAL_CMD)
       {
-        WarnS("preimage in local qring may be wrong: use Ring::preimageLoc instead");
+        image=IDIDEAL(h);
       }
-      res->data=(char *)maGetPreimage(rr,mapping,IDIDEAL(h));
-      if (res->data==NULL/* is of type ideal, should not be NULL*/) return TRUE;
+      else
+      {
+        Werror("`%s` is no ideal",IDID(h));
+        return TRUE;
+      }
     }
     else
     {
-      Werror("`%s` is no ideal",IDID(h));
+      Werror("`%s` is not defined in `%s`",w->name,ring_name);
       return TRUE;
     }
   }
-  else
+  if (((currRing->qideal!=NULL) && (pOrdSgn==-1))
+  || ((rr->qideal!=NULL) && (rr->OrdSgn==-1)))
   {
-    Werror("`%s` is not defined in `%s`",w->name,ring_name);
-    return TRUE;
+    WarnS("preimage in local qring may be wrong: use Ring::preimageLoc instead");
   }
-  return FALSE;
+  res->data=(char *)maGetPreimage(rr,mapping,image);
+  if (kernel_cmd) idDelete(&image);
+  return (res->data==NULL/* is of type ideal, should not be NULL*/);
 }
 static BOOLEAN jjRANDOM_Im(leftv res, leftv u, leftv v, leftv w)
 {

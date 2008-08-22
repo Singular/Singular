@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.306 2008-08-21 08:01:27 Singular Exp $
+@comment $Id: reference.doc,v 1.307 2008-08-22 09:01:19 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -114,6 +114,7 @@ and @code{LIB} no brackets are allowed.
 * janet::
 * jet::
 * kbase::
+* kernel::
 * kill::
 * killattrib::
 * koszul::
@@ -2890,7 +2891,7 @@ See
 @ref{vector}.
 @c ref
 @c ---------------------------------------
-@node kbase, kill, jet, Functions
+@node kbase, kernel, jet, Functions
 @subsection kbase
 @cindex kbase
 @table @code
@@ -2930,7 +2931,43 @@ See
 @ref{vdim}.
 @c ref
 @c ---------------------------------------
-@node kill, killattrib, kbase, Functions
+@node kernel, kill, kbase, Functions
+@subsection kernel
+@cindex kernel
+
+@table @code
+@item @strong{Syntax:}
+@code{kernel (} ring_name@code{,} map_name @code{)}
+@*@code{preimage (} ring_name@code{,} ideal_expression @code{)}
+@item @strong{Type:}
+ideal
+@item @strong{Purpose:}
+returns the kernel of a given map.
+@*
+The second argument has to be a map from the basering to the given ring
+(or an ideal defining such a map).
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r1=32003,(x,y,z,w),lp;
+  ring r=32003,(x,y,z),dp;
+  ideal i=x,y,z;
+  map f=r1,i;
+  setring r1;
+  // the kernel of f
+  kernel(r,f);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{preimage);
+@ref{map};
+@ref{ideal};
+@ref{ring}.
+@c ref
+@c ---------------------------------------
+@node kill, killattrib, kernel, Functions
 @subsection kill
 @cindex kill
 @table @code
@@ -4730,24 +4767,22 @@ See
 @node preimage, prime, parstr, Functions
 @subsection preimage
 @cindex preimage
-@cindex kernel
 
 @table @code
 @item @strong{Syntax:}
-@code{preimage (} ring_name@code{,} map_name@code{,} ideal_name @code{)}
+@code{preimage (} map @code{)}
+@*@code{preimage (} ring_name@code{,} map_name@code{,} ideal_name @code{)}
 @*@code{preimage (} ring_name@code{,} ideal_expression@code{,} ideal_name @code{)}
 @item @strong{Type:}
-ideal
+ring
+@*ideal
 @item @strong{Purpose:}
-returns the preimage of an ideal under a given map.
+returns the source ring of a map (in the first case) or
+@*returns the preimage of an ideal under a given map.
 @*
 The second argument has to be a map from the basering to the given ring
 (or an ideal defining such a map),
 and the ideal has to be an ideal in the given ring.
-@item @strong{Note:}
-To compute the kernel of a map, the preimage of zero has to be determined.
-Hence there is no special command for computing the kernel of a map in
-@sc{Singular}.
 @item @strong{Note:}
 As @code{preimage} is handling ideals (not polynomials), the result of a preimage
 calculation of a principal ideal, whose generator is not in the image of the map,
@@ -4761,16 +4796,20 @@ is the zero ideal.
   ideal i1=x,y;
   ideal i0=0;
   map f=r1,i;
+  nameof (preimage (f));
   setring r1;
   ideal i1=preimage(r,f,i1);
   i1;
   // the kernel of f
   preimage(r,f,i0);
+  // or, use:
+  kernel(r,f);
 @c example
 @end smallexample
 @end table
 @c ref
 See
+@ref{kernel};
 @ref{map};
 @ref{ideal};
 @ref{ring}.

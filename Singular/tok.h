@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.69 2008-01-22 09:40:03 Singular Exp $ */
+/* $Id: tok.h,v 1.70 2008-08-22 09:01:18 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -88,6 +88,7 @@ enum {
   INTVEC_CMD,
   IS_RINGVAR,
   JANET_CMD,
+  KERNEL_CMD,
   KILLATTR_CMD,
   KRES_CMD,
   LAGSOLVE_CMD,

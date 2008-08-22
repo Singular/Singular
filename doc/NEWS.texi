@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.102 2008-08-19 18:04:02 Singular Exp $
+@comment $Id: NEWS.texi,v 1.103 2008-08-22 09:01:19 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -32,6 +32,8 @@ new handling of the default argument in libraries (@nref{Parameter list})
 @heading New @sc{Singular} functions
 @itemize @bullet
 @item
+new command: kernel (@nref{kernel})
+@item
 new command: sqrfree (@nref{sqrfree})
 @item
 command changed: the first argument to to @code{monitor} should be an ASCII link.
@@ -39,11 +41,11 @@ command changed: the first argument to to @code{monitor} should be an ASCII link
 @end itemize
 
 @heading Internal Changes
-@table @bullet
+@itemize @bullet
 @item new build target: libsingular.a (for gfan etc.)
 @item code variants depend now on CPU typ, not OS
 @item better test for builtin limits (@nref{Limitations})
-@end table
+@end itemize
 
 @heading New @sc{Singular} libraries
 @itemize @bullet
