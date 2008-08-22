@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: bfct.lib,v 1.2 2008-08-07 20:14:21 levandov Exp $";
+version="$Id: bfct.lib,v 1.3 2008-08-22 09:31:56 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: bfct.lib     M. Noro's Algorithm for Bernstein-Sato polynomial
@@ -723,7 +723,7 @@ static proc bfctengine (poly f, int whichengine, int methodord, int methodminpol
     if (minpolchar == 0) // minpolsyz::modular
     {
       int lb = 30000;
-      int ub = 2147483647;
+      int ub = 536870909;
       i = 1;
       list usedprimes;
       while (b == 0)
