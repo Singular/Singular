@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_char.cc,v 1.10 2008-08-18 11:19:33 Singular Exp $ */
+/* $Id: cf_char.cc,v 1.11 2008-08-22 09:35:08 Singular Exp $ */
 
 #include <config.h>
 
@@ -40,7 +40,7 @@ void setCharacteristic( int c )
         theCharacteristic = c;
         ff_big = c > cf_getSmallPrime( cf_getNumSmallPrimes()-1 );
 #ifdef SINGULAR
-	if (!errorreported && (c > 536870909)) WerrorS("characteristic too large(max is 2^29)");
+	if (!errorreported && (c > 536870909)) Werror("characteristic %d is too large(max is 2^29)",c);
 #endif
         ff_setprime( c );
         resetFPT();
