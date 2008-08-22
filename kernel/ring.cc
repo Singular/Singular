@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.102 2008-07-26 18:15:46 Singular Exp $ */
+/* $Id: ring.cc,v 1.103 2008-08-22 11:56:55 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -111,9 +111,9 @@ void rChangeCurrRing(ring r)
     pSetGlobals(r);
     /*------------ global variables related to factory -------------------*/
 #ifdef HAVE_FACTORY
-    int c=ABS(nGetChar());
-    if (c==1) c=0;
-    setCharacteristic( c );
+    //int c=ABS(nGetChar());
+    //if (c==1) c=0;
+    //setCharacteristic( c );
 #endif
   }
 }

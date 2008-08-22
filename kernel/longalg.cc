@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.37 2008-07-20 10:19:02 Singular Exp $ */
+/* $Id: longalg.cc,v 1.38 2008-08-22 11:56:55 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1691,6 +1691,10 @@ number naGcd(number a, number b, const ring r)
     result->z = napGcd(x->z, y->z); // change from napGcd0
 #else
   {
+    int c=ABS(nGetChar());
+    if (c==1) c=0;
+    setCharacteristic( c );
+
     napoly rz=napGcd(x->z, y->z);
     CanonicalForm F, G, R;
     R=convSingTrFactoryP(rz); 
