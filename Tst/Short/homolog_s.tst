@@ -17,7 +17,7 @@ example isCM;
 example isFlat;
 example isLocallyFree;
 example isReg;
-example kernel; 
+example ker; 
 example kohom;
 example kontrahom;
 example KoszulHomology;
