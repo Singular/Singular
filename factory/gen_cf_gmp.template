@@ -1,3 +1,3 @@
-GMP_H=`echo $GMP_H_T| sed -e 's/^.*t.cc//' -e 's/ .$//'`
+GMP_H=`echo $GMP_H_T| sed -e 's/^.*gmp.cc//' -e 's/ .$//'`
 echo generating cf_gmp.h from $GMP_H
-grep -v __GMP_DECLSPEC_XX <$GMP_H >cf_gmp.h
+cat $GMP_H | grep -v __GMP_DECLSPEC_XX > cf_gmp.h
