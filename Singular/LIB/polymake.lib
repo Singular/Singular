@@ -1,4 +1,4 @@
-version="$Id: polymake.lib,v 1.8 2008-08-08 10:30:35 keilen Exp $";
+version="$Id: polymake.lib,v 1.9 2008-08-29 15:16:49 keilen Exp $";
 category="Tropical Geometry";
 info="
 LIBRARY:        polymake.lib    Computations with polytopes and fans, interface to polymake and TOPCOM
@@ -230,7 +230,7 @@ example
    // the secondary polytope of this lattice point configuration is computed
    intmat secpoly=secondaryPolytope(points)[1];
    list np=polymakePolytope(secpoly);
-   // the vertices of the Newton polytope are:
+   // the vertices of the secondary polytope are:
    np[1];
    // its dimension is
    np[2];
@@ -380,7 +380,7 @@ EXAMPLE: example normalFan;   shows an example"
   // we work over the following ring  
   execute("ring ineqring=0,x(1.."+string(ncols(vertices))+"),lp;");
   string greatersign=">";
-  // create the variable names 
+  // create the variable names
   if (size(#)>0)
   {
     if (typeof(#[1])=="string")
