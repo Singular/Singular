@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.307 2008-08-22 09:01:19 Singular Exp $
+@comment $Id: reference.doc,v 1.308 2008-09-09 10:00:57 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2964,7 +2964,10 @@ See
 @ref{preimage);
 @ref{map};
 @ref{ideal};
-@ref{ring}.
+@ref{ring};
+@ref{alg_kernel};
+@ref{hom_kernel};
+@ref{modulo}.
 @c ref
 @c ---------------------------------------
 @node kill, killattrib, kernel, Functions
@@ -3776,7 +3779,8 @@ set, @code{modulo(h1,h2)} also sets the attribute @code{"isHomog"}
 @end table
 @c ref
 See
-@ref{syz}.
+@ref{syz};
+@ref{hom_kernel}.
 @c ref
 @c ---------------------------------------
 @node monitor, mpresmat, modulo, Functions

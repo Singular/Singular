@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.103 2008-08-22 09:01:19 Singular Exp $
+@comment $Id: NEWS.texi,v 1.104 2008-09-09 10:00:56 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -68,6 +68,9 @@ new library: discretize.lib @nref{discretize_lib}: tools for the generation of f
 new library: nchomolog.lib @nref{nchomolog_lib}: Noncommutative Homological Algebra)
 @item
 contributed library: phindex.lib @nref{phindex_lib}
+@item
+homolog.lib: kernel renamed to @nref{hom_kernel}. 
+@*(See also @nref{kernel}, @nref{alg_kernel}).
 @end itemize
 
 @heading News for version 3-0-4
