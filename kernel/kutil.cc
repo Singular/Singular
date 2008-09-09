@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.106 2008-07-28 18:14:24 Singular Exp $ */
+/* $Id: kutil.cc,v 1.107 2008-09-09 15:46:14 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -4728,12 +4728,12 @@ void messageSets (kStrategy strat)
 /*2
 *construct the set s from F
 */
-void initS (ideal F, ideal Q,kStrategy strat)
+void initS (ideal F, ideal Q, kStrategy strat)
 {
   int   i,pos;
 
-  if (Q!=NULL) i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
-  else i=setmaxT;
+  if (Q!=NULL) i=((IDELEMS(F)+IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
+  else         i=((IDELEMS(F)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
   strat->ecartS=initec(i);
   strat->sevS=initsevS(i);
   strat->S_2_R=initS_2_R(i);
