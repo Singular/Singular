@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: homolog.lib,v 1.25 2008-08-22 09:41:17 Singular Exp $";
+version="$Id: homolog.lib,v 1.26 2008-09-09 09:54:30 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  homolog.lib   Procedures for Homological Algebra
@@ -21,7 +21,7 @@ PROCEDURES:
  isFlat(M);             test if coker(M) is flat, M module
  isLocallyFree(M,r);    test if coker(M) is locally free of constant rank r
  isReg(I,M);            test if I is coker(M)-sequence, I ideal, M module
- ker(A,M,N);            ker(M'--A->N')  M,N modules, A matrix
+ hom_kernel(A,M,N);     ker(M'--A->N')  M,N modules, A matrix
  kohom(A,k);            Hom(R^k,A),     A matrix over basering R
  kontrahom(A,k);        Hom(A,R^k),     A matrix over basering R
  KoszulHomology(I,M,n); n-th Koszul homology H_n(I,coker(M)), I=ideal
@@ -1126,8 +1126,8 @@ example
 }
 //////////////////////////////////////////////////////////////////////////////
 
-proc ker (matrix A,module M,module N)
-"USAGE:   ker(A,M,N);
+proc hom_kernel (matrix A,module M,module N)
+"USAGE:   hom_kernel(A,M,N);
 COMPUTE: Let M and N be submodules of R^m and R^n, presenting M'=R^m/M,
          N'=R^n/N (R=basering), and let A:R^m-->R^n be a matrix inducing a
          map A':M'-->N'. Then ker(A,M,N); computes a presentation K of
@@ -1143,7 +1143,7 @@ COMPUTE: Let M and N be submodules of R^m and R^n, presenting M'=R^m/M,
              R^s  ---> R^p -----> R^q
 @end example
 RETURN:  module K, a presentation of ker(A':coker(M)->coker(N)).
-EXAMPLE: example ker; shows examples.
+EXAMPLE: example hom_kernel; shows examples.
 "
 {
   module M1 = modulo(A,N);
@@ -1155,7 +1155,7 @@ example
   module N=[2x,x],[0,y];
   module M=maxideal(1)*freemodule(2);
   matrix A[2][3]=2x,0,x,y,z2,y;
-  module K=ker(A,M,N);
+  module K=hom_kernel(A,M,N);
   // dimension of kernel:
   dim(std(K));
   // vector space dimension of kernel:
