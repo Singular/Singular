@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.47 2008-03-19 17:44:37 Singular Exp $ */
+/* $Id: silink.cc,v 1.48 2008-09-10 08:52:57 Singular Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -152,7 +152,7 @@ void slKill(si_link l)
     omFreeBin((ADDRESS)l,  ip_link_bin);
 }
 
-const char* slStatus(si_link l, char *request)
+const char* slStatus(si_link l, const char *request)
 {
   if (l == NULL) return "empty link";
   else if (l->m == NULL) return "unknown link type";
@@ -519,7 +519,7 @@ BOOLEAN slWriteAscii(si_link l, leftv v)
   return err;
 }
 
-const char* slStatusAscii(si_link l, char* request)
+const char* slStatusAscii(si_link l, const char* request)
 {
   if (strcmp(request, "read") == 0)
   {

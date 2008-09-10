@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.11 2008-08-18 10:39:03 Singular Exp $ */
+/* $Id: febase.h,v 1.12 2008-09-10 08:52:27 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -190,7 +190,7 @@ void feHelp(char* str = NULL);
 // return string identifying current browser
 // keeps feOpt("browser") up-to-date
 // Optional warn argument is as in feResource
-char* feHelpBrowser(char* browser = NULL, int warn = -1);
+const char* feHelpBrowser(char* browser = NULL, int warn = -1);
 void feStringAppendBrowsers(int warn = -1);
 
 /*****************************************************************

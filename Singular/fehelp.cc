@@ -3,7 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
-* versin $Id: fehelp.cc,v 1.52 2008-03-18 17:31:50 Singular Exp $
+* versin $Id: fehelp.cc,v 1.53 2008-09-10 08:52:56 Singular Exp $
 */
 
 #include <string.h>
@@ -44,11 +44,11 @@ typedef BOOLEAN (*heBrowserInitProc)(int warn, int br);
 
 typedef struct
 {
-  char* browser;
+  const char* browser;
   heBrowserInitProc init_proc;
   heBrowserHelpProc help_proc;
-  char* required;
-  char* action;
+  const char* required;
+  const char* action;
 } heBrowser_s;
 typedef heBrowser_s * heBrowser;
 
@@ -317,7 +317,7 @@ static void feBrowserFile()
   //heHelpBrowsers[br].action=NULL;
 }
 
-char* feHelpBrowser(char* which, int warn)
+const char* feHelpBrowser(char* which, int warn)
 {
   int i = 0;
 
@@ -890,7 +890,7 @@ static void heBrowserHelp(heEntry hentry)
 static BOOLEAN heGenInit(int warn, int br)
 {
   if (heHelpBrowsers[br].required==NULL) return TRUE;
-  char *p=heHelpBrowsers[br].required;
+  const char *p=heHelpBrowsers[br].required;
   while (*p>'\0')
   {
     switch (*p)
@@ -996,7 +996,7 @@ static void heGenHelp(heEntry hentry, int br)
 {
   char sys[MAX_SYSCMD_LEN];
   char url[MAXPATHLEN];
-  char *p=heHelpBrowsers[br].action;
+  const char *p=heHelpBrowsers[br].action;
   if (p==NULL) {PrintS("no action ?\n"); return;}
   memset(sys,0,MAX_SYSCMD_LEN);
   int i=0;
