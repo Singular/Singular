@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.10 2007-01-11 09:20:35 Singular Exp $ */
+/* $Id: feread.cc,v 1.11 2008-09-10 09:06:37 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -37,8 +37,8 @@
 #include <unistd.h>
 #endif
 
-static char * fe_fgets_stdin_init(char *pr,char *s, int size);
-char * (*fe_fgets_stdin)(char *pr,char *s, int size)
+static char * fe_fgets_stdin_init(const char *pr,char *s, int size);
+char * (*fe_fgets_stdin)(const char *pr,char *s, int size)
  = fe_fgets_stdin_init;
 
 extern char *iiArithGetCmd(int);
@@ -145,7 +145,7 @@ extern "C" {
 }
 
 
-char * fe_fgets_stdin_rl(char *pr,char *s, int size);
+char * fe_fgets_stdin_rl(const char *pr,char *s, int size);
 
 /* Tell the GNU Readline library how to complete.  We want to try to complete
    on command names  or on filenames if it is preceded by " */
@@ -204,7 +204,7 @@ char ** singular_completion (char *text, int start, int end)
 }
 
 #ifndef HAVE_DYN_RL
-char * fe_fgets_stdin_rl(char *pr,char *s, int size)
+char * fe_fgets_stdin_rl(const char *pr,char *s, int size)
 {
   if (!BVERBOSE(V_PROMPT))
   {
@@ -245,9 +245,9 @@ char * fe_fgets_stdin_rl(char *pr,char *s, int size)
 /* ===================================================================*/
 #if !defined(HAVE_READLINE) && defined(HAVE_FEREAD)
 extern "C" {
-char * fe_fgets_stdin_fe(char *pr,char *s, int size);
+char * fe_fgets_stdin_fe(const char *pr,char *s, int size);
 }
-char * fe_fgets_stdin_emu(char *pr,char *s, int size)
+char * fe_fgets_stdin_emu(const char *pr,char *s, int size)
 {
   if (!BVERBOSE(V_PROMPT))
   {
@@ -263,7 +263,7 @@ char * fe_fgets_stdin_emu(char *pr,char *s, int size)
 /* ===================================================================*/
 /* some procedure are shared with "static readline" */
 #if defined(HAVE_DYN_RL)
-char * fe_fgets_stdin_drl(char *pr,char *s, int size)
+char * fe_fgets_stdin_drl(const char *pr,char *s, int size)
 {
   if (!BVERBOSE(V_PROMPT))
   {
@@ -301,7 +301,7 @@ char * fe_fgets_stdin_drl(char *pr,char *s, int size)
 /* ===================================================================*/
 /* =                        fgets                                   = */
 /* ===================================================================*/
-char * fe_fgets(char *pr,char *s, int size)
+char * fe_fgets(const char *pr,char *s, int size)
 {
   if (BVERBOSE(V_PROMPT))
   {
@@ -317,7 +317,7 @@ char * fe_fgets(char *pr,char *s, int size)
 /* ===================================================================*/
 /* =       init for static rl, dyn. rl, emu. rl                     = */
 /* ===================================================================*/
-static char * fe_fgets_stdin_init(char *pr,char *s, int size)
+static char * fe_fgets_stdin_init(const char *pr,char *s, int size)
 {
 #if (defined(HAVE_READLINE) || defined(HAVE_LIBREADLINE)) && !defined(HAVE_DYN_RL) && !defined(HAVE_FEREAD)
   /* Allow conditional parsing of the ~/.inputrc file. */
@@ -410,7 +410,7 @@ static char * fe_fgets_stdin_init(char *pr,char *s, int size)
 /* ===================================================================*/
 #ifdef HAVE_TCL
 /* tcl: */
-char * fe_fgets_tcl(char *pr,char *s, int size)
+char * fe_fgets_tcl(const char *pr,char *s, int size)
 {
   if(currRing!=NULL) PrintTCLS('P',pr);
   else               PrintTCLS('U',pr);
@@ -424,7 +424,7 @@ char * fe_fgets_tcl(char *pr,char *s, int size)
 /* =                      batch mode                                = */
 /* ===================================================================*/
 /* dummy (for batch mode): */
-char * fe_fgets_dummy(char *pr,char *s, int size)
+char * fe_fgets_dummy(const char *pr,char *s, int size)
 {
   return NULL;
 }

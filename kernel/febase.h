@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.12 2008-09-10 08:52:27 Singular Exp $ */
+/* $Id: febase.h,v 1.13 2008-09-10 09:06:37 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -275,10 +275,10 @@ Voice * feInitStdin(Voice *pp);
 /* feread.cc: */
 
 /* the interface for reading: */
-extern  char * (*fe_fgets_stdin)(char *pr,char *s, int size);
+extern  char * (*fe_fgets_stdin)(const char *pr,char *s, int size);
 
 #ifdef HAVE_DYN_RL
-char * fe_fgets_stdin_drl(char *pr,char *s, int size);
+char * fe_fgets_stdin_drl(const char *pr,char *s, int size);
 #endif
 
 extern "C" void fe_reset_input_mode();
@@ -298,21 +298,21 @@ extern "C"
 {
 #endif
   /* readline, linked in: */
-  char * fe_fgets_stdin_rl(char *pr,char *s, int size);
+  char * fe_fgets_stdin_rl(const char *pr,char *s, int size);
 
   /* emulated readline: */
-  char * fe_fgets_stdin_emu(char *pr,char *s, int size);
+  char * fe_fgets_stdin_emu(const char *pr,char *s, int size);
 
   /* fgets: */
-  char * fe_fgets(char *pr,char *s, int size);
+  char * fe_fgets(const char *pr,char *s, int size);
 
   #ifdef HAVE_TCL
   /* tcl: */
-  char * fe_fgets_tcl(char *pr,char *s, int size);
+  char * fe_fgets_tcl(const char *pr,char *s, int size);
   #endif
 
   /* dummy (for batch mode): */
-  char * fe_fgets_dummy(char *pr,char *s, int size);
+  char * fe_fgets_dummy(const char *pr,char *s, int size);
 
 #ifdef __cplusplus
 }
