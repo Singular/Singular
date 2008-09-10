@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.37 2008-07-22 15:15:21 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.38 2008-09-10 16:41:12 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1933,8 +1933,7 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
     //if (strat->ak!=0) { pSetComp(M->m[0],strat->ak); pSetmComp(M->m[0]); }
     if (strat->M!=NULL) idDelete(&strat->M);
   }
-  else
-  if (strat->M==NULL)
+  else if (strat->M==NULL)
   {
     M=idInit(1,F->rank);
     Warn("no minimal generating set computed");
@@ -1950,6 +1949,10 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
     Kstd1_deg=Kstd1_OldDeg;
     if (!oldDegBound)
       test &= ~Sy_bit(OPT_DEGBOUND);
+  }
+  else
+  {
+    if (IDELEMS(M)>IDELEMS(r)) { idDelete(&M); M=idCopy(r); }
   }
   return r;
 }

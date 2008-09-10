@@ -3,17 +3,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.h,v 1.4 2008-06-24 08:20:31 Singular Exp $ */
+/* $Id: kstd1.h,v 1.5 2008-09-10 16:41:12 Singular Exp $ */
 /*
 * ABSTRACT
 */
 #include "structs.h"
 
-/*2
-*input: F: a set (array) of polys with <= Fmax entries (0..Fmax-1)
-*       *S: a set (array) of polys with *Smax initialized entries (0..*Smax-1)
-*output:*S: the standard base: a set (array) with <= *Smax+1 entries (0..*Smax)
-*/
 ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
 
 // lazy_reduce flags: can be combined by |
