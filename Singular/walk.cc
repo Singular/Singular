@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: walk.cc,v 1.13 2008-03-19 17:44:37 Singular Exp $ */
+/* $Id: walk.cc,v 1.14 2008-09-10 09:21:29 Singular Exp $ */
 /*
 * ABSTRACT: Implementation of the Groebner walk
 */
@@ -416,7 +416,7 @@ static void TimeStringFractal(clock_t tinput, clock_t tostd, clock_t tif,clock_t
         ostd,totm,mostd,mif,mstd,mextra,mlf,mred,mnw,tot,res);
 }
 
-static void idString(ideal L, char* st)
+static void idString(ideal L, const char* st)
 {
   int i, nL = IDELEMS(L);
 
@@ -5093,10 +5093,10 @@ ideal TranMImprovwalk(ideal G,intvec* curr_weight,intvec* target_tmp, int nP)
       /*
       Print("\n// Subroutine needs (%d) steps.", nwalk);
       idElements(Glp, "last G in walk:");
-      PrintS("\n//****************************************");
+      PrintS("\n// ****************************************");
       Print("\n// Perturb the original target vector (%d): ", nsteppert);
       ivString(target_weight, "new target");
-      PrintS("\n//****************************************\n");
+      PrintS("\n// ****************************************\n");
       */
       rChangeCurrRing(newRing);
       G = idrMoveR(Glp, lpRing);

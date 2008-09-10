@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.281 2008-08-07 18:08:36 levandov Exp $ */
+/* $Id: extra.cc,v 1.282 2008-09-10 09:15:52 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -443,7 +443,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         Werror("Need string or int argument to set option value");
         return TRUE;
       }
-      char* errormsg;
+      const char* errormsg;
       if (h->Typ() == INT_CMD)
       {
         if (feOptSpec[opt].type == feOptString)

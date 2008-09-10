@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.48 2008-09-10 08:52:57 Singular Exp $ */
+/* $Id: silink.cc,v 1.49 2008-09-10 09:18:01 Singular Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -189,7 +189,7 @@ BOOLEAN slOpen(si_link l, short flag)
 {
   BOOLEAN res;
 
-  if (l->m == NULL) slInit(l, "");
+  if (l->m == NULL) slInit(l, ((char*)""));
 
   if (SI_LINK_OPEN_P(l))
   {

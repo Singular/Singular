@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.22 2005-07-27 15:47:54 Singular Exp $ */
+/* $Id: feOpt.cc,v 1.23 2008-09-10 09:15:52 Singular Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
@@ -292,8 +292,8 @@ static void feOptHelp(const char* name);
 #endif
 #include <errno.h>
 
-static char* feOptAction(feOptIndex opt);
-char* feSetOptValue(feOptIndex opt, char* optarg)
+static const char* feOptAction(feOptIndex opt);
+const char* feSetOptValue(feOptIndex opt, char* optarg)
 {
   if (opt == FE_OPT_UNDEF) return "option undefined";
 
@@ -327,7 +327,7 @@ char* feSetOptValue(feOptIndex opt, char* optarg)
   return feOptAction(opt);
 }
 
-char* feSetOptValue(feOptIndex opt, int optarg)
+const char* feSetOptValue(feOptIndex opt, int optarg)
 {
   if (opt == FE_OPT_UNDEF) return "option undefined";
 
@@ -341,7 +341,7 @@ char* feSetOptValue(feOptIndex opt, int optarg)
   return feOptAction(opt);
 }
 
-static char* feOptAction(feOptIndex opt)
+static const char* feOptAction(feOptIndex opt)
 {
   // do some special actions
   switch(opt)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.56 2008-03-19 17:44:29 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.57 2008-09-10 09:21:29 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -427,7 +427,7 @@ static void debug (int method)
   }
   int pid;
   char buf[16];
-  char * args[4] = { "gdb", "Singularg", NULL, NULL };
+  const char * args[4] = { "gdb", "Singularg", NULL, NULL };
 
   #ifdef HAVE_FEREAD
   if (fe_is_raw_tty) fe_temp_reset();

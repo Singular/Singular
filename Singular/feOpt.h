@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.h,v 1.9 2006-05-29 14:27:53 Singular Exp $ */
+/* $Id: feOpt.h,v 1.10 2008-09-10 09:15:51 Singular Exp $ */
 /*
 * ABSTRACT: Declarations for working with Options
 */
@@ -75,10 +75,10 @@ feOptIndex feGetOptIndex(int optc);
 //         "error-string" on error
 
 // opt->type must be feOptInt or feOptBool
-char* feSetOptValue(feOptIndex opt, int optarg);
+const char* feSetOptValue(feOptIndex opt, int optarg);
 // for opt->type != feOptString, optarg is converted
 // to an int
-char* feSetOptValue(feOptIndex opt, char* optarg);
+const char* feSetOptValue(feOptIndex opt, char* optarg);
 
 void fePrintOptValues();
 
