@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.114 2008-07-16 12:51:19 Singular Exp $ */
+/* $Id: tesths.cc,v 1.115 2008-09-10 09:33:58 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -87,7 +87,7 @@ int main(          /* main entry to Singular */
   siRandomStart=inits();
   feOptSpec[FE_OPT_RANDOM].value = (void*) ((long)siRandomStart);
   int optc, option_index;
-  char* errormsg;
+  const char* errormsg;
 
   // do this first, because -v might print version path
   feInitResources(argv[0]);
