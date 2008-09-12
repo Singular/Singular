@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.65 2008-08-06 13:53:15 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.66 2008-09-12 10:43:58 Singular Exp $ */
 
 #include <config.h>
 
@@ -781,10 +781,16 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
             //if ((f.level()==g.level()) && f.isUnivariate() && g.isUnivariate())
             //  return univarQGCD(f,g);
             //else
-              return QGCD(f,g);
+              //return QGCD(f,g);
+            bool on_rational = isOn(SW_RATIONAL);
+            On(SW_RATIONAL);
+            CanonicalForm r=QGCD(f,g);
+            CanonicalForm cdF = bCommonDen( r );
+            if (!on_rational) Off(SW_RATIONAL);
+            return cdF*r;
           }
         }
-            
+
         if ( f.inExtension() && getReduce( f.mvar() ) )
             return CanonicalForm(1);
         else

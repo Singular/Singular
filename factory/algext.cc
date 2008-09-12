@@ -489,6 +489,7 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
   int p, i;
   int *bound, *other; // degree vectors
   bool fail;
+  bool off_rational=!isOn(SW_RATIONAL);
   On( SW_RATIONAL ); // needed by bCommonDen
   f = F * bCommonDen(F);
   g = G * bCommonDen(G);
@@ -509,6 +510,7 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
       Off( SW_USE_QGCD );
       tmp = gcd( F, G );
       On( SW_USE_QGCD );
+      if (off_rational) Off(SW_RATIONAL);
       return tmp;
     }
   }
@@ -559,6 +561,7 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
       if(fail)
         continue;
       setReduce(a,true);
+      if (off_rational) Off(SW_RATIONAL); else On(SW_RATIONAL);
       return CanonicalForm(1);
     }
     // here: Dp NOT inCoeffDomain
@@ -583,6 +586,7 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
       {
         Off( SW_RATIONAL );
         setReduce(a,true);
+        if (off_rational) Off(SW_RATIONAL); else On(SW_RATIONAL);
         return tmp;
       }
       Off( SW_RATIONAL );
@@ -602,6 +606,7 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
   Off( SW_USE_QGCD );
   D = gcd( f, g );
   On( SW_USE_QGCD );
+  if (off_rational) Off(SW_RATIONAL); else On(SW_RATIONAL);
   return D;
 }
 
