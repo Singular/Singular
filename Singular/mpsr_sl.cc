@@ -6,7 +6,7 @@
  *  Purpose: implementation of sl_link routines for MP
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: mpsr_sl.cc,v 1.9 2008-04-01 17:32:36 wienand Exp $
+ *  Version: $Id: mpsr_sl.cc,v 1.10 2008-09-12 17:03:41 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -452,7 +452,7 @@ LINKAGE BOOLEAN slGetDumpMP(si_link l)
     return FALSE;
 }
 
-LINKAGE const char* slStatusMP(si_link l, char* request)
+LINKAGE const char* slStatusMP(si_link l, const char* request)
 {
   if (strcmp(request, "read") == 0)
   {
