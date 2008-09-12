@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.66 2008-09-12 10:43:58 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.67 2008-09-12 15:47:02 Singular Exp $ */
 
 #include <config.h>
 
@@ -783,8 +783,8 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
             //else
               //return QGCD(f,g);
             bool on_rational = isOn(SW_RATIONAL);
-            On(SW_RATIONAL);
             CanonicalForm r=QGCD(f,g);
+            On(SW_RATIONAL);
             CanonicalForm cdF = bCommonDen( r );
             if (!on_rational) Off(SW_RATIONAL);
             return cdF*r;
