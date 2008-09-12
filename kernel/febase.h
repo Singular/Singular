@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.13 2008-09-10 09:06:37 Singular Exp $ */
+/* $Id: febase.h,v 1.14 2008-09-12 14:13:32 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -111,10 +111,10 @@ extern BOOLEAN feOut;
 extern "C" {
 #endif
 
-void    Werror(const char *fmt, ...);
+void    Werror(const char *fmt, ...) __attribute__((format(printf,1,2)));
 void    WerrorS(const char *s);
 void    WarnS(const char *s);
-void    Print(const char* fmt, ...);
+void    Print(const char* fmt, ...) __attribute__((format(printf,1,2)));
 /* Print should not produce more than strlen(fmt)+510 characters! */
 
 void    PrintNSpaces(const int n);

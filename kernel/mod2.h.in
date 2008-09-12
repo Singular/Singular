@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.26 2008-08-12 10:08:52 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.27 2008-09-12 14:13:32 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -651,5 +651,9 @@ while (0)
 #endif
 #endif
 
+/* If we're not using GNU C, elide __attribute__ */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
 
 #endif /* MOD2_H  */

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.55 2008-08-18 12:25:35 Singular Exp $ */
+/* $Id: structs.h,v 1.56 2008-09-12 14:13:32 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -728,7 +728,7 @@ struct sideal_list
 #ifdef __cplusplus
 extern "C" {
 #endif
-void  m2_end(int i);
+void  m2_end(int i) __attribute__((noreturn));
 #ifdef __cplusplus
 }
 #endif
