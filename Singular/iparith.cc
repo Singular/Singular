@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.478 2008-08-22 09:01:18 Singular Exp $ */
+/* $Id: iparith.cc,v 1.479 2008-09-15 10:08:08 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2468,7 +2468,7 @@ static BOOLEAN jjMONITOR2(leftv res, leftv u,leftv v)
   if (slOpen(l,SI_LINK_WRITE)) return TRUE;
   if(strcmp(l->m->type,"ASCII")!=0)
   {
-    Werror("ASCII link required, not >$s<",l->m->type);
+    Werror("ASCII link required, not `%s`",l->m->type);
     slClose(l);
     return TRUE;
   }
