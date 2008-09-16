@@ -117,7 +117,7 @@ BOOLEAN jjStdJanetBasis(leftv res, leftv v, int flag)
   if ((flag==1) && (!dpO))
   {
     //Print ("interred\n");
-    result=kInterRed(result);
+    result=kInterRedOld(result);
     idSkipZeroes(result);
   }
   res->data = (char *)result;

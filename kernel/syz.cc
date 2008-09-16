@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.15 2008-06-20 16:15:13 Singular Exp $ */
+/* $Id: syz.cc,v 1.16 2008-09-16 12:32:33 Singular Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -316,7 +316,7 @@ static void syMinStep1(resolvente res, int length)
     if (res[index+1]!=NULL)
     {
       deg0 = idJet(res[index+1],0);
-      reddeg0 = kInterRed(deg0);
+      reddeg0 = kInterRedOld(deg0);
       idDelete(&deg0);
       have_del = new intvec(IDELEMS(res[index]));
       for (i=0;i<IDELEMS(reddeg0);i++)
@@ -521,7 +521,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
     }
     if (minim || (syzIndex!=0))
     {
-      temp = kInterRed(res[syzIndex],currQuotient);
+      temp = kInterRedOld(res[syzIndex],currQuotient);
       idDelete(&res[syzIndex]);
       idSkipZeroes(temp);
       res[syzIndex] = temp;

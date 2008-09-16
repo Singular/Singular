@@ -958,7 +958,7 @@ ideal idInterRed(ideal G)
 {
   assume(G != NULL);
 
-  ideal GG = kInterRed(G, NULL);
+  ideal GG = kInterRedOld(G, NULL);
   idDelete(&G);
   return GG;
 }

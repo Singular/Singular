@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.28 2008-08-18 12:25:35 Singular Exp $
+ *  Version: $Id: sca.cc,v 1.29 2008-09-16 12:32:33 Singular Exp $
  *******************************************************************/
 
 // set it here if needed.
@@ -1259,7 +1259,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   /* complete reduction of the standard basis--------- */
   if (TEST_OPT_REDSB){
     ideal I = strat->Shdl;
-    ideal erg = kInterRed(I,tempQ);
+    ideal erg = kInterRedOld(I,tempQ);
     assume(I!=erg);
     id_Delete(&I, currRing);
     strat->Shdl = erg;
@@ -2030,7 +2030,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
   {
     // must be at the very end (after exitBuchMora) as it changes the S set!!!
     ideal I = strat->Shdl;
-    ideal erg = kInterRed(I,tempQ);
+    ideal erg = kInterRedOld(I,tempQ);
     assume(I!=erg);
     id_Delete(&I, currRing);
     strat->Shdl = erg;

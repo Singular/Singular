@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.158 2008-08-18 12:25:35 Singular Exp $ */
+/* $Id: tgb.cc,v 1.159 2008-09-16 12:32:33 Singular Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -3297,8 +3297,9 @@ ideal do_t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode,int deg_pos)
     c->completed=TRUE;
   I=c->S;
   delete c;
-  if (TEST_OPT_REDSB){
-    ideal erg=kInterRed(I,NULL);
+  if (TEST_OPT_REDSB)
+  {
+    ideal erg=kInterRedOld(I,NULL);
     assume(I!=erg);
     id_Delete(&I, currRing);
     return erg;
