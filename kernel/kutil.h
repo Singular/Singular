@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.37 2008-07-09 08:26:30 wienand Exp $ */
+/* $Id: kutil.h,v 1.38 2008-09-16 12:33:18 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -349,8 +349,8 @@ void deleteHC(poly *p, int *e, int *l, kStrategy strat);
 void deleteHC(LObject* L, kStrategy strat, BOOLEAN fromNext = FALSE);
 void deleteInS (int i,kStrategy strat);
 void cleanT (kStrategy strat);
-static inline LSet initL ()
-{ return (LSet)omAlloc(setmaxL*sizeof(LObject)); };
+static inline LSet initL (int nr=setmaxL)
+{ return (LSet)omAlloc(nr*sizeof(LObject)); };
 void deleteInL(LSet set, int *length, int j,kStrategy strat);
 void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at);
 void enterSBba (LObject p,int atS,kStrategy strat, int atR = -1);

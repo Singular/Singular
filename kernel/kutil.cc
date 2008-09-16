@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.107 2008-09-09 15:46:14 Singular Exp $ */
+/* $Id: kutil.cc,v 1.108 2008-09-16 12:33:18 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -5763,9 +5763,9 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   /*- set s -*/
   strat->sl = -1;
   /*- set L -*/
-  strat->Lmax = setmaxL;
+  strat->Lmax = ((IDELEMS(F)+setmaxLinc-1)/setmaxLinc)*setmaxLinc;
   strat->Ll = -1;
-  strat->L = initL();
+  strat->L = initL(((IDELEMS(F)+setmaxLinc-1)/setmaxLinc)*setmaxLinc);
   /*- set B -*/
   strat->Bmax = setmaxL;
   strat->Bl = -1;
