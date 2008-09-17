@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.11 2008-09-10 09:06:37 Singular Exp $ */
+/* $Id: feread.cc,v 1.12 2008-09-17 08:05:12 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -131,7 +131,7 @@ extern "C" {
     extern char ** rl_completion_matches (const char*, RL_PROC);
     extern CPPFunction * rl_attempted_completion_function;
     extern FILE * rl_outstream;
-    extern char * readline (char *);
+    extern char * readline (const char *);
     extern void add_history (char *);
     extern int write_history ();
     extern void using_history();
