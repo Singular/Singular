@@ -41,11 +41,6 @@ if test "$ac_cv_singuname" = ix86-Win; then
   AC_MSG_RESULT(SI_CPU_I386)
 fi
 AC_SUBST(EXEC_EXT)
-if test "$ac_cv_singcpuname" = sparc; then
-  AC_DEFINE(SI_CPU_SPARC)
-  AC_SUBST(SI_CPU_SPARC)
-  AC_MSG_RESULT(SI_CPU_SPARC)
-fi
 if test "$ac_cv_singuname" = x86_64-Linux; then
   AC_DEFINE(SI_CPU_X86_64)
   AC_SUBST(SI_CPU_X86_64)
@@ -77,6 +72,11 @@ if test "$ac_cv_singcpuname" = i386; then
   AC_SUBST(SI_CPU_I386)
   AC_MSG_RESULT(SI_CPU_I386)
 fi
+if test "$ac_cv_singcpuname" = i686; then
+  AC_DEFINE(SI_CPU_I386)
+  AC_SUBST(SI_CPU_I386)
+  AC_MSG_RESULT(SI_CPU_I386)
+fi
 if test "$ac_cv_singcpuname" = x86_64; then
   AC_DEFINE(SI_CPU_X86_64)
   AC_SUBST(SI_CPU_X86_64)
@@ -86,6 +86,11 @@ if test "$ac_cv_singcpuname" = ia64; then
   AC_DEFINE(SI_CPU_IA64)
   AC_SUBST(SI_CPU_IA64)
   AC_MSG_RESULT(SI_CPU_IA64)
+fi
+if test "$ac_cv_singcpuname" = sparc; then
+  AC_DEFINE(SI_CPU_SPARC)
+  AC_SUBST(SI_CPU_SPARC)
+  AC_MSG_RESULT(SI_CPU_SPARC)
 fi
 if test "$ac_cv_singcpuname" = ppc; then
   AC_DEFINE(SI_CPU_PPC)
