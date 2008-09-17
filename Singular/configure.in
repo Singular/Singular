@@ -8,7 +8,7 @@ dnl determine singuname
 dnl
 
 AC_MSG_CHECKING(CPU for singular)
-ac_cv_singcpuname=`uname -p`
+ac_cv_singcpuname=`uname -m`
 AC_MSG_RESULT($ac_cv_singcpuname)
 
 AC_MSG_CHECKING(uname for singular)
@@ -41,7 +41,7 @@ if test "$ac_cv_singuname" = ix86-Win; then
   AC_MSG_RESULT(SI_CPU_I386)
 fi
 AC_SUBST(EXEC_EXT)
-if test "$ac_cv_ac_cv_singcpuname" = sparc; then
+if test "$ac_cv_singcpuname" = sparc; then
   AC_DEFINE(SI_CPU_SPARC)
   AC_SUBST(SI_CPU_SPARC)
   AC_MSG_RESULT(SI_CPU_SPARC)
@@ -67,6 +67,27 @@ if test "$ac_cv_singuname" = ppc-Linux; then
   AC_MSG_RESULT(SI_CPU_PPC)
 fi
 if test "$ac_cv_singuname" = ppcMac-darwin; then
+  AC_DEFINE(SI_CPU_PPC)
+  AC_SUBST(SI_CPU_PPC)
+  AC_MSG_RESULT(SI_CPU_PPC)
+fi
+# test again with CPU names
+if test "$ac_cv_singcpuname" = i386; then
+  AC_DEFINE(SI_CPU_I386)
+  AC_SUBST(SI_CPU_I386)
+  AC_MSG_RESULT(SI_CPU_I386)
+fi
+if test "$ac_cv_singcpuname" = x86_64; then
+  AC_DEFINE(SI_CPU_X86_64)
+  AC_SUBST(SI_CPU_X86_64)
+  AC_MSG_RESULT(SI_CPU_X86_64)
+fi
+if test "$ac_cv_singcpuname" = ia64; then
+  AC_DEFINE(SI_CPU_IA64)
+  AC_SUBST(SI_CPU_IA64)
+  AC_MSG_RESULT(SI_CPU_IA64)
+fi
+if test "$ac_cv_singcpuname" = ppc; then
   AC_DEFINE(SI_CPU_PPC)
   AC_SUBST(SI_CPU_PPC)
   AC_MSG_RESULT(SI_CPU_PPC)
