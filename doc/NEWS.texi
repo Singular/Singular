@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.104 2008-09-09 10:00:56 Singular Exp $
+@comment $Id: NEWS.texi,v 1.105 2008-09-19 14:20:51 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -42,6 +42,12 @@ command changed: the first argument to to @code{monitor} should be an ASCII link
 
 @heading Internal Changes
 @itemize @bullet
+@item
+handling of large input for std improved
+@item
+@nref{interred} implemented in a different way
+@item
+@nref{gcd} over algebraic extensions implemented in a different way
 @item new build target: libsingular.a (for gfan etc.)
 @item code variants depend now on CPU typ, not OS
 @item better test for builtin limits (@nref{Limitations})
