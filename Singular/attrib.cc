@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.29 2008-08-13 15:16:23 Singular Exp $ */
+/* $Id: attrib.cc,v 1.30 2008-09-19 14:06:00 Singular Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -80,7 +80,7 @@ attr sattr::set(const char * s, void * data, int t)
       break;
 #ifdef TEST
     default:
-      ::Print("at-set: unknown type\n",atyp);  /* DEBUG */
+      ::Print("at-set: unknown type(%d)\n",atyp);  /* DEBUG */
 #endif
     } /* end switch: (atyp) */
     omFree((ADDRESS)s);
@@ -218,7 +218,7 @@ void sattr::kill()
     break;
 #ifdef TEST
   default:
-    ::Print("atKill: unknown type\n",atyp);  /* DEBUG */
+    ::Print("atKill: unknown type(%d)\n",atyp);  /* DEBUG */
 #endif
   } /* end switch: (atyp) */
   data=NULL;
