@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: walk.cc,v 1.14 2008-09-10 09:21:29 Singular Exp $ */
+/* $Id: walk.cc,v 1.15 2008-09-19 14:15:14 Singular Exp $ */
 /*
 * ABSTRACT: Implementation of the Groebner walk
 */
@@ -358,28 +358,28 @@ static void TimeString(clock_t tinput, clock_t tostd, clock_t tif,clock_t tstd,
   double ostd,mostd, mif, mstd, mextra, mlf, mred, mnw, mxif,mxstd,mxlf,mxred,mxnw,tot;
 
   Print("\n// total time = %.2f sec", totm);
-  Print("\n// tostd = %.2f sec = %.2f %", ostd=((double) tostd)/1000000,
+  Print("\n// tostd = %.2f sec = %.2f", ostd=((double) tostd)/1000000,
         mostd=((((double) tostd)/1000000)/totm)*100);
-  Print("\n// tif   = %.2f sec = %.2f %", ((double) tif)/1000000,
+  Print("\n// tif   = %.2f sec = %.2f", ((double) tif)/1000000,
         mif=((((double) tif)/1000000)/totm)*100);
-  Print("\n// std   = %.2f sec = %.2f %", ((double) tstd)/1000000,
+  Print("\n// std   = %.2f sec = %.2f", ((double) tstd)/1000000,
         mstd=((((double) tstd)/1000000)/totm)*100);
-  Print("\n// lift  = %.2f sec = %.2f %", ((double) tlf)/1000000,
+  Print("\n// lift  = %.2f sec = %.2f", ((double) tlf)/1000000,
         mlf=((((double) tlf)/1000000)/totm)*100);
-  Print("\n// ired  = %.2f sec = %.2f %", ((double) tred)/1000000,
+  Print("\n// ired  = %.2f sec = %.2f", ((double) tred)/1000000,
         mred=((((double) tred)/1000000)/totm)*100);
-  Print("\n// nextw = %.2f sec = %.2f %", ((double) tnw)/1000000,
+  Print("\n// nextw = %.2f sec = %.2f", ((double) tnw)/1000000,
         mnw=((((double) tnw)/1000000)/totm)*100);
   PrintS("\n Time for the last step:");
-  Print("\n// xinfo = %.2f sec = %.2f %", ((double) xtif)/1000000,
+  Print("\n// xinfo = %.2f sec = %.2f", ((double) xtif)/1000000,
         mxif=((((double) xtif)/1000000)/totm)*100);
-  Print("\n// xstd  = %.2f sec = %.2f %", ((double) xtstd)/1000000,
+  Print("\n// xstd  = %.2f sec = %.2f", ((double) xtstd)/1000000,
         mxstd=((((double) xtstd)/1000000)/totm)*100);
-  Print("\n// xlift = %.2f sec = %.2f %", ((double) xtlift)/1000000,
+  Print("\n// xlift = %.2f sec = %.2f", ((double) xtlift)/1000000,
         mxlf=((((double) xtlift)/1000000)/totm)*100);
-  Print("\n// xired = %.2f sec = %.2f %", ((double) xtred)/1000000,
+  Print("\n// xired = %.2f sec = %.2f", ((double) xtred)/1000000,
         mxred=((((double) xtred)/1000000)/totm)*100);
-  Print("\n// xnextw= %.2f sec = %.2f %", ((double) xtnw)/1000000,
+  Print("\n// xnextw= %.2f sec = %.2f", ((double) xtnw)/1000000,
         mxnw=((((double) xtnw)/1000000)/totm)*100);
 
   tot=mostd+mif+mstd+mlf+mred+mnw+mxif+mxstd+mxlf+mxred+mxnw;
@@ -396,19 +396,19 @@ static void TimeStringFractal(clock_t tinput, clock_t tostd, clock_t tif,clock_t
   double totm = ((double) (clock() - tinput))/1000000;
   double ostd, mostd, mif, mstd, mextra, mlf, mred, mnw, tot, res;
   Print("\n// total time = %.2f sec", totm);
-  Print("\n// tostd = %.2f sec = %.2f %", ostd=((double) tostd)/1000000,
+  Print("\n// tostd = %.2f sec = %.2f", ostd=((double) tostd)/1000000,
         mostd=((((double) tostd)/1000000)/totm)*100);
-  Print("\n// tif   = %.2f sec = %.2f %", ((double) tif)/1000000,
+  Print("\n// tif   = %.2f sec = %.2f", ((double) tif)/1000000,
         mif=((((double) tif)/1000000)/totm)*100);
-  Print("\n// std   = %.2f sec = %.2f %", ((double) tstd)/1000000,
+  Print("\n// std   = %.2f sec = %.2f", ((double) tstd)/1000000,
         mstd=((((double) tstd)/1000000)/totm)*100);
-  Print("\n// xstd  = %.2f sec = %.2f %", ((double) textra)/1000000,
+  Print("\n// xstd  = %.2f sec = %.2f", ((double) textra)/1000000,
         mextra=((((double) textra)/1000000)/totm)*100);
-  Print("\n// lift  = %.2f sec = %.2f %", ((double) tlf)/1000000,
+  Print("\n// lift  = %.2f sec = %.2f", ((double) tlf)/1000000,
         mlf=((((double) tlf)/1000000)/totm)*100);
-  Print("\n// ired  = %.2f sec = %.2f %", ((double) tred)/1000000,
+  Print("\n// ired  = %.2f sec = %.2f", ((double) tred)/1000000,
         mred=((((double) tred)/1000000)/totm)*100);
-  Print("\n// nextw = %.2f sec = %.2f %", ((double) tnw)/1000000,
+  Print("\n// nextw = %.2f sec = %.2f", ((double) tnw)/1000000,
         mnw=((((double) tnw)/1000000)/totm)*100);
   tot = mostd+mif+mstd+mextra+mlf+mred+mnw;
   res = (double) 100.00-tot;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.192 2008-08-13 15:16:23 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.193 2008-09-19 14:15:14 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -131,9 +131,9 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
                       }
                     }
                     break;
-    case MODUL_CMD: Print(", rk %d", IDIDEAL(h)->rank);
+    case MODUL_CMD: Print(", rk %d", (int)(IDIDEAL(h)->rank));
     case IDEAL_CMD: Print(", %u generator(s)",
-                    IDELEMS(IDIDEAL(h)),IDIDEAL(h)->rank); break;
+                    IDELEMS(IDIDEAL(h))); break;
     case MAP_CMD:
                     Print(" from %s",IDMAP(h)->preimage); break;
     case MATRIX_CMD:Print(" %u x %u"
@@ -186,7 +186,7 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
                      PrintS("(*)"); /* this is an alias to currRing */
 #ifdef RDEBUG
                    if (traceit &TRACE_SHOW_RINGS)
-                     Print(" <%x>",IDRING(h));
+                     Print(" <%lx>",(long)(IDRING(h)));
 #endif
                    break;
     /*default:     break;*/
@@ -5048,7 +5048,7 @@ void rKill(ring r)
   if ((r->ref<=0)&&(r->order!=NULL))
   {
 #ifdef RDEBUG
-    if (traceit &TRACE_SHOW_RINGS) Print("kill ring %x\n",r);
+    if (traceit &TRACE_SHOW_RINGS) Print("kill ring %lx\n",(long)r);
 #endif
     if (r==currRing)
     {

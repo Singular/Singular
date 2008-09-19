@@ -632,8 +632,8 @@ void listall(int showproc)
           if (IDDATA(hh)==(void *)currRing) PrintS("(R)");
           else if (IDDATA(hh)==(void *)currPack) PrintS("(P)");
           else PrintS("   ");
-          Print("::%s, typ %s level %d data %x",
-                 IDID(hh),Tok2Cmdname(IDTYP(hh)),IDLEV(hh),IDDATA(hh));
+          Print("::%s, typ %s level %d data %lx",
+                 IDID(hh),Tok2Cmdname(IDTYP(hh)),IDLEV(hh),(long)IDDATA(hh));
           if ((IDTYP(hh)==RING_CMD)
           || (IDTYP(hh)==QRING_CMD))
             Print(" ref: %d\n",IDRING(hh)->ref);
@@ -646,8 +646,8 @@ void listall(int showproc)
       while (hh!=NULL)
       {
         if (IDDATA(hh)==(void *)basePack)
-          Print("(T)::%s, typ %s level %d data %x\n",
-          IDID(hh),Tok2Cmdname(IDTYP(hh)),IDLEV(hh),IDDATA(hh));
+          Print("(T)::%s, typ %s level %d data %lx\n",
+          IDID(hh),Tok2Cmdname(IDTYP(hh)),IDLEV(hh),(long)IDDATA(hh));
         else
         if ((IDTYP(hh)==RING_CMD)
         || (IDTYP(hh)==QRING_CMD)
@@ -664,15 +664,15 @@ void listall(int showproc)
                 PrintS("(R)");
               else if (IDDATA(h2)==(void *)currPack) PrintS("(P)");
               else PrintS("   ");
-              Print("%s::%s, typ %s level %d data %x\n",
-              IDID(hh),IDID(h2),Tok2Cmdname(IDTYP(h2)),IDLEV(h2),IDDATA(h2));
+              Print("%s::%s, typ %s level %d data %lx\n",
+              IDID(hh),IDID(h2),Tok2Cmdname(IDTYP(h2)),IDLEV(h2),(long)IDDATA(h2));
             }
             h2=IDNEXT(h2);
           }
         }
         hh=IDNEXT(hh);
       }
-      Print("currRing:%x, currPack:%x,basePack:%x\n",currRing,currPack,basePack);
+      Print("currRing:%lx, currPack:%lx,basePack:%lx\n",(long)currRing,(long)currPack,(long)basePack);
       iiCheckPack(currPack);
 }
 #ifndef NDEBUG

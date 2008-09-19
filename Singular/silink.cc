@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.49 2008-09-10 09:18:01 Singular Exp $ */
+/* $Id: silink.cc,v 1.50 2008-09-19 14:15:14 Singular Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -452,7 +452,7 @@ leftv slReadAscii2(si_link l, leftv pr)
     fseek(fp,0L,SEEK_SET);
     buf=(char *)omAlloc((int)len+1);
     if (BVERBOSE(V_READING))
-      Print("//Reading %d chars\n",len);
+      Print("//Reading %ld chars\n",len);
     myfread( buf, len, 1, fp);
     buf[len]='\0';
   }
