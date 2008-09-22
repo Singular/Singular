@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.cc,v 1.13 2008-06-19 15:58:18 Singular Exp $ */
+/* $Id: cf_algorithm.cc,v 1.14 2008-09-22 16:27:17 Singular Exp $ */
 
 //{{{ docu
 //
@@ -29,6 +29,8 @@
 #include "variable.h"
 #include "cf_iter.h"
 #include "ftmpl_functions.h"
+
+void out_cf(char *s1,const CanonicalForm &f,char *s2);
 
 //{{{ CanonicalForm psr ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 //{{{ docu
@@ -108,26 +110,33 @@ psr ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
     }
 }
 #else
-psr ( const CanonicalForm &rr, const CanonicalForm &vv, const Variable & x ){
+psr ( const CanonicalForm &rr, const CanonicalForm &vv, const Variable & x )
+{
   CanonicalForm r=rr, v=vv, l, test, lu, lv, t, retvalue;
   int dr, dv, d,n=0;
 
 
   dr = degree( r, x );
-  dv = degree( v, x );
-  if (dv <= dr) {l=LC(v,x); v = v -l*power(x,dv);}
-  else { l = 1; }
-  d= dr-dv+1;
-  while ( ( dv <= dr  ) && ( r != r.genZero()) )
+  if (dr>0)
   {
-    test = power(x,dr-dv)*v*LC(r,x);
-    if ( dr == 0 ) { r= CanonicalForm(0); }
-    else { r= r - LC(r,x)*power(x,dr); }
-    r= l*r -test;
-    dr= degree(r,x);
-    n+=1;
+    dv = degree( v, x );
+    if (dv <= dr) {l=LC(v,x); v = v -l*power(x,dv);}
+    else { l = 1; }
+    d= dr-dv+1;
+    //out_cf("psr(",rr," ");
+    //out_cf("",vv," ");
+    //printf(" var=%d\n",x.level());
+    while ( ( dv <= dr  ) && ( !r.isZero()) )
+    {
+      test = power(x,dr-dv)*v*LC(r,x);
+      if ( dr == 0 ) { r= CanonicalForm(0); }
+      else { r= r - LC(r,x)*power(x,dr); }
+      r= l*r -test;
+      dr= degree(r,x);
+      n+=1;
+    }
+    r= power(l, d-n)*r;
   }
-  r= power(l, d-n)*r;
   return r;
 }
 #endif
