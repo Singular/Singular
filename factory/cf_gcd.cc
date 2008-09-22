@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.67 2008-09-12 15:47:02 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.68 2008-09-22 16:26:42 Singular Exp $ */
 
 #include <config.h>
 
@@ -374,11 +374,13 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
         bi = 1;
     else
         bi = -1;
-    while ( degree( pi1, v ) > 0 ) {
+    while ( degree( pi1, v ) > 0 )
+    {
         pi2 = psr( pi, pi1, v );
         pi2 = pi2 / bi;
         pi = pi1; pi1 = pi2;
-        if ( degree( pi1, v ) > 0 ) {
+        if ( degree( pi1, v ) > 0 )
+        {
             delta = degree( pi, v ) - degree( pi1, v );
             if ( (delta+1) % 2 )
                 bi = LC( pi, v ) * power( Hi, delta );
