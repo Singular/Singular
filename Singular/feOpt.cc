@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.23 2008-09-10 09:15:52 Singular Exp $ */
+/* $Id: feOpt.cc,v 1.24 2008-09-22 17:24:03 Singular Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
@@ -491,7 +491,7 @@ void fePrintOptValues()
       }
       else
       {
-        Print("// --%-15s %d\n", feOptSpec[i].name, feOptSpec[i].value);
+        Print("// --%-15s %d\n", feOptSpec[i].name, (int)(long)feOptSpec[i].value);
       }
     }
     i++;
