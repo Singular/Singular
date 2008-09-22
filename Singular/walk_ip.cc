@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: walk_ip.cc,v 1.1 2005-05-05 13:45:45 Singular Exp $ */
+/* $Id: walk_ip.cc,v 1.2 2008-09-22 11:43:59 Singular Exp $ */
 /*
 * ABSTRACT: frwalk: interpreter link
 */
@@ -261,7 +261,7 @@ fractalWalkProc(leftv first, leftv second)
             break;
 
         case WalkOverFlowError:
-            Werror( "Overflow occured.\n", first->Name() );
+            Werror( "Overflow occured in ring %s.\n", first->Name() );
             rSetHdl(destRingHdl);
             destIdeal= idInit(0,0);
             return destIdeal;
