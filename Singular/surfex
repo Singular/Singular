@@ -15,4 +15,4 @@ read surfexstartdir <$tmp_dir/tmp.$$.txt
 /bin/rm $tmp_dir/tmp.$$.txt
 cd "$surfex_dir"
 str_exe=$surfex_call$allargs
-java surfex -d "$surfexstartdir" -t "$tmp_dir" $allargs
+java -jar surfex.jar -d "$surfexstartdir" -t "$tmp_dir" $allargs
