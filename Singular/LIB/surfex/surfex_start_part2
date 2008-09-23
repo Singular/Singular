@@ -1,9 +1,6 @@
 # the temporary directory in which surfex stores temporary image files etc.:
 tmp_dir=/tmp
 
-# the java call needed to call surfex from within $surfex_dir:
-surfex_call="java surfex"
-
 # the standard equation which will be displayed 
 # if the user does not specify an equation or filename:
 std_eqn="x^3+y^3+z^3+1-0.25*(x+y+z+1)^3"
@@ -44,10 +41,7 @@ read surfexstartdir <$tmp_dir/tmp.txt
 cd "$surfex_dir"
 
 # call the java program surfex:
-str_exe=$surfex_call$allargs
-# print the result of this call to the shell:
-#echo $str_exe
-java surfex -d "$surfexstartdir" -t "$tmp_dir" $allargs
+java -jar surfex.jar -d "$surfexstartdir" -t "$tmp_dir" $allargs
 
 #
 # end of the surfex startscript
