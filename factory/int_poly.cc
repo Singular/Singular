@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.cc,v 1.21 2008-06-25 13:53:20 Singular Exp $ */
+/* $Id: int_poly.cc,v 1.22 2008-09-23 11:47:30 Singular Exp $ */
 
 #include <config.h>
 
@@ -223,7 +223,7 @@ InternalPoly::print(OSTREAM &aStream, char * aString )
 InternalCF *
 InternalPoly::neg ()
 {
-    if ( getRefCount() == 1 )
+    if ( getRefCount() <= 1 )
     {
         negateTermList( firstTerm );
         return this;
@@ -258,7 +258,7 @@ InternalCF*
 InternalPoly::addsame( InternalCF* aCoeff )
 {
     InternalPoly * aPoly = (InternalPoly*)aCoeff;
-    if ( getRefCount() == 1 )
+    if ( getRefCount() <= 1 )
     {
         firstTerm = addTermList( firstTerm, aPoly->firstTerm, lastTerm, false );
         if ( firstTerm && firstTerm->exp != 0 )
@@ -298,7 +298,7 @@ InternalCF*
 InternalPoly::subsame( InternalCF* aCoeff )
 {
     InternalPoly * aPoly = (InternalPoly*)aCoeff;
-    if ( getRefCount() == 1 )
+    if ( getRefCount() <= 1 )
     {
         firstTerm = addTermList( firstTerm, aPoly->firstTerm, lastTerm, true );
         if ( firstTerm && firstTerm->exp != 0 )
@@ -352,7 +352,7 @@ InternalPoly::mulsame( InternalCF* aCoeff )
     {
         resultFirst = reduceTermList( resultFirst, (getInternalMipo( var ))->firstTerm, resultLast );
         if ( resultFirst == 0 )
-            if ( getRefCount() == 1 )
+            if ( getRefCount() <= 1 )
             {
                 delete this;
                 return CFFactory::basic(0);
@@ -363,7 +363,7 @@ InternalPoly::mulsame( InternalCF* aCoeff )
                 return CFFactory::basic(0);
             }
         else  if ( resultFirst->exp == 0 )
-            if ( getRefCount() == 1 )
+            if ( getRefCount() <= 1 )
             {
                 InternalCF * res = resultFirst->coeff.getval();
                 delete resultFirst;
@@ -378,7 +378,7 @@ InternalPoly::mulsame( InternalCF* aCoeff )
                 return res;
             }
     }
-    if ( getRefCount() == 1 )
+    if ( getRefCount() <= 1 )
     {
         freeTermList( firstTerm );
         firstTerm = resultFirst;
@@ -407,7 +407,7 @@ InternalPoly::divsame( InternalCF* aCoeff )
         InternalCF * dummy = aCoeff->invert();
         if (is_imm(dummy)) dummy=this->mulsame(dummy);
         else dummy = dummy->mulsame( this );
-        if ( getRefCount() == 1 )
+        if ( getRefCount() <= 1 )
         {
              delete this;
              return dummy;
@@ -424,7 +424,7 @@ InternalPoly::divsame( InternalCF* aCoeff )
     int exp, newexp;
     bool singleObject;
 
-    if ( getRefCount() == 1 )
+    if ( getRefCount() <= 1 )
     {
         first = firstTerm; last = lastTerm; singleObject = true;
     }
@@ -505,7 +505,7 @@ InternalPoly::modsame( InternalCF* aCoeff )
     int exp, newexp;
     bool singleObject;
 
-    if ( getRefCount() == 1 )
+    if ( getRefCount() <= 1 )
     {
         first = firstTerm; last = lastTerm; singleObject = true;
     }
@@ -762,7 +762,7 @@ InternalPoly::addcoeff( InternalCF* cc )
         return this;
     else
     {
-        if ( getRefCount() == 1 )
+        if ( getRefCount() <= 1 )
         {
             if ( lastTerm->exp == 0 )
             {
@@ -830,7 +830,7 @@ InternalPoly::subcoeff( InternalCF* cc, bool negate )
         }
     else
     {
-        if ( getRefCount() == 1 )
+        if ( getRefCount() <= 1 )
         {
             if ( lastTerm->exp == 0 )
             {
@@ -903,7 +903,7 @@ InternalPoly::mulcoeff( InternalCF* cc )
     CanonicalForm c( is_imm(cc) ? cc : cc->copyObject() );
     if ( c.isZero() )
     {
-        if ( getRefCount() == 1 )
+        if ( getRefCount() <= 1 )
         {
             delete this;
             return CFFactory::basic( 0 );
@@ -918,7 +918,7 @@ InternalPoly::mulcoeff( InternalCF* cc )
         return this;
     else
     {
-        if ( getRefCount() == 1 )
+        if ( getRefCount() <= 1 )
         {
             mulTermList( firstTerm, c, 0 );
             return this;
@@ -952,7 +952,7 @@ InternalPoly::dividecoeff( InternalCF* cc, bool invert )
             dummy=cc->mulcoeff(dummy);
         }
         else dummy = dummy->mulcoeff( cc );
-        if ( getRefCount() == 1 )
+        if ( getRefCount() <= 1 )
         {
             delete this;
             return dummy;
@@ -964,7 +964,7 @@ InternalPoly::dividecoeff( InternalCF* cc, bool invert )
         }
     }
     if ( invert )
-        if ( getRefCount() == 1 )
+        if ( getRefCount() <= 1 )
         {
             delete this;
             return CFFactory::basic( 0 );
@@ -978,7 +978,7 @@ InternalPoly::dividecoeff( InternalCF* cc, bool invert )
         return this;
     else
     {
-        if ( getRefCount() == 1 )
+        if ( getRefCount() <= 1 )
         {
             firstTerm = divideTermList( firstTerm, c, lastTerm );
             if ( firstTerm && firstTerm->exp != 0 )
@@ -1026,7 +1026,7 @@ InternalPoly::divcoeff( InternalCF* cc, bool invert )
         InternalCF * dummy;
         dummy = this->invert();
         dummy = dummy->mulcoeff( cc );
-        if ( getRefCount() == 1 )
+        if ( getRefCount() <= 1 )
         {
             delete this;
             return dummy;
@@ -1038,7 +1038,7 @@ InternalPoly::divcoeff( InternalCF* cc, bool invert )
         }
     }
     if ( invert )
-        if ( getRefCount() == 1 )
+        if ( getRefCount() <= 1 )
         {
             delete this;
             return CFFactory::basic( 0 );
@@ -1052,7 +1052,7 @@ InternalPoly::divcoeff( InternalCF* cc, bool invert )
         return this;
     else
     {
-        if ( getRefCount() == 1 )
+        if ( getRefCount() <= 1 )
         {
             firstTerm = divTermList( firstTerm, c, lastTerm );
             if ( firstTerm && firstTerm->exp != 0 )
@@ -1117,7 +1117,7 @@ InternalPoly::modcoeff( InternalCF* cc, bool invert )
     ASSERT( ! c.isZero(), "divide by zero!" );
     if ( c.isOne() )
     {
-        if ( getRefCount() == 1 )
+        if ( getRefCount() <= 1 )
         {
             delete this;
             return CFFactory::basic( 0 );
@@ -1130,7 +1130,7 @@ InternalPoly::modcoeff( InternalCF* cc, bool invert )
     }
     else
     {
-        if ( getRefCount() == 1 )
+        if ( getRefCount() <= 1 )
         {
             firstTerm = modTermList( firstTerm, c, lastTerm );
             if ( firstTerm && firstTerm->exp != 0 )
