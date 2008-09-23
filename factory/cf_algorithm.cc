@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.cc,v 1.15 2008-09-23 11:46:54 Singular Exp $ */
+/* $Id: cf_algorithm.cc,v 1.16 2008-09-23 12:18:45 Singular Exp $ */
 
 //{{{ docu
 //
@@ -124,9 +124,9 @@ psr ( const CanonicalForm &rr, const CanonicalForm &vv, const Variable & x )
     if (dv <= dr) {l=LC(v,x); v = v -l*power(x,dv);}
     else { l = 1; }
     d= dr-dv+1;
-    out_cf("psr(",rr," ");
-    out_cf("",vv," ");
-    printf(" var=%d\n",x.level());
+    //out_cf("psr(",rr," ");
+    //out_cf("",vv," ");
+    //printf(" var=%d\n",x.level());
     while ( ( dv <= dr  ) && ( !r.isZero()) )
     {
       test = power(x,dr-dv)*v*LC(r,x);
