@@ -1,0 +1,107 @@
+light1_x =-100.0;
+light1_y =100.0;
+light1_z =100.0;
+light1_vol =50;
+light1_red =255;
+light1_green =255;
+light1_blue =255;
+light2_x =5.773502;
+light2_y =5.773502;
+light2_z =5.773502;
+light2_vol =70;
+light2_red =255;
+light2_green =255;
+light2_blue =255;
+light3_x =0.0;
+light3_y =-100.0;
+light3_z =100.0;
+light3_vol =30;
+light3_red =255;
+light3_green =255;
+light3_blue =255;
+light4_x =0.0;
+light4_y =0.0;
+light4_z =0.0;
+light4_vol =0;
+light4_red =0;
+light4_green =0;
+light4_blue =0;
+light5_x =0.0;
+light5_y =0.0;
+light5_z =0.0;
+light5_vol =0;
+light5_red =0;
+light5_green =0;
+light5_blue =0;
+light6_x =0.0;
+light6_y =0.0;
+light6_z =0.0;
+light6_vol =0;
+light6_red =0;
+light6_green =0;
+light6_blue =0;
+light7_x =0.0;
+light7_y =0.0;
+light7_z =0.0;
+light7_vol =0;
+light7_red =0;
+light7_green =0;
+light7_blue =0;
+light8_x =0.0;
+light8_y =0.0;
+light8_z =0.0;
+light8_vol =0;
+light8_red =0;
+light8_green =0;
+light8_blue =0;
+light9_x =0.0;
+light9_y =0.0;
+light9_z =0.0;
+light9_vol =0;
+light9_red =0;
+light9_green =0;
+light9_blue =0;
+root_finder = d_chain_bisection; epsilon = 0.00000001;
+illumination = ambient_light + diffuse_light + reflected_light + transmitted_light;
+ambient      = 40;
+diffuse      = 80;
+reflected    = 80;
+transmitted  = 20;
+smoothness   = 50;
+transparence = 0;
+thickness = 10;
+antialiasing = 6;
+background_red=49; background_green=39; background_blue=6;
+width=240; height=240;
+rot_x=0.0; rot_y=0.0; rot_z=0.0;
+scale_x=0.3556187766714083; scale_y=0.3556187766714083; scale_z=0.3556187766714083;
+poly xx=z-1+sqrt(2)*x; poly yy=z-1-sqrt(2)*x; poly zz=-(z+1+sqrt(2)*y); poly ww=-(z+1-sqrt(2)*y);
+double PI = 2*arcsin(1);
+// the parameters:
+double p1=1.0;
+p1=sin(PI*p1);
+
+
+// the equations:
+poly f1 = x^2+y^2-1*z^3-1*p1*z^2;
+surface = f1;surface_red = 255;surface_green = 102;surface_blue = 255;inside_red = 255;inside_green = 204;inside_blue = 255;transparence = 0;
+
+
+// the solitary points (shown as spheres):
+
+// the rotation:
+surface=rotate(surface,0.0,yAxis);surface=rotate(surface,0.0,xAxis);surface=rotate(surface,0.0,zAxis);
+surface=rotate(surface,1.0834624855290231,yAxis);surface=rotate(surface,-1.3835481931694011,xAxis);surface=rotate(surface,-1.108735034549833,zAxis);
+clip = 0;
+radius = 10.0;
+
+// the rotation:
+draw_surface;
+
+// the curves:
+
+// save the image:
+filename="/home/labs/mytools/surfex_0_89_07/examples/A2_A1_bg_dark_olive.jpg";
+color_file_format=jpg;
+save_color_image;
+

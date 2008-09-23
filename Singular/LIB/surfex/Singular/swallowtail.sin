@@ -1,0 +1,32 @@
+LIB "all.lib";
+LIB "surfex.lib";
+
+ring r = 0,(a,x,y,z),dp;
+
+poly f = a^4+z*a^2+y*a+x;
+
+ideal j = f, diff(f,a);
+short = 0;
+ideal discriminant = eliminate(j,a);
+poly swallowtail = discriminant[1];
+swallowtail;
+ideal sl = slocus(swallowtail);
+std_primdecGTZ(sl,3);
+
+poly ptOnRealIso = substitute(f, x, 1/4, z, -1, y, 0);
+factorize(ptOnRealIso);
+$;
+
+if(1) {
+    "The swallowtail:";
+    ring r = 0,(x,y,z),dp;
+    poly swallowtail = -4*y^2*z^3-16*x*z^4+27*y^4+144*x*y^2*z+128*x^2*z^2-256*x^3;
+
+    "only show the real 2-dimesional part:";
+//    plotRotated(swallowtail, list(x,y,z),0);
+
+    "also show the real 1-dimensional parts:";
+    plotRotated(swallowtail, list(x,y,z),2);
+}
+
+$;

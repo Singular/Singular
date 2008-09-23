@@ -1,0 +1,1490 @@
+//last change: 2007/07/06 (Oliver Labs)
+///////////////////////////////////////////////////////////////////////////////
+version="$Id: surfex.lib,v 1.1 2008-09-23 11:12:53 Singular Exp $";
+category="Visualization";
+info="
+LIBRARY: surfex.lib    
+	 Procedures for Visualizing Surfaces.
+         This is still an alpha version! Please, send me any comments
+         or suggestions via http://www.AlgebraicSurface.net 
+         Thank you!!!
+AUTHOR: Oliver Labs
+        This library uses the program surfex.
+        surfex is written by Oliver Labs and others, 
+        mainly Stephan Holzer.
+	It is based on some other tools, mainly 
+        surf which was written by Stefan Endrass and others.
+        Some of the code is based on the code in surf.lib
+
+NOTE:
+ Many procedures of this library require the program surfex 
+ to be installed.
+ This software is used for producing raytraced images of the surfaces.
+ You can download @code{surfex} from @uref{http://www.surfex.AlgebraicSurface.net}.
+ 
+ surfex is a front-end for surf which aims to be easier to use than 
+ the original tool. In the future, we plan to extend it to a tool which 
+ can use other appropriate programs for producing the best visualization. 
+ Please, contact me via @uref{http://www.surfex.AlgebraicSurface.net} 
+ if you have any questions or suggestions,
+
+ Oliver Labs
+ 
+PROCEDURES:
+proc plotRotated(poly p, list coords, list #) 
+               Plot the surface given by the polynomial p 
+               with the coordinates coords.
+proc plotRot(poly p, list #) 
+               Similar to plotRotated, but tries to guess automatically 
+               which coordinates should be used. 
+proc plotRotatedList(list varieties, list coords, list #);
+               Plot the varieties given by the list varieties 
+               with the coordinates coords.
+proc plotRotatedDirect(list varietiesList, list #);
+               Plot the varieties given by the list varietiesList.
+               varietiesList has a complicated format.
+               The procedure passes the data directly to surfex.
+               Thus, the coordinates have to be x,y,z.
+               Parameters are allowed; their names have to be p1, p2, ...
+proc plotRotatedListFromSpecifyList(list varietiesList, list #) ;
+               Plot the varieties given by the list varietiesList.
+               varietiesList has a complicated format; see the example.
+";
+
+LIB "solve.lib";
+LIB "primdec.lib";
+LIB "sing.lib";
+
+///////////////////////////////////////////////////////////
+//
+// the main procedures:
+//
+
+proc plotRot(poly p, list #) 
+"
+USAGE: plotRot(poly p, list #)
+Similar to plotRotated, but tries to guess automatically 
+which coordinates should be used. 
+
+It opens the external program surfex for drawing the surface given by p, 
+seen as a surface in the real affine space with coordinates coords.
+
+RETURN: the return code of the system command which executes surfex.
+
+ASSUME: The basering is characteristic zero and without parameters.
+"
+{
+    list coords = list();
+    if(num_vars_id(p)==3) {
+	execute("coords = "+string_of_vars(p)+";");
+    } else {
+	if(num_vars_id(p)<3) {
+	    if(nvars(basering)==3) {
+		execute("coords = "+varstr(basering)+";");
+	    } else {
+		if(nvars(basering)<3) {
+		    "Could not guess the coordinates because the number of variables in the basering is smaller than 3!";
+		    "Please use plotRotated() instead of plotRot() and specify the coordinates explicitly.";
+		    return(0);
+		} else {
+		    "Could not guess the coordinates because the number of variables in the polynomial is smaller than 3 and the number of variables in the basering is greater than three!";
+		    "Please use plotRotated() instead of plotRot() and specify the coordinates explicitly.";
+		    return(0);
+		}
+	    }
+	} else {
+	    "Could not guess the coordinates because the number of variables in the polynomial is greater than 3!";
+		    "Please use plotRotated() instead of plotRot() and specify the coordinates explicitly.";
+	    return(0);
+	}
+    }
+    return(plotRotatedList(list(p), coords, #));
+}
+example {
+    "Example:"; echo=2;
+
+    // More variables in the basering, but only 3 variables in the polynomial:
+    ring r1 = 0, (w,x,y,z), dp; 
+    poly cayley_cubic = x^3+y^3+z^3+1^3-1/4*(x+y+z+1)^3;
+    plotRot(cayley_cubic);
+
+    // Three variables in the basering, but fewer variables in the polynomial:
+    ring r2 = 0, (x,y,z), dp; 
+    plotRot(x^2+y^2-1);
+    plotRot(y^2+z^2-1);
+
+    // A cubic surface with a solitary point:
+    // Use the additional parameter 3 to ask singular
+    // to compute the singular locus before calling surfex.
+    ring r3 = 0, (x,y,z), dp;  
+    poly kn_10 = x^3-3*x*y^2+z^3+3*x^2+3*y^2+z^2;
+    plotRot(kn_10, 3);
+
+    // The swallowtail:
+    // a surface with a real solitary curve sticking out of the surface.
+    // Use the additional parameter 3 to ask singular
+    // to compute the singular locus before calling surfex.
+    poly swallowtail = -4*y^2*z^3-16*x*z^4+27*y^4+144*x*y^2*z+128*x^2*z^2-256*x^3;
+    plotRot(swallowtail, 3);
+}
+
+proc plotRotated(poly p, list coords, list #) 
+"
+USAGE: plotRotated(poly p, list coords, list #)
+This opens the external program surfex for drawing the surface given by p, 
+seen as a surface in the real affine space with coordinates coords.
+
+RETURN: the return code of the system command which executes surfex.
+
+ASSUME: coords is a list of three variables.
+The basering is characteristic zero and without parameters.
+"
+{
+    return(plotRotatedList(list(p), coords, #));
+}
+example {
+    "Example:"; echo=2;
+
+    // An easy example: a surface with four conical nodes.
+    ring r = 0, (x,y,z), dp; 
+    poly cayley_cubic = x^3+y^3+z^3+1^3-1/4*(x+y+z+1)^3;
+//     plotRotated(cayley_cubic, list(x,y,z));
+
+    // An difficult example: a surface with a one-dimensional real component!
+    poly whitney_umbrella = x^2*z-y^2;
+    // The Whitney Umbrella without its handle:
+    plotRotated(whitney_umbrella, list(x,y,z));
+    // The Whitney Umbrella together with its handle:
+    plotRotated(whitney_umbrella, list(x,y,z), 2);
+}
+
+
+proc plotRotatedList(list varieties, list coords, list #) 
+"
+USAGE: plotRotatedList(list varieties, list coords, list #)
+This opens the external program surfex for drawing the surfaces given by varieties, 
+seen as a surface in the real affine space with coordinates coords.
+
+RETURN: the return code of the system command which executes surfex.
+
+ASSUME: coords is a list of three variables,
+varieties is a list of ideals discribing the varieties to be shown.
+The basering is characteristic zero and without parameters.
+"
+{
+    def oring = basering;
+
+    int plotquality = 0;
+    if(size(#)>0) {
+	plotquality = #[1];
+    }
+
+    list varietiesList = list(list(), list(), list(), list());
+    list usedSurfaces = list();
+    list curveColors = list();
+    
+    // go through the list of varieties 
+    // produce a list which can be used as input for plotRotatedListFromList()
+    int i;
+    int j;
+    list indList;
+    int ind;
+    ideal itmp;
+    int ncurves;
+    list pd;
+    int k;
+    int surfind;
+    list curSurfColors = list();
+
+    list listOfPoints = list();
+    string str_I = "";
+    
+    for(i=1; i<=size(varieties); i++) {
+	itmp = varieties[i];
+	if(plotquality>=3) {
+	    itmp = radical(itmp);
+	}
+	itmp = simplify(itmp,1);
+	itmp = simplify(itmp,2);
+	if(size(itmp)==1) { // i.e.: a surface given by one equation
+	    surfind = findInList(surfEqn(itmp[1],coords), usedSurfaces);
+	    if(surfind==0) {
+		usedSurfaces = usedSurfaces + list(surfEqn(itmp[1],coords));
+		curSurfColors = list(list("insidecolor:",getInsideColorStr(size(varietiesList[1])+1)),
+				     list("outsidecolor:",getOutsideColorStr(size(varietiesList[1])+1)));
+		varietiesList[1] = varietiesList[1] + 
+		    list(list(list("eqno:",string(size(varietiesList[1])+1)),
+			      list("equation:",surfEqn(itmp[1], coords)),
+			      curSurfColors[1],
+			      curSurfColors[2],
+			      list("showcbox:","true"),
+			      list("transparency:","0")));
+		surfind = size(varietiesList[1]);
+			      
+	    }
+	    if(plotquality==1) {
+		varieties = varieties + list(slocus(itmp[1]));
+	    }
+	    if(plotquality==2 || plotquality==3) {
+		// remove doubled components and 
+		// add the 1-dimensional singular components 
+		// of the surface to the list of curves:
+		int dsl = dim_slocus(itmp[1]);
+		dsl;
+		if(dsl>=0) { // i.e. there is a singular locus
+		    "compute singular locus...";
+		    list eqd;
+                    // 
+		    eqd = equidim(slocus(itmp[1]));
+		    ideal tmp_l;
+		    tmp_l = std(eqd[size(eqd)]);
+		    "dim:",dim(tmp_l);
+		    if(dim(tmp_l)==(nvars(basering)-3+2)) {
+			"--- 2-dim.";
+			// we have found a multiple component; 
+			// replace it by a simple copy of it
+			itmp = quotient(itmp[1], tmp_l);
+			varieties[i] = itmp[1];
+			eqd = delete(eqd,size(eqd));
+			if(size(eqd)>0) {
+			    tmp_l = std(eqd[size(eqd)]);
+			}
+		    }
+		    if(dim(tmp_l)==(nvars(basering)-3+1)) {
+			"--- 1-dim.";
+			// we have found a 1-dimensional singular locus
+			pd = std_primdecGTZ(tmp_l,2);
+			for(k=1; k<=size(pd); k++) {
+			    if(pd[k][3]==(nvars(basering)-3+1)) {
+				varieties = varieties + list(pd[k][2]);
+				curveColors[size(varieties)] = curSurfColors;
+			    } else {
+				"???";
+			    }
+			}
+			eqd = delete(eqd,size(eqd));
+			if(size(eqd)>0) {
+			    tmp_l = std(eqd[size(eqd)]);
+			}
+		    }
+		    if(dim(tmp_l)==(nvars(basering)-3+0)) {
+			"--- 0-dim.";
+			// we have found a 0-dimensional singular locus
+			// we compute floating point approximations of the 
+			// coordinates of all singular points
+			if(npars(oring)>0) {
+			    "str:",parstr(1),rootminpoly();
+			    list all_real_sols = allroots_minpoly();
+//			    "all sols:";all_real_sols;
+//			    sprintf("number %s = %s; ", parstr(1), rootminpoly());
+			    int minp;
+			    if((npars(basering) == 1) && (minpoly != 0)) {
+				minp = 1;
+			    } else {
+				minp = 0;
+			    }
+			    str_I = "";
+			    if(minp==1) {
+				"minp=1";
+				string str_para = parstr(1);
+				string str_tmp_l;
+				def cur_ring = basering;
+				if(1) {
+				    short=0;
+				    str_tmp_l = "ideal eqd_tmp = "+
+//					string(tmp_l)+","+string(minpoly)+";";
+					string(tmp_l);
+				    "str:",str_tmp_l;
+				    string str_num_mp = "number "+parstr(1)+"="+
+					decstr2ratstr(rootminpoly())+";";
+				    execute("ring Iring = 0,("
+//					    +string(coords)+","+str_para+"),dp;");
+					    +string(coords)+"),dp;");
+				    basering;
+				    execute(str_num_mp);
+				    execute(str_tmp_l);
+				    eqd_tmp;
+				    list real_sols = real_solve(eqd_tmp);
+				    real_sols;
+				    $;
+				    setring cur_ring;
+				}
+			    } else {
+				// minp==0: we do not know how to handle this
+				"???";
+			    }
+			} else {
+			    "no pars";
+			    ideal eqd_tmp = tmp_l;
+			    short=0;
+			    string str_tmp_l = "ideal eqd_tmp = "+string(tmp_l)+";";
+			    def cur_ring = basering;
+			    execute("ring Iring = (real,30),("+string(coords)+"),("+ordstr(oring)+");");
+//			    basering;
+			    execute(str_I);
+			    execute(str_tmp_l);
+			    list real_sols = real_solve(eqd_tmp);
+			    setring cur_ring;
+			}
+			"real_sols:";real_sols;
+			for(k=1; k<=size(real_sols); k++) {
+			    "search point:";
+ 			    string(list(real_sols[k][1],real_sols[k][2],real_sols[k][3],string(surfind)));
+// 			    listOfPoints;
+			    if(findInList(string(list(list(real_sols[k][1],real_sols[k][2],real_sols[k][3],string(surfind)))),
+					  listOfPoints)==0) {
+				"add pt";
+				varietiesList[4] = varietiesList[4] + 
+				    list(list(real_sols[k][1],real_sols[k][2],real_sols[k][3],string(surfind)));
+				listOfPoints = listOfPoints + 
+				    list(string(list(real_sols[k][1],real_sols[k][2],real_sols[k][3],string(surfind))));
+			    }
+			}
+		    }
+		}
+	    }
+	} else {
+	    // i.e.: more than one equation
+	    varietiesList[2] = varietiesList[2] + 
+		list(list(list("surfaces:"),
+			  list("curveno:",
+			       string(size(varietiesList[2])+1)),
+			  list("showcbox:","true")));
+	    if(size(curveColors) >= i) {
+		varietiesList[2][size(varietiesList[2])][4] = curveColors[i][1];
+		varietiesList[2][size(varietiesList[2])][4][1] = "color:";
+	    }
+	    ncurves = size(varietiesList[2]);
+	    for(j=1; j<=size(itmp); j++) {
+		ind = findInList(surfEqn(itmp[j],coords), usedSurfaces);
+		usedSurfaces = usedSurfaces + list(surfEqn(itmp[1],coords));
+//		"indList:";indList;
+		if(ind == 0) {
+//		    "--------> not in list", surfEqn(itmp[j], coords);
+		    if(j==1) {
+			varietiesList[1] = varietiesList[1] + 
+			    list(list(list("eqno:",string(size(varietiesList[1])+1)),
+				      list("equation:",surfEqn(itmp[j], coords)),
+				      list("insidecolor:",getInsideColorStr(size(varietiesList[1])+1)),
+				      list("outsidecolor:",getOutsideColorStr(size(varietiesList[1])+1)),
+				      list("showcbox:","true"),
+				      list("transparency:","100")));
+		    } else {
+			varietiesList[1] = varietiesList[1] + 
+			    list(list(list("eqno:",string(size(varietiesList[1])+1)),
+				      list("equation:",surfEqn(itmp[j], coords)),
+				      list("insidecolor:",getInsideColorStr(size(varietiesList[1])+1)),
+				      list("outsidecolor:",getOutsideColorStr(size(varietiesList[1])+1)),
+				      list("showcbox:","false"),
+				      list("transparency:","0")));
+		    }
+		    ind = size(varietiesList[1]);
+		} else {
+		}
+		varietiesList[2][ncurves][1] = varietiesList[2][ncurves][1] + list(string(ind));
+	    }
+	}
+    }
+
+//      "------------";
+//      varietiesList;
+//      "------------";
+    return(plotRotatedListFromSpecifyList(varietiesList, coords, #));
+}
+example {
+    "Example:"; echo=2;
+
+    // A cubic surface together with a tritangent plane 
+    // (i.e. a plane which cuts out three lines).
+    ring r = 0, (x,y,z), dp; 
+    poly cayley_cubic = x^3+y^3+z^3+1^3-1/4*(x+y+z+1)^3;
+    poly plane = 1-x-y-z;
+    plotRotatedList(list(cayley_cubic, plane), list(x,y,z));
+
+    // The same cubic and plane. 
+    // The plane is not shown but only its intersection with the surface.
+    plotRotatedList(list(cayley_cubic, ideal(cayley_cubic, plane)), list(x,y,z));
+}
+
+
+proc plotRotatedListFromSpecifyList(list varietiesList, list #) 
+"
+USAGE: plotRotatedListFromSpecifyList(list varietiesList, list #);
+varietiesList has a complicated format (not documented yet);
+see the example.
+
+RETURN: the return code of the system command which executes surfex.
+
+ASSUME: The basering is characteristic zero.
+
+EXAMPLE: example plotRotatedListFromSpecifyList;
+"
+{
+    // make the surfex file
+    string str = getSurfexCodeFromSpecifyList(varietiesList, #);
+
+    return(plotRotatedFromCode(str, #));
+} 
+example {
+    "Example:"; echo=2;
+    
+    // A cubic surface depending on a parameter:
+    ring r = (0,p1), (x,y,z), dp; 
+    poly cayley_cubic = x^3+y^3+z^3+1^3-p1*(x+y+z+1)^3;
+    poly plane = 1-x-y-z;
+    plotRotatedListFromSpecifyList(list(list(list(list("eqno:","1"),
+						  list("equation:",
+						       string(cayley_cubic))
+						 )
+					    ),
+					list(),
+					list(list(1,"0.0","1.0","500","0.25+0.25*sin(PI*p1)")),
+					list()
+				       ));
+}
+
+
+proc plotRotatedListFromStringList(list varieties, list #) 
+"
+RETURN: the return code of the system command which executes surfex.
+
+USAGE: not documented yet.
+"
+{
+    // make the surfex file
+    getSurfexCodeFromStringList(varieties, #);
+    string str = getSurfexCodeFromStringList(varieties, #);
+    
+    return(plotRotatedFromCode(str, #));
+}
+
+
+proc plotRotatedDirect(list varieties, list #) 
+"
+USAGE: plotRotatedDirect(list varieties, list #)
+This opens the external program surfex for drawing the surfaces given by varieties, 
+seen as a surface in the real affine space with coordinates x,y,z.
+The format for the list varieties is not fully documented yet;
+please, try to adapt the examples to your needs.
+
+RETURN: the return code of the system command which executes surfex.
+
+ASSUME: 
+Passes the equations directly to surfex, 
+i.e., the variable names should be correct, i.e. x,y,z.
+The advantage is that one can use parameters p1, p2, ...;
+these will be passed to surfex.
+"
+{
+    string str = getSurfexCodeFromListDirect(varieties, #);
+    
+    return(plotRotatedFromCode(str, #));
+}
+example {
+    "Example:"; echo=2;
+    
+    // A cubic surface depending on a parameter:
+    ring r = (0,p1), (x,y,z), dp; 
+    poly cayley_cubic = x^3+y^3+z^3+1^3-p1*(x+y+z+1)^3;
+    // The entries of the list of varieties can either be polynomials
+    plotRotatedDirect(list(list(list(cayley_cubic)),
+			   list(),
+			   list(list(1,"0.0","1.0","500","0.25+0.25*sin(PI*p1)"))
+			   ));
+
+    // or strings which represent surfex-readable polynomials
+    plotRotatedDirect(list(list(list("x^3+y^3+z^3+1^3-p1*(x+y+z+1)^3")),
+			   list(),
+			   list(list("1","0.0","1.0","500","0.25+0.25*sin(PI*p1)"))
+			   ));
+
+    // More complicated varieties
+    plotRotatedDirect(list(list(list("x^2+y^2-z^2-3^2"),
+				list("x*sin(p1)+y*cos(p1)-3")),
+			   list(list(list(1,2))),
+			   list(list("1","0.0","1.0","500","2*PI*p1"))
+			   ));
+}
+
+proc plotRotatedFromCode(string str, list #) 
+"
+USAGE: plotRotatedFromCode(string str, list #);
+
+This procedure is only for internal usage;
+it takes the surfex-code as a string and calls surfex.
+
+RETURN: the return code of the system command which executes surfex.
+"
+{
+     // we need a temporary .sux file for surfex
+    string tmpd = "/tmp";
+    string l="surf"+string(system("pid"))+".sux";
+    // a temporary file which stores the output of surfex
+    string erg="/tmp/surferg"+string(system("pid"));
+
+    write(":w "+tmpd+"/"+l, str);
+
+    int i=system("sh","surfex -d "+tmpd+" -i " + l +" >"+erg+" 2>/dev/null");
+
+    // delete the temporary file
+    i = system("sh","rm " + l +" 2>/dev/null");    
+    return(read(erg));
+}
+
+
+///////////////////////////////////////////////////////////
+//
+// procedures used to produce the surf-code:
+//
+
+
+proc getSurfexCodeFromListDirect(list varieties, list #) 
+"
+USAGE: getSurfexCodeFromListDirect(list varieties, list #) 
+
+ASSUME: varieties has four components,
+        - the first is a list of polynomials, say f_1, ..., f_k
+        - the second is a list of lists of numbers in {1, ..., k} describing the curves 
+          as intersections of the corresponding f_i
+        - the third is a list of lists describing the parameters used in the polynomials f_i
+        - the fourth is a list of lists of points given by their approximate coordinates (three decimal numbers)
+
+RETURN: the surfex code (.sux) 
+"
+{
+    int i;
+    int j;
+    string str = "this is surfex v0.89.07"+newline;
+
+    str = str + "TYPE:" + newline;
+    str = str + "specify"+newline;
+    str = str + "EQUATIONS:"+newline;
+    str = str + string(size(varieties[1])) + newline;
+    for(i=1; i<=size(varieties[1]); i++) {
+	str = str + "Equation:"+newline;
+	str = str + "eqno:"+newline;
+	str = str + string(i) + newline;
+	str = str + "equation:"+newline;
+	str = str + surfEqnDir(varieties[1][i][1]) + newline;
+	if(size(varieties[1][i])>=2) {
+	    str = str + "showcbox:"+newline;
+	    str = str + varieties[1][i][2] + newline;     // show it or not
+	    if(size(varieties[1][i])>=3) {
+		str = str + "transparency:"+newline;
+		str = str + string(varieties[1][i][3]) + newline;     // transparency
+	    }
+	}
+    }
+    str = str + "CURVES:"+newline;
+    str = str + string(size(varieties[2])) + newline;
+    for(i=1; i<=size(varieties[2]); i++) {
+	str = str + "Curve:"+newline;
+	str = str + "curveno:"+newline;
+	str = str + string(i) + newline;
+	str = str + "surfaces:"+newline;
+//	"curves:";varieties[2][i];
+	for(j=1; j<=size(varieties[2][i][1]); j++) {
+	    str = str + string(varieties[2][i][1][j]) + newline;
+	}
+	if(size(varieties[2][i])>=2) {
+	    str = str + "showcbox:"+newline;
+	    str = str + varieties[2][i][2] + newline;     // show it or not
+	}
+    }
+    str = str + "PARAMETERS:"+newline;
+    str = str + string(size(varieties[3])) + newline;
+    for(i=1; i<=size(varieties[3]); i++) {
+	str = str + "Parameter:"+newline;
+	str = str + "parno:"+newline;
+	str = str + string(varieties[3][i][1]) + newline;
+	str = str + "fromtoval:"+newline;
+	str = str + varieties[3][i][2] + newline;
+	str = str + varieties[3][i][3] + newline;
+	str = str + string(varieties[3][i][4]) + newline;
+	if(size(varieties[3][i])>=5) {
+	    str = str + "function:"+newline;
+	    str = str + varieties[3][i][5]+newline;
+	}
+    }    
+//     str = str + "////////////////// Parameter: /////////////////////////"+newline;
+//     str = str + "1" + newline;
+//     str = str + "0.0" + newline;
+//     str = str + "1.0" + newline;
+//     str = str + "1000" + newline;
+//    str = str + string(size(varieties[3])) + newline;
+    return(str);
+}
+
+proc getSurfexCodeFromList(list varieties, list coords, list #) 
+"
+ASSUME: varieties has four components,
+        - the first is a list of polynomials, say f_1, ..., f_k
+        - the second is a list of lists of numbers in {1, ..., k} describing the curves 
+          as intersections of the corresponding f_i
+        - the third is a list of lists describing the parameters used in the polynomials f_i
+        - the fourth is a list of lists of points given by their approximate coordinates (three decimal numbers)
+
+RETURN: the surfex code (.sux) 
+"
+{
+    int i;
+    int j;
+    string str = "this is surfex v0.89.07"+newline;
+
+    str = str + "TYPE:" + newline;
+    str = str + "specify"+newline;
+    str = str + "EQUATIONS:"+newline;
+    str = str + string(size(varieties[1])) + newline;
+    for(i=1; i<=size(varieties[1]); i++) {
+	str = str + "Equation:"+newline;
+	str = str + "eqno:"+newline;
+	str = str + string(i) + newline;
+	str = str + "equation:"+newline;
+	str = str + surfEqn(varieties[1][i][1], coords) + newline;
+	str = str + "showcbox:"+newline;
+	str = str + varieties[1][i][2] + newline;     // show it or not
+	str = str + "transparency:"+newline;
+	str = str + string(varieties[1][i][3]) + newline;     // transparency
+    }
+    str = str + "CURVES:"+newline;
+    str = str + string(size(varieties[2])) + newline;
+    for(i=1; i<=size(varieties[2]); i++) {
+	str = str + "Curve:"+newline;
+	str = str + "curveno:"+newline;
+	str = str + string(i) + newline;
+	str = str + "surfaces:"+newline;
+	for(j=1; j<=size(varieties[2][i]); j++) {
+	    str = str + string(varieties[2][i][1][j]) + newline;
+	}
+	str = str + "showcbox:"+newline;
+	str = str + varieties[2][i][2] + newline;     // show it or not
+    }
+    str = str + "PARAMETERS:"+newline;
+    str = str + string(size(varieties[3])) + newline;
+    for(i=1; i<=size(varieties[3]); i++) {
+	str = str + "Parameter:"+newline;
+	str = str + "parno:"+newline;
+	str = str + string(varieties[3][i][1]) + newline;
+	str = str + "fromtoval:"+newline;
+	str = str + surfEqn(varieties[3][i][2], coords) + newline;
+	str = str + surfEqn(varieties[3][i][3], coords) + newline;
+	str = str + string(varieties[3][i][4]) + newline;
+	if(size(varieties[3][i])>=5) {
+	    str = str + "function:"+newline;
+	    str = str + varieties[3][i][5]+newline;
+	}
+    }    
+//     str = str + "////////////////// Parameter: /////////////////////////"+newline;
+//     str = str + "1" + newline;
+//     str = str + "0.0" + newline;
+//     str = str + "1.0" + newline;
+//     str = str + "1000" + newline;
+//    str = str + string(size(varieties[3])) + newline;
+    return(str);
+}
+
+proc getSurfexCodeFromStringList(list varieties, list #) 
+"
+ASSUME: varieties has three components,
+        - the first is a list of polynomials, say f_1, ..., f_k
+        - the second is a list of lists of numbers in {1, ..., k} describing the curves 
+          as intersections of the corresponding f_i
+        - the third is a list of lists describing the parameters used in the polynomials f_i
+
+RETURN: the surfex code (.sux) 
+"
+{
+    int i;
+    int j;
+    string str = "this is surfex v0.89.07"+newline;
+
+    str = str + "TYPE:" + newline;
+    str = str + "specify"+newline;
+    str = str + "EQUATIONS:"+newline;
+    str = str + string(size(varieties[1])) + newline;
+    for(i=1; i<=size(varieties[1]); i++) {
+	str = str + "Equation:"+newline;
+	str = str + "eqno:"+newline;
+	str = str + string(i) + newline;
+	str = str + "equation:"+newline;
+	str = str + varieties[1][i][1] + newline;
+	str = str + "showcbox:"+newline;
+	str = str + varieties[1][i][2] + newline;     // show it or not
+	str = str + "transparency:"+newline;
+	str = str + varieties[1][i][3] + newline;     // transparency
+    }
+    str = str + "CURVES:"+newline;
+    str = str + string(size(varieties[2])) + newline;
+    for(i=1; i<=size(varieties[2]); i++) {
+	str = str + "Curve:"+newline;
+	str = str + "curveno:"+newline;
+	str = str + string(i) + newline;
+	str = str + "surfaces:"+newline;
+	for(j=1; j<=size(varieties[2][i][1]); j++) {
+	    str = str + string(varieties[2][i][1][j]) + newline;
+	}
+	str = str + "showcbox:"+newline;
+	str = str + varieties[2][i][2] + newline;     // show it or not
+    }
+    str = str + "PARAMETERS:"+newline;
+    str = str + string(size(varieties[3])) + newline;
+    for(i=1; i<=size(varieties[3]); i++) {
+	str = str + "Parameter:"+newline;
+	str = str + "parno:"+newline;
+	str = str + string(varieties[3][i][1]) + newline;
+	str = str + "fromtoval:"+newline;
+	str = str + varieties[3][i][2] + newline;
+	str = str + varieties[3][i][3] + newline;
+	str = str + string(varieties[3][i][4]) + newline;
+	if(size(varieties[3][i])>=5) {
+	    str = str + "function:"+newline;
+	    str = str + varieties[3][i][5]+newline;
+	}
+    }    
+    return(str);
+}
+
+
+proc getSurfexCodeFromSpecifyList(list varieties, list #) 
+"
+ASSUME: varieties has three components,
+        - the first is a list of polynomials, say f_1, ..., f_k
+        - the second is a list of lists of numbers in {1, ..., k} describing the curves 
+          as intersections of the corresponding f_i
+        - the third is a list of lists describing the parameters used in the polynomials f_i
+        - the fourth is a list of lists describing the singular points to be shown as spheres
+
+RETURN: the surfex code (.sux) 
+"
+{
+    int i;
+    int j;
+    int k;
+    string str = "this is surfex v0.89.07"+newline;
+
+    str = str + "TYPE:" + newline;
+    str = str + "specify"+newline;
+    str = str + "EQUATIONS:"+newline;
+    str = str + string(size(varieties[1])) + newline;
+    for(i=1; i<=size(varieties[1]); i++) {
+	str = str + "Equation:"+newline;
+	for(j=1; j<=size(varieties[1][i]); j++) {
+	    str = str + varieties[1][i][j][1] +newline;
+	    str = str + varieties[1][i][j][2] +newline;
+	}
+    }
+    str = str + "CURVES:"+newline;
+    str = str + string(size(varieties[2])) + newline;
+    for(i=1; i<=size(varieties[2]); i++) {
+	str = str + "Curve:"+newline;
+	for(j=1; j<=size(varieties[2][i]); j++) {
+	    str = str + varieties[2][i][j][1] +newline;
+	    if(varieties[2][i][j][1] == "surfaces:") {
+		for(k=2; k<=size(varieties[2][i][j]); k++) {
+		    str = str + string(varieties[2][i][j][k]) + newline;
+		}
+	    } else {
+		str = str + varieties[2][i][j][2] +newline;
+	    }
+	}
+// 	str = str + "curveno:"+newline;
+// 	str = str + string(i) + newline;
+// 	str = str + "surfaces:"+newline;
+// 	for(j=1; j<=size(varieties[2][i][1]); j++) {
+// 	    str = str + string(varieties[2][i][1][j]) + newline;
+// 	}
+// 	str = str + "showcbox:"+newline;
+// 	str = str + varieties[2][i][2] + newline;     // show it or not
+    }
+    str = str + "PARAMETERS:"+newline;
+    str = str + string(size(varieties[3])) + newline;
+    for(i=1; i<=size(varieties[3]); i++) {
+	str = str + "Parameter:"+newline;
+	str = str + "parno:"+newline;
+	str = str + string(varieties[3][i][1]) + newline;
+	str = str + "fromtoval:"+newline;
+	str = str + varieties[3][i][2] + newline;
+	str = str + varieties[3][i][3] + newline;
+	str = str + string(varieties[3][i][4]) + newline;
+	if(size(varieties[3][i])>=5) {
+	    str = str + "function:"+newline;
+	    str = str + varieties[3][i][5]+newline;
+	}
+    }    
+    string str_from = "0.0";
+    string str_to = "5.0";
+    string str_radius = "50";
+    str = str + "SOLITARY POINTS:"+newline;
+    str = str + string(size(varieties[4])) + newline;
+    for(i=1; i<=size(varieties[4]); i++) {
+	str = str + "SolitaryPoint:"+newline;
+	str = str + "solPtNo:"+newline;
+	str = str + string(i) + newline;
+	str = str + "surface:"+newline;
+	str = str + varieties[4][i][4] + newline;
+	str = str + "fromtoval:"+newline;
+	str = str + str_from + newline;
+	str = str + str_to + newline;
+	str = str + str_radius + newline;
+	str = str + "coords:" + newline;
+	str = str + varieties[4][i][1] + newline;
+	str = str + varieties[4][i][2] + newline;
+	str = str + varieties[4][i][3] + newline;
+    }    
+    return(str);
+}
+
+///////////////////////////////////////////////////////////
+//
+// procedures for standard colors:
+//
+
+proc numBaseColors() 
+"
+USAGE: numBaseColors()
+
+RETURN: the number of predefined surface colors.
+"
+{
+    return(6);
+}
+
+proc baseSurfaceColors(int no) 
+"
+USAGE: baseSurfaceColors(int no) 
+
+REMARK: There are currently 6=numBaseColors() basic surface colors. 
+You can modify them according to your wishes
+by just redefining this procedure in your Singular-script.
+
+If you want more colors, then you also have to redefine numBaseColors() accordingly.
+
+RETURN: a list of three integers describing the RGB values of a color.
+"
+{
+    if(no%numBaseColors()==1) {
+	return(list(240,160,0));
+    }
+    if(no%numBaseColors()==2) {
+	return(list(160,240,0));
+    }
+    if(no%numBaseColors()==3) {
+	return(list(0,160,240));
+    }
+    if(no%numBaseColors()==4) {
+	return(list(240,0,160));
+    }
+    if(no%numBaseColors()==5) {
+	return(list(0,240,160));
+    }
+    if(no%numBaseColors()==0) {
+	return(list(160,0,240));
+    }
+}
+
+proc getInsideColorStr(int no) 
+"
+USAGE: getInsideColorStr(int no) 
+
+RETURN: a string describing inside color number no 
+where the three integer RGB values are in one line each.
+"
+{
+    list bc = baseSurfaceColors(no);
+    string str = string(bc[1])+newline+string(bc[2])+newline+string(bc[3]);
+    return(str);
+}
+
+proc getOutsideColorStr(int no) 
+"
+USAGE: getOutsideColorStr(int no) 
+
+RETURN: a string describing outside color number no 
+where the three integer RGB values are in one line each.
+"
+{
+    list bc = baseSurfaceColors(no);
+    string str = string(bc[1])+newline+string(bc[2])+newline+string(bc[3]);
+    return(str);
+}
+
+///////////////////////////////////////////////////////////
+//
+// procedures used by the plot procedures:
+//
+
+proc surfEqnDir(list #)
+"
+USAGE: surfEqnDir(list #) without any checks etc.
+
+RETURN: string(#[1]) where short=0.
+"
+{
+    int stmp = short; short = 0;
+    string str = string(#[1]);
+    short = stmp;
+    return(str);
+}
+
+proc surfEqn(poly p, list coords, list #)
+"  
+USAGE: surfEqn(poly p, list coords)
+       Tries to produce a string for the equation of p which is convenient for surfex.
+ASSUME: - p defines a plane curve or a surface, 
+         - coords is a list of the three coordinates to use, e.g. list(x,y,z),
+           in this way, it is possible to distinguish between x^2+y^2-1 and y^2+z^2-1
+RETURN: a string, that one can use with the external program surf
+EXAMPLE: example surfEqn; shows an example
+"
+{
+    int params=0;
+    if(size(#)>0) {
+	params = #[1];
+    }
+    string err_mes; // string containing error messages
+    def base=basering;
+    int mynvars = nvars(basering);
+
+    intvec ind=num_of_vars(p);
+
+    int i,j,n;
+    int minp = 0;
+    n=0;
+    for(i=size(ind);i>0;i--)
+    {
+  	if (ind[i]!=0) { 
+	    n++; 
+	} else {
+	    if(var(i)==coords[1] || var(i)==coords[2] || var(i)==coords[3]) {
+		ind[i]=1;
+		n++;
+	    }
+	}
+    }
+    
+    params = params + npars(basering);
+    n = n + npars(basering);
+    if((npars(basering) == 1) && (minpoly != 0)) {
+	minp = 1;
+    } else {
+	minp = 0;
+    }
+    string str_I = "";
+    for(i=1; i<=npars(basering); i=i+1) {
+	if(!(parstr(i) == "i")) {
+	    if(minp==1) {
+		str_I = str_I + sprintf("number %s = %s; ", parstr(i), rootminpoly());
+	    } else {
+	    }
+	}
+    }
+    int bshort = short; short = 0;
+    if(!(minp==1 || npars(basering)==0)) {
+	p=cleardenom(p);
+	err_mes="Cannot plot equations with a parameter without a specified minpoly";
+	ERROR(err_mes);
+    }
+    str_I = str_I + "poly p = " + string(p) + ";";
+
+    short = bshort;
+
+    if(params==0) {
+	if (n<=2 or n>=4)
+	{
+	    err_mes="Cannot plot equations with "+string(n)+" variables";
+	    ERROR(err_mes);
+//	    return("0");
+	}
+	if(n==4) {
+	    ring r=(real,30,30),(xx,yy,zz,ww),dp;
+	} else {
+	    ring r=(real,30,30),(x,y,z),dp;
+	}
+    } else {
+	if(n-params<=2 || n-params>=4) {
+	    err_mes="Cannot plot equations with "+string(n-params)+" variables";
+	    ERROR(err_mes);
+//	    return("0");
+	} else {
+	    if(params == 1) {
+		if(n-params==3) {
+		    if(minp==1) {
+			// switch to a ring without minimal polynomial:
+			execute("ring rr = (real,30,30),("+varstr(base)+"), dp;");
+//			rr;
+//			"str_I",str_I;
+			execute(str_I);
+			def base = rr;
+			ring r=(real,30,30),(x,y,z),dp;
+		    } else {
+			p=cleardenom(p);
+			ring r=(real,30,30),(x,y,z,p1),dp;
+		    }
+		}
+	    }
+	    if(params == 2) {
+		if(n-params==3) {
+		    p=cleardenom(p);
+		    ring r=(real,30,30),(x,y,z,p1,p2),dp;
+		}
+	    }
+	    if(params == 3) {
+		if(n-params==3) {
+		    p=cleardenom(p);
+		    execute("ring rr = (real,30,30),("+varstr(base)+","+parstr(base)+"), dp;");
+		    rr;
+		    "str_I",str_I;
+		    execute(str_I);
+		    "pnew:",p;
+		    def base = rr;
+
+		    ring r=(real,30,30),(x,y,z,p1,p2,p3),dp;
+		}
+	    }
+	}
+    }
+//    basering;
+    short=0;
+    map phi=base,0;
+    j=1;
+
+    for(i=1;i<=mynvars;i++)
+    {
+	if (ind[i]!=0)
+	{
+	    phi[i]=var(j);
+	    j++;
+	}
+    }
+    poly p=(simplify(phi(p),1));
+    if (leadcoef(p) <0) { 
+	if(size(#)>1) {
+	    if(#[2]!=0) {
+		p=-p; 
+	    }
+	} else { 
+	    p=-p; 
+	}
+    }
+    if(leadcoef(p)!=0) {
+	p = p/leadcoef(p);
+    }
+    string thesurfstr = string(p);
+    if(minp == 1) {
+	// replace k by rootRepl
+    }
+
+    return (thesurfstr);
+} // end of surfEqn()
+example
+{ "EXAMPLE:"; echo =2;
+
+  ring rr0 = 0,(x(1..3)),dp;
+  poly p = x(1)^3 - x(2)^2;
+  print(surfEqn(p,list(x(1),x(2),x(3))));
+
+  ring rr1 = 0,(x,y,z),dp;
+  poly I(1) = 2x2-1/2x3 +1-y+1;
+  print(surfEqn(I(1),list(x,y,z)));
+
+  // Steiner surface
+  poly J(2) = x^2*y^2+x^2*z^2+y^2*z^2-17*x*y*z;
+  print(surfEqn(J(2),list(x,y,z)));
+} // end of example surfEqn()
+
+
+proc num_of_vars(ideal I)
+"
+USAGE: num_of_vars(ideal I)
+
+RETURN: an intvec containing one entry for each ring variable.
+each contains the sums of all degrees in this variable of all monomials 
+occuring in the ideal.
+An entry is zero iff the corresponding variable does not occur in the ideal.
+"
+{
+  intvec v;
+  int i;
+  poly p;
+  for(i=size(I);i>0;i--)
+  {
+    p=I[i];
+    while(p!=0)
+    {
+	v=v+leadexp(p);
+	p=p-lead(p);
+    }
+  }
+  return(v);
+}
+example {
+    "EXAMPLE:"; echo = 2;
+    ring r = 0, (x,y,z),dp;
+    ideal j0 = x^2-x*y;
+    num_of_vars(j0);
+    ideal j1 = x^2-x*y-y;
+    num_of_vars(j1);
+    ideal j2 = x^2-x*y-y, x^3-2*y;
+    num_of_vars(j2);
+}
+
+
+proc num_vars_id(ideal I)
+"
+USAGE: num_vars_id(ideal I)
+
+RETURN: The number of ring-variables occurring in the ideal I.
+"
+{
+    intvec v = num_of_vars(I);
+    int num = 0;
+    for(int i=size(v);i>0;i--)
+    {
+	if (v[i]!=0) { num++; }
+    }
+    return(num);
+}
+example {
+    "EXAMPLE:"; echo = 2;
+    ring r = 0, (x,y,z),dp;
+    ideal j = x^2-y, x^3-2;
+    num_vars_id(j);
+}
+
+proc findInList(list obj, list l) 
+"
+USAGE: findInList(list obj, list l) 
+       Tries to find the object obj in the list l.
+
+ASSUME: the object obj[1] can be compared to the objects in the list l
+
+RETURN: if obj[1]=l[i] for some i, then return the first such i,
+        otherwise return 0 
+"
+{
+    for(int i=1; i<=size(l); i++) {
+	if(l[i]==obj[1]) {
+	    return(i);
+	}
+    }
+
+    return(0);
+} 
+example {
+    "EXAMPLE:"; echo = 2;
+    ring r = 0,(x,y,z), dp;
+    list a = list(x^2+y^2+z^2+1, x^2+y^2+z^2-1, x^2+y^2-z^2+1, x^2+y^2-z^2-1);
+    findInList(x^2+y^2+z^2-1, a);
+    findInList(x^2+y^2+z^2, a);
+}
+
+proc std_primdecGTZ(ideal I, list #)
+"
+USAGE: std_primdecGTZ(ideal I, list #)
+Computes a primdary decomposition pd of I using primdecGTZ and then 
+calls std_for_pd(pd).
+For the output and options, consult the help of std_for_pd.
+
+RETURN: see std_for_pd.
+"
+{
+    list pd = primdecGTZ(I);
+    return(std_for_pd(pd, #));
+}
+example {
+    "EXAMPLE:"; echo = 2;
+
+    ring r = 0, (x,y), dp;
+    ideal j = y-x^2,z-x^3;
+    primdecGTZ(j);
+    std_primdecGTZ(j);
+    std_primdecGTZ(j,1);
+}
+
+proc std_for_pd(list pd, list #)
+"
+USAGE: std_for_pd(list pd, list #)
+Call std for each of the prime ideals in the list pd
+replace the prime ideals by their standard-basis.
+Compute dim() and mult() of each prime component using these standard bases. 
+If an additional argument is given then do the same for the primary components.
+
+ASSUME:
+pd is in the format produced by primdecGTZ() or primdecSY().
+
+RETURN: A list, say l, of lists, similar to a list returned by primdecSY() or primdecGTZ().
+However, each of the entries of l (which is a list l[i]) contains some additional entries:
+l[1]: the primary ideal
+l[2]: a standard basis of the associated prime ideal
+l[3]: dim() of this prime ideal
+l[4]: mult() of this prime ideal
+
+If an additional argument # is given then l[1] changes:
+l[1]: a standard basis of the primary ideal
+Morever, there are some more entries:
+l[5]: dim() of this primary ideal
+l[6]: mult() of this primary ideal
+l[7]: l[6] / l[5]
+"
+{
+
+    if(typeof(pd[1])=="ideal") {
+	// this is a Singular bug!?
+//	"bug!";pd;"---";
+	pd = list(list(pd[1], pd[1]));
+//	pd;$;
+    }
+    list pd_neu;
+    int i;
+    list coords;
+    ideal stdtmp;
+    ideal stdtmp2;
+    for(i=1; i<=size(pd); i++) {
+	stdtmp = std(pd[i][2]);
+	stdtmp2 = pd[i][1];
+	if(size(#)>0) {
+	    stdtmp2 = std(stdtmp2);	   
+	    if(mult(stdtmp)==0) {
+		pd_neu[i] = list(stdtmp2, 
+				 stdtmp, 
+				 dim(stdtmp), mult(stdtmp), 
+				 dim(stdtmp2), mult(stdtmp2),
+				 0);
+	    } else {
+		pd_neu[i] = list(stdtmp2, 
+				 stdtmp, 
+				 dim(stdtmp), mult(stdtmp), 
+				 dim(stdtmp2), mult(stdtmp2), 
+				 mult(stdtmp2)/mult(stdtmp));
+	    }
+	} else {
+	    pd_neu[i] = list(stdtmp2, 
+			     stdtmp, 
+			     dim(stdtmp), mult(stdtmp));
+	}
+    }
+    return(pd_neu);
+}
+example {
+    "EXAMPLE:"; echo = 2;
+
+    ring r = 0, (x,y,z), dp;
+    ideal j = y-x^2,z-x^3;
+    list pd = primdecGTZ(j);
+    pd;
+    std_for_pd(pd, 1);
+}
+
+proc real_solve(ideal to_solve) 
+"
+USAGE: real_solve(ideal to_solve) 
+
+RETURN: a list of all real solutions (as strings) 
+of the zero-dimensional ideal to_solve (without multiplicities).
+
+REMARK: Until now, it may happen that some points appear more than once.
+"
+{
+    int k;
+    int i;
+
+//    def Isolring = solve(to_solve,30,0,60,"nodisplay");
+    def Isolring = solve(to_solve,9,0,13,"nodisplay");
+    setring Isolring;
+//    list SOL = solve(to_solve, "oldring", "nodisplay");
+    list real_sols = list();
+    list tmpl;
+    for(k=1; k<=size(SOL); k++) {
+	if(find(string(SOL[k]),"I")==0 && find(string(SOL[k]),"i")==0) {	    
+	    tmpl = list();
+	    for(i=1; i<=size(SOL[k]); i++) {
+		tmpl = tmpl + list(string(SOL[k][i]));
+	    }
+	    real_sols = real_sols + list(tmpl);
+	}
+    }    
+    return(real_sols);
+}
+example {
+    "EXAMPLE:"; echo = 2;
+    ring r = 0, (x,y), dp;
+    number a = 2;
+    number b = 3;
+    ideal j = (x^2-a),(y^3-b);
+    real_solve(j);
+}
+
+proc rootminpoly(list #) 
+"
+USAGE: rootminpoly(list #) 
+
+RETURN: A root of the current minpoly 
+as a string representation of a complex number with 
+the given precision #[1] (default: 30). 
+E.g. ring r=(0,s),x,dp; minpoly = s^2-2; => rootminpoly() 1.41421356237309504880168872421
+
+ASSUME: The current minpoly is non-zero.
+"
+{
+    int prec = 30;
+    int k, done;
+    if(size(#)>0) {
+	prec = #[1];
+    }
+    short = 0;
+    string str_lag = sprintf("list lag = laguerre_solve(%s);", minpoly);
+    string str_ring = sprintf("ring r_sqrt = (complex,prec,I),(%s),lp;", parstr(basering));
+    execute(str_ring);
+    execute(str_lag);
+//    lag;
+    // choose a real solution, if it exists:
+    done = 0;
+    for(k=1; k<=size(lag) && done==0; k++) {
+	if(find(string(lag[k]),"I")==0) {	    
+	    done = k;
+	}
+    }     
+    if(done==0) {
+//	"no real solution.";
+    }
+
+    if(size(lag)>2) {
+	// return the first real solution
+	return(sprintf("%s",lag[done]));
+    }
+
+    if(sprintf("%s",lag[1])[1] == "-") {
+	return(sprintf("%s",lag[2]));
+    } else {
+	if(sprintf("%s",lag[1])[1] == "(") {
+	    if(sprintf("%s",lag[1])[2] == "-") {
+		return(sprintf("%s",lag[2]));
+	    } else {
+		return(sprintf("%s",lag[1]));
+	    }
+	} else {
+	    return(sprintf("%s",lag[1]));
+	}
+    }
+    short = 1;
+} 
+example
+{
+   "EXAMPLE:"; echo =2;
+   ring r=(0,s),x,dp; 
+   minpoly = s^2-2;
+   rootminpoly();
+
+   ring R=(0,s),x,dp; 
+   minpoly = s^2+2;
+   rootminpoly();
+}
+
+proc allroots_minpoly(list #) 
+"
+USAGE: allroots_minpoly(list #) 
+
+RETURN: a list of strings containing all real roots of the minimal polynomial of the active ring.
+
+ASSUME: The current minpoly is non-zero.
+"
+{
+    int prec = 30;
+    int k, done;
+    if(size(#)>0) {
+	prec = #[1];
+    }
+    short = 0;
+    string str_lag = sprintf("list lag = laguerre_solve(%s);", minpoly);
+    string str_ring = sprintf("ring r_sqrt = (complex,prec,I),(%s),lp;", parstr(basering));
+    execute(str_ring);
+    execute(str_lag);
+
+    // only take the real solutions:
+    done = 0;
+    list real_sols = list();
+    for(k=1; k<=size(lag) && done==0; k++) {
+	if(find(string(lag[k]),"I")==0) {	    
+	    real_sols = real_sols + list(string(lag[k]));
+	}
+    }     
+    return(real_sols);
+}
+example {
+    "EXAMPLE:"; echo = 2;
+   ring r=(0,s),x,dp; 
+   minpoly = s^3-2;
+   allroots_minpoly();
+
+   ring R=(0,s),x,dp; 
+   minpoly = s^2-2;
+   allroots_minpoly();
+}
+
+proc decstr2ratstr(string str)
+"
+USAGE: decstr2ratstr(string str)
+Convert a decimal number of not more than 30 digits to a rational number with 14 digits.
+
+REMARK: This procedure still has to be adapted to accept other precisions!
+"
+{
+    ring decR = (complex,30,I),(x),lp;
+    execute("number r="+str+";");
+    execute("r = "+truncdec(r,14)+";");
+    return(real2ratstr(r));
+}
+
+proc real2ratstr(number r)
+"
+USAGE: real2ratstr(number r)
+
+RETURN: A string containing a rational number representing the decimal number r.
+
+ASSUME: The current ring has either real or complex base field.
+"
+{
+    string ratstr = "number("+string(r*number(10000000000000000))+")/number(10000000000000000)";
+    return(ratstr);
+}
+
+proc truncdec(number r, int decs)
+"
+USAGE: truncdec(number r, int decs)
+Truncates a decimal number r to the given number (decs) of digits.
+
+RETURN: A string representing the truncated number.
+"
+{
+    string str = string(r);
+    return(str[1,(decs+2)]);
+}
+
+proc string_of_vars(ideal I)
+"
+USAGE: string_of_vars(ideal I)
+
+RETURN: A string of all variables contained in the ideal I, separated by commas.
+"
+{
+    list listvars = list();
+    intvec v;
+    int i;
+    poly p;
+    for(i=size(I);i>0;i--)
+    {
+	p=I[i];
+	while(p!=0)
+	{
+	    v=v+leadexp(p);
+	    p=p-lead(p);
+	}
+    }
+    for(i=1; i<=nvars(basering); i++) {
+	if(v[i] > 0) {
+	    listvars = listvars + list(var(i));
+	}
+    }
+    string strvars = string(listvars);
+    return(strvars);
+}
