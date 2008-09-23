@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: decodegb.lib,v 1.2 2008-08-21 14:06:56 bulygin Exp $";
+version="$Id: decodegb.lib,v 1.3 2008-09-23 11:58:38 bulygin Exp $";
 category="Coding theory";
 info="
 LIBRARY:   decodedistGB.lib     Generating and solving systems of polynomial equations for decoding and finding the minimum distance of linear codes
@@ -13,24 +13,25 @@ OVERVIEW:
  We provide some auxiliary functions for further manipulations and decoding.
  For an overview of the methods mentioned above, cf. Stanislav Bulygin, Ruud Pellikaan: 'Decoding and finding the minimum distance with 
  Groebner bases: history and new insights', in 'Selected Topics in Information and Coding Theory', World Scientific (2008) (to appear) (*).
+ For the vanishing ideal computation the algorithm of Farr and Gao is implemented.
 
 MAIN PROCEDURES: 
- sysCRHT(n,defset,e,q,m,#); generates the CRHT-ideal that follows Cooper's philosophy, Sala's extentions are available
- sysCRHTMindistBinary(n,defset,w); generates the ideal from Cooper's philosophy to find the minimum distance in the binary case
+ sysCRHT(n,defset,e,q,m,#); generates the CRHT-ideal that follows Cooper's philosophy
+ sysCRHTMindistBinary(n,defset,w); generates the CRHT-ideal to find the minimum distance in the binary case
  sysNewton(n,defset,t,q,m,#); generates the ideal with the Generalized Newton identities
  sysBin(v,Q,n,#);  generates Bin system as in the work of Augot et.al, cf. [*] for the reference
  encode(x,g);  encodes given message with the given generator matrix
  syndrome(h, c);  computes a syndrome w.r.t. the given check matrix
- sysQE(check,y,t,fieldeq,formal); generates the system of quadratic equations as in the method of Pellikaan and Bulygin
- error(y,pos,val);  inserts errors in a word
+ sysQE(check,y,t,fieldeq,formal); generates the system of quadratic equations as in [*]
+ errorInsert(y,pos,val);  inserts errors in a word
  errorRand(y,num,e);  inserts random errors in a word
  randomCheck(m,n,e);  generates a random check matrix
  genMDSMat(n,a);  generates an MDS (actually an RS) matrix
- mindist(check);   computes the minimum distance of the code via solving the system of quadratic equations
+ mindist(check);   computes the minimum distance of a code
  decode(rec);  decoding of a word using the system of quadratic equations 
  solveForRandom(redun,ncodes,ntrials,#);  a procedure for manipulation with random codes
  solveForCode(check,ntrials,#); a procedure for manipulation with the given codes
- vanishId(points); computes the vanishing ideal for the given set of points. The algorithm of Farr and Gao is implemented
+ vanishId(points); computes the vanishing ideal for the given set of points
  sysFL(check,y,t,e,s); generates the Fitzgerald-Lax system
  solveForRandomFL(n,redun,p,e,t,ncodes,ntrials,minpol); a procedure for manipulation with random codes via Fitzgerald-Lax
  
@@ -730,7 +731,7 @@ EXAMPLE:  example sysQE; shows an example
      matrix x[1][3]=0,0,1,0;
      matrix y[1][7]=encode(x,g);
      //disturb with 2 errors
-     matrix rec[1][7]=error(y,list(2,4),list(1,a));
+     matrix rec[1][7]=errorInsert(y,list(2,4),list(1,a));
      //generate the system
      def A=sysQE(h,rec,t,0,0);
      setring A;
@@ -741,8 +742,8 @@ EXAMPLE:  example sysQE; shows an example
      print(sys_qe);     
 }
 
-proc error(matrix y, list pos, list val)
-"USAGE:  error(y, pos, val); y is a (code) word, pos = positions where errors occured, val = their corresponding values
+proc errorInsert(matrix y, list pos, list val)
+"USAGE:  errorInsert(y, pos, val); y is a (code) word, pos = positions where errors occured, val = their corresponding values
 RETURN:  corresponding received word
 EXAMPLE: example error; shows an example
 "
@@ -768,7 +769,7 @@ EXAMPLE: example error; shows an example
      print(y);
      
      //disturb with 2 errors
-     matrix rec[1][7]=error(y,list(2,4),list(1,a));
+     matrix rec[1][7]=errorInsert(y,list(2,4),list(1,a));
      print(rec);
      print(rec-y);
 }
@@ -870,8 +871,8 @@ EXAMPLE:   example randomCheck; shows an example
 }
 
 proc genMDSMat(int n, number a)
-"USAGE:   genMDSMat(n, a); n x n are dimensions of the matrix, a is a primitive element of the field.
-          An MDS matrix is constructed in the following way. We take a to be a generator of the multiplicative group of the field.
+"USAGE:   genMDSMat(n, a); n x n are dimensions of the matrix, a is a primitive element of the field.          
+NOTE:     An MDS matrix is constructed in the following way. We take a to be a generator of the multiplicative group of the field.
           Then we construct the Vandermonde matrix with this a.
 ASSUME:   extension field should already be defined 
 RETURN:   a matrix with the MDS property
@@ -1575,7 +1576,7 @@ EXAMPLE:   example sysFL; shows an example
      matrix x[1][6];
      matrix y[1][11]=encode(x,g);
      //disturb with 2 errors
-     matrix rec[1][11]=error(y,list(2,4),list(1,-1));
+     matrix rec[1][11]=errorInsert(y,list(2,4),list(1,-1));
 
      //the Fitzgerald-Lax system     
      ideal sys=sysFL(h,rec,2,1,s_work);
@@ -1788,6 +1789,26 @@ static proc LF_add_synd (matrix rec, matrix check, ideal sys)
 
 
 /*
+//////////////     SOME RELATIVELY EASY EXAMPLES    //////////////
+///////////////////  THAT RUN AROUND ONE MINUTE  ////////////////
+
+"EXAMPLE:";  echo = 2;
+int q=128; int n=120; int redun=n-30; 
+ring r=(q,a),x,dp;
+solveForRandom(n,redun,1,1,6);
+
+int q=128; int n=120; int redun=n-20; 
+ring r=(q,a),x,dp;
+solveForRandom(n,redun,1,1,9);
+
+int q=128; int n=120; int redun=n-10;
+ring r=(q,a),x,dp;
+solveForRandom(n,redun,1,1,19);
+
+int q=256; int n=150; int redun=n-10;
+ring r=(q,a),x,dp;
+solveForRandom(n,redun,1,1,22);
+
 //////////////     SOME HARD EXAMPLES    //////////////////////
 //////      THAT MAYBE WILL BE DOABLE LATER     ///////////////
 
