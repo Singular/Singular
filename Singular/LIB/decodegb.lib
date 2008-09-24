@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: decodegb.lib,v 1.3 2008-09-23 11:58:38 bulygin Exp $";
+version="$Id: decodegb.lib,v 1.4 2008-09-24 13:44:01 bulygin Exp $";
 category="Coding theory";
 info="
 LIBRARY:   decodedistGB.lib     Generating and solving systems of polynomial equations for decoding and finding the minimum distance of linear codes
@@ -44,7 +44,7 @@ LIB "linalg.lib";
 LIB "brnoeth.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
-
+// creates a list result, where result[i]=i, 1<=i<=n
 static proc lis (int n)
 {
  list result;
@@ -56,6 +56,8 @@ static proc lis (int n)
  return(result);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// creates a list of all combinations without repititions of m objects out of n
 static proc combinations (int m, int n)
 {
  list result;
@@ -71,26 +73,9 @@ static proc combinations (int m, int n)
  return(result);
 }
 
-static proc combinsert (list temp, int i)
-{
- list result;
- list tmp;
- int j,k;
- for (j=1; j<=size(temp); j++)
- {
-  result[j]=tmp;
- }
- for (j=1; j<=size(temp); j++)
- {
-  for (k=1; k<=size(temp[j]); k++)
-  {
-   if (temp[j][k]<i) {result[j][k]=temp[j][k];}
-   else {result[j][k]=temp[j][k]+1;}
-  }
- }
- return(result);   
-}
 
+///////////////////////////////////////////////////////////////////////////////
+// the poolynomial for Sala's restrictions 
 static proc p_poly(int n, int a, int b)
 {
   poly f;
@@ -100,6 +85,8 @@ static proc p_poly(int n, int a, int b)
   }
   return(f);
 }
+
+///////////////////////////////////////////////////////////////////////////////
 
 proc sysCRHT (int n, list defset, int e, int q, int m, int #)
 "USAGE:   sysCRHT(n,defset,e,q,m,#);  n length of the cyclic code, defset is a list representing the defining set,
@@ -115,7 +102,7 @@ EXAMPLE:  example sysCRHT; shows an example
   int i,j;
   poly sum;
   
-  // check equations
+  //------------ add check equations -----------------
   for (i=1; i<=r; i++)
   {
     sum=0;
@@ -126,13 +113,13 @@ EXAMPLE:  example sysCRHT; shows an example
     crht[i]=sum-X(i);
   }
   
-  // restrictions on syndromes
+  //------------ field equations on syndromes -----------
   for (i=1; i<=r; i++)
   {
     crht=crht,X(i)^(q^m)-X(i);
   }
   
-  // n-th roots of unity
+  //------------ restrictions on error-locations: n-th roots of unity --------------
   for (i=1; i<=e; i++)
   {
     crht=crht,Z(i)^(n+1)-Z(i);
@@ -143,6 +130,7 @@ EXAMPLE:  example sysCRHT; shows an example
     crht=crht,Y(i)^(q-1)-1;
   }  
   
+  //------------ add Sala's additional conditions if necessary -----------------
   if (#)
   {
     for (i=1; i<=e; i++)
@@ -189,6 +177,8 @@ EXAMPLE:  example sysCRHT; shows an example
   red_crht[5];
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
 
 proc sysCRHTMindistBinary (int n, list defset, int w)
 "USAGE:  sysCRHTMindistBinary(n,defset,w);  n length of the cyclic code, defset is a list representing the defining set,
@@ -203,7 +193,7 @@ EXAMPLE: example sysCRHTMindistBinary; shows an example
   int i,j;
   poly sum;
   
-  // check equations
+  //------------ add check equations --------------
   for (i=1; i<=r; i++)
   {
     sum=0;
@@ -215,13 +205,13 @@ EXAMPLE: example sysCRHTMindistBinary; shows an example
   }  
   
   
-  // n-th roots of unity
+  //----------- locations are n-th roots of unity ------------
   for (i=1; i<=w; i++)
   {
     crht_md=crht_md,Z(i)^n-1;
   }  
   
-  
+  //------------ adding conditions on locations being different ------------
   for (i=1; i<=w; i++)
   {
     for (j=i+1; j<=w; j++)
@@ -252,11 +242,15 @@ EXAMPLE: example sysCRHTMindistBinary; shows an example
   print(red_crht_md);  
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// slightly modified mod function
 static proc mod_ (int n, int m)
 {
   if (n mod m==0) {return(m);}
   if (n mod m!=0) {return(n mod m);}
 }
+
+///////////////////////////////////////////////////////////////////////////////
 
 proc sysNewton (int n, list defset, int t, int q, int m, int #)
 "USAGE:   sysNewton (n, defset, t, q, m, #);  n is length, defset is the defining set,
@@ -299,7 +293,7 @@ EXAMPLE:  example sysNewton; shows an example
  poly sum;
  
  
- // generate generalized Newton identities
+ //------------ generate generalized Newton identities ----------
  if (#)
  {
   for (i=1; i<=t; i++)
@@ -333,13 +327,13 @@ EXAMPLE:  example sysNewton; shows an example
   newton=newton,S(t+i)+sum;
  } 
  
- // field equations on sigma's
+ //----------- add field equations on sigma's --------------
  for (i=1; i<=t; i++)
  {
   newton=newton,sigma(i)^(q^m)-sigma(i);
  }
  
- // conjugacy relations
+ //----------- add conjugacy relations ------------------
  for (i=1; i<=n; i++)
  {
   newton=newton,S(i)^q-S(mod_(q*i,n));
@@ -370,6 +364,8 @@ EXAMPLE:  example sysNewton; shows an example
      print(newton); // generalized Newton identities in triangular form
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// forms a list of special combinations needed for computation of Waring's function
 static proc combinations_sum (int m, int n)
 {
  list result;
@@ -403,6 +399,8 @@ static proc combinations_sum (int m, int n)
  return(result);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//if n=q^e*m, m and n are coprime, then return e
 static proc exp_count (int n, int q)
 {
  int flag=1;
@@ -414,6 +412,8 @@ static proc exp_count (int n, int q)
  }
  return(result);
 }
+
+///////////////////////////////////////////////////////////////////////////////
 
 
 proc sysBin (int v, list Q, int n, int#)
@@ -458,7 +458,8 @@ EXAMPLE:   example sysBin; shows an example
  {
   Q_update=Q;
  }
-   
+ 
+ //-------------- form polynomials for the Bin system via Waring's function --------------  
  for (i=1; i<=size(Q_update); i++)
  {
   comb=combinations_sum(v,Q_update[i]);
@@ -510,6 +511,8 @@ EXAMPLE:   example sysBin; shows an example
      print(bin);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
 proc encode (matrix x, matrix g)
 "USAGE:  encode (x, g);  x a row vector (message), and g a generator matrix
 RETURN:  corresponding codeword
@@ -531,6 +534,8 @@ EXAMPLE: example encode; shows an example
      //encode x with the generator matrix g
      print(encode(x,g)); 
 }
+
+///////////////////////////////////////////////////////////////////////////////
 
 proc syndrome (matrix h, matrix c)
 "USAGE:  syndrome (h, c);  h a check matrix, c a row vector (codeword)
@@ -563,6 +568,8 @@ EXAMPLE: example syndrome; shows an example
      print(syndrome(check,c));
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// (coordinatewise) star product of two vectors
 static proc star(matrix m, int i, int j)
 {
  matrix result[ncols(m)][1];
@@ -572,6 +579,8 @@ static proc star(matrix m, int i, int j)
  }
  return(result);
 }
+
+///////////////////////////////////////////////////////////////////////////////
 
 proc sysQE(matrix check, matrix y, int t, int fieldeq, int formal)
 "USAGE:   sysQE(check, y, t, fieldeq, formal); check is the check matrix of the code   
@@ -622,6 +631,7 @@ EXAMPLE:  example sysQE; shows an example
  int tim=rtimer;
  matrix transf=inverse(transpose(h_full));
   
+ //----------- expression matrix of check vectors w.r.t. the MDS basis --------------
  tim=rtimer;
  for (i=1; i<=red ; i++)
  {
@@ -629,6 +639,7 @@ EXAMPLE:  example sysQE; shows an example
   a[i]=transf*a[i];
  }
  
+ //----------- compute the structure constants ------------------------
  tim=rtimer;
  matrix te[n][1]; 
  for (i=1; i<=n; i++)
@@ -693,6 +704,8 @@ EXAMPLE:  example sysQE; shows an example
      result=result,V(j)^q-V(j);
   }
  } 
+ 
+ //--------- form the quadratic equations according to the theory ---------------
  for (i=1; i<=n; i++)
  {
   sum1=0;
@@ -742,6 +755,8 @@ EXAMPLE:  example sysQE; shows an example
      print(sys_qe);     
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
 proc errorInsert(matrix y, list pos, list val)
 "USAGE:  errorInsert(y, pos, val); y is a (code) word, pos = positions where errors occured, val = their corresponding values
 RETURN:  corresponding received word
@@ -773,6 +788,8 @@ EXAMPLE: example error; shows an example
      print(rec);
      print(rec-y);
 }
+
+///////////////////////////////////////////////////////////////////////////////
 
 proc errorRand(matrix y, int num, int e)
 "USAGE:    errorRand(y, num, e); y is a (code) word, num is the number of errors, e is an extension degree (if one wants values to
@@ -834,6 +851,8 @@ EXAMPLE:   example errorRand; shows an example
      print(rec-y);     
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
 proc randomCheck(int m, int n, int e, int #)
 "USAGE:    randomCheck(m, n, e); m x n are dimensions of the matrix, e is an extension degree (if one wants values to
            be from GF(p^e))
@@ -870,6 +889,8 @@ EXAMPLE:   example randomCheck; shows an example
      print(g);     
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
 proc genMDSMat(int n, number a)
 "USAGE:   genMDSMat(n, a); n x n are dimensions of the matrix, a is a primitive element of the field.          
 NOTE:     An MDS matrix is constructed in the following way. We take a to be a generator of the multiplicative group of the field.
@@ -900,6 +921,8 @@ EXAMPLE:  example genMDSMat; shows an example
      print(h_full);     
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
 
 proc mindist (matrix check)
 "USAGE:  mindist (check, q); check is a check matrix, q = field size
@@ -924,6 +947,8 @@ EXAMPLE: example mindist; shows an example
  matrix z[1][n]; 
  option(redSB);
  def A=sysQE(check,z,count,0,0);
+
+ //----------- proceed with solving the system w.r.t zero vector until some solutions are found -------------------- 
  while (flag)
  {
     A=sysQE(check,z,count,0,0);
@@ -969,6 +994,8 @@ EXAMPLE: example mindist; shows an example
      //time for the comutation in secs   
      print(l[2]);     
 }
+
+///////////////////////////////////////////////////////////////////////////////
 
 proc decode(matrix check, matrix rec)
 "USAGE:    decode(check, rec, t); check is the check matrix of the code
@@ -1043,6 +1070,8 @@ EXAMPLE:   example decode; shows an example
      print(dec_word);     
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
 
 proc solveForRandom(int n, int redun, int ncodes, int ntrials, int #)
 "USAGE:    solveForRandom(redun, q, ncodes, ntrials); redun is a redundabcy of a (random) code,
@@ -1065,6 +1094,8 @@ EXAMPLE:   example solveForRandom; shows an example
  matrix h_full=genMDSMat(n,a); 
  matrix z[1][ncols(h_full)];
  int n=ncols(h_full);
+
+ //------------------ determine error-correction capacity -------------------
  for (i=1; i<=ncodes; i++)
  {
   setring br;
@@ -1084,6 +1115,8 @@ EXAMPLE:   example solveForRandom; shows an example
   }     
   tim2=rtimer;  
   tim3=rtimer;
+
+  //------------- generate the template system ----------------------
   def A=sysQE(h,z,t,0,0);
   setring A;
   matrix word,y,rec;
@@ -1093,6 +1126,8 @@ EXAMPLE:   example solveForRandom; shows an example
   ideal sys=qe;
   print("The system is generated");
   timdec3=timdec3+rtimer-tim3;  
+
+  //------------- modify the template according to every received word -------------------
   for (j=1; j<=ntrials; j++)
   {
    word=randomvector(n-redun,1);   
@@ -1122,6 +1157,8 @@ EXAMPLE:   example solveForRandom; shows an example
      solveForRandom(n,redun,5,50,2); 
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
 
 proc solveForCode(matrix check, int ntrials, int #)
 "USAGE:     solveForCode(check, ntrials); 
@@ -1148,6 +1185,8 @@ EXAMPLE:    example solveForCode; shows an example
  setring br;
  h=check;
  print(h);
+
+ //------------------ determine error-correction capacity -------------------
  if (#>0)
  {
     t=#;
@@ -1162,6 +1201,8 @@ EXAMPLE:    example solveForCode; shows an example
  }     
  tim2=rtimer;  
  tim3=rtimer;
+
+ //------------- generate the template system ----------------------
  def A=sysQE(h,z,t,0,0);
  setring A;
  matrix word,y,rec;
@@ -1170,7 +1211,9 @@ EXAMPLE:    example solveForCode; shows an example
  matrix g=dual_code(h);  
  ideal sys=qe;
  print("The system is generated");
- timdec3=timdec3+rtimer-tim3;  
+ timdec3=timdec3+rtimer-tim3; 
+
+ //------------- modify the template according to every received word ------------------- 
  for (j=1; j<=ntrials; j++)
  {
    word=randomvector(n-redun,1);   
@@ -1201,17 +1244,8 @@ EXAMPLE:    example solveForCode; shows an example
 }
 
 
-static proc list2intvec (list l)
-{
- intvec result;
- for (int i=1; i<=size(l); i++)
- {
-  result[i]=l[i];
- }
- return(result);
-}
-   
-
+///////////////////////////////////////////////////////////////////////////////
+// adding syndrome values to the template system
 static proc add_synd (matrix rec, matrix check, int redun, ideal sys)
 {
      ideal result=sys;
@@ -1224,6 +1258,8 @@ static proc add_synd (matrix rec, matrix check, int redun, ideal sys)
      return(result);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// evaluate a polynomial at a given point
 static proc ev (poly f, matrix p)
 {
      if (ncols(p)>1) {ERROR("not a column vector");};
@@ -1236,6 +1272,8 @@ static proc ev (poly f, matrix p)
      return(number(temp));
 }
 
+//////////////////////////////////////////////////////////////////////////////////////
+// return index of an element in the ideal where it does not vanish at the given point
 static proc find_index (ideal G, matrix p)
 {
      if (ncols(p)>1) {ERROR("not a column vector");};
@@ -1249,6 +1287,8 @@ static proc find_index (ideal G, matrix p)
      return(-1);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// convert ideal to list
 static proc ideal2list (ideal id)
 {
      list l;
@@ -1259,6 +1299,8 @@ static proc ideal2list (ideal id)
      return(l);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// convert list to ideal
 static proc list2ideal (list l)
 {
      ideal id;
@@ -1269,6 +1311,8 @@ static proc list2ideal (list l)
      return(id);
 }
 
+////////////////////////////////////////////////////////////////////////////////////
+// checl whether given polynomial is divisible by some leading monomial of the ideal
 static proc divisible (poly m, ideal G)
 {
      for (int i=1; i<=size(G); i++)
@@ -1277,6 +1321,8 @@ static proc divisible (poly m, ideal G)
      }
      return(0);
 }
+
+///////////////////////////////////////////////////////////////////////////////
 
 proc vanishId (list points)
 "USAGE:  vanishId (points,e); points is a list of points, for which the vanishing ideal is to be constructed.
@@ -1291,6 +1337,8 @@ EXAMPLE: example vanishId; shows an example
      int i,k,j;
      list temp;
      poly h,cur;
+
+     //------------- proceed according to Farr-Gao algorithm ----------------
      for (k=1; k<=n; k++)
      {          
           i=find_index(G,points[k]);
@@ -1324,12 +1372,12 @@ EXAMPLE: example vanishId; shows an example
       ring r=3,(x(1..3)),dp;
      
      //generate all 3-vectors over GF(3)
-     list points=points_gen(3,1);
+     list points=pointsGen(3,1);
      
-     list points2=conv_points(points);
+     list points2=convPoints(points);
      
      //grasps the first 11 points
-     list p=grasp_list(points2,1,11);
+     list p=graspList(points2,1,11);
      print(p);
      
      //construct the vanishing ideal
@@ -1337,7 +1385,9 @@ EXAMPLE: example vanishId; shows an example
      print(id);
 }
 
-proc points_gen (int m, int e)
+//////////////////////////////////////////////////////////////////////////////////////////////////
+// construct the list of all vectors of length m with elements in p^e, where p is characteristics
+proc pointsGen (int m, int e)
 {
      if (e>1)
      {
@@ -1363,7 +1413,7 @@ proc points_gen (int m, int e)
           }
           return(result);
      }
-     list prev=points_gen(m-1,e);     
+     list prev=pointsGen(m-1,e);     
      for (i=1; i<=size(prev); i++)
      {
           result[count]=prev[i];
@@ -1400,7 +1450,7 @@ proc points_gen (int m, int e)
           }
           return(result);
      }
-     list prev=points_gen(m-1,e);     
+     list prev=pointsGen(m-1,e);     
      for (i=1; i<=size(prev); i++)
      {
           for (j=0; j<=charac-1; j++)
@@ -1415,6 +1465,8 @@ proc points_gen (int m, int e)
      
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// convert list to a column vector
 static proc list2vec (list l)
 {
      matrix m[size(l)][1];
@@ -1425,7 +1477,9 @@ static proc list2vec (list l)
      return(m);
 }
 
-proc conv_points (list points)
+///////////////////////////////////////////////////////////////////////////////
+// convert all the point in the list with list2vec
+proc convPoints (list points)
 {
      for (int i=1; i<=size(points); i++)
      {
@@ -1434,7 +1488,9 @@ proc conv_points (list points)
      return(points);
 }
 
-proc grasp_list (list l, int m, int n)
+///////////////////////////////////////////////////////////////////////////////
+// extracts elements from l in the range m..n
+proc graspList (list l, int m, int n)
 {
      list result;
      int count=1;
@@ -1446,6 +1502,8 @@ proc grasp_list (list l, int m, int n)
      return(result);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// "characteristic" polynomial
 static proc xi_gen (matrix p, int e, int s)
 {
      poly prod=1;
@@ -1459,6 +1517,8 @@ static proc xi_gen (matrix p, int e, int s)
      return(prod);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// generating polynomials in Fitzgerald-Lax construction
 static proc gener_funcs (matrix check, list points, int e, ideal id, int s)
 {
      int n=ncols(check);
@@ -1484,6 +1544,8 @@ static proc gener_funcs (matrix check, list points, int e, ideal id, int s)
      return(result);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
 proc sysFL (matrix check, matrix y, int t, int e, int s)
 "USAGE:    sysFL (check,y,t,e,s); check is a check matrix of the code, y is a received word, t the number of errors to correct,
            e is the extension degree, s is the dimension of the point for the vanishing ideal
@@ -1495,9 +1557,9 @@ EXAMPLE:   example sysFL; shows an example
      int charac=rl[1][1];     
      int n=ncols(check);
      int m=nrows(check);          
-     list points=points_gen(s,e);
-     list points2=conv_points(points);
-     list p=grasp_list(points2,1,n);     
+     list points=pointsGen(s,e);
+     list points2=convPoints(points);
+     list p=graspList(points2,1,n);     
      ideal id=vanishId(p,e);      
      ideal funcs=gener_funcs(check,p,e,id,s);          
      
@@ -1505,7 +1567,7 @@ EXAMPLE:   example sysFL; shows an example
      poly temp;
      int i,j,k;
      
-     //vanishing realtions     
+     //--------------- add vanishing realtions ---------------------
      for (i=1; i<=t; i++)
      {          
           for (j=1; j<=size(id); j++)
@@ -1519,7 +1581,7 @@ EXAMPLE:   example sysFL; shows an example
           }
      }          
      
-     //field equations
+     //--------------- add field equations --------------------
      for (i=1; i<=t; i++)
      {
           for (k=1; k<=s; k++)
@@ -1534,7 +1596,7 @@ EXAMPLE:   example sysFL; shows an example
      
      result=simplify(result,8);
      
-     //check realtions
+     //--------------- add check realtions --------------------
      poly sum;
      matrix syn[m][1]=syndrome(check,y);          
      for (i=1; i<=size(funcs); i++)
@@ -1589,6 +1651,8 @@ EXAMPLE:   example sysFL; shows an example
      points;     
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// preprocessing steps for the Fitzgerald-Lax scheme
 proc FLpreprocess (int p, int e, int n, int t, string minp)
 {
      ring r1=p,x,dp;
@@ -1669,11 +1733,15 @@ proc FLpreprocess (int p, int e, int n, int t, string minp)
      return(list(r,s));
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// imitating two indeces
 static proc x_var (int i, int j, int s)
 {     
      return(x1(s*(i-1)+j));
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// random vector of length n with entries from p^e, p the characteristic
 static proc randomvector(int n, int e, int #)
 {     
     int i;
@@ -1685,6 +1753,8 @@ static proc randomvector(int n, int e, int #)
     return(result);        
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////
+// "convert" representation of an element from the field extension from vector to an elelemnt
 static proc asElement(list l)
 {
   number s;
@@ -1698,7 +1768,9 @@ static proc asElement(list l)
   return(s);
 }
 
-proc random_prime_vector (int n, int #)
+///////////////////////////////////////////////////////////////////////////////
+// random vector of length n with entries from p, p the characteristic
+static proc random_prime_vector (int n, int #)
 {
   if (#==1)
   {
@@ -1715,6 +1787,8 @@ proc random_prime_vector (int n, int #)
   }
   return(l);
 }
+
+///////////////////////////////////////////////////////////////////////////////
 
 proc solveForRandomFL(int n, int redun, int p, int e, int t, int ncodes, int ntrials, string minpol)
 "USAGE:    solveForRandomFL(redun,p,e,n,t,ncodes,ntrials,minpol); n = length of codes generated, redun = redundancy of codes generated, 
@@ -1747,10 +1821,13 @@ EXAMPLE:   example solveForRandomFL; shows an example
      h=randomCheck(redun,n,e,1);            
      g=dual_code(h);
      tim2=rtimer;       
-     tim3=rtimer;               
+     tim3=rtimer;
+
+     //------------ generate the template system ------------------               
      sys=sysFL(h,z,t,e,s_work);     
      timdec3=timdec3+rtimer-tim3;
    
+     //------------- modifying the template according to the received word ---------------
      for (j=1; j<=ntrials; j++)
      {
           word=randomvector(n-redun,1);
@@ -1775,6 +1852,8 @@ EXAMPLE:   example solveForRandomFL; shows an example
      solveForRandomFL(25,14,2,1,1,1,300,"");
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// add syndrome values to the template system in FL
 static proc LF_add_synd (matrix rec, matrix check, ideal sys)
 {
      int redun=nrows(check);
