@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.35 2008-03-27 18:15:40 motsak Exp $
+@comment $Id: COPYING.texi,v 1.36 2008-09-24 08:21:17 Singular Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -30,7 +30,8 @@ the omalloc library, the readline library,
 the Gnu Multiple Precision Library (GMP),
 NTL: A Library for doing Number Theory (NTL),
 the Multi Protocol library (MP), the
-Singular-Factory library, the Singular-libfac library, and,
+Singular-Factory library, the Singular-libfac library, 
+surfex, and,
 for the Windows distributions the Cygwin DLL and the Cygwin tools (Cygwin), and the
 XEmacs editor (XEmacs).
 
@@ -93,6 +94,9 @@ anonymous ftp through the following addresses:
 @item Singular-libfac
 @copyright{}  Messollen, University of Saarbr@"ucken:
 @* @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Libfac}
+@item surfex
+@copyright{} Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
+@* @uref{http://surfex.AlgebraicSurface.net}
 @item @sc{Singular} binaries and sources
 @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/} or via a
 WWW brow@-ser from
