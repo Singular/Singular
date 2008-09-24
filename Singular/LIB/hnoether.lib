@@ -1,4 +1,7 @@
-version="$Id: hnoether.lib,v 1.57 2008-07-08 12:33:46 Singular Exp $";
+version="$Id: hnoether.lib,v 1.58 2008-09-24 07:54:59 Singular Exp $";
+// (GMG, last modified 08.06.08: comments to Newton non-degenerate added)
+///////////////////////////////////////////////////////////////////////////////
+
 category="Singularities";
 info="
 LIBRARY:  hnoether.lib   Hamburger-Noether (Puiseux) Expansion
@@ -269,12 +272,12 @@ EXAMPLE: example squarefree; shows some examples.
 "
 {
  //----------------- Wechsel in geeigneten Ring & Variablendefinition ---------
+  if (nvars(basering)!=2)
+  { ERROR("basering must have exactly 2 variables for Hnoether::squarefree"); }
   def altring = basering;
   int e;
   int gcd_ok=1;
   string mipl="0";
-  if (nvars(basering)!=2)
-  { ERROR("basering must have exactly 2 variables for Hnoether::squarefree"); }
   if (size(parstr(altring))==1) { mipl=string(minpoly); }
  //---- test: char = (p^k,a) (-> gcd not implemented) or (p,a) (gcd works) ----
   if ((char(basering)!=0) and (charstr(basering)!=string(char(basering)))) {
@@ -2293,6 +2296,8 @@ EXAMPLE: example is_NND;  shows examples
 
   if(mu==nN)
   { // the Newton-polygon is non-degenerate
+    // REFERENCE? (tfuer mehr als 2 Variable gilt nicht, dass mu=nu impliziert,
+    // dass NP nicht ausgeartet ist!, Siehe KOMMENTAR in equising.lib in esIdeal)
     return(1);
   }
   else

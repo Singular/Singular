@@ -1,7 +1,8 @@
-// $Id: sing.lib,v 1.30 2006-08-02 15:40:52 Singular Exp $
-//(GMG/BM, last modified 26.06.96)
+// $Id: sing.lib,v 1.31 2008-09-24 07:54:59 Singular Exp $
+//(GMG/BM, last modified 26.06.96,
+//GMG, 27.7.08: in milnor printlevel und Ausschrift geŠndert)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: sing.lib,v 1.30 2006-08-02 15:40:52 Singular Exp $";
+version="$Id: sing.lib,v 1.31 2008-09-24 07:54:59 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  sing.lib      Invariants of Singularities
@@ -263,20 +264,20 @@ proc milnor (ideal i)
 RETURN:  Milnor number of i, if i is ICIS (isolated complete intersection
          singularity) in generic form, resp. -1 if not
 NOTE:    use proc nf_icis to put generators in generic form
-         printlevel >=0: display comments (default)
+         printlevel >=1: display comments
 EXAMPLE: example milnor; shows an example
 "
 {
   i = simplify(i,10);     //delete zeroes and multiples from set of generators
   int n = size(i);
   int l,q,m_nr;  ideal t;  intvec disc;
-  int p = printlevel-voice+3;  // p=printlevel+1 (default: p=1)
+  int p = printlevel-voice+2;             // p=printlevel+1 (default: p=0)
 //---------------------------- hypersurface case ------------------------------
   if( n==1 or i==0 )
   {
      i = std(jacob(i[1]));
      m_nr = vdim(i);
-     if( m_nr<0 and p>=1 ) { "// no isolated singularity"; }
+     if( m_nr<0 and p>=1 ) { "// Milnor number is infinite"; }
      return(m_nr);
   }
 //------------ isolated complete intersection singularity (ICIS) --------------
@@ -301,7 +302,7 @@ EXAMPLE: example milnor; shows an example
 example
 { "EXAMPLE:"; echo = 2;
    int p      = printlevel;
-   printlevel = 1;
+   printlevel = 2;
    ring r     = 32003,(x,y,z),ds;
    ideal j    = x5+y6+z6,x2+2y2+3z2,xyz+yx;
    milnor(j);
@@ -798,13 +799,14 @@ example
 proc codim (id1, id2)
 "USAGE:   codim(id1,id2); id1,id2 ideal or module, both must be standard bases
 RETURN:  int, which is:
-         1. the codimension of id2 in id1, i.e. the vectorspace dimension of
-            id1/id2 if id2 is contained in id1 and if this number is finite@*
+         1. the vectorspace dimension of id1/id2 if id2 is contained in id1
+            and if this number is finite@*
          2. -1 if the dimension of id1/id2 is infinite@*
-         3. -2 if id2 is not contained in id1,
-COMPUTE: consider the two Hilbert series iv1(t) and iv2(t), then, in case 1.,
-         q(t)=(iv2(t)-iv1(t))/(1-t)^n must be rational, and the result is the
-         sum of the coefficients of q(t) (n dimension of basering)
+         3. -2 if id2 is not contained in id1
+COMPUTE: consider the Hilbert series iv1(t) of id1 and iv2(t) of id2.
+         If codim(id1,id2) is finite,  q(t)=(iv2(t)-iv1(t))/(1-t)^n is
+         rational, and the codimension is the sum of the coefficients of q(t)
+         (n = dimension of basering).
 EXAMPLE: example codim; shows an example
 "
 {
@@ -823,9 +825,13 @@ EXAMPLE: example codim; shows an example
    i2 = dim(id2);
    if (i1 < 0)
    {
+     if ( i2 < 0 )
+     {
+        return(0);
+     }
      if (i2 == 0)
      {
-       return vdim(id2);
+       return (vdim(id2));
      }
      else
      {

@@ -1,6 +1,7 @@
-// (GMG/BM, last modified 22.06.96)
+//(GMG/BM, last modified 22.06.96)
+//(GMG, last modified 21.07.2008: Argument von show von id in @@id geaendert)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: inout.lib,v 1.30 2007-11-29 13:27:48 king Exp $";
+version="$Id: inout.lib,v 1.31 2008-09-24 07:54:59 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  inout.lib     Printing and Manipulating In- and Output
@@ -110,15 +111,13 @@ example
 
 proc pmat (matrix m, list #)
 "USAGE:   pmat(M[,n]);  M matrix, n integer
-RETURN: A string representing M in array format if it fits into 
-        pagewidth; if n is given, only the first n characters of 
-        each column are shown (n>1 required), where a truncation 
-        of a column is indicated by two dots (\'..\')
+DISPLAY: display M in array format if it fits into pagewidth; if n is given,
+         only the first n characters of each colum are shown
+RETURN:  no return value
 EXAMPLE: example pmat; shows an example
 "
 {
 //------------- main case: input is a matrix, no second argument---------------
-   string OUT = "";
    if ( size(#)==0)
    {
       int elems,mlen,slen,c,r;
@@ -144,7 +143,7 @@ EXAMPLE: example pmat; shows an example
             aus = aus + s(elems)[1,len(c)] + sep;
             elems = elems + nrows(m);
          }
-         OUT=OUT+aus+newline;
+         aus;
       }
    //--------------- print last row (no comma after last entry) ---------------
       aus = ""; elems = nrows(m);
@@ -154,50 +153,21 @@ EXAMPLE: example pmat; shows an example
          elems = elems + nrows(m);
       }
       aus = aus + string(m[nrows(m),ncols(m)]);
-      OUT=OUT+aus;  return(OUT);
+      aus;  return();
    }
 //---------- second case: second argument is given and of type int ------------
-   if ( typeof(#[1])=="int" and #[1]>1)
-   {  string aus,tmp; int c,r;
-   //---------------------- print all - except last - rows --------------------
-      for ( r=1; r<nrows(m); r=r+1)
+   if ( typeof(#[1])=="int" )
+   {  string aus,tmp; int ll,c,r;
+      for ( r=1; r<=nrows(m); r=r+1)
       {  aus = "";
          for (c=1; c<=ncols(m); c=c+1)
          {
             tmp=string(m[r,c]);
-            if (size(tmp)>#[1])
-            { tmp[#[1]-1]=".";
-              tmp[#[1]]  =".";
-              aus=aus+tmp[1,#[1]]+", ";
-            }
-            else
-            { tmp=tmp+",";
-              aus=aus+tmp[1,#[1]+1]+" ";
-            }
+            aus=aus+tmp[1,#[1]]+" ";
          }
-         OUT=OUT+aus+newline;
+         aus;
       }
-   //--------------- print last row (no comma after last entry) ---------------
-      aus = "";
-      for (c=1; c<ncols(m); c=c+1)
-      { tmp=string(m[r,c]);
-        if (size(tmp)>#[1])
-        { tmp[#[1]-1]=".";
-          tmp[#[1]]  =".";
-          aus=aus+tmp[1,#[1]]+", ";
-        }
-        else
-        { tmp=tmp+",";
-          aus=aus+tmp[1,#[1]+1]+" ";
-        }
-      }
-      tmp=string(m[nrows(m),ncols(m)]);
-      if (size(tmp)>#[1])
-      { tmp[#[1]-1]=".";
-        tmp[#[1]]  =".";
-      }
-      aus = aus + tmp[1,#[1]];
-      OUT=OUT+aus;  return(OUT);
+      return();
    }
 }
 example
@@ -206,7 +176,7 @@ example
    ideal i= x,z+3y,x+y,z;
    matrix m[3][3]=i^2;
    pmat(m);
-   pmat(m,5);
+   pmat(m,3);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -332,7 +302,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc show (id, list #)
+proc show (@@id, list #)
 "USAGE:   show(id);   id any object of basering or of type ring/qring
 @*       show(R,s);  R=ring, s=string (s = name of an object belonging to R)
 DISPLAY: display id/s in a compact format together with some information
@@ -354,40 +324,40 @@ EXAMPLE: example show; shows an example
    {
       if( typeof(#[1])=="int" ) { @li@=#[1]; }
    }
-   if ( typeof(id)!="list" )
+   if ( typeof(@@id)!="list" )
    {
       if( size(#)==0 )
       {
-          def @id@ = id;
+          def @id@ = @@id;
       }
       if( size(#)==1 )
       {
          if( typeof(#[1])=="int" )
          {
-             def @id@ = id;
+             def @id@ = @@id;
          }
          if( typeof(#[1])=="string" )
          {
-            if( typeof(id)=="ring" or typeof(id)=="qring")
+            if( typeof(@@id)=="ring" or typeof(@@id)=="qring")
             {
-               def @R@ = id;
+               def @R@ = @@id;
                setring @R@;
                def @id@=`#[1]`;
             }
          }
       }
    }
-//----------------------- case: id is of type list ----------------------------
-   if ( typeof(id)=="list" )
+//----------------------- case: @@id is of type list -------------------------
+   if ( typeof(@@id)=="list" )
    {
-//      @@s = tab(@li@)+"// list, "+string(size(id))+" element(s):";
-      @@s = tab((3*(voice-2)))+"// list, "+string(size(id))+" element(s):";
+//      @@s = tab(@li@)+"// list, "+string(size(@@id))+" element(s):";
+      @@s = tab((3*(voice-2)))+"// list, "+string(size(@@id))+" element(s):";
       @@s;
-      for ( @ii=1; @ii<=size(id); @ii++ )
+      for ( @ii=1; @ii<=size(@@id); @ii++ )
       {
-         if( typeof(id[@ii])!="none" )
+         if( typeof(@@id[@ii])!="none" )
          {
-            def @id(@ii) = id[@ii];
+            def @id(@ii) = @@id[@ii];
             tab(3*(voice-2))+"["+string(@ii)+"]:";
             //           show(@id(@ii),@li@+3*(voice-1));
             show(@id(@ii),3*(voice-1));
@@ -395,7 +365,7 @@ EXAMPLE: example show; shows an example
          else
          {
             "["+string(@ii)+"]:";
-            tab(@li@+2),"//",id[@ii];
+            tab(@li@+2),"//",@@id[@ii];
          }
       }
       short=@short@; return();
@@ -486,7 +456,7 @@ EXAMPLE: example show; shows an example
       if( typeof(@id@)=="ring" )
       {
          list na@me@s=names(@id@);
-         kill @id@;
+         //kill @id@;
          @@s = tab(@li@)+"// ring:"; @@s,s;
          @@s = tab(@li@)+"// minpoly ="; @@s,minpoly;
          "// objects belonging to this ring:";
