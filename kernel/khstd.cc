@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: khstd.cc,v 1.3 2006-09-21 16:02:20 Singular Exp $ */
+/* $Id: khstd.cc,v 1.4 2008-09-24 15:55:19 Singular Exp $ */
 /*
 * ABSTRACT:utils for hilbert driven kStd
 */
@@ -31,6 +31,7 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
 * then we have eledeg == 0 on this degree and we make:
 *   - compute the Hilbert series newhilb from S
 *     (hilb is the final Hilbert series)
+*   - in module case: check that all comp up to strat->ak are used
 *   - compute the eledeg from newhilb-hilb for the first degree deg with
 *     newhilb-hilb != 0
 *     (Remark: consider the Hilbert series with coeff. up to infinity)
@@ -72,6 +73,23 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
           eledeg = -(*hilb)[deg];
         else // we have newhilb = hilb
         {
+          if (strat->ak>0)
+          {
+            char *used_comp=(char*)omAlloc0(strat->ak+1);
+            int i;
+            for(i=strat->sl;i>0;i--)
+              used_comp[pGetComp(strat->S[i])]='\1';
+            for(i=strat->ak;i>0;i--)
+            {
+              if(used_comp[i]=='\0')
+              {
+                omFree((ADDRESS)used_comp);
+                delete newhilb;
+                return;
+              }
+            }
+            omFree((ADDRESS)used_comp);
+          }
           while (strat->Ll>=0)
           {
             count++;
