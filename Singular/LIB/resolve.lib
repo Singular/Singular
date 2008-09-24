@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: resolve.lib,v 1.10 2008-02-22 14:17:21 Singular Exp $";
+version="$Id: resolve.lib,v 1.11 2008-09-24 16:41:31 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  resolve.lib      Resolution of singularities (Desingularization)
@@ -4643,7 +4643,7 @@ if((dim(std(cent))==0)&&defined(shortcut)) {kill shortcut;}
                 break;
               }
            }
-           if(k)
+           if((k)||(extra==2))
            {
 //--- chart finished, non-redundant
               endRings[size(endRings)+1]=S;
