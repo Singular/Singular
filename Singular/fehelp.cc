@@ -3,7 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
-* versin $Id: fehelp.cc,v 1.53 2008-09-10 08:52:56 Singular Exp $
+* versin $Id: fehelp.cc,v 1.54 2008-09-25 10:20:37 Singular Exp $
 */
 
 #include <string.h>
@@ -733,7 +733,7 @@ static BOOLEAN heOnlineHelp(char* s)
       h=ggetid(s);
       if (h!=NULL)
       {
-        Print("help for %s from package %\n",ss,s);
+        Print("help for %s from package %s\n",ss,s);
         char s_help[200];
         strcpy(s_help,ss);
         strcat(s_help,"_help");
