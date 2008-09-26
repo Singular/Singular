@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.108 2008-09-16 12:33:18 Singular Exp $ */
+/* $Id: kutil.cc,v 1.109 2008-09-26 08:09:09 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1331,11 +1331,11 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat,
   p_LmDelete(m2, strat->tailRing);
 
 #ifdef KDEBUG
-    if (TEST_OPT_DEBUG)
-    {
-      wrp(gcd);
-      PrintLn();
-    }
+  if (TEST_OPT_DEBUG)
+  {
+    wrp(gcd);
+    PrintLn();
+  }
 #endif
 
   LObject h;
@@ -1343,14 +1343,14 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat,
   h.tailRing = strat->tailRing;
   int posx;
   h.pCleardenom();
-    strat->initEcart(&h);
-    if (strat->Ll==-1)
-      posx =0;
-    else
-      posx = strat->posInL(strat->L,strat->Ll,&h,strat);
-    h.sev = pGetShortExpVector(h.p);
-    h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
-    enterL(&strat->L,&strat->Ll,&strat->Lmax,h,posx);
+  strat->initEcart(&h);
+  if (strat->Ll==-1)
+    posx =0;
+  else
+    posx = strat->posInL(strat->L,strat->Ll,&h,strat);
+  h.sev = pGetShortExpVector(h.p);
+  h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
+  enterL(&strat->L,&strat->Ll,&strat->Lmax,h,posx);
   return TRUE;
 }
 #endif
@@ -1727,6 +1727,28 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
 }
 
 /*2
+* merge set B into L
+*/
+void kMergeBintoL(kStrategy strat)
+{
+  int j=strat->Ll+strat->Bl+1;
+  if (j>strat->Lmax)
+  {
+    j=((j+setmaxLinc-1)/setmaxLinc)*setmaxLinc;
+    strat->L = (LSet)omReallocSize(strat->L,strat->Lmax*sizeof(LObject),
+                                 j*sizeof(LObject));
+    strat->Lmax=j;
+  }
+  j = strat->Ll;
+  int i;
+  for (i=strat->Bl; i>=0; i--)
+  {
+    j = strat->posInL(strat->L,j,&(strat->B[i]),strat);
+    enterL(&strat->L,&strat->Ll,&strat->Lmax,strat->B[i],j);
+  }
+  strat->Bl = -1;
+}
+/*2
 *the pairset B of pairs of type (s[i],p) is complete now. It will be updated
 *using the chain-criterion in B and L and enters B to L
 */
@@ -1855,18 +1877,9 @@ void chainCrit (poly p,int ecart,kStrategy strat)
       }
     }
     /*
-    *the elements of B enter L/their order with respect to B is kept
-    *j = posInL(L,j,B[i]) would permutate the order
-    *if once B is ordered different from L
-    *then one should use j = posInL(L,Ll,B[i])
+    *the elements of B enter L
     */
-    j = strat->Ll+1;
-    for (i=strat->Bl; i>=0; i--)
-    {
-      j = strat->posInL(strat->L,j-1,&(strat->B[i]),strat);
-      enterL(&strat->L,&strat->Ll,&strat->Lmax,strat->B[i],j);
-    }
-    strat->Bl = -1;
+    kMergeBintoL(strat);
   }
   else
   {
@@ -1894,13 +1907,7 @@ void chainCrit (poly p,int ecart,kStrategy strat)
     *B enters to L/their order with respect to B is permutated for elements
     *B[i].p with the same leading term
     */
-    j = strat->Ll;
-    for (i=strat->Bl; i>=0; i--)
-    {
-      j = strat->posInL(strat->L,j,&(strat->B[i]),strat);
-      enterL(&strat->L,&strat->Ll,&strat->Lmax,strat->B[i],j);
-    }
-    strat->Bl = -1;
+    kMergeBintoL(strat);
     j = strat->Ll;
     loop  /*cannot be changed into a for !!! */
     {
@@ -2129,18 +2136,9 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
       }
     }
     /*
-    *the elements of B enter L/their order with respect to B is kept
-    *j = posInL(L,j,B[i]) would permutate the order
-    *if once B is ordered different from L
-    *then one should use j = posInL(L,Ll,B[i])
+    *the elements of B enter L
     */
-    j = strat->Ll+1;
-    for (i=strat->Bl; i>=0; i--)
-    {
-      j = strat->posInL(strat->L,j-1,&(strat->B[i]),strat);
-      enterL(&strat->L,&strat->Ll,&strat->Lmax,strat->B[i],j);
-    }
-    strat->Bl = -1;
+    kMergeBintoL(strat);
   }
   else
   {
@@ -2176,13 +2174,7 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
     *B enters to L/their order with respect to B is permutated for elements
     *B[i].p with the same leading term
     */
-    j = strat->Ll;
-    for (i=strat->Bl; i>=0; i--)
-    {
-      j = strat->posInL(strat->L,j,&(strat->B[i]),strat);
-      enterL(&strat->L,&strat->Ll,&strat->Lmax,strat->B[i],j);
-    }
-    strat->Bl = -1;
+    kMergeBintoL(strat);
     j = strat->Ll;
     loop  /*cannot be changed into a for !!! */
     {
@@ -2406,13 +2398,7 @@ void chainCritRing (poly p,int ecart,kStrategy strat)
   *B enters to L/their order with respect to B is permutated for elements
   *B[i].p with the same leading term
   */
-  j = strat->Ll;
-  for (i=strat->Bl; i>=0; i--)
-  {
-    j = strat->posInL(strat->L,j,&(strat->B[i]),strat);
-    enterL(&strat->L,&strat->Ll,&strat->Lmax,strat->B[i],j);
-  }
-  strat->Bl = -1;
+  kMergeBintoL(strat);
   j = strat->Ll;
   loop  /*cannot be changed into a for !!! */
   {
