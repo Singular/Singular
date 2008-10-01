@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.309 2008-09-12 10:41:51 Singular Exp $
+@comment $Id: reference.doc,v 1.310 2008-10-01 13:55:30 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4418,7 +4418,7 @@ which was used in Singular version before 2-0
 @c ---------
 @item @code{prot}
 @cindex prot, option
-@cindex protocoll of computations
+@cindex protocol of computations
 @cindex progress watch
 shows protocol information indicating the
 progress during the following computations:

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.52 2008-07-17 12:27:39 wienand Exp $
+@comment $Id: start.doc,v 1.53 2008-10-01 13:55:31 Singular Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added changes by GMG.
 
@@ -82,7 +82,7 @@ H.@: Schoenemann; Humboldt-Universitaet
 @tex
 H.\ Sch\"onemann; Humboldt-Universit\"at
 @end tex
-zu Berlin).  The need for a new system arose from the investigation of
+ zu Berlin).  The need for a new system arose from the investigation of
 mathematical problems coming from singularity theory which none of the
 existing systems was able to compute.
 
