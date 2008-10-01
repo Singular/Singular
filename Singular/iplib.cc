@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.126 2008-08-13 15:16:23 Singular Exp $ */
+/* $Id: iplib.cc,v 1.127 2008-10-01 15:18:44 seelisch Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -385,7 +385,7 @@ static void iiShowLevRings()
   {
     Print("lev %d:",i);
     if (iiLocalRing[i]==NULL) PrintS("NULL");
-    else                      Print("%x",iiLocalRing[i]);
+    else                      Print("%lx",(long)iiLocalRing[i]);
     PrintLn();
   }
 #endif
@@ -403,7 +403,7 @@ static void iiShowLevRings()
   }
 #endif
   if (currRing==NULL) PrintS("curr:NULL\n");
-  else                Print ("curr:%x\n",currRing);
+  else                Print ("curr:%lx\n",(long)currRing);
 }
 #endif /* RDEBUG */
 
