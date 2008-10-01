@@ -1,6 +1,6 @@
-// $Id: ainvar.lib,v 1.8 2006-07-18 12:17:36 Singular Exp $
+// $Id: ainvar.lib,v 1.9 2008-10-01 15:29:23 Singular Exp $
 /////////////////////////////////////////////////////////////////////////////
-version="$Id: ainvar.lib,v 1.8 2006-07-18 12:17:36 Singular Exp $";
+version="$Id: ainvar.lib,v 1.9 2008-10-01 15:29:23 Singular Exp $";
 category="Invariant theory";
 info="
 LIBRARY: ainvar.lib    Invariant Rings of the Additive Group
@@ -25,27 +25,22 @@ LIB "algebra.lib";
 
 proc sortier(id)
 "USAGE:   sortier(id);  id ideal/module
-RETURN:  the same ideal/module but with generators ordered by there
-         leading term, starting with the smallest
+RETURN:  the same ideal/module but with generators ordered by their
+         leading terms, starting with the smallest
 EXAMPLE: example sortier; shows an example
 "
 {
   if(size(id)==0)
-  {return(id);
-  }
+  {return(id); }
   intvec i=sortvec(id);
   int j;
   if( typeof(id)=="ideal")
-  { ideal m;
-  }
+  { ideal m; }
   if( typeof(id)=="module")
-  { module m;
-  }
- if( typeof(id)!="ideal" and  typeof(id)!="module")
- { "// input must be of type ideal or module"
-     return();
- }
- for (j=1;j<=size(i);j++)
+  { module m; }
+  if( typeof(id)!="ideal" and  typeof(id)!="module")
+  { ERROR("input must be of type ideal or module"); }
+  for (j=1;j<=size(i);j++)
   {
     m[j] = id[i[j]];
   }

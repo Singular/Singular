@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.42 2008-06-27 18:08:53 motsak Exp $";
+version="$Id: matrix.lib,v 1.43 2008-10-01 15:29:23 Singular Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -301,13 +301,11 @@ EXAMPLE: example power; shows an example
 //---------------------------- type checking ----------------------------------
    if( typeof(A)!="matrix" and typeof(A)!="intmat" )
    {
-      "// no matrix or intmat!";
-      return (A);
+      ERROR("no matrix or intmat!");
    }
    if( ncols(A) != nrows(A) )
    {
-      "// not a suare matrix!";
-      return();
+      ERROR("not a square matrix!");
    }
 //---------------------------- trivial cases ----------------------------------
    int ii;
