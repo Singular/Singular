@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: bfct.lib,v 1.3 2008-08-22 09:31:56 Singular Exp $";
+version="$Id: bfct.lib,v 1.4 2008-10-01 17:44:37 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: bfct.lib     M. Noro's Algorithm for Bernstein-Sato polynomial
@@ -18,11 +18,11 @@ THEORY: Given a polynomial ring R = K[x_1,...,x_n] and a polynomial F in R,
 MAIN PROCEDURES:
 
 bfct(f[,s,t,v]);           compute the global Bernstein-Sato polynomial of a given poly
-bfctsyz(f[,r,s,t,v]);      compute the global Bernstein-Sato polynomial of a given poly
+bfctsyz(f[,r,s,t,u,v]);    compute the global Bernstein-Sato polynomial of a given poly
 bfctonestep(f[,s,t]);      compute the global Bernstein-Sato polynomial of a given poly
 bfctideal(I,w[,s,t]);      compute the global b-function of a given ideal w.r.t. a given weight
-minpol(f,I);               compute the minimal polynomial of the endormorphism in basering modulo I given by f
-minpolsyz(f,I[,p,t]);      compute the minimal polynomial of the endormorphism in basering modulo I given by f
+minpol(f,I);               compute the minimal polynomial of the endormorphism in basering modulo ideal given by a poly
+minpolsyz(f,I[,p,s,t]);    compute the minimal polynomial of the endormorphism in basering modulo ideal given by a poly
 linreduce(f,I[,s]);        reduce a poly by linear reductions of its leading term
 ncsolve(I[,s]);            find and compute a linear dependency of the elements of an ideal
 
@@ -40,11 +40,10 @@ LIB "qhmoduli.lib"; // for Max
 LIB "dmodapp.lib"; // for initialideal etc
 
 
-proc testbfctlib()
+proc testbfctlib ()
 {
   // tests all procs for consistency
   "AUXILIARY PROCEDURES:";
-
   example ispositive;
   example isin;
   example scalarprod;
@@ -185,8 +184,8 @@ proc scalarprod (intvec v, intvec w)
 "USAGE:  scalarprod(v,w);  v,w intvecs
 RETURN:  an int, the standard scalar product of v and w
 PURPOSE: compute the scalar product of two intvecs
-EXAMPLE: example scalarprod; shows examples
 NOTE:    the arguments must have the same size
+EXAMPLE: example scalarprod; shows examples
 "
 {
   int i; int sp;
@@ -217,8 +216,8 @@ example
 
 proc linreduce(poly f, ideal I, list #)
 "USAGE:  linreduce(f, I [,s]);  f a poly, I an ideal, s an optional int
-RETURN:  a poly obtained by linear reductions of the leading term with I
-PURPOSE: reduce a poly by linear reductions of its leading term only
+RETURN:  a poly obtained by linear reductions of the leading term of the given poly with an ideal
+PURPOSE: reduce a poly only by linear reductions of its leading term
 NOTE:    If s<>0, a list consisting of the reduced poly and the vector of the used 
 @*       reductions is returned.
 EXAMPLE: example linreduce; shows examples
@@ -279,7 +278,7 @@ example
   ring r = 0,(x,y),dp;
   ideal I = 1,y,xy;
   poly f = 5xy+7y+3;
-  poly g = 5xy+7x+3;
+  poly g = 5y+7x+3;
   linreduce(f,I);
   linreduce(g,I);
   linreduce(f,I,1);
@@ -348,12 +347,10 @@ EXAMPLE: example ncsolve; shows examples
     // 3. this QQ is a polynomial ideal, so "solve" the system
     dbprint(ppl, "ncsolve: starting Groebner basis computation with engine:", whichengine);
     QQ = engine(QQ,whichengine);
-    dbprint(ppl, "QQ after groebner:", QQ);
-    //    "QQ after groebner:"; QQ;
+    dbprint(ppl, "QQ after engine:", QQ);
     if (dim(QQ) == -1)
     {
       dbprint(ppl+1, "no solutions by ncsolve");
-      //      "no solutions by ncsolve";
       // output zeroes
       setring save;
       kill @A,@aA,@B;
@@ -361,8 +358,8 @@ EXAMPLE: example ncsolve; shows examples
     }
     // 4. in order to get the numeric values
     matrix AA = matrix(maxideal(1));
-    attrib(QQ,"isSB",1); // to suppress NF warnings
-    AA = NF(AA,QQ);      // todo: we still receive NF warnings
+    module MQQ = std(module(QQ));
+    AA = NF(AA,MQQ); // todo: we still receive NF warnings
     dbprint(ppl, "AA after NF:",AA);
     //    "AA after NF:"; print(AA);
     for(i=1; i<=sI; i++)
@@ -482,17 +479,18 @@ EXAMPLE: example minpol; shows examples
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring r = 0,(t,x,y,Dt,Dx,Dy),dp;
-  def D = Weyl();
+  printlevel = 0;
+  ring r = 0,(x,y),dp;
+  poly f = x^2+y^3+x*y^2;
+  def D = initialmalgrange(f);
   setring D;
-  ideal I = x*Dt,6*t*Dt+2*y*Dy+3*x*Dx+6,3*y^2*Dx-2*x*Dy,2*y*x*Dy+3*x^2*Dx+6*x,y^2*Dt,y^3+x^2,9*y*x^2*Dx^2+4*x^2*Dy^2+6*y^2*Dy+24*y*x*Dx+18*y,27*x^3*Dx^3-8*x^2*Dy^3-12*y^2*Dy^2+162*x^2*Dx^2-48*y*Dy+186*x*Dx;
-  // I is a Groebner basis of the initial Malgrange ideal of x2+y3
+  inF;
   poly s = t*Dt;
-  vector m = minpol(s,I);m;
+  minpol(s,inF);
 }
 
 proc minpolsyz (poly s, ideal II, list #)
-"USAGE:  minpolsyz(f, I [,p,t]);  f a poly, I an ideal, p, t optial ints, p a prime number
+"USAGE:  minpolsyz(f, I [,p,s,t]);  f a poly, I an ideal, p, t optial ints, p a prime number
 RETURN:  coefficient vector of the minimal polynomial of the endomorphism of basering modulo I defined by f
 PURPOSE: compute the minimal polynomial
 NOTE:    If f does not define an endomorphism, this proc will not terminate.
@@ -501,9 +499,10 @@ NOTE:    If f does not define an endomorphism, this proc will not terminate.
 @*       then only searches for a minimal polynomial of the obtained degree in the basering.
 @*       Otherwise, it searched for all degrees.
 @*       This is done by computing syzygies.
-@*       If s<>0, @code{std} is used for Groebner basis computations,
-@*       otherwise @code{slimgb} is used.
-@*       By default, @code{slimgb} is used in char 0 and @code{std} in char p.
+@*       If s<>0, @code{std} is used for Groebner basis computations in char 0,
+@*       otherwise, and by default, @code{slimgb} is used.
+@*       If t<>0 and by default, @code{std} is used for Groebner basis computations in char >0,
+@*       otherwise, @code{slimgb} is used.
 @*       If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example minpolsyz; shows examples
@@ -514,21 +513,27 @@ EXAMPLE: example minpolsyz; shows examples
   attrib(I,"isSB",1); // set attribute for suppressing NF messages
   int ppl = printlevel-voice+2;
   int whichengine  = 0; // default
-  int enginespec   = 0; // default
+  int modengine    = 1; // default
   int solveincharp = 0; // default
   def save = basering;
   if (size(#)>0)
   {
     if (typeof(#[1])=="int" || typeof(#[1])=="number")
     {
-      solveincharp = int( #[1]);
+      solveincharp = int(#[1]);
     }
     if (size(#)>1)
     {
       if (typeof(#[2])=="int" || typeof(#[2])=="number")
       {
         whichengine = int(#[2]);
-	enginespec = 1;
+      }
+      if (size(#)>2)
+      {
+	if (typeof(#[3])=="int" || typeof(#[3])=="number")
+	{
+	  modengine = int(#[3]);
+	}
       }
     }
   }
@@ -585,14 +590,7 @@ EXAMPLE: example minpolsyz; shows examples
     {
       setring Rp;
       NI[i+1] = phi(newNF);
-      if (enginespec==1)
-      {
-	v = ncsolve(NI,whichengine);
-      }
-      else
-      {
-	v = ncsolve(NI);
-      }
+      v = ncsolve(NI,modengine);
       if (v!=0) // there is a modular solution
       {
 	dbprint(ppl,"got solution in char ",solveincharp," of degree " ,i);
@@ -646,15 +644,16 @@ EXAMPLE: example minpolsyz; shows examples
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring r = 0,(t,x,y,Dt,Dx,Dy),dp;
-  def D = Weyl();
+  printlevel = 0;
+  ring r = 0,(x,y),dp;
+  poly f = x^2+y^3+x*y^2;
+  def D = initialmalgrange(f);
   setring D;
-  ideal I = x*Dt,6*t*Dt+2*y*Dy+3*x*Dx+6,3*y^2*Dx-2*x*Dy,2*y*x*Dy+3*x^2*Dx+6*x,y^2*Dt,y^3+x^2,9*y*x^2*Dx^2+4*x^2*Dy^2+6*y^2*Dy+24*y*x*Dx+18*y,27*x^3*Dx^3-8*x^2*Dy^3-12*y^2*Dy^2+162*x^2*Dx^2-48*y*Dy+186*x*Dx;
-  // I is a Groebner basis of the initial Malgrange ideal of x2+y3
+  inF;
   poly s = t*Dt;
-  minpolsyz(s,I);
+  minpolsyz(s,inF);
   int p = prime(20000);
-  minpolsyz(s,I,p,0);
+  minpolsyz(s,inF,p,0,0);
 }
 
 static proc listofroots (list #)
@@ -684,7 +683,7 @@ static proc listofroots (list #)
   }
   map @m = save,J;
   poly p = @m(p);
-  if (substitution ==1)
+  if (substitution == 1)
   {
     p = subst(p,s,-s-1);
   }
@@ -705,7 +704,7 @@ static proc listofroots (list #)
   return(BS);
 }
 
-static proc bfctengine (poly f, int whichengine, int methodord, int methodminpol, int minpolchar, intvec u0)
+static proc bfctengine (poly f, int whichengine, int methodord, int methodminpol, int minpolchar, int modengine, intvec u0)
 {
   int ppl = printlevel - voice +2;
   int i;
@@ -734,7 +733,7 @@ static proc bfctengine (poly f, int whichengine, int methodord, int methodminpol
         {
 	  usedprimes = usedprimes,q;
 	  dbprint(ppl,"used prime is: "+string(q));
-	  b = minpolsyz(s,inI,q,whichengine);
+	  b = minpolsyz(s,inI,q,whichengine,modengine);
 	}
 	i++;
       }
@@ -755,8 +754,8 @@ static proc bfctengine (poly f, int whichengine, int methodord, int methodminpol
 }
 
 proc bfct (poly f, list #)
-"USAGE:  bfct(f [,s,t,v]);  f a poly, r,s,t optional ints, v an optional intvec
-RETURN:  list of roots of the Bernstein-Sato polynomial bs(f) and its multiplicies
+"USAGE:  bfct(f [,s,t,v]);  f a poly, s,t optional ints, v an optional intvec
+RETURN:  list of roots of the Bernstein-Sato polynomial bs(f) and their multiplicies
 PURPOSE: compute the global Bernstein-Sato polynomial for a hypersurface, defined by f, according to the algorithm by Masayuki Noro
 NOTE:    In this proc, a system of linear equations is solved by linear reductions.
 @*       If s<>0, @code{std} is used for Groebner basis computations,
@@ -801,20 +800,21 @@ EXAMPLE: example bfct; shows examples
       }
     }
   }
-  list b = bfctengine(f,whichengine,methodord,0,0,u0);
+  list b = bfctengine(f,whichengine,methodord,0,0,0,u0);
   return(b);
 }
 example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  poly f = x2+y3+x*y^2;
+  poly f = x^2+y^3+x*y^2;
   bfct(f);
-  bfct(f,1,1);
+  intvec v = 3,2;
+  bfct(f,1,0,v);
 }
 
 proc bfctsyz (poly f, list #)
-"USAGE:  bfctsyz(f [,r,s,t,v]);  f a poly, r,s,t optional ints, v an optional intvec
+"USAGE:  bfctsyz(f [,r,s,t,u,v]);  f a poly, r,s,t,u optional ints, v an optional intvec
 RETURN:  list of roots of the Bernstein-Sato polynomial bs(f) and its multiplicies
 PURPOSE: compute the global Bernstein-Sato polynomial for a hypersurface, defined by f, according to the algorithm by Masayuki Noro
 NOTE:    In this proc, a system of linear equations is solved by computing syzygies.
@@ -824,8 +824,8 @@ NOTE:    In this proc, a system of linear equations is solved by computing syzyg
 @*       otherwise, and by default, a block ordering is used.
 @*       If t<>0, the minimal polynomial computation is solely performed over charasteristic 0,
 @*       otherwise and by default, a modular method is used.
-@*       If u<>0, @code{std} is used for Groebner basis computations in characteristic >0,
-@*       otherwise, and by default, @code{slimgb} is used. 
+@*       If u<>0 and by default, @code{std} is used for Groebner basis computations in characteristic >0,
+@*       otherwise, @code{slimgb} is used. 
 @*       If v is a positive weight vector, v is used for homogenization computations,
 @*       otherwise and by default, no weights are used.
 @*       If printlevel=1, progress debug messages will be printed,
@@ -846,6 +846,7 @@ EXAMPLE: example bfct; shows examples
   int whichengine = 0; // default
   int methodord   = 0; // default
   int minpolchar  = 0; // default
+  int modengine   = 1; // default
   intvec u0       = 0; // default
   if (size(#)>0)
   {
@@ -865,32 +866,40 @@ EXAMPLE: example bfct; shows examples
         {
 	  minpolchar = int(#[3]);
 	}
-        if (size(#)>3)
+	if (size(#)>3)
         {
-	  if (typeof(#[4])=="intvec" && size(#[4])==n && ispositive(#[4])==1)
+	  if (typeof(#[4])=="int" || typeof(#[4])=="number")
           {
-	    u0 = #[4];
+	    modengine = int(#[4]);
+	  }
+	  if (size(#)>4)
+	  {
+	    if (typeof(#[5])=="intvec" && size(#[5])==n && ispositive(#[5])==1)
+	    {
+	      u0 = #[5];
+	    }
 	  }
 	}
       }
     }
   }
-  list b = bfctengine(f,whichengine,methodord,1,minpolchar,u0);
+  list b = bfctengine(f,whichengine,methodord,1,minpolchar,modengine,u0);
   return(b);
 }
 example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  poly F = x2+y3;
-  bfctsyz(F);
-  bfctsyz(F,1,1,1);
+  poly f = x^2+y^3+x*y^2;
+  bfctsyz(f);
+  intvec v = 3,2;
+  bfctsyz(f,0,1,1,0,v);
 }
 
 proc bfctideal (ideal I, intvec w, list #)
-"USAGE:  bfctideal(I,w[,s,t]);  I an ideal, r,s optional ints
-RETURN:  list of roots and its multiplicies of the global b-function of I w.r.t. to the weight -w,w
-PURPOSE: compute the global b-function of an ideal according to the algorithm by Masayuki Noro
+"USAGE:  bfctideal(I,w[,s,t]);  I an ideal, w an intvec, s,t optional ints
+RETURN:  list of roots and their multiplicies of the global b-function of I w.r.t. the weight vector (-w,w)
+PURPOSE: compute the global b-function of an ideal according to the algorithm by M. Noro
 NOTE:    Assume, I is an ideal in the n-th Weyl algebra where the sequence of the
 @*       variables is x(1),...,x(n),D(1),...,D(n).
 @*       If s<>0, @code{std} is used for Groebner basis computations in characteristic 0,
@@ -936,15 +945,15 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring @D = 0,(x,y,Dx,Dy),dp;
-  def DD = Weyl();
-  setring DD;
+  def D = Weyl();
+  setring D;
   ideal I = 3*x^2*Dy+2*y*Dx,2*x*Dx+3*y*Dy+6;
   intvec w1 = 1,1;
   intvec w2 = 1,2;
   intvec w3 = 2,3;
   bfctideal(I,w1);
-  bfctideal(I,w2);
-  bfctideal(I,w3);
+  bfctideal(I,w2,1);
+  bfctideal(I,w3,0,1);
 }
 
 
@@ -983,6 +992,7 @@ EXAMPLE: example bfctonestep; shows examples
   }
   def DDh = initialidealengine("bfctonestep", whichengine, methodord, f);
   setring DDh;
+  dbprint(ppl, "the initial ideal:", string(matrix(inF)));
   inF = nselect(inF,3,2*n+4);
   inF = nselect(inF,1);
   dbprint(ppl, "generators containing only s:", string(matrix(inF)));
@@ -999,8 +1009,9 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
-  poly f = x2+y3;
+  poly f = x^2+y^3+x*y^2;
   bfctonestep(f);
+  bfctonestep(f,1,1);
 }
 
 static proc hardexamples ()
