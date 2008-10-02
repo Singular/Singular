@@ -270,7 +270,7 @@ Use the @code{LIB} command for loading of single libraries.
 @c lib freegb.lib
 
 @c ----------------------------------------------------------
-@node involut_lib,  gkdim_lib, dmodapp_lib, PLURAL libraries
+@node involut_lib,  gkdim_lib, freegb_lib, PLURAL libraries
 @section involut_lib
 @cindex involut_lib
 @cindex involut.lib
