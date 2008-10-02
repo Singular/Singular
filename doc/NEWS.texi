@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.106 2008-10-01 13:55:30 Singular Exp $
+@comment $Id: NEWS.texi,v 1.107 2008-10-02 07:30:19 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -71,7 +71,9 @@ new library: bfct.lib global (@nref{bfct_lib}: Bernstein-Sato polynomial)
 @item
 new library: discretize.lib @nref{discretize_lib}: tools for the generation of finite difference schemes)
 @item 
-new library: nchomolog.lib @nref{nchomolog_lib}: Noncommutative Homological Algebra)
+new library: nchomolog.lib @nref{nchomolog_lib}: Noncommutative Homological Algebra
+@item 
+new library: freegb.lib @nref{freegb_lib}: Twosided Noncommutative Groebner bases in Free Algebras
 @item
 contributed library: phindex.lib @nref{phindex_lib}
 @item

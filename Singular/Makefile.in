@@ -282,8 +282,8 @@ SLIB0 = absfact.lib  arcpoint.lib  atkins.lib    aksaka.lib    ainvar.lib\
 	triang.lib   rootsur.lib  weierstr.lib  zeroset.lib     phindex.lib
  
 
-PLIBS = bfct.lib central.lib discretize.lib dmod.lib dmodapp.lib gkdim.lib \
-        involut.lib ncalg.lib ncdecomp.lib nchomolog.lib nctools.lib \
+PLIBS = bfct.lib central.lib discretize.lib dmod.lib dmodapp.lib freegb.lib \
+        gkdim.lib involut.lib ncalg.lib ncdecomp.lib nchomolog.lib nctools.lib \
         perron.lib qmatrix.lib
 
 ifdef HAVE_PLURAL
