@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.36 2008-09-24 08:21:17 Singular Exp $
+@comment $Id: COPYING.texi,v 1.37 2008-10-02 08:46:28 Singular Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -9,8 +9,10 @@
 @cindex factory
 @cindex GMP
 @cindex MP
+@cindex NTL
 @cindex readline
 @cindex libfac
+@cindex surfex
 
 @center @sc{Singular} version @value{VERSION}
 @center @uref{http://www.uni-kl.de/,,University of Kaiserslautern}
