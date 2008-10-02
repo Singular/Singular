@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: freegb.lib,v 1.10 2008-08-07 18:08:37 levandov Exp $";
+version="$Id: freegb.lib,v 1.11 2008-10-02 08:14:35 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: freegb.lib   Twosided Noncommutative Groebner bases in Free Algebras
@@ -55,7 +55,7 @@ proc lshift(module M, int s, string varing, def lpring)
       sp = "@@p = @@p + ";
       for (k=2; k<=sv; k++)
       {
-	sp = sp + string(v[k])+"("+string(k-1+s)+")*";
+        sp = sp + string(v[k])+"("+string(k-1+s)+")*";
       }
       sp = sp + string(v[1])+";"; // coef;
       setring lpring;
@@ -241,13 +241,13 @@ NOTE: if an optional integer is not 0, stars signs are used in multiplication
       q = find(vv,"^");
       if (q==0)
       {
-	q = find(vv,string(p));
-	if (q==0)
-	{
-	  err = "error in find for string "+vv;
-	  dbprint(ppl,err);
-	  return("_");
-	}
+        q = find(vv,string(p));
+        if (q==0)
+        {
+          err = "error in find for string "+vv;
+          dbprint(ppl,err);
+          return("_");
+        }
       }
       // q>0
       vp = vv[1..q-1];
@@ -356,7 +356,6 @@ proc id2words(ideal I, int d)
       while (p!=0)
       {
          q = leadmonom(p);
-         
       }
     }
   }
@@ -372,7 +371,7 @@ example
 }
 
 proc mono2word(poly p, int d)
-{ 
+{
 }
 
 // given the element -7xy^2x, it is represented as [-7,x,y^2,x] or as [-7,x,y,y,x]
@@ -468,7 +467,7 @@ EXAMPLE: example freegbasis; shows examples
     {
       for (j=1; j<=nb; j++)
       {
-	LR[3][i*nb+j] = LR[3][j];
+        LR[3][i*nb+j] = LR[3][j];
       }
     }
     //    size(LR[3]);
@@ -504,11 +503,11 @@ EXAMPLE: example freegbasis; shows examples
       //vectors, e.g. free monomials
       v  = M[j];
       sv = size(v);
-      //	"sv:";sv;
+      //        "sv:";sv;
       sp = "@@p = @@p + ";
       for (k=2; k<=sv; k++)
       {
-	sp = sp + string(v[k])+"("+string(k-1)+")*";
+        sp = sp + string(v[k])+"("+string(k-1)+")*";
       }
       sp = sp + string(v[1])+";"; // coef;
       setring @R;
@@ -526,7 +525,7 @@ EXAMPLE: example freegbasis; shows examples
   setring @R;
   dbprint(ppl,"computing GB");
   ideal J = system("freegb",I,d,nvars(save));
-  //  ideal J = slimgb(I); 
+  //  ideal J = slimgb(I);
   dbprint(ppl,J);
   // 4. skip shifted elts
   ideal K = select1(J,1,s); // s = size(OrigNames)
@@ -563,16 +562,16 @@ EXAMPLE: example freegbasis; shows examples
       sx = size(x);
       for(k=1; k<=sx; k++)
       {
-	if ( x[k] >= 2 )
-	{
-	  err = "skip: the value x[k] is " + string(x[k]);
-	  dbprint(ppl,err);
-	  //	    return(0);
-	  K[i] = 0;
-	  p    = 0;
-	  q    = 0;
-	  break;
-	}
+        if ( x[k] >= 2 )
+        {
+          err = "skip: the value x[k] is " + string(x[k]);
+          dbprint(ppl,err);
+          //            return(0);
+          K[i] = 0;
+          p    = 0;
+          q    = 0;
+          break;
+        }
       }
       p  = p - q;
     }
@@ -598,24 +597,24 @@ EXAMPLE: example freegbasis; shows examples
       V  = V + leadcoef(pn)*gen(1);
       for(k=1; k<=sx; k++)
       {
-	if (x[k] ==1)
-	{
-	  a = k / s; // block number=a+1, a!=0
-	  b = k % s; // remainder
-	  //	  printf("a: %s, b: %s",a,b);
-	  if (b == 0)
-	  {
-	    // that is it's the last var in the block
-	    b = s;
-	    a = a-1;
-	  }
-	  V = V + var(b)*gen(a+2);
-	}
-// 	else
-// 	{
-// 	  printf("error: the value x[k] is %s", x[k]);
-// 	  return(0);
-// 	}
+        if (x[k] ==1)
+        {
+          a = k / s; // block number=a+1, a!=0
+          b = k % s; // remainder
+          //          printf("a: %s, b: %s",a,b);
+          if (b == 0)
+          {
+            // that is it's the last var in the block
+            b = s;
+            a = a-1;
+          }
+          V = V + var(b)*gen(a+2);
+        }
+//         else
+//         {
+//           printf("error: the value x[k] is %s", x[k]);
+//           return(0);
+//         }
       }
       err = "V: " + string(V);
       dbprint(ppl,err);
@@ -721,7 +720,7 @@ EXAMPLE: example crs; shows examples
     {
       for (j=1; j<=nb; j++)
       {
-	LR[3][i*nb+j] = LR[3][j];
+        LR[3][i*nb+j] = LR[3][j];
       }
     }
     //    size(LR[3]);
@@ -756,19 +755,19 @@ EXAMPLE: example crs; shows examples
       // modules, e.g. free polynomials
       for (j=1; j<=sm; j++)
       {
-	//vectors, e.g. free monomials
-	v  = M[j];
-	sv = size(v);
-	//	"sv:";sv;
-	sp = "@@p = @@p + ";
-	for (k=2; k<=sv; k++)
-	{
-	  sp = sp + string(v[k])+"("+string(k-2+i)+")*";
-	}
-	sp = sp + string(v[1])+";"; // coef;
-	setring @R;
-	execute(sp);
-	setring save;
+        //vectors, e.g. free monomials
+        v  = M[j];
+        sv = size(v);
+        //        "sv:";sv;
+        sp = "@@p = @@p + ";
+        for (k=2; k<=sv; k++)
+        {
+          sp = sp + string(v[k])+"("+string(k-2+i)+")*";
+        }
+        sp = sp + string(v[1])+";"; // coef;
+        setring @R;
+        execute(sp);
+        setring save;
       }
       setring @R;
       //      "@@p:"; @@p;
@@ -868,7 +867,7 @@ EXAMPLE: example freegbRing; shows examples
     {
       for (j=1; j<=nb; j++)
       {
-	LR[3][i*nb+j] = LR[3][j];
+        LR[3][i*nb+j] = LR[3][j];
       }
     }
     //    size(LR[3]);
@@ -1124,7 +1123,7 @@ EXAMPLE: example freegbold; shows examples
     {
       for (j=1; j<=nb; j++)
       {
-	LR[3][i*nb+j] = LR[3][j];
+        LR[3][i*nb+j] = LR[3][j];
       }
     }
     //    size(LR[3]);
@@ -1159,19 +1158,19 @@ EXAMPLE: example freegbold; shows examples
       // modules, e.g. free polynomials
       for (j=1; j<=sm; j++)
       {
-	//vectors, e.g. free monomials
-	v  = M[j];
-	sv = size(v);
-	//	"sv:";sv;
-	sp = "@@p = @@p + ";
-	for (k=2; k<=sv; k++)
-	{
-	  sp = sp + string(v[k])+"("+string(k-1+i)+")*";
-	}
-	sp = sp + string(v[1])+";"; // coef;
-	setring @R;
-	execute(sp);
-	setring save;
+        //vectors, e.g. free monomials
+        v  = M[j];
+        sv = size(v);
+        //        "sv:";sv;
+        sp = "@@p = @@p + ";
+        for (k=2; k<=sv; k++)
+        {
+          sp = sp + string(v[k])+"("+string(k-1+i)+")*";
+        }
+        sp = sp + string(v[1])+";"; // coef;
+        setring @R;
+        execute(sp);
+        setring save;
       }
       setring @R;
       //      "@@p:"; @@p;
@@ -1222,16 +1221,16 @@ EXAMPLE: example freegbold; shows examples
       sx = size(x);
       for(k=1; k<=sx; k++)
       {
-	if ( x[k] >= 2 )
-	{
-	  err = "skip: the value x[k] is " + string(x[k]);
-	  dbprint(ppl,err);
-	  //	    return(0);
-	  K[i] = 0;
-	  p    = 0;
-	  q    = 0;
-	  break;
-	}
+        if ( x[k] >= 2 )
+        {
+          err = "skip: the value x[k] is " + string(x[k]);
+          dbprint(ppl,err);
+          //            return(0);
+          K[i] = 0;
+          p    = 0;
+          q    = 0;
+          break;
+        }
       }
       p  = p - q;
     }
@@ -1257,24 +1256,24 @@ EXAMPLE: example freegbold; shows examples
       V  = V + leadcoef(pn)*gen(1);
       for(k=1; k<=sx; k++)
       {
-	if (x[k] ==1)
-	{
-	  a = k / s; // block number=a+1, a!=0
-	  b = k % s; // remainder
-	  //	  printf("a: %s, b: %s",a,b);
-	  if (b == 0)
-	  {
-	    // that is it's the last var in the block
-	    b = s;
-	    a = a-1;
-	  }
-	  V = V + var(b)*gen(a+2);
-	}
-// 	else
-// 	{
-// 	  printf("error: the value x[k] is %s", x[k]);
-// 	  return(0);
-// 	}
+        if (x[k] ==1)
+        {
+          a = k / s; // block number=a+1, a!=0
+          b = k % s; // remainder
+          //          printf("a: %s, b: %s",a,b);
+          if (b == 0)
+          {
+            // that is it's the last var in the block
+            b = s;
+            a = a-1;
+          }
+          V = V + var(b)*gen(a+2);
+        }
+//         else
+//         {
+//           printf("error: the value x[k] is %s", x[k]);
+//           return(0);
+//         }
       }
       err = "V: " + string(V);
       dbprint(ppl,err);
@@ -1361,8 +1360,8 @@ proc exHom1()
   lst2str(L);
   def U = crs(L,4);
   setring U;
-  I = I, 
-    y(2)*h(3)+z(2)*x(3),     y(3)*h(4)+z(3)*x(4), 
+  I = I,
+    y(2)*h(3)+z(2)*x(3),     y(3)*h(4)+z(3)*x(4),
     y(2)*x(3)-z(2)*h(3),     y(3)*x(4)-z(3)*h(4);
   I = simplify(I,2);
   ring r2 = 0,(x(0..4),y(0..4),z(0..4),h(0..4)),dp;
@@ -1485,20 +1484,20 @@ example
 4,4: s(7)*s(1)+s(6)*s(2)
 */
 
-/* s1,s2: 
+/* s1,s2:
 s1*s1 =0, s2*s2 = s1*s2*s1
 */
 
 /*
 try char 0:
-s1,s2: 
+s1,s2:
 s1*s1 =0, s2*s2 = s1*s2*s1, s(1)*s(3)== s(1)*s(1)*s(3) == 0 = 2*s(4) ->def for s(4)
 hence 2==0! only in char 2
  */
 
 proc adem2mod(int n)
 {
-  // Adem rels modulo 2  
+  // Adem rels modulo 2
 }
 
 proc stringpoly2lplace(string s)
@@ -1517,7 +1516,7 @@ proc stringpoly2lplace(string s)
     LS[1] = string("-"+string(LS[1]));
     return(LS);
   }
-  i = find(s,"-",2); 
+  i = find(s,"-",2);
   // i==1 might happen if the 1st symbol coeff is negative
   j = find(s,"+");
   list LL;
@@ -1539,7 +1538,7 @@ proc stringpoly2lplace(string s)
     {
       j = find(s,"+");
       cnt++;
-      if (j==0) 
+      if (j==0)
       {
         LS[cnt] = string(s);
         s = "";
@@ -1563,7 +1562,7 @@ proc stringpoly2lplace(string s)
     {
       i = find(s,"-",2);
       cnt++;
-      if (i==0) 
+      if (i==0)
       {
         LS[cnt] = string(s);
         s = "";
@@ -1603,7 +1602,7 @@ proc stringpoly2lplace(string s)
     else
     {
       // i==1->  minus at leadcoef
-      ie = find(s,"-",i+1); 
+      ie = find(s,"-",i+1);
       je = find(s,"+",i+1);
       if (je == ie)
       {
@@ -1670,9 +1669,9 @@ proc addplaces(list L)
 example
 {
   "EXAMPLE:"; echo = 2;
-  string a = "f1";   string b = "f2"; 
+  string a = "f1";   string b = "f2";
   list L = a,b,a;
-  addplaces(L);  
+  addplaces(L);
 }
 
 proc sent2lplace(string s)
@@ -1691,7 +1690,7 @@ example
   "EXAMPLE:"; echo = 2;
   ring r = 0,(f2,f1),dp;
   string s = "f2*f1*f1 - 2*f1*f2*f1+ f1*f1*f2";
-  sent2lplace(s);  
+  sent2lplace(s);
 }
 
 proc testnumber(string s)
@@ -1702,7 +1701,7 @@ proc testnumber(string s)
     // two situations: either there's a negative number
     t = s[2..size(s)];
     if (testnumber(t))
-    { 
+    {
       //a negative number
     }
     else
@@ -1739,9 +1738,9 @@ example
   "EXAMPLE:"; echo = 2;
   ring r = (0,a),x,dp;
   string s = "a^2+7*a-2";
-  testnumber(s);  
+  testnumber(s);
   s = "b+a";
-  testnumber(s);  
+  testnumber(s);
 }
 
 proc str2lplace(string s)
@@ -1753,8 +1752,8 @@ proc str2lplace(string s)
   int i,j,k,insC;
   string a,b,c,d,t;
   // 1. get coeff
-  i = find(s,"*"); 
-  if (i==0) { return(s); } 
+  i = find(s,"*");
+  if (i==0) { return(s); }
   list VN;
   c = s[1..i-1]; // incl. the case like (-a^2+1)
   int tn = testnumber(c);
@@ -1766,8 +1765,8 @@ proc str2lplace(string s)
       // two situations: either there's a negative number
       t = c[2..size(c)];
       if (testnumber(t))
-      { 
-         //a negative number        
+      {
+         //a negative number
         // nop here
       }
       else
@@ -1816,7 +1815,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = (0,a),(f2,f1),dp;
-  str2lplace("-2*f2^2*f1^2*f2");  
+  str2lplace("-2*f2^2*f1^2*f2");
   str2lplace("-f1*f2");
   str2lplace("(-a^2+7a)*f1*f2");
 }
@@ -1824,7 +1823,7 @@ example
 proc strpower2rep(string s)
 {
   // makes x*x*x*x out of x^4 ., rep statys for repetitions
-  // looks for "-" problem 
+  // looks for "-" problem
   // exception: "-" as coeff
   string ex,t;
   int i,j,k;
@@ -1876,13 +1875,13 @@ proc strpower2rep(string s)
 
   i = find(s,"^"); // first ^
   j = find(s,"*",i+1); // next * == end of ^
-  if (j==0) 
-  { 
-    ex = s[i+1..size(s)]; 
+  if (j==0)
+  {
+    ex = s[i+1..size(s)];
   }
-  else 
-  { 
-    ex = s[i+1..j-1]; 
+  else
+  {
+    ex = s[i+1..j-1];
   }
   execute("int @exp = " + ex + ";"); //@exp = exponent
   // got varname
@@ -1893,12 +1892,12 @@ proc strpower2rep(string s)
   string varn = s[k+1..i-1];
   //  "varn:";  varn;
   string pref;
-  if (k>0) 
-  { 
-    pref = s[1..k]; // with * on the k-th place  
+  if (k>0)
+  {
+    pref = s[1..k]; // with * on the k-th place
   }
   //  "pref:";  pref;
-  string suf; 
+  string suf;
   if ( (j>0) && (j+1 <= size(s)) )
   {
     suf = s[j+1..size(s)]; // without * on the 1st place
@@ -1926,14 +1925,14 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = (0,a),(x,y,z,t),dp;
-  strpower2rep("-x^4");  
-  strpower2rep("-2*x^4*y^3*z*t^2");  
-  strpower2rep("-a^2*x^4");  
+  strpower2rep("-x^4");
+  strpower2rep("-2*x^4*y^3*z*t^2");
+  strpower2rep("-a^2*x^4");
 }
 
 proc Liebr(poly a, poly b, list #)
 {
-  // alias ppLiebr; 
+  // alias ppLiebr;
   //if int N is given compute [a,[...[a,b]]]] left normed bracket
   poly q;
   int N=1;
@@ -1996,8 +1995,8 @@ proc mmLiebr(poly a, poly b)
   // a,b, monomials
   a = lead(a);
   b = lead(b);
-  int sa = deg(a);  
-  int sb = deg(b);  
+  int sa = deg(a);
+  int sb = deg(b);
   poly v = a*pshift(b,sa) - b*pshift(a,sb);
   return(v);
 }
@@ -2020,11 +2019,11 @@ proc Serre(intmat A, int zu)
   // zu = 1 -> with commutators [f_i,f_j]; zu == 0 without them
   // suppose that A is cartan matrix
   // then Serre's relations are
-  // (ad f_j)^{1-A_{ij}} ( f_i) 
+  // (ad f_j)^{1-A_{ij}} ( f_i)
   int ppl = printlevel-voice+2;
   int n = ncols(A); // hence n variables
   int i,j,k,l;
-  poly p,q; 
+  poly p,q;
   ideal I;
   for (i=1; i<=n; i++)
   {
@@ -2038,17 +2037,17 @@ proc Serre(intmat A, int zu)
       if ((i!=j) && (l >0))
       {
         q = Liebr(var(j),var(i));
-	//        printf("first bracket: %s",q);
+        //        printf("first bracket: %s",q);
         dbprint(ppl,"first bracket: ",q);
-	//        if (l >=2)
-	//        {
+        //        if (l >=2)
+        //        {
           for (k=1; k<=l-1; k++)
           {
             q = Liebr(var(j),q);
-	    //            printf("further bracket: %s",q);
+            //            printf("further bracket: %s",q);
             dbprint(ppl,"further bracket:",q);
           }
-	  //        }
+          //        }
       }
       if (q!=0) { I = I,q; q=0;}
     }
@@ -2107,16 +2106,16 @@ EXAMPLE: example lp2lstr; shows examples
       sx = size(x);
       for(k=1; k<=sx; k++)
       {
-	if ( x[k] >= 2 )
-	{
-	  err = "skip: the value x[k] is " + string(x[k]);
-	  dbprint(ppl,err);
-	  //	    return(0);
-	  K[i] = 0;
-	  p    = 0;
-	  q    = 0;
-	  break;
-	}
+        if ( x[k] >= 2 )
+        {
+          err = "skip: the value x[k] is " + string(x[k]);
+          dbprint(ppl,err);
+          //            return(0);
+          K[i] = 0;
+          p    = 0;
+          q    = 0;
+          break;
+        }
       }
       p  = p - q;
     }
@@ -2142,19 +2141,19 @@ EXAMPLE: example lp2lstr; shows examples
       V  = V + leadcoef(pn)*gen(1);
       for(k=1; k<=sx; k++)
       {
-	if (x[k] ==1)
-	{
-	  a = k / s; // block number=a+1, a!=0
-	  b = k % s; // remainder
-	  //	  printf("a: %s, b: %s",a,b);
-	  if (b == 0)
-	  {
-	    // that is it's the last var in the block
-	    b = s;
-	    a = a-1;
-	  }
-	  V = V + var(b)*gen(a+2);
-	}
+        if (x[k] ==1)
+        {
+          a = k / s; // block number=a+1, a!=0
+          b = k % s; // remainder
+          //          printf("a: %s, b: %s",a,b);
+          if (b == 0)
+          {
+            // that is it's the last var in the block
+            b = s;
+            a = a-1;
+          }
+          V = V + var(b)*gen(a+2);
+        }
       }
       err = "V: " + string(V);
       dbprint(ppl,err);
@@ -2243,8 +2242,8 @@ proc file2lplace(string fname)
   {
     i = find(s,",");
     "i"; i;
-    if (i==0) 
-    { 
+    if (i==0)
+    {
       i = find(s,";");
       if (i==0)
       {
@@ -2278,7 +2277,7 @@ example
   def A = freegbRing(4);
   setring A;
   string fn = "myfile";
-  string s1 = "z*y*y*y - 3*y*z*x*y  + 3*y*y*z*y - y*x*y*z,"; 
+  string s1 = "z*y*y*y - 3*y*z*x*y  + 3*y*y*z*y - y*x*y*z,";
   string s2 = "-2*y*x*y*z + y*y*z*z - z*z*y*y + 2*z*y*z*y,";
   string s3 = "z*y*x*t - 2*y*z*y*t + y*y*z*t - t*z*y*y + 2*t*y*z*y - t*x*y*z;";
   write(":w "+fn,s1);  write(":a "+fn,s2);   write(":a "+fn,s3);
@@ -2320,7 +2319,7 @@ static proc doc_example
 
 
 
-// TODO: 
+// TODO:
 // multiply two letterplace polynomials, lpMult
 // reduction/ Normalform? needs kernel stuff
 
