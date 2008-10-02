@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.12 2008-07-16 12:41:33 wienand Exp $ */
+/* $Id: modulop.cc,v 1.13 2008-10-02 14:33:15 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -274,12 +274,18 @@ const char * npRead (const char *s, number *a)
   if (n == 1)
     *a = (number)z;
   else
-#ifdef NV_OPS
-    if (npPrimeM>NV_MAX_PRIME)
-      *a = nvDiv((number)z,(number)n);
+  {
+    if ((z==0)&&(n==0)) WerrorS(nDivBy0);
     else
+    {
+#ifdef NV_OPS
+      if (npPrimeM>NV_MAX_PRIME)
+        *a = nvDiv((number)z,(number)n);
+      else
 #endif
-      *a = npDiv((number)z,(number)n);
+        *a = npDiv((number)z,(number)n);
+    }
+  }
   return s;
 }
 
