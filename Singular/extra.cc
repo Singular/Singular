@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.282 2008-09-10 09:15:52 Singular Exp $ */
+/* $Id: extra.cc,v 1.283 2008-10-02 12:02:36 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -915,7 +915,41 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       }
     }
     else
-#endif
+/*==================== freeGB, twosided GB in free algebra =================*/
+#ifdef HAVE_SHIFTBBA
+    if (strcmp(sys_cmd, "freegb") == 0)
+    {
+      ideal I;
+      int uptodeg, lVblock;
+      if ((h!=NULL) && (h->Typ()==IDEAL_CMD))
+      {
+	I=(ideal)h->CopyD();
+	h=h->next;
+      }
+      else return TRUE;
+      if ((h!=NULL) && (h->Typ()==INT_CMD))
+      {
+	uptodeg=(int)((long)(h->Data()));
+	h=h->next;
+      }
+      else return TRUE;
+      if ((h!=NULL) && (h->Typ()==INT_CMD))
+      {
+	lVblock=(int)((long)(h->Data()));
+	res->data = freegb(I,uptodeg,lVblock);
+	if (res->data == NULL)
+	{
+	  /* that is there were input errors */
+	  res->data = I;
+	}
+	res->rtyp = IDEAL_CMD;
+      }
+      else return TRUE;
+      return FALSE;
+    }
+    else
+#endif /*SHIFTBBA*/
+#endif /*PLURAL*/
 #ifdef HAVE_WALK
 /*==================== walk stuff =================*/
 #ifdef OWNW
@@ -2630,40 +2664,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return (start==0)||(end==0)||(start>end);
     }
     else
-/*==================== freeGB, twosided GB in free algebra =================*/
-#ifdef HAVE_SHIFTBBA
-    if (strcmp(sys_cmd, "freegb") == 0)
-    {
-      ideal I;
-      int uptodeg, lVblock;
-      if ((h!=NULL) && (h->Typ()==IDEAL_CMD))
-      {
-	I=(ideal)h->CopyD();
-	h=h->next;
-      }
-      else return TRUE;
-      if ((h!=NULL) && (h->Typ()==INT_CMD))
-      {
-	uptodeg=(int)((long)(h->Data()));
-	h=h->next;
-      }
-      else return TRUE;
-      if ((h!=NULL) && (h->Typ()==INT_CMD))
-      {
-	lVblock=(int)((long)(h->Data()));
-	res->data = freegb(I,uptodeg,lVblock);
-	if (res->data == NULL)
-	{
-	  /* that is there were input errors */
-	  res->data = I;
-	}
-	res->rtyp = IDEAL_CMD;
-      }
-      else return TRUE;
-      return FALSE;
-    }
-    else
-#endif
 /*==================== shift-test for freeGB  =================*/
 #ifdef HAVE_SHIFTBBA
     if (strcmp(sys_cmd, "stest") == 0)
