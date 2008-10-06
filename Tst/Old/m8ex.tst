@@ -58,7 +58,7 @@
   // We need proc 'nselect' from elim.lib.
   LIB "elim.lib";
   j = std(i);                    // compute a std basis j
-  j = nselect(j,1,4);            // select generators from j not
+  j = nselect(j,1..4);           // select generators from j not
   j;                             // containing variable 1,...,4
   killall();
 LIB "tst.lib";tst_status(1);$

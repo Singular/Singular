@@ -18,7 +18,7 @@ ideal i= -6s5x+a, -5s4tx-1s5y+b, -4s3t2x-2s4ty+c,
 -3s2t3x-3s3t2y+d, -2st4x-4s2t3y+e, -1t5x-5st4y+f, -6t5y+g;
 ;ideal j=std(i);
 LIB "elim.lib";
-j=nselect(j,1,4);
+j=nselect(j,1..4);
 j;
 LIB "tst.lib";tst_status(1);$
 ==============

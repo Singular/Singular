@@ -2284,7 +2284,7 @@ x*y+(2*a)*y^2,
 (-1)*x^6+y^6+y(3)
 ;
 matrix N=std(M);
-N=elim(N,1,3);
+N=elim(N,1..3);
 N;
 module(N);
 
