@@ -1,4 +1,4 @@
-version="$Id: equising.lib,v 1.18 2008-10-06 17:04:26 Singular Exp $";
+version="$Id: equising.lib,v 1.19 2008-10-06 17:34:18 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  equising.lib  Equisingularity Stratum of a Family of Plane Curves
@@ -358,7 +358,7 @@ static proc createMyRing_new(poly p_F, string ordStr,
   else
   {
     charaStr = charstr(basering);
-    if (charaStr == string(chara) + "," + parstr(basering) or minPolyStr<>"")
+    if ((charaStr == string(chara) + "," + parstr(basering)) or (minPolyStr<>""))
     {
       if (minPolyStr<>"")
       {
@@ -441,7 +441,7 @@ static proc createMyRing_new(poly p_F, string ordStr,
     }
     ideal qIdeal = imap(myRing1, qIdeal);
 
-    if(qIdeal != 0)
+    if(size(qIdeal) != 0)
     {
       def r_base = basering;
       setring r_base;
@@ -456,7 +456,7 @@ static proc createMyRing_new(poly p_F, string ordStr,
   }
   else
   {
-    if(qIdeal != 0)
+    if(size(qIdeal) != 0)
     {
       def r_base = basering;
       setring r_base;

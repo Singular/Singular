@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: central.lib,v 1.5 2008-04-23 14:06:09 motsak Exp $"
+version="$Id: central.lib,v 1.6 2008-10-06 17:33:57 Singular Exp $"
 category="Noncommutative"
 info="
 LIBRARY:  central.lib      Computation of central elements of GR-algebras
@@ -704,19 +704,22 @@ PURPOSE: Computation of the kernel basis of the linear map given by the list @gi
 
 
   // check result of linearMapKernel
-  if( (typeof(T) == "int") and (T == 0) )
+  if( typeof(T) == "int" )
+  {
+    if( T == 0 )
     {
       // All zeroes! Return Basis:
       /*4DEBUG*/        if( defined( @@@DEBUG ) ){ ECall( "LINEAR_MAP_KERNEL", Basis ); }; /*4DEBUG*/
       return( Basis );
     }
+  }
   else
+  {
+    if( typeof(T) != "module" )
     {
-      if( typeof(T) != "module" )
-        {
-          ERROR( "Wrong output from the 'linearMapKernel' function!" );
-        }
+       ERROR( "Wrong output from the 'linearMapKernel' function!" );
     }
+  }
 
   result = linearCombinations( Basis, T );
 
