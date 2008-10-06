@@ -1,6 +1,6 @@
 // Last change 10.12.2000 (TB)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: rinvar.lib,v 1.16 2006-07-18 15:22:15 Singular Exp $";
+version="$Id: rinvar.lib,v 1.17 2008-10-06 17:04:28 Singular Exp $";
 category="Invariant theory";
 info="
 LIBRARY:  rinvar.lib      Invariant Rings of Reductive Groups
@@ -145,7 +145,7 @@ EXAMPLE: example ImageGroup; shows an example
   for(i = 1; i <= ncols(F); i++) { newGaction[i] = reduce(F[i], I1); }
   I2 = G, I1;
   I2 = std(I2);
-  Gn = nselect(I2, 1, nvars(RIGB));
+  Gn = nselect(I2, 1.. nvars(RIGB));
   imageSize = ncols(Gn);
 
   // create a new basering which might contain more variables
@@ -328,7 +328,7 @@ EXAMPLE: example ImageVariety; shows an example
 
   // forget all elements which contain other than the slack variables
 
-  J2 = nselect(J1, 1, nvars(RARB));
+  J2 = nselect(J1, 1.. nvars(RARB));
 
   execute(ringSTR2);
   minpoly = number(imap(RARB, mPoly));
@@ -903,7 +903,7 @@ EXAMPLE: example NullCone; shows an example
 
   // eliminate
 
-  N = nselect(J, 1, groupVars);
+  N = nselect(J, 1.. groupVars);
 
   // substitute
   for(i = 1; i <= nvars(basering); i = i + 1) { F[i] = 0; }

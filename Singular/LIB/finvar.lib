@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.76 2008-01-22 09:17:19 Singular Exp $"
+version="$Id: finvar.lib,v 1.77 2008-10-06 17:04:27 Singular Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -7106,7 +7106,7 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
     }
   }
 
-  M=elim(module(M),1,n);               // eliminating x(1..n), std-calculation
+  M=elim(module(M),1..n);               // eliminating x(1..n), std-calculation
                                          // is done internally -
   M=homog(module(M),h);            // homogenize for 'minbase'
   M=minbase(module(M));
@@ -7630,7 +7630,7 @@ EXAMPLE: example orbit_variety; shows an example
     for (int i=1;i<=m;i++)
     { I[i]=I[i]-y(i);
     }
-    I=elim(I,1,n);
+    I=elim(I,1..n);
     execute("ring "+newring+"=("+charstr(br)+"),(y(1..m)),dp(m);");
     execute("minpoly=number("+mp+");");
     ideal vars;

@@ -1,6 +1,6 @@
 // AH last modified:  01.07.2007
 //////////////////////////////////////////////////////////////////////////////
-version = "$Id: noether.lib,v 1.10 2008-04-11 14:04:40 Singular Exp $";
+version = "$Id: noether.lib,v 1.11 2008-10-06 17:04:28 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: noether.lib   Noether normalization of an ideal (not nessecary
@@ -198,11 +198,11 @@ RETURN:  A linear map phi such that  phi(i) is in Noether position
     L=maxideal(1);
     for ( ii = n; ii>=0; ii-- )
     {
-      chcoord=select1(maxideal(1),1,(ii));
+      chcoord=select1(maxideal(1),1..ii);
       ran=random(100,1,ii);
       ran=intmat(ran,1,ii+1);
       ran[1,ii+1]=1;
-      m=select1(maxideal(1),1,(ii+1));
+      m=select1(maxideal(1),1..(ii+1));
       for ( jj = 1; jj<=ii+1; jj++ )
       {
         P=P+ran[1,jj]*m[jj];
@@ -278,11 +278,11 @@ NOTE:    It uses the procedure  modNPos_test to test Noether position.
      L=maxideal(1);
      for ( ii = n; ii>=0; ii-- )
      {
-       chcoord=select1(maxideal(1),1,(ii));
+       chcoord=select1(maxideal(1),1..ii);
        ran=random(100,1,ii);
        ran=intmat(ran,1,ii+1);
        ran[1,ii+1]=1;
-       m=select1(maxideal(1),1,(ii+1));
+       m=select1(maxideal(1),1..(ii+1));
        for ( jj = 1; jj<=ii+1; jj++ )
        {
          P=P+ran[1,jj]*m[jj];
@@ -383,11 +383,11 @@ THEORY:  The satiety, or saturation index, of a homogeneous ideal i is the
   while ( nl < 5 )
   {
     nl=nl+1;
-    chcoord=select1(maxideal(1),1,(n));
+    chcoord=select1(maxideal(1),1..n);
     ran=random(100,1,n);
     ran=intmat(ran,1,n+1);
     ran[1,n+1]=1;
-    m=select1(maxideal(1),1,(n+1));
+    m=select1(maxideal(1),1..(n+1));
     for ( jj = 1; jj<=n+1; jj++ )
     {
       P=P+ran[1,jj]*m[jj];
@@ -478,11 +478,11 @@ NOTE:    This is a probabilistic procedure, and it computes the initial of the i
   while ( nl < 30 )
   {
     nl=nl+1;
-    chcoord=select1(maxideal(1),1,(n));
+    chcoord=select1(maxideal(1),1..n);
     ran=random(100,1,n);
     ran=intmat(ran,1,n+1);
     ran[1,n+1]=1;
-    m=select1(maxideal(1),1,(n+1));
+    m=select1(maxideal(1),1..(n+1));
     for ( jj = 1; jj<=n+1; jj++ )
     {
       P=P+ran[1,jj]*m[jj];

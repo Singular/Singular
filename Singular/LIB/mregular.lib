@@ -1,6 +1,6 @@
 // IB/PG/GMG, last modified:  15.10.2004
 //////////////////////////////////////////////////////////////////////////////
-version = "$Id: mregular.lib,v 1.8 2005-05-06 14:38:47 hannes Exp $";
+version = "$Id: mregular.lib,v 1.9 2008-10-06 17:04:27 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: mregular.lib   Castelnuovo-Mumford regularity of homogeneous ideals
@@ -90,365 +90,363 @@ EXAMPLE: example regIdeal; shows some examples
    d=dim(I);
 //----- If the ideal i is not proper:
    if ( d == -1 )
-     {
-       dbprint(printlevel-voice+2,
-               "// The ideal i is (1)!
+   {
+     dbprint(printlevel-voice+2,
+             "// The ideal i is (1)!
 // Its Castelnuovo-Mumford regularity is:");
-       return (0);
-     }
+     return (0);
+   }
 //----- If the ideal i is 0:
    if ( size(I) == 0 )
-     {
-       dbprint(printlevel-voice+2,
-               "// The ideal i is (0)!
+   {
+     dbprint(printlevel-voice+2,
+             "// The ideal i is (0)!
 // Its Castelnuovo-Mumford regularity is:");
-       return (0);
-     }
+     return (0);
+   }
 //----- When the ideal i is 0-dimensional:
    if ( d == 0 )
-     {
-       H=maxdeg1(minbase(quotient(I,maxideal(1))))+1;
-       time=rtimer-time;
-       // Additional information:
-       dbprint(printlevel-voice+2,
-               "// Dimension of S/i : 0");
-       dbprint(printlevel-voice+2,
-               "// Time for computing regularity: " + string(time) + " sec.");
-       dbprint(printlevel-voice+2,
+   {
+     H=maxdeg1(minbase(quotient(I,maxideal(1))))+1;
+     time=rtimer-time;
+     // Additional information:
+     dbprint(printlevel-voice+2,
+             "// Dimension of S/i : 0");
+     dbprint(printlevel-voice+2,
+             "// Time for computing regularity: " + string(time) + " sec.");
+     dbprint(printlevel-voice+2,
 "// The Castelnuovo-Mumford regularity of i coincides with its satiety, and
  // with the regularity of the Hilbert function of S/i. Its value is:");
-       return (H);
-     }
+     return (H);
+   }
 //----- Determine the situation: NT, or NP, or nothing.
 //----- Choose the method depending on the situation, on the
 //----- characteristic of the ground field, and on the option argument
 //----- in order to get the mon. ideal of nested type associated to i
    if ( e == 1 )
-     {
-       ch=0;
-     }
+   { ch=0; }
    NPtest=is_NP(I);
    if ( NPtest == 1 )
-     {
-       nesttest=is_nested(I);
-     }
+   {
+     nesttest=is_nested(I);
+   }
    if ( ch != 0 )
+   {
+     if ( NPtest == 0 )
      {
-       if ( NPtest == 0 )
+       N=d*n-d*(d-1)/2;
+       s = "ring rtr = (ch,t(1..N)),x(0..n),dp;";
+       execute(s);
+       ideal chcoord,m,i,I;
+       poly P;
+       map phi;
+       i=imap(r1,i);
+       chcoord=select1(maxideal(1),1..(n-d+1));
+       acc=0;
+       for ( ii = 1; ii<=d; ii++ )
+       {
+         matrix trex[1][n-d+ii+1]=t((1+acc)..(n-d+ii+acc)),1;
+         m=select1(maxideal(1),1..(n-d+1+ii));
+         for ( jj = 1; jj<=n-d+ii+1; jj++ )
          {
-           N=d*n-d*(d-1)/2;
-           s = "ring rtr = (ch,t(1..N)),x(0..n),dp;";
-           execute(s);
-           ideal chcoord,m,i,I;
-           poly P;
-           map phi;
-           i=imap(r1,i);
-           chcoord=select1(maxideal(1),1,(n-d+1));
-           acc=0;
-           for ( ii = 1; ii<=d; ii++ )
-             {
-               matrix trex[1][n-d+ii+1]=t((1+acc)..(n-d+ii+acc)),1;
-               m=select1(maxideal(1),1,(n-d+1+ii));
-               for ( jj = 1; jj<=n-d+ii+1; jj++ )
-                 {
-                   P=P+trex[1,jj]*m[jj];
-                 }
-               chcoord[n-d+1+ii]=P;
-               P=0;
-               acc=acc+n-d+ii;
-               kill trex;
-             }
-               phi=rtr,chcoord;
-               I=simplify(lead(std(phi(i))),1);
-               setring r1;
-               I=imap(rtr,I);
-               attrib(I,"isSB",1);
+           P=P+trex[1,jj]*m[jj];
          }
-       else
-         {
-           if ( nesttest == 0 )
-             {
-               N=d*(d-1)/2;
-               s = "ring rtr = (ch,t(1..N)),x(0..n),dp;";
-               execute(s);
-               ideal chcoord,m,i,I;
-               poly P;
-               map phi;
-               i=imap(r1,i);
-               chcoord=select1(maxideal(1),1,(n-d+2));
-               acc=0;
-               for ( ii = 1; ii<=d-1; ii++ )
-                 {
-                   matrix trex[1][ii+1]=t((1+acc)..(ii+acc)),1;
-                    m=select1(maxideal(1),(n-d+2),(n-d+2+ii));
-                   for ( jj = 1; jj<=ii+1; jj++ )
-                     {
-                       P=P+trex[1,jj]*m[jj];
-                     }
-                   chcoord[n-d+2+ii]=P;
-                   P=0;
-                   acc=acc+ii;
-                   kill trex;
-                 }
-               phi=rtr,chcoord;
-               I=simplify(lead(std(phi(i))),1);
-               setring r1;
-               I=imap(rtr,I);
-               attrib(I,"isSB",1);
-             }
-         }
+         chcoord[n-d+1+ii]=P;
+         P=0;
+         acc=acc+n-d+ii;
+         kill trex;
+       }
+       phi=rtr,chcoord;
+       I=simplify(lead(std(phi(i))),1);
+       setring r1;
+       I=imap(rtr,I);
+       attrib(I,"isSB",1);
      }
-   else
+     else
      {
-       if ( NPtest == 0 )
+       if ( nesttest == 0 )
+       {
+         N=d*(d-1)/2;
+         s = "ring rtr = (ch,t(1..N)),x(0..n),dp;";
+         execute(s);
+         ideal chcoord,m,i,I;
+         poly P;
+         map phi;
+         i=imap(r1,i);
+         chcoord=select1(maxideal(1),1..(n-d+2));
+         acc=0;
+         for ( ii = 1; ii<=d-1; ii++ )
          {
-           while ( nl < 30 )
-             {
-               chcoord=select1(maxideal(1),1,(n-d+1));
-               nl=nl+1;
-               for ( ii = 1; ii<=d; ii++ )
-                 {
-                   ran=random(100,1,n-d+ii);
-                   ran=intmat(ran,1,n-d+ii+1);
-                   ran[1,n-d+ii+1]=1;
-                   m=select1(maxideal(1),1,(n-d+1+ii));
-                   for ( jj = 1; jj<=n-d+ii+1; jj++ )
-                     {
-                       P=P+ran[1,jj]*m[jj];
-                     }
-                   chcoord[n-d+1+ii]=P;
-                   P=0;
-                 }
-               phi=r1,chcoord;
-               dbprint(printlevel-voice+2,"// (1 random change of coord.)");
-               I=simplify(lead(std(phi(i))),1);
-               attrib(I,"isSB",1);
-               NPtest=is_NP(I);
-               if ( NPtest == 1 )
-                 {
-                   break;
-                 }
-             }
-           if ( NPtest == 0 )
-             {
+           matrix trex[1][ii+1]=t((1+acc)..(ii+acc)),1;
+           m=select1(maxideal(1),(n-d+2)..(n-d+2+ii));
+           for ( jj = 1; jj<=ii+1; jj++ )
+           {
+             P=P+trex[1,jj]*m[jj];
+           }
+           chcoord[n-d+2+ii]=P;
+           P=0;
+           acc=acc+ii;
+           kill trex;
+         }
+         phi=rtr,chcoord;
+         I=simplify(lead(std(phi(i))),1);
+         setring r1;
+         I=imap(rtr,I);
+         attrib(I,"isSB",1);
+       }
+     }
+   }
+   else
+   {
+     if ( NPtest == 0 )
+     {
+       while ( nl < 30 )
+       {
+         chcoord=select1(maxideal(1),1..(n-d+1));
+         nl=nl+1;
+         for ( ii = 1; ii<=d; ii++ )
+         {
+           ran=random(100,1,n-d+ii);
+           ran=intmat(ran,1,n-d+ii+1);
+           ran[1,n-d+ii+1]=1;
+           m=select1(maxideal(1),1..(n-d+1+ii));
+           for ( jj = 1; jj<=n-d+ii+1; jj++ )
+           {
+             P=P+ran[1,jj]*m[jj];
+           }
+           chcoord[n-d+1+ii]=P;
+           P=0;
+         }
+         phi=r1,chcoord;
+         dbprint(printlevel-voice+2,"// (1 random change of coord.)");
+         I=simplify(lead(std(phi(i))),1);
+         attrib(I,"isSB",1);
+         NPtest=is_NP(I);
+         if ( NPtest == 1 )
+         {
+           break;
+         }
+       }
+       if ( NPtest == 0 )
+       {
        "// WARNING from proc regIdeal from lib mregular.lib:
 // The procedure has entered in 30 loops and could not put the variables
 // in Noether position: in your example the method using random changes
 // of coordinates may enter an infinite loop when the field is finite.
 // Try removing this optional argument.";
-       return (-1);
-             }
-           i=phi(i);
-           nesttest=is_nested(I);
-         }
-       if ( nesttest == 0 )
+         return (-1);
+       }
+       i=phi(i);
+       nesttest=is_nested(I);
+     }
+     if ( nesttest == 0 )
+     {
+       while ( nl < 30 )
+       {
+         chcoord=select1(maxideal(1),1..(n-d+2));
+         nl=nl+1;
+         for ( ii = 1; ii<=d-1; ii++ )
          {
-           while ( nl < 30 )
-             {
-               chcoord=select1(maxideal(1),1,(n-d+2));
-               nl=nl+1;
-               for ( ii = 1; ii<=d-1; ii++ )
-                 {
-                   ran=random(100,1,ii);
-                   ran=intmat(ran,1,ii+1);
-                   ran[1,ii+1]=1;
-                   m=select1(maxideal(1),(n-d+2),(n-d+2+ii));
-                   for ( jj = 1; jj<=ii+1; jj++ )
-                     {
-                       P=P+ran[1,jj]*m[jj];
-                     }
-                   chcoord[n-d+2+ii]=P;
-                   P=0;
-                 }
-               phi=r1,chcoord;
-               dbprint(printlevel-voice+2,"// (1 random change of coord.)");
-               I=simplify(lead(std(phi(i))),1);
-               attrib(I,"isSB",1);
-               nesttest=is_nested(I);
-               if ( nesttest == 1 )
-                 {
-                   break;
-                 }
-             }
-           if ( nesttest == 0 )
-             {
+           ran=random(100,1,ii);
+           ran=intmat(ran,1,ii+1);
+           ran[1,ii+1]=1;
+           m=select1(maxideal(1),(n-d+2)..(n-d+2+ii));
+           for ( jj = 1; jj<=ii+1; jj++ )
+           {
+             P=P+ran[1,jj]*m[jj];
+           }
+           chcoord[n-d+2+ii]=P;
+           P=0;
+         }
+         phi=r1,chcoord;
+         dbprint(printlevel-voice+2,"// (1 random change of coord.)");
+         I=simplify(lead(std(phi(i))),1);
+         attrib(I,"isSB",1);
+         nesttest=is_nested(I);
+         if ( nesttest == 1 )
+         {
+           break;
+         }
+       }
+       if ( nesttest == 0 )
+       {
        "// WARNING from proc regIdeal from lib mregular.lib:
 // The procedure has entered in 30 loops and could not find a monomial
 // ideal of nested type with the same regularity as your ideal: in your
 // example the method using random changes of coordinates may enter an
 // infinite loop when the field is finite.
 // Try removing this optional argument.";
-       return (-1);
-             }
-         }
+         return (-1);
+       }
      }
+   }
 //
 // At this stage, we have obtained a monomial ideal I of nested type
 // such that reg(i)=reg(I). We now compute reg(I).
 //
 //----- When S/i is Cohen-Macaulay:
    for ( ii = n-d+2; ii <= n+1; ii++ )
-     {
-       K=K+select(I,ii);
-     }
+   {
+     K=K+select(I,ii);
+   }
    if ( size(K) == 0 )
-     {
-       s="ring nr = ",charstr(r0),",x(0..n-d),dp;";
-       execute(s);
-       ideal I;
-       I = imap(r1,I);
-       H=maxdeg1(minbase(quotient(I,maxideal(1))))+1;
-       time=rtimer-time;
-       // Additional information:
-       dbprint(printlevel-voice+2,
+   {
+     s="ring nr = ",charstr(r0),",x(0..n-d),dp;";
+     execute(s);
+     ideal I;
+     I = imap(r1,I);
+     H=maxdeg1(minbase(quotient(I,maxideal(1))))+1;
+     time=rtimer-time;
+     // Additional information:
+     dbprint(printlevel-voice+2,
                "// S/i is Cohen-Macaulay");
-       dbprint(printlevel-voice+2,
+     dbprint(printlevel-voice+2,
                "// Dimension of S/i ( = depth(S/i) ): "+string(d));
-       dbprint(printlevel-voice+2,
+     dbprint(printlevel-voice+2,
                "// Regularity attained at the last step of m.g.f.r. of i: YES");
-       dbprint(printlevel-voice+2,
+     dbprint(printlevel-voice+2,
                "// Regularity of the Hilbert function of S/i: " + string(H-d));
-       dbprint(printlevel-voice+2,
+     dbprint(printlevel-voice+2,
                "// Time for computing regularity: " + string(time) + " sec.");
-       dbprint(printlevel-voice+2,
+     dbprint(printlevel-voice+2,
                "// The Castelnuovo-Mumford regularity of i is:");
-       return(H);
-     }
+     return(H);
+   }
 //----- When d=1:
    if ( d == 1 )
+   {
+     H=maxdeg1(simplify(reduce(quotient(I,maxideal(1)),I),2))+1;
+     sat=H;
+     J=subst(I,x(n),1);
+     s = "ring nr = ",charstr(r0),",x(0..n-1),dp;";
+     execute(s);
+     ideal J=imap(r1,J);
+     attrib(J,"isSB",1);
+     h=maxdeg1(minbase(quotient(J,maxideal(1))))+1;
+     time=rtimer-time;
+     if ( h > H )
      {
-       H=maxdeg1(simplify(reduce(quotient(I,maxideal(1)),I),2))+1;
-       sat=H;
-       J=subst(I,x(n),1);
-       s = "ring nr = ",charstr(r0),",x(0..n-1),dp;";
-       execute(s);
-       ideal J=imap(r1,J);
-       attrib(J,"isSB",1);
-       h=maxdeg1(minbase(quotient(J,maxideal(1))))+1;
-       time=rtimer-time;
-       if ( h > H )
-         {
-           H=h;
-         }
-       // Additional information:
-       dbprint(printlevel-voice+2,
+       H=h;
+     }
+     // Additional information:
+     dbprint(printlevel-voice+2,
                "// Dimension of S/i: 1");
-       dbprint(printlevel-voice+2,
+     dbprint(printlevel-voice+2,
                "// Depth of S/i: 0");
-       dbprint(printlevel-voice+2,
+     dbprint(printlevel-voice+2,
                "// Satiety of i: "+string(sat));
-       dbprint(printlevel-voice+2,
+     dbprint(printlevel-voice+2,
                "// Upper bound for the a-invariant of S/i: end(H^1(S/i)) <= "+
                string(h-2));
-       if ( H == sat )
-         {
-           dbprint(printlevel-voice+2,
+     if ( H == sat )
+     {
+       dbprint(printlevel-voice+2,
                    "// Regularity attained at the last step of m.g.f.r. of i: YES");
-           dbprint(printlevel-voice+2,
+       dbprint(printlevel-voice+2,
                    "// Regularity of the Hilbert function of S/i: "+string(H));
-         }
-       else
-         {
-           dbprint(printlevel-voice+2,
-                   "// Regularity attained at the last step of m.g.f.r. of i: NO");
-         }
-           dbprint(printlevel-voice+2,
-                   "// Time for computing regularity: "+ string(time) + " sec.");
-           dbprint(printlevel-voice+2,
-                   "// The Castelnuovo-Mumford regularity of i is:");
-           return(H);
      }
+     else
+     {
+       dbprint(printlevel-voice+2,
+                   "// Regularity attained at the last step of m.g.f.r. of i: NO");
+     }
+     dbprint(printlevel-voice+2,
+                   "// Time for computing regularity: "+ string(time) + " sec.");
+     dbprint(printlevel-voice+2,
+                   "// The Castelnuovo-Mumford regularity of i is:");
+     return(H);
+   }
 //----- Now d>1 and S/i is not Cohen-Macaulay:
 //
 //----- First, determine the last variable really occuring
-       lastv=n-d;
-       h=n;
-       while ( lastv == n-d and h > n-d )
-         {
-           K=select(I,h+1);
-           if ( size(K) == 0 )
-             {
-               h=h-1;
-             }
-           else
-             {
-               lastv=h;
-             }
-         }
+   lastv=n-d;
+   h=n;
+   while ( lastv == n-d and h > n-d )
+   {
+     K=select(I,h+1);
+     if ( size(K) == 0 )
+     {
+       h=h-1;
+     }
+     else
+     {
+       lastv=h;
+     }
+   }
 //----- and compute Castelnuovo-Mumford regularity:
-       s = "ring nr = ",charstr(r0),",x(0..lastv),dp;";
-       execute(s);
-       ideal I,K,KK,LL;
-       I=imap(r1,I);
-       attrib(I,"isSB",1);
-       K=simplify(reduce(quotient(I,maxideal(1)),I),2);
-       H=maxdeg1(K)+1;
-       firstind=H;
-       KK=minbase(subst(I,x(lastv),1));
-       for ( ii = n-lastv; ii<=d-2; ii++ )
-         {
-           LL=minbase(subst(I,x(n-ii-1),1));
-           attrib(LL,"isSB",1);
-           s = "ring mr = ",charstr(r0),",x(0..n-ii-1),dp;";
-           execute(s);
-           ideal K,KK;
-           KK=imap(nr,KK);
-           attrib(KK,"isSB",1);
-           K=simplify(reduce(quotient(KK,maxideal(1)),KK),2);
-           h=maxdeg1(K)+1;
-           if ( h > H )
-             {
-               H=h;
-             }
-           setring nr;
-           kill mr;
-           KK=LL;
-         }
-       // We must determine one more sat. index:
-       s = "ring mr = ",charstr(r0),",x(0..n-d),dp;";
-       execute(s);
-       ideal KK,K;
-       KK=imap(nr,KK);
-       attrib(KK,"isSB",1);
-       K=simplify(reduce(quotient(KK,maxideal(1)),KK),2);
-       h=maxdeg1(K)+1;
-       lastind=h;
-       if ( h > H )
-         {
-           H=h;
-         }
-       setring nr;
-       kill mr;
-       time=rtimer-time;
-       // Additional information:
-       dbprint(printlevel-voice+2,
+   s = "ring nr = ",charstr(r0),",x(0..lastv),dp;";
+   execute(s);
+   ideal I,K,KK,LL;
+   I=imap(r1,I);
+   attrib(I,"isSB",1);
+   K=simplify(reduce(quotient(I,maxideal(1)),I),2);
+   H=maxdeg1(K)+1;
+   firstind=H;
+   KK=minbase(subst(I,x(lastv),1));
+   for ( ii = n-lastv; ii<=d-2; ii++ )
+   {
+     LL=minbase(subst(I,x(n-ii-1),1));
+     attrib(LL,"isSB",1);
+     s = "ring mr = ",charstr(r0),",x(0..n-ii-1),dp;";
+     execute(s);
+     ideal K,KK;
+     KK=imap(nr,KK);
+     attrib(KK,"isSB",1);
+     K=simplify(reduce(quotient(KK,maxideal(1)),KK),2);
+     h=maxdeg1(K)+1;
+     if ( h > H )
+     {
+       H=h;
+     }
+     setring nr;
+     kill mr;
+     KK=LL;
+   }
+   // We must determine one more sat. index:
+   s = "ring mr = ",charstr(r0),",x(0..n-d),dp;";
+   execute(s);
+   ideal KK,K;
+   KK=imap(nr,KK);
+   attrib(KK,"isSB",1);
+   K=simplify(reduce(quotient(KK,maxideal(1)),KK),2);
+   h=maxdeg1(K)+1;
+   lastind=h;
+   if ( h > H )
+   {
+     H=h;
+   }
+   setring nr;
+   kill mr;
+   time=rtimer-time;
+   // Additional information:
+   dbprint(printlevel-voice+2,
                "// Dimension of S/i: "+string(d));
-       dbprint(printlevel-voice+2,
+   dbprint(printlevel-voice+2,
                "// Depth of S/i: "+string(n-lastv));
-       dbprint(printlevel-voice+2,
+   dbprint(printlevel-voice+2,
                "// end(H^"+string(n-lastv)+"(S/i)) = "
                +string(firstind-n+lastv-1));
-       dbprint(printlevel-voice+2,
+   dbprint(printlevel-voice+2,
                "// Upper bound for the a-invariant of S/i: end(H^"
                +string(d)+"(S/i)) <= "+string(lastind-d-1));
-       if ( H == firstind )
-         {
-           dbprint(printlevel-voice+2,
+   if ( H == firstind )
+   {
+     dbprint(printlevel-voice+2,
                    "// Regularity attained at the last step of m.g.f.r. of i: YES");
-           dbprint(printlevel-voice+2,
+     dbprint(printlevel-voice+2,
                    "// Regularity of the Hilbert function of S/i: "
                    +string(H-n+lastv));
-         }
-       else
-         {
-           dbprint(printlevel-voice+2,
+   }
+   else
+   {
+     dbprint(printlevel-voice+2,
                    "// Regularity attained at the last step of m.g.f.r. of i: NO");
-         }
-       dbprint(printlevel-voice+2,
+   }
+   dbprint(printlevel-voice+2,
                "// Time for computing regularity: "+ string(time) + " sec.");
-       dbprint(printlevel-voice+2,
+   dbprint(printlevel-voice+2,
                "// The Castelnuovo-Mumford regularity of i is:");
-       return(H);
+   return(H);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -647,12 +645,12 @@ EXAMPLE: example depthIdeal; shows some examples
            poly P;
            map phi;
            i=imap(r1,i);
-           chcoord=select1(maxideal(1),1,(n-d+1));
+           chcoord=select1(maxideal(1),1..(n-d+1));
            acc=0;
            for ( ii = 1; ii<=d; ii++ )
              {
                matrix trex[1][n-d+ii+1]=t((1+acc)..(n-d+ii+acc)),1;
-               m=select1(maxideal(1),1,(n-d+1+ii));
+               m=select1(maxideal(1),1..(n-d+1+ii));
                for ( jj = 1; jj<=n-d+ii+1; jj++ )
                  {
                    P=P+trex[1,jj]*m[jj];
@@ -679,12 +677,12 @@ EXAMPLE: example depthIdeal; shows some examples
                poly P;
                map phi;
                i=imap(r1,i);
-               chcoord=select1(maxideal(1),1,(n-d+2));
+               chcoord=select1(maxideal(1),1..(n-d+2));
                acc=0;
                for ( ii = 1; ii<=d-1; ii++ )
                  {
                    matrix trex[1][ii+1]=t((1+acc)..(ii+acc)),1;
-                    m=select1(maxideal(1),(n-d+2),(n-d+2+ii));
+                    m=select1(maxideal(1),(n-d+2)..(n-d+2+ii));
                    for ( jj = 1; jj<=ii+1; jj++ )
                      {
                        P=P+trex[1,jj]*m[jj];
@@ -708,14 +706,14 @@ EXAMPLE: example depthIdeal; shows some examples
          {
            while ( nl < 30 )
              {
-               chcoord=select1(maxideal(1),1,(n-d+1));
+               chcoord=select1(maxideal(1),1..(n-d+1));
                nl=nl+1;
                for ( ii = 1; ii<=d; ii++ )
                  {
                    ran=random(100,1,n-d+ii);
                    ran=intmat(ran,1,n-d+ii+1);
                    ran[1,n-d+ii+1]=1;
-                   m=select1(maxideal(1),1,(n-d+1+ii));
+                   m=select1(maxideal(1),1..(n-d+1+ii));
                    for ( jj = 1; jj<=n-d+ii+1; jj++ )
                      {
                        P=P+ran[1,jj]*m[jj];
@@ -749,14 +747,14 @@ EXAMPLE: example depthIdeal; shows some examples
          {
            while ( nl < 30 )
              {
-               chcoord=select1(maxideal(1),1,(n-d+2));
+               chcoord=select1(maxideal(1),1..(n-d+2));
                nl=nl+1;
                for ( ii = 1; ii<=d-1; ii++ )
                  {
                    ran=random(100,1,ii);
                    ran=intmat(ran,1,ii+1);
                    ran[1,ii+1]=1;
-                   m=select1(maxideal(1),(n-d+2),(n-d+2+ii));
+                   m=select1(maxideal(1),(n-d+2)..(n-d+2+ii));
                    for ( jj = 1; jj<=ii+1; jj++ )
                      {
                        P=P+ran[1,jj]*m[jj];
@@ -1029,14 +1027,14 @@ EXAMPLE: example satiety; shows some examples
          {
            while ( nl < 30 )
              {
-               chcoord=select1(maxideal(1),1,(n-d+1));
+               chcoord=select1(maxideal(1),1..(n-d+1));
                nl=nl+1;
                for ( ii = 1; ii<=d; ii++ )
                  {
                    ran=random(100,1,n-d+ii);
                    ran=intmat(ran,1,n-d+ii+1);
                    ran[1,n-d+ii+1]=1;
-                   m=select1(maxideal(1),1,(n-d+1+ii));
+                   m=select1(maxideal(1),1..(n-d+1+ii));
                    for ( jj = 1; jj<=n-d+ii+1; jj++ )
                      {
                        P=P+ran[1,jj]*m[jj];
@@ -1070,14 +1068,14 @@ EXAMPLE: example satiety; shows some examples
          {
            while ( nl < 30 )
              {
-               chcoord=select1(maxideal(1),1,(n-d+2));
+               chcoord=select1(maxideal(1),1..(n-d+2));
                nl=nl+1;
                for ( ii = 1; ii<=d-1; ii++ )
                  {
                    ran=random(100,1,ii);
                    ran=intmat(ran,1,ii+1);
                    ran[1,ii+1]=1;
-                   m=select1(maxideal(1),(n-d+2),(n-d+2+ii));
+                   m=select1(maxideal(1),(n-d+2)..(n-d+2+ii));
                    for ( jj = 1; jj<=ii+1; jj++ )
                      {
                        P=P+ran[1,jj]*m[jj];
@@ -1535,14 +1533,14 @@ EXAMPLE: example NoetherPosition; shows some examples
 //---- If we were unlucky, another change of coord. will be done:
    while ( nl < 30 )
    {
-     chcoord=select1(maxideal(1),1,(n-d+1));
+     chcoord=select1(maxideal(1),1..(n-d+1));
      nl=nl+1;
      for ( ii = 1; ii<=d; ii++ )
      {
        ran=random(100,1,n-d+ii);
        ran=intmat(ran,1,n-d+ii+1);
        ran[1,n-d+ii+1]=1;
-       m=select1(maxideal(1),1,(n-d+1+ii));
+       m=select1(maxideal(1),1..(n-d+1+ii));
        for ( jj = 1; jj<=n-d+ii+1; jj++ )
        {
        P=P+ran[1,jj]*m[jj];

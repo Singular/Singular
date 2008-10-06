@@ -1,19 +1,20 @@
-// $Id: elim.lib,v 1.22 2008-04-22 17:20:51 Singular Exp $
+// $Id: elim.lib,v 1.23 2008-10-06 17:04:26 Singular Exp $
 // (GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: elim.lib,v 1.22 2008-04-22 17:20:51 Singular Exp $";
+version="$Id: elim.lib,v 1.23 2008-10-06 17:04:26 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      Elimination, Saturation and Blowing up
 
 PROCEDURES:
  blowup0(j[,s1,s2]);    create presentation of blownup ring of ideal j
- elim(id,n,m);          variable n..m eliminated from id (ideal/module)
+ elim(id,v);            eliminate variables in v from id (ideal/module)
  elim1(id,p);           p=product of vars to be eliminated from id
- nselect(id,n[,m]);     select generators not containing nth [..mth] variable
+ nselect(id,v);         select generators not containing variables given by v
  sat(id,j);             saturated quotient of ideal/module id by ideal j
- select(id,n[,m]);      select generators containing all variables n...m
- select1(id,n[,m]);     select generators containing one variable n...m
+ select(id,v);          select generators containing all variables given by v
+ select1(id,v);         select generators containing one variable given by v
+
            (parameters in square brackets [] are optional)
 ";
 
@@ -187,9 +188,9 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc elim (id, int n, int m)
-"USAGE:   elim(id,n,m);  id ideal/module, n,m integers
-RETURNS: ideal/module obtained from id by eliminating variables var(n) to var(m)
+proc elim (id, intvec va)
+"USAGE:   elim(id,v);  id ideal/module, v intvec
+RETURNS: ideal/module obtained from id by eliminating variables in v
 NOTE:    no special monomial ordering is required, result is a SB with
          respect to ordering dp (resp. ls) if the first var not to be
          eliminated belongs to a -p (resp. -s) blockordering
@@ -200,7 +201,7 @@ EXAMPLE: example elim; shows examples
 {
 //---- get variables to be eliminated and create string for new ordering ------
    int ii; poly vars=1;
-   for( ii=n; ii<=m; ii++ ) { vars=vars*var(ii); }
+   for( ii=1; ii<=size(va); ii++ ) { vars=vars*var(va[ii]); }
    if(  attrib(basering,"global")) { string ordering = "),dp;"; }
    else { string ordering = "),ls;"; }
    string mpoly=string(minpoly);
@@ -220,9 +221,9 @@ example
 { "EXAMPLE:"; echo = 2;
    ring r=0,(x,y,u,v,w),dp;
    ideal i=x-u,y-u2,w-u3,v-x+y3;
-   elim(i,3,4);
+   elim(i,3..4);
    module m=i*gen(1)+i*gen(2);
-   m=elim(m,3,4);show(m);
+   m=elim(m,3..4);show(m);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -266,20 +267,34 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc nselect (id, int n, list#)
-"USAGE:   nselect(id,n[,m]); id a module or ideal, n, m integers
-RETURN:  generators of id not containing the variable n [up to m]
+proc nselect (id_inp, intvec v)
+"USAGE:   nselect(id,v); id = module or ideal, v = intvec
+RETURN:  generators of id not containing the variables with index an entry of v
 SEE ALSO: select, select1
 EXAMPLE: example nselect; shows examples
-"{
-   int j,k;
-   if( size(#)==0 ) { #[1]=n; }
-   for( k=1; k<=ncols(id); k++ )
-   {  for( j=n; j<=#[1]; j++ )
-      {  if( size(id[k]/var(j))!=0) { id[k]=0; break; }
+"
+{
+  if (typeof(id_inp)!="ideal") { module id=module(id_inp); }
+  else                         { ideal id=id_inp;         }
+  int j,k;
+  int n,m = size(v), ncols(id);
+  //listvar(id);
+  for( k=1; k<=m; k++ )
+  {  
+    for( j=1; j<=n; j++ )
+    {  
+      if( size(id[k]/var(v[j]))!=0 ) 
+      { 
+         id[k]=0; break; 
       }
-   }
-   return(simplify(id,2));
+    }
+  }
+  //if(typeof(id)=="ideal") { return(simplify(id,2)); }
+  //return(simplify(module(id),2));
+  id=(simplify(module(id),2));
+  //listvar(id);
+  return(id);
+  //return(simplify(id,2));
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -288,7 +303,7 @@ example
    nselect(i,3);
    module m=i*(gen(1)+gen(2));
    show(m);
-   show(nselect(m,3,4));
+   show(nselect(m,3..4));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -332,19 +347,24 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc select (id, int n, list#)
-"USAGE:   select(id,n[,m]); id ideal/module, n, m integers
-RETURN:  generators of id containing the variable n [all variables up to m]
+proc select (id, intvec v)
+"USAGE:   select(id,n[,m]); id = ideal/module, v= intvec
+RETURN:  generators of id containing all variables with index an entry of v
 NOTE:    use 'select1' for selecting generators containing at least one of the
-         variables between n and m
+         variables with index an entry of v
 SEE ALSO: select1, nselect
 EXAMPLE: example select; shows examples
 "{
-   if( size(#)==0 ) { #[1]=n; }
    int j,k;
-   for( k=1; k<=ncols(id); k++ )
-   {  for( j=n; j<=#[1]; j++ )
-      {   if( size(id[k]/var(j))==0) { id[k]=0; break; }
+   int n,m = size(v), ncols(id);
+   for( k=1; k<=m; k++ )
+   {  
+      for( j=1; j<=n; j++ )
+      {   
+         if( size(id[k]/var(v[j]))==0) 
+         { 
+            id[k]=0; break; 
+         }
       }
    }
    return(simplify(id,2));
@@ -357,27 +377,29 @@ example
    j;
    module m=i*(gen(1)+gen(2));
    m;
-   select(m,1,2);
+   select(m,1..2);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc select1 (id, int n, list#)
-"USAGE:   select1(id,n[,m]); id ideal/module, n, m integers
-RETURN:  generators of id containing the variable n
-         [at least one of the variables up to m]
+proc select1 (id, intvec v)
+"USAGE:   select1(id,v); id = ideal/module, v = intvec
+RETURN:  generators of id containing at least one of the variables with
+         index an entry of v
 NOTE:    use 'select' for selecting generators containing all the
-         variables between n and m
+         variables with index an entry of v
 SEE ALSO: select, nselect
 EXAMPLE: example select1; shows examples
 "{
-   if( size(#)==0 ) { #[1]=n; }
    int j,k;
+   int n,m = size(v), ncols(id);
    execute (typeof(id)+" I;");
-   for( k=1; k<=ncols(id); k++ )
-   {  for( j=n; j<=#[1]; j++ )
+   for( k=1; k<=m; k++ )
+   {  for( j=1; j<=n; j++ )
       {
-         if( size(subst(id[k],var(j),0)) != size(id[k]) )
-         { I=I,id[k]; break; }
+         if( size(subst(id[k],var(v[j]),0)) != size(id[k]) )
+         {  
+            I = I,id[k]; break; 
+         }
       }
    }
    return(simplify(I,2));
@@ -390,6 +412,6 @@ example
    j;
    module m=i*(gen(1)+gen(2));
    m;
-   select1(m,1,2);
+   select1(m,1..2);
 }
 ///////////////////////////////////////////////////////////////////////////////

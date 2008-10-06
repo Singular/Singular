@@ -1,4 +1,4 @@
-version="$Id: equising.lib,v 1.17 2006-07-18 15:48:12 Singular Exp $";
+version="$Id: equising.lib,v 1.18 2008-10-06 17:04:26 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  equising.lib  Equisingularity Stratum of a Family of Plane Curves
@@ -853,7 +853,7 @@ static proc esComputation (int typ, poly p_F, list #)
 
   if (typ==1) // isEquising
   {
-    if(ideal(nselect(J,1,no_b))<>0)
+    if(ideal(nselect(J,1..no_b))<>0)
     {
       setring old_ring;
       option(set,ov);
@@ -940,7 +940,7 @@ static proc esComputation (int typ, poly p_F, list #)
 
   if (typ==1) // isEquising
   {
-    if(ideal(nselect(J,1,no_b))<>0)
+    if(ideal(nselect(J,1..no_b))<>0)
     {
       setring old_ring;
       option(set,ov);
@@ -1061,7 +1061,7 @@ static proc esComputation (int typ, poly p_F, list #)
         if (typ==1) // isEquising
         {
           if (defined(artin_bd)) { J=jet(Jnew,artin_bd-1); }
-          if(ideal(nselect(J,1,no_b))<>0)
+          if(ideal(nselect(J,1..no_b))<>0)
           {
             setring old_ring;
             option(set,ov);
@@ -1076,7 +1076,7 @@ static proc esComputation (int typ, poly p_F, list #)
       if (typ==1) // isEquising
       {
         if (defined(artin_bd)) { J=jet(Jnew,artin_bd-1); }
-        if(ideal(nselect(J,1,no_b))<>0)
+        if(ideal(nselect(J,1..no_b))<>0)
         {
           setring old_ring;
           option(set,ov);
@@ -1120,7 +1120,7 @@ static proc esComputation (int typ, poly p_F, list #)
   if (typ==1) // isEquising
   {
     if (defined(artin_bd)) { J=jet(Jnew,artin_bd-1); }
-    if(ideal(nselect(J,1,no_b))<>0)
+    if(ideal(nselect(J,1..no_b))<>0)
     {
       setring old_ring;
       option(set,ov);
@@ -1172,8 +1172,8 @@ static proc esComputation (int typ, poly p_F, list #)
     }
   }
 
-  Jtriv = nselect(Jtriv,1,no_b);
-  ideal J_no_b = nselect(J,1,no_b);
+  Jtriv = nselect(Jtriv,1..no_b);
+  ideal J_no_b = nselect(J,1..no_b);
   if (size(J) > size(J_no_b))
   {
     dbprint(i_print,"// std computation started");
@@ -1226,12 +1226,12 @@ static proc esComputation (int typ, poly p_F, list #)
       ideal J=phiphi(J);
       option(redSB);
       J=std(J);
-      J=nselect(J,1,no_b);
+      J=nselect(J,1..no_b);
 
       setring myRing;
       // back to "myRing"
 
-      J=nselect(J,1,no_b);
+      J=nselect(J,1..no_b);
       Jnew=imap(QQ,J);
 
       J=J,Jnew;
@@ -1241,7 +1241,7 @@ static proc esComputation (int typ, poly p_F, list #)
     else
     {
       J=std(J);
-      J=nselect(J,1,no_b);
+      J=nselect(J,1..no_b);
       if (defined(artin_bd)){ J=jet(J,artin_bd-1); }
     }
   }

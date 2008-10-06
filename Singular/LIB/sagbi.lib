@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: sagbi.lib,v 1.11 2007-07-13 12:31:06 Singular Exp $";
+version="$Id: sagbi.lib,v 1.12 2008-10-06 17:04:28 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  sagbi.lib  Compute Subalgebras bases Analogous to Groebner bases for ideals
@@ -82,7 +82,7 @@ EXAMPLE: example sagbiSPoly; show an example "
     }
 
     A=groebner(A);
-    ideal kern=nselect(A,1,n);// "kern" is the kernel of the ring map:
+    ideal kern=nselect(A,1..n);// "kern" is the kernel of the ring map:
                         // R1----->bsr ;y(z)----> lead(id[z]).
                         //"kern" is the ideal of algebraic relations between
                         // lead(id[z]).
@@ -215,7 +215,7 @@ static proc Spoly1(list l,ideal I,ideal J,int a)
     ideal @Res=std1(A1,A,1);// the generators of @Res are whose we have to add
                             // to A to get std(A1).
     A=A+@Res;
-    kern1=nselect(@Res,1,n);
+    kern1=nselect(@Res,1..n);
     kern=kern+kern1;
     export kern,kern1,A;
     setring br;
@@ -341,7 +341,7 @@ EXAMPLE: sagbiReduction; shows an example"
     }
     if(choose==2)
     {
-      ideal kern= nselect(groebner(dom),1,n);//"nselect" is combinatorial command
+      ideal kern= nselect(groebner(dom),1..n);//"nselect" is combinatorial command
                                          //which uses the internal command
                                          // "simplify"
     }

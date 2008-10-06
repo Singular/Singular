@@ -2,7 +2,7 @@
 //major revision Jan/Feb. 2007, GMG
 //groebner mit Optionen versehen
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.101 2008-01-28 11:42:30 Singular Exp $";
+version="$Id: standard.lib,v 1.102 2008-10-06 17:04:28 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -823,8 +823,8 @@ EXAMPLE: example groebner;  shows an example"
 
 
   def P=basering;
-  if ((typeof(i_par)=="vector")||(typeof(i_par)=="module")) {module i=i_par;}
-  else {ideal i=i_par; }
+  if ((typeof(i_par)=="vector")||(typeof(i_par)=="module")||(typeof(i_par)=="matrix")) {module i=i_par;}
+  else {ideal i=i_par; } // int, poly, number, ideal
   kill i_par;
 
 //----------------------- save the given method ---------------------------
@@ -1345,6 +1345,7 @@ See also
    {
       string ri= "ring Phelp ="
                   +string(char(P))+",("+varstr_P+"),(dp,C);";
+      ri = ri + "minpoly = "+string(minpoly) + ";";
       execute(ri);
       def m=imap(P,m);
       if (p_opt) { "using mres in another ring";}
@@ -1360,6 +1361,7 @@ See also
    {
       string ri= "ring Phelp ="
                   +string(char(P))+",("+varstr_P+"),(ls,c);";
+      ri = ri + "minpoly = "+string(minpoly) + ";";
       execute(ri);
       def m=imap(P,m);
       m=std(m);
@@ -1373,6 +1375,7 @@ See also
    //mres for the local case and minimal resolution
    string ri= "ring Phelp ="
                   +string(char(P))+",("+varstr_P+"),(ls,C);";
+   ri = ri + "minpoly = "+string(minpoly) + ";";
    execute(ri);
    def m=imap(P,m);
     if (p_opt) { "using mres in another ring";}

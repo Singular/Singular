@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: algebra.lib,v 1.16 2008-07-02 09:42:59 Singular Exp $";
+version="$Id: algebra.lib,v 1.17 2008-10-06 17:04:26 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  algebra.lib   Compute with Algbras and Algebra Maps
@@ -394,7 +394,7 @@ EXAMPLE: example algDependent; shows an example
         }
         ideal A = imap(R2,A);
         A = std(A);
-        ideal ker = nselect(A,1,n);
+        ideal ker = nselect(A,1..n);
         setring R2;
         if ( defined(Q)==voice )
         { ideal ker = imap(Q,ker);
@@ -716,7 +716,7 @@ EXAMPLE: example is_bijective; shows an example
     A=std(A);
     def bsr = basering;
  // ------- checking whether phi is injective by computing the kernel -------
-    ideal ker = nselect(A,1,n);
+    ideal ker = nselect(A,1..n);
     t = size(ker);
     setring pr;
     if ( size(ideal(pr)) != 0 )

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: freegb.lib,v 1.11 2008-10-02 08:14:35 Singular Exp $";
+version="$Id: freegb.lib,v 1.12 2008-10-06 17:04:27 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: freegb.lib   Twosided Noncommutative Groebner bases in Free Algebras
@@ -528,7 +528,7 @@ EXAMPLE: example freegbasis; shows examples
   //  ideal J = slimgb(I);
   dbprint(ppl,J);
   // 4. skip shifted elts
-  ideal K = select1(J,1,s); // s = size(OrigNames)
+  ideal K = select1(J,1..s); // s = size(OrigNames)
   dbprint(ppl,K);
   dbprint(ppl, "done with GB");
   // K contains vars x(1),...z(1) = images of originals
@@ -1187,7 +1187,7 @@ EXAMPLE: example freegbold; shows examples
   ideal J = slimgb(I);
   dbprint(ppl,J);
   // 4. skip shifted elts
-  ideal K = select1(J,1,s); // s = size(OrigNames)
+  ideal K = select1(J,1..s); // s = size(OrigNames)
   dbprint(ppl,K);
   dbprint(ppl, "done with GB");
   // K contains vars x(1),...z(1) = images of originals
