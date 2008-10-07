@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.38 2007-06-20 22:31:00 levandov Exp $";
+version="$Id: control.lib,v 1.39 2008-10-07 17:55:52 levandov Exp $";
 category="System and Control Theory";
 info="
 LIBRARY:  control.lib     Algebraic analysis tools for System and Control Theory
@@ -21,7 +21,6 @@ COMPONENT PROCEDURES:
   rightKernel(R);      a right kernel of R
   leftInverse(R);      a left inverse of R
   rightInverse(R);     a right inverse of R
-  smith(M);            a Smith form of a module M
   colrank(M);          a column rank of M as of matrix
   genericity(M);       analysis of the genericity of parameters
   canonize(L);         Groebnerification for modules in the output of control or autonomy procs
@@ -1139,8 +1138,8 @@ NOTE: number of columns of N and Q must coincide.
 }
 
 //---------------------------------------------------------------
-proc smith( module M )
-"USAGE: smith(M); M a module/matrix
+proc oldsmith( module M )
+"USAGE: oldsmith(M); M a module/matrix
 PURPOSE: computes the Smith normal form of a matrix
 RETURN: a list of length 4 with the following entries:
 @*      [1]: the Smith normal form S of M,
@@ -1148,7 +1147,7 @@ RETURN: a list of length 4 with the following entries:
 @*      [3]: a unimodular matrix U,
 @*      [4]: a unimodular matrix V,
 such that U*M*V=S. An warning is returned when no Smith form exists.
-NOTE: The Smith form only exists over PIDs (principal ideal domains). Use global ordering for computations!
+NOTE: Older experimental implementation. The Smith form only exists over PIDs (principal ideal domains). Use global ordering for computations!
 "
 {
   if (nvars(basering)>1) //if more than one variable, return empty list
@@ -1272,7 +1271,7 @@ example
   ring r   = 0,x,dp;
   module M = [x2,x,3x3-4], [2x2-1,4x,5x2], [2x5,3x,4x];
   print(M);
-  list P = smith(M);
+  list P = oldsmith(M);
   print(P[1]);
   matrix N = matrix(M);
   matrix B = P[3]*N*P[4];
@@ -1280,7 +1279,7 @@ example
 }
 // see what happens when the matrix is already in Smith-Form
 //  module M = [x,0,0],[0,x2,0],[0,0,x3];
-//  list L = smith(M);
+//  list L = oldsmith(M);
 // print(L[1]);
 //matrix N=matrix(M);
 //matrix B=L[3]*N*L[4];
