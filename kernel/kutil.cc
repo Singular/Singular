@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.110 2008-10-07 07:57:10 wienand Exp $ */
+/* $Id: kutil.cc,v 1.111 2008-10-07 07:59:08 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2924,7 +2924,8 @@ void initenterpairsRing (poly h,int k,int ecart,int isFromQ,kStrategy strat, int
         if ((pGetComp(h)==pGetComp(strat->S[j])) || (pGetComp(strat->S[j])==0))
         {
           new_pair=TRUE;
-          Print("TODO Oliver 2 --- j:%d, Ll:%d\n",j,strat->Ll);
+          // Print("j:%d, Ll:%d\n",j,strat->Ll);
+          // Modules not checked right now
           enterOnePairRing(j,h,ecart,isFromQ,strat, atR);
         }
       }
