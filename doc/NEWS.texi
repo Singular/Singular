@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.107 2008-10-02 07:30:19 Singular Exp $
+@comment $Id: NEWS.texi,v 1.108 2008-10-07 09:05:25 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -74,6 +74,8 @@ new library: discretize.lib @nref{discretize_lib}: tools for the generation of f
 new library: nchomolog.lib @nref{nchomolog_lib}: Noncommutative Homological Algebra
 @item 
 new library: freegb.lib @nref{freegb_lib}: Twosided Noncommutative Groebner bases in Free Algebras
+@item
+contributed library: cimonom.lib @nref{cimonom_lib}
 @item
 contributed library: phindex.lib @nref{phindex_lib}
 @item
