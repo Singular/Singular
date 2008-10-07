@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.109 2008-09-26 08:09:09 Singular Exp $ */
+/* $Id: kutil.cc,v 1.110 2008-10-07 07:57:10 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2902,7 +2902,7 @@ void initenterpairsRing (poly h,int k,int ecart,int isFromQ,kStrategy strat, int
           if (!strat->fromQ[j])
           {
             new_pair=TRUE;
-            Print("TODO Oliver --- j:%d, Ll:%d\n",j,strat->Ll);
+            Print("TODO Oliver 1 --- j:%d, Ll:%d\n",j,strat->Ll);
             enterOnePairRing(j,h,ecart,isFromQ,strat, atR);
           }
         }
@@ -2924,7 +2924,7 @@ void initenterpairsRing (poly h,int k,int ecart,int isFromQ,kStrategy strat, int
         if ((pGetComp(h)==pGetComp(strat->S[j])) || (pGetComp(strat->S[j])==0))
         {
           new_pair=TRUE;
-          Print("TODO Oliver --- j:%d, Ll:%d\n",j,strat->Ll);
+          Print("TODO Oliver 2 --- j:%d, Ll:%d\n",j,strat->Ll);
           enterOnePairRing(j,h,ecart,isFromQ,strat, atR);
         }
       }
@@ -3016,6 +3016,8 @@ void enterExtendedSpoly(poly h,kStrategy strat)
       {
         pSetExp(tmp, i, p_GetExp(p, i, strat->tailRing));
       }
+      if (rRing_has_Comp(currRing))
+        p_SetComp(tmp, p_GetComp(p, strat->tailRing), currRing);
       p_Setm(tmp, currRing);
       p = p_LmFreeAndNext(p, strat->tailRing);
       pNext(tmp) = p;
@@ -3040,7 +3042,8 @@ void enterExtendedSpoly(poly h,kStrategy strat)
         else
           posx = strat->posInL(strat->L,strat->Ll,&h,strat);
         h.sev = pGetShortExpVector(h.p);
-        h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
+        if (strat->tailRing != currRing)
+          h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
         if (pNext(p) != NULL)
         {
           // What does this? (Oliver)
