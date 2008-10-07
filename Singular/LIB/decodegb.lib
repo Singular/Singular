@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: decodegb.lib,v 1.4 2008-09-24 13:44:01 bulygin Exp $";
+version="$Id: decodegb.lib,v 1.5 2008-10-07 14:14:56 bulygin Exp $";
 category="Coding theory";
 info="
 LIBRARY:   decodedistGB.lib     Generating and solving systems of polynomial equations for decoding and finding the minimum distance of linear codes
@@ -1093,13 +1093,13 @@ EXAMPLE:   example solveForRandom; shows an example
  def br=basering;
  matrix h_full=genMDSMat(n,a); 
  matrix z[1][ncols(h_full)];
- int n=ncols(h_full);
 
  //------------------ determine error-correction capacity -------------------
  for (i=1; i<=ncodes; i++)
  {
   setring br;
   h=randomCheck(redun,n,1);
+  "check matrix:";
   print(h);
   if (#>0)
   {
@@ -1181,9 +1181,9 @@ EXAMPLE:    example solveForCode; shows an example
  def br=basering;
  matrix h_full=genMDSMat(n,a); 
  matrix z[1][ncols(h_full)];
- int n=ncols(h_full);
  setring br;
  h=check;
+ "check matrix:";
  print(h);
 
  //------------------ determine error-correction capacity -------------------
@@ -1808,7 +1808,6 @@ EXAMPLE:   example solveForRandomFL; shows an example
  
  int i,j;
  matrix h, g, word, y, rec;
- list l;
  int dist, tim, tim2, tim3, timdist, timdec, timdist2, timdec2, timdec3;
  ideal sys, sys2, sys3;
  list tmp; 
