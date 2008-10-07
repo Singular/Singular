@@ -1,4 +1,4 @@
-version="$Id: brnoeth.lib,v 1.19 2006-07-18 15:48:10 Singular Exp $";
+version="$Id: brnoeth.lib,v 1.20 2008-10-07 17:36:30 Singular Exp $";
 category="Coding theory";
 info="
 LIBRARY:   brnoeth.lib  Brill-Noether Algorithm, Weierstrass-SG and AG-codes
@@ -273,7 +273,7 @@ static proc Aff_SL (ideal ISL)
   //     "Aff_SLocus"
   list SL=list();
   ideal I=ISL;
-  if ( I != 1 )
+  if ( I[1] != 1 )
   {
     list L=list();
     ideal aux;
