@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.108 2008-10-07 09:05:25 Singular Exp $
+@comment $Id: NEWS.texi,v 1.109 2008-10-07 17:37:01 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -78,6 +78,8 @@ new library: freegb.lib @nref{freegb_lib}: Twosided Noncommutative Groebner base
 contributed library: cimonom.lib @nref{cimonom_lib}
 @item
 contributed library: phindex.lib @nref{phindex_lib}
+@item
+elim.lib (@nref{elim_lib}): @nref{elim}, @nref{nselect}, @nref{select}, @nref{select1}: changed syntax
 @item
 homolog.lib: kernel renamed to @nref{hom_kernel}. 
 @*(See also @nref{kernel}, @nref{alg_kernel}).
