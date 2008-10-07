@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: jacobson.lib,v 1.1 2008-10-07 17:49:06 levandov Exp $";
-category="Noncommutative";
+version="$Id: jacobson.lib,v 1.2 2008-10-07 17:57:17 levandov Exp $";
+category="System and Control Theory";
 info="
 LIBRARY: jacobson.lib     Algorithms for Smith and Jacobson Normal Form
 AUTHOR: Kristina Schindelar,     Kristina.Schindelar@math.rwth-aachen.de
@@ -16,6 +16,8 @@ THEORY: We work over a ring R, that is a principal ideal domain.
 MAIN PROCEDURES:
 smith(R,M[,eng1,eng2]);  compute the Smith Normal Form of M over commutative ring
 jacobson(R,M[,eng]);       compute a weak Jacobson Normal Form of M over non-commutative ring, i.e. a diagonal matrix
+
+SEE ALSO: control_lib
 ";
   LIB "poly.lib";
   LIB "involut.lib";
