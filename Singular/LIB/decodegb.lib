@@ -1,39 +1,45 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: decodegb.lib,v 1.5 2008-10-07 14:14:56 bulygin Exp $";
+version="$Id: decodegb.lib,v 1.6 2008-10-08 16:52:24 bulygin Exp $";
 category="Coding theory";
 info="
-LIBRARY:   decodedistGB.lib     Generating and solving systems of polynomial equations for decoding and finding the minimum distance of linear codes
-AUTHORS:   Stanislav Bulygin,   bulygin@mathematik.uni-kl.de                     
+LIBRARY: decodegb.lib         Decoding and min distance of linear codes with GB
+AUTHOR:  Stanislav Bulygin,   bulygin@mathematik.uni-kl.de                     
 
 OVERVIEW:
- In this library we generate several systems used for decoding cyclic codes and finding their minimum distance.
- Namely, we work with the Cooper's philosophy and generalized Newton identities.
- The original method of quadratic equations is worked out here as well. 
- We also (for comparison) enable to work with the system of Fitzgerald-Lax.
- We provide some auxiliary functions for further manipulations and decoding.
- For an overview of the methods mentioned above, cf. Stanislav Bulygin, Ruud Pellikaan: 'Decoding and finding the minimum distance with 
- Groebner bases: history and new insights', in 'Selected Topics in Information and Coding Theory', World Scientific (2008) (to appear) (*).
- For the vanishing ideal computation the algorithm of Farr and Gao is implemented.
+ In this library we generate several systems used for decoding cyclic codes and
+ finding their minimum distance. Namely, we work with the Cooper's philosophy 
+ and generalized Newton identities. The original method of quadratic equations 
+ is worked out here as well. We also (for comparison) enable to work with the 
+ system of Fitzgerald-Lax. We provide some auxiliary functions for further 
+ manipulations and decoding. For an overview of the methods mentioned above, 
+ cf. 
+ @format
+  Stanislav Bulygin, Ruud Pellikaan: 'Decoding and finding the minimum 
+  distance with Groebner bases: history and new insights', in 'Selected Topics 
+  in Information and Coding Theory', World Scientific (2008) (to appear) (*).
+ @end format
+ For the vanishing ideal computation the algorithm of Farr and Gao is 
+ implemented.
 
 MAIN PROCEDURES: 
- sysCRHT(n,defset,e,q,m,#); generates the CRHT-ideal that follows Cooper's philosophy
- sysCRHTMindistBinary(n,defset,w); generates the CRHT-ideal to find the minimum distance in the binary case
- sysNewton(n,defset,t,q,m,#); generates the ideal with the Generalized Newton identities
- sysBin(v,Q,n,#);  generates Bin system as in the work of Augot et.al, cf. [*] for the reference
- encode(x,g);  encodes given message with the given generator matrix
- syndrome(h, c);  computes a syndrome w.r.t. the given check matrix
- sysQE(check,y,t,fieldeq,formal); generates the system of quadratic equations as in [*]
- errorInsert(y,pos,val);  inserts errors in a word
- errorRand(y,num,e);  inserts random errors in a word
- randomCheck(m,n,e);  generates a random check matrix
- genMDSMat(n,a);  generates an MDS (actually an RS) matrix
- mindist(check);   computes the minimum distance of a code
- decode(rec);  decoding of a word using the system of quadratic equations 
- solveForRandom(redun,ncodes,ntrials,#);  a procedure for manipulation with random codes
- solveForCode(check,ntrials,#); a procedure for manipulation with the given codes
- vanishId(points); computes the vanishing ideal for the given set of points
- sysFL(check,y,t,e,s); generates the Fitzgerald-Lax system
- solveForRandomFL(n,redun,p,e,t,ncodes,ntrials,minpol); a procedure for manipulation with random codes via Fitzgerald-Lax
+ sysCRHT(..);        generates the CRHT-ideal as in Cooper's philosophy
+ sysCRHTMindist(..); CRHT-ideal to find the minimum distance in the binary case
+ sysNewton(..);      generates the ideal with the generalized Newton identities
+ sysBin(..);         generates Bin system using Waring function
+ encode(x,g);        encodes given message x with the given generator matrix g
+ syndrome(h,c);      computes a syndrome w.r.t. the given check matrix
+ sysQE(..);          generates the system of quadratic equations for decoding
+ errorInsert(..);    inserts errors in a word
+ errorRand(y,num,e); inserts random errors in a word
+ randomCheck(m,n,e); generates a random check matrix
+ genMDSMat(n,a);     generates an MDS (actually an RS) matrix
+ mindist(check);     computes the minimum distance of a code
+ decode(rec);        decoding of a word using the system of quadratic equations 
+ decodeRandom(..); a procedure for manipulation with random codes
+ decodeCode(..);   a procedure for manipulation with the given code
+ vanishId(points);   computes the vanishing ideal for the given set of points
+ sysFL(..);          generates the Fitzgerald-Lax system
+ decodeRandomFL(..); manipulation with random codes via Fitzgerald-Lax
  
 
 KEYWORDS:  Cyclic code; Linear code; Decoding; 
@@ -75,7 +81,7 @@ static proc combinations (int m, int n)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// the poolynomial for Sala's restrictions 
+// the polynomial for Sala's restrictions 
 static proc p_poly(int n, int a, int b)
 {
   poly f;
@@ -88,12 +94,23 @@ static proc p_poly(int n, int a, int b)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc sysCRHT (int n, list defset, int e, int q, int m, int #)
-"USAGE:   sysCRHT(n,defset,e,q,m,#);  n length of the cyclic code, defset is a list representing the defining set,
-          e the error-correcting capacity, m degree extension of the splitting field, if #>0 additional equations
-          representing the fact that every two error positions are either different or at least one of them is zero
-RETURN:   the ring to work with the CRHT-ideal (with Sala's additions), the ideal itself is exported with the name 'crht'
-EXAMPLE:  example sysCRHT; shows an example
+proc sysCRHT (int n, list defset, int e, int q, int m, list #)
+"USAGE:   sysCRHT(n,defset,e,q,m,[k]); n,e,q,m,k int, defset list of int's
+@format
+         - n length of the cyclic code, 
+         - defset is a list representing the defining set,
+         - e the error-correcting capacity, 
+         - q field size
+         - m degree extension of the splitting field, 
+         - if k>0 additional equations representing the fact that every two 
+         error positions are either different or at least one of them is zero
+@end format
+RETURN:  
+@format
+        the ring to work with the CRHT-ideal (with Sala's additions), 
+        containig an ideal with name 'crht'
+@end format
+EXAMPLE: example sysCRHT; shows an example
 "
 {
   int r=size(defset);  
@@ -101,8 +118,13 @@ EXAMPLE:  example sysCRHT; shows an example
   ideal crht;
   int i,j;
   poly sum;
+  int k;
+  if ( size(#) > 0) 
+  { 
+    k = #[1]; 
+  }
   
-  //------------ add check equations -----------------
+  //---------------------- add check equations --------------------------
   for (i=1; i<=r; i++)
   {
     sum=0;
@@ -113,13 +135,13 @@ EXAMPLE:  example sysCRHT; shows an example
     crht[i]=sum-X(i);
   }
   
-  //------------ field equations on syndromes -----------
+  //--------------------- field equations on syndromes ------------------
   for (i=1; i<=r; i++)
   {
     crht=crht,X(i)^(q^m)-X(i);
   }
   
-  //------------ restrictions on error-locations: n-th roots of unity --------------
+  //------ restrictions on error-locations: n-th roots of unity ----------
   for (i=1; i<=e; i++)
   {
     crht=crht,Z(i)^(n+1)-Z(i);
@@ -130,8 +152,9 @@ EXAMPLE:  example sysCRHT; shows an example
     crht=crht,Y(i)^(q-1)-1;
   }  
   
-  //------------ add Sala's additional conditions if necessary -----------------
-  if (#)
+  //--------- add Sala's additional conditions if necessary --------------
+  if ( k > 0 )
+  
   {
     for (i=1; i<=e; i++)
     {
@@ -143,48 +166,54 @@ EXAMPLE:  example sysCRHT; shows an example
   }  
   export crht;  
   return(@crht);    
-} example
-{
-  "EXAMPLE:"; echo=2;
+} 
+example
+{ "EXAMPLE:"; echo=2;
   // binary cyclic [15,7,5] code with defining set (1,3)
-  
-  list defset=1,3; // defining set
-  
-  int n=15; // length
-  int e=2; // error-correcting capacity
-  int q=2; // basefield size
-  int m=4; // degree extension of the splitting field
-  int sala=1; // indicator to add additional equations
+  intvec v = option(get);
+
+  list defset=1,3;           // defining set  
+  int n=15;                  // length
+  int e=2;                   // error-correcting capacity
+  int q=2;                   // basefield size
+  int m=4;                   // degree extension of the splitting field
+  int sala=1;                // indicator to add additional equations
     
   def A=sysCRHT(n,defset,e,q,m); 
   setring A;
-  A; // shows the ring we are working in
-  print(crht); // the CRHT-ideal 
+  A;                         // shows the ring we are working in
+  print(crht);               // the CRHT-ideal 
   option(redSB);
-  ideal red_crht=std(crht);
-  // reduced Groebner basis
+  ideal red_crht=std(crht);  // reduced Groebner basis
   print(red_crht);
   
   //============================
   A=sysCRHT(n,defset,e,q,m,sala); 
   setring A;  
-  print(crht); // the CRHT-ideal with additional equations from Sala
+  print(crht);                // CRHT-ideal with additional equations from Sala
   option(redSB);
-  ideal red_crht=std(crht);
-  // reduced Groebner basis
-  print(red_crht);
-  // general error-locator polynomial for this code
-  red_crht[5];
+  ideal red_crht=std(crht);   // reduced Groebner basis
+  print(red_crht);            
+  red_crht[5];                // general error-locator polynomial for this code
+  option(set,v);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 
-proc sysCRHTMindistBinary (int n, list defset, int w)
-"USAGE:  sysCRHTMindistBinary(n,defset,w);  n length of the cyclic code, defset is a list representing the defining set,
-         w is a candidate for the minimum distance
-RETURN:  the ring to work with the Sala's ideal for the minimum distance, the ideal itself is exported with the name 'crht_md'
-EXAMPLE: example sysCRHTMindistBinary; shows an example
+proc sysCRHTMindist (int n, list defset, int w)
+"USAGE:  sysCRHTMindist(n,defset,w);  n,w are int, defset is list of int's  
+@format
+        - n length of the cyclic code, 
+        - defset is a list representing the defining set,
+        - w is a candidate for the minimum distance
+@end format
+RETURN:
+@format
+         the ring to work with the Sala's ideal for the minimum distance 
+         containing the ideal with name 'crht_md'
+@end format
+EXAMPLE: example sysCRHTMindist; shows an example
 "
 {
   int r=size(defset);  
@@ -222,24 +251,26 @@ EXAMPLE: example sysCRHTMindistBinary; shows an example
     
   export crht_md;  
   return(@crht_md);    
-} example
+} 
+example
 {
   "EXAMPLE:"; echo=2;
+  intvec v = option(get);
   // binary cyclic [15,7,5] code with defining set (1,3)
   
-  list defset=1,3; // defining set
-  
-  int n=15; // length
-  int d=5; // candidate for the minimum distance  
+  list defset=1,3;             // defining set  
+  int n=15;                    // length 
+  int d=5;                     // candidate for the minimum distance  
       
-  def A=sysCRHTMindistBinary(n,defset,d); 
+  def A=sysCRHTMindist(n,defset,d); 
   setring A;
-  A; // shows the ring we are working in
-  print(crht_md); // the Sala's ideal for mindist
+  A;                           // shows the ring we are working in
+  print(crht_md);              // the Sala's ideal for mindist
   option(redSB);
-  ideal red_crht_md=std(crht_md);
-  // reduced Groebner basis
-  print(red_crht_md);  
+  ideal red_crht_md=std(crht_md);     
+  print(red_crht_md);          // reduced Groebner basis
+  
+  option(set,v);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -252,18 +283,35 @@ static proc mod_ (int n, int m)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc sysNewton (int n, list defset, int t, int q, int m, int #)
-"USAGE:   sysNewton (n, defset, t, q, m, #);  n is length, defset is the defining set,
-          t is the number of errors, q is basefield size, m is degree extension of the splitting field
-          if triangular>0 it indicates that Newton identities in triangular form should be constructed
-RETURN:   the ring to work with the generalized Newton identities (in triangular form if applicable), 
-          the ideal itself is exported with the name 'newton'
+proc sysNewton (int n, list defset, int t, int q, int m, list #)
+"USAGE:   sysNewton (n,defset,t,q,m,[tr]); n,t,q,m,tr int, defset list int's 
+@format
+         - n is length, 
+         - defset is the defining set,
+         - t is the number of errors, 
+         - q is basefield size, 
+         - m is degree extension of the splitting field,
+         - if tr>0 it indicates that Newton identities in triangular 
+           form should be constructed
+@end format
+RETURN:   
+@format
+        the ring to work with the generalized Newton identities (in triangular 
+        form if applicable) containing the ideal with name 'newton'
+@end format
 EXAMPLE:  example sysNewton; shows an example
 "
 {  
  string s="ring @newton=("+string(q)+",a),(";
  int i,j;
  int flag;
+ int tr;
+ 
+ if (size(#)>0)
+ {
+  tr=#[1];
+ }
+ 
  for (i=n; i>=1; i--)
  {
   for (j=1; j<=size(defset); j++)
@@ -294,7 +342,7 @@ EXAMPLE:  example sysNewton; shows an example
  
  
  //------------ generate generalized Newton identities ----------
- if (#)
+ if (tr)
  {
   for (i=1; i<=t; i++)
   {
@@ -341,31 +389,35 @@ EXAMPLE:  example sysNewton; shows an example
  newton=simplify(newton,2);
  export newton;
  return(@newton); 
-} example 
+} 
+example 
 {
      "EXAMPLE:";  echo = 2;
-     // Newton identities for a binary 3-error-correcting cyclic code of length 31 with defining set (1,5,7)
+     // Newton identities for a binary 3-error-correcting cyclic code of 
+     //length 31 with defining set (1,5,7)
      
-     int n=31; // length
+     int n=31;          // length
      list defset=1,5,7; //defining set
-     int t=3; // number of errors
-     int q=2; // basefield size
-     int m=5; // degree extension of the splitting field
-     int triangular=1; // indicator of triangular form of Newton identities        
+     int t=3;           // number of errors
+     int q=2;           // basefield size
+     int m=5;           // degree extension of the splitting field
+     int tr=1;          // indicator of triangular form of Newton identities
+     
      
      def A=sysNewton(n,defset,t,q,m);
      setring A;
-     A; // shows the ring we are working in
-     print(newton); // generalized Newton identities
+     A;                 // shows the ring we are working in
+     print(newton);     // generalized Newton identities
      
      //===============================
-     A=sysNewton(n,defset,t,q,m,triangular);
+     A=sysNewton(n,defset,t,q,m,tr);
      setring A;     
-     print(newton); // generalized Newton identities in triangular form
+     print(newton);     // generalized Newton identities in triangular form
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// forms a list of special combinations needed for computation of Waring's function
+// forms a list of special combinations needed for computation of Waring's 
+//function
 static proc combinations_sum (int m, int n)
 {
  list result;
@@ -416,13 +468,31 @@ static proc exp_count (int n, int q)
 ///////////////////////////////////////////////////////////////////////////////
 
 
-proc sysBin (int v, list Q, int n, int#)
-"USAGE:    sysBin (v, Q, n, #);  v a number if errors, Q is a generating set of the code, n the length, # is an additional parameter: if  
-           set to 1, then the generating set is enlarged by odd elements, which are 2^(some power)*(some elment in the gen.set) mod n
-RETURN:    keeps the ring with the resulting system, which ideal is called 'bin'
+proc sysBin (int v, list Q, int n, list #)
+"USAGE:    sysBin (v,Q,n,[odd]);  v,n,odd are int, Q is list of int's
+@format
+          - v a number if errors, 
+          - Q is a generating set of the code, 
+          - n the length, 
+          - odd is an additional parameter: if  
+           set to 1, then the generating set is enlarged by odd elements, 
+           which are 2^(some power)*(some elment in the gen.set) mod n
+@end format
+THEORY:    
+@format
+          The system using Waring's function due to Augot et.al. 
+          is built as in [*].
+@end format
+RETURN:    the ring with the resulting system called 'bin'
 EXAMPLE:   example sysBin; shows an example
 "
 {
+ int odd;
+ if (size(#)>0)
+ {
+  odd=#[1];
+ }
+
  //ring r=2,(sigma(1..v),S(1..n)),(lp(v),dp(n));
  ring r=2,(S(1..n),sigma(1..v)),lp;
  list cyclot;
@@ -432,7 +502,7 @@ EXAMPLE:   example sysBin; shows an example
  poly sum_, mon;
  int count1, count2, upper, coef_, flag, gener;
  list Q_update;
- if (#==1)
+ if (odd==1)
  {
   for (i=1; i<=n; i++)
   {
@@ -459,7 +529,7 @@ EXAMPLE:   example sysBin; shows an example
   Q_update=Q;
  }
  
- //-------------- form polynomials for the Bin system via Waring's function --------------  
+ //---- form polynomials for the Bin system via Waring's function ---------  
  for (i=1; i<=size(Q_update); i++)
  {
   comb=combinations_sum(v,Q_update[i]);
@@ -582,16 +652,34 @@ static proc star(matrix m, int i, int j)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc sysQE(matrix check, matrix y, int t, int fieldeq, int formal)
-"USAGE:   sysQE(check, y, t, fieldeq, formal); check is the check matrix of the code   
-          y is a received word, t the number of errors to be corrected, 
-          if fieldeq=1, then field equations are added; if formal=0, field equations on (known) syndrome variables 
-          are not added, in order to add them (note that the exponent should be as a number of elements in the INITIAL alphabet) one
+proc sysQE(matrix check, matrix y, int t, list #)
+"USAGE:   sysQE(check,y,t,[fieldeq,formal]);check,y matrix;t,fieldeq,formal int
+@format
+        - check is the check matrix of the code   
+        - y is a received word, 
+        - t the number of errors to be corrected, 
+        - if fieldeq=1, then field equations are added, 
+        - if formal=0, field equations on (known) syndrome variables 
+          are not added, in order to add them (note that the exponent should 
+          be as a number of elements in the INITIAL alphabet) one
           needs to set formal>0 for the exponent
-RETURN:   the ring to work with together with the resulting system
+@end format
+THEORY:   The system of quadratic equations is built as in [*].
+RETURN:   the ring to work with together with the resulting system called 'qe'
 EXAMPLE:  example sysQE; shows an example
 "
 {
+ int fieldeq;
+ int formal;
+ if (size(#)>0)
+ {
+  fieldeq=#[1];
+ }
+ if (size(#)>1)
+ {
+  formal=#[2];
+ }
+ 
  def br=basering; 
  list rl=ringlist(br);
  
@@ -631,7 +719,7 @@ EXAMPLE:  example sysQE; shows an example
  int tim=rtimer;
  matrix transf=inverse(transpose(h_full));
   
- //----------- expression matrix of check vectors w.r.t. the MDS basis --------------
+ //------ expression matrix of check vectors w.r.t. the MDS basis -----------
  tim=rtimer;
  for (i=1; i<=red ; i++)
  {
@@ -705,7 +793,7 @@ EXAMPLE:  example sysQE; shows an example
   }
  } 
  
- //--------- form the quadratic equations according to the theory ---------------
+ //----- form the quadratic equations according to the theory -----------
  for (i=1; i<=n; i++)
  {
   sum1=0;
@@ -730,11 +818,12 @@ EXAMPLE:  example sysQE; shows an example
  
  ideal qe=result;
  export qe;
- return(work);
- //exportto(Top,h_full);   
+ return(work); 
 } example 
 {
      "EXAMPLE:";  echo = 2;
+     intvec v = option(get);
+     
      //correct 2 errors in [7,3] 8-ary code RS code
      int t=2; int q=8; int n=7; int redun=4;
      ring r=(q,a),x,dp;
@@ -743,24 +832,34 @@ EXAMPLE:  example sysQE; shows an example
      matrix g=dual_code(h);
      matrix x[1][3]=0,0,1,0;
      matrix y[1][7]=encode(x,g);
+     
      //disturb with 2 errors
-     matrix rec[1][7]=errorInsert(y,list(2,4),list(1,a));
+     matrix rec[1][7]=errorInsert(y,list(2,4),list(1,a)); 
+     
      //generate the system
-     def A=sysQE(h,rec,t,0,0);
+     def A=sysQE(h,rec,t);
      setring A;
      print(qe);
+     
      //let us decode
      option(redSB);
      ideal sys_qe=std(qe);
      print(sys_qe);     
+     
+     option(set,v);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 proc errorInsert(matrix y, list pos, list val)
-"USAGE:  errorInsert(y, pos, val); y is a (code) word, pos = positions where errors occured, val = their corresponding values
+"USAGE:  errorInsert(y,pos,val); y is matrix, pos,val list of int's
+@format
+        - y is a (code) word, 
+        - pos = positions where errors occured, 
+        - val = their corresponding values
+@end format
 RETURN:  corresponding received word
-EXAMPLE: example error; shows an example
+EXAMPLE: example errorInsert; shows an example
 "
 {
  matrix result[1][ncols(y)]=y;
@@ -792,8 +891,12 @@ EXAMPLE: example error; shows an example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc errorRand(matrix y, int num, int e)
-"USAGE:    errorRand(y, num, e); y is a (code) word, num is the number of errors, e is an extension degree (if one wants values to
-           be from GF(p^e))
+"USAGE:    errorRand(y, num, e); y matrix, num,e int
+@format
+          - y is a (code) word, 
+          - num is the number of errors, 
+          - e is an extension degree (if one wants values to be from GF(p^e))
+@end format
 RETURN:    corresponding received word
 EXAMPLE:   example errorRand; shows an example
 "
@@ -853,9 +956,12 @@ EXAMPLE:   example errorRand; shows an example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc randomCheck(int m, int n, int e, int #)
-"USAGE:    randomCheck(m, n, e); m x n are dimensions of the matrix, e is an extension degree (if one wants values to
-           be from GF(p^e))
+proc randomCheck(int m, int n, int e)
+"USAGE:    randomCheck(m, n, e); m,n,e are int
+@format
+          - m x n are dimensions of the matrix, 
+          - e is an extension degree (if one wants values to be from GF(p^e))
+@end format
 RETURN:    random check matrix
 EXAMPLE:   example randomCheck; shows an example
 "
@@ -866,7 +972,7 @@ EXAMPLE:   example randomCheck; shows an example
  matrix temp;
  for (i=1; i<=m; i++)
  {
-  temp=randomvector(n-m,e,#);  
+  temp=randomvector(n-m,e);
   for (j=1; j<=n-m; j++)
   {
    rand[i,j]=temp[j,1];
@@ -892,9 +998,17 @@ EXAMPLE:   example randomCheck; shows an example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc genMDSMat(int n, number a)
-"USAGE:   genMDSMat(n, a); n x n are dimensions of the matrix, a is a primitive element of the field.          
-NOTE:     An MDS matrix is constructed in the following way. We take a to be a generator of the multiplicative group of the field.
-          Then we construct the Vandermonde matrix with this a.
+"USAGE:   genMDSMat(n, a); n is int, a is number
+@format
+        - n x n are dimensions of the MDS matrix, 
+        - a is a primitive element of the field.
+@end format    
+NOTE:     
+@format
+        An MDS matrix is constructed in the following way. We take a to be a 
+        generator of the multiplicative group of the field. Then we construct 
+        the Vandermonde matrix with this a.
+@end format
 ASSUME:   extension field should already be defined 
 RETURN:   a matrix with the MDS property
 EXAMPLE:  example genMDSMat; shows an example  
@@ -925,11 +1039,21 @@ EXAMPLE:  example genMDSMat; shows an example
 
 
 proc mindist (matrix check)
-"USAGE:  mindist (check, q); check is a check matrix, q = field size
-RETURN:  minimum distance of the code together with the time needed for its calculation
+"USAGE:  mindist (check, q); check matrix, q int
+@format
+        - check is a check matrix, 
+        - q is the field size
+@end format
+RETURN:
+@format
+        minimum distance of the code together with the time needed for its 
+        calculation
+@end format
 EXAMPLE: example mindist; shows an example 
 "
 {
+ intvec vopt = option(get);
+
  int n=ncols(check); int redun=nrows(check); int t=redun+1;
  
  def br=basering; 
@@ -946,12 +1070,13 @@ EXAMPLE: example mindist; shows an example
  int i, tim, timsolve;
  matrix z[1][n]; 
  option(redSB);
- def A=sysQE(check,z,count,0,0);
+ def A=sysQE(check,z,count);
 
- //----------- proceed with solving the system w.r.t zero vector until some solutions are found -------------------- 
+ //proceed with solving the system w.r.t zero vector until some solutions 
+ //are found
  while (flag)
  {
-    A=sysQE(check,z,count,0,0);
+    A=sysQE(check,z,count);
     setring A;
     ideal temp=qe;
     tim=rtimer;
@@ -978,8 +1103,11 @@ EXAMPLE: example mindist; shows an example
     }
  }
  list result=list(count,timsolve); 
+ 
+ option(set,vopt);
  return(result); 
-} example 
+} 
+example 
 {
      "EXAMPLE:";  echo = 2;
      //determine a minimum distance for a [7,3] binary code 
@@ -998,21 +1126,31 @@ EXAMPLE: example mindist; shows an example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc decode(matrix check, matrix rec)
-"USAGE:    decode(check, rec, t); check is the check matrix of the code
-           rec is a received word, t is an upper bound for the number of errors one wants to correct
-ASSUME:    Errors in rec should be correctable, otherwise the output is unpredictable
+"USAGE:    decode(check, rec, t); check, rec matrix, t int
+@format
+          - check is the check matrix of the code,
+          - rec is a received word, 
+          - t is an upper bound for the number of errors one wants to correct
+@end format
+ASSUME:
+@format
+          Errors in rec should be correctable, otherwise the output is 
+          unpredictable
+@end format
 RETURN:    a codeword that is closest to rec
 EXAMPLE:   example decode; shows an example 
 "
-{ 
+{
+ intvec vopt = option(get); 
+ 
  def br=basering;
  int n=ncols(check); 
  
  int count=1; 
- def A=sysQE(check,rec,count,0,0);
+ def A=sysQE(check,rec,count);
  while(1)
  {
-  A=sysQE(check,rec,count,0,0);
+  A=sysQE(check,rec,count);
   setring A;     
   matrix h_full=genMDSMat(n,a);
   matrix rec=imap(br,rec);
@@ -1042,8 +1180,11 @@ EXAMPLE:   example decode; shows an example
  matrix real_syn=inverse(h_full)*syn;  
  setring br;
  matrix real_syn=imap(A,real_syn);
+ 
+ option(set,vopt);
  return(rec-transpose(real_syn));     
-} example 
+} 
+example 
 {
      "EXAMPLE:";  echo = 2;     
      //correct 1 error in [15,7] binary code 
@@ -1073,21 +1214,34 @@ EXAMPLE:   example decode; shows an example
 ///////////////////////////////////////////////////////////////////////////////
 
 
-proc solveForRandom(int n, int redun, int ncodes, int ntrials, int #)
-"USAGE:    solveForRandom(redun, q, ncodes, ntrials); redun is a redundabcy of a (random) code,
-           q = field size, ncodes = number of random codes to be processed,
-           ntrials = number of received vectors per code to be corrected.
-           If # is given it sets the correction capacity explicitly. It should be used in case one expexts some lower bound,
-           otherwise the procedure tries to compute the real minimum distance to find out the error-correction capacity
+proc decodeRandom(int n, int redun, int ncodes, int ntrials, list #)
+"USAGE:    decodeRandom(redun,q,ncodes,ntrials,[e]); all parameters int
+@format
+          - redun is a redundabcy of a (random) code,
+          - q is the field size, 
+          - ncodes is the number of random codes to be processed,
+          - ntrials is the number of received vectors per code to be corrected
+          - If e is given it sets the correction capacity explicitly. It 
+          should be used in case one expects some lower bound,
+          otherwise the procedure tries to compute the real minimum distance 
+          to find out the error-correction capacity
+@end format
 RETURN:    nothing; 
-EXAMPLE:   example solveForRandom; shows an example 
+EXAMPLE:   example decodeRandom; shows an example 
 "
 {
+ intvec vopt = option(get);
+
  int i,j;
  matrix h;
  int dist, t, tim, tim2, tim3, timdist, timdec, timdist2, timdec2, timdec3;
  ideal sys;
  list tmp;
+ int e;
+ if (size(#)>0)
+ {
+  e=#[1];
+ }
 
  option(redSB);
  def br=basering;
@@ -1101,9 +1255,9 @@ EXAMPLE:   example solveForRandom; shows an example
   h=randomCheck(redun,n,1);
   "check matrix:";
   print(h);
-  if (#>0)
+  if (e>0)
   {
-     t=#;
+     t=e;
   } else {
      tim=rtimer;
      tmp=mindist(h);
@@ -1117,7 +1271,7 @@ EXAMPLE:   example solveForRandom; shows an example
   tim3=rtimer;
 
   //------------- generate the template system ----------------------
-  def A=sysQE(h,z,t,0,0);
+  def A=sysQE(h,z,t);
   setring A;
   matrix word,y,rec;
   ideal sys2,sys3;
@@ -1127,7 +1281,7 @@ EXAMPLE:   example solveForRandom; shows an example
   print("The system is generated");
   timdec3=timdec3+rtimer-tim3;  
 
-  //------------- modify the template according to every received word -------------------
+  //------ modify the template according to every received word --------------
   for (j=1; j<=ntrials; j++)
   {
    word=randomvector(n-redun,1);   
@@ -1141,34 +1295,44 @@ EXAMPLE:   example solveForRandom; shows an example
   } 
   timdec2=timdec2+rtimer-tim2;
   kill A;
+  option(set,vopt);
  } 
  printf("Time for mindist: %p", timdist);
  printf("Time for GB in mindist: %p", timdist);
  printf("Time for decoding: %p", timdec2);
  printf("Time for GB in decoding: %p", timdec);
  printf("Time for sysQE in decoding: %p", timdec3); 
-} example 
+} 
+example 
 {
      "EXAMPLE:";  echo = 2;
      int q=32; int n=25; int redun=n-11; int t=redun+1;
      ring r=(q,a),x,dp;
      
      // correct 2 errors in 5 random binary codes, 50 trials each
-     solveForRandom(n,redun,5,50,2); 
+     decodeRandom(n,redun,5,50,2); 
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 
-proc solveForCode(matrix check, int ntrials, int #)
-"USAGE:     solveForCode(check, ntrials); 
-            check is a check matrix for the code, ntrials = number of received vectors per code to be corrected.
-            If # is given it sets the correction capacity explicitly. It should be used in case one expects some lower bound,
-            otherwise the procedure tries to compute the real minimum distance to find out the error-correction capacity
+proc decodeCode(matrix check, int ntrials, list #)
+"USAGE:     decodeCode(check, ntrials, [e]); check matrix, ntrials,e int 
+@format            
+           - check is a check matrix for the code, 
+           - ntrials is the number of received vectors per code to be 
+           corrected.
+           - If e is given it sets the correction capacity explicitly. It 
+           should be used in case one expects some lower bound,
+           otherwise the procedure tries to compute the real minimum distance 
+           to find out the error-correction capacity
+@end format
 RETURN:     nothing;  
-EXAMPLE:    example solveForCode; shows an example 
+EXAMPLE:    example decodeCode; shows an example 
 "
 {
+ intvec vopt = option(get);
+
  int n=ncols(check);
  int redun=nrows(check);
  int i,j;
@@ -1176,6 +1340,11 @@ EXAMPLE:    example solveForCode; shows an example
  int dist, t, tim, tim2, tim3, timdist, timdec, timdist2, timdec2, timdec3;
  ideal sys;
  list tmp;
+ int e;
+ if (size(#)>0)
+ {
+  e=#[1];
+ }
 
  option(redSB);
  def br=basering;
@@ -1187,9 +1356,9 @@ EXAMPLE:    example solveForCode; shows an example
  print(h);
 
  //------------------ determine error-correction capacity -------------------
- if (#>0)
+ if (e>0)
  {
-    t=#;
+    t=e;
  } else {
    tim=rtimer;
    tmp=mindist(h);
@@ -1203,7 +1372,7 @@ EXAMPLE:    example solveForCode; shows an example
  tim3=rtimer;
 
  //------------- generate the template system ----------------------
- def A=sysQE(h,z,t,0,0);
+ def A=sysQE(h,z,t);
  setring A;
  matrix word,y,rec;
  ideal sys2,sys3;
@@ -1213,7 +1382,7 @@ EXAMPLE:    example solveForCode; shows an example
  print("The system is generated");
  timdec3=timdec3+rtimer-tim3; 
 
- //------------- modify the template according to every received word ------------------- 
+ //--- modify the template according to every received word --------------- 
  for (j=1; j<=ntrials; j++)
  {
    word=randomvector(n-redun,1);   
@@ -1232,7 +1401,10 @@ EXAMPLE:    example solveForCode; shows an example
  printf("Time for decoding: %p", timdec2);
  printf("Time for GB in decoding: %p", timdec);
  printf("Time for sysQE in decoding: %p", timdec3); 
-} example 
+ 
+ option(set,vopt);
+} 
+example 
 {
      "EXAMPLE:";  echo = 2;
      int q=32; int n=25; int redun=n-11; int t=redun+1;
@@ -1240,7 +1412,7 @@ EXAMPLE:    example solveForCode; shows an example
      matrix check=randomCheck(redun,n,1);
      
      // correct 2 errors in using the code above, 50 trials 
-     solveForCode(check,50,2); 
+     decodeCode(check,50,2); 
 }
 
 
@@ -1272,8 +1444,9 @@ static proc ev (poly f, matrix p)
      return(number(temp));
 }
 
-//////////////////////////////////////////////////////////////////////////////////////
-// return index of an element in the ideal where it does not vanish at the given point
+///////////////////////////////////////////////////////////////////////////////
+// return index of an element in the ideal where it does not vanish at the 
+//given point
 static proc find_index (ideal G, matrix p)
 {
      if (ncols(p)>1) {ERROR("not a column vector");};
@@ -1311,8 +1484,9 @@ static proc list2ideal (list l)
      return(id);
 }
 
-////////////////////////////////////////////////////////////////////////////////////
-// checl whether given polynomial is divisible by some leading monomial of the ideal
+///////////////////////////////////////////////////////////////////////////////
+// check whether given polynomial is divisible by some leading monomial of the 
+//ideal
 static proc divisible (poly m, ideal G)
 {
      for (int i=1; i<=size(G); i++)
@@ -1325,7 +1499,11 @@ static proc divisible (poly m, ideal G)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc vanishId (list points)
-"USAGE:  vanishId (points,e); points is a list of points, for which the vanishing ideal is to be constructed.
+"USAGE:  vanishId (points); point is a list of matrices
+@format
+        - points is a list of points for which the vanishing ideal is to be 
+        constructed        
+@end format
 RETURN:  Vanishing ideal corresponding to the given set of points
 EXAMPLE: example vanishId; shows an example 
 "
@@ -1385,8 +1563,9 @@ EXAMPLE: example vanishId; shows an example
      print(id);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-// construct the list of all vectors of length m with elements in p^e, where p is characteristics
+///////////////////////////////////////////////////////////////////////////////
+// construct the list of all vectors of length m with elements in p^e, where p 
+//is characteristics
 proc pointsGen (int m, int e)
 {
      if (e>1)
@@ -1547,8 +1726,14 @@ static proc gener_funcs (matrix check, list points, int e, ideal id, int s)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc sysFL (matrix check, matrix y, int t, int e, int s)
-"USAGE:    sysFL (check,y,t,e,s); check is a check matrix of the code, y is a received word, t the number of errors to correct,
-           e is the extension degree, s is the dimension of the point for the vanishing ideal
+"USAGE:    sysFL (check,y,t,e,s); check,y matrix, t,e,s int
+@format
+          - check is a check matrix of the code, 
+          - y is a received word, 
+          - t the number of errors to correct,
+          - e is the extension degree, 
+          - s is the dimension of the point for the vanishing ideal
+@end format
 RETURN:    the system of Fitzgerald-Lax for the given decoding problem
 EXAMPLE:   example sysFL; shows an example
 "
@@ -1619,9 +1804,11 @@ EXAMPLE:   example sysFL; shows an example
      points=points2;
      export points;     
      return(result);
-} example
+} 
+example
 {
      "EXAMPLE:";  echo = 2;
+     intvec vopt = option(get);
      
      list l=FLpreprocess(3,1,11,2,"");
      def r=l[1];
@@ -1645,10 +1832,13 @@ EXAMPLE:   example sysFL; shows an example
      print(sys);
      option(redSB);
      ideal red_sys=std(sys);
-     red_sys; // read the solutions from this redGB
+     red_sys; 
+     // read the solutions from this redGB
      // the points are (0,0,1) and (0,1,0) with error values 1 and -1 resp.
      // use list points to find error positions;
-     points;     
+     points;
+     
+     option(set,vopt);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1690,8 +1880,7 @@ proc FLpreprocess (int p, int e, int n, int t, string minp)
           rl[1][2]=tmp;
           rl[1][2][1]=string("a");
           rl[1][3]=tmp;
-          rl[1][3][1]=tmp;
-          //rl[1][3][1][1]=string("dp("+string((t-1)*(s+1)+s)+"),lp("+string(s+1)+")");
+          rl[1][3][1]=tmp;          
           rl[1][3][1][1]=string("lp");
           rl[1][3][1][2]=1;
           rl[1][4]=ideal(0);
@@ -1703,7 +1892,6 @@ proc FLpreprocess (int p, int e, int n, int t, string minp)
      
      rl[3]=tmp;
      rl[3][1]=tmp;     
-     //rl[3][1][1]=string("dp("+string((t-1)*(s+1)+s)+"),lp("+string(s+1)+")");
      rl[3][1][1]=string("lp");
      intvec v=1;
      for (i=1; i<=size(var_ord)-1; i++)
@@ -1742,19 +1930,20 @@ static proc x_var (int i, int j, int s)
 
 ///////////////////////////////////////////////////////////////////////////////
 // random vector of length n with entries from p^e, p the characteristic
-static proc randomvector(int n, int e, int #)
+static proc randomvector(int n, int e)
 {     
     int i;
     matrix result[n][1];
     for (i=1; i<=n; i++)
     {
-        result[i,1]=asElement(random_prime_vector(e,#));
+        result[i,1]=asElement(random_prime_vector(e));
     }
     return(result);        
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
-// "convert" representation of an element from the field extension from vector to an elelemnt
+///////////////////////////////////////////////////////////////////////////////
+// "convert" representation of an element from the field extension from vector 
+//to an elelemnt
 static proc asElement(list l)
 {
   number s;
@@ -1770,17 +1959,21 @@ static proc asElement(list l)
 
 ///////////////////////////////////////////////////////////////////////////////
 // random vector of length n with entries from p, p the characteristic
-static proc random_prime_vector (int n, int #)
-{
-  if (#==1)
+static proc random_prime_vector (int n)
+{  
+  list rl=ringlist(basering);
+  int i, charac;
+  for (i=2; i<=rl[1][1]; i++)
   {
-     list rl=ringlist(basering);     
-     int charac=rl[1][1];
-  } else {
-     int charac=2;
+    if (rl[1][1] mod i ==0)
+    {      
+      break;
+    }
   }
+  charac=i;  
+  
   list l;
-  int i;
+  
   for (i=1; i<=n; i++)
   {
     l=l+list(random(0,charac-1));
@@ -1790,15 +1983,25 @@ static proc random_prime_vector (int n, int #)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc solveForRandomFL(int n, int redun, int p, int e, int t, int ncodes, int ntrials, string minpol)
-"USAGE:    solveForRandomFL(redun,p,e,n,t,ncodes,ntrials,minpol); n = length of codes generated, redun = redundancy of codes generated, 
-           p = characteristics, e is the extension degree, 
-           t = number of errors to correct, ncodes = number of random codes to be processed
-           ntrials = number of received vectors per code to be corrected
-           due to some pecularities of SINGULAR one needs to provide minimal polynomial for the extension explicitly
+proc decodeRandomFL(int n, int redun, int p, int e, int t, int ncodes, int ntrials, string minpol)
+"USAGE:    decodeRandomFL(redun,p,e,n,t,ncodes,ntrials,minpol); 
+@format
+          - n is length of codes generated, redun = redundancy of codes 
+          generated, 
+          - p is characteristics, 
+          - e is the extension degree, 
+          - t is the number of errors to correct, 
+          - ncodes is the number of random codes to be processed,
+          - ntrials is the number of received vectors per code to be corrected,
+          - minpol: due to some pecularities of SINGULAR one needs to provide 
+          minimal polynomial for the extension explicitly
+@end format
 RETURN:    nothing
-EXAMPLE:   example solveForRandomFL; shows an example
+EXAMPLE:   example decodeRandomFL; shows an example
+"
 {
+ intvec vopt = option(get);
+
  list l=FLpreprocess(p,e,n,t,minpol); 
  
  def r=l[1];
@@ -1817,16 +2020,16 @@ EXAMPLE:   example solveForRandomFL; shows an example
  
  for (i=1; i<=ncodes; i++)
  {
-     h=randomCheck(redun,n,e,1);            
+     h=randomCheck(redun,n,e);            
      g=dual_code(h);
      tim2=rtimer;       
      tim3=rtimer;
 
-     //------------ generate the template system ------------------               
+     //---------------- generate the template system -----------------------  
      sys=sysFL(h,z,t,e,s_work);     
      timdec3=timdec3+rtimer-tim3;
    
-     //------------- modifying the template according to the received word ---------------
+     //------ modifying the template according to the received word ---------
      for (j=1; j<=ntrials; j++)
      {
           word=randomvector(n-redun,1);
@@ -1843,12 +2046,16 @@ EXAMPLE:   example solveForRandomFL; shows an example
  printf("Time for decoding: %p", timdec2);
  printf("Time for GB in decoding: %p", timdec);
  printf("Time for generating Fitzgerald-Lax system during decoding: %p", timdec3); 
-} example
+ 
+ option(set,vopt);
+} 
+example
 {
      "EXAMPLE:";  echo = 2;
      
-     // correcting one error for one random binary code of length 25, redundancy 14; 300 words are processed
-     solveForRandomFL(25,14,2,1,1,1,300,"");
+     // correcting one error for one random binary code of length 25, 
+     //redundancy 14; 300 words are processed
+     decodeRandomFL(25,14,2,1,1,1,300,"");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1873,19 +2080,19 @@ static proc LF_add_synd (matrix rec, matrix check, ideal sys)
 "EXAMPLE:";  echo = 2;
 int q=128; int n=120; int redun=n-30; 
 ring r=(q,a),x,dp;
-solveForRandom(n,redun,1,1,6);
+decodeRandom(n,redun,1,1,6);
 
 int q=128; int n=120; int redun=n-20; 
 ring r=(q,a),x,dp;
-solveForRandom(n,redun,1,1,9);
+decodeRandom(n,redun,1,1,9);
 
 int q=128; int n=120; int redun=n-10;
 ring r=(q,a),x,dp;
-solveForRandom(n,redun,1,1,19);
+decodeRandom(n,redun,1,1,19);
 
 int q=256; int n=150; int redun=n-10;
 ring r=(q,a),x,dp;
-solveForRandom(n,redun,1,1,22);
+decodeRandom(n,redun,1,1,22);
 
 //////////////     SOME HARD EXAMPLES    //////////////////////
 //////      THAT MAYBE WILL BE DOABLE LATER     ///////////////
@@ -1895,20 +2102,20 @@ solveForRandom(n,redun,1,1,22);
 "EXAMPLE:";  echo = 2;
 int q=128; int n=120; int redun=n-40; 
 ring r=(q,a),x,dp;
-solveForRandom(n,redun,1,1,6);
+decodeRandom(n,redun,1,1,6);
 
 redun=n-30;
-solveForRandom(n,redun,1,1,8);
+decodeRandom(n,redun,1,1,8);
 
 redun=n-20;
-solveForRandom(n,redun,1,1,12);
+decodeRandom(n,redun,1,1,12);
 
 redun=n-10;
-solveForRandom(n,redun,1,1,24);
+decodeRandom(n,redun,1,1,24);
 
 int q=256; int n=150; int redun=n-10; 
 ring r=(q,a),x,dp;
-solveForRandom(n,redun,1,1,26);
+decodeRandom(n,redun,1,1,26);
 
 
 2.) Generic decoding is hard!
