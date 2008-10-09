@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: phindex.lib,v 1.2 2008-08-18 10:42:27 Singular Exp $";
+version="$Id: phindex.lib,v 1.3 2008-10-09 09:31:57 Singular Exp $";
 category=" ";
 info="
 LIBRARY : phindex.lib Procedures to compute the index of real analytic vector fields
@@ -494,7 +494,7 @@ example
 //////////////////////////////////////////////////////////////////////
 static proc SigntL(poly M)  //static procedure to compute the signature of any quadratic form.
 "USAGE:    SigntL(M); M is a quadratic form.
-RETURN:   The signature of of M of type int.
+RETURN:   The signature of M of type int.
 ASSUME:   M is a quadratic form (ply type).
 "
 {

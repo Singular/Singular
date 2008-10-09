@@ -1,6 +1,6 @@
 //GP, last modified 28.6.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: crypto.lib,v 1.5 2008-08-07 16:00:50 Singular Exp $";
+version="$Id: crypto.lib,v 1.6 2008-10-09 09:31:57 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY:  crypto.lib     Procedures for teaching cryptography
@@ -1905,7 +1905,7 @@ RETURN: message:N is not prime or {L,P,m,q} as certificate for N being prime
          P a list ((P[1]:P[2]:P[3]) is a point of C)
          m,q integers
 ASSUME: gcd(N,6)=1
-NOTE:   The basis of the the algorithm is the following theorem:
+NOTE:   The basis of the algorithm is the following theorem:
          Given C, an elliptic curve over Z/N, P a point of C(Z/N),
          m an integer, q a prime with the following properties:
          - q|m

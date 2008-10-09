@@ -1,55 +1,55 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: redcgs.lib,v 1.2 2008-08-18 10:42:50 Singular Exp $";
+version="$Id: redcgs.lib,v 1.3 2008-10-09 09:31:58 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  redcgs.lib      Reduced Comprehesive Groebner Systems.
 PURPOSE:  Comprehensive Groebner Systems. Canonical Forms.
           The library contains Monte's algorithms to compute disjoint, reduced
-          Comprehensive Groebner Systems (CGS). A CGS is a set of pairs of 
-          (segment,basis). The segments S_i are subsets of the parameter space, 
-          and the bases B_i are sets of polynomials specializing to Groebner 
+          Comprehensive Groebner Systems (CGS). A CGS is a set of pairs of
+          (segment,basis). The segments S_i are subsets of the parameter space,
+          and the bases B_i are sets of polynomials specializing to Groebner
           bases of the specialized ideal for every point in S_i.
-          
+
           The purpose of the routines in this library is to obtain CGS with
           better properties, namely disjoint segments forming a partition of
-          the parameter space and reduced bases. Reduced bases are sets of 
-          polynomials that specialize to the reduced Groebner basis of the 
-          specialized ideal preserving the leading power products (lpp). 
+          the parameter space and reduced bases. Reduced bases are sets of
+          polynomials that specialize to the reduced Groebner basis of the
+          specialized ideal preserving the leading power products (lpp).
           The lpp characterize the type of solution in each segment.
-          
+
           A further objective is to summarize as much as possible the segments
           with the same lpp into a single segment, and if possible to obtain
           a final result that is canonical, i.e. independent of the algorithm
           and only attached to the given ideal.
-          
-          There are three fundamental routines in the library: mrcgs, rcgs and 
-          crcgs. mrcgs (Minimal Reduced CGS) is an algorithm that packs so 
-          much as it is able to do (using algorithms adhoc) the segments with 
-          the same lpp, obtaining the minimal number of segments. The hypothesis 
-          is that the result is also canonical, but for the moment there is no 
-          proof of the uniqueness of this minimal packing. Moreover, the 
-          segments that are obtained are not locally closed, i.e. there are not 
+
+          There are three fundamental routines in the library: mrcgs, rcgs and
+          crcgs. mrcgs (Minimal Reduced CGS) is an algorithm that packs so
+          much as it is able to do (using algorithms adhoc) the segments with
+          the same lpp, obtaining the minimal number of segments. The hypothesis
+          is that the result is also canonical, but for the moment there is no
+          proof of the uniqueness of this minimal packing. Moreover, the
+          segments that are obtained are not locally closed, i.e. there are not
           difference of two varieties.
-          
+
           On the other side, Michael Wibmer has proved that for homogeneous ideals,
           all the segments with reduced bases having the same lpp admit a unique
           basis specializing well. For this purpose it is necessary to extend the
           description of the elements of the bases to functions, forming sheaves
-          of polynomials instead of simple polynomials, so that the polynomials in 
-          a sheaf either preserve the lpp of the corresponding polynomial of 
+          of polynomials instead of simple polynomials, so that the polynomials in
+          a sheaf either preserve the lpp of the corresponding polynomial of
           the specialized Groebner basis (and then it specializes well) or
           it specializes to 0. Moreover, in a sheaf, for every point in the
           corresponding segment, at least one of the polynomials specializes well.
           specializes well. And moreover Wibmer's Theorem ensures that the packed
           segments are locally closed, that is can be described as the difference of
           two varieties.
-          
+
           Using Wibmer's Theorem we proved that an affine ideal can be homogenized,
           than discussed by mrcgs and finally de-homogenized. The bases so obtained
           can be reduced and specialize well in the segment. If the theoretic
-          objective is reached, and all the segments of the homogenized ideal 
+          objective is reached, and all the segments of the homogenized ideal
           have been packed, locally closed segments will be obtained.
-          
+
           If we only homogenize the given basis of the ideal, then we cannot ensure
           the canonicity of the partition obtained, because there are many different
           bases of the given ideal that can be homogenized, and the homogenized ideals
@@ -57,35 +57,35 @@ PURPOSE:  Comprehensive Groebner Systems. Canonical Forms.
           as the most practical routine. It provides locally closed segments and
           is usually faster than mrcgs and crcgs. But the given partition is not
           always canonical.
-          
+
           Finally it is possible to homogenize the whole affine ideal, and then
           the packing algorithm will provide canonical segments by dehomogenizing.
           This corresponds to crcgs routine. It provides the best description
-          of the segments and bases. In contrast crcgs algorithm is usually much 
-          more time consuming and it will not always finish in a reasonable time. 
-          Moreover it will contain more segments than mrcgs and possibly also more 
+          of the segments and bases. In contrast crcgs algorithm is usually much
+          more time consuming and it will not always finish in a reasonable time.
+          Moreover it will contain more segments than mrcgs and possibly also more
           than rcgs.
-          
+
           But the actual algorithms in the library to pack segments have some lacks.
           They are not theoretically always able to pack the segments that we know
           that can be packed. Nevertheless, thanks to Wibmer's Theorem, the
-          algorithms rcgs and crcgs are able to detect if the objective has not been 
-          reached, and if so, to give a Warning. The warning does not invalidate the 
-          output, but it only recognizes that the theoretical objective is not 
-          completely reached by the actual campcting methods and that some segments 
+          algorithms rcgs and crcgs are able to detect if the objective has not been
+          reached, and if so, to give a Warning. The warning does not invalidate the
+          output, but it only recognizes that the theoretical objective is not
+          completely reached by the actual campcting methods and that some segments
           that can be packed have not been packed with a single basis.
-          
+
           The routine buildtree is the first algorithm used in all the previous
           methods providing a first disjoint CGS, and can be used if none of the
           three fundamental algorithms of the library finishes in a reasonable time.
-          
-          There are also routines to visualize better the output of the previous 
+
+          There are also routines to visualize better the output of the previous
           algorithms:
           finalcases can be applied to the list provided by buildtree to obtain the
           CGS. The list provided by buildtree contains the whole discussion, and
           finalcases extracts the CGS.
-          The output of buildtree can also be transformed into a file using 
-          buildtreetoMaple routine that can be read in Maple. Using Monte's dpgb 
+          The output of buildtree can also be transformed into a file using
+          buildtreetoMaple routine that can be read in Maple. Using Monte's dpgb
           library in Maple the output can be plotted (with the routine tplot).
           To plot the output of mrcgs, rcgs or crcgs in Maple, the library also
           provides the routine cantreetoMaple. The file written using it
@@ -94,14 +94,14 @@ PURPOSE:  Comprehensive Groebner Systems. Canonical Forms.
           The output of mrcgs, rcgs and crcgs is given in form of tree using
           prime ideals in a canonical form that is described in the papers.
           Nevertheless this canonical form is somewhat uncomfortable to be
-          interpreted. When the segments are all locally closed (and this is 
+          interpreted. When the segments are all locally closed (and this is
           always the case for rcgs and crcgs) the routine cantodiffcgs transforms
           the output into a simpler form having only one list element for
           each segment and providing the two varieties whose difference represent
           the segment also in a canonical form.
-          
-AUTHORS:  Antonio Montes , Hans Schoenemann. 
-OVERVIEW: see \"Minimal Reduced Comprehensive Groebner Systems\" 
+
+AUTHORS:  Antonio Montes , Hans Schoenemann.
+OVERVIEW: see \"Minimal Reduced Comprehensive Groebner Systems\"
           by Antonio Montes. (http://www-ma2.upc.edu/~montes/).
 
 NOTATIONS: All given and determined polynomials and ideals are in the
@@ -117,62 +117,62 @@ PROCEDURES:
 
 setglobalrings();    It is called by the fundamental routines of the library:
                      (buildtree, mrcgs, rcgs, crcgs).
-                     After calling it, the rings @R, @P and @RP are defined 
+                     After calling it, the rings @R, @P and @RP are defined
                      globally.
-memberpos(f,J);      Returns the list of two integers: the value 0 or 1 depending 
-                     on if f belongs to J or not, and the position in J (0 if it 
+memberpos(f,J);      Returns the list of two integers: the value 0 or 1 depending
+                     on if f belongs to J or not, and the position in J (0 if it
                      does not belong).
 subset(F,G);         If all elements of F belong to the ideal G it returns 1,
-                     and 0 otherwise. 
-pdivi(f,F);          Pseudodivision of a poly f by an ideal F in @R. Returns a 
+                     and 0 otherwise.
+pdivi(f,F);          Pseudodivision of a poly f by an ideal F in @R. Returns a
                      list (r,q,m) such that m*f=r+sum(q.G).
-facvar(ideal J)      Returns all the free-square factors of the elements 
+facvar(ideal J)      Returns all the free-square factors of the elements
                      of ideal J (non repeated). Integer factors are ignored,
                      even 0 is ignored. It can be called from ideal @R, but
                      the given ideal J must only contain poynomials in the
                      parameters.
-redspec(N,W);        Given null and non-null conditions depending only on the 
+redspec(N,W);        Given null and non-null conditions depending only on the
                      parameters it returns a red-specification.
-pnormalform(f,N,W);  Reduces the poly f wrt to the null condition ideal N and the 
+pnormalform(f,N,W);  Reduces the poly f wrt to the null condition ideal N and the
                      non-null condition ideal W (both depending on the parameters).
-buildtree(F);        Returns a list T describing a first reduced CGS of the ideal 
+buildtree(F);        Returns a list T describing a first reduced CGS of the ideal
                      F in K[a][x].
-buildtreetoMaple(T); Writes into a file the output of buildtree in Maple readable 
+buildtreetoMaple(T); Writes into a file the output of buildtree in Maple readable
                      form.
 finalcases(T);       From the output of buildtree it provides the list
-                     of its terminal vertices. That list represents the dichotomic, 
+                     of its terminal vertices. That list represents the dichotomic,
                      reduced CGS obtained by buildtree.
-mrcgs(F);            Returns a list T describing the Minimal Reduced CGS of the 
+mrcgs(F);            Returns a list T describing the Minimal Reduced CGS of the
                      ideal F of K[a][x]
-rcgs(F);             Returns a list T describing the Reduced CGS of the ideal F 
-                     of K[a][x] obtained by direct homogenizing and de-homogenizing 
+rcgs(F);             Returns a list T describing the Reduced CGS of the ideal F
+                     of K[a][x] obtained by direct homogenizing and de-homogenizing
                      the basis of the given ideal.
-crcgs(F);            Returns a list T describing the Canonical Reduced CGS of the 
-                     ideal F of K[a][x] obtained by homogenizing and de-homogenizing 
+crcgs(F);            Returns a list T describing the Canonical Reduced CGS of the
+                     ideal F of K[a][x] obtained by homogenizing and de-homogenizing
                      the initial ideal.
-cantreetoMaple)(M);  Writes into a file the output of mrcgs, rcgs or crcgs in Maple 
+cantreetoMaple)(M);  Writes into a file the output of mrcgs, rcgs or crcgs in Maple
                      readable form.
 cantodiffcgs(list L);From the output of rcgs or crcgs (or even of mrcgs when
                      it is possible) it returns a simpler list where the segments
-                     are given as difference of varieties.                    
+                     are given as difference of varieties.
 
-SEE ALSO: compregb_lib 
+SEE ALSO: compregb_lib
 ";
 
 // ************ Begin of the redCGS library *********************
-// Library redCGS 
-// (Reduced Comprehesive Groebner Systems): 
+// Library redCGS
+// (Reduced Comprehesive Groebner Systems):
 // Initial data: 21-1-2008
 // Release 1:
 // Final data: 3_7-2008
-// All given and determined polynomials and ideals are in the 
+// All given and determined polynomials and ideals are in the
 // basering K[a][x];
-// After calling setglobalrings(); the rings 
+// After calling setglobalrings(); the rings
 //        @R   (K[a][x]),
-//        @P   (K[a]), 
+//        @P   (K[a]),
 //        @RP   (K[x,a]) are globally defined
 //        They are used internally and can also be called by the user;
-//        setglobalrings() is called by buildtree, so it is not required to 
+//        setglobalrings() is called by buildtree, so it is not required to
 //        call setglobalrings before using
 //        the fundamental routines of the library.
 
@@ -183,31 +183,31 @@ LIB "primdec.lib";
 proc setglobalrings()
 "USAGE:   setglobalrings();
           No arguments
-RETURN:   After its call the rings @R=K[a][x], @P=K[a], @RP=K[x,a] are 
+RETURN:   After its call the rings @R=K[a][x], @P=K[a], @RP=K[x,a] are
           defined as global variables.
 NOTE:     It is called by the fundamental routines of the library.
           The user does not need to call it, except when none of
           the fundamental routines have been called and some
           other routines of the library are used.
-          The basering R, must be of the form K[a][x], a=parameters, 
+          The basering R, must be of the form K[a][x], a=parameters,
           x=variables, and should be defined previously.
 KEYWORDS: ring, rings
 EXAMPLE:  setglobalrings; shows an example"
 {
   def @R=basering;  // must be of the form K[a][x], a=parameters, x=variables
-  def Rx=ringlist(@R);  
-  def @P=ring(Rx[1]);   
+  def Rx=ringlist(@R);
+  def @P=ring(Rx[1]);
   list Lx;
   Lx[1]=0;
   Lx[2]=Rx[2]+Rx[1][2];
   Lx[3]=Rx[1][3];
-  Lx[4]=Rx[1][4];  
+  Lx[4]=Rx[1][4];
   //def @K=ring(Lx);
   //exportto(Top,@K);  //global ring K[x,a] with the order of x extended to x,a
-  Rx[1]=0;              
-  def D=ring(Rx);       
-  def @RP=D+@P; 
-  exportto(Top,@R);      // global ring K[a][x]          
+  Rx[1]=0;
+  def D=ring(Rx);
+  def @RP=D+@P;
+  exportto(Top,@R);      // global ring K[a][x]
   exportto(Top,@P);      // global ring K[a]
   exportto(Top,@RP);     // global ring K[x,a] with product order
   setring(@R);
@@ -228,7 +228,7 @@ example
 // input:
 //   ideal J (J can be also poly), but the output is an ideal;
 // output:
-//   ideal Jc (the new form of ideal J without denominators and 
+//   ideal Jc (the new form of ideal J without denominators and
 //       normalized to content 1)
 proc cld(ideal J)
 {
@@ -391,7 +391,7 @@ EXAMPLE:  subset; shows an example;"
 }
 example
 { "EXAMPLE:"; echo = 2;
-  list J=list(7,3,2); 
+  list J=list(7,3,2);
   list K=list(1,2,3,5,7,8);
   subset(J,K);
 }
@@ -438,10 +438,10 @@ proc pdivi(poly f,ideal F)
 "USAGE:   pdivi(f,F);
           poly f: the polynomial to be divided
           ideal F: the divisor ideal
-RETURN:   A list (poly r, ideal q, poly m). r is the remainder of the 
-          pseudodivision, q is the ideal of quotients, and m is the 
-          factor by which f is to be multiplied.     
-NOTE:     Pseudodivision of a poly f by an ideal F in @R. Returns a 
+RETURN:   A list (poly r, ideal q, poly m). r is the remainder of the
+          pseudodivision, q is the ideal of quotients, and m is the
+          factor by which f is to be multiplied.
+NOTE:     Pseudodivision of a poly f by an ideal F in @R. Returns a
           list (r,q,m) such that m*f=r+sum(q.G).
 KEYWORDS: division, reduce
 EXAMPLE:  pdivi; shows an example"
@@ -529,14 +529,14 @@ proc pspol(poly f,poly g)
   return(S);
 };
 
-// facvar: Returns all the free-square factors of the elements 
+// facvar: Returns all the free-square factors of the elements
 //         of ideal J (non repeated). Integer factors are ignored,
 //         even 0 is ignored. It can be called from ideal @R, but
 //         the given ideal J must only contain poynomials in the
 //         parameters.
 //         Operates in the ring @P, but can be called from ring @R.
 // input:   ideal J
-// output:  ideal Jc: Returns all the free-square factors of the elements 
+// output:  ideal Jc: Returns all the free-square factors of the elements
 //         of ideal J (non repeated). Integer factors are ignored,
 //         even 0 is ignored. It can be called from ideal @R, but
 //         the given ideal J must only contain poynomials in the
@@ -544,13 +544,13 @@ proc pspol(poly f,poly g)
 proc facvar(ideal J)
 "USAGE:   facvar(J);
           J: an ideal in the parameters
-RETURN:   all the free-square factors of the elements 
+RETURN:   all the free-square factors of the elements
           of ideal J (non repeated). Integer factors are ignored,
           even 0 is ignored. It can be called from ideal @R, but
           the given ideal J must only contain poynomials in the
-          parameters.          
+          parameters.
 NOTE:     Operates in the ring @P, and the ideal J must contain only
-          polynomials in the parameters, but can be called from ring @R.  
+          polynomials in the parameters, but can be called from ring @R.
 KEYWORDS: factor
 EXAMPLE:  facvar; shows an example"
 {
@@ -620,14 +620,14 @@ proc Wred(poly f, ideal W)
 // note:   for security a lot of work is done. If (N,W) is already a red-spec it should be simplified
 proc pnormalform(poly f, ideal N, ideal W)
 "USAGE:   pnormalform(f,N,W);
-          f: the polynomial to be reduced modulo N,W (in parameters and 
+          f: the polynomial to be reduced modulo N,W (in parameters and
              variables)
           N: the null conditions ideal
-          W: the non-null conditions (set of irreducible polynomials, ideal)          
+          W: the non-null conditions (set of irreducible polynomials, ideal)
 RETURN:   a reduced polynomial g of f, whose coefficients are reduced
           modulo N and having no factor in W.
-NOTE:     Should be called from ring @R. Ideals N and W must be polynomials 
-          in the parameters forming a red-specification (see definition)         the papers). 
+NOTE:     Should be called from ring @R. Ideals N and W must be polynomials
+          in the parameters forming a red-specification (see definition)         the papers).
 KEYWORDS: division, pdivi, reduce
 EXAMPLE:  pnormalform; shows an example"
 {
@@ -699,14 +699,14 @@ proc redspec(ideal Ni, ideal Wi)
           N: null conditions ideal
           W: set of non-null polynomials (ideal)
 RETURN:   a list (N1,W1,L1) containing a red-specification of the segment (N,W).
-          N1 is the radical reduced ideal characterizing the segment. 
-          V(N1) is the Zarisky closure of the segment (N,W). 
+          N1 is the radical reduced ideal characterizing the segment.
+          V(N1) is the Zarisky closure of the segment (N,W).
           The segment S=V(N1) \ V(h), where h=prod(w in W1)
           N1 is uniquely determined and no prime component of N1 contains none of
           the polynomials in W1. The polynomials in W1 are prime and reduced
           wrt N1, and are considered non-null on the segment.
-          L1 contains the list of prime components of N1.                     
-NOTE:     can be called from ring @R but it works in ring @P.     
+          L1 contains the list of prime components of N1.
+NOTE:     can be called from ring @R but it works in ring @P.
 KEYWORDS: specification
 EXAMPLE:  redspec; shows an example"
 {
@@ -1283,7 +1283,7 @@ proc discussSpolys(ideal B, list r, list P)
 proc buildtree(ideal F, list #)
 "USAGE:   buildtree(F);
           F: ideal in K[a][x] (parameters and variables) to be discussed
-RETURN:   Returns a list T describing a dichotomic discussion tree, whose 
+RETURN:   Returns a list T describing a dichotomic discussion tree, whose
           content is the first discussion of the ideal F of K[a][x].
           The first element of the list is the root, and contains
             [1] label: intvec(-1)
@@ -1293,7 +1293,7 @@ RETURN:   Returns a list T describing a dichotomic discussion tree, whose
                 given (as option). ideal (0), ideal (0), list(ideal(0)) if
                 no optional conditions are given.
             [7] the set of lpp of ideal F
-            [8] condition that was taken to reach the vertex 
+            [8] condition that was taken to reach the vertex
                 (poly 1, for the root).
           The remaning elements of the list represent vertices of the tree:
           with the same structure:
@@ -1305,14 +1305,14 @@ RETURN:   Returns a list T describing a dichotomic discussion tree, whose
             [4],[5],[6] the red-spec of the previous assumed conditions
                 to reach the vertex
             [7] the set of lpp of the specialized ideal at this stage
-            [8] condition that was taken to reach the vertex from the 
+            [8] condition that was taken to reach the vertex from the
                 father's vertex (that was taken non-null if the last
                 integer in the label is 1, and null if it is 0)
           The terminal vertices form a disjoint partition of the parameter space
           whose bases specialize to the reduced Groebner basis of the
           specialized ideal on each point of the segment and preserve
           the lpp. So they form a disjoint reduced CGS.
-NOTE:     The basering R, must be of the form K[a][x], a=parameters, 
+NOTE:     The basering R, must be of the form K[a][x], a=parameters,
           x=variables, and should be defined previously. The ideal must
           be defined on R.
           The disjoint and reduced CGS built by buildtree can be obtained
@@ -1322,7 +1322,7 @@ NOTE:     The basering R, must be of the form K[a][x], a=parameters,
           by Maple in order to plot its content using buildtreetoMaple;
           The file written by buildtreetoMaple when readed in a Maple
           worksheet can be plotted using the dbgb routine tplot;
-          
+
 KEYWORDS: CGS, disjoint, reduced, comprehensive Groebner system
 EXAMPLE:  buildtree; shows an example"
 {
@@ -1937,14 +1937,14 @@ proc genimage(poly f1, ideal N1, ideal W1, poly f2, ideal N2, ideal W2)
   {
     // detect weather W1 intersect W2 is non-empty
     for (i=1;i<=size(W1);i++)
-    { 
+    {
       if (memberpos(W1[i],W2)[1])
-      {     
+      {
         W12[size(W12)+1]=W1[i];
       }
       else
       {
-        if (nonnull(W1[i],N2,W2)) 
+        if (nonnull(W1[i],N2,W2))
         {
           W12[size(W12)+1]=W1[i];
         }
@@ -2129,13 +2129,13 @@ proc genimage(poly f1, ideal N1, ideal W1, poly f2, ideal N2, ideal W2)
       for (i=size(N1)+1;i<=size(N1)+size(N2);i++){N10[i]=0;}
       G=G+(cA1*ww1*c1[alpha]-(matrix(N10)*T*qT)[1,1])*Tm[alpha];
     }
-    //T_ "genimage has found a more generic basis (method 2)";    
+    //T_ "genimage has found a more generic basis (method 2)";
     //T_ "f1:"; f1; "N1:"; N1; "W1:"; W1;
     //T_ "f2:"; f2; "N2:"; N2; "W2:"; W2;
     //T_ "G:"; G;
     GG=ideal(G);
   }
-  else{GG=ideal(0);} 
+  else{GG=ideal(0);}
   return(GG);
 };
 
@@ -2146,9 +2146,9 @@ proc genimage(poly f1, ideal N1, ideal W1, poly f2, ideal N2, ideal W2)
 //          to obtain an equivalent polynomial with a leading coefficient
 //          that is non-null in the second segment.
 // input:
-// poly f:    a polynomials of the reduced basis in the segment (N,W) 
+// poly f:    a polynomials of the reduced basis in the segment (N,W)
 // ideal N:   the null-conditions ideal in the segment
-// ideal W12: the set of non-null polynomials common to the segment and 
+// ideal W12: the set of non-null polynomials common to the segment and
 //            a second segment
 proc extendpoly(poly f, ideal N, ideal W12)
 {
@@ -2296,7 +2296,7 @@ proc decide(poly g1, ideal N1, ideal W1, poly g2, ideal N2, ideal W2)
   {
     //T_ "A sheaf has been found (method 1)";
     return(ideal(g1,g2));
-  } 
+  }
   return(ideal(genimage(g1,N1,W1,g2,N2,W2)));
 }
 
@@ -2315,13 +2315,13 @@ RETURN:   A list with the CGS determined by buildtree.
                 that this was a terminal vertex in buildtree.
            [3]: the reduced basis of the segment.
            [4], [5], [6]: the red-spec of the null and non-null conditions
-                of the segment. 
+                of the segment.
                 [4] is the null-conditions radical ideal N,
                 [5] is the non-null polynomials set (ideal) W,
                 [6] is the set of prime components (ideals) of N.
            [7]: is the set of lpp
            [8]: poly 1 (irrelevant) is the condition to branch (but no
-                more branch is necessary in the discussion, so 1 is the result. 
+                more branch is necessary in the discussion, so 1 is the result.
 NOTE:     It can be called having as argument the list output by buildtree
 KEYWORDS: buildtree, buildtreetoMaple, CGS
 EXAMPLE:  finalcases; shows an example"
@@ -2454,7 +2454,7 @@ proc newredspec(ideal N,ideal W, ideal Nj, ideal Wj)
 //   list L   it contins the list of segments allowing a common
 //            reduced basis. The elements of L are of the form
 //            list (lpp,B,list(list(N,W,L),..list(N,W,L)) )
-proc selectcases(list bT) 
+proc selectcases(list bT)
 {
   list T=groupsegments(finalcases(bT));
   list T0=bT[1];
@@ -3070,7 +3070,7 @@ proc simplifynewadded(intvec labu)
   deletebrotherscontaining(labfu);
 }
 
-// given the the label labfu of the vertex fu it returns the last 
+// given the label labfu of the vertex fu it returns the last
 // int of the label of the last existing children.
 // if no child exists, then it ouputs 0.
 proc lastchildrenindex(intvec labfu)
@@ -3097,7 +3097,7 @@ proc lastchildrenindex(intvec labfu)
   return(lastlab);
 }
 
-// given the the vertex u it provides the next brother of u.
+// given the vertex u it provides the next brother of u.
 // if it does not exist, then it ouputs v=list(list(intvec(0)),0)
 proc nextbrother(intvec labu)
 {
@@ -3251,11 +3251,11 @@ proc mrcgs(ideal F, list #)
 RETURN:   The list representing the Minimal Reduced CGS.
           The description given here is identical for rcgs and crcgs.
           The elements of the list T computed by mrcgs are lists representing
-          a rooted tree. 
+          a rooted tree.
           Each element has as the two first entries with the following content:
-           [1]: The label (intvec) representing the position in the rooted 
+           [1]: The label (intvec) representing the position in the rooted
                 tree:  0 for the root (and this is a special element)
-                       i for the root of the segment i 
+                       i for the root of the segment i
                        (i,...) for the children of the segment i
            [2]: the number of children (int) of the vertex.
           There thus three kind of vertices:
@@ -3263,7 +3263,7 @@ RETURN:   The list representing the Minimal Reduced CGS.
            2) the vertices labelled with a single integer i,
            3) the rest of vertices labelled with more indices.
           Description of the root. Vertex type 1)
-           There is a special vertex (the first one) whose content is 
+           There is a special vertex (the first one) whose content is
            the following:
              [3] lpp of the given ideal
              [4] the given ideal
@@ -3285,12 +3285,12 @@ RETURN:   The list representing the Minimal Reduced CGS.
           integers in the label are to be considered as additive and those
           with an odd number of integers in the label are to be considered as
           substraction. As an example consider the following vertices:
-          v1=((i),2,lpp,B), 
-          v2=((i,1),2,P_{(i,1)}), 
+          v1=((i),2,lpp,B),
+          v2=((i,1),2,P_{(i,1)}),
           v3=((i,1,1),2,P_{(i,1,1)},
-          v4=((i,1,1,1),1,P_{(i,1,1,1)}, 
+          v4=((i,1,1,1),1,P_{(i,1,1,1)},
           v5=((i,1,1,1,1),0,P_{(i,1,1,1,1)},
-          v6=((i,1,1,2),1,P_{(i,1,1,2)}, 
+          v6=((i,1,1,2),1,P_{(i,1,1,2)},
           v7=((i,1,1,2,1),0,P_{(i,1,1,2,1)},
           v8=((i,1,2),0,P_{(i,1,2)},
           v9=((i,2),1,P_{(i,2)},
@@ -3298,17 +3298,17 @@ RETURN:   The list representing the Minimal Reduced CGS.
           They represent the segment:
           (V(i,1)\(((V(i,1,1) \ ((V(i,1,1,1) \ V(i,1,1,1,1)) u (V(i,1,1,2) \ V(i,1,1,2,1)))))
           u V(i,1,2)) u (V(i,2) \ V(i,2,1))
-          and can also be represented by 
+          and can also be represented by
           (V(i,1) \ (V(i,1,1) u V(i,1,2))) u
           (V(i,1,1,1) \ V(i,1,1,1)) u
-          (V(i,1,1,2) \ V(i,1,1,2,1)) u 
+          (V(i,1,1,2) \ V(i,1,1,2,1)) u
           (V(i,2) \ V(i,2,1))
-          where V(i,j,..) = V(P_{(i,j,..)}          
+          where V(i,j,..) = V(P_{(i,j,..)}
 NOTE:     There are three fundamental routines in the library: mrcgs, rcgs and crcgs.
           mrcgs (Minimal Reduced CGS) is an algorithm that packs so much as it
-          is able to do (using algorithms adhoc) the segments with the same lpp, 
-          obtaining the minimal number of segments. The hypothesis is that this 
-          is also canonical, but for the moment there is no proof of the uniqueness 
+          is able to do (using algorithms adhoc) the segments with the same lpp,
+          obtaining the minimal number of segments. The hypothesis is that this
+          is also canonical, but for the moment there is no proof of the uniqueness
           of that minimal packing. Moreover, the segments that are obtained are not
           locally closed, i.e. there are not always the difference of two varieties,
           but can be a union of differences.
@@ -3395,14 +3395,14 @@ proc reduceconds(list T,ideal N,ideal W)
   for (i=2;i<=size(@L);i++)
   {
     if (size(@L[i][1])>1)
-    { 
+    {
       @L[i][3]=delidfromid(N,@L[i][3]);
     }
   }
   for (i=2;i<=size(@L);i++)
   {
     if ((size(@L[i][1])>1) and (size(@L[i][1]) mod 2==1) and (equalideals(@L[i][3],ideal(0))))
-    { 
+    {
       lab=@L[i][1];
       labfu=delintvec(lab,size(lab));
       fu=tree(labfu,@L);
@@ -3594,11 +3594,11 @@ proc rcgs(ideal F, list #)
 RETURN:   The list representing the Reduced CGS.
           The description given here is analogous as for mrcgs and crcgs.
           The elements of the list T computed by rcgs are lists representing
-          a rooted tree. 
+          a rooted tree.
           Each element has as the two first entries with the following content:
-           [1]: The label (intvec) representing the position in the rooted 
+           [1]: The label (intvec) representing the position in the rooted
                 tree:  0 for the root (and this is a special element)
-                       i for the root of the segment i 
+                       i for the root of the segment i
                        (i,...) for the children of the segment i
            [2]: the number of children (int) of the vertex.
           There thus three kind of vertices:
@@ -3606,7 +3606,7 @@ RETURN:   The list representing the Reduced CGS.
            2) the vertices labelled with a single integer i,
            3) the rest of vertices labelled with more indices.
           Description of the root. Vertex type 1)
-           There is a special vertex (the first one) whose content is 
+           There is a special vertex (the first one) whose content is
            the following:
              [3] lpp of the given ideal
              [4] the given ideal
@@ -3628,25 +3628,25 @@ RETURN:   The list representing the Reduced CGS.
           integers in the label are to be considered as additive and those
           with an odd number of integers in the label are to be considered as
           substraction. As an example consider the following vertices:
-          v1=((i),2,lpp,B), 
-          v2=((i,1),2,P_{(i,1)}), 
+          v1=((i),2,lpp,B),
+          v2=((i,1),2,P_{(i,1)}),
           v3=((i,1,1),0,P_{(i,1,1)}, v4=((i,1,2),0,P_{(i,1,1)}),
-          v5=((i,2),2,P_{(i,2)},  
+          v5=((i,2),2,P_{(i,2)},
           v6=((i,2,1),0,P_{(i,2,1)}, v7=((i,2,2),0,P_{(i,2,2)}
           They represent the segment:
-          (V(i,1)\(V(i,1,1) u V(i,1,2))) u 
+          (V(i,1)\(V(i,1,1) u V(i,1,2))) u
           (V(i,2)\(V(i,2,1) u V(i,2,2)))
-          where V(i,j,..) = V(P_{(i,j,..)}          
+          where V(i,j,..) = V(P_{(i,j,..)}
 NOTE:     There are three fundamental routines in the library: mrcgs, rcgs and crcgs.
           rcgs (Reduced CGS) is an algorithm that first homogenizes the
-          basis of the given ideal then applies mrcgs and finally de-homogenizes 
+          basis of the given ideal then applies mrcgs and finally de-homogenizes
           and reduces the resulting bases. (See the note of mrcgs).
           As a result of Wibmer's Theorem, the resulting segments are
           locally closed (i.e. difference of varieties). Nevertheless, the
           output is not completely canonical as the homogeneous ideal considered
           is not the homogenized ideal of the given ideal but only the ideal
           obtained by homogenizing the given basis.
-          
+
           The output can be visualized using cantreetoMaple, that will
           write a file with the content of mrcgs that can be read in Maple
           and plotted using the Maple plotcantree routine of the Monte's dpgb library
@@ -3776,11 +3776,11 @@ proc crcgs(ideal F, list #)
 RETURN:   The list representing the Canonical Reduced CGS.
           The description given here is identical for mrcgs and rcgs.
           The elements of the list T computed by crcgs are lists representing
-          a rooted tree. 
+          a rooted tree.
           Each element has as the two first entries with the following content:
-           [1]: The label (intvec) representing the position in the rooted 
+           [1]: The label (intvec) representing the position in the rooted
                 tree:  0 for the root (and this is a special element)
-                       i for the root of the segment i 
+                       i for the root of the segment i
                        (i,...) for the children of the segment i
            [2]: the number of children (int) of the vertex.
           There thus three kind of vertices:
@@ -3788,7 +3788,7 @@ RETURN:   The list representing the Canonical Reduced CGS.
            2) the vertices labelled with a single integer i,
            3) the rest of vertices labelled with more indices.
           Description of the root. Vertex type 1)
-           There is a special vertex (the first one) whose content is 
+           There is a special vertex (the first one) whose content is
            the following:
              [3] lpp of the given ideal
              [4] the given ideal
@@ -3810,28 +3810,28 @@ RETURN:   The list representing the Canonical Reduced CGS.
           integers in the label are to be considered as additive and those
           with an odd number of integers in the label are to be considered as
           substraction. As an example consider the following vertices:
-          v1=((i),2,lpp,B), 
-          v2=((i,1),2,P_{(i,1)}), 
+          v1=((i),2,lpp,B),
+          v2=((i,1),2,P_{(i,1)}),
           v3=((i,1,1),0,P_{(i,1,1)}, v4=((i,1,2),0,P_{(i,1,1)}),
-          v5=((i,2),2,P_{(i,2)},  
+          v5=((i,2),2,P_{(i,2)},
           v6=((i,2,1),0,P_{(i,2,1)}, v7=((i,2,2),0,P_{(i,2,2)}
           They represent the segment:
-          (V(i,1)\(V(i,1,1) u V(i,1,2))) u 
+          (V(i,1)\(V(i,1,1) u V(i,1,2))) u
           (V(i,2)\(V(i,2,1) u V(i,2,2)))
-          where V(i,j,..) = V(P_{(i,j,..)}          
+          where V(i,j,..) = V(P_{(i,j,..)}
 NOTE:     There are three fundamental routines in the library: mrcgs, rcgs and crcgs.
           crcgs (Canonical Reduced CGS) is an algorithm that first homogenizes the
-          the given ideal then applies mrcgs and finally de-homogenizes 
+          the given ideal then applies mrcgs and finally de-homogenizes
           and reduces the resulting bases. (See the note of mrcgs).
           As a result of Wibmer's Theorem, the resulting segments are
           locally closed (i.e. difference of varieties) and the partition is
-          canonical as the homogenized ideal is uniquely associated to the given 
+          canonical as the homogenized ideal is uniquely associated to the given
           ideal not depending of the given basis.
-          
+
           Nevertheless the computations to do are usually more time consuming
           and so it is preferable to compute first the rcgs and only if
           it success you can try crcgs.
-          
+
           The output can be visualized using cantreetoMaple, that will
           write a file with the content of crcgs that can be read in Maple
           and plotted using the Maple plotcantree routine of the Monte's dpgb library
@@ -3881,7 +3881,7 @@ proc idintR(ideal N, ideal M)
   def Mp=imap(RR,M);
   def Jp=idint(Np,Mp);
   setring(RR);
-  return(imap(@P,Jp));  
+  return(imap(@P,Jp));
 }
 
 //purpose reduced groebner basis called in @R and computed in @P
@@ -3904,7 +3904,7 @@ proc cantodiffcgs(list L)
 RETURN:   The list transforming the content of these routines to a simpler
           output where each segment corresponds to a single element of the list
           that is described as difference of two varieties.
-          
+
           The first element of the list is identical to the first element
           of the list provided by the corresponding cgs algorithm, and
           contains general information on the call (see mrcgs).
@@ -3915,7 +3915,7 @@ RETURN:   The list transforming the content of these routines to a simpler
            [3]; the ideal of the first variety (radical)
            [4]; the ideal of the second variety (radical)
           The segment is V([3]) \ V([4]).
-          
+
 NOTE:     It can be called from the output of mrcgs or rcgs of crcgs
 KEYWORDS: mrcgs, rcgs, crcgs, Maple
 EXAMPLE:  cantodiffcgs; shows an example"
@@ -3946,12 +3946,12 @@ EXAMPLE:  cantodiffcgs; shows an example"
     {
       v=tree(intvec(i,j),L);
       Nn=v[1][3];
-      N=idintR(N,Nn); 
+      N=idintR(N,Nn);
       for (k=1;k<=v[1][2];k++)
       {
         w=tree(intvec(i,j,k),L);
         Mn=w[1][3];
-        M=idintR(M,Mn); 
+        M=idintR(M,Mn);
       }
     }
     setring(@P);
@@ -3963,8 +3963,8 @@ EXAMPLE:  cantodiffcgs; shows an example"
     NP=gbR(NP);
     MP=gbR(MP);
     setring(RR);
-    N=imap(@P,NP);     
-    M=imap(@P,MP);     
+    N=imap(@P,NP);
+    M=imap(@P,MP);
     LL[i+1]=list(u[1][3],u[1][4],N,M);
   }
   return(LL);
@@ -3976,7 +3976,7 @@ example
   def T=crcgs(F);
   T;
   cantreetoMaple(T,"Tc","Tc.txt");
-  cantodiffcgs(T);  
+  cantodiffcgs(T);
 }
 
 //**************End homogenizing************************

@@ -1,8 +1,8 @@
-// $Id: tst.lib,v 1.33 2005-05-18 17:54:58 Singular Exp $
+// $Id: tst.lib,v 1.34 2008-10-09 09:31:58 Singular Exp $
 //(obachman, last modified 6/30/98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.33 2005-05-18 17:54:58 Singular Exp $";
+version="$Id: tst.lib,v 1.34 2008-10-09 09:31:58 Singular Exp $";
 category="Utilities";
 info="
 LIBRARY:  tst.lib      Procedures for running automatic tst Tests
@@ -12,7 +12,7 @@ PROCEDURES:
  tst_ignore(any,[keyword], [link]) writes string(any) to link (or stdout),
                                    prepending prefix \"// tst_ignore:\"
  tst_init()             writes some identification data to GetTstStatusFile()
- tst_status([any])      writes status info to to GetTstStatusFile()
+ tst_status([any])      writes status info to GetTstStatusFile()
  tst_InitTimer()        initialize tst-Timer
  tst_StopTimer()        stop Tst-Timer
  tst_GetTimer           get value of Tst-Timer
@@ -47,7 +47,7 @@ EXAMPLE:  example tst_system; shows examples"
 example
 {
   "EXAMPLE"; echo = 2;
-  string s = tst_system("echo This is is an example of tst_system");
+  string s = tst_system("echo This is an example of tst_system");
   "The following is what the system call wrote to stdout: " + s;
 }
 

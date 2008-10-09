@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: homolog.lib,v 1.26 2008-09-09 09:54:30 Singular Exp $";
+version="$Id: homolog.lib,v 1.27 2008-10-09 09:31:57 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  homolog.lib   Procedures for Homological Algebra
@@ -136,7 +136,7 @@ EXAMPLE: example cup; shows examples
    kb2 = matrix(ker)*kb2;
    dbprint(p-1,"// kbase of Ext^2(M,M)",
              "//  - the columns present the kbase elements in Hom(F(2),F(0))",
-             "//  - F(*) is a a free resolution of M ",kb2);
+             "//  - F(*) is a free resolution of M ",kb2);
 //-------  compute: cup-products of base-elements -----------------------------
    for (i=1;i<=e1;i=i+1)
    {

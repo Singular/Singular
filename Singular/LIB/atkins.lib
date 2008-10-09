@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: atkins.lib,v 1.4 2007-07-20 11:26:46 Singular Exp $";
+version="$Id: atkins.lib,v 1.5 2008-10-09 09:31:57 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY:  atkins.lib     Procedures for teaching cryptography
@@ -775,7 +775,7 @@ ASSUME: N is coprime to 6 and different from 1
 NOTE:   - K/2 is input for the procedure "disc",
           K is input for the procedure "HilbertClassPolynomial",
           B describes the number of recursions being calculated
-        - The basis of the the algorithm is the following theorem:
+        - The basis of the algorithm is the following theorem:
           Let N be an integer coprime to 6 and different from 1 and E be an
           ellipic curve modulo N. Assume that we know an integer m and a
           point P of E(Z/NZ) satisfying the following conditions.

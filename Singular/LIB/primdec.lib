@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.139 2008-03-19 17:44:38 Singular Exp $";
+version="$Id: primdec.lib,v 1.140 2008-10-09 09:31:57 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -5605,7 +5605,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Computes the radical of I using KL algorithm.
-// The only difference with the the previous implementation of KL algorithm is
+// The only difference with the previous implementation of KL algorithm is
 // that now it uses block dp instead of lp ordering for the reduction to the
 // zerodimensional case.
 // The reduction step has been moved to the new routine radicalReduction, so that it can be
@@ -5729,7 +5729,7 @@ static proc radicalReduction(ideal I, ideal ser, int allIndep, list #)
 //                    must be done for all indep set of the leading terms ideal
 //                 0 -> Otherwise
 // ideal ser       Only for radicalKL. (Same as in radicalKL)
-// list #          Only for radicalKL (If #[1] = 1, 
+// list #          Only for radicalKL (If #[1] = 1,
 //                    only equiradical is required.
 //                    It is used to set the value of done.)
 

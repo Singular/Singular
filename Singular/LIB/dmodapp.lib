@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmodapp.lib,v 1.9 2008-10-06 17:04:26 Singular Exp $";
+version="$Id: dmodapp.lib,v 1.10 2008-10-09 09:31:57 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmodapp.lib     Applications of algebraic D-modules
@@ -74,7 +74,7 @@ NOTE:    Assume, I is an ideal in the n-th Weyl algebra where the sequence of th
 @*       Note that the returned ideal is not a D-ideal but an ideal in the associated
 @*       graded ring while the Groebner basis is a subset of D.
 @*       If s<>0, @code{std} is used for Groebner basis computations, otherwise,
-@*       and by default, @code{slimgb} is used. 
+@*       and by default, @code{slimgb} is used.
 @*       If t<>0, a matrix ordering is used for Groebner basis computations,
 @*       otherwise, and by default, a block ordering is used.
 @*       If printlevel=1, progress debug messages will be printed,
@@ -123,9 +123,9 @@ PURPOSE: compute the initial Malgrange ideal of a given poly w.r.t. the weight v
 @*       (-1,0...,0,1,0,...,0) such that the weight of t is -1 and the weight of Dt is 1.
 NOTE:    Activate the output ring with the @code{setring} command.
 @*       Varnames of the basering should not include t and Dt.
-@*       In the ouput ring, inF is is the initial Malgrange ideal.
+@*       In the ouput ring, inF is the initial Malgrange ideal.
 @*       If s<>0, @code{std} is used for Groebner basis computations, otherwise,
-@*        and by default, @code{slimgb} is used. 
+@*        and by default, @code{slimgb} is used.
 @*       If t<>0, a matrix ordering is used for Groebner basis computations,
 @*       otherwise, and by default, a block ordering is used.
 @*       If u<>0, the order of the variables is reversed.
@@ -135,7 +135,7 @@ NOTE:    Activate the output ring with the @code{setring} command.
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example initialmalgrange; shows examples
 "
-{ 
+{
   int ppl = printlevel - voice +2;
   def save = basering;
   int n = nvars(save);
@@ -160,14 +160,14 @@ EXAMPLE: example initialmalgrange; shows examples
         if (typeof(#[3])=="int" || typeof(#[3])=="number")
         {
           reversevars = int(#[3]);
-	}
+        }
         if (size(#)>3)
         {
           if (typeof(#[4])=="intvec" && size(#[4])==n && ispositive(#[4])==1)
           {
             u0 = #[4];
-	  }
-	}
+          }
+        }
       }
     }
   }
@@ -271,11 +271,11 @@ proc initialidealengine(string calledfrom, int whichengine, int blockord, list #
     {
       if (calledfrom == "initialideal")
       {
-	ring Dh = 0,(x(1..n),D(1..n),h),(a(@a),dp(noofvars-1),lp(1));
+        ring Dh = 0,(x(1..n),D(1..n),h),(a(@a),dp(noofvars-1),lp(1));
       }
       else // bfctonestep
       {
-	ring Dh = 0,(t,s,x(n..1),Dt,D(n..1),h),(a(@a),a(@a2),a(uv),dp(noofvars-1),lp(1));
+        ring Dh = 0,(t,s,x(n..1),Dt,D(n..1),h),(a(@a),a(@a2),a(uv),dp(noofvars-1),lp(1));
       }
     }
   }
@@ -298,11 +298,11 @@ proc initialidealengine(string calledfrom, int whichengine, int blockord, list #
     {
       if (calledfrom == "initialideal")
       {
-	ring Dh = 0,(x(1..n),D(1..n),h),(a(@a),M(@Ord));
+        ring Dh = 0,(x(1..n),D(1..n),h),(a(@a),M(@Ord));
       }
       else // bfctonestep
       {
-	ring Dh = 0,(t,s,x(n..1),Dt,D(n..1),h),(a(@a),a(@a2),M(@Ord));
+        ring Dh = 0,(t,s,x(n..1),Dt,D(n..1),h),(a(@a),a(@a2),M(@Ord));
       }
     }
   }
@@ -322,7 +322,7 @@ proc initialidealengine(string calledfrom, int whichengine, int blockord, list #
     {
       for (i=1; i<=n; i++)
       {
-	@relD[i,n+i] = h^2;
+        @relD[i,n+i] = h^2;
       }
     }
     else // bfctonestep
@@ -332,7 +332,7 @@ proc initialidealengine(string calledfrom, int whichengine, int blockord, list #
       @relD[1,n+3] = h^2;
       for (i=1; i<=n; i++)
       {
-	@relD[i+2,n+3+i] = h^2;
+        @relD[i+2,n+3+i] = h^2;
       }
     }
   }
@@ -360,7 +360,7 @@ proc initialidealengine(string calledfrom, int whichengine, int blockord, list #
     {
       I = I,t*Dt-s;
     }
-  }  
+  }
   dbprint(ppl, "starting Groebner basis computation with engine:", whichengine);
   I = engine(I, whichengine);
   dbprint(ppl, "finished Groebner basis computation");
@@ -378,7 +378,7 @@ proc initialidealengine(string calledfrom, int whichengine, int blockord, list #
     {
       if (varnames[i] == "t")
       {
-	ERROR("Variable names should not include t");
+        ERROR("Variable names should not include t");
       }
     }
     list newvarnamesrev = "t";
@@ -402,8 +402,8 @@ proc initialidealengine(string calledfrom, int whichengine, int blockord, list #
       newvarnames[n+2] = "Dt";
       for (i=1; i<=n; i++)
       {
-	newvarnames[i+1] = varnames[i];
-	newvarnames[i+n+2] = "D"+varnames[i];
+        newvarnames[i+1] = varnames[i];
+        newvarnames[i+n+2] = "D"+varnames[i];
       }
       rl[2] = newvarnames;
       def @D = ring(rl);
@@ -489,7 +489,7 @@ EXAMPLE: example InForm; shows examples
         g = g+l[i][2];
       }
     }
-    J[j] = g;  
+    J[j] = g;
   }
   if (typeof(#[1])=="poly")
   {
@@ -536,7 +536,7 @@ EXAMPLE: example charVariety; shows examples
   def save = basering;
   list LL = ringlist(save);
   list L;
-  int i; 
+  int i;
   for(i=1;i<=4;i++)
   {
     L[i] = LL[i];
@@ -561,7 +561,7 @@ EXAMPLE: example charVariety; shows examples
   matrix @C = ncr[1];
   matrix @D = ncr[2];
   def @U = ring(L);
-  // 2. create the commutative ring  
+  // 2. create the commutative ring
   setring save;
   list CL;
   for(i=1;i<=4;i++)
@@ -605,7 +605,7 @@ example
 
 // TODO
 static proc charInfo(ideal I)
-"USAGE:  charInfo(I);  I an ideal 
+"USAGE:  charInfo(I);  I an ideal
 RETURN:  ring
 STATUS: experimental, todo
 PURPOSE: compute the characteristic information for I
@@ -739,7 +739,7 @@ example
 
 proc isFsat(ideal I, poly F)
 "USAGE:  isFsat(I, F);  I an ideal, F a poly
-RETURN: int 
+RETURN: int
 PURPOSE: check whether the ideal I is F-saturated
 NOTE:    1 is returned if I is F-saturated, otherwise 0 is returned
 *   we check indeed that  Ker(D --F--> D/I) is (0) //todo: * or @* ??
@@ -814,9 +814,9 @@ example;
   ring r = 0,(x,y,Dx,Dy),dp;
   def R = Weyl();    setring R;
   poly F = x2-y3;
-  ideal I = (y^3 - x^2)*Dx - 2*x, (y^3 - x^2)*Dy + 3*y^2; // I = Dx*F, Dy*F; 
+  ideal I = (y^3 - x^2)*Dx - 2*x, (y^3 - x^2)*Dy + 3*y^2; // I = Dx*F, Dy*F;
   DLoc(I, x2-y3);
-  LD0; 
+  LD0;
   BS;
 }
 
@@ -870,7 +870,7 @@ EXAMPLE: example DLoc0; shows examples
   }
   ideal bbs; int srat=0; int HasRatRoots = 0;
   int sP;
-  for (i=1; i<= size(bs); i++) 
+  for (i=1; i<= size(bs); i++)
   {
     if (deg(bs[i]) == 1)
     {
@@ -919,7 +919,7 @@ EXAMPLE: example DLoc0; shows examples
     {
       // no roots!
       dbprint(ppl,"// -2-4- no integer root, setting s0 = -1");
-      sP = -1; 
+      sP = -1;
       //      HasRatRoots = 0; // older stuff, here we do substitution
       HasRatRoots = 1;
     }
@@ -1016,7 +1016,7 @@ EXAMPLE: example DLoc0; shows examples
     bs = subst(bs,s,0);
     kill @R3;
     setring @R4;
-    ideal bs = imap(@R2,bs); // only rationals are the entries 
+    ideal bs = imap(@R2,bs); // only rationals are the entries
     list BS; BS[1] = bs; BS[2] = m;
     export BS;
     //    list LBS = imap(@R3,LBS);
@@ -1025,10 +1025,10 @@ EXAMPLE: example DLoc0; shows examples
     //    export BS;
     ideal LD0 = K4;
     export LD0;
-    return(@R4);    
+    return(@R4);
   }
   else
-  { 
+  {
     /* SHOULD NEVER GET THERE */
     /* no rational/integer roots */
     /* return objects in the copy of current ring */
@@ -1038,7 +1038,7 @@ EXAMPLE: example DLoc0; shows examples
     export LD0;
     export BS;
     return(@R2);
-  }  
+  }
 }
 example;
 {
@@ -1046,10 +1046,10 @@ example;
   ring r = 0,(x,y,Dx,Dy),dp;
   def R = Weyl();    setring R;
   poly F = x2-y3;
-  ideal I = (y^3 - x^2)*Dx - 2*x, (y^3 - x^2)*Dy + 3*y^2; // I = Dx*F, Dy*F; 
+  ideal I = (y^3 - x^2)*Dx - 2*x, (y^3 - x^2)*Dy + 3*y^2; // I = Dx*F, Dy*F;
   def W = SDLoc(I,F);  setring W; // creates ideal LD
   def U = DLoc0(LD, x2-y3);  setring U;
-  LD0; 
+  LD0;
   BS;
 }
 
@@ -1434,14 +1434,14 @@ static proc exCusp()
   ring r = 0,(x,y,Dx,Dy),dp;
   def R = Weyl();   setring R;
   poly F = x2-y3;
-  ideal I = (y^3 - x^2)*Dx - 2*x, (y^3 - x^2)*Dy + 3*y^2; // I = Dx*F, Dy*F; 
+  ideal I = (y^3 - x^2)*Dx - 2*x, (y^3 - x^2)*Dy + 3*y^2; // I = Dx*F, Dy*F;
   def W = SDLoc(I,F);
   setring W;
   LD;
   def U = DLoc0(LD,x2-y3);
   setring U;
   LD0;
-  BS; 
+  BS;
   // the same with DLoc:
   setring R;
   DLoc(I,F);

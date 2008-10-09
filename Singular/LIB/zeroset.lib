@@ -1,6 +1,6 @@
 // Last change 12.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: zeroset.lib,v 1.17 2007-03-14 18:27:47 Singular Exp $";
+version="$Id: zeroset.lib,v 1.18 2008-10-09 09:31:58 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  zeroset.lib      Procedures For Roots and Factorization
@@ -109,7 +109,7 @@ EXAMPLE: example  Roots; shows an example
   poly f = imap(ROB, f);
   list result = RootsMain(f);  // find roots of f
 
-  // store the roots and the the new representation of 'a' and transform
+  // store the roots and the new representation of 'a' and transform
   // the coefficients of f.
 
   list roots = result[1];
