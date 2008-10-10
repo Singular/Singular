@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.171 2008-10-10 09:30:16 Singular Exp $
+@comment $Id: singular.doc,v 1.172 2008-10-10 12:03:16 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -660,6 +660,7 @@ LIB "all.lib";
 @menu
 * Control theory background:: An overview of the theory
 * control_lib:: Algebraic analysis tools for System and Control Theory
+* jacobson_lib:: Algorithms for Smith and Jacobson Normal Form
 @end menu
 
 @c ---------------------------------------------------------
@@ -710,10 +711,14 @@ from the outside. Again, the property can be refined in terms
 of autonomy degrees.
 
 @c ---------------------------------------------------------
-@node control_lib, , Control theory background, System and Control theory
+@node control_lib, jacobson_lib, Control theory background, System and Control theory
 @subsection control_lib
 @c lib control.lib
 
+@c ---------------------------------------------------------
+@node jacobson_lib, , control_lib, System and Control theory
+@subsection control_lib
+@c lib jacobson.lib
 
 @c ----------------------------------------------------------------------------
 @node Teaching, Tropical Geometry, System and Control theory, SINGULAR libraries

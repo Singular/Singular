@@ -10,8 +10,8 @@ SLIB0 = absfact.lib  arcpoint.lib  atkins.lib    aksaka.lib    ainvar.lib\
         equising.lib freegb.lib \
 	finvar.lib   gmspoly.lib   gmssing.lib   general.lib   graphics.lib \
 	grwalk.lib   groups.lib    hnoether.lib  homolog.lib   hyperel.lib \
-	inout.lib    intprog.lib   kskernel.lib  latex.lib     linalg.lib \
-        lll.lib      makedbm.lib   matrix.lib \
+	inout.lib    intprog.lib   jacobbson.lib kskernel.lib  latex.lib \
+        linalg.lib   lll.lib       makedbm.lib   matrix.lib \
 	modstd.lib   mondromy.lib  mprimdec.lib  mregular.lib  rootsmr.lib \
 	noether.lib  normal.lib    ntsolve.lib  \
 	poly.lib     presolve.lib  primdec.lib   primitiv.lib   qhmoduli.lib \
@@ -24,6 +24,6 @@ SLIB0 = absfact.lib  arcpoint.lib  atkins.lib    aksaka.lib    ainvar.lib\
  
 
 PLIBS = bfct.lib central.lib discretize.lib dmod.lib dmodapp.lib freegb.lib \
-        gkdim.lib involut.lib jacobson.lib  ncalg.lib ncdecomp.lib nchomolog.lib\
+        gkdim.lib involut.lib ncalg.lib ncdecomp.lib nchomolog.lib\
         nctools.lib perron.lib qmatrix.lib
 
