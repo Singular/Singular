@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.138 2008-07-17 12:27:39 wienand Exp $
+@comment $Id: types.doc,v 1.139 2008-10-10 09:30:17 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1742,7 +1742,7 @@ server, there is exactly one expression written back. This might be an
 a value.
 
 MPtcp links should explicitly be opened before being used. MPtcp links
-are bidirectional, i.e. can be be used for both, writing and
+are bidirectional, i.e. can be used for both, writing and
 reading. Reading from an MPtcp link blocks until data was written to
 that link. The @code{status} command can be used to check whether there
 is data to read.

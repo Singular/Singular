@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.170 2008-08-16 14:51:31 Singular Exp $
+@comment $Id: singular.doc,v 1.171 2008-10-10 09:30:16 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -463,7 +463,7 @@ LIB "all.lib";
 * gmssing_lib:: procedures for gauss-manin system of a singularity
 * gmspoly_lib:: procedures for gauss-manin system of cohomologically tame polynomials
 * hnoether_lib:: procedures for the Hamburger-Noether (Puiseux) development
-* kskernel_lib:: procedures for kernel  of the the kodaira-spencer map
+* kskernel_lib:: procedures for kernel  of the kodaira-spencer map
 * mondromy_lib:: procedures to compute the monodromy of a singularity
 * qhmoduli_lib:: procedures for moduli spaces of sqh-singularities
 * sing_lib:: procedures for computing invariants of singularities
