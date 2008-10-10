@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: jacobson.lib,v 1.2 2008-10-07 17:57:17 levandov Exp $";
+version="$Id: jacobson.lib,v 1.3 2008-10-10 14:33:54 Singular Exp $";
 category="System and Control Theory";
 info="
 LIBRARY: jacobson.lib     Algorithms for Smith and Jacobson Normal Form
@@ -13,9 +13,9 @@ THEORY: We work over a ring R, that is a principal ideal domain.
 @*  such that U*M*V=D is a diagonal matrix. 
 @*  Depending on the ring, the diagonal entries of D have certain properties.
 
-MAIN PROCEDURES:
+PROCEDURES:
 smith(R,M[,eng1,eng2]);  compute the Smith Normal Form of M over commutative ring
-jacobson(R,M[,eng]);       compute a weak Jacobson Normal Form of M over non-commutative ring, i.e. a diagonal matrix
+jacobson(R,M[,eng]);     compute a weak Jacobson Normal Form of M over non-commutative ring, i.e. a diagonal matrix
 
 SEE ALSO: control_lib
 ";
