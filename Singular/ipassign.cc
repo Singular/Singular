@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.98 2008-06-26 18:35:11 motsak Exp $ */
+/* $Id: ipassign.cc,v 1.99 2008-10-10 15:49:08 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -424,10 +424,24 @@ static BOOLEAN jiA_PROC(leftv res, leftv a, Subexpr e)
 }
 static BOOLEAN jiA_INTVEC(leftv res, leftv a, Subexpr e)
 {
-  if (res->data!=NULL) delete ((intvec *)res->data);
-  res->data=(void *)a->CopyD(INTVEC_CMD);
-  jiAssignAttr(res,a);
-  return FALSE;
+  if ((res->data==NULL) || (res->Typ()==a->Typ()))
+  {
+    if (res->data!=NULL) delete ((intvec *)res->data);
+    res->data=(void *)a->CopyD(INTVEC_CMD);
+    jiAssignAttr(res,a);
+    return FALSE;
+  }
+  else
+  {
+    intvec *r=(intvec *)(res->data);
+    intvec *s=(intvec *)(a->data);
+    int i=si_min(r->length(), s->length())-1;
+    for(;i>=0;i--)
+    {
+      (*r)[i]=(*s)[i];
+    }
+    return (r->length()< s->length());
+  }
 }
 static BOOLEAN jiA_IDEAL(leftv res, leftv a, Subexpr e)
 {
@@ -643,6 +657,7 @@ struct sValAssign dAssign[]=
 ,{jiA_POLY,     VECTOR_CMD,     VECTOR_CMD }
 ,{jiA_INTVEC,   INTVEC_CMD,     INTVEC_CMD }
 ,{jiA_INTVEC,   INTMAT_CMD,     INTMAT_CMD }
+,{jiA_INTVEC,   INTMAT_CMD,     INTVEC_CMD }
 ,{jiA_NUMBER,   NUMBER_CMD,     NUMBER_CMD }
 ,{jiA_BIGINT,   BIGINT_CMD,     BIGINT_CMD }
 ,{jiA_LIST_RES, LIST_CMD,       RESOLUTION_CMD }
