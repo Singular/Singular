@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.194 2008-10-10 10:18:13 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.195 2008-10-10 12:59:22 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -569,16 +569,11 @@ int exprlist_length(leftv v)
   return rc;
 }
 
-int IsPrime(int p)  /* brute force !!!! */
+int iiIsPrime0(unsigned p)  /* brute force !!!! */
 {
-  int i,j;
-  if      (p == 0)    return 0;
-  else if (p == 1)    return 1/*1*/;
-  else if (p == 2)    return p;
-  else if (p < 0)     return (-IsPrime(-p));
-  else if (!(p & 1)) return IsPrime(p-1);
+  unsigned i,j;
 #ifdef HAVE_FACTORY
-  else if (p<=32749) // max. small prime in factory
+  if (p<=32749) // max. small prime in factory
   {
     int a=0;
     int e=cf_getNumSmallPrimes()-1;
@@ -595,11 +590,11 @@ int IsPrime(int p)  /* brute force !!!! */
   }
 #endif
 #ifdef HAVE_FACTORY
-  int end_i=cf_getNumSmallPrimes()-1;
+  unsigned end_i=cf_getNumSmallPrimes()-1;
 #else
-  int end_i=p/2;
+  unsigned end_i=p/2;
 #endif
-  int end_p=(int)sqrt((double)p);
+  unsigned end_p=(unsigned)sqrt((double)p);
 restart:
   for (i=0; i<end_i; i++)
   {
@@ -612,7 +607,7 @@ restart:
     if ((p%j) == 0)
     {
     #ifdef HAVE_FACTORY
-      if (p<=32751) return IsPrime(p-2);
+      if (p<=32751) return iiIsPrime0(p-2);
     #endif
       p-=2;
       goto restart;
@@ -620,6 +615,16 @@ restart:
     if (j > end_p) return p;
   }
   return p;
+}
+int IsPrime(int p)  /* brute force !!!! */
+{
+  int i,j;
+  if      (p == 0)    return 0;
+  else if (p == 1)    return 1/*1*/;
+  else if ((p == 2)||(p==3))    return p;
+  else if (p < 0)     return (iiIsPrime0((unsigned)(-p)));
+  else if ((p & 1)==0) return iiIsPrime0((unsigned)(p-1));
+  return iiIsPrime0((unsigned)(p));
 }
 
 BOOLEAN iiWRITE(leftv res,leftv v)
