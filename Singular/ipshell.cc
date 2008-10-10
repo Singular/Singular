@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.193 2008-09-19 14:15:14 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.194 2008-10-10 10:18:13 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -251,6 +251,17 @@ static void killlocals0(int v, idhdl * localhdl, const ring r)
     }
   }
 }
+void killlocals_list(lists l,int v)
+{
+  int i;
+  for(i=l->nr; i>=0; i--)
+  {
+    if (l->m[i].rtyp == LIST_CMD)
+      killlocals_list((lists)l->m[i].data,v);
+    else if ((l->m[i].rtyp == RING_CMD) || (l->m[i].rtyp == QRING_CMD))
+      killlocals0(v,&(((ring)(l->m[i].data))->idroot),currRing);
+  }
+}
 #ifndef HAVE_NS
 void killlocals(int v)
 {
@@ -281,6 +292,10 @@ void killlocals(int v)
     else if (IDTYP(h) == PACKAGE_CMD)
     {
       killlocals0(v,&(IDPACKAGE(h)->idroot),IDRING(h));
+    }
+    else if (IDTYP(h) == LIST_CMD)
+    {
+      killlocals_list(IDLIST(h),v);
     }
     h = IDNEXT(h);
   }
