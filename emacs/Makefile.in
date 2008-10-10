@@ -37,7 +37,7 @@ lib-cmpl-old.el: ${prefix}/Singular/Makefile cmpl.pl
 	rm lib-temp
 
 lib-cmpl.el: ${prefix}/Singular/Makefile lib.pl
-	${MAKE} --no-print-directory -s -f ${prefix}/Singular/Makefile echoLIBS > lib-temp
+	(cd ${prefix}/Singular;${MAKE} --no-print-directory -s -f Makefile echoLIBS) > lib-temp
 	${PERL} lib.pl -s ${singulardir} `cat lib-temp` > lib-cmpl.el
 
 clean mostlyclean distclean:
