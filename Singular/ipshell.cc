@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.195 2008-10-10 12:59:22 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.196 2008-10-11 13:47:26 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -622,7 +622,7 @@ int IsPrime(int p)  /* brute force !!!! */
   if      (p == 0)    return 0;
   else if (p == 1)    return 1/*1*/;
   else if ((p == 2)||(p==3))    return p;
-  else if (p < 0)     return (iiIsPrime0((unsigned)(-p)));
+  else if (p < 0)     return 2; //(iiIsPrime0((unsigned)(-p)));
   else if ((p & 1)==0) return iiIsPrime0((unsigned)(p-1));
   return iiIsPrime0((unsigned)(p));
 }
