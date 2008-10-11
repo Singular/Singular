@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.cc,v 1.9 2008-08-07 13:18:36 Singular Exp $ */
+/* $Id: f5gb.cc,v 1.10 2008-10-11 12:12:46 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -66,9 +66,25 @@ void qsort_degree(poly* left, poly* right)
 */  
 lpoly *f5_inc(lpoly* lp, lpoly* g_prev)
 {
+        long length = 1;
         
-        
-        return lp;
+        while(g_prev->getNext() != NULL) {
+                length++;
+                g_prev++; 
+        }
+        Print("Laenge der Liste: %d\n",length);
+        /*critpair *critpairs = new critpair[length];
+        * int i = 1;
+        *
+        * while(g_prev->getNext()->getNext() != NULL) {
+        *        critpairs[i] = {lp, g_prev, critpairs[i+1]};
+        *        i++;
+        *        g_prev++;
+        * } 
+        * *critpairs[length] = {lp, g_prev+length-1, NULL};
+        *
+        * return lp;
+        */
 }    
 
 
@@ -78,71 +94,106 @@ lpoly *f5_inc(lpoly* lp, lpoly* g_prev)
 */
 ideal F5main(ideal i, ring r)
 {
-      ideal iTmp, g_basis;
-      long j, k;
-      poly one = pInit();
-      pSetCoeff(one, nInit(1));
-      pWrite(one);
-      lpoly *lp, *gb;
-      intvec* sort;
-      iTmp = idInit(IDELEMS(i),i->rank);
+        ideal iTmp, g_basis;
+        long j, k;
+        poly one = pInit();
+        pSetCoeff(one, nInit(1));
+        pWrite(one);
+        lpoly *lp, *gb;
+        intvec* sort;
+        iTmp = idInit(IDELEMS(i),i->rank);
   
-      for(j=0; j<IDELEMS(i); j++)
-      {
-              if(NULL != i->m[j])
-              {
-                      iTmp->m[j] = i->m[j];
-              }
-      }
-
-      iTmp = kInterRed(i,0);  
-      qsort_degree(&iTmp->m[0],&iTmp->m[IDELEMS(iTmp)-1]);
-      idShow(iTmp);
-      
-      lp = new lpoly[IDELEMS(iTmp)];
-      
-      for(j=0; j <IDELEMS(iTmp); j++){
+        for(j=0; j<IDELEMS(i); j++)
+        {
+                if(NULL != i->m[j])
+                {
+                        iTmp->m[j] = i->m[j];
+                }
+        ;}
+        
+        iTmp = kInterRed(i,0);  
+        qsort_degree(&iTmp->m[0],&iTmp->m[IDELEMS(iTmp)-1]);
+        idShow(iTmp);
+        
+        // generating the list lp of ideal generators 
+        lp = new lpoly[IDELEMS(iTmp)];
+        
+        for(j=0; j <IDELEMS(iTmp)-1; j++){
                 lp[j].setPoly(iTmp->m[j]);
                 
                 if(pComparePolys(lp[j].getPoly(), one)){
-                                Print("1 in GB");
-                                return(NULL);
+                        Print("1 in GB\n");
+                        return(iTmp);
                 }
                 
                 lp[j].setIndex(j+1);
                 lp[j].setTerm(one);
+                lp[j].setDel(false);
+                lp[j].setNext(&lp[j+1]);
                 Print("Labeled Polynomial %d: ",j+1);
-                Print("Signature Term: ");
+                Print("Label Term: ");
                 pWrite(lp[j].getTerm());
-                Print("Signature Index: %d\n", lp[j].getIndex());
+                Print("Index: %d\n", lp[j].getIndex());
+                Print("Delete? %d\n", lp[j].getDel());
                 pWrite(lp[j].getPoly());
                 Print("\n\n");
-                         
-      }
-      
-      // PROBLEM: muss signatur mitliefern, daher datentyp
-      //          ideal nicht zu gebrauchen? 
-      gb = new lpoly;
-      gb = &lp[IDELEMS(iTmp)-1];
-      pWrite((*gb).getPoly());
+        }
 
-      for(j=IDELEMS(iTmp)-2; j>0; j--){
-             //PROBLEM: muss dynamisch Speicher allozieren
-             gb = f5_inc(&lp[j], gb);
-             for(k=0; k< IDELEMS(iTmp); k++){
-                    if(gb[k].getPoly()){
-                    }
-             }
+        lp[IDELEMS(iTmp)-1].setPoly(iTmp->m[IDELEMS(iTmp)-1]);
+        
+        if(pComparePolys(lp[IDELEMS(iTmp)-1].getPoly(), one)){
+                        Print("1 in GB\n");
+                        return(iTmp);
+        }
+        
+        lp[IDELEMS(iTmp)-1].setIndex(IDELEMS(iTmp));
+        lp[IDELEMS(iTmp)-1].setTerm(one);
+        lp[IDELEMS(iTmp)-1].setDel(false);
+        lp[IDELEMS(iTmp)-1].setNext(NULL);
+        Print("Labeled Polynomial %d: ",IDELEMS(iTmp));
+        Print("Label Term: ");
+        pWrite(lp[IDELEMS(iTmp)-1].getTerm());
+        Print("Index: %d\n", lp[IDELEMS(iTmp)-1].getIndex());
+        Print("Delete? %d\n", lp[IDELEMS(iTmp)-1].getDel());
+        pWrite(lp[IDELEMS(iTmp)-1].getPoly());
+        Print("\n\n");
+        
+        // PROBLEM: muss signatur mitliefern, daher datentyp
+        //          ideal nicht zu gebrauchen? 
+        
 
-
-
-               
-      }
+        // gb: Grobner Bases, pointer on the first element in the list, 
+        // end of the list is marked by next = NULL
+        
+        gb = new lpoly;
+        gb = &lp[IDELEMS(iTmp)-1];
+        (*gb).setNext(NULL);
+        Print("last element in sequence = first element in gb:\n");
+        pWrite((*gb).getPoly());
+        Print("Next: %p\n", lp[IDELEMS(iTmp)-2].getNext());
+        Print("Next: %p\n", lp[IDELEMS(iTmp)-1].getNext());
+        
+        for(j=IDELEMS(iTmp)-2; j>0; j--){
+                //PROBLEM: muss dynamisch Speicher allozieren
+                gb = f5_inc(&lp[j], gb);
                 
+                for(k=0; k< IDELEMS(iTmp); k++){
+                        
+                        if(pComparePolys(gb[k].getPoly(),one)){
+                                Print("1 in GB\n");
+                                return(iTmp);
+                        }
+
+                }
+        
+         
+        }
+
+        Print("Es klappt!\n");
+        return(iTmp); 
                         
 
 
-        return iTmp;
 }
 
 

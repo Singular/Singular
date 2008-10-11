@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.8 2008-08-07 13:18:36 Singular Exp $ */
+/* $Id: f5gb.h,v 1.9 2008-10-11 12:12:46 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -10,14 +10,6 @@
 
 #ifdef HAVE_F5
 #include "lpolynom.h"
-
-
-// structure of the rules, i.e. index and term
-struct rule
-{
-        long index;
-        poly term;
-};
 
 
 // sort polynomials in ideal i by decreasing total degree

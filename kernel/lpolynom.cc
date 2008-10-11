@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lpolynom.cc,v 1.2 2008-08-07 13:18:36 Singular Exp $ */
+/* $Id: lpolynom.cc,v 1.3 2008-10-11 12:12:46 ederc Exp $ */
 /*
 * ABSTRACT: lpolynomial definition 
 */
@@ -44,6 +44,17 @@ void lpoly::setIndex(long i)
         index = i;
 }
 
+
+void lpoly::setDel(bool b)
+{
+        del = b;
+}
+
+void lpoly::setNext(lpoly* l)
+{
+        next = l;
+}
+
 poly lpoly::getPoly()
 {
         return polynomial;
@@ -59,5 +70,14 @@ long lpoly::getIndex()
         return index;
 }
 
+bool lpoly::getDel()
+{
+        return del;
+}
+
+lpoly *lpoly::getNext()
+{
+        return next;
+}
 
 #endif
