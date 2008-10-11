@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.172 2008-10-10 12:03:16 Singular Exp $
+@comment $Id: singular.doc,v 1.173 2008-10-11 13:46:31 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -717,7 +717,7 @@ of autonomy degrees.
 
 @c ---------------------------------------------------------
 @node jacobson_lib, , control_lib, System and Control theory
-@subsection control_lib
+@subsection jacobson_lib
 @c lib jacobson.lib
 
 @c ----------------------------------------------------------------------------
