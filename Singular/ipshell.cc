@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.196 2008-10-11 13:47:26 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.197 2008-10-13 12:45:29 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -236,7 +236,7 @@ static void killlocals0(int v, idhdl * localhdl, const ring r)
         h = IDNEXT(h);
         //PrintLn();
       }
-      else if (vv >= v)
+      else //if (vv >= v)
       {
         idhdl nexth = IDNEXT(h);
         killhdl2(h,localhdl,r);
