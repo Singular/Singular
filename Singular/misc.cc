@@ -480,7 +480,7 @@ char * versionString()
   StringAppend("Singular for %s version %s (%d-%lu)  %s\nwith\n",
                S_UNAME, S_VERSION1, SINGULAR_VERSION,
                feVersionId,singular_date);
-  StringAppend("\t");
+  StringAppendS("\t");
 #ifdef HAVE_FACTORY
               StringAppend("factory(%s),", factoryVersion);
 #endif
@@ -557,7 +557,7 @@ char * versionString()
               StringAppend("OM_TRACK=%d,",OM_TRACK);
 #endif
 #ifdef OM_NDEBUG
-              StringAppend("OM_NDEBUG,");
+              StringAppendS("OM_NDEBUG,");
 #endif
 #ifdef PDEBUG
               StringAppendS("PDEBUG,");
@@ -582,7 +582,7 @@ char * versionString()
               "\n",CC,CXX);
               feStringAppendResources(0);
               feStringAppendBrowsers(0);
-              StringAppend("\n");
+              StringAppendS("\n");
               return str;
 }
 
