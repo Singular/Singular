@@ -1,6 +1,6 @@
 //last change: 2007/07/06 (Oliver Labs)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surfex.lib,v 1.6 2007-11-13 17:26:14 Singular Exp $";
+version="$Id: surfex.lib,v 1.7 2008-10-13 21:32:53 keilen Exp $";
 category="Visualization";
 info="
 LIBRARY: surfex.lib      Procedures for visualizing and rotating surfaces.
@@ -22,7 +22,7 @@ SEE ALSO: surf_lib
 
 PROCEDURES:
 plotRotated(poly,coord); Plot the surface given by the polynomial p
-               with the coordinates coords(list)
+                         with the coordinates coords(list)
 plotRot(poly);           Similar to plotRotated,
                          but guesses automatically
                          which coordinates should be used
@@ -516,13 +516,21 @@ it takes the surfex-code as a string and calls surfex.
        while (find(surfex_path1,":")!=0)
        {
          surfex_path2=surfex_path1[1..find(surfex_path1,":")-1];
+         while(surfex_path2[size(surfex_path2)]==" ") {
+           surfex_path2 = surfex_path2[1..(size(surfex_path2)-1)];
+         }
+         
          if (status(surfex_path2+"/surfex","exists")=="yes") break;
          surfex_path1=surfex_path1[find(surfex_path1,":")+1,size(surfex_path1)];
+         surfex_path2=surfex_path1[1..(size(surfex_path1)-1)];
+         while(surfex_path2[size(surfex_path2)]==" ") {
+           surfex_path2 = surfex_path2[1..(size(surfex_path2)-1)];
+         }
        }
-       surfex_path=surfex_path2;
+       surfex_path=surfex_path2+"/surfex";
     }
 
-    int i=system("sh","surfex \""+surfex_path+"\" -d "+tmpd+" -i " + l +" >"+erg+" 2>/dev/null");
+     int i=system("sh","surfex \""+surfex_path+"\" -d "+tmpd+" -i " + l +" >"+erg+" 2>/dev/null");
 
     // delete the temporary file
     i = system("sh","rm " + l +" 2>/dev/null");
