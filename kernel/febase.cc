@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.18 2008-08-18 10:39:03 Singular Exp $ */
+/* $Id: febase.cc,v 1.19 2008-10-13 16:17:14 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -1019,9 +1019,8 @@ void SPrintStart()
 static void SPrintS(const char* s)
 {
   omCheckAddr(sprint);
-  if (s == NULL) return;
+  if ((s == NULL)||(*s == '\0')) return;
   int ls = strlen(s);
-  if (ls == 0) return;
 
   char* ns;
   int l = strlen(sprint);
