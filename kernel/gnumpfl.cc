@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.9 2008-05-20 14:40:00 Singular Exp $ */
+/* $Id: gnumpfl.cc,v 1.10 2008-10-13 17:32:35 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -478,13 +478,13 @@ void ngfWrite (number &a)
   if ( a != NULL )
   {
     out= floatToStr(*(gmp_float*)a,gmp_output_digits);
-    StringAppend(out);
+    StringAppendS(out);
     //omFreeSize((ADDRESS)out, (strlen(out)+1)* sizeof(char) );
     omFree( (ADDRESS)out );
   }
   else
   {
-    StringAppend("0");
+    StringAppendS("0");
   }
 }
 

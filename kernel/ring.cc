@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.103 2008-08-22 11:56:55 Singular Exp $ */
+/* $Id: ring.cc,v 1.104 2008-10-13 17:32:35 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -544,7 +544,7 @@ char * rOrdStr(ring r)
   StringSetS("");
   for (l=0; ; l++)
   {
-    StringAppend((char *)rSimpleOrdStr(r->order[l]));
+    StringAppendS((char *)rSimpleOrdStr(r->order[l]));
     if ((r->order[l] != ringorder_c) && (r->order[l] != ringorder_C))
     {
       if (r->wvhdl[l]!=NULL)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.7 2008-03-19 17:44:08 Singular Exp $ */
+/* $Id: gnumpc.cc,v 1.8 2008-10-13 17:32:34 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -460,12 +460,12 @@ const char * ngcRead (const char * s, number * a)
 void ngcWrite (number &a)
 {
   if (a==NULL)
-    StringAppend("0");
+    StringAppendS("0");
   else
   {
     char *out;
     out= complexToStr(*(gmp_complex*)a,gmp_output_digits);
-    StringAppend(out);
+    StringAppendS(out);
     //    omFreeSize((ADDRESS)out, (strlen(out)+1)* sizeof(char) );
     omFree( (ADDRESS)out );
   }

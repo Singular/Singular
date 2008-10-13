@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.20 2008-10-13 17:17:06 Singular Exp $ */
+/* $Id: febase.cc,v 1.21 2008-10-13 17:32:34 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -825,9 +825,9 @@ char * StringAppend(const char *fmt, ...)
   {
     if ((more=feBufferStart-feBuffer+strlen(fmt)+100)>feBufferLength)
     {
-      more = ((more + (4*1024-1))/(4*1024))*(4*1024);
+      more = ((more + (8*1024-1))/(8*1024))*(8*1024);
       int l=s-feBuffer;
-      if (more!=feBufferLength)
+      //if (more!=feBufferLength)
       {
         feBuffer=(char *)omReallocSize((ADDRESS)feBuffer,feBufferLength,
                                                        more);
@@ -867,20 +867,23 @@ char * StringAppend(const char *fmt, ...)
 
 char * StringAppendS(const char *st)
 {
-  /* feBufferStart is feBuffer + strlen(feBuffer);*/
-  int l;
-  long more;
-  int ll=feBufferStart-feBuffer;
-  if ((more=ll+2+(l=strlen(st)))>feBufferLength)
+  if (*st!='\0')
   {
-    more = ((more + (4*1024-1))/(4*1024))*(4*1024);
-    feBuffer=(char *)omReallocSize((ADDRESS)feBuffer,feBufferLength,
-                                                     more);
-    feBufferLength=more;
-    feBufferStart=feBuffer+ll;
+    /* feBufferStart is feBuffer + strlen(feBuffer);*/
+    int l;
+    long more;
+    int ll=feBufferStart-feBuffer;
+    if ((more=ll+2+(l=strlen(st)))>feBufferLength)
+    {
+      more = ((more + (8*1024-1))/(8*1024))*(8*1024);
+      feBuffer=(char *)omReallocSize((ADDRESS)feBuffer,feBufferLength,
+                                                       more);
+      feBufferLength=more;
+      feBufferStart=feBuffer+ll;
+    }
+    strcat(feBufferStart, st);
+    feBufferStart +=l;
   }
-  strcat(feBufferStart, st);
-  feBufferStart +=l;
   return feBuffer;
 }
 
