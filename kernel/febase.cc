@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.19 2008-10-13 16:17:14 Singular Exp $ */
+/* $Id: febase.cc,v 1.20 2008-10-13 17:17:06 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -821,40 +821,46 @@ char * StringAppend(const char *fmt, ...)
   int vs;
   long more;
   va_start(ap, fmt);
-  if ((more=feBufferStart-feBuffer+strlen(fmt)+100)>feBufferLength)
+  if (*fmt!='\0')
   {
-    more = ((more + (4*1024-1))/(4*1024))*(4*1024);
-    int l=s-feBuffer;
-    feBuffer=(char *)omReallocSize((ADDRESS)feBuffer,feBufferLength,
-                                                     more);
-    omMarkAsStaticAddr(feBuffer);
-    feBufferLength=more;
-    s=feBuffer+l;
+    if ((more=feBufferStart-feBuffer+strlen(fmt)+100)>feBufferLength)
+    {
+      more = ((more + (4*1024-1))/(4*1024))*(4*1024);
+      int l=s-feBuffer;
+      if (more!=feBufferLength)
+      {
+        feBuffer=(char *)omReallocSize((ADDRESS)feBuffer,feBufferLength,
+                                                       more);
+        omMarkAsStaticAddr(feBuffer);
+        feBufferLength=more;
+        s=feBuffer+l;
 #ifndef BSD_SPRINTF
-    feBufferStart=s;
+        feBufferStart=s;
 #endif
-  }
+      }
+    }
 #ifdef BSD_SPRINTF
-  vsprintf(s, fmt, ap);
-  while (*s!='\0') s++;
-  feBufferStart =s;
+    vsprintf(s, fmt, ap);
+    while (*s!='\0') s++;
+    feBufferStart =s;
 #else
 #ifdef HAVE_VSNPRINTF
-  vs = vsnprintf(s, feBufferLength - (feBufferStart - feBuffer), fmt, ap);
-  if (vs == -1)
-  {
-    assume(0);
-    feBufferStart = feBuffer + feBufferLength -1;
-  }
-  else
-  {
-    feBufferStart += vs;
-  }
+    vs = vsnprintf(s, feBufferLength - (feBufferStart - feBuffer), fmt, ap);
+    if (vs == -1)
+    {
+      assume(0);
+      feBufferStart = feBuffer + feBufferLength -1;
+    }
+    else
+    {
+      feBufferStart += vs;
+    }
 #else
-  feBufferStart += vsprintf(s, fmt, ap);
+    feBufferStart += vsprintf(s, fmt, ap);
 #endif
 #endif
-  omCheckAddrSize(feBuffer, feBufferLength);
+    omCheckAddrSize(feBuffer, feBufferLength);
+  }
   va_end(ap);
   return feBuffer;
 }
