@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.111 2008-10-07 07:59:08 wienand Exp $ */
+/* $Id: kutil.cc,v 1.112 2008-10-14 09:18:36 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1310,7 +1310,7 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat,
 #ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
-    Print("t = %d; s = %d; d = %d\n", nInt(t), nInt(s), nInt(d));
+    // Print("t = %d; s = %d; d = %d\n", nInt(t), nInt(s), nInt(d));
     PrintS("m1 = ");
     p_wrp(m1, strat->tailRing);
     PrintS(" ; m2 = ");
