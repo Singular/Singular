@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.21 2008-10-13 17:32:34 Singular Exp $ */
+/* $Id: febase.cc,v 1.22 2008-10-14 07:56:47 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -821,46 +821,40 @@ char * StringAppend(const char *fmt, ...)
   int vs;
   long more;
   va_start(ap, fmt);
-  if (*fmt!='\0')
+  if ((more=feBufferStart-feBuffer+strlen(fmt)+100)>feBufferLength)
   {
-    if ((more=feBufferStart-feBuffer+strlen(fmt)+100)>feBufferLength)
-    {
-      more = ((more + (8*1024-1))/(8*1024))*(8*1024);
-      int l=s-feBuffer;
-      //if (more!=feBufferLength)
-      {
-        feBuffer=(char *)omReallocSize((ADDRESS)feBuffer,feBufferLength,
-                                                       more);
-        omMarkAsStaticAddr(feBuffer);
-        feBufferLength=more;
-        s=feBuffer+l;
+    more = ((more + (8*1024-1))/(8*1024))*(8*1024);
+    int l=s-feBuffer;
+    feBuffer=(char *)omReallocSize((ADDRESS)feBuffer,feBufferLength,
+                                                     more);
+    omMarkAsStaticAddr(feBuffer);
+    feBufferLength=more;
+    s=feBuffer+l;
 #ifndef BSD_SPRINTF
-        feBufferStart=s;
+    feBufferStart=s;
 #endif
-      }
-    }
+  }
 #ifdef BSD_SPRINTF
-    vsprintf(s, fmt, ap);
-    while (*s!='\0') s++;
-    feBufferStart =s;
+  vsprintf(s, fmt, ap);
+  while (*s!='\0') s++;
+  feBufferStart =s;
 #else
 #ifdef HAVE_VSNPRINTF
-    vs = vsnprintf(s, feBufferLength - (feBufferStart - feBuffer), fmt, ap);
-    if (vs == -1)
-    {
-      assume(0);
-      feBufferStart = feBuffer + feBufferLength -1;
-    }
-    else
-    {
-      feBufferStart += vs;
-    }
-#else
-    feBufferStart += vsprintf(s, fmt, ap);
-#endif
-#endif
-    omCheckAddrSize(feBuffer, feBufferLength);
+  vs = vsnprintf(s, feBufferLength - (feBufferStart - feBuffer), fmt, ap);
+  if (vs == -1)
+  {
+    assume(0);
+    feBufferStart = feBuffer + feBufferLength -1;
   }
+  else
+  {
+    feBufferStart += vs;
+  }
+#else
+  feBufferStart += vsprintf(s, fmt, ap);
+#endif
+#endif
+  omCheckAddrSize(feBuffer, feBufferLength);
   va_end(ap);
   return feBuffer;
 }
