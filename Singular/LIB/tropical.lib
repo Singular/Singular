@@ -1,4 +1,4 @@
-version="$Id: tropical.lib,v 1.8 2008-10-09 09:31:58 Singular Exp $";
+version="$Id: tropical.lib,v 1.9 2008-10-15 08:53:18 keilen Exp $";
 category="Tropical Geometry";
 info="
 LIBRARY:         tropical.lib  Computations in Tropical Geometry
@@ -7,7 +7,7 @@ AUTHORS:         Anders Jensen Needergard, email: jensen@math.tu-berlin.de
 @*               Hannah Markwig,  email: hannah@uni-math.gwdg.de
 @*               Thomas Markwig,  email: keilen@mathematik.uni-kl.de
 
-WARNING:
+WARNING: 
      - tropicalLifting will only work under LINUX and if in addition gfan is installed.
 @*   - drawTropicalCurve and drawTropicalNewtonSubdivision will only display the tropical
        curve under LINUX and if in addition latex and kghostview are installed.
@@ -19,27 +19,27 @@ THEORY:
      then this defines a toric variety as the closure of (K*)^n in the projective space P^m, where
      the torus is embedded via the map sending a point x in (K*)^n to the point (x^v0,...,x^vm).
      The generic hyperplane sections are just the images of the hypersurfaces in (K*)^n defined by
-     the polynomials f=a0*x^v0+...+am*x^vm=0. Some properties of these hypersurfaces can be studied
-     via tropicalisation.
+     the polynomials f=a0*x^v0+...+am*x^vm=0. Some properties of these hypersurfaces can be studied 
+     via tropicalisation. 
 
-     For this we suppose that K=C{{t}} is the field of Puiseux series over the field of complex
+     For this we suppose that K=C{{t}} is the field of Puiseux series over the field of complex 
      numbers (or any other field with a valuation into the real numbers). One associates to the
      hypersurface given by f=a0*x^v0+...+am*x^vm the tropical hypersurface defined by the tropicalisation
      trop(f)=min{val(a0)+<v0,x>,...,val(am)+<vm,x>}. Here, <v,x> denotes the standard scalar product
      of the integer vector v in Z^n with the vector x=(x1,...,xn) of variables, so that trop(f) is
      a piecewise linear function on R^n. The corner locus of this function (i.e. the points at which
-     the minimum is attained a least twice) is the tropical hypersurface defined by trop(f).
+     the minimum is attained a least twice) is the tropical hypersurface defined by trop(f). 
      The theorem of Newton-Kapranov states that this tropical hypersurface is the same as if one
      computes pointwise the valuation of the hypersurface given by f. The analogue holds true if one
-     replaces one equation f by an ideal I. A constructive proof of the theorem is given by an adapted
+     replaces one equation f by an ideal I. A constructive proof of the theorem is given by an adapted 
      version of the Newton-Puiseux algorithm. The hard part is to find a point in the variety over
      C{{t}} which corresponds to a given point in the tropical variety.
 
      It is the purpose of this library to provide basic means to deal with tropical varieties.
      Of course we cannot represent the field of Puiseux series over C in its full strength, however,
      in order to compute interesting examples it will be sufficient to replace the complex numbers C
-     by the rational numbers Q and to replace Puiseux series in t by rational functions in t,
-     i.e. we replace C{{t}} by Q(t), or sometimes even by Q[t]. Note, that this in particular
+     by the rational numbers Q and to replace Puiseux series in t by rational functions in t, 
+     i.e. we replace C{{t}} by Q(t), or sometimes even by Q[t]. Note, that this in particular 
      forbits rational exponents for the t's.
 
      Moreover, in Singular no negative exponents of monomials are allowed, so that the integer vectors
@@ -47,9 +47,9 @@ THEORY:
      change the tropicalisation nor does it change the toric variety. Thus this does not cause any restriction.
      If, however, for some reason you prefer to work with general vi, then you have to pass right away to
      the tropicalisation of the equations, whereever this is allowed -- these are linear polynomials
-     where the constant coefficient correspond to the valuation of the original coefficient and where
+     where the constant coefficient correspond to the valuation of the original coefficient and where 
      the non-constant coefficient correspond to the exponents of the monomials, thus they may be rational
-     numbers respectively negative numbers:
+     numbers respectively negative numbers: 
      e.g. if f=t^{1/2}*x^{-2}*y^3+2t*x*y+4  then  trop(f)=min{1/2-2x+3y,1+x+y,0}.
 
      The main tools provided in this library are as follows:
@@ -58,14 +58,14 @@ THEORY:
                           corresponding tropical variety associated to an ideal I; the generators of
                           I have to be in the polynomial ring Q[t,x1,...,xn] considered as a subring of
                           C{{t}}[x1,...,xn]; a solution will be constructed up to given order; note that
-                          several field extensions of Q might be necessary thoughout the intermediate
+                          several field extensions of Q might be necessary thoughout the intermediate 
                           computations; the procedures uses the external program gfan
 @*   - drawTropicalCurve  visualises a tropical plane curve either given by a polynomial in Q(t)[x,y]
                           or by a list of linear polynomials of the form ax+by+c with a,b in Z and c in Q;
                           latex must be installed on your computer
 @*   - tropicalJInvariant computes the tropical j-invaiant of a tropical elliptic curve
 @*   - jInvariant         computes the j-invariant of an elliptic curve
-@*   - weierstrassFom     computes the Weierstrass form of an elliptic curve
+@*   - weierstrassFom     computes the Weierstrass form of an elliptic curve     
 
 PROCEDURES CONCERNED WITH TROPICAL LIFTING:
      tropicalLifting(ideal,intvec,int) computes a point in the tropical variety of ideal over intvec
@@ -92,12 +92,12 @@ GENERAL PROCEDURES:
 
 PROCEDURES CONCERNED WITH THE LATEX CONVERSION:
      texNumber(poly)                  outputs the texcommand for the leading coefficient of poly
-     texPolynomial(poly)              outputs the texcommand for the polynomial poly
+     texPolynomial(poly)              outputs the texcommand for the polynomial poly 
      texMatrix(matrix)                outputs the texcommand for the matrix
      texDrawBasic(list)               embeds the output of texDrawTropical in a texdraw environment
      texDrawTropical(list)            computes the texdraw commands for a tropical curve
-     texDrawNewtonSubdivision(list)   computes the texdraw commands for a Newton subdivision
-     texDrawTriangulation(list,list)  computes the texdraw commands for a triangulation
+     texDrawNewtonSubdivision(list)   computes the texdraw commands for a Newton subdivision 
+     texDrawTriangulation(list,list)  computes the texdraw commands for a triangulation     
 
 AUXILARY PROCEDURES:
      radicalMemberShip(poly,ideal)    checks if the poly is contained in the radical of ideal
@@ -107,7 +107,7 @@ AUXILARY PROCEDURES:
      detropcialise(poly)              computes the detropicalisation of a linear form
      dualConic(poly)                  computes the dual of the affine plane conic defined by poly
      parameterSubstitute(poly,int)    substitutes in the poly the parameter t by t^N
-     tropcialSubst(poly,int,list)     computes the tropical polynomial of poly with certain substitutions
+     tropcialSubst(poly,int,list)     computes the tropical polynomial of poly with certain substitutions 
      randomPoly(int,int,int)          computes a polynomial with random coefficients
      cleanTmp()                       removes the latex and ps files from /tmp created by other procedures
 
@@ -136,7 +136,7 @@ KEYWORDS:        tropical curves; tropical polynomials
 /// - tropicalparametrise
 /// - eliminatecomponents
 /// - findzerosAndBasictransform
-/// - ordermaximalideals
+/// - ordermaximalideals 
 /// - verticesTropicalCurve
 /// - bunchOfLines
 /// - clearintmat
@@ -185,24 +185,24 @@ LIB "absfact.lib";
 ////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////////
-/// Procedures concerned with tropical parametrisation
-///////////////////////////////////////////////////////////////////////////////////
+/// Procedures concerned with tropical parametrisation 
+///////////////////////////////////////////////////////////////////////////////////  
 
 proc tropicalLifting (ideal i,intvec w,int ordnung,list #)
 "USAGE:  tropicalLifting(i,w,ord[,opt]); i ideal, w intvec, ord int, opt string
-ASSUME:  - i is an ideal in Q[t,x_1,...,x_n], w=(w_0,w_1,...,w_n)
-           and (w_1/w_0,...,w_n/w_0) is in the tropical variety of i,
-           and ord is the order up to which a point in V(i) over Q{{t}} lying over
+ASSUME:  - i is an ideal in Q[t,x_1,...,x_n], w=(w_0,w_1,...,w_n)  
+           and (w_1/w_0,...,w_n/w_0) is in the tropical variety of i, 
+           and ord is the order up to which a point in V(i) over Q{{t}} lying over 
            (w_1/w_0,...,w_n/w_0) shall be computed; w_0 may NOT be ZERO
-@*       - the basering should not have any parameters on its own
+@*       - the basering should not have any parameters on its own 
            and it should have a global monomial ordering, e.g. ring r=0,(t,x(1..n)),dp;
-@*       - the first variable of the basering will be treated as the parameter t
+@*       - the first variable of the basering will be treated as the parameter t 
            in the Puiseux series field !!!!
 @*       - the optional parameter opt should be one or more strings among the following:
 @*         'isZeroDimensional'  : the dimension i is zero (not to be checked);
 @*         'isPrime'            : the ideal is prime over Q(t)[x_1,...,x_n]  (not to be checked);
 @*         'isInTrop'           : (w_1/w_0,...,w_n/w_0) is in the tropical variety (not to be checked);
-@*         'oldGfan'            : uses gfan version 0.2.1 or less
+@*         'oldGfan'            : uses gfan version 0.2.1 or less 
 @*         'findAll'            : find all solutions of a zero-dimensional ideal over (w_1/w_0,...,w_n/w_0)
 @*         'noAbs'              : do NOT use absolute primary decomposition
 @*         'noResubst'         : avoids computing the resubstitution
@@ -225,16 +225,16 @@ RETURN:  IF THE OPTION 'findAll' WAS NOT SET THEN:
 @*       list, containing ALL liftings of the given point ((w_1/w_0,...,w_n/w_0)
                in the tropical variety of i to a point in V(i) over Puiseux series field up to
                the first ord terms, if the ideal is zero-dimensional over Q{{t}};
-               more precisely, each entry of the list is a list l as computed if
+               more precisely, each entry of the list is a list l as computed if 
                'find_all' was NOT set
 @*       WE NOW DESCRIBE THE LIST ENTRIES IF 'findAll' WAS NOT SET:
-@*       - the ring l[1] contains an ideal LIFT, which contains
+@*       - the ring l[1] contains an ideal LIFT, which contains 
            a point in V(i) lying over w up to the first ord terms;
 @*       - and if the integer l[2] is N then t has to be replaced by t^1/N in the
            lift, or alternatively replace t by t^N in the defining ideal
 @*       - if the k+1st entry of l[3] is  non-zero, then the kth component of LIFT has to
            be multiplied t^(-l[3][k]/l[3][1]) AFTER substituting t by t^1/N
-@*       - unless the option 'noResubst' was set, the kth entry of list l[4]
+@*       - unless the option 'noResubst' was set, the kth entry of list l[4] 
            is a string which represents the kth generator of
            the ideal i where the coordinates have been replaced by the result of the lift;
            the t-order of the kth entry should in principle be larger than the t-degree of LIFT
@@ -245,7 +245,7 @@ REMARK:  - it is best to use the procedure displayTropicalLifting to display the
 @*       - the option 'findAll' cannot be used if 'noAbs' is set
 @*       - if the parameter 'findAll' is set AND the ideal i is zero-dimensional in Q{{t}}[x_1,...,x_n]
            then ALL points in V(i) lying over w are computed up to order ord; if the ideal
-           is not-zero dimenisonal, then only all points in the ideal after cutting down
+           is not-zero dimenisonal, then only all points in the ideal after cutting down 
            to dimension zero will be computed
 @*       - the procedure REQUIRES that the program GFAN is installed on your computer;
            if you have GFAN version less than 0.3.0 then you MUST use the optional
@@ -262,12 +262,12 @@ REMARK:  - it is best to use the procedure displayTropicalLifting to display the
 @*         + the Puiseux series field over the algebraic closure of Z/pZ is NOT algebraicall closed,
              and thus there may not exist a point in V(i) over the Puiseux series field
              with the desired valuation; so there is no chance that the procedure produced
-             a sensible output - e.g. if i=tx^p-tx-1
-@*         + if the dimension of i over Z/pZ(t) is not zero the process of reduction to
+             a sensible output - e.g. if i=tx^p-tx-1 
+@*         + if the dimension of i over Z/pZ(t) is not zero the process of reduction to 
              zero might not work if the characteristic is small and you are unlucky
-@*         + the option 'noAbs' has to be used since absolute primary decomposition in
+@*         + the option 'noAbs' has to be used since absolute primary decomposition in 
              Singular only works in characteristic zero
-@*       - the basefield should either be Q or Z/pZ for some prime p; field extensions
+@*       - the basefield should either be Q or Z/pZ for some prime p; field extensions 
            will be computed where necessary; if you need parameters or field extensions
            from the beginning they should rather be simulated as variables possibly adding
            their relations to the ideal; the weights for the additional variables should be zero
@@ -345,7 +345,7 @@ EXAMPLE: example tropicalLifting;   shows an example"
   if (w[1]==0)
   {
     Error("The first coordinate of your input w must be NON-ZERO, since it is a DENOMINATOR!");
-  }
+  } 
   // if w_0<0, then replace w by -w, so that the "denominator" w_0 is positive
   if (w[1]<0)
   {
@@ -361,7 +361,7 @@ EXAMPLE: example tropicalLifting;   shows an example"
     N=-w[1];
     w[1]=-1;
   }
-  // if some entry of w is positive, we have to make a transformation,
+  // if some entry of w is positive, we have to make a transformation, 
   // which moves it to something non-positive
   for (j=2;j<=nvars(basering);j++)
   {
@@ -386,14 +386,14 @@ EXAMPLE: example tropicalLifting;   shows an example"
   for (j=1;j<=nvars(basering)-1;j++)
   {
     variablen=variablen+var(j);
-  }
+  }    
   map GRUNDPHI=BASERING,t,variablen;
   ideal i=GRUNDPHI(i);
-  // compute the initial ideal of i and test if w is in the tropical variety of i
+  // compute the initial ideal of i and test if w is in the tropical variety of i 
   // - the last entry 1 only means that t is the last variable in the ring
   ideal ini=tInitialIdeal(i,w,1);
   if (isintrop==0) // test if w is in trop(i) only if isInTrop has not been set
-  {
+  {    
     poly product=1;
     for (j=1;j<=nvars(basering)-1;j++)
     {
@@ -417,10 +417,10 @@ EXAMPLE: example tropicalLifting;   shows an example"
     {
       // the procedurce cutdown computes a new ring, in which there lives a zero-dimensional
       // ideal which has been computed by cutting down the input with generic linear forms
-      // of the type x_i1-p_1,...,x_id-p_d for some polynomials p_1,...,p_d not depending
+      // of the type x_i1-p_1,...,x_id-p_d for some polynomials p_1,...,p_d not depending 
       // on the variables x_i1,...,x_id; that way we have reduced the number of variables by dd !!!
       // the new zero-dimensional ideal is called i, its t-initial ideal (with respect to
-      // the new w=CUTDOWN[2]) is ini, and finally there is a list repl in the ring
+      // the new w=CUTDOWN[2]) is ini, and finally there is a list repl in the ring 
       // which contains at the polynomial p_j at position i_j and a zero otherwise;
       if (isprime==0) // the minimal associated primes of i are computed
       {
@@ -460,7 +460,7 @@ EXAMPLE: example tropicalLifting;   shows an example"
     int isgood;  // test in the non-zerodimensional case if the result has the correct valuation
     for (jj=1;jj<=size(TP);jj++)
     {
-      // the list TP contains as a first entry the ring over which the tropical parametrisation
+      // the list TP contains as a first entry the ring over which the tropical parametrisation 
       // of the (possibly cutdown ideal) i lives
       def LIFTRING=TP[jj][1];
       // if the dimension of i originally was not zero, then we have to fill in the missing
@@ -492,11 +492,11 @@ EXAMPLE: example tropicalLifting;   shows an example"
           }
         }
         setring LIFTRING;
-        ideal LIFT=imap(REPLACEMENTRING,LIFT);
-        // test now if the LIFT has the correct valuation !!!
+        ideal LIFT=imap(REPLACEMENTRING,LIFT);    
+        // test now if the LIFT has the correct valuation !!!     
         // note: it may happen, that when resubstituting PARA into the replacement rules
         //       there occured some unexpected cancellation; we only know that for SOME
-        //       solution of the zero-dimensional reduction NO canellation will occur,
+        //       solution of the zero-dimensional reduction NO canellation will occur, 
         //       but for others this may very well happen; this in particular means that
         //       we possibly MUST compute all zero-dimensional solutions when cutting down!
         intvec testw=precutdownw[1];
@@ -547,18 +547,18 @@ EXAMPLE: example tropicalLifting;   shows an example"
           kill LIFTRING;
           // replace @a by a in minpoly and in LIFT
           map phi=INTERRING,t,a,a;
-          mp=phi(mp);
+          mp=phi(mp);      
           LIFT=phi(LIFT);
           // pass now to a ring whithout @a and with a as parameter
           ring LIFTRING=(char(INTERRING),a),t,ls;
           minpoly=number(imap(INTERRING,mp));
           ideal LIFT=imap(INTERRING,LIFT);
           kill INTERRING;
-        }
+        }    
         // then export LIFT
-        export(LIFT);
+        export(LIFT); 
         // test the  result by resubstitution
-        setring GRUNDRING;
+        setring GRUNDRING;  
         list resubst;
         if (noresubst==0)
         {
@@ -567,12 +567,12 @@ EXAMPLE: example tropicalLifting;   shows an example"
             resubst=tropicalliftingresubstitute(substitute(i,t,t^(TP[jj][2])),list(LIFTRING),N*TP[jj][2],TP[jj][3]);
           }
           else
-          {
+          {      
             resubst=tropicalliftingresubstitute(substitute(i,t,t^(TP[jj][2])),list(LIFTRING),N*TP[jj][2]);
           }
         }
         setring BASERING;
-        // Finally, if t has been replaced by t^N, then we have to change the
+        // Finally, if t has been replaced by t^N, then we have to change the 
         // third entry of TP by multiplying by N.
         if (noabs==1)
         {
@@ -597,13 +597,13 @@ EXAMPLE: example tropicalLifting;   shows an example"
       "The procedure was called without findAll and no proper solution was found.";
       "The procedure will be restarted with the option 'findAll'.";
       "Go on by hitting RETURN!";
-      findall=1;
+      findall=1;    
       noabs=0;
       setring CUTDOWNRING;
       int hadproblems;
       "i";i;
       "ini";tInitialIdeal(i,w,1);
-
+      
 /*
       setring GRUNDRING;
       list repl=imap(CUTDOWNRING,repl);
@@ -629,26 +629,26 @@ EXAMPLE: example tropicalLifting;   shows an example"
   ///////////////////////////////////////////////////////////
   if (voice+printlevel>=2)
   {
-
+      
       "The procedure has created a list of lists. The jth entry of this list
 contains a ring, an integer and an intvec.
 In this ring lives an ideal representing the wanted lifting,
 if the integer is N then in the parametrisation t has to be replaced by t^1/N,
-and if the ith component of the intvec is w[i] then the ith component in LIFT
+and if the ith component of the intvec is w[i] then the ith component in LIFT 
 should be multiplied by t^-w[i]/N in order to get the parametrisation.
-
+   
 Suppose your list has the name L, then you can access the 1st ring via:
 ";
     if (findall==1)
     {
-      "def LIFTRing=L[1][1]; setring LIFTRing; LIFT;
+      "def LIFTRing=L[1][1]; setring LIFTRing; LIFT; 
 ";
     }
     else
     {
-      "def LIFTRing=L[1]; setring LIFTRing; LIFT;
+      "def LIFTRing=L[1]; setring LIFTRing; LIFT; 
 ";
-    }
+    }  
   }
   if (findall==1) // if all solutions have been computed, return a list of lists
   {
@@ -673,7 +673,7 @@ example
    list LIST=tropicalLifting(i,w,4);
    def LIFTRing=LIST[1];
    setring LIFTRing;
-   // LIFT contains the first 4 terms of a point in the variety of i
+   // LIFT contains the first 4 terms of a point in the variety of i 
    // over the Puiseux series field C{{t}} whose order is -w[1]/w[0]=1
    LIFT;
    // Since the computations were done over Q a field extension was necessary,
@@ -701,7 +701,7 @@ example
    // only after we multiply LIFT[3] by t^k with k=-LIST[4][3];
    // NOTE: since the last component of v is positive, the lifting
    //       must start with a negative power of t, which in Singular
-   //       is not allowed for a variable.
+   //       is not allowed for a variable. 
    def LIFTRing3=LIST[1];
    setring LIFTRing3;
    LIFT;
@@ -755,24 +755,24 @@ EXAMPLE:     example displayTropicalLifting;   shows an example"
       string Kstring="Z/"+string(char(LIFTRing))+"Z";
     }
     if (size(troplift)==4) // this means that tropicalLifting was called with absolute primary decomposition
-    {
+    {      
       setring LIFTRing;
       "The lifting of the point in the tropical variety lives in the ring";
       if ((size(LIFTpar)==0) and (N==1))
       {
-        Kstring+"[[t]]";
+        Kstring+"[[t]]"; 
       }
       if ((size(LIFTpar)==0) and (N!=1))
       {
-        Kstring+"[[t^(1/"+string(N)+")]]";
+        Kstring+"[[t^(1/"+string(N)+")]]"; 
       }
       if ((size(LIFTpar)!=0) and (N!=1))
-      {
-        Kstring+"["+LIFTpar+"]/"+string(minpoly)+"[[t^(1/"+string(N)+")]]";
+      {    
+        Kstring+"["+LIFTpar+"]/"+string(minpoly)+"[[t^(1/"+string(N)+")]]";  
       }
       if ((size(LIFTpar)!=0) and (N==1))
-      {
-        Kstring+"["+LIFTpar+"]/"+string(minpoly)+"[[t]]";
+      {    
+        Kstring+"["+LIFTpar+"]/"+string(minpoly)+"[[t]]";  
       }
     }
     else // tropicalLifting was called with the option noAbs
@@ -789,17 +789,17 @@ EXAMPLE:     example displayTropicalLifting;   shows an example"
         Kstring+"[[t^(1/"+string(N)+")]]";
       }
       if ((size(LIFTpar)!=0) and (N!=1))
-      {
-        Kstring+"["+LIFTpar+"]/M[[t^(1/"+string(N)+")]]";
+      {    
+        Kstring+"["+LIFTpar+"]/M[[t^(1/"+string(N)+")]]";  
         "where M is the maximal ideal";
         "M=<"+m+">";
       }
       if ((size(LIFTpar)!=0) and (N==1))
-      {
-        Kstring+"["+LIFTpar+"]/M[[t]]";
+      {    
+        Kstring+"["+LIFTpar+"]/M[[t]]";  
         "where M is the maximal ideal";
         "M=<"+m+">";
-      }
+      }      
     }
     "";
     "The lifting has the form:";
@@ -826,7 +826,7 @@ EXAMPLE:     example displayTropicalLifting;   shows an example"
         }
       }
     }
-  }
+  }      
 }
 example
 {
@@ -840,28 +840,28 @@ example
 
 
 ////////////////////////////////////////////////////////////////////////////////////
-/// Procedures concerned with drawing a tropical curve or a Newton subdivision
+/// Procedures concerned with drawing a tropical curve or a Newton subdivision 
 ////////////////////////////////////////////////////////////////////////////////////
 proc tropicalCurve (def tp,list #)
 "USAGE:      tropicalCurve(tp[,#]); tp list, # optional list
-ASSUME:      tp is list of linear polynomials of the form ax+by+c with integers a, b and a rational number c
+ASSUME:      tp is list of linear polynomials of the form ax+by+c with integers a, b and a rational number c 
              representing a tropical Laurent polynomial defining a tropical plane curve;
              alternatively tp can be a polynomial in Q(t)[x,y] defining a tropical plane curve
-             via the valuation map;
+             via the valuation map; 
              the basering must have a global monomial ordering, two variables and up to one parameter!
-RETURN:      list, each entry i=1,...,size(l)-1 corresponds to a vertex in the tropical plane
+RETURN:      list, each entry i=1,...,size(l)-1 corresponds to a vertex in the tropical plane 
                    curve defined by tp
                    l[i][1] = x-coordinate of the ith vertex
                    l[i][2] = y-coordinate of the ith vertex
                    l[i][3] = intmat, if j is an entry in the first row of intmat then the ith vertex of
                              the tropical curve is connected to the jth vertex with multiplicity given
                              by the corresponding entry in the second row
-                   l[i][4] = list of lists, the first entry of a list is a primitive integer vector
-                             defining the direction of an unbounded edge emerging from the ith vertex
+                   l[i][4] = list of lists, the first entry of a list is a primitive integer vector 
+                             defining the direction of an unbounded edge emerging from the ith vertex 
                              of the graph, the corresponding second entry in the list is the multiplicity
                              of the unbounded edge
                    l[i][5] = a polynomial whose monomials mark the vertices in the Newton polygon
-                             corresponding to the entries in tp which take the common minimum
+                             corresponding to the entries in tp which take the common minimum 
                              at the ith vertex -- if some coefficient a or b of the linear polynomials
                              in the input was negative, then each monomial has to be shifted by
                              the values in l[size(l)][3]
@@ -884,14 +884,14 @@ EXAMPLE:     example tropicalCurve;   shows an example"
     ERROR("The basering should have a global monomial ordering, e.g. ring r=(0,t),(x,y),dp;");
   }
   // if you insert a single polynomial instead of an ideal representing a tropicalised polynomial,
-  // then we compute first the tropicalisation of this polynomial -- this feature is not
+  // then we compute first the tropicalisation of this polynomial -- this feature is not 
   // documented in the above help string
   if (typeof(tp)=="poly")
   {
     // exclude the case that the basering has not precisely one parameter and two indeterminates
     if ((npars(basering)!=1) or (nvars(basering)!=2))
     {
-      ERROR("The basering should have precisely one parameter and two indeterminates!");
+      ERROR("The basering should have precisely one parameter and two indeterminates!");      
     }
     poly f=tp;
     kill tp;
@@ -900,7 +900,7 @@ EXAMPLE:     example tropicalCurve;   shows an example"
   // Exclude the case that the basering has more than 2 indeterminates
   if (nvars(basering) != 2)
   {
-    ERROR("The basering should have precisely two indeterminates!");
+    ERROR("The basering should have precisely two indeterminates!");      
   }
   // -1) Exclude the pathological case that the defining tropical polynomial has only one term,
   //    so that the tropical variety is not defined.
@@ -909,7 +909,7 @@ EXAMPLE:     example tropicalCurve;   shows an example"
     ERROR("A monomial does not define a tropical curve!");
     intmat M[2][1]=0,0;
     return(list(list(0,0,M,list(),detropicalise(tp[1])),list(list(leadexp(detropicalise(tp[1]))),list())));
-  }
+  }    
   // 0) If the input was a list of linear polynomials, then some coefficient of x or y can be negative,
   //    i.e. the input corresponds to the tropical curve of a Laurent polynomial. In that case we should
   //    add some ax+by, so that all coefficients are positive. This does not change the tropical curve.
@@ -924,7 +924,7 @@ EXAMPLE:     example tropicalCurve;   shows an example"
     if (koeffizienten(tp[i],2)<bb)
     {
       bb=koeffizienten(tp[i],2);
-    }
+    }    
   }
   if ((aa!=0) or (bb!=0))
   {
@@ -941,19 +941,19 @@ EXAMPLE:     example tropicalCurve;   shows an example"
   {
     return(bunchOfLines(tp));
   }
-  // 2) store all vertices belonging to the ith part of the
+  // 2) store all vertices belonging to the ith part of the 
   //    Newton subdivision in the list vtp[i] as 4th entry,
   //    and store those, which are not corners of the ith subdivision polygon
   //    in vtp[i][6]
-  poly nwt;
+  poly nwt; 
   list boundaryNSD;  // stores the boundary of a Newton subdivision
-  intmat zwsp[2][1]; // used for intermediate storage
+  intmat zwsp[2][1]; // used for intermediate storage    
   for (i=1;i<=size(vtp);i++)
   {
     k=1;
     nwt=vtp[i][3]; // the polynomial representing the ith part of the Newton subdivision
     // store the vertices of the ith part of the Newton subdivision in the list newton
-    list newton;
+    list newton;  
     while (nwt!=0)
     {
       newton[k]=leadexp(nwt);
@@ -963,7 +963,7 @@ EXAMPLE:     example tropicalCurve;   shows an example"
     boundaryNSD=findOrientedBoundary(newton);// a list of the vertices of the Newton subdivision as integer vectors (only those on the boundary, and oriented clockwise)
     vtp[i][4]=boundaryNSD[1];
     vtp[i][5]=boundaryNSD[2];
-    vtp[i][6]=zwsp; // the entries of the first row will denote to which vertex the ith one is connected
+    vtp[i][6]=zwsp; // the entries of the first row will denote to which vertex the ith one is connected 
                  // and the entries of the second row will denote with which multiplicity
     kill newton; // we kill the superflous list
   }
@@ -983,21 +983,21 @@ EXAMPLE:     example tropicalCurve;   shows an example"
     pairs[i]=ipairs;
     kill ipairs;
   }
-  // 4) Check for all pairs of verticies in the Newton diagram if they
+  // 4) Check for all pairs of verticies in the Newton diagram if they 
   //    occur in two different parts of the Newton subdivision
   int deleted; // if a pair occurs in two NSD, it can be removed from both - deleted is then set to 1
   list inneredges; // contains the list of all pairs contained in two NSD - these are inner the edges of NSD
   int ggt;
   d=1;  // counts the inner edges
   for (i=1;i<=size(pairs)-1;i++)
-  {
+  {  
     for (j=i+1;j<=size(pairs);j++)
     {
       for (k=size(pairs[i]);k>=1;k--)
       {
         deleted=0;
         for (l=size(pairs[j]);l>=1 and deleted==0;l--)
-        {
+        {  
           if (((pairs[i][k][1]==pairs[j][l][1]) and (pairs[i][k][2]==pairs[j][l][2])) or ((pairs[i][k][1]==pairs[j][l][2]) and (pairs[i][k][2]==pairs[j][l][1])))
           {
             inneredges[d]=pairs[i][k];  // the new inner edge is saved in inneredges,
@@ -1061,7 +1061,7 @@ EXAMPLE:     example tropicalCurve;   shows an example"
   int gestorben; // tests if unbounded edges are multiple
   for (i=1;i<=size(pairs);i++)
   {
-    list ubedges; // stores the unbounded edges
+    list ubedges; // stores the unbounded edges 
     k=1; // counts the unbounded edges
     for (j=1;j<=size(pairs[i]);j++)
     {
@@ -1113,7 +1113,7 @@ EXAMPLE:     example tropicalCurve;   shows an example"
     gr[2]=vtp[i][2];  // the second coordinate of the ith vertex of the tropical curve
     gr[3]=vtp[i][6];  // to which vertices is the ith vertex of the tropical curve connected
     gr[4]=vtp[i][7];  // the directions unbounded edges emerging from the ith vertex of the trop. curve
-    gr[5]=vtp[i][3];  // the vertices of the boundary of the ith part of the NSD
+    gr[5]=vtp[i][3];  // the vertices of the boundary of the ith part of the NSD 
     graph[i]=gr;
   }
   // 9) Shift the Newton subdivision by (aa,bb) if necessary
@@ -1148,45 +1148,45 @@ example
    size(graph)-1;
 // the coordinates of the first vertex are graph[1][1],graph[1][2];
    graph[1][1],graph[1][2];
-// the first vertex is connected to the vertices
+// the first vertex is connected to the vertices 
 //     graph[1][3][1,1..ncols(graph[1][3])]
    intmat M=graph[1][3];
    M[1,1..ncols(graph[1][3])];
-// the weights of the edges to these vertices are
+// the weights of the edges to these vertices are 
 //     graph[1][3][2,1..ncols(graph[1][3])]
    M[2,1..ncols(graph[1][3])];
 // from the first vertex emerge size(graph[1][4]) unbounded edges
    size(graph[1][4]);
-// the primitive integral direction vector of the first unbounded edge
+// the primitive integral direction vector of the first unbounded edge 
 //     of the first vertex
    graph[1][4][1][1];
 // the weight of the first unbounded edge of the first vertex
    graph[1][4][1][2];
-// the monomials which are part of the Newton subdivision of the first vertex
+// the monomials which are part of the Newton subdivision of the first vertex 
    graph[1][5];
-// connecting the points in graph[size(graph)][1] we get
+// connecting the points in graph[size(graph)][1] we get 
 //     the boundary of the Newton polytope
    graph[size(graph)][1];
-// an entry in graph[size(graph)][2] is a pair of points
+// an entry in graph[size(graph)][2] is a pair of points 
 //     in the Newton polytope bounding an inner edge
    graph[size(graph)][2][1];
 }
 
 proc drawTropicalCurve (def f,list #)
 "USAGE:      drawTropicalCurve(f[,#]); f poly or list, # optional list
-ASSUME:      f is list of linear polynomials of the form ax+by+c with integers a, b and a rational number c
+ASSUME:      f is list of linear polynomials of the form ax+by+c with integers a, b and a rational number c 
              representing a tropical Laurent polynomial defining a tropical plane curve;
              alternatively f can be a polynomial in Q(t)[x,y] defining a tropical plane curve
-             via the valuation map;
+             via the valuation map; 
              the basering must have a global monomial ordering, two variables and up to one parameter!
 RETURN:      NONE
-NOTE:        - the procedure produces the files /tmp/tropicalcurveNUMBER.tex and
-               /tmp/tropicalcurveNUMBER.ps, where NUMBER is a random four digit integer;
+NOTE:        - the procedure produces the files /tmp/tropicalcurveNUMBER.tex and 
+               /tmp/tropicalcurveNUMBER.ps, where NUMBER is a random four digit integer; 
                moreover it displays the tropical curve defined by f via kghostview;
                if you wish to remove all these files from /tmp, call the procedure cleanTmp
 @*           - edges with multiplicity greater than one carry this multiplicity
 @*           - if # is empty, then the tropical curve is computed w.r.t. minimum, if #[1] is the
-               string 'max', then it is computed w.r.t. maximum
+               string 'max', then it is computed w.r.t. maximum 
 @*           - if the last optional argument is 'onlytexfile' then only the latex file
                is produced; this option should be used if kghostview is not installed on
                your system
@@ -1211,7 +1211,7 @@ EXAMPLE:     example drawTropicalCurve  shows an example"
     // exclude the case that the basering has not precisely one parameter and two indeterminates
     if ((npars(basering)!=1) or (nvars(basering)!=2))
     {
-      ERROR("The basering should have precisely one parameter and two indeterminates!");
+      ERROR("The basering should have precisely one parameter and two indeterminates!");      
     }
     texf=texPolynomial(f); // write the polynomial over Q(t)
     list graph=tropicalCurve(tropicalise(f,#),#); // the graph of the tropicalisation of f
@@ -1222,11 +1222,11 @@ EXAMPLE:     example drawTropicalCurve  shows an example"
     {
       texf="\\mbox{\\tt The defining equation was not handed over!}";
       list graph=f;
-    }
+    }   
     else
     { // write the tropical polynomial defined by f
       if (size(#)==0)
-      {
+      {      
         texf="\\min\\{";
       }
       else
@@ -1235,7 +1235,7 @@ EXAMPLE:     example drawTropicalCurve  shows an example"
       }
       for (j=1;j<=size(f);j++)
       {
-        texf=texf+texPolynomial(f[j]);
+        texf=texf+texPolynomial(f[j]);    
         if (j<size(f))
         {
           texf=texf+", ";
@@ -1244,7 +1244,7 @@ EXAMPLE:     example drawTropicalCurve  shows an example"
         {
           texf=texf+"\\}";
         }
-      }
+      }    
       list graph=tropicalCurve(f,#); // the graph of the tropical polynomial f
     }
   }
@@ -1262,19 +1262,19 @@ EXAMPLE:     example drawTropicalCurve  shows an example"
 \\addtolength{\\topmargin}{-\\headsep}
 \\addtolength{\\topmargin}{-\\headheight}
 \\addtolength{\\topmargin}{-\\topskip}
-\\setlength{\\textheight}{267mm}
+\\setlength{\\textheight}{267mm} 
 \\addtolength{\\textheight}{\\topskip}
 \\addtolength{\\textheight}{-\\footskip}
 \\addtolength{\\textheight}{-30pt}
-\\setlength{\\oddsidemargin}{-1in}
+\\setlength{\\oddsidemargin}{-1in} 
 \\addtolength{\\oddsidemargin}{20mm}
 \\setlength{\\evensidemargin}{\\oddsidemargin}
-\\setlength{\\textwidth}{170mm}
+\\setlength{\\textwidth}{170mm} 
 
 \\begin{document}
    \\parindent0cm
    \\begin{center}
-      \\large\\bf The Tropicalisation of
+      \\large\\bf The Tropicalisation of 
 
       \\bigskip
 
@@ -1298,14 +1298,14 @@ EXAMPLE:     example drawTropicalCurve  shows an example"
    \\vspace*{0.5cm}
 
    \\begin{center}
-       "+texDrawNewtonSubdivision(graph,#)+"
+       "+texDrawNewtonSubdivision(graph,#)+" 
    \\end{center}
 \\end{document}";
   if(defined(onlytexfile)==0)
   {
     int rdnum=random(1000,9999);
     write(":w /tmp/tropicalcurve"+string(rdnum)+".tex",TEXBILD);
-    system("sh","cd /tmp; latex /tmp/tropicalcurve"+string(rdnum)+".tex; dvips /tmp/tropicalcurve"+string(rdnum)+".dvi -o; /bin/rm tropicalcurve"+string(rdnum)+".log;  /bin/rm tropicalcurve"+string(rdnum)+".aux;  /bin/rm tropicalcurve"+string(rdnum)+".ps?;  /bin/rm tropicalcurve"+string(rdnum)+".dvi; kghostview tropicalcurve"+string(rdnum)+".ps &");
+    system("sh","cd /tmp; latex /tmp/tropicalcurve"+string(rdnum)+".tex; dvips /tmp/tropicalcurve"+string(rdnum)+".dvi -o; /bin/rm tropicalcurve"+string(rdnum)+".log;  /bin/rm tropicalcurve"+string(rdnum)+".aux;  /bin/rm tropicalcurve"+string(rdnum)+".ps?;  /bin/rm tropicalcurve"+string(rdnum)+".dvi; kghostview tropicalcurve"+string(rdnum)+".ps &");  
   }
   else
   {
@@ -1321,27 +1321,27 @@ example
 // the command drawTropicalCurve(f) computes the graph of the tropical curve
 // given by f and displays a post script image, provided you have kghostview
    drawTropicalCurve(f);
-// we can instead apply the procedure to a tropical polynomial
+// we can instead apply the procedure to a tropical polynomial and use "maximum"
    poly g=t3*(x7+y7+1)+1/t3*(x4+y4+x2+y2+x3y+xy3)+1/t21*x2y2;
    list tropical_g=tropicalise(g);
    tropical_g;
-   drawTropicalCurve(tropical_g);
+   drawTropicalCurve(tropical_g,"max");
 }
 
 proc drawNewtonSubdivision (def f,list #)
 "USAGE:   drawTropicalCurve(f[,#]); f poly, # optional list
-ASSUME:   f is list of linear polynomials of the form ax+by+c with integers a, b and a rational number c
+ASSUME:   f is list of linear polynomials of the form ax+by+c with integers a, b and a rational number c 
           representing a tropical Laurent polynomial defining a tropical plane curve;
           alternatively f can be a polynomial in Q(t)[x,y] defining a tropical plane curve
-          via the valuation map;
+          via the valuation map; 
           the basering must have a global monomial ordering, two variables and up to one parameter!
 RETURN:   NONE
-NOTE:     - the procedure produces the files /tmp/newtonsubdivisionNUMBER.tex,
-            and /tmp/newtonsubdivisionNUMBER.ps, where NUMBER is a random four digit integer;
+NOTE:     - the procedure produces the files /tmp/newtonsubdivisionNUMBER.tex, 
+            and /tmp/newtonsubdivisionNUMBER.ps, where NUMBER is a random four digit integer; 
             moreover it desplays the tropical curve defined by f via kghostview;
             if you wish to remove all these files from /tmp, call the procedure cleanTmp
 @*          if # is empty, then the tropical curve is computed w.r.t. minimum, if #[1] is the
-            string 'max', then it is computed w.r.t. maximum
+            string 'max', then it is computed w.r.t. maximum 
 @*        - note that lattice points in the Newton subdivision which are black correspond to markings
             of the marked subdivision, while lattice points in grey are not marked
 EXAMPLE:     example drawNewtonSubdivision;   shows an example"
@@ -1356,7 +1356,7 @@ EXAMPLE:     example drawNewtonSubdivision;   shows an example"
   else
   { // write the tropical polynomial defined by f
     if (size(#)==0)
-    {
+    {      
       texf="\\min\\{";
     }
     else
@@ -1365,7 +1365,7 @@ EXAMPLE:     example drawNewtonSubdivision;   shows an example"
     }
     for (j=1;j<=size(f);j++)
     {
-      texf=texf+texPolynomial(f[j]);
+      texf=texf+texPolynomial(f[j]);    
       if (j<size(f))
       {
         texf=texf+", ";
@@ -1374,7 +1374,7 @@ EXAMPLE:     example drawNewtonSubdivision;   shows an example"
       {
         texf=texf+"\\}";
       }
-    }
+    }    
     list graph=tropicalCurve(f,#); // the graph of the tropical polynomial f
   }
   string TEXBILD="\\documentclass[12pt]{amsart}
@@ -1382,7 +1382,7 @@ EXAMPLE:     example drawNewtonSubdivision;   shows an example"
 \\begin{document}
    \\parindent0cm
    \\begin{center}
-      \\large\\bf The Newtonsubdivison of
+      \\large\\bf The Newtonsubdivison of 
       \\begin{displaymath}
           f="+texf+"
       \\end{displaymath}
@@ -1390,13 +1390,13 @@ EXAMPLE:     example drawNewtonSubdivision;   shows an example"
    \\vspace*{1cm}
 
    \\begin{center}
-"+texDrawNewtonSubdivision(graph)+
+"+texDrawNewtonSubdivision(graph)+  
 "   \\end{center}
 
 \\end{document}";
   int rdnum=random(1000,9999);
   write(":w /tmp/newtonsubdivision"+string(rdnum)+".tex",TEXBILD);
-  system("sh","cd /tmp; latex /tmp/newtonsubdivision"+string(rdnum)+".tex; dvips /tmp/newtonsubdivision"+string(rdnum)+".dvi -o; /bin/rm newtonsubdivision"+string(rdnum)+".log;  /bin/rm newtonsubdivision"+string(rdnum)+".aux;  /bin/rm newtonsubdivision"+string(rdnum)+".ps?;  /bin/rm newtonsubdivision"+string(rdnum)+".dvi; kghostview newtonsubdivision"+string(rdnum)+".ps &");
+  system("sh","cd /tmp; latex /tmp/newtonsubdivision"+string(rdnum)+".tex; dvips /tmp/newtonsubdivision"+string(rdnum)+".dvi -o; /bin/rm newtonsubdivision"+string(rdnum)+".log;  /bin/rm newtonsubdivision"+string(rdnum)+".aux;  /bin/rm newtonsubdivision"+string(rdnum)+".ps?;  /bin/rm newtonsubdivision"+string(rdnum)+".dvi; kghostview newtonsubdivision"+string(rdnum)+".ps &");  
 //  return(TEXBILD);
 }
 example
@@ -1421,25 +1421,25 @@ example
 
 proc tropicalJInvariant (def f,list #)
 "USAGE:      tropicalJInvariant(f[,#]); f poly or list, # optional list
-ASSUME:      f is list of linear polynomials of the form ax+by+c with integers a, b and a rational number c
+ASSUME:      f is list of linear polynomials of the form ax+by+c with integers a, b and a rational number c 
              representing a tropical Laurent polynomial defining a tropical plane curve;
              alternatively f can be a polynomial in Q(t)[x,y] defining a tropical plane curve
-             via the valuation map;
+             via the valuation map; 
 @*           the basering must have a global monomial ordering, two variables and up to one parameter!
 RETURN:      number, if the graph underlying the tropical curve has precisely one loop then its weighted
                      lattice length is returned, otherwise the result will be -1
-NOTE:        - if the tropical curve is elliptic and its embedded graph has precisely one loop,
+NOTE:        - if the tropical curve is elliptic and its embedded graph has precisely one loop, 
                then the weigthed lattice length of the loop is its tropical j-invariant
-@*           - the procedure checks if the embedded graph of the tropical curve has genus one,
-               but it does NOT check if the loop can be resolved, so that the curve is not
-               a proper tropical elliptic curve
+@*           - the procedure checks if the embedded graph of the tropical curve has genus one, 
+               but it does NOT check if the loop can be resolved, so that the curve is not 
+               a proper tropical elliptic curve 
 @*           - if the embedded graph of a tropical elliptic curve has more than one loop, then
                all but one can be resolved, but this is not observed by this procedure, so it
                will not compute the j-invariant
 @*           - if # is empty, then the tropical curve is computed w.r.t. minimum, if #[1] is the
-               string 'max', then it is computed w.r.t. maximum
+               string 'max', then it is computed w.r.t. maximum 
 @*           - the tropicalJInvariant of a plane tropical cubic is the 'cycle length' of the
-               cubic as introduced in the paper:
+               cubic as introduced in the paper: 
                Erik Katz, Hannah Markwig, Thomas Markwig: The j-invariant of a cubic tropical plane curve.
 EXAMPLE:     example tropicalJInvariant;   shows an example"
 {
@@ -1453,7 +1453,7 @@ EXAMPLE:     example tropicalJInvariant;   shows an example"
     if (typeof(f)=="list")
     {
       if (typeof(f[1])=="list")
-      {
+      {        
         list graph=f;
       }
       else
@@ -1465,7 +1465,7 @@ EXAMPLE:     example tropicalJInvariant;   shows an example"
         else
         {
           ERROR("This is no valid input.");
-        }
+        }        
       }
     }
     else
@@ -1493,8 +1493,8 @@ EXAMPLE:     example tropicalJInvariant;   shows an example"
   }
   else
   {
-    intmat nullmat[2][1];  // used to set
-    // 4) find a vertex which has only one bounded edge, if none exists zero is returned,
+    intmat nullmat[2][1];  // used to set 
+    // 4) find a vertex which has only one bounded edge, if none exists zero is returned, 
     //    otherwise the number of the vertex in the list graph
     int nonloopvertex=findNonLoopVertex(graph);
     int dv; // checks if the vertex has been found to which the nonloopvertex is connected
@@ -1527,8 +1527,8 @@ EXAMPLE:     example tropicalJInvariant;   shows an example"
     // 6) find the loop and the weights of the edges
     intvec loop,weights; // encodes the loop and the edges
     i=1;
-    //    start by finding some vertex which belongs to the loop
-    while (loop==0)
+    //    start by finding some vertex which belongs to the loop 
+    while (loop==0) 
     {
       if (ncols(graph[i][3])==1) // the graph[i][3] of a vertex in the loop has 2 columns, all others have 1
       {
@@ -1536,8 +1536,8 @@ EXAMPLE:     example tropicalJInvariant;   shows an example"
       }
       else
       {
-        loop[1]=i; // a starting vertex is found
-        loop[2]=graph[i][3][1,1]; // it is connected to the vertex with this number
+        loop[1]=i; // a starting vertex is found 
+        loop[2]=graph[i][3][1,1]; // it is connected to the vertex with this number 
         weights[2]=graph[i][3][2,1]; // and the edge has this weight
       }
     }
@@ -1548,7 +1548,7 @@ EXAMPLE:     example tropicalJInvariant;   shows an example"
       // the first row of graph[j][3] has two entries corresponding to the two vertices
       // to which the active vertex j is connected; one is loop[k-1], i.e. the one which
       // precedes j in the loop; we have to choose the other one
-      if (graph[j][3][1,1]==loop[k-1])
+      if (graph[j][3][1,1]==loop[k-1]) 
       {
         loop[k+1]=graph[j][3][1,2];
         weights[k+1]=graph[j][3][2,2];
@@ -1559,24 +1559,24 @@ EXAMPLE:     example tropicalJInvariant;   shows an example"
         weights[k+1]=graph[j][3][2,1];
       }
       j=loop[k+1]; // set loop[k+1] the new active vertex
-      k++;
-    }
+      k++; 
+    }    
     // 7) compute for each edge in the loop the lattice length
     poly xcomp,ycomp; // the x- and y-components of the vectors connecting two vertices of the loop
     number nenner;    // the product of the denominators of the x- and y-components
     number jinvariant;  // the j-invariant
-    int eins,zwei,ggt;
+    int eins,zwei,ggt;  
     for (i=1;i<=size(loop)-1;i++) // compute the lattice length for each edge
     {
-      xcomp=graph[loop[i]][1]-graph[loop[i+1]][1];
-      ycomp=graph[loop[i]][2]-graph[loop[i+1]][2];
+      xcomp=graph[loop[i]][1]-graph[loop[i+1]][1]; 
+      ycomp=graph[loop[i]][2]-graph[loop[i+1]][2]; 
       nenner=denominator(leadcoef(xcomp))*denominator(leadcoef(ycomp));
-      execute("eins="+string(numerator(leadcoef(nenner*xcomp)))+";");
-      execute("zwei="+string(numerator(leadcoef(nenner*ycomp)))+";");
+      execute("eins="+string(numerator(leadcoef(nenner*xcomp)))+";"); 
+      execute("zwei="+string(numerator(leadcoef(nenner*ycomp)))+";"); 
       ggt=gcd(eins,zwei); // the lattice length is the "gcd" of the x-component and the y-component
       jinvariant=jinvariant+ggt/(nenner*weights[i+1]); // divided by the weight of the edge
     }
-    return(jinvariant);
+    return(jinvariant);   
   }
 }
 example
@@ -1590,23 +1590,23 @@ example
    tropicalJInvariant(x+y+x2y+xy2+1/t*xy);
 // the curve can have arbitrary degree
    tropicalJInvariant(t*(x7+y7+1)+1/t*(x4+y4+x2+y2+x3y+xy3)+1/t7*x2y2);
-// the procedure does not realise, if the embedded graph of the tropical
+// the procedure does not realise, if the embedded graph of the tropical 
 //     curve has a loop that can be resolved
    tropicalJInvariant(1+x+y+xy+tx2y+txy2);
 // but it does realise, if the curve has no loop at all ...
    tropicalJInvariant(x+y+1);
-// or if the embedded graph has more than one loop - even if only one
+// or if the embedded graph has more than one loop - even if only one 
 //     cannot be resolved
    tropicalJInvariant(1+x+y+xy+tx2y+txy2+t3x5+t3y5+tx2y2+t2xy4+t2yx4);
 }
 
 proc weierstrassForm (poly f,list #)
 "USAGE:      weierstrassFormOfACubic(wf[,#]); wf poly, # list
-ASSUME:      wf is a polynomial whose Newton polygon has precisely one interior lattice
+ASSUME:      wf is a a polynomial whose Newton polygon has precisely one interior lattice
              point, so that it defines an elliptic curve on the toric surface corresponding
              to the Newton polygon
 RETURN:      poly, the Weierstrass normal form of the polygon
-NOTE:        - the algorithm for the coefficients of the Weierstrass form is due to
+NOTE:        - the algorithm for the coefficients of the Weierstrass form is due to 
                Fernando Rodriguez Villegas, villegas@math.utexas.edu
 @*           - the characteristic of the base field should not be 2 or 3
 @*           - if an additional argument # is given, a simplified Weierstrass form
@@ -1668,11 +1668,11 @@ example
 }
 
 proc jInvariant (poly f,list #)
-"USAGE:      jInvariant(f[,#]); f poly, # list
-ASSUME:      - f is a polynomial whose Newton polygon has precisely one interior lattice
+"USAGE:      jInvariant(f[,#]); f poly, # list 
+ASSUME:      - f is a a polynomial whose Newton polygon has precisely one interior lattice
                point, so that it defines an elliptic curve on the toric surface corresponding
                to the Newton polygon
-@*           - it the optional argument # is present the base field should be Q(t) and
+@*           - it the optional argument # is present the base field should be Q(t) and 
                the optional argument should be one of the following strings:
 @*             'ord'   : then the return value is of type integer, namely the order of the j-invariant
 @*             'split' : then the return value is a list of two polynomials, such that the quotient
@@ -1703,9 +1703,9 @@ example
    "EXAMPLE:";
    echo=2;
    ring r=(0,t),(x,y),dp;
-// jInvariant computes the j-invariant of a cubic
+// jInvariant computes the j-invariant of a cubic 
    jInvariant(x+y+x2y+y3+1/t*xy);
-// if the ground field has one parameter t, then we can instead
+// if the ground field has one parameter t, then we can instead 
 //    compute the order of the j-invariant
    jInvariant(x+y+x2y+y3+1/t*xy,"ord");
 // one can compare the order of the j-invariant to the tropical j-invariant
@@ -1713,7 +1713,7 @@ example
 // the following curve is elliptic as well
    poly h=x22y11+x19y10+x17y9+x16y9+x12y7+x9y6+x7y5+x2y3+x14y8;
 // its j-invariant is
-   jInvariant(h);
+   jInvariant(h);  
 }
 
 
@@ -1776,7 +1776,7 @@ EXAMPLE:     example conicWithTangents;   shows an example"
   // compute the tropical coordinates of the points - part 2
   ring tRING=0,t,ls;
   list pointdenom=imap(BASERING,pointdenom);
-  list pointnum=imap(BASERING,pointnum);
+  list pointnum=imap(BASERING,pointnum);  
   intvec pointcoordinates;
   for (i=1;i<=size(pointdenom);i++)
   {
@@ -1852,7 +1852,7 @@ EXAMPLE:     example conicWithTangents;   shows an example"
 
    We consider the concic through the following five points:
    \\begin{displaymath}
-";
+";  
   string texf=texDrawTropical(graphf,list("",scalefactor));
   for (i=1;i<=size(points);i++)
   {
@@ -1890,12 +1890,12 @@ EXAMPLE:     example conicWithTangents;   shows an example"
 
 \\end{document}";
   setring BASERING;
-  // If # non-empty, compute the dual conic and the tangents through the dual points
+  // If # non-empty, compute the dual conic and the tangents through the dual points 
   // corresponding to the tangents of the given conic.
   if (size(#)>0)
   {
     list dualpoints;
-    for (i=1;i<=size(points);i++)
+    for (i=1;i<=size(points);i++) 
     {
       dualpoints[i]=list(leadcoef(tangents[i])/substitute(tangents[i],x,0,y,0),leadcoef(tangents[i]-lead(tangents[i]))/substitute(tangents[i],x,0,y,0));
     }
@@ -1919,30 +1919,30 @@ example
    conic[1];
 // conic[2] is the equation of the conic f passing through the five points
    conic[2];
-// conic[3] is a list containing the equations of the tangents
+// conic[3] is a list containing the equations of the tangents 
 //          through the five points
    conic[3];
 // conic[4] is an ideal representing the tropicalisation of the conic f
    conic[4];
-// conic[5] is a list containing the tropicalisation
+// conic[5] is a list containing the tropicalisation 
 //          of the five tangents in conic[3]
    conic[5];
-// conic[6] is a list containing the vertices of the tropical conic
+// conic[6] is a list containing the vertices of the tropical conic 
    conic[6];
 // conic[7] is a list containing the vertices of the five tangents
    conic[7];
-// conic[8] contains the latex code to draw the tropical conic and
-//          its tropicalised tangents; it can written in a file, processed and
-//          displayed via kghostview
-   write(":w /tmp/conic.tex",conic[8]);
-   system("sh","cd /tmp; latex /tmp/conic.tex; dvips /tmp/conic.dvi -o;
+// conic[8] contains the latex code to draw the tropical conic and 
+//          its tropicalised tangents; it can written in a file, processed and 
+//          displayed via kghostview 
+   write(":w /tmp/conic.tex",conic[8]);   
+   system("sh","cd /tmp; latex /tmp/conic.tex; dvips /tmp/conic.dvi -o; 
             kghostview conic.ps &");
-// with an optional argument the same information for the dual conic is computed
+// with an optional argument the same information for the dual conic is computed 
 //         and saved in conic[9]
    conic=conicWithTangents(points,1);
    conic[9][2]; // the equation of the dual conic
 }
-
+ 
 ////////////////////////////////////////////////////////////////////////////////////
 /// Procedures concerned with tropicalisation
 ////////////////////////////////////////////////////////////////////////////////////
@@ -1951,9 +1951,9 @@ proc tropicalise (poly f,list #)
 "USAGE:      tropicalise(f[,#]); f polynomial, # optional list
 ASSUME:      f is a polynomial in Q(t)[x_1,...,x_n]
 RETURN:      list, the linear forms of the tropicalisation of f
-NOTE:        if # is empty, then the valuation of t will be 1,
-@*           if # is the string 'max' it will be -1;
-@*           the latter supposes that we consider the maximum of the computed
+NOTE:        if # is empty, then the valuation of t will be 1, 
+@*           if # is the string 'max' it will be -1; 
+@*           the latter supposes that we consider the maximum of the the computed 
              linear forms, the former that we consider their minimum
 EXAMPLE:     example tropicalise;   shows an example"
 {
@@ -1976,7 +1976,7 @@ EXAMPLE:     example tropicalise;   shows an example"
     for (j=1;j<=nvars(basering);j++)
     {
       tropicalf[i]=tropicalf[i]+exp[j]*var(j);
-    }
+    }    
     f=f-lead(f);
   }
   return(tropicalf);
@@ -2012,7 +2012,7 @@ example
    tropicaliseSet(i);
 }
 
-proc tInitialForm (poly f, intvec w)
+proc tInitialForm (poly f, intvec w) 
 "USAGE:      tInitialForm(f,w); f a polynomial, w an integer vector
 ASSUME:      f is a polynomial in Q[t,x_1,...,x_n] and w=(w_0,w_1,...,w_n)
 RETURN:      poly, the t-initialform of f(t,x) w.r.t. w evaluated at t=1
@@ -2025,8 +2025,8 @@ EXAMPLE:     example tInitialForm;   shows an example"
   int gewicht=scalarproduct(w,leadexp(f));
   // do the same for the remaining part of f and compare the results
   // keep only the smallest ones
-  int vglgewicht;
-  f=f-lead(f);
+  int vglgewicht;  
+  f=f-lead(f); 
   while (f!=0)
   {
     vglgewicht=scalarproduct(w,leadexp(f));
@@ -2041,7 +2041,7 @@ EXAMPLE:     example tInitialForm;   shows an example"
       {
         initialf=initialf+lead(f);
       }
-    }
+    }    
     f=f-lead(f);
   }
   initialf=substitute(initialf,var(1),1);
@@ -2057,9 +2057,9 @@ example
    tInitialForm(f,w);
 }
 
-proc tInitialIdeal (ideal i,intvec w,list #)
+proc tInitialIdeal (ideal i,intvec w,list #) 
 "USAGE:      tInitialIdeal(i,w); i ideal, w intvec
-ASSUME:      i is an ideal in Q[t,x_1,...,x_n] and w=(w_0,...,w_n)
+ASSUME:      i is an ideal in Q[t,x_1,...,x_n] and w=(w_0,...,w_n) 
 RETURN:      ideal ini, the t-initial ideal of i with respect to w"
 {
   // THE PROCEDURE WILL BE CALLED FROM OTHER PROCEDURES INSIDE THIS LIBRARY;
@@ -2086,9 +2086,9 @@ RETURN:      ideal ini, the t-initial ideal of i with respect to w"
   ideal i=homog(std(imap(BASERING,i)),@s);
   // ... and compute a standard basis with
   // respect to the homogenised ordering defined by w. Since the generators
-  // of i will be homogeneous it we can instead take the ordering wp
-  // with the weightvector (0,w) replaced by (M,...,M)+(0,w) for some
-  // large M, so that all entries are positive
+  // of i will be homogeneous it we can instead take the ordering wp 
+  // with the weightvector (0,w) replaced by (M,...,M)+(0,w) for some 
+  // large M, so that all entries are positive 
   int M=-minInIntvec(w)[1]+1; // find M such that w[j]+M is strictly positive for all j
   intvec whomog=M+1;
   for (j=1;j<=size(w);j++)
@@ -2096,8 +2096,8 @@ RETURN:      ideal ini, the t-initial ideal of i with respect to w"
     whomog[j+1]=w[j]+M;
   }
   execute("ring WEIGHTRING=("+charstr(basering)+"),("+varstr(basering)+"),(wp("+string(whomog)+"));");
-  // map i to the new ring and compute a GB of i, then dehomogenise i,
-  // so that we can be sure, that the
+  // map i to the new ring and compute a GB of i, then dehomogenise i, 
+  // so that we can be sure, that the 
   // initial forms of the generators generate the initial ideal
   ideal i=subst(groebner(imap(HOMOGRING,i)),@s,1);
   // compute the w-initial ideal with the help of the procedure tInitialForm;
@@ -2342,7 +2342,7 @@ example
 
 proc texDrawBasic (list texdraw)
 "USAGE:      texDrawBasic(texdraw); list texdraw
-ASSUME:      texdraw is a list of strings representing texdraw commands (as produced by
+ASSUME:      texdraw is a list of strings representing texdraw commands (as produced by 
              texDrawTropical) which should be embedded into a texdraw environment
 RETURN:      string, a texdraw environment enclosing the input
 NOTE:        is called from conicWithTangents
@@ -2362,7 +2362,7 @@ EXAMPLE:     example texDrawBasic;   shows an example"
   texdrawtp=texdrawtp+"
     \\end{texdraw}";
   return(texdrawtp);
-}
+}  
 example
 {
    "EXAMPLE:";
@@ -2377,11 +2377,11 @@ proc texDrawTropical (list graph,list #)
 "USAGE:  texDrawTropical(graph[,#]); graph list, # optional list
 ASSUME:  graph is the output of tropicalCurve
 RETURN:  string, the texdraw code of the tropical plane curve encoded by graph
-NOTE:    - if the list # is non-empty, the first entry should be a string; if this string is 'max',
+NOTE:    - if the list # is non-empty, the first entry should be a string; if this string is 'max', 
            then the tropical curve is considered with respect to the maximum; otherwise the curve
-           is considered with respect to the minimum and the string can be used to
+           is considered with respect to the minimum and the string can be used to 
            insert further texdraw commands (e.g. to have a lighter image as when called
-           from inside conicWithTangents);
+           from inside conicWithTangents); 
 @*       - the procedure computes a scalefactor for the texdraw command which should
            help to display the curve in the right way; this may, however, be a bad idea
            if several texDrawTropical outputs are put together to form one image; the
@@ -2391,7 +2391,7 @@ EXAMPLE:     example texDrawTropical;   shows an example"
 {
   int i,j;
   // deal first with the pathological case that the input polynomial was a monomial
-  // and does therefore not define a tropical curve, and check if the Newton polytope is
+  // and does therefore not define a tropical curve, and check if the Newton polytope is 
   // a line segment so that the curve defines a bunch of lines
   int bunchoflines;
   if (size(graph[size(graph)][1])==1) // the boundary of the Newton polytope consists of a single point
@@ -2413,7 +2413,7 @@ EXAMPLE:     example texDrawTropical;   shows an example"
   }
   // go on with the case that a tropical curve is defined
   if (size(#)==0)
-  {
+  {    
      string texdrawtp="
 
        \\setgray 0.6";
@@ -2421,7 +2421,7 @@ EXAMPLE:     example texDrawTropical;   shows an example"
   else
   {
     if ((#[1]!="max") and (#[1]!=""))
-    {
+    {      
       string texdrawtp=#[1];
     }
     else
@@ -2544,7 +2544,7 @@ ASSUME:      graph is the output of tropicalCurve
 RETURN:      string, the texdraw code of the Newton subdivision of the tropical plane curve encoded by graph
 NOTE:        - the list # should contain as only entry a string; if this string is 'max', then
                the tropical curve is considered with respect to the maximum; otherwise the curve
-               is considered with respect to the minimum and the string can be used to
+               is considered with respect to the minimum and the string can be used to 
                insert further texdraw commands (e.g. to have a lighter image as when called
                from inside conicWithTangents); the list # is optional and may as well be empty
 @*           - note that lattice points in the Newton subdivision which are black correspond to markings
@@ -2553,7 +2553,7 @@ EXAMPLE:     example texDrawNewtonSubdivision;   shows an example"
 {
   int i,j,k,l;
   list boundary=graph[size(graph)][1];
-  list inneredges=graph[size(graph)][2];
+  list inneredges=graph[size(graph)][2];  
   intvec shiftvector=graph[size(graph)][3];
   string subdivision;
   // find the maximal and minimal x- and y-coordinates and define the scalefactor
@@ -2565,7 +2565,7 @@ EXAMPLE:     example texDrawNewtonSubdivision;   shows an example"
   }
   poly scalefactor=minOfPolys(list(12/leadcoef(maxx),12/leadcoef(maxy)));
   if (scalefactor<1)
-  {
+  {    
     subdivision=subdivision+"
        \\relunitscale"+ decimal(scalefactor);
   }
@@ -2573,18 +2573,18 @@ EXAMPLE:     example texDrawNewtonSubdivision;   shows an example"
   for (i=1;i<=size(boundary)-1;i++)
   {
     subdivision=subdivision+"
-        \\move ("+string(boundary[i][1])+" "+string(boundary[i][2])+")
+        \\move ("+string(boundary[i][1])+" "+string(boundary[i][2])+")        
         \\lvec ("+string(boundary[i+1][1])+" "+string(boundary[i+1][2])+")";
-  }
+  } 
   subdivision=subdivision+"
-        \\move ("+string(boundary[size(boundary)][1])+" "+string(boundary[size(boundary)][2])+")
+        \\move ("+string(boundary[size(boundary)][1])+" "+string(boundary[size(boundary)][2])+")        
         \\lvec ("+string(boundary[1][1])+" "+string(boundary[1][2])+")
 
     ";
   for (i=1;i<=size(inneredges);i++)
   {
     subdivision=subdivision+"
-        \\move ("+string(inneredges[i][1][1])+" "+string(inneredges[i][1][2])+")
+        \\move ("+string(inneredges[i][1][1])+" "+string(inneredges[i][1][2])+")        
         \\lvec ("+string(inneredges[i][2][1])+" "+string(inneredges[i][2][2])+")";
   }
   // add lattice points if the scalefactor is >= 1/2
@@ -2604,7 +2604,7 @@ EXAMPLE:     example texDrawNewtonSubdivision;   shows an example"
         \\htext (-0.3 0.1){{\\tiny $(0,0)$}}";
     }
   }
-  // deal with the pathological cases
+  // deal with the pathological cases 
   if (size(boundary)==1) // then the Newton polytope is a point
   {
     subdivision=subdivision+"
@@ -2659,13 +2659,13 @@ EXAMPLE:     example texDrawNewtonSubdivision;   shows an example"
   for (i=1;i<=size(markings);i++)
   {
     subdivision=subdivision+"
-       \\move ("+string(markings[i][1])+" "+string(markings[i][2])+")
+       \\move ("+string(markings[i][1])+" "+string(markings[i][2])+") 
        \\fcir f:0 r:"+decimal(2/(8*scalefactor),size(string(int(scalefactor)))+1);
   }
   // enclose subdivision in the texdraw environment
-  string texsubdivision="
+  string texsubdivision="     
     \\begin{texdraw}
-       \\drawdim cm  \\relunitscale 1
+       \\drawdim cm  \\relunitscale 1 
        \\linewd 0.05"
     +subdivision+"
    \\end{texdraw}
@@ -2679,7 +2679,7 @@ example
    ring r=(0,t),(x,y),dp;
    poly f=x+y+x2y+xy2+1/t*xy;
    list graph=tropicalCurve(f);
-// compute the texdraw code of the Newton subdivision of the tropical curve
+// compute the texdraw code of the Newton subdivision of the tropical curve 
    texDrawNewtonSubdivision(graph);
 }
 
@@ -2706,7 +2706,7 @@ EXAMPLE:     example texDrawTriangulation;   shows an example"
     pairs[3*i]=intvec(triang[i][3],triang[i][1]);
     markings[3*i-2]=triang[i][1];
     markings[3*i-1]=triang[i][2];
-    markings[3*i]=triang[i][3];
+    markings[3*i]=triang[i][3];    
   }
   // delete redundant pairs which occur more than once
   for (i=size(pairs);i>=1;i--)
@@ -2739,21 +2739,21 @@ EXAMPLE:     example texDrawTriangulation;   shows an example"
   for (i=1;i<=size(markings);i++)
   {
     latex=latex+"
-        \\move ("+string(polygon[markings[i]][1])+" "+string(polygon[markings[i]][2])+")
+        \\move ("+string(polygon[markings[i]][1])+" "+string(polygon[markings[i]][2])+")        
         \\fcir f:0 r:0.08";
   }
   // next draw all edges in black
   for (i=1;i<=size(pairs);i++)
   {
     latex=latex+"
-        \\move ("+string(polygon[pairs[i][1]][1])+" "+string(polygon[pairs[i][1]][2])+")
+        \\move ("+string(polygon[pairs[i][1]][1])+" "+string(polygon[pairs[i][1]][2])+")        
         \\lvec ("+string(polygon[pairs[i][2]][1])+" "+string(polygon[pairs[i][2]][2])+")";
   }
   // finally daw all marked points of the polygon in small gray
   for (i=1;i<=size(polygon);i++)
   {
     latex=latex+"
-        \\move ("+string(polygon[i][1])+" "+string(polygon[i][2])+")
+        \\move ("+string(polygon[i][1])+" "+string(polygon[i][2])+")        
         \\fcir f:0.7 r:0.04";
   }
   return(latex);
@@ -2762,11 +2762,11 @@ example
 {
    "EXAMPLE:";
    echo=2;
-   // the lattice polygon spanned by the points (0,0), (3,0) and (0,3)
+   // the lattice polygon spanned by the points (0,0), (3,0) and (0,3) 
    // with all integer points as markings
    list polygon=intvec(1,1),intvec(3,0),intvec(2,0),intvec(1,0),intvec(0,0),
                 intvec(2,1),intvec(0,1),intvec(1,2),intvec(0,2),intvec(0,3);
-   // define a triangulation by connecting the only interior point
+   // define a triangulation by connecting the only interior point 
    //        with the vertices
    list triang=intvec(1,2,5),intvec(1,5,10),intvec(1,2,10);
    // produce the texdraw output of the triangulation triang
@@ -2774,7 +2774,7 @@ example
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
-/// Auxilary Procedures
+/// Auxilary Procedures 
 ////////////////////////////////////////////////////////////////////////////////////
 
 proc radicalMemberShip (poly f,ideal i)
@@ -2828,11 +2828,11 @@ EXAMPLE:     example tInitialFormPar;   shows an example"
   int gewicht=leitkoef[1]+scalarproduct(w,leadexp(f));
   // do the same for the remaining part of f and compare the results
   // keep only the smallest ones
-  int vglgewicht;
-  f=f-lead(f);
+  int vglgewicht;  
+  f=f-lead(f);  
   while (f!=0)
   {
-    leitkoef=simplifyToOrder(f);
+    leitkoef=simplifyToOrder(f);    
     vglgewicht=leitkoef[1]+scalarproduct(w,leadexp(f));
     if (vglgewicht<gewicht)
     {
@@ -2847,7 +2847,7 @@ EXAMPLE:     example tInitialFormPar;   shows an example"
         execute("koef="+leitkoef[2]+";");
         initialf=initialf+koef*leadmonom(f);
       }
-    }
+    }    
     f=f-lead(f);
   }
   return(initialf);
@@ -2871,7 +2871,7 @@ EXAMPLE:     example tInitialFormParMax;   shows an example"
 {
   // compute first the t-order of the leading coefficient of f (leitkoef[1]) and
   // the rational constant corresponding to this order in leadkoef(f) (leitkoef[2])
-  list leitkoef=simplifyToOrder(f);
+  list leitkoef=simplifyToOrder(f);  
   execute("poly koef="+leitkoef[2]+";");
   // take in lead(f) only the term of lowest t-order and set t=1
   poly initialf=koef*leadmonom(f);
@@ -2880,7 +2880,7 @@ EXAMPLE:     example tInitialFormParMax;   shows an example"
   // do the same for the remaining part of f and compare the results
   // keep only the largest ones
   int vglgewicht;
-  f=f-lead(f);
+  f=f-lead(f);  
   while (f!=0)
   {
     leitkoef=simplifyToOrder(f);
@@ -2898,7 +2898,7 @@ EXAMPLE:     example tInitialFormParMax;   shows an example"
         execute("koef="+leitkoef[2]+";");
         initialf=initialf+koef*leadmonom(f);
       }
-    }
+    }    
     f=f-lead(f);
   }
   return(initialf);
@@ -2915,7 +2915,7 @@ example
 
 proc solveTInitialFormPar (ideal i)
 "USAGE:      solveTInitialFormPar(i); i ideal
-ASSUME:      i is a zero-dimensional ideal in Q(t)[x_1,...,x_n] generated by the (1,w)-homogeneous
+ASSUME:      i is a zero-dimensional ideal in Q(t)[x_1,...,x_n] generated by the (1,w)-homogeneous 
              elements for some integer vector w - i.e. by the (1,w)-initialforms of polynomials
 RETURN:      none
 NOTE:        the procedure just displays complex approximations of the solution set of i
@@ -2940,7 +2940,7 @@ example
    solveTInitialFormPar(i);
 }
 
-proc detropicalise (poly p)
+proc detropicalise (poly p) 
 "USAGE:      detropicalise(f); f poly
 ASSUME:      f is a linear polynomial with an arbitrary constant term and
              positive integer coefficients as further coefficients;
@@ -2952,7 +2952,7 @@ EXAMPLE:     example detropicalise;   shows an example"
   while (p!=0)
   {
     if (leadmonom(p)!=1)
-    {
+    { 
       dtp=dtp*leadmonom(p)^int(leadcoef(p));
     }
     p=p-lead(p);
@@ -3056,14 +3056,14 @@ example
    ring r=(0,t),(x,y),dp;
    poly f=t2x+1/t*y-1;
    tropicalSubst(f,2,x,x+t,y,tx+y+t2);
-   // The procedure can be used to study the effect of a transformation of
+   // The procedure can be used to study the effect of a transformation of 
    // the form x -> x+t^b, with b a rational number, on the tropicalisation and
    // the j-invariant of a cubic over the Puiseux series.
    f=t7*y3+t3*y2+t*(x3+xy2+y+1)+xy;
    // - the j-invariant, and hence its valuation, does not change under the transformation
    jInvariant(f,"ord");
-   // - b=3/2, then the cycle length of the tropical cubic equals -val(j-inv)
-   list g32=tropicalSubst(f,2,x,x+t3,y,y);
+   // - b=3/2, then the cycle length of the tropical cubic equals -val(j-inv)   
+   list g32=tropicalSubst(f,2,x,x+t3,y,y);  
    tropicalJInvariant(g32);
    // - b=1, then it is still true, but only just ...
    list g1=tropicalSubst(f,1,x,x+t,y,y);
@@ -3074,11 +3074,11 @@ example
 }
 
 proc randomPoly (int d,int ug, int og, list #)
-"USAGE:      randomPoly(d,ug,og[,#]);   d, ug, og int, # list
+"USAGE:      randomPoly(d,ug,og[,#]);   d, ug, og int, # list 
 ASSUME:      the basering has a parameter t
 RETURN:      poly, a polynomial of degree d where the coefficients are of the form t^j with
                    j a random integer between ug and og
-NOTE:        if an optional argument # is given, then the coefficients are instead either of the
+NOTE:        if an optional argument # is given, then the coefficients are instead either of the 
              form t^j as above or they are zero, and this is chosen randomly
 EXAMPLE:     example randomPoly;   shows an example"
 {
@@ -3094,11 +3094,11 @@ EXAMPLE:     example randomPoly;   shows an example"
   for (i=1;i<=size(m);i++)
   {
     if (size(#)!=0)
-    {
+    {      
       k=random(0,1);
     }
     if (k==0)
-    {
+    {      
       j=random(ug,og);
       randomPolynomial=randomPolynomial+t^j*m[i];
     }
@@ -3126,7 +3126,7 @@ PURPOSE: some procedures create latex and ps-files in the directory /tmp;
          in order to remove them simply call cleanTmp();
 RETURN:  none"
 {
-  system("sh","cd /tmp; /bin/rm -f tropicalcurve*; /bin/rm -f tropicalnewtonsubdivision*");
+  system("sh","cd /tmp; /bin/rm -f tropicalcurve*; /bin/rm -f tropicalnewtonsubdivision*");  
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -3181,9 +3181,9 @@ NOTE:        is called from tropicalLifting"
 
 static proc cutdown (ideal jideal,intvec wvec,int dimension,list #)
 "USAGE:      cutdown(i,w,d); i ideal, w intvec, d int, # list
-ASSUME:      i an ideal in Q[t,x_1,...,x_n], (w_1,...,w_n) is in the tropical variety of jideal
+ASSUME:      i an ideal in Q[t,x_1,...,x_n], (w_1,...,w_n) is in the tropical variety of jideal 
              and d=dim(i)>0, in Q(t)[x]; the optional parameter # can contain the string 'isPrime'
-             to indicate that the input ideal is prime and no minimal associated primes have
+             to indicate that the input ideal is prime and no minimal associated primes have 
              to be computed
 RETURN:      list, the first entry is a ring, namely the basering where some variables have been
                    eliminated, and the ring contains the ideal i (with the same variables eliminated),
@@ -3194,11 +3194,11 @@ RETURN:      list, the first entry is a ring, namely the basering where some var
                    for the new i gives a solution for the old i; the second entry is the weight vector
                    wvec with the components corresponding to the eliminated variables removed
 NOTE:        needs the libraries random.lib and primdec.lib; is called from tropicalLifting"
-{
-  // IDEA: i is an ideal of dimension d; we want to cut it with d random linear
+{ 
+  // IDEA: i is an ideal of dimension d; we want to cut it with d random linear 
   //       forms in such a way that the resulting
   //       ideal is 0-dim and still contains w in the tropical variety
-  // NOTE: t is the last variable in the basering
+  // NOTE: t is the last variable in the basering  
   ideal pideal;  //this is the ideal we want to return
   ideal cutideal;
   ideal pini;    //this is the initial ideal
@@ -3218,54 +3218,54 @@ NOTE:        needs the libraries random.lib and primdec.lib; is called from trop
   {
     variablen=variablen+var(j1); //read the set of variables (needed to make the quotring later)
     product=product*var(j1); //make product of all variables (needed for the initial-monomial-check later
-  }
+  }    
   execute("ring QUOTRING=("+charstr(basering)+",t),("+string(variablen)+"),dp;");
   setring BASERING;
 // change to quotring where we want to compute the primary decomposition of i
   if (size(#)==0) // we only have to do so if isPrime is not set
   {
     setring QUOTRING;
-    ideal jideal=imap(BASERING,jideal);
-    list primp=minAssGTZ(jideal); //compute the primary decomposition
+    ideal jideal=imap(BASERING,jideal); 
+    list primp=minAssGTZ(jideal); //compute the primary decomposition  
     for (j1=1;j1<=size(primp);j1++)
-    {
+    {      
       for(j2=1;j2<=size(primp[j1]);j2++)
       {
         primp[j1][j2]=primp[j1][j2]/content(primp[j1][j2]);// clear all denominators
-      }
+      }       
     }
     setring BASERING;
     list primp=imap(QUOTRING,primp);
     // if i is not primary itself
     // go through the list of min. ass. primes and find the first one which has w in its tropical variety
-    if (size(primp)>1)
+    if (size(primp)>1) 
     {
       j1=1;
       while(winprim==0)
       {
         //compute the t-initial of the associated prime
         // - the last entry 1 only means that t is the last variable in the ring
-        primini=tInitialIdeal(primp[j1],wvec,1);
+        primini=tInitialIdeal(primp[j1],wvec,1); 
         // check if it contains a monomial (resp if the product of var is in the radical)
-        if (radicalMemberShip(product,primini)==0)
-        {
+        if (radicalMemberShip(product,primini)==0) 
+        { 
           jideal=primp[j1];// if w is in the tropical variety of the prime, we take that
           setring QUOTRING;
           dimension=dim(groebner(imap(BASERING,jideal)));//compute its dimension
           setring BASERING;
           winprim=1; // and stop the checking
-        }
+        } 
         j1=j1+1;  //else we look at the next associated prime
       }
     }
     else
     {
       jideal=primp[1]; //if i is primary itself we take its prime instead
-    }
+    }  
   }
   // now we start as a first try to intersect with a hyperplane parallel to
   // coordinate axes, because this would make our further computations
-  // a lot easier.
+  // a lot easier. 
   // We choose a subset of our n variables of size d=dim(ideal). For each of these
   // variables, we want to fix a value: x_i= a_i*t^-w_i. This will only work if the
   // projection of the d-dim variety to the other n-d variables is the whole n-d plane.
@@ -3274,14 +3274,14 @@ NOTE:        needs the libraries random.lib and primdec.lib; is called from trop
   // We could determine if we picked a good d-subset of variables using elimination
   // (NOTE, there EXIST d variables such that a random choice of a_i's would work!).
   // But since this involves many computations, we prefer to choose randomly and just
-  // try in the end if our intersected ideal satisfies our requirements. If this does not
+  // try in the end if our intersected ideal satisfies our requirements. If this does not 
   // work, we give up this try and use our second intersection idea, which
   // will work for a Zariksi-open subset (i.e. almost always).
   //
   // As random subset of d variables we choose those for which the absolute value of the
   // wvec-coordinate is smallest, because this will give us the smallest powers of t and hence
   // less effort in following computations. Note that the smallest absolute value have those
-  // which are biggest, because wvec is negative.
+  // which are biggest, because wvec is negative. 
   //print("first try");
   intvec wminust=intvecdelete(wvec,1);
   intmat A[2][size(wminust)];
@@ -3289,8 +3289,8 @@ NOTE:        needs the libraries random.lib and primdec.lib; is called from trop
   A[1,1..size(wminust)]=-wminust;
   A[2,1..size(wminust)]=1..size(wminust);
   // sort this matrix in order to get the d biggest entries and their position in wvec
-  A=sortintmat(A);
-  // we construct a vector which has 1 at entry j if j belongs to the list
+  A=sortintmat(A); 
+  // we construct a vector which has 1 at entry j if j belongs to the list 
   // of the d biggest entries of wvec and a 0 else
   for (j1=1;j1<=nvars(basering)-1;j1++) //go through the variables
   {
@@ -3299,10 +3299,10 @@ NOTE:        needs the libraries random.lib and primdec.lib; is called from trop
       if (A[2,j2]==j1)//if the variable belongs to this list
       {
         setvec[j1]=1;//put a 1
-      }
-    }
+      }        
+    }  
   }
-  // using this 0/1-vector we produce a random constant (i.e. coeff in Q times something in t)
+  // using this 0/1-vector we produce a random constant (i.e. coeff in Q times something in t) 
   // for each of the biggest variables, we add the forms x_i-random constant to the ideal
   // and we save the constant at the i-th place of a list we want to return for later computations
   j3=0;
@@ -3314,17 +3314,17 @@ NOTE:        needs the libraries random.lib and primdec.lib; is called from trop
     for (j1=1;j1<=nvars(basering)-1;j1++)
     {
       if(setvec[j1]==1)//if x_i belongs to the biggest variables
-      {
+      {     
         if ((j3==1) and ((char(basering)==0) or (char(basering)>3)))
-        {
+        {        
           randomp1=random(1,3);
           randomp=t^(A[1,j2])*randomp1;//make a random constant --- first we try small numbers
-        }
+        }   
         if ((j3==2) and ((char(basering)==0) or (char(basering)>100)))
         {
           randomp1=random(1,100);
           randomp=t^(A[1,j2])*randomp1;//make a random constant --- next we try bigger numbers
-        }
+        }   
         else
         {
           randomp1=random(1,char(basering)-1);
@@ -3336,21 +3336,21 @@ NOTE:        needs the libraries random.lib and primdec.lib; is called from trop
       }
       else
       {
-        ergl[j1]=0; //if the variable belongs not the d biggest ones, save 0 in the list
+        ergl[j1]=0; //if the variable belongs not the the d biggest ones, save 0 in the list
         erglini[j1]=0;
-      }
+      }        
     }
       // print(ergl);print(pideal);
-      // now we check if we made a good choice of pideal, i.e. if dim=0 and
+      // now we check if we made a good choice of pideal, i.e. if dim=0 and 
       // wvec is still in the tropical variety
       //change to quotring where we compute dimension
       cutideal=pideal;
     for(j1=1;j1<=nvars(basering)-1;j1++)
     {
       if(setvec[j1]==1)
-      {
-        cutideal=cutideal,var(j1)-ergl[j1];//add all forms to the ideal
-      }
+      {      
+        cutideal=cutideal,var(j1)-ergl[j1];//add all forms to the ideal  
+      }      
     }
     setring QUOTRING;
     ideal cutideal=imap(BASERING,cutideal);
@@ -3368,13 +3368,13 @@ NOTE:        needs the libraries random.lib and primdec.lib; is called from trop
       //print(pini);
       // and if the initial w.r.t. t contains no monomial as we want (checked with
       // radical-membership of the product of all variables)
-      if (radicalMemberShip(product,pini)==0)
+      if (radicalMemberShip(product,pini)==0) 
       {
-        // we made the right choice and now we substitute the variables in the ideal
+        // we made the right choice and now we substitute the variables in the ideal    
         //to get an ideal in less variables
         // also we make a projected vector from wvec only the components of the remaining variables
         wvecp=wvec;
-        variablen=0;
+        variablen=0;   
         j2=0;
         for(j1=1;j1<=nvars(basering)-1;j1++)
         {
@@ -3388,8 +3388,8 @@ NOTE:        needs the libraries random.lib and primdec.lib; is called from trop
           else
           {
             variablen=variablen+var(j1); //read the set of remaining variables (needed to make quotring later)
-          }
-        }
+          }    
+        }      
         // return pideal, the initial and the list ergl which tells us
         // which variables we replaced by which form
         execute("ring BASERINGLESS1=("+charstr(BASERING)+"),("+string(variablen)+",t),(dp("+string(ncols(variablen))+"),lp(1));");
@@ -3399,7 +3399,7 @@ NOTE:        needs the libraries random.lib and primdec.lib; is called from trop
         export(i);
         export(ini);
         export(repl);
-        return(list(BASERINGLESS1,wvecp));
+        return(list(BASERINGLESS1,wvecp)); 
       }
     }
   }
@@ -3408,31 +3408,31 @@ NOTE:        needs the libraries random.lib and primdec.lib; is called from trop
   // them to be parallel to coordinate hyperplanes anymore. This works out with
   // probability 1.
   //
-  // We choose general hyperplanes, i.e. linear forms which involve all x_i.
-  // Each x_i has to be multiplied bz t^(w_i) in order to get the same weight (namely 0)
+  // We choose general hyperplanes, i.e. linear forms which involve all x_i. 
+  // Each x_i has to be multiplied bz t^(w_i) in order to get the same weight (namely 0) 
   // for each term. As we cannot have negative exponents, we multiply
-  // the whole form by t^minimumw. Notice that then in the first form,
+  // the whole form by t^minimumw. Notice that then in the first form, 
   // there is one term without t- the term of the variable
   // x_i such that w_i is minimal. That is, we can solve for this variable.
-  // In the second form, we can replace that variable, and divide by t as much as possible.
-  // Then there is again one term wihtout t - the term of the variable with second least w.
+  // In the second form, we can replace that variable, and divide by t as much as possible. 
+  // Then there is again one term wihtout t - the term of the variable with second least w. 
   // So we can solve for this one again and also replace it in the first form.
-  // Since all our coefficients are chosen randomly, we can also from the beginning on
-  // choose the set of variables which belong to the d smallest entries of wvec
-  // (t not counting) and pick random forms g_i(t,x') (where x' is the set of remaining variables)
-  // and set x_i=g_i(t,x').
+  // Since all our coefficients are chosen randomly, we can also from the beginning on 
+  // choose the set of variables which belong to the d smallest entries of wvec 
+  // (t not counting) and pick random forms g_i(t,x') (where x' is the set of remaining variables) 
+  // and set x_i=g_i(t,x'). 
   //
   // make a matrix with first row wvec (without t) and second row 1..n
   //print("second try");
   setring BASERING;
-  A[1,1..size(wminust)]=wminust;
+  A[1,1..size(wminust)]=wminust;  
   A[2,1..size(wminust)]=1..size(wminust);
   // sort this matrix in otder to get the d smallest entries (without counting the t-entry)
   A=sortintmat(A);
   randomp=0;
   setvec=0;
   setvec[nvars(basering)-1]=0;
-  // we construct a vector which has 1 at entry j if j belongs to the list of
+  // we construct a vector which has 1 at entry j if j belongs to the list of 
   // the d smallest entries of wvec and a 0 else
   for (j1=1;j1<=nvars(basering)-1;j1++) //go through the variables
   {
@@ -3458,16 +3458,16 @@ NOTE:        needs the libraries random.lib and primdec.lib; is called from trop
     {
       variablen=variablen+var(j1); //read the set of remaining variables (needed to make the quotring later)
     }
-  }
+  } 
   setring BASERING;
   execute("ring BASERINGLESS2=("+charstr(BASERING)+"),("+string(variablen)+",t),(dp("+string(ncols(variablen))+"),lp(1));");
   // using the 0/1-vector which tells us which variables belong to the set of smallest entries of wvec
-  // we construct a set of d random linear polynomials of the form x_i=g_i(t,x'),
+  // we construct a set of d random linear polynomials of the form x_i=g_i(t,x'), 
   // where the set of all x_i is the set of
   // all variables which are in the list of smallest entries in wvec, and x' are the other variables.
-  // We add these d random linear polynomials to the indeal pideal, i.e. we intersect
+  // We add these d random linear polynomials to the indeal pideal, i.e. we intersect 
   // with these and hope to get something
-  // 0-dim which still contains wvec in its tropical variety. Also, we produce a list ergl
+  // 0-dim which still contains wvec in its tropical variety. Also, we produce a list ergl  
   // with g_i at the i-th position.
   // This is a list we want to return.
   // we try first with small numbers
@@ -3476,7 +3476,7 @@ NOTE:        needs the libraries random.lib and primdec.lib; is called from trop
   for(j1=1;j1<=dimension;j1++)//go through the list of variables corres to the d smallest in wvec
   {
     if ((char(basering)==0) or (char(basering)>3))
-    {
+    { 
       randomp1=random(1,3);
       randomp=randomp1*t^(-A[1,j1]);
     }
@@ -3513,15 +3513,15 @@ NOTE:        needs the libraries random.lib and primdec.lib; is called from trop
     randomp1=0;
     }
   //print(ergl);
-  // Again, we have to test if we made a good choice to intersect,i.e. we have to check whether
+  // Again, we have to test if we made a good choice to intersect,i.e. we have to check whether 
   // pideal is 0-dim and contains wvec in the tropical variety.
   cutideal=pideal;
   for(j1=1;j1<=nvars(basering)-1;j1++)
   {
     if(setvec[j1]==1)
     {
-      cutideal=cutideal,var(j1)-ergl[j1];//add all forms to the ideal
-    }
+      cutideal=cutideal,var(j1)-ergl[j1];//add all forms to the ideal 
+    }    
   }
   setring QUOTRING;
   ideal cutideal=imap(BASERING,cutideal);
@@ -3539,10 +3539,10 @@ NOTE:        needs the libraries random.lib and primdec.lib; is called from trop
     //print(pini);
     // and if the initial w.r.t. t contains no monomial as we want (checked with
     // radical-membership of the product of all variables)
-    if (radicalMemberShip(product,pini)==0)
+    if (radicalMemberShip(product,pini)==0) 
     {
       // we want to replace the variables x_i by the forms -g_i in
-      // our ideal in order to return an ideal with less variables
+      // our ideal in order to return an ideal with less variables  
       // first we substitute the chosen variables
       for(j1=1;j1<=nvars(basering)-1;j1++)
       {
@@ -3559,7 +3559,7 @@ NOTE:        needs the libraries random.lib and primdec.lib; is called from trop
       export(i);
       export(ini);
       export(repl);
-      return(list(BASERINGLESS2,wvecp));
+      return(list(BASERINGLESS2,wvecp)); 
     }
   }
   // now we try bigger numbers
@@ -3572,12 +3572,12 @@ NOTE:        needs the libraries random.lib and primdec.lib; is called from trop
       randomp1=random(1,100);
       randomp=randomp1*t^(-A[1,j1]);
       for(j2=1;j2<=nvars(basering)-1;j2++)//go through all variables
-      {
+      { 
         if(setvec[j2]==0)//if x_j belongs to the set x'
         {
           // add a random term with the suitable power of t to the random linear form
           if ((char(basering)==0) or (char(basering)>100))
-          {
+          {  
             randomp2=random(1,100);
             randomp1=randomp1+randomp2*var(j2);
             randomp=randomp+randomp2*t^(wminust[j2]-A[1,j1])*var(j2);
@@ -3598,15 +3598,15 @@ NOTE:        needs the libraries random.lib and primdec.lib; is called from trop
       randomp1=0;
       }
     //print(ergl);
-    // Again, we have to test if we made a good choice to intersect,i.e. we have to check whether
+    // Again, we have to test if we made a good choice to intersect,i.e. we have to check whether 
     // pideal is 0-dim and contains wvec in the tropical variety.
     cutideal=pideal;
     for(j1=1;j1<=nvars(basering)-1;j1++)
     {
       if(setvec[j1]==1)
       {
-        cutideal=cutideal,var(j1)-ergl[j1];//add all forms to the ideal
-      }
+        cutideal=cutideal,var(j1)-ergl[j1];//add all forms to the ideal  
+      }      
     }
     setring QUOTRING;
     ideal cutideal=imap(BASERING,cutideal);
@@ -3614,7 +3614,7 @@ NOTE:        needs the libraries random.lib and primdec.lib; is called from trop
     //print("dimension");
     //print(dimp);
     kill cutideal;
-    setring BASERING;
+    setring BASERING; 
     if (dimp==0) // if it is 0 as we want
     {
       // compute the t-initial of the associated prime
@@ -3624,7 +3624,7 @@ NOTE:        needs the libraries random.lib and primdec.lib; is called from trop
       //print(pini);
       // and if the initial w.r.t. t contains no monomial as we want (checked with
       // radical-membership of the product of all variables)
-      if (radicalMemberShip(product,pini)==0)
+      if (radicalMemberShip(product,pini)==0) 
       {
         // we want to replace the variables x_i by the forms -g_i in
         // our ideal in order to return an ideal with less variables
@@ -3635,8 +3635,8 @@ NOTE:        needs the libraries random.lib and primdec.lib; is called from trop
           {
             pideal=subst(pideal,var(j1),ergl[j1]);//substitute it
             pini=subst(pini,var(j1),erglini[j1]);
-          }
-        }
+          }   
+        }   
         // return pideal and the list ergl which tells us
         // which variables we replaced by which form
         setring BASERINGLESS2;
@@ -3646,7 +3646,7 @@ NOTE:        needs the libraries random.lib and primdec.lib; is called from trop
         export(i);
         export(ini);
         export(repl);
-        return(list(BASERINGLESS2,wvecp));
+        return(list(BASERINGLESS2,wvecp)); 
       }
     }
   }
@@ -3655,20 +3655,20 @@ NOTE:        needs the libraries random.lib and primdec.lib; is called from trop
 
 static proc tropicalparametriseNoabs (ideal i,intvec ww,int ordnung,int gfanold,int nogfan,list #)
   "USAGE:  tropicalparametriseNoabs(i,tw,ord,gf,ng[,#]); i ideal, tw intvec, ord int, gf,ng int, # opt. list
-ASSUME:  - i is an ideal in Q[t,x_1,...,x_n,X_1,...,X_k], tw=(w_0,w_1,...,w_n,0,...,0)
-           and (w_0,...,w_n,0,...,0) is in the tropical variety of i,
-           and ord is the order up to which a point in V(i) over C((t)) lying over w shall be computed;
+ASSUME:  - i is an ideal in Q[t,x_1,...,x_n,X_1,...,X_k], tw=(w_0,w_1,...,w_n,0,...,0) 
+           and (w_0,...,w_n,0,...,0) is in the tropical variety of i, 
+           and ord is the order up to which a point in V(i) over C((t)) lying over w shall be computed; 
          - moreover, k should be zero if the procedure is not called recursively;
          - the point in the tropical variety is supposed to lie in the NEGATIVE orthant;
          - the ideal is zero-dimensional when considered in (Q(t)[X_1,...,X_k]/m)[x_1,...,x_n],
-           where m=#[2] is a maximal ideal in Q(t)[X_1,...,X_k];
+           where m=#[2] is a maximal ideal in Q(t)[X_1,...,X_k]; 
          - gf is 0 if version 2.2 or larger is used and it is 1 else
-         - ng is 1 if gfan should not be executed
+         - ng is 1 if gfan should not be executed 
 RETURN:  list, l[1] = ring Q(0,X_1,...,X_r)[[t]]
                l[2] = int
                l[3] = string
 NOTE:    - the procedure is also called recursively by itself, and
-           if it is called in the first recursion, the list # is empty,
+           if it is called in the first recursion, the list # is empty, 
            otherwise #[1] is an integer, one more than the number of true variables x_1,...,x_n,
            and #[2] will contain the maximal ideal m in the variables X_1,...X_k
            by which the ring Q[t,x_1,...,x_n,X_1,...,X_k] should be divided to
@@ -3738,7 +3738,7 @@ NOTE:    - the procedure is also called recursively by itself, and
   ideal variablen;            // will contain the variables which are not eliminated
   intvec tw=ww; // in case some variables are deleted, we have to store the old weight vector
   deletedvariables[anzahlvariablen]=0;
-  ideal I,LI;
+  ideal I,LI; 
   i=i+m; // if a field extension was necessary, then i has to be extended by m
   for (jj=anzahlvariablen-1;jj>=1;jj--)  // the variable t is the last one !!!
   {
@@ -3750,7 +3750,7 @@ NOTE:    - the procedure is also called recursively by itself, and
     }
     if (size(LI)==0) // if no power of t is in lead(I) (where the X(i) are considered as field elements)
     {
-      // get rid of var(jj)
+      // get rid of var(jj)   
       i=eliminate(I,var(jj));
       deletedvariables[jj]=1;
       anzahlvariablen--;         // if a variable is eliminated, then the number of true variables drops
@@ -3774,7 +3774,7 @@ NOTE:    - the procedure is also called recursively by itself, and
   {
     execute("ring NEURING=("+charstr(basering)+"),("+string(variablen)+"),(dp("+string(size(variablen)-1)+"),lp(1));");
     ideal i=imap(BASERING,i);
-    ideal gesamt_m=imap(BASERING,gesamt_m);
+    ideal gesamt_m=imap(BASERING,gesamt_m);    
   }
   // now we have to compute a point ww on the tropical variety of the transformed ideal i;
   // of course, we only have to do so, if we have not yet reached the order up to which we
@@ -3783,18 +3783,18 @@ NOTE:    - the procedure is also called recursively by itself, and
   {
     def PREGFANRING=basering;
     if (nogfan!=1)
-    {
+    {      
       // pass to a ring which has variables which are suitable for gfan
       execute("ring GFANRING=("+charstr(basering)+"),(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z),dp;");
-      ideal phiideal=b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z;
+      ideal phiideal=b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z; 
       phiideal[nvars(PREGFANRING)]=a; // map t to a
-      map phi=PREGFANRING,phiideal;
+      map phi=PREGFANRING,phiideal; 
       ideal i=phi(i);
-      // homogenise the ideal i with the first not yet used variable in our ring, since gfan
+      // homogenise the ideal i with the first not yet used variable in our ring, since gfan 
       // only handles homogenous ideals; in principle for this one has first to compute a
-      // standard basis of i and homogenise that, but for the tropical variety (says Anders)
+      // standard basis of i and homogenise that, but for the tropical variety (says Anders) 
       // it suffices to homogenise an arbitrary system of generators
-      // i=groebner(i);
+      // i=groebner(i); 
       i=homog(i,maxideal(1)[nvars(PREGFANRING)+1]);
       // if gfan version >= 0.3.0 is used and the characteristic
       // is not zero, then write the basering to the output
@@ -3803,12 +3803,12 @@ NOTE:    - the procedure is also called recursively by itself, and
         string ringvariablen=varstr(GFANRING);
         ringvariablen=ringvariablen[1..2*nvars(PREGFANRING)+1];
         write(":w /tmp/gfaninput","Z/"+string(char(GFANRING))+"Z["+ringvariablen+"]");
-        // write the ideal to a file which gfan takes as input and call gfan
+        // write the ideal to a file which gfan takes as input and call gfan      
         write(":a /tmp/gfaninput","{"+string(i)+"}");
       }
-      else
+      else  
       {
-        // write the ideal to a file which gfan takes as input and call gfan
+        // write the ideal to a file which gfan takes as input and call gfan      
         write(":w /tmp/gfaninput","{"+string(i)+"}");
       }
       if (gfanold==1)
@@ -3839,7 +3839,7 @@ NOTE:    - the procedure is also called recursively by itself, and
         "IF YOU WANT wneu TO BE TESTED, THEN SET goon=0;";
         ~
           // THIS IS NOT NECESSARY !!!! IF WE COMPUTE NOT ONLY THE TROPICAL PREVARIETY
-          // test, if wneu really is in the tropical variety
+          // test, if wneu really is in the tropical variety    
           while (goon==0)
         {
           if (testw(reduce(i,std(gesamt_m)),wneu,anzahlvariablen)==1)
@@ -3872,7 +3872,7 @@ NOTE:    - the procedure is also called recursively by itself, and
   // zero is not yet a solution, then we have to go on by calling the procedure recursively;
   // if all variables were deleted, then i=0 and thus anzahlvariablen==0
   if ((ordnung>1) and (anzahlvariablen>1))
-  {
+  {   
     // we call the procedure with the transformed ideal i, the new weight vector, with the
     // required order lowered by one, and with additional parameters, namely the number of
     // true variables and the maximal ideal that was computed so far to describe the field extension
@@ -3883,7 +3883,7 @@ NOTE:    - the procedure is also called recursively by itself, and
     int tweight=-tw[1]*PARALIST[2];
     string PARAm=PARALIST[3];
     setring PARARing;
-    // if some variables have been eliminated in before, then we have to insert zeros
+    // if some variables have been eliminated in before, then we have to insert zeros 
     // into the parametrisation for those variables
     if (numberdeletedvariables>0)
     {
@@ -3911,7 +3911,7 @@ NOTE:    - the procedure is also called recursively by itself, and
     // we define the weight of t, i.e. in the parametrisation t has to be replaced by t^1/tweight
     int tweight=-tw[1];
     // if additional variables were necessary, we introduce them now as parameters;
-    // in any case the parametrisation ring will have only one variable, namely t,
+    // in any case the parametrisation ring will have only one variable, namely t,  
     // and its order will be local, so that it displays the lowest term in t first
     if (anzahlvariablen+numberdeletedvariables<nvars(basering))
     {
@@ -3932,7 +3932,7 @@ NOTE:    - the procedure is also called recursively by itself, and
   // we now have to change the parametrisation by reverting the transformations that we have done
   list a=imap(BASERING,a);
   if (defined(wneu)==0) // when tropicalparametriseNoabs is called for the last time, it does not
-  {                     // enter the part, where wneu is defined and the variable t should have
+  {                     // enter the part, where wneu is defined and the variable t should have 
     intvec wneu=-1;     // weight -1
   }
   for (jj=1;jj<=anzahlvariablen+numberdeletedvariables-1;jj++)
@@ -3944,11 +3944,11 @@ NOTE:    - the procedure is also called recursively by itself, and
   // otherwise it has already been exported before
   // note, if all variables were deleted, then i==0 and thus testaufnull==0
   if ((ordnung==1) or (anzahlvariablen==1))
-  {
+  {    
     export(PARA);
   }
   // kill the gfan files in /tmp
-  system("sh","cd /tmp; /bin/rm gfaninput; /bin/rm gfanoutput");
+  system("sh","cd /tmp; /bin/rm gfaninput; /bin/rm gfanoutput");  
   // we return a list which contains the parametrisation ring (with the parametrisation ideal)
   // and the string representing the maximal ideal describing the necessary field extension
   return(list(PARARing,tweight,PARAm));
@@ -3956,9 +3956,9 @@ NOTE:    - the procedure is also called recursively by itself, and
 
 static proc findzeros (ideal i,intvec w,list #)
   "USAGE:      findzeros(i,w[,#]); i ideal, w intvec, # an optional list
-ASSUME:      i is an ideal in Q[t,x_1,...,x_n,X_n+1,...,X_m] and w=(w_0,...,w_n,0,...,0)
+ASSUME:      i is an ideal in Q[t,x_1,...,x_n,X_n+1,...,X_m] and w=(w_0,...,w_n,0,...,0) 
              is in the tropical variety of i
-RETURN:      list, l[1] = is polynomial ring containing an associated maximal ideal m of the w-initial
+RETURN:      list, l[1] = is polynomial ring containing an associated maximal ideal m of the w-initial 
                           ideal of i which does not contain any monomial and where the variables
                           which do not lead to a field extension have already been eliminated,
                           and containing a list a such that the non-zero entries of a correspond
@@ -3968,11 +3968,11 @@ RETURN:      list, l[1] = is polynomial ring containing an associated maximal id
                    l[3] = intvec, if the entry is one then the corresponding variable has not
                           been eliminated
 NOTE:        the procedure is called from inside the recursive procedure tropicalparametriseNoabs;
-             if it is called in the first recursion, the list #[1] contains the t-initial ideal
-             of i w.r.t. w, otherwise #[1] is an integer, one more than the number of true
+             if it is called in the first recursion, the list #[1] contains the t-initial ideal 
+             of i w.r.t. w, otherwise #[1] is an integer, one more than the number of true 
              variables x_1,...,x_n"
 {
-  def BASERING=basering;
+  def BASERING=basering;  
   // set anzahlvariablen to the number of true variables
   if (typeof(#[1])=="int")
   {
@@ -3989,7 +3989,7 @@ NOTE:        the procedure is called from inside the recursive procedure tropica
   // move to a polynomial ring with global monomial ordering - the variable t is superflous
   ideal variablen;
   for (int j=1;j<=nvars(basering)-1;j++)
-  {
+  {   
     variablen=variablen+var(j);
   }
   execute("ring INITIALRING=("+charstr(basering)+"),("+string(variablen)+"),dp;");
@@ -4001,7 +4001,7 @@ NOTE:        the procedure is called from inside the recursive procedure tropica
   int neuvar=maximalideals[1][2];           // the number of new variables needed
   intvec neuevariablen=maximalideals[1][3]; // the information which variable leads to a new one
   list a=maximalideals[1][4];               // a_k is the kth component of a zero of m, if it is not zero
-  // eliminate from m the superflous variables, that is those ones, which do not lead to
+  // eliminate from m the superflous variables, that is those ones, which do not lead to 
   // a new variable
   poly elimvars=1;
   for (j=1;j<=anzahlvariablen-1;j++)
@@ -4011,8 +4011,8 @@ NOTE:        the procedure is called from inside the recursive procedure tropica
       elimvars=elimvars*var(j);
     }
   }
-  m=eliminate(m,elimvars);
-  export(a);
+  m=eliminate(m,elimvars);  
+  export(a);  
   export(m);
   list m_ring=INITIALRING,neuvar,neuevariablen;
   setring BASERING;
@@ -4022,7 +4022,7 @@ NOTE:        the procedure is called from inside the recursive procedure tropica
 
 static proc basictransformideal (ideal i,intvec w,list m_ring,list #)
   "USAGE:      basictransformideal(i,w,m_ring[,#]); i ideal, w intvec, m_ring list, # an optional list
-ASSUME:      i is an ideal in Q[t,x_1,...,x_n,X_1,...,X_k], w=(w_0,...,w_n,0,...,0)
+ASSUME:      i is an ideal in Q[t,x_1,...,x_n,X_1,...,X_k], w=(w_0,...,w_n,0,...,0) 
              is in the tropical variety of i, and m_ring contains a ring containing a maximal ideal m needed
              to describe the field extension over which a corresponding associated maximal ideal of the
              initialideal of i, considered in (Q[X_1,...,X_k]/m_alt)(t)[x_1,...,x_n],
@@ -4033,12 +4033,12 @@ RETURN:      list, either l[1] = ideal, i transformed by x_j -> (a_j+x_j)*t^w_j
                           l[3] = ideal, the maximal ideal m
                    or l[1] = ring which contains the ideals i and m, and the list a
 NOTE:        the procedure is called from inside the recursive procedure tropicalparametriseNoabs;
-             if it is called in the first recursion, the list # is empty,
+             if it is called in the first recursion, the list # is empty, 
              otherwise #[1] is an integer, the number of true variables x_1,...,x_n;
              during the procedure we check if a field extension is necessary to express
              a zero (a_1,...,a_n) of m; if so, we have to introduce new variables and
              a list containing a ring is returned, otherwise the list containing i, a and m
-             is returned;
+             is returned; 
              the ideal m will be changed during the procedure since all variables which reduce
              to a polynomial in X_1,...,X_k modulo m will be eliminated, while the others are
              replaced by new variables X_k+1,...,X_k'"
@@ -4082,9 +4082,9 @@ NOTE:        the procedure is called from inside the recursive procedure tropica
     execute("ring TRANSFORMRING=("+charstr(basering)+"),("+string(variablen)+",X("+string(nvars(BASERING)-anzahlvariablen+1)+".."+string(nvars(BASERING)-anzahlvariablen+neuvar)+"),t),(dp("+string(anzahlvariablen-1)+"),dp("+string(nvars(BASERING)+neuvar-anzahlvariablen)+"),lp(1));");
     // map i into the new ring
     ideal i=imap(BASERING,i);
-    // define a map phi which maps the true variables, which are not
+    // define a map phi which maps the true variables, which are not 
     // reduced to polynomials in the additional variables modulo m, to
-    // the corresponding newly introduced variables, and which maps
+    // the corresponding newly introduced variables, and which maps 
     // the old additional variables to themselves
     ideal phiideal;
     k=1;
@@ -4097,14 +4097,14 @@ NOTE:        the procedure is called from inside the recursive procedure tropica
       }
       else
       {
-        phiideal[j-1]=0;
+        phiideal[j-1]=0;  
       }
     }
     if (anzahlvariablen<nvars(BASERING))
     {
       phiideal=phiideal,X(1..nvars(BASERING)-anzahlvariablen);
     }
-    map phi=MRING,phiideal;
+    map phi=MRING,phiideal; 
     // map m and a to the new ring via phi, so that the true variables in m and a are replaced by
     // the corresponding newly introduced variables
     ideal m=std(phi(m));
@@ -4114,17 +4114,17 @@ NOTE:        the procedure is called from inside the recursive procedure tropica
   // note that no component of a can be zero since the maximal ideal m contains no variable!
   // moreover, substitute right away in the ideal i the true variable x_j by (a_j+x_j)*t^w_j
   zaehler=nvars(BASERING)-anzahlvariablen+1;
-  for (j=1;j<=anzahlvariablen;j++)
+  for (j=1;j<=anzahlvariablen;j++)  
   {
     if ((a[j]==0) and (j!=1))  // a[1]=0, since t->t^w_0
-    {
+    {        
       a[j]=X(zaehler);
       zaehler++;
     }
     for (k=1;k<=size(i);k++)
     {
       if (j!=1) // corresponds to  x_(j-1) --  note t is the last variable
-      {
+      {        
         i[k]=substitute(i[k],var(j-1),(a[j]+var(j-1))*t^(-w[j]));
       }
       else // corresponds to t
@@ -4137,7 +4137,7 @@ NOTE:        the procedure is called from inside the recursive procedure tropica
   for (j=1;j<=ncols(i);j++)
   {
     if (wdegs[j]<0) // if wdegs[j]==0 there is no need to divide, and we made sure that it is no positive
-    {
+    {      
       i[j]=i[j]/t^(-wdegs[j]);
     }
   }
@@ -4163,7 +4163,7 @@ NOTE:        the procedure is called from inside the recursive procedure tropica
 
 static proc testw (ideal i,intvec w,int anzahlvariablen,list #)
 "USAGE:      testw(i,w,n); i ideal, w intvec, n number
-ASSUME:      i is an ideal in Q[t,x_1,...,x_n,X_1,...,X_k] and w=(w_0,...,w_n,0,...,0)
+ASSUME:      i is an ideal in Q[t,x_1,...,x_n,X_1,...,X_k] and w=(w_0,...,w_n,0,...,0)            
 RETURN:      int b, 0 if the t-initial ideal of i considered in Q(X_1,...,X_k)[t,x_1,...,x_n]
                     is monomial free, 1 else
 NOTE:        the procedure is called by tinitialform"
@@ -4178,7 +4178,7 @@ NOTE:        the procedure is called by tinitialform"
   {
     ideal tin=tInitialIdeal(i,w,1);
   }
-
+  
   int j;
   ideal variablen;
   poly monom=1;
@@ -4210,7 +4210,7 @@ NOTE:        the procedure is called by tinitialform"
   }
   def BASERING=basering;
   if (anzahlvariablen<nvars(basering))
-  {
+  {   
     execute("ring TINRING=("+charstr(basering)+","+string(Parameter)+"),("+string(variablen)+"),dp;");
   }
   else
@@ -4220,11 +4220,11 @@ NOTE:        the procedure is called by tinitialform"
   ideal tin=imap(BASERING,tin);
   poly monom=imap(BASERING,monom);
   return(radicalMemberShip(monom,tin));
-}
+}  
 
 static proc simplifyToOrder (poly f)
 "USAGE:      simplifyToOrder(f); f a polynomial
-ASSUME:      f is a polynomial in Q(t)[x_1,...,x_n]
+ASSUME:      f is a polynomial in Q(t)[x_1,...,x_n] 
 RETURN:      list, l[1] = t-order of leading term of f
                    l[2] = the rational coefficient of the term of lowest t-order
                           in lead(f)
@@ -4245,7 +4245,7 @@ NOTE:        the procedure is called by tInitialFormPar"
 
 static proc scalarproduct (intvec w,intvec v)
 "USAGE:      scalarproduct(w,v); w,v intvec
-ASSUME:      w and v are integer vectors of the same length
+ASSUME:      w and v are integer vectors of the same length 
 RETURN:      int, the scalarproduct of v and w
 NOTE:        the procedure is called by tropicalparametriseNoabs"
 {
@@ -4303,7 +4303,7 @@ RETURN:      list, the procedure orders the maximal ideals in minassi according 
                    l[j][2] = the number of variables needed
                    l[j][3] = intvec, if for the kth variable a new variable is needed to
                              define the corresponding zero of l[j][1], then the k+1st entry is one
-                   l[j][4] = list, if for the kth variable no new variable is needed to
+                   l[j][4] = list, if for the kth variable no new variable is needed to 
                              define the corresponding zero of l[j][1], then its value is the k+1st entry
 NOTE:        if a maximal ideal contains a variable, it is removed from the list;
              the procedure is called by findzeros"
@@ -4319,9 +4319,9 @@ NOTE:        if a maximal ideal contains a variable, it is removed from the list
   intvec neuevariablen; // ith entry is 1, if for the ith component of a zero of m a new variable is needed
   intvec testvariablen; // integer vector of length n=number of variables
   // compute for each maximal ideal the number of new variables, which are needed to describe
-  // its zeros -- note, a new variable is needed if modulo the maximal ideal it does not reduce
+  // its zeros -- note, a new variable is needed if modulo the maximal ideal it does not reduce 
   // to something which only depends on the following variables;
-  // if no new variable is needed, then store the value a variable reduces to in the list a;
+  // if no new variable is needed, then store the value a variable reduces to in the list a; 
   for (j=size(minassi);j>=1;j--)
   {
     a[1]=poly(0);         // the first entry in a and in neuevariablen corresponds to the variable t,
@@ -4340,7 +4340,7 @@ NOTE:        if a maximal ideal contains a variable, it is removed from the list
       for (l=1;l<=nvars(basering);l++)
       {
         if (l<=k)
-        {
+        {          
           testvariablen[l]=1;
         }
         else
@@ -4356,7 +4356,7 @@ NOTE:        if a maximal ideal contains a variable, it is removed from the list
       {
         a[k+1]=nf;             // a_k is the normal form of the kth variable modulo m
         neuevariablen[k+1]=0;  // no new variable is needed
-      }
+      }    
       else
       {
         a[k+1]=poly(0);       // a_k is set to zero until we have introduced the new variable
@@ -4366,7 +4366,7 @@ NOTE:        if a maximal ideal contains a variable, it is removed from the list
     }
     // if the maximal ideal contains a variable, we simply delete it
     if (pruefer==0)
-    {
+    {      
       minassisort[j]=list(minassi[j],neuvar,neuevariablen,a);
     }
     // otherwise we store the information on a, neuevariablen and neuvar together with the ideal
@@ -4383,7 +4383,7 @@ NOTE:        if a maximal ideal contains a variable, it is removed from the list
   {
     l=j;
     for (k=j-1;k>=1;k--)
-    {
+    {      
       if (minassisort[l][2]<minassisort[k][2])
       {
         zwischen=minassisort[l];
@@ -4399,7 +4399,7 @@ NOTE:        if a maximal ideal contains a variable, it is removed from the list
 static proc displaypoly(poly p,int N,int wj,int w1)
 "USAGE:  displaypoly(p,N,wj,w1); p poly, N, wj, w1 int
 ASSUME:  p is a polynomial in r=(0,X(1..k)),t,ls
-RETURN:  string, the string of t^-wj/w1*p(t^1/N)
+RETURN:  string, the string of t^-wj/w1*p(t^1/N)  
 NOTE:    the procedure is called from displayTropicalLifting"
 {
   if (p==0)
@@ -4417,7 +4417,7 @@ NOTE:    the procedure is called from displayTropicalLifting"
   for (j=ord(p);j<=deg(p);j++)
   {
     if (koeffizienten[j-ord(p)+1]!=0)
-    {
+    {      
       if ((j-(N*wj)/w1)==0)
       {
         dp=dp+displaycoef(koeffizienten[j-ord(p)+1]);
@@ -4533,8 +4533,8 @@ NOTE:     the procedure is called from tropicalparametrise"
 static proc tropicalliftingresubstitute (ideal i,list liftring,int N,list #)
 "USAGE:   tropicalliftingresubstitute(i,L,N[,#]); i ideal, L list, N int, # string
 ASSUME:   i is an ideal and L[1] is a ring which contains the lifting of a point in the
-          tropical variety of i computed with tropicalLifting;
-          t has to be replaced by t^1/N in the lifting; #[1]=m is the string of the maximal
+          tropical variety of i computed with tropicalLifting; 
+          t has to be replaced by t^1/N in the lifting; #[1]=m is the string of the maximal 
           ideal defining the necessary field extension as computed by tropicalLifting,
           if #[1] is present
 RETURN:   string, the lifting has been substituted into i
@@ -4558,7 +4558,7 @@ NOTE:     the procedure is called from tropicalLifting"
       minpoly=number(imap(LIFTRing,mp));
       ideal i=imap(BASERING,i);
     }
-  }
+  }  
   else
   {
     def TESTRing=BASERING;
@@ -4587,7 +4587,7 @@ NOTE:     the procedure is called from tropicalLifting"
   // replace t by t^1/N
   for (j=1;j<=ncols(i);j++)
   {
-    SUBSTTEST[j]=displaypoly(i[j],N,0,1);
+    SUBSTTEST[j]=displaypoly(i[j],N,0,1);  
   }
   return(SUBSTTEST);
 }
@@ -4597,25 +4597,25 @@ NOTE:     the procedure is called from tropicalLifting"
 /// - tropicalparametrise
 /// - eliminatecomponents
 /// - findzerosAndBasictransform
-/// - ordermaximalideals
+/// - ordermaximalideals 
 ////////////////////////////////////////////////////////////////////////////////////
 
 static proc tropicalparametrise (ideal i,intvec ww,int ordnung,int gfanold,int findall,int nogfan,list #)
 "USAGE:  tropicalparametrise(i,tw,ord,gf,fa,ng[,#]); i ideal, tw intvec, ord int, gf,fa,ng int, # opt. list
-ASSUME:  - i is an ideal in Q[t,x_1,...,x_n,@a], tw=(w_0,w_1,...,w_n,0)
-           and (w_0,...,w_n,0) is in the tropical variety of i,
-           and ord is the order up to which a point in V(i) over K{{t}} lying over w shall be computed;
+ASSUME:  - i is an ideal in Q[t,x_1,...,x_n,@a], tw=(w_0,w_1,...,w_n,0) 
+           and (w_0,...,w_n,0) is in the tropical variety of i, 
+           and ord is the order up to which a point in V(i) over K{{t}} lying over w shall be computed; 
          - moreover, @a should be not be there if the procedure is not called recursively;
          - the point in the tropical variety is supposed to lie in the NEGATIVE orthant;
          - the ideal is zero-dimensional when considered in (K(t)[@a]/m)[x_1,...,x_n],
-           where m=#[2] is a maximal ideal in K[@a];
+           where m=#[2] is a maximal ideal in K[@a]; 
          - gf is 0 if version 2.2 or larger is used and it is 1 else
          - fa is 1 if all solutions should be found
          - ng is 1 if gfan should not be executed
 RETURN:  list, l[1] = ring K[@a]/m[[t]]
                l[2] = int
 NOTE:    - the procedure is also called recursively by itself, and
-           if it is called in the first recursion, the list # is empty,
+           if it is called in the first recursion, the list # is empty, 
            otherwise #[1] is an integer, one more than the number of true variables x_1,...,x_n,
            and #[2] will contain the maximal ideal m in the variable @a
            by which the ring K[t,x_1,...,x_n,@a] should be divided to
@@ -4650,7 +4650,7 @@ NOTE:    - the procedure is also called recursively by itself, and
     // only true variables have to be transformed
     int anzahlvariablen=nvars(basering);
     list zerolist; // will carry the zeros which are computed in the recursion steps
-
+    
     // the initial ideal of i has been handed over as #[1]
     ideal ini=#[1];
     // find the zeros of the w-initial ideal and transform the ideal i;
@@ -4659,7 +4659,7 @@ NOTE:    - the procedure is also called recursively by itself, and
     list trring=findzerosAndBasictransform(i,ww,zerolist,findall,ini);
   }
   list wneulist; // carries all newly computed weight vector
-  intvec wneu;   // carries the newly computed weight vector
+  intvec wneu;   // carries the newly computed weight vector 
   int tweight;   // carries the weight of t
   list PARALIST; // carries the result when tropicalparametrise is recursively called
   list eliminaterings;     // carries the result of eliminatecomponents
@@ -4694,18 +4694,18 @@ NOTE:    - the procedure is also called recursively by itself, and
       if ((ordnung>1) and (anzahlvariablen>1)) // if only t remains, all true variables are gone
       {
         if (nogfan!=1)
-        {
+        {          
           // pass to a ring which has variables which are suitable for gfan
           execute("ring GFANRING=("+string(char(basering))+"),(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z),dp;");
-          ideal phiideal=b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z;
+          ideal phiideal=b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z; 
           phiideal[nvars(PREGFANRING)]=a; // map t to a
-          map phi=PREGFANRING,phiideal;
+          map phi=PREGFANRING,phiideal; 
           ideal II=phi(i);
-          // homogenise the ideal II with the first not yet used variable in our ring, since gfan
+          // homogenise the ideal II with the first not yet used variable in our ring, since gfan 
           // only handles homogenous ideals; in principle for this one has first to compute a
-          // standard basis of II and homogenise that, but for the tropical variety (says Anders)
+          // standard basis of II and homogenise that, but for the tropical variety (says Anders) 
           // it suffices to homogenise an arbitrary system of generators
-          // II=groebner(II);
+          // II=groebner(II); 
           II=homog(II,maxideal(1)[nvars(PREGFANRING)+1]);
           // if gfan version >= 0.3.0 is used and the characteristic
           // is not zero, then write the basering to the output
@@ -4750,7 +4750,7 @@ NOTE:    - the procedure is also called recursively by itself, and
             "IF YOU WANT wneu TO BE TESTED, THEN SET goon=0;";
             ~
             // THIS IS NOT NECESSARY !!!! IF WE COMPUTE NOT ONLY THE TROPICAL PREVARIETY
-            // test, if wneu really is in the tropical variety
+            // test, if wneu really is in the tropical variety    
             while (goon==0)
             {
               if (testw(reduce(i,std(gesamt_m)),wneu,anzahlvariablen)==1)
@@ -4795,7 +4795,7 @@ NOTE:    - the procedure is also called recursively by itself, and
       // if all variables were deleted, then i=0 and thus anzahlvariablen==0
       lll=0;
       if ((ordnung>1) and (anzahlvariablen>1))
-      {
+      { 
         partliftings=list(); // initialise partliftings
         // we call the procedure with the transformed ideal i, the new weight vector, with the
         // required order lowered by one, and with additional parameters, namely the number of
@@ -4807,11 +4807,11 @@ NOTE:    - the procedure is also called recursively by itself, and
           // the output will be a ring, in which the parametrisation lives, and a string, which contains
           // the maximal ideal that describes the necessary field extension
           for (ll=1;ll<=size(PARALIST);ll++)
-          {
+          {  
             def PARARing=PARALIST[ll][1];
             tweight=-ww[1]*PARALIST[ll][2];
             setring PARARing;
-            // if some variables have been eliminated in before, then we have to insert zeros
+            // if some variables have been eliminated in before, then we have to insert zeros 
             // into the parametrisation for those variables
             if (numberdeletedvariables>0)
             {
@@ -4843,7 +4843,7 @@ NOTE:    - the procedure is also called recursively by itself, and
         // we define the weight of t, i.e. in the parametrisation t has to be replaced by t^1/tweight
         tweight=-ww[1];
         // if additional variables were necessary, we introduce them now as parameters;
-        // in any case the parametrisation ring will have only one variable, namely t,
+        // in any case the parametrisation ring will have only one variable, namely t,  
         // and its order will be local, so that it displays the lowest term in t first
         if (anzahlvariablen<nvars(basering))
         {
@@ -4871,7 +4871,7 @@ NOTE:    - the procedure is also called recursively by itself, and
       for (lll=1;lll<=size(partliftings);lll++)
       {
         if (size(partliftings[lll])==2) // when tropicalparametrise is called for the last time, it does not
-        {                     // enter the part, where wneu is defined and the variable t should have
+        {                     // enter the part, where wneu is defined and the variable t should have 
           wneu=-1;     // weight -1
         }
         else
@@ -4903,7 +4903,7 @@ NOTE:    - the procedure is also called recursively by itself, and
     kill TRRING;
   }
   // kill the gfan files in /tmp
-  system("sh","cd /tmp; /bin/rm gfaninput; /bin/rm gfanoutput");
+  system("sh","cd /tmp; /bin/rm gfaninput; /bin/rm gfanoutput");  
   // we return a list which contains lists of the parametrisation rings (with the parametrisation ideal)
   // and an integer N such that t should be replaced by t^1/N
   return(liftings);
@@ -4911,9 +4911,9 @@ NOTE:    - the procedure is also called recursively by itself, and
 
 static proc eliminatecomponents (ideal i,ideal m,int anzahlvariablen,int findall,int lastvar,intvec deletedvariables)
 "USAGE:  eliminatecomponents(i,m,n,a,v,d); i,m ideal, n,a,v int, d intvec
-ASSUME:  i is an ideal in Q[x_1,...,x_n,@a,t] and w=(-w_1/w_0,...,-w_n/w_0)
-         is in the tropical variety of i considered in Q[@a]/m{{t}}[x_1,...,x_n];
-         considered in this ring i is zero-dimensional; @a need not be present
+ASSUME:  i is an ideal in Q[x_1,...,x_n,@a,t] and w=(-w_1/w_0,...,-w_n/w_0) 
+         is in the tropical variety of i considered in Q[@a]/m{{t}}[x_1,...,x_n]; 
+         considered in this ring i is zero-dimensional; @a need not be present 
          in which case m is zero; 1<=v<=n
 RETURN:  list, L of lists
                L[j][1] = a ring containing an ideal i and an ideal m
@@ -4921,7 +4921,7 @@ RETURN:  list, L of lists
                L[j][3] = an intvec deletedvariables
 NOTE:    - the procedure is called from inside the recursive procedure tropicalparametrise
          - the procedure checks for solutions which have certain components zero; these are
-           separated from the rest by elimination and saturation; the integer deletedvariables
+           separated from the rest by elimination and saturation; the integer deletedvariables 
            records which variables have been eliminated; the integer anzahlvariablen records how
            many true variables remain after the elimination
          - if the integer a is one then all zeros of the ideal i are considered and found, otherwise
@@ -4932,16 +4932,16 @@ NOTE:    - the procedure is called from inside the recursive procedure tropicalp
   ideal I,LI; // stores the changed ideal i, respectively its leading ideal
   // if all solutions have to be found
   if (findall==1)
-  {
+  {    
     list saturatelist,eliminatelist; // carry the solution of the two tests
-    // we test first if there is a solution which has the component lastvar zero and
+    // we test first if there is a solution which has the component lastvar zero and 
     // where the order of each component is strictly positive;
     // if so, we add this variable to the ideal and eliminate it - which amounts to
     // to projecting the solutions with this component zero to the hyperplane without this component;
     // for the test we compute the saturation with respect to t and replace each variable
-    // x_i and also t by zero -- if the result is zero, then 1 is not in I:t^infty
+    // x_i and also t by zero -- if the result is zero, then 1 is not in I:t^infty 
     // (i.e. there is a solution which has the component lastvar zero) and
-    // the result lives in the maximal ideal <t,x_1,...,[no x_lastvar],...,x_n> so that
+    // the result lives in the maximal ideal <t,x_1,...,[no x_lastvar],...,x_n> so that 
     // there is a solution which has strictly positive valuation
 /*
     // DER NACHFOLGENDE TEIL IST MUELL UND WIRD NICHT MEHR GAMACHT
@@ -4953,7 +4953,7 @@ NOTE:    - the procedure is called from inside the recursive procedure tropicalp
     // however, we also have to ensure that if there exists a solution with the component lastvar
     // equal to zero then this component has a valuation with all strictly positive values!!!!;
     // for this we can either saturate the ideal after elimination with respect to <t,x_1,...,x_n>
-    // and see if the saturated ideal is contained in <t,x_1,...x_n>+m,
+    // and see if the saturated ideal is contained in <t,x_1,...x_n>+m, 
     // or ALTERNATIVELY we can pass to the ring 0,(t,x_1,...,x_n,@a),(ds(n+1),dp(1)),
     // compute a standard basis of the elimination ideal (plus m) there and check if the dimension 1
     // (since we have not omitted the variable lastvar, this means that we have the ideal
@@ -4988,13 +4988,13 @@ NOTE:    - the procedure is called from inside the recursive procedure tropicalp
       else
       {
         string elring="ring ELIMINATERING=("+charstr(basering)+"),("+string(simplify(reduce(maxideal(1),std(var(lastvar))),2))+"),(";
-      }
+      }    
       if (anzahlvariablen<nvars(basering)) // if @a was present, the ordersting needs an additional entry
       {
         elring=elring+"dp(1),";
       }
       elring=elring+"lp(1));";
-      execute(elring);
+      execute(elring);      
       ideal i=imap(BASERING,I); // move the ideal I to the new ring
       // if not yet all variables have been checked, then go on with the next smaller variable,
       // else prepare the elimination ring and the neccessary information for return
@@ -5010,12 +5010,12 @@ NOTE:    - the procedure is called from inside the recursive procedure tropicalp
       setring BASERING;
     }
     // next we have to test if there is also a solution which has the variable lastvar non-zero;
-    // to do so, we saturate with respect to this variable; since when considered over K{{t}}
+    // to do so, we saturate with respect to this variable; since when considered over K{{t}} 
     // the ideal is zero dimensional, this really removes  all solutions with that component zero;
     // the checking is then done as above
     i=std(sat(i,var(lastvar))[1]);
     I=reduce(i,std(m)); // "remove" m from i
-    // test first, if i still is in the ideal <t,x_1,...,x_n> -- if not, then
+    // test first, if i still is in the ideal <t,x_1,...,x_n> -- if not, then 
     // we know that i has no longer a point in the tropical variety with all components negative
     LI=subst(I,var(nvars(basering)),0);
     for (j=1;j<=anzahlvariablen-1;j++) // set all variables t,x_1,...,x_n equal to zero
@@ -5023,7 +5023,7 @@ NOTE:    - the procedure is called from inside the recursive procedure tropicalp
       LI=subst(LI,var(j),0);
     }
     if (size(LI)==0) // the entries of i have not constant part
-    {
+    {      
       // check now, if the leading ideal of i contains an element which only depends on t
       LI=lead(I);
       for (j=1;j<=anzahlvariablen-1;j++) //size(deletedvariables)=anzahlvariablen(before elimination)
@@ -5039,7 +5039,7 @@ NOTE:    - the procedure is called from inside the recursive procedure tropicalp
           saturatelist=eliminatecomponents(i,m,anzahlvariablen,findall,lastvar-1,deletedvariables);
         }
         else
-        {
+        {   
           execute("ring SATURATERING=("+charstr(basering)+"),("+varstr(basering)+"),("+ordstr(basering)+");");
           ideal i=imap(BASERING,i);
           export(i);
@@ -5068,7 +5068,7 @@ NOTE:    - the procedure is called from inside the recursive procedure tropicalp
       }
       if (size(LI)==0) // if no power of t is in lead(I) (where the X(i) are considered as field elements)
       {
-        // get rid of var(j)
+        // get rid of var(j)   
         i=eliminate(I,var(j));
         deletedvariables[j]=1;
         anzahlvariablen--;         // if a variable is eliminated, then the number of true variables drops
@@ -5085,7 +5085,7 @@ NOTE:    - the procedure is called from inside the recursive procedure tropicalp
       variablen=variablen+var(j);
     }
     // if there are variables left, then pass to a ring which only realises these variables
-    // else we are done
+    // else we are done 
     if (anzahlvariablen>1)
     {
       string elring="ring ELIMINATERING=("+charstr(basering)+"),("+string(variablen)+"),(dp("+string(anzahlvariablen-1)+"),";
@@ -5093,13 +5093,13 @@ NOTE:    - the procedure is called from inside the recursive procedure tropicalp
     else
     {
       string elring="ring ELIMINATERING=("+charstr(basering)+"),("+string(variablen)+"),(";
-    }
+    }    
     if (size(deletedvariables)+1<nvars(basering)) // if @a was present, the ordersting needs an additional entry
     {
       elring=elring+"dp(1),";
     }
     elring=elring+"lp(1));";
-    execute(elring);
+    execute(elring);      
     ideal i=imap(BASERING,i);
     ideal m=imap(BASERING,m);
     export(i);
@@ -5110,7 +5110,7 @@ NOTE:    - the procedure is called from inside the recursive procedure tropicalp
 
 static proc findzerosAndBasictransform (ideal i,intvec w,list zerolist,int findall,list #)
 "USAGE:      findzerosAndBasictransform(i,w,z,f[,#]); i ideal, w intvec, z list, f int,# an optional list
-ASSUME:      i is an ideal in Q[t,x_1,...,x_n,@a] and w=(w_0,...,w_n,0)
+ASSUME:      i is an ideal in Q[t,x_1,...,x_n,@a] and w=(w_0,...,w_n,0) 
              is in the tropical variety of i; @a need not be present;
              the list 'zero' contains the zeros computed in previous recursion steps;
              if 'f' is one then all zeros should be found and returned, otherwise only one
@@ -5124,8 +5124,8 @@ RETURN:      list, each entry is a ring corresponding to one conjugacy class of 
                    poly m     = the new minimal polynomial for @a (it is zero if no @a is present)
                    list zero  = zero[k+1] is the kth component of a zero the t-initial ideal of i
 NOTE:     -  the procedure is called from inside the recursive procedure tropicalparametrise;
-             if it is called in the first recursion, the list #[1] contains the t-initial ideal
-             of i w.r.t. w, otherwise #[1] is an integer, one more than the number of true
+             if it is called in the first recursion, the list #[1] contains the t-initial ideal 
+             of i w.r.t. w, otherwise #[1] is an integer, one more than the number of true 
              variables x_1,...,x_n
           -  if #[2] is present, then it is an integer which tells whether ALL zeros should be
              found or not"
@@ -5153,11 +5153,11 @@ NOTE:     -  the procedure is called from inside the recursive procedure tropica
     int recursive=0;
     int anzahlvariablen=nvars(basering);
     ideal ini=#[1]; // the t-initial ideal has been computed in before and was handed over
-  }
+  } 
   // collect the true variables x_1,...,x_n plus @a, if it is defined in BASERING
   ideal variablen;
   for (j=1;j<=nvars(basering)-1;j++)
-  {
+  {   
     variablen=variablen+var(j);
   }
   // move to a polynomial ring with global monomial ordering - the variable t is superflous,
@@ -5186,7 +5186,7 @@ NOTE:     -  the procedure is called from inside the recursive procedure tropica
       execute("ring EXTENSIONRING=("+charstr(BASERING)+"),("+string(imap(BASERING,variablen))+",@a,"+tvar+"),(dp("+string(anzahlvariablen-1)+"),dp(1),lp(1));");
       // phi maps x_i to x_i, @a to @a (if present in the ring), and the additional variable
       // for the field extension is mapped to @a as well -- note that we only apply phi
-      // to the list a, and in this list no @a is present; therefore, it does not matter
+      // to the list a, and in this list no @a is present; therefore, it does not matter 
       // where this is mapped to
       map phi=ABSRING,imap(BASERING,variablen),@a;
     }
@@ -5196,10 +5196,10 @@ NOTE:     -  the procedure is called from inside the recursive procedure tropica
       // phi maps x_i to x_i, @a to @a (if present in the ring), and the additional variable
       // for the field extension is mapped to @a as well respectively to 0, if no @a is present;
       // note that we only apply phi to the list a and to the replacement rule for
-      // the old variable @a, and in this list resp. replacement rule no @a is present;
+      // the old variable @a, and in this list resp. replacement rule no @a is present; 
       // therefore, it does not matter where this is mapped to;
       if (anzahlvariablen<nvars(EXTENSIONRING)) // @a is in EXTENSIONRING
-      {
+      {      
         map phi=ABSRING,imap(BASERING,variablen),@a; // additional variable is mapped to @a
       }
       else
@@ -5211,10 +5211,10 @@ NOTE:     -  the procedure is called from inside the recursive procedure tropica
     list maximalideals=phi(maximalideals);
     poly m=maximalideals[j][1];    // extract m
     list zeroneu=maximalideals[j][2]; // extract the new zero
-    poly repl=maximalideals[j][3]; // extract the replacement rule
+    poly repl=maximalideals[j][3]; // extract the replacement rule    
     // the list zero may very well exist as an EMPTY global list - in this case we have to remove it
     // in order to avoid a redefining warning
-    if (defined(zero)!=0)
+    if (defined(zero)!=0) 
     {
       if (size(zero)==0)
       {
@@ -5226,15 +5226,15 @@ NOTE:     -  the procedure is called from inside the recursive procedure tropica
     {
       ideal i=imap(BASERING,i);
       if (defined(zerolist)==0) // if zerolist is empty, it does not depend on BASERING !
-      {
+      {        
         list zero=imap(BASERING,zerolist);
       }
-      else
+      else 
       {
         list zero=zerolist;
       }
     }
-    else // in BASERING was @a present
+    else // in BASERING was @a present 
     {
       ideal variablen=imap(BASERING,variablen);
       // map i and zerolist to EXTENSIONRING replacing @a by the replacement rule repl
@@ -5246,12 +5246,12 @@ NOTE:     -  the procedure is called from inside the recursive procedure tropica
     // add the last vector of zeros to zero
     zero[size(zero)+1]=zeroneu;
     // do now the basic transformation sending x_l -> t^-w_l*(zero_l+x_l)
-    for (l=1;l<=anzahlvariablen;l++)
+    for (l=1;l<=anzahlvariablen;l++)  
     {
       for (k=1;k<=size(i);k++)
       {
         if (l!=1) // corresponds to  x_(l-1) --  note t is the last variable
-        {
+        {        
           i[k]=substitute(i[k],var(l-1),(zeroneu[l]+var(l-1))*t^(-w[l]));
         }
         else // corresponds to t
@@ -5264,7 +5264,7 @@ NOTE:     -  the procedure is called from inside the recursive procedure tropica
     for (l=1;l<=ncols(i);l++)
     {
       if (wdegs[l]<0) // if wdegs[l]==0 there is no need to divide, and we made sure that it is no positive
-      {
+      {      
         i[l]=i[l]/t^(-wdegs[l]);
       }
     }
@@ -5275,7 +5275,7 @@ NOTE:     -  the procedure is called from inside the recursive procedure tropica
     i=simplify(ideal(reduce(i,std(m))+m),2);
     export(i);
     export(m);
-    export(zero);
+    export(zero);    
     extensionringlist[j]=EXTENSIONRING;
     kill EXTENSIONRING;
     setring ABSRING;
@@ -5289,12 +5289,12 @@ ASSUME:      minassi is a list of maximal ideals (together with the information 
              conjugates it has), where the first polynomial is the minimal
              polynomial of the last variable in the ring which is considered as a parameter
 RETURN:      list, the procedure orders the maximal ideals in minassi according to how many new
-                   variables are needed (namely none or one) to describe the zeros of the ideal,
+                   variables are needed (namely none or one) to describe the zeros of the ideal, 
                    and accordingly to the degree of the corresponding minimal polynomial
                    l[j][1] = the minimal polynomial for the jth maximal ideal
-                   l[j][2] = list, the k+1st entry is the kth coordinate of the zero
+                   l[j][2] = list, the k+1st entry is the kth coordinate of the zero 
                                    described by the maximal ideal in terms of the last variable
-                   l[j][3] = poly, the replacement for the old variable @a
+                   l[j][3] = poly, the replacement for the old variable @a 
 NOTE:        if a maximal ideal contains a variable, it is removed from the list;
              the procedure is called by findzerosAndBasictransform"
 {
@@ -5305,11 +5305,11 @@ NOTE:        if a maximal ideal contains a variable, it is removed from the list
   list zwischen;     // needed for reordering
   list zero;         // (a_1,...,a_n)=(zero[2],...,zero[n+1]) will be a common zero of the ideal m
   poly nf;           // normalform of a variable w.r.t. m
-  poly minimalpolynomial;  // minimal polynomial for the field extension
+  poly minimalpolynomial;  // minimal polynomial for the field extension 
   poly parrep;       // the old variable @a possibly has to be replaced by a new one
   // compute for each maximal ideal the number of new variables, which are needed to describe
   // its zeros -- note, a new variable is needed if the first entry of minassi[j][1] is not the last variable
-  // store the value a variable reduces to in the list a;
+  // store the value a variable reduces to in the list a; 
   for (j=size(minassi);j>=1;j--)
   {
     minimalpolynomial=minassi[j][1][1];
@@ -5336,7 +5336,7 @@ NOTE:        if a maximal ideal contains a variable, it is removed from the list
     }
     // if the maximal ideal contains a variable, we simply delete it
     if (pruefer==0)
-    {
+    {      
       minassisort[j]=list(minimalpolynomial,zero,parrep);
     }
     // otherwise we store the information on a, neuevariablen and neuvar together with the ideal
@@ -5353,7 +5353,7 @@ NOTE:        if a maximal ideal contains a variable, it is removed from the list
   {
     l=j;
     for (k=j-1;k>=1;k--)
-    {
+    {      
       if (deg(minassisort[l][1])<deg(minassisort[k][1]))
       {
         zwischen=minassisort[l];
@@ -5392,20 +5392,20 @@ RETURN:      list, each entry corresponds to a vertex in the tropical plane curv
                    l[i][1] = x-coordinate of the ith vertex
                    l[i][2] = y-coordinate of the ith vertex
                    l[i][3] = a polynomial whose monimials mark the vertices in the Newton polygon
-                             corresponding to the entries in tp which take the common minimum
+                             corresponding to the entries in tp which take the common minimum 
                              at the ith vertex
-NOTE:      - the information in l[i][3] represents the subdivision of the Newton polygon of tp
-             (respectively a polynomial which defines tp);
-           - if # is non-empty and #[1] is the string 'max', then in the computations minimum and
-             maximum are exchanged;
-           - if # is non-empty and the #[1] is not a string, only the vertices will be computed
+NOTE:      - the information in l[i][3] represents the subdivision of the Newton polygon of tp 
+             (respectively a polynomial which defines tp); 
+           - if # is non-empty and #[1] is the string 'max', then in the computations minimum and 
+             maximum are exchanged; 
+           - if # is non-empty and the #[1] is not a string, only the vertices will be computed 
              and the information on the Newton subdivision will be omitted;
            - here the tropical polynomial is supposed to be the MINIMUM of the linear forms in tp,
              unless the optional input #[1] is the string 'max'
            - the procedure is called from tropicalCurve and from conicWithTangents"
 {
   // if you insert a single polynomial instead of an ideal representing a tropicalised polynomial,
-  // then we compute first the tropicalisation of this polynomial -- this feature is not
+  // then we compute first the tropicalisation of this polynomial -- this feature is not 
   // documented in the above help string
   if (typeof(tp)=="poly")
   {
@@ -5484,7 +5484,7 @@ NOTE:      - the information in l[i][3] represents the subdivision of the Newton
             }
             e++;
           }
-        }
+        }          
       }
     }
   }
@@ -5510,18 +5510,18 @@ ASSUME:      tp is represents an ideal in Q[x,y] representing a tropical polynom
              i.e. the Newton polygone is a line segment
 RETURN:      list, see the procedure tropicalCurve for an explanation of the syntax of this list
 NOTE:      - the tropical curve defined by tp will consist of a bunch of parallel lines and
-             throughout the procedure a list with the name bunchoflines is computed, which
+             throughout the procedure a list with the name bunchoflines is computed, which 
              represents these lines and has the following interpretation:
              list, each entry corresponds to a vertex in the tropical plane curve defined by tp
                    l[i][1] = the equation of the ith line in the tropical curve
                    l[i][2] = a polynomial whose monimials mark the vertices in the Newton polygon
-                             corresponding to the entries in tp which take the common minimum
+                             corresponding to the entries in tp which take the common minimum 
                              at the ith vertex
-           - the information in l[i][2] represents the subdivision of the Newton polygon of tp
-             (respectively a polynomial which defines tp);
-           - if # is non-empty and #[1] is the string 'max', then in the computations minimum and
-             maximum are exchanged;
-           - if # is non-empty and the #[1] is not a string, only the vertices will be computed
+           - the information in l[i][2] represents the subdivision of the Newton polygon of tp 
+             (respectively a polynomial which defines tp); 
+           - if # is non-empty and #[1] is the string 'max', then in the computations minimum and 
+             maximum are exchanged; 
+           - if # is non-empty and the #[1] is not a string, only the vertices will be computed 
              and the information on the Newton subdivision will be omitted;
            - here the tropical polynomial is supposed to be the MINIMUM of the linear forms in tp,
              unless the optional input #[1] is the string 'max'
@@ -5570,7 +5570,7 @@ NOTE:      - the tropical curve defined by tp will consist of a bunch of paralle
       while((l<=size(tp)) and (vergleiche(wert,vergleich,#)))
       {
         vergleich=substitute(tp[l],var(1),px);
-        if (vergleich==wert)
+        if (vergleich==wert)  
         {
           newton=newton+detropicalise(oldtp[l]);
         }
@@ -5581,14 +5581,14 @@ NOTE:      - the tropical curve defined by tp will consist of a bunch of paralle
         bunchoflines[e]=list((oldtp[i]-oldtp[j])/leadcoef(oldtp[i]-oldtp[j]),newton);
         e++;
       }
-    }
+    }          
   }
   // if a vertex appears several times, only its first occurence will be kept
   for (i=size(bunchoflines);i>=2;i--)
   {
     for (j=i-1;j>=1;j--)
     {
-      if (bunchoflines[i][1]==bunchoflines[j][1])
+      if (bunchoflines[i][1]==bunchoflines[j][1]) 
       {
         bunchoflines=delete(bunchoflines,i);
         j=0;
@@ -5629,7 +5629,7 @@ NOTE:      - the tropical curve defined by tp will consist of a bunch of paralle
     cc=substitute(bunchoflines[i][1],var(2),0,var(1),0);
     xc=substitute(bunchoflines[i][1]-cc,var(2),0,var(1),1);
     yc=substitute(bunchoflines[i][1]-cc,var(2),1,var(1),0);
-        if (xc!=0) // then there is a point on the line with y-coordinate zero
+	if (xc!=0) // then there is a point on the line with y-coordinate zero
     {
       gr[1]=-cc/leadcoef(xc);
       gr[2]=0;
@@ -5649,11 +5649,11 @@ NOTE:      - the tropical curve defined by tp will consist of a bunch of paralle
 }
 
 static proc clearintmat (intmat vv)
-"USAGE:      clearintmat(vv); vv intmat
+"USAGE:      clearintmat(vv); vv intmat 
 ASSUME:      all entries of the first column of vv are non-negative, not all entries are zero
              unless vv has only one column
-RETURN:      intmat, vv has been ordered in an ascending way by the entries of the first row;
-                     if an entry in the first row occurs several times, the entries in the
+RETURN:      intmat, vv has been ordered in an ascending way by the entries of the first row; 
+                     if an entry in the first row occurs several times, the entries in the 
                      second row have been added and only one row has been kept;
                      colums with a zero in the first row have been removed unless vv has only one
                      column
@@ -5662,7 +5662,7 @@ NOTE:        called by tropicalCurve"
   vv=sortintmat(vv);
   for (int i=ncols(vv)-1;i>=1;i--)
   {
-    if (vv[1,i]==vv[1,i+1])
+    if (vv[1,i]==vv[1,i+1]) 
     {
       vv[2,i]=vv[2,i]+vv[2,i+1];
       vv=intmatcoldelete(vv,i+1);
@@ -5692,7 +5692,7 @@ NOTE:        not called at all"
       {
         k++;
       }
-      else
+      else 
       {
         stop=1;
       }
@@ -5767,7 +5767,7 @@ NOTE:        the procedure is called by intmatcoldelete and sortintmat"
   if (nrows(M)>=nrows(N))
   {
     int m=nrows(M);
-
+    
   }
   else
   {
@@ -5889,15 +5889,15 @@ NOTE:        the procedure is called from tropicalCurve"
   {
     return(c);
   }
-  f=f-c;
+  f=f-c;  
   if (k==1)
   {
     return(substitute(f,var(1),1,var(2),0));
-  }
+  }    
   else
   {
     return(substitute(f,var(1),0,var(2),1));
-  }
+  }    
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -5982,7 +5982,7 @@ static proc decimal (poly n,list #)
 "USAGE:      decimal(f[,#]); f poly, # list
 ASSUME:      f is a polynomial in Q[x_1,...,x_n], and # is either empty or #[1] is a positive integer
 RETURN:      string, a decimal expansion of the leading coefficient of f up to order two respectively #[1]
-NOTE:        the procedure is called by texDrawTropical and conicWithTangents and
+NOTE:        the procedure is called by texDrawTropical and conicWithTangents and 
              f will actually be a number"
 {
   def BASERING=basering;
@@ -6009,7 +6009,7 @@ NOTE:        the procedure is called by texDrawTropical and conicWithTangents an
         nachkomma=size(s)-i;
       }
       for (j=i;j<=i+nachkomma;j++)
-      {
+      {        
         news=news+s[j];
       }
       check=1;
@@ -6039,7 +6039,7 @@ NOTE:        the procedure is called from extremeraysC"
     }
   }
   return(0);
-}
+}      
 
 static proc stringdelete (string w,int i)
 "USAGE:      stringdelete(w,i); w string, i int
@@ -6053,7 +6053,7 @@ NOTE:        the procedure is called by texNumber and choosegfanvector"
   if ((size(w)==1) and (i==1))
   {
     return("");
-
+    
   }
   if (i==1)
   {
@@ -6108,7 +6108,7 @@ NOTE:        the procedure is called by texPolynomial and texNumber"
       F=stringinsert(F,"{",j+1);
       k=j+2;
       while (k<=size(F) and ((F[k]=="0") or (F[k]=="1") or (F[k]=="2") or (F[k]=="3") or
-                                (F[k]=="4") or (F[k]=="5") or (F[k]=="6") or (F[k]=="7") or (F[k]=="8")
+                                (F[k]=="4") or (F[k]=="5") or (F[k]=="6") or (F[k]=="7") or (F[k]=="8") 
                              or (F[k]=="9")))
       {
         k++;
@@ -6122,7 +6122,7 @@ NOTE:        the procedure is called by texPolynomial and texNumber"
       F=stringinsert(F,"_{",j);
       k=j+2;
       while (k<=size(F) and ((F[k]=="0") or (F[k]=="1") or (F[k]=="2") or (F[k]=="3") or
-                                (F[k]=="4") or (F[k]=="5") or (F[k]=="6") or (F[k]=="7") or (F[k]=="8")
+                                (F[k]=="4") or (F[k]=="5") or (F[k]=="6") or (F[k]=="7") or (F[k]=="8") 
                              or (F[k]=="9")))
       {
         k++;
@@ -6135,12 +6135,12 @@ NOTE:        the procedure is called by texPolynomial and texNumber"
     {
       F=stringdelete(F,j);
       j--;
-    }
+    }      
   }
   short=altshort;
   return(F);
 }
-
+  
 static proc texcoefficient (poly f,list #)
 "USAGE:      texcoefficient(f[,#]); f poly, # optional list
 RETURN:      string, the tex command representing the leading coefficient of f using \frac as coefficient
@@ -6175,7 +6175,7 @@ NOTE:        if # is non-empty, then the cdot at the end is omitted; this is nee
     }
   }
   if (size(koeffizient)>5)
-  {
+  {    
     string tfractest=koeffizient[2..6];
     if (tfractest=="tfrac")
     {
@@ -6258,7 +6258,7 @@ NOTE:        the procedure is called by tropicalJInvariant"
 
 static proc coordinatechange (poly f,intmat A,intvec v)
 "USAGE:   coordinatechange(f,A,v);  f poly, A intmat, v intvec
-ASSUME:   f is a polynomial in two variables, A is a 2x2
+ASSUME:   f is a polynomial in two variables, A is a 2x2 
           integer matrix, and v is an integer vector with 2 entries
 RETURN:   poly, the polynomial transformed by (x,y)->A*(x,y)+v
 NOTE:     the procedure is called by weierstrassForm"
@@ -6279,7 +6279,7 @@ static proc weierstrassFormOfACubic (poly f,list #)
 "USAGE:      weierstrassFormOfACubic(wf[,#]); wf poly, # list
 ASSUME:      poly is a cubic polynomial
 RETURN:      poly, the Weierstrass normal form of the cubic, 0 if poly is not a cubic
-NOTE:        - the algorithm for the coefficients of the Weierstrass form is due to
+NOTE:        - the algorithm for the coefficients of the Weierstrass form is due to 
                Fernando Rodriguez Villegas, villegas@math.utexas.edu
              - if an additional argument # is given, the simplified Weierstrass form
                is computed
@@ -6293,7 +6293,7 @@ NOTE:        - the algorithm for the coefficients of the Weierstrass form is due
   // store the coefficients of f in a specific order
   poly t0,s1,s0,r2,r1,r0,q3,q2,q1,q0=flatten(coeffs(f,ideal(var(2)^3,var(2)^2,var(2)^2*var(1),var(2),var(2)*var(1),var(2)*var(1)^2,1,var(1),var(1)^2,var(1)^3)));
   // test, if f is already in Weierstrass form
-  if ((t0==0) and (s1==1) and (s0==0) and (r0==0) and (q0==-1))
+  if ((t0==0) and (s1==1) and (s0==0) and (r0==0) and (q0==-1) and (size(#)==0))
   {
     return (f);
   }
@@ -6303,20 +6303,20 @@ NOTE:        - the algorithm for the coefficients of the Weierstrass form is due
   poly a3=(9*t0*q0-s0*r0)*q3+((-t0*q1-s1*r0)*q2+(-s0*r2*q1-s1*r2*q0));
   poly a4=((-3*t0*r0+s0^2)*q1+(-3*s1*s0*q0+s1*r0^2))*q3
     +(t0*r0*q2^2+(s1*s0*q1+((-3*t0*r2+s1^2)*q0+s0*r0*r2))*q2
-      +(t0*r2*q1^2+s1*r0*r2*q1+s0*r2^2*q0));
+      +(t0*r2*q1^2+s1*r0*r2*q1+s0*r2^2*q0)); 
   poly a6=(-27*t0^2*q0^2+(9*t0*s0*r0-s0^3)*q0-t0*r0^3)*q3^2+
-        (((9*t0^2*q0-t0*s0*r0)*q1+((-3*t0*s0*r1+(3*t0*s1*r0+
-        2*s1*s0^2))*q0+(t0*r0^2*r1-s1*s0*r0^2)))*q2+(-t0^2*q1^3
-        +(t0*s0*r1+(2*t0*s1*r0-s1*s0^2))*q1^2+((3*t0*s0*r2+
-        (-3*t0*s1*r1+2*s1^2*s0))*q0+((2*t0*r0^2-s0^2*r0)*r2+
-        (-t0*r0*r1^2+s1*s0*r0*r1-s1^2*r0^2)))*q1+((9*t0*s1*r2-
-        s1^3)*q0^2+(((-3*t0*r0+s0^2)*r1-s1*s0*r0)*r2+(t0*r1^3
-        -s1*s0*r1^2+s1^2*r0*r1))*q0)))*q3+(-t0^2*q0*q2^3+
-        (-t0*s1*r0*q1+((2*t0*s0*r2+(t0*s1*r1-s1^2*s0))*q0-
-        t0*r0^2*r2))*q2^2+(-t0*s0*r2*q1^2+(-t0*s1*r2*q0+
-        (t0*r0*r1-s1*s0*r0)*r2)*q1+((2*t0*r0-s0^2)*r2^2+
-        (-t0*r1^2+s1*s0*r1-s1^2*r0)*r2)*q0)*q2+
-        (-t0*r0*r2^2*q1^2+(t0*r1-s1*s0)*r2^2*q0*q1-
+	(((9*t0^2*q0-t0*s0*r0)*q1+((-3*t0*s0*r1+(3*t0*s1*r0+
+	2*s1*s0^2))*q0+(t0*r0^2*r1-s1*s0*r0^2)))*q2+(-t0^2*q1^3
+	+(t0*s0*r1+(2*t0*s1*r0-s1*s0^2))*q1^2+((3*t0*s0*r2+
+	(-3*t0*s1*r1+2*s1^2*s0))*q0+((2*t0*r0^2-s0^2*r0)*r2+
+	(-t0*r0*r1^2+s1*s0*r0*r1-s1^2*r0^2)))*q1+((9*t0*s1*r2-
+	s1^3)*q0^2+(((-3*t0*r0+s0^2)*r1-s1*s0*r0)*r2+(t0*r1^3
+	-s1*s0*r1^2+s1^2*r0*r1))*q0)))*q3+(-t0^2*q0*q2^3+
+	(-t0*s1*r0*q1+((2*t0*s0*r2+(t0*s1*r1-s1^2*s0))*q0-
+	t0*r0^2*r2))*q2^2+(-t0*s0*r2*q1^2+(-t0*s1*r2*q0+
+	(t0*r0*r1-s1*s0*r0)*r2)*q1+((2*t0*r0-s0^2)*r2^2+
+	(-t0*r1^2+s1*s0*r1-s1^2*r0)*r2)*q0)*q2+
+	(-t0*r0*r2^2*q1^2+(t0*r1-s1*s0)*r2^2*q0*q1-
      t0*r2^3*q0^2));
   poly b2=a1^2+4*a2;
   poly b4=2*a4+a1*a3;
@@ -6364,7 +6364,7 @@ static proc weierstrassFormOfA2x2Curve (poly f)
 ASSUME:      poly, is a polynomial defining an elliptic curve of type (2,2) on P^1xP^1,
              i.e. a polynomial of the form a+bx+cx2+dy+exy+fx2y+gy2+hxy2+ix2y2
 RETURN:      poly, a Weierstrass form of the elliptic curve defined by poly
-NOTE:        - the algorithm is based on the paper Sang Yook An, Seog Young Kim,
+NOTE:        - the algorithm is based on the paper Sang Yook An, Seog Young Kim, 
                David C. Marshall, Susan H. Marshall, William G. McCallum and Alexander R. Perlis:
                Jacobians of Genus One Curves. Journal of Number Theory 90,2 (2001), 304-315.
              - the procedure is called by weierstrassForm
@@ -6387,7 +6387,7 @@ NOTE:        - the algorithm is based on the paper Sang Yook An, Seog Young Kim,
 }
 
 static proc jInvariantOfACubic (poly f,list #)
-"USAGE:      jInvariantOfACubic(f[,#]); f poly, # list
+"USAGE:      jInvariantOfACubic(f[,#]); f poly, # list 
 ASSUME:      poly is a cubic polynomial defining an elliptic curve
 RETURN:      poly, the j-invariant of the elliptic curve defined by poly
 NOTE:        - if the base field is Q(t) an optional argument # may be given;
@@ -6428,7 +6428,7 @@ NOTE:        - if the base field is Q(t) an optional argument # may be given;
 }
 
 static proc jInvariantOfA2x2Curve (poly f,list #)
-"USAGE:      jInvariantOfA2x2Curve(f[,#]); f poly, # list
+"USAGE:      jInvariantOfA2x2Curve(f[,#]); f poly, # list 
 ASSUME:      poly, is a polynomial defining an elliptic curve of type (2,2) on P^1xP^1,
              i.e. a polynomial of the form a+bx+cx2+dy+exy+fx2y+gy2+hxy2+ix2y2
 RETURN:      poly, the j-invariant of the elliptic curve defined by poly
@@ -6474,7 +6474,7 @@ NOTE:        - if the base field is Q(t) an optional argument # may be given;
 }
 
 static proc jInvariantOfA4x2Curve (poly f,list #)
-"USAGE:      jInvariantOfA4x2Curve(f[,#]); f poly, # list
+"USAGE:      jInvariantOfA4x2Curve(f[,#]); f poly, # list 
 ASSUME:      poly, is a polynomial defining an elliptic curve of type (4,2),
              i.e. a polynomial of the form a+bx+cx2+dx3+ex4+fy+gxy+hx2y+iy2
 RETURN:      poly, the j-invariant of the elliptic curve defined by poly
@@ -6514,9 +6514,9 @@ NOTE:        - if the base field is Q(t) an optional argument # may be given;
 }
 
 static proc jInvariantOfAPuiseuxCubic (poly f,list #)
-"USAGE:      jInvariantOfAPuiseuxCubic(f[,#]); f poly, # list
+"USAGE:      jInvariantOfAPuiseuxCubic(f[,#]); f poly, # list 
 ASSUME:      poly is a cubic polynomial over Q(t) defining an elliptic curve and # is empty
-RETURN:      list, containing two polynomials whose ratio is the j-invariant of the
+RETURN:      list, containing two polynomials whose ratio is the j-invariant of the 
                    elliptic curve defined by poly
 ASSUME:      poly is a cubic polynomial over Q(t) defining an elliptic curve and # is non-empty
 RETURN:      int, the order of the j-invariant of the elliptic curve defined by poly
@@ -6623,7 +6623,7 @@ displayTropicalLifting(tropicalLifting(g,intvec(1,-1),4),"subst");
 // --------------------------------------------------------
 // Example 3 - the ideal is not zero dimensional
 // --------------------------------------------------------
-ring r1=0,(t,x,y),dp;
+ring r1=0,(t,x,y),dp; 
 poly f=(9t27-12t26-5t25+21t24+35t23-51t22-40t21+87t20+56t19-94t18-62t17+92t16+56t15-70t14-42t13+38t12+28t11+18t10-50t9-48t8+40t7+36t6-16t5-12t4+4t2)*x2+(-9t24+12t23-4t22-42t20+28t19+30t18-20t17-54t16+16t15+48t14-16t12+8t11-18t10-26t9+30t8+20t7-24t6+4t5+28t4-8t3-16t2+4)*xy+(6t16-10t15-2t14+16t13+4t12-18t11-10t10+24t9+6t8-20t7+8t6+8t5-20t4-4t3+12t2+4t-4)*y2+(-9t28+3t27+8t26-4t25-45t24-6t23+42t22+30t21-94t20-40t19+68t18+82t17-38t16-60t15+26t14+36t13-22t12-20t11+4t10+4t9+12t8+8t7-8t6-8t5+4t4)*x+(9t27-21t26+16t25+14t24+12t23-61t22+27t21+80t20-19t19-100t18+26t17+96t16-24t15-84t14+44t12-2t11-18t10+2t9+40t8+4t7-32t6-12t5+4t3+12t2-4)*y+(9t27-12t26+4t25+36t23-18t22-28t21-2t20+54t19+14t18-52t17-44t16+24t15+40t14-4t13-12t12+4t11-4t10-4t9+4t8);
 f;
 displayTropicalLifting(tropicalLifting(f,intvec(1,-1,-4),3),"subst");
@@ -6809,7 +6809,7 @@ displayTropicalLifting(tropicalLifting(i11,intvec(1,3,1),5),"subst");
 ring r=(0,t),(x,y),dp;
 poly f=t*(x7+y7+1)+1/t*(x4+y4+x2+y2+x3y+xy3)+1/t7*x2y2;
 list graph=tropicalCurve(f);
-graph;
+graph; 
 size(graph)-1;
 drawTropicalCurve(graph);
 poly g=t3*(x7+y7+1)+1/t3*(x4+y4+x2+y2+x3y+xy3)+1/t21*x2y2;
