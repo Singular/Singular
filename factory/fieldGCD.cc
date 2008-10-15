@@ -1,6 +1,14 @@
 #include <stdio.h>
-#include <iostream.h>
 #include <config.h>
+#ifndef NOSTREAMIO
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#define OSTREAM std::ostream
+#elif defined(HAVE_IOSTREAM_H)
+#include <iostream.h>
+#define OSTREAM ostream
+#endif
+#endif /* NOSTREAMIO */
 
 #include "cf_defs.h"
 #include "canonicalform.h"
@@ -111,12 +119,12 @@ CanonicalForm fieldGCD( const CanonicalForm & F, const CanonicalForm & G )
       if(gnew == gm) // gnew did not change
       {
         g_image = gm / vcontent(gm, Variable(2));
-	//out_cf("=========== try ",g_image,"\n");
+        //out_cf("=========== try ",g_image,"\n");
         if(fdivides(g_image,f) && fdivides(g_image,g)) // trial division
-	{
-	  //printf("=========== okay\n");
+        {
+          //printf("=========== okay\n");
           return NN(c*g_image);
-	}
+        }
       }
       gm = gnew;
       continue;
