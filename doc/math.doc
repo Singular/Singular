@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.79 2006-07-20 14:30:27 Singular Exp $
+@comment $Id: math.doc,v 1.80 2008-10-16 14:21:38 bulygin Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -35,6 +35,7 @@ some articles or text books (see @ref{References}).
 @ifset withplural
 * Non-commutative algebra  ::
 @end ifset
+* Decoding codes with GB::
 * References::
 @end menu
 @c ---------------------------------------------------------------------------
@@ -711,8 +712,18 @@ using @code{spectrumnd(f,1)}.
 @end ifclear
 
 @ifset withplural
-@node References, ,Non-commutative algebra , Mathematical background
+
+@c ---------------------------------------------------------------------------
+@node Decoding codes with GB, References, Non-commutative algebra, Mathematical background
 @end ifset
+
+@section Decoding codes with GB
+@cindex  Decoding codes with GB
+
+@include{decodegb.doc}
+
+@node References, ,Decoding codes with GB , Mathematical background
+
 
 
 @section References
