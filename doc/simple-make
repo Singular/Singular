@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+cp examples.doc examples.tex
+cp general.doc general.tex
+cp math.doc math.tex
+cp pdata.doc pdata.tex
+cp platform.doc platform.tex
+cp pluconventions.doc pluconventions.tex
+cp plumath.doc plumath.tex
+cp pluplatform.doc pluplatform.tex
+cp plural.doc plural.tex
+cp pluralmain.doc pluralmain.tex
+cp plureference.doc plureference.tex
+cp plutypes.doc plutypes.tex
+cp reference.doc reference.tex
+cp start.doc start.tex
+cp ti_ip.doc ti_ip.tex
+cp tricks.doc tricks.tex
+cp types.doc types.tex
+for i in pluplatform.tex plural.tex plumath.tex plureference.tex plutypes.tex pluconventions.tex
+do
+  sed 's/@value{PSUFFIX}/(plural)/g' <$i >s-$i
+done
+sed -e 's/@include plu/@include s-plu/' -e 's/@value{PSUFFIX}/(plural)/g' < plural.tex >s-plural.tex
+texi2dvi singular.doc
