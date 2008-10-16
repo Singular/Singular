@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.310 2008-10-01 13:55:30 Singular Exp $
+@comment $Id: reference.doc,v 1.311 2008-10-16 10:09:57 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1656,7 +1656,7 @@ type @code{(p^n,a)}.
 @c ref
 See
 @ref{poly};
-@ref{absFactorize).
+@ref{absFactorize}.
 @c ref
 @c ---------------------------------------
 @node fetch, fglm, factorize, Functions
@@ -2961,7 +2961,7 @@ The second argument has to be a map from the basering to the given ring
 @end table
 @c ref
 See
-@ref{preimage);
+@ref{preimage};
 @ref{map};
 @ref{ideal};
 @ref{ring};
