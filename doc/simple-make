@@ -25,11 +25,15 @@ do
   sed 's/@value{PSUFFIX}/(plural)/g' <$i >s-$i
 done
 sed -e 's/@include plu/@include s-plu/' -e 's/@value{PSUFFIX}/(plural)/g' < plural.tex >s-plural.tex
-# DVI:
+# DVI: --------------------------------------------
 texi2dvi singular.doc
-# HTML:
+# INFO: -------------------------------------------
+makeinfo --force --no-split singular.doc
+# HTML: -------------------------------------------
 /bin/rm -rf tmp
 mkdir tmp
 perl ./texi2html -init_file t2h_singular.init \
   -l2h -short_ext -l2h_tmp tmp -subdir html -prefix simple \
   -top_file index.htm  singular.doc
+#
+echo "created: singular.hlp (info), singular.dvi, html/index.htm"
