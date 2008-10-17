@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.80 2008-10-16 14:21:38 bulygin Exp $
+@comment $Id: math.doc,v 1.81 2008-10-17 08:36:26 bulygin Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -681,7 +681,7 @@ using @code{spectrumnd(f,1)}.
 
 @c ---------------------------------------------------------------------------
 @ifclear withplural
-@node Toric ideals and integer programming, References, Gauss-Manin connection, Mathematical background
+@node Toric ideals and integer programming, Decoding codes with GB, Gauss-Manin connection, Mathematical background
 @end ifclear
 
 @ifset withplural
@@ -697,7 +697,7 @@ using @code{spectrumnd(f,1)}.
 @ifset withplural
 
 @c ---------------------------------------------------------------------------
-@node Non-commutative algebra, References, Toric ideals and integer programming, Mathematical background
+@node Non-commutative algebra, Decoding codes with GB, Toric ideals and integer programming, Mathematical background
 
 @section Non-commutative algebra
 @cindex  Non-commutative algebra
@@ -708,21 +708,19 @@ using @code{spectrumnd(f,1)}.
 @c ---------------------------------------------------------------------------
 
 @ifclear withplural
-@node References, , Toric ideals and integer programming, Mathematical background
+@node Decoding codes with GB, References, Toric ideals and integer programming, Mathematical background
 @end ifclear
 
 @ifset withplural
-
 @c ---------------------------------------------------------------------------
 @node Decoding codes with GB, References, Non-commutative algebra, Mathematical background
 @end ifset
 
 @section Decoding codes with GB
 @cindex  Decoding codes with GB
+@include decodegb.tex
 
-@include{decodegb.doc}
-
-@node References, ,Decoding codes with GB , Mathematical background
+@node References, ,Decoding codes with GB, Mathematical background
 
 
 
