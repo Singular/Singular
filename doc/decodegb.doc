@@ -170,7 +170,7 @@ where t is the number of errors, @{ j_1 , @dots{} , j_t @} are the @strong{error
 Define z_l=a^(j_l) and y_l=e_(j_l). Then z_1,@dots{},z_t are the error locations and 
 y_1,@dots{},y_t are the error values and
 the syndromes above become @strong{generalized power sum functions} 
-s_{i_m}=sum_{l=1}^t y_l z_l^(i_m), 1\le m \le n-k.
+s_(i_m)=sum_(l=1)^t y_l z_l^(i_m), 1\le m \le n-k.
 @end ifinfo
 
 @subsubheading CRHT-ideal
@@ -182,7 +182,7 @@ Replace the concrete values above by variables and add some natural restrictions
   $f_u := \sum_{l=1}^e Y_lZ_l^{i_u}-X_u=0, 1\le u\le n-k$;
 @end tex
 @ifinfo
-  f_u := sum_{l=1}^e Y_l Z_l^(i_u)-X_u=0, 1<= u<=e n-k;
+  f_u := sum_(l=1)^e Y_l Z_l^(i_u)-X_u=0, 1<= u<=e n-k;
 @end ifinfo
 @item 
 @tex 
@@ -260,7 +260,7 @@ after Chen, Reed, Helleseth and Truong.
     $L_C(s,Z)=Z^{e-t}\prod_{i=1}^{t}(Z-a ^{k_i}).$
 @end tex
 @ifinfo
-    given a syndrome s=(s_@{i_1@},@dots{},s_@{i_@{n-k@}@}) in F^(n-k)} corresponding to an error of weight t<= e
+    given a syndrome s=(s_@{i_1@},@dots{},s_@{i_@{n-k@}@}) in F^(n-k)@} corresponding to an error of weight t<= e
     and error locations @{k_1,@dots{},k_t@}, if we evaluate the X_u=s_@{i_u@} for all 1<= u <= n-k,
     then the roots of L_C(s,Z) are exactly a^(k_1),@dots{},a^(k_t) and 0 of multiplicity e-t, in other words
     L_C(s,Z)=Z^(e-t) prod_@{i=1@}^t(Z-a^(k_i)).
@@ -400,7 +400,7 @@ s_i+sum_@{j=1@}^t sigma_j s_@{i-j@}=0, forall i in Z_n.
   $$
 @end tex
 @ifinfo
-We have s_@{i+n@}=s_i, forall  i in Z_n, since s_@{i+n@}=r(a^(i+n))=r(a^i)}. Furthermore
+We have s_@{i+n@}=s_i, forall  i in Z_n, since s_@{i+n@}=r(a^(i+n))=r(a^i)@}. Furthermore
 s_i^q=(e(a^i))^q=e(a^(iq))=s_@{qi@}, forall i in Z_n and sigma_i^(q^m)=sigma_i, forall 1<= i <= t.
 Replace the syndromes by variables and obtain following set of polynomials @code{Newton_t} in the variables
 S_1,@dots{},S_n and sigma_1,@dots{},sigma_t:
@@ -446,7 +446,7 @@ Every q-ary linear code C with parameters [n,k] can be seen as an
 @strong{evaluation map}
  phi:R --> F_q ^n,
  ^f^ |-> (f(P_1),@dots{},f(P_n)),    
-where R:=F_q[U_1,@dots{},U_s]/I_q}, L is a vector subspace of R and ^f^ 
+where R:=F_q[U_1,@dots{},U_s]/I_q], L is a vector subspace of R and ^f^ 
 the coset of f in F_q[U_1,@dots{},U_s] modulo I_q.
 @end ifinfo
 
@@ -456,7 +456,7 @@ the coset of f in F_q[U_1,@dots{},U_s] modulo I_q.
   Given a $q$-ary $[n,k]$ code $C$ with a generator matrix $G=(g_{ij})$:
 @end tex
 @ifinfo
-  Given a q-ary [n,k] code C with the generator matrix G=(g_{ij}):
+  Given a q-ary [n,k] code C with the generator matrix G=(g_@{ij@}):
 @end ifinfo
 @enumerate
 @c @bullet
@@ -475,7 +475,7 @@ the coset of f in F_q[U_1,@dots{},U_s] modulo I_q.
 @end tex
 @ifinfo
   Construct a Groebner basis @{g_1,@dots{},g_m@} for an ideal I of polynomials from F_q[X_1,@dots{},X_s]
-  that vanish at the points P_1,@dots{},P_s \ref{vanishId}. Denote by
+  that vanish at the points P_1,@dots{},P_s @ref{vanishId}. Denote by
   xi_i in F_q[X_1,@dots{},X_s] such that xi_i(P_i)=1,\xi_i(P_j)=0,i<>j. 
 @end ifinfo
 @item 
@@ -699,6 +699,7 @@ algebraic closure of F_q. Then
   V_j-v_j, j=1,@dots{},t,  
   where (u(e),v)} is the unique solution.
 @end ifinfo
+@end itemize
 
 For an example see example to @code{sysQE} in @ref{decodegb.lib}.
 

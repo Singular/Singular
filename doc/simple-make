@@ -20,6 +20,7 @@ cp start.doc start.tex
 cp ti_ip.doc ti_ip.tex
 cp tricks.doc tricks.tex
 cp types.doc types.tex
+cp decodegb.doc decodegb.tex
 for i in pluplatform.tex plural.tex plumath.tex plureference.tex plutypes.tex pluconventions.tex
 do
   sed 's/@value{PSUFFIX}/(plural)/g' <$i >s-$i

@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.103 2008-06-18 14:48:56 wienand Exp $
+### $Id: Makefile.in,v 1.104 2008-10-17 09:01:33 Singular Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -112,7 +112,7 @@ PLU_ONLY_FILES		= pluplatform.tex
 PLU_DOC2TEX_FILES	= \
 		plural.tex plumath.tex plureference.tex plutypes.tex pluconventions.tex
 
-DOC2TEX_FILES	= \
+DOC2TEX_FILES	= decodegb.tex \
 		examples.tex general.tex ti_ip.tex math.tex reference.tex \
 		start.tex types.tex pdata.tex tricks.tex platform.tex \
 		${PLU_DOC2TEX_FILES}
