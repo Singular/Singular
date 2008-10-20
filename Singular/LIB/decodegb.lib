@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: decodegb.lib,v 1.6 2008-10-08 16:52:24 bulygin Exp $";
+version="$Id: decodegb.lib,v 1.7 2008-10-20 17:21:36 bulygin Exp $";
 category="Coding theory";
 info="
 LIBRARY: decodegb.lib         Decoding and min distance of linear codes with GB
@@ -11,13 +11,7 @@ OVERVIEW:
  and generalized Newton identities. The original method of quadratic equations 
  is worked out here as well. We also (for comparison) enable to work with the 
  system of Fitzgerald-Lax. We provide some auxiliary functions for further 
- manipulations and decoding. For an overview of the methods mentioned above, 
- cf. 
- @format
-  Stanislav Bulygin, Ruud Pellikaan: 'Decoding and finding the minimum 
-  distance with Groebner bases: history and new insights', in 'Selected Topics 
-  in Information and Coding Theory', World Scientific (2008) (to appear) (*).
- @end format
+ manipulations and decoding. For an overview of the methods mentioned above @ref{Decoding codes with GB} 
  For the vanishing ideal computation the algorithm of Farr and Gao is 
  implemented.
 
@@ -105,11 +99,12 @@ proc sysCRHT (int n, list defset, int e, int q, int m, list #)
          - if k>0 additional equations representing the fact that every two 
          error positions are either different or at least one of them is zero
 @end format
-RETURN:  
-@format
-        the ring to work with the CRHT-ideal (with Sala's additions), 
+RETURN: the ring to work with the CRHT-ideal (with Sala's additions), 
         containig an ideal with name 'crht'
-@end format
+THEORY:  Based on 'defset' of the given cyclic code, the procedure constructs 
+         the corresponding Cooper-Reed-Heleseth-Truong ideal 'crht'. With its 
+         help one can solve the decoding problem. For basics of the method @ref{Copper philosophy}.
+SEE ALSO: sysNewton, sysBin
 EXAMPLE: example sysCRHT; shows an example
 "
 {
@@ -208,11 +203,12 @@ proc sysCRHTMindist (int n, list defset, int w)
         - defset is a list representing the defining set,
         - w is a candidate for the minimum distance
 @end format
-RETURN:
-@format
-         the ring to work with the Sala's ideal for the minimum distance 
+RETURN:  the ring to work with the Sala's ideal for the minimum distance 
          containing the ideal with name 'crht_md'
-@end format
+THEORY:  Based on 'defset' of the given cyclic code, the procedure constructs 
+         the corresponding Cooper-Reed-Heleseth-Truong ideal 'crht_md'. With 
+         its help one can find minimum distance of the code in the binary 
+         case. For basics of the method @ref{Copper philosophy}.
 EXAMPLE: example sysCRHTMindist; shows an example
 "
 {
@@ -294,11 +290,13 @@ proc sysNewton (int n, list defset, int t, int q, int m, list #)
          - if tr>0 it indicates that Newton identities in triangular 
            form should be constructed
 @end format
-RETURN:   
-@format
-        the ring to work with the generalized Newton identities (in triangular 
-        form if applicable) containing the ideal with name 'newton'
-@end format
+RETURN:  the ring to work with the generalized Newton identities (in 
+         triangular form if applicable) containing the ideal with name 'newton'
+THEORY:  Based on 'defset' of the given cyclic code, the procedure constructs 
+         the corresponding ideal 'newton' with the generalized Newton 
+         identities. With its help one can solve the decoding problem. For 
+         basics of the method @ref{Copper philosophy}.
+SEE ALSO: sysCRHT, sysBin
 EXAMPLE:  example sysNewton; shows an example
 "
 {  
@@ -478,12 +476,12 @@ proc sysBin (int v, list Q, int n, list #)
            set to 1, then the generating set is enlarged by odd elements, 
            which are 2^(some power)*(some elment in the gen.set) mod n
 @end format
-THEORY:    
-@format
-          The system using Waring's function due to Augot et.al. 
-          is built as in [*].
-@end format
 RETURN:    the ring with the resulting system called 'bin'
+THEORY:  Based on Q of the given cyclic code, the procedure constructs 
+         the corresponding ideal 'bin' with the use of Waring function. 
+         With its help one can solve the decoding problem. 
+         For basics of the method @ref{Generalized Newton identities}.
+SEE ALSO: sysNewton, sysCRHT
 EXAMPLE:   example sysBin; shows an example
 "
 {
@@ -570,7 +568,8 @@ EXAMPLE:   example sysBin; shows an example
  ideal bin=simplify(result,2);
  export bin;
  return(r);
-} example 
+} 
+example 
 {
      "EXAMPLE:";  echo = 2;
      // [31,16,7] quadratic residue code
@@ -592,7 +591,8 @@ EXAMPLE: example encode; shows an example
  if (nrows(x)>1) {print("ERRORencode1!");}
  if (ncols(x)!=nrows(g)) {print("ERRORencode2!");}
  return(x*g);
-} example 
+} 
+example 
 {
      "EXAMPLE:";  echo = 2;
      ring r=2,x,dp;
@@ -616,7 +616,8 @@ EXAMPLE: example syndrome; shows an example
  if (nrows(c)>1) {print("ERRORsyndrome1!");}
  if (ncols(c)!=ncols(h)) {print("ERRORsyndrome2!");}
  return(h*transpose(c));  
-} example 
+} 
+example 
 {
      "EXAMPLE:";  echo = 2;
      ring r=2,x,dp;
@@ -664,8 +665,13 @@ proc sysQE(matrix check, matrix y, int t, list #)
           be as a number of elements in the INITIAL alphabet) one
           needs to set formal>0 for the exponent
 @end format
-THEORY:   The system of quadratic equations is built as in [*].
 RETURN:   the ring to work with together with the resulting system called 'qe'
+THEORY:  Based on 'check' of the given linear code, the procedure constructs 
+         the corresponding ideal that gives an opportunity to compute
+         unknown syndrome of the received word y. Further
+         one is able to solve the decoding problem. 
+         For basics of the method @ref{Decoding method based on quadratic equations}.
+SEE ALSO: sysFL
 EXAMPLE:  example sysQE; shows an example
 "
 {
@@ -819,7 +825,8 @@ EXAMPLE:  example sysQE; shows an example
  ideal qe=result;
  export qe;
  return(work); 
-} example 
+} 
+example 
 {
      "EXAMPLE:";  echo = 2;
      intvec v = option(get);
@@ -869,7 +876,8 @@ EXAMPLE: example errorInsert; shows an example
   result[1,pos[i]]=y[1,pos[i]]+val[i];
  }
  return(result);
-} example 
+} 
+example 
 {
      "EXAMPLE:";  echo = 2;
      //correct 2 errors in [7,3] 8-ary code RS code
@@ -936,7 +944,8 @@ EXAMPLE:   example errorRand; shows an example
   result[1,pos[i]]=y[1,pos[i]]+val[i];
  }
  return(result);
-} example 
+} 
+example 
 {
   "EXAMPLE:";  echo = 2;
      //correct 2 errors in [7,3] 8-ary code RS code
@@ -980,7 +989,8 @@ EXAMPLE:   example randomCheck; shows an example
  }
  result=concat(rand,unitmat(m));
  return(result);
-} example 
+} 
+example 
 {
   "EXAMPLE:";  echo = 2;     
      int redun=5; int n=15;
@@ -1003,12 +1013,9 @@ proc genMDSMat(int n, number a)
         - n x n are dimensions of the MDS matrix, 
         - a is a primitive element of the field.
 @end format    
-NOTE:     
-@format
-        An MDS matrix is constructed in the following way. We take a to be a 
+NOTE:   An MDS matrix is constructed in the following way. We take a to be a 
         generator of the multiplicative group of the field. Then we construct 
         the Vandermonde matrix with this a.
-@end format
 ASSUME:   extension field should already be defined 
 RETURN:   a matrix with the MDS property
 EXAMPLE:  example genMDSMat; shows an example  
@@ -1024,7 +1031,8 @@ EXAMPLE:  example genMDSMat; shows an example
   } 
  }
  return(result);
-} example 
+} 
+example 
 {
      "EXAMPLE:";  echo = 2;
      int q=16; int n=15;
@@ -1044,11 +1052,8 @@ proc mindist (matrix check)
         - check is a check matrix, 
         - q is the field size
 @end format
-RETURN:
-@format
-        minimum distance of the code together with the time needed for its 
-        calculation
-@end format
+RETURN:  minimum distance of the code together with the time needed for its 
+         calculation
 EXAMPLE: example mindist; shows an example 
 "
 {
@@ -1132,13 +1137,10 @@ proc decode(matrix check, matrix rec)
           - rec is a received word, 
           - t is an upper bound for the number of errors one wants to correct
 @end format
-ASSUME:
-@format
-          Errors in rec should be correctable, otherwise the output is 
+ASSUME:   Errors in rec should be correctable, otherwise the output is 
           unpredictable
-@end format
-RETURN:    a codeword that is closest to rec
-EXAMPLE:   example decode; shows an example 
+RETURN:   a codeword that is closest to rec
+EXAMPLE:  example decode; shows an example 
 "
 {
  intvec vopt = option(get); 
@@ -1500,10 +1502,8 @@ static proc divisible (poly m, ideal G)
 
 proc vanishId (list points)
 "USAGE:  vanishId (points); point is a list of matrices
-@format
-        - points is a list of points for which the vanishing ideal is to be 
+        'points' is a list of points for which the vanishing ideal is to be 
         constructed        
-@end format
 RETURN:  Vanishing ideal corresponding to the given set of points
 EXAMPLE: example vanishId; shows an example 
 "
@@ -1544,7 +1544,8 @@ EXAMPLE: example vanishId; shows an example
      }
      attrib(G,"isSB",1);
      return(G);
-} example 
+} 
+example 
 {
      "EXAMPLE:";  echo = 2;
       ring r=3,(x(1..3)),dp;
@@ -1734,7 +1735,11 @@ proc sysFL (matrix check, matrix y, int t, int e, int s)
           - e is the extension degree, 
           - s is the dimension of the point for the vanishing ideal
 @end format
-RETURN:    the system of Fitzgerald-Lax for the given decoding problem
+RETURN:  the system of Fitzgerald-Lax for the given decoding problem
+THEORY:  Based on 'check' of the given linear code, the procedure constructs 
+         the corresponding ideal constructed with a generalization of
+         Cooper's philosophy. For basics of the method @ref{Fitzgerald-Lax method}.
+SEE ALSO: sysQE
 EXAMPLE:   example sysFL; shows an example
 "
 {
