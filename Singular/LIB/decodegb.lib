@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: decodegb.lib,v 1.7 2008-10-20 17:21:36 bulygin Exp $";
+version="$Id: decodegb.lib,v 1.8 2008-10-22 13:31:48 bulygin Exp $";
 category="Coding theory";
 info="
 LIBRARY: decodegb.lib         Decoding and min distance of linear codes with GB
@@ -103,7 +103,7 @@ RETURN: the ring to work with the CRHT-ideal (with Sala's additions),
         containig an ideal with name 'crht'
 THEORY:  Based on 'defset' of the given cyclic code, the procedure constructs 
          the corresponding Cooper-Reed-Heleseth-Truong ideal 'crht'. With its 
-         help one can solve the decoding problem. For basics of the method @ref{Copper philosophy}.
+         help one can solve the decoding problem. For basics of the method @ref{Cooper philosophy}.
 SEE ALSO: sysNewton, sysBin
 EXAMPLE: example sysCRHT; shows an example
 "
@@ -208,7 +208,7 @@ RETURN:  the ring to work with the Sala's ideal for the minimum distance
 THEORY:  Based on 'defset' of the given cyclic code, the procedure constructs 
          the corresponding Cooper-Reed-Heleseth-Truong ideal 'crht_md'. With 
          its help one can find minimum distance of the code in the binary 
-         case. For basics of the method @ref{Copper philosophy}.
+         case. For basics of the method @ref{Cooper philosophy}.
 EXAMPLE: example sysCRHTMindist; shows an example
 "
 {
@@ -295,7 +295,7 @@ RETURN:  the ring to work with the generalized Newton identities (in
 THEORY:  Based on 'defset' of the given cyclic code, the procedure constructs 
          the corresponding ideal 'newton' with the generalized Newton 
          identities. With its help one can solve the decoding problem. For 
-         basics of the method @ref{Copper philosophy}.
+         basics of the method @ref{Cooper philosophy}.
 SEE ALSO: sysCRHT, sysBin
 EXAMPLE:  example sysNewton; shows an example
 "
