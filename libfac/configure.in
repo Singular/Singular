@@ -6,19 +6,22 @@ dnl
 dnl Initialisation
 dnl
 AC_INIT(factor.h)
+AC_CONFIG_HEADER(factor/version.h)
 
 dnl
 dnl Set up variables for Makefile.in
 dnl
 dnl Change libfac variables here:
-AC_SUBST(libfac_name)
 libfac_name="\"Factorization and characteristic sets library\""
-AC_SUBST(libfac_version)
+AC_SUBST(libfac_name)
 libfac_version="3.1.0"
-AC_SUBST(libfac_date)
+AC_DEFINE_UNQUOTED(LIBFAC_VERSION,"$libfac_version")
+AC_SUBST(libfac_version)
 libfac_date="\"Aug 2008\""
-AC_SUBST(libfac_author)
+AC_DEFINE_UNQUOTED(LIBFAC_DATE,$libfac_date)
+AC_SUBST(libfac_date)
 libfac_author="\"M. Messollen\""
+AC_SUBST(libfac_author)
 
 AC_SUBST(libfac)
 libfac="libfac"
@@ -189,8 +192,3 @@ fi
 AC_SUBST(CXXTEMPLFLAGS)
 
 AC_OUTPUT(Makefile)
-
-dnl
-dnl Plans:
-dnl 1) look for libraries (warn if not found) for building testprog
-dnl 1) search for perl
