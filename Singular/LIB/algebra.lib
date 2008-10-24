@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: algebra.lib,v 1.17 2008-10-06 17:04:26 Singular Exp $";
+version="$Id: algebra.lib,v 1.18 2008-10-24 12:16:59 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  algebra.lib   Compute with Algbras and Algebra Maps
@@ -264,7 +264,7 @@ EXAMPLE: example inSubring; shows an example
   // ---------- create new ring with extra variables --------------------
   //the intersection of ideal nett=(p-y(0),I[1]-y(1),...)
   //with the ring k[y(0),...,y(n)] is computed, the result is ker
-   execute ("ring r1= ("+charstr(basering)+"),(x(1..n),y(0..z)),dp;");
+   execute ("ring r1= ("+charstr(basering)+"),(x(1..n),y(0..z)),lp;");
  //  execute ("ring r1= ("+charstr(basering)+"),(y(0..z),x(1..n)),dp;");
   execute ("minpoly=number("+mp+");");
   ideal va = x(1..n);
@@ -278,6 +278,7 @@ EXAMPLE: example inSubring; shows an example
   if (is_qring) { nett = nett,emb(IdQ); }
   //-----------------
   ideal ker=eliminate(nett,product(va));
+  ker=std(ker);
   //---------- test wether y(0)-h(y(1),...,y(z)) is in ker --------------
   l[1]=0;
   l[2]="";
