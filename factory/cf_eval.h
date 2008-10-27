@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_eval.h,v 1.5 2006-05-15 09:03:04 Singular Exp $ */
+/* $Id: cf_eval.h,v 1.6 2008-10-27 10:16:09 Singular Exp $ */
 
 #ifndef INCL_CF_EVAL_H
 #define INCL_CF_EVAL_H
@@ -26,7 +26,7 @@ protected:
     CFArray values;
 public:
     Evaluation() : values() {}
-    Evaluation( int min, int max ) : values( min, max ) {}
+    Evaluation( int min0, int max0 ) : values( min0, max0 ) {}
     Evaluation( const Evaluation & e ) : values( e.values ) {}
     virtual ~Evaluation() {}
     Evaluation& operator= ( const Evaluation & e );
