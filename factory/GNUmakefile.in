@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.59 2008-08-20 14:43:12 Singular Exp $
+# $Id: GNUmakefile.in,v 1.60 2008-10-28 18:34:08 Singular Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -393,7 +393,7 @@ distfiles :=	\
 		$(addprefix ftest/,$(ftestdistfiles)) \
 		GNUmakefile.in configure.in config.h.in configure \
 		ChangeLog README NEWS INSTALL \
-		factory.cfg \
+		factory.cfg gen_cf_gmp.template \
 		$(addprefix winnt/,$(distntfiles)) \
 		examples/GNUmakefile examples/application.cc \
 		examples/factorize.cc examples/gcd.cc \
