@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.cc,v 1.6 2008-10-25 11:05:51 Singular Exp $ */
+/* $Id: mmalloc.cc,v 1.7 2008-10-28 09:12:40 Singular Exp $ */
 /*
 * ABSTRACT: standard version of C++-memory management alloc func
 */
@@ -17,9 +17,27 @@
 void* operator new ( size_t size )
 {
   void* addr;
-  if (!size) size = 1;
+  if (size==(size_t)0) size = 1;
   omTypeAlloc(void*, addr, size);
   return addr;
+}
+
+void operator delete ( void* block )
+{
+  omfree( block );
+}
+
+void* operator new[] ( size_t size )
+{
+  void* addr;
+  if (size==(size_t)0) size = (size_t)1;
+  omTypeAlloc(void*, addr, size);
+  return addr;
+}
+
+void operator delete[] ( void* block )
+{
+  omfree( block );
 }
 
 // The C++ standard has ratified a change to the new operator.
@@ -49,29 +67,10 @@ void * operator new(size_t size, const std::nothrow_t &) throw()
   return addr;
 }
 
-void operator delete ( void* block )
-{
-  omfree( block );
-}
-
-void* operator new[] ( size_t size )
-{
-  void* addr;
-  if (size==(size_t)0) size = (size_t)1;
-  omTypeAlloc(void*, addr, size);
-  return addr;
-}
-
 void * operator new[](size_t size, const std::nothrow_t &) throw()
 {
   void* addr;
   if (size==(size_t)0) size = (size_t)1;
   omTypeAlloc(void*, addr, size);
   return addr;
-}
-
-
-void operator delete[] ( void* block )
-{
-  omfree( block );
 }
