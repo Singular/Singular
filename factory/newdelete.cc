@@ -1,7 +1,8 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: newdelete.cc,v 1.3 2008-10-25 11:04:06 Singular Exp $ */
+/* $Id: newdelete.cc,v 1.4 2008-10-28 08:46:23 Singular Exp $ */
 
 #include <config.h>
+#include <new>
 
 #include "assert.h"
 
@@ -52,11 +53,11 @@ void operator delete[] ( void * block )
     freeBlock( block, 0 );
 }
 
-void * operator new(size_t size, const std::nothrow_t &) throw()
+void * operator new(size_t size, std::nothrow_t) throw()
 {
     return getBlock( size );
 }
-void * operator new[](size_t size, const std::nothrow_t &) throw()
+void * operator new[](size_t size, std::nothrow_t) throw()
 {
     return getBlock( size );
 }
@@ -83,11 +84,11 @@ void operator delete[] ( void * block )
     mmFree( block );
 }
 
-void * operator new(size_t size, const std::nothrow_t &) throw()
+void * operator new(size_t size, const std::nothrow_t&) throw()
 {
     return mmAlloc( size );
 }
-void * operator new[](size_t size, const std::nothrow_t &) throw()
+void * operator new[](size_t size, const std::nothrow_t&) throw()
 {
     return mmAlloc( size );
 }
