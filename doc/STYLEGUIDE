@@ -70,7 +70,10 @@
 
 + @tex and '@end tex' should always be on separate lines
 
-
++ keine latex-Konstrukte in @tex.. @end tex, 
+  also z.B. kein \begin{..}...\end{..}, etc.:
+  hier darf nur auftauchen, was sowohl von tex als auch von latex
+  verstanden wird
 
 * Notationen *
 ==============
@@ -279,4 +282,4 @@ i;  // mit Leerzeichen beginnen.
 + Innerhalb einer @tex-Umgebeung keine texinfo-Befehle (wie @ref) verwenden.
 
 ------------------------------------------------------------
-$Id: STYLEGUIDE,v 1.19 2006-11-28 14:53:53 Singular Exp $
+$Id: STYLEGUIDE,v 1.20 2008-10-29 15:42:36 Singular Exp $
