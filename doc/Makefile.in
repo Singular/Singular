@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.104 2008-10-17 09:01:33 Singular Exp $
+### $Id: Makefile.in,v 1.105 2008-10-29 15:43:19 Singular Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -110,7 +110,7 @@ PLU_STANDALONE_TEXI_FILES = COPYING.plural.texi INSTALL_unix.plural.texi \
 PLU_ONLY_FILES		= pluplatform.tex
 
 PLU_DOC2TEX_FILES	= \
-		plural.tex plumath.tex plureference.tex plutypes.tex pluconventions.tex
+		plural.tex plumath.tex plureference.tex plutypes.tex pluconventions.tex letterplace.tex
 
 DOC2TEX_FILES	= decodegb.tex \
 		examples.tex general.tex ti_ip.tex math.tex reference.tex \

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.110 2008-10-10 12:03:15 Singular Exp $
+@comment $Id: NEWS.texi,v 1.111 2008-10-29 15:43:19 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -275,7 +275,7 @@ Major new features are:
 @item
 @nref{Dynamic modules}
 @item
-non-commutative extension @nref{Non-commutative subsystem PLURAL}
+non-commutative extension @nref{Non-commutative subsystem}
 @item
 name spaces (@nref{package})
 @item

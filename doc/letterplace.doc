@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: letterplace.doc,v 1.1 2008-10-28 16:39:35 Singular Exp $
+@comment $Id: letterplace.doc,v 1.2 2008-10-29 15:43:19 Singular Exp $
 @comment this file contains the mathematical background of Singular:Letterplace
 
 @c The following directives are necessary for proper compilation
@@ -9,8 +9,11 @@
 @c ignores the `@ignore').
 @ignore
 %**start
-\input texinfo.tex
-@setfilename letterplace.info
+@end ignore
+
+@node Letterplace,,,Non-commutative subsystem
+@section Letterplace
+@cindex Letterplace
 
 This section describes mathematical notions and definitions used in
 the experimental @sc{Letterplace} extension of @sc{Singular}.
@@ -24,100 +27,147 @@ All algebras are assumed to be associative @math{K}-algebras for some field @mat
 * Free associative algebras::
 * Groebner bases for two-sided ideals in free associative algebras::
 * Letterplace correspondence::
-* Example of use::
+* Example of use of Letterplace::
 * Release notes::
 @end menu
 
 
 @c ---------------------------------------------------------------------------
-@node Free associative algebras, Groebner bases for two-sided ideals in free associative algebras
-@section Free associative algebras
+@node Free associative algebras, Groebner bases for two-sided ideals in free associative algebras, , Letterplace
+@subsection Free associative algebras
 @cindex free associative algebra, tensor algebra
 
-Let $V$ be a $K$-vector space, spanned by the symbols $x_1,\dots,x_n$.
-Free associative algebra in $x_1,\dots,x_n$ over $K$, denoted by 
-$K\langle x_1,\dots,x_n \rangle$ is also known as a tensor algebra $T(V)$ of $V$.
-It is an infinite dimensional $K$-vector space, where as a basis one can take
-the elements of a free monoid $\langle x_1,\dots,x_n \rangle$. In other
-words, the monomials of $K\langle x_1,\dots,x_n \rangle$ are the words
-of finite length in the finite alphabet $\{ x_1,\dots,x_n \}$. 
-$K\langle x_1,\dots,x_n \rangle$ is an integral domain, which is not
-Noetherian for $n\geq 2$ (hence, a Groebner basis of an ideal might
+Let V be a K-vector space, spanned by the symbols @math{x_1},@dots{},@math{x_n}.
+Free associative algebra in @math{x_1},@dots{},@math{x_n} over K, denoted by 
+K< @math{x_1},@dots{},@math{x_n} > is also known as a tensor algebra T(V) of V.
+It is an infinite dimensional K-vector space, where as a basis one can take
+the elements of a free monoid < @math{x_1},@dots{},@math{x_n} >. In other
+words, the monomials of K< @math{x_1},@dots{},@math{x_n} > are the words
+of finite length in the finite alphabet @{ @math{x_1},@dots{},@math{x_n} @}. 
+K< @math{x_1},@dots{},@math{x_n} > is an integral domain, which is not
+Noetherian for n>=2 (hence, a Groebner basis of an ideal might
 be infinite). It can be regarded as a graded algebra in a natural way. 
 
 Any finitely presented associative algebra is isomorphic to a
-quotient of $K\langle x_1,\dots,x_n \rangle$ modulo a certain
+quotient of K< @math{x_1},@dots{},@math{x_n} > modulo a certain
 two-sided ideal.
 
 @c ---------------------------------------------------------------------------
-@node Groebner bases for two-sided ideals in free associative algebras, Letterplace correspondence, Free associative algebras
+@node Groebner bases for two-sided ideals in free associative algebras, Letterplace correspondence, Free associative algebras, Letterplace
 @section Groebner bases for two-sided ideals in free associative algebras
 @cindex Groebner bases in free associative algebras
 
+@tex
 We call a total ordering $<$ on $N := \langle x_1,\dots,x_n \rangle$ a 
 \textbf{monomial ordering} if the following conditions hold:
+@end tex
+@ifinfo
+We call a total ordering < on N := < x_1,@dots{},x_n > a 
+@strong{monomial ordering} if the following conditions hold:
+@end ifinfo
 
-\begin{enumerate}
-\item $<$ is a well-ordering on $N$, that is $1 < x$ $\ \forall x \in N$,
-\item $\forall p,q,s,t \in N$, \; if $s<t$, then $p\cdot s \cdot q< p\cdot t \cdot q$,
-\item $\forall p,q,s,t \in N$, \; if $s=p\cdot t \cdot q$ and $s\not=t$, then $t<s$.    
-\end{enumerate}
+@itemize
+@item
+@ifinfo
+< is a well-ordering on N, that is 1 < x forall x in N,
+@end ifinfo
+@tex
+$<$ is a well-ordering on $N$, that is $ 1 < x$ $\forall x \in N$,
+@end tex
+@item
+@ifinfo
+forall p,q,s,t in N,  if s<t, then p . s . q < p . t . q,
+@end ifinfo
+@tex
+$\forall p,q,s,t \in N$, if $s<t$, then $p\cdot s \cdot q< p\cdot t \cdot q$,
+@end tex
+@item
+@ifinfo
+forall p,q,s,t in N, if s=p . t . q and s<>t, then t<s.    
+@end ifinfo
+@tex
+$\forall p,q,s,t \in N$, if $s=p\cdot t \cdot q$ and $s\not=t$, then $t<s$.    
+@end tex
+@end itemize
 
 Hence the notions of a leading monomial and coefficients transfer to this situation.
 @c as they usually do
 
-We say that a monomial $v$ divides monomial $w$, iff there exist monomials 
-$p,s \in N$, such that $w = p \cdot w \cdot s$.
+We say that a monomial v divides monomial w, iff there exist monomials 
+@math{p,s \in N}, such that @math{w = p \cdot w \cdot s}.
 
+@tex
 For a subset $G \subset T := K\langle x_1,\dots,x_n \rangle$, 
 define a \textbf{leading ideal} of $G$ to be the two-sided ideal 
-$L(G) \; = \; {}_{T} \langle$ $\; \{\lm(g) \;|\; g \in G\setminus\{0\} \}$ $\; \rangle_{T} \subseteq T$. 
+$L(G) \; = \; {}_{T} \langle$ $\; \{lm(g) \;|\; g \in G\setminus\{0\} \}$ $\; \rangle_{T} \subseteq T$. 
 
 Let $<$ be a fixed monomial ordering on $T$.
 We say that a subset $G \subset I$ is a \textbf{(two-sided) Gr\"obner basis} for the ideal $I$ with respect to $<$, if $L(G) = L(I)$. That is $\forall f\in I$ there exists $g\in G$, such that
-$\lm(g)$ divides $\lm(f)$.
+$lm(g)$ divides $lm(f)$.
+@end tex
+
+
+@ifinfo
+For a subset G in T := K< x_1,@dots{},x_n >, 
+define a @strong{leading ideal} of G to be the two-sided ideal 
+L(G)  =  @{g, lm(g) | g in G\@{0@} @} in  T. 
+
+Let < be a fixed monomial ordering on T.
+We say that a subset G in I is a (two-sided) Gr\"obner basis for the ideal I with respect to <, if L(G) = L(I). That is forall f in I there exists g in G, such that
+lm(g) divides lm(f).
+@end ifinfo
 
 @c ---------------------------------------------------------------------------
-@node Letterplace correspondence, Example of use of Letterplace, Groebner bases for two-sided ideals in free associative algebras
+@node Letterplace correspondence, Example of use of Letterplace, Groebner bases for two-sided ideals in free associative algebras,Letterplace
 @section Letterplace correspondence
 @cindex letterplace correspondence
 
+@tex
 We utilize the ideas of Feynmann and Rota and encode
 the monomials (words) of the free algebra 
 $x_{i_1} x_{i_2} \dots x_{i_m} \in K\langle x_1,\ldots,x_n \rangle$ 
 via the double-indexed letterplace 
 (that is encoding the letter (= variable) and its place in the word) monomials
-$x(i_1 | 1) x(i_2 | 2) \dots x(i_m | m) \in K[X\times \mathbb{N}]$, where $X=\{x_1,\ldots,x_n\}$.
+$x(i_1 | 1) x(i_2 | 2) \dots x(i_m | m) \in K[X\times N]$, where $X=\{x_1,\ldots,x_n\}$.
+@end tex
+@ifinfo
+We utilize the ideas of Feynmann and Rota and encode
+the monomials (words) of the free algebra 
+x_(i_1) x_(i_2) @dots{} x_(i_m) in K< x_1,@dots{},x_n > 
+via the double-indexed letterplace 
+(that is encoding the letter (= variable) and its place in the word) monomials
+x(i_1 | 1) x(i_2 | 2) @dots{} x(i_m | m) in K[X x N]$, where X=@{x_1,@dots{},x_n@}.
+@end ifinfo
 
-Note, that the latter letterplace algebra $K[X\times \mathbb{N}]$ is infinitely generated. 
-Since $K\langle x_1,\ldots,x_n \rangle$ is not Noetherian, it is common to perform
+Note, that the latter letterplace algebra K[X x N] is infinitely generated. 
+Since K< @math{x_1},@dots{},@math{x_n} > is not Noetherian, it is common to perform
 the computations up to a given degree. In that case the truncated letterplace 
 algebra is finitely generated commutative ring.
 
 Indeed, there is 1-to-1 correspondence between graded two-sided ideals
 of a free algebra and so-called letterplace ideals in the letterplace algebra, see [LL].
 All the computations take place in the latter algebra. A letterplace ideal
-is a subset of a special vector space $V$, which is spanned by all letterplace
-monomials. A letterplace monomial of length $m$ is a monomial of
-a letterplace algebra, such that its $m$ places are exactly $1,2,\ldots,m$. 
+is a subset of a special vector space V, which is spanned by all letterplace
+monomials. A letterplace monomial of length m is a monomial of
+a letterplace algebra, such that its m places are exactly 1,2,@dots{},m. 
 That is a multilinearity wrt places take place.
 
 @c ---------------------------------------------------------------------------
-@node Example of use of Letterplace, Release notes, Letterplace correspondence
+@node Example of use of Letterplace, Release notes, Letterplace correspondence,Letterplace
 @section Example of use of @sc{Letterplace}
 
 The input monomials must be given in a letterplace notation. We recommend
-first to define a commutative ring $K[X]$ in @sc{Singular} and equip it with
-a degree well-ordering. Then, decide what should be the degree bound $d$ and
-run the procedure \texttt{freegbRing(d)} from the library \texttt{freegb.lib}.
+first to define a commutative ring K[X] in @sc{Singular} and equip it with
+a degree well-ordering. Then, decide what should be the degree bound d and
+run the procedure @code{freegbRing(d)} from the library @code{freegb.lib}.
 This procedure creates a letterplace algebra with an induced ordering.
-In this algebra, define the ideal $I$ in the letterplace encoding and run the procedure
-\texttt{system("freegb",I,d,n)}, where $n$ is the number of variables of
+In this algebra, define the ideal I in the letterplace encoding and run the procedure
+@code{system("freegb",I,d,n)}, where $n$ is the number of variables of
 the original commutative ring. The output is given in the letterplace encoding.
 
 We illustrate this approach with the following example:
 
-\begin{verbatim}
+@example
 LIB "freegb.lib";
 ring r = 0,(x,y,z),dp;
 int d =4; // degree bound
@@ -127,24 +177,26 @@ ideal I = x(1)*y(2) + y(1)*z(2), x(1)*x(2) + x(1)*y(2) - y(1)*x(2) - y(1)*y(2);
 option(redSB);option(redTail);
 ideal J = system("freegb",I,d,nvars(r));
 J;
-\end{verbatim}
+@end example
 
 It is possible to convert the letterplace presentation of an ideal
-to a list of strings with the help of procedures \texttt{lp2lstr} and \texttt{lst2str} from
-the library \texttt{freegb.lib}. Let us continue with the example above: 
+to a list of strings with the help of procedures @code{lp2lstr}
+and @code{lst2str} from
 
-\begin{verbatim}
+the library @code{freegb.lib}. Let us continue with the example above: 
+
+@example
   lp2lstr(J,r); // export an object called LN to the ring r
   setring r;  // change to the ring r
   lst2str(LN,1); // output the string presentation
-\end{verbatim}
+@end example
 
-There are various conversion routines in the library \texttt{freegb.lib}.
+There are various conversion routines in the library @code{freegb.lib}.
 We work further on implementing more algorithms for 
 non-commutative ideals and modules over free associative algebra.
 
 @c ---------------------------------------------------------------------------
-@node Release notes,  , Example of use of Letterplace
+@node Release notes,  , Example of use of Letterplace,Letterplace
 @section Release notes of @sc{Letterplace}
 
 With this functionality it is possible to compute two-sided Groebner basis
@@ -157,7 +209,7 @@ Restrictions of the @sc{Letterplace} package:
 computations with inhomogeneous ideals are under development.
 @item Since free algebra is not Noetherian, one has to define an explicit degree bound,
 up to which a partial Groebner basis will be computed.
-@item the options \texttt{option(redSB);option(redTail);} must be always activated
-@item we advise to run the computations with the options  \texttt{option(prot);option(mem);}
+@item the options @code{option(redSB);option(redTail);} must be always activated
+@item we advise to run the computations with the options  @code{option(prot);option(mem);}
 in order to see the activity journal as well as the memory usage
 @end itemize
