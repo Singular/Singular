@@ -89,7 +89,7 @@
 @c @include general.tex
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node  Getting started with PLURAL, Data types @value{PSUFFIX}, , Non-commutative subsystem PLURAL
+@node  Getting started with PLURAL, Data types @value{PSUFFIX}, , Non-commutative subsystem
 @section  Getting started with PLURAL
 @end ifset
 
@@ -109,7 +109,7 @@
 @c @end ifset
 
 
-@node Data types @value{PSUFFIX}, Functions @value{PSUFFIX}, Getting started with PLURAL, Non-commutative subsystem PLURAL
+@node Data types @value{PSUFFIX}, Functions @value{PSUFFIX}, Getting started with PLURAL, Non-commutative subsystem
 
 @ifset singularmanual
 @section Data types @value{PSUFFIX}
@@ -134,7 +134,7 @@
 @c @end menu
 @c @end ifset
 
-@node Functions @value{PSUFFIX}, Mathematical background @value{PSUFFIX}, Data types @value{PSUFFIX}, Non-commutative subsystem PLURAL
+@node Functions @value{PSUFFIX}, Mathematical background @value{PSUFFIX}, Data types @value{PSUFFIX}, Non-commutative subsystem
 
 @ifset singularmanual
 @section Functions @value{PSUFFIX}
@@ -160,7 +160,7 @@
 @c @end menu
 @c @end ifset
 
-@node Mathematical background @value{PSUFFIX}, PLURAL libraries, Functions @value{PSUFFIX}, Non-commutative subsystem PLURAL
+@node Mathematical background @value{PSUFFIX}, PLURAL libraries, Functions @value{PSUFFIX}, Non-commutative subsystem
 
 @ifset singularmanual
 @section Mathematical background @value{PSUFFIX}
@@ -180,7 +180,7 @@
 
 @c --------------------------------------------------------------------
 @ifset singularmanual
-@node PLURAL libraries, , Mathematical background @value{PSUFFIX}, Non-commutative subsystem PLURAL
+@node PLURAL libraries, , Mathematical background @value{PSUFFIX}, Non-commutative subsystem
 @section PLURAL libraries
 @lowersections
 @end ifset

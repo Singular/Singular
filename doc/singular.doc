@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.173 2008-10-11 13:46:31 Singular Exp $
+@comment $Id: singular.doc,v 1.174 2008-10-29 15:43:19 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -110,7 +110,7 @@ This is the texinfo file describing Singular (version @value{VERSION})
 * Functions and system variables::
 * Tricks and pitfalls::
 @ifset withplural
-* Non-commutative subsystem PLURAL::
+* Non-commutative subsystem::
 @end ifset
 * Examples::
 * Polynomial data::
@@ -152,7 +152,7 @@ This is the texinfo file describing Singular (version @value{VERSION})
 
 @c ----------------------------------------------------------------------------
 @ifset withplural
-@node Tricks and pitfalls, Non-commutative subsystem PLURAL, Functions and system variables, Top
+@node Tricks and pitfalls, Non-commutative subsystem, Functions and system variables, Top
 @end ifset
 
 @ifclear withplural
@@ -165,15 +165,20 @@ This is the texinfo file describing Singular (version @value{VERSION})
 
 @c ----------------------------------------------------------------------------
 @ifset withplural
-@node Non-commutative subsystem PLURAL, Examples, Tricks and pitfalls, Top
-@chapter Non-commutative subsystem PLURAL
-@cindex Non-commutative subsystem PLURAL
+@node Non-commutative subsystem, Examples, Tricks and pitfalls, Top
+@chapter Non-commutative subsystem
+@cindex Non-commutative subsystem
+@menu
+* Getting started with PLURAL::
+* Letterplace::
+@end menu
 @include s-plural.tex
+@include letterplace.tex
 @end ifset
 
 @c ----------------------------------------------------------------------------
 @ifset withplural
-@node Examples, Polynomial data, Non-commutative subsystem PLURAL, Top
+@node Examples, Polynomial data, Non-commutative subsystem, Top
 @end ifset
 
 @ifclear withplural
