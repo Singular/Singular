@@ -1,20 +1,18 @@
-// $Id: elim.lib,v 1.23 2008-10-06 17:04:26 Singular Exp $
-// (GMG, last modified 22.06.96)
+// $Id: elim.lib,v 1.24 2008-10-31 15:33:07 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: elim.lib,v 1.23 2008-10-06 17:04:26 Singular Exp $";
+version="$Id: elim.lib,v 1.24 2008-10-31 15:33:07 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      Elimination, Saturation and Blowing up
 
 PROCEDURES:
- blowup0(j[,s1,s2]);    create presentation of blownup ring of ideal j
- elim(id,v);            eliminate variables in v from id (ideal/module)
- elim1(id,p);           p=product of vars to be eliminated from id
- nselect(id,v);         select generators not containing variables given by v
- sat(id,j);             saturated quotient of ideal/module id by ideal j
- select(id,v);          select generators containing all variables given by v
- select1(id,v);         select generators containing one variable given by v
-
+ blowup0(j[,s1,s2]);   create presentation of blownup ring of ideal j
+ elim(id,..);          variables .. eliminated from id (ideal/module)
+ elim1(id,p);          p=product of vars to be eliminated from id
+ nselect(id,v);        select generators not containing variables given by v
+ sat(id,j);            saturated quotient of ideal/module id by ideal j
+ select(id,v]);        select generators containing all variables given by v
+ select1(id,v);        select generators containing one variable given by v
            (parameters in square brackets [] are optional)
 ";
 
@@ -226,18 +224,23 @@ example
    m=elim(m,3..4);show(m);
 }
 ///////////////////////////////////////////////////////////////////////////////
-
 proc elim1 (id, poly vars)
 "USAGE:   elim1(id,p); id ideal/module, p product of vars to be eliminated
 RETURN:  ideal/module obtained from id by eliminating vars occuring in poly
-NOTE:    no special monomial ordering is required, result is a SB with
-         respect to ordering dp (resp. ls) if the first var not to be
-         eliminated belongs to a -p (resp. -s) blockordering
+METHOD:  elim1 calls eliminate but in a ring with ordering dp (resp. ls)
+         if the first var not to be eliminated belongs to a -p (resp. -s)
+         ordering.
+NOTE:    no special monomial ordering is required.
          This proc uses 'execute' or calls a procedure using 'execute'.
 SEE ALSO: elim, eliminate
 EXAMPLE: example elim1; shows examples
 "
 {
+   def br = basering;
+   if ( size(ideal(br)) != 0 )
+   {
+      ERROR ("cannot eliminate in a qring");
+   }
 //---- get variables to be eliminated and create string for new ordering ------
    int ii;
    for( ii=1; ii<=nvars(basering); ii++ )
@@ -247,7 +250,6 @@ EXAMPLE: example elim1; shows examples
    if( ord(p)==0 ) { string ordering = "),ls;"; }
    if( ord(p)>0 ) { string ordering = "),dp;"; }
 //-------------- create new ring and map objects to new ring ------------------
-   def br = basering;
    string str = "ring @newr = ("+charstr(br)+"),("+varstr(br)+ordering;
    execute(str);
    def id = fetch(br,id);
@@ -266,35 +268,46 @@ example
    m=elim1(m,st); show(m);
 }
 ///////////////////////////////////////////////////////////////////////////////
-
-proc nselect (id_inp, intvec v)
-"USAGE:   nselect(id,v); id = module or ideal, v = intvec
-RETURN:  generators of id not containing the variables with index an entry of v
+proc nselect (id, intvec v)
+"USAGE:   nselect(id,v); id = ideal, module or matrix, v = intvec
+RETURN:  generators (or columns) of id not containing the variables with index
+         an entry of v
 SEE ALSO: select, select1
 EXAMPLE: example nselect; shows examples
-"
-{
-  if (typeof(id_inp)!="ideal") { module id=module(id_inp); }
-  else                         { ideal id=id_inp;         }
-  int j,k;
-  int n,m = size(v), ncols(id);
-  //listvar(id);
-  for( k=1; k<=m; k++ )
-  {  
-    for( j=1; j<=n; j++ )
-    {  
-      if( size(id[k]/var(v[j]))!=0 ) 
-      { 
-         id[k]=0; break; 
+"{
+   if (typeof(id)!="ideal")
+   {
+     if (typeof(id)=="module" || typeof(id)=="matrix")
+     {
+       module id1 = module(id);
+     }
+     else
+     {
+       ERROR("// *** input must be of type ideal or module or matrix");
+     }
+   }
+   else
+   {
+      ideal id1 = id;
+   }
+   int j,k;
+   int n,m = size(v), ncols(id1);
+   for( k=1; k<=m; k++ )
+   {
+      for( j=1; j<=n; j++ )
+      {
+        if( size(id1[k]/var(v[j]))!=0 )
+        {
+           id1[k]=0; break;
+        }
       }
-    }
-  }
-  //if(typeof(id)=="ideal") { return(simplify(id,2)); }
-  //return(simplify(module(id),2));
-  id=(simplify(module(id),2));
-  //listvar(id);
-  return(id);
-  //return(simplify(id,2));
+   }
+   id1=simplify(id1,2);
+   if(typeof(id)=="matrix")
+   {
+      return(matrix(id1));
+   }
+   return(id1);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -302,8 +315,9 @@ example
    ideal i=x-y,y-z2,z-t3,s-x+y3;
    nselect(i,3);
    module m=i*(gen(1)+gen(2));
-   show(m);
-   show(nselect(m,3..4));
+   m;
+   nselect(m,3..4);
+   nselect(matrix(m),3..4);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -346,28 +360,47 @@ example
    printlevel = p;
 }
 ///////////////////////////////////////////////////////////////////////////////
-
 proc select (id, intvec v)
-"USAGE:   select(id,n[,m]); id = ideal/module, v= intvec
-RETURN:  generators of id containing all variables with index an entry of v
-NOTE:    use 'select1' for selecting generators containing at least one of the
-         variables with index an entry of v
+"USAGE:   select(id,n[,m]); id = ideal/module/matrix, v = intvec
+RETURN:  generators/columns of id containing all variables with index
+         an entry of v
+NOTE:    use 'select1' for selecting generators/columns containing at least
+         one of the variables with index an entry of v
 SEE ALSO: select1, nselect
 EXAMPLE: example select; shows examples
 "{
+   if (typeof(id)!="ideal")
+   {
+     if (typeof(id)=="module" || typeof(id)=="matrix")
+     {
+       module id1 = module(id);
+     }
+     else
+     {
+       ERROR("// *** input must be of type ideal or module or matrix");
+     }
+   }
+   else
+   {
+     ideal id1 = id;
+   }
    int j,k;
-   int n,m = size(v), ncols(id);
+   int n,m = size(v), ncols(id1);
    for( k=1; k<=m; k++ )
-   {  
+   {
       for( j=1; j<=n; j++ )
-      {   
-         if( size(id[k]/var(v[j]))==0) 
-         { 
-            id[k]=0; break; 
+      {
+         if( size(id1[k]/var(v[j]))==0)
+         {
+            id1[k]=0; break;
          }
       }
    }
-   return(simplify(id,2));
+   if(typeof(id)=="matrix")
+   {
+      return(matrix(simplify(id1,2)));
+   }
+   return(simplify(id1,2));
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -378,40 +411,61 @@ example
    module m=i*(gen(1)+gen(2));
    m;
    select(m,1..2);
+   select(matrix(m),1..2);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc select1 (id, intvec v)
-"USAGE:   select1(id,v); id = ideal/module, v = intvec
-RETURN:  generators of id containing at least one of the variables with
-         index an entry of v
-NOTE:    use 'select' for selecting generators containing all the
-         variables with index an entry of v
+"USAGE:   select1(id,v); id = ideal/module/matrix, v = intvec
+RETURN:  generators/columns of id containing at least one of the variables
+         with index an entry of v
+NOTE:    use 'select' for selecting generators/columns containing all variables
+         with index an entry of v
 SEE ALSO: select, nselect
 EXAMPLE: example select1; shows examples
 "{
+   if (typeof(id)!="ideal")
+   {
+     if (typeof(id)=="module" || typeof(id)=="matrix")
+     {
+       module id1 = module(id);
+       module I;
+     }
+     else
+     {
+       ERROR("// *** input must be of type ideal or module or matrix");
+     }
+   }
+   else
+   {
+     ideal id1 = id;
+     ideal I;
+   }
    int j,k;
-   int n,m = size(v), ncols(id);
-   execute (typeof(id)+" I;");
+   int n,m = size(v), ncols(id1);
    for( k=1; k<=m; k++ )
    {  for( j=1; j<=n; j++ )
       {
-         if( size(subst(id[k],var(v[j]),0)) != size(id[k]) )
-         {  
-            I = I,id[k]; break; 
+         if( size(subst(id1[k],var(v[j]),0)) != size(id1[k]) )
+         {
+            I = I,id1[k]; break;
          }
       }
    }
-   return(simplify(I,2));
+   I=simplify(I,2);
+   if(typeof(id)=="matrix")
+   {
+      return(matrix(I));
+   }
+   return(I);
 }
 example
 { "EXAMPLE:"; echo = 2;
    ring r=0,(x,y,t,s,z),(c,dp);
    ideal i=x-y,y-z2,z-t3,s-x+y3;
-   ideal j=select1(i,1);
-   j;
-   module m=i*(gen(1)+gen(2));
-   m;
+   ideal j=select1(i,1);j;
+   module m=i*(gen(1)+gen(2)); m;
    select1(m,1..2);
+   select1(matrix(m),1..2);
 }
 ///////////////////////////////////////////////////////////////////////////////
