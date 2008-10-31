@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.77 2008-10-06 17:04:27 Singular Exp $"
+version="$Id: finvar.lib,v 1.78 2008-10-31 15:32:45 Singular Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -280,7 +280,7 @@ EXAMPLE: example group_reynolds; shows an example
         }                              // orders -
         REY=concat(REY,P(k)*vars);     // adding new mapping to REY
         if (v)
-        { "  Group element "+string(g)+" has been found.";
+        { "  Group element ",g," has been found.";
         }
       }
       kill P(k);
@@ -291,7 +291,7 @@ EXAMPLE: example group_reynolds; shows an example
   }
   if (v)
   { if (g<=i)
-    { "  There are only "+string(g)+" group elements.";
+    { "  There are only ",g," group elements.";
     }
     "";
   }
@@ -572,7 +572,7 @@ EXAMPLE: example molien; shows an example
         }
       }
       if (v)
-      { "  Term "+string(j)+" of the Molien series has been computed.";
+      { "  Term ",j," of the Molien series has been computed.";
       }
     }
     if (interval==0)                   // canceling common terms of denominator
@@ -725,7 +725,7 @@ EXAMPLE: example molien; shows an example
         p=1;
         setring bre;
         if (v)
-        { "  Term "+string(i)+" of the Molien series has been computed.";
+        { "  Term ",i," of the Molien series has been computed.";
         }
       }
       if (v)
@@ -842,7 +842,7 @@ EXAMPLE: example molien; shows an example
         }
       }
       if (v)
-      { "  Term "+string(i)+" of the Molien series has been computed.";
+      { "  Term ",i," of the Molien series has been computed.";
       }
     }
     if (interval==0)                   // canceling common terms of denominator
@@ -1138,7 +1138,7 @@ EXAMPLE: example reynolds_molien; shows an example
             }
           }
           if (v)
-          { "  Group element "+string(g)+" has been found.";
+          { "  Group element ",g," has been found.";
           }
         }
         kill P(k);
@@ -1149,7 +1149,7 @@ EXAMPLE: example reynolds_molien; shows an example
     }
     if (v)
     { if (g<=i)
-      { "  There are only "+string(g)+" group elements.";
+      { "  There are only ",g," group elements.";
       }
       "";
     }
@@ -1360,7 +1360,7 @@ EXAMPLE: example reynolds_molien; shows an example
             }
           }
           if (v)
-          { "  Group element "+string(g)+" has been found.";
+          { "  Group element ",g," has been found.";
           }
           setring br;
         }
@@ -1372,7 +1372,7 @@ EXAMPLE: example reynolds_molien; shows an example
     }
     if (v)
     { if (g<=i)
-      { "  There are only "+string(g)+" group elements.";
+      { "  There are only ",g," group elements.";
       }
       "";
     }
@@ -2165,7 +2165,7 @@ EXAMPLE: example primary_char0; shows an example
     cd=int(coef(p(1),v1)[2,1]);        // dimension of the homogeneous space of
                                        // inviarants of degree d
     if (v)
-    { "  Computing primary invariants in degree "+string(d)+":";
+    { "  Computing primary invariants in degree ",d,":";
     }
     B=invariant_basis_reynolds(REY,d,intvec(cd,6)); // basis of invariants of
                                        // degree d
@@ -2314,7 +2314,7 @@ EXAMPLE: example primary_charp; shows an example
                                        // inviarants of degree d
     setring br;
     if (v)
-    { "  Computing primary invariants in degree "+string(d)+":";
+    { "  Computing primary invariants in degree ",d,":";
     }
     B=invariant_basis_reynolds(REY,d,intvec(cd,6)); // basis of invariants of
                                        // degree d
@@ -2453,7 +2453,7 @@ EXAMPLE: example primary_char0_no_molien; shows an example
   {                                    // found -
     d++;                               // degree where we'll search
     if (v)
-    { "  Computing primary invariants in degree "+string(d)+":";
+    { "  Computing primary invariants in degree ",d,":";
     }
     B=invariant_basis_reynolds(REY,d,intvec(-1,6)); // basis of invariants of
                                        // degree d
@@ -2594,7 +2594,7 @@ EXAMPLE: example primary_charp_no_molien; shows an example
   {                                    // found -
     d++;                               // degree where we'll search
     if (v)
-    { "  Computing primary invariants in degree "+string(d)+":";
+    { "  Computing primary invariants in degree ",d,":";
     }
     B=invariant_basis_reynolds(REY,d,intvec(-1,6)); // basis of invariants of
                                        // degree d
@@ -2741,7 +2741,7 @@ EXAMPLE: example primary_charp_without; shows an example
   {                                    // found -
     d++;                               // degree where we'll search
     if (v)
-    { "  Computing primary invariants in degree "+string(d)+":";
+    { "  Computing primary invariants in degree ",d,":";
     }
     B=invariant_basis(d,#[1..gen_num]); // basis of invariants of degree d
     if (B[1]<>0)
@@ -3035,9 +3035,9 @@ proc search_random (int n,int d,ideal B,int cd,ideal P,int i,int dif,int dB,idea
     { break;
     }
     else
-    { "HELP:    The "+string(dif)+" random combination(s) of the "+string(cd)+" basis elements with";
-      "         coefficients in the range from -"+string(max)+" to "+string(max)+" did not lower the";
-      "         dimension by "+string(dif)+". You can abort, try again or give a new range:";
+    { "HELP:    The ",dif," random combination(s) of the ",cd," basis elements with";
+      "         coefficients in the range from -",max," to ",max," did not lower the";
+      "         dimension by ",dif,". You can abort, try again or give a new range:";
       answer="";
       while (answer<>"n
 " && answer<>"y
@@ -3061,7 +3061,7 @@ proc search_random (int n,int d,ideal B,int cd,ideal P,int i,int dif,int dB,idea
 ")
       { flag=1;
         while (flag)
-        { "         Give a new <int> > "+string(max)+" that bounds the range of coefficients:";
+        { "         Give a new <int> > ",max," that bounds the range of coefficients:";
           answer=read("");
           for (j=1;j<=size(answer)-1;j++)
           { for (k=0;k<=9;k++)
@@ -3131,9 +3131,9 @@ proc p_search_random (int n,int d,ideal B,int cd,ideal P,int i,int dif,int dB,id
     { break;
     }
     else
-    { "HELP:    The "+string(dif)+" random combination(s) of the "+string(cd)+" basis elements with";
-      "         coefficients in the range from -"+string(max)+" to "+string(max)+" did not lower the";
-      "         dimension by "+string(dif)+". You can abort, try again, lower the number of";
+    { "HELP:    The ",dif," random combination(s) of the ",cd," basis elements with";
+      "         coefficients in the range from -",max," to ",max," did not lower the";
+      "         dimension by ",dif,". You can abort, try again, lower the number of";
       "         combinations searched for by 1 or give a larger coefficient range:";
       answer="";
       while (answer<>"n
@@ -3170,7 +3170,7 @@ proc p_search_random (int n,int d,ideal B,int cd,ideal P,int i,int dif,int dB,id
         else
         { flag=1;
           while (flag)
-          { "         Give a new <int> > "+string(max)+" that bounds the range of coefficients:";
+          { "         Give a new <int> > ",max," that bounds the range of coefficients:";
             answer=read("");
             for (j=1;j<=size(answer)-1;j++)
             { for (k=0;k<=9;k++)
@@ -3300,7 +3300,7 @@ EXAMPLE: example primary_char0_random; shows an example
     cd=int(coef(p(1),v1)[2,1]);        // dimension of the homogeneous space of
                                        // inviarants of degree d
     if (v)
-    { "  Computing primary invariants in degree "+string(d)+":";
+    { "  Computing primary invariants in degree ",d,":";
     }
     B=invariant_basis_reynolds(REY,d,intvec(cd,6)); // basis of invariants of
                                        // degree d
@@ -3326,7 +3326,7 @@ EXAMPLE: example primary_char0_random; shows an example
       }
       if (ncols(P)==i)
       { "WARNING: The return value is not a set of primary invariants, but";
-        "         polynomials qualifying as the first "+string(i)+" primary invariants.";
+        "         polynomials qualifying as the first ",i," primary invariants.";
         return(matrix(P));
       }
       if (v)
@@ -3453,7 +3453,7 @@ EXAMPLE: example primary_charp_random; shows an example
                                        // inviarants of degree d
     setring br;
     if (v)
-    { "  Computing primary invariants in degree "+string(d)+":";
+    { "  Computing primary invariants in degree ",d,":";
     }
     B=invariant_basis_reynolds(REY,d,intvec(cd,6)); // basis of invariants of
                                        // degree d
@@ -3479,7 +3479,7 @@ EXAMPLE: example primary_charp_random; shows an example
       }
       if (ncols(P)==n+1)
       { "WARNING: The first return value is not a set of primary invariants,";
-        "         but polynomials qualifying as the first "+string(i)+" primary invariants.";
+        "         but polynomials qualifying as the first ",i," primary invariants.";
         return(matrix(P));
       }
       if (v)
@@ -3591,7 +3591,7 @@ EXAMPLE: example primary_char0_no_molien_random; shows an example
   {                                    // found -
     d++;                               // degree where we'll search
     if (v)
-    { "  Computing primary invariants in degree "+string(d)+":";
+    { "  Computing primary invariants in degree ",d,":";
     }
     B=invariant_basis_reynolds(REY,d,intvec(-1,6)); // basis of invariants of
                                        // degree d
@@ -3619,7 +3619,7 @@ EXAMPLE: example primary_char0_no_molien_random; shows an example
       }
       if (ncols(P)==i)
       { "WARNING: The first return value is not a set of primary invariants,";
-        "         but polynomials qualifying as the first "+string(i)+" primary invariants.";
+        "         but polynomials qualifying as the first ",i," primary invariants.";
         return(matrix(P));
       }
       if (v)
@@ -3738,7 +3738,7 @@ EXAMPLE: example primary_charp_no_molien_random; shows an example
   {                                    // found -
     d++;                               // degree where we'll search
     if (v)
-    { "  Computing primary invariants in degree "+string(d)+":";
+    { "  Computing primary invariants in degree ",d,":";
     }
     B=invariant_basis_reynolds(REY,d,intvec(-1,6)); // basis of invariants of
                                        // degree d
@@ -3766,7 +3766,7 @@ EXAMPLE: example primary_charp_no_molien_random; shows an example
       }
       if (ncols(P)==n+1)
       { "WARNING: The first return value is not a set of primary invariants,";
-        "         but polynomials qualifying as the first "+string(i)+" primary invariants.";
+        "         but polynomials qualifying as the first ",i," primary invariants.";
         return(matrix(P));
       }
       if (v)
@@ -3896,7 +3896,7 @@ EXAMPLE: example primary_charp_without_random; shows an example
   {                                    // found -
     d++;                               // degree where we'll search
     if (v)
-    { "  Computing primary invariants in degree "+string(d)+":";
+    { "  Computing primary invariants in degree ",d,":";
     }
     B=invariant_basis(d,#[1..gen_num]); // basis of invariants of degree d
     if (B[1]<>0)
@@ -3923,7 +3923,7 @@ EXAMPLE: example primary_charp_without_random; shows an example
       }
       if (ncols(P)==n+1)
       { "WARNING: The first return value is not a set of primary invariants,";
-        "         but polynomials qualifying as the first "+string(i)+" primary invariants.";
+        "         but polynomials qualifying as the first ",i," primary invariants.";
         return(matrix(P));
       }
       if (v)
@@ -4338,7 +4338,7 @@ THEORY:  The secondary invariants are calculated by finding a basis (in terms
   { if (int(dimmat[i,1])<>0)           // when it is == 0 we need to find 0
     {                                  // elements in the current degree (i-1)
       if (v)
-      { "Searching in degree "+string(i-1)+", we need to find "+string(int(dimmat[i,1]))+" invariant(s)...";
+      { "Searching in degree ",i-1,", we need to find ",int(dimmat[i,1])," invariant(s)...";
       }
       TEST=sP;
       counter=0;                       // we'll count up to degvec[i]
@@ -4466,8 +4466,8 @@ DISPLAY:  Information on the progress of the computations if v is an integer
 THEORY:   The secondary invariants are calculated by finding a basis (in terms
           of monomials) of the basering modulo the primary invariants, mapping
           those to invariants with the Reynolds operator. Among these images
-          or their power products we pick secondary invariants using Groebner 
-          basis techniques (see S. King: Fast Computation of Secondary 
+          or their power products we pick secondary invariants using Groebner
+          basis techniques (see S. King: Fast Computation of Secondary
           Invariants).
           The size of this set can be read off from the Molien series.
 NOTE:     Secondary invariants are not uniquely determined by the given data.
@@ -4625,7 +4625,7 @@ EXAMPLE:  example secondary_char0; shows an example
   { if (int(dimmat[i,1])<>0)           // when it is == 0 we need to find no
     {                                  // elements in the current degree (i-1)
       if (v)
-      { "Searching in degree "+string(i-1)+", we need to find "+string(int(dimmat[i,1]))+
+      { "Searching in degree ",i-1,", we need to find ",int(dimmat[i,1]),
         " invariant(s)...";
         "  Looking for Power Products...";
       }
@@ -4918,7 +4918,7 @@ DISPLAY:  Information on the progress of computations if v does not equal 0
 THEORY:   The secondary invariants are calculated by finding a basis (in terms
           of monomials) of the basering modulo the primary invariants, mapping
           those to invariants with the Reynolds operator. Among these images
-          or their power products we pick secondary invariants using Groebner 
+          or their power products we pick secondary invariants using Groebner
           basis techniques (see S. King: Fast Computation of Secondary Invariants).
           The size of this set can be read off from the Molien series. Here, only
           irreducible secondary invariants are explicitly computed, which saves time and
@@ -5091,8 +5091,8 @@ EXAMPLE:  example irred_secondary_char0; shows an example
     if (int(dimmat[i,1])<>0)           // when it is == 0 we need to find no
     {                                  // elements in the current degree (i-1)
       if (v)
-      { "Searching in degree "+string(i-1)+". There are "+
-        string(int(dimmat[i,1]))+" secondary invariant(s)...";
+      { "Searching in degree ",i-1,". There are ",
+        int(dimmat[i,1])," secondary invariant(s)...";
       }
       counter = 0;                       // we'll count up to dimmat[i,1]
       Reductor = ideal(0);
@@ -5173,7 +5173,7 @@ EXAMPLE:  example irred_secondary_char0; shows an example
                           // of degree i-1.
                       attrib(RedSSort[i-1][k],"size",saveAttr);
                       if (v)
-                      { "    We found reducible sec. inv. number "+string(counter);
+                      { "    We found reducible sec. inv. number ",counter;
                       }
                       if (int(dimmat[i,1])<>counter)
                       { Reductor = ideal(helpP);
@@ -5238,7 +5238,7 @@ EXAMPLE:  example irred_secondary_char0; shows an example
               else
               { RedISSort[i-1] = NF(B,sP);
               }
-              if (v) {"    We found "+string(size(B))+" irred. sec. inv.";}
+              if (v) {"    We found ",size(B)," irred. sec. inv.";}
             }
             else
             { irrcounter=0;
@@ -5293,7 +5293,7 @@ EXAMPLE:  example irred_secondary_char0; shows an example
                     }
                   }
                   if (v)
-                  { "    We found irred. sec. inv. number "+string(irrcounter);
+                  { "    We found irred. sec. inv. number ",irrcounter;
                   }
                   Reductor = ideal(helpP);
                   attrib(Reductor, "isSB",1);
@@ -5330,7 +5330,7 @@ EXAMPLE:  example irred_secondary_char0; shows an example
               else
               { RedISSort[i-1] = B;
               }
-              if (v) {"    We found "+string(size(B))+" irred. sec. inv.";}
+              if (v) {"    We found ",size(B)," irred. sec. inv.";}
             }
             else
             { irrcounter=0;
@@ -5356,7 +5356,7 @@ EXAMPLE:  example irred_secondary_char0; shows an example
                   { RedISSort[i-1] = ideal(ReducedCandidates[j]);
                   }
                   if (v)
-                  { "    We found irred. sec. inv. number "+string(irrcounter);
+                  { "    We found irred. sec. inv. number ",irrcounter;
                   }
                   Reductor = ideal(helpP);
                   attrib(Reductor, "isSB",1);
@@ -5511,7 +5511,7 @@ EXAMPLE: example secondary_charp; shows an example
   { if (deg_dim_vec[i]<>0)             // when it is == 0 we need to find 0
     {                                  // elements in the current degree (i-1)
       if (v)
-      { "Searching in degree "+string(i-1)+", we need to find "+string(deg_dim_vec[i])+" invariant(s)...";
+      { "Searching in degree ",i-1,", we need to find ",deg_dim_vec[i]," invariant(s)...";
       }
       TEST=sP;
       counter=0;                       // we'll count up to degvec[i]
@@ -5649,7 +5649,7 @@ DISPLAY:  information if v does not equal 0
 THEORY:   The secondary invariants are calculated by finding a basis (in terms
           of monomials) of the basering modulo the primary invariants, mapping
           those to invariants with the Reynolds operator. Among these images
-          or their power products we pick secondary invariants using Groebner 
+          or their power products we pick secondary invariants using Groebner
           basis techniques (see S. King: Fast Computation of Secondary Invariants).
           The size of this set can be read off from the Molien series.
 EXAMPLE:  example secondary_charp; shows an example
@@ -5810,7 +5810,7 @@ EXAMPLE:  example secondary_charp; shows an example
   { if (deg_dim_vec[i]<>0)             // when it is == 0 we need to find no
     {                                  // elements in the current degree (i-1)
       if (v)
-      { "Searching in degree "+string(i-1)+", we need to find "+string(deg_dim_vec[i])+
+      { "Searching in degree ",i-1,", we need to find ",deg_dim_vec[i],
         " invariant(s)...";
         "  Looking for Power Products...";
       }
@@ -6109,7 +6109,7 @@ THEORY:   Secondary invariants are calculated by finding a basis (in terms of
           we are in the non-modular case. Therefore, the invariant ring is Cohen-Macaulay,
           hence the number of secondary invariants is the product of the degrees of
           primary invariants divided by the group order.
-NOTE:     <secondary_and_irreducibles_no_molien> should usually be faster and of 
+NOTE:     <secondary_and_irreducibles_no_molien> should usually be faster and of
           more useful functionality.
 SEE ALSO: secondary_and_irreducibles_no_molien
 EXAMPLE:  example secondary_no_molien; shows an example
@@ -6193,7 +6193,7 @@ EXAMPLE:  example secondary_no_molien; shows an example
   }
   max=max/nrows(REY);
   if (v)
-  { "  We need to find "+string(max)+" secondary invariants.";
+  { "  We need to find ",max," secondary invariants.";
     "";
     "In degree 0 we have: 1";
     "";
@@ -6232,7 +6232,7 @@ EXAMPLE:  example secondary_no_molien; shows an example
     attrib(SaveRed,"isSB",1);
     if (deg_vec[k]<>i)
     { if (v)
-      { "Searching in degree "+string(i)+"...";
+      { "Searching in degree ",i,"...";
       }
       mon = kbase(sP,i);
       ii = ncols(mon);
@@ -6266,7 +6266,7 @@ EXAMPLE:  example secondary_no_molien; shows an example
           { counter++;
             S[counter] = B[j];
             if (v)
-            { "    We found sec. inv. number "+string(counter)+" in degree "+string(i);
+            { "    We found sec. inv. number ",counter," in degree ",i;
             }
             if (counter == max) {break;}
             Reductor = ideal(helpP);
@@ -6298,7 +6298,7 @@ EXAMPLE:  example secondary_no_molien; shows an example
           { counter++;
             S[counter] = B[j];
             if (v)
-            { "    We found sec. inv. number "+string(counter)+" in degree "+string(i);
+            { "    We found sec. inv. number ",counter," in degree ",i;
             }
             if (counter == max) {break;}
             Reductor = ideal(helpP);
@@ -6355,7 +6355,7 @@ DISPLAY: information if v does not equal 0
 THEORY:  Secondary invariants are calculated by finding a basis (in terms of
          monomials) of the basering modulo primary invariants, mapping those to
          invariants with the Reynolds operator. Among these images
-         or their power products we pick secondary invariants using Groebner 
+         or their power products we pick secondary invariants using Groebner
          basis techniques (see S. King: Fast Computation of Secondary Invariants).
          We have the Reynolds operator, hence, we are in the non-modular case.
          Therefore, the invariant ring is Cohen-Macaulay, hence the number of
@@ -6446,7 +6446,7 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
   }
   max=max/nrows(REY);
   if (v)
-  { "  We need to find "+string(max)+" secondary invariants.";
+  { "  We need to find ",max," secondary invariants.";
     "";
     "In degree 0 we have: 1";
     "";
@@ -6501,7 +6501,7 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
     }
     if (deg_vec[l]<>i-1)
     { if (v)
-      { "Searching in degree "+string(i-1);
+      { "Searching in degree ",i-1;
         "  Looking for Power Products...";
       }
       Reductor = ideal(0);
@@ -6862,7 +6862,7 @@ EXAMPLE: example irred_secondary_no_molien; shows an example
   while (totalcount < Max)
   { d++;
     if (deg_vec[l]<>d)
-    { if (v) { "Searching irred. sec. inv. in degree "+string(d); }
+    { if (v) { "Searching irred. sec. inv. in degree ",d; }
       NewIS = ideal();
       NewIScounter=0;
       MON = kbase(sP,d);
@@ -6871,7 +6871,7 @@ EXAMPLE: example irred_secondary_no_molien; shows an example
       totalcount = totalcount + ncols(MON);
       if (mon[1]<>0)
       {
-        if (v) { "  We have "+string(monsize)+" candidates for irred. secondaries";}
+        if (v) { "  We have ",monsize," candidates for irred. secondaries";}
         block=0; // Loops through the monomials
         while (block<monsize)
         { if ((block mod MonStep) == 0)
@@ -6894,7 +6894,7 @@ EXAMPLE: example irred_secondary_no_molien; shows an example
           helpP = RedInv[block];
           if (helpP<>0)
           { counter++; // found new irr. sec. inv.!
-            if (v) { "    We found irr. sec. inv. number "+string(counter)+" in degree "+string(d); }
+            if (v) { "    We found irr. sec. inv. number ",counter," in degree ",d; }
             IS[counter] = Inv[block];
             sIS = sIS,helpP;
             attrib(sIS,"isSB",1);
@@ -7016,7 +7016,7 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
   { "";
   }
   // ring alskdfalkdsj=0,x,dp;
-  // matrix M[1][2]=1,(1-x)^n;            
+  // matrix M[1][2]=1,(1-x)^n;
   // export alskdfalkdsj;
   // export M;                            // we look at our primary invariants as
   // setring br;                          // such of the subgroup that only
@@ -7069,7 +7069,7 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
 //  option(returnSB,redSB);
 //  module M(2)=syz(M(1));               // nres(M(1),2)[2];
 //  option(set,save_opts);
-  if (v) 
+  if (v)
   { "Syzygies of the \"trivial\" secondaries"; }
   module M(2)=nres(M(1),2)[2];
   int m=ncols(M(2));                   // number of generators of the module
@@ -7078,7 +7078,7 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
   // the algebra A^k where A denote the subalgebra of the usual polynomial
   // ring, generated by the primary invariants
 
-  // generate a ring where we can do elimination  
+  // generate a ring where we can do elimination
   // in order to make it weighted homogeneous, we choose appropriate weights
   if (v)
   { "By elimination: Intersect with the invariant ring"; }
@@ -7097,7 +7097,7 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
   setring R;
   ideal GElimP = std(ElimP,EPvec,degvec(maxideal(1)));
   attrib(GElimP,"isSB",1);
-  int newN = ncols(GElimP);  
+  int newN = ncols(GElimP);
   matrix M[k][m+k*newN];
   M[1..k,1..m]=matrix(imap(br,M(2)));        // will contain a module -
   for (i=1;i<=newN;i++)
@@ -7105,9 +7105,10 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
     { M[j,m+(i-1)*k+j]=GElimP[i]; // y(i)-P[1,i];
     }
   }
-
-  M=elim(module(M),1..n);               // eliminating x(1..n), std-calculation
-                                         // is done internally -
+  M=elim(module(M),1..n);   // eliminating x(1..n), std-calculation
+                            // is done internally -
+  //M=std(module(M));                // we have already an elimination ordering
+  //M=nselect(M,1..n);
   M=homog(module(M),h);            // homogenize for 'minbase'
   M=minbase(module(M));
   ideal substitute;
@@ -8170,9 +8171,9 @@ ASSUME:   We are in the non-modular case, i.e., the characteristic of the baseri
 DISPLAY:  Information on the progress of computations if v does not equal 0
 THEORY:   We do an incremental search in increasing degree d. Generators of the invariant
           ring are found among the orbit sums of degree d. The generators are chosen by
-          Groebner basis techniques (see S. King: Minimal generating sets of non-modular 
+          Groebner basis techniques (see S. King: Minimal generating sets of non-modular
           invariant rings of finite groups).
-NOTE:     invariant_algebra_perm should not be used in rings with weighted orders. 
+NOTE:     invariant_algebra_perm should not be used in rings with weighted orders.
 SEE ALSO: invariant_algebra_reynolds
 KEYWORDS: invariant ring minimal generating set permutation group
 EXAMPLE:  example invariant_algebra_perm; shows an example
@@ -8265,7 +8266,7 @@ EXAMPLE:  example invariant_algebra_perm; shows an example
     OrbSums = orbit_sums(kbase(sG,d),M);
     OrbSize = ncols(OrbSums);
     if (v)
-    { "  We have "+string(OrbSize)+" orbit sums of degree "+string(d);
+    { "  We have ",OrbSize," orbit sums of degree ",d;
     }
     RedSums = reduce(OrbSums,sG);
     sGoffset=ncols(sG);
@@ -8276,8 +8277,8 @@ EXAMPLE:  example invariant_algebra_perm; shows an example
       { counter++; // found new inv. algebra generator!
         totalcount++;
         if (v)
-        { "    We found generator number "+string(totalcount)+
-          " in degree "+string(d);
+        { "    We found generator number ",totalcount,
+          " in degree ",d;
         }
         G[totalcount] = OrbSums[i];
         sG[sGoffset+counter] = helpP;
@@ -8349,7 +8350,7 @@ ASSUME:   We are in the non-modular case, i.e., the characteristic of the baseri
 DISPLAY:  Information on the progress of computations if v does not equal 0
 THEORY:   We do an incremental search in increasing degree d. Generators of the invariant
           ring are found among the Reynolds images of monomials of degree d. The generators are
-          chosen by Groebner basis techniques (see S. King: Minimal generating sets of 
+          chosen by Groebner basis techniques (see S. King: Minimal generating sets of
           non-modular invariant rings of finite groups).
 NOTE:     invariant_algebra_reynolds should not be used in rings with weighted orders.
 SEE ALSO: invariant_algebra_perm
@@ -8385,8 +8386,8 @@ EXAMPLE:  example invariant_algebra_reynolds; shows an example
     sGoffset=ncols(sG);
     monsize = ncols(mon);
     if (mon[1]<>0)
-    { if (v) { "  We have "+string(monsize)+
-     " relevant monomials in degree "+string(d);}
+    { if (v) { "  We have ",monsize,
+     " relevant monomials in degree ",d;}
       block=0; // Loops through the monomials
       while (block<monsize)
       { if ((block mod MonStep) == 0)
@@ -8409,8 +8410,7 @@ EXAMPLE:  example invariant_algebra_reynolds; shows an example
         helpP = RedInv[block];
         if (helpP<>0)
         { counter++; // found new inv. algebra generator!
-          if (v) { "    We found generator number "+string(counter)+
-                   " in degree "+string(d); }
+          if (v) { "    We found generator number ",counter," in degree ",d; }
           G[counter] = Inv[block];
           sG[sGoffset+counter] = helpP;
           attrib(sG,"isSB",1);
