@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.479 2008-09-15 10:08:08 Singular Exp $ */
+/* $Id: iparith.cc,v 1.480 2008-11-03 15:50:59 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1931,6 +1931,20 @@ static BOOLEAN jjELIMIN(leftv res, leftv u, leftv v)
   setFlag(res,FLAG_STD);
   return FALSE;
 }
+static BOOLEAN jjELIMIN_IV(leftv res, leftv u, leftv v)
+{
+  poly p=pOne();
+  intvec *iv=(intvec*)v->Data();
+  for(int i=iv->length()-1; i>=0; i--)
+  {
+    pSetExp(p,(*iv)[i],1);
+  }
+  pSetm(p);
+  res->data=(char *)idElimination((ideal)u->Data(),p);
+  pLmDelete(&p);
+  setFlag(res,FLAG_STD);
+  return FALSE;
+}
 static BOOLEAN jjEXPORTTO(leftv res, leftv u, leftv v)
 {
 #ifdef HAVE_NS
@@ -3296,6 +3310,8 @@ struct sValCmd2 dArith2[]=
 ,{jjDIVISION,  DIVISION_CMD,   LIST_CMD,       MODUL_CMD,  MODUL_CMD NO_PLURAL}
 ,{jjELIMIN,    ELIMINATION_CMD,IDEAL_CMD,      IDEAL_CMD,  POLY_CMD ALLOW_PLURAL}
 ,{jjELIMIN,    ELIMINATION_CMD,MODUL_CMD,      MODUL_CMD,  POLY_CMD ALLOW_PLURAL}
+,{jjELIMIN_IV, ELIMINATION_CMD,IDEAL_CMD,      IDEAL_CMD,  INTVEC_CMD ALLOW_PLURAL}
+,{jjELIMIN_IV, ELIMINATION_CMD,MODUL_CMD,      MODUL_CMD,  INTVEC_CMD ALLOW_PLURAL}
 ,{jjEXPORTTO,  EXPORTTO_CMD,   NONE,           PACKAGE_CMD, IDHDL ALLOW_PLURAL}
 ,{jjEXTGCD_I,  EXTGCD_CMD,     LIST_CMD,       INT_CMD,    INT_CMD ALLOW_PLURAL}
 #ifdef HAVE_FACTORY
