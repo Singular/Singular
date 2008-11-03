@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.311 2008-10-16 10:09:57 Singular Exp $
+@comment $Id: reference.doc,v 1.312 2008-11-03 10:39:06 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1361,12 +1361,14 @@ See
 @item @strong{Syntax:}
 @code{eliminate (} ideal_expression@code{,} product_of_ring_variables @code{)}
 @*@code{eliminate (} module_expression@code{,} product_of_ring_variables @code{)}
+@*@code{eliminate (} ideal_expression@code{,} intvec_expression @code{)}
+@*@code{eliminate (} module_expression@code{,} intvec_expression @code{)}
 @*@code{eliminate (} ideal_expression@code{,} product_of_ring_variables@code{,} intvec_hilb @code{)}
 @*@code{eliminate (} module_expression@code{,} product_of_ring_variables@code{,} intvec_hilb @code{)}
 @item @strong{Type:}
 the same as the type of the first argument
 @item @strong{Purpose:}
-eliminates variables occurring as factors of the second argument from an
+eliminates variables occurring as factors/entries of the second argument from an
 ideal (resp.@: a submodule of a free module), by intersecting it
 (resp. each component of the submodule) with the subring not containing these variables.
 @c comment: GMG insisted on changing the definition
