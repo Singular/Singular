@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.61 2000-12-18 15:44:32 wichmann Exp $
+;; $Id: singular.el,v 1.62 2008-11-03 14:16:38 wienand Exp $
 
 ;;; Commentary:
 
@@ -866,6 +866,8 @@ This function is called at mode initialization time."
 
   ;; some relict from Comint mode
   (setq comint-prompt-regexp singular-comint-prompt-regexp))
+  ;; required to use prompt-regexp
+  (setq comint-use-prompt-regexp t)
 ;;}}}
 
 ;;{{{ Miscellaneous

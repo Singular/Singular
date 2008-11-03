@@ -1,5 +1,5 @@
 ;;; Emacs edit mode for this file is  -*- Emacs-Lisp -*-
-;;; $Id: .emacs-singular,v 1.17 2004-12-09 16:27:54 Singular Exp $
+;;; $Id: .emacs-singular,v 1.18 2008-11-03 14:16:38 wienand Exp $
 
 ;;;
 ;;; .emacs-singular - Emacs initialization file to use for
@@ -96,10 +96,10 @@
        ;; unix stuff 
 
        ;; lazy-lock seems to be broken under mswindows:
-       ;; causes delay of input (only reacts after mouse click), or even total 
+       ;; causes delay of input (only reacts after mouse click), or even total
        ;; hang
-       (add-hook 'font-lock-mode-hook 'lazy-lock-mode)
-       (setq font-lock-support-mode 'lazy-lock-mode)
+       ;(add-hook 'font-lock-mode-hook 'lazy-lock-mode)
+       ;(setq font-lock-support-mode 'lazy-lock-mode)
        
        ;; somewhat nicer scrolling This causes a core dump with 21.1.9
        ;; under cygwin, when a file is opened with a button 
