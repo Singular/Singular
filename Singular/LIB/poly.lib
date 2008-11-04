@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: poly.lib,v 1.46 2007-07-25 10:02:08 Singular Exp $";
+version="$Id: poly.lib,v 1.47 2008-11-04 11:21:46 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  poly.lib      Procedures for Manipulating Polys, Ideals, Modules
@@ -1070,15 +1070,18 @@ EXAMPLE: example subrInterred; shows an example
   setring r;
   kill motemp;
   def motemp=imap(rtemp,motemp);
-  list ret=monmat,motemp,monmat*motemp;
-  for(i=1;i<=ncols(ret[2]);i++)
+  //list ret=monmat,motemp,monmat*motemp;
+  module motemp2=motemp;
+  for(i=1;i<=ncols(motemp2);i++)
   {
-    ret[2][i]=cleardenom(ret[2][i]);
+    motemp2[i]=cleardenom(motemp2[i]);
   }
-  for(i=1;i<=ncols(ret[3]);i++)
+  module motemp3=monmat*motemp;
+  for(i=1;i<=ncols(motemp3);i++)
   {
-    ret[3][i]=cleardenom(ret[3][i]);
+    motemp3[i]=cleardenom(motemp3[i]);
   }
+  list ret=monmat,motemp2,matrix(motemp3);
   return(ret);
 }
 example
