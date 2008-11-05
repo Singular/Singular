@@ -437,9 +437,11 @@ cygwin-dist-scripts:
 	@echo -e  'else' >> /usr/bin/surfex
 	@echo -e  '    allargs=$$*' >> /usr/bin/surfex
 	@echo -e  'fi' >> /usr/bin/surfex
+	@echo -e  'echo "$$PWD" | sed -e "s/ /\ /g" > $$tmp_dir/tmp.$$$$.txt' >> /usr/bin/surfex
+	@echo -e  'read surfexstartdir <$$tmp_dir/tmp.$$$$.txt' >> /usr/bin/surfex
 	@echo -e  '/bin/rm -f $$tmp_dir/tmp.$$$$.txt' >> /usr/bin/surfex
 	@echo -e  'cd "$$surfex_dir"' >> /usr/bin/surfex
-	@echo -e  'java surfex -d "$$surfex_dir" -t "$$tmp_dir" $$allargs' >> /usr/bin/surfex
+	@echo -e  'java -jar surfex.jar -d "$$surfexstartdir" -t "$$tmp_dir" $$allargs' >> /usr/bin/surfex
 
 cygwin-dist-install: cygwin-dist-scripts ## ${BINDIST_NAME}.tar.gz
 	if test -d ${TMPDIR}; then rm -fr ${TMPDIR}; fi
@@ -458,6 +460,7 @@ cygwin-dist-install: cygwin-dist-scripts ## ${BINDIST_NAME}.tar.gz
 ## Install Cygwin specific structure
 	-rm -rf /lib/surfex
 	mv ${TMPDIR}/Singular/${S_VERSION}/LIB/surfex /lib/surfex
+	-mv -u ${TMPDIR}/Singular/${S_VERSION}/LIB/surfex.jar /lib/surfex/surfex.jar
 	mv ${TMPDIR}/Singular/${S_VERSION}/ix86-Win/* ${CYGWIN_SINGULAR_BIN}/
 	-rmdir ${TMPDIR}/Singular/${S_VERSION}/ix86-Win
 	mv ${TMPDIR}/Singular/${S_VERSION}/LIB ${CYGWIN_SINGULAR_ROOT}/
@@ -560,7 +563,11 @@ cygwin-setup-init:
 	@echo `perl -e 'print time'` >> ${CYGWIN_REP_DIR}/setup.ini
 	@echo "setup-version: ${CYGWIN_SETUP_VER}" >> ${CYGWIN_REP_DIR}/setup.ini
 	@echo >> ${CYGWIN_REP_DIR}/setup.ini
-	cat ${CYGWIN_AUX_FILES}/setup.ini ${CYGWIN_REP_DIR}/setup.ini
+	if test -f ${CYGWIN_ORIG}/Small/setup.ini; then                             \
+		tail -n +7 ${CYGWIN_ORIG}/Small/setup.ini >> ${CYGWIN_REP_DIR}/setup.ini;  \
+	else                                                                        \
+		tail -n +7 ${CYGWIN_ORIG}/Full/setup.ini >> ${CYGWIN_REP_DIR}/setup.ini;   \
+	fi;
 	@echo >> ${CYGWIN_REP_DIR}/setup.ini
 ##	Download setup exe
 	export http_proxy=http://positron.mathematik.uni-kl.de:3128; \
