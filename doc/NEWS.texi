@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.112 2008-11-03 10:39:07 Singular Exp $
+@comment $Id: NEWS.texi,v 1.113 2008-11-05 17:54:27 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -27,6 +27,8 @@
 new coefficients: Z, Z/m, Z/(2^n) (@nref{Rings and orderings})
 @item
 new handling of the default argument in libraries (@nref{Parameter list})
+@item
+@code{ESingular} updated for emacs 22
 @end itemize
 
 @heading New @sc{Singular} functions
@@ -54,10 +56,14 @@ handling of large input for std improved
 @item new build target: libsingular.a (for gfan etc.)
 @item code variants now depend on CPU type, not OS
 @item better test for builtin limits (@nref{Limitations})
+@item
+overloads also operator @code{new(size_t,const std::nothrow_t&)}
 @end itemize
 
 @heading New @sc{Singular} libraries
 @itemize @bullet
+@item
+surfex: new version 0.90 (@nref{surfex_lib}).
 @item
 new library: redcgs.lib (@nref{redcgs_lib}: Reduced Comprehensive Groebner Systems)
 @item
