@@ -15,6 +15,8 @@ extern const char * libfac_version;
 extern const char * libfac_date;
 extern const char * libfac_author;
 
+CanonicalForm alg_gcd(const CanonicalForm &, const CanonicalForm &, const CFList &);
+
 //// Note: second argument for Factorize is for internal use only.
 CFFList Factorize( const CanonicalForm & F, int is_SqrFree=0 ) ;
 CFFList Factorize( const CanonicalForm & F, const CanonicalForm & mipo, int is_SqrFree=0 ) ;
