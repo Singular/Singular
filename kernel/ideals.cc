@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.59 2008-08-02 14:20:22 Singular Exp $ */
+/* $Id: ideals.cc,v 1.60 2008-11-05 15:40:38 wienand Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2524,6 +2524,73 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   if (w!=NULL)
     delete w;
   return h3;
+}
+
+/*2
+* compute the which-th ar-minor of the matrix a
+*/
+poly idMinor(matrix a, int ar, unsigned long which, ideal R)
+{
+  int     i,j,k,size;
+  unsigned long curr;
+  int *rowchoise,*colchoise;
+  BOOLEAN rowch,colch;
+  ideal result;
+  matrix tmp;
+  poly p,q;
+
+  i = binom(a->rows(),ar);
+  j = binom(a->cols(),ar);
+
+  rowchoise=(int *)omAlloc(ar*sizeof(int));
+  colchoise=(int *)omAlloc(ar*sizeof(int));
+  if ((i>512) || (j>512) || (i*j >512)) size=512;
+  else size=i*j;
+  result=idInit(size,1);
+  tmp=mpNew(ar,ar);
+  k = 0; /* the index in result*/
+  curr = 0; /* index of current minor */
+  idInitChoise(ar,1,a->rows(),&rowch,rowchoise);
+  while (!rowch)
+  {
+    idInitChoise(ar,1,a->cols(),&colch,colchoise);
+    while (!colch)
+    {
+      if (curr == which)
+      {
+        for (i=1; i<=ar; i++)
+        {
+          for (j=1; j<=ar; j++)
+          {
+            MATELEM(tmp,i,j) = MATELEM(a,rowchoise[i-1],colchoise[j-1]);
+          }
+        }
+        p = mpDetBareiss(tmp);
+        if (p!=NULL)
+        {
+          if (R!=NULL)
+          {
+            q = p;
+            p = kNF(R,currQuotient,q);
+            pDelete(&q);
+          }
+          /*delete the matrix tmp*/
+          for (i=1; i<=ar; i++)
+          {
+            for (j=1; j<=ar; j++) MATELEM(tmp,i,j) = NULL;
+          }
+          idDelete((ideal*)&tmp);
+          omFreeSize((ADDRESS)rowchoise,ar*sizeof(int));
+          omFreeSize((ADDRESS)colchoise,ar*sizeof(int));
+          return (p);
+        }
+      }
+      curr++;
+      idGetNextChoise(ar,a->cols(),&colch,colchoise);
+    }
+    idGetNextChoise(ar,a->rows(),&rowch,rowchoise);
+  }
+  return (poly) 1;
 }
 
 #ifdef WITH_OLD_MINOR

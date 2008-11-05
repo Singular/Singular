@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.283 2008-10-02 12:02:36 Singular Exp $ */
+/* $Id: extra.cc,v 1.284 2008-11-05 15:40:38 wienand Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2472,6 +2472,33 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
+    if (strcmp(sys_cmd, "minor")==0)
+    {
+      ring r = currRing;
+      matrix a = (matrix) h->Data();
+      h = h->next;
+      int ar = (int) h->Data();
+      h = h->next;
+      int which = (int) h->Data();
+      h = h->next;
+      ideal R = NULL;
+      if (h != NULL)
+      {
+        R = (ideal) h->Data();
+      }
+      res->data=(poly) idMinor(a, ar, (unsigned long) which, R);
+      if (res->data == (poly) 1)
+      {
+        res->rtyp=INT_CMD;
+        res->data = 0;
+      }
+      else
+      {
+        res->rtyp=POLY_CMD;
+      }
+      return(FALSE);
+    }
+    else
 #ifdef HAVE_F5
 /*==================== F5 Implementation =================*/
     if (strcmp(sys_cmd, "f5")==0)
