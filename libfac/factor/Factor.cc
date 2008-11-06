@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-/* $Id: Factor.cc,v 1.48 2008-06-10 14:49:15 Singular Exp $ */
+/* $Id: Factor.cc,v 1.49 2008-11-06 14:47:04 Singular Exp $ */
 static const char * errmsg = "\nYou found a bug!\nPlease inform singular@mathematik.uni-kl.de\nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -1183,7 +1183,8 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
         {
           d = i.getItem().exp();
           fac = i.getItem().factor();
-          G = newfactoras( fac, as, 1);
+          int success=1;
+          G = newfactoras( fac, as, success);
           for ( k = G; k.hasItem(); ++k )
           {
             fac = k.getItem().factor();
@@ -1333,6 +1334,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.48  2008/06/10 14:49:15  Singular
+*hannes: licence stuff
+
 Revision 1.47  2008/06/01 17:48:14  Singular
 *hannes: sqrfree etc
 

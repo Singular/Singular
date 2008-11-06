@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-/* $Id: alg_factor.cc,v 1.25 2008-11-06 14:05:51 Singular Exp $ */
+/* $Id: alg_factor.cc,v 1.26 2008-11-06 14:47:03 Singular Exp $ */
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -486,7 +486,8 @@ alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vmin
       CanonicalForm mipo=getMipo(X,XX);
       CFList as(mipo);
       DEBOUTLN(CERR, "alg_factor: newfactoras( ", R);
-      Factorlist = newfactoras(R, as , 1);
+      int success=1;
+      Factorlist = newfactoras(R, as , success);
       #else
       // factor R over k
       DEBOUTLN(CERR, "alg_factor: Factorize( ", R);
@@ -827,6 +828,9 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.25  2008/11/06 14:05:51  Singular
+*hannes: newfactoras
+
 Revision 1.24  2008/06/10 14:49:14  Singular
 *hannes: licence stuff
 
