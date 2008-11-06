@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-// $Id: alg_factor.h,v 1.3 2008-06-10 14:49:14 Singular Exp $
+// $Id: alg_factor.h,v 1.4 2008-11-06 14:05:51 Singular Exp $
 ////////////////////////////////////////////////////////////
 
 #ifndef INCL_NEW_ALGFACTOR_H
@@ -26,7 +26,7 @@ public:
     void operator++ ( int ) { next(); }
 };
 
-CFFList newfactoras( const CanonicalForm & f, const CFList & as, int success);
+CFFList newfactoras( const CanonicalForm & f, const CFList & as, int &success);
 CFFList newcfactor(const CanonicalForm & f, const CFList & as, int success );
 /*BEGINPUBLIC*/
 /*ENDPUBLIC*/

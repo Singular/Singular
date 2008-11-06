@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-/* $Id: alg_factor.cc,v 1.24 2008-06-10 14:49:14 Singular Exp $ */
+/* $Id: alg_factor.cc,v 1.25 2008-11-06 14:05:51 Singular Exp $ */
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -667,7 +667,7 @@ endler( const CanonicalForm & f, const CFList & AS, const Varlist & uord ){
 // 2) for char=p we distinguish 3 cases:
 //           no transcendentals, seperable and inseperable extensions
 CFFList
-newfactoras( const CanonicalForm & f, const CFList & as, int success){
+newfactoras( const CanonicalForm & f, const CFList & as, int &success){
   Variable vf=f.mvar();
   CFListIterator i;
   CFFListIterator jj;
@@ -827,6 +827,9 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.24  2008/06/10 14:49:14  Singular
+*hannes: licence stuff
+
 Revision 1.23  2008/04/08 16:19:09  Singular
 *hannes: removed rcsid
 
