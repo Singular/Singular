@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.480 2008-11-03 15:50:59 Singular Exp $ */
+/* $Id: iparith.cc,v 1.481 2008-11-12 12:51:15 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1928,7 +1928,7 @@ static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
 static BOOLEAN jjELIMIN(leftv res, leftv u, leftv v)
 {
   res->data=(char *)idElimination((ideal)u->Data(),(poly)v->Data());
-  setFlag(res,FLAG_STD);
+  //setFlag(res,FLAG_STD);
   return FALSE;
 }
 static BOOLEAN jjELIMIN_IV(leftv res, leftv u, leftv v)
@@ -1942,7 +1942,7 @@ static BOOLEAN jjELIMIN_IV(leftv res, leftv u, leftv v)
   pSetm(p);
   res->data=(char *)idElimination((ideal)u->Data(),p);
   pLmDelete(&p);
-  setFlag(res,FLAG_STD);
+  //setFlag(res,FLAG_STD);
   return FALSE;
 }
 static BOOLEAN jjEXPORTTO(leftv res, leftv u, leftv v)
@@ -5525,7 +5525,7 @@ static BOOLEAN jjELIMIN_HILB(leftv res, leftv u, leftv v, leftv w)
 {
   res->data=(char *)idElimination((ideal)u->Data(),(poly)v->Data(),
     (intvec *)w->Data());
-  setFlag(res,FLAG_STD);
+  //setFlag(res,FLAG_STD);
   return FALSE;
 }
 static BOOLEAN jjFIND3(leftv res, leftv u, leftv v, leftv w)
