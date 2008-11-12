@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.76 2008-11-12 12:42:12 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.77 2008-11-12 16:07:45 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -777,7 +777,7 @@ int redHoney (LObject* h, kStrategy strat)
     }
     else if (TEST_OPT_PROT && (strat->Ll < 0) && (d > reddeg))
     {
-      h->wrp(); Print("<%d>\n",h->GetpLength());
+      //h->wrp(); Print("<%d>\n",h->GetpLength());
       reddeg = d;
       Print(".%d",d); mflush();
     }
