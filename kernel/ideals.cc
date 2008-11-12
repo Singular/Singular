@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.60 2008-11-05 15:40:38 wienand Exp $ */
+/* $Id: ideals.cc,v 1.61 2008-11-12 12:41:03 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2438,15 +2438,50 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
     else break;
   }
   ord=(int*)omAlloc0(ordersize*sizeof(int));
-  block0=(int*)omAlloc(ordersize*sizeof(int));
-  block1=(int*)omAlloc(ordersize*sizeof(int));
+  block0=(int*)omAlloc0(ordersize*sizeof(int));
+  block1=(int*)omAlloc0(ordersize*sizeof(int));
   wv=(int**) omAlloc0(ordersize*sizeof(int**));
-  for (k=0;k<ordersize-1; k++)
+  if (rIsPluralRing(origR)) // we have too keep the odering: it may be needed
+                            // for G-algebra
   {
-    block0[k+1] = origR->block0[k];
-    block1[k+1] = origR->block1[k];
-    ord[k+1] = origR->order[k];
-    if (origR->wvhdl[k]!=NULL) wv[k+1] = (int*) omMemDup(origR->wvhdl[k]);
+    for (k=0;k<ordersize-1; k++)
+    {
+      block0[k+1] = origR->block0[k];
+      block1[k+1] = origR->block1[k];
+      ord[k+1] = origR->order[k];
+      if (origR->wvhdl[k]!=NULL) wv[k+1] = (int*) omMemDup(origR->wvhdl[k]);
+    }
+  }
+  else
+  {
+    block0[1] = 1;
+    block1[1] = pVariables;
+    if (origR->OrdSgn==1) ord[1] = ringorder_wp;
+    else                  ord[1] = ringorder_ws;
+    wv[1]=(int*)omAlloc0(pVariables*sizeof(int));
+    double wNsqr = (double)2.0 / (double)pVariables;
+    wFunctional = wFunctionalBuch;
+    int  *x= (int * )omAlloc(2 * (pVariables + 1) * sizeof(int));
+    int sl=IDELEMS(h1) - 1;
+    wCall(h1->m, sl, x, wNsqr);
+    for (sl = pVariables; sl!=0; sl--)
+      wv[1][sl-1] = x[sl + pVariables + 1]; 
+    omFreeSize((ADDRESS)x, 2 * (pVariables + 1) * sizeof(int));
+
+#if 0
+    for (k=0;k<ordersize-1; k++)
+    {
+      if ( (origR->order[k]==ringorder_c)
+      || (origR->order[k]==ringorder_C))
+      {
+        ord[2]=origR->order[k];
+        break;
+      }
+    }
+#else
+    ord[2]=ringorder_C;
+#endif
+    ord[3]=0;
   }
   block0[0] = 1;
   block1[0] = rVar(origR);
@@ -2460,10 +2495,12 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
 
   // fill in tmp ring to get back the data later on
   tmpR  = rCopy0(origR,FALSE,FALSE); // qring==NULL
+  //rUnComplete(tmpR);
   tmpR->order = ord;
   tmpR->block0 = block0;
   tmpR->block1 = block1;
   tmpR->wvhdl = wv;
+  tmpR->p_Procs=NULL;
 
   rComplete(tmpR, 1);
 
@@ -2486,12 +2523,20 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   //pChangeRing(pVariables,currRing->OrdSgn,ord,block0,block1,wv);
   rChangeCurrRing(tmpR);
 
-  h = idInit(IDELEMS(h1),h1->rank);
+  //h = idInit(IDELEMS(h1),h1->rank);
   // fetch data from the old ring
-  for (k=0;k<IDELEMS(h1);k++) h->m[k] = prCopyR( h1->m[k], origR);
+  //for (k=0;k<IDELEMS(h1);k++) h->m[k] = prCopyR( h1->m[k], origR);
+  h=idrCopyR(h1,origR,currRing);
   // compute kStd
 #if 1
+  //rWrite(tmpR);PrintLn();
+  BITSET save=test;
+  //test |=1;
+  //Print("h: %d gen, rk=%d\n",IDELEMS(h),h->rank);
+  //extern char * showOption();
+  //Print("%s\n",showOption());
   hh = kStd(h,NULL,hom,&w,hilb);
+  test=save;
   idDelete(&h);
 #else
   extern ideal kGroebner(ideal F, ideal Q);
@@ -2515,7 +2560,8 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
         pEnlargeSet(&(h3->m),IDELEMS(h3),16);
         IDELEMS(h3) += 16;
       }
-      h3->m[j] = prCopyR( hh->m[k], tmpR);
+      h3->m[j] = prMoveR( hh->m[k], tmpR);
+      hh->m[k] = NULL;
     }
   }
   id_Delete(&hh, tmpR);
