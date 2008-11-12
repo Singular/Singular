@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.39 2008-09-16 12:35:32 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.40 2008-11-12 16:07:20 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -2230,8 +2230,9 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
     }
     else
     {
+      int deg_before=olddeg;
       if (TEST_OPT_PROT)
-        message((strat->honey ? strat->P.ecart : 0) + strat->P.pFDeg(),
+        message(strat->P.pFDeg(),
                 &olddeg,&reduc,strat, red_result);
 
       /* reduction of the element choosen from L */
@@ -2255,7 +2256,8 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
       if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
       {
         strat->P.pCleardenom();
-        if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+	if (0)
+        //if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
         {
           strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT);
           strat->P.pCleardenom();
@@ -2264,7 +2266,8 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
       else
       {
         strat->P.pNorm();
-        if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+	if (0)
+        //if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
           strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT);
       }
 
@@ -2299,8 +2302,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
 #endif
   /* complete reduction of the standard basis--------- */
 
-  //if (TEST_OPT_REDSB)
-  if(need_retry==0)
+  if((need_retry==0) && (TEST_OPT_REDSB))
   {
     completeReduce(strat);
 #ifdef HAVE_TAIL_RING
@@ -2344,6 +2346,14 @@ ideal kInterRed (ideal F, ideal Q)
 #endif
   if(pOrdSgn==-1) return kInterRedOld(F,Q);
 
+  BITSET save=test;
+  //test|=Sy_bit(OPT_NOT_SUGAR);
+  test|=Sy_bit(OPT_REDTHROUGH);
+  //test&= ~Sy_bit(OPT_REDTAIL);
+  //test&= ~Sy_bit(OPT_REDSB);
+  //extern char * showOption() ;
+  //Print("%s\n",showOption());
+
   int need_retry;
   int counter=3;
   int elems=idElem(F);
@@ -2357,6 +2367,7 @@ ideal kInterRed (ideal F, ideal Q)
     idDelete(&res);
     res = res1;
   }
+  test=save;
   idSkipZeroes(res);
   return res;
 }
