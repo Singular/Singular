@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.127 2008-07-16 12:51:26 Singular Exp $ */
+/* $Id: grammar.y,v 1.128 2008-11-12 12:51:53 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -861,6 +861,12 @@ left_value:
               Werror("`%s` is undefined",$1.Fullname());
               YYERROR;
             }
+            else if (($1.rtyp==MODUL_CMD)
+            // matrix m; m[2]=...
+            && ($1.e!=NULL) && ($1.e->next==NULL))
+            {
+              MYYERROR("matrix must have 2 indices");
+            }
             $$ = $1;
           }
         ;
@@ -1347,7 +1353,7 @@ ringcmd:
             if (b!=NULL)
             {
               #ifdef HAVE_NS
-                newRingHdl=enterid(ring_name, myynest, RING_CMD, 
+                newRingHdl=enterid(ring_name, myynest, RING_CMD,
                                    &($2.req_packhdl->idroot));
               #else
                 newRingHdl=enterid(ring_name, myynest, RING_CMD, &IDROOT);
