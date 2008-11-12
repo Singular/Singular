@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.61 2008-11-12 12:41:03 Singular Exp $ */
+/* $Id: ideals.cc,v 1.62 2008-11-12 16:06:50 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2441,6 +2441,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   block0=(int*)omAlloc0(ordersize*sizeof(int));
   block1=(int*)omAlloc0(ordersize*sizeof(int));
   wv=(int**) omAlloc0(ordersize*sizeof(int**));
+#if 0
   if (rIsPluralRing(origR)) // we have too keep the odering: it may be needed
                             // for G-algebra
   {
@@ -2468,21 +2469,18 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
       wv[1][sl-1] = x[sl + pVariables + 1]; 
     omFreeSize((ADDRESS)x, 2 * (pVariables + 1) * sizeof(int));
 
-#if 0
-    for (k=0;k<ordersize-1; k++)
-    {
-      if ( (origR->order[k]==ringorder_c)
-      || (origR->order[k]==ringorder_C))
-      {
-        ord[2]=origR->order[k];
-        break;
-      }
-    }
-#else
     ord[2]=ringorder_C;
-#endif
     ord[3]=0;
   }
+#else
+  for (k=0;k<ordersize-1; k++)
+  {
+    block0[k+1] = origR->block0[k];
+    block1[k+1] = origR->block1[k];
+    ord[k+1] = origR->order[k];
+    if (origR->wvhdl[k]!=NULL) wv[k+1] = (int*) omMemDup(origR->wvhdl[k]);
+  }
+#endif
   block0[0] = 1;
   block1[0] = rVar(origR);
   wv[0]=(int*)omAlloc((rVar(origR) + 1)*sizeof(int));
@@ -2492,16 +2490,14 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   // use this special ordering: like ringorder_a, except that pFDeg, pWeights
   // ignore it
   ord[0] = ringorder_aa;
-
   // fill in tmp ring to get back the data later on
   tmpR  = rCopy0(origR,FALSE,FALSE); // qring==NULL
   //rUnComplete(tmpR);
+  tmpR->p_Procs=NULL;
   tmpR->order = ord;
   tmpR->block0 = block0;
   tmpR->block1 = block1;
   tmpR->wvhdl = wv;
-  tmpR->p_Procs=NULL;
-
   rComplete(tmpR, 1);
 
 #ifdef HAVE_PLURAL
