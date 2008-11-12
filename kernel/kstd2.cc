@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.75 2008-08-14 13:00:34 wienand Exp $ */
+/* $Id: kstd2.cc,v 1.76 2008-11-12 12:42:12 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -630,7 +630,6 @@ int redHoney (LObject* h, kStrategy strat)
   if (strat->tl<0) return 1;
   //if (h->GetLmTailRing()==NULL) return 0; // HS: SHOULD NOT BE NEEDED!
   assume(h->FDeg == h->pFDeg());
-
   poly h_p;
   int i,j,at,pass,ei, ii, h_d;
   unsigned long not_sev;
@@ -642,20 +641,15 @@ int redHoney (LObject* h, kStrategy strat)
   int li;
   h_p = h->GetLmTailRing();
   not_sev = ~ h->sev;
+
+  h->PrepareRed(strat->use_buckets);
   loop
   {
-    j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
+    j=kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
     if (j < 0) return 1;
 
     ei = strat->T[j].ecart;
     li = strat->T[j].pLength;
-    #if 0
-    if (li==0)
-    {
-       //PrintS("!");
-       li=strat->T[j].pLength=pLength(strat->T[j].p);
-    }
-    #endif
     ii = j;
     /*
      * the polynomial to reduce with (up to the moment) is;
@@ -693,6 +687,7 @@ int redHoney (LObject* h, kStrategy strat)
      */
     if (!K_TEST_OPT_REDTHROUGH && (pass!=0) && (ei > h->ecart))
     {
+      h->GetTP(); // clears bucket
       h->SetLmCurrRing();
       /*
        * It is not possible to reduce h with smaller ecart;
@@ -725,115 +720,23 @@ int redHoney (LObject* h, kStrategy strat)
 #endif
     assume(strat->fromT == FALSE);
 
-#if 0 // test poly exchange
-    if (strat->inStdFac==0)
-    {
-      int ll;
-      poly t_p;
-      if (strat->tailRing==currRing)
-        t_p=strat->T[ii].p;
-      else
-        t_p=strat->T[ii].t_p;
-      if ((p_LmCmp(h_p,t_p,strat->tailRing)==0)
-      && ((ll=h->GuessLength()) < strat->T[ii].pLength))
-      {
-        h->GetP();
-        if ((h->pLength=h->GetpLength()) < strat->T[ii].pLength)
-        {
-          if (TEST_OPT_PROT)  PrintS("e");
-          h->GetP();
-          if (h->p!=NULL)
-          {
-            if (strat->T[ii].p!=NULL)
-            {
-              poly swap;
-              omTypeAlloc0Bin(poly,swap,currRing->PolyBin);
-              memcpy(swap,h->p,currRing->PolyBin->sizeW*sizeof(long));
-              memcpy(h->p,strat->T[ii].p,currRing->PolyBin->sizeW*sizeof(long));
-              memcpy(strat->T[ii].p,swap,currRing->PolyBin->sizeW*sizeof(long));
-              omFreeBinAddr(swap);
-            }
-            else
-            {
-              strat->T[ii].p=h->p;
-              h->p=NULL;
-            }
-          }
-          else
-          {
-            if (strat->T[ii].p!=NULL)
-            {
-              h->p=strat->T[ii].p;
-              strat->T[ii].p=NULL;
-            }
-            // else: all NULL
-          }
-          if (h->t_p!=NULL)
-          {
-            if (strat->T[ii].t_p!=NULL)
-            {
-              poly swap;
-              omTypeAlloc0Bin(poly,swap,strat->tailRing->PolyBin);
-              memcpy(swap,h->t_p,strat->tailRing->PolyBin->sizeW*sizeof(long));
-              memcpy(h->t_p,strat->T[ii].t_p,strat->tailRing->PolyBin->sizeW*sizeof(long));
-              memcpy(strat->T[ii].t_p,swap,strat->tailRing->PolyBin->sizeW*sizeof(long));
-              omFreeBinAddr(swap);
-            }
-            else
-            {
-              strat->T[ii].t_p=h->t_p;
-              h->t_p=NULL;
-            }
-          }
-          else
-          {
-            if (strat->T[ii].t_p!=NULL)
-            {
-              h->t_p=strat->T[ii].t_p;
-              strat->T[ii].t_p=NULL;
-            }
-            // else: all NULL
-          }
-          if (strat->tailRing != currRing && (strat->T[ii].p != NULL)
-          && pNext(strat->T[ii].p) != NULL)
-             strat->T[ii].max =p_GetMaxExpP(pNext(strat->T[ii].p), strat->tailRing);
-          else
-             strat->T[ii].max = NULL;
-          h->length=h->pLength=pLength(h->p);
-          strat->T[ii].length=strat->T[ii].pLength=pLength(strat->T[ii].p);
-          if (strat->T[ii].is_normalized)
-          {
-            strat->T[ii].is_normalized=0;
-            strat->T[ii].pNorm();
-          }
-          else
-          {
-            if (TEST_OPT_INTSTRATEGY)
-              strat->T[ii].pCleardenom();
-          }
-          h->PrepareRed(strat->use_buckets);
-        }
-      }
-    }
-#endif // test poly exchange
-    ksReducePoly(h, &(strat->T[ii]), NULL, NULL, strat);
-
+    number coef;
+    ksReducePoly(h,&(strat->T[ii]),strat->kNoetherTail(),&coef,strat);
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
-      PrintS("\nto ");
+      PrintS("\nto:");
       h->wrp();
       PrintLn();
     }
 #endif
-
-    h_p = h->GetLmTailRing();
-    if (h_p == NULL)
+    if(h->IsNull())
     {
+      h->Clear();
       if (h->lcm!=NULL) pLmFree(h->lcm);
-#ifdef KDEBUG
+      #ifdef KDEBUG
       h->lcm=NULL;
-#endif
+      #endif
       return 0;
     }
     h->SetShortExpVector();
@@ -842,8 +745,9 @@ int redHoney (LObject* h, kStrategy strat)
     /* compute the ecart */
     if (ei <= h->ecart)
       h->ecart = d-h_d;
-    else
+    else 
       h->ecart = d-h_d+ei-h->ecart;
+
     /*
      * try to reduce the s-polynomial h
      *test first whether h should go to the lazyset L
@@ -854,6 +758,7 @@ int redHoney (LObject* h, kStrategy strat)
     d = h_d + h->ecart;
     if (!K_TEST_OPT_REDTHROUGH && (strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
     {
+      h->GetTP(); // clear bucket
       h->SetLmCurrRing();
       at = strat->posInL(strat->L,strat->Ll,h,strat);
       if (at <= strat->Ll)
@@ -872,6 +777,7 @@ int redHoney (LObject* h, kStrategy strat)
     }
     else if (TEST_OPT_PROT && (strat->Ll < 0) && (d > reddeg))
     {
+      h->wrp(); Print("<%d>\n",h->GetpLength());
       reddeg = d;
       Print(".%d",d); mflush();
     }
