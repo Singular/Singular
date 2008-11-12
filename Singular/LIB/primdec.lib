@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.140 2008-10-09 09:31:57 Singular Exp $";
+version="$Id: primdec.lib,v 1.141 2008-11-12 17:37:30 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -859,6 +859,8 @@ EXAMPLE: example zero_decomp; shows an example
     primary[2]=ideal(1);
     return(primary);
   }
+  intvec save=option(get);
+  option(redSB);
   j=interred(j);
 
   attrib(j,"isSB",1);
@@ -889,9 +891,11 @@ EXAMPLE: example zero_decomp; shows an example
         primary[2*@k]=ideal(1);
       }
     }
+    option(set,save);
     return(primary);
   }
 
+  option(set,save);
   if(homog(j)==1)
   {
     primary[1]=j;
@@ -3769,7 +3773,11 @@ example
       if(l[i][2]>k){k=l[i][2];}  //computation of the maximal k
    }
 
-   if((k==0)||(m==0)){return(interred(I+F));}        //the separable case
+   if((k==0)||(m==0)) //the separable case
+   {
+    intvec save=option(get);option(redSB);
+    I=interred(I+F);option(set,save);return(I);
+   }
 
    for(i=1;i<=n;i++)             //consider all polynomials over
    {                             //Fp(t(1)^(p^-k),...,t(m)^(p^-k))
@@ -5537,7 +5545,9 @@ EXAMPLE: example radical; shows an example
   if(di == 0)
   {
     i = zeroRad(i, qr[1]);
+    option(redSB);
     i=interred(phi(i));
+    option(set, op);
     setring(P0);
     i=imap(@P,i);
     return(i);
