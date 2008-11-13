@@ -40,7 +40,9 @@ kill s6,e,a,b,c,alpha,beta,t;
 
 ring s12=32003,(x,y,z,w),dp;
 ideal i0=x2-z10-z20,xy3-z10-z30,y6-xy3w40;
+option(redSB);
 ideal i=interred(i0^3);
+option(noredSB);
 i;
 intvec e=weight(i);
 e;

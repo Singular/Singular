@@ -16,6 +16,7 @@ abcde+bcdef+cdefa+defab+efabc+fabcd,
 abcdef+1;
 ring rm=32003,(g,h,l,m,n,o),dp;
 map f=r1,g,h,l3,m+n2,n,o2;
+option(redSB);
 ideal i=interred(f(i0));
 i;
 test(22);

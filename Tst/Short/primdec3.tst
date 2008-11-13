@@ -6,7 +6,9 @@ proc sortMinAss(list l)
 {
    int i,j,notReady;
    ideal K;
+   intvec save=option(get);option(redSB);
    for(i=1;i<=size(l);i++){"start interrred";l[i]=interred(l[i]);"end interred";}
+ 
    
    notReady=1;
    while(notReady)
@@ -32,6 +34,7 @@ proc sortMinAss(list l)
          }
       }
    }
+   option(set,save);
    return(l);
 } 
 proc sortGTZ(list l)
