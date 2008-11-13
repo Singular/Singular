@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.284 2008-11-05 15:40:38 wienand Exp $ */
+/* $Id: extra.cc,v 1.285 2008-11-13 14:06:07 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2477,9 +2477,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       ring r = currRing;
       matrix a = (matrix) h->Data();
       h = h->next;
-      int ar = (int) h->Data();
+      int ar = (int)(long) h->Data();
       h = h->next;
-      int which = (int) h->Data();
+      int which = (int)(long) h->Data();
       h = h->next;
       ideal R = NULL;
       if (h != NULL)
