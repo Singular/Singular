@@ -152,7 +152,12 @@ rInit
 reduce_s
 res_s
 resultantp_s
+ringlist-z
+ringmaps
+ringmod2m
+ringmodn
 ringsum
+ringz
 schwarz_6_32003_lp 
 schwarz_7_32003_lp
 schwarz_8_32003_lp
