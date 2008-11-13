@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.78 2008-10-31 15:32:45 Singular Exp $"
+version="$Id: finvar.lib,v 1.79 2008-11-13 10:50:17 Singular Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -7105,7 +7105,7 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
     { M[j,m+(i-1)*k+j]=GElimP[i]; // y(i)-P[1,i];
     }
   }
-  M=elim(module(M),1..n);   // eliminating x(1..n), std-calculation
+  M=elim2(module(M),1..n);   // eliminating x(1..n), std-calculation
                             // is done internally -
   //M=std(module(M));                // we have already an elimination ordering
   //M=nselect(M,1..n);
