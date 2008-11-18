@@ -1,5 +1,5 @@
 /*
- * $Id: utils.cc,v 1.15 2003-06-09 09:47:09 krueger Exp $
+ * $Id: utils.cc,v 1.16 2008-11-18 21:48:05 dreyer Exp $
  */
 
 #include <stdio.h>
@@ -19,7 +19,6 @@ int modlineno;    /* lineno within module */
 #include "modgen.h"
 
 extern int do_create_srcdir;
-void init_system_type();
 
 /*========================================================================*/
 int init_modgen(
@@ -49,8 +48,6 @@ int init_modgen(
   module_def->name = (char *)malloc(strlen(tmpfile)+1);
   memset(module_def->name, '\0', strlen(tmpfile)+1);
   memcpy(module_def->name, tmpfile, strlen(tmpfile));
-  
-  init_system_type();
   
   return (create_tmpfile(module_def));
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: mod_grammar.y,v 1.2 2005-05-24 11:34:32 Singular Exp $
+ * $Id: mod_grammar.y,v 1.3 2008-11-18 21:48:05 dreyer Exp $
  */
 
 %{
@@ -9,13 +9,10 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-#include <mylimits.h>
 
-#include <mod2.h>
-#include <tok.h>
-
-#include "modgen.h"
+#include "typmap.h"
 #include "stype.h"
+
 
 int sectnum = 1;
 int iseof = 0;

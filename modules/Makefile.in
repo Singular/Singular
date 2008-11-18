@@ -2,7 +2,7 @@
 ###
 ### Makefile for Singular-modules
 ###
-### $Id: Makefile.in,v 1.21 2007-11-21 18:23:00 Singular Exp $
+### $Id: Makefile.in,v 1.22 2008-11-18 21:48:04 dreyer Exp $
 ###
 #################################################################
 
@@ -34,9 +34,6 @@ CXX		= @CXX@
 PERL		= @PERL@
 BISON		= bison
 @SET_MAKE@
-INSTALL		= ./install-sh -c
-INSTALL_PROGRAM	= ${INSTALL}
-INSTALL_DATA	= ${INSTALL} -m 644
 MKINSTALLDIRS   = ./mkinstalldirs
 MODGEN		= ${srcdir}/modgen/modgen
 
@@ -65,8 +62,8 @@ MOD_FILES = loctriv
 #MOD_DIRS = kernel
 MOD_DIRS =
 #else
-MOD_FILES = dummy
-MOD_DIRS = dummy
+MOD_FILES =
+MOD_DIRS =
 #endif
 
 ##

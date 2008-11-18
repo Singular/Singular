@@ -46,12 +46,8 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-#include <mylimits.h>
 
-#include <mod2.h>
-#include <tok.h>
-
-#include "modgen.h"
+#include "typmap.h"
 #include "stype.h"
 
 int sectnum = 1;

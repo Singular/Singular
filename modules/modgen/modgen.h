@@ -1,11 +1,11 @@
 /*
- *  $Id: modgen.h,v 1.16 2002-07-04 14:18:36 anne Exp $
+ *  $Id: modgen.h,v 1.17 2008-11-18 21:48:05 dreyer Exp $
  *
  */
 
 #ifndef _MODGEN_H
 #define _MODGEN_H
-#define MOD_GEN_VERSION "0.2"
+#define MOD_GEN_VERSION "0.3"
 
 #define BUFLEN 128
 #define TMPL_HEAD ""
@@ -13,8 +13,32 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <mod2.h>
-#include <subexpr.h>
+
+/* Basic definitions */
+#ifndef BOOLEAN
+  typedef int BOOLEAN;
+#endif
+
+#ifndef TRUE
+#  define TRUE 1
+#endif
+
+#ifndef FALSE
+#  define FALSE 0
+#endif
+
+/*
+ * LANG_TOP     : Toplevel package only
+ * LANG_SINGULAR:
+ * LANG_C       :
+ */
+typedef enum { LANG_NONE, LANG_TOP, LANG_SINGULAR, LANG_C, LANG_MAX}
+  language_defs;
+
+/* id type */
+typedef int idtyp;
+
+
 
 class paramdef;
 class procdef;

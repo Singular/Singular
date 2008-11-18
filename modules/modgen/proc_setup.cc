@@ -1,5 +1,5 @@
 /*
- * $Id: proc_setup.cc,v 1.7 2000-05-12 12:24:44 krueger Exp $
+ * $Id: proc_setup.cc,v 1.8 2008-11-18 21:48:05 dreyer Exp $
  */
 
 #include <stdio.h>
@@ -7,8 +7,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "modgen.h"
-#include <mod2.h>
-#include <tok.h>
 #include "typmap.h"
 
 

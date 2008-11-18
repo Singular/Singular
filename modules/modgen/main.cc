@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-#include <mylimits.h>
 #include <unistd.h>
 #include "config.h"
 #ifdef HAVE_GETOPT_LONG

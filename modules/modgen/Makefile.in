@@ -25,9 +25,6 @@ CXX		= @CXX@
 LEX		= sh ../../Singular/flexer.sh
 PERL		= @PERL@
 BISON		= bison
-INSTALL		= @INSTALL@
-INSTALL_PROGRAM	= @INSTALL_PROGRAM@ 
-INSTALL_DATA	= @INSTALL_DATA@
 
 SINGUNAME	= @SINGUNAME@
 SING_UNAME	= @SING_UNAME@
@@ -36,11 +33,12 @@ S_VERSION       = $${SINGULAR_VERSION-@SINGULAR_VERSION@}
 DISTROOT_NAME   = Singular-${S_VERSION}
 BINDIST_NAME    = ${DISTROOT_NAME}-${SINGUNAME}
 SHAREDIST_NAME  = ${DISTROOT_NAME}-share
-MKINSTALLDIRS   = ../../Singular/mkinstalldirs
+MKINSTALLDIRS   = ../mkinstalldirs
 LN_S            = @LN_S@
-INSTALL         = ../../Singular/install-sh -c
-INSTALL_PROGRAM = ${INSTALL}
-INSTALL_DATA    = ${INSTALL} -m 644
+INSTALL 	= $(INSTALL_SH)
+INSTALL_PROGRAM	= @INSTALL_PROGRAM@
+INSTALL_DATA	= @INSTALL_DATA@
+INSTALL_SH 	= $(topsrcdir)/@ac_install_sh@
 MODGEN		= $(bindir)/modgen
 
 ##

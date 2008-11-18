@@ -45,6 +45,9 @@ AC_PROG_MAKE_SET
 # ln -s
 AC_PROG_LN_S
 
+# Export install-sh
+AC_SUBST(ac_install_sh)
+
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lgmp':
 AC_CHECK_LIB([gmp], [main])
@@ -105,6 +108,7 @@ SING_UNAME=`echo $SINGUNAME | tr '-' '_' `
 AC_SUBST(SING_UNAME)
 AC_SUBST(SINGULAR_VERSION)
 AC_SUBST(LN_S)
+
 
 # stupid Win programs do not like dots in their pathnames
 VERSION_SEP="-"

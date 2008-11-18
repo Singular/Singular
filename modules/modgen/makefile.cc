@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.31 2007-10-31 17:56:16 Singular Exp $ */
+/* $Id: makefile.cc,v 1.32 2008-11-18 21:48:05 dreyer Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -12,14 +12,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include <mod2.h>
-#include <febase.h>
-#include <grammar.h>
-#include <structs.h>
-#include <tok.h>
-#include <ipid.h>
-#include <ipshell.h>
-#include <subexpr.h>
 #include <regex.h>
 
 #include "modgen.h"

@@ -1,12 +1,10 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: creat_top.cc,v 1.26 2007-10-08 16:04:55 Singular Exp $ */
+/* $Id: creat_top.cc,v 1.27 2008-11-18 21:48:05 dreyer Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
-
-#include <mod2.h>
 
 #include "modgen.h"
 #include <sys/stat.h>

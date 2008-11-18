@@ -1,5 +1,5 @@
 /*
- * $Id: proc.cc,v 1.28 2007-10-08 16:04:55 Singular Exp $
+ * $Id: proc.cc,v 1.29 2008-11-18 21:48:05 dreyer Exp $
  */
 
 #include <stdio.h>
@@ -7,8 +7,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "modgen.h"
-#include <mod2.h>
-#include <tok.h>
+
 #include "typmap.h"
 
 

@@ -1,21 +1,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.30 2008-04-28 10:15:23 Singular Exp $ */
+/* $Id: misc.cc,v 1.31 2008-11-18 21:48:05 dreyer Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
 
 #include <stdlib.h>
-#include <mod2.h>
-#include <febase.h>
-#include <grammar.h>
-#include <structs.h>
-#include <tok.h>
-#include <ipid.h>
-#include <ipshell.h>
-#include <structs.h>
-#include <subexpr.h>
 #include <regex.h>
 
 #include "modgen.h"
@@ -23,16 +14,29 @@
 
 #define NEW_PARAM 1
 
-#define SYSTYP_NONE   0
-#define SYSTYP_LINUX  1
-#define SYSTYP_HPUX9  2
-#define SYSTYP_HPUX10 3
-
 #if 1
 #  define logx printf
 #else
 #  define logx
 #endif
+
+/* This is the same structure as in Singular's kernel/structs.h.
+ * Duplicating the following code sniplets is save, because it is used
+ * independently here. 
+ * Moreover, it is recommended not to include structs.h here, because otherwise
+ * changing the latter could break modgen also.
+ */
+struct _scmdnames
+{
+  char *name;
+  short alias;
+  short tokval;
+  short toktype;
+};
+typedef struct _scmdnames cmdnames;
+
+
+
 
 typedef struct {
   unsigned long nCmdUsed;      /**< number of commands used */
@@ -56,19 +60,6 @@ typedef struct {
  *---------------------------------------------------------------------*/
 static SArithBase sArithBase;  /**< Base entry for arithmetic */
 
-char *DYNAinclude[] =
-{
-   "",
-   "#include <dlfcn.h>",
-   "#include <dl.h>",
-   "#include <dl.h>",
-   "#include <>",
-   "#include <>",
-   "#include <>",
-   NULL
-};
-
-int systyp = SYSTYP_NONE;
 
 BOOLEAN    expected_parms;
 int        cmdtok;
@@ -101,6 +92,8 @@ struct sValCmdTab
   short start;
 };
 
+/* todo: ensure compiler picks the right header, without using paths here */
+/*#include "iparith.inc"*/
 #include "../../Singular/iparith.inc"
 
 /*=================== general utilities ============================*/
@@ -419,23 +412,6 @@ void Add2files(
 }
 
 /*========================================================================*/
-void init_system_type()
-{
-  if(strcmp(S_UNAME, "ix86-Linux") == 0)
-  {
-    systyp = SYSTYP_LINUX;
-  }
-  else if (strcmp(S_UNAME, "HPUX-9")==0)
-  {
-    systyp = SYSTYP_HPUX9;
-  }
-  else if (strcmp(S_UNAME, "HPUX-10")==0)
-  {
-    systyp = SYSTYP_HPUX10;
-  }
-}
-
-/*========================================================================*/
 void PrintProclist(
   moddefv module
   )
@@ -559,7 +535,13 @@ void  mod_write_header(FILE *fp, char *module, char what)
     fprintf(fp, "#include <stdio.h>\n");
     fprintf(fp, "#include <string.h>\n");
     fprintf(fp, "#include <ctype.h>\n");
-    fprintf(fp, "%s\n", DYNAinclude[systyp]);
+
+    fprintf(fp, "#if defined(HPUX_9) || defined(HPUX_10)\n");
+    fprintf(fp, "#  include <dl.h>\n");
+    fprintf(fp, "#else\n");
+    fprintf(fp, "#  include <dlfcn.h>\n");
+    fprintf(fp, "#endif\n");
+
     fprintf(fp, "#include <unistd.h>\n");
     fprintf(fp, "#include <sys/stat.h>");
     fprintf(fp, "\n");
