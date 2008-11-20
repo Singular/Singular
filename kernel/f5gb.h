@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.9 2008-10-11 12:12:46 ederc Exp $ */
+/* $Id: f5gb.h,v 1.10 2008-11-20 17:55:04 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -16,8 +16,12 @@
 void qsort_degree(poly* left, poly* right);
 
 
+// generating the list lp of ideal generators and 
+// test if 1 is in lp(return 1) or not(return 0)
+bool generate_input_list(lpoly* lp, ideal id);
+
 /* computes incrementally gbs of subsets of the input 
-** gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}  
+   gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}  
 */
 lpoly* f5_inc(lpoly* lp, lpoly* g_prev);
 

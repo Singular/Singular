@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.cc,v 1.10 2008-10-11 12:12:46 ederc Exp $ */
+/* $Id: f5gb.cc,v 1.11 2008-11-20 17:55:04 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -23,6 +23,10 @@
 #include "pInline1.h"
 #include "f5gb.h"
 #include "lpolynom.h"
+
+
+// global variables
+const poly one = pInit();
 
 
 /*2
@@ -88,6 +92,35 @@ lpoly *f5_inc(lpoly* lp, lpoly* g_prev)
 }    
 
 
+// generating the list lp of ideal generators and test if 1 is in lp
+bool generate_input_list(lpoly* lp, ideal id)
+{
+        long j;
+        for(j=0; j<IDELEMS(id)-1; j++){
+
+                lp[j].setPoly(id->m[j]);
+                
+                if(pComparePolys(lp[j].getPoly(), one)){
+                        Print("1 in GB\n");
+                        return(1);
+                }
+                
+                lp[j].setIndex(j+1);
+                lp[j].setTerm(one);
+                lp[j].setDel(false);
+                lp[j].setNext(&lp[j+1]);
+                Print("Labeled Polynomial %d: ",j+1);
+                Print("Label Term: ");
+                pWrite(lp[j].getTerm());
+                Print("Index: %d\n", lp[j].getIndex());
+                Print("Delete? %d\n", lp[j].getDel());
+                pWrite(lp[j].getPoly());
+                Print("NEUNEUNEU\n\n");
+        }
+        return(0);
+}
+
+
 /*2
 * computes a gb of the ideal i in the ring r with our f5 
 * implementation 
@@ -95,8 +128,8 @@ lpoly *f5_inc(lpoly* lp, lpoly* g_prev)
 ideal F5main(ideal i, ring r)
 {
         ideal iTmp, g_basis;
-        long j, k;
-        poly one = pInit();
+        bool one_id;
+        long j,k;
         pSetCoeff(one, nInit(1));
         pWrite(one);
         lpoly *lp, *gb;
@@ -118,45 +151,8 @@ ideal F5main(ideal i, ring r)
         // generating the list lp of ideal generators 
         lp = new lpoly[IDELEMS(iTmp)];
         
-        for(j=0; j <IDELEMS(iTmp)-1; j++){
-                lp[j].setPoly(iTmp->m[j]);
-                
-                if(pComparePolys(lp[j].getPoly(), one)){
-                        Print("1 in GB\n");
-                        return(iTmp);
-                }
-                
-                lp[j].setIndex(j+1);
-                lp[j].setTerm(one);
-                lp[j].setDel(false);
-                lp[j].setNext(&lp[j+1]);
-                Print("Labeled Polynomial %d: ",j+1);
-                Print("Label Term: ");
-                pWrite(lp[j].getTerm());
-                Print("Index: %d\n", lp[j].getIndex());
-                Print("Delete? %d\n", lp[j].getDel());
-                pWrite(lp[j].getPoly());
-                Print("\n\n");
-        }
-
-        lp[IDELEMS(iTmp)-1].setPoly(iTmp->m[IDELEMS(iTmp)-1]);
-        
-        if(pComparePolys(lp[IDELEMS(iTmp)-1].getPoly(), one)){
-                        Print("1 in GB\n");
-                        return(iTmp);
-        }
-        
-        lp[IDELEMS(iTmp)-1].setIndex(IDELEMS(iTmp));
-        lp[IDELEMS(iTmp)-1].setTerm(one);
-        lp[IDELEMS(iTmp)-1].setDel(false);
-        lp[IDELEMS(iTmp)-1].setNext(NULL);
-        Print("Labeled Polynomial %d: ",IDELEMS(iTmp));
-        Print("Label Term: ");
-        pWrite(lp[IDELEMS(iTmp)-1].getTerm());
-        Print("Index: %d\n", lp[IDELEMS(iTmp)-1].getIndex());
-        Print("Delete? %d\n", lp[IDELEMS(iTmp)-1].getDel());
-        pWrite(lp[IDELEMS(iTmp)-1].getPoly());
-        Print("\n\n");
+        one_id = generate_input_list(lp,iTmp);        
+         
         
         // PROBLEM: muss signatur mitliefern, daher datentyp
         //          ideal nicht zu gebrauchen? 
