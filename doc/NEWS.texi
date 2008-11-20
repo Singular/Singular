@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.115 2008-11-12 16:43:36 Singular Exp $
+@comment $Id: NEWS.texi,v 1.116 2008-11-20 17:21:19 motsak Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -96,6 +96,8 @@ elim.lib (@nref{elim_lib}): @nref{elim}, @nref{nselect}, @nref{select}, @nref{se
 @item
 homolog.lib: kernel renamed to @nref{hom_kernel}. 
 @*(See also @nref{kernel}, @nref{alg_kernel}).
+@item
+matrix.lib: new commands for computing symmetric/exterior powers(bases)
 @end itemize
 
 @heading News for version 3-0-4
