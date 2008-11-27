@@ -1,12 +1,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.cc,v 1.12 2008-11-22 20:48:23 ederc Exp $ */
+/* $Id: f5gb.cc,v 1.13 2008-11-27 17:17:32 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
 #include "mod2.h"
-#include <list>
 #ifdef HAVE_F5
 #include "kutil.h"
 #include "structs.h"
@@ -23,6 +22,7 @@
 #include "pInline1.h"
 #include "f5gb.h"
 #include "lpolynomial.h"
+#include "lplist.h"
 
 
 
@@ -65,7 +65,7 @@ void qsort_degree(poly* left, poly* right)
 * computes incrementally gbs of subsets of the input 
 * gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}
   
-lpoly *f5_inc(lpoly* lp, lpoly* g_prev)
+LPoly *f5_inc(LPoly* lp, LPoly* g_prev)
 {
         long length = 1;
         
@@ -90,7 +90,7 @@ lpoly *f5_inc(lpoly* lp, lpoly* g_prev)
 
 */
 // generating the list lp of ideal generators and test if 1 is in lp
-bool generate_input_list(lpoly* lp, ideal id, poly ONE)
+bool generate_input_list(LPoly* lp, ideal id, poly ONE)
 {
         long j;
         for(j=0; j<IDELEMS(id)-1; j++){
@@ -106,10 +106,10 @@ bool generate_input_list(lpoly* lp, ideal id, poly ONE)
                 lp[j].setTerm(ONE);
                 lp[j].setDel(false);
                 lp[j].setNext(&lp[j+1]);
-                Print("Labeled Polynomial %d: ",j+1);
+                Print("Labeled Polynomial %ld: ",j+1);
                 Print("Label Term: ");
                 pWrite(lp[j].getTerm());
-                Print("Index: %d\n", lp[j].getIndex());
+                Print("Index: %ld\n", lp[j].getIndex());
                 Print("Delete? %d\n", lp[j].getDel());
                 pWrite(lp[j].getPoly());
                 Print("NEUNEUNEU\n\n");
@@ -123,9 +123,9 @@ bool generate_input_list(lpoly* lp, ideal id, poly ONE)
 * implementation 
 */
 ideal F5main(ideal i, ring r) {
-    lpoly* lp;
-    long j;
 
+    long j;
+    LPoly * lp = new LPoly;
     // definition of one-polynomial as global constant ONE
     poly one = pInit();
     pSetCoeff(one, nInit(1));
@@ -152,9 +152,17 @@ ideal F5main(ideal i, ring r) {
             return(iTmp);
     }
     */
-    Print("Es klappt!\nWIRKLICH!");
-    return(i); 
-    
+    Print("Es klappt!\nWIRKLICH!\n");
+    // only for debugging
+    lp->get();
+    //return(i); 
+    LpList lp_list;
+    while(NULL != lp->getNext()) {
+        lp_list.insert(lp);
+        lp = lp->getNext();
+    }
+    lp_list.get();
+    return i;
 
 
 }

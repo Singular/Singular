@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.11 2008-11-22 20:48:23 ederc Exp $ */
+/* $Id: f5gb.h,v 1.12 2008-11-27 17:18:05 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -10,6 +10,7 @@
 
 #ifdef HAVE_F5
 #include "lpolynomial.h"
+#include "lplist.h"
 
 
 // sort polynomials in ideal i by decreasing total degree
@@ -18,7 +19,7 @@
 
 // generating the list lp of ideal generators and 
 // test if 1 is in lp(return 1) or not(return 0)
- bool generate_input_list(lpoly* lp, ideal id, poly one);
+ bool generate_input_list(LPoly* lp, ideal id, poly one);
 
 /* computes incrementally gbs of subsets of the input 
    gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}  
