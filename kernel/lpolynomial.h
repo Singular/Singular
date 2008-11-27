@@ -1,9 +1,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lpolynomial.h,v 1.1 2008-11-22 20:47:27 ederc Exp $ */
+/* $Id: lpolynomial.h,v 1.2 2008-11-27 17:19:22 ederc Exp $ */
 /*
-* ABSTRACT: f5gb interface
+* ABSTRACT: labeled polynomial interface
 */
 #ifndef LPOLYNOMIAL_HEADER
 #define LPOLYNOMIAL_HEADER
@@ -12,14 +12,14 @@
 
 
 // class of a labeled polynomial 
-class lpoly
+class LPoly
 {
         private:
                 poly    term; //term of signature
                 long    index; //index of signature
                 poly    polynomial; //standard polynomial data
                 bool    del; //for deletion in TopReduction Subalgorithm
-                lpoly   *next; //pointer on the next labeled polynomial in the list
+                LPoly   *next; //pointer on the next labeled polynomial in the list
         public:
                 void    setPoly(poly p);
                 poly    getPoly();
@@ -29,16 +29,18 @@ class lpoly
                 long    getIndex();
                 void    setDel(bool b);
                 bool    getDel();
-                void    setNext(lpoly *l);
-                lpoly   *getNext();
+                void    setNext(LPoly *l);
+                LPoly   *getNext();
+                int     compare(const LPoly& lp);
+                void    get();
 };
 
 
 // structure of the critical pairs, just the addresses of the corresponding generator labeled polynomials
 struct critpair
 {
-        lpoly       *cp1;   // first  component
-        lpoly       *cp2;   // second component
+        LPoly       *cp1;   // first  component
+        LPoly       *cp2;   // second component
         critpair    *next;  // next critical pair
 };
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lpolynomial.cc,v 1.1 2008-11-22 20:46:20 ederc Exp $ */
+/* $Id: lpolynomial.cc,v 1.2 2008-11-27 17:18:45 ederc Exp $ */
 /*
 * ABSTRACT: lpolynomial definition 
 */
@@ -23,61 +23,72 @@
 #include "pInline1.h"
 #include "f5gb.h"
 #include "lpolynomial.h"
-
-
-/*2
-* all functions working on the class lpoly for labeled polynomials
+#include "lplist.h"
+/*
+================================================================
+all functions working on the class LPoly for labeled polynomials
+================================================================
 */
-
-void lpoly::setPoly(poly p)
+void LPoly::setPoly(poly p) 
 {
-        polynomial = p;
+    polynomial = p;
 }
 
-void lpoly::setTerm(poly t)
-{
-        term = t;
+void LPoly::setTerm(poly t) {
+    term = t;
 }
 
-void lpoly::setIndex(long i)
-{
-        index = i;
+void LPoly::setIndex(long i) {
+    index = i;
 }
 
 
-void lpoly::setDel(bool b)
-{
-        del = b;
+void LPoly::setDel(bool b) {
+    del = b;
 }
 
-void lpoly::setNext(lpoly* l)
-{
-        next = l;
+void LPoly::setNext(LPoly* l) {
+    next = l;
 }
 
-poly lpoly::getPoly()
-{
-        return polynomial;
+poly LPoly::getPoly() {
+    return polynomial;
 }
 
-poly lpoly::getTerm()
-{
-        return term;
+poly LPoly::getTerm() {
+    return term;
 }
 
-long lpoly::getIndex()
-{
-        return index;
+long LPoly::getIndex() {
+    return index;
 }
 
-bool lpoly::getDel()
-{
-        return del;
+bool LPoly::getDel() {
+    return del;
 }
 
-lpoly *lpoly::getNext()
-{
-        return next;
+LPoly* LPoly::getNext() {
+    return next;
 }
 
+/*
+=====================================================
+comparing two labeled polynomials by their signatures
+=====================================================
+*/
+int LPoly::compare(const LPoly& lp) {
+    if(index > lp.index) {
+        return 1;
+    }
+    if(index < lp.index) {
+        return -1;
+    }
+    return 0;
+}
+
+void LPoly::get() {
+    Print("Label: ");
+    pWrite(getTerm());
+    Print("  %d\n",getIndex());
+}
 #endif
