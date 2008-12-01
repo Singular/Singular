@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: jacobson.lib,v 1.3 2008-10-10 14:33:54 Singular Exp $";
+version="$Id: jacobson.lib,v 1.4 2008-12-01 20:51:16 levandov Exp $";
 category="System and Control Theory";
 info="
 LIBRARY: jacobson.lib     Algorithms for Smith and Jacobson Normal Form
@@ -104,7 +104,8 @@ example
   print(s[2]);
   print(s[1]*m*s[3]);
 }
-proc diagonal_with_trafo( R, matrix MA, int B)
+
+static proc diagonal_with_trafo( R, matrix MA, int B)
 {
 
 int ppl = printlevel-voice+2;
@@ -328,7 +329,7 @@ int ppl = printlevel-voice+2;
 }
 
 
-proc divisibility(matrix M)
+static proc divisibility(matrix M)
    {
     matrix STDM=M;
     int i,j;
@@ -396,7 +397,7 @@ proc divisibility(matrix M)
     return(RUECK);
 }
 
-proc diagonal_without_trafo( R, matrix MA, int B)
+static proc diagonal_without_trafo( R, matrix MA, int B)
 {
   int ppl = printlevel-voice+2;  
 
@@ -623,7 +624,7 @@ example
 
 
 
-proc triangle( matrix MA, int B)
+static proc triangle( matrix MA, int B)
 {
  int ppl = printlevel-voice+2; 
 
