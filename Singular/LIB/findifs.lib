@@ -1,11 +1,14 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: findifs.lib,v 1.1 2008-12-01 20:51:16 levandov Exp $";
+version="$Id: findifs.lib,v 1.2 2008-12-03 17:40:23 motsak Exp $";
 category="Applications";
 info="
 LIBRARY: findifs.lib  Tools for the finite difference schemes
 AUTHORS: Viktor Levandovskyy,     levandov@risc.uni-linz.ac.at
 
-THEORY: We provide the presentation of difference operators in a polynomial, semi-factorized and a nodal form. Running @code{example discr_example;} will show how we generate finite difference schemes of linear PDE's from given approximations.
+THEORY: We provide the presentation of difference operators in a polynomial, 
+        semi-factorized and a nodal form. Running @code{findifs_example();} 
+        will show how we generate finite difference schemes of linear PDE's 
+        from given approximations.
 
 PROCEDURES:
 decoef(P,n);  decompose poly P into summands with respect to the number n
@@ -63,7 +66,10 @@ proc par2tex(string s)
 "USAGE:  par2tex(s);  s a string
 RETURN:  string
 PURPOSE: converts special characters to TeX in s
-NOTE: the convention is the following: Tx goes to T_x, dx to tri x (the same for t,y,z). Moreover, some parameters (theta,ro,A,V) are converted to greek letters.
+NOTE: the convention is the following: 
+      'Tx' goes to 'T_x', 
+      'dx' to '\\tri x' (the same for dt, dy, dz),
+      'theta', 'ro', 'A', 'V' are converted to greek letters.
 EXAMPLE: example par2tex; shows examples
 "{
 // s is a tex string with a poly
