@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.40 2008-11-12 16:07:20 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.41 2008-12-04 14:13:37 wienand Exp $ */
 /*
 * ABSTRACT:
 */
@@ -950,6 +950,7 @@ void enterSMora (LObject p,int atS,kStrategy strat, int atR = -1)
     PrintLn();
   }
   #endif
+  return;
   if ((!strat->kHEdgeFound) || (strat->kNoether!=NULL)) HEckeTest(p.p,strat);
   if (strat->kHEdgeFound)
   {
@@ -1082,10 +1083,6 @@ void initMora(ideal F,kStrategy strat)
      strat->kNoether = pCopy(ppNoether);
   else if (strat->kHEdgeFound || strat->homog)
     strat->red = redFirst;  /*take the first possible in T*/
-#ifdef HAVE_RINGS  //TODO Oliver
-  else if (rField_is_Ring(currRing))
-    strat->red = redRing;
-#endif
   else
     strat->red = redEcart;/*take the first possible in under ecart-restriction*/
   if (strat->kHEdgeFound)
@@ -1228,6 +1225,11 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     if (pNext(strat->P.p) == strat->tail)
     {
       /*- deletes the short spoly and computes -*/
+#ifdef HAVE_RINGS
+      if (rField_is_Ring(currRing))
+        pLmDelete(strat->P.p);
+      else
+#endif
       pLmFree(strat->P.p);
       strat->P.p = NULL;
       poly m1 = NULL, m2 = NULL;
@@ -1283,6 +1285,11 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // put in T
       enterT(strat->P,strat);
       // build new pairs
+#ifdef HAVE_RINGS
+      if (rField_is_Ring(currRing))
+        superenterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat, strat->tl);
+      else
+#endif
       enterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat, strat->tl);
       // put in S
       strat->enterS(strat->P,
@@ -1293,7 +1300,12 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 
       // clear strat->P
-      if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
+      if (strat->P.lcm!=NULL) 
+#ifdef HAVE_RINGS
+        pLmDelete(strat->P.lcm);
+#else
+        pLmFree(strat->P.lcm);
+#endif
       strat->P.lcm=NULL;
 #ifdef KDEBUG
       // make sure kTest_TS does not complain about strat->P
