@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.113 2008-12-04 14:13:37 wienand Exp $ */
+/* $Id: kutil.cc,v 1.114 2008-12-08 10:00:44 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -314,7 +314,7 @@ void cancelunit (LObject* L,BOOLEAN inNF)
   ring r = L->tailRing;
   poly p = L->GetLmTailRing();
 
-#ifdef HAVE_RINGS
+#ifdef HAVE_RINGS_LOC
   // Leading coef have to be a unit
   if ( !(nIsUnit(p_GetCoeff(p, r))) ) return;
 #endif
@@ -5090,7 +5090,7 @@ void cancelunit1 (LObject* p,int *suc, int index,kStrategy strat )
 
   if (!pIsVector((*p).p) && ((*p).ecart != 0))
   {
-#ifdef HAVE_RINGS
+#ifdef HAVE_RINGS_LOC
     // Leading coef have to be a unit
     if ( !(nIsUnit(p_GetCoeff((*p).p, r))) ) return;
 #endif
@@ -5105,7 +5105,7 @@ void cancelunit1 (LObject* p,int *suc, int index,kStrategy strat )
         pDelete(&(pNext((*p).p)));
         (*p).ecart = 0;
         (*p).length = 1;
-#ifdef HAVE_RINGS
+#ifdef HAVE_RINGS_LOC
         (*p).pLength = 1;  // Why wasn't this set already?
 #endif
         (*suc)=0;

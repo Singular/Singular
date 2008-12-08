@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.41 2008-12-04 14:13:37 wienand Exp $ */
+/* $Id: kstd1.cc,v 1.42 2008-12-08 10:00:44 wienand Exp $ */
 /*
 * ABSTRACT:
 */
@@ -950,7 +950,6 @@ void enterSMora (LObject p,int atS,kStrategy strat, int atR = -1)
     PrintLn();
   }
   #endif
-  return;
   if ((!strat->kHEdgeFound) || (strat->kNoether!=NULL)) HEckeTest(p.p,strat);
   if (strat->kHEdgeFound)
   {
@@ -1225,7 +1224,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     if (pNext(strat->P.p) == strat->tail)
     {
       /*- deletes the short spoly and computes -*/
-#ifdef HAVE_RINGS
+#ifdef HAVE_RINGS_LOC
       if (rField_is_Ring(currRing))
         pLmDelete(strat->P.p);
       else
@@ -1285,7 +1284,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // put in T
       enterT(strat->P,strat);
       // build new pairs
-#ifdef HAVE_RINGS
+#ifdef HAVE_RINGS_LOC
       if (rField_is_Ring(currRing))
         superenterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat, strat->tl);
       else
@@ -1301,7 +1300,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       // clear strat->P
       if (strat->P.lcm!=NULL) 
-#ifdef HAVE_RINGS
+#ifdef HAVE_RINGS_LOC
         pLmDelete(strat->P.lcm);
 #else
         pLmFree(strat->P.lcm);
