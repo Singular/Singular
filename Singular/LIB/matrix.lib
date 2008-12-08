@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.44 2008-11-20 17:17:33 motsak Exp $";
+version="$Id: matrix.lib,v 1.45 2008-12-08 14:31:46 motsak Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -1077,7 +1077,7 @@ example
 
 proc symmetricBasis(int n, int k, list #)
 "USAGE:    symmetricBasis(n, k[,s]); n int, k int, s string
-RETURN:   poynomial ring containing the ideal \"symBasis\", 
+RETURN:   ring, poynomial ring containing the ideal \"symBasis\", 
           being a basis of the k-th symmetric power of an n-dim vector space.
 NOTE:     The output polynomial ring has characteristics 0 and n variables 
           named \"S(i)\", where the base variable name S is either given by the
@@ -1125,7 +1125,7 @@ symBasis; // symmetric basis:
 
 proc exteriorBasis(int n, int k, list #)
 "USAGE:    exteriorBasis(n, k[,s]); n int, k int, s string
-RETURN:   poynomial ring containing the ideal \"extBasis\", 
+RETURN:   qring, an exterior algebra containing the ideal \"extBasis\", 
           being a basis of the k-th exterior power of an n-dim vector space.
 NOTE:     The output polynomial ring has characteristics 0 and n variables 
           named \"S(i)\", where the base variable name S is either given by the
@@ -1169,6 +1169,7 @@ r; // container ring:
 extBasis; // exterior basis:
 }
 
+//////////////////////////////////////////////////////////////////////////////
 
 static proc chooseSafeVarName(string prefix, string suffix)
 "USAGE: give appropreate prefix for variable names
@@ -1183,6 +1184,8 @@ RETURN: safe variable name (repeated prefix + suffix)
   }
   return(S);
 }
+
+//////////////////////////////////////////////////////////////////////////////
 
 static proc mapPower(int p, module A, int k, def Tn, def Tm)
 "USAGE: by both symmetric- and exterior-Power"
@@ -1262,8 +1265,6 @@ SEE ALSO: symmetricPower, exteriorPower"
   setring save;
   return( imap(Rm, D) );
 }
-
-
 
 
 //////////////////////////////////////////////////////////////////////////////
