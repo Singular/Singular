@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.h,v 1.2 2008-03-19 17:44:08 Singular Exp $ */
+/* $Id: gnumpfl.h,v 1.3 2008-12-08 17:47:35 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 */
@@ -38,4 +38,5 @@ void     ngfDelete(number *a, const ring r);
 nMapFunc  ngfSetMap(ring src, ring dst);
 
 void setGMPFloatDigits( size_t digits, size_t rest );
+number ngfMapQ(number from);
 #endif

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.18 2008-08-06 13:55:42 Singular Exp $ */
+/* $Id: numbers.cc,v 1.19 2008-12-08 17:47:35 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -37,6 +37,7 @@ extern int IsPrime(int p);
 
 void   (*nNew)(number *a);
 number (*nInit)(int i);
+number  (*nInit_bigint)(number i);
 number (*nPar)(int i);
 int    (*nParDeg)(number n);
 int    (*nSize)(number n);
@@ -138,12 +139,15 @@ void nSetChar(ring r)
   if (rField_is_Extension(r))
   {
     naSetChar(c,r);
+    if (rField_is_Q_a()) nInit_bigint=naMap00;
+    if (rField_is_Zp_a()) nInit_bigint=naMap0P;
   }
 #ifdef HAVE_RING2TOM
   /*----------------------ring Z / 2^m----------------*/
   else if (rField_is_Ring_2toM(r))
   {
     nr2mSetExp(c, r);
+    nInit_bigint=nr2mMapQ;
   }
 #endif  
 #ifdef HAVE_RINGZ
@@ -151,6 +155,7 @@ void nSetChar(ring r)
   else if (rField_is_Ring_Z(r))
   {
     nrzSetExp(c, r);
+    nInit_bigint=nrzMapQ;
   }
 #endif  
 #ifdef HAVE_RINGMODN
@@ -158,6 +163,7 @@ void nSetChar(ring r)
   else if (rField_is_Ring_ModN(r))
   {
     nrnSetExp(c, r);
+    nInit_bigint=nrnMapQ;
   }
 #endif
 #ifdef HAVE_RINGMODN
@@ -165,22 +171,26 @@ void nSetChar(ring r)
   else if (rField_is_Ring_PtoM(r))
   {
     nrnSetExp(c, r);
+    nInit_bigint=nrnMapQ;
   }
 #endif
   else if (rField_is_Zp(r))
   /*----------------------char. p----------------*/
   {
     npSetChar(c, r);
+    nInit_bigint=npMap0;
   }
   /* -------------- GF(p^m) -----------------------*/
   else if (rField_is_GF(r))
   {
     nfSetChar(c,r->parameter);
+    nInit_bigint=ndReturn0; // not impl.
   }
   /* -------------- R -----------------------*/
   //if (c==(-1))
   else if (rField_is_R(r))
   {
+    nInit_bigint=nrMapQ;
   }
   /* -------------- long R -----------------------*/
   /* -------------- long C -----------------------*/
@@ -188,6 +198,8 @@ void nSetChar(ring r)
   || (rField_is_long_C(r)))
   {
     setGMPFloatDigits(r->float_len,r->float_len2);
+    if (rField_is_long_R(r)) nInit_bigint=ngfMapQ;
+    else                     nInit_bigint=ngcMapQ;
   }
 #ifdef TEST
   /* -------------- R -----------------------*/

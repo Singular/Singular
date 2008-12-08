@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.h,v 1.2 2008-03-19 17:44:08 Singular Exp $ */
+/* $Id: gnumpc.h,v 1.3 2008-12-08 17:47:35 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 */
@@ -41,6 +41,7 @@ void     ngcDelete(number *a, const ring r);
 
 nMapFunc  ngcSetMap(ring src, ring dst);
 
+number ngcMapQ(number from);
 #endif
 
 
