@@ -1,6 +1,6 @@
 // KK,GMG last modified: 17.12.00
 ///////////////////////////////////////////////////////////////////////////////
-version  = "$Id: classify.lib,v 1.53 2006-07-31 09:11:10 Singular Exp $";
+version  = "$Id: classify.lib,v 1.54 2008-12-08 14:24:41 dreyer Exp $";
 category="Singularities";
 info="
 LIBRARY:  classify.lib  Arnold Classifier of Singularities
@@ -95,9 +95,14 @@ EXAMPLE:  example classify; shows an example"
   export @ringdisplay;
 
   v = Klassifiziere(conv_ext2top(f_in));
-  poly f_out = v[1];
-  s2 = v[2];          // s2: Typ des Polynoms f z.b: E[18]
-  corank = v[3];
+  if(typeof(v[1])=="poly") {
+     poly f_out = v[1];
+     s2 = v[2];          // s2: Typ des Polynoms f z.b: E[18]
+     corank = v[3];
+  }
+  else {
+     s2="NoClass";
+  }
 
 //---------------- collect results and create return-value --------------------
   if( s2=="error!" || s2=="NoClass") {
@@ -260,6 +265,9 @@ static proc Funktion1bis (poly f, list cstn)
       else { v_class = printresult(1, f, "error!", cstn, -1); }
     }
 //-------------------------- classification done ------------------------------
+    if(typeof(v_class[1])!="poly") {
+       return(v);
+    }
     poly f_result = v_class[1];
     v[2] = v_class[2];
     v[3] = v_class[3];
@@ -531,7 +539,7 @@ static proc Funktion25 (poly f, list cstn)
         if(Dim==0) {return(printresult(30,f,"W["+string(k)+",0]",cstn,3*k-1));}
         if(Dim==1) {
            return(printresult(32, f,
-                  "W#["+string(k)+","+string(Mu-12*k-2)+"]", cstn, 3*k-1));
+                  "W#["+string(k)+","+string(Mu-12*k-3)+"]", cstn, 3*k-1));
         }
         return(printresult(29, f, "error!", cstn, -1));
       }
@@ -1460,13 +1468,15 @@ static proc Funktion47 (poly f, list cstn)
   int corank = cstn[1];
   int Mu = cstn[2];
   int K  = cstn[3];
-  string s = "The Singularity ";+Show(jet(f, K), corank, K);
+  string s = "The Singularity "+Show(jet(f, K));
   string tp="";
 //  return(printresult(47, f, tp, cstn, -1));
 
   s = s +" has 4-jet equal to zero. (F47), mu="+string(Mu);
-
+  
   s; // +"  ("+SG_Typ+")";
+  s = "No further classification available.";
+  s;
   return(Show(f), tp, corank);
 }
 
@@ -2211,7 +2221,13 @@ static proc HKclass7 (intvec sg, string SG_Typ, int cnt)
 {
   list v;
 
-  if(sg[1]==1 && sg[2]==0 && sg[3]==1) { v=HKclass7_teil_1(sg, SG_Typ, cnt); }
+  if(sg[1]==1 && sg[2]==0 && sg[3]==1) { 
+      v=HKclass7_teil_1(sg, SG_Typ, cnt); 
+  }
+  else {
+      v[1]="not in list";
+      v[2]=0;
+  }
   debug_log(6, "HKclass7: ", v[1], " cnt=", v[2]);
   return(v);
 }
