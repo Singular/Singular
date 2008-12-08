@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.481 2008-11-12 12:51:15 Singular Exp $ */
+/* $Id: iparith.cc,v 1.482 2008-12-08 17:48:07 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -6305,6 +6305,22 @@ static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
       case INT_CMD:
       {
         number n=nInit((int)(long)h->Data());
+        if (!nIsZero(n))
+        {
+          p=pOne();
+          pSetCoeff(p,n);
+        }
+        else
+        {
+          p=NULL;
+          nDelete(&n);
+        }
+        break;
+      }
+      case BIGINT_CMD:
+      {
+        number b=(number)h->Data(BIGINT_CMD);
+	number n=nInit_bigint(b);
         if (!nIsZero(n))
         {
           p=pOne();

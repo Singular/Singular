@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.39 2008-07-16 12:51:26 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.40 2008-12-08 17:48:07 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -159,29 +159,11 @@ static void * iiI2BI(void *data)
   return (void *)n;
 }
 
-extern number ngfMapQ(number from); // gnumpfl.cc
-extern number ngcMapQ(number from); // gnumpc.cc
-extern number nrMapQ(number from);  // shortfl.cc
-
 static void * iiBI2N(void *data)
 {
   if (currRing==NULL) return NULL;
   // a bigint is really a number from char 0, with diffrent operations...
-  if (rField_is_Q())      return (void*)nlCopy((number)data);
-  if (rField_is_Zp())     return (void*)npMap0((number)data);
-  if (rField_is_long_R()) return (void*)ngfMapQ((number)data);
-  if (rField_is_long_C()) return (void*)ngcMapQ((number)data);
-  if (rField_is_R())      return (void*)nrMapQ((number)data);
-  if (rField_is_Q_a())    return (void*)naMap00((number)data);
-  if (rField_is_Zp_a())   return (void*)naMap0P((number)data);
-#ifdef HAVE_RINGS
-  if (rField_is_Ring_Z())   return (void*)nrzMapQ((number)data);
-  if (rField_is_Ring_ModN())   return (void*)nrnMapQ((number)data);
-  if (rField_is_Ring_PtoM())   return (void*)nrnMapQ((number)data);
-  if (rField_is_Ring_2toM())   return (void*)nr2mMapQ((number)data);
-#endif
-  WerrorS("cannot convert bigint to this ring");
-  return NULL;
+  return (void*)nInit_bigint((number)data);
 }
 
 static void * iiIm2Ma(void *data)
