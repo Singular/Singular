@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.17 2008-07-16 12:41:33 wienand Exp $ */
+/* $Id: rintegers.cc,v 1.18 2008-12-08 15:00:43 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -17,7 +17,7 @@
 #include "mpr_complex.h"
 #include "ring.h"
 #include "rintegers.h"
-#include "gmp.h"
+#include "si_gmp.h"
 
 #ifdef HAVE_RINGZ
 

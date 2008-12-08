@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.13 2008-10-02 14:33:15 Singular Exp $ */
+/* $Id: modulop.cc,v 1.14 2008-12-08 15:00:43 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -17,7 +17,7 @@
 #include "mpr_complex.h"
 #include "ring.h"
 #ifdef HAVE_RINGS
-#include <gmp.h>
+#include <si_gmp.h>
 #endif
 #include "modulop.h"
 

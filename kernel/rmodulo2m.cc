@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.22 2008-07-16 12:41:33 wienand Exp $ */
+/* $Id: rmodulo2m.cc,v 1.23 2008-12-08 15:00:43 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -19,7 +19,7 @@
 #include "mpr_complex.h"
 #include "ring.h"
 #include "rmodulo2m.h"
-#include "gmp.h"
+#include "si_gmp.h"
 
 int nr2mExp;
 NATNUMBER nr2mModul;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.30 2008-07-16 15:04:26 wienand Exp $ */
+/* $Id: rmodulon.cc,v 1.31 2008-12-08 15:00:43 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -17,7 +17,7 @@
 #include "mpr_complex.h"
 #include "ring.h"
 #include "rmodulon.h"
-#include "gmp.h"
+#include "si_gmp.h"
 
 #ifdef HAVE_RINGMODN
 

@@ -55,9 +55,6 @@
   extern const char * libfac_version;
   extern const char * libfac_date;
 #endif
-//extern "C" {
-//#include <gmp.h>
-//}
 #include <si_gmp.h>
 #ifdef HAVE_MPSR
 #include <MP_Config.h>

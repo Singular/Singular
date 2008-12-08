@@ -3,14 +3,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.56 2008-09-12 14:13:32 Singular Exp $ */
+/* $Id: structs.h,v 1.57 2008-12-08 15:00:43 Singular Exp $ */
 /*
 * ABSTRACT
 */
 
 #include <string.h> /* for memset */
 #ifdef HAVE_RINGS
-#include <gmp.h>
+#include <si_gmp.h>
 #endif
 
 #ifndef NATNUMBER
