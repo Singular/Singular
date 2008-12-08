@@ -182,7 +182,7 @@ RETURN:  list l of lists of two ideals such that the
 NOTE:    algorithm of Gianni/Trager/Zacharias
 "  
 {
-   if(i==0)
+   if(size(i)==0)
    {
      return(list(i,i));
    }
