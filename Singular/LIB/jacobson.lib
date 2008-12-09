@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: jacobson.lib,v 1.4 2008-12-01 20:51:16 levandov Exp $";
+version="$Id: jacobson.lib,v 1.5 2008-12-09 16:50:21 levandov Exp $";
 category="System and Control Theory";
 info="
 LIBRARY: jacobson.lib     Algorithms for Smith and Jacobson Normal Form
@@ -26,6 +26,7 @@ proc smith(R, matrix MA, list #)
 "USAGE:  smith(R, M[, eng1, eng2]);  R ring, M matrix, eng1 and eng2 are optional int
 RETURN: list 
 NOTE: By default, the diagonal matrix, the Smith normal form, is returned. 
+@* R stays for the ring, where computations will take place.
 @* If optional integer eng1 is nonzero, smith returns 
 @* a list of matrices L such that L[1]*M*L[3]=L[2] with L[2]_11|L[2]_22|...|L[2]_nn and 
 @* L[1], L[3] unimodular matrices.
@@ -67,7 +68,7 @@ EXAMPLE: example smith; shows examples
   }
 
   //if MA eqauls the zero matrix give back MA
-  if ( (size(m)==0) and (size(transpose(m))==0) )
+  if ( (size(module(m))==0) and (size(transpose(module(m)))==0) )
   {
     module L=freemodule(COL);
     matrix LM=L;
@@ -557,6 +558,7 @@ proc jacobson(R, matrix MA, list #)
 RETURN: list 
 NOTE: A list of matrices L such that L[1]*M*L[3]=L[2] such that L[2] is a diagonal matrix and 
 @* L[1], L[3] unimodular matrices.
+@* R stays for the ring, where computations will take place.
 @* eng determines the engine, that computes the Groebner basis. By default eng equals zero.
 @* If eng = 0 than std is used to caculate a Groebner basis
 @* If eng = 1 than groebner is used to caculate a Groebner basis 

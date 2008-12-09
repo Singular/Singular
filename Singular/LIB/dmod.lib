@@ -1,9 +1,9 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.31 2008-10-06 17:04:26 Singular Exp $";
+version="$Id: dmod.lib,v 1.32 2008-12-09 16:50:21 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
-AUTHORS: Viktor Levandovskyy,     levandov@risc.uni-linz.ac.at
+AUTHORS: Viktor Levandovskyy,     levandov@math.rwth-aachen.de
 @*             Jorge Martin Morales,    jorge@unizar.es
 
 THEORY: Given a polynomial ring R = K[x_1,...,x_n] and a polynomial F in R,
@@ -55,9 +55,10 @@ annfsBM(F[,eng]);          compute Ann F^s0 in D and Bernstein poly for a poly F
 annfsLOT(F[,eng]);         compute Ann F^s0 in D and Bernstein poly for a poly F (Levandovskyy modification of the Oaku-Takayama algorithm)
 annfsOT(F[,eng]);          compute Ann F^s0 in D and Bernstein poly for a poly F (algorithm of Oaku-Takayama)
 SannfsBM(F[,eng]);         compute Ann F^s in D[s] for a poly F (algorithm of Briancon-Maisonobe)
+SannfsBFCT(F[,eng]);      compute Ann F^s in D[s] for a poly F (algorithm of Briancon-Maisonobe)
 SannfsLOT(F[,eng]);        compute Ann F^s in D[s] for a poly F (Levandovskyy modification of the Oaku-Takayama algorithm)
 SannfsOT(F[,eng]);         compute Ann F^s in D[s] for a poly F (algorithm of Oaku-Takayama)
-annfs0(I,F [,eng]);        compute Ann F^s0 in D and Bernstein poly from the known Ann F^s in D[s]
+annfs0(I,F [,eng]);           compute Ann F^s0 in D and Bernstein poly from the known Ann F^s in D[s]
 checkRoot1(I,F,a[,eng]);   check whether a rational is a root of the global Bernstein polynomial of F from the known Ann F^s in D[s]
 checkRoot2(I,F,a[,eng]);   check whether a rational is a root of the global Bernstein polynomial of F and compute its multiplicity from the known Ann F^s in D[s]
 checkFactor(I,F,qs[,eng]); check whether a polynomial qs in K[s] is a factor of the global Bernstein polynomial of F from the known Ann F^s in D[s]
@@ -106,7 +107,6 @@ proc testdmodlib()
   example SannfsBM;
   example SannfsLOT;
   example SannfsOT;
-  example annfs0;
   example checkRoot1;
   example checkRoot2;
   example checkFactor;
@@ -1866,8 +1866,6 @@ EXAMPLE: example operatorBM; shows examples
 example
 {
   "EXAMPLE:"; echo = 2;
-  //  ring r = 0,(x,y,z,w),Dp;
-  //  poly F = x^3+y^3+z^2*w;
   ring r = 0,(x,y,z),Dp;
   poly F = x^3+y^3+z^3;
   printlevel = 0;
@@ -1880,6 +1878,121 @@ example
   BS; // roots and multiplicities of the Bernstein poly
   PS; // the operator, s.t. PS*F^{s+1} = bs*F^s mod LD
   reduce(PS*F-bs,LD); // check the property of PS
+}
+
+// more interesting:
+//  ring r = 0,(x,y,z,w),Dp;
+//  poly F = x^3+y^3+z^2*w;
+
+// TODO: 1 has to appear in the 2nd column of transp. matrix
+// this does not happen automatically
+// for this, do special modulo with emphasis on the 2comp
+// of the transp matrix, there must appear 1 in the GB
+// need: (c,<) ordering for such comp's
+
+// proc operatorModulo(poly F, ideal I, poly b)
+// "USAGE:  operatorModulo(f,I,b);  f a poly, I an ideal, b a poly
+// RETURN:  poly
+// PURPOSE: compute the B-operator from the poly F, ideal I = Ann f^s and Bernstein-Sato
+// polynomial b using modulo
+// NOTE:  The computations take place in the ring, similar to the one returned by Sannfs procedure.
+// @*       If printlevel=1, progress debug messages will be printed,
+// @*       if printlevel>=2, all the debug messages will be printed.
+// EXAMPLE: example operatorModulo; shows examples
+// "
+// {
+//   // with hom_kernel;
+//   matrix AA[1][2] = F,-b;
+//   //  matrix M = matrix(subst(I,s,s+1)*freemodule(2)); // ann f^{s+1}
+//   matrix N = matrix(I); // ann f^s
+//   //  matrix K = hom_kernel(AA,M,N);
+//   matrix K = modulo(AA,N);
+//   K = transpose(K);
+//   print(K);
+//   ideal J;
+//   int i;
+//   poly t; number n;
+//   for(i=1; i<=nrows(K); i++)
+//   {
+//     if (K[i,2]!=0)
+//     {
+//       if ( leadmonom(K[i,2]) == 1)
+//       {
+// 	t = K[i,1];
+// 	n = leadcoef(K[i,2]);
+// 	t = t/n;
+// 	//        J = J, K[i][2];
+// 	break;
+//       }
+//     }
+//   }
+//   ideal J = groebner(subst(I,s,s+1)); // for NF
+//   t = NF(t,J);
+//   "candidate:"; t;
+//   J = subst(J,s,s-1);
+//   // test:
+//   if ( NF(t*F-b,J) !=0)
+//   {
+//     "Problem: PS does not work on F";
+//   }
+//   return(t);
+// }
+// example
+// {
+//   "EXAMPLE:"; echo = 2;
+//   //  ring r = 0,(x,y,z),Dp;
+//   //   poly F = x^3+y^3+z^3;
+//   LIB "dmod.lib"; option(prot); option(mem);
+//   ring r = 0,(x,y),Dp;
+//   //  poly F = x^3+y^3+x*y^2;
+//   poly F = x^4 + y^4 + x*y^4;
+//   def A = Sannfs(F); // here we get LD = ann f^s
+//   setring A;
+//   poly F = imap(r,F);
+//   def B = annfs0(LD,F); // to obtain BS polynomial
+//   list BS = imap(B,BS);
+//   poly b = fl2poly(BS,"s");
+//   LD = groebner(LD);
+//   poly PS = operatorModulo(F,LD,b);
+//   PS; // the operator, s.t. PS*F^{s+1} = bs*F^s mod LD
+//   reduce(PS*F-bs,LD); // check the property of PS
+// }
+
+proc fl2poly(list L, string s)
+"USAGE:  fl2poly(L,s); L a list, s a string
+RETURN:  poly
+PURPOSE: reconstruct a monic polynomial in one variable from its factorization
+ASSUME:  s is a string with the name of some variable and L is supposed to consist of two entries:
+@*         L[1] of the type ideal with the roots of a polynomial
+@*         L[2] of the type intvec with the multiplicities of corr. roots
+EXAMPLE: example fl2poly; shows examples
+"
+{
+  if (varnum(s)==0)
+  {
+    ERROR("no such variable found"); return(0);
+  }
+  poly x = var(varnum(s));
+  poly P = 1;
+  int sl = size(L[1]);
+  ideal RR = L[1];
+  intvec IV = L[2];
+  for(int i=1; i<= sl; i++)
+  {
+    P = P*((x-RR[i])^IV[i]);
+  }
+  return(P);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z,s),Dp;
+  ideal I = -1,-4/3,-5/3,-2;
+  intvec mI = 2,1,1,1;
+  list BS = I,mI;
+  poly p = fl2poly(BS,"s");
+  p;
+  factorize(p,2);
 }
 
 proc annfsParamBM (poly F, list #)
@@ -3320,6 +3433,224 @@ example
   def A = SannfsBM(F);
   setring A;
   LD;
+}
+
+proc SannfsBFCT(poly F, list #)
+"USAGE:  SannfsBFCT(f [,eng]);  f a poly, eng an optional int
+RETURN:  ring
+PURPOSE: compute the D-module structure of basering[1/f]*f^s, according to the 1st step of the algorithm by Briancon and Maisonobe in the ring D[s], where D is the Weyl algebra
+NOTE:    activate this ring with the @code{setring} command.
+@*       This procedure, unlike SannfsBM, returns a ring with the degrevlex ordering in all variables.
+@*       In the ring D[s], the ideal LD (which is NOT a Groebner basis) is the needed D-module structure,
+@*       If eng <>0, @code{std} is used for Groebner basis computations,
+@*       otherwise, and by default @code{slimgb} is used.
+@*       If printlevel=1, progress debug messages will be printed,
+@*       if printlevel>=2, all the debug messages will be printed.
+EXAMPLE: example SannfsBFCT; shows examples
+"
+{
+  int eng = 0;
+  if ( size(#)>0 )
+  {
+    if ( typeof(#[1]) == "int" )
+    {
+      eng = int(#[1]);
+    }
+  }
+  // returns a list with a ring and an ideal LD in it
+  int ppl = printlevel-voice+2;
+  //  printf("plevel :%s, voice: %s",printlevel,voice);
+  def save = basering;
+  int N = nvars(basering);
+  int Nnew = 2*N+2;
+  int i,j;
+  string s;
+  list RL = ringlist(basering);
+  list L, Lord;
+  list tmp;
+  intvec iv;
+  L[1] = RL[1]; // char
+  L[4] = RL[4]; // char, minpoly
+  // check whether vars have admissible names
+  list Name  = RL[2];
+  list RName;
+  RName[1] = "@t";
+  RName[2] = "@s";
+  for(i=1;i<=N;i++)
+  {
+    for(j=1; j<=size(RName);j++)
+    {
+      if (Name[i] == RName[j])
+      {
+        ERROR("Variable names should not include @t,@s");
+      }
+    }
+  }
+  // now, create the names for new vars
+  list DName;
+  for(i=1;i<=N;i++)
+  {
+    DName[i] = "D"+Name[i]; // concat
+  }
+  tmp[1] = "t";
+  tmp[2] = "s";
+  list NName = tmp + DName + Name ;
+  L[2]   = NName;
+  // Name, Dname will be used further
+  kill NName;
+  // block ord (lp(2),dp);
+  tmp[1]  = "lp"; // string
+  iv      = 1,1;
+  tmp[2]  = iv; //intvec
+  Lord[1] = tmp;
+  // continue with dp 1,1,1,1...
+  tmp[1]  = "dp"; // string
+  s       = "iv=";
+  for(i=1;i<=Nnew;i++)
+  {
+    s = s+"1,";
+  }
+  s[size(s)]= ";";
+  execute(s);
+  kill s;
+  tmp[2]    = iv;
+  Lord[2]   = tmp;
+  tmp[1]    = "C";
+  iv        = 0;
+  tmp[2]    = iv;
+  Lord[3]   = tmp;
+  tmp       = 0;
+  L[3]      = Lord;
+  // we are done with the list
+  def @R@ = ring(L);
+  setring @R@;
+  matrix @D[Nnew][Nnew];
+  @D[1,2]=t;
+  for(i=1; i<=N; i++)
+  {
+    @D[2+i,N+2+i]=-1;
+  }
+  //  L[5] = matrix(UpOneMatrix(Nnew));
+  //  L[6] = @D;
+  def @R = nc_algebra(1,@D);
+  setring @R;
+  kill @R@;
+  dbprint(ppl,"// -1-1- the ring @R(t,s,_Dx,_x) is ready");
+  dbprint(ppl-1, @R);
+  // create the ideal I
+  poly  F = imap(save,F);
+  ideal I = t*F+s;
+  poly p;
+  for(i=1; i<=N; i++)
+  {
+    p = t; // t
+    p = diff(F,var(N+2+i))*p;
+    I = I, var(2+i) + p;
+  }
+  // -------- the ideal I is ready ----------
+  dbprint(ppl,"// -1-2- starting the elimination of t in @R");
+  dbprint(ppl-1, I);
+  ideal J = engine(I,eng);
+  ideal K = nselect(J,1);
+  dbprint(ppl,"// -1-3- t is eliminated");
+  dbprint(ppl-1, K);  // K is without t
+  K = engine(K,eng);  // std does the job too
+  // now, we must change the ordering
+  // and create a ring without t
+  //  setring S;
+  // ----------- the ring @R3 ------------
+  // _Dx,_x,s;  +fast ord !
+  // keep: N, i,j,s, tmp, RL
+  Nnew = 2*N+1;
+  kill Lord, tmp, iv, RName;
+  list Lord, tmp;
+  intvec iv;
+  list L=imap(save,L);
+  list RL=imap(save,RL);
+  L[1] = RL[1];
+  L[4] = RL[4];  // char, minpoly
+  // check whether vars hava admissible names -> done earlier
+  // now, create the names for new var
+  tmp[1] = "s";
+  // DName is defined earlier
+  list NName = DName + Name + tmp;
+  L[2] = NName;
+  tmp = 0;
+  // just dp
+  // block ord (dp(N),dp);
+  string s = "iv=";
+  for (i=1; i<=Nnew; i++)
+  {
+    s = s+"1,";
+  }
+  s[size(s)]=";";
+  execute(s);
+  tmp[1] = "dp";  // string
+  tmp[2] = iv;   // intvec
+  Lord[1] = tmp;
+  kill s;
+  kill NName;
+  tmp[1]      = "C"; 
+  Lord[2]     = tmp;  tmp = 0;
+  L[3]        = Lord;
+  // we are done with the list. Now add a Plural part
+  def @R2@ = ring(L);
+  setring @R2@;
+  matrix @D[Nnew][Nnew];
+  for (i=1; i<=N; i++)
+  {
+    @D[i,N+i]=-1;
+  }
+  def @R2 = nc_algebra(1,@D);
+  setring @R2;
+  kill @R2@;
+  dbprint(ppl,"//  -2-1- the ring @R2(_Dx,_x,s) is ready");
+  dbprint(ppl-1, @R2);
+  ideal MM = maxideal(1);
+  MM = 0,s,MM;
+  map R01 = @R, MM;
+  ideal K = R01(K);
+  // total cleanup
+  poly F = imap(save, F);
+  ideal LD = K,F;
+  dbprint(ppl,"//  -2-2- start GB computations for Ann f^s + f");
+  dbprint(ppl-1, LD);
+  LD = engine(LD,eng);
+  dbprint(ppl,"//  -2-3- finished GB computations for Ann f^s + f");
+  dbprint(ppl-1, LD);
+  // make leadcoeffs positive
+  for (i=1; i<= ncols(LD); i++)
+  {
+    if (leadcoef(LD[i]) <0 )
+    {
+      LD[i] = -LD[i];
+    }
+  }
+  export LD;
+  kill @R;
+  return(@R2);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z,w),Dp;
+  poly F = x^3+y^3+z^3*w;
+  printlevel = 0;
+  def A = SannfsBFCT(F);
+  setring A;
+  intvec v = 1,2,3,4,5,6,7,8;
+  // are there polynomials, depending on s only?
+  nselect(LD,v);
+  // a fancier example:
+  def R = reiffen(4,5);
+  setring R;
+  v = 1,2,3,4;
+  def B = SannfsBFCT(RC);
+  setring B;
+  // are there polynomials, depending on s only?
+  nselect(LD,v);
+  // it is not the case. Are there leading monomials in s only?
+  nselect(lead(LD),v);
 }
 
 // use a finer ordering
@@ -5128,7 +5459,6 @@ example
   M = indAR(M,4);
   M;
 }
-
 
 
 static proc exCheckGenericity()

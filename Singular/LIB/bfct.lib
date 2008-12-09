@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: bfct.lib,v 1.6 2008-12-01 20:58:20 levandov Exp $";
+version="$Id: bfct.lib,v 1.7 2008-12-09 16:50:21 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: bfct.lib     M. Noro's Algorithm for Bernstein-Sato polynomial
@@ -39,6 +39,7 @@ SEE ALSO: dmod_lib, dmodapp_lib, gmssing_lib
 
 
 LIB "qhmoduli.lib"; // for Max
+LIB "dmod.lib"; // for SannfsBFCT etc
 LIB "dmodapp.lib";  // for initialideal etc
 
 
