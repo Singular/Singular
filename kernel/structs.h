@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.57 2008-12-08 15:00:43 Singular Exp $ */
+/* $Id: structs.h,v 1.58 2008-12-09 17:32:52 levandov Exp $ */
 /*
 * ABSTRACT
 */
@@ -615,6 +615,9 @@ struct sip_sring
   short     real_var_start, real_var_end;
 #endif
 
+#ifdef HAVE_SHIFTBBA
+  short          isLPring; /* 0 for non-letterplace rings, otherwise the number of LP blocks, at least 1, known also as lV */
+#endif
 
   BOOLEAN   VectorOut;
   BOOLEAN   ShortOut;

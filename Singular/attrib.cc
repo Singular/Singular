@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.30 2008-09-19 14:06:00 Singular Exp $ */
+/* $Id: attrib.cc,v 1.31 2008-12-09 17:32:52 levandov Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -315,6 +315,14 @@ BOOLEAN atATTRIB2(leftv res,leftv a,leftv b)
     res->rtyp=INT_CMD;
     res->data=(void *)(((ring)v->Data())->OrdSgn==1);
   }
+#ifdef HAVE_SHIFTBBA
+  else if ((strcmp(name,"isLPring")==0)
+  &&(((t=v->Typ())==RING_CMD)||(t==QRING_CMD)))
+  {
+    res->rtyp=INT_CMD;
+    res->data=(void *)(((ring)v->Data())->isLPring);
+  }
+#endif
   else
   {
     attr at=v->attribute->get(name);
@@ -348,7 +356,7 @@ BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
   {
     if (c->Typ()!=INT_CMD)
     {
-      WerrorS("attrib isSB must be int");
+      WerrorS("attribute isSB must be int");
       return TRUE;
     }
     if (((long)c->Data())!=0L)
@@ -366,7 +374,7 @@ BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
   {
     if (c->Typ()!=INT_CMD)
     {
-      WerrorS("attrib `rank` must be int");
+      WerrorS("attribute `rank` must be int");
       return TRUE;
     }
     ideal I=(ideal)v->Data();
@@ -375,9 +383,22 @@ BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
   else if ((strcmp(name,"global")==0)
   &&(((t=v->Typ())==RING_CMD)||(t==QRING_CMD)))
   {
-    WerrorS("can not set attribut `global`");
+    WerrorS("can not set attribute `global`");
     return TRUE;
   }
+#ifdef HAVE_SHIFTBBA
+  else if ((strcmp(name,"isLPring")==0)
+  &&(((t=v->Typ())==RING_CMD)||(t==QRING_CMD)))
+  {
+    if (c->Typ()==INT_CMD)
+      ((ring)v->Data())->isLPring=(int)(long)c->Data();
+    else
+    {
+      WerrorS("attribute `isLPring` must be int");
+      return TRUE;
+    }
+  }
+#endif
   else
   {
     int typ=c->Typ();
