@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.139 2008-10-10 09:30:17 Singular Exp $
+@comment $Id: types.doc,v 1.140 2008-12-09 14:27:29 seelisch Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -550,7 +550,7 @@ to represent boolean values
 Integers consist of a sequence of digits, possibly preceded by a sign.
 A space is considered as a separator, so it is not allowed between digits.
 A sequence of digits outside the allowed range is converted to the type
-@code{number} if possible.
+@code{bigint}, see @ref{bigint}.
 
 @menu
 * int declarations::
