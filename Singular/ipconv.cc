@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.40 2008-12-08 17:48:07 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.41 2008-12-09 10:53:49 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -49,10 +49,9 @@ static void * iiI2P(void *data)
   return (void *)p;
 }
 
-static void * iiBI2N(void *data);
 static void * iiBI2P(void *data)
 {
-  number n=(number)iiBI2N(data);
+  number n=nInit_bigint((number)data);
   nlDelete((number *)&data,NULL);
   poly p=pNSet(n);
   return (void *)p;
@@ -67,7 +66,7 @@ static void * iiI2V(void *data)
 
 static void * iiBI2V(void *data)
 {
-  number n=(number)iiBI2N(data);
+  number n=nInit_bigint((number)data);
   nlDelete((number *)&data,NULL);
   poly p=pNSet(n);
   if (p!=NULL) pSetComp(p,1);
@@ -84,7 +83,7 @@ static void * iiI2Id(void *data)
 static void * iiBI2Id(void *data)
 {
   ideal I=idInit(1,1);
-  number n=(number)iiBI2N(data);
+  number n=nInit_bigint((number)data);
   nlDelete((number *)&data,NULL);
   poly p=pNSet(n);
   I->m[0]=p;
