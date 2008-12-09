@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.19 2008-12-08 17:47:35 Singular Exp $ */
+/* $Id: numbers.cc,v 1.20 2008-12-09 08:59:32 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -136,7 +136,14 @@ void nSetChar(ring r)
   int c=rInternalChar(r);
 
   n__Delete= r->cf->cfDelete;
-  if (rField_is_Extension(r))
+  
+  /*--------------------- Q -----------------*/
+  if (rField_is_Q(r))
+  {
+    nInit_bigint=nlCopy;
+  }
+  /*--------------------- Q_a/ Zp_a -----------------*/
+  else if (rField_is_Extension(r))
   {
     naSetChar(c,r);
     if (rField_is_Q_a()) nInit_bigint=naMap00;
