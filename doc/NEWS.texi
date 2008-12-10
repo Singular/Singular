@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.116 2008-11-20 17:21:19 motsak Exp $
+@comment $Id: NEWS.texi,v 1.117 2008-12-10 19:05:56 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -30,7 +30,7 @@ new handling of the default argument in libraries (see @nref{Parameter list})
 @item
 @code{ESingular} updated for emacs 22
 @item
-licences for all parts of @sc{Singular} clarified (see @nref{Copyright})
+licences for all parts of @sc{Singular} clarified (see @nref{Preface})
 @end itemize
 
 @heading New @sc{Singular} functions
