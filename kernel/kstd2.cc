@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.77 2008-11-12 16:07:45 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.78 2008-12-10 19:48:51 levandov Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1419,7 +1419,6 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
     if ( ! strat->homog)
     {
       strat->P.GetP(strat->lmBin); // because shifts are counted with .p structure
-      /* assume strat->P.t_p != NULL */
       /* in the nonhomog case we have to shrink the polynomial */
       assume(strat->P.t_p!=NULL);
       qq = p_Shrink(strat->P.t_p, lV, strat->tailRing); // direct shrink
@@ -1659,9 +1658,11 @@ ideal freegb(ideal I, int uptodeg, int lVblock)
   /* uptodeg and lVblock are correct - test them! */
 
   /* check whether the ideal is in V */
-  if (! ideal_isInV(I,lVblock) )
+
+  if (0)
+  //  if (! ideal_isInV(I,lVblock) )
   {
-    PrintS("ERROR: The input ideal contains incorrectly encoded elements! ");
+    WerrorS("The input ideal contains incorrectly encoded elements! ");
     return(NULL);
   }
 
@@ -1718,6 +1719,7 @@ int redFirstShift (LObject* h,kStrategy strat)
     }
 #endif
     ksReducePoly(h, &(strat->T[j]), strat->kNoetherTail(), NULL, strat);
+
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {

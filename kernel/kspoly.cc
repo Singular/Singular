@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.15 2008-06-25 11:27:31 Singular Exp $ */
+/* $Id: kspoly.cc,v 1.16 2008-12-10 19:48:51 levandov Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -137,6 +137,21 @@ int ksReducePoly(LObject* PR,
   PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->GetpLength() - 1, spNoether);
   assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
   PR->LmDeleteAndIter();
+
+  // the following is commented out: shrinking
+#ifdef HAVE_SHIFTBBA_NONEXISTENT
+  if ( (currRing->isLPring) && (!strat->homog) )
+  {
+    // assume? h->p in currRing
+    PR->GetP();
+    poly qq = p_Shrink(PR->p, currRing->isLPring, currRing);
+    PR->Clear(); // does the right things
+    PR->p = qq; 
+    PR->t_p = NULL;
+    PR->SetShortExpVector();
+  }
+#endif
+  
 #if defined(KDEBUG) && defined(TEST_OPT_DEBUG_RED)
   if (TEST_OPT_DEBUG)
   {
@@ -250,6 +265,21 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
       p_SetCompP(p2,0, currRing, tailRing);
     }
   }
+
+  // the following is commented out: shrinking
+#ifdef HAVE_SHIFTBBA_NONEXISTENT
+  if (currRing->isLPring)
+  {
+    // assume? h->p in currRing
+    Pair->GetP();
+    poly qq = p_Shrink(Pair->p, currRing->isLPring, currRing);
+    Pair->Clear(); // does the right things
+    Pair->p = qq; 
+    Pair->t_p = NULL;
+    Pair->SetShortExpVector();
+  }
+#endif
+
 }
 
 int ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
@@ -290,6 +320,21 @@ int ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
 
   if (Lp == Save)
     With.Delete();
+
+  // the following is commented out: shrinking
+#ifdef HAVE_SHIFTBBA_NONEXISTENT
+  if (currRing->isLPring)
+  {
+    // assume? h->p in currRing
+    PR->GetP();
+    poly qq = p_Shrink(PR->p, currRing->isLPring, currRing);
+    PR->Clear(); // does the right things
+    PR->p = qq; 
+    PR->t_p = NULL;
+    PR->SetShortExpVector();
+  }
+#endif
+
   return ret;
 }
 
