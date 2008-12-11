@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.plural.texi,v 1.4 2007-08-01 15:07:22 Singular Exp $
+@comment $Id: COPYING.plural.texi,v 1.5 2008-12-11 12:47:14 Singular Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -21,86 +21,8 @@
 @sp 2
 @center @strong{NOTICE}
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation ( version 2 of the License );
-with the following additional restrictions (which override any conflicting
-restrictions in the GPL):
-
-The following software used with @sc{Singular} have their own copyright:
-the omalloc library, the readline library,
-the Gnu Multiple Precision Library (GMP),
-NTL: A Library for doing Number Theory (NTL),
-the Multi Protocol library (MP), the
-Singular-Factory library, the Singular-libfac library, and,
-for the Windows distributions the Cygwin DLL and the Cygwin tools (Cygwin), and the
-XEmacs editor (XEmacs).
-
-Their copyrights and licenses can be found in the accompanying files
-which are distributed along with these packages.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-(see @uref{http://www.gnu.org/copyleft/gpl.html,,GPL})
-
-Please send any comments or bug reports to
-@email{singular@@mathematik.uni-kl.de}.
-
-Please register yourself as a @sc{Singular} user by using the
-registration form on the @sc{Singular} homepage
-              @uref{http://www.singular.uni-kl.de}.
-If for some reason you cannot access the registration form, you
-can also register by sending an email to
-              @email{singular@@mathematik.uni-kl.de}
-with subject line @code{register} and body containing the following data:
-     your name, email address, organisation, country and platform(s).
-
-
-If you use Singular::Plural or parts thereof in a project and/or publish
-results that were partly obtained using @sc{Singular}, we ask you to
-cite @sc{Singular} and inform us thereof -- see
-@uref{http://www.singular.uni-kl.de/how_to_cite.html},
-for information on how to cite Singular.
-
-@heading Availability
-
-The latest information about @sc{Singular::Plural} is always available from
-@uref{http://www.singular.uni-kl.de/plural}.
-@ifset singularmanual
-The program @sc{Singular} and the above mentioned parts are available via
-anonymous ftp through the following addresses:
-@table @asis
-@item GMP, libreadline
-@copyright{} Free Software Foundation
-@* @uref{ftp://ftp.gnu.ai.mit.edu} or its mirrors
-@item MP
-@copyright{} Gray/Kajler/Wang, Kent State University
-@* @uref{http://www.symbolicnet.org/areas/protocols/mp.html}
-@item NTL
-@copyright{} Victor Shoup
-@* @uref{http://www.shoup.net}
-@item Singular-Factory
-@copyright{} Greuel/Stobbe, University of Kaiserslautern:
-@* @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Factory}
-@item Singular-libfac
-@copyright{}  Messollen, University of Saarbr@"ucken:
-@* @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Libfac}
-@item @sc{Singular} binaries and sources
-@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/} or via a
-WWW brow@-ser from
-@uref{http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/}
-@item Cygwin
-@uref{http://www.cygwin.com/}
-@item Xemacs
-@uref{http://www.xemacs.org}
-@end table
-@end ifset
+This program is now part of @sc{Singular}, the Copyright notice of @sc{Singular}
+applies.
 
 @heading Acknowledgements
 
