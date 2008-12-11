@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_ftp.texi,v 1.12 2001-08-27 14:40:03 Singular Exp $
+@comment $Id: README_ftp.texi,v 1.13 2008-12-11 12:47:33 Singular Exp $
 @c FILE: README_download.texi
 @c PURPOSE: This should reside as README file in the main directory of the
 @c          Singular ftp site.
@@ -20,9 +20,9 @@ detailed overview of
 @uref{http://www.singular.uni-kl.de/Overview/}
 @end display
 
-@sc{Singular} is developed on UNIX systems (Linux and HPUX).
+@sc{Singular} is developed on UNIX systems (Linux).
 Moreover, there exist ports to FreeBSD, SunOS, IRIX, AIX, 
-and Windows 95/98/NT/2K.
+and Windows NT/2K/XP.
 If your operating system is not in this list you may try to port
 @sc{Singular} to your platform
 (see @uref{http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/src/README.html})
