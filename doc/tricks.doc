@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: tricks.doc,v 1.22 2008-12-09 14:27:29 seelisch Exp $
+@comment $Id: tricks.doc,v 1.23 2008-12-12 12:26:44 Singular Exp $
 @comment this file contains the "Tricks and pittfalls" sections
 
 @c The following directives are necessary for proper compilation
@@ -408,6 +408,7 @@ used. If there is at least one space surrounding the @code{/} operator
 the @code{div} operator instead of @code{/} for integer division and an
 explicit type cast to @code{number} for ring division. Note, that this
 problem does only occur for divisions of numerical constants.
+It also apllies for large numerical constants which are of type @code{bigint}.
 @smallexample
 @c example error
   ring r=32002,x,dp;
