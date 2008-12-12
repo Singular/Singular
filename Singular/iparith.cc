@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.483 2008-12-08 18:47:03 Singular Exp $ */
+/* $Id: iparith.cc,v 1.484 2008-12-12 15:45:20 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -7495,6 +7495,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
 {
 #ifndef GENTABLE
   memset(res,0,sizeof(sleftv));
+  BOOLEAN call_failed=FALSE;
 
   if (!errorreported)
   {
@@ -7541,7 +7542,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
           /* else ALLOW_PLURAL */
         }
         #endif
-        if (dArith2[i].p(res,a,b))
+        if (call_failed=dArith2[i].p(res,a,b))
         {
           break;// leave loop, goto error handling
         }
@@ -7587,7 +7588,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
             #endif
             failed= ((iiConvert(at,dArith2[i].arg1,ai,a,an))
             || (iiConvert(bt,dArith2[i].arg2,bi,b,bn))
-            || (dArith2[i].p(res,an,bn)));
+            || (call_failed=dArith2[i].p(res,an,bn)));
             // everything done, clean up temp. variables
             if (failed)
             {
@@ -7642,7 +7643,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
           Werror("`%s` %s `%s` failed"
                 ,Tok2Cmdname(at),s,Tok2Cmdname(bt));
         }
-        if (BVERBOSE(V_SHOW_USE))
+        if ((!call_failed) && BVERBOSE(V_SHOW_USE))
         {
           while (dArith2[i].cmd==op)
           {
@@ -7676,6 +7677,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
 {
 #ifndef GENTABLE
   memset(res,0,sizeof(sleftv));
+  BOOLEAN call_failed=FALSE;
 
   if (!errorreported)
   {
@@ -7728,7 +7730,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
           res->data=(char *)((Proc1)dArith1[i].p)((char *)a->Data());
           #endif
         }
-        else if (dArith1[i].p(res,a))
+        else if (call_failed=dArith1[i].p(res,a))
         {
           break;// leave loop, goto error handling
         }
@@ -7786,7 +7788,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
           else
           {
             failed= ((iiConvert(at,dArith1[i].arg,ai,a,an))
-            || (dArith1[i].p(res,an)));
+            || (call_failed=dArith1[i].p(res,an)));
           }
           // everything done, clean up temp. variables
           if (failed)
@@ -7826,7 +7828,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
         const char *s = iiTwoOps(op);
         Werror("%s(`%s`) failed"
                 ,s,Tok2Cmdname(at));
-        if (BVERBOSE(V_SHOW_USE))
+        if ((!call_failed) && BVERBOSE(V_SHOW_USE))
         {
           while (dArith1[i].cmd==op)
           {
@@ -7852,6 +7854,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
 {
 #ifndef GENTABLE
   memset(res,0,sizeof(sleftv));
+  BOOLEAN call_failed=FALSE;
 
   if (!errorreported)
   {
@@ -7902,7 +7905,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
             /* else ALLOW_PLURAL */
         }
         #endif
-        if (dArith3[i].p(res,a,b,c))
+        if (call_failed=dArith3[i].p(res,a,b,c))
         {
           break;// leave loop, goto error handling
         }
@@ -7951,7 +7954,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
               failed= ((iiConvert(at,dArith3[i].arg1,ai,a,an))
                 || (iiConvert(bt,dArith3[i].arg2,bi,b,bn))
                 || (iiConvert(ct,dArith3[i].arg3,ci,c,cn))
-                || (dArith3[i].p(res,an,bn,cn)));
+                || (call_failed=dArith3[i].p(res,an,bn,cn)));
               // everything done, clean up temp. variables
               if (failed)
               {
@@ -8010,7 +8013,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
         const char *s = iiTwoOps(op);
         Werror("%s(`%s`,`%s`,`%s`) failed"
                 ,s,Tok2Cmdname(at),Tok2Cmdname(bt),Tok2Cmdname(ct));
-        if (BVERBOSE(V_SHOW_USE))
+        if ((!call_failed) && BVERBOSE(V_SHOW_USE))
         {
           while (dArith3[i].cmd==op)
           {
