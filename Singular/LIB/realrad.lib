@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: realrad.lib,v 1.6 2008-02-22 14:12:29 Singular Exp $";
+version="$Id: realrad.lib,v 1.7 2008-12-12 11:26:34 Singular Exp $";
 category="real algebra";
 info="
 LIBRARY:  realrad.lib   Computation of real radicals
@@ -1141,10 +1141,10 @@ EXAMPLE: permutation(L) gives an example"
 }
 example
 { "EXAMPLE:"; echo = 2;
-  list L1="Nur","ein","Beispiel";
-  permutaion(L1);
+  list L1="Just","an","example";
+  permutation(L1);
   list L2=1,2,3,4;
-  permutaion(L2);
+  permutation(L2);
 }
 static proc simplify_gen(poly f)
 "USAGE : simplify_gen(f); f a polymimial in Q(y_1,..,y_m)[x_1,..,x_n]

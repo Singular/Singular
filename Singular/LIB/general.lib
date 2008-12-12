@@ -2,7 +2,7 @@
 //anne, added deleteSublist and watchdog 12.12.2000
 //eric, added absValue 11.04.2002
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.57 2008-08-20 16:33:40 Singular Exp $";
+version="$Id: general.lib,v 1.58 2008-12-12 11:26:34 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -317,8 +317,8 @@ EXAMPLE: example kmemory; shows an example
     if ( n==1 )
     { dbprint(printlevel-voice+3,
       "// total memory allocated, at the moment, by SINGULAR (kilobyte):"); }
-   }
-   return ((memory(n)+1023)/1024);
+  }
+  return ((memory(n)+1023) div 1024);
 }
 example
 { "EXAMPLE:"; echo = 2;
