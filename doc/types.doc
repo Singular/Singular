@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.140 2008-12-09 14:27:29 seelisch Exp $
+@comment $Id: types.doc,v 1.141 2008-12-12 10:59:19 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -181,6 +181,8 @@ bigint(-5) div 2, bigint(-5) mod 2;
 @table @code
 @item gcd
 greatest common divisor (see @ref{gcd})
+@item memory
+memory usage (see @ref{memory})
 @end table
 
 @c ---------------------------------------
