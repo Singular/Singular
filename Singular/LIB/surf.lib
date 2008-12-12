@@ -1,6 +1,6 @@
 // last modified 21.07.2005, Oliver Wienand
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.28 2007-07-13 12:31:06 Singular Exp $";
+version="$Id: surf.lib,v 1.29 2008-12-12 17:27:01 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: surf.lib    Procedures for Graphics with Surf
@@ -23,12 +23,19 @@ PROCEDURES:
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
-static proc num_of_vars(ideal I)
+proc num_of_vars(ideal I)
+"USAGE: num_of_vars(ideal I)
+
+RETURN: an intvec containing one entry for each ring variable.
+each contains the sums of all degrees in this variable of all monomials
+occuring in the ideal.
+An entry is zero iff the corresponding variable does not occur in the ideal.
+"
 {
   intvec v;
   int i;
   poly p;
-  for(i=size(I);i>0;i--)
+  for(i=ncols(I);i>0;i--)
   {
     p=I[i];
     while(p!=0)
@@ -38,6 +45,17 @@ static proc num_of_vars(ideal I)
     }
   }
   return(v);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0, (x,y,z),dp;
+  ideal j0 = x^2-x*y;
+  num_of_vars(j0);
+  ideal j1 = x^2-x*y-y;
+  num_of_vars(j1);
+  ideal j2 = x^2-x*y-y, x^3-2*y;
+  num_of_vars(j2);
 }
 
 proc plot(ideal I,list #)
