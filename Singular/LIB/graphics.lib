@@ -1,6 +1,6 @@
 //last change: 13.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: graphics.lib,v 1.11 2006-07-18 15:53:58 Singular Exp $";
+version="$Id: graphics.lib,v 1.12 2008-12-12 17:22:35 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: graphics.lib    Procedures to use Graphics with Mathematica
@@ -149,7 +149,7 @@ static proc endstr(string filename)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-proc  mplot(string fname,ideal I,list #)
+proc mplot(string fname,ideal I,list #)
 "USAGE:   mplot(fname, I [,I1,I2,..,s] ); fname=string; I,I1,I2,..=ideals,
          s=string representing the plot region.@*
          Use the ideals I1,I2,.. in order to produce multiple plots (they need
@@ -359,5 +359,3 @@ example
  kill rr0,rr1;
 }
 ///////////////////////////////////////////////////////////////////////////////
-
-

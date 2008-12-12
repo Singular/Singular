@@ -1,4 +1,4 @@
-version="$Id: alexpoly.lib,v 1.16 2007-04-20 12:21:12 Singular Exp $";
+version="$Id: alexpoly.lib,v 1.17 2008-12-12 17:22:35 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  alexpoly.lib   Resolution Graph and Alexander Polynomial
@@ -1104,7 +1104,7 @@ example
   charexp2multseq(intvec(28,64,66,77));
 }
 
-proc  multseq2charexp(def v)   // Procedure written by Fernando.
+proc multseq2charexp(def v)   // Procedure written by Fernando.
 "USAGE:  multseq2charexp(v), v intvec
 ASSUME:  The input is an intvec, which contains the mutiplicity sequence
          of an irreducible plane curve singularity .
