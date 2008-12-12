@@ -1,7 +1,7 @@
-// $Id: groups.lib,v 1.3 2005-05-06 14:38:34 hannes Exp $
+// $Id: groups.lib,v 1.4 2008-12-12 17:19:59 Singular Exp $
 //(GP, last modified 26.10.01)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: groups.lib,v 1.3 2005-05-06 14:38:34 hannes Exp $";
+version="$Id: groups.lib,v 1.4 2008-12-12 17:19:59 Singular Exp $";
 category="Applications";
 info="
 LIBRARY:  groups.lib      Finite Group Theory
@@ -330,7 +330,7 @@ EXAMPLE: example finalSplit; shows an example
          if(deg(K[1])!=0)
          {
             "split";
-            pr=splitS1(shortid(K,3),2);
+            pr=splitS1(shortid_L(K,3),2);
             q=pr[1];
             qr=insResult(qr,pr[2]);
             size(q);"out";
@@ -386,7 +386,7 @@ EXAMPLE: example finalSplit; shows an example
                n++;
                "split again";
                K=q[1];
-               J=shortid(K,3+n);
+               J=shortid_L(K,3+n);
                pr=splitS1(J,5);
                if(size(pr[1])>1)
                {
@@ -467,7 +467,7 @@ EXAMPLE: example noSolution; shows an example
    int t=30;
    option(redThrough);
    option(contentSB);
-   ideal J=shortid(I,3);
+   ideal J=shortid_L(I,3);
    ideal K;
    number n;
 
@@ -611,7 +611,7 @@ EXAMPLE: example noSolution; shows an example
          J=pr[1];
          qr=insResult(qr,pr[2]);
          "in splitting";
-         J=shortid(J,3);
+         J=shortid_L(J,3);
          pr=splitS(J,s);
          l=pr[1];
          if(size(l)==1)
@@ -744,7 +744,7 @@ EXAMPLE: example trivialSplit; shows an example
       pr=simpliFy(p[k]);
       p[k]=pr[1];
       qr=insResult(qr,pr[2]);
-      J=shortid(p[k],1);
+      J=shortid_L(p[k],1);
       if((size(J)>0)&&(deg(J[1])>=1))
       {
          pr=splitS1(J,10);
@@ -1007,7 +1007,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc shortid (ideal id,int n)
+static proc shortid_L (ideal id,int n)
 {
   ideal Lc;
   intvec v;
