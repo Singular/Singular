@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.141 2008-12-12 10:59:19 Singular Exp $
+@comment $Id: types.doc,v 1.142 2008-12-12 11:05:55 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -190,6 +190,7 @@ memory usage (see @ref{memory})
 @section def
 @cindex def
 @cindex untyped definitions
+@cindex basering
 
 Objects may be defined without a specific type: they get their
 type from the first assignment to them.
@@ -201,6 +202,7 @@ is not a copy but another reference to the same (possibly unnamed) ring.
 This means that entries in one of these rings appear also in the other ones.
 The following defines a ring @code{s} which is just another reference (or name)
 for the basering @code{r}.
+The name @code{basering} is an alias for the current ring.
 
 @smallexample
 @c example
