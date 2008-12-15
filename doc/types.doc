@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.142 2008-12-12 11:05:55 Singular Exp $
+@comment $Id: types.doc,v 1.143 2008-12-15 13:20:14 seelisch Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -185,6 +185,11 @@ greatest common divisor (see @ref{gcd})
 memory usage (see @ref{memory})
 @end table
 
+@c ref
+See
+@ref{memory};
+@c ref
+
 @c ---------------------------------------
 @node def, ideal, bigint, Data types
 @section def
@@ -192,7 +197,7 @@ memory usage (see @ref{memory})
 @cindex untyped definitions
 @cindex basering
 
-Objects may be defined without a specific type: they get their
+Objects may be defined without a specific type: they inherit their
 type from the first assignment to them.
 E.g., @code{ideal i=x,y,z; def j=i^2;} defines the ideal @code{i^2}
 with the name @code{j}.
@@ -1213,8 +1218,8 @@ An intvec expression is:
 @item
 a range: int expression @code{..} int expression
 @item
-a repeated entry: int expression @code{:} int expression
-@*(@code{a:b} generates an @code{intvec} of length @code{b} with constant entries @code{a})
+a repeated entry: int expression @code{:} positive int expression
+@*(@code{a:b} generates an @code{intvec} of length @code{b}>0 with identical entries @code{a})
 @item
 a function returning intvec
 @item
@@ -1233,7 +1238,13 @@ a type cast to intvec
   intvec v=-1,2;
   intvec w=v,v;         // concatenation
   w;
-  w = -2..2,v,1;
+  w=2:3;                // repetition
+  w;
+  int k = 3;
+  v = 7:k;
+  v;
+  v=-1,2;
+  w=-2..2,v,1;
   w;
   intmat m[3][2] = 0,1,2,-2,3,1;
   m*v;

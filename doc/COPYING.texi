@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.38 2008-11-12 16:43:36 Singular Exp $
+@comment $Id: COPYING.texi,v 1.39 2008-12-15 13:20:13 seelisch Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -168,22 +168,27 @@ Tim Wichmann.
 @cindex Wichmann, Tim
 
 Further contributions to @sc{Singular} were made by:
+Daniel Andres,
 Thomas Bayer,
 Isabelle Bermejo,
 Markus Becker,
 Stas Bulygin,
+Nadine Cremer,
 Kai Dehmann,
 Marcin Dumnicki,
 Stephan Endra@ss{},
 Jose Ignacio Farran,
+I. Garcia-Marco,
 Vladimir Gerdt,
 Philippe Gimenez,
 Christian Gorzel,
 Hubert Grassmann,
+Amir Hashemi,
 Fernando Hernando,
 Agnes Heydtmann,
 Dietmar Hillebrand,
 Tobias Hirsch,
+Markus Hochstetter,
 Manuel Kauers,
 Simon King,
 Anen Lakhal,
@@ -191,40 +196,54 @@ Martin Lamm,
 Santiago Laplagne,
 Gregoire Lecerf,
 Francisco Javier Lobillo,
+Christoph Mang,
 Thomas Markwig,
 Bernd Martin,
 Michael Me@ss{}ollen,
 Andrea Mindnich,
 Jorge Martin Morales,
 Thomas N@"u@ss{}ler,
+Tetyana Povalyaeva,
 Carlos Rabelo,
+J.-J. Salazar-Gonzalez,
 Alfredo Sanchez-Navarro,
+Ivor Saynisch,
+Kristina Schindelar,
+Silke Spang,
+Stefan Steidel,
 Henrik Strohmayer,
 Christian Stussak,
 Imade Sulandra,
+Akira Suzuki,
 Christine Theis,
 Enrique Tobis,
+Maryna Viazovska,
 Alberto Vigneron-Tenorio,
 Moritz Wenk,
 Denis Yanovich,
 Oleksandr Iena.
+@cindex Andres, Daniel
 @cindex Bayer, Thomas
 @cindex Bermejo, Isabelle
 @cindex Becker, Markus 
 @cindex Bulygin, Stas
+@cindex Cremer, Nadine
 @cindex Dehmann, Kai
 @cindex Dumnicki, Marcin
 @cindex Endra@ss{}, Stephan
 @cindex Farran, Jose Ignacio
+@cindex Garcia-Marco, I.
 @cindex Gerdt, Vladimir 
 @cindex Gimenez, Philippe
 @cindex Gorzel, Christian
 @cindex Grassmann, Hubert
+@cindex Hashemi, Amir
 @cindex Hernando, Fernando 
 @cindex Heydtmann, Agnes
 @cindex Hillebrand, Dietmar
 @cindex Hirsch, Tobias
-@cindex Iena, Oleksandr 
+@cindex Hochstetter, Markus
+@cindex Iena, Oleksandr
 @cindex Kauers, Manuel
 @cindex King, Simon
 @cindex Lakhal, Anen
@@ -232,20 +251,29 @@ Oleksandr Iena.
 @cindex Laplagne, Santiago
 @cindex Lecerf, Gregoire
 @cindex Lobillo, Javier
+@cindex Mang, Christoph
 @cindex Markwig, Thomas
 @cindex Martin, Bernd
 @cindex Me@ss{}ollen, Michael
 @cindex Mindnich, Andrea
 @cindex Morales, Jorge Martin
 @cindex N@"u@ss{}ler, Thomas
+@cindex Povalyaeva, Tetyana
 @cindex Rabelo, Carlos
+@cindex Salazar-Gonzalez, J.-J.
 @cindex Sanchez-Navarro, Alfredo 
+@cindex Saynisch, Ivor
+@cindex Schindelar, Kristina
+@cindex Spang, Silke
+@cindex Steidel, Stefan
 @cindex Strohmayer, Henrik
 @cindex Stussak, Christian
 @cindex Sulandra, Imade
+@cindex Suzuki, Akira
 @cindex Tobis, Enrique
 @cindex Theis, Christine 
-@cindex Vigneron-Tenorio, Alberto 
+@cindex Viazovska, Maryna
+@cindex Vigneron-Tenorio, Alberto
 @cindex Wenk, Moritz
 @cindex Yanovich, Denis
 

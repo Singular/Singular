@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.313 2008-12-09 14:27:29 seelisch Exp $
+@comment $Id: reference.doc,v 1.314 2008-12-15 13:20:14 seelisch Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -684,12 +684,15 @@ all denominators from its coefficients and then divide it by its content.
   poly f=(3x+6y)^5;
   f/5;
   cleardenom(f/5);
+  vector w= [4x2+20,6x+2,0,8];   // application to a vector
+  print(cleardenom(w));
 @c example
 @end smallexample
 @end table
-@c @c ref
-@c See @ref{poly}.
-@c @c ref
+@c ref
+See
+@ref{content}.
+@c ref
 @c ---------------------------------------
 @node close, coef, cleardenom, Functions
 @subsection close
@@ -1496,7 +1499,7 @@ example intvec_declarations;
 @ref{help}
 @c ref
 @c ---------------------------------------
-@node execute, exit, example, Functions
+@node execute, extgcd, example, Functions
 @subsection execute
 @cindex execute
 @table @code
@@ -1527,18 +1530,7 @@ provide in the future).
 @end smallexample
 @end table
 @c ---------------------------------------
-@node exit, extgcd, execute, Functions
-@subsection exit
-@cindex exit
-@table @code
-@item @strong{Syntax:}
-@code{exit;}
-@item @strong{Purpose:}
-exits (quits) @sc{Singular},
-works also from inside a procedure or from an interrupt.
-@end table
-@c ---------------------------------------
-@node extgcd, facstd, exit, Functions
+@node extgcd, facstd, execute, Functions
 @subsection extgcd
 @cindex extgcd
 
@@ -1652,6 +1644,13 @@ type @code{(p^n,a)}.
   factorize(9*(x-1)^2*(y+z));
   factorize(9*(x-1)^2*(y+z),1);
   factorize(9*(x-1)^2*(y+z),2);
+  ring rQ=0,x,dp;
+  poly f = x2+1;            // irreducible in Q[x]
+  factorize(f);
+  ring rQi = (0,i),x,dp;
+  minpoly = i2+1;
+  poly f = x2+1;            // splits into linear factors in Q(i)[x]
+  factorize(f);
 @c example
 @end smallexample
 @end table
@@ -1992,6 +1991,8 @@ otherwise it is not defined.
 @smallexample
 @c example
   gcd(2,3);
+  gcd(bigint(2)23*3,bigint(3)32*2));     // also applicable for bigints
+  typeof(_);
   ring r=0,(x,y,z),lp;
   gcd(3x2*(x+y),9x*(y2-x2));
   gcd(number(6472674604870),number(878646537247372));
@@ -2002,6 +2003,7 @@ otherwise it is not defined.
 See
 @ref{extgcd};
 @ref{int};
+@ref{bigint};
 @ref{number};
 @ref{poly}
 @c ref
@@ -7468,18 +7470,23 @@ See
 @subsection quit
 @cindex quit
 @cindex exit
+@anchor exit
 @table @code
 @item @strong{Syntax:}
 @code{quit;}
 @item @strong{Purpose:}
 quits @sc{Singular};
-works also from inside a procedure. The commands @code{quit} and
-@code{exit} are synonymous.
+works also from inside a procedure or from an interrupt. Instead of @code{quit}, the synonymous command
+@code{exit} may be used.
 @item @strong{Example:}
 @smallexample
   quit;
 @end smallexample
 @end table
+@c ref
+See
+@ref{exit}.
+@c ref
 @c ---------------------------------------
 @node return, while, quit, Control structures
 @subsection return

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.220 2008-12-09 14:27:28 seelisch Exp $
+@comment $Id: general.doc,v 1.221 2008-12-15 13:20:13 seelisch Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -2421,6 +2421,10 @@ The following characters and operators have special meanings:
 @item @code{=}
 @cindex =
 assignment
+@item @code{@{}, @code{@}}
+@cindex @{
+@cindex @}
+parentheses for block programming
 @item @code{(}, @code{)}
 @cindex (
 @cindex )
@@ -2517,6 +2521,14 @@ escape character for @code{"} and @code{\} within strings
 @cindex ..
 interval specifier returning intvec.
 E.g., @code{1..3} which is equivalent to the intvec @code{1, 2, 3}.
+@item @code{:}
+@cindex :
+repeated entry.
+E.g., @code{3:5} generates an intvec of length 5 with constant entries 3, i.e., (3, 3, 3, 3, 3).
+@item @code{::}
+@cindex ::
+accessor for package members.
+E.g., @code{MyPackage::i} accesses variable @code{i} in package @code{MyPackage}.
 @item @code{_}
 @cindex _
 value of expression last displayed
