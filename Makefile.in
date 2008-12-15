@@ -334,26 +334,26 @@ cygwin-dist-scripts:
 	@echo -e  '       -P /bin/rxvt -d "Start Singular in a rxvt terminal"' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '# xterm' >> /etc/postinstall/singular-icons.sh
-	@echo -e  'if test -f /usr/X11R6/bin/xwin.exe; then' >> /etc/postinstall/singular-icons.sh
+	@echo -e  'if test -f /usr/bin/XWin.exe; then' >> /etc/postinstall/singular-icons.sh
 	@echo -e  'mkshortcut -A -a \047\047 \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -i /usr/X11R6/bin/XWin.exe \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -P /usr/X11R6/bin/startxwin.bat -n "Singular CAS\\Cygwin\\XTerm" \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -i /usr/bin/XWin.exe \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -P /usr/bin/startxwin.bat -n "Singular CAS\\Cygwin\\XTerm" \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -d "This starts the Cygwin X-Server and launches one XTerm"' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '# XServer + xterm' >> /etc/postinstall/singular-icons.sh
 	@echo -e  'mkshortcut -A -a \047\047 \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -i /usr/X11R6/bin/XWin.exe \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -P /usr/X11R6/bin/startxwin.bat -n "Singular CAS\\Cygwin\\Start X - Server (+ XTerm)" \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -i /usr/bin/XWin.exe \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -P /usr/bin/startxwin.bat -n "Singular CAS\\Cygwin\\Start X - Server (+ XTerm)" \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -d "This starts the Cygwin X-Server and launches one XTerm"' >> /etc/postinstall/singular-icons.sh
 	@echo -e  'fi' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '##################### Singular CAS' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '# Emacs + Singular EXP' >> /etc/postinstall/singular-icons.sh
-	@echo -e  'if test -f /usr/X11R6/bin/xwin.exe; then' >> /etc/postinstall/singular-icons.sh
+	@echo -e  'if test -f /usr/bin/XWin.exe; then' >> /etc/postinstall/singular-icons.sh
 	@echo -e  'mkshortcut -A -a \047bash -l -c "${CYGWIN_SINGULAR_BIN}/startxserver.bat && sleep 1 &&  ESingular"\047 \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -i ${CYGWIN_SINGULAR_BIN}/runESingular.exe -n "Singular CAS\\Singular (Emacs and X-Server) (experimental)" \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -w /bin \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -P /usr/X11R6/bin/run.exe -d "Start Singular in Emacs after starting the X - Server"' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -P /usr/bin/run.exe -d "Start Singular in Emacs after starting the X - Server"' >> /etc/postinstall/singular-icons.sh
 	@echo -e  'fi' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '# Singular in rxvt' >> /etc/postinstall/singular-icons.sh
@@ -367,34 +367,34 @@ cygwin-dist-scripts:
 	@echo -e  '       -P /bin/bash -d "Start Singular in a Microsoft terminal"' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '# Singular in Emacs' >> /etc/postinstall/singular-icons.sh
-	@echo -e  'if test -f /usr/X11R6/bin/xwin.exe; then' >> /etc/postinstall/singular-icons.sh
+	@echo -e  'if test -f usr/bin/XWin.exe; then' >> /etc/postinstall/singular-icons.sh
 	@echo -e  'mkshortcut -A -a \047bash -l ESingular\047 \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -i ${CYGWIN_SINGULAR_BIN}/runESingular.exe -n "Singular CAS\\Singular (Emacs)" \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -w /bin \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -P /usr/X11R6/bin/run.exe \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -P /usr/bin/run.exe \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -d "Start Singular in Emacs"' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '# Only XServer' >> /etc/postinstall/singular-icons.sh
 	@echo -e  'mkshortcut -A -a \047\047 \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -i /usr/X11R6/bin/XWin.exe \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -w /usr/X11R6/bin \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -i /usr/bin/XWin.exe \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -w /usr/bin \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -P ${CYGWIN_SINGULAR_BIN}/startxserver.bat -n "Singular CAS\\Start X - Server (needed for emacs and surf)" \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -d "This starts the Cygwin X-Server. Without XServer Emacs and Surf do not work."' >> /etc/postinstall/singular-icons.sh
 	@echo -e  'fi' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '##################### Desktop' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '# Only XServer' >> /etc/postinstall/singular-icons.sh
-	@echo -e  'if test -f /usr/X11R6/bin/xwin.exe; then' >> /etc/postinstall/singular-icons.sh
+	@echo -e  'if test -f /usr/bin/XWin.exe; then' >> /etc/postinstall/singular-icons.sh
 	@echo -e  'mkshortcut -A -a \047\047 \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -i /usr/X11R6/bin/XWin.exe \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -w /usr/X11R6/bin \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -i /usr/bin/XWin.exe \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -w /usr/bin \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -D ${CYGWIN_SINGULAR_BIN}/startxserver.bat -n "Start X - Server (needed for emacs and surf)" \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -d "This starts the Cygwin X-Server. Without XServer Emacs and Surf do not work."' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '' >> /etc/postinstall/singular-icons.sh
 	@echo -e  'mkshortcut -A -a \047bash -l ESingular\047 \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -i ${CYGWIN_SINGULAR_BIN}/runESingular.exe -n "Singular (Emacs)" \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -w /bin \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -D /usr/X11R6/bin/run.exe \'  >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -D /usr/bin/run.exe \'  >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -d "Start Singular in Emacs"' >> /etc/postinstall/singular-icons.sh
 	@echo -e  'fi' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '' >> /etc/postinstall/singular-icons.sh
@@ -411,7 +411,7 @@ cygwin-dist-scripts:
 	@echo -e  "export SINGULAR_HTML_DIR=${CYGWIN_SINGULAR_DOC}/html" >> /usr/bin/ESingular
 	@echo -e  "export SINGULAR_CHM_FILE=${CYGWIN_SINGULAR_DOC}/doc/Manual.chm" >> /usr/bin/ESingular
 	@echo -e  "export SINGULAR_EXAMPLES_DIR=${CYGWIN_SINGULAR_DOC}/examples" >> /usr/bin/ESingular
-	@echo -e  'export PATH="${CYGWIN_SINGULAR_BIN}:/usr/X11R6/bin:$$PATH"' >> /usr/bin/ESingular
+	@echo -e  'export PATH="${CYGWIN_SINGULAR_BIN}:/usr/bin:$$PATH"' >> /usr/bin/ESingular
 	@echo -e  'if [ -z $$DISPLAY ]; then export DISPLAY=:0.0; fi' >> /usr/bin/ESingular
 	@echo -e  "exec ${CYGWIN_SINGULAR_BIN}/ESingular.exe \$$*" >> /usr/bin/ESingular
 	@echo -e  Writing /usr/bin/Singular
