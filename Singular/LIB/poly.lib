@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: poly.lib,v 1.49 2008-12-12 11:26:34 Singular Exp $";
+version="$Id: poly.lib,v 1.50 2008-12-15 15:30:30 seelisch Exp $";
 category="General purpose";
 info="
 LIBRARY:  poly.lib      Procedures for Manipulating Polys, Ideals, Modules
@@ -827,6 +827,7 @@ proc content(f)
 "USAGE:   content(f); f polynomial/vector
 RETURN:  number, the content (greatest common factor of coefficients)
          of the polynomial/vector f
+SEE ALSO: cleardenom
 EXAMPLE: example content; shows an example
 "
 {

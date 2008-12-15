@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.27 2007-08-01 15:07:22 Singular Exp $
+@comment $Id: INSTALL_unix.texi,v 1.28 2008-12-15 15:30:30 seelisch Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on Unix
 @c
@@ -170,7 +170,7 @@ on other Unix platforms you can download the
 @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/src/,,
 Singular emacs lisp files} but we give no warranties for specific platforms).
 @item on-line @code{html} help
-@tab @uref{http://www.netscape.com,,netscape} browser
+@tab any web browser
 @item on-line @code{info} help
 @tab @uref{http://www.texinfo.org,,info}, or
 @uref{http://math-www.uni-paderborn.de/~axel/tkinfo/,,tkinfo} texinfo browser programs
@@ -275,13 +275,14 @@ directories by starting up @sc{Singular} with the
 @code{--version} option, or by issuing the @sc{Singular} command
 @code{system("--version");}.
 
-@item Under SuSE-Linux, @sc{ESingular} does not display a prompt:
+@item Under previous SuSE-Linux releases, @sc{ESingular} did not display a prompt:
 @cindex SuSE, ESingular bug
 @cindex ESingular, no prompt
 @cindex bug, ESingular
 This is due to the very restrictive access rights of @code{/dev/pty*} of
 the standard @uref{http://www.suse.de,SuSE} distribution (starting from
-version 6.3 on). As root, do one of the following: Either
+version 6.3 on). The problem may still be present when working with the latest SuSE-Linux release.
+As root, do one of the following: Either
 @example
 chmod 666 /dev/pty*
 @end example
@@ -293,18 +294,18 @@ chmod g+s $(which xemacs)
 chgrp tty $(which xemacs)
 @end example
 
-@item For @code{HPUX} systems:
-@*The /etc/termcap files which are pre-installed on these systems are
-broken which leads to messages like
-@example
-Name collision between 9826 9836
-@end example
-when @sc{Singular} is started. To fix this, you can get fixed termcap
-files from @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils}
-by downloading the files termcap-<uname-description> and either
-replace your /etc/termcap file by the file found there, or view, and
-redo the respective changes by @code{diff}'ing the downloaded and the
-original file.
+@c @item For @code{HPUX} systems:
+@c @*The /etc/termcap files which are pre-installed on these systems are
+@c broken which leads to messages like
+@c @example
+@c Name collision between 9826 9836
+@c @end example
+@c when @sc{Singular} is started. To fix this, you can get fixed termcap
+@c files from @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils}
+@c by downloading the files termcap-<uname-description> and either
+@c replace your /etc/termcap file by the file found there, or view, and
+@c redo the respective changes by @code{diff}'ing the downloaded and the
+@c original file.
 
 @item For @code{ix86-Linux} systems:
 @*Due to some incompatibilities of shared libraries, the start-up of
