@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.285 2008-11-13 14:06:07 Singular Exp $ */
+/* $Id: extra.cc,v 1.286 2008-12-17 15:10:37 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -53,6 +53,7 @@
 #include "distrib.h"
 #include "prCopy.h"
 #include "mpr_complex.h"
+#include "ffields.h" // test GF only
 
 #ifdef HAVE_RINGS
 #include "ringgb.h"
@@ -2318,15 +2319,19 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     else
 #endif
 /*==================== GF =================*/
-#if 0
+#if 0 // for testing only
     if (strcmp(sys_cmd, "GF") == 0)
     {
-      int c=rChar(currRing);
-      setCharacteristic( c, 2);
-      CanonicalForm F( convSingGFClapGF( (poly)h->Data() ) );
-      res->rtyp=POLY_CMD;
-      res->data=convClapGFSingGF( F );
-      return FALSE;
+      if ((h!=NULL) && (h->Typ()==POLY_CMD))
+      {
+        int c=rChar(currRing);
+        setCharacteristic( c,nfMinPoly[0], currRing->parameter[0][0] );
+        CanonicalForm F( convSingGFFactoryGF( (poly)h->Data() ) );
+        res->rtyp=POLY_CMD;
+        res->data=convFactoryGFSingGF( F );
+        return FALSE;
+      }
+      else { Werror("wrong typ"); return TRUE;}
     }
     else
 #endif
