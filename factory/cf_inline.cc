@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_inline.cc,v 1.1 1998-06-29 10:46:07 schmidt Exp $ */
+/* $Id: cf_inline.cc,v 1.2 2008-12-17 15:06:45 Singular Exp $ */
 
 //{{{ docu
 //
@@ -372,7 +372,7 @@ CanonicalForm::isZero () const
 {
     int what = is_imm( value );
 
-    if ( ! what )
+    if ( what == 0 )
 	return value->isZero();
     else  if ( what == INTMARK )
 	return imm_iszero( value );

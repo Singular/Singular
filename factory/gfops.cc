@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gfops.cc,v 1.8 2008-08-20 14:44:49 Singular Exp $ */
+/* $Id: gfops.cc,v 1.9 2008-12-17 15:06:24 Singular Exp $ */
 
 #include <config.h>
 
@@ -58,7 +58,7 @@ intVec2CF ( int degree, int * coeffs, int level )
     CanonicalForm result;
     for ( i = 0; i <= degree; i++ )
     {
-	result += CanonicalForm( coeffs[ i ] ) * power( Variable( level ), degree - i );
+        result += CanonicalForm( coeffs[ i ] ) * power( Variable( level ), degree - i );
     }
     return result;
 }
@@ -68,26 +68,28 @@ gf_get_table ( int p, int n )
 {
     char buffer[gf_maxbuffer];
     int q = ipower( p, n );
-    if ( gf_table == 0 )
-	gf_table = new unsigned short[gf_maxtable];
 
     // do not read the table a second time
     if ( gf_q == q )
     {
-	return;
+        return;
     }
+
+    if ( gf_table == 0 )
+        gf_table = new unsigned short[gf_maxtable];
 
 #ifdef SINGULAR
     // just copy the table if Singular already read it
+    //printf("init_gf(gf_get_table) q=%d, nfCharQ=%d\n",q,nfCharQ);
     if ( q == nfCharQ )
     {
-	gf_p = p; gf_n = n;
-	gf_q = q; gf_q1 = q - 1;
-	gf_m1 = nfM1;
-	gf_mipo = intVec2CF( nfMinPoly[0], nfMinPoly + 1, 1 );
-	(void)memcpy( gf_table, nfPlus1Table, gf_q * sizeof( unsigned short ) );
-	gf_table[gf_q] = 0;
-	return;
+        gf_p = p; gf_n = n;
+        gf_q = q; gf_q1 = q - 1;
+        gf_m1 = nfM1;
+        gf_mipo = intVec2CF( nfMinPoly[0], nfMinPoly + 1, 1 );
+        (void)memcpy( gf_table, nfPlus1Table, gf_q * sizeof( unsigned short ) );
+        gf_table[gf_q] = 0;
+        return;
     }
 #endif
 
@@ -123,8 +125,8 @@ gf_get_table ( int p, int n )
     int * mipo = new int[degree + 1];
     for ( i = 0; i <= degree; i++ )
     {
-	sscanf( bufptr, "%d", mipo + i );
-	bufptr = (char *)strchr( bufptr, ' ' ) + 1;
+        sscanf( bufptr, "%d", mipo + i );
+        bufptr = (char *)strchr( bufptr, ' ' ) + 1;
     }
 
     gf_p = p; gf_n = n;
@@ -137,21 +139,21 @@ gf_get_table ( int p, int n )
     i = 1;
     while ( i < gf_q )
     {
-	success = fgets( buffer, gf_maxbuffer, inputfile );
-	STICKYASSERT( strlen( buffer ) - 1 == (size_t)digs * 30, "illegal table" );
-	bufptr = buffer;
-	k = 0;
-	while ( i < gf_q && k < 30 )
+        success = fgets( buffer, gf_maxbuffer, inputfile );
+        STICKYASSERT( strlen( buffer ) - 1 == (size_t)digs * 30, "illegal table" );
+        bufptr = buffer;
+        k = 0;
+        while ( i < gf_q && k < 30 )
         {
-	    gf_table[i] = convertback62( bufptr, digs );
-	    bufptr += digs;
+            gf_table[i] = convertback62( bufptr, digs );
+            bufptr += digs;
             if ( gf_table[i] == gf_q )
-		if ( i == gf_q1 )
-		    gf_m1 = 0;
-		else
-		    gf_m1 = i;
-	    i++; k++;
-	}
+                if ( i == gf_q1 )
+                    gf_m1 = 0;
+                else
+                    gf_m1 = i;
+            i++; k++;
+        }
     }
     gf_table[0] = gf_table[gf_q1];
     gf_table[gf_q] = 0;
@@ -165,20 +167,20 @@ gf_valid_combination ( int p, int n )
     int i = 0;
     while ( i < gf_primes_len && gf_primes[i] != p ) i++;
     if ( i == gf_primes_len )
-	return false;
+        return false;
     else
     {
-	i = n;
-	int a = 1;
-	while ( a < gf_maxtable && i > 0 )
+        i = n;
+        int a = 1;
+        while ( a < gf_maxtable && i > 0 )
         {
-	    a *= p;
-	    i--;
-	}
-	if ( i > 0 || a > gf_maxtable )
-	    return false;
-	else
-	    return true;
+            a *= p;
+            i--;
+        }
+        if ( i > 0 || a > gf_maxtable )
+            return false;
+        else
+            return true;
     }
 }
 
@@ -194,22 +196,22 @@ int
 gf_gf2ff ( int a )
 {
     if ( gf_iszero( a ) )
-	return 0;
+        return 0;
     else
     {
-	// starting from z^0=1, step through the table
-	// counting the steps until we hit z^a or z^0
-	// again.  since we are working in char(p), the
-	// latter is guaranteed to be fulfilled.
-	int i = 0, ff = 1;
-	do
+        // starting from z^0=1, step through the table
+        // counting the steps until we hit z^a or z^0
+        // again.  since we are working in char(p), the
+        // latter is guaranteed to be fulfilled.
+        int i = 0, ff = 1;
+        do
         {
-	    if ( i == a )
-		return ff;
-	    ff++;
-	    i = gf_table[i];
-	} while ( i != 0 );
-	return -1;
+            if ( i == a )
+                return ff;
+            ff++;
+            i = gf_table[i];
+        } while ( i != 0 );
+        return -1;
     }
 }
 
@@ -217,10 +219,10 @@ bool
 gf_isff ( int a )
 {
     if ( gf_iszero( a ) )
-	return true;
+        return true;
     else
     {
-	// z^a in GF(p) iff (z^a)^p-1=1
-	return gf_isone( gf_power( a, gf_p - 1 ) );
+        // z^a in GF(p) iff (z^a)^p-1=1
+        return gf_isone( gf_power( a, gf_p - 1 ) );
     }
 }
