@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.h,v 1.2 2008-03-19 17:44:08 Singular Exp $ */
+/* $Id: ffields.h,v 1.3 2008-12-17 15:07:46 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -37,6 +37,8 @@ void    nfSetChar     (int c, char ** param);
 nMapFunc nfSetMap     (ring src, ring dst);
 char *  nfName        (number n);
 extern  int nfMinPoly[];
+extern  int nfCharP;  /* the characteristic: p*/
+extern  int nfCharQ;  /* p^n = number of el. = repr. of 0 */
 void    nfShowMipo();
 #endif
 

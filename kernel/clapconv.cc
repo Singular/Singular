@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.11 2008-04-08 16:59:53 Singular Exp $
+// $Id: clapconv.cc,v 1.12 2008-12-17 15:07:46 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -21,6 +21,8 @@
 #include "febase.h"
 #include "ring.h"
 #include "sbuckets.h"
+#include "ffields.h"
+void out_cf(char *s1,const CanonicalForm &f,char *s2);
 
 static void convRec( const CanonicalForm & f, int * exp, poly & result );
 
@@ -624,17 +626,18 @@ number   nlChineseRemainder(number *x, number *q,int rl)
 #endif
 }
 
-#if 0
 CanonicalForm
 convSingGFFactoryGF( poly p )
 {
-  CanonicalForm result = 0;
+  CanonicalForm result=CanonicalForm(0);
   int e, n = pVariables;
 
   while ( p != NULL )
   {
     CanonicalForm term;
-    term = make_cf_from_gf( pGetCoeff( p ) );
+    term = make_cf_from_gf( (int)(long)pGetCoeff( p ) );
+    //int * A=(int *)&term;
+    //Print("term=%x, == 0 ?: %d\n",*A, term.isZero());
     for ( int i = 1; i <= n; i++ )
     {
       if ( (e = pGetExp( p, i )) != 0 )
@@ -686,7 +689,6 @@ convRecGFGF ( const CanonicalForm & f, int * exp, poly & result )
     result = pAdd( result, term );
   }
 }
-#endif
 
 int convFactoryISingI( const CanonicalForm & f)
 {

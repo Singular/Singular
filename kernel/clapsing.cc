@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.31 2008-09-12 14:16:01 Singular Exp $
+// $Id: clapsing.cc,v 1.32 2008-12-17 15:08:50 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -16,6 +16,7 @@
 #include "clapsing.h"
 #include "numbers.h"
 #include "ring.h"
+#include "ffields.h"
 #include <factory.h>
 #include "clapconv.h"
 #ifdef HAVE_LIBFAC_P
@@ -553,6 +554,15 @@ poly singclap_pdivide ( poly f, poly g )
       res= convFactoryPSingTrP(  F / G  );
     }
   }
+  #if 0 // not yet working
+  else if (rField_is_GF())
+  {
+    //Print("GF(%d^%d)\n",nfCharP,nfMinPoly[0]);
+    setCharacteristic( nfCharP,nfMinPoly[0], currRing->parameter[0][0] );
+    CanonicalForm F( convSingGFFactoryGF( f ) ), G( convSingGFFactoryGF( g ) );
+    res = convFactoryGFSingGF( F / G );
+  }
+  #endif
   else
     WerrorS( feNotImplemented );
   Off(SW_RATIONAL);
