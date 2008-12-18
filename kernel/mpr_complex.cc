@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.6 2008-03-19 17:44:10 Singular Exp $ */
+/* $Id: mpr_complex.cc,v 1.7 2008-12-18 10:23:50 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -77,6 +77,7 @@ size_t getGMPFloatDigits()
   return gmp_output_digits;
 }
 
+#if 1
 void gmp_float::setFromStr(const char * in )
 {
   BOOLEAN neg=false;
@@ -105,6 +106,64 @@ void gmp_float::setFromStr(const char * in )
   }
   if (neg)  mpf_neg( t, t );
 }
+#else
+// problemns with solve_s.tst
+void gmp_float::setFromStr(const char * in )
+{
+  BOOLEAN neg=false;
+  BOOLEAN E_found=FALSE;
+  if (*in == '-') { in++; neg=TRUE; }
+  char *s;
+  if ((s=strchr(in,'E')) !=NULL)
+  {
+    *s='e';
+    E_found=TRUE;
+  }
+  // gmp doesn't understand number like 1e1, it need 1e+1
+  // so, insert the +
+  if (E_found ||((s=strchr(in,'e')) !=NULL))
+  {
+    if ((*(s+1)!='+') && (*(s+1)!='-'))
+    {
+      int len = strlen(in)+3;
+      char* c_in = (char*) omAlloc(len);
+      if (*in == '.')
+      {
+        *c_in = '0';
+        strcpy(&(c_in[1]), in);
+      }
+      else
+      {
+        strcpy(c_in, in);
+      }
+      char * ss=strchr(c_in,'e');
+      memmove(ss+2,s+1,strlen(s+1));
+      *(ss+1)+'+';
+
+      mpf_set_str( t, c_in, 10 );
+      omFreeSize((void*)c_in, len);
+    }
+  }
+
+  // gmp doesn't understand number which begin with "." -- it needs 0.
+  // so, insert the zero
+  else if (*in == '.')
+  {
+    int len = strlen(in)+2;
+    char* c_in = (char*) omAlloc(len);
+    *c_in = '0';
+    strcpy(&(c_in[1]), in);
+
+    mpf_set_str( t, c_in, 10 );
+    omFreeSize((void*)c_in, len);
+  }
+  else
+  {
+    mpf_set_str( t, in, 10 );
+  }
+  if (neg)  mpf_neg( t, t );
+}
+#endif
 
 
 // <gmp_float> = <gmp_float> operator <gmp_float>
