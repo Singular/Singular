@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: pl2doc.pl,v 1.22 2005-05-06 15:51:14 Singular Exp $
+# $Id: pl2doc.pl,v 1.23 2008-12-18 16:17:51 Singular Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -470,17 +470,16 @@ sub OutRef
   $refs =~ s/\n/,/g;
   my @refs = split (/[,;\.]+/, $refs);
   my $ref;
-  print $FH "\@c ref\n";
+  print $FH "\@c ref\nSee also:\n";
   $ref = shift @refs;
   print $FH "\@ref{$ref}";
   for $ref (@refs)
   {
     $ref =~ s/^\s*//;
     $ref =~ s/\s*$//;
-    print $FH ", \@ref{$ref}"  if ($ref =~ /\w/);
+    print $FH "; \@ref{$ref}"  if ($ref =~ /\w/);
   }
-  print $FH "\n\@c ref\n\n";
-
+  print $FH "\.\n\@c ref\n\n";
 }
 
 sub OutKeywords
