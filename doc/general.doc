@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.221 2008-12-15 13:20:13 seelisch Exp $
+@comment $Id: general.doc,v 1.222 2008-12-18 10:01:08 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -3212,6 +3212,7 @@ execution of @code{xxx}.
 @cindex Parameter list
 @cindex argument, optional
 @cindex argument, default
+@cindex default argument
 @table @code
 @item @strong{Syntax:}
 @code{( )}
@@ -3225,6 +3226,8 @@ which means the arguments are referenced by @code{#[1], #[2]}, etc.
 @*If a procedure has optional parameters (i.e. @code{(list #)} appears
 in the declaration), the attribute @code{default_arg} gives the default values
 for this optional arguments.
+(This provides the possibility to change the behaviour of procedures
+which are only called indirect.)
 @item @strong{Example:}
 @smallexample
 proc x0
