@@ -2,7 +2,7 @@
 //major revision Jan/Feb. 2007, GMG
 //groebner mit Optionen versehen
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.102 2008-10-06 17:04:28 Singular Exp $";
+version="$Id: standard.lib,v 1.103 2008-12-18 15:45:21 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -1278,8 +1278,8 @@ See also
 @ref{nres};
 @ref{lres};
 @ref{hres};
-@ref{sres}.
-@ref{resolution}
+@ref{sres};
+@ref{resolution}.
 @c ref
 "
 {
