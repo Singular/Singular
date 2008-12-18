@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.315 2008-12-18 11:07:01 Singular Exp $
+@comment $Id: reference.doc,v 1.316 2008-12-18 11:12:35 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1992,7 +1992,7 @@ otherwise it is not defined.
 @smallexample
 @c example
   gcd(2,3);
-  gcd(bigint(2)^20,bigint(3)^23));     // also applicable for bigints
+  gcd(bigint(2)^20,bigint(3)^23);     // also applicable for bigints
   typeof(_);
   ring r=0,(x,y,z),lp;
   gcd(3x2*(x+y),9x*(y2-x2));
