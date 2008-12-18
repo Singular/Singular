@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.317 2008-12-18 13:30:33 seelisch Exp $
+@comment $Id: reference.doc,v 1.318 2008-12-18 13:34:06 seelisch Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -7471,7 +7471,7 @@ See
 @subsection quit
 @cindex quit
 @cindex exit
-@anchor exit
+@anchor{exit}
 @table @code
 @item @strong{Syntax:}
 @code{quit;}
