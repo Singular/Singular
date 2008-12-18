@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.117 2008-12-10 19:05:56 Singular Exp $
+@comment $Id: NEWS.texi,v 1.118 2008-12-18 10:00:09 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -54,7 +54,7 @@ handling of large input for std improved
 @item
 @nref{interred} implemented in a different way
 @item
-@nref{gcd} over algebraic extensions implemented in a different way
+@nref{gcd} over algebraic extensions of the rationals implemented in a different way
 @item new build target: libsingular.a (for gfan etc.)
 @item code variants now depend on CPU type, not OS
 @item better test for builtin limits (see @nref{Limitations})
