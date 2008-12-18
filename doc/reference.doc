@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.314 2008-12-15 13:20:14 seelisch Exp $
+@comment $Id: reference.doc,v 1.315 2008-12-18 11:07:01 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1976,6 +1976,7 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{gcd (} int_expression@code{,} int_expression @code{)}
+@*@code{gcd (} bigint_expression@code{,} bigint_expression @code{)}
 @*@code{gcd (} number_expression@code{,} number_expression @code{)}
 @*@code{gcd (} poly_expression@code{,} poly_expression @code{)}
 @item @strong{Type:}
@@ -1991,7 +1992,7 @@ otherwise it is not defined.
 @smallexample
 @c example
   gcd(2,3);
-  gcd(bigint(2)23*3,bigint(3)32*2));     // also applicable for bigints
+  gcd(bigint(2)^20,bigint(3)^23));     // also applicable for bigints
   typeof(_);
   ring r=0,(x,y,z),lp;
   gcd(3x2*(x+y),9x*(y2-x2));
