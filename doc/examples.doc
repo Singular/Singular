@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.102 2007-10-31 17:43:42 Singular Exp $
+@comment $Id: examples.doc,v 1.103 2008-12-18 13:36:30 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -956,17 +956,17 @@ and @code{stdhilb} about 10 times faster than @code{std}.
 @cindex Groebner bases, slim
 @cindex slimgb
 The command slimgb calls an implementation of an algorithm to compute
-Groebner bases which is designed for keeping the polynomials slim (short 
-with small coefficients) during a Groebner basis computation. It provides, 
-in particular, a fast algorithm for computing Groebner bases over function 
-fields or over the rational numbers, but also in several other 
-cases. The algorithm which is still under developement was developed in 
-the diploma thesis of Michael Brickenstein, it is published as 
+Groebner bases which is designed for keeping the polynomials slim (short
+with small coefficients) during a Groebner basis computation. It provides,
+in particular, a fast algorithm for computing Groebner bases over function
+fields or over the rational numbers, but also in several other
+cases. The algorithm which is still under developement was developed in
+the diploma thesis of Michael Brickenstein, it is published as
 @code{http://www.mathematik.uni-kl.de/~zca/Reports_on_ca/35/paper_35_full.ps.gz}.
 
 
-In the example below (Groebner basis with respect to degree reverse 
-lexicographic ordering over function field) it is much faster than 
+In the example below (Groebner basis with respect to degree reverse
+lexicographic ordering over function field) it is much faster than
 the @code{std} command.
 
 @smallexample

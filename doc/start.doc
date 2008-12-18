@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.53 2008-10-01 13:55:31 Singular Exp $
+@comment $Id: start.doc,v 1.54 2008-12-18 13:36:31 Singular Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added changes by GMG.
 
@@ -502,7 +502,7 @@ variable names @code{a} and @code{b}.
 @c
 
 Typing the name of a ring prints its definition. The example below
-shows that the default ring in @sc{Singular} is @math{Z/32003[x,y,z]} with 
+shows that the default ring in @sc{Singular} is @math{Z/32003[x,y,z]} with
 degree reverse lexicographical ordering:
 
 @smallexample

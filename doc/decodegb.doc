@@ -1,7 +1,7 @@
 @comment this file contains the mathematical background of decoding with Groebner bases
 
-This section introduces some of the mathematical notions, definitions, and 
-results for solving decoding problem and finding minimum distance of 
+This section introduces some of the mathematical notions, definitions, and
+results for solving decoding problem and finding minimum distance of
 linear (and in particular cyclic) codes. The material presented here
 should assist the user in working with @ref{decodegb_lib}.
 More details can be obtained from @ref{[BP2008b]}.
@@ -17,7 +17,7 @@ More details can be obtained from @ref{[BP2008b]}.
 @end menu
 
 @c ---------------------------------------------------------------------------
-@node Codes and decoding problem, Cooper philosophy, , Decoding codes with GB 
+@node Codes and decoding problem, Cooper philosophy, , Decoding codes with GB
 @subsection Codes and decoding problem
 @cindex Codes and decoding problem
 
@@ -25,51 +25,51 @@ More details can be obtained from @ref{[BP2008b]}.
 @cindex Code
 @c table @asis
 @itemize @bullet
-@item 
-@tex 
+@item
+@tex
   Let $F_q$ be a field with $q$ elements. A \emph{linear code} $C$ is a linear subspace of $F_q^n$ endowed with the
-  {\bf Hamming metric}  
+  {\bf Hamming metric}
 @end tex
 @ifinfo
   Let F_q be a field with q elements. A @strong{linear code} C is a linear subspace of F_q^n endowed with the
   @strong{Hamming metric}
 @end ifinfo
-@item 
+@item
 @tex
-  {\bf Hamming distance} between ${\bf x,y}\in F_q^n: d({\bf x,y})=\#\{i|x_i\ne y_i\}$. 
+  {\bf Hamming distance} between ${\bf x,y}\in F_q^n: d({\bf x,y})=\#\{i|x_i\ne y_i\}$.
   {\bf Hamming weight} of ${\bf x}\in F_q^n: wt({\bf x})=\#\{i|x_i\ne 0\}$.
 @end tex
 @ifinfo
   @strong{Hamming distance} between x, y in F_q^n: d(x,y)=@{i|x_i<> y_i@},
   @strong{Hamming weight} of x in F_q^n: wt(x)=@{i|x_i<> 0@}.
 @end ifinfo
-@item 
+@item
 @tex
   {\bf Minimum distance} of the code $C: d(C):=\min_{{\bf x,y}\in C, {\bf x}\ne {\bf y}}(d({\bf x,y}))$.
 @end tex
 @ifinfo
   @strong{Minimum distance} of the code C: d(C):=min(d(x,y)), where min is over x,y in C, x<>y.
 @end ifinfo
-@item 
+@item
 @tex
   The code $C$ of dimension $k$ and minimum distance $d$ is denoted as $[n,k,d]$.
 @end tex
 @ifinfo
   The code C of dimension k and minimum distance d is denoted as [n,k,d].
 @end ifinfo
-@item 
+@item
 @tex
   A matrix $G$ whose rows are the basis vectors of $C$ is the {\bf generator matrix}.
 @end tex
 @ifinfo
   A matrix G whose rows are the basis vectors of C is the @strong{generator matrix}.
 @end ifinfo
-@item 
+@item
 @tex
-  A matrix $H$ with the property ${\bf c}\in C\iff H{\bf c}^T=0$ is the {\bf check matrix}. 
+  A matrix $H$ with the property ${\bf c}\in C\iff H{\bf c}^T=0$ is the {\bf check matrix}.
 @end tex
 @ifinfo
-  A matrix H with the property c in C iff Hc^T=0 is the @strong{check matrix}. 
+  A matrix H with the property c in C iff Hc^T=0 is the @strong{check matrix}.
 @end ifinfo
 @end itemize
 @c @end table
@@ -107,27 +107,27 @@ More details can be obtained from @ref{[BP2008b]}.
   A cyclic code has several defining sets.
 @end ifinfo
 
-  
+
 @subsubheading Decoding problem
 @cindex decoding, decoding problem
 @c table @asis
 @itemize @bullet
-@item 
+@item
 @tex
   {\bf Complete decoding}: Given $y\in F_q^n$ and a code $C\subseteq F_q^n$, so that $y$ is at distance $d(y,C)$ from
   the code, find $c\in C: d(y,c)=d(y,C)$.
 @end tex
 @ifinfo
-  @strong{Complete decoding}: Given y in F_q^n and a code C<=F_q^n, 
+  @strong{Complete decoding}: Given y in F_q^n and a code C<=F_q^n,
   so that y is at distance d(y,C) from the code, find cin C: d(y,c)=d(y,C).
 @end ifinfo
-@item 
+@item
 @tex
   {\bf Bounded up to half the minimum distance}: Additional assumption $d({\bf y},C)\le(d(C)-1)/2$. Then a codeword with the above property
   is unique.
 @end tex
 @ifinfo
-  @strong{Bounded up to half the minimum distance}: Additional assumption d(y,C)<= (d(C)-1)/2.  
+  @strong{Bounded up to half the minimum distance}: Additional assumption d(y,C)<= (d(C)-1)/2.
   Then a codeword with the above property is unique.
 @end ifinfo
 @end itemize
@@ -138,19 +138,19 @@ More details can be obtained from @ref{[BP2008b]}.
 One distinguishes between two concepts:
 @c table @asis
 @itemize @bullet
-@item 
+@item
 @tex
   {\bf Generic decoding}: Solve some system $S(C)$ and obtain some "closed" formulas $CF$. Evaluating these formulas
-  at data specific to a received word ${\bf r}$ should yield a solution to the decoding problem. For example for 
-  $f\in CF: f(syndrome({\bf r}),x)=poly(x)$. The roots of $poly(x)=0$ yield error positions -- general error-locator polynomial $f$.  
+  at data specific to a received word ${\bf r}$ should yield a solution to the decoding problem. For example for
+  $f\in CF: f(syndrome({\bf r}),x)=poly(x)$. The roots of $poly(x)=0$ yield error positions -- general error-locator polynomial $f$.
 @end tex
 @ifinfo
-  @strong{Generic decoding}: Solve some system S(C) and obtain some ``closed'' formulas CF. 
-  Evaluating these formulas at data specific to a received word r should yield a solution to the 
-  decoding problem. For example for f in CF: f(syndrome(r),x)=poly(x). The roots of 
+  @strong{Generic decoding}: Solve some system S(C) and obtain some ``closed'' formulas CF.
+  Evaluating these formulas at data specific to a received word r should yield a solution to the
+  decoding problem. For example for f in CF: f(syndrome(r),x)=poly(x). The roots of
   poly(x)=0 yield error positions -- general error-locator polynomial f.
 @end ifinfo
-@item 
+@item
 @tex
   {\bf Online decoding}: Solve some system $S(C,{\bf r})$. The solutions should solve the decoding problem.
 @end tex
@@ -172,15 +172,15 @@ One distinguishes between two concepts:
 @c @end table
 
 @c ---------------------------------------------------------------------------
-@node Cooper philosophy, Generalized Newton identities, Codes and decoding problem, Decoding codes with GB 
+@node Cooper philosophy, Generalized Newton identities, Codes and decoding problem, Decoding codes with GB
 @subsection Cooper philosophy
 @cindex Cooper philosophy
 
 @subsubheading Computing syndromes in cyclic code case
 @tex
-  Let $C$ be an $[n,k]$ cyclic code over $F_q$; $F$ is a splitting field with $a$ being a primitive n-th root of unity. Let 
-  $S_C=\{i_1,\dots,i_{n-k}\}$ be the complete defining set of $C$. Let ${\bf r}={\bf c}+{\bf e}$ 
-  be a received word with ${\bf c}\in C$ and ${\bf e}$ an error vector. 
+  Let $C$ be an $[n,k]$ cyclic code over $F_q$; $F$ is a splitting field with $a$ being a primitive n-th root of unity. Let
+  $S_C=\{i_1,\dots,i_{n-k}\}$ be the complete defining set of $C$. Let ${\bf r}={\bf c}+{\bf e}$
+  be a received word with ${\bf c}\in C$ and ${\bf e}$ an error vector.
   Denote the corresponding polynomials in $F_q[x]/\langle x^n-1 \rangle$ by $r(x)$, $c(x)$ and $e(x)$, resp. Compute syndromes
   $$
     s_{i_m}=r(a^{i_m})=e(a^{i_m})= \sum_{l=1}^{t}e_{j_l}(a^{i_m})^{j_l}, \ \ 1\le m \le n-k,
@@ -189,11 +189,11 @@ One distinguishes between two concepts:
   error values}.
 @end tex
 @ifinfo
-Let C be an [n,k] cyclic code over F_q; F is a splitting field with a being a primitive n-th root of unity. Let 
-S_C=@{i_1,@dots{},i_(n-k)@} be the complete defining set of C. 
-Let r=c+e be the received word with c in C and e an error vector. 
-Denote the corresponding polynomials in F_q[x]/<x^n-1> by r(x),c(x) and e(x), resp. 
-Compute syndromes 
+Let C be an [n,k] cyclic code over F_q; F is a splitting field with a being a primitive n-th root of unity. Let
+S_C=@{i_1,@dots{},i_(n-k)@} be the complete defining set of C.
+Let r=c+e be the received word with c in C and e an error vector.
+Denote the corresponding polynomials in F_q[x]/<x^n-1> by r(x),c(x) and e(x), resp.
+Compute syndromes
 @display
   s_(i_m)=r(a^(i_m))=e(a^(i_m))=sum_(l=1)^t e_(j_l)(a^(i_m))^(j_l), 1<= m <= n-k,
 @end display
@@ -205,40 +205,40 @@ where t is the number of errors, @{ j_1 , @dots{} , j_t @} are the @strong{error
   the syndromes above become {\bf generalized power sum functions} $s_{i_m}=\sum_{l=1}^{t}y_lz_l^{i_m}, \ \ 1\le m \le n-k. $
 @end tex
 @ifinfo
-Define z_l=a^(j_l) and y_l=e_(j_l). Then z_1,@dots{},z_t are the error locations and 
+Define z_l=a^(j_l) and y_l=e_(j_l). Then z_1,@dots{},z_t are the error locations and
 y_1,@dots{},y_t are the error values and
-the syndromes above become @strong{generalized power sum functions} 
+the syndromes above become @strong{generalized power sum functions}
 s_(i_m)=sum_(l=1)^t y_l z_l^(i_m), 1\le m \le n-k.
 @end ifinfo
 
 @subsubheading CRHT-ideal
 @cindex CRHT-ideal
-Replace the concrete values above by variables and add some natural restrictions. Introduce 
+Replace the concrete values above by variables and add some natural restrictions. Introduce
 @c table @asis
-@itemize @bullet  
-@item 
-@tex 
+@itemize @bullet
+@item
+@tex
   $f_u := \sum_{l=1}^e Y_lZ_l^{i_u}-X_u=0, 1\le u\le n-k$;
 @end tex
 @ifinfo
   f_u := sum_(l=1)^e Y_l Z_l^(i_u)-X_u=0, 1<= u<= n-k;
 @end ifinfo
-@item 
-@tex 
+@item
+@tex
   $\epsilon_j:=X_j^{q^m}-X_j=0, 1\le j\le n-k,$ since $s_j\in F$;
 @end tex
 @ifinfo
   epsilon_j:=X_j^(q^m)-X_j=0, 1<= j<= n-k, since s_j in F;
 @end ifinfo
-@item 
-@tex 
-  $\eta_i:= Z_i^{n+1}-Z_i=0, 1\le i\le e$, since $a^{j_i}$ are either $n$-th roots of unity or zero; 
+@item
+@tex
+  $\eta_i:= Z_i^{n+1}-Z_i=0, 1\le i\le e$, since $a^{j_i}$ are either $n$-th roots of unity or zero;
 @end tex
 @ifinfo
-  eta_i:= Z_i^(n+1)-Z_i=0, 1<= i<= e, since a^(j_i) are either n-th roots of unity or zero; 
+  eta_i:= Z_i^(n+1)-Z_i=0, 1<= i<= e, since a^(j_i) are either n-th roots of unity or zero;
 @end ifinfo
-@item 
-@tex 
+@item
+@tex
   $\lambda_i:=Y_i^{q-1}-1=0, 1\le i\le e$, since $y_l\in F_q \setminus\{0\}$.
 @end tex
 @ifinfo
@@ -250,15 +250,15 @@ Replace the concrete values above by variables and add some natural restrictions
 @tex
   We obtain the following set of polynomials in the variables $X=(X_1,\dots,X_{n-k})$, $Z=(Z_1,\dots,Z_e)$  and  $Y=(Y_1,\dots,Y_e)$:
   $$
-     F_C=\{f_j,\epsilon_j,\eta_i,\lambda_i:1\le j\le n-k,1\le i\le e\}\subset F_q[X,Z,Y].    
-  $$  
+     F_C=\{f_j,\epsilon_j,\eta_i,\lambda_i:1\le j\le n-k,1\le i\le e\}\subset F_q[X,Z,Y].
+  $$
   The zero-dimensional ideal $I_C$ generated by $F_C$ is the {\bf CRHT-syndrome ideal}
   associated to the code $C$, and the variety $V(F_C)$ defined by $F_C$ is the {\bf CRHT-syndrome variety},
   after Chen, Reed, Helleseth and Truong.
 @end tex
 @ifinfo
 We obtain the following set of polynomials in the variables X=(X_1,@dots{},X_(n-k)), Z=(Z_1,@dots{},Z_e)
-and Y=(Y_1,@dots{},Y_e): 
+and Y=(Y_1,@dots{},Y_e):
 @display
   F_C=@{f_j,epsilon_j,eta_i,lambda_i: 1<= j<= n-k, 1<= i<= e@}< F_q[X,Z,Y].
 @end display
@@ -270,22 +270,22 @@ after Chen, Reed, Helleseth and Truong.
 @subsubheading General error-locator polynomial
 @cindex general error-locator polynomial
 @tex
-  Adding some more polynomials to $F_C$, thus obtaining some $F'_C$, it is possible to prove the following {\bf Theorem}: 
+  Adding some more polynomials to $F_C$, thus obtaining some $F'_C$, it is possible to prove the following {\bf Theorem}:
 @end tex
 @ifinfo
-  Adding some additional polynomials to F_C, thus obtaining some F'_C, it is possible to prove the following @strong{Theorem}: 
+  Adding some additional polynomials to F_C, thus obtaining some F'_C, it is possible to prove the following @strong{Theorem}:
 @end ifinfo
 
 @tex
-  Every cyclic code $C$ possesses a {\bf general error-locator polynomial} $L_C$ from $F_q[X_1,\ldots ,X_{n-k},Z]$ that satisfies the following 
+  Every cyclic code $C$ possesses a {\bf general error-locator polynomial} $L_C$ from $F_q[X_1,\ldots ,X_{n-k},Z]$ that satisfies the following
   two properties:
 @end tex
 @ifinfo
-  Every cyclic code C possesses a @strong{general error-locator polynomial} L_C from F_q[X_1,@dots{},X_(n-k),Z] that satisfies the following 
+  Every cyclic code C possesses a @strong{general error-locator polynomial} L_C from F_q[X_1,@dots{},X_(n-k),Z] that satisfies the following
   two properties:
 @end ifinfo
 @c table @asis
-@itemize @bullet 
+@itemize @bullet
 @item
 @tex
   $L_C=Z^e+a_{t-1}Z^{e-1}+\dots +a_0 \hbox{ with } a_j\in F_q[X_1,\dots ,X_{n-k}],\ 0\le j\le e-1$, where $e$ is the error-correcting
@@ -295,7 +295,7 @@ after Chen, Reed, Helleseth and Truong.
   L_C=Z^e+a_(t-1)Z^(e-1)+@dots{}+a_0,  a_j in F_q[X_1,@dots{},X_(n-k)], 0<= j<= e-1, where e is the error-correcting
   capacity;
 @end ifinfo
-@item  
+@item
 @tex
     given a syndrome ${\bf s}=(s_{i_1},\dots,s_{i_{n-k}})\in F^{n-k}$ corresponding to an error of weight $t\le e$
     and error locations $\{k_1,\dots,k_{t}\}$, if we evaluate the $X_u=s_{i_u}$ for all $1\le u \le n-k$,
@@ -309,26 +309,26 @@ after Chen, Reed, Helleseth and Truong.
     L_C(s,Z)=Z^(e-t) prod_(i=1)^t (Z-a^(k_i)).
 @end ifinfo
 @end itemize
-@c @end table  
+@c @end table
 
 @tex
   The general error-locator polynomial  actually is an element of the reduced Gr\"obner basis of $\langle F'_C \rangle$. Having this polynomial,
   decoding of the cyclic code $C$ reduces to univariate factorization.
 @end tex
 @ifinfo
-The general error-locator polynomial actually is an element of the reduced Groebner basis of 
+The general error-locator polynomial actually is an element of the reduced Groebner basis of
 <F'_C>. Having this polynomial, decoding of the cyclic code C reduces to univariate factorization.
 @end ifinfo
 
-For an example see example to @code{sysCRHT} in @ref{decodegb_lib}. 
+For an example see example to @code{sysCRHT} in @ref{decodegb_lib}.
 More on Cooper's philosophy and general error-locator polynomial in @ref{[OS2005]}.
 
 
 @subsubheading Finding the minimum distance
-The method described above can be adapted to find minimum distance of a code. 
+The method described above can be adapted to find minimum distance of a code.
 Namely, the following holds:
 
-@tex  
+@tex
   Let $C$ be the binary $[n,k,d]$ cyclic code with the defining set $S_C=\{i_1,\dots,i_v\}$. Let $1\le w\le n$ and let $J_C(w)$ denote the system:
   $$
   Z_1^{i_1}+\dots+Z_w^{i_1}=0,
@@ -349,29 +349,29 @@ Namely, the following holds:
   Z_w^n-1=0,
   $$
   $$
-  p(n,Z_i,Z_j)=0, 1\le i<j\le w.     
+  p(n,Z_i,Z_j)=0, 1\le i<j\le w.
   $$
 @end tex
 @ifinfo
-  Let C be the binary [n,k,d] cyclic code with the defining set 
+  Let C be the binary [n,k,d] cyclic code with the defining set
   S_C=@{i_1,@dots{},i_v@}. Let 1<= w<= n and let J_C(w) denote the system:
   @display
-  Z_1^(i_1)+@dots{}+Z_w^(i_1)=0,  
-  Z_1^(i_v)+@dots{}+Z_w^(i_v)=0,  
-  Z_1^n-1=0,  
-  Z_w^n-1=0,  
-  p(n,Z_i,Z_j)=0,1<= i<j<= w.  
+  Z_1^(i_1)+@dots{}+Z_w^(i_1)=0,
+  Z_1^(i_v)+@dots{}+Z_w^(i_v)=0,
+  Z_1^n-1=0,
+  Z_w^n-1=0,
+  p(n,Z_i,Z_j)=0,1<= i<j<= w.
   @end display
 @end ifinfo
 @tex
-  Then the number of solutions of $J_C(w)$ is equal to $w!$ times the number of codewords of weight $w$. And for $1\le w\le d$: either $J_C(w)$ 
-  has no solutions, which is equivalent to $w<d$, or $J_C(w)$ has some solutions, which is equivalent to $w=d$.  
+  Then the number of solutions of $J_C(w)$ is equal to $w!$ times the number of codewords of weight $w$. And for $1\le w\le d$: either $J_C(w)$
+  has no solutions, which is equivalent to $w<d$, or $J_C(w)$ has some solutions, which is equivalent to $w=d$.
 @end tex
 @ifinfo
-Then the number of solutions of J_C(w) is equal to w! 
-times the number of codewords of weight w. And for 1<= w<= d: 
-either J_C(w) has no solutions, which is equivalent to w<d, or 
-J_C(w) has some solutions, which is equivalent to w=d.  
+Then the number of solutions of J_C(w) is equal to w!
+times the number of codewords of weight w. And for 1<= w<= d:
+either J_C(w) has no solutions, which is equivalent to w<d, or
+J_C(w) has some solutions, which is equivalent to w=d.
 @end ifinfo
 
 For an example see example to @code{sysCRHTMindist} in @ref{decodegb_lib}.
@@ -380,7 +380,7 @@ More on finding the minimum distance with Groebner bases in @ref{[S2007]}.
 
 
 @c ---------------------------------------------------------------------------
-@node Generalized Newton identities, Fitzgerald-Lax method, Cooper philosophy,  Decoding codes with GB 
+@node Generalized Newton identities, Fitzgerald-Lax method, Cooper philosophy,  Decoding codes with GB
 @subsection Generalized Newton identities
 @cindex Generalized Newton identities
 
@@ -400,16 +400,16 @@ More on finding the minimum distance with Groebner bases in @ref{[S2007]}.
   $$
 @end tex
 @ifinfo
-The @strong{error-locator polynomial} is defined by 
+The @strong{error-locator polynomial} is defined by
 @display
   sigma(Z)=prod_(l=1)^t (Z-z_l).
 @end display
-If this product is expanded 
+If this product is expanded
 @display
   sigma(Z)=Z^t+sigma_1 Z^(t-1)+@dots{}+sigma_(t-1)Z+sigma_t,
 @end display
 then the coefficients sigma_i are the @strong{elementary symmetric functions} in
-the error locations z_1,@dots{},z_t: 
+the error locations z_1,@dots{},z_t:
 @display
   sigma_i=(-1)^i sum_(1<=j_1<j_2<@dots{}<j_i<=t) z_(j_1) z_(j_2)@dots{}z_(j_i),1<= i<= t.
 @end display
@@ -421,20 +421,20 @@ the error locations z_1,@dots{},z_t:
   The syndromes $s_i=r(a^i)=e(a^i)$ and the coefficients $\sigma_i$ satisfy
   the following {\bf generalized Newton identities}:
   $$
-    s_i+\sum_{j=1}^{t}\sigma_js_{i-j}=0,\ \  \hbox{ for all } \ i\in Z\!\!\! Z_n.    
+    s_i+\sum_{j=1}^{t}\sigma_js_{i-j}=0,\ \  \hbox{ for all } \ i\in Z\!\!\! Z_n.
   $$
 @end tex
 @ifinfo
 The syndromes s_i=r(a^i)=e(a^i) and the coefficients sigma_i satisfy
-the following @strong{generalized Newton identities}: 
+the following @strong{generalized Newton identities}:
 @display
-  s_i+sum_(j=1)^t sigma_j s_(i-j)=0, forall i in Z_n.    
+  s_i+sum_(j=1)^t sigma_j s_(i-j)=0, forall i in Z_n.
 @end display
 @end ifinfo
 
 @subsubheading Decoding up to error-correcting capacity
-  
-@tex 
+
+@tex
   We have $ s_{i+n}=s_i, \hbox{ for all }  i\in Z\!\!\! Z_n$, since $s_{i+n}=r(a^{i+n})=r(a^i)$. Furthermore
   $$
     s_i^q=(e(a^i))^q=e(a^{iq})=s_{qi}, \hbox{ for all } i \in Z_n,
@@ -442,7 +442,7 @@ the following @strong{generalized Newton identities}:
   and $\sigma_i^{q^m}=\sigma_i, \hbox{ for all } 1\le i \le t$.
   Replace the syndromes by variables and obtain following set of polynomials $Newton_t$ in the variables
   $S_1,\dots,S_n$ and $\sigma_1,\dots,\sigma_t$:
-  $$  
+  $$
   \sigma_i^{q^m}-\sigma_i, \ \  \forall \ 1\le i \le t,
   $$
   $$
@@ -455,23 +455,23 @@ the following @strong{generalized Newton identities}:
   S_i+\sum_{j=1}^{t}\sigma_jS_{i-j}, \ \  \forall \  i\in Z\!\!\! Z_n,
   $$
   $$
-  S_i-s_i(r) \ \ \forall \ i\in S_C.  
+  S_i-s_i(r) \ \ \forall \ i\in S_C.
   $$
 @end tex
 @ifinfo
 We have s_(i+n)=s_i, forall  i in Z_n, since s_(i+n)=r(a^(i+n))=r(a^i). Furthermore
 @display
-  s_i^q=(e(a^i))^q=e(a^(iq))=s_(qi), forall i in Z_n 
-@end display 
+  s_i^q=(e(a^i))^q=e(a^(iq))=s_(qi), forall i in Z_n
+@end display
 and sigma_i^(q^m)=sigma_i, forall 1<= i <= t.
 Replace the syndromes by variables and obtain following set of polynomials @code{Newton_t} in the variables
 S_1,@dots{},S_n and sigma_1,@dots{},sigma_t:
 @display
   sigma_i^(q^m)-sigma_i, forall  1<= i <= t,
-  S_(i+n)-S_i, forall i in Z_n,  
-  S_i^q-S_(qi), forall i in Z_n, 
-  S_i+sum_(j=1)^t sigma_j S_(i-j), forall i in Z_n,  
-  S_i-s_i(r) forall i in S_C.    
+  S_(i+n)-S_i, forall i in Z_n,
+  S_i^q-S_(qi), forall i in Z_n,
+  S_i+sum_(j=1)^t sigma_j S_(i-j), forall i in Z_n,
+  S_i-s_i(r) forall i in S_C.
 @end display
 @end ifinfo
 
@@ -480,7 +480,7 @@ Waring function in @ref{[ABF2002]}. See also @ref{[ABF2008]}.
 
 
 @c ---------------------------------------------------------------------------
-@node Fitzgerald-Lax method, Decoding method based on quadratic equations, Generalized Newton identities, Decoding codes with GB 
+@node Fitzgerald-Lax method, Decoding method based on quadratic equations, Generalized Newton identities, Decoding codes with GB
 @subsection Fitzgerald-Lax method
 @cindex Fitzgerald-Lax method
 
@@ -489,36 +489,36 @@ Waring function in @ref{[ABF2002]}. See also @ref{[ABF2008]}.
 
 @tex
   Let $I=\langle g_1,\dots,g_m \rangle \subseteq F_q[X_1,\dots,X_s]$ be an
-  ideal. Define 
+  ideal. Define
   $$
     I_q:=I+\langle X_1^q-X_1,\dots,X_s^q-X_s\rangle .
-  $$ 
+  $$
   So $I_q$ is a zero-dimensional ideal. Define also $V(I_q)=:\{P_1,\dots,P_n\}$.
   Every $q$-ary linear code $C$ with parameters $[n,k]$ can be seen as an
   {\bf affine variety code} $C(I,L)$, that is the image of a vector space $L$ of the {\bf evaluation map}
-  $$  
+  $$
   \phi :R\to F_q ^n
   $$
   $$
-  \bar{f}\mapsto(f(P_1),\dots,f(P_n)),  
+  \bar{f}\mapsto(f(P_1),\dots,f(P_n)),
   $$
   where $R:=F_q[U_1,\dots,U_s]/I_q$, $L$ is a vector subspace of $R$ and $\bar{f}$ the coset of $f$ in $F_q[U_1,\dots,U_s]$ modulo $I_q$.
 @end tex
 @ifinfo
-Let I=<g_1,@dots{},g_m> <= F_q[X_1,@dots{},X_s] be an ideal. 
-Define 
+Let I=<g_1,@dots{},g_m> <= F_q[X_1,@dots{},X_s] be an ideal.
+Define
 @display
   I_q:=I+<X_1^q-X_1,@dots{},X_s^q-X_s>.
 @end display
 So I_q is a zero-dimensional ideal. Define also V(I_q)=:@{P_1,@dots{},P_n@}.
 Every q-ary linear code C with parameters [n,k] can be seen as an
-@strong{affine variety code} C(I,L), that is the image of a vector space L of the 
+@strong{affine variety code} C(I,L), that is the image of a vector space L of the
 @strong{evaluation map}
 @display
  phi:R --> F_q ^n,
- ^f^ |-> (f(P_1),@dots{},f(P_n)),    
+ ^f^ |-> (f(P_1),@dots{},f(P_n)),
 @end display
-where R:=F_q[U_1,@dots{},U_s]/I_q, L is a vector subspace of R and ^f^ 
+where R:=F_q[U_1,@dots{},U_s]/I_q, L is a vector subspace of R and ^f^
 the coset of f in F_q[U_1,@dots{},U_s] modulo I_q.
 @end ifinfo
 
@@ -533,24 +533,24 @@ the coset of f in F_q[U_1,@dots{},U_s] modulo I_q.
 @enumerate
 @c @bullet
 @c @table @asis
-@item 
+@item
 @tex
-  choose $s$, such that $q^s\ge n$, and construct $s$ distinct points $P_1,\dots,P_s$ in $F_q^s$. 
+  choose $s$, such that $q^s\ge n$, and construct $s$ distinct points $P_1,\dots,P_s$ in $F_q^s$.
 @end tex
 @ifinfo
-  choose s, such that q^s>= n, and construct s distinct points P_1,@dots{},P_s in F_q^s. 
+  choose s, such that q^s>= n, and construct s distinct points P_1,@dots{},P_s in F_q^s.
 @end ifinfo
-@item 
+@item
 @tex
-  Construct a Gr\"obner basis $\{g_1,\dots,g_m\}$ for an ideal $I$ of polynomials from $F_q[X_1,\dots,X_s]$ that vanish at the points 
-  $P_1,\dots,P_s$. Denote by $\xi_i\in F_q[X_1,\dots,X_s]$ such that $\xi_i(P_i)=1,\xi_i(P_j)=0,i\ne j$. 
+  Construct a Gr\"obner basis $\{g_1,\dots,g_m\}$ for an ideal $I$ of polynomials from $F_q[X_1,\dots,X_s]$ that vanish at the points
+  $P_1,\dots,P_s$. Denote by $\xi_i\in F_q[X_1,\dots,X_s]$ such that $\xi_i(P_i)=1,\xi_i(P_j)=0,i\ne j$.
 @end tex
 @ifinfo
   Construct a Groebner basis @{g_1,@dots{},g_m@} for an ideal I of polynomials from F_q[X_1,@dots{},X_s]
   that vanish at the points P_1,@dots{},P_s @ref{vanishId}. Denote by
-  xi_i in F_q[X_1,@dots{},X_s] such that xi_i(P_i)=1,xi_i(P_j)=0,i<>j. 
+  xi_i in F_q[X_1,@dots{},X_s] such that xi_i(P_i)=1,xi_i(P_j)=0,i<>j.
 @end ifinfo
-@item 
+@item
 @tex
   Then $f_i=\sum_{i=1}^ng_{ij}\xi_j$ span the space $L$, so that $g_{ij}=f_i(P_j)$.
 @end tex
@@ -558,54 +558,54 @@ the coset of f in F_q[U_1,@dots{},U_s] modulo I_q.
   Then f_i=sum_(i=1)^n g_(ij) xi_j span the space L, so that g_(ij)=f_i(P_j).
 @end ifinfo
 @end enumerate
-@c @end table  
+@c @end table
 
 @tex
   In this way we obtain that the code $C$ is the image of the evaluation above, so $C=C(I,L)$. In the
   same way by considering a parity check matrix instead of a generator matrix we have that the dual code is also an affine variety code.
-  
+
   The method of decoding is a generalization of CRHT. One needs to add polynomials
   $(g_l(X_{k1},\dots,X_{ks}))_{l=1,\dots,m; k=1,\dots,t}$ for every error position. We also assume that field equations on $X_{ij}$'s are included
   among the polynomials above. Let $C$ be a $q$-ary $[n,k]$ linear code such that its
   dual is written as an affine variety code of the form $C^{\bot}=C(I,L)$.
-  Let ${\bf r}={\bf c}+{\bf e}$ as usual and $t\le e$. Then the syndromes are computed by $s_i=\sum_{j=1}^nr_jf_i(P_j)=\sum_{j=1}^ne_jf_i(P_j) 
-  \hbox{ for } i=1,\dots,n-k$.  
+  Let ${\bf r}={\bf c}+{\bf e}$ as usual and $t\le e$. Then the syndromes are computed by $s_i=\sum_{j=1}^nr_jf_i(P_j)=\sum_{j=1}^ne_jf_i(P_j)
+  \hbox{ for } i=1,\dots,n-k$.
 @end tex
 @ifinfo
 In this way we obtain that the code C is the image of the evaluation above, so C=C(I,L). In the
 same way by considering a parity check matrix instead of a generator matrix we have that the dual code is also an affine variety code.
 
 The method of decoding is a generalization of CRHT. One needs to add polynomials
-(g_l(X_(k1),@dots{},X_(ks)))_@{l=1,@dots{},m; k=1,@dots{},t@} for every error position. 
+(g_l(X_(k1),@dots{},X_(ks)))_@{l=1,@dots{},m; k=1,@dots{},t@} for every error position.
 We also assume that field equations on X_(ij)'s are included
 among the polynomials above. Let C be a q-ary [n,k] linear code such that its
-dual is written as an affine variety code of the form C^perpend=C(I,L). 
-Let r=c+e as usual and t<= e. Then the syndromes are computed by 
+dual is written as an affine variety code of the form C^perpend=C(I,L).
+Let r=c+e as usual and t<= e. Then the syndromes are computed by
 s_i=sum_(j=1)^n r_j f_i(P_j)=sum_(j=1)^n e_j f_i(P_j),  i=1,@dots{},n-k.
 @end ifinfo
 
 @tex
   Consider the ring $F_q[X_{11},\dots,X_{1s},\ldots,X_{t1},\dots,X_{ts},E_1,\dots,E_t]$, where $(X_{i1},\dots,X_{is})$ correspond to
   the $i$-th error position and $E_i$ to the $i$-th error value. Consider the ideal $Id_C$ generated by
-  $$  
+  $$
   \sum_{j=1}^tE_jf_i(X_{j1},\dots,X_{js})-s_i, 1\le i\le n-k,
   $$
   $$
   g_l(X_{j1},\dots,X_{js}), 1\le l\le m,
   $$
   $$
-  E_k^{q-1}-1.  
+  E_k^{q-1}-1.
   $$
 @end tex
 @ifinfo
-Consider the ring F_q[X_(11),@dots{},X_(1s),@dots{},X_(t1),@dots{},X_(ts),E_1,@dots{},E_t], where 
+Consider the ring F_q[X_(11),@dots{},X_(1s),@dots{},X_(t1),@dots{},X_(ts),E_1,@dots{},E_t], where
 (X_(i1),@dots{},X_(is)) correspond to
-the i-th error position and E_i to the i-th error value. 
+the i-th error position and E_i to the i-th error value.
 Consider the ideal Id_C generated by
 @display
- sum_(j=1)^t E_j f_i(X_(j1),@dots{},X_(js))-s_i, 1<= i<= n-k,  
+ sum_(j=1)^t E_j f_i(X_(j1),@dots{},X_(js))-s_i, 1<= i<= n-k,
  g_l(X_(j1),@dots{},X_(js)), 1<= l<= m,
- E_k^(q-1)-1.    
+ E_k^(q-1)-1.
 @end display
 @end ifinfo
 
@@ -613,12 +613,12 @@ Consider the ideal Id_C generated by
 @table @code
 @item @strong{Theorem:}
 @tex
-  Let $G$ be the reduced Gr\"obner basis for $Id_C$ with respect to an elimination order w.r.t $X_{11},\dots,X_{1s},E_1$, such that   
+  Let $G$ be the reduced Gr\"obner basis for $Id_C$ with respect to an elimination order w.r.t $X_{11},\dots,X_{1s},E_1$, such that
   $X_{11}<\dots<X_{1s}<E_1$. Then we may solve for the error locations and values by applying elimination theory to the polynomials in $G$.
 @end tex
 @ifinfo
   Let G be the reduced Groebner basis for Id_C with respect to an elimination order induced by
-  X_(11),@dots{},X_(1s),E_1, such that X_(11)<@dots{}<X_(1s)<E_1. 
+  X_(11),@dots{},X_(1s),E_1, such that X_(11)<@dots{}<X_(1s)<E_1.
   Then we may solve for the error locations and values by applying elimination theory to the polynomials in G.
 @end ifinfo
 @end table
@@ -627,7 +627,7 @@ For an example see example to @code{sysFL} in @ref{decodegb_lib}. More on this m
 
 
 @c ---------------------------------------------------------------------------
-@node Decoding method based on quadratic equations, References for decoding with GB, Fitzgerald-Lax method, Decoding codes with GB 
+@node Decoding method based on quadratic equations, References for decoding with GB, Fitzgerald-Lax method, Decoding codes with GB
 @subsection Decoding method based on quadratic equations
 @cindex Decoding method based on quadratic equations
 
@@ -640,14 +640,14 @@ For an example see example to @code{sysFL} in @ref{decodegb_lib}. More on this m
   is the column vector ${\bf u}(B,{\bf e})=B{\bf e}^T$ with entries $u_i(B,{\bf e})={\bf b}_i\cdot {\bf e}$ for $i=1,\dots,n$.
 
   For two vectors ${\bf x,y} \in F_q^n$ define
-  ${\bf x*y}=(x_1y_1,\dots,x_ny_n)$. Then ${\bf b}_i*{\bf b_j}$ is a linear combination of 
+  ${\bf x*y}=(x_1y_1,\dots,x_ny_n)$. Then ${\bf b}_i*{\bf b_j}$ is a linear combination of
   ${\bf b}_1,\dots,{\bf b}_n$, so there are constants $\mu^{ij}_l\in F_q $ such that
   ${\bf b}_i*{\bf b}_j = \sum_{l=1}^n \mu^{ij}_l{\bf b}_l.$
   The elements $\mu^{ij}_l\in F_q$ are the {\bf structure constants} of the basis ${\bf b}_1,\dots,{\bf b}_n$.
 
   Let $B_s$ be the $s \times n$ matrix with ${\bf b}_1,\dots,{\bf b}_s$ as rows ($B=B_n$).
   Then ${\bf b}_1,\dots,{\bf b}_n$ is an {\bf ordered MDS basis} and $B$ an {\bf MDS matrix} if all
-  the $s\times s$ submatrices of $B_s$ have rank $s$ for all $s=1 ,\dots ,n$. 
+  the $s\times s$ submatrices of $B_s$ have rank $s$ for all $s=1 ,\dots ,n$.
 @end tex
 @ifinfo
 Let b_1, @dots{} ,b_n be a basis of F_q^n and let B be the n x n matrix with
@@ -655,16 +655,16 @@ b_1, @dots{} ,b_n as rows. The @strong{unknown syndrome} u(B,e) of a word e w.r.
 is the column vector u(B,e)=Be^T with entries u_i(B,e)=b_i·e for i=1,@dots{},n.
 
 For two vectors x,y in F_q^n define
-x*y=(x_1 y_1,@dots{},x_n y_n). Then b_i*b_j is a linear combination of 
+x*y=(x_1 y_1,@dots{},x_n y_n). Then b_i*b_j is a linear combination of
 b_1,@dots{},b_n, so there are constants mu^(ij)_l in F_q such that
 b_i*b_j = sum_(l=1)^n mu^(ij)_l b_l.
 The elements mu^(ij)_l in F_q are the @strong{structure constants} of the basis b_1,@dots{},b_n.
 
 Let B_s be the s x n matrix with b_1,@dots{},b_s as rows (B=B_n).
 Then b_1,@dots{},b_n is an @strong{ordered MDS basis} and B an @strong{MDS matrix} if all
-the s x s submatrices of B_s have rank s for all s=1,@dots{},n. 
+the s x s submatrices of B_s have rank s for all s=1,@dots{},n.
 @end ifinfo
-  
+
 @subsubheading Expressing known syndromes
 @tex
   Let $C$ be an $F_q$-linear code with parameters $[n,k,d]$. W.l.o.g $n\le q$. $H$ is a check matrix of $C$.
@@ -684,7 +684,7 @@ the s x s submatrices of B_s have rank s for all s=1,@dots{},n.
   since ${\bf h}_i = \sum _{j=1}^n a_{ij}{\bf b}_j$ and ${\bf b}_j \cdot {\bf e}=u_j({\bf e})$.
 @end tex
 @ifinfo
-Let C be an F_q-linear code with parameters [n,k,d]. W.l.o.g n<= q. 
+Let C be an F_q-linear code with parameters [n,k,d]. W.l.o.g n<= q.
 H is a check matrix of C.
 Let h_1,@dots{},h_(n-k) be the rows of H.
 One can express h_i = sum_(j=1)^n a_(ij)b_j for some a_(ij) in F_q.
@@ -694,7 +694,7 @@ The syndromes of r and e w.r.t H are equal and known:
 @display
   s_i(r):=h_i·r=h_i·e=s_i(e).
 @end display
-They can be expressed in the unknown syndromes of e w.r.t B: 
+They can be expressed in the unknown syndromes of e w.r.t B:
 @display
   s_i(r)=s_i(e) =sum_(j=1)^n a_(ij)u_j(e)
 @end display
@@ -714,9 +714,9 @@ since h_i=sum_(j=1)^n a_(ij)b_j and b_j·e=u_j(e).
      \sum_{l=1}^n a_{jl}U_l-s_j({\bf r})  \hbox{ for }   j=1,\dots,n-k.
   $$
   The ideal $I(t,U,V)$ in $F_q[U_1,\dots,U_n,V_1,\dots,V_t]$
-  is generated by 
-  $$  
-    \sum_{j=1}^t U_{ij}V_j-U_{i,t+1} \hbox{ for } i=1,\dots,n  
+  is generated by
+  $$
+    \sum_{j=1}^t U_{ij}V_j-U_{i,t+1} \hbox{ for } i=1,\dots,n
   $$
   Let $J(t,{\bf r})$ be the ideal in $F_q[U_1,\dots,U_n,V_1,\dots,V_t]$
   generated by $J({\bf r})$ and $I(t,U,V)$.
@@ -726,13 +726,13 @@ Let B be an MDS matrix with structure constants mu^(ij)_l.
 Define U_(ij) in the variables U_1,@dots{},U_n by
 @display
   U_(ij)=sum_(l=1)^n mu^(ij)_l U_l.
-@end display  
+@end display
 The ideal J(r) in F_q [U_1,@dots{},U_n] is generated by
 @display
   sum_(l=1)^n a_(jl) U_l-s_j(r),j=1,@dots{},n-k
 @end display
 The ideal I(t,U,V) in F_q[U_1,@dots{},U_n,V_1,@dots{},V_t]
-is generated by 
+is generated by
 @display
   sum_(j=1)^t U_(ij) V_j-U_(i,t+1), i=1,@dots{},n.
 @end display
@@ -747,10 +747,10 @@ generated by J(r) and I(t,U,V).
   Let ${\bf r}={\bf c}+{\bf e}$ be a received word with ${\bf c} \in C$ the codeword sent
   and ${\bf e}$ the error vector. Suppose that  $wt({\bf e})\ne 0$ and $wt({\bf e})\le\lfloor (d(C)-1)/2\rfloor$.
   Let $t$ be the smallest positive integer such that $J(t,{\bf r})$ has a solution $({\bf u,v})$ over the algebraic closure of
-  $F_q$. Then   
+  $F_q$. Then
 @end tex
 @ifinfo
-Let B be an MDS matrix with structure constants mu^(ij)_l. 
+Let B be an MDS matrix with structure constants mu^(ij)_l.
 Let H be a check matrix of the code C such that H=AB as above.
 Let r=c+e be a received word with c in C the codeword sent
 and e the error vector. Suppose that wt(e)<>0 and wt(e)<=(d(C)-1)/2.
@@ -759,14 +759,14 @@ algebraic closure of F_q. Then
 @end ifinfo
 @c table @asis
 @itemize @bullet
-@item 
-@tex 
+@item
+@tex
   $wt({\bf e})=t$ and the solution is unique and of multiplicity one satisfying ${\bf u}={\bf u}({\bf e})$.
 @end tex
 @ifinfo
   wt(e)=t and the solution is unique and of multiplicity one satisfying u=u(e).
 @end ifinfo
-@item 
+@item
 @tex
   the reduced Gr\"{o}bner basis $G$ for the ideal $J(t,{\bf r})$ w.r.t any
   monomial ordering is
@@ -774,7 +774,7 @@ algebraic closure of F_q. Then
   U_i-u_i({\bf e}), i=1,\dots,n,
   $$
   $$
-  V_j-v_j, j=1,\dots,t,  
+  V_j-v_j, j=1,\dots,t,
   $$
   where $({\bf u}({\bf e}),{\bf v})$ is the unique solution.
 @end tex
@@ -782,7 +782,7 @@ algebraic closure of F_q. Then
   the reduced Groebner basis G for the ideal J(t,r) w.r.t any monomial ordering is
   @display
   U_i-u_i(e), i=1,@dots{},n,
-  V_j-v_j, j=1,@dots{},t,  
+  V_j-v_j, j=1,@dots{},t,
 <<<<<<< decodegb.doc
   @end display
   where (u(e),v) is the unique solution.
