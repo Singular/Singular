@@ -195,9 +195,7 @@ CYGWIN_SINGULAR_DOC   = /usr/share/doc/${CYGWIN_SINGULAR_DIR}-${CYGWIN_SING_VER}
 
 
 BINDIST_DIRS        = kernel Singular doc IntegerProgramming modules
-PLU_BINDIST_DIRS    = ${BINDIST_DIRS}
 SHAREDIST_DIRS      = Singular doc emacs
-PLU_SHAREDIST_DIRS  = ${SHAREDIST_DIRS}
 TMPDIR		    = ${TMP_DIR}/singdist
 
 LN_S		= @LN_S@

@@ -586,10 +586,6 @@ install-bindist: $(HEADERS) $(SOURCES) Makefile depend
 	${INSTALL_PROGRAM} surfex ${install_bindir}
 	echo "#undef MAKE_DISTRIBUTION " > distrib.h
 
-install-bindist-plural: install-bindist
-
-install-sharedist-plural: install-sharedist
-
 install-sharedist: ${SLIBS_FILES} LIB/gftables
 	${MKINSTALLDIRS} ${install_slibdir}
 	cp ${SLIBS_FILES} ${install_slibdir}

@@ -318,10 +318,6 @@ else
 	-${INSTALL_PROGRAM} ${DL_LIBS} ${bindir}
 endif
 
-# compatibility
-
-install-bindist-plural: install-bindist
-
 ##
 ## clean targest
 ##
