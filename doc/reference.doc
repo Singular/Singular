@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.318 2008-12-18 13:34:06 seelisch Exp $
+@comment $Id: reference.doc,v 1.319 2008-12-19 09:54:53 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -7464,7 +7464,7 @@ See
 @ref{LIB};
 @ref{exportto};
 @ref{importfrom};
-@ref{dynamic module}.
+@ref{Dynamic modules}.
 @c ref
 @c ---------------------------------------
 @node quit, return, load, Control structures
