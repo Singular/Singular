@@ -1,44 +1,61 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: jacobson.lib,v 1.5 2008-12-09 16:50:21 levandov Exp $";
+version="$Id: jacobson.lib,v 1.6 2008-12-22 21:45:09 levandov Exp $";
 category="System and Control Theory";
 info="
 LIBRARY: jacobson.lib     Algorithms for Smith and Jacobson Normal Form
 AUTHOR: Kristina Schindelar,     Kristina.Schindelar@math.rwth-aachen.de
 
 THEORY: We work over a ring R, that is a principal ideal domain. 
-@*  If R is commutative, we suppose R to be a polynomial ring in one variable.
-@*  If R is non-commutative, we suppose R to be in two variables, say x and d. We treat
-@* then the Ore localization of R with respect to the mult.closed set S = K[x] without 0.
-@*  Given a rectangular matrix M over R, one can compute unimodular matrices U, V 
-@*  such that U*M*V=D is a diagonal matrix. 
-@*  Depending on the ring, the diagonal entries of D have certain properties.
+@*   If R is commutative, we suppose R to be a polynomial ring in one variable.
+@* If R is non-commutative, we suppose R to be in two variables, say x and d. 
+@* We treat then the basering as principal ideal ring with d a polynomial
+@* variable and x an invertible one. That is, we work in the Ore localization of R 
+@* with respect to the mult. closed set S = K[x] without 0. 
+@* Note, that in computations no division by x will actually happen.
+@*   Given a rectangular matrix M over R, one can compute unimodular (that is invertible) 
+@* square matrices U and V, such that U*M*V=D is a diagonal matrix. 
+@*   Depending on the ring, the diagonal entries of D have certain properties.
+
+REFERENCES: 
+@* N. Jacobson, 'The theory of rings', AMS, 1943.
+@* Manuel Avelino Insua Hermo, 'Varias perspectives sobre las bases de Groebner: Forma normal de Smith, Algorithme de Berlekamp y algebras de Leibniz'. PhD thesis, Universidad de Santiago de Compostela, 2005.
+
 
 PROCEDURES:
-smith(R,M[,eng1,eng2]);  compute the Smith Normal Form of M over commutative ring
-jacobson(R,M[,eng]);     compute a weak Jacobson Normal Form of M over non-commutative ring, i.e. a diagonal matrix
+smith(M[,eng1,eng2]);  compute the Smith Normal Form of M over commutative ring
+jacobson(M[,eng]);       compute a weak Jacobson Normal Form of M over non-commutative ring
 
 SEE ALSO: control_lib
 ";
+
   LIB "poly.lib";
   LIB "involut.lib";
 
-proc smith(R, matrix MA, list #)
-"USAGE:  smith(R, M[, eng1, eng2]);  R ring, M matrix, eng1 and eng2 are optional int
-RETURN: list 
-NOTE: By default, the diagonal matrix, the Smith normal form, is returned. 
-@* R stays for the ring, where computations will take place.
-@* If optional integer eng1 is nonzero, smith returns 
-@* a list of matrices L such that L[1]*M*L[3]=L[2] with L[2]_11|L[2]_22|...|L[2]_nn and 
-@* L[1], L[3] unimodular matrices.
-@* eng2 determines the engine, that computes the Groebner basis. By default eng2 equals zero.
-@* If optional integer eng2 = 0 than std is used to caculate a Groebner basis , 
-@* If eng2 = 1 than groebner is used to caculate a Groebner basis 
-@* If eng2 = 2 than slimgb is used to caculate a Groebner basis 
-@* If @code{printlevel}=1, progress debug messages will be printed,
+proc smith(matrix MA, list #)
+"USAGE: smith(M[, eng1, eng2]);  M matrix, eng1 and eng2 are optional integers
+RETURN: matrix or list
+ASSUME: The current ring is assumed to be the commutative polynomial ring in 
+        one variable
+PURPOSE: compute the Smith Normal Form of M with transformation matrices (optionally)
+NOTE: If the optional integer eng1 is non-zero, returns the list {U,D,V}, 
+where U*M*V = D and the diagonal field entries of D are not normalized.
+@*    Otherwise only the matrix D, that is the Smith Normal Form of M, is returned.
+@*    Here, U and V are square unimodular (invertible) matrices. The procedure works for rectangular matrix M.
+@* The optional integer eng2 determines the engine, that computes the Groebner basis:
+@* 0 means 'std' (default), 1 means 'groebner' and 2 means 'slimgb'.
+DISPLAY: If @code{printlevel}=1, progress debug messages will be printed,
 @* if @code{printlevel}>=2, all the debug messages will be printed.
 EXAMPLE: example smith; shows examples
 "
 { 
+  def R = basering;
+  // check assume: R must be a polynomial ring in 1 variable
+  setring R;
+  if (nvars(R) >1 )
+  {
+    ERROR("Basering must have exactly one variable");
+  }
+
   int eng = 0;
   int BASIS;
   if ( size(#)>0 )
@@ -101,9 +118,9 @@ example
 { "EXAMPLE:"; echo = 2;
   ring r = 0,x,Dp;
   matrix m[3][2]=x, x^4+x^2+21, x^4+x^2+x, x^3+x, 4*x^2+x, x;
-  list s=smith(r,m,1);
-  print(s[2]);
-  print(s[1]*m*s[3]);
+  list s=smith(m,1);
+  print(s[2]);  // Smith form of m
+  print(s[1]*m*s[3] - s[2]); // check U*M*V = D
 }
 
 static proc diagonal_with_trafo( R, matrix MA, int B)
@@ -553,21 +570,40 @@ static proc engine(module I, int i)
   return(J);
 }
 
-proc jacobson(R, matrix MA, list #)
- "USAGE:  jacobson(R, matrix MA, eng);  R ring, M matrix, eng an optional int
+proc jacobson(matrix MA, list #)
+ "USAGE:  jacobson(M, eng);  M matrix, eng an optional int
 RETURN: list 
-NOTE: A list of matrices L such that L[1]*M*L[3]=L[2] such that L[2] is a diagonal matrix and 
-@* L[1], L[3] unimodular matrices.
-@* R stays for the ring, where computations will take place.
-@* eng determines the engine, that computes the Groebner basis. By default eng equals zero.
-@* If eng = 0 than std is used to caculate a Groebner basis
-@* If eng = 1 than groebner is used to caculate a Groebner basis 
-@* If eng = 2 than slimgb is used to caculate a Groebner basis 
-@* If @code{printlevel}=1, progress debug messages will be printed,
+ASSUME: Basering is a noncommutative ring in two variables.
+PURPOSE: compute a weak Jacobson Normal Form of M over a noncommutative ring
+NOTE: A list L of matrices {U,D,V} is returned. That is L[1]*M*L[3]=L[2], where
+@*      L[2] is a diagonal matrix and L[1], L[3] square invertible (unimodular) matrices.
+@*      Note, that M can be rectangular.
+@* The optional integer @code{eng} determines the engine, that computes the Groebner basis:
+@* 0 means 'std' (default), 1 means 'groebner' and 2 means 'slimgb'.
+DISPLAY: If @code{printlevel}=1, progress debug messages will be printed,
 @* if @code{printlevel}>=2, all the debug messages will be printed.
 EXAMPLE: example jacobson; shows examples
 "
 { 
+  def R = basering;
+  // check assume: R must be a polynomial ring in 2 variables
+  setring R;
+  if ( (nvars(R) !=2 ) )
+  {
+    ERROR("Basering must have exactly two variables");
+  }
+
+  // check if MA is zero matrix and return corr. U,V
+  if ( (size(module(MA))==0) and (size(transpose(module(MA)))==0) )
+  {
+    int nr = nrows(MA);
+    int nc = ncols(MA);
+    matrix U = matrix(freemodule(nr));
+    matrix V = matrix(freemodule(nc));
+    list L; L[1]=U; L[2] = MA; L[3] = V;
+    return(L);
+  }
+
   int B=0;
   if ( size(#)>0 )
   {
@@ -614,17 +650,22 @@ list RUECK=CON*TL, CON*MAA, TR;
 return(RUECK);
 }
 example
-{ "EXAMPLE:"; echo = 2;
+{ 
+  "EXAMPLE:"; echo = 2;
   ring r = 0,(x,d),Dp;
-  def R=nc_algebra(1,1); // the Weyl algebra
-  setring R;
-  matrix m[2][2]=d,x,0,d; print(m);
-  list J=jacobson(R,m); // returns a list with 3 entries
-  print(J[2]); // a Jacobson Form D
-  print(J[1]*m*J[3]); // check that U*M*V = D
+  def R = nc_algebra(1,1);   setring R; // the 1st Weyl algebra
+  matrix m[2][2] = d,x,0,d; print(m);
+  list J = jacobson(m); // returns a list with 3 entries
+  print(J[2]); // a Jacobson Form D for m
+  print(J[1]*m*J[3] - J[2]); // check that U*M*V = D
+  /*   now, let us do the same for the shift algebra  */
+  ring r2 = 0,(x,s),Dp;
+  def R2 = nc_algebra(1,s);   setring R2; // the 1st shift algebra
+  matrix m[2][2] = s,x,0,s; print(m); // matrix of the same for as above
+  list J = jacobson(m); 
+  print(J[2]); // a Jacobson Form D, quite different from above
+  print(J[1]*m*J[3] - J[2]); // check that U*M*V = D
 }
-
-
 
 static proc triangle( matrix MA, int B)
 {
@@ -843,74 +884,74 @@ return(TL);
 
 /////interesting examples for smith////////////////
 
-static proc Ex_One_wheeled_bicycle()
+/*
+
+//static proc Ex_One_wheeled_bicycle()
 { 
 ring RA=(0,m), D, lp;
 matrix bicycle[2][3]=(1+m)*D^2, D^2, 1, D^2, D^2-1, 0;
-list s=smith(RA,bicycle, 1,0);
+list s=smith(bicycle, 1,0);
 print(s[2]);
 print(s[1]*bicycle*s[3]-s[2]);
 }
 
 
-static proc Ex_RLC-circuit() 
+//static proc Ex_RLC-circuit() 
 {
 ring RA=(0,m,R1,R2,L,C), D, lp;
 matrix  circuit[2][3]=D+1/(R1*C), 0, -1/(R1*C), 0, D+R2/L, -1/L;
-list s=smith(RA,circuit, 1,0);
+list s=smith(circuit, 1,0);
 print(s[2]);
 print(s[1]*circuit*s[3]-s[2]);
 }
 
 
-static proc Ex_two_pendula()
+//static proc Ex_two_pendula()
 {
 ring RA=(0,m,M,L1,L2,m1,m2,g), D, lp;
-
 matrix pendula[3][4]=m1*L1*D^2,m2*L2*D^2,(M+m1+m2)*D^2,-1,m1*L1^2*D^2-m1*L1*g,0,m1*L1*D^2,0,0,
 m2*L2^2*D^2-m2*L2*g,m2*L2*D^2,0;
-list s=smith(RA,pendula, 1,0);
+list s=smith(pendula, 1,0);
 print(s[2]);
 print(s[1]*pendula*s[3]-s[2]);
 }
 
-
-
-static proc Ex_linerized_satellite_in_a_circular_equatorial_orbit()
+//static proc Ex_linerized_satellite_in_a_circular_equatorial_orbit()
 {
 ring RA=(0,m,omega,r,a,b), D, lp;
-
 matrix satellite[4][6]=
 D,-1,0,0,0,0,
 -3*omega^2,D,0,-2*omega*r,-a/m,0,
 0,0,D,-1,0,0,
 0,2*omega/r,0,D,0,-b/(m*r);
-
-list s=smith(RA,satellite, 1,0);
+list s=smith(satellite, 1,0);
 print(s[2]);
 print(s[1]*satellite*s[3]-s[2]);
 }
 
-static proc Ex_flexible_one_link_robot()
+//static proc Ex_flexible_one_link_robot()
 {
 ring RA=(0,M11,M12,M13,M21,M22,M31,M33,K1,K2), D, lp;
-
 matrix robot[3][4]=M11*D^2,M12*D^2,M13*D^2,-1,M21*D^2,M22*D^2+K1,0,0,M31*D^2,0,M33*D^2+K2,0;
-list s=smith(RA,robot, 1,0);
+list s=smith(robot, 1,0);
 print(s[2]);
 print(s[1]*robot*s[3]-s[2]);
 }
 
+*/
 
 
 /////interesting examples for jacobson////////////////
 
-static proc Ex_compare_output_with_maple_package_JanetOre()  
-{   ring w = 0,(x,d),Dp;
+/*
+
+//static proc Ex_compare_output_with_maple_package_JanetOre()  
+{  
+    ring w = 0,(x,d),Dp;
     def W=nc_algebra(1,1);
     setring W;
     matrix m[3][3]=[d2,d+1,0],[d+1,0,d3-x2*d],[2d+1, d3+d2, d2]; 
-    list J=jacobson(W,m,0);
+    list J=jacobson(m,0);
     print(J[1]*m*J[3]); 
     print(J[2]);
     print(J[1]);
@@ -918,13 +959,27 @@ static proc Ex_compare_output_with_maple_package_JanetOre()
     print(J[1]*m*J[3]-J[2]);
 }
 
+// modification for shift algebra
+{
+    ring w = 0,(x,s),Dp;
+    def W=nc_algebra(1,s);
+    setring W;
+    matrix m[3][3]=[s^2,s+1,0],[s+1,0,s^3-x^2*s],[2*s+1, s^3+s^2, s^2]; 
+    list J=jacobson(m,0);
+    print(J[1]*m*J[3]); 
+    print(J[2]);
+    print(J[1]);
+    print(J[3]);
+    print(J[1]*m*J[3]-J[2]);
+}
 
-static proc Ex_cyclic()
-{   ring w = 0,(x,d),Dp;
+//static proc Ex_cyclic()
+{   
+    ring w = 0,(x,d),Dp;
     def W=nc_algebra(1,1);
     setring W;
     matrix m[3][3]=d,0,0,x*d+1,d,0,0,x*d,d;
-    list J=jacobson(W,m,0);
+    list J=jacobson(m,0);
     print(J[1]*m*J[3]); 
     print(J[2]);
     print(J[1]);
@@ -932,3 +987,47 @@ static proc Ex_cyclic()
     print(J[1]*m*J[3]-J[2]);
 }
 
+// modification for shift algebra: gives a module with ann = s^2
+{
+    ring w = 0,(x,s),Dp;
+    def W=nc_algebra(1,s);
+    setring W;
+    matrix m[3][3]=s,0,0,x*s+1,s,0,0,x*s,s;
+    list J=jacobson(m,0);
+    print(J[1]*m*J[3]); 
+    print(J[2]);
+    print(J[1]);
+    print(J[3]);
+    print(J[1]*m*J[3]-J[2]);
+}
+
+// yet another modification for shift algebra: gives a module with ann = s
+// xs+1 is replaced by x*s+s
+{
+    ring w = 0,(x,s),Dp;
+    def W=nc_algebra(1,s);
+    setring W;
+    matrix m[3][3]=s,0,0,x*s+s,s,0,0,x*s,s;
+    list J=jacobson(m,0);
+    print(J[1]*m*J[3]); 
+    print(J[2]);
+    print(J[1]);
+    print(J[3]);
+    print(J[1]*m*J[3]-J[2]);
+}
+
+// variations for above setup with shift algebra:
+
+// easy but instructive one: see the difference to Weyl case!
+matrix m[2][2]=s,x,0,s; print(m);
+
+// more interesting:
+matrix n[3][3]=s,x,0,0,s,x,s,0,x;
+
+// things blow up
+matrix m[3][4] = s,x^2*s,x^3*s,s*x^2,s*x+1,(x+1)^3, (x+s)^2, x*s;
+
+// this one is quite nasty and time consuming
+matrix m[3][4] = s,x^2*s,x^3*s,s*x^2,s*x+1,(x+1)^3, (x+s)^2, x*s,x,x^2,x^3,s;
+
+*/
