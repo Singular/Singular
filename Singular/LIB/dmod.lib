@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.32 2008-12-09 16:50:21 levandov Exp $";
+version="$Id: dmod.lib,v 1.33 2008-12-23 21:39:31 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -26,15 +26,15 @@ THEORY: Given a polynomial ring R = K[x_1,...,x_n] and a polynomial F in R,
 @* We provide the following implementations:
 @* OT) the classical Ann F^s algorithm from Oaku and Takayama (J. Pure
         Applied Math., 1999),
-@* LOT) Levandovskyy's modification of the Oaku-Takayama algorithm (unpublished)
+@* LOT) Levandovskyy's modification of the Oaku-Takayama algorithm (ISSAC 2007)
 @* BM) the Ann F^s algorithm by Briancon and Maisonobe (Remarques sur
         l'ideal de Bernstein associe a des polynomes, preprint, 2002)
 
 GUIDE:
-@* - Ann F^s = I = I(F^s) = LD in D(R)[s] can be computed by SannfsBM SannfsOT, SannfsLOT
+@* - Ann F^s = I = I(F^s) = LD in D(R)[s] can be computed by SannfsBM, SannfsOT, SannfsLOT
 @* - Ann^(1) F^s in D(R)[s] can be computed by Sannfslog
 @* - global Bernstein polynomial bs resp. BS in K[s] can be computed by bernsteinBM
-@* - Ann F^s0 = I(F^s0) = LD0 in D(R) can be computed by annfs0, annfsBM, annfsOT, annfsLOT
+@* - Ann F^s0 = I(F^s0) = LD0 in D(R) can be computed by annfs0, annfsBM, annfsOT, annfsLOT, annfs2
 @* - all the relevant data (LD, LD0, bs, PS) are computed by operatorBM
 
 MAIN PROCEDURES:
@@ -48,20 +48,19 @@ operatorBM(F[,eng]);    compute Ann F^s, Ann F^s0, BS and PS for a poly F (algor
 annfsParamBM(F[,eng]);  compute the generic Ann F^s (algorithm by Briancon and Maisonobe) and exceptional parametric constellations for a poly F with parametric coefficients
 annfsBMI(F[,eng]);      compute Ann F^s and Bernstein ideal for a poly F=f1*..*fP (multivariate algorithm of Briancon-Maisonobe)
 checkRoot(F,a[,S,eng]); check if a given rational is a root of the global Bernstein polynomial of F and compute its multiplicity
-
-SECONDARY PROCEDURES FOR D-MODULES:
-
 annfsBM(F[,eng]);          compute Ann F^s0 in D and Bernstein poly for a poly F (algorithm of Briancon-Maisonobe)
 annfsLOT(F[,eng]);         compute Ann F^s0 in D and Bernstein poly for a poly F (Levandovskyy modification of the Oaku-Takayama algorithm)
 annfsOT(F[,eng]);          compute Ann F^s0 in D and Bernstein poly for a poly F (algorithm of Oaku-Takayama)
 SannfsBM(F[,eng]);         compute Ann F^s in D[s] for a poly F (algorithm of Briancon-Maisonobe)
-SannfsBFCT(F[,eng]);      compute Ann F^s in D[s] for a poly F (algorithm of Briancon-Maisonobe)
+SannfsBFCT(F[,eng]);      compute Ann F^s in D[s] for a poly F (algorithm of Briancon-Maisonobe, other output ordering)
 SannfsLOT(F[,eng]);        compute Ann F^s in D[s] for a poly F (Levandovskyy modification of the Oaku-Takayama algorithm)
 SannfsOT(F[,eng]);         compute Ann F^s in D[s] for a poly F (algorithm of Oaku-Takayama)
-annfs0(I,F [,eng]);           compute Ann F^s0 in D and Bernstein poly from the known Ann F^s in D[s]
+annfs0(I,F [,eng]);          compute Ann F^s0 in D and Bernstein poly from the known Ann F^s in D[s]
+annfs2(I,F [,eng]);           compute Ann F^s0 in D and Bernstein poly from the known Ann F^s in D[s] by using a trick of Noro
+annfsRB(I,F [,eng]);          compute Ann F^s0 in D and Bernstein poly from the known Ann F^s in D[s] by reduceB strategy of Macaulay
 checkRoot1(I,F,a[,eng]);   check whether a rational is a root of the global Bernstein polynomial of F from the known Ann F^s in D[s]
 checkRoot2(I,F,a[,eng]);   check whether a rational is a root of the global Bernstein polynomial of F and compute its multiplicity from the known Ann F^s in D[s]
-checkFactor(I,F,qs[,eng]); check whether a polynomial qs in K[s] is a factor of the global Bernstein polynomial of F from the known Ann F^s in D[s]
+checkFactor(I,F,q[,eng]); check whether a polynomial q in K[s] is a factor of the global Bernstein polynomial of F from the known Ann F^s in D[s]
 
 AUXILIARY PROCEDURES:
 
@@ -71,6 +70,7 @@ isHolonomic(M);     check whether a module is holonomic
 convloc(L);         replace global orderings with local in the ringlist L
 minIntRoot(P,fact); minimal integer root among the roots of a maximal ideal P
 varnum(s);          the number of the variable with the name s
+
 
 SEE ALSO: gmssing_lib, bfct_lib, dmodapp_lib
 ";
@@ -91,7 +91,6 @@ proc testdmodlib()
 
   "MAIN PROCEDURES:";
   example annfs;
-  example annfs0;
   example Sannfs;
   example Sannfslog;
   example bernsteinBM;
@@ -100,6 +99,10 @@ proc testdmodlib()
   example annfsParamBM;
   example annfsBMI;
   example checkRoot;
+  example annfs0;
+  example annfs2;
+  example annfsRB;
+  example annfs2;
   "SECONDARY D-MOD PROCEDURES:";
   example annfsBM;
   example annfsLOT;
@@ -107,6 +110,7 @@ proc testdmodlib()
   example SannfsBM;
   example SannfsLOT;
   example SannfsOT;
+  example SannfsBFCT;
   example checkRoot1;
   example checkRoot2;
   example checkFactor;
@@ -129,8 +133,8 @@ NOTE:    activate the output ring with the @code{setring} command.
 @*       In the output ring:
 @*       - the ideal LD (which is a Groebner basis) is the needed D-module structure,
 @*       - the list  BS is the list of roots and multiplicities of a Bernstein polynomial of f.
-@*       If @code{printlevel}=1, progress debug messages will be printed,
-@*       if @code{printlevel}>=2, all the debug messages will be printed.
+DISPLAY: If @code{printlevel}=1, progress debug messages will be printed,
+@*          if @code{printlevel}>=2, all the debug messages will be printed.
 EXAMPLE: example annfs; shows examples
 "
 {
@@ -251,8 +255,8 @@ NOTE:    activate the output ring with the @code{setring} command.
 @*       otherwise, and by default @code{slimgb} is used.
 @*       In the output ring:
 @*       - the ideal LD is the needed D-module structure.
-@*       If @code{printlevel}=1, progress debug messages will be printed,
-@*       if @code{printlevel}>=2, all the debug messages will be printed.
+DISPLAY: If @code{printlevel}=1, progress debug messages will be printed,
+@*          if @code{printlevel}>=2, all the debug messages will be printed.
 EXAMPLE: example Sannfs; shows examples
 "
 {
@@ -364,8 +368,8 @@ NOTE:    activate this ring with the @code{setring} command.
 @*       In the ring D[s], the ideal LD1 is generated by the elements in Ann F^s in D[s] coming from logarithmic derivations.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise, and by default @code{slimgb} is used.
-@*       If printlevel=1, progress debug messages will be printed,
-@*       if printlevel>=2, all the debug messages will be printed.
+DISPLAY: If @code{printlevel}=1, progress debug messages will be printed,
+@*          if @code{printlevel}>=2, all the debug messages will be printed.
 EXAMPLE: example Sannfslog; shows examples
 "
 {
@@ -505,7 +509,7 @@ example
 
 // alternative code for SannfsBM, renamed from annfsBM to ALTannfsBM
 // is superfluos - will not be included in the official documentation
-proc ALTannfsBM (poly F, list #)
+static proc ALTannfsBM (poly F, list #)
 "USAGE:  ALTannfsBM(f [,eng]);  f a poly, eng an optional int
 RETURN:  ring
 PURPOSE: compute the annihilator ideal of f^s in D[s], where D is the Weyl Algebra, according to the algorithm by Briancon and Maisonobe
@@ -513,8 +517,8 @@ NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the ideal LD is the annihilator of f^s.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise, and by default @code{slimgb} is used.
-@*       If printlevel=1, progress debug messages will be printed,
-@*       if printlevel>=2, all the debug messages will be printed.
+DISPLAY: If @code{printlevel}=1, progress debug messages will be printed,
+@*          if @code{printlevel}>=2, all the debug messages will be printed.
 EXAMPLE: example ALTannfsBM; shows examples
 "
 {
@@ -702,8 +706,8 @@ RETURN:  list of roots of the Bernstein polynomial b and its multiplicies
 PURPOSE: compute the global Bernstein-Sato polynomial for a hypersurface, defined by f, according to the algorithm by Briancon and Maisonobe
 NOTE:    If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise, and by default @code{slimgb} is used.
-@*       If printlevel=1, progress debug messages will be printed,
-@*       if printlevel>=2, all the debug messages will be printed.
+DISPLAY: If @code{printlevel}=1, progress debug messages will be printed,
+@*          if @code{printlevel}>=2, all the debug messages will be printed.
 EXAMPLE: example bernsteinBM; shows examples
 "
 {
@@ -932,8 +936,8 @@ NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the list BS is the list of roots and multiplicities of a Bernstein polynomial of f.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise, and by default @code{slimgb} is used.
-@*       If printlevel=1, progress debug messages will be printed,
-@*       if printlevel>=2, all the debug messages will be printed.
+DISPLAY: If @code{printlevel}=1, progress debug messages will be printed,
+@*          if @code{printlevel}>=2, all the debug messages will be printed.
 EXAMPLE: example annfsBM; shows examples
 "
 {
@@ -1216,21 +1220,21 @@ example
 }
 
 
-// try to replace s with -s-1 => data is shorter
+// replacing s with -s-1 => data is shorter
 // analogue of annfs0
 proc annfs2(ideal I, poly F, list #)
 "USAGE:  annfs2(I, F [,eng]);  I an ideal, F a poly, eng an optional int
 RETURN:  ring
 PURPOSE: compute the annihilator ideal of f^s in the Weyl Algebra, based on the
-output of procedures SannfsBM, SannfsOT or SannfsLOT
+output of Sannfs-like procedure
 NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the ideal LD (which is a Groebner basis) is the annihilator of f^s,
 @*       - the list BS contains the roots with multiplicities of a Bernstein polynomial of f.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise and by default @code{slimgb} is used.
-@*       Uses the shorter form of expressions in the variable s (the idea of Noro).
-@*       If printlevel=1, progress debug messages will be printed,
-@*       if printlevel>=2, all the debug messages will be printed.
+@*       annfs2 uses the shorter form of expressions in the variable s (the idea of Noro).
+DISPLAY: If @code{printlevel}=1, progress debug messages will be printed,
+@*       if @code{printlevel}>=2, all the debug messages will be printed.
 EXAMPLE: example annfs2; shows examples
 "
 {
@@ -1389,9 +1393,9 @@ NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the list BS contains the roots with multiplicities of a Bernstein polynomial of f.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise and by default @code{slimgb} is used.
-@*       Uses the shorter form of expressions in the variable s (the idea of Noro).
-@*       If printlevel=1, progress debug messages will be printed,
-@*       if printlevel>=2, all the debug messages will be printed.
+@*       This procedure follows the 'reduceB' strategy, used in Macaulay2.
+DISPLAY: If @code{printlevel}=1, progress debug messages will be printed,
+@*       if @code{printlevel}>=2, all the debug messages will be printed.
 EXAMPLE: example annfsRB; shows examples
 "
 {
@@ -1560,12 +1564,10 @@ example
   ring r = 0,(x,y,z),Dp;
   poly F = x^3+y^3+z^3;
   printlevel = 0;
-  def A = SannfsBM(F);
-  setring A;
-  LD;
+  def A = SannfsBM(F); setring A;
+  LD; // s-parametric ahhinilator
   poly F = imap(r,F);
-  def B  = annfsRB(LD,F);
-  setring B;
+  def B  = annfsRB(LD,F); setring B;
   LD;
   BS;
 }
@@ -1583,8 +1585,8 @@ NOTE:    activate this ring with the @code{setring} command. In this ring D[s]
 @*       - the polynomial PS is an operator in Dn[s] such that PS*f^(s+1) = bs*f^s.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise and by default @code{slimgb} is used.
-@*       If printlevel=1, progress debug messages will be printed,
-@*       if printlevel>=2, all the debug messages will be printed.
+DISPLAY: If @code{printlevel}=1, progress debug messages will be printed,
+@*       if @code{printlevel}>=2, all the debug messages will be printed.
 EXAMPLE: example operatorBM; shows examples
 "
 {
@@ -1888,112 +1890,80 @@ example
 // this does not happen automatically
 // for this, do special modulo with emphasis on the 2comp
 // of the transp matrix, there must appear 1 in the GB
+// then use lift to get the expression...
 // need: (c,<) ordering for such comp's
 
-// proc operatorModulo(poly F, ideal I, poly b)
-// "USAGE:  operatorModulo(f,I,b);  f a poly, I an ideal, b a poly
-// RETURN:  poly
-// PURPOSE: compute the B-operator from the poly F, ideal I = Ann f^s and Bernstein-Sato
-// polynomial b using modulo
-// NOTE:  The computations take place in the ring, similar to the one returned by Sannfs procedure.
-// @*       If printlevel=1, progress debug messages will be printed,
-// @*       if printlevel>=2, all the debug messages will be printed.
-// EXAMPLE: example operatorModulo; shows examples
-// "
-// {
-//   // with hom_kernel;
-//   matrix AA[1][2] = F,-b;
-//   //  matrix M = matrix(subst(I,s,s+1)*freemodule(2)); // ann f^{s+1}
-//   matrix N = matrix(I); // ann f^s
-//   //  matrix K = hom_kernel(AA,M,N);
-//   matrix K = modulo(AA,N);
-//   K = transpose(K);
-//   print(K);
-//   ideal J;
-//   int i;
-//   poly t; number n;
-//   for(i=1; i<=nrows(K); i++)
-//   {
-//     if (K[i,2]!=0)
-//     {
-//       if ( leadmonom(K[i,2]) == 1)
-//       {
-// 	t = K[i,1];
-// 	n = leadcoef(K[i,2]);
-// 	t = t/n;
-// 	//        J = J, K[i][2];
-// 	break;
-//       }
-//     }
-//   }
-//   ideal J = groebner(subst(I,s,s+1)); // for NF
-//   t = NF(t,J);
-//   "candidate:"; t;
-//   J = subst(J,s,s-1);
-//   // test:
-//   if ( NF(t*F-b,J) !=0)
-//   {
-//     "Problem: PS does not work on F";
-//   }
-//   return(t);
-// }
-// example
-// {
-//   "EXAMPLE:"; echo = 2;
-//   //  ring r = 0,(x,y,z),Dp;
-//   //   poly F = x^3+y^3+z^3;
-//   LIB "dmod.lib"; option(prot); option(mem);
-//   ring r = 0,(x,y),Dp;
-//   //  poly F = x^3+y^3+x*y^2;
-//   poly F = x^4 + y^4 + x*y^4;
-//   def A = Sannfs(F); // here we get LD = ann f^s
-//   setring A;
-//   poly F = imap(r,F);
-//   def B = annfs0(LD,F); // to obtain BS polynomial
-//   list BS = imap(B,BS);
-//   poly b = fl2poly(BS,"s");
-//   LD = groebner(LD);
-//   poly PS = operatorModulo(F,LD,b);
-//   PS; // the operator, s.t. PS*F^{s+1} = bs*F^s mod LD
-//   reduce(PS*F-bs,LD); // check the property of PS
-// }
-
-proc fl2poly(list L, string s)
-"USAGE:  fl2poly(L,s); L a list, s a string
+/*
+proc operatorModulo(poly F, ideal I, poly b)
+"USAGE:  operatorModulo(f,I,b);  f a poly, I an ideal, b a poly
 RETURN:  poly
-PURPOSE: reconstruct a monic polynomial in one variable from its factorization
-ASSUME:  s is a string with the name of some variable and L is supposed to consist of two entries:
-@*         L[1] of the type ideal with the roots of a polynomial
-@*         L[2] of the type intvec with the multiplicities of corr. roots
-EXAMPLE: example fl2poly; shows examples
+PURPOSE: compute the B-operator from the poly F, ideal I = Ann f^s and Bernstein-Sato
+polynomial b using modulo
+NOTE:  The computations take place in the ring, similar to the one returned by Sannfs procedure.
+@*       If printlevel=1, progress debug messages will be printed,
+@*       if printlevel>=2, all the debug messages will be printed.
+EXAMPLE: example operatorModulo; shows examples
 "
 {
-  if (varnum(s)==0)
+  // with hom_kernel;
+  matrix AA[1][2] = F,-b;
+  //  matrix M = matrix(subst(I,s,s+1)*freemodule(2)); // ann f^{s+1}
+  matrix N = matrix(I); // ann f^s
+  //  matrix K = hom_kernel(AA,M,N);
+  matrix K = modulo(AA,N);
+  K = transpose(K);
+  print(K);
+  ideal J;
+  int i;
+  poly t; number n;
+  for(i=1; i<=nrows(K); i++)
   {
-    ERROR("no such variable found"); return(0);
+    if (K[i,2]!=0)
+    {
+      if ( leadmonom(K[i,2]) == 1)
+      {
+	t = K[i,1];
+	n = leadcoef(K[i,2]);
+	t = t/n;
+	//        J = J, K[i][2];
+	break;
+      }
+    }
   }
-  poly x = var(varnum(s));
-  poly P = 1;
-  int sl = size(L[1]);
-  ideal RR = L[1];
-  intvec IV = L[2];
-  for(int i=1; i<= sl; i++)
+  ideal J = groebner(subst(I,s,s+1)); // for NF
+  t = NF(t,J);
+  "candidate:"; t;
+  J = subst(J,s,s-1);
+  // test:
+  if ( NF(t*F-b,J) !=0)
   {
-    P = P*((x-RR[i])^IV[i]);
+    "Problem: PS does not work on F";
   }
-  return(P);
+  return(t);
 }
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y,z,s),Dp;
-  ideal I = -1,-4/3,-5/3,-2;
-  intvec mI = 2,1,1,1;
-  list BS = I,mI;
-  poly p = fl2poly(BS,"s");
-  p;
-  factorize(p,2);
+  //  ring r = 0,(x,y,z),Dp;
+  //   poly F = x^3+y^3+z^3;
+  LIB "dmod.lib"; option(prot); option(mem);
+  ring r = 0,(x,y),Dp;
+  //  poly F = x^3+y^3+x*y^2;
+  poly F = x^4 + y^4 + x*y^4;
+  def A = Sannfs(F); // here we get LD = ann f^s
+  setring A;
+  poly F = imap(r,F);
+  def B = annfs0(LD,F); // to obtain BS polynomial
+  list BS = imap(B,BS);
+  poly b = fl2poly(BS,"s");
+  LD = groebner(LD);
+  poly PS = operatorModulo(F,LD,b);
+  PS; // the operator, s.t. PS*F^{s+1} = bs*F^s mod LD
+  reduce(PS*F-bs,LD); // check the property of PS
 }
+*/
+
+
 
 proc annfsParamBM (poly F, list #)
 "USAGE:  annfsParamBM(f [,eng]);  f a poly, eng an optional int
@@ -2004,8 +1974,8 @@ NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the ideal Param contains the list of the special parameters.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise, and by default @code{slimgb} is used.
-@*       If printlevel=1, progress debug messages will be printed,
-@*       if printlevel>=2, all the debug messages will be printed.
+DISPLAY: If @code{printlevel}=1, progress debug messages will be printed,
+@*          if @code{printlevel}>=2, all the debug messages will be printed.
 EXAMPLE: example annfsParamBM; shows examples
 "
 {
@@ -3444,7 +3414,7 @@ NOTE:    activate this ring with the @code{setring} command.
 @*       In the ring D[s], the ideal LD (which is NOT a Groebner basis) is the needed D-module structure,
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise, and by default @code{slimgb} is used.
-@*       If printlevel=1, progress debug messages will be printed,
+DISPLAY: If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example SannfsBFCT; shows examples
 "
@@ -3636,15 +3606,14 @@ example
   ring r = 0,(x,y,z,w),Dp;
   poly F = x^3+y^3+z^3*w;
   printlevel = 0;
-  def A = SannfsBFCT(F);
-  setring A;
+  def A = SannfsBFCT(F); setring A;
   intvec v = 1,2,3,4,5,6,7,8;
   // are there polynomials, depending on s only?
   nselect(LD,v);
   // a fancier example:
-  def R = reiffen(4,5);
-  setring R;
+  def R = reiffen(4,5); setring R;
   v = 1,2,3,4;
+  RC; // the Reiffen curve in 4,5
   def B = SannfsBFCT(RC);
   setring B;
   // are there polynomials, depending on s only?
@@ -3884,7 +3853,7 @@ example
   LD;
 }
 
-
+/*
 proc SannfsLOTold(poly F, list #)
 "USAGE:  SannfsLOT(f [,eng]);  f a poly, eng an optional int
 RETURN:  ring
@@ -4108,6 +4077,7 @@ example
   LD;
 }
 
+*/
 
 proc annfsLOT(poly F, list #)
 "USAGE:  annfsLOT(F [,eng]);  F a poly, eng an optional int
@@ -4157,7 +4127,7 @@ proc annfs0(ideal I, poly F, list #)
 "USAGE:  annfs0(I, F [,eng]);  I an ideal, F a poly, eng an optional int
 RETURN:  ring
 PURPOSE: compute the annihilator ideal of f^s in the Weyl Algebra, based on the
-output of procedures SannfsBM, SannfsOT or SannfsLOT
+output of Sannfs-like procedure
 NOTE:    activate this ring with the @code{setring} command. In this ring,
 @*       - the ideal LD (which is a Groebner basis) is the annihilator of f^s,
 @*       - the list BS contains the roots with multiplicities of a Bernstein polynomial of f.
@@ -4298,13 +4268,11 @@ example
   ring r = 0,(x,y,z),Dp;
   poly F = x^3+y^3+z^3;
   printlevel = 0;
-  def A = SannfsBM(F);
+  def A = SannfsBM(F);   setring A;
   // alternatively, one can use SannfsOT or SannfsLOT
-  setring A;
   LD;
   poly F = imap(r,F);
-  def B  = annfs0(LD,F);
-  setring B;
+  def B  = annfs0(LD,F);  setring B;
   LD;
   BS;
 }
@@ -4655,7 +4623,7 @@ NOTE:    We assume that the basering is D[s],
 @*          and the number n is rational.
 @*       We compute the real annihilator for any rational value of n (both generic and exceptional).
 @*       The implementation goes along the lines of Saito-Sturmfels-Takayama, Alg. 5.3.15
-@*       If printlevel=1, progress debug messages will be printed,
+DISPLAY: If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example annfspecial; shows examples
 "
@@ -4723,7 +4691,8 @@ example
   annfspecial(LD,F,-1,1);   // exceptional root
 }
 
-static proc new_ex_annfspecial()
+/*
+//static proc new_ex_annfspecial()
 {
   //another example for annfspecial: x3+y3+z3
   ring r = 0,(x,y,z),dp;
@@ -4739,6 +4708,7 @@ static proc new_ex_annfspecial()
   annfspecial(LD,F,-1,-2);  // integer but still generic root
   annfspecial(LD,F,-1,1);   // exceptional root
 }
+*/
 
 proc minIntRoot(ideal P, int fact)
 "USAGE:  minIntRoot(P, fact); P an ideal, fact an int
@@ -4816,6 +4786,7 @@ example
 proc isHolonomic(def M)
 "USAGE:  isHolonomic(M); M an ideal/module/matrix
 RETURN:  int, 1 if M is holonomic and 0 otherwise
+ASSUME: basering is a Weyl algebra
 PURPOSE: check the modules for the property of holonomy
 NOTE:    M is holonomic, if 2*dim(M) = dim(R), where R is a
 ground ring; dim stays for Gelfand-Kirillov dimension
@@ -4955,14 +4926,14 @@ NOTE:    The annihilator of f^s in D[s] is needed and it is computed according t
 @*       The value of a string S can be
 @*       'alg1' (default) - for the algorithm 1 of J. Martin-Morales (unpublished)
 @*       'alg2' - for the algorithm 2 of J. Martin-Morales (unpublished)
-@*       The output int is:
-@*       - if the algorithm 1 is chosen: 1 if -alpha is a root of the global Bernstein polynomial and 0 otherwise
-@*       - if the algorithm 2 is chosen: the multiplicity of -alpha as a root of the global Bernstein polynomial of f.
-@*                                       (If -alpha is not a root, the output is 0)
+@*       The output of type int is:
+@*       'alg1': 1 if -alpha is a root of the global Bernstein polynomial and 0 otherwise
+@*       'alg2':  the multiplicity of -alpha as a root of the global Bernstein polynomial of f.
+@*                (If -alpha is not a root, the output is 0)
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise (and by default) @code{slimgb} is used.
-@*       If printlevel=1, progress debug messages will be printed,
-@*       if printlevel>=2, all the debug messages will be printed.
+DISPLAY: If printlevel=1, progress debug messages will be printed,
+@*          if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example checkRoot; shows examples
 "
 {
@@ -5067,8 +5038,8 @@ RETURN:  int, 1 if -alpha is a root of the global Bernstein polynomial of f and 
 PURPOSE: check whether a rational is a root of the global Bernstein polynomial of f
 NOTE:    If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise (and by default) @code{slimgb} is used.
-@*       If printlevel=1, progress debug messages will be printed,
-@*       if printlevel>=2, all the debug messages will be printed.
+DISPLAY: If printlevel=1, progress debug messages will be printed,
+@*          if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example checkRoot1; shows examples
 "
 {
@@ -5191,8 +5162,8 @@ RETURN:  int, the multiplicity of -alpha as a root of the global Bernstein polyn
 PURPOSE: check whether a rational is a root of the global Bernstein polynomial of f and compute its multiplicity from the known Ann F^s in D[s]
 NOTE:    If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise (and by default) @code{slimgb} is used.
-@*       If printlevel=1, progress debug messages will be printed,
-@*       if printlevel>=2, all the debug messages will be printed.
+DISPLAY: If printlevel=1, progress debug messages will be printed,
+@*          if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example checkRoot2; shows examples
 "
 {
@@ -5323,8 +5294,8 @@ RETURN:  int, 1 if qs is a factor of the global Bernstein polynomial of f and 0 
 PURPOSE: check whether a rational is a root of the global Bernstein polynomial of f and compute its multiplicity from the known Ann F^s in D[s]
 NOTE:    If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise (and by default) @code{slimgb} is used.
-@*       If printlevel=1, progress debug messages will be printed,
-@*       if printlevel>=2, all the debug messages will be printed.
+DISPLAY: If printlevel=1, progress debug messages will be printed,
+@*          if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example checkFactor; shows examples
 "
 {
@@ -5460,8 +5431,11 @@ example
   M;
 }
 
+/// ****** EXAMPLES ************
 
-static proc exCheckGenericity()
+/*
+
+//static proc exCheckGenericity()
 {
   LIB "control.lib";
   ring r = (0,a,b,c),x,dp;
@@ -5483,7 +5457,7 @@ static proc exCheckGenericity()
   // Ann = x*Dx+3*t*Dt+(-a)*Dx+3
 }
 
-static proc exOT_17()
+//static proc exOT_17()
 {
   // Oaku-Takayama, p.208
   ring R = 0,(x,y),dp;
@@ -5498,7 +5472,7 @@ static proc exOT_17()
   //  poly F = x^3-y^2; // = x^7 - y^5; // x^3-y^4; // x^5 - y^4;
 }
 
-static proc exOT_16()
+//static proc exOT_16()
 {
   // Oaku-Takayama, p.208
   ring R = 0,(x),dp;
@@ -5512,7 +5486,7 @@ static proc exOT_16()
   gkdim(LD); // a holonomic check
 }
 
-static proc ex_bcheck()
+//static proc ex_bcheck()
 {
   ring R = 0,(x,y),dp;
   poly F = x*y*(x+y);
@@ -5525,7 +5499,7 @@ static proc ex_bcheck()
   LD;
 }
 
-static proc ex_bcheck2()
+//static proc ex_bcheck2()
 {
   ring R = 0,(x,y),dp;
   poly F = x*y*(x+y);
@@ -5535,7 +5509,7 @@ static proc ex_bcheck2()
   LD;
 }
 
-static proc ex_BMI()
+//static proc ex_BMI()
 {
   // a hard example
   ring r = 0,(x,y),Dp;
@@ -5548,7 +5522,7 @@ static proc ex_BMI()
   BS;
 }
 
-static proc ex2_BMI()
+//static proc ex2_BMI()
 {
   // this example was believed to be intractable in 2005 by Gago-Vargas, Castro and Ucha
   ring r = 0,(x,y),Dp;
@@ -5562,7 +5536,7 @@ static proc ex2_BMI()
   BS;
 }
 
-static proc ex_operatorBM()
+//static proc ex_operatorBM()
 {
   ring r = 0,(x,y,z,w),Dp;
   poly F = x^3+y^3+z^2*w;
@@ -5577,3 +5551,5 @@ static proc ex_operatorBM()
   PS; // the operator, s.t. PS*F^{s+1} = bs*F^s mod LD
   reduce(PS*F-bs,LD); // check the property of PS
 }
+
+*/
