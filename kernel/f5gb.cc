@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.cc,v 1.13 2008-11-27 17:17:32 ederc Exp $ */
+/* $Id: f5gb.cc,v 1.14 2008-12-26 13:49:29 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -22,129 +22,114 @@
 #include "pInline1.h"
 #include "f5gb.h"
 #include "lpolynomial.h"
-#include "lplist.h"
+#include "lists.h"
 
 
-
-/*2
-* sorting ideals by decreasing total degree 
-* "left" and "right" are the pointer of the first
-* and last polynomial in the considered ideal
+/*
+=======================
+static/global variables
+=======================
 */
-void qsort_degree(poly* left, poly* right)
-{
-        poly* ptr1 = left;
-        poly* ptr2 = right;
-        poly p1,p2;
-        p2 = *(left + (right - left >> 1));
-        do{
-                while(pTotaldegree(*ptr1, currRing) < pTotaldegree(p2, currRing)){
-                        ptr1++;
-                }
-                while(pTotaldegree(*ptr2, currRing) > pTotaldegree(p2,currRing)){
-                        ptr2--;
-                }
-                if(ptr1 > ptr2){
-                        break;
-                }
-                p1    = *ptr1;
-                *ptr1 = *ptr2;
-                *ptr2 = p1;
-        } while(++ptr1 <= --ptr2);
-
-        if(left < ptr2){
-                qsort_degree(left,ptr2);
-        }
-        if(ptr1 < right){
-                qsort_degree(ptr1,right);
-        }
-}
+static poly ONE = one_poly();
 
 
-/*2
-* computes incrementally gbs of subsets of the input 
-* gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}
-  
-LPoly *f5_inc(LPoly* lp, LPoly* g_prev)
-{
-        long length = 1;
-        
-        while(g_prev->getNext() != NULL) {
-                length++;
-                g_prev++; 
-        }
-        Print("Laenge der Liste: %d\n",length);
-        /*critpair *critpairs = new critpair[length];
-        * int i = 1;
-        *
-        * while(g_prev->getNext()->getNext() != NULL) {
-        *        critpairs[i] = {lp, g_prev, critpairs[i+1]};
-        *        i++;
-        *        g_prev++;
-        * } 
-        * *critpairs[length] = {lp, g_prev+length-1, NULL};
-        *
-        * return lp;
-        
-}    
-
+/*
+================================================
+computation of ONE polynomial as global variable
+================================================
 */
-// generating the list lp of ideal generators and test if 1 is in lp
-bool generate_input_list(LPoly* lp, ideal id, poly ONE)
-{
-        long j;
-        for(j=0; j<IDELEMS(id)-1; j++){
-
-                lp[j].setPoly(id->m[j]);
-                
-                if(pComparePolys(lp[j].getPoly(), ONE)){
-                        Print("1 in GB\n");
-                        return(1);
-                }
-                
-                lp[j].setIndex(j+1);
-                lp[j].setTerm(ONE);
-                lp[j].setDel(false);
-                lp[j].setNext(&lp[j+1]);
-                Print("Labeled Polynomial %ld: ",j+1);
-                Print("Label Term: ");
-                pWrite(lp[j].getTerm());
-                Print("Index: %ld\n", lp[j].getIndex());
-                Print("Delete? %d\n", lp[j].getDel());
-                pWrite(lp[j].getPoly());
-                Print("NEUNEUNEU\n\n");
-        }
-        return(0);
-}
-
-
-/*2
-* computes a gb of the ideal i in the ring r with our f5 
-* implementation 
-*/
-ideal F5main(ideal i, ring r) {
-
-    long j;
-    LPoly * lp = new LPoly;
-    // definition of one-polynomial as global constant ONE
+poly one_poly() {
     poly one = pInit();
-    pSetCoeff(one, nInit(1));
-    static const poly ONE = one;
+    pSetCoeff(one,nInit(1));
+    return one;
+}
+
+/*
+====================================================================
+sorting ideals by decreasing total degree "left" and "right" are the 
+pointer of the first and last polynomial in the considered ideal
+====================================================================
+*/
+void qsortDegree(poly* left, poly* right) {
+    poly* ptr1 = left;
+    poly* ptr2 = right;
+    poly p1,p2;
+    p2 = *(left + (right - left >> 1));
+    do {
+            while(pTotaldegree(*ptr1, currRing) < pTotaldegree(p2, currRing)) {
+                    ptr1++;
+            } 
+            while(pTotaldegree(*ptr2, currRing) > pTotaldegree(p2,currRing)) {
+                    ptr2--;
+            }
+            if(ptr1 > ptr2) {
+                    break;
+            }
+            p1    = *ptr1;
+            *ptr1 = *ptr2;
+            *ptr2 = p1;
+    } while(++ptr1 <= --ptr2);
+
+    if(left < ptr2) {
+            qsortDegree(left,ptr2);
+    }
+    if(ptr1 < right) {
+            qsortDegree(ptr1,right);
+    }
+}
+
+
+/*
+==================================================
+computes incrementally gbs of subsets of the input 
+gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}
+==================================================
+*/
+  
+LList* F5inc(long i, poly* f_i, LList* g_prev) {
+    LList* g_curr       =   g_prev;
+    LNode* prev_last    =   g_prev->getLast(); //tags the end of g_prev->only 1 list for g_prev & g_curr
+    g_curr->append(&ONE,&i,f_i);
+   
+    return g_curr;
+
+
+
+
+}
+
+/*
+==========================================================================
+MAIN:computes a gb of the ideal i in the ring r with our f5 implementation
+==========================================================================
+*/
+ideal F5main(ideal id, ring r) {
+    long i,j;
+    LPoly* lp = new LPoly;
+    // definition of one-polynomial as global constant ONE
+    //poly one = pInit();
+    //pSetCoeff(one, nInit(1));
+    //static poly ONE = one;
     
-    // 
-    for(j=0; j<IDELEMS(i); j++) {
-        if(NULL != i->m[j]) { 
-            if(pComparePolys(i->m[j],ONE)) {
+    for(j=0; j<IDELEMS(id); j++) {
+        if(NULL != id->m[j]) { 
+            if(pComparePolys(id->m[j],ONE)) {
                 Print("One Polynomial in Input => Computations stopped\n");
-                return(i);
+                ideal id_new = idInit(1,1);
+                id_new->m[0] = ONE;
+                return(id_new);
             }   
         }
     } 
     
-    i = kInterRed(i,0);  
-    qsort_degree(&i->m[0],&i->m[IDELEMS(i)-1]);
-    idShow(i);
-            
+    id = kInterRed(id,0);  
+    qsortDegree(&id->m[0],&id->m[IDELEMS(id)-1]);
+    idShow(id);
+    i = 1;
+    //lp->setIndex(&i);
+    //lp->setTerm(&ONE);
+    //lp->setPoly(&id->m[0]);
+    //lp->set(ONE,1,ONE);    
     /* if(generate_input_list(lp,iTmp,ONE)) {
             Print("One Polynomial in Input => Computations stopped");
             iTmp = idInit(1,0);
@@ -152,17 +137,32 @@ ideal F5main(ideal i, ring r) {
             return(iTmp);
     }
     */
-    Print("Es klappt!\nWIRKLICH!\n");
     // only for debugging
-    lp->get();
-    //return(i); 
-    LpList lp_list;
-    while(NULL != lp->getNext()) {
-        lp_list.insert(lp);
-        lp = lp->getNext();
+    long k = 1;
+    LList* g_prev = new LList(lp);
+    //LList* g_curr = new LList;
+    //LNode* current = new LNode;
+    g_prev->append(&ONE,&k,&id->m[2]);
+    i = g_prev->getLength();
+    Print("%ld\n\n",i); 
+    LPoly* current = g_prev->getFirst()->getLPoly();
+    if(pComparePolys(current->getPoly(), id->m[0])) {
+        Print("Yes!\n");
     }
-    lp_list.get();
-    return i;
+    //current = g_prev->getFirst();
+    //current++;
+    //Print("Term: %ld\n\n",current->get()->getTerm);
+    /*for(i=2; i<IDELEMS(id); i++) {
+        g_curr = F5inc(i,g_prev);
+        if(g_curr->poly_test(ONE)) {
+            Print("One Polynomial in Input => Computations stopped\n");
+            ideal id_new = idInit(1,1);
+            id_new->m[0] = ONE;
+            return(id_new);               
+        }
+    }
+    */        
+    return(id);
 
 
 }

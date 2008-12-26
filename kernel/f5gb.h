@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.12 2008-11-27 17:18:05 ederc Exp $ */
+/* $Id: f5gb.h,v 1.13 2008-12-26 13:49:57 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -10,25 +10,51 @@
 
 #ifdef HAVE_F5
 #include "lpolynomial.h"
-#include "lplist.h"
+#include "lists.h"
 
 
-// sort polynomials in ideal i by decreasing total degree
- void qsort_degree(poly* left, poly* right);
-
-
-// generating the list lp of ideal generators and 
-// test if 1 is in lp(return 1) or not(return 0)
- bool generate_input_list(LPoly* lp, ideal id, poly one);
-
-/* computes incrementally gbs of subsets of the input 
-   gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}  
+/*
+================================================
+computation of ONE polynomial as global variable
+================================================
 */
-// lpoly* f5_inc(lpoly* lp, lpoly* g_prev);
+poly one_poly();
 
 
-// main function of our f5 implementation
+/*
+======================================================
+sort polynomials in ideal i by decreasing total degree
+======================================================
+*/
+void qsort_degree(poly* left, poly* right);
+
+
+/*
+==============================================
+generating the list lp of ideal generators and 
+test if 1 is in lp(return 1) or not(return 0)
+==============================================
+*/
+void generate_input_list(LPoly* lp, ideal id, poly one);
+
+
+/*
+==================================================
+computes incrementally gbs of subsets of the input 
+gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}  
+==================================================
+*/
+LList* F5inc(const long i, LList* g_prev);
+
+
+/*
+======================================
+main function of our f5 implementation
+======================================
+*/
 ideal F5main(ideal i, ring r);
+
+
 #endif
 #endif
 
