@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lpolynomial.cc,v 1.2 2008-11-27 17:18:45 ederc Exp $ */
+/* $Id: lpolynomial.cc,v 1.3 2008-12-26 13:51:50 ederc Exp $ */
 /*
 * ABSTRACT: lpolynomial definition 
 */
@@ -23,23 +23,23 @@
 #include "pInline1.h"
 #include "f5gb.h"
 #include "lpolynomial.h"
-#include "lplist.h"
+#include "lists.h"
 /*
 ================================================================
 all functions working on the class LPoly for labeled polynomials
 ================================================================
 */
-void LPoly::setPoly(poly p) 
+void LPoly::setPoly(poly* p) 
 {
-    polynomial = p;
+    polynomial = *p;
 }
 
-void LPoly::setTerm(poly t) {
-    term = t;
+void LPoly::setTerm(poly* t) {
+    term = *t;
 }
 
-void LPoly::setIndex(long i) {
-    index = i;
+void LPoly::setIndex(long* i) {
+    index = *i;
 }
 
 
@@ -47,28 +47,26 @@ void LPoly::setDel(bool b) {
     del = b;
 }
 
-void LPoly::setNext(LPoly* l) {
-    next = l;
-}
-
-poly LPoly::getPoly() {
+poly LPoly::getPoly() const {
     return polynomial;
 }
 
-poly LPoly::getTerm() {
+poly LPoly::getTerm() const {
     return term;
 }
 
-long LPoly::getIndex() {
+long LPoly::getIndex() const {
     return index;
 }
 
-bool LPoly::getDel() {
+bool LPoly::getDel() const {
     return del;
 }
 
-LPoly* LPoly::getNext() {
-    return next;
+void LPoly::set(poly* t, long* i, poly* p) {
+    this->setTerm(t);
+    this->setIndex(i);
+    this->setPoly(p);
 }
 
 /*
@@ -76,7 +74,7 @@ LPoly* LPoly::getNext() {
 comparing two labeled polynomials by their signatures
 =====================================================
 */
-int LPoly::compare(const LPoly& lp) {
+int LPoly::compare(const LPoly& lp) const {
     if(index > lp.index) {
         return 1;
     }
@@ -86,9 +84,7 @@ int LPoly::compare(const LPoly& lp) {
     return 0;
 }
 
-void LPoly::get() {
-    Print("Label: ");
-    pWrite(getTerm());
-    Print("  %d\n",getIndex());
+LPoly* LPoly::get() {
+    return this;
 }
 #endif
