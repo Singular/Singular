@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: letterplace.doc,v 1.4 2008-12-18 13:36:31 Singular Exp $
+@comment $Id: letterplace.doc,v 1.5 2008-12-26 18:15:40 levandov Exp $
 @comment this file contains the mathematical background of Singular:Letterplace
 
 @c The following directives are necessary for proper compilation
@@ -18,8 +18,8 @@
 This section describes mathematical notions and definitions used in
 the experimental @sc{Letterplace} extension of @sc{Singular}.
 
-For further details, please, refer to the paper [LL] of R. La Scala and
-V. Levandovskyy, to appear in the Journal of Symbolic Computation.
+For further details, please, refer to the forthcoming paper [LL] of R. La Scala and
+V. Levandovskyy, submitted to the Journal of Symbolic Computation.
 
 All algebras are assumed to be associative @math{K}-algebras for some field @math{K}.
 
@@ -37,19 +37,19 @@ All algebras are assumed to be associative @math{K}-algebras for some field @mat
 @subsection Free associative algebras
 @cindex free associative algebra, tensor algebra
 
-Let V be a K-vector space, spanned by the symbols @math{x_1},@dots{},@math{x_n}.
-Free associative algebra in @math{x_1},@dots{},@math{x_n} over K, denoted by
-K< @math{x_1},@dots{},@math{x_n} > is also known as a tensor algebra T(V) of V.
-It is an infinite dimensional K-vector space, where as a basis one can take
+Let @math{V} be a @math{K}-vector space, spanned by the symbols @math{x_1},@dots{},@math{x_n}.
+Free associative algebra in @math{x_1},@dots{},@math{x_n} over @math{K}, denoted by
+@math{K}< @math{x_1},@dots{},@math{x_n} > is also known as a tensor algebra @math{T(V)} of @math{V}.
+It is an infinite dimensional @math{K}-vector space, where as a basis one can take
 the elements of a free monoid < @math{x_1},@dots{},@math{x_n} >. In other
-words, the monomials of K< @math{x_1},@dots{},@math{x_n} > are the words
+words, the monomials of @math{K} < @math{x_1},@dots{},@math{x_n} > are the words
 of finite length in the finite alphabet @{ @math{x_1},@dots{},@math{x_n} @}.
-K< @math{x_1},@dots{},@math{x_n} > is an integral domain, which is not
-Noetherian for n>=2 (hence, a Groebner basis of an ideal might
+@math{K}< @math{x_1},@dots{},@math{x_n} > is an integral domain, which is not
+Noetherian for @math{n>1} (hence, a Groebner basis of an ideal might
 be infinite). It can be regarded as a graded algebra in a natural way.
 
 Any finitely presented associative algebra is isomorphic to a
-quotient of K< @math{x_1},@dots{},@math{x_n} > modulo a certain
+quotient of @math{K}< @math{x_1},@dots{},@math{x_n} > modulo a certain
 two-sided ideal.
 
 @c ---------------------------------------------------------------------------
@@ -93,7 +93,7 @@ $\forall p,q,s,t \in N$, if $s=p\cdot t \cdot q$ and $s\not=t$, then $t<s$.
 Hence the notions of a leading monomial and coefficients transfer to this situation.
 @c as they usually do
 
-We say that a monomial v divides monomial w, iff there exist monomials
+We say that a monomial @math{v} divides monomial @math{w}, iff there exist monomials
 @math{p,s \in N}, such that @math{w = p \cdot w \cdot s}.
 
 @tex
@@ -136,7 +136,7 @@ the monomials (words) of the free algebra
 x_(i_1) x_(i_2) @dots{} x_(i_m) in K< x_1,@dots{},x_n >
 via the double-indexed letterplace
 (that is encoding the letter (= variable) and its place in the word) monomials
-x(i_1 | 1) x(i_2 | 2) @dots{} x(i_m | m) in K[X x N]$, where X=@{x_1,@dots{},x_n@}.
+x(i_1 | 1) x(i_2 | 2) @dots{} x(i_m | m) in K[X x N], where X=@{x_1,@dots{},x_n@}.
 @end ifinfo
 
 Note, that the latter letterplace algebra K[X x N] is infinitely generated.
@@ -174,16 +174,14 @@ int d =4; // degree bound
 def R = freegbRing(d);
 setring R;
 ideal I = x(1)*y(2) + y(1)*z(2), x(1)*x(2) + x(1)*y(2) - y(1)*x(2) - y(1)*y(2);
-option(redSB);option(redTail);
+option(redSB); option(redTail);
 ideal J = system("freegb",I,d,nvars(r));
 J;
 @end smallexample
 
 It is possible to convert the letterplace presentation of an ideal
 to a list of strings with the help of procedures @code{lp2lstr}
-and @code{lst2str} from
-
-the library @code{freegb.lib}. Let us continue with the example above:
+and @code{lst2str} from the library @code{freegb.lib}. Let us continue with the example above:
 
 @smallexample
   lp2lstr(J,r); // export an object called LN to the ring r
@@ -205,7 +203,7 @@ in a free associative algebra up to a given degree.
 
 Restrictions of the @sc{Letterplace} package:
 @itemize
-@item At the moment we provide stable algorithm for the homogeneous input only,
+@item At the moment we provide stable implementation for the homogeneous input only,
 computations with inhomogeneous ideals are under development.
 @item Since free algebra is not Noetherian, one has to define an explicit degree bound,
 up to which a partial Groebner basis will be computed.

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.78 2008-12-10 19:48:51 levandov Exp $ */
+/* $Id: kstd2.cc,v 1.79 2008-12-26 18:15:40 levandov Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1659,8 +1659,8 @@ ideal freegb(ideal I, int uptodeg, int lVblock)
 
   /* check whether the ideal is in V */
 
-  if (0)
-  //  if (! ideal_isInV(I,lVblock) )
+//  if (0)
+  if (! ideal_isInV(I,lVblock) )
   {
     WerrorS("The input ideal contains incorrectly encoded elements! ");
     return(NULL);
