@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.h,v 1.1 2008-12-26 13:51:10 ederc Exp $ */
+/* $Id: lists.h,v 1.2 2008-12-27 13:50:05 ederc Exp $ */
 /*
 * ABSTRACT: list interface
 */
@@ -40,31 +40,24 @@ class LNode {
         LPoly* data;
         LNode* next;
     public:
-        LNode(LPoly* lp, LNode* n) {
-            data = lp;
-            next = n;
-        }
-        LNode(poly* t, long* i, poly* p, LNode* n) {
-            data->set(t,i,p);
-            next = n;
-        }
-        ~LNode() {
-            delete next;
-            delete data;   
-        }
-        LNode* append(LPoly* lp) {
-            LNode* new_element = new LNode(lp,NULL);
-            next = new_element;
-            return new_element;
-        }
-        LNode* append(poly* t, long* i, poly* p) {
-            LNode* new_element = new LNode(t,i,p,NULL);
-            next = new_element;
-            return new_element;
-        }
-        LPoly* getLPoly() const {
-            return data;
-        }
+        // generating new list elements from the labeled / classical polynomial view
+                LNode(LPoly* lp);
+                LNode(poly* t, long* i, poly* p);
+                LNode(LNode* ln);
+                ~LNode();
+        // append new elements to the list from the labeled / classical polynomial view
+        LNode*  append(LPoly* lp);
+        LNode*  append(poly* t, long* i, poly* p);
+        // get next from current LNode
+        LNode*  getNext();
+        
+        // get the LPoly* out of LNode*
+        LPoly*  getLPoly();
+        // get the address of the polynomial part of LPoly* of LNode*
+        poly*   getPoly();
+        // test if for any list element the polynomial part of the data is equal to *p
+        bool    polyTest(poly* p);
+        LNode*  operator++();
 };
 
 
@@ -79,31 +72,15 @@ class LList {
         LNode*  last;
         long    length;
     public:
-        LList(LPoly* lp) {
-            first = new LNode(lp,NULL);
-            last = first;
-            length = 1;
-        }
-        ~LList() {
-            delete first;
-        }
-        void append(LPoly* lp) {
-            last = last->append(lp);
-            length++;
-        }
-        void append(poly* t,long* i, poly* p) {
-            last = last->append(t,i,p);
-            length++;
-        }
-        long getLength() const {
-            return length;
-        }
-        LNode* getFirst() const {
-            return first;
-        }
-        LNode* getLast() const {
-            return last;
-        }
+                LList(LPoly* lp);
+                LList(poly* t,long* i,poly* p);
+                ~LList();
+        void    append(LPoly* lp);
+        void    append(poly* t,long* i, poly* p);
+        bool    polyTest(poly* p);
+        long    getLength() const;
+        LNode*  getFirst();
+        LNode*  getLast();
 };
 
 
@@ -187,10 +164,5 @@ class CList {
             return last;
         }
 };
-
-
-
-
 #endif
 #endif
- 

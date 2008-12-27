@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.13 2008-12-26 13:49:57 ederc Exp $ */
+/* $Id: f5gb.h,v 1.14 2008-12-27 13:50:05 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -54,7 +54,5 @@ main function of our f5 implementation
 */
 ideal F5main(ideal i, ring r);
 
-
 #endif
 #endif
-

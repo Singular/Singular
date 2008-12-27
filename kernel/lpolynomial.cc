@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lpolynomial.cc,v 1.3 2008-12-26 13:51:50 ederc Exp $ */
+/* $Id: lpolynomial.cc,v 1.4 2008-12-27 13:50:06 ederc Exp $ */
 /*
 * ABSTRACT: lpolynomial definition 
 */
@@ -29,8 +29,10 @@
 all functions working on the class LPoly for labeled polynomials
 ================================================================
 */
-void LPoly::setPoly(poly* p) 
-{
+LPoly::LPoly(poly* t,long* i,poly* p) {
+    set(t,i,p);
+}
+void LPoly::setPoly(poly* p)  {
     polynomial = *p;
 }
 
@@ -47,16 +49,16 @@ void LPoly::setDel(bool b) {
     del = b;
 }
 
-poly LPoly::getPoly() const {
-    return polynomial;
+poly* LPoly::getPoly() {
+    return &polynomial;
 }
 
-poly LPoly::getTerm() const {
-    return term;
+poly* LPoly::getTerm() {
+    return &term;
 }
 
-long LPoly::getIndex() const {
-    return index;
+long* LPoly::getIndex() {
+    return &index;
 }
 
 bool LPoly::getDel() const {
@@ -67,21 +69,6 @@ void LPoly::set(poly* t, long* i, poly* p) {
     this->setTerm(t);
     this->setIndex(i);
     this->setPoly(p);
-}
-
-/*
-=====================================================
-comparing two labeled polynomials by their signatures
-=====================================================
-*/
-int LPoly::compare(const LPoly& lp) const {
-    if(index > lp.index) {
-        return 1;
-    }
-    if(index < lp.index) {
-        return -1;
-    }
-    return 0;
 }
 
 LPoly* LPoly::get() {
