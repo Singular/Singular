@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: tricks.doc,v 1.23 2008-12-12 12:26:44 Singular Exp $
+@comment $Id: tricks.doc,v 1.24 2009-01-06 14:06:50 Singular Exp $
 @comment this file contains the "Tricks and pittfalls" sections
 
 @c The following directives are necessary for proper compilation
@@ -62,6 +62,10 @@ a limited range which is machine dependent. A typical range is -1.0e-38
 to 1.0e+38.  The string representation of overflow and underflow is
 machine dependent, as well. For example "@code{Inf}" on Linux, or
 "@code{+.+00e+00}" on HPUX.
+@*Their input syntax is given by @code{scanf}, but must start with a digit.
+@item
+floating point numbers (type @code{number} from field @code{real} with a precision p larger then 3) use internally @code{mpf_set_default_prec(3.5*p+1)}. 
+@*Their input syntax is given by @code{mpf_set_str} from GMP, but must start with a digit.
 @c @item
 @c a token (in the input) must have 16383 characters or less.
 @c @*(Tokens are strings, blocks of statements, numbers)
