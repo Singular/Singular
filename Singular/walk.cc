@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: walk.cc,v 1.16 2009-01-06 15:48:29 Singular Exp $ */
+/* $Id: walk.cc,v 1.17 2009-01-06 16:55:31 Singular Exp $ */
 /*
 * ABSTRACT: Implementation of the Groebner walk
 */
@@ -161,7 +161,7 @@ static void initSSpecialCC (ideal F, ideal Q, ideal P,kStrategy strat)
         //  h.pNorm();
         //}
         strat->initEcart(&h);
-        if (rHasLocalOrMixedOrdering_currRing)
+        if (rHasLocalOrMixedOrdering_currRing())
         {
           deleteHC(&h,strat);
         }
@@ -303,7 +303,7 @@ static ideal kInterRedCC(ideal F, ideal Q)
   strat->T           = initT();
   strat->R           = initR();
   strat->sevT        = initsevT();
-  if (rHasLocalOrMixedOrdering_currRing)   strat->honey = TRUE;
+  if (rHasLocalOrMixedOrdering_currRing())   strat->honey = TRUE;
 
 
   //initSCC(F,Q,strat);

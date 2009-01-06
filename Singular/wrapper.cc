@@ -16,7 +16,7 @@ extern void Initialization(char *);
 
 BOOLEAN jInitBasis(ideal v, jList **TT,jList **QQ)
 {
-  if (rHasLocalOrMixedOrdering_currRing)
+  if (rHasLocalOrMixedOrdering_currRing())
   {
     WerrorS("janet only for well-orderings");
     return TRUE;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.485 2009-01-06 15:48:28 Singular Exp $ */
+/* $Id: iparith.cc,v 1.486 2009-01-06 16:55:31 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4426,7 +4426,7 @@ static BOOLEAN jjSLIM_GB(leftv res, leftv u)
     WerrorS("qring not supported by slimgb at the moment");
     return TRUE;
   }
-  if (rHasLocalOrMixedOrdering_currRing)
+  if (rHasLocalOrMixedOrdering_currRing())
   {
     WerrorS("ordering must be global for slimgb");
     return TRUE;
@@ -5714,7 +5714,7 @@ static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w)
       return TRUE;
     }
   }
-  if (((currRing->qideal!=NULL) && (rHasLocalOrMixedOrdering_currRing))
+  if (((currRing->qideal!=NULL) && (rHasLocalOrMixedOrdering_currRing()))
   || ((rr->qideal!=NULL) && (rHasLocalOrMixedOrdering(rr))))
   {
     WarnS("preimage in local qring may be wrong: use Ring::preimageLoc instead");

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.17 2009-01-06 15:49:15 Singular Exp $ */
+/* $Id: syz.cc,v 1.18 2009-01-06 16:53:54 Singular Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -139,7 +139,7 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
     j=IDELEMS(syz);
     while ((j>0) && (syz->m[j-1]==NULL)) j--;
     existsUnit = FALSE;
-    if (rHasGlobalOrdering_currRing)
+    if (rHasGlobalOrdering_currRing())
     {
       while ((i<j) && (!existsUnit))
       {
