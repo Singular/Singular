@@ -1109,7 +1109,7 @@ int64vec* rGetGlobalOrderMatrix(ring r)
 {
   int n=rVar(r);
   int64vec* res=new int64vec(n,n,(int64)0);
-  if (r->OrdSgn != 1) return res;
+  if (rHasLocalOrMixedOrdering(r)) return res;
   int pos1=0;
   int pos2=0;
   int temp;
@@ -1187,7 +1187,7 @@ int64vec* rGetGlobalOrderWeightVec(ring r)
   int n=rVar(r);
   int64vec* res=new int64vec(n);
 
-  if (r->OrdSgn != 1) return res;
+  if (rHasLocalOrMixedOrdering(r)) return res;
 
   int length;
 

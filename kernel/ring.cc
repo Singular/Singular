@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.105 2008-11-12 12:38:59 Singular Exp $ */
+/* $Id: ring.cc,v 1.106 2009-01-06 13:59:35 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1462,6 +1462,123 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   if (r == NULL) return NULL;
   int i,j;
   ring res=(ring)omAllocBin(ip_sring_bin);
+  res->idroot=NULL; /* local objects */
+  //int*       order;  /* array of orderings */
+  //int*       block0; /* starting pos.*/
+  //int*       block1; /* ending pos.*/
+  //char**     parameter; /* names of parameters */
+  //number     minpoly;
+  //ideal      minideal;
+  //int**      wvhdl;  /* array of weight vectors */
+  //char **    names;  /* array of variable names */
+
+  res->options=r->options; /* ring dependent options */
+
+  // what follows below here should be set by rComplete, _only_
+  //long      *ordsgn;  /* array of +/- 1 (or 0) for comparing monomials */
+                       /*  ExpL_Size entries*/
+
+  // is NULL for lp or N == 1, otherwise non-NULL (with OrdSize > 0 entries) */
+  //sro_ord*   typ;   /* array of orderings + sizes, OrdSize entries */
+
+  //ideal      qideal; /* extension to the ring structure: qring */
+
+
+  //int*     VarOffset;
+  //int*     firstwv;
+
+  //struct omBin_s*   PolyBin; /* Bin from where monoms are allocated */
+  res->ch=r->ch;     /* characteristic */
+#ifdef HAVE_RINGS
+  res->ringtype=r->ringtype;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
+  //res->ringflaga=mpz_copy(r->ringflaga);
+  res->ringflagb=r->ringflagb;
+#endif
+  res->ref=0; /* reference counter to the ring */
+
+  res->float_len=r->float_len; /* additional char-flags */
+  res->float_len2=r->float_len2; /* additional char-flags */
+
+  res->N=r->N;      /* number of vars */
+
+  res->P=r->P;      /* number of pars */
+  res->OrdSgn=r->OrdSgn; /* 1 for polynomial rings, -1 otherwise */
+
+  res->firstBlockEnds=r->firstBlockEnds;
+#ifdef HAVE_PLURAL
+  res->real_var_start=r->real_var_start;
+  res->real_var_end=r->real_var_end;
+#endif
+
+#ifdef HAVE_SHIFTBBA
+  res->isLPring=r->isLPring; /* 0 for non-letterplace rings, otherwise the number of LP blocks, at least 1, known also as lV */
+#endif
+
+  res->VectorOut=r->VectorOut;
+  res->ShortOut=r->ShortOut;
+  res->CanShortOut=r->CanShortOut;
+  res->LexOrder=r->LexOrder; // TRUE if the monomial ordering has polynomial and power series blocks
+  res->MixedOrder=r->MixedOrder; // ?? 1 for lex ordering (except ls), -1 otherwise
+  res->ComponentOrder=r->ComponentOrder;
+
+
+  // what follows below here should be set by rComplete, _only_
+  // contains component, but no weight fields in E */
+  //short      ExpL_Size; // size of exponent vector in long
+  //short      CmpL_Size; // portions which need to be compared
+  /* number of long vars in exp vector:
+     long vars are those longs in the exponent vector which are
+     occupied by variables, only */
+  //short     VarL_Size;
+
+  //short      BitsPerExp; /* number of bits per exponent */
+  //short      ExpPerLong; /* maximal number of Exponents per long */
+
+  //short      pCompIndex; /* p->exp.e[pCompIndex] is the component */
+  //short      pOrdIndex; /* p->exp[pOrdIndex] is pGetOrd(p) */
+
+  //short      OrdSize; /* size of ord vector (in sro_ord) */
+
+
+  /* if >= 0, long vars in exp vector are consecutive and start there
+     if <  0, long vars in exp vector are not consecutive */
+  //short     VarL_LowIndex;
+  // number of exponents in r->VarL_Offset[0]
+  // is minimal number of exponents in a long var
+  //short     MinExpPerLong;
+
+  /* if this is > 0, then NegWeightL_Offset[0..size_1] is index of longs in
+   ExpVector whose values need an offset due to negative weights */
+  //short     NegWeightL_Size;
+  /* array of NegWeigtL_Size indicies */
+  //int*      NegWeightL_Offset;
+
+  /* array of size VarL_Size,
+     VarL_Offset[i] gets i-th long var in exp vector */
+  //int*      VarL_Offset;
+
+  /* mask for getting single exponents */
+  //unsigned long bitmask;
+  /* mask used for divisiblity tests */
+  //unsigned long divmask;
+
+  //p_Procs_s*    p_Procs;
+
+  /* FDeg and LDeg */
+  //pFDegProc     pFDeg;
+  //pLDegProc     pLDeg;
+
+  /* as it was determined by rComplete */
+  //pFDegProc     pFDegOrig;
+  /* and as it was determined before rOptimizeLDeg */
+  //pLDegProc     pLDegOrig;
+
+  //p_SetmProc    p_Setm;
+  //n_Procs_s*    cf;
+  //ring          algring;
+#ifdef HAVE_PLURAL
+  //  nc_struct*    _nc; // private
+#endif
 
   memcpy4(res,r,sizeof(ip_sring));
   res->NegWeightL_Offset=NULL;
@@ -1743,7 +1860,7 @@ rOrderType_t rGetOrderType(ring r)
     return rOrderType_General;
 }
 
-BOOLEAN rHasSimpleOrder(ring r)
+BOOLEAN rHasSimpleOrder(const ring r)
 {
   if (r->order[0] == ringorder_unspec) return TRUE;
   int blocks = rBlocks(r) - 1;
@@ -1762,7 +1879,7 @@ BOOLEAN rHasSimpleOrder(ring r)
 }
 
 // returns TRUE, if simple lp or ls ordering
-BOOLEAN rHasSimpleLexOrder(ring r)
+BOOLEAN rHasSimpleLexOrder(const ring r)
 {
   return rHasSimpleOrder(r) &&
     (r->order[0] == ringorder_ls ||
@@ -1771,7 +1888,7 @@ BOOLEAN rHasSimpleLexOrder(ring r)
      r->order[1] == ringorder_lp);
 }
 
-BOOLEAN rOrder_is_DegOrdering(rRingOrder_t order)
+BOOLEAN rOrder_is_DegOrdering(const rRingOrder_t order)
 {
   switch(order)
   {

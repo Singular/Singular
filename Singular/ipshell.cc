@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.197 2008-10-13 12:45:29 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.198 2009-01-06 14:00:57 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1408,7 +1408,7 @@ poly    iiHighCorner(ideal I, int ak)
   int i;
   if(!idIsZeroDim(I)) return NULL; // not zero-dim.
   poly po=NULL;
-  if (currRing->OrdSgn== -1)
+  if (rHasLocalOrMixedOrdering(currRing))
   {
     scComputeHC(I,currQuotient,ak,po);
     if (po!=NULL)

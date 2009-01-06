@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight.cc,v 1.6 2008-07-08 11:26:50 Singular Exp $ */
+/* $Id: weight.cc,v 1.7 2009-01-06 13:59:36 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -188,7 +188,7 @@ void kEcartWeights(polyset s, int sl, short *eweight)
 
   *eweight = 0;
   n = pVariables;
-  if (pOrdSgn == -1)
+  if (rHasLocalOrMixedOrdering())
     wFunctional = wFunctionalMora;
   else
     wFunctional = wFunctionalBuch;

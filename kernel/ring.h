@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.33 2008-07-20 15:12:35 Singular Exp $ */
+/* $Id: ring.h,v 1.34 2009-01-06 13:59:36 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -338,10 +338,14 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos);
 // Assume: i<= syzIndex_limit
 int rGetMaxSyzComp(int i);
 
-BOOLEAN rHasSimpleOrder(ring r);
+BOOLEAN rHasSimpleOrder(const ring r);
 // returns TRUE, if simple lp or ls ordering
-BOOLEAN rHasSimpleLexOrder(ring r);
+BOOLEAN rHasSimpleLexOrder(const ring r);
 // return TRUE if p->exp[r->pOrdIndex] holds total degree of p */
+inline BOOLEAN rHasGlobalOrdering(const ring r=currRing)
+{ return (r->OrdSgn==1); }
+inline BOOLEAN rHasLocalOrMixedOrdering(const ring r=currRing)
+{ return (r->OrdSgn==-1); }
 BOOLEAN rOrd_is_Totaldegree_Ordering(ring r =currRing);
 // return TRUE if p_SetComp requires p_Setm
 BOOLEAN rOrd_SetCompRequiresSetm(ring r);

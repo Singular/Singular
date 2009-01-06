@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.25 2008-07-15 16:27:58 motsak Exp $ */
+/* $Id: gring.h,v 1.26 2009-01-06 13:59:35 Singular Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -230,7 +230,7 @@ inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const intvec *
   return currRing->GetNC()->p_Procs.GB(F, Q, w, hilb, strat);
 
 /*
-  if (pOrdSgn==-1)
+  if (rHasLocalOrMixedOrder(currRing))
   {
     assume(currRing->GetNC()->p_Procs.LocalGB!=NULL);
     return currRing->GetNC()->p_Procs.LocalGB(F, Q, w, hilb, strat);

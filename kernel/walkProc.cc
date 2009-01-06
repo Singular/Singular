@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: walkProc.cc,v 1.1 2005-05-04 15:41:27 Singular Exp $ */
+/* $Id: walkProc.cc,v 1.2 2009-01-06 13:59:36 Singular Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -65,7 +65,8 @@ walkConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         WerrorS( "rings must have same characteristic" );
         state= WalkIncompatibleRings;
     }
-    else if ( (sring->OrdSgn != 1) || (dring->OrdSgn != 1) )
+    else if ( (rHasLocalOrMixedOrdering(sring))
+    || (rHasLocalOrMixedOrdering(dring)) )
     {
         WerrorS( "only works for global orderings" );
         state= WalkIncompatibleRings;
@@ -85,7 +86,7 @@ walkConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
     // now the rings have the same number of variables resp. parameters.
     // check if the names of the variables resp. parameters do agree:
 
-    int nvar = sring->N;
+    int nvar = rVar(sring);
     int npar = rPar(sring);
     int * pperm;
     if ( npar > 0 )
@@ -98,27 +99,31 @@ walkConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
                 dring->ch);
 
     for ( k= nvar; (k > 0) && (state == WalkOk); k-- )
-        if ( vperm[k] <= 0 ) {
+        if ( vperm[k] <= 0 )
+        {
             WerrorS( "variable names do not agree" );
             state= WalkIncompatibleRings;
         }
 
     for ( k= npar-1; (k >= 0) && (state == WalkOk); k-- )
-        if ( pperm[k] >= 0 ) {
+        if ( pperm[k] >= 0 )
+        {
             WerrorS( "paramater names do not agree" );
             state= WalkIncompatibleRings;
         }
 
     //remove this to if you want to allow permutations of variables
     for ( k= nvar; (k > 0) && (state == WalkOk); k-- )
-      if ( vperm[k] != (k) ) {
+      if ( vperm[k] != (k) )
+      {
         WerrorS( "orders of variables do not agree" );
         state= WalkIncompatibleRings;
       }
 
     //remove this to if you want to allow permutations of parameters
     for ( k= npar; (k > 0) && (state == WalkOk); k-- )
-      if ( pperm[k-1] != (-k) ) {
+      if ( pperm[k-1] != (-k) )
+      {
         WerrorS( "orders of parameters do not agree" );
         state= WalkIncompatibleRings;
       }
@@ -129,13 +134,15 @@ walkConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
     if ( state != WalkOk ) return state;
 
     // check if any of the rings are qrings or not
-    if ( (sring->qideal != NULL) || (dring->qideal != NULL) ){
-          Werror( "rings are not allowed to be qrings");
+    if ( (sring->qideal != NULL) || (dring->qideal != NULL) )
+    {
+          WerrorS( "rings are not allowed to be qrings");
           return WalkIncompatibleRings;
     }
 
     int i=0;
-    while(dring->order[i]!=0){
+    while(dring->order[i]!=0)
+    {
       if(
            !(dring->order[i]==ringorder_a) &&
            !(dring->order[i]==ringorder_a64) &&
@@ -146,15 +153,16 @@ walkConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
            !(dring->order[i]==ringorder_Wp) &&
            !(dring->order[i]==ringorder_C)  &&
            !(dring->order[i]==ringorder_M)
-         ) {
-
+         )
+      {
         state=WalkIncompatibleDestRing;
       }
       i++;
     }
 
     i=0;
-    while(sring->order[i]!=0){
+    while(sring->order[i]!=0)
+    {
       if(
            !(sring->order[i]==ringorder_a) &&
            !(sring->order[i]==ringorder_a64) &&
@@ -165,7 +173,8 @@ walkConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
            !(sring->order[i]==ringorder_Wp) &&
            !(sring->order[i]==ringorder_C)  &&
            !(sring->order[i]==ringorder_M)
-         ) {
+         )
+      {
        state=WalkIncompatibleSourceRing;
       }
       i++;
@@ -209,17 +218,20 @@ fractalWalkConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
     ring dring = IDRING( dringHdl );
     ring sring = IDRING( sringHdl );
 
-    if ( rChar(sring) != rChar(dring) ) {
+    if ( rChar(sring) != rChar(dring) )
+    {
         WerrorS( "rings must have same characteristic" );
         state= WalkIncompatibleRings;
     }
 
-    if ( (sring->OrdSgn != 1) || (dring->OrdSgn != 1) ) {
+    if ( (rHasLocalOrMixedOrdering(sring))
+    || (rHasLocalOrMixedOrdering(dring)) )
+    {
         WerrorS( "only works for global orderings" );
         state= WalkIncompatibleRings;
     }
 
-    if ( sring->N != dring->N )
+    if ( rVar(sring) != rVar(dring) )
     {
         WerrorS( "rings must have same number of variables" );
         state= WalkIncompatibleRings;
@@ -249,13 +261,15 @@ fractalWalkConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
                 dring->ch);
 
     for ( k= nvar; (k > 0) && (state == WalkOk); k-- )
-      if ( vperm[k] <= 0 ) {
+      if ( vperm[k] <= 0 )
+      {
         WerrorS( "variable names do not agree" );
         state= WalkIncompatibleRings;
       }
 
     for ( k= npar; (k > 0) && (state == WalkOk); k-- )
-      if ( pperm[k-1] >= 0 ){
+      if ( pperm[k-1] >= 0 )
+      {
         WerrorS( "parameter names do not agree" );
         state= WalkIncompatibleRings;
       }
@@ -263,14 +277,16 @@ fractalWalkConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
     //check if order of variables resp. parameters does agree
     //remove this to if you want to allow permutations of variables
     for ( k= nvar; (k > 0) && (state == WalkOk); k-- )
-      if ( vperm[k] != (k) ) {
+      if ( vperm[k] != (k) )
+      {
         WerrorS( "orders of variables do not agree" );
         state= WalkIncompatibleRings;
       }
 
     //remove this to if you want to allow permutations of parameters
     for ( k= npar; (k > 0) && (state == WalkOk); k-- )
-      if ( pperm[k-1] != (-k) ) {
+      if ( pperm[k-1] != (-k) )
+      {
         WerrorS( "orders of parameters do not agree" );
         state= WalkIncompatibleRings;
       }
@@ -281,8 +297,9 @@ fractalWalkConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
     if ( state != WalkOk ) return state;
 
     // check if any of the rings are qrings or not
-    if ( (sring->qideal != NULL) || (dring->qideal != NULL) ){
-          Werror( "rings are not allowed to be qrings");
+    if ( (sring->qideal != NULL) || (dring->qideal != NULL) )
+    {
+          WerrorS( "rings are not allowed to be qrings");
           return WalkIncompatibleRings;
     }
 
@@ -295,14 +312,16 @@ fractalWalkConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
            !(dring->order[i]==ringorder_Wp) &&
            !(dring->order[i]==ringorder_C)  &&
            !(dring->order[0]==ringorder_M)
-         ) {
+         )
+      {
         state=WalkIncompatibleDestRing;
       }
       i++;
     }
 
     i=0;
-    while(sring->order[i]!=0){
+    while(sring->order[i]!=0)
+    {
       if(  !(sring->order[i]==ringorder_lp) &&
            !(sring->order[i]==ringorder_dp) &&
            !(sring->order[i]==ringorder_Dp) &&
@@ -310,7 +329,8 @@ fractalWalkConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
            !(sring->order[i]==ringorder_Wp) &&
            !(sring->order[i]==ringorder_C)  &&
            !(dring->order[0]==ringorder_M)
-         ) {
+         )
+      {
         state=WalkIncompatibleSourceRing;
       }
       i++;
