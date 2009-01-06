@@ -25,7 +25,6 @@ LIB"dmod.lib";
   example checkRoot2;
   example checkFactor;
   "forgot:";
-example ALTannfsBM;
 example convloc;
 example minIntRoot;
 example isHolonomic;
