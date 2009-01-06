@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.58 2008-12-09 17:32:52 levandov Exp $ */
+/* $Id: structs.h,v 1.59 2009-01-06 13:59:59 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -568,17 +568,18 @@ struct nc_struct
 
 struct sip_sring
 {
-  idhdl      idroot; /* local objects */
-  int*       order;  /* array of orderings */
-  int*       block0; /* starting pos.*/
-  int*       block1; /* ending pos.*/
-  char**     parameter; /* names of parameters */
-  number     minpoly;
+// each entry must have a description and a procedure defining it,
+// general ordering: pointer/structs, long, int, short, BOOLEAN/char/enum
+// general defining procedures: rInit, rComplete, interpreter, ??
+  idhdl      idroot; /* local objects , interpreter*/
+  int*       order;  /* array of orderings, rInit/rSleftvOrdering2Ordering */
+  int*       block0; /* starting pos., rInit/rSleftvOrdering2Ordering*/
+  int*       block1; /* ending pos., rInit/rSleftvOrdering2Ordering*/
+  char**     parameter; /* names of parameters, rInit */
+  number     minpoly;  /* for Q_a/Zp_a, rInit */
   ideal      minideal;
-  int**      wvhdl;  /* array of weight vectors */
-  char **    names;  /* array of variable names */
-
-  unsigned long options; /* ring dependent options */
+  int**      wvhdl;  /* array of weight vectors, rInit/rSleftvOrdering2Ordering */
+  char **    names;  /* array of variable names, rInit */
 
   // what follows below here should be set by rComplete, _only_
   long      *ordsgn;  /* array of +/- 1 (or 0) for comparing monomials */
@@ -586,29 +587,36 @@ struct sip_sring
 
   // is NULL for lp or N == 1, otherwise non-NULL (with OrdSize > 0 entries) */
   sro_ord*   typ;   /* array of orderings + sizes, OrdSize entries */
+  /* if NegWeightL_Size > 0, then NegWeightL_Offset[0..size_1] is index of longs
+  in ExpVector whose values need an offset due to negative weights */
+  /* array of NegWeigtL_Size indicies */
+  int*      NegWeightL_Offset;
 
-  ideal      qideal; /* extension to the ring structure: qring */
+
+  ideal      qideal; /* extension to the ring structure: qring, rInit */
 
 
   int*     VarOffset;
   int*     firstwv;
 
   struct omBin_s*   PolyBin; /* Bin from where monoms are allocated */
-  int        ch;     /* characteristic */
 #ifdef HAVE_RINGS
   unsigned int  ringtype;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
   int_number    ringflaga;
   unsigned long ringflagb;
 #endif
-  int        ref; /* reference counter to the ring */
+  unsigned long options; /* ring dependent options */
 
-  short      float_len; /* additional char-flags */
-  short      float_len2; /* additional char-flags */
+  int        ch;  /* characteristic, rInit */
+  int        ref; /* reference counter to the ring, interpreter */
 
-  short      N;      /* number of vars */
+  short      float_len; /* additional char-flags, rInit */
+  short      float_len2; /* additional char-flags, rInit */
 
-  short      P;      /* number of pars */
-  short      OrdSgn; /* 1 for polynomial rings, -1 otherwise */
+  short      N;      /* number of vars, rInit */
+
+  short      P;      /* number of pars, rInit */
+  short      OrdSgn; /* 1 for polynomial rings, -1 otherwise, rInit */
 
   short     firstBlockEnds;
 #ifdef HAVE_PLURAL
@@ -625,7 +633,7 @@ struct sip_sring
   BOOLEAN   LexOrder;
   // TRUE if the monomial ordering has polynomial and power series blocks
   BOOLEAN   MixedOrder;
-  // 1 for lex ordering (except ls), -1 otherwise
+  // TRUE for global/local mixed orderings, FALSE otherwise
   BOOLEAN   ComponentOrder;
 
 
@@ -637,15 +645,11 @@ struct sip_sring
      long vars are those longs in the exponent vector which are
      occupied by variables, only */
   short     VarL_Size;
-
   short      BitsPerExp; /* number of bits per exponent */
   short      ExpPerLong; /* maximal number of Exponents per long */
-
   short      pCompIndex; /* p->exp.e[pCompIndex] is the component */
   short      pOrdIndex; /* p->exp[pOrdIndex] is pGetOrd(p) */
-
   short      OrdSize; /* size of ord vector (in sro_ord) */
-
 
   /* if >= 0, long vars in exp vector are consecutive and start there
      if <  0, long vars in exp vector are not consecutive */
@@ -654,12 +658,7 @@ struct sip_sring
   // is minimal number of exponents in a long var
   short     MinExpPerLong;
 
-  /* if this is > 0, then NegWeightL_Offset[0..size_1] is index of longs in
-   ExpVector whose values need an offset due to negative weights */
   short     NegWeightL_Size;
-  /* array of NegWeigtL_Size indicies */
-  int*      NegWeightL_Offset;
-
   /* array of size VarL_Size,
      VarL_Offset[i] gets i-th long var in exp vector */
   int*      VarL_Offset;
