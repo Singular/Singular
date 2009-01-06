@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: solve.lib,v 1.36 2007-05-07 17:00:36 Singular Exp $";
+version="$Id: solve.lib,v 1.37 2009-01-06 14:15:21 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: solve.lib     Complex Solving of Polynomial Systems
@@ -772,7 +772,7 @@ EXAMPLE: example solve; shows an example
       {
         execute("ring rinC =(complex,"+string(outprec)+"),("+varstr(basering)+"),lp;");
         list SOL;
-        for (ii=1; ii<=size(L); ii++ ) { execute("SOL[ii]="+L[ii]+";"); }
+        for (ii=1; ii<=size(L); ii++ ) { execute("SOL[ii]=number("+L[ii]+");"); }
         export SOL;
         if (nodisp==0) { print(SOL); }
         option(set,ovec);
