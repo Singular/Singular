@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.63 2009-01-06 13:59:35 Singular Exp $ */
+/* $Id: ideals.cc,v 1.64 2009-01-06 15:49:14 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -686,17 +686,20 @@ ideal idMinBase (ideal h1)
   BOOLEAN homog;
 
   homog = idHomModule(h1,currQuotient,&wth);
-  if (rHasGlobalOrdering() && (!homog))
+  if (rHasGlobalOrdering_currRing)
   {
-    WarnS("minbase applies only to the local or homogeneous case");
-    e=idCopy(h1);
-    return e;
-  }
-  if ((currRing->OrdSgn == 1) && (homog))
-  {
-    ideal re=kMin_std(h1,currQuotient,(tHomog)homog,&wth,h2,NULL,0,3);
-    idDelete(&re);
-    return h2;
+    if(!homog)
+    {
+      WarnS("minbase applies only to the local or homogeneous case");
+      e=idCopy(h1);
+      return e;
+    }
+    else
+    {
+      ideal re=kMin_std(h1,currQuotient,(tHomog)homog,&wth,h2,NULL,0,3);
+      idDelete(&re);
+      return h2;
+    }
   }
   e=idInit(1,h1->rank);
   if (idIs0(h1))

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: walk.cc,v 1.15 2008-09-19 14:15:14 Singular Exp $ */
+/* $Id: walk.cc,v 1.16 2009-01-06 15:48:29 Singular Exp $ */
 /*
 * ABSTRACT: Implementation of the Groebner walk
 */
@@ -161,7 +161,7 @@ static void initSSpecialCC (ideal F, ideal Q, ideal P,kStrategy strat)
         //  h.pNorm();
         //}
         strat->initEcart(&h);
-        if (pOrdSgn==-1)
+        if (rHasLocalOrMixedOrdering_currRing)
         {
           deleteHC(&h,strat);
         }
@@ -189,16 +189,16 @@ static void initSSpecialCC (ideal F, ideal Q, ideal P,kStrategy strat)
     {
       LObject h;
       h.p = pCopy(F->m[i]);
-      if (pOrdSgn==1)
+      if (rHasGlobalOrdering(currRing))
       {
         //h.p=redtailBba(h.p,strat->sl,strat);
         h.p=redtailBba(h.p,strat->sl,strat);
       }
-      strat->initEcart(&h);
-      if (pOrdSgn==-1)
+      else
       {
         deleteHC(&h,strat);
       }
+      strat->initEcart(&h);
       if (h.p!=NULL)
       {
         if (strat->sl==-1)
@@ -232,7 +232,7 @@ static void initSSpecialCC (ideal F, ideal Q, ideal P,kStrategy strat)
       }
       if(strat->sl>=0)
       {
-        if (pOrdSgn==1)
+        if (rHasGlobalOrdering(currRing))
         {
           h.p=redBba(h.p,strat->sl,strat);
           if (h.p!=NULL)
@@ -303,7 +303,7 @@ static ideal kInterRedCC(ideal F, ideal Q)
   strat->T           = initT();
   strat->R           = initR();
   strat->sevT        = initsevT();
-  if (pOrdSgn == -1)   strat->honey = TRUE;
+  if (rHasLocalOrMixedOrdering_currRing)   strat->honey = TRUE;
 
 
   //initSCC(F,Q,strat);

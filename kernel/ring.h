@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.34 2009-01-06 13:59:36 Singular Exp $ */
+/* $Id: ring.h,v 1.35 2009-01-06 15:49:14 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -342,10 +342,14 @@ BOOLEAN rHasSimpleOrder(const ring r);
 // returns TRUE, if simple lp or ls ordering
 BOOLEAN rHasSimpleLexOrder(const ring r);
 // return TRUE if p->exp[r->pOrdIndex] holds total degree of p */
-inline BOOLEAN rHasGlobalOrdering(const ring r=currRing)
-{ return (r->OrdSgn==1); }
-inline BOOLEAN rHasLocalOrMixedOrdering(const ring r=currRing)
-{ return (r->OrdSgn==-1); }
+//inline BOOLEAN rHasGlobalOrdering(const ring r=currRing)
+//{ return (r->OrdSgn==1); }
+#define rHasGlobalOrdering(R) ((R)->OrdSgn==1)
+#define rHasGlobalOrdering_currRing (pOrdSgn==1)
+//inline BOOLEAN rHasLocalOrMixedOrdering(const ring r=currRing)
+//{ return (r->OrdSgn==-1); }
+#define rHasLocalOrMixedOrdering(R) ((R)->OrdSgn==-1)
+#define rHasLocalOrMixedOrdering_currRing (pOrdSgn==-1)
 BOOLEAN rOrd_is_Totaldegree_Ordering(ring r =currRing);
 // return TRUE if p_SetComp requires p_Setm
 BOOLEAN rOrd_SetCompRequiresSetm(ring r);

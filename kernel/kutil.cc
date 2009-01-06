@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.114 2008-12-08 10:00:44 wienand Exp $ */
+/* $Id: kutil.cc,v 1.115 2009-01-06 15:49:14 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -308,7 +308,7 @@ void cancelunit (LObject* L,BOOLEAN inNF)
   int  i;
   poly h;
 
-  if(currRing->OrdSgn != -1) return;
+  if(rHasGlobalOrdering_currRing) return;
   if(TEST_OPT_CANCELUNIT) return;
 
   ring r = L->tailRing;

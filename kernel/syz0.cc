@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.6 2005-08-23 09:07:00 Singular Exp $ */
+/* $Id: syz0.cc,v 1.7 2009-01-06 15:49:15 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -890,7 +890,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
       *length += 4;
       res=newres;
     }
-    if ((hom==isHomog)|| (origR->OrdSgn == 1))
+    if ((hom==isHomog)|| (rHasGlobalOrdering(origR)))
     {
       if (syzIndex==0) syInitSort(res[0],&modcomp);
       if ((syzIndex==0) && !rRing_has_CompLastBlock(currRing))
@@ -903,7 +903,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
 
     if ((syzIndex==0))
     {
-      if ((hom==isHomog)|| (origR->OrdSgn == 1))
+      if ((hom==isHomog)|| (rHasGlobalOrdering(origR)))
       {
         syRing = rCurrRingAssure_CompLastBlock();
         if (syRing != origR)
@@ -928,7 +928,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
         idTest(res[0]);
       }
     }
-    if ((hom!=isHomog) && (origR->OrdSgn != 1))
+    if ((hom!=isHomog) && (rHasLocalOrMixedOrdering(origR)))
     {
       if (syzIndex==0) syInitSort(res[0],&modcomp);
       res[syzIndex+1] = sySchreyersSyzygiesFM(res[syzIndex],&modcomp);
@@ -938,7 +938,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
     kBucketDestroy(&(sy0buck));
   }
   //syPrintResolution(res,1,*length);
-  if ((hom!=isHomog) && (origR->OrdSgn != 1))
+  if ((hom!=isHomog) && (rHasLocalOrMixedOrdering(origR)))
   {
     syzIndex = 1;
     while ((syzIndex < *length) && (!idIs0(res[syzIndex])))
@@ -947,7 +947,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
       syzIndex++;
     }
   }
-  if ((hom==isHomog) || (origR->OrdSgn == 1))
+  if ((hom==isHomog) || (rHasGlobalOrdering(origR)))
     syzIndex = 1;
   else
     syzIndex = 0;
@@ -984,7 +984,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
       syzIndex++;
     }
   }
-  if ((hom==isHomog) || (origR->OrdSgn == 1))
+  if ((hom==isHomog) || (rHasGlobalOrdering(origR)))
   {
     if (res[1]!=NULL)
     {

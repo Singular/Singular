@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.29 2008-09-16 12:32:33 Singular Exp $
+ *  Version: $Id: sca.cc,v 1.30 2009-01-06 15:49:14 Singular Exp $
  *******************************************************************/
 
 // set it here if needed.
@@ -2395,7 +2395,7 @@ void sca_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
   rGR->GetNC()->p_Procs.mm_Mult_pp  = sca_mm_Mult_pp;
 
 
-  if (rGR->OrdSgn==-1)
+  if (rHasLocalOrMixedOrdering(rGR))
   {
 #ifdef PDEBUG
 //           Print("Local case => GB == mora!\n");
