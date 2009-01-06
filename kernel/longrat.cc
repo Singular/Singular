@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.39 2008-08-07 15:08:22 Singular Exp $ */
+/* $Id: longrat.cc,v 1.40 2009-01-06 16:47:13 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -1537,7 +1537,7 @@ number _nlCopy_NoImm(number a)
   return b;
 }
 
-void _nlDelete_NoImm(number *a, const ring r)
+void _nlDelete_NoImm(number *a)
 {
   {
     switch ((*a)->s)
@@ -2205,7 +2205,7 @@ number nlInit2gmp (mpz_t i, mpz_t j)
 number nlRInit (int i);
 BOOLEAN _nlEqual_aNoImm_OR_bNoImm(number a, number b);
 number  _nlCopy_NoImm(number a);
-void    _nlDelete_NoImm(number *a, const ring r);
+void    _nlDelete_NoImm(number *a);
 number  _nlNeg_NoImm(number a);
 number  _nlAdd_aNoImm_OR_bNoImm(number a, number b);
 number  _nlSub_aNoImm_OR_bNoImm(number a, number b);
@@ -2299,7 +2299,7 @@ LINLINE void nlDelete (number * a, const ring r)
 #endif
     if ((SR_HDL(*a) & SR_INT)==0)
     {
-      _nlDelete_NoImm(a,r);
+      _nlDelete_NoImm(a);
     }
     *a=NULL;
   }
