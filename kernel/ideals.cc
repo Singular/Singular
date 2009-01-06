@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.64 2009-01-06 15:49:14 Singular Exp $ */
+/* $Id: ideals.cc,v 1.65 2009-01-06 16:53:54 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -686,7 +686,7 @@ ideal idMinBase (ideal h1)
   BOOLEAN homog;
 
   homog = idHomModule(h1,currQuotient,&wth);
-  if (rHasGlobalOrdering_currRing)
+  if (rHasGlobalOrdering_currRing())
   {
     if(!homog)
     {

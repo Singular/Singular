@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.35 2009-01-06 15:49:14 Singular Exp $ */
+/* $Id: ring.h,v 1.36 2009-01-06 16:53:54 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -345,7 +345,7 @@ BOOLEAN rHasSimpleLexOrder(const ring r);
 //inline BOOLEAN rHasGlobalOrdering(const ring r=currRing)
 //{ return (r->OrdSgn==1); }
 #define rHasGlobalOrdering(R) ((R)->OrdSgn==1)
-#define rHasGlobalOrdering_currRing (pOrdSgn==1)
+#define rHasGlobalOrdering_currRing() (pOrdSgn==1)
 //inline BOOLEAN rHasLocalOrMixedOrdering(const ring r=currRing)
 //{ return (r->OrdSgn==-1); }
 #define rHasLocalOrMixedOrdering(R) ((R)->OrdSgn==-1)
