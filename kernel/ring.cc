@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.109 2009-01-07 14:54:05 Singular Exp $ */
+/* $Id: ring.cc,v 1.110 2009-01-07 15:22:40 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1465,6 +1465,8 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   if (r == NULL) return NULL;
   int i,j;
   ring res=(ring)omAllocBin(ip_sring_bin);
+  memset(res,0,sizeof(ip_sring));
+  //memcpy4(res,r,sizeof(ip_sring));
   res->idroot=NULL; /* local objects */
   //int*       order;  /* array of orderings */
   //int*       block0; /* starting pos.*/
@@ -1507,7 +1509,6 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   res->float_len2=r->float_len2; /* additional char-flags */
 
   res->N=r->N;      /* number of vars */
-
   res->P=r->P;      /* number of pars */
   res->OrdSgn=r->OrdSgn; /* 1 for polynomial rings, -1 otherwise */
 
@@ -1586,20 +1587,16 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
 #ifdef HAVE_PLURAL
   //  nc_struct*    _nc; // private
 #endif
-
-  memcpy4(res,r,sizeof(ip_sring));
-  res->NegWeightL_Offset=NULL;
-  res->VarL_Offset=NULL;
-  res->ordsgn=NULL;
-  res->typ=NULL;
-  res->order=NULL;
-  res->VarOffset = NULL;
-  res->p_Procs=NULL;
+  res->options=r->options;
+  #ifdef HAVE_RINGS
+  res->ringtype=r->ringtype;
+  #endif
   res->cf=NULL;
   res->PolyBin=NULL;
-  res->ref=0;
+  //
   if (r->algring!=NULL)
     r->algring->ref++;
+  res->algring=r->algring;
   if (r->parameter!=NULL)
   {
     res->minpoly=nCopy(r->minpoly);
@@ -1648,12 +1645,12 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   {
     res->names[i] = omStrDup(r->names[i]);
   }
-  res->idroot = NULL;
   if (r->qideal!=NULL)
   {
     if (copy_qideal) res->qideal= idrCopyR_NoSort(r->qideal, r);
     else res->qideal = NULL;
   }
+  else res->qideal = NULL;
 #ifdef HAVE_PLURAL
   res->GetNC() = NULL; // copy is purely commutative!!!
 //  if (rIsPluralRing(r))
