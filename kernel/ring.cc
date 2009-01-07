@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.110 2009-01-07 15:22:40 Singular Exp $ */
+/* $Id: ring.cc,v 1.111 2009-01-07 18:03:28 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1465,34 +1465,29 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   if (r == NULL) return NULL;
   int i,j;
   ring res=(ring)omAllocBin(ip_sring_bin);
-  memset(res,0,sizeof(ip_sring));
-  //memcpy4(res,r,sizeof(ip_sring));
+  //memset(res,0,sizeof(ip_sring));
+  memcpy4(res,r,sizeof(ip_sring));
   res->idroot=NULL; /* local objects */
-  //int*       order;  /* array of orderings */
-  //int*       block0; /* starting pos.*/
-  //int*       block1; /* ending pos.*/
-  //char**     parameter; /* names of parameters */
-  //number     minpoly;
   //ideal      minideal;
-  //int**      wvhdl;  /* array of weight vectors */
-  //char **    names;  /* array of variable names */
-
   res->options=r->options; /* ring dependent options */
 
   // what follows below here should be set by rComplete, _only_
   //long      *ordsgn;  /* array of +/- 1 (or 0) for comparing monomials */
                        /*  ExpL_Size entries*/
+  res->ordsgn=NULL;
 
   // is NULL for lp or N == 1, otherwise non-NULL (with OrdSize > 0 entries) */
   //sro_ord*   typ;   /* array of orderings + sizes, OrdSize entries */
-
-  //ideal      qideal; /* extension to the ring structure: qring */
+  res->typ=NULL;
 
 
   //int*     VarOffset;
+  res->VarOffset=NULL;
   //int*     firstwv;
+  res->firstwv=NULL;
 
   //struct omBin_s*   PolyBin; /* Bin from where monoms are allocated */
+  res->PolyBin=NULL; // rComplete
   res->ch=r->ch;     /* characteristic */
 #ifdef HAVE_RINGS
   res->ringtype=r->ringtype;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
@@ -1533,70 +1528,87 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   // what follows below here should be set by rComplete, _only_
   // contains component, but no weight fields in E */
   //short      ExpL_Size; // size of exponent vector in long
+  res->ExpL_Size=0;
   //short      CmpL_Size; // portions which need to be compared
+  res->CmpL_Size=0;
   /* number of long vars in exp vector:
      long vars are those longs in the exponent vector which are
      occupied by variables, only */
   //short     VarL_Size;
+  res->VarL_Size=0;
 
   //short      BitsPerExp; /* number of bits per exponent */
+  res->BitsPerExp=0;
   //short      ExpPerLong; /* maximal number of Exponents per long */
+  res->ExpPerLong=0;
 
   //short      pCompIndex; /* p->exp.e[pCompIndex] is the component */
+  res->pCompIndex=0;
   //short      pOrdIndex; /* p->exp[pOrdIndex] is pGetOrd(p) */
+  res->pOrdIndex=0;
 
   //short      OrdSize; /* size of ord vector (in sro_ord) */
+  res->OrdSize=0;
 
 
   /* if >= 0, long vars in exp vector are consecutive and start there
      if <  0, long vars in exp vector are not consecutive */
   //short     VarL_LowIndex;
+  res->VarL_LowIndex=0;
   // number of exponents in r->VarL_Offset[0]
   // is minimal number of exponents in a long var
   //short     MinExpPerLong;
+  res->MinExpPerLong=0;
 
   /* if this is > 0, then NegWeightL_Offset[0..size_1] is index of longs in
    ExpVector whose values need an offset due to negative weights */
   //short     NegWeightL_Size;
+  res->NegWeightL_Size=0;
   /* array of NegWeigtL_Size indicies */
   //int*      NegWeightL_Offset;
+  res->NegWeightL_Offset=NULL;
 
   /* array of size VarL_Size,
      VarL_Offset[i] gets i-th long var in exp vector */
   //int*      VarL_Offset;
+  res->VarL_Offset=NULL;
 
   /* mask for getting single exponents */
   //unsigned long bitmask;
+  res->bitmask=0;
   /* mask used for divisiblity tests */
   //unsigned long divmask;
+  res->divmask=0;
 
   //p_Procs_s*    p_Procs;
+  res->p_Procs=NULL;
 
   /* FDeg and LDeg */
   //pFDegProc     pFDeg;
+  res->pFDeg=NULL;
   //pLDegProc     pLDeg;
+  res->pLDeg=NULL;
 
   /* as it was determined by rComplete */
   //pFDegProc     pFDegOrig;
+  res->pFDegOrig=NULL;
   /* and as it was determined before rOptimizeLDeg */
   //pLDegProc     pLDegOrig;
+  res->pLDegOrig=NULL;
 
   //p_SetmProc    p_Setm;
+  res->p_Setm=NULL;
   //n_Procs_s*    cf;
-  //ring          algring;
-#ifdef HAVE_PLURAL
-  //  nc_struct*    _nc; // private
-#endif
+  res->cf=NULL;
   res->options=r->options;
   #ifdef HAVE_RINGS
   res->ringtype=r->ringtype;
   #endif
-  res->cf=NULL;
-  res->PolyBin=NULL;
   //
   if (r->algring!=NULL)
     r->algring->ref++;
   res->algring=r->algring;
+  res->minideal=NULL;
   if (r->parameter!=NULL)
   {
     res->minpoly=nCopy(r->minpoly);
