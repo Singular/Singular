@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.486 2009-01-06 16:55:31 Singular Exp $ */
+/* $Id: iparith.cc,v 1.487 2009-01-07 16:35:53 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -7542,7 +7542,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
           /* else ALLOW_PLURAL */
         }
         #endif
-        if (call_failed=dArith2[i].p(res,a,b))
+        if ((call_failed=dArith2[i].p(res,a,b)))
         {
           break;// leave loop, goto error handling
         }
@@ -7730,7 +7730,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
           res->data=(char *)((Proc1)dArith1[i].p)((char *)a->Data());
           #endif
         }
-        else if (call_failed=dArith1[i].p(res,a))
+        else if ((call_failed=dArith1[i].p(res,a)))
         {
           break;// leave loop, goto error handling
         }
@@ -7905,7 +7905,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
             /* else ALLOW_PLURAL */
         }
         #endif
-        if (call_failed=dArith3[i].p(res,a,b,c))
+        if ((call_failed=dArith3[i].p(res,a,b,c)))
         {
           break;// leave loop, goto error handling
         }
