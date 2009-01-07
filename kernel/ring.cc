@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.108 2009-01-07 14:51:11 Singular Exp $ */
+/* $Id: ring.cc,v 1.109 2009-01-07 14:54:05 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1497,7 +1497,7 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   if (r->ringflaga!=NULL) 
   {
     res->ringflaga = (int_number) omAlloc(sizeof(MP_INT));
-    mpz_set(res->ringflaga,r->ringflaga);
+    mpz_init_set(res->ringflaga,r->ringflaga);
   }
   res->ringflagb=r->ringflagb;
 #endif
