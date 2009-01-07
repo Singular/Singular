@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: jacobson.lib,v 1.6 2008-12-22 21:45:09 levandov Exp $";
+version="$Id: jacobson.lib,v 1.7 2009-01-07 16:11:37 Singular Exp $";
 category="System and Control Theory";
 info="
 LIBRARY: jacobson.lib     Algorithms for Smith and Jacobson Normal Form

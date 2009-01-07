@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: discretize.lib,v 1.3 2008-08-07 18:29:40 levandov Exp $";
+version="$Id: discretize.lib,v 1.4 2009-01-07 16:11:35 Singular Exp $";
 category="Applications";
 info="
 LIBRARY: discretize.lib  Tools for the finite difference schemes

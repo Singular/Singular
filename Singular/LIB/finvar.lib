@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.79 2008-11-13 10:50:17 Singular Exp $"
+version="$Id: finvar.lib,v 1.80 2009-01-07 16:11:36 Singular Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -6855,8 +6855,7 @@ EXAMPLE: example irred_secondary_no_molien; shows an example
   ideal sP = slimgb(ideal(P));
   int Max = vdim(sP);
   if (Max<0)
-  { "ERROR:   The first parameter ought to be a matrix of primary invariants.";
-    return();
+  { ERROR("The first parameter ought to be a matrix of primary invariants.");
   }
   ideal sIS = sP;   // sIS will be a Groebner basis up to degree d of P+irred. sec. inv.
   while (totalcount < Max)

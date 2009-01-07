@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: bfct.lib,v 1.8 2008-12-23 21:39:31 levandov Exp $";
+version="$Id: bfct.lib,v 1.9 2009-01-07 16:11:35 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: bfct.lib     Algorithms for b-functions and Bernstein-Sato polynomial

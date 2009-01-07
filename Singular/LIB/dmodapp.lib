@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmodapp.lib,v 1.13 2008-12-23 21:39:31 levandov Exp $";
+version="$Id: dmodapp.lib,v 1.14 2009-01-07 16:11:35 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmodapp.lib     Applications of algebraic D-modules
