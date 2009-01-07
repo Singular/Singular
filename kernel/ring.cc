@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.107 2009-01-06 16:46:40 Singular Exp $ */
+/* $Id: ring.cc,v 1.108 2009-01-07 14:51:11 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -514,7 +514,10 @@ void rDelete(ring r)
   }
 #ifdef HAVE_RINGS
   if (r->ringflaga != NULL)
+  {
     mpz_clear(r->ringflaga);
+    omFree((ADDRESS)r->ringflaga);
+  }
 #endif
   omFreeBin(r, ip_sring_bin);
 }
@@ -1491,7 +1494,11 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   res->ch=r->ch;     /* characteristic */
 #ifdef HAVE_RINGS
   res->ringtype=r->ringtype;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
-  if (r->ringflaga!=NULL) mpz_set(res->ringflaga,r->ringflaga);
+  if (r->ringflaga!=NULL) 
+  {
+    res->ringflaga = (int_number) omAlloc(sizeof(MP_INT));
+    mpz_set(res->ringflaga,r->ringflaga);
+  }
   res->ringflagb=r->ringflagb;
 #endif
   res->ref=0; /* reference counter to the ring */
