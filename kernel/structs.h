@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.59 2009-01-06 13:59:59 Singular Exp $ */
+/* $Id: structs.h,v 1.60 2009-01-07 15:22:01 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -592,11 +592,11 @@ struct sip_sring
   /* array of NegWeigtL_Size indicies */
   int*      NegWeightL_Offset;
 
+  int*     VarOffset;
 
   ideal      qideal; /* extension to the ring structure: qring, rInit */
 
 
-  int*     VarOffset;
   int*     firstwv;
 
   struct omBin_s*   PolyBin; /* Bin from where monoms are allocated */
@@ -666,13 +666,13 @@ struct sip_sring
   /* mask for getting single exponents */
   unsigned long bitmask;
   /* mask used for divisiblity tests */
-  unsigned long divmask;
+  unsigned long divmask; // rComplete
 
-  p_Procs_s*    p_Procs;
+  p_Procs_s*    p_Procs; // rComplete/p_ProcsSet
 
   /* FDeg and LDeg */
-  pFDegProc     pFDeg;
-  pLDegProc     pLDeg;
+  pFDegProc     pFDeg; // rComplete/rSetDegStuff
+  pLDegProc     pLDeg; // rComplete/rSetDegStuff
 
   /* as it was determined by rComplete */
   pFDegProc     pFDegOrig;
