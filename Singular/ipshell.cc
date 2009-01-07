@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.200 2009-01-06 16:55:31 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.201 2009-01-07 15:04:33 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1910,14 +1910,15 @@ void rComposeRing(lists L, ring R)
     {
       number ringflaga = (number) LL->m[0].data;
       nlGMP(ringflaga, (number) R->ringflaga);
+      LL->m[0].data = (void *)ringflaga;
     }
     else if ((LL->nr >= 0) && LL->m[0].rtyp == INT_CMD)
     {
-      mpz_init_set_ui(R->ringflaga,(unsigned long) LL->m[0].data);
+      mpz_set_ui(R->ringflaga,(unsigned long) LL->m[0].data);
     }
     else
     {
-      mpz_init_set_ui(R->ringflaga,0);
+      mpz_set_ui(R->ringflaga,0);
     }
     if (LL->nr >= 1)
     {
