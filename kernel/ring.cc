@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.112 2009-01-08 09:42:48 Singular Exp $ */
+/* $Id: ring.cc,v 1.113 2009-01-08 10:21:35 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1467,27 +1467,17 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   ring res=(ring)omAllocBin(ip_sring_bin);
   memset(res,0,sizeof(ip_sring));
   //memcpy4(res,r,sizeof(ip_sring));
-  res->idroot=NULL; /* local objects */
+  //memset: res->idroot=NULL; /* local objects */
   //ideal      minideal;
   res->options=r->options; /* ring dependent options */
 
-  // what follows below here should be set by rComplete, _only_
-  //long      *ordsgn;  /* array of +/- 1 (or 0) for comparing monomials */
-                       /*  ExpL_Size entries*/
-  res->ordsgn=NULL;
-
-  // is NULL for lp or N == 1, otherwise non-NULL (with OrdSize > 0 entries) */
-  //sro_ord*   typ;   /* array of orderings + sizes, OrdSize entries */
-  res->typ=NULL;
-
-
-  //int*     VarOffset;
-  res->VarOffset=NULL;
-  //int*     firstwv;
-  res->firstwv=NULL;
+  //memset: res->ordsgn=NULL;
+  //memset: res->typ=NULL;
+  //memset: res->VarOffset=NULL;
+  //memset: res->firstwv=NULL;
 
   //struct omBin_s*   PolyBin; /* Bin from where monoms are allocated */
-  res->PolyBin=NULL; // rComplete
+  //memset: res->PolyBin=NULL; // rComplete
   res->ch=r->ch;     /* characteristic */
 #ifdef HAVE_RINGS
   res->ringtype=r->ringtype;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
@@ -1498,7 +1488,7 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   }
   res->ringflagb=r->ringflagb;
 #endif
-  res->ref=0; /* reference counter to the ring */
+  //memset: res->ref=0; /* reference counter to the ring */
 
   res->float_len=r->float_len; /* additional char-flags */
   res->float_len2=r->float_len2; /* additional char-flags */
@@ -1524,79 +1514,33 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   res->MixedOrder=r->MixedOrder; // ?? 1 for lex ordering (except ls), -1 otherwise
   res->ComponentOrder=r->ComponentOrder;
 
-
-  // what follows below here should be set by rComplete, _only_
-  // contains component, but no weight fields in E */
-  //short      ExpL_Size; // size of exponent vector in long
-  res->ExpL_Size=0;
-  //short      CmpL_Size; // portions which need to be compared
-  res->CmpL_Size=0;
-  /* number of long vars in exp vector:
-     long vars are those longs in the exponent vector which are
-     occupied by variables, only */
-  //short     VarL_Size;
-  res->VarL_Size=0;
-
-  //short      pCompIndex; /* p->exp.e[pCompIndex] is the component */
-  res->pCompIndex=0;
-  //short      pOrdIndex; /* p->exp[pOrdIndex] is pGetOrd(p) */
-  res->pOrdIndex=0;
-
-  //short      OrdSize; /* size of ord vector (in sro_ord) */
-  res->OrdSize=0;
-
-
-  /* if >= 0, long vars in exp vector are consecutive and start there
-     if <  0, long vars in exp vector are not consecutive */
-  //short     VarL_LowIndex;
-  res->VarL_LowIndex=0;
-  // number of exponents in r->VarL_Offset[0]
-  // is minimal number of exponents in a long var
-  //short     MinExpPerLong;
-  res->MinExpPerLong=0;
-
-  /* if this is > 0, then NegWeightL_Offset[0..size_1] is index of longs in
-   ExpVector whose values need an offset due to negative weights */
-  //short     NegWeightL_Size;
-  res->NegWeightL_Size=0;
-  /* array of NegWeigtL_Size indicies */
-  //int*      NegWeightL_Offset;
-  res->NegWeightL_Offset=NULL;
-
-  /* array of size VarL_Size,
-     VarL_Offset[i] gets i-th long var in exp vector */
-  //int*      VarL_Offset;
-  res->VarL_Offset=NULL;
+  //memset: res->ExpL_Size=0;
+  //memset: res->CmpL_Size=0;
+  //memset: res->VarL_Size=0;
+  //memset: res->pCompIndex=0;
+  //memset: res->pOrdIndex=0;
+  //memset: res->OrdSize=0;
+  //memset: res->VarL_LowIndex=0;
+  //memset: res->MinExpPerLong=0;
+  //memset: res->NegWeightL_Size=0;
+  //memset: res->NegWeightL_Offset=NULL;
+  //memset: res->VarL_Offset=NULL;
 
   // the following are set by rComplete unless predefined
   // therefore, we copy these values: maybe they are non-standard
   /* mask for getting single exponents */
   res->bitmask=r->bitmask;
-  /* mask used for divisiblity tests */
   res->divmask=r->divmask;
   res->BitsPerExp = r->BitsPerExp;
   res->ExpPerLong =  r->ExpPerLong;
 
-  //p_Procs_s*    p_Procs;
-  res->p_Procs=NULL;
-
-  /* FDeg and LDeg */
-  //pFDegProc     pFDeg;
-  res->pFDeg=NULL;
-  //pLDegProc     pLDeg;
-  res->pLDeg=NULL;
-
-  /* as it was determined by rComplete */
-  //pFDegProc     pFDegOrig;
-  res->pFDegOrig=NULL;
-  /* and as it was determined before rOptimizeLDeg */
-  //pLDegProc     pLDegOrig;
-  res->pLDegOrig=NULL;
-
-  //p_SetmProc    p_Setm;
-  res->p_Setm=NULL;
-  //n_Procs_s*    cf;
-  res->cf=NULL;
+  //memset: res->p_Procs=NULL;
+  //memset: res->pFDeg=NULL;
+  //memset: res->pLDeg=NULL;
+  //memset: res->pFDegOrig=NULL;
+  //memset: res->pLDegOrig=NULL;
+  //memset: res->p_Setm=NULL;
+  //memset: res->cf=NULL;
   res->options=r->options;
   #ifdef HAVE_RINGS
   res->ringtype=r->ringtype;
@@ -1605,7 +1549,7 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   if (r->algring!=NULL)
     r->algring->ref++;
   res->algring=r->algring;
-  res->minideal=NULL;
+  //memset: res->minideal=NULL;
   if (r->parameter!=NULL)
   {
     res->minpoly=nCopy(r->minpoly);
@@ -1641,13 +1585,13 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
     memcpy4(res->block0,r->block0,i * sizeof(int));
     memcpy4(res->block1,r->block1,i * sizeof(int));
   }
-  else
-  {
-    res->wvhdl = NULL;
-    res->order = NULL;
-    res->block0 = NULL;
-    res->block1 = NULL;
-  }
+  //memset: else
+  //memset: {
+  //memset:   res->wvhdl = NULL;
+  //memset:   res->order = NULL;
+  //memset:   res->block0 = NULL;
+  //memset:   res->block1 = NULL;
+  //memset: }
 
   res->names   = (char **)omAlloc0(rVar(r) * sizeof(char_ptr));
   for (i=0; i<rVar(res); i++)
@@ -1657,11 +1601,11 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   if (r->qideal!=NULL)
   {
     if (copy_qideal) res->qideal= idrCopyR_NoSort(r->qideal, r);
-    else res->qideal = NULL;
+    //memset: else res->qideal = NULL;
   }
-  else res->qideal = NULL;
+  //memset: else res->qideal = NULL;
 #ifdef HAVE_PLURAL
-  res->GetNC() = NULL; // copy is purely commutative!!!
+  //memset: res->GetNC() = NULL; // copy is purely commutative!!!
 //  if (rIsPluralRing(r))
 //    nc_rCopy0(res, r); // is this correct??? imho: no!
 #endif
