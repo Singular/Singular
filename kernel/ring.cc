@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.111 2009-01-07 18:03:28 Singular Exp $ */
+/* $Id: ring.cc,v 1.112 2009-01-08 09:42:48 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1465,8 +1465,8 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   if (r == NULL) return NULL;
   int i,j;
   ring res=(ring)omAllocBin(ip_sring_bin);
-  //memset(res,0,sizeof(ip_sring));
-  memcpy4(res,r,sizeof(ip_sring));
+  memset(res,0,sizeof(ip_sring));
+  //memcpy4(res,r,sizeof(ip_sring));
   res->idroot=NULL; /* local objects */
   //ideal      minideal;
   res->options=r->options; /* ring dependent options */
@@ -1537,11 +1537,6 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   //short     VarL_Size;
   res->VarL_Size=0;
 
-  //short      BitsPerExp; /* number of bits per exponent */
-  res->BitsPerExp=0;
-  //short      ExpPerLong; /* maximal number of Exponents per long */
-  res->ExpPerLong=0;
-
   //short      pCompIndex; /* p->exp.e[pCompIndex] is the component */
   res->pCompIndex=0;
   //short      pOrdIndex; /* p->exp[pOrdIndex] is pGetOrd(p) */
@@ -1573,12 +1568,14 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   //int*      VarL_Offset;
   res->VarL_Offset=NULL;
 
+  // the following are set by rComplete unless predefined
+  // therefore, we copy these values: maybe they are non-standard
   /* mask for getting single exponents */
-  //unsigned long bitmask;
-  res->bitmask=0;
+  res->bitmask=r->bitmask;
   /* mask used for divisiblity tests */
-  //unsigned long divmask;
-  res->divmask=0;
+  res->divmask=r->divmask;
+  res->BitsPerExp = r->BitsPerExp;
+  res->ExpPerLong =  r->ExpPerLong;
 
   //p_Procs_s*    p_Procs;
   res->p_Procs=NULL;
