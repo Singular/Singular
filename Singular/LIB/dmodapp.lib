@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmodapp.lib,v 1.14 2009-01-07 16:11:35 Singular Exp $";
+version="$Id: dmodapp.lib,v 1.15 2009-01-12 19:31:23 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmodapp.lib     Applications of algebraic D-modules
@@ -17,7 +17,7 @@ The procedures for the localization are DLoc, SDLoc and DLoc0.
 @* - annihilator in Weyl algebra of a given polynomial F from R as well as of a given
 rational function G/F from Quot(R). These can be computed via annPoly resp. annRat.
 
-@* - initial form and initial ideals in Weyl algebras with respect to a given weight vector can be computed with the help of inForm, initialMalgrange, initialIdeal.
+@* - initial form and initial ideals in Weyl algebras with respect to a given weight vector can be computed with the help of inForm, initialMalgrange, initialIdealW.
 
 @* - appelF1, appelF2 and appelF4 return ideals in parametric Weyl algebra, which
 annihilate corresponding Appel hypergeometric functions.
@@ -32,7 +32,7 @@ SDLoc(I, F);  a generic presentation of the localization of D/I w.r.t. f^s, for 
 DLoc0(I, F);  presentation of the localization of D/I w.r.t. f^s, based on the procedure SDLoc
 
 initialMalgrange(f[,s,t,u,v]); Groebner basis of the initial Malgrange ideal for a given poly
-initialIdeal(I,u,v[,s,t]); initial ideal of a given ideal w.r.t. given weights
+initialIdealW(I,u,v[,s,t]); initial ideal of a given ideal w.r.t. given weights
 inForm(f,w);     initial form of a poly/ideal w.r.t. a given weight
 isFsat(I, F);       check whether the ideal I is F-saturated
 
@@ -66,7 +66,7 @@ LIB "bfct.lib";
 // testing for consistency of the library:
 proc testdmodapp()
 {
-  example initialIdeal;
+  example initialIdealW;
   example initialMalgrange;
   example DLoc;
   example DLoc0;
@@ -85,8 +85,8 @@ proc testdmodapp()
 }
 
 
-proc initialIdeal (ideal I, intvec u, intvec v, list #)
-"USAGE:  initialIdeal(I,u,v [,s,t]);  I ideal, u,v intvecs, s,t optional ints
+proc initialIdealW (ideal I, intvec u, intvec v, list #)
+"USAGE:  initialIdealW(I,u,v [,s,t]);  I ideal, u,v intvecs, s,t optional ints
 RETURN:  ideal, GB of initial ideal of the input ideal wrt the weights u and v
 PURPOSE: computes the initial ideal
 NOTE:    Assume, I is an ideal in the n-th Weyl algebra D, where the sequence
@@ -101,7 +101,7 @@ NOTE:    Assume, I is an ideal in the n-th Weyl algebra D, where the sequence
 @*       otherwise, and by default, a block ordering is used.
 DISPLAY: If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
-EXAMPLE: example initialIdeal; shows examples
+EXAMPLE: example initialIdealW; shows examples
 "
 {
   int ppl = printlevel - voice +2;
@@ -135,7 +135,7 @@ example
   setring D;
   intvec u = -1; intvec v = 2;
   ideal I = x^2*Dx^2,x*Dx^4;
-  ideal J = initialIdeal(I,u,v); J;
+  ideal J = initialIdealW(I,u,v); J;
 }
 
 proc initialMalgrange (poly f,list #)

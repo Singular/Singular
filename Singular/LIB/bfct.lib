@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: bfct.lib,v 1.9 2009-01-07 16:11:35 Singular Exp $";
+version="$Id: bfct.lib,v 1.10 2009-01-12 19:31:23 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: bfct.lib     Algorithms for b-functions and Bernstein-Sato polynomial
@@ -44,7 +44,7 @@ SEE ALSO: dmod_lib, dmodapp_lib, gmssing_lib
 
 LIB "qhmoduli.lib"; // for Max
 LIB "dmod.lib";     // for SannfsBFCT etc
-LIB "dmodapp.lib";  // for initialIdeal etc
+LIB "dmodapp.lib";  // for initialIdealW etc
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1345,7 +1345,7 @@ EXAMPLE: example bfctideal; shows examples
       }
     }
   }
-  ideal J = initialIdeal(I,-w,w,whichengine,methodord);
+  ideal J = initialIdealW(I,-w,w,whichengine,methodord);
   poly s;
   for (i=1; i<=n; i++)
   {
