@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.174 2008-10-29 15:43:19 Singular Exp $
+@comment $Id: singular.doc,v 1.175 2009-01-12 17:24:33 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -630,6 +630,11 @@ LIB "all.lib";
 @c ---------------------------------------------------------
 @node surf_lib,surfex_lib, resgraph_lib, Visualization
 @subsection surf_lib
+This library requires the external programs @code{surf}
+and/or @code{surfer} (should be in your search path).
+They can be found at:
+@*@code{surf}: @uref{http://surf.sf.net}
+@*@code{surfer}: @uref{http://www.imaginary2008.de/surf.php}.
 @c lib surf.lib no_ex
 @c ---------------------------------------------------------
 @node surfex_lib,, surf_lib, Visualization
