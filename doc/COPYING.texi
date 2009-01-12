@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.39 2008-12-15 13:20:13 seelisch Exp $
+@comment $Id: COPYING.texi,v 1.40 2009-01-12 16:58:27 Singular Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -13,6 +13,7 @@
 @cindex readline
 @cindex libfac
 @cindex surfex
+@cindex surfer
 
 @center @sc{Singular} version @value{VERSION}
 @center @uref{http://www.uni-kl.de/,,University of Kaiserslautern}
@@ -86,13 +87,13 @@ anonymous ftp through the following addresses:
 @table @asis
 @item GMP, libreadline
 @copyright{} Free Software Foundation
-@* @uref{ftp://ftp.gnu.ai.mit.edu} or its mirrors
+@* @uref{http://gmplib.org}
 @item MP
 @copyright{} Gray/Kajler/Wang, Kent State University
 @* @uref{http://www.symbolicnet.org/areas/protocols/mp.html}
 @item NTL
 @copyright{} Victor Shoup
-@* @uref{http://www.shoup.net}
+@* @uref{http://www.shoup.net/ntl}
 @item Singular-Factory
 @copyright{} Greuel/Stobbe, University of Kaiserslautern:
 @* @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Factory}
@@ -102,6 +103,10 @@ anonymous ftp through the following addresses:
 @item surfex
 @copyright{} Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
 @* @uref{http://surfex.AlgebraicSurface.net}
+@item surf
+@* @uref{http://surf.sf.net}
+@item surfer
+@* @uref{http://www.imaginary2008.de/surfer.php}
 @item @sc{Singular} binaries and sources
 @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/} or via a
 WWW brow@-ser from
