@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.65 2009-01-06 16:53:54 Singular Exp $ */
+/* $Id: ideals.cc,v 1.66 2009-01-12 16:19:45 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -3249,6 +3249,7 @@ matrix idDiff(matrix i, int k)
 {
   int e=MATCOLS(i)*MATROWS(i);
   matrix r=mpNew(MATROWS(i),MATCOLS(i));
+  r->rank=i->rank;
   int j;
   for(j=0; j<e; j++)
   {
