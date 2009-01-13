@@ -1,7 +1,7 @@
 // $Id:
 //GMG, last modified 28.9.01
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: teachstd.lib,v 1.7 2009-01-09 15:19:26 motsak Exp $";
+version="$Id: teachstd.lib,v 1.8 2009-01-13 09:04:40 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY:  teachstd.lib   Procedures for teaching standard bases
@@ -416,10 +416,10 @@ NOTE:    if product criterion applies we can delete (f,g) from pairset
 EXAMPLE: example prodcrit; shows an example
 "
 {
-  if( defined(@@@NOPC) && (@@@NOPC == 1) )
+  if( defined(@@@NOPC) )
   {
-    return(0);
-  };
+    if( @@@NOPC == 1) { return(0); }
+  }
   
   if(typeof(f)=="poly")    //product criterion for polynomials
   {
