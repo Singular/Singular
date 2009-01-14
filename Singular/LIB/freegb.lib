@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: freegb.lib,v 1.13 2008-12-26 18:15:40 levandov Exp $";
+version="$Id: freegb.lib,v 1.14 2009-01-14 15:48:37 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: freegb.lib   Twosided Noncommutative Groebner bases in Free Algebras
@@ -19,7 +19,7 @@ Liebr(a,b[, N]);    compute Lie bracket ab-ba of two letterplace polynomials
 Serre(A,z);          compute the ideal of Serre's relations associated to a generalized Cartan matrix A
 isVar(p);             check whether p is a power of a single variable
 
-SEE ALSO: User manual, section Noncommutative Subsystem, subsection Letterplace
+SEE ALSO: Letterplace
 "
 
 // this library computes two-sided GB of an ideal
