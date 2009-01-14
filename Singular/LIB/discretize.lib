@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: discretize.lib,v 1.4 2009-01-07 16:11:35 Singular Exp $";
+version="$Id: discretize.lib,v 1.5 2009-01-14 16:07:04 Singular Exp $";
 category="Applications";
 info="
 LIBRARY: discretize.lib  Tools for the finite difference schemes
@@ -107,7 +107,7 @@ proc replace(string s, string what, string with)
 "USAGE:  replace(s,what,with);  s,what,with strings
 RETURN:  string
 PURPOSE: replaces in 's' all the substrings 'what' with substring 'with'
-NOTE: 
+NOTE:
 EXAMPLE: example replace; shows examples
 "{
   // clear: replace in s, "what" with "with"
@@ -418,7 +418,7 @@ EXAMPLE: example texcoef; shows examples
     {
       if ( (sout[i]=="+") || (sout[i]=="-") )
       {
-	NisPoly = 1;
+        NisPoly = 1;
       }
     }
     if (NisPoly)
@@ -708,7 +708,7 @@ print(M*X);
  "* Create the nodal of the scheme in TeX format: ";
  " ideal I = decoef(p,dt);";
  " difpoly2tex(I,L);";
- difpoly2tex(I,L); // the nodal form of the scheme in TeX 
+ difpoly2tex(I,L); // the nodal form of the scheme in TeX
  "* Preparations for the semi-factorized form: ";
  poly pi1 = subst(I[2],B,0);
  poly pi2 = I[2] - pi1;

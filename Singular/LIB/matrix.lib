@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.45 2008-12-08 14:31:46 motsak Exp $";
+version="$Id: matrix.lib,v 1.46 2009-01-14 16:07:05 Singular Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -29,14 +29,14 @@ PROCEDURES:
  permrow(A,i,j);        permute i-th and j-th rows
  rowred(A[,any]);       reduction of matrix A with elementary row-operations
  colred(A[,any]);       reduction of matrix A with elementary col-operations
- linear_relations(E);   find linear relations between homogeneous vectors 
+ linear_relations(E);   find linear relations between homogeneous vectors
  rm_unitrow(A);         remove unit rows and associated columns of A
  rm_unitcol(A);         remove unit columns and associated rows of A
  headStand(A);          A[n-i+1,m-j+1]:=A[i,j]
  symmetricBasis(n,k[,s]); basis of k-th symmetric power of n-dim v.space
  exteriorBasis(n,k[,s]); basis of k-th exterior power of n-dim v.space
  symmetricPower(A,k);   k-th symmetric power of a module/matrix A
- exteriorPower(A,k);    k-th exterior power of a module/matrix A 
+ exteriorPower(A,k);    k-th exterior power of a module/matrix A
           (parameters in square brackets [] are optional)
 ";
 
@@ -909,8 +909,8 @@ example
 proc linear_relations(module M)
 "USAGE:   linear_relations(M);
          M: a module
-ASSUME:  All non-zero entries of M are homogeneous polynomials of the same 
-         positife degree. The base field must be an exact field (not real 
+ASSUME:  All non-zero entries of M are homogeneous polynomials of the same
+         positife degree. The base field must be an exact field (not real
          or complex).
          It is not checked whether these assumptions hold.
 RETURN:  a maximal module R such that M*R is formed by zero vectors.
@@ -956,7 +956,7 @@ example
   module REL = linear_relations(M);
   pmat(REL);
   pmat(M*REL);
-}  
+}
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -1077,9 +1077,9 @@ example
 
 proc symmetricBasis(int n, int k, list #)
 "USAGE:    symmetricBasis(n, k[,s]); n int, k int, s string
-RETURN:   ring, poynomial ring containing the ideal \"symBasis\", 
+RETURN:   ring, poynomial ring containing the ideal \"symBasis\",
           being a basis of the k-th symmetric power of an n-dim vector space.
-NOTE:     The output polynomial ring has characteristics 0 and n variables 
+NOTE:     The output polynomial ring has characteristics 0 and n variables
           named \"S(i)\", where the base variable name S is either given by the
           optional string argument(which must not contain brackets) or equal to
           "e" by default.
@@ -1098,7 +1098,7 @@ EXAMPLE:  example symmetricBasis; shows an example"
     S = #[1];
     if( (find(S, "(") + find(S, ")")) > 0 )
     {
-      ERROR("Wrong optional argument: must be a string without brackets"); 
+      ERROR("Wrong optional argument: must be a string without brackets");
     }
   }
 
@@ -1116,7 +1116,7 @@ example
 { "EXAMPLE:"; echo = 2;
 
 // basis of the 3-rd symmetricPower of a 4-dim vector space:
-def R = symmetricBasis(4, 3, "@e"); setring R; 
+def R = symmetricBasis(4, 3, "@e"); setring R;
 R;  // container ring:
 symBasis; // symmetric basis:
 }
@@ -1125,9 +1125,9 @@ symBasis; // symmetric basis:
 
 proc exteriorBasis(int n, int k, list #)
 "USAGE:    exteriorBasis(n, k[,s]); n int, k int, s string
-RETURN:   qring, an exterior algebra containing the ideal \"extBasis\", 
+RETURN:   qring, an exterior algebra containing the ideal \"extBasis\",
           being a basis of the k-th exterior power of an n-dim vector space.
-NOTE:     The output polynomial ring has characteristics 0 and n variables 
+NOTE:     The output polynomial ring has characteristics 0 and n variables
           named \"S(i)\", where the base variable name S is either given by the
           optional string argument(which must not contain brackets) or equal to
           "e" by default.
@@ -1146,7 +1146,7 @@ EXAMPLE:  example exteriorBasis; shows an example"
     S = #[1];
     if( (find(S, "(") + find(S, ")")) > 0 )
     {
-      ERROR("Wrong optional argument: must be a string without brackets"); 
+      ERROR("Wrong optional argument: must be a string without brackets");
     }
   }
 
@@ -1164,7 +1164,7 @@ EXAMPLE:  example exteriorBasis; shows an example"
 example
 { "EXAMPLE:"; echo = 2;
 // basis of the 3-rd symmetricPower of a 4-dim vector space:
-def r = exteriorBasis(4, 3, "@e"); setring r; 
+def r = exteriorBasis(4, 3, "@e"); setring r;
 r; // container ring:
 extBasis; // exterior basis:
 }
@@ -1193,7 +1193,7 @@ NOTE: everything over the basering!
       module A (matrix of the map), int k (power)
       rings Tn is source- and Tm is image-ring with bases
           resp. Ink and Imk.
-      M = max dim of Image, N - dim. of source      
+      M = max dim of Image, N - dim. of source
 SEE ALSO: symmetricPower, exteriorPower"
 {
   def save = basering;
@@ -1205,7 +1205,7 @@ SEE ALSO: symmetricPower, exteriorPower"
   int i, j;
 
 //------------------------- compute matrix of single images ------------------
-  def Rm = save + Tm;  setring Rm; 
+  def Rm = save + Tm;  setring Rm;
   dbprint(p-2, "Temporary Working Ring", Rm);
 
   module A = imap(save, A);
@@ -1227,9 +1227,9 @@ SEE ALSO: symmetricPower, exteriorPower"
 
 //------------------------- compute image ---------------------
   // apply S^k(A): Tn -> Rm  to Source basis vectors Ink:
-  map TMap = Tn, B; 
+  map TMap = Tn, B;
 
-  ideal C = NF(TMap(Ink), std(0)); 
+  ideal C = NF(TMap(Ink), std(0));
   dbprint(p-1, "Image Matrix: ", C);
 
 
@@ -1272,7 +1272,7 @@ SEE ALSO: symmetricPower, exteriorPower"
 proc symmetricPower(module A, int k)
 "USAGE:    symmetricPower(A, k); A module, k int
 RETURN:   module: the k-th symmetric power of A
-NOTE:     the chosen bases and most of intermediate data will be shown if 
+NOTE:     the chosen bases and most of intermediate data will be shown if
           printlevel is big enough
 SEE ALSO: exteriorPower
 KEYWORDS: symmetric power
@@ -1302,7 +1302,7 @@ EXAMPLE:  example symmetricPower; shows an example"
   dbprint(p, "S^k(Image Basis)", Imk);
 
 //------------------------- compute and return S^k(A) in chosen bases --
-  setring save;  
+  setring save;
 
   return(mapPower(p, A, k, Tn, Tm));
 }
@@ -1331,7 +1331,7 @@ print(symmetricPower(B, 3)); // zero! (over an exterior algebra!)
 proc exteriorPower(module A, int k)
 "USAGE:    exteriorPower(A, k); A module, k int
 RETURN:   module: the k-th exterior power of A
-NOTE:     the chosen bases and most of intermediate data will be shown if 
+NOTE:     the chosen bases and most of intermediate data will be shown if
           printlevel is big enough. Last rows will be invisible if zero.
 SEE ALSO: symmetricPower
 KEYWORDS: exterior power
@@ -1365,16 +1365,16 @@ EXAMPLE:  example exteriorPower; shows an example"
 }
 example
 { "EXAMPLE:"; echo = 2;
-  ring r = (0),(a, b, c, d, e, f), dp; 
+  ring r = (0),(a, b, c, d, e, f), dp;
   r; "base ring:";
 
-  module B = a*gen(1) + c*gen(2) + e*gen(3), 
-             b*gen(1) + d*gen(2) + f*gen(3), 
+  module B = a*gen(1) + c*gen(2) + e*gen(3),
+             b*gen(1) + d*gen(2) + f*gen(3),
                         e*gen(1) + f*gen(3);
 
   print(B);
-  print(exteriorPower(B, 2)); 
-  print(exteriorPower(B, 3)); 
+  print(exteriorPower(B, 2));
+  print(exteriorPower(B, 3));
 
   def g = SuperCommutative(); setring g; g;
 
@@ -1383,8 +1383,8 @@ example
 
   print(exteriorPower(A, 2));
 
-  module B = a*gen(1) + c*gen(2) + e*gen(3), 
-             b*gen(1) + d*gen(2) + f*gen(3), 
+  module B = a*gen(1) + c*gen(2) + e*gen(3),
+             b*gen(1) + d*gen(2) + f*gen(3),
                         e*gen(1) + f*gen(3);
   print(B);
 

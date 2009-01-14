@@ -1,6 +1,6 @@
-// $Id: elim.lib,v 1.25 2008-11-13 10:50:17 Singular Exp $
+// $Id: elim.lib,v 1.26 2009-01-14 16:07:04 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: elim.lib,v 1.25 2008-11-13 10:50:17 Singular Exp $";
+version="$Id: elim.lib,v 1.26 2009-01-14 16:07:04 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      Elimination, Saturation and Blowing up
@@ -185,26 +185,26 @@ example
  }
 ///////////////////////////////////////////////////////////////////////////////
 proc elimRing ( poly vars, list #)
-"USAGE:   elimRing(vars [,w]); vars = product of variables to be eliminated 
+"USAGE:   elimRing(vars [,w]); vars = product of variables to be eliminated
          (type poly), w = intvec (specifying weights for all variables)
-RETURN:  a ring, say R, s.t. the monomial ordering of R has 2 blocks. 
+RETURN:  a ring, say R, s.t. the monomial ordering of R has 2 blocks.
          The first block corresponds to the (given) variables to be eliminated
-         and has ordering dp if these variables have weight all 1; if w is 
-         given or if not all variables in vars have weight 1 the ordering is 
-         wp(w1) where w1 is the intvec of weights of the variables to be 
-         eliminated. 
-         The second block corresponds to variables not to be eliminated. 
-@*       If the first variable not to be eliminated is global (i.e. > 1), 
-         resp. local (i.e. < 1), the second block has ordering dp, resp. ds, 
-         (or wp(w2), resp. ws(w2), where w2 is the intvec of weights of the 
+         and has ordering dp if these variables have weight all 1; if w is
+         given or if not all variables in vars have weight 1 the ordering is
+         wp(w1) where w1 is the intvec of weights of the variables to be
+         eliminated.
+         The second block corresponds to variables not to be eliminated.
+@*       If the first variable not to be eliminated is global (i.e. > 1),
+         resp. local (i.e. < 1), the second block has ordering dp, resp. ds,
+         (or wp(w2), resp. ws(w2), where w2 is the intvec of weights of the
          variables not to be eliminated).
-@*       If the basering is a quotient ring P/Q, then R a quotient ring 
+@*       If the basering is a quotient ring P/Q, then R a quotient ring
          with Q replaced by a standard basis of Q w.r.t. the new ordering
-         (parameters are not touched). 
+         (parameters are not touched).
 NOTE:    The ordering in R is an elimination ordering for the variables
          appearing in vars.
-PURPOSE: Prepare a ring for eliminating vars from an ideal/moduel by 
-         computing a standard basis in R with a fast monomial ordering. 
+PURPOSE: Prepare a ring for eliminating vars from an ideal/moduel by
+         computing a standard basis in R with a fast monomial ordering.
          This procedure is used by the procedure elim.
 EXAMPLE: example elimRing; shows an example
 "
@@ -218,7 +218,7 @@ EXAMPLE: example elimRing; shows an example
   if (size(#) == 1)
   {
     if ( typeof(#[1]) == "intvec" )
-    {  
+    {
        @w = #[1];              //take the given weights
     }
   }
@@ -235,7 +235,7 @@ EXAMPLE: example elimRing; shows an example
   for( ii=1; ii<=nvarBR; ii++ )
   {
      if( vars/var(ii)==0 )    //treat variables not to be eliminated
-     { 
+     {
         w2 = w2,@w[ii];
         v2 = v2+list(string(var(ii)));
         if ( defined(local) == 0 )
@@ -243,7 +243,7 @@ EXAMPLE: example elimRing; shows an example
            int local = (var(ii) < 1);
          }
      }
-     else 
+     else
      {
         w1 = w1,@w[ii];
         v1 = v1+list(string(var(ii)));
@@ -262,11 +262,11 @@ EXAMPLE: example elimRing; shows an example
   }
 
   w1 = w1[2..size(w1)];
-  w2 = w2[2..size(w2)]; 
+  w2 = w2[2..size(w2)];
 
   //--- put variables to be eliminated in front:
-  BRlist[2] = v1 + v2;  
-             
+  BRlist[2] = v1 + v2;
+
   //--- create a block ordering with two blocks and weights:
   int nblock = size(BRlist[3]);      //number of blocks
   list BR3 =  BRlist[3];             //save ordering
@@ -317,7 +317,7 @@ EXAMPLE: example elimRing; shows an example
     BRlist[3] = insert(BRlist[3],BR3[1]);
   }
 
-  def eRing = ring(quotientList(BRlist)); 
+  def eRing = ring(quotientList(BRlist));
   return (eRing);
 }
 example
@@ -326,40 +326,40 @@ example
    def P = elimRing(yu);  P;
    intvec w = 1,1,3,4,5;
    elimRing(yu,w);
- 
+
    ring S =  (0,a),(x,y,z,u,v),ws(1,2,3,4,5);
    minpoly = a2+1;
    qring T = std(ideal(x+y2+v3,(x+v)^2));
-   def Q = elimRing(yv);  
+   def Q = elimRing(yv);
    setring Q; Q;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc elim (id, list #)
-"USAGE:   elim(id,arg[,\"withWeights\"]);  id ideal/module, arg can be either 
-        an intvec vor a product p of variables (type poly) 
-RETURN: ideal/module obtained from id by eliminating either the variables 
-        with indices appearing in v or the variables appearing in p. 
+"USAGE:   elim(id,arg[,\"withWeights\"]);  id ideal/module, arg can be either
+        an intvec vor a product p of variables (type poly)
+RETURN: ideal/module obtained from id by eliminating either the variables
+        with indices appearing in v or the variables appearing in p.
         Works also in a qring.
 METHOD: elim uses elimRing to create a ring with block ordering with two
-        blocks where the first block contains the variables to be eliminated 
+        blocks where the first block contains the variables to be eliminated
         and then uses groebner. If the variables in the basering have weights
         these weights are used in elimRing.
-@*      If a string \"withWeigts\" as second, optional argument is given, 
-        Singular computes weights for the variables to make the input as 
+@*      If a string \"withWeigts\" as second, optional argument is given,
+        Singular computes weights for the variables to make the input as
         homogeneous as possible.
 @*      The method is different from that used by eliminate and elim1;
         in some examples elim can be significantly faster.
-NOTE:   No special monomial ordering is required, i.e. the ordering can be 
-        local or mixed. The result is a SB with respect to the ordering of 
-        the second block used by elimRing. E.g. if the first var not to be 
-        eliminated is global, resp. local, this ordering is dp, resp. ds 
-        (or wp, resp. ws, with the given weights for these variables). 
-        If printlevel > 0 the ring for which the output is a SB is shown. 
+NOTE:   No special monomial ordering is required, i.e. the ordering can be
+        local or mixed. The result is a SB with respect to the ordering of
+        the second block used by elimRing. E.g. if the first var not to be
+        eliminated is global, resp. local, this ordering is dp, resp. ds
+        (or wp, resp. ws, with the given weights for these variables).
+        If printlevel > 0 the ring for which the output is a SB is shown.
 SEE ALSO: eliminate, elim1
 EXAMPLE: example elim; shows an example
 "
-{  
+{
   if (size(#) == 0)
   {
     ERROR("## specify variables to be eliminated");
@@ -368,28 +368,28 @@ EXAMPLE: example elim; shows an example
   def BR = basering;
 //-------------------------------- check input -------------------------------
   poly vars;
-  int ii; 
+  int ii;
   if (size(#) > 0)
   {
     if ( typeof(#[1]) == "poly" )
-    {  
+    {
       vars = #[1];
     }
     if ( typeof(#[1]) == "intvec")
-    {  
+    {
       vars=1;
-      for( ii=1; ii<=size(#[1]); ii++ ) 
-      {  
-        vars=vars*var(#[1][ii]); 
+      for( ii=1; ii<=size(#[1]); ii++ )
+      {
+        vars=vars*var(#[1][ii]);
       }
     }
   }
   if (size(#) == 2)
   {
     if ( typeof(#[2]) == "string" )
-    {  
+    {
        if ( #[2] == "withWeights" )
-       { 
+       {
          intvec @w = weight(id);
        }
     }
@@ -410,8 +410,8 @@ EXAMPLE: example elim; shows an example
 //---------- now eliminate in new ring and map back to old ring ---------------
   id = groebner(id);
   id = nselect(id,1..size(ringlist(ER)[3][1][2]));
-  if ( pr > 0 ) 
-  { 
+  if ( pr > 0 )
+  {
      "// result is a SB in the following ring:";
      ER;
   }
@@ -423,7 +423,7 @@ example
    ring r=0,(x,y,u,v,w),dp;
    ideal i=x-u,y-u2,w-u3,v-x+y3;
    elim(i,3..4);
-   elim(i,uv); 
+   elim(i,uv);
    int p = printlevel;
    printlevel = 2;
    elim(i,uv,"withWeights");

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmodapp.lib,v 1.15 2009-01-12 19:31:23 Singular Exp $";
+version="$Id: dmodapp.lib,v 1.16 2009-01-14 16:07:04 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmodapp.lib     Applications of algebraic D-modules
@@ -8,10 +8,10 @@ AUTHORS: Viktor Levandovskyy,      levandov@math.rwth-aachen.de
 
 GUIDE: Let R = K[x1,..xN] and D be the Weyl algebra in variables x1,..xN,d1,..dN.
 In this library there are the following procedures for algebraic D-modules:
-@* - localization of a holonomic module D/I with respect to a mult. closed set 
+@* - localization of a holonomic module D/I with respect to a mult. closed set
 of all powers of a given polynomial F from R. Our aim is to compute an ideal L
-in D, such that D/L is a presentation of a localized module. Such L always exists, since 
-such localizations are known to be holonomic and thus cyclic modules. 
+in D, such that D/L is a presentation of a localized module. Such L always exists, since
+such localizations are known to be holonomic and thus cyclic modules.
 The procedures for the localization are DLoc, SDLoc and DLoc0.
 
 @* - annihilator in Weyl algebra of a given polynomial F from R as well as of a given
@@ -422,7 +422,7 @@ EXAMPLE: example inForm; shows examples
   if (I == 0)
   {
     return(I);
-  }  
+  }
   int j,i,s,m;
   list l;
   poly g;
@@ -441,11 +441,11 @@ EXAMPLE: example inForm; shows examples
       }
       else
       {
-	if (s > m)
-	{
-	  m = s;
-	  g = l[i][2];
-	}
+        if (s > m)
+        {
+          m = s;
+          g = l[i][2];
+        }
       }
     }
     J[j] = g;
@@ -586,7 +586,7 @@ EXAMPLE: example annfs; shows examples
 */
 
 
-proc appelF1() 
+proc appelF1()
 "USAGE:  appelF1();
 RETURN:  ring
 PURPOSE: define the ideal in a parametric Weyl algebra, which annihilates Appel F1 hypergeometric function
@@ -612,7 +612,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,x,dp;
-  def A = appelF1(); 
+  def A = appelF1();
   setring A;
   IAppel1;
 }
@@ -642,12 +642,12 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,x,dp;
-  def A = appelF2(); 
+  def A = appelF2();
   setring A;
   IAppel2;
 }
 
-proc appelF4() 
+proc appelF4()
 "USAGE:  appelF4();
 RETURN:  ring
 PURPOSE: define the ideal in a parametric Weyl algebra, which annihilates Appel F4 hypergeometric function
@@ -672,7 +672,7 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,x,dp;
-  def A = appelF4(); 
+  def A = appelF4();
   setring A;
   IAppel4;
 }
@@ -715,7 +715,7 @@ proc isFsat(ideal I, poly F)
 RETURN: int
 PURPOSE: check whether the ideal I is F-saturated
 NOTE:    1 is returned if I is F-saturated, otherwise 0 is returned.
-@*   we check indeed that Ker(D --F--> D/I) is (0) 
+@*   we check indeed that Ker(D --F--> D/I) is (0)
 EXAMPLE: example isFsat; shows examples
 "
 {
@@ -1331,8 +1331,8 @@ example
   setring B;
   LD;
   // Now, compare with the output of Macaulay2:
-  ideal tst = 3*x*Dx + 2*y*Dy + 1, y^3*Dy^2 - x^2*Dy^2 + 6*y^2*Dy + 6*y, 
-9*y^2*Dx^2*Dy - 4*y*Dy^3 + 27*y*Dx^2 + 2*Dy^2, 9*y^3*Dx^2 - 4*y^2*Dy^2 + 10*y*Dy -10; 
+  ideal tst = 3*x*Dx + 2*y*Dy + 1, y^3*Dy^2 - x^2*Dy^2 + 6*y^2*Dy + 6*y,
+9*y^2*Dx^2*Dy - 4*y*Dy^3 + 27*y*Dx^2 + 2*Dy^2, 9*y^3*Dx^2 - 4*y^2*Dy^2 + 10*y*Dy -10;
  option(redSB); option(redTail);
  LD = groebner(LD);
  tst = groebner(tst);
@@ -1404,7 +1404,7 @@ example
   NF(Dy^4, LD); // must be 0 since Dy^4 clearly annihilates f
 }
 
-/* DIFFERENT EXAMPLES 
+/* DIFFERENT EXAMPLES
 
 //static proc exCusp()
 {
@@ -1503,7 +1503,7 @@ example
 
 */
 
-proc engine(ideal I, int i) 
+proc engine(ideal I, int i)
 "USAGE:  engine(I,i);  I an ideal, i an int
 RETURN:  ideal
 PURPOSE: compute the Groebner basis of I with the algorithm, chosen via i
@@ -1526,7 +1526,7 @@ EXAMPLE: example engine; shows examples
   }
   return(J);
 }
-example 
+example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),Dp;
@@ -1561,9 +1561,9 @@ EXAMPLE: example insertGenerator; shows examples
     if (inp2 =="poly") { poly f = #[2]; }
     else
     {
-      if (inp1 == "ideal") 
+      if (inp1 == "ideal")
       {
-	ERROR("second argument has to be a poly if first argument is an ideal");
+        ERROR("second argument has to be a poly if first argument is an ideal");
       }
       else { vector f = #[2]; }
     }
@@ -1578,7 +1578,7 @@ EXAMPLE: example insertGenerator; shows examples
       k = #[3];
       if (k<=0)
       {
-	ERROR("third argument has to be positive");
+        ERROR("third argument has to be positive");
       }
     }
     else { ERROR("third argument has to be of type int"); }

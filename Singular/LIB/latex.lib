@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: latex.lib,v 1.29 2007-06-20 22:30:41 levandov Exp $";
+version="$Id: latex.lib,v 1.30 2009-01-14 16:07:05 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: latex.lib    Typesetting of Singular-Objects in LaTeX2e
@@ -676,8 +676,8 @@ EXAMPLE: example texobj; shows an example
 
  if (size(#)==1)
  { if (typeof(#[1])=="int" or typeof(#[1])=="intvec" or typeof(#[1])=="vector"
-    or typeof(#[1])=="number" or typeof(#[1])=="bigint" or defined(TeXaligned)) 
-   { DA = D; DE = D; } 
+    or typeof(#[1])=="number" or typeof(#[1])=="bigint" or defined(TeXaligned))
+   { DA = D; DE = D; }
 }
 
  s = DA;
@@ -695,7 +695,7 @@ EXAMPLE: example texobj; shows an example
      }
     else {s = s + obj + newline;}
    }
-   if (typeof(obj) == "int" or typeof(#[1])=="bigint") 
+   if (typeof(obj) == "int" or typeof(#[1])=="bigint")
    { s = s + "  " + string(obj) + "  ";}
 
    if (typeof(obj) == "intvec")
@@ -1593,7 +1593,7 @@ static proc parst(string s,int sec)                // parse parameter
 
   //if(defined(TeXreplace)){ short =0;}   // hier ueberfluessig 31.5.07
   if (short)
-  { j = 0;  // 31.5.07  
+  { j = 0;  // 31.5.07
     while(s[i]<>"!")
     { b=i; if (s[i]=="+" or s[i]=="-") {j++;}  // 31.5.07
       while(s[i]>="0" and s[i]<="9" or (s[i]=="+" or s[i]=="-") and s[i]!="!")

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: freegb.lib,v 1.14 2009-01-14 15:48:37 Singular Exp $";
+version="$Id: freegb.lib,v 1.15 2009-01-14 16:07:04 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: freegb.lib   Twosided Noncommutative Groebner bases in Free Algebras
@@ -9,7 +9,7 @@ PROCEDURES:
 freegbRing(d);    creates a ring with d blocks of shifted original variables
 freegbasis(L, int n);   compute two-sided Groebner basis of ideal, encoded via L, up to degree n
 
-AUXILIARY PROCEDURES: 
+AUXILIARY PROCEDURES:
 
 lp2lstr(K, s);      convert letter-place ideal to a list of modules
 lst2str(L[, n]);     convert a list (of modules) into polynomials in free algebra
@@ -309,7 +309,7 @@ example
 proc isVar(poly p)
 "USAGE:  isVar(p);  poly p
 RETURN:  int
-PURPOSE: checks whether p is a power of a single variable from the basering. 
+PURPOSE: checks whether p is a power of a single variable from the basering.
 @* Returns the exponent or 0 is p is not a power of  a single variable.
 EXAMPLE: example isVar; shows examples
 "
@@ -912,7 +912,7 @@ example
   A;
 }
 
-/* EXAMPLES: 
+/* EXAMPLES:
 
 //static proc ex_shift()
 {
@@ -1064,7 +1064,7 @@ example
   lst2str(U);
 }
 
-// END COMMENTED EXAMPLES 
+// END COMMENTED EXAMPLES
 
 */
 
@@ -1530,7 +1530,7 @@ hence 2==0! only in char 2
 
   // Adem rels modulo 2 are interesting
 
-//static 
+//static
 proc stringpoly2lplace(string s)
 {
   // decomposes sentence into terms
@@ -1705,7 +1705,7 @@ example
   addplaces(L);
 }
 
-//static 
+//static
 proc sent2lplace(string s)
 {
   // SENTence of words TO LetterPLACE
@@ -2101,7 +2101,7 @@ EXAMPLE: example Serre; shows examples
 example
 {
   "EXAMPLE:"; echo = 2;
-  intmat A[3][3] =  
+  intmat A[3][3] =
     2, -1, 0,
     -1, 2, -3,
     0, -1, 2; // G^1_2 Cartan matrix
@@ -2344,7 +2344,7 @@ example
   I;
 }
 
-/* EXAMPLES AGAIN: 
+/* EXAMPLES AGAIN:
 //static proc get_ls3nilp()
 {
 //first app of file2lplace

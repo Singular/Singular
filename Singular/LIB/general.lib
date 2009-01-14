@@ -2,7 +2,7 @@
 //anne, added deleteSublist and watchdog 12.12.2000
 //eric, added absValue 11.04.2002
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.58 2008-12-12 11:26:34 Singular Exp $";
+version="$Id: general.lib,v 1.59 2009-01-14 16:07:04 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -196,7 +196,7 @@ example
 { "EXAMPLE:"; echo = 2;
    binomial(200,100);"";                 //type bigint
    int n,k = 200,100;
-   bigint b1 = binomial(n,k);            
+   bigint b1 = binomial(n,k);
    ring r = 0,x,dp;
    poly b2 = coeffs((x+1)^n,x)[k+1,1];  //coefficient of x^k in (x+1)^n
    b1-b2;                               //b1 and b2 should coincide
@@ -1087,10 +1087,10 @@ EXAMPLE: example watchdog; shows an example
         {
           def watchdog_rneu=basering;
           setring rsave;
-	  if (!defined(result))
-	  {
-	    def result=fetch(watchdog_rneu,result);
-	  }
+          if (!defined(result))
+          {
+            def result=fetch(watchdog_rneu,result);
+          }
         }
         if(defined(watchdog_interrupt))
         {

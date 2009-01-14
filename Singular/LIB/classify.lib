@@ -1,6 +1,6 @@
 // KK,GMG last modified: 17.12.00
 ///////////////////////////////////////////////////////////////////////////////
-version  = "$Id: classify.lib,v 1.54 2008-12-08 14:24:41 dreyer Exp $";
+version  = "$Id: classify.lib,v 1.55 2009-01-14 16:07:03 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  classify.lib  Arnold Classifier of Singularities
@@ -1473,7 +1473,7 @@ static proc Funktion47 (poly f, list cstn)
 //  return(printresult(47, f, tp, cstn, -1));
 
   s = s +" has 4-jet equal to zero. (F47), mu="+string(Mu);
-  
+
   s; // +"  ("+SG_Typ+")";
   s = "No further classification available.";
   s;
@@ -2221,8 +2221,8 @@ static proc HKclass7 (intvec sg, string SG_Typ, int cnt)
 {
   list v;
 
-  if(sg[1]==1 && sg[2]==0 && sg[3]==1) { 
-      v=HKclass7_teil_1(sg, SG_Typ, cnt); 
+  if(sg[1]==1 && sg[2]==0 && sg[3]==1) {
+      v=HKclass7_teil_1(sg, SG_Typ, cnt);
   }
   else {
       v[1]="not in list";

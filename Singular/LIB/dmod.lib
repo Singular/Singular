@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.33 2008-12-23 21:39:31 levandov Exp $";
+version="$Id: dmod.lib,v 1.34 2009-01-14 16:07:04 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -1284,7 +1284,7 @@ EXAMPLE: example annfs2; shows examples
   for (i=2; i<= size(P[1]); i++)  //we delete P[1][1] and P[2][1]
   {
     bs[i-1] = P[1][i]; bs[i-1] = subst(bs[i-1],s,-s-1);
-    m[i-1]  = P[2][i]; 
+    m[i-1]  = P[2][i];
   }
   int sP = minIntRoot(bs,1);
   bs =  normalize(bs);
@@ -1464,7 +1464,7 @@ EXAMPLE: example annfsRB; shows examples
   ring @R3 = 0,s,dp;
   dbprint(ppl,"// -2-1- the ring @R3 i.e. K[s] is ready");
   ideal K3 = imap(@R2,K2);
-  poly p = K3[1]; 
+  poly p = K3[1];
   p = s*p; // mult with the lost (s+1) factor
   dbprint(ppl,"// -2-2- factorization");
   //  ideal P = factorize(p,1);  //without constants and multiplicities
@@ -1479,7 +1479,7 @@ EXAMPLE: example annfsRB; shows examples
   for (i=2; i<= size(P[1]); i++)  //we delete P[1][1] and P[2][1]
   {
     bs[i-1] = P[1][i]; bs[i-1] = subst(bs[i-1],s,-s-1);
-    m[i-1]  = P[2][i]; 
+    m[i-1]  = P[2][i];
   }
   int sP = minIntRoot(bs,1);
   bs =  normalize(bs);
@@ -1922,11 +1922,11 @@ EXAMPLE: example operatorModulo; shows examples
     {
       if ( leadmonom(K[i,2]) == 1)
       {
-	t = K[i,1];
-	n = leadcoef(K[i,2]);
-	t = t/n;
-	//        J = J, K[i][2];
-	break;
+        t = K[i,1];
+        n = leadcoef(K[i,2]);
+        t = t/n;
+        //        J = J, K[i][2];
+        break;
       }
     }
   }
@@ -3560,7 +3560,7 @@ EXAMPLE: example SannfsBFCT; shows examples
   Lord[1] = tmp;
   kill s;
   kill NName;
-  tmp[1]      = "C"; 
+  tmp[1]      = "C";
   Lord[2]     = tmp;  tmp = 0;
   L[3]        = Lord;
   // we are done with the list. Now add a Plural part

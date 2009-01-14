@@ -1,5 +1,5 @@
 // version string automatically expanded by CVS
-version="$Id: powers.lib,v 1.3 2008-06-26 13:17:43 motsak Exp $";
+version="$Id: powers.lib,v 1.4 2009-01-14 16:07:05 Singular Exp $";
 category="Linear algebra";
 
 info="
@@ -14,9 +14,9 @@ PROCEDURES:
 
     exteriorBasis(int, int)        return a basis of a k-th exterior power
     exteriorPower(module,int)      return k-th exterior power of a matrix
-       
+
 ";
-    
+
 
 LIB "general.lib"; // for sort
 LIB "nctools.lib"; // for SuperCommutative
@@ -80,7 +80,7 @@ EXAMPLE:  example exteriorBasis; shows an example"
   {
     p = char(basering);
   }
-    
+
   ring S = (p), (e(1..n)), dp;
   def T = SuperCommutative(); setring T;
   ideal I = simplify( NF(maxideal(k), std(0)), 1 + 2 + 8 );

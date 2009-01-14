@@ -1,4 +1,4 @@
-version="$Id: nchomolog.lib,v 1.8 2008-08-07 21:15:02 levandov Exp $";
+version="$Id: nchomolog.lib,v 1.9 2009-01-14 16:07:05 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  nchomolog.lib   Procedures for Noncommutative Homological Algebra
@@ -167,7 +167,7 @@ example
 { "EXAMPLE:"; echo = 2;
   ring A=0,(x,t,dx,dt),dp;
   def W = Weyl(); setring W;
-  matrix M[2][2] = 
+  matrix M[2][2] =
     dt,  dx,
     t*dx,x*dt;
   module H = ncHom_R(M);
@@ -225,7 +225,7 @@ RETURN:   right module Ext, a presentation of Ext^i(M',R)
 EXAMPLE: example ncExt_R; shows an example
 "{
   if (i==0)
-  { 
+  {
     return(ncHom_R(Ps)); // the rest is not needed
   }
   list Phi   = nres(Ps,i+1); // left resolution
@@ -511,7 +511,7 @@ proc dmodualtest(module M, int n)
   // where n is the half-number of vars of Weyl algebra
   // assumed to be basering
   // returns the difference between M and Ext^n_D(Ext^n_D(M,D),D)
-  def save = basering; 
+  def save = basering;
   setring save;
   module Md = ncExt_R(n,M); // right module
   // would be nice to use "prune"!
@@ -536,14 +536,14 @@ example
 { "EXAMPLE:"; echo = 2;
   ring R   = 0,(x,y),dp;
   poly F   = x3-y2;
-  def A    = annfs(F); 
+  def A    = annfs(F);
   setring A;
   dmodualtest(LD,2);
 }
 
 
 proc dmodoublext(module M, list #)
-"USAGE:   dmodoublext(M [,i]);  M module, i optional int 
+"USAGE:   dmodoublext(M [,i]);  M module, i optional int
 COMPUTE:  a presentation of Ext^i(Ext^i(M,D),D); for basering D
 RETURN:   left module
 NOTE: by default, i is set to the integer part of the half of number of variables of D
@@ -552,7 +552,7 @@ EXAMPLE: example dmodoublext; shows an example
 "
 {
   // assume: basering is a Weyl algebra?
-  def save = basering; 
+  def save = basering;
   setring save;
   // if a list is nonempty and contains an integer N, n = N; otherwise n = nvars/2
   int n;
@@ -571,7 +571,7 @@ EXAMPLE: example dmodoublext; shows an example
   {
     n = nvars(save); n = n div 2;
   }
-  // returns Ext^i_D(Ext^i_D(M,D),D), that is 
+  // returns Ext^i_D(Ext^i_D(M,D),D), that is
   // computes the "dual" of the "dual" of a d-mod M (for n = nvars/2)
   module Md = ncExt_R(n,M); // right module
   // no prune yet!
@@ -601,7 +601,7 @@ example
 { "EXAMPLE:"; echo = 2;
   ring R   = 0,(x,y),dp;
   poly F   = x3-y2;
-  def A    = annfs(F); 
+  def A    = annfs(F);
   setring A;
   dmodoublext(LD);
   LD;

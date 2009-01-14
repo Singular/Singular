@@ -1,22 +1,22 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: jacobson.lib,v 1.7 2009-01-07 16:11:37 Singular Exp $";
+version="$Id: jacobson.lib,v 1.8 2009-01-14 16:07:04 Singular Exp $";
 category="System and Control Theory";
 info="
 LIBRARY: jacobson.lib     Algorithms for Smith and Jacobson Normal Form
 AUTHOR: Kristina Schindelar,     Kristina.Schindelar@math.rwth-aachen.de
 
-THEORY: We work over a ring R, that is a principal ideal domain. 
+THEORY: We work over a ring R, that is a principal ideal domain.
 @*   If R is commutative, we suppose R to be a polynomial ring in one variable.
-@* If R is non-commutative, we suppose R to be in two variables, say x and d. 
+@* If R is non-commutative, we suppose R to be in two variables, say x and d.
 @* We treat then the basering as principal ideal ring with d a polynomial
-@* variable and x an invertible one. That is, we work in the Ore localization of R 
-@* with respect to the mult. closed set S = K[x] without 0. 
+@* variable and x an invertible one. That is, we work in the Ore localization of R
+@* with respect to the mult. closed set S = K[x] without 0.
 @* Note, that in computations no division by x will actually happen.
-@*   Given a rectangular matrix M over R, one can compute unimodular (that is invertible) 
-@* square matrices U and V, such that U*M*V=D is a diagonal matrix. 
+@*   Given a rectangular matrix M over R, one can compute unimodular (that is invertible)
+@* square matrices U and V, such that U*M*V=D is a diagonal matrix.
 @*   Depending on the ring, the diagonal entries of D have certain properties.
 
-REFERENCES: 
+REFERENCES:
 @* N. Jacobson, 'The theory of rings', AMS, 1943.
 @* Manuel Avelino Insua Hermo, 'Varias perspectives sobre las bases de Groebner: Forma normal de Smith, Algorithme de Berlekamp y algebras de Leibniz'. PhD thesis, Universidad de Santiago de Compostela, 2005.
 
@@ -34,10 +34,10 @@ SEE ALSO: control_lib
 proc smith(matrix MA, list #)
 "USAGE: smith(M[, eng1, eng2]);  M matrix, eng1 and eng2 are optional integers
 RETURN: matrix or list
-ASSUME: The current ring is assumed to be the commutative polynomial ring in 
+ASSUME: The current ring is assumed to be the commutative polynomial ring in
         one variable
 PURPOSE: compute the Smith Normal Form of M with transformation matrices (optionally)
-NOTE: If the optional integer eng1 is non-zero, returns the list {U,D,V}, 
+NOTE: If the optional integer eng1 is non-zero, returns the list {U,D,V},
 where U*M*V = D and the diagonal field entries of D are not normalized.
 @*    Otherwise only the matrix D, that is the Smith Normal Form of M, is returned.
 @*    Here, U and V are square unimodular (invertible) matrices. The procedure works for rectangular matrix M.
@@ -47,7 +47,7 @@ DISPLAY: If @code{printlevel}=1, progress debug messages will be printed,
 @* if @code{printlevel}>=2, all the debug messages will be printed.
 EXAMPLE: example smith; shows examples
 "
-{ 
+{
   def R = basering;
   // check assume: R must be a polynomial ring in 1 variable
   setring R;
@@ -69,9 +69,9 @@ EXAMPLE: example smith; shows examples
   if (size(#)==2)
   {
   BASIS=#[2];
-  } 
+  }
   else{BASIS=0;}
- 
+
 
   int ROW=ncols(MA);
   int COL=nrows(MA);
@@ -99,7 +99,7 @@ EXAMPLE: example smith; shows examples
 
   if(eng==1)
   {
-    list rueckLI=diagonal_with_trafo(R,MA,BASIS); 
+    list rueckLI=diagonal_with_trafo(R,MA,BASIS);
     list rueckLII=divisibility(rueckLI[2]);
     matrix CON=divideByContent(rueckLII[2]);
     list rueckL=CON*rueckLII[1]*rueckLI[1], CON*rueckLII[2], rueckLI[3]*rueckLII[3];
@@ -107,7 +107,7 @@ EXAMPLE: example smith; shows examples
   }
   else
   {
-    matrix rueckm=diagonal_without_trafo(R,MA,BASIS); 
+    matrix rueckm=diagonal_without_trafo(R,MA,BASIS);
     list rueckL=divisibility(rueckm);
     matrix CON=divideByContent(rueckm);
     rueckm=CON*rueckL[2];
@@ -151,7 +151,7 @@ int ppl = printlevel-voice+2;
   }
   if(k==0){adrow++;}
   }
-   
+
     m=transpose(m);
     for(i=1;i<=adrow;i++){m=m,0;}
     m=transpose(m);
@@ -180,7 +180,7 @@ int ppl = printlevel-voice+2;
     module Trafo;
 
     int s,st,p,ff;
-    
+
     module LT,TSTD;
     module STD=transpose(m);
     int finish=0;
@@ -188,8 +188,8 @@ int ppl = printlevel-voice+2;
     list pos;
     matrix END;
     matrix ENDSTD;
-    matrix STDFIN; 
-    STDFIN=STD; 
+    matrix STDFIN;
+    STDFIN=STD;
     list COMPARE=STDFIN;
 
     while(finish==0)
@@ -199,24 +199,24 @@ int ppl = printlevel-voice+2;
       if(flag mod 2==1)
       {
         STD_EX=EXL,transpose(STD);
-      } 
-      else 
+      }
+      else
       {
         STD_EX=EXR,transpose(STD);
       }
-	dbprint(ppl,"Computing Groebner basis: start");
-	dbprint(ppl-1,STD);
+        dbprint(ppl,"Computing Groebner basis: start");
+        dbprint(ppl-1,STD);
       STD=engine(STD,BASIS);
-	dbprint(ppl,"Computing Groebner basis: finished");
-	dbprint(ppl-1,STD);
+        dbprint(ppl,"Computing Groebner basis: finished");
+        dbprint(ppl-1,STD);
 
       if(flag mod 2==1){s=ROW; st=COL;}else{s=COL; st=ROW;}
-	dbprint(ppl,"Computing Groebner basis for transformation matrix: start");
-	dbprint(ppl-1,STD_EX);
+        dbprint(ppl,"Computing Groebner basis for transformation matrix: start");
+        dbprint(ppl-1,STD_EX);
       STD_EX=transpose(STD_EX);
       STD_EX=engine(STD_EX,BASIS);
-	dbprint(ppl,"Computing Groebner basis for transformation matrix: finished");
-	dbprint(ppl-1,STD_EX);
+        dbprint(ppl,"Computing Groebner basis for transformation matrix: finished");
+        dbprint(ppl-1,STD_EX);
 
       //////// split STD_EX in STD and the transformation matrix
       STD_EX=transpose(STD_EX);
@@ -240,22 +240,22 @@ int ppl = printlevel-voice+2;
       LT=transpose(LT);
 
       ////////////////////// compute the transformation matrices
-      
+
       if (flag mod 2 ==1)
-      { 
+      {
         TrafoL=transpose(LT)*TrafoL;
       }
-      else 
-      { 
+      else
+      {
         TrafoR=TrafoR*LT;
       }
 
 
-      STDFIN=STD; 
+      STDFIN=STD;
       /////////////////////////////////// check if the D-th row is finished ///////////////////////////////////
       COMPARE=insert(COMPARE,STDFIN);
-     	if(size(COMPARE)>=3)
-       {   
+             if(size(COMPARE)>=3)
+       {
         if(STD==COMPARE[3]){finish=1;}
        }
 ////////////////////////////////// change to the opposite module
@@ -267,8 +267,8 @@ int ppl = printlevel-voice+2;
 
 
    if (flag mod 2!=0) { STD=transpose(STD); }
-   
-   
+
+
    //zero colums to the end
     matrix STDMM=STD;
     pos=list();
@@ -277,7 +277,7 @@ int ppl = printlevel-voice+2;
     {
       for(i=1; i<=ncols(STDMM); i++)
       {
-        ff=0; 
+        ff=0;
         for(j=1; j<=nrows(STDMM); j++)
         {
           if (STD[j,i]==0) { ff++; }
@@ -290,11 +290,11 @@ int ppl = printlevel-voice+2;
     }
     int fehlposc=fehlpos;
     module SORT;
-    for(i=1; i<=fehlpos; i++) 
+    for(i=1; i<=fehlpos; i++)
     {
       SORT=gen(2);
       for (j=3;j<=ROW;j++)
-      { 
+      {
         SORT=SORT,gen(j);
       }
       SORT=SORT,gen(1);
@@ -307,7 +307,7 @@ int ppl = printlevel-voice+2;
     pos=list();
     fehlpos=0;
     while( size(transpose(STD))+fehlpos-ncols(STDMM) < 0)
-    { 
+    {
       for(i=1; i<=ncols(STDMM); i++)
       {
         ff=0; for(j=1; j<=nrows(STDMM); j++)
@@ -318,7 +318,7 @@ int ppl = printlevel-voice+2;
     }
     int fehlposr=fehlpos;
 
-    for(i=1; i<=fehlpos; i++) 
+    for(i=1; i<=fehlpos; i++)
     {
       SORT=gen(2);
       for(j=3;j<=COL;j++){SORT=SORT,gen(j);}
@@ -327,7 +327,7 @@ int ppl = printlevel-voice+2;
       STD=SORT*STD;
       TrafoL=SORT*TrafoL;
     }
-     
+
     setring R;
     map MAPinv=r,var(1);
     module STD=MAPinv(STD);
@@ -337,9 +337,9 @@ int ppl = printlevel-voice+2;
     matrix TrafoRM=TrafoR;
     matrix STDM=STD;
 
-    //Test 
+    //Test
     if(TrafoLM*m*TrafoRM!=STDM){ return(0); }
-    
+
     list RUECK=TrafoRM;
     RUECK=insert(RUECK,STDM);
     RUECK=insert(RUECK,TrafoLM);
@@ -392,21 +392,21 @@ static proc divisibility(matrix M)
     {
       for(j=i+1; j<=Sort; j++)
       {
-	GCDL=UNITL;
-	GCDR=UNITR;
-	G=gcd(STDM[i,i],STDM[j,j]);
-	ideal Z=STDM[i,i],STDM[j,j];
-	matrix T=lift(Z,G);
-	GCDL[i,i]=T[1,1];
-	GCDL[i,j]=T[2,1];
-	GCDL[j,i]=-STDM[j,j]/G;
-	GCDL[j,j]=STDM[i,i]/G;
-	GCDR[i,j]=T[2,1]*STDM[j,j]/G;
-	GCDR[j,j]=T[2,1]*STDM[j,j]/G-1;
-	GCDR[j,i]=1;
-	STDM=GCDL*STDM*GCDR;
-	TrafoLM=GCDL*TrafoLM;
-	TrafoRM=TrafoRM*GCDR;
+        GCDL=UNITL;
+        GCDR=UNITR;
+        G=gcd(STDM[i,i],STDM[j,j]);
+        ideal Z=STDM[i,i],STDM[j,j];
+        matrix T=lift(Z,G);
+        GCDL[i,i]=T[1,1];
+        GCDL[i,j]=T[2,1];
+        GCDL[j,i]=-STDM[j,j]/G;
+        GCDL[j,j]=STDM[i,i]/G;
+        GCDR[i,j]=T[2,1]*STDM[j,j]/G;
+        GCDR[j,j]=T[2,1]*STDM[j,j]/G-1;
+        GCDR[j,i]=1;
+        STDM=GCDL*STDM*GCDR;
+        TrafoLM=GCDL*TrafoLM;
+        TrafoRM=TrafoRM*GCDR;
       }
     }
     list RUECK=TrafoRM;
@@ -417,7 +417,7 @@ static proc divisibility(matrix M)
 
 static proc diagonal_without_trafo( R, matrix MA, int B)
 {
-  int ppl = printlevel-voice+2;  
+  int ppl = printlevel-voice+2;
 
   int BASIS=B;
   int ROW=ncols(MA);
@@ -451,7 +451,7 @@ static proc diagonal_without_trafo( R, matrix MA, int B)
     module TSTD;
     int finish=0;
     matrix STDFIN;
-    STDFIN=STD; 
+    STDFIN=STD;
     list COMPARE=STDFIN;
 
     while(finish==0)
@@ -462,18 +462,18 @@ static proc diagonal_without_trafo( R, matrix MA, int B)
       STD=engine(STD,BASIS);
       dbprint(ppl,"Computing Groebner basis: finished");
       dbprint(ppl-1,STD);
-      STDFIN=STD; 
+      STDFIN=STD;
       /////////////////////////////////// check if the D-th row is finished ///////////////////////////////////
       COMPARE=insert(COMPARE,STDFIN);
-     	if(size(COMPARE)>=3)
-       {   
+             if(size(COMPARE)>=3)
+       {
         if(STD==COMPARE[3]){finish=1;}
-       }     
-	////////////////////////////////// change to the opposite module
+       }
+        ////////////////////////////////// change to the opposite module
 
-	TSTD=transpose(STD);
-	STD=TSTD;
-	flag++;
+        TSTD=transpose(STD);
+        STD=TSTD;
+        flag++;
         dbprint(ppl,"Finished one while cycle");
     }
 
@@ -484,7 +484,7 @@ static proc diagonal_without_trafo( R, matrix MA, int B)
     {
       for(i=1; i<=ncols(STDMM); i++)
       {
-        ff=0; 
+        ff=0;
         for(j=1; j<=nrows(STDMM); j++)
         {
           if (STD[j,i]==0) { ff++; }
@@ -497,11 +497,11 @@ static proc diagonal_without_trafo( R, matrix MA, int B)
     }
    int fehlposc=fehlpos;
     module SORT;
-    for(i=1; i<=fehlpos; i++) 
+    for(i=1; i<=fehlpos; i++)
     {
       SORT=gen(2);
       for (j=3;j<=ROW;j++)
-      { 
+      {
         SORT=SORT,gen(j);
       }
       SORT=SORT,gen(1);
@@ -513,7 +513,7 @@ static proc diagonal_without_trafo( R, matrix MA, int B)
     pos=list();
     fehlpos=0;
     while( size(transpose(STD))+fehlpos-ncols(STDMM) < 0)
-    { 
+    {
       for(i=1; i<=ncols(STDMM); i++)
       {
         ff=0; for(j=1; j<=nrows(STDMM); j++)
@@ -524,7 +524,7 @@ static proc diagonal_without_trafo( R, matrix MA, int B)
     }
     int fehlposr=fehlpos;
 
-    for(i=1; i<=fehlpos; i++) 
+    for(i=1; i<=fehlpos; i++)
     {
       SORT=gen(2);
       for(j=3;j<=COL;j++){SORT=SORT,gen(j);}
@@ -532,7 +532,7 @@ static proc diagonal_without_trafo( R, matrix MA, int B)
       SORT=transpose(SORT);
       STD=SORT*STD;
     }
-    
+
    //add zero rows or columns
 
     int adrow=COL-size(transpose(STD));
@@ -572,7 +572,7 @@ static proc engine(module I, int i)
 
 proc jacobson(matrix MA, list #)
  "USAGE:  jacobson(M, eng);  M matrix, eng an optional int
-RETURN: list 
+RETURN: list
 ASSUME: Basering is a noncommutative ring in two variables.
 PURPOSE: compute a weak Jacobson Normal Form of M over a noncommutative ring
 NOTE: A list L of matrices {U,D,V} is returned. That is L[1]*M*L[3]=L[2], where
@@ -584,7 +584,7 @@ DISPLAY: If @code{printlevel}=1, progress debug messages will be printed,
 @* if @code{printlevel}>=2, all the debug messages will be printed.
 EXAMPLE: example jacobson; shows examples
 "
-{ 
+{
   def R = basering;
   // check assume: R must be a polynomial ring in 2 variables
   setring R;
@@ -625,7 +625,7 @@ EXAMPLE: example jacobson; shows examples
   RINGLIST[3]=ORD;
   def r=ring(RINGLIST);
   setring r;
-  
+
   //fix the required ordering
   map MAP=R,var(1),var(2);
   matrix M=MAP(MA);
@@ -637,7 +637,7 @@ EXAMPLE: example jacobson; shows examples
   TrafoR=TRIANGLE[3];
   module m=TRIANGLE[2];
 
-  //back to the ring 
+  //back to the ring
   setring R;
   map MAPR=r,var(1),var(2);
   module ma=MAPR(m);
@@ -645,12 +645,12 @@ EXAMPLE: example jacobson; shows examples
   module TL=MAPR(TrafoL);
   module TR=MAPR(TrafoR);
   matrix CON=divideByContent(MAA);
- 
+
 list RUECK=CON*TL, CON*MAA, TR;
 return(RUECK);
 }
 example
-{ 
+{
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,d),Dp;
   def R = nc_algebra(1,1);   setring R; // the 1st Weyl algebra
@@ -662,14 +662,14 @@ example
   ring r2 = 0,(x,s),Dp;
   def R2 = nc_algebra(1,s);   setring R2; // the 1st shift algebra
   matrix m[2][2] = s,x,0,s; print(m); // matrix of the same for as above
-  list J = jacobson(m); 
+  list J = jacobson(m);
   print(J[2]); // a Jacobson Form D, quite different from above
   print(J[1]*m*J[3] - J[2]); // check that U*M*V = D
 }
 
 static proc triangle( matrix MA, int B)
 {
- int ppl = printlevel-voice+2; 
+ int ppl = printlevel-voice+2;
 
   map inv=ncdetection();
   int ROW=ncols(MA);
@@ -712,8 +712,8 @@ static proc triangle( matrix MA, int B)
     option(redTail);
     module STD_EX,LT,TSTD, L, Trafo;
 
-    
-    
+
+
     module STD=transpose(m);
     int finish=0;
     list pos, COM, COM_EX;
@@ -733,7 +733,7 @@ static proc triangle( matrix MA, int B)
       dbprint(ppl,"Computing Groebner basis: finished");
       dbprint(ppl-1,STD);
       if(flag mod 2==1){s=ROW; st=COL;}else{s=COL; st=ROW;}
- 
+
       STD_EX=transpose(STD_EX);
       dbprint(ppl,"Computing Groebner basis for transformation matrix: start");
       dbprint(ppl-1,STD_EX);
@@ -744,10 +744,10 @@ static proc triangle( matrix MA, int B)
       COM=1;
       COM_EX=1;
       for(i=2; i<=size(STD); i++)
-         { COM=COM[1..size(COM)],i; COM_EX=COM_EX[1..size(COM_EX)],i; }	
-      nz=size(STD_EX)-size(STD); 
+         { COM=COM[1..size(COM)],i; COM_EX=COM_EX[1..size(COM_EX)],i; }
+      nz=size(STD_EX)-size(STD);
 
-      //zero rows in the begining 
+      //zero rows in the begining
 
        if(size(STD)!=size(STD_EX) )
        {
@@ -755,20 +755,20 @@ static proc triangle( matrix MA, int B)
          {
            COM_EX=0,COM_EX[1..size(COM_EX)];
          }
-       }  
+       }
 
-	
-	
-      
+
+
+
        for(i=nz+1; i<=size(STD_EX); i++ )
-        {if( leadcoef(STD[i-nz])!=leadcoef(STD_EX[i]) )	  {STD[i-nz]=leadcoef(STD_EX[i])*STD[i-nz];}
+        {if( leadcoef(STD[i-nz])!=leadcoef(STD_EX[i]) )          {STD[i-nz]=leadcoef(STD_EX[i])*STD[i-nz];}
         }
 
-	//assign the zero rows in STD_EX
+        //assign the zero rows in STD_EX
 
        for (j=2; j<=nz; j++)
        {
-	p=0;
+        p=0;
         i=1;
         while(STD_EX[j-1][i]==0){i++;};
         p=i-1;
@@ -779,11 +779,11 @@ static proc triangle( matrix MA, int B)
         { k++; i++;}
         if (k==p){ COM_EX[j]=-1; }
        }
-     
+
       //assign the zero rows in STD
       for (j=2; j<=size(STD); j++)
        {
-	i=size(transpose(STD));
+        i=size(transpose(STD));
         while(STD[j-1][i]==0){i--;}
         p=i;
         i=size(transpose(STD[j]));
@@ -795,7 +795,7 @@ static proc triangle( matrix MA, int B)
         {
         if(COM[j]<0){COM=delete(COM,j);}
         }
-     
+
       for(i=1; i<=size(COM_EX); i++)
         {ff=0;
          if(COM_EX[i]==0){ff=1;}
@@ -818,7 +818,7 @@ static proc triangle( matrix MA, int B)
        STD=L[st+1];
        LT=L[1];
 
-      
+
        for(i=2; i<=s+st; i++)
         {
          if (i<=st)
@@ -837,22 +837,22 @@ static proc triangle( matrix MA, int B)
        LT=transpose(LT);
 
       ////////////////////// compute the transformation matrices
-      
+
        if (flag mod 2 ==1)
-        { 
+        {
          TrafoL=transpose(LT)*TrafoL;
         }
-       else 
-        { 
+       else
+        {
          TrafoR=TrafoR*involution(LT,inv);
         }
 
 
       ///////////////////////// check whether the alg termined /////////////////
       if(size(COMPARE)>=3)
-       {   
+       {
         if(STD==COMPARE[3]){finish=1;}
-       }       
+       }
        ////////////////////////////////// change to the opposite module
        TSTD=transpose(STD);
        STD=involution(TSTD,inv);
@@ -860,8 +860,8 @@ static proc triangle( matrix MA, int B)
        dbprint(ppl,"Finished one while cycle");
     }
 
-if (flag mod 2 ==0){ STD = involution(STD,inv);} else { STD = transpose(STD);  } 
- 
+if (flag mod 2 ==0){ STD = involution(STD,inv);} else { STD = transpose(STD);  }
+
     list REVERSE=TrafoL,STD,TrafoR;
     return(REVERSE);
 }
@@ -876,7 +876,7 @@ vector CON;
    {
     if(leadcoef(M[i])!=0){CON=CON+leadcoef(M[i])*gen(k); k++;}
    }
-poly con=content(CON); 
+poly con=content(CON);
 matrix TL=1/con*freemodule(nrows(M));
 return(TL);
 }
@@ -887,7 +887,7 @@ return(TL);
 /*
 
 //static proc Ex_One_wheeled_bicycle()
-{ 
+{
 ring RA=(0,m), D, lp;
 matrix bicycle[2][3]=(1+m)*D^2, D^2, 1, D^2, D^2-1, 0;
 list s=smith(bicycle, 1,0);
@@ -896,7 +896,7 @@ print(s[1]*bicycle*s[3]-s[2]);
 }
 
 
-//static proc Ex_RLC-circuit() 
+//static proc Ex_RLC-circuit()
 {
 ring RA=(0,m,R1,R2,L,C), D, lp;
 matrix  circuit[2][3]=D+1/(R1*C), 0, -1/(R1*C), 0, D+R2/L, -1/L;
@@ -945,14 +945,14 @@ print(s[1]*robot*s[3]-s[2]);
 
 /*
 
-//static proc Ex_compare_output_with_maple_package_JanetOre()  
-{  
+//static proc Ex_compare_output_with_maple_package_JanetOre()
+{
     ring w = 0,(x,d),Dp;
     def W=nc_algebra(1,1);
     setring W;
-    matrix m[3][3]=[d2,d+1,0],[d+1,0,d3-x2*d],[2d+1, d3+d2, d2]; 
+    matrix m[3][3]=[d2,d+1,0],[d+1,0,d3-x2*d],[2d+1, d3+d2, d2];
     list J=jacobson(m,0);
-    print(J[1]*m*J[3]); 
+    print(J[1]*m*J[3]);
     print(J[2]);
     print(J[1]);
     print(J[3]);
@@ -964,9 +964,9 @@ print(s[1]*robot*s[3]-s[2]);
     ring w = 0,(x,s),Dp;
     def W=nc_algebra(1,s);
     setring W;
-    matrix m[3][3]=[s^2,s+1,0],[s+1,0,s^3-x^2*s],[2*s+1, s^3+s^2, s^2]; 
+    matrix m[3][3]=[s^2,s+1,0],[s+1,0,s^3-x^2*s],[2*s+1, s^3+s^2, s^2];
     list J=jacobson(m,0);
-    print(J[1]*m*J[3]); 
+    print(J[1]*m*J[3]);
     print(J[2]);
     print(J[1]);
     print(J[3]);
@@ -974,13 +974,13 @@ print(s[1]*robot*s[3]-s[2]);
 }
 
 //static proc Ex_cyclic()
-{   
+{
     ring w = 0,(x,d),Dp;
     def W=nc_algebra(1,1);
     setring W;
     matrix m[3][3]=d,0,0,x*d+1,d,0,0,x*d,d;
     list J=jacobson(m,0);
-    print(J[1]*m*J[3]); 
+    print(J[1]*m*J[3]);
     print(J[2]);
     print(J[1]);
     print(J[3]);
@@ -994,7 +994,7 @@ print(s[1]*robot*s[3]-s[2]);
     setring W;
     matrix m[3][3]=s,0,0,x*s+1,s,0,0,x*s,s;
     list J=jacobson(m,0);
-    print(J[1]*m*J[3]); 
+    print(J[1]*m*J[3]);
     print(J[2]);
     print(J[1]);
     print(J[3]);
@@ -1009,7 +1009,7 @@ print(s[1]*robot*s[3]-s[2]);
     setring W;
     matrix m[3][3]=s,0,0,x*s+s,s,0,0,x*s,s;
     list J=jacobson(m,0);
-    print(J[1]*m*J[3]); 
+    print(J[1]*m*J[3]);
     print(J[2]);
     print(J[1]);
     print(J[3]);

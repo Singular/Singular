@@ -266,13 +266,13 @@ example
 
 // POLYNOMIAL EXAMPLES (Singular ready)
 // ===================
-// 
+//
 // For each of the examples below, there are three equivalent polynomials. 'm' indicates the bit-widths of the
 // input/output variables. For some of the polynomials, I have attached the RTL as well.
-// 
-// 
+//
+//
 // 1) VOLTERRA MODELS:
-// 
+//
 //        A) CUBIC FILTER: (m = 32, 3 Vars)
 
 LIB "ringgb.lib";

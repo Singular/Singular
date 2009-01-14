@@ -1,4 +1,4 @@
-version="$Id: polymake.lib,v 1.9 2008-08-29 15:16:49 keilen Exp $";
+version="$Id: polymake.lib,v 1.10 2009-01-14 16:07:05 Singular Exp $";
 category="Tropical Geometry";
 info="
 LIBRARY:        polymake.lib    Computations with polytopes and fans, interface to polymake and TOPCOM
@@ -6,22 +6,22 @@ AUTHOR:         Thomas Markwig,  email: keilen@mathematik.uni-kl.de
 
 WARNING:
      Most procedures will not work unless polymake or topcom is installed and
-     if so, they will only work with the operating system LINUX! 
+     if so, they will only work with the operating system LINUX!
      For more detailed information see IMPORTANT NOTE respectively consult the
      help string of the procedures.
 
 IMPORTANT NOTE:
-     Even though this is a Singular library for computing polytopes and fans such 
-     as the Newton polytope or the Groebner fan of a polynomial, most of the hard 
-     computations are NOT done by Singular but by the program 
+     Even though this is a Singular library for computing polytopes and fans such
+     as the Newton polytope or the Groebner fan of a polynomial, most of the hard
+     computations are NOT done by Singular but by the program
 @*   -  polymake by Ewgenij Gawrilow, TU Berlin and Michael Joswig, TU Darmstadt
-@*      (see http://www.math.tu-berlin.de/polymake/),  
+@*      (see http://www.math.tu-berlin.de/polymake/),
 @*   respectively (only in the procedure triangularions) by the program
 @*   -  topcom by Joerg Rambau, Universitaet Bayreuth
 @*      (see http://www.uni-bayreuth.de/departments/wirtschaftsmathematik/rambau/TOPCOM);
-@*   this library should rather be seen as an interface which allows to use a (very limited) 
-     number of options which polymake respectively topcom offers to compute with polytopes 
-     and fans and to make the results available in Singular for further computations; 
+@*   this library should rather be seen as an interface which allows to use a (very limited)
+     number of options which polymake respectively topcom offers to compute with polytopes
+     and fans and to make the results available in Singular for further computations;
      moreover, the user familiar with Singular does not have to learn the syntax of polymake
      or topcom, if the options offered here are sufficient for his purposes.
 @*   Note, though, that the procedures concerned with planar polygons are independent of
@@ -34,7 +34,7 @@ PROCEDURES USING POLYMAKE:
      normalFan(intmat,intmat,list)     computes the normal fan of a polytope
      groebnerFan(poly)                 computes the Groebner fan of a polynomial
      intmatToPolymake(intmat,string)   transforms an integer matrix into polymake format
-     polymakeToIntmat(string,string)   transforms polymake output into an integer matrix 
+     polymakeToIntmat(string,string)   transforms polymake output into an integer matrix
 
 PROCEDURES USING TOPCOM:
      triangulations(list)          computes all triangulations of a marked polytope
@@ -58,7 +58,7 @@ AUXILARY PROCEDURES:
      polymakeKeepTmpFiles(int)     determines whether the files created in /tmp should be kept
 
 KEYWORDS:    polytope; fan; secondary fan; secondary polytope; polymake;
-             Newton polytope; Groebner fan 
+             Newton polytope; Groebner fan
 
 ";
 
@@ -98,7 +98,7 @@ PURPOSE: the procedure calls polymake to compute the vertices of the polytope as
          as its dimension and information on its facets
 RETURN:  list, L with four entries
 @*            L[1] : an integer matrix whose rows are the coordinates of vertices
-                     of the polytope 
+                     of the polytope
 @*            L[2] : the dimension of the polytope
 @*            L[3] : a list whose ith entry explains to which vertices the ith vertex
                      of the Newton polytope is connected -- i.e. L[3][i] is an integer
@@ -108,7 +108,7 @@ RETURN:  list, L with four entries
                      a linear system of equations describing the affine hull of the polytope,
                      i.e. the smallest affine space containing the polytope
 NOTE: -  for its computations the procedure calls the program polymake by Ewgenij Gawrilow,
-         TU Berlin and Michael Joswig, TU Darmstadt; it therefore is necessary that 
+         TU Berlin and Michael Joswig, TU Darmstadt; it therefore is necessary that
          this program is installed in order to use this procedure;
          see http://www.math.tu-berlin.de/polymake/
 @*    -  note that in the vertex edge graph we have changed the polymake convention which
@@ -116,7 +116,7 @@ NOTE: -  for its computations the procedure calls the program polymake by Ewgeni
 @*    -  the procedure creates the file  /tmp/polytope.polymake which contains the polytope
          in polymake format; if you wish to use this for further computations with polymake,
          you have to use the procedure polymakeKeepTmpFiles in before
-@*    -  moreover, the procedure creates the file /tmp/polytope.output which it deletes 
+@*    -  moreover, the procedure creates the file /tmp/polytope.output which it deletes
          again before ending
 @*    -  it is possible to give as an optional second argument as string which then will be
          used instead of 'polytope' in the name of the polymake output file
@@ -190,7 +190,7 @@ POINTS
         }
       }
     }
-  }  
+  }
   newveg=newveg[1,size(newveg)-1];
   execute("list nveg="+newveg+";");
   // raise each entry in nveg by one
@@ -225,7 +225,7 @@ example
 {
    "EXAMPLE:";
    echo=2;
-   // the lattice points of the unit square in the plane 
+   // the lattice points of the unit square in the plane
    list points=intvec(0,0),intvec(0,1),intvec(1,0),intvec(1,1);
    // the secondary polytope of this lattice point configuration is computed
    intmat secpoly=secondaryPolytope(points)[1];
@@ -265,7 +265,7 @@ NOTE: -  if we replace the first column of L[4] by zeros, i.e. if we move the af
          see http://www.math.tu-berlin.de/polymake/
 @*    -  the procedure creates the file  /tmp/newtonPolytope.polymake which contains the polytope
          in polymake format and which can be used for further computations with polymake
-@*    -  moreover, the procedure creates the file /tmp/newtonPolytope.output which it deletes 
+@*    -  moreover, the procedure creates the file /tmp/newtonPolytope.output which it deletes
          again before ending
 @*    -  it is possible to give as an optional second argument as string which then will be
          used instead of 'newtonPolytope' in the name of the polymake output file
@@ -302,7 +302,7 @@ example
    // its dimension is
    np[2];
    // np[3] contains information how the vertices are connected to each other,
-   // e.g. the first vertex (number 0) is connected to the second, third and 
+   // e.g. the first vertex (number 0) is connected to the second, third and
    //      fourth vertex
    np[3][1];
    //////////////////////////
@@ -312,8 +312,8 @@ example
    // the vertices of the Newton polytope are:
    np[1];
    // its dimension is
-   np[2];   
-   // the Newton polytope is contained in the affine space given 
+   np[2];
+   // the Newton polytope is contained in the affine space given
    //     by the equations
    np[4]*M;
 }
@@ -347,17 +347,17 @@ example
 proc normalFan (intmat vertices,intmat affinehull,list graph,int er,list #)
 "USAGE:  normalFan (vert,aff,graph,rays,[,#]);   vert,aff intmat,  graph list, rays int, # string
 ASSUME:  - vert is an integer matrix whose rows are the coordinate of the vertices of
-           a convex lattice polygon; 
+           a convex lattice polygon;
 @*       - aff describes the affine hull of this polytope, i.e.
-           the smallest affine space containing it, in the following sense: 
-           denote by n the number of columns of vert, then multiply aff by (1,x(1),...,x(n)) 
+           the smallest affine space containing it, in the following sense:
+           denote by n the number of columns of vert, then multiply aff by (1,x(1),...,x(n))
            and set the resulting terms to zero in order to get the equations for the affine hull;
 @*       - the ith entry of graph is an integer vector describing to which vertices
            the ith vertex is connected, i.e. a k as entry means that the vertex vert[i] is
            connected to vert[k];
 @*       - the integer rays is either one (if the extreme rays should be computed) or zero (otherwise)
-RETURN:  list, the ith entry of L[1] contains information about the cone in the normal fan 
-               dual to the ith vertex of the polytope 
+RETURN:  list, the ith entry of L[1] contains information about the cone in the normal fan
+               dual to the ith vertex of the polytope
 @*             L[1][i][1] = integer matrix representing the inequalities which describe the
                             cone dual to the ith vertex
 @*             L[1][i][2] = a list which contains the inequalities represented by L[i][1]
@@ -369,7 +369,7 @@ RETURN:  list, the ith entry of L[1] contains information about the cone in the 
 NOTE:    - the procedure calls for its computation polymake by Ewgenij Gawrilow,
            TU Berlin and Michael Joswig, so it only works if polymake is installed;
            see http://www.math.tu-berlin.de/polymake/
-@*       - in the optional argument # it is possible to hand over other names for the 
+@*       - in the optional argument # it is possible to hand over other names for the
            variables to be used -- be carful, the format must be correct and that is
            not tested, e.g. if you want the variable names to be u00,u10,u01,u11
            then you must hand over the string u11,u10,u01,u11
@@ -377,7 +377,7 @@ EXAMPLE: example normalFan;   shows an example"
 {
   list ineq; // stores the inequalities of the cones
   int i,j,k;
-  // we work over the following ring  
+  // we work over the following ring
   execute("ring ineqring=0,x(1.."+string(ncols(vertices))+"),lp;");
   string greatersign=">";
   // create the variable names
@@ -402,7 +402,7 @@ EXAMPLE: example normalFan;   shows an example"
   // consider all vertices of the polytope
   for (i=1;i<=nrows(vertices);i++)
   {
-    // first we produce for each vertex in the polytope 
+    // first we produce for each vertex in the polytope
     // the inequalities describing the dual cone in the normal fan
     list pp;  // contain strings representing the inequalities describing the normal cone
     intmat ie[size(graph[i])][ncols(vertices)]; // contains the inequalities as rows
@@ -488,7 +488,7 @@ EQUATIONS
     system("sh","/bin/rm /tmp/ineq.output");
   }
   // get the linearity space
-  return(list(ineq,linearity)); 
+  return(list(ineq,linearity));
 }
 example
 {
@@ -515,14 +515,14 @@ example
 
 proc groebnerFan (poly f,list #)
 "USAGE:  groebnerFan(f[,#]);  f poly, # string
-RETURN:  list, the ith entry of L[1] contains information about the ith cone in the Groebner fan 
+RETURN:  list, the ith entry of L[1] contains information about the ith cone in the Groebner fan
                dual to the ith vertex in the Newton polytope of the f
-@*             L[1][i][1] = integer matrix representing the inequalities which describe the cone         
+@*             L[1][i][1] = integer matrix representing the inequalities which describe the cone
 @*             L[1][i][2] = a list which contains the inequalities represented by L[1][i][1]
                             as a list of strings
 @*             L[1][i][3] = an interger matrix whose rows are the extreme rays of the cone
 @*             L[2] = is an integer matrix whose rows span the linearity space of the fan,
-                      i.e. the linear space which is contained in each cone               
+                      i.e. the linear space which is contained in each cone
 @*             L[3] = the Newton polytope of f in the format of the procedure newtonPolytope
 @*             L[4] = integer matrix where each row represents the exponet vector of one monomial
                       occuring in the input polynomial
@@ -532,8 +532,8 @@ NOTE:    - if you have alread computed the Newton polytope of f then you might w
 @*       - the procedure calls for its computation polymake by Ewgenij Gawrilow,
            TU Berlin and Michael Joswig, so it only works if polymake is installed;
            see http://www.math.tu-berlin.de/polymake/
-@*       - the procedure creates the file  /tmp/newtonPolytope.polymake which contains the 
-           Newton polytope of f in polymake format and which can be used for further 
+@*       - the procedure creates the file  /tmp/newtonPolytope.polymake which contains the
+           Newton polytope of f in polymake format and which can be used for further
            computations with polymake
 @*       - it is possible to give as an optional second argument as string which then will be
            used instead of 'newtonPolytope' in the name of the polymake output file
@@ -604,8 +604,8 @@ proc intmatToPolymake (intmat M,string art)
 "USAGE:  intmatToPolymake(M,art);  M intmat, art string
 ASSUME:  - M is an integer matrix which should be transformed into polymake format;
 @*       - art is one of the following strings:
-@*         + 'rays'   : indicating that a first column of 0's should be added 
-@*         + 'points' : indicating that a first column of 1's should be added 
+@*         + 'rays'   : indicating that a first column of 0's should be added
+@*         + 'points' : indicating that a first column of 1's should be added
 RETURN:  string, the matrix is transformed in a string and a first column has been added
 EXAMPLE: example intmatToPolymake;   shows an example"
 {
@@ -613,7 +613,7 @@ EXAMPLE: example intmatToPolymake;   shows an example"
   {
     string anf="0 ";
   }
-  else 
+  else
   {
     string anf="1 ";
   }
@@ -653,7 +653,7 @@ ASSUME:  pm is the result of calling polymake with one 'argument' like VERTICES,
 RETURN:  intmat, the rows of the matrix are basically the vectors in pm from the second row on
                  where each row has been multiplied with the lowest common multiple of the
                  denominators of its entries so as to be an integer matrix; moreover,
-                 if art=='affine', then the first column is omitted since we only want affine 
+                 if art=='affine', then the first column is omitted since we only want affine
                  coordinates
 EXAMPLE: example polymakeToIntmat;   shows an example"
 {
@@ -665,7 +665,7 @@ EXAMPLE: example polymakeToIntmat;   shows an example"
   {
     pm=stringdelete(pm,1);
   }
-  pm=stringdelete(pm,1);  
+  pm=stringdelete(pm,1);
   // find out how many entries each vector has, namely one more than 'spaces' in a row
   int i=1;
   int s=1;
@@ -680,7 +680,7 @@ EXAMPLE: example polymakeToIntmat;   shows an example"
   }
   // if we want to have affine coordinates
   if (art=="affine")
-  {    
+  {
     s--; // then there is one column less
     // and the entry of the first column (in the first row) has to be removed
     while (pm[1]!=" ")
@@ -719,7 +719,7 @@ EXAMPLE: example polymakeToIntmat;   shows an example"
       // a space has to be replaced by a comma
       if (pm[i]==" ")
       {
-        pm[i]=",";      
+        pm[i]=",";
       }
     }
   }
@@ -729,7 +729,7 @@ EXAMPLE: example polymakeToIntmat;   shows an example"
     pm=stringdelete(pm,size(pm));
   }
   // since the matrix could be over the rationals, we need a ring with rational coefficients
-  ring zwischering=0,x,lp;    
+  ring zwischering=0,x,lp;
   // create the matrix with the elements of pm as entries
   execute("matrix mm["+string(z)+"]["+string(s)+"]="+pm+";");
   // transform this into an integer matrix
@@ -779,17 +779,17 @@ example
 proc triangulations (list polygon)
 "USAGE:  triangulations(polygon); list polygon
 ASSUME:  polygon is a list of integer vectors of the same size representing the affine
-         coordinates of the lattice points 
+         coordinates of the lattice points
 PURPOSE: the procedure considers the marked polytope given as the convex hull of
          the lattice points and with these lattice points as markings; it then
-         computes all possible triangulations of this marked polytope 
+         computes all possible triangulations of this marked polytope
 RETURN:  list, each entry corresponds to one triangulation and the ith entry is
                itself a list of integer vectors of size three, where each integer
                vector defines one triangle in the triangulation by telling which
                points of the input are the vertices of the triangle
 NOTE:  - the procedure calls for its computations the program points2triangs
          from the program topcom by Joerg Rambau, Universitaet Bayreuth; it
-         therefore is necessary that this program is installed in order to use this 
+         therefore is necessary that this program is installed in order to use this
          procedure; see
 @*       http://www.uni-bayreuth.de/departments/wirtschaftsmathematik/rambau/TOPCOM
 @*     - the procedure creates the files /tmp/triangulationsinput and /tmp/triangulationsoutput;
@@ -798,12 +798,12 @@ NOTE:  - the procedure calls for its computations the program points2triangs
          of points2triangs; if you wish to use this for further computations with topcom,
          you have to use the procedure polymakeKeepTmpFiles in before
 @*     - note that an integer i in an integer vector representing a triangle refers to
-         the ith lattice point, i.e. polygon[i]; this convention is different from 
+         the ith lattice point, i.e. polygon[i]; this convention is different from
          TOPCOM's convention, where i would refer to the i-1st lattice point
 EXAMPLE: example triangulations;   shows an example"
 {
   int i,j;
-  // prepare the input for points2triangs by writing the input polygon in the 
+  // prepare the input for points2triangs by writing the input polygon in the
   // necessary format
   string spi="[";
   for (i=1;i<=size(polygon);i++)
@@ -846,7 +846,7 @@ EXAMPLE: example triangulations;   shows an example"
         i=i+1;
       }
       else
-      {        
+      {
         np2t=np2t+p2t[i];
       }
     }
@@ -858,7 +858,7 @@ EXAMPLE: example triangulations;   shows an example"
   else
   {
     if (np2t[size(np2t)]!=";")
-    {      
+    {
       np2t=np2t+p2t[size(p2t)-1]+p2t[size(p2t)];
     }
   }
@@ -880,7 +880,7 @@ EXAMPLE: example triangulations;   shows an example"
         {
           np2t=np2t+"))";
           i++;
-        }     
+        }
         else
         {
           if (p2t[i]=="{")
@@ -918,7 +918,7 @@ example
 {
    "EXAMPLE:";
    echo=2;
-   // the lattice points of the unit square in the plane 
+   // the lattice points of the unit square in the plane
    list polygon=intvec(0,0),intvec(0,1),intvec(1,0),intvec(1,1);
    // the triangulations of this lattice point configuration are computed
    list triang=triangulations(polygon);
@@ -934,18 +934,18 @@ ASSUME:  - polygon is a list of integer vectors of the same size representing th
            argument in order to avoid doing this computation again
 PURPOSE: the procedure considers the marked polytope given as the convex hull of
          the lattice points and with these lattice points as markings; it then
-         computes the lattice points of the secondary polytope given by this 
+         computes the lattice points of the secondary polytope given by this
          marked polytope which correspond to the triangulations computed by
          the procedure triangulations
 RETURN:  list, say L, such that:
-@*             L[1] = intmat, each row gives the affine coordinates of a lattice point 
+@*             L[1] = intmat, each row gives the affine coordinates of a lattice point
                       in the secondary polytope given by the marked
                       polytope corresponding to polygon
 @*             L[2] = the list of corresponding triangulations
-NOTE:    if the triangluations are not handed over as optional argument the procedure calls 
+NOTE:    if the triangluations are not handed over as optional argument the procedure calls
          for its computation of these triangulations the program points2triangs
          from the program topcom by Joerg Rambau, Universitaet Bayreuth; it
-         therefore is necessary that this program is installed in order to use this 
+         therefore is necessary that this program is installed in order to use this
          procedure; see
 @*       http://www.uni-bayreuth.de/departments/wirtschaftsmathematik/rambau/TOPCOM
 EXAMPLE: example secondaryPolytope;   shows an example"
@@ -994,7 +994,7 @@ EXAMPLE: example secondaryPolytope;   shows an example"
     }
     secpoly[i,1..size(polygon)]=vertex;
   }
-  return(list(secpoly,triangs));          
+  return(list(secpoly,triangs));
 }
 example
 {
@@ -1023,10 +1023,10 @@ ASSUME:  - polygon is a list of integer vectors of the same size representing th
            argument in order to avoid doing this computation again
 PURPOSE: the procedure considers the marked polytope given as the convex hull of
          the lattice points and with these lattice points as markings; it then
-         computes the lattice points of the secondary polytope given by this 
+         computes the lattice points of the secondary polytope given by this
          marked polytope which correspond to the triangulations computed by
          the procedure triangulations
-RETURN:  list, the ith entry of L[1] contains information about the ith cone in the 
+RETURN:  list, the ith entry of L[1] contains information about the ith cone in the
                secondary fan of the polygon, i.e. the cone dual to the ith vertex of the
                secondary polytope
 @*             L[1][i][1] = integer matrix representing the inequalities which describe the
@@ -1038,19 +1038,19 @@ RETURN:  list, the ith entry of L[1] contains information about the ith cone in 
 @*             L[2] = is an integer matrix whose rows span the linearity space of the fan,
                       i.e. the linear space which is contained in each cone
 @*             L[3] = the secondary polytope in the format of the procedure polymakePolytope
-@*             L[4] = the list of triangulations corresponding to the vertices 
+@*             L[4] = the list of triangulations corresponding to the vertices
                       of the secondary polytope
 NOTE:    - the procedure calls for its computation polymake by Ewgenij Gawrilow,
            TU Berlin and Michael Joswig, so it only works if polymake is installed;
            see http://www.math.tu-berlin.de/polymake/
-@*       - in the optional argument # it is possible to hand over other names for the 
+@*       - in the optional argument # it is possible to hand over other names for the
            variables to be used -- be carful, the format must be correct and that is
            not tested, e.g. if you want the variable names to be u00,u10,u01,u11
            then you must hand over the string u11,u10,u01,u11
-@*       - if the triangluations are not handed over as optional argument the procedure calls 
+@*       - if the triangluations are not handed over as optional argument the procedure calls
            for its computation of these triangulations the program points2triangs
            from the program topcom by Joerg Rambau, Universitaet Bayreuth; it
-           therefore is necessary that this program is installed in order to use this 
+           therefore is necessary that this program is installed in order to use this
            procedure; see
 @*         http://www.uni-bayreuth.de/departments/wirtschaftsmathematik/rambau/TOPCOM
 EXAMPLE: example secondaryFan;   shows an example"
@@ -1142,7 +1142,7 @@ example
                  intvec(2,1),intvec(2,0);
    // interior is a lattice point in the interior of this lattice polygon
    intvec interior=1,1;
-   // compute the general cycle length of a cycle of the corresponding cycle 
+   // compute the general cycle length of a cycle of the corresponding cycle
    // in the dual tropical curve, note that (0,1) and (2,1) do not contribute
    cycleLength(boundary,interior);
 }
@@ -1161,7 +1161,7 @@ RETURN:  list, L consisting of three lists
                          endpoints L[1][i] and L[1][i+1] (i considered modulo size(L[1]))
 @*                       L[2][i][j][1] = intvec, the coordinates of the jth lattice point on that facet
 @*                       L[2][i][j][2] = int, the position of L[2][i][j][1] in markings
-@*             L[3]    : represents the interior lattice points of the polygon 
+@*             L[3]    : represents the interior lattice points of the polygon
 @*                       L[3][i][1] = intvec, the coordinates of the ith interior point
 @*                       L[3][i][2] = int, the position of L[3][i][1] in markings
 EXAMPLE: example splitPolygon;   shows an example"
@@ -1246,14 +1246,14 @@ EXAMPLE: example splitPolygon;   shows an example"
       j++;
     }
     vert[3][i]=list(vert[3][i],j);
-  }  
+  }
   return(vert);
 }
 example
 {
    "EXAMPLE:";
    echo=2;
-   // the lattice polygon spanned by the points (0,0), (3,0) and (0,3) 
+   // the lattice polygon spanned by the points (0,0), (3,0) and (0,3)
    // with all integer points as markings
    list polygon=intvec(1,1),intvec(3,0),intvec(2,0),intvec(1,0),
                 intvec(0,0),intvec(2,1),intvec(0,1),intvec(1,2),
@@ -1271,7 +1271,7 @@ example
 
 proc eta (list triang,list polygon)
 "USAGE:  eta(triang,polygon);  triang, polygon list
-ASSUME:  polygon has the format of the output of splitPolygon, i.e. it is a list with three 
+ASSUME:  polygon has the format of the output of splitPolygon, i.e. it is a list with three
          entries describing a convex lattice polygon in the following way:
 @*       polygon[1] : is a list of lists; for each i the entry polygon[1][i][1] is a lattice point which is
                       a vertex of the lattice polygon, and polygon[1][i][2] is an integer assigned to
@@ -1288,10 +1288,10 @@ ASSUME:  polygon has the format of the output of splitPolygon, i.e. it is a list
 @*       triang is a list of integer vectors all of size three describing a triangulation of the
          polygon described by polygon; if an entry of triang is the vector (i,j,k) then the triangle
          is build by the vertices with indices i, j and k
-RETURN:  intvec, the integer vector eta describing that vertex of the Newton polytope discriminant 
-                 of the polygone whose dual cone in the Groebner fan contains the cone of the 
+RETURN:  intvec, the integer vector eta describing that vertex of the Newton polytope discriminant
+                 of the polygone whose dual cone in the Groebner fan contains the cone of the
                  secondary fan of the polygon corresponding to the given triangulation
-NOTE:    for a better description of eta see either Gelfand, Kapranov, Zelevinski: Discriminants, 
+NOTE:    for a better description of eta see either Gelfand, Kapranov, Zelevinski: Discriminants,
          Resultants and multidimensional Determinants. Chapter 10.
 EXAMPLE: example eta;   shows an example"
 {
@@ -1358,9 +1358,9 @@ EXAMPLE: example eta;   shows an example"
       // ... if the vertex is actually a vertex of the triangle ...
       if ((polygon[1][j][2]==triang[k][1]) or (polygon[1][j][2]==triang[k][2]) or (polygon[1][j][2]==triang[k][3]))
       {
-        // ... if so, add the area of the triangle to etaij 
+        // ... if so, add the area of the triangle to etaij
         etaij=etaij+triangarea[k];
-        // then check if that triangle has a facet which is contained in one of the 
+        // then check if that triangle has a facet which is contained in one of the
         // two facets of the polygon which are adjecent to the given vertex ...
         // these two facets are seiten[j] and seiten[j+1]
         for (n=j;n<=j+1;n++)
@@ -1392,7 +1392,7 @@ EXAMPLE: example eta;   shows an example"
   for (i=1;i<=size(polygon[2]);i++)
   {
     for (j=1;j<=size(polygon[2][i]);j++)
-    {      
+    {
       // initialise etaij
       etaij=0;
       // initialise seitenlaenge
@@ -1403,9 +1403,9 @@ EXAMPLE: example eta;   shows an example"
         // ... if the vertex is actually a vertex of the triangle ...
         if ((polygon[2][i][j][2]==triang[k][1]) or (polygon[2][i][j][2]==triang[k][2]) or (polygon[2][i][j][2]==triang[k][3]))
         {
-          // ... if so, add the area of the triangle to etaij 
+          // ... if so, add the area of the triangle to etaij
           etaij=etaij+triangarea[k];
-          // then check if that triangle has a facet which is contained in the 
+          // then check if that triangle has a facet which is contained in the
           // facet of the polygon which contains the lattice point in question,
           // this is the facet seiten[i+1];
           // check for each lattice point in the facet of the polygon ...
@@ -1413,7 +1413,7 @@ EXAMPLE: example eta;   shows an example"
           {
             // ... and for each lattice point in the triangle ...
             for (m=1;m<=size(triang[k]);m++)
-            {            
+            {
               // ... if they coincide and are not the vertex itself ...
               if ((seiten[i+1][l][2]==triang[k][m]) and (seiten[i+1][l][2]!=polygon[2][i][j][2]))
               {
@@ -1450,7 +1450,7 @@ EXAMPLE: example eta;   shows an example"
       // ... if the vertex is actually a vertex of the triangle ...
       if ((polygon[3][j][2]==triang[k][1]) or (polygon[3][j][2]==triang[k][2]) or (polygon[3][j][2]==triang[k][3]))
       {
-        // ... if so, add the area of the triangle to etaij 
+        // ... if so, add the area of the triangle to etaij
         etaij=etaij+triangarea[k];
       }
     }
@@ -1463,20 +1463,20 @@ example
 {
    "EXAMPLE:";
    echo=2;
-   // the lattice polygon spanned by the points (0,0), (3,0) and (0,3) 
+   // the lattice polygon spanned by the points (0,0), (3,0) and (0,3)
    // with all integer points as markings
    list polygon=intvec(1,1),intvec(3,0),intvec(2,0),intvec(1,0),
                 intvec(0,0),intvec(2,1),intvec(0,1),intvec(1,2),
                 intvec(0,2),intvec(0,3);
    // split the polygon in its vertices, its facets and its interior points
    list sp=splitPolygon(polygon);
-   // define a triangulation by connecting the only interior point 
+   // define a triangulation by connecting the only interior point
    //        with the vertices
    list triang=intvec(1,2,5),intvec(1,5,10),intvec(1,5,10);
    // compute the eta-vector of this triangulation
    eta(triang,sp);
 }
- 
+
 proc findOrientedBoundary (list polygon)
 "USAGE:      findOrientedBoundary(polygon); polygon list
 ASSUME:      polygon is a list of integer vectors defining integer lattice points in the plane
@@ -1516,7 +1516,7 @@ EXAMPLE:     example findOrientedBoundary;   shows an example"
     //   for this collect first all vectors pointing from one lattice point to the next,
     //   compute their pairwise angles and their lengths
     for (i=1;i<=size(polygon)-1;i++)
-    {      
+    {
       for (j=i+1;j<=size(polygon);j++)
       {
         mp=polygon[i]-polygon[j];
@@ -1540,7 +1540,7 @@ EXAMPLE:     example findOrientedBoundary;   shows an example"
     }
     polygon=sortlistbyintvec(polygon,abstand);
     return(list(polygon,endpoints));
-  }  
+  }
   ///////////////////////////////////////////////////////////////
   list orderedvertices;  // stores the vertices in an ordered way
   list minimisedorderedvertices;  // stores the vertices in an ordered way; redundant ones removed
@@ -1550,7 +1550,7 @@ EXAMPLE:     example findOrientedBoundary;   shows an example"
   intvec testvertex=polygon[1];  // the vertex to which the others have to be compared
   intvec startvertex=polygon[1]; // keep the starting vertex to test, when the end is reached
   int endtest;                    // is set to one, when the end is reached
-  int startvertexfound;// is 1, once for some testvertex a candidate for the next vertex has been found 
+  int startvertexfound;// is 1, once for some testvertex a candidate for the next vertex has been found
   polygon=delete(polygon,1);    // delete the testvertex
   intvec v,w;
   int l=1;  // counts the vertices
@@ -1576,7 +1576,7 @@ EXAMPLE:     example findOrientedBoundary;   shows an example"
       // of all vertices, and when all vertices on the boundary have been found we would
       // therefore find a vertex in the interior as candidate; but always testing against
       // the starting vertex, this can not happen
-      comparevertices[size(comparevertices)+1]=startvertex; 
+      comparevertices[size(comparevertices)+1]=startvertex;
       for (j=1;(j<=size(comparevertices)) and (d<=0);j++)
       {
         w=comparevertices[j]-testvertex; // points form the testvertex to the jth vertex
@@ -1590,7 +1590,7 @@ EXAMPLE:     example findOrientedBoundary;   shows an example"
       }
     }
     if (size(naechste)>0) // then a candidate for the next vertex has been found
-    {      
+    {
       startvertexfound=1; // at least once a candidate has been found
       naechste=sortlist(naechste,3);  //we order the candidates according to their distance from testvertex;
       for (j=1;j<=size(naechste);j++) // then we store them in this order in orderedvertices
@@ -1606,12 +1606,12 @@ EXAMPLE:     example findOrientedBoundary;   shows an example"
         polygon=delete(polygon,naechste[j][2]);
       }
     }
-    else // that means either that the vertex was inside the polygon, 
+    else // that means either that the vertex was inside the polygon,
     {    // or that we have reached the last vertex on the boundary of the polytope
       if (startvertexfound==0) // the vertex was in the interior; we delete it and start all over again
-      {        
-        orderedvertices[1]=polygon[1]; 
-        minimisedorderedvertices[1]=polygon[1]; 
+      {
+        orderedvertices[1]=polygon[1];
+        minimisedorderedvertices[1]=polygon[1];
         testvertex=polygon[1];
         startvertex=polygon[1];
         polygon=delete(polygon,1);
@@ -1672,9 +1672,9 @@ PURPOSE:     consider the convex lattice polygon, say P, spanned by all lattice 
              in the triangulation triang are connected to the point points[pt]; the procedure
              computes all marked points in points which ly on the boundary of that polygon, ordered
              clockwise
-RETURN:      list, of integer vectors which are the coordinates of the lattice points on 
+RETURN:      list, of integer vectors which are the coordinates of the lattice points on
                    the boundary of the above mentioned polygon P, if this polygon is not the
-                   empty set (that would be the case if points[pt] is not a vertex of any  
+                   empty set (that would be the case if points[pt] is not a vertex of any
                    triangle in the triangulation); otherwise return the empty list
 EXAMPLE:     example cyclePoints;   shows an example"
 {
@@ -1722,12 +1722,12 @@ example
 {
    "EXAMPLE:";
    echo=2;
-   // the lattice polygon spanned by the points (0,0), (3,0) and (0,3) 
+   // the lattice polygon spanned by the points (0,0), (3,0) and (0,3)
    // with all integer points as markings
    list points=intvec(1,1),intvec(3,0),intvec(2,0),intvec(1,0),
                intvec(0,0),intvec(2,1),intvec(0,1),intvec(1,2),
                intvec(0,2),intvec(0,3);
-   // define a triangulation 
+   // define a triangulation
    list triang=intvec(1,2,5),intvec(1,5,7),intvec(1,7,9),intvec(8,9,10),
                intvec(1,8,9),intvec(1,2,8);
    // compute the points connected to (1,1) in triang
@@ -1764,8 +1764,8 @@ example
 
 proc picksFormula (list polygon)
 "USAGE:  picksFormula(polygon);   polygon list
-ASSUME:  polygon is a list of integer vectors in the plane and consider their convex hull C 
-RETURN:  list, L of three integersthe 
+ASSUME:  polygon is a list of integer vectors in the plane and consider their convex hull C
+RETURN:  list, L of three integersthe
 @*             L[1] : the lattice area of C, i.e. twice the Euclidean area
 @*             L[2] : the number of lattice points on the boundary of C
 @*             L[3] : the number of interior lattice points of C
@@ -1814,11 +1814,11 @@ example
 
 proc ellipticNF (list polygon)
 "USAGE:  ellipticNF(polygon);   polygon list
-ASSUME:  polygon is a list of integer vectors in the plane such that their convex hull C 
+ASSUME:  polygon is a list of integer vectors in the plane such that their convex hull C
          has precisely one interior lattice point; i.e. C is the Newton polygon of an
          elliptic curve
 PURPOSE: compute the normal form of the polygon with respect to the unimodular affine
-         transformations T=A*x+v; there are sixteen different normal forms 
+         transformations T=A*x+v; there are sixteen different normal forms
          (see e.g. Bjorn Poonen, Fernando Rodriguez-Villegas: Lattice Polygons and
                    the number 12.  Amer. Math. Monthly  107  (2000),  no. 3, 238--250.)
 RETURN:  list, L such that
@@ -1951,7 +1951,7 @@ EXAMPLE: example ellipticNF;   shows an example"
     }
     M=pg[max],1,pg[max+1],1,pg[max+2],1;
     // the orientation of the polygon matters
-    A=pg[max-1]-pg[max],pg[max+1]-pg[max];    
+    A=pg[max-1]-pg[max],pg[max+1]-pg[max];
     if (det(A)==4)
     {
       N=2,0,1,0,0,1,0,2,1;
@@ -2000,7 +2000,7 @@ EXAMPLE: example ellipticNF;   shows an example"
     while ((dt[max]!=2) or (dt[max+1]!=2))
     {
       max++;
-    }    
+    }
     M=pg[max],1,pg[max+1],1,pg[max+2],1;
     N=0,1,1,1,2,1,2,1,1;
   }
@@ -2063,7 +2063,7 @@ example
    list nf=ellipticNF(polygon);
    // the vertices of the normal form are
    nf[1];
-   // it has been transformed by the unimodular affine transformation A*x+v 
+   // it has been transformed by the unimodular affine transformation A*x+v
    // with matrix A
    nf[2];
    // and translation vector v
@@ -2078,15 +2078,15 @@ example
 proc ellipticNFDB (int n,list #)
 "USAGE:  ellipticNFDB(n[,#]);   n int, # list
 ASSUME:  n is an intger between 1 and 16
-PURPOSE: this is a database storing the 16 normal forms of planar polygons with 
+PURPOSE: this is a database storing the 16 normal forms of planar polygons with
          precisely one interior point up to unimodular affine transformations
 @*       (see e.g. Bjorn Poonen, Fernando Rodriguez-Villegas: Lattice Polygons and
                    the number 12.  Amer. Math. Monthly  107  (2000),  no. 3, 238--250.)
 RETURN:  list, L such that
-@*             L[1] : list whose entries are the vertices of the nth normal form 
-@*             L[2] : list whose entries are all the lattice points of the nth normal form 
+@*             L[1] : list whose entries are the vertices of the nth normal form
+@*             L[2] : list whose entries are all the lattice points of the nth normal form
 @*             L[3] : only present if the optional parameter # is present, and then
-                      it is a polynomial in the variables (x,y) whose Newton polygon 
+                      it is a polynomial in the variables (x,y) whose Newton polygon
                       is the nth normal form
 NOTE:    the optional parameter is only allowed if the basering has the variables x and y
 EXAMPLE: example ellipticNFDB;   shows an example"
@@ -2138,7 +2138,7 @@ example
 
 proc polymakeKeepTmpFiles (int i)
 "USAGE:  polymakeKeepTmpFiles(int i);   i int
-PURPOSE: some procedures create files in the directory /tmp which are used for 
+PURPOSE: some procedures create files in the directory /tmp which are used for
          computations with polymake respectively topcom; these will be removed
          when the corresponding procedure is left; however, it might be desireable
          to keep them for further computations with either polymake or topcom; this
@@ -2183,7 +2183,7 @@ RETURN:  none"
 
 static proc scalarproduct (intvec w,intvec v)
 "USAGE:      scalarproduct(w,v); w,v intvec
-ASSUME:      w and v are integer vectors of the same length 
+ASSUME:      w and v are integer vectors of the same length
 RETURN:      int, the scalarproduct of v and w
 NOTE:        the procedure is called by findOrientedBoundary"
 {
@@ -2230,7 +2230,7 @@ NOTE:        the procedure is called by intmatcoldelete and sortintmat"
   if (nrows(M)>=nrows(N))
   {
     int m=nrows(M);
-    
+
   }
   else
   {
@@ -2288,7 +2288,7 @@ NOTE:        the procedure is called by texnumber and choosegfanvector"
   if ((size(w)==1) and (i==1))
   {
     return("");
-    
+
   }
   if (i==1)
   {
@@ -2398,7 +2398,7 @@ NOTE:        called from ellipticNF"
       {
         k++;
       }
-      else 
+      else
       {
         stop=1;
       }
@@ -2441,7 +2441,7 @@ NOTE:        called from ellipticNF"
       {
         k++;
       }
-      else 
+      else
       {
         stop=1;
       }
@@ -2490,9 +2490,9 @@ NOTE:        called from ellipticNF"
 
 static proc polygonToCoordinates (list points)
 "USAGE:      polygonToCoordinates(points);   points list
-ASSUME:      points is a list of integer vectors each of size two describing the 
+ASSUME:      points is a list of integer vectors each of size two describing the
              marked points of a convex lattice polygon like the output of polygonDB
-RETURN:      list, the first entry is a string representing the coordinates corresponding 
+RETURN:      list, the first entry is a string representing the coordinates corresponding
                    to the latticpoints seperated by commata
                    the second entry is a list where the ith entry is a string representing
                    the coordinate of corresponding to the ith lattice point
@@ -2527,7 +2527,7 @@ proc ADeterminant (list polygon,list #)
     etavectors[i]=eta(triangs[i],sppg);
   }
   size(etavectors);
-  
+
   for (i=size(etavectors);i>=2;i--)
   {
     stop=0;
@@ -2562,10 +2562,10 @@ proc ADeterminant (list polygon,list #)
     {
     }
     return(list(etavectors,string(ad)));
-    
-    
+
+
   }
-  
+
   return(etavectors);
 }
 
@@ -2598,4 +2598,4 @@ proc adsub ()
   return(string(ff));
 }
 
-*/ 
+*/

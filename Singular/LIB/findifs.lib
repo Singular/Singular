@@ -1,13 +1,13 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: findifs.lib,v 1.3 2009-01-07 16:11:35 Singular Exp $";
+version="$Id: findifs.lib,v 1.4 2009-01-14 16:07:04 Singular Exp $";
 category="Applications";
 info="
 LIBRARY: findifs.lib  Tools for the finite difference schemes
 AUTHORS: Viktor Levandovskyy,     levandov@risc.uni-linz.ac.at
 
-THEORY: We provide the presentation of difference operators in a polynomial, 
-        semi-factorized and a nodal form. Running @code{findifs_example();} 
-        will show how we generate finite difference schemes of linear PDE's 
+THEORY: We provide the presentation of difference operators in a polynomial,
+        semi-factorized and a nodal form. Running @code{findifs_example();}
+        will show how we generate finite difference schemes of linear PDE's
         from given approximations.
 
 PROCEDURES:
@@ -66,8 +66,8 @@ proc par2tex(string s)
 "USAGE:  par2tex(s);  s a string
 RETURN:  string
 PURPOSE: converts special characters to TeX in s
-NOTE: the convention is the following: 
-      'Tx' goes to 'T_x', 
+NOTE: the convention is the following:
+      'Tx' goes to 'T_x',
       'dx' to '\\tri x' (the same for dt, dy, dz),
       'theta', 'ro', 'A', 'V' are converted to greek letters.
 EXAMPLE: example par2tex; shows examples
@@ -113,7 +113,7 @@ proc replace(string s, string what, string with)
 "USAGE:  replace(s,what,with);  s,what,with strings
 RETURN:  string
 PURPOSE: replaces in 's' all the substrings 'what' with substring 'with'
-NOTE: 
+NOTE:
 EXAMPLE: example replace; shows examples
 "{
   // clear: replace in s, "what" with "with"
@@ -424,7 +424,7 @@ EXAMPLE: example texcoef; shows examples
     {
       if ( (sout[i]=="+") || (sout[i]=="-") )
       {
-	NisPoly = 1;
+        NisPoly = 1;
       }
     }
     if (NisPoly)
@@ -721,7 +721,7 @@ print(M*X);
  "* Create the nodal of the scheme in TeX format: ";
  " ideal I = decoef(p,dt);";
  " difpoly2tex(I,L);";
- difpoly2tex(I,L); // the nodal form of the scheme in TeX 
+ difpoly2tex(I,L); // the nodal form of the scheme in TeX
  "* Preparations for the semi-factorized form: ";
  poly pi1 = subst(I[2],B,0);
  poly pi2 = I[2] - pi1;

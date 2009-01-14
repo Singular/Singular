@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: compregb.lib,v 1.2 2007-06-20 15:39:44 Singular Exp $";
+version="$Id: compregb.lib,v 1.3 2009-01-14 16:07:03 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  compregb.lib      experimental implementation for comprehensive Groebner systems
@@ -78,10 +78,10 @@ static proc polys_heads(list PolyL)
       CoefLsub = factorize(Coef, 1);
       for (j = 1; j <= size(CoefLsub); j ++)
       {
-	if (CoefLsub[j] > 1)
+        if (CoefLsub[j] > 1)
         {
-	  CoefL = insert(CoefL, CoefLsub[j]);
-	}
+          CoefL = insert(CoefL, CoefLsub[j]);
+        }
       }
     }
   }
@@ -93,8 +93,8 @@ static proc polys_heads(list PolyL)
     {
       if (Coef == CoefL[j])
       {
-	CoefL = delete(CoefL, j);
-	j --;
+        CoefL = delete(CoefL, j);
+        j --;
       }
     }
   }

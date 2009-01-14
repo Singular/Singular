@@ -1,6 +1,6 @@
 //last change: 2007/07/06 (Oliver Labs)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surfex.lib,v 1.8 2008-12-12 17:27:01 Singular Exp $";
+version="$Id: surfex.lib,v 1.9 2009-01-14 16:07:05 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: surfex.lib      Procedures for visualizing and rotating surfaces.
@@ -520,7 +520,7 @@ it takes the surfex-code as a string and calls surfex.
          while(surfex_path2[size(surfex_path2)]==" ") {
            surfex_path2 = surfex_path2[1..(size(surfex_path2)-1)];
          }
-         
+
          if (status(surfex_path2+"/surfex","exists")=="yes") break;
          surfex_path1=surfex_path1[find(surfex_path1,":")+1,size(surfex_path1)];
          surfex_path2=surfex_path1[1..(size(surfex_path1)-1)];
