@@ -6,7 +6,7 @@
  *  Purpose: link initialization for dynamic linking
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: slInit_Dynamic.cc,v 1.2 2001-10-09 16:36:23 Singular Exp $
+ *  Version: $Id: slInit_Dynamic.cc,v 1.3 2009-01-14 16:49:22 Singular Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -19,6 +19,7 @@
 #include "slInit.h"
 #include "mod_raw.h"
 
+#ifdef HAVE_DL
 #ifdef HAVE_MPSR
 #include "MP.h"
 #include "mpsr_sl.h"
@@ -134,5 +135,6 @@ si_link_extension slInitDBMExtension(si_link_extension s)
   return s;
 }
 
+#endif
 #endif
 
