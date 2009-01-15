@@ -4,7 +4,7 @@
 //stdhilb can be called with std or slimgb (Jan 2008, GMG)
 //### Todo: im lokalen Fall die Hilbert-Samuel Funktion verwenden
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.104 2009-01-14 16:06:46 Singular Exp $";
+version="$Id: standard.lib,v 1.105 2009-01-15 10:57:30 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -185,7 +185,7 @@ EXAMPLE: example stdhilb;  shows an example"
   def P=basering;
   int nr;
   if (typeof(i)=="ideal") { nr=1;}
-  else                    { nr= nrows(i); }    //nr=1 iff i is an ideal
+  else                    { nr= nrows(i); }    //nr=1 if i is an ideal
   ideal Qideal = ideal(P);      //defining the quotient ideal if P is a qring
   int was_qring;                //remembers if basering was a qring
   int is_homog =homog(i);       //check for homogeneity of i and Qideal
