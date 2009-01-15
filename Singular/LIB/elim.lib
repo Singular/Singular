@@ -1,6 +1,15 @@
-// $Id: elim.lib,v 1.26 2009-01-14 16:07:04 Singular Exp $
+// $Id: elim.lib,v 1.27 2009-01-15 10:57:51 Singular Exp $
+// (GMG, modified 22.06.96)
+// GMG, last modified 30.10.08: new procedure elimRing;
+// elim changes now to ring with elimination ordering (extra weight vector
+// a(...)), works now in qring, new examples have been added;
+// syntax of elim, nselect, select and select1 changed: instead of two
+// integers an intvec can be given. Bug in nselect fixed which occured
+// in connectin with type conversion from matrix to module.
+// GMG, last modified 5.01.09: elim uses now stdhilb(id,@w) instead of std(id)
+// and can now choose as method slimgb or std.
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: elim.lib,v 1.26 2009-01-14 16:07:04 Singular Exp $";
+version="$Id: elim.lib,v 1.27 2009-01-15 10:57:51 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      Elimination, Saturation and Blowing up
@@ -9,8 +18,8 @@ PROCEDURES:
  blowup0(j[,s1,s2]);   create presentation of blownup ring of ideal j
  elimRing(p);          create ring with block ordering for elimating vars in p
  elim(id,..);          variables .. eliminated from id (ideal/module)
- elim1(id,p);          p=product of vars to be eliminated from id
- elim2(id,..);         variables .. eliminated from id (ideal/module)
+ elim1(id,p);          variables .. eliminated from id (different algorithm)
+ elim2(id,..);         variables .. eliminated from id (different algorithm)
  nselect(id,v);        select generators not containing variables given by v
  sat(id,j);            saturated quotient of ideal/module id by ideal j
  select(id,v]);        select generators containing all variables given by v
@@ -21,7 +30,7 @@ PROCEDURES:
 LIB "inout.lib";
 LIB "general.lib";
 LIB "poly.lib";
-
+LIB "ring.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc blowup0 (ideal J,ideal C, list #)
@@ -107,8 +116,7 @@ EXAMPLE: example blowup0; shows examples
 
    //---- change l[3]:
    l[3][s+1] = l[3][s];         // save the module ordering of the basering
-   intvec w;
-   w[k]=0; w=w+1;
+   intvec w=1:k;
    intvec v;                    // containing the weights for the varibale
    if( homog(C) )
    {
@@ -183,26 +191,29 @@ example
    eD;                       //ideal of exceptional divisor
    //Note that the different affine charts are {y(i)=1}
  }
-///////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////
 proc elimRing ( poly vars, list #)
-"USAGE:   elimRing(vars [,w]); vars = product of variables to be eliminated
-         (type poly), w = intvec (specifying weights for all variables)
-RETURN:  a ring, say R, s.t. the monomial ordering of R has 2 blocks.
-         The first block corresponds to the (given) variables to be eliminated
-         and has ordering dp if these variables have weight all 1; if w is
-         given or if not all variables in vars have weight 1 the ordering is
-         wp(w1) where w1 is the intvec of weights of the variables to be
-         eliminated.
-         The second block corresponds to variables not to be eliminated.
-@*       If the first variable not to be eliminated is global (i.e. > 1),
-         resp. local (i.e. < 1), the second block has ordering dp, resp. ds,
-         (or wp(w2), resp. ws(w2), where w2 is the intvec of weights of the
-         variables not to be eliminated).
-@*       If the basering is a quotient ring P/Q, then R a quotient ring
+"USAGE:   elimRing(vars [,w,str]); vars = product of variables to be eliminated
+         (type poly), w = intvec (specifying weights for all variables),
+         str = string either \"a\" or \"b\" (default: w=ringweights, str=\"a\")
+RETURN:  a list, say L, with R:=L[1] a ring and L[2] an intvec.
+         The ordering in R is an elimination ordering for the variables
+         appearing in vars depending on \"a\" resp. \"b\". Let w1 (resp. w2)
+         be the intvec of weights of the variables to be eliminated (resp. not
+         to be eliminated).
+         The monomial ordering of R has always 2 blocks, the first
+         block corresponds to the (given) variables to be eliminated.
+@*       If str = \"a\" the first block is a(w1,0..0) and the second block is
+         wp(w) resp. ws(w) if the first variable not to be eliminated is local.
+@*       If str = \"b\" the 1st block has ordering wp(w1) and the 2nd block
+         is wp(w2) resp. ws(w2) if the first variable not to be eliminated is
+         local.
+@*       If the basering is a quotient ring P/Q, then R is also a quotient ring
          with Q replaced by a standard basis of Q w.r.t. the new ordering
          (parameters are not touched).
-NOTE:    The ordering in R is an elimination ordering for the variables
-         appearing in vars.
+@*       The intvec L[2] is the intvec of variable weights (or the given w)
+         with weights <= 0 replaced by 1.
 PURPOSE: Prepare a ring for eliminating vars from an ideal/moduel by
          computing a standard basis in R with a fast monomial ordering.
          This procedure is used by the procedure elim.
@@ -212,26 +223,56 @@ EXAMPLE: example elimRing; shows an example
   def BR = basering;
   int nvarBR = nvars(BR);
   list BRlist = ringlist(BR);
-  intvec @w;                   //to store weights of all variables
+  //------------------ set resp. compute ring weights ----------------------
+  int ii;
+  intvec @w;              //to store weights of all variables
   @w[nvarBR] = 0;
-  @w = @w + 1;                 //initialize @w as 1..1
+  @w = @w + 1;            //initialize @w as 1..1
+  string str = "a";       //default for specifying elimination ordering
+  if (size(#) == 0)       //default values
+  {
+     @w = ringweights(BR);     //compute the ring weights (proc from ring.lib)
+  }
+
   if (size(#) == 1)
   {
     if ( typeof(#[1]) == "intvec" )
     {
        @w = #[1];              //take the given weights
     }
-  }
-  else
-  {
-     @w = ringweights(BR);     //compute the ring weights (proc from ring.lib)
+    if ( typeof(#[1]) == "string" )
+    {
+       str = #[1];             //string for specifying elimination ordering
+    }
   }
 
-  //--- get variables to be eliminated and ringweights:
+  if (size(#) >= 2)
+  {
+    if ( typeof(#[1]) == "intvec" and typeof(#[2]) == "string" )
+    {
+       @w = #[1];              //take the given weights
+       str = #[2];             //string for specifying elimination ordering
+
+    }
+    if ( typeof(#[1]) == "string" and typeof(#[2]) == "intvec" )
+    {
+       str = #[1];             //string for specifying elimination ordering
+       @w = #[2];              //take the given weights
+    }
+  }
+
+  for ( ii=1; ii<=size(@w); ii++ )
+  {
+    if ( @w[ii] <= 0 )
+    {
+       @w[ii] = 1;             //replace non-positive weights by 1
+    }
+  }
+
+  //------ get variables to be eliminated together with their weights -------
   intvec w1,w2;  //for ringweights of first (w1) and second (w2) block
   list v1,v2;    //for variables of first (to be liminated) and second block
 
-  int ii;
   for( ii=1; ii<=nvarBR; ii++ )
   {
      if( vars/var(ii)==0 )    //treat variables not to be eliminated
@@ -250,75 +291,107 @@ EXAMPLE: example elimRing; shows an example
      }
   }
 
-  int l1, l2 = size(w1), size(w2);
-  if ( l1 <= 1 )
+  if ( size(w1) <= 1 )
   {
-    ERROR("no elimination ?");
-    //return(BR);
+    return(BR);
   }
-  if ( l2 <= 1 )
+  if ( size(w2) <= 1 )
   {
     ERROR("## elimination of all variables is not possible");
   }
 
   w1 = w1[2..size(w1)];
   w2 = w2[2..size(w2)];
+  BRlist[2] = v1 + v2;         //put variables to be eliminated in front
 
-  //--- put variables to be eliminated in front:
-  BRlist[2] = v1 + v2;
+  //-------- create elimination ordering with two blocks and weights ---------
+  //Assume that the first r of the n variables are to be eliminated.
+  //Then, in case of an a-ordering (default), the new ring ordering will be
+  //of the form (a(1..1,0..0),dp) with r 1's and n-r 0's or (a(w1,0..0),wp(@w))
+  //if there are varaible weights which are not 1.
+  //In the case of a b-ordering the ordering will be a block ordering with two
+  //blocks of the form (dp(r),dp(n-r))  resp. (wp(w1),dp(w2))
 
-  //--- create a block ordering with two blocks and weights:
-  int nblock = size(BRlist[3]);      //number of blocks
-  list BR3 =  BRlist[3];             //save ordering
-  BRlist[3] = list();
-  list B3;
+  list B3;                     //this will become the list for new ordering
 
-  if( w1==1 )
+  //----- b-ordering case:
+  if ( str == "b" )
   {
-     B3[1] = list("dp", w1);
+    if( w1==1 )              //weights for vars to be eliminated are all 1
+    {
+       B3[1] = list("dp", w1);
+    }
+    else
+    {
+       B3[1] = list("wp", w1);
+    }
+
+    if( w2==1 )              //weights for vars not to be eliminated are all 1
+    {
+       if ( local==1 )
+       {
+          B3[2] = list("ds", w2);
+       }
+       else
+       {
+          B3[2] = list("dp", w2);
+       }
+    }
+    else
+    {
+       if ( local==1 )
+       {
+          B3[2] = list("ws", w2);
+       }
+       else
+       {
+          B3[2] = list("wp", w2);
+       }
+    }
   }
+
+  //----- a-ordering case:
   else
   {
-     B3[1] = list("wp", w1);
-  }
+    //define first the second block
+    if( @w==1 )              //weights for all vars are 1
+    {
+       if ( local==1 )
+       {
+          B3[2] = list("ls", @w);
+       }
+       else
+       {
+          B3[2] = list("dp", @w);
+       }
+    }
+    else
+    {
+       if ( local==1 )
+       {
+          B3[2] = list("ws", @w);
+       }
+       else
+       {
+          B3[2] = list("wp", @w);
+       }
+    }
 
-  if( w2==1 )
-  {
-     if ( local==1 )
-     {
-        B3[2] = list("ds", w2);
-     }
-     else
-     {
-        B3[2] = list("dp", w2);
-     }
+    //define now the first a-block of the form a(w1,0..0)
+    intvec @v;
+    @v[nvarBR] = 0;
+    @v = @v+w1;
+    B3[1] = list("a", @v);
   }
-  else
-  {
-     if ( local==1 )
-     {
-        B3[2] = list("ws", w2);
-     }
-     else
-     {
-        B3[2] = list("wp", w2);
-     }
-  }
-
   BRlist[3] = B3;
 
-  //Module ordering stays in front resp. at the end:
-  if( BR3[nblock][1] =="c" || BR3[nblock][1] =="C" )
-  {
-    BRlist[3] = insert(BRlist[3],BR3[nblock],size(B3));
-  }
-  else
-  {
-    BRlist[3] = insert(BRlist[3],BR3[1]);
-  }
+  //----------- put module ordering always at the end and return -------------
+
+  BRlist[3] = insert(BRlist[3],list("C",intvec(0)),size(B3));
 
   def eRing = ring(quotientList(BRlist));
-  return (eRing);
+  list result = eRing, @w;
+  return (result);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -330,26 +403,29 @@ example
    ring S =  (0,a),(x,y,z,u,v),ws(1,2,3,4,5);
    minpoly = a2+1;
    qring T = std(ideal(x+y2+v3,(x+v)^2));
-   def Q = elimRing(yv);
+   def Q = elimRing(yv)[1];
    setring Q; Q;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc elim (id, list #)
-"USAGE:   elim(id,arg[,\"withWeights\"]);  id ideal/module, arg can be either
-        an intvec vor a product p of variables (type poly)
+"USAGE:   elim(id,arg[,s]);  id ideal/module, arg can be either an intvec v or
+         a product p of variables (type poly), s a string determining the
+         method which can be \"slimgb\" or \"std\" or, additionally,
+         \"withWeigts\".
 RETURN: ideal/module obtained from id by eliminating either the variables
         with indices appearing in v or the variables appearing in p.
         Works also in a qring.
-METHOD: elim uses elimRing to create a ring with block ordering with two
-        blocks where the first block contains the variables to be eliminated
-        and then uses groebner. If the variables in the basering have weights
-        these weights are used in elimRing.
-@*      If a string \"withWeigts\" as second, optional argument is given,
+METHOD: elim uses elimRing to create a ring with an elimination ordering for
+        the variables to be eliminated and then applies std if \"std\"
+        is given, or slimgb if \"slimgb\" is given, or a heuristically choosen
+        method.
+@*      If the variables in the basering have weights these weights are used
+        in elimRing. If a string \"withWeigts\" as (optional) argument is given
         Singular computes weights for the variables to make the input as
         homogeneous as possible.
 @*      The method is different from that used by eliminate and elim1;
-        in some examples elim can be significantly faster.
+        depending on the example, any of these commands can be faster.
 NOTE:   No special monomial ordering is required, i.e. the ordering can be
         local or mixed. The result is a SB with respect to the ordering of
         the second block used by elimRing. E.g. if the first var not to be
@@ -366,57 +442,105 @@ EXAMPLE: example elim; shows an example
   }
   int pr = printlevel - voice + 2;   //for ring display if printlevel > 0
   def BR = basering;
+  list lER;                          //for list returned by elimRing
 //-------------------------------- check input -------------------------------
   poly vars;
+  int ne;                           //for number of vars to be eliminated
   int ii;
   if (size(#) > 0)
   {
     if ( typeof(#[1]) == "poly" )
     {
       vars = #[1];
+      for( ii=1; ii<=nvars(BR); ii++ )
+      {
+        if ( vars/var(ii) != 0)
+        { ne++; }
+      }
     }
-    if ( typeof(#[1]) == "intvec")
+    if ( typeof(#[1]) == "intvec" or typeof(#[1]) == "int")
     {
+      ne = size(#[1]);
       vars=1;
-      for( ii=1; ii<=size(#[1]); ii++ )
+      for( ii=1; ii<=ne; ii++ )
       {
         vars=vars*var(#[1][ii]);
       }
     }
   }
-  if (size(#) == 2)
+
+  string method;                    //for "std" or "slimgb" or "withWeights"
+  if (size(#) >= 2)
   {
     if ( typeof(#[2]) == "string" )
     {
        if ( #[2] == "withWeights" )
        {
-         intvec @w = weight(id);
+         intvec @w = weight(id);        //computation of weights
+       }
+       if ( #[2] == "std" ) { method = "std"; }
+       if ( #[2] == "slimgb" ) { method = "slimgb"; }
+    }
+    if (size(#) == 3)
+    {
+       if ( typeof(#[3]) == "string" )
+       {
+          if ( #[3] == "withWeights" )
+          {
+            intvec @w = weight(id);        //computation of weights
+          }
+          if ( #[3] == "std" ) { method = "std"; }
+          if ( #[3] == "slimgb" ) { method = "slimgb"; }
        }
     }
   }
 
 //-------------- create new ring and map objects to new ring ------------------
-  if ( defined(@w) )
-  {
-     def ER = elimRing(vars,@w);
-  }
-  else
-  {
-     def ER = elimRing(vars);
-  }
-  setring ER;
-  def id = imap(BR,id);
-  poly vars = imap(BR,vars);
+   if ( defined(@w) )
+   {
+      lER = elimRing(vars,@w);  //in this case lER[2] = @w
+   }
+   else
+   {
+      lER = elimRing(vars);
+      intvec @w = lER[2];      //in this case w is the intvec of
+                               //variable weights as computed in elimRing
+   }
+   def ER = lER[1];
+   setring ER;
+   def id = imap(BR,id);
+   poly vars = imap(BR,vars);
+
 //---------- now eliminate in new ring and map back to old ring ---------------
-  id = groebner(id);
-  id = nselect(id,1..size(ringlist(ER)[3][1][2]));
-  if ( pr > 0 )
-  {
+  //if possible apply std(id,hi,w) where hi is the first hilbert function
+  //of id with respect to the weights w. If w is not defined (i.e. good weights
+  //@w are computed then id is only approximately @w-homogeneous and
+  //the hilbert driven std cannot be used directly; however, stdhilb
+  //homogenizes first and applies the hilbert driven std to the homogenization
+
+   option(redThrough);
+   if (typeof(id)=="matrix")
+   {
+     id = matrix(stdhilb(module(id),method,@w));
+   }
+   else
+   {
+     id = stdhilb(id,method,@w);
+   }
+
+   //### Todo: hier sollte id = groebner(id, "hilb"); verwendet werden.
+   //da z.Zt. (Jan 09) groebener bei extra Gewichtsvektor a(...) aber stets std
+   //aufruft und ausserdem "withWeigts" nicht kennt, ist groebner(id, "hilb")
+   //zunaechst nicht aktiviert. Ev. nach Ueberarbeitung von groebner aktivieren
+
+   id = nselect(id,1..ne);
+   if ( pr > 0 )
+   {
      "// result is a SB in the following ring:";
-     ER;
-  }
-  setring BR;
-  return(imap(ER,id));
+      ER;
+   }
+   setring BR;
+   return(imap(ER,id));
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -426,7 +550,7 @@ example
    elim(i,uv);
    int p = printlevel;
    printlevel = 2;
-   elim(i,uv,"withWeights");
+   elim(i,uv,"withWeights","slimgb");
    printlevel = p;
 
    ring S =  (0,a),(x,y,z,u,v),ws(1,2,3,4,5);
@@ -476,10 +600,13 @@ example
    module m=i*gen(1)+i*gen(2);
    m=elim2(m,3..4);show(m);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
-proc elim1 (id, poly vars)
-"USAGE:   elim1(id,p); id ideal/module, p product of vars to be eliminated
-RETURN:  ideal/module obtained from id by eliminating vars occuring in poly
+proc elim1 (id, list #)
+"USAGE:   elim1(id,arg); id ideal/module, arg can be either an intvec v or a
+         product p of variables (type poly)
+RETURN: ideal/module obtained from id by eliminating either the variables
+        with indices appearing in v or the variables appearing in p
 METHOD:  elim1 calls eliminate but in a ring with ordering dp (resp. ls)
          if the first var not to be eliminated belongs to a -p (resp. -s)
          ordering.
@@ -492,10 +619,24 @@ EXAMPLE: example elim1; shows examples
    def br = basering;
    if ( size(ideal(br)) != 0 )
    {
-      ERROR ("cannot eliminate in a qring");
+      ERROR ("elim1 cannot eliminate in a qring");
    }
+//------------- create product vars of variables to be eliminated -------------
+  poly vars;
+  int ii;
+  if (size(#) > 0)
+  {
+    if ( typeof(#[1]) == "poly" ) {  vars = #[1]; }
+    if ( typeof(#[1]) == "intvec" or typeof(#[1]) == "int")
+    {
+      vars=1;
+      for( ii=1; ii<=size(#[1]); ii++ )
+      {
+        vars=vars*var(#[1][ii]);
+      }
+    }
+  }
 //---- get variables to be eliminated and create string for new ordering ------
-   int ii;
    for( ii=1; ii<=nvars(basering); ii++ )
    {
       if( vars/var(ii)==0 ) { poly p = 1+var(ii); break;}
@@ -518,26 +659,28 @@ example
    ideal i=x-t,y-t2,z-t3,s-x+y3;
    elim1(i,ts);
    module m=i*gen(1)+i*gen(2);
-   m=elim1(m,st); show(m);
+   m=elim1(m,3..4); show(m);
 }
 ///////////////////////////////////////////////////////////////////////////////
+
 proc nselect (id, intvec v)
 "USAGE:   nselect(id,v); id = ideal, module or matrix, v = intvec
 RETURN:  generators (or columns) of id not containing the variables with index
          an entry of v
 SEE ALSO: select, select1
 EXAMPLE: example nselect; shows examples
-"{
-   if (typeof(id)!="ideal")
+"
+{
+   if (typeof(id) != "ideal")
    {
-     if (typeof(id)=="module" || typeof(id)=="matrix")
-     {
-       module id1 = module(id);
-     }
-     else
-     {
-       ERROR("// *** input must be of type ideal or module or matrix");
-     }
+      if (typeof(id)=="module" || typeof(id)=="matrix")
+      {
+        module id1 = module(id);
+      }
+      else
+      {
+        ERROR("// *** input must be of type ideal or module or matrix");
+      }
    }
    else
    {
@@ -555,12 +698,11 @@ EXAMPLE: example nselect; shows examples
         }
       }
    }
-   id1=simplify(id1,2);
    if(typeof(id)=="matrix")
    {
-      return(matrix(id1));
+      return(matrix(simplify(id1,2)));
    }
-   return(id1);
+   return(simplify(id1,2));
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -613,6 +755,7 @@ example
    printlevel = p;
 }
 ///////////////////////////////////////////////////////////////////////////////
+
 proc select (id, intvec v)
 "USAGE:   select(id,n[,m]); id = ideal/module/matrix, v = intvec
 RETURN:  generators/columns of id containing all variables with index
@@ -621,21 +764,22 @@ NOTE:    use 'select1' for selecting generators/columns containing at least
          one of the variables with index an entry of v
 SEE ALSO: select1, nselect
 EXAMPLE: example select; shows examples
-"{
-   if (typeof(id)!="ideal")
+"
+{
+   if (typeof(id) != "ideal")
    {
-     if (typeof(id)=="module" || typeof(id)=="matrix")
-     {
-       module id1 = module(id);
-     }
-     else
-     {
-       ERROR("// *** input must be of type ideal or module or matrix");
-     }
+      if (typeof(id)=="module" || typeof(id)=="matrix")
+      {
+        module id1 = module(id);
+      }
+      else
+      {
+        ERROR("// *** input must be of type ideal or module or matrix");
+      }
    }
    else
    {
-     ideal id1 = id;
+      ideal id1 = id;
    }
    int j,k;
    int n,m = size(v), ncols(id1);
@@ -676,23 +820,24 @@ NOTE:    use 'select' for selecting generators/columns containing all variables
          with index an entry of v
 SEE ALSO: select, nselect
 EXAMPLE: example select1; shows examples
-"{
-   if (typeof(id)!="ideal")
+"
+{
+   if (typeof(id) != "ideal")
    {
-     if (typeof(id)=="module" || typeof(id)=="matrix")
-     {
-       module id1 = module(id);
-       module I;
-     }
-     else
-     {
-       ERROR("// *** input must be of type ideal or module or matrix");
-     }
+      if (typeof(id)=="module" || typeof(id)=="matrix")
+      {
+        module id1 = module(id);
+        module I;
+      }
+      else
+      {
+        ERROR("// *** input must be of type ideal or module or matrix");
+      }
    }
    else
    {
-     ideal id1 = id;
-     ideal I;
+      ideal id1 = id;
+      ideal I;
    }
    int j,k;
    int n,m = size(v), ncols(id1);
@@ -705,12 +850,11 @@ EXAMPLE: example select1; shows examples
          }
       }
    }
-   I=simplify(I,2);
    if(typeof(id)=="matrix")
    {
-      return(matrix(I));
+      return(matrix(simplify(I,2)));
    }
-   return(I);
+   return(simplify(I,2));
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -721,4 +865,129 @@ example
    select1(m,1..2);
    select1(matrix(m),1..2);
 }
+/*
 ///////////////////////////////////////////////////////////////////////////////
+//                      EXAMPLEs
+///////////////////////////////////////////////////////////////////////////////
+// Siehe auch file 'tst-elim' mit grossem Beispiel;
+example blowup0;
+example elimRing;
+example elim;
+example elim1;
+example nselect;
+example sat;
+example select;
+example select1;
+//===========================================================================
+//         Rationale Normalkurve vom Grad d im P^d bzw. im A^d:
+//homogen s:t -> (t^d:t^(d-1)s: ...: s^d), inhomogen t ->(t^d:t^(d-1): ...:t)
+
+//------------------- 1. Homogen:
+//Varianten der Methode
+int d = 5;
+ring R = 0,(s,t,x(0..d)),dp;
+ideal I;
+for( int ii=0; ii<=d; ii++) {I = I,ideal(x(ii)-t^(d-ii)*s^ii); }
+
+int tt = timer;
+ideal eI = elim(I,1..2,"std");
+ideal eI = elim(I,1..2,"slimgb");
+ideal eI = elim(I,st,"withWeights");
+ideal eI = elim(I,st,"std","withWeights");
+//komplizierter
+int d = 50;
+ring R = 0,(s,t,x(0..d)),dp;
+ideal I;
+for( int ii=0; ii<=d; ii++) {I = I,ideal(x(ii)-t^(d-ii)*s^ii); }
+int tt = timer;
+ideal eI = elim(I,1..2);               //56(44)sec (slimgb 22(17),hilb 33(26))
+timer-tt; tt = timer;
+ideal eI = elim1(I,1..2);              //71(53)sec
+timer-tt; tt = timer;
+ideal eI = eliminate(I,st);            //70(51)sec (wie elim1)
+timer-tt;
+timer-tt; tt = timer;
+ideal eI = elim(I,1..2,"withWeights"); //190(138)sec
+                                //(weights73(49), slimgb43(33), hilb71(53)
+timer-tt;
+//------------------- 2. Inhomogen
+int d = 50;
+ring r = 0,(t,x(0..d)),dp;
+ideal I;
+for( int ii=0; ii<=d; ii++) {I = I+ideal(x(ii)-t^(d-ii)); }
+int tt = timer;
+ideal eI = elim(I,1,);                //20(15)sec (slimgb13(10), hilb6(5))
+ideal eI = elim(I,1,"std");           //17sec (std 11, hilb 6)
+timer-tt; tt = timer;
+ideal eI = elim1(I,t);               //8(6)sec
+timer-tt; tt = timer;
+ideal eI = eliminate(I,t);           //7(6)sec
+timer-tt;
+timer-tt; tt = timer;
+ideal eI = elim(I,1..1,"withWeights"); //189(47)sec
+//(weights73(42), slimgb43(1), hilb70(2)
+timer-tt;
+
+//===========================================================================
+//        Zufaellige Beispiele, homogen
+system("random",37);
+ring R = 0,x(1..6),lp;
+ideal I = sparseid(4,3);
+
+int tt = timer;
+ideal eI = elim(I,1);                //108(85)sec (slimgb 29(23), hilb79(61)
+timer-tt; tt = timer;
+ideal eI = elim(I,1,"std");          //(139)sec (std 77, hilb 61)
+timer-tt; tt = timer;
+ideal eI = elim1(I,1);               //(nach 45 min abgebrochen)
+timer-tt; tt = timer;
+ideal eI = eliminate(I,x(1));        //(nach 45 min abgebrochen)
+timer-tt; tt = timer;
+
+//        Zufaellige Beispiele, inhomogen
+system("random",37);
+ring R = 32003,x(1..5),dp;
+ideal I = sparseid(4,2,3);
+option(prot,redThrough);
+
+intvec w = 1,1,1,1,1,1;
+int tt = timer;
+ideal eI = elim(I,1,w);            //(nach 5min abgebr.) hilb schlaegt nicht zu
+timer-tt; tt = timer;              //BUG!!!!!!
+
+int tt = timer;
+ideal eI = elim(I,1);              //(nach 5min abgebr.) hilb schlaegt nicht zu
+timer-tt; tt = timer;              //BUG!!!!!!
+ideal eI = elim1(I,1);             //8(7.8)sec
+timer-tt; tt = timer;
+ideal eI = eliminate(I,x(1));      //8(7.8)sec
+timer-tt; tt = timer;
+
+                              BUG!!!!
+//        Zufaellige Beispiele, inhomogen, lokal
+system("random",37);
+ring R = 32003,x(1..6),ds;
+ideal I = sparseid(4,1,2);
+option(prot,redThrough);
+int tt = timer;
+ideal eI = elim(I,1);                //(haengt sich auf)
+timer-tt; tt = timer;
+ideal eI = elim1(I,1);               //(0)sec !!!!!!
+timer-tt; tt = timer;
+ideal eI = eliminate(I,x(1));        //(ewig mit ...., abgebrochen)
+timer-tt; tt = timer;
+
+ring R1 =(32003),(x(1),x(2),x(3),x(4),x(5),x(6)),(a(1,0,0,0,0,0),ds,C);
+ideal I = imap(R,I);
+I = std(I);                           //(haengt sich auf) !!!!!!!
+
+ideal eI = elim(I,1..1,"withWeights"); //(47)sec (weights42, slimgb1, hilb2)
+timer-tt;
+
+ring R1 =(32003),(x(1),x(2),x(3),x(4),x(5),x(6)),(a(1,0,0,0,0,0),ds,C);
+ideal I = imap(R,I);
+I = std(I);                           //(haengt sich auf) !!!!!!!
+
+ideal eI = elim(I,1..1,"withWeights"); //(47)sec (weights42, slimgb1, hilb2)
+timer-tt;
+*/
