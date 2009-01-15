@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: stairc.h,v 1.5 2007-11-09 12:50:44 Singular Exp $ */
+/* $Id: stairc.h,v 1.6 2009-01-15 17:03:19 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -23,7 +23,7 @@ int scMult0Int(ideal  s,ideal Q=NULL);
 void scPrintDegree(int co, int mu);
 void scDegree(ideal  s,intvec *modulweight,ideal Q=NULL);
 
-ideal scKBase(int deg, ideal  s, ideal Q=NULL);
+ideal scKBase(int deg, ideal  s, ideal Q=NULL, intvec * mv=NULL);
 
 intvec * hHstdSeries(ideal S, intvec *modulweight, intvec *wdegree,
                      ideal Q=NULL, ring tailRing = currRing);

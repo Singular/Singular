@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.10 2007-11-09 12:50:44 Singular Exp $ */
+/* $Id: hdegree.cc,v 1.11 2009-01-15 17:03:19 Singular Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
@@ -1295,7 +1295,7 @@ static ideal scIdKbase()
   return res;
 }
 
-ideal scKBase(int deg, ideal s, ideal Q)
+ideal scKBase(int deg, ideal s, ideal Q, intvec * mv)
 {
   int  i, di;
   poly p;
@@ -1332,13 +1332,18 @@ ideal scKBase(int deg, ideal s, ideal Q)
     {
       *act = i;
       hComp(hexist, hNexist, i, hstc, &hNstc);
-      if (hNstc)
+      int deg_ei=deg;
+      if (mv!=NULL) deg_ei -= (*mv)[i-1];
+      if ((deg < 0) || (deg_ei>=0))
       {
-        if (deg < 0) scInKbase(hstc, hNstc, pVariables);
-        else scDegKbase(hstc, hNstc, pVariables, deg);
+        if (hNstc)
+        {
+          if (deg < 0) scInKbase(hstc, hNstc, pVariables);
+          else scDegKbase(hstc, hNstc, pVariables, deg_ei);
+        }
+        else
+          scAll(pVariables, deg_ei);
       }
-      else
-        scAll(pVariables, deg);
     }
     omFreeSize((ADDRESS)hstc, hNexist * sizeof(scmon));
   }
