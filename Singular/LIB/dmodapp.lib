@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmodapp.lib,v 1.16 2009-01-14 16:07:04 Singular Exp $";
+version="$Id: dmodapp.lib,v 1.17 2009-01-15 19:19:08 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmodapp.lib     Applications of algebraic D-modules
@@ -88,12 +88,11 @@ proc testdmodapp()
 proc initialIdealW (ideal I, intvec u, intvec v, list #)
 "USAGE:  initialIdealW(I,u,v [,s,t]);  I ideal, u,v intvecs, s,t optional ints
 RETURN:  ideal, GB of initial ideal of the input ideal wrt the weights u and v
-PURPOSE: computes the initial ideal
-NOTE:    Assume, I is an ideal in the n-th Weyl algebra D, where the sequence
-@*       of the indeterminates is x(1),...,x(n),D(1),...,D(n).
-@*       Further assume that u is the weight for the x(i) and v the weight for
-@*       the D(i).
-@*       Note that the returned ideal is not a D-ideal but an ideal in the associated
+ASSUME: basering is the n-th Weyl algebra and the sequence of the indeterminates is x(1),...,x(n),D(1),...,D(n).
+PURPOSE: computes the initial ideal with respect to given weights.
+NOTE:    Let I be an ideal in the n-th Weyl algebra D, then
+@*       u and v understood as intvecs of weights for x(i) and D(i) respectively.
+@*       Note that the returned ideal is not an ideal in D, but an ideal in the associated
 @*       graded ring while the Groebner basis is a subset of D.
 @*       If s<>0, @code{std} is used for Groebner basis computations, otherwise,
 @*       and by default, @code{slimgb} is used.
