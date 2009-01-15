@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.34 2008-07-25 14:37:55 Singular Exp $ */
+/* $Id: polys.cc,v 1.35 2009-01-15 10:33:24 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -464,13 +464,14 @@ poly pTakeOutComp(poly * p, int k)
   poly q = *p,qq=NULL,result = NULL;
 
   if (q==NULL) return NULL;
+  BOOLEAN use_setmcomp=rOrd_SetCompRequiresSetm(currRing);
   if (pGetComp(q)==k)
   {
     result = q;
     do
     {
       pSetComp(q,0);
-      pSetmComp(q);
+      if (use_setmcomp) pSetmComp(q);
       qq = q;
       pIter(q);
     }
@@ -482,7 +483,7 @@ poly pTakeOutComp(poly * p, int k)
   if (pGetComp(q) > k)
   {
     pDecrComp(q);
-    pSetmComp(q);
+    if (use_setmcomp) pSetmComp(q);
   }
   poly pNext_q;
   while ((pNext_q=pNext(q))!=NULL)
@@ -502,7 +503,7 @@ poly pTakeOutComp(poly * p, int k)
       pNext(q) = pNext(pNext_q);
       pNext(qq) =NULL;
       pSetComp(qq,0);
-      pSetmComp(qq);
+      if (use_setmcomp) pSetmComp(qq);
     }
     else
     {
@@ -510,7 +511,7 @@ poly pTakeOutComp(poly * p, int k)
       if (pGetComp(q) > k)
       {
         pDecrComp(q);
-        pSetmComp(q);
+        if (use_setmcomp) pSetmComp(q);
       }
     }
   }
