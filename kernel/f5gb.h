@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.14 2008-12-27 13:50:05 ederc Exp $ */
+/* $Id: f5gb.h,v 1.15 2009-01-15 17:44:23 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -11,14 +11,6 @@
 #ifdef HAVE_F5
 #include "lpolynomial.h"
 #include "lists.h"
-
-
-/*
-================================================
-computation of ONE polynomial as global variable
-================================================
-*/
-poly one_poly();
 
 
 /*
@@ -44,7 +36,7 @@ computes incrementally gbs of subsets of the input
 gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}  
 ==================================================
 */
-LList* F5inc(const long i, LList* g_prev);
+LList* F5inc(const int i, LList* g_prev);
 
 
 /*

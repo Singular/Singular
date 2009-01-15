@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.h,v 1.2 2008-12-27 13:50:05 ederc Exp $ */
+/* $Id: lists.h,v 1.3 2009-01-15 17:44:24 ederc Exp $ */
 /*
 * ABSTRACT: list interface
 */
@@ -10,24 +10,19 @@
 #define LISTS_HEADER
 
 #ifdef HAVE_F5
-
-
 /*
-=======================
-=======================
-linked lists for LPolys
-=======================
-=======================
-*/
-
-
-/*
-===========================
-classes for lists of LPolys 
-===========================
+============================
+============================
+classes for lists used in F5 
+============================
+============================
 */
 class LNode;
 class LList;
+class PrevNode;
+class PrevList;
+class CNode;
+class CList;
 
 
 /*
@@ -42,12 +37,12 @@ class LNode {
     public:
         // generating new list elements from the labeled / classical polynomial view
                 LNode(LPoly* lp);
-                LNode(poly* t, long* i, poly* p);
+                LNode(poly* t, int* i, poly* p);
                 LNode(LNode* ln);
                 ~LNode();
         // append new elements to the list from the labeled / classical polynomial view
-        LNode*  append(LPoly* lp);
-        LNode*  append(poly* t, long* i, poly* p);
+        LNode*  insert(LPoly* lp);
+        LNode*  insert(poly* t, int* i, poly* p);
         // get next from current LNode
         LNode*  getNext();
         
@@ -57,7 +52,6 @@ class LNode {
         poly*   getPoly();
         // test if for any list element the polynomial part of the data is equal to *p
         bool    polyTest(poly* p);
-        LNode*  operator++();
 };
 
 
@@ -69,37 +63,53 @@ class LList(lists of LPolys)
 class LList {
     private:
         LNode*  first;
-        LNode*  last;
-        long    length;
+        int     length;
     public:
                 LList(LPoly* lp);
-                LList(poly* t,long* i,poly* p);
+                LList(poly* t,int* i,poly* p);
                 ~LList();
-        void    append(LPoly* lp);
-        void    append(poly* t,long* i, poly* p);
+        void    insert(LPoly* lp);
+        // insertion in front of the list
+        void    insert(poly* t,int* i, poly* p);
         bool    polyTest(poly* p);
-        long    getLength() const;
+        int     getLength() const;
         LNode*  getFirst();
-        LNode*  getLast();
 };
 
 
 /*
-=======================
-=======================
-linked lists for CPairs 
-=======================
-=======================
+=============================================
+PrevNode class (nodes for lists of gPrevLast)
+=============================================
 */
+class PrevNode {
+    private:
+        LNode*      data;
+        PrevNode*   next;
+    public:
+        PrevNode(LNode* l);
+        ~PrevNode();
+        PrevNode*   append(LNode* l);
+        LNode*      getLNode();
+        LNode*      getPrevLast(int i);
+};
 
 
 /*
-===========================
-classes for lists of CPairs 
-===========================
+====================================================
+class PrevList(lists of last node elements in gPrev)
+====================================================
 */
-class CNode;
-class CList;
+class PrevList {
+    private:
+        PrevNode*   first;
+        PrevNode*   last;
+    public:
+                PrevList(LNode* l);
+                ~PrevList();
+        void    append(LNode* l);
+        LNode*  getPrevLast(int i);
+};
 
 
 /*
@@ -109,25 +119,13 @@ CNode class (nodes for lists of CPairs)
 */
 class CNode {
     private:
-        LPoly* data;
+        CPair* data;
         CNode* next;
     public:
-        CNode(LPoly* lp, CNode* n) {
-            data = lp;
-            next = n;
-        }
-        ~CNode() {
-            delete next;
-            delete data;   
-        }
-        CNode* append(LPoly* lp) {
-            CNode* new_element = new CNode(lp,NULL);
-            next = new_element;
-            return new_element;
-        }
-        LPoly* getLPoly() const {
-            return data;
-        }
+                CNode(CPair* c);
+                ~CNode(); 
+        CNode*  insert(CPair* c); 
+        CNode*  getLPoly() const; 
 };
 
 
@@ -139,30 +137,10 @@ class CPList(lists of CPairs)
 class CList {
     private:
         CNode*  first;
-        CNode*  last;
-        long    length;
     public:
-        CList(LPoly* lp) {
-            first = new CNode(lp,NULL);
-            last = first;
-            length = 1;
-        }
-        ~CList() {
-            delete first;
-        }
-        void append(LPoly* lp) {
-            last = last->append(lp);
-            length++;
-        }
-        long getLength() const {
-            return length;
-        }
-        CNode* getFirst() const {
-            return first;
-        }
-        CNode* getLast() const {
-            return last;
-        }
+                CList(CPair* c); 
+                ~CList(); 
+        void    insert(CPair* c); 
 };
 #endif
 #endif
