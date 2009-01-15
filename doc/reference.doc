@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.319 2008-12-19 09:54:53 Singular Exp $
+@comment $Id: reference.doc,v 1.320 2009-01-15 17:22:21 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2918,6 +2918,8 @@ used and the result may have no meaning.
 @*With two arguments: computes the part of a vector space basis of the
 respective quotient with degree of the monomials equal to the
 second argument. Here, the quotient does not need to be finite dimensional.
+If an attribute@code{isHomog} (of type @code{intvec} is present,
+it is used as module weight.
 @item @strong{Example:}
 @smallexample
 @c example

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.118 2008-12-18 10:00:09 Singular Exp $
+@comment $Id: NEWS.texi,v 1.119 2009-01-15 17:22:21 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -53,6 +53,8 @@ command extended: eliminate: variables to eliminate may also be given as intvec.
 handling of large input for std improved
 @item
 @nref{interred} implemented in a different way
+@item
+@nref{kbase} honors the attribute "isHomog"
 @item
 @nref{gcd} over algebraic extensions of the rationals implemented in a different way
 @item new build target: libsingular.a (for gfan etc.)
