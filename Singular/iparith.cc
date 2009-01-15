@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.488 2009-01-07 17:40:16 Singular Exp $ */
+/* $Id: iparith.cc,v 1.489 2009-01-15 17:04:47 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2334,8 +2334,9 @@ static BOOLEAN jjJET_ID(leftv res, leftv u, leftv v)
 static BOOLEAN jjKBASE2(leftv res, leftv u, leftv v)
 {
   assumeStdFlag(u);
+  intvec *w_u=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   res->data = (char *)scKBase((int)(long)v->Data(),
-                              (ideal)(u->Data()),currQuotient);
+                              (ideal)(u->Data()),currQuotient, w_u);
   return FALSE;
 }
 static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w);
