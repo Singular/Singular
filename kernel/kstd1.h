@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.h,v 1.6 2008-09-16 12:32:33 Singular Exp $ */
+/* $Id: kstd1.h,v 1.7 2009-01-15 10:32:04 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -57,6 +57,8 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M,
 extern pFDegProc pFDegOld;
 extern pLDegProc pLDegOld;
 extern intvec * kModW;
+extern intvec * kHomW;
+
 
 /* options:
 0 prot
