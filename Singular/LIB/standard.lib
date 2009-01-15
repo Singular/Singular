@@ -4,7 +4,7 @@
 //stdhilb can be called with std or slimgb (Jan 2008, GMG)
 //### Todo: im lokalen Fall die Hilbert-Samuel Funktion verwenden
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.105 2009-01-15 10:57:30 Singular Exp $";
+version="$Id: standard.lib,v 1.106 2009-01-15 13:51:18 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -28,7 +28,7 @@ PROCEDURES:
 
 //////////////////////////////////////////////////////////////////////////////
 
-proc stdfglm (i, list #)
+proc stdfglm (ideal i, list #)
 "SYNTAX: @code{stdfglm (} ideal_expression @code{)} @*
          @code{stdfglm (} ideal_expression@code{,} string_expression @code{)}
 TYPE:    ideal
@@ -43,10 +43,6 @@ SEE ALSO: fglm, groebner, std, slimgb, stdhilb
 KEYWORDS: fglm
 EXAMPLE: example stdfglm; shows an example"
 {
-  if (typeof(i)!="ideal")
-  {
-    ERROR("first argument of 'stdfglm' must be an ideal");
-  }
   string os;
   int s = size(#);
   def P= basering;
@@ -66,7 +62,7 @@ EXAMPLE: example stdfglm; shows an example"
     }
   }
 
-  if( s > 0 && (typeof(#[1]) == "string") )
+  if((s > 0) && (typeof(#[1]) == "string"))
   {
     os = #[1];
     ideal Qideal = ideal(P);
@@ -228,7 +224,7 @@ EXAMPLE: example stdhilb;  shows an example"
   if ( defined(w)!=voice )
   {
     intvec w;
-    for(k=1;  k<=nvarP; k++)
+    for(k=nvarP;  k>=1; k--)
     {
        w[k] = deg(var(k));     //compute ring weights
     }
@@ -246,14 +242,10 @@ EXAMPLE: example stdhilb;  shows an example"
 //---------- exclude cases to which stdhilb should no be applied  ----------
 //Note that quotient ideal of qring must be homogeneous too
 
-  int neg;
-  for ( k=1; k<=nvarP; k++)
-  {
-     if( var(k) < 1)
-     { neg = 1; }
-  }
+  int neg=1-attrib (P,"global");
 
-  if( find(ordstr_P,"s") || find(ordstr_P,"M") || (neg > 0) )
+  if( //find(ordstr_P,"s") ||// covered by neg
+     find(ordstr_P,"M") || neg )
   {
     // if( defined(hi) && is_homog )
     // {
@@ -1034,7 +1026,7 @@ EXAMPLE: example groebner;  shows an example"
 //### Todo: extra weight vector should be allowed for e.g. with "hilb"
 
   if(  //( find(ordstr_P,"s") > 0 ) || // covered by neg
-       ( find(ordstr_P,"M") > 0 )  || ( find(ordstr_P,"a") > 0 )  || ( neg>0 ) )
+       ( find(ordstr_P,"M") > 0 )  || ( find(ordstr_P,"a") > 0 )  || neg )
   {
     if (p_opt) { "std in basering"; }
     return(std(i));

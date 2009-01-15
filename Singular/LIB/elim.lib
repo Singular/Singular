@@ -1,4 +1,4 @@
-// $Id: elim.lib,v 1.27 2009-01-15 10:57:51 Singular Exp $
+// $Id: elim.lib,v 1.28 2009-01-15 13:51:18 Singular Exp $
 // (GMG, modified 22.06.96)
 // GMG, last modified 30.10.08: new procedure elimRing;
 // elim changes now to ring with elimination ordering (extra weight vector
@@ -9,7 +9,7 @@
 // GMG, last modified 5.01.09: elim uses now stdhilb(id,@w) instead of std(id)
 // and can now choose as method slimgb or std.
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: elim.lib,v 1.27 2009-01-15 10:57:51 Singular Exp $";
+version="$Id: elim.lib,v 1.28 2009-01-15 13:51:18 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      Elimination, Saturation and Blowing up
@@ -98,7 +98,7 @@ EXAMPLE: example blowup0; shows examples
 
 //--------------- create tr = K[x(1),...,x(n),t] ---------------------------
    int s = size(l[3]);
-   for ( i=1; i<=n; i++)
+   for ( i=n; i>=1; i--)
    {
       l[2][i]="x("+string(i)+")";
    }
@@ -109,7 +109,7 @@ EXAMPLE: example blowup0; shows examples
 //--------------- create nr = K[x(1),...,x(n),y(1),...,y(k)] ---------------
    l[2]=delete(l[2],n+1);
    l[3]=delete(l[3],s);
-   for ( i=1; i<=k; i++)
+   for ( i=k; i>=1; i--)
    {
       l[2][n+i]="y("+string(i)+")";
    }
@@ -120,7 +120,7 @@ EXAMPLE: example blowup0; shows examples
    intvec v;                    // containing the weights for the varibale
    if( homog(C) )
    {
-      for( i=1; i<=k; i++)
+      for( i=k; i>=1; i--)
       {
          v[i]=deg(C[i]);
       }
@@ -135,10 +135,7 @@ EXAMPLE: example blowup0; shows examples
    }
    else
    {
-      for( i=1; i<=k; i++)
-      {
-         v[i]=1;
-      }
+      v=1:k;
       l[3][s]=list("dp",v);
    }
    def nr = ring(l);
@@ -279,7 +276,7 @@ EXAMPLE: example elimRing; shows an example
      {
         w2 = w2,@w[ii];
         v2 = v2+list(string(var(ii)));
-        if ( defined(local) == 0 )
+        if ( ! defined(local) )
         {
            int local = (var(ii) < 1);
          }
@@ -328,7 +325,7 @@ EXAMPLE: example elimRing; shows an example
 
     if( w2==1 )              //weights for vars not to be eliminated are all 1
     {
-       if ( local==1 )
+       if ( local )
        {
           B3[2] = list("ds", w2);
        }
@@ -339,7 +336,7 @@ EXAMPLE: example elimRing; shows an example
     }
     else
     {
-       if ( local==1 )
+       if ( local )
        {
           B3[2] = list("ws", w2);
        }
@@ -356,7 +353,7 @@ EXAMPLE: example elimRing; shows an example
     //define first the second block
     if( @w==1 )              //weights for all vars are 1
     {
-       if ( local==1 )
+       if ( local )
        {
           B3[2] = list("ls", @w);
        }
@@ -367,7 +364,7 @@ EXAMPLE: example elimRing; shows an example
     }
     else
     {
-       if ( local==1 )
+       if ( local )
        {
           B3[2] = list("ws", @w);
        }
