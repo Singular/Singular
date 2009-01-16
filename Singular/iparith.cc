@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.491 2009-01-15 17:22:02 Singular Exp $ */
+/* $Id: iparith.cc,v 1.492 2009-01-16 02:21:09 motsak Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4044,6 +4044,36 @@ static BOOLEAN jjJACOB_P(leftv res, leftv v)
   res->data = (char *)i;
   return FALSE;
 }
+/*2
+ * compute Jacobi matrix of a module/matrix
+ * Jacobi(M) := ( diff(Mt,var(1))|, ... ,| diff(Mt,var(pVariables))  ),
+ * where Mt := transpose(M)
+ * Note that this is consistent with the current conventions for jacob in Singular,
+ * whereas M2 computes its transposed.
+ */
+static BOOLEAN jjJACOB_M(leftv res, leftv a)
+{
+
+	ideal id = (ideal)a->Data();
+	id = idTransp(id);
+	int W = IDELEMS(id);
+
+	ideal result = idInit(W * pVariables, id->rank); 
+	poly *p = result->m;
+	
+	for( int v = 1; v <= pVariables; v++ )
+  {
+    poly* q = id->m;
+	  for( int i = 0; i < W; i++, p++, q++ ) 
+		  *p = pDiff( *q, v );
+  }
+	idDelete(&id);
+
+	res->data = (char *)result;
+  return FALSE;
+}
+
+
 static BOOLEAN jjKBASE(leftv res, leftv v)
 {
   assumeStdFlag(v);
@@ -5083,6 +5113,7 @@ struct sValCmd1 dArith1[]=
 ,{jjIS_RINGVAR0,IS_RINGVAR,      INT_CMD,        ANY_TYPE       ALLOW_PLURAL}
 ,{jjJACOB_P,    JACOB_CMD,       IDEAL_CMD,      POLY_CMD       ALLOW_PLURAL}
 ,{mpJacobi,     JACOB_CMD,       MATRIX_CMD,     IDEAL_CMD      ALLOW_PLURAL}
+,{jjJACOB_M,    JACOB_CMD,       MODUL_CMD,      MODUL_CMD      ALLOW_PLURAL}
 ,{jjJanetBasis, JANET_CMD,       IDEAL_CMD,      IDEAL_CMD      ALLOW_PLURAL}
 ,{jjKBASE,      KBASE_CMD,       IDEAL_CMD,      IDEAL_CMD      ALLOW_PLURAL}
 ,{jjKBASE,      KBASE_CMD,       MODUL_CMD,      MODUL_CMD      ALLOW_PLURAL}
