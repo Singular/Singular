@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.492 2009-01-16 02:21:09 motsak Exp $ */
+/* $Id: iparith.cc,v 1.493 2009-01-17 10:19:17 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -260,7 +260,7 @@ cmdnames cmds[] =
   { "GCD",         2, GCD_CMD ,           CMD_2},
   { "hilb",        0, HILBERT_CMD ,       CMD_123},
   { "highcorner",  0, HIGHCORNER_CMD,     CMD_1},
-  { "homog",       0, HOMOG_CMD ,         CMD_12},
+  { "homog",       0, HOMOG_CMD ,         CMD_123},
   { "hres",        0, HRES_CMD ,          CMD_2},
   { "ideal",       0, IDEAL_CMD ,         IDEAL_CMD},
   { "if",          0, IF_CMD ,            IF_CMD},
@@ -897,7 +897,7 @@ static BOOLEAN jjPLUS_MA(leftv res, leftv u, leftv v)
   if (res->data==NULL)
   {
      Werror("matrix size not compatible(%dx%d, %dx%d)",
-	     MATROWS(A),MATCOLS(A),MATROWS(B),MATCOLS(B));
+             MATROWS(A),MATCOLS(A),MATROWS(B),MATCOLS(B));
      return TRUE;
   }
   return jjPLUSMINUS_Gen(res,u,v);
@@ -976,7 +976,7 @@ static BOOLEAN jjMINUS_MA(leftv res, leftv u, leftv v)
   if (res->data==NULL)
   {
      Werror("matrix size not compatible(%dx%d, %dx%d)",
-	     MATROWS(A),MATCOLS(A),MATROWS(B),MATCOLS(B));
+             MATROWS(A),MATCOLS(A),MATROWS(B),MATCOLS(B));
      return TRUE;
   }
   return jjPLUSMINUS_Gen(res,u,v);
@@ -1102,7 +1102,7 @@ static BOOLEAN jjTIMES_MA(leftv res, leftv u, leftv v)
   if (res->data==NULL)
   {
      Werror("matrix size not compatible(%dx%d, %dx%d)",
-	     MATROWS(A),MATCOLS(A),MATROWS(B),MATCOLS(B));
+             MATROWS(A),MATCOLS(A),MATROWS(B),MATCOLS(B));
      return TRUE;
   }
   idNormalize((ideal)res->data);
@@ -2304,6 +2304,26 @@ static BOOLEAN jjHOMOG_ID(leftv res, leftv u, leftv v)
     WerrorS("variable must have weight 1");
   return (d!=1);
 }
+static BOOLEAN jjHOMOG1_W(leftv res, leftv v, leftv u)
+{
+  intvec *w=new intvec(rVar(currRing));
+  intvec *vw=(intvec*)u->Data();
+  ideal v_id=(ideal)v->Data();
+  pFDegProc save_FDeg=pFDeg;
+  pLDegProc save_LDeg=pLDeg;
+  BOOLEAN save_pLexOrder=pLexOrder;
+  pLexOrder=FALSE;
+  kHomW=vw;
+  kModW=w;
+  pSetDegProcs(kHomModDeg);
+  res->data=(void *)(long)idHomModule(v_id,currQuotient,&w);
+  pLexOrder=save_pLexOrder;
+  kHomW=NULL;
+  kModW=NULL;
+  pRestoreDegProcs(save_FDeg,save_LDeg);
+  if (w!=NULL) delete w;
+  return FALSE;
+}
 static BOOLEAN jjINDEPSET2(leftv res, leftv u, leftv v)
 {
   assumeStdFlag(u);
@@ -2818,7 +2838,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
     intvec *w=ivCopy(r->weights[0]);
     if (weights!=NULL) (*w) += add_row_shift;
     atSet(res,omStrDup("isHomog"),w,INTVEC_CMD);
-    delete w;
+    w=NULL;
   }
   else
   {
@@ -3351,6 +3371,8 @@ struct sValCmd2 dArith2[]=
 #endif
 ,{jjHILBERT2,  HILBERT_CMD,    INTVEC_CMD,     IDEAL_CMD,  INT_CMD NO_PLURAL}
 ,{jjHILBERT2,  HILBERT_CMD,    INTVEC_CMD,     MODUL_CMD,  INT_CMD NO_PLURAL}
+,{jjHOMOG1_W,  HOMOG_CMD,      INT_CMD,        IDEAL_CMD,  INTVEC_CMD ALLOW_PLURAL}
+,{jjHOMOG1_W,  HOMOG_CMD,      INT_CMD,        MODUL_CMD,   INTVEC_CMD ALLOW_PLURAL}
 ,{jjHOMOG_P,   HOMOG_CMD,      POLY_CMD,       POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjHOMOG_P,   HOMOG_CMD,      VECTOR_CMD,     VECTOR_CMD, POLY_CMD ALLOW_PLURAL}
 ,{jjHOMOG_ID,  HOMOG_CMD,      IDEAL_CMD,      IDEAL_CMD,  POLY_CMD ALLOW_PLURAL}
@@ -3933,18 +3955,30 @@ static BOOLEAN jjHOMOG1(leftv res, leftv v)
   if (w==NULL)
   {
     res->data=(void *)(long)idHomModule(v_id,currQuotient,&w);
-    if ((res->data!=NULL) && (v->rtyp==IDHDL))
+    if (res->data!=NULL) 
     {
-      char *isHomog=omStrDup("isHomog");
-      if (v->e==NULL)
-        atSet((idhdl)(v->data),isHomog,w,INTVEC_CMD);
-      else
-        atSet((idhdl)(v->LData()),isHomog,w,INTVEC_CMD);
-    }
-    else if (w!=NULL) delete w;
+      if (v->rtyp==IDHDL)
+      {
+        char *isHomog=omStrDup("isHomog");
+        if (v->e==NULL)
+          atSet((idhdl)(v->data),isHomog,w,INTVEC_CMD);
+        else
+          atSet((idhdl)(v->LData()),isHomog,w,INTVEC_CMD);
+      }
+      else if (w!=NULL) delete w;
+    } // if res->data==NULL then w==NULL
   }
   else
+  {
     res->data=(void *)(long)idTestHomModule(v_id,currQuotient,w);
+    if((res->data==NULL) && (v->rtyp==IDHDL))
+    {
+      if (v->e==NULL)
+        atKill((idhdl)(v->data),"isHomog");
+      else
+        atKill((idhdl)(v->LData()),"isHomog");
+    }
+  }
   return FALSE;
 }
 static BOOLEAN jjIDEAL_Ma(leftv res, leftv v)
@@ -4053,23 +4087,22 @@ static BOOLEAN jjJACOB_P(leftv res, leftv v)
  */
 static BOOLEAN jjJACOB_M(leftv res, leftv a)
 {
+  ideal id = (ideal)a->Data();
+  id = idTransp(id);
+  int W = IDELEMS(id);
 
-	ideal id = (ideal)a->Data();
-	id = idTransp(id);
-	int W = IDELEMS(id);
-
-	ideal result = idInit(W * pVariables, id->rank); 
-	poly *p = result->m;
-	
-	for( int v = 1; v <= pVariables; v++ )
+  ideal result = idInit(W * pVariables, id->rank); 
+  poly *p = result->m;
+        
+  for( int v = 1; v <= pVariables; v++ )
   {
     poly* q = id->m;
-	  for( int i = 0; i < W; i++, p++, q++ ) 
-		  *p = pDiff( *q, v );
+    for( int i = 0; i < W; i++, p++, q++ ) 
+      *p = pDiff( *q, v );
   }
-	idDelete(&id);
+  idDelete(&id);
 
-	res->data = (char *)result;
+  res->data = (char *)result;
   return FALSE;
 }
 
@@ -5630,6 +5663,42 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
   delete iv;
   return TRUE;
 }
+static BOOLEAN jjHOMOG_ID_W(leftv res, leftv u, leftv v, leftv w)
+{
+  PrintS("TODO\n");
+  int i=pVar((poly)v->Data());
+  if (i==0)
+  {
+    WerrorS("ringvar expected");
+    return TRUE;
+  }
+  poly p=pOne(); pSetExp(p,i,1); pSetm(p);
+  int d=pWTotaldegree(p);
+  pLmDelete(p);
+  if (d==1)
+    res->data = (char *)idHomogen((ideal)u->Data(),i);
+  else
+    WerrorS("variable must have weight 1");
+  return (d!=1);
+}
+static BOOLEAN jjHOMOG_P_W(leftv res, leftv u, leftv v,leftv w)
+{
+  PrintS("TODO\n");
+  int i=pVar((poly)v->Data());
+  if (i==0)
+  {
+    WerrorS("ringvar expected");
+    return TRUE;
+  }
+  poly p=pOne(); pSetExp(p,i,1); pSetm(p);
+  int d=pWTotaldegree(p);
+  pLmDelete(p);
+  if (d==1)
+    res->data = (char *)pHomogen((poly)u->Data(),i);
+  else
+    WerrorS("variable must have weight 1");
+  return (d!=1);
+}
 static BOOLEAN jjINTMAT3(leftv res, leftv u, leftv v,leftv w)
 {
   intvec* im= new intvec((int)(long)v->Data(),(int)(long)w->Data(), 0);
@@ -6089,6 +6158,10 @@ struct sValCmd3 dArith3[]=
 ,{jjFWALK3,         FWALK_CMD,  IDEAL_CMD,  RING_CMD,   DEF_CMD,    INT_CMD NO_PLURAL}
 ,{jjHILBERT3,       HILBERT_CMD,INTVEC_CMD, IDEAL_CMD,  INT_CMD,    INTVEC_CMD NO_PLURAL}
 ,{jjHILBERT3,       HILBERT_CMD,INTVEC_CMD, MODUL_CMD,  INT_CMD,    INTVEC_CMD NO_PLURAL}
+,{jjHOMOG_P_W,      HOMOG_CMD,  POLY_CMD,   POLY_CMD,   POLY_CMD,   INTVEC_CMD ALLOW_PLURAL}
+,{jjHOMOG_P_W,      HOMOG_CMD,  VECTOR_CMD, VECTOR_CMD, POLY_CMD,   INTVEC_CMD ALLOW_PLURAL}
+,{jjHOMOG_ID_W,     HOMOG_CMD,  IDEAL_CMD,  IDEAL_CMD,  POLY_CMD,   INTVEC_CMD ALLOW_PLURAL}
+,{jjHOMOG_ID_W,     HOMOG_CMD,  MODUL_CMD,  MODUL_CMD,  POLY_CMD,   INTVEC_CMD ALLOW_PLURAL}
 ,{jjCALL3MANY,      IDEAL_CMD,  IDEAL_CMD,  DEF_CMD,    DEF_CMD,    DEF_CMD ALLOW_PLURAL}
 ,{lInsert3,         INSERT_CMD, LIST_CMD,   LIST_CMD,   DEF_CMD,    INT_CMD ALLOW_PLURAL}
 //,{jjCALL3MANY,      INTERSECT_CMD,  NONE,   DEF_CMD,    DEF_CMD,    DEF_CMD ALLOW_PLURAL}
@@ -6356,7 +6429,7 @@ static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
       case BIGINT_CMD:
       {
         number b=(number)h->Data();
-	number n=nInit_bigint(b);
+        number n=nInit_bigint(b);
         if (!nIsZero(n))
         {
           p=pOne();
