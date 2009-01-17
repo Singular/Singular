@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.18 2008-12-08 15:00:43 Singular Exp $ */
+/* $Id: rintegers.cc,v 1.19 2009-01-17 12:35:50 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -28,7 +28,7 @@ omBin gmp_nrz_bin = omGetSpecBin(sizeof(MP_INT));
  */
 number nrzMult (number a, number b)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrz_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
   mpz_mul(erg, (int_number) a, (int_number) b);
   return (number) erg;
@@ -39,7 +39,7 @@ number nrzMult (number a, number b)
  */
 number nrzLcm (number a,number b,ring r)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrz_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
   mpz_lcm(erg, (int_number) a, (int_number) b);
   return (number) erg;
@@ -51,7 +51,7 @@ number nrzLcm (number a,number b,ring r)
  */
 number nrzGcd (number a,number b,ring r)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrz_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
   mpz_gcd(erg, (int_number) a, (int_number) b);
   return (number) erg;
@@ -63,9 +63,9 @@ number nrzGcd (number a,number b,ring r)
  */
 number  nrzExtGcd (number a, number b, number *s, number *t)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrz_bin); // evtl. spaeter mit bin
-  int_number bs = (int_number) omAllocBin(gmp_nrz_bin); // evtl. spaeter mit bin
-  int_number bt = (int_number) omAllocBin(gmp_nrz_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
+  int_number bs = (int_number) omAllocBin(gmp_nrz_bin);
+  int_number bt = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
   mpz_init(bs);
   mpz_init(bt);
@@ -77,7 +77,7 @@ number  nrzExtGcd (number a, number b, number *s, number *t)
 
 void nrzPower (number a, int i, number * result)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrz_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
   mpz_pow_ui(erg, (int_number) a, i);
   *result = (number) erg;
@@ -88,7 +88,7 @@ void nrzPower (number a, int i, number * result)
  */
 number nrzInit (int i)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrz_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init_set_si(erg, i);
   return (number) erg;
 }
@@ -103,7 +103,7 @@ void nrzDelete(number *a, const ring r)
 
 number nrzCopy(number a)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrz_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init_set(erg, (int_number) a);
   return (number) erg;
 }
@@ -129,7 +129,7 @@ int nrzInt(number &n)
 
 number nrzAdd (number a, number b)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrz_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
   mpz_add(erg, (int_number) a, (int_number) b);
   return (number) erg;
@@ -137,7 +137,7 @@ number nrzAdd (number a, number b)
 
 number nrzSub (number a, number b)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrz_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
   mpz_sub(erg, (int_number) a, (int_number) b);
   return (number) erg;
@@ -198,9 +198,10 @@ BOOLEAN nrzDivBy (number a,number b)
 
 number nrzDiv (number a,number b)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrz_bin); // evtl. spaeter mit bin
-  int_number r = (int_number) omAllocBin(gmp_nrz_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
+  int_number r = (int_number) omAllocBin(gmp_nrz_bin);
+  mpz_init(r);
   mpz_tdiv_qr(erg, r, (int_number) a, (int_number) b);
   if (!nrzIsZero((number) r))
   {
@@ -214,7 +215,7 @@ number nrzDiv (number a,number b)
 
 number nrzIntDiv (number a,number b)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrz_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
   mpz_tdiv_q(erg, (int_number) a, (int_number) b);
   return (number) erg;
@@ -232,30 +233,28 @@ number  nrzInvers (number c)
 
 number nrzNeg (number c)
 {
-// nNeg inplace !!! TODO
-//  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
-//  mpz_init(erg);
+// nNeg inplace !!!
   mpz_mul_si((int_number) c, (int_number) c, -1);
   return c;
 }
 
 number nrzMapMachineInt(number from)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrz_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init_set_ui(erg, (NATNUMBER) from);
   return (number) erg;
 }
 
 number nrzMapZp(number from)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrz_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init_set_si(erg, (long) from);
   return (number) erg;
 }
 
 number nrzMapQ(number from)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrz_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
   nlGMP(from, (number) erg);
   return (number) erg;
@@ -349,7 +348,7 @@ static const char * nlEatLongC(char *s, MP_INT *i)
 
 const char * nrzRead (const char *s, number *a)
 {
-  int_number z = (int_number) omAllocBin(gmp_nrz_bin); // evtl. spaeter mit bin
+  int_number z = (int_number) omAllocBin(gmp_nrz_bin);
   {
     mpz_init(z);
     s = nlEatLongC((char *) s, z);
