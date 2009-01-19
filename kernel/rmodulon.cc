@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.31 2008-12-08 15:00:43 Singular Exp $ */
+/* $Id: rmodulon.cc,v 1.32 2009-01-19 12:43:53 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -20,8 +20,12 @@
 #include "si_gmp.h"
 
 #ifdef HAVE_RINGMODN
-
-omBin gmp_nrn_bin = omGetSpecBin(sizeof(MP_INT));
+  #ifdef HAVE_RINGZ
+    #define gmp_nrn_bin gmp_nrz_bin
+    extern omBin gmp_nrz_bin;
+  #else
+    omBin gmp_nrn_bin = omGetSpecBin(sizeof(MP_INT));
+  #endif
 
 int_number nrnModul = NULL;
 int_number nrnMinusOne = NULL;
@@ -32,7 +36,7 @@ unsigned long nrnExponent = 0;
  */
 number nrnInit (int i)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init_set_si(erg, i);
   mpz_mod(erg, erg, nrnModul);
   return (number) erg;
@@ -48,7 +52,7 @@ void nrnDelete(number *a, const ring r)
 
 number nrnCopy(number a)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init_set(erg, (int_number) a);
   return (number) erg;
 }
@@ -77,7 +81,7 @@ int nrnInt(number &n)
  */
 number nrnMult (number a, number b)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
   mpz_mul(erg, (int_number) a, (int_number) b);
   mpz_mod(erg, erg, nrnModul);
@@ -86,7 +90,7 @@ number nrnMult (number a, number b)
 
 void nrnPower (number a, int i, number * result)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
   mpz_powm_ui(erg, (int_number) a, i, nrnModul);
   *result = (number) erg;
@@ -94,7 +98,7 @@ void nrnPower (number a, int i, number * result)
 
 number nrnAdd (number a, number b)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
   mpz_add(erg, (int_number) a, (int_number) b);
   mpz_mod(erg, erg, nrnModul);
@@ -103,7 +107,7 @@ number nrnAdd (number a, number b)
 
 number nrnSub (number a, number b)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
   mpz_sub(erg, (int_number) a, (int_number) b);
   mpz_mod(erg, erg, nrnModul);
@@ -112,16 +116,14 @@ number nrnSub (number a, number b)
 
 number nrnNeg (number c)
 {
-// nNeg inplace !!! TODO
-//  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
-//  mpz_init(erg);
+// nNeg inplace !!!
   mpz_sub((int_number) c, nrnModul, (int_number) c);
   return c;
 }
 
 number  nrnInvers (number c)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
   mpz_invert(erg, (int_number) c, nrnModul);
   return (number) erg;
@@ -147,7 +149,7 @@ number nrnLcm (number a,number b,ring r)
 number nrnGcd (number a,number b,ring r)
 {
   if ((a == NULL) && (b == NULL)) return nrnInit(0);
-  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init_set(erg, nrnModul);
   if (a != NULL) mpz_gcd(erg, erg, (int_number) a);
   if (b != NULL) mpz_gcd(erg, erg, (int_number) b);
@@ -157,7 +159,7 @@ number nrnGcd (number a,number b,ring r)
 /* Not needed any more, but may have room for improvement
 number nrnGcd3 (number a,number b, number c,ring r)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
   if (a == NULL) a = (number) nrnModul;
   if (b == NULL) b = (number) nrnModul;
@@ -175,9 +177,9 @@ number nrnGcd3 (number a,number b, number c,ring r)
  */
 number  nrnExtGcd (number a, number b, number *s, number *t)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
-  int_number bs = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
-  int_number bt = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
+  int_number bs = (int_number) omAllocBin(gmp_nrn_bin);
+  int_number bt = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
   mpz_init(bs);
   mpz_init(bt);
@@ -290,7 +292,7 @@ int nrnDivComp(number a, number b)
 number nrnDiv (number a,number b)
 {
   if (a == NULL) a = (number) nrnModul;
-  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
   if (mpz_divisible_p((int_number) a, (int_number) b))
   {
@@ -322,7 +324,7 @@ number nrnDiv (number a,number b)
 
 number nrnIntDiv (number a,number b)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
   if (a == NULL) a = (number) nrnModul;
   mpz_tdiv_q(erg, (int_number) a, (int_number) b);
@@ -342,7 +344,7 @@ number nrnMapModN(number from)
 
 number nrnMap2toM(number from)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
   mpz_mul_ui(erg, nrnMapCoef, (NATNUMBER) from);
   mpz_mod(erg, erg, nrnModul);
@@ -351,7 +353,7 @@ number nrnMap2toM(number from)
 
 number nrnMapZp(number from)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
   mpz_mul_si(erg, nrnMapCoef, (NATNUMBER) from);
   mpz_mod(erg, erg, nrnModul);
@@ -360,7 +362,7 @@ number nrnMapZp(number from)
 
 number nrnMapGMP(number from)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
   mpz_mod(erg, (int_number) from, nrnModul);
   return (number) erg;
@@ -368,7 +370,7 @@ number nrnMapGMP(number from)
 
 number nrnMapQ(number from)
 {
-  int_number erg = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
   nlGMP(from, (number) erg);
   mpz_mod(erg, erg, nrnModul);
@@ -394,7 +396,7 @@ nMapFunc nrnSetMap(ring src, ring dst)
         && (src->ringflagb == dst->ringflagb)) return nrnMapGMP;
     else
     {
-      int_number nrnMapModul = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+      int_number nrnMapModul = (int_number) omAllocBin(gmp_nrn_bin);
       // Computing the n of Z/n
       if (rField_is_Zp(src))
       {
@@ -410,7 +412,7 @@ nMapFunc nrnSetMap(ring src, ring dst)
       // nrnMapCoef = 0 in dst / src if src is a subring of dst
       if (nrnMapCoef == NULL)
       {
-        nrnMapCoef = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+        nrnMapCoef = (int_number) omAllocBin(gmp_nrn_bin);
         mpz_init(nrnMapCoef);
       }
       if (mpz_divisible_p(nrnMapModul, nrnModul))
@@ -463,9 +465,9 @@ void nrnSetExp(int m, ring r)
   nrnExponent = r->ringflagb;
   if (nrnModul == NULL)
   {
-    nrnModul = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+    nrnModul = (int_number) omAllocBin(gmp_nrn_bin);
     mpz_init(nrnModul);
-    nrnMinusOne = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+    nrnMinusOne = (int_number) omAllocBin(gmp_nrn_bin);
     mpz_init(nrnMinusOne);
   }
   mpz_set(nrnModul, r->ringflaga);
@@ -542,7 +544,7 @@ static const char * nlCPEatLongC(char *s, MP_INT *i)
 
 const char * nrnRead (const char *s, number *a)
 {
-  int_number z = (int_number) omAllocBin(gmp_nrn_bin); // evtl. spaeter mit bin
+  int_number z = (int_number) omAllocBin(gmp_nrn_bin);
   {
     s = nlCPEatLongC((char *)s, z);
   }
