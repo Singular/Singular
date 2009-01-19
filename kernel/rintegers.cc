@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.19 2009-01-17 12:35:50 Singular Exp $ */
+/* $Id: rintegers.cc,v 1.20 2009-01-19 12:34:50 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -228,7 +228,7 @@ number  nrzInvers (number c)
     WarnS("Non invertible element.");
     return (number)0; //TODO
   }
-  return c;
+  return nrzCopy(c);
 }
 
 number nrzNeg (number c)
