@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.119 2009-01-15 17:22:21 Singular Exp $
+@comment $Id: NEWS.texi,v 1.120 2009-01-21 21:40:24 motsak Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -56,6 +56,9 @@ handling of large input for std improved
 @item
 @nref{kbase} honors the attribute "isHomog"
 @item
+@nref{jacob} accepts modules and matrices
+
+@item
 @nref{gcd} over algebraic extensions of the rationals implemented in a different way
 @item new build target: libsingular.a (for gfan etc.)
 @item code variants now depend on CPU type, not OS
@@ -100,6 +103,10 @@ homolog.lib: kernel renamed to @nref{hom_kernel}.
 @*(See also @nref{kernel}, @nref{alg_kernel}).
 @item
 matrix.lib: new commands for computing symmetric/exterior powers(bases)
+@item
+teachstd.lib: spoly works now in non-commutative algebras and thus standard can be used there. 
+However if product criterion is a priori not applicable one can disable it by defining 
+global integer constant @@@@@@NOPC to be 1.
 @end itemize
 
 @heading News for version 3-0-4
