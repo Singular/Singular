@@ -33,7 +33,6 @@ LNode::LNode(LPoly* lp) {
 LNode::LNode(poly* t, int* i, poly* p) {
     LPoly* lp = new LPoly(t,i,p);
     data = lp;
-    Print("Index angelegt?  %d\n",*(data->getIndex()));
     next = NULL;
 }
        
@@ -60,6 +59,40 @@ LNode* LNode::insert(poly* t, int* i, poly* p) {
     return newElement;
 }
         
+// insert new elemets to the list w.r.t. increasing labels
+// only used for the S-polys to be reduced (TopReduction building new S-polys with higher label)
+LNode* LNode::insertByLabel(LPoly* lp) {
+    if( lp->getTerm() <= this->data->getTerm() ) {
+        LNode* newElement   =   new LNode(lp);
+        newElement->next    =   this;
+        return newElement;
+    }
+    else {
+        LNode* temp = this;
+        while( NULL != temp->next ) {
+            if( lp->getTerm() <= temp->next->data->getTerm() ) {
+                LNode* newElement   =   new LNode(lp);
+                newElement->next    =   temp->next;
+                temp->next          =   newElement;
+                return this;
+            }
+            else {
+                temp = temp->next;
+            }
+        }
+        LNode* newElement   =   new LNode(lp);
+        temp->next          =   newElement;
+        newElement->next    =   NULL;
+        return this;
+    }
+}
+
+// deletes the first elements of the list with the same degree
+// only used for the S-polys, which are already sorted by increasing degree by CList
+LNode*  LNode::deleteByDeg() {
+    return this;
+}
+
 // get next from current LNode
 LNode* LNode::getNext() {
     return next;
@@ -70,9 +103,17 @@ LPoly* LNode::getLPoly() {
     return data;
 }
 
-// get the address of the polynomial part of LPoly* of LNode*
+// get the data from the LPoly saved in LNode
 poly* LNode::getPoly() {
     return data->getPoly();
+}
+
+poly* LNode::getTerm() {
+    return data->getTerm();
+}
+
+int* LNode::getIndex() {
+    return data->getIndex();
 }
 
 // test if for any list element the polynomial part of the data is equal to *p
@@ -87,6 +128,9 @@ bool LNode::polyTest(poly* p) {
     return 0;
 }
 
+LNode* LNode::getNext(LNode* l) {
+    return l->next;
+}
 
 /*
 ====================================
@@ -96,12 +140,10 @@ functions working on the class LList
 
 LList::LList(LPoly* lp) {
     first   = new LNode(lp);
-    length  = 1;
 }
 
 LList::LList(poly* t,int* i,poly* p) {
     first   = new LNode(t,i,p);
-    length  = 1;
 } 
 
 LList::~LList() {
@@ -111,26 +153,31 @@ LList::~LList() {
 // insertion in front of the list
 void LList::insert(LPoly* lp) {
     first = first->insert(lp);
-    length++;
 }
 
 void LList::insert(poly* t,int* i, poly* p) {
     first = first->insert(t,i,p);
-    length++;
+}
+
+void LList::insertByLabel(LPoly* lp) {
+    first = first->insertByLabel(lp);
+}
+
+void LList::deleteByDeg() {
+    first = first->deleteByDeg();
 }
 
 bool LList::polyTest(poly* p) {
     return first->polyTest(p);
 }
 
-int LList::getLength() const {
-    return length;
-}
-
 LNode* LList::getFirst() {
     return first;
 }
 
+LNode* LList::getNext(LNode* l) {
+    return l->getNext();
+}
 
 /*
 =======================================
@@ -224,7 +271,7 @@ CNode* CNode::insert(CPair* c) {
         }
         else {
             CNode* temp = this;
-            while(  temp->next != NULL ) {
+            while(  NULL != temp->next ) {
                 if( temp->next->data->getDeg() == c->getDeg() ) { 
                     if( c->getT1() <= temp->next->data->getT1() ) {
                         temp = temp->next;
@@ -251,7 +298,7 @@ CNode* CNode::insert(CPair* c) {
     } // outer if-clause
     if( c->getDeg() > this->data->getDeg() ) { // greater degree than the first list element
         CNode* temp =   this;
-        while( temp->next != NULL) {   
+        while( NULL != temp->next ) {   
             if( c->getDeg() < temp->next->data->getDeg() ) {
                 CNode* newElement   =   new CNode(c);
                 newElement->next    =   temp->next;
@@ -267,7 +314,7 @@ CNode* CNode::insert(CPair* c) {
                 }
                 else {
                     temp = temp->next;
-                    while(  temp->next != NULL ) {
+                    while(  NULL != temp->next ) {
                         if( temp->next->data->getDeg() == c->getDeg() ) { 
                             if( c->getT1() <= temp->next->data->getT1() ) {
                                 temp = temp->next;
@@ -303,12 +350,26 @@ CNode* CNode::insert(CPair* c) {
     }
 }
 
+// get the first elements from CList which by the above sorting have minimal degree
+CNode* CNode::getMinDeg() {
+    CNode* temp = this;
+    while( NULL != temp ) {
+        if( temp->next->data->getDeg() == this->data->getDeg() ) {
+            temp = temp->next;
+        }
+        CNode* returnCNode  =   temp->next;    
+        temp->next          =   NULL;
+        return returnCNode;
+    }
+    return NULL;
+}
+
+
 /*
 ====================================
 functions working on the class CList
 ====================================
 */
-
 CList::CList(CPair* c) {
     first   = new CNode(c);
 }
@@ -321,5 +382,48 @@ CList::~CList() {
 // note: as all critical pairs have the same index here, the second sort is done on the terms of the labels
 void CList::insert(CPair* c) {
     first = first->insert(c);
+}
+
+// get the first elements from CList which by the above sorting have minimal degree
+// returns the pointer on the first element of those
+CNode* CList::getMinDeg() {
+    CNode* temp     =   first;
+    first           =   first->getMinDeg();
+    return temp;
+}
+
+
+/*
+====================================
+functions working on the class RNode
+====================================
+*/
+RNode::RNode(Rule* r) {
+    data    =   r;
+    next    =   NULL;
+}
+
+RNode::~RNode() {
+    delete  next;
+    delete  data;
+}
+
+RNode* RNode::insert(Rule* r) {
+    RNode* newElement   =   new RNode(r);
+    newElement->next    =   this;
+    return newElement;
+}
+
+/*
+====================================
+functions working on the class RList
+====================================
+*/
+RList::RList(Rule* r) {
+    first = new RNode(r);
+}
+
+void RList::insert(Rule* r) {
+    first = first->insert(r);
 }
 #endif
