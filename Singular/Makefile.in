@@ -34,7 +34,7 @@ install_slibdir = ${install_prefix}/LIB
 ##
 @SET_MAKE@
 CC		= @CC@
-LD              = @LD@
+LD              = @LDSO@
 CXX		= @CXX@
 LEX		= sh flexer.sh
 
@@ -495,7 +495,7 @@ installbin: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}
 	  ${INSTALL_PROGRAM} $$file ${bindir}; \
 	done
 	${INSTALL_PROGRAM} libparse ${RUN_SINGULARS} ${bindir}
-	${INSTALL_PROGRAM} ESingular TSingular ${DL_LIBS} ${bindir}
+	${INSTALL_PROGRAM} ESingular TSingular ${bindir}
 	${INSTALL_PROGRAM} surfex ${bindir}
 	chmod a+x ${SINGULAR}
 	rm -f ${bindir}/${SING_EXEC}${EXEC_EXT}

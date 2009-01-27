@@ -410,9 +410,9 @@ case "$ac_cv_singuname" in
 	  	SFLAGS="-fpic -fPIC -DPIC"
 	  	SLDFLAGS="-fPIC -DPIC -shared"
                 if test "${LD+set}" != set; then
-                  LD="${LD}"
+                  LDSO="${LD}"
                 else
-		  LD=gcc
+		  LDSO=gcc
                 fi
 		ac_lib_dl=yes
 	  fi
@@ -424,9 +424,9 @@ case "$ac_cv_singuname" in
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
                 if test "${LD+set}" != set; then
-                  LD="${LD}"
+                  LDSO="${LD}"
                 else
-		  LD=ld
+		  LDSO=ld
                 fi
 	        ac_lib_dl=yes
 	  fi
@@ -436,9 +436,9 @@ case "$ac_cv_singuname" in
 	  SFLAGS="-fPIC -DPIC"
 	  SLDFLAGS="-w -no_unresolved -_SYSTYPE_SVR4 -n32 -shared"
           if test "${LD+set}" != set; then
-            LD="${LD}"
+            LDSO="${LD}"
           else
-	    LD=ld
+	    LDSO=ld
           fi
 	  ac_lib_dl=yes
         ;;
@@ -449,9 +449,9 @@ case "$ac_cv_singuname" in
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
                 if test "${LD+set}" != set; then
-                  LD="${LD}"
+                  LDSO="${LD}"
                 else
-                  LD=$CC
+                  LDSO=$CC
                 fi
 	        ac_lib_dl=yes
 	  fi
@@ -463,7 +463,7 @@ case "$ac_cv_singuname" in
 	  	LD_DYN_FLAGS="-ldl -dynamic"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS="-dynamic -twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup"
-		LD=libtool
+		LDSO=libtool
 	        ac_lib_dl=yes
 	  fi
 	;;
@@ -473,7 +473,7 @@ case "$ac_cv_singuname" in
 	  	LD_DYN_FLAGS="-ldl -dynamic"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS="-dynamic -twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup"
-		LD=libtool
+		LDSO=libtool
 	        ac_lib_dl=yes
 	  fi
 	;;
@@ -483,7 +483,7 @@ case "$ac_cv_singuname" in
 	  	LD_DYN_FLAGS="-Xlinker -E"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
-		LD=ld
+		LDSO=ld
 	        ac_lib_dl=yes
 	  fi
 	;;
@@ -491,7 +491,7 @@ esac
 AC_SUBST(LD_DYN_FLAGS)
 AC_SUBST(SFLAGS)
 AC_SUBST(SLDFLAGS)
-AC_SUBST(LD)
+AC_SUBST(LDSO)
 LIBS=${SAVE_LIBS}
 
 

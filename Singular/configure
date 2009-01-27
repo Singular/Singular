@@ -2131,9 +2131,9 @@ fi
 	  	SFLAGS="-fpic -fPIC -DPIC"
 	  	SLDFLAGS="-fPIC -DPIC -shared"
                 if test "${LD+set}" != set; then
-                  LD="${LD}"
+                  LDSO="${LD}"
                 else
-		  LD=gcc
+		  LDSO=gcc
                 fi
 		ac_lib_dl=yes
 	  fi
@@ -2191,9 +2191,9 @@ fi
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
                 if test "${LD+set}" != set; then
-                  LD="${LD}"
+                  LDSO="${LD}"
                 else
-		  LD=ld
+		  LDSO=ld
                 fi
 	        ac_lib_dl=yes
 	  fi
@@ -2203,9 +2203,9 @@ fi
 	  SFLAGS="-fPIC -DPIC"
 	  SLDFLAGS="-w -no_unresolved -_SYSTYPE_SVR4 -n32 -shared"
           if test "${LD+set}" != set; then
-            LD="${LD}"
+            LDSO="${LD}"
           else
-	    LD=ld
+	    LDSO=ld
           fi
 	  ac_lib_dl=yes
         ;;
@@ -2262,9 +2262,9 @@ fi
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
                 if test "${LD+set}" != set; then
-                  LD="${LD}"
+                  LDSO="${LD}"
                 else
-                  LD=$CC
+                  LDSO=$CC
                 fi
 	        ac_lib_dl=yes
 	  fi
@@ -2322,7 +2322,7 @@ fi
 	  	LD_DYN_FLAGS="-ldl -dynamic"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS="-dynamic -twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup"
-		LD=libtool
+		LDSO=libtool
 	        ac_lib_dl=yes
 	  fi
 	;;
@@ -2378,7 +2378,7 @@ fi
 	  	LD_DYN_FLAGS="-ldl -dynamic"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS="-dynamic -twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup"
-		LD=libtool
+		LDSO=libtool
 	        ac_lib_dl=yes
 	  fi
 	;;
@@ -2434,7 +2434,7 @@ fi
 	  	LD_DYN_FLAGS="-Xlinker -E"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
-		LD=ld
+		LDSO=ld
 	        ac_lib_dl=yes
 	  fi
 	;;
@@ -5654,7 +5654,7 @@ s%@PERL@%$PERL%g
 s%@LD_DYN_FLAGS@%$LD_DYN_FLAGS%g
 s%@SFLAGS@%$SFLAGS%g
 s%@SLDFLAGS@%$SLDFLAGS%g
-s%@LD@%$LD%g
+s%@LDSO@%$LDSO%g
 s%@ALLOCA@%$ALLOCA%g
 s%@CXXCPP@%$CXXCPP%g
 s%@USE_STDVECBOOL@%$USE_STDVECBOOL%g
