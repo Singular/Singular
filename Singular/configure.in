@@ -401,6 +401,11 @@ AC_CHECK_LIB(socket, listen)
 AC_CHECK_LIB(nsl, gethostbyname)
 dnl AC_CHECK_LIB(ucb, index)
 MP_LIBS=${LIBS}
+if test "${LD+set}" != set; then
+  LDSO="${LD}"
+else
+  LDSO=ld
+fi
 # check for dl lib
 case "$ac_cv_singuname" in
 	HPUX*)
