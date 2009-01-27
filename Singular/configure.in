@@ -409,7 +409,11 @@ case "$ac_cv_singuname" in
          	LD_DYN_FLAGS="-ldld -Xlinker -E"
 	  	SFLAGS="-fpic -fPIC -DPIC"
 	  	SLDFLAGS="-fPIC -DPIC -shared"
-		LD=gcc
+                if test "${LD+set}" != set; then
+                  LD="${LD}"
+                else
+		  LD=gcc
+                fi
 		ac_lib_dl=yes
 	  fi
 	;;
@@ -419,7 +423,11 @@ case "$ac_cv_singuname" in
 	  	LD_DYN_FLAGS="-ldl -rdynamic"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
-		LD=ld
+                if test "${LD+set}" != set; then
+                  LD="${LD}"
+                else
+		  LD=ld
+                fi
 	        ac_lib_dl=yes
 	  fi
 	;;
@@ -427,7 +435,11 @@ case "$ac_cv_singuname" in
           LD_DYN_FLAGS="-lc"
 	  SFLAGS="-fPIC -DPIC"
 	  SLDFLAGS="-w -no_unresolved -_SYSTYPE_SVR4 -n32 -shared"
-          LD=ld
+          if test "${LD+set}" != set; then
+            LD="${LD}"
+          else
+	    LD=ld
+          fi
 	  ac_lib_dl=yes
         ;;
 	SunOS-5)
@@ -436,7 +448,11 @@ case "$ac_cv_singuname" in
 	  	LD_DYN_FLAGS="-ldl"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
-                LD=$CC
+                if test "${LD+set}" != set; then
+                  LD="${LD}"
+                else
+                  LD=$CC
+                fi
 	        ac_lib_dl=yes
 	  fi
 	;;
