@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lpolynomial.cc,v 1.6 2009-01-25 17:13:06 ederc Exp $ */
+/* $Id: lpolynomial.cc,v 1.7 2009-01-28 17:21:07 Singular Exp $ */
 /*
 * ABSTRACT: lpolynomial definition 
 */
@@ -23,7 +23,7 @@
 #include "pInline1.h"
 #include "f5gb.h"
 #include "lpolynomial.h"
-#include "lists.h"
+#include "f5lists.h"
 /*
 ================================================================
 all functions working on the class LPoly for labeled polynomials

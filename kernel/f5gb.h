@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.16 2009-01-25 17:13:06 ederc Exp $ */
+/* $Id: f5gb.h,v 1.17 2009-01-28 17:20:53 Singular Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -10,7 +10,7 @@
 
 #ifdef HAVE_F5
 #include "lpolynomial.h"
-#include "lists.h"
+#include "f5lists.h"
 
 
 /*
