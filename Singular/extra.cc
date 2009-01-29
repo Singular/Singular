@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.287 2009-01-29 10:12:19 monerjan Exp $ */
+/* $Id: extra.cc,v 1.288 2009-01-29 14:08:01 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -3066,7 +3066,8 @@ ipshell()");
 /*======== GFAN ==============*/
 if (strcmp(sys_cmd,"gfan")==0)
 {
-	if ((h==NULL) or (h!=NULL and h->Typ()!=IDEAL_CMD)){
+	if ((h==NULL) || (h!=NULL && h->Typ()!=IDEAL_CMD))
+        {
 		Werror("system(\"gfan\"...) Ideal expected");
 		return TRUE; //Ooooops
 	}
