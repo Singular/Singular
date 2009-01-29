@@ -496,6 +496,11 @@ char * versionString()
 #ifdef HAVE_MPSR
               StringAppend("MP(%s),",MP_VERSION);
 #endif
+#if SIZEOF_VOIDP == 8
+              StringAppendS("64bit,");
+#else
+              StringAppendS("32bit,");
+#endif
 #if defined(HAVE_DYN_RL)
               if (fe_fgets_stdin==fe_fgets_dummy)
                 StringAppendS("no input,");
