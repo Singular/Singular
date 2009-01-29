@@ -401,11 +401,6 @@ AC_CHECK_LIB(socket, listen)
 AC_CHECK_LIB(nsl, gethostbyname)
 dnl AC_CHECK_LIB(ucb, index)
 MP_LIBS=${LIBS}
-if test "${LD+set}" != set; then
-  LDSO="${LD}"
-else
-  LDSO=ld
-fi
 # check for dl lib
 case "$ac_cv_singuname" in
 	HPUX*)
@@ -415,9 +410,7 @@ case "$ac_cv_singuname" in
 	  	SFLAGS="-fpic -fPIC -DPIC"
 	  	SLDFLAGS="-fPIC -DPIC -shared"
                 if test "${LD+set}" != set; then
-                  LDSO="${LD}"
-                else
-		  LDSO=gcc
+		  LD=gcc
                 fi
 		ac_lib_dl=yes
 	  fi
@@ -429,9 +422,7 @@ case "$ac_cv_singuname" in
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
                 if test "${LD+set}" != set; then
-                  LDSO="${LD}"
-                else
-		  LDSO=ld
+		  LD=ld
                 fi
 	        ac_lib_dl=yes
 	  fi
@@ -441,9 +432,7 @@ case "$ac_cv_singuname" in
 	  SFLAGS="-fPIC -DPIC"
 	  SLDFLAGS="-w -no_unresolved -_SYSTYPE_SVR4 -n32 -shared"
           if test "${LD+set}" != set; then
-            LDSO="${LD}"
-          else
-	    LDSO=ld
+	    LD=ld
           fi
 	  ac_lib_dl=yes
         ;;
@@ -454,9 +443,7 @@ case "$ac_cv_singuname" in
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
                 if test "${LD+set}" != set; then
-                  LDSO="${LD}"
-                else
-                  LDSO=$CC
+                  LD=$CC
                 fi
 	        ac_lib_dl=yes
 	  fi
@@ -468,7 +455,9 @@ case "$ac_cv_singuname" in
 	  	LD_DYN_FLAGS="-ldl -dynamic"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS="-dynamic -twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup"
-		LDSO=libtool
+                if test "${LD+set}" != set; then
+		  LD=libtool
+                fi
 	        ac_lib_dl=yes
 	  fi
 	;;
@@ -478,7 +467,9 @@ case "$ac_cv_singuname" in
 	  	LD_DYN_FLAGS="-ldl -dynamic"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS="-dynamic -twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup"
-		LDSO=libtool
+                if test "${LD+set}" != set; then
+		  LD=libtool
+                fi
 	        ac_lib_dl=yes
 	  fi
 	;;
@@ -488,7 +479,9 @@ case "$ac_cv_singuname" in
 	  	LD_DYN_FLAGS="-Xlinker -E"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
-		LDSO=ld
+                if test "${LD+set}" != set; then
+		  LD=ld
+                fi
 	        ac_lib_dl=yes
 	  fi
 	;;
@@ -496,7 +489,7 @@ esac
 AC_SUBST(LD_DYN_FLAGS)
 AC_SUBST(SFLAGS)
 AC_SUBST(SLDFLAGS)
-AC_SUBST(LDSO)
+AC_SUBST(LD)
 LIBS=${SAVE_LIBS}
 
 
