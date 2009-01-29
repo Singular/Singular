@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: timer.cc,v 1.8 2008-08-22 12:11:05 Singular Exp $ */
+/* $Id: timer.cc,v 1.9 2009-01-29 16:57:02 Singular Exp $ */
 
 /*
 *  ABSTRACT - get the computing time
@@ -87,8 +87,13 @@ void SetMinDisplayTime(double mtime)
 /*3
 * the start time of the timer
 */
-static clock_t startl;
+#ifdef GETRUSAGE
+static int64 siStartTime;
+static int64 startl;
+#else
 static clock_t siStartTime;
+static clock_t startl;
+#endif
 
 /*3
 * temp structure to get the time
@@ -118,9 +123,9 @@ void startTimer()
 {
 #ifdef GETRUSAGE
   getrusage(RUSAGE_SELF,&t_rec); 
-  startl = (t_rec.ru_utime.tv_sec*1000000+t_rec.ru_utime.tv_usec
-               +t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
-               +5000)/10000; // unit is 1/100 sec
+  startl = ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
+               +(int64)t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
+               +(int64)5000)/(int64)10000; // unit is 1/100 sec
 #else
   times(&t_rec);
   startl = t_rec.tms_utime+t_rec.tms_stime;
@@ -132,15 +137,16 @@ void startTimer()
 */
 int getTimer()
 {
-  clock_t curr;
 #ifdef GETRUSAGE
+  int64 curr;
   getrusage(RUSAGE_SELF,&t_rec); 
-  curr = (t_rec.ru_utime.tv_sec*1000000+t_rec.ru_utime.tv_usec
-               +t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
-               +5000)/10000; // unit is 1/100 sec
+  curr = ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
+         +(int64)t_rec.ru_stime.tv_sec*1000000+(int64)t_rec.ru_stime.tv_usec
+         +(int64)5000)/(int64)10000; // unit is 1/100 sec
   curr -= siStartTime;
   double f =  ((double)curr) * timer_resolution / (double)100;
 #else
+  clock_t curr;
 
   times(&t_rec);
   curr = t_rec.tms_utime+t_rec.tms_stime - siStartTime;
@@ -159,16 +165,17 @@ extern int iiOp;
 #endif
 void writeTime(const char* v)
 {
-  clock_t curr;
 
 #ifdef GETRUSAGE
+  int64 curr;
   getrusage(RUSAGE_SELF,&t_rec); 
-  curr = (t_rec.ru_utime.tv_sec*1000000+t_rec.ru_utime.tv_usec
-               +t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
-               +5000)/10000; // unit is 1/100 sec
+  curr = ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
+               +(int64)t_rec.ru_stime.tv_sec*1000000+(int64)t_rec.ru_stime.tv_usec
+               +(int64)5000)/(int64)10000; // unit is 1/100 sec
   curr -= startl;
   double f =  ((double)curr) * timer_resolution / (double)100;
 #else
+  clock_t curr;
   times(&t_rec);
   curr = t_rec.tms_utime+t_rec.tms_stime - startl;
 
