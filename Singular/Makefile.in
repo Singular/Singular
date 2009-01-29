@@ -34,7 +34,7 @@ install_slibdir = ${install_prefix}/LIB
 ##
 @SET_MAKE@
 CC		= @CC@
-LD              = @LDSO@
+LD              = @LD@
 CXX		= @CXX@
 LEX		= sh flexer.sh
 

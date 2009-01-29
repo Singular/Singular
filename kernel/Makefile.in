@@ -30,7 +30,7 @@ install_bindir  = ${install_prefix}/${SINGUNAME}
 ##
 @SET_MAKE@
 CC		= @CC@
-LD              = @LDSO@
+LD              = @LD@
 CXX		= @CXX@
 LEX		= @LEX@
 PERL		= @PERL@
