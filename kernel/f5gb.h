@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.17 2009-01-28 17:20:53 Singular Exp $ */
+/* $Id: f5gb.h,v 1.18 2009-01-29 17:59:30 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -34,7 +34,7 @@ computes incrementally gbs of subsets of the input
 gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}  
 ==================================================
 */
-LList* F5inc(int* i, poly* f_i, LList* gPrev, poly* ONE);
+LList* F5inc(int* i, poly* f_i, LList* gPrev, poly* ONE, RList* rules, LTagList* lTag);
 
 /*
 ================================================================
@@ -43,14 +43,22 @@ first element in gPrev is always the newest element which must
 build critical pairs with all other elements in gPrev
 ================================================================
 */
-CList* criticalPair(LList* gPrev);
+CList* criticalPair(LList* gPrev, CList* critPairs, RList* rules, LTagList* lTag);
 
 /*
 ========================================
 Criterion 1, i.e. Faugere's F5 Criterion
 ========================================
 */
-bool criterion1(LNode* l, LList* gPrev);
+bool criterion1(poly* t, LNode* l, LTagList* lTag);
+
+/*
+=====================================
+Criterion 2, i.e. Rewritten Criterion
+=====================================
+*/
+bool criterion2(poly* t, LNode* l, RList* rules);
+
 /*
 ======================================
 main function of our f5 implementation

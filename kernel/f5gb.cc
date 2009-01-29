@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.cc,v 1.18 2009-01-28 17:20:49 Singular Exp $ */
+/* $Id: f5gb.cc,v 1.19 2009-01-29 17:59:30 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -66,10 +66,11 @@ computes incrementally gbs of subsets of the input
 gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}
 ==================================================
 */
-LList* F5inc(int* i, poly* f_i, LList* gPrev, poly* ONE) {
+LList* F5inc(int* i, poly* f_i, LList* gPrev, poly* ONE, RList* rules, LTagList* lTag) {
     gPrev->insert(ONE,i,f_i);
-    CList* critPairs    =   criticalPair(gPrev);
-     
+    CList* critPairs    =   new CList();
+    critPairs           =   criticalPair(gPrev, critPairs, rules, lTag);
+    
     return gPrev;
 }
 
@@ -81,67 +82,56 @@ first element in gPrev is always the newest element which must
 build critical pairs with all other elements in gPrev
 ================================================================
 */
-CList* criticalPair(LList* gPrev) {
-    poly lcm   = pInit();
-    number n    = nInit(2);
-    nWrite(n);
-    pWrite(lcm);
+CList* criticalPair(LList* gPrev, CList* critPairs, RList* rules, LTagList* lTag) {
     // initialization for usage in pLcm()
+    number nOne         =   nInit(1);
     LNode* first        =   gPrev->getFirst();
     LNode* l            =   gPrev->getFirst()->getNext();
-    poly t1, t2         =   pInit();
-    t1                  =   pHead(*first->getPoly());
-    poly u1             =   pOne();
-    poly u2             =   pOne();
-    CList*  critpairs   =   NULL;
+    poly* u1            =   new poly(pInit());
+    poly* u2            =   new poly(pInit());
+    poly* lcm           =   new poly(pInit());
     // computation of critical pairs
     while( NULL != l) {
         //pWrite( *(gPrev->getFirst()->getPoly()) );
         //pWrite( *(l->getPoly()) );
-        pLcm(*first->getPoly(), *l->getPoly(), t1);
-        pWrite(t1);
-        pWrite(u1);
-        pWrite(u2);
-        pSetCoeff0(lcm,n);
-        poly p = lcm; 
-        pWrite(p);
-        Print("%ld\n",pDeg(t1));
+        pLcm(first->getPoly(), l->getPoly(), *lcm);
+        pSetCoeff(*lcm,nOne);
         // computing factors u1 & u2 for new labels
-        u1  = pDivide(lcm, t1);
-        pWrite(u1);
-        pWrite(t1);
-        Print("%ld\n",pDeg(t1));
-        //pSetCoeff(u1,pGetCoeff(pOne()));
-        pWrite(u1);
-        t2  = pHead(*l->getPoly());
-        pWrite(t2);
-        // testing stuff
-        u1 = ppMult_qq(t1,t2);
-        pWrite(u1);
-        pWrite(t2);
-        Print("%ld\n",pDeg(u1));
-        Print("%ld\n",pDeg(t2));
-        u2  = pDivide(lcm, t2);
-        pSetCoeff(u2, pGetCoeff(pOne()));
-        pWrite(u2);
-        Print("%ld\n",pDeg(u2)); 
+        *u1 = pDivide(*lcm,pHead(first->getPoly()));
+        pSetCoeff(*u1,nOne);
+        *u2 = pDivide(*lcm, pHead(l->getPoly()));
+        pSetCoeff(*u2,nOne);
+        pWrite(*u2);
         // testing both new labels by the F5 Criterion
-        if(!criterion1(first, gPrev) &&
-           !criterion1(l, gPrev)) {
-            if(*first->getIndex() == *l->getIndex()) {
-                if(pMult(u1, *first->getTerm()) < pMult(u2, *l->getTerm())) {
-                    //if(!critPairs) {
-                        CPair* cp   =   new CPair(pDeg(lcm), u1, first->getLPoly(), u2, 
-                                        l->getLPoly());                   
-                    //}
-                }
+        if(!criterion1(u1, first, lTag) && !criterion1(u2, l, lTag) && 
+           !criterion2(u1, first, rules) && !criterion2(u2, l, rules)) {
+            Print("Criteria passed\n");
+            // if they pass the test, add them to CList critPairs, having the LPoly with greater
+            // label as first element in the CPair
+            if(first->getIndex() == l->getIndex() && 
+            pMult(*u1, first->getTerm()) < pMult(*u2, l->getTerm())) {
+                CPair* cp   =   new CPair(pDeg(ppMult_qq(*u2,pHead(l->getPoly()))), *u2, 
+                                l->getLPoly(), *u1, first->getLPoly());                   
+                    critPairs->insert(cp);
+            }
+            else {
+                CPair* cp   =   new CPair(pDeg(ppMult_qq(*u2,pHead(l->getPoly()))), *u1, 
+                                first->getLPoly(), *u2, l->getLPoly());                   
+                    critPairs->insert(cp);
             }
         }
-
-        Print("\n");
+        else {
+            Print("Criteria not passed\n");
+        }
+        
+        // for debugging
+        if(NULL != critPairs) {
+            critPairs->print(); 
+        }
         l   =   l->getNext();
     }
-    return NULL;
+    Print("ENDE CRITPAIRS\n");
+    return critPairs;
 }
 
 /*
@@ -149,29 +139,65 @@ CList* criticalPair(LList* gPrev) {
 Criterion 1, i.e. Faugere's F5 Criterion
 ========================================
 */
-bool criterion1(LNode* l, LList* gPrev) {
-    LNode* testNode =   l->getNext();
+bool criterion1(poly* t, LNode* l, LTagList* lTag) {
+    // start at the previously added element to gPrev, as all other elements will have the same index for sure
+    LNode* testNode =   lTag->get(l->getIndex());
+    // save the monom t1*label_term(l) as it is tested various times in the following
+    poly u1 = ppMult_qq(*t,l->getTerm());
     while(NULL != testNode) {
-        while(*testNode->getIndex() == *l->getIndex()) {
-            testNode = testNode->getNext();
+        //while(NULL != testNode && testNode->getIndex() == l->getIndex()) {
+        //    testNode = testNode->getNext();
+        //}
+        Print("%d\n", pLmDivisibleByNoComp(pHead(testNode->getPoly()),u1));
+        if(NULL != testNode && pLmDivisibleByNoComp(pHead(testNode->getPoly()),u1)) {
+            return true;
         }
-    }
+        testNode    =   testNode->getNext();
         
-
-    return true;
+    }
+    // 25/01/2009: TO DO -> change return value, until now no element is added to CList!
+    return false;
 }
 
 /*
+=====================================
+Criterion 2, i.e. Rewritten Criterion
+=====================================
+*/
+bool criterion2(poly* t, LNode* l, RList* rules) {
+    // start at the previously added element to gPrev, as all other elements will have the same index for sure
+    RNode* testNode =   rules->getFirst();
+    while(NULL != testNode->getRule()) {
+        while(NULL != testNode->getRule() && testNode->getRuleIndex() == l->getIndex()) {
+            testNode = testNode->getNext();
+        }
+        if(NULL != testNode->getRule() && 
+           pLmDivisibleByNoComp(ppMult_qq(*t,l->getTerm()),testNode->getRuleTerm())) {
+            return true;
+        }
+        testNode    =   testNode->getNext();
+        
+    }
+    // 25/01/2009: TO DO -> change return value, until now no element is added to CList!
+    
+    return false;
+}
+
+
+/*
 ==========================================================================
-MAIN:computes a gb of the ideal i in the ring r with our f5 implementation
+MAIN:computes a gb of the ideal i in the ring r with our F5 implementation
 ==========================================================================
 */
 ideal F5main(ideal id, ring r) {
     int i,j;
     // 1 polynomial for defining initial labels & further tests
-    static poly ONE = pOne(); 
+    poly ONE = pOne();
+    // list of rules
+    RList* rules    =   new RList();
     i = 1;
-    LList* gPrev = new LList( &ONE, &i, &id->m[0]);
+    LList* gPrev    =   new LList( &ONE, &i, &id->m[0]);
+    LTagList* lTag  =   new LTagList(gPrev->getFirst());
     poly* lcm = new poly;
     // initialization for usage in pLcm()
     *lcm = pOne();
@@ -204,7 +230,9 @@ ideal F5main(ideal id, ring r) {
     poly q = pHead(id->m[2]);
     pWrite(q);
     for(i=2; i<=IDELEMS(id); i++) {
-        gPrev   =   F5inc( &i, &id->m[i-1], gPrev, &ONE );
+        gPrev   =   F5inc(&i, &id->m[i-1], gPrev, &ONE, rules, lTag);
+        lTag->insert(gPrev->getFirst());
+        Print("JA\n");
     } 
     // only for debugging
     //LNode* current;

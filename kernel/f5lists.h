@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5lists.h,v 1.1 2009-01-27 10:38:08 Singular Exp $ */
+/* $Id: f5lists.h,v 1.2 2009-01-29 17:59:30 ederc Exp $ */
 /*
 * ABSTRACT: list interface
 */
@@ -19,16 +19,19 @@ classes for lists used in F5
 */
 class LNode;
 class LList;
-class PrevNode;
-class PrevList;
+class LTagNode;
+class LTagList;
 class CNode;
 class CList;
 class RList;
 class RNode;
+class RTagNode;
+class RTagList;
+
 
 /*
 =======================================
-LNode class (nodes for lists of LPolys)
+class LNode (nodes for lists of LPolys)
 =======================================
 */
 class LNode {
@@ -38,7 +41,9 @@ class LNode {
     public:
         // generating new list elements from the labeled / classical polynomial view
                 LNode(LPoly* lp);
+                LNode(LPoly* lp, LNode* l);
                 LNode(poly* t, int* i, poly* p);
+                LNode(poly* t, int* i, poly* p, LNode* l);
                 LNode(LNode* ln);
                 ~LNode();
         // insert new elements to the list in first place from the labeled / classical polynomial view
@@ -55,9 +60,9 @@ class LNode {
         // get the LPoly* out of LNode*
         LPoly*  getLPoly();
         // get the data from the LPoly saved in LNode
-        poly*   getPoly();
-        poly*   getTerm();
-        int*    getIndex();
+        poly    getPoly();
+        poly    getTerm();
+        int     getIndex();
         // test if for any list element the polynomial part of the data is equal to *p
         bool    polyTest(poly* p);
         LNode*  getNext(LNode* l);
@@ -88,37 +93,40 @@ class LList {
 
 
 /*
-=============================================
-PrevNode class (nodes for lists of gPrevLast)
-=============================================
+==============================================
+class LtagNode (nodes for lists of LPoly tags)
+==============================================
 */
-class PrevNode {
+class LTagNode {
     private:
         LNode*      data;
-        PrevNode*   next;
+        LTagNode*   next;
     public:
-        PrevNode(LNode* l);
-        ~PrevNode();
-        PrevNode*   append(LNode* l);
+        LTagNode(LNode* l);
+        LTagNode(LNode* l, LTagNode* n);
+        ~LTagNode();
+        // declaration with first as parameter due to sorting of LTagList
+        LTagNode*   insert(LNode* l);
         LNode*      getLNode();
-        LNode*      getPrevLast(int i);
+        LNode*      get(int i, int length);
 };
 
 
 /*
-====================================================
-class PrevList(lists of last node elements in gPrev)
-====================================================
+=========================================================================
+class LTagList(lists of LPoly tags, i.e. first elements of a given index)
+=========================================================================
 */
-class PrevList {
+class LTagList {
     private:
-        PrevNode*   first;
-        PrevNode*   last;
+        LTagNode*   first;
+        int         length;
     public:
-                PrevList(LNode* l);
-                ~PrevList();
-        void    append(LNode* l);
-        LNode*  getPrevLast(int i);
+                LTagList(LNode* l);
+                ~LTagList();
+        // declaration with first as parameter in LTagNode due to sorting of LTagList
+        void    insert(LNode* l);
+        LNode*  get(int idx);
 };
 
 
@@ -132,11 +140,21 @@ class CNode {
         CPair* data;
         CNode* next;
     public:
+                CNode();
                 CNode(CPair* c);
+                CNode(CPair* c, CNode* n);
                 ~CNode(); 
-        CNode*  insert(CPair* c); 
+        CNode*  insert(CPair* c, CNode* last); 
         CNode*  getMinDeg();
-        //CNode*  getLPoly() const; 
+        poly    getLp1Poly();
+        poly    getLp2Poly();
+        poly    getLp1Term();
+        poly    getLp2Term();
+        poly    getT1();   
+        poly    getT2(); 
+        int     getLp1Index();
+        int     getLp2Index();
+        void    print();
 };
 
 
@@ -148,12 +166,16 @@ class CList(lists of CPairs)
 class CList {
     private:
         CNode*  first;
+        // last alway has data=NULL and next=NULL, for initialization purposes used
+        CNode*  last;
     public:
+                // for initialization of CLists, last element alwas has data=NULL and next=NULL
+                CList(); 
                 CList(CPair* c); 
                 ~CList(); 
         void    insert(CPair* c);
         CNode*  getMinDeg();
-
+        void    print();
 };
 
 
@@ -167,9 +189,14 @@ class RNode {
         Rule*   data;
         RNode*  next;
     public:
+                RNode();
                 RNode(Rule* r);
                 ~RNode();
         RNode*  insert(Rule* r);
+        RNode*  getNext();
+        Rule*   getRule();
+        int     getRuleIndex();
+        poly    getRuleTerm();
 };
 
 /*
@@ -180,10 +207,54 @@ class RList (lists of Rules)
 class RList {
     private:
         RNode*  first;
+        // last alway has data=NULL and next=NULL, for initialization purposes used
+        RNode*  last;
     public:
+                RList();
                 RList(Rule* r);
                 ~RList();
         void    insert(Rule* r);
+        RNode*  getFirst();
+        Rule*   getRule();
+};
+
+
+
+/*
+=============================================
+class RtagNode (nodes for lists of Rule tags)
+=============================================
+*/
+class RTagNode {
+    private:
+        RNode*      data;
+        RTagNode*   next;
+    public:
+        RTagNode(RNode* r);
+        RTagNode(RNode* r, RTagNode* n);
+        ~RTagNode();
+        // declaration with first as parameter due to sorting of LTagList
+        RTagNode*   insert(RNode* r);
+        RNode*      getRNode();
+        RNode*      get(int idx, int length);
+};
+
+
+/*
+========================================================================
+class RTagList(lists of Rule tags, i.e. first elements of a given index)
+========================================================================
+*/
+class RTagList {
+    private:
+        RTagNode*   first;
+        int         length;
+    public:
+                RTagList(RNode* r);
+                ~RTagList();
+        // declaration with first as parameter in LTagNode due to sorting of LTagList
+        void    insert(RNode* r);
+        RNode*  get(int idx);
 };
 #endif
 #endif

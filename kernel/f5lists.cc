@@ -30,13 +30,23 @@ LNode::LNode(LPoly* lp) {
     next = NULL;
 }
        
+LNode::LNode(LPoly* lp, LNode* l) {
+    data = lp;
+    next = l;
+}
 LNode::LNode(poly* t, int* i, poly* p) {
     LPoly* lp = new LPoly(t,i,p);
     data = lp;
     next = NULL;
 }
        
-LNode::LNode(LNode* ln) {
+LNode::LNode(poly* t, int* i, poly* p, LNode* l) {
+    LPoly* lp = new LPoly(t,i,p);
+    data = lp;
+    next = l;
+}
+
+ LNode::LNode(LNode* ln) {
     data = ln->getLPoly();
     next = ln->getNext();
 }
@@ -48,14 +58,12 @@ LNode::~LNode() {
        
 // insert new elements to the list always in front (labeled / classical polynomial view)
 LNode* LNode::insert(LPoly* lp) {
-    LNode* newElement = new LNode(lp);
-    newElement->next = this;
+    LNode* newElement = new LNode(lp, this);
     return newElement;
 }
         
 LNode* LNode::insert(poly* t, int* i, poly* p) {
-    LNode* newElement = new LNode(t,i,p);
-    newElement->next = this;
+    LNode* newElement = new LNode(t, i, p, this);
     return newElement;
 }
         
@@ -63,16 +71,14 @@ LNode* LNode::insert(poly* t, int* i, poly* p) {
 // only used for the S-polys to be reduced (TopReduction building new S-polys with higher label)
 LNode* LNode::insertByLabel(LPoly* lp) {
     if( lp->getTerm() <= this->data->getTerm() ) {
-        LNode* newElement   =   new LNode(lp);
-        newElement->next    =   this;
+        LNode* newElement   =   new LNode(lp, this);
         return newElement;
     }
     else {
         LNode* temp = this;
         while( NULL != temp->next ) {
             if( lp->getTerm() <= temp->next->data->getTerm() ) {
-                LNode* newElement   =   new LNode(lp);
-                newElement->next    =   temp->next;
+                LNode* newElement   =   new LNode(lp, temp->next);
                 temp->next          =   newElement;
                 return this;
             }
@@ -80,9 +86,8 @@ LNode* LNode::insertByLabel(LPoly* lp) {
                 temp = temp->next;
             }
         }
-        LNode* newElement   =   new LNode(lp);
+        LNode* newElement   =   new LNode(lp, NULL);
         temp->next          =   newElement;
-        newElement->next    =   NULL;
         return this;
     }
 }
@@ -104,15 +109,15 @@ LPoly* LNode::getLPoly() {
 }
 
 // get the data from the LPoly saved in LNode
-poly* LNode::getPoly() {
+poly LNode::getPoly() {
     return data->getPoly();
 }
 
-poly* LNode::getTerm() {
+poly LNode::getTerm() {
     return data->getTerm();
 }
 
-int* LNode::getIndex() {
+int LNode::getIndex() {
     return data->getIndex();
 }
 
@@ -120,7 +125,7 @@ int* LNode::getIndex() {
 bool LNode::polyTest(poly* p) {
     LNode* temp = new LNode(this);
     while(NULL != temp) {
-        if(pComparePolys(*(temp->getPoly()),*p)) {
+        if(pComparePolys(temp->getPoly(),*p)) {
             return 1;
         }
         temp = temp->next;
@@ -181,60 +186,72 @@ LNode* LList::getNext(LNode* l) {
 
 /*
 =======================================
-functions working on the class PrevNode
+functions working on the class LTagNode
 =======================================
 */
 
-PrevNode::PrevNode(LNode* l) {
+LTagNode::LTagNode(LNode* l) {
     data = l;
     next = NULL;
 }
        
-PrevNode::~PrevNode() {
+LTagNode::LTagNode(LNode* l, LTagNode* n) {
+    data = l;
+    next = n;
+}
+
+ LTagNode::~LTagNode() {
     delete next;
     delete data;   
 }
        
-PrevNode* PrevNode::append(LNode* l) {
-    PrevNode* new_element = new PrevNode(l);
-    next = new_element;
-    return new_element;
+// declaration with first as parameter due to sorting of LTagList
+LTagNode* LTagNode::insert(LNode* l) {
+    LTagNode* newElement  = new LTagNode(l, this);
+    return newElement;
 }
 
-LNode* PrevNode::getLNode() {
+LNode* LTagNode::getLNode() {
     return this->data;
 }
 
-LNode* PrevNode::getPrevLast(int i) {
-    int j;
-    PrevNode* temp = this;
-    for(j=1;j<=i-1;j++) {
-        temp = temp->next;
+// NOTE: We insert at the beginning of the list and length = i-1, where i is the actual index.
+//       Thus given actual index i and idx being the index of the LPoly under investigation
+//       the element on position length-idx is the right one
+LNode* LTagNode::get(int idx, int length) {
+    if(idx == 1) {
+        return NULL;
     }
-    return temp->data;
+    else {
+        int j;
+        LTagNode* temp = this; // last
+        for(j=1;j<=length-idx+1;j++) {
+            temp = temp->next;
+        }
+        return temp->data;
+    }
 }
+
 
 /*
 =======================================
-functions working on the class PrevList
+functions working on the class LTagList
 =======================================
 */
 
-PrevList::PrevList(LNode* l) {
-    PrevNode* first =   new PrevNode(l);
-    last            =   first;    
+LTagList::LTagList(LNode* l) {
+    LTagNode* first =   new LTagNode(l);
+    length          =   1;
 }
 
-void PrevList::append(LNode* l) {
-    last = last->append(l);
+// declaration with first as parameter in LTagNode due to sorting of LTagList
+void LTagList::insert(LNode* l) {
+    first   =   first->insert(l);
+    length++;
 }
 
-LNode* PrevList::getPrevLast(int i) {
-    switch(i) {
-        case 0:     return NULL;
-        case 1:     return first->getLNode();
-        default:    first->getPrevLast(i);
-    }
+LNode* LTagList::get(int idx) {
+    return first->get(idx, length);
 }
 
 /*
@@ -243,9 +260,19 @@ functions working on the class CNode
 ====================================
 */
 
+CNode::CNode() {
+    data    =   NULL;   
+    next    =   NULL;    
+}
+
 CNode::CNode(CPair* c) {
     data    =   c;   
     next    =   NULL;    
+}
+
+CNode::CNode(CPair* c, CNode* n) {
+    data    =   c;   
+    next    =   n;    
 }
 
 CNode::~CNode() {
@@ -257,104 +284,108 @@ CNode::~CNode() {
 // note: as all critical pairs have the same index here, the second sort is done on the terms of the labels
 // working only with linked, but not doubly linked lists due to memory usage we have to check the 
 // insertion around the first element separately from the insertion around all other elements in the list
-CNode* CNode::insert(CPair* c) {
-    if( c->getDeg() < this->data->getDeg() ) { // lower degree than the first list element
-        CNode* newElement = new CNode(c);
-        newElement->next = this;
+CNode* CNode::insert(CPair* c, CNode* last) {
+    if(NULL == this->data) {
+        CNode* newElement   =   new CNode(c, this);
         return newElement;
     }
-    if( c->getDeg() == this->data->getDeg() ) { // same degree than the first list element
-        if( c->getT1() <= this->data->getT1() ) {
-            CNode* newElement   =   new CNode(c);
-            newElement->next    =   this;
+    else {
+        poly u1 = ppMult_qq(c->getT1(),c->getLp1Term());
+        if( c->getDeg() < this->data->getDeg() ) { // lower degree than the first list element
+            CNode* newElement   =   new CNode(c, this);
             return newElement;
         }
-        else {
-            CNode* temp = this;
-            while(  NULL != temp->next ) {
-                if( temp->next->data->getDeg() == c->getDeg() ) { 
-                    if( c->getT1() <= temp->next->data->getT1() ) {
-                        temp = temp->next;
+        if( c->getDeg() == this->data->getDeg() ) { // same degree than the first list element
+            if(0 == pLmCmp(u1,ppMult_qq(this->data->getT1(), this->data->getLp1Term())) ||
+               -1 == pLmCmp(u1,ppMult_qq(this->data->getT1(), this->data->getLp1Term()))) {
+                Print("Leck mich am Arsch: ");
+                pWrite(u1);
+                Print("Multi-Term in CritPairs Sortierung altes Element: ");
+                pWrite(ppMult_qq(this->data->getT1(),this->data->getLp1Term()));
+                CNode* newElement   =   new CNode(c, this);
+                return newElement;
+            }
+            else {
+                Print("Insert Deg\n");
+                CNode* temp = this;
+                while(  NULL != temp->next->data ) {
+                    if(temp->next->data->getDeg() == c->getDeg() ) { 
+                        if(1 == pLmCmp(u1,ppMult_qq(temp->next->data->getT1(),temp->next->data->getLp1Term()))) {
+                            temp = temp->next;
+                        }
+                        else {
+                            CNode* newElement   =   new CNode(c, temp->next);
+                            temp->next          =   newElement;
+                            return this;
+                        } 
                     }
                     else {
-                        CNode* newElement   =   new CNode(c);
-                        newElement->next    =   temp->next;
+                        CNode* newElement   =   new CNode(c, temp->next);
                         temp->next          =   newElement;
                         return this;
-                    } 
+                    }
                 }
-                else {
-                    CNode* newElement   =   new CNode(c);
-                    newElement->next    =   temp->next;
-                    temp->next          =   newElement;
-                    return this;
-                }
-            }
-            CNode* newElement   =   new CNode(c);
-            newElement->next    =   NULL;
-            temp->next          =   newElement;
-            return this;
-        }
-    } // outer if-clause
-    if( c->getDeg() > this->data->getDeg() ) { // greater degree than the first list element
-        CNode* temp =   this;
-        while( NULL != temp->next ) {   
-            if( c->getDeg() < temp->next->data->getDeg() ) {
-                CNode* newElement   =   new CNode(c);
-                newElement->next    =   temp->next;
+                CNode* newElement   =   new CNode(c, last);
                 temp->next          =   newElement;
                 return this;
             }
-            if( c->getDeg() == temp->next->data->getDeg() ) {
-                if( c->getT1() <= temp->next->data->getT1() ) {
-                    CNode* newElement   =   new CNode(c);
-                    newElement->next    =   temp->next;
+        } // outer if-clause
+        if( c->getDeg() > this->data->getDeg() ) { // greater degree than the first list element
+            CNode* temp =   this;
+            while( NULL != temp->next->data ) {   
+                if( c->getDeg() < temp->next->data->getDeg() ) {
+                    CNode* newElement   =   new CNode(c, temp->next);
                     temp->next          =   newElement;
                     return this;
                 }
-                else {
-                    temp = temp->next;
-                    while(  NULL != temp->next ) {
-                        if( temp->next->data->getDeg() == c->getDeg() ) { 
-                            if( c->getT1() <= temp->next->data->getT1() ) {
-                                temp = temp->next;
+                if( c->getDeg() == temp->next->data->getDeg() ) {
+                    if(0 == pLmCmp(u1,ppMult_qq(temp->next->data->getT1(),temp->next->data->getLp1Term())) || 
+                       -1 == pLmCmp(u1,ppMult_qq(temp->next->data->getT1(),temp->next->data->getLp1Term()))) { 
+                        CNode* newElement   =   new CNode(c, temp->next);
+                        temp->next          =   newElement;
+                        return this;
+                    }
+                    else {
+                        temp = temp->next;
+                        while(  NULL != temp->next->data ) {
+                            if( temp->next->data->getDeg() == c->getDeg() ) { 
+                                if(1 == pLmCmp(u1,ppMult_qq(temp->next->data->getT1(),
+                                               temp->next->data->getLp1Term()))) {
+                                    temp = temp->next;
+                                }
+                                else {
+                                    CNode* newElement   =   new CNode(c, temp->next);
+                                    temp->next          =   newElement;
+                                    return this;
+                                } 
                             }
                             else {
-                                CNode* newElement   =   new CNode(c);
-                                newElement->next    =   temp->next;
+                                CNode* newElement   =   new CNode(c, temp->next);
                                 temp->next          =   newElement;
                                 return this;
-                            } 
+                            }
                         }
-                        else {
-                            CNode* newElement   =   new CNode(c);
-                            newElement->next    =   temp->next;
-                            temp->next          =   newElement;
-                            return this;
-                        }
+                        CNode* newElement   =   new CNode(c, last);
+                        temp->next          =   newElement;
+                        return this;
                     }
-                    CNode* newElement   =   new CNode(c);
-                    newElement->next    =   NULL;
-                    temp->next          =   newElement;
-                    return this;
+                }
+                if( c->getDeg() > temp->next->data->getDeg() ) {
+                    temp    =   temp->next;
                 }
             }
-            if( c->getDeg() > temp->next->data->getDeg() ) {
-                temp    =   temp->next;
-            }
+            CNode* newElement   =   new CNode(c, last);
+            temp->next          =   newElement;
+            return this;
         }
-        CNode* newElement   =   new CNode(c);
-        newElement->next    =   NULL;
-        temp->next          =   newElement;
-        return this;
     }
 }
 
 // get the first elements from CList which by the above sorting have minimal degree
 CNode* CNode::getMinDeg() {
     CNode* temp = this;
-    while( NULL != temp ) {
-        if( temp->next->data->getDeg() == this->data->getDeg() ) {
+    while( NULL != temp->data ) {
+        while( temp->next->data->getDeg() == this->data->getDeg() ) {
             temp = temp->next;
         }
         CNode* returnCNode  =   temp->next;    
@@ -364,14 +395,71 @@ CNode* CNode::getMinDeg() {
     return NULL;
 }
 
+poly CNode::getLp1Poly() {
+    return this->data->getLp1Poly();
+}
+
+poly CNode::getLp2Poly() {
+    return this->data->getLp2Poly();
+}
+
+poly CNode::getLp1Term() {
+    return this->data->getLp1Term();
+}
+
+poly CNode::getLp2Term() {
+    return this->data->getLp2Term();
+}
+
+int CNode::getLp1Index() {
+    return this->data->getLp1Index();
+}
+
+int CNode::getLp2Index() {
+    return this->data->getLp2Index();
+}
+
+poly CNode::getT1() {
+    return this->data->getT1();
+}
+
+poly CNode::getT2() {
+    return this->data->getT2();
+}
+
+// for debugging
+void CNode::print() {
+    CNode* temp = this;
+    Print("List of critical pairs:\n");
+    while(NULL != temp->data) {
+        Print("Leck mich am Arsch: ");
+        Print("Index: %d\n",temp->getLp1Index());
+        Print("T1: ");
+        pWrite(temp->getT1());
+        Print("Lp1 Term: ");
+        pWrite(temp->getLp1Term());
+        Print("%d\n",temp->getLp2Index());
+        pWrite(temp->getT2());
+        pWrite(temp->getLp2Term());
+        Print("\n");
+        temp = temp->next;
+    }
+}
 
 /*
 ====================================
 functions working on the class CList
 ====================================
 */
+// for initialization of CLists, last element alwas has data=NULL and next=NULL
+CList::CList() {
+    first   =   new CNode();
+    last    =   first;
+}
+
 CList::CList(CPair* c) {
-    first   = new CNode(c);
+    first   =   new CNode(c);
+    last    =   first;
 }
 
 CList::~CList() {
@@ -381,7 +469,7 @@ CList::~CList() {
 // insert sorts the critical pairs firstly by increasing total degree, secondly by increasing label
 // note: as all critical pairs have the same index here, the second sort is done on the terms of the labels
 void CList::insert(CPair* c) {
-    first = first->insert(c);
+    first = first->insert(c, last);
 }
 
 // get the first elements from CList which by the above sorting have minimal degree
@@ -392,12 +480,20 @@ CNode* CList::getMinDeg() {
     return temp;
 }
 
+void CList::print() {
+    first->print();
+}
 
 /*
 ====================================
 functions working on the class RNode
 ====================================
 */
+RNode::RNode() {
+    data    =   NULL;
+    next    =   NULL;
+}
+
 RNode::RNode(Rule* r) {
     data    =   r;
     next    =   NULL;
@@ -414,16 +510,116 @@ RNode* RNode::insert(Rule* r) {
     return newElement;
 }
 
+RNode* RNode::getNext() {
+    return next;
+}    
+
+Rule* RNode::getRule() {
+    return data;
+}
+
+int RNode::getRuleIndex() {
+    return data->getIndex();
+}
+
+poly RNode::getRuleTerm() {
+    return data->getTerm();
+}
+
 /*
 ====================================
 functions working on the class RList
 ====================================
 */
+RList::RList() {
+    first = new RNode();
+}
+
 RList::RList(Rule* r) {
     first = new RNode(r);
 }
 
 void RList::insert(Rule* r) {
     first = first->insert(r);
+}
+
+RNode* RList::getFirst() {
+    return first;
+}
+
+Rule* RList::getRule() {
+    return this->getRule();
+}
+
+/*
+=======================================
+functions working on the class RTagNode
+=======================================
+*/
+
+RTagNode::RTagNode(RNode* r) {
+    data = r;
+    next = NULL;
+}
+       
+RTagNode::RTagNode(RNode* r, RTagNode* n) {
+    data = r;
+    next = n;
+}
+
+ RTagNode::~RTagNode() {
+    delete next;
+    delete data;   
+}
+       
+// declaration with first as parameter due to sorting of LTagList
+RTagNode* RTagNode::insert(RNode* r) {
+    Print("Hier1\n");
+    RTagNode* newElement  = new RTagNode(r, this);
+    Print("Hier2\n");
+    return newElement;
+}
+
+RNode* RTagNode::getRNode() {
+    return this->data;
+}
+
+// NOTE: We insert at the beginning of the list and length = i-1, where i is the actual index.
+//       Thus given actual index i and idx being the index of the LPoly under investigation
+//       the element on position length-idx+1 is the right one
+RNode* RTagNode::get(int idx, int length) {
+    if(idx == 1) {
+        return NULL;
+    }
+    else {
+        int j;
+        RTagNode* temp = this; 
+        for(j=1;j<=length-idx+1;j++) {
+            temp = temp->next;
+        }
+        return temp->data;
+    }
+}
+
+
+/*
+=======================================
+functions working on the class LTagList
+=======================================
+*/
+
+RTagList::RTagList(RNode* r) {
+    RTagNode* first =   new RTagNode(r);
+    length          =   1;
+}
+
+// declaration with first as parameter in LTagNode due to sorting of LTagList
+void RTagList::insert(RNode* r) {
+    first = first->insert(r);
+    length++;
+}
+
+RNode* RTagList::get(int idx) {
+    return first->get(idx, length);
 }
 #endif

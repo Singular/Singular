@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lpolynomial.cc,v 1.7 2009-01-28 17:21:07 Singular Exp $ */
+/* $Id: lpolynomial.cc,v 1.8 2009-01-29 17:59:30 ederc Exp $ */
 /*
 * ABSTRACT: lpolynomial definition 
 */
@@ -49,16 +49,16 @@ void LPoly::setDel(bool b) {
     del = b;
 }
 
-poly* LPoly::getPoly() {
-    return &polynomial;
+poly LPoly::getPoly() {
+    return polynomial;
 }
 
-poly* LPoly::getTerm() {
-    return &term;
+poly LPoly::getTerm() {
+    return term;
 }
 
-int* LPoly::getIndex() {
-    return &index;
+int LPoly::getIndex() {
+    return index;
 }
 
 bool LPoly::getDel() const {
@@ -81,11 +81,12 @@ functions working on the class CPair
 ====================================
 */
 CPair::CPair(long degree, poly term1, LPoly* lpoly1, poly term2, LPoly* lpoly2) {
-   deg  =   degree;
-   t1   =   term1;
-   lp1  =   lpoly1;
-   t2   =   term2;
-   lp2  =   lpoly2;
+   deg              =   degree;
+   t1               =   term1;
+   lp1              =   lpoly1;
+   t2               =   term2;
+   lp2              =   lpoly2;
+   lastRuleTested   =   NULL;
 }
 
 long CPair::getDeg() {
@@ -101,30 +102,32 @@ poly CPair::getT2() {
 }
 
 poly CPair::getLp1Poly() {
-    return *(lp1->getPoly());
+    return lp1->getPoly();
 }
 
 poly CPair::getLp2Poly() {
-    return *(lp2->getPoly());
+    return lp2->getPoly();
 }
 
 poly CPair::getLp1Term() {
-    return *(lp1->getTerm());
+    return lp1->getTerm();
 }
 
 poly CPair::getLp2Term() {
-    return *(lp2->getTerm());
+    return lp2->getTerm();
 }
 
 int CPair::getLp1Index() {
-    return *(lp1->getIndex());
+    return lp1->getIndex();
 }
-
 
 int CPair::getLp2Index() {
-    return *(lp2->getIndex());
+    return lp2->getIndex();
 }
 
+Rule* CPair::getLastRuleTested() {
+    return lastRuleTested;
+}
 
 /*
 ===================================
