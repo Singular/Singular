@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.286 2008-12-17 15:10:37 Singular Exp $ */
+/* $Id: extra.cc,v 1.287 2009-01-29 10:12:19 monerjan Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -3061,12 +3061,30 @@ ipshell()");
     else
               */
 
-
 #endif
+
+/*======== GFAN ==============*/
+if (strcmp(sys_cmd,"gfan")==0)
+{
+	if ((h==NULL) or (h!=NULL and h->Typ()!=IDEAL_CMD)){
+		Werror("system(\"gfan\"...) Ideal expected");
+		return TRUE; //Ooooops
+	}
+ideal myideal=((ideal)h->Data());
+printf("Addr: %l\n",*myideal); 
+//printf(myideal.next());
+	
+return FALSE; //Everything went fine	
+}
+else
+
+
 /*==================== Error =================*/
       Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }
   return TRUE;
 }
+
 #endif // HAVE_EXTENDED_SYSTEM
+
 
