@@ -432,7 +432,6 @@ void CNode::print() {
     CNode* temp = this;
     Print("List of critical pairs:\n");
     while(NULL != temp->data) {
-        Print("Leck mich am Arsch: ");
         Print("Index: %d\n",temp->getLp1Index());
         Print("T1: ");
         pWrite(temp->getT1());
