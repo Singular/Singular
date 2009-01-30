@@ -15,7 +15,7 @@
 #include "intvec.h"
 #include "pInline1.h"
 #include "f5gb.h"
-#include "lpolynomial.h"
+#include "f5data.h"
 #include "f5lists.h"
 
 /*

@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.28 2008-10-02 08:59:35 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.29 2009-01-30 17:25:04 ederc Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -193,7 +193,7 @@
 
 /* procedures to compute groebner bases with the f5 implementation */
 /* still testing */
-#undef HAVE_F5
+#define HAVE_F5 1
 
 /* letterplace gb:*/
 #define HAVE_SHIFTBBA 1

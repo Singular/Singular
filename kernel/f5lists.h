@@ -1,13 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5lists.h,v 1.2 2009-01-29 17:59:30 ederc Exp $ */
+/* $Id: f5lists.h,v 1.3 2009-01-30 17:25:04 ederc Exp $ */
 /*
 * ABSTRACT: list interface
 */
-#include "lpolynomial.h"
-#ifndef LISTS_HEADER
-#define LISTS_HEADER
+#include "f5data.h"
+#ifndef F5LISTS_HEADER
+#define F5LISTS_HEADER
 
 #ifdef HAVE_F5
 /*
