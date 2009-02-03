@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5data.cc,v 1.1 2009-01-30 17:27:20 ederc Exp $ */
+/* $Id: f5data.cc,v 1.2 2009-02-03 20:55:43 ederc Exp $ */
 /*
 * ABSTRACT: lpolynomial definition 
 */
@@ -145,5 +145,9 @@ int Rule::getIndex() {
 
 poly Rule::getTerm() {
     return *term;
+}
+
+LPoly* Rule::getOrigin() {
+    return origin;
 }
 #endif

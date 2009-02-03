@@ -556,6 +556,11 @@ functions working on the class RTagNode
 =======================================
 */
 
+RTagNode::RTagNode() {
+    data = NULL;
+    next = NULL;
+}
+ 
 RTagNode::RTagNode(RNode* r) {
     data = r;
     next = NULL;
@@ -587,13 +592,13 @@ RNode* RTagNode::getRNode() {
 //       Thus given actual index i and idx being the index of the LPoly under investigation
 //       the element on position length-idx+1 is the right one
 RNode* RTagNode::get(int idx, int length) {
-    if(idx == 1) {
+    if(idx==1 || idx==0) {
         return NULL;
     }
     else {
         int j;
         RTagNode* temp = this; 
-        for(j=1;j<=length-idx+1;j++) {
+        for(j=1; j<=length-idx+1; j++) {
             temp = temp->next;
         }
         return temp->data;
@@ -606,6 +611,11 @@ RNode* RTagNode::get(int idx, int length) {
 functions working on the class LTagList
 =======================================
 */
+
+RTagList::RTagList() {
+    RTagNode* first =   new RTagNode();
+    length          =   0;
+}
 
 RTagList::RTagList(RNode* r) {
     RTagNode* first =   new RTagNode(r);

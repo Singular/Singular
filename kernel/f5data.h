@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5data.h,v 1.1 2009-01-30 17:27:20 ederc Exp $ */
+/* $Id: f5data.h,v 1.2 2009-02-03 20:55:43 ederc Exp $ */
 /*
 * ABSTRACT: labeled polynomial interface
 */
@@ -46,22 +46,6 @@ class LPoly {
 };
 
 /*
-========================================================
-structure of rules(i.e. already computed / known labels)
-========================================================
-*/
-class Rule {
-    private:
-        int*     index;    // index of the labeled polynomial the rule comes from 
-        poly*    term;     // term of the labeled polynomial the rule comes from
-    public:
-                Rule(int* i, poly* term);
-        int     getIndex();
-        poly    getTerm();
-};
-
-
-/*
 ===================================
 structure of labeled critical pairs
 ===================================
@@ -88,5 +72,22 @@ class CPair {
         Rule*   getLastRuleTested();
 };
 
+
+/*
+========================================================
+structure of rules(i.e. already computed / known labels)
+========================================================
+*/
+class Rule {
+    private:
+        int*    index;      // index of the labeled polynomial the rule comes from 
+        poly*   term;       // term of the labeled polynomial the rule comes from
+        LPoly*  origin;     // pointer of the LPoly which generated this rule (needed in criterion2())
+    public:
+                Rule(int* i, poly* term);
+        int     getIndex();
+        poly    getTerm();
+        LPoly*  getOrigin();
+};
 #endif
 #endif

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5lists.h,v 1.3 2009-01-30 17:25:04 ederc Exp $ */
+/* $Id: f5lists.h,v 1.4 2009-02-03 20:55:43 ederc Exp $ */
 /*
 * ABSTRACT: list interface
 */
@@ -230,9 +230,10 @@ class RTagNode {
         RNode*      data;
         RTagNode*   next;
     public:
-        RTagNode(RNode* r);
-        RTagNode(RNode* r, RTagNode* n);
-        ~RTagNode();
+                    RTagNode();
+                    RTagNode(RNode* r);
+                    RTagNode(RNode* r, RTagNode* n);
+                    ~RTagNode();
         // declaration with first as parameter due to sorting of LTagList
         RTagNode*   insert(RNode* r);
         RNode*      getRNode();
@@ -250,6 +251,7 @@ class RTagList {
         RTagNode*   first;
         int         length;
     public:
+                RTagList();
                 RTagList(RNode* r);
                 ~RTagList();
         // declaration with first as parameter in LTagNode due to sorting of LTagList

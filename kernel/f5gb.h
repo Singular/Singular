@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.19 2009-01-30 17:25:04 ederc Exp $ */
+/* $Id: f5gb.h,v 1.20 2009-02-03 20:55:43 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -34,7 +34,7 @@ computes incrementally gbs of subsets of the input
 gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}  
 ==================================================
 */
-LList* F5inc(int* i, poly* f_i, LList* gPrev, poly* ONE, RList* rules, LTagList* lTag);
+LList* F5inc(int* i, poly* f_i, LList* gPrev, poly* ONE);
 
 /*
 ================================================================
@@ -43,7 +43,7 @@ first element in gPrev is always the newest element which must
 build critical pairs with all other elements in gPrev
 ================================================================
 */
-CList* criticalPair(LList* gPrev, CList* critPairs, RList* rules, LTagList* lTag);
+CList* criticalPair(LList* gPrev, CList* critPairs, LTagList* lTag, RTagList* rTag);
 
 /*
 ========================================
@@ -57,7 +57,7 @@ bool criterion1(poly* t, LNode* l, LTagList* lTag);
 Criterion 2, i.e. Rewritten Criterion
 =====================================
 */
-bool criterion2(poly* t, LNode* l, RList* rules);
+bool criterion2(poly* t, LNode* l, RTagList* rTag);
 
 /*
 ======================================

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.cc,v 1.20 2009-01-30 17:25:04 ederc Exp $ */
+/* $Id: f5gb.cc,v 1.21 2009-02-03 20:55:43 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -66,10 +66,14 @@ computes incrementally gbs of subsets of the input
 gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}
 ==================================================
 */
-LList* F5inc(int* i, poly* f_i, LList* gPrev, poly* ONE, RList* rules, LTagList* lTag) {
+LList* F5inc(int* i, poly* f_i, LList* gPrev, poly* ONE) {
+    // tag the first element of index i-1 for criterion 1 
+    LTagList* lTag  =   new LTagList(gPrev->getFirst());
+    // first element in rTag is NULL, this must be done due to possible later improvements
+    RTagList* rTag  =   new RTagList();
     gPrev->insert(ONE,i,f_i);
     CList* critPairs    =   new CList();
-    critPairs           =   criticalPair(gPrev, critPairs, rules, lTag);
+    critPairs           =   criticalPair(gPrev, critPairs, lTag, rTag);
     
     return gPrev;
 }
@@ -82,7 +86,7 @@ first element in gPrev is always the newest element which must
 build critical pairs with all other elements in gPrev
 ================================================================
 */
-CList* criticalPair(LList* gPrev, CList* critPairs, RList* rules, LTagList* lTag) {
+CList* criticalPair(LList* gPrev, CList* critPairs, LTagList* lTag, RTagList* rTag) {
     // initialization for usage in pLcm()
     number nOne         =   nInit(1);
     LNode* first        =   gPrev->getFirst();
@@ -104,7 +108,7 @@ CList* criticalPair(LList* gPrev, CList* critPairs, RList* rules, LTagList* lTag
         pWrite(*u2);
         // testing both new labels by the F5 Criterion
         if(!criterion1(u1, first, lTag) && !criterion1(u2, l, lTag) && 
-           !criterion2(u1, first, rules) && !criterion2(u2, l, rules)) {
+           !criterion2(u1, first, rTag) && !criterion2(u2, l, rTag)) {
             Print("Criteria passed\n");
             // if they pass the test, add them to CList critPairs, having the LPoly with greater
             // label as first element in the CPair
@@ -140,22 +144,16 @@ Criterion 1, i.e. Faugere's F5 Criterion
 ========================================
 */
 bool criterion1(poly* t, LNode* l, LTagList* lTag) {
-    // start at the previously added element to gPrev, as all other elements will have the same index for sure
+    // starts at the first element in gPrev with index = (index of l)-1, these tags are saved in lTag
     LNode* testNode =   lTag->get(l->getIndex());
     // save the monom t1*label_term(l) as it is tested various times in the following
     poly u1 = ppMult_qq(*t,l->getTerm());
     while(NULL != testNode) {
-        //while(NULL != testNode && testNode->getIndex() == l->getIndex()) {
-        //    testNode = testNode->getNext();
-        //}
-        Print("%d\n", pLmDivisibleByNoComp(pHead(testNode->getPoly()),u1));
-        if(NULL != testNode && pLmDivisibleByNoComp(pHead(testNode->getPoly()),u1)) {
+        if(pLmDivisibleByNoComp(pHead(testNode->getPoly()),u1)) {
             return true;
         }
         testNode    =   testNode->getNext();
-        
     }
-    // 25/01/2009: TO DO -> change return value, until now no element is added to CList!
     return false;
 }
 
@@ -164,22 +162,20 @@ bool criterion1(poly* t, LNode* l, LTagList* lTag) {
 Criterion 2, i.e. Rewritten Criterion
 =====================================
 */
-bool criterion2(poly* t, LNode* l, RList* rules) {
+bool criterion2(poly* t, LNode* l, RTagList* rTag) {
     // start at the previously added element to gPrev, as all other elements will have the same index for sure
-    RNode* testNode =   rules->getFirst();
-    while(NULL != testNode->getRule()) {
-        while(NULL != testNode->getRule() && testNode->getRuleIndex() == l->getIndex()) {
-            testNode = testNode->getNext();
-        }
-        if(NULL != testNode->getRule() && 
-           pLmDivisibleByNoComp(ppMult_qq(*t,l->getTerm()),testNode->getRuleTerm())) {
+    RNode* testNode =   rTag->get(l->getIndex());
+    // save the monom t1*label_term(l) as it is tested various times in the following
+    poly u1 = ppMult_qq(*t,l->getTerm());
+    // first element added to rTag was NULL, check for this
+    Print("Hier1\n");
+    while(NULL != testNode && testNode->getRule()->getOrigin() != l->getLPoly()) {
+        Print("Hier2\n");
+        if(pLmDivisibleByNoComp(ppMult_qq(*t,l->getTerm()),testNode->getRuleTerm())) {
             return true;
         }
         testNode    =   testNode->getNext();
-        
     }
-    // 25/01/2009: TO DO -> change return value, until now no element is added to CList!
-    
     return false;
 }
 
@@ -197,7 +193,6 @@ ideal F5main(ideal id, ring r) {
     RList* rules    =   new RList();
     i = 1;
     LList* gPrev    =   new LList( &ONE, &i, &id->m[0]);
-    LTagList* lTag  =   new LTagList(gPrev->getFirst());
     poly* lcm = new poly;
     // initialization for usage in pLcm()
     *lcm = pOne();
@@ -230,8 +225,7 @@ ideal F5main(ideal id, ring r) {
     poly q = pHead(id->m[2]);
     pWrite(q);
     for(i=2; i<=IDELEMS(id); i++) {
-        gPrev   =   F5inc(&i, &id->m[i-1], gPrev, &ONE, rules, lTag);
-        lTag->insert(gPrev->getFirst());
+        gPrev   =   F5inc(&i, &id->m[i-1], gPrev, &ONE);
         Print("JA\n");
     } 
     // only for debugging
