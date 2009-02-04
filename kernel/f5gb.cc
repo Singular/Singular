@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.cc,v 1.21 2009-02-03 20:55:43 ederc Exp $ */
+/* $Id: f5gb.cc,v 1.22 2009-02-04 19:27:11 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -179,6 +179,27 @@ bool criterion2(poly* t, LNode* l, RTagList* rTag) {
     return false;
 }
 
+/*
+==========================================================================================================
+Criterion 2, i.e. Rewritten Criterion, for its second call in sPols(), with added lastRuleTested parameter
+==========================================================================================================
+*/
+bool criterion2(poly* t, LNode* l, RTagList* rTag, Rule* lastRuleTested) {
+    // start at the previously added element to gPrev, as all other elements will have the same index for sure
+    RNode* testNode =   rTag->getFirst();
+    // save the monom t1*label_term(l) as it is tested various times in the following
+    poly u1 = ppMult_qq(*t,l->getTerm());
+    // first element added to rTag was NULL, check for this
+    Print("Hier1\n");
+    while(NULL != testNode && testNode->getRule()->getOrigin() != l->getLPoly()) {
+        Print("Hier2\n");
+        if(pLmDivisibleByNoComp(ppMult_qq(*t,l->getTerm()),testNode->getRuleTerm())) {
+            return true;
+        }
+        testNode    =   testNode->getNext();
+    }
+    return false;
+}
 
 /*
 ==========================================================================

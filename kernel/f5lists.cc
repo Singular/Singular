@@ -628,6 +628,10 @@ void RTagList::insert(RNode* r) {
     length++;
 }
 
+RNode* RTagList::getFirst() {
+    return first->getRNode();
+}
+
 RNode* RTagList::get(int idx) {
     return first->get(idx, length);
 }

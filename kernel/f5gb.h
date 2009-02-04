@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.20 2009-02-03 20:55:43 ederc Exp $ */
+/* $Id: f5gb.h,v 1.21 2009-02-04 19:27:12 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -59,6 +59,13 @@ Criterion 2, i.e. Rewritten Criterion
 */
 bool criterion2(poly* t, LNode* l, RTagList* rTag);
 
+/*
+==========================================================================================================
+Criterion 2, i.e. Rewritten Criterion, for its second call in sPols(), with added lastRuleTested parameter
+==========================================================================================================
+*/
+bool criterion2(poly* t, LNode* l, RTagList* rTag, Rule* lastRuleTested);
+ 
 /*
 ======================================
 main function of our f5 implementation
