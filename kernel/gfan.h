@@ -1,0 +1,1 @@
+ideal getGB(ideal inputIdeal

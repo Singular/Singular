@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.289 2009-02-02 13:16:54 monerjan Exp $ */
+/* $Id: extra.cc,v 1.290 2009-02-06 07:54:11 monerjan Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -57,6 +57,7 @@
 
 #ifdef HAVE_RINGS
 #include "ringgb.h"
+#include "gfan.h"
 #endif
 
 
