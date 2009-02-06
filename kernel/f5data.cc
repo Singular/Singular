@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5data.cc,v 1.2 2009-02-03 20:55:43 ederc Exp $ */
+/* $Id: f5data.cc,v 1.3 2009-02-06 20:12:35 ederc Exp $ */
 /*
 * ABSTRACT: lpolynomial definition 
 */
@@ -29,20 +29,20 @@
 all functions working on the class LPoly for labeled polynomials
 ================================================================
 */
-LPoly::LPoly(poly* t,int* i,poly* p) {
-    set(t,i,p);
+LPoly::LPoly(poly t,int i,poly p,bool d) {
+    set(t,i,p,d);
 }
 
-void LPoly::setPoly(poly* p)  {
-    polynomial = *p;
+void LPoly::setPoly(poly p)  {
+    polynomial = p;
 }
 
-void LPoly::setTerm(poly* t) {
-    term = *t;
+void LPoly::setTerm(poly t) {
+    term = t;
 }
 
-void LPoly::setIndex(int* i) {
-    index = *i;
+void LPoly::setIndex(int i) {
+    index = i;
 }
 
 void LPoly::setDel(bool b) {
@@ -65,10 +65,11 @@ bool LPoly::getDel() const {
     return del;
 }
 
-void LPoly::set(poly* t, int* i, poly* p) {
+void LPoly::set(poly t, int i, poly p, bool d) {
     this->setTerm(t);
     this->setIndex(i);
     this->setPoly(p);
+    this->setDel(d);
 }
 
 LPoly* LPoly::get() {
@@ -97,8 +98,24 @@ poly CPair::getT1() {
     return t1;
 }
 
+poly* CPair::getAdT1() {
+    return &t1;
+}
+
+poly* CPair::getAdT2() {
+    return &t2;
+}
+
 poly CPair::getT2() {
     return t2;
+}
+
+LPoly* CPair::getAdLp1() {
+    return lp1;
+}
+
+LPoly* CPair::getAdLp2() {
+    return lp2;
 }
 
 poly CPair::getLp1Poly() {
@@ -134,17 +151,18 @@ Rule* CPair::getLastRuleTested() {
 functions working on the class Rule
 ===================================
 */
-Rule::Rule(int* i, poly* t) {
+Rule::Rule(int i, poly t, LPoly* l) {
     index   =   i;
     term    =   t;
+    origin  =   l;
 }
 
 int Rule::getIndex() {
-    return *index;
+    return index;
 }
 
 poly Rule::getTerm() {
-    return *term;
+    return term;
 }
 
 LPoly* Rule::getOrigin() {

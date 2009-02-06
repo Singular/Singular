@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5data.h,v 1.2 2009-02-03 20:55:43 ederc Exp $ */
+/* $Id: f5data.h,v 1.3 2009-02-06 20:12:35 ederc Exp $ */
 /*
 * ABSTRACT: labeled polynomial interface
 */
@@ -32,16 +32,16 @@ class LPoly {
         poly    polynomial; //standard polynomial data
         bool    del; //for deletion in TopReduction Subalgorithm
     public:
-                LPoly(poly*t,int* i,poly* p); 
-        void    setPoly(poly* p);
+                LPoly(poly t, int i, poly p, bool d = false); 
+        void    setPoly(poly p);
         poly    getPoly();
-        void    setTerm(poly* t);
+        void    setTerm(poly t);
         poly    getTerm();
-        void    setIndex(int* i);
+        void    setIndex(int i);
         int     getIndex();
         void    setDel(bool b);
         bool    getDel() const;
-        void    set(poly* t, int* i, poly* p);
+        void    set(poly t, int i, poly p, bool d);
         LPoly*  get();
 };
 
@@ -62,10 +62,14 @@ class CPair {
                 CPair(long degree, poly term1, LPoly* lpoly1, poly term2, LPoly* lpoly2);
         long    getDeg();
         poly    getT1();
+        poly*   getAdT1();
+        LPoly*  getAdLp1();
         poly    getLp1Poly();
         poly    getLp1Term();
         int     getLp1Index();
         poly    getT2();
+        poly*   getAdT2();
+        LPoly*  getAdLp2();
         poly    getLp2Poly();
         poly    getLp2Term();
         int     getLp2Index();
@@ -80,11 +84,11 @@ structure of rules(i.e. already computed / known labels)
 */
 class Rule {
     private:
-        int*    index;      // index of the labeled polynomial the rule comes from 
-        poly*   term;       // term of the labeled polynomial the rule comes from
+        int     index;      // index of the labeled polynomial the rule comes from 
+        poly    term;       // term of the labeled polynomial the rule comes from
         LPoly*  origin;     // pointer of the LPoly which generated this rule (needed in criterion2())
     public:
-                Rule(int* i, poly* term);
+                Rule(int i, poly term, LPoly* l);
         int     getIndex();
         poly    getTerm();
         LPoly*  getOrigin();

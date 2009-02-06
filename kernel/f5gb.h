@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.21 2009-02-04 19:27:12 ederc Exp $ */
+/* $Id: f5gb.h,v 1.22 2009-02-06 20:12:35 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -34,7 +34,7 @@ computes incrementally gbs of subsets of the input
 gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}  
 ==================================================
 */
-LList* F5inc(int* i, poly* f_i, LList* gPrev, poly* ONE);
+LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, int* reductionToZero);
 
 /*
 ================================================================
@@ -64,8 +64,37 @@ bool criterion2(poly* t, LNode* l, RTagList* rTag);
 Criterion 2, i.e. Rewritten Criterion, for its second call in sPols(), with added lastRuleTested parameter
 ==========================================================================================================
 */
-bool criterion2(poly* t, LNode* l, RTagList* rTag, Rule* lastRuleTested);
- 
+bool criterion2(poly* t, LPoly* l, RTagList* rTag, Rule* lastRuleTested);
+
+/*
+==================================
+Computation of S-Polynomials in F5
+==================================
+*/
+void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList, int* reductionsToZero);
+
+/*
+========================================================================
+reduction including subalgorithm topReduction() using Faugere's criteria
+========================================================================
+*/
+LNode* reduction(LList* sPolyList, LList* completed, ideal gbPrev, int* reductionsToZero);
+
+/*
+=====================================================================================
+top reduction in F5, i.e. reduction of a given S-polynomial by labeled polynomials of
+the same index whereas the labels are taken into account
+=====================================================================================
+*/
+LNode* topReduction(LNode* l, LList* gPrev, LList* completed); 
+
+/*
+=====================================================================
+subalgorithm to find a possible reductor for the labeled polynomial l
+=====================================================================
+*/
+LPoly* findReductor(LNode* l, LList* gPrev, LList* completed);
+
 /*
 ======================================
 main function of our f5 implementation

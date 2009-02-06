@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5lists.h,v 1.5 2009-02-04 19:27:12 ederc Exp $ */
+/* $Id: f5lists.h,v 1.6 2009-02-06 20:12:35 ederc Exp $ */
 /*
 * ABSTRACT: list interface
 */
@@ -40,18 +40,19 @@ class LNode {
         LNode* next;
     public:
         // generating new list elements from the labeled / classical polynomial view
+                LNode();
                 LNode(LPoly* lp);
                 LNode(LPoly* lp, LNode* l);
-                LNode(poly* t, int* i, poly* p);
-                LNode(poly* t, int* i, poly* p, LNode* l);
+                LNode(poly t, int i, poly p);
+                LNode(poly t, int i, poly p, LNode* l);
                 LNode(LNode* ln);
                 ~LNode();
         // insert new elements to the list in first place from the labeled / classical polynomial view
         LNode*  insert(LPoly* lp);
-        LNode*  insert(poly* t, int* i, poly* p);
+        LNode*  insert(poly t, int i, poly p);
         // insert new elements to the list with resp. to increasing labels
         // only used for the S-polys to be reduced (TopReduction building new S-polys with higher label)
-        LNode*  insertByLabel(LPoly* lp);
+        LNode*  insertByLabel(poly t, int i, poly p);
         // deletes the first elements of the list with the same degree
         // get next from current LNode
         LNode*  getNext();
@@ -62,7 +63,13 @@ class LNode {
         // get the data from the LPoly saved in LNode
         poly    getPoly();
         poly    getTerm();
-        int     getIndex();
+        int     getIndex(); 
+        bool    getDel();
+        // set the data from the LPoly saved in LNode
+        void    setPoly(poly p);
+        void    setTerm(poly t);
+        void    setIndex(int i);
+        void    setDel(bool d);
         // test if for any list element the polynomial part of the data is equal to *p
         bool    polyTest(poly* p);
         LNode*  getNext(LNode* l);
@@ -77,18 +84,21 @@ class LList(lists of LPolys)
 class LList {
     private:
         LNode*  first;
+        int     length;
     public:
+                LList();
                 LList(LPoly* lp);
-                LList(poly* t,int* i,poly* p);
+                LList(poly t,int i,poly p);
                 ~LList();
         void    insert(LPoly* lp);
         // insertion in front of the list
-        void    insert(poly* t,int* i, poly* p);
-        void    insertByLabel(LPoly* lp);
+        void    insert(poly t,int i, poly p);
+        void    insertByLabel(poly t, int i, poly p);
         void    deleteByDeg();
         bool    polyTest(poly* p);
         LNode*  getFirst(); 
         LNode*  getNext(LNode* l);
+        int     getLength();
 };
 
 
@@ -146,14 +156,21 @@ class CNode {
                 ~CNode(); 
         CNode*  insert(CPair* c, CNode* last); 
         CNode*  getMinDeg();
+        CPair*  getData();
+        CNode*  getNext();
+        LPoly*  getAdLp1();
+        LPoly*  getAdLp2();
         poly    getLp1Poly();
         poly    getLp2Poly();
         poly    getLp1Term();
         poly    getLp2Term();
-        poly    getT1();   
+        poly    getT1(); 
+        poly*   getAdT1();  
         poly    getT2(); 
+        poly*   getAdT2();  
         int     getLp1Index();
         int     getLp2Index();
+        Rule*   getLastRuleTested();
         void    print();
 };
 
@@ -173,6 +190,7 @@ class CList {
                 CList(); 
                 CList(CPair* c); 
                 ~CList(); 
+        CNode*  getFirst();
         void    insert(CPair* c);
         CNode*  getMinDeg();
         void    print();
@@ -193,6 +211,7 @@ class RNode {
                 RNode(Rule* r);
                 ~RNode();
         RNode*  insert(Rule* r);
+        RNode*  insert(int i, poly t, LPoly* l);
         RNode*  getNext();
         Rule*   getRule();
         int     getRuleIndex();
@@ -214,6 +233,7 @@ class RList {
                 RList(Rule* r);
                 ~RList();
         void    insert(Rule* r);
+        void    insert(int i, poly t, LPoly* l);
         RNode*  getFirst();
         Rule*   getRule();
 };
@@ -256,6 +276,7 @@ class RTagList {
                 ~RTagList();
         // declaration with first as parameter in LTagNode due to sorting of LTagList
         void    insert(RNode* r);
+        void    insert(int i, poly* t, LPoly* l);
         RNode*  getFirst();
         RNode*  get(int idx);
 };
