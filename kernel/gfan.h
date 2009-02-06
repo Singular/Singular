@@ -1,1 +1,3 @@
-ideal getGB(ideal inputIdeal
+#include "intvec.h"
+
+ideal getGB(ideal inputIdeal);
