@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.290 2009-02-06 07:54:11 monerjan Exp $ */
+/* $Id: extra.cc,v 1.291 2009-02-06 15:16:16 monerjan Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -3074,13 +3074,7 @@ if (strcmp(sys_cmd,"gfan")==0)
 	}
 ideal I=((ideal)h->Data());
 res->rtyp=IDEAL_CMD;
-/*
- to do: 
- create ../kernel/gfan.h & ../kernel/gfan.cc
- #include "gfan.h"
-
-res->data=(void*) gfan(I); //needs to be included
-*/
+res->data=(ideal) gfan(I);
 	
 return FALSE; //Everything went fine	
 }
