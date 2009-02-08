@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.cc,v 1.23 2009-02-06 20:12:35 ederc Exp $ */
+/* $Id: f5gb.cc,v 1.24 2009-02-08 19:17:54 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -24,7 +24,8 @@
 #include "f5data.h"
 #include "f5lists.h"
 
-
+int reductionsToZero   =  0;
+//*reductionsToZero       =   0;
 
 /*
 ====================================================================
@@ -68,7 +69,7 @@ computes incrementally gbs of subsets of the input
 gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}
 ==================================================
 */
-LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, int* reductionsToZero) {
+LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE) {
     int j;
     // tag the first element of index i-1 for criterion 1 
     LTagList* lTag  =   new LTagList(gPrev->getFirst());
@@ -99,9 +100,9 @@ LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, int* reducti
         // the corresponding rules to the list rules
         // NOTE: inside there is a second check of criterion 2 if new rules are 
         // added
-        computeSPols(critPairsMinDeg,rTag,rules,sPolyList,reductionsToZero);
+        computeSPols(critPairsMinDeg,rTag,rules,sPolyList);
          
-        reducedLPolys   =   reduction(sPolyList, completed, gbPrev, reductionsToZero);
+        reducedLPolys   =   reduction(sPolyList, completed, gPrev, lTag, rTag, gbPrev);
     }
     return gPrev;
 }
@@ -123,17 +124,22 @@ CList* criticalPair(LList* gPrev, CList* critPairs, LTagList* lTag, RTagList* rT
     poly* u1            =   new poly(pInit());
     poly* u2            =   new poly(pInit());
     poly* lcm           =   new poly(pInit());
+    poly t              =   pHead(first->getPoly());
     // computation of critical pairs
     while( NULL != l) {
         //pWrite( *(gPrev->getFirst()->getPoly()) );
         //pWrite( *(l->getPoly()) );
         pLcm(first->getPoly(), l->getPoly(), *lcm);
         pSetCoeff(*lcm,nOne);
-        // computing factors u1 & u2 for new labels
-        *u1 = pDivide(*lcm,pHead(first->getPoly()));
+        // computing factors u2 for new labels
+        pWrite(t);
+        *u1 = pDivide(*lcm,t);
+        pWrite(*u1);
         pSetCoeff(*u1,nOne);
+        pWrite(pHead(l->getPoly()));
         *u2 = pDivide(*lcm, pHead(l->getPoly()));
         pSetCoeff(*u2,nOne);
+        Print("IN CRITPAIRS\n");
         pWrite(*u2);
         // testing both new labels by the F5 Criterion
         if(!criterion1(u1, first, lTag) && !criterion1(u2, l, lTag) && 
@@ -177,7 +183,7 @@ bool criterion1(poly* t, LNode* l, LTagList* lTag) {
     // save the monom t1*label_term(l) as it is tested various times in the following
     poly u1 = ppMult_qq(*t,l->getTerm());
     while(NULL != testNode) {
-        if(pLmDivisibleByNoComp(pHead(testNode->getPoly()),u1)) {
+        if(pLmDivisibleByNoComp(testNode->getPoly(),u1)) {
             Print("Criterion 1 NOT passed!\n");
             return true;
         }
@@ -239,7 +245,7 @@ bool criterion2(poly* t, LPoly* l, RTagList* rTag, Rule* lastRuleTested) {
 Computation of S-Polynomials in F5
 ==================================
 */
-void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList, int* reductionsToZero) { 
+void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) { 
     CNode* temp =   first;
     poly zero   =   pInit();
     while(NULL != temp->getData()) {
@@ -265,12 +271,14 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList, 
                             // origin of rule can be set NULL as the labeled polynomial
                             // will never be used again as it is zero => no problems with 
                             // further criterion2() tests and termination conditions
-                            *reductionsToZero++;
+                            reductionsToZero++;
                             rules->insert(temp->getLp1Index(),temp->getT1(),NULL);
+                            rTag->setFirst(rules->getFirst());
                         }
                         else {
                             sPolyList->insert(temp->getT1(),temp->getLp1Index(),sp);
                             rules->insert(temp->getLp1Index(),temp->getT1(),sPolyList->getFirst()->getLPoly());
+                            rTag->setFirst(rules->getFirst());
                         }
                         // data is saved in sPolyList or zero => delete sp
                         pDelete(&sp);
@@ -289,12 +297,15 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList, 
                         // origin of rule can be set NULL as the labeled polynomial
                         // will never be used again as it is zero => no problems with 
                         // further criterion2() tests and termination conditions
-                        *reductionsToZero++;
+                        reductionsToZero++;
                         rules->insert(temp->getLp1Index(),temp->getT1(),NULL);
+                        rTag->setFirst(rules->getFirst());
+
                     }
                     else {
                         sPolyList->insert(temp->getT1(),temp->getLp1Index(),sp);
                         rules->insert(temp->getLp1Index(),temp->getT1(),sPolyList->getFirst()->getLPoly());
+                        rTag->setFirst(rules->getFirst());
                     }
                     // data is saved in sPolyList or zero => delete sp
                     pDelete(&sp);
@@ -315,26 +326,42 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList, 
 reduction including subalgorithm topReduction() using Faugere's criteria
 ========================================================================
 */
-LNode* reduction(LList* sPolyList, LList* completed, ideal gbPrev, int* reductionsToZero) { 
-    poly zero   =   pInit();
+LNode* reduction(LList* sPolyList, LList* completed, LList* gPrev, LTagList* lTag, RTagList* rTag, 
+                 ideal gbPrev) { 
+    // temporary normal form and zero polynomial for testing
+    poly tempNF =   pInit();
+    poly zero   =   pInit();  
     // compute only if there are any S-polynomials to be reduced
     if(NULL != sPolyList->getFirst()->getLPoly()) {
         LNode* temp =   sPolyList->getFirst();
         while(NULL != temp->getLPoly()) {
-            temp->setPoly(kNF(gbPrev,currQuotient,temp->getPoly()));
+            poly test   =   temp->getPoly();
+            Print("ADDRESS BEFORE:  %p\n",&test);
+            tempNF = kNF(gbPrev,currQuotient,temp->getPoly());  
+            temp->setPoly(tempNF);
+            Print("ADDRESS AFTER:  %p\n",&test);
             Print("Nach NORMAL FORM: ");
             pWrite(temp->getPoly());
-            // test if temp->getPoly() is zero polynomial
-            if(!pCmp(temp->getPoly(),zero)) {
-                *reductionsToZero++;
+            // test if normal form is zero
+            if(0 == pLmCmp(temp->getPoly(),zero)) {
+            Print("HIER\n");
+                reductionsToZero++;
                 // TODO: sPolyList -> delete first element of list as it is zero and done
+                
+                temp = temp->getNext();
+                // TODO: problem is that when deleting the first element, the origin of the 
+                // corresponding rule is deleted!
+                //sPolyList->setFirst(temp);
             }
-            //completed   =   topReduction();
-            // in topReduction() the investigated first element of sPolyList will be deleted after its
-            // reduction has finished => the next to be investigated element is the newly first element
-            // in sPolyList => the while loop is finite
-            // first possible after implementation of topReduction(): temp = sPolyList->getFirst();
-            temp    =   temp->getNext();
+            else {
+            //Print("HIER\n");
+                topReduction(temp, completed, gPrev, lTag, rTag);
+                // in topReduction() the investigated first element of sPolyList will be deleted after its
+                // reduction has finished => the next to be investigated element is the newly first element
+                // in sPolyList => the while loop is finite
+                // first possible after implementation of topReduction(): temp = sPolyList->getFirst();
+                temp    =   temp->getNext();
+            }
         }
     }
     return NULL;
@@ -348,9 +375,27 @@ top reduction in F5, i.e. reduction of a given S-polynomial by labeled polynomia
 the same index whereas the labels are taken into account
 =====================================================================================
 */
-LNode* topReduction(LNode* l, LList* gPrev, LList* completed) {
-    LPoly* red  =   findReductor(l, gPrev, completed);
-    return NULL;
+void topReduction(LNode* l, LList* completed, LList* gPrev, LTagList* lTag, RTagList* rTag) {
+    Print("In topREDUCTION!\n");
+    LRed* red   =   new LRed();
+    do {
+        red  =   findReductor(l, completed, gPrev, lTag, rTag, 
+                              red->getGPrevRedCheck(), red->getCompletedRedCheck());
+        // no reductor found
+        if(NULL == red) {
+            pNorm(l->getPoly());
+            completed->insert(l->getLPoly());
+            
+        }
+        // reductor found
+        else {
+            Print("REDUCTOR VORHER:  ");
+            pWrite(red->getPoly()); 
+            red->setPoly(ppMult_nn(red->getPoly(),pGetCoeff(l->getPoly())));
+            Print("REDUCTOR NACHHER:  ");
+            pWrite(red->getPoly());
+        }            
+    } while(NULL != red);
 }
 
 
@@ -360,7 +405,88 @@ LNode* topReduction(LNode* l, LList* gPrev, LList* completed) {
 subalgorithm to find a possible reductor for the labeled polynomial l
 =====================================================================
 */
-LPoly* findReductor(LNode* l, LList* gPrev, LList* completed) {
+LRed* findReductor(LNode* l,LList* completed,LList* gPrev,LTagList* lTag,RTagList* rTag,
+                    LNode* gPrevRedCheck, LNode* completedRedCheck) {
+    number nOne     =   nInit(1);
+    poly u          =   pInit();
+    poly redPoly    =   pInit();
+    poly t          =   pHead(l->getPoly());
+    LNode* temp     =   new LNode();
+    // setting starting point for search of reductors in gPrev
+    if(NULL != gPrevRedCheck) { 
+        temp =   gPrevRedCheck;
+    }
+    else {
+        temp =   gPrev->getFirst();
+    }
+    // search only for reductors with the same index, as reductions with elements of lower
+    // index where already done in reduction() beforehand
+    while(NULL != temp->getLPoly() && temp->getIndex() == l->getIndex()) {
+        // divides head term t?
+        if(pLmDivisibleByNoComp(temp->getPoly(),t)) {
+            u       =   pDivide(t,pHead(temp->getPoly()));
+            pSetCoeff(u,nOne);
+            // multiply reductor with factor and normalize it, i.e. LC = 1
+            redPoly =   ppMult_qq(u,temp->getPoly());
+            pNorm(redPoly);
+            u       =   ppMult_qq(u,temp->getTerm());
+            Print("IN FIND REDUCTOR:  ");
+            pWrite(u);
+            pWrite(redPoly);
+            // same label? NOTE: also used to 
+            if(pLmCmp(u,l->getTerm()) != 0) {
+                // passing criterion 2?
+                Print("HIER DRIN\n");
+                if(!criterion2(&u,temp,rTag)) {
+                    // passing criterion 1?
+                    if(!criterion1(&u,temp,lTag)) {
+                        // set tag findRedCheck such that you can start at this point when the 
+                        // next time a reductor is searched for in findReductor()
+                        LRed* red      =   new LRed(u,temp->getIndex(),redPoly,temp->getNext(),completedRedCheck);
+                        return red;
+                    }
+                }
+            }
+        }
+        temp    =   temp->getNext();
+    }
+
+    // do the same as above now for the elements in completed
+    if(NULL != completedRedCheck) {
+        temp    =   completedRedCheck;
+    }
+    else {
+        temp    =   completed->getFirst();
+    }
+    // search only for reductors with the same index, as reductions with elements of lower
+    // index where already done in reduction() beforehand
+    while(NULL != temp->getLPoly()) {
+        // divides head term t?
+        if(pLmDivisibleByNoComp(temp->getPoly(),t)) {
+            u       =   pDivide(t,pHead(temp->getPoly()));
+            redPoly =   ppMult_qq(u,temp->getPoly());
+            u       =   ppMult_qq(u,temp->getTerm());
+            Print("IN FIND REDUCTOR1:  ");
+            pWrite(u);
+            pWrite(redPoly);
+            // same label? NOTE: also used to 
+            if(pLmCmp(u,l->getTerm()) != 0) {
+                // passing criterion 2?
+                if(!criterion2(&u,temp,rTag)) {
+                    // passing criterion 1?
+                    if(!criterion1(&u,temp,lTag)) {
+                        // set tag findRedCheck such that you can start at this point when the 
+                        // next time a reductor is searched for in findReductor()
+                        LRed* red      =   new LRed(u,temp->getIndex(),redPoly,gPrevRedCheck,temp->getNext());
+                        return red;
+                    }
+                }
+            }
+        }
+        temp    =   temp->getNext();
+    }
+
+    // no reductor found
     return NULL;
 }
 
@@ -373,8 +499,8 @@ MAIN:computes a gb of the ideal i in the ring r with our F5 implementation
 */
 ideal F5main(ideal id, ring r) {
     int i,j;
-    int* reductionsToZero   =   new int;
-    *reductionsToZero       =   0;
+    //static int* reductionsToZero   =   new int;
+    //*reductionsToZero       =   0;
     // 1 polynomial for defining initial labels & further tests
     poly ONE = pOne();
     i = 1;
@@ -406,6 +532,7 @@ ideal F5main(ideal id, ring r) {
     qsortDegree(&id->m[0],&id->m[IDELEMS(id)-1]);
     idShow(id);
     LList* gPrev    =   new LList(ONE, i, id->m[0]);
+    int gbLength    =   gPrev->getLength();
     pWrite(id->m[0]);
     poly p = pHead(id->m[0]);
     pWrite(p);
@@ -414,32 +541,30 @@ ideal F5main(ideal id, ring r) {
     
     // computing the groebner basis of the elements of index < actual index
     Print("Laenge der bisherigen Groebner Basis: %d\n",gPrev->getLength());
-    ideal gbPrev    =   idInit(gPrev->getLength(),1);
+    ideal gbPrev    =   idInit(gbLength,1);
     // initializing the groebner basis of elements of index < actual index
     gbPrev->m[0]    =   gPrev->getFirst()->getPoly();
     idShow(gbPrev);
     idShow(currQuotient);
 
     for(i=2; i<=IDELEMS(id); i++) {
-        gPrev   =   F5inc(i, id->m[i-1], gPrev, gbPrev, ONE, reductionsToZero);
+        gPrev   =   F5inc(i, id->m[i-1], gPrev, gbPrev, ONE);
+        // comuting new groebner basis gbPrev
+        ideal gbAdd =   idInit(gPrev->getLength()-gbLength,1);
+        LNode*  temp    =   gPrev->getFirst();
+        for(j=0;j<=gPrev->getLength()-gbLength-1;j++) {
+            gbAdd->m[j] =   temp->getPoly();
+            temp        =   temp->getNext();
+        }
+        gbPrev  =   idAdd(gbPrev,gbAdd);
+        Print("GROEBNER BASIS:\n====================================================\n");
+        idShow(gbPrev);
+        Print("===================================================\n");
+
         Print("JA\n");
-        //TODO: idAdd for computing gbPrev with the actual index!
     } 
-    // only for debugging
-    //LNode* current;
-    //LList* g_curr = new LList(lp);
-    //}
-    //for(i=2; i<IDELEMS(id); i++) {
-        //g_curr = F5inc(&i,&id->m[i],g_prev);
-        //if(g_curr->polyTest(&ONE)) {
-        //    Print("One Polynomial in Input => Computations stopped\n");
-         //   ideal id_new = idInit(1,1);
-        //    id_new->m[0] = ONE;
-        //    return(id_new);               
-        //}
-    //}
-    Print("\n\nNumber of zero-reductions:  %d\n",*reductionsToZero);
-    return(id);
+    Print("\n\nNumber of zero-reductions:  %d\n",reductionsToZero);
+    return(gbPrev);
 
 
 }

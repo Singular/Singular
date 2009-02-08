@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5data.h,v 1.3 2009-02-06 20:12:35 ederc Exp $ */
+/* $Id: f5data.h,v 1.4 2009-02-08 19:17:54 ederc Exp $ */
 /*
 * ABSTRACT: labeled polynomial interface
 */
@@ -27,21 +27,18 @@ class of labeled polynomials
 */
 class LPoly {
     private:
-        poly    term; //term of signature
-        int     index; //index of signature
-        poly    polynomial; //standard polynomial data
-        bool    del; //for deletion in TopReduction Subalgorithm
+        poly    term;           //term of signature
+        int     index;          //index of signature
+        poly    polynomial;     //standard polynomial data
     public:
-                LPoly(poly t, int i, poly p, bool d = false); 
+                LPoly(poly t, int i, poly p); 
         void    setPoly(poly p);
         poly    getPoly();
         void    setTerm(poly t);
         poly    getTerm();
         void    setIndex(int i);
         int     getIndex();
-        void    setDel(bool b);
-        bool    getDel() const;
-        void    set(poly t, int i, poly p, bool d);
+        void    set(poly t, int i, poly p);
         LPoly*  get();
 };
 
@@ -92,6 +89,7 @@ class Rule {
         int     getIndex();
         poly    getTerm();
         LPoly*  getOrigin();
+        void    setOrigin(LPoly* l);
 };
 #endif
 #endif

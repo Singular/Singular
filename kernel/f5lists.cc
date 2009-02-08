@@ -125,10 +125,6 @@ int LNode::getIndex() {
     return data->getIndex();
 }
 
-bool LNode::getDel() {
-    return data->getDel();
-}
-
 // set the data from the LPoly saved in LNode
 void LNode::setPoly(poly p) {
     data->setPoly(p);
@@ -140,10 +136,6 @@ void LNode::setTerm(poly t) {
 
 void LNode::setIndex(int i) {
     data->setIndex(i);
-}
-
-void LNode::setDel(bool d) {
-    data->setDel(d);
 }
 
 // test if for any list element the polynomial part of the data is equal to *p
@@ -222,6 +214,69 @@ LNode* LList::getNext(LNode* l) {
 int LList::getLength() {
     return length;
 }
+
+void LList::setFirst(LNode* l) {
+    LNode* temp =   first;
+    first       =   l;
+    delete(temp);
+}
+
+/*
+===================================
+functions working on the class LRed
+===================================
+*/
+LRed::LRed() {
+    data                =   NULL;
+    gPrevRedCheck       =   NULL;
+    completedRedCheck   =   NULL;
+}
+
+LRed::LRed(poly t,int i,poly p,LNode* g, LNode* c) {
+    LPoly* lp           =   new LPoly(t,i,p);
+    data                =   lp;
+    gPrevRedCheck       =   g;
+    completedRedCheck   =   c;
+}
+
+LPoly* LRed::getLPoly() {
+    return data;
+}
+
+LNode* LRed::getGPrevRedCheck() {
+    return gPrevRedCheck;
+}
+
+LNode* LRed::getCompletedRedCheck() {
+    return completedRedCheck;
+}
+
+// get the data from the LPoly saved in LNode
+poly LRed::getPoly() {
+    return data->getPoly();
+}
+
+poly LRed::getTerm() {
+    return data->getTerm();
+}
+
+int LRed::getIndex() {
+    return data->getIndex();
+}
+
+// set the data from the LPoly saved in LNode
+void LRed::setPoly(poly p) {
+    data->setPoly(p);
+}
+
+void LRed::setTerm(poly t) {
+    data->setTerm(t);
+}
+
+void LRed::setIndex(int i) {
+    data->setIndex(i);
+}
+
 
 /*
 =======================================
@@ -335,8 +390,7 @@ CNode* CNode::insert(CPair* c, CNode* last) {
             return newElement;
         }
         if( c->getDeg() == this->data->getDeg() ) { // same degree than the first list element
-            if(0 == pLmCmp(u1,ppMult_qq(this->data->getT1(), this->data->getLp1Term())) ||
-               -1 == pLmCmp(u1,ppMult_qq(this->data->getT1(), this->data->getLp1Term()))) {
+            if(1 != pLmCmp(u1,ppMult_qq(this->data->getT1(), this->data->getLp1Term()))) {
                 pWrite(u1);
                 Print("Multi-Term in CritPairs Sortierung altes Element: ");
                 pWrite(ppMult_qq(this->data->getT1(),this->data->getLp1Term()));
@@ -377,8 +431,7 @@ CNode* CNode::insert(CPair* c, CNode* last) {
                     return this;
                 }
                 if( c->getDeg() == temp->next->data->getDeg() ) {
-                    if(0 == pLmCmp(u1,ppMult_qq(temp->next->data->getT1(),temp->next->data->getLp1Term())) || 
-                       -1 == pLmCmp(u1,ppMult_qq(temp->next->data->getT1(),temp->next->data->getLp1Term()))) { 
+                    if(1 != pLmCmp(u1,ppMult_qq(temp->next->data->getT1(),temp->next->data->getLp1Term()))) { 
                         CNode* newElement   =   new CNode(c, temp->next);
                         temp->next          =   newElement;
                         return this;
@@ -604,6 +657,10 @@ poly RNode::getRuleTerm() {
     return data->getTerm();
 }
 
+LPoly* RNode::getRuleOrigin() {
+    return data->getOrigin();
+}
+
 /*
 ====================================
 functions working on the class RList
@@ -659,7 +716,7 @@ RTagNode::RTagNode(RNode* r, RTagNode* n) {
     delete data;   
 }
        
-// declaration with first as parameter due to sorting of LTagList
+// declaration with first as parameter due to sorting of RTagList
 RTagNode* RTagNode::insert(RNode* r) {
     Print("Hier1\n");
     RTagNode* newElement  = new RTagNode(r, this);
@@ -688,6 +745,9 @@ RNode* RTagNode::get(int idx, int length) {
     }
 }
 
+void RTagNode::set(RNode* r) {
+    this->data  =   r;
+}
 
 /*
 =======================================
@@ -717,5 +777,9 @@ RNode* RTagList::getFirst() {
 
 RNode* RTagList::get(int idx) {
     return first->get(idx, length);
+}
+
+void RTagList::setFirst(RNode* r) {
+    first->set(r);
 }
 #endif

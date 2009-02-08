@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5data.cc,v 1.3 2009-02-06 20:12:35 ederc Exp $ */
+/* $Id: f5data.cc,v 1.4 2009-02-08 19:17:54 ederc Exp $ */
 /*
 * ABSTRACT: lpolynomial definition 
 */
@@ -29,8 +29,8 @@
 all functions working on the class LPoly for labeled polynomials
 ================================================================
 */
-LPoly::LPoly(poly t,int i,poly p,bool d) {
-    set(t,i,p,d);
+LPoly::LPoly(poly t,int i,poly p) {
+    set(t,i,p);
 }
 
 void LPoly::setPoly(poly p)  {
@@ -45,10 +45,6 @@ void LPoly::setIndex(int i) {
     index = i;
 }
 
-void LPoly::setDel(bool b) {
-    del = b;
-}
-
 poly LPoly::getPoly() {
     return polynomial;
 }
@@ -61,15 +57,10 @@ int LPoly::getIndex() {
     return index;
 }
 
-bool LPoly::getDel() const {
-    return del;
-}
-
-void LPoly::set(poly t, int i, poly p, bool d) {
+void LPoly::set(poly t, int i, poly p) {
     this->setTerm(t);
     this->setIndex(i);
     this->setPoly(p);
-    this->setDel(d);
 }
 
 LPoly* LPoly::get() {
@@ -167,5 +158,9 @@ poly Rule::getTerm() {
 
 LPoly* Rule::getOrigin() {
     return origin;
+}
+
+void Rule::setOrigin(LPoly* l) {
+    origin  =   l;
 }
 #endif
