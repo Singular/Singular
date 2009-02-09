@@ -1,5 +1,9 @@
 /*
-Compute the Gröbner fan of an ideal
+Compute the Grï¿½bner fan of an ideal
+Author: $Author: monerjan $
+Date: $Date: 2009-02-09 20:45:27 $
+Header: $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.5 2009-02-09 20:45:27 monerjan Exp $
+Id: $id$
 */
 
 #include "mod2.h"
@@ -74,4 +78,3 @@ ideal gfan(ideal inputIdeal)
 	getWallIneq(res);
 	return res;
 }
-
