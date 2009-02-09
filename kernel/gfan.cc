@@ -1,9 +1,9 @@
 /*
 Compute the Gr�bner fan of an ideal
 Author: $Author: monerjan $
-Date: $Date: 2009-02-09 20:45:27 $
-Header: $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.5 2009-02-09 20:45:27 monerjan Exp $
-Id: $id$
+Date: $Date: 2009-02-09 20:46:59 $
+Header: $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.6 2009-02-09 20:46:59 monerjan Exp $
+Id: $Id: gfan.cc,v 1.6 2009-02-09 20:46:59 monerjan Exp $
 */
 
 #include "mod2.h"
