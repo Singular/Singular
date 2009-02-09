@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.cc,v 1.24 2009-02-08 19:17:54 ederc Exp $ */
+/* $Id: f5gb.cc,v 1.25 2009-02-09 14:24:08 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -25,7 +25,6 @@
 #include "f5lists.h"
 
 int reductionsToZero   =  0;
-//*reductionsToZero       =   0;
 
 /*
 ====================================================================
@@ -179,16 +178,19 @@ Criterion 1, i.e. Faugere's F5 Criterion
 */
 bool criterion1(poly* t, LNode* l, LTagList* lTag) {
     // starts at the first element in gPrev with index = (index of l)-1, these tags are saved in lTag
-    LNode* testNode =   lTag->get(l->getIndex());
-    // save the monom t1*label_term(l) as it is tested various times in the following
+	LNode* testNode =   lTag->get(l->getIndex());
+	// save the monom t1*label_term(l) as it is tested various times in the following
     poly u1 = ppMult_qq(*t,l->getTerm());
     while(NULL != testNode) {
         if(pLmDivisibleByNoComp(testNode->getPoly(),u1)) {
             Print("Criterion 1 NOT passed!\n");
             return true;
         }
-        testNode    =   testNode->getNext();
+        //pWrite(testNode->getNext()->getPoly());
+		testNode    =   testNode->getNext();
     }
+    Print("HIER DRIN CRITERION 1\n");
+	
     return false;
 }
 
@@ -200,17 +202,27 @@ Criterion 2, i.e. Rewritten Criterion
 =====================================
 */
 bool criterion2(poly* t, LNode* l, RTagList* rTag) {
+	Print("HIER DRIN CRITERION 2:=========================\n");
     // start at the previously added element to gPrev, as all other elements will have the same index for sure
-    RNode* testNode =   rTag->get(l->getIndex());
-    // save the monom t1*label_term(l) as it is tested various times in the following
+	RNode* testNode =   rTag->get(l->getIndex());
+    Print("ADDRESS TEST NODE: %p\n", testNode);
+	// save the monom t1*label_term(l) as it is tested various times in the following
     poly u1 = ppMult_qq(*t,l->getTerm());
+	Print("Poly u1: ");
+	pWrite(u1);
     // first element added to rTag was NULL, check for this
-    while(NULL != testNode && testNode->getRule()->getOrigin() != l->getLPoly()) {
-        if(pLmDivisibleByNoComp(ppMult_qq(*t,l->getTerm()),testNode->getRuleTerm())) {
+    while(NULL != testNode && NULL != testNode->getRule() && testNode->getRule()->getOrigin() != l->getLPoly()) {
+        Print("----------------------------------------------------------------------------------------------------------------------------------------------------\n");
+		pWrite(ppMult_qq(*t,l->getTerm()));
+		pWrite(testNode->getRuleTerm());
+		if(pLmDivisibleBy(ppMult_qq(*t,l->getTerm()),testNode->getRuleTerm())) {
             Print("Criterion 2 NOT passed!\n");
             return true;
         }
-        testNode    =   testNode->getNext();
+    Print("HIER AUCH DRIN?\n");
+		Print("TEST NODE ADDRESS: %p\n",testNode->getNext());
+		Print("TEST NODE LPOLY ADDRESS: %p\n",testNode->getNext()->getRule());
+		testNode    =   testNode->getNext();
     }
     return false;
 }
@@ -224,16 +236,16 @@ Criterion 2, i.e. Rewritten Criterion, for its second call in computeSPols(), wi
 */
 bool criterion2(poly* t, LPoly* l, RTagList* rTag, Rule* lastRuleTested) {
     // start at the previously added element to gPrev, as all other elements will have the same index for sure
-    RNode* testNode =   rTag->getFirst();
+	RNode* testNode =   rTag->getFirst();
     // save the monom t1*label_term(l) as it is tested various times in the following
     poly u1 = ppMult_qq(*t,l->getTerm());
-    // first element added to rTag was NULL, check for this
-    while(NULL != testNode && testNode->getRule() != lastRuleTested) {
-        if(pLmDivisibleByNoComp(ppMult_qq(*t,l->getTerm()),testNode->getRuleTerm())) {
+	// first element added to rTag was NULL, check for this
+	while(NULL != testNode && NULL != testNode->getRule() && testNode->getRule() != lastRuleTested) {
+        if(pLmDivisibleBy(testNode->getRuleTerm(),ppMult_qq(*t,l->getTerm()))) {
             Print("Criterion 2 NOT passed!\n");
             return true;
         }
-        testNode    =   testNode->getNext();
+		testNode    =   testNode->getNext();
     }
     return false;
 }
@@ -271,7 +283,8 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) 
                             // origin of rule can be set NULL as the labeled polynomial
                             // will never be used again as it is zero => no problems with 
                             // further criterion2() tests and termination conditions
-                            reductionsToZero++;
+                            Print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ZERO REDUCTION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+							reductionsToZero++;
                             rules->insert(temp->getLp1Index(),temp->getT1(),NULL);
                             rTag->setFirst(rules->getFirst());
                         }
@@ -297,6 +310,7 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) 
                         // origin of rule can be set NULL as the labeled polynomial
                         // will never be used again as it is zero => no problems with 
                         // further criterion2() tests and termination conditions
+                            Print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ZERO REDUCTION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
                         reductionsToZero++;
                         rules->insert(temp->getLp1Index(),temp->getT1(),NULL);
                         rTag->setFirst(rules->getFirst());
@@ -345,6 +359,7 @@ LNode* reduction(LList* sPolyList, LList* completed, LList* gPrev, LTagList* lTa
             // test if normal form is zero
             if(0 == pLmCmp(temp->getPoly(),zero)) {
             Print("HIER\n");
+                            Print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ZERO REDUCTION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
                 reductionsToZero++;
                 // TODO: sPolyList -> delete first element of list as it is zero and done
                 
