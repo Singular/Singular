@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.116 2009-01-06 16:53:54 Singular Exp $ */
+/* $Id: kutil.cc,v 1.117 2009-02-10 18:53:04 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -6422,6 +6422,77 @@ int posInT_pLength(const TSet set,const int length,LObject &p)
   }
 }
 #endif
+
+// kstd1.cc:
+int redFirst (LObject* h,kStrategy strat);
+int redEcart (LObject* h,kStrategy strat);
+void enterSMora (LObject p,int atS,kStrategy strat, int atR=-1);
+void enterSMoraNF (LObject p,int atS,kStrategy strat, int atR=-1);
+// ../Singular/misc.cc:
+char *  showOption();
+
+void kDebugPrint(kStrategy strat)
+{
+  PrintS("red: ");
+    if (strat->red==redFirst) PrintS("redFirst\n");
+    else if (strat->red==redHoney) PrintS("redHoney\n");
+    else if (strat->red==redEcart) PrintS("redEcart\n");
+    else if (strat->red==redHomog) PrintS("redHomog\n");
+    else  Print("%x\n",strat->red);
+  PrintS("posInT: ");
+    if (strat->posInT==posInT0) PrintS("posInT0\n");
+    else if (strat->posInT==posInT0) PrintS("posInT0\n");
+    else if (strat->posInT==posInT1) PrintS("posInT1\n");
+    else if (strat->posInT==posInT11) PrintS("posInT11\n");
+    else if (strat->posInT==posInT110) PrintS("posInT110\n");
+    else if (strat->posInT==posInT13) PrintS("posInT13\n");
+    else if (strat->posInT==posInT15) PrintS("posInT15\n");
+    else if (strat->posInT==posInT17) PrintS("posInT17\n");
+    else if (strat->posInT==posInT17_c) PrintS("posInT17_c\n");
+    else if (strat->posInT==posInT19) PrintS("posInT19\n");
+    else if (strat->posInT==posInT2) PrintS("posInT2\n");
+#ifdef HAVE_MORE_POS_IN_T
+    else if (strat->posInT==posInT_EcartFDegpLength) PrintS("posInT_EcartFDegpLength\n");
+    else if (strat->posInT==posInT_FDegpLength) PrintS("posInT_FDegpLength\n");
+    else if (strat->posInT==posInT_pLength) PrintS("posInT_pLength\n");
+#endif
+    else if (strat->posInT==posInT_EcartpLength) PrintS("posInT_EcartpLength\n");
+    else if (strat->posInT==posInTrg0) PrintS("posInTrg0\n");
+    else  Print("%x\n",strat->posInT);
+  PrintS("posInL: ");
+    if (strat->posInL==posInL0) PrintS("posInL0\n");
+    else if (strat->posInL==posInL10) PrintS("posInL10\n");
+    else if (strat->posInL==posInL11) PrintS("posInL11\n");
+    else if (strat->posInL==posInL110) PrintS("posInL110\n");
+    else if (strat->posInL==posInL13) PrintS("posInL13\n");
+    else if (strat->posInL==posInL15) PrintS("posInL15\n");
+    else if (strat->posInL==posInL17) PrintS("posInL17\n");
+    else if (strat->posInL==posInL17_c) PrintS("posInL17\n");
+    else if (strat->posInL==posInLSpecial) PrintS("posInLSpecial\n");
+    else if (strat->posInL==posInLrg0) PrintS("posInLrg0\n");
+    else  Print("%x\n",strat->posInL);
+  PrintS("enterS: ");
+    if (strat->enterS==enterSBba) PrintS("enterSBba\n");
+    else if (strat->enterS==enterSMora) PrintS("enterSMora\n");
+    else if (strat->enterS==enterSMoraNF) PrintS("enterSMoraNF\n");
+    else  Print("%x\n",strat->enterS);
+  PrintS("initEcart: ");
+    if (strat->initEcart==initEcartBBA) PrintS("initEcartBBA\n");
+    else if (strat->initEcart==initEcartNormal) PrintS("initEcartNormal\n");
+    else  Print("%x\n",strat->initEcart);
+  PrintS("initEcartPair: ");
+    if (strat->initEcartPair==initEcartPairBba) PrintS("initEcartPairBba\n");
+    else if (strat->initEcartPair==initEcartPairMora) PrintS("initEcartPairMora\n");
+    else  Print("%x\n",strat->initEcartPair);
+  Print("homog=%d, LazyDegree=%d, LazyPass=%d, ak=%d,\n",
+         strat->homog, strat->LazyDegree,strat->LazyPass, strat->ak);
+  Print("honey=%d, sugarCrit=%d, Gebauer=%d, noTailReduction=%d\n",
+         strat->honey,strat->sugarCrit,strat->Gebauer,strat->noTailReduction,strat->use_buckets);
+  Print("posInLDependsOnLength=%d, use_buckets=%d\n",
+         strat->posInLDependsOnLength,strat->use_buckets);
+   PrintS(showOption());PrintLn();
+}
+
 
 #ifdef HAVE_SHIFTBBA
 poly pMove2CurrTail(poly p, kStrategy strat)

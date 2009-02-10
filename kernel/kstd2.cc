@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.79 2008-12-26 18:15:40 levandov Exp $ */
+/* $Id: kstd2.cc,v 1.80 2009-02-10 18:53:04 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -911,6 +911,7 @@ poly redNF (poly h,int &max_ind,kStrategy strat)
 #ifdef KDEBUG
 static int bba_count = 0;
 #endif
+void kDebugPrint(kStrategy strat);
 
 ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 {
@@ -949,6 +950,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #ifdef HAVE_TAIL_RING
   kStratInitChangeTailRing(strat);
 #endif
+  //kDebugPrint(strat);
 
   /* compute------------------------------------------------------- */
   while (strat->Ll >= 0)
