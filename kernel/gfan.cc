@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 Author: $Author: monerjan $
-Date: $Date: 2009-02-09 20:51:48 $
-Header: $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.7 2009-02-09 20:51:48 monerjan Exp $
-Id: $Id: gfan.cc,v 1.7 2009-02-09 20:51:48 monerjan Exp $
+Date: $Date: 2009-02-10 12:03:50 $
+Header: $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.8 2009-02-10 12:03:50 monerjan Exp $
+Id: $Id: gfan.cc,v 1.8 2009-02-10 12:03:50 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -36,31 +36,65 @@ ideal getGB(ideal inputIdeal)
 void getWallIneq(ideal I)
 {
 	#ifdef gfan_DEBUG
-	printf("Computing Inequalities...\n");
+	printf("*** Computing Inequalities... ***\n");
 	#endif
 
-	// Exponentenvektor
-	Exponent_t leadexp,aktexp,diffexp;
+	//All variables go here - except ineq matrix
+	int lengthGB=IDELEMS(I);	// # of polys in the groebner basis
+	int pCompCount;			// # of terms in a poly
 	poly aktpoly;
+	int numvar = pVariables; 	// # of variables in a polynomial (or ring?)
+	int leadexp[numvar];		// dirty hack of exp.vects
+	int aktexp[numvar];
+	int cols,rows; 			// will contain the dimensions of the ineq matrix
+	// End of var declaration
 
-	int lengthGB=IDELEMS(I);
 	printf("The Gröbner basis has %i elements\n",lengthGB);
+	printf("The current ring has %i variables\n",numvar);
+	cols = numvar;
+
+	//Compute the # inequalities i.e. rows of the matrix
+	rows=0; //Initialization
+	for (int ii=0;ii<IDELEMS(I);ii++)
+	{
+		aktpoly=(poly)I->m[ii];
+		rows=rows+pLength(aktpoly)-1;
+	}
+	printf("rows=%i\n",rows);
+	printf("Will create a %i x %i - matrix to store inequalities\n",rows,cols);
+	matrix ineq[rows][cols];
+
 
 	// We loop through each g\in GB
 	for (int i=0; i<IDELEMS(I); i++)
 	{
 		aktpoly=(poly)I->m[i];
-		leadexp = pGetExp(aktpoly,1); //get the exp.vect of leading monomial
-		for (int j=2;j<=pLength(aktpoly);j++)
-		{
-			aktexp=pGetExp(aktpoly,j);
-			//diffexp=pSubExp(aktpoly, leadexp,aktexp); //Dang! => runtime error
-			//printf("Exponentenvektor=%i\n",expmark);
-			//printf("Diff=%i\n",expmark-pGetExp(aktpoly,j));
-		}
-		int pCompCount;
 		pCompCount=pLength(aktpoly);
 		printf("Poly No. %i has %i components\n",i,pCompCount);
+
+		int *v=(int *)omAlloc((numvar+1)*sizeof(int));
+		pGetExpV(aktpoly,v);	//find the exp.vect in v[1],...,v[n], use pNext(p)
+
+		//Store leadexp for aktpoly
+		for (int kk=0;kk<numvar;kk++)
+		{
+			leadexp[kk]=v[kk+1];
+			printf("Leadexpcomp=%i\n",leadexp[kk]);
+		}
+
+		while (pNext(aktpoly)!=NULL)
+		{
+			aktpoly=pNext(aktpoly);
+			pSetm(aktpoly);
+			pGetExpV(aktpoly,v);
+			for (int kk=0;kk<numvar;kk++)
+			{
+//The ordering somehow gets lost here but this is acceptable, since we are only interested in the inequalities
+				aktexp[kk]=v[kk+1];
+				printf("aktexpcomp=%i\n",aktexp[kk]);
+			}
+		}//while
+
 	} //for
 	//res=(ideal)aktpoly;
 	//return res;
