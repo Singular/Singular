@@ -1,6 +1,6 @@
 // last modified 21.07.2005, Oliver Wienand
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.30 2009-02-10 11:06:20 Singular Exp $";
+version="$Id: surf.lib,v 1.31 2009-02-10 11:07:32 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: surf.lib    Procedures for Graphics with Surf
@@ -195,7 +195,7 @@ example
   plot(z^2-x^2*y);
 
 }
-proc surfer(ideal f)
+proc surfer(ideal I)
 "USAGE:   surfer(f);  f poly
 ASSUME: f defines a surface given by one equation
 RETURN: nothing
