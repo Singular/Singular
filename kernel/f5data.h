@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5data.h,v 1.4 2009-02-08 19:17:54 ederc Exp $ */
+/* $Id: f5data.h,v 1.5 2009-02-11 21:24:07 ederc Exp $ */
 /*
 * ABSTRACT: labeled polynomial interface
 */
@@ -30,15 +30,18 @@ class LPoly {
         poly    term;           //term of signature
         int     index;          //index of signature
         poly    polynomial;     //standard polynomial data
+        Rule*   _rule;
     public:
-                LPoly(poly t, int i, poly p); 
+                LPoly(poly t, int i, poly p, Rule* r=NULL);
         void    setPoly(poly p);
         poly    getPoly();
         void    setTerm(poly t);
         poly    getTerm();
         void    setIndex(int i);
         int     getIndex();
-        void    set(poly t, int i, poly p);
+        void    setRule(Rule* r);
+        Rule*   getRule();
+        void    set(poly t, int i, poly p, Rule* r);
         LPoly*  get();
 };
 
@@ -83,13 +86,10 @@ class Rule {
     private:
         int     index;      // index of the labeled polynomial the rule comes from 
         poly    term;       // term of the labeled polynomial the rule comes from
-        LPoly*  origin;     // pointer of the LPoly which generated this rule (needed in criterion2())
     public:
-                Rule(int i, poly term, LPoly* l);
+                Rule(int i, poly term);
         int     getIndex();
         poly    getTerm();
-        LPoly*  getOrigin();
-        void    setOrigin(LPoly* l);
 };
 #endif
 #endif

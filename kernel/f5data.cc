@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5data.cc,v 1.4 2009-02-08 19:17:54 ederc Exp $ */
+/* $Id: f5data.cc,v 1.5 2009-02-11 21:24:07 ederc Exp $ */
 /*
 * ABSTRACT: lpolynomial definition 
 */
@@ -29,8 +29,8 @@
 all functions working on the class LPoly for labeled polynomials
 ================================================================
 */
-LPoly::LPoly(poly t,int i,poly p) {
-    set(t,i,p);
+LPoly::LPoly(poly t,int i,poly p, Rule* r) {
+    set(t,i,p,r);
 }
 
 void LPoly::setPoly(poly p)  {
@@ -45,6 +45,10 @@ void LPoly::setIndex(int i) {
     index = i;
 }
 
+void LPoly::setRule(Rule* r) {
+    _rule   =   r;
+}
+
 poly LPoly::getPoly() {
     return polynomial;
 }
@@ -57,10 +61,14 @@ int LPoly::getIndex() {
     return index;
 }
 
-void LPoly::set(poly t, int i, poly p) {
+Rule* LPoly::getRule() {
+    return _rule;
+}
+void LPoly::set(poly t, int i, poly p, Rule* r) {
     this->setTerm(t);
     this->setIndex(i);
     this->setPoly(p);
+    this->setRule(r);
 }
 
 LPoly* LPoly::get() {
@@ -142,10 +150,9 @@ Rule* CPair::getLastRuleTested() {
 functions working on the class Rule
 ===================================
 */
-Rule::Rule(int i, poly t, LPoly* l) {
+Rule::Rule(int i, poly t) {
     index   =   i;
     term    =   t;
-    origin  =   l;
 }
 
 int Rule::getIndex() {
@@ -154,13 +161,5 @@ int Rule::getIndex() {
 
 poly Rule::getTerm() {
     return term;
-}
-
-LPoly* Rule::getOrigin() {
-    return origin;
-}
-
-void Rule::setOrigin(LPoly* l) {
-    origin  =   l;
 }
 #endif

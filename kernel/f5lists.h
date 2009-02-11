@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5lists.h,v 1.7 2009-02-08 19:17:54 ederc Exp $ */
+/* $Id: f5lists.h,v 1.8 2009-02-11 21:24:08 ederc Exp $ */
 /*
 * ABSTRACT: list interface
 */
@@ -19,7 +19,6 @@ classes for lists used in F5
 */
 class LNode;
 class LList;
-class LRed;
 class LTagNode;
 class LTagList;
 class CNode;
@@ -37,23 +36,25 @@ class LNode (nodes for lists of LPolys)
 */
 class LNode {
     private:
-        LPoly* data;
-        LNode* next;
+        LPoly*  data;
+        LNode*  next;
+        LNode*  gPrevRedCheck;
+        LNode*  completedRedCheck;
     public:
         // generating new list elements from the labeled / classical polynomial view
                 LNode();
                 LNode(LPoly* lp);
                 LNode(LPoly* lp, LNode* l);
-                LNode(poly t, int i, poly p);
-                LNode(poly t, int i, poly p, LNode* l);
+                LNode(poly t, int i, poly p, Rule* r=NULL, LNode* gPCheck=NULL, LNode* CompCheck=NULL);
+                LNode(poly t, int i, poly p, Rule* r, LNode* gPCheck, LNode* CompCheck, LNode* l);
                 LNode(LNode* ln);
                 ~LNode();
         // insert new elements to the list in first place from the labeled / classical polynomial view
         LNode*  insert(LPoly* lp);
-        LNode*  insert(poly t, int i, poly p);
+        LNode*  insert(poly t, int i, poly p, Rule* r);
         // insert new elements to the list with resp. to increasing labels
         // only used for the S-polys to be reduced (TopReduction building new S-polys with higher label)
-        LNode*  insertByLabel(poly t, int i, poly p);
+        LNode*  insertByLabel(poly t, int i, poly p, Rule* r);
         // deletes the first elements of the list with the same degree
         // get next from current LNode
         LNode*  getNext();
@@ -65,10 +66,15 @@ class LNode {
         poly    getPoly();
         poly    getTerm();
         int     getIndex(); 
+        Rule*   getRule();
+        LNode*  getGPrevRedCheck();
+        LNode*  getCompletedRedCheck();
         // set the data from the LPoly saved in LNode
         void    setPoly(poly p);
         void    setTerm(poly t);
         void    setIndex(int i);
+        void    setGPrevRedCheck(LNode* l);
+        void    setCompletedRedCheck(LNode* l);
         // test if for any list element the polynomial part of the data is equal to *p
         bool    polyTest(poly* p);
         LNode*  getNext(LNode* l);
@@ -87,12 +93,13 @@ class LList {
     public:
                 LList();
                 LList(LPoly* lp);
-                LList(poly t,int i,poly p);
+                LList(poly t,int i,poly p, Rule* r = NULL);
                 ~LList();
         void    insert(LPoly* lp);
         // insertion in front of the list
-        void    insert(poly t,int i, poly p);
-        void    insertByLabel(poly t, int i, poly p);
+        void    insert(poly t,int i, poly p, Rule* r = NULL);
+        void    insertByLabel(poly t, int i, poly p, Rule* r = NULL);
+        void    insertByLabel(LNode* l);
         void    deleteByDeg();
         bool    polyTest(poly* p);
         LNode*  getFirst(); 
@@ -101,36 +108,6 @@ class LList {
         void    setFirst(LNode* l);
 };
 
-
-/*
-=========================================
-class LRed (nodes for lists of Reductors)
-=========================================
-*/
-class LRed {
-    private:
-        LPoly* data;
-        LNode* gPrevRedCheck;
-        LNode* completedRedCheck;
-    public:
-        // generating new list elements from the labeled / classical polynomial view
-                LRed();
-                LRed(poly t, int i, poly p, LNode* g, LNode* c);
-                ~LRed();
-        // get the LPoly* out of LNode*
-        LPoly*  getLPoly();
-        // get the last reductor tested in subalgorithm findReductor() in f5gb.cc 
-        LNode*  getGPrevRedCheck();
-        LNode*  getCompletedRedCheck();
-        // get data from the labeled polynomial 
-        poly    getPoly();
-        poly    getTerm();
-        int     getIndex(); 
-        // set the data from the LPoly saved in LNode
-        void    setPoly(poly p);
-        void    setTerm(poly t);
-        void    setIndex(int i);
-};
 
 
 /*
@@ -143,6 +120,7 @@ class LTagNode {
         LNode*      data;
         LTagNode*   next;
     public:
+        LTagNode();
         LTagNode(LNode* l);
         LTagNode(LNode* l, LTagNode* n);
         ~LTagNode();
@@ -163,11 +141,34 @@ class LTagList {
         LTagNode*   first;
         int         length;
     public:
+                LTagList();
                 LTagList(LNode* l);
                 ~LTagList();
         // declaration with first as parameter in LTagNode due to sorting of LTagList
         void    insert(LNode* l);
         LNode*  get(int idx);
+        LNode*  getFirst();
+};
+
+LNode*  getGPrevRedCheck();
+LNode*  getcompletedRedCheck();
+
+
+/*
+======================================================================================
+class TopRed(return values of subalgorithm TopRed in f5gb.cc), i.e. the first elements 
+             of the lists LList* completed & LList* sPolyList
+======================================================================================
+*/
+class TopRed {
+    private:
+        LList*  _completed;
+        LList*  _toDo;
+    public:
+                TopRed();
+                TopRed(LList* c, LList* t);
+        LList*  getCompleted();
+        LList*  getToDo();
 };
 
 
@@ -242,12 +243,11 @@ class RNode {
                 RNode(Rule* r);
                 ~RNode();
         RNode*  insert(Rule* r);
-        RNode*  insert(int i, poly t, LPoly* l);
+        RNode*  insert(int i, poly t);
         RNode*  getNext();
         Rule*   getRule();
         int     getRuleIndex();
         poly    getRuleTerm();
-        LPoly*  getRuleOrigin();
 };
 
 /*
@@ -265,7 +265,7 @@ class RList {
                 RList(Rule* r);
                 ~RList();
         void    insert(Rule* r);
-        void    insert(int i, poly t, LPoly* l);
+        void    insert(int i, poly t);
         RNode*  getFirst();
         Rule*   getRule();
 };
@@ -291,6 +291,7 @@ class RTagNode {
         RNode*      getRNode();
         RNode*      get(int idx, int length);
         void        set(RNode*);
+        void        print();
 };
 
 
@@ -309,10 +310,11 @@ class RTagList {
                 ~RTagList();
         // declaration with first as parameter in LTagNode due to sorting of LTagList
         void    insert(RNode* r);
-        void    insert(int i, poly* t, LPoly* l);
         RNode*  getFirst();
         RNode*  get(int idx);
         void    setFirst(RNode* r);
+        void    print();
+        int     getLength();
 };
 #endif
 #endif

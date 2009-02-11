@@ -26,63 +26,80 @@ functions working on the class LNode
 
 // generating new list elements (labeled / classical polynomial / LNode view)
 LNode::LNode() {
-    data = NULL;
-    next = NULL;
+    data                =   NULL;
+    next                =   NULL;
+    gPrevRedCheck       =   NULL;
+    completedRedCheck   =   NULL;
 }
  LNode::LNode(LPoly* lp) {
-    data = lp;
-    next = NULL;
+    data                =   lp;
+    next                =   NULL;
+    gPrevRedCheck       =   NULL;
+    completedRedCheck   =   NULL;
 }
        
 LNode::LNode(LPoly* lp, LNode* l) {
-    data = lp;
-    next = l;
+Print("HIER LNODE\n");
+    data                =   lp;
+    next                =   l;
+    gPrevRedCheck       =   NULL;
+    completedRedCheck   =   NULL;
 }
-LNode::LNode(poly t, int i, poly p) {
-    LPoly* lp = new LPoly(t,i,p);
-    data = lp;
-    next = NULL;
+
+LNode::LNode(poly t, int i, poly p, Rule* r, LNode* gPCheck, LNode* CompCheck) {
+LPoly* lp = new LPoly(t,i,p,r);
+data                =   lp;
+next                =   NULL;
+gPrevRedCheck       =   gPCheck;
+completedRedCheck   =   CompCheck;
 }
        
-LNode::LNode(poly t, int i, poly p, LNode* l) {
-    LPoly* lp = new LPoly(t,i,p);
-    data = lp;
-    next = l;
+LNode::LNode(poly t, int i, poly p, Rule* r, LNode* gPCheck, LNode* CompCheck, LNode* l) {
+    LPoly* lp           =   new LPoly(t,i,p,r);
+    data                =   lp;
+    next                =   l;
+    gPrevRedCheck       =   gPCheck;
+    completedRedCheck   =   CompCheck;
 }
 
  LNode::LNode(LNode* ln) {
-    data = ln->getLPoly();
-    next = ln->getNext();
+    data                =   ln->getLPoly();
+    next                =   ln->getNext();
+    gPrevRedCheck       =   NULL;
+    completedRedCheck   =   NULL;
 }
         
 LNode::~LNode() {
     delete next;
+    delete gPrevRedCheck;
+    delete completedRedCheck;
     delete data;   
 }
        
 // insert new elements to the list always in front (labeled / classical polynomial view)
 LNode* LNode::insert(LPoly* lp) {
+    Print("HIER\n");
     LNode* newElement = new LNode(lp, this);
     return newElement;
 }
         
-LNode* LNode::insert(poly t, int i, poly p) {
-    LNode* newElement = new LNode(t, i, p, this);
+LNode* LNode::insert(poly t, int i, poly p, Rule* r) {
+    LNode* newElement = new LNode(t, i, p, r, NULL, NULL, this);
     return newElement;
 }
         
 // insert new elemets to the list w.r.t. increasing labels
 // only used for the S-polys to be reduced (TopReduction building new S-polys with higher label)
-LNode* LNode::insertByLabel(poly t, int i, poly p) {
+LNode* LNode::insertByLabel(poly t, int i, poly p, Rule* r) {
     if(0 == pLmCmp(t,this->getTerm()) || -1 == pLmCmp(t,this->getTerm())) {
-        LNode* newElement   =   new LNode(t, i, p, this);
+        LNode* newElement   =   new LNode(t, i, p, r, this);
         return newElement;
     }
     else {
         LNode* temp = this;
         while( NULL != temp->next->data ) {
             if( 0 == pLmCmp(t,temp->next->getTerm()) || -1 == pLmCmp(t,temp->next->getTerm())) {
-                LNode* newElement   =   new LNode(t, i, p, temp->next);
+                LNode* newElement   =   new LNode(t, i, p, r, temp->next);
                 temp->next          =   newElement;
                 return this;
             }
@@ -90,7 +107,7 @@ LNode* LNode::insertByLabel(poly t, int i, poly p) {
                 temp = temp->next;
             }
         }
-        LNode* newElement   =   new LNode(t, i, p, NULL);
+        LNode* newElement   =   new LNode(t, i, p, r, NULL);
         temp->next          =   newElement;
         return this;
     }
@@ -125,6 +142,18 @@ int LNode::getIndex() {
     return data->getIndex();
 }
 
+Rule* LNode::getRule() {
+    return data->getRule();
+}
+
+LNode* LNode::getGPrevRedCheck() {
+    return gPrevRedCheck;
+}
+
+LNode* LNode::getCompletedRedCheck() {
+    return completedRedCheck;
+}
+
 // set the data from the LPoly saved in LNode
 void LNode::setPoly(poly p) {
     data->setPoly(p);
@@ -136,6 +165,14 @@ void LNode::setTerm(poly t) {
 
 void LNode::setIndex(int i) {
     data->setIndex(i);
+}
+
+void LNode::setGPrevRedCheck(LNode* l) {
+    gPrevRedCheck   =   l;
+}
+
+void LNode::setCompletedRedCheck(LNode* l) {
+    completedRedCheck   =   l;
 }
 
 // test if for any list element the polynomial part of the data is equal to *p
@@ -170,8 +207,8 @@ LList::LList(LPoly* lp) {
     length  =   1;
 }
 
-LList::LList(poly t,int i,poly p) {
-    first   =   new LNode(t,i,p);
+LList::LList(poly t,int i,poly p,Rule* r) {
+    first   =   new LNode(t,i,p,r);
     length  =   1;
 } 
 
@@ -185,13 +222,18 @@ void LList::insert(LPoly* lp) {
     length++;
 }
 
-void LList::insert(poly t,int i, poly p) {
-    first = first->insert(t,i,p);
+void LList::insert(poly t,int i, poly p, Rule* r) {
+    first = first->insert(t,i,p,r);
     length++;
 }
 
-void LList::insertByLabel(poly t, int i, poly p) {
-    first = first->insertByLabel(t,i,p);
+void LList::insertByLabel(poly t, int i, poly p, Rule* r) {
+    first = first->insertByLabel(t,i,p,r);
+    length++;
+}
+
+void LList::insertByLabel(LNode* l) {
+    first = first->insertByLabel(l->getTerm(),l->getIndex(),l->getPoly(),l->getRule());
     length++;
 }
 
@@ -221,61 +263,6 @@ void LList::setFirst(LNode* l) {
     delete(temp);
 }
 
-/*
-===================================
-functions working on the class LRed
-===================================
-*/
-LRed::LRed() {
-    data                =   NULL;
-    gPrevRedCheck       =   NULL;
-    completedRedCheck   =   NULL;
-}
-
-LRed::LRed(poly t,int i,poly p,LNode* g, LNode* c) {
-    LPoly* lp           =   new LPoly(t,i,p);
-    data                =   lp;
-    gPrevRedCheck       =   g;
-    completedRedCheck   =   c;
-}
-
-LPoly* LRed::getLPoly() {
-    return data;
-}
-
-LNode* LRed::getGPrevRedCheck() {
-    return gPrevRedCheck;
-}
-
-LNode* LRed::getCompletedRedCheck() {
-    return completedRedCheck;
-}
-
-// get the data from the LPoly saved in LNode
-poly LRed::getPoly() {
-    return data->getPoly();
-}
-
-poly LRed::getTerm() {
-    return data->getTerm();
-}
-
-int LRed::getIndex() {
-    return data->getIndex();
-}
-
-// set the data from the LPoly saved in LNode
-void LRed::setPoly(poly p) {
-    data->setPoly(p);
-}
-
-void LRed::setTerm(poly t) {
-    data->setTerm(t);
-}
-
-void LRed::setIndex(int i) {
-    data->setIndex(i);
-}
 
 
 /*
@@ -283,6 +270,10 @@ void LRed::setIndex(int i) {
 functions working on the class LTagNode
 =======================================
 */
+LTagNode::LTagNode() {
+    data    =   NULL;
+    next    =   NULL;
+}
 
 LTagNode::LTagNode(LNode* l) {
     data = l;
@@ -332,6 +323,10 @@ LNode* LTagNode::get(int idx, int length) {
 functions working on the class LTagList
 =======================================
 */
+LTagList::LTagList() {
+    LTagNode* first =   new LTagNode();
+    length          =   0;
+}
 
 LTagList::LTagList(LNode* l) {
     LTagNode* first =   new LTagNode(l);
@@ -346,6 +341,35 @@ void LTagList::insert(LNode* l) {
 
 LNode* LTagList::get(int idx) {
     return first->get(idx, length);
+}
+
+LNode* LTagList::getFirst() {
+    return first->getLNode();
+}
+
+
+/*
+=====================================
+functions working on the class TopRed
+=====================================
+*/
+
+TopRed::TopRed() {
+    _completed  =   NULL;
+    _toDo       =   NULL;
+}
+
+TopRed::TopRed(LList* c, LList* t) {
+    _completed  =   c;
+    _toDo       =   t;
+}
+
+LList* TopRed::getCompleted() {
+    return _completed;
+}
+
+LList* TopRed::getToDo() {
+    return _toDo;
 }
 
 /*
@@ -634,8 +658,8 @@ RNode* RNode::insert(Rule* r) {
     return newElement;
 }
 
-RNode* RNode::insert(int i, poly t, LPoly* l) {
-    Rule*   r           =   new Rule(i,t,l);
+RNode* RNode::insert(int i, poly t) {
+    Rule*   r           =   new Rule(i,t);
     RNode* newElement   =   new RNode(r);
     newElement->next    =   this;
     return newElement;
@@ -657,10 +681,6 @@ poly RNode::getRuleTerm() {
     return data->getTerm();
 }
 
-LPoly* RNode::getRuleOrigin() {
-    return data->getOrigin();
-}
-
 /*
 ====================================
 functions working on the class RList
@@ -674,8 +694,8 @@ RList::RList(Rule* r) {
     first = new RNode(r);
 }
 
-void RList::insert(int i, poly t, LPoly* l) {
-    first = first->insert(i,t,l);
+void RList::insert(int i, poly t) {
+    first = first->insert(i,t);
 }
 
 void RList::insert(Rule* r) {
@@ -733,12 +753,17 @@ RNode* RTagNode::getRNode() {
 //       the element on position length-idx+1 is the right one
 RNode* RTagNode::get(int idx, int length) {
     if(idx==1 || idx==0) {
+        // NOTE: We set this NULL as putting it the last element in the list, i.e. the element having
+        //       RNode* = NULL would cost lots of iterations at each step of F5inc, with increasing
+        //       length of the list this should be prevented
         return NULL;
     }
     else {
         int j;
         RTagNode* temp = this; 
-        for(j=1; j<=length-idx+1; j++) {
+    Print("\n\nHIER IN GET IDX\n");
+    Print("FOR LOOP: %d\n",length-idx+1);    
+    for(j=1; j<=length-idx+1; j++) {
             temp = temp->next;
         }
         return temp->data;
@@ -749,6 +774,19 @@ void RTagNode::set(RNode* r) {
     this->data  =   r;
 }
 
+void RTagNode::print() {
+    RTagNode* temp  =   this;
+    Print("1. element: %d",getRNode()->getRule()->getIndex());
+    pWrite(getRNode()->getRule()->getTerm());
+    temp    =   temp->next;
+    int i   =   2;
+    while(NULL != temp->getRNode()) {
+        Print("%d. element: %d",i,getRNode()->getRule()->getIndex());
+        pWrite(getRNode()->getRule()->getTerm());
+        temp    =   temp->next;
+        i++;
+    }
+}
 /*
 =======================================
 functions working on the class LTagList
@@ -768,7 +806,9 @@ RTagList::RTagList(RNode* r) {
 // declaration with first as parameter in LTagNode due to sorting of LTagList
 void RTagList::insert(RNode* r) {
     first = first->insert(r);
-    length++;
+    Print("LENGTH:%d\n",length);
+    length = length +1;
+    Print("LENGTH:%d\n",length);
 }
 
 RNode* RTagList::getFirst() {
@@ -781,5 +821,13 @@ RNode* RTagList::get(int idx) {
 
 void RTagList::setFirst(RNode* r) {
     first->set(r);
+}
+
+void RTagList::print() {
+    first->print();
+}
+
+int RTagList::getLength() {
+    return length;
 }
 #endif
