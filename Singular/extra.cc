@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.291 2009-02-06 15:16:16 monerjan Exp $ */
+/* $Id: extra.cc,v 1.292 2009-02-11 14:57:54 monerjan Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -57,9 +57,11 @@
 
 #ifdef HAVE_RINGS
 #include "ringgb.h"
-#include "gfan.h"
 #endif
 
+#ifdef HAVE_GFAN
+#include "gfan.h"
+#endif
 
 #ifdef HAVE_F5
 #include "f5gb.h"
@@ -3064,6 +3066,7 @@ ipshell()");
 
 #endif
 
+#ifdef HAVE_GFAN
 /*======== GFAN ==============*/
 if (strcmp(sys_cmd,"gfan")==0)
 {
@@ -3079,7 +3082,7 @@ res->data=(ideal) gfan(I);
 return FALSE; //Everything went fine	
 }
 else
-
+#endif
 
 /*==================== Error =================*/
       Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );

@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 Author: $Author: monerjan $
-Date: $Date: 2009-02-10 17:04:17 $
-Header: $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.9 2009-02-10 17:04:17 monerjan Exp $
-Id: $Id: gfan.cc,v 1.9 2009-02-10 17:04:17 monerjan Exp $
+Date: $Date: 2009-02-11 14:57:55 $
+Header: $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.10 2009-02-11 14:57:55 monerjan Exp $
+Id: $Id: gfan.cc,v 1.10 2009-02-11 14:57:55 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -12,6 +12,8 @@ Id: $Id: gfan.cc,v 1.9 2009-02-10 17:04:17 monerjan Exp $
 #include "polys.h"
 #include "ideals.h"
 #include "kmatrix.h"
+#include "/users/urmel/alggeom/monerjan/cddlib/include/setoper.h" //Support for cddlib. Dirty hack
+#include "/users/urmel/alggeom/monerjan/cddlib/include/cdd.h"
 
 #ifndef gfan_DEBUG
 #define gfan_DEBUG
@@ -40,14 +42,19 @@ void getWallIneq(ideal I)
 	printf("*** Computing Inequalities... ***\n");
 	#endif
 
-	//All variables go here - except ineq matrix
+	//All variables go here - except ineq matrix and *v, see below
 	int lengthGB=IDELEMS(I);	// # of polys in the groebner basis
 	int pCompCount;			// # of terms in a poly
 	poly aktpoly;
 	int numvar = pVariables; 	// # of variables in a polynomial (or ring?)
 	int leadexp[numvar];		// dirty hack of exp.vects
 	int aktexp[numvar];
-	int cols,rows; 			// will contain the dimensions of the ineq matrix
+	int cols,rows; 			// will contain the dimensions of the ineq matrix - deprecated by
+	dd_rowrange ddrows;
+	dd_colrange ddcols;
+	dd_rowset ddredrows;		// # of redundant rows in ddineq
+	dd_NumberType ddnumb=dd_Real;	//Number type
+	dd_ErrorType dderr=dd_NoError;	//
 	// End of var declaration
 
 	printf("The Groebner basis has %i elements\n",lengthGB);
@@ -63,10 +70,15 @@ void getWallIneq(ideal I)
 	}
 	printf("rows=%i\n",rows);
 	printf("Will create a %i x %i - matrix to store inequalities\n",rows,cols);
-	int ineq[rows][cols];	// array of int vs matrix vs KMatrix ??? What's to use?
-	int aktmatrixrow=0;	// needed to store the diffs of the expvects in the rows of ineq
 
-	// We loop through each g\in GB
+	dd_rowrange aktmatrixrow=0;	// needed to store the diffs of the expvects in the rows of ddineq
+	dd_set_global_constants();
+	ddrows=rows;
+	ddcols=cols;
+	dd_MatrixPtr ddineq; 		//Matrix to store the inequalities
+	ddineq=dd_CreateMatrix(ddrows,ddcols);
+
+	// We loop through each g\in GB and compute the resulting inequalities
 	for (int i=0; i<IDELEMS(I); i++)
 	{
 		aktpoly=(poly)I->m[i];		//get aktpoly as i-th component of I
@@ -80,7 +92,7 @@ void getWallIneq(ideal I)
 		for (int kk=0;kk<numvar;kk++)
 		{
 			leadexp[kk]=v[kk+1];
-			printf("Leadexpcomp=%i\n",leadexp[kk]);
+			//printf("Leadexpcomp=%i\n",leadexp[kk]);
 			//Since we need to know the difference of leadexp with the other expvects we do nothing here
 			//but compute the diff below
 		}
@@ -95,13 +107,28 @@ void getWallIneq(ideal I)
 			{
 //The ordering somehow gets lost here but this is acceptable, since we are only interested in the inequalities
 				aktexp[kk]=v[kk+1];
-				printf("aktexpcomp=%i\n",aktexp[kk]);
-				ineq[aktmatrixrow][kk]=leadexp[kk]-aktexp[kk];	//dito
+				//printf("aktexpcomp=%i\n",aktexp[kk]);
+				//ineq[aktmatrixrow][kk]=leadexp[kk]-aktexp[kk];	//dito
+				dd_set_si(ddineq->matrix[(dd_rowrange)aktmatrixrow][kk],leadexp[kk]-aktexp[kk]);
 			}
 			aktmatrixrow=aktmatrixrow+1;
 		}//while
+
 	} //for
-	#ifdef gfan_DEBUG
+
+	// The inequalities are now stored in ddineq
+	// Next we check for superflous rows
+	ddredrows = dd_RedundantRows(ddineq, &dderr);
+	if (dderr!=dd_NoError)			// did an error occur?
+	{
+		 dd_WriteErrorMessages(stderr,dderr);	//if so tell us
+	} else
+	{
+		printf("Redundant rows: ");
+		set_fwrite(stdout, ddredrows);		//otherwise print the redundant rows
+	}//if dd_Error
+
+	#ifdef gfan_DEBUGs
 	printf("Inequalitiy matrix\n");
 	for (int i=0;i<rows;i++)
 	{
