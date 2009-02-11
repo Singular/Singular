@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.120 2009-01-21 21:40:24 motsak Exp $
+@comment $Id: NEWS.texi,v 1.121 2009-02-11 14:31:56 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -103,6 +103,9 @@ homolog.lib: kernel renamed to @nref{hom_kernel}.
 @*(See also @nref{kernel}, @nref{alg_kernel}).
 @item
 matrix.lib: new commands for computing symmetric/exterior powers(bases)
+@item
+surf.lib: new command @code{surfer}: interface to program @code{surfer}
+@*(See @nref{surf_lib}).
 @item
 teachstd.lib: spoly works now in non-commutative algebras and thus standard can be used there. 
 However if product criterion is a priori not applicable one can disable it by defining 
