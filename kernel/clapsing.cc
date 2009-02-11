@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.32 2008-12-17 15:08:50 Singular Exp $
+// $Id: clapsing.cc,v 1.33 2009-02-11 14:56:16 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -194,7 +194,7 @@ TIMING_DEFINE_PRINT( algLcmTimer );
   FACTORY_CFAOUT_PAT( tag "#= ", f )
 
 
-
+void out_cf(char *s1,const CanonicalForm &f,char *s2);
 
 
 poly singclap_gcd ( poly f, poly g )
@@ -258,13 +258,13 @@ poly singclap_gcd ( poly f, poly g )
       #endif
       #endif
       {
-	bool b=isOn(SW_USE_QGCD);
-	if ( nGetChar()==1 ) On(SW_USE_QGCD);
+        bool b=isOn(SW_USE_QGCD);
+        if ( nGetChar()==1 ) On(SW_USE_QGCD);
         CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
         Variable a=rootOf(mipo);
         CanonicalForm F( convSingAPFactoryAP( f,a ) ), G( convSingAPFactoryAP( g,a ) );
         res= convFactoryAPSingAP( gcd( F, G ) );
-	if (!b) Off(SW_USE_QGCD);
+        if (!b) Off(SW_USE_QGCD);
       }
     }
     else
@@ -970,8 +970,6 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
         printf("while okay\n");
         #endif
         libfac_interruptflag=0;
-        //else
-        //  L=Factorize(G, mipo);
 #else
         WarnS("complete factorization only for univariate polynomials");
         if (rField_is_Q_a() ||(!F.isUnivariate())) /* Q(a) */
@@ -1031,8 +1029,10 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       poly p;
       if (with_exps!=1) (**v)[j] = J.getItem().exp();
       if (rField_is_Zp() || rField_is_Q())           /* Q, Fp */
+      {
         //count_Factors(res,*v,f, j, convFactoryPSingP( J.getItem().factor() );
         res->m[j] = convFactoryPSingP( J.getItem().factor() );
+      }
       #if 0
       else if (rField_is_GF())
         res->m[j] = convFactoryGFSingGF( J.getItem().factor() );
@@ -1042,9 +1042,16 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
         intvec *w=NULL;
         if (v!=NULL) w=*v;
         if (currRing->minpoly==NULL)
-          count_Factors(res,w,j,ff,convFactoryPSingTrP( J.getItem().factor() ));
+        {
+          if(!count_Factors(res,w,j,ff,convFactoryPSingTrP( J.getItem().factor() )))
+            res->m[j]=pOne();
+        }
         else
-          count_Factors(res,w,j,ff,convFactoryAPSingAP( J.getItem().factor() ));
+        {
+          if (!count_Factors(res,w,j,ff,convFactoryAPSingAP( J.getItem().factor() )))
+
+            res->m[j]=pOne();
+        }
       }
     }
     if (rField_is_Extension() && (!pIsConstantPoly(ff)))
