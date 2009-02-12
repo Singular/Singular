@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.11 2008-11-05 15:40:39 wienand Exp $ */
+/* $Id: ideals.h,v 1.12 2009-02-12 13:31:22 motsak Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -147,7 +147,11 @@ intvec *idSort(ideal id,BOOLEAN nolex=TRUE);
 ideal   idModulo (ideal h1,ideal h2, tHomog h=testHomog, intvec ** w=NULL);
 int     idElem(const ideal F);
 matrix  idCoeffOfKBase(ideal arg, ideal kbase, poly how);
+// transpose a module
 ideal   idTransp(ideal a);
+// version of "ideal idTransp(ideal)" which works within a given ring.
+ideal id_Transp(ideal a, const ring rRing);
+
 
 intvec *idQHomWeight(ideal id);
 
@@ -159,4 +163,10 @@ poly id_GCD(poly f, poly g, const ring r);
 
 ideal idChineseRemainder(ideal *x, number *q, int rl);
 ideal idChineseRemainder(ideal *x, intvec *iv);
+
+
+ideal tensorModuleMult(const int m, const ideal M, const ring rRing); // image of certain map for BGG
+
+
+
 #endif

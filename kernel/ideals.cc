@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.66 2009-01-12 16:19:45 Singular Exp $ */
+/* $Id: ideals.cc,v 1.67 2009-02-12 13:31:22 motsak Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -3954,4 +3954,137 @@ ideal idChineseRemainder(ideal *xx, intvec *iv)
     q[i]=nInit((*iv)[i]);
   }
   return idChineseRemainder(xx,q,rl);
+}
+
+
+
+
+/*2
+* transpose a module
+* NOTE: just a version of "ideal idTransp(ideal)" which works within specified ring.
+*/
+ideal id_Transp(ideal a, const ring rRing)
+{
+  int r = a->rank, c = IDELEMS(a);
+  ideal b =  idInit(r,c);
+
+  for (int i=c; i>0; i--)
+  {
+    poly p=a->m[i-1];
+    while(p!=NULL)
+    {
+      poly h=p_Head(p, rRing);
+      int co=p_GetComp(h, rRing)-1;
+      p_SetComp(h, i, rRing);
+      p_Setm(h, rRing);
+      b->m[co] = p_Add_q(b->m[co], h, rRing);
+      pIter(p);
+    }
+  }
+  return b;
+}
+
+
+
+/*2
+* The following is needed to compute the image of certain map used in
+* the computation of cohomologies via BGG
+* let M = { w_1, ..., w_k }, k = size(M) == ncols(M), n = nvars(currRing).
+* assuming that nrows(M) <= m*n; the procedure computes:
+* transpose(M) * transpose( var(1) I_m | ... | var(n) I_m ) :== transpose(module{f_1, ... f_k}),
+* where f_i = \sum_{j=1}^{m} (w_i, v_j) gen(j),  (w_i, v_j) is a `scalar` multiplication.
+* that is, if w_i = (a^1_1, ... a^1_m) | (a^2_1, ..., a^2_m) | ... | (a^n_1, ..., a^n_m) then
+
+  (a^1_1, ... a^1_m) | (a^2_1, ..., a^2_m) | ... | (a^n_1, ..., a^n_m)
+*  var_1  ... var_1  |  var_2  ...  var_2  | ... |  var_n  ...  var(n)
+*  gen_1  ... gen_m  |  gen_1  ...  gen_m  | ... |  gen_1  ...  gen_m
++ =>
+  f_i =
+
+   a^1_1 * var(1) * gen(1) + ... + a^1_m * var(1) * gen(m) +
+   a^2_1 * var(2) * gen(1) + ... + a^2_m * var(2) * gen(m) +
+                             ...
+   a^n_1 * var(n) * gen(1) + ... + a^n_m * var(n) * gen(m);
+
+   NOTE: for every f_i we run only ONCE along w_i saving partial sums into a temporary array of polys of size m
+*/
+ideal tensorModuleMult(const int m, const ideal M, const ring rRing)
+{
+// #ifdef DEBU
+//  WarnS("tensorModuleMult!!!!");
+
+  assume(m > 0);
+  assume(M != NULL);
+
+  const int n = rRing->N;
+
+  assume(M->rank <= m * n);
+
+  const int k = IDELEMS(M);
+
+  ideal idTemp =  idInit(k,m); // = {f_1, ..., f_k }
+
+  for( int i = 0; i < k; i++ ) // for every w \in M
+  {
+    poly pTempSum = NULL;
+
+    poly w = M->m[i];
+
+    while(w != NULL) // for each term of w...
+    {
+      poly h = p_Head(w, rRing);
+
+      const int  gen = p_GetComp(h, rRing); // 1 ...
+
+      assume(gen > 0);
+      assume(gen <= n*m);
+
+      // TODO: write a formula with %, / instead of while!
+      /*
+      int c = gen;
+      int v = 1;
+      while(c > m)
+      {
+        c -= m;
+        v++;
+      }
+      */
+
+      int cc = gen % m;      
+      if( cc == 0) cc = m;
+      int vv = 1 + (gen - cc) / m;
+
+//      assume( cc == c );
+//      assume( vv == v );
+
+      //  1<= c <= m
+      assume( cc > 0 );
+      assume( cc <= m );
+
+      assume( vv > 0 );
+      assume( vv <= n );
+
+      assume( (cc + (vv-1)*m) == gen );
+
+
+      p_SetExp(h, vv, 1 + p_GetExp(h, vv, rRing) , rRing); // h *= var(j) &&
+      p_SetComp(h, cc, rRing); 
+
+      p_Setm(h, rRing);         // addjust degree after the previous steps!
+
+      pTempSum = p_Add_q(pTempSum, h, rRing); // it is slow since h will be usually put to the back of pTempSum!!!
+
+      pIter(w);
+    }
+
+    idTemp->m[i] = pTempSum;
+  }
+
+  // simplify idTemp???
+
+  ideal idResult = id_Transp(idTemp, rRing);
+
+  id_Delete(&idTemp, rRing);
+
+  return(idResult);
 }
