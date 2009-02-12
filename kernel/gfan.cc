@@ -1,12 +1,15 @@
 /*
 Compute the Groebner fan of an ideal
-Author: $Author: monerjan $
-Date: $Date: 2009-02-11 14:57:55 $
-Header: $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.10 2009-02-11 14:57:55 monerjan Exp $
-Id: $Id: gfan.cc,v 1.10 2009-02-11 14:57:55 monerjan Exp $
+Author: $Author: Singular $
+Date: $Date: 2009-02-12 08:35:05 $
+Header: $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.11 2009-02-12 08:35:05 Singular Exp $
+Id: $Id: gfan.cc,v 1.11 2009-02-12 08:35:05 Singular Exp $
 */
 
 #include "mod2.h"
+
+#ifdef HAVE_GFAN
+
 #include "kstd1.h"
 #include "intvec.h"
 #include "polys.h"
@@ -155,3 +158,4 @@ ideal gfan(ideal inputIdeal)
 	getWallIneq(res);
 	return res;
 }
+#endif
