@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.121 2009-02-11 14:31:56 Singular Exp $
+@comment $Id: NEWS.texi,v 1.122 2009-02-12 15:08:09 motsak Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -84,8 +84,9 @@ new library: decodegb.lib (see @nref{decodegb_lib}: Generating and solving syste
 new library: dmodapp.lib (see @nref{dmodapp_lib}: applications of D-modules)
 @item
 new library: bfct.lib global (see @nref{bfct_lib}: Bernstein-Sato polynomial)
-@item
-new library: discretize.lib (see @nref{discretize_lib}): tools for the generation of finite difference schemes)
+@comment this was taken back
+@comment @item
+@comment new library: discretize.lib (see @nref{discretize_lib}): tools for the generation of finite difference schemes)
 @item 
 new library: nchomolog.lib (see @nref{nchomolog_lib}): Noncommutative Homological Algebra
 @item 
@@ -102,14 +103,14 @@ elim.lib (@nref{elim_lib}): @nref{elim}, @nref{nselect}, @nref{select}, @nref{se
 homolog.lib: kernel renamed to @nref{hom_kernel}. 
 @*(See also @nref{kernel}, @nref{alg_kernel}).
 @item
-matrix.lib: new commands for computing symmetric/exterior powers(bases)
+matrix.lib: new commands for computing symmetric/exterior powers/bases
 @item
 surf.lib: new command @code{surfer}: interface to program @code{surfer}
 @*(See @nref{surf_lib}).
 @item
 teachstd.lib: spoly works now in non-commutative algebras and thus standard can be used there. 
-However if product criterion is a priori not applicable one can disable it by defining 
-global integer constant @@@@@@NOPC to be 1.
+However since product criterion is a priori not applicable in non-commutative case, 
+one may want to disable it first (see @code{prodcrit} for details).
 @end itemize
 
 @heading News for version 3-0-4
