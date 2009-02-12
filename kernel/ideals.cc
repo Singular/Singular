@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.67 2009-02-12 13:31:22 motsak Exp $ */
+/* $Id: ideals.cc,v 1.68 2009-02-12 13:45:23 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1314,9 +1314,9 @@ static ideal idPrepare (ideal  h1, tHomog h, int syzcomp, intvec **w)
 #ifdef RDEBUG
   Print("Prepare::h2: ");
   idPrint(h2);
-#endif  
 #endif
-  
+#endif
+
   for (j=0; j<=i; j++)
   {
     p = h2->m[j];
@@ -1342,12 +1342,12 @@ static ideal idPrepare (ideal  h1, tHomog h, int syzcomp, intvec **w)
 
   Print("Prepare::currQuotient: ");
   idPrint(currQuotient);
-#endif  
 #endif
-  
 #endif
 
-  
+#endif
+
+
   h3 = kStd(h2,currQuotient,h,w,NULL,syzcomp);
   idDelete(&h2);
   return h3;
@@ -1563,14 +1563,14 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
   ring syz_ring = rCurrRingAssure_SyzComp();
   rSetSyzComp(k);
 
-  
+
 #if MYTEST
 #ifdef RDEBUG
   rWrite(syz_ring);
   rDebugPrint(syz_ring);
-#endif  
 #endif
-  
+#endif
+
   ideal s_h1=h1;
 
   if (orig_ring != syz_ring)
@@ -1582,9 +1582,9 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
 #ifdef RDEBUG
   Print("Input: ");
   idPrint(s_h1);
-#endif  
 #endif
- 
+#endif
+
 
   ideal s_h3=idPrepare(s_h1,h,k,&w);
 
@@ -1592,7 +1592,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
 #ifdef RDEBUG
   Print("Prepare: ");
   idPrint(s_h3);
-#endif  
+#endif
 #endif
 
   ideal s_h2 = idInit(IDELEMS(s_h3), s_h3->rank);
@@ -1601,9 +1601,9 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
 #ifdef RDEBUG
   Print("Temp: ");
   idPrint(s_h2);
-#endif  
 #endif
-  
+#endif
+
   if (w!=NULL) delete w;
   i = 0;
 
@@ -1639,7 +1639,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
 #ifdef RDEBUG
   Print("Input'': ");
   idPrint(s_h3);
-#endif  
+#endif
 #endif
 
   j = IDELEMS(s_h1);
@@ -1649,10 +1649,10 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
 #ifdef RDEBUG
   Print("Temp Result: ");
   idPrint(s_h2);
-#endif  
+#endif
 #endif
 
-  
+
   if (syz_ring!=orig_ring)
   {
     idDelete(&s_h1);
@@ -1697,9 +1697,9 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
 
   Print("Output Matrix: ");
   iiWriteMatrix(*ma, "ma", 2, 4);
-#endif  
 #endif
-  
+#endif
+
 
   if (syz_ring!=orig_ring) rKill(syz_ring);
   verbose = save_verbose;
@@ -2469,7 +2469,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
     int sl=IDELEMS(h1) - 1;
     wCall(h1->m, sl, x, wNsqr);
     for (sl = pVariables; sl!=0; sl--)
-      wv[1][sl-1] = x[sl + pVariables + 1]; 
+      wv[1][sl-1] = x[sl + pVariables + 1];
     omFreeSize((ADDRESS)x, 2 * (pVariables + 1) * sizeof(int));
 
     ord[2]=ringorder_C;
@@ -4050,7 +4050,7 @@ ideal tensorModuleMult(const int m, const ideal M, const ring rRing)
       }
       */
 
-      int cc = gen % m;      
+      int cc = gen % m;
       if( cc == 0) cc = m;
       int vv = 1 + (gen - cc) / m;
 
@@ -4067,8 +4067,8 @@ ideal tensorModuleMult(const int m, const ideal M, const ring rRing)
       assume( (cc + (vv-1)*m) == gen );
 
 
-      p_SetExp(h, vv, 1 + p_GetExp(h, vv, rRing) , rRing); // h *= var(j) &&
-      p_SetComp(h, cc, rRing); 
+      p_AddExp(h, vv, 1, rRing); // h *= var(j) &&
+      p_SetComp(h, cc, rRing);
 
       p_Setm(h, rRing);         // addjust degree after the previous steps!
 
