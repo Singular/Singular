@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.292 2009-02-11 14:57:54 monerjan Exp $ */
+/* $Id: extra.cc,v 1.293 2009-02-12 13:29:49 motsak Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -695,6 +695,31 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
    }
    else
 #endif
+
+#define HAVE_SHEAFCOH_TRICKS 1
+
+#ifdef HAVE_SHEAFCOH_TRICKS
+    if(strcmp(sys_cmd,"tensorModuleMult")==0)
+    {
+//      WarnS("tensorModuleMult!");
+      if (h!=NULL && h->Typ()==INT_CMD && h->Data() != NULL &&
+          h->next != NULL && h->next->Typ() == MODUL_CMD
+          && h->next->Data() != NULL)
+      {
+        int m = (int)( (long)h->Data() );
+        ideal M = (ideal)h->next->Data();
+
+        res->rtyp=MODUL_CMD;
+        res->data=(void *)tensorModuleMult(m, M, currRing);
+        return FALSE;
+      }
+      
+      WerrorS("system(\"tensorModuleMult\", int, module) expected");
+      return TRUE;
+    } else
+#endif
+
+
 #ifdef HAVE_PLURAL
 /*==================== Approx_Step  =================*/
      if (strcmp(sys_cmd, "astep") == 0)
@@ -856,6 +881,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
       return FALSE;
     }
+
+
+
     
     /*==================== PLURAL =================*/
 /*==================== opp ==================================*/
