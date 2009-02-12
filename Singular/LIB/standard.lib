@@ -4,7 +4,7 @@
 //stdhilb can be called with std or slimgb (Jan 2008, GMG)
 //### Todo: im lokalen Fall die Hilbert-Samuel Funktion verwenden
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.106 2009-01-15 13:51:18 Singular Exp $";
+version="$Id: standard.lib,v 1.107 2009-02-12 13:31:40 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -1301,8 +1301,6 @@ example
 
   groebner(i,"fglm");          //computes a reduced standard basis
 
-  if (system("with","MP")) {groebner(i,10,"std");}
-  defined(Standard::groebner_error);
   option(set,opt);
 }
 
