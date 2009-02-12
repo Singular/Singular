@@ -1,6 +1,6 @@
-// $Id: all.lib,v 1.59 2008-10-07 09:16:09 Singular Exp $
+// $Id: all.lib,v 1.60 2009-02-12 20:25:23 levandov Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.59 2008-10-07 09:16:09 Singular Exp $";
+version="$Id: all.lib,v 1.60 2009-02-12 20:25:23 levandov Exp $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries (commutative case)
@@ -87,7 +87,7 @@ LIB "rootsur.lib";
 LIB "weierstr.lib";
 LIB "zeroset.lib";
 LIB "phindex.lib";
-LIB "bfct.lib";
+LIB "bfun.lib";
 LIB "central.lib";
 LIB "discretize.lib";
 LIB "dmod.lib";

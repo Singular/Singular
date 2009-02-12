@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmodapp.lib,v 1.17 2009-01-15 19:19:08 levandov Exp $";
+version="$Id: dmodapp.lib,v 1.18 2009-02-12 20:25:23 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmodapp.lib     Applications of algebraic D-modules
@@ -48,14 +48,14 @@ insertGenerator(id,p[,k]); insert an element into an ideal/module
 deleteGenerator(id,k); delete the k-th element from an ideal/module
 
 
-SEE ALSO: dmod_lib, gmssing_lib, bfct_lib
+SEE ALSO: dmod_lib, gmssing_lib, bfun_lib
 ";
 
 LIB "poly.lib";
 LIB "sing.lib";
 LIB "primdec.lib";
 LIB "dmod.lib"; // loads e.g. nctools.lib
-LIB "bfct.lib";
+LIB "bfun.lib"; //formerly LIB "bfct.lib";
 
 // todo: complete and include into above list
 // charVariety(I);       compute the characteristic variety of the ideal I
