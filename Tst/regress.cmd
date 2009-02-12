@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.39 2004-02-12 13:00:24 Singular Exp $
+# $Id: regress.cmd,v 1.40 2009-02-12 15:42:38 motsak Exp $
 # FILE:    regress.cmd
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -191,14 +191,14 @@ sub Diff
   local($exit_status);
 
   # prepare the result files:
-  &mysystem("$cat $root.res | $tr -d '\\013' | $sed $sed_scripts > $root.res.cleaned");
-  &mysystem("$cat $root.new.res | $tr -d '\\013' | $sed $sed_scripts > $root.new.res.cleaned");
+  &mysystem("$cat \"$root.res\" | $tr -d '\\013' | $sed $sed_scripts > \"$root.res.cleaned\"");
+  &mysystem("$cat \"$root.new.res\" | $tr -d '\\013' | $sed $sed_scripts > \"$root.new.res.cleaned\"");
 
   # doo the diff call
-  $exit_status = &mysystem("$diff -w -b $root.res.cleaned $root.new.res.cleaned > $root.diff 2>&1");
+  $exit_status = &mysystem("$diff -w -b \"$root.res.cleaned\" \"$root.new.res.cleaned\" > \"$root.diff\" 2>&1");
 
   # clean up time
-  &mysystem("$rm -f $root.res.cleaned $root.new.res.cleaned");
+  &mysystem("$rm -f \"$root.res.cleaned\" \"$root.new.res.cleaned\"");
 
   # there seems to be a bug here somewhere: even if diff reported
   # differenceses and exited with status != 0, then system still
@@ -333,7 +333,7 @@ sub tst_status_merge
       close(RES_FILE);
       close(NEW_RES_FILE);
       close(TEMP_FILE);
-      &mysystem("$rm $root.tmp.stat");
+      &mysystem("$rm \"$root.tmp.stat\"");
       return (1, "Can not find '$prefix >> $crit' in $root.stat\n");
     }
     if ($merge_version)
@@ -353,8 +353,8 @@ sub tst_status_merge
   close(RES_FILE);
   close(NEW_RES_FILE);
   close(TEMP_FILE);
-  &mysystem("$mv -f $root.tmp.stat $root.stat");
-  &mysystem("$rm -f $root.new.stat $root.stat.sdiff") unless $keep eq "yes";
+  &mysystem("$mv -f \"$root.tmp.stat\" \"$root.stat\"");
+  &mysystem("$rm -f \"$root.new.stat\" \"$root.stat.sdiff\"") unless $keep eq "yes";
   return ;
 }
 
@@ -385,7 +385,7 @@ sub tst_check
   {
     if ((-r "$root.res.gz.uu") && ! ( -z "$root.res.gz.uu"))
     {
-      $exit_status = &mysystem("$uudecode $root.res.gz.uu > /dev/null 2>&1; $gunzip -f $root.res.gz");
+      $exit_status = &mysystem("$uudecode \"$root.res.gz.uu\" > /dev/null 2>&1; $gunzip -f \"$root.res.gz\"");
       if ($exit_status)
       {
         print (STDERR "Can not decode $root.res.gz.uu\n");
@@ -399,15 +399,15 @@ sub tst_check
     }
   }
 
-  my $resfile = "$root.new.res";
-  $resfile = "$root.mtrack.res" if (defined($mtrack));
+  my $resfile = "\"$root.new.res\"";
+  $resfile = "\"$root.mtrack.res\"" if (defined($mtrack));
   my $statfile = "$root.new.stat";
-  &mysystem("$rm -f $statfile");
+  &mysystem("$rm -f \"$statfile\"");
   if (defined($mtrack))
   {
-    $system_call = "$cat $root.tst | sed -e 's/\\\\\$/LIB \"general.lib\"; killall(); killall(\"proc\");kill killall;system(\"mtrack\", \"$root.mtrack.unused\", $mtrack); \\\$/' | $singular $singularOptions ";
+    $system_call = "$cat \"$root.tst\" | sed -e 's/\\\\\$/LIB \"general.lib\"; killall(); killall(\"proc\");kill killall;system(\"mtrack\", \"$root.mtrack.unused\", $mtrack); \\\$/' | $singular $singularOptions ";
     $system_call .= ($verbosity > 3 ? " | $tee " : " > ");
-    $system_call .= "$root.mtrack.res";
+    $system_call .= "\"$root.mtrack.res\"";
     $system_call .= " 2>&1 " if ($verbosity <= 3);
   }
   else
@@ -416,11 +416,11 @@ sub tst_check
     # prepare Singular run
     if ($verbosity > 3 && !$WINNT)
     {
-      $system_call = "$cat $root.tst | $singular --execute 'string tst_status_file=\"$statfile\";' $singularOptions | $tee $resfile";
+      $system_call = "$cat \"$root.tst\" | $singular --execute 'string tst_status_file=\"$statfile\";' $singularOptions | $tee $resfile";
     }
     else
     {
-      $system_call = "$cat $root.tst | $singular --execute 'string tst_status_file=\"$statfile\";' $singularOptions > $resfile 2>&1";
+      $system_call = "$cat \"$root.tst\" | $singular --execute 'string tst_status_file=\"$statfile\";' $singularOptions > $resfile 2>&1";
     }
   }
   # Go Singular, Go!
@@ -445,10 +445,10 @@ sub tst_check
     }
     elsif (! defined($mtrack) && !defined($timings_only))
     {
-      &mysystem("$rm -f $root.diff");
+      &mysystem("$rm -f \"$root.diff\"");
       if ($generate eq "yes")
       {
-        &mysystem("$cp $resfile $root.res");
+        &mysystem("$cp $resfile \"$root.res\"");
       }
       else
       {
@@ -459,19 +459,21 @@ sub tst_check
 	  unless ($verbosity == 0)
 	  {
 	    print "\n";
-	    mysystem("$cat $root.diff");
+	    mysystem("$cat \"$root.diff\"");
 	  }
           $error_cause = "Differences in res files";
         }
         else
         {
-          &mysystem("$rm -f $root.diff");
+          &mysystem("$rm -f \"$root.diff\"");
         }
       }
     }
   }
 
-  mysystem("mv tst_status.out $statfile")
+
+
+  mysystem("mv tst_status.out \"$statfile\"")
     if (! -e $statfile && -e "tst_status.out");
 
   if (%checks && ! $exit_status && $generate ne "yes" && ! defined($mtrack))
@@ -506,11 +508,11 @@ sub tst_check
       #clean up
       if ($generate eq "yes")
       {
-	mysystem("$rm -f $root.stat") unless %merge;
+	mysystem("$rm -f \"$root.stat\"") unless %merge;
 	($exit_status, $error_cause) = tst_status_merge($root);
 	if (! $WINNT)
 	{
-	  &mysystem("$gzip -cf $root.res | $uuencode $root.res.gz > $root.res.gz.uu");
+	  &mysystem("$gzip -cf \"$root.res\" | $uuencode \"$root.res.gz\" > \"$root.res.gz.uu\"");
 	}
 	else
 	{
@@ -528,7 +530,7 @@ sub tst_check
     }
     if ($keep ne "yes")
     {
-      &mysystem("$rm -f tst_status.out $resfile $root.res $root.diff $root.new.stat");
+      &mysystem("$rm -f tst_status.out $resfile \"$root.res\" \"$root.diff\" \"$root.new.stat\"");
     }
   }
   # und tschuess
@@ -545,6 +547,10 @@ sub tst_check
     print " \n";
   }
   $total_checks_pass++ unless $exit_status;
+
+  mysystem("mv gmon.out \"gmon.$root.out\"")
+    if (-e "gmon.out");
+
   return ($exit_status);
 }
 
