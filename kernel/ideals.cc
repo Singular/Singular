@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.68 2009-02-12 13:45:23 Singular Exp $ */
+/* $Id: ideals.cc,v 1.69 2009-02-12 16:19:23 motsak Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -4008,7 +4008,7 @@ ideal id_Transp(ideal a, const ring rRing)
 
    NOTE: for every f_i we run only ONCE along w_i saving partial sums into a temporary array of polys of size m
 */
-ideal tensorModuleMult(const int m, const ideal M, const ring rRing)
+ideal id_TensorModuleMult(const int m, const ideal M, const ring rRing)
 {
 // #ifdef DEBU
 //  WarnS("tensorModuleMult!!!!");
@@ -4066,8 +4066,7 @@ ideal tensorModuleMult(const int m, const ideal M, const ring rRing)
 
       assume( (cc + (vv-1)*m) == gen );
 
-
-      p_AddExp(h, vv, 1, rRing); // h *= var(j) &&
+      p_IncrExp(h, vv, rRing); // h *= var(j) && //      p_AddExp(h, vv, 1, rRing);
       p_SetComp(h, cc, rRing);
 
       p_Setm(h, rRing);         // addjust degree after the previous steps!

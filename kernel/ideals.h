@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.12 2009-02-12 13:31:22 motsak Exp $ */
+/* $Id: ideals.h,v 1.13 2009-02-12 16:19:23 motsak Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -150,7 +150,7 @@ matrix  idCoeffOfKBase(ideal arg, ideal kbase, poly how);
 // transpose a module
 ideal   idTransp(ideal a);
 // version of "ideal idTransp(ideal)" which works within a given ring.
-ideal id_Transp(ideal a, const ring rRing);
+ideal id_Transp(ideal a, const ring rRing = currRing);
 
 
 intvec *idQHomWeight(ideal id);
@@ -165,7 +165,7 @@ ideal idChineseRemainder(ideal *x, number *q, int rl);
 ideal idChineseRemainder(ideal *x, intvec *iv);
 
 
-ideal tensorModuleMult(const int m, const ideal M, const ring rRing); // image of certain map for BGG
+ideal id_TensorModuleMult(const int m, const ideal M, const ring rRing = currRing); // image of certain map for BGG
 
 
 
