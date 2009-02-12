@@ -1,7 +1,7 @@
 // $Id:
 //GMG, last modified 28.9.01
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: teachstd.lib,v 1.9 2009-01-14 16:07:05 Singular Exp $";
+version="$Id: teachstd.lib,v 1.10 2009-02-12 13:57:00 motsak Exp $";
 category="Teaching";
 info="
 LIBRARY:  teachstd.lib   Procedures for teaching standard bases
@@ -23,7 +23,7 @@ PROCEDURES:
  spoly(f[,1]);          s-polynomial of f [symmetric form]
  minEcart(T,h);         element g from T of minimal ecart s.t. LM(g)|LM(h)
  NFMora(i);             normal form of i w.r.t Mora algorithm
- prodcrit(f,g);         test for product criterion
+ prodcrit(f,g[,o]);     test for product criterion
  chaincrit(f,g,h);      test for chain criterion
  pairset(G);            pairs form G neither satifying prodcrit nor chaincrit
  updatePairs(P,S,h);    pairset P enlarded by not useless pairs (h,f), f in S
@@ -408,20 +408,31 @@ example
    NFMora(v,M);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc prodcrit(f,g)
-"USAGE:   prodcrit(f,g); f,g poly or vector
+proc prodcrit(f,g,list #)
+"USAGE:   prodcrit(f,g[,o]); f,g poly or vector, and optional int argument o
 RETURN:  1 if product criterion applies in the same module component,
          2 if lead(f) and lead(g) involve different components, 0 else
 NOTE:    if product criterion applies we can delete (f,g) from pairset
+         This procedure returns 0 if o is given and is a positive integer, or
+         you may set the attribute \"default_arg\" for prodcrit to 1.
 EXAMPLE: example prodcrit; shows an example
 "
 {
-  if( defined(@@@NOPC) )
-  {
-    if( @@@NOPC == 1) { return(0); }
+// ------------------ check for optional disabling argument -------------
+  if( size(#) > 0 )
+  {// "size(#): ", size(#);   "typeof(#[1]): ", typeof(#[1]);
+    
+    if( typeof(#[1]) == "int" )
+    {// "#[1] = int ", #[1];
+      if( #[1] > 0 )
+      {        
+        return(0);
+      }
+    }
   }
 
-  if(typeof(f)=="poly")    //product criterion for polynomials
+// ------------------- product criterion for polynomials ---------------------
+  if(typeof(f)=="poly")
   {
     if( monomialLcm(f,g)==leadmonom(f)*leadmonom(g))
     {
