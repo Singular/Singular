@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.293 2009-02-12 13:29:49 motsak Exp $ */
+/* $Id: extra.cc,v 1.294 2009-02-12 16:22:17 motsak Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -710,7 +710,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         ideal M = (ideal)h->next->Data();
 
         res->rtyp=MODUL_CMD;
-        res->data=(void *)tensorModuleMult(m, M, currRing);
+        res->data=(void *)id_TensorModuleMult(m, M, currRing);
         return FALSE;
       }
       
