@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.cc,v 1.26 2009-02-11 21:24:07 ederc Exp $ */
+/* $Id: f5gb.cc,v 1.27 2009-02-12 12:43:31 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -371,11 +371,11 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) 
 reduction including subalgorithm topReduction() using Faugere's criteria
 ========================================================================
 */
-LList* reduction(LList* &sPolyList, LList* &completed, LList* &gPrev, RList* &rules, LTagList* &lTag, RTagList* &rTag, 
+LList* reduction(LList* sPolyList, LList* completed, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag, 
                  ideal gbPrev) { 
     Print("##########################################In REDUCTION!########################################\n");
     // temporary normal form and zero polynomial for testing
-    poly tempNF =   pInit();
+    static poly tempNF =   pInit();
     TopRed* ret =   new TopRed();
     // compute only if there are any S-polynomials to be reduced
     Print("LENGTH OF SPOLYLIST: %d\n",sPolyList->getLength());
@@ -383,7 +383,12 @@ LList* reduction(LList* &sPolyList, LList* &completed, LList* &gPrev, RList* &ru
         LNode* temp =   sPolyList->getFirst();
         Print("HIER REDUCTION\n");
         while(NULL != temp->getLPoly()) {
-            tempNF = kNF(gbPrev,currQuotient,temp->getPoly());  
+            if(NULL != completed->getFirst()->getLPoly()) {
+				Print("BIS HIERHIN UND NICHT WEITER\n");	
+				Print("%p\n",completed->getFirst());
+				pWrite(completed->getFirst()->getPoly());
+			}
+			tempNF = kNF(gbPrev,currQuotient,temp->getPoly());  
             pWrite(tempNF);
             pWrite(temp->getPoly());
             temp->setPoly(tempNF);
@@ -402,17 +407,42 @@ LList* reduction(LList* &sPolyList, LList* &completed, LList* &gPrev, RList* &ru
                 Print("///////////////////////////////////////////////////////////////////////\n");
             }
             else {
+				Print("HIERLALA\n");
+				if(NULL != completed->getFirst()->getLPoly()) {
+					Print("%p\n",completed->getFirst());
+					pWrite(completed->getFirst()->getPoly());
+				}
+				//
+				//
+				//
+				//
+				// NOTE: until this point the element completed->getFirst()->getPoly() exists!!!
+				//
+				//
+				//
+				// 
                 ret =   topReduction(temp, completed, gPrev, rules, lTag, rTag);
                 // in topReduction() the investigated first element of sPolyList will be deleted after its
                 // reduction has finished => the next to be investigated element is the newly first element
                 // in sPolyList => the while loop is finite
                 // first possible after implementation of topReduction(): temp = sPolyList->getFirst();
-                completed   =   ret->getCompleted();
+                
+				completed   =   ret->getCompleted();
+				
+				Print("%p\n",completed->getFirst());
+				Print("%p\n",ret->getCompleted()->getFirst());
+				pWrite(completed->getFirst()->getPoly());
             Print("~~~HIER~~~\n");
+			Print("%d\n",completed->getFirst()->getIndex());
                 if(NULL != ret->getToDo()) {
                     sPolyList->insertByLabel(ret->getToDo()->getFirst());
                 }
             }
+			temp	=	sPolyList->getFirst();
+			Print("END WHILE LOOP: ");
+			Print("%p\n",completed->getFirst());
+			pWrite(completed->getFirst()->getPoly());
+						
         }
     }
     return ret->getCompleted();
@@ -426,7 +456,7 @@ top reduction in F5, i.e. reduction of a given S-polynomial by labeled polynomia
 the same index whereas the labels are taken into account
 =====================================================================================
 */
-TopRed* topReduction(LNode* l, LList* &completed, LList* &gPrev, RList* &rules, LTagList* &lTag, RTagList* &rTag) {
+TopRed* topReduction(LNode* l, LList* completed, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag) {
     Print("##########################################In topREDUCTION!########################################\n");
     LNode* red   =   new LNode();
     do {
@@ -441,6 +471,7 @@ TopRed* topReduction(LNode* l, LList* &completed, LList* &gPrev, RList* &rules, 
             Print("________________________INSERT IN COMPLETED!____________________________\n");
             completed->insert(l->getLPoly());
             Print("%p\n",completed->getFirst()->getLPoly());
+			Print("%d\n",completed->getFirst()->getIndex());
             pWrite(completed->getFirst()->getPoly());
             TopRed* ret =   new TopRed(completed,NULL);
             return ret;
@@ -463,11 +494,11 @@ TopRed* topReduction(LNode* l, LList* &completed, LList* &gPrev, RList* &rules, 
 subalgorithm to find a possible reductor for the labeled polynomial l
 =====================================================================
 */
-LNode* findReductor(LNode* l,LList* &completed,LList* &gPrev, RList* &rules, LTagList* &lTag,RTagList* &rTag,
+LNode* findReductor(LNode* l,LList* completed,LList* gPrev, RList* rules, LTagList* lTag,RTagList* rTag,
                     LNode* gPrevRedCheck, LNode* completedRedCheck) {
     number nOne     =   nInit(1);
-    poly u          =   pInit();
-    poly redPoly    =   pInit();
+    static poly u          =   pInit();
+    static poly redPoly    =   pInit();
     poly t          =   pHead(l->getPoly());
     LNode* temp     =   new LNode();
     // setting starting point for search of reductors in gPrev
@@ -517,8 +548,8 @@ LNode* findReductor(LNode* l,LList* &completed,LList* &gPrev, RList* &rules, LTa
     }
     else {
         temp    =   completed->getFirst();
-        Print("HIER FIND\n");
-        Print("%p\n",temp->getLPoly());
+        Print("HIER FIND2\n");
+		Print("%p\n",temp->getLPoly());
     }
     // search only for reductors with the same index, as reductions with elements of lower
     // index where already done in reduction() beforehand
