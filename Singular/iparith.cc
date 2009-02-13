@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.493 2009-01-17 10:19:17 Singular Exp $ */
+/* $Id: iparith.cc,v 1.494 2009-02-13 09:46:49 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -386,7 +386,7 @@ cmdnames cmds[] =
   { "sres",        0, SRES_CMD ,          CMD_2},
 #endif /* OLD_RES */
   { "status",      0, STATUS_CMD,         CMD_M},
-  { "std",         0, STD_CMD ,           CMD_123},
+  { "std",         0, STD_CMD ,           CMD_M},
   { "string",      0, STRING_CMD ,        ROOT_DECL_LIST},
   { "subst",       0, SUBST_CMD ,         CMD_M},
   { "system",      0, SYSTEM_CMD,         CMD_M},
@@ -3067,7 +3067,7 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   {
     i0=(ideal)v->CopyD();
   }
-  int ii0=idElem(i0);
+  int ii0=idElem(i0); /* size of i0 */
   i1=idSimpleAdd(i1,i0);
   memset(i0->m,0,sizeof(poly)*IDELEMS(i0));
   idDelete(&i0);
@@ -3090,6 +3090,8 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   }
   BITSET save_test=test;
   test|=Sy_bit(OPT_SB_1);
+  /* IDELEMS(il)-ii0 appears to be the position of the first element of il that 
+     does not belong to the input ideal */
   result=kStd(i1,currQuotient,hom,&w,NULL,0,IDELEMS(i1)-ii0);
   test=save_test;
   idDelete(&i1);
@@ -6950,6 +6952,71 @@ static BOOLEAN jjSUBST_M(leftv res, leftv u)
   // rest was w->next, but is already cleaned
   return b;
 }
+static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
+{ ideal result;
+  leftv u = INPUT;    /* an ideal, weighted homogeneous and standard */
+  leftv v = u->next;  /* one additional polynomial or ideal */
+  leftv h = v->next;  /* Hilbert vector */
+  leftv w = h->next;  /* weight vector */
+  assumeStdFlag(u);
+  ideal i1=(ideal)(u->Data());
+  ideal i0;
+  intvec *vw=(intvec *)w->Data(); // weights of vars
+  /* merging std_hilb_w and std_1 */
+  if (vw->length()!=currRing->N)
+  {
+    Werror("%d weights for %d variables",vw->length(),currRing->N);
+    return TRUE;
+  }
+  int r=v->Typ();
+  if ((r==POLY_CMD) ||(r==VECTOR_CMD))
+  {
+    i0=idInit(1,i1->rank);
+    i0->m[0]=(poly)v->Data();
+  }
+  else /* IDEAL */
+  {
+    i0=(ideal)v->Data();
+  }
+  int ii0=idElem(i0);
+  i1 = idSimpleAdd(i1,i0);
+  memset(i0->m,0,sizeof(poly)*IDELEMS(i0));
+  idDelete(&i0);
+  intvec *ww=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
+  tHomog hom=testHomog;
+  /* u_id from jjSTD_W is now i1 as in jjSTD_1 */
+  if (ww!=NULL)
+  {
+    if (!idTestHomModule(i1,currQuotient,ww))
+    {
+      WarnS("wrong weights");
+      ww=NULL;
+    }
+    else
+    {
+      ww=ivCopy(ww);
+      hom=isHomog;
+    }
+  }
+  BITSET save_test=test;
+  test|=Sy_bit(OPT_SB_1);
+  result=kStd(i1,
+              currQuotient,
+              hom,
+              &ww,                  // module weights
+              (intvec *)h->Data(),  // hilbert series
+              0,                    // syzComp, whatever it is...
+              IDELEMS(i1)-ii0,      // new ideal
+              vw);                  // weights of vars
+  test=save_test;
+  idDelete(&i1);
+  idSkipZeroes(result);
+  res->data = (char *)result;
+  if (!TEST_OPT_DEGBOUND) setFlag(res,FLAG_STD);
+  if (ww!=NULL) atSet(res,omStrDup("isHomog"),ww,INTVEC_CMD);
+  return FALSE;
+}
+
 
 /*=================== operations with many arg.: table =================*/
 /* number_of_args:  -1: any, -2: any >0, .. */
@@ -6999,6 +7066,10 @@ struct sValCmdM dArithM[]=
 ,{jjSTATUS_M,  STATUS_CMD,      INT_CMD,             4       ALLOW_PLURAL}
 ,{loSimplex,   SIMPLEX_CMD,     LIST_CMD,            6       NO_PLURAL}
 ,{nuUResSolve, URSOLVE_CMD,     LIST_CMD,            4       NO_PLURAL}
+,{jjCALL1ARG,  STD_CMD,         IDEAL_CMD,           1       ALLOW_PLURAL}
+,{jjCALL2ARG,  STD_CMD,         IDEAL_CMD,           2       ALLOW_PLURAL}
+,{jjCALL3ARG,  STD_CMD,         IDEAL_CMD,           3       NO_PLURAL}
+,{jjSTD_HILB_WP, STD_CMD,       IDEAL_CMD,           4       NO_PLURAL}
 ,{NULL,        0,               0,                   0       NO_PLURAL}
 };
 #ifdef MDEBUG
