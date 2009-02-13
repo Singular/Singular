@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.494 2009-02-13 09:46:49 Singular Exp $ */
+/* $Id: iparith.cc,v 1.495 2009-02-13 10:01:26 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -6969,10 +6969,12 @@ static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
     return TRUE;
   }
   int r=v->Typ();
+  BOOLEAN cleanup_i0=FALSE;
   if ((r==POLY_CMD) ||(r==VECTOR_CMD))
   {
     i0=idInit(1,i1->rank);
     i0->m[0]=(poly)v->Data();
+    BOOLEAN cleanup_i0=TRUE;;
   }
   else /* IDEAL */
   {
@@ -6980,8 +6982,11 @@ static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
   }
   int ii0=idElem(i0);
   i1 = idSimpleAdd(i1,i0);
-  memset(i0->m,0,sizeof(poly)*IDELEMS(i0));
-  idDelete(&i0);
+  if (cleanup_i0)
+  {
+    memset(i0->m,0,sizeof(poly)*IDELEMS(i0));
+    idDelete(&i0);
+  }
   intvec *ww=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   tHomog hom=testHomog;
   /* u_id from jjSTD_W is now i1 as in jjSTD_1 */
