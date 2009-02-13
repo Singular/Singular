@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.495 2009-02-13 10:01:26 Singular Exp $ */
+/* $Id: iparith.cc,v 1.496 2009-02-13 11:40:12 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3035,7 +3035,7 @@ static BOOLEAN jjSTD_HILB(leftv res, leftv u, leftv v)
   {
     if (!idTestHomModule(u_id,currQuotient,w))
     {
-      WarnS("wrong weights");
+      WarnS("wrong weights:");w->show();PrintLn();
       w=NULL;
     }
     else
