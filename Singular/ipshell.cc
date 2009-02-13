@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.201 2009-01-07 15:04:33 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.202 2009-02-13 09:16:27 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -2020,7 +2020,6 @@ ring rCompose(const lists  L)
     WerrorS("variable must be given as `list`");
     goto rCompose_err;
   }
-  rNameCheck(R);
   // ------------------------ ORDER ------------------------------
   if (L->m[2].Typ()==LIST_CMD)
   {
@@ -2240,6 +2239,7 @@ ring rCompose(const lists  L)
     WerrorS("coefficient field must be described by `int` or `list`");
     goto rCompose_err;
   }
+  rNameCheck(R);
   // ------------------------ Q-IDEAL ------------------------
   rComplete(R);
 
@@ -4852,21 +4852,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   }
 
   /* check names and parameters for conflicts ------------------------- */
-  {
-    int i,j;
-    for(i=0;i<R->P; i++)
-    {
-      for(j=0;j<R->N;j++)
-      {
-        if (strcmp(R->parameter[i],R->names[j])==0)
-        {
-          Werror("parameter %d conflicts with variable %d",i+1,j+1);
-          goto rInitError;
-        }
-      }
-    }
-  }
-  rNameCheck(R);
+  rNameCheck(R); // conflicting variables will be renamed
   /* ordering -------------------------------------------------------------*/
   if (rSleftvOrdering2Ordering(ord, R))
     goto rInitError;
