@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pluconventions.doc,v 1.14 2007-10-31 17:29:40 Singular Exp $
+@comment $Id: pluconventions.doc,v 1.15 2009-02-13 17:04:45 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -76,10 +76,10 @@ by two-sided ideals (see @ref{twostd}).
 @itemize
 
 @item
-@sc{Plural} does not perform computations in free algebra or in its general factor algebras.
+@sc{Plural} does not perform computations in free algebra or in its general factor algebras (instead, this computations can be possibly done with @ref{Letterplace}).
 
-One can only work with @math{G}-algebras and with their factor-algebras
-by two-sided ideals.
+In @sc{Plural} one can only work with @math{G}-algebras and with their factor-algebras
+by two-sided ideals (@math{GR}-algebras).
 
 @item @sc{Plural} requires a monomial ordering but it does not work with local and mixed orderings.
 
@@ -147,5 +147,3 @@ Under a @code{module} @sc{Plural} understands
 In @sc{Plural} it is only possible to build factor-algebras modulo @strong{two-sided} ideals (see @ref{qring @value{PSUFFIX}}).
 @end itemize
 @end table
-
-
