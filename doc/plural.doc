@@ -205,7 +205,7 @@ Use the @code{LIB} command for loading of single libraries.
 @c @sc{Singular} and @sc{Plural} together.
 
 @menu
-* bfct_lib::
+* bfun_lib::
 * central_lib::
 * discretize_lib::
 * dmod_lib::
@@ -222,15 +222,15 @@ Use the @code{LIB} command for loading of single libraries.
 @end menu
 
 @c ----------------------------------------------------------
-@node bfct_lib, central_lib, PLURAL libraries, PLURAL libraries
-@section bfct_lib
-@cindex bfct_lib
-@cindex bfct.lib
+@node bfun_lib, central_lib, PLURAL libraries, PLURAL libraries
+@section bfun_lib
+@cindex bfun_lib
+@cindex bfun.lib
 
-@c lib bfct.lib
+@c lib bfun.lib
 
 @c ----------------------------------------------------------
-@node central_lib, discretize_lib, bfct_lib, PLURAL libraries
+@node central_lib, discretize_lib, bfun_lib, PLURAL libraries
 @section central_lib
 @cindex central_lib
 @cindex central.lib
