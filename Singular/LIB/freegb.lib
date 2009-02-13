@@ -1,9 +1,11 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: freegb.lib,v 1.15 2009-01-14 16:07:04 Singular Exp $";
+version="$Id: freegb.lib,v 1.16 2009-02-13 21:37:20 levandov Exp $";
 category="Noncommutative";
 info="
-LIBRARY: freegb.lib   Twosided Noncommutative Groebner bases in Free Algebras
+LIBRARY: freegb.lib   Twosided Noncommutative Groebner bases in Free Algebras via Letterplace
 AUTHOR: Viktor Levandovskyy,     levandov@math.rwth-aachen.de
+
+THEORY: See chapter 'Letterplace' in the Singular Manual.
 
 PROCEDURES:
 freegbRing(d);    creates a ring with d blocks of shifted original variables
@@ -11,6 +13,7 @@ freegbasis(L, int n);   compute two-sided Groebner basis of ideal, encoded via L
 
 AUXILIARY PROCEDURES:
 
+lpMult(f,g);        letterplace multiplication of letterplace polynomials
 lp2lstr(K, s);      convert letter-place ideal to a list of modules
 lst2str(L[, n]);     convert a list (of modules) into polynomials in free algebra
 mod2str(M[, n]); convert a module into a polynomial in free algebra
@@ -18,6 +21,7 @@ vct2str(M[, n]);   convert a vector into a word in free algebra
 Liebr(a,b[, N]);    compute Lie bracket ab-ba of two letterplace polynomials
 Serre(A,z);          compute the ideal of Serre's relations associated to a generalized Cartan matrix A
 isVar(p);             check whether p is a power of a single variable
+adem(i,j);            compute the ideal of Adem relations for i<2j in char 0
 
 SEE ALSO: Letterplace
 "
@@ -37,6 +41,7 @@ proc testfreegblib()
   example freegbRing;
   example freegbasis;
     "AUXILIARY PROCEDURES: ";
+  example lpMult;
   example lp2lstr;
   example lst2str;
   example mod2str;
@@ -1457,9 +1462,10 @@ static proc schur2-3()
 
 proc adem(int i, int j)
 "USAGE:  adem(i,j); i,j int
-RETURN:  ideal
+RETURN:  ring and exports ideal
 ASSUME: there are at least i+j variables in the basering
 PURPOSE: compute the ideal of Adem relations for i<2j in characteristic 0
+@*  the ideal is exported under the name AdemRel in the output ring
 EXAMPLE: example adem; shows examples
 "
 {
@@ -1477,13 +1483,13 @@ EXAMPLE: example adem; shows examples
   // k=0 => s(0)=1
   n = binomial(j-1,i);
   q = n*s(i+j)*s(0);
-  printf("k=0, term=%s",q);
+  //  printf("k=0, term=%s",q);
   p = p + q;
   for (k=1; k<= ii; k++)
   {
     n = binomial(j-k-1,i-2*k);
     q = n*s(i+j-k)*s(k);;
-    printf("k=%s, term=%s",k,q);
+    //    printf("k=%s, term=%s",k,q);
     p = p + q;
   }
   poly AdemRel = p;
@@ -1530,8 +1536,7 @@ hence 2==0! only in char 2
 
   // Adem rels modulo 2 are interesting
 
-//static
-proc stringpoly2lplace(string s)
+static proc stringpoly2lplace(string s)
 {
   // decomposes sentence into terms
   s = replace(s,newline,""); // get rid of newlines
@@ -1705,8 +1710,7 @@ example
   addplaces(L);
 }
 
-//static
-proc sent2lplace(string s)
+static proc sent2lplace(string s)
 {
   // SENTence of words TO LetterPLACE
   list L =   stringpoly2lplace(s);
@@ -1775,7 +1779,7 @@ example
   testnumber(s);
 }
 
-proc str2lplace(string s)
+static proc str2lplace(string s)
 {
   // converts a word (monomial) with coeff into letter-place
   // string: coef*var1^exp1*var2^exp2*...varN^expN
@@ -1965,11 +1969,19 @@ example
 proc Liebr(poly a, poly b, list #)
 "USAGE:  Liebr(a,b[,N]); a,b letterplace polynomials, N an optional integer
 RETURN:  poly
+ASSUME: basering has a letterplace ring structure, like the one returned by freegbRing
+@*   Moreover, the variables 'uptodeg' (degree bound of the letterplace ring) and 'lV' (number of
+blocks of variables of the letterplace ring ) must be defined
 PURPOSE: compute the Lie bracket [a,b] = ab - ba between letterplace polynomials
 NOTE: if N>1 is specified, then the left normed bracket [a,[...[a,b]]]] is computed.
 EXAMPLE: example Liebr; shows examples
 "
 {
+
+  if (lpAssumeViolation())
+  {
+    ERROR("Either 'uptodeg' or 'lV' global variables are not set!");
+  }
   // alias ppLiebr;
   //if int N is given compute [a,[...[a,b]]]] left normed bracket
   poly q;
@@ -2006,6 +2018,7 @@ example
   export uptodeg; export lV;
   Liebr(a,b);
   Liebr(x(1),y(1),2);
+  kill uptodeg, lV;
 }
 
 static proc pmLiebr(poly a, poly b)
@@ -2025,6 +2038,10 @@ static proc pshift(poly a, int i)
 {
   // shifts a monomial a by i
   // calls pLPshift(p,sh,uptodeg,lVblock);
+  if (deg(a) + i > uptodeg)
+  {
+    ERROR("degree bound violated by the shift!");
+  }
   return(system("stest",a,i,uptodeg,lV));
 }
 
@@ -2050,6 +2067,7 @@ static proc test_shift()
   int lV = 2; export lV;
   poly p = mmLiebr(a(1),b(1));
   poly p = Liebr(a(1),b(1));
+  kill uptodeg, lV;
 }
 
 proc Serre(intmat A, int zu)
@@ -2112,6 +2130,7 @@ example
   setring R;
   ideal I = Serre(A,1); I = simplify(I,1+2+8);
   I;
+  kill uptodeg, lV;
 }
 
 /* setup for older example:
@@ -2241,7 +2260,7 @@ example
   kill uptodeg; kill lV;
 }
 
-proc strList2poly(list L)
+static proc strList2poly(list L)
 {
   //  list L comes from sent2lplace (which takes a poly on the input)
   // each entry of L is a sublist with the coef on the last place
@@ -2281,7 +2300,7 @@ example
   p;
 }
 
-proc file2lplace(string fname)
+static proc file2lplace(string fname)
 "USAGE:  file2lplace(fnm);  fnm a string
 RETURN:  ideal
 PURPOSE: convert the contents of the file fnm into ideal of polynomials in free algebra
@@ -2382,3 +2401,48 @@ example
 // multiply two letterplace polynomials, lpMult
 // reduction/ Normalform? needs kernel stuff
 
+proc lpMult(poly f, poly g)
+"USAGE:  lpMult(f,g); f,g letterplace polynomials
+RETURN:  poly
+ASSUME: basering has a letterplace ring structure, like the one returned by freegbRing
+@*   Moreover, the variables 'uptodeg' (degree bound of the letterplace ring) and 'lV' (number of
+blocks of variables of the letterplace ring ) must be defined
+PURPOSE: compute the letterplace form of f*g
+EXAMPLE: example lpMult; shows examples
+"
+{
+  if (lpAssumeViolation())
+  {
+    ERROR("Either 'uptodeg' or 'lV' global variables are not set!");
+  }
+  int sf = deg(f);
+  int sg = deg(g);
+  if (sf+sg > uptodeg)
+  {
+    ERROR("degree bound violated by the product!");
+  }
+  //  if (sf>1) { sf = sf -1; }
+  poly v = f*pshift(g,sf);
+  return(v);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  // define a ring in letterplace form as follows:
+  ring r = 0,(x(1),y(1),x(2),y(2),x(3),y(3),x(4),y(4)),dp; 
+  poly a = x(1)*y(2); poly b = y(1);
+  int uptodeg=4; int lV=2;
+  export uptodeg; export lV;
+  lpMult(b,a);
+  lpMult(a,b);
+  kill uptodeg, lV;
+}
+
+static proc lpAssumeViolation()
+{
+  // checks whether the global vars
+  // uptodeg and lV are defined
+  // returns Boolean : yes/no [for assume violation]
+  int i = ( defined(uptodeg) && (defined(lV)) );
+  return ( !i );
+}
