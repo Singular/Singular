@@ -1,6 +1,6 @@
-// $Id: all.lib,v 1.61 2009-02-13 13:29:22 Singular Exp $
+// $Id: all.lib,v 1.62 2009-02-13 13:57:37 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.61 2009-02-13 13:29:22 Singular Exp $";
+version="$Id: all.lib,v 1.62 2009-02-13 13:57:37 Singular Exp $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries (commutative case)
