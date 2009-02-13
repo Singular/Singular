@@ -1,12 +1,18 @@
 /*
 Compute the Groebner fan of an ideal
-Author: $Author: Singular $
-Date: $Date: 2009-02-12 08:35:05 $
-Header: $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.11 2009-02-12 08:35:05 Singular Exp $
-Id: $Id: gfan.cc,v 1.11 2009-02-12 08:35:05 Singular Exp $
+Author: $Author: monerjan $
+Date: $Date: 2009-02-13 15:17:40 $
+Header: $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.12 2009-02-13 15:17:40 monerjan Exp $
+Id: $Id: gfan.cc,v 1.12 2009-02-13 15:17:40 monerjan Exp $
 */
 
 #include "mod2.h"
+
+//A hack that hopefully will make compiler happy. Workaround only
+//do the same in extra.cc and remove it befor committing!
+//#ifndef HAVE_GFAN
+//#define HAVE_GFAN
+//#endif
 
 #ifdef HAVE_GFAN
 
@@ -79,7 +85,7 @@ void getWallIneq(ideal I)
 	ddrows=rows;
 	ddcols=cols;
 	dd_MatrixPtr ddineq; 		//Matrix to store the inequalities
-	ddineq=dd_CreateMatrix(ddrows,ddcols);
+	ddineq=dd_CreateMatrix(ddrows,ddcols+1); //The first col has to be 0 since cddlib checks for additive consts there
 
 	// We loop through each g\in GB and compute the resulting inequalities
 	for (int i=0; i<IDELEMS(I); i++)
@@ -112,12 +118,17 @@ void getWallIneq(ideal I)
 				aktexp[kk]=v[kk+1];
 				//printf("aktexpcomp=%i\n",aktexp[kk]);
 				//ineq[aktmatrixrow][kk]=leadexp[kk]-aktexp[kk];	//dito
-				dd_set_si(ddineq->matrix[(dd_rowrange)aktmatrixrow][kk],leadexp[kk]-aktexp[kk]);
+				dd_set_si(ddineq->matrix[(dd_rowrange)aktmatrixrow][kk+1],leadexp[kk]-aktexp[kk]); //because of the 1st col being const 0
 			}
 			aktmatrixrow=aktmatrixrow+1;
 		}//while
 
 	} //for
+
+	#ifdef gfan_DEBUG
+	printf("The inequality matrix is:\n");
+	dd_WriteMatrix(stdout, ddineq);
+	#endif
 
 	// The inequalities are now stored in ddineq
 	// Next we check for superflous rows
@@ -131,17 +142,19 @@ void getWallIneq(ideal I)
 		set_fwrite(stdout, ddredrows);		//otherwise print the redundant rows
 	}//if dd_Error
 
-	#ifdef gfan_DEBUGs
-	printf("Inequalitiy matrix\n");
-	for (int i=0;i<rows;i++)
-	{
-		for (int j=0;j<cols;j++)
-		{
-			printf("%i ",ineq[i][j]);
-		}
-		printf("\n");
-	}
-	#endif
+	//Remove reduntant rows here!
+
+	ddineq->representation=dd_Inequality;		//We want our LP to be Ax>=0
+
+	//Clean up but don't delete the return value!
+	dd_FreeMatrix(ddineq);
+	//dd_clear(ddrows);
+	//dd_clear(ddcols);
+	//dd_clear(ddredrows);
+	//dd_clear(ddnumb);
+	//dd_clear(dderr);
+	dd_free_global_constants();
+
 	//res=(ideal)aktpoly;
 	//return res;
 }
