@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.113 2009-01-08 10:21:35 Singular Exp $ */
+/* $Id: ring.cc,v 1.114 2009-02-13 09:15:41 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -127,10 +127,23 @@ void rNameCheck(ring R)
     {
       if (strcmp(R->names[i],R->names[j])==0)
       {
-        Warn("name conflict var(%d) and var(%d): `%s`",i+1,j+1,R->names[i]);
+        Warn("name conflict var(%d) and var(%d): `%s`, rename to `@(%d)`",i+1,j+1,R->names[i],j+1);
         omFree(R->names[j]);
         R->names[j]=(char *)omAlloc(10);
         sprintf(R->names[j],"@(%d)",j+1);
+      }
+    }
+  }
+  for(i=0;i<R->P; i++)
+  {
+    for(j=0;j<R->N;j++)
+    {
+      if (strcmp(R->parameter[i],R->names[j])==0)
+      {
+        Warn("name conflict par(%d) and var(%d): `%s`, rename to `@@(%d)`",i+1,j+1,R->names[j],i+1);
+        omFree(R->parameter[i]);
+        R->parameter[i]=(char *)omAlloc(10);
+        sprintf(R->parameter[i],"@@(%d)",i+1);
       }
     }
   }
