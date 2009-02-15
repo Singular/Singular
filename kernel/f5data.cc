@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5data.cc,v 1.5 2009-02-11 21:24:07 ederc Exp $ */
+/* $Id: f5data.cc,v 1.6 2009-02-15 20:33:56 ederc Exp $ */
 /*
 * ABSTRACT: lpolynomial definition 
 */
@@ -34,10 +34,14 @@ LPoly::LPoly(poly t,int i,poly p, Rule* r) {
 }
 
 void LPoly::setPoly(poly p)  {
+    //poly _p     =   pInit();
+    //_p          =   pCopy(p);
     polynomial = p;
 }
 
 void LPoly::setTerm(poly t) {
+    //poly _t     =   pInit();
+    //_t          =   pCopy(t);
     term = t;
 }
 

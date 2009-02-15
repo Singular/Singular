@@ -47,7 +47,7 @@ Print("HIER LNODE\n");
 }
 
 LNode::LNode(poly t, int i, poly p, Rule* r, LNode* gPCheck, LNode* CompCheck) {
-LPoly* lp = new LPoly(t,i,p,r);
+LPoly* lp           =   new LPoly(t,i,p,r);
 data                =   lp;
 next                =   NULL;
 gPrevRedCheck       =   gPCheck;
