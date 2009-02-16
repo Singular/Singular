@@ -1,18 +1,18 @@
 /*
 Compute the Groebner fan of an ideal
 Author: $Author: monerjan $
-Date: $Date: 2009-02-13 15:17:40 $
-Header: $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.12 2009-02-13 15:17:40 monerjan Exp $
-Id: $Id: gfan.cc,v 1.12 2009-02-13 15:17:40 monerjan Exp $
+Date: $Date: 2009-02-16 16:16:21 $
+Header: $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.13 2009-02-16 16:16:21 monerjan Exp $
+Id: $Id: gfan.cc,v 1.13 2009-02-16 16:16:21 monerjan Exp $
 */
 
 #include "mod2.h"
 
 //A hack that hopefully will make compiler happy. Workaround only
 //do the same in extra.cc and remove it befor committing!
-//#ifndef HAVE_GFAN
-//#define HAVE_GFAN
-//#endif
+#ifndef HAVE_GFAN
+#define HAVE_GFAN
+#endif
 
 #ifdef HAVE_GFAN
 
@@ -62,6 +62,8 @@ void getWallIneq(ideal I)
 	dd_rowrange ddrows;
 	dd_colrange ddcols;
 	dd_rowset ddredrows;		// # of redundant rows in ddineq
+	dd_rowset ddlinset;		// the opposite
+	dd_rowindex ddnewpos;		// all to make dd_Canonicalize happy
 	dd_NumberType ddnumb=dd_Real;	//Number type
 	dd_ErrorType dderr=dd_NoError;	//
 	// End of var declaration
@@ -125,6 +127,8 @@ void getWallIneq(ideal I)
 
 	} //for
 
+	//Maybe add another row to contain the constraints of the standard simplex?
+
 	#ifdef gfan_DEBUG
 	printf("The inequality matrix is:\n");
 	dd_WriteMatrix(stdout, ddineq);
@@ -143,16 +147,23 @@ void getWallIneq(ideal I)
 	}//if dd_Error
 
 	//Remove reduntant rows here!
+	dd_MatrixCanonicalize(&ddineq, &ddlinset, &ddredrows, &ddnewpos, &dderr);
+	#ifdef gfan_DEBUG
+	printf("Having removed redundant rows, the inequalities now read:\n");
+	dd_WriteMatrix(stdout,ddineq);
+	#endif
 
-	ddineq->representation=dd_Inequality;		//We want our LP to be Ax>=0
+	//ddineq->representation=dd_Inequality;		//We want our LP to be Ax>=0
 
-	//Clean up but don't delete the return value!
+	//Clean up but don't delete the return value! (Whatever it will turn out to be)
 	dd_FreeMatrix(ddineq);
-	//dd_clear(ddrows);
-	//dd_clear(ddcols);
-	//dd_clear(ddredrows);
-	//dd_clear(ddnumb);
-	//dd_clear(dderr);
+	//set_free(ddrows);
+	//set_free(ddcols);
+	set_free(ddredrows);
+	//set_free(ddnumb);
+	//set_free(dderr);
+	free(ddnewpos);
+	//set_free(ddlinset);
 	dd_free_global_constants();
 
 	//res=(ideal)aktpoly;
