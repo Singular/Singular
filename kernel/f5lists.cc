@@ -29,13 +29,11 @@ LNode::LNode() {
     data                =   NULL;
     next                =   NULL;
     gPrevRedCheck       =   NULL;
-    completedRedCheck   =   NULL;
 }
  LNode::LNode(LPoly* lp) {
     data                =   lp;
     next                =   NULL;
     gPrevRedCheck       =   NULL;
-    completedRedCheck   =   NULL;
 }
        
 LNode::LNode(LPoly* lp, LNode* l) {
@@ -43,36 +41,31 @@ Print("HIER LNODE\n");
     data                =   lp;
     next                =   l;
     gPrevRedCheck       =   NULL;
-    completedRedCheck   =   NULL;
 }
 
-LNode::LNode(poly t, int i, poly p, Rule* r, LNode* gPCheck, LNode* CompCheck) {
+LNode::LNode(poly t, int i, poly p, Rule* r, LNode* gPCheck) {
 LPoly* lp           =   new LPoly(t,i,p,r);
 data                =   lp;
 next                =   NULL;
 gPrevRedCheck       =   gPCheck;
-completedRedCheck   =   CompCheck;
 }
        
-LNode::LNode(poly t, int i, poly p, Rule* r, LNode* gPCheck, LNode* CompCheck, LNode* l) {
+LNode::LNode(poly t, int i, poly p, Rule* r, LNode* gPCheck, LNode* l) {
     LPoly* lp           =   new LPoly(t,i,p,r);
     data                =   lp;
     next                =   l;
     gPrevRedCheck       =   gPCheck;
-    completedRedCheck   =   CompCheck;
 }
 
  LNode::LNode(LNode* ln) {
     data                =   ln->getLPoly();
     next                =   ln->getNext();
     gPrevRedCheck       =   NULL;
-    completedRedCheck   =   NULL;
 }
         
 LNode::~LNode() {
-    delete next;
+    //delete next;
     delete gPrevRedCheck;
-    delete completedRedCheck;
     delete data;   
 }
        
@@ -84,10 +77,15 @@ LNode* LNode::insert(LPoly* lp) {
 }
         
 LNode* LNode::insert(poly t, int i, poly p, Rule* r) {
-    LNode* newElement = new LNode(t, i, p, r, NULL, NULL, this);
+    LNode* newElement = new LNode(t, i, p, r, NULL, this);
     return newElement;
 }
-        
+
+LNode* LNode::append(poly t, int i, poly p, Rule* r) {
+    LNode* newElement   =   new LNode(t,i,p,r,NULL);
+    this->next          =   newElement;
+}
+
 // insert new elemets to the list w.r.t. increasing labels
 // only used for the S-polys to be reduced (TopReduction building new S-polys with higher label)
 LNode* LNode::insertByLabel(poly t, int i, poly p, Rule* r) {
@@ -150,10 +148,6 @@ LNode* LNode::getGPrevRedCheck() {
     return gPrevRedCheck;
 }
 
-LNode* LNode::getCompletedRedCheck() {
-    return completedRedCheck;
-}
-
 // set the data from the LPoly saved in LNode
 void LNode::setPoly(poly p) {
     data->setPoly(p);
@@ -169,10 +163,6 @@ void LNode::setIndex(int i) {
 
 void LNode::setGPrevRedCheck(LNode* l) {
     gPrevRedCheck   =   l;
-}
-
-void LNode::setCompletedRedCheck(LNode* l) {
-    completedRedCheck   =   l;
 }
 
 // test if for any list element the polynomial part of the data is equal to *p
@@ -199,16 +189,19 @@ functions working on the class LList
 
 LList::LList() {
     first   =   new LNode();
+    last    =   first;
     length  =   0;
 }
 
 LList::LList(LPoly* lp) {
     first   =   new LNode(lp);
+    last    =   first;
     length  =   1;
 }
 
 LList::LList(poly t,int i,poly p,Rule* r) {
     first   =   new LNode(t,i,p,r);
+    last    =   first;
     length  =   1;
 } 
 
@@ -224,6 +217,11 @@ void LList::insert(LPoly* lp) {
 
 void LList::insert(poly t,int i, poly p, Rule* r) {
     first = first->insert(t,i,p,r);
+    length++;
+}
+
+void LList::append(poly t, int i, poly p, Rule* r) {
+    last    =   last->append(t,i,p,r);
     length++;
 }
 
@@ -249,6 +247,10 @@ LNode* LList::getFirst() {
     return first;
 }
 
+LNode* LList::getLast() {
+    return last;
+}
+
 LNode* LList::getNext(LNode* l) {
     return l->getNext();
 }
@@ -261,6 +263,7 @@ void LList::setFirst(LNode* l) {
     LNode* temp =   first;
     first       =   l;
     delete(temp);
+    length--;
 }
 
 

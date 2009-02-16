@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5lists.h,v 1.8 2009-02-11 21:24:08 ederc Exp $ */
+/* $Id: f5lists.h,v 1.9 2009-02-16 14:23:42 ederc Exp $ */
 /*
 * ABSTRACT: list interface
 */
@@ -39,19 +39,20 @@ class LNode {
         LPoly*  data;
         LNode*  next;
         LNode*  gPrevRedCheck;
-        LNode*  completedRedCheck;
     public:
         // generating new list elements from the labeled / classical polynomial view
                 LNode();
                 LNode(LPoly* lp);
                 LNode(LPoly* lp, LNode* l);
-                LNode(poly t, int i, poly p, Rule* r=NULL, LNode* gPCheck=NULL, LNode* CompCheck=NULL);
-                LNode(poly t, int i, poly p, Rule* r, LNode* gPCheck, LNode* CompCheck, LNode* l);
+                LNode(poly t, int i, poly p, Rule* r=NULL, LNode* gPCheck=NULL);
+                LNode(poly t, int i, poly p, Rule* r, LNode* gPCheck, LNode* l);
                 LNode(LNode* ln);
                 ~LNode();
         // insert new elements to the list in first place from the labeled / classical polynomial view
         LNode*  insert(LPoly* lp);
         LNode*  insert(poly t, int i, poly p, Rule* r);
+        //appends elements to the end of the list, done in reduction() in f5gb.cc
+        LNode*  append(poly t, int i, poly p, Rule* r);
         // insert new elements to the list with resp. to increasing labels
         // only used for the S-polys to be reduced (TopReduction building new S-polys with higher label)
         LNode*  insertByLabel(poly t, int i, poly p, Rule* r);
@@ -68,13 +69,11 @@ class LNode {
         int     getIndex(); 
         Rule*   getRule();
         LNode*  getGPrevRedCheck();
-        LNode*  getCompletedRedCheck();
         // set the data from the LPoly saved in LNode
         void    setPoly(poly p);
         void    setTerm(poly t);
         void    setIndex(int i);
         void    setGPrevRedCheck(LNode* l);
-        void    setCompletedRedCheck(LNode* l);
         // test if for any list element the polynomial part of the data is equal to *p
         bool    polyTest(poly* p);
         LNode*  getNext(LNode* l);
@@ -89,6 +88,7 @@ class LList(lists of LPolys)
 class LList {
     private:
         LNode*  first;
+        LNode*  last;
         int     length;
     public:
                 LList();
@@ -100,9 +100,11 @@ class LList {
         void    insert(poly t,int i, poly p, Rule* r = NULL);
         void    insertByLabel(poly t, int i, poly p, Rule* r = NULL);
         void    insertByLabel(LNode* l);
+        void    append(poly t, int i, poly p, Rule* r=NULL);
         void    deleteByDeg();
         bool    polyTest(poly* p);
-        LNode*  getFirst(); 
+        LNode*  getFirst();
+        LNode*  getLast();
         LNode*  getNext(LNode* l);
         int     getLength();
         void    setFirst(LNode* l);

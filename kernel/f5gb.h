@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.25 2009-02-12 12:43:31 ederc Exp $ */
+/* $Id: f5gb.h,v 1.26 2009-02-16 14:23:42 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -78,7 +78,7 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList);
 reduction including subalgorithm topReduction() using Faugere's criteria
 ========================================================================
 */
-LList* reduction(LList* sPolyList, LList* completed, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag,
+void reduction(LList* sPolyList, LList* completed, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag,
                  ideal gbPrev);
 
 /*
@@ -87,7 +87,7 @@ top reduction in F5, i.e. reduction of a given S-polynomial by labeled polynomia
 the same index whereas the labels are taken into account
 =====================================================================================
 */
-TopRed* topReduction(LNode* l, LList* completed, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag); 
+void topReduction(LNode* l, LList* completed, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag); 
 
 /*
 =====================================================================
@@ -95,7 +95,7 @@ subalgorithm to find a possible reductor for the labeled polynomial l
 =====================================================================
 */
 LNode* findReductor(LNode* l,LList* completed,LList* gPrev, RList* rules, LTagList* lTag,RTagList* rTag,
-                    LNode* gPrevRedCheck, LNode* completedRedCheck);
+                    LNode* gPrevRedCheck);
 
 /*
 ======================================
