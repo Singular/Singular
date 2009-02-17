@@ -1,6 +1,6 @@
 // last modified 21.07.2005, Oliver Wienand
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.31 2009-02-10 11:07:32 Singular Exp $";
+version="$Id: surf.lib,v 1.32 2009-02-17 11:47:48 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: surf.lib    Procedures for Graphics with Surf
@@ -16,6 +16,7 @@ NOTE:
  The procedure surfer requires the program @code{surfer} to be installed.
  You can download @code{surfer} from
   @uref{http://www.imaginary2008.de/surfer.php}
+ @*Under Windows, version 159 or newer of @code{surfer} is required.
  @end texinfo
 
 SEE ALSO: surfex_lib
