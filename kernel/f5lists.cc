@@ -69,23 +69,34 @@ LNode::~LNode() {
     delete data;   
 }
        
-// insert new elements to the list always in front (labeled / classical polynomial view)
+// insert new elements to the list always at the end (labeled / classical polynomial view)
+// needed for list gPrev
 LNode* LNode::insert(LPoly* lp) {
-    Print("HIER\n");
-    LNode* newElement = new LNode(lp, this);
+    Print("INSERTION: \n");
+    Print("LAST GPREV: ");
+    pWrite(this->getPoly());
+LNode* newElement   =   new LNode(lp, NULL);
+    this->next          =   newElement;
     return newElement;
 }
         
 LNode* LNode::insert(poly t, int i, poly p, Rule* r) {
-    LNode* newElement = new LNode(t, i, p, r, NULL, this);
+    LNode* newElement   =   new LNode(t, i, p, r, NULL, NULL);
+    this->next          =   newElement;
     return newElement;
 }
 
-LNode* LNode::append(poly t, int i, poly p, Rule* r) {
-    LNode* newElement   =   new LNode(t,i,p,r,NULL);
-    this->next          =   newElement;
+// insert new elements to the list always in front (labeled / classical polynomial view)
+// needed for sPolyList
+LNode* LNode::insertSP(LPoly* lp) {
+    LNode* newElement   =   new LNode(lp, this);
+    return newElement;
 }
-
+        
+LNode* LNode::insertSP(poly t, int i, poly p, Rule* r) {
+    LNode* newElement   =   new LNode(t, i, p, r, NULL, this);
+    return newElement;
+}
 // insert new elemets to the list w.r.t. increasing labels
 // only used for the S-polys to be reduced (TopReduction building new S-polys with higher label)
 LNode* LNode::insertByLabel(poly t, int i, poly p, Rule* r) {
@@ -121,7 +132,7 @@ LNode*  LNode::deleteByDeg() {
 LNode* LNode::getNext() {
     return next;
 }
-        
+
 // get the LPoly* out of LNode*
 LPoly* LNode::getLPoly() {
     return data;
@@ -181,6 +192,22 @@ LNode* LNode::getNext(LNode* l) {
     return l->next;
 }
 
+// for debugging
+void LNode::print() {
+    LNode* temp = this;
+    Print("___________________List of S-polynomials______________________:\n");
+    while(NULL != temp->data) {
+        Print("Index: %d\n",temp->getIndex());
+        Print("Term: ");
+        pWrite(temp->getTerm());
+        Print("Poly: ");
+        pWrite(temp->getPoly());
+        Print("\n");
+        temp = temp->next;
+    }
+}
+
+
 /*
 ====================================
 functions working on the class LList
@@ -209,30 +236,45 @@ LList::~LList() {
     delete first;
 }
 
-// insertion in front of the list
+// insertion at the end of the list, needed for gPrev
 void LList::insert(LPoly* lp) {
-    first = first->insert(lp);
+    last = last->insert(lp);
+    Print("NEW LAST GPREV: ");
+    pWrite(last->getPoly());
     length++;
+    Print("LENGTH %d\n",length);
 }
 
 void LList::insert(poly t,int i, poly p, Rule* r) {
-    first = first->insert(t,i,p,r);
+    last = last->insert(t,i,p,r);
     length++;
+    Print("LENGTH %d\n",length);
 }
 
-void LList::append(poly t, int i, poly p, Rule* r) {
-    last    =   last->append(t,i,p,r);
+// insertion in front of the list, needed for sPolyList
+void LList::insertSP(LPoly* lp) {
+    first = first->insertSP(lp);
     length++;
+    Print("LENGTH %d\n",length);
 }
+
+void LList::insertSP(poly t,int i, poly p, Rule* r) {
+    first = first->insertSP(t,i,p,r);
+    length++;
+    Print("LENGTH %d\n",length);
+}
+
 
 void LList::insertByLabel(poly t, int i, poly p, Rule* r) {
     first = first->insertByLabel(t,i,p,r);
     length++;
+    Print("LENGTH %d\n",length);
 }
 
 void LList::insertByLabel(LNode* l) {
     first = first->insertByLabel(l->getTerm(),l->getIndex(),l->getPoly(),l->getRule());
     length++;
+    Print("LENGTH %d\n",length);
 }
 
 void LList::deleteByDeg() {
@@ -251,22 +293,18 @@ LNode* LList::getLast() {
     return last;
 }
 
-LNode* LList::getNext(LNode* l) {
-    return l->getNext();
-}
-
 int LList::getLength() {
     return length;
 }
 
 void LList::setFirst(LNode* l) {
-    LNode* temp =   first;
     first       =   l;
-    delete(temp);
     length--;
 }
 
-
+void LList::print() {
+    first->print();
+}
 
 /*
 =======================================
@@ -303,6 +341,10 @@ LNode* LTagNode::getLNode() {
     return this->data;
 }
 
+LTagNode* LTagNode::getNext() {
+    return next;
+}
+
 // NOTE: We insert at the beginning of the list and length = i-1, where i is the actual index.
 //       Thus given actual index i and idx being the index of the LPoly under investigation
 //       the element on position length-idx is the right one
@@ -328,6 +370,7 @@ functions working on the class LTagList
 */
 LTagList::LTagList() {
     LTagNode* first =   new LTagNode();
+    
     length          =   0;
 }
 
@@ -342,6 +385,10 @@ void LTagList::insert(LNode* l) {
     length++;
 }
 
+void LTagList::setFirstCurrentIdx(LNode* l) {
+    firstCurrentIdx =   l;
+}
+
 LNode* LTagList::get(int idx) {
     return first->get(idx, length);
 }
@@ -350,6 +397,9 @@ LNode* LTagList::getFirst() {
     return first->getLNode();
 }
 
+LNode* LTagList::getFirstCurrentIdx() {
+    return firstCurrentIdx;
+}
 
 /*
 =====================================
@@ -578,19 +628,29 @@ Rule* CNode::getLastRuleTested() {
 // for debugging
 void CNode::print() {
     CNode* temp = this;
-    Print("List of critical pairs:\n");
+    Print("___________________List of critical pairs______________________:\n");
     while(NULL != temp->data) {
-        Print("Index: %d\n",temp->getLp1Index());
+        Print("LP1 Index: %d\n",temp->getLp1Index());
         Print("T1: ");
         pWrite(temp->getT1());
-        Print("Lp1 Term: ");
+        Print("LP1 Term: ");
         pWrite(temp->getLp1Term());
-        Print("%d\n",temp->getLp2Index());
+        Print("LP1 Poly: ");
+        pWrite(temp->getLp1Poly());
+        Print("LP2 Index: %d\n",temp->getLp2Index());
+        Print("T2: ");
         pWrite(temp->getT2());
+        Print("LP2 Term: ");
         pWrite(temp->getLp2Term());
+        Print("LP2 Poly: ");
+        pWrite(temp->getLp2Poly());
         Print("\n");
         temp = temp->next;
     }
+}
+
+void CNode::setLastRuleTested(Rule* r) {
+    data->setLastRuleTested(r);
 }
 
 /*

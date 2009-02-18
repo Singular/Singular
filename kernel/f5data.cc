@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5data.cc,v 1.6 2009-02-15 20:33:56 ederc Exp $ */
+/* $Id: f5data.cc,v 1.7 2009-02-18 20:43:05 ederc Exp $ */
 /*
 * ABSTRACT: lpolynomial definition 
 */
@@ -147,6 +147,10 @@ int CPair::getLp2Index() {
 
 Rule* CPair::getLastRuleTested() {
     return lastRuleTested;
+}
+
+void CPair::setLastRuleTested(Rule* r) {
+    lastRuleTested   =   r;
 }
 
 /*

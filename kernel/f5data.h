@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5data.h,v 1.5 2009-02-11 21:24:07 ederc Exp $ */
+/* $Id: f5data.h,v 1.6 2009-02-18 20:43:05 ederc Exp $ */
 /*
 * ABSTRACT: labeled polynomial interface
 */
@@ -74,6 +74,7 @@ class CPair {
         poly    getLp2Term();
         int     getLp2Index();
         Rule*   getLastRuleTested();
+        void    setLastRuleTested(Rule* r);
 };
 
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5lists.h,v 1.9 2009-02-16 14:23:42 ederc Exp $ */
+/* $Id: f5lists.h,v 1.10 2009-02-18 20:43:05 ederc Exp $ */
 /*
 * ABSTRACT: list interface
 */
@@ -48,17 +48,21 @@ class LNode {
                 LNode(poly t, int i, poly p, Rule* r, LNode* gPCheck, LNode* l);
                 LNode(LNode* ln);
                 ~LNode();
-        // insert new elements to the list in first place from the labeled / classical polynomial view
+        // insert new elements to the list at the end from the labeled / classical polynomial view
+        // needed for gPrev
         LNode*  insert(LPoly* lp);
         LNode*  insert(poly t, int i, poly p, Rule* r);
-        //appends elements to the end of the list, done in reduction() in f5gb.cc
-        LNode*  append(poly t, int i, poly p, Rule* r);
+        // insert new elements to the list in front from the labeled / classical polynomial view
+        // needed for sPolyList
+        LNode*  insertSP(LPoly* lp);
+        LNode*  insertSP(poly t, int i, poly p, Rule* r);
         // insert new elements to the list with resp. to increasing labels
         // only used for the S-polys to be reduced (TopReduction building new S-polys with higher label)
         LNode*  insertByLabel(poly t, int i, poly p, Rule* r);
         // deletes the first elements of the list with the same degree
-        // get next from current LNode
+        // get next & prev from current LNode
         LNode*  getNext();
+        LNode*  getPrev();
         // only used for the S-polys, which are already sorted by increasing degree by CList
         LNode*  deleteByDeg();
         // get the LPoly* out of LNode*
@@ -77,6 +81,7 @@ class LNode {
         // test if for any list element the polynomial part of the data is equal to *p
         bool    polyTest(poly* p);
         LNode*  getNext(LNode* l);
+        void    print();
 };
 
 
@@ -95,19 +100,23 @@ class LList {
                 LList(LPoly* lp);
                 LList(poly t,int i,poly p, Rule* r = NULL);
                 ~LList();
+        // insertion at the end of the list
+        // needed for gPrev
         void    insert(LPoly* lp);
-        // insertion in front of the list
         void    insert(poly t,int i, poly p, Rule* r = NULL);
+         // insertion in front of the list
+        // needed for sPolyList
+        void    insertSP(LPoly* lp);
+        void    insertSP(poly t,int i, poly p, Rule* r = NULL);
         void    insertByLabel(poly t, int i, poly p, Rule* r = NULL);
         void    insertByLabel(LNode* l);
-        void    append(poly t, int i, poly p, Rule* r=NULL);
         void    deleteByDeg();
         bool    polyTest(poly* p);
         LNode*  getFirst();
         LNode*  getLast();
-        LNode*  getNext(LNode* l);
         int     getLength();
         void    setFirst(LNode* l);
+        void    print();
 };
 
 
@@ -129,6 +138,7 @@ class LTagNode {
         // declaration with first as parameter due to sorting of LTagList
         LTagNode*   insert(LNode* l);
         LNode*      getLNode();
+        LTagNode*   getNext();
         LNode*      get(int i, int length);
 };
 
@@ -141,6 +151,7 @@ class LTagList(lists of LPoly tags, i.e. first elements of a given index)
 class LTagList {
     private:
         LTagNode*   first;
+        LNode*      firstCurrentIdx;
         int         length;
     public:
                 LTagList();
@@ -148,8 +159,10 @@ class LTagList {
                 ~LTagList();
         // declaration with first as parameter in LTagNode due to sorting of LTagList
         void    insert(LNode* l);
+        void    setFirstCurrentIdx(LNode* l);
         LNode*  get(int idx);
         LNode*  getFirst();
+        LNode*  getFirstCurrentIdx();
 };
 
 LNode*  getGPrevRedCheck();
@@ -206,6 +219,7 @@ class CNode {
         int     getLp2Index();
         Rule*   getLastRuleTested();
         void    print();
+        void    setLastRuleTested(Rule* r);
 };
 
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.26 2009-02-16 14:23:42 ederc Exp $ */
+/* $Id: f5gb.h,v 1.27 2009-02-18 20:43:05 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -43,28 +43,39 @@ first element in gPrev is always the newest element which must
 build critical pairs with all other elements in gPrev
 ================================================================
 */
-CList* criticalPair(LList* gPrev, CList* critPairs, LTagList* lTag, RTagList* rTag, RList* rules);
+void criticalPair(LList* gPrev, CList* critPairs, LTagList* lTag, RTagList* rTag, RList* rules);
+
+/*
+================================================================
+computes a list of critical pairs for the next reduction process
+first element in gPrev is always the newest element which must
+build critical pairs with all other elements in gPrev
+NOTE: this is a special version for the call inside reduction()
+      which adds to the already existing critical pairs new ones
+================================================================
+*/
+void criticalPairRed(LList* gPrev, CList* critPairs, LTagList* lTag, RTagList* rTag, RList* rules);
 
 /*
 ========================================
 Criterion 1, i.e. Faugere's F5 Criterion
 ========================================
 */
-bool criterion1(poly* t, LNode* l, LTagList* lTag);
+bool criterion1(LList* gPrev, poly t, LNode* l, LTagList* lTag);
 
 /*
 =====================================
 Criterion 2, i.e. Rewritten Criterion
 =====================================
 */
-bool criterion2(poly* t, LNode* l, RList* rules, RTagList* rTag);
+bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag);
 
 /*
 ==========================================================================================================
 Criterion 2, i.e. Rewritten Criterion, for its second call in sPols(), with added lastRuleTested parameter
 ==========================================================================================================
 */
-bool criterion2(poly* t, LPoly* l, RList* rules, Rule* lastRuleTested);
+bool criterion2(poly t, LPoly* l, RList* rules, Rule* lastRuleTested);
 
 /*
 ==================================
@@ -78,7 +89,7 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList);
 reduction including subalgorithm topReduction() using Faugere's criteria
 ========================================================================
 */
-void reduction(LList* sPolyList, LList* completed, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag,
+void reduction(LList* sPolyList, CList* critPairs, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag,
                  ideal gbPrev);
 
 /*
@@ -87,15 +98,14 @@ top reduction in F5, i.e. reduction of a given S-polynomial by labeled polynomia
 the same index whereas the labels are taken into account
 =====================================================================================
 */
-void topReduction(LNode* l, LList* completed, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag); 
+void topReduction(LNode* l, LList* sPolyList, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag); 
 
 /*
 =====================================================================
 subalgorithm to find a possible reductor for the labeled polynomial l
 =====================================================================
 */
-LNode* findReductor(LNode* l,LList* completed,LList* gPrev, RList* rules, LTagList* lTag,RTagList* rTag,
-                    LNode* gPrevRedCheck);
+LNode* findReductor(LNode* l, LList* gPrev, RList* rules, LTagList* lTag,RTagList* rTag);
 
 /*
 ======================================
