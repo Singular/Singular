@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.27 2009-02-18 20:43:05 ederc Exp $ */
+/* $Id: f5gb.h,v 1.28 2009-02-19 14:52:34 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -46,17 +46,6 @@ build critical pairs with all other elements in gPrev
 void criticalPair(LList* gPrev, CList* critPairs, LTagList* lTag, RTagList* rTag, RList* rules);
 
 /*
-================================================================
-computes a list of critical pairs for the next reduction process
-first element in gPrev is always the newest element which must
-build critical pairs with all other elements in gPrev
-NOTE: this is a special version for the call inside reduction()
-      which adds to the already existing critical pairs new ones
-================================================================
-*/
-void criticalPairRed(LList* gPrev, CList* critPairs, LTagList* lTag, RTagList* rTag, RList* rules);
-
-/*
 ========================================
 Criterion 1, i.e. Faugere's F5 Criterion
 ========================================
@@ -75,7 +64,7 @@ bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag);
 Criterion 2, i.e. Rewritten Criterion, for its second call in sPols(), with added lastRuleTested parameter
 ==========================================================================================================
 */
-bool criterion2(poly t, LPoly* l, RList* rules, Rule* lastRuleTested);
+bool criterion2(poly t, LPoly* l, RList* rules, Rule* testedRule);
 
 /*
 ==================================

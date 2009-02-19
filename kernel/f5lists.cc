@@ -621,8 +621,8 @@ poly* CNode::getAdT2() {
     return this->data->getAdT2();
 }
 
-Rule* CNode::getLastRuleTested() {
-    return this->data->getLastRuleTested();
+Rule* CNode::getTestedRule() {
+    return this->data->getTestedRule();
 }
 
 // for debugging
@@ -647,10 +647,6 @@ void CNode::print() {
         Print("\n");
         temp = temp->next;
     }
-}
-
-void CNode::setLastRuleTested(Rule* r) {
-    data->setLastRuleTested(r);
 }
 
 /*

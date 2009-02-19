@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5data.cc,v 1.7 2009-02-18 20:43:05 ederc Exp $ */
+/* $Id: f5data.cc,v 1.8 2009-02-19 14:52:34 ederc Exp $ */
 /*
 * ABSTRACT: lpolynomial definition 
 */
@@ -84,13 +84,13 @@ LPoly* LPoly::get() {
 functions working on the class CPair
 ====================================
 */
-CPair::CPair(long degree, poly term1, LPoly* lpoly1, poly term2, LPoly* lpoly2) {
+CPair::CPair(long degree, poly term1, LPoly* lpoly1, poly term2, LPoly* lpoly2, Rule* r) {
    deg              =   degree;
    t1               =   term1;
    lp1              =   lpoly1;
    t2               =   term2;
    lp2              =   lpoly2;
-   lastRuleTested   =   NULL;
+   testedRule       =   r;
 }
 
 long CPair::getDeg() {
@@ -145,12 +145,12 @@ int CPair::getLp2Index() {
     return lp2->getIndex();
 }
 
-Rule* CPair::getLastRuleTested() {
-    return lastRuleTested;
+Rule* CPair::getTestedRule() {
+    return testedRule;
 }
 
-void CPair::setLastRuleTested(Rule* r) {
-    lastRuleTested   =   r;
+void CPair::setTestedRule(Rule* r) {
+    testedRule      =   r;
 }
 
 /*

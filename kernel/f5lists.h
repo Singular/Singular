@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5lists.h,v 1.10 2009-02-18 20:43:05 ederc Exp $ */
+/* $Id: f5lists.h,v 1.11 2009-02-19 14:52:34 ederc Exp $ */
 /*
 * ABSTRACT: list interface
 */
@@ -217,9 +217,8 @@ class CNode {
         poly*   getAdT2();  
         int     getLp1Index();
         int     getLp2Index();
-        Rule*   getLastRuleTested();
+        Rule*   getTestedRule();
         void    print();
-        void    setLastRuleTested(Rule* r);
 };
 
 

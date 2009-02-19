@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5data.h,v 1.6 2009-02-18 20:43:05 ederc Exp $ */
+/* $Id: f5data.h,v 1.7 2009-02-19 14:52:34 ederc Exp $ */
 /*
 * ABSTRACT: labeled polynomial interface
 */
@@ -57,9 +57,9 @@ class CPair {
         LPoly*  lp1;            // first labeled poly
         poly    t2;             // second term for label
         LPoly*  lp2;            // second labeled poly
-        Rule*   lastRuleTested; // already tested by rules up to lastRuleTested
+        Rule*   testedRule;     // already tested by rules up to lastRuleTested
     public:
-                CPair(long degree, poly term1, LPoly* lpoly1, poly term2, LPoly* lpoly2);
+                CPair(long degree, poly term1, LPoly* lpoly1, poly term2, LPoly* lpoly2, Rule* r = NULL);
         long    getDeg();
         poly    getT1();
         poly*   getAdT1();
@@ -73,8 +73,8 @@ class CPair {
         poly    getLp2Poly();
         poly    getLp2Term();
         int     getLp2Index();
-        Rule*   getLastRuleTested();
-        void    setLastRuleTested(Rule* r);
+        Rule*   getTestedRule();
+        void    setTestedRule(Rule* r);
 };
 
 
