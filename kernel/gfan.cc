@@ -1,18 +1,12 @@
 /*
 Compute the Groebner fan of an ideal
-Author: $Author: monerjan $
-Date: $Date: 2009-02-16 16:16:21 $
-Header: $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.13 2009-02-16 16:16:21 monerjan Exp $
-Id: $Id: gfan.cc,v 1.13 2009-02-16 16:16:21 monerjan Exp $
+Author: $Author: Singular $
+Date: $Date: 2009-02-19 15:39:08 $
+Header: $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.14 2009-02-19 15:39:08 Singular Exp $
+Id: $Id: gfan.cc,v 1.14 2009-02-19 15:39:08 Singular Exp $
 */
 
 #include "mod2.h"
-
-//A hack that hopefully will make compiler happy. Workaround only
-//do the same in extra.cc and remove it befor committing!
-#ifndef HAVE_GFAN
-#define HAVE_GFAN
-#endif
 
 #ifdef HAVE_GFAN
 

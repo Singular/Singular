@@ -1,12 +1,14 @@
 /*
 gfan.h Interface to gfan.cc
 
-$Author: monerjan $
-$Date: 2009-02-09 20:51:48 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.h,v 1.4 2009-02-09 20:51:48 monerjan Exp $
-$Id: gfan.h,v 1.4 2009-02-09 20:51:48 monerjan Exp $
+$Author: Singular $
+$Date: 2009-02-19 15:39:08 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.h,v 1.5 2009-02-19 15:39:08 Singular Exp $
+$Id: gfan.h,v 1.5 2009-02-19 15:39:08 Singular Exp $
 */
+#ifdef HAVE_GFAN
 #include "intvec.h"
 
 ideal getGB(ideal inputIdeal);
 ideal gfan(ideal inputIdeal);
+#endif
