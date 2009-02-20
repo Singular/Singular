@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: poly.lib,v 1.50 2008-12-15 15:30:30 seelisch Exp $";
+version="$Id: poly.lib,v 1.51 2009-02-20 18:50:55 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  poly.lib      Procedures for Manipulating Polys, Ideals, Modules
@@ -865,7 +865,7 @@ example
 proc denominator(number n)
 "USAGE:    denominator(n); n number
 RETURN:   number, the denominator of n
-SEE ALSO: denominator, content, cleardenom
+SEE ALSO: numerator, content, cleardenom
 EXAMPLE:  example denominator; shows an example
 "
 {
