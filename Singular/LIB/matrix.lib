@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.46 2009-01-14 16:07:05 Singular Exp $";
+version="$Id: matrix.lib,v 1.47 2009-02-20 18:58:36 Singular Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -910,7 +910,7 @@ proc linear_relations(module M)
 "USAGE:   linear_relations(M);
          M: a module
 ASSUME:  All non-zero entries of M are homogeneous polynomials of the same
-         positife degree. The base field must be an exact field (not real
+         positive degree. The base field must be an exact field (not real
          or complex).
          It is not checked whether these assumptions hold.
 RETURN:  a maximal module R such that M*R is formed by zero vectors.

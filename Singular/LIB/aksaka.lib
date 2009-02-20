@@ -1,6 +1,6 @@
 //CM, last modified 10.12.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: aksaka.lib,v 1.1 2007-01-09 10:31:48 Singular Exp $";
+version="$Id: aksaka.lib,v 1.2 2009-02-20 19:02:43 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY: aksaka.lib
@@ -207,7 +207,7 @@ example
 //////////////////////////////////////////////////////////////////////////
 proc wurzel(number r)
 "USAGE: wurzel(r);
-ASSUME: caracteristic of basering is 0, r>=0
+ASSUME: characteristic of basering is 0, r>=0
 RETURN: number, square root of r
 EXAMPLE:example wurzel; shows an example
 "
