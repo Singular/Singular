@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.143 2008-12-15 13:20:14 seelisch Exp $
+@comment $Id: types.doc,v 1.144 2009-02-20 19:00:56 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1064,9 +1064,9 @@ expression.
 @end table
 @c ref
 See
-@ref{intmat}
-@ref{Type conversion and casting}
-@ref{matrix type cast}
+@ref{intmat};
+@ref{Type conversion and casting};
+@ref{matrix type cast}.
 @c ref
 @c ------------------------------
 @node intmat operations, intmat related functions, intmat type cast, intmat
