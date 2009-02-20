@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.102 2008-08-13 15:16:23 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.103 2009-02-20 18:39:21 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -1269,11 +1269,11 @@ void syMake(leftv v,const char * id, idhdl packhdl)
 //  if (v->req_packhdl!=basePack)
 //    Print("search %s in %s\n",id,v->req_packhdl->libname);
 #endif /* HAVE_NS */
+  idhdl h=NULL;
 #ifdef SIQ
   if (siq<=0)
 #endif
   {
-    idhdl h=NULL;
     if (!isdigit(id[0]))
     {
       if (strcmp(id,"basering")==0)
@@ -1281,11 +1281,8 @@ void syMake(leftv v,const char * id, idhdl packhdl)
         if (currRingHdl!=NULL)
         {
           if (id!=IDID(currRingHdl)) omFree((ADDRESS)id);
-          v->rtyp = IDHDL;
-          v->data = (char *)currRingHdl;
-          v->name = IDID(currRingHdl);
-          v->flag = IDFLAG(currRingHdl);
-          return;
+          h=currRingHdl;
+          goto id_found;
         }
         else
         {
@@ -1294,16 +1291,13 @@ void syMake(leftv v,const char * id, idhdl packhdl)
         }
       }
 #ifdef HAVE_NS
-      if (strcmp(id,"Current")==0)
+      else if (strcmp(id,"Current")==0)
       {
         if (currPackHdl!=NULL)
         {
           omFree((ADDRESS)id);
-          v->rtyp = IDHDL;
-          v->data = (char *)currPackHdl;
-          v->name = IDID(currPackHdl);
-          v->flag = IDFLAG(currPackHdl);
-          return;
+          h=currPackHdl;
+          goto id_found;
         }
         else
         {
@@ -1322,12 +1316,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
       if ((h!=NULL) && (IDLEV(h)==myynest))
       {
         if (id!=IDID(h)) omFree((ADDRESS)id);
-        v->rtyp = IDHDL;
-        v->data = (char *)h;
-        v->flag = IDFLAG(h);
-        v->name = IDID(h);
-        v->attribute=IDATTR(h);
-        return;
+        goto id_found;
       }
     }
     /* 4. local ring: ringvar */
@@ -1349,12 +1338,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
     if (h!=NULL)
     {
       if (id!=IDID(h)) omFree((ADDRESS)id);
-      v->rtyp = IDHDL;
-      v->data = (char *)h;
-      v->flag = IDFLAG(h);
-      v->name = IDID(h);
-      v->attribute=IDATTR(h);
-      return;
+      goto id_found;
     }
     /* 6. local ring: number/poly */
     if ((currRingHdl!=NULL) && (IDLEV(currRingHdl)==myynest))
@@ -1437,11 +1421,8 @@ void syMake(leftv v,const char * id, idhdl packhdl)
       if (strcmp(id,IDID(currRingHdl))==0)
       {
         if (IDID(currRingHdl)!=id) omFree((ADDRESS)id);
-        v->rtyp=IDHDL;
-        v->data=currRingHdl;
-        v->name=IDID(currRingHdl);
-        v->attribute=IDATTR(currRingHdl);
-        return;
+        h=currRingHdl;
+        goto id_found;
       }
     }
 #ifdef HAVE_NS
@@ -1451,13 +1432,8 @@ void syMake(leftv v,const char * id, idhdl packhdl)
       if (h!=NULL)
       {
         if (id!=IDID(h)) omFree((ADDRESS)id);
-        v->rtyp = IDHDL;
-        v->data = (char *)h;
-        v->flag = IDFLAG(h);
-        v->name = IDID(h);
-        v->attribute=IDATTR(h);
         v->req_packhdl=basePack;
-        return;
+        goto id_found;
       }
     }
 #endif
@@ -1478,6 +1454,13 @@ void syMake(leftv v,const char * id, idhdl packhdl)
     /* v->rtyp = UNKNOWN;*/
     v->name = id;
   }
+  return;
+id_found: // we have an id (in h) found, to set the data in from h
+  v->rtyp = IDHDL;
+  v->data = (char *)h;
+  v->flag = IDFLAG(h);
+  v->name = IDID(h);
+  v->attribute=IDATTR(h);
 }
 
 int sleftv::Eval()
