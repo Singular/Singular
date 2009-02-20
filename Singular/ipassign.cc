@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.101 2009-02-20 09:19:19 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.102 2009-02-20 09:28:58 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -630,6 +630,7 @@ static BOOLEAN jiA_RING(leftv res, leftv a, Subexpr e)
     }
   }
   r->ref++;
+  jiAssignAttr(res,a);
   return FALSE;
 }
 static BOOLEAN jiA_PACKAGE(leftv res, leftv a, Subexpr e)
