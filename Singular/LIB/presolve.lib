@@ -1,13 +1,12 @@
-//last change: 13.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: presolve.lib,v 1.27 2006-12-18 18:37:04 Singular Exp $";
+version="$Id: presolve.lib,v 1.28 2009-02-20 09:26:50 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  presolve.lib     Pre-Solving of Polynomial Equations
 AUTHOR:   Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de,
 
 PROCEDURES:
- degreepart(id,d1,d2);  elements of id of total degree >= d1 and <= d2
+ degreepart(id,d1,d2);  elements of id of total degree >= d1 and <= d2, and rest
  elimlinearpart(id);    linear part eliminated from id
  elimpart(id[,n]);      partial elimination of vars [among first n vars]
  elimpartanyr(i,p);     factors of p partially eliminated from i in any ring
@@ -17,7 +16,7 @@ PROCEDURES:
  linearpart(id);        elements of id of total degree <=1
  tolessvars(id[,]);     maps id to new basering having only vars occuring in id
  solvelinearpart(id);   reduced std-basis of linear part of id
- sortandmap(id[..]);   map to new basering with vars sorted w.r.t. complexity
+ sortandmap(id[..]);    map to new basering with vars sorted w.r.t. complexity
  sortvars(id[n1,p1..]); sort vars w.r.t. complexity in id [different blocks]
  valvars(id[..]);       valuation of vars w.r.t. to their complexity in id
  idealSplit(id,tF,fS);  a list of ideals such that their intersection
@@ -88,37 +87,73 @@ example
 
 proc degreepart (id,int d1,int d2,list #)
 "USAGE:   degreepart(id,d1,d2[,v]);  id=ideal/module, d1,d1=integers, v=intvec
-RETURN:  generators of id of [v-weighted] total degree >= d1 and <= d2
-         (default: v = 1,...,1)
+RETURN:  list of size 2,
+         _[1]: generators of id of [v-weighted] total degree >= d1 and <= d2
+          (default: v = 1,...,1)
+         _[2]: remaining generators of id
 EXAMPLE: example degreepart; shows an example
 "
 {
-   def dpart = id;
-   int s,ii = size(id),0;
+   if( typeof(id)=="int" or typeof(id)=="number" or typeof(id)=="ideal" )
+   {
+      ideal dpart = ideal(id);
+   }
+   if( typeof(id)=="intmat" or typeof(id)=="matrix" or typeof(id)=="module")
+   {
+      module dpart = module(id);
+   }
+
+   def epart = dpart;
+   int s,ii = ncols(id),0;
    if ( size(#)==0 )
    {
-      for ( ii=1; ii<=s; ii=ii+1 )
+      for ( ii=1; ii<=s; ii++ )
       {
          dpart[ii] = (jet(id[ii],d1-1)==0)*(id[ii]==jet(id[ii],d2))*id[ii];
+         epart[ii] = (size(dpart[ii])==0) * id[ii];
       }
    }
    else
    {
       for ( ii=1; ii<=s; ii=ii+1 )
       {
-         dpart[ii]=(jet(id[ii],d1-1,#[1])==0)*(id[ii]==jet(id[ii],d2,#[1]))*id[ii];
+      dpart[ii]=(jet(id[ii],d1-1,#[1])==0)*(id[ii]==jet(id[ii],d2,#[1]))*id[ii];
+       epart[ii] = (size(dpart[ii])==0)*id[ii];
       }
    }
-   return(simplify(dpart,2));
+   list L = simplify(dpart,2),simplify(epart,2);
+   return(L);
 }
 example
 { "EXAMPLE:"; echo = 2;
    ring r=0,(x,y,z),dp;
    ideal i=1+x+x2+x3+x4,3,xz+y3+z8;
    degreepart(i,0,4);
+
    module m=[x,y,z],x*[x3,y2,z],[1,x2,z3,0,1];
    intvec v=2,3,6;
    show(degreepart(m,8,8,v));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc linearpart (id)
+"USAGE:   linearpart(id);  id=ideal/module
+RETURN:  list of size 2,
+         _[1]: generators of id of total degree <= 1
+         _[2]: remaining generators of id
+EXAMPLE: example linearpart; shows an example
+"
+{
+   return(degreepart(id,0,1));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),dp;
+   ideal i=1+x+x2+x3,3,x+3y+5z;
+   linearpart(i);
+
+   module m=[x,y,z],x*[x3,y2,z],[1,x2,z3,0,1];
+   show(linearpart(m));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -127,67 +162,98 @@ proc elimlinearpart (ideal i,list #)
           default: n=nvars(basering)
 RETURN:   list L with 5 entries:
   @format
-  L[1]: (interreduced) ideal obtained from i by substituing
-        from the first n variables those, which appear in a linear part
-        of i, by putting this part into triangular form
+  L[1]: ideal obtained from i by substituting from the first n variables those
+        which appear in a linear part of i, by putting this part into triangular 
+        form
   L[2]: ideal of variables which have been substituted
   L[3]: ideal, j-th element defines substitution of j-th var in [2]
   L[4]: ideal of variables of basering, eliminated ones are set to 0
   L[5]: ideal, describing the map from the basering to itself such that
         L[1] is the image of i
   @end format
-NOTE:    the procedure does always interreduce the ideal i internally w.r.t.
+NOTE:    the procedure always interreduces the ideal i internally w.r.t.
          ordering dp.
 EXAMPLE: example elimlinearpart; shows an example
 "
 {
-   int ii,n,fi,k;
+   int ii,n,k;
    string o, newo;
    intvec getoption = option(get);
    option(redSB);
-   def P = basering;
-   n = nvars(P);
-//--------------- replace ordering by dp-ordering if necessary ----------------
-   o = "dp("+string(n)+")";
-   fi = find(ordstr(P),o);
-   if( fi == 0 or find(ordstr(P),"a") != 0 )
-   {
-      execute("ring newP = ("+charstr(P)+"),("+varstr(P)+"),dp;");
-      ideal i = imap(P,i);
-   }
+   def BAS = basering;
+   n = nvars(BAS);
+   list gnirlist = ringlist(basering);
+   list g3 = gnirlist[3];
+   list g32 = g3[size(g3)];
+
 //---------------------------------- start ------------------------------------
    if ( size(#)!=0 ) {  n=#[1]; }
    ideal maxi,rest = maxideal(1),0;
-   if ( n < nvars(P) ) { rest = maxi[n+1..nvars(P)]; }
+   if ( n < nvars(BAS) ) 
+   { 
+      rest = maxi[n+1..nvars(BAS)]; 
+   }
    attrib(rest,"isSB",1);
-//-------------------- interreduce and find linear part  ----------------------
-// interred does the only real work. Because of ordering dp the linear part is
-// within the first elements after interreduction
-// **: perhaps Bareiss to constant matrix of linear part instead of interred,
-// and/or for big systems, interred only those generators of id
+
+//-------------------- find linear part and reduce rest ----------------------
+// Perhaps for big systems, check only those generators of id
 // which do not contain elements not to be eliminated
 
-   ideal id = interred(i);
+   //ideal id = interred(i); 
+   //## gmg, geŠndert 9/2008: interred sehr lange z.B. bei Leonard1 in normal, 
+   //daher interred ersetzt durch: std nur auf linearpart angewendet
+   //Ordnung muss global sein, sonst egal (da Lin affin linear)
 
-   if(id[1] == 1 )                          //special case of unit ideal
+//--------------- replace ordering by dp if it is not global -----------------
+   if ( ord_test(BAS) <= 0 )
+   { 
+      intvec V;  
+      V[n]=0; V=V+1;                          //weights for dp ordering
+      gnirlist[3] = list("dp",V), g32;
+      def newBAS = ring(gnirlist);            //change of ring to dp ordering
+      setring newBAS;
+      ideal i = imap(BAS,i);
+   }
+     
+   list  Lin = linearpart(i);
+   ideal lin = std(Lin[1]);          //SB of ideal generated by polys of i
+                                     //having at most degree 1
+   ideal id = Lin[2];                //remaining polys from i, of deg > 1
+   id = simplify(NF(id,lin),2);      //instead of subst
+   ideal id1 = linearpart(id)[1];
+   while( size(id1) != 0 )           //repeat to find linear parts
    {
-     setring P;
+      lin = lin,id1;
+      lin = std(lin);
+      id = simplify(NF(id,lin),2);   //instead of subst
+      id1 = linearpart(id)[1];
+   }
+//------------- check for special case of unit ideal and return ---------------
+   int check;
+   if( lin[1] == 1 ) 
+   { 
+     check = 1; 
+   }
+   else             
+   {
+     for (ii=1; ii<=size(id); ii++ )
+     {
+       if ( id[ii] == 1 )
+       { 
+         check = 1; break;
+        }
+      }
+    }
+
+   if (check == 1)        //case of a unit ideal
+   {
+     setring BAS;
      list L = ideal(1), ideal(0), ideal(0), maxideal(1), maxideal(1);
      option(set,getoption);
      return(L);
    }
-
-   for ( ii=1; ii<=size(id); ii++ )
-   {
-      if( deg(id[ii]) > 1) { break; }
-      k=ii;
-   }
-   if( k == 0 )       { ideal lin; }
-   else               { ideal lin = id[1..k];}
-   if( k < size(id) ) { id = id[k+1..size(id)]; }
-   else               { id = 0; }
 //----- remove generators from lin containing vars not to be eliminated  ------
-   if ( n < nvars(P) )
+   if ( n < nvars(BAS) )
    {
       for ( ii=1; ii<=size(lin); ii++ )
       {
@@ -198,24 +264,24 @@ EXAMPLE: example elimlinearpart; shows an example
          }
       }
    }
-   lin = simplify(lin,3);
-   attrib(lin,"isSB",1);
-   ideal eva = lead(lin);
+   lin = simplify(lin,1);
+   ideal eva = lead(lin);               //vars to be eliminated
    attrib(eva,"isSB",1);
-   ideal neva = reduce(maxideal(1),eva);
+   ideal neva = NF(maxideal(1),eva);    //vars not to be eliminated
 //------------------ go back to original ring end return  ---------------------
-   if( fi == 0 or find(ordstr(P),"a") != 0 )
+
+   if ( ord_test(BAS) <= 0  )           //i.e there was a ring change
    {
-      setring P;
-      ideal id = imap(newP,id);
-      ideal eva = imap(newP,eva);
-      ideal lin = imap(newP,lin);
-      ideal neva = imap(newP,neva);
+      setring BAS;
+      ideal id = imap(newBAS,id);
+      ideal eva = imap(newBAS,eva);
+      ideal lin = imap(newBAS,lin);
+      ideal neva = imap(newBAS,neva);
    }
 
    eva = eva[ncols(eva)..1];  // sorting according to variables in basering
    lin = lin[ncols(lin)..1];
-   ideal phi= neva;
+   ideal phi = neva;
    k = 1;
    for( ii=1; ii<=n; ii++ )
    {
@@ -225,18 +291,18 @@ EXAMPLE: example elimlinearpart; shows an example
          k=k+1;
       }
    }
+
    list L = id, eva, lin, neva, phi;
    option(set,getoption);
    return(L);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring s=0,(x,y,z),dp;
-   ideal i = x3+y2+z,x2y2+z3,y+z+1;
-  elimlinearpart(i);
+   ring s=0,(u,x,y,z),dp;
+   ideal i = u3+y3+z-x,x2y2+z3,y+z+1,y+u;
+   elimlinearpart(i);
 }
 ///////////////////////////////////////////////////////////////////////////////
-
 proc elimpart (ideal i,list #)
 "USAGE:   elimpart(i [,n,e] );  i=ideal, n,e=integers
          n   : only the first n vars are considered for substitution,@*
@@ -259,111 +325,154 @@ RETURN:  list of 5 objects:
   @format
             k[x(1..m)]/i -> k[..variables from [4]..]/[1]
   @end format
-NOTE:    If the basering has ordering (c,dp), this is faster for big ideals,
-         since it avoids internal ring change and mapping.
+NOTE:    Applying elimpart to interred(i) may result in more sbstitutions.
+         However, interred may be more expansive than elimpart for big ideals
 EXAMPLE: example elimpart; shows an example
 "
 {
-   def P = basering;
-   int n,e = nvars(P),1;
+   def BAS = basering;
+   int n,e = nvars(BAS),1;
    if ( size(#)==1 ) {  n=#[1]; }
    if ( size(#)==2 ) {  n=#[1]; e=#[2];}
 //----------- interreduce linear part with proc elimlinearpart ----------------
-// lin = ideal after interreduction of linear part
+// lin = ideal i after interreduction with linear part
 // eva = eliminated (substituted) variables
 // sub = polynomials defining substitution
 // neva= not eliminated variables
 // phi = map describing substitution
+
    list L = elimlinearpart(i,n);
    ideal lin, eva, sub, neva, phi = L[1], L[2], L[3], L[4], L[5];
-//-------- direct substitution of variables if possible and if e!=0 -----------
-// first find terms lin1 of pure degree 1 in each poly of lin
-// k1 = pure degree 1 part, k1+k2 = those polys of lin which contained a pure
-// degree 1 part.
-// Then go to ring newP with ordering c,dp(n) and create a matrix with size(k1)
-// colums and 2 rows, such that if [f1,f2] is a column of M then f1+f2 is one
-// of the polys of lin containing a pure degree 1 part and f1 is this part
-// interreduce this matrix (i.e. Gauss elimination on linear part, with rest
-// transformed accordingly).
-   int ii, kk;
-   if ( e!=0 )
+   if ( e == 0 )
    {
-      ideal k1,k2;
-      int l = size(lin);
-      ideal lin1 = jet(lin,1) - jet(lin,0);  // part of pure degree 1
-      lin = lin - lin1;                      // rest, part of degree 1 substracted
+       return(L);
+   }
+//-------- direct substitution of variables if possible and if e!=0 -----------
+// first find terms lin1 in lin of pure degree 1 in each poly of lin
+// k1 = pure degree 1 part, i.e. nonzero elts of lin1, renumbered
+// k2 = lin2 (=matrix(lin) - matrix(lin2)), renumbered
+// kin = matrix(k1)+matrix(k2) = those polys of lin which contained a pure
+// degree 1 part.
+/*
+Alte Version mit interred:
+// Then go to ring newBAS with ordering c,dp(n) and create a matrix with 
+// size(k1) colums and 2 rows, such that if [f1,f2] is a column of M then f1+f2 
+// is one of the polys of lin containing a pure degree 1 part and f1 is this 
+// part interreduce this matrix (i.e. Gauss elimination on linear part, with 
+// rest transformed accordingly).
+//Ist jetzt durch direkte Substitution gemacht (schneller!)
+         //Variante falls wieder interred angewendet werden soll:
+         //ideal k12 = k1,k2;
+         //matrix M = matrix(k12,2,kk);     //degree 1 part is now in row 1
+         //M = interred(M);             
+         //### interred zu teuer, muss nicht sein. Wenn interred angewendet  
+         //werden soll, vorher in Ring mit Ordnung (c,dp) wechseln!
+         //Abfrage:  if( ordstr(BAS) != "c,dp("+string(n)+")" )
+         //auf KEINEN Fall std (wird zu gross)
+         //l = ncols(M);
+         //k1 = M[1,1..l];
+         //k2 = M[2,1..l];
+Interred ist jetzt ganz weggelassen. Aber es gibt Beispiele wo interred polys
+mit Grad 1 Teilen produziert, die vorher nicht da waren (aus polys, die einen konstanten Term haben).
+z.B. i=xy2-xu4-x+y2,x2y2+z3+zy,y+z2+1,y+u2;, interred(i)=z2+y+1,y2-x,u2+y,x3-z
+-z ergibt ich auch i[2]-z*i[3] mit option(redThrough)
+statt interred kann man hier auch NF(i,i[3])+i[3] verwenden
+hier lifert elimpart(i) 2 Substitutionen (x,y) elimpart(interred(i)) 
+aber 3 (x,y,z)
+Da interred oder NF aber die Laenge der polys vergroessern kann, nicht gemacht
+*/
+   int ii, kk;
+   ideal k1, k2, lin2;
+   int l = size(lin);                   // lin=i after applying elimlinearpart
+   ideal lin1 = jet(lin,1)-jet(lin,0);  // part of pure degree 1
+   //Note: If i,i1,i2 are ideals, then i = i1 - i2 is equivalent to
+   //i = ideal(matrix(i1) - matrix(i2))
 
-      for( ii=1; ii<=l; ii++ )
+   if (size(lin1) == 0 )
+   {
+       return(L);
+   }
+
+   //-------- check candidates for direct substitution of variables ----------
+   //since lin1 != 0 there are candidates for substituting variables
+
+   lin2 = lin - lin1;      //difference as matrix       
+   // rest of lin, part of pure degree 1 substracted from each generator of lin
+
+   for( ii=1; ii<=l; ii++ )
+   {
+      if( lin1[ii] != 0 )
       {
-         if( lin1[ii] != 0 )
-         {
-            kk = kk+1;
-            k1[kk] = lin1[ii];    // part of pure degree 1, renumbered
-            k2[kk] = lin[ii];     // rest of those polys which had a degree 1 part
-            lin[ii] = 0;
-         }
+         kk = kk+1;
+         k1[kk] = lin1[ii];  // part of pure degree 1, renumbered
+         k2[kk] = lin2[ii];  // rest of those polys which had a degree 1 part
+         lin2[ii] = 0;
       }
+   }
+   //Now each !=0 generator of lin2 contains only constant terms or terms of 
+   //degree >= 2, hence lin 2 can never be used for further substitutions
+   //We have: lin = ideal(matrix(k1)+matrix(k2)), lin2
 
-      if( kk != 0 )
-      {
-         if( ordstr(P) != "c,dp(n)" )
-         {
-            execute("ring newP = ("+charstr(P)+"),("+varstr(P)+"),(c,dp);");
-            ideal k1 = imap(P,k1);
-            ideal k2 = imap(P,k2);
-            ideal lin = imap(P,lin);
-            ideal eva = imap(P,eva);
-            ideal sub = imap(P,sub);
-            ideal neva = imap(P,neva);
-         }
-         ideal k12 = k1,k2;
-         matrix M = matrix(k12,2,kk);
-        // M = interred(M);
-         l = ncols(M);
-         k1 = M[1,1..l];
-         k2 = M[2,1..l];
-         ideal kin = matrix(k1)+matrix(k2);
-         lin = simplify(lin,2);
-
-         l = size(kin);
-         poly p; map phi; ideal max;
-         for ( ii=1; ii<=n; ii++  )
+   ideal kin = matrix(k1)+matrix(k2); 
+   //kin = polys of lin which contained a pure degree 1 part.
+   kin = simplify(kin,2);
+   l = size(kin);                      //l != 0 since lin1 != 0
+   poly p,kip,vip, cand;
+   int count=1;
+   while ( count != 0 )
+   {    
+         count = 0;
+         for ( ii=1; ii<=n; ii++  )    //start direct substitution of var(ii)
          {
             for (kk=1; kk<=l; kk++ )
             {
                p = kin[kk]/var(ii);
-               if ( deg(p) == 0 )
+               if ( deg(p) == 0 )  //this means that kin[kk]= p*var(ii) + h,
+                                   //with p=const and h not depending on var(ii)
                {
-                  eva = eva+var(ii);
+                  //we look for the shortest candidate to substitute var(ii)
+                  if ( cand == 0 ) 
+                  { 
+                     cand = kin[kk];  //candidate for substituting var(ii)
+                  } 
+                  else
+                  {
+                     if ( size(kin[kk]) < size(cand) ) 
+                     { 
+                        cand = kin[kk]; 
+                     }
+                  }
+                }
+            }                     
+            if ( cand != 0 )
+            {
+                  p = cand/var(ii);
+                  kip = cand/p;      //normalized poly of kin w.r.t var(ii)
+                  eva = eva+var(ii); //var(ii) added to list of elimin. vars
                   neva[ii] = 0;
-                  sub = sub+kin[kk]/p;
-                  max = maxideal(1);
-                  max[ii] = var(ii) - (kin[kk]/p);
-                  phi = basering,max;
-                  lin = phi(lin);
-                  kin = simplify(phi(kin),2);
+                  sub = sub+kip;     //poly defining substituion
+                  //## gmg: geŠndert 08/2008, map durch subst ersetzt 
+                  //(viel schneller)
+                  vip = var(ii) - kip;  //poly to be substituted
+                  lin = subst(lin, var(ii), vip);  //subst in rest
+                  lin = simplify(lin,2);
+                  kin = subst(kin, var(ii), vip);  //subst in pure dgree 1 part
+                  kin = simplify(kin,2);
                   l = size(kin);
-                 // ii=ii+1;
-                  break;
-               }
+                  count = 1;
             }
+            cand=0;
          }
-         lin = kin+lin;
-      }
    }
+         
+   lin = kin+lin;
+  
    for( ii=1; ii<=size(lin); ii++ )
    {
       lin[ii] = cleardenom(lin[ii]);
    }
-   if( defined(newP) )
-   {
-      setring P;
-      lin = imap(newP,lin);
-      eva = imap(newP,eva);
-      sub = imap(newP,sub);
-      neva = imap(newP,neva);
-   }
-   for( ii=1; ii<=n; ii++ )
+
+   for( ii=1; ii<=n; ii++ )     
    {
       for( kk=1; kk<=size(eva); kk++ )
       {
@@ -371,18 +480,25 @@ EXAMPLE: example elimpart; shows an example
          {  phi[ii] = eva[kk]-sub[kk]; break; }
       }
    }
-   map psi=P,phi;
-   ideal phi1=maxideal(1);
-   for(ii=1;ii<=size(eva);ii++){phi1=psi(phi1);}
+   map psi = BAS,phi;
+   ideal phi1 = maxideal(1);
+   for(ii=1; ii<=size(eva); ii++)
+   {
+      phi1=psi(phi1);
+   }
    L = lin, eva, sub, neva, phi1;
-  return(L);
+   return(L);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring s=0,(x,y,z),dp;
-   ideal i =x2+y2,x2+y+1;
-   elimpart(i,3,0);
-   elimpart(i,3,1);
+   ring s=0,(u,x,y,z),dp;
+   ideal i = xy2-xu4-x+y2,x2y2+z3+zy,y+z2+1,y+u2;
+   elimpart(i);
+
+   i = interred(i); i;
+   elimpart(i);
+
+   elimpart(i,2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -784,24 +900,6 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc linearpart (id)
-"USAGE:   linearpart(id);  id=ideal/module
-RETURN:  generators of id of total degree <= 1
-EXAMPLE: example linearpart; shows an example
-"
-{
-   return(degreepart(id,0,1));
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   ring r=0,(x,y,z),dp;
-   ideal i=1+x+x2+x3,3,x+3y+5z;
-   linearpart(i);
-   module m=[x,y,z],x*[x3,y2,z],[1,x2,z3,0,1];
-   show(linearpart(m));
-}
-///////////////////////////////////////////////////////////////////////////////
-
 proc tolessvars (id ,list #)
 "USAGE:   tolessvars(id [,s1,s2] ); id poly/ideal/vector/module/matrix,
           s1=string (new ordering)@*
@@ -888,7 +986,7 @@ EXAMPLE: example solvelinearpart; shows an example
    {
       if(#[1]!=0) { option(noredSB); }
    }
-   def lin = interred(degreepart(id,0,1));
+   def lin = interred(degreepart(id,0,1)[1]);
    if ( size(#)!=0 )
    {
       if(#[1]!=0)
