@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.222 2008-12-18 10:01:08 Singular Exp $
+@comment $Id: general.doc,v 1.223 2009-02-20 18:55:36 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -3350,10 +3350,10 @@ none
 @item @strong{Purpose:}
 reads a library of procedures from a file. If the given filename does
 not start with @kbd{.} or @kbd{/} and can not be located in the current
-directory, each directory contained in the library
+directory, each directory contained in the
 @code{SearchPath} is searched for file of this name.
 @item @strong{Note on SearchPath:}
-The the library @code{SearchPath} is constructed at @sc{Singular}
+The @code{SearchPath} for a library is constructed at @sc{Singular}
 start-up time as follows:
 @enumerate
 @item
@@ -3376,8 +3376,7 @@ is the value of the environment variable
 @item @code{$DefaultDir}
 is the value of the environment variable
 @code{SINGULAR_DEFAULT_DIR}, if set, or @code{/usr/local/Singular/} on a
-Unix platform, @code{\Singular\} on a Windows 95/98/NT platform, and
-@code{::Singular:} on a Macintosh.
+Unix platform, @code{\Singular\} on a Windows 95/98/NT platform.
 @end itemize
 
 @item
