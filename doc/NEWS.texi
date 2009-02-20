@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.122 2009-02-12 15:08:09 motsak Exp $
+@comment $Id: NEWS.texi,v 1.123 2009-02-20 12:16:14 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -83,7 +83,7 @@ new library: decodegb.lib (see @nref{decodegb_lib}: Generating and solving syste
 @item
 new library: dmodapp.lib (see @nref{dmodapp_lib}: applications of D-modules)
 @item
-new library: bfct.lib global (see @nref{bfct_lib}: Bernstein-Sato polynomial)
+new library: bfun.lib global (see @nref{bfun_lib}: Bernstein-Sato polynomial)
 @comment this was taken back
 @comment @item
 @comment new library: discretize.lib (see @nref{discretize_lib}): tools for the generation of finite difference schemes)
