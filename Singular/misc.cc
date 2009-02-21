@@ -576,6 +576,9 @@ char * versionString()
 #ifdef HAVE_GMS
               StringAppendS("Gauss-Manin system,");
 #endif
+#ifdef HAVE_RATGRING
+              StringAppendS("ratGB,");
+#endif
               StringAppend("random=%d\n",siRandomStart);
               StringAppend("\tCC=%s,\n\tCXX=%s"
 #ifdef __GNUC__
