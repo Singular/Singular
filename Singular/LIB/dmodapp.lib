@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmodapp.lib,v 1.18 2009-02-12 20:25:23 levandov Exp $";
+version="$Id: dmodapp.lib,v 1.19 2009-02-21 15:26:41 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmodapp.lib     Applications of algebraic D-modules
@@ -594,7 +594,7 @@ EXAMPLE: example appelF1; shows examples
 "
 {
   // Appel F1, d = b', SST p.48
-  ring @r = (0,a,b,c,d),(x,y,Dx,Dy),(a(0,0,1,1),dp);
+  ring @r = (0,a,b,c,d),(x,y,Dx,Dy),(a(0,0,1,1),a(0,0,1,0),dp);
   matrix @D[4][4];
   @D[1,3]=1; @D[2,4]=1;
   def @S = nc_algebra(1,@D);
@@ -610,7 +610,6 @@ EXAMPLE: example appelF1; shows examples
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring r = 0,x,dp;
   def A = appelF1();
   setring A;
   IAppel1;
@@ -625,7 +624,7 @@ EXAMPLE: example appelF2; shows examples
 "
 {
   // Appel F2, c = b', SST p.85
-  ring @r = (0,a,b,c),(x,y,Dx,Dy),(a(0,0,1,1),dp);
+  ring @r = (0,a,b,c),(x,y,Dx,Dy),(a(0,0,1,1),a(0,0,1,0),dp);
   matrix @D[4][4];
   @D[1,3]=1; @D[2,4]=1;
   def @S = nc_algebra(1,@D);
@@ -640,7 +639,6 @@ EXAMPLE: example appelF2; shows examples
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring r = 0,x,dp;
   def A = appelF2();
   setring A;
   IAppel2;
@@ -655,7 +653,7 @@ EXAMPLE: example appelF4; shows examples
 "
 {
   // Appel F4, d = c', SST, p. 39
-  ring @r = (0,a,b,c,d),(x,y,Dx,Dy),(a(0,0,1,1),dp);
+  ring @r = (0,a,b,c,d),(x,y,Dx,Dy),(a(0,0,1,1),a(0,0,1,0),dp);
   matrix @D[4][4];
   @D[1,3]=1; @D[2,4]=1;
   def @S = nc_algebra(1,@D);
@@ -670,7 +668,6 @@ EXAMPLE: example appelF4; shows examples
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring r = 0,x,dp;
   def A = appelF4();
   setring A;
   IAppel4;
