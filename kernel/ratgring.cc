@@ -6,7 +6,7 @@
  *  Purpose: Ore-noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: ratgring.cc,v 1.12 2009-02-21 15:25:43 levandov Exp $
+ *  Version: $Id: ratgring.cc,v 1.13 2009-02-21 16:01:05 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "ratgring.h"
@@ -483,7 +483,7 @@ BOOLEAN p_DivisibleByRat(poly a, poly b, int ishift, const ring r)
   for(i=r->N; i>ishift; i--)
   {
 #ifdef PDEBUG
-    PrintS("i=%d,",i);
+    Print("i=%d,",i);
 #endif
     if (p_GetExp(a,i,r) > p_GetExp(b,i,r)) return FALSE;
   }
