@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.38 2008-09-16 12:33:18 Singular Exp $ */
+/* $Id: kutil.h,v 1.39 2009-02-21 17:50:11 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -329,6 +329,12 @@ public:
   // if set, then posInL does not depend on L.length
   BOOLEAN posInLDependsOnLength;
   /*FALSE, if posInL == posInL10*/
+#ifdef HAVE_PLURAL
+  BOOLEAN no_prod_crit;
+#define PROD_CRIT(A) (!(A)->no_prod_crit)
+#else
+#define PROD_CRIT(A) (1)
+#endif
   char    redTailChange;
   char    news;
   char    newt;/*used for messageSets*/

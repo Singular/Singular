@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.42 2008-12-08 10:00:44 wienand Exp $ */
+/* $Id: kstd1.cc,v 1.43 2009-02-21 17:50:11 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1704,6 +1704,8 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(currRing))
   {
+    const BOOLEAN bIsSCA  = rIsSCA(currRing) && strat->z2homog; // for Z_2 prod-crit
+    strat->no_prod_crit   = ! bIsSCA;
     if (w!=NULL)
       r = nc_GB(F, Q, *w, hilb, strat);
     else

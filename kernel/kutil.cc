@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.118 2009-02-21 11:04:19 Singular Exp $ */
+/* $Id: kutil.cc,v 1.119 2009-02-21 17:50:11 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1386,19 +1386,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
 
 #define MYTEST 0
 
-#ifdef HAVE_PLURAL
-  const BOOLEAN bIsPluralRing = rIsPluralRing(currRing);
-  const BOOLEAN bIsSCA        = rIsSCA(currRing) && strat->z2homog; // for Z_2 prod-crit
-  const BOOLEAN bNCProdCrit   = ( !bIsPluralRing || bIsSCA ); // commutative or homogeneous SCA
-
-#else
-  const BOOLEAN bIsPluralRing = FALSE;
-  const BOOLEAN bIsSCA        = FALSE;
-  const BOOLEAN bNCProdCrit   = TRUE;
-#endif
-
-
-  if (strat->sugarCrit && bNCProdCrit)
+  if (strat->sugarCrit && PROD_CRIT(strat))
   {
     if((!((strat->ecartS[i]>0)&&(ecart>0)))
     && pHasNotCF(p,strat->S[i]))
@@ -1467,7 +1455,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
   }
   else /*sugarcrit*/
   {
-    if (bNCProdCrit)
+    if (PROD_CRIT(strat))
     {
       // if currRing->nc_type!=quasi (or skew)
       // TODO: enable productCrit for super commutative algebras...
@@ -1541,7 +1529,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
   else
   {
     #ifdef HAVE_PLURAL
-    if ( bIsPluralRing )
+    if ( rIsPluralRing(currRing) )
     {
       if(pHasNotCF(p, strat->S[i]))
       {
@@ -1552,7 +1540,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
 //             Lp.p = nc_p_Bracket_qq(pCopy(p),strat->S[i]);
 //         }
 //         else
-        if( bIsSCA )
+        if( PROD_CRIT(strat) )
         {
             // product criterion for homogeneous case in SCA
             strat->cp++;
@@ -1617,7 +1605,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
     Lp.p1 = strat->S[i];
     Lp.p2 = p;
 
-//    if ( !bIsPluralRing ) // !!!!
+//    if ( !rIsPluralRing(currRing) ) // !!!!
     assume(pNext(Lp.p)==NULL);
     pNext(Lp.p) = strat->tail; // !!!
 
@@ -1635,7 +1623,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
 
     if (TEST_OPT_INTSTRATEGY)
     {
-      if (!bIsPluralRing)
+      if (!rIsPluralRing(currRing))
         nDelete(&(Lp.p->coef));
     }
 
@@ -1654,9 +1642,7 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
   if(pHasNotCF(p,strat->S[i]))
   {
     //PrintS("prod-crit\n");
-    #ifdef HAVE_PLURAL
-    if((!rIsPluralRing(currRing)) || (rIsSCA(currRing) && strat->z2homog))
-    #endif
+    if(PROD_CRIT(strat))
     {
       //PrintS("prod-crit\n");
       strat->cp++;
@@ -6927,11 +6913,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
     return;
   }
 
-  const BOOLEAN bIsPluralRing = rIsPluralRing(currRing);
-  const BOOLEAN bIsSCA        = rIsSCA(currRing) && strat->z2homog; // for prod-crit
-  const BOOLEAN bNCProdCrit   = ( !bIsPluralRing || bIsSCA ); // commutative or homogeneous SCA
-
-  if (strat->sugarCrit && bNCProdCrit)
+  if (strat->sugarCrit && PROD_CRIT(strat))
   {
     if((!((ecartq>0)&&(ecart>0)))
     && pHasNotCF(p,q))
@@ -7000,7 +6982,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
   }
   else /*sugarcrit*/
   {
-    if (bNCProdCrit)
+    if (PROD_CRIT(strat))
     {
       // if currRing->nc_type!=quasi (or skew)
       // TODO: enable productCrit for super commutative algebras...
@@ -7071,7 +7053,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
     Lp.p=NULL;
   else
   {
-//     if ( bIsPluralRing )
+//     if ( rIsPluralRing(currRing) )
 //     {
 //       if(pHasNotCF(p, q))
 //       {
@@ -7082,7 +7064,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 //             Lp.p = nc_p_Bracket_qq(pCopy(p),q);
 //         }
 //         else
-//         if( bIsSCA )
+//         if( PROD_CRIT(strat) )
 //         {
 //             // product criterion for homogeneous case in SCA
 //             strat->cp++;
@@ -7129,7 +7111,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
     Lp.p1 = q;  // already in the needed form 
     Lp.p2 = p; // already in the needed form 
 
-    if ( !bIsPluralRing )
+    if ( !rIsPluralRing(currRing) )
       pNext(Lp.p) = strat->tail;
 
     /* TEMPORARILY DISABLED FOR SHIFTS because there's no i*/
@@ -7149,7 +7131,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 
     if (TEST_OPT_INTSTRATEGY)
     {
-      if (!bIsPluralRing)
+      if (!rIsPluralRing(currRing))
         nDelete(&(Lp.p->coef));
     }
 

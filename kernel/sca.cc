@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.30 2009-01-06 15:49:14 Singular Exp $
+ *  Version: $Id: sca.cc,v 1.31 2009-02-21 17:50:11 Singular Exp $
  *******************************************************************/
 
 // set it here if needed.
@@ -1040,6 +1040,9 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
     tempQ = SCAQuotient(currRing);
 
   strat->z2homog = id_IsSCAHomogeneous(tempF, NULL, NULL, currRing); // wCx == wCy == NULL!
+  // redo: no_prod_crit
+  const BOOLEAN bIsSCA  = rIsSCA(currRing) && strat->z2homog; // for Z_2 prod-crit
+  strat->no_prod_crit   = ! bIsSCA;
 
 //  strat->homog = strat->homog && strat->z2homog; // ?
 
@@ -1686,6 +1689,9 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 #endif
   
   strat->z2homog = id_IsSCAHomogeneous(tempF, NULL, NULL, currRing); // wCx == wCy == NULL!
+   // redo no_prod_crit:
+  const BOOLEAN bIsSCA  = rIsSCA(currRing) && strat->z2homog; // for Z_2 prod-crit
+  strat->no_prod_crit   = ! bIsSCA;
 
 //  strat->homog = strat->homog && strat->z2homog; // ?
 
