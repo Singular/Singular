@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgbgauss.cc,v 1.8 2006-08-21 17:08:47 Singular Exp $ */
+/* $Id: tgbgauss.cc,v 1.9 2009-02-21 19:15:55 Singular Exp $ */
 /*
 * ABSTRACT: gauss implementation for F4
 */
@@ -500,15 +500,15 @@ void tgb_matrix::print()
   PrintLn();
   for(i=0;i<rows;i++)
   {
-    Print("(");
+    PrintS("(");
     for(j=0;j<columns;j++)
     {
       StringSetS("");
       n_Write(n[i][j],currRing);
-      Print(StringAppendS(""));
-      Print("\t");
+      PrintS(StringAppendS(""));
+      PrintS("\t");
     }
-    Print(")\n");
+    PrintS(")\n");
   }
 }
 
@@ -696,19 +696,19 @@ void tgb_sparse_matrix::print()
 {
   int i;
   int j;
-  Print("\n");
+  PrintLn();
   for(i=0;i<rows;i++)
   {
-    Print("(");
+    PrintS("(");
     for(j=0;j<columns;j++)
     {
       StringSetS("");
       number n=get(i,j);
       n_Write(n,currRing);
-      Print(StringAppendS(""));
-      Print("\t");
+      PrintS(StringAppendS(""));
+      PrintS("\t");
     }
-    Print(")\n");
+    PrintS(")\n");
   }
 }
 
