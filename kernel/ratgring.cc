@@ -6,7 +6,7 @@
  *  Purpose: Ore-noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: ratgring.cc,v 1.13 2009-02-21 16:01:05 Singular Exp $
+ *  Version: $Id: ratgring.cc,v 1.14 2009-02-21 19:30:56 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "ratgring.h"
@@ -74,7 +74,9 @@ poly p_HeadRat(poly p, int ishift, ring r)
 
 /* TO TEST!!! */
 /* returns x-coeff of p, i.e. a poly in x, s.t. corresponding xd-monomials 
-have the same D-part */
+have the same D-part 
+does not destroy p
+*/
 
 poly p_GetCoeffRat(poly p, int ishift, ring r)
 {
@@ -206,6 +208,7 @@ ideal ncGCD(poly p, poly q, const ring r)
 #endif
   poly u = singclap_pdivide(q,g); //q/g
   poly v = singclap_pdivide(p,g); //p/g
+  v = p_Neg(v,r);
   p_Delete(&p,r);
   p_Delete(&q,r);
   ideal h = idInit(2,1);
@@ -364,6 +367,121 @@ ideal ncGCD(poly p, poly q, const ring r)
 //   if (P1!=NULL) pContent(P1);
 //   return(P1);
 // }
+
+
+/*4 - follow the numbering of gring.cc
+* creates the S-polynomial of p1 and p2
+* do not destroy p1 and p2
+*/
+poly nc_rat_CreateSpoly(poly pp1, poly pp2, int ishift, const ring r)
+{
+
+  poly p1 = p_Copy(pp1,r);
+  poly p2 = p_Copy(pp2,r);
+
+  const long lCompP1 = p_GetComp(p1,r);
+  const long lCompP2 = p_GetComp(p2,r);
+
+  if ((lCompP1!=lCompP2) && (lCompP1!=0) && (lCompP2!=0))
+  {
+#ifdef PDEBUG
+    Werror("nc_rat_CreateSpoly: different non-zero components!");
+#endif
+    return(NULL);
+  }
+
+/* note: prod. crit does not apply! */
+  poly pL=pOne();
+  poly m1=pOne();
+  poly m2=pOne();
+  int is = ishift; /* TODO */
+  pLcmRat(p1,p2,pL,is);
+  p_Setm(pL,r);
+#ifdef PDEBUG
+  p_Test(pL,r);
+#endif
+  poly pr1 = p_GetExp_k_n(p1,1,ishift,r); /* rat D-exp of p1 */
+  poly pr2 = p_GetExp_k_n(p2,1,ishift,r); /* rat D-exp of p2 */
+  p_ExpVectorDiff(m1,pL,pr1,r); /* purely in D part by construction */
+  p_ExpVectorDiff(m2,pL,pr2,r); /* purely in D part by construction */
+  p_Delete(&pr1,r);
+  p_Delete(&pr2,r);
+  p_Delete(&pL,r);
+#ifdef PDEBUG
+  p_Test(m1,r);
+  PrintS("d^{gamma-alpha} = "); p_wrp(m1,r); PrintLn();
+  p_Test(m2,r);
+  PrintS("d^{gamma-beta} = "); p_wrp(m2,r); PrintLn();
+#endif
+
+  poly HF = NULL;
+  HF = p_HeadRat(p1,is,r); // lm_D(f)
+  HF  = nc_mm_Mult_p(m1, HF, r); // // d^{gamma-alpha} lm_D(f)
+  poly C  = p_GetCoeffRat(HF,  is, r); // c = lc_D(h_f) in the paper
+
+  poly HG = NULL;
+  HG = p_HeadRat(p2,is,r); // lm_D(g)
+  HG  = nc_mm_Mult_p(m2, HG, r); // // d^{gamma-beta} lm_D(g)
+  poly K  = p_GetCoeffRat(HG,  is, r); // k = lc_D(h_g) in the paper
+
+#ifdef PDEBUG
+  PrintS("f: "); p_wrp(p1,r); PrintS("\n");
+  PrintS("c: "); p_wrp(C,r); PrintS("\n");
+  PrintS("g: "); p_wrp(p2,r); PrintS("\n");
+  PrintS("k: "); p_wrp(K,r); PrintS("\n");
+#endif
+  
+  ideal ncsyz = ncGCD(C,K,r);
+  poly KK = ncsyz->m[0]; ncsyz->m[0]=NULL; //p_Copy(ncsyz->m[0],r); // k'
+  poly CC = ncsyz->m[1]; ncsyz->m[1]= NULL; //p_Copy(ncsyz->m[1],r); // c'
+  id_Delete(&ncsyz,r);
+
+  p_LmDeleteAndNextRat(&p1, is+1, r); // t_f
+  p_LmDeleteAndNextRat(&HF, is+1, r); // r_f = h_f - lt_D(h_f)
+
+  p_LmDeleteAndNextRat(&p2, is+1, r); // t_g
+  p_LmDeleteAndNextRat(&HG, is+1, r); // r_g = h_g - lt_D(h_g)
+
+
+#ifdef PDEBUG
+  PrintS(" t_f: "); p_wrp(p1,r); PrintS("\n");  
+  PrintS(" t_g: "); p_wrp(p2,r); PrintS("\n");  
+  PrintS(" r_f: "); p_wrp(HF,r); PrintS("\n");  
+  PrintS(" r_g: "); p_wrp(HG,r); PrintS("\n");  
+  PrintS(" c': "); p_wrp(CC,r); PrintS("\n");  
+  PrintS(" k': "); p_wrp(KK,r); PrintS("\n");  
+
+#endif
+
+  // k'(r_f + d^{gamma-alpha} t_f)
+
+  p1 = p_Mult_q(m1, p1, r); // p1 = d^{gamma-alpha} t_f
+  p1 = p_Add_q(p1,HF,r); // p1 = r_f + d^{gamma-alpha} t_f
+  p1 = p_Mult_q(KK,p1,r); // p1 = k'(r_f + d^{gamma-alpha} t_f)
+
+  // c'(r_f + d^{gamma-beta} t_g)
+
+  p2 = p_Mult_q(m2, p2, r); // p2 = d^{gamma-beta} t_g
+  p2 = p_Add_q(p2,HG,r); // p2 = r_g + d^{gamma-beta} t_g
+  p2 = p_Mult_q(CC,p2,r); // p2 = c'(r_g + d^{gamma-beta} t_g)
+
+#ifdef PDEBUG
+  p_Test(p1,r);
+  p_Test(p2,r);
+  PrintS(" k'(r_f + d^{gamma-alpha} t_f): "); p_wrp(p1,r);
+  PrintS(" c'(r_g + d^{gamma-beta} t_g): "); p_wrp(p2,r);
+#endif
+
+  poly out = p_Add_q(p1,p2,r); // delete p1, p2; // the sum
+
+#ifdef PDEBUG
+  p_Test(out,r);
+#endif
+
+  if ( out!=NULL ) pContent(out);
+  return(out);
+}
+
 
 /*2
 * reduction of p2 with p1

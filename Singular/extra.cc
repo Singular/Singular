@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.295 2009-02-21 15:25:43 levandov Exp $ */
+/* $Id: extra.cc,v 1.296 2009-02-21 19:30:56 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2696,6 +2696,39 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 	if (rIsPluralRing(currRing))
 	{ 
 	  res->data = nc_rat_ReduceSpolyNew(q,p,is, currRing);
+	  //	res->data = ncGCD(p,q,currRing);	
+	}
+	else res->data=p;
+      }
+      else return TRUE;
+      return FALSE;
+    }
+    else
+/*==================== RatSpoly, noncomm rational coeffs =================*/
+    if (strcmp(sys_cmd, "ratSpoly") == 0)
+    {
+      poly p,q;
+      int is;
+      if ((h!=NULL) && (h->Typ()==POLY_CMD))
+      {
+	p=(poly)h->CopyD();
+	h=h->next;
+      }
+      else return TRUE;
+      if ((h!=NULL) && (h->Typ()==POLY_CMD))
+      {
+	q=(poly)h->CopyD();
+	h=h->next;
+      }
+      else return TRUE;
+      if ((h!=NULL) && (h->Typ()==INT_CMD))
+      {
+	is=(int)((long)(h->Data()));
+	res->rtyp=POLY_CMD;
+	//	res->rtyp=IDEAL_CMD;
+	if (rIsPluralRing(currRing))
+	{ 
+	  res->data = nc_rat_CreateSpoly(p,q,is,currRing);
 	  //	res->data = ncGCD(p,q,currRing);	
 	}
 	else res->data=p;

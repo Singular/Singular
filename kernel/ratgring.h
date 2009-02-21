@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ratgring.h,v 1.6 2008-08-07 21:15:56 levandov Exp $ */
+/* $Id: ratgring.h,v 1.7 2009-02-21 19:30:56 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -34,7 +34,7 @@ ideal ncGCD2(poly p, poly q, ring r); // real nc stuff
 
 ideal ncGCD(poly p, poly q, ring r); // for p,q from a commutative ring
 
-//poly nc_rat_CreateSpoly(poly p1, poly p2, poly spNoether, int ishift, ring r);
+poly nc_rat_CreateSpoly(poly p1, poly p2, int ishift, ring r);
 
 poly nc_rat_ReduceSpolyNew(poly p1, poly p2, int ishift, ring r);
 
