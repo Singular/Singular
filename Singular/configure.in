@@ -113,7 +113,7 @@ SINGULAR_MAJOR_VERSION=${SINGULAR_MAJOR_VERSION:-3}
 SINGULAR_MINOR_VERSION=${SINGULAR_MINOR_VERSION:-1}
 SINGULAR_SUB_VERSION=${SINGULAR_SUB_VERSION:-0}
 SINGULAR_VERSION="${SINGULAR_VERSION:-$SINGULAR_MAJOR_VERSION${VERSION_SEP}$SINGULAR_MINOR_VERSION${VERSION_SEP}$SINGULAR_SUB_VERSION}"
-VERSION_DATE=${VERSION_DATE:-"Aug 2008"}
+VERSION_DATE=${VERSION_DATE:-"Mar 2009"}
 
 dnl pass them on into the Makefiles
 AC_SUBST(SINGULAR_VERSION)
@@ -665,6 +665,9 @@ AC_ARG_WITH(
   [  --with-NTL              build for use with NTL.],
   ,
   with_NTL=yes)
+AC_ARG_WITH(
+  RatGB,
+  [  --with-ratGB            do compile with ratGB support (experimental)])
 
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl check for packages we need
@@ -1030,6 +1033,14 @@ if test "$with_Plural" != no && test "$enable_Plural" != no; then
   AC_SUBST(PLURAL)
 else
   AC_MSG_RESULT(no)
+fi
+
+AC_MSG_CHECKING(whether to have ratGB)
+if test "$with_ratGB" != yes && test "$enable_ratGB" != yes; then
+  AC_MSG_RESULT(no)
+else
+  AC_DEFINE(HAVE_RATGRING)
+  AC_MSG_RESULT(yes)
 fi
 
 
