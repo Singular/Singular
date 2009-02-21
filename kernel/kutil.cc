@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.117 2009-02-10 18:53:04 Singular Exp $ */
+/* $Id: kutil.cc,v 1.118 2009-02-21 11:04:19 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1354,7 +1354,8 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat,
   else
     posx = strat->posInL(strat->L,strat->Ll,&h,strat);
   h.sev = pGetShortExpVector(h.p);
-  h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
+  if (currRing!=strat->tailRing)
+    h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
   enterL(&strat->L,&strat->Ll,&strat->Lmax,h,posx);
   return TRUE;
 }
@@ -6091,7 +6092,7 @@ BOOLEAN kCheckSpolyCreation(LObject *L, kStrategy strat, poly &m1, poly &m2)
 BOOLEAN kCheckStrongCreation(int atR, poly m1, int atS, poly m2, kStrategy strat)
 {
   assume(strat->S_2_R[atS] >= -1 && strat->S_2_R[atS] <= strat->tl);
-  assume(strat->tailRing != currRing);
+  //assume(strat->tailRing != currRing);
 
   poly p1_max = (strat->R[atR])->max;
   poly p2_max = (strat->R[strat->S_2_R[atS]])->max;
