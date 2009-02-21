@@ -6,7 +6,7 @@
  *  Purpose: Ore-noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: ratgring.cc,v 1.11 2008-08-07 21:15:56 levandov Exp $
+ *  Version: $Id: ratgring.cc,v 1.12 2009-02-21 15:25:43 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "ratgring.h"
@@ -96,17 +96,17 @@ poly p_GetCoeffRat(poly p, int ishift, ring r)
 void p_LmDeleteAndNextRat(poly *p, int ishift, ring r)
 {
   /* modifies p*/
-  Print("start: "); Print(" "); p_wrp(*p,r);
+  //  Print("start: "); Print(" "); p_wrp(*p,r);
   p_LmCheckPolyRing2(*p, r);
   poly q = p_Head(*p,r);
   // in the next line ishift is correct
   while ( ( (*p)!=NULL ) && ( p_Comp_k_n(*p, q, ishift, r) ))
   {
     p_LmDelete(p,r);
-    Print("while: ");p_wrp(*p,r);Print(" ");
+    //    Print("while: ");p_wrp(*p,r);Print(" ");
   }
-  p_wrp(*p,r);Print(" ");
-  PrintS("end\n"); 
+  //  p_wrp(*p,r);Print(" ");
+  //  PrintS("end\n"); 
   p_LmDelete(&q,r);
 }
 
@@ -145,6 +145,7 @@ void p_ExpVectorDiffRat(poly pr, poly p1, poly p2, int ishift, ring r)
 
 ideal ncGCD2(poly p, poly q, const ring r)
 {
+  // todo: must destroy p,q
   intvec *w = NULL;
   ideal h = idInit(2,1);
   h->m[0] = p_Copy(p,r);
@@ -192,18 +193,21 @@ ideal ncGCD2(poly p, poly q, const ring r)
 
 ideal ncGCD(poly p, poly q, const ring r)
 {
+  // destroys p and q
   // assume: p,q are in the comm. ring
   // to be used in the coeff business
 #ifdef PDEBUG
-  Print("G_start:");
+  PrintS(" GCD_start:");
 #endif
   poly g = singclap_gcd(p_Copy(p,r),p_Copy(q,r));
 #ifdef PDEBUG
   p_wrp(g,r);
-  Print("G_end;");
+  PrintS(" GCD_end;\n");
 #endif
   poly u = singclap_pdivide(q,g); //q/g
   poly v = singclap_pdivide(p,g); //p/g
+  p_Delete(&p,r);
+  p_Delete(&q,r);
   ideal h = idInit(2,1);
   h->m[0] = u; // p_Copy(u,r);
   h->m[1] = v; // p_Copy(v,r);
@@ -384,79 +388,80 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
   int is = ishift; /* TODO */
 
   poly m = pOne();
-  p_ExpVectorDiffRat(m, p1, p2, ishift, r); // includes X and D parts
+  p_ExpVectorDiffRat(m, p2, p1, ishift, r); // includes X and D parts
   //p_Setm(m,r);
   //  m = p_GetExp_k_n(m,1,ishift,r); /* rat D-exp of m */
 #ifdef PDEBUG
   p_Test(m,r);
+  PrintS("d^alpha = "); p_wrp(m,r); PrintLn();
 #endif
 
   /* pSetComp(m,r)=0? */
   poly HH = NULL;
   poly H  = NULL;
-  HH = p_Copy(p_HeadRat(p1,is,r),r); // lm_D(g)
+  HH = p_HeadRat(p1,is,r); //p_Copy(p_HeadRat(p1,is,r),r); // lm_D(g)
 //  H  = r->nc->p_Procs.mm_Mult_p(m, p_Copy(HH, r), r); // d^aplha lm_D(g)
-  H  = nc_mm_Mult_pp(m, HH, r); // d^aplha lm_D(g) == h_g in the paper
+  H  = nc_mm_Mult_p(m, HH, r); // d^aplha lm_D(g) == h_g in the paper
 
-  poly K  = p_Copy( p_GetCoeffRat(H,  is, r), r); // k in the paper
-  Print("k: "); p_wrp(K,r); PrintS("\n");
-  poly P  = p_Copy( p_GetCoeffRat(p2, is, r), r); // lc_D(p_2) == lc_D(f)
-  Print("p: "); p_wrp(P,r); PrintS("\n");
+  poly K  = p_GetCoeffRat(H,  is, r); //p_Copy( p_GetCoeffRat(H,  is, r), r); // k in the paper
+  poly P  = p_GetCoeffRat(p2, is, r); //p_Copy( p_GetCoeffRat(p2, is, r), r); // lc_D(p_2) == lc_D(f)
 
-  //  HH = p_Neg(HH, r);
-  //  poly out = NULL;
-  //  out = p_Add_q(p_Copy(p1,r), HH, r); // out == t_g
-
-  Print("f: "); p_wrp(p2,r); PrintS("\n");
-  Print("g: "); p_wrp(p1,r); PrintS("\n");
-
+#ifdef PDEBUG
+  PrintS("k: "); p_wrp(K,r); PrintS("\n");
+  PrintS("p: "); p_wrp(P,r); PrintS("\n");
+  PrintS("f: "); p_wrp(p2,r); PrintS("\n");
+  PrintS("g: "); p_wrp(p1,r); PrintS("\n");
+#endif
   // alt:
-  poly out = p1; //p_Copy(p1,r);
+  poly out = p_Copy(p1,r);
   p_LmDeleteAndNextRat(&out, is+1, r); // out == t_g
 
-  Print("t_g: "); p_wrp(out,r);
-
   ideal ncsyz = ncGCD(P,K,r);
-  poly KK = p_Copy(ncsyz->m[0],r); // k'
-  poly PP = p_Copy(ncsyz->m[1],r); // p'
-  
-//    HH = p_Copy(p_HeadRat(p2,is,r),r);
-//    HH = p_Neg(HH, r);
-//    p2 = p_Add_q(p2, HH, r); // t_f
+  poly KK = ncsyz->m[0]; ncsyz->m[0]=NULL; //p_Copy(ncsyz->m[0],r); // k'
+  poly PP = ncsyz->m[1]; ncsyz->m[1]= NULL; //p_Copy(ncsyz->m[1],r); // p'
 
-  // alt:
+#ifdef PDEBUG
+  PrintS("t_g: "); p_wrp(out,r);
+  PrintS("k': "); p_wrp(KK,r); PrintS("\n");  
+  PrintS("p': "); p_wrp(PP,r); PrintS("\n");  
+#endif
+  id_Delete(&ncsyz,r);
   p_LmDeleteAndNextRat(&p2, is+1, r); // t_f
+  p_LmDeleteAndNextRat(&H, is+1, r); // r_g = h_g - lt_D(h_g)
 
-  Print("t_f: "); p_wrp(p2,r);
-
-//    HH = p_Copy(p_HeadRat(H,is,r),r);
-//    HH = p_Neg(HH, r);
-//    H  = p_Add_q(H, HH, r); // r_g
-
-  // alt:
-  p_LmDeleteAndNextRat(&H, is+1, r); // r_g
-
-  Print("r_g: "); p_wrp(H,r);
+#ifdef PDEBUG
+  PrintS(" t_f: "); p_wrp(p2,r);
+  PrintS(" r_g: "); p_wrp(H,r);
+#endif
 
   p2 = p_Mult_q(KK, p2, r); // p2 = k' t_f
-  p_Test(p2,r);
-//  p_Delete(&KK,r);
 
-  Print("k' t_f: "); p_wrp(p2,r);
+#ifdef PDEBUG
+  p_Test(p2,r);
+  PrintS(" k' t_f: "); p_wrp(p2,r);
+#endif
 
 //  out = r->nc->p_Procs.mm_Mult_p(m, out, r); // d^aplha t_g
   out = nc_mm_Mult_p(m, out, r); // d^aplha t_g  
-  
   p_Delete(&m,r);
 
-  Print("d^a t_g: "); p_wrp(out,r);
-  Print(" end reduction\n");
-  out = p_Add_q(H, out, r); // r_g + d^a t_g
-  p_Test(out,r);
-  out  = p_Mult_q(PP, out, r); // c' (r_g + d^a t_g)
+#ifdef PDEBUG
+  PrintS(" d^a t_g: "); p_wrp(out,r);
+  PrintS(" end reduction\n");
+#endif
 
-  out = p_Add_q(p2,out,r); // delete out, p2; // the sum
+  out = p_Add_q(H, out, r); // r_g + d^a t_g
+
+#ifdef PDEBUG
   p_Test(out,r);
+#endif
+  out = p_Mult_q(PP, out, r); // p' (r_g + d^a t_g)
+  out = p_Add_q(p2,out,r); // delete out, p2; // the sum
+
+#ifdef PDEBUG
+  p_Test(out,r);
+#endif
+
   if ( out!=NULL ) pContent(out);
   return(out);
 }
@@ -467,9 +472,19 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
 
 BOOLEAN p_DivisibleByRat(poly a, poly b, int ishift, const ring r)
 {
+#ifdef PDEBUG
+  PrintS("invoke p_DivByRat with a = ");
+  p_wrp(p_Head(a,r),r);
+  PrintS(" and b= ");
+  p_wrp(p_Head(b,r),r); 
+  PrintLn();
+#endif
   int i;
-  for(i=r->N;i>ishift;i--)
+  for(i=r->N; i>ishift; i--)
   {
+#ifdef PDEBUG
+    PrintS("i=%d,",i);
+#endif
     if (p_GetExp(a,i,r) > p_GetExp(b,i,r)) return FALSE;
   }
   return ((p_GetComp(a,r)==p_GetComp(b,r)) || (p_GetComp(a,r)==0));
@@ -490,10 +505,13 @@ int redRat (poly* h, poly *reducer, int *red_length, int rl, int ishift, ring r)
     j=rl;l=MAX_INT_VAL;
     for(i=rl-1;i>=0;i--)
     {
+      //      Print("test %d, l=%d (curr=%d, l=%d\n",i,red_length[i],j,l);
       if ((l>red_length[i]) && (p_DivisibleByRat(reducer[i],*h,ishift,r)))
       {
         j=i; l=red_length[i];
+	//        PrintS(" yes\n");
       }
+      //      else PrintS(" no\n");
     }
     if (j >=rl)
     {

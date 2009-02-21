@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.294 2009-02-12 16:22:17 motsak Exp $ */
+/* $Id: extra.cc,v 1.295 2009-02-21 15:25:43 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2649,7 +2649,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 	if (rIsPluralRing(currRing))
 	{ 
 	  id = IDELEMS(I);
-          int *pl=(int*)omAlloc0(IDELEMS(I)*sizeof(int));
+                 int *pl=(int*)omAlloc0(IDELEMS(I)*sizeof(int));
 	  for(k=0; k < id; k++)
 	  {
 	    pl[k] = pLength(I->m[k]);
