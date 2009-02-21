@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.35 2009-01-15 10:33:24 Singular Exp $ */
+/* $Id: polys.cc,v 1.36 2009-02-21 17:05:51 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -715,12 +715,12 @@ BOOLEAN pHasNotCF(poly p1, poly p2)
     if (pGetComp(p1) > 0 || pGetComp(p2) > 0)
       return FALSE;
   }
-  int i = 1;
+  int i = pVariables;
   loop
   {
     if ((pGetExp(p1, i) > 0) && (pGetExp(p2, i) > 0))   return FALSE;
-    if (i == pVariables)                                return TRUE;
-    i++;
+    i--;
+    if (i == 0)                                         return TRUE;
   }
 }
 
