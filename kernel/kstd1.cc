@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.43 2009-02-21 17:50:11 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.44 2009-02-22 17:37:54 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1656,6 +1656,8 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   else
     strat->LazyPass=2;
   strat->LazyDegree = 1;
+  strat->enterOnePair=enterOnePairNormal;
+  strat->chainCrit=chainCritNormal;
   strat->ak = idRankFreeModule(F);
   strat->kModW=kModW=NULL;
   strat->kHomW=kHomW=NULL;
