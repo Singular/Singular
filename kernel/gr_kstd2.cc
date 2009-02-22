@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.26 2009-02-21 15:25:43 levandov Exp $ */
+/* $Id: gr_kstd2.cc,v 1.27 2009-02-22 11:22:08 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -1115,12 +1115,12 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
       /* deletes the short spoly and computes */
       pLmFree(strat->P.p);
       /* the real one */
-      if (ncRingType(currRing)==nc_lie) /* prod crit */
-        if(pHasNotCF(strat->P.p1,strat->P.p2))
-        {
+//      if (ncRingType(currRing)==nc_lie) /* prod crit */
+//        if(pHasNotCF(strat->P.p1,strat->P.p2))
+//        {
 //          strat->cp++;
-          /* prod.crit itself in nc_CreateSpoly */
-        }
+//          /* prod.crit itself in nc_CreateSpoly */
+//        }
 
       strat->P.p = nc_CreateSpoly(strat->P.p1,strat->P.p2,currRing);
 
