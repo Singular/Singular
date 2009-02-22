@@ -100,25 +100,36 @@ LNode* LNode::insertSP(poly t, int i, poly p, Rule* r) {
 // insert new elemets to the list w.r.t. increasing labels
 // only used for the S-polys to be reduced (TopReduction building new S-polys with higher label)
 LNode* LNode::insertByLabel(poly t, int i, poly p, Rule* r) {
-    if(0 == pLmCmp(t,this->getTerm()) || -1 == pLmCmp(t,this->getTerm())) {
+    if(NULL == data) {
         LNode* newElement   =   new LNode(t, i, p, r, this);
         return newElement;
     }
     else {
-        LNode* temp = this;
-        while( NULL != temp->next->data ) {
-            if( 0 == pLmCmp(t,temp->next->getTerm()) || -1 == pLmCmp(t,temp->next->getTerm())) {
-                LNode* newElement   =   new LNode(t, i, p, r, temp->next);
-                temp->next          =   newElement;
-                return this;
-            }
-            else {
-                temp = temp->next;
-            }
+        if(0 == pLmCmp(t,this->getTerm()) || -1 == pLmCmp(t,this->getTerm())) {
+            LNode* newElement   =   new LNode(t, i, p, r, this);
+            return newElement;
         }
-        LNode* newElement   =   new LNode(t, i, p, r, NULL);
-        temp->next          =   newElement;
-        return this;
+        else {
+            LNode* temp = this;
+            while(NULL != temp->next && NULL != temp->next->data) {
+                if( 0 == pLmCmp(t,temp->next->getTerm()) || -1 == pLmCmp(t,temp->next->getTerm())) {
+                    LNode* newElement   =   new LNode(t, i, p, r, temp->next);
+                    temp->next          =   newElement;
+                    return this;
+                }
+                else {
+                    temp = temp->next;
+                    Print("%p\n",temp);
+                    Print("%p\n",temp->data);
+                    
+                    Print("%p\n",temp->next);
+                }
+            }
+        Print("HIER\n");
+            LNode* newElement   =   new LNode(t, i, p, r, temp->next);
+            temp->next          =   newElement;
+            return this;
+        }
     }
 }
 
@@ -196,7 +207,8 @@ LNode* LNode::getNext(LNode* l) {
 void LNode::print() {
     LNode* temp = this;
     Print("___________________List of S-polynomials______________________:\n");
-    while(NULL != temp->data) {
+    while(NULL != temp && NULL != temp->data) {
+        Print("HIER\n");
         Print("Index: %d\n",temp->getIndex());
         Print("Term: ");
         pWrite(temp->getTerm());
