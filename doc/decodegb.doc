@@ -783,12 +783,8 @@ algebraic closure of F_q. Then
   @display
   U_i-u_i(e), i=1,@dots{},n,
   V_j-v_j, j=1,@dots{},t,  
-<<<<<<< decodegb.doc
   @end display
-  where (u(e),v) is the unique solution.
-=======
-  where (u(e),v)) is the unique solution.
->>>>>>> 1.6
+  where (u(e),v) is a unique solution.
 @end ifinfo
 @end itemize
 
