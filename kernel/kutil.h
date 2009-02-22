@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.40 2009-02-22 10:39:42 Singular Exp $ */
+/* $Id: kutil.h,v 1.41 2009-02-22 17:37:55 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -254,6 +254,8 @@ public:
   void (*initEcartPair)(LObject * h, poly f, poly g, int ecartF, int ecartG);
   int (*posInLOld)(const LSet Ls,const int Ll,
                    LObject* Lo,const kStrategy strat);
+  void (*enterOnePair) (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR /*= -1*/);
+  void (*chainCrit) (poly p,int ecart,kStrategy strat);
   pFDegProc pOrigFDeg;
   pLDegProc pOrigLDeg;
   pFDegProc pOrigFDeg_TailRing;
@@ -448,6 +450,8 @@ void exitBuchMora (kStrategy strat);
 void updateResult(ideal r,ideal Q,kStrategy strat);
 void completeReduce (kStrategy strat, BOOLEAN withT=FALSE);
 void kFreeStrat(kStrategy strat);
+void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR);
+void chainCritNormal (poly p,int ecart,kStrategy strat);
 BOOLEAN homogTest(polyset F, int Fmax);
 BOOLEAN newHEdge(polyset S, kStrategy strat);
 // returns index of p in TSet, or -1 if not found

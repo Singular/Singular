@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.120 2009-02-22 10:39:42 Singular Exp $ */
+/* $Id: kutil.cc,v 1.121 2009-02-22 17:37:55 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1366,7 +1366,7 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat,
 */
 
 
-void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR = -1)
+void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR = -1)
 {
   assume(i<=strat->sl);
   if (strat->interred_flag) return;
@@ -1744,7 +1744,7 @@ void kMergeBintoL(kStrategy strat)
 *the pairset B of pairs of type (s[i],p) is complete now. It will be updated
 *using the chain-criterion in B and L and enters B to L
 */
-void chainCrit (poly p,int ecart,kStrategy strat)
+void chainCritNormal (poly p,int ecart,kStrategy strat)
 {
   int i,j,l;
 
@@ -2264,7 +2264,7 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
           if (!strat->fromQ[j])
           {
             new_pair=TRUE;
-            enterOnePair(j,h,ecart,isFromQ,strat, atR);
+            strat->enterOnePair(j,h,ecart,isFromQ,strat, atR);
           //Print("j:%d, Ll:%d\n",j,strat->Ll);
           }
         }
@@ -2274,7 +2274,7 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
         new_pair=TRUE;
         for (j=0; j<=k; j++)
         {
-          enterOnePair(j,h,ecart,isFromQ,strat, atR);
+          strat->enterOnePair(j,h,ecart,isFromQ,strat, atR);
           //Print("j:%d, Ll:%d\n",j,strat->Ll);
         }
       }
@@ -2287,7 +2287,7 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
         || (pGetComp(strat->S[j])==0))
         {
           new_pair=TRUE;
-          enterOnePair(j,h,ecart,isFromQ,strat, atR);
+          strat->enterOnePair(j,h,ecart,isFromQ,strat, atR);
         //Print("j:%d, Ll:%d\n",j,strat->Ll);
         }
       }
@@ -2300,7 +2300,7 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
         chainCritPart(h,ecart,strat);
       else
 #endif
-      chainCrit(h,ecart,strat);
+      strat->chainCrit(h,ecart,strat);
     }
   }
 }
@@ -5598,6 +5598,9 @@ void initHilbCrit(ideal F, ideal Q, intvec **hilb,kStrategy strat)
 
 void initBuchMoraCrit(kStrategy strat)
 {
+  strat->enterOnePair=enterOnePairNormal;
+  strat->chainCrit=chainCritNormal;
+
   strat->sugarCrit =        TEST_OPT_SUGARCRIT;
   // obachman: Hmm.. I need BTEST1(2) for notBuckets ..
   //  strat->Gebauer =          BTEST1(2) || strat->homog || strat->sugarCrit;
@@ -7246,7 +7249,7 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
         chainCritPart(h,ecart,strat);
       else
 #endif
-      chainCrit(h,ecart,strat);
+      strat->chainCrit(h,ecart,strat);
     }
 
   }

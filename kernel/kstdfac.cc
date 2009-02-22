@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.15 2009-02-22 17:37:55 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.16 2009-02-22 17:38:18 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -172,6 +172,7 @@ kStrategy kStratCopy(kStrategy o)
   s->initEcartPair=o->initEcartPair;
   s->posInLOld=o->posInLOld;
   s->enterOnePair=o->enterOnePair;
+  s->chainCrit=o->chainCrit;
   s->Shdl=idCopy(o->Shdl);
   s->S=s->Shdl->m;
   s->tailRing = o->tailRing;
