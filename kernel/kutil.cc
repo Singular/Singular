@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.119 2009-02-21 17:50:11 Singular Exp $ */
+/* $Id: kutil.cc,v 1.120 2009-02-22 10:39:42 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1386,7 +1386,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
 
 #define MYTEST 0
 
-  if (strat->sugarCrit && PROD_CRIT(strat))
+  if (strat->sugarCrit && ALLOW_PROD_CRIT(strat))
   {
     if((!((strat->ecartS[i]>0)&&(ecart>0)))
     && pHasNotCF(p,strat->S[i]))
@@ -1455,7 +1455,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
   }
   else /*sugarcrit*/
   {
-    if (PROD_CRIT(strat))
+    if (ALLOW_PROD_CRIT(strat))
     {
       // if currRing->nc_type!=quasi (or skew)
       // TODO: enable productCrit for super commutative algebras...
@@ -1540,7 +1540,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
 //             Lp.p = nc_p_Bracket_qq(pCopy(p),strat->S[i]);
 //         }
 //         else
-        if( PROD_CRIT(strat) )
+        if( ALLOW_PROD_CRIT(strat) )
         {
             // product criterion for homogeneous case in SCA
             strat->cp++;
@@ -1642,7 +1642,7 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
   if(pHasNotCF(p,strat->S[i]))
   {
     //PrintS("prod-crit\n");
-    if(PROD_CRIT(strat))
+    if(ALLOW_PROD_CRIT(strat))
     {
       //PrintS("prod-crit\n");
       strat->cp++;
@@ -6913,7 +6913,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
     return;
   }
 
-  if (strat->sugarCrit && PROD_CRIT(strat))
+  if (strat->sugarCrit && ALLOW_PROD_CRIT(strat))
   {
     if((!((ecartq>0)&&(ecart>0)))
     && pHasNotCF(p,q))
@@ -6982,7 +6982,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
   }
   else /*sugarcrit*/
   {
-    if (PROD_CRIT(strat))
+    if (ALLOW_PROD_CRIT(strat))
     {
       // if currRing->nc_type!=quasi (or skew)
       // TODO: enable productCrit for super commutative algebras...
@@ -7064,7 +7064,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 //             Lp.p = nc_p_Bracket_qq(pCopy(p),q);
 //         }
 //         else
-//         if( PROD_CRIT(strat) )
+//         if( ALLOW_PROD_CRIT(strat) )
 //         {
 //             // product criterion for homogeneous case in SCA
 //             strat->cp++;
