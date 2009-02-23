@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.121 2009-02-22 17:37:55 Singular Exp $ */
+/* $Id: kutil.cc,v 1.122 2009-02-23 10:59:20 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2876,66 +2876,6 @@ ideal createG0()
 /*2
 *(s[0],h),...,(s[k],h) will be put to the pairset L
 */
-void initenterpairsRing (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR = -1)
-{
-
-  if ((strat->syzComp==0) || (pGetComp(h)<=strat->syzComp))
-  {
-    int j;
-    BOOLEAN new_pair=FALSE;
-
-    if (pGetComp(h)==0)
-    {
-      /* for Q!=NULL: build pairs (f,q),(f1,f2), but not (q1,q2)*/
-      if ((isFromQ)&&(strat->fromQ!=NULL))
-      {
-        for (j=0; j<=k; j++)
-        {
-          if (!strat->fromQ[j])
-          {
-            new_pair=TRUE;
-            Print("TODO Oliver 1 --- j:%d, Ll:%d\n",j,strat->Ll);
-            enterOnePairRing(j,h,ecart,isFromQ,strat, atR);
-          }
-        }
-      }
-      else
-      {
-        new_pair=TRUE;
-        for (j=0; j<=k; j++)
-        {
-          // Print("j:%d, Ll:%d\n",j,strat->Ll);
-          enterOnePairRing(j,h,ecart,isFromQ,strat, atR);
-        }
-      }
-    }
-    else
-    {
-      for (j=0; j<=k; j++)
-      {
-        if ((pGetComp(h)==pGetComp(strat->S[j])) || (pGetComp(strat->S[j])==0))
-        {
-          new_pair=TRUE;
-          // Print("j:%d, Ll:%d\n",j,strat->Ll);
-          // Modules not checked right now
-          enterOnePairRing(j,h,ecart,isFromQ,strat, atR);
-        }
-      }
-    }
-
-    if (new_pair) chainCritRing(h,ecart,strat);
-
-  }
-/*
-ring r=256,(x,y,z),dp;
-ideal I=12xz-133y, 2xy-z;
-*/
-
-}
-
-/*2
-*(s[0],h),...,(s[k],h) will be put to the pairset L
-*/
 void initenterstrongPairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR = -1)
 {
 
@@ -3088,7 +3028,7 @@ void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
     assume (rField_is_Ring(currRing));
     // enter also zero divisor * poly, if this is non zero and of smaller degree
     if (!(rField_is_Domain(currRing))) enterExtendedSpoly(h, strat);
-    initenterpairsRing(h, k, ecart, 0, strat, atR);
+    initenterpairs(h, k, ecart, 0, strat, atR);
     initenterstrongPairs(h, k, ecart, 0, strat, atR);
     clearSbatch(h, k, pos, strat);
 }
@@ -5600,6 +5540,13 @@ void initBuchMoraCrit(kStrategy strat)
 {
   strat->enterOnePair=enterOnePairNormal;
   strat->chainCrit=chainCritNormal;
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(currRing))
+  {
+    strat->enterOnePair=enterOnePairRing;
+    strat->chainCrit=chainCritRing;
+  }
+#endif
 
   strat->sugarCrit =        TEST_OPT_SUGARCRIT;
   // obachman: Hmm.. I need BTEST1(2) for notBuckets ..
