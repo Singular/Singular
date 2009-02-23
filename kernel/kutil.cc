@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.126 2009-02-23 11:33:41 Singular Exp $ */
+/* $Id: kutil.cc,v 1.127 2009-02-23 13:32:35 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -158,7 +158,7 @@ static inline int pDivComp(poly p, poly q)
 {
   if (pGetComp(p) == pGetComp(q))
   {
-#ifdef HAVE_PLURAL
+#ifdef HAVE_RATGRING
     if (rIsRatGRing(currRing))
     {
       if (_p_LmDivisibleByPart(p,currRing,
