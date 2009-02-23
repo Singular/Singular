@@ -1,8 +1,5 @@
-// $Id: sing.lib,v 1.32 2008-10-09 09:31:58 Singular Exp $
-//(GMG/BM, last modified 26.06.96,
-//GMG, 27.7.08: in milnor printlevel und Ausschrift geändert)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: sing.lib,v 1.32 2008-10-09 09:31:58 Singular Exp $";
+version="$Id: sing.lib,v 1.33 2009-02-23 15:12:44 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  sing.lib      Invariants of Singularities
