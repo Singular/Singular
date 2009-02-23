@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.36 2009-02-21 17:05:51 Singular Exp $ */
+/* $Id: polys.cc,v 1.37 2009-02-23 13:29:22 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -1041,6 +1041,7 @@ BOOLEAN pCompareChain (poly p,poly p1,poly p2,poly lcm)
   }
   return FALSE;
 }
+#ifdef HAVE_RATGRING
 BOOLEAN pCompareChainPart (poly p,poly p1,poly p2,poly lcm)
 {
   int k, j;
@@ -1094,6 +1095,7 @@ BOOLEAN pCompareChainPart (poly p,poly p1,poly p2,poly lcm)
   }
   return FALSE;
 }
+#endif
 
 int pSize(poly p)
 {

@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.16 2008-07-24 16:33:57 Singular Exp $
+ *  Version: $Id: pInline1.h,v 1.17 2009-02-23 13:27:31 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -414,6 +414,7 @@ static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, const ring r_a, poly b, con
 #endif
 }
 
+#ifdef HAVE_RATGRING
 static inline BOOLEAN _p_LmDivisibleByNoCompPart(poly a, const ring r_a, poly b, const ring r_b,const int start, const int end)
 {
   int i=end;
@@ -432,6 +433,21 @@ static inline BOOLEAN _p_LmDivisibleByNoCompPart(poly a, const ring r_a, poly b,
   return TRUE;
 #endif
 }
+static inline BOOLEAN _p_LmDivisibleByPart(poly a, const ring r_a, poly b, const ring r_b,const int start, const int end)
+{
+  if (p_GetComp(a, r_a) == 0 || p_GetComp(a,r_a) == p_GetComp(b,r_b))
+    return _p_LmDivisibleByNoCompPart(a, r_a, b, r_b,start,end);
+  return FALSE;
+}
+PINLINE1 BOOLEAN p_LmDivisibleByPart(poly a, poly b, const ring r,const int start, const int end)
+{
+  p_LmCheckPolyRing1(b, r);
+  pIfThen1(a != NULL, p_LmCheckPolyRing1(b, r));
+  if (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r))
+    return _p_LmDivisibleByNoCompPart(a, r, b, r,start, end);
+  return FALSE;
+}
+#endif
 static inline BOOLEAN _p_LmDivisibleBy(poly a, poly b, const ring r)
 {
   if (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r))
@@ -442,12 +458,6 @@ static inline BOOLEAN _p_LmDivisibleBy(poly a, const ring r_a, poly b, const rin
 {
   if (p_GetComp(a, r_a) == 0 || p_GetComp(a,r_a) == p_GetComp(b,r_b))
     return _p_LmDivisibleByNoComp(a, r_a, b, r_b);
-  return FALSE;
-}
-static inline BOOLEAN _p_LmDivisibleByPart(poly a, const ring r_a, poly b, const ring r_b,const int start, const int end)
-{
-  if (p_GetComp(a, r_a) == 0 || p_GetComp(a,r_a) == p_GetComp(b,r_b))
-    return _p_LmDivisibleByNoCompPart(a, r_a, b, r_b,start,end);
   return FALSE;
 }
 PINLINE1 BOOLEAN p_LmDivisibleByNoComp(poly a, poly b, const ring r)
@@ -462,14 +472,6 @@ PINLINE1 BOOLEAN p_LmDivisibleBy(poly a, poly b, const ring r)
   pIfThen1(a != NULL, p_LmCheckPolyRing1(b, r));
   if (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r))
     return _p_LmDivisibleByNoComp(a, b, r);
-  return FALSE;
-}
-PINLINE1 BOOLEAN p_LmDivisibleByPart(poly a, poly b, const ring r,const int start, const int end)
-{
-  p_LmCheckPolyRing1(b, r);
-  pIfThen1(a != NULL, p_LmCheckPolyRing1(b, r));
-  if (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r))
-    return _p_LmDivisibleByNoCompPart(a, r, b, r,start, end);
   return FALSE;
 }
 
