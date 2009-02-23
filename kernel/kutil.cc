@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.123 2009-02-23 11:26:29 Singular Exp $ */
+/* $Id: kutil.cc,v 1.124 2009-02-23 11:31:29 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1955,6 +1955,7 @@ void chainCritNormal (poly p,int ecart,kStrategy strat)
     }
   }
 }
+#ifdef HAVE_RATGRING
 void chainCritPart (poly p,int ecart,kStrategy strat)
 {
   int i,j,l;
@@ -2241,6 +2242,7 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
     }
   }
 }
+#endif
 
 /*2
 *(s[0],h),...,(s[k],h) will be put to the pairset L
