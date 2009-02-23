@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ratgring.h,v 1.7 2009-02-21 19:30:56 levandov Exp $ */
+/* $Id: ratgring.h,v 1.8 2009-02-23 19:22:27 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -20,7 +20,7 @@
 
 void pLcmRat(poly a, poly b, poly m, int rat_shift);
 
-//void pLcmRat(poly a, poly b, poly m, poly pshift);
+poly p_LcmRat(const poly a, const poly b, const long lCompM, const ring r);
 
 poly p_GetCoeffRat(poly p, int ishift, ring r);
 

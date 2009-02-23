@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.127 2009-02-23 13:32:35 Singular Exp $ */
+/* $Id: kutil.cc,v 1.128 2009-02-23 19:22:27 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -52,6 +52,10 @@
 /* shiftgb stuff */
 #include "shiftgb.h"
 #include "prCopy.h"
+
+#ifdef HAVE_RATGRING
+#include "ratgring.h"
+#endif
 
 #ifdef KDEBUG
 #undef KDEBUG
@@ -1365,7 +1369,6 @@ BOOLEAN enterOneStrongPoly (int i,poly p,int ecart, int isFromQ,kStrategy strat,
 * put the pair (s[i],p)  into the set B, ecart=ecart(p)
 */
 
-
 void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR = -1)
 {
   assume(i<=strat->sl);
@@ -1381,7 +1384,12 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
   /*- computes the lcm(s[i],p) -*/
   Lp.lcm = pInit();
 
+#ifndef HAVE_RATGRING
   pLcm(p,strat->S[i],Lp.lcm);
+#elif defined(HAVE_RATGRING)
+  //  if (rIsRatGRing(currRing))
+  pLcmRat(p,strat->S[i],Lp.lcm, currRing->real_var_start); // int rat_shift
+#endif
   pSetm(Lp.lcm);
 
 #define MYTEST 0
@@ -2297,6 +2305,11 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
 
     if (new_pair) 
     {
+#ifdef HAVE_RATGRING
+      if (currRing->real_var_start>0)
+        chainCritPart(h,ecart,strat);
+      else
+#endif
       strat->chainCrit(h,ecart,strat);
     }
   }
@@ -5548,6 +5561,7 @@ void initBuchMoraCrit(kStrategy strat)
   if (rIsRatGRing(currRing))
   {
      strat->chainCrit=chainCritPart;
+     /* enterOnePairNormal get rational part in it */
   }
 #endif
 
@@ -5564,6 +5578,7 @@ void initBuchMoraCrit(kStrategy strat)
 
 #ifdef HAVE_PLURAL
   // and r is plural_ring
+  //  hence this holds for r a rational_plural_ring
   if( rIsPluralRing(currRing) || (rIsSCA(currRing) && !strat->z2homog) )
   {    //or it has non-quasi-comm type... later
     strat->sugarCrit = FALSE;
@@ -7194,11 +7209,6 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
 
     if (new_pair)
     {
-#ifdef HAVE_RATGRING
-      if (currRing->real_var_start>0)
-        chainCritPart(h,ecart,strat);
-      else
-#endif
       strat->chainCrit(h,ecart,strat);
     }
 

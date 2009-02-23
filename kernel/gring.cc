@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.68 2008-07-26 14:28:03 motsak Exp $
+ *  Version: $Id: gring.cc,v 1.69 2009-02-23 19:22:27 levandov Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -44,6 +44,10 @@
 
 #include <ncSAMult.h> // for CMultiplier etc classes
 #include <ncSAFormula.h> // for CFormulaPowerMultiplier and enum Enum_ncSAType
+
+#ifdef HAVE_RATGRING
+#include "ratgring.h"
+#endif
 
 
 static const bool bNoPluralMultiplication = false;  // use only formula shortcuts in my OOP Multiplier
@@ -1895,7 +1899,16 @@ poly nc_CreateShortSpoly(poly p1, poly p2, const ring r)
     return(NULL);
   }
 
-  poly m = p_Lcm(p1, p2, si_max(lCompP1, lCompP2), r);
+  poly m; 
+  if ( ! rIsRatGRing(currRing))
+  {
+    m = p_Lcm(p1, p2, si_max(lCompP1, lCompP2), r);
+  }
+  else
+  {
+    /* rational version */
+    m = p_LcmRat(p1, p2, si_max(lCompP1, lCompP2), r);
+  }
 
 //  n_Delete(&p_GetCoeff(m, r), r);
 //  pSetCoeff0(m, NULL);

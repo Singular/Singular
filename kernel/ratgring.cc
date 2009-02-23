@@ -6,7 +6,7 @@
  *  Purpose: Ore-noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: ratgring.cc,v 1.14 2009-02-21 19:30:56 levandov Exp $
+ *  Version: $Id: ratgring.cc,v 1.15 2009-02-23 19:22:27 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "ratgring.h"
@@ -36,6 +36,33 @@ void pLcmRat(poly a, poly b, poly m, int rat_shift)
   pSetComp(m, si_max(pGetComp(a), pGetComp(b)));
   /* Don't do a pSetm here, otherwise hres/lres chockes */ 
 }
+
+/*2
+* returns the rational LCM of the head terms of a and b
+* without coefficient!!!
+*/
+poly p_LcmRat(const poly a, const poly b, const long lCompM, const ring r)
+{
+  poly m = // p_One( r);
+          p_Init(r);
+
+  const int pVariables = r->N;
+
+  //  for (int i = pVariables; i>=r->real_var_start; i--)
+  for (int i = r->real_var_end; i>=r->real_var_start; i--)
+  {
+    const int lExpA = p_GetExp (a, i, r);
+    const int lExpB = p_GetExp (b, i, r);
+
+    p_SetExp (m, i, si_max(lExpA, lExpB), r);
+  }
+
+  p_SetComp (m, lCompM, r);
+  p_Setm(m,r);
+  n_New(&(p_GetCoeff(m, r)), r);
+
+  return(m);
+};
 
 // void pLcmRat(poly a, poly b, poly m, poly pshift)
 // {
