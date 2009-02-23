@@ -6,7 +6,7 @@
  *  Purpose: implementation of multiplication in simple NC subalgebras
  *  Author:  motsak
  *  Created: 
- *  Version: $Id: ncSAMult.cc,v 1.10 2008-07-29 13:28:21 motsak Exp $
+ *  Version: $Id: ncSAMult.cc,v 1.11 2009-02-23 13:50:52 Singular Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -42,7 +42,7 @@ static poly gnc_pp_Mult_mm(const poly p, const poly m, const ring r, poly& last)
   assume( (p != NULL) && (m != NULL) && (r != NULL) );
 
 #if OUTPUT  
-  Print("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV gnc_pp_Mult_mm(p, m) VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ");
+  PrintS("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV gnc_pp_Mult_mm(p, m) VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ");
   PrintLn();
   PrintS("p: "); p_Write(p, r);    
   PrintS("m: "); p_Write(m, r);      
@@ -66,10 +66,10 @@ static poly gnc_pp_Mult_mm(const poly p, const poly m, const ring r, poly& last)
 #if OUTPUT  
   p_Test(pResult, r);
 
-  Print("gnc_pp_Mult_mm(p, m) => "); p_Write(pResult, r);
+  PrintS("gnc_pp_Mult_mm(p, m) => "); p_Write(pResult, r);
   PrintS("p: "); p_Write(p, r);    
   PrintS("m: "); p_Write(m, r);      
-  Print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ");
+  PrintS("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ");
   PrintLn();
 #endif
 
@@ -88,7 +88,7 @@ static poly gnc_p_Mult_mm(poly p, const poly m, const ring r)
   assume( (p != NULL) && (m != NULL) && (r != NULL) );
 
 #if OUTPUT  
-  Print("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV gnc_p_Mult_mm(p, m) VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ");
+  PrintS("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV gnc_p_Mult_mm(p, m) VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ");
   PrintLn();
   PrintS("p: ");
   p_Write(p, r);    
@@ -115,10 +115,10 @@ static poly gnc_p_Mult_mm(poly p, const poly m, const ring r)
 #if OUTPUT  
   p_Test(pResult, r);
 
-  Print("gnc_p_Mult_mm(p, m) => "); p_Write(pResult, r);      
+  PrintS("gnc_p_Mult_mm(p, m) => "); p_Write(pResult, r);      
 //  PrintS("p: "); p_Write(p, r);    
   PrintS("m: "); p_Write(m, r);      
-  Print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ");
+  PrintS("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ");
   PrintLn();
 #endif
   
@@ -140,7 +140,7 @@ static poly gnc_mm_Mult_p(const poly m, poly p, const ring r)
   p_Test(p, r);
 
 #if OUTPUT  
-  Print("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV gnc_mm_Mult_p(m, p) VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ");
+  PrintS("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV gnc_mm_Mult_p(m, p) VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ");
   PrintLn();
   PrintS("m: "); p_Write(m, r);      
   PrintS("p: "); p_Write(p, r);    
@@ -165,10 +165,10 @@ static poly gnc_mm_Mult_p(const poly m, poly p, const ring r)
 #if OUTPUT  
   p_Test(pResult, r);
 
-  Print("gnc_mm_Mult_p(m, p) => "); p_Write(pResult, r);      
+  PrintS("gnc_mm_Mult_p(m, p) => "); p_Write(pResult, r);      
 //  PrintS("p: "); p_Write(p, r);    
   PrintS("m: "); p_Write(m, r);      
-  Print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ");
+  PrintS("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ");
   PrintLn();
 #endif
   
@@ -188,7 +188,7 @@ static poly gnc_mm_Mult_pp(const poly m, const poly p, const ring r)
   p_Test(p, r);
   
 #if OUTPUT  
-  Print("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV gnc_mm_Mult_pp(m, p) VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ");
+  PrintS("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV gnc_mm_Mult_pp(m, p) VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ");
   PrintLn();
   PrintS("m: "); p_Write(m, r);      
   PrintS("p: "); p_Write(p, r);    
@@ -213,10 +213,10 @@ static poly gnc_mm_Mult_pp(const poly m, const poly p, const ring r)
 #if OUTPUT  
   p_Test(pResult, r);
 
-  Print("gnc_mm_Mult_pp(m, p) => "); p_Write(pResult, r);      
+  PrintS("gnc_mm_Mult_pp(m, p) => "); p_Write(pResult, r);      
   PrintS("p: "); p_Write(p, r);    
   PrintS("m: "); p_Write(m, r);      
-  Print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ");
+  PrintS("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ");
   PrintLn();
 #endif
   
@@ -226,7 +226,7 @@ static poly gnc_mm_Mult_pp(const poly m, const poly p, const ring r)
 static void gnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs = NULL)
 {
 #if OUTPUT  
-  Print("|gnc_p_ProcsSet()");
+  PrintS("|gnc_p_ProcsSet()");
   PrintLn();
 #endif
 
@@ -248,7 +248,7 @@ static void gnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs = NULL)
 bool ncInitSpecialPairMultiplication(ring r)
 {
 #if OUTPUT  
-  Print("ncInitSpecialPairMultiplication(ring), ring: \n");
+  PrintS("ncInitSpecialPairMultiplication(ring), ring: \n");
   rWrite(r);
   PrintLn();
 #endif
@@ -273,7 +273,7 @@ CGlobalMultiplier::CGlobalMultiplier(ring r):
     CMultiplier<poly>(r), m_RingFormulaMultiplier(GetFormulaPowerMultiplier(r))
 {
 #if OUTPUT  
-  Print("CGlobalMultiplier::CGlobalMultiplier(ring)!");
+  PrintS("CGlobalMultiplier::CGlobalMultiplier(ring)!");
   PrintLn();
 #endif
 
@@ -285,7 +285,7 @@ CGlobalMultiplier::CGlobalMultiplier(ring r):
 CGlobalMultiplier::~CGlobalMultiplier()
 {
 #if OUTPUT  
-  Print("CGlobalMultiplier::~CGlobalMultiplier()!");
+  PrintS("CGlobalMultiplier::~CGlobalMultiplier()!");
   PrintLn();
 #endif
 
@@ -305,7 +305,7 @@ poly CGlobalMultiplier::MultiplyEE(const CGlobalMultiplier::CExponent expLeft, c
   const ring r = GetBasering();
 
 #if OUTPUT  
-  Print("CGlobalMultiplier::MultiplyEE(expLeft, expRight)!");
+  PrintS("CGlobalMultiplier::MultiplyEE(expLeft, expRight)!");
   PrintLn();
   PrintS("expL: "); p_Write(expLeft, GetBasering());    
   PrintS("expR: "); p_Write(expRight, GetBasering());    
@@ -341,9 +341,9 @@ poly CGlobalMultiplier::MultiplyEE(const CGlobalMultiplier::CExponent expLeft, c
 
   
 #if OUTPUT  
-  Print("<CGlobalMultiplier::MultiplyEE>");
+  PrintS("<CGlobalMultiplier::MultiplyEE>");
   PrintLn();
-  Print("i: %d, j: %d", i, j); 
+  SPrint("i: %d, j: %d", i, j); 
   PrintLn();
   Print("ei: %d, ej: %d", ei, ej); 
   PrintLn();
@@ -406,13 +406,13 @@ poly CGlobalMultiplier::MultiplyEE(const CGlobalMultiplier::CExponent expLeft, c
     
 
 #if OUTPUT  
-    Print("<CGlobalMultiplier::MultiplyEE> ==> ");
+    PrintS("<CGlobalMultiplier::MultiplyEE> ==> ");
     PrintLn();
     Print("i: %d, j: %d", i, j); 
     PrintLn();
     Print("ei: %d, ej: %d", ei, ej); 
     PrintLn();
-    Print("<product>: "); p_Write(product, GetBasering());  
+    PrintS("<product>: "); p_Write(product, GetBasering());  
 #endif
     
 
@@ -447,13 +447,13 @@ poly CGlobalMultiplier::MultiplyEE(const CGlobalMultiplier::CExponent expLeft, c
 
 
 #if OUTPUT  
-      Print("<CGlobalMultiplier::MultiplyEE> ==> ");
+      PrintS("<CGlobalMultiplier::MultiplyEE> ==> ");
       PrintLn();
       Print("i: %d, j: %d", i, j); 
       PrintLn();
       Print("ei: %d, ej: %d", ei, ej); 
       PrintLn();
-      Print("<product>: "); p_Write(product, GetBasering());  
+      PrintS("<product>: "); p_Write(product, GetBasering());  
 #endif
       
     }
@@ -472,7 +472,7 @@ poly CGlobalMultiplier::MultiplyEE(const CGlobalMultiplier::CExponent expLeft, c
 poly CGlobalMultiplier::MultiplyME(const poly pMonom, const CGlobalMultiplier::CExponent expRight)
 {
 #if OUTPUT  
-  Print("CGlobalMultiplier::MultiplyME(monom, expR)!");  
+  PrintS("CGlobalMultiplier::MultiplyME(monom, expR)!");  
   PrintLn();
   PrintS("Monom: "); p_Write(pMonom, GetBasering());    
   PrintS("expR: "); p_Write(expRight, GetBasering());    
@@ -485,7 +485,7 @@ poly CGlobalMultiplier::MultiplyME(const poly pMonom, const CGlobalMultiplier::C
 poly CGlobalMultiplier::MultiplyEM(const CGlobalMultiplier::CExponent expLeft, const poly pMonom)
 {
 #if OUTPUT  
-  Print("CGlobalMultiplier::MultiplyEM(expL, monom)!");  
+  PrintS("CGlobalMultiplier::MultiplyEM(expL, monom)!");  
   PrintLn();
   PrintS("expL: "); p_Write(expLeft, GetBasering());    
   PrintS("Monom: "); p_Write(pMonom, GetBasering());    
@@ -512,7 +512,7 @@ CCommutativeSpecialPairMultiplier::CCommutativeSpecialPairMultiplier(ring r, int
 CCommutativeSpecialPairMultiplier::~CCommutativeSpecialPairMultiplier()
 {
 #if OUTPUT  
-  Print("CCommutativeSpecialPairMultiplier::~CCommutativeSpecialPairMultiplier()");
+  PrintS("CCommutativeSpecialPairMultiplier::~CCommutativeSpecialPairMultiplier()");
   PrintLn();
 #endif
 }
@@ -544,7 +544,7 @@ CAntiCommutativeSpecialPairMultiplier::CAntiCommutativeSpecialPairMultiplier(rin
 CAntiCommutativeSpecialPairMultiplier::~CAntiCommutativeSpecialPairMultiplier()
 {
 #if OUTPUT  
-	Print("CAntiCommutativeSpecialPairMultiplier::~CAntiCommutativeSpecialPairMultiplier()");
+	PrintS("CAntiCommutativeSpecialPairMultiplier::~CAntiCommutativeSpecialPairMultiplier()");
 	PrintLn();
 #endif
 }
@@ -578,7 +578,7 @@ CQuasiCommutativeSpecialPairMultiplier::CQuasiCommutativeSpecialPairMultiplier(r
 CQuasiCommutativeSpecialPairMultiplier::~CQuasiCommutativeSpecialPairMultiplier()
 {
 #if OUTPUT  
-	Print("CQuasiCommutativeSpecialPairMultiplier::~CQuasiCommutativeSpecialPairMultiplier()");
+	PrintS("CQuasiCommutativeSpecialPairMultiplier::~CQuasiCommutativeSpecialPairMultiplier()");
 	PrintLn();
 #endif
 }
@@ -613,7 +613,7 @@ CWeylSpecialPairMultiplier::CWeylSpecialPairMultiplier(ring r, int i, int j, num
 CWeylSpecialPairMultiplier::~CWeylSpecialPairMultiplier()
 {
 #if OUTPUT  
-  Print("CWeylSpecialPairMultiplier::~CWeylSpecialPairMultiplier()");
+  PrintS("CWeylSpecialPairMultiplier::~CWeylSpecialPairMultiplier()");
   PrintLn();
 #endif
 }
@@ -651,7 +651,7 @@ CShiftSpecialPairMultiplier::CShiftSpecialPairMultiplier(ring r, int i, int j, i
 CShiftSpecialPairMultiplier::~CShiftSpecialPairMultiplier()
 {
 #if OUTPUT  
-  Print("CShiftSpecialPairMultiplier::~CShiftSpecialPairMultiplier()");
+  PrintS("CShiftSpecialPairMultiplier::~CShiftSpecialPairMultiplier()");
   PrintLn();
 #endif
 }
@@ -692,7 +692,7 @@ CExternalSpecialPairMultiplier::CExternalSpecialPairMultiplier(ring r, int i, in
 CExternalSpecialPairMultiplier::~CExternalSpecialPairMultiplier()
 {
 #if OUTPUT  
-  Print("CExternalSpecialPairMultiplier::~CExternalSpecialPairMultiplier()");
+  PrintS("CExternalSpecialPairMultiplier::~CExternalSpecialPairMultiplier()");
   PrintLn();
 #endif
 }
@@ -773,7 +773,7 @@ CSpecialPairMultiplier* AnalyzePair(const ring r, int i, int j)
 CPowerMultiplier::CPowerMultiplier(ring r): CMultiplier<CPower>(r)
 {
 #if OUTPUT  
-  Print("CPowerMultiplier::CPowerMultiplier(ring)!");
+  PrintS("CPowerMultiplier::CPowerMultiplier(ring)!");
   PrintLn();
 #endif
 
@@ -788,7 +788,7 @@ CPowerMultiplier::CPowerMultiplier(ring r): CMultiplier<CPower>(r)
 CPowerMultiplier::~CPowerMultiplier()
 {
 #if OUTPUT  
-  Print("CPowerMultiplier::~CPowerMultiplier()!");
+  PrintS("CPowerMultiplier::~CPowerMultiplier()!");
   PrintLn();
 #endif
 
@@ -853,7 +853,7 @@ poly CPowerMultiplier::MultiplyME(const poly pMonom, const CExponent expRight)
   }
 
 #if OUTPUT  
-  Print("CPowerMultiplier::MultiplyME() ===> ");
+  PrintS("CPowerMultiplier::MultiplyME() ===> ");
   p_Write(p, GetBasering());  
 #endif
   
@@ -918,7 +918,7 @@ poly CPowerMultiplier::MultiplyEM(const CExponent expLeft, const poly pMonom)
   }
 
 #if OUTPUT  
-  Print("CPowerMultiplier::MultiplyEM() ===> ");
+  PrintS("CPowerMultiplier::MultiplyEM() ===> ");
   p_Write(p, r);  
 #endif
 
@@ -932,7 +932,7 @@ poly CPowerMultiplier::MultiplyEM(const CExponent expLeft, const poly pMonom)
 poly CPowerMultiplier::MultiplyEE(const CExponent expLeft, const CExponent expRight)
 {
 #if OUTPUT  
-  Print("CPowerMultiplier::MultiplyEE)!");
+  PrintS("CPowerMultiplier::MultiplyEE)!");
   PrintLn();
 #endif
 
@@ -1014,7 +1014,7 @@ CSpecialPairMultiplier::CSpecialPairMultiplier(ring r, int i, int j):
 CSpecialPairMultiplier::~CSpecialPairMultiplier()
 {
 #if OUTPUT  
-  Print("CSpecialPairMultiplier::~CSpecialPairMultiplier()!");
+  PrintS("CSpecialPairMultiplier::~CSpecialPairMultiplier()!");
   PrintLn();
 #endif
 }

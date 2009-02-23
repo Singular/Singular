@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.34 2006-06-21 06:26:58 bricken Exp $
+//$Id: Poly.h,v 1.35 2009-02-23 13:50:51 Singular Exp $
 
 
 
@@ -379,7 +379,7 @@ template<poly_variant variant, class create_type_input, class error_handle_trait
   /*  void print(){
      StringSetS("");
      write();
-     Print(StringAppendS(""));
+     PrintS(StringAppendS(""));
      }*/
   virtual ~PolyBase(){}
   PolyBase(poly p, ring r):ptr(new PolyImpl(p_Copy(p,r),r)){

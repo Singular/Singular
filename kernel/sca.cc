@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.31 2009-02-21 17:50:11 Singular Exp $
+ *  Version: $Id: sca.cc,v 1.32 2009-02-23 13:50:52 Singular Exp $
  *******************************************************************/
 
 // set it here if needed.
@@ -688,7 +688,7 @@ poly sca_mm_Mult_p(const poly pMonom, poly pPoly, const ring rRing) // !!!!! the
 #ifdef PDEBUG
     if( !p_Test(p, rRing) )
     {
-      Print("p is wrong!");
+      PrintS("p is wrong!");
       p_Write(p,rRing);
     }
 #endif
@@ -744,7 +744,7 @@ poly sca_mm_Mult_p(const poly pMonom, poly pPoly, const ring rRing) // !!!!! the
 #ifdef PDEBUG
     if( !p_Test(pPoly, rRing) )
     {
-      Print("pPoly is wrong!");
+      PrintS("pPoly is wrong!");
       p_Write(pPoly, rRing);
     }
 #endif
@@ -1048,9 +1048,9 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 
 #if MYTEST
   {
-    Print("ideal tempF: \n");
+    PrintS("ideal tempF: \n");
     idPrint(tempF);
-    Print("ideal tempQ: \n");
+    PrintS("ideal tempQ: \n");
     idPrint(tempQ);
   }
 #endif
@@ -1465,7 +1465,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
 
 
 #if MYTEST
-  Print("Analyzing quotient ideal:\n");
+  PrintS("Analyzing quotient ideal:\n");
   idPrint(idQuotient); // in rG!!!
 #endif
 
@@ -1531,9 +1531,9 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
 
 #ifdef PDEBUG
 #if OUTPUT
-  Print("Quotient: \n");
+  PrintS("Quotient: \n");
   iiWriteMatrix((matrix)idQuotient,"__",1);
-  Print("tempSCAQuotient: \n");
+  PrintS("tempSCAQuotient: \n");
   iiWriteMatrix((matrix)tempQ,"__",1);
 #endif
 #endif
@@ -1555,11 +1555,11 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
 
 #ifdef PDEBUG
 #if OUTPUT
-  Print("SCAQuotient: \n");
+  PrintS("SCAQuotient: \n");
   if(tempQ != NULL)
     iiWriteMatrix((matrix)tempQ,"__",1);
   else
-    Print("(NULL)\n");
+    PrintS("(NULL)\n");
 #endif
 #endif
   
@@ -2714,13 +2714,13 @@ ideal id_KillSquares(const ideal id,
 #if 0
    PrintS("<id_KillSquares>\n");
   {
-    Print("ideal id: \n");
+    PrintS("ideal id: \n");
     for (int i = 0; i < IDELEMS(id); i++)
     {
       Print("; id[%d] = ", i+1);
       p_Write(id->m[i], r);
     }
-    Print(";\n");
+    PrintS(";\n");
     PrintLn();
   }
 #endif
@@ -2734,13 +2734,13 @@ ideal id_KillSquares(const ideal id,
 #if 0
    PrintS("<id_KillSquares>\n");
   {
-    Print("ideal temp: \n");
+    PrintS("ideal temp: \n");
     for (int i = 0; i < IDELEMS(temp); i++)
     {
       Print("; temp[%d] = ", i+1);
       p_Write(temp->m[i], r);
     }
-    Print(";\n");
+    PrintS(";\n");
     PrintLn();
   }
    PrintS("</id_KillSquares>\n");

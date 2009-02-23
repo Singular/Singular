@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shiftgb.cc,v 1.10 2008-08-07 18:08:37 levandov Exp $ */
+/* $Id: shiftgb.cc,v 1.11 2009-02-23 13:50:52 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for shift GB and free GB
 */
@@ -100,7 +100,7 @@ poly p_mLPshift(poly p, int sh, int uptodeg, int lV, const ring r)
   if (sh < 0 )
   {
 #ifdef PDEBUG
-    Print("pmLPshift: negative shift requested");
+    PrintS("pmLPshift: negative shift requested\n");
 #endif
     return(NULL); /* violation, 2check */
   }
@@ -109,7 +109,7 @@ poly p_mLPshift(poly p, int sh, int uptodeg, int lV, const ring r)
   if (L+sh-1 > uptodeg)
   {
 #ifdef PDEBUG
-    Print("p_mLPshift: too big shift requested");
+    PrintS("p_mLPshift: too big shift requested\n");
 #endif
     return(NULL); /* violation, 2check */
   }
@@ -184,7 +184,7 @@ poly pmLPshift(poly p, int sh, int uptodeg, int lV)
   if (sh < 0 )
   {
 #ifdef PDEBUG
-    Print("pmLPshift: negative shift requested");
+    PrintS("pmLPshift: negative shift requested\n");
 #endif
     return(NULL); /* violation, 2check */
   }
@@ -193,7 +193,7 @@ poly pmLPshift(poly p, int sh, int uptodeg, int lV)
   if (L+sh-1 > uptodeg)
   {
 #ifdef PDEBUG
-    Print("pmLPshift: too big shift requested");
+    PrintS("pmLPshift: too big shift requested\n");
 #endif
     return(NULL); /* violation, 2check */
   }
@@ -253,8 +253,7 @@ int pmLastVblock(poly p, int lV)
   if (j==0) 
   {
 #ifdef PDEBUG
-    Print("pmLastVblock: unexpected zero exponent vector");
-    PrintLn();
+    PrintS("pmLastVblock: unexpected zero exponent vector\n");
 #endif   
     return(j);
   }
@@ -319,8 +318,7 @@ int p_mLastVblock(poly p, int lV, const ring r)
   if (j==0) 
   {
 #ifdef PDEBUG
-    Print("pmLastVblock: unexpected zero exponent vector");
-    PrintLn();
+    PrintS("pmLastVblock: unexpected zero exponent vector\n");
 #endif   
     return(j);
   }
@@ -363,8 +361,7 @@ int pmFirstVblock(poly p, int lV)
   if (j==currRing->N + 1) 
   {
 #ifdef PDEBUG
-    Print("pmFirstVblock: unexpected zero exponent vector");
-    PrintLn();
+    PrintS("pmFirstVblock: unexpected zero exponent vector\n");
 #endif   
     return(j);
   }

@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.160 2008-09-19 17:31:38 Singular Exp $ */
+/* $Id: tgb.cc,v 1.161 2009-02-23 13:50:52 Singular Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -496,7 +496,7 @@ static inline wlen_type pQuality(poly p, slimgb_alg* c, int l=-1){
       //return cs*pELength(p,c,l);
       return erg;
     }
-    //Print("I am here");
+    //PrintS("I am here");
     wlen_type r=pSLength(p,l);
     assume(r>=0);
     return r;
@@ -1632,7 +1632,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
 
       omfree(array_arg); // !!!
     }
-//     Print("Saturation - done!!!\n");
+//     PrintS("Saturation - done!!!\n");
   }
 #endif // if SCAlgebra
 
@@ -2045,7 +2045,7 @@ void NoroCache::evaluateRows(int level, NoroCacheNode* node){
         pIter(p);
       }
       if (i!=dn->value_len){
-        Print("F4 calc wrong, as poly len was wrong\n");
+        PrintS("F4 calc wrong, as poly len was wrong\n");
       }
       assume(i==dn->value_len);
       #endif
@@ -4274,7 +4274,7 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
     int i;
     int len;
     //    wrp(los[erg.to_reduce_u].p);
-    //Print("\n");
+    //PrintLn();
     multi_reduce_step(erg,los,c);
 
 

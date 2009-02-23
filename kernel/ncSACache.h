@@ -3,7 +3,7 @@
 /*****************************************
  *  Computer Algebra System SINGULAR     *
  *****************************************/
-/* $Id: ncSACache.h,v 1.4 2008-07-21 00:05:09 motsak Exp $ */
+/* $Id: ncSACache.h,v 1.5 2009-02-23 13:50:51 Singular Exp $ */
 
 // #include <ncSACache.h> // for CCacheHash etc classes
 
@@ -58,9 +58,9 @@ class CCacheHash
     int LookupEE(CExponent a, CExponent b, CCacheItem*& pItems)
     {
 /*
-      Print("//////////////////////////////////////////////////////////////////////////////////////////////");
+      PrintS("//////////////////////////////////////////////////////////////////////////////////////////////");
       PrintLn();
-      Print("CCacheHash::LookupEE(a, b, *results)!");
+      PrintS("CCacheHash::LookupEE(a, b, *results)!");
       PrintLn();
 */
       History(MULT_LOOKUP, a, b);
@@ -72,14 +72,14 @@ class CCacheHash
     bool StoreEE(CExponent a, CExponent b, poly pProduct)
     {
 /*
-      Print("CCacheHash::StoreEE(a, b, Product)!");
+      PrintS("CCacheHash::StoreEE(a, b, Product)!");
       PrintLn();
 */
       
       History(MULT_STORE, a, b, pProduct);
 
 /*
-      Print("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\");
+      PrintS("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\");
       PrintLn();
 */
       
@@ -88,8 +88,7 @@ class CCacheHash
     
     virtual void History(const EHistoryType t, const CExponent a, const CExponent b, const poly p = NULL)
     {
-      Print("CCacheHash::History(a, b, [p])!");
-      PrintLn();
+      PrintS("CCacheHash::History(a, b, [p])!\n");
     }
 
   private: // no copy constuctors!
