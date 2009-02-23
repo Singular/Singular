@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.124 2009-02-23 11:31:29 Singular Exp $ */
+/* $Id: kutil.cc,v 1.125 2009-02-23 11:32:53 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -5544,7 +5544,7 @@ void initBuchMoraCrit(kStrategy strat)
     strat->chainCrit=chainCritRing;
   }
 #endif
-#ifdef HAVE_PLURAL
+#ifdef HAVE_RATGRING
   if (rIsRatGRing(currRing))
   {
      strat->chainCrit=chainCritPart;
