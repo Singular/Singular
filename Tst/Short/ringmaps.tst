@@ -1,3 +1,6 @@
+LIB"tst.lib";
+tst_init();
+
 ring integer = (integer), (a, b, c), dp;
 ideal I = 975020030*a^5*b,130350797*b*c^9,209617295*a^5*b^3, a3+b4-c3;
 poly f = 975020030*a^5*b + 130350797*b*c^9 - 209617295*a^5;
@@ -376,3 +379,5 @@ setring(integer);
   print(imap(z2to80, I));
   print(imap(z2to80, f));
   print(imap(z2to80, n));
+
+tst_status(1);$

@@ -1,3 +1,6 @@
+LIB"tst.lib";
+tst_init();
+
 ring r = (integer), (a, b, c), dp;
 ideal I = 975020030*a^5*b,130350797*b*c^9,209617295*a^5*b^3;
 ideal G = std(I);
@@ -203,3 +206,10 @@ ideal I = 571236477558863*a^5*b^3*c*d,910715302974676*a^3*c^3*d^2,27233829850259
 ideal G = std(I);
 G;
 kill r;
+ring r=integer,x,dp;
+module m=[2,4],[3,6];
+option(prot);
+std(m);
+kill r;
+
+tst_status(1),$
