@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.125 2009-02-23 11:32:53 Singular Exp $ */
+/* $Id: kutil.cc,v 1.126 2009-02-23 11:33:41 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -7194,7 +7194,7 @@ void initenterpairsShift (poly h,int k,int ecart,int isFromQ, kStrategy strat, i
 
     if (new_pair)
     {
-#ifdef HAVE_PLURAL
+#ifdef HAVE_RATGRING
       if (currRing->real_var_start>0)
         chainCritPart(h,ecart,strat);
       else
