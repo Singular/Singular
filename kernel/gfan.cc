@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
-Author: $Author: Singular $
-Date: $Date: 2009-02-19 15:39:08 $
-Header: $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.14 2009-02-19 15:39:08 Singular Exp $
-Id: $Id: gfan.cc,v 1.14 2009-02-19 15:39:08 Singular Exp $
+Author: $Author: monerjan $
+Date: $Date: 2009-02-23 15:12:49 $
+Header: $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.15 2009-02-23 15:12:49 monerjan Exp $
+Id: $Id: gfan.cc,v 1.15 2009-02-23 15:12:49 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -146,6 +146,13 @@ void getWallIneq(ideal I)
 	printf("Having removed redundant rows, the inequalities now read:\n");
 	dd_WriteMatrix(stdout,ddineq);
 	#endif
+
+	dd_PolyhedraPtr ddpolyh;
+	dd_MatrixPtr G;
+	ddpolyh=dd_DDMatrix2Poly(ddineq, &dderr);
+	G=dd_CopyGenerators(ddpolyh);
+	printf("\nSpanning vectors = rows:\n");
+	dd_WriteMatrix(stdout, G);
 
 	//ddineq->representation=dd_Inequality;		//We want our LP to be Ax>=0
 
