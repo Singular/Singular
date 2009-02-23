@@ -1,7 +1,6 @@
-//(GMG/BM, last modified 22.06.96)
-//(GMG, last modified 21.07.2008: Argument von show von id in @@id geaendert)
+// (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: inout.lib,v 1.31 2008-09-24 07:54:59 Singular Exp $";
+version="$Id: inout.lib,v 1.32 2009-02-23 12:08:39 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  inout.lib     Printing and Manipulating In- and Output
@@ -111,13 +110,15 @@ example
 
 proc pmat (matrix m, list #)
 "USAGE:   pmat(M[,n]);  M matrix, n integer
-DISPLAY: display M in array format if it fits into pagewidth; if n is given,
-         only the first n characters of each colum are shown
-RETURN:  no return value
+RETURN: A string representing M in array format if it fits into
+        pagewidth; if n is given, only the first n characters of
+        each column are shown (n>1 required), where a truncation
+        of a column is indicated by two dots (\'..\')
 EXAMPLE: example pmat; shows an example
 "
 {
 //------------- main case: input is a matrix, no second argument---------------
+   string OUT = "";
    if ( size(#)==0)
    {
       int elems,mlen,slen,c,r;
@@ -143,7 +144,7 @@ EXAMPLE: example pmat; shows an example
             aus = aus + s(elems)[1,len(c)] + sep;
             elems = elems + nrows(m);
          }
-         aus;
+         OUT=OUT+aus+newline;
       }
    //--------------- print last row (no comma after last entry) ---------------
       aus = ""; elems = nrows(m);
@@ -153,21 +154,50 @@ EXAMPLE: example pmat; shows an example
          elems = elems + nrows(m);
       }
       aus = aus + string(m[nrows(m),ncols(m)]);
-      aus;  return();
+      OUT=OUT+aus;  return(OUT);
    }
 //---------- second case: second argument is given and of type int ------------
-   if ( typeof(#[1])=="int" )
-   {  string aus,tmp; int ll,c,r;
-      for ( r=1; r<=nrows(m); r=r+1)
+   if ( typeof(#[1])=="int" and #[1]>1)
+   {  string aus,tmp; int c,r;
+   //---------------------- print all - except last - rows --------------------
+      for ( r=1; r<nrows(m); r=r+1)
       {  aus = "";
          for (c=1; c<=ncols(m); c=c+1)
          {
             tmp=string(m[r,c]);
-            aus=aus+tmp[1,#[1]]+" ";
+            if (size(tmp)>#[1])
+            { tmp[#[1]-1]=".";
+              tmp[#[1]]  =".";
+              aus=aus+tmp[1,#[1]]+", ";
+            }
+            else
+            { tmp=tmp+",";
+              aus=aus+tmp[1,#[1]+1]+" ";
+            }
          }
-         aus;
+         OUT=OUT+aus+newline;
       }
-      return();
+   //--------------- print last row (no comma after last entry) ---------------
+      aus = "";
+      for (c=1; c<ncols(m); c=c+1)
+      { tmp=string(m[r,c]);
+        if (size(tmp)>#[1])
+        { tmp[#[1]-1]=".";
+          tmp[#[1]]  =".";
+          aus=aus+tmp[1,#[1]]+", ";
+        }
+        else
+        { tmp=tmp+",";
+          aus=aus+tmp[1,#[1]+1]+" ";
+        }
+      }
+      tmp=string(m[nrows(m),ncols(m)]);
+      if (size(tmp)>#[1])
+      { tmp[#[1]-1]=".";
+        tmp[#[1]]  =".";
+      }
+      aus = aus + tmp[1,#[1]];
+      OUT=OUT+aus;  return(OUT);
    }
 }
 example
@@ -176,7 +206,7 @@ example
    ideal i= x,z+3y,x+y,z;
    matrix m[3][3]=i^2;
    pmat(m);
-   pmat(m,3);
+   pmat(m,5);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -347,7 +377,7 @@ EXAMPLE: example show; shows an example
          }
       }
    }
-//----------------------- case: @@id is of type list -------------------------
+//----------------------- case: @@id is of type list ----------------------------
    if ( typeof(@@id)=="list" )
    {
 //      @@s = tab(@li@)+"// list, "+string(size(@@id))+" element(s):";
@@ -456,7 +486,7 @@ EXAMPLE: example show; shows an example
       if( typeof(@id@)=="ring" )
       {
          list na@me@s=names(@id@);
-         //kill @id@;
+         kill @id@;
          @@s = tab(@li@)+"// ring:"; @@s,s;
          @@s = tab(@li@)+"// minpoly ="; @@s,minpoly;
          "// objects belonging to this ring:";
@@ -534,7 +564,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc showrecursive (id,poly p,list #)
+proc showrecursive (@@id,poly p,list #)
 "USAGE:   showrecursive(id,p[,ord]); id= any object of basering, p= product of
          variables and ord=string (any allowed ordstr)
 DISPLAY: display 'id' in a recursive format as a polynomial in the variables
@@ -566,8 +596,8 @@ EXAMPLE: example showrecursive; shows an example
    newvar = newvar[2,size(newvar)-1];
 
    execute("ring newP=("+newchar+"),("+newvar+"),("+neword+");");
-   def id = imap(P,id);
-   show(id);
+   def @@id = imap(P,@@id);
+   show(@@id);
    return();
 }
 example
