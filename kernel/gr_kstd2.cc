@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.27 2009-02-22 11:22:08 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.28 2009-02-23 11:26:29 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -169,7 +169,7 @@ void ratGB_divide_out(poly p)
 {
   if (p==NULL) return;
   poly root=p;
-  assume(currRing->real_var_start>0);
+  assume(rIsRatGRing(currRing));
   poly f=pHead(p);
   int i;
   for (i=currRing->real_var_start;i<=currRing->real_var_end;i++)
@@ -980,7 +980,7 @@ void nc_gr_initBba(ideal F, kStrategy strat)
 //   if (rIsPluralRing(currRing))
     strat->red = redGrFirst;
 #ifdef HAVE_RATGRING
-  if (currRing->real_var_start>0)
+  if (rIsRatGRing(currRing))
   {
     int ii=IDELEMS(F)-1;
     int jj;
@@ -1073,7 +1073,7 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   /* in plural we don't need Hilb yet */
   nc_gr_initBba(F,strat);
   initBuchMoraPos(strat);
-  if (currRing->real_var_start>0)
+  if (rIsRatGRing(currRing))
   {
     strat->posInL=posInL0; // by pCmp of lcm
   }

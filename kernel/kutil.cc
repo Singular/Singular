@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.122 2009-02-23 10:59:20 Singular Exp $ */
+/* $Id: kutil.cc,v 1.123 2009-02-23 11:26:29 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -159,7 +159,7 @@ static inline int pDivComp(poly p, poly q)
   if (pGetComp(p) == pGetComp(q))
   {
 #ifdef HAVE_PLURAL
-    if (currRing->real_var_start>0)
+    if (rIsRatGRing(currRing))
     {
       if (_p_LmDivisibleByPart(p,currRing,
                            q,currRing,
@@ -2295,11 +2295,6 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
 
     if (new_pair) 
     {
-#ifdef HAVE_PLURAL
-      if (currRing->real_var_start>0)
-        chainCritPart(h,ecart,strat);
-      else
-#endif
       strat->chainCrit(h,ecart,strat);
     }
   }
@@ -5545,6 +5540,12 @@ void initBuchMoraCrit(kStrategy strat)
   {
     strat->enterOnePair=enterOnePairRing;
     strat->chainCrit=chainCritRing;
+  }
+#endif
+#ifdef HAVE_PLURAL
+  if (rIsRatGRing(currRing))
+  {
+     strat->chainCrit=chainCritPart;
   }
 #endif
 

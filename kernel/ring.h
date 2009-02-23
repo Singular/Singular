@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.39 2009-02-22 11:22:08 Singular Exp $ */
+/* $Id: ring.h,v 1.40 2009-02-23 11:26:29 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -47,7 +47,7 @@ inline bool rIsRatGRing(const ring r)
 {
 #ifdef HAVE_PLURAL
   nc_struct *n;
-  return (r != NULL) && ((n=r->GetNC()) != NULL) 
+  return (r != NULL) /* && ((n=r->GetNC()) != NULL) */
 	  && (r->real_var_start>1);
 #else
   return false;
