@@ -6,7 +6,7 @@
  *  Purpose: implementation of multiplication in simple NC subalgebras
  *  Author:  motsak
  *  Created: 
- *  Version: $Id: ncSAMult.cc,v 1.11 2009-02-23 13:50:52 Singular Exp $
+ *  Version: $Id: ncSAMult.cc,v 1.12 2009-02-23 13:52:19 Singular Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -343,7 +343,7 @@ poly CGlobalMultiplier::MultiplyEE(const CGlobalMultiplier::CExponent expLeft, c
 #if OUTPUT  
   PrintS("<CGlobalMultiplier::MultiplyEE>");
   PrintLn();
-  SPrint("i: %d, j: %d", i, j); 
+  Print("i: %d, j: %d", i, j); 
   PrintLn();
   Print("ei: %d, ej: %d", ei, ej); 
   PrintLn();
