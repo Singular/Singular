@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.69 2009-02-23 19:22:27 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.70 2009-02-24 17:40:28 Singular Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -248,7 +248,7 @@ poly _nc_p_Mult_q(poly pPolyP, poly pPolyQ, const ring rRing)
 #ifdef RDEBUG
   rTest(rRing);
 #endif
-  
+
   int lp, lq;
 
   pqLength(pPolyP, pPolyQ, lp, lq, MIN_LENGTH_BUCKET);
@@ -256,7 +256,7 @@ poly _nc_p_Mult_q(poly pPolyP, poly pPolyQ, const ring rRing)
   bool bUsePolynomial = TEST_OPT_NOT_BUCKETS || (si_max(lp, lq) < MIN_LENGTH_BUCKET); // ???
 
   CPolynomialSummator sum(rRing, bUsePolynomial);
-  
+
   if (lq <= lp) // ?
   {
     // always length(q) times "p * q[j]"
@@ -307,7 +307,7 @@ poly _nc_pp_Mult_qq(const poly pPolyP, const poly pPolyQ, const ring rRing)
     for( poly p = pPolyP; p !=NULL; p = pNext(p) )
       sum += nc_mm_Mult_pp( p, pPolyQ, rRing);
   }
-  
+
   return(sum);
 }
 
@@ -774,7 +774,7 @@ poly gnc_mm_Mult_uu(int *F,int jG,int bG, const ring r)
   int *Prv=(int*)omAlloc0((rN+1)*sizeof(int));
   int *Nxt=(int*)omAlloc0((rN+1)*sizeof(int));
   int *lF=(int *)omAlloc0((rN+1)*sizeof(int));
-  
+
   int cnt=0; int cnf=0;
   /* splitting F wrt jG */
   for (i=1;i<=jG;i++) /* mult at the very end */
@@ -782,12 +782,12 @@ poly gnc_mm_Mult_uu(int *F,int jG,int bG, const ring r)
     Prv[i]=F[i]; Nxt[i]=0;
     if (F[i]!=0) cnf++;
   }
-  
+
   if (cnf==0)
   {
     freeT(Prv,rN); Prv = NULL;
   }
-  
+
   for (i=jG+1;i<=rN;i++)
   {
     Nxt[i]=F[i];
@@ -816,22 +816,22 @@ poly gnc_mm_Mult_uu(int *F,int jG,int bG, const ring r)
 #ifdef PDEBUG
        p_Test(Rout,r);
 #endif
-       
+
        freeT(Prv,rN);
        Prv = NULL;
-       
+
        out=gnc_mm_Mult_p(Rout,out,r); /* getting the final result */
     }
 
     freeT(lF,rN);
     lF = NULL;
-    
+
     p_Delete(&Rout,r);
 
     assume(Nxt == NULL);
     assume(lF == NULL);
     assume(Prv == NULL);
-    
+
     return (out);
   }
 /* -------------------- MAIN ACTION --------------------- */
@@ -954,7 +954,7 @@ poly gnc_mm_Mult_uu(int *F,int jG,int bG, const ring r)
     out=gnc_mm_Mult_p(Rout,out,r); /* getting the final result */
     p_Delete(&Rout,r);
   }
-  
+
   return (out);
 }
 
@@ -1010,7 +1010,7 @@ poly gnc_uu_Mult_ww_vert (int i, int a, int j, int b, const ring r)
   p_Delete(&x,r);
   p_Delete(&y,r);
   //  t=MATELEM(cMT,a,b);
-  t= nc_p_CopyGet(MATELEM(cMT,a,b),r); 
+  t= nc_p_CopyGet(MATELEM(cMT,a,b),r);
   //  return(p_Copy(t,r));
   /* since the last computed element was cMT[a,b] */
   return(t);
@@ -1021,27 +1021,27 @@ static inline poly gnc_uu_Mult_ww_formula (int i, int a, int j, int b, const rin
 {
   if(bNoFormula)
     return gnc_uu_Mult_ww_vert(i, a, j, b, r);
-  
+
   CFormulaPowerMultiplier* FormulaMultiplier = GetFormulaPowerMultiplier(r);
   Enum_ncSAType PairType = _ncSA_notImplemented;
-  
+
   if( FormulaMultiplier != NULL )
     PairType = FormulaMultiplier->GetPair(j, i);
-   
+
 
   if( PairType == _ncSA_notImplemented )
     return gnc_uu_Mult_ww_vert(i, a, j, b, r);
 
-  
+
  //    return FormulaMultiplier->Multiply(j, i, b, a);
   poly t = CFormulaPowerMultiplier::Multiply( PairType, j, i, b, a, r);
-  
+
   int rN=r->N;
   matrix cMT = r->GetNC()->MT[UPMATELEM(j,i,rN)];         /* cMT=current MT */
 
 
   MATELEM(cMT, a, b) = nc_p_CopyPut(t,r);
-  
+
   //  t=MATELEM(cMT,a,b);
 //  t= nc_p_CopyGet(MATELEM(cMT,a,b),r);
   //  return(p_Copy(t,r));
@@ -1101,7 +1101,7 @@ poly gnc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
        return CFormulaPowerMultiplier::Multiply( PairType, j, i, b, a, r);
   }
 
-  
+
   /* we are here if  i>j and variables do not commute or quasicommute */
   /* in fact, now a>=1 and b>=1; and j<i */
   /* now check whether the polynomial is already computed */
@@ -1899,16 +1899,18 @@ poly nc_CreateShortSpoly(poly p1, poly p2, const ring r)
     return(NULL);
   }
 
-  poly m; 
+  poly m;
   if ( ! rIsRatGRing(currRing))
   {
     m = p_Lcm(p1, p2, si_max(lCompP1, lCompP2), r);
   }
+#ifdef HAVE_RATGRING
   else
   {
     /* rational version */
     m = p_LcmRat(p1, p2, si_max(lCompP1, lCompP2), r);
   }
+#endif
 
 //  n_Delete(&p_GetCoeff(m, r), r);
 //  pSetCoeff0(m, NULL);
@@ -2247,7 +2249,7 @@ poly nc_p_Bracket_qq(poly p, poly q)
 
 
   CPolynomialSummator sum(currRing, UseBuckets == 0);
-  
+
   while (p!=NULL)
   {
     Q=q;
@@ -2662,8 +2664,8 @@ void nc_rKill(ring r)
     delete r->GetNC()->GetFormulaPowerMultiplier();
     r->GetNC()->GetFormulaPowerMultiplier() = NULL;
   }
-  
-  
+
+
   int i,j;
   int rN=r->N;
   if ( rN > 1 )
@@ -3199,7 +3201,7 @@ BOOLEAN nc_CallPlural(
 
 bool nc_rCopy(ring res, const ring r, bool bSetupQuotient)
 {
-  if (nc_CallPlural(r->GetNC()->C, r->GetNC()->D, NULL, NULL, res, bSetupQuotient, true, true, r)) 
+  if (nc_CallPlural(r->GetNC()->C, r->GetNC()->D, NULL, NULL, res, bSetupQuotient, true, true, r))
   {
     WarnS("Error occured while coping/setuping the NC structure!"); // No reaction!???
     return true; // error
@@ -3308,8 +3310,8 @@ BOOLEAN gnc_InitMultiplication(ring r, bool bSetupQuotient)
 
   if(!rIsSCA(r) && !bNoFormula)
     ncInitSpecialPowersMultiplication(r);
-  
-  
+
+
   if (save != currRing)
     rChangeCurrRing(save);
 

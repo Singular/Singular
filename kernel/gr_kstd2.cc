@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.29 2009-02-23 19:22:27 levandov Exp $ */
+/* $Id: gr_kstd2.cc,v 1.30 2009-02-24 17:40:28 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -1122,16 +1122,18 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 //          /* prod.crit itself in nc_CreateSpoly */
 //        }
 
-      
+
       if( ! rIsRatGRing(currRing) )
-      { 
+      {
         strat->P.p = nc_CreateSpoly(strat->P.p1,strat->P.p2,currRing);
       }
+#ifdef HAVE_RATGRING
       else
       {
         /* rational case */
         strat->P.p = nc_rat_CreateSpoly(strat->P.p1,strat->P.p2,currRing->real_var_start-1,currRing);
       }
+#endif
 
 
 #ifdef PDEBUG
