@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: letterplace.doc,v 1.6 2009-02-13 17:04:45 levandov Exp $
+@comment $Id: letterplace.doc,v 1.7 2009-02-24 12:00:12 Singular Exp $
 @comment this file contains the mathematical background of Singular:Letterplace
 
 @c The following directives are necessary for proper compilation
@@ -11,8 +11,9 @@
 %**start
 @end ignore
 
-@node Letterplace,,,Non-commutative subsystem
-@section Letterplace
+@node LETTERPLACE,Non-commutative libraries,Mathematical background (plural),Non-commutative subsystem
+@section LETTERPLACE
+@cindex LETTERPLACE
 @cindex Letterplace
 
 This section describes mathematical notions and definitions used in
@@ -33,7 +34,7 @@ All algebras are assumed to be associative @math{K}-algebras for some field @mat
 
 
 @c ---------------------------------------------------------------------------
-@node Free associative algebras, Groebner bases for two-sided ideals in free associative algebras, , Letterplace
+@node Free associative algebras, Groebner bases for two-sided ideals in free associative algebras, , LETTERPLACE
 @subsection Free associative algebras
 @cindex free associative algebra, tensor algebra
 
@@ -53,7 +54,7 @@ quotient of @math{K}< @math{x_1},@dots{},@math{x_n} > modulo a certain
 two-sided ideal.
 
 @c ---------------------------------------------------------------------------
-@node Groebner bases for two-sided ideals in free associative algebras, Letterplace correspondence, Free associative algebras, Letterplace
+@node Groebner bases for two-sided ideals in free associative algebras, Letterplace correspondence, Free associative algebras, LETTERPLACE
 @subsection Groebner bases for two-sided ideals in free associative algebras
 @cindex Groebner bases in free associative algebras
 
@@ -123,7 +124,7 @@ We say that a subset @math{G} of @math{I} is a (two-sided) Groebner basis for th
 @end ifinfo
 
 @c ---------------------------------------------------------------------------
-@node Letterplace correspondence, Example of use of Letterplace, Groebner bases for two-sided ideals in free associative algebras,Letterplace
+@node Letterplace correspondence, Example of use of Letterplace, Groebner bases for two-sided ideals in free associative algebras,LETTERPLACE
 @subsection Letterplace correspondence
 @cindex letterplace correspondence
 
@@ -159,7 +160,7 @@ a letterplace algebra, such that its m places are exactly 1,2,@dots{},@math{m}.
 That is a multilinearity with respect to places occur.
 
 @c ---------------------------------------------------------------------------
-@node Example of use of Letterplace, Release notes, Letterplace correspondence,Letterplace
+@node Example of use of Letterplace, Release notes, Letterplace correspondence,LETTERPLACE
 @subsection Example of use of @sc{Letterplace}
 
 The input monomials must be given in a letterplace notation. We recommend
@@ -200,7 +201,7 @@ We work further on implementing more algorithms for
 non-commutative ideals and modules over free associative algebra.
 
 @c ---------------------------------------------------------------------------
-@node Release notes,  , Example of use of Letterplace,Letterplace
+@node Release notes,  , Example of use of Letterplace,LETTERPLACE
 @subsection Release notes of @sc{Letterplace}
 
 With this functionality it is possible to compute two-sided Groebner basis

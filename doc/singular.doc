@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.175 2009-01-12 17:24:33 Singular Exp $
+@comment $Id: singular.doc,v 1.176 2009-02-24 12:00:12 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -169,11 +169,16 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @chapter Non-commutative subsystem
 @cindex Non-commutative subsystem
 @menu
-* Getting started with PLURAL::
-* Letterplace::
+* PLURAL::
+* Data types (plural)::
+* Functions  (plural)::
+* Mathematical background (plural)::
+* LETTERPLACE::
+* Non-commutative libraries::
 @end menu
 @include s-plural.tex
 @include letterplace.tex
+@include s-plulibs.tex
 @end ifset
 
 @c ----------------------------------------------------------------------------
@@ -200,10 +205,6 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @appendix Mathematical background
 @cindex Mathematical background
 @include math.tex
-
-@c @ifset withplural
-@c @include s-plumath.tex
-@c @end ifset
 
 @c ----------------------------------------------------------------------------
 @node SINGULAR libraries, Release Notes, Mathematical background, Top

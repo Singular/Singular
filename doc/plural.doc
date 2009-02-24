@@ -1,353 +1,3909 @@
 @c -*-texinfo-*-
-@ifclear singularmanual
-@c -----------------------Top node-----------------------------------
-@node Top, Getting started with PLURAL, Top, Top
-@c @chapter Non-commutative subsystem PLURAL
-@c @cindex Non-commutative subsystem PLURAL
+
+@c ----------------------------------------------------------------------------
+@node  PLURAL, Data types BR_PLURAL_BR, , Non-commutative subsystem
+@section  PLURAL
+@cindex  PLURAL
+
+@table @strong
+@item @strong{What is and what does @sc{Plural}?}
+
+@sc{Plural} is a kernel extension of @sc{Singular},
+providing many algorithms for computations within certain noncommutative algebras
+(see see @ref{G-algebras} and @ref{Mathematical background BR_PLURAL_BR} for detailed information on algebras and algorithms).
+
+@sc{Plural} is compatible with @sc{Singular}, since it uses the
+same data structures, sometimes interpreting them in a different way
+and/or modifying them for its own purposes.
+In spite of such a difference, one can always transfer
+objects from commutative rings of @sc{Singular}
+to noncommutative rings @sc{Plural} and back.
 
 
-@ifclear PSUFFIX
-@set PSUFFIX
-@end ifclear
-@end ifclear
+With @sc{Plural}, one can set up a noncommutative @math{G}-algebra with
+a Poincar@'e-Birkhoff-Witt (PBW) basis, say, @math{A} (see @ref{G-algebras} for step-by-step building instructions and also @ref{Non-commutative libraries}
+for procedures for setting many important algebras easily).
 
-@ifnothtml
+Functionalities of @sc{Plural} (enlisted in @ref{Functions  BR_PLURAL_BR}) are accessible as soon as the basering becomes noncommutative (see @ref{nc_algebra}).
+
+One can perform various computations with polynomials and ideals in @math{A} and with
+vectors and submodules of a free module
+@tex
+$A^n$.
+@end tex
 @ifinfo
-@center @strong{SINGULAR:PLURAL}
-@center A Computer Algebra Subsystem for Noncommutative Polynomial Algebras
-@center User Manual for @sc{Singular:Plural} Version @value{VERSION}
-@center @uref{http://www.singular.uni-kl.de/plural}
+A^n.
 @end ifinfo
-@end ifnothtml
 
-@ifhtml
-@html
-<CENTER>
-<A HREF="http://www.singular.uni-kl.de/plural">
-<IMG SRC="plural.jpg" ALT="Singular:Plural logo"></A><br>
-<h3> A Computer Algebra Subsystem for Noncommutative Polynomial Algebras </h3>
-<p></p>
-@end html
-@ifclear singularmanual
-@ifhtml
-@html
-<h4>HTML User Manual for Singular:Plural Version
-@end html
-@value{VERSION}, @value{VERSION_DATE}
-@html
-</h4>
-</center>
-@end html
-@end ifclear
+One can work also within factor-algebras of @math{G}-algebras (see @ref{qring BR_PLURAL_BR} type)
+by two-sided ideals (see @ref{twostd}).
+@end table
 
-@ifhtml
-@html
-<CENTER><A HREF="http://www.uni-kl.de/"><I>University of Kaiserslautern</I></A></CENTER>
-<CENTER><A HREF="http://www.mathematik.uni-kl.de/"><I>Department of Mathematics</I></A></CENTER>
-<CENTER><A HREF="http://www.mathematik.uni-kl.de/~zca/">
-<I>Centre for Computer Algebra</I></A></CENTER><p></p>
-@end html
-@end ifhtml
+@table @strong
+@item @strong{What @sc{Plural} does not:}
+@itemize
 
-@menu
-@c * Preface::
-@c * Introduction::
-@c * General concepts::
-* Getting started with PLURAL::
-* Data types @value{PSUFFIX}::
-* Functions  @value{PSUFFIX}::
-@c * Tricks and pitfalls::
-@c * Examples::
-@c * Polynomial data::
+@item
+@sc{Plural} does not perform computations in free algebra or in its general factor algebras (instead, this computations can be possibly done with @ref{LETTERPLACE}).
+
+In @sc{Plural} one can only work with @math{G}-algebras and with their factor-algebras
+by two-sided ideals (@math{GR}-algebras).
+
+@item @sc{Plural} requires a monomial ordering but it does not work with local and mixed orderings.
+
+Right now, one can use only global orderings in @sc{Plural}
+(see @ref{General definitions for orderings}).
+
+This will be enhaced in the future by providing the possibility of computations in a tensor product of a noncommutative algebra (with a global ordering)
+@* with a commutative algebra (with any ordering).
+
+@item @sc{Plural} does not handle noncommutative parameters.
+
+Defining parameters, one @strong{cannot} impose noncommutative relations
+on them. Moreover, it is impossible to introduce
+@* parameters which do not commute with variables.
+
+@end itemize
+@end table
+
+
+@table @strong
+@item @sc{Plural} conventions
+
+@item *-multiplication  BR_PLURAL_BR
+@itemize
+
+in the noncommutative case, the correct multiplication of @code{y} by
+ @code{x} must be written as @code{y*x}.
+@* Both expressions @code{yx} and @code{xy} are equal, since they are
+interpreted as commutative expressions. See example in @ref{poly expressions BR_PLURAL_BR}.
+@* Note, that @sc{Plural} output consists only of monomials, hence the signs @code{*} are omitted.
+
+@end itemize
+
+@item   @code{ideal} BR_PLURAL_BR
+@itemize
+
+Under an @code{ideal} @sc{Plural} understands a list of generators
+of a @strong{left} ideal. For more information see @ref{ideal BR_PLURAL_BR}.
+ @* For a @strong{two-sided ideal} @code{T}, use command @ref{twostd} in order to compute
+the two-sided Groebner basis of @code{T}.
+@c ( at the same time it is a left Groebner basis).
+@end itemize
+
+@item @code{module} BR_PLURAL_BR
+@itemize
+Under a @code{module} @sc{Plural} understands
+@strong{either} a fininitely generated @strong{left} submodule of a free module (of finite rank)
+@* @strong{or} a factor module of a free module (of finite rank) by its left submodule (see @ref{module BR_PLURAL_BR} for details).
+@end itemize
+
+@c @item ordering BR_PLURAL_BR
+@c @itemize
+@c @sc{Plural} works with @strong{global} orderings  only.
+@c @ifset singularmanual
+@c See @ref{ General definitions for orderings }
+@c @end ifset
 @c @ifclear singularmanual
-* Mathematical background @value{PSUFFIX}::
+@c See @sc{Singular} manual section General definitions for orderings.
 @c @end ifclear
-* PLURAL libraries::
-@c * Release Notes::
-@ifclear singularmanual
-* Release Notes::
-* Index::
-@end ifclear
-@end menu
+@c @end itemize
 
-@c @c ----------------------------------------------------------------------------
-@c @node Preface, Introduction, Top, Top
-@c @chapter Preface
-@c @cindex Preface
-@c @include COPYING.texi
+@item @code{qring} BR_PLURAL_BR
 
-@c @c ----------------------------------------------------------------------------
-@c @node Introduction, General concepts, Preface, Top
-@c @chapter Introduction
-@c @cindex Introduction
-
-@c @include start.tex
-@c @c ----------------------------------------------------------------------------
-@c @node General concepts, Data types, Introduction, Top
-@c @chapter General concepts
-@c @cindex General concepts
-@c @include general.tex
-@c ----------------------------------------------------------------------------
-@ifset singularmanual
-@node  Getting started with PLURAL, Data types @value{PSUFFIX}, , Non-commutative subsystem
-@section  Getting started with PLURAL
-@end ifset
-
-@ifclear singularmanual
-@node   Getting started with PLURAL, Data types @value{PSUFFIX}, , Top
-@chapter Getting started with PLURAL
-@end ifclear
-
-@cindex  Getting started with PLURAL
-@include pluconventions.tex
+@itemize
+In @sc{Plural} it is only possible to build factor-algebras modulo @strong{two-sided} ideals (see @ref{qring BR_PLURAL_BR}).
+@end itemize
+@end table
 
 @c ----------------------------------------------------------------------------
-@c @ifset singularmanual
-@c @menu
-@c * Data types @value{PSUFFIX}::
-@c @end menu
-@c @end ifset
-
-
-@node Data types @value{PSUFFIX}, Functions @value{PSUFFIX}, Getting started with PLURAL, Non-commutative subsystem
-
-@ifset singularmanual
-@section Data types @value{PSUFFIX}
+@node Data types BR_PLURAL_BR, Functions BR_PLURAL_BR, PLURAL, Non-commutative subsystem
+@section Data types BR_PLURAL_BR
 @lowersections
-@end ifset
 
-@ifclear singularmanual
-@chapter Data types @value{PSUFFIX}
-@end ifclear
+@cindex Data types BR_PLURAL_BR
+@cindex expression list
 
-@cindex Data types @value{PSUFFIX}
-@include plutypes.tex
+This chapter explains all data types of @sc{Plural} in
+alphabetical order. For every type, there is a description of the
+declaration syntax
+@* as well as information about how to build expressions of certain types.
 
-@ifset singularmanual
-@raisesections
-@end ifset
+The term "expression list" in @sc{Plural} refers to any comma separated
+list of expressions.
 
-@c ----------------------------------------------------------------------------
-@c @ifset singularmanual
-@c @menu
-@c * Functions @value{PSUFFIX}::
-@c @end menu
-@c @end ifset
-
-@node Functions @value{PSUFFIX}, Mathematical background @value{PSUFFIX}, Data types @value{PSUFFIX}, Non-commutative subsystem
-
-@ifset singularmanual
-@section Functions @value{PSUFFIX}
-@lowersections
-@end ifset
-
-@ifclear singularmanual
-@chapter Functions @value{PSUFFIX}
-@end ifclear
-
-@cindex commands @value{PSUFFIX}
-@include plureference.tex
-
-@ifset singularmanual
-@raisesections
-@end ifset
-
-
-@c ----------------------------------------------------------------------------
-@c @ifset singularmanual
-@c @menu
-@c * Mathematical background @value{PSUFFIX}::
-@c @end menu
-@c @end ifset
-
-@node Mathematical background @value{PSUFFIX}, PLURAL libraries, Functions @value{PSUFFIX}, Non-commutative subsystem
-
-@ifset singularmanual
-@section Mathematical background @value{PSUFFIX}
-@lowersections
-@end ifset
-
-@ifclear singularmanual
-@appendix Mathematical background @value{PSUFFIX}
-@end ifclear
-
-@cindex Mathematical background @value{PSUFFIX}
-@include plumath.tex
-
-@ifset singularmanual
-@raisesections
-@end ifset
-
-@c --------------------------------------------------------------------
-@ifset singularmanual
-@node PLURAL libraries, , Mathematical background @value{PSUFFIX}, Non-commutative subsystem
-@section PLURAL libraries
-@lowersections
-@end ifset
-
-@ifclear singularmanual
-@node PLURAL libraries, Release Notes @value{PSUFFIX}, Mathematical background @value{PSUFFIX}, Top
-@appendix  PLURAL libraries
-@end ifclear
-
-@cindex  PLURAL libraries
-@cindex  PLURAL LIBs
-
-@sc{Plural} comes with a set of standard libraries. Their content is
-described in the following subsections.
-
-Use the @code{LIB} command for loading of single libraries.
-
-@strong{Note:} For any computation in @sc{Plural}, the monomial ordering must be a global ordering.
-
-@c , and the
-@c command @code{LIB "all.lib";} for loading all libraries of
-@c @sc{Singular} and @sc{Plural} together.
+For the general syntax of a declaration see @ref{General command syntax}.
 
 @menu
-* bfun_lib::
-* central_lib::
-* discretize_lib::
-* dmod_lib::
-* dmodapp_lib::
-* freegb_lib::
-* involut_lib::
-* gkdim_lib::
-* ncalg_lib::
-* ncdecomp_lib::
-* nchomolog_lib::
-* nctools_lib::
-* perron_lib::
-* qmatrix_lib::
+* ideal BR_PLURAL_BR::
+* map BR_PLURAL_BR::
+* module BR_PLURAL_BR::
+* poly BR_PLURAL_BR::
+* qring BR_PLURAL_BR::
+* resolution BR_PLURAL_BR::
+* ring BR_PLURAL_BR::
 @end menu
 
-@c ----------------------------------------------------------
-@node bfun_lib, central_lib, PLURAL libraries, PLURAL libraries
-@section bfun_lib
-@cindex bfun_lib
-@cindex bfun.lib
 
-@c lib bfun.lib
+@c ---------------------------------------
 
-@c ----------------------------------------------------------
-@node central_lib, discretize_lib, bfun_lib, PLURAL libraries
-@section central_lib
-@cindex central_lib
-@cindex central.lib
+@node ideal BR_PLURAL_BR, map BR_PLURAL_BR, Data types BR_PLURAL_BR, Data types BR_PLURAL_BR
+@section ideal BR_PLURAL_BR
+@c @cindex ideal
+@cindex  untyped definitions
 
-@c lib central.lib
+For @sc{Plural} ideals are @strong{left} ideals.
+@* Ideals are represented as lists of polynomials which are interpreted as
+left generators of  the ideal.
+@* For the operations with two-sided ideals see
+ @ref{twostd}.
 
-@c ----------------------------------------------------------
-@node discretize_lib, dmod_lib, central_lib, PLURAL libraries
-@section discretize_lib
-@cindex discretize_lib
-@cindex discretize.lib
 
-@c lib discretize.lib
+Like polynomials, ideals can only be defined or accessed with respect to a basering.
 
-@c ----------------------------------------------------------
-@node dmod_lib, dmodapp_lib, discretize_lib, PLURAL libraries
-@section dmod_lib
-@cindex dmod_lib
-@cindex dmod.lib
+@strong{Note:} @code{size} counts only the non-zero generators of an ideal
+whereas @code{ncols} counts all generators.
 
-@c lib dmod.lib
 
-@c ----------------------------------------------------------
-@node dmodapp_lib, freegb_lib, dmod_lib, PLURAL libraries
-@section dmodapp_lib
-@cindex dmodapp_lib
-@cindex dmodapp.lib
+@menu
+* ideal declarations BR_PLURAL_BR::
+* ideal expressions BR_PLURAL_BR::
+* ideal operations BR_PLURAL_BR::
+* ideal related functions BR_PLURAL_BR::
+@end menu
 
-@c lib dmodapp.lib
 
-@c ----------------------------------------------------------
-@node freegb_lib, involut_lib, dmodapp_lib, PLURAL libraries
-@section freegb_lib
-@cindex freegb_lib
-@cindex freegb.lib
+@c ---------------------------------------
 
-@c lib freegb.lib
+@node ideal declarations BR_PLURAL_BR, ideal expressions BR_PLURAL_BR, ideal BR_PLURAL_BR, ideal BR_PLURAL_BR
+@subsection ideal declarations BR_PLURAL_BR
+@cindex ideal declarations BR_PLURAL_BR
 
-@c ----------------------------------------------------------
-@node involut_lib,  gkdim_lib, freegb_lib, PLURAL libraries
-@section involut_lib
-@cindex involut_lib
-@cindex involut.lib
+@table @strong
+@item Syntax:
+@code{ideal} name @code{=} list_of_poly_and_ideal_expressions @code{;}
+@*@code{ideal} name @code{=} ideal_expression @code{;}
 
-@c lib involut.lib
+@item Purpose:
+defines a left ideal.
 
-@c ----------------------------------------------------------
-@node gkdim_lib, ncalg_lib, involut_lib, PLURAL libraries
-@section gkdim_lib
-@cindex gkdim_lib
-@cindex gkdim.lib
+@item Default:
+0
 
-@c lib gkdim.lib
+@item Example:
+@smallexample
+@c example
+ring r=0,(x,y,z),dp;
+def R=nc_algebra(-1,0); // an anticommutative algebra
+setring R;
+poly s1 = x2;
+poly s2 = y3;
+poly s3 = z;
+ideal i =  s1, s2-s1, 0,s2*s3, s3^4;
+i;
+size(i);
+ncols(i);
+@c example
+@end smallexample
+@end table
 
-@c ----------------------------------------------------------
-@node ncalg_lib, ncdecomp_lib, gkdim_lib, PLURAL libraries
-@section ncalg_lib
-@cindex ncalg_lib
-@cindex ncalg.lib
 
-@c lib ncalg.lib
 
-@c ----------------------------------------------------------
-@node ncdecomp_lib, nchomolog_lib, ncalg_lib, PLURAL libraries
-@section ncdecomp_lib
-@cindex ncdecomp_lib
-@cindex ncdecomp.lib
+@c ------------------------------
 
-@c lib ncdecomp.lib
+@node ideal expressions BR_PLURAL_BR, ideal operations BR_PLURAL_BR, ideal declarations BR_PLURAL_BR, ideal BR_PLURAL_BR
+@subsection ideal expressions BR_PLURAL_BR
+@cindex ideal expressions BR_PLURAL_BR
 
-@c ----------------------------------------------------------
-@node nchomolog_lib, nctools_lib, ncdecomp_lib, PLURAL libraries
-@section nchomolog_lib
-@cindex nchomolog_lib
-@cindex nchomolog.lib
+An ideal expression is:
+@enumerate
+@item
+an identifier of type ideal
+@item
+a function returning an ideal
+@item
+a combination of ideal expressions by the arithmetic operations
+@code{+} or @code{*}
+@item
+a power of an ideal expression (operator @code{^} or @code{**})
+@*Note that the computation of the product @code{i*i} involves
+all products of generators of @code{i} while @code{i^2} involves
+only the different ones, and is therefore faster.
+@item
+a type cast to ideal
+@end enumerate
 
-@c lib nchomolog.lib
+@*@strong{Example:}
+@smallexample
+@c example
+ring r=0,(x,y,z),dp;
+def R=nc_algebra(-1,0); // an anticommutative algebra
+setring R;
+ideal m = maxideal(1);
+m;
+poly f = x2;
+poly g = y3;
+ideal i = x*y*z , f-g, g*(x-y) + f^4 ,0, 2x-z2y;
+ideal M = i + maxideal(10);
+i = M*M;
+ncols(i);
+i = M^2;
+ncols(i);
+i[ncols(i)];
+vector v = [x,y-z,x2,y-x,x2yz2-y];
+ideal j = ideal(v);
+j;
+@c example
+@end smallexample
 
-@c ----------------------------------------------------------
-@node nctools_lib, perron_lib, nchomolog_lib, PLURAL libraries
-@section nctools_lib
-@cindex nctools_lib
-@cindex nctools.lib
 
-@c lib nctools.lib
+@c ------------------------------
 
-@c ----------------------------------------------------------
-@node perron_lib, qmatrix_lib, nctools_lib, PLURAL libraries
-@section perron_lib
-@cindex perron_lib
-@cindex perron.lib
+@node ideal operations BR_PLURAL_BR, ideal related functions BR_PLURAL_BR, ideal expressions BR_PLURAL_BR, ideal BR_PLURAL_BR
+@subsection ideal operations BR_PLURAL_BR
+@cindex ideal operations BR_PLURAL_BR
 
-@c lib perron.lib
+@table @asis
+@item @code{+}
+addition (concatenation of the generators and simplification)
 
-@c ---------------------------------------------------------
-@node qmatrix_lib,  , perron_lib, PLURAL libraries
-@section qmatrix_lib
-@cindex qmatrix_lib
-@cindex qmatrix.lib
+@item @code{*}
+multiplication (with ideal, poly, vector, module; in case of
+multiplication with ideal, the result will be simplified)
 
-@c lib qmatrix.lib
+@item @code{^}
+exponentiation (by a non-negative integer)
+
+@item ideal_expression @code{[} intvec_expression @code{]}
+are polynomial generators of the ideal, index 1 gives the first
+generator.
+@end table
 
 @ifset singularmanual
-@raisesections
+@strong{Note:} For simplification of an ideal, see also
+ @ref{simplify}.
 @end ifset
 
-@c ----------------------------------------------------------
-
 @ifclear singularmanual
-@node Release Notes @value{PSUFFIX}, Index @value{PSUFFIX}, PLURAL libraries, Top
-@chapter Release Notes @value{PSUFFIX}
-@cindex Release Notes @value{PSUFFIX}
-@include pluplatform.tex
-
-@c ----------------------------------------------------------
-@node Index @value{PSUFFIX},  , Release Notes @value{PSUFFIX}, Top
-@appendix Index @value{PSUFFIX}
-@cindex  Index @value{PSUFFIX}
-@printindex cp
+@strong{Note:} For simplification of an ideal, see also section simplify
+in @sc{Singular} manual.
 @end ifclear
+
+@*@strong{Example:}
+@smallexample
+@c example
+ring r=0,(x,y,z),dp;
+matrix D[3][3];
+D[1,2]=-z;  D[1,3]=y;  D[2,3]=x;
+def R=nc_algebra(1,D); // this algebra is U(so_3)
+setring R;
+ideal I = 0,x,0,1;
+I;
+I + 0;    // simplification
+I*x;
+ideal J = I,0,x,x-z;
+I * J;   //  multiplication with simplification
+vector V = [x,y,z];
+print(I*V);
+ideal m = maxideal(1);
+m^2;
+ideal II = I[2..4];
+II;
+@c example
+@end smallexample
+
+
+@c ------------------------------
+
+@node ideal related functions BR_PLURAL_BR,  , ideal operations BR_PLURAL_BR, ideal BR_PLURAL_BR
+@subsection ideal related functions BR_PLURAL_BR
+@cindex ideal related functions BR_PLURAL_BR
+
+
+@table @code
+@item eliminate
+elimination of variables (see @ref{eliminate BR_PLURAL_BR})
+@item intersect
+ideal intersection (see @ref{intersect BR_PLURAL_BR})
+@item kbase
+vector space basis of basering modulo the leading ideal
+(see @ref{kbase BR_PLURAL_BR})
+@item lead
+leading terms of a set of generators (see @ref{lead})
+@item lift
+lift-matrix (see @ref{lift BR_PLURAL_BR})
+@item liftstd
+left Groebner basis and transformation matrix computation (see @ref{liftstd BR_PLURAL_BR})
+@item maxideal
+generators of a power of the maximal ideal at 0 (see @ref{maxideal})
+@item modulo
+represents
+@tex
+$(h1+h2)/h1 \cong h2/(h1 \cap h2)$
+@end tex
+@ifinfo
+(h1+h2)/h1=h2/(h1 intersect h2)
+@end ifinfo
+(see @ref{modulo BR_PLURAL_BR})
+@item mres
+minimal free resolution of an ideal and a minimal set
+of generators of the given ideal
+(see @ref{mres BR_PLURAL_BR})
+@item ncols
+number of columns (see @ref{ncols})
+@item nres
+computes a free resolution of an ideal resp.@: module M which is
+minimized from the second free module on (see @ref{nres BR_PLURAL_BR})
+@item oppose
+creates an opposite ideal of a given ideal from the given ring into a basering (see @ref{oppose})
+@item preimage
+preimage under a ring map (see @ref{preimage BR_PLURAL_BR})
+@item quotient
+ideal quotient (see @ref{quotient BR_PLURAL_BR})
+@item reduce
+left normal form with respect to a left Groebner basis (see @ref{reduce BR_PLURAL_BR})
+@item simplify
+simplify a set of polynomials (see @ref{simplify})
+@item size
+number of non-zero generators (see @ref{size})
+@item slimgb
+left Groebner basis computation with slim technique (see @ref{slimgb BR_PLURAL_BR})
+@item std
+left Groebner basis computation (see @ref{std BR_PLURAL_BR})
+@item subst
+substitute a ring variable (see @ref{subst BR_PLURAL_BR})
+@item syz
+computation of the first syzygy module (see @ref{syz BR_PLURAL_BR})
+@item twostd
+two-sided Groebner basis computation (see @ref{twostd})
+@item vdim
+vector space dimension of basering modulo the leading ideal (see @ref{vdim BR_PLURAL_BR})
+@end table
+
+
+@c ---------------------------------------
+@node map BR_PLURAL_BR, module BR_PLURAL_BR, ideal BR_PLURAL_BR, Data types BR_PLURAL_BR
+@section map BR_PLURAL_BR
+@cindex map BR_PLURAL_BR
+
+Maps are ring maps from a preimage ring into the basering.
+
+@strong{Note:}
+@itemize @bullet
+@item
+the target of a map is @strong{ALWAYS} the actual basering
+@item
+the preimage ring has to be stored "by its name", that means, maps can only be
+used in such contexts, where the name of the preimage ring can be
+resolved (this has to be considered in subprocedures).
+@c (i.e., there might be problems for rings/maps defined in subprocedures).
+@ifset singularmanual
+See also @ref{Identifier resolution}, @ref{Names in procedures}.
+@end ifset
+@end itemize
+
+Maps between rings with different coefficient fields are
+possible and listed below.
+
+Canonically realized are
+@itemize @bullet
+@item
+@tex
+$Q \rightarrow  Q(a, \ldots)$
+@end tex
+@ifinfo
+Q -> Q(a,..)
+@end ifinfo
+     (@math{Q}: the rational numbers)
+@item
+@tex
+$Q \rightarrow R$
+@end tex
+@ifinfo
+Q -> R
+@end ifinfo
+     (@math{R}: the real numbers)
+@item
+@tex
+$Q \rightarrow  C$
+@end tex
+@ifinfo
+Q -> C
+@end ifinfo
+     (@math{C}: the complex numbers)
+@item
+@tex
+$Z/p \rightarrow  (Z/p)(a, \ldots)$
+@end tex
+@ifinfo
+Z/p ->(Z/p)(a,...)
+@end ifinfo
+     (@math{Z}: the integers)
+@item
+@tex
+$Z/p \rightarrow  GF(p^n)$
+@end tex
+@ifinfo
+Z/p -> GF(p^n)
+@end ifinfo
+     (@math{GF}: the Galois field)
+@item
+@tex
+$Z/p \rightarrow  R$
+@end tex
+@ifinfo
+Z/p -> R
+@end ifinfo
+
+@item
+@tex
+$R \rightarrow C$
+@end tex
+@ifinfo
+R -> C
+@end ifinfo
+@end itemize
+
+Possible are furthermore
+@itemize @bullet
+@item
+@tex
+% This is quite a hack, but for now it works.
+$Z/p \rightarrow Q,
+\quad
+[i]_p \mapsto i \in [-p/2, \, p/2]
+\subseteq Z$
+@end tex
+@ifinfo
+Z/p -> Q : [i]_p -> i in [-p/2, p/2] in Z
+@end ifinfo
+@item
+@tex
+$Z/p \rightarrow Z/p^\prime,
+\quad
+[i]_p \mapsto i \in [-p/2, \, p/2] \subseteq Z, \;
+i \mapsto [i]_{p^\prime} \in Z/p^\prime$
+@end tex
+@ifinfo
+Z/p -> Z/p' : [i]_p in Z/p -> i in [-p/2,p/2] in Z, i -> [i]_p' in Z/p'
+@end ifinfo
+@item
+@tex
+$C \rightarrow R, \quad$ by taking the real part
+@end tex
+@ifinfo
+C -> R by taking the real part.
+@end ifinfo
+@end itemize
+
+Finally, in @sc{Plural} we allow the mapping from rings
+with coefficient field Q to rings whose ground fields
+have finite characteristic:
+
+@itemize @bullet
+@item
+@tex
+$Q \rightarrow Z/p$
+@end tex
+@ifinfo
+Q -> Z/p
+@end ifinfo
+
+@item
+@tex
+$Q \rightarrow (Z/p)(a, \ldots)$
+@end tex
+@ifinfo
+Q -> (Z/p)(a,..)
+@end ifinfo
+@end itemize
+In these cases the denominator and the numerator
+of a number are mapped separately by the usual
+map from Z to Z/p, and the image of the number
+is built again afterwards by division. It is thus
+not allowed to map numbers whose denominator is
+divisible by the characteristic of the target
+ground field, or objects containing such numbers.
+We, therefore, strongly recommend using such
+maps only to map objects with integer coefficients.
+
+
+@menu
+* map declarations BR_PLURAL_BR::
+* map expressions BR_PLURAL_BR::
+* map operations BR_PLURAL_BR ::
+* map related functions BR_PLURAL_BR ::
+@end menu
+@c @iftex
+@c See @ref{imap}; @ref{fetch}; @ref{subst}.
+@c @end iftex
+
+@c ------------------------------
+@node map declarations BR_PLURAL_BR, map expressions BR_PLURAL_BR, map BR_PLURAL_BR, map BR_PLURAL_BR
+@subsection map declarations BR_PLURAL_BR
+@cindex map declarations BR_PLURAL_BR
+
+@table @strong
+@item Syntax:
+@code{map} name @code{=} preimage_ring_name @code{,} ideal_expression @code{;}
+@*@code{map} name @code{=} preimage_ring_name @code{,} list_of_poly_and_ideal_expressions @code{;}
+@*@code{map} name @code{=} map_expression @code{;}
+
+@item Purpose:
+defines a ring map from @code{preimage_ring} to basering.
+@* Maps the variables of the @code{preimage ring} to the generators of the ideal.
+@* If the ideal contains less elements than the number of variables in the
+@code{preimage_ring}, the remaining variables are mapped to 0.
+@* If the ideal contains more elements, extra elements are ignored.
+@* The image ring is always the current basering.
+For the mapping of coefficients from different fields see @ref{map BR_PLURAL_BR}.
+
+@item Default:
+none
+
+@item Note:
+There are standard mappings for maps which are close to the identity
+map: @code{fetch BR_PLURAL_BR} and @code{imap BR_PLURAL_BR}.
+
+The name of a map serves as the function which maps objects from the
+preimage_ring into the basering.  These objects must be defined
+by names (no evaluation in the preimage ring is possible).
+
+@item Example:
+@smallexample
+@c example
+// an easy example
+ring r1 = 0,(a,b),dp; // a commutative ring
+poly P = a^2+ab+b^3;
+ring r2 = 0,(x,y),dp;
+def W=nc_algebra(1,-1); // a Weyl algebra
+setring W;
+map M = r1, x^2, -y^3;
+// note: M is a map and not a morphism
+M(P);
+// now, a more interesting example
+LIB "ncalg.lib";
+def Usl2 = makeUsl2();
+// this algebra is U(sl_2), generated by  e,f,h
+setring Usl2;
+poly  P  = 4*e*f+h^2-2*h; // the central el-t of Usl2
+poly  Q  = e^3*f-h^4;     // some polynomial
+ring W1  = 0,(D,X),dp;
+def W2=nc_algebra(1,-1);
+setring W2;
+// this algebra is the opposite Weyl algebra
+option(redSB);
+option(redTail);
+map F = Usl2, -X, D*D*X, 2*D*X;
+F(P); // 0, because P is in the kernel of F
+F(Q);
+
+@c example
+@end smallexample
+@end table
+
+@c ref
+See
+@ref{fetch BR_PLURAL_BR};
+@ref{ideal expressions BR_PLURAL_BR};
+@ref{imap BR_PLURAL_BR};
+@ref{map BR_PLURAL_BR};
+@ref{ring BR_PLURAL_BR}.
+@c ref
+@c ------------------------------
+@node map expressions BR_PLURAL_BR, map operations BR_PLURAL_BR, map declarations BR_PLURAL_BR, map BR_PLURAL_BR
+@subsection map expressions BR_PLURAL_BR
+@cindex map expressions BR_PLURAL_BR
+
+A map expression is:
+@enumerate
+@item
+an identifier of type map
+@item
+a function returning map
+@item
+map expressions combined by composition using parentheses (@code{(}, @code{)})
+@end enumerate
+
+@c ------------------------------
+@node map operations  BR_PLURAL_BR, map related functions BR_PLURAL_BR, map expressions BR_PLURAL_BR, map BR_PLURAL_BR
+@subsection map BR_PLURAL_BR operations
+
+@cindex map operations BR_PLURAL_BR
+
+@table @asis
+@item @code{( )}
+composition of maps. If, for example, @code{f} and @code{g} are maps,
+then @code{f(g)} is a map expression giving the composition
+@tex
+$f \circ g$
+@end tex
+@ifinfo
+@code{f} @bullet{} @code{g}
+@end ifinfo
+ of @code{f} and @code{g},
+@* provided the target ring of @code{g} is the basering of @code{f}.
+
+@item map_expression @code{[} int_expressions @code{]}
+is a map entry (the image of the corresponding variable)
+@end table
+
+@*@strong{Example:}
+@smallexample
+@c example
+LIB "ncalg.lib";
+def Usl2 = makeUsl2(); // this algebra is U(sl_2)
+setring Usl2;
+map F = Usl2, f, e, -h; // endomorphism of U(sl_2)
+map G = F(F);
+poly p = (f+e*h)^2 + 3*h-e;
+p;
+F(p);
+G(p);
+(G(p) == p); // G is the identity on p
+@c example
+@end smallexample
+
+@c ------------------------------
+@node map related functions BR_PLURAL_BR,  , map operations BR_PLURAL_BR, map  BR_PLURAL_BR
+@subsection map related functions  BR_PLURAL_BR
+
+@cindex map related functions  BR_PLURAL_BR
+
+@table @code
+@item fetch BR_PLURAL_BR
+the identity map between rings and qrings (see @ref{fetch BR_PLURAL_BR})
+
+@item imap BR_PLURAL_BR
+a convenient map procedure for inclusions and projections of rings (see @ref{imap BR_PLURAL_BR})
+
+@item preimage BR_PLURAL_BR
+preimage under a ring map (see @ref{preimage BR_PLURAL_BR})
+
+@item subst
+substitute a ring variable (see @ref{subst BR_PLURAL_BR})
+@end table
+
+
+@c ---------------------------------------
+
+@node module BR_PLURAL_BR, poly BR_PLURAL_BR, map BR_PLURAL_BR, Data types BR_PLURAL_BR
+@section module BR_PLURAL_BR
+@cindex module BR_PLURAL_BR
+
+Modules are @strong{left} submodules of a free module over the basering with basis
+@code{gen(1)}, @code{gen(2)}, @dots{}, @code{gen(n)} for some natural number @code{n}.
+@* They are represented by lists of vectors, which generate the left submodule.
+Like vectors, they can only be defined or accessed with respect to a basering.
+
+If @math{M} is a left submodule of
+@ifinfo
+R^n,
+@end ifinfo
+@tex
+$R^n$
+@end tex
+(where @math{R} is the basering) generated by vectors
+@ifinfo
+v_1, @dots{}, v_k, then
+@end ifinfo
+@tex
+$v_1, \ldots, v_k$, then
+@end tex
+ these generators may be considered as
+@* the generators of relations of
+@ifinfo
+R^n/M
+@end ifinfo
+@tex
+$R^n/M$
+@end tex
+between the canonical generators @code{gen(1)},@dots{},@code{gen(n)}.
+Hence, any finitely generated @math{R}-module can be represented in @sc{Plural}
+by its module of relations.
+@* The assignments @code{module M=v1,...,vk; matrix A=M;}
+create the presentation matrix of size
+@ifinfo
+n x k
+@end ifinfo
+@tex
+$n \times k$
+@end tex
+ for
+@ifinfo
+R^n/M,
+@end ifinfo
+@tex
+$R^n/M$,
+@end tex
+ i.e. the columns of A are the vectors
+@ifinfo
+v_1, @dots{}, v_k which generate M.
+@end ifinfo
+@tex
+$v_1, \ldots, v_k$ which generate $M$.
+@end tex
+
+
+@menu
+* module declarations BR_PLURAL_BR::
+* module expressions BR_PLURAL_BR::
+* module operations BR_PLURAL_BR::
+* module related functions BR_PLURAL_BR::
+@end menu
+
+@c ------------------------------
+
+@node module declarations BR_PLURAL_BR, module expressions BR_PLURAL_BR, module BR_PLURAL_BR, module BR_PLURAL_BR
+@subsection module declarations BR_PLURAL_BR
+@cindex module declarations BR_PLURAL_BR
+
+@table @strong
+@item Syntax:
+@code{module} name @code{=} list_of_vector_expressions (which are
+interpreted as
+left generators of  the module) @code{;}
+@*@code{module} name @code{=} module_expression @code{;}
+
+@item Purpose:
+defines a left  module.
+
+@item Default:
+[0]
+
+@item Example:
+@smallexample
+@c example
+ring r=0,(x,y,z),(c,dp);
+matrix D[3][3];
+D[1,2]=-z;  D[1,3]=y;  D[2,3]=x;
+def R=nc_algebra(1,D); // this algebra is U(so_3)
+setring R;
+vector s1 = [x2,y3,z];
+vector s2 = [xy,1,0];
+vector s3 = [0,x2-y2,z];
+poly   f  = -x*y;
+module m = s1, s2-s1,f*(s3-s1);
+m;
+// show m in matrix format (columns generate m)
+print(m);
+
+@c example
+@end smallexample
+@end table
+
+@c ------------------------------
+
+@node module expressions BR_PLURAL_BR, module operations BR_PLURAL_BR, module declarations BR_PLURAL_BR, module BR_PLURAL_BR
+@subsection module expressions BR_PLURAL_BR
+@cindex module expressions BR_PLURAL_BR
+
+A module expression is:
+@enumerate
+@item
+an identifier of type module
+@item
+a function returning module
+@item
+module expressions combined by the arithmetic operation @code{+}
+@item
+multiplication of a module expression with an ideal or a poly expression: @code{*}
+@item
+a type cast to module
+@end enumerate
+
+@c ------------------------------
+@node module operations BR_PLURAL_BR, module related functions BR_PLURAL_BR, module expressions BR_PLURAL_BR, module BR_PLURAL_BR
+@subsection module operations BR_PLURAL_BR
+@cindex module operations BR_PLURAL_BR
+
+
+@table @asis
+@item @code{+}
+addition (concatenation of the generators and simplification)
+
+@item @code{*}
+right or left multiplication with ideal or poly (but not `module` * `module`!)
+
+@item module_expression @code{[} int_expression @code{,} int_expression @code{]}
+is a module entry, where the first index indicates the row and
+the second the column
+
+@item module_expressions @code{[} int_expression @code{]}
+is a vector, where the index indicates the column (generator)
+@end table
+
+@*@strong{Example:}
+@smallexample
+@c example
+ring A=0,(x,y,z),Dp;
+matrix D[3][3];
+D[1,2]=-z;  D[1,3]=y;  D[2,3]=x;  // this algebra is U(so_3)
+def B=nc_algebra(1,D);
+setring B;
+module M = [x,y],[0,0,x*z];
+module N = (x+y-z)*M - M*(x+y-z);
+print(-N);
+@c example
+@end smallexample
+
+
+@c ------------------------------
+@node module related functions BR_PLURAL_BR, poly declarations BR_PLURAL_BR, module operations BR_PLURAL_BR, module BR_PLURAL_BR
+@subsection module related functions BR_PLURAL_BR
+@cindex module related functions BR_PLURAL_BR
+
+@table @code
+@item eliminate
+elimination of variables (see @ref{eliminate BR_PLURAL_BR})
+@item freemodule
+the free module of given rank (see @ref{freemodule})
+@item intersect
+module intersection (see @ref{intersect BR_PLURAL_BR})
+@item kbase
+vector space basis of free module over the basering modulo the module of
+leading terms (see @ref{kbase BR_PLURAL_BR})
+@item lead
+initial module (see @ref{lead})
+@item lift
+lift-matrix (see @ref{lift BR_PLURAL_BR})
+@item liftstd
+left Groebner basis and transformation matrix computation (see @ref{liftstd BR_PLURAL_BR})
+@item modulo
+represents
+@tex
+$(h1+h2)/h1 \cong h2/(h1 \cap h2)$
+@end tex
+@ifinfo
+(h1+h2)/h1=h2/(h1 intersect h2)
+@end ifinfo
+(see @ref{modulo BR_PLURAL_BR})
+@item mres
+minimal free resolution of a module and a minimal set
+of generators of the given ideal module
+(see @ref{mres BR_PLURAL_BR})
+@item ncols
+number of columns (see @ref{ncols})
+@item nres
+computes a free resolution of an ideal resp.@: module M which is
+minimized from the second free module on (see @ref{nres BR_PLURAL_BR})
+@item nrows
+number of rows (see @ref{nrows})
+@item oppose
+creates an opposite module of a given module from the given ring into a basering (see @ref{oppose})
+@item print
+nice print format (see @ref{print})
+@item prune
+minimize the embedding into a free module (see @ref{prune})
+@item quotient
+module quotient (see @ref{quotient BR_PLURAL_BR})
+@item reduce
+left normal form with respect to a left Groebner basis (see @ref{reduce BR_PLURAL_BR})
+@item simplify
+simplify a set of vectors (see @ref{simplify})
+@item size
+number of non-zero generators (see @ref{size})
+@item std
+left Groebner basis computation (see @ref{std BR_PLURAL_BR})
+@item subst
+substitute a ring variable (see @ref{subst BR_PLURAL_BR})
+@item syz
+computation of the first syzygy module (see @ref{syz BR_PLURAL_BR})
+@item vdim
+vector space dimension of free module over the basering modulo module
+of leading terms (see @ref{vdim BR_PLURAL_BR})
+@end table
+
+
+@c ---------------------------------------
+
+@node poly BR_PLURAL_BR, qring BR_PLURAL_BR, module BR_PLURAL_BR, Data types BR_PLURAL_BR
+@section poly BR_PLURAL_BR
+@cindex poly BR_PLURAL_BR
+
+Polynomials are the basic data for all main algorithms in
+@sc{Plural}. They consist of finitely many terms
+(coefficient*monomial) which are combined by the usual polynomial
+operations (see @ref{poly expressions BR_PLURAL_BR}).
+ Polynomials can only be defined
+or accessed with respect to a basering which determines the coefficient
+type, the names of the indeterminants and the monomial ordering.
+@*@strong{Example:}
+@smallexample
+@c example
+  ring r=32003,(x,y,z),dp;
+  poly f=x3+y5+z2;
+@c example
+@end smallexample
+
+@strong{Remark:} Remember the conventions on polynomial
+multiplication we follow (@code{*}-multiplication in @ref{PLURAL}).
+
+@menu
+* poly declarations BR_PLURAL_BR::
+* poly expressions BR_PLURAL_BR::
+* poly operations BR_PLURAL_BR::
+* poly related functions BR_PLURAL_BR::
+@end menu
+
+@c ------------------------------
+
+@node poly declarations BR_PLURAL_BR, poly expressions BR_PLURAL_BR, module related functions BR_PLURAL_BR, poly BR_PLURAL_BR
+@subsection poly declarations BR_PLURAL_BR
+@cindex poly declarations BR_PLURAL_BR
+
+@table @strong
+@item Syntax:
+@code{poly} name @code{=} poly_expression @code{;}
+
+@item Purpose:
+defines a polynomial.
+
+@item Default:
+0
+
+@item Example:
+@smallexample
+@c example
+ring r = 32003,(x,y,z),dp;
+def R=nc_algebra(-1,1);
+setring R;
+// ring of some differential-like operators
+R;
+yx;      // not correct input
+y*x;     // correct input
+poly s1  = x3y2+151x5y+186xy6+169y9;
+poly s2  = 1*x^2*y^2*z^2+3z8;
+poly s3  = 5/4x4y2+4/5*x*y^5+2x2y2z3+y7+11x10;
+int a,b,c,t=37,5,4,1;
+poly f=3*x^a+x*y^(b+c)+t*x^a*y^b*z^c;
+f;
+short = 0;
+f;
+
+@c example
+@end smallexample
+@end table
+
+
+
+@c ----------------------------
+
+@node poly expressions BR_PLURAL_BR, poly operations BR_PLURAL_BR, poly declarations BR_PLURAL_BR, poly BR_PLURAL_BR
+@subsection poly expressions BR_PLURAL_BR
+@cindex poly expressions BR_PLURAL_BR
+
+A poly expression is (optional parts in square brackets):
+@enumerate
+@item
+a monomial (there are NO spaces allowed inside a monomial)
+@smallexample
+[coefficient] ring_variable [exponent] [ring_variable [exponent] @dots{}]
+@end smallexample
+ monomials which contain an indexed ring variable
+ must be built from @code{ring_variable} and @code{coefficient}
+ with the operations @code{*} and @code{^}
+@item
+an identifier of type poly
+@item
+a function returning poly
+@item
+poly expressions combined by the arithmetic operations @code{+}, @code{-}, @code{*}, @code{/}, or @code{^}.
+@item
+a type cast to poly
+@end enumerate
+
+
+@strong{Example:}
+@smallexample
+@c example
+ring r=0,(x,y),dp;
+def R=nc_algebra(1,1);  // make it a Weyl algebra
+setring R;
+R;
+yx;      // not correct input
+y*x;     // correct input
+poly f = 10x2*y3 + 2y2*x^2 - 2*x*y + y - x + 2;
+lead(f);
+leadmonom(f);
+simplify(f,1);     // normalize leading coefficient
+cleardenom(f);
+@c example
+@end smallexample
+
+
+@c ------------------------------
+
+@node poly operations BR_PLURAL_BR, poly related functions BR_PLURAL_BR, poly expressions BR_PLURAL_BR, poly BR_PLURAL_BR
+@subsection poly operations BR_PLURAL_BR
+@cindex poly operations BR_PLURAL_BR
+
+@table @asis
+@item @code{+}
+addition
+
+@item @code{-}
+negation or subtraction
+
+@item @code{*}
+multiplication
+
+@item @code{/}
+division by a monomial, non divisible terms yield 0
+
+@item @code{^}, @code{**}
+power by a positive integer
+
+@item @code{<}, @code{<=}, @code{>}, @code{>=}, @code{==}, @code{<>}
+comparison (of leading monomials w.r.t. monomial ordering)
+
+@item poly_expression @code{[} intvec_expression @code{]}
+the sum of monomials at the indicated places w.r.t. the monomial ordering
+@end table
+
+
+@c ------------------------------
+
+@node poly related functions BR_PLURAL_BR,  , poly operations BR_PLURAL_BR, poly BR_PLURAL_BR
+@subsection poly related functions BR_PLURAL_BR
+@cindex poly related functions BR_PLURAL_BR
+
+
+@table @code
+@item bracket
+computes the Lie bracket of two polinomials (see @ref{bracket})
+@item lead
+leading term (see @ref{lead})
+@item leadcoef
+coefficient of the leading term (see @ref{leadcoef})
+@item leadexp
+the exponent vector of the leading monomial (see @ref{leadexp})
+@item leadmonom
+leading monomial (see @ref{leadmonom})
+@item oppose
+creates an opposite poly of a given poly from the given ring into a basering (see @ref{oppose})
+@item reduce
+left normal form with respect to a left Groebner basis (see @ref{reduce BR_PLURAL_BR})
+@item simplify
+normalize a polynomial (see @ref{simplify})
+@item size
+number of monomials (see @ref{size})
+@item subst
+substitute a ring variable (see @ref{subst BR_PLURAL_BR})
+@item var
+the indicated variable of the ring (see @ref{var})
+@end table
+
+@c ---------------------------------------
+
+@node qring BR_PLURAL_BR, resolution BR_PLURAL_BR, poly BR_PLURAL_BR, Data types BR_PLURAL_BR
+@section qring BR_PLURAL_BR
+@cindex qring BR_PLURAL_BR
+
+@sc{Plural} offers the possibility to compute within
+factor-rings modulo two-sided ideals.  The ideal has to be given
+as a two-sided Groebner basis (see @ref{twostd} command).
+
+@* For a detailed description of the concept of rings and quotient rings see
+@ifclear singularmanual
+in @sc{Singular} manual section Rings and orderings.
+@end ifclear
+@ifset singularmanual
+@ref{Rings and orderings}.
+@end ifset
+
+
+@menu
+* qring declaration BR_PLURAL_BR::
+* qring related functions BR_PLURAL_BR::
+@end menu
+
+@strong{Note:}
+we highly recommend to turn on
+@code{option(redSB); option(redTail);}
+while computing in qrings. Otherwise results may have a difficult interpretation.
+
+@c ---------------------------------------
+@node qring declaration BR_PLURAL_BR, qring related functions BR_PLURAL_BR, qring BR_PLURAL_BR, qring BR_PLURAL_BR
+@subsection qring declaration BR_PLURAL_BR
+@cindex qring declaration BR_PLURAL_BR
+
+
+@table @strong
+@item Syntax:
+@code{qring} name @code{=} ideal_expression @code{;}
+@item Default:
+none
+@item Purpose:
+declares a quotient ring as the basering modulo an @code{ideal_expression} and sets
+it as current basering.
+@item Note:
+reports error if an ideal is not a two-sided Groebner basis.
+@item Example:
+@smallexample
+@c example error
+ring r=0,(z,u,v,w),dp;
+def R=nc_algebra(-1,0); // an anticommutative algebra
+setring R;
+option(redSB);
+option(redTail);
+ideal i=z^2,u^2,v^2,w^2;
+qring Q = i;  // incorrect call produces error
+kill Q;
+setring R;  // go back to the ring R
+qring q=twostd(i); // now it is an exterior algebra
+q;
+poly k = (v-u)*(zv+u-w);
+k; // the output is not yet totally reduced
+poly ek=reduce(k,std(0));
+ek; // the reduced form
+@c example
+@end smallexample
+@end table
+
+@c ---------------------------------------
+@node qring related functions BR_PLURAL_BR, , qring declaration BR_PLURAL_BR, qring BR_PLURAL_BR
+@subsection qring related functions BR_PLURAL_BR
+@cindex qring related functions BR_PLURAL_BR
+
+@table @code
+@item envelope
+enveloping ring (see @ref{envelope})
+@item nvars
+number of ring variables (see @ref{nvars})
+@item opposite
+opposite ring (see @ref{opposite})
+@item setring
+set a new basering (see @ref{setring})
+@end table
+
+@c ---------------------------------------
+
+@node resolution BR_PLURAL_BR, ring BR_PLURAL_BR, qring BR_PLURAL_BR, Data types BR_PLURAL_BR
+@section resolution BR_PLURAL_BR
+@cindex resolution BR_PLURAL_BR
+
+The type resolution is intended as an intermediate representation which
+internally retains additional information obtained during computation of
+resolutions. It furthermore enables the use of partial results to
+compute, for example, Betti numbers or minimal resolutions. Like ideals
+and modules, a resolution can only be defined w.r.t.@: a basering.
+
+@strong{Note:}
+to access the elements of a resolution, it has to be assigned to a list.
+This assignment also completes computations and may therefore take time,
+(resp.@: an access directly with the brackets @code{[ , ]} causes
+implicitly a cast to a list).
+
+@menu
+* resolution declarations BR_PLURAL_BR::
+* resolution expressions BR_PLURAL_BR::
+* resolution related functions BR_PLURAL_BR::
+@end menu
+
+@c ---------------------------------------
+
+@node resolution declarations BR_PLURAL_BR, resolution expressions BR_PLURAL_BR, resolution BR_PLURAL_BR, resolution BR_PLURAL_BR
+@subsection resolution declarations BR_PLURAL_BR
+@cindex resolution declarations BR_PLURAL_BR
+
+@table @strong
+@item Syntax:
+@code{resolution} name @code{=} resolution_expression @code{;}
+
+@item Purpose:
+defines a resolution.
+
+@item Default:
+none
+
+@item Example:
+@smallexample
+@c example
+ring r=0,(x,y,z),dp;
+matrix D[3][3];
+D[1,2]=z;
+def R=nc_algebra(1,D); // it is a Heisenberg algebra
+setring R;
+ideal i=z2+z,x+y;
+resolution re=nres(i,0);
+re;
+list l = re;
+l;
+print(matrix(l[2]));
+@c example
+@end smallexample
+@end table
+
+@c ------------------------------
+
+@node resolution expressions BR_PLURAL_BR, resolution related functions BR_PLURAL_BR, resolution declarations BR_PLURAL_BR, resolution BR_PLURAL_BR
+@subsection resolution expressions BR_PLURAL_BR
+@cindex resolution expressions BR_PLURAL_BR
+
+A resolution expression is:
+@enumerate
+@item
+an identifier of type resolution
+@item
+a function returning a resolution
+@item
+a type cast to resolution from a list of ideals, resp.@: modules.
+@end enumerate
+
+
+@c ------------------------------
+
+@node resolution related functions BR_PLURAL_BR,  , resolution expressions BR_PLURAL_BR, resolution BR_PLURAL_BR
+@subsection resolution related functions BR_PLURAL_BR
+@cindex resolution related functions BR_PLURAL_BR
+
+@table @code
+@item betti
+Betti numbers of a resolution (see @ref{betti BR_PLURAL_BR})
+@item minres
+minimizes a free resolution  (see @ref{minres BR_PLURAL_BR})
+@item mres
+computes a minimal free resolution of an ideal resp.
+module and a minimal set of generators of the given ideal
+resp. module (see @ref{mres BR_PLURAL_BR})
+@item nres
+computes a free resolution of an ideal resp.@: module M which is
+minimized from the second module on (see @ref{nres BR_PLURAL_BR})
+@c @item res
+@c free resolution of an ideal resp.@: module but not changing the given ideal resp.@: module(see @ref{res BR_PLURAL_BR})
+@end table
+
+
+@c ---------------------------------------
+
+@node ring BR_PLURAL_BR,  , resolution BR_PLURAL_BR, Data types BR_PLURAL_BR
+@section ring BR_PLURAL_BR
+@cindex ring BR_PLURAL_BR
+
+Rings are used to describe properties of polynomials, ideals etc.
+Almost all computations in @sc{Plural} require a basering.
+For a detailed description of the concept of rings see
+@ifset singularmanual
+@ref{Rings and orderings}.
+@end ifset
+@ifclear singularmanual
+@sc{Singular} manual (Chapter: General Concepts, Section: Rings and orderings).
+@end ifclear
+
+@*@strong{Note:} @sc{Plural} works with global orderings
+only (@pxref{PLURAL}).
+
+@menu
+* ring declarations BR_PLURAL_BR::
+* ring operations BR_PLURAL_BR::
+* ring related functions BR_PLURAL_BR::
+@end menu
+
+@c ---------------------------------------
+
+@node ring declarations BR_PLURAL_BR, ring operations BR_PLURAL_BR, ring BR_PLURAL_BR, ring BR_PLURAL_BR
+@subsection ring declarations BR_PLURAL_BR
+@cindex ring declarations BR_PLURAL_BR
+
+@table @strong
+@item Syntax:
+@code{ring} name @code{= (} coefficient_field @code{),}
+  @code{(} names_of_ring_variables @code{),}
+  @code{(} ordering @code{);}
+@item Default:
+@code{2147483629,(x,y,z),(dp,C);}
+@item Purpose:
+declares a ring and sets it as the actual basering.
+@end table
+
+The coefficient_field is given by one of the following:
+@enumerate
+@item
+a non-negative int_expression less or equal 2147483629.
+@item
+an expression_list of an int_expression and one or more names.
+@item
+the name @code{real}.
+@item
+an expression_list of the name @code{real} and an  int_expression.
+@item
+an expression_list of the name @code{complex}, an optional int_expression
+and a name.
+@end enumerate
+
+
+'names_of_ring_variables' must be a list of names or indexed names.
+
+'ordering' is a list of block orderings where each block ordering is either
+@enumerate
+@item
+@code{lp}, @code{dp}, @code{Dp},
+optionally followed by a size parameter in parentheses.
+
+@item
+@code{wp}, @code{Wp}, or @code{a} followed by a
+weight vector given as an intvec_expression in parentheses.
+
+@item
+@code{M} followed by an intmat_expression in parentheses.
+
+@item
+@code{c} or @code{C}.
+@end enumerate
+
+
+If one of coefficient_field, names_of_ring_variables, and ordering
+consists of only one entry, the parentheses around this entry may be
+omitted.
+
+@strong{In order to create the non-commutative extension, use} @ref{nc_algebra}.
+
+
+@c ---------------------------------------
+
+@node ring operations BR_PLURAL_BR, ring related functions BR_PLURAL_BR, ring declarations BR_PLURAL_BR, ring BR_PLURAL_BR
+@subsection ring operations BR_PLURAL_BR
+@cindex ring operations BR_PLURAL_BR
+@table @asis
+@item @code{+}
+construct a tensor product
+@ifinfo
+C = A\otimes_k B
+@end ifinfo
+@tex
+$C = A\otimes_{\bf{K} } B$
+@end tex
+of two
+@ifinfo
+G-algebras A and B
+@end ifinfo
+@tex
+$G$-algebras $A$ and $B$
+@end tex
+ over the groung field.
+
+Let
+@ifinfo
+ A=k1<x_1,...,x_n | @{x_j x_i=c_@{ij@}x_i x_j + d_@{ij @} @}, 1 =<i <j =< n >,
+ and
+ B=k2<y_1,...,y_m | @{y_j y_i=q_@{ij@}y_i y_j + r_@{ij @} @}, 1 =<i <j =< m >
+@end ifinfo
+
+@tex
+$A= k_1 \langle x_1, \ldots ,x_n \mid$
+$\{ x_j x_i=c_{ij} \cdot x_i x_j + d_{ij}\}, 1 \leq i <j \leq n \rangle$,
+and
+$B= k_2 \langle y_1, \ldots ,y_m \mid$
+$\{ y_j y_i=q_{ij} \cdot y_i y_j + r_{ij}\}, 1 \leq i <j \leq m \rangle$
+@end tex
+
+be two @math{G}-algebras, then @math{C} is defined to be the algebra
+
+@ifinfo
+C = K<x_1,...,x_n, y_1,...,y_m |
+@{x_j x_i=c_@{ij@}x_i x_j + d_@{ij @}, 1 =<i <j =< n @},
+@{y_j y_i=q_@{ij@}y_i y_j + r_@{ij @}, 1 =<i <j =< m @},
+@{y_j x_i = x_i y_j, 1 <= j <= m, 1 <= i <= n @}>
+@end ifinfo
+
+@tex
+$C = K \langle x_1, \ldots ,x_n, y_1, \ldots ,y_m \mid$
+$\{ x_j x_i=c_{ij} \cdot x_i x_j + d_{ij}, 1 \leq i <j \leq n\}$,
+$\{ y_j y_i=q_{ij} \cdot y_i y_j + r_{ij}, 1 \leq i <j \leq m\}$,
+$\{ y_j x_i = x_i y_j, 1 \leq j \leq m, 1 \leq i \leq n\}  \rangle$.
+@end tex
+
+@end table
+
+
+Concerning the ground fields @math{k_1} resp. @math{k_2} of @math{A} resp. @math{B}, take the
+following guide lines for
+@ifinfo
+A\otimes_k B
+@end ifinfo
+@tex
+$A\otimes_{\bf{K} } B$
+@end tex
+ into consideration:
+@itemize @bullet
+@item Neither @math{k_1} nor @math{k_2} may be @math{R} or @math{C}.
+@item If the characteristic of @math{k_1} and @math{k_2} differs, then one of them must be @math{Q}.
+@item At most one of @math{k_1} and @math{k_2} may have parameters.
+@item If one of @math{k_1} and @math{k_2} is an algebraic extension of @math{Z/p} it may not be defined by a @code{charstr} of type @code{(p^n,a)}.
+@end itemize
+
+
+@strong{Example:}
+@smallexample
+@c example
+LIB "ncalg.lib";
+def a = makeUsl2();       // U(sl_2) in e,f,h presentation
+ring W = 0,(x,d),dp;
+Weyl();              // 1st Weyl algebra in x,d
+def S = a+W;
+setring S;
+S;
+@c example
+@end smallexample
+
+@c ---------------------------------------
+
+@node ring related functions BR_PLURAL_BR,  , ring operations BR_PLURAL_BR, ring BR_PLURAL_BR
+@subsection ring related functions BR_PLURAL_BR
+@cindex ring related functions BR_PLURAL_BR
+
+@table @code
+@item charstr
+description of the coefficient field of a ring (see @ref{charstr})
+@item envelope
+enveloping ring (see @ref{envelope})
+@item npars
+number of ring parameters (see @ref{npars})
+@item nvars
+number of ring variables (see @ref{nvars})
+@item opposite
+opposite ring (see @ref{opposite})
+@item ordstr
+monomial ordering of a ring (see @ref{ordstr})
+@item parstr
+names of all ring parameters or the
+name of the n-th ring parameter (see @ref{parstr})
+@item qring
+quotient ring (see @ref{qring BR_PLURAL_BR})
+@item ringlist
+decomposes a ring into a list of its components (see @ref{ringlist BR_PLURAL_BR})
+@item setring
+set a new basering (see @ref{setring})
+@item varstr
+names of all ring variables or the
+name of the n-th ring variable (see @ref{varstr})
+@end table
+
+@raisesections
+@c ----------------------------------------------------------------------------
+@node Functions BR_PLURAL_BR, Mathematical background BR_PLURAL_BR, Data types BR_PLURAL_BR, Non-commutative subsystem
+
+@section Functions BR_PLURAL_BR
+@lowersections
+
+@cindex commands BR_PLURAL_BR
+
+This chapter gives a complete reference of all functions and commands of the @sc{Plural} kernel, i.e. all built-in commands
+(for the @sc{Plural} libraries see @ref{Non-commutative libraries}).
+
+The general syntax of a function is
+@format
+                   [target =] function_name (<arguments>);
+@end format
+
+
+Note, that both @strong{Control structures} and @strong{System variables} of
+@sc{Plural} are the same as of @sc{Singular}
+(see @ref{Control structures}, @ref{System variables}).
+
+@menu
+* betti BR_PLURAL_BR::
+* bracket::
+* eliminate BR_PLURAL_BR::
+* envelope::
+* fetch BR_PLURAL_BR::
+* imap BR_PLURAL_BR::
+* intersect BR_PLURAL_BR::
+* kbase BR_PLURAL_BR::
+* lift BR_PLURAL_BR::
+* liftstd BR_PLURAL_BR::
+* minres BR_PLURAL_BR::
+* modulo BR_PLURAL_BR::
+* mres BR_PLURAL_BR::
+* nc_algebra::
+* ncalgebra::
+* nres BR_PLURAL_BR::
+* oppose::
+* opposite::
+* preimage BR_PLURAL_BR::
+* quotient BR_PLURAL_BR::
+* reduce BR_PLURAL_BR::
+* ringlist BR_PLURAL_BR::
+* slimgb BR_PLURAL_BR::
+* std BR_PLURAL_BR::
+* subst  BR_PLURAL_BR::
+* syz BR_PLURAL_BR::
+* twostd::
+* vdim BR_PLURAL_BR::
+@end menu
+
+@c -----------------------------
+@node betti BR_PLURAL_BR, bracket, Functions BR_PLURAL_BR, Functions BR_PLURAL_BR
+@section betti BR_PLURAL_BR
+@cindex betti BR_PLURAL_BR
+@table @code
+@item @strong{Syntax:}
+@code{betti (} list_expression @code{)}
+@*@code{betti (} resolution_expression @code{)}
+@*@code{betti (} list_expression @code{,} int_expression @code{)}
+@*@code{betti (} resolution_expression @code{,} int_expression @code{)}
+@item @strong{Type:}
+intmat
+@item @strong{Note:}
+in the noncommutative case, computing Betti numbers makes sense only if the basering @math{R} has homogeneous relations
+@item @strong{Purpose:}
+with 1 argument: computes the graded Betti numbers of a minimal resolution of
+@tex
+$R^n/M$, if $R$ denotes the basering and
+$M$ a homogeneous submodule of $R^n$ and the argument represents a
+resolution of
+$R^n/M$.
+@end tex
+@iftex
+@*
+@end iftex
+@tex
+The entry d of the intmat at place (i, j) is the minimal number of
+generators in degree i+j of the j-th syzygy module (= module of
+relations) of $R^n/M$ (the 0th (resp.\ 1st) syzygy module of $R^n/M$ is
+$R^n$ (resp.\ $M$)).
+@end tex
+@ifinfo
+R^n/M, if R denotes the basering and
+M a homogeneous submodule of R^n and the argument represents a resolution of
+R^n/M:
+@*The entry d of the intmat at place (i,j) is the minimal number of
+generators in degree i+j of the j-th syzygy module
+@c (= module of relations)
+of R^n/M (the 0th (resp.@: 1st) syzygy module of R^n/M is R^n
+(resp.@: M)).
+@end ifinfo
+The argument is considered to be the result of a @code{mres} or @code{nres}
+command. This implies that a zero is only allowed (and counted) as a
+generator in the first module.
+@*For the computation @code{betti} uses only the initial monomials. This could lead to confusing results for a non-homogeneous input.
+
+If the optional second argument is non-zero, the Betti numbers will be minimized.
+@c The optional second argument is a switch for the minimization of the Betti
+@c numbers. If it is 0 then the Betti numbers correspond exactly to the input -
+@c otherwise the command is identical to the one-argument form.
+@item @strong{Example:}
+@smallexample
+@c example
+int i;int N=2;
+ring r=0,(x(1..N),d(1..N),q(1..N)),Dp;
+matrix D[3*N][3*N];
+for (i=1;i<=N;i++)
+{ D[i,N+i]=q(i)^2; }
+def W=nc_algebra(1,D); setring W;
+// this algebra is a kind of homogenized Weyl algebra
+W;
+ideal I = x(1),x(2),d(1),d(2),q(1),q(2);
+option(redSB);
+option(redTail);
+resolution R = mres(I,0);
+// thus R will be the full length minimal resolution
+print(betti(R),"betti");
+@c example
+@end smallexample
+@end table
+
+
+@c -----------------------------
+@node bracket, eliminate BR_PLURAL_BR, betti BR_PLURAL_BR, Functions BR_PLURAL_BR
+@section bracket
+@cindex bracket
+
+@table @code
+@item @strong{Syntax:}
+@code{bracket (} poly_expression, poly_expression @code{)}
+@item @strong{Type:}
+poly
+@item @strong{Purpose:}
+Computes the Lie bracket @code{[p,q]=pq-qp} of the first polynomial with
+the second. Uses special routines, based on the Leibniz rule.
+@item @strong{Example:}
+@smallexample
+@c example
+ring r=(0,Q),(x,y,z),Dp;
+minpoly=Q^2-Q+1;
+matrix C[3][3];  matrix D[3][3];
+C[1,2]=Q2;    C[1,3]=1/Q2;  C[2,3]=Q2;
+D[1,2]=-Q*z;  D[1,3]=1/Q*y; D[2,3]=-Q*x;
+def R=nc_algebra(C,D); setring R;
+// this is a quantum deformation of U(so_3),
+// where Q is a 6th root of unity
+poly p=Q^4*x2+y2+Q^4*z2+Q*(1-Q^4)*x*y*z;
+// p is the central element of the algebra
+p=p^3; // any power of a central element is central
+poly q=(x+Q*y+Q^2*z)^4;
+// take q to be some big noncentral element
+size(q); // check how many monomials are in big poly q
+bracket(p,q); // check p*q=q*p
+// a more common behaviour of the bracket follows:
+bracket(x+Q*y+Q^2*z,z);
+@c example
+@end smallexample
+@end table
+
+@c ---------------------------------------
+@node eliminate BR_PLURAL_BR, envelope, bracket, Functions BR_PLURAL_BR
+@section eliminate BR_PLURAL_BR
+@cindex eliminate BR_PLURAL_BR
+
+@table @code
+@item @strong{Syntax:}
+@code{eliminate (} ideal_expression@code{,} product_of_ring_variables@code{)}
+@*@code{eliminate (} module_expression@code{,} product_of_ring_variables@code{)}
+@item @strong{Type:}
+the same as the type of the first argument
+@item @strong{Purpose:}
+eliminates variables occurring as factors of the second argument from an
+ideal (resp.@: a submodule of a free module), by intersecting it
+(resp. each component of the submodule) with the subring not containing these variables.
+@item @strong{Note:}
+@code{eliminate} does not need neither a special ordering on the basering nor a Groebner basis as input.
+@item @strong{Remark:}
+ in a noncommutative algebra, not every subset of a set of variables generates
+a proper subalgebra. But if it is so, there may be cases, when no elimination is possible.
+In these situations error messages will be reported.
+
+@item @strong{Example:}
+@smallexample
+@c example error
+ring r=0,(e,f,h,a),Dp;
+matrix d[4][4];
+d[1,2]=-h; d[1,3]=2*e; d[2,3]=-2*f;
+def R=nc_algebra(1,d); setring R;
+// this algebra is U(sl_2), tensored with K[a] over K
+option(redSB);
+option(redTail);
+poly  p = 4*e*f+h^2-2*h - a;
+// p is a central element with parameter
+ideal I = e^3, f^3, h^3-4*h, p; // take this ideal
+// and intersect I with the ring K[a]
+ideal J = eliminate(I,e*f*h);
+// if we want substitute 'a' with a value,
+// it has to be a root of this polynomial
+J;
+// now we try to eliminate h,
+// that is we intersect I with the subalgebra S,
+// generated by e and f.
+// But S is not closed in itself, since f*e-e*f=-h !
+// the next command will definitely produce an error
+eliminate(I,h);
+// since a commutes with e,f,h, we can eliminate it:
+eliminate(I,a);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{ideal BR_PLURAL_BR};
+@ref{module BR_PLURAL_BR};
+@ref{std BR_PLURAL_BR}.
+@c ref
+
+@c ---------------------------------------
+@node  envelope, fetch BR_PLURAL_BR, eliminate BR_PLURAL_BR, Functions BR_PLURAL_BR
+@section envelope
+@cindex envelope
+
+@table @code
+@item @strong{Syntax:}
+@code{envelope (} ring_name @code{)}
+@item @strong{Type:}
+ring
+@item @strong{Purpose:}
+creates an enveloping algebra of a given algebra, that is
+@ifinfo
+A_env = A tensor A_opp, where A_opp is the
+opposite algebra of A.
+@end ifinfo
+@tex
+$A^{env} = A \otimes_K A^{opp}$, where $A^{opp}$ is the
+opposite algebra of $A$.
+@end tex
+@item @strong{Remark:}
+You have to activate the ring with the @code{setring} command.
+For the presentation, see explanation of @code{opposite} in @ref{opposite}.
+@smallexample
+@c example
+LIB "ncalg.lib";
+def A = makeUsl2();
+setring A; A;
+def Aenv = envelope(A);
+setring Aenv;
+Aenv;
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{oppose};
+@ref{opposite}.
+@c ref
+
+@c ---------------------------------------
+@node fetch BR_PLURAL_BR, imap BR_PLURAL_BR, envelope, Functions BR_PLURAL_BR
+@section fetch BR_PLURAL_BR
+@cindex fetch BR_PLURAL_BR
+
+@table @code
+@item @strong{Syntax:}
+@code{fetch (} ring_name@code{,} name @code{)}
+@item @strong{Type:}
+number, poly, vector, ideal, module, matrix or list
+(the same type as the second argument)
+@item @strong{Purpose:}
+maps objects between rings.
+@code{fetch} is the identity map between rings and qrings,
+the i-th variable of the source ring is mapped to the i-th
+variable of the basering.  The coefficient fields must be compatible.
+(See @ref{map BR_PLURAL_BR} for a description of possible mappings between
+different ground fields).
+@*@code{fetch} offers a convenient way to change
+variable names or orderings, or to map objects from a ring to a quotient
+ring of that ring or vice versa.
+@item @strong{Note:}
+Compared with @code{imap}, @code{fetch} uses the position of the ring
+variables, not their names.
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "ncalg.lib";
+def Usl2 = makeUsl2(); // this algebra is U(sl_2)
+setring Usl2;
+option(redSB);
+option(redTail);
+poly  C  = 4*e*f+h^2-2*h; // the central element of Usl2
+ideal I  = e^3,f^3,h^3-4*h;
+ideal J  = twostd(I);
+matrix M = matrix(J);
+ // print a compact presentation of J:
+print(matrix(ideal(J[1..5]))); // first 5 generators
+print(matrix(ideal(J[6..size(J)]))); // last generators
+ideal QC = twostd(C-8);
+qring Q  = QC;
+ideal QJ = fetch(Usl2,J);
+QJ = std(QJ);
+// thus QJ is the image of I in the factor-algebra QC
+print(matrix(QJ)); // print QJ compactly
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{imap BR_PLURAL_BR};
+@ref{map BR_PLURAL_BR};
+@ref{qring BR_PLURAL_BR};
+@ref{ring BR_PLURAL_BR}.
+@c ref
+
+
+@c ---------------------------------------
+@node imap BR_PLURAL_BR, intersect BR_PLURAL_BR, fetch BR_PLURAL_BR, Functions BR_PLURAL_BR
+@section imap BR_PLURAL_BR
+@cindex imap BR_PLURAL_BR
+
+@table @code
+@item @strong{Syntax:}
+@code{imap (} ring_name@code{,} name @code{)}
+@item @strong{Type:}
+number, poly, vector, ideal, module, matrix or list
+(the same type as the second argument)
+@item @strong{Purpose:}
+identity map on common subrings.  @code{imap} is the map between rings
+and qrings with compatible ground fields which is the identity on
+variables and parameters of the same name and 0 otherwise.
+(See @ref{map BR_PLURAL_BR} for a description of possible mappings between
+different ground fields).
+Useful for mappings from a homogenized ring to the original ring or
+for mappings from/to rings with/without parameters. Compared with
+@code{fetch}, @code{imap} uses the names of variables and parameters.
+Unlike @code{map} and @code{fetch}, @code{imap} can map parameters to variables.
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "ncalg.lib";
+ring ABP=0,(p4,p5,a,b),dp; //  a commutative ring
+def Usl3 = makeUsl(3);
+def BIG  = Usl3+ABP;
+setring BIG;
+poly P4 = 3*x(1)*y(1)+3*x(2)*y(2)+3*x(3)*y(3);
+P4 = P4 +h(1)^2+h(1)*h(2)+h(2)^2-3*h(1)-3*h(2);
+// P4 is a central element of Usl3 of degree 2
+poly P5 = 4*x(1)*y(1) + h(1)^2 - 2*h(1);
+// P5 is a central element of the subalgebra of U(sl_3),
+// generated by x(1),y(1),h(1)
+ideal J = x(1),x(2),h(1)-a,h(2)-b;
+// we are interested in the module U(sl_3)/J,
+// which depends on parameters a,b
+ideal I = p4-P4, p5-P5;
+ideal K = I, J;
+ideal E = eliminate(K,x(1)*x(2)*x(3)*y(1)*y(2)*y(3)*h(1)*h(2));
+E; // this is the ideal of central characters in ABP
+// what are the characters on nonzero a,b?
+ring abP = (0,a,b),(p4,p5),dp;
+ideal abE = imap(BIG, E);
+option(redSB);
+option(redTail);
+abE = std(abE);
+// here come characters (indeed, we have only one)
+// that is a maximal ideal in K[p4,p5]
+abE;
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{fetch BR_PLURAL_BR};
+@ref{map BR_PLURAL_BR};
+@ref{qring BR_PLURAL_BR};
+@ref{ring BR_PLURAL_BR}.
+@c ref
+
+
+
+@c ------------------------------------------------
+@node intersect BR_PLURAL_BR, kbase BR_PLURAL_BR, imap BR_PLURAL_BR, Functions BR_PLURAL_BR
+@section  intersect BR_PLURAL_BR
+@cindex  intersect BR_PLURAL_BR
+
+@table @code
+@item @strong{Syntax:}
+@code{intersect (}expression_list of ideal_expression  @code{)}
+@*@code{intersect (}expression_list of module_expression  @code{)}
+
+@item @strong{Type:}
+ideal, resp. module
+
+@item @strong{Purpose:}
+computes the intersection of ideals, resp. modules.
+@item @strong{Example:}
+@c // 1. from [BGV], p.213, Ex.2.5. answer: [0,xy^2],[y^2,-xy]
+@c // 2. from [BGV], p.148, Ex.3.8
+@smallexample
+@c example
+ring r=0,(x,y),dp;
+def R=nc_algebra(-1,0);
+setring R;
+module M=[x,x],[y,0];
+module N=[0,y^2],[y,x];
+option(redSB);
+module Res;
+Res=intersect(M,N);
+print(Res);
+kill r,R;
+//--------------------------------
+LIB "ncalg.lib";
+ring r=0,(x,d),dp;
+def RR=Weyl(); // make r into Weyl algebra
+setring RR;
+ideal I = x+d^2;
+ideal J = d-1;
+ideal H = intersect(I,J);
+H;
+@c example
+@end smallexample
+@end table
+
+
+
+@c ------------------------------------------------
+@node kbase BR_PLURAL_BR, lift BR_PLURAL_BR, intersect BR_PLURAL_BR, Functions BR_PLURAL_BR
+@section kbase BR_PLURAL_BR
+@cindex kbase BR_PLURAL_BR
+@table @code
+@item @strong{Syntax:}
+@code{kbase (} ideal_expression @code{)}
+@*@code{kbase (} module_expression @code{)}
+@*@code{kbase (} ideal_expression@code{,} int_expression@code{)}
+@*@code{kbase (} module_expression@code{,} int_expression@code{)}
+@item @strong{Type:}
+the same as the input type of the first argument
+@item @strong{Purpose:}
+
+computes the vector space basis of the
+factor-module that equals
+ring (resp. free module) modulo the ideal (resp. submodule),
+generated by the initial terms of the given generators.
+@* If the factor-module is not of finite dimension, -1 is returned.
+
+If the generators form a Groebner basis,
+this is the same as the vector space basis of the
+factor-module.
+
+@item @strong{Note:}
+in the noncommutative case, a ring modulo an ideal has a ring stucture
+if and only if the ideal is two-sided.
+@item @strong{Example:}
+@smallexample
+@c example
+ring r=0,(x,y,z),dp;
+matrix d[3][3];
+d[1,2]=-z;  d[1,3]=2x;  d[2,3]=-2y;
+def R=nc_algebra(1,d); // this algebra is U(sl_2)
+setring R;
+ideal i=x2,y2,z2-1;
+i=std(i);
+print(matrix(i));  // print a compact presentation of i
+kbase(i);
+vdim(i);
+ideal j=x,z-1;
+j=std(j);
+kbase(j,3);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{ideal BR_PLURAL_BR};
+@ref{module BR_PLURAL_BR};
+@ref{vdim BR_PLURAL_BR}.
+@c ref
+
+
+@c -------------------------------------------------
+@node lift BR_PLURAL_BR, liftstd BR_PLURAL_BR, kbase BR_PLURAL_BR, Functions BR_PLURAL_BR
+@section lift BR_PLURAL_BR
+@cindex lift BR_PLURAL_BR
+@table @code
+@item @strong{Syntax:}
+@code{lift (} ideal_expression@code{,} subideal_expression @code{)}
+@*@code{lift (} module_expression@code{,} submodule_expression @code{)}
+@item @strong{Type:}
+matrix
+@item @strong{Purpose:}
+computes the (left) transformation matrix which expresses the (left) generators of a
+submodule in terms of the (left) generators of a module.  Uses different
+algorithms for modules which are (resp.@: are not) represented by a
+Groebner basis.
+@* More precisely, if  @code{m} is the
+module, @code{sm} the submodule,
+and @code{T} the transformation matrix returned by
+lift, then @code{transpose(matrix(sm)) = transpose(T)*transpose(m)}
+and @code{module(transpose(sm)) = module(transpose(T)*transpose(m))}.
+If  @code{m} and @code{sm} are ideals, @code{ideal(sm) = ideal(transpose(T)*transpose(m))}.
+
+@item @strong{Note:}
+Gives a warning if @code{sm} is not a submodule.
+@item @strong{Example:}
+@smallexample
+@c example
+ring r = (0,a),(e,f,h),(c,dp);
+matrix D[3][3];
+D[1,2]=-h;  D[1,3]=2*e;  D[2,3]=-2*f;
+def R=nc_algebra(1,D); // this algebra is a parametric U(sl_2)
+setring R;
+ideal i = e,h-a; // consider this parametric ideal
+i = std(i);
+print(matrix(i)); // print a compact presentation of i
+poly Z = 4*e*f+h^2-2*h; // a central element
+Z = Z - NF(Z,i); // a central character
+ideal j = std(Z);
+j;
+matrix T = lift(i,j);
+print(T);
+ideal tj = ideal(transpose(T)*transpose(matrix(i)));
+std(ideal(j-tj)); // test
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{liftstd BR_PLURAL_BR};
+@ref{ideal BR_PLURAL_BR};
+@ref{module BR_PLURAL_BR}.
+@c ref
+
+
+@c -----------------------------------------
+@node liftstd BR_PLURAL_BR, minres BR_PLURAL_BR, lift BR_PLURAL_BR, Functions BR_PLURAL_BR
+@section liftstd BR_PLURAL_BR
+@cindex liftstd BR_PLURAL_BR
+@table @code
+@item @strong{Syntax:}
+@code{liftstd (} ideal_expression@code{,} matrix_name @code{)}
+@*@code{liftstd (} module_expression@code{,} matrix_name @code{)}
+@item @strong{Type:}
+ideal or module
+@item @strong{Purpose:}
+returns a Groebner basis of an ideal or module and the transformation
+matrix from the given ideal, resp.@: module, to the Groebner basis.
+@*That is, if @code{m} is the ideal or module, @code{sm} is the Groebner
+basis of  @code{m}, returned by @code{liftstd}, and @code{T} is the transformation matrix,
+then @code{transpose(matrix(sm))=transpose(T)*transpose(matrix(m))} and
+@code{sm=module(transpose(transpose(T)*transpose(matrix(m))))}.
+
+If @code{m} is an ideal, @code{sm=ideal(transpose(T)*transpose(matrix(m)))}.
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "ncalg.lib";
+def A = makeUsl2();
+setring A;  // this algebra is U(sl_2)
+ideal i = e2,f;
+option(redSB);
+option(redTail);
+matrix T;
+ideal j = liftstd(i,T);
+// the Groebner basis in a compact form:
+print(matrix(j));
+print(T);  // the transformation matrix
+ideal tj = ideal(transpose(T)*transpose(matrix(i)));
+std(ideal(j-tj)); // test
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{ideal BR_PLURAL_BR};
+@ref{ring BR_PLURAL_BR};
+@ref{std BR_PLURAL_BR}.
+@c ref
+
+
+@c ---------------------------------------
+@node  minres BR_PLURAL_BR, modulo BR_PLURAL_BR, liftstd BR_PLURAL_BR, Functions BR_PLURAL_BR
+@section minres BR_PLURAL_BR
+@cindex minres BR_PLURAL_BR
+
+@table @code
+@item @strong{Syntax:}
+@code{minres (} list_expression @code{)}
+@item @strong{Type:}
+list
+@item @strong{Syntax:}
+@code{minres (} resolution_expression @code{)}
+@item @strong{Type:}
+resolution
+@item @strong{Purpose:}
+minimizes a free resolution of an ideal or module
+given by the list_expression, resp.@: resolution_expression.
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "ncalg.lib";
+def A = makeUsl2();
+setring A; // this algebra is U(sl_2)
+ideal i=e,f,h;
+i=std(i);
+resolution F=nres(i,0);   F;
+print(matrix(F[1])); // print F's compactly
+print(matrix(F[2]));
+print(matrix(F[3]));
+resolution MF=minres(F);  MF;
+print(matrix(MF[1]));
+print(matrix(MF[2]));
+print(matrix(MF[3]));
+@c example
+@end smallexample
+@end table
+
+@c ref
+See
+@ref{mres BR_PLURAL_BR};
+@ref{nres BR_PLURAL_BR}.
+@c ref
+
+
+@c ---------------------------------------
+@node modulo BR_PLURAL_BR, mres BR_PLURAL_BR, minres BR_PLURAL_BR, Functions BR_PLURAL_BR
+@section modulo BR_PLURAL_BR
+@cindex modulo BR_PLURAL_BR
+@table @code
+@item @strong{Syntax:}
+@code{modulo (} ideal_expression@code{,} ideal_expression @code{)}
+@*@code{modulo (} module_expression@code{,} module_expression @code{)}
+@item @strong{Type:}
+module
+@item @strong{Purpose:}
+@code{modulo(h1,h2)}
+@ifinfo
+represents h1/(h1 intersect h2) (isomorphic to (h1+h2)/h2)
+@end ifinfo
+@tex
+represents $h_1/(h_1 \cap h_2) \cong (h_1+h_2)/h_2$
+@end tex
+, where
+@tex
+$h_1$ and $h_2$
+@end tex
+@ifinfo
+h1 and h2
+@end ifinfo
+are considered as submodules of the same free module
+@tex
+$R^s$
+@end tex
+@ifinfo
+R^s
+@end ifinfo
+(s=1 for ideals).
+@*Let
+@tex
+$H_1$ (resp.\ $H_2$)
+@end tex
+@ifinfo
+H1 (resp. H2)
+ be the matrix of size l x k (resp.@: l x m), having the generators of
+ h1 (resp.@: h2)
+@end ifinfo
+@tex
+ be the matrix of size $l \times k$ (resp.\ $l \times m$), having the
+generators of $h_1$ (resp.\ $h_2$)
+@end tex
+as columns.
+@* Then
+@tex
+$h_1/(h_1 \cap h_2) \cong R^k / ker(\overline{H_1})$
+@end tex
+@ifinfo
+@format
+                                                    __
+      h1/(h1 intersect h2) is isomorphic to R^k/ker(H1)
+
+@*
+@end format
+@end ifinfo
+, where
+@tex
+$\overline{H_1}: R^k \rightarrow R^s/Im(H_2)=R^s/h_2$
+is the induced map.
+@end tex
+@ifinfo
+@format
+         __
+         H1: R^k ----> R^l/Im(H2)=R^l/h2 is the induced map.
+
+@*
+@end format
+@end ifinfo
+@*@code{modulo(h1,h2)} returns generators of
+the kernel of this induced map.
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "ncalg.lib";
+def A = makeUsl2();
+setring A; // this algebra is U(sl_2)
+option(redSB);
+option(redTail);
+ideal I = e2,f2,h2-1;
+I = twostd(I);
+print(matrix(I)); // print I in a compact form
+ideal E = std(e);
+ideal T = modulo(E,I);
+T = NF(std(I+T),I);
+T = std(T);
+T;
+@c example
+@end smallexample
+@end table
+@c ref
+See also
+@ref{syz BR_PLURAL_BR}.
+@c ref
+
+
+@c ---------------------------------------
+@node  mres BR_PLURAL_BR, nc_algebra, modulo BR_PLURAL_BR, Functions BR_PLURAL_BR
+@section mres BR_PLURAL_BR
+@cindex mres BR_PLURAL_BR
+@table @code
+@item @strong{Syntax:}
+@code{mres (} ideal_expression@code{,} int_expression @code{)}
+@*@code{mres (} module_expression@code{,} int_expression @code{)}
+@item @strong{Type:}
+resolution
+@item @strong{Purpose:}
+computes a minimal free resolution of an ideal or module M with the
+Groebner basis method. More precisely, let A=@code{matrix}(M), then @code{mres}
+computes a free resolution of
+@ifinfo
+coker(A)=F0/M
+@format
+                    A2       A1
+      ... ----> F2 ----> F1 ----> F0 --> F0/M --> 0.
+@end format
+@end ifinfo
+@tex
+$coker(A)=F_0/M$
+$$...\longrightarrow F_2 \buildrel{A_2}\over{\longrightarrow} F_1
+\buildrel{A_1}\over{\longrightarrow} F_0\longrightarrow F_0/M
+\longrightarrow 0,$$
+@end tex
+where the columns of the matrix
+@tex
+$A_1$
+@end tex
+@ifinfo
+A1
+@end ifinfo
+are a (possibly) minimal set of generators
+of @math{M}.
+If the int expression k is not zero, then the computation stops after k steps
+and returns a list of modules
+@tex
+$M_i={\tt module}(A_i)$, $i= 1 \ldots k$.
+@end tex
+@ifinfo
+Mi=module(Ai), i=1...k.
+@end ifinfo
+@*@code{mres(M,0)} returns a resolution consisting of at most n+2 modules,
+where n is the number of variables of the basering.
+Let @code{list L=mres(M,0);}
+ then @code{L[1]} consists of a minimal set of generators of the input, @code{L[2]}
+consists of a minimal set of generators for the first syzygy module of
+@code{L[1]}, etc., until @code{L[p+1]}, such that
+@ifinfo
+L[i]<>0 for i<=p,
+@end ifinfo
+@tex
+${\tt L[i]}\neq 0$ for $i \le p$,
+@end tex
+ but @code{L[p+1]} (the first syzygy module of @code{L[p]})
+is 0 (if the basering is not a qring).
+@item @strong{Note:}
+Accessing single elements of a resolution may require that some partial
+computations have to be finished and may therefore take some time.
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "ncalg.lib";
+def A = makeUsl2();
+setring A; // this algebra is U(sl_2)
+option(redSB);
+option(redTail);
+ideal i = e,f,h;
+i = std(i);
+resolution M=mres(i,0);
+M;
+print(matrix(M[1])); // print M's in a compact way
+print(matrix(M[2]));
+// see the exactness at this point
+std(ideal(transpose(M[2])*transpose(M[1])));
+print(matrix(M[3]));
+// see the exactness at this point
+std(ideal(transpose(M[3])*transpose(M[2])));
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{ideal BR_PLURAL_BR};
+@ref{minres BR_PLURAL_BR};
+@ref{nres BR_PLURAL_BR};
+@ref{module BR_PLURAL_BR};
+@c ref
+
+
+@c -----------------------------
+@node nc_algebra, ncalgebra, mres BR_PLURAL_BR, Functions BR_PLURAL_BR
+@section nc_algebra
+@cindex nc_algebra
+
+@table @code
+@item @strong{Syntax:}
+@*@code{nc_algebra(} matrix_expression C, matrix_expression D @code{)}
+@*@code{nc_algebra(} number_expression n, matrix_expression D @code{)}
+@*@code{nc_algebra(} matrix_expression C, poly_expression p @code{)}
+@*@code{nc_algebra(} number_expression n, poly_expression p @code{)}
+@item @strong{Type:}
+ring
+@item @strong{Purpose:}
+Executed in the basering @code{r}, say, in k variables
+@tex
+$ x_1, \ldots, x_k ,\;$
+@end tex
+@ifinfo
+ x_1,... ,x_k,
+@end ifinfo
+@code{nc_algebra} creates the
+noncommutative extension of @code{r} subject to relations
+@tex
+$ \{ x_j x_i=c_{ij} \cdot x_i x_j + d_{ij}, 1 \leq i <j \leq k \}, $
+where $c_{ij}$ and $d_{ij}$ must be put into two strictly upper
+@end tex
+@ifinfo
+@{x_j x_i=c_@{ij@} ..., x_i x_j + d_@{ij@} , 0< i <j < k+1 @}.
+where c_@{ij@}  and d_@{ij@  must be put into two strictly upper
+@end ifinfo
+ triangular matrices @code{C} with entries
+@tex
+$c_{ij}$
+@end tex
+@ifinfo
+c_@{ij@}
+@end ifinfo
+ from the ground field of @code{r}
+and @code{D}  with  polynomial entries
+@tex
+$ d_{ij}$
+@end tex
+@ifinfo
+d_@{ij@}
+@end ifinfo
+ from @code{r}. See all the details in @ref{G-algebras}.
+@* If
+@tex
+$\forall i<j$, $c_{ij} = n$
+@end tex
+@ifinfo
+for all i<j, c_@{ij@} = n
+@end ifinfo
+ , one can input a number @code{n} instead of matrix @code{C}.
+@* If
+@tex
+$\forall i<j$, $d_{ij} = p$
+@end tex
+@ifinfo
+for all i<j, d_@{ij@} = p
+@end ifinfo
+ , one can input a poly @code{p} instead of matrix @code{D}.
+
+@item @strong{Remark:}
+At present, @sc{Plural} does not check the non-degeneracy conditions (@pxref{G-algebras}) while setting an algebra.
+
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "nctools.lib";
+// ------- first example: C, D are matrices --------
+ring r1 = (0,Q),(x,y,z),Dp;
+minpoly = rootofUnity(6);
+matrix C[3][3];
+matrix D[3][3];
+C[1,2]=Q2;   C[1,3]=1/Q2;  C[2,3]=Q2;
+D[1,2]=-Q*z; D[1,3]=1/Q*y; D[2,3]=-Q*x;
+def S=nc_algebra(C,D);
+// this algebra is a quantum deformation U'_q(so_3),
+// where Q is a 6th root of unity
+setring S;S;
+kill r1,S;
+// ----- second example: number n=1, D is a matrix
+ring r2=0,(Xa,Xb,Xc,Ya,Yb,Yc,Ha,Hb),dp;
+matrix d[8][8];
+d[1,2]=-Xc; d[1,4]=-Ha; d[1,6]=Yb;  d[1,7]=2*Xa;
+d[1,8]=-Xa; d[2,5]=-Hb; d[2,6]=-Ya; d[2,7]=-Xb;
+d[2,8]=2*Xb; d[3,4]=Xb; d[3,5]=-Xa; d[3,6]=-Ha-Hb;
+d[3,7]=Xc;   d[3,8]=Xc; d[4,5]=Yc; d[4,7]=-2*Ya;
+d[4,8]=Ya;  d[5,7]=Yb; d[5,8]=-2*Yb;
+d[6,7]=-Yc; d[6,8]=-Yc;
+def S=nc_algebra(1,d);  // this algebra is U(sl_3)
+setring S;S;
+kill r2,S;
+// ---- third example: C is a matrix, p=0 is a poly
+ring r3=0,(a,b,c,d),lp;
+matrix c[4][4];
+c[1,2]=1; c[1,3]=3; c[1,4]=-2;
+c[2,3]=-1; c[2,4]=-3; c[3,4]=1;
+def S=nc_algebra(c,0); // it is a quasi--commutative algebra
+setring S;S;
+kill r3,S;
+// -- fourth example : number n = -1, poly p = 3w
+ring r4=0,(u,v,w),dp;
+def S=nc_algebra(-1,3w);
+setring S;S;
+kill r4,S;
+@c example
+@end smallexample
+@end table
+@c ref
+See also
+@ref{ncalg_lib};
+@ref{nctools_lib};
+@ref{qmatrix_lib};
+@c ref
+
+
+@c -----------------------------
+@node ncalgebra, nres BR_PLURAL_BR, nc_algebra, Functions BR_PLURAL_BR
+@section ncalgebra
+@cindex ncalgebra
+
+@table @code
+@item @strong{Syntax:}
+@*@code{ncalgebra(} matrix_expression C, matrix_expression D @code{)}
+@*@code{ncalgebra(} number_expression n, matrix_expression D @code{)}
+@*@code{ncalgebra(} matrix_expression C, poly_expression p @code{)}
+@*@code{ncalgebra(} number_expression n, poly_expression p @code{)}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+Works like @ref{nc_algebra} but changes the basering.
+
+@item @strong{Remark:}
+This function is @strong{depreciated} and should be substituted by @code{nc_algebra},
+since it violates the general @sc{Singular} policy: only @ref{ring} and @ref{setring} can change the basering.
+
+@end table
+@c ref
+See also
+@ref{nc_algebra};
+@ref{nctools_lib};
+@c ref
+
+@c ---------------------------------------
+@node  nres BR_PLURAL_BR, oppose, ncalgebra, Functions BR_PLURAL_BR
+@section nres BR_PLURAL_BR
+@cindex nres BR_PLURAL_BR
+@table @code
+@item @strong{Syntax:}
+@code{nres (} ideal_expression@code{,} int_expression @code{)}
+@*@code{nres (} module_expression@code{,} int_expression @code{)}
+@item @strong{Type:}
+resolution
+@item @strong{Purpose:}
+computes a free resolution of an ideal or module which is minimized
+from the second module on (by the Groebner basis method).
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "ncalg.lib";
+def A = makeUsl2();
+setring A; // this algebra is U(sl_2)
+option(redSB);
+option(redTail);
+ideal i = e,f,h;
+i = std(i);
+resolution F=nres(i,0);
+F;
+// print the resolution componentwise:
+print(matrix(F[1]));
+print(matrix(F[2]));
+// see the exactness at this point:
+std(ideal(transpose(F[2])*transpose(F[1])));
+print(matrix(F[3]));
+// see the exactness at this point:
+std(ideal(transpose(F[3])*transpose(F[2])));
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{ideal BR_PLURAL_BR};
+@ref{module BR_PLURAL_BR};
+@ref{minres BR_PLURAL_BR};
+@ref{mres BR_PLURAL_BR};
+@c ref
+
+@c ---------------------------------------
+@node  oppose, opposite, nres BR_PLURAL_BR, Functions BR_PLURAL_BR
+@section oppose
+@cindex oppose
+
+@table @code
+@item @strong{Syntax:}
+@code{oppose (} ring_name, name @code{)}
+@item @strong{Type:}
+poly, vector, ideal, module or matrix (the same type as the second argument)
+@item @strong{Purpose:}
+for a given object in the given ring, creates its opposite object
+in the opposite (@ref{opposite}) ring (the last one is assumed to be the current ring).
+@item @strong{Remark:}
+for any object
+@tex
+ $O, \; (O^{opp})^{opp} = O$.
+@end tex
+@ifinfo
+ O,  (O^opp)^opp = O.
+@end ifinfo
+@smallexample
+@c example
+LIB "ncalg.lib";
+def r = makeUsl2();
+setring r;
+matrix m[3][4];
+poly   p  = (h^2-1)*f*e;
+vector v  = [1,e*h,0,p];
+ideal  i  = h*e, f^2*e,h*f*e;
+m         = e,f,h,1,0,h^2, p,0,0,1,e^2,e*f*h+1;
+module mm = module(m);
+def b     = opposite(r);
+// we will oppose these objects: p,v,i,m,mm
+setring b; b;
+poly P    = oppose(r,p);
+vector V  = oppose(r,v);
+ideal  I  = oppose(r,i);
+matrix M  = oppose(r,m);
+module MM = oppose(r,mm);
+setring r;   // now let's check the correctness:
+// print compact presentations of objects
+print(matrix(oppose(b,P)-p));
+print(matrix(oppose(b,V)-v));
+print(matrix(oppose(b,I)-i));
+print(matrix(oppose(b,M)-m));
+print(matrix(oppose(b,MM)-mm));
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{envelope};
+@ref{opposite}.
+@c ref
+
+@c ---------------------------------------
+@node opposite, preimage BR_PLURAL_BR, oppose, Functions BR_PLURAL_BR
+@section opposite
+@cindex opposite
+
+@table @code
+@item @strong{Syntax:}
+@code{opposite (} ring_name @code{)}
+@item @strong{Type:}
+ring
+@item @strong{Purpose:}
+creates an opposite algebra of a given algebra.
+@item @strong{Note:}
+activate the ring with the @code{setring} command.
+@* An opposite algebra of a given algebra (@math{A},.) is
+an algebra (@math{A},*) with the same vectorspace but with the opposite
+multiplication, i.e.
+@*
+@tex
+$\forall \; f,g \in A^{opp}$, a new multiplication $*$ on $A^{opp}$
+is defined to be $f*g := g \cdot f$.
+@end tex
+
+@ifinfo
+for any f,g in A_opp, a multiplication @code{*} on A_opp is defined to
+be f @code{*} g := gf.
+@end ifinfo
+
+@item @strong{Remark:}
+Starting from the variables x_1,...,x_N and the ordering @code{<}
+of the given algebra,
+an opposite algebra will have variables X_N,...,X_1
+(where the case and the position are reverted). Moreover, it is
+equipped with an opposed ordering @code{<_opp} (it is given
+by the matrix, obtained from the matrix ordering of @code{<}
+with the reverse order of columns).
+@smallexample
+@c example
+LIB "ncalg.lib";
+def B = makeQso3(3);
+// this algebra is a quantum deformation of U(so_3),
+// where the quantum parameter is a 6th root of unity
+setring B; B;
+def Bopp = opposite(B);
+setring Bopp;
+Bopp;
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{envelope};
+@ref{oppose}.
+See also a Section @ref{Matrix orderings}.
+@c ref
+
+@c ---------------------------------------
+@node preimage BR_PLURAL_BR, quotient BR_PLURAL_BR, opposite, Functions BR_PLURAL_BR
+@section preimage BR_PLURAL_BR
+@cindex preimage BR_PLURAL_BR
+
+@table @code
+@item @strong{Syntax:}
+@code{preimage (} ring_name@code{,} map_name@code{,} ideal_name @code{)}
+@*@code{preimage (} ring_name@code{,} ideal_expression@code{,} ideal_name @code{)}
+@item @strong{Type:}
+ideal
+@item @strong{Purpose:}
+returns the preimage of an ideal under a given map.
+The second argument has to be a map from the basering to the given ring
+(or an ideal defining such a map),
+and the ideal has to be an ideal in the given ring.
+@item @strong{Note:}
+To compute the kernel of a map, the preimage of zero has to be determined.
+Hence there is no special command for computing the kernel of a map in
+@sc{Plural}.
+@item @strong{Remark:}
+In the noncommutative case, it is implemented only for maps @math{A} -> @math{B}, where @math{A} is  a commutative ring.
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "ncalg.lib";
+ring   R = 0,a,dp;
+def Usl2 = makeUsl2();
+setring Usl2;
+poly  C = 4*e*f+h^2-2*h;
+// C is a central element of U(sl2)
+ideal I = e^3, f^3, h^3-4*h;
+ideal J = twostd(I); // two-sided GB
+ideal K = std(I);    // left GB
+map Phi = R,C;
+setring R;
+ideal PreJ = preimage(Usl2,Phi,J);
+// the central character of J
+PreJ;
+factorize(PreJ[1],1);
+// hence, there are two simple characters for J
+ideal PreK = preimage(Usl2,Phi,K);
+// the central character of K
+PreK;
+factorize(PreK[1],1);
+// hence, there are three simple characters for K
+
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{map BR_PLURAL_BR};
+@ref{ideal BR_PLURAL_BR};
+@ref{ring BR_PLURAL_BR}.
+@c ref
+
+
+
+@c ---------------------------------------
+@node quotient BR_PLURAL_BR, reduce BR_PLURAL_BR, preimage BR_PLURAL_BR, Functions BR_PLURAL_BR
+@section quotient BR_PLURAL_BR
+@cindex quotient BR_PLURAL_BR
+@table @code
+@item @strong{Syntax:}
+@code{quotient (} ideal_expression@code{,} ideal_expression @code{)}
+@*@code{quotient (} module_expression@code{,} module_expression @code{)}
+@item @strong{Type:}
+ideal
+@item @strong{Syntax:}
+@code{quotient (} module_expression@code{,} ideal_expression @code{)}
+@item @strong{Type:}
+module
+@item @strong{Purpose:}
+computes the ideal quotient, resp.@: module quotient. Let @code{R} be the
+basering, @code{I,J} ideals and @code{M} a module in
+@ifinfo
+R^n.
+@end ifinfo
+@tex
+${\tt R}^n$.
+@end tex
+Then
+@itemize
+@item
+@code{quotient(I,J)}=
+@ifinfo
+@{a in R | aJ in I @}
+@end ifinfo
+@tex
+$\{a \in R \mid aJ \subset I\}$,
+@end tex
+@item
+@code{quotient(M,J)}=
+@ifinfo
+@{b in R | bJ in M @}.
+@end ifinfo
+@tex
+$\{b \in R^n \mid bJ \subset M\}$.
+@end tex
+@end itemize
+@item @strong{Note:}
+It an only be used for two-sided ideals (bimodules), otherwise the
+result may have no meaning.
+
+@item @strong{Example:}
+@c // from [BGV], Ex.3.17, p.150, modified by q
+@smallexample
+@c example
+//------ a very easy example ------------
+ring r=(0,q),(x,y),Dp;
+def R=nc_algebra(q,0); // this algebra is a quantum plane
+setring R;
+option(returnSB);
+poly f1  = x^3+2*x*y^2+2*x^2*y;
+poly f2  = y;
+poly f1' = x^2;
+poly f2' = x+y;
+ideal i = f1,f2;
+ideal I = twostd(i);
+ideal j = f1',f2';
+ideal J = twostd(j);
+quotient(I,J);
+kill r,R;
+//------- a bit more complicated example
+LIB "ncalg.lib";
+def Usl2 = makeUsl2();
+// this algebra is U(sl_2)
+setring Usl2;
+ideal i = e3,f3,h3-4*h;
+ideal I = std(i);
+poly  C = 4*e*f+h^2-2*h;
+ideal H = twostd(C-8);
+option(returnSB);
+ideal Q = quotient(I,H);
+// print a compact presentation of Q:
+print(matrix(Q));
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{ideal BR_PLURAL_BR};
+@ref{module BR_PLURAL_BR}.
+@c ref
+
+@c ---------------------------------------
+@node reduce BR_PLURAL_BR, ringlist BR_PLURAL_BR, quotient BR_PLURAL_BR, Functions BR_PLURAL_BR
+@section reduce BR_PLURAL_BR
+@cindex reduce BR_PLURAL_BR
+@cindex NF
+@table @code
+@item @strong{Syntax:}
+
+@code{reduce (} poly_expression@code{,} ideal_expression @code{)}
+@*@code{reduce (} poly_expression@code{,} ideal_expression@code{,} int_expression @code{)}
+@*@code{reduce (} vector_expression@code{,} ideal_expression @code{)}
+@*@code{reduce (} vector_expression@code{,} ideal_expression@code{,} int_expression @code{)}
+@*@code{reduce (} vector_expression@code{,} module_expression @code{)}
+@*@code{reduce (} vector_expression@code{,} module_expression@code{,} int_expression @code{)}
+@*@code{reduce (} ideal_expression@code{,} ideal_expression @code{)}
+@*@code{reduce (} ideal_expression@code{,} ideal_expression@code{,} int_expression @code{)}
+@*@code{reduce (} module_expression@code{,} ideal_expression @code{)}
+@*@code{reduce (} module_expression@code{,} ideal_expression@code{,} int_expression @code{)}
+@*@code{reduce (} module_expression@code{,} module_expression @code{)}
+@*@code{reduce (} module_expression@code{,} module_expression@code{,} int_expression @code{)}
+@item @strong{Type:}
+the type of the first argument
+@item @strong{Purpose:}
+reduces a polynomial, vector, ideal  or module to its @strong{left} normal form with
+respect to an ideal or module represented by a left Groebner basis.
+Returns 0 if and only if the polynomial (resp.@: vector, ideal, module)
+is an element (resp.@: subideal, submodule) of the ideal (resp.@: module).
+The result may have no meaning if the second argument is not a left Groebner basis.
+@*The third (optional) argument 1 of type int forces a reduction which considers only the leading term and does no tail reduction.
+@item @strong{Note:}
+The commands @code{reduce} and @code{NF} are synonymous.
+@item @strong{Example:}
+@smallexample
+@c example
+ring r=(0,a),(e,f,h),Dp;
+matrix d[3][3];
+d[1,2]=-h;  d[1,3]=2e;  d[2,3]=-2f;
+def R=nc_algebra(1,d);
+setring R;
+// this algebra is a parametric U(sl_2)
+ideal I = e2, f2, h2-1;
+I = std(I);
+// print a compact presentation of I
+print(matrix(I));
+ideal J = e, h-a;
+J = std(J);
+// print a compact presentation of J
+print(matrix(J));
+poly z=4*e*f+h^2-2*h;
+// z is the central element of U(sl_2)
+NF(z,I);  // the central character of I:
+NF(z,J); // the central character of J:
+poly nz = z - NF(z,J); // nz will belong to J
+NF(nz,J);
+@c example
+@end smallexample
+@end table
+
+@c ref
+See also
+@ref{ideal BR_PLURAL_BR};
+@ref{module BR_PLURAL_BR};
+@ref{std BR_PLURAL_BR}.
+@c ref
+
+@c ---------------------------------------
+@node ringlist BR_PLURAL_BR, slimgb BR_PLURAL_BR, reduce BR_PLURAL_BR, Functions BR_PLURAL_BR
+@section ringlist BR_PLURAL_BR
+@cindex ringlist BR_PLURAL_BR
+@table @code
+@item @strong{Syntax:}
+@code{ringlist (} ring_expression @code{)}
+@*@code{ringlist (} qring_expression @code{)}
+@item @strong{Type:}
+list
+@item @strong{Purpose:}
+decomposes a ring/qring into a list of 6 (or 4 in the commutative case)
+components.
+@* The first 4 components are common both for the commutative and for the
+non-commutative cases, the 5th and the 6th appear only in the non-commutative case.
+
+@enumerate 5
+@item square matrix with nonzero upper triangle, containing
+structural coefficients of a G-algebra (this corresponds to the
+matrix C from the definition of @ref{G-algebras})
+@item square matrix, containing structural polynomials of a G-algebra
+(this corresponds to the matrix D from the definition of @ref{G-algebras})
+@end enumerate
+@item @strong{Example:}
+@smallexample
+@c example
+// consider the quantized Weyl algebra
+ring r = (0,q),(x,d),Dp;
+def RS=nc_algebra(q,1);
+setring RS;
+list l = ringlist(RS);
+l;
+// now, change the relation d*x = q*x*d +1
+// into the relation d*x=(q2+1)*x*d + q*d + 1
+matrix S = l[5]; // matrix of coefficients
+S[1,2] = q^2+1;
+l[5] = S;
+matrix T = l[6]; // matrix of polynomials
+T[1,2] = q*d+1;
+l[6] = T;
+def rr = ring(l);
+setring rr; rr;
+// compare with the ring we started with:
+setring RS; RS;
+@c example
+@end smallexample
+@end table
+
+@c ref
+See also
+@ref{ring BR_PLURAL_BR};
+@ref{ringlist}.
+@c ref
+
+
+@c ---------------------------------------
+@node slimgb BR_PLURAL_BR, std BR_PLURAL_BR, ringlist BR_PLURAL_BR, Functions BR_PLURAL_BR
+@section slimgb BR_PLURAL_BR
+@cindex slimgb BR_PLURAL_BR
+@table @code
+@item @strong{Syntax:}
+@code{slimgb (} ideal_expression@code{)}
+
+@item @strong{Type:}
+ideal
+@item @strong{Purpose:}
+returns a left Groebner basis of a left ideal with respect to the
+global monomial ordering of the basering.
+@item @strong{Note:}
+The commutative algorithm is described in the diploma thesis of Michael Brickenstein "Neue Varianten zur Berechnung von Groebnerbasen",
+written 2004 under supervision of G.-M. Greuel in Kaiserslautern.
+
+It is designed to keep polynomials slim (short with small coefficients).
+Currently best results are examples over function fields (parameters).
+
+The current implementation may not be optimal for weighted degree orderings.
+
+The program only supports the options @code{prot}, which will give protocol output and @code{redSB} for returning a reduced Groebner basis.
+The protocol messages of @code{slimgb} mean the following:
+@* @code{M[n,m]} means a parallel reduction of @code{n} elements with @code{m} non-zero output elements,
+@* @code{b} notices an exchange trick described in the thesis and
+@* @code{e} adds a reductor with non-minimal leading term.
+
+For a detailed commutative example see @ref{slim Groebner bases}.
+
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "ncalg.lib";
+def U = makeUsl(2);
+// U is the U(sl_2) algebra
+setring U;
+ideal I = e^3, f^3, h^3-4*h;
+option(redSB);
+ideal J = slimgb(I);
+J;
+// compare slimgb with std:
+ideal K = std(I);
+print(matrix(NF(K,J)));
+print(matrix(NF(J,K)));
+// hence both Groebner bases are equal
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{option};
+@ref{std BR_PLURAL_BR}.
+@c ref
+
+@c ---------------------------------------
+@node std BR_PLURAL_BR, subst  BR_PLURAL_BR, slimgb BR_PLURAL_BR, Functions BR_PLURAL_BR
+@section std BR_PLURAL_BR
+@cindex std BR_PLURAL_BR
+@table @code
+@item @strong{Syntax:}
+@code{std (} ideal_expression@code{)}
+@*@code{std (} module_expression@code{)}
+@*@code{std (} ideal_expression@code{,} poly_expression @code{)}
+@*@code{std (} module_expression@code{,} vector_expression @code{)}
+@item @strong{Type:}
+ideal or module
+@item @strong{Purpose:}
+returns a left Groebner basis (see @ref{Groebner bases in G-algebras} for a definition)
+of an ideal or module with respect to the
+monomial ordering of the basering.
+@c is a set of generators such that
+@c the leading terms generate the leading ideal, resp.@: module.
+
+Use an optional second argument of type poly, resp.@: vector,
+to construct the Groebner basis from an already computed one (given as the
+first argument) and one additional generator (the second argument).
+@item @strong{Note:}
+To view the progress of long running computations, use
+@code{option(prot)}.
+@ifset singularmanual
+(@pxref{option}(prot)).
+@end ifset
+
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "ncalg.lib";
+def R = makeUsl2();
+// this algebra is U(sl_2)
+setring R;
+ideal I = e2, f2, h2-1;
+I=std(I);
+I;
+kill R;
+//------------------------------------------
+def RQ = makeQso3(3);
+// this algebra is U'_q(so_3),
+// where Q is a 6th root of unity
+setring RQ;
+RQ;
+ideal J=x2, y2, z2;
+J=std(J);
+J;
+@c example
+@end smallexample
+@end table
+@c ref
+See also
+@ref{ideal BR_PLURAL_BR};
+@ref{ring BR_PLURAL_BR}.
+@c ref
+
+
+@c -------------------------------------------------
+@node subst  BR_PLURAL_BR, syz BR_PLURAL_BR, std BR_PLURAL_BR, Functions BR_PLURAL_BR
+@section subst BR_PLURAL_BR
+@cindex subst BR_PLURAL_BR
+@table @code
+@item @strong{Syntax:}
+@code{subst (} poly_expression,ring_variable, poly_expression  @code{)}
+@*@code{subst (} vector _expression,ring_variable, poly_expression  @code{)}
+@*@code{subst (} ideal_expression,ring_variable, poly_expression  @code{)}
+@*@code{subst (} module _expression,ring_variable, poly_expression @code{)}
+
+@item @strong{Type:}
+poly, vector, ideal or module (corresponding to the first argument)
+
+@item @strong{Purpose:}
+ substitutes a ring variable by a polynomial.
+
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "ncalg.lib";
+def R = makeUsl2();
+// this algebra is U(sl_2)
+setring R;
+poly C  = e*f*h;
+poly C1 = subst(C,e,h^3);
+C1;
+poly C2 = subst(C,f,e+f);
+C2;
+@c example
+@end smallexample
+@end table
+@c ref
+@c ref
+
+
+@c -------------------------------------------------
+@node syz BR_PLURAL_BR, twostd, subst  BR_PLURAL_BR, Functions BR_PLURAL_BR
+@section syz BR_PLURAL_BR
+@cindex syz BR_PLURAL_BR
+@table @code
+@item @strong{Syntax:}
+@code{syz (} ideal_expression @code{)}
+@*@code{syz (} module_expression @code{)}
+@item @strong{Type:}
+module
+@item @strong{Purpose:}
+computes the first syzygy (i.e., the module of relations of the given
+generators) of the ideal, resp.@: module.
+@item @strong{Note:}
+if @code{S} is a matrix of a left syzygy module of left submodule given by matrix @code{M}, then
+@code{transpose(S)*transpose(M) = 0}.
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "ncalg.lib";
+def R = makeQso3(3);
+setring R;
+option(redSB);
+// we wish to have completely reduced bases:
+option(redTail);
+ideal tst;
+ideal J = x3+x,x*y*z;
+print(syz(J));
+ideal K = x+y+z,y+z,z;
+module S = syz(K);
+print(S);
+tst = ideal(transpose(S)*transpose(K));
+// check the property of a syzygy module (tst==0):
+size(tst);
+ // now compute the Groebner basis of K ...
+K = std(K);
+// ... print a matrix presentation of K ...
+print(matrix(K));
+S = syz(K); // ... and its syzygy module
+print(S);
+tst = ideal(transpose(S)*transpose(K));
+// check the property of a syzygy module (tst==0):
+size(tst);
+// but the "commutative" syzygy property does not hold
+size(ideal(matrix(K)*matrix(S)));
+@c example
+@end smallexample
+@end table
+@c ref
+See also
+@ref{ideal BR_PLURAL_BR};
+@ref{module BR_PLURAL_BR};
+@ref{mres BR_PLURAL_BR};
+@ref{nres BR_PLURAL_BR};
+@ref{minres BR_PLURAL_BR};
+@c ref
+
+
+@c ------------------------------
+@node twostd, vdim BR_PLURAL_BR, syz BR_PLURAL_BR, Functions BR_PLURAL_BR
+@section twostd
+@cindex twostd
+
+@table @code
+@item @strong{Syntax:}
+  @code{twostd(} ideal_expression@code{)};
+@item @strong{Type:}
+ideal or module
+@item @strong{Purpose:}
+returns a left Groebner basis of the two-sided ideal,
+generated by the input, treated as a set of two-sided generators.
+@ifset singularmanual
+see @ref{std}
+@end ifset
+@item @strong{Remark:}
+There are algebras with no two-sided ideals except 0 and the
+whole algebra (like Weyl algebras).
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "ncalg.lib";
+def U = makeUsl2(); // this algebra is U(sl_2)
+setring U;
+ideal i= e^3, f^3, h^3 - 4*h;
+option(redSB);
+option(redTail);
+ideal I = std(i);
+print(matrix(I)); // print a compact presentation of I
+ideal J = twostd(i);
+// print a compact presentation of J:
+print(matrix(ideal(J[1..6]))); // first 6 gen's
+print(matrix(ideal(J[7..size(J)]))); // the rest of gen's
+// compute the set of elements present in J but not in I
+ideal K = NF(J,I);
+K = K+0; // simplify K
+print(matrix(K));
+@c example
+@end smallexample
+@end table
+
+
+@c -------------------------------------------------------------------------
+@node vdim BR_PLURAL_BR,, twostd, Functions BR_PLURAL_BR
+@section vdim BR_PLURAL_BR
+@cindex vdim BR_PLURAL_BR
+@table @code
+@item @strong{Syntax:}
+@code{vdim (} ideal_expression @code{)}
+@*@code{vdim (} module_expression @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+computes the vector space dimension of the
+factor-module that equals
+ring (resp. free module) modulo the ideal (resp. submodule),
+generated by the leading terms of the given generators.
+@* If the factor-module is not of finite dimension, -1 is returned.
+
+If the generators form a Groebner basis,
+this is the same as the vector space dimension of the
+factor-module.
+
+@item @strong{Note:}
+In the noncommutative case, a ring modulo an ideal has a ring stucture if and only if the ideal is two-sided.
+@item @strong{Example:}
+@smallexample
+@c example
+ring R=0,(x,y,z),dp;
+matrix d[3][3];
+d[1,2]=-z;  d[1,3]=2x;  d[2,3]=-2y;
+def RS=nc_algebra(1,d); //U(sl_2)
+setring RS;
+option(redSB); option(redTail);
+ideal I=x3,y3,z3-z;
+I=std(I);
+I;
+vdim(I);
+
+@c example
+@end smallexample
+@end table
+@c ref
+See also
+@ref{ideal BR_PLURAL_BR};
+@ref{std BR_PLURAL_BR};
+@ref{kbase BR_PLURAL_BR}.
+@c ref
+@c -------------------------------------------------------------------------
+
+@raisesections
+
+@c ----------------------------------------------------------------------------
+@node Mathematical background BR_PLURAL_BR, LETTERPLACE , Functions BR_PLURAL_BR, Non-commutative subsystem
+
+@section Mathematical background BR_PLURAL_BR
+@lowersections
+
+@cindex Mathematical background BR_PLURAL_BR
+
+This section introduces some of the mathematical notions and definitions used
+throughout the @sc{Plural} manual. For details, please, refer to
+appropriate articles or text books (see @ref{References BR_PLURAL_BR}).
+A detailed discussion of the subjects in this section can be found in the doctoral thesis
+ [LV] of V. Levandovskyy (see @ref{References BR_PLURAL_BR}).
+
+
+All algebras are assumed to be associative @math{K}-algebras for some field @math{K}.
+
+@menu
+* G-algebras::
+* Groebner bases in G-algebras::
+* Syzygies and resolutions BR_PLURAL_BR::
+* References BR_PLURAL_BR::
+@end menu
+
+
+@c ---------------------------------------------------------------------------
+@node G-algebras, Groebner bases in G-algebras,  , Mathematical background BR_PLURAL_BR
+@section G-algebras
+@cindex G-algebra
+
+
+@subheading Definition (PBW basis)
+@cindex PBW basis
+@tex
+ Let $K$ be a field, and let a $K$-algebra $A$ be generated by
+variables $x_1, \ldots ,x_n$ subject to some relations.
+We call $A$ an algebra with {\bf PBW basis} (Poincar\'e-Birkhoff-Witt basis), if a $K$--basis of
+$A$ is Mon$(x_1,\dots,x_n)=\{x^{a_1}_1 x^{a_2}_2 \dots x^{a_n}_n \mid a_i \in N \cup \{0\} \}$,
+where a power-product $x^{a_1}_1 x^{a_2}_2 \dots x^{a_n}_n$ (in this particular order) is called
+{\bf a monomial}. For example, $x_1 x_2$ is a monomial, while $x_2 x_1$ is, in general, not
+a monomial.
+@end tex
+
+@ifinfo
+ Let K be a field, and let a K-algebra A be generated by
+variables x_1, ... ,x_n subject to some relations.
+@* We call A an algebra with PBW basis (Poincare-Birkhoff-Witt basis),
+if a K--basis of A is Mon(x_1,...,x_n) =@{x^a1_1 x^a2_2 ... x^an_n  a_i in N union @{0@} @},
+where a power-product x^a1_1 x^a2_2 ... x^an_n (in this particular order) is called
+@strong{a monomial}. For example, x_1 x_2 is a monomial, while x_2 x_1 is, in general, not a monomial.
+@end ifinfo
+
+
+@subheading Definition (G-algebra)
+@cindex G-algebra
+@tex
+ Let $K$ be a field, and let a $K$-algebra $A$ be given in terms of generators subject to the following relations:
+
+$A= K \langle x_1, \ldots ,x_n \mid \{ x_j x_i=c_{ij} \cdot x_i x_j + d_{ij}\}, 1 \leq i <j \leq n \rangle$,
+where $c_{ij} \in K^{*}, d_{ij} \in K[x_1, \ldots, x_n]$.
+
+ $A$ is called \textbf{a $G$--algebra}, if the following conditions hold:
+@end tex
+
+@ifinfo
+ Let K be a field, and let a K-algebra A be given in terms of generators and relations:
+A= K < x_1,... ,x_n |
+@{x_j x_i=c_@{ij@} ..., x_i x_j + d_@{ij@} @}, 0< i <j < n+1 >,
+where c_@{ij@} in K^*, d_@{ij@} in K[x_1, ..., x_n].
+ A is called a G--algebra, if the following conditions hold:
+@end ifinfo
+
+@c table @asis
+@itemize @bullet
+@item
+@tex
+there is a monomial well-ordering < such that
+                        $\forall i<j \; \hbox{LM}(d_{ij})< x_i x_j$,
+@end tex
+
+
+@ifinfo
+there is a monomial well-ordering < such that
+                        for all i<j LM(d_@{ij@})< x_i x_j,
+@end ifinfo
+
+
+@item @strong{non-degeneracy conditions}:
+@tex
+$\forall \; 1 \leq i<j<k \leq n \; \; : \; {\cal NDC}_{ijk} =0$, where
+$$
+{\cal NDC}_{ijk} = c_{ik}c_{jk} \cdot d_{ij}x_k - x_k d_{ij} +
+c_{jk} \cdot x_j d_{ik} - c_{ij} \cdot d_{ik}x_j + d_{jk}x_i
+- c_{ij}c_{ik} \cdot x_i d_{jk}.
+$$
+@end tex
+
+@ifinfo
+For all  0< i<j<k< n+1  NDC_@{ijk@} =0, where
+NDC_@{ijk@}= c_@{ik@}  c_@{jk@} d_@{ij@} x_k - x_k d_@{ij@} +
+c_@{jk@} x_j d_@{ik@} - c_@{ij@} d_@{ik@} x_j + d_@{jk@}x_i
+- c_@{ij@}c_@{ik@} x_i d_@{jk@}.
+
+@end ifinfo
+
+@end itemize
+
+@c @end table
+
+
+@subheading Theorem (properties of G-algebras)
+@c @table @asis
+
+@tex
+Let $A$ be a $G$-algebra. Then
+@end tex
+
+@ifinfo
+Let A be a G-algebra. Then
+@end ifinfo
+
+@itemize
+@item
+@tex
+$A$ has a PBW (Poincar\'e-Birkhoff-Witt) basis,
+@end tex
+
+@ifinfo
+ A has a PBW (Poincar'e-Birkhoff-Witt) basis,
+@end ifinfo
+
+@item
+@tex
+$A$
+is left and right noetherian,
+@end tex
+
+@item
+@tex
+$A$ is an integral domain.
+@end tex
+
+@ifinfo
+A is an integral domain.
+@end  ifinfo
+
+
+@c @item
+@c @tex
+@c $A$ has left and right quotient rings.
+@c @end tex
+@c @ifinfo
+@c A has left and right quotient rings.
+@c @end ifinfo
+
+@end itemize
+
+@subheading Setting up a G-algebra
+@cindex Setting up a G-algebra
+@cindex G-algebra, setup
+
+@tex
+In order to set up a $G$--algebra
+in {\sc Plural}, one has to do the following steps:
+@end tex
+
+@ifinfo
+In order to set up a G-algebra
+in @sc{Plural}, one has to do the following steps:
+@end ifinfo
+
+@itemize
+
+@item
+ define a commutative ring
+@tex
+$R= K[x_1, \ldots, x_n]$,
+@end tex
+@ifinfo
+ R= K[x_1, ..., x_n],
+@end ifinfo
+ equipped with a global monomial ordering @math{<} (see @ref{ring declarations BR_PLURAL_BR}).
+@* This provides us with the information on a field @math{K} (together with its parameters), variables
+@tex
+ $\{x_i\}$
+@end tex
+@ifinfo
+ @{x_i@}
+@end ifinfo
+and an ordering <.
+@* From the sequence of variables we will build a G-algebra with the PBW basis
+@tex
+$\{x^{a_1}_1 x^{a_2}_2 \dots x^{a_n}_n\}$.
+@end tex
+@ifinfo
+@{x^a1_1 x^a2_2 ... x^an_n@}.
+@end ifinfo
+
+
+@item
+Define strictly
+@tex
+$n\times n$
+@end tex
+@ifinfo
+n x n
+@end ifinfo
+ upper triangular matrices (of type @code{matrix})
+
+@enumerate
+@c @bullet
+@c @table @asis
+
+@item
+@tex
+ $C=\{c_{ij}, i<j\}$, with nonzero entries $c_{ij}$ of type number ($c_{ij}$ for $i\geq j$ will be ignored).
+@end tex
+@ifinfo
+ C=@{c_@{ij@}, i<j @}, with nonzero entries c_@{ij@} of type number (c_@{ij@} for i>=j will be ignored).
+@end ifinfo
+
+@item
+@tex
+  $D=\{d_{ij}, i<j\}$, with polynomial entries $d_{ij}$ from $R$ ($d_{ij}$ for $i\geq j$ will be ignored).
+@end tex
+
+@ifinfo
+  D=@{d_@{ij@}, i<j@}, with polynomial entries d_@{ij@} from R (c_@{ij@} for i>=j will be ignored).
+@end ifinfo
+
+
+@end enumerate
+@c @end table
+
+
+@item
+Call the initialization function @code{nc_algebra(C,D)} (see @ref{nc_algebra}) with the data
+@tex
+$C$ and $D$.
+@end tex
+@ifinfo
+C and D.
+@end ifinfo
+
+
+@end itemize
+
+At present, @sc{Plural} does not check automatically whether the non-degeneracy conditions
+hold but it provides a procedure @ref{ndcond} from the library @ref{nctools_lib} to check this.
+
+
+@c ---------------------------------------------------------------------------
+@node Groebner bases in G-algebras, Syzygies and resolutions BR_PLURAL_BR, G-algebras, Mathematical background BR_PLURAL_BR
+@section Groebner bases in G-algebras
+@cindex Groebner bases in G-algebras
+
+
+We follow the notations, used in the @sc{Singular} Manual (e.g. in @ref{Standard bases}).
+
+@tex
+For a $G$--algebra $A$, we denote by ${}_{A} \langle g_1, \dots, g_s \rangle$
+the left submodule of a free module $A^r$, generated by elements $\{g_1, \dots, g_s\}\subset A^r$.
+@end tex
+
+@tex
+Let $<$ be a fixed monomial well-ordering on the $G$--algebra $A$ with the PBW basis
+$\{x^{\alpha} = x^{a_1}_1 x^{a_2}_2 \dots x^{a_n}_n\}$.
+For a given free module $A^r$ with the basis $\{e_1,\ldots, e_r\}$, $<$ denotes also a
+fixed module ordering on the set of monomials $\{x^{\alpha} e_i \mid \alpha\in {\bf N}^n, 1\leq i\leq r \}$.
+@end tex
+
+@ifinfo
+Let < be a fixed monomial well-ordering on the G-algebra A with the PBW basis
+@{x^a1_1 x^a2_2 ... x^an_n @}. For a given free module A^r with the basis @{e_1,...,e_r@}, < denotes also a fixed module ordering on the set of monomials @{x^a e_i |
+a in N^n, 1<= i <= r @}.
+@end ifinfo
+
+@c For a set $S \subset A^r$, define
+@c $\ell(S) \subseteq N^n$ to be the monoid, generated by the leading exponents
+@c of elements of $S$, that is
+@c $\ell(S)=\langle \alpha \mid \exists s \in S, \hbox{lm(s)}=x^{\alpha} \rangle
+@c \subseteq N^n$. We call $\ell(S)$ the \textbf{monoid of leading exponents}.
+@c There exist $\alpha_1, \ldots, \alpha_m \in N^n$,
+@c such that $\ell(S) :=\langle \alpha_1, \ldots, \alpha_m \rangle$.
+@c We define a \textbf{set of leading monomials of $S$} be
+@c $L(S) := \{ x^{\alpha} \mid \alpha \in \ell(S) \}\subset{A}$.
+
+@subheading Definition
+@tex
+For a set $S \subset A^r$, define
+$L(S)$ to be the $K$--vector space, spanned on the leading monomials
+of elements of $S$, $L(S) = \oplus \{K x^{\alpha} e_i \mid \exists s \in S, \hbox{LM(s)}=x^{\alpha}e_i\}$.
+We call $L(S)$ the \textbf{span of leading monomials} of $S$.
+@end tex
+
+@ifinfo
+For a set S a subset of A^r, define
+L(S) to be the K-vector space, spanned on the leading monomials
+of elements of S, L(S) = + @{ K x^a e_i | exists s in S, LM(s)=x^a e_i@}.
+We call L(S) the @strong{span of leading monomials} of S.
+@end ifinfo
+
+
+@c For a set S a subset A^r, define
+@c l(S) to be the monoid, generated by the leading exponents
+@c of elements of S, that is
+@c l(S)=<a| exists s in S, lm(s)=x^a>
+@c is subset N^n. We call l(S) the monoid of leading exponents.
+@c There exist a_1, ..., a_m in N^n,
+@c such that l(S) :=< a_1,..., a_m>.
+@c We define a @strong{set of leading monomials of S} be
+@c L(S) := @{ x^a| a in l(S) @} subset A.
+
+
+@c Let $ I\subset A^r $ be a submodule of $A^r$.
+@c Denote by $L(I)$ the submodule of $A^r$ generated by the leading terms
+@c of elements of $I$, i.e. by $\left\{\hbox{lm(f)} \mid f \in I\right\}$.
+
+@tex
+Let $I \subset A^r$ be a left $A$--submodule.
+A finite set $G\subset I$ is called {\bf a left  Groebner basis} of $I$ if and
+only if $L(G)=L(I)$, that is for any $f \in I\setminus \{ 0 \}$ there exists a $g\in G$
+satisfying $ \hbox{LM}(g) \mid \hbox{LM}(f)$, i.e., if $\hbox{LM}(f) = x^{\alpha}e_i$, then
+$\hbox{LM}(f) = x^{\beta}e_i$ with $\beta_j \leq \alpha_j, \; 1\leq j \leq n$.
+@end tex
+@ifinfo
+Let I a subset of A^r be a left A-submodule.
+A finite set G subset I is called  @strong{ a left Groebner basis} of I if and
+only if L(G)=L(I), that is for any f in I\ @{ 0 @} there exists a g in G
+satisfying LM(g)|LM(f), i.e. if LM(f) = x^a e_i, then
+LM(f) = x^b e_i with b_j <= a_j, 1<= j <= n.
+@end ifinfo
+
+
+@*@strong{Remark:} In the non-commutative case we are working with well
+ordering only (see @ref{PLURAL}, @ref{Monomial orderings} and @ref{Term orderings}).
+
+@tex
+A Groebner basis $G\subset A^r$ is called {\bf minimal} (or {\bf reduced}) if $0\notin G$ and if
+$\hbox{LM}(g)\notin L(G\setminus \{ g \})$ for all $g\in G$.
+Note, that any Groebner basis can be made minimal by deleting successively those
+$g$ with $\hbox{LM}(h)\mid \hbox{LM}(g)$ for some $h\in G\setminus\{g \}$.
+
+For $f\in A^r $ and $ G\subset A^r $ we say that $f$ is {\bf completely reduced with
+respect to $G$} if no monomial of $f$ is contained in $L(G)$.
+@end tex
+
+@ifinfo
+A Groebner basis G a subset of A^r is called @strong{minimal} (or @strong{reduced})
+if 0 not in G and if LM(g) not in L(G\@{ g @}) for all g in G.
+Note, that any Groebner basis can be made minimal by deleting successively those
+g with LM(h)| LM(g) for some h in G\@{g@}.
+
+For f in A^r  and  G subset A^r  we say that f  is @strong{completely reduced with
+respect to G} if no monomial of f is contained in L(G).
+@end ifinfo
+
+
+@subheading Left Normal Form
+@cindex Left normal form
+@table @asis
+@tex
+A map $\hbox{NF} : A^r \times \{G \mid G\ \hbox{ a (left) Groebner
+basis}\} \to A^r, (f|G) \mapsto \hbox{NF}(f|G)$, is called a {\bf (left) normal form}
+on $A^r$ if for any $f \in A^r$ and any left Groebner basis $G$ the following
+holds:
+
+(i) $\hbox{NF}(0|G) = 0$,
+
+(ii)  if $\hbox{NF}(f|G) \not= 0$ then $\hbox{LM}(g)$ does not divide
+$\hbox{LM}(\hbox{NF}(f|G))$ for all $g \in G$,
+
+(iii) $f - \hbox{NF}(f|G)\in {}_{A}\langle G \rangle$.
+
+\noindent
+$\hbox{NF}(f|G)$ is called a {\bf left normal form of} $f$ {\bf with
+respect to} $G$ (note that such a map is not unique).
+@end tex
+
+@ifinfo
+A map NF : A^r x G| G\ @{ a (left) Groebner basis@} --> A^r,
+
+(f|G) --> NF(f|G), is called a @strong{left normal form} on A^r if for any f in A^r and any left Groebner basis G the following
+holds:
+
+(i) NF(f|G)<> 0 then lm(g)  does not divide LM(NF(f|G)) for all g \in G.
+
+(ii) f - NF(f|G) is in <G>.$
+
+
+NF(f|G) is called a @strong{left normal form of} f @strong{with respect to}
+ G (note that such a map is not unique).
+@end ifinfo
+@end table
+
+@*@strong{ Remark:}
+As we have already mentioned in the definitions @code{ideal} and @code{module} (see
+ @ref{PLURAL}), @sc{Plural} works with left normal form only.
+
+
+@subheading Left ideal membership
+@cindex Left ideal membership
+@table @asis
+@tex
+For a left Groebner basis $G$ of $I$ the following holds:
+$f \in I$ if and only if the left normal form $\hbox{NF}(f|G) = 0$.
+@end tex
+
+@ifinfo
+For a leftGroebner basis G of I the following holds:
+f is in I if and only if left the normal form NF(f|G) = 0.
+@end ifinfo
+@end table
+
+@c ---------------------------------------------------------------------------
+@node Syzygies and resolutions BR_PLURAL_BR, References BR_PLURAL_BR, Groebner bases in G-algebras, Mathematical background BR_PLURAL_BR
+@section Syzygies and resolutions BR_PLURAL_BR
+@cindex Syzygies and resolutions BR_PLURAL_BR
+
+@subheading Syzygies
+@tex
+Let $K$ be a field and $<$ a well ordering on $A^r=\oplus_{i=1}^{r}Ae_i$.
+A {\bf left} (resp. {\bf right}) {\bf syzygy}
+between $k$ elements $\{f_1,\dots,f_k\} \subset A^r $ is
+a $k$-tuple $(g_1,\dots ,g_k)\in A^k$ satisfying
+$$\sum_{i=1}^{k} g_i f_i = 0 \;\;\; {\rm resp. } \;\;\; \sum_{i=1}^{k} f_i g_i = 0. $$
+The set of all left (resp. right) syzygies between $\{f_1,...,f_k\}$ is a left (resp. right) submodule $S$ of $A^k$.
+@end tex
+
+@ifinfo
+Let K be a field and < a well ordering on A^r. A @strong{left} resp.  @strong{right syzygy}
+between k elements f_1,...,f_k in A^r is
+k-tuple (g_1,... ,g_k) in A^k satisfying
+ sum_@{i=1@}^@{k@}g_i f_i =0   resp. sum_@{i=1@}^@{k@} f_i g_i =0
+The set of all left (resp. right) syzygies between f_1,...,f_k is left (resp.
+right) submodule S of A^k.
+@end ifinfo
+
+
+
+@*@strong{Remark:}
+With respect to the definitions of @code{ideal} and  @code{module}  (see @ref{PLURAL}), @sc{Plural} works with left
+syzygies only (by @code{syz} we understand  a  left syzygy).
+If @code{S} is a matrix of a left syzygy module of left submodule given by matrix @code{M}, then @code{transpose(S)*transpose(M) = 0}
+ (but, in general,
+@tex
+$M \cdot S \not=0$).
+@end tex
+@ifinfo
+M S <> 0
+@end ifinfo
+
+Note, that the syzygy modules of @math{I} depend on a choice of generators
+@tex
+$\{g_1, \dots , g_s\}$,
+@end tex
+@ifinfo
+@{g_1,\dots , g_s@},
+@end ifinfo
+ but one can show that they depend on @math{I} uniquely up to direct summands.
+
+
+@subheading Free resolutions
+@tex
+Let $I={}_{A}\langle g_1,\dots ,g_s\rangle \subseteq A^r$ and $M= A^r/I$.
+A {\bf free resolution of $M$} is a long exact sequence
+$$\dots \longrightarrow F_2 \buildrel{B_2}\over{\longrightarrow} F_1
+ \buildrel{B_1}\over{\longrightarrow} F_0\longrightarrow M\longrightarrow
+0,$$
+@end tex
+@ifinfo
+Let I=<g_1,... ,g_s> in A^r and M=A^r/I.  A free resolution of M is a
+long exact sequence
+@display
+...--> F2 --A2-> F1 --A1-> F0-->M-->0,
+@end display
+@end ifinfo
+@* with
+@tex
+${\tt transpose}(B_{i+1}) \cdot {\tt transpose}(B_i) =0$
+@end tex
+@ifinfo
+@code{transpose}(B[i+1]) * @code{transpose}(B[i]) =0
+@end ifinfo
+
+@c @tex
+@c {\tt transpose} (B_{i+1}) \cdot {\tt transpose} (B_{i}) = 0$
+@c @end tex
+and where the columns of the matrix
+@tex
+$B_1$
+@end tex
+@ifinfo
+B_1
+@end ifinfo
+generate @math{I}. Note, that resolutions over factor-algebras need not to be of finite length.
+
+@subheading Generalized Hilbert Syzygy Theorem
+@cindex Generalized Hilbert Syzygy Theorem
+@tex
+For a $G$--algebra $A$, generated by $n$
+@end tex
+@ifinfo
+For a @math{G}-algebra @math{A}, generated by @math{n}
+@end ifinfo
+ variables, there exists a free resolution of length smaller or equal than @math{n}.
+
+@table @code
+@item @strong{Example:}
+@smallexample
+@c example
+ring R=0,(x,y,z),dp;
+matrix d[3][3];
+d[1,2]=-z;  d[1,3]=2x;  d[2,3]=-2y;
+def U=nc_algebra(1,d); // this algebra is U(sl_2)
+setring U;
+option(redSB); option(redTail);
+ideal I=x3,y3,z3-z;
+I=std(I);
+I;
+resolution resI = mres(I,0);
+resI;
+// The matrix A_1 is given by
+print(matrix(resI[1]));
+// We see that the columns of A_1 generate I.
+// The matrix A_2 is given by
+print(matrix(resI[2]));
+ideal tst; // now let us show that the resolution is exact
+matrix TST;
+TST = transpose(resI[3])*transpose(resI[2]); // 2nd term
+tst = std(ideal(TST));
+tst;
+TST = transpose(resI[2])*transpose(resI[1]); // 1st term
+tst = std(ideal(TST));
+tst;
+@c example
+@end smallexample
+@end table
+
+@c ---------------------------------------------------------------------------
+@node References BR_PLURAL_BR, , Syzygies and resolutions BR_PLURAL_BR, Mathematical background BR_PLURAL_BR
+@section References BR_PLURAL_BR
+@cindex References BR_PLURAL_BR
+
+The Centre for Computer Algebra Kaiserslautern publishes a series of preprints
+which are electronically available at
+@code{http://www.mathematik.uni-kl.de/~zca/Reports_on_ca}.
+Other sources to check are the following books and articles:
+
+@subheading Text books
+
+@itemize @bullet
+@item
+@c DK  book
+ [DK] Y. Drozd and V. Kirichenko.
+    Finite dimensional algebras. With an appendix by Vlastimil
+  Dlab.
+   Springer, 1994
+
+@item
+@c GPS  book
+ [GPS] Greuel, G.-M. and Pfister, G. with contributions by Bachmann, O. ; Lossen, C.
+  and Sch@"onemann, H.
+     A SINGULAR Introduction to Commutative Algebra.
+   Springer, 2002
+
+@item
+@c BGV
+ [BGV] Bueso, J.; Gomez Torrecillas, J.; Verschoren, A.
+   Algorithmic methods in non-commutative algebra. Applications to quantum groups.
+   Kluwer Academic Publishers, 2003
+
+@item
+@c Kr  Book
+ [Kr] Kredel, H.
+     Solvable polynomial rings.
+  Shaker, 1993
+
+@item
+@c HLi  Book
+   [Li] Huishi Li.
+     Noncommutative Gr@"obner bases and filtered-graded transfer.
+     Springer, 2002
+
+@item
+@c MR  book
+ [MR] McConnell, J.C. and Robson, J.C.
+Noncommutative Noetherian rings. With the cooperation of L. W. Small.
+Graduate Studies in Mathematics. 30. Providence, RI: American Mathematical Society (AMS).,
+2001
+
+@end itemize
+
+@subheading Descriptions of algorithms and problems
+
+@itemize @bullet
+
+@item
+@c{HKP} art
+  Havlicek, M. and Klimyk, A. and Posta, S.
+   Central elements of the algebras
+@tex
+ $U'_q({\rm so}_m)$ and $U'_q({\rm iso}_m)$.
+  {arXiv. math. QA/9911130}, (1999)
+@end tex
+
+@item
+@c{AP} art
+J. Apel.
+  Gr@"obnerbasen in nichtkommutativen algebren und ihre anwendung.
+    Dissertation, Universit@"at Leipzig, 1988.
+
+@item
+@c{AP2}  art
+ Apel, J.
+  Computational ideal theory in finitely generated extension rings.
+    Theor. Comput. Sci.(2000), 244(1-2):1-33
+
+@item
+@c{BachS:98} InCollection
+O. Bachmann and H. Sch@"onemann.
+   Monomial operations for computations of Gr@"obner bases.
+  In   Reports On Computer Algebra 18. Centre for Computer Algebra,
+University of Kaiserslautern (1998)
+
+
+@item
+@c DE} InProceedings
+D. Decker and D. Eisenbud.
+  Sheaf algorithms using the exterior algebra.
+  In  Eisenbud, D.; Grayson, D.; Stillman, M.; Sturmfels, B., editor,
+     Computations in algebraic geometry with Macaulay 2, (2001)
+
+@item
+@c art
+Jose L. Bueso, J. Gomez Torrecillas and F. J. Lobillo.
+  Computing the Gelfand-Kirillov dimension II.
+    In  A. Granja, J. A. Hermida and A. Verschoren eds. Ring Theory and Algebraic Geometry, Lect. Not. in Pure and Appl. Maths., Marcel Dekker, 2001.
+
+@item
+@c art
+Jose L. Bueso, J. Gomez Torrecillas and F. J. Lobillo.
+  Re-filtering and exactness of the Gelfand-Kirillov dimension.
+    Bulletin des Sciences Mathematiques 125(8), 689-715 (2001).
+
+
+@item
+@c GL  art
+J. Gomez Torrecillas and F.J. Lobillo.
+  Global homological dimension of multifiltered rings and quantized
+  enveloping algebras.
+    J. Algebra, 225(2):522-533, 2000.
+
+
+@item
+@c I1  InProc
+N. Iorgov.
+@tex
+ On the Center of $q$-Deformed Algebra $U'_q( \rm so _3)$ Related to
+  Quantum Gravity at $q$ a Root of $1$.
+@end tex
+In Proceedings of IV Int. Conf. "Symmetry in Nonlinear
+  Mathematical Physics",(2001) Kyiv, Ukraine
+
+@item
+@c KW  art
+A. Kandri-Rody and V. Weispfenning.
+  Non-commutative Gr@"obner bases in algebras of solvable type.
+    J. Symbolic Computation, 9(1):1-26, 1990.
+
+
+@item
+@c LV2  Inproc
+ Levandovskyy, V.
+   On Gr@"obner bases for non-commutative G-algebras.
+  In  Kredel, H. and Seiler, W.K., editor,    Proceedings of the
+  8th Rhine Workshop on Computer Algebra, 2002.
+
+@item
+@c NDC  InProc
+ [L1] Levandovskyy, V.
+   PBW Bases, Non-degeneracy Conditions and Applications.
+  In  Buchweitz, R.-O. and Lenzing, H., editor,    Proceedings of
+  the ICRA X conference, Toronto, 2003.
+
+@item
+@c LS  InProc
+  [LS] Levandovskyy V.; Sch@"onemann, H.
+  Plural - a computer algebra system for noncommutative polynomial
+  algebras.
+  In  Proc. of the International Symposium on Symbolic and
+  Algebraic Computation (ISSAC'03). ACM Press, 2003.
+
+@item
+@c LVdiss  art
+ [LV] Levandovskyy, V.
+   Non-commutative Computer Algebra for polynomial algebras: Gr@"obner bases, applications and implementation.
+   Doctoral Thesis, Universit@"at Kaiserslautern, 2005. Available online at @code{http://kluedo.ub.uni-kl.de/volltexte/2005/1883/}.
+
+@item
+@c LV3  article
+ [L2] Levandovskyy, V.
+ On preimages of ideals in certain non-commutative algebras.
+ In Pfister G., Cojocaru S. and Ufnarovski, V. (editors), Computational Commutative and Non-Commutative Algebraic Geometry, IOS Press, 2005.
+
+
+@item
+@c MoraNC  article
+ Mora, T.
+   Gr@"obner bases for non-commutative polynomial rings.
+     Proc. AAECC 3 Lect. N. Comp. Sci, 229:  353-362, 1986.
+
+@item
+@c Mora  article
+ Mora, T.
+   An introduction to commutative and non-commutative Groebner bases.
+     Theor. Comp. Sci., 134:  131-173, 1994.
+
+@item
+@c NS  art
+T. N@"u@ss{}ler and H. Sch@"onemann.
+  Gr@"obner bases in algebras with zero-divisors.
+     Preprint 244, Universit@"at Kaiserslautern, 1993. Available online at @code{http://www.mathematik.uni-kl.de/~zca/Reports_on_ca/index.html}.
+
+@item
+@c S:03  InColl
+Sch@"onemann, H.
+  Singular in a Framework for Polynomial Computations.
+  In Joswig, M. and Takayama, N., editor, Algebra, Geometry and
+  Software Systems, pages 163-176. Springer, 2003.
+
+@item
+@c Yan:98  art
+T. Yan.
+  The geobucket data structure for polynomials.
+   J. Symbolic Computation, 25(3):285-294, March 1998.
+@end itemize
+
+
+@c @subheading Descriptions of algorithms
+
+
+@raisesections
