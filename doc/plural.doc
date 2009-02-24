@@ -5,6 +5,17 @@
 @section  PLURAL
 @cindex  PLURAL
 
+@ifhtml
+@html
+<CENTER>
+<A HREF="http://www.singular.uni-kl.de/plural">
+<IMG SRC="plural.jpg" ALT="Singular:Plural logo"></A><br>
+</CENTER>
+<h3> A Computer Algebra Subsystem for Noncommutative Polynomial Algebras </h3>
+<p></p>
+@end html
+@end ifhtml
+
 @table @strong
 @item @strong{What is and what does @sc{Plural}?}
 
@@ -1485,7 +1496,6 @@ name of the n-th ring variable (see @ref{varstr})
 @node Functions BR_PLURAL_BR, Mathematical background BR_PLURAL_BR, Data types BR_PLURAL_BR, Non-commutative subsystem
 
 @section Functions BR_PLURAL_BR
-@lowersections
 
 @cindex commands BR_PLURAL_BR
 
@@ -1535,7 +1545,7 @@ Note, that both @strong{Control structures} and @strong{System variables} of
 
 @c -----------------------------
 @node betti BR_PLURAL_BR, bracket, Functions BR_PLURAL_BR, Functions BR_PLURAL_BR
-@section betti BR_PLURAL_BR
+@subsection betti BR_PLURAL_BR
 @cindex betti BR_PLURAL_BR
 @table @code
 @item @strong{Syntax:}
@@ -1607,7 +1617,7 @@ print(betti(R),"betti");
 
 @c -----------------------------
 @node bracket, eliminate BR_PLURAL_BR, betti BR_PLURAL_BR, Functions BR_PLURAL_BR
-@section bracket
+@subsection bracket
 @cindex bracket
 
 @table @code
@@ -1644,7 +1654,7 @@ bracket(x+Q*y+Q^2*z,z);
 
 @c ---------------------------------------
 @node eliminate BR_PLURAL_BR, envelope, bracket, Functions BR_PLURAL_BR
-@section eliminate BR_PLURAL_BR
+@subsection eliminate BR_PLURAL_BR
 @cindex eliminate BR_PLURAL_BR
 
 @table @code
@@ -1702,7 +1712,7 @@ See
 
 @c ---------------------------------------
 @node  envelope, fetch BR_PLURAL_BR, eliminate BR_PLURAL_BR, Functions BR_PLURAL_BR
-@section envelope
+@subsection envelope
 @cindex envelope
 
 @table @code
@@ -1742,7 +1752,7 @@ See
 
 @c ---------------------------------------
 @node fetch BR_PLURAL_BR, imap BR_PLURAL_BR, envelope, Functions BR_PLURAL_BR
-@section fetch BR_PLURAL_BR
+@subsection fetch BR_PLURAL_BR
 @cindex fetch BR_PLURAL_BR
 
 @table @code
@@ -1799,7 +1809,7 @@ See
 
 @c ---------------------------------------
 @node imap BR_PLURAL_BR, intersect BR_PLURAL_BR, fetch BR_PLURAL_BR, Functions BR_PLURAL_BR
-@section imap BR_PLURAL_BR
+@subsection imap BR_PLURAL_BR
 @cindex imap BR_PLURAL_BR
 
 @table @code
@@ -1863,7 +1873,7 @@ See
 
 @c ------------------------------------------------
 @node intersect BR_PLURAL_BR, kbase BR_PLURAL_BR, imap BR_PLURAL_BR, Functions BR_PLURAL_BR
-@section  intersect BR_PLURAL_BR
+@subsection  intersect BR_PLURAL_BR
 @cindex  intersect BR_PLURAL_BR
 
 @table @code
@@ -1908,7 +1918,7 @@ H;
 
 @c ------------------------------------------------
 @node kbase BR_PLURAL_BR, lift BR_PLURAL_BR, intersect BR_PLURAL_BR, Functions BR_PLURAL_BR
-@section kbase BR_PLURAL_BR
+@subsection kbase BR_PLURAL_BR
 @cindex kbase BR_PLURAL_BR
 @table @code
 @item @strong{Syntax:}
@@ -1962,7 +1972,7 @@ See
 
 @c -------------------------------------------------
 @node lift BR_PLURAL_BR, liftstd BR_PLURAL_BR, kbase BR_PLURAL_BR, Functions BR_PLURAL_BR
-@section lift BR_PLURAL_BR
+@subsection lift BR_PLURAL_BR
 @cindex lift BR_PLURAL_BR
 @table @code
 @item @strong{Syntax:}
@@ -2016,7 +2026,7 @@ See
 
 @c -----------------------------------------
 @node liftstd BR_PLURAL_BR, minres BR_PLURAL_BR, lift BR_PLURAL_BR, Functions BR_PLURAL_BR
-@section liftstd BR_PLURAL_BR
+@subsection liftstd BR_PLURAL_BR
 @cindex liftstd BR_PLURAL_BR
 @table @code
 @item @strong{Syntax:}
@@ -2062,7 +2072,7 @@ See
 
 @c ---------------------------------------
 @node  minres BR_PLURAL_BR, modulo BR_PLURAL_BR, liftstd BR_PLURAL_BR, Functions BR_PLURAL_BR
-@section minres BR_PLURAL_BR
+@subsection minres BR_PLURAL_BR
 @cindex minres BR_PLURAL_BR
 
 @table @code
@@ -2106,7 +2116,7 @@ See
 
 @c ---------------------------------------
 @node modulo BR_PLURAL_BR, mres BR_PLURAL_BR, minres BR_PLURAL_BR, Functions BR_PLURAL_BR
-@section modulo BR_PLURAL_BR
+@subsection modulo BR_PLURAL_BR
 @cindex modulo BR_PLURAL_BR
 @table @code
 @item @strong{Syntax:}
@@ -2205,7 +2215,7 @@ See also
 
 @c ---------------------------------------
 @node  mres BR_PLURAL_BR, nc_algebra, modulo BR_PLURAL_BR, Functions BR_PLURAL_BR
-@section mres BR_PLURAL_BR
+@subsection mres BR_PLURAL_BR
 @cindex mres BR_PLURAL_BR
 @table @code
 @item @strong{Syntax:}
@@ -2297,7 +2307,7 @@ See
 
 @c -----------------------------
 @node nc_algebra, ncalgebra, mres BR_PLURAL_BR, Functions BR_PLURAL_BR
-@section nc_algebra
+@subsection nc_algebra
 @cindex nc_algebra
 
 @table @code
@@ -2416,7 +2426,7 @@ See also
 
 @c -----------------------------
 @node ncalgebra, nres BR_PLURAL_BR, nc_algebra, Functions BR_PLURAL_BR
-@section ncalgebra
+@subsection ncalgebra
 @cindex ncalgebra
 
 @table @code
@@ -2443,7 +2453,7 @@ See also
 
 @c ---------------------------------------
 @node  nres BR_PLURAL_BR, oppose, ncalgebra, Functions BR_PLURAL_BR
-@section nres BR_PLURAL_BR
+@subsection nres BR_PLURAL_BR
 @cindex nres BR_PLURAL_BR
 @table @code
 @item @strong{Syntax:}
@@ -2487,7 +2497,7 @@ See
 
 @c ---------------------------------------
 @node  oppose, opposite, nres BR_PLURAL_BR, Functions BR_PLURAL_BR
-@section oppose
+@subsection oppose
 @cindex oppose
 
 @table @code
@@ -2543,7 +2553,7 @@ See
 
 @c ---------------------------------------
 @node opposite, preimage BR_PLURAL_BR, oppose, Functions BR_PLURAL_BR
-@section opposite
+@subsection opposite
 @cindex opposite
 
 @table @code
@@ -2599,7 +2609,7 @@ See also a Section @ref{Matrix orderings}.
 
 @c ---------------------------------------
 @node preimage BR_PLURAL_BR, quotient BR_PLURAL_BR, opposite, Functions BR_PLURAL_BR
-@section preimage BR_PLURAL_BR
+@subsection preimage BR_PLURAL_BR
 @cindex preimage BR_PLURAL_BR
 
 @table @code
@@ -2658,7 +2668,7 @@ See
 
 @c ---------------------------------------
 @node quotient BR_PLURAL_BR, reduce BR_PLURAL_BR, preimage BR_PLURAL_BR, Functions BR_PLURAL_BR
-@section quotient BR_PLURAL_BR
+@subsection quotient BR_PLURAL_BR
 @cindex quotient BR_PLURAL_BR
 @table @code
 @item @strong{Syntax:}
@@ -2745,7 +2755,7 @@ See
 
 @c ---------------------------------------
 @node reduce BR_PLURAL_BR, ringlist BR_PLURAL_BR, quotient BR_PLURAL_BR, Functions BR_PLURAL_BR
-@section reduce BR_PLURAL_BR
+@subsection reduce BR_PLURAL_BR
 @cindex reduce BR_PLURAL_BR
 @cindex NF
 @table @code
@@ -2810,7 +2820,7 @@ See also
 
 @c ---------------------------------------
 @node ringlist BR_PLURAL_BR, slimgb BR_PLURAL_BR, reduce BR_PLURAL_BR, Functions BR_PLURAL_BR
-@section ringlist BR_PLURAL_BR
+@subsection ringlist BR_PLURAL_BR
 @cindex ringlist BR_PLURAL_BR
 @table @code
 @item @strong{Syntax:}
@@ -2865,7 +2875,7 @@ See also
 
 @c ---------------------------------------
 @node slimgb BR_PLURAL_BR, std BR_PLURAL_BR, ringlist BR_PLURAL_BR, Functions BR_PLURAL_BR
-@section slimgb BR_PLURAL_BR
+@subsection slimgb BR_PLURAL_BR
 @cindex slimgb BR_PLURAL_BR
 @table @code
 @item @strong{Syntax:}
@@ -2920,7 +2930,7 @@ See
 
 @c ---------------------------------------
 @node std BR_PLURAL_BR, subst  BR_PLURAL_BR, slimgb BR_PLURAL_BR, Functions BR_PLURAL_BR
-@section std BR_PLURAL_BR
+@subsection std BR_PLURAL_BR
 @cindex std BR_PLURAL_BR
 @table @code
 @item @strong{Syntax:}
@@ -2979,7 +2989,7 @@ See also
 
 @c -------------------------------------------------
 @node subst  BR_PLURAL_BR, syz BR_PLURAL_BR, std BR_PLURAL_BR, Functions BR_PLURAL_BR
-@section subst BR_PLURAL_BR
+@subsection subst BR_PLURAL_BR
 @cindex subst BR_PLURAL_BR
 @table @code
 @item @strong{Syntax:}
@@ -3015,7 +3025,7 @@ C2;
 
 @c -------------------------------------------------
 @node syz BR_PLURAL_BR, twostd, subst  BR_PLURAL_BR, Functions BR_PLURAL_BR
-@section syz BR_PLURAL_BR
+@subsection syz BR_PLURAL_BR
 @cindex syz BR_PLURAL_BR
 @table @code
 @item @strong{Syntax:}
@@ -3073,7 +3083,7 @@ See also
 
 @c ------------------------------
 @node twostd, vdim BR_PLURAL_BR, syz BR_PLURAL_BR, Functions BR_PLURAL_BR
-@section twostd
+@subsection twostd
 @cindex twostd
 
 @table @code
@@ -3116,7 +3126,7 @@ print(matrix(K));
 
 @c -------------------------------------------------------------------------
 @node vdim BR_PLURAL_BR,, twostd, Functions BR_PLURAL_BR
-@section vdim BR_PLURAL_BR
+@subsection vdim BR_PLURAL_BR
 @cindex vdim BR_PLURAL_BR
 @table @code
 @item @strong{Syntax:}
@@ -3162,14 +3172,9 @@ See also
 @c ref
 @c -------------------------------------------------------------------------
 
-@raisesections
-
-@c ----------------------------------------------------------------------------
 @node Mathematical background BR_PLURAL_BR, LETTERPLACE , Functions BR_PLURAL_BR, Non-commutative subsystem
 
 @section Mathematical background BR_PLURAL_BR
-@lowersections
-
 @cindex Mathematical background BR_PLURAL_BR
 
 This section introduces some of the mathematical notions and definitions used
@@ -3191,7 +3196,7 @@ All algebras are assumed to be associative @math{K}-algebras for some field @mat
 
 @c ---------------------------------------------------------------------------
 @node G-algebras, Groebner bases in G-algebras,  , Mathematical background BR_PLURAL_BR
-@section G-algebras
+@subsection G-algebras
 @cindex G-algebra
 
 
@@ -3417,7 +3422,7 @@ hold but it provides a procedure @ref{ndcond} from the library @ref{nctools_lib}
 
 @c ---------------------------------------------------------------------------
 @node Groebner bases in G-algebras, Syzygies and resolutions BR_PLURAL_BR, G-algebras, Mathematical background BR_PLURAL_BR
-@section Groebner bases in G-algebras
+@subsection Groebner bases in G-algebras
 @cindex Groebner bases in G-algebras
 
 
@@ -3580,7 +3585,7 @@ f is in I if and only if left the normal form NF(f|G) = 0.
 
 @c ---------------------------------------------------------------------------
 @node Syzygies and resolutions BR_PLURAL_BR, References BR_PLURAL_BR, Groebner bases in G-algebras, Mathematical background BR_PLURAL_BR
-@section Syzygies and resolutions BR_PLURAL_BR
+@subsection Syzygies and resolutions BR_PLURAL_BR
 @cindex Syzygies and resolutions BR_PLURAL_BR
 
 @subheading Syzygies
@@ -3705,7 +3710,7 @@ tst;
 
 @c ---------------------------------------------------------------------------
 @node References BR_PLURAL_BR, , Syzygies and resolutions BR_PLURAL_BR, Mathematical background BR_PLURAL_BR
-@section References BR_PLURAL_BR
+@subsection References BR_PLURAL_BR
 @cindex References BR_PLURAL_BR
 
 The Centre for Computer Algebra Kaiserslautern publishes a series of preprints
@@ -3905,5 +3910,3 @@ T. Yan.
 
 @c @subheading Descriptions of algorithms
 
-
-@raisesections
