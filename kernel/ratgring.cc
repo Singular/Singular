@@ -6,7 +6,7 @@
  *  Purpose: Ore-noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: ratgring.cc,v 1.15 2009-02-23 19:22:27 levandov Exp $
+ *  Version: $Id: ratgring.cc,v 1.16 2009-02-25 16:37:34 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "ratgring.h"
@@ -685,4 +685,235 @@ int redRat (poly* h, poly *reducer, int *red_length, int rl, int ishift, ring r)
     }
   }
 }
+
+poly pInitContentRat_a(poly ph)
+// for rat coefficients in K(x1,..xN)
+{
+
+  // init array of RatLeadCoeffs
+  //  poly p_GetCoeffRat(poly p, int ishift, ring r);
+
+  poly *C = (poly *)omAlloc0((pLength(ph)+1)*sizeof(poly));  //rat coeffs
+  poly *LM = (poly *)omAlloc0((pLength(ph)+1)*sizeof(poly));  // rat lead terms
+  int *D = (int *)omAlloc0((pLength(ph)+1)*sizeof(int));  //degrees of coeffs
+  int *L = (int *)omAlloc0((pLength(ph)+1)*sizeof(int));  //lengths of coeffs
+  int k = 0;
+  poly p = ph;
+  int HasConstantCoef = 0;
+  int mintdeg = pTotaldegree(p);
+  int minlen = pLength(p);
+  while (p!=NULL)
+  {
+    LM[k] = p_HeadRat(p, currRing->real_var_start, currRing); 
+    C[k] = p_GetCoeffRat(p, currRing->real_var_start, currRing);
+    D[k] =  pTotaldegree(C[k]);
+    mintdeg = si_min(mintdeg,D[k]);
+    L[k] = pLength(C[k]);
+    minlen = si_min(minlen,L[k]);
+    if (pIsConstant(C[k]))
+    {
+      // C[k] = const, so the content will be numerical
+      HasConstantCoef = 1;
+      // smth like goto cleanup and return(pContent(p));
+    }
+    p_LmDeleteAndNextRat(&p, currRing->real_var_start, currRing);
+    k++;
+  }
+
+  // look for 1 element of minimal degree and of minimal length
+  int *DD = (int *)omAlloc0((k+1)*sizeof(int));  //minimal degrees
+  k--;
+  int dd = 0; int i;
+  int mindeglen = pLength(p); // expensive?
+  int pmindeglen;
+  for(i=0; i<=k; i++)
+  {
+    if (D[i] == mintdeg)
+    {
+      //      DD[dd] = i;
+      //      dd++;
+      mindeglen = si_min(mindeglen,L[i]);
+      if (L[i] == mindeglen)
+      {
+        pmindeglen = i;
+      }
+    }
+  }
+  poly d = C[pmindeglen];
+  // there are dd>=1 mindeg elements
+  // and pmideglen is the coordinate of one of the smallest among them
+
+  //  poly g = singclap_gcd(p_Copy(p,r),p_Copy(q,r)); 
+  //  return naGcd(d,d2,currRing);
+
+  // adjoin pContentRat here?
+
+}
+
+// void pContentRat(poly ph)
+// {
+// #ifdef HAVE_RINGS
+//   if (rField_is_Ring(currRing))
+//   {
+//     if ((ph!=NULL) && rField_has_Units(currRing))
+//     {
+//       number k = nGetUnit(pGetCoeff(ph));
+//       if (!nIsOne(k))
+//       {
+//         number tmpGMP = k;
+//         k = nInvers(k);
+//         nDelete(&tmpGMP);
+//         poly h = pNext(ph);
+//         pSetCoeff(ph, nMult(pGetCoeff(ph), k));
+//         while (h != NULL)
+//         {
+//           pSetCoeff(h, nMult(pGetCoeff(h), k));
+//           pIter(h);
+//         }
+//       }
+//       nDelete(&k);
+//     }
+//     return;
+//   }
+// #endif
+//   number h,d;
+//   poly p;
+
+//   if(TEST_OPT_CONTENTSB) return;
+//   if(pNext(ph)==NULL)
+//   {
+//     pSetCoeff(ph,nInit(1));
+//   }
+//   else
+//   {
+//     nNormalize(pGetCoeff(ph));
+//     if(!nGreaterZero(pGetCoeff(ph))) ph = pNeg(ph);
+//     if (rField_is_Q())
+//     {
+//       h=pInitContent(ph);
+//       p=ph;
+//     }
+//     else if ((rField_is_Extension())
+//     && ((rPar(currRing)>1)||(currRing->minpoly==NULL)))
+//     {
+//       h=pInitContent_a(ph);
+//       p=ph;
+//     }
+//     else
+//     {
+//       h=nCopy(pGetCoeff(ph));
+//       p = pNext(ph);
+//     }
+//     while (p!=NULL)
+//     {
+//       nNormalize(pGetCoeff(p));
+//       d=nGcd(h,pGetCoeff(p),currRing);
+//       nDelete(&h);
+//       h = d;
+//       if(nIsOne(h))
+//       {
+//         break;
+//       }
+//       pIter(p);
+//     }
+//     p = ph;
+//     //number tmp;
+//     if(!nIsOne(h))
+//     {
+//       while (p!=NULL)
+//       {
+//         //d = nDiv(pGetCoeff(p),h);
+//         //tmp = nIntDiv(pGetCoeff(p),h);
+//         //if (!nEqual(d,tmp))
+//         //{
+//         //  StringSetS("** div0:");nWrite(pGetCoeff(p));StringAppendS("/");
+//         //  nWrite(h);StringAppendS("=");nWrite(d);StringAppendS(" int:");
+//         //  nWrite(tmp);Print(StringAppendS("\n"));
+//         //}
+//         //nDelete(&tmp);
+//         d = nIntDiv(pGetCoeff(p),h);
+//         pSetCoeff(p,d);
+//         pIter(p);
+//       }
+//     }
+//     nDelete(&h);
+// #ifdef HAVE_FACTORY
+//     if ( (nGetChar() == 1) || (nGetChar() < 0) ) /* Q[a],Q(a),Zp[a],Z/p(a) */
+//     {
+//       singclap_divide_content(ph);
+//       if(!nGreaterZero(pGetCoeff(ph))) ph = pNeg(ph);
+//     }
+// #endif
+//     if (rField_is_Q_a())
+//     {
+//       number hzz = nlInit(1);
+//       h = nlInit(1);
+//       p=ph;
+//       while (p!=NULL)
+//       { // each monom: coeff in Q_a
+//         lnumber c_n_n=(lnumber)pGetCoeff(p);
+//         napoly c_n=c_n_n->z;
+//         while (c_n!=NULL)
+//         { // each monom: coeff in Q
+//           d=nlLcm(hzz,pGetCoeff(c_n),currRing->algring);
+//           n_Delete(&hzz,currRing->algring);
+//           hzz=d;
+//           pIter(c_n);
+//         }
+//         c_n=c_n_n->n;
+//         while (c_n!=NULL)
+//         { // each monom: coeff in Q
+//           d=nlLcm(h,pGetCoeff(c_n),currRing->algring);
+//           n_Delete(&h,currRing->algring);
+//           h=d;
+//           pIter(c_n);
+//         }
+//         pIter(p);
+//       }
+//       /* hzz contains the 1/lcm of all denominators in c_n_n->z*/
+//       /* h contains the 1/lcm of all denominators in c_n_n->n*/
+//       number htmp=nlInvers(h);
+//       number hzztmp=nlInvers(hzz);
+//       number hh=nlMult(hzz,h);
+//       nlDelete(&hzz,currRing->algring);
+//       nlDelete(&h,currRing->algring);
+//       number hg=nlGcd(hzztmp,htmp,currRing->algring);
+//       nlDelete(&hzztmp,currRing->algring);
+//       nlDelete(&htmp,currRing->algring);
+//       h=nlMult(hh,hg);
+//       nlDelete(&hg,currRing->algring);
+//       nlDelete(&hh,currRing->algring);
+//       nlNormalize(h);
+//       if(!nlIsOne(h))
+//       {
+//         p=ph;
+//         while (p!=NULL)
+//         { // each monom: coeff in Q_a
+//           lnumber c_n_n=(lnumber)pGetCoeff(p);
+//           napoly c_n=c_n_n->z;
+//           while (c_n!=NULL)
+//           { // each monom: coeff in Q
+//             d=nlMult(h,pGetCoeff(c_n));
+//             nlNormalize(d);
+//             nlDelete(&pGetCoeff(c_n),currRing->algring);
+//             pGetCoeff(c_n)=d;
+//             pIter(c_n);
+//           }
+// 	  c_n=c_n_n->n;
+//           while (c_n!=NULL)
+//           { // each monom: coeff in Q
+//             d=nlMult(h,pGetCoeff(c_n));
+//             nlNormalize(d);
+//             nlDelete(&pGetCoeff(c_n),currRing->algring);
+//             pGetCoeff(c_n)=d;
+//             pIter(c_n);
+//           }
+//           pIter(p);
+//         }
+//       }
+//       nlDelete(&h,currRing->algring);
+//     }
+//   }
+// }
+
 #endif

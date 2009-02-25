@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ratgring.h,v 1.8 2009-02-23 19:22:27 levandov Exp $ */
+/* $Id: ratgring.h,v 1.9 2009-02-25 16:37:34 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -110,5 +110,11 @@ BOOLEAN p_DivisibleByRat(poly a, poly b, int ishift, const ring r);
 * arrays reducer and red_length are [0..(rl-1)]
 */
 int redRat (poly* h,poly *reducer, int *red_length,int rl, int ishift, ring r);
+
+// Content stuff
+
+poly pInitContentRat_a(poly ph);
+void pContentRat(poly ph);
+
 #endif /* HAVE_PLURAL */
 #endif
