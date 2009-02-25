@@ -3,7 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
-* versin $Id: fehelp.cc,v 1.54 2008-09-25 10:20:37 Singular Exp $
+* versin $Id: fehelp.cc,v 1.55 2009-02-25 17:36:32 Singular Exp $
 */
 
 #include <string.h>
@@ -126,10 +126,11 @@ void feHelp(char *str)
 
   BOOLEAN key_is_regexp = (strchr(str, '*') != NULL);
   heEntry_s hentry;
+  memset(&hentry,0,sizeof(hentry));
   char* idxfile = feResource('x' /*"IdxFile"*/);
 
   // Try exact match of help string with key in index
-  if (!key_is_regexp && idxfile != NULL && heKey2Entry(idxfile, str, &hentry))
+  if (!key_is_regexp && (idxfile != NULL) && heKey2Entry(idxfile, str, &hentry))
   {
     heBrowserHelp(&hentry);
     return;
@@ -859,11 +860,11 @@ static void heBrowserHelp(heEntry hentry)
   if (! feHelpCalled)
   {
     Warn("Displaying help in browser '%s'.", heCurrentHelpBrowser->browser);
-    if (strcmp(heCurrentHelpBrowser->browser, "netscape") == 0 &&
-        feResource('h', 0) == NULL)
-    {
-      Warn("Using URL '%s'.", feResource('u', 0));
-    }
+    //if (strcmp(heCurrentHelpBrowser->browser, "netscape") == 0 &&
+    //    feResource('h', 0) == NULL)
+    //{
+    //  Warn("Using URL '%s'.", feResource('u', 0));
+    //}
     Warn("Use 'system(\"--browser\", <browser>);' to change browser,");
     char* browsers = StringSetS("where <browser> can be: ");
     int i = 0;
@@ -890,6 +891,7 @@ static void heBrowserHelp(heEntry hentry)
 static BOOLEAN heGenInit(int warn, int br)
 {
   if (heHelpBrowsers[br].required==NULL) return TRUE;
+  Print("req:%s\n",heHelpBrowsers[br].required);
   const char *p=heHelpBrowsers[br].required;
   while (*p>'\0')
   {
@@ -1163,18 +1165,18 @@ static inline char tolow(char p)
 }
 
 /*************************************************/
-static int show(unsigned long offset,FILE *help, char *close)
+static int show(unsigned long offset, char *close)
 { char buffer[BUF_LEN+1];
   int  lines = 0;
+  FILE * help;
 
-  if( help== NULL)
-    if( (help = fopen(feResource('i'), "rb")) == NULL)
-      return HELP_NOT_OPEN;
+  if( (help = fopen(feResource('i'), "rb")) == NULL)
+    return HELP_NOT_OPEN;
 
   fseek(help,  (long)(offset+1), (int)0);
-  while( !feof(help)
-        && *fgets(buffer, BUF_LEN, help) != EOF
-        && buffer[0] != FIN_INDEX)
+  while( (!feof(help))
+        && (*fgets(buffer, BUF_LEN, help) != EOF)
+        && (buffer[0] != FIN_INDEX))
   {
     printf("%s", buffer);
     if(lines++> MAX_LINES)
@@ -1198,18 +1200,20 @@ static int show(unsigned long offset,FILE *help, char *close)
     if(*close=='x')
       getchar();
   }
+  fclose(help);
   return HELP_OK;
 }
 
 /*************************************************/
 static int singular_manual(char *str)
-{ FILE *index=NULL,*help=NULL;
+{ FILE *index=NULL;
   unsigned long offset;
   char *p,close;
   int done = 0;
   char buffer[BUF_LEN+1],
        Index[IDX_LEN+1],
        String[IDX_LEN+1];
+  Print("HELP >>%s>>\n",str);
 
   if( (index = fopen(feResource('i'), "rb")) == NULL)
   {
@@ -1227,8 +1231,8 @@ static int singular_manual(char *str)
   (void)sprintf(String, " %s ", str);
 
   while(!feof(index)
-        && fgets(buffer, BUF_LEN, index) != (char *)0
-        && buffer[0] != FIN_INDEX);
+        && (fgets(buffer, BUF_LEN, index) != (char *)0)
+        && (buffer[0] != FIN_INDEX));
 
   while(!feof(index))
   {
@@ -1238,14 +1242,13 @@ static int singular_manual(char *str)
     (void)strcat(Index, " ");
     if( strstr(Index, String)!=NULL)
     {
-      done++; (void)show(offset, help, &close);
+      done++; (void)show(offset, &close);
     }
     Index[0]='\0';
     if(close=='x')
     break;
   }
   if (index != NULL) (void)fclose(index);
-  if (help != NULL) (void)fclose(help);
   if(! done)
   {
     Warn("`%s` not found",String);
