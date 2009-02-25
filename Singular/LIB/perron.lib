@@ -1,9 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: perron.lib,v 1.11 2008-04-23 14:06:10 motsak Exp $";
+version="$Id: perron.lib,v 1.12 2009-02-25 18:51:26 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  perron.lib         computation of algebraic dependences
-AUTHORS:  Oleksandr Motsak,         {U@D}, where U={motsak}, D={mathematik.uni-kl.de}.
+AUTHOR:   Oleksandr Motsak
 
 PROCEDURES:
 perron(L[, D]);  relations between pairwise commuting polynomials
@@ -24,99 +24,76 @@ EXAMPLE: example perron; shows an example
 "
 {
   int N, D, i;
-
   N = size(L);
-
   if( N == 0 )
-    {
-      ERROR( "Input ideal must be non-zero!" );
-    }
-
+  {
+    ERROR( "Input ideal must be non-zero!" );
+  }
   intvec W; // weights
-
   for ( i = N; i > 0; i-- )
-    {
-      W[i] = deg(L[i]);
-    }
-
+  {
+    W[i] = deg(L[i]);
+  }
   ////////////////////////////////////////////////////////////////////////
   D = -1;
-
   // Check whether the degree bound 'D' is given:
   if( size(#)>0 )
+  {
+    if ( typeof(#[1]) == typeof(D) )
     {
-      if ( typeof(#[1]) == typeof(D) )
-        {
-          D = #[1];
-
-          if( D <= 0 )
-            {
-              ERROR( "An optional parameter D must be positive!" );
-            }
-        }
+      D = #[1];
+      if( D <= 0 )
+      {
+        ERROR( "An optional parameter D must be positive!" );
+      }
     }
+  }
 
   // , otherwise we try to estimate it according to Perron's Th:
   if( D < 0 )
+  {
+    D = 1;
+    int d;
+    int min = -1;
+
+    for ( i = size(L); i > 0 ; i-- )
     {
-      D = 1;
-      int d, min;
-
-      min = -1;
-
-      for ( i = size(L); i > 0 ; i-- )
+      d = W[i];
+      D = D * d;
+      if( min == -1)
+      {
+        min = d;
+      }
+      else
+      {
+        if( min > d )
         {
-          d = W[i];
-
-          D = D * d;
-          if( min == -1)
-            {
-              min = d;
-            } else
-              {
-                if( min > d )
-                  {
-                    min = d;
-                  }
-              }
+          min = d;
         }
-
-      if( (D == 0) or (min <= 0) )
-        {
-          ERROR( "Wrong set of polynomials!" );
-        }
-
-      D = D / min;
-
+      }
     }
-
+    if( (D == 0) or (min <= 0) )
+    {
+      ERROR( "Wrong set of polynomials!" );
+    }
+    D = D / min;
+  }
   ////////////////////////////////////////////////////////////////////////
-
   def NCRING = basering;
-
   def CurrentField = ringlist( NCRING )[1];
-
-//  CurrentField;
 
   // We are going to construct a commutative ring in N variables F(i),
   // with the field specified by 'CurrentField':
 
   ring TEMPRING = 0, ( F(1..N) ), dp;
-
   list RingList = ringlist( TEMPRING );
-
   setring NCRING;
-
 
   if( !defined(RingList) )
   {
     list RingList = imap( TEMPRING, RingList );
   }
-
-
   RingList[1] = CurrentField;
-
-//  RingList;
 
   // New Commutative Ring with correct field!
   def COMMUTATIVERING = ring( RingList );
@@ -146,18 +123,18 @@ EXAMPLE: example perron; shows an example
   int t = 0;
 
   if( (typeof(T) != "module") and (typeof(T) != "int" ) )
+  {
+    ERROR( "Wrong output from function 'linearMapKernel'!" );
+  }
+
+  if( typeof(T) == "int" )
+  {
+    t = 1;
+    if( T != 0 )
     {
       ERROR( "Wrong output from function 'linearMapKernel'!" );
     }
-
-  if( typeof(T) == "int" )
-    {
-      t = 1;
-      if( T != 0 )
-        {
-          ERROR( "Wrong output from function 'linearMapKernel'!" );
-        }
-    }
+  }
 
   ////////////////////////////////////////////////////////////////////////
 
@@ -167,15 +144,14 @@ EXAMPLE: example perron; shows an example
   ideal Relations; // And generate Relations:
 
   if( t == 0 ) // T is a module
-    {
-      module KER = imap( NCRING, T );
-      Relations = linearCombinations( PBWBasis, KER );
-
-    } else
-      { // T == int(0) => all images are zero =>
-        Relations = PBWBasis;
-      }
-
+  {
+    module KER = imap( NCRING, T );
+    Relations = linearCombinations( PBWBasis, KER );
+  }
+  else
+  { // T == int(0) => all images are zero =>
+    Relations = PBWBasis;
+  }
 
   ////////////////////////////////////////////////////////////////////////
 
