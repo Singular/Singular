@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 Author: $Author: monerjan $
-Date: $Date: 2009-02-23 15:12:49 $
-Header: $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.15 2009-02-23 15:12:49 monerjan Exp $
-Id: $Id: gfan.cc,v 1.15 2009-02-23 15:12:49 monerjan Exp $
+Date: $Date: 2009-02-25 14:30:25 $
+Header: $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.16 2009-02-25 14:30:25 monerjan Exp $
+Id: $Id: gfan.cc,v 1.16 2009-02-25 14:30:25 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -22,10 +22,34 @@ Id: $Id: gfan.cc,v 1.15 2009-02-23 15:12:49 monerjan Exp $
 #define gfan_DEBUG
 #endif
 
+class facet
+{
+	private:
+		intvec fnormal;		//inner normal, describing the facet uniquely
+	public:
+		facet();		//constructor
+		bool isflippable;	//flippable facet?
+};
+
+/*class gcone
+finally this should become s.th. like gconelib.{h,cc} to provide an API
+*/
+class gcone
+{
+public:
+	gcone(int);		//constructor with dimension
+	poly gc_marked_term; 	//marked terms of the cone's Gröbner basis
+	ideal gc_basis;		//GB of the cone
+	gcone *next;		//Pointer to *previous* cone in search tree
+	
+	void flip();		//Compute "the other side"
+
+};//class gcone
+
 ideal getGB(ideal inputIdeal)
 {
 	#ifdef gfan_DEBUG
-	printf("Now in getGB\n");
+	printf("Computing a groebner basis...\n");
 	#endif
 
   	ideal gb;
