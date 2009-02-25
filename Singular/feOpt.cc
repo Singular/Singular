@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.24 2008-09-22 17:24:03 Singular Exp $ */
+/* $Id: feOpt.cc,v 1.25 2009-02-25 16:02:15 Singular Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
@@ -119,7 +119,7 @@ struct fe_option feOptSpec[] =
    0,          "Allow to fetch (html) help pages from the net",                feOptBool,    0,      0},
 
   {"browser",           required_argument,  LONG_OPTION_RETURN,
-   "BROWSER",  "Display help in BROWSER ([x,tk]info, netscape)",       feOptString, 0,   0},
+   "BROWSER",  "Display help in BROWSER (see help.cnf)",       feOptString, 0,   0},
 
 #ifndef ESINGULAR
   {"emacs",             no_argument,        LONG_OPTION_RETURN,
