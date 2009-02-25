@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.70 2009-02-25 10:41:54 Singular Exp $ */
+/* $Id: ideals.cc,v 1.71 2009-02-25 18:15:03 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2750,12 +2750,12 @@ ideal idMinors(matrix a, int ar, ideal R)
   if (R!=NULL)
   {
     R = idrCopyR(R,origR);
-    if (ar>1) // otherwise done in mpMinorToResult
-    {
-      matrix bb=(matrix)kNF(R,currQuotient,(ideal)b);
-      bb->rank=b->rank; bb->nrows=b->nrows; bb->ncols=b->ncols;
-      idDelete((ideal*)&b); b=bb;
-    }
+    //if (ar>1) // otherwise done in mpMinorToResult
+    //{
+    //  matrix bb=(matrix)kNF(R,currQuotient,(ideal)b);
+    //  bb->rank=b->rank; bb->nrows=b->nrows; bb->ncols=b->ncols;
+    //  idDelete((ideal*)&b); b=bb;
+    //}
   }
   result=idInit(32,1);
   if(ar>1) mpRecMin(ar-1,result,elems,b,r,c,NULL,R);
