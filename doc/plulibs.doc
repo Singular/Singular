@@ -1,0 +1,149 @@
+@c --------------------------------------------------------------------
+@node Non-commutative libraries, , LETTERPLACE, Non-commutative subsystem
+@section Non-commutative libraries
+@cindex  Non-commutative libraries
+@cindex  Non-commutative LIBs
+@cindex  PLURAL LIBs
+
+@sc{Plural} comes with a set of standard libraries. Their content is
+described in the following subsections.
+
+Use the @code{LIB} command for loading of single libraries.
+
+@strong{Note:} For any computation in @sc{Plural}, the monomial ordering must be a global ordering.
+
+@menu
+* bfun_lib::
+* central_lib::
+* discretize_lib::
+* dmod_lib::
+* dmodapp_lib::
+* freegb_lib::
+* involut_lib::
+* gkdim_lib::
+* ncalg_lib::
+* ncdecomp_lib::
+* nchomolog_lib::
+* nctools_lib::
+* perron_lib::
+* qmatrix_lib::
+@end menu
+
+@c as @c lib generates parts of sections, but we need subsections:
+@lowersections
+
+@c ----------------------------------------------------------
+@node bfun_lib, central_lib, , Non-commutative libraries
+@section bfun_lib
+@cindex bfun_lib
+@cindex bfun.lib
+
+@c lib bfun.lib
+
+@c ----------------------------------------------------------
+@node central_lib, discretize_lib, bfun_lib, Non-commutative libraries
+@section central_lib
+@cindex central_lib
+@cindex central.lib
+
+@c lib central.lib
+
+@c ----------------------------------------------------------
+@node discretize_lib, dmod_lib, central_lib, Non-commutative libraries
+@section discretize_lib
+@cindex discretize_lib
+@cindex discretize.lib
+
+@c lib discretize.lib
+
+@c ----------------------------------------------------------
+@node dmod_lib, dmodapp_lib, discretize_lib, Non-commutative libraries
+@section dmod_lib
+@cindex dmod_lib
+@cindex dmod.lib
+
+@c lib dmod.lib
+
+@c ----------------------------------------------------------
+@node dmodapp_lib, freegb_lib, dmod_lib, Non-commutative libraries
+@section dmodapp_lib
+@cindex dmodapp_lib
+@cindex dmodapp.lib
+
+@c lib dmodapp.lib
+
+@c ----------------------------------------------------------
+@node freegb_lib, involut_lib, dmodapp_lib, Non-commutative libraries
+@section freegb_lib
+@cindex freegb_lib
+@cindex freegb.lib
+
+@c lib freegb.lib
+
+@c ----------------------------------------------------------
+@node involut_lib,  gkdim_lib, freegb_lib, Non-commutative libraries
+@section involut_lib
+@cindex involut_lib
+@cindex involut.lib
+
+@c lib involut.lib
+
+@c ----------------------------------------------------------
+@node gkdim_lib, ncalg_lib, involut_lib, Non-commutative libraries
+@section gkdim_lib
+@cindex gkdim_lib
+@cindex gkdim.lib
+
+@c lib gkdim.lib
+
+@c ----------------------------------------------------------
+@node ncalg_lib, ncdecomp_lib, gkdim_lib, Non-commutative libraries
+@section ncalg_lib
+@cindex ncalg_lib
+@cindex ncalg.lib
+
+@c lib ncalg.lib
+
+@c ----------------------------------------------------------
+@node ncdecomp_lib, nchomolog_lib, ncalg_lib, Non-commutative libraries
+@section ncdecomp_lib
+@cindex ncdecomp_lib
+@cindex ncdecomp.lib
+
+@c lib ncdecomp.lib
+
+@c ----------------------------------------------------------
+@node nchomolog_lib, nctools_lib, ncdecomp_lib, Non-commutative libraries
+@section nchomolog_lib
+@cindex nchomolog_lib
+@cindex nchomolog.lib
+
+@c lib nchomolog.lib
+
+@c ----------------------------------------------------------
+@node nctools_lib, perron_lib, nchomolog_lib, Non-commutative libraries
+@section nctools_lib
+@cindex nctools_lib
+@cindex nctools.lib
+
+@c lib nctools.lib
+
+@c ----------------------------------------------------------
+@node perron_lib, qmatrix_lib, nctools_lib, Non-commutative libraries
+@section perron_lib
+@cindex perron_lib
+@cindex perron.lib
+
+@c lib perron.lib
+
+@c ---------------------------------------------------------
+@node qmatrix_lib,  , perron_lib, Non-commutative libraries
+@section qmatrix_lib
+@cindex qmatrix_lib
+@cindex qmatrix.lib
+
+@c lib qmatrix.lib
+
+@c ----------------------------------------------------------
+@raisesections
+
