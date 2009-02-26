@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.30 2009-02-24 17:40:28 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.31 2009-02-26 12:17:38 levandov Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -167,6 +167,7 @@ int redGrFirst (LObject* h,kStrategy strat)
 }
 void ratGB_divide_out(poly p)
 {
+  /* extracts monomial content from localized expression  */
   if (p==NULL) return;
   poly root=p;
   assume(rIsRatGRing(currRing));
@@ -229,7 +230,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
   if (!TEST_OPT_INTSTRATEGY)
   {
     if (rField_is_Zp_a()) pContent(h->p);
-    else pCleardenom(h->p);// also does a pContent
+    else pCleardenom(h->p);// also does a pContentRat
   }
   loop
   {
