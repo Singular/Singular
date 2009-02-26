@@ -6,7 +6,7 @@
  *  Purpose: Ore-noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: ratgring.cc,v 1.21 2009-02-26 13:38:30 Singular Exp $
+ *  Version: $Id: ratgring.cc,v 1.22 2009-02-26 14:24:23 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "ratgring.h"
@@ -684,7 +684,7 @@ int redRat (poly* h, poly *reducer, int *red_length, int rl, int ishift, ring r)
   }
 }
 
-void pContentRat(poly ph)
+void pContentRat(poly &ph)
 // changes ph
 // for rat coefficients in K(x1,..xN)
 {
