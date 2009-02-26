@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.35 2009-02-26 14:23:07 Singular Exp $ */
+/* $Id: polys1.cc,v 1.36 2009-02-26 14:30:23 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -954,7 +954,7 @@ poly pCleardenom(poly ph)
     return start;
   }
 #endif
-  if (rField_is_Zp() && TEST_OPT_INTSTRATEGY) return;
+  if (rField_is_Zp() && TEST_OPT_INTSTRATEGY) return start;
   p = ph;
   if(pNext(p)==NULL)
   {

@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.13 2009-02-26 14:22:38 Singular Exp $
+ *  Version: $Id: kInline.cc,v 1.14 2009-02-26 14:30:23 Singular Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -411,7 +411,7 @@ KINLINE long sTObject::SetDegStuffReturnLDeg()
   return d;
 }
 
-extern void pCleardenom(poly p);
+//extern void pCleardenom(poly p);
 extern void pNorm(poly p);
 // manipulations
 KINLINE void  sTObject::pCleardenom()
