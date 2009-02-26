@@ -6,7 +6,7 @@
  *  Purpose: Ore-noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: ratgring.cc,v 1.18 2009-02-26 11:14:16 levandov Exp $
+ *  Version: $Id: ratgring.cc,v 1.19 2009-02-26 11:24:15 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "ratgring.h"
@@ -700,8 +700,6 @@ void pContentRat(poly ph)
   int k = 0;
   poly p = pCopy(ph); // ph will be needed below
   int HasConstantCoef = 0;
-  int mintdeg = pTotaldegree(p);
-  int minlen = len;
   int is = currRing->real_var_start - 1;
   while (p!=NULL)
   {
@@ -723,7 +721,16 @@ void pContentRat(poly ph)
 
   // look for 1 element of minimal degree and of minimal length
   k--;
+  if (k<=0) // this poly is not a ratgring poly -> pContent
+  {
+    pDelete(&C[0]);
+    pDelete(&LM[0]);
+    pContent(ph);
+    goto cleanup;
+  }
+  int mintdeg = pTotaldegree(p);
   int dd = 0; int i;
+  int minlen = len;
   int mindeglen = len;
   int pmindeglen;
   for(i=0; i<=k; i++)
