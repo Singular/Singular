@@ -6,7 +6,7 @@
  *  Purpose: Ore-noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: ratgring.cc,v 1.17 2009-02-25 17:01:00 Singular Exp $
+ *  Version: $Id: ratgring.cc,v 1.18 2009-02-26 11:14:16 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "ratgring.h"
@@ -99,7 +99,6 @@ poly p_HeadRat(poly p, int ishift, ring r)
   return res;
 }
 
-/* TO TEST!!! */
 /* returns x-coeff of p, i.e. a poly in x, s.t. corresponding xd-monomials 
 have the same D-part 
 does not destroy p
@@ -109,7 +108,7 @@ poly p_GetCoeffRat(poly p, int ishift, ring r)
 {
   poly q   = pNext(p);
   poly res; // = p_Head(p,r);
-  res = p_GetExp_k_n(p, ishift+1, r->N, r);
+  res = p_GetExp_k_n(p, ishift+1, r->N, r); // does pSetm internally
   p_SetCoeff(res,n_Copy(p_GetCoeff(p,r),r),r);
   poly s;
   while ((q!= NULL) && (p_Comp_k_n(p, q, ishift+1, r)))
@@ -128,8 +127,7 @@ void p_LmDeleteAndNextRat(poly *p, int ishift, ring r)
   //  Print("start: "); Print(" "); p_wrp(*p,r);
   p_LmCheckPolyRing2(*p, r);
   poly q = p_Head(*p,r);
-  // in the next line ishift is correct
-  while ( ( (*p)!=NULL ) && ( p_Comp_k_n(*p, q, ishift, r) ))
+  while ( ( (*p)!=NULL ) && ( p_Comp_k_n(*p, q, ishift+1, r) ))
   {
     p_LmDelete(p,r);
     //    Print("while: ");p_wrp(*p,r);Print(" ");
@@ -463,11 +461,11 @@ poly nc_rat_CreateSpoly(poly pp1, poly pp2, int ishift, const ring r)
   poly CC = ncsyz->m[1]; ncsyz->m[1]= NULL; //p_Copy(ncsyz->m[1],r); // c'
   id_Delete(&ncsyz,r);
 
-  p_LmDeleteAndNextRat(&p1, is+1, r); // t_f
-  p_LmDeleteAndNextRat(&HF, is+1, r); // r_f = h_f - lt_D(h_f)
+  p_LmDeleteAndNextRat(&p1, is, r); // t_f
+  p_LmDeleteAndNextRat(&HF, is, r); // r_f = h_f - lt_D(h_f)
 
-  p_LmDeleteAndNextRat(&p2, is+1, r); // t_g
-  p_LmDeleteAndNextRat(&HG, is+1, r); // r_g = h_g - lt_D(h_g)
+  p_LmDeleteAndNextRat(&p2, is, r); // t_g
+  p_LmDeleteAndNextRat(&HG, is, r); // r_g = h_g - lt_D(h_g)
 
 
 #ifdef PDEBUG
@@ -505,7 +503,7 @@ poly nc_rat_CreateSpoly(poly pp1, poly pp2, int ishift, const ring r)
   p_Test(out,r);
 #endif
 
-  if ( out!=NULL ) pContent(out);
+  //  if ( out!=NULL ) pContent(out); // postponed to enterS
   return(out);
 }
 
@@ -559,7 +557,7 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
 #endif
   // alt:
   poly out = p_Copy(p1,r);
-  p_LmDeleteAndNextRat(&out, is+1, r); // out == t_g
+  p_LmDeleteAndNextRat(&out, is, r); // out == t_g
 
   ideal ncsyz = ncGCD(P,K,r);
   poly KK = ncsyz->m[0]; ncsyz->m[0]=NULL; //p_Copy(ncsyz->m[0],r); // k'
@@ -571,8 +569,8 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
   PrintS("p': "); p_wrp(PP,r); PrintS("\n");  
 #endif
   id_Delete(&ncsyz,r);
-  p_LmDeleteAndNextRat(&p2, is+1, r); // t_f
-  p_LmDeleteAndNextRat(&H, is+1, r); // r_g = h_g - lt_D(h_g)
+  p_LmDeleteAndNextRat(&p2, is, r); // t_f
+  p_LmDeleteAndNextRat(&H, is, r); // r_g = h_g - lt_D(h_g)
 
 #ifdef PDEBUG
   PrintS(" t_f: "); p_wrp(p2,r);
@@ -607,7 +605,7 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
   p_Test(out,r);
 #endif
 
-  if ( out!=NULL ) pContent(out);
+  //  if ( out!=NULL ) pContent(out); // postponed to enterS
   return(out);
 }
 
@@ -686,8 +684,8 @@ int redRat (poly* h, poly *reducer, int *red_length, int rl, int ishift, ring r)
   }
 }
 
-poly pContentRat(poly ph)
-// destroys ph
+void pContentRat(poly ph)
+// changes ph
 // for rat coefficients in K(x1,..xN)
 {
 
@@ -700,14 +698,15 @@ poly pContentRat(poly ph)
   int *D = (int *)omAlloc0((len+1)*sizeof(int));  //degrees of coeffs
   int *L = (int *)omAlloc0((len+1)*sizeof(int));  //lengths of coeffs
   int k = 0;
-  poly p = ph;
+  poly p = pCopy(ph); // ph will be needed below
   int HasConstantCoef = 0;
   int mintdeg = pTotaldegree(p);
   int minlen = len;
+  int is = currRing->real_var_start - 1;
   while (p!=NULL)
   {
-    LM[k] = p_HeadRat(p, currRing->real_var_start, currRing); 
-    C[k] = p_GetCoeffRat(p, currRing->real_var_start, currRing);
+    LM[k] = p_GetExp_k_n(p,1,is,currRing); // need LmRat istead of  p_HeadRat(p, is, currRing); !
+    C[k] = p_GetCoeffRat(p, is, currRing);
     D[k] =  pTotaldegree(C[k]);
     mintdeg = si_min(mintdeg,D[k]);
     L[k] = pLength(C[k]);
@@ -718,7 +717,7 @@ poly pContentRat(poly ph)
       HasConstantCoef = 1;
       // smth like goto cleanup and return(pContent(p));
     }
-    p_LmDeleteAndNextRat(&p, currRing->real_var_start, currRing);
+    p_LmDeleteAndNextRat(&p, is, currRing);
     k++;
   }
 
@@ -733,7 +732,7 @@ poly pContentRat(poly ph)
     {
       if (L[i] < mindeglen)
       {
-	mindeglen=L[i];
+        mindeglen=L[i];
         pmindeglen = i;
       }
     }
@@ -758,7 +757,7 @@ poly pContentRat(poly ph)
         pDelete(&C[k]);
         pDelete(&LM[k]);
       }
-      p=pContent(ph);
+      pContent(ph);
       goto cleanup;
     }
   }
@@ -773,15 +772,16 @@ poly pContentRat(poly ph)
   p=NULL; // just to be sure
   for(i=0; i<=k; i++)
   {
-   p=pAdd(p,pMult(C[i],LM[i]));
+   p = pAdd(p, pMult(C[i],LM[i]) );
    C[i]=NULL; LM[i]=NULL;
   }
+  pDelete(&ph); // do not need it anymore
+  ph = p;
   // aufraeumen, return
 cleanup:
   omFree(C);
   omFree(LM);
   omFree(D);
   omFree(L);
-  return p;
 }
 #endif

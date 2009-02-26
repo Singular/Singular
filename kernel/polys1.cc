@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.32 2008-07-25 14:37:55 Singular Exp $ */
+/* $Id: polys1.cc,v 1.33 2009-02-26 11:14:16 levandov Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -25,6 +25,10 @@
 //#include "ipid.h"
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
+#endif
+
+#ifdef HAVE_RATGRING
+#include "ratgring.h"
 #endif
 
 /*-------- several access procedures to monomials -------------------- */
@@ -1047,7 +1051,15 @@ void pCleardenom(poly ph)
       }
     }
     if (h!=NULL) nDelete(&h);
-    pContent(ph);
+  
+#ifdef HAVE_RATGRING
+    if (rIsRatGRing(currRing))
+    {
+      pContentRat(ph);
+    }
+    else
+#endif
+      pContent(ph);
   }
 }
 

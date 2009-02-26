@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ratgring.h,v 1.9 2009-02-25 16:37:34 levandov Exp $ */
+/* $Id: ratgring.h,v 1.10 2009-02-26 11:14:16 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -11,6 +11,7 @@
 
 #ifdef HAVE_RATGRING
 #include "structs.h"
+#include "gring.h"
 
 /* MACROS */
 
@@ -113,7 +114,6 @@ int redRat (poly* h,poly *reducer, int *red_length,int rl, int ishift, ring r);
 
 // Content stuff
 
-poly pInitContentRat_a(poly ph);
 void pContentRat(poly ph);
 
 #endif /* HAVE_PLURAL */
