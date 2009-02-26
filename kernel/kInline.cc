@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.12 2009-02-21 14:11:06 Singular Exp $
+ *  Version: $Id: kInline.cc,v 1.13 2009-02-26 14:22:38 Singular Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -417,7 +417,11 @@ extern void pNorm(poly p);
 KINLINE void  sTObject::pCleardenom()
 {
   assume(p != NULL);
+  #ifdef HAVE_RATGRING
+  p= ::pCleardenom(p);
+  #else
   ::pCleardenom(p);
+  #endif
   if (t_p != NULL)
     pSetCoeff0(t_p, pGetCoeff(p));
 }

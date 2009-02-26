@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.34 2009-02-26 11:24:15 Singular Exp $ */
+/* $Id: polys1.cc,v 1.35 2009-02-26 14:23:07 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -941,8 +941,9 @@ void p_Content(poly ph, ring r)
 }
 #endif
 
-void pCleardenom(poly ph)
+poly pCleardenom(poly ph)
 {
+  poly start=ph;
   number d, h;
   poly p;
 
@@ -950,7 +951,7 @@ void pCleardenom(poly ph)
   if (rField_is_Ring(currRing))
   {
     pContent(ph);
-    return;
+    return start;
   }
 #endif
   if (rField_is_Zp() && TEST_OPT_INTSTRATEGY) return;
@@ -1057,9 +1058,11 @@ void pCleardenom(poly ph)
     if (rIsRatGRing(currRing))
     {
       pContentRat(ph);
+      start=ph;
     }
 #endif
   }
+  return start;
 }
 
 void pCleardenom_n(poly ph,number &c)

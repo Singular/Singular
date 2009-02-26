@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.20 2008-07-26 16:05:41 Singular Exp $ */
+/* $Id: polys.h,v 1.21 2009-02-26 14:22:49 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -363,7 +363,7 @@ poly p_One(const ring r);
 
 void      pContent(poly p);
 void      pSimpleContent(poly p, int s);
-void      pCleardenom(poly p);
+poly      pCleardenom(poly p);
 void      pCleardenom_n(poly p,number &c);
 void      p_Normalize(poly p,const ring r);
 #define   pNormalize(p) p_Normalize(p,currRing)
