@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.17 2009-02-22 17:43:47 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.18 2009-02-26 15:55:23 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -327,7 +327,7 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
     strat->S[si] = redtailBba(strat->S[si],si-1,strat);
     if (TEST_OPT_INTSTRATEGY)
     {
-      pCleardenom(strat->S[si]);
+      strat->S[si]=pCleardenom(strat->S[si]);
     }
     if (TEST_OPT_PROT)
     {
@@ -370,7 +370,7 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
       if (TEST_OPT_INTSTRATEGY)
       {
         n->P.p = redtailBba(n->P.p,pos-1,n);
-        pCleardenom(n->P.p);
+        n->P.pCleardenom();
       }
       else
       {
@@ -612,7 +612,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
         if (TEST_OPT_INTSTRATEGY)
         {
           strat->P.p = redtailBba(strat->P.p,strat->sl,strat);
-          if (strat->redTailChange) pCleardenom(strat->P.p);
+          if (strat->redTailChange) strat->P.pCleardenom();
         }
         else
         {
@@ -669,7 +669,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
           n->P.p = redtailBba(n->P.p,pos-1,n);
           if (n->redTailChange)
           {
-            pCleardenom(n->P.p);
+            n->P.pCleardenom();
             n->P.pLength=0;
           }
         }

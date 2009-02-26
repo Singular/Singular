@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.70 2009-02-24 17:40:28 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.71 2009-02-26 15:55:46 Singular Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -1551,8 +1551,8 @@ poly gnc_CreateSpolyOld(poly p1, poly p2/*,poly spNoether*/, const ring r)
 #ifdef PDEBUG
   p_Test(M2,r);
 #endif
-  if (M2!=NULL) pCleardenom(M2);
-  if (M2!=NULL) pContent(M2);
+  if (M2!=NULL) M2=pCleardenom(M2);
+  //if (M2!=NULL) pContent(M2); // done by pCleardenom
   return(M2);
 }
 

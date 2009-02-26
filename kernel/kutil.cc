@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.128 2009-02-23 19:22:27 levandov Exp $ */
+/* $Id: kutil.cc,v 1.129 2009-02-26 15:55:02 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -5232,7 +5232,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
             if (TEST_OPT_INTSTRATEGY)
             {
               //pContent(strat->S[i]);
-              pCleardenom(strat->S[i]);// also does a pContent
+              strat->S[i]=pCleardenom(strat->S[i]);// also does a pContent
             }
             else
             {
@@ -5255,7 +5255,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
           h.p = redtailBba(strat->S[i],i-1,strat);
           if (TEST_OPT_INTSTRATEGY)
           {
-            pCleardenom(h.p);// also does a pContent
+            h.pCleardenom();// also does a pContent
           }
         }
         else
@@ -5301,7 +5301,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
             strat->ecartS[i] = h.ecart;
             if (TEST_OPT_INTSTRATEGY)
             {
-              pCleardenom(strat->S[i]);// also does a pContent
+              strat->S[i]=pCleardenom(strat->S[i]);// also does a pContent
             }
             else
             {
@@ -5930,7 +5930,7 @@ void completeReduce (kStrategy strat, BOOLEAN withT)
       else
         strat->S[i] = redtail(strat->S[i], strat->sl, strat);
       if (TEST_OPT_INTSTRATEGY)
-        pCleardenom(strat->S[i]);
+        strat->S[i]=pCleardenom(strat->S[i]);
     }
     if (TEST_OPT_PROT)
       PrintS("-");

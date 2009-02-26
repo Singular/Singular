@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.31 2009-02-26 12:17:38 levandov Exp $ */
+/* $Id: gr_kstd2.cc,v 1.32 2009-02-26 15:57:01 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -102,7 +102,7 @@ int redGrFirst (LObject* h,kStrategy strat)
       if (TEST_OPT_INTSTRATEGY)
       {
         if (rField_is_Zp_a()) pContent(h->p);
-        else pCleardenom(h->p);// also does a pContent
+        else h->pCleardenom();// also does a pContent
       }
       /*computes the ecart*/
       d = pLDeg((*h).p,&((*h).length),currRing);
@@ -230,7 +230,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
   if (!TEST_OPT_INTSTRATEGY)
   {
     if (rField_is_Zp_a()) pContent(h->p);
-    else pCleardenom(h->p);// also does a pContentRat
+    else h->pCleardenom();// also does a pContentRat
   }
   loop
   {
@@ -263,7 +263,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
         if (!TEST_OPT_INTSTRATEGY)
         {
           if (rField_is_Zp_a()) pContent(h->p);
-          else pCleardenom(h->p);// also does a pContent
+          else h->pCleardenom();// also does a pContent
         }
 
 #ifdef KDEBUG
@@ -462,7 +462,7 @@ static int nc_redHomog0 (LObject* h,kStrategy strat)
         if (TEST_OPT_INTSTRATEGY)
         {
           if (rField_is_Zp_a()) pContent(h->p);
-          else pCleardenom(h->p);// also does a pContent
+          else h->pCleardenom();// also does a pContent
         }
         if (strat->syzComp!=0)
         {
@@ -486,7 +486,7 @@ static int nc_redHomog0 (LObject* h,kStrategy strat)
         if (TEST_OPT_INTSTRATEGY)
         {
           if (rField_is_Zp_a()) pContent(h->p);
-          else pCleardenom(h->p);// also does a pContent
+          else h->pCleardenom();// also does a pContent
         }
 /*
 *       (*h).length=pLength0((*h).p);
@@ -606,7 +606,7 @@ static int nc_redLazy (LObject* h,kStrategy strat)
         if (TEST_OPT_INTSTRATEGY)
         {
           if (rField_is_Zp_a()) pContent(h->p);
-          else pCleardenom(h->p);// also does a pContent
+          else h->pCleardenom();// also does a pContent
         }
         enterT((*h),strat);
         return 0;
@@ -723,7 +723,7 @@ static int nc_redHoney (LObject*  h,kStrategy strat)
       if (TEST_OPT_INTSTRATEGY)
       {
         //pContent(h->p);
-        pCleardenom(h->p);// also does a pContent
+        h->pCleardenom();// also does a pContent
       }
       /* compute the ecart */
       if (ei <= (*h).ecart)
@@ -789,7 +789,7 @@ static int nc_redHoney (LObject*  h,kStrategy strat)
         if (TEST_OPT_INTSTRATEGY)
         {
           //pContent(h->p);
-          pCleardenom(h->p);// also does a pContent
+          h->pCleardenom();// also does a pContent
         }
         enterT((*h),strat);
         return 0;
@@ -944,7 +944,7 @@ static int nc_redBest (LObject*  h,kStrategy strat)
         if (TEST_OPT_INTSTRATEGY)
         {
           //pContent(h->p);
-          pCleardenom(h->p);// also does a pContent
+          h->pCleardenom();// also does a pContent
         }
         enterT((*h),strat);
         return 0;
@@ -1057,8 +1057,6 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
    idPrint(Q);
 #endif
 #endif
-
-
 
   assume(pOrdSgn != -1); // no mora!!! it terminates only for global ordering!!! (?)
 
@@ -1176,62 +1174,59 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
         PrintS("red SPoly: "); pWrite(strat->P.p);
       }
 #endif
-
     }
     if (strat->P.p != NULL)
     {
-          /* statistic */
-          if (TEST_OPT_PROT)
+      if (TEST_OPT_PROT)
+      {
+        PrintS("s\n");
+      }
+      /* enter P.p into s and L */
+      {
+        strat->P.sev=0;
+        int pos=posInS(strat,strat->sl,strat->P.p, strat->P.ecart);
+        {
+          if (TEST_OPT_INTSTRATEGY)
           {
-            PrintS("s\n");
-          }
-          /* enter P.p into s and L */
-          {
-            strat->P.sev=0;
-            int pos=posInS(strat,strat->sl,strat->P.p, strat->P.ecart);
+            if ((strat->syzComp==0)||(!strat->homog))
             {
-              if (TEST_OPT_INTSTRATEGY)
-              {
-                if ((strat->syzComp==0)||(!strat->homog))
-                {
-                  strat->P.p = redtailBba(strat->P.p,pos-1,strat);
-                }
-                pCleardenom(strat->P.p);
-              }
-              else
-              {
-                pNorm(strat->P.p);
-                if ((strat->syzComp==0)||(!strat->homog))
-                {
-                  strat->P.p = redtailBba(strat->P.p,pos-1,strat);
-                }
-              }
-              // PLURAL debug
-              /* should be used only internally!!! */
+              #ifdef HAVE_RATGRING
+              if(!rIsRatGRing(currRing))
+              #endif
+                strat->P.p = redtailBba(strat->P.p,pos-1,strat);
+            }
 
-              //pWrite(strat->P.p);
-
-              if (TEST_OPT_DEBUG)
-              {
-                PrintS("new s:"); wrp(strat->P.p);
-                PrintLn();
+            strat->P.p=pCleardenom(strat->P.p);
+          }
+          else
+          {
+            pNorm(strat->P.p);
+            if ((strat->syzComp==0)||(!strat->homog))
+            {
+              strat->P.p = redtailBba(strat->P.p,pos-1,strat);
+            }
+          }
+          if (TEST_OPT_DEBUG)
+          {
+            PrintS("new s:"); wrp(strat->P.p);
+            PrintLn();
 #if MYTEST
-                Print("s: "); pWrite(strat->P.p);
+            Print("s: "); pWrite(strat->P.p);
 #endif
 
-              }
-              // kTest(strat);
-              //
-              enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
-
-              if (strat->sl==-1) pos=0;
-              else pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
-
-              strat->enterS(strat->P,pos,strat,-1);
-            }
-//            if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
           }
-          if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
+          // kTest(strat);
+          //
+          enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
+
+          if (strat->sl==-1) pos=0;
+          else pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
+
+          strat->enterS(strat->P,pos,strat,-1);
+        }
+//      if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
+      }
+      if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
       if (strat->sl>srmax) srmax = strat->sl;
     }
 #ifdef KDEBUG
