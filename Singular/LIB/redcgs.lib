@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: redcgs.lib,v 1.3 2008-10-09 09:31:58 Singular Exp $";
+version="$Id: redcgs.lib,v 1.4 2009-02-26 14:07:04 Singular Exp $";
 category="General purpose";
 info="
-LIBRARY:  redcgs.lib      Reduced Comprehesive Groebner Systems.
+LIBRARY:  redcgs.lib      Reduced Comprehensive Groebner Systems.
 PURPOSE:  Comprehensive Groebner Systems. Canonical Forms.
           The library contains Monte's algorithms to compute disjoint, reduced
           Comprehensive Groebner Systems (CGS). A CGS is a set of pairs of
@@ -72,7 +72,7 @@ PURPOSE:  Comprehensive Groebner Systems. Canonical Forms.
           algorithms rcgs and crcgs are able to detect if the objective has not been
           reached, and if so, to give a Warning. The warning does not invalidate the
           output, but it only recognizes that the theoretical objective is not
-          completely reached by the actual campcting methods and that some segments
+          completely reached by the actual computing methods and that some segments
           that can be packed have not been packed with a single basis.
 
           The routine buildtree is the first algorithm used in all the previous
@@ -129,7 +129,7 @@ pdivi(f,F);          Pseudodivision of a poly f by an ideal F in @R. Returns a
 facvar(ideal J)      Returns all the free-square factors of the elements
                      of ideal J (non repeated). Integer factors are ignored,
                      even 0 is ignored. It can be called from ideal @R, but
-                     the given ideal J must only contain poynomials in the
+                     the given ideal J must only contain polynomials in the
                      parameters.
 redspec(N,W);        Given null and non-null conditions depending only on the
                      parameters it returns a red-specification.
@@ -1913,11 +1913,11 @@ proc genimage(poly f1, ideal N1, ideal W1, poly f2, ideal N2, ideal W2)
 {
   int i; ideal W12;  poly ff1; poly g1=0; ideal GG;
   int tt=1;
-  // detect weather f1 reduces to 0 on segment 2
+  // detect whether f1 reduces to 0 on segment 2
   ff1=pnormalform(f1,N2,W2);
   if (ff1==0)
   {
-    // detect weather N1 is included in N2
+    // detect whether N1 is included in N2
     def RR=basering;
     setring @P;
     def NP1=imap(RR,N1);
@@ -1935,7 +1935,7 @@ proc genimage(poly f1, ideal N1, ideal W1, poly f2, ideal N2, ideal W2)
   else{tt=0;}
   if (tt==1)
   {
-    // detect weather W1 intersect W2 is non-empty
+    // detect whether W1 intersect W2 is non-empty
     for (i=1;i<=size(W1);i++)
     {
       if (memberpos(W1[i],W2)[1])
