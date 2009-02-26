@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5lists.h,v 1.11 2009-02-19 14:52:34 ederc Exp $ */
+/* $Id: f5lists.h,v 1.12 2009-02-26 09:01:52 ederc Exp $ */
 /*
 * ABSTRACT: list interface
 */
@@ -78,6 +78,7 @@ class LNode {
         void    setTerm(poly t);
         void    setIndex(int i);
         void    setGPrevRedCheck(LNode* l);
+        void    setNext(LNode* l);
         // test if for any list element the polynomial part of the data is equal to *p
         bool    polyTest(poly* p);
         LNode*  getNext(LNode* l);

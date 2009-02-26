@@ -105,14 +105,14 @@ LNode* LNode::insertByLabel(poly t, int i, poly p, Rule* r) {
         return newElement;
     }
     else {
-        if(0 == pLmCmp(t,this->getTerm()) || -1 == pLmCmp(t,this->getTerm())) {
+        if(-1 == pLmCmp(t,this->getTerm())) {
             LNode* newElement   =   new LNode(t, i, p, r, this);
             return newElement;
         }
         else {
             LNode* temp = this;
             while(NULL != temp->next && NULL != temp->next->data) {
-                if( 0 == pLmCmp(t,temp->next->getTerm()) || -1 == pLmCmp(t,temp->next->getTerm())) {
+                if(-1 == pLmCmp(t,temp->next->getTerm())) {
                     LNode* newElement   =   new LNode(t, i, p, r, temp->next);
                     temp->next          =   newElement;
                     return this;
@@ -187,6 +187,10 @@ void LNode::setGPrevRedCheck(LNode* l) {
     gPrevRedCheck   =   l;
 }
 
+void LNode::setNext(LNode* l) {
+    next    =   l;
+}
+
 // test if for any list element the polynomial part of the data is equal to *p
 bool LNode::polyTest(poly* p) {
     LNode* temp = new LNode(this);
@@ -212,9 +216,9 @@ void LNode::print() {
         Print("HIER\n");
         Print("Index: %d\n",temp->getIndex());
         Print("Term: ");
-        //pWrite(temp->getTerm());
+        pWrite(temp->getTerm());
         Print("Poly: ");
-        //pWrite(temp->getPoly());
+        pWrite(temp->getPoly());
         Print("\n");
         temp = temp->next;
     }
@@ -311,6 +315,8 @@ int LList::getLength() {
 }
 
 void LList::setFirst(LNode* l) {
+    LNode* temp =   first;
+    temp->setNext(NULL);
     first       =   l;
     length--;
 }

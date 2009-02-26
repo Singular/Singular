@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.28 2009-02-19 14:52:34 ederc Exp $ */
+/* $Id: f5gb.h,v 1.29 2009-02-26 09:01:52 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -18,7 +18,7 @@
 sort polynomials in ideal i by decreasing total degree
 ======================================================
 */
-void qsort_degree(poly* left, poly* right);
+void qsortDegree(poly* left, poly* right);
 
 /*
 ==============================================
@@ -87,7 +87,7 @@ top reduction in F5, i.e. reduction of a given S-polynomial by labeled polynomia
 the same index whereas the labels are taken into account
 =====================================================================================
 */
-void topReduction(LNode* l, LList* sPolyList, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag); 
+void topReduction(LNode* l, LList* sPolyList, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev); 
 
 /*
 =====================================================================
