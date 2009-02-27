@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.34 2009-02-27 16:34:45 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.35 2009-02-27 16:56:51 levandov Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -255,14 +255,16 @@ int redGrRatGB (LObject* h,kStrategy strat)
           wrp(strat->S[c_j]);
         }
 #endif
-        //poly hh = nc_CreateSpoly(strat->S[c_j],(*h).p, currRing);
-        Print("vor nc_rat_ReduceSpolyNew (ce:%d) ",c_e);wrp(h->p);PrintLn();
-	//if(c_e==-1)
-        //  c_p = nc_CreateSpoly(pCopy(strat->S[c_j]),pCopy((*h).p), currRing);
-	//else
-          c_p=nc_rat_ReduceSpolyNew(strat->S[c_j],pCopy((*h).p), currRing->real_var_start-1,currRing);
-        Print("nach nc_rat_ReduceSpolyNew ");wrp(c_p);PrintLn();
-        pDelete(&((*h).p));
+    //poly hh = nc_CreateSpoly(strat->S[c_j],(*h).p, currRing);
+    //        Print("vor nc_rat_ReduceSpolyNew (ce:%d) ",c_e);wrp(h->p);PrintLn();
+    //if(c_e==-1)
+    //  c_p = nc_CreateSpoly(pCopy(strat->S[c_j]),pCopy((*h).p), currRing);
+    //else
+    //          c_p=nc_rat_ReduceSpolyNew(strat->S[c_j],pCopy((*h).p), currRing->real_var_start-1,currRing);
+    //        Print("nach nc_rat_ReduceSpolyNew ");wrp(c_p);PrintLn();
+    //        pDelete(&((*h).p));
+    
+        c_p=nc_rat_ReduceSpolyNew(strat->S[c_j],(*h).p, currRing->real_var_start-1,currRing);
         (*h).p=c_p;
         if (!TEST_OPT_INTSTRATEGY)
         {
