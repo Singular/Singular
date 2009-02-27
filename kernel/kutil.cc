@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.130 2009-02-27 11:05:15 Singular Exp $ */
+/* $Id: kutil.cc,v 1.131 2009-02-27 11:21:24 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1989,11 +1989,11 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
             {
               if(TEST_OPT_DEBUG)
               {
-		 Print("chain-crit-part: S[%d]=",j); 
-		 p_wrp(strat->S[j],currRing);
-		 Print(" divide B[%d].lcm=",i);
-		 p_wrp(strat->B[i].lcm,currRing);
-		 PrintLn();
+                 Print("chain-crit-part: S[%d]=",j); 
+                 p_wrp(strat->S[j],currRing);
+                 Print(" divide B[%d].lcm=",i);
+                 p_wrp(strat->B[i].lcm,currRing);
+                 PrintLn();
               }
               deleteInL(strat->B,&strat->Bl,i,strat);
               strat->c3++;
@@ -2024,11 +2024,11 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
           {
               if(TEST_OPT_DEBUG)
               {
-		 PrintS("chain-crit-part: pCompareChainPart p="); 
-		 p_wrp(p,currRing);
-		 Print(" delete L[%d]",j);
-		 p_wrp(strat->L[j].lcm,currRing);
-		 PrintLn();
+                 PrintS("chain-crit-part: pCompareChainPart p="); 
+                 p_wrp(p,currRing);
+                 Print(" delete L[%d]",j);
+                 p_wrp(strat->L[j].lcm,currRing);
+                 PrintLn();
               }
               deleteInL(strat->L,&strat->Ll,j,strat);
               strat->c3++;
@@ -2055,11 +2055,11 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
             {
               if(TEST_OPT_DEBUG)
               {
-		 Print("chain-crit-part: sugar B[%d].lcm=",j); 
-		 p_wrp(strat->B[j].lcm,currRing);
-		 Print(" delete B[%d]",i);
-		 p_wrp(strat->B[i].lcm,currRing);
-		 PrintLn();
+                 Print("chain-crit-part: sugar B[%d].lcm=",j); 
+                 p_wrp(strat->B[j].lcm,currRing);
+                 Print(" delete B[%d]",i);
+                 p_wrp(strat->B[i].lcm,currRing);
+                 PrintLn();
               }
               deleteInL(strat->B,&strat->Bl,i,strat);
               j--;
@@ -2068,11 +2068,11 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
             {
               if(TEST_OPT_DEBUG)
               {
-		 Print("chain-crit-part: sugar B[%d].lcm=",i); 
-		 p_wrp(strat->B[i].lcm,currRing);
-		 Print(" delete B[%d]",j);
-		 p_wrp(strat->B[j].lcm,currRing);
-		 PrintLn();
+                 Print("chain-crit-part: sugar B[%d].lcm=",i); 
+                 p_wrp(strat->B[i].lcm,currRing);
+                 Print(" delete B[%d]",j);
+                 p_wrp(strat->B[j].lcm,currRing);
+                 PrintLn();
               }
               deleteInL(strat->B,&strat->Bl,j,strat);
               break;
@@ -2098,11 +2098,11 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
           {
               if(TEST_OPT_DEBUG)
               {
-		 PrintS("chain-crit-part: sugar:pCompareChainPart p="); 
-		 p_wrp(p,currRing);
-		 Print(" delete L[%d]",j);
-		 p_wrp(strat->L[j].lcm,currRing);
-		 PrintLn();
+                 PrintS("chain-crit-part: sugar:pCompareChainPart p="); 
+                 p_wrp(p,currRing);
+                 Print(" delete L[%d]",j);
+                 p_wrp(strat->L[j].lcm,currRing);
+                 PrintLn();
               }
             deleteInL(strat->L,&strat->Ll,j,strat);
             strat->c3++;
@@ -2124,9 +2124,9 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
           {
               if(TEST_OPT_DEBUG)
               {
-		 Print("chain-crit-part: equal lcm B[%d].lcm=",j); 
-		 p_wrp(strat->B[j].lcm,currRing);
-		 Print(" delete B[%d]\n",i);
+                 Print("chain-crit-part: equal lcm B[%d].lcm=",j); 
+                 p_wrp(strat->B[j].lcm,currRing);
+                 Print(" delete B[%d]\n",i);
               }
             strat->c3++;
             deleteInL(strat->B,&strat->Bl,i,strat);
@@ -2151,11 +2151,11 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
         {
               if(TEST_OPT_DEBUG)
               {
-		 PrintS("chain-crit-part: pCompareChainPart p="); 
-		 p_wrp(p,currRing);
-		 Print(" delete L[%d]",j);
-		 p_wrp(strat->L[j].lcm,currRing);
-		 PrintLn();
+                 PrintS("chain-crit-part: pCompareChainPart p="); 
+                 p_wrp(p,currRing);
+                 Print(" delete L[%d]",j);
+                 p_wrp(strat->L[j].lcm,currRing);
+                 PrintLn();
               }
           deleteInL(strat->L,&strat->Ll,j,strat);
           strat->c3++;
@@ -2215,11 +2215,11 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
               */
               if(TEST_OPT_DEBUG)
               {
-		 PrintS("chain-crit-part: divisible_by p="); 
-		 p_wrp(p,currRing);
-		 Print(" delete L[%d]",l);
-		 p_wrp(strat->L[l].lcm,currRing);
-		 PrintLn();
+                 PrintS("chain-crit-part: divisible_by p="); 
+                 p_wrp(p,currRing);
+                 Print(" delete L[%d]",l);
+                 p_wrp(strat->L[l].lcm,currRing);
+                 PrintLn();
               }
               deleteInL(strat->L,&strat->Ll,l,strat);
               i--;
@@ -2228,11 +2228,11 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
             {
               if(TEST_OPT_DEBUG)
               {
-		 PrintS("chain-crit-part: divisible_by(2) p="); 
-		 p_wrp(p,currRing);
-		 Print(" delete L[%d]",i);
-		 p_wrp(strat->L[i].lcm,currRing);
-		 PrintLn();
+                 PrintS("chain-crit-part: divisible_by(2) p="); 
+                 p_wrp(p,currRing);
+                 Print(" delete L[%d]",i);
+                 p_wrp(strat->L[i].lcm,currRing);
+                 PrintLn();
               }
               deleteInL(strat->L,&strat->Ll,i,strat);
             }
@@ -5850,6 +5850,7 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
   {
     int q;
     poly p;
+    BOOLEAN reduction_found=FALSE;
     for (l=IDELEMS(r)-1;l>=0;l--)
     {
       if (r->m[l]!=NULL)
@@ -5864,12 +5865,31 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
               p=r->m[l];
               r->m[l]=kNF(Q,NULL,p);
               pDelete(&p);
+              reduction_found=TRUE;
             }
             else
             {
               pDelete(&r->m[l]); // and set it to NULL
             }
             break;
+          }
+        }
+      }
+    }
+    if (/*TEST_OPT_REDSB &&*/ reduction_found)
+    {
+      for (l=IDELEMS(r)-1;l>=0;l--)
+      {
+        if (r->m[l]!=NULL)
+        {
+          for(q=IDELEMS(r)-1;q>=0;q--)
+          {
+            if ((l!=q)
+            && (r->m[q]!=NULL)
+            &&(pLmDivisibleBy(r->m[l],r->m[q])))
+            {
+              pDelete(&r->m[q]);
+            }
           }
         }
       }
