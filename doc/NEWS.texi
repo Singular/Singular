@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.123 2009-02-20 12:16:14 Singular Exp $
+@comment $Id: NEWS.texi,v 1.124 2009-02-27 10:08:55 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -78,6 +78,9 @@ new library: tropical.lib (see @nref{tropical_lib}: Computations in Tropical Geo
 @item
 new library: polymake.lib (see @nref{polymake_lib}:
 Computations with polytopes and fans, interface to polymake and TOPCOM)
+@item
+new library: sing4ti2.lib (see @nref{sing4ti2_lib}:
+interface to 4ti2
 @item
 new library: decodegb.lib (see @nref{decodegb_lib}: Generating and solving systems of polynomial equations for decoding and finding the minimum distance of linear codes)
 @item
