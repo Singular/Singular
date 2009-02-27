@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.496 2009-02-13 11:40:12 Singular Exp $ */
+/* $Id: iparith.cc,v 1.497 2009-02-27 13:59:54 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1846,9 +1846,16 @@ static BOOLEAN jjDEG_M_IV(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjDEG_IV(leftv res, leftv u, leftv v)
 {
-  short *iv=iv2array((intvec *)v->Data());
-  res->data = (char *)pDegW((poly)u->Data(),iv);
-  omFreeSize((ADDRESS)iv,(pVariables+1)*sizeof(short));
+  poly p=(poly)u->Data();
+  if (p!=NULL)
+  {
+    short *iv=iv2array((intvec *)v->Data());
+    int d=(int)pDegW(p,iv);
+    omFreeSize((ADDRESS)iv,(pVariables+1)*sizeof(short));
+    res->data = (char *)(long(d));
+  }
+  else
+    res->data=(char *)(long)(-1);
   return FALSE;
 }
 static BOOLEAN jjDIFF_P(leftv res, leftv u, leftv v)
