@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.44 2009-02-22 17:37:54 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.45 2009-02-27 15:51:28 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1367,6 +1367,11 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
 poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
 {
+// lazy_reduce flags: can be combined by |
+//#define KSTD_NF_LAZY   1
+  // do only a reduction of the leading term
+//#define KSTD_NF_ECART  2
+  // only local: recude even with bad ecart
   poly   p;
   int   i;
   int   j;
@@ -1485,6 +1490,11 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
 
 ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
 {
+// lazy_reduce flags: can be combined by |
+//#define KSTD_NF_LAZY   1
+  // do only a reduction of the leading term
+//#define KSTD_NF_ECART  2
+  // only local: recude even with bad ecart
   poly   p;
   int   i;
   int   j;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.80 2009-02-10 18:53:04 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.81 2009-02-27 15:51:28 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1142,7 +1142,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #ifdef KDEBUG
   if (TEST_OPT_DEBUG) messageSets(strat);
 #endif
-  /* complete reduction of the standard basis--------- */
   if (TEST_OPT_SB_1)
   {
     int k=1;
@@ -1160,6 +1159,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     }
   }
 
+  /* complete reduction of the standard basis--------- */
   if (TEST_OPT_REDSB)
   {
     completeReduce(strat);
@@ -1196,6 +1196,11 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
 poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
 {
+// lazy_reduce flags: can be combined by |
+//#define KSTD_NF_LAZY   1
+  // do only a reduction of the leading term
+//#define KSTD_NF_NONORM 4
+  // only global: avoid normalization, return a multiply of NF
   poly   p;
   int   i;
 
@@ -1251,6 +1256,11 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
 
 ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
 {
+// lazy_reduce flags: can be combined by |
+//#define KSTD_NF_LAZY   1
+  // do only a reduction of the leading term
+//#define KSTD_NF_NONORM 4
+  // only global: avoid normalization, return a multiply of NF
   poly   p;
   int   i;
   ideal res;
