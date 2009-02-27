@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.36 2009-02-26 14:30:23 Singular Exp $ */
+/* $Id: polys1.cc,v 1.37 2009-02-27 19:30:47 levandov Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -1057,6 +1057,7 @@ poly pCleardenom(poly ph)
 #ifdef HAVE_RATGRING
     if (rIsRatGRing(currRing))
     {
+      /* quick unit detection in the rational case is done in gr_nc_bba */
       pContentRat(ph);
       start=ph;
     }

@@ -6,7 +6,7 @@
  *  Purpose: Ore-noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: ratgring.cc,v 1.22 2009-02-26 14:24:23 Singular Exp $
+ *  Version: $Id: ratgring.cc,v 1.23 2009-02-27 19:30:47 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "ratgring.h"
@@ -415,6 +415,14 @@ poly nc_rat_CreateSpoly(poly pp1, poly pp2, int ishift, const ring r)
     return(NULL);
   }
 
+  if ( (p_LmIsConstantRat(p1,r)) || (p_LmIsConstantRat(p2,r)) )
+  {
+    p_Delete(&p1,r);
+    p_Delete(&p2,r);
+    return( NULL );
+  }
+
+
 /* note: prod. crit does not apply! */
   poly pL=pOne();
   poly m1=pOne();
@@ -527,6 +535,12 @@ poly nc_rat_ReduceSpolyNew(const poly p1, poly p2, int ishift, const ring r)
 #endif
     return(NULL);
   }
+
+  if (p_LmIsConstantRat(p1,r))
+  {
+    return( NULL );
+  }
+
 
   int is = ishift; /* TODO */
 
@@ -793,4 +807,27 @@ cleanup:
   omFree(D);
   omFree(L);
 }
+
+// test if monomial is a constant, i.e. if all exponents and the component
+// is zero
+BOOLEAN p_LmIsConstantRat(const poly p, const ring r)
+{
+  if (p_LmIsConstantCompRat(p, r))
+    return (p_GetComp(p, r) == 0);
+  return FALSE;
+}
+
+// test if the monomial is a constant as a vector component
+// i.e., test if all exponents are zero
+BOOLEAN p_LmIsConstantCompRat(const poly p, const ring r)
+{
+  int i = r->real_var_end;
+
+  while ( (p_GetExp(p,i,r)==0) && (i>=r->real_var_start))
+  {
+    i--;
+  }
+  return ( i+1 == r->real_var_start );
+}
+
 #endif

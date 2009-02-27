@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.35 2009-02-27 16:56:51 levandov Exp $ */
+/* $Id: gr_kstd2.cc,v 1.36 2009-02-27 19:30:47 levandov Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -1189,6 +1189,21 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
       }
       /* enter P.p into s and L */
       {
+/* quick unit detection in the rational case */
+#ifdef HAVE_RATGRING
+        if( rIsRatGRing(currRing) )
+        {
+          if ( p_LmIsConstantRat(strat->P.p, currRing) )
+          {
+#ifdef PDEBUG
+             Print("unit element detected:"); 
+             p_wrp(strat->P.p,currRing);
+#endif
+            p_Delete(&strat->P.p,currRing, strat->tailRing);
+            strat->P.p = pOne();
+          }
+      }
+#endif
         strat->P.sev=0;
         int pos=posInS(strat,strat->sl,strat->P.p, strat->P.ecart);
         {

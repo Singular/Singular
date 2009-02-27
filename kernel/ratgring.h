@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ratgring.h,v 1.11 2009-02-26 14:24:32 Singular Exp $ */
+/* $Id: ratgring.h,v 1.12 2009-02-27 19:30:47 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -115,6 +115,10 @@ int redRat (poly* h,poly *reducer, int *red_length,int rl, int ishift, ring r);
 // Content stuff
 
 void pContentRat(poly &ph);
+
+BOOLEAN p_LmIsConstantRat(const poly p, const ring r);
+
+BOOLEAN p_LmIsConstantCompRat(const poly p, const ring r);
 
 #endif /* HAVE_PLURAL */
 #endif
