@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.129 2009-02-26 15:55:02 Singular Exp $ */
+/* $Id: kutil.cc,v 1.130 2009-02-27 11:05:15 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -4723,17 +4723,18 @@ void initS (ideal F, ideal Q, kStrategy strat)
         cancelunit(&h);  /*- tries to cancel a unit -*/
         deleteHC(&h, strat);
       }
-      if (TEST_OPT_INTSTRATEGY)
-      {
-        //pContent(h.p);
-        h.pCleardenom(); // also does a pContent
-      }
-      else
-      {
-        h.pNorm();
-      }
       if (h.p!=NULL)
+      // do not rely on the input being a SB!
       {
+        if (TEST_OPT_INTSTRATEGY)
+        {
+          //pContent(h.p);
+          h.pCleardenom(); // also does a pContent
+        }
+        else
+        {
+          h.pNorm();
+        }
         strat->initEcart(&h);
         if (strat->sl==-1)
           pos =0;
