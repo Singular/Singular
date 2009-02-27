@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.33 2009-02-26 16:34:46 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.34 2009-02-27 16:34:45 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -168,6 +168,8 @@ int redGrFirst (LObject* h,kStrategy strat)
 void ratGB_divide_out(poly p)
 {
   /* extracts monomial content from localized expression  */
+  /* searches for an m (monomial in var 1.. real_var_start-1)
+   * such that m divides p and divides p by this m if it exist*/
   if (p==NULL) return;
   poly root=p;
   assume(rIsRatGRing(currRing));
