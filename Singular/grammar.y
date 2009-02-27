@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.128 2008-11-12 12:51:53 Singular Exp $ */
+/* $Id: grammar.y,v 1.129 2009-02-27 17:25:22 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -135,10 +135,10 @@ void yyerror(const char * fmt)
     { /* omit output of line number if tclmode and stdin */
       const char *n=VoiceName();
       if (strcmp(n,"STDIN")==0)
-        Werror( "error occurred in %s: `%s`"
+        Werror( "error occurred in or before %s: `%s`"
                ,n, my_yylinebuf);
       else
-        Werror( "error occurred in %s line %d: `%s`"
+        Werror( "error occurred in or before %s line %d: `%s`"
                ,n, yylineno, my_yylinebuf);
     }
     else
@@ -148,7 +148,7 @@ void yyerror(const char * fmt)
       && (strncmp(fmt,"parse",5)!=0)
       && (strncmp(fmt,"syntax",6)!=0))
         WerrorS(fmt);
-      Werror( "error occurred in %s line %d: `%s`"
+      Werror( "error occurred in or before %s line %d: `%s`"
              ,VoiceName(), yylineno, my_yylinebuf);
     }
     if (cmdtok!=0)
