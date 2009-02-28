@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.81 2009-02-27 15:51:28 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.82 2009-02-28 11:49:05 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -787,7 +787,7 @@ int redHoney (LObject* h, kStrategy strat)
 *  reduction procedure for the normal form
 */
 
-poly redNF (poly h,int &max_ind,kStrategy strat)
+poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
 {
   if (h==NULL) return NULL;
   int j;
@@ -814,28 +814,14 @@ poly redNF (poly h,int &max_ind,kStrategy strat)
       if (!is_ring)
       {
 #endif
-      int sl=pSize(strat->S[j]);
-      int jj=j;
-      loop
-      {
-        int sll;
-        jj=kFindNextDivisibleByInS(strat,jj+1,max_ind,&P);
-        if (jj<0) break;
-        sll=pSize(strat->S[jj]);
-        if (sll<sl)
+        int sl=pSize(strat->S[j]);
+        int jj=j;
+        loop
         {
-          if (!nIsOne(pGetCoeff(strat->S[j])))
-          {
-            pNorm(strat->S[j]);
-            //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
-            sl=pSize(strat->S[j]);
-          }
-          if (!nIsOne(pGetCoeff(strat->S[jj])))
-          {
-            pNorm(strat->S[jj]);
-            //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
-            sll=pSize(strat->S[jj]);
-          }
+          int sll;
+          jj=kFindNextDivisibleByInS(strat,jj+1,max_ind,&P);
+          if (jj<0) break;
+          sll=pSize(strat->S[jj]);
           if (sll<sl)
           {
             #ifdef KDEBUG
@@ -846,12 +832,11 @@ poly redNF (poly h,int &max_ind,kStrategy strat)
             sl=sll;
           }
         }
-      }
-      if (!nIsOne(pGetCoeff(strat->S[j])))
-      {
-        pNorm(strat->S[j]);
-        //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
-      }
+        if (!nonorm && !nIsOne(pGetCoeff(strat->S[j])))
+        {
+          pNorm(strat->S[j]);
+          //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
+        }
 #ifdef HAVE_RINGS
       }
 #endif
@@ -1229,7 +1214,7 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   kTest(strat);
   if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
   int max_ind;
-  p = redNF(pCopy(q),max_ind,strat);
+  p = redNF(pCopy(q),max_ind,lazyReduce & KSTD_NF_NONORM,strat);
   if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
   {
     BITSET save=test;
@@ -1291,7 +1276,7 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
     if (q->m[i]!=NULL)
     {
       if (TEST_OPT_PROT) { PrintS("r");mflush(); }
-      p = redNF(pCopy(q->m[i]),max_ind,strat);
+      p = redNF(pCopy(q->m[i]),max_ind,lazyReduce & KSTD_NF_NONORM,strat);
       if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
       {
         BITSET save=test;

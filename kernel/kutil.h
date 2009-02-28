@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.41 2009-02-22 17:37:55 Singular Exp $ */
+/* $Id: kutil.h,v 1.42 2009-02-28 11:49:04 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -405,7 +405,7 @@ poly redtailBba (LObject *L, int pos,kStrategy strat,
 poly redtailBba (TObject *T, int pos,kStrategy strat);
 poly redtail (poly p,int pos,kStrategy strat);
 poly redtail (LObject *L,int pos,kStrategy strat);
-poly redNF (poly h,int & max_ind,kStrategy strat);
+poly redNF (poly h,int & max_ind,int nonorm,kStrategy strat);
 int redNF0 (LObject *P,kStrategy strat);
 poly redNFTail (poly h,const int sl,kStrategy strat);
 int redHoney (LObject* h, kStrategy strat);
