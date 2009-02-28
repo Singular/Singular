@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.29 2009-02-26 09:01:52 ederc Exp $ */
+/* $Id: f5gb.h,v 1.30 2009-02-28 21:14:06 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -44,6 +44,18 @@ build critical pairs with all other elements in gPrev
 ================================================================
 */
 void criticalPair(LList* gPrev, CList* critPairs, LTagList* lTag, RTagList* rTag, RList* rules);
+
+/*
+================================================================
+computes a list of critical pairs for the next reduction process
+first element in gPrev is always the newest element which must
+build critical pairs with all other elements in gPrev
+this is a special version for reduction() in which the first 
+generator of the critical pair is not tested by criterion2()
+as there are no rules added until then to test for
+================================================================
+*/
+void criticalPairRed(LList* gPrev, CList* critPairs, LTagList* lTag, RTagList* rTag, RList* rules);
 
 /*
 ========================================
