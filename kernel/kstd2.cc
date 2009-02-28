@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.82 2009-02-28 11:49:05 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.83 2009-02-28 14:32:26 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -832,7 +832,7 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
             sl=sll;
           }
         }
-        if (!nonorm && !nIsOne(pGetCoeff(strat->S[j])))
+        if ((nonorm==0) && (!nIsOne(pGetCoeff(strat->S[j]))))
         {
           pNorm(strat->S[j]);
           //if (TEST_OPT_PROT) { PrintS("n"); mflush(); }
