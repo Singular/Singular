@@ -3,7 +3,7 @@
  *  Purpose: implementation of Error handling routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omError.c,v 1.9 2001-04-30 09:02:05 Singular Exp $
+ *  Version: $Id: omError.c,v 1.10 2009-02-28 13:39:05 Singular Exp $
  *******************************************************************/
 
 #include <stdarg.h>
@@ -94,6 +94,8 @@ omError_t omReportError(omError_t error, omError_t report_error, OM_FLR_DECL,
 
   if (om_Opts.HowToReportErrors && om_ErrorStatus != omError_NoError)
   {
+    /* to avoid spurious error msg in 64 bit mode*/
+    if (om_ErrorStatus != omError_StickyBin)
     fprintf(stderr, "***%s: %s", omError2Serror(om_ErrorStatus), omError2String(om_ErrorStatus));
 
 #ifdef OM_INTERNAL_DEBUG
