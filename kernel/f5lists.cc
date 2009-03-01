@@ -28,47 +28,49 @@ functions working on the class LNode
 LNode::LNode() {
     data                =   NULL;
     next                =   NULL;
-    gPrevRedCheck       =   NULL;
 }
  LNode::LNode(LPoly* lp) {
     data                =   lp;
     next                =   NULL;
-    gPrevRedCheck       =   NULL;
 }
        
 LNode::LNode(LPoly* lp, LNode* l) {
 //Print("HIER LNODE\n");
     data                =   lp;
     next                =   l;
-    gPrevRedCheck       =   NULL;
 }
 
-LNode::LNode(poly t, int i, poly p, Rule* r, LNode* gPCheck) {
+LNode::LNode(poly t, int i, poly p, Rule* r) {
 LPoly* lp           =   new LPoly(t,i,p,r);
 data                =   lp;
 next                =   NULL;
-gPrevRedCheck       =   gPCheck;
 }
        
-LNode::LNode(poly t, int i, poly p, Rule* r, LNode* gPCheck, LNode* l) {
+LNode::LNode(poly t, int i, poly p, Rule* r, LNode* l) {
     LPoly* lp           =   new LPoly(t,i,p,r);
     data                =   lp;
     next                =   l;
-    gPrevRedCheck       =   gPCheck;
 }
 
  LNode::LNode(LNode* ln) {
     data                =   ln->getLPoly();
     next                =   ln->getNext();
-    gPrevRedCheck       =   NULL;
 }
         
 LNode::~LNode() {
     //delete next;
-    delete gPrevRedCheck;
     delete data;   
 }
-       
+
+void LNode::deleteAll() {
+    while(NULL != next) {
+        Print("%p\n",next);
+        pWrite(next->data->getPoly());
+        next->deleteAll();
+    }
+    delete data;
+}
+
 // insert new elements to the list always at the end (labeled / classical polynomial view)
 // needed for list gPrev
 LNode* LNode::insert(LPoly* lp) {
@@ -81,7 +83,7 @@ LNode* newElement   =   new LNode(lp, NULL);
 }
         
 LNode* LNode::insert(poly t, int i, poly p, Rule* r) {
-    LNode* newElement   =   new LNode(t, i, p, r, NULL, NULL);
+    LNode* newElement   =   new LNode(t, i, p, r, NULL);
     this->next          =   newElement;
     return newElement;
 }
@@ -96,7 +98,7 @@ LNode* LNode::insertSP(LPoly* lp) {
 }
         
 LNode* LNode::insertSP(poly t, int i, poly p, Rule* r) {
-    LNode* newElement   =   new LNode(t, i, p, r, NULL, this);
+    LNode* newElement   =   new LNode(t, i, p, r, this);
      //Print("INSERTED IN SPOLYLIST: ");
   //pWrite(t);
 return newElement;
@@ -108,7 +110,7 @@ LNode* LNode::insertByLabel(poly t, int i, poly p, Rule* r) {
     //Print("new element: ");
     //pWrite(t);
        if(NULL == this || NULL == data) {
-        LNode* newElement   =   new LNode(t, i, p, r, NULL, this);
+        LNode* newElement   =   new LNode(t, i, p, r, this);
         return newElement;
     }
     else {
@@ -116,7 +118,7 @@ LNode* LNode::insertByLabel(poly t, int i, poly p, Rule* r) {
     //pWrite(this->getTerm());
         if(-1 == pLmCmp(t,this->getTerm())) {
             //Print("HIERDRIN\n");
-            LNode* newElement   =   new LNode(t, i, p, r, NULL, this);
+            LNode* newElement   =   new LNode(t, i, p, r, this);
             //Print("%p\n",this);
             //Print("%p\n",newElement->next);
             return newElement;
@@ -127,7 +129,7 @@ LNode* LNode::insertByLabel(poly t, int i, poly p, Rule* r) {
                 //Print("tested element: ");
                 //pWrite(temp->getTerm());
  if(-1 == pLmCmp(t,temp->next->getTerm())) {
-                    LNode* newElement   =   new LNode(t, i, p, r, NULL, temp->next);
+                    LNode* newElement   =   new LNode(t, i, p, r, temp->next);
                     temp->next          =   newElement;
                     return this;
                 }
@@ -140,7 +142,7 @@ LNode* LNode::insertByLabel(poly t, int i, poly p, Rule* r) {
                 }
             }
         //Print("HIER\n");
-            LNode* newElement   =   new LNode(t, i, p, r, NULL, temp->next);
+            LNode* newElement   =   new LNode(t, i, p, r, temp->next);
             temp->next          =   newElement;
             return this;
         }
@@ -180,10 +182,6 @@ Rule* LNode::getRule() {
     return data->getRule();
 }
 
-LNode* LNode::getGPrevRedCheck() {
-    return gPrevRedCheck;
-}
-
 // set the data from the LPoly saved in LNode
 void LNode::setPoly(poly p) {
     data->setPoly(p);
@@ -195,10 +193,6 @@ void LNode::setTerm(poly t) {
 
 void LNode::setIndex(int i) {
     data->setIndex(i);
-}
-
-void LNode::setGPrevRedCheck(LNode* l) {
-    gPrevRedCheck   =   l;
 }
 
 void LNode::setNext(LNode* l) {
@@ -264,7 +258,12 @@ LList::LList(poly t,int i,poly p,Rule* r) {
 } 
 
 LList::~LList() {
-    delete first;
+    LNode* temp;
+    while(first) {
+        temp    =   first;
+        first   =   first->getNext();
+        delete  temp;
+    }
 }
 
 // insertion at the end of the list, needed for gPrev
@@ -786,6 +785,10 @@ RList::RList(Rule* r) {
     first = new RNode(r);
 }
 
+RList::~RList() {
+    delete first;
+}
+
 void RList::insert(int i, poly t) {
     first = first->insert(i,t);
 }
@@ -823,7 +826,7 @@ RTagNode::RTagNode(RNode* r, RTagNode* n) {
     next = n;
 }
 
- RTagNode::~RTagNode() {
+RTagNode::~RTagNode() {
     delete next;
     delete data;   
 }
@@ -893,6 +896,10 @@ RTagList::RTagList() {
 RTagList::RTagList(RNode* r) {
     RTagNode* first =   new RTagNode(r);
     length          =   1;
+}
+
+RTagList::~RTagList() {
+    delete first;
 }
 
 // declaration with first as parameter in LTagNode due to sorting of LTagList

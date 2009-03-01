@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5lists.h,v 1.12 2009-02-26 09:01:52 ederc Exp $ */
+/* $Id: f5lists.h,v 1.13 2009-03-01 20:31:55 ederc Exp $ */
 /*
 * ABSTRACT: list interface
 */
@@ -38,16 +38,16 @@ class LNode {
     private:
         LPoly*  data;
         LNode*  next;
-        LNode*  gPrevRedCheck;
     public:
         // generating new list elements from the labeled / classical polynomial view
                 LNode();
                 LNode(LPoly* lp);
                 LNode(LPoly* lp, LNode* l);
-                LNode(poly t, int i, poly p, Rule* r=NULL, LNode* gPCheck=NULL);
-                LNode(poly t, int i, poly p, Rule* r, LNode* gPCheck, LNode* l);
+                LNode(poly t, int i, poly p, Rule* r=NULL);
+                LNode(poly t, int i, poly p, Rule* r, LNode* l);
                 LNode(LNode* ln);
                 ~LNode();
+        void    deleteAll();
         // insert new elements to the list at the end from the labeled / classical polynomial view
         // needed for gPrev
         LNode*  insert(LPoly* lp);
@@ -72,12 +72,10 @@ class LNode {
         poly    getTerm();
         int     getIndex(); 
         Rule*   getRule();
-        LNode*  getGPrevRedCheck();
         // set the data from the LPoly saved in LNode
         void    setPoly(poly p);
         void    setTerm(poly t);
         void    setIndex(int i);
-        void    setGPrevRedCheck(LNode* l);
         void    setNext(LNode* l);
         // test if for any list element the polynomial part of the data is equal to *p
         bool    polyTest(poly* p);

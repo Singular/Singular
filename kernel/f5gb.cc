@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.cc,v 1.36 2009-02-28 21:14:06 ederc Exp $ */
+/* $Id: f5gb.cc,v 1.37 2009-03-01 20:31:54 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -149,8 +149,9 @@ LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lT
     //pWrite(gPrev->getFirst()->getNext()->getPoly());
     //Print("3rd gPrev: ");
     //pWrite(gPrev->getFirst()->getNext()->getNext()->getPoly());
- 
- 
+    //delete sPolyList;
+    //delete critPairs;
+    //gPrev->print();
     return gPrev;
 }
 
@@ -631,11 +632,12 @@ void topReduction(LNode* l, LList* sPolyList, LList* gPrev, RList* rules, LTagLi
     //Print("##########################################In topREDUCTION!########################################\n");
     // try l as long as there are reductors found by findReductor()
     do {
-        LNode* tempRed  =   new LNode();
+        LNode* gPrevRedCheck    =   new LNode(lTag->getFirstCurrentIdx());
+        LNode* tempRed          =   new LNode();
         //Print("TESTED POLYNOMIAL IN THE FOLLOWING: ");
         //pWrite(l->getPoly());
         //Print("HIER\n");
-        tempRed  =   findReductor(l,gPrev,rules,lTag,rTag);
+        tempRed  =   findReductor(l,gPrevRedCheck,gPrev,rules,lTag,rTag);
         //Print("--------------------------------HIER DEBUG 2----------------------------------\n");
         // if a reductor for l is found and saved in tempRed
         if(NULL != tempRed) {
@@ -712,7 +714,7 @@ void topReduction(LNode* l, LList* sPolyList, LList* gPrev, RList* rules, LTagLi
                     l->setPoly(tempNF);
                     
                     //pWrite(l->getPoly());
-                    l->setGPrevRedCheck(NULL);
+                    gPrevRedCheck   =   lTag->getFirstCurrentIdx();
                 }
                 else {
                     //Print("ZERO REDUCTION!\n");
@@ -752,7 +754,7 @@ void topReduction(LNode* l, LList* sPolyList, LList* gPrev, RList* rules, LTagLi
 subalgorithm to find a possible reductor for the labeled polynomial l
 =====================================================================
 */
-LNode* findReductor(LNode* l, LList* gPrev, RList* rules, LTagList* lTag,RTagList* rTag) {
+LNode* findReductor(LNode* l, LNode* gPrevRedCheck, LList* gPrev, RList* rules, LTagList* lTag,RTagList* rTag) {
     // allociation of memory for the possible reductor
     //Print("IN FIND REDUCTOR\n");
     poly u      =   pOne();
@@ -764,17 +766,12 @@ LNode* findReductor(LNode* l, LList* gPrev, RList* rules, LTagList* lTag,RTagLis
     // if l was already checked use the information in gPrevRedCheck such
     // that we can start searching for new reducers from this point and 
     // not from the first element of gPrev with the current index
-    if(NULL != l->getGPrevRedCheck()) {
-        temp    =   l->getGPrevRedCheck()->getNext();
-    } 
-    // no reductors were searched for l before, thus start at the first
-    // element of gPrev with the current index, tagged by lTag
-    else {
-        temp    =   lTag->getFirstCurrentIdx();
-    }
+    temp    =   gPrevRedCheck;
     // search for reductors until we are at the end of gPrev resp. at the
     // end of the elements of the current index
     while(NULL != temp && temp->getIndex() == l->getIndex()) {
+        //pWrite(temp->getPoly());
+        //Print("INDEX: %d\n",temp->getIndex());
         // does the head of the element of gPrev divides the head of
         // the to be reduced element?
         //Print("-------------FOUND REDUCTORS----------------------\n");
@@ -806,7 +803,7 @@ LNode* findReductor(LNode* l, LList* gPrev, RList* rules, LTagList* lTag,RTagLis
                     // passing criterion1 ?
                     if(!criterion1(gPrev,u,temp,lTag)) {
                             //Print("HIER DEBUG\n");
-                            l->setGPrevRedCheck(temp);
+                            gPrevRedCheck   =   temp;
                             LNode* redNode  =   new LNode(ppMult_qq(u,temp->getTerm()),temp->getIndex(),red,NULL,NULL);
                             return redNode;
                     }
@@ -859,8 +856,8 @@ ideal F5main(ideal id, ring r) {
         }
     } 
     ideal idNew     =   kInterRed(id); 
-    idDelete(&id);
     id              =   idNew;
+    idShow(id);
     qsortDegree(&id->m[0],&id->m[IDELEMS(id)-1]);
     LList* gPrev    =   new LList(ONE, i, id->m[0]);
     //idShow(id); 
@@ -926,7 +923,11 @@ ideal F5main(ideal id, ring r) {
     //    pWrite(temp->getPoly());
     //    temp    =   temp->getNext();
     // }
-    delete(gPrev);
+    idShow(id);
+    //gPrev->print();
+    //delete gPrev;
+    //delete lTag;
+    //delete rTag;
     return(gbPrev);
 
 

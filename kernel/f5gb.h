@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.30 2009-02-28 21:14:06 ederc Exp $ */
+/* $Id: f5gb.h,v 1.31 2009-03-01 20:31:54 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -106,7 +106,7 @@ void topReduction(LNode* l, LList* sPolyList, LList* gPrev, RList* rules, LTagLi
 subalgorithm to find a possible reductor for the labeled polynomial l
 =====================================================================
 */
-LNode* findReductor(LNode* l, LList* gPrev, RList* rules, LTagList* lTag,RTagList* rTag);
+LNode* findReductor(LNode* l, LNode* gPrevRedCheck, LList* gPrev, RList* rules, LTagList* lTag,RTagList* rTag);
 
 /*
 ======================================
