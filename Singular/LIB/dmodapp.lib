@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmodapp.lib,v 1.19 2009-02-21 15:26:41 levandov Exp $";
+version="$Id: dmodapp.lib,v 1.20 2009-03-01 17:41:31 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmodapp.lib     Applications of algebraic D-modules
@@ -601,7 +601,7 @@ EXAMPLE: example appelF1; shows examples
   setring @S;
   ideal IAppel1 =
     (x*Dx)*(x*Dx+y*Dy+c-1) - x*(x*Dx+y*Dy+a)*(x*Dx+b),
-    (y*Dy)*(x*Dx+y*Dy+c-1) - y*(x*Dx+y*Dy+a)*(x*Dx+d),
+    (y*Dy)*(x*Dx+y*Dy+c-1) - y*(x*Dx+y*Dy+a)*(y*Dy+d),
     (x-y)*Dx*Dy - d*Dx + b*Dy;
   export IAppel1;
   kill @r;
@@ -659,8 +659,8 @@ EXAMPLE: example appelF4; shows examples
   def @S = nc_algebra(1,@D);
   setring @S;
   ideal IAppel4 =
-    Dx*(x*Dx+c-1) - x*(x*Dx+y*Dy+a)*(x*Dx+y*Dy+b),
-    Dy*(y*Dy+d-1) - y*(x*Dx+y*Dy+a)*(x*Dx+y*Dy+b);
+    Dx*(x*Dx+c-1) - (x*Dx+y*Dy+a)*(x*Dx+y*Dy+b),
+    Dy*(y*Dy+d-1) - (x*Dx+y*Dy+a)*(x*Dx+y*Dy+b);
   export IAppel4;
   kill @r;
   return(@S);
