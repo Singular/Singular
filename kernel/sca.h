@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sca.h,v 1.15 2009-03-02 17:04:52 motsak Exp $ */
+/* $Id: sca.h,v 1.16 2009-03-02 18:06:54 motsak Exp $ */
 
 #include <ring.h>
 #include <gring.h>
@@ -162,9 +162,11 @@ poly p_KillSquares(const poly p,
 //////////////////////////////////////////////////////////////////////////////////////
 
 // reduce ideal id modulo <y_i^2> , i = iFirstAltVar .. iLastAltVar
+// optional argument bSkipZeroes allow skipping of zero entries, by
+// default - no skipping!
 ideal id_KillSquares(const ideal id,
   const unsigned int iFirstAltVar, const unsigned int iLastAltVar,
-  const ring r, const bool bSkipZeroes = true);
+  const ring r, const bool bSkipZeroes = false);
 
 // for benchmarking
 bool sca_Force(ring rGR, int b, int e);

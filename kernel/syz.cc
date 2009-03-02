@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.18 2009-01-06 16:53:54 Singular Exp $ */
+/* $Id: syz.cc,v 1.19 2009-03-02 18:06:54 motsak Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -631,7 +631,7 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
     const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
     const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
     
-    arg = id_KillSquares(arg, m_iFirstAltVar, m_iLastAltVar, currRing); // kill suares in input!
+    arg = id_KillSquares(arg, m_iFirstAltVar, m_iLastAltVar, currRing, false); // kill suares in input!
   }
 #endif
   
