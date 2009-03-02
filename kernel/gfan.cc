@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 Author: $Author: monerjan $
-Date: $Date: 2009-02-25 14:30:25 $
-Header: $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.16 2009-02-25 14:30:25 monerjan Exp $
-Id: $Id: gfan.cc,v 1.16 2009-02-25 14:30:25 monerjan Exp $
+Date: $Date: 2009-03-02 14:44:49 $
+Header: $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.17 2009-03-02 14:44:49 monerjan Exp $
+Id: $Id: gfan.cc,v 1.17 2009-03-02 14:44:49 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -25,10 +25,11 @@ Id: $Id: gfan.cc,v 1.16 2009-02-25 14:30:25 monerjan Exp $
 class facet
 {
 	private:
-		intvec fnormal;		//inner normal, describing the facet uniquely
+		intvec fNormal;		//inner normal, describing the facet uniquely
 	public:
 		facet();		//constructor
-		bool isflippable;	//flippable facet?
+		bool isFlippable;	//flippable facet? Want to have cone->isflippable.facet[i]
+		bool isIncoming;	//Is the facet incoming or outgoing?
 };
 
 /*class gcone
@@ -36,13 +37,18 @@ finally this should become s.th. like gconelib.{h,cc} to provide an API
 */
 class gcone
 {
-public:
-	gcone(int);		//constructor with dimension
-	poly gc_marked_term; 	//marked terms of the cone's Gröbner basis
-	ideal gc_basis;		//GB of the cone
-	gcone *next;		//Pointer to *previous* cone in search tree
+	private:
+		int numFacets;		//#of facets of the cone
+
+	public:
+		gcone(int);		//constructor with dimension
+		poly gcMarkedTerm; 	//marked terms of the cone's Gröbner basis
+		ideal gcBasis;		//GB of the cone
+		gcone *next;		//Pointer to *previous* cone in search tree
 	
-	void flip();		//Compute "the other side"
+		void flip();		//Compute "the other side"
+		void remRedFacets();	//Remove redundant facets of the cone
+		
 
 };//class gcone
 
