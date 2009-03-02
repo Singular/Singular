@@ -3,7 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
-* versin $Id: fehelp.cc,v 1.55 2009-02-25 17:36:32 Singular Exp $
+* versin $Id: fehelp.cc,v 1.56 2009-03-02 15:34:59 Singular Exp $
 */
 
 #include <string.h>
@@ -891,7 +891,6 @@ static void heBrowserHelp(heEntry hentry)
 static BOOLEAN heGenInit(int warn, int br)
 {
   if (heHelpBrowsers[br].required==NULL) return TRUE;
-  Print("req:%s\n",heHelpBrowsers[br].required);
   const char *p=heHelpBrowsers[br].required;
   while (*p>'\0')
   {
