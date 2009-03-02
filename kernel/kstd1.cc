@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.45 2009-02-27 15:51:28 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.46 2009-03-02 17:04:52 motsak Exp $ */
 /*
 * ABSTRACT:
 */
@@ -2035,7 +2035,7 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
   {
     const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
     const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
-    pp = id_KillSquares(pp, m_iFirstAltVar, m_iLastAltVar, currRing);
+    pp = id_KillSquares(pp, m_iFirstAltVar, m_iLastAltVar, currRing, false);
 
     if(Q == currQuotient)
       Q = SCAQuotient(currRing);
