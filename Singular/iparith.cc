@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.498 2009-03-02 15:30:17 Singular Exp $ */
+/* $Id: iparith.cc,v 1.499 2009-03-02 15:43:24 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3843,20 +3843,29 @@ static BOOLEAN jjFACSTD(leftv res, leftv v)
 {
   ideal_list p,h;
   h=kStdfac((ideal)v->Data(),NULL,testHomog,NULL);
-  p=h;
-  int l=0;
-  while (p!=NULL) { p=p->next;l++; }
   lists L=(lists)omAllocBin(slists_bin);
-  L->Init(l);
-  l=0;
-  while(h!=NULL)
+  if (h==NULL)
   {
-    L->m[l].data=(char *)h->d;
-    L->m[l].rtyp=IDEAL_CMD;
-    p=h->next;
-    omFreeSize(h,sizeof(*h));
-    h=p;
-    l++;
+    L->Init(1);
+    L->m[0].data=(char *)idInit(0,1);
+    L->m[0].rtyp=IDEAL_CMD;
+  }
+  else
+  {
+    p=h;
+    int l=0;
+    while (p!=NULL) { p=p->next;l++; }
+    L->Init(l);
+    l=0;
+    while(h!=NULL)
+    {
+      L->m[l].data=(char *)h->d;
+      L->m[l].rtyp=IDEAL_CMD;
+      p=h->next;
+      omFreeSize(h,sizeof(*h));
+      h=p;
+      l++;
+    }
   }
   res->data=(void *)L;
   return FALSE;
@@ -4373,6 +4382,35 @@ static BOOLEAN jjPARSTR1(leftv res, leftv v)
     return TRUE;
   }
   return FALSE;
+}
+static BOOLEAN jjP2BI(leftv res, leftv v)
+{
+  poly p=(poly)v->Data();
+  if (p==NULL) { res->data=(char *)nlInit(0); return FALSE; }
+  if ((pNext(p)!=NULL)|| (!pIsConstant(p)))
+  {
+    WerrorS("poly must be constant");
+    return TRUE;
+  }
+  number i=pGetCoeff(p);
+  number n;
+  if (rField_is_Zp())
+  {
+     if (((long)i)>(npPrimeM>>1))
+       n=nlInit((int)(((long)i)-npPrimeM));
+     else
+       n=nlInit((int)(long)i);
+  }
+  else if (rField_is_Q()) n=nlBigInt(i);
+#ifdef HAVE_RINGS
+  else if (rField_is_Ring_Z() || rField_is_Ring_ModN() || rField_is_Ring_PtoM()) n=nlMapGMP(i);
+  else if (rField_is_Ring_2toM()) n=nlInit((unsigned long) i);
+#endif
+  else goto err;
+  res->data=(void *)n;
+  return FALSE;
+err:
+  WerrorS("cannot convert to bigint"); return TRUE;
 }
 static BOOLEAN jjP2I(leftv res, leftv v)
 {
@@ -5058,6 +5096,7 @@ struct sValCmd1 dArith1[]=
 ,{jjBETTI,      BETTI_CMD,       INTMAT_CMD,     MODUL_CMD      ALLOW_PLURAL}
 ,{jjDUMMY,      BIGINT_CMD,      BIGINT_CMD,     BIGINT_CMD     ALLOW_PLURAL}
 ,{jjN2BI,       BIGINT_CMD,      BIGINT_CMD,     NUMBER_CMD     ALLOW_PLURAL}
+,{jjP2BI,       BIGINT_CMD,      BIGINT_CMD,     POLY_CMD       ALLOW_PLURAL}
 ,{jjCHAR,       CHARACTERISTIC_CMD, INT_CMD,     RING_CMD       ALLOW_PLURAL}
 ,{jjCHAR,       CHARACTERISTIC_CMD, INT_CMD,     QRING_CMD      ALLOW_PLURAL}
 #ifdef HAVE_FACTORY
