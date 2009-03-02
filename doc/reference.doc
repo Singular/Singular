@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.323 2009-02-13 09:53:44 Singular Exp $
+@comment $Id: reference.doc,v 1.324 2009-03-02 16:00:01 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5266,7 +5266,17 @@ reduces a polynomial, vector, ideal  or module to its normal form with respect t
 Returns 0 if and only if the polynomial (resp.@: vector, ideal, module)
 is an element (resp.@: subideal, submodule) of the ideal (resp.@: module).
 The result may have no meaning if the second argument is not a standard basis.
-@*The third (optional) argument 1 of type int forces a reduction which considers only the leading term and does no tail reduction.
+@*The third (optional) argument of type int modifies the behaviour:
+@itemize
+@item 0
+default
+@item 1
+consider only the leading term and do no tail reduction.
+@item 2
+reduce also with bad ecart (in the local case)
+@item 4
+reduce without division, return possibly a non-zero constant multiple of the remainder
+@end itemize
 @*If a second argument @code{u} of type poly or matrix is given, the first argument @code{p} is replaced by @code{p/u}.
 This works only for zero dimensional ideals (resp.@: modules) in the third argument and gives, even in a local ring, a reduced normal form which is the projection to the quotient by the ideal (resp.@: module).
 One may give a degree bound in the fourth argument with respect to a weight vector in the fifth argument in order have a finite computation.
