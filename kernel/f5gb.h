@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.31 2009-03-01 20:31:54 ederc Exp $ */
+/* $Id: f5gb.h,v 1.32 2009-03-04 20:23:04 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -34,7 +34,7 @@ computes incrementally gbs of subsets of the input
 gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}  
 ==================================================
 */
-LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lTag, RList* rules, RTagList* rTag);
+inline LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lTag, RList* rules, RTagList* rTag);
 
 /*
 ================================================================
@@ -46,51 +46,39 @@ build critical pairs with all other elements in gPrev
 void criticalPair(LList* gPrev, CList* critPairs, LTagList* lTag, RTagList* rTag, RList* rules);
 
 /*
-================================================================
-computes a list of critical pairs for the next reduction process
-first element in gPrev is always the newest element which must
-build critical pairs with all other elements in gPrev
-this is a special version for reduction() in which the first 
-generator of the critical pair is not tested by criterion2()
-as there are no rules added until then to test for
-================================================================
-*/
-void criticalPairRed(LList* gPrev, CList* critPairs, LTagList* lTag, RTagList* rTag, RList* rules);
-
-/*
 ========================================
 Criterion 1, i.e. Faugere's F5 Criterion
 ========================================
 */
-bool criterion1(LList* gPrev, poly t, LNode* l, LTagList* lTag);
+inline bool criterion1(LList* gPrev, poly t, LNode* l, LTagList* lTag);
 
 /*
 =====================================
 Criterion 2, i.e. Rewritten Criterion
 =====================================
 */
-bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag);
+inline bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag);
 
 /*
 ==========================================================================================================
 Criterion 2, i.e. Rewritten Criterion, for its second call in sPols(), with added lastRuleTested parameter
 ==========================================================================================================
 */
-bool criterion2(poly t, LPoly* l, RList* rules, Rule* testedRule);
+inline bool criterion2(poly t, LPoly* l, RList* rules, Rule* testedRule);
 
 /*
 ==================================
 Computation of S-Polynomials in F5
 ==================================
 */
-void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList);
+inline void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList);
 
 /*
 ========================================================================
 reduction including subalgorithm topReduction() using Faugere's criteria
 ========================================================================
 */
-void reduction(LList* sPolyList, CList* critPairs, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag,
+inline void reduction(LList* sPolyList, CList* critPairs, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag,
                  ideal gbPrev);
 
 /*
@@ -99,14 +87,14 @@ top reduction in F5, i.e. reduction of a given S-polynomial by labeled polynomia
 the same index whereas the labels are taken into account
 =====================================================================================
 */
-void topReduction(LNode* l, LList* sPolyList, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev); 
+inline void topReduction(LNode* l, LList* sPolyList, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev); 
 
 /*
 =====================================================================
 subalgorithm to find a possible reductor for the labeled polynomial l
 =====================================================================
 */
-LNode* findReductor(LNode* l, LNode* gPrevRedCheck, LList* gPrev, RList* rules, LTagList* lTag,RTagList* rTag);
+inline LNode* findReductor(LNode* l, LNode* gPrevRedCheck, LList* gPrev, RList* rules, LTagList* lTag,RTagList* rTag);
 
 /*
 ======================================

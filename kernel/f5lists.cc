@@ -29,7 +29,7 @@ LNode::LNode() {
     data                =   NULL;
     next                =   NULL;
 }
- LNode::LNode(LPoly* lp) {
+LNode::LNode(LPoly* lp) {
     data                =   lp;
     next                =   NULL;
 }
@@ -52,13 +52,14 @@ LNode::LNode(poly t, int i, poly p, Rule* r, LNode* l) {
     next                =   l;
 }
 
- LNode::LNode(LNode* ln) {
+LNode::LNode(LNode* ln) {
     data                =   ln->getLPoly();
     next                =   ln->getNext();
 }
         
 LNode::~LNode() {
     //delete next;
+    Print("DELETE LNODE\n");
     delete data;   
 }
 
@@ -73,16 +74,16 @@ void LNode::deleteAll() {
 
 // insert new elements to the list always at the end (labeled / classical polynomial view)
 // needed for list gPrev
-LNode* LNode::insert(LPoly* lp) {
+inline LNode* LNode::insert(LPoly* lp) {
     //Print("INSERTION: \n");
     //Print("LAST GPREV: ");
     //pWrite(this->getPoly());
-LNode* newElement   =   new LNode(lp, NULL);
+    LNode* newElement   =   new LNode(lp, NULL);
     this->next          =   newElement;
     return newElement;
 }
         
-LNode* LNode::insert(poly t, int i, poly p, Rule* r) {
+inline LNode* LNode::insert(poly t, int i, poly p, Rule* r) {
     LNode* newElement   =   new LNode(t, i, p, r, NULL);
     this->next          =   newElement;
     return newElement;
@@ -90,14 +91,14 @@ LNode* LNode::insert(poly t, int i, poly p, Rule* r) {
 
 // insert new elements to the list always in front (labeled / classical polynomial view)
 // needed for sPolyList
-LNode* LNode::insertSP(LPoly* lp) {
+inline LNode* LNode::insertSP(LPoly* lp) {
     LNode* newElement   =   new LNode(lp, this);
     //Print("INSERTED IN SPOLYLIST: ");
     //pWrite(lp->getTerm());
     return newElement;
 }
         
-LNode* LNode::insertSP(poly t, int i, poly p, Rule* r) {
+inline LNode* LNode::insertSP(poly t, int i, poly p, Rule* r) {
     LNode* newElement   =   new LNode(t, i, p, r, this);
      //Print("INSERTED IN SPOLYLIST: ");
   //pWrite(t);
@@ -105,7 +106,7 @@ return newElement;
 }
 // insert new elemets to the list w.r.t. increasing labels
 // only used for the S-polys to be reduced (TopReduction building new S-polys with higher label)
-LNode* LNode::insertByLabel(poly t, int i, poly p, Rule* r) {
+inline LNode* LNode::insertByLabel(poly t, int i, poly p, Rule* r) {
     //Print("ADDING SOLYS TO THE LIST\n");
     //Print("new element: ");
     //pWrite(t);
@@ -263,6 +264,7 @@ LList::~LList() {
         temp    =   first;
         first   =   first->getNext();
         delete  temp;
+        Print("%p\n",first);
     }
 }
 
@@ -479,7 +481,6 @@ CNode::CNode(CPair* c, CNode* n) {
 }
 
 CNode::~CNode() {
-    delete next;
     delete data;
 }
 
@@ -698,7 +699,12 @@ CList::CList(CPair* c) {
 }
 
 CList::~CList() {
-    delete first;
+    CNode* temp;
+    while(first) {
+        temp    =   first;
+        first   =   first->getNext();
+        delete  temp;
+    }
 }
 
 // insert sorts the critical pairs firstly by increasing total degree, secondly by increasing label
@@ -739,7 +745,7 @@ RNode::RNode(Rule* r) {
 }
 
 RNode::~RNode() {
-    delete  next;
+    Print("DELETE RULE\n");
     delete  data;
 }
 
@@ -786,8 +792,20 @@ RList::RList(Rule* r) {
 }
 
 RList::~RList() {
-    delete first;
-}
+    RNode* temp;
+    Print("%p\n",first);
+    while(first->getRule()) {
+        temp    =   first;
+        first   =   first->getNext();
+        Print("1 %p\n",first);
+        if(first) {
+            Print("2 %p\n",first->getNext());
+            //Print("3 %p\n",first->getNext()->getRuleTerm());
+        }
+        delete  temp;
+    }
+    Print("FERTIG\n");
+} 
 
 void RList::insert(int i, poly t) {
     first = first->insert(i,t);
@@ -827,7 +845,6 @@ RTagNode::RTagNode(RNode* r, RTagNode* n) {
 }
 
 RTagNode::~RTagNode() {
-    delete next;
     delete data;   
 }
        
@@ -841,6 +858,10 @@ RTagNode* RTagNode::insert(RNode* r) {
 
 RNode* RTagNode::getRNode() {
     return this->data;
+}
+
+RTagNode* RTagNode::getNext() {
+    return next;
 }
 
 // NOTE: We insert at the beginning of the list and length = i-1, where i is the actual index.
@@ -899,7 +920,12 @@ RTagList::RTagList(RNode* r) {
 }
 
 RTagList::~RTagList() {
-    delete first;
+    RTagNode* temp;
+    while(first) {
+        temp    =   first;
+        first   =   first->getNext();
+        delete  temp;
+    }
 }
 
 // declaration with first as parameter in LTagNode due to sorting of LTagList
