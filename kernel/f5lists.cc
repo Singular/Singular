@@ -735,6 +735,7 @@ functions working on the class RNode
 ====================================
 */
 RNode::RNode() {
+    Print("HIER RNODE CONSTRUCTOR\n");
     data    =   NULL;
     next    =   NULL;
 }
@@ -756,8 +757,13 @@ RNode* RNode::insert(Rule* r) {
 }
 
 RNode* RNode::insert(int i, poly t) {
+    Print("IN INSERT: ");
+    pWrite(t);
     Rule*   r           =   new Rule(i,t);
+    Print("ADDRESS OF RULE: %p\n",r);
     RNode* newElement   =   new RNode(r);
+    Print("ADDRESS OF RNODE: %p\n",newElement);
+    Print("ADDRESS OF RNODE DATA: %p\n",newElement->getRule());
     newElement->next    =   this;
     return newElement;
 }
@@ -799,7 +805,9 @@ RList::~RList() {
         first   =   first->getNext();
         Print("1 %p\n",first);
         if(first) {
+            Print("1' %p\n",first->getRule());
             Print("2 %p\n",first->getNext());
+            //Print("3 %p\n",first->getNext()->getRule());
             //Print("3 %p\n",first->getNext()->getRuleTerm());
         }
         delete  temp;

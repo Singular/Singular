@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.cc,v 1.38 2009-03-04 20:23:04 ederc Exp $ */
+/* $Id: f5gb.cc,v 1.39 2009-03-05 14:30:23 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -77,6 +77,7 @@ LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lT
     poly tempNF =   kNF(gbPrev,currQuotient,f_i);
     f_i         =   tempNF;
     gPrev->insert(ONE,i,f_i);
+    //gPrev->insert(ONE,gPrev->getLength()+1,f_i);
     // tag the first element in gPrev of the current index for findReductor()
     lTag->setFirstCurrentIdx(gPrev->getLast());
     //Print("1st gPrev: ");
@@ -277,21 +278,22 @@ Criterion 2, i.e. Rewritten Criterion
 =====================================
 */
 inline bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag) {
-    //Print("------------------------------IN CRITERION 2-----------------------------------------\n");
-        //Print("RULES: \n");
+    Print("------------------------------IN CRITERION 2-----------------------------------------\n");
+        Print("RULES: \n");
         RNode* tempR    =   rules->getFirst();
-        //while(NULL != tempR->getRule()) {
-        //    Print("ADDRESS OF RULE: %p\n",tempR->getRule());
-        //    pWrite(tempR->getRuleTerm());
-        //    Print("ADDRESS OF TERM: %p\n",tempR->getRuleTerm());
-        //    Print("%d\n\n",tempR->getRuleIndex());
-        //    tempR   =   tempR->getNext();
-        //}
-        //Print("TESTED ELEMENT: ");
-        //pWrite(l->getPoly());
-        //pWrite(l->getTerm());
-        //pWrite(ppMult_qq(t,l->getTerm()));
-        //Print("%d\n\n",l->getIndex());
+        while(NULL != tempR->getRule()) {
+            Print("ADDRESS OF RNODE: %p\n",tempR);
+            Print("ADDRESS OF RULE: %p\n",tempR->getRule());
+            pWrite(tempR->getRuleTerm());
+            Print("ADDRESS OF TERM: %p\n",tempR->getRuleTerm());
+            Print("%d\n\n",tempR->getRuleIndex());
+            tempR   =   tempR->getNext();
+        }
+        Print("TESTED ELEMENT: ");
+        pWrite(l->getPoly());
+        pWrite(l->getTerm());
+        pWrite(ppMult_qq(t,l->getTerm()));
+        Print("%d\n\n",l->getIndex());
 // start at the previously added element to gPrev, as all other elements will have the same index for sure
     RNode* testNode =   new RNode();
     if(NULL == rTag->getFirst()->getRule()) {
@@ -304,7 +306,13 @@ inline bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag) {
         else {
         //Print("DEBUG\n");
         //Print("L INDEX: %d\n",l->getIndex());
-            testNode    =   rTag->get(l->getIndex());
+            /*-------------------------------------
+             * TODO: WHEN INTERREDUCING THE GB THE
+             *       INDEX OF THE PREVIOUS ELEMENTS
+             *       GETS HIGHER!
+             *-----------------------------------*/
+            testNode    =   rules->getFirst();
+            //testNode    =   rTag->get(l->getIndex());
             //Print("TESTNODE ADDRESS: %p\n",testNode);
         }
     }
@@ -313,6 +321,8 @@ inline bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag) {
     // first element added to rTag was NULL, check for this
     //Print("%p\n",testNode->getRule());
     // NOTE: testNode is possibly NULL as rTag->get() returns NULL for elements of index <=1!
+    //Print("TESTNODE: %p\n",testNode);
+    //pWrite(testNode->getRuleTerm());
     if(NULL != testNode && NULL != testNode->getRule()) {   
         //pWrite(testNode->getRuleTerm());
     }
@@ -328,18 +338,19 @@ inline bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag) {
     while(NULL != testNode && NULL != testNode->getRule() && testNode->getRule() != l->getRule() 
           && l->getIndex() == testNode->getRuleIndex()) {
         //pWrite(testNode->getRuleTerm());
-		//pWrite(testNode->getRuleTerm());
-        //pWrite(t);
-        //pWrite(l->getTerm());
-        //pWrite(u1);
+		pWrite(testNode->getRuleTerm());
+        pWrite(t);
+        pWrite(l->getTerm());
+        pWrite(u1);
         //Print("%d\n",testNode->getRuleIndex());
         if(pLmDivisibleBy(testNode->getRuleTerm(),u1)) {
-            //Print("Criterion 2 NOT passed!\n");
+            Print("Criterion 2 NOT passed!\n");
             pDelete(&u1);
             return true;
         }
 		testNode    =   testNode->getNext();
     }
+    //delete testNode;
     pDelete(&u1);
     return false;
 }
@@ -419,6 +430,7 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) 
                             // further criterion2() tests and termination conditions
                             //Print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ZERO REDUCTION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 							reductionsToZero++;
+                        Print("IN SPOLS 1\n");
                             rules->insert(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
                             //Print("RULE ADDED: \n");
                             //pWrite(rules->getFirst()->getRuleTerm());
@@ -427,6 +439,7 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) 
                             //Print("HIER\n");
                         }
                         else {
+                        Print("IN SPOLS 2\n");
                             rules->insert(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
                             //Print("RULE ADDED: \n");
                             //pWrite(rules->getFirst()->getRuleTerm());  
@@ -450,6 +463,7 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) 
                         // further criterion2() tests and termination conditions
                             //Print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ZERO REDUCTION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
                         reductionsToZero++;
+                        Print("IN SPOLS 3\n");
                         rules->insert(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
                         //Print("RULE ADDED: \n");
                         //pWrite(rules->getFirst()->getRuleTerm()); 
@@ -457,6 +471,7 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) 
                         pDelete(&sp);
                     }
                     else {
+                        Print("IN SPOLS 4\n");
                         rules->insert(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
                         //Print("RULE ADDED: \n");
                         //pWrite(rules->getFirst()->getRuleTerm()); 
@@ -569,19 +584,21 @@ void topReduction(LNode* l, LList* sPolyList, LList* gPrev, RList* rules, LTagLi
         //Print("gPrevCheckPOLY: ");
         //pWrite(gPrevRedCheck->getPoly());
         LNode* tempRed          =   new LNode();
-        //Print("TESTED POLYNOMIAL IN THE FOLLOWING: ");
-        //pWrite(l->getPoly());
+        Print("TESTED POLYNOMIAL IN THE FOLLOWING: ");
+        pWrite(l->getPoly());
         //Print("HIER\n");
         tempRed  =   findReductor(l,gPrevRedCheck,gPrev,rules,lTag,rTag);
+        //Print("TEMPRED NEXT: %p\n",tempRed->getNext());
         //Print("--------------------------------HIER DEBUG 2----------------------------------\n");
         // if a reductor for l is found and saved in tempRed
         if(NULL != tempRed) {
             // if label of reductor is greater than the label of l we have to built a new element
             // and add it to sPolyList
-            //Print("REDUCTOR POLYNOMIAL: ");
-            //pWrite(tempRed->getPoly());
-            //Print("TERM: ");
-            //pWrite(tempRed->getTerm());
+            Print("REDUCTOR POLYNOMIAL: ");
+            pWrite(tempRed->getPoly());
+            Print("TEMPRED: %p\n",tempRed);
+            Print("TERM: ");
+            pWrite(tempRed->getTerm());
             if(pLmCmp(tempRed->getTerm(),l->getTerm()) == 1) {
                 // needed sinc pSub destroys the arguments!
                 //Print("H----------I------------E--------------R\n");
@@ -604,16 +621,16 @@ void topReduction(LNode* l, LList* sPolyList, LList* gPrev, RList* rules, LTagLi
                     //pWrite(tempRed->getPoly());
                     // for debugging
                     //pWrite(tempRed->getPoly());
-                    //Print("RULE ADDED\n");
+                    Print("RULE ADDED\n");
                     rules->insert(tempRed->getIndex(),tempRed->getTerm());
                     tempRed->getLPoly()->setRule(rules->getFirst()->getRule());
-                    //Print("%p\n",sPolyList->getFirst());
-                    //Print("%p\n",sPolyList->getFirst()->getLPoly());
-                    //Print("SPOLYLIST LENGTH: %d\n",sPolyList->getLength());
+                    Print("%p\n",sPolyList->getFirst());
+                    Print("%p\n",sPolyList->getFirst()->getLPoly());
+                    Print("SPOLYLIST LENGTH: %d\n",sPolyList->getLength());
                     //sPolyList->print();
                     
                     sPolyList->insertByLabel(tempRed);
-                    //sPolyList->print();
+                    sPolyList->print();
                     //Print("SPOLYLIST LENGTH: %d\n",sPolyList->getLength());
                     //Print("OH JE\n");
                 }
@@ -621,7 +638,7 @@ void topReduction(LNode* l, LList* sPolyList, LList* gPrev, RList* rules, LTagLi
                     pDelete(&temp);
                     reductionsToZero++;
                     //Print("RULE ADDED\n");
-        //Print("wieder hier2\n");
+        Print("wieder hier2\n");
                     rules->insert(tempRed->getIndex(),tempRed->getTerm());
                     pWrite(rules->getFirst()->getRuleTerm());
                     Print("DELETE TEMPRED\n");
@@ -666,10 +683,10 @@ void topReduction(LNode* l, LList* sPolyList, LList* gPrev, RList* rules, LTagLi
         else {
             if(NULL != l->getPoly()) {
                 pNorm(l->getPoly());
-                //Print("----------------------------------ADDED TO GPREV IN TOPREDUCTION:-------------------------------------- ");
-                //pWrite(l->getPoly());
-                //pWrite(l->getTerm());
-                //Print("INDEX: %d\n\n\n", l->getIndex());
+                Print("----------------------------------ADDED TO GPREV IN TOPREDUCTION:-------------------------------------- ");
+                pWrite(l->getPoly());
+                pWrite(l->getTerm());
+                Print("INDEX: %d\n\n\n", l->getIndex());
                 //sleep(20);
                 gPrev->insert(l->getLPoly());
                 //Print("GPREV: \n");
@@ -704,6 +721,9 @@ LNode* findReductor(LNode* l, LNode* gPrevRedCheck, LList* gPrev, RList* rules, 
     // that we can start searching for new reducers from this point and 
     // not from the first element of gPrev with the current index
     temp    =   gPrevRedCheck;
+    //temp    =   lTag->getFirstCurrentIdx();  
+    //Print("GPREVREDCHECK: %p\n",gPrevRedCheck);
+    //pWrite(gPrevRedCheck->getPoly());
     // search for reductors until we are at the end of gPrev resp. at the
     // end of the elements of the current index
     while(NULL != temp && temp->getIndex() == l->getIndex()) {
@@ -782,6 +802,7 @@ ideal F5main(ideal id, ring r) {
     // this must be done due to possible later improvements
     RList* rules    =   new RList();
     Print("RULES FIRST: %p\n",rules->getFirst());
+    Print("RULES FIRST DATA: %p\n",rules->getFirst()->getRule());
     RTagList* rTag  =   new RTagList(rules->getFirst());
     i = 1;
     for(j=0; j<IDELEMS(id); j++) {
@@ -836,17 +857,17 @@ ideal F5main(ideal id, ring r) {
         //Print("%d\n",gbLength);
         Print("%d\n",gPrev->getLength()-gbLength-1);
             for(j=0;j<=gPrev->getLength()-gbLength-1;j++) {
-                Print("YES\n");
+                //Print("YES\n");
                 temp        =   temp->getNext();
                 if(temp) {
-                    Print("%p\n",temp);
-                    pWrite(temp->getPoly());
-                    Print("%p\n",temp->getNext());
+                    //Print("%p\n",temp);
+                    //pWrite(temp->getPoly());
+                    //Print("%p\n",temp->getNext());
                 }
                 gbAdd->m[j] =   temp->getPoly();
                 //pWrite(temp->getPoly());
             }
-            Print("HIER AUCH\n");
+            //Print("HIER AUCH\n");
             gbPrev          =   idAdd(gbPrev,gbAdd);
             // interreduction stuff
             /*
@@ -855,33 +876,39 @@ ideal F5main(ideal id, ring r) {
                 gbPrev          =   tempId;
                 qsortDegree(&gbPrev->m[0],&gbPrev->m[IDELEMS(gbPrev)-1]);
                 delete gPrev;
-                Print("RULES FIRST NOW1: %p\n",rules->getFirst());
+                //Print("RULES FIRST NOW1: %p\n",rules->getFirst());
                 delete rules;
-                Print("HIERLALA\n");
-                LList* gPrev    =   new LList(pOne,1,gbPrev->m[0]);
+                //Print("%p\n",rules->getFirst());
+                gPrev    =   new LList(pOne,1,gbPrev->m[0]);
                 gPrev->insert(pOne,1,gbPrev->m[1]);
                 poly tempPoly = pInit();
                 pSetCoeff(tempPoly,nOne);
                 pLcm(pHead(gbPrev->m[0]),pHead(gbPrev->m[1]),tempPoly);
                 rules    =   new RList();
+                //Print("%p\n",rules->getFirst());
+                //pWrite(tempPoly);
                 rules->insert(2,tempPoly);
-            pWrite(rules->getFirst()->getRuleTerm());
+                //Print("%p\n",rules->getFirst());
+                //Print("%p\n",rules->getFirst()->getNext()->getNext());
+                //Print("HIERLALA\n");
+            //pWrite(rules->getFirst()->getRuleTerm());
             Print("RULES FIRST NOW2: %p\n",rules->getFirst());
                 for(k=2; k<IDELEMS(gbPrev); k++) {
                     gPrev->insert(pOne,k+1,gbPrev->m[k]);
                     for(l=0; l<k; l++) {
+                        pWrite(gbPrev->m[k]);
+                        pWrite(gbPrev->m[l]);
                         pLcm(pHead(gbPrev->m[k]),pHead(gbPrev->m[l]),tempPoly);
                         pSetCoeff(tempPoly,nOne);
                         rules->insert(k+1,tempPoly);
                     }
                 }
             }
-            */
+           */ 
             gbLength    =   gPrev->getLength(); 
 
         }
-        Print("%p\n",gPrev->getFirst());
-        //gPrev->print();
+        gPrev->print();
         //int anzahl  =   1;
         //while(NULL != temp) {
         //    Print("%d. Element: ",anzahl);

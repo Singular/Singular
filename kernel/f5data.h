@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5data.h,v 1.8 2009-03-04 20:23:05 ederc Exp $ */
+/* $Id: f5data.h,v 1.9 2009-03-05 14:30:23 ederc Exp $ */
 /*
 * ABSTRACT: labeled polynomial interface
 */
@@ -211,6 +211,7 @@ class Rule {
         poly    term;       // term of the labeled polynomial the rule comes from
     public:
         inline          Rule(int i, poly term);
+        inline          ~Rule();
         inline  int     getIndex();
         inline  poly    getTerm();
 };
@@ -218,6 +219,10 @@ class Rule {
 Rule::Rule(int i, poly t) {
     index   =   i;
     term    =   t;
+}
+
+Rule::~Rule() {
+    //pDelete(&term);
 }
 
 int Rule::getIndex() {
