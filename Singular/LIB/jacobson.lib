@@ -1,51 +1,142 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: jacobson.lib,v 1.9 2009-02-12 20:27:17 levandov Exp $";
+version="$Id: jacobson.lib,v 1.10 2009-03-05 20:36:11 levandov Exp $";
 category="System and Control Theory";
 info="
 LIBRARY: jacobson.lib     Algorithms for Smith and Jacobson Normal Form
-AUTHOR: Kristina Schindelar,     Kristina.Schindelar@math.rwth-aachen.de
+AUTHOR: Kristina Schindelar,     Kristina.Schindelar@math.rwth-aachen.de,
+@*           Viktor Levandovskyy,      levandov@math.rwth-aachen.de
 
-THEORY: We work over a ring R, that is a principal ideal domain.
-@*   If R is commutative, we suppose R to be a polynomial ring in one variable.
-@* If R is non-commutative, we suppose R to be in two variables, say x and d.
-@* We treat then the basering as principal ideal ring with d a polynomial
-@* variable and x an invertible one. That is, we work in the Ore localization of R
+THEORY: We work over a ring R, that is an Euclidean principal ideal domain.
+@* If R is commutative, we suppose R to be a polynomial ring in one variable.
+@* If R is non-commutative, we suppose R to have two variables, say x and d.
+@* We treat then the basering as the Ore localization of R
 @* with respect to the mult. closed set S = K[x] without 0.
+@* Thus, we treat basering as principal ideal ring with d a polynomial
+@* variable and x an invertible one. 
 @* Note, that in computations no division by x will actually happen.
-@*   Given a rectangular matrix M over R, one can compute unimodular (that is invertible)
-@* square matrices U and V, such that U*M*V=D is a diagonal matrix.
-@*   Depending on the ring, the diagonal entries of D have certain properties.
+@*
+@* Given a rectangular matrix M over R, one can compute unimodular (that is
+@* invertible) square matrices U and V, such that U*M*V=D is a diagonal matrix.
+@* Depending on the ring, the diagonal entries of D have certain properties.
 
 REFERENCES:
-@* N. Jacobson, 'The theory of rings', AMS, 1943.
-@* Manuel Avelino Insua Hermo, 'Varias perspectives sobre las bases de Groebner: Forma normal de Smith, Algorithme de Berlekamp y algebras de Leibniz'. PhD thesis, Universidad de Santiago de Compostela, 2005.
+@* (1) N. Jacobson, 'The theory of rings', AMS, 1943.
+@* (2) Manuel Avelino Insua Hermo, 'Varias perspectives sobre las bases de Groebner : 
+@* Forma normal de Smith, Algorithme de Berlekamp y algebras de Leibniz'. 
+@* PhD thesis, Universidad de Santiago de Compostela, 2005.
 
 
 PROCEDURES:
 smith(M[,eng1,eng2]);  compute the Smith Normal Form of M over commutative ring
-jacobson(M[,eng]);       compute a weak Jacobson Normal Form of M over non-commutative ring
+jacobson(M[,eng]); compute a weak Jacobson Normal Form of M over non-commutative ring
+divideUnits(L);     create ones out of units in the output of smith or jacobson
+
 
 SEE ALSO: control_lib
 ";
 
   LIB "poly.lib";
-  LIB "involut.lib";
+  LIB "involut.lib"; // involution
+  LIB "dmodapp.lib"; // engine
+  LIB "qhmoduli.lib"; // Min
+
+proc divideUnits(list L)
+"USAGE: divideUnits(L); list L
+RETURN: matrix or list of matrices
+ASSUME: L is an output of @code{smith} or a @code{jacobson} procedures, that is
+@* either L contains one rectangular matrix with elements only on the main diagonal
+@* or L consists of three matrices, where L[1] and L[3] are square invertible matrices
+@* while L[2] is a rectangular matrix with elements only on the main diagonal
+PURPOSE: divide out units from the diagonal and reflect this in transformation matrices
+EXAMPLE: example divideUnits; shows examples
+"
+{
+  // check assumptions
+  int s = size(L);
+  if ( (s!=1) && (s!=3) )
+  {
+    ERROR("The list has neither 1 nor 3 elements");
+  }
+  // check sizes of matrices
+
+  if (s==1)
+  {
+    list LL; LL[1] = L[1]; LL[2] = L[1];
+    L = LL;
+  }
+  
+
+  // divide units out
+  matrix M = L[2];
+  int ncM = ncols(M);   int nrM = nrows(M);
+  //  matrix TM[nrM][nrM]; // m times m matrix
+  matrix TM = matrix(freemodule(nrM));
+  int i; int nsize = Min(intvec(nrM,ncM));
+  poly p; number n; intvec lexp;
+  
+  for(i=1; i<=nsize; i++)
+  {
+    p = M[i,i];
+    lexp = leadexp(p);
+    //    TM[i,i] = 1;
+    // check: is p a unit?
+    if (p!=0)
+    {
+      if ( lexp == 0)
+      {
+        // hence p = n*1
+        n = leadcoef(p);
+        TM[i,i] = 1/n;
+      }
+    }
+  }
+  int ppl = printlevel-voice+2;
+  dbprint(ppl,"divideUnits: extra transformation matrix is: ");
+  dbprint(ppl, TM);
+  L[2] = TM*L[2];
+  if (s==3)
+  {
+    L[1] = TM*L[1];
+    return(L);
+  }
+  else
+  {
+    return(L[2]);
+  }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R=(0,m,M,L1,L2,m1,m2,g), D, lp; // two pendula example
+  matrix P[3][4]=m1*L1*D^2,m2*L2*D^2,(M+m1+m2)*D^2,-1,
+  m1*L1^2*D^2-m1*L1*g,0,m1*L1*D^2,0,0,
+  m2*L2^2*D^2-m2*L2*g,m2*L2*D^2,0;
+  list s=smith(P,1);  // returns a list with 3 entries
+  print(s[2]); // a diagonal form, close to the Smith form
+  print(s[1]); // U, left transformation matrix
+  list t = divideUnits(s);
+  print(t[2]); // the Smith form of the matrix P
+  print(t[1]); // U', modified left transformation matrix
+}
 
 proc smith(matrix MA, list #)
 "USAGE: smith(M[, eng1, eng2]);  M matrix, eng1 and eng2 are optional integers
-RETURN: matrix or list
-ASSUME: The current ring is assumed to be the commutative polynomial ring in
-        one variable
-PURPOSE: compute the Smith Normal Form of M with transformation matrices (optionally)
-NOTE: If the optional integer eng1 is non-zero, returns the list {U,D,V},
-where U*M*V = D and the diagonal field entries of D are not normalized.
-@*    Otherwise only the matrix D, that is the Smith Normal Form of M, is returned.
-@*    Here, U and V are square unimodular (invertible) matrices. The procedure works for rectangular matrix M.
-@* The optional integer eng2 determines the engine, that computes the Groebner basis:
-@* 0 means 'std' (default), 1 means 'groebner' and 2 means 'slimgb'.
+RETURN: matrix or list of matrices, depending on arguments
+ASSUME: Basering is a commutative polynomial ring in one variable
+PURPOSE: compute the Smith Normal Form of M with (optionally) transformation matrices 
+THEORY: Groebner bases are used for the Smith form like in (2).
+NOTE: By default, just the Smith normal form of M is returned.
+@* If the optional integer @code{eng1} is non-zero, the list {U,D,V} is returned
+@* where U*M*V = D and the diagonal field entries of D are not normalized.
+@* The normalization of the latter can be done with the 'divideUnits' procedure.
+@* U and V above are square unimodular (invertible) matrices. 
+@* Note, that the procedure works for a rectangular matrix M.
+@*
+@* The optional integer @code{eng2} determines the Groebner basis engine:
+@* 0 (default) ensures the use of 'slimgb' , otherwise 'std' is used.
 DISPLAY: If @code{printlevel}=1, progress debug messages will be printed,
 @* if @code{printlevel}>=2, all the debug messages will be printed.
 EXAMPLE: example smith; shows examples
+SEE ALSO: divideUnits, jacobson
 "
 {
   def R = basering;
@@ -119,8 +210,10 @@ example
   ring r = 0,x,Dp;
   matrix m[3][2]=x, x^4+x^2+21, x^4+x^2+x, x^3+x, 4*x^2+x, x;
   list s=smith(m,1);
-  print(s[2]);  // Smith form of m
+  print(s[2]);  // non-normalized Smith form of m
   print(s[1]*m*s[3] - s[2]); // check U*M*V = D
+  list t = divideUnits(s);
+  print(t[2]); // the Smith form of m
 }
 
 static proc diagonal_with_trafo( R, matrix MA, int B)
@@ -551,38 +644,42 @@ static proc diagonal_without_trafo( R, matrix MA, int B)
 }
 
 
+// VL : engine replaced by the one from dmodapp.lib
+// cases are changed
 
-static proc engine(module I, int i)
-{
-  module J;
-  if (i==0)
-  {
-    J = std(I);
-  }
-  if (i==1)
-  {
-    J = groebner(I);
-  }
-  if (i==2)
-  {
-    J = slimgb(I);
-  }
-  return(J);
-}
+// static proc engine(module I, int i)
+// {
+//   module J;
+//   if (i==0)
+//   {
+//     J = std(I);
+//   }
+//   if (i==1)
+//   {
+//     J = groebner(I);
+//   }
+//   if (i==2)
+//   {
+//     J = slimgb(I);
+//   }
+//   return(J);
+// }
 
 proc jacobson(matrix MA, list #)
  "USAGE:  jacobson(M, eng);  M matrix, eng an optional int
 RETURN: list
-ASSUME: Basering is a noncommutative ring in two variables.
-PURPOSE: compute a weak Jacobson Normal Form of M over a noncommutative ring
+ASSUME: Basering is a (non-commutative) ring in two variables.
+PURPOSE: compute a weak Jacobson Normal Form of M over the basering
+THEORY: Groebner bases and involutions are used, generalizing an idea of (2)
 NOTE: A list L of matrices {U,D,V} is returned. That is L[1]*M*L[3]=L[2], where
 @*      L[2] is a diagonal matrix and L[1], L[3] square invertible (unimodular) matrices.
 @*      Note, that M can be rectangular.
-@* The optional integer @code{eng} determines the engine, that computes the Groebner basis:
-@* 0 means 'std' (default), 1 means 'groebner' and 2 means 'slimgb'.
+@* The optional integer @code{eng2} determines the Groebner basis engine:
+@* 0 (default) ensures the use of 'slimgb' , otherwise 'std' is used.
 DISPLAY: If @code{printlevel}=1, progress debug messages will be printed,
 @* if @code{printlevel}>=2, all the debug messages will be printed.
 EXAMPLE: example jacobson; shows examples
+SEE ALSO: divideUnits, smith
 "
 {
   def R = basering;
