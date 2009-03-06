@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: bfun.lib,v 1.2 2009-02-23 15:10:18 Singular Exp $";
+version="$Id: bfun.lib,v 1.3 2009-03-06 20:32:28 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: bfun.lib     Algorithms for b-functions and Bernstein-Sato polynomial
@@ -8,16 +8,25 @@ AUTHORS: Daniel Andres, daniel.andres@math.rwth-aachen.de
 
 THEORY: Given a polynomial ring R = K[x_1,...,x_n] and a polynomial F in R,
 @*      one is interested in the global b-Function (also known as Bernstein-Sato
-@*      polynomial) b(s) in K[s], defined to be the monic polynomial, satisfying a functional
-@*      identity L * F^{s+1} = b(s) F^s,   for some operator L in D[s]. Here, D stands for an
-@*      n-th Weyl algebra K<x_1,...,x_n,d_1,...,d_n | d_j x_j = x_j d_j +1>.
+@*      polynomial) b(s) in K[s], defined to be the monic polynomial, satisfying
+@*      a functional identity    L * F^{s+1} = b(s) F^s,   
+@*      for some operator L in D[s]. Here, D stands for an n-th Weyl algebra
+@*      K<x_1,...,x_n,d_1,...,d_n | d_j x_j = x_j d_j +1>.
 @*      One is interested in the following data:
 @*      - Bernstein-Sato polynomial b(s) in K[s],
 @*      - the list of its roots, which are known to be rational
 @*      - the multiplicities of the roots.
-@*      References: Saito, Sturmfels, Takayama: Groebner Deformations of Hypergeometric
-@*      Differential Equations (2000), Noro: An Efficient Modular Algorithm for Computing
-@*      the Global b-function, (2002).
+@*
+@*    There is a general definition of a b-function of a holonomic ideal [SST]
+@*    (that is, an ideal I in a Weyl algebra D, such that D/I is holonomic module)
+@*    with respect to the given weight vector. B-function b_w(s) is in K[s].
+@*    Unlike Bernstein-Sato polynomial, general B-function with respect to
+@*    arbitrary weights need not have rational roots at all.
+@* 
+@*      References: [SST] Saito, Sturmfels, Takayama: Groebner Deformations of 
+@*      Hypergeometric Differential Equations (2000),
+@*      Noro: An Efficient Modular Algorithm for Computing the Global b-function,
+@*      (2002).
 
 
 MAIN PROCEDURES:
@@ -26,12 +35,12 @@ bfct(f[,s,t,v]);            computes the Bernstein-Sato polynomial of poly f
 bfctSyz(f[,r,s,t,u,v]);     computes the Bernstein-Sato polynomial of poly f
 bfctAnn(f[,s]);             computes the Bernstein-Sato polynomial of poly f
 bfctOneGB(f[,s,t]);         computes the Bernstein-Sato polynomial of poly f
-bfctIdeal(I,w[,s,t]);       computes the global b-function of ideal I w.r.t. the weight w
-pIntersect(f,I);            intersection of the ideal I with the subalgebra K[f] for a poly f
-pIntersectSyz(f,I[,p,s,t]); intersection of the ideal I with the subalgebra K[f] for a poly f
+bfctIdeal(I,w[,s,t]);       computes the global b-function of ideal wrt weight
+pIntersect(f,I[,s]);        intersection of ideal with subalgebra K[f] for poly f
+pIntersectSyz(f,I[,p,s,t]); intersection of ideal with subalgebra K[f] for poly f
 linReduce(f,I[,s]);         reduces a poly by linear reductions only
 linReduceIdeal(I,[s,t]);    reduces generators of ideal by linear reductions only
-linSyzSolve(I[,s]);         computes a linear dependency of the elements of ideal I
+linSyzSolve(I[,s]);         computes a linear dependency of elements of ideal I
 
 AUXILIARY PROCEDURES:
 
@@ -46,7 +55,7 @@ SEE ALSO: dmod_lib, dmodapp_lib, gmssing_lib
 LIB "qhmoduli.lib"; // for Max
 LIB "dmod.lib";     // for SannfsBFCT etc
 LIB "dmodapp.lib";  // for initialIdealW etc
-
+LIB "nctools.lib"; // for isWeyl etc
 
 ///////////////////////////////////////////////////////////////////////////////
 // testing for consistency of the library:
@@ -82,6 +91,7 @@ NOTE:    u[i] is the weight of x(i), v[i] the weight of D(i).
 @*       u+v has to be a non-negative intvec. 
 "
 {
+  // todo check assumption
   int i;
   def save = basering;
   int n = nvars(save)/2;
@@ -136,6 +146,18 @@ example
   setring G; G;
 }
 
+static proc safeVarName (string s)
+{
+  string cv = "," + charstr(basering) + "," + varstr(basering) + ",";
+  s = "," + s + ",";
+  while (find(cv,s) <> 0)
+  {
+    s[1] = "@";
+    s = "," + s;
+  }
+  s = s[2..size(s)-1];
+  return(s)
+}
 
 proc allPositive (intvec v)
 "USAGE:  allPositive(v);  v an intvec
@@ -166,7 +188,8 @@ example
 
 static proc findFirst (list l, i)
 "USAGE:  findFirst(l,i);  l a list, i an argument of any type
-RETURN:  int, the position of the first appearance of i in l, or 0 if i is not a member of l
+RETURN:  int, the position of the first appearance of i in l,
+@*       or 0 if i is not a member of l
 PURPOSE: check whether the second argument is a member of a list
 EXAMPLE: example findFirst; shows an example
 "
@@ -229,14 +252,15 @@ example
 proc linReduceIdeal(ideal I, list #)
 "USAGE:  linReduceIdeal(I [,s,t,u]); I an ideal, s,t,u optional ints
 RETURN:  ideal or list, linear reductum (over field) of I by its elements
-PURPOSE: reduce a list of polys only by linear reductions (no monomial multiplications)
-NOTE:    If s<>0, a list consisting of the reduced ideal and the coefficient 
+PURPOSE: reduces a list of polys only by linear reductions (no monomial
+@*        multiplications)
+NOTE:    If s<>0, a list consisting of the reduced ideal and the coefficient
 @*       vectors of the used reductions given as module is returned.
 @*       Otherwise (and by default), only the reduced ideal is returned.
 @*       If t<>0 (and by default) all monomials are reduced (if possible),
 @*       otherwise, only leading monomials are reduced.
 @*       If u<>0 (and by default), the ideal is first sorted in increasing order.
-@*       If u is set to 0 and the given ideal is not sorted in the way described, 
+@*       If u is set to 0 and the given ideal is not sorted in the way described,
 @*       the result might not be as expected.
 DISPLAY: If @code{printlevel}=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
@@ -326,8 +350,8 @@ EXAMPLE: example linReduceIdeal; shows examples
       for (i=1; i<=ncols(I); i++) { M[i] = gen(i);  }
     }
   }  
-  dbprint(ppl-1,"initially sorted ideal:", I);
-  if (remembercoeffs <> 0) { dbprint(ppl-1," used permutations:", M); }
+  dbprint(ppl-1,"// initially sorted ideal:", I);
+  if (remembercoeffs <> 0) { dbprint(ppl-1,"// used permutations:", M); }
   // step 2: reduce leading monomials by linear reductions
   poly lm,c,redpoly,maxlmJ;
   J[sZeros+1] = I[sZeros+1];
@@ -357,11 +381,11 @@ EXAMPLE: example linReduceIdeal; shows examples
 	{
 	  if (lm == lmJ[j])
 	  {
-	    dbprint(ppl-1,"reducing " + string(redpoly));
-	    dbprint(ppl-1," with " + string(J[j]));
+	    dbprint(ppl-1,"// reducing " + string(redpoly));
+	    dbprint(ppl-1,"//  with " + string(J[j]));
 	    c = leadcoef(redpoly)/leadcoef(J[j]);
 	    redpoly = redpoly - c*J[j];
-	    dbprint(ppl-1," to " + string(redpoly));
+	    dbprint(ppl-1,"//  to " + string(redpoly));
 	    lm = leadmonom(redpoly);
 	    ordlm = ord(lm);
 	    if (remembercoeffs <> 0) { M[i] = M[i] - c * M[j]; }
@@ -389,9 +413,9 @@ EXAMPLE: example linReduceIdeal; shows examples
   // step 3: reduce tails by linear reductions as well
   if (redtail <> 0)
   {
-    dbprint(ppl,"finished reducing leading monomials");
+    dbprint(ppl,"// finished reducing leading monomials");
     dbprint(ppl-1,string(J));
-    if (remembercoeffs <> 0) { dbprint(ppl-1,"used reductions:" + string(M)); }
+    if (remembercoeffs <> 0) { dbprint(ppl-1,"// used reductions:" + string(M)); }
     int k;
     for (i=sZeros+1; i<=sI; i++)
     {
@@ -405,10 +429,10 @@ EXAMPLE: example linReduceIdeal; shows examples
 	    if (lm == normalize(J[j][k]))
 	    {
 	      c = leadcoef(J[j][k])/leadcoef(J[i]);
-	      dbprint(ppl-1,"reducing " + string(J[j]));
-	      dbprint(ppl-1," with " + string(J[i]));
+	      dbprint(ppl-1,"// reducing " + string(J[j]));
+	      dbprint(ppl-1,"//  with " + string(J[i]));
 	      J[j] = J[j] - c*J[i];
-	      dbprint(ppl-1," to " + string(J[j]));
+	      dbprint(ppl-1,"//  to " + string(J[j]));
 	      if (remembercoeffs <> 0) { M[j] = M[j] - c * M[i]; }
 	    }
 	  }
@@ -441,10 +465,10 @@ NOTE:    If s<>0, a list consisting of the reduced poly and the coefficient
 @*       only reduced poly is returned.
 @*       If t<>0 (and by default) all monomials are reduced (if possible),
 @*       otherwise, only leading monomials are reduced.
-@*       If u<>0 (and by default), the ideal is linearly pre-reduced, i.e. instead
-@*       of the given ideal, the output of @code{linReduceIdeal} is used. If u is
-@*       set to 0 and the given ideal does not equal the output of 
-@*       @code{linReduceIdeal}, the result might not be as expected. 
+@*       If u<>0 (and by default), the ideal is linearly pre-reduced, i.e. 
+@*       instead of the given ideal, the output of @code{linReduceIdeal} is used.
+@*       If u is set to 0 and the given ideal does not equal the output of
+@*       @code{linReduceIdeal}, the result might not be as expected.
 DISPLAY: If @code{printlevel}=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example linReduce; shows examples
@@ -486,8 +510,8 @@ EXAMPLE: example linReduce; shows examples
       list sortedI = linReduceIdeal(I,1,redtail);
       I = sortedI[1];
       M = sortedI[2];
-      dbprint(ppl-1,"prepared ideal:",I);
-      dbprint(ppl-1," with operations:",M);
+      dbprint(ppl-1,"// prepared ideal:" +string(I));
+      dbprint(ppl-1,"//  with operations:" +string(M));
     }
     else { I = linReduceIdeal(I,0,redtail); }
   }
@@ -531,12 +555,12 @@ EXAMPLE: example linReduce; shows examples
   // === reduce tails as well ===
   if (redtail <> 0)
   {
-    dbprint(ppl,"finished reducing leading monomials");
+    dbprint(ppl,"// finished reducing leading monomials");
     dbprint(ppl-1,string(f));
-    if (remembercoeffs <> 0) { dbprint(ppl-1,"used reductions:" + string(v)); }
+    if (remembercoeffs <> 0) { dbprint(ppl-1,"// used reductions:" + string(v)); }
     for (i=1; i<=sI; i++)
     {
-      dbprint(ppl,"testing ideal entry:",i);
+      dbprint(ppl,"// testing ideal entry "+string(i));
       for (j=1; j<=size(f); j++)
       {
 	if (ord(f[j]) == ordI[i])
@@ -545,8 +569,8 @@ EXAMPLE: example linReduce; shows examples
 	  {
 	    c = leadcoef(f[j])/lcI[i];
 	    f = f - c*I[i];
-	    dbprint(ppl-1,"reducing with " + string(I[i]));
-	    dbprint(ppl-1," to " + string(f));
+	    dbprint(ppl-1,"// reducing with " + string(I[i]));
+	    dbprint(ppl-1,"//  to " + string(f));
 	    if (remembercoeffs <> 0) { v = v - c * M[i]; }
 	  }
 	}
@@ -580,7 +604,7 @@ example
 
 proc linSyzSolve (ideal I, list #)
 "USAGE:  linSyzSolve(I[,s]);  I an ideal, s an optional int
-RETURN:  vector, coefficient vector of a linear combination of 0 in the elements of I
+RETURN:  vector, coefficient vector of linear combination of 0 in elements of I
 PURPOSE: compute a linear dependency between the elements of an ideal
 @*       if such one exists
 NOTE:    If s<>0, @code{std} is used for Groebner basis computations,
@@ -612,7 +636,11 @@ EXAMPLE: example linSyzSolve; shows examples
   {
     // ------- 1. introduce undefined coeffs ------------------
     def save = basering;
+    list RL = ringlist(save);
+    int nv = nvars(save);
+    int np = npars(save);
     int p = char(save);
+    string cs = "(" + charstr(save) + ")";
     if (enginespecified == 0)
     {
       if (p <> 0)
@@ -620,18 +648,36 @@ EXAMPLE: example linSyzSolve; shows examples
 	whichengine = 1;
       }
     }
-    ring @A = p,(@a(1..sI)),lp;
-    ring @aA = (p,@a(1..sI)), (@z),dp;
-    // TODO: BUG! WHAT IF THE ORIGINAL RING ALREADY HAS SUCH VARIABLES/PARAMETERS!!!?
-    // TODO: YOU CAN OVERCOME THIS BY MEANS SIMILAR TO "chooseSafeVarName" FROM NEW "matrix.lib"
+    int i;
+    list Lvar;
+    for (i=1; i<=sI; i++)
+    {
+      Lvar[i] = safeVarName("@a(" + string(i) + ")");
+    }
+    list L@A = RL[1..4];
+    L@A[2] = Lvar;
+    L@A[3] = list(list("lp",intvec(1:sI)),list("C",intvec(0)));
+    def @A = ring(L@A);
+    L@A[2] = list(safeVarName("@z"));
+    L@A[3][1] = list("dp",intvec(1));
+    if (size(L@A[1])>1)
+    {
+      L@A[1][2] = L@A[1][2] + Lvar;
+      L@A[1][3][size(L@A[1][3])+1] = list("lp",intvec(1:sI));
+    }
+    else
+    {
+      L@A[1] = list(p,Lvar,list(list("lp",intvec(1:sI))),ideal(0));
+    }
+    def @aA = ring(L@A);
     def @B = save + @aA;
     setring @B;
     ideal I = imap(save,I);
     // ------- 2. form the linear system for the undef coeffs ---
-    int i;   poly W;  ideal QQ;
+     poly W;  ideal QQ;
     for (i=1; i<=sI; i++)
     {
-      W = W + @a(i)*I[i];
+      W = W + par(np+i)*I[i];
     }
     while (W!=0)
     {
@@ -642,12 +688,12 @@ EXAMPLE: example linSyzSolve; shows examples
     setring @A;
     ideal QQ = imap(@B,QQ);
     // ------- 3. this QQ is a polynomial ideal, so "solve" the system -----
-    dbprint(ppl, "linSyzSolve: starting Groebner basis computation with engine:", whichengine);
+    dbprint(ppl, "// linSyzSolve: starting Groebner basis computation with engine:", whichengine);
     QQ = engine(QQ,whichengine);
-    dbprint(ppl, "QQ after engine:", QQ);
+    dbprint(ppl, "// QQ after engine:", QQ);
     if (dim(QQ) == -1)
     {
-      dbprint(ppl+1, "no solutions by linSyzSolve");
+      dbprint(ppl+1, "// no solutions by linSyzSolve");
       // output zeroes
       setring save;
       kill @A,@aA,@B;
@@ -657,13 +703,13 @@ EXAMPLE: example linSyzSolve; shows examples
     matrix AA = matrix(maxideal(1));
     module MQQ = std(module(QQ));
     AA = NF(AA,MQQ); // todo: we still receive NF warnings
-    dbprint(ppl, "AA after NF:",AA);
+    dbprint(ppl, "// AA after NF:",AA);
     //    "AA after NF:"; print(AA);
     for(i=1; i<=sI; i++)
     {
       AA = subst(AA,var(i),1);
     }
-    dbprint(ppl, "AA after subst:",AA);
+    dbprint(ppl, "// AA after subst:",AA);
     //    "AA after subst: "; print(AA);
     vector v = (module(transpose(AA)))[1];
     setring save;
@@ -686,7 +732,7 @@ proc pIntersect (poly s, ideal I, list #)
 "USAGE:  pIntersect(f, I [,s]);  f a poly, I an ideal, s an optional int
 RETURN:  vector, coefficient vector of the monic polynomial 
 PURPOSE: compute the intersection of ideal I with the subalgebra K[f]
-ASSUME:  I is given as Groebner basis.
+ASSUME:  I is given as Groebner basis, basering is not a qring.
 NOTE:    If the intersection is zero, this proc might not terminate.
 @*       If s>0 is given, it is searched for the generator of the intersection
 @*       only up to degree s. Otherwise (and by default), no bound is assumed.
@@ -695,11 +741,19 @@ DISPLAY: If printlevel=1, progress debug messages will be printed,
 EXAMPLE: example pIntersect; shows examples
 "
 {
+  def save = basering;
+  int n = nvars(save);
+  list RL = ringlist(save);
+  int i,j,k;
+  if (RL[4]<>0)
+  {
+    ERROR ("basering must not be a qring");
+  }
   // assume I is given in Groebner basis
   if (attrib(I,"isSB") <> 1)
   {
-    print("WARNING: The input has no SB attribute!");
-    print(" Treating it as if it were a Groebner basis and proceeding...");
+    print("// WARNING: The input has no SB attribute!");
+    print("// Treating it as if it were a Groebner basis and proceeding...");
     attrib(I,"isSB",1); // set attribute for suppressing NF messages
   }
   int bound = 0; // default
@@ -710,18 +764,15 @@ EXAMPLE: example pIntersect; shows examples
       bound = #[1];
     }
   }
-  int ppl = printlevel-voice+1;
+  int ppl = printlevel-voice+2;
   // ---case 1: I = basering---
   if (size(I) == 1)
   {
     if (simplify(I,2)[1] == 1)
     {
-      return(gen(2)); // = s
+      return(gen(1)); // = 1
     }
   }
-  def save = basering;
-  int n = nvars(save);
-  int i,j,k;
   // ---case 2: intersection is zero---
   intvec degs = leadexp(s);
   intvec possdegbounds;
@@ -751,8 +802,7 @@ EXAMPLE: example pIntersect; shows examples
     print("// Try a bound of at least " + string(degbound));
     return(vector(0));
   }  
-  dbprint(ppl,"a lower bound for the degree of the insection is:");
-  dbprint(ppl,degbound);
+  dbprint(ppl,"// lower bound for the degree of the insection is " +string(degbound));
   if (degbound == 0) // lm(s) does not appear in lm(I)
   {
     print("// Intersection is zero");
@@ -765,11 +815,10 @@ EXAMPLE: example pIntersect; shows examples
   l[1] = vector(0);
   poly toNF,tobracket,newNF,rednewNF,oldNF,secNF;
   i = 1;
-  dbprint(ppl+1,"pIntersect starts...");
   while (1)
   {
     if (bound>0 && i>bound) { return(vector(0)); }
-    dbprint(ppl,"testing degree: "+string(i));
+    dbprint(ppl,"// Testing degree "+string(i));
     if (i>1)
     {
       oldNF = newNF;
@@ -792,8 +841,8 @@ EXAMPLE: example pIntersect; shows examples
     ll = linReduce(newNF,redNI,1);
     rednewNF = ll[1];
     l[i+1] = ll[2];
-    dbprint(ppl,"newNF is:", newNF);
-    dbprint(ppl,"rednewNF is:", rednewNF);
+    dbprint(ppl-1,"// newNF is: "+string(newNF));
+    dbprint(ppl-1,"// rednewNF is: "+string(rednewNF));
     if (rednewNF != 0) // no linear dependency
     {
       redNI[i+1] = rednewNF;
@@ -801,14 +850,21 @@ EXAMPLE: example pIntersect; shows examples
     }
     else // there is a linear dependency, hence we are done
     {
-      dbprint(ppl+1,"the degree of the generator of the intersection is:", i);
+      dbprint(ppl,"// degree of the generator of the intersection is: "+string(i));
       break;
     }
   }
-  dbprint(ppl,"used linear reductions:", l);
-  // we obtain the coefficients of the generator of the intersection by the used reductions:
-  ring @R = 0,(a(1..i+1)),dp;
-  setring @R;
+  dbprint(ppl-1,"// used linear reductions:", l);
+  // we obtain the coefficients of the generator by the used reductions:
+  list Lvar;
+  for (j=1; j<=i+1; j++)
+  {
+    Lvar[j] = safeVarName("a("+string(j)+")");
+  }
+  list Lord = list("dp",intvec(1:(i+1))),list("C",intvec(0));
+  list L@R = RL[1..4];
+  L@R[2] = Lvar; L@R[3] = Lord;
+  def @R = ring(L@R); setring @R;
   list l = imap(save,l);
   ideal C;
   for (j=1;j<=i+1;j++)
@@ -816,12 +872,12 @@ EXAMPLE: example pIntersect; shows examples
     C[j] = 0;
     for (k=1;k<=j;k++)
     {
-      C[j] = C[j]+l[j][k]*a(k);
+      C[j] = C[j]+l[j][k]*var(k);
     }
   }
   for (j=i;j>=1;j--)
   {
-    C[i+1]= subst(C[i+1],a(j),a(j)+C[j]);
+    C[i+1]= subst(C[i+1],var(j),var(j)+C[j]);
   }
   matrix m = coeffs(C[i+1],maxideal(1));
   vector v = gen(i+1);
@@ -832,7 +888,6 @@ EXAMPLE: example pIntersect; shows examples
   setring save; 
   v = imap(@R,v);
   kill @R;
-  dbprint(ppl+1,"pIntersect finished");
   return(v);
 }
 example
@@ -848,18 +903,19 @@ example
 }
 
 proc pIntersectSyz (poly s, ideal II, list #)
-"USAGE:  pIntersectSyz(f, I [,p,s,t]);  f a poly, I an ideal, p, t optial ints, p a prime number
+"USAGE:  pIntersectSyz(f, I [,p,s,t]);  f poly, I ideal, p,t optial ints, p prime
 RETURN:  vector, coefficient vector of the monic polynomial
 PURPOSE: compute the intersection of an ideal I with the subalgebra K[f]
-ASSUME:  I is given as Groebner basis.
+ASSUME:  I is given as Groebner basis, basering is free of parameters.
 NOTE:    If the intersection is zero, this procedure might not terminate.
-@*       If p>0 is given, this proc computes the generator of the intersection in char p first
-@*       and then only searches for a generator of the obtained degree in the basering.
-@*       Otherwise, it searched for all degrees by computing syzygies.
+@*       If p>0 is given, this proc computes the generator of the intersection in
+@*       char p first and then only searches for a generator of the obtained 
+@*       degree in the basering. Otherwise, it searched for all degrees by 
+@*       computing syzygies.
 @*       If s<>0, @code{std} is used for Groebner basis computations in char 0,
 @*       otherwise, and by default, @code{slimgb} is used.
-@*       If t<>0 and by default, @code{std} is used for Groebner basis computations in char >0,
-@*       otherwise, @code{slimgb} is used.
+@*       If t<>0 and by default, @code{std} is used for Groebner basis 
+@*       computations in char >0, otherwise, @code{slimgb} is used.
 DISPLAY: If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example pIntersectSyz; shows examples
@@ -869,8 +925,8 @@ EXAMPLE: example pIntersectSyz; shows examples
   ideal I = II;
   if (attrib(I,"isSB") <> 1)
   {
-    print("WARNING: The input has no SB attribute!");
-    print(" Treating it as if it were a Groebner basis and proceeding...");
+    print("// WARNING: The input has no SB attribute!");
+    print("//  Treating it as if it were a Groebner basis and proceeding...");
     attrib(I,"isSB",1); // set attribute for suppressing NF messages
   }
   int ppl = printlevel-voice+2;
@@ -919,7 +975,7 @@ EXAMPLE: example pIntersectSyz; shows examples
     def Rp = ring(l);
     setring Rp;
     kill @Rp;
-    dbprint(ppl+1,"solving in ring ", Rp);
+    dbprint(ppl+1,"// solving in ring ", Rp);
     vector v;
     map phi = save,maxideal(1);
     poly s = phi(s);
@@ -927,11 +983,11 @@ EXAMPLE: example pIntersectSyz; shows examples
     setring save;
   }
   i = 1;
-  dbprint(ppl+1,"pIntersectSyz starts...");
-  dbprint(ppl+1,"with ideal I=", I);
+  dbprint(ppl+1,"// pIntersectSyz starts...");
+  dbprint(ppl+1,"// with ideal I=", I);
   while (1)
   {
-    dbprint(ppl,"i:"+string(i));
+    dbprint(ppl,"// i:"+string(i));
     if (i>1)
     {
       tobracket = s^(i-1)-NI[i];
@@ -947,7 +1003,7 @@ EXAMPLE: example pIntersectSyz; shows examples
       NI[i+1] = newNF;
     }
     // look for a solution
-    dbprint(ppl,"linSyzSolve starts with: "+string(matrix(NI)));
+    dbprint(ppl,"// linSyzSolve starts with: "+string(matrix(NI)));
     if (solveincharp<>0) // modular method
     {
       setring Rp;
@@ -955,7 +1011,7 @@ EXAMPLE: example pIntersectSyz; shows examples
       v = linSyzSolve(NI,modengine);
       if (v!=0) // there is a modular solution
       {
-	dbprint(ppl,"got solution in char ",solveincharp," of degree " ,i);
+	dbprint(ppl,"// got solution in char "+string(solveincharp)+" of degree "+string(i));
 	setring save;
 	v = linSyzSolve(NI,whichengine);
 	if (v==0)
@@ -974,7 +1030,7 @@ EXAMPLE: example pIntersectSyz; shows examples
       v = linSyzSolve(NI,whichengine);
     }
     matrix MM[1][nrows(v)] = matrix(v);
-    dbprint(ppl,"linSyzSolve ready  with: "+string(MM));
+    dbprint(ppl,"// linSyzSolve ready  with: "+string(MM));
     kill MM;
     //  "linSyzSolve ready with"; print(v);
     if (v!=0)
@@ -988,11 +1044,11 @@ EXAMPLE: example pIntersectSyz; shows examples
       }
       if (p!=0)
       {
-        dbprint(ppl,"linSyzSolve: bad solution!");
+        dbprint(ppl,"// linSyzSolve: bad solution!");
       }
       else
       {
-        dbprint(ppl,"linSyzSolve: got solution!");
+        dbprint(ppl,"// linSyzSolve: got solution!");
 	// "got solution!";
         break;
       }
@@ -1000,7 +1056,7 @@ EXAMPLE: example pIntersectSyz; shows examples
     // no solution:
     i++;
   }
-  dbprint(ppl+1,"pIntersectSyz finished");
+  dbprint(ppl+1,"// pIntersectSyz finished");
   return(v);
 }
 example
@@ -1087,28 +1143,31 @@ static proc listofroots (list #)
     p = #[1];
   }
   int substitution = int(#[2]);
-  ring S = 0,s,dp;
+  string s = safeVarName("s");
+  list RL = ringlist(save); RL = RL[1..4];
+  RL[2] = list(s); RL[3] = list(list("dp",intvec(1)),list("C",0));
+  def S = ring(RL); setring S;
   ideal J;
   for (i=1; i<=n; i++)
   {
-    J[i] = s;
+    J[i] = var(1);
   }
   map @m = save,J;
   poly p = @m(p);
   if (substitution == 1)
   {
-    p = subst(p,s,-s-1);
+    p = subst(p,var(1),-var(1)-1);
   }
   // the rest of this proc is nicked from bernsteinBM from dmod.lib
   list P = factorize(p);//with constants and multiplicities
-  ideal bs; intvec m;   //the Bernstein polynomial is monic, so we are not interested in constants
+  ideal bs; intvec m;   //the BS poly is monic, so we are not interested in constants
   for (i=2; i<= size(P[1]); i++)  //we delete P[1][1] and P[2][1]
   {
     bs[i-1] = P[1][i];
     m[i-1]  = P[2][i];
   }
   bs =  normalize(bs);
-  bs = -subst(bs,s,0);
+  bs = -subst(bs,var(1),0);
   setring save;
   ideal bs = imap(S,bs);
   kill S;
@@ -1122,13 +1181,27 @@ static proc bfctengine (poly f, int inorann, int whichengine, int methodord, int
   int i;
   def save = basering;
   int n = nvars(save);
+  if (isCommutative() == 0) { ERROR("basering must be commutative"); }
+  if (char(save) <> 0) { ERROR("characteristic of basering has to be 0"); }
+  list L = ringlist(save);
+  int qr;
+  if (L[4] <> 0) // qring
+  {
+    print("// basering is qring:");
+    print("// discarding the quotient and proceeding...");
+    L[4] = 0;
+    qr = 1;
+    def save2 = ring(L);
+    setring save2;
+    poly f = imap(save,f);
+  }
   if (size(variables(f)) == 0) // f is constant
   {
     return(list(ideal(0),intvec(0)));
   }  
   if (inorann == 0) // bfct using initial ideal
   {
-    def D = initialMalgrange(f,whichengine,methodord,1,u0);
+    def D = initialMalgrange(f,whichengine,methodord,u0);
     setring D;
     ideal J = inF;
     kill inF;
@@ -1153,12 +1226,12 @@ static proc bfctengine (poly f, int inorann, int whichengine, int methodord, int
       list usedprimes;
       while (b == 0)
       {
-	dbprint(ppl,"number of run in the loop: "+string(i));
+	dbprint(ppl,"// number of run in the loop: "+string(i));
 	int q = prime(random(lb,ub));
 	if (findFirst(usedprimes,q)==0) // if q was not already used
         {
 	  usedprimes = usedprimes,q;
-	  dbprint(ppl,"used prime is: "+string(q));
+	  dbprint(ppl,"// used prime is: "+string(q));
 	  b = pIntersectSyz(s,J,q,whichengine,modengine);
 	}
 	i++;
@@ -1173,15 +1246,15 @@ static proc bfctengine (poly f, int inorann, int whichengine, int methodord, int
   {
     b = pIntersect(s,J);
   }
-  setring save;
+  if (qr == 1) { setring save2; }
+  else { setring save; }
   vector b = imap(D,b);
-  if (inorann == 0)
+  if (inorann == 0) { list l = listofroots(b,1); }
+  else              { list l = listofroots(b,0); }
+  if (qr == 1) 
   {
-    list l = listofroots(b,1);
-  }
-  else
-  {
-    list l = listofroots(b,0);
+    setring save;
+    list l = imap(save2,l);
   }
   return(l);
 }
@@ -1191,17 +1264,18 @@ proc bfct (poly f, list #)
 RETURN:  list of ideal and intvec
 PURPOSE: computes the roots of the Bernstein-Sato polynomial b(s)
 @*       for the hypersurface defined by f. 
-ASSUME:  The basering is a commutative polynomial ring in char 0.
-BACKGROUND: In this proc, the initial Malgrange ideal is computed according to the algorithm 
-@*       by Masayuki Noro and then a system of linear equations is solved by linear reductions.
+ASSUME:  The basering is commutative and of characteristic 0.
+BACKGROUND: In this proc, the initial Malgrange ideal is computed according to
+@*       the algorithm by Masayuki Noro and then a system of linear equations is
+@*       solved by linear reductions.
 NOTE:    In the output list, the ideal contains all the roots 
 @*       and the intvec their multiplicities.
 @*       If s<>0, @code{std} is used for GB computations,
 @*       otherwise, and by default, @code{slimgb} is used. 
 @*       If t<>0, a matrix ordering is used for Groebner basis computations,
 @*       otherwise, and by default, a block ordering is used.
-@*       If v is a positive weight vector, v is used for homogenization computations, 
-@*       otherwise and by default, no weights are used.
+@*       If v is a positive weight vector, v is used for homogenization
+@*       computations, otherwise and by default, no weights are used.
 DISPLAY: If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example bfct; shows examples
@@ -1252,24 +1326,25 @@ example
 }
 
 proc bfctSyz (poly f, list #)
-"USAGE:  bfctSyz(f [,r,s,t,u,v]);  f a poly, r,s,t,u optional ints, v an optional intvec
+"USAGE:  bfctSyz(f [,r,s,t,u,v]);  f poly, r,s,t,u optional ints, v opt. intvec
 RETURN:  list of ideal and intvec
-PURPOSE: computes the roots of the Bernstein-Sato polynomial b(s) 
+PURPOSE: computes the roots of the Bernstein-Sato polynomial b(s)
 @*       for the hypersurface defined by f
-ASSUME:  The basering is a commutative polynomial ring in char 0.
-BACKGROUND: In this proc, the initial Malgrange ideal is computed according to the algorithm 
-@*       by Masayuki Noro and then a system of linear equations is solved by computing syzygies.
-NOTE:    In the output list, the ideal contains all the roots 
-@*       and the intvec their multiplicities.
-@*       If r<>0, @code{std} is used for GB computations in characteristic 0, 
-@*       otherwise, and by default, @code{slimgb} is used. 
-@*       If s<>0, a matrix ordering is used for GB computations, otherwise, 
+ASSUME:  The basering is commutative and of characteristic 0.
+BACKGROUND: In this proc, the initial Malgrange ideal is computed according to
+@*       the algorithm by Masayuki Noro and then a system of linear equations is
+@*       solved by computing syzygies.
+NOTE:    In the output list, the ideal contains all the roots and the intvec 
+@*       their multiplicities.
+@*       If r<>0, @code{std} is used for GB computations in characteristic 0,
+@*       otherwise, and by default, @code{slimgb} is used.
+@*       If s<>0, a matrix ordering is used for GB computations, otherwise,
 @*       and by default, a block ordering is used.
-@*       If t<>0, the computation of the intersection is solely performed over 
+@*       If t<>0, the computation of the intersection is solely performed over
 @*       charasteristic 0, otherwise and by default, a modular method is used.
-@*       If u<>0 and by default, @code{std} is used for GB computations in 
-@*       characteristic >0, otherwise, @code{slimgb} is used. 
-@*       If v is a positive weight vector, v is used for homogenization 
+@*       If u<>0 and by default, @code{std} is used for GB computations in
+@*       characteristic >0, otherwise, @code{slimgb} is used.
+@*       If v is a positive weight vector, v is used for homogenization
 @*       computations, otherwise and by default, no weights are used.
 DISPLAY: If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
@@ -1284,8 +1359,7 @@ EXAMPLE: example bfctSyz; shows examples
   // one for a modular method when computing the intersection
   // and one for the engine used for Groebner basis computations in char >0
   // in # can also be the optional weight vector
-  def save = basering;
-  int n = nvars(save);
+  int n = nvars(basering);
   int whichengine = 0; // default
   int methodord   = 0; // default
   int pIntersectchar  = 0; // default
@@ -1342,13 +1416,17 @@ example
 proc bfctIdeal (ideal I, intvec w, list #)
 "USAGE:  bfctIdeal(I,w[,s,t]);  I an ideal, w an intvec, s,t optional ints
 RETURN:  list of ideal and intvec
-PURPOSE: computes the roots of the global b-function of I wrt the weight vector (-w,w).
-ASSUME:  The basering is the n-th Weyl algebra in char 0, where the sequence of
-@*       the variables is x(1),...,x(n),D(1),...,D(n).
-BACKGROUND:  In this proc, the initial ideal of I is computed according to the algorithm by
-@*       Masayuki Noro and then a system of linear equations is solved by linear reductions.
-NOTE:    In the output list, the ideal contains all the roots 
-@*       and the intvec their multiplicities.
+PURPOSE: computes the roots of the global b-function of I wrt the weight (-w,w).
+ASSUME:  The basering is the n-th Weyl algebra in characteristic 0 and  for all
+@*       1<=i<=n the identity var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the
+@*       sequence of variables is given by x(1),...,x(n),D(1),...,D(n), 
+@*       where D(i) is the differential operator belonging to x(i).
+@*       Further assume that I is holonomic.
+BACKGROUND:  In this proc, the initial ideal of I is computed according to the
+@*       algorithm by Masayuki Noro and then a system of linear equations is
+@*       solved by linear reductions.
+NOTE:    In the output list, the ideal contains all the roots and the intvec
+@*       their multiplicities.
 @*       If s<>0, @code{std} is used for GB computations in characteristic 0,
 @*       otherwise, and by default, @code{slimgb} is used. 
 @*       If t<>0, a matrix ordering is used for GB computations, otherwise,
@@ -1378,14 +1456,38 @@ EXAMPLE: example bfctIdeal; shows examples
       }
     }
   }
+  if (isWeyl()==0) { ERROR("basering is not a Weyl algebra"); }
+  for (i=1; i<=n; i++)
+  {
+    if (bracket(var(i+n),var(i))<>1)
+    {
+      ERROR(string(var(i+n))+" is not a differential operator for " +string(var(i)));
+    }
+  }
+  int isH = isHolonomic(I);
+  if (isH<>1)
+  {
+    print("// given ideal is not holonomic");
+    print("// setting bound for degree of b-fubction to 10 and proceeding");
+    isH = 10;
+  }
+  else { isH = 0; } // no degree bound for pIntersect
   ideal J = initialIdealW(I,-w,w,whichengine,methodord);
   poly s;
   for (i=1; i<=n; i++)
   {
     s = s + w[i]*var(i)*var(n+i);
   }
-  vector b = pIntersect(s,J);
-  list l = listofroots(b,0);
+  vector b = pIntersect(s,J,isH);
+  list RL = ringlist(save); RL = RL[1..4];
+  RL[2] = list(safeVarName("s"));
+  RL[3] = list(list("dp",intvec(1)),list("C",intvec(0)));
+  def @S = ring(RL); setring @S;
+  vector b = imap(save,b);
+  poly bs = vec2poly(b);
+  list l = bFactor(bs);
+  setring save;
+  list l = imap(@S,l);
   return(l);
 }
 example
@@ -1406,13 +1508,13 @@ example
 proc bfctOneGB (poly f,list #)
 "USAGE:  bfctOneGB(f [,s,t]);  f a poly, s,t optional ints
 RETURN:  list of ideal and intvec
-PURPOSE: computes the roots of the Bernstein-Sato polynomial b(s) for the 
+PURPOSE: computes the roots of the Bernstein-Sato polynomial b(s) for the
 @*       hypersurface defined by f, using only one GB computation
-ASSUME:  The basering is a commutative polynomial ring in char 0.
-BACKGROUND: In this proc, the initial Malgrange ideal is computed based on the 
+ASSUME:  The basering is commutative and of characteristic 0.
+BACKGROUND: In this proc, the initial Malgrange ideal is computed based on the
 @*       algorithm by Masayuki Noro and combined with an elimination ordering.
-NOTE:    In the output list, the ideal contains all the roots 
-@*       and the intvec their multiplicities.
+NOTE:    In the output list, the ideal contains all the roots and the intvec
+@*       their multiplicities.
 @*       If s<>0, @code{std} is used for the GB computation, otherwise,
 @*       and by default, @code{slimgb} is used. 
 @*       If t<>0, a matrix ordering is used for GB computations,
@@ -1423,8 +1525,25 @@ EXAMPLE: example bfctOneGB; shows examples
 "
 {
   int ppl = printlevel - voice +2;
+  if (isCommutative() == 0) { ERROR("basering must be commutative"); }
   def save = basering;
   int n = nvars(save);
+  if (char(save) <> 0) 
+  {
+    ERROR("characteristic of basering has to be 0");
+  }
+  list L = ringlist(save);
+  int qr;
+  if (L[4] <> 0) // qring?
+  {
+    print("// basering is qring:");
+    print("// discarding the quotient and proceeding...");
+    L[4] = 0;
+    qr = 1;
+    def save2 = ring(L);
+    setring save2;
+    poly f = imap(save,f);
+  }
   int noofvars = 2*n+4;
   int i;
   int whichengine = 0; // default
@@ -1453,7 +1572,7 @@ EXAMPLE: example bfctOneGB; shows examples
   intvec @a2 = @a; @a2[2] = 0; @a2[2*n+4] = 0;
   if (methodord == 0) // default: block ordering
   {
-    ring Dh = 0,(t,s,x(n..1),Dt,D(n..1),h),(a(@a),a(@a2),a(uv),dp(noofvars-1),lp(1));
+    ring @Dh = 0,(t,s,x(n..1),Dt,D(n..1),h),(a(@a),a(@a2),a(uv),dp(noofvars-1),lp(1));
   }
   else // M() ordering
   {
@@ -1464,11 +1583,11 @@ EXAMPLE: example bfctOneGB; shows examples
     {
       @Ord[2+i,noofvars - i] = -1;
     }
-    dbprint(ppl,"weights for ordering:",transpose(@a));
-    dbprint(ppl,"the ordering matrix:",@Ord);
-    ring Dh = 0,(t,s,x(n..1),Dt,D(n..1),h),(a(@a),a(@a2),M(@Ord));
+    dbprint(ppl,"// weights for ordering: "+string(transpose(@a)));
+    dbprint(ppl,"// the ordering matrix:",@Ord);
+    ring @Dh = 0,(t,s,x(n..1),Dt,D(n..1),h),(a(@a),a(@a2),M(@Ord));
   }
-  dbprint(ppl,"the ring Dh:",Dh);
+  dbprint(ppl,"// the ring Dh:",Dh);
   // non-commutative relations
   matrix @relD[noofvars][noofvars];
   @relD[1,2] = t*h^2;// s*t = t*s+t*h^2
@@ -1478,10 +1597,10 @@ EXAMPLE: example bfctOneGB; shows examples
   {
     @relD[i+2,n+3+i] = h^2;
   }
-  dbprint(ppl,"nc relations:",@relD);
-  def DDh = nc_algebra(1,@relD);
-  setring DDh;
-  dbprint(ppl,"computing in ring",DDh);
+  dbprint(ppl,"// nc relations:",@relD);
+  def Dh = nc_algebra(1,@relD);
+  setring Dh;
+  dbprint(ppl,"// computing in ring",DDh);
   ideal I;
   poly f = imap(r,f);
   kill r;
@@ -1491,25 +1610,31 @@ EXAMPLE: example bfctOneGB; shows examples
   {
     I = I, D(i)+diff(f,x(i))*Dt;
   }
-  dbprint(ppl, "starting Groebner basis computation with engine:", whichengine);
+  dbprint(ppl, "// starting Groebner basis computation with engine: "+string(whichengine));
   I = engine(I, whichengine);
-  dbprint(ppl, "finished Groebner basis computation");
-  dbprint(ppl, "I before dehomogenization is" ,I);
+  dbprint(ppl, "// finished Groebner basis computation");
+  dbprint(ppl, "// I before dehomogenization: "+string(I));
   I = subst(I,h,1); // dehomogenization
-  dbprint(ppl, "I after dehomogenization is" ,I);
+  dbprint(ppl, "// I after dehomogenization: " +string(I));
   I = inForm(I,uv); // we are only interested in the initial form w.r.t. uv
-  dbprint(ppl, "the initial ideal:", string(matrix(I)));
+  dbprint(ppl, "// the initial ideal:", string(matrix(I)));
   intvec tonselect = 1;
   for (i=3; i<=2*n+4; i++) { tonselect = tonselect,i; }
   I = nselect(I,tonselect);
-  dbprint(ppl, "generators containing only s:", string(matrix(I)));
+  dbprint(ppl, "// generators containing only s:", string(matrix(I)));
   I = engine(I, whichengine); // is now a principal ideal;
-  setring save;
+  if (qr == 1) { setring save2; }
+  else { setring save; }
   ideal J; J[2] = var(1);
-  map @m = DDh,J;
+  map @m = Dh,J;
   ideal I = @m(I);
   poly p = I[1];
   list l = listofroots(p,1);
+  if (qr == 1)
+  {
+    setring save;
+    list l = imap(save2,l);
+  }
   return(l);
 }
 example
@@ -1524,13 +1649,13 @@ example
 proc bfctAnn (poly f, list #)
 "USAGE:  bfctAnn(f [,r]);  f a poly, r an optional int
 RETURN:  list of ideal and intvec
-PURPOSE: computes the roots of the Bernstein-Sato polynomial b(s) 
-@*       for the hypersurface defined by f
-ASSUME:  The basering is a commutative polynomial ring in char 0.
+PURPOSE: computes the roots of the Bernstein-Sato polynomial b(s) for the
+@*       hypersurface defined by f.
+ASSUME:  The basering is commutative and of characteristic 0.
 BACKGROUND: In this proc, ann(f^s) is computed and then a system of linear
 @*       equations is solved by linear reductions.
-NOTE:    In the output list, the ideal contains all the roots 
-@*       and the intvec their multiplicities.
+NOTE:    In the output list, the ideal contains all the roots and the intvec
+@*       their multiplicities.
 @*       If r<>0, @code{std} is used for GB computations,
 @*       otherwise, and by default, @code{slimgb} is used. 
 DISPLAY: If printlevel=1, progress debug messages will be printed,
@@ -1548,7 +1673,7 @@ EXAMPLE: example bfctAnn; shows examples
       whichengine = int(#[1]);
     }
   }
-  list b = bfctengine(f,1,whichengine,0,1,0,0,0);
+  list b = bfctengine(f,1,whichengine,0,0,0,0,0);
   return(b);
 }
 example
