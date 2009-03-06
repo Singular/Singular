@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.47 2009-03-06 09:39:29 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.48 2009-03-06 10:14:41 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -2281,7 +2281,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
       if ((TEST_OPT_INTSTRATEGY) || (rField_is_Ring(currRing)))
       {
         strat->P.pCleardenom();
-	if (0)
+        if (0)
         //if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
         {
           strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT);
@@ -2291,7 +2291,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
       else
       {
         strat->P.pNorm();
-	if (0)
+        if (0)
         //if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
           strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT);
       }
@@ -2369,8 +2369,9 @@ ideal kInterRed (ideal F, ideal Q)
 #ifdef HAVE_PLURAL
   if(rIsPluralRing(currRing)) return kInterRedOld(F,Q);
 #endif
-  if(pOrdSgn==-1) return kInterRedOld(F,Q);
-  if (rField_is_numeric(currRing)) return kInterRedOld(F,Q);
+  if ((pOrdSgn==-1)
+  || (rField_is_numeric(currRing)))
+    return kInterRedOld(F,Q);
 
   BITSET save=test;
   //test|=Sy_bit(OPT_NOT_SUGAR);
