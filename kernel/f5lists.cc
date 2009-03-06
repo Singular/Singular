@@ -59,14 +59,14 @@ LNode::LNode(LNode* ln) {
         
 LNode::~LNode() {
     //delete next;
-    Print("DELETE LNODE\n");
+    //Print("DELETE LNODE\n");
     delete data;   
 }
 
 void LNode::deleteAll() {
     while(NULL != next) {
-        Print("%p\n",next);
-        pWrite(next->data->getPoly());
+        //Print("%p\n",next);
+        //pWrite(next->data->getPoly());
         next->deleteAll();
     }
     delete data;
@@ -264,7 +264,7 @@ LList::~LList() {
         temp    =   first;
         first   =   first->getNext();
         delete  temp;
-        Print("%p\n",first);
+        //Print("%p\n",first);
     }
 }
 
@@ -735,7 +735,7 @@ functions working on the class RNode
 ====================================
 */
 RNode::RNode() {
-    Print("HIER RNODE CONSTRUCTOR\n");
+    //Print("HIER RNODE CONSTRUCTOR\n");
     data    =   NULL;
     next    =   NULL;
 }
@@ -746,7 +746,7 @@ RNode::RNode(Rule* r) {
 }
 
 RNode::~RNode() {
-    Print("DELETE RULE\n");
+    //Print("DELETE RULE\n");
     delete  data;
 }
 
@@ -757,13 +757,13 @@ RNode* RNode::insert(Rule* r) {
 }
 
 RNode* RNode::insert(int i, poly t) {
-    Print("IN INSERT: ");
-    pWrite(t);
+    //Print("IN INSERT: ");
+    //pWrite(t);
     Rule*   r           =   new Rule(i,t);
-    Print("ADDRESS OF RULE: %p\n",r);
+    //Print("ADDRESS OF RULE: %p\n",r);
     RNode* newElement   =   new RNode(r);
-    Print("ADDRESS OF RNODE: %p\n",newElement);
-    Print("ADDRESS OF RNODE DATA: %p\n",newElement->getRule());
+    //Print("ADDRESS OF RNODE: %p\n",newElement);
+    //Print("ADDRESS OF RNODE DATA: %p\n",newElement->getRule());
     newElement->next    =   this;
     return newElement;
 }
@@ -799,20 +799,20 @@ RList::RList(Rule* r) {
 
 RList::~RList() {
     RNode* temp;
-    Print("%p\n",first);
+    //Print("%p\n",first);
     while(first->getRule()) {
         temp    =   first;
         first   =   first->getNext();
-        Print("1 %p\n",first);
-        if(first) {
-            Print("1' %p\n",first->getRule());
-            Print("2 %p\n",first->getNext());
+        //Print("1 %p\n",first);
+        //if(first) {
+            //Print("1' %p\n",first->getRule());
+            //Print("2 %p\n",first->getNext());
             //Print("3 %p\n",first->getNext()->getRule());
             //Print("3 %p\n",first->getNext()->getRuleTerm());
-        }
+        //}
         delete  temp;
     }
-    Print("FERTIG\n");
+    //Print("FERTIG\n");
 } 
 
 void RList::insert(int i, poly t) {
