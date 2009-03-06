@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.46 2009-03-02 17:04:52 motsak Exp $ */
+/* $Id: kstd1.cc,v 1.47 2009-03-06 09:39:29 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -2370,6 +2370,7 @@ ideal kInterRed (ideal F, ideal Q)
   if(rIsPluralRing(currRing)) return kInterRedOld(F,Q);
 #endif
   if(pOrdSgn==-1) return kInterRedOld(F,Q);
+  if (rField_is_numeric(currRing)) return kInterRedOld(F,Q);
 
   BITSET save=test;
   //test|=Sy_bit(OPT_NOT_SUGAR);
