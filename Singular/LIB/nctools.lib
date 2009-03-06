@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.40 2009-01-14 16:07:05 Singular Exp $";
+version="$Id: nctools.lib,v 1.41 2009-03-06 17:51:27 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -25,13 +25,15 @@ SuperCommutative([b,e,Q]);  return qring, the super-commutative algebra over a b
 rightStd(I);              compute a right Groebner basis of an ideal,
 
 AUXILIARY PROCEDURES:
-ncRelations(r);         recover the non-commutative relations of a G-algebra,
-isCentral(p);           check for the commutativity of a polynomial in the G-algebra,
+ncRelations(r);      recover the non-commutative relations of a G-algebra,
+isCentral(p);         check for the commutativity of a polynomial in the G-algebra,
 isNC();                 check whether basering is noncommutative,
-UpOneMatrix(N);         return NxN matrix with 1's in the whole upper triagle,
-AltVarStart();          return first alternating variable of a super-commutative algebra,
-AltVarEnd();            return last alternating variable of a super-commutative algebra,
-IsSCA();                checks whether current ring is a super-commutative algebra
+isCommutative();  check whether basering is commutative
+isWeyl();               check whether basering is a Weyl algebra
+UpOneMatrix(N);   return NxN matrix with 1's in the whole upper triagle,
+AltVarStart();        return first alternating variable of a super-commutative algebra,
+AltVarEnd();          return last alternating variable of a super-commutative algebra,
+IsSCA();                check whether current ring is a super-commutative algebra
 ";
 
 
@@ -1460,3 +1462,92 @@ example
 }
 
 //////////////////////////////////////////////////////////////////////
+
+proc isCommutative ()
+"USAGE:  isCommutative();
+RETURN:  int, 1 if basering is commutative, or 0 otherwise
+PURPOSE: check whether basering is commutative
+EXAMPLE: example isCommutative; shows an example
+"
+{
+  int iscom = 1;
+  list L = ringlist(basering);
+  if (size(L) > 4) // basering is nc_algebra
+  {
+    matrix C = L[5];
+    matrix D = L[6];
+    if (size(module(D)) <> 0) { iscom = 0; }
+    else
+    {
+      matrix U = UpOneMatrix(nvars(basering));
+      if (size(module(C-U)) <> 0) { iscom = 0; }
+    }
+  }
+  return(iscom);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  isCommutative();
+  def D = Weyl(); setring D;
+  isCommutative();
+  setring r;
+  def R = nc_algebra(1,0); setring R;
+  isCommutative();
+}
+
+//////////////////////////////////////////////////////////////////////
+
+proc isWeyl ()
+"USAGE:  isWeyl();
+RETURN:  int, 1 if basering is a Weyl algebra, or 0 otherwise
+PURPOSE: check whether basering is a Weyl algebra
+EXAMPLE: example isWeyl; shows an example
+"
+{
+  int i,j;
+  int notW = 0;
+  int N = nvars(basering);
+  if (N mod 2 <> 0) { return(notW); } // odd number of generators
+  int n = N/2;
+  list L = ringlist(basering);
+  if (size(L) < 6) { return(notW); } // basering is commutative
+  matrix C = L[5];
+  matrix D = L[6];
+  matrix U = UpOneMatrix(N);
+  if (size(ideal(C-U)) <> 0) { return(notW); } // lt(xy)<>lt(yx)
+  ideal I = D;
+  if (size(I) <> n) { return(notW); } // not n entries<>0
+  I = simplify(I,4+2);
+  int sI = size(I);
+  if (sI > 2) { return(notW); }  // more than 2 distinct entries
+  for (i=1; i<=sI; i++)
+  {
+    if (I[i]<>1 && I[i]<>-1) { return (notW); } // other values apart from 1,-1
+  }
+  ideal Ro,Co;
+  for (i=1; i<=N; i++)
+  {
+    Ro = D[1..N,i];
+    Co = D[i,1..N];
+    if (size(Ro)>1 || size(Co)>1)
+    {
+      return(int(0)); // var(i) doesn't commute with more than 1 other vars
+    }
+  }
+  return(int(1)); // all tests passed: basering is Weyl algebra
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(a,b,c,d),dp;
+  isWeyl();
+  def D = Weyl(1); setring D; //make from r a Weyl algebra
+  b*a;
+  isWeyl();
+  ring t = 0,(Dx,x,y,Dy),dp;
+  matrix M[4][4]; M[1,2]=-1; M[3,4]=1;
+  def T = nc_algebra(1,M); setring T;
+  isWeyl();
+}
