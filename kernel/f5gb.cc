@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.cc,v 1.40 2009-03-06 21:30:21 ederc Exp $ */
+/* $Id: f5gb.cc,v 1.41 2009-03-08 20:20:21 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -133,13 +133,13 @@ LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lT
     //Print("REDUCTION DONE\n");
     //Print("%p\n",rules->getFirst());
     //Print("%p\n",rTag->getFirst());
-    if(rules->getFirst() != rTag->getFirst()) {
+    //if(rules->getFirst() != rTag->getFirst()) {
         //Print("+++++++++++++++++++++++++++++++++++++NEW RULES+++++++++++++++++++++++++++++++++++++\n");
-        rTag->insert(rules->getFirst());
-    }
-    else {
+        //rTag->insert(rules->getFirst());
+    //}
+    //else {
         //Print("+++++++++++++++++++++++++++++++++++NO NEW RULES++++++++++++++++++++++++++++++++++++\n");
-    }
+    //}
     lTag->insert(lTag->getFirstCurrentIdx());
     //Print("INDEX: %d\n",tempTag->getIndex());
     //pWrite(tempTag->getPoly());
@@ -872,6 +872,8 @@ ideal F5main(ideal id, ring r) {
             }
             //Print("HIER AUCH\n");
             gbPrev          =   idAdd(gbPrev,gbAdd);
+            
+            
             // interreduction stuff
             
             if(i<IDELEMS(id)) {
@@ -882,6 +884,7 @@ ideal F5main(ideal id, ring r) {
                 //Print("RULES FIRST NOW1: %p\n",rules->getFirst());
                 //Print("HIER\n");
                 delete rules;
+                //delete rTag;
                 //Print("HIER AUCH\n");
                 //Print("%p\n",rules->getFirst());
                 gPrev    =   new LList(pOne,1,gbPrev->m[0]);
@@ -890,9 +893,11 @@ ideal F5main(ideal id, ring r) {
                 pSetCoeff(tempPoly,nOne);
                 pLcm(pHead(gbPrev->m[0]),pHead(gbPrev->m[1]),tempPoly);
                 rules    =   new RList();
+                
                 //Print("%p\n",rules->getFirst());
                 //pWrite(tempPoly);
                 rules->insert(2,tempPoly);
+                rTag    =   new RTagList(rules->getFirst());
                 //Print("%p\n",rules->getFirst());
                 //Print("%p\n",rules->getFirst()->getNext()->getNext());
                 //Print("HIERLALA\n");
@@ -907,6 +912,7 @@ ideal F5main(ideal id, ring r) {
                         pSetCoeff(tempPoly,nOne);
                         rules->insert(k+1,tempPoly);
                     }
+                    rTag->insert(rules->getFirst());
                 }
             }
             
