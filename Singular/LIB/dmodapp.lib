@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmodapp.lib,v 1.21 2009-03-06 20:32:29 levandov Exp $";
+version="$Id: dmodapp.lib,v 1.22 2009-03-09 18:34:52 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmodapp.lib     Applications of algebraic D-modules
@@ -1521,6 +1521,7 @@ EXAMPLE: example initialIdealW; shows examples
       ERROR(string(var(i+n))+" is not a differential operator for " +string(var(i)));
     }
   }
+  
   // 1. create  homogenized Weyl algebra
   // 1.1 create ordering
   intvec uv = u,v,0;
@@ -1555,7 +1556,7 @@ EXAMPLE: example initialIdealW; shows examples
   dbprint(ppl,"// nc relations:",@relD);
   def Dh = nc_algebra(1,@relD);
   setring Dh; kill @Dh;
-  dbprint(ppl,"// computing in ring",DDh);
+  dbprint(ppl,"// computing in ring",Dh);
   // 2. Compute the initial ideal
   ideal I = imap(save,I);
   I = homog(I,h);
@@ -1652,10 +1653,10 @@ EXAMPLE: example initialMalgrange; shows examples
   {
     u0 = 1:n;
   }
-  if (isCommutative() == 0) { ERROR("basering must be commutative"); }
   if (char(save) <> 0)      { ERROR("characteristic of basering has to be 0"); }
   // creating the homogenized extended Weyl algebra
   list RL = ringlist(save);
+  RL = RL[1..4]; // if basering is commutative nc_algebra
   list C0 = list("C",intvec(0));
   // 1. get the weighted degree of f
   list Lord = list(list("wp",u0),C0);
@@ -1778,14 +1779,14 @@ example
   inF;
 }
 
-static proc dmodappassumeViolation()
+proc dmodappassumeViolation()
 {
   // returns Boolean : yes/no [for assume violation]
   // char K = 0
   // no qring
-  // input poly/ideal is nonzero ?
-  if ( (char(basering) !=0 ) || (nvars(basering) != gkdim(std(0)) ) )
+  if (  (size(ideal(basering)) >0) || (char(basering) >0) )
   {
+    //    "ERROR: no qring is allowed";
     return(1);
   }
   return(0);

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: bfun.lib,v 1.3 2009-03-06 20:32:28 levandov Exp $";
+version="$Id: bfun.lib,v 1.4 2009-03-09 18:34:51 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: bfun.lib     Algorithms for b-functions and Bernstein-Sato polynomial
@@ -55,7 +55,7 @@ SEE ALSO: dmod_lib, dmodapp_lib, gmssing_lib
 LIB "qhmoduli.lib"; // for Max
 LIB "dmod.lib";     // for SannfsBFCT etc
 LIB "dmodapp.lib";  // for initialIdealW etc
-LIB "nctools.lib"; // for isWeyl etc
+LIB "nctools.lib";  // for isWeyl etc
 
 ///////////////////////////////////////////////////////////////////////////////
 // testing for consistency of the library:
@@ -148,9 +148,9 @@ example
 
 static proc safeVarName (string s)
 {
-  string cv = "," + charstr(basering) + "," + varstr(basering) + ",";
+  string S = "," + charstr(basering) + "," + varstr(basering) + ",";
   s = "," + s + ",";
-  while (find(cv,s) <> 0)
+  while (find(S,s) <> 0)
   {
     s[1] = "@";
     s = "," + s;
@@ -902,16 +902,17 @@ example
   pIntersect(t*Dt,inF,1);
 }
 
-proc pIntersectSyz (poly s, ideal II, list #)
+proc pIntersectSyz (poly s, ideal I, list #)
 "USAGE:  pIntersectSyz(f, I [,p,s,t]);  f poly, I ideal, p,t optial ints, p prime
 RETURN:  vector, coefficient vector of the monic polynomial
 PURPOSE: compute the intersection of an ideal I with the subalgebra K[f]
-ASSUME:  I is given as Groebner basis, basering is free of parameters.
+ASSUME:  I is given as Groebner basis.
 NOTE:    If the intersection is zero, this procedure might not terminate.
 @*       If p>0 is given, this proc computes the generator of the intersection in
 @*       char p first and then only searches for a generator of the obtained 
 @*       degree in the basering. Otherwise, it searched for all degrees by 
-@*       computing syzygies.
+@*       computing syzygies. Note that the basering must be free of parameters to
+@*       use this modular method.
 @*       If s<>0, @code{std} is used for Groebner basis computations in char 0,
 @*       otherwise, and by default, @code{slimgb} is used.
 @*       If t<>0 and by default, @code{std} is used for Groebner basis 
@@ -922,7 +923,6 @@ EXAMPLE: example pIntersectSyz; shows examples
 "
 {
   // assume I is given in Groebner basis
-  ideal I = II;
   if (attrib(I,"isSB") <> 1)
   {
     print("// WARNING: The input has no SB attribute!");
@@ -961,21 +961,39 @@ EXAMPLE: example pIntersectSyz; shows examples
   ideal NI = 1;
   newNF = NF(s,I);
   NI[2] = newNF;
+  list l = ringlist(save);
+  if (typeof(l[1]) == "int") { l[1] = solveincharp; }
+  else // parameters in basering: problems with mappings from Q(a_i)->Z/p(a_i)
+  {
+    if (solveincharp <> 0)
+    {
+      print("// basering must be free of parameters to use modular method");
+      print("// solving in characteristic of basering only...");
+      solveincharp = 0;
+    }
+  }
   if (solveincharp<>0)
   {
-    list l = ringlist(save);
-    l[1] = solveincharp;
-    matrix l5 = l[5];
-    matrix l6 = l[6];
+    if (size(l)>4)
+    {
+      matrix l5 = l[5];
+      matrix l6 = l[6];
+    }
     def @Rp = ring(l);
     setring @Rp;
     list l = ringlist(@Rp);
-    l[5] = fetch(save,l5);
-    l[6] = fetch(save,l6);
+    setring save;
+    if (size(l)>4)
+    {
+      setring @Rp;
+      l[5] = fetch(save,l5);
+      l[6] = fetch(save,l6);
+    }
+    setring @Rp;
     def Rp = ring(l);
     setring Rp;
     kill @Rp;
-    dbprint(ppl+1,"// solving in ring ", Rp);
+    dbprint(ppl-1,"// solving in ring ", Rp);
     vector v;
     map phi = save,maxideal(1);
     poly s = phi(s);
@@ -983,11 +1001,11 @@ EXAMPLE: example pIntersectSyz; shows examples
     setring save;
   }
   i = 1;
-  dbprint(ppl+1,"// pIntersectSyz starts...");
-  dbprint(ppl+1,"// with ideal I=", I);
+  dbprint(ppl,"// pIntersectSyz starts...");
+  dbprint(ppl-1,"// with ideal I=", I);
   while (1)
   {
-    dbprint(ppl,"// i:"+string(i));
+    dbprint(ppl,"// testing degree: "+string(i));
     if (i>1)
     {
       tobracket = s^(i-1)-NI[i];
@@ -1003,7 +1021,7 @@ EXAMPLE: example pIntersectSyz; shows examples
       NI[i+1] = newNF;
     }
     // look for a solution
-    dbprint(ppl,"// linSyzSolve starts with: "+string(matrix(NI)));
+    dbprint(ppl-1,"// linSyzSolve starts with: "+string(matrix(NI)));
     if (solveincharp<>0) // modular method
     {
       setring Rp;
@@ -1030,7 +1048,7 @@ EXAMPLE: example pIntersectSyz; shows examples
       v = linSyzSolve(NI,whichengine);
     }
     matrix MM[1][nrows(v)] = matrix(v);
-    dbprint(ppl,"// linSyzSolve ready  with: "+string(MM));
+    dbprint(ppl-1,"// linSyzSolve ready  with: "+string(MM));
     kill MM;
     //  "linSyzSolve ready with"; print(v);
     if (v!=0)
@@ -1056,7 +1074,7 @@ EXAMPLE: example pIntersectSyz; shows examples
     // no solution:
     i++;
   }
-  dbprint(ppl+1,"// pIntersectSyz finished");
+  dbprint(ppl,"// pIntersectSyz finished");
   return(v);
 }
 example
@@ -1189,10 +1207,9 @@ static proc bfctengine (poly f, int inorann, int whichengine, int methodord, int
   {
     print("// basering is qring:");
     print("// discarding the quotient and proceeding...");
-    L[4] = 0;
+    L[4] = ideal(0);
     qr = 1;
-    def save2 = ring(L);
-    setring save2;
+    def save2 = ring(L); setring save2;
     poly f = imap(save,f);
   }
   if (size(variables(f)) == 0) // f is constant
@@ -1213,6 +1230,7 @@ static proc bfctengine (poly f, int inorann, int whichengine, int methodord, int
     setring D;
     ideal J = LD;
     kill LD;
+    poly s = var(2*n+1);
   }
   vector b;
   // try it modular
@@ -1220,24 +1238,53 @@ static proc bfctengine (poly f, int inorann, int whichengine, int methodord, int
   {
     if (pIntersectchar == 0) // pIntersectSyz::modular
     {
-      int lb = 30000;
-      int ub = 536870909;
-      i = 1;
-      list usedprimes;
-      while (b == 0)
-      {
-	dbprint(ppl,"// number of run in the loop: "+string(i));
-	int q = prime(random(lb,ub));
-	if (findFirst(usedprimes,q)==0) // if q was not already used
-        {
-	  usedprimes = usedprimes,q;
-	  dbprint(ppl,"// used prime is: "+string(q));
-	  b = pIntersectSyz(s,J,q,whichengine,modengine);
+      list L = ringlist(D);
+      if (typeof(L[1])=="int")
+      {  
+	int lb = 10000;
+	int ub = 536870909;
+	i = 1;
+	list usedprimes;
+	matrix L5 = L[5]; matrix L6 = L[6];
+	int sJ = size(J); int sJq;
+	while (b == 0)
+	{
+	  dbprint(ppl,"// number of run in the loop: "+string(i));
+	  int q = prime(random(lb,ub));
+	  if (findFirst(usedprimes,q)==0) // if q was not already used
+	  {
+	    usedprimes = usedprimes,q;
+	    dbprint(ppl,"// using prime: "+string(q));
+	    L[1] = q;
+	    def @Rq = ring(L); setring @Rq;
+	    list lq = ringlist(@Rq);
+	    lq[5] = fetch(D,L5); lq[6] = fetch(D,L6);
+	    def Rq = ring(lq);
+	    setring Rq; kill @Rq;
+	    ideal Jq = fetch(D,J);
+	    sJq = size(lead(Jq));
+	    setring D; kill Rq;
+	    if (sJq <> sJ)
+	    {
+	      dbprint(ppl,"// " +string(q) + " is unlucky");
+	      b = 0;
+	    }
+	    else
+	    {
+	      b = pIntersectSyz(s,J,q,whichengine,modengine);
+	    }
+	  }
+	  i++;
 	}
-	i++;
       }
-    }
-    else // pIntersectSyz::non-modular 
+      else //parameters: problem when mapping Q(a_i) -> Z/p(a_i)
+      {
+	print("// basering must be free of parameters to use modular method");
+	print("// solving only in char 0...");
+	b = pIntersectSyz(s,J,0,whichengine);
+      }
+    }  
+    else // pIntersectSyz::non-modular else // parameters in basering: problems with mappings
     {
       b = pIntersectSyz(s,J,0,whichengine);
     }
@@ -1246,16 +1293,10 @@ static proc bfctengine (poly f, int inorann, int whichengine, int methodord, int
   {
     b = pIntersect(s,J);
   }
-  if (qr == 1) { setring save2; }
-  else { setring save; }
-  vector b = imap(D,b);
   if (inorann == 0) { list l = listofroots(b,1); }
   else              { list l = listofroots(b,0); }
-  if (qr == 1) 
-  {
-    setring save;
-    list l = imap(save2,l);
-  }
+  setring save;
+  list l = imap(D,l);
   return(l);
 }
 
@@ -1342,6 +1383,7 @@ NOTE:    In the output list, the ideal contains all the roots and the intvec
 @*       and by default, a block ordering is used.
 @*       If t<>0, the computation of the intersection is solely performed over
 @*       charasteristic 0, otherwise and by default, a modular method is used.
+@*       Note that in this case, the basering must be free of parameters.
 @*       If u<>0 and by default, @code{std} is used for GB computations in
 @*       characteristic >0, otherwise, @code{slimgb} is used.
 @*       If v is a positive weight vector, v is used for homogenization
@@ -1468,7 +1510,7 @@ EXAMPLE: example bfctIdeal; shows examples
   if (isH<>1)
   {
     print("// given ideal is not holonomic");
-    print("// setting bound for degree of b-fubction to 10 and proceeding");
+    print("// setting bound for degree of b-function to 10 and proceeding");
     isH = 10;
   }
   else { isH = 0; } // no degree bound for pIntersect
@@ -1525,7 +1567,7 @@ EXAMPLE: example bfctOneGB; shows examples
 "
 {
   int ppl = printlevel - voice +2;
-  if (isCommutative() == 0) { ERROR("basering must be commutative"); }
+  if (!isCommutative()) { ERROR("Basering must be commutative"); }
   def save = basering;
   int n = nvars(save);
   if (char(save) <> 0) 
@@ -1538,13 +1580,13 @@ EXAMPLE: example bfctOneGB; shows examples
   {
     print("// basering is qring:");
     print("// discarding the quotient and proceeding...");
-    L[4] = 0;
+    L[4] = ideal(0);
     qr = 1;
     def save2 = ring(L);
     setring save2;
     poly f = imap(save,f);
   }
-  int noofvars = 2*n+4;
+  int N = 2*n+4;
   int i;
   int whichengine = 0; // default
   int methodord   = 0; // default
@@ -1562,62 +1604,81 @@ EXAMPLE: example bfctOneGB; shows examples
       }
     }
   }
-  intvec uv;
-  uv[n+3] = 1;
-  ring r = 0,(x(1..n)),dp;
-  poly f = fetch(save,f);
-  uv[1] = -1; uv[noofvars] = 0;
-  //  for the ordering
-  intvec @a; @a = 1:noofvars; @a[2] = 2;
+  // creating the homogenized extended Weyl algebra
+  // create names for vars
+  list Lvar;
+  Lvar[1]   = safeVarName("t"); 
+  Lvar[2]   = safeVarName("s");
+  Lvar[n+3] = safeVarName("D"+Lvar[1]);
+  Lvar[N]   = safeVarName("h");
+  for (i=1; i<=n; i++)
+  {
+    Lvar[i+2]   = string(var(i));
+    Lvar[i+n+3] = safeVarName("D" + string(var(i)));
+  }
+  // create ordering
+  intvec uv = -1; uv[n+3] = 1; uv[N] = 0;
+  intvec @a = 1:N; @a[2] = 2;
   intvec @a2 = @a; @a2[2] = 0; @a2[2*n+4] = 0;
+  list Lord; 
+  Lord[1] = list("a",@a); Lord[2] = list("a",@a2);
   if (methodord == 0) // default: block ordering
   {
-    ring @Dh = 0,(t,s,x(n..1),Dt,D(n..1),h),(a(@a),a(@a2),a(uv),dp(noofvars-1),lp(1));
+    //ring @Dh = 0,(t,s,x(n..1),Dt,D(n..1),h),(a(@a),a(@a2),a(uv),dp(N-1),lp(1));
+    Lord[3] = list("a",uv);
+    Lord[4] = list("dp",intvec(1:(N-1)));
+    Lord[5] = list("lp",intvec(1));
+    Lord[6] = list("C",intvec(0));
   }
   else // M() ordering
   {
-    intmat @Ord[noofvars][noofvars];
-    @Ord[1,1..noofvars] = uv;
-    @Ord[2,1..noofvars] = 1:(noofvars-1);
-    for (i=1; i<=noofvars-2; i++)
-    {
-      @Ord[2+i,noofvars - i] = -1;
-    }
+    intmat @Ord[N][N];
+    @Ord[1,1..N] = uv; @Ord[2,1..N] = 1:(N-1);
+    for (i=1; i<=N-2; i++) { @Ord[2+i,N - i] = -1; }
     dbprint(ppl,"// weights for ordering: "+string(transpose(@a)));
     dbprint(ppl,"// the ordering matrix:",@Ord);
-    ring @Dh = 0,(t,s,x(n..1),Dt,D(n..1),h),(a(@a),a(@a2),M(@Ord));
+    //ring @Dh = 0,(t,s,x(n..1),Dt,D(n..1),h),(a(@a),a(@a2),M(@Ord));
+    Lord[3] = list("M",intvec(@Ord));
+    Lord[4] = list("C",intvec(0));
   }
-  dbprint(ppl,"// the ring Dh:",Dh);
-  // non-commutative relations
-  matrix @relD[noofvars][noofvars];
-  @relD[1,2] = t*h^2;// s*t = t*s+t*h^2
-  @relD[2,n+3] = Dt*h^2;// Dt*s = s*Dt+h^2
-  @relD[1,n+3] = h^2;
+  // create commutative ring
+  list L@Dh = ringlist(basering);
+  L@Dh = L@Dh[1..4]; // if basering is commutative nc_algebra
+  L@Dh[2] = Lvar; L@Dh[3] = Lord;
+  def @Dh = ring(L@Dh); setring @Dh;
+  dbprint(ppl,"// the ring @Dh:",@Dh);
+  // create non-commutative relations
+  matrix @relD[N][N];
+  @relD[1,2] = var(1)*var(N)^2;     //  s*t = t*s + t*h^2
+  @relD[2,n+3] = var(n+3)*var(N)^2; // Dt*s = s*Dt+Dt*h^2
+  @relD[1,n+3] = var(N)^2;
   for (i=1; i<=n; i++)
   {
-    @relD[i+2,n+3+i] = h^2;
+    @relD[i+2,n+3+i] = var(N)^2;
   }
   dbprint(ppl,"// nc relations:",@relD);
   def Dh = nc_algebra(1,@relD);
-  setring Dh;
-  dbprint(ppl,"// computing in ring",DDh);
-  ideal I;
-  poly f = imap(r,f);
-  kill r;
+  setring Dh; kill @Dh;
+  dbprint(ppl,"// computing in ring",Dh);
+  poly f = imap(save,f);
   f = homog(f,h);
-  I = t - f, t*Dt - s;  // defining the Malgrange ideal
+  // create the Malgrange ideal
+  ideal I = var(1) - f, var(1)*var(n+3) - var(2);
   for (i=1; i<=n; i++)
   {
-    I = I, D(i)+diff(f,x(i))*Dt;
+    I[3+i] = var(i+n+3)+diff(f,var(i+2))*var(n+3);
   }
+  dbprint(ppl-1, "// the Malgrange ideal: " +string(I));
+  // the hard part: Groebner basis computation
   dbprint(ppl, "// starting Groebner basis computation with engine: "+string(whichengine));
   I = engine(I, whichengine);
   dbprint(ppl, "// finished Groebner basis computation");
-  dbprint(ppl, "// I before dehomogenization: "+string(I));
   I = subst(I,h,1); // dehomogenization
-  dbprint(ppl, "// I after dehomogenization: " +string(I));
-  I = inForm(I,uv); // we are only interested in the initial form w.r.t. uv
+  dbprint(ppl-1,string(I));
+  // 3.3 the initial form
+  I = inForm(I,uv);
   dbprint(ppl, "// the initial ideal:", string(matrix(I)));
+  // read off the solution
   intvec tonselect = 1;
   for (i=3; i<=2*n+4; i++) { tonselect = tonselect,i; }
   I = nselect(I,tonselect);
