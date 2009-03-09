@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.324 2009-03-02 16:00:01 Singular Exp $
+@comment $Id: reference.doc,v 1.325 2009-03-09 11:05:03 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -792,7 +792,7 @@ matrix
 @item @strong{Purpose:}
 develops each polynomial of the first argument, say J,
 as a univariate polynomial in the given ring_variable,
-say z, and returns the coefficients as a k x d
+say z, and returns the coefficients as a d x k
 matrix M,
 where:
 @format
