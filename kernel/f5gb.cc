@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.cc,v 1.41 2009-03-08 20:20:21 ederc Exp $ */
+/* $Id: f5gb.cc,v 1.42 2009-03-09 14:51:42 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -23,7 +23,6 @@
 #include "f5gb.h"
 #include "f5data.h"
 #include "f5lists.h"
-
 int reductionsToZero   =  0;
 
 /*
@@ -297,8 +296,8 @@ inline bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag) {
         //Print("%d\n\n",l->getIndex());
 // start at the previously added element to gPrev, as all other elements will have the same index for sure
     RNode* testNode =   new RNode();
-    /*
-    if(NULL == rTag->getFirst()->getRule()) {
+     
+    if(NULL == rTag->getFirst() || NULL == rTag->getFirst()->getRule()) {
         testNode    =   rules->getFirst();
     }
     else {
@@ -306,20 +305,24 @@ inline bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag) {
             testNode    =   rules->getFirst();
         }
         else {
-        //Print("DEBUG\n");
+       //Print("HIER\n"); 
+            //Print("DEBUG\n");
         //Print("L INDEX: %d\n",l->getIndex());
             /*-------------------------------------
              * TODO: WHEN INTERREDUCING THE GB THE
              *       INDEX OF THE PREVIOUS ELEMENTS
              *       GETS HIGHER!
-             *-----------------------------------
-            testNode    =   rules->getFirst();
-            //testNode    =   rTag->get(l->getIndex());
+             *-----------------------------------*/
+            //testNode    =   rules->getFirst();
+            testNode    =   rTag->get(l->getIndex());
+            if(NULL == testNode) {
+                testNode    =   rules->getFirst();
+            }
             //Print("TESTNODE ADDRESS: %p\n",testNode);
         }
     }
-    */
-    testNode    =   rules->getFirst();
+    
+    //testNode    =   rules->getFirst();
 	// save the monom t1*label_term(l) as it is tested various times in the following
     poly u1 = ppMult_qq(t,l->getTerm());
     // first element added to rTag was NULL, check for this
@@ -350,12 +353,14 @@ inline bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag) {
         if(pLmDivisibleBy(testNode->getRuleTerm(),u1)) {
             //Print("Criterion 2 NOT passed!\n");
             pDelete(&u1);
+    //Print("------------------------------IN CRITERION 2/1-----------------------------------------\n\n");
             return true;
         }
 		testNode    =   testNode->getNext();
     }
     //delete testNode;
     pDelete(&u1);
+    //Print("------------------------------IN CRITERION 2/1-----------------------------------------\n\n");
     return false;
 }
 
@@ -391,11 +396,13 @@ inline bool criterion2(poly t, LPoly* l, RList* rules, Rule* testedRule) {
         if(pLmDivisibleBy(testNode->getRuleTerm(),u1)) {
             //Print("Criterion 2 NOT passed!\n");
             pDelete(&u1);
+    //Print("------------------------------IN CRITERION 2/2-----------------------------------------\n\n");
             return true;
         }
 		testNode    =   testNode->getNext();
     }
     pDelete(&u1);
+    //Print("------------------------------IN CRITERION 2/2-----------------------------------------\n\n");
     return false;
 }
 
@@ -893,11 +900,14 @@ ideal F5main(ideal id, ring r) {
                 pSetCoeff(tempPoly,nOne);
                 pLcm(pHead(gbPrev->m[0]),pHead(gbPrev->m[1]),tempPoly);
                 rules    =   new RList();
+                rTag     =   new RTagList(rules->getFirst());
                 
                 //Print("%p\n",rules->getFirst());
                 //pWrite(tempPoly);
                 rules->insert(2,tempPoly);
-                rTag    =   new RTagList(rules->getFirst());
+                rTag->insert(rules->getFirst());
+                //Print("%p\n",rules->getFirst());
+                //Print("%p\n",rTag->getFirst());
                 //Print("%p\n",rules->getFirst());
                 //Print("%p\n",rules->getFirst()->getNext()->getNext());
                 //Print("HIERLALA\n");
@@ -917,7 +927,7 @@ ideal F5main(ideal id, ring r) {
             }
             
             gbLength    =   gPrev->getLength(); 
-
+            //Print("HIER\n");
         }
         //gPrev->print();
         //int anzahl  =   1;

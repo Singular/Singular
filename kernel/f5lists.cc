@@ -848,6 +848,7 @@ RTagNode::RTagNode(RNode* r) {
 }
        
 RTagNode::RTagNode(RNode* r, RTagNode* n) {
+    
     data = r;
     next = n;
 }
@@ -900,15 +901,17 @@ void RTagNode::set(RNode* r) {
 
 void RTagNode::print() {
     RTagNode* temp  =   this;
-    Print("1. element: %d",getRNode()->getRule()->getIndex());
-    //pWrite(getRNode()->getRule()->getTerm());
-    temp    =   temp->next;
-    int i   =   2;
-    while(NULL != temp->getRNode()) {
-        Print("%d. element: %d",i,getRNode()->getRule()->getIndex());
-        //pWrite(getRNode()->getRule()->getTerm());
+    if(NULL != temp && NULL != temp->getRNode()) {
+        Print("1. element: %d,  ",getRNode()->getRule()->getIndex());
+        pWrite(getRNode()->getRule()->getTerm());
         temp    =   temp->next;
-        i++;
+        int i   =   2;
+        while(NULL != temp->getRNode() && NULL != temp) {
+            Print("%d. element: %d,  ",i,getRNode()->getRule()->getIndex());
+            pWrite(getRNode()->getRule()->getTerm());
+            temp    =   temp->next;
+            i++;
+        }
     }
 }
 /*
@@ -929,7 +932,7 @@ RTagList::RTagList(RNode* r) {
 
 RTagList::~RTagList() {
     RTagNode* temp;
-    while(first) {
+    while(first->getRNode()) {
         temp    =   first;
         first   =   first->getNext();
         delete  temp;
