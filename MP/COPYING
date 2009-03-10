@@ -1,4 +1,4 @@
-                       SINGULAR version 3-0
+                       SINGULAR version 3-1
                     Package name:   Singular-MP
 
                       University of Kaiserslautern
@@ -8,89 +8,39 @@
             Author of this package: S. Gray, N. Kajler, P. Wang
                adopted to Singular by: O. Bachmann, S. Gray
 
-                        Copyright (C) 1999-2007
+                        Copyright (C) 1999-2009
 
 
                                *NOTICE*
 
-Permission of use within the software SINGULAR is granted by the authors.
-In addition to this permission to modify the sources is granted to the
-copyright holders of SINGULAR.
+As of September 2006, MP is also licensed under GPL, for details see README:
 
-If you wish to use this package outside of SINGULAR or to modify it in
-any way, please contact the authors
-"Simon Gray" <sgray@ashland.edu>.
-"Norbert Kajler" <kajler@paris.ensmp.fr>
-"Paul Wang" <pwang@mcs.kent.edu>
-For details see README
---------------------------------------------------------------------------
-Important addition:
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation ( version 2 or version 3 of the License );
+with the following additional remarks:
 
-As of September 2006, MP is also licensed under GPL:
+This package is part of the software SINGULAR. The GPL is valid for
+this package, other packages may have other copyrights.
 
-From: Simon Gray <SGRAY@wooster.edu>
-Date: 07-Sep-2006 07:43
-Subject: Re: License for MP
-To: "Paul S. Wang" <pwang@cs.kent.edu>, Jordi Gutierrez Hermoso
-<jordigh@gmail.com>
-Cc: kajler@paris.ensmp.fr
+Their copyrights and licences can be found in the accompanying files
+which are distributed along with these packages.
 
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
 
-Agreed. Nice to hear this combination is still being used.
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+59 Temple Place, Suite 330, Boston, MA  02111-1307  USA (see GPL)
 
+Please send any comments or bug reports to
+<singular@mathematik.uni-kl.de>.
 
-Simon Gray, PhD
-Department of Mathematics and Computer Science
-College of Wooster
+Availability
+============
 
-
----------- Forwarded message ----------
-From: Norbert Kajler <Norbert.Kajler@ensmp.fr>
-Date: 07-Sep-2006 07:35
-Subject: Re: License for MP
-To: Jordi Gutierrez Hermoso <jordigh@gmail.com>
-Cc: sgray@mcs.kent.edu, pwang@cs.kent.edu
-
-
-Dear Jordi, Paul, Simon,
-
-I have no objection either, and agrees with whatever Paul decides.
-
-BTW, I just attended a lecture by Richard Stallman yesterday.  I know next
-to nothing about DRM and software licenses but after listening Richard,
-my understanding is that a "free" program (in terms of GNU philosophy)
-is indeed a program that includes some kind of viral licence (so that
-programs derived from a "free" program must remain 100% "free", and so on).
-
-Therefore I am confused with the following sentences :
-
- > The specific problem is that you do not allow modifications of your code fo
-r
- > commercial purposes, which according to the DFSG, makes your code
- > non-free.
-
-Not that I insist on any kind of license, but it looks like I missed
-something :-)
-
-Regards,
--- Norbert
-
-
-
----------- Forwarded message ----------
-From: Paul S. Wang <pwang@cs.kent.edu>
-Date: 06-Sep-2006 16:22
-Subject: Re: License for MP
-To: Jordi Gutierrez Hermoso <jordigh@gmail.com>
-Cc: kajler@paris.ensmp.fr, sgray@wooster.edu
-
-
-Jordi,
-
-I am agreeable to any reasonable license including GLP.
-
-I am forwarding the msg to Simon and Norbert to see what
-they say.
-
-Paul
+The latest information about SINGULAR is always available from
+`http://www.singular.uni-kl.de'.
 
