@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: freegb.lib,v 1.18 2009-03-06 20:54:45 levandov Exp $";
+version="$Id: freegb.lib,v 1.19 2009-03-10 18:15:13 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: freegb.lib   Twosided Noncommutative Groebner bases in Free Algebras via Letterplace
@@ -20,9 +20,9 @@ lst2str(L[, n]);     convert a list (of modules) into polynomials in free algebr
 mod2str(M[, n]); convert a module into a polynomial in free algebra
 vct2str(M[, n]);   convert a vector into a word in free algebra
 lieBracket(a,b[, N]);    compute Lie bracket ab-ba of two letterplace polynomials
-serreRelations(A,z);          compute the ideal of Serre's relations associated to a generalized Cartan matrix A
-isVar(p);             check whether p is a power of a single variable
-adem(i,j);            compute the ideal of Adem relations for i<2j in char 0
+serreRelations(A,z);   compute the ideal of Serre's relations associated to a generalized Cartan matrix A
+isVar(p);                   check whether p is a power of a single variable
+ademRelations(i,j);    compute the ideal of Adem relations for i<2j in char 0
 
 SEE ALSO: LETTERPLACE
 "
@@ -135,6 +135,7 @@ static proc lshift(module M, int s, string varing, def lpring)
 static proc skip0(vector v)
 {
   // skips zeros in a vector, producing another vector
+  if ( (v[1]==0) || (v==0) ) { return(vector(0)); }
   int sv = nrows(v);
   int sw = size(v);
   if (sv == sw)
@@ -169,6 +170,10 @@ NOTE: if an optional integer is not 0, stars signs are used in multiplication
   int useStar = 0;
   if ( size(#)>0 )
   {
+    if ( typeof(#[1]) != "int")
+    {
+      ERROR("Second argument of type int expected");
+    }
     if (#[1])
     {
       useStar = 1;
@@ -176,6 +181,7 @@ NOTE: if an optional integer is not 0, stars signs are used in multiplication
   }
   int i;
   int s    = size(L);
+  if (s<1) { return(list(""));}
   list N;
   for(i=1; i<=s; i++)
   {
@@ -211,12 +217,17 @@ EXAMPLE: example mod2str; shows examples
 NOTE: if an optional integer is not 0, stars signs are used in multiplication
 "
 {
+  if (size(M)==0) { return(""); }
   // returns a string
   // a sentence in words built from M
   // if #[1] = 1, use * between generators
   int useStar = 0;
   if ( size(#)>0 )
   {
+    if ( typeof(#[1]) != "int")
+    {
+      ERROR("Second argument of type int expected");
+    }
     if (#[1])
     {
       useStar = 1;
@@ -235,7 +246,10 @@ NOTE: if an optional integer is not 0, stars signs are used in multiplication
     }
     else
     {
-      t = t + "+" + mp;
+      if (mp != "")
+      {
+         t = t + "+" + mp;
+      }
     }
   }
   if (t[1]=="+")
@@ -261,6 +275,7 @@ EXAMPLE: example vct2str; shows examples
 NOTE: if an optional integer is not 0, stars signs are used in multiplication
 "
 {
+  if (v==0) { return(""); }
   // if #[1] = 1, use * between generators
   int useStar = 0;
   if ( size(#)>0 )
@@ -274,6 +289,7 @@ NOTE: if an optional integer is not 0, stars signs are used in multiplication
   // for a word, encoded by v
   // produces a string for it
   v = skip0(v);
+  if (v==0) { return(string(""));}
   number cf = leadcoef(v[1]);
   int s = size(v);
   string vs,vv,vp,err;
@@ -283,9 +299,10 @@ NOTE: if an optional integer is not 0, stars signs are used in multiplication
     p     = isVar(v[i+1]);
     if (p==0)
     {
-      err = "Error: monomial expected at" + string(i+1);
-      dbprint(ppl,err);
-      return("_");
+      err = "Error: monomial expected at nonzero position " + string(i+1);
+      ERROR(err+" in vct2str");
+      //      dbprint(ppl,err);
+      //      return("_");
     }
     if (p==1)
     {
@@ -323,7 +340,7 @@ NOTE: if an optional integer is not 0, stars signs are used in multiplication
   else
   {
     scf = string(cf);
-    if (cf == 1)
+    if ( (cf == 1) && (size(vs)>0) )
     {
       scf = "";
     }
@@ -347,8 +364,8 @@ example
 proc isVar(poly p)
 "USAGE:  isVar(p);  poly p
 RETURN:  int
-PURPOSE: checks whether p is a power of a single variable from the basering.
-@* Returns the exponent or 0 is p is not a power of  a single variable.
+PURPOSE: check, whether leading monomial of p is a power of a single variable 
+@* from the basering. Returns the exponent or 0 if p is multivariate.
 EXAMPLE: example isVar; shows examples
 "
 {
@@ -380,9 +397,9 @@ example
   ring r = 0,(x,y),dp;
   poly f = xy+1;
   isVar(f);
-  poly g = xy;
+  poly g = y^3;
   isVar(g);
-  poly h = y^3;
+  poly h = 7*x^3;
   isVar(h);
   poly i = 1;
   isVar(i);
@@ -1505,13 +1522,13 @@ static proc schur2-3()
 
 end older procs and tests */
 
-proc adem(int i, int j)
-"USAGE:  adem(i,j); i,j int
+proc ademRelations(int i, int j)
+"USAGE:  ademRelations(i,j); i,j int
 RETURN:  ring (and exports ideal)
 ASSUME: there are at least i+j variables in the basering
 PURPOSE: compute the ideal of Adem relations for i<2j in characteristic 0
 @*  the ideal is exported under the name AdemRel in the output ring
-EXAMPLE: example adem; shows examples
+EXAMPLE: example ademRelations; shows examples
 "
 {
   // produces Adem relations for i<2j in char 0
@@ -1544,7 +1561,7 @@ EXAMPLE: example adem; shows examples
 example
 {
   "EXAMPLE:"; echo = 2;
-  def A = adem(2,5);
+  def A = ademRelations(2,5);
   setring A;
   AdemRel;
 }
@@ -2524,4 +2541,15 @@ static proc lpAssumeViolation()
   //  int i = ( defined(uptodeg) && (defined(lV)) );
   //  return ( !i );
   return(0);
+}
+
+// alias libs for compatibility with older examples
+proc freegbRing(int d)
+{
+  return(makeLetterplaceRing(d));
+}
+
+proc freegbasis( list L, int n)
+{
+  return(freeGBasis(L, n));
 }
