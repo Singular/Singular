@@ -1,0 +1,385 @@
+///////////////////////////////////////////////////////////////////
+version="$Id: sing4ti2.lib,v 1.1 2009-03-10 16:51:29 Singular Exp $";
+category="Commutative Algebra";
+info="
+LIBRARY:  sing4ti2.lib          Communication Interface to 4ti2
+
+AUTHORS:  Thomas Kahle , kahle@mis.mpg.de
+@*        Anne Fruehbis-Krueger, anne@math.uni-hannover.de
+
+NOTE: This library uses the external program 4ti2 for calculations
+@*    and the standard unix tools sed and awk for conversion of
+@*    the returned result
+
+REQUIRES: External programs 4ti2, sed and awk to be installed 
+
+PROCEDURES:
+markov4ti2(A[,i])   compute Markov basis of given lattice
+hilbert4ti2(A[,i])  compute Hilbert basis of given lattice
+graver4ti2(A[,i])   compute Graver basis of given lattice
+";
+
+
+proc markov4ti2(matrix A, list #)
+"USAGE:  markov4ti2(A[,i]);
+@*       A=intmat
+@*       i=int
+ASSUME:  - A is a matrix with integer entries which describes the lattice
+@*         as ker(A), if second argument is not present,
+@*         as left image Im(A) = {zA, z \in ZZ^k}(!), if second argument is a positive integer
+@*       - number of variables of basering equals number of columns of A
+@*         (for ker(A)) resp. of rows of A (for Im(A))
+CREATE:  files sing4ti2.mat, sing4ti2.lat, sing4ti2.mar in the current
+@*       directory (I/O files for communication with 4ti2)
+NOTE:    input rules for 4ti2 also apply to input to this procedure
+@*       hence ker(A)={x|Ax=0} and Im(A)={xA}
+RETURN:  toric ideal specified by Markov basis thereof
+EXAMPLE: example markov4ti2; shows an example
+"
+{
+//--------------------------------------------------------------------------
+// Initialization and Sanity Checks
+//--------------------------------------------------------------------------
+   int i,j;
+   int nr=nrows(A);
+   int nc=ncols(A);
+   string fileending="mat";
+   if (size(#)!=0)
+   {
+//--- default behaviour: use ker(A) as lattice
+//--- if #[1]!=0 use Im(A) as lattice
+      if(typeof(#[1])!="int")
+      {
+         ERROR("optional parameter needs to be integer value");\
+      }
+      if(#[1]!=0)
+      {
+         fileending="lat";
+      }
+   }
+//--- we should also be checking whether all entries are indeed integers
+//--- or whether there are fractions, but in this case the error message
+//--- of 4ti2 is printed directly
+   if(nvars(basering)!=ncols(A))
+      {
+          ERROR("number of columns needs to match number of variables");
+      }
+//--------------------------------------------------------------------------
+// preparing input file for 4ti2
+//--------------------------------------------------------------------------
+   link eing=":w sing4ti2."+fileending;
+   string eingstring=string(nr)+" "+string(nc);
+   write(eing,eingstring);
+   for(i=1;i<=nr;i++)
+   {
+      kill eingstring;
+      string eingstring;
+      for(j=1;j<=nc;j++)
+      {
+          if((deg(A[i,j])>0)||(char(basering)!=0)||(npars(basering)>0))
+          {
+             ERROR("Input to markov4ti2 needs to be a matrix with integer entries");
+          }
+          eingstring=eingstring+string(A[i,j])+" ";
+      }
+      write(eing, eingstring);
+   }
+   close(eing);
+
+//----------------------------------------------------------------------
+// calling 4ti2 and converting output 
+// Singular's string is too clumsy for this, hence we first prepare
+// using standard unix commands
+//----------------------------------------------------------------------
+   j=system("sh","markov sing4ti2");
+   j=system("sh","awk \'BEGIN{ORS=\",\";}{print $0;}\' sing4ti2.mar | sed s/[\\\ \\\t\\\v\\\f]/,/g | sed s/,+/,/g|sed s/,,/,/g|sed s/,,/,/g > sing4ti2.converted"); 
+   if(!defined(keepfiles))
+   {
+      j=system("sh",("rm -f sing4ti2.mar sing4ti2."+fileending));
+   } 
+//----------------------------------------------------------------------
+// reading output of 4ti2
+//----------------------------------------------------------------------
+   link ausg=":r sing4ti2.converted";
+//--- last entry ideal(0) is used to tie the list to the basering
+//--- it will not be processed any further
+   string ergstr="list erglist="+read(ausg)+ string(ideal(0))+";";
+   execute(ergstr);
+   ideal toric;
+   poly temppol1,temppol2;
+   for(i=1;i<=erglist[1];i++)
+   {
+     temppol1=1;
+     temppol2=1;
+     for(j=1;j<=erglist[2];j++)
+     {
+        if(erglist[2+(i-1)*erglist[2]+j]>=0)
+        { 
+//--- positive exponents
+           temppol1=temppol1*(var(j)^erglist[2+(i-1)*erglist[2]+j]);
+        }
+        else
+        {
+//--- negative exponents
+           temppol2=temppol2*(var(j)^(-erglist[2+(i-1)*erglist[2]+j]));
+        }
+     }
+     toric=toric,temppol1-temppol2;  
+   }
+//--- get rid of leading entry 0;
+   toric=toric[2..ncols(toric)];
+   return(toric);
+}
+example
+{"EXAMPLE:";
+   echo=2;
+   ring r=0,(x,y,z),dp;
+   matrix M[2][3]=0,1,2,2,1,0;
+   markov4ti2(M);
+   matrix N[1][3]=1,2,1;
+   markov4ti2(N,1);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc graver4ti2(matrix A, list #)
+"USAGE:  graver4ti2(A[,i]);
+@*       A=intmat
+@*       i=int
+ASSUME:  - A is a matrix with integer entries which describes the lattice
+@*         as ker(A), if second argument is not present,
+@*         as the left image Im(A) = {zA : z \in ZZ^k}, if second argument is a positive integer
+@*       - number of variables of basering equals number of columns of A
+@*         (for ker(A)) resp. of rows of A (for Im(A))
+CREATE:  temporary files sing4ti2.mat, sing4ti2.lat, sing4ti2.gra
+@*       in the current directory (I/O files for communication with 4ti2)
+NOTE:    input rules for 4ti2 also apply to input to this procedure
+@*       hence ker(A)={x|Ax=0} and Im(A)={xA}
+RETURN:  toric ideal specified by Graver basis thereof
+EXAMPLE: example graver4ti2; shows an example
+"
+{
+//--------------------------------------------------------------------------
+// Initialization and Sanity Checks
+//--------------------------------------------------------------------------
+   int i,j;
+   int nr=nrows(A);
+   int nc=ncols(A);
+   string fileending="mat";
+   if (size(#)!=0)
+   {
+//--- default behaviour: use ker(A) as lattice
+//--- if #[1]!=0 use Im(A) as lattice
+      if(typeof(#[1])!="int")
+      {
+         ERROR("optional parameter needs to be integer value");\
+      }
+      if(#[1]!=0)
+      {
+         fileending="lat";
+      }
+   }
+//--- we should also be checking whether all entries are indeed integers
+//--- or whether there are fractions, but in this case the error message
+//--- of 4ti2 is printed directly
+      if(nvars(basering)!=ncols(A))
+      {
+          ERROR("number of columns needs to match number of variables");
+      }
+//--------------------------------------------------------------------------
+// preparing input file for 4ti2
+//--------------------------------------------------------------------------
+   link eing=":w sing4ti2."+fileending;
+   string eingstring=string(nr)+" "+string(nc);
+   write(eing,eingstring);
+   for(i=1;i<=nr;i++)
+   {
+      kill eingstring;
+      string eingstring;
+      for(j=1;j<=nc;j++)
+      {
+          if((deg(A[i,j])>0)||(char(basering)!=0)||(npars(basering)>0))
+          {
+             ERROR("Input to graver4ti2 needs to be a matrix with integer entries");
+          }
+          eingstring=eingstring+string(A[i,j])+" ";
+      }
+      write(eing, eingstring);
+   }
+   close(eing);
+
+//----------------------------------------------------------------------
+// calling 4ti2 and converting output 
+// Singular's string is too clumsy for this, hence we first prepare
+// using standard unix commands
+//----------------------------------------------------------------------
+   j=system("sh","graver sing4ti2");
+   j=system("sh","awk \'BEGIN{ORS=\",\";}{print $0;}\' sing4ti2.gra | sed s/[\\\ \\\t\\\v\\\f]/,/g | sed s/,+/,/g |sed s/,,/,/g|sed s/,,/,/g > sing4ti2.converted"); 
+   if(!defined(keepfiles))
+   {
+      j=system("sh",("rm -f sing4ti2.gra sing4ti2."+fileending));
+   } 
+//----------------------------------------------------------------------
+// reading output of 4ti2
+//----------------------------------------------------------------------
+   link ausg=":r sing4ti2.converted";
+//--- last entry ideal(0) is used to tie the list to the basering
+//--- it will not be processed any further
+   string ergstr="list erglist="+read(ausg)+ string(ideal(0))+";";
+   execute(ergstr);
+   ideal toric;
+   poly temppol1,temppol2;
+   for(i=1;i<=erglist[1];i++)
+   {
+     temppol1=1;
+     temppol2=1;
+     for(j=1;j<=erglist[2];j++)
+     {
+        if(erglist[2+(i-1)*erglist[2]+j]>=0)
+        { 
+//--- positive exponents
+           temppol1=temppol1*(var(j)^erglist[2+(i-1)*erglist[2]+j]);
+        }
+        else
+        {
+//--- negative exponents
+           temppol2=temppol2*(var(j)^(-erglist[2+(i-1)*erglist[2]+j]));
+        }
+     }
+     toric=toric,temppol1-temppol2;  
+   }
+//--- get rid of leading entry 0;
+   toric=toric[2..ncols(toric)];
+   return(toric);
+}
+example
+{"EXAMPLE:";
+   echo=2;
+   ring r=0,(x,y,z,w),dp;
+   matrix M[2][4]=0,1,2,3,3,2,1,0;
+   graver4ti2(M);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc hilbert4ti2(matrix A, list #)
+"USAGE:  hilbert4ti2(A[,i]);
+@*       A=intmat
+@*       i=int
+ASSUME:  - A is a matrix with integer entries which describes the lattice
+@*         as ker(A), if second argument is not present,
+@*         as the left image Im(A) = {zA : z \in ZZ^k}, if second argument is a positive integer
+@*       - number of variables of basering equals number of columns of A
+@*         (for ker(A)) resp. of rows of A (for Im(A))
+CREATE:  temporary files sing4ti2.mat, sing4ti2.lat, sing4ti2.mar 
+@*       in the current directory (I/O files for communication with 4ti2)
+NOTE:    input rules for 4ti2 also apply to input to this procedure
+@*       hence ker(A)={x|Ax=0} and Im(A)={xA}
+RETURN:  toric ideal specified by Graver basis thereof
+EXAMPLE: example graver4ti2; shows an example
+"
+{
+//--------------------------------------------------------------------------
+// Initialization and Sanity Checks
+//--------------------------------------------------------------------------
+   int i,j;
+   int nr=nrows(A);
+   int nc=ncols(A);
+   string fileending="mat";
+   if (size(#)!=0)
+   {
+//--- default behaviour: use ker(A) as lattice
+//--- if #[1]!=0 use Im(A) as lattice
+      if(typeof(#[1])!="int")
+      {
+         ERROR("optional parameter needs to be integer value");\
+      }
+      if(#[1]!=0)
+      {
+         fileending="lat";
+      }
+   }
+//--- we should also be checking whether all entries are indeed integers
+//--- or whether there are fractions, but in this case the error message
+//--- of 4ti2 is printed directly
+      if(nvars(basering)!=ncols(A))
+      {
+          ERROR("number of columns needs to match number of variables");
+      }
+//--------------------------------------------------------------------------
+// preparing input file for 4ti2
+//--------------------------------------------------------------------------
+   link eing=":w sing4ti2."+fileending;
+   string eingstring=string(nr)+" "+string(nc);
+   write(eing,eingstring);
+   for(i=1;i<=nr;i++)
+   {
+      kill eingstring;
+      string eingstring;
+      for(j=1;j<=nc;j++)
+      {
+          if((deg(A[i,j])>0)||(char(basering)!=0)||(npars(basering)>0))
+          {
+             ERROR("Input to hilbert4ti2 needs to be a matrix with integer entries");
+          }
+          eingstring=eingstring+string(A[i,j])+" ";
+      }
+      write(eing, eingstring);
+   }
+   close(eing);
+
+//----------------------------------------------------------------------
+// calling 4ti2 and converting output 
+// Singular's string is too clumsy for this, hence we first prepare
+// using standard unix commands
+//----------------------------------------------------------------------
+   j=system("sh","hilbert sing4ti2");
+   j=system("sh","awk \'BEGIN{ORS=\",\";}{print $0;}\' sing4ti2.hil | sed s/[\\\ \\\t\\\v\\\f]/,/g | sed s/,+/,/g |sed s/,,/,/g|sed s/,,/,/g > sing4ti2.converted"); 
+   if(!defined(keepfiles))
+   {
+      j=system("sh",("rm -f sing4ti2.hil sing4ti2."+fileending));
+   } 
+//----------------------------------------------------------------------
+// reading output of 4ti2
+//----------------------------------------------------------------------
+   link ausg=":r sing4ti2.converted";
+//--- last entry ideal(0) is used to tie the list to the basering
+//--- it will not be processed any further
+   string ergstr="list erglist="+read(ausg)+ string(ideal(0))+";";
+   execute(ergstr);
+   ideal toric;
+   poly temppol1,temppol2;
+   for(i=1;i<=erglist[1];i++)
+   {
+     temppol1=1;
+     temppol2=1;
+     for(j=1;j<=erglist[2];j++)
+     {
+        if(erglist[2+(i-1)*erglist[2]+j]>=0)
+        { 
+//--- positive exponents
+           temppol1=temppol1*(var(j)^erglist[2+(i-1)*erglist[2]+j]);
+        }
+        else
+        {
+//--- negative exponents
+           temppol2=temppol2*(var(j)^(-erglist[2+(i-1)*erglist[2]+j]));
+        }
+     }
+     toric=toric,temppol1-temppol2;  
+   }
+//--- get rid of leading entry 0;
+   toric=toric[2..ncols(toric)];
+   return(toric);
+}
+// A nice example here is the 3x3 Magic Squares
+example
+{"EXAMPLE:";
+   echo=2;
+   ring r=0,(x1,x2,x3,x4,x5,x6,x7,x8,x9),dp;
+   matrix M[7][9]=1,1,1,-1,-1,-1,0,0,0,1,1,1,0,0,0,-1,-1,-1,0,1,1,-1,0,0,-1,0,0,1,0,1,0,-1,0,0,-1,0,1,1,0,0,0,-1,0,0,-1,0,1,1,0,-1,0,0,0,-1,1,1,0,0,-1,0,-1,0,0;
+   hilbert4ti2(M);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+
