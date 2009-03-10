@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmodapp.lib,v 1.22 2009-03-09 18:34:52 levandov Exp $";
+version="$Id: dmodapp.lib,v 1.23 2009-03-10 16:12:52 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmodapp.lib     Applications of algebraic D-modules
@@ -92,6 +92,7 @@ proc testdmodapp()
   example fl2poly;
   example insertGenerator;
   example deleteGenerator;
+  example bFactor;
 }
 
 proc inForm (ideal I, intvec w)
