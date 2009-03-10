@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.14 2008-06-10 10:17:32 motsak Exp $ */
+/* $Id: matpol.cc,v 1.15 2009-03-10 13:00:23 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -754,7 +754,7 @@ void   mpMonomials(matrix c, int r, int var, matrix m)
   }
   for(l=p;l>0; l--)
   {
-    pSetExp(h,var,l);
+    pSetExp(h,var,p-l+1);
     pSetm(h);
     for(k=r;k>0; k--)
     {
