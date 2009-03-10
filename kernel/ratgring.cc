@@ -6,7 +6,7 @@
  *  Purpose: Ore-noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: ratgring.cc,v 1.23 2009-02-27 19:30:47 levandov Exp $
+ *  Version: $Id: ratgring.cc,v 1.24 2009-03-10 15:47:18 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "ratgring.h"
@@ -91,16 +91,18 @@ poly p_HeadRat(poly p, int ishift, ring r)
   poly q   = pNext(p);
   if (q == NULL) return p;
   poly res = p_Head(p,r);
-  while ( (q!=NULL) && (p_Comp_k_n(p, q, ishift+1, r)))
+  const long cmp = p_GetComp(p, r);
+  while ( (q!=NULL) && (p_Comp_k_n(p, q, ishift+1, r)) && (p_GetComp(q, r) == cmp) )
   {
     res = p_Add_q(res,p_Head(q,r),r);
     q   = pNext(q);
   }
+  p_SetCompP(res,cmp,r);
   return res;
 }
 
 /* returns x-coeff of p, i.e. a poly in x, s.t. corresponding xd-monomials 
-have the same D-part 
+have the same D-part and the component 0
 does not destroy p
 */
 
@@ -111,13 +113,16 @@ poly p_GetCoeffRat(poly p, int ishift, ring r)
   res = p_GetExp_k_n(p, ishift+1, r->N, r); // does pSetm internally
   p_SetCoeff(res,n_Copy(p_GetCoeff(p,r),r),r);
   poly s;
-  while ((q!= NULL) && (p_Comp_k_n(p, q, ishift+1, r)))
+  long cmp = p_GetComp(p, r);
+  while ( (q!= NULL) && (p_Comp_k_n(p, q, ishift+1, r)) && (p_GetComp(q, r) == cmp) )
   {
     s   = p_GetExp_k_n(q, ishift+1, r->N, r);
     p_SetCoeff(s,n_Copy(p_GetCoeff(q,r),r),r);
     res = p_Add_q(res,s,r);
     q   = pNext(q);
   }
+  cmp = 0;
+  p_SetCompP(res,cmp,r);
   return res;
 }
 
@@ -127,7 +132,8 @@ void p_LmDeleteAndNextRat(poly *p, int ishift, ring r)
   //  Print("start: "); Print(" "); p_wrp(*p,r);
   p_LmCheckPolyRing2(*p, r);
   poly q = p_Head(*p,r);
-  while ( ( (*p)!=NULL ) && ( p_Comp_k_n(*p, q, ishift+1, r) ))
+  const long cmp = p_GetComp(*p, r);
+  while ( ( (*p)!=NULL ) && ( p_Comp_k_n(*p, q, ishift+1, r) ) && (p_GetComp(*p, r) == cmp) )
   {
     p_LmDelete(p,r);
     //    Print("while: ");p_wrp(*p,r);Print(" ");

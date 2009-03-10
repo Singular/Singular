@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.36 2009-02-27 19:30:47 levandov Exp $ */
+/* $Id: gr_kstd2.cc,v 1.37 2009-03-10 15:47:17 levandov Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -305,7 +305,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
 #ifdef KDEBUG
       if(TEST_OPT_DEBUG)
       {
-        p_wrp(h->p,currRing); Print(" divisibly by S[%d]=",j);
+        p_wrp(h->p,currRing); Print(" divisible by S[%d]=",j);
         p_wrp(strat->S[j],currRing); PrintS(" e=-1\n");
       }
 #endif

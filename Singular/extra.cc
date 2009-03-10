@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.296 2009-02-21 19:30:56 levandov Exp $ */
+/* $Id: extra.cc,v 1.297 2009-03-10 15:47:18 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2675,14 +2675,15 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     if (strcmp(sys_cmd, "ratNF") == 0)
     {
       poly p,q;
-      int is;
-      if ((h!=NULL) && (h->Typ()==POLY_CMD))
+      int is, htype;
+      if ((h!=NULL) && ( (h->Typ()==POLY_CMD) || (h->Typ()==VECTOR_CMD) ) )
       {
 	p=(poly)h->CopyD();
 	h=h->next;
+	htype = h->Typ();
       }
       else return TRUE;
-      if ((h!=NULL) && (h->Typ()==POLY_CMD))
+      if ((h!=NULL) && ( (h->Typ()==POLY_CMD) || (h->Typ()==VECTOR_CMD) ) )
       {
 	q=(poly)h->CopyD();
 	h=h->next;
@@ -2691,7 +2692,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       if ((h!=NULL) && (h->Typ()==INT_CMD))
       {
 	is=(int)((long)(h->Data()));
-	res->rtyp=POLY_CMD;
+	res->rtyp=htype;
 	//	res->rtyp=IDEAL_CMD;
 	if (rIsPluralRing(currRing))
 	{ 
