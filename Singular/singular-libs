@@ -18,6 +18,7 @@ SLIB0 = absfact.lib  arcpoint.lib  atkins.lib    aksaka.lib    ainvar.lib\
 	random.lib   realrad.lib   redcgs.lib    reesclos.lib   resolve.lib \
 	resgraph.lib reszeta.lib \
 	ring.lib     rinvar.lib    sagbi.lib     sheafcoh.lib   sing.lib \
+	sing4ti2.lib \
 	solve.lib    signcond.lib  spcurve.lib   spectrum.lib   standard.lib \
 	stratify.lib surf.lib      surfex.lib    teachstd.lib   toric.lib \
 	triang.lib   rootsur.lib  weierstr.lib  zeroset.lib     phindex.lib

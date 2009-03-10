@@ -1,6 +1,6 @@
-// $Id: all.lib,v 1.63 2009-03-10 11:32:00 Singular Exp $
+// $Id: all.lib,v 1.64 2009-03-10 13:19:43 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.63 2009-03-10 11:32:00 Singular Exp $";
+version="$Id: all.lib,v 1.64 2009-03-10 13:19:43 Singular Exp $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries (commutative case)
@@ -71,6 +71,7 @@ LIB "rinvar.lib";
 LIB "sagbi.lib";
 LIB "sheafcoh.lib";
 LIB "sing.lib";
+LIB "sing4ti2.lib";
 LIB "solve.lib";
 LIB "signcond.lib";
 LIB "spcurve.lib";
