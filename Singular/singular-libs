@@ -4,10 +4,10 @@
 #
 
 SLIB0 = absfact.lib  arcpoint.lib  atkins.lib    aksaka.lib    ainvar.lib\
-	alexpoly.lib algebra.lib   brnoeth.lib   curvepar.lib  cimonom.lib \
+	alexpoly.lib algebra.lib   brnoeth.lib   cimonom.lib \
         classify.lib compregb.lib \
 	control.lib  curvepar.lib   crypto.lib    deform.lib   elim.lib \
-        equising.lib freegb.lib \
+        equising.lib \
 	finvar.lib   gmspoly.lib   gmssing.lib   general.lib   graphics.lib \
 	grwalk.lib   groups.lib    hnoether.lib  homolog.lib   hyperel.lib \
 	inout.lib    intprog.lib   jacobson.lib kskernel.lib  latex.lib \
