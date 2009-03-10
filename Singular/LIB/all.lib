@@ -1,6 +1,6 @@
-// $Id: all.lib,v 1.62 2009-02-13 13:57:37 Singular Exp $
+// $Id: all.lib,v 1.63 2009-03-10 11:32:00 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.62 2009-02-13 13:57:37 Singular Exp $";
+version="$Id: all.lib,v 1.63 2009-03-10 11:32:00 Singular Exp $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries (commutative case)
@@ -18,7 +18,6 @@ LIB "ainvar.lib";
 LIB "alexpoly.lib";
 LIB "algebra.lib";
 LIB "brnoeth.lib";
-LIB "curvepar.lib";
 LIB "cimonom.lib";
 LIB "classify.lib";
 LIB "compregb.lib";
@@ -28,7 +27,6 @@ LIB "crypto.lib";
 LIB "deform.lib";
 LIB "elim.lib";
 LIB "equising.lib";
-LIB "freegb.lib";
 LIB "finvar.lib";
 LIB "gmspoly.lib";
 LIB "gmssing.lib";

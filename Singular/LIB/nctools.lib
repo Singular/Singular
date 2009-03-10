@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.41 2009-03-06 17:51:27 levandov Exp $";
+version="$Id: nctools.lib,v 1.42 2009-03-10 11:32:00 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
 AUTHORS:   Levandovskyy V.,     levandov@mathematik.uni-kl.de,
 @*         Lobillo, F.J.,       jlobillo@ugr.es,
 @*         Rabelo, C.,          crabelo@ugr.es,
-@*         Motsak, O.,          {U@D}, where U={motsak}, D={mathematik.uni-kl.de}.
+@*         Motsak, O.,          motsak@mathematik.uni-kl.de.
 
 
 
