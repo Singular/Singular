@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.499 2009-03-02 15:43:24 Singular Exp $ */
+/* $Id: iparith.cc,v 1.500 2009-03-11 09:43:29 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -5311,9 +5311,9 @@ struct sValCmd1 dArith1[]=
 ,{jjidTransp,   TRANSPOSE_CMD,   XS(MODUL_CMD),  MODUL_CMD      ALLOW_PLURAL}
 ,{jjTYPEOF,     TYPEOF_CMD,      STRING_CMD,     ANY_TYPE       ALLOW_PLURAL}
 ,{jjUNIVARIATE, UNIVARIATE_CMD,  INT_CMD,        POLY_CMD       ALLOW_PLURAL}
-,{jjVARIABLES_P,VARIABLES_CMD,   LIST_CMD,       POLY_CMD       ALLOW_PLURAL}
-,{jjVARIABLES_ID,VARIABLES_CMD,  LIST_CMD,       IDEAL_CMD       ALLOW_PLURAL}
-,{jjVARIABLES_ID,VARIABLES_CMD,  LIST_CMD,       MATRIX_CMD       ALLOW_PLURAL}
+,{jjVARIABLES_P,VARIABLES_CMD,   IDEAL_CMD,      POLY_CMD       ALLOW_PLURAL}
+,{jjVARIABLES_ID,VARIABLES_CMD,  IDEAL_CMD,      IDEAL_CMD       ALLOW_PLURAL}
+,{jjVARIABLES_ID,VARIABLES_CMD,  IDEAL_CMD,      MATRIX_CMD       ALLOW_PLURAL}
 ,{jjDUMMY,      VECTOR_CMD,      VECTOR_CMD,     VECTOR_CMD     ALLOW_PLURAL}
 ,{jjVDIM,       VDIM_CMD,        INT_CMD,        IDEAL_CMD      ALLOW_PLURAL}
 ,{jjVDIM,       VDIM_CMD,        INT_CMD,        MODUL_CMD      ALLOW_PLURAL}

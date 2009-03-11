@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmodapp.lib,v 1.24 2009-03-10 16:27:56 Singular Exp $";
+version="$Id: dmodapp.lib,v 1.25 2009-03-11 09:43:29 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmodapp.lib     Applications of algebraic D-modules
@@ -1808,8 +1808,9 @@ EXAMPLE: example bFactor; shows examples
 {
   int ppl = printlevel - voice +2;
   def save = basering;
-  list L = variables(F);
-  int i = size(L);
+  ideal LI = variables(F);
+  list L;
+  int i = size(LI);
   if (i>1) { ERROR("poly has to be univariate")}
   if (i == 0)
   {
@@ -1817,7 +1818,7 @@ EXAMPLE: example bFactor; shows examples
     L = list(ideal(0),intvec(0),string(F));
     return(L);
   }
-  poly v = L[1];
+  poly v = LI[1];
   L = ringlist(save); L = L[1..4];
   L[2] = list(string(v));
   L[3] = list(list("dp",intvec(1)),list("C",intvec(0)));

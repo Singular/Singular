@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.202 2009-02-13 09:16:27 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.203 2009-03-11 09:43:29 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -5213,10 +5213,10 @@ ideal kGroebner(ideal F, ideal Q)
   return resid;
 }
 
-void jjINT_S_TO_LIST(int n,int *e, leftv res)
+void jjINT_S_TO_ID(int n,int *e, leftv res)
 {
-  lists l=(lists)omAlloc0Bin(slists_bin);
-  l->Init(n);
+  if (n==0) n=1;
+  ideal l=idInit(n,1);
   int i;
   poly p;
   for(i=pVariables;i>0;i--)
@@ -5224,11 +5224,10 @@ void jjINT_S_TO_LIST(int n,int *e, leftv res)
     if (e[i]>0)
     {
       n--;
-      l->m[n].rtyp=POLY_CMD;
       p=pOne();
       pSetExp(p,i,1);
       pSetm(p);
-      l->m[n].data=(char *)p;
+      l->m[n]=p;
       if (n==0) break;
     }
   }
@@ -5239,7 +5238,7 @@ BOOLEAN jjVARIABLES_P(leftv res, leftv u)
 {
   int *e=(int *)omAlloc0((pVariables+1)*sizeof(int));
   int n=pGetVariables((poly)u->Data(),e);
-  jjINT_S_TO_LIST(n,e,res);
+  jjINT_S_TO_ID(n,e,res);
   return FALSE;
 }
 
@@ -5253,6 +5252,6 @@ BOOLEAN jjVARIABLES_ID(leftv res, leftv u)
   {
     n=pGetVariables(I->m[i],e);
   }
-  jjINT_S_TO_LIST(n,e,res);
+  jjINT_S_TO_ID(n,e,res);
   return FALSE;
 }
