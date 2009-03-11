@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.15 2009-03-10 13:00:23 Singular Exp $ */
+/* $Id: matpol.cc,v 1.16 2009-03-11 18:36:34 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -752,9 +752,9 @@ void   mpMonomials(matrix c, int r, int var, matrix m)
   {
     MATELEM(m,k,k*(p+1))=pOne();
   }
-  for(l=p;l>0; l--)
+  for(l=p;l>=0; l--)
   {
-    pSetExp(h,var,p-l+1);
+    pSetExp(h,var,p-l);
     pSetm(h);
     for(k=r;k>0; k--)
     {
