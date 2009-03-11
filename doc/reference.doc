@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.330 2009-03-11 11:22:03 seelisch Exp $
+@comment $Id: reference.doc,v 1.331 2009-03-11 11:46:16 seelisch Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -942,7 +942,7 @@ matrix
 @item @strong{Purpose:}
 expresses each polynomial of the first argument M as a sum
 @tex
-  $sum_{i=1}^k m_i\cdot a_i\cdot x^{e_i}$,
+  $\sum_{i=1}^k m_i\cdot a_i\cdot x^{e_i}$,
 @end tex
 @ifinfo
   m_1 * a_1 * x^e1 + m_2 * a_2 * x^e2 + ... + m_k * a_k * x^ek,
@@ -978,7 +978,7 @@ are given by ideals, then this matrix has just one row.)
 The optional parameter product_of_ringvars determines the variable x: It is expected to be either the product of
 all ring variables (then x is 1, and each polynomial will be expressed as
 @tex
-  $sum_{i=1}^k m_i\cdot a_i$,
+  $\sum_{i=1}^k m_i\cdot a_i$,
 @end tex
 @ifinfo
   m_1 * a_1 + m_2 * a_2 + ... + m_k * a_k,
