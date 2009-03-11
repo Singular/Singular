@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.501 2009-03-11 15:26:00 Singular Exp $ */
+/* $Id: iparith.cc,v 1.502 2009-03-11 16:14:31 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2521,10 +2521,10 @@ static BOOLEAN jjMONITOR2(leftv res, leftv u,leftv v)
     return TRUE;
   }
   SI_LINK_SET_CLOSE_P(l); // febase handles the FILE*
-  char *opt;
-  int mode=0;
-  if ( l->name[0]!='\0')
+  if ( l->name[0]!='\0') // "" is the stop condition
   {
+    char *opt;
+    int mode=0;
     if (v==NULL) opt="i";
     else         opt=(char *)v->Data();
     while(*opt!='\0')
@@ -2533,9 +2533,10 @@ static BOOLEAN jjMONITOR2(leftv res, leftv u,leftv v)
       else if (*opt=='o') mode |= PROT_O;
       opt++;
     }
+    monitor((FILE *)l->data,mode);
   }
-  if (((FILE*)l->data) == stdin) monitor(NULL,0);
-  else monitor((FILE *)l->data,mode);
+  else
+    monitor(NULL,0);
   return FALSE;
 #endif
 }
