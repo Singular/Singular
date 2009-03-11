@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: letterplace.doc,v 1.8 2009-03-10 18:14:38 levandov Exp $
+@comment $Id: letterplace.doc,v 1.9 2009-03-11 09:11:53 Singular Exp $
 @comment this file contains the mathematical background of Singular:Letterplace
 
 @c The following directives are necessary for proper compilation
@@ -188,20 +188,17 @@ ideal I = x(1)*y(2) + y(1)*z(2), x(1)*x(2) + x(1)*y(2) - y(1)*x(2) - y(1)*y(2);
 option(redSB); option(redTail);
 ideal J = system("freegb",I,d,nvars(r));
 J;
-@c example
-@end smallexample
-
-It is possible to convert the letterplace presentation of an ideal
-to a list of strings with the help of procedures @code{lp2lstr}
-and @code{lst2str} from the library @code{freegb.lib}. Let us continue with the example above:
-
-@smallexample
-@c example
+// ----------------------------------
   lp2lstr(J,r); // export an object called @code{@LN} to the ring r
   setring r;  // change to the ring r
   lst2str(@LN,1); // output the string presentation
 @c example
 @end smallexample
+
+It is possible to convert the letterplace presentation of an ideal
+to a list of strings with the help of procedures @code{lp2lstr}
+and @code{lst2str} from the library @code{freegb.lib}. This is shown in the 
+second part of the example above.
 
 There are various conversion routines in the library @code{freegb.lib}.
 We work further on implementing more algorithms for
