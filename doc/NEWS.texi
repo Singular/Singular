@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.124 2009-02-27 10:08:55 Singular Exp $
+@comment $Id: NEWS.texi,v 1.125 2009-03-12 12:34:25 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -125,7 +125,7 @@ all parts of @sc{Singular} are licenced under GPL (resp. LGPL) version 2, or (at
 @item
 new command: (@nref{univariate}): test polynomials for being univariate.
 @item
-new command: (@nref{variables}): list of all variables occurring in a polynomial, ideal or matrix.
+new command: (@nref{variables}): ideal of all variables occurring in a polynomial, ideal or matrix.
 @item
 syntax change: @nref{ncalgebra} should be substituted by @nref{nc_algebra}.
 @code{ncalgebra} is now depreciated, but still supported
