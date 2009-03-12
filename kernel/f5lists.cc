@@ -488,8 +488,8 @@ CNode::~CNode() {
 // note: as all critical pairs have the same index here, the second sort is done on the terms of the labels
 // working only with linked, but not doubly linked lists due to memory usage we have to check the 
 // insertion around the first element separately from the insertion around all other elements in the list
-CNode* CNode::insert(CPair* c, CNode* last) {
-    if(NULL == this->data) {
+CNode* CNode::insert(CPair* c) {
+    if(NULL == this) {
         CNode* newElement   =   new CNode(c, this);
         return newElement;
     }
@@ -510,7 +510,7 @@ CNode* CNode::insert(CPair* c, CNode* last) {
             else {
                 //Print("Insert Deg\n");
                 CNode* temp = this;
-                while(  NULL != temp->next->data ) {
+                while(  NULL != temp->next) {
                     if(temp->next->data->getDeg() == c->getDeg() ) { 
                         if(1 == pLmCmp(u1,ppMult_qq(temp->next->data->getT1(),temp->next->data->getLp1Term()))) {
                             temp = temp->next;
@@ -527,14 +527,14 @@ CNode* CNode::insert(CPair* c, CNode* last) {
                         return this;
                     }
                 }
-                CNode* newElement   =   new CNode(c, last);
+                CNode* newElement   =   new CNode(c, NULL);
                 temp->next          =   newElement;
                 return this;
             }
         } // outer if-clause
         if( c->getDeg() > this->data->getDeg() ) { // greater degree than the first list element
             CNode* temp =   this;
-            while( NULL != temp->next->data ) {   
+            while( NULL != temp->next ) {   
                 if( c->getDeg() < temp->next->data->getDeg() ) {
                     CNode* newElement   =   new CNode(c, temp->next);
                     temp->next          =   newElement;
@@ -548,7 +548,7 @@ CNode* CNode::insert(CPair* c, CNode* last) {
                     }
                     else {
                         temp = temp->next;
-                        while(  NULL != temp->next->data ) {
+                        while(  NULL != temp->next ) {
                             if( temp->next->data->getDeg() == c->getDeg() ) { 
                                 if(1 == pLmCmp(u1,ppMult_qq(temp->next->data->getT1(),
                                                temp->next->data->getLp1Term()))) {
@@ -566,7 +566,7 @@ CNode* CNode::insert(CPair* c, CNode* last) {
                                 return this;
                             }
                         }
-                        CNode* newElement   =   new CNode(c, last);
+                        CNode* newElement   =   new CNode(c, NULL);
                         temp->next          =   newElement;
                         return this;
                     }
@@ -575,7 +575,7 @@ CNode* CNode::insert(CPair* c, CNode* last) {
                     temp    =   temp->next;
                 }
             }
-            CNode* newElement   =   new CNode(c, last);
+            CNode* newElement   =   new CNode(c, NULL);
             temp->next          =   newElement;
             return this;
         }
@@ -585,14 +585,14 @@ CNode* CNode::insert(CPair* c, CNode* last) {
 // get the first elements from CList which by the above sorting have minimal degree
 CNode* CNode::getMinDeg() {
     CNode* temp = this;
-    while( NULL != temp->data ) {
-        while(NULL != temp->next->data && temp->next->data->getDeg() == this->data->getDeg()) {
+    while(NULL != temp) {
+        while(NULL != temp->next && temp->next->data->getDeg() == this->data->getDeg()) {
             temp = temp->next;
         }
         CNode* returnCNode  =   temp->next;    
         // every CList should end with a (NULL,NULL) element for a similar behaviour 
         // using termination conditions throughout the algorithm
-        temp->next          =   new CNode();
+        temp->next          =   NULL;
         return returnCNode;
     }
     return NULL;
@@ -662,7 +662,7 @@ Rule* CNode::getTestedRule() {
 void CNode::print() {
     CNode* temp = this;
     Print("___________________List of critical pairs______________________:\n");
-    while(NULL != temp->data) {
+    while(NULL != temp) {
         Print("LP1 Index: %d\n",temp->getLp1Index());
         Print("T1: ");
         pWrite(temp->getT1());
@@ -689,18 +689,16 @@ functions working on the class CList
 */
 // for initialization of CLists, last element alwas has data=NULL and next=NULL
 CList::CList() {
-    first   =   new CNode();
-    last    =   first;
+    first   =   NULL;
 }
 
 CList::CList(CPair* c) {
     first   =   new CNode(c);
-    last    =   first;
 }
 
 CList::~CList() {
     CNode* temp;
-    while(first) {
+    while(NULL != first) {
         temp    =   first;
         first   =   first->getNext();
         delete  temp;
@@ -710,7 +708,7 @@ CList::~CList() {
 // insert sorts the critical pairs firstly by increasing total degree, secondly by increasing label
 // note: as all critical pairs have the same index here, the second sort is done on the terms of the labels
 void CList::insert(CPair* c) {
-    first = first->insert(c, last);
+    first = first->insert(c);
 }
 
 CNode* CList::getFirst() {

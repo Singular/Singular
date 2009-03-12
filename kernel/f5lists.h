@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5lists.h,v 1.14 2009-03-04 20:23:05 ederc Exp $ */
+/* $Id: f5lists.h,v 1.15 2009-03-12 09:43:53 ederc Exp $ */
 /*
 * ABSTRACT: list interface
 */
@@ -200,7 +200,7 @@ class CNode {
                 CNode(CPair* c);
                 CNode(CPair* c, CNode* n);
                 ~CNode(); 
-        CNode*  insert(CPair* c, CNode* last); 
+        CNode*  insert(CPair* c); 
         CNode*  getMinDeg();
         CPair*  getData();
         CNode*  getNext();
@@ -229,8 +229,6 @@ class CList(lists of CPairs)
 class CList {
     private:
         CNode*  first;
-        // last alway has data=NULL and next=NULL, for initialization purposes used
-        CNode*  last;
     public:
                 // for initialization of CLists, last element alwas has data=NULL and next=NULL
                 CList(); 
