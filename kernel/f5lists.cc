@@ -110,7 +110,7 @@ inline LNode* LNode::insertByLabel(poly t, int i, poly p, Rule* r) {
     //Print("ADDING SOLYS TO THE LIST\n");
     //Print("new element: ");
     //pWrite(t);
-       if(NULL == this || NULL == data) {
+       if(NULL == this) { // || NULL == data) {
         LNode* newElement   =   new LNode(t, i, p, r, this);
         return newElement;
     }
@@ -241,8 +241,7 @@ functions working on the class LList
 */
 
 LList::LList() {
-    first   =   new LNode();
-    last    =   first;
+    first   =   last    =   NULL;;
     length  =   0;
 }
 
@@ -930,7 +929,7 @@ RTagList::RTagList(RNode* r) {
 
 RTagList::~RTagList() {
     RTagNode* temp;
-    while(first->getRNode()) {
+    while(first) {
         temp    =   first;
         first   =   first->getNext();
         delete  temp;

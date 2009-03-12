@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.cc,v 1.43 2009-03-12 09:43:53 ederc Exp $ */
+/* $Id: f5gb.cc,v 1.44 2009-03-12 14:34:03 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -90,6 +90,7 @@ LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lT
     // in the list critPairs
     criticalPair(gPrev, critPairs, lTag, rTag, rules);
     static LList* sPolyList        =   new LList();
+    //sPolyList->print();
     // labeled polynomials which have passed reduction() and have to be added to list gPrev
     static LList* completed        =   new LList();
     // the reduced labeled polynomials which are returned from subalgorithm reduction()
@@ -177,7 +178,10 @@ inline void criticalPair(LList* gPrev, CList* critPairs, LTagList* lTag, RTagLis
     poly u2             =   pOne();
     poly lcm            =   pOne();
     poly t              =   pHead(newElement->getPoly());
-    Rule* testedRule    =   rules->getFirst()->getRule();
+    Rule* testedRule    =   NULL;
+    if(NULL != rules->getFirst()) {
+        testedRule  =   rules->getFirst()->getRule();
+    }
     // computation of critical pairs
     //critPairs->print();
     while( gPrev->getLast() != temp) {
@@ -263,7 +267,7 @@ inline bool criterion1(LList* gPrev, poly t, LNode* l, LTagList* lTag) {
         //pWrite(l->getTerm());
         //pWrite(ppMult_qq(t,l->getTerm()));
         //Print("%d\n\n",l->getIndex());
-        while(testNode->getIndex() < idx && NULL != testNode->getLPoly()) {
+        while(testNode->getIndex() < idx) { // && NULL != testNode->getLPoly()) {
             //pWrite(testNode->getPoly());
             //Print("%d\n",testNode->getIndex());
             if(pLmDivisibleByNoComp(testNode->getPoly(),u1)) {
@@ -290,7 +294,7 @@ inline bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag) {
     Print("RULES: \n");
         RNode* tempR    =   rules->getFirst();
         int i   = 1;
-        while(NULL != tempR->getRule()) {
+        while(NULL != tempR) {
             Print("ADDRESS OF %d RNODE: %p\n",i,tempR);
             Print("ADDRESS OF RULE: %p\n",tempR->getRule());
             pWrite(tempR->getRuleTerm());
@@ -305,11 +309,11 @@ inline bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag) {
         //pWrite(l->getTerm());
         //pWrite(ppMult_qq(t,l->getTerm()));
         //Print("%d\n\n",l->getIndex());
-        */
+       */ 
 // start at the previously added element to gPrev, as all other elements will have the same index for sure
-    RNode* testNode =   new RNode();
+    RNode* testNode; // =   new RNode();
      
-    if(NULL == rTag->getFirst() || NULL == rTag->getFirst()->getRule()) {
+    if(NULL == rTag->getFirst() ) {
         testNode    =   rules->getFirst();
     }
     else {
@@ -342,7 +346,7 @@ inline bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag) {
     // NOTE: testNode is possibly NULL as rTag->get() returns NULL for elements of index <=1!
     //Print("TESTNODE: %p\n",testNode);
     //pWrite(testNode->getRuleTerm());
-    if(NULL != testNode && NULL != testNode->getRule()) {   
+    if(NULL != testNode ) {   
         //pWrite(testNode->getRuleTerm());
     }
     if(NULL != testNode) {
@@ -354,7 +358,7 @@ inline bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag) {
             //Print("NOT EQUAL\n");
         }
     }
-    while(NULL != testNode && NULL != testNode->getRule() && testNode->getRule() != l->getRule() 
+    while(NULL != testNode && testNode->getRule() != l->getRule() 
           && l->getIndex() == testNode->getRuleIndex()) {
         //Print("%p\n",testNode);
         //pWrite(testNode->getRuleTerm());
@@ -386,24 +390,26 @@ Criterion 2, i.e. Rewritten Criterion, for its second call in computeSPols(), wi
 inline bool criterion2(poly t, LPoly* l, RList* rules, Rule* testedRule) {
     //Print("------------------------------IN CRITERION 2/2-----------------------------------------\n");
     //Print("LAST RULE TESTED: %p",testedRule);
-    //Print("RULES: \n");
-        //RNode* tempR    =   rules->getFirst();
-        //while(NULL != tempR->getRule()) {
-            //pWrite(tempR->getRuleTerm());
-            //Print("%d\n\n",tempR->getRuleIndex());
-            //tempR   =   tempR->getNext();
-        //}
+    /*
+    Print("RULES: \n");
+        RNode* tempR    =   rules->getFirst();
+        while(NULL != tempR) {
+            pWrite(tempR->getRuleTerm());
+            Print("%d\n\n",tempR->getRuleIndex());
+            tempR   =   tempR->getNext();
+        }
         //Print("TESTED ELEMENT: ");
         //pWrite(l->getPoly());
         //pWrite(l->getTerm());
         //pWrite(ppMult_qq(t,l->getTerm()));
         //Print("%d\n\n",l->getIndex());
+    */
 // start at the previously added element to gPrev, as all other elements will have the same index for sure
 	RNode* testNode =   rules->getFirst();
     // save the monom t1*label_term(l) as it is tested various times in the following
     poly u1 = ppMult_qq(t,l->getTerm());
 	// first element added to rTag was NULL, check for this
-	while(NULL != testNode->getRule() && testNode->getRule() != testedRule) {
+	while(NULL != testNode && testNode->getRule() != testedRule) {
         //pWrite(testNode->getRuleTerm());
         if(pLmDivisibleBy(testNode->getRuleTerm(),u1)) {
             //Print("Criterion 2 NOT passed!\n");
@@ -505,7 +511,6 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) 
                         //Print("%p\n",sPolyList->getFirst());
                         sPolyList->insertByLabel(ppMult_qq(temp->getT1(),temp->getLp1Term()),temp->getLp1Index(),sp,rules->getFirst()->getRule());
                     }
-                    // data is saved in sPolyList or zero => delete sp
                 }
             }
         //}
@@ -553,7 +558,7 @@ void reduction(LList* sPolyList, CList* critPairs, LList* gPrev, RList* rules, L
         //pWrite(temp->getPoly());
         // delete the above first element from sPolyList, temp will be either reduced to
         // zero or added to gPrev, but never come back to sPolyList
-        if(NULL != temp && NULL != temp->getLPoly()) {
+        if(NULL != temp) { 
             sPolyList->setFirst(temp->getNext());
         //Print("HIER\n");
         }
@@ -830,7 +835,7 @@ ideal F5main(ideal id, ring r) {
     // first element in rTag is first element of rules which is NULL RNode, 
     // this must be done due to possible later improvements
     RList* rules    =   new RList();
-    //Print("RULES FIRST: %p\n",rules->getFirst());
+    Print("RULES FIRST: %p\n",rules->getFirst());
     //Print("RULES FIRST DATA: %p\n",rules->getFirst()->getRule());
     RTagList* rTag  =   new RTagList(rules->getFirst());
     i = 1;
@@ -964,7 +969,7 @@ ideal F5main(ideal id, ring r) {
         //Print("===================================================\n");
         //Print("JA\n");
     } 
-        idShow(gbPrev);
+        //idShow(gbPrev);
     Print("\n\nNumber of zero-reductions:  %d\n",reductionsToZero);
     //LNode* temp    =   gPrev->getFirst();
     //while(NULL != temp) {
