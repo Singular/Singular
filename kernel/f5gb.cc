@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.cc,v 1.44 2009-03-12 14:34:03 ederc Exp $ */
+/* $Id: f5gb.cc,v 1.45 2009-03-13 10:36:19 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -910,6 +910,8 @@ ideal F5main(ideal id, ring r) {
             
             if(i<IDELEMS(id)) {
                 ideal tempId    =   kInterRed(gbPrev);
+                idShow(tempId);
+                sleep(5);
                 gbPrev          =   tempId;
                 qsortDegree(&gbPrev->m[0],&gbPrev->m[IDELEMS(gbPrev)-1]);
                 delete gPrev;
