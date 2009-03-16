@@ -1,4 +1,4 @@
-version="$Id: tropical.lib,v 1.10 2009-01-14 16:07:05 Singular Exp $";
+version="$Id: tropical.lib,v 1.11 2009-03-16 11:32:31 keilen Exp $";
 category="Tropical Geometry";
 info="
 LIBRARY:         tropical.lib  Computations in Tropical Geometry
@@ -44,7 +44,8 @@ THEORY:
 
      Moreover, in Singular no negative exponents of monomials are allowed, so that the integer vectors
      vi will have to have non-negative entries. Shifting all exponents by a fixed integer vector does not
-     change the tropicalisation nor does it change the toric variety. Thus this does not cause any restriction.
+     change the tropicalisation nor does it change the toric variety. 
+     Thus this does not cause any restriction.
      If, however, for some reason you prefer to work with general vi, then you have to pass right away to
      the tropicalisation of the equations, whereever this is allowed -- these are linear polynomials
      where the constant coefficient correspond to the valuation of the original coefficient and where
@@ -1601,12 +1602,12 @@ example
 }
 
 proc weierstrassForm (poly f,list #)
-"USAGE:      weierstrassFormOfACubic(wf[,#]); wf poly, # list
+"USAGE:      weierstrassForm(wf[,#]); wf poly, # list
 ASSUME:      wf is a a polynomial whose Newton polygon has precisely one interior lattice
              point, so that it defines an elliptic curve on the toric surface corresponding
              to the Newton polygon
-RETURN:      poly, the Weierstrass normal form of the polygon
-NOTE:        - the algorithm for the coefficients of the Weierstrass form is due to
+RETURN:      poly, the Weierstrass normal form of the polynomial
+NOTE:        - the algorithm for the coefficients of the Weierstrass form is due to 
                Fernando Rodriguez Villegas, villegas@math.utexas.edu
 @*           - the characteristic of the base field should not be 2 or 3
 @*           - if an additional argument # is given, a simplified Weierstrass form
@@ -1646,7 +1647,7 @@ example
 {
    "EXAMPLE:";
    echo=2;
-   ring r=(0,t),(y,x),lp;
+   ring r=(0,t),(x,y),lp;
 // f is already in Weierstrass form
    poly f=y2+yx+3y-x3-2x2-4x-6;
    weierstrassForm(f);
@@ -1654,7 +1655,7 @@ example
    poly g=x+y+x2y+xy2+1/t*xy;
    poly wg=weierstrassForm(g);
    wg;
-// but it is not yet a simple, since it still has an xy-term, unlike swg
+// but it is not yet simple, since it still has an xy-term, unlike swg
    poly swg=weierstrassForm(g,1);
    swg;
 // the j-invariants of all three polynomials coincide
@@ -3948,7 +3949,7 @@ NOTE:    - the procedure is also called recursively by itself, and
     export(PARA);
   }
   // kill the gfan files in /tmp
-  system("sh","cd /tmp; /bin/rm gfaninput; /bin/rm gfanoutput");
+  system("sh","cd /tmp; /usr/bin/touch gfaninput; /usr/bin/touch gfanoutput; /bin/rm gfaninput; /bin/rm gfanoutput");  
   // we return a list which contains the parametrisation ring (with the parametrisation ideal)
   // and the string representing the maximal ideal describing the necessary field extension
   return(list(PARARing,tweight,PARAm));
@@ -4903,7 +4904,7 @@ NOTE:    - the procedure is also called recursively by itself, and
     kill TRRING;
   }
   // kill the gfan files in /tmp
-  system("sh","cd /tmp; /bin/rm gfaninput; /bin/rm gfanoutput");
+  system("sh","cd /tmp; /usr/bin/touch gfaninput; /usr/bin/touch gfanoutput; /bin/rm gfaninput; /bin/rm gfanoutput");  
   // we return a list which contains lists of the parametrisation rings (with the parametrisation ideal)
   // and an integer N such that t should be replaced by t^1/N
   return(liftings);
