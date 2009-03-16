@@ -665,6 +665,7 @@ void CNode::print() {
         Print("LP1 Index: %d\n",temp->getLp1Index());
         Print("T1: ");
         pWrite(temp->getT1());
+        Print("%p\n",temp->getT1());
         Print("LP1 Term: ");
         pWrite(temp->getLp1Term());
         Print("LP1 Poly: ");
@@ -672,6 +673,7 @@ void CNode::print() {
         Print("LP2 Index: %d\n",temp->getLp2Index());
         Print("T2: ");
         pWrite(temp->getT2());
+        Print("%p\n",temp->getT2());
         Print("LP2 Term: ");
         pWrite(temp->getLp2Term());
         Print("LP2 Poly: ");
@@ -761,7 +763,34 @@ RNode* RNode::insert(int i, poly t) {
     RNode* newElement   =   new RNode(r);
     //Print("ADDRESS OF RNODE: %p\n",newElement);
     //Print("ADDRESS OF RNODE DATA: %p\n",newElement->getRule());
-    newElement->next    =   this;
+    if(NULL == this || this->getRuleIndex() < newElement->getRuleIndex()) {
+        newElement->next    =   this;
+    }
+    else {
+        if(pDeg(newElement->getRuleTerm()) > pDeg(this->getRuleTerm())) {
+                newElement->next    =   this;
+        }
+        if(-1 == pLmCmp(newElement->getRuleTerm(),this->getRuleTerm())) {
+            Print("HAHI\n");
+            Print("%ld\n",pDeg(newElement->getRuleTerm()));
+            Print("%ld\n",pDeg(this->getRuleTerm()));
+            
+            pWrite(newElement->getRuleTerm());
+            pWrite(this->getRuleTerm());
+            RNode* temp    =   this;
+            while(NULL != temp->next && pDeg(newElement->getRuleTerm()) <= pDeg(temp->next->getRuleTerm())
+                    && -1 == pLmCmp(newElement->getRuleTerm(),temp->next->getRuleTerm())) {
+                temp    =   temp->next;
+            }
+            newElement->next    =   temp->next;
+            temp->next          =   newElement;
+            return this;
+        }
+        else {
+            newElement->next    =   this;
+            return newElement;
+        }
+    }
     return newElement;
 }
 
@@ -787,7 +816,7 @@ functions working on the class RList
 ====================================
 */
 RList::RList() {
-    first = new RNode();
+    first = NULL;
 }
 
 RList::RList(Rule* r) {
@@ -797,7 +826,7 @@ RList::RList(Rule* r) {
 RList::~RList() {
     RNode* temp;
     //Print("%p\n",first);
-    while(first->getRule()) {
+    while(first) {
         temp    =   first;
         first   =   first->getNext();
         //Print("1 %p\n",first);

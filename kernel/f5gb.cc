@@ -1,7 +1,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.cc,v 1.47 2009-03-16 13:30:59 Singular Exp $ */
+<<<<<<< f5gb.cc
+/* $Id: f5gb.cc,v 1.48 2009-03-16 19:28:07 ederc Exp $ */
+=======
+/* $Id: f5gb.cc,v 1.48 2009-03-16 19:28:07 ederc Exp $ */
+>>>>>>> 1.47
 /*
 * ABSTRACT: f5gb interface
 */
@@ -107,7 +111,6 @@ LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lT
         // NOTE: inside there is a second check of criterion 2 if new rules are 
         // added
         computeSPols(critPairsMinDeg,rTag,rules,sPolyList);
-        //Print("HIER2\n");
         // DEBUG STUFF FOR SPOLYLIST
         LNode* temp     =   sPolyList->getFirst();
         //while(NULL != temp && NULL != temp->getLPoly()) {
@@ -156,7 +159,20 @@ LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lT
     //critPairs->print();
     delete critPairs;
     //Print("IN F5INC\n");
-    
+   Print("\n\n\nRULES: \n");
+        RNode* tempR    =   rules->getFirst();
+        Print("%p\n",tempR);
+        int t   = 1;
+        while(NULL != tempR) {
+            Print("ADDRESS OF %d RNODE: %p\n",t,tempR);
+            Print("ADDRESS OF RULE: %p\n",tempR->getRule());
+            pWrite(tempR->getRuleTerm());
+            Print("ADDRESS OF TERM: %p\n",tempR->getRuleTerm());
+            Print("%d\n\n",tempR->getRuleIndex());
+            tempR   =   tempR->getNext();
+            t++;
+        }
+ 
     //gPrev->print();
     return gPrev;
 }
@@ -189,19 +205,26 @@ inline void criticalPair(LList* gPrev, CList* critPairs, LTagList* lTag, RTagLis
     while( gPrev->getLast() != temp) {
         //pWrite( *(gPrev->getFirst()->getPoly()) );
        // pWrite( *(l->getPoly()) );
+       //pWrite(newElement->getPoly());
+        //pWrite(temp->getPoly());
         pLcm(newElement->getPoly(), temp->getPoly(), lcm);
         pSetCoeff(lcm,nOne);
         // computing factors u2 for new labels
-        pExpVectorDiff(u1,lcm,t);
+        //pExpVectorDiff(u1,lcm,t);
+        //Print("U1: ");
         //pWrite(u1);
-        //u1 = pDivide(lcm,t);
+        u1 = pDivide(lcm,t);
         //pWrite(u1);
-        //pSetCoeff(u1,nOne);
-        pExpVectorDiff(u2,lcm,temp->getPoly());
+        pSetCoeff(u1,nOne);
+        //Print("%p\n",u1);
+        //critPairs->print();
+        //pExpVectorDiff(u2,lcm,temp->getPoly());
+        //Print("U2: ");
         //pWrite(u2);
-        //u2 = pDivide(lcm, pHead(temp->getPoly()));
+        u2 = pDivide(lcm, pHead(temp->getPoly()));
         //pWrite(u2);
-        //pSetCoeff(u2,nOne);
+        //Print("%p\n",u2);
+        pSetCoeff(u2,nOne);
         //if(gPrev->getLast()->getIndex()==5) {
             //Print("IN CRITPAIRS\n");
         //    pWrite(u1);
@@ -211,6 +234,7 @@ inline void criticalPair(LList* gPrev, CList* critPairs, LTagList* lTag, RTagLis
         //    pWrite(temp->getPoly());
         //}
         // testing both new labels by the F5 Criterion
+        //critPairs->print();
         if(!criterion2(u1, newElement, rules, rTag) && !criterion2(u2, temp, rules, rTag) && 
            !criterion1(gPrev,u1,newElement,lTag) && !criterion1(gPrev,u2,temp,lTag)) {
             // if they pass the test, add them to CList critPairs, having the LPoly with greater
@@ -221,6 +245,7 @@ inline void criticalPair(LList* gPrev, CList* critPairs, LTagList* lTag, RTagLis
                 
                 CPair* cp   =   new CPair(pDeg(ppMult_qq(u2,pHead(temp->getPoly()))), u2, 
                                 temp->getLPoly(), u1, newElement->getLPoly(), testedRule);                   
+                
                 critPairs->insert(cp);
                 //Print("LALA %p\n",critPairs->getFirst());
                 //sleep(5);
@@ -264,6 +289,7 @@ inline bool criterion1(LList* gPrev, poly t, LNode* l, LTagList* lTag) {
 	int idx =   l->getIndex();
     int i;
     if(idx == 1) {
+        //Print("HIER\n");
         return false;
     }
     else {
@@ -315,9 +341,10 @@ Criterion 2, i.e. Rewritten Criterion
 */
 inline bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag) {
     //Print("------------------------------IN CRITERION 2/1-----------------------------------------\n");
-    /*    
+    /*  
     Print("RULES: \n");
         RNode* tempR    =   rules->getFirst();
+        Print("%p\n",tempR);
         int i   = 1;
         while(NULL != tempR) {
             Print("ADDRESS OF %d RNODE: %p\n",i,tempR);
@@ -328,17 +355,16 @@ inline bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag) {
             tempR   =   tempR->getNext();
             i++;
         }
-        
         //Print("TESTED ELEMENT: ");
         //pWrite(l->getPoly());
         //pWrite(l->getTerm());
         //pWrite(ppMult_qq(t,l->getTerm()));
         //Print("%d\n\n",l->getIndex());
-       */ 
+      */
 // start at the previously added element to gPrev, as all other elements will have the same index for sure
     RNode* testNode; // =   new RNode();
      
-    if(NULL == rTag->getFirst()->getRule()) {
+    if(NULL == rTag->getFirst()) {
         if(NULL != rules->getFirst()) {
             testNode    =   rules->getFirst();
         }
@@ -937,14 +963,13 @@ ideal F5main(ideal id, ring r) {
             
             
             // interreduction stuff
-            
             if(i<IDELEMS(id)) {
                 ideal tempId    =   kInterRed(gbPrev);
                 //idShow(tempId);
-                sleep(5);
                 gbPrev          =   tempId;
                 //qsortDegree(&gbPrev->m[0],&gbPrev->m[IDELEMS(gbPrev)-1]);
                 delete gPrev;
+                //sleep(5);
                 //Print("RULES FIRST NOW1: %p\n",rules->getFirst());
                 //Print("HIER\n");
                 delete rules;
@@ -960,7 +985,7 @@ ideal F5main(ideal id, ring r) {
                 rTag     =   new RTagList(rules->getFirst());
                 
                 //Print("%p\n",rules->getFirst());
-                //pWrite(tempPoly);
+                pWrite(tempPoly);
                 rules->insert(2,tempPoly);
                 rTag->insert(rules->getFirst());
                 //Print("%p\n",rules->getFirst());
@@ -975,9 +1000,11 @@ ideal F5main(ideal id, ring r) {
                     for(l=0; l<k; l++) {
                         //pWrite(gbPrev->m[k]);
                         //pWrite(gbPrev->m[l]);
-                        pLcm(pHead(gbPrev->m[k]),pHead(gbPrev->m[l]),tempPoly);
-                        pSetCoeff(tempPoly,nOne);
-                        rules->insert(k+1,tempPoly);
+                        poly tempPoly2  =   pOne();
+                        pLcm(pHead(gbPrev->m[k]),pHead(gbPrev->m[l]),tempPoly2);
+                        pSetCoeff(tempPoly2,nOne);
+                        pWrite(tempPoly2);
+                        rules->insert(k+1,tempPoly2);
                     }
                     rTag->insert(rules->getFirst());
                 }
