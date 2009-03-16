@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.cc,v 1.45 2009-03-13 10:36:19 ederc Exp $ */
+/* $Id: f5gb.cc,v 1.46 2009-03-16 07:50:23 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -190,10 +190,16 @@ inline void criticalPair(LList* gPrev, CList* critPairs, LTagList* lTag, RTagLis
         pLcm(newElement->getPoly(), temp->getPoly(), lcm);
         pSetCoeff(lcm,nOne);
         // computing factors u2 for new labels
-        u1 = pDivide(lcm,t);
-        pSetCoeff(u1,nOne);
-        u2 = pDivide(lcm, pHead(temp->getPoly()));
-        pSetCoeff(u2,nOne);
+        pExpVectorDiff(u1,lcm,t);
+        //pWrite(u1);
+        //u1 = pDivide(lcm,t);
+        //pWrite(u1);
+        //pSetCoeff(u1,nOne);
+        pExpVectorDiff(u2,lcm,temp->getPoly());
+        //pWrite(u2);
+        //u2 = pDivide(lcm, pHead(temp->getPoly()));
+        //pWrite(u2);
+        //pSetCoeff(u2,nOne);
         //if(gPrev->getLast()->getIndex()==5) {
             //Print("IN CRITPAIRS\n");
         //    pWrite(u1);
@@ -203,8 +209,8 @@ inline void criticalPair(LList* gPrev, CList* critPairs, LTagList* lTag, RTagLis
         //    pWrite(temp->getPoly());
         //}
         // testing both new labels by the F5 Criterion
-        if(!criterion1(gPrev,u1,newElement,lTag) && !criterion1(gPrev,u2,temp,lTag) && 
-           !criterion2(u1, newElement, rules, rTag) && !criterion2(u2, temp, rules, rTag)) {
+        if(!criterion2(u1, newElement, rules, rTag) && !criterion2(u2, temp, rules, rTag) && 
+           !criterion1(gPrev,u1,newElement,lTag) && !criterion1(gPrev,u2,temp,lTag)) {
             // if they pass the test, add them to CList critPairs, having the LPoly with greater
             // label as first element in the CPair
             if(newElement->getIndex() == temp->getIndex() && 
@@ -254,6 +260,7 @@ Criterion 1, i.e. Faugere's F5 Criterion
 inline bool criterion1(LList* gPrev, poly t, LNode* l, LTagList* lTag) {
     // starts at the first element in gPrev with index = (index of l)-1, these tags are saved in lTag
 	int idx =   l->getIndex();
+    int i;
     if(idx == 1) {
         return false;
     }
@@ -267,6 +274,7 @@ inline bool criterion1(LList* gPrev, poly t, LNode* l, LTagList* lTag) {
         //pWrite(l->getTerm());
         //pWrite(ppMult_qq(t,l->getTerm()));
         //Print("%d\n\n",l->getIndex());
+        /*
         while(testNode->getIndex() < idx) { // && NULL != testNode->getLPoly()) {
             //pWrite(testNode->getPoly());
             //Print("%d\n",testNode->getIndex());
@@ -276,6 +284,21 @@ inline bool criterion1(LList* gPrev, poly t, LNode* l, LTagList* lTag) {
             }
             //pWrite(testNode->getNext()->getPoly());
             testNode    =   testNode->getNext();
+        }
+        */
+        ideal testId    =   idInit(idx-1,1);
+        for(i=0;i<idx-1;i++) {
+            testId->m[i]  =   pHead(testNode->getPoly());
+            testNode        =   testNode->getNext();
+        }
+        poly temp   =   kNF(testId,currQuotient,u1);
+        //pWrite(temp);
+        for(i=0;i<IDELEMS(testId);i++) {
+            testId->m[i]    =   NULL;
+        }
+        idDelete(&testId);
+        if(NULL == temp) {
+            return true;
         }
         return false;
     }
@@ -313,10 +336,16 @@ inline bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag) {
 // start at the previously added element to gPrev, as all other elements will have the same index for sure
     RNode* testNode; // =   new RNode();
      
-    if(NULL == rTag->getFirst() ) {
-        testNode    =   rules->getFirst();
+    if(NULL == rTag->getFirst()->getRule()) {
+        if(NULL != rules->getFirst()) {
+            testNode    =   rules->getFirst();
+        }
+        else {
+            return false;
+        }
     }
     else {
+
         if(l->getIndex() > rTag->getFirst()->getRuleIndex()) {
             testNode    =   rules->getFirst();
         }
@@ -337,7 +366,6 @@ inline bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag) {
             //Print("TESTNODE ADDRESS: %p\n",testNode);
         }
     }
-    
     //testNode    =   rules->getFirst();
 	// save the monom t1*label_term(l) as it is tested various times in the following
     poly u1 = ppMult_qq(t,l->getTerm());
@@ -366,7 +394,7 @@ inline bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag) {
         //pWrite(l->getTerm());
         //pWrite(u1);
         //Print("%d\n",testNode->getRuleIndex());
-        if(pLmDivisibleBy(testNode->getRuleTerm(),u1)) {
+        if(pLmDivisibleByNoComp(testNode->getRuleTerm(),u1)) {
             //Print("Criterion 2 NOT passed!\n");
             pDelete(&u1);
     //Print("------------------------------IN CRITERION 2/1-----------------------------------------\n\n");
@@ -411,7 +439,7 @@ inline bool criterion2(poly t, LPoly* l, RList* rules, Rule* testedRule) {
 	// first element added to rTag was NULL, check for this
 	while(NULL != testNode && testNode->getRule() != testedRule) {
         //pWrite(testNode->getRuleTerm());
-        if(pLmDivisibleBy(testNode->getRuleTerm(),u1)) {
+        if(pLmDivisibleByNoComp(testNode->getRuleTerm(),u1)) {
             //Print("Criterion 2 NOT passed!\n");
             pDelete(&u1);
     //Print("------------------------------IN CRITERION 2/2-----------------------------------------\n\n");
@@ -771,7 +799,7 @@ LNode* findReductor(LNode* l, LNode* gPrevRedCheck, LList* gPrev, RList* rules, 
         //pWrite(temp->getTerm());
         //pWrite(t);
         //Print("HALLO\n");
-        if(pLmDivisibleByNoComp(temp->getPoly(),t)) {
+        if(pLmDivisibleByNoComp(pHead(temp->getPoly()),t)) {
         //Print("HALLO\n");
             // get all the information needed for the following tests
             // of the criteria
@@ -851,7 +879,7 @@ ideal F5main(ideal id, ring r) {
     } 
     ideal idNew     =   kInterRed(id); 
     id              =   idNew;
-    qsortDegree(&id->m[0],&id->m[IDELEMS(id)-1]);
+    //qsortDegree(&id->m[0],&id->m[IDELEMS(id)-1]);
     idShow(id);
     LList* gPrev    =   new LList(ONE, i, id->m[0]);
     //idShow(id); 
@@ -910,10 +938,10 @@ ideal F5main(ideal id, ring r) {
             
             if(i<IDELEMS(id)) {
                 ideal tempId    =   kInterRed(gbPrev);
-                idShow(tempId);
+                //idShow(tempId);
                 sleep(5);
                 gbPrev          =   tempId;
-                qsortDegree(&gbPrev->m[0],&gbPrev->m[IDELEMS(gbPrev)-1]);
+                //qsortDegree(&gbPrev->m[0],&gbPrev->m[IDELEMS(gbPrev)-1]);
                 delete gPrev;
                 //Print("RULES FIRST NOW1: %p\n",rules->getFirst());
                 //Print("HIER\n");
