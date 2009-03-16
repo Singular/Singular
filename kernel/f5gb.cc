@@ -1,14 +1,16 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.cc,v 1.46 2009-03-16 07:50:23 ederc Exp $ */
+/* $Id: f5gb.cc,v 1.47 2009-03-16 13:30:59 Singular Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
+
 #include "mod2.h"
 #ifdef HAVE_F5
-#include "kutil.h"
+#include <unistd.h>
 #include "structs.h"
+#include "kutil.h"
 #include "omalloc.h"
 #include "polys.h"
 #include "p_polys.h"
