@@ -1,4 +1,4 @@
-version="$Id: polymake.lib,v 1.10 2009-01-14 16:07:05 Singular Exp $";
+version="$Id: polymake.lib,v 1.11 2009-03-16 11:34:10 keilen Exp $";
 category="Tropical Geometry";
 info="
 LIBRARY:        polymake.lib    Computations with polytopes and fans, interface to polymake and TOPCOM
@@ -347,7 +347,7 @@ example
 proc normalFan (intmat vertices,intmat affinehull,list graph,int er,list #)
 "USAGE:  normalFan (vert,aff,graph,rays,[,#]);   vert,aff intmat,  graph list, rays int, # string
 ASSUME:  - vert is an integer matrix whose rows are the coordinate of the vertices of
-           a convex lattice polygon;
+           a convex lattice polytope; 
 @*       - aff describes the affine hull of this polytope, i.e.
            the smallest affine space containing it, in the following sense:
            denote by n the number of columns of vert, then multiply aff by (1,x(1),...,x(n))
@@ -1031,7 +1031,7 @@ RETURN:  list, the ith entry of L[1] contains information about the ith cone in 
                secondary polytope
 @*             L[1][i][1] = integer matrix representing the inequalities which describe the
                             cone dual to the ith vertex
-@*             L[1][i][2] = a list which contains the inequalities represented by L[i][1]
+@*             L[1][i][2] = a list which contains the inequalities represented by L[1][i][1]
                             as a list of strings, where we use the variables x(1),...,x(n)
 @*             L[1][i][3] = only present if 'er' is set to 1; in that case it is an interger matrix
                             whose rows are the extreme rays of the cone
@@ -2147,12 +2147,12 @@ PURPOSE: some procedures create files in the directory /tmp which are used for
 @*       - polymakeKeepTmpFiles(0);  - then the files will be removed in the future
 RETURN:  none"
 {
-  if (i==1)
+  if ((i==1) and (defined(polymakekeeptmpfiles)==0))
   {
     int polymakekeeptmpfiles;
-    export polymakekeeptmpfiles;
+    export(polymakekeeptmpfiles);
   }
-  else
+  if (i!=1)
   {
     if (defined(polymakekeeptmpfiles))
     {
@@ -2514,88 +2514,3 @@ NOTE:        the procedure is called by fan"
 }
 
 
-/*
-proc ADeterminant (list polygon,list #)
-{
-  list triangs=triangulations(polygon);
-  list sppg=splitPolygon(polygon);
-  list etavectors;
-  int i,j;
-  int stop;
-  for (i=1;i<=size(triangs);i++)
-  {
-    etavectors[i]=eta(triangs[i],sppg);
-  }
-  size(etavectors);
-
-  for (i=size(etavectors);i>=2;i--)
-  {
-    stop=0;
-    for (j=1;(j<i) and (stop==0);j++)
-    {
-      if (etavectors[i]==etavectors[j])
-      {
-        etavectors=delete(etavectors,i);
-        stop=1;
-      }
-    }
-  }
-  size(etavectors);
-  if (size(#)>0)
-  {
-    execute("ring ADring=(0,a(1.."+string(size(etavectors))+")),("+polygonToCoordinates(polygon)[1]+"),lp;");
-    list terme;
-    poly ad,term;
-    matrix XE[1][1];
-    for (i=1;i<=size(etavectors);i++)
-    {
-      term=1;
-      for (j=1;j<=nvars(basering);j++)
-      {
-        term=term*var(j)^etavectors[i][j];
-      }
-      terme[i]=term;
-      ad=ad+a(i)*term;
-    }
-    matrix M[size(etavectors)][nvars(basering)];
-    for (i=1;i<=size(etavectors);i++)
-    {
-    }
-    return(list(etavectors,string(ad)));
-
-
-  }
-
-  return(etavectors);
-}
-
-proc adsub ()
-{
-  ring r=0,(x,y,u00,u10,u20,u01,u11,u02,a(1..5)),dp;
-  poly f1=(3x-y+1)*(2x+y+1);
-  poly f2=(7x+2y-1)*(x+y);
-  poly f3=(x-y-2)*(x+y+3);
-  poly f4=(17x-11y+3)*(x+7y-2);
-  poly f5=(x+2y-7)*(3x+3y-1);
-  poly f6=(2x+12y-17)*(33x-3y-1);
-  matrix M1=coeffs(f1,ideal(1,x,x2,y,xy,y2));
-  matrix M2=coeffs(f2,ideal(1,x,x2,y,xy,y2));
-  matrix M3=coeffs(f3,ideal(1,x,x2,y,xy,y2));
-  matrix M4=coeffs(f4,ideal(1,x,x2,y,xy,y2));
-  matrix M5=coeffs(f5,ideal(1,x,x2,y,xy,y2));
-  matrix M6=coeffs(f6,ideal(1,x,x2,y,xy,y2));
-  poly f=(a(5))*u00*u20*u02+(a(3))*u00*u11^2+(a(4))*u10^2*u02+(a(2))*u10*u01*u11+(a(1))*u20*u01^2;
-  poly g1=substitute(f,u00,M1[1,1],u10,M1[2,1],u20,M1[3,1],u01,M1[4,1],u11,M1[5,1],u02,M1[6,1]);
-  poly g2=substitute(f,u00,M2[1,1],u10,M2[2,1],u20,M2[3,1],u01,M2[4,1],u11,M2[5,1],u02,M2[6,1]);
-  poly g3=substitute(f,u00,M3[1,1],u10,M3[2,1],u20,M3[3,1],u01,M3[4,1],u11,M3[5,1],u02,M3[6,1]);
-  poly g4=substitute(f,u00,M4[1,1],u10,M4[2,1],u20,M4[3,1],u01,M4[4,1],u11,M4[5,1],u02,M4[6,1]);
-  poly g5=substitute(f,u00,M5[1,1],u10,M5[2,1],u20,M5[3,1],u01,M5[4,1],u11,M5[5,1],u02,M5[6,1]);
-  poly g6=substitute(f,u00,M6[1,1],u10,M6[2,1],u20,M6[3,1],u01,M6[4,1],u11,M6[5,1],u02,M6[6,1]);
-  ideal i=g1,g2,g3,g4,g5,g6;
-  option(redSB);
-  ideal j=std(i);
-  poly ff=substitute(f,a(5),4,a(4),-1,a(3),-1,a(2),1,a(1),-1);
-  return(string(ff));
-}
-
-*/
