@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmstd.c,v 1.4 2007-03-21 17:45:27 Singular Exp $ */
+/* $Id: mmstd.c,v 1.5 2009-03-17 09:01:46 Singular Exp $ */
 /*
 * ABSTRACT: standard version of C-memory management alloc func 
 * i.e. (malloc/realloc/free)
@@ -10,15 +10,6 @@
 #include "mod2.h"
 
 #define OM_NO_MALLOC_MACROS
-#ifdef ix86_Win
-#define OMALLOC_USES_MALLOC
-#endif
-#ifdef ppcMac_darwin
-#define OMALLOC_USES_MALLOC
-#endif
-#ifdef ix86Mac_darwin
-#define OMALLOC_USES_MALLOC
-#endif
 #include "omalloc.h"
 #include "../Singular/static.h"
 
@@ -27,6 +18,10 @@
 // on them
 // already provided in libomalloc
 #if !defined(OMALLOC_USES_MALLOC) && !defined(X_OMALLOC) && !defined(HAVE_STATIC)
+    /* in mmstd.c, for some architectures freeSize() unconditionally uses the *system* free() */
+    /* sage ticket 5344: http://trac.sagemath.org/sage_trac/ticket/5344 */
+    /* solution: correctly check OMALLOC_USES_MALLOC from omalloc.h, */
+    /* do not rely on the default in Singular as libsingular may be different */
 
 // define this so that all addr allocated there are marked 
 // as static, i.e. not metioned by omPrintUsedAddr

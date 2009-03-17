@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mminit.cc,v 1.1.1.1 2003-10-06 12:15:57 Singular Exp $ */
+/* $Id: mminit.cc,v 1.2 2009-03-17 09:01:46 Singular Exp $ */
 /*
 * ABSTRACT: init of memory management
 */
@@ -38,6 +38,10 @@ int mmInit( void )
   if(mmIsInitialized==0)
   {
 #if defined(OMALLOC_USES_MALLOC) || defined(X_OMALLOC)
+    /* in mmstd.c, for some architectures freeSize() unconditionally uses the *system* free() */
+    /* sage ticket 5344: http://trac.sagemath.org/sage_trac/ticket/5344 */
+    /* solution: correctly check OMALLOC_USES_MALLOC from omalloc.h, */
+    /* do not rely on the default in Singular as libsingular may be different */
     mp_set_memory_functions(omMallocFunc,omReallocSizeFunc,omFreeSizeFunc);
 #else
     mp_set_memory_functions(malloc,reallocSize,freeSize);
