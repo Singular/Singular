@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.141 2008-11-12 17:37:30 Singular Exp $";
+version="$Id: primdec.lib,v 1.142 2009-03-17 16:48:31 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -2676,7 +2676,20 @@ proc algeDeco(ideal i, int w)
    }
    return(re);
 }
-
+///////////////////////////////////////////////////////////////////////////////
+static proc prepare_absprimdec(list primary)
+{
+  list resu,tempo;
+  string absotto;
+  resu[size(primary)/2]=list();
+  for(int ab=1;ab<=size(primary)/2;ab++)
+  {
+    absotto= absFactorize(primary[2*ab][1],77);
+    tempo=primary[2*ab-1],primary[2*ab],absotto,string(var(nvars(basering)));
+    resu[ab]=tempo;
+  }
+  return(resu);
+}
 ///////////////////////////////////////////////////////////////////////////////
 static proc decomp(ideal i,list #)
 "USAGE:  decomp(i); i ideal  (for primary decomposition)   (resp.
@@ -2750,8 +2763,10 @@ EXAMPLE: example decomp; shows an example
         list l;
         l[1]=maxideal(1);
         l[2]=maxideal(1);
+        if (abspri) { return(prepare_absprimdec(l));}
         return(l);
       }
+      if (abspri) { return(prepare_absprimdec(primary));}
       return(primary);
     }
     for(@n=1;@n<=nvars(basering);@n++)
@@ -2769,6 +2784,7 @@ EXAMPLE: example decomp; shows an example
   if(size(i)==0)
   {
     primary=i,i;
+    if (abspri) { return(prepare_absprimdec(primary));}
     return(primary);
   }
 
@@ -2835,6 +2851,7 @@ EXAMPLE: example decomp; shows an example
       setring @P;
       primary[1]=i;
       primary[2]=i;
+      if (abspri) { return(prepare_absprimdec(primary));}
       return(primary);
     }
     if(size(fried)>0)
@@ -2878,6 +2895,7 @@ EXAMPLE: example decomp; shows an example
         pr[@k]=@j;
       }
       setring @P;
+      if (abspri) { return(prepare_absprimdec(imap(gnir,pr)));}
       return(imap(gnir,pr));
     }
   }
@@ -2889,6 +2907,7 @@ EXAMPLE: example decomp; shows an example
   {
     setring @P;
     primary=ideal(1),ideal(1);
+    if (abspri) { return(prepare_absprimdec(primary));}
     return(primary);
   }
 
@@ -2917,18 +2936,7 @@ EXAMPLE: example decomp; shows an example
     primary=fetch(gnir,gprimary);
 
 //HIER
-    if(abspri)
-    {
-      list resu,tempo;
-      string absotto;
-      for(ab=1;ab<=size(primary)/2;ab++)
-      {
-        absotto= absFactorize(primary[2*ab][1],77);
-        tempo=primary[2*ab-1],primary[2*ab],absotto,string(var(nvars(basering)));
-        resu[ab]=tempo;
-      }
-      primary=resu;
-    }
+    if (abspri) { return(prepare_absprimdec(primary));}
     return(primary);
   }
 
@@ -2986,6 +2994,7 @@ EXAMPLE: example decomp; shows an example
       setring @P;
       primary=imap(gnir,primary);
     }
+    if (abspri) { return(prepare_absprimdec(primary));}
     return(primary);
   }
 
@@ -3649,6 +3658,7 @@ EXAMPLE: example decomp; shows an example
   {
     primary=cleanPrimary(primary);
   }
+  else { return(prepare_absprimdec(primary));}
   return(primary);
 }
 
@@ -5169,7 +5179,8 @@ EXAMPLE: example absPrimdecGTZ; shows an example
   def R=basering;
   int n=nvars(R);
   list L=decomp(I,3);
-  string newvar=L[1][3];
+  L;
+  string newvar=string(L[1][3]);
   int k=find(newvar,",",find(newvar,",")+1);
   newvar=newvar[k+1..size(newvar)];
   list lR=ringlist(R);
