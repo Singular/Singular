@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.32 2009-02-20 09:27:45 Singular Exp $ */
+/* $Id: attrib.cc,v 1.33 2009-03-18 16:35:54 Singular Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -321,7 +321,7 @@ BOOLEAN atATTRIB2(leftv res,leftv a,leftv b)
   &&(((t=v->Typ())==RING_CMD)||(t==QRING_CMD)))
   {
     res->rtyp=INT_CMD;
-    res->data=(void *)(((ring)v->Data())->isLPring);
+    res->data=(void *)(long)(((ring)v->Data())->isLPring);
   }
 #endif
   else
