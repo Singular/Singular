@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.144 2009-03-17 17:24:29 Singular Exp $";
+version="$Id: primdec.lib,v 1.145 2009-03-18 14:17:33 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -2763,10 +2763,8 @@ EXAMPLE: example decomp; shows an example
         list l;
         l[1]=maxideal(1);
         l[2]=maxideal(1);
-        if (abspri) { return(prepare_absprimdec(l));}
         return(l);
       }
-      if (abspri) { return(prepare_absprimdec(primary));}
       return(primary);
     }
     for(@n=1;@n<=nvars(basering);@n++)
@@ -3658,6 +3656,8 @@ EXAMPLE: example decomp; shows an example
   {
     primary=cleanPrimary(primary);
   }
+  if (abspri && (typeof(primary[1][1])=="poly"))
+  { return(prepare_absprimdec(primary));}
   return(primary);
 }
 
