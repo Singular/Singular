@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmstd.c,v 1.6 2009-03-18 18:49:55 Singular Exp $ */
+/* $Id: mmstd.c,v 1.7 2009-03-18 18:53:28 Singular Exp $ */
 /*
 * ABSTRACT: standard version of C-memory management alloc func 
 * i.e. (malloc/realloc/free)
@@ -24,7 +24,6 @@ void* si_malloc(size_t size)
   if (size == 0) size = 1;
 
   omTypeAllocAligned(void*, addr, size);
-  OM_MARK_AS_STATIC(addr);
   return addr;
 }
 
@@ -39,7 +38,6 @@ void* reallocSize(void* old_addr, size_t old_size, size_t new_size)
   {
    void* new_addr;
     omTypeReallocAlignedSize(old_addr, old_size, void*, new_addr, new_size);
-    OM_MARK_AS_STATIC(new_addr);
     return new_addr;
   }
   else
