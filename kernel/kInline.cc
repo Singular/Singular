@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.14 2009-02-26 14:30:23 Singular Exp $
+ *  Version: $Id: kInline.cc,v 1.15 2009-03-18 16:56:02 Singular Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -965,7 +965,7 @@ KINLINE BOOLEAN k_GetLeadTerms(const poly p1, const poly p2, const ring p_r,
 // get m1 = LCM(LM(p1), LM(p2))/LM(p1)
 //     m2 = LCM(LM(p1), LM(p2))/LM(p2)   in tailRing
 //    lcm = LCM(LM(p1), LM(p2)           in leadRing
-KINLINE BOOLEAN k_GetStrongLeadTerms(const poly p1, const poly p2, const ring leadRing,
+KINLINE void k_GetStrongLeadTerms(const poly p1, const poly p2, const ring leadRing,
                                poly &m1, poly &m2, poly &lcm, const ring tailRing)
 {
   p_LmCheckPolyRing(p1, leadRing);
