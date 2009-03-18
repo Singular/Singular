@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.32 2009-03-04 20:23:04 ederc Exp $ */
+/* $Id: f5gb.h,v 1.33 2009-03-18 13:39:13 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -57,7 +57,7 @@ inline bool criterion1(LList* gPrev, poly t, LNode* l, LTagList* lTag);
 Criterion 2, i.e. Rewritten Criterion
 =====================================
 */
-inline bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag);
+inline bool criterion2(int idx, poly t, LNode* l, RList* rules, RTagList* rTag);
 
 /*
 ==========================================================================================================

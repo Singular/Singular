@@ -763,6 +763,13 @@ RNode* RNode::insert(int i, poly t) {
     RNode* newElement   =   new RNode(r);
     //Print("ADDRESS OF RNODE: %p\n",newElement);
     //Print("ADDRESS OF RNODE DATA: %p\n",newElement->getRule());
+    newElement->next    =   this;
+    return newElement;
+    
+    /*
+     * not useful, as it does not only adds new rules to be tested but also
+     * deletes rules to be tested if a rule is set to another place in the line
+     *
     if(NULL == this || this->getRuleIndex() < newElement->getRuleIndex()) {
         newElement->next    =   this;
     }
@@ -792,6 +799,7 @@ RNode* RNode::insert(int i, poly t) {
         }
     }
     return newElement;
+    */
 }
 
 RNode* RNode::getNext() {

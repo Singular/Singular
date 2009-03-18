@@ -154,7 +154,8 @@ LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lT
     //critPairs->print();
     delete critPairs;
     //Print("IN F5INC\n");
-   Print("\n\n\nRULES: \n");
+    /*
+    Print("\n\n\nRULES: \n");
         RNode* tempR    =   rules->getFirst();
         Print("%p\n",tempR);
         int t   = 1;
@@ -167,7 +168,7 @@ LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lT
             tempR   =   tempR->getNext();
             t++;
         }
- 
+    */
     //gPrev->print();
     return gPrev;
 }
@@ -230,7 +231,8 @@ inline void criticalPair(LList* gPrev, CList* critPairs, LTagList* lTag, RTagLis
         //}
         // testing both new labels by the F5 Criterion
         //critPairs->print();
-        if(!criterion2(u1, newElement, rules, rTag) && !criterion2(u2, temp, rules, rTag) && 
+        if(!criterion2(gPrev->getFirst()->getIndex(), u1, newElement, rules, rTag) 
+           && !criterion2(gPrev->getFirst()->getIndex(), u2, temp, rules, rTag) && 
            !criterion1(gPrev,u1,newElement,lTag) && !criterion1(gPrev,u2,temp,lTag)) {
             // if they pass the test, add them to CList critPairs, having the LPoly with greater
             // label as first element in the CPair
@@ -321,6 +323,9 @@ inline bool criterion1(LList* gPrev, poly t, LNode* l, LTagList* lTag) {
         }
         idDelete(&testId);
         if(NULL == temp) {
+            //if(l->getIndex() != gPrev->getFirst()->getIndex()) {
+            //    Print("----------------------------Criterion1 not passed----------------------------------\n");
+            //}
             return true;
         }
         return false;
@@ -334,7 +339,7 @@ inline bool criterion1(LList* gPrev, poly t, LNode* l, LTagList* lTag) {
 Criterion 2, i.e. Rewritten Criterion
 =====================================
 */
-inline bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag) {
+inline bool criterion2(int idx, poly t, LNode* l, RList* rules, RTagList* rTag) {
     //Print("------------------------------IN CRITERION 2/1-----------------------------------------\n");
     /*  
     Print("RULES: \n");
@@ -357,8 +362,13 @@ inline bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag) {
         //Print("%d\n\n",l->getIndex());
       */
 // start at the previously added element to gPrev, as all other elements will have the same index for sure
+    if(idx > l->getIndex()) {
+        return false;
+    }
+    
     RNode* testNode; // =   new RNode();
-     
+    
+
     if(NULL == rTag->getFirst()) {
         if(NULL != rules->getFirst()) {
             testNode    =   rules->getFirst();
@@ -418,7 +428,8 @@ inline bool criterion2(poly t, LNode* l, RList* rules, RTagList* rTag) {
         //pWrite(u1);
         //Print("%d\n",testNode->getRuleIndex());
         if(pLmDivisibleByNoComp(testNode->getRuleTerm(),u1)) {
-            //Print("Criterion 2 NOT passed!\n");
+            //Print("-----------------Criterion 2 NOT passed!-----------------------------------\n");
+            //Print("INDEX: %d\n",l->getIndex());
             pDelete(&u1);
     //Print("------------------------------IN CRITERION 2/1-----------------------------------------\n\n");
             return true;
@@ -463,7 +474,8 @@ inline bool criterion2(poly t, LPoly* l, RList* rules, Rule* testedRule) {
 	while(NULL != testNode && testNode->getRule() != testedRule) {
         //pWrite(testNode->getRuleTerm());
         if(pLmDivisibleByNoComp(testNode->getRuleTerm(),u1)) {
-            //Print("Criterion 2 NOT passed!\n");
+            //Print("--------------------------Criterion 2 NOT passed!------------------------------\n");
+            //Print("INDEX: %d\n",l->getIndex());
             pDelete(&u1);
     //Print("------------------------------IN CRITERION 2/2-----------------------------------------\n\n");
             return true;
@@ -840,7 +852,7 @@ LNode* findReductor(LNode* l, LNode* gPrevRedCheck, LList* gPrev, RList* rules, 
             if(pLmCmp(u,l->getTerm()) != 0) {
         //Print("HALLO\n");
                 // passing criterion2 ?
-                if(!criterion2(u,temp,rules,rTag)) {
+                if(!criterion2(gPrev->getFirst()->getIndex(), u,temp,rules,rTag)) {
                     // passing criterion1 ?
                     if(!criterion1(gPrev,u,temp,lTag)) {
                             //Print("HIER DEBUG\n");
@@ -886,7 +898,7 @@ ideal F5main(ideal id, ring r) {
     // first element in rTag is first element of rules which is NULL RNode, 
     // this must be done due to possible later improvements
     RList* rules    =   new RList();
-    Print("RULES FIRST: %p\n",rules->getFirst());
+    //Print("RULES FIRST: %p\n",rules->getFirst());
     //Print("RULES FIRST DATA: %p\n",rules->getFirst()->getRule());
     RTagList* rTag  =   new RTagList(rules->getFirst());
     i = 1;
@@ -974,13 +986,14 @@ ideal F5main(ideal id, ring r) {
                 gPrev    =   new LList(pOne,1,gbPrev->m[0]);
                 gPrev->insert(pOne,1,gbPrev->m[1]);
                 poly tempPoly = pInit();
-                pSetCoeff(tempPoly,nOne);
                 pLcm(pHead(gbPrev->m[0]),pHead(gbPrev->m[1]),tempPoly);
+                tempPoly    =   pDivide(tempPoly,pOne());
+                pSetCoeff(tempPoly,nOne);
                 rules    =   new RList();
                 rTag     =   new RTagList(rules->getFirst());
                 
                 //Print("%p\n",rules->getFirst());
-                pWrite(tempPoly);
+                //pWrite(tempPoly);
                 rules->insert(2,tempPoly);
                 rTag->insert(rules->getFirst());
                 //Print("%p\n",rules->getFirst());
@@ -997,8 +1010,9 @@ ideal F5main(ideal id, ring r) {
                         //pWrite(gbPrev->m[l]);
                         poly tempPoly2  =   pOne();
                         pLcm(pHead(gbPrev->m[k]),pHead(gbPrev->m[l]),tempPoly2);
+                        tempPoly2   =   pDivide(tempPoly2,pOne());
                         pSetCoeff(tempPoly2,nOne);
-                        pWrite(tempPoly2);
+                        //pWrite(tempPoly2);
                         rules->insert(k+1,tempPoly2);
                     }
                     rTag->insert(rules->getFirst());
