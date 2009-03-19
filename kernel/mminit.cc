@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mminit.cc,v 1.3 2009-03-18 18:49:55 Singular Exp $ */
+/* $Id: mminit.cc,v 1.4 2009-03-19 10:34:00 Singular Exp $ */
 /*
 * ABSTRACT: init of memory management
 */
@@ -31,9 +31,6 @@ extern "C"
     /* should never get here */
     exit(1);
   }
-#if defined(HAVE_STATIC)
-void* si_malloc(size_t size);
-#endif
 }
 
 int mmInit( void )
@@ -47,12 +44,7 @@ int mmInit( void )
     /* do not rely on the default in Singular as libsingular may be different */
     mp_set_memory_functions(omMallocFunc,omReallocSizeFunc,omFreeSizeFunc);
 #else
-  #ifdef HAVE_STATIC
-    mp_set_memory_functions(si_malloc,reallocSize,freeSize);
-  #else
     mp_set_memory_functions(malloc,reallocSize,freeSize);
-  #endif
-
 #endif
     om_Opts.OutOfMemoryFunc = omSingOutOfMemoryFunc;
 #ifndef OM_NDEBUG
