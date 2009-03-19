@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.102 2009-02-20 09:28:58 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.103 2009-03-19 11:04:56 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -396,7 +396,7 @@ static BOOLEAN jiA_STRING(leftv res, leftv a, Subexpr e)
       s[e->start-1]=(char)(*((char *)a->Data()));
     else
     {
-      Werror("string index %d out of range 1..%d",e->start,strlen(s));
+      Werror("string index %d out of range 1..%d",e->start,(int)strlen(s));
       return TRUE;
     }
   }

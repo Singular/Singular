@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: walk.cc,v 1.17 2009-01-06 16:55:31 Singular Exp $ */
+/* $Id: walk.cc,v 1.18 2009-03-19 11:06:04 Singular Exp $ */
 /*
 * ABSTRACT: Implementation of the Groebner walk
 */
@@ -921,7 +921,7 @@ static void checkComplexity(ideal G, char* cG)
   char* pStr = pString(p);
   Print("// max total degree of %s = %d\n",cG, maxdeg);
   Print("// max coefficient of %s  = %s", cG, pStr);//ing(p));
-  Print(" which consists of %d digits", strlen(pStr));
+  Print(" which consists of %d digits", (int)strlen(pStr));
   PrintLn();
 }
 
