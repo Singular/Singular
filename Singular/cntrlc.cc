@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.58 2008-09-10 09:33:58 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.59 2009-03-19 10:33:14 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -173,6 +173,7 @@ void sigsegv_handler(int sig, sigcontext s)
   fprintf(stderr,"Singular : signal %d (v: %d/%u):\n",sig,SINGULAR_VERSION,feVersionId);
   if (sig!=SIGINT)
   {
+    fprintf(stderr,"current line:>>%s<<\n",my_yylinebuf);
     fprintf(stderr,"Segment fault/Bus error occurred at %lx because of %lx (r:%d)\n"
                    "please inform the authors\n",
                    #ifdef __i386__
@@ -255,6 +256,7 @@ void sigsegv_handler(int sig, int code, struct sigcontext *scp, char *addr)
     sig,code,SINGULAR_VERSION,feVersionId);
   if ((sig!=SIGINT)&&(sig!=SIGABRT))
   {
+    fprintf(stderr,"current line:>>%s<<\n",my_yylinebuf);
     fprintf(stderr,"Segment fault/Bus error occurred at %x (r:%d)\n"
                    "please inform the authors\n",
                    (int)addr,siRandomStart);
@@ -300,6 +302,7 @@ void sigsegv_handler(int sig)
     sig,SINGULAR_VERSION,feVersionId);
   if (sig!=SIGINT)
   {
+    fprintf(stderr,"current line:>>%s<<\n",my_yylinebuf);
     fprintf(stderr,"Segment fault/Bus error occurred (r:%d)\n"
                    "please inform the authors\n",
                    siRandomStart);
