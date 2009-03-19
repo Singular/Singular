@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.331 2009-03-11 11:46:16 seelisch Exp $
+@comment $Id: reference.doc,v 1.332 2009-03-19 08:54:12 seelisch Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1025,7 +1025,7 @@ matrix
 @item @strong{Purpose:}
 contracts each of the n elements of the second ideal J
 by each of the m elements of the first ideal I,
-producing a m x n matrix.
+producing an m x n matrix.
 @*Contraction is defined on monomials by:
 @*
 @ifinfo

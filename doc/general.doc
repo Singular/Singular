@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.223 2009-02-20 18:55:36 Singular Exp $
+@comment $Id: general.doc,v 1.224 2009-03-19 08:54:12 seelisch Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -4092,13 +4092,13 @@ See @ref{TRACE var}.
 
 
 The source code debugger (sdb) is an experimental feature, its
-interface may change in future versions of Singular.  @*To enable the
+interface may change in future versions of @sc{Singular}.  @*To enable the
 use of the source code debugger @sc{Singular} has to be started with the
 option @code{-d} or @code{--sdb} (see @ref{Command line options}).
 
 
 @subsubheading sdb commands
-Each sdb command consist of one character which may be followed by
+Each sdb command consists of one character which may be followed by
 a parameter.
 @table @asis
 @item @code{b}

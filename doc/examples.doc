@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.103 2008-12-18 13:36:30 Singular Exp $
+@comment $Id: examples.doc,v 1.104 2009-03-19 08:54:12 seelisch Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -1601,7 +1601,7 @@ vector really is admissible. Moreover, note that all assigned
 attributes are lost under a type conversion (e.g. from @code{module} to
 @code{matrix}).
 
-(3) These considerations may be apllied when computing data from free resolutions (see @ref{Computation of Ext}).
+(3) These considerations may be applied when computing data from free resolutions (see @ref{Computation of Ext}).
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
