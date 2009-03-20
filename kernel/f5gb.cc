@@ -24,6 +24,7 @@
 #include "f5gb.h"
 #include "f5data.h"
 #include "f5lists.h"
+#include "timer.h"
 int reductionsToZero   =  0;
 
 /*
@@ -231,9 +232,9 @@ inline void criticalPair(LList* gPrev, CList* critPairs, LTagList* lTag, RTagLis
         //}
         // testing both new labels by the F5 Criterion
         //critPairs->print();
-        if(!criterion2(gPrev->getFirst()->getIndex(), u1, newElement, rules, rTag) 
-           && !criterion2(gPrev->getFirst()->getIndex(), u2, temp, rules, rTag) && 
-           !criterion1(gPrev,u1,newElement,lTag) && !criterion1(gPrev,u2,temp,lTag)) {
+        if(!criterion2(gPrev->getFirst()->getIndex(), u2, temp, rules, rTag)
+           && !criterion2(gPrev->getFirst()->getIndex(), u1, newElement, rules, rTag) 
+           && !criterion1(gPrev,u1,newElement,lTag) && !criterion1(gPrev,u2,temp,lTag)) {
             // if they pass the test, add them to CList critPairs, having the LPoly with greater
             // label as first element in the CPair
             if(newElement->getIndex() == temp->getIndex() && 
@@ -299,7 +300,6 @@ inline bool criterion1(LList* gPrev, poly t, LNode* l, LTagList* lTag) {
         //pWrite(l->getTerm());
         //pWrite(ppMult_qq(t,l->getTerm()));
         //Print("%d\n\n",l->getIndex());
-        /*
         while(testNode->getIndex() < idx) { // && NULL != testNode->getLPoly()) {
             //pWrite(testNode->getPoly());
             //Print("%d\n",testNode->getIndex());
@@ -310,7 +310,7 @@ inline bool criterion1(LList* gPrev, poly t, LNode* l, LTagList* lTag) {
             //pWrite(testNode->getNext()->getPoly());
             testNode    =   testNode->getNext();
         }
-        */
+        /*
         ideal testId    =   idInit(idx-1,1);
         for(i=0;i<idx-1;i++) {
             testId->m[i]  =   pHead(testNode->getPoly());
@@ -328,6 +328,7 @@ inline bool criterion1(LList* gPrev, poly t, LNode* l, LTagList* lTag) {
             //}
             return true;
         }
+        */
         return false;
     }
 }
@@ -885,6 +886,8 @@ MAIN:computes a gb of the ideal i in the ring r with our F5 implementation
 ==========================================================================
 */
 ideal F5main(ideal id, ring r) {
+    int timer   =   initTimer();
+    startTimer();
     int i,j,k,l;
     int gbLength;
     // 1 polynomial for defining initial labels & further tests
@@ -985,17 +988,17 @@ ideal F5main(ideal id, ring r) {
                 //Print("%p\n",rules->getFirst());
                 gPrev    =   new LList(pOne,1,gbPrev->m[0]);
                 gPrev->insert(pOne,1,gbPrev->m[1]);
-                poly tempPoly = pInit();
-                pLcm(pHead(gbPrev->m[0]),pHead(gbPrev->m[1]),tempPoly);
-                tempPoly    =   pDivide(tempPoly,pOne());
-                pSetCoeff(tempPoly,nOne);
+                //poly tempPoly = pInit();
+                //pLcm(pHead(gbPrev->m[0]),pHead(gbPrev->m[1]),tempPoly);
+                //tempPoly    =   pDivide(tempPoly,pOne());
+                //pSetCoeff(tempPoly,nOne);
                 rules    =   new RList();
                 rTag     =   new RTagList(rules->getFirst());
                 
                 //Print("%p\n",rules->getFirst());
                 //pWrite(tempPoly);
-                rules->insert(2,tempPoly);
-                rTag->insert(rules->getFirst());
+                //rules->insert(2,tempPoly);
+                //rTag->insert(rules->getFirst());
                 //Print("%p\n",rules->getFirst());
                 //Print("%p\n",rTag->getFirst());
                 //Print("%p\n",rules->getFirst());
@@ -1008,14 +1011,14 @@ ideal F5main(ideal id, ring r) {
                     for(l=0; l<k; l++) {
                         //pWrite(gbPrev->m[k]);
                         //pWrite(gbPrev->m[l]);
-                        poly tempPoly2  =   pOne();
-                        pLcm(pHead(gbPrev->m[k]),pHead(gbPrev->m[l]),tempPoly2);
-                        tempPoly2   =   pDivide(tempPoly2,pOne());
-                        pSetCoeff(tempPoly2,nOne);
+                        //poly tempPoly2  =   pOne();
+                        //pLcm(pHead(gbPrev->m[k]),pHead(gbPrev->m[l]),tempPoly2);
+                        //tempPoly2   =   pDivide(tempPoly2,pOne());
+                        //pSetCoeff(tempPoly2,nOne);
                         //pWrite(tempPoly2);
-                        rules->insert(k+1,tempPoly2);
+                        //rules->insert(k+1,tempPoly2);
                     }
-                    rTag->insert(rules->getFirst());
+                    //rTag->insert(rules->getFirst());
                 }
             }
             
@@ -1039,6 +1042,8 @@ ideal F5main(ideal id, ring r) {
     } 
         //idShow(gbPrev);
     Print("\n\nNumber of zero-reductions:  %d\n",reductionsToZero);
+    timer   =   getTimer();
+    Print("Time for computations: %d/1000 seconds\n",timer);
     //LNode* temp    =   gPrev->getFirst();
     //while(NULL != temp) {
     //    pWrite(temp->getPoly());
