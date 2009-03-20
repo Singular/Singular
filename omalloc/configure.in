@@ -3,12 +3,12 @@ dnl File: configure.in
 dnl Purpose: Process this file with autoconf to produce configure
 dnl Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 dnl Created: 11/99
-dnl Version: $Id: configure.in,v 1.16 2005-11-08 08:49:16 bricken Exp $
+dnl Version: $Id: configure.in,v 1.17 2009-03-20 14:39:14 Singular Exp $
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 
 AC_INIT(om_Alloc.c)
 
-VERSION=0.9.5
+VERSION=0.9.6
 AC_SUBST(VERSION)
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
@@ -25,7 +25,7 @@ AC_ARG_WITH(
 AC_ARG_WITH(
   malloc,
   [ --with-malloc=system|dlmalloc|gmalloc|pmalloc|external
-                    which malloc to use, default: dlmalloc ])
+                    which malloc to use, default: malloc ])
 AC_ARG_WITH(
   external-malloc_h,
   [ --with-external-malloc-h=HEADER_FILE
@@ -258,10 +258,16 @@ elif test "${with_malloc}" = external; then
   OM_MALLOC_HEADER=$with_external_malloc_h
   OM_MALLOC_SOURCE=$with_external_malloc_c
   AC_DEFINE(OMALLOC_USES_MALLOC)
-else
+elif test "${with_malloc}" = dlmalloc; then
   with_malloc=dlmalloc
   OM_MALLOC_HEADER=dlmalloc.h
   OM_MALLOC_SOURCE=dlmalloc.c
+else
+  OM_MALLOC_HEADER=omMallocSystem.h
+  AC_DEFINE(OMALLOC_USES_MALLOC)
+  if test "${with_provide_malloc}" = yes || test "${with_provide_malloc}" = debug; then
+    AC_MSG_ERROR("can not provide malloc for --with-malloc=system")
+  fi
 fi
 AC_MSG_RESULT($with_malloc)
 
