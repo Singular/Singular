@@ -13,7 +13,7 @@ SLIB0 = absfact.lib  arcpoint.lib  atkins.lib    aksaka.lib    ainvar.lib\
 	inout.lib    intprog.lib   jacobson.lib kskernel.lib  latex.lib \
         linalg.lib   lll.lib       makedbm.lib   matrix.lib \
 	modstd.lib   mondromy.lib  mprimdec.lib  mregular.lib  rootsmr.lib \
-	noether.lib  normal.lib    ntsolve.lib  \
+	noether.lib  normal.lib    ntsolve.lib   phindex.lib \
 	poly.lib     presolve.lib  primdec.lib   primitiv.lib   qhmoduli.lib \
 	random.lib   realrad.lib   redcgs.lib    reesclos.lib   resolve.lib \
 	resgraph.lib reszeta.lib \
@@ -21,7 +21,7 @@ SLIB0 = absfact.lib  arcpoint.lib  atkins.lib    aksaka.lib    ainvar.lib\
 	sing4ti2.lib \
 	solve.lib    signcond.lib  spcurve.lib   spectrum.lib   standard.lib \
 	stratify.lib surf.lib      surfex.lib    teachstd.lib   toric.lib \
-	triang.lib   rootsur.lib  weierstr.lib  zeroset.lib     phindex.lib
+	triang.lib   rootsur.lib  weierstr.lib  zeroset.lib
  
 
 PLIBS = bfun.lib central.lib discretize.lib dmod.lib dmodapp.lib freegb.lib \
