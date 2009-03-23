@@ -3,28 +3,25 @@
 # MAKE SURE THAT THIS IS UP_TO_DATE
 #
 
-SLIB0 = absfact.lib  arcpoint.lib  atkins.lib    aksaka.lib    ainvar.lib\
-	alexpoly.lib algebra.lib   brnoeth.lib   cimonom.lib \
-        classify.lib compregb.lib \
-	control.lib  curvepar.lib   crypto.lib    deform.lib   elim.lib \
-        equising.lib \
-	finvar.lib   gmspoly.lib   gmssing.lib   general.lib   graphics.lib \
-	grwalk.lib   groups.lib    hnoether.lib  homolog.lib   hyperel.lib \
-	inout.lib    intprog.lib   jacobson.lib kskernel.lib  latex.lib \
-        linalg.lib   lll.lib       makedbm.lib   matrix.lib \
-	modstd.lib   mondromy.lib  mprimdec.lib  mregular.lib  rootsmr.lib \
-	noether.lib  normal.lib    ntsolve.lib   phindex.lib \
-	poly.lib     presolve.lib  primdec.lib   primitiv.lib   qhmoduli.lib \
-	random.lib   realrad.lib   redcgs.lib    reesclos.lib   resolve.lib \
-	resgraph.lib reszeta.lib \
-	ring.lib     rinvar.lib    sagbi.lib     sheafcoh.lib   sing.lib \
-	sing4ti2.lib \
-	solve.lib    signcond.lib  spcurve.lib   spectrum.lib   standard.lib \
-	stratify.lib surf.lib      surfex.lib    teachstd.lib   toric.lib \
-	triang.lib   rootsur.lib  weierstr.lib  zeroset.lib
- 
+SLIB0 = absfact.lib  ainvar.lib  aksaka.lib  alexpoly.lib  algebra.lib \
+	arcpoint.lib  atkins.lib  brnoeth.lib  cimonom.lib  classify.lib \
+	compregb.lib  control.lib  crypto.lib  curvepar.lib  deform.lib \
+	elim.lib  equising.lib  finvar.lib  general.lib  gmspoly.lib \
+	gmssing.lib  graphics.lib  groups.lib  grwalk.lib  hnoether.lib \
+	homolog.lib  hyperel.lib  inout.lib  intprog.lib  jacobson.lib \
+	kskernel.lib  latex.lib  linalg.lib  lll.lib  makedbm.lib \
+	matrix.lib  modstd.lib  mondromy.lib  mprimdec.lib  mregular.lib \
+	noether.lib  normal.lib  ntsolve.lib  phindex.lib  poly.lib \
+	presolve.lib  primdec.lib  primitiv.lib  qhmoduli.lib  random.lib \
+	realrad.lib  redcgs.lib  reesclos.lib  resgraph.lib  resolve.lib \
+	reszeta.lib  ring.lib  rinvar.lib  rootsmr.lib  rootsur.lib \
+	sagbi.lib  sheafcoh.lib  sing.lib  sing4ti2.lib  signcond.lib \
+	solve.lib  spcurve.lib  spectrum.lib  standard.lib  stratify.lib \
+	surf.lib  surfex.lib  teachstd.lib  toric.lib  triang.lib \
+	weierstr.lib  zeroset.lib
 
-PLIBS = bfun.lib central.lib discretize.lib dmod.lib dmodapp.lib freegb.lib \
-        gkdim.lib involut.lib ncalg.lib ncdecomp.lib nchomolog.lib\
-        nctools.lib perron.lib qmatrix.lib
+
+PLIBS = bfun.lib  central.lib  discretize.lib  dmod.lib  dmodapp.lib \
+	freegb.lib  gkdim.lib  involut.lib  ncalg.lib  ncdecomp.lib \
+	nchomolog.lib  nctools.lib  perron.lib  qmatrix.lib
 
