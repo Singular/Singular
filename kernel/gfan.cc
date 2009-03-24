@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-03-24 17:37:40 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.19 2009-03-24 17:37:40 monerjan Exp $
-$Id: gfan.cc,v 1.19 2009-03-24 17:37:40 monerjan Exp $
+$Date: 2009-03-24 21:31:49 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.20 2009-03-24 21:31:49 monerjan Exp $
+$Id: gfan.cc,v 1.20 2009-03-24 21:31:49 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -38,19 +38,29 @@ $Id: gfan.cc,v 1.19 2009-03-24 17:37:40 monerjan Exp $
 #ifndef gfan_DEBUG
 #define gfan_DEBUG
 #endif
-
+/**
+*\brief Class facet
+*	Implements the facet structure
+*
+*/
 class facet
 {
 	private:
-		intvec fNormal;		//inner normal, describing the facet uniquely
+		/** inner normal, describing the facet uniquely  */
+		intvec fNormal;		
 	public:
-		facet()			//default constructor. Do I need a constructor of type facet(intvec) ?
+		/** The default constructor. Do I need a constructor of type facet(intvec)? */
+		facet()			
 		{
 			//fNormal = FN;
-			this->next=NULL;	//By default each facet is last
+			// Pointer to next facet.  */
+			/* Defaults to NULL. This way there is no need to check explicitly */
+			this->next=NULL; 
 		}
 		
-		~facet(){;}		//destructor
+		/** The default destructor */
+		~facet(){;}
+		
 		void setFacetNormal(intvec iv){
 			fNormal = iv;
 			return;
@@ -61,6 +71,10 @@ class facet
 		facet *next;		//Pointer to next facet
 };
 
+/**
+*\brief Class gcone
+*	Implements the cone structure
+*/
 /*class gcone
 finally this should become s.th. like gconelib.{h,cc} to provide an API
 */
@@ -97,6 +111,15 @@ ideal getGB(ideal inputIdeal)
 	return gb;
 }
 
+/** 
+*\brief Compute the representation of a cone
+*
+*	Detailed description goes here
+*
+*\param An ideal
+*
+*\return A pointer to a facet
+*/
 /****** getConeNormals computes the inequalities ***/
 /*INPUT_TYPE: ideal                             */
 /*RETURN_TYPE: pointer to first facet           */
