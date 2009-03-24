@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-03-23 16:59:56 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.18 2009-03-23 16:59:56 monerjan Exp $
-$Id: gfan.cc,v 1.18 2009-03-23 16:59:56 monerjan Exp $
+$Date: 2009-03-24 17:37:40 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.19 2009-03-24 17:37:40 monerjan Exp $
+$Id: gfan.cc,v 1.19 2009-03-24 17:37:40 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -15,7 +15,7 @@ $Id: gfan.cc,v 1.18 2009-03-23 16:59:56 monerjan Exp $
 #include "polys.h"
 #include "ideals.h"
 #include "kmatrix.h"
-#include "iostream.h"
+#include "iostream.h"	//deprecated
 
 //Hacks for different working places
 #define HOME
@@ -31,6 +31,8 @@ $Id: gfan.cc,v 1.18 2009-03-23 16:59:56 monerjan Exp $
 #endif
 
 #ifdef ITWM
+#include "/u/slg/monerjan/cddlib/include/setoper.h"
+#include "/u/slg/monerjan/cddlib/include/cdd.h"
 #endif
 
 #ifndef gfan_DEBUG
@@ -42,19 +44,21 @@ class facet
 	private:
 		intvec fNormal;		//inner normal, describing the facet uniquely
 	public:
-		facet(intvec FN)		//constructor
+		facet()			//default constructor. Do I need a constructor of type facet(intvec) ?
 		{
-			fNormal = FN;
+			//fNormal = FN;
+			this->next=NULL;	//By default each facet is last
 		}
 		
-		~facet();		//destructor
-		void printNormal(){
-			std::cout << "The normal is = " << "fNormal" << endl;
+		~facet(){;}		//destructor
+		void setFacetNormal(intvec iv){
+			fNormal = iv;
 			return;
 		}
 		
 		bool isFlippable;	//flippable facet? Want to have cone->isflippable.facet[i]
 		bool isIncoming;	//Is the facet incoming or outgoing?
+		facet *next;		//Pointer to next facet
 };
 
 /*class gcone
@@ -68,7 +72,7 @@ class gcone
 	public:
 		gcone(int);		//constructor with dimension
 		~gcone();		//destructor
-		poly gcMarkedTerm; 	//marked terms of the cone's Gr�bner basis
+		poly gcMarkedTerm; 	//marked terms of the cone's Groebner basis
 		ideal gcBasis;		//GB of the cone
 		gcone *next;		//Pointer to *previous* cone in search tree
 	
@@ -95,9 +99,9 @@ ideal getGB(ideal inputIdeal)
 
 /****** getConeNormals computes the inequalities ***/
 /*INPUT_TYPE: ideal                             */
-/*RETURN_TYPE: matrix                           */
+/*RETURN_TYPE: pointer to first facet           */
 /************************************************/
-void getConeNormals(ideal I)
+facet getConeNormals(ideal I)
 {
 	#ifdef gfan_DEBUG
 	cout << "*** Computing Inequalities... ***" << endl;
@@ -200,9 +204,13 @@ void getConeNormals(ideal I)
 
 	//Remove reduntant rows here!
 	dd_MatrixCanonicalize(&ddineq, &ddlinset, &ddredrows, &ddnewpos, &dderr);
+	ddrows = ddineq->rowsize;	//Size of the matrix with redundancies removed
+	ddcols = ddineq->colsize;
 	#ifdef gfan_DEBUG
 	cout << "Having removed redundancies, the normals now read:" << endl;
 	dd_WriteMatrix(stdout,ddineq);
+	cout << "Rows = " << ddrows << endl;
+	cout << "Cols = " << ddcols << endl;
 	#endif
 
 	/*dd_PolyhedraPtr ddpolyh;
@@ -215,18 +223,43 @@ void getConeNormals(ideal I)
 	
 	
 	/*Write the normals into class facet
-		How do I get the #rows in ddineq? \exists s.th. like dd_NumRows?
+		How do I get the #rows in ddineq? \exists s.th. like dd_NumRows? dd_get_si(ddineq->matrix[i][j]) ?
 	Strange enough: facet *f=new facet(intvec(2,3)) does work for the constructor facet(intvec FN){fNormal = FN;}
 	*/
-	for (int kk = 1; kk<=2; kk++){
-		facet *f = new facet(intvec(2,3));
-		//facet *fPtr = &f;
-		cout << &f << endl;
- 		f->printNormal();
+	#ifdef gfan_DEBUG
+	cout << "Creating list of normals" << endl;
+	#endif
+	/*The pointer *fRoot should be the return value of this function*/
+	facet *fRoot = new facet();		//instantiate new facet with intvec with numvar rows, one column and initial values all 0
+	//facet *fRoot;
+	facet *fAct; 			//instantiate pointer to active facet
+	fAct = (facet*)&fRoot;	
+	//fAct = fRoot;			//Let fAct point to fRoot
+	for (int kk = 0; kk<ddrows; kk++)
+	{
+		intvec load;	//intvec to sto
+		for (int jj = 1; jj <ddcols; jj++)
+		{
+			double *foo;
+			foo = (double*)ddineq->matrix[kk][jj];	//get entry from actual position
+#ifdef gfan_DEBUG
+			std::cout << "fAct is " << *foo << " at " << fAct << endl;
+#endif
+			/*next two lines commented out. How to store values into intvec? */
+			//load[jj] = (int)*foo;			//store typecasted entry at pos jj of load
+			//fAct->setFacetNormal(load);
+			if (jj<ddcols)				//Is this facet NOT the last facet? Writing while instead of if is a really bad idea :)
+			{
+				fAct->next = new facet();	//If so: instantiate new facet. Otherwise this->next=NULL due to the constructor
+				fAct = fAct->next;		//scary :)
+			}
+		}
 	}
+	/*
+	Now we should have a concatenated list containing the facet normals which we can adress via *f
+	*/
 	
 	//ddineq->representation=dd_Inequality;		//We want our LP to be Ax>=0
-
 	//Clean up but don't delete the return value! (Whatever it will turn out to be)
 	dd_FreeMatrix(ddineq);
 	//set_free(ddrows);
@@ -238,8 +271,8 @@ void getConeNormals(ideal I)
 	//set_free(ddlinset);
 	dd_free_global_constants();
 
-	//res=(ideal)aktpoly;
-	//return res;
+
+	return *fRoot;
 }
 
 ideal gfan(ideal inputIdeal)
@@ -251,7 +284,7 @@ ideal gfan(ideal inputIdeal)
 	matrix ineq; //Matrix containing the boundary inequalities
 	/*
 	1. Select target order
-	2. Compute GB of inputIdeal wrt target order
+	2. Compute GB of inputIdeal wrt target order -> newRing, setCurrRing etc...
 	3. getConeNormals
 	*/
 	res=getGB(inputIdeal);
