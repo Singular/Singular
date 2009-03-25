@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-03-24 21:31:49 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.20 2009-03-24 21:31:49 monerjan Exp $
-$Id: gfan.cc,v 1.20 2009-03-24 21:31:49 monerjan Exp $
+$Date: 2009-03-25 19:55:50 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.21 2009-03-25 19:55:50 monerjan Exp $
+$Id: gfan.cc,v 1.21 2009-03-25 19:55:50 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -38,6 +38,9 @@ $Id: gfan.cc,v 1.20 2009-03-24 21:31:49 monerjan Exp $
 #ifndef gfan_DEBUG
 #define gfan_DEBUG
 #endif
+
+//#include gcone.h
+
 /**
 *\brief Class facet
 *	Implements the facet structure
@@ -124,7 +127,7 @@ ideal getGB(ideal inputIdeal)
 /*INPUT_TYPE: ideal                             */
 /*RETURN_TYPE: pointer to first facet           */
 /************************************************/
-facet getConeNormals(ideal I)
+facet *getConeNormals(ideal I)
 {
 	#ifdef gfan_DEBUG
 	cout << "*** Computing Inequalities... ***" << endl;
@@ -254,9 +257,9 @@ facet getConeNormals(ideal I)
 	#endif
 	/*The pointer *fRoot should be the return value of this function*/
 	facet *fRoot = new facet();		//instantiate new facet with intvec with numvar rows, one column and initial values all 0
-	//facet *fRoot;
 	facet *fAct; 			//instantiate pointer to active facet
-	fAct = (facet*)&fRoot;	
+	fAct = fRoot;		//This does not seem to do the trick. fRoot and fAct have to point to the same adress!
+	std::cout << "fRoot = " << fRoot << ", fAct = " << fAct << endl;
 	//fAct = fRoot;			//Let fAct point to fRoot
 	for (int kk = 0; kk<ddrows; kk++)
 	{
@@ -266,11 +269,12 @@ facet getConeNormals(ideal I)
 			double *foo;
 			foo = (double*)ddineq->matrix[kk][jj];	//get entry from actual position
 #ifdef gfan_DEBUG
-			std::cout << "fAct is " << *foo << " at " << fAct << endl;
+			std::cout << "fAct is " << *foo << " at " << fAct << std::endl;
 #endif
 			/*next two lines commented out. How to store values into intvec? */
 			//load[jj] = (int)*foo;			//store typecasted entry at pos jj of load
 			//fAct->setFacetNormal(load);
+			//check for flipability here
 			if (jj<ddcols)				//Is this facet NOT the last facet? Writing while instead of if is a really bad idea :)
 			{
 				fAct->next = new facet();	//If so: instantiate new facet. Otherwise this->next=NULL due to the constructor
@@ -279,23 +283,22 @@ facet getConeNormals(ideal I)
 		}
 	}
 	/*
-	Now we should have a concatenated list containing the facet normals which we can adress via *f
+	Now we should have a concatenated list containing the facet normals of those facets that are
+		-irredundant
+		-flipable
+	Adressing is done via *fRoot
+	But since we did this in a function probably most if not all is lost after the return. So implement this as a method of gcone
 	*/
 	
 	//ddineq->representation=dd_Inequality;		//We want our LP to be Ax>=0
 	//Clean up but don't delete the return value! (Whatever it will turn out to be)
 	dd_FreeMatrix(ddineq);
-	//set_free(ddrows);
-	//set_free(ddcols);
 	set_free(ddredrows);
-	//set_free(ddnumb);
-	//set_free(dderr);
 	free(ddnewpos);
-	//set_free(ddlinset);
+	set_free(ddlinset);
 	dd_free_global_constants();
 
-
-	return *fRoot;
+	return fRoot;
 }
 
 ideal gfan(ideal inputIdeal)
@@ -303,15 +306,34 @@ ideal gfan(ideal inputIdeal)
 	#ifdef gfan_DEBUG
 	cout << "Now in subroutine gfan" << endl;
 	#endif
+	ring rootRing;	// The ring associated to the target ordering
 	ideal res;
 	matrix ineq; //Matrix containing the boundary inequalities
+	facet *fRoot;
+	
+	
+	rootRing=rCopy0(currRing);
+	rComplete(rootRing);
+	rChangeCurrRing(rootRing);
+	cout << "The current ring is " << endl;
+	rWrite(rootRing);
+	
+	gcone *gcRoot = new gcone();	//Instantiate the sink
+	gcone *gcAct;
+	gcAct = gcRoot;
+
+	
 	/*
-	1. Select target order
+	1. Select target order, say dp.
 	2. Compute GB of inputIdeal wrt target order -> newRing, setCurrRing etc...
 	3. getConeNormals
 	*/
 	res=getGB(inputIdeal);
-	getConeNormals(res);
+	fRoot=getConeNormals(res);
+	cout << fRoot << endl;
 	return res;
 }
+/*
+Since gfan.cc is #included from extra.cc there must not be a int main(){} here
+*/
 #endif
