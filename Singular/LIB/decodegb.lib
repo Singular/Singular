@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: decodegb.lib,v 1.9 2009-01-14 16:07:03 Singular Exp $";
+version="$Id: decodegb.lib,v 1.10 2009-03-25 11:15:16 bulygin Exp $";
 category="Coding theory";
 info="
 LIBRARY: decodegb.lib         Decoding and min distance of linear codes with GB
@@ -11,7 +11,7 @@ OVERVIEW:
  and generalized Newton identities. The original method of quadratic equations
  is worked out here as well. We also (for comparison) enable to work with the
  system of Fitzgerald-Lax. We provide some auxiliary functions for further
- manipulations and decoding. For an overview of the methods mentioned above @ref{Decoding codes with GB}
+ manipulations and decoding. For an overview of the methods mentioned above @ref{Decoding codes with GB}.
  For the vanishing ideal computation the algorithm of Farr and Gao is
  implemented.
 
@@ -89,7 +89,7 @@ static proc p_poly(int n, int a, int b)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc sysCRHT (int n, list defset, int e, int q, int m, list #)
-"USAGE:   sysCRHT(n,defset,e,q,m,[k]); n,e,q,m,k int, defset list of int's
+"USAGE:   sysCRHT(n,defset,e,q,m,[k]); n,e,q,m,k are int, defset list of int's
 @format
          - n length of the cyclic code,
          - defset is a list representing the defining set,
@@ -280,7 +280,7 @@ static proc mod_ (int n, int m)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc sysNewton (int n, list defset, int t, int q, int m, list #)
-"USAGE:   sysNewton (n,defset,t,q,m,[tr]); n,t,q,m,tr int, defset list int's
+"USAGE:   sysNewton (n,defset,t,q,m,[tr]); n,t,q,m,tr int, defset is list int's
 @format
          - n is length,
          - defset is the defining set,
@@ -295,7 +295,7 @@ RETURN:  the ring to work with the generalized Newton identities (in
 THEORY:  Based on 'defset' of the given cyclic code, the procedure constructs
          the corresponding ideal 'newton' with the generalized Newton
          identities. With its help one can solve the decoding problem. For
-         basics of the method @ref{Cooper philosophy}.
+         basics of the method @ref{Generalized Newton identities}.
 SEE ALSO: sysCRHT, sysBin
 EXAMPLE:  example sysNewton; shows an example
 "
@@ -470,15 +470,15 @@ proc sysBin (int v, list Q, int n, list #)
 "USAGE:    sysBin (v,Q,n,[odd]);  v,n,odd are int, Q is list of int's
 @format
           - v a number if errors,
-          - Q is a generating set of the code,
+          - Q is a defining set of the code,
           - n the length,
           - odd is an additional parameter: if
-           set to 1, then the generating set is enlarged by odd elements,
-           which are 2^(some power)*(some elment in the gen.set) mod n
+           set to 1, then the defining set is enlarged by odd elements,
+           which are 2^(some power)*(some elment in the def.set) mod n
 @end format
 RETURN:    the ring with the resulting system called 'bin'
 THEORY:  Based on Q of the given cyclic code, the procedure constructs
-         the corresponding ideal 'bin' with the use of Waring function.
+         the corresponding ideal 'bin' with the use of the Waring function.
          With its help one can solve the decoding problem.
          For basics of the method @ref{Generalized Newton identities}.
 SEE ALSO: sysNewton, sysCRHT
@@ -656,20 +656,20 @@ static proc star(matrix m, int i, int j)
 proc sysQE(matrix check, matrix y, int t, list #)
 "USAGE:   sysQE(check,y,t,[fieldeq,formal]);check,y matrix;t,fieldeq,formal int
 @format
-        - check is the check matrix of the code
+        - check is a parity check matrix of the code
         - y is a received word,
         - t the number of errors to be corrected,
         - if fieldeq=1, then field equations are added,
         - if formal=0, field equations on (known) syndrome variables
           are not added, in order to add them (note that the exponent should
-          be as a number of elements in the INITIAL alphabet) one
+          be equal to the number of elements in the INITIAL alphabet) one
           needs to set formal>0 for the exponent
 @end format
 RETURN:   the ring to work with together with the resulting system called 'qe'
 THEORY:  Based on 'check' of the given linear code, the procedure constructs
          the corresponding ideal that gives an opportunity to compute
-         unknown syndrome of the received word y. Further
-         one is able to solve the decoding problem.
+         unknown syndrome of the received word y. After computing the unknown
+         syndromes one is able to solve the decoding problem.
          For basics of the method @ref{Decoding method based on quadratic equations}.
 SEE ALSO: sysFL
 EXAMPLE:  example sysQE; shows an example
@@ -859,7 +859,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc errorInsert(matrix y, list pos, list val)
-"USAGE:  errorInsert(y,pos,val); y is matrix, pos,val list of int's
+"USAGE:  errorInsert(y,pos,val); y is matrix, pos,val are list of int's
 @format
         - y is a (code) word,
         - pos = positions where errors occured,
@@ -899,7 +899,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc errorRand(matrix y, int num, int e)
-"USAGE:    errorRand(y, num, e); y matrix, num,e int
+"USAGE:    errorRand(y, num, e); y is matrix, num,e are int
 @format
           - y is a (code) word,
           - num is the number of errors,
@@ -1013,11 +1013,12 @@ proc genMDSMat(int n, number a)
         - n x n are dimensions of the MDS matrix,
         - a is a primitive element of the field.
 @end format
-NOTE:   An MDS matrix is constructed in the following way. We take a to be a
+NOTE:   An MDS matrix is constructed in the following way. We take 'a' to be a
         generator of the multiplicative group of the field. Then we construct
-        the Vandermonde matrix with this a.
+        the Vandermonde matrix with this 'a'.
 ASSUME:   extension field should already be defined
-RETURN:   a matrix with the MDS property
+RETURN:   a matrix with the MDS property. @xref{Decoding method based on quadratic equations} 
+          for more info.
 EXAMPLE:  example genMDSMat; shows an example
 "
 {
@@ -1137,6 +1138,8 @@ proc decode(matrix check, matrix rec)
           - rec is a received word,
           - t is an upper bound for the number of errors one wants to correct
 @end format
+NOTE:     The method described in @ref{Decoding method based on quadratic equations}
+          is used for decoding.
 ASSUME:   Errors in rec should be correctable, otherwise the output is
           unpredictable
 RETURN:   a codeword that is closest to rec
@@ -1321,7 +1324,7 @@ example
 proc decodeCode(matrix check, int ntrials, list #)
 "USAGE:     decodeCode(check, ntrials, [e]); check matrix, ntrials,e int
 @format
-           - check is a check matrix for the code,
+           - check is a parity check matrix for the code,
            - ntrials is the number of received vectors per code to be
            corrected.
            - If e is given it sets the correction capacity explicitly. It
@@ -1729,7 +1732,7 @@ static proc gener_funcs (matrix check, list points, int e, ideal id, int s)
 proc sysFL (matrix check, matrix y, int t, int e, int s)
 "USAGE:    sysFL (check,y,t,e,s); check,y matrix, t,e,s int
 @format
-          - check is a check matrix of the code,
+          - check is a parity check matrix of the code,
           - y is a received word,
           - t the number of errors to correct,
           - e is the extension degree,
@@ -1991,8 +1994,8 @@ static proc random_prime_vector (int n)
 proc decodeRandomFL(int n, int redun, int p, int e, int t, int ncodes, int ntrials, string minpol)
 "USAGE:    decodeRandomFL(redun,p,e,n,t,ncodes,ntrials,minpol);
 @format
-          - n is length of codes generated, redun = redundancy of codes
-          generated,
+          - n is length of codes generated, 
+          - redun = redundancy of codes generated,
           - p is characteristics,
           - e is the extension degree,
           - t is the number of errors to correct,
