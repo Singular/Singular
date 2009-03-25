@@ -70,7 +70,7 @@ gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}
 ==================================================
 */
 LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lTag, RList* rules, RTagList* rTag) {
-    //Print("in f5inc\n");            
+    Print("in f5inc\n");            
     //pWrite(rules->getFirst()->getRuleTerm());
     int j;
     //Print("%p\n",gPrev->getFirst());
@@ -90,6 +90,7 @@ LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lT
     CNode* critPairsMinDeg  =   new CNode();   
     // computation of critical pairs with checking of criterion 1 and criterion 2 and saving them
     // in the list critPairs
+    Print("END F5INC\n");
     criticalPair(gPrev, critPairs, lTag, rTag, rules);
     static LList* sPolyList        =   new LList();
     //sPolyList->print();
@@ -898,6 +899,19 @@ ideal F5main(ideal id, ring r) {
     LTagList* lTag  =   new LTagList();
     //Print("LTAG BEGINNING: %p\n",lTag);
     
+    //DEBUGGING STUFF START
+    //Print("NUMBER: %d\n",r->N);
+    int* ev = new int[r->N];
+    for(i=0;i<IDELEMS(id);i++) {
+        pGetExpV(id->m[i],ev);
+        pWrite(id->m[i]);
+        Print("EXP1: %d\n",ev[1]);
+        Print("EXP2: %d\n",ev[2]);
+        Print("EXP3: %d\n\n",ev[3]);
+    }
+    //delete ev;
+    //DEBUGGING STUFF END
+    
     // first element in rTag is first element of rules which is NULL RNode, 
     // this must be done due to possible later improvements
     RList* rules    =   new RList();
@@ -905,7 +919,7 @@ ideal F5main(ideal id, ring r) {
     //Print("RULES FIRST DATA: %p\n",rules->getFirst()->getRule());
     RTagList* rTag  =   new RTagList(rules->getFirst());
     i = 1;
-    for(j=0; j<IDELEMS(id); j++) {
+    /*for(j=0; j<IDELEMS(id); j++) {
         if(NULL != id->m[j]) { 
             if(pComparePolys(id->m[j],ONE)) {
                 Print("One Polynomial in Input => Computations stopped\n");
@@ -914,7 +928,7 @@ ideal F5main(ideal id, ring r) {
                 return(idNew);
             }   
         }
-    } 
+    }*/ 
     ideal idNew     =   kInterRed(id); 
     id              =   idNew;
     //qsortDegree(&id->m[0],&id->m[IDELEMS(id)-1]);
@@ -936,7 +950,6 @@ ideal F5main(ideal id, ring r) {
     gbPrev->m[0]    =   gPrev->getFirst()->getPoly();
     //idShow(gbPrev);
     //idShow(currQuotient);
-
     for(i=2; i<=IDELEMS(id); i++) {
         LNode* gPrevTag =   gPrev->getLast();
         //Print("Last POlynomial in GPREV: ");
