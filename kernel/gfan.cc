@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-03-25 19:55:50 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.21 2009-03-25 19:55:50 monerjan Exp $
-$Id: gfan.cc,v 1.21 2009-03-25 19:55:50 monerjan Exp $
+$Date: 2009-03-26 10:30:21 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.22 2009-03-26 10:30:21 monerjan Exp $
+$Id: gfan.cc,v 1.22 2009-03-26 10:30:21 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -18,7 +18,7 @@ $Id: gfan.cc,v 1.21 2009-03-25 19:55:50 monerjan Exp $
 #include "iostream.h"	//deprecated
 
 //Hacks for different working places
-#define HOME
+#define ITWM
 
 #ifdef UNI
 #include "/users/urmel/alggeom/monerjan/cddlib/include/setoper.h" //Support for cddlib. Dirty hack
@@ -50,12 +50,11 @@ class facet
 {
 	private:
 		/** inner normal, describing the facet uniquely  */
-		intvec fNormal;		
+		intvec *fNormal;		
 	public:
 		/** The default constructor. Do I need a constructor of type facet(intvec)? */
 		facet()			
 		{
-			//fNormal = FN;
 			// Pointer to next facet.  */
 			/* Defaults to NULL. This way there is no need to check explicitly */
 			this->next=NULL; 
@@ -64,9 +63,16 @@ class facet
 		/** The default destructor */
 		~facet(){;}
 		
-		void setFacetNormal(intvec iv){
+		/** Stores the facet normal \param intvec*/
+		void setFacetNormal(intvec *iv){
 			fNormal = iv;
-			return;
+			//return;
+		}
+		
+		/** Method to print the facet normal*/
+		void printNormal()
+		{
+			fNormal->show();
 		}
 		
 		bool isFlippable;	//flippable facet? Want to have cone->isflippable.facet[i]
@@ -87,8 +93,14 @@ class gcone
 		int numFacets;		//#of facets of the cone
 
 	public:
+		gcone()
+		{
+			this->next=NULL;
+			this->facetPtr=NULL;
+		}
 		gcone(int);		//constructor with dimension
 		~gcone();		//destructor
+		facet *facetPtr;	//Will hold the adress of the first facet
 		poly gcMarkedTerm; 	//marked terms of the cone's Groebner basis
 		ideal gcBasis;		//GB of the cone
 		gcone *next;		//Pointer to *previous* cone in search tree
@@ -248,10 +260,7 @@ facet *getConeNormals(ideal I)
 	*/
 	
 	
-	/*Write the normals into class facet
-		How do I get the #rows in ddineq? \exists s.th. like dd_NumRows? dd_get_si(ddineq->matrix[i][j]) ?
-	Strange enough: facet *f=new facet(intvec(2,3)) does work for the constructor facet(intvec FN){fNormal = FN;}
-	*/
+	/*Write the normals into class facet*/
 	#ifdef gfan_DEBUG
 	cout << "Creating list of normals" << endl;
 	#endif
@@ -263,7 +272,7 @@ facet *getConeNormals(ideal I)
 	//fAct = fRoot;			//Let fAct point to fRoot
 	for (int kk = 0; kk<ddrows; kk++)
 	{
-		intvec load;	//intvec to sto
+		intvec *load = new intvec(numvar);	//intvec to store a single facet normal that will then be stored via setFacetNormal
 		for (int jj = 1; jj <ddcols; jj++)
 		{
 			double *foo;
@@ -272,7 +281,7 @@ facet *getConeNormals(ideal I)
 			std::cout << "fAct is " << *foo << " at " << fAct << std::endl;
 #endif
 			/*next two lines commented out. How to store values into intvec? */
-			//load[jj] = (int)*foo;			//store typecasted entry at pos jj of load
+			(*load)[jj-1] = (int)*foo;		//store typecasted entry at pos jj-1 of load
 			//fAct->setFacetNormal(load);
 			//check for flipability here
 			if (jj<ddcols)				//Is this facet NOT the last facet? Writing while instead of if is a really bad idea :)
@@ -280,7 +289,10 @@ facet *getConeNormals(ideal I)
 				fAct->next = new facet();	//If so: instantiate new facet. Otherwise this->next=NULL due to the constructor
 				fAct = fAct->next;		//scary :)
 			}
-		}
+		}//for jj<ddcols
+		/*Now load should be full and we can call setFacetNormal*/
+		fAct->setFacetNormal(load);
+		fAct->printNormal();
 	}
 	/*
 	Now we should have a concatenated list containing the facet normals of those facets that are
@@ -303,16 +315,21 @@ facet *getConeNormals(ideal I)
 
 ideal gfan(ideal inputIdeal)
 {
+	int numvar = pVariables; 
+	
 	#ifdef gfan_DEBUG
 	cout << "Now in subroutine gfan" << endl;
 	#endif
 	ring rootRing;	// The ring associated to the target ordering
+	rRingOrder_t t=ringorder_dp;
+	
 	ideal res;
 	matrix ineq; //Matrix containing the boundary inequalities
 	facet *fRoot;
 	
 	
 	rootRing=rCopy0(currRing);
+	rootRing=rInit(0,numvar,t);
 	rComplete(rootRing);
 	rChangeCurrRing(rootRing);
 	cout << "The current ring is " << endl;
