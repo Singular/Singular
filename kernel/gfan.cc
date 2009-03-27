@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-03-26 10:30:21 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.22 2009-03-26 10:30:21 monerjan Exp $
-$Id: gfan.cc,v 1.22 2009-03-26 10:30:21 monerjan Exp $
+$Date: 2009-03-27 12:21:27 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.23 2009-03-27 12:21:27 monerjan Exp $
+$Id: gfan.cc,v 1.23 2009-03-27 12:21:27 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -43,7 +43,7 @@ $Id: gfan.cc,v 1.22 2009-03-26 10:30:21 monerjan Exp $
 
 /**
 *\brief Class facet
-*	Implements the facet structure
+*	Implements the facet structure as a linked list
 *
 */
 class facet
@@ -93,6 +93,7 @@ class gcone
 		int numFacets;		//#of facets of the cone
 
 	public:
+		/** Default constructor. */
 		gcone()
 		{
 			this->next=NULL;
@@ -100,11 +101,12 @@ class gcone
 		}
 		gcone(int);		//constructor with dimension
 		~gcone();		//destructor
+		/** Pointer to the first facet */
 		facet *facetPtr;	//Will hold the adress of the first facet
 		poly gcMarkedTerm; 	//marked terms of the cone's Groebner basis
 		ideal gcBasis;		//GB of the cone
 		gcone *next;		//Pointer to *previous* cone in search tree
-	
+		void getConeNormals();	//Compute 
 		void flip();		//Compute "the other side"
 		void remRedFacets();	//Remove redundant facets of the cone NOT NEEDED since this is already done by cddlib while compunting the normals
 		
@@ -321,7 +323,7 @@ ideal gfan(ideal inputIdeal)
 	cout << "Now in subroutine gfan" << endl;
 	#endif
 	ring rootRing;	// The ring associated to the target ordering
-	rRingOrder_t t=ringorder_dp;
+	rRingOrder_t t;
 	
 	ideal res;
 	matrix ineq; //Matrix containing the boundary inequalities
@@ -329,12 +331,15 @@ ideal gfan(ideal inputIdeal)
 	
 	
 	rootRing=rCopy0(currRing);
-	rootRing=rInit(0,numvar,t);
+	rootRing->order[0]=ringorder_dp;
+	//t=rootRing->order[0];
+	rootRing=rInit(0,2,rootRing->order);
+	rootRing=rDefault(currRing->ch,numvar,currRing->names);
 	rComplete(rootRing);
 	rChangeCurrRing(rootRing);
 	cout << "The current ring is " << endl;
 	rWrite(rootRing);
-	
+		
 	gcone *gcRoot = new gcone();	//Instantiate the sink
 	gcone *gcAct;
 	gcAct = gcRoot;
