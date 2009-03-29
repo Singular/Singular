@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5lists.h,v 1.15 2009-03-12 09:43:53 ederc Exp $ */
+/* $Id: f5lists.h,v 1.16 2009-03-29 17:17:09 ederc Exp $ */
 /*
 * ABSTRACT: list interface
 */
@@ -59,6 +59,7 @@ class LNode {
         // insert new elements to the list with resp. to increasing labels
         // only used for the S-polys to be reduced (TopReduction building new S-polys with higher label)
         LNode*  insertByLabel(poly t, int i, poly p, Rule* r);
+        LNode*  insertByLabel(LNode* l);
         // deletes the first elements of the list with the same degree
         // get next & prev from current LNode
         LNode*  getNext();
@@ -72,15 +73,18 @@ class LNode {
         poly    getTerm();
         int     getIndex(); 
         Rule*   getRule();
+        bool    getDel();
         // set the data from the LPoly saved in LNode
         void    setPoly(poly p);
         void    setTerm(poly t);
         void    setIndex(int i);
         void    setNext(LNode* l);
+        void    setDel(bool d);
         // test if for any list element the polynomial part of the data is equal to *p
         bool    polyTest(poly* p);
         LNode*  getNext(LNode* l);
         void    print();
+        int     count(LNode* l);
 };
 
 
@@ -116,6 +120,7 @@ class LList {
         int     getLength();
         void    setFirst(LNode* l);
         void    print();
+        int     count(LNode* l);
 };
 
 

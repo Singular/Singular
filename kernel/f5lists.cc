@@ -150,6 +150,50 @@ inline LNode* LNode::insertByLabel(poly t, int i, poly p, Rule* r) {
     }
 }
 
+inline LNode* LNode::insertByLabel(LNode* l) {
+    //Print("ADDING SOLYS TO THE LIST\n");
+    //Print("new element: ");
+    //pWrite(t);
+       if(NULL == this) { // || NULL == data) {
+        l->next =   this;
+        return l;
+    }
+    else {
+         //Print("tested element1: ");
+    //pWrite(this->getTerm());
+        if(-1 == pLmCmp(l->getTerm(),this->getTerm())) {
+            //Print("HIERDRIN\n");
+            l->next =   this;
+            //Print("%p\n",this);
+            //Print("%p\n",newElement->next);
+            return l;
+        }
+        else {
+            LNode* temp = this;
+            while(NULL != temp->next && NULL != temp->next->data) {
+                //Print("tested element: ");
+                //pWrite(temp->getTerm());
+                if(-1 == pLmCmp(l->getTerm(),temp->next->getTerm())) {
+                    l->next     =   temp->next;
+                    temp->next  =   l;
+                    return this;
+                }
+                else {
+                    temp = temp->next;
+                    //Print("%p\n",temp);
+                    //Print("%p\n",temp->data);
+                    
+                    //Print("%p\n",temp->next);
+                }
+            }
+        //Print("HIER\n");
+            l->next     =   temp->next;
+            temp->next  =   l;
+            return this;
+        }
+    }
+}
+
 // deletes the first elements of the list with the same degree
 // only used for the S-polys, which are already sorted by increasing degree by CList
 LNode*  LNode::deleteByDeg() {
@@ -183,6 +227,10 @@ Rule* LNode::getRule() {
     return data->getRule();
 }
 
+bool LNode::getDel() {
+    return data->getDel();
+}
+
 // set the data from the LPoly saved in LNode
 void LNode::setPoly(poly p) {
     data->setPoly(p);
@@ -198,6 +246,10 @@ void LNode::setIndex(int i) {
 
 void LNode::setNext(LNode* l) {
     next    =   l;
+}
+
+void LNode::setDel(bool d) {
+    data->setDel(d);
 }
 
 // test if for any list element the polynomial part of the data is equal to *p
@@ -228,11 +280,26 @@ void LNode::print() {
         Print("Poly: ");
         pWrite(temp->getPoly());
         Print("%p\n",temp->next);
+        Print("DELETE? %d\n",temp->getDel());
         temp = temp->next;
     }
     Print("_______________________________________________________________\n");
 }
 
+int LNode::count(LNode* l) {
+    int nonDel  =   0;
+    LNode* temp =   l;
+    while(NULL != temp) {
+        if(!temp->getDel()) {
+            nonDel++;
+            temp    =   temp->next;
+        }
+        else {
+            temp    =   temp->next;
+        }
+    }
+    return nonDel;
+}
 
 /*
 ====================================
@@ -303,7 +370,7 @@ void LList::insertByLabel(poly t, int i, poly p, Rule* r) {
 }
 
 void LList::insertByLabel(LNode* l) {
-    first = first->insertByLabel(l->getTerm(),l->getIndex(),l->getPoly(),l->getRule());
+    first = first->insertByLabel(l);
     length++;
     //Print("LENGTH %d\n",length);
 }
@@ -339,6 +406,9 @@ void LList::print() {
     first->print();
 }
 
+int LList::count(LNode* l) {
+    return first->count(l);
+}
 /*
 =======================================
 functions working on the class LTagNode

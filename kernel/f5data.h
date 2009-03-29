@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5data.h,v 1.9 2009-03-05 14:30:23 ederc Exp $ */
+/* $Id: f5data.h,v 1.10 2009-03-29 17:17:09 ederc Exp $ */
 /*
 * ABSTRACT: labeled polynomial interface
 */
@@ -32,6 +32,7 @@ class LPoly {
         int     index;          //index of signature
         poly    polynomial;     //standard polynomial data
         Rule*   _rule;
+        bool    del;
     public:
         inline          LPoly(poly t, int i, poly p, Rule* r=NULL);
         inline  void    setPoly(poly p);
@@ -42,12 +43,15 @@ class LPoly {
         inline  int     getIndex();
         inline  void    setRule(Rule* r);
         inline  Rule*   getRule();
+        inline  void    setDel(bool d);
+        inline  bool    getDel();
         inline  void    set(poly t, int i, poly p, Rule* r);
         inline  LPoly*  get();
 };
 
 LPoly::LPoly(poly t,int i,poly p, Rule* r) {
     set(t,i,p,r);
+    del =   0;
 }
 
 void LPoly::setPoly(poly p)  {
@@ -70,6 +74,10 @@ void LPoly::setRule(Rule* r) {
     _rule   =   r;
 }
 
+void LPoly::setDel(bool d) {
+    del =   d;
+}
+
 poly LPoly::getPoly() {
     return polynomial;
 }
@@ -84,6 +92,10 @@ int LPoly::getIndex() {
 
 Rule* LPoly::getRule() {
     return _rule;
+}
+
+bool LPoly::getDel() {
+    return del;
 }
 
 void LPoly::set(poly t, int i, poly p, Rule* r) {

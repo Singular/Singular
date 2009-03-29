@@ -25,8 +25,10 @@
 #include "f5data.h"
 #include "f5lists.h"
 #include "timer.h"
-int reductionsToZero   =  0;
-
+int reductionsToZero    =   0;
+int reductionTime       =   0;
+int spolsTime           =   0;
+int highestDegree       =   0;
 /*
 ====================================================================
 sorting ideals by decreasing total degree "left" and "right" are the 
@@ -90,7 +92,6 @@ LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lT
     CNode* critPairsMinDeg  =   new CNode();   
     // computation of critical pairs with checking of criterion 1 and criterion 2 and saving them
     // in the list critPairs
-    Print("END F5INC\n");
     criticalPair(gPrev, critPairs, lTag, rTag, rules);
     static LList* sPolyList        =   new LList();
     //sPolyList->print();
@@ -107,7 +108,12 @@ LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lT
         // the corresponding rules to the list rules
         // NOTE: inside there is a second check of criterion 2 if new rules are 
         // added
+        int timer4  =   initTimer();
+        startTimer();
         computeSPols(critPairsMinDeg,rTag,rules,sPolyList);
+        timer4  =   getTimer();
+        Print("SPOLS TIMER: %d\n",timer4);
+        spolsTime  =   spolsTime  +   timer4;
         // DEBUG STUFF FOR SPOLYLIST
         LNode* temp     =   sPolyList->getFirst();
         //while(NULL != temp && NULL != temp->getLPoly()) {
@@ -116,8 +122,12 @@ LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lT
             //temp    =   temp->getNext();
         //}
         // reduction process of new S-polynomials and also adds new critical pairs to critPairs
+        int timer3  =   initTimer();
+        startTimer();
         reduction(sPolyList, critPairs, gPrev, rules, lTag, rTag, gbPrev);
-        
+        timer3      =  getTimer();
+        reductionTime = reductionTime + timer3;
+        Print("REDUCTION TIMER: %d\n",timer3); 
         // DEBUG STUFF FOR GPREV
         //temp    =   gPrev->getFirst();
         //int number  =   1;
@@ -172,6 +182,8 @@ LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lT
         }
     */
     //gPrev->print();
+    Print("COMPLETE REDUCTION TIME UNTIL NOW: %d\n",reductionTime);
+    Print("COMPLETE SPOLS TIME UNTIL NOW:     %d\n",spolsTime);
     return gPrev;
 }
 
@@ -509,6 +521,10 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) 
         if(!criterion2(temp->getT1(),temp->getAdLp1(),rules,temp->getTestedRule())) {
                 // the second component is tested only when it has the actual index, otherwise there is
                 // no new rule to test since the last test in subalgorithm criticalPair()
+                if(highestDegree < pDeg(ppMult_qq(temp->getT1(),temp->getLp1Poly()))) { 
+                    highestDegree   = pDeg(ppMult_qq(temp->getT1(),temp->getLp1Poly()));
+                    //pWrite(pHead(ppMult_qq(temp->getT1(),temp->getLp1Poly())));
+                }   
                 if(temp->getLp2Index() == temp->getLp1Index()) {
                     if(!criterion2(temp->getT2(),temp->getAdLp2(),rules,temp->getTestedRule())) {
                         // computation of S-polynomial
@@ -718,7 +734,7 @@ void topReduction(LNode* l, LList* sPolyList, LList* gPrev, RList* rules, LTagLi
                 if(NULL != temp) {
                     pNorm(temp);
                     tempRed->setPoly(temp);
-                    //pWrite(tempRed->getPoly());
+                    tempRed->setDel(1);
                     // for debugging
                     //pWrite(tempRed->getPoly());
                     //Print("RULE ADDED\n");
@@ -899,18 +915,23 @@ ideal F5main(ideal id, ring r) {
     LTagList* lTag  =   new LTagList();
     //Print("LTAG BEGINNING: %p\n",lTag);
     
-    //DEBUGGING STUFF START
+    // DEBUGGING STUFF START
     //Print("NUMBER: %d\n",r->N);
-    int* ev = new int[r->N];
-    for(i=0;i<IDELEMS(id);i++) {
-        pGetExpV(id->m[i],ev);
-        pWrite(id->m[i]);
-        Print("EXP1: %d\n",ev[1]);
-        Print("EXP2: %d\n",ev[2]);
-        Print("EXP3: %d\n\n",ev[3]);
-    }
+    
+    //int* ev = new int[r->N];
+    //int  ev2;
+    //for(i=0;i<IDELEMS(id);i++) {
+        //pGetExpV(id->m[i],ev);
+        //ev2  =   pGetExp(id->m[i],1);
+        //pWrite(id->m[i]);
+        //Print("%d\n",ev2);
+        //Print("EXP1: %d\n",ev[1]);
+        //Print("EXP2: %d\n",ev[2]);
+        //Print("EXP3: %d\n\n",ev[3]);
+    //}
     //delete ev;
-    //DEBUGGING STUFF END
+    
+    /*DEBUGGING STUFF END */
     
     // first element in rTag is first element of rules which is NULL RNode, 
     // this must be done due to possible later improvements
@@ -956,40 +977,54 @@ ideal F5main(ideal id, ring r) {
         //Print("%p\n",gPrevTag);    
         //pWrite(gPrevTag->getPoly());
         gPrev   =   F5inc(i, id->m[i-1], gPrev, gbPrev, ONE, lTag, rules, rTag);
+        Print("%d\n",gPrev->count(gPrevTag->getNext()));
+        Print("%d\n",gPrev->getLength());
         //Print("____________________________________ITERATION STEP DONE________________________________________\n");
         
         // DEBUGGING STUFF
         LNode* temp    =   gPrev->getFirst();
     // computing new groebner basis gbPrev
         if(gPrev->getLength() > gbLength) {
-            ideal gbAdd =   idInit(gPrev->getLength()-gbLength,1);
-            LNode*  temp =   gPrevTag;
-        //Print("%p\n",gPrevTag);    
-        //Print("%p\n",gPrev->getLast());    
-        //pWrite(temp->getPoly());
-        //Print("LENGTH OF GPREV LIST: %d\n",gPrev->getLength());
-        //Print("%d\n",gbLength);
-        //Print("%d\n",gPrev->getLength()-gbLength-1);
-            for(j=0;j<=gPrev->getLength()-gbLength-1;j++) {
-                //Print("YES\n");
-                temp        =   temp->getNext();
-                if(temp) {
-                    //Print("%p\n",temp);
-                    //pWrite(temp->getPoly());
-                    //Print("%p\n",temp->getNext());
+            if(i < IDELEMS(id)) {
+                ideal gbAdd =   idInit(gPrev->getLength()-gbLength,1);
+                LNode*  temp =   gPrevTag;
+                int counter =   0;
+                for(j=0;j<=gPrev->getLength()-gbLength-1;j++) {
+                    temp        =   temp->getNext();
+                    if(0 == temp->getDel()) {
+                        counter++;
+                        gbAdd->m[j] =   temp->getPoly();
+                    }
+                        //if(1 == temp->getDel()) {
+                        //    pWrite(temp->getPoly());
+                        //}
                 }
-                gbAdd->m[j] =   temp->getPoly();
-                //pWrite(temp->getPoly());
+                if(counter != gPrev->count(gPrevTag->getNext())) {
+                    Print("----------------------------------WRONG COUNTING---------------------------\n");
+                }
+                    gbPrev          =   idAdd(gbPrev,gbAdd);
+                    //idShow(gbPrev);
             }
-            //Print("HIER AUCH\n");
-            gbPrev          =   idAdd(gbPrev,gbAdd);
-            
-            
+            else {
+                ideal gbAdd =   idInit(gPrev->getLength()-gbLength,1);
+                LNode*  temp =   gPrevTag;
+                for(j=0;j<=gPrev->getLength()-gbLength-1;j++) {
+                    temp        =   temp->getNext();
+                    gbAdd->m[j] =   temp->getPoly();
+                }
+                gbPrev          =   idAdd(gbPrev,gbAdd);
+            }
             // interreduction stuff
             if(i<IDELEMS(id)) {
+                int timer2  =   initTimer();
+                startTimer();
                 ideal tempId    =   kInterRed(gbPrev);
+                
                 //idShow(tempId);
                 gbPrev          =   tempId;
+                timer2  =   getTimer();
+                Print("Timer INTERREDUCTION: %d\n",timer2);
+                //idShow(gbPrev);
                 //qsortDegree(&gbPrev->m[0],&gbPrev->m[IDELEMS(gbPrev)-1]);
                 delete gPrev;
                 //sleep(5);
@@ -1034,7 +1069,6 @@ ideal F5main(ideal id, ring r) {
                     //rTag->insert(rules->getFirst());
                 }
             }
-            
             gbLength    =   gPrev->getLength(); 
             //Print("HIER\n");
         }
@@ -1052,10 +1086,12 @@ ideal F5main(ideal id, ring r) {
         //idShow(gbPrev);
         //Print("===================================================\n");
         //Print("JA\n");
+        Print("LENGTH OF GPREV: %d\n",gPrev->getLength());
     } 
         //idShow(gbPrev);
     Print("\n\nNumber of zero-reductions:  %d\n",reductionsToZero);
     timer   =   getTimer();
+    Print("Highest Degree during computations: %d\n",highestDegree);
     Print("Time for computations: %d/1000 seconds\n",timer);
     //LNode* temp    =   gPrev->getFirst();
     //while(NULL != temp) {
@@ -1066,6 +1102,8 @@ ideal F5main(ideal id, ring r) {
     //delete lTag;
     //delete rTag;
     //delete gPrev;
+    reductionTime   =   0;
+    spolsTime       =   0;
     return(gbPrev);
 
 
