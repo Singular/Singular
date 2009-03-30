@@ -47,7 +47,7 @@ bfun.lib        Daniel Andres                   daniel.andres@math.rwth-aachen.d
                 Viktor Levandovskyy             levandov@math.rwth-aachen.de
 brnoeth.lib	Jose Ignacio Farran Martin  	ignfar@eis.uva.es
 		Christoph Lossen            	lossen@mathematik.uni-kl.de
-central.lib     Oleksandr Motsak            
+central.lib     Oleksandr Motsak                motsak at mathematik dot uni minus kl dot de
 cimonom.lib     I.Bermejo                       ibermejo@ull.es
                 I.Garcia-Marco                  iggarcia@ull.es
                 J.-J.Salazar-Gonzalez           jjsalaza@ull.es
@@ -119,14 +119,14 @@ nchomolog.lib   Viktor Levandovskyy             levandov@math.rwth-aachen.de
 nctools.lib     Levandovskyy V.                 levandov@mathematik.uni-kl.de
                 Lobillo, F.J.                   jlobillo@ugr.es
                 Rabelo, C.                      crabelo@ugr.es
-                Motsak, O.                      motsak at mathematik dot uni minus kl dot de
+                Oleksandr Motsak                motsak at mathematik dot uni minus kl dot de
 noether.lib     A. Hashemi                      Amir.Hashemi@lip6.fr
 normal.lib	Gert-Martin Greuel  		greuel@mathematik.uni-kl.de
 		G. Pfister 			pfister@mathematik.uni-kl.de
 ntsolve.lib	Wilfred Pohl 			pohl@mathematik.uni-kl.de
 		Dietmar Hillebrand
 paramet.lib	Thomas Keilen 			keilen@mathematik.uni-kl.de
-perron.lib      Oleksandr Motsak
+perron.lib      Oleksandr Motsak                motsak at mathematik dot uni minus kl dot de
 phindex.lib 
 poly.lib	Olaf Bachmann 			obachman@mathematik.uni-kl.de
 		Gert-Martin Greuel  		greuel@mathematik.uni-kl.de
