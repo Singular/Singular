@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.114 2009-02-13 09:15:41 Singular Exp $ */
+/* $Id: ring.cc,v 1.115 2009-03-30 09:03:08 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -634,10 +634,22 @@ char * rCharStr(ring r)
   int i;
 
 #ifdef HAVE_RINGS
-  if (rField_is_Ring(r))
+  if (rField_is_Ring_Z(r))
   {
-    s=omStrDup("coefficient ring");                   /* Z */
+    s=omStrDup("integer");                   /* Z */
     return s;
+  }
+  if(rField_is_Ring_2toM(r))
+  {
+    return omStrDup("coefficient ring");
+  }
+  if(rField_is_Ring_ModN(r))
+  {
+    return omStrDup("coefficient ring");
+  }
+  if(rField_is_Ring_PtoM(r))
+  {
+    return omStrDup("coefficient ring");
   }
 #endif
   if (r->parameter==NULL)
