@@ -1,6 +1,6 @@
 //(GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: random.lib,v 1.17 2006-07-20 15:19:35 Singular Exp $";
+version="$Id: random.lib,v 1.18 2009-03-30 18:36:35 motsak Exp $";
 category="General purpose";
 info="
 LIBRARY:  random.lib    Creating Random and Sparse Matrices, Ideals, Polys
@@ -14,6 +14,7 @@ PROCEDURES:
  sparsemat(n,m[,p,b]);   nxm sparse integer matrix with random coefficients
  sparsepoly(u[,o,p,b]);  random sparse polynomial with terms of degree in [u,o]
  sparsetriag(n,m[,.]);   nxm sparse lower-triag intmat with random coefficients
+ sparseHomogIdeal(k,u,[,.]); ideal with k sparse homogeneous generators of degree in [u, o]
  triagmatrix(n,m,o[,.]); nxm sparse lower-triag matrix of poly's of degree<=o
  randomLast(b);          random transformation of the last variable
  randomBinomial(k,u,..); binomial ideal, k random generators of degree >=u
@@ -148,6 +149,41 @@ example
    sparseid(2,3);"";
    sparseid(3,0,4,90,9);
 }
+
+///////////////////////////////////////////////////////////////////////////////
+proc sparseHomogIdeal (int k, int u, list #)
+"USAGE:   sparseid(k,u[,o,p,b]);  k,u,o,p,b integers
+RETURN:  ideal having k homogeneous generators, each of random degree in the 
+         interval [u,o], p percent of terms in degree d are 0, the remaining 
+         have random coefficients in the interval [1,b], (default: o=u, p=75, 
+         b=30000)
+EXAMPLE: example sparseid; shows an example
+"
+{
+//----------------------------- set defaults ----------------------------------
+   if( size(#)>=3 ) { int o=#[1]; int p=#[2]; int b=#[3]; }
+   if( size(#)==2 ) { int o=#[1]; int p=#[2]; int b=30000; }
+   if( size(#)==1 ) { int o=#[1]; int p=75; int b=30000; }
+   if( size(#)==0 ) { int o=u; int p=75; int b=30000; }
+//------------------ use sparsemat for creation of sparseid -------------------
+   int ii; ideal i; intmat m; ideal id;
+
+   for ( ii=k; ii>0; ii=ii-1)
+   {
+       id = maxideal(random(u, o)); // monomial basis of some degree
+       m = sparsemat(size(id),1,p,b); // random coefficients       
+       i[ii] = (matrix(id)*m)[1,1];
+   }
+   return(i);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(a,b,c,d),dp;
+   sparseHomogIdeal(2,3);"";
+   sparseHomogIdeal(3,0,4,90,9);
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 
 proc sparsemat (int n, int m, list #)
