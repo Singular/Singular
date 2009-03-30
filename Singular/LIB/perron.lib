@@ -1,9 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: perron.lib,v 1.12 2009-02-25 18:51:26 Singular Exp $";
+version="$Id: perron.lib,v 1.13 2009-03-30 18:41:56 motsak Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  perron.lib         computation of algebraic dependences
-AUTHOR:   Oleksandr Motsak
+AUTHOR:   Oleksandr Motsak   U@D, where U={motsak}, D={mathematik.uni-kl.de}
 
 PROCEDURES:
 perron(L[, D]);  relations between pairwise commuting polynomials
