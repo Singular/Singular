@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.297 2009-03-10 15:47:18 levandov Exp $ */
+/* $Id: extra.cc,v 1.298 2009-03-30 14:07:21 monerjan Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -3130,6 +3130,9 @@ ipshell()");
 
 #ifdef HAVE_GFAN
 /*======== GFAN ==============*/
+/*
+WILL HAVE TO CHANGE RETURN TYPE TO LIST_CMD
+*/
 if (strcmp(sys_cmd,"gfan")==0)
 {
 	if ((h==NULL) || (h!=NULL && h->Typ()!=IDEAL_CMD))
@@ -3140,6 +3143,8 @@ if (strcmp(sys_cmd,"gfan")==0)
 ideal I=((ideal)h->Data());
 res->rtyp=IDEAL_CMD;
 res->data=(ideal) gfan(I);
+//res->rtyp=LIST_CMD;
+//res->data= ???
 	
 return FALSE; //Everything went fine	
 }
