@@ -1,4 +1,4 @@
-// $Id: mprimdec.lib,v 1.6 2006-07-25 17:54:27 Singular Exp $
+// $Id: mprimdec.lib,v 1.7 2009-03-30 13:49:52 dreyer Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // mprimdec.lib
 // algorithms for primary decomposition for modules based on
@@ -9,6 +9,9 @@
 // written by Alexander Dreyer
 //
 // $Log: not supported by cvs2svn $
+// Revision 1.6  2006/07/25 17:54:27  Singular
+// *hannes: Michael C.
+//
 // Revision 1.5  2005/04/28 09:22:17  Singular
 // *hannes/lossen: new ring.lib
 //
@@ -22,7 +25,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: mprimdec.lib,v 1.6 2006-07-25 17:54:27 Singular Exp $";
+version="$Id: mprimdec.lib,v 1.7 2009-03-30 13:49:52 dreyer Exp $";
 category="Commutative Algebra";
 
 info="
@@ -33,7 +36,7 @@ REMARK:
 These procedures are implemented to be used in characteristic 0.
 @*They also work in positive characteristic >> 0.
 @*In small characteristic and for algebraic extensions, the
-procedures cia Gianni Trage, Zacharias may not terminate.
+procedures via Gianni, Trager, Zacharias may not terminate.
 
 PROCEDURES:
   separator(l);                computes a list of separators of prime ideals
@@ -55,13 +58,6 @@ PROCEDURES:
   indSet(i);                   lists with varstrings of(in)dependend variables
   GTZopt(N[,check[,ann]]);     a faster version of GTZmod
   zeroOpt(N[,check[,ann]]);    a faster version of zeroMod
-  clrSBmod(N);                 extracts an minimal SB from a SB
-  minSatMod(N,I);              minimal saturation of N w.r.t. I
-  specialModulesEqual(N1,N2);  checks for equality of standard bases of modules
-                               if N1 is contained in N2 or vice versa
-  stdModulesEqual(N1,N2);      checks for equality of standard bases
-  modulesEqual(N1,N2);         checks for equality of modules
-  getData(N,l[,i]);            extracts oldData and computes the remaining data
 ";
 
 LIB "primdec.lib";
@@ -133,7 +129,7 @@ example
 /////////////////////////////////////////////////////////////////////////////
 // PrimdecA(N[,i])
 // computes a primary decomposition, not necessarily minimal,
-// using a generalization of the algorithm of Schimoyama/Yokoyama,
+// using a generalization of the algorithm of Shimoyama/Yokoyama,
 // suggested by Hans-Gerd Graebe, Leipzig
 // [Hans-Gert Graebe, Minimal Primary Decompostion
 //  and Factorized Groebner Bases, AAECC 8, 265-278 (1997)]
@@ -144,7 +140,7 @@ proc PrimdecA(module @N, list #)
 "USAGE:   PrimdecA (N[, i]); module N, int i
 RETURN:  list l
          a (not necessarily minimal) primary decomposition of N
-         computed by a generalized version of the algorithm of Schimoyama/Yokoyama,
+         computed by a generalized version of the algorithm of Shimoyama/Yokoyama,
          @*if i!=0 is given, the factorizing Groebner is used to compute the
          isolated primes
 EXAMPLE: example PrimdecA; shows an example
@@ -374,8 +370,8 @@ proc modDec(module @N, list #)
 "USAGE:   modDec (N[, i]); module N, int i
 RETURN:  list l
          a minimal primary decomposition of N
-         computed by an generalized version of the algorithm of Schimoyama/Yokoyama,
-         @*if i=1 is given, the factorizing Groebner is used
+         computed by an generalized version of the algorithm of Shimoyama/Yokoyama,
+         @*if i=1 is given, the factorizing Groebner basis algorithm is used internally.
 EXAMPLE: example modDec; shows an example
 "
 {
@@ -463,7 +459,7 @@ proc zeroMod (module @N, list #)
 "USAGE:   zeroMod (N[, check]); zero-dimensional module N[, module check]
 RETURN:  list l
          the minimal primary decomposition of a zero-dimensional module N,
-         computed by a gernalized version of the algorithm of Gianni, Trager and Zacharias
+         computed by a generalized version of the algorithm of Gianni, Trager and Zacharias
 NOTE:    if the parameter check is given, only components not containing check are computed
 EXAMPLE: example zeroMod; shows an example
 "
@@ -602,7 +598,7 @@ proc GTZmod (module @N, list #)
 "USAGE:   GTZmod (N[, check]); module N[, module check]
 RETURN:  list l
          the minimal primary decomposition of the module N,
-         computed by a gernalized version of the algorithm of Gianny, Trager and Zacharias
+         computed by a generalized version of the algorithm of Gianni, Trager and Zacharias
 NOTE:    if the parameter check is given, only components not containing check are computed
 EXAMPLE: example GTZmod; shows an example
 "
@@ -897,10 +893,11 @@ example
 proc splitting (module @N, list #)
 "USAGE:   splitting(N[,check[, ann]]);  modul N, module check, ideal ann
 RETURN:  (l, check) list l, module check
-         the elements of l consists of a triple with
-         [1] of type module [2] and [3] of type ideal
+         the elements of l consists of quadruples, where
+         [1] is of type module, [2], [3] and [4] are of type ideal,
          s.th. the intersection of the modules is equal to the
          zero-dimensional module N, furthermore l[j][3]=annil(l[j][1])
+         and l[j][4] contains internal ideal data;
          if l[j][2]!=0 then the module l[j][1] is primary
             with associated prime l[j][2], and check=intersect(check, l[j][1]) is computed
 NOTE:    if the parameter check is given, only components not containing
@@ -1122,8 +1119,8 @@ static proc sp2(module @N,  poly p, list #)
 
 proc primTest(ideal id, list #)
 "USAGE:   primTest(i[, p]); a zero-dimensional ideal i, irreducible poly p in i
-RETURN:  if i neither is prime nor is homogeneous then ideal(0) is returned,
-         else radical(i)
+RETURN:  if i is neither prime nor homogeneous then ideal(0) is returned,
+         otherwise radical(i)
 EXAMPLE: example primTest; shows an example
 "
 {
@@ -1319,12 +1316,12 @@ example
 
 proc indSet (ideal @j)
 "USAGE:   indSet(i); i ideal
-RETURN:  list with two entrees
-         both are lists of new varstrings with the dependend variables
+RETURN:  list with two entries
+         both are lists of new varstrings with the dependent variables,
          the independent set, the ordstring with the corresp. block ordering,
          and the integer where the independent set starts in the varstring
-NOTE:    the first entry gives the strings for all maximal independend sets
-         the second gives the strings for the independend sets,
+NOTE:    the first entry gives the strings for all maximal independent sets
+         the second gives the strings for the independent sets,
          which cannot be enhanced
 EXAMPLE: example indSet; shows an example
 "
@@ -1405,7 +1402,7 @@ proc GTZopt (module @N, list #)
 RETURN:  list l
          the minimal primary decomposition of the module N,
          computed by a generalized and optimized version of
-         the algorithm of Gianny, Trager and Zacharias
+         the algorithm of Gianni, Trager and Zacharias
 NOTE:    if the parameter check is given, only components
          not containing check are computed
 EXAMPLE: example GTZmod; shows an example
@@ -1731,7 +1728,7 @@ proc zeroOpt (module @N, list #)
 RETURN:  list l
          the minimal primary decomposition of a zero-dimensional module N,
          computed by a generalized and optimized version of the algorithm
-         of Gianny, Trager and Zacharias
+         of Gianni, Trager and Zacharias
 NOTE:    if the parameter check is given, only components
          not containing check are computed
 EXAMPLE: example zeroMod; shows an example
@@ -1934,7 +1931,7 @@ example
 // Generalization of clearSB from primdec.lib
 /////////////////////////////////////////////////////////////////////////////
 
-proc clrSBmod (module @N)
+static proc clrSBmod (module @N)
 "USAGE:   clrSBmod(N); N module which is SB ordered by monomial ordering
 RETURN:  module = minimal SB
 EXAMPLE: example clrSBmod; shows an example
@@ -1989,7 +1986,7 @@ example
 // Generalization of minsat from primdec.lib
 /////////////////////////////////////////////////////////////////////////////
 
-proc minSatMod(module Nnew, ideal @h)
+static proc minSatMod(module Nnew, ideal @h)
 "USAGE:   minSatMod(N, I); module N, ideal I
 RETURN:  list with 2 elements:
          [1]=sat(N,product(I))[1],
@@ -2120,7 +2117,7 @@ proc quotMinMod(list tsil)
 // Generalization of specialIdealsEqual from primdec.lib
 /////////////////////////////////////////////////////////////////////////////
 
-proc specialModulesEqual( module k1, module k2)
+static proc specialModulesEqual( module k1, module k2)
 "USAGE:   specialModulesEqual(N1, N2) N1, N2 standard bases of modules,
          s.th. N1 is contained in N2 or vice versa
 RETURN:  int i
@@ -2234,7 +2231,7 @@ NOTE:    result is a std basis in the basering
 // Generalization of stdIdealsEqual from primdec.lib
 /////////////////////////////////////////////////////////////////////////////
 
-proc stdModulesEqual(module k1, module k2)
+static proc stdModulesEqual(module k1, module k2)
 "USAGE:   stdModulesEqual(N1, N2) N1, N2 standard bases of modules,
 RETURN:  int i
          if (N1==N2) then i=1
@@ -2279,7 +2276,7 @@ example
 // Generalization of IdealsEqual from primdec.lib
 /////////////////////////////////////////////////////////////////////////////
 
-proc modulesEqual( module @k, module @j)
+static proc modulesEqual( module @k, module @j)
 "USAGE:   modulesEqual(N1, N2) N1, N2 modules,
 RETURN:  int i
          if (N1==N2) then i=1
@@ -2314,7 +2311,7 @@ example
    i;
 }
 
-proc getData (module @N, list oldData, list #)
+static proc getData (module @N, list oldData, list #)
 "USAGE:   getData(N, l[, noCheck]);  module N, list l[, int noCheck]
 RETURN:  (ann, check, M, checked)
          ideal ann, module check, M, int checked
