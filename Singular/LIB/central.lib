@@ -1,10 +1,10 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: central.lib,v 1.8 2009-03-30 18:03:47 motsak Exp $"
+version="$Id: central.lib,v 1.9 2009-03-30 18:11:39 motsak Exp $"
 category="Noncommutative"
 info="
 LIBRARY:  central.lib      Computation of central elements of GR-algebras
 
-AUTHOR:  Oleksandr Motsak, motsak at mathematik dot uni minus kl dot kl
+AUTHOR:  Oleksandr Motsak,    U@D, where U={motsak}, D={mathematik.uni-kl.de}
 
 OVERVIEW: A library for computing elements of the center and centralizers of sets of elements in GR-algebras.
 
