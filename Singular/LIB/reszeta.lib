@@ -1,8 +1,9 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: reszeta.lib,v 1.12 2008-10-06 17:04:28 Singular Exp $";
+version="$Id: reszeta.lib,v 1.13 2009-03-30 11:56:03 dreyer Exp $";
 category="Commutative Algebra";
 info="
-LIBRARY:  reszeta.lib       Zeta-function of Denef and Loeser
+LIBRARY:  reszeta.lib       topological Zeta-function and
+                            some other applications of desingularization
 
 AUTHORS:  A. Fruehbis-Krueger,  anne@mathematik.uni-kl.de,
 @*        G. Pfister,           pfister@mathematik.uni-kl.de
@@ -1745,10 +1746,10 @@ example
 
 proc zetaDL(list re,int d,list #)
 "USAGE:   zetaDL(L,d[,s1][,s2][,a]);
-@*        L     = list of rings
-@*        d     = integer
-@*        s1,s2 = string
-@*        a     = integer
+          L     = list of rings;
+          d     = integer;
+          s1,s2 = string;
+          a     = integer
 ASSUME:   L is the output of resolution of singularities
 COMPUTE:  local Denef-Loeser zeta function, if string s1 is present and
              has the value 'local'; global Denef-Loeser zeta function
@@ -1757,11 +1758,11 @@ COMPUTE:  local Denef-Loeser zeta function, if string s1 is present and
              characteristic polynomial of the monodromy is computed
 RETURN:   list l
           if a is not present:
-          l[1]: string specifying the Denef-Loeser zeta function
+          l[1]: string specifying the top. zeta function
           l[2]: string specifying characteristic polynomial of monodromy,
                 if "A" was specified
-          if a is present
-          l[1]: string specifying the Denef-Loeser zeta function
+          if a is present:
+          l[1]: string specifying the top. zeta function
           l[2]: list ast,
                      ast[1]=chi(Ei^*)
                      ast[2]=chi(Eij^*)
@@ -2065,7 +2066,9 @@ example
    ring r = 0,(x,y,z),dp;
    ideal I=x2+y2+z11;
    list L=resolve(I);
-   abstractR(L);
+   list absR=abstractR(L);
+   absR[1];
+   absR[2];
 }
 //////////////////////////////////////////////////////////////////////////////
 static
@@ -3295,7 +3298,6 @@ EXAMPLE:  example intersectionDiv;  shows an example
    }
    iden=tmpiden;                      // store the modified divisor list
    kill tmpiden;                      // and clean up temporary objects
-iden;
 //---------------------------------------------------------------------------
 // Now we have decomposed everything into irreducible components over Q,
 // but over C there might still be some reducible ones left:
@@ -4428,9 +4430,10 @@ example
 //we really need to blow up curves even if the generic point of
 //the curve the total transform is n.c.
 //this occurs here in r[2][5]
-   list re=resolve(I,1);
+   list re=resolve(I);
    list di=collectDiv(re);
-   di;
+   di[1];
+   di[2];
 }
 //////////////////////////////////////////////////////////////////////////////
 static
