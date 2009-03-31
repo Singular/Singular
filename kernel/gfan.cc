@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-03-30 14:07:21 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.24 2009-03-30 14:07:21 monerjan Exp $
-$Id: gfan.cc,v 1.24 2009-03-30 14:07:21 monerjan Exp $
+$Date: 2009-03-31 09:59:14 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.25 2009-03-31 09:59:14 monerjan Exp $
+$Id: gfan.cc,v 1.25 2009-03-31 09:59:14 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -16,6 +16,7 @@ $Id: gfan.cc,v 1.24 2009-03-30 14:07:21 monerjan Exp $
 #include "ideals.h"
 #include "kmatrix.h"
 #include "fast_maps.h"	//Mapping of ideals
+#include "maps.h"
 #include "iostream.h"	//deprecated
 
 //Hacks for different working places
@@ -75,6 +76,14 @@ class facet
 		{
 			fNormal->show();
 		}
+		
+		/** \brief The Groebner basis on the other side of a shared facet
+		*
+		* In order not to have to compute the flipped GB twice we store the basis we already get
+		* when identifying search facets. Thus in the next step of the reverse search we can 
+		* just copy the old cone and update the facet and the gcBasis
+		*/
+		ideal flibGB;		//The Groebner Basis on the other side, computed via gcone::flip
 		
 		bool isFlippable;	//flippable facet? Want to have cone->isflippable.facet[i]
 		bool isIncoming;	//Is the facet incoming or outgoing?
@@ -277,7 +286,27 @@ class gcone
 
 		}//method getConeNormals(ideal I)	
 		
-		void flip();		//Compute "the other side"
+		/** \brief Compute the Groebner Basis on the other side of a shared facet 
+		*
+		* Implements algorithm 4.3.2 from Anders' thesis.
+		* As shown there it is not necessary to compute an interior point. The knowledge of the facet normal
+		* suffices. A term \f$ x^\gamma \f$ of \f$ g \f$ is in \f$  in_\omega(g) \f$ iff \f$ \gamma - leadexp(g)\f$
+		* is parallel to \f$ leadexp(g) \f$
+		* Checking for parallelity is done by computing the rank of the matrix consisting of the vectors in question.
+		* Another possibility would be to compute an interior point of the facet and taking all terms having the same
+		* weight with respect to this interior point.
+		*\param ideal, facet
+		*/
+		void flip(ideal I, facet *f)		//Compute "the other side"
+		{
+			/*1st step: Compute the initial ideal*/
+			map mapping;
+			idhdl h;
+			ideal image;
+			mapping=IDMAP(h);
+			image=idInit(1,1);
+			image=maGetPreimage(currRing,mapping,image);			
+		}
 				
 		/** \brief Compute a Groebner Basis
 		*
@@ -353,8 +382,9 @@ ideal gfan(ideal inputIdeal)
 	gcAct = gcRoot;
 	gcAct->getGB(inputIdeal);
 	gcAct->getConeNormals(gcAct->gcBasis);	//hopefully compute the normals
+	
 	/*Now it is time to compute the search facets, respectively start the reverse search.
-	But since we are in the root all facets should be search facets.
+	But since we are in the root all facets should be search facets. IS THIS TRUE?
 	MIND: AS OF NOW, THE LIST OF FACETS IS NOT PURGED OF NON-FLIPPAPLE FACETS
 	*/
 	
