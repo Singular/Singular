@@ -659,9 +659,9 @@ the same index whereas the labels are taken into account
 void topReduction(LNode* l, LList* sPolyList, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev) {
     //Print("##########################################In topREDUCTION!########################################\n");
     // try l as long as there are reductors found by findReductor()
+    LNode* gPrevRedCheck    =   new LNode(lTag->getFirstCurrentIdx());
+    LNode* tempRed          =   new LNode();
     do {
-        LNode* gPrevRedCheck    =   new LNode(lTag->getFirstCurrentIdx());
-        LNode* tempRed          =   new LNode();
         tempRed  =   findReductor(l,gPrevRedCheck,gPrev,rules,lTag,rTag);
         // if a reductor for l is found and saved in tempRed
         if(NULL != tempRed) {
@@ -674,11 +674,13 @@ void topReduction(LNode* l, LList* sPolyList, LList* gPrev, RList* rules, LTagLi
                 poly temp           =   pSub(tempRed->getPoly(),temp_poly_l);
                 if(NULL != temp) {
                     pNorm(temp);
-                    tempRed->setPoly(temp);
-                    tempRed->setDel(1);
+                    //tempRed->setPoly(temp);
+                    //tempRed->setDel(1);
                     rules->insert(tempRed->getIndex(),tempRed->getTerm());
-                    tempRed->getLPoly()->setRule(rules->getFirst()->getRule());
-                    sPolyList->insertByLabel(tempRed);
+                    LNode* tempRedNew   =   new LNode(tempRed->getTerm(),tempRed->getIndex(),temp,rules->getFirst()->getRule());
+                    //tempRed->getLPoly()->setRule(rules->getFirst()->getRule());
+                    tempRedNew->setDel(1);
+                    sPolyList->insertByLabel(tempRedNew);
                 }
                 else {
                     pDelete(&temp);
