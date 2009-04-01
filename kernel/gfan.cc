@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-03-31 09:59:14 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.25 2009-03-31 09:59:14 monerjan Exp $
-$Id: gfan.cc,v 1.25 2009-03-31 09:59:14 monerjan Exp $
+$Date: 2009-04-01 14:07:20 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.26 2009-04-01 14:07:20 monerjan Exp $
+$Id: gfan.cc,v 1.26 2009-04-01 14:07:20 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -102,7 +102,7 @@ finally this should become s.th. like gconelib.{h,cc} to provide an API
 class gcone
 {
 	private:
-		int numFacets;		//#of facets of the cone
+		int numFacets;		//#of facets of the cone		
 
 	public:
 		/** \brief Default constructor. 
@@ -115,18 +115,24 @@ class gcone
 			this->facetPtr=NULL;
 		}
 		~gcone();		//destructor
+		
 		/** Pointer to the first facet */
-		facet *facetPtr;	//Will hold the adress of the first facet
+		facet *facetPtr;	//Will hold the adress of the first facet; set by gcone::getConeNormals
 		poly gcMarkedTerm; 	//marked terms of the cone's Groebner basis
-		ideal gcBasis;		//GB of the cone
+		int numVars;		//#of variables in the ring
+		
+		/** Contains the Groebner basis of the cone. Is set by gcone::getGB(ideal I)*/
+		ideal gcBasis;		//GB of the cone, set by gcone::getGB();
 		gcone *next;		//Pointer to *previous* cone in search tree
+		
 		/** \brief Compute the normals of the cone
 		*
 		* This method computes a representation of the cone in terms of facet normals. It takes an ideal
 		* as its input. Redundancies are automatically removed using cddlib's dd_MatrixCanonicalize.
 		* Other methods for redundancy checkings might be implemented later. See Anders' diss p.44.
 		* Note that in order to use cddlib a 0-th column has to be added to the matrix since cddlib expects 
-		* each row to represent an inequality of type const+x1+...+xn <= 0
+		* each row to represent an inequality of type const+x1+...+xn <= 0. While computing the normals we come across
+		* the set \f$ \partial\mathcal{G} \f$ which we might store for later use. C.f p71 of journal
 		* As a result of this procedure the pointer facetPtr points to the first facet of the cone.
 		*/
 		void getConeNormals(ideal I)
@@ -286,31 +292,58 @@ class gcone
 
 		}//method getConeNormals(ideal I)	
 		
+		bool isParallel(int v[], intvec iv)
+		{
+		}
+		
 		/** \brief Compute the Groebner Basis on the other side of a shared facet 
 		*
 		* Implements algorithm 4.3.2 from Anders' thesis.
 		* As shown there it is not necessary to compute an interior point. The knowledge of the facet normal
 		* suffices. A term \f$ x^\gamma \f$ of \f$ g \f$ is in \f$  in_\omega(g) \f$ iff \f$ \gamma - leadexp(g)\f$
 		* is parallel to \f$ leadexp(g) \f$
-		* Checking for parallelity is done by computing the rank of the matrix consisting of the vectors in question.
-		* Another possibility would be to compute an interior point of the facet and taking all terms having the same
-		* weight with respect to this interior point.
+		* Checking for parallelity is done by brute force dividing of components.
+		* Other possibilitiesincludes  computing the rank of the matrix consisting of the vectors in question and
+		* computing an interior point of the facet and taking all terms having the same weight with respect 
+		* to this interior point.
 		*\param ideal, facet
+		* Input: a marked,reduced Groebner basis and a facet
 		*/
-		void flip(ideal I, facet *f)		//Compute "the other side"
-		{
+		void flip(ideal gb, facet *f)		//Compute "the other side"
+		{			
+			intvec fNormal;	//facet normal, check for parallelity
+			/* EXTREMELY EXPERIMENTAL CODE AHEAD*/
 			/*1st step: Compute the initial ideal*/
-			map mapping;
-			idhdl h;
-			ideal image;
-			mapping=IDMAP(h);
-			image=idInit(1,1);
-			image=maGetPreimage(currRing,mapping,image);			
-		}
+			poly initialForm[IDELEMS(gb)];	//array of #polys in GB to store initial form
+			poly aktpoly;
+			int check[this->numVars];	//array to store the difference of LE and v
+			for (int ii=0;ii<IDELEMS(gb);ii++)
+			{
+				aktpoly = (poly)gb->m[ii];
+				int *v=(int *)omAlloc((this->numVars+1)*sizeof(int));
+				int *leadExpV=(int *)omAlloc((this->numVars+1)*sizeof(int));				
+				pGetExpV(aktpoly,leadExpV);	//find the leading exponent in leadExpV[1],...,leadExpV[n], use pNext(p)
+				initialForm[ii]=pHead(aktpoly);
+				while(pNext(aktpoly)!=NULL)	/*loop trough terms and check for parallelity*/
+				{
+					aktpoly=pNext(aktpoly);	//next term
+					pGetExpV(aktpoly,v);
+					for (int i=0;i<pVariables;i++)
+					{
+						check[i] = v[i]-leadExpV[i];
+					}
+					if (isParallel(*check,fNormal)) //pass *check when 
+					{
+						//initialForm[ii] += pHead(aktpoly);	//This should add the respective term to 
+					}				
+				}
+				
+			}
+		}//void flip(ideal gb, facet *f)
 				
 		/** \brief Compute a Groebner Basis
 		*
-		* Computes the Groebner basis and stores the result in this->gcBasis
+		* Computes the Groebner basis and stores the result in gcone::gcBasis
 		*\param ideal
 		*\return void
 		*/
@@ -380,6 +413,7 @@ ideal gfan(ideal inputIdeal)
 	gcone *gcRoot = new gcone();	//Instantiate the sink
 	gcone *gcAct;
 	gcAct = gcRoot;
+	gcAct->numVars=pVariables;
 	gcAct->getGB(inputIdeal);
 	gcAct->getConeNormals(gcAct->gcBasis);	//hopefully compute the normals
 	
