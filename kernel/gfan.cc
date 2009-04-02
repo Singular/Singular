@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-04-01 14:07:20 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.26 2009-04-01 14:07:20 monerjan Exp $
-$Id: gfan.cc,v 1.26 2009-04-01 14:07:20 monerjan Exp $
+$Date: 2009-04-02 09:44:23 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.27 2009-04-02 09:44:23 monerjan Exp $
+$Id: gfan.cc,v 1.27 2009-04-02 09:44:23 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -67,8 +67,15 @@ class facet
 		
 		/** Stores the facet normal \param intvec*/
 		void setFacetNormal(intvec *iv){
-			fNormal = iv;
+			this->fNormal = ivCopy(iv);
 			//return;
+		}
+		
+		/** Hopefully returns the facet normal */
+		intvec *getFacetNormal()
+		{	
+			//this->fNormal->show();	cout << endl;	
+			return this->fNormal;
 		}
 		
 		/** Method to print the facet normal*/
@@ -249,8 +256,8 @@ class gcone
 			cout << "Creating list of normals" << endl;
 #endif
 			/*The pointer *fRoot should be the return value of this function*/
-			facet *fRoot = new facet();		//instantiate new facet with intvec with numvar rows, one column and initial values all 0
-			facetPtr = fRoot;		//set variable facetPtr of class gcone to first facet
+			facet *fRoot = new facet();	//instantiate new facet
+			this->facetPtr = fRoot;		//set variable facetPtr of class gcone to first facet
 			facet *fAct; 			//instantiate pointer to active facet
 			fAct = fRoot;		//This does not seem to do the trick. fRoot and fAct have to point to the same adress!
 			std::cout << "fRoot = " << fRoot << ", fAct = " << fAct << endl;
@@ -268,13 +275,14 @@ class gcone
 					//check for flipability here
 					if (jj<ddcols)				//Is this facet NOT the last facet? Writing while instead of if is a really bad idea :)
 					{
-						fAct->next = new facet();	//If so: instantiate new facet. Otherwise this->next=NULL due to the constructor
-						fAct = fAct->next;		//scary :)
+						fAct->next = new facet();	//If so: instantiate new facet. Otherwise this->next=NULL due to the constructor						
 					}
 				}//for jj<ddcols
 				/*Now load should be full and we can call setFacetNormal*/
 				fAct->setFacetNormal(load);
 				fAct->printNormal();
+				fAct=fAct->next;	//this should definitely not be called in the above while-loop :D
+				delete load;
 			}
 			/*
 			Now we should have a linked list containing the facet normals of those facets that are
@@ -311,29 +319,56 @@ class gcone
 		*/
 		void flip(ideal gb, facet *f)		//Compute "the other side"
 		{			
-			intvec fNormal;	//facet normal, check for parallelity
-			/* EXTREMELY EXPERIMENTAL CODE AHEAD*/
+			
+			intvec *fNormal = new intvec(this->numVars);	//facet normal, check for parallelity			
+			fNormal = f->getFacetNormal();	//read this->fNormal;			
+			fNormal->show();
+			
+			bool isParallel=TRUE;
+			double lambda=0;
+			double lambda_temp=lambda;
+			/* EXTREMELY EXPERIMENTAL CODE AHEAD - NUMERICAL INSTABILITIES GUARANTEED DUE TO DIVISONS*/
 			/*1st step: Compute the initial ideal*/
 			poly initialForm[IDELEMS(gb)];	//array of #polys in GB to store initial form
 			poly aktpoly;
 			int check[this->numVars];	//array to store the difference of LE and v
+			
 			for (int ii=0;ii<IDELEMS(gb);ii++)
 			{
-				aktpoly = (poly)gb->m[ii];
+				aktpoly = (poly)gb->m[ii];								
 				int *v=(int *)omAlloc((this->numVars+1)*sizeof(int));
 				int *leadExpV=(int *)omAlloc((this->numVars+1)*sizeof(int));				
+				intvec *iv=(intvec *)omAlloc((this->numVars+1)*sizeof(intvec));	//let's try this
+				intvec *ivLeadExpV=(intvec *)omAlloc((this->numVars+1)*sizeof(intvec));
 				pGetExpV(aktpoly,leadExpV);	//find the leading exponent in leadExpV[1],...,leadExpV[n], use pNext(p)
+				//pGetExpV(aktpoly,ivLeadExpV);
 				initialForm[ii]=pHead(aktpoly);
+				
 				while(pNext(aktpoly)!=NULL)	/*loop trough terms and check for parallelity*/
 				{
 					aktpoly=pNext(aktpoly);	//next term
 					pGetExpV(aktpoly,v);
+					
 					for (int i=0;i<pVariables;i++)
 					{
 						check[i] = v[i]-leadExpV[i];
+						cout << "check["<<i<<"]="<<check[i]<<endl;
 					}
-					if (isParallel(*check,fNormal)) //pass *check when 
+					lambda=check[0]/(*fNormal)[0];
+					lambda_temp=lambda;
+					cout << "lambda="<<lambda<<endl;
+					for (int i=0;i<pVariables;i++)
 					{
+						lambda_temp=check[i]/(*fNormal)[i];
+						cout<<"lambda_temp="<<lambda_temp<<endl;
+						if (lambda_temp!=lambda)
+						{
+							isParallel=FALSE;
+						}
+					}
+					if (isParallel==TRUE) //pass *check when 
+					{
+						cout << "PARALLEL" << endl;
 						//initialForm[ii] += pHead(aktpoly);	//This should add the respective term to 
 					}				
 				}
@@ -416,7 +451,7 @@ ideal gfan(ideal inputIdeal)
 	gcAct->numVars=pVariables;
 	gcAct->getGB(inputIdeal);
 	gcAct->getConeNormals(gcAct->gcBasis);	//hopefully compute the normals
-	
+	gcAct->flip(gcAct->gcBasis,gcAct->facetPtr);
 	/*Now it is time to compute the search facets, respectively start the reverse search.
 	But since we are in the root all facets should be search facets. IS THIS TRUE?
 	MIND: AS OF NOW, THE LIST OF FACETS IS NOT PURGED OF NON-FLIPPAPLE FACETS
