@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.33 2009-03-18 13:39:13 ederc Exp $ */
+/* $Id: f5gb.h,v 1.34 2009-04-02 12:59:59 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -87,7 +87,7 @@ top reduction in F5, i.e. reduction of a given S-polynomial by labeled polynomia
 the same index whereas the labels are taken into account
 =====================================================================================
 */
-inline void topReduction(LNode* l, LList* sPolyList, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev); 
+inline void topReduction(LNode* l, LList* sPolyList, LList* gPrev, CList* critPairs, RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev); 
 
 /*
 =====================================================================

@@ -122,11 +122,11 @@ LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lT
             //temp    =   temp->getNext();
         //}
         // reduction process of new S-polynomials and also adds new critical pairs to critPairs
-        int timer3  =   initTimer();
-        startTimer();
+        //int timer3  =   initTimer();
+        //startTimer();
         reduction(sPolyList, critPairs, gPrev, rules, lTag, rTag, gbPrev);
-        timer3      =  getTimer();
-        reductionTime = reductionTime + timer3;
+        //timer3      =  getTimer();
+        //reductionTime = reductionTime + timer3;
         //Print("REDUCTION TIMER: %d\n",timer3); 
         // DEBUG STUFF FOR GPREV
         //temp    =   gPrev->getFirst();
@@ -618,20 +618,14 @@ void reduction(LList* sPolyList, CList* critPairs, LList* gPrev, RList* rules, L
     //Print("##########################################In REDUCTION!########################################\n");
     // check if sPolyList has any elements
     // NOTE: due to initialization sPolyList always has a default NULL element
-    LNode* temp;
-    while(sPolyList->getLength() > 0) {
+    LNode* temp = sPolyList->getFirst();
+    while(NULL != temp) {
         // temp is the first element in the sPolyList which should be reduced
         // due to earlier sorting this is the element of minimal degree AND 
         // minimal label
-        temp =   sPolyList->getFirst();
         // delete the above first element from sPolyList, temp will be either reduced to
         // zero or added to gPrev, but never come back to sPolyList
-        if(NULL != temp) { 
-            sPolyList->setFirst(temp->getNext());
-        }
-        else {
-            break;
-        }
+        sPolyList->setFirst(temp->getNext());
         poly tempNF = kNF(gbPrev,currQuotient,temp->getPoly());
         if(NULL != tempNF) {
             pNorm(tempNF);
@@ -639,13 +633,19 @@ void reduction(LList* sPolyList, CList* critPairs, LList* gPrev, RList* rules, L
             // try further reductions of temp with polynomials in gPrev
             // with label index = current label index: this is done such that there 
             // is no label corruption during the reduction process
-            topReduction(temp,sPolyList,gPrev,rules,lTag,rTag,gbPrev);
+            topReduction(temp,sPolyList,gPrev,critPairs,rules,lTag,rTag,gbPrev);
         
         }
-        if(NULL != temp->getPoly()) {
-            criticalPair(gPrev,critPairs,lTag,rTag,rules);
+        else {
+            reductionsToZero++;
+            delete temp;
         }
+        //if(NULL != temp->getPoly()) {
+        //    criticalPair(gPrev,critPairs,lTag,rTag,rules);
+        //}
+        temp =   sPolyList->getFirst();
     }
+    //delete sPolyList;
 }    
 
 
@@ -656,22 +656,33 @@ top reduction in F5, i.e. reduction of a given S-polynomial by labeled polynomia
 the same index whereas the labels are taken into account
 =====================================================================================
 */
-void topReduction(LNode* l, LList* sPolyList, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev) {
+void topReduction(LNode* l, LList* sPolyList, LList* gPrev, CList* critPairs,  RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev) {
     //Print("##########################################In topREDUCTION!########################################\n");
     // try l as long as there are reductors found by findReductor()
-    LNode* gPrevRedCheck    =   new LNode(lTag->getFirstCurrentIdx());
-    LNode* tempRed          =   new LNode();
+    LNode* gPrevRedCheck    =   lTag->getFirstCurrentIdx();
+    LNode* tempRed;
+    poly pOne               =   pOne();
     do {
+        int timer5  =   initTimer();
+        startTimer();
         tempRed  =   findReductor(l,gPrevRedCheck,gPrev,rules,lTag,rTag);
+        timer5  =   getTimer();
+        reductionTime   =   reductionTime   +   timer5;
         // if a reductor for l is found and saved in tempRed
         if(NULL != tempRed) {
             // if label of reductor is greater than the label of l we have to built a new element
             // and add it to sPolyList
             if(pLmCmp(tempRed->getTerm(),l->getTerm()) == 1) {
                 // needed sinc pSub destroys the arguments!
-                poly temp_poly_l    =   pInit();
-                temp_poly_l         =   pCopy(l->getPoly());
-                poly temp           =   pSub(tempRed->getPoly(),temp_poly_l);
+                //poly temp_poly_l    =   pInit();
+                //temp_poly_l         =   pCopy(l->getPoly());
+                //Print("VORHER: ");
+                //pWrite(tempRed->getPoly());
+                poly temp           =   pMinus_mm_Mult_qq(tempRed->getPoly(),pOne,l->getPoly());
+                //Print("NACHHER: ");
+                //pWrite(tempRed->getPoly());
+                //Print("TEMP: ");
+                //pWrite(temp);
                 if(NULL != temp) {
                     pNorm(temp);
                     //tempRed->setPoly(temp);
@@ -685,7 +696,7 @@ void topReduction(LNode* l, LList* sPolyList, LList* gPrev, RList* rules, LTagLi
                 else {
                     pDelete(&temp);
                     reductionsToZero++;
-                    delete tempRed;
+                    //delete tempRed;
                 }
             }
             // label of reductor is smaller than the label of l, subtract reductor from l and delete the 
@@ -693,9 +704,9 @@ void topReduction(LNode* l, LList* sPolyList, LList* gPrev, RList* rules, LTagLi
             // after subtraction 
             else {
                 
-                poly temp_poly_l    =   pInit();
-                temp_poly_l         =   pCopy(l->getPoly());
-                poly temp   =   pSub(temp_poly_l,tempRed->getPoly());
+                //poly temp_poly_l    =   pInit();
+                //temp_poly_l         =   pCopy(l->getPoly());
+                poly temp   =   pMinus_mm_Mult_qq(tempRed->getPoly(),pOne,l->getPoly());
                 if(NULL != temp) {
                     pNorm(temp);
                     poly tempNF =   kNF(gbPrev,currQuotient,temp);  
@@ -722,6 +733,7 @@ void topReduction(LNode* l, LList* sPolyList, LList* gPrev, RList* rules, LTagLi
             if(NULL != l->getPoly()) {
                 pNorm(l->getPoly());
                 gPrev->insert(l->getLPoly());
+                criticalPair(gPrev,critPairs,lTag,rTag,rules);
             }
             break;
         }
@@ -801,17 +813,17 @@ ideal F5main(ideal id, ring r) {
     // DEBUGGING STUFF START
     //Print("NUMBER: %d\n",r->N);
     
-    //int* ev = new int[r->N];
-    //int  ev2;
-    //for(i=0;i<IDELEMS(id);i++) {
-        //pGetExpV(id->m[i],ev);
+    int* ev = new int[r->N +1];
+    int  ev2;
+    for(i=0;i<IDELEMS(id);i++) {
+        pGetExpV(id->m[i],ev);
         //ev2  =   pGetExp(id->m[i],1);
         //pWrite(id->m[i]);
         //Print("%d\n",ev2);
         //Print("EXP1: %d\n",ev[1]);
         //Print("EXP2: %d\n",ev[2]);
         //Print("EXP3: %d\n\n",ev[3]);
-    //}
+    }
     //delete ev;
     
     /*DEBUGGING STUFF END */
