@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-04-02 09:44:23 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.27 2009-04-02 09:44:23 monerjan Exp $
-$Id: gfan.cc,v 1.27 2009-04-02 09:44:23 monerjan Exp $
+$Date: 2009-04-03 13:49:16 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.28 2009-04-03 13:49:16 monerjan Exp $
+$Id: gfan.cc,v 1.28 2009-04-03 13:49:16 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -280,7 +280,7 @@ class gcone
 				}//for jj<ddcols
 				/*Now load should be full and we can call setFacetNormal*/
 				fAct->setFacetNormal(load);
-				fAct->printNormal();
+				//fAct->printNormal();
 				fAct=fAct->next;	//this should definitely not be called in the above while-loop :D
 				delete load;
 			}
@@ -300,9 +300,9 @@ class gcone
 
 		}//method getConeNormals(ideal I)	
 		
-		bool isParallel(int v[], intvec iv)
+		/*bool isParallel(int v[], intvec iv)
 		{
-		}
+}*/
 		
 		/** \brief Compute the Groebner Basis on the other side of a shared facet 
 		*
@@ -310,8 +310,8 @@ class gcone
 		* As shown there it is not necessary to compute an interior point. The knowledge of the facet normal
 		* suffices. A term \f$ x^\gamma \f$ of \f$ g \f$ is in \f$  in_\omega(g) \f$ iff \f$ \gamma - leadexp(g)\f$
 		* is parallel to \f$ leadexp(g) \f$
-		* Checking for parallelity is done by brute force dividing of components.
-		* Other possibilitiesincludes  computing the rank of the matrix consisting of the vectors in question and
+		* Parallelity is checked using basic linear algebra. See gcone::isParallel.
+		* Other possibilities includes  computing the rank of the matrix consisting of the vectors in question and
 		* computing an interior point of the facet and taking all terms having the same weight with respect 
 		* to this interior point.
 		*\param ideal, facet
@@ -321,59 +321,53 @@ class gcone
 		{			
 			
 			intvec *fNormal = new intvec(this->numVars);	//facet normal, check for parallelity			
-			fNormal = f->getFacetNormal();	//read this->fNormal;			
+			fNormal = f->getFacetNormal();	//read this->fNormal;
+#ifdef gfan_DEBUG
+			cout << "fNormal=";
 			fNormal->show();
-			
-			bool isParallel=TRUE;
-			double lambda=0;
-			double lambda_temp=lambda;
-			/* EXTREMELY EXPERIMENTAL CODE AHEAD - NUMERICAL INSTABILITIES GUARANTEED DUE TO DIVISONS*/
+			cout << endl;
+#endif				
 			/*1st step: Compute the initial ideal*/
-			poly initialForm[IDELEMS(gb)];	//array of #polys in GB to store initial form
+			poly initialFormElement[IDELEMS(gb)];	//array of #polys in GB to store initial form
+			ideal initialForm;
 			poly aktpoly;
-			int check[this->numVars];	//array to store the difference of LE and v
+			intvec *check = new intvec(this->numVars);	//array to store the difference of LE and v
 			
 			for (int ii=0;ii<IDELEMS(gb);ii++)
 			{
 				aktpoly = (poly)gb->m[ii];								
 				int *v=(int *)omAlloc((this->numVars+1)*sizeof(int));
-				int *leadExpV=(int *)omAlloc((this->numVars+1)*sizeof(int));				
-				intvec *iv=(intvec *)omAlloc((this->numVars+1)*sizeof(intvec));	//let's try this
-				intvec *ivLeadExpV=(intvec *)omAlloc((this->numVars+1)*sizeof(intvec));
+				int *leadExpV=(int *)omAlloc((this->numVars+1)*sizeof(int));
 				pGetExpV(aktpoly,leadExpV);	//find the leading exponent in leadExpV[1],...,leadExpV[n], use pNext(p)
 				//pGetExpV(aktpoly,ivLeadExpV);
-				initialForm[ii]=pHead(aktpoly);
+				initialFormElement[ii]=pHead(aktpoly);
 				
 				while(pNext(aktpoly)!=NULL)	/*loop trough terms and check for parallelity*/
 				{
 					aktpoly=pNext(aktpoly);	//next term
-					pGetExpV(aktpoly,v);
-					
-					for (int i=0;i<pVariables;i++)
+					pSetm(aktpoly);
+					pGetExpV(aktpoly,v);		
+					/* Convert (int)v into (intvec)check */			
+					for (int jj=0;jj<this->numVars;jj++)
 					{
-						check[i] = v[i]-leadExpV[i];
-						cout << "check["<<i<<"]="<<check[i]<<endl;
+						//cout << "v["<<jj+1<<"]="<<v[jj+1]<<endl;
+						//cout << "leadExpV["<<jj+1<<"]="<<leadExpV[jj+1]<<endl;
+						(*check)[jj]=v[jj+1]-leadExpV[jj+1];
 					}
-					lambda=check[0]/(*fNormal)[0];
-					lambda_temp=lambda;
-					cout << "lambda="<<lambda<<endl;
-					for (int i=0;i<pVariables;i++)
+					cout << "check=";			
+					check->show();
+					cout << endl;
+					if (isParallel(check,fNormal)) //pass *check when 
 					{
-						lambda_temp=check[i]/(*fNormal)[i];
-						cout<<"lambda_temp="<<lambda_temp<<endl;
-						if (lambda_temp!=lambda)
-						{
-							isParallel=FALSE;
-						}
-					}
-					if (isParallel==TRUE) //pass *check when 
-					{
-						cout << "PARALLEL" << endl;
-						//initialForm[ii] += pHead(aktpoly);	//This should add the respective term to 
-					}				
-				}
-				
-			}
+						cout << "Parallel vector found, adding to initialFormElement" << endl;				
+						initialFormElement[ii] = pAdd(initialFormElement[ii],(poly)pHead(aktpoly));
+					}						
+				}//while
+				cout << "Initial Form=";				
+				pWrite(initialFormElement[ii]);
+				cout << "---" << endl;
+				/*Now initialFormElement must be added to (ideal)initialForm */							
+			}//for
 		}//void flip(ideal gb, facet *f)
 				
 		/** \brief Compute a Groebner Basis
@@ -391,20 +385,77 @@ class gcone
 		}
 		
 		ideal GenGrbWlk(ideal, ideal);	//Implementation of the Generic Groebner Walk. Needed for a) Computing the sink and b) finding search facets
+
+
+		/** \brief Compute the dot product of two intvecs
+		*
+		* THIS IS WEIRD - BUT WORKS
+		*/
+		int dotProduct(intvec **a, intvec **b)				
+		{
+			intvec iva=*a;
+			intvec ivb=*b;
+			int res=0;
+			for (int i=0;i<this->numVars;i++)
+			{
+				res = res+(iva[i]*ivb[i]);
+			}
+			return res;
+		}
+
+		/** \brief Check whether two intvecs are parallel
+		*
+		* \f$ \alpha\parallel\beta\Leftrightarrow\langle\alpha,\beta\rangle^2=\langle\alpha,\alpha\rangle\langle\beta,\beta\rangle \f$
+		*/
+		bool isParallel(intvec *a, intvec *b)
+		{			
+			//bool res=FALSE;
+			//intvec iva(this->numVars);
+			//intvec ivb(this->numVars);
+			int lhs,rhs;
+			//lhs=0;
+			//rhs=0;
+			//iva = a;
+			//ivb = b;
+			//lhs=dotProduct(&iva,&ivb)*dotProduct(&iva,&ivb);
+			//lhs=dotProduct(&iva,&iva)*dotProduct(&ivb,&ivb);
+			lhs=dotProduct(&a,&b)*dotProduct(&a,&b);
+			rhs=dotProduct(&a,&a)*dotProduct(&b,&b);
+			cout << "LHS="<<lhs<<", RHS="<<rhs<<endl;
+			if (lhs==rhs)
+			{
+				return TRUE;
+			}
+			else
+			{
+				return FALSE;
+			}
+		}//bool isParallel
 		
-
+		/** \brief Check two intvecs for equality --- PROBABLY NOT NEEDED
+		*
+		* \f$ \alpha=\beta\Leftrightarrow\langle\alpha-\beta,\alpha-\beta\rangle=0 \f$
+		*/
+		bool isEqual(intvec a, intvec b)
+		{
+			intvec *ivdiff;
+			int res;
+			
+			ivdiff=ivSub(&a,&b);
+			cout << "ivdiff=";
+			ivdiff->show();
+			cout << endl;
+			//res=dotProduct(ivdiff,ivdiff);
+			if (res==0)
+			{
+				return TRUE;
+			}
+			else
+			{
+				return FALSE;
+			}			
+		}//bool isEqual
 };//class gcone
-
-/*
-function getGB incorporated into class gcone with rev 1.24
-*/
-
-//DEPRECATED since rev 1.24 with existence of gcone::getConeNormals(ideal I);
-//Kept for unknown reasons ;)
-facet *getConeNormals(ideal I)
-{
-	return NULL;
-}
 
 ideal gfan(ideal inputIdeal)
 {
@@ -432,11 +483,11 @@ ideal gfan(ideal inputIdeal)
 	rootRing=rCopy0(currRing);
 	rootRing->order[0]=ringorder_dp;
 	rComplete(rootRing);
-	rChangeCurrRing(rootRing);
+	//rChangeCurrRing(rootRing);
 	ideal rootIdeal;
 	/* Fetch the inputIdeal into our rootRing */
 	map m=(map)idInit(IDELEMS(inputIdeal),0);
-	rootIdeal=fast_map(inputIdeal,inputRing,(ideal)m, currRing);
+	//rootIdeal=fast_map(inputIdeal,inputRing,(ideal)m, currRing);
 #ifdef gfan_DEBUG
 	cout << "Root ideal is " << endl;
 	idPrint(rootIdeal);
