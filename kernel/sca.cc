@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.34 2009-04-03 18:53:16 motsak Exp $
+ *  Version: $Id: sca.cc,v 1.35 2009-04-03 19:10:36 motsak Exp $
  *******************************************************************/
 
 // set it here if needed.
@@ -206,7 +206,7 @@ inline poly sca_m_Mult_mm( poly pMonomM, const poly pMonomMM, const ring rRing )
     p_SetCoeff(pMonomM, nCoeff, rRing); // delete lc(pMonomM) and set lc(pMonomM) = nCoeff
 
 #ifdef PDEBUG
-    p_Test(pMonomM, rRing);
+    p_LmTest(pMonomM, rRing);
 #endif
 
     return(pMonomM);
@@ -270,7 +270,7 @@ inline poly sca_mm_Mult_m( const poly pMonomMM, poly pMonomM, const ring rRing )
     p_SetCoeff(pMonomM, nCoeff, rRing); // delete lc(pMonomM) and set lc(pMonomM) = nCoeff
 
 #ifdef PDEBUG
-    p_Test(pMonomM, rRing);
+    p_LmTest(pMonomM, rRing);
 #endif
 
     return(pMonomM);
@@ -340,7 +340,7 @@ inline poly sca_mm_Mult_mm( poly pMonom1, const poly pMonom2, const ring rRing )
     p_SetCoeff0(pResult, nCoeff, rRing); // set lc(pResult) = nCoeff, no destruction!
 
 #ifdef PDEBUG
-    p_Test(pResult, rRing);
+    p_LmTest(pResult, rRing);
 #endif
 
     return(pResult);
@@ -385,7 +385,7 @@ inline poly sca_xi_Mult_mm(unsigned int i, const poly pMonom, const ring rRing)
     p_SetCoeff0(pResult, nCoeff, rRing); // set lc(pResult) = nCoeff, no destruction!
 
 #ifdef PDEBUG
-    p_Test(pResult, rRing);
+    p_LmTest(pResult, rRing);
 #endif
 
     return(pResult);
