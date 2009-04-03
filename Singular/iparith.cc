@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.502 2009-03-11 16:14:31 Singular Exp $ */
+/* $Id: iparith.cc,v 1.503 2009-04-03 18:27:19 motsak Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2619,13 +2619,21 @@ static BOOLEAN jjPlural_mat_mat(leftv res, leftv a, leftv b)
 }
 static BOOLEAN jjBRACKET(leftv res, leftv a, leftv b)
 {
+  res->data=NULL;
+            
   if (rIsPluralRing(currRing))
   {
-    poly p = (poly)a->CopyD(POLY_CMD);
-    poly q = (poly)b->Data();
-    res->data = nc_p_Bracket_qq(p,q);
+    const poly q = (poly)b->Data();
+
+    if( q != NULL )
+    {
+      if( (poly)a->Data() != NULL )
+      {
+        poly p = (poly)a->CopyD(POLY_CMD); // p = copy!
+        res->data = nc_p_Bracket_qq(p,q); // p will be destroyed!
+      }
+    }
   }
-  else res->data=NULL;
   return FALSE;
 }
 static BOOLEAN jjOPPOSE(leftv res, leftv a, leftv b)
