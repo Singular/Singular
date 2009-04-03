@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.115 2009-03-30 09:03:08 Singular Exp $ */
+/* $Id: ring.cc,v 1.116 2009-04-03 20:02:20 motsak Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -4389,10 +4389,24 @@ ring rOpposite(ring src)
   /* treats the case of qring */
 {
   if (src == NULL) return(NULL);
+
+#ifdef RDEBUG
+  rTest(src);
+#endif
+
   ring save = currRing;
   rChangeCurrRing(src);
 
-  ring r = rCopy0(src,TRUE); /* TRUE for copy the qideal */
+#ifdef RDEBUG
+  rTest(src);
+//  rWrite(src);
+//  rDebugPrint(src);
+#endif
+
+  
+//  ring r = rCopy0(src,TRUE); /* TRUE for copy the qideal: Why??? */
+  ring r = rCopy0(src,FALSE); /* qideal will be deleted later on!!! */
+  
   /*  rChangeCurrRing(r); */
   // change vars v1..vN -> vN..v1
   int i;
@@ -4604,12 +4618,18 @@ ring rOpposite(ring src)
 
 
 #ifdef RDEBUG
-  //   rDebugPrint(r);
   rTest(r);
 #endif
 
   rChangeCurrRing(r);
 
+#ifdef RDEBUG
+  rTest(r);
+//  rWrite(r);
+//  rDebugPrint(r);
+#endif
+
+  
 #ifdef HAVE_PLURAL
   // now, we initialize a non-comm structure on r
   if (rIsPluralRing(src))
@@ -4646,15 +4666,19 @@ ring rOpposite(ring src)
     idTest((ideal)C);
     idTest((ideal)D);
 
-    if (nc_CallPlural(C, D, NULL, NULL, r, false, false, true, r))
+    if (nc_CallPlural(C, D, NULL, NULL, r, false, false, true, r)) // no qring setup!
       WarnS("Error initializing non-commutative multiplication!");
 
+    
+#ifdef RDEBUG
+    rTest(r);
+//    rWrite(r);
+//    rDebugPrint(r);
+#endif
+
     assume( r->GetNC()->IsSkewConstant == src->GetNC()->IsSkewConstant);
-    assume( ncRingType(r) == ncRingType(src) );
 
     omFreeSize((ADDRESS)perm,(rVar(r)+1)*sizeof(int));
-
-    rChangeCurrRing(save);
 
   }
 #endif /* HAVE_PLURAL */
@@ -4664,19 +4688,36 @@ ring rOpposite(ring src)
   if (src->qideal != NULL)
   {
     idDelete(&(r->qideal));
+
 #ifdef HAVE_PLURAL
-    r->qideal = idOppose(src, src->qideal);
+    r->qideal = idOppose(src, src->qideal); // into the currRing: r
 #else
-    r->qideal = idCopy( src->qideal);
+    r->qideal = id_Copy(src->qideal, currRing); // ?
 #endif
 
 
 #ifdef HAVE_PLURAL
     if( rIsPluralRing(r) )
+    {
       nc_SetupQuotient(r);
+
+#ifdef RDEBUG
+      rTest(r);
+//      rWrite(r);
+//      rDebugPrint(r);
+#endif
+    }
+
 #endif
   }
 
+
+#ifdef HAVE_PLURAL
+  if( rIsPluralRing(r) )
+    assume( ncRingType(r) == ncRingType(src) );
+#endif
+
+  
   rTest(r);
 
   rChangeCurrRing(save);
