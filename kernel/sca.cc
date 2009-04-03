@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.33 2009-03-02 17:04:52 motsak Exp $
+ *  Version: $Id: sca.cc,v 1.34 2009-04-03 18:53:16 motsak Exp $
  *******************************************************************/
 
 // set it here if needed.
@@ -1476,13 +1476,13 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
 
   bool bSCA = true;
 
-  int b = 1;
-  int e = N;  
+  int b = N+1;
+  int e = -1;  
 
   if(rIsSCA(rG))
   {
-    b = si_max(b, scaFirstAltVar(rG));
-    e = si_min(e, scaLastAltVar(rG));
+    b = si_min(b, scaFirstAltVar(rG));
+    e = si_max(e, scaLastAltVar(rG));
 
 #if MYTEST
     Print("AltVars!?: [%d, %d]\n", b, e);
