@@ -645,6 +645,7 @@ void reduction(LList* sPolyList, CList* critPairs, LList* gPrev, RList* rules, L
         //}
         temp =   sPolyList->getFirst();
     }
+    //sPolyList->print();
     //delete sPolyList;
 }    
 
@@ -679,6 +680,7 @@ void topReduction(LNode* l, LList* sPolyList, LList* gPrev, CList* critPairs,  R
                 //Print("VORHER: ");
                 //pWrite(tempRed->getPoly());
                 poly temp           =   pMinus_mm_Mult_qq(tempRed->getPoly(),pOne,l->getPoly());
+                //poly temp   =   ksOldSpolyRedNew(l->getPoly(),tempRed->getPoly());
                 //Print("NACHHER: ");
                 //pWrite(tempRed->getPoly());
                 //Print("TEMP: ");
@@ -707,6 +709,7 @@ void topReduction(LNode* l, LList* sPolyList, LList* gPrev, CList* critPairs,  R
                 //poly temp_poly_l    =   pInit();
                 //temp_poly_l         =   pCopy(l->getPoly());
                 poly temp   =   pMinus_mm_Mult_qq(tempRed->getPoly(),pOne,l->getPoly());
+                //poly temp   =   ksOldSpolyRedNew(l->getPoly(),tempRed->getPoly());
                 if(NULL != temp) {
                     pNorm(temp);
                     poly tempNF =   kNF(gbPrev,currQuotient,temp);  
@@ -749,9 +752,9 @@ subalgorithm to find a possible reductor for the labeled polynomial l
 LNode* findReductor(LNode* l, LNode* gPrevRedCheck, LList* gPrev, RList* rules, LTagList* lTag,RTagList* rTag) {
     // allociation of memory for the possible reductor
     poly u      =   pOne();
-    poly red    =   pOne();
+    poly red;
     number nOne =   nInit(1);
-    LNode* temp =   new LNode();
+    LNode* temp;
     // head term of actual element such that we do not have to call pHead at each new reductor test
     poly t      =   pHead(l->getPoly());
     // if l was already checked use the information in gPrevRedCheck such
@@ -818,13 +821,13 @@ ideal F5main(ideal id, ring r) {
     for(i=0;i<IDELEMS(id);i++) {
         pGetExpV(id->m[i],ev);
         //ev2  =   pGetExp(id->m[i],1);
-        //pWrite(id->m[i]);
-        //Print("%d\n",ev2);
-        //Print("EXP1: %d\n",ev[1]);
-        //Print("EXP2: %d\n",ev[2]);
-        //Print("EXP3: %d\n\n",ev[3]);
+        pWrite(id->m[i]);
+        Print("%d\n",ev2);
+        Print("EXP1: %d\n",ev[1]);
+        Print("EXP2: %d\n",ev[2]);
+        Print("EXP3: %d\n\n",ev[3]);
     }
-    //delete ev;
+    delete ev;
     
     /*DEBUGGING STUFF END */
     
