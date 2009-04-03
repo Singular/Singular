@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.71 2009-02-26 15:55:46 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.72 2009-04-03 18:28:53 motsak Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -2233,9 +2233,10 @@ void nc_PolyPolyRed(poly &b, poly p, number *c)
 
 poly nc_mm_Bracket_nn(poly m1, poly m2);
 
-poly nc_p_Bracket_qq(poly p, poly q)
+poly nc_p_Bracket_qq(poly p, const poly q)
   /* returns [p,q], destroys p */
 {
+  assume(p != NULL && q!= NULL);
 
   if (!rIsPluralRing(currRing)) return(NULL);
   if (pComparePolys(p,q)) return(NULL);

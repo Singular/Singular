@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.26 2009-01-06 13:59:35 Singular Exp $ */
+/* $Id: gring.h,v 1.27 2009-04-03 18:28:53 motsak Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -86,8 +86,8 @@ void nc_PolyPolyRed(poly &b, poly p, number *c);
 poly nc_CreateShortSpoly(poly p1, poly p2, const ring r=currRing);
 
 
-/* brackets: */
-poly nc_p_Bracket_qq(poly p, poly q);
+/* brackets: p will be destroyed... */
+poly nc_p_Bracket_qq(poly p, const poly q);
 
 /* twostd: */
 ideal twostd(ideal I);
