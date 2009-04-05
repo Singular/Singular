@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.34 2009-04-02 12:59:59 ederc Exp $ */
+/* $Id: f5gb.h,v 1.35 2009-04-05 07:49:18 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -19,6 +19,13 @@ sort polynomials in ideal i by decreasing total degree
 ======================================================
 */
 void qsortDegree(poly* left, poly* right);
+
+/**
+==========================================================================
+compare monomials, i.e. divisibility tests for criterion 1 and criterion 2
+==========================================================================
+*/
+bool compareMonomials(int* m1, int** m2, int numberOfRules);
 
 /*
 ==============================================
@@ -94,7 +101,7 @@ inline void topReduction(LNode* l, LList* sPolyList, LList* gPrev, CList* critPa
 subalgorithm to find a possible reductor for the labeled polynomial l
 =====================================================================
 */
-inline LNode* findReductor(LNode* l, LNode* gPrevRedCheck, LList* gPrev, RList* rules, LTagList* lTag,RTagList* rTag);
+inline LNode* findReductor(LNode* l, LList* sPolyList, LNode* gPrevRedCheck, LList* gPrev, RList* rules, LTagList* lTag,RTagList* rTag);
 
 /*
 ======================================

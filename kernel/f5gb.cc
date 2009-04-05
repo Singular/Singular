@@ -63,7 +63,23 @@ void qsortDegree(poly* left, poly* right) {
     }
 }
 
-
+/**
+==========================================================================
+compare monomials, i.e. divisibility tests for criterion 1 and criterion 2
+==========================================================================
+*/
+bool compareMonomials(int* m1, int** m2, int numberOfRules) {
+    int i,j;
+    int k   =   sizeof(m1) / sizeof(int);
+    for(i=0; i<numberOfRules; i++) {
+        for(j=1; j<=k; j++) {
+            if(m1[j]>m2[i][j]) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 /*
 ==================================================
@@ -182,8 +198,8 @@ LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lT
         }
     */
     //gPrev->print();
-    Print("COMPLETE REDUCTION TIME UNTIL NOW: %d\n",reductionTime);
-    Print("COMPLETE SPOLS TIME UNTIL NOW:     %d\n",spolsTime);
+    //Print("COMPLETE REDUCTION TIME UNTIL NOW: %d\n",reductionTime);
+    //Print("COMPLETE SPOLS TIME UNTIL NOW:     %d\n",spolsTime);
     return gPrev;
 }
 
@@ -528,7 +544,7 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) 
                 if(temp->getLp2Index() == temp->getLp1Index()) {
                     if(!criterion2(temp->getT2(),temp->getAdLp2(),rules,temp->getTestedRule())) {
                         // computation of S-polynomial
-                        sp      =   pSub(ppMult_qq(temp->getT1(),temp->getLp1Poly()),
+                        sp      =   ksOldSpolyRedNew(ppMult_qq(temp->getT1(),temp->getLp1Poly()),
                                          ppMult_qq(temp->getT2(),temp->getLp2Poly()));
                         //Print("BEGIN SPOLY1\n====================\n");
                         pNorm(sp);
@@ -563,7 +579,7 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) 
                 }
                 else { // temp->getLp2Index() < temp->getLp1Index()
                     // computation of S-polynomial
-                    sp      =   pSub(ppMult_qq(temp->getT1(),temp->getLp1Poly()),
+                    sp      =   ksOldSpolyRedNew(ppMult_qq(temp->getT1(),temp->getLp1Poly()),
                                      ppMult_qq(temp->getT2(),temp->getLp2Poly()));
                     //Print("BEGIN SPOLY2\n====================\n");
                     pNorm(sp);
@@ -664,11 +680,11 @@ void topReduction(LNode* l, LList* sPolyList, LList* gPrev, CList* critPairs,  R
     LNode* tempRed;
     poly pOne               =   pOne();
     do {
-        int timer5  =   initTimer();
-        startTimer();
-        tempRed  =   findReductor(l,gPrevRedCheck,gPrev,rules,lTag,rTag);
-        timer5  =   getTimer();
-        reductionTime   =   reductionTime   +   timer5;
+        //int timer5  =   initTimer();
+        //startTimer();
+        tempRed  =   findReductor(l,sPolyList,gPrevRedCheck,gPrev,rules,lTag,rTag);
+        //timer5  =   getTimer();
+        //reductionTime   =   reductionTime   +   timer5;
         // if a reductor for l is found and saved in tempRed
         if(NULL != tempRed) {
             // if label of reductor is greater than the label of l we have to built a new element
@@ -679,8 +695,8 @@ void topReduction(LNode* l, LList* sPolyList, LList* gPrev, CList* critPairs,  R
                 //temp_poly_l         =   pCopy(l->getPoly());
                 //Print("VORHER: ");
                 //pWrite(tempRed->getPoly());
-                poly temp           =   pMinus_mm_Mult_qq(tempRed->getPoly(),pOne,l->getPoly());
-                //poly temp   =   ksOldSpolyRedNew(l->getPoly(),tempRed->getPoly());
+                //poly temp           =   pMinus_mm_Mult_qq(tempRed->getPoly(),pOne,l->getPoly());
+                poly temp   =   ksOldSpolyRedNew(l->getPoly(),tempRed->getPoly());
                 //Print("NACHHER: ");
                 //pWrite(tempRed->getPoly());
                 //Print("TEMP: ");
@@ -708,8 +724,8 @@ void topReduction(LNode* l, LList* sPolyList, LList* gPrev, CList* critPairs,  R
                 
                 //poly temp_poly_l    =   pInit();
                 //temp_poly_l         =   pCopy(l->getPoly());
-                poly temp   =   pMinus_mm_Mult_qq(tempRed->getPoly(),pOne,l->getPoly());
-                //poly temp   =   ksOldSpolyRedNew(l->getPoly(),tempRed->getPoly());
+                //poly temp   =   pMinus_mm_Mult_qq(tempRed->getPoly(),pOne,l->getPoly());
+                poly temp   =   ksOldSpolyRedNew(l->getPoly(),tempRed->getPoly());
                 if(NULL != temp) {
                     pNorm(temp);
                     poly tempNF =   kNF(gbPrev,currQuotient,temp);  
@@ -749,8 +765,10 @@ void topReduction(LNode* l, LList* sPolyList, LList* gPrev, CList* critPairs,  R
 subalgorithm to find a possible reductor for the labeled polynomial l
 =====================================================================
 */
-LNode* findReductor(LNode* l, LNode* gPrevRedCheck, LList* gPrev, RList* rules, LTagList* lTag,RTagList* rTag) {
+LNode* findReductor(LNode* l, LList* sPolyList, LNode* gPrevRedCheck, LList* gPrev, RList* rules, LTagList* lTag,RTagList* rTag) {
     // allociation of memory for the possible reductor
+    //Print("LPOLY:  ");
+    //pWrite(l->getPoly());
     poly u      =   pOne();
     poly red;
     number nOne =   nInit(1);
@@ -774,7 +792,7 @@ LNode* findReductor(LNode* l, LNode* gPrevRedCheck, LList* gPrev, RList* rules, 
             red =   ppMult_qq(u,temp->getPoly());
             pNorm(red);
             // check if both have the same label
-            if(pLmCmp(u,l->getTerm()) != 0) {
+            if(pLmCmp(ppMult_qq(u,temp->getTerm()),l->getTerm()) == -1) {
                 // passing criterion2 ?
                 if(!criterion2(gPrev->getFirst()->getIndex(), u,temp,rules,rTag)) {
                     // passing criterion1 ?
@@ -785,7 +803,28 @@ LNode* findReductor(LNode* l, LNode* gPrevRedCheck, LList* gPrev, RList* rules, 
                     }
                 }
             }
+            if(pLmCmp(ppMult_qq(u,temp->getTerm()),l->getTerm()) == 1) {
+                // passing criterion2 ?
+                if(!criterion2(gPrev->getFirst()->getIndex(), u,temp,rules,rTag)) {
+                    // passing criterion1 ?
+                    if(!criterion1(gPrev,u,temp,lTag)) {
+                        poly tempSpoly  =   ksOldSpolyRedNew(red,l->getPoly());
+                        rules->insert(temp->getIndex(),ppMult_qq(u,temp->getTerm()));
+                        gPrevRedCheck   =   temp->getNext();
+                        if(NULL != tempSpoly) {
+                            pNorm(tempSpoly);
+                            sPolyList->insertByLabel(ppMult_qq(u,temp->getTerm()),temp->getIndex(),tempSpoly,rules->getFirst()->getRule());
+                    //Print("NEW ONE: ");
+                    //pWrite(tempSpoly);
+                    //Print("HIER\n");
+                            //sPolyList->print();
+                            //sleep(5);
+                        }
+                    }
+                }
+            }
         }
+        //Print("AUCH HIER\n");
         temp = temp->getNext();
     }
     
@@ -914,14 +953,14 @@ ideal F5main(ideal id, ring r) {
             }
             // interreduction stuff
             if(i<IDELEMS(id)) {
-                int timer2  =   initTimer();
-                startTimer();
+                //int timer2  =   initTimer();
+                //startTimer();
                 ideal tempId    =   kInterRed(gbPrev);
                 
                 //idShow(tempId);
                 gbPrev          =   tempId;
-                timer2  =   getTimer();
-                Print("Timer INTERREDUCTION: %d\n",timer2);
+                //timer2  =   getTimer();
+                //Print("Timer INTERREDUCTION: %d\n",timer2);
                 //idShow(gbPrev);
                 //qsortDegree(&gbPrev->m[0],&gbPrev->m[IDELEMS(gbPrev)-1]);
                 delete gPrev;
