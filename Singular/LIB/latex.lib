@@ -1,25 +1,27 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: latex.lib,v 1.30 2009-01-14 16:07:05 Singular Exp $";
+version="$Id: latex.lib,v 1.31 2009-04-06 12:39:02 seelisch Exp $";
 category="Visualization";
 info="
 LIBRARY: latex.lib    Typesetting of Singular-Objects in LaTeX2e
 AUTHOR: Christian Gorzel, gorzelc@math.uni-muenster.de
 
 PROCEDURES:
- closetex(fnm);       writes closing line for LaTeX-document
- opentex(fnm);        writes header for LaTeX-file fnm
- tex(fnm);            calls LaTeX2e for LaTeX-file fnm
- texdemo([n]);        produces a file explaining the features of this lib
- texfactorize(fnm,f); creates string in LaTeX-format for factors of poly f
- texmap(fnm,m,r1,r2); creates string in LaTeX-format for map m:r1->r2
- texname(fnm,s);      creates string in LaTeX-format for identifier
- texobj(l);           creates string in LaTeX-format for any (basic) type
- texpoly(f,n[,l]);    creates string in LaTeX-format for poly
- texproc(fnm,p);      creates string in LaTeX-format of text from proc p
- texring(fnm,r[,l]);  creates string in LaTeX-format for ring/qring
- rmx(s);              removes .aux and .log files of LaTeX-files
- xdvi(s);             calls xdvi for dvi-files
-         (parameters in square brackets [] are optional)
+ closetex(fnm)       writes closing line for LaTeX-document
+ opentex(fnm)        writes header for LaTeX-file fnm
+ tex(fnm)            calls LaTeX2e for LaTeX-file fnm
+ texdemo([n])        produces a file explaining the features of this lib
+ texfactorize(fnm,f) creates string in LaTeX-format for factors of poly f
+ texmap(fnm,m,r1,r2) creates string in LaTeX-format for map m:r1->r2
+ texname(fnm,s)      creates string in LaTeX-format for identifier
+ texobj(l)           creates string in LaTeX-format for any (basic) type
+ texpoly(f,n[,l])    creates string in LaTeX-format for poly
+ texproc(fnm,p)      creates string in LaTeX-format of text from proc p
+ texring(fnm,r[,l])  creates string in LaTeX-format for ring/qring
+ rmx(s)              removes .aux and .log files of LaTeX-files
+ xdvi(s)             calls xdvi for dvi-files
+        (parameters in square brackets [] are optional)
+        (Procedures with file output assume sufficient write permissions
+        when trying to append existing or create new files.)
 
 GLOBAL VARIABLES:
   TeXwidth, TeXnofrac, TeXbrack, TeXproj, TeXaligned, TeXreplace, NoDollars
@@ -577,7 +579,7 @@ static proc manipul(string s)
 
 proc texname(string fname, string s)
 "USAGE:   texname(fname,s);  fname,s  strings
-RETURN:  if @code{fname=\"\"}: string, the transformed string s, where the
+RETURN:  if @code{fname=\"\"}: the transformed string s, for which the
          following rules apply:
 @example
       s' + \"~\"             -->  \"\\tilde@{\"+ s' +\"@}\"
@@ -587,9 +589,9 @@ RETURN:  if @code{fname=\"\"}: string, the transformed string s, where the
    \"a..z\" + int            --> \"a..z\" + \"_@{\" + int + \"@}\"
 \"(\" + int + \",\" + s' + \")\" --> \"_@{\"+ int +\"@}\" + \"^@{\" + s'+\"@}\"
 @end example
-         Anyhow, strings which begin with a @code{\"@{\"} are only changed
-         by deleting the first and last character (intended to remove the
-         surrounding curly brackets).
+         Furthermore, strings which begin with a @code{\"@{\"} are modified
+         by deleting the first and the last character (which is then assumed to
+         be a @code{\"@}\"}).
 
          if @code{fname!=\"\"}: append the transformed string s to the file
          @code{<fname>}, and return nothing.
@@ -1050,7 +1052,7 @@ RETURN:  if @code{fname=\"\"}: string, the ring in TeX-typesetting;@*
 NOTE:    preceding \">>\" are deleted and suffix \".tex\" (if not given)
          is added to @code{fname}.@*
          The optional list L is assumed to be a list of strings which control,
-         for instamce the symbol for the field of coefficients.@*
+         for instance the symbol for the field of coefficients.@*
          For more details call @code{texdemo();} (generates a LaTeX2e
          file called @code{texlibdemo.tex} which explains all features of
          @code{texring}).
@@ -1250,7 +1252,7 @@ proc xdvi(string fname, list #)
 "USAGE:   xdvi(fname[,style]); fname,style = string
 RETURN:  nothing; displays dvi-file fname.dvi with previewer xdvi
 NOTE:    suffix .dvi may be omitted in fname
-         style overwrites the default setting xdvi
+         style captures the program that will be called instead of the default (xdvi)
 EXAMPLE: example xdvi; shows an example
 "
 {

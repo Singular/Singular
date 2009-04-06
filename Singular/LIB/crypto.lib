@@ -1,13 +1,13 @@
 //GP, last modified 28.6.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: crypto.lib,v 1.6 2008-10-09 09:31:57 Singular Exp $";
+version="$Id: crypto.lib,v 1.7 2009-04-06 12:39:02 seelisch Exp $";
 category="Teaching";
 info="
 LIBRARY:  crypto.lib     Procedures for teaching cryptography
 AUTHOR:                  Gerhard Pfister, pfister@mathematik.uni-kl.de
 
 NOTE: The library contains procedures to compute the discrete logarithm,
-      primaly-tests, factorization included elliptic curve methodes.
+      primality-tests, factorization included elliptic curves.
       The library is intended to be used for teaching purposes but not
       for serious computations. Sufficiently high printlevel allows to
       control each step, thus illustrating the algorithms at work.
@@ -64,7 +64,7 @@ LIB "poly.lib";
 
 proc decimal(string s)
 "USAGE:  decimal(s); s = string
-RETURN: the (decimal)number corresponding to the hexadecimal number s
+RETURN: the (decimal) number corresponding to the hexadecimal number s
 EXAMPLE:example decimal; shows an example
 "
 {
@@ -102,7 +102,7 @@ example
 
 proc exgcdN(number a, number n)
 "USAGE:  exgcdN(a,n);
-RETURN: a list s,t,d of numbers, d=gcd(a,n)=s*a+t*n
+RETURN: a list s,t,d of numbers satisfying d=gcd(a,n)=s*a+t*n
 EXAMPLE:example exgcdN; shows an example
 "
 {
@@ -509,7 +509,7 @@ example
 proc babyGiant(number b, number y, number p)
 "USAGE:  babyGiant(b,y,p);
 RETURN: the discrete logarithm x: b^x=y mod p
-NOTE:   giant-step-baby-step
+NOTE:   This procedure works based on Shank's baby step - giant step method.
 EXAMPLE:example babyGiant; shows an example
 "
 {
@@ -560,7 +560,7 @@ proc rho(number b, number y, number p)
 RETURN: the discrete logarithm x=log_b(y): b^x=y mod p
 NOTE: Pollard's rho:
        choose random f_0 in 0,...,p-2 ,e_0=0, define x_0=b^f_0, define
-       x_i=y^e_ib^f_i as below. For i large enough there is i with
+       x_i=y^e_i*b^f_i as below. For i large enough there is i with
        x_(i/2)=x_i. Let s:=e_(i/2)-e_i mod p-1 and t:=f_i-f_(i/2) mod p-1,
        d=gcd(s,p-1)=u*s+v*(p-1) then x=tu/d +j*(p-1)/d for some j (to be
        found by trying)
@@ -648,7 +648,7 @@ proc MillerRabin(number n, int k)
 "USAGE:  MillerRabin(n,k);
 RETURN: 1 if n is prime, 0 else
 NOTE: probabilistic test of Miller-Rabin with k loops to test if n is prime.
-       Using the theorem:If n is prime, n-1=2^s*r, r odd, then
+       Using the theorem: If n is prime, n-1=2^s*r, r odd, then
        powerN(a,r,n)=1 or powerN(a,r*2^i,n)=-1 for some i
 EXAMPLE:example MillerRabin; shows an example
 "
@@ -700,8 +700,8 @@ proc SolowayStrassen(number n, int k)
 "USAGE:  SolowayStrassen(n,k);
 RETURN: 1 if n is prime, 0 else
 NOTE: probabilistic test of Soloway-Strassen with k loops to test if n is
-       prime using the theorem:
-       If n is prime then powerN(a,(n-1)/2,n)=Jacobi(a,n) mod n
+       prime using the theorem: If n is prime then
+       powerN(a,(n-1)/2,n)=Jacobi(a,n) mod n
 EXAMPLE:example SolowayStrassen; shows an example
 "
 {
@@ -745,7 +745,7 @@ proc PocklingtonLehmer(number N, list #)
 "USAGE: PocklingtonLehmer(N); optional: PocklingtonLehmer(N,L);
         L a list of the first k primes
 RETURN:message N is not prime or {A,{p},{a_p}} as certificate for N being prime
-NOTE:assumes that it is possible to factorize N-1=A*B such that gcd(A,B)=1
+NOTE:assumes that it is possible to factorize N-1=A*B such that gcd(A,B)=1,
       the factorization of A is completely known and A^2>N .
       N is prime if and only if for each prime factor p of A we can find
       a_p such that a_p^(N-1)=1 mod N and gcd(a_p^((N-1)/p)-1,N)=1
@@ -829,7 +829,7 @@ example
 proc PollardRho(number n, int k, int allFactors, list #)
 "USAGE:  PollardRho(n,k,allFactors); optional: PollardRho(n,k,allFactors,L);
          L a list of the first k primes
-RETURN: a list of factors of n (which could be just n),if allFactors=0
+RETURN: a list of factors of n (which could be just n),if allFactors=0@*
         a list of all factors of n ,if allFactors=1
 NOTE: probabilistic rho-algorithm of Pollard to find a factor of n in k loops.
       Creates a sequence x_i such that (x_i)^2=(x_2i)^2 mod n for some i,
@@ -932,8 +932,8 @@ proc pFactor(number n,int B, list P)
 RETURN: a list of factors of n or n if no factor found
 NOTE: Pollard's p-factorization
        creates the product k of powers of primes (bounded by B)  from
-       the list P with the idea that for a prime divisor p of n p-1|k
-       then p devides gcd(a^k-1,n) for some random a
+       the list P with the idea that for a prime divisor p of n we have
+       p-1|k, and then p devides gcd(a^k-1,n) for some random a
 EXAMPLE:example pFactor; shows an example
 "
 {
@@ -973,7 +973,7 @@ proc quadraticSieve(number n, int c, list B, int k)
          sieve-intervall, B a list of primes,
          k for using the first k elements in B
 RETURN: a list of factors of n or the message: no divisor found
-NOTE: quadraticSieve: Idea is to find x,y such that x^2=y^2 mod n then
+NOTE: The idea being used is to find x,y such that x^2=y^2 mod n then
       gcd(x-y,n) can be a proper divisor of n
 EXAMPLE:example quadraticSieve; shows an example
 "
@@ -1127,7 +1127,7 @@ example
 proc ellipticAdd(number N, number a, number b, list P, list Q)
 "USAGE:  ellipticAdd(N,a,b,P,Q);
 RETURN: list L, representing the point P+Q
-NOTE: P=(P[1]:P[2]:P[3]),Q =(Q[1]:Q[2]:Q[3])points on the elliptic curve
+NOTE: P=(P[1]:P[2]:P[3]), Q=(Q[1]:Q[2]:Q[3]) points on the elliptic curve
       defined by y^2z=x^3+a*xz^2+b*z^3  over Z/N
 EXAMPLE:example ellipticAdd; shows an example
 "
@@ -1349,7 +1349,7 @@ proc countPoints(number N, number a, number b)
 "USAGE:  countPoints(N,a,b);
 RETURN: the number of points of the elliptic curve defined by
         y^2=x^3+a*x+b  over Z/N
-NOTE: trivial aproach
+NOTE: trivial approach
 EXAMPLE:example countPoints; shows an example
 "
 {
@@ -1419,11 +1419,11 @@ example
 //================ the algorithm of Shanks and Mestre =================
 
 proc ShanksMestre(number q, number a, number b, list #)
-"USAGE:  ShanksMestre(q,a,b); optional:ShanksMestre(q,a,b,s); s the number
+"USAGE:  ShanksMestre(q,a,b); optional: ShanksMestre(q,a,b,s); s the number
          of loops in the algorithm (default s=1)
 RETURN: the number of points of the elliptic curve defined by
          y^2=x^3+a*x+b  over Z/N
-NOTE: algorithm of Shanks and Mestre (giant-step-baby-step)
+NOTE: algorithm of Shanks and Mestre (baby-step-giant-step)
 EXAMPLE:example ShanksMestre; shows an example
 "
 {
@@ -1574,11 +1574,11 @@ Schoof(2147483629,17,3567);
 proc generateG(number a,number b, int m)
 "USAGE:  generateG(a,b,m);
 RETURN: m-th division polynomial
-NOTE: generate the recursively defined polynomials in Z[x,y],so called
- division polynomials, p_m=generateG(a,b,m) such that on the elliptic curve
- defined by y^2=x^3+a*x+b  over Z/N and a point P=(x:y:1) the point m*P is
- (x-(p_(m-1)*p_(m+1))/p_m^2 :(p_(m+2)*p_(m-1)^2-p_(m-2)*p_(m+1)^2)/4y*p_m^3 :1)
- m*P=0  iff p_m(P)=0
+NOTE: generate the so-called division polynomials, i.e., the recursively defined 
+polynomials p_m=generateG(a,b,m) in Z[x, y] such that, for a point (x:y:1) on the
+elliptic curve defined by y^2=x^3+a*x+b  over Z/N the point@*
+m*P=(x-(p_(m-1)*p_(m+1))/p_m^2 :(p_(m+2)*p_(m-1)^2-p_(m-2)*p_(m+1)^2)/4y*p_m^3 :1)
+and m*P=0  iff p_m(P)=0
 EXAMPLE:example generateG; shows an example
 "
 {
@@ -1845,7 +1845,7 @@ proc factorLenstraECM(number N, list S, int B, list #)
 "USAGE:  factorLenstraECM(N,S,B); optional: factorLenstraECM(N,S,B,d);
          d+1 the number of loops in the algorithm (default d=0)
 RETURN: a factor of N or the message no factor found
-NOTE: - computes a factor of N using Lenstra's ECM factorization
+NOTE: - computes a factor of N using Lenstra's ECM factorization@*
       - the idea is that the fact that N is not prime is dedected using
         the operations on the elliptic curve
       - is similarly to Pollard's p-1-factorization
@@ -1900,9 +1900,9 @@ example
 
 proc ECPP(number N)
 "USAGE:  ECPP(N);
-RETURN: message:N is not prime or {L,P,m,q} as certificate for N being prime
-         L a list (y^2=x^3+L[1]*x+L[2] defines an elliptic curve C)
-         P a list ((P[1]:P[2]:P[3]) is a point of C)
+RETURN: message:N is not prime or {L,P,m,q} as certificate for N being prime@*
+         L a list (y^2=x^3+L[1]*x+L[2] defines an elliptic curve C)@*
+         P a list ((P[1]:P[2]:P[3]) is a point of C)@*
          m,q integers
 ASSUME: gcd(N,6)=1
 NOTE:   The basis of the algorithm is the following theorem:

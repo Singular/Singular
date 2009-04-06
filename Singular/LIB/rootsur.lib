@@ -1,4 +1,4 @@
-// $Id: rootsur.lib,v 1.6 2007-11-16 18:38:24 Singular Exp $
+// $Id: rootsur.lib,v 1.7 2009-04-06 12:39:02 seelisch Exp $
 // E. Tobis  12.Nov.2004, April 2004
 // last change 5. May 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
@@ -62,8 +62,8 @@ static proc isparametric(poly p)
 ///////////////////////////////////////////////////////////////////////////////
 proc isparam(list #)
 "USAGE:     isparam(ideal/module/poly/list);
-RETURN:    int: 0 if the argument has non-parametric coefficients
-           and 1 if it has
+RETURN:    int: 0 if the argument has non-parametric coefficients and 1 if it
+           has parametric coefficients
 EXAMPLE:   example isparam; shows an example"
 {
   int i;
@@ -203,8 +203,8 @@ proc boundBuFou(poly p,number a,number b)
 RETURN:    int: an upper bound for the number of real roots of p in (a,b],
            with the same parity as the actual number of roots (using the
            Budan-Fourier Theorem)
-ASSUME:    p is a univariate polynomial with rational coefficients
-           a, b are rational numbers with a < b
+ASSUME:    - p is a univariate polynomial with rational coefficients@*
+           - a, b are rational numbers with a < b
 SEE ALSO:  boundposDes,varsigns
 EXAMPLE:   example boundBuFou; shows an example"
 {
@@ -456,7 +456,7 @@ example
 proc sturm(poly p,number a,number b)
 "USAGE:     sturm(p,a,b); poly p, number a,b
 RETURN:    int: the number of real roots of p in (a,b]
-ASSUME:    p is a univariate polynomial with rational coefficients,
+ASSUME:    p is a univariate polynomial with rational coefficients,@*
            a, b are rational numbers with a < b
 SEE ALSO:  sturmha,allrealst,allreal
 EXAMPLE:   example sturm; shows an example"
@@ -521,9 +521,9 @@ proc sturmseq(poly p)
 RETURN:    list: a Sturm sequence of p
 ASSUME:    p is a univariate polynomial with rational coefficients
 THEORY:    The Sturm sequence of p (also called remainder sequence) is the
-           sequence begininng with p, p' and goes on with the negative of the
-           remainder of the two previous polynomials, until the remainder is
-           zero.
+           sequence beginning with p, p' and goes on with the negative part of
+           the remainder of the two previous polynomials, until the remainder
+           is zero.
            See: Basu, Pollack, Roy, Algorithms in Real Algebraic Geometry,
            Springer, 2003.
 SEE ALSO:  sturm,sturmhaseq
@@ -613,8 +613,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc sturmha(poly P,number a,number b)
 "USAGE:     sturmha(p,a,b); poly p, number a,b
-RETURN:    int: the number of real roots of p in (a,b) (using a
-           Sturm-Habicht sequence)
+RETURN:    int: the number of real roots of p in (a,b) (using a Sturm-Habicht sequence)
 SEE ALSO:  sturm,allreal
 EXAMPLE:   example sturmha; shows an example"
 {
@@ -682,7 +681,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc sturmhaseq(poly P)
 "USAGE:     sturmhaseq(P); P poly.
-RETURN:    list: the nonzero polynomials of the Sturm-Habicht sequence of P
+RETURN:    list: the non-zero polynomials of the Sturm-Habicht sequence of P
 ASSUME:    P is a univariate polynomial.
 THEORY:    The Sturm-Habicht sequence (also subresultant sequence) is closely
            related to the Sturm sequence, but behaves better with respect to
@@ -804,7 +803,7 @@ example
   poly p = (x+2)*(x-1)*(x-5);
   nrroots(p);
   p = p*(x2+1);
-  nrroots(p)
+  nrroots(p);
 }
 ///////////////////////////////////////////////////////////////////////////////
 static proc abs(number x)

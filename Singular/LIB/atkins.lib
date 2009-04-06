@@ -1,14 +1,14 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: atkins.lib,v 1.5 2008-10-09 09:31:57 Singular Exp $";
+version="$Id: atkins.lib,v 1.6 2009-04-06 12:39:02 seelisch Exp $";
 category="Teaching";
 info="
 LIBRARY:  atkins.lib     Procedures for teaching cryptography
-AUTHOR:                  Stefan Steidel, Stefan.Steidel@gmx.de
+AUTHOR:                  Stefan Steidel, steidel@mathematik.uni-kl.de
 
 NOTE: The library contains auxiliary procedures to compute the elliptic
        curve primality test of Atkin and the Atkin's Test itself.
        The library is intended to be used for teaching purposes but not
-       for serious computations. Sufficiently high printLevel allows to
+       for serious computations. Sufficiently high printlevel allows to
        control each step, thus illustrating the algorithms at work.
 
 
@@ -19,6 +19,7 @@ PROCEDURES:
   Cornacchia(d,p)           computes solution (x,y) for x^2+d*y^2=p
   CornacchiaModified(D,p)   computes solution (x,y) for x^2+|D|*y^2=4p
   maximum(L)                computes the maximal number contained in L
+  sqr(w,k)                  computes the square root of w w.r.t. accuracy k
   expo(z,k)                 computes exp(z)
   jOft(t,k)                 computes the j-invariant of t
   round(r)                  rounds r to the nearest number out of Z
@@ -97,7 +98,7 @@ example
 
 proc disc(number N, int k)
 "USAGE: disc(N,k);
-RETURN: list L of negative discriminants D, sort in decreasing order
+RETURN: list L of negative discriminants D, sorted in decreasing order
 ASSUME: D<0, D kongruent 0 or 1 modulo 4 and |D|<4N
 NOTE:   D=b^2-4*a, where 0<=b<=k and intPart((b^2)/4)+1<=a<=k for each b
 EXAMPLE:example disc; shows an example
@@ -383,7 +384,7 @@ proc expo(number z, int k)
 "USAGE: expo(z,k);
 RETURN: e^z to the order k
 NOTE:   k describes the number of summands being calculated in the exponential power series
-EXAMPLE:example e; shows an example
+EXAMPLE:example expo; shows an example
 "
 {
   number q=1;
@@ -411,8 +412,8 @@ proc jOft(number t, int k)
 RETURN: the j-invariant of t
 ASSUME: t is a complex number with positive imaginary part
 NOTE:   k describes the number of summands being calculated in the power series,
-        10*k is input for the procedure "e"
-EXAMPLE:example jot; shows an example
+        10*k is input for the procedure @code{expo}
+EXAMPLE:example jOft; shows an example
 "
 {
   number q1,q2,qr1,qi1,tr,ti,m1,m2,f,j;
@@ -512,10 +513,10 @@ proc HilbertClassPoly(number D, int k)
 "USAGE: HilbertClassPoly(D,k);
 RETURN: the monic polynomial of degree h(D) in Z[X] of which jOft((D+sqr(D))/2) is a root
 ASSUME: D is a negative discriminant
-NOTE:   k is input for the procedure "jot",
+NOTE:   k is input for the procedure "jOft",
         5*k is input for the procedure "sqr",
         10*k describes the number of decimals being calculated in the complex numbers
-EXAMPLE:example HilbertClassPolynomial; shows an example
+EXAMPLE:example HilbertClassPoly; shows an example
 "
 {
   if(D>=0)                // (0)[Test if assumptions well-defined]
@@ -772,16 +773,16 @@ RETURN:  1, if N is prime,
         -1, if N is not prime,
          0, if the algorithm is not applicable, since there are too little discriminants
 ASSUME: N is coprime to 6 and different from 1
-NOTE:   - K/2 is input for the procedure "disc",
-          K is input for the procedure "HilbertClassPolynomial",
-          B describes the number of recursions being calculated
-        - The basis of the algorithm is the following theorem:
+NOTE:   K/2 is input for the procedure "disc",@*
+        K is input for the procedure "HilbertClassPolynomial",@*
+        B describes the number of recursions being calculated.@*
+        The basis of the algorithm is the following theorem:
           Let N be an integer coprime to 6 and different from 1 and E be an
           ellipic curve modulo N. Assume that we know an integer m and a
-          point P of E(Z/NZ) satisfying the following conditions.
-           (1) There exists a prime divisor q of m such that q>(4-th root(N)+1)^2.
-           (2) m*P=O(E)=(0:1:0).
-           (3) (m/q)*P=(x:y:t) with t element of (Z/NZ)*.
+          point P of E(Z/NZ) satisfying the following conditions.@*
+           (1) There exists a prime divisor q of m such that q>(4-th root(N)+1)^2.@*
+           (2) m*P=O(E)=(0:1:0).@*
+           (3) (m/q)*P=(x:y:t) with t element of (Z/NZ)*.@*
           Then N is prime.
 EXAMPLE:example Atkin; shows an example
 "
@@ -1199,8 +1200,6 @@ example
     ring R = 0,x,dp;
     printlevel=1;
     Atkin(7691,100,5);
-    Atkin(8543,100,4);
-    Atkin(100019,100,5);
     Atkin(10000079,100,2);
 }
 

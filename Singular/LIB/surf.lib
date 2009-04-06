@@ -1,21 +1,20 @@
 // last modified 21.07.2005, Oliver Wienand
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.32 2009-02-17 11:47:48 Singular Exp $";
+version="$Id: surf.lib,v 1.33 2009-04-06 12:39:02 seelisch Exp $";
 category="Visualization";
 info="
 LIBRARY: surf.lib    Procedures for Graphics with Surf
-AUTHOR: Hans Schoenemann,
-        the program surf is written by Stefan Endrass
+AUTHOR: Hans Schoenemann
 
 NOTE:
  @texinfo
- To use this library requires the program @code{surf} to be installed.
+ Using this library requires the program @code{surf} to be installed.
  You can download @code{surf} either from
   @uref{http://sourceforge.net/projects/surf}
   or from @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/}.
  The procedure surfer requires the program @code{surfer} to be installed.
  You can download @code{surfer} from
-  @uref{http://www.imaginary2008.de/surfer.php}
+  @uref{http://www.imaginary2008.de/surfer.imaginary2008.de}
  @*Under Windows, version 159 or newer of @code{surfer} is required.
  @end texinfo
 

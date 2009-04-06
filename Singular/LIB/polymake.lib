@@ -1,4 +1,4 @@
-version="$Id: polymake.lib,v 1.12 2009-03-25 11:31:32 keilen Exp $";
+version="$Id: polymake.lib,v 1.13 2009-04-06 12:39:02 seelisch Exp $";
 category="Tropical Geometry";
 info="
 LIBRARY:   polymake.lib    Computations with polytopes and fans, 
@@ -99,11 +99,11 @@ ASSUME:  each row of polytope gives the coordinates of a lattice point of a
          secondaryPolytope
 PURPOSE: the procedure calls polymake to compute the vertices of the polytope 
          as well as its dimension and information on its facets
-RETURN:  list, L with four entries
+RETURN:  list L with four entries
 @*            L[1] : an integer matrix whose rows are the coordinates of vertices
                      of the polytope 
 @*            L[2] : the dimension of the polytope
-@*            L[3] : a list whose ith entry explains to which vertices the 
+@*            L[3] : a list whose i-th entry explains to which vertices the
                      ith vertex of the Newton polytope is connected 
                      -- i.e. L[3][i] is an integer vector and an entry k in 
                         there means that the vertex L[1][i] is connected to the 
@@ -126,7 +126,7 @@ NOTE: -  for its computations the procedure calls the program polymake by
          polymakeKeepTmpFiles in before
 @*    -  moreover, the procedure creates the file /tmp/polytope.output which 
          it deletes again before ending
-@*    -  it is possible to give as an optional second argument as string 
+@*    -  it is possible to provide an optional second argument as string
          which then will be used instead of 'polytope' in the name of the 
          polymake output file
 EXAMPLE: example polymakePolytope;   shows an example"

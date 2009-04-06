@@ -1,19 +1,18 @@
 //CM, last modified 10.12.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: aksaka.lib,v 1.3 2009-02-21 10:02:00 Singular Exp $";
+version="$Id: aksaka.lib,v 1.4 2009-04-06 12:39:02 seelisch Exp $";
 category="Teaching";
 info="
-LIBRARY: aksaka.lib
-         Procedures for primality testing after Agrawal, Saxena, Kayal
+LIBRARY: aksaka.lib     Procedures for primality testing after Agrawal, Saxena, Kayal
 AUTHORS: Christoph Mang
 
-OVERVIEV:
+OVERVIEW:
  Algorithms for primality testing in polynomial time
  based on the ideas of Agrawal, Saxena and  Kayal.
 
 PROCEDURES:
 
-schnellexpt(a,m,n)         a^m for numbers a,m; if a^k>n n+1 is returned
+fastExpt(a,m,n)         a^m for numbers a,m; if a^k>n n+1 is returned
 log2(n)                    logarithm to basis 2 of n
 PerfectPowerTest(n)        checks if there are a,b>1, so that a^b=n
 wurzel(r)                  square root of number r
@@ -31,11 +30,11 @@ LIB "ntsolve.lib";
 //   FAST (MODULAR) EXPONENTIATION                           //
 //                                                           //
 ///////////////////////////////////////////////////////////////
-proc schnellexpt(number a,number m,number n)
-"USAGE: schnellexpt(a,m,n);
+proc fastExpt(number a,number m,number n)
+"USAGE: fastExpt(a,m,n); a, m, n = number;
 RETURN: the m-th power of a; if a^m>n the procedure returns n+1
 NOTE:   uses fast exponentiation
-EXAMPLE:example schnellexpt; shows an example
+EXAMPLE:example fastExpt; shows an example
 "
 {
   number b,c,d;
@@ -64,7 +63,7 @@ EXAMPLE:example schnellexpt; shows an example
 example
 { "EXAMPLE:"; echo = 2;
    ring R = 0,x,dp;
-   schnellexpt(2,10,1022);
+   fastExpt(2,10,1022);
 }
 ////////////////////////////////////////////////////////////////////////////
 proc coeffmod(poly f,number n)
@@ -263,7 +262,7 @@ EXAMPLE:example PerfectPowerTest; shows an example
     while(c-a>=2)
     {
       m=intPart((a+c)/2);
-      p=schnellexpt(m,b,n);
+      p=fastExpt(m,b,n);
 
       if(p==n)
       {

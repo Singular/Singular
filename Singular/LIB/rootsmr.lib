@@ -1,4 +1,4 @@
-// $Id: rootsmr.lib,v 1.4 2008-03-18 15:51:41 Singular Exp $
+// $Id: rootsmr.lib,v 1.5 2009-04-06 12:39:02 seelisch Exp $
 // E. Tobis  12.Nov.2004, April 2004
 // last change 7. May 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
@@ -302,11 +302,10 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc tracemult(poly f,ideal B,ideal I)
-"USAGE:     tracemult(f,b,i);f poly, b,i ideal
-RETURN:    number: the trace of the multiplication by f (m_f) on r/i,
-           written in the monomial basis b of r/i, r = basering
-           (faster than matmult + trace)
-ASSUME:    i is a Groebner basis and b is an ordered monomial basis of r/i
+"USAGE:     tracemult(f,B,I);f poly, B,I ideal
+RETURN:    number: the trace of the multiplication by f (m_f) on r/I, written in
+           the monomial basis B of r/I, r = basering (faster than matmult + trace)
+ASSUME:    I is given by a Groebner basis and B is an ordered monomial basis of r/I
 SEE ALSO:  matmult,trace
 EXAMPLE:   example tracemult; shows an example"
 {
@@ -495,11 +494,11 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc verify(poly p,ideal b,ideal i)
-"USAGE:     verify(p,b,i);p poly, b,i,ideal
-RETURN:    integer: 1 iff the polynomial p splits the points of V(i).
+proc verify(poly p,ideal B,ideal I)
+"USAGE:     verify(p,B,I); p poly, B,I,ideal
+RETURN:    integer: 1 iff the polynomial p splits the points of V(I).
            It's used to check the result of randcharpoly
-ASSUME:    i is a Groebner basis and b is an ordered monomial basis of r/i,
+ASSUME:    I is given by a Groebner basis and B is an ordered monomial basis of r/I,
            r = basering
 NOTE:      comments the result if printlevel>0 (default: printlevel=0)
 SEE ALSO:  randcharpoly
@@ -510,13 +509,13 @@ EXAMPLE:   example verify; shows an example"
   int correct;
   poly variable;
 
-  if (isparam(p) || isparam(b) || isparam(i)) {
+  if (isparam(p) || isparam(B) || isparam(I)) {
     ERROR("This procedure cannot operate with parametric arguments");
   }
 
   variable = isuni(p);
   sqr_free = p/gcd(p,diff(p,variable));
-  correct = (mat_rk(matbil(1,b,i)) == deg(sqr_free));
+  correct = (mat_rk(matbil(1,B,I)) == deg(sqr_free));
 
   if (correct) {
     dbprint(pr,"//Verification successful");
@@ -593,7 +592,7 @@ example
   echo = 2;
   ring r = 0,(x,y,z),dp;
 
-  ideal i = (x-1)*(x-2),(y-1),(z+5); // V(I) = {(1,1,-5),(2,1,-5)
+  ideal i = (x-1)*(x-2),(y-1),(z+5); // V(I) = {(1,1,-5),(2,1,-5)}
   i = std(i);
 
   ideal b = qbase(i);

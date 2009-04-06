@@ -1,6 +1,6 @@
 //GMG, last modified 28.10.2001
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: weierstr.lib,v 1.5 2006-11-22 21:42:42 levandov Exp $";
+version="$Id: weierstr.lib,v 1.6 2009-04-06 12:39:02 seelisch Exp $";
 category="Teaching";
 info="
 LIBRARY:  weierstr.lib   Procedures for the Weierstrass Theorems
@@ -48,11 +48,10 @@ proc weierstrDiv ( poly g, poly f, int d )
 ASSUME:  f must be general of finite order, say b, in the last ring variable,
          say T; if not use the procedure lastvarGeneral first
 PURPOSE: perform the Weierstrass division of g by f up to order d
-RETURN:  a list, say l, of two polynomials and an interer, such that
-                   g = l[1]*f + l[2],  deg_T(l[2]) < b
-         up to (including) total degree d
-         l[3] is the number of iterations used
-         if f is not T-general, return (0,g)
+RETURN:  - a list, say l, of two polynomials and an integer, such that@*
+            g = l[1]*f + l[2],  deg_T(l[2]) < b, up to (including) total degree d@*
+         - l[3] is the number of iterations used
+         - if f is not T-general, return (0,g)
 NOTE:    the procedure works for any monomial ordering
 THEORY:  the proof of Grauert-Remmert (Analytische Stellenalgebren) is used
          for the algorithm
@@ -142,12 +141,12 @@ proc weierstrPrep (poly f, int d)
 ASSUME:  f must be general of finite order, say b, in the last ring variable,
          say T; if not apply the procedure lastvarGeneral first
 PURPOSE: perform the Weierstrass preparation of f up to order d
-RETURN:  a list, say l, of two polynomials and one integer,
+RETURN:  - a list, say l, of two polynomials and one integer,
          l[1] a unit, l[2] a Weierstrass polynomial, l[3] an integer
          such that l[1]*f = l[2], where l[2] is a Weierstrass polynomial,
          (i.e. l[2] = T^b + lower terms in T) up to (including) total degree d
-         l[3] is the number of iterations used
-         if f is not T-general, return (0,0)
+         l[3] is the number of iterations used@*
+         - if f is not T-general, return (0,0)
 NOTE:    the procedure works for any monomial ordering
 THEORY:  the proof of Grauert-Remmert (Analytische Stellenalgebren) is used
          for the algorithm

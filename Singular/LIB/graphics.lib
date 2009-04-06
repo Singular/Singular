@@ -1,13 +1,13 @@
 //last change: 13.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: graphics.lib,v 1.13 2009-04-06 09:17:01 seelisch Exp $";
+version="$Id: graphics.lib,v 1.14 2009-04-06 12:39:02 seelisch Exp $";
 category="Visualization";
 info="
 LIBRARY: graphics.lib    Procedures for graphical output using Mathematica
 AUTHOR:   Christian Gorzel, gorzelc@math.uni-muenster.de
 
 PROCEDURES:
- staircase(fname,I);  Mathematica text for displaying staircase of I
+ staircase(I);        Mathematica text for displaying staircase of I
  mathinit();          string for loading Mathematica's ImplicitPlot
  mplot(fname,I[# s]); Mathematica text for various plots
 ";

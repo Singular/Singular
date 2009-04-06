@@ -1,6 +1,6 @@
 //last change: 2007/07/06 (Oliver Labs)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surfex.lib,v 1.9 2009-01-14 16:07:05 Singular Exp $";
+version="$Id: surfex.lib,v 1.10 2009-04-06 12:39:02 seelisch Exp $";
 category="Visualization";
 info="
 LIBRARY: surfex.lib      Procedures for visualizing and rotating surfaces.
@@ -45,8 +45,8 @@ LIB "surf.lib";
 proc plotRot(poly p, list #)
 "
 USAGE: plotRot(poly p, list #)
-Similar to plotRotated, but guesses automatically
-which coordinates should be used.
+Similar to plotRotated, but guesses automatically which coordinates should be used.
+The optional int parameter can be used to set plotting quality.
 
 It opens the external program surfex for drawing the surface given by p,
 seen as a surface in the real affine space with coordinates coords.
@@ -120,6 +120,7 @@ proc plotRotated(poly p, list coords, list #)
 USAGE: plotRotated(poly p, list coords, list #)
 This opens the external program surfex for drawing the surface given by p,
 seen as a surface in the real affine space with coordinates coords.
+The optional int parameter can be used to set plotting quality.
 
 ASSUME: coords is a list of three variables.
 The basering is of characteristic zero and without parameters.
@@ -151,6 +152,7 @@ proc plotRotatedList(list varieties, list coords, list #)
 USAGE: plotRotatedList(list varieties, list coords, list #)
 This opens the external program surfex for drawing the surfaces given by varieties,
 seen as a surface in the real affine space with coordinates coords.
+The optional int parameter can be used to set plotting quality.
 
 ASSUME: coords is a list of three variables, varieties is a list of ideals
 describing the varieties to be shown.
@@ -396,7 +398,8 @@ proc plotRotatedListFromSpecifyList(list varietiesList, list #)
 "
 USAGE: plotRotatedListFromSpecifyList(list varietiesList, list #);
 varietiesList has a complicated format (not documented yet);
-see the example.
+see the example.@*
+The optional int parameter can be used to set plotting quality.
 
 ASSUME: The basering is of characteristic zero.
 
@@ -449,7 +452,8 @@ USAGE: plotRotatedDirect(list varieties, list #)
 This opens the external program surfex for drawing the surfaces given by varieties,
 seen as a surface in the real affine space with coordinates x,y,z.
 The format for the list varieties is not fully documented yet;
-please, see the examples below and try to adapt the examples to your needs.
+please, see the examples below and try to adjust the examples to suit your needs.@*
+The optional int parameter can be used to set plotting quality.
 
 ASSUME:
 Passes the equations directly to surfex, i.e., the variable names should

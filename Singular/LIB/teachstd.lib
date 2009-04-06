@@ -1,7 +1,7 @@
 // $Id:
 //GMG, last modified 28.9.01
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: teachstd.lib,v 1.10 2009-02-12 13:57:00 motsak Exp $";
+version="$Id: teachstd.lib,v 1.11 2009-04-06 12:39:02 seelisch Exp $";
 category="Teaching";
 info="
 LIBRARY:  teachstd.lib   Procedures for teaching standard bases
@@ -77,8 +77,8 @@ EXAMPLE: example leadmonomial; shows an example
 example
 { "EXAMPLE:"; echo = 2;
    ring s=0,(x,y,z),(c,dp);
-   leadmonomial((y+z+x+xyz)**2);
-   leadmonomial([(y+z+x+xyz)**2,xyz5]);
+   leadmonomial((y+z+x+xyz)^2);
+   leadmonomial([(y+z+x+xyz)^2,xyz5]);
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc tail(f)
@@ -225,7 +225,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc minEcart(T,h)
 "USAGE:   minEcart(T,h); T ideal or module, h poly or vector
-RETURN:  element g from T such that leadmonom(g) divides leadmonom(h)
+RETURN:  element g from T such that leadmonom(g) divides leadmonom(h)@*
          ecart(g) is minimal with this property (if T != 0);
          return 0 if T is 0 or h = 0
 EXAMPLE: example minEcart; shows an example
@@ -412,7 +412,7 @@ proc prodcrit(f,g,list #)
 "USAGE:   prodcrit(f,g[,o]); f,g poly or vector, and optional int argument o
 RETURN:  1 if product criterion applies in the same module component,
          2 if lead(f) and lead(g) involve different components, 0 else
-NOTE:    if product criterion applies we can delete (f,g) from pairset
+NOTE:    if product criterion applies we can delete (f,g) from pairset.
          This procedure returns 0 if o is given and is a positive integer, or
          you may set the attribute \"default_arg\" for prodcrit to 1.
 EXAMPLE: example prodcrit; shows an example
@@ -499,7 +499,7 @@ proc pairset(G)
 "USAGE:   pairset(G); G ideal or module
 RETURN:  list L,
          L[1] = the pairset of G as list (not containing pairs for
-         which the product or the chain criterion applies)
+         which the product or the chain criterion applies),
          L[2] = intvec v, v[1]= # product criterion, v[2]= # chain criterion
 EXAMPLE: example pairset; shows an example
 "
@@ -571,11 +571,11 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc updatePairs(P,S,h)
-"USAGE:   updatePairs(P,S,h); P list, S ideal or module, h poly or vector
+"USAGE:   updatePairs(P,S,h); P list, S ideal or module, h poly or vector@*
          P a list of pairs of polys or vectors (obtained from pairset)
 RETURN:  list Q,
          Q[1] = the pairset P enlarged  by all pairs (f,h), f from S,
-         without pairs for which the product or the chain criterion applies
+         without pairs for which the product or the chain criterion applies@*
          Q[2] = intvec v, v[1]= # product criterion, v[2]= # chain criterion
 EXAMPLE: example updatePairs; shows an example
 "
@@ -744,7 +744,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc localstd (id)
-"USAGE:   localstd (id); id = ideal
+"USAGE:   localstd(id); id = ideal
 RETURN:  A standard basis for a local degree ordering, using Lazard's method.
 NOTE:    The procedure homogenizes id w.r.t. a new 1st variable local@t,
          computes a SB w.r.t. (dp(1),dp) and substitutes local@t by 1.
