@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: qhmoduli.lib,v 1.12 2008-10-01 15:29:23 Singular Exp $";
+version="$Id: qhmoduli.lib,v 1.13 2009-04-06 09:48:23 seelisch Exp $";
 category="Singularities";
 info="
 LIBRARY:  qhmoduli.lib    Moduli Spaces of Semi-Quasihomogeneous Singularities
@@ -479,10 +479,11 @@ EXAMPLE: example StabEqnId; shows an example
 GLOBAL: varSubsList, contains the index j s.t. t(i) -> t(i)t(j) ...
 "
 {
-  int i, j, c, k, r, nrVars, offset, n, sln, dbPrt;
+  int i, j, c, d, k, r, nrVars, offset, n, sln, dbPrt;
   list Variables, rd, temp, sList, varSubsList;
   poly mPoly;
   string ringSTR, ringSTR1, varString, parString;
+  matrix newcoMx, coMx;
 
   dbPrt = printlevel-voice+2;
   dbprint(dbPrt, "StabilizerEquations of " + string(data));
@@ -554,9 +555,9 @@ GLOBAL: varSubsList, contains the index j s.t. t(i) -> t(i)t(j) ...
 
   f = data[r];
   f1 = F(f);
-  int d = deg(f);
-  matrix newcoMx = coef(f1, vars);        // coefficients of F(f)
-  matrix coMx = coef(f, vars);          // coefficients of f
+  d = deg(f);
+  newcoMx = coef(f1, vars);        // coefficients of F(f)
+  coMx = coef(f, vars);          // coefficients of f
 
   for(i = 1; i <= ncols(newcoMx); i = i + 1) {      // build the system of eqns via coeff. comp.
     j = 1;
