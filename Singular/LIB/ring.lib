@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ring.lib,v 1.32 2008-03-25 15:20:08 Singular Exp $";
+version="$Id: ring.lib,v 1.33 2009-04-06 09:17:01 seelisch Exp $";
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -278,14 +278,14 @@ RETURN:  ring R, which extends the ring r by adding n new variables in front
             a and b are globally (!) defined integers and if a+b+1<=n.
             If, however, a and b are local to a proc calling extendring, the
             intvec iv must be used to let extendring know the values of a and b
-@*        -  If an intvec iv !=0 is given, iv[1],iv[2],... is taken for the
+@*        -  If a non-zero intvec iv is given, iv[1],iv[2],... are taken for the
             1st, 2nd,... block of o, if o contains no substring \"w\" or \"W\"
             i.e. no weighted ordering (in the above case o=\"ds,dp,ls\"
             and iv=a,b).
             If o contains a weighted ordering (only one (!) weighted block is
             allowed) iv[1] is taken as size for the weight-vector, the next
             iv[1] values of iv are taken as weights and the remaining values of
-            iv as block-size for the remaining non-weighted blocks.
+            iv as block size for the remaining non-weighted blocks.
             e.g. o=\"dp,ws,Dp,ds\", iv=3,2,3,4,2,5 creates the ordering
             dp(2),ws(2,3,4),Dp(5),ds
 NOTE:    This proc is useful for adding deformation parameters.
@@ -415,11 +415,11 @@ example
 
 proc fetchall (R, list #)
 "USAGE:   fetchall(R[,s]);  R=ring/qring, s=string
-CREATE:  fetch all objects of ring R (of type poly/ideal/vector/module/number/
-         matrix) into the basering.
+CREATE:  fetch all objects of ring R (of type poly/ideal/vector/module/number/matrix)
+         into the basering.
          If no 2nd argument is present, the names are the same as in R. If,
          say, f is a poly in R and the 2nd argument is the string \"R\", then f
-         is maped to f_R etc.
+         is mapped to f_R etc.
 RETURN:  no return value
 NOTE:    As fetch, this procedure maps the 1st, 2nd, ... variable of R to the
          1st, 2nd, ... variable of the basering.
@@ -461,14 +461,14 @@ example
 
 proc imapall (R, list #)
 "USAGE:   imapall(R[,s]);  R=ring/qring, s=string
-CREATE:  map all objects of ring R (of type poly/ideal/vector/module/number/
-         matrix) into the basering, by applying imap to all objects of R.
+CREATE:  map all objects of ring R (of type poly/ideal/vector/module/number/matrix)
+         into the basering by applying imap to all objects of R.
          If no 2nd argument is present, the names are the same as in R. If,
          say, f is a poly in R and the 3rd argument is the string \"R\", then f
-         is maped to f_R etc.
+         is mapped to f_R etc.
 RETURN:  no return value
 NOTE:    As imap, this procedure maps the variables of R to the variables with
-         the same name in the basering, the other variables are maped to 0.
+         the same name in the basering, the other variables are mapped to 0.
          The 2nd argument is useful in order to avoid conflicts of names, the
          empty string is allowed
 CAUTION: imapall does not work inside a procedure
@@ -508,10 +508,10 @@ example
 proc mapall (R, ideal i, list #)
 "USAGE:   mapall(R,i[,s]);  R=ring/qring, i=ideal of basering, s=string
 CREATE:  map all objects of ring R (of type poly/ideal/vector/module/number/
-         matrix, map) into the basering, by mapping the jth variable of R to
-         the jth generator of the ideal i. If no 3rd argument is present, the
+         matrix, map) into the basering by mapping the j-th variable of R to
+         the j-th generator of the ideal i. If no 3rd argument is present, the
          names are the same as in R. If, say, f is a poly in R and the 3rd
-         argument is the string \"R\", then f is maped to f_R etc.
+         argument is the string \"R\", then f is mapped to f_R etc.
 RETURN:  no return value.
 NOTE:    This procedure has the same effect as defining a map, say psi, by
          map psi=R,i; and then applying psi to all objects of R. In particular,
@@ -548,11 +548,11 @@ example
 //   names(S);
 //   j; print(M); phi;    //phi maps R to S: x->c2, y->a2, z->b2
 //   ideal i1=a2,a+b,1;
-//   mapall(R,i1,\"\");   //map from R to S: x->a2, y->a+b, z->1
+//   mapall(R,i1,\"\");     //map from R to S: x->a2, y->a+b, z->1
 //   names(S);
 //   j_; print(M_); phi_;
 //   changevar(\"T\",\"x()\",R);  //change vars in R and call result T
-//   mapall(R,maxideal(1));       //identity map from R to T
+//   mapall(R,maxideal(1));   //identity map from R to T
 //   names(T);
 //   j; print(M); phi;
 //   kill R,S,T;
@@ -644,7 +644,7 @@ example
    ideal i = a2+b3+c5;
    def S=changevar("x,y,z");       //change vars of s
    setring S;
-   qring qS =std(fetch(s,i));      //create qring of S mod i (maped to S)
+   qring qS =std(fetch(s,i));      //create qring of S mod i (mapped to S)
    def T=changevar("d,e,f,g,h",t); //change vars of t
    setring T;
    qring qT=std(d2+e2-f3);         //create qring of T mod d2+e2-f3
@@ -686,9 +686,9 @@ proc preimageLoc(string R_name,string phi_name,string Q_name )
 "USAGE: preimageLoc ( ring_name, map_name, ideal_name );
         all input parameters of type string
 RETURN:  ideal
-PURPOSE: computes the preimage of an ideal under a given map for non-global
+PURPOSE: compute the preimage of an ideal under a given map for non-global
          orderings.
-         The second argument has to be the name of a map from the basering to
+         The 2nd argument has to be the name of a map from the basering to
          the given ring (or the name of an ideal defining such a map), and
          the ideal has to be an ideal in the given ring.
 SEE ALSO: preimage

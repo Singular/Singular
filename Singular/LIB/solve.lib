@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: solve.lib,v 1.37 2009-01-06 14:15:21 Singular Exp $";
+version="$Id: solve.lib,v 1.38 2009-04-06 09:17:01 seelisch Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: solve.lib     Complex Solving of Polynomial Systems
@@ -27,11 +27,11 @@ LIB "triang.lib";    // needed for triang_solve
 
 proc laguerre_solve( poly f, list # )
 "USAGE:   laguerre_solve(f [, m, l, n, s] ); f = polynomial,@*
-         m, l, n, s = integers (control parameters of the method)
+         m, l, n, s = integers (control parameters of the method)@*
  m: precision of output in digits ( 4 <= m), if basering is not ring of
       complex numbers;
  l: precision of internal computation in decimal digits ( l >=8 )
-      only if the basering is not complex or complex with smaller precision;
+      only if the basering is not complex or complex with smaller precision;@*
  n: control of multiplicity of roots or of splitting of f into
       squarefree factors
       n < 0, no split of f (good, if all roots are simple)
@@ -201,7 +201,7 @@ EXAMPLE: example laguerre_solve; shows an example
       else
       {
         if(charstr(rn)=="0"){dbprint(prot,"// polynomial is squarefree");}
-        else{dbprint(prot,"// split without result");}
+        else{dbprint(prot,"//split without result");}
       }
     }
   }
@@ -516,7 +516,7 @@ static proc addzero(list zz,string ss,int iz,int a)
 
 proc solve( ideal G, list # )
 "USAGE:   solve(G [, m, n [, l]] [,\"oldring\"] [,\"nodisplay\"] ); G = ideal,
-         m, n, l = integers (control parameters of the method), outR ring
+         m, n, l = integers (control parameters of the method), outR ring,@*
          m: precision of output in digits ( 4 <= m) and of the generated ring
             of complex numbers;
          n: control of multiplicity
@@ -1475,7 +1475,7 @@ example
 
 proc mp_res_mat( ideal i, list # )
 "USAGE:   mp_res_mat(i [, k] ); i ideal, k integer,
-    k=0: sparse resultant matrix of Gelfand, Kapranov and Zelevinsky,
+    k=0: sparse resultant matrix of Gelfand, Kapranov and Zelevinsky,@*
     k=1: resultant matrix of Macaulay (k=0 is default)
 ASSUME:  The number of elements in the input system must be the number of
          variables in the basering plus one;
@@ -2042,7 +2042,7 @@ example
 
 proc triang_solve( list lfi, int prec, list # )
 "USAGE:   triang_solve(l,p [,d] ); l=list, p,d=integers@*
-         l a list of finitely many triangular systems, such that the union of
+         l is a list of finitely many triangular systems, such that the union of
          their varieties equals the variety of the initial ideal.@*
          p>0: gives precision of complex numbers in digits,@*
          d>0: gives precision (1<d<p) for near-zero-determination,@*

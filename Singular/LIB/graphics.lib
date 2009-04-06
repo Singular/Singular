@@ -1,9 +1,9 @@
 //last change: 13.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: graphics.lib,v 1.12 2008-12-12 17:22:35 Singular Exp $";
+version="$Id: graphics.lib,v 1.13 2009-04-06 09:17:01 seelisch Exp $";
 category="Visualization";
 info="
-LIBRARY: graphics.lib    Procedures to use Graphics with Mathematica
+LIBRARY: graphics.lib    Procedures for graphical output using Mathematica
 AUTHOR:   Christian Gorzel, gorzelc@math.uni-muenster.de
 
 PROCEDURES:
@@ -14,11 +14,11 @@ PROCEDURES:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc staircase(string fname,ideal I)
-"USAGE:   staircase(s,I); s a string, I ideal in two variables
+proc staircase(ideal I)
+"USAGE:   staircase(I); I an ideal in two variables
 RETURN:  string with Mathematica input for displaying staircase diagrams of an
          ideal I, i.e. exponent vectors of the initial ideal of I
-NOTE:    ideal I should be given by a standard basis. Let s=\"\" and copy and
+NOTE:    ideal I should be given by a standard basis. Copy and
          paste the result into a Mathematica notebook.
 EXAMPLE: example staircase; shows an example
 "
@@ -63,15 +63,15 @@ example
 { "EXAMPLE:"; echo =2;
   ring r0 = 0,(x,y),ls;
   ideal I = -1x2y6-1x4y2, 7x6y5+1/2x7y4+6x4y6;
-  staircase("",std(I));
+  staircase(std(I));
 
   ring r1 = 0,(x,y),dp;
   ideal I = fetch(r0,I);
-  staircase("",std(I));
+  staircase(std(I));
 
   ring r2 = 0,(x,y),wp(2,3);
   ideal I = fetch(r0,I);
-  staircase("",std(I));
+  staircase(std(I));
 
   // Paste the output into a Mathematica notebook
   // active evalutation of the cell with SHIFT RETURN

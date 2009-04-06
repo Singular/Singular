@@ -1,6 +1,6 @@
 //last change: 13.02.2001 (Eric Westenberger)
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: triang.lib,v 1.12 2008-10-01 14:20:22 Singular Exp $";
+version="$Id: triang.lib,v 1.13 2009-04-06 09:17:01 seelisch Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: triang.lib   Decompose Zero-dimensional Ideals into Triangular Sets
@@ -628,10 +628,9 @@ RETURN:  a list of finitely many triangular systems, such that
          the union of their varieties equals the variety of (G).
          If i = 2, then each polynomial of the triangular systems
          is factorized.
-NOTE:    Algorithm of Moeller (see: Moeller, H.M.:
-         On decomposing systems of polynomial equations with
-         finitely many solutions, Appl. Algebra Eng. Commun. Comput. 4,
-         217 - 230, 1993).
+NOTE:    Algorithm of Moeller (see: Moeller, H.M.: On decomposing systems of 
+         polynomial equations with finitely many solutions, Appl. Algebra Eng. 
+         Commun. Comput. 4, 217 - 230, 1993).
 EXAMPLE: example triangM; shows an example
 "
 {

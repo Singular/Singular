@@ -1,12 +1,12 @@
 // Last change 12.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: zeroset.lib,v 1.18 2008-10-09 09:31:58 Singular Exp $";
+version="$Id: zeroset.lib,v 1.19 2009-04-06 09:17:01 seelisch Exp $";
 category="Symbolic-numerical solving";
 info="
-LIBRARY:  zeroset.lib      Procedures For Roots and Factorization
-AUTHOR:   Thomas Bayer,    email: tbayer@mathematik.uni-kl.de
-          http://wwwmayr.informatik.tu-muenchen.de/personen/bayert/
-          Current Address: Institut fuer Informatik, TU Muenchen
+LIBRARY:  zeroset.lib      Procedures for roots and factorization
+AUTHOR:   Thomas Bayer,    email: tbayer@mathematik.uni-kl.de,@*
+          http://wwwmayr.informatik.tu-muenchen.de/personen/bayert/@*
+          Current address: Hochschule Ravensburg-Weingarten
 
 OVERVIEW:
  Algorithms for finding the zero-set of a zero-dim. ideal in Q(a)[x_1,..,x_n],
@@ -17,27 +17,29 @@ OVERVIEW:
  This library is meant as a preliminary extension of the functionality
  of Singular for univariate factorization of polynomials over simple algebraic
  extensions in characteristic 0.
+ 
+ NOTE:
  Subprocedures with postfix 'Main' require that the ring contains a variable
  'a' and no parameters, and the ideal 'mpoly', where 'minpoly' from the
  basering is stored.
 
 PROCEDURES:
- Quotient(f, g)    quotient q  of f w.r.t. g (in f = q*g + remainder)
- Remainder(f,g)    remainder of the division of f by g
- Roots(f)    computes all roots of f in an extension field of Q
- SQFRNorm(f)    norm of f (f must be squarefree)
- ZeroSet(I)    zero-set of the 0-dim. ideal I
+ quotient(f, g)    quotient q  of f w.r.t. g (in f = q*g + remainder)
+ remainder(f,g)    remainder of the division of f by g
+ roots(f)    computes all roots of f in an extension field of Q
+ sqfrNorm(f)    norm of f (f must be squarefree)
+ zeroSet(I)    zero-set of the 0-dim. ideal I
 
 AUXILIARY PROCEDURES:
- EGCDMain(f, g)    gcd over an algebraic extension field of Q
- FactorMain(f)    factorization of f over an algebraic extension field
- InvertNumberMain(c)  inverts an element of an algebraic extension field
- QuotientMain(f, g)  quotient of f w.r.t. g
- RemainderMain(f,g)  remainder of the division of f by g
- RootsMain(f)    computes all roots of f, might extend the ground field
- SQFRNormMain(f)  norm of f (f must be squarefree)
- ContainedQ(data, f)  f in data ?
- SameQ(a, b)    a == b (list a,b)
+ egcdMain(f, g)    gcd over an algebraic extension field of Q
+ factorMain(f)    factorization of f over an algebraic extension field
+ invertNumberMain(c)  inverts an element of an algebraic extension field
+ quotientMain(f, g)  quotient of f w.r.t. g
+ remainderMain(f,g)  remainder of the division of f by g
+ rootsMain(f)    computes all roots of f, might extend the ground field
+ sqfrNormMain(f)  norm of f (f must be squarefree)
+ containedQ(data, f)  f in data ?
+ sameQ(a, b)    a == b (list a,b)
 ";
 
 LIB "primitiv.lib";
@@ -56,7 +58,7 @@ LIB "primdec.lib";
 // multiplicities
 
 // Improvement :
-// a main problem is the growth of the coefficients. Try Roots(x7 - 1)
+// a main problem is the growth of the coefficients. Try roots(x7 - 1)
 // return ideal mpoly !
 // mpoly is not monic, comes from primitive_extra
 
@@ -74,8 +76,8 @@ LIB "primdec.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc Roots(poly f)
-"USAGE:   Roots(f); where f is a polynomial
+proc roots(poly f)
+"USAGE:   roots(f); where f is a polynomial
 PURPOSE: compute all roots of f in a finite extension of the ground field
          without multiplicities.
 RETURN:  ring, a polynomial ring over an extension field of the ground field,
@@ -90,7 +92,7 @@ RETURN:  ring, a polynomial ring over an extension field of the ground field,
   - 'f' is the polynomial f in Q(a) (a' being substituted by 'newA')
   @end format
 ASSUME:  ground field to be Q or a simple extension of Q given by a minpoly
-EXAMPLE: example  Roots; shows an example
+EXAMPLE: example  roots; shows an example
 "
 {
   int dbPrt = printlevel-voice+3;
@@ -107,7 +109,7 @@ EXAMPLE: example  Roots; shows an example
   // get the polynomial f and find the roots
 
   poly f = imap(ROB, f);
-  list result = RootsMain(f);  // find roots of f
+  list result = rootsMain(f);  // find roots of f
 
   // store the roots and the new representation of 'a' and transform
   // the coefficients of f.
@@ -129,10 +131,10 @@ EXAMPLE: example  Roots; shows an example
   export(roots);
   export(newA);
   export(f); dbprint(dbPrt,"
-// 'Roots' created a new ring which contains the list 'roots' and
+// 'roots' created a new ring which contains the list 'roots' and
 // the polynomials 'f' and 'newA'
 // To access the roots, newA and the new representation of f, type
-   def R = Roots(f); setring R; roots; newA; f;
+   def R = roots(f); setring R; roots; newA; f;
 ");
   return(RON);
 }
@@ -141,7 +143,7 @@ example
   ring R = (0,a), x, lp;
   minpoly = a2+1;
   poly f = x3 - a;
-  def R1 = Roots(f);
+  def R1 = roots(f);
   setring R1;
   minpoly;
   newA;
@@ -154,20 +156,20 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc RootsMain(poly f)
-"USAGE:   RootsMain(f); where f is a polynomial
+proc rootsMain(poly f)
+"USAGE:   rootsMain(f); where f is a polynomial
 PURPOSE: compute all roots of f in a finite extension of the ground field
          without multiplicities.
 RETURN:  list, all entries are polynomials
   @format
   _[1] = roots of f, each entry is a polynomial
-  _[2] = 'newA' - if the ground field is Q(a') and the extension field
-         is Q(a), then 'newA' is the representation of a' in Q(a)
+  _[2] = 'newA' - if the ground field is Q(b) and the extension field
+         is Q(a), then 'newA' is the representation of b in Q(a)
   _[3] = minpoly of the algebraic extension of the ground field
   @end format
 ASSUME:  basering = Q[x,a] ideal mpoly must be defined, it might be 0!
 NOTE:    might change the ideal mpoly!!
-EXAMPLE: example  Roots; shows an example
+EXAMPLE: example  roots; shows an example
 "
 {
   int i, linFactors, nlinFactors, dbPrt;
@@ -181,8 +183,8 @@ EXAMPLE: example  Roots; shows an example
   // firstly, find roots of the linear factors,
   // nonlinear factors are processed later
 
-  dbprint(dbPrt, "Roots of " + string(f) +  ", minimal polynomial = " + string(mpoly[1]));
-  factorList = FactorMain(f);          // Factorize f
+  dbprint(dbPrt, "roots of " + string(f) +  ", minimal polynomial = " + string(mpoly[1]));
+  factorList = factorMain(f);          // Factorize f
   dbprint(dbPrt, (" prime factors of f are : " + string(factorList[1])));
 
   linFactors = 0;
@@ -192,7 +194,7 @@ EXAMPLE: example  Roots; shows an example
     if(deg(fa, wt) == 1) {
       linFactors++;        // get the root from the linear factor
       lc = LeadTerm(fa, 1)[3];
-      fa = MultPolys(InvertNumberMain(lc), fa); // make factor monic
+      fa = MultPolys(invertNumberMain(lc), fa); // make factor monic
       roots[linFactors] = var(1) - fa;  // fa is monic !!
     }
     else {            // ignore nonlinear factors
@@ -226,7 +228,7 @@ EXAMPLE: example  Roots; shows an example
 
     // compute the roots of the nonlinear (irreducible, monic) factor f1 of f
     // by extending the basefield by a' with minimal polynomial f1
-    // Then call Roots(f1) to find the roots of f1 over the new base field
+    // Then call roots(f1) to find the roots of f1 over the new base field
 
     f1 = nlFactors[1];
     if(mpoly[1] != 0) {
@@ -246,7 +248,7 @@ EXAMPLE: example  Roots; shows an example
     }
     result[3] = mpoly[1];
     oldMinPoly = mpoly[1];
-    partSol = RootsMain(f1);    // find roots of f1 over extended field
+    partSol = rootsMain(f1);    // find roots of f1 over extended field
 
     if(oldMinPoly != partSol[3]) {    // minpoly has changed ?
       // all previously computed roots must be transformed
@@ -261,7 +263,7 @@ EXAMPLE: example  Roots; shows an example
     result[1] = roots;
   }
   else {  // more than one nonlinear (irreducible) factor (f_1,...,f_r)
-    // solve each of them by RootsMain(f_i), append their roots
+    // solve each of them by rootsMain(f_i), append their roots
     // change the minpoly and transform all previously computed
     // roots if necessary.
     // Note that the for-loop is more or less book-keeping
@@ -270,7 +272,7 @@ EXAMPLE: example  Roots; shows an example
     result[2] = newA;
     for(i = 1; i <= size(nlFactors); i = i + 1) {
       oldMinPoly = mpoly[1];
-      partSol = RootsMain(nlFactors[i]);    // main work
+      partSol = rootsMain(nlFactors[i]);    // main work
       nlFactors[i] = 0;        // delete factor
       result[3] = partSol[3];        // store minpoly
 
@@ -296,8 +298,8 @@ EXAMPLE: example  Roots; shows an example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc ZeroSet(ideal I, list #)
-"USAGE:   ZeroSet(I [,opt] ); I=ideal, opt=integer
+proc zeroSet(ideal I, list #)
+"USAGE:   zeroSet(I [,opt] ); I=ideal, opt=integer
 PURPOSE: compute the zero-set of the zero-dim. ideal I, in a finite extension
          of the ground field.
 RETURN:  ring, a polynomial ring over an extension field of the ground field,
@@ -305,8 +307,8 @@ RETURN:  ring, a polynomial ring over an extension field of the ground field,
          ideal 'id':
   @format
   - 'zeroset' is the list of the zeros of the ideal I, each zero is an ideal.
-  - if the ground field is Q(a') and the extension field is Q(a), then
-    'newA' is the representation of a' in Q(a).
+  - if the ground field is Q(b) and the extension field is Q(a), then
+    'newA' is the representation of b in Q(a).
     If the basering contains a parameter 'a' and the minpoly remains unchanged
     then 'newA' = 'a'.
     If the basering does not contain a parameter then 'newA' = 'a' (default).
@@ -314,11 +316,11 @@ RETURN:  ring, a polynomial ring over an extension field of the ground field,
   @end format
 ASSUME:  dim(I) = 0, and ground field to be Q or a simple extension of Q given
          by a minpoly.
-OPTIONS: opt = 0 no primary decomposition (default)
-         opt > 0 primary decomposition
-NOTE:    If I contains an algebraic number (parameter) then 'I' must be
+OPTIONS: opt = 0: no primary decomposition (default)
+         opt > 0: primary decomposition
+NOTE:    If I contains an algebraic number (parameter) then I must be
          transformed w.r.t. 'newA' in the new ring.
-EXAMPLE: example ZeroSet; shows an example
+EXAMPLE: example zeroSet; shows an example
 "
 {
   int primaryDecQ, dbPrt;
@@ -346,7 +348,7 @@ EXAMPLE: example ZeroSet; shows an example
     ERROR(" ideal not zerodimensional ");
   }
 
-  list result = ZeroSetMain(id, primaryDecQ);
+  list result = zeroSetMain(id, primaryDecQ);
 
   // store the zero-set, minimal polynomial and the new representative of 'a'
 
@@ -375,11 +377,11 @@ EXAMPLE: example ZeroSet; shows an example
   export(zeroset);
   export(newA);
     dbprint(dbPrt,"
-// 'ZeroSet' created a new ring which contains the list 'zeroset', the ideal
+// 'zeroSet' created a new ring which contains the list 'zeroset', the ideal
 // 'id' and the polynomial 'newA'. 'id' is the ideal of the input transformed
 // w.r.t. 'newA'.
 // To access the zero-set, 'newA' and the new representation of the ideal, type
-   def R = ZeroSet(I); setring R; zeroset; newA; id;
+   def R = zeroSet(I); setring R; zeroset; newA; id;
 ");
   setring RZSB;
   return(RZBN);
@@ -389,7 +391,7 @@ example
   ring R = (0,a), (x,y,z), lp;
   minpoly = a2 + 1;
   ideal I = x2 - 1/2, a*z - 1, y - 2;
-  def T = ZeroSet(I);
+  def T = zeroSet(I);
   setring T;
   minpoly;
   newA;
@@ -403,8 +405,8 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc InvertNumberMain(poly f)
-"USAGE:   InvertNumberMain(f); where f is a polynomial
+proc invertNumberMain(poly f)
+"USAGE:   invertNumberMain(f); where f is a polynomial
 PURPOSE: compute 1/f if f is a number in Q(a), i.e., f is represented by a
          polynomial in Q[a].
 RETURN:  poly 1/f
@@ -467,8 +469,8 @@ ASSUME:  basering = Q[x_1,...,x_n,a]
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc Quotient(poly f, poly g)
-"USAGE:   Quotient(f, g); where f,g are polynomials;
+proc quotient(poly f, poly g)
+"USAGE:   quotient(f, g); where f,g are polynomials;
 PURPOSE: compute the quotient q and remainder r s.t. f = g*q + r, deg(r) < deg(g)
 RETURN:  list of polynomials
   @format
@@ -477,7 +479,7 @@ RETURN:  list of polynomials
   @end format
 ASSUME:  basering = Q[x] or Q(a)[x]
 NOTE: outdated, use div/mod instead
-EXAMPLE: example  Quotient; shows an example
+EXAMPLE: example  quotient; shows an example
 "
 {
   def QUOB = basering;
@@ -486,7 +488,7 @@ EXAMPLE: example  Quotient; shows an example
   export(QUOR);
   poly f = imap(QUOB, f);
   poly g = imap(QUOB, g);
-  list result = QuotientMain(f, g);
+  list result = quotientMain(f, g);
 
   setring(QUOB);
   list result = imap(QUOR, result);
@@ -499,13 +501,13 @@ example
  minpoly = a2+1;
  poly f =  x4 - 2;
  poly g = x - a;
- list qr = Quotient(f, g);
+ list qr = quotient(f, g);
  qr;
  qr[1]*g + qr[2] - f;
 }
 
-proc QuotientMain(poly f, poly g)
-"USAGE:   QuotientMain(f, g); where f,g are polynomials
+proc quotientMain(poly f, poly g)
+"USAGE:   quotientMain(f, g); where f,g are polynomials
 PURPOSE: compute the quotient q and remainder r s.th. f = g*q + r, deg(r) < deg(g)
 RETURN:  list of polynomials
   @format
@@ -515,7 +517,7 @@ RETURN:  list of polynomials
 ASSUME:  basering = Q[x,a] and ideal mpoly is defined (it might be 0),
          this represents the ring Q(a)[x] together with its minimal polynomial.
 NOTE: outdated, use div/mod instead
-EXAMPLE: example  Quotient; shows an example
+EXAMPLE: example  quotient; shows an example
 "
 {
   if(g == 0) { ERROR("Division by zero !");}
@@ -531,8 +533,8 @@ EXAMPLE: example  Quotient; shows an example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc Remainder(poly f, poly g)
-"USAGE:   Remainder(f, g); where f,g are polynomials
+proc remainder(poly f, poly g)
+"USAGE:   remainder(f, g); where f,g are polynomials
 PURPOSE: compute the remainder of the division of f by g, i.e. a polynomial r
          s.t. f = g*q + r, deg(r) < deg(g).
 RETURN:  poly
@@ -546,7 +548,7 @@ NOTE: outdated, use mod/reduce instead
   export(REMR);
   poly f = imap(REMB, f);
   poly g = imap(REMB, g);
-  poly h = RemainderMain(f, g);
+  poly h = remainderMain(f, g);
 
   setring(REMB);
   poly r = imap(REMR, h);
@@ -559,11 +561,11 @@ example
  minpoly = a2+1;
  poly f =  x4 - 1;
  poly g = x3 - 1;
- Remainder(f, g);
+ remainder(f, g);
 }
 
-proc RemainderMain(poly f, poly g)
-"USAGE:   RemainderMain(f, g); where f,g are polynomials
+proc remainderMain(poly f, poly g)
+"USAGE:   remainderMain(f, g); where f,g are polynomials
 PURPOSE: compute the remainder r s.t. f = g*q + r, deg(r) < deg(g)
 RETURN:  poly
 ASSUME:  basering = Q[x,a] and ideal mpoly is defined (it might be 0),
@@ -578,15 +580,15 @@ NOTE: outdated, use mod/reduce instead
   if(deg(g, wt) == 0) { return(0); }
 
   lc = LeadTerm(g, 1)[3];
-  g1 = MultPolys(InvertNumberMain(lc), g);  // make g monic
+  g1 = MultPolys(invertNumberMain(lc), g);  // make g monic
 
   return(SimplifyPoly(reduce(f, std(g1))));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc EGCDMain(poly f, poly g)
-"USAGE:   EGCDMain(f, g); where f,g are polynomials
+proc egcdMain(poly f, poly g)
+"USAGE:   egcdMain(f, g); where f,g are polynomials
 PURPOSE: compute the polynomial gcd of f and g over Q(a)[x]
 RETURN:  poly
 ASSUME:  basering = Q[x,a] and ideal mpoly is defined (it might be 0),
@@ -603,7 +605,7 @@ EXAMPLE: example EGCD; shows an example
   r2 = g;
 
   while(r2 != 0) {
-    r  = RemainderMain(r1, r2);
+    r  = remainderMain(r1, r2);
     r1 = r2;
     r2 = r;
   }
@@ -647,8 +649,8 @@ EXAMPLE: example  MEGCD; shows an example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc SQFRNorm(poly f)
-"USAGE:   SQFRNorm(f); where f is a polynomial
+proc sqfrNorm(poly f)
+"USAGE:   sqfrNorm(f); where f is a polynomial
 PURPOSE: compute the norm of the squarefree polynomial f in Q(a)[x].
 RETURN:  list with 3 entries
   @format
@@ -658,7 +660,7 @@ RETURN:  list with 3 entries
   @end format
 ASSUME:  f must be squarefree, basering = Q(a)[x] and minpoly != 0.
 NOTE:    the norm is an element of Q[x]
-EXAMPLE: example  SQFRNorm; shows an example
+EXAMPLE: example  sqfrNorm; shows an example
 "
 {
   def SNB = basering;
@@ -666,7 +668,7 @@ EXAMPLE: example  SQFRNorm; shows an example
                                 // replaced by a variable
   setring SNR;
   poly f = imap(SNB, f);
-  list result = SQFRNormMain(f);  // squarefree norm of f
+  list result = sqfrNormMain(f);  // squarefree norm of f
 
   setring SNB;
   list result = imap(SNR, result);
@@ -678,11 +680,11 @@ example
    ring R = (0,a), x, lp;
    minpoly = a2+1;
   poly f =  x4 - 2*x + 1;
-  SQFRNorm(f);
+  sqfrNorm(f);
 }
 
-proc SQFRNormMain(poly f)
-"USAGE:   SQFRNorm(f); where f is a polynomial
+proc sqfrNormMain(poly f)
+"USAGE:   sqfrNorm(f); where f is a polynomial
 PURPOSE: compute the norm of the squarefree polynomial f in Q(a)[x].
 RETURN:  list with 3 entries
   @format
@@ -733,8 +735,8 @@ EXAMPLE: example  SqfrNorm; shows an example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc FactorMain(poly f)
-"USAGE:   FactorMain(f); where f is a polynomial
+proc factorMain(poly f)
+"USAGE:   factorMain(f); where f is a polynomial
 PURPOSE: compute the factorization of the squarefree poly f over Q(a)[t],
          minpoly  = p(a).
 RETURN:  list with 2 entries
@@ -770,7 +772,7 @@ EXAMPLE: example  Factor; shows an example
 
   fac1[1] = 1;
   fac2[1] = 1;
-  normList = SQFRNormMain(f);
+  normList = sqfrNormMain(f);
   // print(" factorize : deg = " + string(deg(normList[1], intvec(1,0))));
   factorList = factorize(normList[1]);     // factor squarefree norm of f over Q[x]
   g = normList[2];
@@ -781,8 +783,8 @@ EXAMPLE: example  Factor; shows an example
   fac2[1] = factorList[2][1];
   for(i = 2; i <= size(factorList[1]); i = i + 1) {
     H = factorList[1][i];
-    h = EGCDMain(H, g);
-    quo_rem = QuotientMain(g, h);
+    h = egcdMain(H, g);
+    quo_rem = quotientMain(g, h);
     g = quo_rem[1];
     fac1[i] = SimplifyPoly(F(h));
     fac2[i] = 1;        // to be changed later
@@ -792,8 +794,8 @@ EXAMPLE: example  Factor; shows an example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc ZeroSetMain(ideal I, int primDecQ)
-"USAGE:   ZeroSetMain(ideal I, int opt); ideal I, int opt
+proc zeroSetMain(ideal I, int primDecQ)
+"USAGE:   zeroSetMain(ideal I, int opt); ideal I, int opt
 PURPOSE: compute the zero-set of the zero-dim. ideal I, in a simple extension
          of the ground field.
 RETURN:  list
@@ -811,11 +813,11 @@ ASSUME:  basering = K[x_1,x_2,...,x_n] where K = Q or a simple extension of Q
          given by a minpoly; dim(I) = 0.
 NOTE:    opt = 0  no primary decomposition
          opt > 0  use a primary decomposition
-EXAMPLE: example ZeroSet; shows an example
+EXAMPLE: example zeroSet; shows an example
 "
 {
-  // main work is done in ZeroSetMainWork, here the zero-set of each ideal from the
-  // primary decompostion is coputed by menas of ZeroSetMainWork, and then the
+  // main work is done in zeroSetMainWork, here the zero-set of each ideal from the
+  // primary decompostion is coputed by menas of zeroSetMainWork, and then the
   // minpoly and the parameter representing the algebraic extension are
   // transformed according to 'newA', i.e., only bookeeping is done.
 
@@ -828,13 +830,13 @@ EXAMPLE: example ZeroSet; shows an example
   poly newA, oldMinPoly;
 
   dbPrt = printlevel-voice+2;
-  dbprint(dbPrt, "ZeroSet of " + string(I) + ", minpoly = " + string(minpoly));
+  dbprint(dbPrt, "zeroSet of " + string(I) + ", minpoly = " + string(minpoly));
 
   n = nvars(basering) - 1;
   for(i = 1; i <= n; i++) { w[i] = 1;}
   w[n + 1] = 0;
 
-  if(primDecQ == 0) { return(ZeroSetMainWork(I, w, 0)); }
+  if(primDecQ == 0) { return(zeroSetMainWork(I, w, 0)); }
 
   newA = var(n + 1);
   if(mpoly[1] == 0) { noMP = 1;}
@@ -861,7 +863,7 @@ and keep track of the minimal polynomials ");
     idealList[i] = 0;
     oldMinPoly = mpoly[1];
     dbprint(dbPrt, " ideal#" + string(i) + " of " + string(size(idealList)) + " = " + string(J));
-    currentSol = ZeroSetMainWork(J, w, 0);
+    currentSol = zeroSetMainWork(J, w, 0);
 
     if(oldMinPoly != currentSol[3]) {   // change minpoly and transform solutions
       dbprint(dbPrt, " change minpoly to " + string(currentSol[3][1]));
@@ -882,8 +884,8 @@ and keep track of the minimal polynomials ");
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc ZeroSetMainWork(ideal id, intvec wt, int sVars)
-"USAGE:   ZeroSetMainWork(I, wt, sVars);
+proc zeroSetMainWork(ideal id, intvec wt, int sVars)
+"USAGE:   zeroSetMainWork(I, wt, sVars);
 PURPOSE: compute the zero-set of the zero-dim. ideal I, in a finite extension
          of the ground field (without multiplicities).
 RETURN:  list, all entries are polynomials
@@ -957,7 +959,7 @@ EXAMPLE: example  IdealSolve; shows an example
   // some variables are not solved.
   // substitute each partial solution in generators and find the
   // zero set of the resulting ideal by recursive application
-  // of ZeroSetMainWork !
+  // of zeroSetMainWork !
 
   index = linIndex + nlinIndex;
   nrSols = 0;
@@ -967,7 +969,7 @@ EXAMPLE: example  IdealSolve; shows an example
     Fsubs = basering, solid;
     gens = std(SimplifyData(Fsubs(generators)));    // substitute partial solution
     oldMinPoly = mpoly[1];
-    partSol = ZeroSetMainWork(gens, wt, size(index) + sVars);
+    partSol = zeroSetMainWork(gens, wt, size(index) + sVars);
 
     if(oldMinPoly != partSol[3]) {    // minpoly has changed
       Fa = basering, maxideal(1);
@@ -1027,7 +1029,7 @@ RETURN:  list
       if(size(vars) == 1 && deg(f, wt) == 1) {  // univariate,linear
         nrSols++; found++;
         index[nrSols] = vars[1];
-        sol[nrSols] = var(vars[1]) - MultPolys(InvertNumberMain(LeadTerm(f, vars[1])[3]), f);
+        sol[nrSols] = var(vars[1]) - MultPolys(invertNumberMain(LeadTerm(f, vars[1])[3]), f);
       }
     }
     if(found > 0) {
@@ -1049,7 +1051,7 @@ RETURN:  list
 ///////////////////////////////////////////////////////////////////////////////
 
 proc NonLinearZeroSetMain(ideal I, intvec wt)
-"USAGE:   ZeroSetMainWork(I, wt, sVars);
+"USAGE:   NonLinearZeroSetMain(I, wt);
 PURPOSE: solves the (nonlinear) univariate polynomials in I
          of the ground field (without multiplicities).
 RETURN:  list, all entries are polynomials
@@ -1102,7 +1104,7 @@ NOTE:    might change 'mpoly' !!
       poly f = imap(NLZR, f);
       export(RIS1);
       export(mpoly);
-      roots = RootsMain(f);
+      roots = rootsMain(f);
 
       // get "old" basering with new minpoly
 
@@ -1179,7 +1181,7 @@ PURPOSE: create a list of solutions of size n, each entry of 'sol2' must
          have size n. 'sol1' is one partial solution (from 'LinearZeroSetMain')
          'sol2' is a list of partial solutions (from 'NonLinearZeroSetMain')
 ASSUME:  'sol2' is not empty
-NOTE:    used by 'ZeroSetMainWork'
+NOTE:    used by 'zeroSetMainWork'
 {
   int i, j, k, m;
   ideal sol;
@@ -1210,7 +1212,7 @@ ASSUME:  size(sol) = size(index) <= nvars(basering)
   int k = 0;
   ideal I;
   for(int i = 1; i <= nvars(basering) - 1; i = i + 1) {    // built subs. map
-    if(ContainedQ(index, i)) {
+    if(containedQ(index, i)) {
       k++;
       I[index[k]] = sol[k];
     }
@@ -1265,14 +1267,14 @@ ASSUME:  n <= nvars(basering)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc ContainedQ(data, f, list #)
-"USAGE:    ContainedQ(data, f [, opt]); data=list; f=any type, opt=integer
+proc containedQ(data, f, list #)
+"USAGE:    containedQ(data, f [, opt]); data=list; f=any type; opt=integer
 PURPOSE:  test if f is an element of data.
 RETURN:   int
           0 if f not contained in data
           1 if f contained in data
 OPTIONS:  opt = 0 : use '==' for comparing f with elements from data@*
-          opt = 1 : use @code{SameQ} for comparing f with elements from data
+          opt = 1 : use @code{sameQ} for comparing f with elements from data
 "
 {
   int opt, i, found;
@@ -1287,7 +1289,7 @@ OPTIONS:  opt = 0 : use '==' for comparing f with elements from data@*
       else {i = i + 1;}
     }
     else {
-      if(SameQ(f, data[i])) { found = 1;}
+      if(sameQ(f, data[i])) { found = 1;}
       else {i = i + 1;}
     }
   }
@@ -1296,8 +1298,8 @@ OPTIONS:  opt = 0 : use '==' for comparing f with elements from data@*
 
 //////////////////////////////////////////////////////////////////////////////
 
-proc SameQ(a, b)
-"USAGE:    SameQ(a, b); a,b=list/intvec
+proc sameQ(a, b)
+"USAGE:    sameQ(a, b); a,b=list/intvec
 PURPOSE:  test a == b elementwise, i.e., a[i] = b[i].
 RETURN:   int
           0 if a != b

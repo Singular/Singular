@@ -1,6 +1,6 @@
 //(GMG, last modified 16.12.00)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ntsolve.lib,v 1.15 2006-07-18 15:48:29 Singular Exp $";
+version="$Id: ntsolve.lib,v 1.16 2009-04-06 09:17:01 seelisch Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  ntsolve.lib     Real Newton Solving of Polynomial Systems
@@ -19,10 +19,10 @@ proc nt_solve (ideal gls, ideal ini, list #)
 "USAGE:   nt_solve(gls,ini[,ipar]); gls,ini= ideals, ipar=list/intvec,@*
   gls: contains the equations, for which a solution will be computed@*
   ini: ideal of initial values (approximate solutions to start with),@*
-  ipar: control integers (default: ipar = 100,10)
+  ipar: control integers (default: ipar = [100, 10])
   @format
  ipar[1]: max. number of iterations
- ipar[2]: accuracy (we have the l_2-norm ||.||): accept solution @code{sol}
+ ipar[2]: accuracy (we have the l_2-norm ||.||): accepts solution @code{sol}
           if ||gls(sol)|| < eps0*(0.1^ipar[2])
           where eps0 = ||gls(ini)|| is the initial error
   @end format
@@ -261,11 +261,11 @@ ASSUME:  G:   g1,..,gn, a triangular system of n equations in n vars, i.e.
   gi=gi(var(n-i+1),..,var(n)),@*
   a:   ideal of numbers, coordinates of an approximation of a common
        zero of G to start with (with a[i] to be substituted in var(i)),@*
-  ipar: control integer vector (default: ipar = 100,10)
+  ipar: control integer vector (default: ipar = [100, 10])
   @format
   ipar[1]: max. number of iterations
   ipar[2]: accuracy (we have as norm |.| absolute value ):
-           accept solution @code{sol} if |G(sol)| < |G(a)|*(0.1^ipar[2]).
+           accepts solution @code{sol} if |G(sol)| < |G(a)|*(0.1^ipar[2]).
   @end format
 RETURN:  an ideal, coordinates of a better approximation of a zero of G
 EXAMPLE: example triMNewton; shows an example

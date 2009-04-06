@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: presolve.lib,v 1.28 2009-02-20 09:26:50 Singular Exp $";
+version="$Id: presolve.lib,v 1.29 2009-04-06 09:17:01 seelisch Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  presolve.lib     Pre-Solving of Polynomial Equations
@@ -163,7 +163,7 @@ proc elimlinearpart (ideal i,list #)
 RETURN:   list L with 5 entries:
   @format
   L[1]: ideal obtained from i by substituting from the first n variables those
-        which appear in a linear part of i, by putting this part into triangular 
+        which appear in a linear part of i, by putting this part into triangular
         form
   L[2]: ideal of variables which have been substituted
   L[3]: ideal, j-th element defines substitution of j-th var in [2]
@@ -325,7 +325,7 @@ RETURN:  list of 5 objects:
   @format
             k[x(1..m)]/i -> k[..variables from [4]..]/[1]
   @end format
-NOTE:    Applying elimpart to interred(i) may result in more sbstitutions.
+NOTE:    Applying elimpart to interred(i) may result in more substitutions.
          However, interred may be more expansive than elimpart for big ideals
 EXAMPLE: example elimpart; shows an example
 "
@@ -560,7 +560,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc fastelim (ideal i, poly p, list #)
-"USAGE:   fastelim(i,p[h,o,a,b,e,m]); i=ideal, p=polynomial; h,o,a,b,e=integers
+"USAGE:   fastelim(i,p[h,o,a,b,e,m]); i=ideal, p=polynomial; h,o,a,b,e=integers@*
           p: product of variables to be eliminated;@*
   Optional parameters:
   @format
@@ -870,9 +870,8 @@ example
 
 proc hilbvec (@id, list #)
 "USAGE:   hilbvec(id[,c,o]); id=poly/ideal/vector/module/matrix, c,o=strings,@*
-          c=char, o=ordering used by @code{hilb}@*
-          (default: c=\"32003\", o=\"dp\")
-RETURN:  intvec of 1-st Hilbert-series of id, computed in char c and ordering o
+          c=char, o=ordering used by @code{hilb} (default: c=\"32003\", o=\"dp\")
+RETURN:  intvec of 1st Hilbert-series of id, computed in char c and ordering o
 NOTE:    id must be homogeneous (i.e. all vars have weight 1)
 EXAMPLE: example hilbvec; shows an example
 "
@@ -968,12 +967,11 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc solvelinearpart (id,list #)
-"USAGE:   solvelinearpart(id [,n] );  id=ideal/module, n=integer,@*
-          (default: n=0)
+"USAGE:   solvelinearpart(id [,n] );  id=ideal/module, n=integer (default: n=0)
 RETURN:  (interreduced) generators of id of degree <=1 in reduced triangular
          form if n=0 [non-reduced triangular form if n!=0]
 ASSUME:  monomial ordering is a global ordering (p-ordering)
-NOTE:    may be used to solve a system of linear equations
+NOTE:    may be used to solve a system of linear equations,
          see @code{gauss_row} from 'matrix.lib' for a different method
 WARNING: the result is very likely to be false for 'real' coefficients, use
          char 0 instead!
@@ -1035,7 +1033,7 @@ RETURN:  a ring R, in which a poly/ideal/vector/module IMAG is stored: @*
   - each block of vars occuring in pi is sorted w.r.t. its complexity in id,
   - ni controls the sorting in i-th block (= vars occuring in pi):
     ni=0 (resp. ni!=0) means that least complex (resp. most complex) vars come
-    first @*
+    first
   - oi and mi define the monomial ordering of the i-th block:
     if mi =0, oi=ordstr(i-th block)
     if mi!=0, the ordering of the i-th block itself is a blockordering,
@@ -1117,7 +1115,7 @@ proc sortvars (id, list #)
 "USAGE:   sortvars(id[,n1,p1,n2,p2,...]);@*
          id=poly/ideal/vector/module,@*
          p1,p2,...= polynomials (product of vars),@*
-         n1,n2,...=integers@*
+         n1,n2,...= integers@*
          (default: p1=product of all vars, n1=0)
          the last pi (containing the remaining vars) may be omitted
 COMPUTE: sort variables with respect to their complexity in id
@@ -1127,11 +1125,11 @@ RETURN:  list of two elements, an ideal and a list:
        ni controls the ordering in i-th block (= vars occuring in pi):
        ni=0 (resp. ni!=0) means that less (resp. more) complex vars come first
   [2]: a list with 4 entries for each pi:
-       ideal ai : vars of pi in correct order,
-       intvec vi: permutation vector describing the ordering in ai,
-       intmat Mi: valuation matrix of ai, the columns of Mi being the
+       _[1]: ideal ai : vars of pi in correct order,
+       _[2]: intvec vi: permutation vector describing the ordering in ai,
+       _[3]: intmat Mi: valuation matrix of ai, the columns of Mi being the
                   valuation vectors of the vars in ai
-       intvec wi: size of 1-st, 2-nd,... block of identical columns of Mi
+       _[4]: intvec wi: size of 1-st, 2-nd,... block of identical columns of Mi
                   (vars with same valuation)
   @end format
 NOTE:    We define a variable x to be more complex than y (with respect to id)
@@ -1182,8 +1180,7 @@ proc valvars (id, list #)
          n1,n2,...= integers,
 
          ni controls the ordering of vars occuring in pi: ni=0 (resp. ni!=0)
-         means that less (resp. more) complex vars come first@*
-         (default: p1=product of all vars, n1=0)
+         means that less (resp. more) complex vars come first (default: p1=product of all vars, n1=0),@*
          the last pi (containing the remaining vars) may be omitted
 COMPUTE: valuation (complexity) of variables with respect to id.@*
          ni controls the ordering of vars occuring in pi:@*

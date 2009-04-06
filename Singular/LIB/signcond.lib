@@ -1,4 +1,4 @@
-// $Id: signcond.lib,v 1.7 2006-07-18 15:48:30 Singular Exp $
+// $Id: signcond.lib,v 1.8 2009-04-06 09:17:01 seelisch Exp $
 // E. Tobis  12.Nov.2004
 // last change 5. May 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
@@ -25,9 +25,9 @@ LIB "linalg.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc firstoct(ideal I)
-"USAGE:    firstoct(i); i ideal
-RETURN:   number: the number of points of V(i) lying in the first octant
-ASSUME:   i is a Groebner basis
+"USAGE:    firstoct(I); I ideal
+RETURN:   number: the number of points of V(I) lying in the first octant
+ASSUME:   I is given by a Groebner basis.
 SEE ALSO: signcnd
 EXAMPLE:  example firstoct; shows an example"
 {
@@ -79,9 +79,9 @@ RETURN:    list: the sign conditions realized by the polynomials of P on V(I).
            Each element of the second list indicates how many elements of V(I)
            give rise to the sign condition expressed by the same position on
            the first list.
-           See the example for further explanation of the output.
-ASSUME:    I is a Groebner basis
-NOTE:      The procedure psigncnd performs some pretty printing of this output
+           See the example for further explanations of the output.
+ASSUME:    I is a Groebner basis.
+NOTE:      The procedure psigncnd performs some pretty printing of this output.
 SEE ALSO:  firstoct, psigncnd
 EXAMPLE:   example signcnd; shows an example"
 {
