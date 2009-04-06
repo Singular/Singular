@@ -1,6 +1,6 @@
 // Last change 12.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: zeroset.lib,v 1.19 2009-04-06 09:17:01 seelisch Exp $";
+version="$Id: zeroset.lib,v 1.20 2009-04-06 13:21:58 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  zeroset.lib      Procedures for roots and factorization
@@ -17,14 +17,14 @@ OVERVIEW:
  This library is meant as a preliminary extension of the functionality
  of Singular for univariate factorization of polynomials over simple algebraic
  extensions in characteristic 0.
- 
+
  NOTE:
  Subprocedures with postfix 'Main' require that the ring contains a variable
  'a' and no parameters, and the ideal 'mpoly', where 'minpoly' from the
  basering is stored.
 
 PROCEDURES:
- quotient(f, g)    quotient q  of f w.r.t. g (in f = q*g + remainder)
+ Quotient(f, g)    quotient q  of f w.r.t. g (in f = q*g + remainder)
  remainder(f,g)    remainder of the division of f by g
  roots(f)    computes all roots of f in an extension field of Q
  sqfrNorm(f)    norm of f (f must be squarefree)
@@ -469,8 +469,8 @@ ASSUME:  basering = Q[x_1,...,x_n,a]
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc quotient(poly f, poly g)
-"USAGE:   quotient(f, g); where f,g are polynomials;
+proc Quotient(poly f, poly g)
+"USAGE:   Quotient(f, g); where f,g are polynomials;
 PURPOSE: compute the quotient q and remainder r s.t. f = g*q + r, deg(r) < deg(g)
 RETURN:  list of polynomials
   @format
@@ -479,7 +479,7 @@ RETURN:  list of polynomials
   @end format
 ASSUME:  basering = Q[x] or Q(a)[x]
 NOTE: outdated, use div/mod instead
-EXAMPLE: example  quotient; shows an example
+EXAMPLE: example  Quotient; shows an example
 "
 {
   def QUOB = basering;
@@ -501,7 +501,7 @@ example
  minpoly = a2+1;
  poly f =  x4 - 2;
  poly g = x - a;
- list qr = quotient(f, g);
+ list qr = Quotient(f, g);
  qr;
  qr[1]*g + qr[2] - f;
 }
@@ -517,7 +517,6 @@ RETURN:  list of polynomials
 ASSUME:  basering = Q[x,a] and ideal mpoly is defined (it might be 0),
          this represents the ring Q(a)[x] together with its minimal polynomial.
 NOTE: outdated, use div/mod instead
-EXAMPLE: example  quotient; shows an example
 "
 {
   if(g == 0) { ERROR("Division by zero !");}
