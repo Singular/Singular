@@ -1,6 +1,6 @@
 // Last change 12.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: zeroset.lib,v 1.20 2009-04-06 13:21:58 Singular Exp $";
+version="$Id: zeroset.lib,v 1.21 2009-04-06 14:12:09 seelisch Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  zeroset.lib      Procedures for roots and factorization
@@ -478,7 +478,8 @@ RETURN:  list of polynomials
   _[2] = remainder r
   @end format
 ASSUME:  basering = Q[x] or Q(a)[x]
-NOTE: outdated, use div/mod instead
+NOTE: This procedure is outdated, and should no longer be used. Use div and mod 
+instead.
 EXAMPLE: example  Quotient; shows an example
 "
 {
