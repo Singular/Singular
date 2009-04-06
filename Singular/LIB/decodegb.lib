@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: decodegb.lib,v 1.10 2009-03-25 11:15:16 bulygin Exp $";
+version="$Id: decodegb.lib,v 1.11 2009-04-06 13:30:27 Singular Exp $";
 category="Coding theory";
 info="
 LIBRARY: decodegb.lib         Decoding and min distance of linear codes with GB
@@ -1017,8 +1017,8 @@ NOTE:   An MDS matrix is constructed in the following way. We take 'a' to be a
         generator of the multiplicative group of the field. Then we construct
         the Vandermonde matrix with this 'a'.
 ASSUME:   extension field should already be defined
-RETURN:   a matrix with the MDS property. @xref{Decoding method based on quadratic equations} 
-          for more info.
+RETURN:   a matrix with the MDS property.
+SEE ALSO: Decoding method based on quadratic equations
 EXAMPLE:  example genMDSMat; shows an example
 "
 {
