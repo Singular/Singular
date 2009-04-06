@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-04-03 13:49:16 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.28 2009-04-03 13:49:16 monerjan Exp $
-$Id: gfan.cc,v 1.28 2009-04-03 13:49:16 monerjan Exp $
+$Date: 2009-04-06 14:57:18 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.29 2009-04-06 14:57:18 monerjan Exp $
+$Id: gfan.cc,v 1.29 2009-04-06 14:57:18 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -51,8 +51,19 @@ $Id: gfan.cc,v 1.28 2009-04-03 13:49:16 monerjan Exp $
 class facet
 {
 	private:
-		/** inner normal, describing the facet uniquely up to isomorphism */
-		intvec *fNormal;		
+		/** \brief Inner normal of the facet, describing it uniquely up to isomorphism */
+		intvec *fNormal;
+		
+		/** \brief The Groebner basis on the other side of a shared facet
+		 *
+		 * In order not to have to compute the flipped GB twice we store the basis we already get
+		 * when identifying search facets. Thus in the next step of the reverse search we can 
+		 * just copy the old cone and update the facet and the gcBasis.
+		 * facet::flibGB is set via facet::setFlipGB() and printed via facet::printFlipGB
+		 */
+		ideal flipGB;		//The Groebner Basis on the other side, computed via gcone::flip
+
+			
 	public:
 		/** The default constructor. Do I need a constructor of type facet(intvec)? */
 		facet()			
@@ -84,13 +95,17 @@ class facet
 			fNormal->show();
 		}
 		
-		/** \brief The Groebner basis on the other side of a shared facet
-		*
-		* In order not to have to compute the flipped GB twice we store the basis we already get
-		* when identifying search facets. Thus in the next step of the reverse search we can 
-		* just copy the old cone and update the facet and the gcBasis
-		*/
-		ideal flibGB;		//The Groebner Basis on the other side, computed via gcone::flip
+		/** Store the flipped GB*/
+		void setFlipGB(ideal I)
+		{
+			this->flipGB=I;
+		}
+		
+		/** Print the flipped GB*/
+		void printFlipGB()
+		{
+			idShow(this->flipGB);
+		}
 		
 		bool isFlippable;	//flippable facet? Want to have cone->isflippable.facet[i]
 		bool isIncoming;	//Is the facet incoming or outgoing?
@@ -142,7 +157,7 @@ class gcone
 		* the set \f$ \partial\mathcal{G} \f$ which we might store for later use. C.f p71 of journal
 		* As a result of this procedure the pointer facetPtr points to the first facet of the cone.
 		*/
-		void getConeNormals(ideal I)
+		void getConeNormals(const ideal &I)
 		{
 #ifdef gfan_DEBUG
 			cout << "*** Computing Inequalities... ***" << endl;
@@ -329,7 +344,7 @@ class gcone
 #endif				
 			/*1st step: Compute the initial ideal*/
 			poly initialFormElement[IDELEMS(gb)];	//array of #polys in GB to store initial form
-			ideal initialForm;
+			ideal initialForm=idInit(IDELEMS(gb),this->gcBasis->rank);
 			poly aktpoly;
 			intvec *check = new intvec(this->numVars);	//array to store the difference of LE and v
 			
@@ -339,7 +354,6 @@ class gcone
 				int *v=(int *)omAlloc((this->numVars+1)*sizeof(int));
 				int *leadExpV=(int *)omAlloc((this->numVars+1)*sizeof(int));
 				pGetExpV(aktpoly,leadExpV);	//find the leading exponent in leadExpV[1],...,leadExpV[n], use pNext(p)
-				//pGetExpV(aktpoly,ivLeadExpV);
 				initialFormElement[ii]=pHead(aktpoly);
 				
 				while(pNext(aktpoly)!=NULL)	/*loop trough terms and check for parallelity*/
@@ -354,9 +368,11 @@ class gcone
 						//cout << "leadExpV["<<jj+1<<"]="<<leadExpV[jj+1]<<endl;
 						(*check)[jj]=v[jj+1]-leadExpV[jj+1];
 					}
+#ifdef gfan_DEBUG
 					cout << "check=";			
 					check->show();
 					cout << endl;
+#endif
 					if (isParallel(check,fNormal)) //pass *check when 
 					{
 						cout << "Parallel vector found, adding to initialFormElement" << endl;				
@@ -366,8 +382,44 @@ class gcone
 				cout << "Initial Form=";				
 				pWrite(initialFormElement[ii]);
 				cout << "---" << endl;
-				/*Now initialFormElement must be added to (ideal)initialForm */							
+				/*Now initialFormElement must be added to (ideal)initialForm */
+				//f->flibGB->m[ii]=(poly)initialFormElement[ii];
+				//(poly)initialForm->m[ii]=pAdd(initialForm[ii],initialFormElement[ii]);
+				initialForm->m[ii]=initialFormElement[ii];
 			}//for
+			f->setFlipGB(initialForm);			
+#ifdef gfan_DEBUG
+			cout << "Initial ideal is: " << endl;
+			//idShow(initialForm);
+			f->printFlipGB();
+			cout << "===" << endl;
+#endif
+			delete check;
+			
+			/*2nd step: lift initial ideal to a GB of the neighbouring cone*/
+			ring tmpring=rCopy0(currRing);
+			tmpring->order[0]=ringorder_a;
+			tmpring->order[1]=ringorder_dp;
+			tmpring->order[2]=ringorder_C;
+			//rWrite(tmpring);
+			tmpring->wvhdl[0] =( int *)omAlloc((fNormal->length())*sizeof(int)); //found in Singular/ipshell.cc
+			
+			for (int ii=0;ii<this->numVars;ii++)
+			{
+				cout << "ping" << endl;
+				tmpring->wvhdl[0][ii]=(*fNormal)[ii];	//What exactly am I doing here?
+				cout << "pong" << endl;
+				cout << *tmpring->wvhdl[ii] << endl;
+			}
+			//tmpring->wvhdl=(int**)(fNormal);
+			rComplete(tmpring);
+			rWrite(tmpring);
+			/*setring(tmpring);
+			ideal ina=initialForm;
+			ideal H;
+			H=kstd(ina,NULL,testHomog,NULL);
+			idShow(H);*/
+			
 		}//void flip(ideal gb, facet *f)
 				
 		/** \brief Compute a Groebner Basis
@@ -376,7 +428,7 @@ class gcone
 		*\param ideal
 		*\return void
 		*/
-		void getGB(ideal inputIdeal)
+		void getGB(const ideal &inputIdeal)
 		{
 			ideal gb;
 			gb=kStd(inputIdeal,NULL,testHomog,NULL);
@@ -409,16 +461,7 @@ class gcone
 		*/
 		bool isParallel(intvec *a, intvec *b)
 		{			
-			//bool res=FALSE;
-			//intvec iva(this->numVars);
-			//intvec ivb(this->numVars);
 			int lhs,rhs;
-			//lhs=0;
-			//rhs=0;
-			//iva = a;
-			//ivb = b;
-			//lhs=dotProduct(&iva,&ivb)*dotProduct(&iva,&ivb);
-			//lhs=dotProduct(&iva,&iva)*dotProduct(&ivb,&ivb);
 			lhs=dotProduct(&a,&b)*dotProduct(&a,&b);
 			rhs=dotProduct(&a,&a)*dotProduct(&b,&b);
 			cout << "LHS="<<lhs<<", RHS="<<rhs<<endl;
@@ -475,23 +518,29 @@ ideal gfan(ideal inputIdeal)
 	2. Compute GB of inputIdeal wrt target order -> newRing, setCurrRing etc...
 	3. getConeNormals
 	*/
-
 	
 	/* Construct a new ring which will serve as our root
 	Does not yet work as expected. Will work fine with order dp,Dp but otherwise hangs in getGB
 	*/
 	rootRing=rCopy0(currRing);
-	rootRing->order[0]=ringorder_dp;
+	rootRing->order[0]=ringorder_lp;
 	rComplete(rootRing);
-	//rChangeCurrRing(rootRing);
-	ideal rootIdeal;
+	rChangeCurrRing(rootRing);
+	
 	/* Fetch the inputIdeal into our rootRing */
-	map m=(map)idInit(IDELEMS(inputIdeal),0);
-	//rootIdeal=fast_map(inputIdeal,inputRing,(ideal)m, currRing);
+	map theMap=(map)idMaxIdeal(1);	//evil hack!
+	//idShow(idMaxIdeal(1));
+	/*for (int ii=0;ii<pVariables;ii++)
+	{
+		theMap->m[ii]=inputIdeal->m[ii];
+	}*/
+	theMap->preimage=NULL;
+	ideal rootIdeal;
+	rootIdeal=fast_map(inputIdeal,inputRing,(ideal)theMap, currRing);
 #ifdef gfan_DEBUG
 	cout << "Root ideal is " << endl;
-	idPrint(rootIdeal);
-	cout << "The current ring is " << endl;
+	idShow(rootIdeal);
+	cout << "The root ring is " << endl;
 	rWrite(rootRing);
 	cout << endl;
 #endif	
@@ -500,7 +549,8 @@ ideal gfan(ideal inputIdeal)
 	gcone *gcAct;
 	gcAct = gcRoot;
 	gcAct->numVars=pVariables;
-	gcAct->getGB(inputIdeal);
+	gcAct->getGB(rootIdeal);	//sets gcone::gcBasis
+	idShow(gcAct->gcBasis);
 	gcAct->getConeNormals(gcAct->gcBasis);	//hopefully compute the normals
 	gcAct->flip(gcAct->gcBasis,gcAct->facetPtr);
 	/*Now it is time to compute the search facets, respectively start the reverse search.
