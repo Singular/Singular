@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.125 2009-03-12 12:34:25 Singular Exp $
+@comment $Id: NEWS.texi,v 1.126 2009-04-06 13:25:20 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -87,11 +87,6 @@ new library: decodegb.lib (see @nref{decodegb_lib}: Generating and solving syste
 new library: dmodapp.lib (see @nref{dmodapp_lib}: applications of D-modules)
 @item
 new library: bfun.lib global (see @nref{bfun_lib}: Bernstein-Sato polynomial)
-@comment this was taken back
-@comment @item
-@comment new library: discretize.lib (see @nref{discretize_lib}): tools for the generation of finite difference schemes)
-@item 
-new library: nchomolog.lib (see @nref{nchomolog_lib}): Noncommutative Homological Algebra
 @item 
 new library: freegb.lib (see @nref{freegb_lib}): Twosided Noncommutative Groebner bases in Free Algebras
 @item
