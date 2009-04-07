@@ -1,35 +1,35 @@
-version="$Id: control.lib,v 1.39 2008-10-07 17:55:52 levandov Exp $";
+version="$Id: control.lib,v 1.40 2009-04-07 09:30:44 seelisch Exp $";
 category="System and Control Theory";
 info="
 LIBRARY:  control.lib     Algebraic analysis tools for System and Control Theory
 
-AUTHORS:  Oleksandr Iena       yena@mathematik.uni-kl.de
-@*        Markus Becker        mbecker@mathematik.uni-kl.de
-@*        Viktor Levandovskyy  levandov@mathematik.uni-kl.de
+AUTHORS:  Oleksandr Iena,       yena@mathematik.uni-kl.de
+@*        Markus Becker,        mbecker@mathematik.uni-kl.de
+@*        Viktor Levandovskyy,  levandov@mathematik.uni-kl.de
 
 SUPPORT: Forschungsschwerpunkt 'Mathematik und Praxis' (Project of Dr. E. Zerz
-and V. Levandovskyy), Uni Kaiserslautern
+and V. Levandovskyy), University of Kaiserslautern
 
 MAIN PROCEDURES:
-  control(R);     analysis of controllability-related properties of R (using Ext modules)
-  controlDim(R);  analysis of controllability-related properties of R (using dimension)
-  autonom(R);     analysis of autonomy-related properties of R (using Ext modules)
-  autonomDim(R);  analysis of autonomy-related properties of R (using dimension)
+  control(R)     analysis of controllability-related properties of R (using Ext modules)
+  controlDim(R)  analysis of controllability-related properties of R (using dimension)
+  autonom(R)     analysis of autonomy-related properties of R (using Ext modules)
+  autonomDim(R)  analysis of autonomy-related properties of R (using dimension)
 
 COMPONENT PROCEDURES:
-  leftKernel(R);       a left kernel of R
-  rightKernel(R);      a right kernel of R
-  leftInverse(R);      a left inverse of R
-  rightInverse(R);     a right inverse of R
-  colrank(M);          a column rank of M as of matrix
-  genericity(M);       analysis of the genericity of parameters
-  canonize(L);         Groebnerification for modules in the output of control or autonomy procs
-  iostruct(R);         computes an IO-structure of behavior given by a module R
-  findTorsion(R, I);   generators of the submodule of a module R, annihilated by the ideal I
+  leftKernel(R)       a left kernel of R
+  rightKernel(R)      a right kernel of R
+  leftInverse(R)      a left inverse of R
+  rightInverse(R)     a right inverse of R
+  colrank(M)          a column rank of M as of matrix
+  genericity(M)       analysis of the genericity of parameters
+  canonize(L)         Groebnerification for modules in the output of control or autonomy procs
+  iostruct(R)         computes an IO-structure of behavior given by a module R
+  findTorsion(R, I)   generators of the submodule of a module R, annihilated by the ideal I
 
 AUXILIARY PROCEDURES:
-  controlExample(s);   set up an example from the mini database inside of the library
-  view();              well-formatted output of lists, modules and matrices
+  controlExample(s)   set up an example from the mini database inside of the library
+  view()              well-formatted output of lists, modules and matrices
 ";
 
 LIB "homolog.lib";
@@ -658,8 +658,9 @@ proc genericity(matrix M)
 "USAGE:  genericity(M); M is a matrix/module
 RETURN:  list (of strings)
 PURPOSE: determine parametric expressions which have been assumed to be non-zero in the process of computing the Groebner basis
-NOTE: the output list consists of strings. The first string contains the variables only, whereas each further string contain a single polynomial in parameters.
-$* We strongly recommend to switch on the redSB and redTail options.
+NOTE: the output list consists of strings. The first string contains the variables only, whereas each further string contains
+      a single polynomial in parameters.
+@* We strongly recommend to switch on the redSB and redTail options.
 @* The procedure is effective with the lift procedure for modules with parameters
 EXAMPLE:  example genericity; shows an example
 "
@@ -1414,7 +1415,7 @@ proc controlExample(string s)
 RETURN:  ring
 PURPOSE: set up an example from the mini database by initalizing a ring and a module in a ring
 NOTE: in order to see the list of available examples, execute @code{controlExample(\"show\");}
-@* To use ab example, one has to do the following. Suppose one calls the ring, where the example will be activated, A. Then, by executing
+@* To use an example, one has to do the following. Suppose one calls the ring, where the example will be activated, A. Then, by executing
 @*  @code{def A = controlExample(\"Antenna\");} and @code{setring A;},
 @* A will become a basering from the example \"Antenna\" with
 the predefined system module R (transposed).

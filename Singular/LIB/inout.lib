@@ -1,6 +1,6 @@
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: inout.lib,v 1.32 2009-02-23 12:08:39 Singular Exp $";
+version="$Id: inout.lib,v 1.33 2009-04-07 09:30:44 seelisch Exp $";
 category="General purpose";
 info="
 LIBRARY:  inout.lib     Printing and Manipulating In- and Output
@@ -565,7 +565,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc showrecursive (@@id,poly p,list #)
-"USAGE:   showrecursive(id,p[,ord]); id= any object of basering, p= product of
+"USAGE:   showrecursive(id,p[,ord]); id any object of basering, p= product of
          variables and ord=string (any allowed ordstr)
 DISPLAY: display 'id' in a recursive format as a polynomial in the variables
          occuring in p with coefficients in the remaining variables. This is

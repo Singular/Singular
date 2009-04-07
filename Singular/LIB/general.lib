@@ -2,7 +2,7 @@
 //anne, added deleteSublist and watchdog 12.12.2000
 //eric, added absValue 11.04.2002
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.59 2009-01-14 16:07:04 Singular Exp $";
+version="$Id: general.lib,v 1.60 2009-04-07 09:30:44 seelisch Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -741,7 +741,7 @@ RETURN:  a list l of two elements:
 @end format
 NOTE:    If v is given id may be any simply indexed object (e.g. any list or
          string); if v[i]<0 and i<=size(id) v[i] is set internally to i;
-         entries of v must be pairwise distinct to get a permutation if id.
+         entries of v must be pairwise distinct to get a permutation id.
          Zero generators of ideal/module are deleted
 EXAMPLE: example sort; shows an example
 "
@@ -1174,7 +1174,7 @@ RETURN:  a list, say l,
          l[3] : remaining factor ( n=product{ (l[1][i]^l[2][i])*l[3]} )
                 type(l[3])=typeof(n)
 NOTE:    If n is a long integer (of type number) then the procedure
-         finds primefactors <= min(p,32003) but n may as larger as
+         finds primefactors <= min(p,32003) but n may be as larger as
          2147483647 (max. integer representation)
 WARNING: the procedure works for small integers only, just by testing all
          primes (not to be considerd as serious prime factorization!)

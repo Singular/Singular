@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: poly.lib,v 1.51 2009-02-20 18:50:55 Singular Exp $";
+version="$Id: poly.lib,v 1.52 2009-04-07 09:30:44 seelisch Exp $";
 category="General purpose";
 info="
 LIBRARY:  poly.lib      Procedures for Manipulating Polys, Ideals, Modules
@@ -258,8 +258,8 @@ proc freerank
 "USAGE:   freerank(M[,any]);  M=poly/ideal/vector/module/matrix
 COMPUTE: rank of module presented by M in case it is free.
          By definition this is vdim(coker(M)/m*coker(M)) if coker(M)
-         is free, where m = maximal ideal of the variables of the
-         basering and M is considered as matrix.
+         is free, where m is the maximal ideal of the variables of the
+         basering and M is considered to be a matrix.
          (the 0-module is free of rank 0)
 RETURN:  rank of coker(M) if coker(M) is free and -1 else;
          in case of a second argument return a list:
@@ -360,9 +360,7 @@ proc maxdeg (id)
 RETURN:  int/intmat, each component equals maximal degree of monomials in the
          corresponding component of id, independent of ring ordering
          (maxdeg of each var is 1).
-         Of type int if id is of type poly, of type intmat else
-NOTE:    proc maxdeg1 returns an integer, the absolute maximum; moreover, it has
-         an option for computing weighted degrees
+         Of type int, if id is of type poly; of type intmat otherwise
 SEE ALSO: maxdeg1
 EXAMPLE: example maxdeg; shows examples
 "
@@ -497,8 +495,7 @@ proc mindeg (id)
 RETURN:  minimal degree/s of monomials of id, independent of ring ordering
          (mindeg of each variable is 1) of type int if id of type poly, else
          of type intmat.
-NOTE:    proc mindeg1 returns one integer, the absolute minimum; moreover it
-         has an option for computing weighted degrees.
+SEE ALSO: mindeg1
 EXAMPLE: example mindeg; shows examples
 "
 {
@@ -629,8 +626,8 @@ example
 
 proc normalize (id)
 "USAGE:   normalize(id);  id=poly/vector/ideal/module
-RETURN:  object of same type,s
-         each element is normalized to make its leading coefficient equal to 1
+RETURN:  object of same type
+         each element is normalized with leading coefficient equal to 1
 EXAMPLE: example normalize; shows an example
 "
 {

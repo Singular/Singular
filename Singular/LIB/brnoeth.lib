@@ -1,4 +1,4 @@
-version="$Id: brnoeth.lib,v 1.20 2008-10-07 17:36:30 Singular Exp $";
+version="$Id: brnoeth.lib,v 1.21 2009-04-07 09:30:44 seelisch Exp $";
 category="Coding theory";
 info="
 LIBRARY:   brnoeth.lib  Brill-Noether Algorithm, Weierstrass-SG and AG-codes
@@ -7,28 +7,28 @@ AUTHORS:   Jose Ignacio Farran Martin, ignfar@eis.uva.es
 
 OVERVIEW:
  Implementation of the Brill-Noether algorithm for solving the
- Riemann-Roch problem and applications in Algebraic Geometry codes.
+ Riemann-Roch problem and applications to Algebraic Geometry codes.
  The computation of Weierstrass semigroups is also implemented.@*
  The procedures are intended only for plane (singular) curves defined over
  a prime field of positive characteristic.@*
  For more information about the library see the end of the file brnoeth.lib.
 
 MAIN PROCEDURES:
- Adj_div(f);            computes the conductor of a curve
- NSplaces(h,A);         computes non-singular places with given degrees
- BrillNoether(D,C);     computes a vector space basis of the linear system L(D)
- Weierstrass(P,m,C);    computes the Weierstrass semigroup of C at P up to m
- extcurve(d,C);         extends the curve C to an extension of degree d
- AGcode_L(G,D,E);       computes the evaluation AG code with divisors G and D
- AGcode_Omega(G,D,E);   computes the residual AG code with divisors G and D
- prepSV(G,D,F,E);       preprocessing for the basic decoding algorithm
- decodeSV(y,K);         decoding of a word with the basic decoding algorithm
+ Adj_div(f)            computes the conductor of a curve
+ NSplaces(h,A)         computes non-singular places with given degrees
+ BrillNoether(D,C)     computes a vector space basis of the linear system L(D)
+ Weierstrass(P,m,C)    computes the Weierstrass semigroup of C at P up to m
+ extcurve(d,C)         extends the curve C to an extension of degree d
+ AGcode_L(G,D,E)       computes the evaluation AG code with divisors G and D
+ AGcode_Omega(G,D,E)   computes the residual AG code with divisors G and D
+ prepSV(G,D,F,E)       preprocessing for the basic decoding algorithm
+ decodeSV(y,K)         decoding of a word with the basic decoding algorithm
 
 AUXILIARY PROCEDURES:
- closed_points(I);      computes the zero-set of a zero-dim. ideal in 2 vars
- dual_code(C);          computes the dual code
- sys_code(C);           computes an equivalent systematic code
- permute_L(L,P);        applies a permutation to a list
+ closed_points(I)      computes the zero-set of a zero-dim. ideal in 2 vars
+ dual_code(C)          computes the dual code
+ sys_code(C)           computes an equivalent systematic code
+ permute_L(L,P)        applies a permutation to a list
 
 KEYWORDS:  Weierstrass semigroup; Algebraic Geometry codes;
            Brill-Noether algorithm
@@ -3344,7 +3344,7 @@ proc BrillNoether (intvec G,list CURVE)
 RETURN:   list of ideals (each of them with two homogeneous generators,
           which represent the numerator, resp. denominator, of a rational
           function).@*
-          The corresponding rational functions form a vector basis of the
+          The corresponding rational functions form a vector space basis of the
           linear system L(G), G a rational divisor over a non-singular curve.
 NOTE:     The procedure must be called from the ring CURVE[1][2], where
           CURVE is the output of the procedure @code{NSplaces}. @*
@@ -3942,7 +3942,7 @@ NOTE:     The procedure must be called within the ring EC[1][4],
           place in EC[1][5] (i.e., to POINTS[i], etc., see @ref{extcurve}).@*
           The intvec G represents a rational divisor (see @ref{BrillNoether}
           for more details).@*
-          The code evaluates the vector basis of L(G) at the rational
+          The code evaluates the vector space basis of L(G) at the rational
           places given by D.
 WARNINGS: G should satisfy @math{ 2*genus-2 < deg(G) < size(D) }, which is
           not checked by the algorithm.

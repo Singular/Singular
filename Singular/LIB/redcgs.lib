@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: redcgs.lib,v 1.4 2009-02-26 14:07:04 Singular Exp $";
+version="$Id: redcgs.lib,v 1.5 2009-04-07 09:30:44 seelisch Exp $";
 category="General purpose";
 info="
 LIBRARY:  redcgs.lib      Reduced Comprehensive Groebner Systems.
@@ -3252,7 +3252,7 @@ RETURN:   The list representing the Minimal Reduced CGS.
           The description given here is identical for rcgs and crcgs.
           The elements of the list T computed by mrcgs are lists representing
           a rooted tree.
-          Each element has as the two first entries with the following content:
+          Each element has as the two first entries with the following content:@*
            [1]: The label (intvec) representing the position in the rooted
                 tree:  0 for the root (and this is a special element)
                        i for the root of the segment i
@@ -3595,7 +3595,7 @@ RETURN:   The list representing the Reduced CGS.
           The description given here is analogous as for mrcgs and crcgs.
           The elements of the list T computed by rcgs are lists representing
           a rooted tree.
-          Each element has as the two first entries with the following content:
+          Each element has as the two first entries with the following content:@*
            [1]: The label (intvec) representing the position in the rooted
                 tree:  0 for the root (and this is a special element)
                        i for the root of the segment i
@@ -3777,7 +3777,7 @@ RETURN:   The list representing the Canonical Reduced CGS.
           The description given here is identical for mrcgs and rcgs.
           The elements of the list T computed by crcgs are lists representing
           a rooted tree.
-          Each element has as the two first entries with the following content:
+          Each element has as the two first entries with the following content:@*
            [1]: The label (intvec) representing the position in the rooted
                 tree:  0 for the root (and this is a special element)
                        i for the root of the segment i
