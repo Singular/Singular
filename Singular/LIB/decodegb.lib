@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: decodegb.lib,v 1.11 2009-04-06 13:30:27 Singular Exp $";
+version="$Id: decodegb.lib,v 1.12 2009-04-07 16:35:41 seelisch Exp $";
 category="Coding theory";
 info="
 LIBRARY: decodegb.lib         Decoding and min distance of linear codes with GB
@@ -1569,7 +1569,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 // construct the list of all vectors of length m with elements in p^e, where p
-//is characteristics
+// is theharacteristic
 proc pointsGen (int m, int e)
 {
      if (e>1)
@@ -1996,7 +1996,7 @@ proc decodeRandomFL(int n, int redun, int p, int e, int t, int ncodes, int ntria
 @format
           - n is length of codes generated, 
           - redun = redundancy of codes generated,
-          - p is characteristics,
+          - p is the characteristic,
           - e is the extension degree,
           - t is the number of errors to correct,
           - ncodes is the number of random codes to be processed,
