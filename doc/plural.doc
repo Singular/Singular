@@ -528,6 +528,7 @@ $Q \rightarrow (Z/p)(a, \ldots)$
 Q -> (Z/p)(a,..)
 @end ifinfo
 @end itemize
+@strong{Note:}
 In these cases the denominator and the numerator
 of a number are mapped separately by the usual
 map from Z to Z/p, and the image of the number
@@ -633,7 +634,7 @@ an identifier of type map
 @item
 a function returning map
 @item
-map expressions combined by composition using parentheses (@code{(}, @code{)})
+a composition of maps using parentheses, e.g. @code{f(g)}
 @end enumerate
 
 @c ------------------------------

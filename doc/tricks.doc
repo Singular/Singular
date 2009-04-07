@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: tricks.doc,v 1.24 2009-01-06 14:06:50 Singular Exp $
+@comment $Id: tricks.doc,v 1.25 2009-04-07 16:29:33 seelisch Exp $
 @comment this file contains the "Tricks and pittfalls" sections
 
 @c The following directives are necessary for proper compilation
@@ -36,9 +36,10 @@
 @sc{Singular} has the following limitations:
 @itemize @bullet
 @item
-the characteristic of a prime field must be less or equal than 2147483629 (2^31)
+the characteristic of a prime field must be less than or equal to 2147483629 (2^31)
 @* (the characteristic of a prime field in the factory routines must be less than 536870912 (2^29))
-@* (the characteristic of a prime field in the NTL routines must be less than NTL_SP_BOUND (2^30) on 32bit machines - always the case, as currently only factory uses NTL)
+@* (the characteristic of a prime field in the NTL routines must be less than NTL_SP_BOUND (2^30) on 32bit
+machines - This is always the case since currently, only factory uses NTL.)
 @item
 the number of elements in GF(p,n) must be less than 65536
 @item
@@ -48,7 +49,7 @@ the rank of any free module
 must be less or equal than 2147483647
 @item
 the maximal allowed exponent of a ring variable
-depend on the ordering of the ring and is at least 32767.
+depends on the ordering of the ring and is at least 32767.
 @c TBC -- number of max parameters
 @item
 the precision of long floating point numbers (for ground field @code{real})
@@ -287,7 +288,7 @@ if (i == 1) return i;    // WRONG!!!!!
 @noindent results in an error. Instead, it must be written as
 
 @smallexample
-if (i == 1) @{ return (i); @}
+if (i == 1) @{ return (i); @}.
 @end smallexample
 
 @c ---------------------------------------

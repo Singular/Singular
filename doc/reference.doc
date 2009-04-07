@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.332 2009-03-19 08:54:12 seelisch Exp $
+@comment $Id: reference.doc,v 1.333 2009-04-07 16:29:33 seelisch Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -6331,24 +6331,22 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{subst (} poly_expression@code{,} variable@code{,} poly_expression @code{)}
+@*@code{subst (} poly_expression@code{,} variable@code{,} poly_expression{,...} variable@code{,} poly_expression @code{)}
 @*@code{subst (} vector_expression@code{,} variable@code{,} poly_expression @code{)}
 @*@code{subst (} ideal_expression@code{,} variable@code{,} poly_expression @code{)}
 @*@code{subst (} module_expression@code{,} variable@code{,} poly_expression @code{)}
 @item @strong{Type:}
 poly, vector, ideal or module (corresponding to the first argument)
 @item @strong{Purpose:}
-substitutes a ring variable/parameter variable by a polynomial.
-@item @strong{Note:}
-use @code{map} for substitutions by polynomials.
+substitutes one or more ring variable(s)/parameter variable(s) by (a) polynomial(s).
 @item @strong{Example:}
 @smallexample
 @c example
   ring r=0,(x,y,z),dp;
   poly f=x2+y2+z2+x+y+z;
-  subst(f,x,3/2);
   int a=1;
-  subst(f,y,a);
-  subst(f,y,z);
+  subst(f,x,a);       // substitute one variable
+  subst(f,x,1,y,2z);  // substitute two variables
 @c example
 @end smallexample
 @end table

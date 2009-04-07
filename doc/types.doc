@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.144 2009-02-20 19:00:56 Singular Exp $
+@comment $Id: types.doc,v 1.145 2009-04-07 16:29:33 seelisch Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -81,7 +81,7 @@ They can only be contructed from other types (int, number).
 @code{bigint} name @code{=} int_expression @code{;}
 
 @item Purpose:
-defines a large integer variable.
+defines a long integer variable
 
 @item Default:
 0
@@ -109,11 +109,11 @@ an identifier of type bigint
 @item
 a function returning bigint
 @item
-bigint expressions combined by the arithmetic operations
+an expression involving bigints and the arithmetic operations
 @code{+}, @code{-}, @code{*}, @code{div},
 @code{%} (@code{mod}), or @code{^}
 @item
-a type cast to bigint
+a type cast to bigint.
 @end enumerate
 
 @*@strong{Example:}
@@ -162,7 +162,7 @@ integer modulo (the remainder of the division @code{div}), always non-negative
 @item @code{^}, @code{**}
 exponentiation (exponent must be non-negative)
 @item @code{<}, @code{>}, @code{<=}, @code{>=}, @code{==}, @code{<>}
-comparison
+comparators
 @end table
 
 @*@strong{Example:}
@@ -281,7 +281,7 @@ Like polynomials they
 can only be defined or accessed with respect to a basering.
 
 @strong{Note:} @code{size} counts only the non-zero generators of an ideal
-whereas @code{ncols} counts all generators.
+whereas @code{ncols} counts all generators; see @ref{size}, @ref{ncol}.
 @menu
 * ideal declarations::
 * ideal expressions::
@@ -372,8 +372,8 @@ a type cast to ideal
 @subsection ideal operations
 @cindex ideal operations
 @cindex +
-ycindex *
-ycindex ^
+@cindex *
+@cindex ^
 
 @table @asis
 @item @code{+}
@@ -446,7 +446,7 @@ computation of univariate polynomials lying in a zero dimensional ideal
 Groebner basis computation (a wrapper around @code{std,stdhilb,stdfglm},...)
 (see @ref{groebner})
 @item highcorner
-computes the smallest monomial not contained in the ideal.
+the smallest monomial not contained in the ideal.
 The ideal has to be zero-dimensional.
 (see @ref{highcorner})
 @item homog
@@ -484,7 +484,7 @@ minimal generating set of a homogeneous ideal, resp.@: module, or an ideal, resp
 @item minor
 set of minors of a matrix (see @ref{minor})
 @item modulo
-represents
+representation of
 @tex
 $(h1+h2)/h1 \cong h2/(h1 \cap h2)$
 @end tex
@@ -502,7 +502,7 @@ multiplicity, resp.@: degree, of the ideal of leading terms (see @ref{mult})
 @item ncols
 number of columns (see @ref{ncols})
 @item nres
-computes a free resolution of an ideal resp.@: module M which is
+a free resolution of an ideal resp.@: module M which is
 minimized from the second free module on (see @ref{nres})
 @item preimage
 preimage under a ring map (see @ref{preimage})
@@ -516,7 +516,7 @@ normalform with respect to a standard basis (see @ref{reduce})
 free resolution of an ideal resp.@: module but not changing the given ideal resp.@: module
 (see @ref{res})
 @item simplify
-simplify a set of polynomials (see @ref{simplify})
+simplification of a set of polynomials (see @ref{simplify})
 @item size
 number of non-zero generators (see @ref{size})
 @item slimgb
@@ -532,7 +532,7 @@ standard basis computation with fglm technique (see @ref{stdfglm})
 @item stdhilb
 Hilbert driven standard basis computation (see @ref{stdhilb})
 @item subst
-substitute a ring variable (see @ref{subst})
+substitution of a ring variable (see @ref{subst})
 @item syz
 computation of the first syzygy module (see @ref{syz})
 @item vdim
@@ -613,7 +613,7 @@ an identifier of type int
 @item
 a function returning int
 @item
-int expressions combined by the arithmetic operations
+an expression involving ints and the arithmetic operations
 @code{+}, @code{-}, @code{*}, @code{div}, @code{/},
 @code{%} (@code{mod}), or @code{^}
 @item a boolean expression
@@ -708,7 +708,7 @@ integer modulo (the remainder of the division @code{div}), always non-negative
 @item @code{^}, @code{**}
 exponentiation (exponent must be non-negative)
 @item @code{<}, @code{>}, @code{<=}, @code{>=}, @code{==}, @code{<>}
-comparison
+comparators
 @end table
 
 @strong{Note:} An assignment @code{j=i++;} or @code{j=i--;} is not allowed,
@@ -806,20 +806,20 @@ resp.@: of freemodule modulo module of leading terms (see @ref{vdim})
 @cindex <=
 @cindex >=
 
-A boolean expression is really an int expression used in a logical context:
+A boolean expression is an int expression used in a logical context:
 
 @c item
-@*An int expression (<> 0 evaluates to @emph{TRUE} (represented by 1),
-0 represents @emph{FALSE}).
+@*An int expression <> 0 evaluates to @emph{TRUE} (represented by 1),
+0 evaluates to @emph{FALSE} (represented by 0).
 
 The following is the list of available comparisons of objects of the same type.
 
-@strong{Note:} There are no comparisons for ideals and modules, resolution
+@strong{Note:} There are no comparisons for ideals and modules, resolutions
 and maps.
 
 @enumerate
 @item
-an integer comparison:
+integer comparisons:
 @smallexample
   i == j
   i != j    // or     i <> j
@@ -829,7 +829,7 @@ an integer comparison:
   i < j
 @end smallexample
 @item
-a number comparison:
+number comparisons:
 @smallexample
   m == n
   m != n    // or     m <> n
@@ -846,7 +846,7 @@ For numbers from Z/p or from field extensions not all operations are useful:
 (@code{>=,<=}) yield always TRUE (1) and
 the @code{<} and @code{>} are equivalent to @code{!=}.
 @item
-a polynomial or vector comparison:
+polynomial or vector comparisons:
 @smallexample
   f == g
   f != g    // or     f <> g
@@ -856,13 +856,13 @@ a polynomial or vector comparison:
   f >  g
 @end smallexample
 @item
-an intmat or matrix comparison:
+intmat or matrix comparisons:
 @smallexample
   v == w
   v != w    // or     v <> w
 @end smallexample
 @item
-an intvec or  string comparison:
+intvec or  string comparisons:
 @smallexample
   f == g
   f != g    // or     f <> g
@@ -1005,9 +1005,9 @@ an identifier of type intmat
 @item
 a function returning intmat
 @item
-intmat operations with int (@code{+}, @code{-}, @code{*}, @code{div}, @code{%})
+an intmat operation involving ints and int operations (@code{+}, @code{-}, @code{*}, @code{div}, @code{%})
 @item
-intmat operations (@code{+}, @code{-}, @code{*})
+an expression involving intmats and the operations (@code{+}, @code{-}, @code{*})
 @item
 a type cast to intmat (@pxref{intmat type cast})
 @end enumerate
@@ -1093,7 +1093,7 @@ division of entries in the integers (omitting the remainder)
 @item @code{%, mod}
 entries modulo int (remainder of the division)
 @item @code{<>}, @code{==}
-comparison
+comparators
 
 @item intmat_expression @code{[} intvec_expression@code{,} intvec_expression @code{]}
 is an intmat entry, where the first index indicates the row and the
@@ -1138,7 +1138,7 @@ number of cols (see @ref{ncols})
 @item nrows
 number of rows (see @ref{nrows})
 @item random
-create a pseudo random intmat (see @ref{random})
+pseudo random intmat (see @ref{random})
 @item size
 total number of entries (see @ref{size})
 @item transpose
@@ -1223,11 +1223,11 @@ a repeated entry: int expression @code{:} positive int expression
 @item
 a function returning intvec
 @item
-intvec operations with int (@code{+}, @code{-}, @code{*}, @code{/}, @code{%})
+an expression involving intvec operations with int (@code{+}, @code{-}, @code{*}, @code{/}, @code{%})
 @item
-intvec operations (@code{+}, @code{-})
+an expression of intvecs involving intvec operations (@code{+}, @code{-})
 @item
-intvec operation with intmat (@code{*})
+an expression involving an intvec operation with intmat (@code{*})
 @item
 a type cast to intvec
 @end enumerate
@@ -1317,7 +1317,7 @@ is an element of the intvec; the first element has index one.
 
 @table @code
 @item hilb
-returns Hilbert series as intvec (see @ref{hilb})
+Hilbert series as intvec (see @ref{hilb})
 @item indepSet
 sets of independent variables of an ideal (see @ref{indepSet})
 @item leadexp
@@ -1325,7 +1325,7 @@ the exponent vector of the leading monomial (see @ref{leadexp})
 @item nrows
 number of rows (see @ref{nrows})
 @item qhweight
-returns quasihomogeneous weights (see @ref{qhweight})
+quasihomogeneous weights (see @ref{qhweight})
 @item size
 length of the intvec (see @ref{size})
 @item sortvec
@@ -1333,7 +1333,7 @@ permutation for sorting ideals/modules (see @ref{sortvec})
 @item transpose
 transpose of an intvec, returns an intmat (see @ref{transpose})
 @item weight
-returns weights for the weighted ecart method (see @ref{weight})
+weights for the weighted ecart method (see @ref{weight})
 @end table
 
 @c ---------------------------------------
@@ -1563,7 +1563,7 @@ read operation. If the expression read from an MP link is not from the
 same ring as the current ring, then a @code{read} changes the current
 ring.
 
-Currently, MP links are only available on Unix platforms and data is
+@strong{Note:} Currently, MP links are only available on Unix platforms and data is
 written without attributes (which is likely to change in future
 versions). For a general description of MP, see
 @code{http://www.symbolicnet.org/areas/mp.html}.
@@ -1710,7 +1710,7 @@ There are the following default values:
 @item if no remote shell (rsh) command is specified, then the command
 @code{ssh} is used.
 
-@item if no application is specified (in mode @code{launch}) the default
+@item if no application is specified in mode @code{launch} the default
 application is the value of @code{system("Singular") + "-bq"}.
 (This evaluates to the absolute path of the @sc{Singular} currently running
 with the option @code{"-bq"} appended.)
@@ -1863,7 +1863,7 @@ Note that @code{name} must be given without the suffix @code{.pag} or
 @section list
 @cindex list
 
-Lists are arrays whose elements can be of any type (including ring and
+Lists are arrays whose elements can be of different types (including ring and
 qring). If one element belongs to a ring the whole list belongs to that
 ring. This applies also to the special list @code{#}. The expression
 @code{list()} is the empty list.
@@ -1972,11 +1972,10 @@ is a list entry; the index 1 gives the first element.
 @smallexample
 @c example
   list l1 = 1,"hello",list(-1,1);
-  list l2 = list(1,2,3);
-  l1 + l2;          // one new list
-  list l3 =_;
-  l1,l2;            // two lists
-  l2[2];
+  list l2 = list(1,5,7);
+  l1 + l2;             // a new list
+  l2 = delete(l2, 2);  // delete 2nd entry
+  l2;
 @c example
 @end smallexample
 
@@ -1992,17 +1991,17 @@ of an intvec (permutations of columns, see @ref{bareiss})
 @item betti
 Betti numbers of a resolution (see @ref{betti})
 @item delete
-deletes an element from a list (see @ref{delete})
+deletion of an element from a list (see @ref{delete})
 @item facstd
 factorizing Groebner basis algorithm (see @ref{facstd})
 @item factorize
 list of factors of a polynomial (see @ref{factorize})
 @item insert
-inserts or appends a new element to a list (see @ref{insert})
+insertion of a new element into a list (see @ref{insert})
 @item lres
 free resolution (see @ref{lres})
 @item minres
-minimize a free resolution (see @ref{minres})
+minimization of a free resolution (see @ref{minres})
 @item mres
 minimal free resolution of an ideal, resp.@: module w.r.t.
 a minimal set of generators of the first module (see @ref{mres})
@@ -2027,9 +2026,9 @@ Maps are ring maps from a preimage ring into the basering.
 @strong{Note:}
 @itemize @bullet
 @item
-the target of a map is @strong{ALWAYS} the actual basering
+The target of a map is @strong{ALWAYS} the actual basering
 @item
-the preimage ring has to be stored "by its name", that means, maps can only be
+The preimage ring has to be stored "by its name", that means, maps can only be
 used in such contexts, where the name of the preimage ring can be
 resolved (this has to be considered in subprocedures).
 @c (i.e., there might be problems for rings/maps defined in subprocedures).
@@ -2301,7 +2300,7 @@ a convenient map procedure for inclusions and projections of rings (see @ref{ima
 @item preimage
 preimage under a ring map (see @ref{preimage})
 @item subst
-substitute a ring variable (see @ref{subst})
+substitution of a ring variable (see @ref{subst})
 @end table
 
 See also the libraries @ref{algebra_lib} and @ref{ring_lib}, which contain more
@@ -2315,7 +2314,7 @@ functions, related to maps.
 Objects of type matrix are matrices with polynomial entries.
 Like polynomials they can
 only be defined or accessed with respect to a basering. In order to
-compute with matrices having integer or rational entries define a ring
+compute with matrices having integer or rational entries, define a ring
 with characteristic 0 and at least one variable.
 
 A matrix can be multiplied by and added to a poly; in this case the
@@ -2428,7 +2427,7 @@ Converts expression to a matrix, where expression must be of type int,
 intmat, intvec, number, poly, ideal, vector, module, or matrix. If
 int_n and int_m are supplied, then they specify the dimension of the
 matrix. Otherwise, the size (resp.@: dimensions) of the matrix
-are determined  by the size (resp.@: dimensions) of the
+is determined by the size (resp.@: dimensions) of the
 expression.
 @item @strong{Example:}
 @smallexample
@@ -2460,7 +2459,7 @@ matrix
 
 @item @code{-}
 negation or subtraction with matrix or poly
-(the matrix should be the first operand);
+(the first operand is expected to be a matrix);
 the poly is converted into a diagonal matrix
 
 @item @code{*}
@@ -2471,7 +2470,7 @@ diagonal matrix
 division by poly
 
 @item @code{==}, @code{<>}, @code{!=}
-comparison
+comparators
 
 @item matrix_expression @code{[} int_expression@code{,} int_expression @code{]}
 is a matrix entry, where the first index indicates the row and the
@@ -2542,7 +2541,7 @@ substitute a ring variable (see @ref{subst})
 @item trace
 trace of a matrix (see @ref{trace})
 @item transpose
-transpose a matrix (see @ref{transpose})
+transposed matrix (see @ref{transpose})
 @item wedge
 wedge product (see @ref{wedge})
 @end table
@@ -2566,16 +2565,15 @@ Like vectors they
 can only be defined or accessed with respect to a basering.
 
 @iftex
-If @math{M} is a submodule of @math{R^n}, @math{R} the basering,
+If @math{R} is the basering, and @math{M} is a submodule of @math{R^n}
 generated by vectors @math{v_1, \ldots, v_k}, then @math{v_1, \ldots, v_k}
-may be considered as the generators of relations of @math{R^n/M}
-between the canonical generators @code{gen(1)},@dots{},@code{gen(n)}.
-Hence any finitely generated @math{R}-module can be represented in @sc{Singular}
-by its module of relations. The assignments
-@code{module M=v1,...,vk; matrix A=M;}
-create the presentation matrix of size n@math{\times}k for @math{R^n/M},
-i.e., the columns of A are the vectors @math{v_1, \ldots, v_k}
-which generate M (cf. @ref{Representation of mathematical objects}).
+may be considered as the generators of relations of @math{R^n/M} between the
+canonical generators @code{gen(1)},@dots{},@code{gen(n)}. Hence any finitely
+generated @math{R}-module can be represented in @sc{Singular} by its module
+of relations. The assignments @code{module M=v1,...,vk; matrix A=M;} create
+the presentation matrix of size n@math{\times}k for @math{R^n/M}, i.e., the
+columns of A are the vectors @math{v_1, \ldots, v_k} which generate M (cf.
+@ref{Representation of mathematical objects}).
 @end iftex
 
 @ifinfo
@@ -2756,7 +2754,7 @@ minimal free resolution of an ideal resp.@: module w.r.t. a minimal set of gener
 @item mult
 multiplicity, resp.@: degree, of the module of leading terms (see @ref{mult})
 @item nres
-computes a free resolution of an ideal resp.@: module M which is
+computation of a free resolution of an ideal resp.@: module M which is
 minimized from the second free module on (see @ref{nres})
 @item ncols
 number of columns (see @ref{ncols})
@@ -2765,7 +2763,7 @@ number of rows (see @ref{nrows})
 @item print
 nice print format (see @ref{print})
 @item prune
-minimize the embedding into a free module (see @ref{prune})
+minimization of the embedding into a free module (see @ref{prune})
 @item qhweight
 quasihomogeneous weights of an ideal, resp.@: module (see @ref{qhweight})
 @item quotient
@@ -2776,7 +2774,7 @@ normalform with respect to a standard basis (see @ref{reduce})
 free resolution of an ideal, resp.@: module, but not changing the given ideal, resp.@: module
 (see @ref{res})
 @item simplify
-simplify a set of vectors (see @ref{simplify})
+simplification of a set of vectors (see @ref{simplify})
 @item size
 number of non-zero generators (see @ref{size})
 @item sortvec
@@ -2786,7 +2784,7 @@ free resolution of a standard basis (see @ref{sres})
 @item std
 standard basis computation (see @ref{std}, @ref{liftstd})
 @item subst
-substitute a ring variable (see @ref{subst})
+substitution of a ring variable (see @ref{subst})
 @item syz
 computation of the first syzygy module (see @ref{syz})
 @item vdim
@@ -2817,8 +2815,8 @@ which determines the coefficient field. See @ref{ring declarations} for
 declarations of coefficient fields.
 
 @strong{Warning:} Beware of the special meaning of the letter @code{e}
-(immediately following a sequence of digits) if the field is real (or complex).
-See @ref{number operations}, @ref{Miscellaneous oddities}.
+(immediately following a sequence of digits) if the field is real (or complex),
+@ref{Miscellaneous oddities}.
 
 @menu
 * number declarations::
@@ -2977,7 +2975,7 @@ comparison
 integer modulo (the remainder of the division @code{div}), always non-negative
 @end table
 
-@strong{Note:} quotient and exponentiation is only recognized as a
+@strong{Note:} Quotient and exponentiation is only recognized as a
 number expression if it is already a number, see @ref{Miscellaneous
 oddities}.
 @* For the behavior of comparison operators in rings with
@@ -3012,13 +3010,13 @@ expressions}.
 
 @table @code
 @item cleardenom
-cancel denominators of numbers in poly and divide it by its content
+cancellation of denominators of numbers in poly and divide it by its content
 (see @ref{cleardenom})
 @item impart
 imaginary part of a complex number, 0 otherwise
 (see @ref{impart}, @ref{repart})
 @item numerator, denominator
-return the numerator/denominator of a rational number
+the numerator/denominator of a rational number
 (see @ref{numerator}, @ref{denominator})
 @item leadcoef
 coefficient of the leading term (see @ref{leadcoef})
@@ -3176,9 +3174,9 @@ A poly expression is (optional parts in square brackets):
 @item
 a monomial (there are NO spaces allowed inside a monomial)
 @smallexample
-  [coefficient] ring_variable [ exponent] [ring_variable [exponent] @dots{}]
+  [coefficient] ring_variable [ exponent] [ring_variable [exponent] @dots{}].
 @end smallexample
-monomials which contain an indexed ring variable
+Monomials which contain an indexed ring variable
 must be built from @code{ring_variable} and @code{coefficient}
 with the operations @code{*} and @code{^}
 @item
@@ -3244,7 +3242,7 @@ division by a polynomial, non divisible terms yield 0
 power by a positive integer
 
 @item @code{<}, @code{<=}, @code{>}, @code{>=}, @code{==}, @code{<>}
-comparison (of leading monomials w.r.t. monomial ordering)
+comparators (considering leading monomials w.r.t. monomial ordering)
 
 @item poly_expression @code{[} intvec_expression @code{]}
 the sum of monomials at the indicated places w.r.t. the monomial ordering
@@ -3282,7 +3280,7 @@ the sum of monomials at the indicated places w.r.t. the monomial ordering
 
 @table @code
 @item cleardenom
-cancel denominators of numbers in poly and divide it by its content
+cancellation of denominators of numbers in poly and divide it by its content
 (see @ref{cleardenom}; @ref{content})
 @item coef
 matrix of coefficients and monomials (see @ref{coef})
@@ -3297,9 +3295,9 @@ partial derivative (see @ref{diff})
 @item extgcd
 Bezout representation of gcd (see @ref{extgcd})
 @item factorize
-factorize polynomial (see @ref{factorize})
+factorization of polynomial (see @ref{factorize})
 @item finduni
-find univariate polynomials in a zero-dimensional ideal (see @ref{finduni})
+univariate polynomials in a zero-dimensional ideal (see @ref{finduni})
 @item gcd
 greatest common divisor (see @ref{gcd})
 @item homog
@@ -3325,11 +3323,11 @@ normal form with respect to a standard base (see @ref{reduce})
 @item rvar
 test for ring variable (see @ref{rvar})
 @item simplify
-normalize a polynomial (see @ref{simplify})
+normalization of a polynomial (see @ref{simplify})
 @item size
 number of monomials (see @ref{size})
 @item subst
-substitute a ring variable (see @ref{subst})
+substitution of a ring variable (see @ref{subst})
 @item trace
 trace of a matrix (see @ref{trace})
 @item var
@@ -3466,7 +3464,7 @@ of rings and quotient rings see @ref{Rings and orderings}.
 @item Default:
 none
 @item Purpose:
-declares a quotient ring as the basering modulo ideal_expression.  Sets
+declares a quotient ring as the basering modulo ideal_expression and sets
 it as current basering.
 @item Example:
 @smallexample
@@ -3495,7 +3493,7 @@ and modules, a resolution can only be defined w.r.t.@: a basering
 (see @ref{Syzygies and resolutions}).
 
 @strong{Note:}
-to access the elements of a resolution, it has to be assigned to a list.
+To access the elements of a resolution, it has to be assigned to a list.
 This assignment also completes computations and may therefore take time,
 (resp.@: an access directly with the brackets @code{[ , ]} causes
 implicitly a cast to a list).
@@ -3690,9 +3688,9 @@ name of the n-th ring parameter (see @ref{parstr})
 @item qring
 quotient ring (see @ref{qring})
 @item ringlist
-decomposes a ring into a list of its components (see @ref{ringlist})
+decomposition of a ring into a list of its components (see @ref{ringlist})
 @item setring
-set a new basering (see @ref{setring})
+setting of a new basering (see @ref{setring})
 @item varstr
 names of all ring variables or the
 name of the n-th ring variable (see @ref{varstr})
@@ -3708,6 +3706,7 @@ construct a new ring @math{k[X,Y]} from @math{k_1[X]}  and @math{k_2[Y]}.
 (The sets of variables must be distinct).
 @end table
 
+@strong{Note:}
 Concerning the ground fields @math{k_1} and @math{k_2} take the
 following guide lines into consideration:
 @itemize @bullet
@@ -3946,7 +3945,7 @@ is a expression list of characters from the string
   s[2]="BC"; s;
   intvec v=1,3,5;
   s=s[v]; s;
-  s="123456"; s=s[3..5]; s;
+  s="654321"; s=s[3..5]; s;
 @c example
 @end smallexample
 
@@ -4108,7 +4107,7 @@ negation or subtraction
 division by a monomial, not divisible terms yield 0
 
 @item @code{<}, @code{<=}, @code{>}, @code{>=}, @code{==}, @code{<>}
-comparison of leading terms w.r.t. monomial ordering
+comparators (considering leading terms w.r.t. monomial ordering)
 
 @item vector_expression @code{[} int_expressions @code{]}
 is a vector entry; the index 1 gives the first entry.
