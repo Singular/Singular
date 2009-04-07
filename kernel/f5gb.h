@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.35 2009-04-05 07:49:18 ederc Exp $ */
+/* $Id: f5gb.h,v 1.36 2009-04-07 13:30:01 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -19,6 +19,14 @@ sort polynomials in ideal i by decreasing total degree
 ======================================================
 */
 void qsortDegree(poly* left, poly* right);
+
+/*!
+ * ======================================================================
+ * builds the sum of the entries of the exponent vectors, i.e. the degree
+ * of the corresponding monomial
+ * ======================================================================
+*/
+long sumVector(int* v, int k);
 
 /**
 ==========================================================================

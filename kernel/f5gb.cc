@@ -63,19 +63,39 @@ void qsortDegree(poly* left, poly* right) {
     }
 }
 
-/**
+/*!
+ * ======================================================================
+ * builds the sum of the entries of the exponent vectors, i.e. the degree
+ * of the corresponding monomial
+ * ======================================================================
+*/
+long sumVector(int* v, int k) {
+    int i;
+    long sum =  0;
+    for(i=1; i<=k; i++) {
+        Print("%d\n",v[i]);
+        Print("%ld\n",sum);
+        sum =   sum + v[i];
+    }
+    return sum;
+}
+
+/*!
 ==========================================================================
-compare monomials, i.e. divisibility tests for criterion 1 and criterion 2
+compares monomials, i.e. divisibility tests for criterion 1 and criterion 2
 ==========================================================================
 */
-bool compareMonomials(int* m1, int** m2, int numberOfRules) {
+bool compareMonomials(int* m1, int** m2, int numberOfRules, int k) {
     int i,j;
-    int k   =   sizeof(m1) / sizeof(int);
+    long sumM1  =   sumVector(m1,k);
+    //int k   =   sizeof(m1) / sizeof(int);
     for(i=0; i<numberOfRules; i++) {
-        for(j=1; j<=k; j++) {
-            if(m1[j]>m2[i][j]) {
-                return true;
-            }
+        if(sumVector(m2[i],k) <= sumM1) {
+            for(j=1; j<=k; j++) {
+                if(m1[j]>m2[i][j]) {
+                    return true;
+                }
+            }   
         }
     }
     return false;
@@ -849,22 +869,20 @@ ideal F5main(ideal id, ring r) {
     poly pOne   =   pOne();
     number nOne =   nInit(1);
     // tag the first element of index i-1 for criterion 1 
-    LTagList* lTag  =   new LTagList();
     //Print("LTAG BEGINNING: %p\n",lTag);
     
     // DEBUGGING STUFF START
     //Print("NUMBER: %d\n",r->N);
     
     int* ev = new int[r->N +1];
-    int  ev2;
     for(i=0;i<IDELEMS(id);i++) {
         pGetExpV(id->m[i],ev);
         //ev2  =   pGetExp(id->m[i],1);
         pWrite(id->m[i]);
-        Print("%d\n",ev2);
         Print("EXP1: %d\n",ev[1]);
         Print("EXP2: %d\n",ev[2]);
         Print("EXP3: %d\n\n",ev[3]);
+        Print("SUM: %ld\n\n\n",sumVector(ev,r->N));
     }
     delete ev;
     
@@ -898,7 +916,8 @@ ideal F5main(ideal id, ring r) {
     //Print("%p\n",gPrev->getFirst()->getPoly());
     //pWrite(gPrev->getFirst()->getPoly());
 
-    lTag->insert(gPrev->getFirst());
+    LTagList* lTag  =   new LTagList(gPrev->getFirst());
+    //lTag->insert(gPrev->getFirst());
     lTag->setFirstCurrentIdx(gPrev->getFirst());
     // computing the groebner basis of the elements of index < actual index
     gbLength    =   gPrev->getLength();
@@ -1037,8 +1056,8 @@ ideal F5main(ideal id, ring r) {
     // }
     //gPrev->print();
     //delete lTag;
-    //delete rTag;
-    //delete gPrev;
+    delete rTag;
+    delete gPrev;
     reductionTime   =   0;
     spolsTime       =   0;
     return(gbPrev);
