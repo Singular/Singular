@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-04-06 14:57:18 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.29 2009-04-06 14:57:18 monerjan Exp $
-$Id: gfan.cc,v 1.29 2009-04-06 14:57:18 monerjan Exp $
+$Date: 2009-04-07 09:44:20 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.30 2009-04-07 09:44:20 monerjan Exp $
+$Id: gfan.cc,v 1.30 2009-04-07 09:44:20 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -266,6 +266,7 @@ class gcone
 			cout << "Rows = " << ddrows << endl;
 			cout << "Cols = " << ddcols << endl;
 #endif
+			
 			/*Write the normals into class facet*/
 #ifdef gfan_DEBUG
 			cout << "Creating list of normals" << endl;
@@ -274,7 +275,7 @@ class gcone
 			facet *fRoot = new facet();	//instantiate new facet
 			this->facetPtr = fRoot;		//set variable facetPtr of class gcone to first facet
 			facet *fAct; 			//instantiate pointer to active facet
-			fAct = fRoot;		//This does not seem to do the trick. fRoot and fAct have to point to the same adress!
+			fAct = fRoot;			//Seems to do the trick. fRoot and fAct have to point to the same adress!
 			std::cout << "fRoot = " << fRoot << ", fAct = " << fAct << endl;
 			for (int kk = 0; kk<ddrows; kk++)
 			{
@@ -290,15 +291,40 @@ class gcone
 					//check for flipability here
 					if (jj<ddcols)				//Is this facet NOT the last facet? Writing while instead of if is a really bad idea :)
 					{
-						fAct->next = new facet();	//If so: instantiate new facet. Otherwise this->next=NULL due to the constructor						
+						//fAct->next = new facet();	//If so: instantiate new facet. Otherwise this->next=NULL due to the constructor						
 					}
-				}//for jj<ddcols
-				/*Now load should be full and we can call setFacetNormal*/
-				fAct->setFacetNormal(load);
-				//fAct->printNormal();
-				fAct=fAct->next;	//this should definitely not be called in the above while-loop :D
+				}//for (int jj = 1; jj <ddcols; jj++)
+				/*Quick'n'dirty hack for flippability*/	
+				bool isFlippable;			
+				for (int jj = 0; jj<this->numVars; jj++)
+				{					
+					intvec *ivCanonical = new intvec(this->numVars);
+					(*ivCanonical)[jj]=1;					
+					if (dotProduct(load,ivCanonical)>=0)
+					{
+						isFlippable=FALSE;						
+					}
+					else
+					{
+						isFlippable=TRUE;
+					}					
+					delete ivCanonical;
+				}//for (int jj = 0; jj<this->numVars; jj++)
+				if (isFlippable==FALSE)
+				{
+					cout << "Ignoring facet";
+					load->show();
+					//fAct->next=NULL;
+				}
+				else
+				{	/*Now load should be full and we can call setFacetNormal*/
+					fAct->setFacetNormal(load);
+					fAct->next = new facet();
+					//fAct->printNormal();
+					fAct=fAct->next;	//this should definitely not be called in the above while-loop :D
+				}//if (isFlippable==FALSE)
 				delete load;
-			}
+			}//for (int kk = 0; kk<ddrows; kk++)
 			/*
 			Now we should have a linked list containing the facet normals of those facets that are
 			-irredundant
@@ -315,9 +341,6 @@ class gcone
 
 		}//method getConeNormals(ideal I)	
 		
-		/*bool isParallel(int v[], intvec iv)
-		{
-}*/
 		
 		/** \brief Compute the Groebner Basis on the other side of a shared facet 
 		*
@@ -334,10 +357,11 @@ class gcone
 		*/
 		void flip(ideal gb, facet *f)		//Compute "the other side"
 		{			
-			
 			intvec *fNormal = new intvec(this->numVars);	//facet normal, check for parallelity			
 			fNormal = f->getFacetNormal();	//read this->fNormal;
 #ifdef gfan_DEBUG
+			cout << "===" << endl;
+			cout << "running gcone::flip" << endl;
 			cout << "fNormal=";
 			fNormal->show();
 			cout << endl;
@@ -383,42 +407,58 @@ class gcone
 				pWrite(initialFormElement[ii]);
 				cout << "---" << endl;
 				/*Now initialFormElement must be added to (ideal)initialForm */
-				//f->flibGB->m[ii]=(poly)initialFormElement[ii];
-				//(poly)initialForm->m[ii]=pAdd(initialForm[ii],initialFormElement[ii]);
 				initialForm->m[ii]=initialFormElement[ii];
 			}//for
 			f->setFlipGB(initialForm);			
 #ifdef gfan_DEBUG
 			cout << "Initial ideal is: " << endl;
-			//idShow(initialForm);
+			idShow(initialForm);
 			f->printFlipGB();
 			cout << "===" << endl;
 #endif
 			delete check;
 			
-			/*2nd step: lift initial ideal to a GB of the neighbouring cone*/
-			ring tmpring=rCopy0(currRing);
-			tmpring->order[0]=ringorder_a;
-			tmpring->order[1]=ringorder_dp;
-			tmpring->order[2]=ringorder_C;
-			//rWrite(tmpring);
-			tmpring->wvhdl[0] =( int *)omAlloc((fNormal->length())*sizeof(int)); //found in Singular/ipshell.cc
+			/*2nd step: lift initial ideal to a GB of the neighbouring cone using minus alpha as weight*/
+			/*Substep 2.1
+			compute $G_{-\alpha}(in_v(I)) 
+			see journal p. 66
+			*/
+			ring srcRing=currRing;
+			ring dstRing=rCopy0(srcRing);
+			dstRing->order[0]=ringorder_a;
+			//tmpring->order[1]=ringorder_dp;
+			//tmpring->order[2]=ringorder_C;
+			dstRing->wvhdl[0] =( int *)omAlloc((fNormal->length())*sizeof(int)); //found in Singular/ipshell.cc
 			
 			for (int ii=0;ii<this->numVars;ii++)
-			{
-				cout << "ping" << endl;
-				tmpring->wvhdl[0][ii]=(*fNormal)[ii];	//What exactly am I doing here?
-				cout << "pong" << endl;
-				cout << *tmpring->wvhdl[ii] << endl;
+			{				
+				dstRing->wvhdl[0][ii]=-(*fNormal)[ii];	//What exactly am I doing here?
+				//cout << tmpring->wvhdl[0][ii] << endl;
 			}
-			//tmpring->wvhdl=(int**)(fNormal);
-			rComplete(tmpring);
-			rWrite(tmpring);
-			/*setring(tmpring);
-			ideal ina=initialForm;
+			rComplete(dstRing);
+			rChangeCurrRing(dstRing);
+			map theMap=(map)idMaxIdeal(1);
+			rWrite(currRing); cout << endl;
+			ideal ina;
+			ina=fast_map(initialForm,srcRing,(ideal)theMap,dstRing);			
+			cout << "ina=";
+			idShow(ina); cout << endl;
 			ideal H;
-			H=kstd(ina,NULL,testHomog,NULL);
-			idShow(H);*/
+			H=kStd(ina,NULL,isHomog,NULL);	//we know it is homogeneous
+			idSkipZeroes(H);
+			cout << "H="; idShow(H); cout << endl;
+			/*Substep 2.2
+			do the lifting
+			*/
+			rChangeCurrRing(srcRing);
+			ideal srcRing_H;
+			ideal srcRing_HH;
+			//map theMap = (map)idMaxIdeal(1);
+			srcRing_H=fast_map(H,dstRing,(ideal)theMap,srcRing);
+			srcRing_HH=srcRing_H-stdred(srcRing_H,this->gcBasis);
+			/*Substep 2.3
+			turn the minimal basis into a reduced one
+			*/
 			
 		}//void flip(ideal gb, facet *f)
 				
@@ -428,42 +468,41 @@ class gcone
 		*\param ideal
 		*\return void
 		*/
-		void getGB(const ideal &inputIdeal)
+		void getGB(ideal const &inputIdeal)
 		{
 			ideal gb;
 			gb=kStd(inputIdeal,NULL,testHomog,NULL);
 			idSkipZeroes(gb);
 			this->gcBasis=gb;	//write the GB into gcBasis
-		}
+		}//void getGB
 		
 		ideal GenGrbWlk(ideal, ideal);	//Implementation of the Generic Groebner Walk. Needed for a) Computing the sink and b) finding search facets
 
 
 		/** \brief Compute the dot product of two intvecs
 		*
-		* THIS IS WEIRD - BUT WORKS
 		*/
-		int dotProduct(intvec **a, intvec **b)				
+		int dotProduct(intvec const &iva, intvec const &ivb)				
 		{
-			intvec iva=*a;
-			intvec ivb=*b;
+			//intvec iva=a;
+			//intvec ivb=b;
 			int res=0;
 			for (int i=0;i<this->numVars;i++)
 			{
 				res = res+(iva[i]*ivb[i]);
 			}
 			return res;
-		}
+		}//int dotProduct
 
 		/** \brief Check whether two intvecs are parallel
 		*
 		* \f$ \alpha\parallel\beta\Leftrightarrow\langle\alpha,\beta\rangle^2=\langle\alpha,\alpha\rangle\langle\beta,\beta\rangle \f$
 		*/
-		bool isParallel(intvec *a, intvec *b)
+		bool isParallel(intvec const &a, intvec const &b)
 		{			
 			int lhs,rhs;
-			lhs=dotProduct(&a,&b)*dotProduct(&a,&b);
-			rhs=dotProduct(&a,&a)*dotProduct(&b,&b);
+			lhs=dotProduct(a,b)*dotProduct(a,b);
+			rhs=dotProduct(a,a)*dotProduct(b,b);
 			cout << "LHS="<<lhs<<", RHS="<<rhs<<endl;
 			if (lhs==rhs)
 			{
@@ -474,30 +513,6 @@ class gcone
 				return FALSE;
 			}
 		}//bool isParallel
-		
-		/** \brief Check two intvecs for equality --- PROBABLY NOT NEEDED
-		*
-		* \f$ \alpha=\beta\Leftrightarrow\langle\alpha-\beta,\alpha-\beta\rangle=0 \f$
-		*/
-		bool isEqual(intvec a, intvec b)
-		{
-			intvec *ivdiff;
-			int res;
-			
-			ivdiff=ivSub(&a,&b);
-			cout << "ivdiff=";
-			ivdiff->show();
-			cout << endl;
-			//res=dotProduct(ivdiff,ivdiff);
-			if (res==0)
-			{
-				return TRUE;
-			}
-			else
-			{
-				return FALSE;
-			}			
-		}//bool isEqual
 };//class gcone
 
 ideal gfan(ideal inputIdeal)
@@ -565,7 +580,7 @@ ideal gfan(ideal inputIdeal)
 	Groebner Basis and merge this somehow with LIST_CMD
 	=> Count the cones!
 	*/
-	
+	rChangeCurrRing(inputRing);
 	res=gcAct->gcBasis;
 	//cout << fRoot << endl;
 	return res;
