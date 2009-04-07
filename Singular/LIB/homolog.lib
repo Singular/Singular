@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: homolog.lib,v 1.27 2008-10-09 09:31:57 Singular Exp $";
+version="$Id: homolog.lib,v 1.28 2009-04-07 16:18:05 seelisch Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  homolog.lib   Procedures for Homological Algebra
@@ -1724,7 +1724,7 @@ proc KoszulHomology(ideal x, module M, int p)
 "USAGE:   KoszulHomology(I,M,p);  I ideal, M module, p int
 COMPUTE: A presentation of the p-th Koszul homology module H_p(f_1,...,f_k;M'),
          where M'=coker(M) and f_1,...,f_k are the given (ordered list
-         of non-zero generators of the) ideal I.
+         of non-zero) generators of the ideal I.
          The computed presentation is minimized via prune.
          In particular, if H_p(f_1,...,f_k;M')=0 then the return value is 0.
 RETURN:  module H, s.th. coker(H) = H_p(f_1,...,f_k;M').

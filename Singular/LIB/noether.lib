@@ -1,6 +1,6 @@
 // AH last modified:  01.07.2007
 //////////////////////////////////////////////////////////////////////////////
-version = "$Id: noether.lib,v 1.11 2008-10-06 17:04:28 Singular Exp $";
+version = "$Id: noether.lib,v 1.12 2009-04-07 16:18:05 seelisch Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: noether.lib   Noether normalization of an ideal (not nessecary
@@ -14,14 +14,12 @@ require the computation of the dimension of the ideal.
 It checks whether an ideal is in Noether position.  A modular version of
 these algorithms is also provided.
 The procedures are based on a paper of Amir Hashemi 'Efficient Algorithms for
-Computing Noether Normalization'
-(presented in ASCM 2007)
+Computing Noether Normalization' (presented in ASCM 2007)
 
 This library computes also Castelnuovo-Mumford regularity and satiety of an
 ideal.  A modular version of these algorithms is also provided.
 The procedures are based on a paper of Amir Hashemi 'Computation of
-Castelnuovo-Mumford regularity and satiety'
-(preprint 2008)
+Castelnuovo-Mumford regularity and satiety' (preprint 2008)
 
 
 PROCEDURES:
@@ -45,10 +43,11 @@ LIB "presolve.lib";
 proc NPos_test (ideal I)
 "
 USAGE:  NPos_test (I); I monomial ideal
-RETURN: A list which first element is 1 if i is in Noether position
-        0  otherwise. The second element of this list is the list of variable which
-        its first part is the variable such that a power of this varaibles belong to the initial of i.
-        It return also the dimension of i if i is in Noether position
+RETURN: A list whose first element is 1, if i is in Noether position,
+        0 otherwise. The second element of this list is a list of variables ordered
+        such that those variables are listed first, of which a power belongs to the
+        initial ideal of i. If i is in Noether position, the method returns furthermore
+        the dimension of i.
 ASSUME: i is a nonzero monomial ideal.
 "
 {

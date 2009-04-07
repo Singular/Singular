@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.39 2006-07-24 14:06:05 Singular Exp $";
+version="$Id: linalg.lib,v 1.40 2009-04-07 16:18:05 seelisch Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib  Algorithmic Linear Algebra
@@ -1475,7 +1475,9 @@ example
 proc spnf(list #)
 "USAGE:   spnf(list(a[,m])); ideal a, intvec m
 ASSUME:  ncols(a)==size(m)
-RETURN:  order a[i] with multiplicity m[i] lexicographically
+RETURN:  list l:
+            l[1] an ideal, the generators of a; sorted and with multiple entries displayed only once@*
+            l[2] and intvec, l[2][i] provides the multiplicity of l[1][i]
 EXAMPLE: example spnf; shows examples
 "
 {
@@ -1596,7 +1598,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc spprint(list sp)
-"USAGE:   spprint(sp); list sp (helper routine for spnf, gmssing.lib)
+"USAGE:   spprint(sp); list sp (helper routine for spnf)
 RETURN:  string s;  spectrum sp
 EXAMPLE: example spprint; shows examples
 SEE ALSO: gmssing_lib, spnf

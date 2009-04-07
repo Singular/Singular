@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.50 2009-03-26 16:37:19 Singular Exp $";
+version="$Id: normal.lib,v 1.51 2009-04-07 16:18:05 seelisch Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -1903,13 +1903,13 @@ Versuch: subst statt phi
 ///////////////////////////////////////////////////////////////////////////////
 
 proc genus(ideal I,list #)
-"USAGE:   genus(i) or genus(i,1); I a 1-dimensional ideal
+"USAGE:   genus(I) or genus(I,1); I a 1-dimensional ideal
 RETURN:  an integer, the geometric genus p_g = p_a - delta of the projective
          curve defined by i, where p_a is the arithmetic genus.
 NOTE:    delta is the sum of all local delta-invariants of the singularities,
          i.e. dim(R'/R), R' the normalization of the local ring R of the
          singularity. @*
-         genus(i,1) uses the normalization to compute delta. Usually genus(i,1)
+         genus(I,1) uses the normalization to compute delta. Usually genus(i,1)
          is slower than genus(i) but sometimes not.
 EXAMPLE: example genus; shows an example
 "
@@ -2540,21 +2540,20 @@ static proc w_deg(poly p, intvec v)
 proc primeClosure (list L, list #)
 "USAGE:    primeClosure(L [,c]); L a list of a ring containing a prime ideal
                                  ker, c an optional integer
-RETURN:   a list L (of size n+1) consisting of rings L[1],...,L[n] such that
-          - L[1] is a copy of (not a reference to!) the input ring L[1]
+RETURN:   a list L (of size n+1) consisting of rings L[1],...,L[n] such that@*
+          - L[1] is a copy of (not a reference to!) the input ring L[1]@*
           - all rings L[i] contain ideals ker, L[2],...,L[n] contain ideals phi
-            such that
-                    L[1]/ker --> ... --> L[n]/ker
-            are injections given by the corresponding ideals phi, and L[n]/ker
-            is the integral closure of L[1]/ker in its quotient field.
+            such that L[1]/ker --> ... --> L[n]/ker are injections given by the
+            corresponding ideals phi, and L[n]/ker is the integral closure of
+            L[1]/ker in its quotient field.@*
           - all rings L[i] contain a polynomial nzd such that elements of
             L[i]/ker are quotients of elements of L[i-1]/ker with denominator
-            nzd via the injection phi.
-            L[n+1] is the delta invariant 
-NOTE:     - L is constructed by recursive calls of primeClosure itself.
-          - c determines the choice of nzd:
+            nzd via the injection phi.@*
+            L[n+1] is the delta invariant
+NOTE:     - L is constructed by recursive calls of primeClosure itself.@*
+          - c determines the choice of nzd:@*
                - c not given or equal to 0: first generator of the ideal SL,
-                 the singular locus of Spec(L[i]/ker)
+                 the singular locus of Spec(L[i]/ker)@*
                - c<>0: the generator of SL with least number of monomials.
 EXAMPLE:  example primeClosure; shows an example
 "
@@ -5525,14 +5524,17 @@ L;
 
 // Used for timing and comparing the different normalization procedures.
 // Option (can be entered in any order)
-// "normal"   -> uses the new algortihm (normal)// "normalP"  -> uses normalP
+// "normal"   -> uses the new algortihm (normal)
+// "normalP"  -> uses normalP
 // "normalC"  -> uses normalC, without "withGens" option
-// "primCl"   -> uses normalC, with option "withGens".// "111"      -> checks the output of normalM using norTest.
+// "primCl"   -> uses normalC, with option "withGens".
+// "111"      -> checks the output of normalM using norTest.
 // "p"        -> compares the output of norM with the output of normalP 
 //               ("normalP" option must also be set).
 // "pc"       -> compares the output of norM with the output of normalC with 
 //               option "withGens"
-//               ("primCl" option must also be set).proc timeNormal(ideal I, list #){
+//               ("primCl" option must also be set).
+proc timeNormal(ideal I, list #){
   //--------------------------- define the method --------------------------- 
   int isPrim, useRing;
   int decomp = -1;
@@ -6068,7 +6070,8 @@ list nor = normalP(i); nor;
 def R=nor[1][1]; setring R; norid; normap;
 
 //Leonhard 4 Komponenten, dim=2, delta: 0,0,0,-1
-ring r=2,(v,u,z,y,x),dp;      //lp zu langeideal i=z3+zyx+y3x2+y2x3, uyx+z2, v3+vuyx+vux+vzyx+vzx+uy3x2+uy2x+zy3x+zy2x2;
+ring r=2,(v,u,z,y,x),dp;      //lp zu lange
+ideal i=z3+zyx+y3x2+y2x3, uyx+z2, v3+vuyx+vux+vzyx+vzx+uy3x2+uy2x+zy3x+zy2x2;
 //normalP: 19 sec, withRing: 22 sec
 //normalC ohne (mit) interred: 112 (113)sec, equidim: 99sec
 //normalC 1. mal 111 sec, (2.mal) 450sec!! 3.mal 172 sec

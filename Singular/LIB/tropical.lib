@@ -1,4 +1,4 @@
-version="$Id: tropical.lib,v 1.12 2009-03-25 11:27:13 keilen Exp $";
+version="$Id: tropical.lib,v 1.13 2009-04-07 16:18:06 seelisch Exp $";
 category="Tropical Geometry";
 info="
 LIBRARY:         tropical.lib  Computations in Tropical Geometry
@@ -49,7 +49,7 @@ THEORY:
   examples it will be sufficient to replace the complex numbers C by the 
   rational numbers Q and to replace Puiseux series in t by rational functions 
   in t, i.e. we replace C{{t}} by Q(t), or sometimes even by Q[t]. 
-  Note, that this in particular forbits rational exponents for the t's.
+  Note, that this in particular forbids rational exponents for the t's.
 
   Moreover, in Singular no negative exponents of monomials are allowed, so 
   that the integer vectors vi will have to have non-negative entries. 
@@ -59,7 +59,7 @@ THEORY:
   If, however, for some reason you prefer to work with general vi, then you 
   have to pass right away to the tropicalisation of the equations, whereever 
   this is allowed -- these are linear polynomials where the constant coefficient
-  correspond to the valuation of the original coefficient and where 
+  corresponds to the valuation of the original coefficient and where 
   the non-constant coefficient correspond to the exponents of the monomials, 
   thus they may be rational numbers respectively negative numbers: 
   e.g. if f=t^{1/2}*x^{-2}*y^3+2t*x*y+4  then  trop(f)=min{1/2-2x+3y,1+x+y,0}.
@@ -73,8 +73,8 @@ THEORY:
                          polynomial ring Q[t,x1,...,xn] considered as a 
                          subring of C{{t}}[x1,...,xn]; a solution will be 
                          constructed up to given order; note that several 
-                         field extensions of Q might be necessary thoughout 
-                         the intermediate computations; the procedures uses 
+                         field extensions of Q might be necessary throughout
+                         the intermediate computations; the procedures use
                          the external program gfan
 @*  - drawTropicalCurve  visualises a tropical plane curve either given by a 
                          polynomial in Q(t)[x,y] or by a list of linear 
@@ -217,7 +217,7 @@ ASSUME:  - i is an ideal in Q[t,x_1,...,x_n], w=(w_0,w_1,...,w_n)
            and it should have a global monomial ordering, 
            e.g. ring r=0,(t,x(1..n)),dp;
 @*       - the first variable of the basering will be treated as the 
-           parameter t in the Puiseux series field !!!!
+           parameter t in the Puiseux series field
 @*       - the optional parameter opt should be one or more strings among 
            the following:
 @*         'isZeroDimensional'  : the dimension i is zero (not to be checked);
@@ -229,29 +229,29 @@ ASSUME:  - i is an ideal in Q[t,x_1,...,x_n], w=(w_0,w_1,...,w_n)
 @*         'findAll'            : find all solutions of a zero-dimensional 
                                   ideal over (w_1/w_0,...,w_n/w_0)
 @*         'noAbs'              : do NOT use absolute primary decomposition
-@*         'noResubst'         : avoids computing the resubstitution
+@*         'noResubst'         : avoids the computation of the resubstitution
 RETURN:  IF THE OPTION 'findAll' WAS NOT SET THEN:
 @*       list, containing one lifting of the given point (w_1/w_0,...,w_n/w_0)
                in the tropical variety of i to a point in V(i) over Puiseux 
                series field up to the first ord terms; more precisely:
-@*             IF THE OPTION 'noAbs' WAS NOT SET THEN:
+@*             IF THE OPTION 'noAbs' WAS NOT SET, THEN:
 @*             l[1] = ring Q[a]/m[[t]]
 @*             l[2] = int
 @*             l[3] = intvec
 @*             l[4] = list
-@*             IF THE OPTION 'noAbs' WAS SET THEN:
+@*             IF THE OPTION 'noAbs' WAS SET, THEN:
 @*             l[1] = ring Q[X(1),...,X(k)]/m[[t]]
 @*             l[2] = int
 @*             l[3] = intvec
 @*             l[4] = list
 @*             l[5] = string
-@*       IF THE OPITON 'findAll' WAS NOT SET THEN:
+@*       IF THE OPITON 'findAll' WAS SET, THEN:
 @*       list, containing ALL liftings of the given point ((w_1/w_0,...,w_n/w_0)
                in the tropical variety of i to a point in V(i) over Puiseux 
                series field up to the first ord terms, if the ideal is 
                zero-dimensional over Q{{t}};
                more precisely, each entry of the list is a list l as computed 
-               if  'find_all' was NOT set
+               if  'findAll' was NOT set
 @*       WE NOW DESCRIBE THE LIST ENTRIES IF 'findAll' WAS NOT SET:
 @*       - the ring l[1] contains an ideal LIFT, which contains 
            a point in V(i) lying over w up to the first ord terms;
@@ -277,17 +277,17 @@ REMARK:  - it is best to use the procedure displayTropicalLifting to
 @*       - if the parameter 'findAll' is set AND the ideal i is zero-dimensional
            in Q{{t}}[x_1,...,x_n] then ALL points in V(i) lying over w are 
            computed up to order ord; if the ideal is not-zero dimenisonal, then
-           only all points in the ideal after cutting down to dimension zero 
+           only the points in the ideal after cutting down to dimension zero
            will be computed
-@*       - the procedure REQUIRES that the program GFAN is installed on your 
-           computer; if you have GFAN version less than 0.3.0 then you MUST 
+@*       - the procedure requires that the program GFAN is installed on your
+           computer; if you have GFAN version less than 0.3.0 then you must 
            use the optional parameter 'oldGfan'
 @*       - the procedure requires the Singular procedure absPrimdecGTZ to be 
            present in the package primdec.lib, unless the option 'noAbs' is set;
            but even if absPrimdecGTZ is present it might be necessary to set 
            the option 'noAbs' in order to avoid the costly absolute primary 
            decomposition; the side effect is that the field extension which is 
-           computed throughout the recursion might need more only one
+           computed throughout the recursion might need more than one
            parameter to be described
 @*       - since Q is infinite, the procedure finishes with probability one
 @*       - you can call the procedure with Z/pZ as base field instead of Q, 
@@ -303,7 +303,7 @@ REMARK:  - it is best to use the procedure displayTropicalLifting to
 @*         + the option 'noAbs' has to be used since absolute primary 
              decomposition in Singular only works in characteristic zero
 @*       - the basefield should either be Q or Z/pZ for some prime p; 
-           field extensions will be computed where necessary; if you need 
+           field extensions will be computed if necessary; if you need 
            parameters or field extensions from the beginning they should 
            rather be simulated as variables possibly adding their relations to 
            the ideal; the weights for the additional variables should be zero
@@ -1315,7 +1315,7 @@ ASSUME:      f is list of linear polynomials of the form ax+by+c with
              the basering must have a global monomial ordering, two 
              variables and up to one parameter!
 RETURN:      NONE
-NOTE:        - the procedure produces the files /tmp/tropicalcurveNUMBER.tex and 
+NOTE:        - the procedure creates the files /tmp/tropicalcurveNUMBER.tex and 
                /tmp/tropicalcurveNUMBER.ps, where NUMBER is a random four 
                digit integer; 
                moreover it displays the tropical curve via kghostview;
@@ -1479,7 +1479,7 @@ ASSUME:   f is list of linear polynomials of the form ax+by+c with integers
           the basering must have a global monomial ordering, two variables 
           and up to one parameter!
 RETURN:   NONE
-NOTE:     - the procedure produces the files /tmp/newtonsubdivisionNUMBER.tex, 
+NOTE:     - the procedure creates the files /tmp/newtonsubdivisionNUMBER.tex, 
             and /tmp/newtonsubdivisionNUMBER.ps, where NUMBER is a random 
             four digit integer; 
             moreover it desplays the tropical curve defined by f via kghostview;
@@ -2241,7 +2241,7 @@ example
 
 /////////////////////////////////////////////////////////////////////////
 
-proc tInitialIdeal (ideal i,intvec w,list #) 
+proc tInitialIdeal (ideal i,intvec w,list #)
 "USAGE:      tInitialIdeal(i,w); i ideal, w intvec
 ASSUME:      i is an ideal in Q[t,x_1,...,x_n] and w=(w_0,...,w_n) 
 RETURN:      ideal ini, the t-initial ideal of i with respect to w"
@@ -2319,8 +2319,8 @@ example
 proc initialForm (poly f, intvec w)
 "USAGE:      initialForm(f,w); f a polynomial, w an integer vector
 ASSUME:      f is a polynomial in Q[x_1,...,x_n] and w=(w_1,...,w_n)
-RETURN:      poly, the initialForm of f(x) w.r.t. w
-NOTE:        the initialForm are the terms with MAXIMAL weighted order w.r.t. w
+RETURN:      poly, the initial form of f(x) w.r.t. w
+NOTE:        the initialForm consists of the terms with MAXIMAL weighted order w.r.t. w
 EXAMPLE:     example initialForm;   shows an example"
 {
   def BASERING=basering;
@@ -2353,7 +2353,7 @@ proc initialIdeal (ideal i, intvec w)
 "USAGE:      initialIdeal(i,w); i ideal, w intvec
 ASSUME:      i is an ideal in Q[x_1,...,x_n] and w=(w_1,...,w_n)
 RETURN:      ideal, the initialIdeal of i w.r.t. w
-NOTE:        the initialform are the terms with MAXIMAL weighted order w.r.t. w
+NOTE:        the initialIdeal consists of the terms with MAXIMAL weighted order w.r.t. w
 EXAMPLE:     example initialIdeal;   shows an example"
 {
   def BASERING=basering;
@@ -2754,23 +2754,23 @@ example
 proc texDrawNewtonSubdivision (list graph,list #)
 "USAGE:      texDrawNewtonSubdivision(graph[,#]); graph list, # optional list
 ASSUME:      graph is the output of tropicalCurve
-RETURN:      string, the texdraw code of the Newton subdivision of the 
+RETURN:      string, the texdraw code of the Newton subdivision of the
                      tropical plane curve encoded by graph
-NOTE:        - the list # should contain as only entry a string; if this string 
-               is 'max', then the tropical curve is considered with respect 
-               to the maximum; otherwise the curve is considered with respect 
-               to the minimum and the string can be used to insert further 
+NOTE:        - the list # should contain only one entry which is a string; if this string
+               is 'max', then the tropical curve is considered with respect
+               to the maximum; otherwise the curve is considered with respect
+               to the minimum and the string can be used to insert further
                texdraw commands (e.g. to have a lighter image as when called
-               from inside conicWithTangents); the list # is optional and may 
+               from inside conicWithTangents); the list # is optional and may
                as well be empty
-@*           - note that lattice points in the Newton subdivision which are 
-               black correspond to markings of the marked subdivision, 
+@*           - note that lattice points in the Newton subdivision which are
+               black correspond to markings of the marked subdivision,
                while lattice points in grey are not marked
 EXAMPLE:     example texDrawNewtonSubdivision;   shows an example"
 {
   int i,j,k,l;
   list boundary=graph[size(graph)][1];
-  list inneredges=graph[size(graph)][2];  
+  list inneredges=graph[size(graph)][2];
   intvec shiftvector=graph[size(graph)][3];
   string subdivision;
   // find maximal and minimal x- and y-coordinates and define the scalefactor
@@ -3242,7 +3242,7 @@ proc parameterSubstitute (poly f,int N)
 "USAGE:   parameterSubstitute(f,N); f poly, N int
 ASSUME:   f is a polynomial in Q(t)[x_1,...,x_n] describing 
           a plane curve over Q(t)
-RETURN:   poly, f with t replaced by t^N
+RETURN:   poly f with t replaced by t^N
 EXAMPLE:  example parameterSubstitute;   shows an example"
 {
   def BASERING=basering;

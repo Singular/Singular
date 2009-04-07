@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////
-version="$Id: sing4ti2.lib,v 1.1 2009-03-10 16:51:29 Singular Exp $";
+version="$Id: sing4ti2.lib,v 1.2 2009-04-07 16:18:06 seelisch Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  sing4ti2.lib          Communication Interface to 4ti2
@@ -275,7 +275,7 @@ CREATE:  temporary files sing4ti2.mat, sing4ti2.lat, sing4ti2.mar
 @*       in the current directory (I/O files for communication with 4ti2)
 NOTE:    input rules for 4ti2 also apply to input to this procedure
 @*       hence ker(A)={x|Ax=0} and Im(A)={xA}
-RETURN:  toric ideal specified by Graver basis thereof
+RETURN:  toric ideal specified by Hilbert basis thereof
 EXAMPLE: example graver4ti2; shows an example
 "
 {

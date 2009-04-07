@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: intprog.lib,v 1.6 2006-07-25 17:54:27 Singular Exp $";
+version="$Id: intprog.lib,v 1.7 2009-04-07 16:18:05 seelisch Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: intprog.lib      Integer Programming with Groebner Basis Methods
@@ -632,11 +632,11 @@ static proc solve_IP_4(intmat A, list bx, intvec c, string alg, intvec prsv)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc solve_IP
-"USAGE:  solve_IP(A,bx,c,alg);  A intmat, bx intvec, c intvec, alg string.
+"USAGE:  solve_IP(A,bx,c,alg);  A intmat, bx intvec, c intvec, alg string.@*
         solve_IP(A,bx,c,alg);  A intmat, bx list of intvec, c intvec,
-                                 alg string.
+                                 alg string.@*
         solve_IP(A,bx,c,alg,prsv);  A intmat, bx intvec, c intvec,
-                                 alg string, prsv intvec.
+                                 alg string, prsv intvec.@*
         solve_IP(A,bx,c,alg,prsv);  A intmat, bx list of intvec, c intvec,
                                  alg string, prsv intvec.
 RETURN: same type as bx: solution of the associated integer programming

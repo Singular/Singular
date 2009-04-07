@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: phindex.lib,v 1.3 2008-10-09 09:31:57 Singular Exp $";
+version="$Id: phindex.lib,v 1.4 2009-04-07 16:18:05 seelisch Exp $";
 category=" ";
 info="
 LIBRARY : phindex.lib Procedures to compute the index of real analytic vector fields
@@ -9,7 +9,7 @@ NOTE: To compute the Poincare-Hopf index of a real analytic vector field
       we use the algebraic formula for the degree of the real analytic map
       germ  found by Eisenbud-Levine in 1997. This result was also proved by
       Khimshiashvili. If the isolated singularity is non algebraically
-      isolated  and the vector field has a reduced complex zeroes of
+      isolated  and the vector field has similar reduced complex zeroes of
       codimension 1, we use a formula as the Eisenbud-Levine found by Victor
       Castellanos, in both cases is necessary to use a local order (ds,...).
       To compute the signature of a quadratic form (or symmetric matrix)
@@ -29,10 +29,10 @@ LIB "zeroset.lib";
 proc signatureL(M,int #)
 "USAGE:    signatureL(M[,r]); M symmetric matrix, r int (optional).
 RETURN:   the signature of M of type int or if r is given and !=0 then
-          intvec with (signature, no of +, no of -) is returned.
-THEORY:   Given the matrix M we construct the quadratic form associated, after
+          intvec with (signature, nr. of +, nr. of -) is returned.
+THEORY:   Given the matrix M, we construct the quadratic form associated. Afterwards
           we use the method of Lagrange to compute the signature. The law of
-          inertia for a real quadratic form A(x,x) say that in a
+          inertia for a real quadratic form A(x,x) says that in a
           representation of A(x,x) as a sum of independent squares
                             A(x,x)=sum_{i=1}^r a_iX_i^2.
           The number of positive and the number of negative squares are
@@ -97,12 +97,11 @@ example
 proc signatureLqf(h,int #)
 "USAGE:    signatureLqf(h); h quadratic form (poly type).
 RETURN:   the signature of h of type int or if r is given and !=0 then
-          intvec with (signature, no of +, no of -) is returned.
+          intvec with (signature, nr. of +, nr. of -) is returned.
 THEORY:   To compute the signature we use the method of Lagrange. The law of
-          inertia for a real quadratic form h(x,x) say that in a
+          inertia for a real quadratic form h(x,x) says that in a
           representation  of h(x,x) as a sum of independent squares
-                             h(x,x)=sum_{i=1}^r a_iX_i^ 2
-          the number of positive and the number of negative squares are
+          h(x,x)=sum_{i=1}^r a_i*X_i^2 the number of positive and the number of negative squares are
           independent of the choice of representation. The signature -s- of
           h(x,x) is the difference between the number -pi- of positive squares
           and the number -nu- of negative squares in the representation of
@@ -228,8 +227,7 @@ proc PH_ais(I)
 RETURN:   the Poincare-Hopf index of type int.
 NOTE:     the isolated singularity must be algebraically isolated.
 THEORY:   The Poincare-Hopf index of a real vector field X at the isolated
-          singularity 0 is the degree of map
-                           (X/|X|) : S_epsilon ---> S,
+          singularity 0 is the degree of the map (X/|X|) : S_epsilon ---> S,
           where S is the unit sphere, and the spheres are oriented as
           (n-1)-spheres in R^n. The degree depends only on the germ, X, of X
           at 0. If the vector field X is real analytic, then an invariant of
@@ -244,13 +242,12 @@ THEORY:   The Poincare-Hopf index of a real vector field X at the isolated
           the signature of the non degenerate bilinear form <,> obtained by
           composition of the product in the algebra Qx with a linear
           functional map
-                                        .       L
-                       <,> : (Qx)x(Qx)----->Qx----->R
+                       <,> : (Qx)x(Qx) ---(.)--> Qx ---(L)--> R
           with L(Jo)>0, where Jo is the residue class of the Jacobian
           determinant in Qx. Here, we use a natural linear functional defined
-          as follows. Suppose that E={E_1,..E_r} is a basis of Qx, then Jo is
-          writing as
-                      Jo=a_1E_{j1}+...+a_kE_{jk},  js\in {1...r}, s=1..k, k<=r.
+          as follows. Suppose that E={E_1,..E_r} is a basis of Qx, then Jo can
+          be written as
+                      Jo=a_1E_{j1}+...+a_kE_{jk},  js\in {1...r}, s=1..k, k<=r,
           where a_s are constant. The linear functional L:Qx--->R is defined as
                                   L(E_{j1})=(a_1)/|a_1|=sign of a_1,
           the other elements of the base are sent to 0.
@@ -354,14 +351,13 @@ RETURN:   the Poincare-Hopf index of type int.
 NOTE:     the vector field must be a non algebraically isolated singularity
           at 0, with reduced complex zeros of codimension 1.
 THEORY:   Suppose that 0 is an algebraically isolated singularity of the real
-          analytic vector field X, geometrically its mean that the
+          analytic vector field X, geometrically this corresponds to the fact that the
           complexified vector field has positive dimension singular locus,
-          algebraically this mean that the local ring
-                      Qx=R[[x1..xn]]/Ix
+          algebraically this mean that the local ring Qx=R[[x1..xn]]/Ix
           where R[[x1,..,xn]] is the ring of germs at 0 of real-valued analytic
           functions on R^n, and Ix is the ideal generated by the components
           of X is infinite dimensional as real vector space. In the case that
-          X has a reduced hypersurface as complex zeroes we have the next.
+          X has a reduced hypersurface as complex zeros we have the next.
           There exist a real analytic function f:R^n-->R, and a real analytic
           vector field Y s. t. X=fY. The function f does not change of sign
           out of 0 and
@@ -370,13 +366,12 @@ THEORY:   Suppose that 0 is an algebraically isolated singularity of the real
           of X at 0 is the sign of f times the signature of the non degenerate
           bilinear form <,> obtained by composition of the product in the
           algebra Mx with a linear functional map
-                                        .       L
-                       <,> : (Mx)x(Mx)----->Mx----->R
+                       <,> : (Mx)x(Mx) ---(.)--> Mx ---(L)--> R
           with L(Jp)>0, where Jp is the residue class of the Jacobian
           determinant of X, JX, over f^n, JX/(f^n) in Mx. Here, we use a
           natural linear functional defined as follows. Suppose that
           E={E_1,..E_r} is a basis of Mx, then Jp is writing as
-                      Jp=a_1E_{j1}+...+a_kE_{jk},  js\in {1...r}, s=1..k, k<=r.
+                      Jp=a_1E_{j1}+...+a_kE_{jk},  js\in {1...r}, s=1..k, k<=r,
           where a_s are constant. The linear functional L:M--->R is defined as
                                   L(E_{j1})=(a_1)/|a_1|=sign of a_1,
           the other elements of the base are sent to 0.

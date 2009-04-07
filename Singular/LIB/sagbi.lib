@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: sagbi.lib,v 1.12 2008-10-06 17:04:28 Singular Exp $";
+version="$Id: sagbi.lib,v 1.13 2009-04-07 16:18:06 seelisch Exp $";
 category="Commutative Algebra";
 info="
-LIBRARY:  sagbi.lib  Compute Subalgebras bases Analogous to Groebner bases for ideals
+LIBRARY:  sagbi.lib  Compute subalgebra bases analogous to Groebner bases for ideals
 AUTHORS: Gerhard Pfister,        pfister@mathematik.uni-kl.de,
 @*       Anen Lakhal,            alakhal@mathematik.uni-kl.de
 
@@ -23,10 +23,10 @@ proc sagbiSPoly(id ,list #)
 RETURN: an ideal
 @format
       - If (n=0 or default) an ideal, whose generators are the S-polynomials.
-      - If (n=1) a  list of size 2:
+      - If (n=1) a list of size 2:
         the first element of this list is the ideal of S-polynomials.
-        the second element of this list is the ring in which is defined
-        the ideal of algebraic relations.
+        the second element of this list is the ring in which the ideal of algebraic
+        relations is defined.
 @end format
 EXAMPLE: example sagbiSPoly; show an example "
 {
@@ -425,17 +425,17 @@ static proc completeReduction1(poly p,ideal dom,list #) //tail reduction
 
 proc sagbiNF(id,ideal dom,int k,list#)
 "USAGE: sagbiNF(id,dom,k[,n]); id either poly or ideal,dom ideal, k and n positive intergers.
-RETURN: depends On the type of id; ideal or polynomial.
+RETURN: same as type of id; ideal or polynomial.
 @format
     The integer k determines what kind of s-reduction is performed:
     - if (k=0) no tail s-reduction is performed.
     - if (k=1) tail s-reduction is performed.
-    Three Algorthim  variants  are used to perform Subalgebra reduction.
-    The positive integer n determine which variant should be used.
+    Three Algorithm variants are used to perform subalgebra reduction.
+    The positive integer n determines which variant should be used.
     n may take the values (0 or default),1 or 2.
 @end format
-NOTE: computation of Subalgebras normal forms may be performed either
-      in polynomial rings or quotient polynomial rings
+NOTE: computation of subalgebra normal forms may be performed in polynomial rings or quotients
+      thereof
 EXAMPLE: example sagbiNF; show example "
 {
   int z;
@@ -513,16 +513,16 @@ proc sagbi(id,int k,list#)
 "USAGE: sagbi(id,k[,n]); id ideal, k and n positive integers.
 RETURN: A SAGBI basis for the subalgebra defined by the generators of id.
 @format
-    k determine what kind of s-reduction is performed:
+    k determines what kind of s-reduction is performed:
      - if (k=0) no tail s-reduction is performed.
      - if (k=1) tail s-reduction is performed, and S-interreduced SAGBI basis
        is returned.
-    Three Algorithm variants are used to perform Subalgebra reduction.
+    Three algorithm variants are used to perform subalgebra reduction.
     The positive interger n determine which variant should be used.
     n may take the values (0 or default),1 or 2.
 @end format
-NOTE: SAGBI bases computations may be performed either
-      in polynomial rings or quotient polynomial rings.
+NOTE: SAGBI bases computations may be performed in polynomial rings or quotients
+      thereof.
 EXAMPLE: example sagbi; show example "
 {
   degBound=0;
@@ -547,23 +547,23 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc sagbiPart(id,int k,int c,list #)
-"USAGE: sagbi(id,k,c[,n]); id ideal, k, c and n positive integer.
+"USAGE: sagbiPart(id,k,c[,n]); id ideal, k, c and n positive integers
 RETURN: A partial SAGBI basis for the subalgebra defined by the generators of id.
 @format
-     should stop. k determine what kind of s-reduction is performed:
+     k determines what kind of s-reduction is performed:
      - if (k=0) no tail s-reduction is performed.
      - if (k=1) tail s-reduction is performed, and S-intereduced SAGBI basis
       is returned.
-     c  determines, after which turn Sagbi basis computations should stop
-     Three Algorithm variants are used to perform Subalgebra reduction.
+     c determines, after how many loops the Sagbi basis computation should stop.
+     Three algorithm variants are used to perform subalgebra reduction.
      The positive integer n determines which variant should be used.
      n may take the values (0 or default),1 or 2.
 @end format
-NOTE:- SAGBI bases computations may be performed either
-       in polynomial rings or quotient polynomial rings.
-     - This version of sagbi procedure is interesting in the case of an Subalgebras
-       with infinte SAGBI basis. In this case, by means of this procedure,
-       we may check for example, if the elements of this basis have a particular form.
+NOTE:- SAGBI bases computations may be performed in polynomial rings or quotients
+       thereof.
+     - This version of sagbi is interesting in the case of subalgebras with infinte
+       SAGBI basis. In this case, it may be used to check, if the elements of this
+       basis have a particular form.
 EXAMPLE: example sagbiPart; show example "
 {
   degBound=0;

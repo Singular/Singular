@@ -1,4 +1,4 @@
-// $Id: elim.lib,v 1.28 2009-01-15 13:51:18 Singular Exp $
+// $Id: elim.lib,v 1.29 2009-04-07 16:18:05 seelisch Exp $
 // (GMG, modified 22.06.96)
 // GMG, last modified 30.10.08: new procedure elimRing;
 // elim changes now to ring with elimination ordering (extra weight vector
@@ -9,21 +9,21 @@
 // GMG, last modified 5.01.09: elim uses now stdhilb(id,@w) instead of std(id)
 // and can now choose as method slimgb or std.
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: elim.lib,v 1.28 2009-01-15 13:51:18 Singular Exp $";
+version="$Id: elim.lib,v 1.29 2009-04-07 16:18:05 seelisch Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      Elimination, Saturation and Blowing up
 
 PROCEDURES:
- blowup0(j[,s1,s2]);   create presentation of blownup ring of ideal j
- elimRing(p);          create ring with block ordering for elimating vars in p
- elim(id,..);          variables .. eliminated from id (ideal/module)
- elim1(id,p);          variables .. eliminated from id (different algorithm)
- elim2(id,..);         variables .. eliminated from id (different algorithm)
- nselect(id,v);        select generators not containing variables given by v
- sat(id,j);            saturated quotient of ideal/module id by ideal j
- select(id,v]);        select generators containing all variables given by v
- select1(id,v);        select generators containing one variable given by v
+ blowup0(j[,s1,s2])   create presentation of blownup ring of ideal j
+ elimRing(p)          create ring with block ordering for elimating vars in p
+ elim(id,..)          variables .. eliminated from id (ideal/module)
+ elim1(id,p)          variables .. eliminated from id (different algorithm)
+ elim2(id,..)         variables .. eliminated from id (different algorithm)
+ nselect(id,v)        select generators not containing variables given by v
+ sat(id,j)            saturated quotient of ideal/module id by ideal j
+ select(id,v])        select generators containing all variables given by v
+ select1(id,v)        select generators containing one variable given by v
            (parameters in square brackets [] are optional)
 ";
 
@@ -62,7 +62,7 @@ THEORY:  If basering = K[x1,...,xn] and C = <f1,...,fk> then let
          of the center V(C) in A^n and is called the blowup of the center.
          The preimage of V(C) is called the exceptional set, the preimage of
          V(J) is called the total transform of V(J). The strict transform
-         is the closure of (total transform - exceptional set).
+         is the closure of (total transform minus the exceptional set).
 @*       If C = <x1,...,xn> then aS = <yi*xj - yj*xi | i,j=1,...,n>
          and Z is the blowup of A^n in 0, the exceptional set is P^(k-1).
 NOTE:    The procedure creates a new ring with variables y(1..k) and x(1..n)
@@ -71,7 +71,7 @@ NOTE:    The procedure creates a new ring with variables y(1..k) and x(1..n)
          the y-block has ordering dp if C is not homogeneous
          resp. the weighted ordering wp(b1,...bk) if C is homogeneous
          with deg(C[i])=bi.
-SEE ALSO:blowUp
+SEE ALSO:blowUp, blowUp2
 EXAMPLE: example blowup0; shows examples
 "{
    def br = basering;

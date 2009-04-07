@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: resolve.lib,v 1.11 2008-09-24 16:41:31 Singular Exp $";
+version="$Id: resolve.lib,v 1.12 2009-04-07 16:18:06 seelisch Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  resolve.lib      Resolution of singularities (Desingularization)
@@ -2299,9 +2299,9 @@ ASSUME:  R  = basering, a polynomial ring, W an ideal of R,
 COMPUTE: the center of the next blow-up of BO in the resolution algorithm
          of [Bravo,Encinas,Villamayor]
 RETURN:  list l,
-         l[1]: ideal describing the center
-         l[2]: intvec w obtained in the process of determining l[1]
-         l[3]: intvec b obtained in the process of determining l[1]
+         l[1]: ideal describing the center@*
+         l[2]: intvec w obtained in the process of determining l[1]@*
+         l[3]: intvec b obtained in the process of determining l[1]@*
          l[4]: intvec inv obtained in the process of determining l[1]
 EXAMPLE: example CenterBO;  shows an example
 "

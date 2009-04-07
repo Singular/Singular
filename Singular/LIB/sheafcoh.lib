@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: sheafcoh.lib,v 1.15 2007-10-30 17:17:44 Singular Exp $";
+version="$Id: sheafcoh.lib,v 1.16 2009-04-07 16:18:06 seelisch Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  sheafcoh.lib   Procedures for Computing Sheaf Cohomology
@@ -149,7 +149,7 @@ ASSUME:  @code{M} is graded, and it comes assigned with an admissible degree
          vector as an attribute
 RETURN:  module
 NOTE:    Output is a presentation matrix for the truncation of coker(M)
-         at d.
+         at degree d.
 EXAMPLE: example truncate; shows an example
 KEYWORDS: truncated module
 "

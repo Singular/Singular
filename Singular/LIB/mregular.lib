@@ -1,6 +1,6 @@
 // IB/PG/GMG, last modified:  15.10.2004
 //////////////////////////////////////////////////////////////////////////////
-version = "$Id: mregular.lib,v 1.9 2008-10-06 17:04:27 Singular Exp $";
+version = "$Id: mregular.lib,v 1.10 2009-04-07 16:18:05 seelisch Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: mregular.lib   Castelnuovo-Mumford regularity of homogeneous ideals
@@ -1452,9 +1452,9 @@ RETURN:  ideal such that, for the homogeneous linear transformation
          S/phi(i) where S=K[x(0),...x(n)] is the basering and d=dim(S/i).
          (returns -1 if i = (0) or (1)).
 ASSUME:  The field K is infinite and i is a nonzero proper ideal.
-NOTES    1. It works also if K is a finite field if it terminates, but
+NOTE:    1. It works also if K is a finite field if it terminates, but
             may result in an infinite loop. If the procedure enters more
-            than 30 loops, -1 is returned and a warning message is displayed.
+            than 30 loops, -1 is returned and a warning message is displayed.@*
          2. If printlevel > 0 (default = 0), additional info is displayed:
             dim(S/i) and K[x(n-d+1),...,x(n)] are given.
 EXAMPLE: example NoetherPosition; shows some examples
@@ -1679,8 +1679,8 @@ RETURN:  1 if i is of nested type, 0 otherwise.
          (returns -1 if i=(0) or i=(1)).
 ASSUME:  i is a nonzero proper monomial ideal.
 NOTES:   1. The ideal must be monomial, otherwise the result has no meaning
-            (so check this before using this procedure).
-         2. is_nested is used in procedures depthIdeal, regIdeal and satiety.
+            (so check this before using this procedure).@*
+         2. is_nested is used in procedures depthIdeal, regIdeal and satiety.@*
          3. When i is a monomial ideal of nested type of S=K[x(0)..x(n)],
             the a-invariant of S/i coincides with the upper bound obtained
             using the procedure regIdeal with printlevel > 0.
