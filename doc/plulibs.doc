@@ -15,7 +15,6 @@ Use the @code{LIB} command for loading of single libraries.
 @menu
 * bfun_lib::
 * central_lib::
-* discretize_lib::
 * dmod_lib::
 * dmodapp_lib::
 * freegb_lib::
@@ -23,7 +22,6 @@ Use the @code{LIB} command for loading of single libraries.
 * gkdim_lib::
 * ncalg_lib::
 * ncdecomp_lib::
-* nchomolog_lib::
 * nctools_lib::
 * perron_lib::
 * qmatrix_lib::
@@ -41,7 +39,7 @@ Use the @code{LIB} command for loading of single libraries.
 @c lib bfun.lib
 
 @c ----------------------------------------------------------
-@node central_lib, discretize_lib, bfun_lib, Non-commutative libraries
+@node central_lib, dmod_lib, bfun_lib, Non-commutative libraries
 @section central_lib
 @cindex central_lib
 @cindex central.lib
@@ -49,15 +47,7 @@ Use the @code{LIB} command for loading of single libraries.
 @c lib central.lib
 
 @c ----------------------------------------------------------
-@node discretize_lib, dmod_lib, central_lib, Non-commutative libraries
-@section discretize_lib
-@cindex discretize_lib
-@cindex discretize.lib
-
-@c lib discretize.lib
-
-@c ----------------------------------------------------------
-@node dmod_lib, dmodapp_lib, discretize_lib, Non-commutative libraries
+@node dmod_lib, dmodapp_lib, central_lib, Non-commutative libraries
 @section dmod_lib
 @cindex dmod_lib
 @cindex dmod.lib
@@ -105,7 +95,7 @@ Use the @code{LIB} command for loading of single libraries.
 @c lib ncalg.lib
 
 @c ----------------------------------------------------------
-@node ncdecomp_lib, nchomolog_lib, ncalg_lib, Non-commutative libraries
+@node ncdecomp_lib, nctools_lib, ncalg_lib, Non-commutative libraries
 @section ncdecomp_lib
 @cindex ncdecomp_lib
 @cindex ncdecomp.lib
@@ -113,15 +103,7 @@ Use the @code{LIB} command for loading of single libraries.
 @c lib ncdecomp.lib
 
 @c ----------------------------------------------------------
-@node nchomolog_lib, nctools_lib, ncdecomp_lib, Non-commutative libraries
-@section nchomolog_lib
-@cindex nchomolog_lib
-@cindex nchomolog.lib
-
-@c lib nchomolog.lib
-
-@c ----------------------------------------------------------
-@node nctools_lib, perron_lib, nchomolog_lib, Non-commutative libraries
+@node nctools_lib, perron_lib, ncdecomp_lib, Non-commutative libraries
 @section nctools_lib
 @cindex nctools_lib
 @cindex nctools.lib
