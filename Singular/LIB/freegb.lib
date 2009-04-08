@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: freegb.lib,v 1.19 2009-03-10 18:15:13 levandov Exp $";
+version="$Id: freegb.lib,v 1.20 2009-04-08 11:11:20 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: freegb.lib   Twosided Noncommutative Groebner bases in Free Algebras via Letterplace
@@ -34,7 +34,6 @@ SEE ALSO: LETTERPLACE
 // where V[1] = coefficient
 // V[1+i] = the corresponding symbol
 
-LIB "discretize.lib"; // for replace
 LIB "qhmoduli.lib"; // for Max
 
 proc testfreegblib()
