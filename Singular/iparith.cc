@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.503 2009-04-03 18:27:19 motsak Exp $ */
+/* $Id: iparith.cc,v 1.504 2009-04-08 17:18:55 motsak Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3081,16 +3081,16 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   int r=v->Typ();
   if ((/*v->Typ()*/r==POLY_CMD) ||(r==VECTOR_CMD))
   {
-    i0=idInit(1,i1->rank);
+    i0=idInit(1,i1->rank); // TODO: rank is wrong (if v is a vector!)
     i0->m[0]=(poly)v->Data();
   }
   else /*IDEAL*/
   {
-    i0=(ideal)v->CopyD();
+    i0=(ideal)v->CopyD(); // TODO: memory leak? !
   }
   int ii0=idElem(i0); /* size of i0 */
-  i1=idSimpleAdd(i1,i0);
-  memset(i0->m,0,sizeof(poly)*IDELEMS(i0));
+  i1=idSimpleAdd(i1,i0); // 
+  memset(i0->m,0,sizeof(poly)*IDELEMS(i0)); // TODO: memory leak? !!
   idDelete(&i0);
   intvec *w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   tHomog hom=testHomog;
