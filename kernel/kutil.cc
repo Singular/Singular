@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.132 2009-04-08 17:21:58 motsak Exp $ */
+/* $Id: kutil.cc,v 1.133 2009-04-08 17:32:57 motsak Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -3081,11 +3081,14 @@ void enterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 void enterpairsSpecial (poly h,int k,int ecart,int pos,kStrategy strat, int atR = -1)
 {
   int j;
+  const int iCompH = pGetComp(h);
 
   for (j=0; j<=k; j++)
   {
-    if ((pGetComp(h)==pGetComp(strat->S[j]))
-    || (0==pGetComp(strat->S[j])))
+    const int iCompSj = pGetComp(strat->S[j]);
+    if ((iCompH==iCompSj)
+        || (0==iCompH) // TODO: what about this case???
+        || (0==iCompSj))
     {
       enterOnePairSpecial(j,h,ecart,strat, atR);
     }
