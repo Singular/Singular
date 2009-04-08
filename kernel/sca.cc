@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.35 2009-04-03 19:10:36 motsak Exp $
+ *  Version: $Id: sca.cc,v 1.36 2009-04-08 17:21:58 motsak Exp $
  *******************************************************************/
 
 // set it here if needed.
@@ -1719,7 +1719,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
   // ?? set spSpolyShort, reduce ???
-  initBuchMora(tempF, tempQ, strat); // tempQ = Q - squares!!!
+  initBuchMora(tempF, tempQ, strat); // tempQ = Q without squares!!!
 
 //   if (strat->minim>0) strat->M = idInit(IDELEMS(F),F->rank);
 
@@ -1748,6 +1748,63 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 
   ///////////////////////////////////////////////////////////////
   // SCA:
+
+  //  due to std( SB, p).
+  // Note that after initBuchMora :: initSSpecial all these additional
+  // elements are in S and T (and some pairs are in L, which also has no initiall
+  // elements!!!)
+  if(TEST_OPT_SB_1)
+  {
+    // For all additional elements...
+    for (int iNewElement = strat->newIdeal; iNewElement < IDELEMS(tempF); iNewElement++)
+    {
+      const poly pSave = tempF->m[iNewElement];
+
+      if( pSave != NULL )
+      {
+//        tempF->m[iNewElement] = NULL;
+
+        const poly p_next = pNext(pSave);
+
+        if(p_next != NULL)
+          for( unsigned int i = m_iFirstAltVar; i <= m_iLastAltVar; i++ )
+            if( p_GetExp(pSave, i, currRing) != 0 )
+            {
+              assume(p_GetExp(pSave, i, currRing) == 1);
+
+              const poly p_new = sca_pp_Mult_xi_pp(i, p_next, currRing);
+
+#ifdef PDEBUG
+              p_Test(p_new, currRing);
+#endif
+
+              if( p_new == NULL) continue;
+
+              LObject h(p_new); // h = x_i * strat->P
+
+              if (TEST_OPT_INTSTRATEGY)
+                h.pCleardenom(); // also does a pContent
+              else
+                h.pNorm();
+
+              strat->initEcart(&h);
+              h.sev = pGetShortExpVector(h.p);
+
+              int pos = 0;
+
+              if (strat->Ll != -1)
+                pos = strat->posInL(strat->L,strat->Ll,&h,strat);
+
+              enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
+            }          
+
+      }        
+
+    }
+  } 
+
+  
+  
 
   /* compute------------------------------------------------------- */
   while (strat->Ll >= 0)
@@ -1913,7 +1970,8 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 
         if (TEST_OPT_INTSTRATEGY)
         {
-          pContent(h.p);
+//          pContent(h.p);
+          h.pCleardenom(); // also does a pContent
         }
         else
         {
@@ -1923,10 +1981,9 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
         strat->initEcart(&h);
         h.sev = pGetShortExpVector(h.p);
 
-        int pos;
-        if (strat->Ll==-1)
-          pos =0;
-        else
+        int pos = 0;
+
+        if (strat->Ll != -1)
           pos = strat->posInL(strat->L,strat->Ll,&h,strat);
 
         enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
@@ -2120,13 +2177,6 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
   om_Opts.MinTrack = 5;
 #endif
 
-  int srmax;
-  int lrmax = 0;
-  int olddeg = 0;
-  int reduc = 0;
-  int red_result = 1;
-//  int hilbeledeg=1;
-  int hilbcount=0;
 
   strat->update = TRUE;
   /*- setting global variables ------------------- -*/
@@ -2158,11 +2208,20 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
     reorderL(strat);
   }
 #endif
+  strat->use_buckets = kMoraUseBucket(strat);
 
-  srmax = strat->sl;
   kTest_TS(strat);
 
-  strat->use_buckets = kMoraUseBucket(strat);
+
+  int srmax = strat->sl;
+  int lrmax = strat->Ll;
+  int olddeg = 0;
+  int reduc = 0;
+  int red_result = 1;
+//  int hilbeledeg=1;
+  int hilbcount=0;
+
+  
   /*- compute-------------------------------------------*/
 
 #undef HAVE_TAIL_RING
@@ -2171,6 +2230,66 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
 //  if (strat->homog && strat->red == redFirst)
 //     kStratInitChangeTailRing(strat);
 #endif
+
+
+
+
+  
+//  due to std( SB, p)
+  if(TEST_OPT_SB_1)
+  {
+    for (int iNewElement = strat->newIdeal; iNewElement < IDELEMS(tempF); iNewElement++)
+    {
+
+      const poly pSave = tempF->m[iNewElement];
+
+      if( pSave != NULL )
+      {
+//        tempF->m[iNewElement] = NULL;
+
+        const poly p_next = pNext(pSave);
+
+        if(p_next != NULL)
+          for( unsigned int i = m_iFirstAltVar; i <= m_iLastAltVar; i++ )
+            if( p_GetExp(pSave, i, currRing) != 0 )
+            {
+
+              assume(p_GetExp(pSave, i, currRing) == 1);
+
+              const poly p_new = sca_pp_Mult_xi_pp(i, p_next, currRing);
+
+#ifdef PDEBUG
+              p_Test(p_new, currRing);
+#endif
+
+              if( p_new == NULL) continue;
+
+              LObject h(p_new); // h = x_i * strat->P
+
+              if (TEST_OPT_INTSTRATEGY)
+                h.pCleardenom(); // also does a pContent
+              else
+                h.pNorm();
+
+              strat->initEcart(&h);
+              h.sev = pGetShortExpVector(h.p);
+
+              int pos = 0;
+
+              if (strat->Ll != -1)
+                pos = strat->posInL(strat->L,strat->Ll,&h,strat);
+
+              enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
+
+              if (strat->Ll>lrmax) lrmax = strat->Ll;
+            }          
+      
+      }      
+
+    }
+  } 
+
+
 
 
   while (strat->Ll >= 0)
@@ -2308,11 +2427,9 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
         strat->initEcart(&h);
         h.sev = pGetShortExpVector(h.p);
 
-        int pos;
+        int pos = 0;
 
-        if (strat->Ll==-1)
-          pos = 0;
-        else
+        if (strat->Ll != -1)
           pos = strat->posInL(strat->L,strat->Ll,&h,strat);
 
         enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);

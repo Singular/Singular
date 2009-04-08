@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.131 2009-02-27 11:21:24 Singular Exp $ */
+/* $Id: kutil.cc,v 1.132 2009-04-08 17:21:58 motsak Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -3090,10 +3090,32 @@ void enterpairsSpecial (poly h,int k,int ecart,int pos,kStrategy strat, int atR 
       enterOnePairSpecial(j,h,ecart,strat, atR);
     }
   }
+
+  if (strat->noClearS) return;
+  
 //   #ifdef HAVE_PLURAL
-  if (!rIsPluralRing(currRing))
-//   #endif
+/*
+  if (rIsPluralRing(currRing))
   {
+    j=pos;
+    loop
+    {
+      if (j > k) break;
+
+      if (pLmDivisibleBy(h, strat->S[j]))
+      {
+        deleteInS(j, strat);
+        j--;
+        k--;
+      }
+      
+      j++;
+    }
+  }    
+  else
+*/  
+//   #endif // ??? Why was the following cancelation disabled for non-commutative rings? 
+  { 
     j=pos;
     loop
     {
