@@ -1,4 +1,4 @@
-version="$Id: tropical.lib,v 1.13 2009-04-07 16:18:06 seelisch Exp $";
+version="$Id: tropical.lib,v 1.14 2009-04-08 12:42:19 seelisch Exp $";
 category="Tropical Geometry";
 info="
 LIBRARY:         tropical.lib  Computations in Tropical Geometry
@@ -22,7 +22,7 @@ THEORY:
   the projective space P^m, where the torus is embedded via the map sending a 
   point x in (K*)^n to the point (x^v0,...,x^vm).
   The generic hyperplane sections are just the images of the hypersurfaces 
-  in (K*)^n defined by the polynomials f=a0*x^v0+...+am*x^vm=0. Some properties 
+  in (K*)^n defined by the polynomials f=a0*x^v0+...+am*x^vm=0. Some properties
   of these hypersurfaces can be studied via tropicalisation. 
 
   For this we suppose that K=C{{t}} is the field of Puiseux series over the 
@@ -31,7 +31,7 @@ THEORY:
   the tropical hypersurface defined by the tropicalisation
   trop(f)=min{val(a0)+<v0,x>,...,val(am)+<vm,x>}. 
   Here, <v,x> denotes the standard scalar product of the integer vector v in Z^n
-  with the vector x=(x1,...,xn) of variables, so that trop(f) is a piecewise 
+  with the vector x=(x1,...,xn) of variables, so that trop(f) is a piecewise
   linear function on R^n. The corner locus of this function (i.e. the points 
   at which the minimum is attained a least twice) is the tropical hypersurface 
   defined by trop(f). 
@@ -91,7 +91,7 @@ PROCEDURES FOR TROPICAL LIFTING:
 
 PROCEDURES FOR DRAWING TROPICAL CURVES:
   tropicalCurve            computes a tropical curve and its Newton subdivision
-  drawTropicalCurve        produces a post script image of a tropical curve 
+  drawTropicalCurve        produces a post script image of a tropical curve
   drawNewtonSubdivision    produces a post script image of a Newton subdivision
 
 PROCEDURES FOR J-INVARIANTS:
@@ -2130,7 +2130,7 @@ ASSUME:      f is a polynomial in Q(t)[x_1,...,x_n]
 RETURN:      list, the linear forms of the tropicalisation of f
 NOTE:        if # is empty, then the valuation of t will be 1, 
 @*           if # is the string 'max' it will be -1; 
-@*           the latter supposes that we consider the maximum of the the 
+@*           the latter supposes that we consider the maximum of the 
              computed linear forms, the former that we consider their minimum
 EXAMPLE:     example tropicalise;   shows an example"
 {
@@ -3612,7 +3612,7 @@ NOTE:        needs the libraries random.lib and primdec.lib;
       }
       else
       {
-        ergl[j1]=0; //if the variable belongs not the the d biggest ones, 
+        ergl[j1]=0; //if the variable is not among the d biggest ones, 
                     //save 0 in the list
         erglini[j1]=0;
       }        
