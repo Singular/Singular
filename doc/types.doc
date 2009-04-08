@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.145 2009-04-07 16:29:33 seelisch Exp $
+@comment $Id: types.doc,v 1.146 2009-04-08 17:13:09 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -281,7 +281,7 @@ Like polynomials they
 can only be defined or accessed with respect to a basering.
 
 @strong{Note:} @code{size} counts only the non-zero generators of an ideal
-whereas @code{ncols} counts all generators; see @ref{size}, @ref{ncol}.
+whereas @code{ncols} counts all generators; see @ref{size}, @ref{ncols}.
 @menu
 * ideal declarations::
 * ideal expressions::
