@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-04-07 09:44:20 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.30 2009-04-07 09:44:20 monerjan Exp $
-$Id: gfan.cc,v 1.30 2009-04-07 09:44:20 monerjan Exp $
+$Date: 2009-04-08 14:02:26 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.31 2009-04-08 14:02:26 monerjan Exp $
+$Id: gfan.cc,v 1.31 2009-04-08 14:02:26 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -11,12 +11,15 @@ $Id: gfan.cc,v 1.30 2009-04-07 09:44:20 monerjan Exp $
 #ifdef HAVE_GFAN
 
 #include "kstd1.h"
+#include "kutil.h"
 #include "intvec.h"
 #include "polys.h"
 #include "ideals.h"
 #include "kmatrix.h"
 #include "fast_maps.h"	//Mapping of ideals
 #include "maps.h"
+#include "ring.h"
+#include "prCopy.h"
 #include "iostream.h"	//deprecated
 
 //Hacks for different working places
@@ -437,10 +440,11 @@ class gcone
 			}
 			rComplete(dstRing);
 			rChangeCurrRing(dstRing);
-			map theMap=(map)idMaxIdeal(1);
+			//map theMap=(map)idMaxIdeal(1);
 			rWrite(currRing); cout << endl;
 			ideal ina;
-			ina=fast_map(initialForm,srcRing,(ideal)theMap,dstRing);			
+			//ina=fast_map(initialForm,srcRing,(ideal)theMap,dstRing);			
+			ina=idrCopyR(initialForm,srcRing);
 			cout << "ina=";
 			idShow(ina); cout << endl;
 			ideal H;
@@ -454,14 +458,82 @@ class gcone
 			ideal srcRing_H;
 			ideal srcRing_HH;
 			//map theMap = (map)idMaxIdeal(1);
-			srcRing_H=fast_map(H,dstRing,(ideal)theMap,srcRing);
-			srcRing_HH=srcRing_H-stdred(srcRing_H,this->gcBasis);
+			//srcRing_H=fast_map(H,dstRing,(ideal)theMap,srcRing);
+			srcRing_H=idrCopyR(H,dstRing);
+			idShow(srcRing_H);
+			srcRing_HH=ffG(srcRing_H,this->gcBasis);			
+			idShow(srcRing_HH);
 			/*Substep 2.3
 			turn the minimal basis into a reduced one
 			*/
 			
 		}//void flip(ideal gb, facet *f)
 				
+		/** \brief Compute the remainder of a polynomial by a given ideal
+		*
+		* Compute \f$ f^{\mathcal{G}} \f$
+		* Algorithm is taken from Cox, Little, O'Shea, IVA 2nd Ed. p 62
+		* However, since we are only interested in the remainder, there is no need to
+		* compute the factors \f$ a_i \f$
+		*/
+		poly restOfDiv(poly const &f, ideal const &I)
+		{
+			cout << "Entering restOfDiv" << endl;
+			poly p=f;
+			pWrite(p);
+			//poly r=kCreateZeroPoly(,currRing,currRing);	//The 0-polynomial, hopefully
+			poly r=0;
+			int ii;
+			bool divOccured;
+			cout << "TICK 1" << endl;	//Hangs after this line. Zeropoly stuff
+			while (pHead(p)!=NULL)
+			{
+				ii=1;
+				divOccured=TRUE;
+				while( (ii<=IDELEMS(I) && (divOccured==FALSE) ))
+				{
+					cout << "TICK 2" << endl;
+					if (pLmDivisibleBy(I->m[ii],p))
+					{
+						cout << "TICK 3" << endl;
+						p=pSub(p,pMult( pDivide(pHead(p),pHead(I->m[ii])), I->m[ii]));
+						cout << "TICK 4" << endl;
+						pWrite(p);
+						pSetm(p);
+						divOccured=TRUE;
+					}
+					else
+					{
+						ii += 1;
+					}//if (pLmDivisibleBy(I->m[ii],p,currRing))
+					if (divOccured==FALSE)
+					{
+						cout << "TICK 5" << endl;
+						r=pAdd(r,pHead(p));
+						cout << "TICK 6" << endl;
+						p=pSub(p,pHead(p));
+						cout << "TICK 7" << endl;
+						pWrite(p);
+					}//if (divOccured==FALSE)
+				}//while( (ii<IDELEMS(I) && (divOccured==FALSE) ))
+			}//while (p!=0)
+			return r;
+		}//poly restOfDiv(poly const &f, ideal const &I)
+		
+		/** \brief Compute \f$ f-f^{\mathcal{G}} \f$
+		*/
+		ideal ffG(ideal const &H, ideal const &G)
+		{
+			cout << "Entering ffG" << endl;
+			int size=IDELEMS(G);
+			ideal res=idInit(size,1);
+			for (int ii=0;ii<size;ii++)
+			{
+				res->m[ii]=restOfDiv(H->m[ii],G);
+			}
+			return res;
+		}
+		
 		/** \brief Compute a Groebner Basis
 		*
 		* Computes the Groebner basis and stores the result in gcone::gcBasis
@@ -536,6 +608,7 @@ ideal gfan(ideal inputIdeal)
 	
 	/* Construct a new ring which will serve as our root
 	Does not yet work as expected. Will work fine with order dp,Dp but otherwise hangs in getGB
+	resolved 07.04.2009 MM
 	*/
 	rootRing=rCopy0(currRing);
 	rootRing->order[0]=ringorder_lp;
@@ -544,12 +617,7 @@ ideal gfan(ideal inputIdeal)
 	
 	/* Fetch the inputIdeal into our rootRing */
 	map theMap=(map)idMaxIdeal(1);	//evil hack!
-	//idShow(idMaxIdeal(1));
-	/*for (int ii=0;ii<pVariables;ii++)
-	{
-		theMap->m[ii]=inputIdeal->m[ii];
-	}*/
-	theMap->preimage=NULL;
+	theMap->preimage=NULL;	//neccessary?
 	ideal rootIdeal;
 	rootIdeal=fast_map(inputIdeal,inputRing,(ideal)theMap, currRing);
 #ifdef gfan_DEBUG
