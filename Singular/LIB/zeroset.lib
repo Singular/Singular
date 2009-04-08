@@ -1,6 +1,6 @@
 // Last change 12.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: zeroset.lib,v 1.21 2009-04-06 14:12:09 seelisch Exp $";
+version="$Id: zeroset.lib,v 1.22 2009-04-08 11:00:08 seelisch Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  zeroset.lib      Procedures for roots and factorization
@@ -81,9 +81,9 @@ proc roots(poly f)
 PURPOSE: compute all roots of f in a finite extension of the ground field
          without multiplicities.
 RETURN:  ring, a polynomial ring over an extension field of the ground field,
-         containing a list 'roots' and polynomials 'newA' and 'f':
+         containing a list 'theRoots' and polynomials 'newA' and 'f':
   @format
-  - 'roots' is the list of roots of the polynomial f (no multiplicities)
+  - 'theRoots' is the list of roots of the polynomial f (no multiplicities)
   - if the ground field is Q(a') and the extension field is Q(a), then
     'newA' is the representation of a' in Q(a).
     If the basering contains a parameter 'a' and the minpoly remains unchanged
@@ -92,7 +92,7 @@ RETURN:  ring, a polynomial ring over an extension field of the ground field,
   - 'f' is the polynomial f in Q(a) (a' being substituted by 'newA')
   @end format
 ASSUME:  ground field to be Q or a simple extension of Q given by a minpoly
-EXAMPLE: example  roots; shows an example
+EXAMPLE: example roots; shows an example
 "
 {
   int dbPrt = printlevel-voice+3;
@@ -114,7 +114,7 @@ EXAMPLE: example  roots; shows an example
   // store the roots and the new representation of 'a' and transform
   // the coefficients of f.
 
-  list roots = result[1];
+  list theRoots = result[1];
   poly newA = result[2];
   map F = basering, maxideal(1);
   F[nvars(basering)] = newA;
@@ -124,17 +124,17 @@ EXAMPLE: example  roots; shows an example
 
   def RON = NewBaseRing();
   setring(RON);
-  list roots = imap(ROR, roots);
+  list theRoots = imap(ROR, theRoots);
   poly newA = imap(ROR, newA);
   poly f = imap(ROR, fn);
   kill ROR;
-  export(roots);
+  export(theRoots);
   export(newA);
   export(f); dbprint(dbPrt,"
-// 'roots' created a new ring which contains the list 'roots' and
+// 'roots' created a new ring which contains the list 'theRoots' and
 // the polynomials 'f' and 'newA'
 // To access the roots, newA and the new representation of f, type
-   def R = roots(f); setring R; roots; newA; f;
+   def R = roots(f); setring R; theRoots; newA; f;
 ");
   return(RON);
 }
@@ -148,9 +148,9 @@ example
   minpoly;
   newA;
   f;
-  roots;
+  theRoots;
   map F;
-  F[1] = roots[1];
+  F[1] = theRoots[1];
   F(f);
 }
 
@@ -169,7 +169,7 @@ RETURN:  list, all entries are polynomials
   @end format
 ASSUME:  basering = Q[x,a] ideal mpoly must be defined, it might be 0!
 NOTE:    might change the ideal mpoly!!
-EXAMPLE: example  roots; shows an example
+EXAMPLE: example rootsMain; shows an example
 "
 {
   int i, linFactors, nlinFactors, dbPrt;
@@ -352,7 +352,7 @@ EXAMPLE: example zeroSet; shows an example
 
   // store the zero-set, minimal polynomial and the new representative of 'a'
 
-  list zeroset = result[1];
+  list theZeroset = result[1];
   poly newA = result[2];
   poly minPoly = result[3][1];
 
@@ -368,20 +368,20 @@ EXAMPLE: example zeroSet; shows an example
   def RZBN = NewBaseRing();
   setring RZBN;
 
-  list zeroset = imap(ZSR, zeroset);
+  list theZeroset = imap(ZSR, theZeroset);
   poly newA = imap(ZSR, newA);
   ideal id = imap(ZSR, id);
   kill ZSR;
 
   export(id);
-  export(zeroset);
+  export(theZeroset);
   export(newA);
     dbprint(dbPrt,"
-// 'zeroSet' created a new ring which contains the list 'zeroset', the ideal
+// 'zeroSet' created a new ring which contains the list 'theZeroset', the ideal
 // 'id' and the polynomial 'newA'. 'id' is the ideal of the input transformed
 // w.r.t. 'newA'.
 // To access the zero-set, 'newA' and the new representation of the ideal, type
-   def R = zeroSet(I); setring R; zeroset; newA; id;
+   def R = zeroSet(I); setring R; theZeroset; newA; id;
 ");
   setring RZSB;
   return(RZBN);
@@ -396,9 +396,9 @@ example
   minpoly;
   newA;
   id;
-  zeroset;
-  map F1 = basering, zeroset[1];
-  map F2 = basering, zeroset[2];
+  theZeroset;
+  map F1 = basering, theZeroset[1];
+  map F2 = basering, theZeroset[2];
   F1(id);
   F2(id);
 }
@@ -480,7 +480,7 @@ RETURN:  list of polynomials
 ASSUME:  basering = Q[x] or Q(a)[x]
 NOTE: This procedure is outdated, and should no longer be used. Use div and mod 
 instead.
-EXAMPLE: example  Quotient; shows an example
+EXAMPLE: example Quotient; shows an example
 "
 {
   def QUOB = basering;
@@ -619,7 +619,7 @@ proc MEGCD(poly f, poly g, int varIndex)
 PURPOSE: compute  the polynomial gcd of f and g in the i'th variable
 RETURN:  poly
 ASSUME:  f, g are polynomials in var(i), last variable is the algebraic number
-EXAMPLE: example  MEGCD; shows an example
+EXAMPLE: example MEGCD; shows an example
 "
 // might be extended to return s1, s2 s.t. f*s1 + g*s2 = gc
 // not used !
@@ -660,7 +660,7 @@ RETURN:  list with 3 entries
   @end format
 ASSUME:  f must be squarefree, basering = Q(a)[x] and minpoly != 0.
 NOTE:    the norm is an element of Q[x]
-EXAMPLE: example  sqfrNorm; shows an example
+EXAMPLE: example sqfrNorm; shows an example
 "
 {
   def SNB = basering;
@@ -695,7 +695,7 @@ RETURN:  list with 3 entries
 ASSUME:  f must be squarefree, basering = Q[x,a] and ideal mpoly is equal to
          'minpoly', this represents the ring Q(a)[x] together with 'minpoly'.
 NOTE:   the norm is an element of Q[x]
-EXAMPLE: example  SqfrNorm; shows an example
+EXAMPLE: example SqfrNorm; shows an example
 "
 {
   def SNRMB = basering;
@@ -747,7 +747,7 @@ RETURN:  list with 2 entries
 ASSUME:  basering = Q[x,a], representing Q(a)[x]. An ideal mpoly must
          be defined, representing the minimal polynomial (it might be 0!).
 NOTE: outdated, use factorize instead
-EXAMPLE: example  Factor; shows an example
+EXAMPLE: example Factor; shows an example
 "
 {
 // extend this by a squarefree factorization !!
@@ -813,7 +813,7 @@ ASSUME:  basering = K[x_1,x_2,...,x_n] where K = Q or a simple extension of Q
          given by a minpoly; dim(I) = 0.
 NOTE:    opt = 0  no primary decomposition
          opt > 0  use a primary decomposition
-EXAMPLE: example zeroSet; shows an example
+EXAMPLE: example zeroSetMain; shows an example
 "
 {
   // main work is done in zeroSetMainWork, here the zero-set of each ideal from the
@@ -896,7 +896,7 @@ RETURN:  list, all entries are polynomials
 ASSUME:  basering = Q[x_1,x_2,...,x_n,a]
          ideal mpoly must be defined, it might be 0!
 NOTE:    might change 'mpoly' !!
-EXAMPLE: example  IdealSolve; shows an example
+EXAMPLE: example IdealSolve; shows an example
 "
 {
   def altring=basering;
