@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.333 2009-04-07 16:29:33 seelisch Exp $
+@comment $Id: reference.doc,v 1.334 2009-04-08 16:51:56 seelisch Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5587,7 +5587,7 @@ See
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
-decomposes a ring/qring into a list of 4 (or 6 in the noncommutative case,
+decomposes a ring/qring into a list of 4 (or 6 in the non-commutative case,
 see @ref{ringlist (plural)}) components:
 @enumerate
 @item

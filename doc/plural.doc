@@ -11,7 +11,7 @@
 <A HREF="http://www.singular.uni-kl.de/plural">
 <IMG SRC="plural.jpg" ALT="Singular:Plural logo"></A><br>
 </CENTER>
-<h3> A Computer Algebra Subsystem for Noncommutative Polynomial Algebras </h3>
+<h3> A Computer Algebra Subsystem for Non-commutative Polynomial Algebras </h3>
 <p></p>
 @end html
 @end ifhtml
@@ -20,22 +20,21 @@
 @item @strong{What is and what does @sc{Plural}?}
 
 @sc{Plural} is a kernel extension of @sc{Singular},
-providing many algorithms for computations within certain noncommutative algebras
-(see see @ref{G-algebras} and @ref{Mathematical background BR_PLURAL_BR} for detailed information on algebras and algorithms).
+providing many algorithms for computations within certain non-commutative algebras
+(see @ref{Mathematical background BR_PLURAL_BR} for detailed information on algebras and algorithms).
 
-@sc{Plural} is compatible with @sc{Singular}, since it uses the
-same data structures, sometimes interpreting them in a different way
+It uses the same data structures, sometimes interpreting them in a different way
 and/or modifying them for its own purposes.
 In spite of such a difference, one can always transfer
-objects from commutative rings of @sc{Singular}
-to noncommutative rings @sc{Plural} and back.
+objects between commutative rings of @sc{Singular}
+and non-commutative rings.
 
 
-With @sc{Plural}, one can set up a noncommutative @math{G}-algebra with
-a Poincar@'e-Birkhoff-Witt (PBW) basis, say, @math{A} (see @ref{G-algebras} for step-by-step building instructions and also @ref{Non-commutative libraries}
+With @sc{Plural}, one can set up a non-commutative @math{G}-algebra, say @math{A}, with
+a Poincar@'e-Birkhoff-Witt (PBW) basis, (see @ref{G-algebras} for step-by-step building instructions and also @ref{Non-commutative libraries}
 for procedures for setting many important algebras easily).
 
-Functionalities of @sc{Plural} (enlisted in @ref{Functions  BR_PLURAL_BR}) are accessible as soon as the basering becomes noncommutative (see @ref{nc_algebra}).
+Functionalities of @sc{Plural} (enlisted in @ref{Functions  BR_PLURAL_BR}) are accessible as soon as the basering becomes non-commutative (see @ref{nc_algebra}).
 
 One can perform various computations with polynomials and ideals in @math{A} and with
 vectors and submodules of a free module
@@ -46,7 +45,7 @@ $A^n$.
 A^n.
 @end ifinfo
 
-One can work also within factor-algebras of @math{G}-algebras (see @ref{qring BR_PLURAL_BR} type)
+One can work also within factor algebras of @math{G}-algebras (see @ref{qring BR_PLURAL_BR} type)
 by two-sided ideals (see @ref{twostd}).
 @end table
 
@@ -55,24 +54,22 @@ by two-sided ideals (see @ref{twostd}).
 @itemize
 
 @item
-@sc{Plural} does not perform computations in free algebra or in its general factor algebras (instead, this computations can be possibly done with @ref{LETTERPLACE}).
+@sc{Plural} does not perform computations in the free algebra or in its general factor algebras (instead, these
+computations can be possibly done due to @ref{LETTERPLACE}).
 
 In @sc{Plural} one can only work with @math{G}-algebras and with their factor-algebras
 by two-sided ideals (@math{GR}-algebras).
 
-@item @sc{Plural} requires a monomial ordering but it does not work with local and mixed orderings.
+@item @sc{Plural} requires a monomial ordering but it does not work generally with local and mixed orderings.
+Right now, one can use only global orderings in @sc{Plural} (see @ref{General definitions for orderings}),
+save for SCA, where we provide the possibility of computations in a tensor product of a non-commutative algebra
+(with a global ordering) with a commutative algebra (with any ordering). In the future, this will be enhanced for
+other algebras, as well.
 
-Right now, one can use only global orderings in @sc{Plural}
-(see @ref{General definitions for orderings}).
+@item @sc{Plural} does not handle non-commutative parameters.
 
-This will be enhaced in the future by providing the possibility of computations in a tensor product of a noncommutative algebra (with a global ordering)
-@* with a commutative algebra (with any ordering).
-
-@item @sc{Plural} does not handle noncommutative parameters.
-
-Defining parameters, one @strong{cannot} impose noncommutative relations
-on them. Moreover, it is impossible to introduce
-@* parameters which do not commute with variables.
+Defining parameters, one @strong{cannot} impose non-commutative relations
+on them. Moreover, it is impossible to introduce parameters which do not commute with variables.
 
 @end itemize
 @end table
@@ -84,7 +81,7 @@ on them. Moreover, it is impossible to introduce
 @item *-multiplication  BR_PLURAL_BR
 @itemize
 
-in the noncommutative case, the correct multiplication of @code{y} by
+in the non-commutative case, the correct multiplication of @code{y} by
  @code{x} must be written as @code{y*x}.
 @* Both expressions @code{yx} and @code{xy} are equal, since they are
 interpreted as commutative expressions. See example in @ref{poly expressions BR_PLURAL_BR}.
@@ -95,7 +92,7 @@ interpreted as commutative expressions. See example in @ref{poly expressions BR_
 @item   @code{ideal} BR_PLURAL_BR
 @itemize
 
-Under an @code{ideal} @sc{Plural} understands a list of generators
+Unless stated otherwise, an @code{ideal} as understood by @sc{Plural}, is a list of generators
 of a @strong{left} ideal. For more information see @ref{ideal BR_PLURAL_BR}.
  @* For a @strong{two-sided ideal} @code{T}, use command @ref{twostd} in order to compute
 the two-sided Groebner basis of @code{T}.
@@ -104,7 +101,7 @@ the two-sided Groebner basis of @code{T}.
 
 @item @code{module} BR_PLURAL_BR
 @itemize
-Under a @code{module} @sc{Plural} understands
+Unless stated otherwise, a @code{module} as understood by @sc{Plural}, is
 @strong{either} a fininitely generated @strong{left} submodule of a free module (of finite rank)
 @* @strong{or} a factor module of a free module (of finite rank) by its left submodule (see @ref{module BR_PLURAL_BR} for details).
 @end itemize
@@ -163,9 +160,9 @@ For the general syntax of a declaration see @ref{General command syntax}.
 @c @cindex ideal
 @cindex  untyped definitions
 
-For @sc{Plural} ideals are @strong{left} ideals.
+For @sc{Plural} ideals are @strong{left} ideals, unless stated otherwise.
 @* Ideals are represented as lists of polynomials which are interpreted as
-left generators of  the ideal.
+left generators of the ideal.
 @* For the operations with two-sided ideals see
  @ref{twostd}.
 
@@ -205,12 +202,12 @@ defines a left ideal.
 @smallexample
 @c example
 ring r=0,(x,y,z),dp;
-def R=nc_algebra(-1,0); // an anticommutative algebra
+def R=nc_algebra(-1,0); // an anti-commutative algebra
 setring R;
 poly s1 = x2;
 poly s2 = y3;
 poly s3 = z;
-ideal i =  s1, s2-s1, 0,s2*s3, s3^4;
+ideal i =  s1, s2-s1, 0,s3*s2, s3^4;
 i;
 size(i);
 ncols(i);
@@ -280,7 +277,7 @@ addition (concatenation of the generators and simplification)
 
 @item @code{*}
 multiplication (with ideal, poly, vector, module; in case of
-multiplication with ideal, the result will be simplified)
+multiplication with ideal or module, the result will be simplified)
 
 @item @code{^}
 exponentiation (by a non-negative integer)
@@ -397,7 +394,8 @@ vector space dimension of basering modulo the leading ideal (see @ref{vdim BR_PL
 @section map BR_PLURAL_BR
 @cindex map BR_PLURAL_BR
 
-Maps are ring maps from a preimage ring into the basering.
+Maps are ring maps from a preimage ring (source) into the basering (target), defined by
+specifying images for source variables in the target ring.
 
 @strong{Note:}
 @itemize @bullet
@@ -528,6 +526,7 @@ $Q \rightarrow (Z/p)(a, \ldots)$
 Q -> (Z/p)(a,..)
 @end ifinfo
 @end itemize
+
 @strong{Note:}
 In these cases the denominator and the numerator
 of a number are mapped separately by the usual
@@ -536,9 +535,10 @@ is built again afterwards by division. It is thus
 not allowed to map numbers whose denominator is
 divisible by the characteristic of the target
 ground field, or objects containing such numbers.
-We, therefore, strongly recommend using such
+We, therefore, strongly recommend to use such
 maps only to map objects with integer coefficients.
-
+@*Note that - in contrast to the commutative case - maps between non-commutative rings
+easily fail to be a morphism.
 
 @menu
 * map declarations BR_PLURAL_BR::
@@ -593,7 +593,7 @@ setring W;
 map M = r1, x^2, -y^3;
 // note: M is a map and not a morphism
 M(P);
-// now, a more interesting example
+// now, a more involved example
 LIB "ncalg.lib";
 def Usl2 = makeUsl2();
 // this algebra is U(sl_2), generated by  e,f,h
@@ -604,8 +604,6 @@ ring W1  = 0,(D,X),dp;
 def W2=nc_algebra(1,-1);
 setring W2;
 // this algebra is the opposite Weyl algebra
-option(redSB);
-option(redTail);
 map F = Usl2, -X, D*D*X, 2*D*X;
 F(P); // 0, because P is in the kernel of F
 F(Q);
@@ -653,8 +651,7 @@ $f \circ g$
 @ifinfo
 @code{f} @bullet{} @code{g}
 @end ifinfo
- of @code{f} and @code{g},
-@* provided the target ring of @code{g} is the basering of @code{f}.
+ of @code{f} and @code{g}, provided the target ring of @code{g} is the basering of @code{f}.
 
 @item map_expression @code{[} int_expressions @code{]}
 is a map entry (the image of the corresponding variable)
@@ -666,13 +663,15 @@ is a map entry (the image of the corresponding variable)
 LIB "ncalg.lib";
 def Usl2 = makeUsl2(); // this algebra is U(sl_2)
 setring Usl2;
-map F = Usl2, f, e, -h; // endomorphism of U(sl_2)
+map F = Usl2, f, e, -h; // involutive endomorphism of U(sl_2)
+F;
 map G = F(F);
+G;
 poly p = (f+e*h)^2 + 3*h-e;
 p;
 F(p);
 G(p);
-(G(p) == p); // G is the identity on p
+(G(p) == p); // G is the identity
 @c example
 @end smallexample
 
@@ -722,8 +721,7 @@ v_1, @dots{}, v_k, then
 @tex
 $v_1, \ldots, v_k$, then
 @end tex
- these generators may be considered as
-@* the generators of relations of
+ these generators may be considered as the generators of relations of
 @ifinfo
 R^n/M
 @end ifinfo
@@ -732,23 +730,16 @@ $R^n/M$
 @end tex
 between the canonical generators @code{gen(1)},@dots{},@code{gen(n)}.
 Hence, any finitely generated @math{R}-module can be represented in @sc{Plural}
-by its module of relations.
+by its module of relations. This is the so-called Coker-representation.
 @* The assignments @code{module M=v1,...,vk; matrix A=M;}
 create the presentation matrix of size
 @ifinfo
-n x k
+n x k,
 @end ifinfo
 @tex
-$n \times k$
+$n \times k$,
 @end tex
- for
-@ifinfo
-R^n/M,
-@end ifinfo
-@tex
-$R^n/M$,
-@end tex
- i.e. the columns of A are the vectors
+with the columns of A being the vectors
 @ifinfo
 v_1, @dots{}, v_k which generate M.
 @end ifinfo
@@ -832,10 +823,11 @@ a type cast to module
 
 @table @asis
 @item @code{+}
-addition (concatenation of the generators and simplification)
+addition (concatenation of the generators and simplification) Note that ''-'' implicitely converts a module into a matrix; see
+below example.
 
 @item @code{*}
-right or left multiplication with ideal or poly (but not `module` * `module`!)
+right or left multiplication with number, ideal, or poly (but not `module` * `module`!)
 
 @item module_expression @code{[} int_expression @code{,} int_expression @code{]}
 is a module entry, where the first index indicates the row and
@@ -855,7 +847,8 @@ def B=nc_algebra(1,D);
 setring B;
 module M = [x,y],[0,0,x*z];
 module N = (x+y-z)*M - M*(x+y-z);
-print(-N);
+print(-N);  // implicit conversion into a matrix
+typeof(-N);
 @c example
 @end smallexample
 
@@ -933,8 +926,8 @@ of leading terms (see @ref{vdim BR_PLURAL_BR})
 @section poly BR_PLURAL_BR
 @cindex poly BR_PLURAL_BR
 
-Polynomials are the basic data for all main algorithms in
-@sc{Plural}. They consist of finitely many terms
+Polynomials and vectors are the basic data for all main algorithms in
+@sc{Plural}. Polynomials consist of finitely many terms
 (coefficient*monomial) which are combined by the usual polynomial
 operations (see @ref{poly expressions BR_PLURAL_BR}).
  Polynomials can only be defined
@@ -1061,7 +1054,7 @@ negation or subtraction
 multiplication
 
 @item @code{/}
-division by a monomial, non divisible terms yield 0
+commutative division by a monomial, non divisible terms yield 0
 
 @item @code{^}, @code{**}
 power by a positive integer
@@ -1159,11 +1152,11 @@ def R=nc_algebra(-1,0); // an anticommutative algebra
 setring R;
 option(redSB);
 option(redTail);
-ideal i=z^2,u^2,v^2,w^2;
+ideal i=z^2,u^2,v^2,w^2, zuv-w;
 qring Q = i;  // incorrect call produces error
 kill Q;
 setring R;  // go back to the ring R
-qring q=twostd(i); // now it is an exterior algebra
+qring q=twostd(i); // now it is an exterior algebra modulo <zuv-w>
 q;
 poly k = (v-u)*(zv+u-w);
 k; // the output is not yet totally reduced
@@ -1243,6 +1236,7 @@ re;
 list l = re;
 l;
 print(matrix(l[2]));
+print(module(transpose(matrix(l[2]))*transpose(matrix(l[1]))));  // check that product is zero
 @c example
 @end smallexample
 @end table
@@ -1303,8 +1297,8 @@ For a detailed description of the concept of rings see
 @sc{Singular} manual (Chapter: General Concepts, Section: Rings and orderings).
 @end ifclear
 
-@*@strong{Note:} @sc{Plural} works with global orderings
-only (@pxref{PLURAL}).
+@*@strong{Note:} @sc{Plural} usually works with global orderings (@pxref{PLURAL}) but one can use
+certain local once when super-commutative rings are being used.
 
 @menu
 * ring declarations BR_PLURAL_BR::
@@ -1324,7 +1318,7 @@ only (@pxref{PLURAL}).
   @code{(} names_of_ring_variables @code{),}
   @code{(} ordering @code{);}
 @item Default:
-@code{2147483629,(x,y,z),(dp,C);}
+@code{32003,(x,y,z),(dp,C);}
 @item Purpose:
 declares a ring and sets it as the actual basering.
 @end table
@@ -1332,7 +1326,7 @@ declares a ring and sets it as the actual basering.
 The coefficient_field is given by one of the following:
 @enumerate
 @item
-a non-negative int_expression less or equal 2147483629.
+a non-negative int_expression less or equal 2147483647.
 @item
 an expression_list of an int_expression and one or more names.
 @item
@@ -1364,12 +1358,14 @@ weight vector given as an intvec_expression in parentheses.
 @code{c} or @code{C}.
 @end enumerate
 
+As long as all non-commuting variables are global, any ordering may be used. In super-commutative
+algebras, one may also use @code{ls, ds, Ds, ws}, and @code{Ws}.
 
 If one of coefficient_field, names_of_ring_variables, and ordering
 consists of only one entry, the parentheses around this entry may be
 omitted.
 
-@strong{In order to create the non-commutative extension, use} @ref{nc_algebra}.
+@strong{In order to create a non-commutative structure over a commutative ring, use} @ref{nc_algebra}.
 
 
 @c ---------------------------------------
@@ -1388,14 +1384,12 @@ $C = A\otimes_{\bf{K} } B$
 @end tex
 of two
 @ifinfo
-G-algebras A and B
+R-algebras A and B
 @end ifinfo
 @tex
 $G$-algebras $A$ and $B$
 @end tex
- over the groung field.
-
-Let
+ over the ground field. Let, e.g.,
 @ifinfo
  A=k1<x_1,...,x_n | @{x_j x_i=c_@{ij@}x_i x_j + d_@{ij @} @}, 1 =<i <j =< n >,
  and
@@ -1430,7 +1424,7 @@ $\{ y_j x_i = x_i y_j, 1 \leq j \leq m, 1 \leq i \leq n\}  \rangle$.
 
 
 Concerning the ground fields @math{k_1} resp. @math{k_2} of @math{A} resp. @math{B}, take the
-following guide lines for
+following guidelines for
 @ifinfo
 A\otimes_k B
 @end ifinfo
@@ -1444,7 +1438,7 @@ $A\otimes_{\bf{K} } B$
 @item At most one of @math{k_1} and @math{k_2} may have parameters.
 @item If one of @math{k_1} and @math{k_2} is an algebraic extension of @math{Z/p} it may not be defined by a @code{charstr} of type @code{(p^n,a)}.
 @end itemize
-
+One can create a ring using @code{ring(list)}, see also @code{ringlist}.
 
 @strong{Example:}
 @smallexample
@@ -1452,7 +1446,7 @@ $A\otimes_{\bf{K} } B$
 LIB "ncalg.lib";
 def a = makeUsl2();       // U(sl_2) in e,f,h presentation
 ring W = 0,(x,d),dp;
-Weyl();              // 1st Weyl algebra in x,d
+def W = Weyl();              // 1st Weyl algebra in x,d
 def S = a+W;
 setring S;
 S;
@@ -1557,7 +1551,8 @@ Note, that both @strong{Control structures} and @strong{System variables} of
 @item @strong{Type:}
 intmat
 @item @strong{Note:}
-in the noncommutative case, computing Betti numbers makes sense only if the basering @math{R} has homogeneous relations
+in the non-commutative case, computing Betti numbers makes sense only if the basering @math{R} has homogeneous relations.
+The output of the command can be pretty-printed using @code{print( , ''betti'')}, i.e., with ''betti'' as second argument; see below example.
 @item @strong{Purpose:}
 with 1 argument: computes the graded Betti numbers of a minimal resolution of
 @tex
@@ -1637,7 +1632,7 @@ minpoly=Q^2-Q+1;
 matrix C[3][3];  matrix D[3][3];
 C[1,2]=Q2;    C[1,3]=1/Q2;  C[2,3]=Q2;
 D[1,2]=-Q*z;  D[1,3]=1/Q*y; D[2,3]=-Q*x;
-def R=nc_algebra(C,D); setring R;
+def R=nc_algebra(C,D); setring R; R;
 // this is a quantum deformation of U(so_3),
 // where Q is a 6th root of unity
 poly p=Q^4*x2+y2+Q^4*z2+Q*(1-Q^4)*x*y*z;
@@ -1669,9 +1664,10 @@ eliminates variables occurring as factors of the second argument from an
 ideal (resp.@: a submodule of a free module), by intersecting it
 (resp. each component of the submodule) with the subring not containing these variables.
 @item @strong{Note:}
-@code{eliminate} does not need neither a special ordering on the basering nor a Groebner basis as input.
+@code{eliminate} neither needs a special ordering on the basering nor a Groebner basis as input.
+Moreover, @code{eliminate} does not work in non-commutative quotients.
 @item @strong{Remark:}
- in a noncommutative algebra, not every subset of a set of variables generates
+ in a non-commutative algebra, not every subset of a set of variables generates
 a proper subalgebra. But if it is so, there may be cases, when no elimination is possible.
 In these situations error messages will be reported.
 
@@ -1786,7 +1782,6 @@ option(redTail);
 poly  C  = 4*e*f+h^2-2*h; // the central element of Usl2
 ideal I  = e^3,f^3,h^3-4*h;
 ideal J  = twostd(I);
-matrix M = matrix(J);
  // print a compact presentation of J:
 print(matrix(ideal(J[1..5]))); // first 5 generators
 print(matrix(ideal(J[6..size(J)]))); // last generators
@@ -1828,7 +1823,7 @@ different ground fields).
 Useful for mappings from a homogenized ring to the original ring or
 for mappings from/to rings with/without parameters. Compared with
 @code{fetch}, @code{imap} uses the names of variables and parameters.
-Unlike @code{map} and @code{fetch}, @code{imap} can map parameters to variables.
+@strong{Unlike @code{map} and @code{fetch}, @code{imap} can map parameters to variables.}
 @item @strong{Example:}
 @smallexample
 @c example
@@ -1893,7 +1888,7 @@ computes the intersection of ideals, resp. modules.
 @smallexample
 @c example
 ring r=0,(x,y),dp;
-def R=nc_algebra(-1,0);
+def R=nc_algebra(-1,0);  /anti-commutative algebra
 setring R;
 module M=[x,x],[y,0];
 module N=[0,y^2],[y,x];
@@ -1930,8 +1925,7 @@ H;
 @item @strong{Type:}
 the same as the input type of the first argument
 @item @strong{Purpose:}
-
-computes the vector space basis of the
+with one argument: computes the vector space basis of the
 factor-module that equals
 ring (resp. free module) modulo the ideal (resp. submodule),
 generated by the initial terms of the given generators.
@@ -1941,9 +1935,13 @@ If the generators form a Groebner basis,
 this is the same as the vector space basis of the
 factor-module.
 
+when called with two arguments: computes the part of a vector space basis of the respective quotient with degree (of monomials) equal
+to the second argument. Here, the quotient does not need to be finite dimensional.
+
 @item @strong{Note:}
-in the noncommutative case, a ring modulo an ideal has a ring stucture
+in the non-commutative case, a ring modulo an ideal has a ring stucture
 if and only if the ideal is two-sided.
+@code{kbase} respects module-grading given by the @code{isHomog} attribute of input modules.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -1986,12 +1984,9 @@ computes the (left) transformation matrix which expresses the (left) generators 
 submodule in terms of the (left) generators of a module.  Uses different
 algorithms for modules which are (resp.@: are not) represented by a
 Groebner basis.
-@* More precisely, if  @code{m} is the
-module, @code{sm} the submodule,
-and @code{T} the transformation matrix returned by
-lift, then @code{transpose(matrix(sm)) = transpose(T)*transpose(m)}
-and @code{module(transpose(sm)) = module(transpose(T)*transpose(m))}.
-If  @code{m} and @code{sm} are ideals, @code{ideal(sm) = ideal(transpose(T)*transpose(m))}.
+@* More precisely, if  @code{m} is the module, @code{sm} the submodule, and @code{T} the
+transformation matrix returned by lift, then @code{transpose(matrix(sm)) = transpose(T)*transpose(matrix(m))}.
+If  @code{m} and @code{sm} are ideals, @code{ideal(sm) = ideal(transpose(T)*transpose(matrix(m)))}.
 
 @item @strong{Note:}
 Gives a warning if @code{sm} is not a submodule.
@@ -2013,7 +2008,7 @@ j;
 matrix T = lift(i,j);
 print(T);
 ideal tj = ideal(transpose(T)*transpose(matrix(i)));
-std(ideal(j-tj)); // test
+size(ideal(j-tj)); // test
 @c example
 @end smallexample
 @end table
@@ -2040,8 +2035,7 @@ returns a Groebner basis of an ideal or module and the transformation
 matrix from the given ideal, resp.@: module, to the Groebner basis.
 @*That is, if @code{m} is the ideal or module, @code{sm} is the Groebner
 basis of  @code{m}, returned by @code{liftstd}, and @code{T} is the transformation matrix,
-then @code{transpose(matrix(sm))=transpose(T)*transpose(matrix(m))} and
-@code{sm=module(transpose(transpose(T)*transpose(matrix(m))))}.
+then @code{sm=module(transpose(transpose(T)*transpose(matrix(m))))}.
 
 If @code{m} is an ideal, @code{sm=ideal(transpose(T)*transpose(matrix(m)))}.
 @item @strong{Example:}
@@ -2059,7 +2053,7 @@ ideal j = liftstd(i,T);
 print(matrix(j));
 print(T);  // the transformation matrix
 ideal tj = ideal(transpose(T)*transpose(matrix(i)));
-std(ideal(j-tj)); // test
+size(ideal(j-tj)); // test
 @c example
 @end smallexample
 @end table
@@ -2096,14 +2090,12 @@ def A = makeUsl2();
 setring A; // this algebra is U(sl_2)
 ideal i=e,f,h;
 i=std(i);
-resolution F=nres(i,0);   F;
-print(matrix(F[1])); // print F's compactly
-print(matrix(F[2]));
-print(matrix(F[3]));
+resolution F=nres(i,0); F;
+list lF = F; lF;
+print(betti(lF), "betti");
 resolution MF=minres(F);  MF;
-print(matrix(MF[1]));
-print(matrix(MF[2]));
-print(matrix(MF[3]));
+list lMF = F; lMF;
+print(betti(lMF), "betti");
 @c example
 @end smallexample
 @end table
@@ -2142,12 +2134,12 @@ h1 and h2
 @end ifinfo
 are considered as submodules of the same free module
 @tex
-$R^s$
+$R^l$
 @end tex
 @ifinfo
-R^s
+R^l
 @end ifinfo
-(s=1 for ideals).
+(l=1 for ideals).
 @*Let
 @tex
 $H_1$ (resp.\ $H_2$)
@@ -2176,9 +2168,15 @@ $h_1/(h_1 \cap h_2) \cong R^k / ker(\overline{H_1})$
 @end ifinfo
 , where
 @tex
-$\overline{H_1}: R^k \rightarrow R^s/Im(H_2)=R^s/h_2$
-is the induced map.
+$\overline{H_1}: R^k \rightarrow R^l/Im(H_2)=R^l/h_2$
 @end tex
+is the induced map given by
+@tex
+$H_1$.
+@end tex
+@ifinfo
+H1.
+@end ifinfo
 @ifinfo
 @format
          __
@@ -2189,6 +2187,16 @@ is the induced map.
 @end ifinfo
 @*@code{modulo(h1,h2)} returns generators of
 the kernel of this induced map.
+
+@item @strong{Note:} If, for at least one of
+@tex
+$h_1$ or $h_2$,
+@end tex
+@ifinfo
+h1 or h2,
+@end ifinfo
+the attribute @code{isHomog} is st, then @code{modulo(h1,h2)} also sets this attribute (if the weights are compatible).
+
 @item @strong{Example:}
 @smallexample
 @c example
@@ -2197,12 +2205,12 @@ def A = makeUsl2();
 setring A; // this algebra is U(sl_2)
 option(redSB);
 option(redTail);
-ideal I = e2,f2,h2-1;
-I = twostd(I);
-print(matrix(I)); // print I in a compact form
-ideal E = std(e);
-ideal T = modulo(E,I);
-T = NF(std(I+T),I);
+ideal H2 = e2,f2,h2-1;
+H2 = twostd(H2);
+print(matrix(H2)); // print H2 in a compact form
+ideal H1 = std(e);
+ideal T = modulo(H1,H2);
+T = NF(std(H2+T),H2);
 T = std(T);
 T;
 @c example
@@ -2251,7 +2259,7 @@ A1
 are a (possibly) minimal set of generators
 of @math{M}.
 If the int expression k is not zero, then the computation stops after k steps
-and returns a list of modules
+and returns a resolution consisting of modules
 @tex
 $M_i={\tt module}(A_i)$, $i= 1 \ldots k$.
 @end tex
@@ -2261,7 +2269,7 @@ Mi=module(Ai), i=1...k.
 @*@code{mres(M,0)} returns a resolution consisting of at most n+2 modules,
 where n is the number of variables of the basering.
 Let @code{list L=mres(M,0);}
- then @code{L[1]} consists of a minimal set of generators of the input, @code{L[2]}
+ then @code{L[1]} consists of a minimal set of generators @code{M}, @code{L[2]}
 consists of a minimal set of generators for the first syzygy module of
 @code{L[1]}, etc., until @code{L[p+1]}, such that
 @ifinfo
@@ -2274,7 +2282,8 @@ ${\tt L[i]}\neq 0$ for $i \le p$,
 is 0 (if the basering is not a qring).
 @item @strong{Note:}
 Accessing single elements of a resolution may require that some partial
-computations have to be finished and may therefore take some time.
+computations have to be finished and may therefore take some time. Hence, assigning right away to a list
+is the recommended way to do it.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -2287,13 +2296,12 @@ ideal i = e,f,h;
 i = std(i);
 resolution M=mres(i,0);
 M;
-print(matrix(M[1])); // print M's in a compact way
-print(matrix(M[2]));
+list l = M; l;
 // see the exactness at this point
-std(ideal(transpose(M[2])*transpose(M[1])));
+size(ideal(transpose(l[2])*transpose(l[1])));
 print(matrix(M[3]));
 // see the exactness at this point
-std(ideal(transpose(M[3])*transpose(M[2])));
+size(ideal(transpose(l[3])*transpose(l[2])));
 @c example
 @end smallexample
 @end table
@@ -2327,15 +2335,15 @@ $ x_1, \ldots, x_k ,\;$
 @ifinfo
  x_1,... ,x_k,
 @end ifinfo
-@code{nc_algebra} creates the
-noncommutative extension of @code{r} subject to relations
+@code{nc_algebra} creates and returns the
+non-commutative extension of @code{r} subject to relations
 @tex
 $ \{ x_j x_i=c_{ij} \cdot x_i x_j + d_{ij}, 1 \leq i <j \leq k \}, $
 where $c_{ij}$ and $d_{ij}$ must be put into two strictly upper
 @end tex
 @ifinfo
 @{x_j x_i=c_@{ij@} ..., x_i x_j + d_@{ij@} , 0< i <j < k+1 @}.
-where c_@{ij@}  and d_@{ij@  must be put into two strictly upper
+where c_@{ij@}  and d_@{ij@  are taken from two strictly upper
 @end ifinfo
  triangular matrices @code{C} with entries
 @tex
@@ -2345,7 +2353,7 @@ $c_{ij}$
 c_@{ij@}
 @end ifinfo
  from the ground field of @code{r}
-and @code{D}  with  polynomial entries
+and @code{D}  with  (commutative) polynomial entries
 @tex
 $ d_{ij}$
 @end tex
@@ -2355,20 +2363,22 @@ d_@{ij@}
  from @code{r}. See all the details in @ref{G-algebras}.
 @* If
 @tex
-$\forall i<j$, $c_{ij} = n$
+$\forall i<j$, $c_{ij} = n$,
 @end tex
 @ifinfo
-for all i<j, c_@{ij@} = n
+for all i<j, c_@{ij@} = n,
 @end ifinfo
- , one can input a number @code{n} instead of matrix @code{C}.
+one can input the number @code{n} instead of matrix @code{C}.
 @* If
 @tex
-$\forall i<j$, $d_{ij} = p$
+$\forall i<j$, $d_{ij} = p$,
 @end tex
 @ifinfo
-for all i<j, d_@{ij@} = p
+for all i<j, d_@{ij@} = p,
 @end ifinfo
- , one can input a poly @code{p} instead of matrix @code{D}.
+one can input the poly @code{p} instead of matrix @code{D}.
+
+@item @strong{Note:} The returned ring should be activated afterwards, using the command @code{setring}.
 
 @item @strong{Remark:}
 At present, @sc{Plural} does not check the non-degeneracy conditions (@pxref{G-algebras}) while setting an algebra.
@@ -2443,7 +2453,9 @@ Works like @ref{nc_algebra} but changes the basering.
 
 @item @strong{Remark:}
 This function is @strong{depreciated} and should be substituted by @code{nc_algebra},
-since it violates the general @sc{Singular} policy: only @ref{ring} and @ref{setring} can change the basering.
+since it violates the general @sc{Singular} policy: only @ref{ring} and @ref{setring} can change the basering. More concretely,
+replace by @code{def A = nc_algebra(C, D); setring A;} which will additionally introduce a new ring. Afterwards, some objects may have to be
+mapped into the new ring.
 
 @end table
 @c ref
@@ -2465,6 +2477,8 @@ resolution
 @item @strong{Purpose:}
 computes a free resolution of an ideal or module which is minimized
 from the second module on (by the Groebner basis method).
+@item @strong{Note:} Assigning a resolution to a list is the best choice of usage. The resolution may be minimized by using the
+command @code{minres}. Use the command @code{betti} to compute Betti numbers.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -2475,16 +2489,14 @@ option(redSB);
 option(redTail);
 ideal i = e,f,h;
 i = std(i);
-resolution F=nres(i,0);
-F;
-// print the resolution componentwise:
-print(matrix(F[1]));
-print(matrix(F[2]));
+resolution F=nres(i,0); F;
+list l = F; l;
 // see the exactness at this point:
-std(ideal(transpose(F[2])*transpose(F[1])));
-print(matrix(F[3]));
+size(ideal(transpose(l[2])*transpose(l[1])));
 // see the exactness at this point:
-std(ideal(transpose(F[3])*transpose(F[2])));
+size(ideal(transpose(l[3])*transpose(l[2])));
+print(betti(l), "betti");
+print(betti(minres(l)), "betti");
 @c example
 @end smallexample
 @end table
@@ -2529,20 +2541,21 @@ ideal  i  = h*e, f^2*e,h*f*e;
 m         = e,f,h,1,0,h^2, p,0,0,1,e^2,e*f*h+1;
 module mm = module(m);
 def b     = opposite(r);
-// we will oppose these objects: p,v,i,m,mm
 setring b; b;
+// we will oppose these objects: p,v,i,m,mm
 poly P    = oppose(r,p);
 vector V  = oppose(r,v);
 ideal  I  = oppose(r,i);
 matrix M  = oppose(r,m);
 module MM = oppose(r,mm);
-setring r;   // now let's check the correctness:
+def c = opposite(b);
+setring c;   // now let's check the correctness:
 // print compact presentations of objects
-print(matrix(oppose(b,P)-p));
-print(matrix(oppose(b,V)-v));
-print(matrix(oppose(b,I)-i));
-print(matrix(oppose(b,M)-m));
-print(matrix(oppose(b,MM)-mm));
+print(matrix(oppose(b,P)-imap(r,p)));
+print(matrix(oppose(b,V)-imap(r,v)));
+print(matrix(oppose(b,I)-imap(r,i)));
+print(matrix(oppose(b,M)-imap(r,m)));
+print(matrix(oppose(b,MM)-imap(r,mm)));
 @c example
 @end smallexample
 @end table
@@ -2566,19 +2579,20 @@ ring
 creates an opposite algebra of a given algebra.
 @item @strong{Note:}
 activate the ring with the @code{setring} command.
-@* An opposite algebra of a given algebra (@math{A},.) is
-an algebra (@math{A},*) with the same vectorspace but with the opposite
+@* An opposite algebra of a given algebra (@math{A},#) is
+an algebra (@math{A},*) with the same vector space but with the opposite
 multiplication, i.e.
 @*
 @tex
 $\forall \; f,g \in A^{opp}$, a new multiplication $*$ on $A^{opp}$
-is defined to be $f*g := g \cdot f$.
+is defined to be $f*g := g \sharp f$.
 @end tex
 
 @ifinfo
 for any f,g in A_opp, a multiplication @code{*} on A_opp is defined to
-be f @code{*} g := gf.
+be f @code{*} g := g # f.
 @end ifinfo
+This is an identity functor on commutative algebras.
 
 @item @strong{Remark:}
 Starting from the variables x_1,...,x_N and the ordering @code{<}
@@ -2598,6 +2612,8 @@ setring B; B;
 def Bopp = opposite(B);
 setring Bopp;
 Bopp;
+def Bcheck = opposite(Bopp);
+setring Bcheck; Bcheck;  // check that (B-opp)-opp = B
 @c example
 @end smallexample
 @end table
@@ -2629,7 +2645,7 @@ To compute the kernel of a map, the preimage of zero has to be determined.
 Hence there is no special command for computing the kernel of a map in
 @sc{Plural}.
 @item @strong{Remark:}
-In the noncommutative case, it is implemented only for maps @math{A} -> @math{B}, where @math{A} is  a commutative ring.
+In the non-commutative case, it is implemented only for maps @math{A} -> @math{B}, where @math{A} is  a commutative ring.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -2640,9 +2656,10 @@ setring Usl2;
 poly  C = 4*e*f+h^2-2*h;
 // C is a central element of U(sl2)
 ideal I = e^3, f^3, h^3-4*h;
+ideal Z = 0;  // zero
 ideal J = twostd(I); // two-sided GB
 ideal K = std(I);    // left GB
-map Phi = R,C;
+map Phi = R,C;  // phi maps a (in R) to C (in U(sl2))
 setring R;
 ideal PreJ = preimage(Usl2,Phi,J);
 // the central character of J
@@ -2654,6 +2671,7 @@ ideal PreK = preimage(Usl2,Phi,K);
 PreK;
 factorize(PreK[1],1);
 // hence, there are three simple characters for K
+preimage(Usl2, Phi, Z);  // kernel pf phi
 
 @c example
 @end smallexample
@@ -2683,7 +2701,7 @@ ideal
 module
 @item @strong{Purpose:}
 computes the ideal quotient, resp.@: module quotient. Let @code{R} be the
-basering, @code{I,J} ideals and @code{M} a module in
+basering, @code{I,J} ideals and @code{M, N} modules in
 @ifinfo
 R^n.
 @end ifinfo
@@ -2703,36 +2721,38 @@ $\{a \in R \mid aJ \subset I\}$,
 @item
 @code{quotient(M,J)}=
 @ifinfo
-@{b in R | bJ in M @}.
+@{a in R | bN in M @}.
 @end ifinfo
 @tex
 $\{b \in R^n \mid bJ \subset M\}$.
 @end tex
 @end itemize
 @item @strong{Note:}
-It an only be used for two-sided ideals (bimodules), otherwise the
+It can only be used for two-sided ideals (bimodules), otherwise the
 result may have no meaning.
 
 @item @strong{Example:}
 @c // from [BGV], Ex.3.17, p.150, modified by q
 @smallexample
 @c example
-//------ a very easy example ------------
+//------ a very simple example ------------
 ring r=(0,q),(x,y),Dp;
 def R=nc_algebra(q,0); // this algebra is a quantum plane
 setring R;
 option(returnSB);
 poly f1  = x^3+2*x*y^2+2*x^2*y;
 poly f2  = y;
-poly f1' = x^2;
-poly f2' = x+y;
+poly f3 = x^2;
+poly f4 = x+y;
 ideal i = f1,f2;
 ideal I = twostd(i);
-ideal j = f1',f2';
+ideal j = f3,f4;
 ideal J = twostd(j);
 quotient(I,J);
+module M = x*freemodule(3), y*freemodule(2);
+quotient(M, ideal(x,y));
 kill r,R;
-//------- a bit more complicated example
+//------- a bit more involved example
 LIB "ncalg.lib";
 def Usl2 = makeUsl2();
 // this algebra is U(sl_2)
@@ -2778,10 +2798,11 @@ See
 the type of the first argument
 @item @strong{Purpose:}
 reduces a polynomial, vector, ideal  or module to its @strong{left} normal form with
-respect to an ideal or module represented by a left Groebner basis.
-Returns 0 if and only if the polynomial (resp.@: vector, ideal, module)
+respect to an ideal or module represented by a left Groebner basis, if the second argument is a left
+Groebner basis.
+@*returns 0 if and only if the polynomial (resp.@: vector, ideal, module)
 is an element (resp.@: subideal, submodule) of the ideal (resp.@: module).
-The result may have no meaning if the second argument is not a left Groebner basis.
+@*Otherwise, the result may have no meaning.
 @*The third (optional) argument 1 of type int forces a reduction which considers only the leading term and does no tail reduction.
 @item @strong{Note:}
 The commands @code{reduce} and @code{NF} are synonymous.
@@ -2793,7 +2814,7 @@ matrix d[3][3];
 d[1,2]=-h;  d[1,3]=2e;  d[2,3]=-2f;
 def R=nc_algebra(1,d);
 setring R;
-// this algebra is a parametric U(sl_2)
+// this algebra is U(sl_2) over Q(a)
 ideal I = e2, f2, h2-1;
 I = std(I);
 // print a compact presentation of I
@@ -2804,10 +2825,11 @@ J = std(J);
 print(matrix(J));
 poly z=4*e*f+h^2-2*h;
 // z is the central element of U(sl_2)
-NF(z,I);  // the central character of I:
-NF(z,J); // the central character of J:
+reduce(z,I);  // the central character of I:
+reduce(z,J); // the central character of J:
 poly nz = z - NF(z,J); // nz will belong to J
-NF(nz,J);
+reduce(nz,J,I);
+reduce(I,J);
 @c example
 @end smallexample
 @end table
@@ -2836,19 +2858,20 @@ components.
 non-commutative cases, the 5th and the 6th appear only in the non-commutative case.
 
 @enumerate 5
-@item square matrix with nonzero upper triangle, containing
+@item upper triangle square matrix with nonzero upper triangle, containing
 structural coefficients of a G-algebra (this corresponds to the
 matrix C from the definition of @ref{G-algebras})
 @item square matrix, containing structural polynomials of a G-algebra
 (this corresponds to the matrix D from the definition of @ref{G-algebras})
 @end enumerate
+@item @strong{Note:} After modifying a list aquired with @code{ringlist}, one can construct a corresponding ring with @code{ring(list)}.
 @item @strong{Example:}
 @smallexample
 @c example
 // consider the quantized Weyl algebra
 ring r = (0,q),(x,d),Dp;
 def RS=nc_algebra(q,1);
-setring RS;
+setring RS; RS;
 list l = ringlist(RS);
 l;
 // now, change the relation d*x = q*x*d +1
@@ -2861,8 +2884,6 @@ T[1,2] = q*d+1;
 l[6] = T;
 def rr = ring(l);
 setring rr; rr;
-// compare with the ring we started with:
-setring RS; RS;
 @c example
 @end smallexample
 @end table
@@ -2881,17 +2902,18 @@ See also
 @table @code
 @item @strong{Syntax:}
 @code{slimgb (} ideal_expression@code{)}
+@*@code{slimgb (} module_expression@code{)}
 
 @item @strong{Type:}
-ideal
+same type as argument
 @item @strong{Purpose:}
-returns a left Groebner basis of a left ideal with respect to the
+returns a left Groebner basis of a left ideal or module with respect to the
 global monomial ordering of the basering.
 @item @strong{Note:}
 The commutative algorithm is described in the diploma thesis of Michael Brickenstein "Neue Varianten zur Berechnung von Groebnerbasen",
 written 2004 under supervision of G.-M. Greuel in Kaiserslautern.
 
-It is designed to keep polynomials slim (short with small coefficients).
+It is designed to keep polynomials or vectors slim (short with small coefficients).
 Currently best results are examples over function fields (parameters).
 
 The current implementation may not be optimal for weighted degree orderings.
@@ -2902,12 +2924,15 @@ The protocol messages of @code{slimgb} mean the following:
 @* @code{b} notices an exchange trick described in the thesis and
 @* @code{e} adds a reductor with non-minimal leading term.
 
+@code{slimgb} works for super-commutative algebras but mot for general GR-algebras. Please use @code{qslimgb} instead.
+
 For a detailed commutative example see @ref{slim Groebner bases}.
 
 @item @strong{Example:}
 @smallexample
 @c example
 LIB "ncalg.lib";
+LIB "nctools.lib";
 def U = makeUsl(2);
 // U is the U(sl_2) algebra
 setring U;
@@ -2920,6 +2945,12 @@ ideal K = std(I);
 print(matrix(NF(K,J)));
 print(matrix(NF(J,K)));
 // hence both Groebner bases are equal
+;
+// another example for exterior algebras
+ring r;
+def E = Exterior();
+setring E; E;
+slimgb(xy+z);
 @c example
 @end smallexample
 @end table
@@ -2962,6 +2993,7 @@ To view the progress of long running computations, use
 @smallexample
 @c example
 LIB "ncalg.lib";
+option(prot);
 def R = makeUsl2();
 // this algebra is U(sl_2)
 setring R;
@@ -3091,7 +3123,7 @@ See also
 @item @strong{Syntax:}
   @code{twostd(} ideal_expression@code{)};
 @item @strong{Type:}
-ideal or module
+ideal
 @item @strong{Purpose:}
 returns a left Groebner basis of the two-sided ideal,
 generated by the input, treated as a set of two-sided generators.
@@ -3147,7 +3179,7 @@ this is the same as the vector space dimension of the
 factor-module.
 
 @item @strong{Note:}
-In the noncommutative case, a ring modulo an ideal has a ring stucture if and only if the ideal is two-sided.
+In the non-commutative case, a ring modulo an ideal has a ring stucture if and only if the ideal is two-sided.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -3246,13 +3278,13 @@ where c_@{ij@} in K^*, d_@{ij@} in K[x_1, ..., x_n].
 @itemize @bullet
 @item
 @tex
-there is a monomial well-ordering < such that
-                        $\forall i<j \; \hbox{LM}(d_{ij})< x_i x_j$,
+there is a monomial well-ordering $<$ on $K[x_1,x_2,\ldots,x_n]$ such that
+                        $\forall i<j \;\; \hbox{LM}(d_{ij})< x_i x_j$,
 @end tex
 
 
 @ifinfo
-there is a monomial well-ordering < such that
+there is a monomial well-ordering < on K[x_1,x_2, ..., x_n] such that
                         for all i<j LM(d_@{ij@})< x_i x_j,
 @end ifinfo
 
@@ -3276,6 +3308,8 @@ c_@{jk@} x_j d_@{ik@} - c_@{ij@} d_@{ik@} x_j + d_@{jk@}x_i
 @end ifinfo
 
 @end itemize
+
+@strong{Note:} Note that non-degeneracy conditions simply ensure associativity of multiplication.
 
 @c @end table
 
@@ -3332,26 +3366,24 @@ A is an integral domain.
 @cindex G-algebra, setup
 
 @tex
-In order to set up a $G$--algebra
-in {\sc Plural}, one has to do the following steps:
+In order to set up a $G$--algebra one has to do the following steps:
 @end tex
 
 @ifinfo
-In order to set up a G-algebra
-in @sc{Plural}, one has to do the following steps:
+In order to set up a G-algebra one has to do the following steps:
 @end ifinfo
 
 @itemize
 
 @item
- define a commutative ring
+ - define a commutative ring
 @tex
 $R= K[x_1, \ldots, x_n]$,
 @end tex
 @ifinfo
  R= K[x_1, ..., x_n],
 @end ifinfo
- equipped with a global monomial ordering @math{<} (see @ref{ring declarations BR_PLURAL_BR}).
+ equipped with a monomial ordering @math{<} (see @ref{ring declarations BR_PLURAL_BR}).
 @* This provides us with the information on a field @math{K} (together with its parameters), variables
 @tex
  $\{x_i\}$
@@ -3360,7 +3392,7 @@ $R= K[x_1, \ldots, x_n]$,
  @{x_i@}
 @end ifinfo
 and an ordering <.
-@* From the sequence of variables we will build a G-algebra with the PBW basis
+@* From the sequence of variables we will build a G-algebra with the Poincar@'e-Birkhoff-Witt (PBW) basis
 @tex
 $\{x^{a_1}_1 x^{a_2}_2 \dots x^{a_n}_n\}$.
 @end tex
@@ -3370,7 +3402,7 @@ $\{x^{a_1}_1 x^{a_2}_2 \dots x^{a_n}_n\}$.
 
 
 @item
-Define strictly
+- define strictly
 @tex
 $n\times n$
 @end tex
@@ -3435,14 +3467,14 @@ the left submodule of a free module $A^r$, generated by elements $\{g_1, \dots, 
 @end tex
 
 @tex
-Let $<$ be a fixed monomial well-ordering on the $G$--algebra $A$ with the PBW basis
+Let $<$ be a fixed monomial well-ordering on the $G$--algebra $A$ with the Poincar@'e-Birkhoff-Witt (PBW) basis
 $\{x^{\alpha} = x^{a_1}_1 x^{a_2}_2 \dots x^{a_n}_n\}$.
 For a given free module $A^r$ with the basis $\{e_1,\ldots, e_r\}$, $<$ denotes also a
 fixed module ordering on the set of monomials $\{x^{\alpha} e_i \mid \alpha\in {\bf N}^n, 1\leq i\leq r \}$.
 @end tex
 
 @ifinfo
-Let < be a fixed monomial well-ordering on the G-algebra A with the PBW basis
+Let < be a fixed monomial well-ordering on the G-algebra A with the Poincar@'e-Birkhoff-Witt (PBW) basis
 @{x^a1_1 x^a2_2 ... x^an_n @}. For a given free module A^r with the basis @{e_1,...,e_r@}, < denotes also a fixed module ordering on the set of monomials @{x^a e_i |
 a in N^n, 1<= i <= r @}.
 @end ifinfo
@@ -3504,8 +3536,8 @@ LM(f) = x^b e_i with b_j <= a_j, 1<= j <= n.
 @end ifinfo
 
 
-@*@strong{Remark:} In the non-commutative case we are working with well
-ordering only (see @ref{PLURAL}, @ref{Monomial orderings} and @ref{Term orderings}).
+@*@strong{Remark:} In general non-commutative algorithms are working with well-orderings
+only (see @ref{PLURAL}, @ref{Monomial orderings} and @ref{Term orderings}), unless we deal with super-commutative algebras.
 
 @tex
 A Groebner basis $G\subset A^r$ is called {\bf minimal} (or {\bf reduced}) if $0\notin G$ and if
@@ -3591,8 +3623,7 @@ f is in I if and only if left the normal form NF(f|G) = 0.
 
 @subheading Syzygies
 @tex
-Let $K$ be a field and $<$ a well ordering on $A^r=\oplus_{i=1}^{r}Ae_i$.
-A {\bf left} (resp. {\bf right}) {\bf syzygy}
+Let $A$ be a GR-algebra. A {\bf left} (resp. {\bf right}) {\bf syzygy}
 between $k$ elements $\{f_1,\dots,f_k\} \subset A^r $ is
 a $k$-tuple $(g_1,\dots ,g_k)\in A^k$ satisfying
 $$\sum_{i=1}^{k} g_i f_i = 0 \;\;\; {\rm resp. } \;\;\; \sum_{i=1}^{k} f_i g_i = 0. $$
@@ -3600,12 +3631,12 @@ The set of all left (resp. right) syzygies between $\{f_1,...,f_k\}$ is a left (
 @end tex
 
 @ifinfo
-Let K be a field and < a well ordering on A^r. A @strong{left} resp.  @strong{right syzygy}
+Let A be a GR-algebra. A @strong{left} resp.  @strong{right syzygy}
 between k elements f_1,...,f_k in A^r is
 k-tuple (g_1,... ,g_k) in A^k satisfying
  sum_@{i=1@}^@{k@}g_i f_i =0   resp. sum_@{i=1@}^@{k@} f_i g_i =0
-The set of all left (resp. right) syzygies between f_1,...,f_k is left (resp.
-right) submodule S of A^k.
+Clearly, the set of all left (resp. right) syzygies between f_1,...,f_k is left (resp.
+right) A-submodule S of A^k.
 @end ifinfo
 
 
@@ -3692,19 +3723,18 @@ I=std(I);
 I;
 resolution resI = mres(I,0);
 resI;
+list l = resI;
 // The matrix A_1 is given by
-print(matrix(resI[1]));
+print(matrix(l[1]));
 // We see that the columns of A_1 generate I.
 // The matrix A_2 is given by
-print(matrix(resI[2]));
+print(matrix(l[2]));
 ideal tst; // now let us show that the resolution is exact
 matrix TST;
-TST = transpose(resI[3])*transpose(resI[2]); // 2nd term
-tst = std(ideal(TST));
-tst;
-TST = transpose(resI[2])*transpose(resI[1]); // 1st term
-tst = std(ideal(TST));
-tst;
+TST = transpose(l[3])*transpose(l[2]); // 2nd term
+size(ideal(TST));
+TST = transpose(l[2])*transpose(l[1]); // 1st term
+size(ideal(TST));
 @c example
 @end smallexample
 @end table
@@ -3751,13 +3781,13 @@ Other sources to check are the following books and articles:
 @item
 @c HLi  Book
    [Li] Huishi Li.
-     Noncommutative Gr@"obner bases and filtered-graded transfer.
+     Non-commutative Gr@"obner bases and filtered-graded transfer.
      Springer, 2002
 
 @item
 @c MR  book
  [MR] McConnell, J.C. and Robson, J.C.
-Noncommutative Noetherian rings. With the cooperation of L. W. Small.
+Non-commutative Noetherian rings. With the cooperation of L. W. Small.
 Graduate Studies in Mathematics. 30. Providence, RI: American Mathematical Society (AMS).,
 2001
 
@@ -3858,7 +3888,7 @@ A. Kandri-Rody and V. Weispfenning.
 @item
 @c LS  InProc
   [LS] Levandovskyy V.; Sch@"onemann, H.
-  Plural - a computer algebra system for noncommutative polynomial
+  Plural - a computer algebra system for non-commutative polynomial
   algebras.
   In  Proc. of the International Symposium on Symbolic and
   Algebraic Computation (ISSAC'03). ACM Press, 2003.

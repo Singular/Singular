@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.127 2009-04-08 12:44:42 seelisch Exp $
+@comment $Id: NEWS.texi,v 1.128 2009-04-08 16:51:56 seelisch Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -88,7 +88,7 @@ new library: dmodapp.lib (see @nref{dmodapp_lib}: applications of D-modules)
 @item
 new library: bfun.lib global (see @nref{bfun_lib}: Bernstein-Sato polynomial)
 @item 
-new library: freegb.lib (see @nref{freegb_lib}): Twosided Noncommutative Groebner bases in Free Algebras
+new library: freegb.lib (see @nref{freegb_lib}): Twosided Non-commutative Groebner bases in Free Algebras
 @item
 new library: jacobson.lib (see @nref{jacobson_lib}): Algorithms for Smith and Jacobson Normal Form
 @item
@@ -388,11 +388,11 @@ outputs degree and dimension instead of returning an int
 new attribute: @code{rowShift}
 @end table
 
-@heading Noncommutative Extension @sc{Plural}
+@heading Non-commutative Extension @sc{Plural}
 
 Starting with version 3-0-0, @sc{Singular} features the
-noncommutative extension @sc{Plural}. It allows to
-set and to compute within noncommutative algebras
+non-commutative extension @sc{Plural}. It allows to
+set and to compute within non-commutative algebras
  with PBW basis. Among available algorithms are Groebner
 bases for left modules, syzygies and resolutions.
 
@@ -408,11 +408,11 @@ determines linear antiautomorphisms (involutions) and automorphisms
 computes a Gel'fand-Kirillov dimension for modules
 @item @nref{ncalg_lib}
 includes ready-to-use funtions for defining many important
- noncommutative algebras
+ non-commutative algebras
 @item @nref{ncdecomp_lib}
 computes a decomposition of a module by its central characters
 @item @nref{ncalg_lib}, @nref{nctools_lib}
-contain numerous useful tools for noncommutative algebras
+contain numerous useful tools for non-commutative algebras
 @item @nref{qmatrix_lib}
 procedures, related to quantum matrices and minors
 @end table

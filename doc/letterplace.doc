@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: letterplace.doc,v 1.9 2009-03-11 09:11:53 Singular Exp $
+@comment $Id: letterplace.doc,v 1.10 2009-04-08 16:51:56 seelisch Exp $
 @comment this file contains the mathematical background of Singular:Letterplace
 
 @c The following directives are necessary for proper compilation
@@ -40,19 +40,16 @@ All algebras are assumed to be associative @math{K}-algebras for some field @mat
 @cindex free associative algebra, tensor algebra
 
 Let @math{V} be a @math{K}-vector space, spanned by the symbols @math{x_1},@dots{},@math{x_n}.
-Free associative algebra in @math{x_1},@dots{},@math{x_n} over @math{K}, denoted by
-@math{K}< @math{x_1},@dots{},@math{x_n} > is also known as a tensor algebra @math{T(V)} of @math{V}.
-It is an infinite dimensional @math{K}-vector space, where as a basis one can take
-the elements of a free monoid < @math{x_1},@dots{},@math{x_n} >. In other
+A free associative algebra in @math{x_1},@dots{},@math{x_n} over @math{K}, denoted by @math{K}< @math{x_1},@dots{},@math{x_n} >
+is also known as a tensor algebra @math{T(V)} of @math{V}. It is an infinite dimensional @math{K}-vector space, where one can take
+as a basis the elements of the free monoid < @math{x_1},@dots{},@math{x_n} >. In other
 words, the monomials of @math{K} < @math{x_1},@dots{},@math{x_n} > are the words
-of finite length in the finite alphabet @{ @math{x_1},@dots{},@math{x_n} @}.
-@math{K<} @math{x_1},@dots{},@math{x_n >} is an integral domain, which is not
-Noetherian for @math{n>1} (hence, a Groebner basis of a finitely generated ideal might 
-be infinite). It can be regarded as a graded algebra in a natural way.
+of finite length in the finite alphabet @{ @math{x_1},@dots{},@math{x_n} @}. The algebra @math{K}< @math{x_1},@dots{},@math{x_n} > is an
+integral domain, which is not Noetherian for @math{n>1} (hence, a Groebner basis of a finitely generated ideal might
+be infinite). The free associative algebra can be regarded as a graded algebra in a natural way.
 
 Any finitely presented associative algebra is isomorphic to a
-quotient of @math{K}< @math{x_1},@dots{},@math{x_n} > modulo a certain
-two-sided ideal.
+quotient of @math{K}< @math{x_1},@dots{},@math{x_n} > modulo a two-sided ideal.
 
 @c ---------------------------------------------------------------------------
 @node Groebner bases for two-sided ideals in free associative algebras, Letterplace correspondence, Free associative algebras, LETTERPLACE
@@ -60,7 +57,7 @@ two-sided ideal.
 @cindex Groebner bases in free associative algebras
 
 @tex
-We call a total ordering $<$ on $X := \langle x_1,\dots,x_n \rangle$ a
+We call a total ordering $<$ on the free monoid $X := \langle x_1,\dots,x_n \rangle$ a
 \textbf{monomial ordering} if the following conditions hold:
 @end tex
 @ifinfo
@@ -136,7 +133,7 @@ $x_{i_1} x_{i_2} \dots x_{i_m} \in K\langle x_1,\ldots,x_n \rangle$
 via the double-indexed letterplace
 (that is encoding the letter (= variable) and its place in the word) monomials
 $x(i_1 | 1) x(i_2 | 2) \dots x(i_m | m) \in K[X\times N]$, where $X=\{x_1,\ldots,x_n\}$
-and $N$ is the monoid of natural numbers.
+and $N$ is the monoid of natural numbers, starting with 0 which cannot be used as a place.
 @end tex
 @ifinfo
 We utilize the ideas of Feynmann and Rota and encode
@@ -145,12 +142,12 @@ the monomials (words) of the free algebra
 via the double-indexed letterplace
 (that is encoding the letter (= variable) and its place in the word) monomials
 @math{x(i_1 | 1) x(i_2 | 2)} @dots{} @math{x(i_m | m)} in @math{K[X x N]}, where @math{X=} @{ @math{x_1},@dots{},@math{x_n} @}
-and @math{N} is the monoid of natural numbers.
+and @math{N} is the monoid of natural numbers, starting with 0 which cannot be used as a place.
 @end ifinfo
 
-Note, that the latter letterplace algebra @math{K[X x N]} is infinitely generated.
-Since @math{K<} @math{x_1},@dots{},@math{x_n} @math{>} is not Noetherian, it is common to perform the computations up to a given degree. In that case the truncated letterplace
-algebra is finitely generated commutative ring.
+Note, that the latter letterplace algebra @math{K[X \times N]} is an infinitely generated commutative polynomial algebra.
+Since @math{K<} @math{x_1},@dots{},@math{x_n} @math{>} is not Noetherian, it is common to perform the computations up to a given degree.
+In that case the truncated letterplace algebra is (a) finitely generated (commutative ring).
 
 Indeed, there is 1-to-1 correspondence between graded two-sided ideals
 of a free algebra and so-called letterplace ideals in the letterplace algebra, see [LL].
@@ -171,9 +168,11 @@ run the procedure @code{makeLetterplaceRing(d)}
 @c @code{freegbRing(d)} 
 from the library @code{freegb.lib}.
 This procedure creates a letterplace algebra with an induced ordering.
-In this algebra, define the ideal @code{I} in the letterplace encoding and run the procedure
+In this algebra, define an ideal @code{I} in the letterplace encoding and run the procedure
 @code{system("freegb",I,d,n)}, where @math{n} is the number of variables of
 the original commutative ring. The output is given in the letterplace encoding.
+
+Note that one can also use @code{freeGBasis} from @code{freegb.lib} in order to simplify technicalities.
 
 We illustrate this approach with the following example:
 
@@ -215,7 +214,7 @@ in a free associative algebra up to a given degree.
 Restrictions of the @sc{Letterplace} package:
 @itemize
 @item At the moment we provide stable implementation for the homogeneous input only,
-computations with inhomogeneous ideals are under development.
+computations with inhomogeneous ideals are under development. (There are no automatic checks.)
 @item Since free algebra is not Noetherian, one has to define an explicit degree bound,
 up to which a partial Groebner basis will be computed.
 @item the options @code{option(redSB);option(redTail);} must be always activated
