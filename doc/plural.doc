@@ -2828,7 +2828,7 @@ poly z=4*e*f+h^2-2*h;
 reduce(z,I);  // the central character of I:
 reduce(z,J); // the central character of J:
 poly nz = z - NF(z,J); // nz will belong to J
-reduce(nz,J,I);
+reduce(nz,J);
 reduce(I,J);
 @c example
 @end smallexample
