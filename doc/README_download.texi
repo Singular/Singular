@@ -1,7 +1,7 @@
 @comment -*-texinfo-*-
-@comment $Id: README_download.texi,v 1.14 2008-12-11 12:47:33 Singular Exp $
+@comment $Id: README_download.texi,v 1.15 2009-04-08 12:44:42 seelisch Exp $
 @c FILE: README_download.texi
-@c PURPOSE: downloading instructions, to be includeded in manual and README_ftp
+@c PURPOSE: download instructions, to be includeded in manual and README_ftp
 @c
 
 @ifclear VERSION
@@ -31,7 +31,7 @@ system for which @sc{Singular} is compiled. Choose one of the following:
 @item @code{ix86-Linux}
 @tab PC's running under Linux with a current @code{libc} version.
 @item @code{ix86-Win}
-@tab PC's running Windows 95/98/NT/2K/XP which have Cygwin version 1.0 (or
+@tab PC's running Windows 95/98/NT/2K/XP/Vista which have Cygwin version 1.0 (or
 higher) already installed. Unless you are familiar with Cygwin, we
 recommend that you download one of the self-extracting archives as
 described below.
@@ -64,7 +64,7 @@ cd /usr/local/
 
 @sc{Singular} specific subdirectories will be created in such a way
 that multiple versions and multiple architecture dependent files
-of @sc{Singular} can peaceably coexist under the same @code{/usr/local/}
+of @sc{Singular} can coexist under the same @code{/usr/local/}
 tree.
 
 @item
@@ -81,18 +81,17 @@ After unpacking, see the created file
 for details on how to finish the installation.
 @end enumerate
 
-@heading To download @sc{Singular} for Windows 95/98/NT/2K/XP
+@heading To download @sc{Singular} for Windows 95/98/NT/2K/XP/Vista
 
 @enumerate
 @item
 Download one of the following self-extracting archives:
 @table @code
-@item @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Singular-@value{VERSION}-Compact.exe,Singular-@value{VERSION}-Compact.exe}
+@item @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Singular-@value{VERSION}-Small.exe,Singular-@value{VERSION}-Small.exe}
 Minimal archive to download. Installs Singular and minimal set of needed
 tools/DLLs.
-@item @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Singular-@value{VERSION}-Typical.exe,Singular-@value{VERSION}-Typical.exe}
-Typical archive to download. Installs Singular and the XEmacs editor to
-run ESingular.
+@item @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Singular-@value{VERSION}-Full.exe,Singular-@value{VERSION}-Full.exe}
+Complete archive to download. Installs Singular and the XEmacs editor for running ESingular.
 @end table
 
 @item 
@@ -100,17 +99,14 @@ Double-click (or, execute), the self-extracting archives, and
 @strong{carefully} follow the instructions given there.
 
 @item
-In case of problems, see the created file 
-@code{etc/INSTALL.txt} (which is also located at
-@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/INSTALL_win.html}
-for details on how to finish the installation.
+In case of problems, see consult
+@uref{http://www.singular.uni-kl.de/Windows/index.html}.
 @end enumerate
 
 @heading To download @sc{Singular} for the Macintosh
 We recommend @code{fink} to install @code{Singular} on a Macintosh running 
 Mac OsX: it supports currently the follwing versions of OsX:
 10.4/intel, 10.4/powerpc, 10.4/powerpc (transitional), 10.3.
-If you want to try to intall a binary package, the Unix installation
-instructions apply.
+If you would like to install a binary package, Unix installation instructions apply.
 (See @uref{http://fink.sf.net})
 

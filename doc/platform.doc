@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: platform.doc,v 1.17 2008-12-18 13:36:31 Singular Exp $
+@comment $Id: platform.doc,v 1.18 2009-04-08 12:44:42 seelisch Exp $
 @comment this file contains Release notes and various howto's
 
 @c The following directives are necessary for proper compilation
@@ -22,14 +22,14 @@
 
 @menu
 * News and changes::
-* Downloading instructions::
+* Download instructions::
 * Unix installation instructions::
 * Windows installation instructions::
 * Macintosh installation instructions::
 @end menu
 
 @c ----------------------------------------------------------
-@node News and changes, Downloading instructions,,Release Notes
+@node News and changes, Download instructions,,Release Notes
 @section News and changes
 @cindex news
 @cindex changes
@@ -37,8 +37,8 @@
 @include NEWS.texi
 
 @c ----------------------------------------------------------
-@node Downloading instructions, Unix installation instructions, News and changes, Release Notes
-@section Downloading instructions
+@node Download instructions, Unix installation instructions, News and changes, Release Notes
+@section Download instructions
 @cindex downloading
 @cindex instructions, downloading
 @cindex howto, download
@@ -60,7 +60,7 @@ from our FTP site
 @include README_download.texi
 
 @c ----------------------------------------------------------
-@node Unix installation instructions, Windows installation instructions,Downloading instructions, Release Notes
+@node Unix installation instructions, Windows installation instructions, Download instructions, Release Notes
 @section Unix installation instructions
 @cindex Unix installation
 @cindex instructions, Unix installation
@@ -84,23 +84,19 @@ from our FTP site
 @cindex instructions, Macintosh installation
 @cindex howto, install on Macintosh
 
-Installation of the provided binaries
+@strong{Installation of the provided binaries}
 
-Do not try to use the Finder for the installation!
+Do not use the Finder for the installation!
 
-After inserting the CD open a terminal (under /Applications/Utilities) and
+After inserting the CD, open a terminal (under /Applications/Utilities) and
 type the following commands (you need an Admin Account):
-
-sudo tar -xvzf /Volumes/CDROM/MAC/OSX/Singular-3-0-3-ppcMac-darwin.tar.gz
-
-sudo tar -xvzf /Volumes/CDROM/MAC/OSX/Singular-3-0-3-share.tar.gz
-
-sudo ln -sf /usr/local/Singular/3-0-3/ppcMac-darwin/Singular /usr/local/bin/Singular-3-0-3
-
-The first two commands unpack the tar.gz files and copy the Singular
+@*   sudo tar -xvzf /Volumes/CDROM/MAC/OSX/Singular-3-0-3-ppcMac-darwin.tar.gz
+@*   sudo tar -xvzf /Volumes/CDROM/MAC/OSX/Singular-3-0-3-share.tar.gz
+@*   sudo ln -sf /usr/local/Singular/3-0-3/ppcMac-darwin/Singular /usr/local/bin/Singular-3-0-3
+@*The first two commands unpack the tar.gz files and copy the Singular
 files (binaries and documentation, libs, etc) to /usr/local/Singular/3-0-3.
 
-The last command creates a link in /usr/local/bin so that you can just type
+The final command creates a link in /usr/local/bin so that you can just type
 Singular-3-0-3
 to run Singular in any terminal.
 
@@ -117,7 +113,7 @@ There are two packages: singular-doc and singular.
 
 They are available for 10.3 and 10.4 (in fink called 10.4-transitional).
 
-If you have fink installed, try one of the two possibilities:
+If you have fink installed, choose one of the two possibilities:
 
 @itemize
 @item
@@ -126,7 +122,7 @@ If you have fink installed, try one of the two possibilities:
      @*@code{fink install singular singular-doc}
 
 @item
-(using the Fink Commander):
+using the Fink Commander:
 
    @itemize
    @item
@@ -135,7 +131,7 @@ If you have fink installed, try one of the two possibilities:
    After updating the package list,
    there should appear "singular" and "singular-doc" as packages
    @item
-   Install it from sources (fink will do that automatic for you).
+   Install it from sources (Fink will do that for you automatically.)
    @end itemize
 
 @end itemize

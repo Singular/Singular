@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.224 2009-03-19 08:54:12 seelisch Exp $
+@comment $Id: general.doc,v 1.225 2009-04-08 12:44:42 seelisch Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -42,7 +42,7 @@
 
 In this section, aspects of interactive use are discussed.  This
 includes how to enter and exit @sc{Singular}, how to interpret its
-prompt, how to get the online help, and so on.
+prompt, how to get online help, and so on.
 
 There are a few important notes which one should not forget:
 @itemize @bullet
@@ -68,12 +68,11 @@ the online help is accessible by means of the @code{help} function
 @subsection How to enter and exit
 @cindex How to enter and exit
 
-@sc{Singular} can either be run in ASCII-terminal or within Emacs.
+@sc{Singular} can either be run in an ASCII-terminal or within Emacs.
 
 To start @sc{Singular} in its ASCII-terminal user interface,  enter
-@code{Singular} at the system prompt. The
-@sc{Singular} banner appears which, among others, reports the version
-and the compilation date.
+@code{Singular} at the system prompt. The @sc{Singular} banner appears which,
+among other data, reports the version and the compilation date.
 
 To start @sc{Singular} in its Emacs user interface, either enter
 @code{ESingular} at the system prompt, or type @code{M-x singular}
@@ -90,7 +89,7 @@ when running within Emacs preferably type @code{C-c $}).
 
 @sc{Singular} and @code{ESingular} may also be started with command line
 options and with
-filenames as arguments. More generally, the synopsis of @sc{Singular} is
+filenames as arguments. More generally, the startup syntax is
 @smallexample
 Singular  [options] [file1 [file2 @dots{}]]
 ESingular  [options] [file1 [file2 @dots{}]]
@@ -107,7 +106,7 @@ under Emacs}.
 @cindex error recovery
 The @sc{Singular} prompt @code{>} (larger than) asks the user for input
 of commands.  The ``continuation'' prompt @code{.} (period) asks the
-user for input of missing parts of a command (remember the semicolon at
+user for input of missing parts of a command (e.g. the semicolon at
 the end of every command).
 
 @sc{Singular} does not interpret the semicolon as the end of a command
@@ -127,12 +126,12 @@ interpreted as empty statements.
 @cindex online help
 @cindex help, online help system
 
-The online help system is invoked with the @code{help} command.
+The online help system is invoked by the @code{help} command.
 @code{?} may be used as a synonym for @code{help}.  Simply typing
 @code{help;} displays the ``top'' of the help system (i.e., the title
 page of the @sc{Singular} manual) which offers a
 short table of contents.  Typing @code{help} topic@code{;} shows the
-available documentation on topic.  Here, topic may be either a function
+available documentation on the respective topic.  Here, topic may be either a function
 name or, more generally, any index entry of the @sc{Singular}
 manual. Furthermore, topic may contain wildcard characters.
 @xref{help}, for more information.
@@ -141,7 +140,7 @@ manual. Furthermore, topic may contain wildcard characters.
 @cindex help browsers
 Online help information can be displayed in various help browsers. The
 following table lists a summary of the browsers which are always present.
-Usually, external browsers are much more convienent:
+Usually, external browsers are much more convenient:
 A complete, customizable list can be found in the file @code{LIB/help.cnf}.
 
 @multitable @columnfractions .2 .2 .6
@@ -152,7 +151,7 @@ A complete, customizable list can be found in the file @code{LIB/help.cnf}.
 @cindex help browsers, html
 @cindex html, default help
 @tab Windows
-@tab displays html version of manual in your default html browser
+@tab displays a html version of the manual in your default html browser
 
 @item builtin
 @cindex help browsers, dummy
@@ -162,16 +161,16 @@ A complete, customizable list can be found in the file @code{LIB/help.cnf}.
 @item emacs
 @cindex help browsers, emacs
 @tab Unix, Windows
-@tab when running @sc{Singular} within (X)emacs, display help in
+@tab when running @sc{Singular} within (X)emacs, displays help inside the
 (X)emacs info buffer.
 
 @item dummy
 @tab all
 @cindex help browsers, dummy
-@tab displays error message about no available help browser
+@tab displays an error message due to the non-availability of a help browser
 @end multitable
 
-External browsers depend on your system and the contents os @code{LIB/help.cnf},
+External browsers depend on your system and the contents of @code{LIB/help.cnf},
 the default includes:
 @code{htmlview} (displays HTML help pages via @code{htlmview}),@*
 @code{mac} (displays HTML help pages via @code{open}),@*
@@ -206,9 +205,8 @@ system("--browser");
 @end smallexample
 returns the currently used browser.
 
-If no browser is explicitely set by the user, then the first (w.r.t. the
-order of the browsers in the file @code{LIB/help.cnf}) available browser is
-chosen.
+If no browser is explicitely set by the user, then the first available browser
+(w.r.t. the order of the browsers in the file @code{LIB/help.cnf}) is chosen.
 
 The @code{.singularrc} (@pxref{Startup sequence}) file is a good place
 to set your default browser. Recall that if a file
@@ -226,7 +224,7 @@ system("--allow-net", 1);
 @end smallexample
 in your file @code{$HOME/.singularrc} sets your default browser to
 @code{info}, unless @sc{Singular} is run within emacs (in which case the
-default browser is set automatically to @code{emacs}).
+default browser is automatically set to @code{emacs}).
 
 Obviously, certain external files and programs are required for the
 @sc{Singular} help system to work correctly. If something is not available
@@ -236,8 +234,8 @@ or goes wrong, here are some tips for troubleshooting the help system:
 @item
 @cindex DISPLAY environment variable
 @cindex environment variable, DISPLAY
-Under Unix, the environment variable @code{DISPLAY} has to be set for
-the browsers all X11 browsers to work.
+Under Unix, the environment variable @code{DISPLAY} has to be set for all X11
+browsers to work.
 
 @item
 @cindex help browsers, setting command to use
@@ -248,15 +246,15 @@ use, by changing the entry in @code{LIB/help.cnf}
 
 @item
 If the help browser can not find the local html
-pages of the @sc{Singular} manual (which it looks for at
-@code{$RootDir/html} -- see @ref{Loading of a library} for more info on
+pages of the @sc{Singular} manual (which it will look for at
+@code{$RootDir/html} -- see @ref{Loading a library} for more info on
 @code{$RootDir}) @emph{and} the (command-line) option @code{--allow-net}
 has @emph{explicitely} been set (see @ref{Command line options} and
 @ref{system} for more info on
 setting values of command-line options), then it dispatches the html
 pages from
-@url{http://www.singular.uni-kl.de/Manual} (note that
-the non-local net-access of HTML pages is disabled, by default).
+@url{http://www.singular.uni-kl.de/Manual}. (Note that
+the non-local net-access of HTML pages is disabled, by default.)
 @*An
 alternative location of a local directory where the html pages reside
 can be specified by setting the environment variable
@@ -265,8 +263,8 @@ can be specified by setting the environment variable
 
 @item
 The @code{info} based help browsers @code{tkinfo}, @code{xinfo}, @code{info}, and
-@code{builtin} need the (info) file @code{singular.hlp} which it looks
-for at @code{$RootDir/info/singular.hlp} (see @ref{Loading of a library}
+@code{builtin} need the (info) file @code{singular.hlp} which will be looked
+for at @code{$RootDir/info/singular.hlp} (see @ref{Loading a library}
 for more info on @code{$RootDir}).  An alternative
 location of the info file of the manual can be specified by setting the
 environment variable @code{SINGULAR_INFO_FILE}.
@@ -275,7 +273,7 @@ environment variable @code{SINGULAR_INFO_FILE}.
 
 @c ref
 @ref{Command line options}
-@ref{Loading of a library}
+@ref{Loading a library}
 @ref{system}
 @ref{Startup sequence}
 @c ref
@@ -302,7 +300,7 @@ To move within info, type commands consisting of single characters.  Do
 not type @code{RETURN}.  Do not use cursor keys, either.  Using some of
 the cursor keys by accident might pop to some totally different node.
 Type @code{l} to return to the original node.  Some of the @code{info}
-commands read input from the command line at the bottom line.  The
+commands read input from the command line at the bottom.  The
 @code{TAB} key may be used to complete partially entered input.
 
 The most important commands are:
@@ -333,10 +331,10 @@ scrolls backward a page
 invokes info tutorial (use @code{l} to return to the manual or
 @code{CTRL-X 0} to remove extra window)
 @item @code{CTRL-H}
-shows a short overview on the online help system (use @code{l} to return
+shows a short overview over the online help system (use @code{l} to return
 to the manual or @code{CTRL-X 0} to remove extra window)
 @item @code{s}
-searches through the manual for a specified string, and selects the node in
+searches through the manual for a specific string, and selects the node in
 which the next occurrence is found
 @item @code{1}, @dots{}, @code{9}
 picks i-th subtopic from a menu
@@ -380,29 +378,29 @@ previous input lines:
 @item TAB
 provides command line completion for function names and file names
 @item CTRL-B
-moves cursor left
+moves cursor to the left
 @item CTRL-F
-moves cursor right
+moves cursor to the right
 @item CTRL-A
-moves cursor to beginning of line
+moves cursor to the beginning of the line
 @item CTRL-E
-moves cursor to end of line
+moves cursor to the end of the line
 @item CTRL-D
-deletes character under cursor
+deletes the character under the cursor
 @* Warning: on an empty line, @code{CTRL-D} is interpreted as the
 @code{EOF} character which immediately terminates @sc{Singular}.
 @item BACKSPACE
 @itemx DELETE
 @itemx CTRL-H
-deletes character before cursor
+deletes the character before the cursor
 @item CTRL-K
-kills from cursor to end of line
+kills from cursor to the end of the line
 @item CTRL-U
-kills from cursor to beginning of line
+kills from cursor to the beginning of the line
 @item CTRL-N
-saves current line on history and gives next line
+saves the current line to history and gives the next line
 @item CTRL-P
-saves current line on history and gives previous line
+saves the current line to history and gives the previous line
 @item RETURN
 saves the current line to the history and
 sends it to the @sc{Singular} parser for interpretation
@@ -417,23 +415,23 @@ be found on your machine, then additional command-line editing
 features like  history completion are available.
 In particuliar, if @sc{Singular} is able to load that library and
 if the environment
-variable @code{SINGULARHIST} is set and has a name of a file as value,
+variable @code{SINGULARHIST} is set and has a name of a valid file as value,
 then the input history is stored across sessions using this
 file. Otherwise, i.e., if the environment variable @code{SINGULARHIST}
 is not set, then the history of the last inputs is only available for
-the commands of the current session.
+previous commands of the current session.
 
 @c --------------------------------------------------------------------------
 @node Command line options, Startup sequence, Editing input, Interactive use
 @subsection Command line options
 @cindex Command line options
 
-The synopsis of @sc{Singular} is
+The startup syntax is
 @smallexample
 Singular  [options] [file1 [file2 @dots{}]]
 ESingular  [options] [file1 [file2 @dots{}]]
 @end smallexample
-Options can be given in both, their long and short format. The following
+Options can be given in both their long and short format. The following
 options control the general behaviour of @sc{Singular}:
 @table @asis
 
@@ -499,7 +497,7 @@ Suppress display of all output.
 
 @item @code{-t}, @code{--no-tty}
 @cindex --no-tty
-Do not redefine the terminal characteristics.  This option should be
+Do not redefine the characteristics of the terminal.  This option should be
 used for batch processes.
 
 @item @code{-q}, @code{--quiet}
@@ -603,7 +601,7 @@ Finally, the following options are only available when running
 @item --emacs=EMACS
 @cindex --emacs
 Use @code{EMACS} as Emacs program to run the @sc{Singular} Emacs
-interface, where @code{EMACS} may e.g. be emacs ore xemacs.
+interface, where @code{EMACS} may e.g. be emacs or xemacs.
 
 @item --emacs-dir=DIR
 @cindex --emacs-dir
@@ -631,7 +629,7 @@ if an option was not given), can be checked with the command
 @end smallexample
 
 Furthermore, the value of options (e.g., @code{--browser}) can be
-re-set while @sc{Singular} is running with the command
+re-defined while @sc{Singular} is running using the command
 @code{system("--}long_option_name_string @code{",}expression@code{)}. @xref{system}.
 @smallexample
   system("--browser", "builtin");  // sets browser to 'builtin'
@@ -657,7 +655,7 @@ option was not given),
 @cindex singularrc
 searches the current directory and then the
 home directory of the user, and then all directories contained in the
-library @code{SearchPath} (see @ref{Loading of a library} for more info
+library @code{SearchPath} (see @ref{Loading a library} for more info
 on @code{SearchPath}) for a file named @code{.singularrc} and
 executes it, if found (provided the @code{--no-rc} option was not
 given),
@@ -714,7 +712,7 @@ prevents the execution of the"global"
 @cindex interface, Emacs
 @cindex user interface, Emacs
 
-Besides, running @sc{Singular} in an ASCII-terminal, @sc{Singular} might
+Besides running @sc{Singular} in an ASCII-terminal, @sc{Singular} might
 also be run within Emacs. Emacs (or, XEmacs which is very similar) is a
 powerful and freely available text editor, which, among others,
 provides a framework for the implementation of interactive user
@@ -728,7 +726,7 @@ only provide everything the ASCII-terminal interface provides, but
 offers much more. Among others, it offers
 @itemize @bullet
 @item
-color-highlighting
+color highlighting
 @item
 truncation of long lines
 @item
@@ -748,7 +746,7 @@ convenient ways to edit @sc{Singular} input files
 interactive customization of nearly all aspects of the user-interface.
 @end itemize
 
-To use the @sc{Singular}-Emacs interface you need to have Emacs version
+In order to use the @sc{Singular}-Emacs interface you need to have Emacs version
 20 or higher, or XEmacs
 version 20.3 or higher installed on your system. These
 editors can be downloaded for most hard- and software platforms
@@ -886,7 +884,7 @@ To end the Emacs (and, @sc{Singular}) session,
 type @code{C-x C-c} (two characters), or use the @code{File -> Exit}
 menu.
 
-@item When Emacs is hung
+@item When Emacs hangs
 If Emacs stops responding to your commands, you can stop it safely by
 typing @code{C-g}, or, if this fails, by typing @code{C-]}.
 
@@ -920,7 +918,8 @@ Emacs. Both ways are described in more detail below.
 Note: To properly run the Emacs interface, several files are needed
 which usually reside in the @code{emacs} subdirectory of your
 @sc{Singular} distribution. This directory is called
-singular-emacs-home-directory in the following.
+singular-emacs-home-directory in the following. Under Windows, the full @sc{Singular}
+installation comes with (x)emacs and will create an ESingular startup icon on your desktop
 
 @subheading Starting the interface using ESingular
 
@@ -943,7 +942,7 @@ providing menu items for starting @sc{Singular}. On XEmacs, a button
 starting @sc{Singular} is added to the main toolbar.
 
 The @sc{Singular} interface is started automatically; once you see a
-buffer called @code{*singular*} and the @sc{Singular} prompt you are
+buffer called @code{*singular*} and the @sc{Singular} prompt, you are
 ready to start your @sc{Singular} session.
 
 @code{ESingular} inherits all @code{Singular} options. For a description
@@ -1006,7 +1005,7 @@ It is a good idea to take a look at the (well documented) file
 along with the distribution. In it you find some useful initializations
 of the @sc{Singular} interface as well as some lisp code, which, for
 example, adds a button to the XEmacs toolbar. Some of this code might be
-useful for your @code{.emacs} file, too. And if you are a Emacs wizard,
+useful for your @code{.emacs} file, too. And if you are an Emacs wizard,
 it is of course a good idea to take a look at @code{singular.el} in the
 singular-emacs-home-directory.
 
@@ -1104,7 +1103,7 @@ blank line is echoed to the screen. Hitting @key{RETURN} executes the
 echoed commands and shows their output. Hitting @key{RETURN} again,
 echos the next commands to the screen, and so on, until all commands of
 the demo file are executed. While running a demo, you can
-execute other commands on the @sc{Singular} prompt: the next input of
+execute other commands on the @sc{Singular} prompt: the next input
 from the demo file is then echoed again, if you hit @key{RETURN} on
 an empty input line.
 
@@ -1133,7 +1132,7 @@ for Emacs, resp. A brief introduction to the customization mode comes up
 with the customization buffer. All customizable parameters are
 hierarchically grouped and you can browse through all these groups and
 change the values of the parameters using the mouse. At the end you can
-safe the settings to a special file making your changes permanent.
+safe your settings to a file making your changes permanent.
 
 To change the settings of the @sc{Singular} Emacs interface you can
 either select the item @code{Preferences} of the @code{Singular} menu,
@@ -1149,7 +1148,7 @@ groups:
 @item Singular Faces
 
 Here you can specify various faces used if font-lock-mode is enabled
-(which it is, by default).
+(which, by default, is).
 
 @item Singular Sections And Foldings
 
@@ -1165,7 +1164,7 @@ to your personal @code{.emacs} file.
 
 @item Singular Interactive Miscellaneous
 
-Here you can specify various different things such as the behavior of
+Here you can specify various things such as the behavior of
 the cursor keys, the name of the special @sc{Singular} startup file, the
 appearance of the help window, or the default values for the
 @code{singular} command.
@@ -1371,9 +1370,9 @@ a polynomial ring over a ring
 @item
 a localization of 1.
 @item
-a quotient ring by an ideal of one of 1.@: or 2.,
+a quotient ring by an ideal of 1.@: or 2.,
 @item
-a tensor product of one of 1.@: or 2.
+a tensor product of 1.@: or 2.
 @end enumerate
 
 Except for quotient rings, all of these rings are realized by choosing a
@@ -1423,22 +1422,21 @@ are guaranteed to work:
 
 @itemize
 @item
-basic polynomial arithmetic, i.e. addition, multiplication, division, exponentation
+- basic polynomial arithmetic, i.e. addition, multiplication, division, exponentation
 @item
-std, i.e. computing standard bases
+- std, i.e. computing standard bases
 @item
-interred
+- interred
 @item
-reduce
+- reduce
 @end itemize
 
 @cindex basering
 Throughout this manual, the current active ring in @sc{Singular} is
 called basering.  The reserved name @code{basering} in @sc{Singular} is
 an alias for the current active ring.  The basering can be set by
-declaring a new ring as described in the following subsections or with
-the commands @code{setring} and @code{keepring}.  @xref{keepring},
-@ref{setring}.
+declaring a new ring as described in the following subsections or by using
+the commands @code{setring} and @code{keepring}. @xref{keepring}, @ref{setring}.
 
 Objects of ring dependent types are local to a ring. To access them
 after a change of the basering they have to be mapped using @code{map} or by
@@ -1462,15 +1460,14 @@ procedure.  @xref{Procedures}, @ref{keepring}.
 @cindex Examples of ring declarations
 
 The exact syntax of a ring declaration is given in the next two
-subsections; this subsection lists some examples first. Note that the
-ordering has to be chosen such that the unit-elements of the
-ring are precisely those elements with leading monomial 1.  For more
-information, see @ref{Monomial orderings}.
+subsections; this subsection lists some examples first. Note that the chosen
+ordering implies that aöö unit-elements of the ring will be among the elements
+with leading monomial 1. For more information, see @ref{Monomial orderings}.
 
 Every floating point number in a ring consists of two parts, which may be
-chosen from the user. The leading part represents the number and the rest
-is for the numerical stability. Two numbers with a difference only in the
-rest are equal.
+chosen by the user. The leading part represents the number and the rest
+is for numerical stability. Two numbers with a difference only in the
+rest will be regarded equal.
 
 @itemize @bullet
 @item
@@ -1676,7 +1673,7 @@ declares a ring and sets it as the current basering.
 The coefficients are given by one of the following:
 @enumerate
 @item
-a non-negative int_expression less or equal 2147483629.
+a non-negative int_expression less than or equal to 2147483629.
 @* The int_expression should either be 0, specifying the field of
 rational numbers Q, or a prime number p, specifying the finite field
 with p elements.  If it is not a prime number, int_expression is
@@ -1688,7 +1685,7 @@ an expression_list of an int_expression and one or more names.
 field as described above. The names are used as parameters in
 transcendental or algebraic extensions of the coefficient
 field. Algebraic extensions are implemented for one parameter only. In
-this case, a minimal polynomial has to be defined by assignment to
+this case, a minimal polynomial has to be defined by an assignment to
 @code{minpoly}. @xref{minpoly}.
 
 @item
@@ -1696,7 +1693,7 @@ an expression_list of an int_expression and a name.
 @* The int_expression has to be a prime number p to the power of a
 positive integer n. This defines the Galois field
 @tex
-$\hbox{GF}(p^n)$ with $p^n$ elements, where $p^n$ has to be smaller or equal $2^{15}$.
+$\hbox{GF}(p^n)$ with $p^n$ elements, where $p^n$ has to be less than or equal to $2^{15}$.
 @end tex
 @ifinfo
 GF(p^n) with p^n elements, where p^n has to be smaller or equal 2^15.
@@ -1714,8 +1711,8 @@ are faster than arithmetic operations in algebraic extensions as
 described above.
 
 @item
-an expression_list of the name @code{real} and two optional int_expression
-giving the precision in decimal digits and
+an expression_list of the name @code{real} and two optional int_expressions
+determining the precision in decimal digits and
 the size for the stabilizing rest. The default for the rest is the same size
 as for the representation.
 An exeption is the name @code{real} without any integers.
@@ -1726,21 +1723,21 @@ Note that computations over all these fields are not exact.
 @item
 an expression_list of the name @code{complex},
 two optional int_expression and a name.
-This specifies the field of complex numbers represented with floating point
+This specifies the field of complex numbers represented by floating point
 numbers with a precision similar to @code{real}. An expression_list
 without int_expression defines a precision and rest with length 6.
 The name of the imaginary unit is given by the last parameter.
 Note that computations over these fields are not exact.
 
 @item
-an expression_list of the name @code{integer}. This specifies the ring of integers.
+an expression_list with the name @code{integer}. This specifies the ring of integers.
 
 @item
-an expression_list of the name @code{integer} and following int_expressions.
-This specifies the ring of integers modulo the product of the given int_expressions.
+an expression_list with the name @code{integer} and one subsequent int_expression.
+This specifies the ring of integers modulo the given int_expression.
 
 @item
-an expression_list of the name @code{integer} and two int_expressions @code{b} and @code{e}.
+an expression_list with the name @code{integer} and two int_expressions @code{b} and @code{e}.
 This specifies the ring of integers modulo b^e. If @code{b = 2} and @code{e < int_bit_size}
 an optimized implementation is used.
 
@@ -1788,7 +1785,7 @@ omitted.
 @item Default:
 none
 @item Purpose:
-declares a quotient ring as the basering modulo ideal_expression.  Sets
+declares a quotient ring as the basering modulo ideal_expression, and sets
 it as current basering.
 @end table
 
@@ -1864,11 +1861,11 @@ degree reverse lexicographical ordering
 degree lexicographical ordering
 
 @item @code{wp(} intvec_expression @code{)}
-weighted reverse lexicographical ordering; the weight vector may
+weighted reverse lexicographical ordering; the weight vector is expected to
 consist of positive integers only.
 
 @item @code{Wp(} intvec_expression @code{)}
-weighted lexicographical ordering; the weight vector may consist of
+weighted lexicographical ordering; the weight vector is expected to consist of
 positive integers only.
 @end table
 
@@ -1906,11 +1903,11 @@ intmat_expression has to be an invertible square matrix
 @end table
 
 Using matrix orderings, @sc{Singular} can compute standard bases
-w.r.t.@: any monomial ordering that is compatible with the natural
+w.r.t.@: any monomial ordering which is compatible with the natural
 semi-group structure on the monomials. In practice, the predefined global
 and local orderings together with the block orderings should be
 sufficient in most cases. These orderings are faster than their
-corresponding matrix orderings since evaluation of a matrix ordering is
+corresponding matrix orderings since evaluation of a matrix ordering is more
 time consuming.
 
 @item Extra weight vector
@@ -1930,7 +1927,7 @@ to yield product or block orderings
 The orderings @code{lp}, @code{dp}, @code{Dp}, @code{ls}, @code{ds}, and
 @code{Ds} may be followed by an int_expression in parentheses giving the
 size of the block. For the last block the size is calculated
-automatically. For the weighted orderings the size of the block is given
+automatically. For weighted orderings, the size of the block is given
 by the size of the weight vector. The same holds analogously for matrix
 orderings.
 
@@ -1976,7 +1973,7 @@ only limited functionality is available.
 @cindex p-adic numbers, l-adic numbers, projective limes
 
 The p-adic integers @math{Z_p} are the projective limit of the finite
-rings @math{Z/p^n} for @code{n} to infinity. Therefore compuations in this ring
+rings @math{Z/p^n} for @code{n} to infinity. Therefore, computations in this ring
 can be approximated by computations in @math{Z/p^n} for large @code{n}.
 
 @c ---------------------------------------------------------------------------
@@ -2029,7 +2026,7 @@ Implements the so-called FGLM (Faugere, Gianni, Lazard, Mora) algorithm.
 The given ideal must be zero-dimensional.
 @item groebner
 @ref{groebner}@*
-computes a standard resp.@: Groebner bases using a heuristically chosen
+computes a standard resp.@: Groebner basis using a heuristically chosen
 method.
 
 This is the preferred method to compute a standard resp.@: Groebner
@@ -2154,7 +2151,7 @@ computes characteristic sets of polynomial ideals.
 @ref{extgcd}@*
 computes the extended gcd of two polynomials.
 
-Implemented as extended Euclidean Algorithm.  Applicable for univariate
+This is implemented as extended Euclidean Algorithm, and applicable for univariate
 polynomials only.
 @item factorize
 @ref{factorize}@*
@@ -2220,7 +2217,7 @@ computes all minors (=subdeterminants) of a given size for a matrix.
 computes all (complex) roots of a univariate polynomial
 @item uressolve
 @ref{uressolve}@*
-find all roots of 0-dimensional ideal i with multivariate resultants
+finds all roots of a 0-dimensional ideal with multivariate resultants
 @end table
 
 @c ----------------------------------------------------------------------
@@ -2261,7 +2258,7 @@ The major building blocks of the @sc{Singular} language  are
 expressions, commands, and control structures.  The notion of expressions
 in the @sc{Singular} and the C programming language are identical,
 whereas the notion of commands and control structures only roughly
-corresponds to the C statements.
+corresponds to C statements.
 
 @itemize @bullet
 
@@ -2286,7 +2283,7 @@ more information.
 @end itemize
 
 @subsubheading Other notational conventions
-For user-defined functions, the notion of ``procedure'' and
+For user-defined functions, the notions of ``procedure'' and
 ``function'' are synonymous.
 
 As already mentioned above, functions without return values are called
@@ -2357,16 +2354,16 @@ not swap the values of @code{f} and @code{g}, but rather assigns
 @code{g} to both @code{f} and @code{g}.
 @end enumerate
 
-There must be a type conversion of the type of expression to the type of
-name. @xref{Type conversion and casting}.
+A type conversion of the type of expression to the type of
+name must be possible. @xref{Type conversion and casting}.
 
 An assignment itself does not yield a value. Hence, compound assignments
 like @code{i = j = k;} are not allowed and result in an error.
 
 @smallexample
-f = x^2 + y^2 ;      // overwrites the old value of f
+f = x^2 + y^2 ;      // overrides the old value of f
 I = jacob(f);
-f,g = I[1],x^2+y^2 ; // overwrites the old values of f and g
+f,g = I[1],x^2+y^2 ; // overrides the old values of f and g
 @end smallexample
 
 @subsubheading Function without return value
@@ -2399,7 +2396,7 @@ expression @code{;}
 @* prints the value of an expression, for example, of a variable.
 @end enumerate
 
-Use the function @code{print} (or the procedure show from inout.lib)
+Use the function @code{print} (or the procedure @code{show} from inout.lib)
 to get a pretty output of various data
 types, e.g., matrix or intmat. @xref{print}.
 
@@ -2472,16 +2469,16 @@ comparison operator equal
 comparison operator not equal
 @item @code{>=}
 @cindex >=
-comparison operator bigger or equal
+comparison operator larger than or equal to
 @item @code{>}
 @cindex >
-comparison operator bigger
+comparison operator larger
 @item @code{<=}
 @cindex <=
-comparison operator smaller or equal
+comparison operator smaller than or equal to
 @item @code{<}
 @cindex <
-comparison operator smaller.  Also used for file input.  @xref{filecmd}.
+comparison operator smaller. Also used for file input. @xref{filecmd}.
 @item @code{!}
 @cindex !
 boolean operator not
@@ -2502,7 +2499,7 @@ delimiter for name substitution
 synonym for @code{help}
 @item @code{//}
 @cindex //
-comment delimiter.  Comment extends to end of line.
+comment delimiter.  Comment extends to the end of the line.
 @item @code{/*}
 @cindex //
 comment delimiter.  Starts a comment which ends with @code{*/}.
@@ -2531,7 +2528,7 @@ accessor for package members.
 E.g., @code{MyPackage::i} accesses variable @code{i} in package @code{MyPackage}.
 @item @code{_}
 @cindex _
-value of expression last displayed
+value of expression displayed last
 @item @code{~}
 @cindex ~
 breakpoint in procedures
@@ -2566,12 +2563,12 @@ used (@pxref{type}).
 It is possible to redefine an already existing name if doing so does not
 change its type. A redefinition first sets the variable to the default
 value and then computes the expression. The difference between
-redefining and overwriting a variable is shown in the following example:
+redefining and overriding a variable is shown in the following example:
 
 @smallexample
 @c example
   int i=3;
-  i=i+1;        // overwriting
+  i=i+1;        // overriding
   i;
   int i=i+1;    // redefinition
   i;
@@ -2601,7 +2598,7 @@ indexed name.
 @c example
 @end smallexample
 
-Names may not coincide with reserved names (keywords).  Type
+Names must not coincide with reserved names (keywords).  Type
 @code{reservedName();} to get a list of the reserved names.
 @xref{reservedName}.  Names should not interfere with names of ring
 variables or, more generally, with monomials.  @xref{Identifier
@@ -2623,7 +2620,7 @@ under the special name @code{_}, e.g.,
 @end smallexample
 
 A string_expression enclosed in @code{`}@dots{}@code{`} (back ticks)
-evaluates to the value of the variable named by the string_expression.
+evaluates to the value of the variable given by the string_expression.
 This feature is referred to as name substitution.
 
 @smallexample
@@ -2666,10 +2663,10 @@ Each object of type
 @code{matrix},
 @code{number}, or
 @code{resolution}
-belongs to a specific ring.  Also @code{list}, if at least one of the
+belongs to a specific ring.  This is also true for @code{list}, if at least one of the
 objects contained in the list belongs to a ring.  These objects are local
-to the ring.  Their names can be used for other objects in other rings.
-Objects from one ring can be mapped to another ring using maps or with the
+to the ring.  Their names can be duplicated for other objects in other rings.
+Objects from one ring can be mapped to another ring using maps or the
 commands @code{fetch} or @code{imap}.  @xref{map}, @ref{fetch}, @ref{imap}.
 
 All other types do not belong to a ring and can be accessed within every
@@ -2840,10 +2837,9 @@ A block is a sequence of commands surrounded by @{ and @}.
 Blocks are used whenever @sc{Singular} is used as a structured programming
 language. The @code{if} and @code{else} structures allow conditional
 execution of blocks (see @ref{if}, @ref{else}). @code{for} and @code{while}
-loops are available for repeated execution of blocks (see @ref{for},
-@ref{while}).
-In procedure definitions the main part and the example section are blocks
-as well(see @ref{proc}).
+loops are available for a repeated execution of blocks (see @ref{for},
+@ref{while}). In procedure definitions, the main part and the example section
+are blocks as well(see @ref{proc}).
 @menu
 * break::
 * quit::
@@ -2868,7 +2864,7 @@ as well(see @ref{proc}).
 @cindex input
 @cindex output
 
-@sc{Singular}'s input and output (short, I/O) is realized using links.
+@sc{Singular}'s input and output (short, I/O) are realized using links.
 Links are the communication channels of @sc{Singular}, i.e., something
 @sc{Singular} can write to and read from.  In this section, a short
 overview of the usage of links and of the different link types is given.
@@ -2903,14 +2899,14 @@ For more information, see @ref{write}, @ref{read}, @ref{dump},
   ring r; poly p = x+y;
   dump("MPfile:w test.mp");   // dump the session to the file test.mp
   kill r;                     // kill the basering
-  listvar();
+  listvar();                  // no output after killing the ring
   getdump("MPfile:r test.mp");// read the dump from the file
   listvar();
 @c example
 @end smallexample
 
 Specifying a link can be as easy as specifying a filename as a string.
-Except for MPtcp links, links even do not need to be explicitly opened
+Except for MPtcp links, links do not even need to be explicitly opened
 or closed before, resp.@: after, they are used.  To explicitly open or
 close a link, the @code{open}, resp.@: @code{close}, commands may be
 used (see @ref{open}, @ref{close}).
@@ -2931,7 +2927,7 @@ Links have various properties which can be queried using the
 @end smallexample
 
 @subheading ASCII links
-Data that can be converted to a string that can be written into files for
+Data that can be converted to a string can be written into files for
 storage or communication with other programs. The data are written in
 plain ASCII format. Reading from an ASCII link returns a string ---
 conversion into other data is up to the user. This can be done, for
@@ -2991,7 +2987,7 @@ exchange is accomplished using TCP/IP links in the binary MP format.
 Reading from an MPtcp link returns the written expressions (i.e., not a
 string, in general).
 
-MPtcp links should primarily be used for communications with other
+MPtcp links should primarily be used for communicating with other
 programs or for parallel computations (see, for example,
 @ref{Parallelization with MPtcp links}).
 
@@ -3045,8 +3041,7 @@ data bases).
 @cindex Procedures
 
 Procedures contain sequences of commands of the @sc{Singular} language.
-They are used to extend
-the set of commands with user defined commands.  Procedures are defined
+They are used to extend the set of commands by user defined commands.  Procedures are defined
 by either typing them on the command line or by loading them from a
 so-called library file with the LIB command, see @ref{LIB}.  Procedures are
 invoked like normal built-in commands, i.e., by typing their name
@@ -3094,14 +3089,14 @@ defined procedures can be displayed by the command @code{listvar(proc);}.
 @*@code{@}}]
 @item Purpose:
 defines a new function, the @code{proc} proc_name, with the additional
-information help_text, which is copied to the screen by
+information help_text, which is written to the screen by
 @code{help proc_name;} and the @code{example} section
 which is executed by @code{example proc_name;}.
 @* The help_text, the parameter_list, and the example section are optional.
 The default for a parameter_list is @code{(list #)}, see @ref{Parameter list}.
 The help and example sections are ignored if the procedure is defined
 @ifset namespaces
-interactively, i.e., if it was not loaded from a file by a @ref{load} command.
+interactively, i.e., if it was not loaded from a file by a command as in @ref{load}.
 @end ifset
 @ifclear namespaces
 interactively, i.e., if it was not loaded from a file by a LIB command
@@ -3173,10 +3168,10 @@ should furthermore comply with  certain rules as explained in
 @cindex Names in procedures
 @cindex local names
 
-All variables are local to the procedure they are defined in and to
-the package in which the procedure is defined. Locally defined variables
-cannot interfere with names in other procedures and are automatically
-deleted after leaving the procedure.
+All variables are local to the procedure. They are defined in the package
+in which the procedure is defined. Locally defined variables cannot interfere
+with names in other procedures and are automatically deleted after leaving
+the procedure.
 
 Internally, local variables are stored using the nesting level. A variable
 is said to have nesting level 1, if it is local to a procedure that was
@@ -3226,8 +3221,8 @@ which means the arguments are referenced by @code{#[1], #[2]}, etc.
 @*If a procedure has optional parameters (i.e. @code{(list #)} appears
 in the declaration), the attribute @code{default_arg} gives the default values
 for this optional arguments.
-(This provides the possibility to change the behaviour of procedures
-which are only called indirect.)
+(This provides the possibility to also change the behaviour of all procedures
+nested inside the given procedure.)
 @item @strong{Example:}
 @smallexample
 proc x0
@@ -3309,24 +3304,24 @@ procedures in a file.
 @*@sc{Singular} reads a library with the commands @code{load} and
 @code{LIB}. General information about the library is displayed by the command
 @code{help libname_lib}. After loading the library, its procedures can be used
-like the built-in @sc{Singular} functions.
+like any built-in @sc{Singular} function.
 
-To have the full functionality of a built-in function libraries have to
-comply with the few syntax rules described below.
+To have the full functionality of a built-in function, libraries have to
+comply with the set of syntax rules described below.
 
 Furthermore, libraries which are to be included in the @sc{Singular}
 distribution, have to comply with certain rules as explained in
 @ref{Guidelines for writing a library}.
 
 @menu
-* Loading of a library::
+* Loading a library::
 * Format of a library::
 @end menu
 
 @c ---------------------------------------
-@node Loading of a library, Format of a library,, Libraries
-@subsection Loading of a library
-@cindex Loading of a library
+@node Loading a library, Format of a library,, Libraries
+@subsection Loading a library
+@cindex Loading a library
 @cindex path
 @cindex SearchPath
 @cindex RootDir
@@ -3351,7 +3346,7 @@ none
 reads a library of procedures from a file. If the given filename does
 not start with @kbd{.} or @kbd{/} and can not be located in the current
 directory, each directory contained in the
-@code{SearchPath} is searched for file of this name.
+@code{SearchPath} is searched for a file with this name.
 @item @strong{Note on SearchPath:}
 The @code{SearchPath} for a library is constructed at @sc{Singular}
 start-up time as follows:
@@ -3376,7 +3371,7 @@ is the value of the environment variable
 @item @code{$DefaultDir}
 is the value of the environment variable
 @code{SINGULAR_DEFAULT_DIR}, if set, or @code{/usr/local/Singular/} on a
-Unix platform, @code{\Singular\} on a Windows 95/98/NT platform.
+Unix platform, @code{\Singular\} on a Windows 95/98/NT/XP/Vista platform.
 @end itemize
 
 @item
@@ -3397,7 +3392,7 @@ library @code{standard.lib} is automatically loaded at start-up time.
 @end table
 
 Only the names of the procedures in the library are loaded, the body of
-the procedures is read during the first call of this procedure. This minimizes
+each procedure is only read during the first call of this procedure. This minimizes
 memory consumption by unused procedures.  When @sc{Singular} is started
 with the @code{-q} or @code{--quiet} option, no message about the
 loading of a library is displayed.  More precisely, option @code{-q} (and
@@ -3430,7 +3425,7 @@ See
 @c ref
 
 @c ---------------------------------------
-@node Format of a library,, Loading of a library, Libraries
+@node Format of a library,, Loading a library, Libraries
 @subsection Format of a library
 @cindex Format of a library
 
@@ -3470,7 +3465,7 @@ info="
 @end smallexample
 @item @strong{Note:}
 In the info-string the characters \ and " must be preceded by a \ (escaped).
-It is recommended that the info string is placed on the top of a
+It is recommended that the info string is placed at the head of a
 library file and contains general information about the library as well
 as a listing of all procedures available to the users (with a one line
 description of each procedure).
@@ -3523,8 +3518,8 @@ reserved for sorting the libraries into categories.
 @cindex Guidelines for writing a library
 @cindex library, Guidelines for writing
 
-Although there are very few enforced rules on how libraries are written
-(see @ref{Libraries}), it is recommended that the libraries comply with
+Although there are very few enforced rules on how @sc{Singular} libraries should be
+written (see @ref{Libraries}), it is recommended that the libraries comply with
 the guidelines explained in this section, so that debugging and
 understanding are made easier.
 
@@ -3552,7 +3547,7 @@ contained in a library should be implemented.
 @enumerate
 @item
 The info- and version-string should appear at the beginning of the
-library, before procedure definitions.
+library, before the first procedure definition.
 
 @item
 The info-string should have the format as explained in @ref{The help
@@ -3567,7 +3562,7 @@ Each procedure which is not declared @code{static} should have a
 help and example section as explained in @ref{Procedure definition}.
 @*Such procedures should furthermore carefully check any assumptions
 made about their input (like the type of list elements), and, if
-necessary, omit an error using the  function @ref{ERROR}.
+necessary, report an error using the  function @ref{ERROR}.
 
 @item
 Names of procedures should not be shorter than 4 characters and should
@@ -3595,8 +3590,8 @@ requested. Instead, an error (using the function
 increasing the value of the reserved variable @code{printlevel}.
 
 @item
-It is often useful for a procedure to print out comments, either to
-explain results or to display intermediate computations. However,
+It is often useful for a procedure to print out comments, either for
+explaining results or for displaying intermediate computations. However,
 if this procedure is called by another procedure, such comments are
 confusing and disturbing in most cases.
 
@@ -3776,9 +3771,8 @@ automatically added to the index keys).
 then the
 content of the item is assumed to be a summary description of the
 procedures contained in the library. Separate texinfo nodes (subsections
-in printed documents) are
-@strong{only} created out of the help strings of such procedures which
-appear in the summary description of a library.
+in printed documents) are created exclusively from the help strings of such
+procedures appearing in the summary description of a library.
 @item @code{LIBRARY}
 then the content of the item is assumed to be a one-line description of
 a library. If this one-line description consist of only uppercase
@@ -3831,7 +3825,7 @@ page 24)
 @end table
 
 @item @code{@@math@{..@}}
-for typesetting of small (i.e., which do not go over
+for typesetting of small (i.e., which do not expand over
 multiple lines) mathematical expressions  in LaTeX math-mode
 syntax.
 @table @asis
@@ -3840,7 +3834,7 @@ syntax.
 @*@expansion{}
 @*@math{\alpha}
 @item Note:
-Mathematical expressions inside @code{@@math@{..@}} may
+Mathematical expressions inside @code{@@math@{..@}} must
 not contain curly parenthesis and the "at" sign, i.e., may not contain
 @code{@{,@},@@}.
 @end table
@@ -3854,8 +3848,8 @@ multiple lines) strings in typewriter font.
 @*@expansion{}
 @*@code{typewriter font}
 @item Note:
-The string inside @code{@@code@{..@}} may
-not contain curly parenthesis and the "at" sign, i.e., may not contain
+The string inside @code{@@code@{..@}} must
+not contain curly parenthesis and the "at" sign, i.e., must not contain
 @code{@{,@},@@}.
 @end table
 
@@ -3928,7 +3922,7 @@ for text which is written in pure texinfo.
 @@texinfo
 Among others, within a texinfo environment
 one can use the tex environment to typeset
-more complex mathematical like
+more complex mathematical items like
 @@tex
 $i_@{1,1@} $
 @@tex
@@ -3936,7 +3930,7 @@ $i_@{1,1@} $
 @end example
 @*@expansion{}
 @*Among others, within a texinfo environment one can use the tex environment
-to typeset more complex mathematical like
+to typeset more complex mathematical items like
 @tex
 $ i_{1,1} $
 @end tex
@@ -3944,7 +3938,7 @@ $ i_{1,1} $
 
 @end table
 
-Furthermore, a line-break is inserted in front of each line
+Furthermore, a line-break is inserted before each line
 whose previous line is shorter than 60
 characters and does not contain any of the above described recognized
 texinfo markup elements.
@@ -3983,7 +3977,7 @@ have a help and example section.
 The purpose of the one line procedure descriptions is not to give a short help
 for the procedure, but to help the user decide what procedure might be
 the right one for the job. Details can then be found in the help section
-of each procedure. Therefore parameters may be omitted or abbreviated if
+of each procedure. Therefore, parameters may be omitted or abbreviated if
 necessary. If this description consists of only upper-case characters,
 then it will be typeset in all lowercase characters in the manual.
 
@@ -4057,7 +4051,7 @@ and then @key{RETURN} .
 @node Tracing of procedures,Source code debugger,Debugging tools,Debugging tools
 @subsection Tracing of procedures
 Setting the @code{TRACE} variable to 1 (resp.@: 3) results in reporting of
-the all procedures entries and exits (resp.@: together with line numbers).
+all procedure entries and exits (resp.@: together with line numbers).
 If @code{TRACE} is set to 4, @code{Singular}
 displays each line before its interpretation and waits for the @key{RETURN}
 key being pressed.
@@ -4125,8 +4119,8 @@ quit debugger, set debugger flags(0,1,2)
 
 
 @subsubheading Syntactical errors in procedures
-If @sc{Singular} was started with the command line option @code{-d} or
-@code{--sdb} a syntactical error in a procedure will start the
+If @sc{Singular} was started using the command line option @code{-d} or
+@code{--sdb}, a syntactical error in a procedure will start the
 source code debugger instead of returning to the top level with an
 error message. The commands @code{q 1} and @code{q 2} are equivalent in this
 case.
@@ -4176,7 +4170,7 @@ i;               // here local variables of the procedure can be accessed
 @subsection Printing of data
 The procedure @code{dbprint} is useful for optional output of data:
 it takes 2 arguments and prints the second argument, if the first
-argument is positive; it does nothing otherwise.
+argument is positive; otherwise, it does nothing.
 @menu
 * dbprint::
 * voice::
@@ -4194,7 +4188,7 @@ See @ref{dbprint}; @ref{voice}.
 
 @code{libparse} is a stand-alone program contained in the @sc{Singular}
 distribution (at the place where the @sc{Singular} executable program
-resides), which cannot be called inside of @sc{Singular}. It is a
+resides), which cannot be called inside @sc{Singular}. It is a
 debugging tool for libraries which performs exactly the same checks as
 @ifset namespaces
 the @code{load} command in @sc{Singular}, but generates more output during
@@ -4205,7 +4199,7 @@ the @code{LIB} command in @sc{Singular}, but generates more output during
 parsing.  @code{libparse} is useful if an error
 occurs while loading the library, but the whole block around the line
 specified seems to be correct. In these situations the real error might
-be hundreds of lines earlier in the library.
+have occured hundreds of lines earlier in the library.
 
 @strong{Usage:}
 @*@code{libparse [options] singular-library}

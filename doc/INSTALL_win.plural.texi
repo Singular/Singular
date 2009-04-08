@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_win.plural.texi,v 1.2 2003-07-31 20:14:28 levandov Exp $
+@comment $Id: INSTALL_win.plural.texi,v 1.3 2009-04-08 12:44:41 seelisch Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on Unix
 @c
@@ -59,7 +59,7 @@ gzip -dc <path_to>/SingularPlural-@value{VERSION}-@value{_UNAME}.tar.gz | tar -p
 gzip -dc <path_to>/SingularPlural-@value{VERSION}-share.tar.gz | tar -pxf -
 @end smallexample
 
-This creates the the directory @code{Plural/@value{VERSION}} with 
+This creates the directory @code{Plural/@value{VERSION}} with
 @multitable @columnfractions .36 .64
 @item (sub)directories
 @tab which contain
@@ -80,7 +80,7 @@ This creates the the directory @code{Plural/@value{VERSION}} with
 @end multitable
 
 For the executable to work, the directory layout must look pretty much
-like this; the executable looks for "sibling" directories at run-time
+like this; the executable will look for "sibling" directories at run-time
 to figure out where its @sc{Singular::Plural} libraries and on-line
 documentation files are. These constraints on the local directory layout
 are necessary to avoid having to hard-code pathnames into the
@@ -111,7 +111,7 @@ Just append the directory @code{Plural/@value{VERSION}/ix86-Win} to your @code{P
 place, but use shortcuts or soft-links instead.
 
 @item
-If you wish to use any of following features of
+If you wish to use any of the following features of
 @sc{Plural}, make sure that the respective programs are installed on your system:
 
 @multitable @columnfractions .5 .5
@@ -141,7 +141,7 @@ higher
 
 @item Customize the on-line help system:
 
-By default, on-line help is displayed in the @code{html} format using
+By default, on-line help is displayed in @code{html} format using
 the default Web browser on your system.
 
 However, this behavior can be customized in several ways

@@ -2,7 +2,7 @@
 This is the README file for lib2doc.
 @end ifclear
 
-@code{lib2doc} is a utility to generate the stand-alone documentation for 
+@code{lib2doc} is a utility to generate the stand-alone documentation for
 a @sc{Singular} library in various formats. 
 
 The @code{lib2doc} utility should be used by developers of @sc{Singular}
@@ -47,25 +47,25 @@ Now you can run the following commands:
 @table @code
 @item make mylib.hlp
 Generates the file @code{mylib.hlp} -- the info file for the documentation
-of @code{mylib.lib}. This file can be viewed with
+of @code{mylib.lib}. This file can be viewed using
 @smallexample
 info -f mylib.hlp
 @end smallexample
 @item make mylib.dvi
 Generates the file @code{mylib.dvi} -- the dvi file for the documentation
-of @code{mylib.lib}. This file can be viewed with
+of @code{mylib.lib}. This file can be viewed using
 @smallexample
 xdvi mylib.dvi
 @end smallexample
 @item make mylib.ps
 Generates the file @code{mylib.ps} -- the PostScript file for the documentation
-of @code{mylib.lib}. This file can be viewed with (for example)
+of @code{mylib.lib}. This file can be viewed using (for example)
 @smallexample
 ghostview mylib.dvi
 @end smallexample
 @item make mylib.html
 Generates the file @code{mylib.html} -- the HTML file for the documentation
-of @code{mylib.lib}. This file can be viewed with (for example)
+of @code{mylib.lib}. This file can be viewed using (for example)
 @smallexample
 netscape mylib.html
 @end smallexample

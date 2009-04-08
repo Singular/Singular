@@ -188,7 +188,7 @@ LLL-algorithm.
 The saturation step is performed in the following way:
 First note that $w$ induces a positive grading w.r.t. which the ideal
 $$ I=<x^{v_i^+}-x^{v_i^-}|i=1,\ldots,r> $$
-corresponding to our lattice basis is homogeneous. We use the following
+is homogeneous corresponding to our lattice basis. We use the following
 lemma:
 
 Let $I$ be a homogeneous ideal w.r.t. the weighted reverse
@@ -238,9 +238,8 @@ lemma with x(i) instead of x(n).
 This procedure involves n Groebner basis computations. Actually, this
 number can be reduced to at most n/2
 @end ifinfo
-(@pxref{[HoSh98]}), and the single
-computations -- except from the first one -- show to be easy and fast in
-practice.
+(@pxref{[HoSh98]}), and each computation -- except for the first one --
+proves to be simple and fast in practice.
 
 @node Di Biase and Urbanke, Bigatti and La Scala and Robbiano, Hosten and Sturmfels, Algorithms
 
@@ -270,7 +269,7 @@ $\{i_1,\ldots,i_l\}$ be the set of indices $i$ with
 $v_{1,i}<0$. Multiplying the components $i_1,\ldots,i_l$ of
 $v_1,\ldots,v_r$ and the columns $i_1,\ldots,i_l$ of $A$ by $-1$ yields
 a matrix $B$ and a lattice basis $u_1,\ldots,u_r$ of the kernel of $B$
-that fulfill the assumption of the observation above. It is then able
+that fulfill the assumption of the observation above. It is then possible
 to compute a generating set of $I_A$ by applying the following
 ``variable flip'' successively to $i=i_1,\ldots,i_l$:
 
@@ -434,8 +433,8 @@ and @pxref{[The99]}.
 
 An implementation of the above algorithm and some examples can be found in @ref{intprog_lib}.
 
-Classical methods for solving IP instances like Branch-and-Bound
-methods seem to be faster in general than the methods using toric
+In general, classical methods for solving IP instances like Branch-and-Bound
+methods seem to be faster than the methods using toric
 ideals. But the latter have one great advantage: If one wants to solve
 various instances that differ only by the vector @math{b}, one has to
 perform steps (1) and (2) above only once. As the running time of step (3)

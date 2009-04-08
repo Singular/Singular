@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pdata.doc,v 1.25 2007-08-03 11:45:53 Singular Exp $
+@comment $Id: pdata.doc,v 1.26 2009-04-08 12:44:42 seelisch Exp $
 @comment this file contains the "Polynomial data" appendix.
 
 @c The following directives are necessary for proper compilation
@@ -40,13 +40,10 @@ polynomials (and some additional information).
 Note that @sc{Singular} stores (and hence prints) a polynomial automatically
 w.r.t@:. the monomial ordering.
 
-Hence, in order to define such an object in @sc{Singular},
-one has to give a list of polynomials in a specific format.
-
-For ideals, resp.@: matrices, this is straight forward:
+The definition of ideals and matrices, respectively, is straight forward:
 The user gives a list of polynomials
 which generate the ideal, resp.@: which are the entries of the matrix.
-(The number of rows and columns has to be given when creating the matrix.)
+(The number of rows and columns need to be provided when creating the matrix.)
 
 A vector  in @sc{Singular} is always an element of a free module over the
 basering. It is given as a list of polynomials in one of the following
@@ -57,7 +54,7 @@ $[f_1,...,f_n]$ or $f_1*gen(1)+...+f_n*gen(n)$, where $gen(i)$
 @ifinfo
 [f_1,...,f_n] or f_1*gen(1)+...+f_n*gen(n), where gen(i)
 @end ifinfo
-denotes the i-th canonical generator of a free module (with 1 at place i and
+denotes the i-th canonical generator of a free module (with 1 at index i and
 0 everywhere else).
 Both forms are equivalent. A vector is internally represented in
 the second form with the
@@ -75,7 +72,7 @@ $[f_1,...,f_n]$
 @ifinfo
 [f_1,...,f_n]
 @end ifinfo
-is given as output only if the monomial ordering gives priority to the
+serves as output only if the monomial ordering gives priority to the
 component, i.e@:., is of the form @code{(c,...)} (see @ref{Module
 orderings}).  However, in any case the procedure @code{show} from the
 library @code{inout.lib} displays the bracket format.
@@ -277,7 +274,7 @@ $N$ as $N = R^n/$std($M$)).
 @ifinfo
 N as N=R^n/std(M)).
 @end ifinfo
-However, @code{dim(M)}, resp.@: @code{vdim(M)}, returns
+However, @code{dim(M)}, resp.@: @code{vdim(M)}, return
 @tex
 dim$(R^n/M)$, resp.@: dim$_k(R^n/M)$
 @end tex
@@ -469,11 +466,10 @@ call it a mixed ordering.   Local or mixed orderings are not wellorderings.
 
 If K is the ground field, x = (x_1, @dots{}, x_n) the
 variables and < a monomial ordering, then Loc K[x] denotes the
-localization of K[x] with respect to the multiplicatively closed set @{1 +
-g | g = 0 or g in K[x]\@{0@} and L(g) < 1@}.   L(g)
-denotes the leading monomial of g, i.e., the biggest monomial of g with
-respect to <.   The result of any computation which uses standard basis
-computations has to be interpreted in Loc K[x].
+localization of K[x] with respect to the multiplicatively closed set
+@{g in K[x]\@{0@} | LM(g) = 1@}. LM(g) denotes the leading monomial of g,
+i.e., the largest monomial of g with respect to <. The result of any computation
+which uses standard basis computations has to be interpreted in Loc K[x].
 @end ifinfo
 
 Note that the definition of a ring includes the definition of its
@@ -489,7 +485,7 @@ described in the following sections.
 @cindex orderings, global
 
 @tex
-For all these orderings: Loc $K[x]$ = $K[x]$
+For all these orderings, we have Loc $K[x]$ = $K[x]$
 @end tex
 @ifinfo
 For all these orderings: Loc K[x] = K[x]
@@ -646,10 +642,10 @@ K[x]
 @end ifinfo
 at the maximal ideal
 @ifinfo
- (x_1, @dots{}, x_n).
+ (x)=(x_1, @dots{}, x_n).
 @end ifinfo
 @tex
-\ $(x_1, ..., x_n)$.
+\ $(x) = (x_1, ..., x_n)$.
 @end tex
 
 @table @asis
@@ -1003,7 +999,7 @@ M_1 a = \; M_1 b, \ldots, M_{i-1} a = \; M_{i-1} b$ and $M_i a < \; M_i b$.
 Thus,
 @ifinfo
 x^a < x^b
-if and only if M*a is smaller than M*b
+if and only if M*a is less than M*b
 @end ifinfo
 @tex
 $x^a < x^b$
@@ -1248,7 +1244,7 @@ entries, an error message is given.
 
 @strong{WARNING:} @sc{Singular}
 does not check whether the matrix has full rank.   In such a case some
-computations might not terminate, others might give a nonsense result.
+computations might not terminate, others may not give a sensible result.
 
 Having these matrix orderings @sc{Singular} can compute standard bases for
 any monomial ordering which is compatible with the natural semigroup structure.

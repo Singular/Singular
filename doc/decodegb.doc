@@ -1,25 +1,25 @@
 @comment this file contains the mathematical background of decoding with Groebner bases
 
 This section introduces some of the mathematical notions, definitions, and 
-results for solving decoding problem and finding minimum distance of 
+results for solving decoding problems and finding the minimum distance of
 linear (and in particular cyclic) codes. The material presented here
 should assist the user in working with @ref{decodegb_lib}.
 More details can be obtained from @ref{[BP2008b]}.
 
 
 @menu
-* Codes and decoding problem::
+* Codes and the decoding problem::
 * Cooper philosophy::
 * Generalized Newton identities::
 * Fitzgerald-Lax method::
 * Decoding method based on quadratic equations::
-* References for decoding with GB::
+* References for decoding with Groebner bases::
 @end menu
 
 @c ---------------------------------------------------------------------------
-@node Codes and decoding problem, Cooper philosophy, , Decoding codes with GB 
-@subsection Codes and decoding problem
-@cindex Codes and decoding problem
+@node Codes and the decoding problem, Cooper philosophy, , Decoding codes with Groebner bases 
+@subsection Codes and the decoding problem
+@cindex Codes and the decoding problem
 
 @subsubheading Codes
 @cindex Code
@@ -59,7 +59,7 @@ More details can be obtained from @ref{[BP2008b]}.
 @end ifinfo
 @item 
 @tex
-  A matrix $G$ whose rows are the basis vectors of $C$ is the {\bf generator matrix}.
+  A matrix $G$ whose rows are the base vectors of $C$ is the {\bf generator matrix}.
 @end tex
 @ifinfo
   A matrix G whose rows are the basis vectors of C is the @strong{generator matrix}.
@@ -123,7 +123,7 @@ More details can be obtained from @ref{[BP2008b]}.
 @end ifinfo
 @item 
 @tex
-  {\bf Bounded up to half the minimum distance}: Additional assumption $d({\bf y},C)\le(d(C)-1)/2$. Then a codeword with the above property
+  {\bf Bounded up to half the minimum distance}: With the additional assumption $d({\bf y},C)\le(d(C)-1)/2$, a codeword with the above property
   is unique.
 @end tex
 @ifinfo
@@ -142,10 +142,11 @@ One distinguishes between two concepts:
 @tex
   {\bf Generic decoding}: Solve some system $S(C)$ and obtain some "closed" formulas $CF$. Evaluating these formulas
   at data specific to a received word ${\bf r}$ should yield a solution to the decoding problem. For example for 
-  $f\in CF: f(syndrome({\bf r}),x)=poly(x)$. The roots of $poly(x)=0$ yield error positions -- general error-locator polynomial $f$.  
+  $f\in CF: f(syndrome({\bf r}),x)=poly(x)$. The roots of $poly(x)=0$ yield error positions, see the section on the
+  general error-locator polynomial.
 @end tex
 @ifinfo
-  @strong{Generic decoding}: Solve some system S(C) and obtain some ``closed'' formulas CF. 
+  @strong{Generic decoding}: Solve some system S(C) and obtain some ``closed'' formulas CF.
   Evaluating these formulas at data specific to a received word r should yield a solution to the 
   decoding problem. For example for f in CF: f(syndrome(r),x)=poly(x). The roots of 
   poly(x)=0 yield error positions -- general error-locator polynomial f.
@@ -165,14 +166,14 @@ One distinguishes between two concepts:
 @subsubheading Computational effort
 @c table @asis
 @itemize @bullet
-@item Generic decoding. Preprocessing: very hard. Decoding: relatively simple (if the formulas are sparse!).
-@item Online decoding. Preprocessing: --  . Decoding: hard.
+@item Generic decoding. Here, preprocessing is very hard, whereas decoding is relatively simple (if the formulas are sparse).
+@item Online decoding. In this case, decoding is the hard part.
 @end itemize
 
 @c @end table
 
 @c ---------------------------------------------------------------------------
-@node Cooper philosophy, Generalized Newton identities, Codes and decoding problem, Decoding codes with GB 
+@node Cooper philosophy, Generalized Newton identities, Codes and the decoding problem, Decoding codes with Groebner bases 
 @subsection Cooper philosophy
 @cindex Cooper philosophy
 
@@ -318,15 +319,15 @@ The general error-locator polynomial actually is an element of the reduced Groeb
 <F'_C>. Having this polynomial, decoding of the cyclic code C reduces to univariate factorization.
 @end ifinfo
 
-For an example see example to @code{sysCRHT} in @ref{decodegb_lib}. 
-More on Cooper's philosophy and general error-locator polynomial in @ref{[OS2005]}.
+For an example see @code{sysCRHT} in @ref{decodegb_lib}.
+More on Cooper's philosophy and the general error-locator polynomial can be found in @ref{[OS2005]}.
 
 
 @subsubheading Finding the minimum distance
-The method described above can be adapted to find minimum distance of a code. 
-Namely, the following holds:
+The method described above can be adapted to find the minimum distance of a code.
+More concretely, the following holds:
 
-@tex  
+@tex
   Let $C$ be the binary $[n,k,d]$ cyclic code with the defining set $S_C=\{i_1,\dots,i_v\}$. Let $1\le w\le n$ and let $J_C(w)$ denote the system:
   $$
   Z_1^{i_1}+\dots+Z_w^{i_1}=0,
@@ -362,7 +363,7 @@ Namely, the following holds:
   @end display
 @end ifinfo
 @tex
-  Then the number of solutions of $J_C(w)$ is equal to $w!$ times the number of codewords of weight $w$. And for $1\le w\le d$: either $J_C(w)$ 
+  Then the number of solutions of $J_C(w)$ is equal to $w!$ times the number of codewords of weight $w$. And for $1\le w\le d$, either $J_C(w)$
   has no solutions, which is equivalent to $w<d$, or $J_C(w)$ has some solutions, which is equivalent to $w=d$.  
 @end tex
 @ifinfo
@@ -372,13 +373,13 @@ either J_C(w) has no solutions, which is equivalent to w<d, or
 J_C(w) has some solutions, which is equivalent to w=d.  
 @end ifinfo
 
-For an example see example to @code{sysCRHTMindist} in @ref{decodegb_lib}.
-More on finding the minimum distance with Groebner bases in @ref{[S2007]}.
+For an example see @code{sysCRHTMindist} in @ref{decodegb_lib}.
+More on finding the minimum distance with Groebner bases can be found in @ref{[S2007]}.
 @xref{[OS2005]}, for the definition of the polynomial @math{p} above.
 
 
 @c ---------------------------------------------------------------------------
-@node Generalized Newton identities, Fitzgerald-Lax method, Cooper philosophy,  Decoding codes with GB 
+@node Generalized Newton identities, Fitzgerald-Lax method, Cooper philosophy,  Decoding codes with Groebner bases 
 @subsection Generalized Newton identities
 @cindex Generalized Newton identities
 
@@ -387,7 +388,7 @@ More on finding the minimum distance with Groebner bases in @ref{[S2007]}.
   $$
     \sigma(Z)=\prod_{l=1}^{t}(Z-z_l).
   $$
-  If this product is expanded
+  If this product is expanded,
   $$
     \sigma(Z)=Z^t+\sigma_1Z^{t-1}+\dots+\sigma_{t-1}Z+\sigma_t,
   $$
@@ -398,7 +399,7 @@ More on finding the minimum distance with Groebner bases in @ref{[S2007]}.
   $$
 @end tex
 @ifinfo
-The @strong{error-locator polynomial} is defined by 
+The @strong{error-locator polynomial} is defined by
 @display
   sigma(Z)=prod_(l=1)^t (Z-z_l).
 @end display
@@ -438,7 +439,7 @@ the following @strong{generalized Newton identities}:
     s_i^q=(e(a^i))^q=e(a^{iq})=s_{qi}, \hbox{ for all } i \in Z_n,
   $$
   and $\sigma_i^{q^m}=\sigma_i, \hbox{ for all } 1\le i \le t$.
-  Replace the syndromes by variables and obtain following set of polynomials $Newton_t$ in the variables
+  Replace the syndromes by variables and obtain the following set of polynomials $Newton_t$ in the variables
   $S_1,\dots,S_n$ and $\sigma_1,\dots,\sigma_t$:
   $$  
   \sigma_i^{q^m}-\sigma_i, \ \  \forall \ 1\le i \le t,
@@ -473,12 +474,12 @@ S_1,@dots{},S_n and sigma_1,@dots{},sigma_t:
 @end display
 @end ifinfo
 
-For an example see example to @code{sysNewton} in @ref{decodegb_lib}. More on this method and the method based on
-Waring function in @ref{[ABF2002]}. See also @ref{[ABF2008]}.
+For an example see @code{sysNewton} in @ref{decodegb_lib}. More on this method and the method based on
+Waring function can be found in @ref{[ABF2002]}. See also @ref{[ABF2008]}.
 
 
 @c ---------------------------------------------------------------------------
-@node Fitzgerald-Lax method, Decoding method based on quadratic equations, Generalized Newton identities, Decoding codes with GB 
+@node Fitzgerald-Lax method, Decoding method based on quadratic equations, Generalized Newton identities, Decoding codes with Groebner bases 
 @subsection Fitzgerald-Lax method
 @cindex Fitzgerald-Lax method
 
@@ -493,7 +494,7 @@ Waring function in @ref{[ABF2002]}. See also @ref{[ABF2008]}.
   $$ 
   So $I_q$ is a zero-dimensional ideal. Define also $V(I_q)=:\{P_1,\dots,P_n\}$.
   Every $q$-ary linear code $C$ with parameters $[n,k]$ can be seen as an
-  {\bf affine variety code} $C(I,L)$, that is the image of a vector space $L$ of the {\bf evaluation map}
+  {\bf affine variety code} $C(I,L)$, that is, the image of a vector space $L$ of the {\bf evaluation map}
   $$  
   \phi :R\to F_q ^n
   $$
@@ -541,7 +542,7 @@ the coset of f in F_q[U_1,@dots{},U_s] modulo I_q.
 @item 
 @tex
   Construct a Gr\"obner basis $\{g_1,\dots,g_m\}$ for an ideal $I$ of polynomials from $F_q[X_1,\dots,X_s]$ that vanish at the points 
-  $P_1,\dots,P_s$. Denote by $\xi_i\in F_q[X_1,\dots,X_s]$ such that $\xi_i(P_i)=1,\xi_i(P_j)=0,i\ne j$. 
+  $P_1,\dots,P_s$. Define $\xi_i\in F_q[X_1,\dots,X_s]$ such that $\xi_i(P_i)=1,\xi_i(P_j)=0,i\ne j$. 
 @end tex
 @ifinfo
   Construct a Groebner basis @{g_1,@dots{},g_m@} for an ideal I of polynomials from F_q[X_1,@dots{},X_s]
@@ -559,7 +560,7 @@ the coset of f in F_q[U_1,@dots{},U_s] modulo I_q.
 @c @end table  
 
 @tex
-  In this way we obtain that the code $C$ is the image of the evaluation above, so $C=C(I,L)$. In the
+  In this way we obtain that the code $C$ is the image of the evaluation above, thus $C=C(I,L)$. In the
   same way by considering a parity check matrix instead of a generator matrix we have that the dual code is also an affine variety code.
   
   The method of decoding is a generalization of CRHT. One needs to add polynomials
@@ -611,8 +612,8 @@ Consider the ideal Id_C generated by
 @table @code
 @item @strong{Theorem:}
 @tex
-  Let $G$ be the reduced Gr\"obner basis for $Id_C$ with respect to an elimination order w.r.t $X_{11},\dots,X_{1s},E_1$, such that   
-  $X_{11}<\dots<X_{1s}<E_1$. Then we may solve for the error locations and values by applying elimination theory to the polynomials in $G$.
+  Let $G$ be the reduced Gr\"obner basis for $Id_C$ with respect to an elimination order $X_{11}<\dots<X_{1s}<E_1$.
+  Then we may solve for the error locations and values by applying elimination theory to the polynomials in $G$.
 @end tex
 @ifinfo
   Let G be the reduced Groebner basis for Id_C with respect to an elimination order induced by
@@ -621,11 +622,11 @@ Consider the ideal Id_C generated by
 @end ifinfo
 @end table
 
-For an example see example to @code{sysFL} in @ref{decodegb_lib}. More on this method in @ref{[FL1998]}.
+For an example see @code{sysFL} in @ref{decodegb_lib}. More on this method can be found in @ref{[FL1998]}.
 
 
 @c ---------------------------------------------------------------------------
-@node Decoding method based on quadratic equations, References for decoding with GB, Fitzgerald-Lax method, Decoding codes with GB 
+@node Decoding method based on quadratic equations, References for decoding with Groebner bases, Fitzgerald-Lax method, Decoding codes with Groebner bases 
 @subsection Decoding method based on quadratic equations
 @cindex Decoding method based on quadratic equations
 
@@ -667,7 +668,7 @@ the s x s submatrices of B_s have rank s for all s=1,@dots{},n.
 @tex
   Let $C$ be an $F_q$-linear code with parameters $[n,k,d]$. W.l.o.g $n\le q$. $H$ is a check matrix of $C$.
   Let ${\bf h}_1,\dots,{\bf h}_{n-k}$ be the rows of $H$.
-  One can express ${\bf h}_i = \sum _{j=1}^n a_{ij}{\bf b}_j$ for some $a_{ij}\in F_q$.
+  One can express ${\bf h}_i = \sum _{j=1}^n a_{ij}{\bf b}_j$ with some $a_{ij}\in F_q$.
   In other words $H=AB$ where $A$ is the $(n-k) \times n$ matrix with entries $a_{ij}$.
 
   Let ${\bf r}={\bf c}+{\bf e}$ be a received word with ${\bf c}\in C$ and ${\bf e}$ an error vector.
@@ -786,11 +787,11 @@ algebraic closure of F_q. Then
 @end ifinfo
 @end itemize
 
-For an example see example to @code{sysQE} in @ref{decodegb_lib}. More on this method in @ref{[BP2008a]}.
+For an example see @code{sysQE} in @ref{decodegb_lib}. More on this method can be found in @ref{[BP2008a]}.
 
 
-@node References for decoding with GB, ,Decoding method based on quadratic equations, Decoding codes with GB
-@subsection References for decoding with GB
+@node References for decoding with Groebner bases, ,Decoding method based on quadratic equations, Decoding codes with Groebner bases
+@subsection References for decoding with Groebner bases
 
 @itemize @bullet
 @item [ABF2002]

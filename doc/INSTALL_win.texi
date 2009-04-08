@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_win.texi,v 1.15 2008-07-17 12:27:38 wienand Exp $
+@comment $Id: INSTALL_win.texi,v 1.16 2009-04-08 12:44:42 seelisch Exp $
 @c FILE:    INSTALL.texi
 @c PURPOSE: Installation instructions for Singular on MSWindows
 @c          This file is displayed during installation and copied to
@@ -13,7 +13,7 @@
 @majorheading Installation instructions for Singular on MS Windows.
 @end ifclear
 
-@heading For the impatient (with only one file download):
+@heading For the impatient (single file download):
 @itemize
 @item
 If you have @code{Cygwin} installed, please read the information below.
@@ -21,7 +21,7 @@ If you have @code{Cygwin} installed, please read the information below.
 Execute the self-extracting installation archive and
 @strong{carefully} follow the instructions given there.
 Setup will analyze your system, create the corresponding configuration
-and give you further tips on the installation process.
+and give you further tips regarding the installation process.
 (see @uref{http://www.singular.uni-kl.de/WINDOWS/pfwinstall.html})
 @item
 In case of troubles, see the installed file @code{/etc/INSTALL} or visit
@@ -30,22 +30,24 @@ In case of troubles, see the installed file @code{/etc/INSTALL} or visit
 
 @heading Installation preliminaries
 
-@sc{Singular} is a CYGWIN package on MS Windows: you can install it
+@sc{Singular} is a CYGWIN package on MS Windows. You can install it
 with the Cygwin Installer (Net Install):
-you will find the packages related to @sc{Singular} under 
+For a minimal installation, the following set of packages is recommended
+to be chosen when the Cygwin package browser comes up:
 @itemize
-@item a.Category Math
-singular-base, singular-share,
-singular-help (optional, recommended),
-singular-icons(optional),
-singular-surf (optional, recommended)
-@item b.Category Editors
-emacs or xemacs (optional, needed if you wish to use @sc{Singular (Emacs)} or @sc{ESingular})
-@item c.Category Shells
-rxvt (optional, strongly recommended)
+@item - singular-base, singular-share, singular-help, singular-icons;
+@item - rxvt.
+@end itemize
+These packages can be complemented by the following, in order to install a full version
+supporting - among other additional features - the use of @sc{Singular} under (x)emacs and
+@sc{Singular} Surf:
+@itemize
+@item - singular-surf,
+@item - emacs-X11, xemacs-sumo,
+@item - xorg-server, xinit.
 @end itemize
 
-Complete installation informations for Windows are available from
+Complete installation information for Windows is available at
 @display
 @uref{http://www.singular.uni-kl.de/WINDOWS/index.html}.
 @end display

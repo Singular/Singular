@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.81 2008-10-17 08:36:26 bulygin Exp $
+@comment $Id: math.doc,v 1.82 2009-04-08 12:44:42 seelisch Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -23,7 +23,7 @@
 This chapter introduces some of the mathematical notions and definitions used
 throughout the manual. It is mostly a collection of the
 most prominent definitions and properties. For details, please, refer to
-some articles or text books (see @ref{References}).
+articles or text books (see @ref{References}).
 
 @menu
 * Standard bases::
@@ -35,7 +35,7 @@ some articles or text books (see @ref{References}).
 @ifset withplural
 * Non-commutative algebra  ::
 @end ifset
-* Decoding codes with GB::
+* Decoding codes with Groebner bases::
 * References::
 @end menu
 @c ---------------------------------------------------------------------------
@@ -366,8 +366,8 @@ $$   0 \not\in \hbox{prem}(\{ d_i, \hbox{ini}(f_i'),
 $$\hbox{prem}(d_if_i-f_i'f_i'',\{f_1,...,f_{i-1}\})=0.$$
 Furthermore, $(T,U)$ is called irreducible if $T$ is irreducible.
 
-The main result on triangular sets is the following:
-let $G=\{g_1,...,g_s\} \subset R$ then there are irreducible triangular sets $T_1,...,T_l$
+The main result on triangular sets is the following: Let
+$G=\{g_1,...,g_s\} \subset R$, then there are irreducible triangular sets $T_1,...,T_l$
 such that $V(G)=\bigcup_{i=1}^{l}(V(T_i\setminus I_i))$
 where $I_i=\{\hbox{ini}(f) \mid f \in T_i \}$. Such a set
 $\{T_1,...,T_l\}$ is called an {\bf irreducible characteristic series} of
@@ -436,7 +436,7 @@ Let $O=C[x_0,\ldots,x_n]_{(x_0,\ldots,x_n)}$ be the local ring at the origin and
 
 A {\bf Milnor representative} of $f$ defines a differentiable fibre bundle over the punctured disc with fibres of homotopy type of $\mu$ $n$-spheres.
 The $n$-th cohomology bundle is a flat vector bundle of dimension $n$ and carries a natural flat connection with covariant derivative $\partial_t$.
-The {\bf monodromy operator} is the action of a positively oriented generator of the fundamental group of the puctured disc on the Milnor fibre.
+The {\bf monodromy operator} is the action of a positively oriented generator of the fundamental group of the punctured disc on the Milnor fibre.
 Sections in the cohomology bundle of {\bf moderate growth} at $0$ form a regular $D=C\{t\}[\partial_t]$-module $G$, the {\bf Gauss-Manin connection}.
 
 By integrating along flat multivalued families of cycles, one can consider fibrewise global holomorphic differential forms as elements of $G$.
@@ -490,7 +490,7 @@ For semiquasihomogeneous singularities, this also holds for intervals of the for
 Two given isolated singularities f and g determine two spectra and from these spectra we get an integer.
 This integer is the maximal positive integer k such that the semicontinuity holds for the spectrum of f and k times the spectrum of g.
 These numbers give bounds for the maximal number of isolated singularities of a specific type on a hypersurface X in P^n of degree d:
-such a hypersurface has a smooth hyperplane section, and the complement is a small deformation of a cone over this hyperplane section.
+Such a hypersurface has a smooth hyperplane section, and the complement is a small deformation of a cone over this hyperplane section.
 The cone itself being a mu-constant deformation of x_0^d+...+x_n^d=0, the singularities are bounded by the spectrum of x_0^d+...+x_n^d.
 
 Using the library @code{gmssing.lib} one can compute the @strong{monodromy}, the V-fitration on H''/H', and the spectrum.
@@ -558,9 +558,8 @@ E~_6 on a surface X in P^3
 @end ifinfo
 of degree seven.
 This calculation can be done over the rationals.
-So choose a local ordering on @math{Q[x,y,z]}. Here we take the
-negative degree lexicographical ordering which is denoted
-@code{ds} in @sc{Singular}:
+We choose a local ordering on @math{Q[x,y,z]}. Here we take the
+negative degree lexicographical ordering, in @sc{Singular} denoted by @code{ds}:
 
 @smallexample
 @c example
@@ -672,7 +671,7 @@ $\tilde{E}_6$.
 E~_6.
 @end ifinfo
 
-Note that @code{spectrumnd(f)} works only if @math{f} has nondegenerate
+Note that @code{spectrumnd(f)} works only if @math{f} has a nondegenerate
 principal part. In fact @code{spectrumnd} will detect a degenerate
 principal part in many cases and print out an error message.
 However if it is known in advance that @math{f} has nondegenerate
@@ -681,7 +680,7 @@ using @code{spectrumnd(f,1)}.
 
 @c ---------------------------------------------------------------------------
 @ifclear withplural
-@node Toric ideals and integer programming, Decoding codes with GB, Gauss-Manin connection, Mathematical background
+@node Toric ideals and integer programming, Decoding codes with Groebner bases, Gauss-Manin connection, Mathematical background
 @end ifclear
 
 @ifset withplural
@@ -697,7 +696,7 @@ using @code{spectrumnd(f,1)}.
 @ifset withplural
 
 @c ---------------------------------------------------------------------------
-@node Non-commutative algebra, Decoding codes with GB, Toric ideals and integer programming, Mathematical background
+@node Non-commutative algebra, Decoding codes with Groebner bases, Toric ideals and integer programming, Mathematical background
 
 @section Non-commutative algebra
 @cindex  Non-commutative algebra
@@ -708,19 +707,19 @@ using @code{spectrumnd(f,1)}.
 @c ---------------------------------------------------------------------------
 
 @ifclear withplural
-@node Decoding codes with GB, References, Toric ideals and integer programming, Mathematical background
+@node Decoding codes with Groebner bases, References, Toric ideals and integer programming, Mathematical background
 @end ifclear
 
 @ifset withplural
 @c ---------------------------------------------------------------------------
-@node Decoding codes with GB, References, Non-commutative algebra, Mathematical background
+@node Decoding codes with Groebner bases, References, Non-commutative algebra, Mathematical background
 @end ifset
 
-@section Decoding codes with GB
-@cindex  Decoding codes with GB
+@section Decoding codes with Groebner bases
+@cindex  Decoding codes with Groebner bases
 @include decodegb.tex
 
-@node References, ,Decoding codes with GB, Mathematical background
+@node References, ,Decoding codes with Groebner bases, Mathematical background
 
 
 
@@ -736,7 +735,7 @@ Other sources to check are @code{http://symbolicnet.org/},
 @code{http://www-sop.inria.fr/galaad/}, @code{http://www.bath.ac.uk/~masjpf/CAIN.html},... and the following list of books.
 
 @ifset withplural
-For the references for noncommutative algebras and algorithms, see @ref{References (plural)}.
+For references on noncommutative algebras and algorithms, see @ref{References (plural)}.
 @end ifset
 
 @subheading Text books on computational algebraic geometry

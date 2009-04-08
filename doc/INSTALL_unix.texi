@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.28 2008-12-15 15:30:30 seelisch Exp $
+@comment $Id: INSTALL_unix.texi,v 1.29 2009-04-08 12:44:41 seelisch Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on Unix
 @c
@@ -90,7 +90,7 @@ gzip -dc <path_to>/Singular-@value{VERSION}-@value{_UNAME}.tar.gz | tar -pxf -
 gzip -dc <path_to>/Singular-@value{VERSION}-share.tar.gz | tar -pxf -
 @end smallexample
 
-This creates the the directory Singular/@value{VERSION} with 
+This creates the directory Singular/@value{VERSION} with
 @multitable @columnfractions .36 .64
 @item (sub)directories
 @tab  which contain
@@ -111,7 +111,7 @@ This creates the the directory Singular/@value{VERSION} with
 @end multitable
 
 For the executable to work, the directory layout must look pretty much
-like this; the executable looks for "sibling" directories at run-time
+like this; the executable will look for "sibling" directories at run-time
 to figure out where its @sc{Singular} libraries and on-line
 documentation files are. These constraints on the local directory layout
 are necessary to avoid having to hard-code pathnames into the
@@ -157,7 +157,7 @@ so that the @code{$PATH} variable is set automatically each time you login.
 place, but use soft-links instead.
 
 @item
-If you wish to use any of following features of
+If you wish to use any of the following features of
 @sc{Singular}, make sure that the respective programs are installed on your system:
 
 @multitable @columnfractions .5 .5
@@ -165,8 +165,8 @@ If you wish to use any of following features of
 @item running @code{ESingular}, or @code{Singular} within Emacs
 @tab @uref{http://www.fsf.org/software/emacs/emacs.html,,Emacs} version
 20 or higher, or, @uref{http://www.xemacs.org,,XEmacs} version 20.3 or
-higher (ESingular is only included in the Linux distribution,
-on other Unix platforms you can download the
+higher (ESingular is only included in the Linux distribution.
+On other Unix platforms you can download the
 @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/src/,,
 Singular emacs lisp files} but we give no warranties for specific platforms).
 @item on-line @code{html} help
@@ -190,7 +190,7 @@ You may download most of these programs from
 
 @item Customize the on-line help system:
 
-By default, on-line help is displayed in the @code{html} format using
+By default, on-line help is displayed in @code{html} format using
 the @code{netscape} program.
 
 However, this behavior can be customized in several ways
@@ -233,7 +233,7 @@ to the directory of your @code{dir} file.
 @*This assures that the
 @sc{Singular} manual can be  accessed from stand-alone texinfo
 browser programs such as @code{info} or @code{Emacs}.
-(It is not necessary for the use of the help system from within @code{Singular}.)
+(This is not a prerequisite for using the help system from within @code{Singular}.)
 @end itemize
 
 @heading Troubleshooting

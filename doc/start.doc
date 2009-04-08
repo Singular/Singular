@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.54 2008-12-18 13:36:31 Singular Exp $
+@comment $Id: start.doc,v 1.55 2009-04-08 12:44:42 seelisch Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added changes by GMG.
 
@@ -54,15 +54,15 @@ algebra, algebraic geometry, and singularity theory.
 @sc{Singular}'s main computational objects are ideals and
 modules over a large variety of baserings. The baserings are polynomial
 rings or localizations thereof over a field (e.g., finite fields, the
-rationals, floats, algebraic extensions, transcendental extensions) or
-quotient rings with respect to an ideal.
+rationals, floats, algebraic extensions, transcendental extensions) or over a
+limited set of rings, or over quotient rings with respect to an ideal.
 
 @sc{Singular} features one of the fastest and most general
 implementations of various algorithms for computing Groebner
 resp.@: standard bases. The implementation includes Buchberger's algorithm
 (if the ordering is a wellordering) and Mora's algorithm (if the
 ordering is a tangent cone ordering) as special cases.  Furthermore, it
-provides polynomial factorizations, resultant, characteristic set and
+provides polynomial factorization, resultant, characteristic set and
 gcd computations, syzygy and free-resolution computations, and many more
 related functionalities.
 
@@ -82,9 +82,9 @@ H.@: Schoenemann; Humboldt-Universitaet
 @tex
 H.\ Sch\"onemann; Humboldt-Universit\"at
 @end tex
- zu Berlin).  The need for a new system arose from the investigation of
+ zu Berlin). The need for a new system arose from the investigation of
 mathematical problems coming from singularity theory which none of the
-existing systems was able to compute.
+existing systems was able to handle.
 
 In the early 1990s @sc{Singular}'s "home-town" moved to
 Kaiserslautern, a general standard basis algorithm was implemented in C
@@ -93,11 +93,11 @@ and @sc{Singular} was ported to Unix, MS-DOS, Windows NT, and MacOS.
 Continuous extensions (like polynomial factorization, gcd computations,
 links) and refinements led in 1997 to the release of @sc{Singular}
 version 1.0 and in 1998 to the release of version 1.2
-(much faster standard and Groebner bases computations based on Hilbert series
-and on improved implementations of the algorithms,
+(with a much faster standard and Groebner bases computation based on Hilbert series
+and on an improved implementation of the core algorithms,
 libraries for primary decomposition, ring normalization, etc.)
 
-For the highlights of the new @sc{Singular} version @value{VERSION} see @ref{News and changes}.
+For the highlights of the new @sc{Singular} version @value{VERSION}, see @ref{News and changes}.
 
 @c Thus, we hope to offer a useful system
 @c for dealing with local and global computational aspects
@@ -122,7 +122,7 @@ In @ref{Getting started}, some simple examples explain how to use
 @sc{Singular}  in a step-by-step manner.
 
 @ref{Examples} should come next for real learning-by-doing or to quickly
-solve some given mathematical problems without dwelling too deeply into
+solve some given mathematical problem without dwelling too deeply into
 @sc{Singular}.
 @ifset singularmanual
 This chapter contains a lot of real-life examples and
@@ -135,10 +135,10 @@ problems using @sc{Singular}.
 @subsubheading For the systematic user
 In @ref{General concepts}, all basic concepts which are important to use
 and to understand @sc{Singular} are developed.  But even for users
-preferring the systematic approach it will be helpful to have a look at
+preferring the systematic approach it will be helpful to take a look at
 the examples in @ref{Getting started}, every now and then. The topics in
-the chapter are organized more or less in the order the novice user has
-to deal with them.
+the chapter are organized more or less in the natural order in which the
+novice user is expected to have to deal with them.
 
 @itemize @bullet
 @item
@@ -157,7 +157,7 @@ is given in @ref{Implemented algorithms}.
 
 @item
 In @ref{The SINGULAR language}, language specific concepts are
-introduced such as the notions of names and objects, data types and
+introduced, such as the notions of names and objects, data types and
 conversion between them, etc.
 
 @item
@@ -166,16 +166,16 @@ retrieve data are discussed.
 
 @item
 The more complex concepts of procedures and libraries as
-well as tools to debug them are considered in the following sections:
+well as tools for debugging them are considered in the following sections:
 @ref{Procedures}, @ref{Libraries}, and @ref{Debugging tools}.
 
 @end itemize
 
-@ref{Data types}, is a complete treatment for @sc{Singular}'s data types
-where each section corresponds to one data type, alphabetically sorted.
+@ref{Data types}, is a complete treatment of @sc{Singular}'s data types
+in alphabetical order, where each section corresponds to one data type.
 For each data type, its purpose is explained, the syntax of its
-declaration is given, and related operations and functions are
-listed. Examples illustrate its usage.
+declaration is given, related operations and functions are
+listed, and one or more examples illustrate its usage.
 
 @ref{Functions and system variables}, is an alphabetically ordered
 reference list of all of @sc{Singular}'s functions, control structures,
@@ -187,17 +187,16 @@ examples on how to use it.
 @ref{Tricks and pitfalls}, is a loose collection of limitations and
 features which may be unexpected by those who expect the
 @sc{Singular} language to be an exact copy of the C programming language or of
-some Computer Algebra system's languages.  But some mathematical hints are
-collected there, as well.
+some other Computer Algebra system's language.  Additionally, some mathematical
+hints are collected there.
 
 @ref{Mathematical background}, introduces some of the mathematical
 notions and definitions used throughout this manual.  For example, if in
-doubt what exactly @sc{Singular} means by a ``negative degree reverse
-lexicographical ordering'' one should refer to this chapter.
+doubt what exactly a ``negative degree reverse lexicographical ordering'' is
+in @sc{Singular}, one should refer to this chapter.
 
-@ref{SINGULAR libraries}, lists the
-libraries which come with @sc{Singular} and the functions contained in
-them, respectively.
+@ref{SINGULAR libraries}, lists the libraries which come with @sc{Singular},
+and all functions contained in them.
 @end ifset
 @c ------------------------------------------------------------------------
 
@@ -211,7 +210,7 @@ text in @code{typewriter} denotes @sc{Singular} input and output as well
 as reserved names:
 
 @itemize @asis
-@item The basering can be set using the command @code{setring}.
+@item The basering can, e.g., be set using the command @code{setring}.
 @end itemize
 
 @item
@@ -238,7 +237,7 @@ keys are denoted using typewriter, for example:
 @item @code{N} (press the key @code{N} to get to the next node in help
 mode)
 @item @code{RETURN} (press @code{RETURN} to finish an input line)
-@item @code{CTRL-P} (press control key together with the key @code{P} to
+@item @code{CTRL-P} (press the control key together with the key @code{P} to
 get the previous input line)
 @end itemize
 
@@ -261,7 +260,7 @@ require the prior definition of a ring. Most important rings are
 polynomial rings over a field, localizations thereof, or quotient rings of
 such rings modulo an ideal. However, some simple computations with
 integers (machine integers of limited size) and manipulations of strings
-are available without a ring.
+can be carried out without the prior definition of a ring.
 
 @menu
 * First steps::
@@ -291,7 +290,7 @@ Once @sc{Singular} is started, it awaits an input after the prompt
 @end smallexample
 
 All objects have a type, e.g., integer variables are defined by
-the word @code{int}. An assignment is done by the symbol @code{=} .
+the word @code{int}. An assignment is made using the symbol @code{=} .
 
 @smallexample
 int k = 2;
@@ -299,7 +298,7 @@ int k = 2;
 
 @noindent Test for equality resp.@: inequality is done using @code{==}
 resp.@: @code{!=} (or @code{<>}), where @code{0} represents the boolean
-value FALSE, any other value represents TRUE.
+value FALSE, and any other value represents TRUE.
 
 @smallexample
 k == 2;
@@ -315,7 +314,7 @@ k;
 @expansion{} 2
 @end smallexample
 
-@noindent On the other hand the output is suppressed if an assignment
+@noindent On the other hand, the output is suppressed if an assignment
 is made.
 
 @smallexample
@@ -323,8 +322,8 @@ int j;
 j = k+1;
 @end smallexample
 
-@noindent The last displayed (!) result is always available
-with the special symbol @code{_} .
+@noindent The last displayed (!) result can be retrieved via the special
+symbol @code{_} .
 
 @smallexample
 2*_;   // the value from k displayed above
@@ -338,15 +337,15 @@ maintains a history of the previous lines of input, which may be accessed by
 keyboard.
 
 The whole manual is available online by typing the command @code{help;} .
-Explanation on single topics, e.g., on @code{intmat}, which defines a
-matrix of integers, are obtained by
+Documentation on single topics, e.g., on @code{intmat}, which defines a
+matrix of integers, is obtained by
 
 @smallexample
 help intmat;
 @end smallexample
 
 @ifset singularmanual
-@noindent This shows the text of @ref{intmat}, in the printed manual.
+@noindent This will display the text of @ref{intmat}, in the printed manual.
 @end ifset
 @ifclear singularmanual
 @noindent This shows the text from node @code{intmat}, in the printed manual.
@@ -393,8 +392,8 @@ tr;
 @expansion{} 15
 @end smallexample
 
-Variables of type string can also be defined and used without a ring
-being active. Strings are delimited by @code{"} (double quotes). They
+Variables of type string can also be defined and used without having an
+active ring. Strings are delimited by @code{"} (double quotes). They
 may be used to comment the output of a computation or to give it a nice
 format. If a string contains valid @sc{Singular} commands, it can be
 executed using the function @code{execute}. The result is the same as if
@@ -429,7 +428,7 @@ this list and prints all results separated by spaces.
 @end ifclear
 @cindex Rings and standard bases
 
-To calculate with objects as ideals, matrices, modules, and polynomial
+In order to compute with objects such as ideals, matrices, modules, and polynomial
 vectors, a ring has to be defined first.
 
 @smallexample
@@ -439,11 +438,11 @@ ring r = 0,(x,y,z),dp;
 The definition of a ring consists of three parts: the first part
 determines the ground field, the second part determines the names of the
 ring variables, and the third part determines the monomial ordering to
-be used. So the example above declares a polynomial ring called @code{r}
+be used. Thus, the above example declares a polynomial ring called @code{r}
 with a ground field of characteristic @math{0} (i.e., the rational
 numbers) and ring variables called @code{x}, @code{y}, and @code{z}. The
-@code{dp} at the end means that the degree reverse lexicographical
-ordering should be used.
+@code{dp} at the end determines that the degree reverse lexicographical
+ordering will be used.
 
 Other ring declarations:
 
@@ -469,11 +468,11 @@ floating point numbers (single machine precision),
 variable names @code{a} and @code{b}.
 
 @item ring r6=(real,50),(a,b),lp;
-floating point numbers with extended precision of 50 digits,
+floating point numbers with precision extended to 50 digits,
 variable names @code{a} and @code{b}.
 
 @item ring r7=(complex,50,i),(a,b),lp;
-complex floating point numbers with extended precision of 50 digits
+complex floating point numbers with precision extended to 50 digits
 and imaginary unit @code{i},
 variable names @code{a} and @code{b}.
 
@@ -523,7 +522,7 @@ the chapter "Rings and orderings" of the @sc{Singular} manual.
 @end ifclear
 
 The basering is now @code{r11}. Since we want to calculate in the ring
-@code{r}, which we defined first, we have to switch back to it. This can
+@code{r}, which we defined first, we need to switch back to it. This can
 be done using the function @code{setring}:
 
 @smallexample
@@ -532,13 +531,13 @@ setring r;
 
 Once a ring is active, we can define polynomials. A monomial, say
 @tex
-$x^3$
+$x^3,$
 @end tex
 @ifinfo
-x^3
+x^3,
 @end ifinfo
 may be entered in two ways: either using the power operator @code{^},
-saying @code{x^3}, or in short-hand notation without operator, saying
+writing @code{x^3}, or in short-hand notation without operator, writing
 @code{x3}. Note that the short-hand notation is forbidden if a name
 of the ring variable(s) consists of more than one character(see @ref{Miscellaneous oddities} for details).
 Note, that @sc{Singular} always expands brackets and automatically
@@ -550,9 +549,9 @@ f;
 @expansion{} x3y2-x2y3+x3+y3+z2
 @end smallexample
 
-The command @code{size} determines in general the number of ''single
-entries`` in an object. In particular, for polynomials, @code{size}
-determines the number of monomials.
+The command @code{size} retrieves in general the number of entries in
+an object. In particular, for polynomials, @code{size} returns the
+number of monomials.
 
 @smallexample
 size(f);
@@ -580,7 +579,7 @@ J;
 not lie on the variety @code{V(f,g)}.
 
 Another question is to decide whether some function vanishes on a
-variety, or in algebraic terms if a polynomial is contained in a given
+variety, or in algebraic terms, if a polynomial is contained in a given
 ideal. For this we calculate a standard basis using the command
 @code{groebner} and afterwards reduce the polynomial with respect to
 this standard basis.
@@ -624,11 +623,11 @@ J;
 @end smallexample
 
 @noindent @sc{Singular} prints the line @code{// ** redefining J
-**}. This indicates that we have previously defined a variable with name
+**}. This indicates that we had previously defined a variable with name
 @code{J} of type ideal (see above).
 
 To obtain a representing set of the quotient vector space we first
-calculate a standard basis, then we apply the function @code{kbase} to
+calculate a standard basis, and then apply the function @code{kbase} to
 this standard basis.
 
 @smallexample
@@ -692,13 +691,13 @@ vdim(groebner(jacob(f)));
 @cindex Procedures and libraries
 
 @sc{Singular} offers a comfortable programming language, with a syntax
-close to C. So it is possible to define procedures which collect several
-commands to a new one. Procedures are defined with the keyword
+close to C. So it is possible to define procedures which bind a sequence of
+several commands in a new one. Procedures are defined using the keyword
 @code{proc} followed by a name and an optional parameter list with
-specified types.  Finally, a procedure may return values using the
+specified types.  Finally, a procedure may return a value using the
 command @code{return}.
 
-Define the following procedure called @code{Milnor}:
+We may e.g. define the following procedure called @code{Milnor}:
 
 @smallexample
 proc Milnor (poly h)
@@ -714,7 +713,7 @@ the usual prompt @code{>} . This shows that the input is incomplete and
 bracket, @sc{Singular} prints the usual prompt indicating that the input
 is now complete.
 
-@noindent Then call the procedure:
+@noindent Then we can call the procedure:
 
 @smallexample
 Milnor(f);
@@ -725,10 +724,9 @@ Milnor(f);
 see in the next chapter.
 
 The distribution of  @sc{Singular} contains  several libraries, each of
-which is a collection of useful
-procedures based on the kernel commands, which extend the functionality
-of @sc{Singular}. The command @code{help "all.lib";} lists all libraries
-together with a one-line explanation.
+which is a collection of useful procedures based on the kernel commands,
+which extend the functionality of @sc{Singular}. The command @code{help "all.lib";}
+lists all libraries together with a one-line explanation.
 @c The command @code{help}
 @c library_name@code{;} lists all procedures of the library, @code{help}
 @c proc_name@code{;} shows an explanation of the procedure after the
@@ -740,7 +738,7 @@ procedure called @code{milnor} to calculate the Milnor number not only
 for hypersurfaces but more generally for complete intersection
 singularities.
 
-Libraries are loaded with the command @code{LIB}. Some additional
+Libraries are loaded using the command @code{LIB}. Some additional
 information during the process of loading is displayed on the screen,
 which we omit here.
 
@@ -815,7 +813,7 @@ help sing.lib;
 To calculate the local Milnor number we have to do the calculation with the
 same commands in a ring with local ordering.
 @ifset singularmanual
-Define the localization of the polynomial ring at the origin
+We can define the localization of the polynomial ring at the origin
 (@pxref{Polynomial data}, and @ref{Mathematical background}).
 @end ifset
 @ifclear singularmanual
@@ -826,9 +824,9 @@ Define the localization of the polynomial ring at the origin.
 ring rl = 0,(x,y,z),ds;
 @end smallexample
 
-This ordering determines the standard basis which will be calculated.
-Fetch the polynomial defined in the ring @code{r} into this new ring,
-thus avoiding retyping the input.
+The ordering directly affects the standard basis which will be calculated.
+Fetching the polynomial defined in the ring @code{r} into this new ring,
+helps us to avoid retyping previous input.
 
 @smallexample
 poly f = fetch(r,f);
@@ -865,8 +863,8 @@ $12-4=8$.
 Using global and local orderings as above is a convenient way to check
 whether a variety has singularities outside the origin.
 
-The command @code{jacob} applied twice gives the Hessian of @code{f}, a
-3x3 - matrix.
+The command @code{jacob} applied twice gives the Hessian of @code{f}, in our example
+a 3x3 - matrix.
 
 @smallexample
 matrix H = jacob(jacob(f));
@@ -882,7 +880,7 @@ H;
 @expansion{} H[3,3]=2
 @end smallexample
 
-The @code{print} command displays the matrix in a nicer form.
+The @code{print} command displays the matrix in a nicer format.
 
 @smallexample
 print(H);
@@ -905,7 +903,7 @@ minor(H,1);  // the 1x1 - minors
 @expansion{} _[5]=6x+6xy2-2y3
 @end smallexample
 
-The algorithm of the standard basis computations may be
+The algorithm of the standard basis computation may be
 affected by the command @code{option}. For example, a reduced standard
 basis of the ideal generated by the
 @tex
@@ -971,11 +969,11 @@ print(freemodule(4));
 @expansion{} 0,0,0,1
 @end smallexample
 
-To define a module, we give a list of vectors generating a submodule of
+To define a module, we provide a list of vectors generating a submodule of
 a free module. Then this set of vectors may be identified with the
 columns of a matrix.  For that reason in @sc{Singular} matrices and
 modules may be interchanged. However, the representation is different
-(modules may be considered as sparse represented matrices).
+(modules may be considered as sparse matrices).
 
 @smallexample
 ring r =0,(x,y,z),dp;
@@ -1039,7 +1037,7 @@ $\hbox{ann}(M) = \{a \mid aM = 0 \}$
 @ifinfo
 ann(M) = @{a | aM = 0 @}
 @end ifinfo
-which is by the description of M the same as
+which is, by definition of M, the same as
 @tex
 $\{ a \mid ar^3 \in U \}$.
 @end tex
@@ -1054,7 +1052,7 @@ $U \colon r^3 $.
 U:r^3.
 @end ifinfo
 The rank of the free module is determined by the choice of U and is the
-number of rows of the corresponding matrix. This may be determined by
+number of rows of the corresponding matrix. This may be retrieved by
 the function @code{nrows}. All we have to do now is the following:
 
 @smallexample

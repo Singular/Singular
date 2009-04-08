@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.plural.texi,v 1.1 2003-05-22 19:15:52 levandov Exp $
+@comment $Id: INSTALL_unix.plural.texi,v 1.2 2009-04-08 12:44:41 seelisch Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on Unix
 @c
@@ -85,7 +85,7 @@ gzip -dc <path_to>/SingularPlural-@value{VERSION}-share.tar.gz | tar -pxf -
 @c unzip -u Singular-@value{VERSION}-share.zip
 @c @end smallexample
 
-This creates the the directory Plural/@value{VERSION} with 
+This creates the directory Plural/@value{VERSION} with
 @multitable @columnfractions .36 .64
 @item (sub)directories
 @tab  which contain
@@ -106,7 +106,7 @@ This creates the the directory Plural/@value{VERSION} with
 @end multitable
 
 For the executable to work, the directory layout must look pretty much
-like this; the executable looks for "sibling" directories at run-time
+like this; the executable will look for "sibling" directories at run-time
 to figure out where its @sc{Singular::Plural} libraries and on-line
 documentation files are. These constraints on the local directory layout
 are necessary to avoid having to hard-code pathnames into the
@@ -152,7 +152,7 @@ so that the @code{$PATH} variable is set automatically each time you login.
 place, but use soft-links instead.
 
 @item
-If you wish to use any of following features of
+If you wish to use any of the following features of
 @sc{Singular::Plural}, make sure that the respective programs are installed on your system:
 
 @multitable @columnfractions .5 .5
@@ -160,8 +160,8 @@ If you wish to use any of following features of
 @item running @code{EPlural}, or @code{Plural} within Emacs
 @tab @uref{http://www.fsf.org/software/emacs/emacs.html,,Emacs} version
 20 or higher, or, @uref{http://www.xemacs.org,,XEmacs} version 20.3 or
-higher (EPlural is only included in the Linux distribution,
-on other Unix platforms you can download the
+higher (EPlural is only included in the Linux distribution.
+On other Unix platforms you can download the
 @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/src/,,
 Singular emacs lisp files} but we give no warranties for specific platforms).
 @item on-line @code{html} help
@@ -185,7 +185,7 @@ You may download most of these programs from
 
 @item Customize the on-line help system:
 
-By default, on-line help is displayed in the @code{html} format using
+By default, on-line help is displayed in @code{html} format using
 the @code{netscape} program.
 
 However, this behavior can be customized in several ways
@@ -228,7 +228,7 @@ to the directory of your @code{dir} file.
 @*This assures that the
 @sc{Singular::Plural} manual can be  accessed from stand-alone texinfo
 browser programs such as @code{info} or @code{Emacs}.
-(It is not necessary for the use of the help system from within @code{Plural}.)
+(This is not a prerequisite for using the help system from within @code{Plural}.)
 @end itemize
 
 @heading Troubleshooting
@@ -237,7 +237,7 @@ browser programs such as @code{info} or @code{Emacs}.
 @item General: @sc{Plural} can not find its libraries or on-line help
 @enumerate
 @item
-Make sure that you have read and/or execute permission the files and
+Make sure that you have read and/or execute permission for files and
 directories of the Singular distribution. If in doubt, @code{cd} to the
 directory where you unpacked @sc{Singular}, and do (as root, if
 necessary):
@@ -276,7 +276,7 @@ directories by starting up @sc{Plural} with the
 @cindex bug, ESingular
 This is due to the very restrictive access rights of @code{/dev/pty*} of
 the standard @uref{http:/www.suse.de,SuSE} distribution (starting from
-version 6.3 on). As root, do one of the following: Either
+version 6.3 onwards). As root, do one of the following: Either
 @example
 chmod 666 /dev/pty*
 @end example

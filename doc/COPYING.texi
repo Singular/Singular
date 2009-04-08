@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.42 2009-03-10 12:48:59 Singular Exp $
+@comment $Id: COPYING.texi,v 1.43 2009-04-08 12:44:41 seelisch Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -26,19 +26,19 @@
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation ( version 2 or version 3 of the License ).
+the Free Software Foundation (version 2 or version 3 of the License).
 
 Some single files have a copyright given within the file:
 Singular/ndbm.* (BSD), kernel/htmlhelp.h (LGPL 2.1+)
 
-The following software used with @sc{Singular} have their own copyright:
+The following software modules shipped with @sc{Singular} have their own copyright:
 the omalloc library, the readline library,
 the Gnu Multiple Precision Library (GMP),
 NTL: A Library for doing Number Theory (NTL),
 the Multi Protocol library (MP), the
 Singular-Factory library, the Singular-libfac library, 
 surfex, and,
-for the Windows distributions the Cygwin DLL and the Cygwin tools (Cygwin), and the
+for the Windows distributions, the Cygwin DLL and the Cygwin tools (Cygwin), and the
 XEmacs editor (XEmacs).
 
 Their copyrights and licenses can be found in the accompanying files COPYING
@@ -60,7 +60,7 @@ Please send any comments or bug reports to
 @email{singular@@mathematik.uni-kl.de}.
 
 If you want to be informed of new releases,
- please register yourself as a @sc{Singular} user by using the
+ please register as a @sc{Singular} user by using the
 registration form on the @sc{Singular} homepage
               @uref{http://www.singular.uni-kl.de}.
 If for some reason you cannot access the registration form, you
@@ -70,17 +70,16 @@ with subject line @code{register} and body containing the following data:
      your name, email address, organisation, country and platform(s).
 
 
-For the citation of @sc{Singular} see
-@uref{http://www.singular.uni-kl.de/how_to_cite.html},
-for information on how to cite Singular.
+For information on how to cite @sc{Singular} see
+@uref{http://www.singular.uni-kl.de/how_to_cite.html}.
 
 You can also support @sc{Singular} by informing us about
 your result obtained by using @sc{Singular}.
 
 @heading Availability
 
-The latest information about @sc{Singular} is always available from
-@uref{http://www.singular.uni-kl.de}.
+The latest information regarding the status of @sc{Singular} is always
+available from @uref{http://www.singular.uni-kl.de}.
 @ifset singularmanual
 The program @sc{Singular} and the above mentioned parts are available via
 anonymous ftp through the following addresses:
@@ -122,8 +121,7 @@ WWW brow@-ser from
 @heading Acknowledgements
 
 The development of @sc{Singular} is directed and coordinated by
-Gert-Martin Greuel, Gerhard Pfister, and Hans
-Sch@"onemann.
+Gert-Martin Greuel, Gerhard Pfister, and Hans Sch@"onemann.
 
 @cindex Contributors
 @cindex Authors
@@ -173,7 +171,7 @@ Tim Wichmann.
 @cindex Westenberger, Eric
 @cindex Wichmann, Tim
 
-Further contributions to @sc{Singular} were made by:
+Further contributions to @sc{Singular} have been made by:
 Daniel Andres,
 Thomas Bayer,
 Isabelle Bermejo,
@@ -284,8 +282,7 @@ Oleksandr Iena.
 @cindex Yanovich, Denis
 
 We should like to acknowledge the financial support given by
-the Volkswagen-Stiftung,
-the Deutsche Forschungsgemeinschaft
+the Volkswagen-Stiftung, the Deutsche Forschungsgemeinschaft
 and the Stiftung f@"ur Innovation des Landes Rheinland-Pfalz
 to the @sc{Singular} project.
 
