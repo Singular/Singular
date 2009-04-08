@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: bfun.lib,v 1.6 2009-03-10 16:27:55 Singular Exp $";
+version="$Id: bfun.lib,v 1.7 2009-04-08 16:51:07 seelisch Exp $";
 category="Noncommutative";
 info="
 LIBRARY: bfun.lib     Algorithms for b-functions and Bernstein-Sato polynomial
@@ -8,7 +8,7 @@ AUTHORS: Daniel Andres, daniel.andres@math.rwth-aachen.de
 
 THEORY: Given a polynomial ring R = K[x_1,...,x_n] and a polynomial F in R,
 @*      one is interested in the global b-function (also known as Bernstein-Sato
-@*      polynomial) b(s) in K[s], defined to be the monic polynomial of minimal
+@*      polynomial) b(s) in K[s], defined to be the non-zero monic polynomial of minimal
 @*      degree, satisfying a functional identity L * F^{s+1} = b(s) F^s,   
 @*      for some operator L in D[s] (* stands for the action of differential operator)
 @*      By D one denotes the n-th Weyl algebra
@@ -18,7 +18,7 @@ THEORY: Given a polynomial ring R = K[x_1,...,x_n] and a polynomial F in R,
 @*      - the list of its roots, which are known to be rational
 @*      - the multiplicities of the roots.
 @*
-@*   There is a general definition of a b-function of a holonomic ideal [SST]
+@*   There is a constructive definition of a b-function of a holonomic ideal I in D
 @*   (that is, an ideal I in a Weyl algebra D, such that D/I is holonomic module)
 @*   with respect to the given weight vector w: For a poly p in D, its initial 
 @*   form w.r.t. (-w,w) is defined as the sum of all terms of p which have 

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.37 2009-03-09 18:34:51 levandov Exp $";
+version="$Id: dmod.lib,v 1.38 2009-04-08 16:51:07 seelisch Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -143,9 +143,9 @@ proc annfs(poly F, list #)
 "USAGE:  annfs(f [,S,eng]);  f a poly, S a string, eng an optional int
 RETURN:  ring
 PURPOSE: compute the D-module structure of basering[1/f]*f^s with the algorithm 
-@*  given in S and with the Groebner basis engine given in 'eng'
+@*  given in S and with the Groebner basis engine given in ''eng''
 NOTE:  activate the output ring with the @code{setring} command.
-@*    The value of a string S can be
+@*    String S; S can be one of the following:
 @*    'bm' (default) - for the algorithm of Briancon and Maisonobe,
 @*    'ot'  - for the algorithm of Oaku and Takayama,
 @*    'lot' - for the Levandovskyy's modification of the algorithm of OT.
@@ -726,7 +726,7 @@ example
 
 proc bernsteinBM(poly F, list #)
 "USAGE:  bernsteinBM(f [,eng]);  f a poly, eng an optional int
-RETURN:  list (of roots of the Bernstein polynomial b and its multiplicies)
+RETURN:  list (of roots of the Bernstein polynomial b and their multiplicies)
 PURPOSE: compute the global Bernstein-Sato polynomial for a hypersurface, 
 @* defined by f, according to the algorithm by Briancon and Maisonobe
 NOTE:    If eng <>0, @code{std} is used for Groebner basis computations,
@@ -1602,7 +1602,7 @@ proc operatorBM(poly F, list #)
 RETURN:  ring
 PURPOSE: compute the B-operator and other relevant data for Ann F^s, 
 @*  using e.g. algorithm by Briancon and Maisonobe for Ann F^s and BS.
-NOTE:    activate this ring with the @code{setring} command. In this ring D[s]
+NOTE:    activate the output ring with the @code{setring} command. In the output ring D[s]
 @*       - the polynomial F is the same as the input,
 @*       - the ideal LD is the annihilator of f^s in Dn[s],
 @*       - the ideal LD0 is the needed D-mod structure, where LD0 = LD|s=s0,
