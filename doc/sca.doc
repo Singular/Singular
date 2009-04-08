@@ -1,26 +1,9 @@
-@ignore
-\input texinfo   @c -*-texinfo-*-
-@setfilename sca.hlp
-@settitle SCA
-@paragraphindent 0
-@end ignore
-
 @comment -*-texinfo-*-
-@comment $Id: sca.doc,v 1.1 2009-04-08 16:53:57 motsak Exp $
+@comment $Id: sca.doc,v 1.2 2009-04-08 17:02:52 Singular Exp $
 @comment this file describes super-commutative algebras and their implementation in Singular
 
 
-@c The following directives are necessary for proper compilation
-@c with emacs (C-c C-e C-r).  Please keep it as it is.  Since it
-@c is wrapped in `@ignore' and `@end ignore' it does not harm `tex' or
-@c `makeinfo' but is a great help in editing this file (emacs
-@c ignores the `@ignore').
-
-@ignore
-%**start
-@end ignore
-
-@node Super-commutative algebras,Non-commutative libraries,LETTERPLACE,Non-commutative subsystem
+@node Super-commutative algebras,LETTERPLACE,Mathematical background (plural),Non-commutative subsystem
 @section Super-commutative algebras
 @cindex SCA, Super-commutative algebras, @math{Z_2}-graded algebras
 
@@ -34,11 +17,9 @@ since upon doing that, supper-commutative structure will be automatically detect
 special internal implementations will be used in most SCA-aware algorithms 
 (otherwise standard generic non-commutative implementations will be used).
 
-
 This section describes mathematical notions, definitions and implementation used in
 the experimental non-commutative kernel extension @sc{SCA} of @sc{Singular}
 which improves performance of many algorithms in super-commutative algebras.
-
 
 All considered algebras are assumed to be associative @math{K}-algebras for some ground field @math{K}.
 
@@ -51,16 +32,13 @@ where anti-commutative algebra generators have degree @math{1} and commutative a
 have degree @math{0}. 
 
 @item GR-algebra presentation
-
 A super-commutative algebra with @math{n} commutative and @math{m} anti-commutative algebra generators can be presented 
 as factors of the following GR-algebra by some two-sided ideal: 
 @tex
 $$K\left\langle x_1, \ldots, x_n; y_1, \ldots, y_m \mid y_j * y_i = - y_i y_j, j > i \right\rangle / \left\langle y_1^2, \ldots, y_m^2  \right\rangle.$$
 @end tex 
 
-
 @item Distinctive features
-
 Super-commutative algebras have zero divisors if @math{m > 0}: @math{y_i * y_i = 0}!
 
 Unlike other non-commutative algebras one may use any monomial ordering on monomials 
@@ -68,9 +46,7 @@ where only non-commuting variables are required to be global,
 that is, commutative variables are allowed to be local. 
 Which means that one can work in tensor products of ANY(!) commutative ring with an exterior algebra.
 
-
 @item Example of defining super-commutative algebras in @sc{Singular}
-
 @smallexample
 @c example
 LIB "nctools.lib";
@@ -88,18 +64,9 @@ ideal I = a*x*y + z*Q + b, y*Q + a; I;
 std(I);
 @c example
 @end smallexample
-
-
 @end itemize
-
-
 
 See example of "superCommutative" from "nctools.lib". 
 
-
 For further details, please, refer to the coming Ph.D (in the end of 2009) thesis by Oleksandr Motsak.
 
-
-@c !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-
-@c @bye

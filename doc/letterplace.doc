@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: letterplace.doc,v 1.10 2009-04-08 16:51:56 seelisch Exp $
+@comment $Id: letterplace.doc,v 1.11 2009-04-08 17:02:52 Singular Exp $
 @comment this file contains the mathematical background of Singular:Letterplace
 
 @c The following directives are necessary for proper compilation
@@ -11,7 +11,7 @@
 %**start
 @end ignore
 
-@node LETTERPLACE,Non-commutative libraries,Mathematical background (plural),Non-commutative subsystem
+@node LETTERPLACE,Non-commutative libraries,Super-commutative algebras,Non-commutative subsystem
 @section LETTERPLACE
 @cindex LETTERPLACE
 @cindex Letterplace

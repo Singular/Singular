@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.106 2009-02-24 12:00:12 Singular Exp $
+### $Id: Makefile.in,v 1.107 2009-04-08 17:02:52 Singular Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -101,7 +101,7 @@ STANDALONE_TEXI_FILES	= COPYING.texi INSTALL_unix.texi NEWS.texi \
 DOC2TEX_FILES	= decodegb.tex \
 		examples.tex general.tex ti_ip.tex math.tex reference.tex \
 		start.tex types.tex pdata.tex tricks.tex platform.tex \
-		plural.tex letterplace.tex plulibs.tex
+		plural.tex letterplace.tex plulibs.tex sca.tex
 
 MANUAL_FILES	= ${TEX_FILES} ${DOC2TEX_FILES}
 
