@@ -1,0 +1,105 @@
+@ignore
+\input texinfo   @c -*-texinfo-*-
+@setfilename sca.hlp
+@settitle SCA
+@paragraphindent 0
+@end ignore
+
+@comment -*-texinfo-*-
+@comment $Id: sca.doc,v 1.1 2009-04-08 16:53:57 motsak Exp $
+@comment this file describes super-commutative algebras and their implementation in Singular
+
+
+@c The following directives are necessary for proper compilation
+@c with emacs (C-c C-e C-r).  Please keep it as it is.  Since it
+@c is wrapped in `@ignore' and `@end ignore' it does not harm `tex' or
+@c `makeinfo' but is a great help in editing this file (emacs
+@c ignores the `@ignore').
+
+@ignore
+%**start
+@end ignore
+
+@node Super-commutative algebras,Non-commutative libraries,LETTERPLACE,Non-commutative subsystem
+@section Super-commutative algebras
+@cindex SCA, Super-commutative algebras, @math{Z_2}-graded algebras
+
+In order to improve performance of @sc{Singular} in specific non-commutative algebras
+one can extend the internal implementation for them in a virtual-method-overloading-like flavour.
+At the moment super-commutative algebras (SCA) and in particular exterior algebras are implemented this way.
+
+Note that super-commuative algebras require no special user actions apart from 
+defining appropreate non-commutative GR-algebra in @sc{Singular},
+since upon doing that, supper-commutative structure will be automatically detected and 
+special internal implementations will be used in most SCA-aware algorithms 
+(otherwise standard generic non-commutative implementations will be used).
+
+
+This section describes mathematical notions, definitions and implementation used in
+the experimental non-commutative kernel extension @sc{SCA} of @sc{Singular}
+which improves performance of many algorithms in super-commutative algebras.
+
+
+All considered algebras are assumed to be associative @math{K}-algebras for some ground field @math{K}.
+
+@itemize
+@item Definition
+
+Super-commutative algebra are factors of tensor products of any commutative algebras and an exterior algebra over @math{K}.
+They are also known as @math{Z_2}-graded algebras since they have natural @math{Z_2}-grading 
+where anti-commutative algebra generators have degree @math{1} and commutative algebra generators (and naturally scalars) 
+have degree @math{0}. 
+
+@item GR-algebra presentation
+
+A super-commutative algebra with @math{n} commutative and @math{m} anti-commutative algebra generators can be presented 
+as factors of the following GR-algebra by some two-sided ideal: 
+@tex
+$$K\left\langle x_1, \ldots, x_n; y_1, \ldots, y_m \mid y_j * y_i = - y_i y_j, j > i \right\rangle / \left\langle y_1^2, \ldots, y_m^2  \right\rangle.$$
+@end tex 
+
+
+@item Distinctive features
+
+Super-commutative algebras have zero divisors if @math{m > 0}: @math{y_i * y_i = 0}!
+
+Unlike other non-commutative algebras one may use any monomial ordering on monomials 
+where only non-commuting variables are required to be global, 
+that is, commutative variables are allowed to be local. 
+Which means that one can work in tensor products of ANY(!) commutative ring with an exterior algebra.
+
+
+@item Example of defining super-commutative algebras in @sc{Singular}
+
+@smallexample
+@c example
+LIB "nctools.lib";
+ring r = 0,(a, b, x,y,z, Q, W),(lp(2), dp(3), Dp(2));
+// Let us make variables x = var(3), ..., z = var(5) to be anti-commutative
+// and add additionally a quotient ideal:
+def S = superCommutative(3, 5, ideal(a*W + b*Q*x + z) ); setring S; S;
+ideal I = a*x*y + z*Q + b, y*Q + a; I;
+std(I); // Groebner basis is used here since > is global
+kill r;
+// Let's do the same but this time with some local commutative variables:
+ring r = 0,(a, b, x,y,z, Q, W),(dp(1), ds(1), lp(3), ds(2));
+def S = superCommutative(3, 5, ideal(a*W + b*Q*x + z) ); setring S; S;
+ideal I = a*x*y + z*Q + b, y*Q + a; I;
+std(I);
+@c example
+@end smallexample
+
+
+@end itemize
+
+
+
+See example of "superCommutative" from "nctools.lib". 
+
+
+For further details, please, refer to the coming Ph.D (in the end of 2009) thesis by Oleksandr Motsak.
+
+
+@c !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+
+@c @bye
