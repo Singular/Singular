@@ -1,12 +1,12 @@
 @comment -*-texinfo-*-
-@comment $Id: sca.doc,v 1.3 2009-04-09 10:08:00 motsak Exp $
+@comment $Id: sca.doc,v 1.4 2009-04-09 12:53:19 motsak Exp $
 @comment this file describes super-commutative algebras and their implementation in Singular
 
 @node Super-commutative algebras,LETTERPLACE,Mathematical background (plural),Non-commutative subsystem
 @section Super-commutative algebras
 @cindex SCA, Super-commutative algebras, @math{Z_2}-graded algebras
 
-This section describes basic mathematical notions, definition, and implementation of
+This section describes basic mathematical notions, definition, and a little bit the implementation of
 the experimental non-commutative kernel extension @sc{SCA} of @sc{Singular}
 which improves performance of many algorithms in super-commutative algebras.
 
@@ -15,10 +15,10 @@ one can extend the internal implementation for them in a virtual-method-overload
 At the moment super-commutative algebras (SCA) and in particular exterior algebras are implemented this way.
 
 Note that super-commutative algebras require no special user actions apart from 
-defining appropriate non-commutative GR-algebra in @sc{Singular}. 
-Upon doing that, supper-commutative structure will be automatically detected and 
+defining an appropriate non-commutative GR-algebra in @sc{Singular}. 
+Upon doing that, the supper-commutative structure will be automatically detected and 
 special multiplication will be used. 
-Moreover, in most SCA-aware algorithms special internal improvements will be used
+Moreover, in most SCA-aware (e.g. @code{std}) algorithms special internal improvements will be used
 (otherwise standard generic non-commutative implementations will be used).
 
 All considered algebras are assumed to be associative @math{K}-algebras for some ground field @math{K}.
@@ -39,12 +39,12 @@ $$K\left\langle x_1, \ldots, x_n; y_1, \ldots, y_m \mid y_j * y_i = - y_i y_j, j
 @end tex 
 
 @item Distinctive features
-Super-commutative algebras have zero divisors if @math{m > 0}: @math{y_i * y_i = 0}!
+Super-commutative algebras have zero divisors if @math{m > 0}: @math{y_i * y_i = 0}.
 
-Unlike other non-commutative algebras one may use any monomial ordering on monomials 
-where only non-commutative variables are required to be global, 
-that is, commutative variables are allowed to be local. 
-This means that one can work in tensor products of ANY(!) commutative ring with an exterior algebra.
+Unlike other non-commutative algebras one may use any monomial ordering
+where only the non-commutative variables are required to be global.
+In particular, commutative variables are allowed to be local. 
+This means that one can work in tensor products of any commutative ring with an exterior algebra.
 
 @item Example of defining super-commutative algebras in @sc{Singular}
 @smallexample
