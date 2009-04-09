@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.44 2009-04-08 17:13:02 motsak Exp $";
+version="$Id: nctools.lib,v 1.45 2009-04-09 12:18:34 seelisch Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -48,10 +48,14 @@ LIB "poly.lib"; // for newtonDiag
 proc Gweights(def r)
 "USAGE:   Gweights(r); r a ring or a square matrix
 RETURN:   intvec
-PURPOSE: compute the weight vector for the following G-algebra:
-@*       for r itself, if it is of the type ring,
-@*       or for a G-algebra, defined by the square polynomial matrix r
-THEORY:   @code{Gweights} returns a vector, which must be used to redefine the G-algebra. If the input is a matrix and the output is the zero vector then there is not a G-algebra structure associated to these relations with respect to the given variables. Another possibility is to use @code{weightedRing} to obtain directly the G-algebra with the new weighted ordering.
+PURPOSE: compute an appropriate weight int vector for a G-algebra, i.e., such that
+\foral\;i<j\;\;lm_w(d_{ij}) <_w x_i x_j.
+@*       the polynomials d_{ij} are taken from r itself, if it is of the type ring
+@*       or defined by the given square polynomial matrix
+THEORY:   @code{Gweights} returns an integer vector, whose weighting should be used to redefine the G-algebra in order
+to get the same non-commutative structure w.r.t. a weighted ordering. If the input is a matrix and the output is the zero
+vector then there is not a G-algebra structure associated to these relations with respect to the given variables.
+@*Another possibility is to use @code{weightedRing} to obtain directly a G-algebra with the new appropriate (weighted) ordering.
 EXAMPLE: example Gweights; shows examples
 SEE ALSO: weightedRing
 "{
@@ -133,7 +137,8 @@ example
 proc weightedRing(def r)
 "USAGE:   weightedRing(r); r a ring
 RETURN:  ring
-PURPOSE:  equip the variables of a ring with such weights,that the relations of new ring (with weighted variables) satisfies the ordering condition for G-algebras
+PURPOSE:  equip the variables of the given ring with weights such that the relations of new ring (with weighted variables) satisfies the ordering condition for G-algebras:
+e.g. \forall\;i<j\;\;lm_w(d_{ij})<_w x_i x_j.
 NOTE:    activate this ring with the \"setring\" command
 EXAMPLE: example weightedRing; shows examples
 SEE ALSO: Gweights
@@ -461,7 +466,7 @@ example
 proc isCentral(poly p, list #)
 "USAGE:   isCentral(p); p poly
 RETURN:  int, 1 if p commutes with all variables and 0 otherwise
-PURPOSE: check whether p is central in a basering (that is, commutes with every generator of a ring)
+PURPOSE: check whether p is central in a basering (that is, commutes with every generator of the ring)
 NOTE: if @code{printlevel} > 0, the procedure displays intermediate information (by default, @code{printlevel}=0 )
 EXAMPLE: example isCentral; shows examples
 "{
@@ -477,7 +482,7 @@ EXAMPLE: example isCentral; shows examples
     {
       if ( (size(#) >0 ) || (printlevel>0) )
       {
-        "Noncentral at:", var(in);
+        "Non-central at:", var(in);
       }
       flag = 0;
     }
@@ -608,13 +613,14 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 proc Weyl(list #)
-"USAGE:   Weyl([p]); p an optional integer
+"USAGE:   Weyl()
 RETURN:  ring
-PURPOSE: create a Weyl algebra structure from the basering
-NOTE: suppose the number of variables of a basering is 2k.
-(if this number is odd, an error message will be returned)
+PURPOSE: create a Weyl algebra structure on the basering
+NOTE: Activate this ring using the command @code{setring}.
+@*Assume the number of variables of a basering is 2k.
+(if the number of variables is odd, an error message will be returned)
 @*    by default, the procedure treats first k variables as coordinates x_i and the last k as differentials d_i
-@*    if nonzero p is given, the procedure treats 2k variables of a basering as k pairs (x_i,d_i), i.e. variables with odd numbers are treated as coordinates and with even numbers as differentials
+@*    if a non-zero optional argument is given, the procedure treats 2k variables of a basering as k pairs (x_i,d_i), i.e. variables with odd numbers are treated as coordinates and with even numbers as differentials
 SEE ALSO: makeWeyl
 EXAMPLE: example Weyl; shows examples
 "
@@ -677,9 +683,11 @@ example
 proc makeHeisenberg(int N, list #)
 "USAGE:  makeHeisenberg(n, [p,d]); int n (setting 2n+1 variables), optional int p (field characteristic), optional int d (power of h in the commutator)
 RETURN: ring
-PURPOSE: create an n-th Heisenberg algebra in the variables x(1),y(1),...,x(n),y(n),h
+PURPOSE: create the n-th Heisenberg algebra in the variables x(1),y(1),...,x(n),y(n),h over the rationals Q or F_p with the relations
+\forall\;i\in\{1,2,\ldots,n\}\;\;y(j)x(i) = x(i)y(j)+h^d.
 SEE ALSO: makeWeyl
-NOTE: activate this ring with the \"setring\" command
+NOTE: activate this ring with the @code{setring} command
+@*       If p is not prime, the next larger prime number will be used.
 EXAMPLE: example makeHeisenberg; shows examples
 "
 {
@@ -719,12 +727,13 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-proc superCommutative(list #)
-"USAGE:   superCommutative([b,[e, [Q, [flag]]]]);
+proc SuperCommutative(list #)
+"USAGE:   SuperCommutative([b,[e, [Q, [flag]]]]);
 RETURN:  qring
-PURPOSE:  create the super-commutative algebra (as a GR-algebra) 'over' a basering,
+PURPOSE:  create a super-commutative algebra (as a GR-algebra) over a basering,
 NOTE: activate this qring with the \"setring\" command.
-NOTE: if b==e then the resulting ring is commutative unles 'flag' is given and non-zero.
+NOTE: if b==e then the resulting ring is commutative unless 'flag' is given and non-zero.
+@* By default, @code{b=1, e=nvars(basering), Q=0}, and @code{flag=0}.
 THEORY: given a basering, this procedure introduces the anticommutative relations x(j)x(i)=-x(i)x(j) for all e>=j>i>=b,
 @* moreover, creates a factor algebra modulo the two-sided ideal, generated by x(b)^2, ..., x(e)^2[ + Q]
 DISPLAY: If @code{printlevel} > 1, warning debug messages will be printed
@@ -737,7 +746,7 @@ EXAMPLE: example superCommutative; shows examples
 
   if ( rname == "basering") // i.e. no ring has been set yet
   {
-    ERROR("You have to call the procedure from a ring");
+    ERROR("You have to call the procedure from the ring");
     return();
   }
 
@@ -1073,7 +1082,8 @@ proc AltVarStart()
 "USAGE:   AltVarStart();
 RETURN:  int
 PURPOSE:  returns the number of the first alternating variable of basering
-NOTE:  basering should be a super-commutative algebra!
+NOTE:  basering should be a super-commutative algebra with at most one block of anti-commutative variables
+@* For commutative rings, @code{nvars(basering)+1} will be returned.
 EXAMPLE: example AltVarStart; shows examples
 "
 {
@@ -1101,7 +1111,8 @@ proc AltVarEnd()
 "USAGE:   AltVarStart();
 RETURN:  int
 PURPOSE:  returns the number of the last alternating variable of basering
-NOTE:  basering should be a super-commutative algebra!
+NOTE:  basering should be a super-commutative algebra with at most one block of anti-commutative variables
+@* returns -1 for commutative rings
 EXAMPLE: example AltVarEnd; shows examples
 "
 {
@@ -1249,10 +1260,11 @@ example
 proc makeWeyl(int n, list #)
 "USAGE:  makeWeyl(n,[p]); n an integer, n>0; p an optional integer (field characteristic)
 RETURN:  ring
-PURPOSE: create an n-th Weyl algebra
+PURPOSE: create the n-th Weyl algebra over the rationals Q or F_p
 NOTE:    activate this ring with the \"setring\" command.
 @*       The presentation of an n-th Weyl algebra is classical: D(i)x(i)=x(i)D(i)+1,
 @*       where x(i) correspond to coordinates and D(i) to partial differentiations, i=1,...,n.
+@*       If p is not prime, the next larger prime number will be used.
 SEE ALSO: Weyl
 EXAMPLE: example makeWeyl; shows examples
 "{
