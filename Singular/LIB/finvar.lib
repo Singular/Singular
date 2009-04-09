@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.81 2009-04-09 10:24:10 seelisch Exp $"
+version="$Id: finvar.lib,v 1.82 2009-04-09 12:21:47 seelisch Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -7173,7 +7173,7 @@ proc invariant_ring (list #)
          common factors should always be canceled when the expansion is simple
          (the root of the extension field occurs not among the coefficients)
 RETURN:  primary and secondary invariants for any matrix representation of a
-         finite group action
+         finite group
 DISPLAY: information about the various stages of the program if the third flag
          does not equal 0
 THEORY:  Bases of homogeneous invariants are generated successively and those
@@ -7389,7 +7389,7 @@ proc invariant_ring_random (list #)
          expansion is simple (the root of the extension field does not occur
          among the coefficients)
 RETURN:  primary and secondary invariants for any matrix representation of a
-         finite group action
+         finite group
 DISPLAY: information about the various stages of the program if the third flag
          does not equal 0
 THEORY:  is the same as for invariant_ring except that random combinations of
