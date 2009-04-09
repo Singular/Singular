@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmodapp.lib,v 1.25 2009-03-11 09:43:29 Singular Exp $";
+version="$Id: dmodapp.lib,v 1.26 2009-04-09 12:04:41 seelisch Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmodapp.lib     Applications of algebraic D-modules
@@ -15,7 +15,7 @@ GUIDE: Let K be a field of characteristic 0, R = K[x1,..xN] and
 @* always exists, since such localizations are known to be holonomic and thus 
 @* cyclic modules. The procedures for the localization are DLoc,SDLoc and DLoc0.
 @*
-@* - annihilator in Weyl algebra of a given polynomial F from R as well as 
+@* - annihilator in D of a given polynomial F from R as well as
 @* of a given rational function G/F from Quot(R). These can be computed via 
 @* procedures annPoly resp. annRat.
 @*
@@ -959,7 +959,7 @@ example;
 proc annRat(poly g, poly f)
 "USAGE:  annRat(g,f);  f, g polynomials
 RETURN:  ring
-PURPOSE: compute the annihilator of the rational function g/f in Weyl algebra
+PURPOSE: compute the annihilator of the rational function g/f in the Weyl algebra D
 NOTE: activate the output ring with the @code{setring} command.
 @*      In the output ring, the ideal LD (in Groebner basis) is the annihilator.
 @*      The algorithm uses the computation of ann f^{-1} via D-modules.
@@ -1094,7 +1094,7 @@ example
 proc annPoly(poly f)
 "USAGE:  annPoly(f);  f a poly
 RETURN:  ring
-PURPOSE: compute the complete annihilator ideal of f in Weyl algebra 
+PURPOSE: compute the complete annihilator ideal of f in the Weyl algebra D
 NOTE:  activate the output ring with the @code{setring} command.
 @*   In the output ring, the ideal LD (in Groebner basis) is the annihilator.
 DISPLAY: If printlevel=1, progress debug messages will be printed,
@@ -1279,7 +1279,7 @@ example
 proc insertGenerator (list #)
 "USAGE:  insertGenerator(id,p[,k]);  id an ideal/module, p a poly/vector, k an optional int
 RETURN:  same as id
-PURPOSE: insert an element into an ideal or a module
+PURPOSE: inserts p into the first argument at k-th index position and returns the enlarged object
 NOTE:    If k is given, p is inserted at position k, otherwise (and by default),
 @*       p is inserted at the beginning.
 EXAMPLE: example insertGenerator; shows examples
@@ -1356,7 +1356,7 @@ example
 proc deleteGenerator (list #)
 "USAGE:  deleteGenerator(id,k);  id an ideal/module, k an int
 RETURN:  same as id
-PURPOSE: deletes the k-th element from an ideal or a module
+PURPOSE: deletes the k-th generator from the first argument and returns the altered object
 EXAMPLE: example insertGenerator; shows examples
 "
 {
@@ -1796,9 +1796,9 @@ proc dmodappassumeViolation()
 proc bFactor (poly F)
 "USAGE:  bFactor(f);  f poly
 RETURN:  list
-PURPOSE: computes the roots of irreducible factors of an univariate poly
+PURPOSE: tries to compute the roots of a univariate poly f
 NOTE:    The output list consists of two or three entries:
-@*       the roots of f as ideal, their multiplicities as intvec, and,
+@*       roots of f as an ideal, their multiplicities as intvec, and,
 @*       if present, a third one being the product of all irreducible factors
 @*       of degree greater than one, given as string.
 DISPLAY: If printlevel=1, progress debug messages will be printed,

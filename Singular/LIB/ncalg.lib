@@ -1,16 +1,16 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncalg.lib,v 1.31 2009-03-30 18:11:39 motsak Exp $";
+version="$Id: ncalg.lib,v 1.32 2009-04-09 12:04:42 seelisch Exp $";
 category="Noncommutative";
 info="
-LIBRARY:  ncalg.lib      Definitions of important GR-algebras
+LIBRARY:  ncalg.lib      Definitions of important G- and GR-algebras
 AUTHORS:  Viktor Levandovskyy,     levandov@mathematik.uni-kl.de,
 @*        Oleksandr Motsak,        U@D, where U={motsak}, D={mathematik.uni-kl.de}
 
 CONVENTIONS: This library provides pre-defined important noncommutative algebras.
 @* For universal enveloping algebras of finite dimensional Lie algebras sl_n, gl_n, g_2 etc.
 there are functions @code{makeUsl}, @code{makeUgl}, @code{makeUg2} etc.
-@* There are quantized enveloping algebras U_q(sl_2) and U_q(sl_3) (via functions @code{makeQsl2}, @code{makeQsl3})
-and non-standard quantum deformation of so_3, accessible via @code{makeQso3} function.
+@* For quantized enveloping algebras U_q(sl_2) and U_q(sl_3), there are functions @code{makeQsl2}, @code{makeQsl3})
+and for non-standard quantum deformation of so_3, there is the function @code{makeQso3}.
 @* For bigger algebras we suppress the output of the (lengthy) list of non-commutative relations
 and provide only the number of these relations instead.
 
@@ -584,7 +584,7 @@ PURPOSE: define a ring (Weyl algebra) and create a Gelfand-Kapranov-Zelevinsky (
 @*        @code{alg}  is a string, saying which algorithm to use (exactly like in toric_lib),
 @*        @code{v}    is an optional intvec.
 @* In addition, the ideal called @code{GKZid} containing actual equations is calculated and exported to the ring.
-NOTE:    activate the ring with the @code{setring} command. This procedure is elaborated by Oleksandr Iena
+NOTE:    activate the output ring with the @code{setring} command. This procedure is elaborated by Oleksandr Iena
 ASSUME: This procedure uses toric_lib and therefore inherits its input requirements:
 @*        possible values for input variable @code{alg} are: \"ect\",\"pt\",\"blr\", \"hs\", \"du\".
 @*        As for the term ordering, it should be a string @code{sord} in Singular format like \"lp\",\"dp\", etc.

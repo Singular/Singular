@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: freegb.lib,v 1.20 2009-04-08 11:11:20 Singular Exp $";
+version="$Id: freegb.lib,v 1.21 2009-04-09 12:04:41 seelisch Exp $";
 category="Noncommutative";
 info="
-LIBRARY: freegb.lib   Twosided Noncommutative Groebner bases in Free Algebras via Letterplace
+LIBRARY: freegb.lib   Compute two-sided Groebner bases in free algebras via letterplace
 AUTHOR: Viktor Levandovskyy,     levandov@math.rwth-aachen.de
 
 THEORY: See chapter 'LETTERPLACE' in the Singular Manual.
@@ -57,10 +57,11 @@ proc testfreegblib()
 proc setLetterplaceAttributes(def R, int uptodeg, int lV)
 "USAGE: setLetterplaceAttributes(R, d, b); R a ring, b,d integers
 RETURN: ring with special attributes set
-PURPOSE: sets attributes for a letterplace ring: 
+PURPOSE: sets attributes for a letterplace ring:
 @*      'isLetterplaceRing' = true, 'uptodeg' = d, 'lV' = b, where
 @*      'uptodeg' stands for the degree bound, 
 @*      'lV' for the number of variables in the block 0.
+NOTE: Activate the resulting ring by using @code{setring}
 "
 {
   if (uptodeg*lV != nvars(R))
@@ -474,6 +475,8 @@ proc freeGBasis(list LM, int d)
 RETURN:  ring
 PURPOSE: compute the two-sided Groebner basis of an ideal, encoded by L in
 the free associative algebra, up to degree d
+NOTE: Apply @code{lst2str} to the output in order to obtain a human-readable
+representation
 EXAMPLE: example freeGBasis; shows examples
 "
 {
@@ -2220,8 +2223,8 @@ example
 */
 
 proc lp2lstr(ideal K, def save)
-"USAGE:  lp2lstr(K,s); K an ideal, s a ring
-RETURN:  nothing (exports object @LN into s)
+"USAGE:  lp2lstr(K,s); K an ideal, s a ring name
+RETURN:  nothing (exports object @LN into the ring named s)
 ASSUME: basering has a letterplace ring structure
 PURPOSE: converts letterplace ideal to list of modules
 NOTE: useful as preprocessing to 'lst2str'
@@ -2506,10 +2509,10 @@ example
 {
   "EXAMPLE:"; echo = 2;
   // define a ring in letterplace form as follows:
-  ring r = 0,(x(1),y(1),x(2),y(2),x(3),y(3),x(4),y(4)),dp; 
-  poly a = x(1)*y(2); poly b = y(1);
+  ring r = 0,(x(1),y(1),x(2),y(2),x(3),y(3),x(4),y(4)),dp;
   def R = setLetterplaceAttributes(r,4,2); // supply R with letterplace structure
   setring R;
+  poly a = x(1)*y(2); poly b = y(1);
   lpMult(b,a);
   lpMult(a,b);
 }

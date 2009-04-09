@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: perron.lib,v 1.13 2009-03-30 18:41:56 motsak Exp $";
+version="$Id: perron.lib,v 1.14 2009-04-09 12:04:42 seelisch Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  perron.lib         computation of algebraic dependences
@@ -194,5 +194,9 @@ example
   def RB = perron(J);
   setring RB;
   Relations;
+  // one more test:
+  setring A;
+  map T=RA,I;
+  T(Relations);  // should be zero
 }
 

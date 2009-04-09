@@ -1,4 +1,4 @@
-version="$Id: qmatrix.lib,v 1.15 2007-10-31 17:23:49 Singular Exp $";
+version="$Id: qmatrix.lib,v 1.16 2009-04-09 12:04:42 seelisch Exp $";
 category="Noncommutative";
 info="
 LIBRARY: qmatrix.lib     Quantum matrices, quantum minors and symmetric groups
@@ -80,7 +80,7 @@ example
 proc LengthSymElement(intvec v)
 "USAGE:  LengthSymElement(v); v intvec
 RETURN:  int
-PURPOSE: determine the length of v
+PURPOSE: determine the length of the permutation given by v in some S(n)
 ASSUME:  v represents an element of S(n); otherwise the output may have no sense
 SEE ALSO: SymGroup, LengthSym
 EXAMPLE: example LengthSymElement; shows examples
@@ -109,7 +109,7 @@ example
 proc LengthSym(intmat M)
 "USAGE:   LengthSym(M); M an intmat
 RETURN:  intvec
-PURPOSE: determine a vector, where the i-th element is the length of the i-th row of M
+PURPOSE: determine a vector, where the i-th element is the length of the permutation of S(n) given by the i-th row of M
 ASSUME: M represents a subset of S(n) (each row must be an element of S(n)); otherwise, the output may have no sense
 SEE ALSO: SymGroup, LengthSymElement
 EXAMPLE: example LengthSym; shows examples
@@ -143,7 +143,9 @@ NOTE:    activate this ring with the \"setring\" command.
 @*       The usual representation of the variables in this quantum
 @*       algebra is not used because double indexes are not allowed
 @*       in the variables. Instead the variables are listed by reading
-@*       the rows of the usual matrix representation.
+@*       the rows of the usual matrix representation, that is, there
+@*       will be n*n variables (one for each entry an n*N generic matrix),
+@*       listed row-wise
 SEE ALSO: qminor
 EXAMPLE: example quantMat; shows examples
 "{
@@ -216,11 +218,12 @@ example
 
 proc qminor(intvec I, intvec J, int nr)
 "USAGE:        qminor(I,J,n); I,J intvec, n int
-RETURN: poly, the quantum minor
+RETURN: poly, the quantum minor of a generic n*n quantum matrix
 ASSUME: I is the ordered list of the rows to consider in the minor,
 @*      J is the ordered list of the columns to consider in the minor,
 @*      I and J must have the same number of elements,
 @*      n is the order of the quantum matrix algebra you are working with (quantMat(n)).
+@*      The base ring should be constructed using @code{quantMat}.
 SEE ALSO: quantMat
 EXAMPLE: example qminor; shows examples
 "{
