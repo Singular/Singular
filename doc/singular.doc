@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.177 2009-02-27 10:06:05 Singular Exp $
+@comment $Id: singular.doc,v 1.178 2009-04-10 08:15:41 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -173,10 +173,12 @@ This is the texinfo file describing Singular (version @value{VERSION})
 * Data types (plural)::
 * Functions  (plural)::
 * Mathematical background (plural)::
+* Super-commutative algebras::
 * LETTERPLACE::
 * Non-commutative libraries::
 @end menu
 @include s-plural.tex
+@include sca.tex
 @include letterplace.tex
 @include s-plulibs.tex
 @end ifset
