@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.45 2009-04-09 12:18:34 seelisch Exp $";
+version="$Id: nctools.lib,v 1.46 2009-04-10 13:25:10 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -727,8 +727,8 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-proc SuperCommutative(list #)
-"USAGE:   SuperCommutative([b,[e, [Q, [flag]]]]);
+proc superCommutative(list #)
+"USAGE:   superCommutative([b,[e, [Q, [flag]]]]);
 RETURN:  qring
 PURPOSE:  create a super-commutative algebra (as a GR-algebra) over a basering,
 NOTE: activate this qring with the \"setring\" command.

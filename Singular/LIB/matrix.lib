@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.47 2009-02-20 18:58:36 Singular Exp $";
+version="$Id: matrix.lib,v 1.48 2009-04-10 13:26:09 Singular Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -44,7 +44,7 @@ LIB "inout.lib";
 LIB "ring.lib";
 LIB "random.lib";
 LIB "general.lib"; // for sort
-LIB "nctools.lib"; // for SuperCommutative
+LIB "nctools.lib"; // for superCommutative
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1154,7 +1154,7 @@ EXAMPLE:  example exteriorBasis; shows an example"
   execute("ring @@@EXT_POWER_RING_NAME=(0),("+S+"(1.."+string(n)+")),dp;");
 
 //------------------------- choose exterior basis -------------------------
-  def T = SuperCommutative(); setring T;
+  def T = superCommutative(); setring T;
   ideal extBasis = simplify( NF(maxideal(k), std(0)), 1 + 2 + 8 );
 
 //------------------------- export and return      -------------------------
@@ -1317,7 +1317,7 @@ print(symmetricPower(B, 2));
 print(symmetricPower(B, 3));
 
 // symmetric power over an exterior algebra:
-def g = SuperCommutative(); setring g; g;
+def g = superCommutative(); setring g; g;
 
 module B = a*gen(1) + c* gen(2), b * gen(1) + d * gen(2); print(B);
 
@@ -1376,7 +1376,7 @@ example
   print(exteriorPower(B, 2));
   print(exteriorPower(B, 3));
 
-  def g = SuperCommutative(); setring g; g;
+  def g = superCommutative(); setring g; g;
 
   module A = a*gen(1), b * gen(1), c*gen(2), d * gen(2);
   print(A);
