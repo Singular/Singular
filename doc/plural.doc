@@ -1445,7 +1445,7 @@ One can create a ring using @code{ring(list)}, see also @code{ringlist}.
 @c example
 LIB "ncalg.lib";
 def a = makeUsl2();       // U(sl_2) in e,f,h presentation
-ring W = 0,(x,d),dp;
+ring W0 = 0,(x,d),dp;
 def W = Weyl();              // 1st Weyl algebra in x,d
 def S = a+W;
 setring S;
@@ -1888,7 +1888,7 @@ computes the intersection of ideals, resp. modules.
 @smallexample
 @c example
 ring r=0,(x,y),dp;
-def R=nc_algebra(-1,0);  /anti-commutative algebra
+def R=nc_algebra(-1,0);  //anti-commutative algebra
 setring R;
 module M=[x,x],[y,0];
 module N=[0,y^2],[y,x];
