@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.19 2009-03-02 18:06:54 motsak Exp $ */
+/* $Id: syz.cc,v 1.20 2009-04-10 19:03:44 motsak Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -615,9 +615,15 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
 
 syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
 {
+#define QSyzTest 0
+
 #ifdef HAVE_PLURAL
-//  ideal idSaveCurrQuotient = currQuotient;
-//  ideal idSaveCurrRingQuotient = currRing->qideal;
+
+#if QSyzTest
+  ideal idSaveCurrQuotient = currQuotient;
+  ideal idSaveCurrRingQuotient = currRing->qideal;
+#endif
+
   if( rIsSCA(currRing) )
   {
 
@@ -625,8 +631,11 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
 //    rWrite(currRing);
 //    rDebugPrint(currRing);
 #endif
-//    currQuotient = SCAQuotient(currRing);
-//    currRing->qideal = currQuotient;
+
+#if QSyzTest
+    currQuotient = SCAQuotient(currRing);
+    currRing->qideal = currQuotient;
+#endif
 
     const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
     const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
@@ -674,8 +683,11 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
 #ifdef HAVE_PLURAL
   if( rIsSCA(currRing) )
   {
-//    currQuotient     = idSaveCurrQuotient; 
-//    currRing->qideal = idSaveCurrRingQuotient;
+
+#if QSyzTest
+    currQuotient     = idSaveCurrQuotient; 
+    currRing->qideal = idSaveCurrRingQuotient;
+#endif
 
     id_Delete(&arg, currRing);
   }
