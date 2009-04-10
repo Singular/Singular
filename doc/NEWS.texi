@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.128 2009-04-08 16:51:56 seelisch Exp $
+@comment $Id: NEWS.texi,v 1.129 2009-04-10 15:14:55 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -202,7 +202,7 @@ library @code{ncall.lib} merged into @nref{all_lib}
 @item
 library center.lib (@code{center_lib}) renamed to @code{central.lib} (@nref{central_lib})
 @item
-@nref{nctools_lib}: new functions for super-commutative algebras (i.e. @nref{SuperCommutative}, @nref{IsSCA}, @nref{AltVarStart}, @nref{AltVarEnd})
+@nref{nctools_lib}: new functions for super-commutative algebras (i.e. @nref{superCommutative}, @nref{IsSCA}, @nref{AltVarStart}, @nref{AltVarEnd})
 @item
 resolve.lib: blow ups revised (@nref{resolve_lib})
 @item
