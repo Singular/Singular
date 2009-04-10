@@ -1,4 +1,4 @@
-// $Id: ehv.lib,v 1.2 2009-04-08 12:11:33 Singular Exp $
+// $Id: ehv.lib,v 1.3 2009-04-10 13:28:50 Singular Exp $
 /////////////////////////////////////////////////////////////////////
 // EHV.lib                                                         //
 // algorithms for primary decomposition of ideals based on         //
@@ -7,7 +7,7 @@
 //                                                                 //
 /////////////////////////////////////////////////////////////////////
 
-version="$Id: ehv.lib,v 1.2 2009-04-08 12:11:33 Singular Exp $";
+version="$Id: ehv.lib,v 1.3 2009-04-10 13:28:50 Singular Exp $";
 category="Commutative Algebra";
 
 info="
@@ -899,7 +899,8 @@ RETURN:  a list, the associated prime ideals of I"
 
   //Compute the normalization of I.
   if(printlevel > 2){"Entering Normalization.";}
-  list K = normal(I);
+  list norOut = normal(I, "noDeco");
+  list K = norOut[1];
   if(printlevel > 2){"Leaving Normalisation.";}
 
   //The normalization algorithm returns k factors.
