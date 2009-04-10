@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.51 2009-04-07 16:18:05 seelisch Exp $";
+version="$Id: normal.lib,v 1.52 2009-04-10 13:34:00 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -9,10 +9,10 @@ AUTHORS:  G.-M. Greuel,  greuel@mathematik.uni-kl.de,
 
 
 MAIN PROCEDURES:
- normal(I[...]);     normalization of an affine ring 
+ normal(I[...]);     normalization of an affine ring
  normalP(I,[...];    normalization of an affine ring in positive characteristic
  normalC(I,[...];    normalization of an affine ring through a chain of rings
- HomJJ(L);           presentation of the End_R(J) as affine ring, J an ideal
+ HomJJ(L);           presentation of End_R(J) as affine ring, J an ideal
  genus(I);           computes the geometric genus of a projective curve
  primeClosure(L);    integral closure of R/p, p a prime ideal
  closureFrac(L);     write a poly in integral closure as element of Quot(R/p)
@@ -21,7 +21,7 @@ MAIN PROCEDURES:
 AUXILIARY PROCEDURES:
  deltaLoc(f,S);      sum of delta invariants at conjugated singular points
  locAtZero(I);       checks whether the zero set of I is located at 0
- norTest(i,nor;)     checks whether result of normal or mormal_p was correct
+ norTest(I,nor);     checks the output of normal, normalP, normalC
 ";
 
 LIB "general.lib";
@@ -43,133 +43,126 @@ proc normal(ideal id, list #)
 "USAGE:  normal(id [,choose]); id = radical ideal, choose = optional string. @*
          Optional parameters in list choose (can be entered in any order):@*
          Decomposition:@*
-         - \"prim\" -> computes first the minimal associated primes, and then 
-         the normalization of each prime. (default)@*
          - \"equidim\" -> computes first an equidimensional decomposition,
-         and then the normalization of each component. @*
-         - \"noDeco\" -> no preliminary decomposition is done. If the ideal is 
+         and then the normalization of each component. (default)@*
+         - \"prim\" -> computes first the minimal associated primes, and then
+         the normalization of each prime. @*
+         - \"noDeco\" -> no preliminary decomposition is done. If the ideal is
          not equidimensional radical, output might be wrong.@*
-         - \"isPrim\" -> assumes that the ideal is prime. If assumption does 
+         - \"isPrim\" -> assumes that the ideal is prime. If assumption does
          not hold, output might be wrong.@*
-         - \"noFac\" -> factorization is avoided in the computation of the 
+         - \"noFac\" -> factorization is avoided in the computation of the
          minimal associated primes;
          Other:@*
          - \"useRing\" -> uses the original ring ordering.@*
          If the ring ordering is not global, it will change to a global
          ordering only for computing radicals and prime or equidimensional
          decompositions.@*
-         If this option is not set, changes to dp ordering and perform all
+         If this option is not set, it changes to dp ordering and perform all
          computation with respect to this ordering.@*
          - \"withDelta\" (or \"wd\") -> returns also the delta invariants.
          If choose is not given or empty, the default options are used.@*
 ASSUME:  The ideal must be radical, for non-radical ideals the output may
-         be wrong (id=radical(id); makes id radical). However, when using 
-         \"prim\" option the minimal associated primes of id are computed first 
-         and hence normal computes the normalization of the radical of id.
+         be wrong (id=radical(id); makes id radical). However, when using
+         \"prim\" option the minimal associated primes of id are computed first
+         and hence normal computes the normalization of the radical of id.@*
          \"isPrim\" should only be used if id is known to be prime.
-RETURN:  a list, say nor, of size 1 (resp. 2 with option \"withDelta\"). 
-@format 
-         The first element nor[1] is a list of r elements, where r is the 
-         number of associated primes P_i with option \"prim\" (resp. >= no 
+RETURN:  a list, say nor, of size 2 (resp. 3 with option \"withDelta\").
+@format
+         * nor[1], the first element, is a list of r rings, where r is the
+         number of associated primes P_i with option \"prim\" (resp. >= no
          of equidimenensional components P_i with option \"equidim\").@*
-         Each element of nor[1] is a list with the information on the
-         normalization of the i-th component, i.e. the integral closure 
-         in its field of fractions (as affine ring).@*
-         Each list nor[1][i] contains 3 elements (resp. 4 with option
-         \"withDelta\"). @*
-         The first two element of nor[1][i] give the normalization by
-         module generators. The normalization is of the form
-         1/c * U, with U = nor[1][i][1] an ideal of R / P_i and
-         c = nor[1][i][2] a polynomial in R / P_i.@*
-         The third element is a ring Ri=nor[1][i][3], i=1..r, 
-         which contains two ideals with given
+         Each ring Ri:=nor[1][i], i=1..r, contains two ideals with given
          names @code{norid} and @code{normap} such that @*
-         - Ri/norid is the normalization of the i-th component.
-         - the direct sum of the rings Ri/norid is the normalization
-           of basering/id; @*
+         - Ri/norid is the normalization of the i-th component, i.e. the
+          integral closure in its field of fractions (as affine ring);
          - @code{normap} gives the normalization map from basering/id to
-           Ri/norid for each j.@*
-         When option \"withDelta\" is set, the forth element nor[1][i][4] is
-         the delta invariant of the i-th component. (-1 means infinite, and 0 
-         that basering/P_i is normal)@*
-         @*
-         Also, When option \"withDelta\" is set the second element of the list
-         nor, nor[2], is an integer, the total delta invariant of basering/id
-         (-1 means infinite, and 0 that basering/id is normal).
+           Ri/norid for each i.@*
+         - the direct sum of the rings Ri/norid, i=1,..r, is the normalization
+           of basering/id; @*
+         * nor[2] is a list of size r with information on the normalization of
+         the i-th component as module over the basering:@*
+         nor[2][i] is an ideal, say U, in the basering such that the integral
+         closure of basering/P_i is generated as module over the basering by
+         1/c * U, with c the last element U[size(U)] of U.@*
+         * nor[3] (if option \"withDelta\" is set) is a list of an intvec
+         of size r, the delta invariants of the r components, and an integer,
+         the total delta invariant of basering/id (-1 means infinite, and 0
+         that basering/P_i resp. basering/input is normal).
 @end format
-THEORY:  We use a general algorithm described in [G.-M. Greuel, S. Laplagne, 
-         F. Seelisch: Normalization of Rings (2009)].
-         The delta invariant of a reduced ring K[x1,...,xn]/id is 
+THEORY:  We use a general algorithm described in [G.-M. Greuel, S. Laplagne,
+         F. Seelisch: Normalization of Rings (2009)].@*
+         The delta invariant of a reduced ring K[x1,...,xn]/id is
              dim_K(normalization(K[x1,...,xn]/id) / K[x1,...,xn]/id)
          We call this number also the delta invariant of id.
-NOTE:    To use the i-th ring type: @code{def R=nor[1][i][3]; setring R;}.
-@*       Increasing/decreasing printlevel displays more/less comments 
+NOTE:    To use the i-th ring type: @code{def R=nor[1][i]; setring R;}.
+@*       Increasing/decreasing printlevel displays more/less comments
          (default: printlevel=0).
-@*       Implementation works also for local rings.         
+@*       Implementation works also for local rings.
 @*       Not implemented for quotient rings.
 @*       If the input ideal id is weighted homogeneous a weighted ordering may
          be used (qhweight(id); computes weights).
 KEYWORDS: normalization; integral closure; delta invariant.
 EXAMPLE: example normal; shows an example
 "
-{  
+{
    intvec opt = option(get);     // Save current options
 
-   int i,j;
-   int decomp;  // Preliminar decomposition:
+  int i,j;
+  int decomp;   // Preliminar decomposition:
                 // 0 -> no decomposition (id is assumed to be prime)
-                // 1 -> no decomposition 
-                //      (id is assumed to be equidimensional radical) 
+                // 1 -> no decomposition
+                //      (id is assumed to be equidimensional radical)
                 // 2 -> equidimensional decomposition
                 // 3 -> minimal associated primes
-   int noFac, useRing, withDelta;
-   int dbg = printlevel - voice + 2;
-   int nvar = nvars(basering);
-   int chara  = char(basering);
-   list result;
-   list keepresult;
-   list ringStruc;
-   ideal U;
-   poly c;
-   
-   // Default methods:
-   noFac = 0;         // Use facSTD when computing minimal associated primes
-   decomp = 3;        // Minimal associated primes
-   useRing = 0;       // Change first to dp ordering, and perform all 
-                      // computations there.
-   withDelta = 0;     // Do not compute the delta invariant.
-  
+  int noFac, useRing, withDelta;
+  int dbg = printlevel - voice + 2;
+  int nvar = nvars(basering);
+  int chara  = char(basering);
+  list result;
+  list keepresult;
+  list ringStruc;
+  ideal U;
+  poly c;
+  int sp;            // Number of components.
 
-  //--------------------------- define the method --------------------------- 
+  // Default methods:
+  noFac = 0;         // Use facSTD when computing minimal associated primes
+  decomp = 2;        // Equidimensional decomposition
+  useRing = 0;       // Change first to dp ordering, and perform all
+                     // computations there.
+  withDelta = 0;     // Do not compute the delta invariant.
+
+//--------------------------- define the method ---------------------------
   string method;                //make all options one string in order to use
                                //all combinations of options simultaneously
   for ( i=1; i <= size(#); i++ )
-  { 
-    if ( typeof(#[i]) == "string" ) 
+  {
+    if ( typeof(#[i]) == "string" )
     {
       method = method + #[i];
     }
   }
 
-  //--------------------------- choosen methods -----------------------
+//--------------------------- choosen methods -----------------------
   if ( find(method,"isprim") or find(method,"isPrim") )
   {decomp = 0;}
-  
+
   if ( find(method,"nodeco") or find(method,"noDeco") )
   {decomp = 1;}
-  
-  if ( find(method,"equidim") )
-  {decomp = 2;}
-  
+
   if ( find(method,"prim") )
   {decomp = 3;}
-  
+
+  if ( find(method,"equidim") )
+  {decomp = 2;}
+
   if ( find(method,"nofac") or find(method,"noFac") )
   {noFac=1;}
-  
+
   if ( (find(method,"useRing") or find(method,"usering")) and (ordstr(basering) != "dp("+string(nvars(basering))+"),C"))
   {useRing = 1;}
-  
+
   if ( find(method,"withDelta") or find(method,"wd") or find(method,"withdelta"))
   {
     if((decomp == 0) or (decomp == 3)){
@@ -185,18 +178,18 @@ EXAMPLE: example normal; shows an example
   kill #;
   list #;
 
-  //------------------------ change ring if required ------------------------
-  // If the ordering is not global, we change to dp ordering for computing the 
-  // min ass primes.
-  // If the ordering is global, but not dp, and useRing = 0, we also change to 
-  // dp ordering.
-  
+//------------------------ change ring if required ------------------------
+// If the ordering is not global, we change to dp ordering for computing the
+// min ass primes.
+// If the ordering is global, but not dp, and useRing = 0, we also change to
+// dp ordering.
+
   int isGlobal = ord_test(basering);      // Checks if the original ring has
                                           // global ordering.
-  
+
   def origR = basering;   // origR is the original ring
                           // R is the ring where computations will be done
-    
+
   if((useRing  == 1) and (isGlobal == 1)){
     def globR = basering;
   } else {
@@ -207,10 +200,32 @@ EXAMPLE: example normal; shows an example
     rl[3] = newOrd;
     def globR = ring(rl);
     setring globR;
-    ideal id = fetch(origR, id);  
+    ideal id = fetch(origR, id);
   }
 
-  //------------------------ preliminary decomposition-----------------------
+//------------------------ trivial checkings ------------------------
+  id = groebner(id);
+  if((size(id) == 0) or (id[1] == 1)){
+    // The original ring R/I was normal. Nothing to do.
+    // We define anyway a new ring, equal to R, to be able to return it.
+    setring origR;
+    list lR = ringlist(origR);
+    def ROut = ring(lR);
+    setring ROut;
+    ideal norid = 0;
+    ideal normap = maxideal(1);
+    export norid;
+    export normap;
+    setring origR;
+    if(withDelta){
+      result = list(list(ideal(1), poly(1), ROut), 0);
+    } else {
+      result = list(list(ideal(1), poly(1), ROut));
+    }
+    return(result);
+  }
+
+//------------------------ preliminary decomposition-----------------------
   list prim;
   if(decomp == 2){
     dbprint(dbg, "// Computing the equidimensional decomposition...");
@@ -226,8 +241,17 @@ EXAMPLE: example normal; shows an example
     else
     { prim = minAssGTZ(id); }
   }
+  sp = size(prim);
+  if(dbg>=1)
+  {
+    prim; "";
+    "// number of components is", sp;
+    "";
+  }
 
-  // if ring was not global and useRing is on, we go back to the original ring
+
+//----------------- back to the original ring if required ------------------
+// if ring was not global and useRing is on, we go back to the original ring
   if((useRing == 1) and (isGlobal != 1)){
     setring origR;
     def R = basering;
@@ -239,16 +263,9 @@ EXAMPLE: example normal; shows an example
       poly c;
     }
   }
-    
-  if(dbg>=1)
-  {  
-    prim; "";
-    "// number of components is", size(prim);
-    "";
-  }
-   
-  // ---------------- normalization of the components-------------------------
-  // calls normalM to compute the normalization of each component.
+
+// ---------------- normalization of the components-------------------------
+// calls normalM to compute the normalization of each component.
 
   list norComp;       // The normalization of each component.
   int delt;
@@ -261,7 +278,7 @@ EXAMPLE: example normal; shows an example
   setring R;
   def newR;
   list newRList;
-    
+
   for(i=1; i<=size(prim); i++)
   {
     if(dbg>=2){pause();}
@@ -275,7 +292,7 @@ EXAMPLE: example normal; shows an example
       }
       printlevel = printlevel + 1;
       norComp = normalM(prim[i], decomp, withDelta);
-      printlevel = printlevel - 1;      
+      printlevel = printlevel - 1;
       for(j = 1; j <= size(norComp); j++){
         newR = norComp[j][3];
         newRList = ringlist(newR);
@@ -289,31 +306,32 @@ EXAMPLE: example normal; shows an example
             deltI = -1;
           }
         }
+        // -- incorporate result for this component to the list of results ---
         if(useRing == 0){
-        // We go back to the original ring.
-        setring origR;
-        U = fetch(R, U);
-        c = fetch(R, c);
-        newRListO = imap(R, newRList); 
-        // We change the ordering in the new ring.
-        if(nvars(newR) > nvars(origR)){
-          newRListO[3]=insert(origOrd, newRListO[3][1]);
-        } else {
-          newRListO[3] = origOrd;
-        }
-        newROrigOrd = ring(newRListO);
-        setring newROrigOrd;
-        ideal norid = imap(newR, norid);
-        ideal normap = imap(newR, normap);
-        export norid;
-        export normap;
-        setring origR;
-        totalComps++;
-        result[totalComps] = list(U, c, newROrigOrd);
-        if(withDelta){
-          result[totalComps] = insert(result[totalComps], delt, 3);
-        }
-        setring R;
+          // We go back to the original ring.
+          setring origR;
+          U = fetch(R, U);
+          c = fetch(R, c);
+          newRListO = imap(R, newRList);
+          // We change the ordering in the new ring.
+          if(nvars(newR) > nvars(origR)){
+            newRListO[3]=insert(origOrd, newRListO[3][1]);
+          } else {
+            newRListO[3] = origOrd;
+          }
+          newROrigOrd = ring(newRListO);
+          setring newROrigOrd;
+          ideal norid = imap(newR, norid);
+          ideal normap = imap(newR, normap);
+          export norid;
+          export normap;
+          setring origR;
+          totalComps++;
+          result[totalComps] = list(U, c, newROrigOrd);
+          if(withDelta){
+            result[totalComps] = insert(result[totalComps], delt, 3);
+          }
+          setring R;
         } else {
           setring R;
           totalComps++;
@@ -322,14 +340,14 @@ EXAMPLE: example normal; shows an example
       }
     }
   }
-  
-  // -------------------------- delta computation ----------------------------  
+
+// -------------------------- delta computation ----------------------------
   if(withDelta == 1){
     // Intersection multiplicities of list prim, sp=size(prim).
     if ( dbg >= 1 )
     {
       "// Sum of delta for all components: ", deltI;
-    }   
+    }
     if(size(prim) > 1){
       dbprint(dbg, "// Computing the sum of the intersection multiplicities of the components...");
       int mul = iMult(prim);
@@ -337,27 +355,69 @@ EXAMPLE: example normal; shows an example
       {
         deltI = -1;
       } else {
-        deltI = deltI + mul; 
+        deltI = deltI + mul;
       }
       if ( dbg >= 1 )
       {
         "// Intersection multiplicity is : ", mul;
-      }         
+      }
     }
   }
-  
-  // -------------------------- prepare output ------------------------------   
-  setring origR;
-  if(withDelta){
-    result = result, deltI;
-  } else {
-    result = list(result);
-  }
-  
-  option(set, opt);
-  return(result);
-}
 
+// -------------------------- prepare output ------------------------------
+  setring origR;
+
+  list RL;      // List of rings
+  list MG;      // Module generators
+  intvec DV;    // Vector of delta's of each component
+  for(i = 1; i <= size(result); i++){
+    RL[i] = result[i][3];
+    MG[i] = lineUpLast(result[i][1], result[i][2]);
+    if(withDelta){
+      DV[i] = result[i][4];
+    }
+  }
+  list resultNew;
+
+  if(withDelta){
+    resultNew = list(RL, MG, list(DV, deltI));
+  } else {
+    resultNew = list(RL, MG);
+  }
+
+  option(set, opt);
+
+  if ( dbg >= 0 )
+  {
+    "";
+    if(!withDelta){
+      "// 'normal' created a list, say nor, of two elements.";
+    } else {
+      "// 'normal' created a list, say nor, of three elements.";
+    }
+    "// * nor[1] is a list of", sp, "ring(s). To access the i-th ring nor[1][i], ";
+    "// give it a name, say Ri, and type e.g. ";
+    "     def R1 = nor[1][1]; setring R1; norid; normap;";
+    "// For the other rings type first ";
+    "     setring r;";
+    "// (if r is the name of your original basering) and then continue as";
+    "// for the first ring.";
+    "// Ri/norid is the affine algebra of the normalization of the i-th ";
+    "// component r/P_i (where P_i is the i-th component of a decomposition of";
+    "// the input ideal) and normap the normalization map from r to Ri/norid.";
+    "// * nor[2] is a list of", sp, "ideal(s) such that the integral";
+    "// closure of basering/P_i is generated as module over the basering by";
+    "// 1/ci * Ui, with Ui the i-th ideal of nor[2] and ci the last element";
+    "// Ui[size(Ui)] of Ui.";
+    if(withDelta){
+      "// * nor[3] is a list of an intvec of size r, the delta invariants ";
+      "// of the r components, and an integer, the total delta invariant ";
+      "// of basering/id (-1 means infinite, and 0 that basering/P_i resp. ";
+      "// basering/input is normal).";
+    }
+  }
+  return(resultNew);
+}
 
 example
 { "EXAMPLE:";
@@ -365,28 +425,28 @@ example
   echo = 2;
   ring s = 0,(x,y),dp;
   ideal i = (x2-y3)*(x2+y2)*x;
-  list nor = normal(i, "withDelta");
-  nor; 
+  list nor = normal(i, "withDelta", "prim");
+  nor;
 
   // 2 branches have delta = 1, and 1 branch has delta = 0
   // the total delta invariant is 13
 
-  def R2 = nor[1][2][3];  setring R2;
+  def R2 = nor[1][2];  setring R2;
   norid; normap;
-   
+
   echo = 0;
   printlevel = printlevel-1;
   pause("   hit return to continue"); echo=2;
 
   ring r = 2,(x,y,z),dp;
   ideal i = z3-xy4;
-  list nor = normal(i, "withDelta");  nor;  
-  // the delta invariant is infinite 
+  list nor = normal(i, "withDelta", "prim");  nor;
+  // the delta invariant is infinite
   // xy2z/z2 and xy3/z2 generate the integral closure of r/i as r/i-module
   // in its quotient field Quot(r/i)
 
-  // the normalization as affine algebra over the ground field:             
-  def R = nor[1][1][3]; setring R;
+  // the normalization as affine algebra over the ground field:
+  def R = nor[1][1]; setring R;
   norid; normap;
 }
 
@@ -422,6 +482,13 @@ EXAMPLE: example HomJJ;  shows an example
    def P = basering;
    ideal SBid, id, J = Li[1], Li[2], Li[3];
    poly p = Li[4];
+   int noRed = 0;
+   if(size(Li) > 4){
+     if(Li[5] == 1){
+       noRed = 1;
+     }
+   }
+
    attrib(SBid,"isSB",1);
    int homo = homog(Li[2]);               //is 1 if id is homogeneous, 0 if not
 
@@ -482,7 +549,7 @@ EXAMPLE: example HomJJ;  shows an example
    p = p/gg;
 
    if ( y>=1 )
-   {  
+   {
       "//   the non-zerodivisor p:"; p;
       "//   the module p*Hom(J,J) = p*J:J :"; f;
       "";
@@ -491,7 +558,7 @@ EXAMPLE: example HomJJ;  shows an example
 
 //---------- Test: Hom(J,J) == R ?, if yes, go home ---------------------------
 
-   //rf = interred(reduce(f,f2)); 
+   //rf = interred(reduce(f,f2));
    //### interred hier weggelassen, unten zugefügt
    rf = reduce(f,f2);       //represents p*Hom(J,J)/p*R = Hom(J,J)/R
    if ( size(rf) == 0 )
@@ -557,15 +624,15 @@ EXAMPLE: example HomJJ;  shows an example
 // the ring newR1/SBid+syzf will be isomorphic to Hom(J,J) as R-module
 // f2=p (i.e. ideal generated by p)
 
-   //f = mstd(f)[2];              //### geändert GMG 04.10.08 
-   //ideal ann = quotient(f2,f);  //### f durch rf ersetzt  
+   //f = mstd(f)[2];              //### geändert GMG 04.10.08
+   //ideal ann = quotient(f2,f);  //### f durch rf ersetzt
    rf = mstd(rf)[2];              //rf = NF(f,p), hence <p,rf> = <p,f>
-   ideal ann = quotient(f2,rf);   //p:f = p:rf 
- 
-   //------------- compute the contribution to delta ---------- 
+   ideal ann = quotient(f2,rf);   //p:f = p:rf
+
+   //------------- compute the contribution to delta ----------
    //delt=dim_K(Hom(JJ)/R (or -1 if infinite)
-  
-   int delt=vdim(std(modulo(f,ideal(p))));    
+
+   int delt=vdim(std(modulo(f,ideal(p))));
 
    f = p,rf;          // generates pJ:J mod(p), i.e. p*Hom(J,J)/p*R as R-module
    q = size(f);
@@ -587,7 +654,7 @@ EXAMPLE: example HomJJ;  shows an example
    }
 
    //map psi1 = P,maxideal(1);          //### psi1 durch fetch ersetzt
-   //ideal SBid = psi1(SBid);        
+   //ideal SBid = psi1(SBid);
    ideal SBid = fetch(P,SBid);
    attrib(SBid,"isSB",1);
 
@@ -610,7 +677,7 @@ EXAMPLE: example HomJJ;  shows an example
 // the same as the kernel of R[T1,...,Tq] -> pJ:J >-> R, Ti -> fi.
 // It is a fact, that the kernel is generated by the linear and the quadratic
 // relations
-// f=p,rf, rf=reduce(f,p), generates pJ:J mod(p), 
+// f=p,rf, rf=reduce(f,p), generates pJ:J mod(p),
 // i.e. p*Hom(J,J)/p*R as R-module
 
    pf = f[1]*f;
@@ -628,7 +695,7 @@ EXAMPLE: example HomJJ;  shows an example
    {
       for ( jj=2; jj<=ii; jj++ )
       {
-         ff = NF(f[ii]*f[jj],std(0));       //this makes lift much faster 
+         ff = NF(f[ii]*f[jj],std(0));       //this makes lift much faster
          A = lift(pf,ff);                   //ff lin. comb. of elts of pf mod I
          Quad = Quad, ideal(T(jj)*T(ii) - T*A);  //quadratic relations
       }
@@ -647,7 +714,7 @@ EXAMPLE: example HomJJ;  shows an example
    //### ev das neue interred
    //mstd dient nur zum verkleinern, die SB-Eigenschaft geht spaeter verloren
    //da in neuen Ring abgebildet und mit id vereinigt
-                       
+
 //---------- reduce number of variables by substitution, if possible ----------
    if (homo==1)
    {
@@ -658,15 +725,36 @@ EXAMPLE: example HomJJ;  shows an example
       ring newRing = char(R),(X(1..nvars(R)),T(2..q)),dp;
    }
 
-   ideal endid  = imap(newR,id),imap(newR,Q);  
+   ideal endid  = imap(newR,id),imap(newR,Q);
    //hier wird Q weiterverwendet, die SB-Eigenschaft wird nicht verwendet.
    endid = simplify(endid,2);
    ideal endphi = ideal(X(1..nvars(R)));
 
-   L = substpart(endid,endphi,homo,rw);
 
-   def lastRing=L[1];
-   setring lastRing;
+  if(noRed == 0){
+    L = substpart(endid,endphi,homo,rw);
+    def lastRing=L[1];
+    setring lastRing;
+    //return(lastRing);
+  } else {
+    list RL = ringlist(newRing);
+    def lastRing = ring(RL);
+    setring lastRing;
+    ideal endid = fetch(newRing, endid);
+    ideal endphi = fetch(newRing, endphi);
+    export(endid);
+    export(endphi);
+    //def lastRing = newRing;
+    //setring R;
+    //return(newR);
+  }
+
+
+
+//   L = substpart(endid,endphi,homo,rw);
+
+//   def lastRing=L[1];
+//   setring lastRing;
 
    attrib(endid,"onlySingularAtZero",0);
    map sigma=R,endphi;
@@ -729,18 +817,18 @@ example
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//compute intersection multiplicities as needed for delta(I) in 
+//compute intersection multiplicities as needed for delta(I) in
 //normalizationPrimes and normalP:
 
 proc iMult (list prim)
 "USAGE:   iMult(L);  L a list of ideals
 RETURN:  int, the intersection multiplicity of the ideals of L;
-         if iMult(L) is infinite, -1 is returned. 
+         if iMult(L) is infinite, -1 is returned.
 THEORY:  If r=size(L)=2 then iMult(L) = vdim(std(L[1]+L[2])) and in general
          iMult(L) = sum{ iMult(L[j],Lj) | j=1..r-1 } with Lj the intersection
          of L[j+1],...,L[r]. If I is the intersection of all ideals in L then
          we have delta(I) = delta(L[1])+...+delta(L[r]) + iMult(L) where
-         delta(I) = vdim (normalisation(R/I)/(R/I)), R the basering. 
+         delta(I) = vdim (normalisation(R/I)/(R/I)), R the basering.
 EXAMPLE: example iMult; shows an example
 "
 {    int i,mul,mu;
@@ -761,9 +849,9 @@ EXAMPLE: example iMult; shows an example
            {
               ideal I(i) = intersect(I(i+1),prim[i+1]);
               mu = vdim(std(I(i)+prim[i]));
-              if ( mu < 0 )  
-              { 
-                break; 
+              if ( mu < 0 )
+              {
+                break;
               }
               mul = mul + mu;
               if ( y>=1 )
@@ -782,7 +870,7 @@ example
    iMult(L);
    L = (x-y),(x3+y2),(x3-y4);
    iMult(L);
-}  
+}
 ///////////////////////////////////////////////////////////////////////////////
 //check if I has a singularity only at zero, as needed in normalizationPrimes
 
@@ -793,15 +881,15 @@ ASSUME:  I is given as a standard bases in the basering
 NOTE:    only useful in affine rings, in local rings vdim does the check
 EXAMPLE: example locAtZero; shows an example
 "
-{    
+{
    int ii,jj, caz;                   //caz: conzentrated at zero
    int dbp = printlevel-voice+2;
    int nva = nvars(basering);
-   int vdi = vdim(I);     
+   int vdi = vdim(I);
    if ( vdi < 0 )
    {
-      if (dbp >=1) 
-      { "// non-isolated singularitiy";""; }         
+      if (dbp >=1)
+      { "// non-isolated singularitiy";""; }
       return(caz);
    }
 
@@ -811,8 +899,8 @@ EXAMPLE: example locAtZero; shows an example
    if( homog(I)==1 && size(jet(I,0))==0)
    {
       caz=1;
-      if (dbp >=1) 
-      { "// isolated singularity and homogeneous";""; }         
+      if (dbp >=1)
+      { "// isolated singularity and homogeneous";""; }
       return(caz);
    }
 
@@ -837,14 +925,14 @@ EXAMPLE: example locAtZero; shows an example
       }
       if ( caz == 1 || pot >= vdi )
       {
-        if (dbp >=1) 
+        if (dbp >=1)
         {
           "// mindeg, exponent, vdim used in 'locAtZero':", mi1,pot,vdi; "";
-        }         
+        }
         return(caz);
       }
       else
-      { 
+      {
         if ( pot^2 < vdi )
         { pot = pot^2; }
         else
@@ -861,19 +949,19 @@ example
    locAtZero(i);
    i= std(i*ideal(x-1,y,z));
    locAtZero(i);
-}  
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
-//The next procedure normalizationPrimes computes the normalization of an 
-//irreducible or an equidimensional ideal i. 
-//- If i is irreducuble, then the returned list, say nor, has size 2 
+//The next procedure normalizationPrimes computes the normalization of an
+//irreducible or an equidimensional ideal i.
+//- If i is irreducuble, then the returned list, say nor, has size 2
 //with nor[1] the normalization ring and nor[2] the delta invariant.
-//- If i is equidimensional, than the "splitting tools" can create a 
-//decomposition of i and nor can have more than 1 ring. 
+//- If i is equidimensional, than the "splitting tools" can create a
+//decomposition of i and nor can have more than 1 ring.
 
 static proc normalizationPrimes(ideal i,ideal ihp,int delt,intvec delti,list #)
-"USAGE:   normalizationPrimes(i,ihp,delt[,si]);  i = equidimensional ideal, 
+"USAGE:   normalizationPrimes(i,ihp,delt[,si]);  i = equidimensional ideal,
          ihp = map (partial normalization), delt = partial delta-invariant,
          si = ideal s.t. V(si) contains singular locus (optional)
 RETURN:   a list of rings, say nor, and an integer, the delta-invariant
@@ -884,7 +972,7 @@ RETURN:   a list of rings, say nor, and an integer, the delta-invariant
              the normalization of basering/i;
            - normap gives the normalization map from basering/id
              to nor[j]/norid (for each j)
-          nor[size(nor)] = dim_K(normalisation(P/i) / (P/i)) is the 
+          nor[size(nor)] = dim_K(normalisation(P/i) / (P/i)) is the
           delta-invariant, where P is the basering.
 EXAMPLE: example normalizationPrimes; shows an example
 "
@@ -910,7 +998,7 @@ EXAMPLE: example normalizationPrimes; shows an example
    ideal J,SB,MB;
    int depth,lauf,prdim,osaz;
    int ti=timer;
-   
+
    gnirlist = ringlist(BAS);
 
 //----------- the trivial case of a zero ideal as input, RETURN ------------
@@ -934,9 +1022,9 @@ EXAMPLE: example normalizationPrimes; shows an example
          return(result);
    }
 
-//--------------- General NOTATION, compute SB of input ----------------- 
+//--------------- General NOTATION, compute SB of input -----------------
 // SM is a list, the result of mstd(i)
-// SM[1] = SB of input ideal i, 
+// SM[1] = SB of input ideal i,
 // SM[2] = (minimal) generators for i.
 // We work with SM and will copy the attributes from i to SM[2]
 // JM will be a list, either JM[1]=maxideal(1),JM[2]=maxideal(1)
@@ -957,9 +1045,9 @@ EXAMPLE: example normalizationPrimes; shows an example
    }
 //----------------- the general case, set attributes ----------------
    //Note: onlySingularAtZero is NOT preserved under the ring extension
-   //basering --> Hom(J,J) (in contrast to isIsolatedSingularity), 
+   //basering --> Hom(J,J) (in contrast to isIsolatedSingularity),
    //therefore we reset it:
-  
+
    attrib(i,"onlySingularAtZero",0);
 
    if(attrib(i,"isPrim")==1)
@@ -1034,7 +1122,7 @@ EXAMPLE: example normalizationPrimes; shows an example
       attrib(SM[2],"onlySingularAtZero",1);
    }
 
-//-------------------- Trivial cases, in each case RETURN ------------------  
+//-------------------- Trivial cases, in each case RETURN ------------------
 // input ideal is the ideal of a partial normalization
 
    // ------------ Trivial case: input ideal contains a unit ---------------
@@ -1058,7 +1146,7 @@ EXAMPLE: example normalizationPrimes; shows an example
          setring BAS;
          return(result);
    }
-   
+
    // --- Trivial case: input ideal is zero-dimensional and homog ---
    if( (dim(SM[1])==0) && (homog(SM[2])==1) )
    {
@@ -1067,8 +1155,8 @@ EXAMPLE: example normalizationPrimes; shows an example
          "// the ideal was zero-dimensional and homogeneous";
       }
       MB=maxideal(1);
-      intvec rw; 
-      list LL=substpart(MB,ihp,0,rw);     
+      intvec rw;
+      list LL=substpart(MB,ihp,0,rw);
       def newR5=LL[1];
       setring newR5;
       ideal norid=endid;
@@ -1106,7 +1194,7 @@ EXAMPLE: example normalizationPrimes; shows an example
       return(result);
    }
 
-//---------------------- The non-trivial cases start -------------------  
+//---------------------- The non-trivial cases start -------------------
    //the higher dimensional case
    //we test first hypersurface, CohenMacaulay and complete intersection
 
@@ -1134,7 +1222,7 @@ EXAMPLE: example normalizationPrimes; shows an example
    // Computation if singular locus is critical
    // Notation: J ideal of singular locus or (if given) containing it
    // JM = mstd(J) or maxideal(1),maxideal(1)
-   // JM[1] SB of singular locus, JM[2] minbasis, dimJ = dim(JM[1]) 
+   // JM[1] SB of singular locus, JM[2] minbasis, dimJ = dim(JM[1])
    // SM[1] SB of the input ideal i, SM[2] minbasis
    // Computation if singular locus is critical, because it determines the
    // size of the ring Hom_R(J,J). We only need a test ideal contained in J.
@@ -1155,7 +1243,7 @@ EXAMPLE: example normalizationPrimes; shows an example
    if( attrib(SM[2],"onlySingularAtZero") == 0 )
    {
       //--- the case where an ideal #[1] is given:
-      if( size(#)>0 )                 
+      if( size(#)>0 )
       {
          J = #[1],SM[2];
          JM = mstd(J);
@@ -1184,10 +1272,10 @@ EXAMPLE: example normalizationPrimes; shows an example
       int dimJ = dim(JM[1]);
       attrib(JM[1],"isSB",1);
       if( y>=1 )
-      {  
+      {
          "// the dimension of the singular locus is";  dimJ ; "";
       }
-         
+
       if(dim(JM[1]) <= dim(SM[1])-2)
       {
          attrib(SM[2],"isRegInCodim2",1);
@@ -1217,13 +1305,13 @@ EXAMPLE: example normalizationPrimes; shows an example
       }
 
       //------- extra check for onlySingularAtZero, relatively cheap ----------
-      //it uses the procedure 'locAtZero' from for testing 
+      //it uses the procedure 'locAtZero' from for testing
       //if an ideal is concentrated at 0
        if(y>=1)
        {
          "// extra test for onlySingularAtZero:";
        }
-       if ( locAtZero(JM[1]) )  
+       if ( locAtZero(JM[1]) )
        {
            attrib(SM[2],"onlySingularAtZero",1);
            JM = maxideal(1),maxideal(1);
@@ -1235,11 +1323,11 @@ EXAMPLE: example normalizationPrimes; shows an example
               attrib(SM[2],"onlySingularAtZero",0);
        }
    }
- 
+
   //displaying the attributes:
    if(y>=2)
    {
-      "// the attributes of the ideal are:";  
+      "// the attributes of the ideal are:";
       "// isCohenMacaulay:", attrib(SM[2],"isCohenMacaulay");
       "// isCompleteIntersection:", attrib(SM[2],"isCompleteIntersection");
       "// isHypersurface:", attrib(SM[2],"isHypersurface");
@@ -1252,7 +1340,7 @@ EXAMPLE: example normalizationPrimes; shows an example
    }
 
    //------------- case: CohenMacaulay in codim 2, RETURN ---------------
-   if( (attrib(SM[2],"isRegInCodim2")==1) &&   
+   if( (attrib(SM[2],"isRegInCodim2")==1) &&
        (attrib(SM[2],"isCohenMacaulay")==1) )
    {
       if(y>=1)
@@ -1277,7 +1365,7 @@ EXAMPLE: example normalizationPrimes; shows an example
 
 //---------- case: isolated singularity only at 0, RETURN ------------
    // In this case things are easier, we can use the maximal ideal as radical
-   // of the singular locus; 
+   // of the singular locus;
    // JM mstd of ideal of singular locus, SM mstd of input ideal
 
    if( attrib(SM[2],"onlySingularAtZero") )
@@ -1306,7 +1394,7 @@ EXAMPLE: example normalizationPrimes; shows an example
       // ------------- test for normality, compute Hom_R(J,J) -------------
       // Note:
       // HomJJ (ideal SBid, ideal id, ideal J, poly p) with
-      //        SBid = SB of id, J = radical ideal of basering  P with: 
+      //        SBid = SB of id, J = radical ideal of basering  P with:
       //        nonNormal(R) is in V(J), J contains the nonzero divisor p
       //        of R = P/id (J = test ideal)
       // returns a list l of three objects
@@ -1355,15 +1443,15 @@ EXAMPLE: example normalizationPrimes; shows an example
             //"size endid:", size(endid), size(string(endid));
 
            printlevel=printlevel+1;
-           list tluser = 
-                normalizationPrimes(endid,psi(ihp),delt,delti); 
-           //list tluser = 
-           //     normalizationPrimes(endid,psi(ihp),delt,delti,J); 
+           list tluser =
+                normalizationPrimes(endid,psi(ihp),delt,delti);
+           //list tluser =
+           //     normalizationPrimes(endid,psi(ihp),delt,delti,J);
            //#### ??? improvement: give also the old ideal of sing locus???
 
            printlevel = printlev;             //reset printlevel
-           setring BAS;   
-           return(tluser);          
+           setring BAS;
+           return(tluser);
          }
 
          // ------------------ the normal case, RETURN -----------------
@@ -1446,7 +1534,7 @@ EXAMPLE: example normalizationPrimes; shows an example
           intvec delti1 = keepresult1[size(keepresult1)][2];
           intvec delti2 = keepresult2[size(keepresult2)][2];
 
-          if( delt>=0 && delt1>=0 && delt2>=0 )  
+          if( delt>=0 && delt1>=0 && delt2>=0 )
           {  ideal idid1=id,id1;
              int mul = vdim(std(idid1));
              if ( mul>=0 )
@@ -1456,7 +1544,7 @@ EXAMPLE: example normalizationPrimes; shows an example
              else
              {
                delt = -1;
-             }            
+             }
           }
          if ( y>=1 )
          {
@@ -1510,7 +1598,7 @@ EXAMPLE: example normalizationPrimes; shows an example
 
       if(y>=1)
       {
-        "// radical is equal to:";"";  JM[2]; 
+        "// radical is equal to:";"";  JM[2];
         "";
       }
       // ------------ choose non-zerodivisor of smaller degree ----------
@@ -1534,7 +1622,7 @@ EXAMPLE: example normalizationPrimes; shows an example
      }
 
      RS=HomJJ(RR,y);               //most important subprocedure
-         
+
      // ------------------ the normal case, RETURN -----------------
      // RS[2]==1 means that the test for normality was positive
      if(RS[2]==1)
@@ -1696,7 +1784,7 @@ EXAMPLE: example normalizationPrimes; shows an example
         "// splitting in two components:";
       }
       printlevel = printlevel+1;
-      keepresult1 = 
+      keepresult1 =
                   normalizationPrimes(vid,ihp,0,0);  //1st split factor
 
       list delta1 = keepresult1[size(keepresult1)];
@@ -1718,11 +1806,11 @@ EXAMPLE: example normalizationPrimes; shows an example
       attrib(vid,"isCompleteIntersection",0);
       attrib(vid,"onlySingularAtZero",oSAZ);
 
-      keepresult2 = 
+      keepresult2 =
                     normalizationPrimes(vid,ihp,0,0);
       list delta2 = keepresult2[size(keepresult2)];   //2nd split factor
       printlevel = printlev;                          //reset printlevel
- 
+
       setring BAS;
 
       //compute intersection multiplicity of both components:
@@ -1793,7 +1881,7 @@ static proc substpart(ideal endid, ideal endphi, int homo, intvec rw)
 //subst x,y: x+y+z->f(g(z),z)+g(z)+z, eliminates x,y
 //subst y,x: x+y+z->f(y,z)+g(z)+z eliminates only x
 //HENCE: substitute vars depending on most other vars first
-//However, if the sytem xi-fi is reduced then xi does not appear in any of the 
+//However, if the sytem xi-fi is reduced then xi does not appear in any of the
 //fj and hence the order does'nt matter when substitutinp xi by fi
 
 {
@@ -1801,7 +1889,7 @@ static proc substpart(ideal endid, ideal endphi, int homo, intvec rw)
    int ii,jj;
    map phi = newRing,maxideal(1);    //identity map
    list Le = elimpart(endid);
-   //this proc and the next loop try to substitute as many variables as 
+   //this proc and the next loop try to substitute as many variables as
    //possible indices of substituted variables
 
    int q = size(Le[2]);    //q vars, stored in Le[2], have been substitutet
@@ -1903,13 +1991,13 @@ Versuch: subst statt phi
 ///////////////////////////////////////////////////////////////////////////////
 
 proc genus(ideal I,list #)
-"USAGE:   genus(I) or genus(I,1); I a 1-dimensional ideal
+"USAGE:   genus(i) or genus(i,1); I a 1-dimensional ideal
 RETURN:  an integer, the geometric genus p_g = p_a - delta of the projective
          curve defined by i, where p_a is the arithmetic genus.
 NOTE:    delta is the sum of all local delta-invariants of the singularities,
          i.e. dim(R'/R), R' the normalization of the local ring R of the
          singularity. @*
-         genus(I,1) uses the normalization to compute delta. Usually genus(i,1)
+         genus(i,1) uses the normalization to compute delta. Usually genus(i,1)
          is slower than genus(i) but sometimes not.
 EXAMPLE: example genus; shows an example
 "
@@ -2540,20 +2628,21 @@ static proc w_deg(poly p, intvec v)
 proc primeClosure (list L, list #)
 "USAGE:    primeClosure(L [,c]); L a list of a ring containing a prime ideal
                                  ker, c an optional integer
-RETURN:   a list L (of size n+1) consisting of rings L[1],...,L[n] such that@*
-          - L[1] is a copy of (not a reference to!) the input ring L[1]@*
+RETURN:   a list L (of size n+1) consisting of rings L[1],...,L[n] such that
+          - L[1] is a copy of (not a reference to!) the input ring L[1]
           - all rings L[i] contain ideals ker, L[2],...,L[n] contain ideals phi
-            such that L[1]/ker --> ... --> L[n]/ker are injections given by the
-            corresponding ideals phi, and L[n]/ker is the integral closure of
-            L[1]/ker in its quotient field.@*
+            such that
+                    L[1]/ker --> ... --> L[n]/ker
+            are injections given by the corresponding ideals phi, and L[n]/ker
+            is the integral closure of L[1]/ker in its quotient field.
           - all rings L[i] contain a polynomial nzd such that elements of
             L[i]/ker are quotients of elements of L[i-1]/ker with denominator
-            nzd via the injection phi.@*
+            nzd via the injection phi.
             L[n+1] is the delta invariant
-NOTE:     - L is constructed by recursive calls of primeClosure itself.@*
-          - c determines the choice of nzd:@*
+NOTE:     - L is constructed by recursive calls of primeClosure itself.
+          - c determines the choice of nzd:
                - c not given or equal to 0: first generator of the ideal SL,
-                 the singular locus of Spec(L[i]/ker)@*
+                 the singular locus of Spec(L[i]/ker)
                - c<>0: the generator of SL with least number of monomials.
 EXAMPLE:  example primeClosure; shows an example
 "
@@ -2602,7 +2691,9 @@ EXAMPLE:  example primeClosure; shows an example
       }
       ker=simplify(interred(ker),15);
       //execute ("ring R0="+charstr(R)+",("+varstr(R)+"),("+ordstr(R)+");");
-      def R0 = ring(Rlist);
+      // Rlist may be not defined in this new ring, so we define it again.
+      list Rlist2 = ringlist(R);
+      def R0 = ring(Rlist2);
       setring R0;
       ideal ker=fetch(R,ker);
 
@@ -2625,10 +2716,10 @@ EXAMPLE:  example primeClosure; shows an example
 // In order to apply HomJJ from normal.lib, we need the radical of the singular
 // locus of ker, J:=rad(ker):
 
-   list SM=mstd(ker); 
+   list SM=mstd(ker);
 
 // In the first iteration, we have to compute the singular locus "from
-// scratch". 
+// scratch".
 // In further iterations, we can fetch it from the previous one but
 // have to compute its radical
 // the next rings R1 contain already the (fetched) ideal
@@ -2693,7 +2784,7 @@ EXAMPLE:  example primeClosure; shows an example
   }
 
   // having computed the radical J of/in the ideal of the singular locus,
-  // we now need to pick an element nzd of J; 
+  // we now need to pick an element nzd of J;
   // NOTE: nzd must be a non-zero divisor mod ker, i.e. not contained in ker
 
   poly nzd = J[1];
@@ -2726,11 +2817,15 @@ EXAMPLE:  example primeClosure; shows an example
   }
 
   export nzd;
-  list RR = SM[1],SM[2],J,nzd;
+  // In this case we do not eliminate variables, so that the maps
+  // are well defined.
+  list RR = SM[1],SM[2],J,nzd,1;
 
   if ( dblvl >= 1 )
   {"";
      "// compute the first ring extension:";
+     "RR: ";
+     RR;
   }
 
   list RS = HomJJ(RR);
@@ -2813,7 +2908,7 @@ EXAMPLE:  example primeClosure; shows an example
       else
       {
          delt = -1;
-      }      
+      }
       L[size(L)] = delt;
 
       if (size(#)>0)
@@ -2937,7 +3032,7 @@ EXAMPLE:  example closureFrac; shows an example
               maxi[nvars(R(k))] = 0;
               maxi = maxi,maxideal(1);
               map backmap = S(k),maxi;
-         
+
               //mapstr=" map backmap = S(k),";
               //for (l=1;l<=nvars(R(k));l++)
               //{
@@ -2996,13 +3091,13 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 // closureGenerators is called inside proc normal (option "withGens" )
-// 
+//
 
-// INPUT is the output of proc primeClosure (except for the last element, the 
-// delta invariant) : hence input is a list L consisting of rings 
+// INPUT is the output of proc primeClosure (except for the last element, the
+// delta invariant) : hence input is a list L consisting of rings
 // L[1],...,L[n] (denoted R(1)...R(n) below) such that
 // - L[1] is a copy of (not a reference to!) the input ring L[1]
-// - all rings L[i] contain ideals ker, L[2],...,L[n] contain ideals phi 
+// - all rings L[i] contain ideals ker, L[2],...,L[n] contain ideals phi
 // such that
 //                L[1]/ker --> ... --> L[n]/ker
 // are injections given by the corresponding ideals phi, and L[n]/ker
@@ -3017,23 +3112,23 @@ example
 // the ith variable of R(n) as fraction of elements of the basering R(1)
 // preim[size(preim)] is a non-zero divisor of basering/i.
 
-proc closureGenerators(list L);    
+proc closureGenerators(list L);
 {
-  def Rees=basering;         // when called inside normalI (in reesclos.lib) 
+  def Rees=basering;         // when called inside normalI (in reesclos.lib)
                              // the Rees Algebra is the current basering
 
   // ------- First of all we need some variable declarations -----------
   int n = size(L);                // the number of rings R(1)-->...-->R(n)
   int length = nvars(L[n]);       // the number of variables of the last ring
   int j,k,l;
-  string mapstr;   
-  list preimages;                 
-  //Note: the empty list belongs to no ring, hence preimages can be used 
+  string mapstr;
+  list preimages;
+  //Note: the empty list belongs to no ring, hence preimages can be used
   //later in R(1)
   //this is not possible for ideals (belong always to some ring)
 
-  for (int i=1; i<=n; i++) 
-  { 
+  for (int i=1; i<=n; i++)
+  {
      def R(i)=L[i];          //give the rings from L a name
   }
 
@@ -3065,7 +3160,7 @@ proc closureGenerators(list L);
         {
           map phimap=R(k-1),phi;   //phimap:R(k-1)-->R(n), k=2..n, is the map
                                    //belonging to phi in R(n)
-        }                             
+        }
 
         p = p*phimap(nzd);
 
@@ -3120,7 +3215,7 @@ proc closureGenerators(list L);
            maxi[nvars(R(k))] = 0;
            maxi = maxi,maxideal(1);
            map backmap = S(k),maxi;
-         
+
            //mapstr=" map backmap = S(k),";
            //for (l=1;l<=nvars(R(k));l++)
            //{
@@ -3151,10 +3246,10 @@ proc closureGenerators(list L);
 ///////////////////////////////////////////////////////////////////////////////
 
 proc normalP(ideal id,list #)
-"USAGE:   normalP(id [,choose]); id a radical ideal, choose a comma separated 
+"USAGE:   normalP(id [,choose]); id a radical ideal, choose a comma separated
          list of optional strings: \"withRing\" or \"isPrim\" or \"noFac\".@*
          If choose = \"noFac\", factorization is avoided during the computation
-         of the minimal associated primes; choose = \"isPrim\" disables the 
+         of the minimal associated primes; choose = \"isPrim\" disables the
          computation of the minimal associated primes (should only be used
          if the ideal is known to be prime).@*
 ASSUME:  The characteristic of the ground field must be positive. The ideal
@@ -3164,37 +3259,37 @@ ASSUME:  The characteristic of the ground field must be positive. The ideal
          If choose = \"isPrim\" the ideal must be a prime ideal (this is not
          tested) otherwise the result may be wrong.
 RETURN:  a list, say 'nor' of size 2 (default) or, if \"withRing\" is given,
-         of size 3. @*         
-         nor[1] (resp. nor[2] if \"withRing\" is given) is a list of ideals 
-         Ii, i=1..r, in the basering where r is the number of associated prime 
+         of size 3. @*
+         nor[1] (resp. nor[2] if \"withRing\" is given) is a list of ideals
+         Ii, i=1..r, in the basering where r is the number of associated prime
          ideals P_i (irreducible components) of id.@*
-         - Ii is an ideal given by polynomials g_1,...,g_k,g_k+1 such that 
+         - Ii is an ideal given by polynomials g_1,...,g_k,g_k+1 such that
            g_1/g_k+1,...,g_k/g_k+1 generate the integral closure of
            basering/P_i as module (over the basering) in its quotient field.@*
-         
-         nor[2] (resp. nor[3] if choose=\"withRing\") is a list of an intvec 
-         of size r, the delta invariants of the r components, and an integer, 
-         the total delta invariant of basering/id (-1 means infinite, and 0 
-         that basering/P_i resp. basering/input is normal). @* 
+
+         nor[2] (resp. nor[3] if choose=\"withRing\") is a list of an intvec
+         of size r, the delta invariants of the r components, and an integer,
+         the total delta invariant of basering/id (-1 means infinite, and 0
+         that basering/P_i resp. basering/input is normal). @*
 
          If the optional string \"withRing\" is given, the ring structure of
          the normalization is computed too and nor[1] is a list of r rings.@*
          Each ring Ri = nor[1][i], i=1..r, contains two ideals with given names
          @code{norid} and @code{normap} such that @*
          - Ri/norid is the normalization of the i-th rime component P_i, i.e.
-           isomorphic to the integral closure of basering/P_i in its field 
+           isomorphic to the integral closure of basering/P_i in its field
            of fractions; @*
-         - the direct sum of the rings Ri/norid is the normalization 
+         - the direct sum of the rings Ri/norid is the normalization
            of basering/id; @*
          - @code{normap} gives the normalization map from basering/P_i to
            Ri/norid (for each i).@*
-THEORY:  The delta invariant of a reduced ring K[x1,...,xn]/id is 
+THEORY:  The delta invariant of a reduced ring K[x1,...,xn]/id is
              dim_K(normalization(K[x1,...,xn]/id) / K[x1,...,xn]/id)
-         We call this number also the delta invariant of id. normalP uses 
-         the qth-power algorithm suggested by Leonard-Pellikaan (using the 
-         Frobenius) in part similair to an implementation by Singh-Swanson. 
+         We call this number also the delta invariant of id. normalP uses
+         the qth-power algorithm suggested by Leonard-Pellikaan (using the
+         Frobenius) in part similair to an implementation by Singh-Swanson.
 NOTE:    To use the i-th ring type: @code{def R=nor[1][i]; setring R;}.
-@*       Increasing/decreasing printlevel displays more/less comments 
+@*       Increasing/decreasing printlevel displays more/less comments
          (default: printlevel = 0).
 @*       Not implemented for local or mixed orderings or quotient rings.
 @*       If the input ideal id is weighted homogeneous a weighted ordering may
@@ -3226,12 +3321,12 @@ EXAMPLE: example normalP; shows an example
      return(resu);
    }
 
-//--------------------------- define the method --------------------------- 
+//--------------------------- define the method ---------------------------
    string method;                //make all options one string in order to use
                                  //all combinations of options simultaneously
    for ( i=1; i<= size(#); i++ )
-   { 
-     if ( typeof(#[i]) == "string" ) 
+   {
+     if ( typeof(#[i]) == "string" )
      {
        method = method + #[i];
      }
@@ -3252,7 +3347,7 @@ EXAMPLE: example normalP; shows an example
 
    kill #;
    list #;
-//--------------------------- start computation --------------------------- 
+//--------------------------- start computation ---------------------------
    ideal II,K1,K2;
 
    //----------- check first (or ignore) if input id is prime -------------
@@ -3277,7 +3372,7 @@ EXAMPLE: example normalP; shows an example
       { prim = minAssGTZ(id); }
 
       if(y>=1)
-      {  
+      {
          prim;"";
          "// number of irreducible components is", size(prim);
       }
@@ -3294,7 +3389,7 @@ EXAMPLE: example normalP; shows an example
             "   --------------------------------";
          }
          if(y>=1)
-         {  "// compute SB of ideal"; 
+         {  "// compute SB of ideal";
          }
          mstdid = mstd(prim[i]);
          if(y>=1)
@@ -3302,7 +3397,7 @@ EXAMPLE: example normalP; shows an example
 
       //------- 1-st main subprocedure: compute module generators ----------
          printlevel = printlevel+1;
-         II = normalityTest(mstdid); 
+         II = normalityTest(mstdid);
 
       //------ compute also the ringstructure if "withRing" is given -------
          if ( wring )
@@ -3324,8 +3419,8 @@ EXAMPLE: example normalP; shows an example
          K1 = mstdid[1]+II;
          K1 = std(K1);
          K2 = mstdid[1]+II[1];
-         K2 = std(K2);       
-         // K1 = std(mstdid[1],II);      //### besser 
+         K2 = std(K2);
+         // K1 = std(mstdid[1],II);      //### besser
          // K2 = std(mstdid[1],II[1]);   //### besser: Hannes, fixen!
          co = codim(K1,K2);
          deli = co,deli;
@@ -3358,20 +3453,20 @@ EXAMPLE: example normalP; shows an example
    {"";
      if ( wring )
      {
-"// 'normalP' created a list, say nor, of three lists: 
+"// 'normalP' created a list, say nor, of three lists:
 // nor[1] resp. nor[2] are lists of",sr,"ring(s) resp. ideal(s)
 // and nor[3] is a list of an intvec and an integer.
 // To see the result, type
      nor;
 // To access the i-th ring nor[1][i] give it a name, say Ri, and type e.g.
      def R1 = nor[1][1]; setring R1;  norid; normap;
-// for the other rings type first setring r; (if r is the name of your 
+// for the other rings type first setring r; (if r is the name of your
 // original basering) and then continue as for the first ring;
-// Ri/norid is the affine algebra of the normalization of the i-th 
+// Ri/norid is the affine algebra of the normalization of the i-th
 // component r/P_i (where P_i is an associated prime of the input ideal)
 // and normap the normalization map from r to Ri/norid;
 //    nor[2] is a list of",sr,"ideal(s), each ideal nor[2][i] consists of
-// elements g1..gk of r such that the gj/gk generate the integral 
+// elements g1..gk of r such that the gj/gk generate the integral
 // closure of r/P_i as (r/P_i)-module in the quotient field of r/P_i.
 //    nor[3] shows the delta-invariant of each component and of the input
 // ideal (-1 means infinite, and 0 that r/P_i is normal).";
@@ -3383,7 +3478,7 @@ EXAMPLE: example normalP; shows an example
 // of elements g1..gk of the basering such that gj/gk generate the integral
 // closure of the i-th component as (basering/P_i)-module in the quotient
 // field of basering/P_i (P_i an associated prime of the input ideal);
-//    nor[2] shows the delta-invariant of each component and of the input ideal 
+//    nor[2] shows the delta-invariant of each component and of the input ideal
 // (-1 means infinite, and 0 that r/P_i is normal).";
      }
    }
@@ -3411,7 +3506,7 @@ example
 // Assume: mstdid is the result of mstd(prim[i]), prim[i] a prime component of
 // the input ideal id of normalP.
 // Output is an ideal U s.t. U[i]/U[1] are module generators.
- 
+
 static proc normalityTest(list mstdid)
 {
    int y = printlevel-voice+2;
@@ -3435,7 +3530,7 @@ static proc normalityTest(list mstdid)
 
    ideal M = minor(jacob(I),h,J); //use the command minor modulo J (hence J=0)
    M = std(M);                    //this makes M much smaller
-   //keep only minors which are not 0 mod I (!) this is important since we 
+   //keep only minors which are not 0 mod I (!) this is important since we
    //need a nzd mod I
 
    //---------------- choose nzd from ideal of singular locus --------------
@@ -3443,16 +3538,16 @@ static proc normalityTest(list mstdid)
    for( ii=2; ii<=size(M); ii++ )            //look for the shortest one
    {
       if( size(M[ii]) < size(D[1]) )
-      { 
-          D = M[ii]; 
+      {
+          D = M[ii];
       }
    }
 
    //--------------- start p-th power algorithm and return ----------------
    ideal F = var(1)^p;
    for(ii=2; ii<=n; ii++)
-   {  
-      F=F,var(ii)^p; 
+   {
+      F=F,var(ii)^p;
    }
 
    ideal Dp=D^(p-1);
@@ -3461,9 +3556,9 @@ static proc normalityTest(list mstdid)
    map phi=Q,F;
    if ( y >= 1)
    {  "compute module generators of integral closure";
-      "denominator D is:";  D;  
+      "denominator D is:";  D;
       pause();
-   }  
+   }
 
    ii=0;
    list LK;
@@ -3472,8 +3567,8 @@ static proc normalityTest(list mstdid)
       ii=ii+1;
       if ( y >= 1)
       { "iteration", ii; }
-      L = U*Dp + I;             
-      //### L=interred(L) oder msdt(L)[2]? 
+      L = U*Dp + I;
+      //### L=interred(L) oder msdt(L)[2]?
       //Wird dadurch kleiner aber string(L) wird groesser
       K = preimage(Q,phi,L);    //### Improvement by block ordering?
       option(returnSB);
@@ -3483,8 +3578,8 @@ static proc normalityTest(list mstdid)
 
    //---------------------------- simplify output --------------------------
       if(size(reduce(U,LK[1]))==0)  //previous U coincides with new U
-      {                             //i.e. we reached the integral closure 
-         U=simplify(reduce(U,groebner(D)),2); 
+      {                             //i.e. we reached the integral closure
+         U=simplify(reduce(U,groebner(D)),2);
          U = D,U;
          poly gg = gcd(U[1],U[size(U)]);
          for(ii=2; ii<=size(U)-1 ;ii++)
@@ -3497,7 +3592,7 @@ static proc normalityTest(list mstdid)
          }
          U = simplify(U,6);
          //if ( y >= 1)
-         //{ "module generators are U[i]/U[1], with U:"; U; 
+         //{ "module generators are U[i]/U[1], with U:"; U;
          //  ""; pause(); }
          option(set,op);
          setring R;
@@ -3512,17 +3607,17 @@ static proc normalityTest(list mstdid)
 
 static proc substpartSpecial(ideal endid, ideal endphi)
 {
-   //Note: newRing is of the form (R the original basering): 
+   //Note: newRing is of the form (R the original basering):
    //char(R),(T(1..N),X(1..nvars(R))),(dp(N),...);
 
    int ii,jj,kk;
    def BAS = basering;
    int n = nvars(basering);
 
-   list Le = elimpart(endid); 
+   list Le = elimpart(endid);
    int q = size(Le[2]);                   //q variables have been substituted
 //Le;"";
-   if ( q == 0 ) 
+   if ( q == 0 )
    {
       ideal normap = endphi;
       ideal norid = endid;
@@ -3545,8 +3640,8 @@ static proc substpartSpecial(ideal endid, ideal endphi)
 //endphi;"";
       list g2 = gnirlist[2];             //the varlist
       list g3 = gnirlist[3];             //contains blocks of orderings
-      int n3 = size(g3);  
-   //----------------- first identify module ordering ------------------ 
+      int n3 = size(g3);
+   //----------------- first identify module ordering ------------------
       if ( g3[n3][1]== "c" or g3[n3][1] == "C" )
       {
          list gm = g3[n3];              //last blockis module ordering
@@ -3559,7 +3654,7 @@ static proc substpartSpecial(ideal endid, ideal endphi)
          g3 = delete(g3,1);
          int m = 1;
       }
-   //---- delete variables which were substituted and weights  -------- 
+   //---- delete variables which were substituted and weights  --------
 //gnirlist;"";
       intvec V;
       int n(0);
@@ -3569,7 +3664,7 @@ static proc substpartSpecial(ideal endid, ideal endphi)
       {
          V = V,g3[ii][2];           //copy weights for ordering in each block
          if ( ii==1 )               //into one intvector
-         { 
+         {
             V = V[2..size(V)];
          }
         // int n(ii) = size(g3[ii][2]);
@@ -3597,13 +3692,13 @@ static proc substpartSpecial(ideal endid, ideal endphi)
       }
 //"newg3"; newg3;
       //newg3 = delete(newg3,1);    //delete empty list
-      
+
 /*
 //### neue Ordnung, 1 Block fuer alle vars, aber Gewichte erhalten;
 //vorerst nicht realisiert, da bei leonhard1 alte Version (neue Variable T(i)
 //ein neuer Block) ein kuerzeres Ergebnis liefert
       kill g3;
-      list g3; 
+      list g3;
       V=0;
       for ( ii= 1; ii<=n3-1; ii++ )
       {
@@ -3612,12 +3707,12 @@ static proc substpartSpecial(ideal endid, ideal endphi)
       V = V[2..size(V)];
 
       if ( V==1 )
-      {    
+      {
          g3[1] = list("dp",V);
       }
       else
       {
-         g3[1] = lis("wp",V);          
+         g3[1] = lis("wp",V);
       }
       newg3 = g3;
 
@@ -3633,7 +3728,7 @@ static proc substpartSpecial(ideal endid, ideal endphi)
       {
          newg3 = insert(newg3,gm);
       }
-      gnirlist[2] = newg2;                    
+      gnirlist[2] = newg2;
       gnirlist[3] = newg3;
 
 //gnirlist;
@@ -3647,10 +3742,10 @@ static proc substpartSpecial(ideal endid, ideal endphi)
       list L = newBAS;
       return(L);
 
-   //Hier scheint interred gut zu sein, da es Ergebnis relativ schnell 
+   //Hier scheint interred gut zu sein, da es Ergebnis relativ schnell
    //verkleinert. Hier wird z.B. bei leonard1 size(norid) verkleinert aber
    //size(string(norid)) stark vergroessert, aber es hat keine Auswirkungen
-   //da keine map mehr folgt. 
+   //da keine map mehr folgt.
    //### Bei Leonard2 haengt interred (BUG)
    //mstd[2] verkleinert norid nocheinmal um die Haelfte, dauert aber 3.71 sec
    //### Ev. Hinweis auf mstd in der Hilfe?
@@ -3661,12 +3756,12 @@ static proc substpartSpecial(ideal endid, ideal endphi)
 // Computes the ring structure of a ring given by module generators.
 // Assume: J[i]/J[1] are the module generators in the quotient field
 // with J[1] as universal denominator.
-// If option "noRed" is not given, a reduction in the number of variables is 
+// If option "noRed" is not given, a reduction in the number of variables is
 // attempted.
 static proc computeRing(ideal J, ideal I, list #)
 {
   int i, ii,jj;
-  intvec V;                          // to be used for variable weights 
+  intvec V;                          // to be used for variable weights
   int y = printlevel-voice+2;
   def R = basering;
   poly c = J[1];                     // the denominator
@@ -3675,17 +3770,17 @@ static proc computeRing(ideal J, ideal I, list #)
   int nva = nvars(basering);
   string svar;
   ideal maxid = maxideal(1);
-  
+
   int noRed = 0;     // By default, we try to reduce the number of generators.
   if(size(#) > 0){
-    if ( typeof(#[1]) == "string" ) 
+    if ( typeof(#[1]) == "string" )
     {
       if (#[1] == "noRed"){noRed = 1;}
     }
   }
 
   if ( y >= 1){"// computing the ring structure...";}
-   
+
   if(c==1)
   {
     if( defined(norid) )  { kill norid; }
@@ -3710,15 +3805,15 @@ static proc computeRing(ideal J, ideal I, list #)
   //check first whether variables T(i) and then whether Z(i),...,A(i) exist
   //old variable names are not touched
 
-  if ( find(svars,"T(") == 0 )        
+  if ( find(svars,"T(") == 0 )
   {
     svar = "T";
   }
   else
   {
-    for (ii=90; ii>=65; ii--)  
+    for (ii=90; ii>=65; ii--)
     {
-      if ( find(svars,ASCII(ii)+"(") == 0 )        
+      if ( find(svars,ASCII(ii)+"(") == 0 )
       {
         svar = ASCII(ii);  break;
       }
@@ -3734,7 +3829,7 @@ static proc computeRing(ideal J, ideal I, list #)
     }
   }
   else
-  {       
+  {
     for ( ii=q; ii>=1; ii-- )
     {
       gnirlist[2] = insert(gnirlist[2],"T("+string(100*nva+ii)+")");
@@ -3752,28 +3847,28 @@ static proc computeRing(ideal J, ideal I, list #)
   //alt: ring newR = char(R),(X(1..nvars(R)),T(1..q)),dp;
   //Reihenfolge geändert:neue Variablen kommen zuerst, Namen ev. nicht T(i)
 
-  def newR = ring(gnirlist);   
+  def newR = ring(gnirlist);
   setring newR;                //new extended ring
   ideal I = imap(R,I);
 
   //------------- Compute linear and quadratic relations ---------------
   if(y>=1)
   {
-     "// compute linear relations:"; 
+     "// compute linear relations:";
   }
   qring newQ = std(I);
-  
+
   ideal f = imap(R,J);
   module syzf = syz(f);
-  ideal pf = f[1]*f;               
+  ideal pf = f[1]*f;
   //f[1] is the denominator D from normalityTest, a non zero divisor of R/I
 
   ideal newT = maxideal(1);
   newT = 1,newT[1..q];
   //matrix T = matrix(ideal(1,T(1..q)),1,q+1);   //alt
-  matrix T = matrix(newT,1,q+1); 
+  matrix T = matrix(newT,1,q+1);
   ideal Lin = ideal(T*syzf);
-  //Lin=interred(Lin); 
+  //Lin=interred(Lin);
   //### interred reduziert ev size aber size(string(LIN)) wird groesser
 
   if(y>=1)
@@ -3788,7 +3883,7 @@ static proc computeRing(ideal J, ideal I, list #)
 
   if(y>=1)
   {
-    "// compute quadratic relations:"; 
+    "// compute quadratic relations:";
   }
   matrix A;
   ideal Quad;
@@ -3805,13 +3900,13 @@ static proc computeRing(ideal J, ideal I, list #)
       // For non-global orderings, we have to take care of the units.
       if(ord_test(basering) != 1){
         A = lift(pf, ff, u);
-        Quad = Quad,ideal(newT[jj-1]*newT[ii-1] * u[1, 1]- T*A);  
+        Quad = Quad,ideal(newT[jj-1]*newT[ii-1] * u[1, 1]- T*A);
       } else {
         A = lift(pf,ff);              // ff lin. comb. of elts of pf mod I
         Quad = Quad,ideal(newT[jj-1]*newT[ii-1] - T*A);
       }
       //A = lift(pf, f[ii]*f[jj]);
-      //Quad = Quad, ideal(T(jj-1)*T(ii-1) - T*A);  
+      //Quad = Quad, ideal(T(jj-1)*T(ii-1) - T*A);
     }
   }
   Quad = Quad[2..ncols(Quad)];
@@ -3830,7 +3925,7 @@ static proc computeRing(ideal J, ideal I, list #)
   //### weglassen, ist sehr zeitaufwendig.
   //Ebenso interred, z.B. bei Leonard1 (1. Komponente von Leonard):
   //"size Q1:", size(Q1), size(string(Q1));   //75 60083
-  //Q1 = interred(Q1); 
+  //Q1 = interred(Q1);
   //"size Q1:", size(Q1), size(string(Q1));   //73 231956 (!)
   //### Speicherueberlauf bei substpartSpecial bei 'ideal norid  = phi1(endid)'
   //Beispiel fuer Hans um map zu testen!
@@ -3839,7 +3934,7 @@ static proc computeRing(ideal J, ideal I, list #)
   ideal endid  = imap(newQ,Q1),I;
   ideal endphi = imap(R,maxid);
 
-  if(noRed == 0){   
+  if(noRed == 0){
     list L=substpartSpecial(endid,endphi);
     def lastRing=L[1];
     if(y>=1)
@@ -3855,7 +3950,7 @@ static proc computeRing(ideal J, ideal I, list #)
     export(normap);
     setring R;
     return(newR);
-  }   
+  }
 }
 
 //                Up to here: procedures for char p with Frobenius
@@ -3872,7 +3967,7 @@ static proc normalM(ideal I, int decomp, int withDelta){
 // Output: a list of 3 elements (resp 4 if withDelta = 1), say nor.
 // - nor[1] = U, an ideal of R.
 // - nor[2] = c, an element of R.
-// U and c satisfy that 1/c * U is the normalization of R / I in the 
+// U and c satisfy that 1/c * U is the normalization of R / I in the
 // quotient field Q(R/I).
 // - nor[3] = ring say T, containing two ideals norid and normap such that
 // normap gives the normalization map from R / I to T / norid.
@@ -3880,26 +3975,26 @@ static proc normalM(ideal I, int decomp, int withDelta){
 
 // Details:
 // --------
-// Computes the ideal of the minors in the first step and then reuses it in all 
+// Computes the ideal of the minors in the first step and then reuses it in all
 // steps.
-// In step s, the denominator is D^s, where D is a nzd of the original quotient 
+// In step s, the denominator is D^s, where D is a nzd of the original quotient
 // ring, contained in the radical of the singular locus.
-// This denominator is used except when the degree of D^i is greater than the 
+// This denominator is used except when the degree of D^i is greater than the
 // degree of a conductor.
-// The nzd is taken as the smallest degree polynomial in the radical of the 
+// The nzd is taken as the smallest degree polynomial in the radical of the
 // singular locus.
 
-// It assumes that the ideal I is equidimensional radical. This is not checked 
+// It assumes that the ideal I is equidimensional radical. This is not checked
 // in the procedure!
-// If decomp = 0 or decomp = 3 it assumes further that I is prime. Therefore 
-// any non-zero element in the jacobian ideal is assumed to be a 
+// If decomp = 0 or decomp = 3 it assumes further that I is prime. Therefore
+// any non-zero element in the jacobian ideal is assumed to be a
 // non-zerodivisor.
 
 // It works over the given basering.
-// If it has a non-global ordering, it changes it to dp global only for 
+// If it has a non-global ordering, it changes it to dp global only for
 // computing radical.
 
-// The delta invariant is only computed if withDelta = 1, and decomp = 0 or 
+// The delta invariant is only computed if withDelta = 1, and decomp = 0 or
 // decomp = 3 (meaning that the ideal is prime).
 
   option("redSB");
@@ -3912,8 +4007,8 @@ static proc normalM(ideal I, int decomp, int withDelta){
   poly c;                     // The common denominator.
 
   def R = basering;
-    
-  // ---------------- computation of the singular locus --------------------- 
+
+  // ---------------- computation of the singular locus ---------------------
   // We compute the radical of the ideal of minors modulo the original ideal.
   // This is done only in the first step.
 
@@ -3928,7 +4023,7 @@ static proc normalM(ideal I, int decomp, int withDelta){
     ideal IMin = I;
   }
   int d = dim(I);
-  
+
   qring Q = I;   // We work in the quotient by the groebner base of the ideal I
   option("redSB");
   option("returnSB");
@@ -3939,20 +4034,20 @@ static proc normalM(ideal I, int decomp, int withDelta){
   dbprint(dbg, "Computing the jacobian ideal...");
   ideal J = minor(jacob(IMin), nvars(basering) - d, I);
   J = groebner(J);
-  
-  // -------------------- election of the conductor -------------------------   
-  poly condu = getSmallest(J);   // Choses the polynomial of smallest degree 
+
+  // -------------------- election of the conductor -------------------------
+  poly condu = getSmallest(J);   // Choses the polynomial of smallest degree
                                  // of J as universal denominator.
   if(dbg >= 1){
     "";
     "The universal denominator is ", condu;
   }
 
-  // ---------  splitting the ideal by the conductor (if possible) ----------- 
-  // If the ideal is equidimensional, but not necessarily prime, we check if 
+  // ---------  splitting the ideal by the conductor (if possible) -----------
+  // If the ideal is equidimensional, but not necessarily prime, we check if
   // the conductor is a non-zerodivisor of R/I.
   // If not, we split I.
-  if((decomp == 1) or (decomp == 2)){  
+  if((decomp == 1) or (decomp == 2)){
     ideal Id1 = quotient(0, condu);
     if(size(Id1) > 0){
       // We have to split.
@@ -3967,14 +4062,14 @@ static proc normalM(ideal I, int decomp, int withDelta){
       printlevel = printlevel + 1;
       list nor1 = normalM(Id1, decomp, withDelta)[1];
       list nor2 = normalM(Id2, decomp, withDelta)[1];
-      printlevel = printlevel - 1;    
+      printlevel = printlevel - 1;
       return(list(nor1, nor2));
     }
   }
 
-  // --------------- computation of the first test ideal ---------------------   
+  // --------------- computation of the first test ideal ---------------------
   // To compute the radical we go back to the original ring.
-  // If we are using a non-global ordering, we must change to the global 
+  // If we are using a non-global ordering, we must change to the global
   // ordering.
   if(isGlobal == 1){
     setring R;
@@ -3986,7 +4081,14 @@ static proc normalM(ideal I, int decomp, int withDelta){
       if(dbg >= 2){pause();}
        "";
     }
-    J = radical(J);
+    // We check if the only singular point is the origin.
+    // If so, the radical is the maximal ideal at the origin.
+    J = groebner(J);
+    if(locAtZero(J)){
+      J = maxideal(1);
+    } else {
+      J = radical(J);
+    }
   } else {
     // We change to global dp ordering.
     list rl = ringlist(R);
@@ -4008,29 +4110,29 @@ static proc normalM(ideal I, int decomp, int withDelta){
     setring R;
     ideal J = fetch(globR, J);
   }
-    
+
   if(dbg >= 1){
     "The radical of the original singular locus is";
     J;
     if(dbg>=2){pause();}
   }
 
-  // ---------------- election of the non zero divisor --------------------- 
+  // ---------------- election of the non zero divisor ---------------------
   setring Q;
   J = fetch(R, J);
-  J = interred(J);          
-  poly D = getSmallest(J);    // Chooses the poly of smallest degree as 
+  J = interred(J);
+  poly D = getSmallest(J);    // Chooses the poly of smallest degree as
                               // non-zerodivisor.
   if(dbg >= 1){
     "The non zero divisor is ", D;
     "";
   }
 
-  // ------- splitting the ideal by the non-zerodivisor (if possible) --------   
+  // ------- splitting the ideal by the non-zerodivisor (if possible) --------
   // If the ideal is equidimensional, but not necessarily prime, we check if D
   // is actually a non-zerodivisor of R/I.
   // If not, we split I.
-  if((decomp == 1) or (decomp == 2)){  
+  if((decomp == 1) or (decomp == 2)){
     // We check if D is actually a non-zerodivisor of R/I.
     // If not, we split I.
     Id1 = quotient(0, D);
@@ -4038,7 +4140,7 @@ static proc normalM(ideal I, int decomp, int withDelta){
       // We have to split.
       if(dbg >= 1){
         "A zerodivisor was found. We split the ideal. The zerodivisor is ", D;
-      }    
+      }
       setring R;
       ideal Id1 = fetch(Q, Id1), I;
       Id1 = groebner(Id1);
@@ -4047,12 +4149,12 @@ static proc normalM(ideal I, int decomp, int withDelta){
       printlevel = printlevel + 1;
       list nor1 = normalM(Id1, decomp, withDelta)[1];
       list nor2 = normalM(Id2, decomp, withDelta)[1];
-      printlevel = printlevel - 1;    
-      return(list(nor1, nor2));    
+      printlevel = printlevel - 1;
+      return(list(nor1, nor2));
     }
   }
 
-  // --------------------- normalization ------------------------------------ 
+  // --------------------- normalization ------------------------------------
   // We call normalMEqui to compute the normalization.
   setring R;
   poly D = fetch(Q, D);
@@ -4065,7 +4167,7 @@ static proc normalM(ideal I, int decomp, int withDelta){
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-  
+
 static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
 // Here is where the normalization is actually computed.
 
@@ -4082,17 +4184,17 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
   int isNormal = 0;                   // check for exiting the loop
   int isGlobal = ord_test(basering);
   int delt;
-  
+
   def R = basering;
   poly c = D;
   ideal U;
   ideal cJ;
   list testOut;                 // Output of proc testIdeal
                                 // (the test ideal and the ring structure)
-    
+
   qring Q = groebner(I);
   option("redSB");
-  option("returnSB");  
+  option("returnSB");
   ideal J = imap(R, origJ);
   poly c = imap(R, c);
   poly D = imap(R, D);
@@ -4102,16 +4204,16 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
 
   dbprint(dbg, "Preliminar step begins.");
 
-  // --------------------- computation of A1 ------------------------------- 
+  // --------------------- computation of A1 -------------------------------
   dbprint(dbg, "Computing the quotient (DJ : J)...");
-  ideal U = groebner(quotient(D*J, J));  
+  ideal U = groebner(quotient(D*J, J));
   ideal oldU = 1;
 
   if(dbg >= 2){
     "The quotient is"; U;
   }
 
-  // ----------------- Grauer-Remmert criterion check ----------------------- 
+  // ----------------- Grauer-Remmert criterion check -----------------------
   // We check if the equality in Grauert - Remmert criterion is satisfied.
   isNormal = checkInclusions(D*oldU, U);
   if(isNormal == 0){
@@ -4119,7 +4221,7 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
       "In this step, we have the ring 1/c * U, with c =", c;
       "and U = "; U;
     }
-  } else {        
+  } else {
     // The original ring R/I was normal. Nothing to do.
     // We define anyway a new ring, equal to R, to be able to return it.
     setring R;
@@ -4139,7 +4241,7 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
     return(output);
   }
 
-  // ----- computation of the chain of ideals A1 c A2 c ... c An ------------ 
+  // ----- computation of the chain of ideals A1 c A2 c ... c An ------------
   while(isNormal == 0){
     step++;
     if(dbg >= 1){
@@ -4147,9 +4249,9 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
       "Step ", step, " begins.";
     }
     dbprint(dbg, "Computing the test ideal...");
-    
-    // --------------- computation of the test ideal ------------------------ 
-    // Computes a test ideal for the new ring. 
+
+    // --------------- computation of the test ideal ------------------------
+    // Computes a test ideal for the new ring.
     // The test ideal will be the radical in the new ring of the original
     // test ideal.
     setring R;
@@ -4157,13 +4259,13 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
     c = imap(Q, c);
     testOut = testIdeal(I, U, origJ, c, D);
     cJ = testOut[1];
-    
+
     setring Q;
     cJ = imap(R, cJ);
     cJ = groebner(cJ);
-    
+
     // cJ / c is now the ideal mapped back.
-    // We have the generators as an ideal in the new ring, 
+    // We have the generators as an ideal in the new ring,
     // but we want the generators as an ideal in the original ring.
     cJMod = getGenerators(cJ, U, c);
 
@@ -4171,27 +4273,27 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
       "The test ideal in this step is ";
       cJMod;
     }
-    
+
     cJ = cJMod;
 
-    // ------------- computation of the quotient (DJ : J)-------------------- 
+    // ------------- computation of the quotient (DJ : J)--------------------
     oldU = U;
     dbprint(dbg, "Computing the quotient (c*D*cJ : cJ)...");
     U = quotient(c*D*cJ, cJ);
     if(dbg >= 2){"The quotient is "; U;}
 
-    // ------------- Grauert - Remmert criterion check ---------------------- 
+    // ------------- Grauert - Remmert criterion check ----------------------
     // We check if the equality in Grauert - Remmert criterion is satisfied.
     isNormal = checkInclusions(D*oldU, U);
 
-    if(isNormal == 1){        
-      // We go one step back. In the last step we didnt get antyhing new, 
+    if(isNormal == 1){
+      // We go one step back. In the last step we didnt get antyhing new,
       // we just verified that the ring was already normal.
       dbprint(dbg, "The ring in the previous step was already normal.");
       dbprint(dbg, "");
       U = oldU;
     } else {
-      // ------------- preparation for next iteration ---------------------- 
+      // ------------- preparation for next iteration ----------------------
       // We have to go on.
       // The new denominator is chosen.
       c = D * c;
@@ -4208,13 +4310,13 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
     }
   }
 
-  // ------------------------- delta computation ---------------------------- 
-  if(withDelta){ 
+  // ------------------------- delta computation ----------------------------
+  if(withDelta){
     ideal UD = groebner(U);
     delt = vdim(std(modulo(UD, c)));
   }
-  
-  // -------------------------- prepare output -----------------------------   
+
+  // -------------------------- prepare output -----------------------------
   setring R;
   U = fetch(Q, U);
   c = fetch(Q, c);
@@ -4227,7 +4329,31 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
     list output = U, c, ere;
   }
   return(output);
- 
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc lineUpLast(ideal U, poly c)
+// Sets c as the last generator of U.
+{
+  int i;
+  ideal newU;
+  for (i = 1; i <= ncols(U); i++){
+    if(U[i] != c){
+      if(size(newU) == 0){
+        newU = U[i];
+      } else {
+        newU = newU, U[i];
+      }
+    }
+  }
+  if(size(newU) == 0){
+    newU = c;
+  } else {
+    newU = newU, c;
+  }
+  return(newU);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -4249,7 +4375,7 @@ static proc lineUp(ideal U, poly c)
 
 static proc getSmallest(ideal J){
 // Computes the polynomial of smallest degree of J.
-// If there are more than one, it chooses the one with smallest number 
+// If there are more than one, it chooses the one with smallest number
 // of monomials.
   int i;
   poly p = J[1];
@@ -4282,7 +4408,7 @@ static proc getGenerators(ideal J, ideal U, poly c){
 // The new ring is given by 1/c * U in the total ring of fractions.
 
   int i, j;                             // counters;
-  int dbg = printlevel - voice + 2;     // dbg = printlevel (default: dbg = 0)  
+  int dbg = printlevel - voice + 2;     // dbg = printlevel (default: dbg = 0)
   poly p;                               // The lifted polynomial
   ideal JGr = groebner(J);              // Groebner base of J
 
@@ -4310,20 +4436,20 @@ static proc getGenerators(ideal J, ideal U, poly c){
 static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D){
 // Internal procedure, used in normalM.
 // Computes the test ideal in the new ring.
-// It takes the original test ideal and computes the radical of it in the 
+// It takes the original test ideal and computes the radical of it in the
 // new ring.
 
 // The new ring is 1/c * U.
 // The original test ideal is origJ.
 // The original ring is R / I, where R is the basering.
   int i;                                // counter
-  int dbg = printlevel - voice + 2;     // dbg = printlevel (default: dbg = 0)  
+  int dbg = printlevel - voice + 2;     // dbg = printlevel (default: dbg = 0)
   def R = basering;                      // We dont work in the quo
   ideal J = origJ;
-  
+
   // ---------- computation of the ring structure of 1/c * U ----------------
   U = lineUp(U, c);
-  
+
   if(dbg > 1){"Computing the new ring structure...";}
   list ele = computeRing(U, I, "noRed");
 
@@ -4331,15 +4457,15 @@ static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D){
   setring origEre;
   if(dbg > 1){"The relations are"; norid;}
 
-  // ---------------- setting the ring to work in  --------------------------  
-  int isGlobal = ord_test(origEre);      // Checks if the original ring has 
+  // ---------------- setting the ring to work in  --------------------------
+  int isGlobal = ord_test(origEre);      // Checks if the original ring has
                                          // global ordering.
   if(isGlobal != 1){
     list rl = ringlist(origEre);
     list origOrd = rl[3];
     list newOrd = list("dp", intvec(1:nvars(origEre))), list("C", 0);
     rl[3] = newOrd;
-    def ere = ring(rl);     // globR is the original ring but 
+    def ere = ring(rl);     // globR is the original ring but
                             // with a global ordering.
     setring ere;
     ideal norid = imap(origEre, norid);
@@ -4352,43 +4478,43 @@ static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D){
   J = J, norid, I;
 
 
-  // ----- computation of the test ideal using the ring structure of Ai -----  
+  // ----- computation of the test ideal using the ring structure of Ai -----
   option("redSB");
   option("returnSB");
 
   if(dbg > 1){"Computing the radical of J...";}
   J = radical(J);
   if(dbg > 1){"Computing the interreduction of the radical...";}
-  J = groebner(J);  
+  J = groebner(J);
   //J = interred(J);
   if(dbg > 1){
     "The radical in the generated ring is";
     J;
     if(dbg>4){pause();}
   }
-  
+
   setring ere;
-  
-  // -------------- map from Ai to the total ring of fractions ---------------  
+
+  // -------------- map from Ai to the total ring of fractions ---------------
   // Now we must map back this ideal J to U_i / c in the total ring of
   // fractions.
   // The map sends T_j -> u_j / c.
   // The map is built by the following steps:
-  // 1) We compute the degree of the generators of J with respect to the 
+  // 1) We compute the degree of the generators of J with respect to the
   //    new variables T_j.
   // 2) For each generator, we multiply each term by a power of c, as if
   //    taking c^n as a common denominator (considering the new variables as
   //    a polynomial in the old variables divided by c).
   // 3) We replace the new variables T_j by the corresponding numerator u_j.
-  // 4) We lift the resulting polynomial to change the denominator 
+  // 4) We lift the resulting polynomial to change the denominator
   //    from c^n to c.
   int nNewVars = nvars(ere) - nvars(R);      // Number of new variables
   poly c = imap(R, c);
-  intvec @v = 1..nNewVars;    // Vector of the new variables. 
+  intvec @v = 1..nNewVars;    // Vector of the new variables.
                               // They must be the first ones.
   if(dbg > 1){"The indices of the new variables are", @v;}
 
-  // ---------------------- step 1 of the mapping ---------------------------  
+  // ---------------------- step 1 of the mapping ---------------------------
   intvec degs;
   for(i = 1; i<=ncols(J); i++){
     degs[i] = degSubring(J[i], @v);
@@ -4397,29 +4523,29 @@ static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D){
     "The degrees with respect to the new variables are";
     degs;
   }
-  
-  // ---------------------- step 2 of the mapping ---------------------------    
+
+  // ---------------------- step 2 of the mapping ---------------------------
   ideal mapJ = mapBackIdeal(J, c, @v);
-  
+
   setring R;
 
-  // ---------------------- step 3 of the mapping ---------------------------  
+  // ---------------------- step 3 of the mapping ---------------------------
   ideal z;                    // The variables of the original ring in order.
   for(i = 1; i<=nvars(R); i++){
     z[i] = var(i);
   }
-      
+
   map f = ere, U[2..ncols(U)], z[1..ncols(z)]; // The map to the original ring.
   if(dbg > 1){
     "The map is ";
     f;
     if(dbg>4){pause();}
   }
-  
+
   if(dbg > 1){
     "Computing the map...";
   }
-      
+
   J = f(mapJ);
   if(dbg > 1){
     "The ideal J mapped back (before lifting) is";
@@ -4427,7 +4553,7 @@ static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D){
     if(dbg>4){pause();}
   }
 
-  // ---------------------- step 4 of the mapping ---------------------------    
+  // ---------------------- step 4 of the mapping ---------------------------
   qring Q = groebner(I);
   ideal J = imap(R, J);
   poly c = imap(R, c);
@@ -4447,19 +4573,19 @@ static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D){
     if(dbg>4){pause();}
   }
 
-  // --------------------------- prepare output ----------------------------    
+  // --------------------------- prepare output ----------------------------
   J = groebner(J);
-  
+
   setring R;
   J = imap(Q, J);
-  
+
   return(list(J, ele[1]));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc changeDenominator(ideal U1, poly c1, poly c2, ideal I){
-// Given a ring in the form 1/c1 * U, it computes a new ideal U2 such that the 
+// Given a ring in the form 1/c1 * U, it computes a new ideal U2 such that the
 // ring is 1/c2 * U2.
 // The base ring is R, but the computations are to be done in R / I.
   int a;      // counter
@@ -4477,7 +4603,7 @@ static proc changeDenominator(ideal U1, poly c1, poly c2, ideal I){
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc changeDenominatorQ(ideal U1, poly c1, poly c2){
-// Given a ring in the form 1/c1 * U, it computes a new U2 st the ring 
+// Given a ring in the form 1/c1 * U, it computes a new U2 st the ring
 // is 1/c2 * U2.
 // The base ring is already a quotient ring R / I.
   int a;      // counter
@@ -4493,20 +4619,20 @@ static proc changeDenominatorQ(ideal U1, poly c1, poly c2){
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc checkInclusions(ideal U1, ideal U2){
-// Checks if the identity A = Hom(J, J) of Grauert-Remmert criterion is 
+// Checks if the identity A = Hom(J, J) of Grauert-Remmert criterion is
 // satisfied.
   int dbg = printlevel - voice + 2;     // dbg = printlevel (default: dbg = 0)
   list reduction1;
   list reduction2;
-  
-  // ---------------------- inclusion Hom(J, J) c A -------------------------  
+
+  // ---------------------- inclusion Hom(J, J) c A -------------------------
   if(dbg > 1){"Checking the inclusion Hom(J, J) c A:";}
   // This interred is used only because a bug in groebner!
   U1 = groebner(U1);
   reduction1 = reduce(U2, U1);
   if(dbg > 1){reduction1[1];}
 
-  // ---------------------- inclusion A c Hom(J, J) -------------------------  
+  // ---------------------- inclusion A c Hom(J, J) -------------------------
   // The following check should always be satisfied.
   // This is only used for debugging.
   if(dbg > 1){
@@ -4522,7 +4648,7 @@ static proc checkInclusions(ideal U1, ideal U2){
       if(dbg>4){pause();}
     }
   }
-  
+
   if(size(reduction1[1]) == 0){
     // We are done! The ring computed in the last step was normal.
     return(1);
@@ -4547,11 +4673,11 @@ static proc degSubring(poly p, intvec @v){
   }
   return(d);
 }
-    
+
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc mapBackIdeal(ideal I, poly c, intvec @v){
-// Modifies all polynomials in I so that a map x(i) -> y(i)/c can be 
+// Modifies all polynomials in I so that a map x(i) -> y(i)/c can be
 // carried out.
 
 // v indicates wicih variables x(i) of the ring will be mapped to y(i)/c.
@@ -4566,7 +4692,7 @@ static proc mapBackIdeal(ideal I, poly c, intvec @v){
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc mapBackPoly(poly p, poly c, intvec @v){
-// Multiplies each monomial of p by a power of c so that a map x(i) -> y(i)/c 
+// Multiplies each monomial of p by a power of c so that a map x(i) -> y(i)/c
 // can be carried out.
 
 // v indicates wicih variables x(i) of the ring will be mapped to y(i)/c.
@@ -4593,21 +4719,21 @@ static proc mapBackPoly(poly p, poly c, intvec @v){
 // special cases
 //NOTE:  We use the following attributes:
 // 1     attrib(id,"isCohenMacaulay");         //--- Cohen Macaulay
-// 2     attrib(id,"isCompleteIntersection");  //--- complete intersection  
-// 3     attrib(id,"isHypersurface");          //--- hypersurface 
-// 4     attrib(id,"isEquidimensional");       //--- equidimensional ideal 
-// 5     attrib(id,"isPrim");                  //--- prime ideal 
-// 6     attrib(id,"isRegInCodim2");           //--- regular in codimension 2 
-// 7     attrib(id,"isIsolatedSingularity");   //--- isolated singularities 
-// 8     attrib(id,"onlySingularAtZero");      //--- only singular at 0 
-// 9     attrib(id,"isRadical");               //--- radical ideal 
+// 2     attrib(id,"isCompleteIntersection");  //--- complete intersection
+// 3     attrib(id,"isHypersurface");          //--- hypersurface
+// 4     attrib(id,"isEquidimensional");       //--- equidimensional ideal
+// 5     attrib(id,"isPrim");                  //--- prime ideal
+// 6     attrib(id,"isRegInCodim2");           //--- regular in codimension 2
+// 7     attrib(id,"isIsolatedSingularity");   //--- isolated singularities
+// 8     attrib(id,"onlySingularAtZero");      //--- only singular at 0
+// 9     attrib(id,"isRadical");               //--- radical ideal
 //Recall: (attrib(id,"xy"),1) sets attrib xy to TRUE and
 //        (attrib(id,"xy"),0) to FALSE
 
 static proc getAttrib (ideal id)
 "USAGE:   getAttrib(id);  id=ideal
-COMPUTE: check attributes for id. If the attributes above are defined, 
-         take its value, otherwise define it and set it to 0 
+COMPUTE: check attributes for id. If the attributes above are defined,
+         take its value, otherwise define it and set it to 0
 RETURN:  intvec of size 9, with entries 0 or 1,  values of attributes defined
          above (in this order)
 EXAMPLE: no example
@@ -4615,48 +4741,48 @@ EXAMPLE: no example
 {
   int isCoM,isCoI,isHy,isEq,isPr,isReg,isIso,oSAZ,isRad;
 
-  if( typeof(attrib(id,"isCohenMacaulay"))=="int" )   
+  if( typeof(attrib(id,"isCohenMacaulay"))=="int" )
   {
-    if( attrib(id,"isCohenMacaulay")==1 ) 
+    if( attrib(id,"isCohenMacaulay")==1 )
     { isCoM=1; isEq=1; }
   }
 
   if( typeof(attrib(id,"isCompleteIntersection"))=="int" )
   {
-    if(attrib(id,"isCompleteIntersection")==1) 
+    if(attrib(id,"isCompleteIntersection")==1)
     { isCoI=1; isCoM=1; isEq=1; }
   }
-    
+
   if( typeof(attrib(id,"isHypersurface"))=="int" )
   {
     if(attrib(id,"isHypersurface")==1)
     { isHy=1; isCoI=1; isCoM=1; isEq=1; }
   }
-   
+
   if( typeof(attrib(id,"isEquidimensional"))=="int" )
   {
-    if(attrib(id,"isEquidimensional")==1) 
+    if(attrib(id,"isEquidimensional")==1)
     { isEq=1; }
   }
-   
+
   if( typeof(attrib(id,"isPrim"))=="int" )
   {
-    if(attrib(id,"isPrim")==1)  
+    if(attrib(id,"isPrim")==1)
     { isPr=1; }
   }
 
   if( typeof(attrib(id,"isRegInCodim2"))=="int" )
   {
-    if(attrib(id,"isRegInCodim2")==1)  
+    if(attrib(id,"isRegInCodim2")==1)
     { isReg=1; }
   }
-   
+
   if( typeof(attrib(id,"isIsolatedSingularity"))=="int" )
   {
-    if(attrib(id,"isIsolatedSingularity")==1)  
+    if(attrib(id,"isIsolatedSingularity")==1)
     { isIso=1; }
   }
- 
+
   if( typeof(attrib(id,"onlySingularAtZero"))=="int" )
   {
     if(attrib(id,"onlySingularAtZero")==1)
@@ -4665,7 +4791,7 @@ EXAMPLE: no example
 
   if( typeof(attrib(id,"isRad"))=="int" )
   {
-    if(attrib(id,"isRad")==1)  
+    if(attrib(id,"isRad")==1)
     { isRad=1; }
   }
 
@@ -4683,14 +4809,14 @@ EXAMPLE: no example
 "
 {
   attrib(id,"isCohenMacaulay",atr[1]);         //--- Cohen Macaulay
-  attrib(id,"isCompleteIntersection",atr[2]);  //--- complete intersection  
-  attrib(id,"isHypersurface",atr[3]);          //--- hypersurface 
-  attrib(id,"isEquidimensional",atr[4]);       //--- equidimensional ideal 
-  attrib(id,"isPrim",atr[5]);                  //--- prime ideal 
-  attrib(id,"isRegInCodim2",atr[6]);           //--- regular in codimension 2 
-  attrib(id,"isIsolatedSingularity",atr[7]);   //--- isolated singularities 
-  attrib(id,"onlySingularAtZero",atr[8]);      //--- only singular at 0 
-  attrib(id,"isRadical",atr[9]);               //--- radical ideal 
+  attrib(id,"isCompleteIntersection",atr[2]);  //--- complete intersection
+  attrib(id,"isHypersurface",atr[3]);          //--- hypersurface
+  attrib(id,"isEquidimensional",atr[4]);       //--- equidimensional ideal
+  attrib(id,"isPrim",atr[5]);                  //--- prime ideal
+  attrib(id,"isRegInCodim2",atr[6]);           //--- regular in codimension 2
+  attrib(id,"isIsolatedSingularity",atr[7]);   //--- isolated singularities
+  attrib(id,"onlySingularAtZero",atr[8]);      //--- only singular at 0
+  attrib(id,"isRadical",atr[9]);               //--- radical ideal
 
   return(id);
 }
@@ -4705,7 +4831,7 @@ RETURN:  id, with assigned attributes from id1
 EXAMPLE: no example
 "
 {
-  if( typeof(attrib(id1,"isCohenMacaulay"))=="int" )   
+  if( typeof(attrib(id1,"isCohenMacaulay"))=="int" )
   {
     if( attrib(id1,"isCohenMacaulay")==1 )
     {
@@ -4715,7 +4841,7 @@ EXAMPLE: no example
   else
   {
     attrib(id,"isCohenMacaulay",0);
-  }  
+  }
 
   if( typeof(attrib(id1,"isCompleteIntersection"))=="int" )
   {
@@ -4729,7 +4855,7 @@ EXAMPLE: no example
   {
     attrib(id,"isCompleteIntersection",0);
   }
-    
+
   if( typeof(attrib(id1,"isHypersurface"))=="int" )
   {
     if(attrib(id1,"isHypersurface")==1)
@@ -4743,7 +4869,7 @@ EXAMPLE: no example
   {
     attrib(id,"isHypersurface",0);
   }
-   
+
   if( (typeof(attrib(id1,"isEquidimensional"))=="int") )
   {
     if(attrib(id1,"isEquidimensional")==1)
@@ -4767,7 +4893,7 @@ EXAMPLE: no example
   {
     attrib(id,"isPrim",0);
   }
-   
+
   if( (typeof(attrib(id1,"isRegInCodim2"))=="int") )
   {
     if(attrib(id1,"isRegInCodim2")==1)
@@ -4779,7 +4905,7 @@ EXAMPLE: no example
   {
     attrib(id,"isRegInCodim2",0);
   }
-    
+
   if( (typeof(attrib(id1,"isIsolatedSingularity"))=="int") )
   {
     if(attrib(id1,"isIsolatedSingularity")==1)
@@ -4791,7 +4917,7 @@ EXAMPLE: no example
   {
     attrib(id,"isIsolatedSingularity",0);
   }
- 
+
   if( typeof(attrib(id1,"onlySingularAtZero"))=="int" )
   {
     if(attrib(id1,"onlySingularAtZero")==1)
@@ -4806,7 +4932,7 @@ EXAMPLE: no example
 
   if( typeof(attrib(id1,"isRad"))=="int" )
   {
-    if(attrib(id1,"isRad")==1)  
+    if(attrib(id1,"isRad")==1)
     {
       attrib(id,"isRad",1);
     }
@@ -4820,61 +4946,61 @@ EXAMPLE: no example
 }
 
 proc normalC(ideal id, list #)
-"USAGE:   normalC(id [,choose]);  id = radical ideal, choose = optional string 
+"USAGE:   normalC(id [,choose]);  id = radical ideal, choose = optional string
          which may be a combination of \"equidim\", \"prim\", \"withGens\",
          \"isPrim\", \"noFac\".@*
          If choose is not given or empty, a default method is choosen@*
          If choose = \"prim\" resp. \"equidim\" normalC computes a prime resp.
          an equidimensional decomposition and then the normalization of each
-         component; if choose = \"noFac\" factorization is avoided in the 
+         component; if choose = \"noFac\" factorization is avoided in the
          computation of the minimal associated primes; @*
-         if choose = \"withGens\" the minimal associated primes P_i of id are 
-         computed and for each P_i, algebra generators of the integral closure 
+         if choose = \"withGens\" the minimal associated primes P_i of id are
+         computed and for each P_i, algebra generators of the integral closure
          of basering/P_i are computed as elements of its quotient field;@*
          \"isPrim\" disables \"equidim\" and \"prim\".@*
 ASSUME:  The ideal must be radical, for non-radical ideals the output may
-         be wrong (id=radical(id); makes id radical). However, if choose = 
-         \"prim\" the minimal associated primes of id are computed first 
+         be wrong (id=radical(id); makes id radical). However, if choose =
+         \"prim\" the minimal associated primes of id are computed first
          and hence normalC computes the normalization of the radical of id.
          \"isPrim\" should only be used if id is known to be irreducible.
-RETURN:  a list, say nor, of size 2 (resp. 3 if choose=\"withGens\"). 
-         The first list nor[1] consists of r rings, where r is the number 
-         of irreducible components if choose = \"prim\" (resp. >= no of 
-         equidimenensional components if choose =  \"equidim\"). 
-@format 
+RETURN:  a list, say nor, of size 2 (resp. 3 if choose=\"withGens\").
+         The first list nor[1] consists of r rings, where r is the number
+         of irreducible components if choose = \"prim\" (resp. >= no of
+         equidimenensional components if choose =  \"equidim\").
+@format
          Each ring Ri=nor[1][i], i=1..r, contains two ideals with given
          names @code{norid} and @code{normap} such that @*
-         - Ri/norid is the normalization of the i-th component, i.e. the 
+         - Ri/norid is the normalization of the i-th component, i.e. the
           integral closure in its field of fractions (as affine ring);
          - the direct sum of the rings Ri/norid is the normalization
            of basering/id; @*
          - @code{normap} gives the normalization map from basering/id to
            Ri/norid for each j.@*
 
-         If choose=\"withGens\", nor[2] is a list of size r of ideals Ii= 
+         If choose=\"withGens\", nor[2] is a list of size r of ideals Ii=
          nor[2][i] in the basering, generating the integral closure of
          basering/P_i in its quotient field, i=1..r, in two different ways:
-         - Ii is given by polynomials 
-           g_1,...,g_k,g_k+1 such that the variables T(j) of the ring Ri 
+         - Ii is given by polynomials
+           g_1,...,g_k,g_k+1 such that the variables T(j) of the ring Ri
            satisfy T(1)=g_1/g_k+1,..,T(k)=g_k/g_k+1. Hence the g_j/g_k+1
            are algebra generators of the integral closure of basering/P_i
-           as sub-algebra in the quotient field of basering/P_i. 
- 
-         nor[2] (resp. nor[3] if choose=\"withGens\") is a list of an intvec 
-         of size r, the delta invariants of the r components, and an integer, 
-         the total delta invariant of basering/id (-1 means infinite, and 0 
-         that basering/P_i resp. basering/input is normal). 
+           as sub-algebra in the quotient field of basering/P_i.
+
+         nor[2] (resp. nor[3] if choose=\"withGens\") is a list of an intvec
+         of size r, the delta invariants of the r components, and an integer,
+         the total delta invariant of basering/id (-1 means infinite, and 0
+         that basering/P_i resp. basering/input is normal).
          Return value -2 means that delta resp. delta of one of the components
          is not computed (which may happen if \"equidim\" is given) .
 @end format
-THEORY:  The delta invariant of a reduced ring K[x1,...,xn]/id is 
+THEORY:  The delta invariant of a reduced ring K[x1,...,xn]/id is
              dim_K(normalization(K[x1,...,xn]/id) / K[x1,...,xn]/id)
          We call this number also the delta invariant of id.
-         We use the algorithm described in [G.-M. Greuel, G. Pfister: 
-         A SINGULAR Introduction to Commutative Algebra, 2nd Edition. 
+         We use the algorithm described in [G.-M. Greuel, G. Pfister:
+         A SINGULAR Introduction to Commutative Algebra, 2nd Edition.
          Springer Verlag (2007)].
 NOTE:    To use the i-th ring type: @code{def R=nor[1][i]; setring R;}.
-@*       Increasing/decreasing printlevel displays more/less comments 
+@*       Increasing/decreasing printlevel displays more/less comments
          (default: printlevel=0).
 @*       Not implemented for local or mixed orderings and for quotient rings.
 @*       If the input ideal id is weighted homogeneous a weighted ordering may
@@ -4882,7 +5008,7 @@ NOTE:    To use the i-th ring type: @code{def R=nor[1][i]; setring R;}.
 KEYWORDS: normalization; integral closure; delta invariant.
 EXAMPLE: example normalC; shows an example
 "
-{  
+{
    int i,j, wgens, withEqui, withPrim, isPrim, nfac;
    int y = printlevel-voice+2;
    int nvar = nvars(basering);
@@ -4897,19 +5023,19 @@ EXAMPLE: example normalC; shows an example
      return(result);
    }
 
-//--------------------------- define the method --------------------------- 
+//--------------------------- define the method ---------------------------
    string method;                //make all options one string in order to use
                                  //all combinations of options simultaneously
    for ( i=1; i <= size(#); i++ )
-   { 
-     if ( typeof(#[i]) == "string" ) 
+   {
+     if ( typeof(#[i]) == "string" )
      {
        method = method + #[i];
      }
    }
 
    //--------------------------- choosen methods -----------------------
-   //we have the methods 
+   //we have the methods
    // "withGens": computes algebra generators for each irreducible component
    // the general case: either "equidim" or not (then applying minAssGTZ)
 
@@ -4931,11 +5057,11 @@ EXAMPLE: example normalC; shows an example
    }
    if ( find(method,"noFac") )
    {
-     nfac=1;            
+     nfac=1;
    }
 
    //------------------ default method, may be changed --------------------
-   //Use a prime decomposition only for small no of variables otherwise equidim 
+   //Use a prime decomposition only for small no of variables otherwise equidim
    //Compute delta whenever possible.
 
    if ( ((chara==0 || chara>30) && nvar>2 && !withPrim && !isPrim) ||
@@ -4965,7 +5091,7 @@ EXAMPLE: example normalC; shows an example
       {
          prim[1] = id;
          if( y >= 0 )
-         { 
+         {
            "";
            "// ** WARNING: result is correct if ideal is prime (not checked) **";
            "// if procedure is called with string \"prim\", primality is checked";
@@ -4982,7 +5108,7 @@ EXAMPLE: example normalC; shows an example
          { prim = minAssGTZ(id); }
 
          if(y>=1)
-         {  
+         {
             prim;"";
             "// number of irreducible components is", size(prim);
          }
@@ -5024,7 +5150,7 @@ EXAMPLE: example normalC; shows an example
          resu = list(l[size(l)]) + resu;
          gens = closureGenerators(l);         //computes algebra(!) generators
 
-         //NOTE: gens[i]/gens[size(gens)] expresses the ith variable of resu[1] 
+         //NOTE: gens[i]/gens[size(gens)] expresses the ith variable of resu[1]
          //(the normalization) as fraction of elements of the basering;
          //the variables of resu[1] are algebra generators.
          //gens[size(gens)] is a non-zero divisor of basering/i
@@ -5041,9 +5167,9 @@ EXAMPLE: example normalC; shows an example
          }
          Gens = list(gens) + Gens;
 
-/*       ### Da die gens Algebra-Erzeuger sind, ist reduce nach Bestimmung 
+/*       ### Da die gens Algebra-Erzeuger sind, ist reduce nach Bestimmung
          der Algebra-Variablen T(i) nicht zulässig!
-         for(i=1;i<=size(gens)-1;i++) 
+         for(i=1;i<=size(gens)-1;i++)
          {
             gens[i]= reduce(gens[i],std(gens[size(gens)]));
          }
@@ -5064,25 +5190,25 @@ EXAMPLE: example normalC; shows an example
       else
       { del = -1; }
       deli = deli[1..size(deli)-1];
-      Resu = resu,Gens,list(deli,del); 
+      Resu = resu,Gens,list(deli,del);
       int sr = size(resu);
 
       if ( y >= 0 )
       {"";
-"// 'normalC' created a list, say nor, of three lists: 
+"// 'normalC' created a list, say nor, of three lists:
 // nor[1] resp. nor[2] are lists of",sr,"ring(s) resp. ideal(s)
 // and nor[3] is a list of an intvec and an integer.
 // To see the result, type
      nor;
 // To access the i-th ring nor[1][i] give it a name, say Ri, and type e.g.
      def R1 = nor[1][1]; setring R1;  norid; normap;
-// for the other rings type first setring r; (if r is the name of your 
+// for the other rings type first setring r; (if r is the name of your
 // original basering) and then continue as for the first ring;
-// Ri/norid is the affine algebra of the normalization of the i-th 
+// Ri/norid is the affine algebra of the normalization of the i-th
 // component r/P_i (where P_i is an associated prime of the input ideal)
 // and normap the normalization map from r to Ri/norid;
 //    nor[2] is a list of",sr,"ideal(s), each ideal nor[2][i] consists of
-// elements g1..gk of r such that the gj/gk generate the integral 
+// elements g1..gk of r such that the gj/gk generate the integral
 // closure of r/P_i as sub-algebra in the quotient field of r/P_i, with
 // gj/gk being mapped by normap to the j-th variable of Ri;
 //    nor[3] shows the delta-invariant of each component and of the input
@@ -5095,16 +5221,16 @@ EXAMPLE: example normalC; shows an example
 // (attrib(id,"xy"),1) sets attrib xy to TRUE and (attrib(id,"xy"),0) to FALSE
 // We use the following attributes:
 //   attrib(id,"isCohenMacaulay");         //--- Cohen Macaulay
-//   attrib(id,"isCompleteIntersection");  //--- complete intersection  
-//   attrib(id,"isHypersurface");          //--- hypersurface 
-//   attrib(id,"isEquidimensional",-1);    //--- equidimensional ideal 
-//   attrib(id,"isPrim");                  //--- prime ideal 
-//   attrib(id,"isRegInCodim2");           //--- regular in codimension 2 
-//   attrib(id,"isIsolatedSingularity";    //--- isolated singularities 
-//   attrib(id,"onlySingularAtZero");      //--- only singular at 0   
+//   attrib(id,"isCompleteIntersection");  //--- complete intersection
+//   attrib(id,"isHypersurface");          //--- hypersurface
+//   attrib(id,"isEquidimensional",-1);    //--- equidimensional ideal
+//   attrib(id,"isPrim");                  //--- prime ideal
+//   attrib(id,"isRegInCodim2");           //--- regular in codimension 2
+//   attrib(id,"isIsolatedSingularity";    //--- isolated singularities
+//   attrib(id,"onlySingularAtZero");      //--- only singular at 0
 
  //------------------- first set the attributes ----------------------
-   if( typeof(attrib(id,"isCohenMacaulay"))=="int" )   
+   if( typeof(attrib(id,"isCohenMacaulay"))=="int" )
    {
       if( attrib(id,"isCohenMacaulay")==1 )
       {
@@ -5114,7 +5240,7 @@ EXAMPLE: example normalC; shows an example
    else
    {
       attrib(id,"isCohenMacaulay",0);
-   }  
+   }
 
    if( typeof(attrib(id,"isCompleteIntersection"))=="int" )
    {
@@ -5128,7 +5254,7 @@ EXAMPLE: example normalC; shows an example
    {
       attrib(id,"isCompleteIntersection",0);
    }
-    
+
    if( typeof(attrib(id,"isHypersurface"))=="int" )
    {
       if(attrib(id,"isHypersurface")==1)
@@ -5142,12 +5268,12 @@ EXAMPLE: example normalC; shows an example
    {
       attrib(id,"isHypersurface",0);
    }
-   
+
    if( ! (typeof(attrib(id,"isEquidimensional"))=="int") )
    {
          attrib(id,"isEquidimensional",0);
    }
-   
+
    if( typeof(attrib(id,"isPrim"))=="int" )
    {
       if(attrib(id,"isPrim")==1)
@@ -5159,17 +5285,17 @@ EXAMPLE: example normalC; shows an example
    {
       attrib(id,"isPrim",0);
    }
-   
+
    if( ! (typeof(attrib(id,"isRegInCodim2"))=="int") )
    {
          attrib(id,"isRegInCodim2",0);
    }
-   
+
    if( ! (typeof(attrib(id,"isIsolatedSingularity"))=="int") )
    {
          attrib(id,"isIsolatedSingularity",0);
    }
- 
+
    if( typeof(attrib(id,"onlySingularAtZero"))=="int" )
    {
       if(attrib(id,"onlySingularAtZero")==1)
@@ -5184,7 +5310,7 @@ EXAMPLE: example normalC; shows an example
 
    //-------------- compute equidimensional decomposition --------------------
    //If the method "equidim" is given, compute the equidim decomposition
-   //and goto the next step (no normalization 
+   //and goto the next step (no normalization
    //ACHTUNG: equidim berechnet bei nicht reduzierten id die eingebetteten
    //Komponenten als niederdim Komponenten, waehrend diese bei primdecGTZ
    //nicht auftauchen: ideal(x,y)*xy
@@ -5221,7 +5347,7 @@ EXAMPLE: example normalC; shows an example
       {
         intvec opt = option(get);
         option(redSB);
-        for(j=1; j<=size(prim); j++)    
+        for(j=1; j<=size(prim); j++)
         {
            keepresult = keepresult+facstd(prim[j]);
         }
@@ -5230,7 +5356,7 @@ EXAMPLE: example normalC; shows an example
         {
           prim=ideal(0);     //Bug in facstd, liefert leere Liste bei 0-Ideal
         }
-        
+
         if(y>=1)
         {  "";
          "// number of components after application of facstd:", size(prim);
@@ -5243,7 +5369,7 @@ EXAMPLE: example normalC; shows an example
    //the case where withEqui = 0, here the min. ass. primes are computed
    //start with the computation of the minimal associated primes:
 
-   else                                          
+   else
    {
     if( isPrim )
     {
@@ -5299,7 +5425,7 @@ EXAMPLE: example normalC; shows an example
 
    //----- for each component (equidim or irred) compute normalization -----
    int sr, skr, del;
-   intvec deli;  
+   intvec deli;
    int sp = size(prim);     //size of list prim (# irred or equidim comp)
 
    for(i=1; i<=sp; i++)
@@ -5330,7 +5456,7 @@ EXAMPLE: example normalC; shows an example
 
       if( attrib(id,"isHypersurface")==1 )
       {
-         attrib(prim[i],"isHypersurface",1); 
+         attrib(prim[i],"isHypersurface",1);
          attrib(prim[i],"isCompleteIntersection",1);
          attrib(prim[i],"isCohenMacaulay",1);
       }
@@ -5355,7 +5481,7 @@ EXAMPLE: example normalC; shows an example
         {attrib(prim[i],"isCompleteIntersection",0); }
       }
       else
-      {  
+      {
         attrib(prim[i],"isRegInCodim2",0);
         attrib(prim[i],"isCohenMacaulay",0);
         attrib(prim[i],"isCompleteIntersection",0);
@@ -5364,9 +5490,9 @@ EXAMPLE: example normalC; shows an example
       //------ Now compute the normalization of each component ---------
       //note: for equidimensional components the "splitting tools" can
       //create further decomposition
-      //We now start normalizationPrimes with 
+      //We now start normalizationPrimes with
       //ihp = partial normalisation map = identity map = maxideal(1)
-      //del = partial delta invariant = 0 
+      //del = partial delta invariant = 0
       //deli= intvec of partial delta invariants of components
       //in normalizationPrimes all the work is done:
 
@@ -5378,21 +5504,21 @@ EXAMPLE: example normalC; shows an example
       }
       skr = size(keepresult);
 
-      //compute delta:             
+      //compute delta:
       if( del >= 0 && keepresult[skr][1] >=0 )
       {
          del = del + keepresult[skr][1];
       }
       else
-      {  
-         del = -1; 
+      {
+         del = -1;
       }
       deli = keepresult[skr][2],deli;
 
       if ( y>=1 )
       {
            "// delta of component",i; keepresult[skr][1];
-      } 
+      }
    }
    sr = size(result);
 
@@ -5405,7 +5531,7 @@ EXAMPLE: example normalC; shows an example
         {
            "// Compute intersection multiplicities of the components";
         }
-      }   
+      }
 
       if ( sp > 1 )
       {
@@ -5416,7 +5542,7 @@ EXAMPLE: example normalC; shows an example
         }
         else
         {
-           del = del + mul; 
+           del = del + mul;
         }
       }
    deli = deli[1..size(deli)-1];
@@ -5432,8 +5558,8 @@ EXAMPLE: example normalC; shows an example
 // To access the i-th ring nor[1][i] give it a name, say Ri, and type e.g.
       def R1 = nor[1][1];  setring R1;  norid;  normap;
 // and similair for the other rings nor[1][i];
-// Ri/norid is the affine algebra of the normalization of the i-th component 
-// r/P_i (where P_i is a prime or an equidimensional ideal of the input ideal) 
+// Ri/norid is the affine algebra of the normalization of the i-th component
+// r/P_i (where P_i is a prime or an equidimensional ideal of the input ideal)
 // and normap the normalization map from the basering to Ri/norid;
 //    nor[2] shows the delta-invariant of each component and of the input
 // ideal (-1 means infinite, -2 that delta of a component was not computed).";
@@ -5450,29 +5576,29 @@ example
 
    list nor = normalC(i);
 
-   nor; 
+   nor;
    // 2 branches have delta = 1, and 1 branch has delta = 0
    // the total delta invariant is 13
 
    def R2 = nor[1][2];  setring R2;
    norid; normap;
-   
+
    echo = 0;
    printlevel = printlevel-1;
    pause("   hit return to continue"); echo=2;
 
    ring r = 2,(x,y,z),dp;
    ideal i = z3-xy4;
-   nor = normalC(i);  nor;  
-   // the delta invariant is infinite 
+   nor = normalC(i);  nor;
+   // the delta invariant is infinite
    // xy2z/z2 and xy3/z2 generate the integral closure of r/i as r/i-module
    // in its quotient field Quot(r/i)
 
-   // the normalization as affine algebra over the ground field:             
+   // the normalization as affine algebra over the ground field:
    def R = nor[1][1]; setring R;
    norid; normap;
 
-   echo = 0;  
+   echo = 0;
    pause("   hit return to continue");echo = 2;
 
    setring r;
@@ -5524,18 +5650,16 @@ L;
 
 // Used for timing and comparing the different normalization procedures.
 // Option (can be entered in any order)
-// "normal"   -> uses the new algortihm (normal)
-// "normalP"  -> uses normalP
+// "normal"   -> uses the new algortihm (normal)// "normalP"  -> uses normalP
 // "normalC"  -> uses normalC, without "withGens" option
-// "primCl"   -> uses normalC, with option "withGens".
-// "111"      -> checks the output of normalM using norTest.
-// "p"        -> compares the output of norM with the output of normalP 
+// "primCl"   -> uses normalC, with option "withGens".// "111"      -> checks the output of normalM using norTest.
+// "p"        -> compares the output of norM with the output of normalP
 //               ("normalP" option must also be set).
-// "pc"       -> compares the output of norM with the output of normalC with 
+// "pc"       -> compares the output of norM with the output of normalC with
 //               option "withGens"
 //               ("primCl" option must also be set).
-proc timeNormal(ideal I, list #){
-  //--------------------------- define the method --------------------------- 
+proc timeNormal(ideal I, list #){
+  //--------------------------- define the method ---------------------------
   int isPrim, useRing;
   int decomp = -1;
   int norM, norC, norP, primCl;
@@ -5548,32 +5672,32 @@ proc timeNormal(ideal I, list #){
   string method;                //make all options one string in order to use
                                 //all combinations of options simultaneously
   for ( i=1; i <= size(#); i++ )
-  { 
-    if ( typeof(#[i]) == "string" ) 
+  {
+    if ( typeof(#[i]) == "string" )
     {
       method = method + #[i];
     }
   }
   if ( find(method, "normal"))
-  {norM = 1;}  
+  {norM = 1;}
   if ( find(method, "normalP") and (char(basering) > 0))
-  {norP = 1;}  
+  {norP = 1;}
   if ( find(method, "normalC"))
-  {norC = 1;}      
+  {norC = 1;}
   if ( find(method, "primCl"))
-  {primCl = 1;}  
+  {primCl = 1;}
   if ( find(method, "isprim") or find(method,"isPrim") )
   {decomp = 0;}
   if ( find(method, "p") )
-  {checkP = 1;}  
+  {checkP = 1;}
   if ( find(method, "pc") )
-  {checkPC = 1;}  
+  {checkPC = 1;}
   if ( find(method, "111") )
-  {check111 = 1;}    
-      
+  {check111 = 1;}
+
   int tt;
   if(norM){
-    tt = timer; 
+    tt = timer;
     if(decomp == 0){
       "Running normal(useRing, isPrim)...";
       list a1 = normal(I, "useRing", "isPrim");
@@ -5586,7 +5710,7 @@ proc timeNormal(ideal I, list #){
     "";
   }
   if(norP){
-    tt = timer; 
+    tt = timer;
     if(decomp == 0){
       "Running normalP(isPrim)...";
       list a2 = normalP(I, "isPrim");
@@ -5598,9 +5722,9 @@ proc timeNormal(ideal I, list #){
     }
     "";
   }
-  
+
   if(norC){
-    tt = timer; 
+    tt = timer;
     if(decomp == 0){
       "Running normalC(isPrim)...";
       list a3 = normalC(I, "isPrim");
@@ -5612,107 +5736,115 @@ proc timeNormal(ideal I, list #){
     }
     "";
   }
-  
+
   if(primCl){
-    tt = timer; 
+    tt = timer;
     if(decomp == 0){
       "Running normalC(withGens, isPrim)...";
       list a4 = normalC(I, "isPrim", "withGens");
       "Time normalC(withGens, isPrim): ", timer - tt;
     } else {
-      "Running normalC(withGens)...";    
+      "Running normalC(withGens)...";
       list a4 = normalC(I, "withGens");
       "Time normalC(withGens): ", timer - tt;
     }
     "";
   }
-  
+
   if(check111 and norM){
     "Checking output with norTest...";
     "WARNING: this checking only works if the original ideal was prime.";
-    list norL = list(a1[1][1][3]);
-    norTest(I, list(norL));
+    norTest(I, a1);
     "";
   }
-  
+
   if(checkP and norP and norM){
     "Comparing with normalP output...";
-    "WARNING: this checking only works if the original ideal was prime.";
-    U1 = a1[1][1][1];
-    c1 = a1[1][1][2];
-    U2 = a2[1][1];
-    c2 = a2[1][1][size(a2[1][1])];
-    W = changeDenominator(U1, c1, c2, groebner(I));
-    qring q = groebner(I);
-    ideal U2 = fetch(r, U2);
-    ideal W = fetch(r, W);
-    ch = 0;
-    if(size(reduce(U2, groebner(W))) == 0){
-      "U2 c U1";
-      ch = 1;
-    }
-    if(size(reduce(W, groebner(U2))) == 0){
-      "U1 c U2";
-      ch = ch + 1;
-    }
-    if(ch == 2){
-      "Output of normalP is equal.";
+    if(size(a2) > 0){
+      "WARNING: this checking only works if the original ideal was prime.";
+      U1 = a1[2][1];
+      c1 = U1[size(U1)];
+      U2 = a2[1][1];
+      c2 = a2[1][1][size(a2[1][1])];
+      W = changeDenominator(U1, c1, c2, groebner(I));
+      qring q = groebner(I);
+      ideal U2 = fetch(r, U2);
+      ideal W = fetch(r, W);
+      ch = 0;
+      if(size(reduce(U2, groebner(W))) == 0){
+        "U2 c U1";
+        ch = 1;
+      }
+      if(size(reduce(W, groebner(U2))) == 0){
+        "U1 c U2";
+        ch = ch + 1;
+      }
+      if(ch == 2){
+        "Output of normalP is equal.";
+      } else {
+        "ERROR: Output of normalP is different.";
+      }
+      setring r;
+      kill q;
     } else {
-      "ERROR: Output of normalP is different.";
+      "normalP returned no output. Comparison is not possible.";
     }
     "";
-    setring r;
-    kill q;
-  }  
+  }
 
-  if(checkPC and norM and primCl){    
+  if(checkPC and norM and primCl){
     "Comparing with primeClosure output...";
-    "WARNING: this checking only works if the original ideal was prime.";
-    // primeClosure check
-    U1 = a1[1][1][1];
-    c1 = a1[1][1][2];
-    U2 = a4[2][1];
-    c2 = a4[2][1][size(a4[2][1])];
-    W = changeDenominator(U1, c1, c2, groebner(I));
-    qring q = groebner(I);
-    ideal U2 = fetch(r, U2);
-    ideal W = fetch(r, W);
-    ch = 0;
-    if(size(reduce(U2, groebner(W))) == 0){
-      "U2 c U1";
-      ch = 1;
-    }
-    if(size(reduce(W, groebner(U2))) == 0){
-      "U1 c U2";
-      ch = ch + 1;
-    }
-    if(ch == 2){
-      "Output of normalC(withGens) is equal.";
+    if(size(a4) > 0){
+      "WARNING: this checking only works if the original ideal was prime.";
+      // primeClosure check
+      U1 = a1[2][1];
+      c1 = U1[size(U1)];
+      U2 = a4[2][1];
+      c2 = a4[2][1][size(a4[2][1])];
+      W = changeDenominator(U1, c1, c2, groebner(I));
+      qring q = groebner(I);
+      ideal U2 = fetch(r, U2);
+      ideal W = fetch(r, W);
+      ch = 0;
+      if(size(reduce(U2, groebner(W))) == 0){
+        "U2 c U1";
+        ch = 1;
+      }
+      if(size(reduce(W, groebner(U2))) == 0){
+        "U1 c U2";
+        ch = ch + 1;
+      }
+      if(ch == 2){
+        "Output of normalC(withGens) is equal.";
+      } else {
+        "ERROR: Output of normalC(withGens) is different.";
+      }
+      setring r;
+      kill q;
     } else {
-      "ERROR: Output of normalC(withGens) is different.";
+      "normalC(withGens) returned no output. Comparison is not possible.";
     }
     "";
-    setring r;
-    kill q;    
   }
 }
 
 ///////////////////////////////////////////////////////////////////////////
 proc norTest (ideal i, list nor, list #)
 "USAGE:   norTest(i,nor,[n]); i=prime ideal, nor=list, n=optional integer
-ASSUME:  nor is the resulting list of normal(i) (any options) or the result
-         of normalP(i,"withRing"). In particular, the ring nor[1][1] contains
-         the ideal norid and the map normap: basering/i --> nor[1][1]/norid.
+ASSUME:  nor is the output of normal(i) (any options) or
+         normalP(i,"withRing") or normalC(i) (any options).
+         In particular, the ring nor[1][1] contains the ideal norid
+         and the map normap: basering/i --> nor[1][1]/norid.
 RETURN:  an intvec v such that:
 @format
          v[1] = 1 if the normap is injective and 0 otherwise
          v[2] = 1 if the normap is finite and 0 otherwise
-         v[3] = 1 if nor[1][1]/norid is normal and 0 otherwise 
+         v[3] = 1 if nor[1][1]/norid is normal and 0 otherwise
 @end format
          If n=1 (resp n=2) only v[1] (resp. v[2]) is computed and returned
-THEORY:  The procedure can be used to test whether the computation of the 
-         normalization was correct: basering/i --> nor[1][1]/norid is the 
-         normalization of basering/i iff v=1,1,0. 
+THEORY:  The procedure can be used to test whether the computation of the
+         normalization was correct: basering/i --> nor[1][1]/norid is the
+         normalization of basering/i iff v=1,1,0.
 NOTE:    For big examples it can be hard to fully test correctness; the
          partial test norTest(i,nor,2) is usually fast
 EXAMPLE: example norTest; shows an example
@@ -5730,18 +5862,19 @@ EXAMPLE: example norTest; shows an example
     def BAS = basering;
 
     //### make a copy of nor to have a cpoy of nor[1][1]  (not a reference to)
-    // in order not to overwrite norid and normap. 
+    // in order not to overwrite norid and normap.
     // delete nor[2] (if it contains the module generators, which are not used)
     // s.t. newnor does not belong to a ring.
 
-    list newnor = nor;         
+    list newnor = nor;
     if ( size(newnor) == 3 )
     {
        newnor = delete(newnor,2);
     }
+    def R = newnor[1][1];
     qring QAS = std(i);
-    
-    def R = newnor[1][1]; 
+
+
     setring R;
     int nva = nvars(R);
     string svars = varstr(R);
@@ -5757,9 +5890,9 @@ EXAMPLE: example norTest; shows an example
     intvec V;
 
     //--------- check first whether variables Z(i),...,A(i) exist -----------
-    for (ii=90; ii>=65; ii--)  
+    for (ii=90; ii>=65; ii--)
     {
-       if ( find(svars,ASCII(ii)+"(") == 0 )        
+       if ( find(svars,ASCII(ii)+"(") == 0 )
        {
           svar = ASCII(ii);  break;
        }
@@ -5773,14 +5906,14 @@ EXAMPLE: example norTest; shows an example
         }
     }
     else
-    {       
+    {
         for ( ii = 1; ii <= nva; ii++ )
         {
            LR[2][ii] = "Z("+string(100*nva+ii)+")";
            V[ii] = 1;
         }
     }
-    
+
     if ( g3[n3][1]== "c" or g3[n3][1] == "C" )
     {
        list gm = g3[n3];       //last blockis module ordering
@@ -5814,7 +5947,7 @@ EXAMPLE: example norTest; shows an example
     //ideal qnormap = imap(newR,normap);
     //ideal qnormap = imap(R,normap);
     map Qnormap = QAS,qnormap;    //r/id --> R/norid
-    
+
     //------------------------ check injectivity ---------------------------
 //"injective:";
     a = is_injective(Qnormap,QAS);          //a. Test for injectivity of Qnormap
@@ -5830,15 +5963,16 @@ EXAMPLE: example norTest; shows an example
    b;
 
     //------------------------ check normality ---------------------------
-    list testnor = normal(lnorid[2],"isPrim","noFac");
-    //### Problem: bei mehrfachem Aufruf von norTest gibt es 
+    list testnor = normal(lnorid[2],"isPrim","noFac", "withDelta");
+    //### Problem: bei mehrfachem Aufruf von norTest gibt es
     // ** redefining norid & ** redefining normap
     //Dies produziert Fehler, da alte norid und normap ueberschrieben werden
     //norid und normap werden innnerhalb von proc computeRing ueberschrieben
     //Die Kopie newR scheint das Problem zu loesen
 
     printlevel=prl;
-    d = testnor[size(testnor)][2];             //d = delta
+
+    d = testnor[3][2];             //d = delta
     kill testnor;                              //### sollte ueberfluessig sein
     int d1 = (d==0);                           //d1=1 if delta=0
     dbprint ( prl, "delta: "+string(d) );
@@ -5853,11 +5987,14 @@ example
    list nor = normal(i);
    norTest(i,nor);                //1,1,1 means that normal was correct
 
+   nor = normalC(i);
+   norTest(i,nor);                //1,1,1 means that normal was correct
+
    ring s = 2,(x,y),dp;
    ideal i = (x-y^2)^2 - y*x^3;
    nor = normalP(i,"withRing");
    norTest(i,nor);               //1,1,1 means that normalP was correct
-   printlevel = prl; 
+   printlevel = prl;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -5869,14 +6006,14 @@ example
 //commands for computing the normalization:
 // options for normal:  "equidim", "prim"
 //                      "noDeco", "isPrim", "noFac"
-//                       (prim by default)                      
+//                       (prim by default)
 // options for normalP: "withRing", "isPrim" or "noFac"
-// options for normalC: "equidim", "prim", "withGens", 
+// options for normalC: "equidim", "prim", "withGens",
 //                      "noDeco", "isPrim", "noFac"
 
-//Commands for testing 'normal' 
- list nor = normal(i); nor;            
- list nor = normal(i,"isPrim");nor; 
+//Commands for testing 'normal'
+ list nor = normal(i); nor;
+ list nor = normal(i,"isPrim");nor;
  list nor = normal(i,"equidim");nor;
  list nor = normal(i,"prim");nor;
  list nor = normal(i,"equidim","noFac");nor;
@@ -5887,10 +6024,10 @@ example
  list nor = normalP(i,"withRing"); nor;  //compute the ringstructure
  list nor = normalP(i,"isPrim"); nor;    //if i is known to be prime
 
-//Commands for testing 'normalC' 
- list nor = normal(i); nor;            
+//Commands for testing 'normalC'
+ list nor = normal(i); nor;
  list nor = normal(i,"withGens");nor;
- list nor = normal(i,"isPrim");nor; 
+ list nor = normal(i,"isPrim");nor;
  list nor = normal(i,"equidim");nor;
  list nor = normal(i,"prim");nor;
  list nor = normal(i,"equidim","noFac");nor;
@@ -5903,6 +6040,107 @@ norTest(i,nor);       //full test for not too big examples (1,1,1 => ok)
 norTest(i,nor,2);     //partial test for big examples (1,1 => ok)
 factorize(i[1]);      //checks for irreducibility
 
+/////////////////////////////////////////////////////////////////////////////
+
+//----------------------Examples for normal (new algorithm)------------------
+// Timings with Computeserver Dual AMD Opteron 242 1.60GHz.
+// Examples from "Normalization of Rings" paper.
+
+// Example 1
+// char 0 : normal = 0 secs (7 steps) - normalC = 75 secs
+// char 2 : normal = 0 secs (7 steps) - normalP = 0 secs - normalC = 0 secs
+// char 5 : normal = 1 secs (7 steps) - normalP = 71 - normalC = 1 secs
+// char 11 : normal = 2 secs (7 steps) - normalP = 12 secs - normalC doesn't finish
+// char 32003 : normal = 1 secs (7 steps) - normalP doesn't finish - normalC = 1 sec
+LIB"normal.lib";
+ring r = 2, (x, y), dp;
+ideal i = (x-y)*x*(y+x^2)^3-y^3*(x^3+x*y-y^2);
+timeNormal(i, "normal", "normalC", "normalP", "isPrim", "p");
+
+// Example 2
+// char 0  : normal = 1 sec (7 steps) - normalC doesn't finish
+// char 3 : normal = 1 secs (8 steps) - normalP = 0 secs - normalC = 4 secs
+// char 13 : normal = 1 sec (7 steps) - normalP doesn't finish - normalC = 13 secs
+// char 32003 : normal = 1 secs (7 steps) - normalP doesn't finish - normalC = 10 sec
+LIB"normal.lib";
+ring r = 13, (x, y), dp;
+ideal i = 55*x^8+66*y^2*x^9+837*x^2*y^6-75*y^4*x^2-70*y^6-97*y^7*x^2;
+timeNormal(i, "normal", "normalC", "normalP", "p", "isPrim");
+
+// Example 3
+// char 0 : normal = 3 secs (6 steps) - normalC doesn't finish
+// char 2 : normal = 1 secs (13 steps) - normalP = 0 secs - normalC doesn't finish
+// char 5 : normal = 0 secs (6 steps) - normalP = 8 secs - normalC doesn't finish
+LIB"normal.lib";
+ring r=5,(x, y),dp;
+ideal i=y9+y8x+y8+y5+y4x+y3x2+y2x3+yx8+x9;
+timeNormal(i, "normal", "normalC", "normalP", "isPrim");
+
+// Example 4
+// char 0 : normal = 0 secs (1 step) - normalC = 0 secs
+// char 5 : normal = 0 secs (1 step) - normalP = 3 secs - normalC = 0 secs
+// char 11 : normal = 0 secs (1 step) - normalP doesn't finish - normalC = 0 secs
+// char 32003 : normal = 0 secs (1 step) - normalP doesn't finish - normalC = 0 secs
+LIB"normal.lib";
+ring r=11,(x,y),dp;   // genus 0 4 nodes and 6 cusps im P2
+ideal i=(x2+y^2-1)^3 +27x2y2;
+timeNormal(i, "normal", "normalC", "normalP", "isPrim");
+
+// Example 5
+// char 0 : normal = 0 secs (1 step) - normalC = 0 secs
+// char 5 : normal = 1 secs (3 step) - normalP doesn't finish - normalC doesn't finish
+// char 11 : normal = 0 secs (1 step) - normalP 0 secs - normalC = 0 secs
+// char 32003 : normal = 0 secs (1 step) - normalP doesn't finish - normalC = 0 secs
+LIB"normal.lib";
+ring r=11,(x,y),dp;    //24 sing, delta 24
+ideal i=-x10+x8y2-x6y4-x2y8+2y10-x8+2x6y2+x4y4-x2y6-y8+2x6-x4y2+x2y4+2x4+2x2y2-y4-x2+y2-1;
+timeNormal(i, "normal", "normalC", "normalP", "isPrim", "p");
+
+// Example 6
+// char 2 : normal = 5 secs (2 steps) - normalP = 25 secs - normalC = 166 secs
+LIB"normal.lib";
+ring r=2,(v,u,z,y,x),dp;
+ideal i = z3+zyx+y3x2+y2x3, uyx+z2,uz+z+y2x+yx2, u2+u+zy+zx, v3+vux+vz2+vzyx+vzx+uz3+uz2y+z3+z2yx2;
+timeNormal(i, "normal", "normalC", "normalP", "isPrim", "p");
+
+// Example 7
+// char 0 : normal = 11 secs (6 steps) - normalC = 11 secs
+// char 2 : normal = 11 secs (6 steps) - normalP = 0 secs - normalC = 11 secs
+// char 5 : normal = 11 secs (6 steps) - normalP = 3 secs - normalC = 11 secs
+// char 11 : normal = 11 secs (6 steps) - normalP = 43 secs - normalC = 11 secs
+// char 32003 : normal = 11 secs (6 steps) - normalP doesn't finish - normalC = 11 secs
+LIB"normal.lib";
+ring r=11,(x,y,z,w,t),dp;   //dim 2, dim s_locus 1
+ideal i= x2+zw, y3+xwt, xw3+z3t+ywt2, y2w4-xy2z2t-w3t3;
+timeNormal(i, "normal", "normalC", "normalP", "isPrim");
+
+////////////////////////////////////////////////////////////////////////////////
+
+// Other examples with new algorithm
+
+// Example 1
+// char 0 : normal = 1 secs (13 steps) - normalC doesn't finish
+// char 2 : normal = 1 secs (13 steps) - normalP = 0 secs - normalC doesn't finish
+// char 5 : normal = 1 secs (13 steps) - normalP = 29 secs - normalC doesn't finish
+ring r=2,(x,y),dp;  //genus 35
+ideal i=y30+y13x+x4y5+x3*(x+1)^2;
+timeNormal(i, "normal", "normalC", "normalP");
+
+// Example 2
+// char 0 : normal = 1 secs (13 steps) - normalC doesn't finish
+// char 3 : normal = 2 secs (13 steps) - normalP = 0 secs - normalC doesn't finish
+ring r=3,(x,y),dp;  //genus 19, delta 21
+ideal i=y20+y13x+x4y5+x3*(x+1)^2;
+timeNormal(i, "normal", "normalC", "normalP");
+
+// Example 3
+// Very fast with all algorithms
+ring r = 3, (x, y), dp;
+ideal I = (x-y^2)^2-x*y^3;
+timeNormal(I, "normal", "normalC", "normalP", "primCl", "111", "p", "pc");
+
+
+
 //----------------------Test Example for charp -------------------
 //Zu tun:
 //### nach minor nur std statt mstd verwenden
@@ -5912,7 +6150,7 @@ factorize(i[1]);      //checks for irreducibility
 //### minor verbessern
 //### preimage verbessern (Ist imm Kern map oder imap verwendet?)
 //### Gleich in Ordnung dp wechseln, ringlist verwenden
-//### interred ev nur zum Schluss 
+//### interred ev nur zum Schluss
 //    (z.B. wenn nacher std; wenn nacher minor: testen )
 
 //Zeiten mit normalV5.lib (mstd aktiv, interred inaktiv)
@@ -5921,7 +6159,7 @@ factorize(i[1]);      //checks for irreducibility
 //---------------------------------------------------------------------
 //1. Series Fp[x,y,u,v]/(x2v-y2u)
 //-------------------------------
-//characteristic p   2   3    5    7    11   13   17   37   97 
+//characteristic p   2   3    5    7    11   13   17   37   97
 //icFracP          0.04 0.03 0.04 0.04 0.04 0.05 0.05 0.13 0.59  Mac
 //normalP           0   0    0    0     0    0    0    0   1    Sing
 //icFractions      0.08 0.09 0.09 0.09 0.14 0.15 0.15 0.15 0.15  Mac
@@ -5929,18 +6167,18 @@ factorize(i[1]);      //checks for irreducibility
 
 2. Series Fp[u, v, w, x, y, z]/u2x4+uvy4+v2z4
 //--------------------------------------------
-//characteristic p 2    3    5    7   11 
-//icFracP         0.07 0.22 9.67 143 12543 
+//characteristic p 2    3    5    7   11
+//icFracP         0.07 0.22 9.67 143 12543
 //normalP          0    0    5   42  1566
 //icFractions     1.16   *    *   *    *       *: > 6h
 //normal            0    0    0   0    0
 
-//3. Series Fp[u, v, w, x, y, z]/(u2xp+uvyp+v2zp) 
+//3. Series Fp[u, v, w, x, y, z]/(u2xp+uvyp+v2zp)
 //-----------------------------------------------
-//characteristic p  2    3    5    7    11   13  17 19 23 
-//icFracP          0.06 0.07 0.09 0.27 1.81 4.89 26 56 225 
+//characteristic p  2    3    5    7    11   13  17 19 23
+//icFracP          0.06 0.07 0.09 0.27 1.81 4.89 26 56 225
 //normalP          0     0    0    0    1    2  6  10  27
-//icFractions      0.16 1.49 75.00 4009  *    *   *  *  * 
+//icFractions      0.16 1.49 75.00 4009  *    *   *  *  *
 //normal            0     0    2    836
 //### p=7 normal braucht 807 sec in:
 // ideal endid  = phi1(endid);      //### bottelneck'
@@ -5953,27 +6191,27 @@ int p = 7; ring r=p,(u,v,w,x,y,z),dp; ideal i=u2x4+uvy4+v2z4;
 int p=23; ring r=p,(u,v,w,x,y,z),dp; ideal i=u2*x^p+uv*y^p+v2*z^p;
 
 //IRREDUCIBLE EXAMPLES:
-//---------------------  
+//---------------------
 //timing for MacBookPro 2.2GHz Intel Core 2 Duo, 4GB Ram
 //Sing. ix86Mac-darwin version 3-1-0 (3100-2008101314)  Oct 13 2008 14:46:59
 //if no time is given: < 1  sec
 
 //Apply:
 list nor = normal(i,"isPrim"); nor;
-list nor = normalP(i,"withRing","isPrim"); nor; 
+list nor = normalP(i,"withRing","isPrim"); nor;
 def R=nor[1][1]; setring R; norid; normap;
 setring r;
 norTest(i,nor);
 
-int tt = timer; 
-list nor = normalP(i,"withRing","isPrim"); nor; 
+int tt = timer;
+list nor = normalP(i,"withRing","isPrim"); nor;
 timer-tt;
-int tt = timer; 
+int tt = timer;
 list nor = normal(i,"isPrim");
 timer-tt;
 
 ring r=19,(x,y,u,v),dp;    //delta -1
-ideal i=x2v-y2u; 
+ideal i=x2v-y2u;
 //norTest 2 sec
 
 ring r=2,(y,x2,x1),lp;     //delta -1
@@ -5993,20 +6231,20 @@ ideal i=u2x4+uvy4+v2z4;
 //norTest(i,nor);  0 sec, norTest(i,nor) haengt!
 
 ring r=5,(u,v,x,y,z),dp;   //delta -1
-ideal i=u2x6+uvy6+v2z6;  
+ideal i=u2x6+uvy6+v2z6;
 //normalP 5sec, normalC 1sec
 //V5: norTest(i,nor); 45 sec bei normalP, V6 12 sec
 //28 sec bei normal
 
 ring r=5,(u,v,x,y,z),dp;   //delta -1
 ideal i=u2x5+uvy5+v2z5;
-//normalP 1sec, normalC 1 sec, 
-//norTest lange: minor(jacob(I),h,J) 193 (308)sec, haengt dann bei M = std(M); 
+//normalP 1sec, normalC 1 sec,
+//norTest lange: minor(jacob(I),h,J) 193 (308)sec, haengt dann bei M = std(M);
 //norTest(i,nor,2); verwenden!
 //Sing 3.0-4 orig  >9h! hängt bei Q = mstd(Q)[2];
 
 ring r=2,(y,x),wp(12,5);  //delta 3
-ideal i=y5+y2x4+y2x+yx2+x12; 
+ideal i=y5+y2x4+y2x+yx2+x12;
 //normalP 0 sec (Test 0 sec), normalC 2 sec (Test 2 sec)
 //normalC withGens (ohne interred) 0sec
 
@@ -6015,11 +6253,11 @@ ideal i=y9+y8x+y8+y5+y4x+y3x2+y2x3+yx8+x9;
 //normalP 1sec, interred verkleinert norid betraechtlich
 //normalC haengt bei minor, ideal im loop wird zu gross ###
 //interred bei normalC vergroeesert string um Faktor 4000!
-//withGens haengt bei interred in loop 4 (> 10 h) oder 
-//(nach Ausschalten von interred) bei 
+//withGens haengt bei interred in loop 4 (> 10 h) oder
+//(nach Ausschalten von interred) bei
 //int delt=vdim(std(modulo(f,ideal(p)))); (>?h)
 
-//Leonard1: (1. Komponente von Leonard),  delta -1 
+//Leonard1: (1. Komponente von Leonard),  delta -1
 ring r=2,(v,u,z,y,x),dp;
 ideal i = z3+zyx+y3x2+y2x3, uyx+z2,uz+z+y2x+yx2, u2+u+zy+zx,
           v3+vux+vz2+vzyx+vzx+uz3+uz2y+z3+z2yx2;
@@ -6045,20 +6283,20 @@ ideal i = z3+zyx+y3x2+y2x3, uyx+z2,uz+z+y2x+yx2, u2+u+zy+zx,
  +y^2*(x^22+x^21+x^20+x^18+x^13+x^12+x^9+x^8+x^7+x^5+x^4+x^3)
  +y*(x^23+x^22+x^20+x^17+x^15+x^14+x^12+x^9)
  +(x^25+x^23+x^19+x^17+x^15+x^13+x^11+x^5);
-//normalP: dp 2sec withRing 8sec, 
+//normalP: dp 2sec withRing 8sec,
 //wp 4sec, withRing:51sec Zeit in lin = subst(lin, var(ii), vip); in elimpart ),
 //norTest(i,nor,2): haengt bei mstd(norid);
 //### normalC: (m. interred): haengt bei endid = interred(endid);
 //GEFIXTES INTERRED ABWARTEN. Dann interred aktivieren
 //interred(norid) haengt u. mst(norid) zu lange
-//(o.interred): haengt bei  haengt bei list SM = mstd(i); 
-//ideal in der Mitte zu gross 
+//(o.interred): haengt bei  haengt bei list SM = mstd(i);
+//ideal in der Mitte zu gross
 //i = Ideal (size 118, 13 var) fuer die neue Normalisierung
 
 REDUCIBLE EXAMPLES:
 ------------------
 //Apply:
-int tt = timer; 
+int tt = timer;
 list nor=normalP(i,"isPrim","withRing");
 timer-tt;
 
@@ -6066,12 +6304,11 @@ list nor = normal(i); nor;
 list nor = normalC(i); nor;
 list nor = normalC(i, "withGens"); nor;
 list nor = normalP(i,"withRing"); nor;
-list nor = normalP(i); nor; 
+list nor = normalP(i); nor;
 def R=nor[1][1]; setring R; norid; normap;
 
 //Leonhard 4 Komponenten, dim=2, delta: 0,0,0,-1
-ring r=2,(v,u,z,y,x),dp;      //lp zu lange
-ideal i=z3+zyx+y3x2+y2x3, uyx+z2, v3+vuyx+vux+vzyx+vzx+uy3x2+uy2x+zy3x+zy2x2;
+ring r=2,(v,u,z,y,x),dp;      //lp zu langeideal i=z3+zyx+y3x2+y2x3, uyx+z2, v3+vuyx+vux+vzyx+vzx+uy3x2+uy2x+zy3x+zy2x2;
 //normalP: 19 sec, withRing: 22 sec
 //normalC ohne (mit) interred: 112 (113)sec, equidim: 99sec
 //normalC 1. mal 111 sec, (2.mal) 450sec!! 3.mal 172 sec
@@ -6079,14 +6316,14 @@ ideal i=z3+zyx+y3x2+y2x3, uyx+z2, v3+vuyx+vux+vzyx+vzx+uy3x2+uy2x+zy3x+zy2x2;
 //char 19: normalC: 15sec , withGens: 14sec (o.interr.)
 
 //----------------------Test Example for special cases -------------------
-int tt = timer; 
+int tt = timer;
 list nor=normalP(i,"withRing");nor;
 //list nor=normalP(i,"withRing", "isPrim");nor;
 timer-tt;
 def R1 = nor[1][1]; setring R1;  norid; normap; interred(norid);
 setring r;
 
-int tt = timer; 
+int tt = timer;
 list nor=normal(i,"isPrim");nor;
 timer-tt;
 
@@ -6097,19 +6334,19 @@ ideal i  = xyz*(z3-xy4);   //### interred(norid) verkuerzt
 
 ideal j = x,y;
 ideal i = j*xy;
-equidim(i);            
+equidim(i);
 //hat eingebettete Komponente, equidim rechnet wie in Beschreibung (ok)
-    
+
 ring r  = 19,(x,y),dp;
    ideal i = x3-y4;                   //delta = 3
    ideal i = y*x*(x3-y4);             //delta = 11; 0,0,3
    ideal i = (x2-y3)*(x3-y4);         //delta = 13; 1,3
-   ideal i = (x-y)*(x3+y2)*(x3-y4);   //delta = 23; 0,1,3     
+   ideal i = (x-y)*(x3+y2)*(x3-y4);   //delta = 23; 0,1,3
    ideal i = (x-1)*(x3+y2)*(x2-y3);   //delta = 16; 0,1,1
    ideal i = (x-y^2)^2 - y*x^3;       //delta = 3
    //singularities at not only at 0, hier rechnet equidim falsch
 
-// -------------------------- General Examples  ---------------------------//Huneke, irred., delta=2 (Version 3-0-4: < 1sec) 
+// -------------------------- General Examples  ---------------------------//Huneke, irred., delta=2 (Version 3-0-4: < 1sec)
 //Version 3-0-6 default: 1sec, mit gens 2sec, mit delta 5 sec
 //(prim,noFac):ca 7 Min, prim:ca 10 min(wg facstd)
 //
@@ -6127,17 +6364,17 @@ a4b2c-abc2d3-ab5e-b3c2de-ad5e+2a2bcde2+cd2e4,
 b6c+bc6+a2b4e-3ab2c2de+c4d2e-a3cde2-abd3e2+bce5;
 //normalC: char 2, 31991: 0 sec (isPrim); char 2, equidim: 7 sec
 //norTest(i,nor,2); 1sec
-//normalP char 2: 1sec (isPrim) 
+//normalP char 2: 1sec (isPrim)
 //size(norid); size(string(norid));21 1219 interred(norid): 21 1245 (0 sec)
 
-int tt = timer; 
+int tt = timer;
 list nor=normalC(i);nor;
 timer-tt;
 
 list nor = normalP(i,"isPrim");
 
 //Vasconcelos irred., delta -1 (dauert laenger)
-//auf macbook pro = 20 sec mit alter Version, 
+//auf macbook pro = 20 sec mit alter Version,
 //Sing 3-0-6:
 // Char 32003: "equidim" 30 sec, "noFac": 30sec
 //gens: nach 9 min abgebr (haengt in Lin = ideal(T*syzf);) !!!! Hans zu tun
@@ -6159,7 +6396,7 @@ ideal i=zy2-zx3-x6;
 //normalC: char 2,19,32003: 0  sec (isPrim)
 //normalP (isPrim) char 2,19: 0sec, char 29: 1sec
 
-//Theo1a, CohenMacaulay regular in codim 2, dim slocus=1, delta=0 
+//Theo1a, CohenMacaulay regular in codim 2, dim slocus=1, delta=0
 //normalC: 0 sec, normalP: haegt in K=preimage(R,phi,L);
 ring r=32003,(x,y,z,u),dp;
 ideal i=zy2-zx3-x6+u2;
@@ -6183,7 +6420,7 @@ T(1)^4*T(2)^2-T(2)^2*T(3)+T(1)*T(4),
 T(1)^7+T(1)^3*T(2)^3-T(1)^3*T(3)+T(2)*T(4),
 T(1)^6*T(2)*T(3)+T(1)^2*T(2)^4*T(3)+T(1)^3*T(2)^2*T(4)-T(1)^2*T(2)*T(3)^2+T(4)^2;
 //normalC: char 2,32003: 0  sec (isPrim)
-//normalP (isPrim) char 2: 0sec, char 11 2se, char 19: 13sec 
+//normalP (isPrim) char 2: 0sec, char 11 2se, char 19: 13sec
 //norTest 48sec in char11
 //### interred verkuerzt
 //char 29: haengt in K = preimage(Q,phi,L);
@@ -6196,14 +6433,14 @@ ideal i=z*(y3-x5)+x10;
 
 //Theo4 reducible, delta (0,0,0) -1
 ring r=29,(x,y,z),dp;
-ideal i=(x-y)*(x-z)*(y-z); 
-//normalC: char 2,32003: 0  sec 
+ideal i=(x-y)*(x-z)*(y-z);
+//normalC: char 2,32003: 0  sec
 //normalP char withRing 2, 29: 0sec, 6sec
 
 //Theo6
 ring r=32003,(x,y,z),dp;
 ideal i=x2y2+x2z2+y2z2;
-//normalC: char 2,32003: 0  sec 
+//normalC: char 2,32003: 0  sec
 //normalP char withRing 2, 29: 0sec, 4sec
 
 //Sturmfels, CM, 15 componenten, alle glatt
@@ -6225,16 +6462,16 @@ ring r=2,(u,v,w,x,y,z),wp(1,1,1,3,2,1);
 ideal i=wx,wy,wz,vx,vy,vz,ux,uy,uz,y3-x2;
 //alles 0 sec in char 2
 //---------------------------------------------------------
-int tt = timer; 
+int tt = timer;
 list nor=normalP(i,"normalC","withRing");nor;
 timer-tt;
 
-//St_S/Y, 3 Komponenten, 2 glatt, 1 normal 
+//St_S/Y, 3 Komponenten, 2 glatt, 1 normal
 //charp haengt (in char 20) in K=preimage(R,phi,L);
 //ring r=32003,(b,s,t,u,v,w,x,y,z),dp;
 ring r=11,(b,s,t,u,v,w,x,y,z),dp;
 ideal i=wy-vz,vx-uy,tv-sw,su-bv,tuy-bvz;
-//normalC: char 2,32003: 0  sec 
+//normalC: char 2,32003: 0  sec
 //normalP char withRing 2: 1sec, char 11: 40sec
 
 //Horrocks: cahr 0: 17 (8 in char 11) Komponenten alle normal, delta 1
@@ -6266,16 +6503,16 @@ vx3y2-ux2y3+vx3z2-ux2yz2+vxy2z2-uy3z2,
 tvx2y2-swx2y2+tvx2z2-swx2z2+tvy2z2-swy2z2,
 sux2y2-bvx2y2+sux2z2-bvx2z2+suy2z2-bvy2z2,
 tux2y3-bvx2y2z+tux2yz2+tuy3z2-bvx2z3-bvy2z3;
-//normalC: char 2,32003: 1 sec 
+//normalC: char 2,32003: 1 sec
 //normalP char withRing 2: 1sec, char 11: 40sec
 
 //---------------------------------------------------------
 //genus:
-int tt = timer; 
+int tt = timer;
 list nor=normal(i, "noFac");nor;
 timer-tt;
 
-//Yoshihiko Sakai, irred, 0sec, delta = 8 
+//Yoshihiko Sakai, irred, 0sec, delta = 8
 ring r=0,(x,y),dp;                    //genus 0 4 nodes and 6 cusps im P2
 //ring r=7,(x,y),dp;                  //charp haengt in K = preimage(Q,phi,L)
 ideal i=(x2+y^2-1)^3 +27x2y2;
@@ -6305,7 +6542,7 @@ ideal i=y10+(-2494x2+474)*y8+(84366+2042158x4-660492)*y6
 
 //Rob Koelman
 //ring r=0,(x,y,z),dp;      //dim sing = 1 (nach ca 15 min abgebrochen)
-ring r=32003,(x,y,z),dp;   
+ring r=32003,(x,y,z),dp;
 ideal i=
 761328152*x^6*z^4-5431439286*x^2*y^8+2494*x^2*z^8+228715574724*x^6*y^4+
  9127158539954*x^10-15052058268*x^6*y^2*z^2+3212722859346*x^8*y^2-
@@ -6313,7 +6550,7 @@ ideal i=
  2042158*x^4*z^6-201803238*y^10+12024807786*x^4*y^4*z^2-128361096*x^4*y^2*z^4+
  506101284*x^2*z^2*y^6+47970216*x^2*z^4*y^4+660492*x^2*z^6*y^2-
  z^10-474*z^8*y^2-84366*z^6*y^4;
-//normalC char 32003: 10 sec, char 0 : 
+//normalC char 32003: 10 sec, char 0 :
 
 //ring r=0,(x,y),dp;//genus 10  with 26 cusps (nach ca 4 min abgebrochen)
 ring r=32003,(x,y),dp;    //24 sing, delta 24
@@ -6352,7 +6589,7 @@ ideal i=x2+y2+z2+w2+u2,x3+y3+z3,z4+w4+u4;
 //---------------------------------------------------------
 //Probleme mit normalC in char 2 und char 0
 
-int tt = timer; 
+int tt = timer;
 list nor=normalC(i,"withRing");nor;
 timer-tt;
 
@@ -6364,11 +6601,11 @@ ideal i=y20+y13x+x4y5+x3*(x+1)^2;
 
 ring r=2,(x,y),dp;  //genus 35
 ideal i=y30+y13x+x4y5+x3*(x+1)^2;
-//char 0 abgebrochen bei list SM = mstd(i); ### 
+//char 0 abgebrochen bei list SM = mstd(i); ###
 //char 2 nach ca 30 min
-//normalC: char 2: abgebr. bei list SM = mstd(i);  //Now the work starts' 
+//normalC: char 2: abgebr. bei list SM = mstd(i);  //Now the work starts'
 //normalC, withGens, char 2: abgebrochen bei Q=mstd(Q)[2];
-//normalP char 2 withRing: 0sec 
+//normalP char 2 withRing: 0sec
 
 ring r=0,(x,y),dp;   //irred, genus 55, delta 21
 ideal i=y40+y13x+x4y5+x3*(x+1)^2;
@@ -6395,35 +6632,35 @@ ideal i=
 //normalC: char 3: 0 sec, char 0: 1sec
 
 //ring r=0,(x,y),dp;
-ring r=32003,(x,y),dp; 
-ideal i= 
-x30y21+21x29y20+210x28y19+10x27y19+1330x27y18+190x26y18+5985x26y17 
-+1710x25y17+20349x25y16+45x24y17+9690x24y16+54264x24y15+765x23y16 
-+38760x23y15+116280x23y14+6120x22y15+116280x22y14+120x21y15 
-+203490x22y13+30600x21y14+271320x21y13+1799x20y14+293930x21y12+107100x20y13 
-+503880x20y12+12586x19y13+352716x20y11+278460x19y12+210x18y13+755820x19y11 
-+54509x18y12+352716x19y10+556920x18y11+2723x17y12+923780x18y10+163436x17y11 
-+293930x18y9+875160x17y10+16296x16y11+923780x17y9+359359x16y10+252x15y11 
-+203490x17y8+1093950x16y9+59598x15y10+755820x16y8+598598x15y9+2751x14y10 
-+116280x16y7+1093950x15y8+148610x14y9+503880x15y7+769197x14y8+13650x13y9 
-+54264x15y6+875160x14y7+266805x13y8+210x12y9+271320x14y6+768768x13y7 
-+40635x12y8+20349x14y5+556920x13y6+354816x12y7+1855x11y8+116280x13y5 
+ring r=32003,(x,y),dp;
+ideal i=
+x30y21+21x29y20+210x28y19+10x27y19+1330x27y18+190x26y18+5985x26y17
++1710x25y17+20349x25y16+45x24y17+9690x24y16+54264x24y15+765x23y16
++38760x23y15+116280x23y14+6120x22y15+116280x22y14+120x21y15
++203490x22y13+30600x21y14+271320x21y13+1799x20y14+293930x21y12+107100x20y13
++503880x20y12+12586x19y13+352716x20y11+278460x19y12+210x18y13+755820x19y11
++54509x18y12+352716x19y10+556920x18y11+2723x17y12+923780x18y10+163436x17y11
++293930x18y9+875160x17y10+16296x16y11+923780x17y9+359359x16y10+252x15y11
++203490x17y8+1093950x16y9+59598x15y10+755820x16y8+598598x15y9+2751x14y10
++116280x16y7+1093950x15y8+148610x14y9+503880x15y7+769197x14y8+13650x13y9
++54264x15y6+875160x14y7+266805x13y8+210x12y9+271320x14y6+768768x13y7
++40635x12y8+20349x14y5+556920x13y6+354816x12y7+1855x11y8+116280x13y5
 +597597x12y6+80640x11y7+5985x13y4+278460x12y5+353892x11y6+7280x10y7+38760x12y4
-+358358x11y5+112014x10y6+120x9y7+1330x12y3+107100x11y4+264726x10y5+16660x9y6 
-+9690x11y3+162799x10y4+111132x9y5+805x8y6+210x11y2+30600x10y3+146685x9y4 
-+24500x8y5+1710x10y2+54236x9y3+78750x8y4+2310x7y5+21x10y+6120x9y2+58520x8y3 
-+24010x7y4+45x6y5+190x9y+12509x8y2+39060x7y3+3675x6y4+x9+765x8y+15918x7y2 
-+15680x6y3+204x5y4+10x8+1786x7y+12915x6y2+3500x5y3+45x7+2646x6y+6580x5y2 
-+366x4y3+119x6+2562x5y+1995x4y2+10x3y3+203x5+1610x4y+324x3y2+231x4+630x3y 
-+23x2y2+175x3+141x2y+85x2+16xy+24x+y+4; 
-list nor = normal(i);   
++358358x11y5+112014x10y6+120x9y7+1330x12y3+107100x11y4+264726x10y5+16660x9y6
++9690x11y3+162799x10y4+111132x9y5+805x8y6+210x11y2+30600x10y3+146685x9y4
++24500x8y5+1710x10y2+54236x9y3+78750x8y4+2310x7y5+21x10y+6120x9y2+58520x8y3
++24010x7y4+45x6y5+190x9y+12509x8y2+39060x7y3+3675x6y4+x9+765x8y+15918x7y2
++15680x6y3+204x5y4+10x8+1786x7y+12915x6y2+3500x5y3+45x7+2646x6y+6580x5y2
++366x4y3+119x6+2562x5y+1995x4y2+10x3y3+203x5+1610x4y+324x3y2+231x4+630x3y
++23x2y2+175x3+141x2y+85x2+16xy+24x+y+4;
+list nor = normal(i);
 //normalC: char 0: ### hängt in SB of singular locus JM = mstd(J);
 //normalC: char 32003,"noFac","equidim": 0sec, "noFac": 1sec
 // ev neues interred
 genus(i);         // haengt bei int mu=vdim(std(jacob(f)));
                   //### ist das noetig?
 
-//Singular rechnet genus richtig, auch im Fall, dass Kurve irreduzibel, 
+//Singular rechnet genus richtig, auch im Fall, dass Kurve irreduzibel,
 //aber nicht absolut irreduzibel ist:
 ring r = 0,(x,y),dp;
 ideal i = x2+y2;      //irreduzibel /Q aber reduzibel /C (x-iy)*(x+iy)
