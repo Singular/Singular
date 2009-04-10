@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gkdim.lib,v 1.12 2009-04-09 12:04:41 seelisch Exp $";
+version="$Id: gkdim.lib,v 1.13 2009-04-10 13:04:12 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: gkdim.lib     Procedures for calculating the Gelfand-Kirillov dimension
@@ -53,9 +53,10 @@ EXAMPLE: example GKdim; shows examples
 "
 {
   def M = L[1];
+  int d = -1;
   if (typeof(M)=="ideal")
   {
-    int d=idGKdim(M);
+    d=idGKdim(M);
   }
   else
   {
@@ -71,7 +72,6 @@ EXAMPLE: example GKdim; shows examples
       {
         M=std(M);
       }
-      int d = -1;
       int n = ncols(M); // Num of vectors defining M
       int m = nrows(M); // The rank of the free module where M is imbedded
       int i,j;
@@ -94,10 +94,10 @@ EXAMPLE: example GKdim; shows examples
     }
     else
     {
-      string d="Error: The input must be an ideal, a module or a matrix.";
+      ERROR("The input must be an ideal, a module or a matrix.");
     }
- }
- return (d);
+  }
+  return (d);
 }
 example
 {
@@ -117,7 +117,7 @@ example
   GKdim(A);
   ideal B = 1;
   GKdim(B);
-  GKdim(0) == nvars(basering);  // should be true, i.e., evaluated to 1
+  GKdim(ideal(0)) == nvars(basering);  // should be true, i.e., evaluated to 1
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc gkdim(list L)
