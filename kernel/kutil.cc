@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.133 2009-04-08 17:32:57 motsak Exp $ */
+/* $Id: kutil.cc,v 1.134 2009-04-10 19:01:11 motsak Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1541,13 +1541,13 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
     {
       if(pHasNotCF(p, strat->S[i]))
       {
-//         if(ncRingType(currRing) == nc_lie)
-//         {
-//             // generalized prod-crit for lie-type
-//             strat->cp++;
-//             Lp.p = nc_p_Bracket_qq(pCopy(p),strat->S[i]);
-//         }
-//         else
+         if(ncRingType(currRing) == nc_lie)
+         {
+             // generalized prod-crit for lie-type
+             strat->cp++;
+             Lp.p = nc_p_Bracket_qq(pCopy(p),strat->S[i]);
+         }
+         else
         if( ALLOW_PROD_CRIT(strat) )
         {
             // product criterion for homogeneous case in SCA
@@ -1555,12 +1555,23 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
             Lp.p = NULL;
         }
         else
+        {
           Lp.p = // nc_CreateSpoly(strat->S[i],p,currRing); 
-                 nc_CreateShortSpoly(strat->S[i], p, currRing); 
+                nc_CreateShortSpoly(strat->S[i], p, currRing);
+
+          assume(pNext(Lp.p)==NULL); // TODO: this may be violated whenever ext.prod.crit. for Lie alg. is used    
+          pNext(Lp.p) = strat->tail; // !!!
+        }
       }
       else
+      {
         Lp.p = // nc_CreateSpoly(strat->S[i],p,currRing); 
-                nc_CreateShortSpoly(strat->S[i], p, currRing); 
+              nc_CreateShortSpoly(strat->S[i], p, currRing);
+
+        assume(pNext(Lp.p)==NULL); // TODO: this may be violated whenever ext.prod.crit. for Lie alg. is used    
+        pNext(Lp.p) = strat->tail; // !!!
+
+      }
 
       
 #if MYTEST
@@ -1613,9 +1624,14 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
     Lp.p1 = strat->S[i];
     Lp.p2 = p;
 
-//    if ( !rIsPluralRing(currRing) ) // !!!!
-    assume(pNext(Lp.p)==NULL);
-    pNext(Lp.p) = strat->tail; // !!!
+    if (
+        (!rIsPluralRing(currRing))
+//      ||  (rIsPluralRing(currRing) && (ncRingType(currRing) != nc_lie))         
+       )
+    {
+      assume(pNext(Lp.p)==NULL); // TODO: this may be violated whenever ext.prod.crit. for Lie alg. is used    
+      pNext(Lp.p) = strat->tail; // !!!
+    }
 
     if (atR >= 0)
     {
