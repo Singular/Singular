@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.334 2009-04-08 16:51:56 seelisch Exp $
+@comment $Id: reference.doc,v 1.335 2009-04-10 15:14:34 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3395,7 +3395,7 @@ If the given filename does
 not start with @kbd{.} or @kbd{/} and cannot be located in the current
 directory, each directory contained in the library
 @code{SearchPath} is searched for file of this name.
-@xref{Loading of a library}, for more info on @code{SearchPath}.
+@xref{Loading a library}, for more info on @code{SearchPath}.
 
 @item @strong{Note on standard.lib:}
 Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
