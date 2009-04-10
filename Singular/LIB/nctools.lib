@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.46 2009-04-10 13:25:10 Singular Exp $";
+version="$Id: nctools.lib,v 1.47 2009-04-10 19:05:00 motsak Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -931,6 +931,12 @@ example
   setring ER; ER;
   "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "].";
   kill R; kill ER;
+}
+
+
+proc SuperCommutative(list #)
+{
+  return (superCommutative(#));  
 }
 
 
