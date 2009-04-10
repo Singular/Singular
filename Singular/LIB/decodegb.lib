@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: decodegb.lib,v 1.12 2009-04-07 16:35:41 seelisch Exp $";
+version="$Id: decodegb.lib,v 1.13 2009-04-10 15:18:18 Singular Exp $";
 category="Coding theory";
 info="
 LIBRARY: decodegb.lib         Decoding and min distance of linear codes with GB
@@ -11,7 +11,7 @@ OVERVIEW:
  and generalized Newton identities. The original method of quadratic equations
  is worked out here as well. We also (for comparison) enable to work with the
  system of Fitzgerald-Lax. We provide some auxiliary functions for further
- manipulations and decoding. For an overview of the methods mentioned above @ref{Decoding codes with GB}.
+ manipulations and decoding. For an overview of the methods mentioned above @ref{Decoding codes with Groebner bases}.
  For the vanishing ideal computation the algorithm of Farr and Gao is
  implemented.
 
