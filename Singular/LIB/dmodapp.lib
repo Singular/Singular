@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmodapp.lib,v 1.26 2009-04-09 12:04:41 seelisch Exp $";
+version="$Id: dmodapp.lib,v 1.27 2009-04-10 08:30:16 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmodapp.lib     Applications of algebraic D-modules
@@ -1411,11 +1411,11 @@ ASSUME:  s is a string with the name of some variable and
 EXAMPLE: example fl2poly; shows examples
 "
 {
-  if (varnum(s)==0)
+  if (varNum(s)==0)
   {
     ERROR("no such variable found in the basering"); return(0);
   }
-  poly x = var(varnum(s));
+  poly x = var(varNum(s));
   poly P = 1;
   int sl = size(L[1]);
   ideal RR = L[1];
