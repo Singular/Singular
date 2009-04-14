@@ -5,8 +5,8 @@ LIB"normal.lib";
 ring A  =0,(x,y,z),wp(2,3,6);
 ideal I =y;
 ideal J =zy2-zx3-x6;
-list nor=normal(J);
-def R   =nor[1];
+list nor=normalC(J);
+def R   =nor[1][1];
 setring R;
 norid;
 

@@ -5,7 +5,7 @@ tst_init();
 
 LIB"ncall.lib";
 ring r=0,(a,b,c,d),dp;
-def nc=SuperCommutative(3,4);
+def nc=superCommutative(3,4);
 setring nc;
 ideal I = ab,ca2-db2,ca-db,a3d-cd;
 ideal G = twostd(I);

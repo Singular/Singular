@@ -16,16 +16,16 @@ b6c+bc6+a2b4e-3ab2c2de+c4d2e-a3cde2-abd3e2+bce5;
 
 list pr=normal(i);
 pr;
-def r1=pr[1];
+def r1=pr[1][1];
 setring r1;
 norid; normap;
 kill r,r1;
 
 ring r=32003,(x,y,z),wp(2,3,6);
 ideal i=zy2-zx3-x6;
-list pr=normal(i);
+list pr=normalC(i);
 pr;
-def r1=pr[1];
+def r1=pr[1][1];
 setring r1;
 norid; normap;
 kill r,r1;
@@ -33,10 +33,10 @@ kill r,r1;
 ring r=32003,(x,y,z),dp;
 ideal i=(x-y)*(x-z)*(y-z);
 
-list pr=normal(i);
+list pr=normalC(i);
 pr;
-def r1=pr[1];
-def r2=pr[2];
+def r1=pr[1][1];
+def r2=pr[1][2];
 setring r1;
 norid; normap;
 kill r,r1;
@@ -51,10 +51,10 @@ su-bv,
 tuy-bvz;
 ideal j=x2y2+x2z2+y2z2;
 ideal i=mstd(intersect(j,k))[2];
-list pr=normal(i);
+list pr=normalC(i);
 pr;
-def r1=pr[1];
-def r4=pr[4];
+def r1=pr[1][1];
+def r4=pr[1][4];
 setring r1;
 norid; normap;
 setring r4;
@@ -73,9 +73,9 @@ tst_status(1);$
 // minor command
 ring r=32003,(x,y,z),wp(3,5,15);
 ideal i=z*(y3-x5)+x10;
-list pr=normal(i);
+list pr=normalC(i);
 pr;
-def r1=pr[1];
+def r1=pr[1][1];
 setring r1;
 norid; normap;
 kill r, r1;
