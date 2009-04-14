@@ -1,6 +1,6 @@
 //(GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: random.lib,v 1.18 2009-03-30 18:36:35 motsak Exp $";
+version="$Id: random.lib,v 1.19 2009-04-14 12:00:14 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  random.lib    Creating Random and Sparse Matrices, Ideals, Polys
@@ -153,9 +153,9 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc sparseHomogIdeal (int k, int u, list #)
 "USAGE:   sparseid(k,u[,o,p,b]);  k,u,o,p,b integers
-RETURN:  ideal having k homogeneous generators, each of random degree in the 
-         interval [u,o], p percent of terms in degree d are 0, the remaining 
-         have random coefficients in the interval [1,b], (default: o=u, p=75, 
+RETURN:  ideal having k homogeneous generators, each of random degree in the
+         interval [u,o], p percent of terms in degree d are 0, the remaining
+         have random coefficients in the interval [1,b], (default: o=u, p=75,
          b=30000)
 EXAMPLE: example sparseid; shows an example
 "
@@ -171,7 +171,7 @@ EXAMPLE: example sparseid; shows an example
    for ( ii=k; ii>0; ii=ii-1)
    {
        id = maxideal(random(u, o)); // monomial basis of some degree
-       m = sparsemat(size(id),1,p,b); // random coefficients       
+       m = sparsemat(size(id),1,p,b); // random coefficients
        i[ii] = (matrix(id)*m)[1,1];
    }
    return(i);

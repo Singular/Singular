@@ -1,4 +1,4 @@
-// $Id: elim.lib,v 1.29 2009-04-07 16:18:05 seelisch Exp $
+// $Id: elim.lib,v 1.30 2009-04-14 12:00:14 Singular Exp $
 // (GMG, modified 22.06.96)
 // GMG, last modified 30.10.08: new procedure elimRing;
 // elim changes now to ring with elimination ordering (extra weight vector
@@ -9,7 +9,7 @@
 // GMG, last modified 5.01.09: elim uses now stdhilb(id,@w) instead of std(id)
 // and can now choose as method slimgb or std.
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: elim.lib,v 1.29 2009-04-07 16:18:05 seelisch Exp $";
+version="$Id: elim.lib,v 1.30 2009-04-14 12:00:14 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      Elimination, Saturation and Blowing up
@@ -222,9 +222,7 @@ EXAMPLE: example elimRing; shows an example
   list BRlist = ringlist(BR);
   //------------------ set resp. compute ring weights ----------------------
   int ii;
-  intvec @w;              //to store weights of all variables
-  @w[nvarBR] = 0;
-  @w = @w + 1;            //initialize @w as 1..1
+  intvec @w=1:nvarBR;     //to store weights of all variables
   string str = "a";       //default for specifying elimination ordering
   if (size(#) == 0)       //default values
   {
@@ -249,7 +247,6 @@ EXAMPLE: example elimRing; shows an example
     {
        @w = #[1];              //take the given weights
        str = #[2];             //string for specifying elimination ordering
-
     }
     if ( typeof(#[1]) == "string" and typeof(#[2]) == "intvec" )
     {
@@ -279,7 +276,7 @@ EXAMPLE: example elimRing; shows an example
         if ( ! defined(local) )
         {
            int local = (var(ii) < 1);
-         }
+        }
      }
      else
      {
@@ -375,8 +372,7 @@ EXAMPLE: example elimRing; shows an example
     }
 
     //define now the first a-block of the form a(w1,0..0)
-    intvec @v;
-    @v[nvarBR] = 0;
+    intvec @v=0:nvarBR;
     @v = @v+w1;
     B3[1] = list("a", @v);
   }

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: decodegb.lib,v 1.13 2009-04-10 15:18:18 Singular Exp $";
+version="$Id: decodegb.lib,v 1.14 2009-04-14 12:00:14 Singular Exp $";
 category="Coding theory";
 info="
 LIBRARY: decodegb.lib         Decoding and min distance of linear codes with GB
@@ -1994,7 +1994,7 @@ static proc random_prime_vector (int n)
 proc decodeRandomFL(int n, int redun, int p, int e, int t, int ncodes, int ntrials, string minpol)
 "USAGE:    decodeRandomFL(redun,p,e,n,t,ncodes,ntrials,minpol);
 @format
-          - n is length of codes generated, 
+          - n is length of codes generated,
           - redun = redundancy of codes generated,
           - p is the characteristic,
           - e is the extension degree,

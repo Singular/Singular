@@ -1,7 +1,7 @@
 // $Id:
 //GMG, last modified 28.9.01
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: teachstd.lib,v 1.11 2009-04-06 12:39:02 seelisch Exp $";
+version="$Id: teachstd.lib,v 1.12 2009-04-14 12:00:15 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY:  teachstd.lib   Procedures for teaching standard bases
@@ -421,11 +421,11 @@ EXAMPLE: example prodcrit; shows an example
 // ------------------ check for optional disabling argument -------------
   if( size(#) > 0 )
   {// "size(#): ", size(#);   "typeof(#[1]): ", typeof(#[1]);
-    
+
     if( typeof(#[1]) == "int" )
     {// "#[1] = int ", #[1];
       if( #[1] > 0 )
-      {        
+      {
         return(0);
       }
     }

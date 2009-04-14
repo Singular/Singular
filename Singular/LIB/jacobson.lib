@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: jacobson.lib,v 1.10 2009-03-05 20:36:11 levandov Exp $";
+version="$Id: jacobson.lib,v 1.11 2009-04-14 12:00:14 Singular Exp $";
 category="System and Control Theory";
 info="
 LIBRARY: jacobson.lib     Algorithms for Smith and Jacobson Normal Form
@@ -12,7 +12,7 @@ THEORY: We work over a ring R, that is an Euclidean principal ideal domain.
 @* We treat then the basering as the Ore localization of R
 @* with respect to the mult. closed set S = K[x] without 0.
 @* Thus, we treat basering as principal ideal ring with d a polynomial
-@* variable and x an invertible one. 
+@* variable and x an invertible one.
 @* Note, that in computations no division by x will actually happen.
 @*
 @* Given a rectangular matrix M over R, one can compute unimodular (that is
@@ -21,8 +21,8 @@ THEORY: We work over a ring R, that is an Euclidean principal ideal domain.
 
 REFERENCES:
 @* (1) N. Jacobson, 'The theory of rings', AMS, 1943.
-@* (2) Manuel Avelino Insua Hermo, 'Varias perspectives sobre las bases de Groebner : 
-@* Forma normal de Smith, Algorithme de Berlekamp y algebras de Leibniz'. 
+@* (2) Manuel Avelino Insua Hermo, 'Varias perspectives sobre las bases de Groebner :
+@* Forma normal de Smith, Algorithme de Berlekamp y algebras de Leibniz'.
 @* PhD thesis, Universidad de Santiago de Compostela, 2005.
 
 
@@ -64,7 +64,7 @@ EXAMPLE: example divideUnits; shows examples
     list LL; LL[1] = L[1]; LL[2] = L[1];
     L = LL;
   }
-  
+
 
   // divide units out
   matrix M = L[2];
@@ -73,7 +73,7 @@ EXAMPLE: example divideUnits; shows examples
   matrix TM = matrix(freemodule(nrM));
   int i; int nsize = Min(intvec(nrM,ncM));
   poly p; number n; intvec lexp;
-  
+
   for(i=1; i<=nsize; i++)
   {
     p = M[i,i];
@@ -122,13 +122,13 @@ proc smith(matrix MA, list #)
 "USAGE: smith(M[, eng1, eng2]);  M matrix, eng1 and eng2 are optional integers
 RETURN: matrix or list of matrices, depending on arguments
 ASSUME: Basering is a commutative polynomial ring in one variable
-PURPOSE: compute the Smith Normal Form of M with (optionally) transformation matrices 
+PURPOSE: compute the Smith Normal Form of M with (optionally) transformation matrices
 THEORY: Groebner bases are used for the Smith form like in (2).
 NOTE: By default, just the Smith normal form of M is returned.
 @* If the optional integer @code{eng1} is non-zero, the list {U,D,V} is returned
 @* where U*M*V = D and the diagonal field entries of D are not normalized.
 @* The normalization of the latter can be done with the 'divideUnits' procedure.
-@* U and V above are square unimodular (invertible) matrices. 
+@* U and V above are square unimodular (invertible) matrices.
 @* Note, that the procedure works for a rectangular matrix M.
 @*
 @* The optional integer @code{eng2} determines the Groebner basis engine:

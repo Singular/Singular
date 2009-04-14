@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.48 2009-04-14 08:25:19 Singular Exp $";
+version="$Id: nctools.lib,v 1.49 2009-04-14 12:00:14 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -900,7 +900,7 @@ EXAMPLE: example superCommutative; shows examples
   if( (fprot == 1) and (attrib(basering, "global") != 1) )
   {
     print("Warning: Since the current ordering is not global there might be problems computing twostd(Q)!");
-    "Q:"; 
+    "Q:";
     @Q;
   }
 

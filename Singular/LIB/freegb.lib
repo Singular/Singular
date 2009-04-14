@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: freegb.lib,v 1.21 2009-04-09 12:04:41 seelisch Exp $";
+version="$Id: freegb.lib,v 1.22 2009-04-14 12:00:14 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: freegb.lib   Compute two-sided Groebner bases in free algebras via letterplace
@@ -59,7 +59,7 @@ proc setLetterplaceAttributes(def R, int uptodeg, int lV)
 RETURN: ring with special attributes set
 PURPOSE: sets attributes for a letterplace ring:
 @*      'isLetterplaceRing' = true, 'uptodeg' = d, 'lV' = b, where
-@*      'uptodeg' stands for the degree bound, 
+@*      'uptodeg' stands for the degree bound,
 @*      'lV' for the number of variables in the block 0.
 NOTE: Activate the resulting ring by using @code{setring}
 "
@@ -68,12 +68,12 @@ NOTE: Activate the resulting ring by using @code{setring}
   {
     ERROR("uptodeg and lV do not agree on the basering!");
   }
-  
+
     // Set letterplace-specific attributes for the output ring!
   attrib(R, "uptodeg", uptodeg);
-  attrib(R, "lV", lV);  
-  attrib(R, "isLetterplaceRing", 1);  
-  return (R); 
+  attrib(R, "lV", lV);
+  attrib(R, "isLetterplaceRing", 1);
+  return (R);
 }
 example
 {
@@ -364,7 +364,7 @@ example
 proc isVar(poly p)
 "USAGE:  isVar(p);  poly p
 RETURN:  int
-PURPOSE: check, whether leading monomial of p is a power of a single variable 
+PURPOSE: check, whether leading monomial of p is a power of a single variable
 @* from the basering. Returns the exponent or 0 if p is multivariate.
 EXAMPLE: example isVar; shows examples
 "
@@ -2147,8 +2147,8 @@ static proc test_shift()
   int d =5;
   def R = makeLetterplaceRing(d);
   setring R;
-  int uptodeg = d; 
-  int lV = 2; 
+  int uptodeg = d;
+  int lV = 2;
   def R = setLetterplaceAttributes(r,uptodeg,2); // supply R with letterplace structure
   setring R;
   poly p = mmLiebr(a(1),b(1));
