@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-04-08 14:02:26 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.31 2009-04-08 14:02:26 monerjan Exp $
-$Id: gfan.cc,v 1.31 2009-04-08 14:02:26 monerjan Exp $
+$Date: 2009-04-14 11:05:52 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.32 2009-04-14 11:05:52 monerjan Exp $
+$Id: gfan.cc,v 1.32 2009-04-14 11:05:52 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -482,40 +482,58 @@ class gcone
 			poly p=f;
 			pWrite(p);
 			//poly r=kCreateZeroPoly(,currRing,currRing);	//The 0-polynomial, hopefully
-			poly r=0;
+			poly r=NULL;	//The zero polynomial
 			int ii;
 			bool divOccured;
-			cout << "TICK 1" << endl;	//Hangs after this line. Zeropoly stuff
-			while (pHead(p)!=NULL)
+			
+			while (p!=NULL)
 			{
 				ii=1;
-				divOccured=TRUE;
+				divOccured=FALSE;
+				
 				while( (ii<=IDELEMS(I) && (divOccured==FALSE) ))
-				{
-					cout << "TICK 2" << endl;
-					if (pLmDivisibleBy(I->m[ii],p))
+				{					
+					if (pDivisibleBy(I->m[ii-1],p))	//does LM(I->m[ii]) divide LM(p) ?
 					{
-						cout << "TICK 3" << endl;
-						p=pSub(p,pMult( pDivide(pHead(p),pHead(I->m[ii])), I->m[ii]));
-						cout << "TICK 4" << endl;
-						pWrite(p);
+						//cout << "TICK 3" << endl;
+						poly step1,step2,step3;
+						cout << "dividing "; pWrite(pHead(p));cout << "by ";pWrite(pHead(I->m[ii-1])); cout << endl;
+						step1 = pDivideM(pHead(p),pHead(I->m[ii-1]));
+						cout << "LT(p)/LT(f_i)="; pWrite(step1); cout << endl;
+						//cout << "TICK 3.1" << endl;
+						step2 = ppMult_qq(step1, I->m[ii-1]);
+						//cout << "TICK 3.2" << endl;
+						step3 = pSub(p, step2);
+						//p=pSub(p,pMult( pDivide(pHead(p),pHead(I->m[ii])), I->m[ii]));
+						//cout << "TICK 4" << endl;
 						pSetm(p);
+						p=step3;
+						pWrite(p);						
 						divOccured=TRUE;
 					}
 					else
 					{
 						ii += 1;
 					}//if (pLmDivisibleBy(I->m[ii],p,currRing))
-					if (divOccured==FALSE)
-					{
-						cout << "TICK 5" << endl;
-						r=pAdd(r,pHead(p));
-						cout << "TICK 6" << endl;
-						p=pSub(p,pHead(p));
-						cout << "TICK 7" << endl;
-						pWrite(p);
-					}//if (divOccured==FALSE)
 				}//while( (ii<IDELEMS(I) && (divOccured==FALSE) ))
+				if (divOccured==FALSE)
+				{
+					//cout << "TICK 5" << endl;
+					r=pAdd(r,pHead(p));
+					pSetm(r);
+					cout << "r="; pWrite(r); cout << endl;
+					//cout << "TICK 6" << endl;
+					if (pLength(p)!=1)
+					{
+						p=pSub(p,pHead(p));	//Here it may occur that p=0 instead of p=NULL
+					}
+					else
+					{
+						p=NULL;	//Hack to correct this situation						
+					}
+					//cout << "TICK 7" << endl;
+					cout << "p="; pWrite(p);
+				}//if (divOccured==FALSE)
 			}//while (p!=0)
 			return r;
 		}//poly restOfDiv(poly const &f, ideal const &I)
@@ -525,11 +543,14 @@ class gcone
 		ideal ffG(ideal const &H, ideal const &G)
 		{
 			cout << "Entering ffG" << endl;
-			int size=IDELEMS(G);
+			int size=IDELEMS(H);
 			ideal res=idInit(size,1);
 			for (int ii=0;ii<size;ii++)
 			{
 				res->m[ii]=restOfDiv(H->m[ii],G);
+				//res->m[ii]=pSub(H->m[ii],res->m[ii]); //buggy
+				pSetm(res->m[ii]);
+				cout << "res->m["<<ii<<"]=";pWrite(res->m[ii]);						
 			}
 			return res;
 		}
