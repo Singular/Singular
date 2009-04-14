@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: latex.lib,v 1.33 2009-04-14 17:03:43 Singular Exp $";
+version="$Id: latex.lib,v 1.34 2009-04-14 17:23:25 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: latex.lib    Typesetting of Singular-Objects in LaTeX2e
@@ -589,9 +589,9 @@ RETURN:  if @code{fname=\"\"}: the transformed string s, for which the
    \"a..z\" + int            --> \"a..z\" + \"_@{\" + int + \"@}\"
 \"(\" + int + \",\" + s' + \")\" --> \"_@{\"+ int +\"@}\" + \"^@{\" + s'+\"@}\"
 @end example
-         Furthermore, strings which begin with a left parenthesis are modified
+         Furthermore, strings which begin with a left brace are modified
          by deleting the first and the last character (which is then assumed to
-         be a right parenthes).
+         be a right brace).
 
          if @code{fname!=\"\"}: append the transformed string s to the file
          @code{<fname>}, and return nothing.
