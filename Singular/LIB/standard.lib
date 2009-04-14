@@ -4,7 +4,7 @@
 //stdhilb can be called with std or slimgb (Jan 2008, GMG)
 //### Todo: im lokalen Fall die Hilbert-Samuel Funktion verwenden
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.107 2009-02-12 13:31:40 Singular Exp $";
+version="$Id: standard.lib,v 1.108 2009-04-14 09:54:52 seelisch Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -156,7 +156,7 @@ proc stdhilb(i,list #)
 TYPE:    type of the first argument
 PURPOSE: Compute a Groebner basis of the ideal/module in the basering by
          using the Hilbert driven Groebner basis algorithm.
-         If an argument of type string @code{\"std\"} resp. @code{\"slimgb\"}
+         If an argument of type string, stating @code{\"std\"} resp. @code{\"slimgb\"},
          is given, the standard basis computation uses @code{std} or
          @code{slimgb}, otherwise a heuristically chosen method (default)@*
          If an optional second argument w of type intvec is given, w is used
@@ -169,7 +169,7 @@ THEORY:  If the ideal is not homogeneous compute first a Groebner basis
          original ring by using the computed Hilbert function. If the given
          w does not coincide with the variable weights of the basering, the
          result may not be a groebner basis in the original ring.
-NOTE:    'homogeneous' means weighted homogeneous with respect to the weights
+NOTE:    'Homogeneous' means weighted homogeneous with respect to the weights
          w[i] of the variables var(i) of the basering. Parameters are not
          converted to variables.
 SEE ALSO: stdfglm, std, slimgb, groebner
@@ -806,37 +806,37 @@ proc groebner(def i_par, list #)
 "SYNTAX: @code{groebner (} ideal_expression @code{)} @*
          @code{groebner (} module_expression @code{)} @*
          @code{groebner (} ideal_expression@code{,} int_expression @code{)} @*
-         @code{groebner (} module_expression@code{,} int_expression @code{)}
+         @code{groebner (} module_expression@code{,} int_expression @code{)} @*
          @code{groebner (} ideal_expression@code{,} list of string_expressions
                @code{)} @*
          @code{groebner (} ideal_expression@code{,} list of string_expressions
                and int_expression @code{)} @*
-         @code{groebner (} ideal_expression@code{,} int_expression @code{)} @*
+         @code{groebner (} ideal_expression@code{,} int_expression @code{)}
 TYPE:    type of the first argument
 PURPOSE: computes a standard basis of the first argument @code{I}
-         (ideal or module), by a heuristically chosen method (default)
+         (ideal or module) by a heuristically chosen method (default)
          or by a method specified by further arguments of type string.
          Possible methods are:  @*
          - the direct methods @code{\"std\"} or @code{\"slimgb\"} without
-           conversion @*
+           conversion, @*
          - conversion methods @code{\"hilb\"} or @code{\"fglm\"} where
            a Groebner basis is first computed with an \"easy\" ordering
            and then converted to the ordering of the basering by the
            Hilbert driven Groebner basis computation or by linear algebra.
            The actual computation of the Groebner basis can be
            specified by @code{\"std\"} or by @code{\"slimgb\"}
-           (not implemented for all orderings) @*
+           (not for all orderings implemented). @*
          A further string @code{\"par2var\"} converts parameters to an extra
          block of variables before a Groebner basis computation (and
          afterwards back).
-         @code{option(prot)} tells about the chosen method.
-NOTE:    If a further argument, say @code{wait}, of type int is given,
-         then the computation proceeds at most @code{wait} seconds.
+         @code{option(prot)} informs about the chosen method.
+NOTE:    If an additional argument, say @code{wait}, of type int is given,
+         then the computation runs for at most @code{wait} seconds.
          That is, if no result could be computed in @code{wait} seconds,
          then the computation is interrupted, 0 is returned, a warning
          message is displayed, and the global variable
          @code{Standard::groebner_error} is defined.
-         This feature uses MP and is hence only available on UNIX platforms.
+         This feature uses MP and hence it is available on UNIX platforms, only.
 HINT:    Since there exists no uniform best method for computing standard
          bases, and since the difference in performance of a method on
          different examples can be huge, it is recommended to test, for hard
@@ -1318,7 +1318,7 @@ resolution
 @item @strong{Purpose:}
 computes a (possibly minimal) free resolution of an ideal or module using
 a heuristically chosen method.
-@* The second (int) argument (say, @code{k}) specifies the length of
+@* The second (int) argument (say @code{k}) specifies the length of
 the resolution. If it is not positive then @code{k} is assumed to be the
 number of variables of the basering.
 @* If a third argument is given, the returned resolution is minimized.
@@ -1339,8 +1339,8 @@ following methods:
 @code{mres} (classical method), see @ref{mres}.
 @end table
 @item @strong{Note:}
-Accessing single elements of a resolution may require that some partial
-computations have to be finished and may therefore take some time.
+Accessing single elements of a resolution may require some partial
+computations to be finished and may therefore take some time.
 @end table
 @c ref
 See also
@@ -1746,13 +1746,13 @@ PURPOSE:  @code{sprintf(fmt,...);} performs output formatting. The first
           these characters are returned as a string. @*
           The control string @code{fmt} is simply text to be copied,
           except that the string may contain conversion specifications.@*
-          Do @code{help print;} for a listing of valid conversion
+          Type @code{help print;} for a listing of valid conversion
           specifications. As an addition to the conversions of @code{print},
           the @code{%n} and @code{%2} conversion specification does not
           consume an additional argument, but simply generates a newline
           character.
 NOTE:     If one of the additional arguments is a list, then it should be
-          enclosed once more into a @code{list()} command, since passing a list
+          wrapped in an additional @code{list()} command, since passing a list
           as an argument flattens the list by one level.
 SEE ALSO: fprintf, printf, print, string
 EXAMPLE : example sprintf; shows an example
@@ -1835,7 +1835,7 @@ PURPOSE:  @code{printf(fmt,...);} performs output formatting. The first
           these characters are displayed (i.e., printed to standard out). @*
           The control string @code{fmt} is simply text to be copied, except
           that the string may contain conversion specifications. @*
-          Do @code{help print;} for a listing of valid conversion
+          Type @code{help print;} for a listing of valid conversion
           specifications. As an addition to the conversions of @code{print},
           the @code{%n} and @code{%2} conversion specification does not
           consume an additional argument, but simply generates a newline
@@ -1877,7 +1877,7 @@ PURPOSE:  @code{fprintf(l,fmt,...);} performs output formatting.
           written to the link l.
           The control string @code{fmt} is simply text to be copied, except
           that the string may contain conversion specifications.@*
-          Do @code{help print;} for a listing of valid conversion
+          Type @code{help print;} for a listing of valid conversion
           specifications. As an addition to the conversions of @code{print},
           the @code{%n} and @code{%2} conversion specification does not
           consume an additional argument, but simply generates a newline
@@ -1949,7 +1949,7 @@ PURPOSE: If @code{I,d,wim} denotes the three arguments then weightKB
          The information about the weights is given as a list of two intvec:
             @code{wim[1]} weights for all variables (positive),
             @code{wim[2]} weights for the module generators.
-NOTE:    This is a generalisation for the command @code{kbase} with the same
+NOTE:    This is a generalization of the command @code{kbase} with the same
          first two arguments.
 SEE ALSO: kbase
 EXAMPLE: example weightKB; shows an example

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.335 2009-04-10 15:14:34 Singular Exp $
+@comment $Id: reference.doc,v 1.336 2009-04-14 09:55:34 seelisch Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -377,8 +377,8 @@ intmat
 @item @strong{Purpose:}
 with 1 argument: computes the graded Betti numbers of a minimal resolution of
 @tex
-$R^n/M$, if $R$ denotes the basering and
-$M$ a homogeneous submodule of $R^n$ and the argument represents a
+$R^n/M$, if $R$ denotes the basering,
+$M$ is a homogeneous submodule of $R^n$ and the argument represents a
 resolution of
 $R^n/M$.
 @end tex
@@ -388,8 +388,8 @@ $R^n/M$.
 @tex
 The entry d of the intmat at place (i,j) is the minimal number of
 generators in degree i+j of the j-th syzygy module (= module of
-relations) of $R^n/M$ (the 0th (resp.\ 1st) syzygy module of $R^n/M$ is
-$R^n$ (resp.\ $M$)).
+relations) of $R^n/M$, i.e. the 0th (resp.\ 1st) syzygy module of $R^n/M$ is
+$R^n$ (resp.\ $M$).
 @end tex
 @ifinfo
 R^n/M, if R denotes the basering and
@@ -430,7 +430,7 @@ If the optional second argument is non-zero, the Betti numbers will be minimized
 @end smallexample
 @end table
 
-Hence
+Hence,
 @itemize @bullet
 @item the 0th syzygy module of r/j (which is r) has 1 generator in
 degree 0 (which is 1),
@@ -647,7 +647,7 @@ See
 @item @strong{Type:}
 ideal resp. bigint
 @item @strong{Purpose:}
-applies chines remainder theorem to the fisrt argument wrt. the moduli given in the second.
+applies chinese remainder theorem to the fisrt argument wrt. the moduli given in the second.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -731,15 +731,25 @@ matrix
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-determines the monomials in f divisible by one of the ring variables of m
+determines the monomials in f divisible by a ring variable of m
 (where f is the first argument and m the second argument) and the coefficients
-of these monomials as polynomials in the remaining variables.
-
-First case:  returns a 2 x n matrix M, n being the number
-of the determined monomials.
+of these monomials as polynomials in the remaining variables. First case:  returns a
+@tex
+  $2\times n$
+@end tex
+@ifinfo
+  2 x n
+@end ifinfo
+matrix M, n being the number of the determined monomials.
 The first row consists of these monomials, the second row
 of the corresponding coefficients of the monomials in f.
-Thus, f = M[1,1]*M[2,1]+...+M[1,n]*M[2,n].
+Thus,
+@tex
+  $f = M[1,1]\cdot M[2,1]+\ldots+M[1,n]\cdotM[2,n].$
+@end tex
+@ifinfo
+  f = M[1,1]*M[2,1]+...+M[1,n]*M[2,n].
+@end ifinfo
 
 Second case: the second matrix (i.e., the 4th argument) contains the
 monomials, the first matrix (i.e., the 3rd argument) the corresponding
@@ -804,12 +814,12 @@ With e denoting the maximal z-degree occuring in the polynomials of J, and d:=e+
 satisfies the following conditions:
 @itemize
 @item
-(i) If J is a single polynomial f, then M is a (d x 1)-matrix and
+(i) If J is a single polynomial f, then M is a
 @tex
-  $m_{i+1,j}, 0\leq i\leq e$,
+  $(d\times 1)$-matrix and $m_{i+1,j}, 0\leq i\leq e$,
 @end tex
 @ifinfo
-  m(i+1,j), 0 <= i <= e,
+  (d x 1)-matrix and m(i+1,j), 0 <= i <= e,
 @end ifinfo
 is the coefficient of
 @tex
@@ -827,12 +837,12 @@ in f.
 @ifinfo
   f_1, f_2, ..., f_k
 @end ifinfo
-then M is a (d x k)-matrix and
+then M is a
 @tex
-  $m_{i+1,j}, 0\leq i\leq e, 1\leq j\leq k$,
+  $(d\times k)$-matrix and $m_{i+1,j}, 0\leq i\leq e, 1\leq j\leq k$,
 @end tex
 @ifinfo
-  m(i+1,j), 0 <= i <= e, 1 <= j <= k,
+  (d x k)-matrix and m(i+1,j), 0 <= i <= e, 1 <= j <= k,
 @end ifinfo
 is the coefficient of
 @tex
@@ -856,12 +866,12 @@ in
 @ifinfo
   f_1, f_2, ..., f_k
 @end ifinfo
-then M is a (dk x 1)-matrix and
+then M is a
 @tex
-  $m_{(j-1)d+i+1,1}, 0\leq i\leq e, 1\leq j\leq k$,
+  $(dk\times 1)$-matrix and $m_{(j-1)d+i+1,1}, 0\leq i\leq e, 1\leq j\leq k$,
 @end tex
 @ifinfo
-  m((j-1)d+i+1, 1), 0 <= i <= e, 1 <= j <= k,
+  (dk x 1)-matrix and m((j-1)d+i+1, 1), 0 <= i <= e, 1 <= j <= k,
 @end ifinfo
 is the coefficient of
 @tex
@@ -885,12 +895,12 @@ in
 @ifinfo
   v_1, v_2, ..., v_s
 @end ifinfo
-of dimension k then M is a (dk x s)-matrix and
+of dimension k then M is a
 @tex
-  $m_{(j-1)d+i+1,r}, 0\leq i\leq e, 1\leq j\leq k, 1\leq r\leq s$,
+  $(dk\times s)$-matrix and $m_{(j-1)d+i+1,r}, 0\leq i\leq e, 1\leq j\leq k, 1\leq r\leq s$,
 @end tex
 @ifinfo
-  m((j-1)d+i+1, r), 0 <= i <= e, 1 <= j <= k, 1 <= r <= s,
+  (dk x s)-matrix and m((j-1)d+i+1, r), 0 <= i <= e, 1 <= j <= k, 1 <= r <= s,
 @end ifinfo
 is the coefficient of
 @tex
@@ -987,7 +997,21 @@ or product_of_ringvars is the product of all ring variables except one variable 
 If product_of_ringvars is omitted then x = 1 as default.
 
 If K contains all monomials that are necessary to express the entries of
-M, then the returned matrix A satisfies K*A=M. Otherwise only a subset of entries of K*A and M will coincide.
+M, then the returned matrix A satisfies
+@tex
+  $K\cdot A=M$.
+@end tex
+@ifinfo
+  K*A=M.
+@end ifinfo
+Otherwise only a subset of entries of
+@tex
+  $K\cdot A
+@end tex
+@ifinfo
+  K*A
+@end ifinfo
+and M will coincide.
 In this case, the valid entries start at M[1,1] and run from left to right, top to bottom.
 
 @item @strong{Note:}
@@ -1025,7 +1049,14 @@ matrix
 @item @strong{Purpose:}
 contracts each of the n elements of the second ideal J
 by each of the m elements of the first ideal I,
-producing an m x n matrix.
+producing an
+@tex
+  m\times n
+@end tex
+@ifinfo
+  (m x n)
+@end ifinfo
+matrix.
 @*Contraction is defined on monomials by:
 @*
 @ifinfo
@@ -1390,7 +1421,8 @@ See
 @*@code{division (} ideal_expression@code{,} ideal_expression@code{,} int_expression @code{)}
 @*@code{division (} module_expression@code{,} module_expression@code{,} int_expression @code{)}
 @*@code{division (} ideal_expression@code{,} ideal_expression@code{,} int_expression@code{,} intvec_expression @code{)}
-@*@code{division (} module_expression@code{,} module_expression@code{,} int_expression@code{,} intvec_expression @code{)}
+@*@code{division (} module_expression@code{,} module_expression@code{,} int_expression@code{,}
+@*          intvec_expression @code{)}
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
@@ -1439,7 +1471,7 @@ See
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-dumps (i.e., writes in one "message" or "block") the state of the @sc{Singular}
+dumps (i.e., writes in a "message" or "block") the state of the @sc{Singular}
 session (i.e., all defined variables and their values) to the specified
 link (which must be either an ASCII or MP link) such that a
 @code{getdump} can retrieve it later on.
@@ -1693,7 +1725,7 @@ returns a list of ideals computed by the factorizing Groebner basis algorithm.
 i.e., the radical of the intersection coincides with the radical of the input
 ideal.
 In many (but not all!) cases this is already a decomposition of the radical
-of the ideal. (Note however, that, in general, no inclusion between the
+of the ideal. (Note however that in general, no inclusion between the
 input and output ideals holds.)
 @*The second, optional argument gives a list of polynomials which define
 non-zero constraints:
@@ -1929,7 +1961,7 @@ See
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-input comes from the file filename. Shorthand for
+Read and execute the content of the file filename. Shorthand for
 @code{execute(read(filename))}.
 @item @strong{Example:}
 @smallexample
@@ -1980,7 +2012,7 @@ See
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
-returns an ideal which is contained in the ideal_expression such that the i-th
+returns an ideal which is contained in the ideal_expression, such that the i-th
 generator is a univariate polynomial in the i-th ring variable.
 @* The polynomials have minimal degree w.r.t.@: this property.
 @item @strong{Assume:}
@@ -2060,8 +2092,8 @@ from a reduced Groebner basis with respect to a degree ordering. This
 can be much faster than computing a lexicographical Groebner basis
 directly.
 @item @strong{Note:}
-The only permissible difference between the ring @code{ring_name}
-and the base ring active when calling @code{frwalk} is the monomial ordering.
+When calling @code{frwalk}, the only permissible difference between the ring
+@code{ring_name} and the active base ring is the monomial ordering.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -2167,7 +2199,7 @@ reads the content of the entire file, resp.@: link, and restores all variables
 from it. For ASCII links, @code{getdump} is equivalent to an
 @code{execute(read(} link @code{))} command. For MP links,
 @code{getdump} should only be used on data which were previously
-@code{dump}'ed.
+´@code{dump}`ed.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -2380,10 +2412,10 @@ none (if called with one argument)
 @item @strong{Purpose:}
 computes the (weighted) Hilbert series of the ideal, resp.@: module,
 defined by the leading terms of the generators of the given ideal, resp.@: module.@*
-If @code{hilb} is called with one argument, then the 1st and 2nd Hilbert series
+If @code{hilb} is called with one argument, then the first and second Hilbert series
 together with some additional information are displayed.@*
 If @code{hilb} is called with two arguments, then the n-th Hilbert series is returned
-as an intvec, where n=1,2 is the second argument.@*
+as an intvec, where n = 1, 2 is the second argument.@*
 If a weight vector w is a given as 3rd argument, then the Hilbert series is computed
 w.r.t.@: these weights w (by default all weights are set to 1).
 @item @strong{Caution:}
@@ -2514,8 +2546,8 @@ L[i]=M_i
 in the above notation.
 @item @strong{Note:}
 The ideal_expression has to be homogeneous.
-@* Accessing single elements of a resolution may require that some partial
-computations have to be finished and may therefore take some time.
+@* Accessing single elements of a resolution may require some partial
+computations to be finished. Therefore, it may take some time.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -2704,10 +2736,10 @@ See
 ideal
 @item @strong{Purpose:}
 @code{interpolation(l,v)} computes the reduced Groebner basis of the intersection
-of ideals l[1]^v[1],...,l[N]^v[N] by applying linear algebra methods.
+of ideals l[1]^v[1], ..., l[N]^v[N] by applying linear algebra methods.
 @item @strong{Assume:}
 Every ideal from the list l must be a maximal ideal of a point and should have
-the following form: variable_1-coordinate_1,...,variable_n-coordinate_n, where n
+the following form: variable_1-coordinate_1, ..., variable_n-coordinate_n, where n
 is the number of variables in the ring.
 @*The ring should be a polynomial ring over Zp or Q with global ordering.
 @item @strong{Example:}
@@ -2757,34 +2789,34 @@ the same as the input type
 interreduces a set of polynomials/vectors.
 @*
 @ifinfo
-input: f_1,@dots{},f_n
+Input: f_1,@dots{},f_n
 @end ifinfo
 @tex
-input: $f_1,\dots,f_n$
+Input: $f_1,\dots,f_n$
 @end tex
 @*
 @ifinfo
-output: g_1,@dots{},g_s with s<=n and the properties
+Output: g_1,@dots{},g_s with s<=n and the properties
 
 @*
 @end ifinfo
 @tex
-output: $g_1,\dots,g_s$ with $s \leq n$ and the properties
+Output: $g_1,\dots,g_s$ with $s \leq n$ and the properties
 @end tex
 @itemize @bullet
 @item
 @ifinfo
-(f_1,@dots{},f_n) = (g_1,@dots{},g_s)
+(f_1,@dots{},f_n) = (g_1,@dots{},g_s),
 @end ifinfo
 @tex
-$(f_1,\dots,f_n) = (g_1,\dots,g_s)$
+$(f_1,\dots,f_n) = (g_1,\dots,g_s)$,
 @end tex
 @item
 @ifinfo
-L(g_i)<>L(g_j) for all i<>j
+L(g_i)<>L(g_j) for all i<>j,
 @end ifinfo
 @tex
-$L(g_i)\neq L(g_j)$ for all $i\neq j$
+$L(g_i)\neq L(g_j)$ for all $i\neq j$,
 @end tex
 @item
 in the case of a global ordering (polynomial ring) and @code{option(redSB);}:
@@ -2797,10 +2829,10 @@ $L(g_i)$
 @end tex
  does not divide m for all monomials m of
 @ifinfo
-@{g_1,@dots{},g_(i-1),g_(i+1),@dots{},g_s@}
+@{g_1,@dots{},g_(i-1),g_(i+1),@dots{},g_s@},
 @end ifinfo
 @tex
-$\{g_1,\dots,g_{i-1},g_{i+1},\dots,g_s\}$
+$\{g_1,\dots,g_{i-1},g_{i+1},\dots,g_s\}$,
 @end tex
 @item
 in the case of a local or mixed ordering (localization of polynomial ring) and @code{option(redSB);}:
@@ -2813,10 +2845,10 @@ $L(g_i) | L(g_j)$ for any $i \neq j$,
 @end tex
 then
 @ifinfo
-ecart(g_i) > ecart(g_j)
+ecart(g_i) > ecart(g_j).
 @end ifinfo
 @tex
-$ecart(g_i) > ecart(g_j)$
+$ecart(g_i) > ecart(g_j)$.
 @end tex
 @end itemize
 @tex
@@ -2901,7 +2933,7 @@ partial derivatives of the input.
 In a ring with n variables, jacob of a module or
 an ideal (considered as matrix with a single a row) or
 a polynomial (considered as a matrix with a single entry)
-is the matrix consisting of horizontally concatinated blocks (in this order):
+is the matrix consisting of horizontally concatenated blocks (in this order):
 diff(MT,var(1)), ... , diff(MT,var(n)),
 where MT is the transposed input argument considered as a matrix.
 @item @strong{Example:}
@@ -2937,7 +2969,7 @@ ideal
 computes the Janet basis of the given ideal, resp.@:  the standard basis
 if 1 is given as the second argument.
 @item @strong{Remark:}
-it works only with global orderings.
+It works only with global orderings.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -3032,17 +3064,17 @@ See
 @item @strong{Type:}
 the same as the input type of the first argument
 @item @strong{Purpose:}
-with one argument:
+With one argument:
 computes a vector space basis (consisting of monomials)
 of the quotient ring by the ideal,
 resp.@: of a free module by the module, in case it is finite dimensional
-and if the input is a standard basis with respect to the ring ordering.
-If the input is not a standard basis, the leading terms of the input are
+and if the input is a standard basis with respect to the ring ordering.@*
+Note that, if the input is not a standard basis, the leading terms of the input are
 used and the result may have no meaning.
 @*With two arguments: computes the part of a vector space basis of the
 respective quotient with degree of the monomials equal to the
 second argument. Here, the quotient does not need to be finite dimensional.
-If an attribute@code{isHomog} (of type @code{intvec} is present,
+If an attribute@code{isHomog} (of type @code{intvec}) is present,
 it is used as module weight.
 @item @strong{Example:}
 @smallexample
@@ -3182,7 +3214,7 @@ the generators of the ideal @code{id}.
 the first n generators of the ideal @code{id}.
 
 @item @strong{Note:}
-@code{koszul(1,id),koszul(2,id),...} form a complex, that is, the product
+@code{koszul(1,id), koszul(2,id), ...} form a complex, that is, the product
 of the matrices @code{koszul(i,id)} and @code{koszul(i+1,id)} equals zero.
 @item @strong{Example:}
 @smallexample
@@ -3437,9 +3469,8 @@ See
 matrix
 @item @strong{Purpose:}
 computes the transformation matrix which expresses the generators of a
-submodule in terms of the generators of a module.  Uses different
-algorithms for modules which are, resp.@: are not, represented by a
-standard basis.
+submodule in terms of the generators of a module. Depending on which algorithm is used,
+modules are represented by a standard basis, or not.
 @* More precisely, if  @code{m} is the
 module (or ideal), @code{sm} the submodule (or ideal),
 and @code{T} the transformation matrix returned by
@@ -3447,7 +3478,7 @@ lift, then @code{matrix(sm)*U = matrix(m)*T}
 and @code{module(sm*U) = module(matrix(m)*T)}
 (resp.@: @code{ideal(sm) = ideal(matrix(m)*T)}),
 where @code{U} is a diagonal matrix of units.
-@*@code{U} is always the unity matrix if the basering is a polynomial ring
+@*@code{U} is always the identity if the basering is a polynomial ring
 (not power series ring). @code{U} is stored in the optional third argument.
 @item @strong{Note:}
 Gives a warning if @code{sm} is not a submodule.
@@ -3752,7 +3783,7 @@ See
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
-returns the set of all minors (=subdeterminants) of the given size of a matrix.
+returns the set of all minors (= subdeterminants) of the given size of a matrix.
 The optional third argument must be a standard basis.
 If a third argument is given, the computations will be performed modulo that
 ideal.
@@ -4039,8 +4070,8 @@ ${\tt L[i]}\neq 0$ for $i \le p$,
  but @code{L[p+1]}, the first syzygy module of @code{L[p]},
 is 0 (if the basering is not a qring).
 @item @strong{Note:}
-Accessing single elements of a resolution may require that some partial
-computations have to be finished and may therefore take some time.
+Accessing single elements of a resolution may require some partial
+computations to be finished and may therefore take some time.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -4074,7 +4105,7 @@ See
 list
 @item @strong{Purpose:}
 returns a list whose first entry is a standard basis for the ideal, resp.@:
-module, and whose second entry is a generating set for the
+module, whose second entry is a generating set for the
 ideal, resp.@: module.
 If the ideal/module is homogeneous or the ordering is local,
 this second entry is a minimal generating set.
@@ -4218,7 +4249,7 @@ See
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-returns the number of columns of a matrix or an intmat or the number of
+returns the number of columns of a matrix, an intmat, or the number of
 given generators of the ideal, including zeros.
 @item @strong{Note:}
 @code{size(}ideal@code{)} counts the number of generators
@@ -4269,7 +4300,7 @@ See
 @ref{ring}.
 @c ref
 @c ---------------------------------------
-@node  nres, nrows, npars, Functions
+@node nres, nrows, npars, Functions
 @subsection nres
 @cindex nres
 @table @code
@@ -4294,7 +4325,7 @@ then @code{nres} computes a free resolution of
 coker(A1)=F0/M
 @format
                     A2       A1
-      ... ----> F2 ----> F1 ----> F0 --> F0/M --> 0.
+      ... ----> F2 ----> F1 ----> F0 --> F0/M --> 0,
 @end format
 @end ifinfo
 @tex
@@ -4312,10 +4343,10 @@ are the given set of generators of M.
 If the int expression k is not zero then the computation stops after k steps
 and returns a list of modules
 @tex
-$M_i={\tt module}(A_i)$, i=1..k.
+$M_i={\tt module}(A_i),\;i = 1,\ldots,k$.
 @end tex
 @ifinfo
-Mi=module(Ai), i=1..k.
+Mi=module(Ai), i = 1...k.
 @end ifinfo
 @*@code{nres(M,0)} returns a list of n modules where n is the number of
 variables of the basering.
@@ -4719,7 +4750,7 @@ shows correct usage in error messages (set by default).
 @item @tab @tab @tab
 @item @tab @code{std}
 @tab @code{[m:n]}
-@tab internal ring change to poly representation with exponent bound
+@tab internal ring change to polynomial representation with exponent bound
 m and n words in exponent vector
 @item @tab @tab @code{s} @tab found a new element of the standard basis
 @item @tab @tab @code{-} @tab reduced a pair/S-polynomial to 0
@@ -4912,10 +4943,9 @@ See
 ring
 @*ideal
 @item @strong{Purpose:}
-returns the source ring of a map (in the first case) or
-@*returns the preimage of an ideal under a given map.
-@*
-The second argument has to be a map from the basering to the given ring
+returns the source ring of a map (in the first case) or returns the preimage of
+an ideal under a given map.
+@* The second argument has to be a map from the basering to the given ring
 (or an ideal defining such a map),
 and the ideal has to be an ideal in the given ring.
 @item @strong{Note:}
@@ -4959,8 +4989,8 @@ See
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-returns the largest prime less than or equal to the argument;
-@*returns 2 for all arguments smaller than 3.
+returns the largest prime less than or equal to the argument; returns 2 for all arguments
+smaller than 3.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -5022,16 +5052,16 @@ string determines which format to use to generate the string.
 The following format strings are supported:
 @table @code
 @item "%s"
-returns @code{string(} expression @code{)}
+returns @code{string(} expression @code{)},
 @item "%2s"
 similar to @code{"%s"}, except that newlines are inserted after every
-comma and at the end
+comma and at the end,
 @item "%l"
 similar to @code{"%s"}, except that each object is embraced by its type
-such that it can be directly used for "cutting and pasting"
+such that it can be directly used for "cutting and pasting",
 @item "%2l"
 similar to @code{"%l"}, except that newlines are inserted after every
-comma and at the end
+comma and at the end,
 @item "%;"
 returns the string equivalent to typing @code{expression;}
 @item "%t"
@@ -5041,7 +5071,7 @@ returns the string equivalent to typing @code{print(expression);}
 @item "%b"
 returns the string equivalent to typing @code{print(expression, "betti");}
 @item "betti"
-is not a format string
+is not a format string.
 @end table
 @item @strong{Example:}
 @smallexample
@@ -5311,7 +5341,7 @@ any
 @item @strong{Purpose:}
 reads data from a link.
 @*For ASCII links, the content of the entire
-file is returned as one string. If the ASCII link is the empty string,
+file is returned as a string. If the ASCII link is the empty string,
 @code{read} reads from standard input.
 @*For MP links, one expression is read
 from the link and returned after evaluation. See @ref{MP links}.
@@ -5380,7 +5410,7 @@ reduces a polynomial, vector, ideal  or module to its normal form with respect t
 Returns 0 if and only if the polynomial (resp.@: vector, ideal, module)
 is an element (resp.@: subideal, submodule) of the ideal (resp.@: module).
 The result may have no meaning if the second argument is not a standard basis.
-@*The third (optional) argument of type int modifies the behaviour:
+@*The third (optional) argument of type int modifies the behavior:
 @itemize
 @item 0
 default
@@ -5667,7 +5697,7 @@ See
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-returns the number of the variable if the name/poly is a ring variable of the
+returns the number of the variable if the name/polynomial is a ring variable of the
 basering or if the string is the name of a ring variable of the
 basering; returns 0 if not. Hence the return value of @code{rvar} can
 also be used in a boolean context to check whether the variable exists.
@@ -5746,12 +5776,12 @@ perform the simplex algorithm for the tableau given by the input, e.g.
 @item  M matrix of numbers :
      first row describing the objective function (maximize problem),
      the remaining rows describing constraints;
-@item  m,n,m1,m2,m3 int :
+@item  m, n, m1, m2, m3 int :
      n = number of variables;
      m = total number of constraints;
-     m1 = number of <=constraints (rows 2 ... m1+1 of M);
-     m2 = number of >=constraints (rows m1+2 ... m1+m2+1 of M);
-     m3 = number of == constraints.
+     m1 = number of inequalities "<=" (rows 2 ... m1+1 of M);
+     m2 = number of inequalities ">=" (rows m1+2 ... m1+m2+1 of M);
+     m3 = number of equalities.
 @end table
 
 The following assumptions are made:
@@ -5782,7 +5812,7 @@ The output is a list L with
    number of variables (= n).
 @end table
 
-The solution can be read from the first column of L[1] as is done by the
+The solution can be read off the first column of L[1] as it is done by the
 procedure @ref{simplexOut} in @code{solve.lib}.
 
 @item @strong{Example:}
@@ -5957,9 +5987,7 @@ See
 @item @strong{Type:}
 ideal or module
 @item @strong{Purpose:}
-
 @ref{slim Groebner bases}
-
 
 Returns a Groebner basis of an ideal or module with respect to the monomial
 ordering of the basering (which has to be global).
@@ -6120,8 +6148,8 @@ module of @code{L[1]}, etc.
 @end tex
  in the notations from above.)
 @item @strong{Note:}
-Accessing single elements of a resolution may require that some partial
-computations have to be finished and may therefore take some time.
+Accessing single elements of a resolution may require some partial
+computations to be finished and may therefore take some time.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -6168,7 +6196,7 @@ int
 returns the status of the link as asked for by the second argument.  If
 a third argument is given, the result of the comparison to the status
 string is returned: @code{(status(l,s1)==s2)} is equivalent to
-@code{status(l,s1,s2)}.  If a fourth integer argument (say, @code{i}) is
+@code{status(l,s1,s2)}.  If a fourth integer argument (say @code{i}) is
 given and if @code{status(l,s1,s2)} yields @code{0}, then the execution
 of the current process is suspended (the process is put to ``sleep'')
 for approximately@: @code{i} microseconds, and afterwards the result of another
@@ -6724,7 +6752,7 @@ of Gelfand, Kapranov and Zelevinsky (second argument = 0). @*
 The sparse resultant algorithm uses a mixed polyhedral subdivision of the
 Minkowsky sum of the Newton polytopes in order to construct the sparse
 resultant matrix. Its determinant is a nonzero multiple of the sparse
-resultant. The u-resultant of B.L.@: van der Waerden and Laguerre's algorithm
+resultant. The u-resultant of B.\ L.@: van der Waerden and Laguerre's algorithm
 are used to determine the complex roots. @*
 The third argument defines the precision of the fractional part if the ground
 field is the field of rational numbers, otherwise it will be ignored. @*
@@ -7127,14 +7155,14 @@ See
 @end menu
 
 A sequence of commands surrounded by curly brackets (@code{@{} and
-@code{@}}) is a so called block. Blocks are used in @sc{Singular} in
+@code{@}}) is a so-called block. Blocks are used in @sc{Singular} in
 order to define procedures and to collect commands belonging to
 @code{if}, @code{else}, @code{for} and @code{while} statements and to the
 @code{example} part in libraries. Even if
 the sequence of statements consists of only a single command it has to be
 surrounded by curly brackets!
 Variables which are defined inside a block
-are not local to that block. Note that there is no ending semicolon at
+are not local to that block. Note that there need not be an ending semicolon at
 the end of the block.
 @table @code
 @item @strong{Example:}
@@ -7188,7 +7216,7 @@ See
 @*@code{breakpoint(} proc_name@code{,} line_no @code{);}
 @item @strong{Purpose:}
 sets a breakpoint at the beginning of the specified procedure or
-at the given line.
+at the given line.@*
 @strong{Note:} Line number 1 is the first line of a library (for
 procedures from libraries), resp.@: the line with the @code{@{}.
 @*A line number of -1 removes all breakpoint from that procedure.
@@ -7284,7 +7312,7 @@ See
 @item @strong{Purpose:}
 converts a local variable of a procedure to a global one, that is the
 identifier is not removed at the end of the procedure.
-However, the package the variable belongs to, is not changed.
+However, the package the variable belongs to is not changed.
 @item @strong{Note:}
 Objects defined in a ring are not automatically exported
 when exporting the ring.
@@ -7785,7 +7813,7 @@ input.
 @*Reset this bound by setting @code{degBound} to 0.
 @*The exact meaning of "degree" depends on the ring odering and the command:
 @code{slimgb} uses always the total degree with weights 1,
-@code{std} does so only for block orderings.
+@code{std} does so for block orderings, only.
 @item @strong{Example:}
 @smallexample
 degBound = 7;
@@ -7844,7 +7872,7 @@ defining the ring.
 The minimal polynomial has to be specified in the syntax of a polynomial.
 Its variable is not one of the ring variables, but the algebraic element
 which is being adjoined to the field.
-Algebraic extensions in @sc{singular} are only possible over the rational
+Algebraic extensions in @sc{Singular} are only possible over the rational
 numbers or over Z/p, p a prime number.
 @c @*@strong{Warning:}
 @*@sc{Singular} does not check whether the given
@@ -8009,7 +8037,7 @@ if @code{printlevel+1 >= voice} (which is by default true on the
 @sc{Singular} top level, but not true while procedures are executed).
 
 @item
-yields the used CPU time since the start-up of @sc{Singular} in a
+yields the CPU time used since the start-up of @sc{Singular} in a
 (customizable) resolution.
 @end enumerate
 
@@ -8064,14 +8092,14 @@ int
 sets level of debugging.
 @table @asis
 @item @code{TRACE=0}
-no debugging messages are printed.
+No debugging messages are printed.
 @item @code{TRACE=1}
-messages about entering and leaving of procedures are displayed.
+Messages about entering and leaving of procedures are displayed.
 @item @code{TRACE=3}
-messages about entering and leaving of procedures together with
+Messages about entering and leaving of procedures together with
 line numbers are displayed.
 @item @code{TRACE=4}
-each line is echoed and the interpretation of commands
+Each line is echoed and the interpretation of commands
 in this line is suspended until the user presses @code{RETURN}.
 @end table
 @*@code{TRACE} is defaulted to 0.
