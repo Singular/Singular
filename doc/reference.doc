@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.336 2009-04-14 09:55:34 seelisch Exp $
+@comment $Id: reference.doc,v 1.337 2009-04-14 11:36:52 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -745,7 +745,7 @@ The first row consists of these monomials, the second row
 of the corresponding coefficients of the monomials in f.
 Thus,
 @tex
-  $f = M[1,1]\cdot M[2,1]+\ldots+M[1,n]\cdotM[2,n].$
+  $f = M[1,1]\cdot M[2,1]+\ldots+M[1,n]\cdot M[2,n].$
 @end tex
 @ifinfo
   f = M[1,1]*M[2,1]+...+M[1,n]*M[2,n].
