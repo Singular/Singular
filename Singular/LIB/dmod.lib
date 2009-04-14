@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.40 2009-04-14 12:00:14 Singular Exp $";
+version="$Id: dmod.lib,v 1.41 2009-04-14 17:11:50 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -103,40 +103,6 @@ LIB "gmssing.lib";
 LIB "control.lib";  // for genericity
 LIB "dmodapp.lib"; // for e.g. engine
 LIB "poly.lib";
-
-proc testdmodlib()
-{
-  /* tests all procs for consistency */
-  /* adding the new proc, add it here */
-
-  "MAIN PROCEDURES:";
-  example annfs;
-  example Sannfs;
-  example Sannfslog;
-  example bernsteinBM;
-  example operatorBM;
-  example annfspecial;
-  example annfsParamBM;
-  example annfsBMI;
-  example checkRoot;
-  example annfs0;
-  example annfs2;
-  example annfsRB;
-  example annfs2;
-  "SECONDARY D-MOD PROCEDURES:";
-  example annfsBM;
-  example annfsLOT;
-  example annfsOT;
-  example SannfsBM;
-  example SannfsLOT;
-  example SannfsOT;
-  example SannfsBFCT;
-  example checkRoot1;
-  example checkRoot2;
-  example checkFactor;
-}
-
-
 
 // new top-level procedures
 proc annfs(poly F, list #)
