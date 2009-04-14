@@ -1,6 +1,6 @@
 // Last change 10.12.2000 (TB)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: rinvar.lib,v 1.17 2008-10-06 17:04:28 Singular Exp $";
+version="$Id: rinvar.lib,v 1.18 2009-04-14 08:22:10 Singular Exp $";
 category="Invariant theory";
 info="
 LIBRARY:  rinvar.lib      Invariant Rings of Reductive Groups
@@ -699,7 +699,7 @@ EXAMPLE: example InvariantRing; shows an example
   }
   ideal invars = invarsGens;
   kill invarsGens;
-  if (defined(ROelements)) { kill ROelements,actionid,zeroset,id; }
+  if (defined(ROelements)) { kill ROelements,actionid,theZeroset,id; }
   export invars;
   dbprint(dbPrt+1, "
 // 'InvariantRing' created a new ring.
@@ -956,7 +956,7 @@ ASSUME:  basering = K[s(1..r),t(1..n)], K = Q or K = Q(a') and minpoly != 0,
   ns = n - size(Gaction);
   for(i = ns + 1; i <= n; i++) { G1 = G1, var(i);}
 
-  def RORR = ZeroSet(G1, primaryDec);
+  def RORR = zeroSet(G1, primaryDec);
   setring ROBR;
   string parName, minPoly;
   if(npars(basering) == 0) {
@@ -974,7 +974,7 @@ ASSUME:  basering = K[s(1..r),t(1..n)], K = Q or K = Q(a') and minpoly != 0,
   setring RORR;
   map Phi = RA1, maxideal(1);
   Phi[nvars(RORR) + 1] = newA;
-  id = Phi(Grp); // id already defined by ZeroSet of level 0
+  id = Phi(Grp); // id already defined by zeroSet of level 0
   ideal actionid = Phi(Gaction);
   kill parName,minPoly,Phi,RA1;
 // end of ersetzt durch
@@ -983,8 +983,8 @@ ASSUME:  basering = K[s(1..r),t(1..n)], K = Q or K = Q(a') and minpoly != 0,
   map groupElem;
   poly h1, h2;
 
-  for(i = 1; i <= size(zeroset); i++) {
-    groupElem = zeroset[i];    // element of G
+  for(i = 1; i <= size(theZeroset); i++) {
+    groupElem = theZeroset[i];    // element of G
     for(j = ns + 1; j<=n; j++) { groupElem[j] = var(j); } //do not change t's
     for(j = 1; j <= n - ns; j++) {
       h1 = actionid[j];
