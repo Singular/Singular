@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.129 2009-04-10 15:14:55 Singular Exp $
+@comment $Id: NEWS.texi,v 1.130 2009-04-14 17:20:17 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -109,6 +109,8 @@ surf.lib: new command @code{surfer}: interface to program @code{surfer}
 teachstd.lib: spoly works now in non-commutative algebras and standard can thus be used there.
 However, since product criterion is a priori not applicable in the non-commutative case,
 one may want to disable it first (see @code{prodcrit} for details).
+@item
+many changes of names in libraries (to have a more consistent naming scheme)
 @end itemize
 
 @heading News for version 3-0-4
