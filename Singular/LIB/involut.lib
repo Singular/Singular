@@ -1,4 +1,4 @@
-version="$Id: involut.lib,v 1.16 2009-04-09 12:04:41 seelisch Exp $";
+version="$Id: involut.lib,v 1.17 2009-04-14 08:26:08 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  involut.lib  Computations and operations with involutions
@@ -165,25 +165,19 @@ example
   matrix D[6][6];
   D[1,4]=1; D[2,5]=1;  D[3,6]=1;
   def r = nc_algebra(1,D); setring r;
-  map F = r;
   ncdetection();
-  F;  // F(F) should be maxideal(1)
   kill r, R;
   //----------------------------------------
   ring R=0,(x,S),dp;
   def r = nc_algebra(1,-S); setring r;
-  map F = r;
   ncdetection();
-  F;  // F(F) should be maxideal(1)
   kill r, R;
   //----------------------------------------
   ring R=0,(x,D(1),S),dp;
   matrix D[3][3];
   D[1,2]=1;  D[1,3]=-S;
   def r = nc_algebra(1,D); setring r;
-  map F = r;
   ncdetection();
-  F;  // F(F) should be maxideal(1)
 }
 
 static proc In_Poly(poly mm, list l, int NVars)
