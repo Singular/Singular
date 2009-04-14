@@ -1,6 +1,6 @@
 // Last change 12.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: zeroset.lib,v 1.22 2009-04-08 11:00:08 seelisch Exp $";
+version="$Id: zeroset.lib,v 1.23 2009-04-14 08:20:45 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  zeroset.lib      Procedures for roots and factorization
@@ -303,10 +303,10 @@ proc zeroSet(ideal I, list #)
 PURPOSE: compute the zero-set of the zero-dim. ideal I, in a finite extension
          of the ground field.
 RETURN:  ring, a polynomial ring over an extension field of the ground field,
-         containing a list 'zeroset', a polynomial 'newA', and an
+         containing a list 'theZeroset', a polynomial 'newA', and an
          ideal 'id':
   @format
-  - 'zeroset' is the list of the zeros of the ideal I, each zero is an ideal.
+  - 'theZeroset' is the list of the zeros of the ideal I, each zero is an ideal.
   - if the ground field is Q(b) and the extension field is Q(a), then
     'newA' is the representation of b in Q(a).
     If the basering contains a parameter 'a' and the minpoly remains unchanged
