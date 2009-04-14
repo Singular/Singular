@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.337 2009-04-14 11:36:52 Singular Exp $
+@comment $Id: reference.doc,v 1.338 2009-04-14 11:44:13 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1006,7 +1006,7 @@ M, then the returned matrix A satisfies
 @end ifinfo
 Otherwise only a subset of entries of
 @tex
-  $K\cdot A
+  $K\cdot A$
 @end tex
 @ifinfo
   K*A
@@ -1051,7 +1051,7 @@ contracts each of the n elements of the second ideal J
 by each of the m elements of the first ideal I,
 producing an
 @tex
-  m\times n
+  $m\times n$
 @end tex
 @ifinfo
   (m x n)
