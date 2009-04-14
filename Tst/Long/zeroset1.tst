@@ -19,7 +19,7 @@ LIB "tst.lib";
 LIB "zeroset.lib";         
 
 tst_init();
-tst_ignore("CVS ID $Id: zeroset1.tst,v 1.1 2000-12-11 16:07:31 Singular Exp $"); 
+tst_ignore("CVS ID $Id: zeroset1.tst,v 1.2 2009-04-14 10:29:45 Singular Exp $"); 
  
 
 
@@ -31,14 +31,14 @@ proc TestzerosetLIB(S)
         setring S;
         map F;
 
-        print(" #Points = " + string(vdim(std(id))) + "; #Solutions = " + string(size(zeroset)));
+        print(" #Points = " + string(vdim(std(id))) + "; #Solutions = " + string(size(theZeroset)));
         print(" minpoly = " + string(minpoly)); 
         print(" ideal = " + string(id));
         
 
-        for(int i = 1; i <= size(zeroset); i++) {
-                F = zeroset[i];
-                print(string(zeroset[i]) + " --> " + string(F(id)));
+        for(int i = 1; i <= size(theZeroset); i++) {
+                F = theZeroset[i];
+                print(string(theZeroset[i]) + " --> " + string(F(id)));
         }
 }
 
@@ -47,11 +47,11 @@ proc TestzerosetLIB(S)
 ring R = 0,(x,y,z), lp;
 ideal I = x2-1,y3-1,z-2x;
 
-def S = ZeroSet(I);TestzerosetLIB(S);
+def S = zeroSet(I);TestzerosetLIB(S);
 setring S;
 minpoly;
 id;
-zeroset;
+theZeroset;
 
 kill R;
 kill S;
@@ -62,11 +62,11 @@ kill S;
 ring R = 0,(x,y,z), lp;
 ideal I = x3-1,3y-x,z4-1;
 
-def S = ZeroSet(I);TestzerosetLIB(S);
+def S = zeroSet(I);TestzerosetLIB(S);
 setring S;
 minpoly;
 id;
-zeroset;
+theZeroset;
        
 kill R;
 kill S;
@@ -77,11 +77,11 @@ kill S;
 ring R = 0, (x(1..5)), lp;
 ideal I = x(1)^2+1,x(2)^4-1,x(3)-x(4),x(4)^2+1,x(5)-x(4);
 
-def S = ZeroSet(I);TestzerosetLIB(S);
+def S = zeroSet(I);TestzerosetLIB(S);
 setring S;
 minpoly;
 id;
-zeroset;
+theZeroset;
 
 kill R;
 kill S;
@@ -93,11 +93,11 @@ ring R = (0,a),(x,y), lp;
 minpoly = a2+1;
 ideal I = x2-a,y-2x;
 
-def S = ZeroSet(I);TestzerosetLIB(S);
+def S = zeroSet(I);TestzerosetLIB(S);
 setring S;
 minpoly;
 id;
-zeroset;
+theZeroset;
 
 kill R;
 kill S;
@@ -109,11 +109,11 @@ ring R = (0,a),(x,y,z), lp;
 minpoly = a2+a+1;
 ideal I = x3-1,a*y^2-x,z^2-a*y;
 
-def S = ZeroSet(I);TestzerosetLIB(S);
+def S = zeroSet(I);TestzerosetLIB(S);
 setring S;
 minpoly;
 id;
-zeroset;
+theZeroset;
 
 kill R;
 kill S;
@@ -125,11 +125,11 @@ ring R = (0,a),(x,y,z), lp;
 minpoly = a2+1;
 ideal I = x2-2,a*y^2-2*x,z^2 - a; // 2
 
-def S = ZeroSet(I);TestzerosetLIB(S);
+def S = zeroSet(I);TestzerosetLIB(S);
 setring S;
 minpoly;
 id;
-zeroset;
+theZeroset;
 
 kill R;
 kill S;
@@ -141,20 +141,20 @@ ring R = (0,a),(x(1..5)), lp;
 minpoly = a2+a+1;
 ideal I = x(1)^2 - 2,x(2) -a*x(1), x(3)^2 + 1, x(4)^2 + a, a*x(5) - x(1);
 
-def S = ZeroSet(I);TestzerosetLIB(S);
+def S = zeroSet(I);TestzerosetLIB(S);
 setring S;
 minpoly;
 id;
-zeroset;
+theZeroset;
 
 kill S;
 
 setring R;
-def S = ZeroSet(I, 1);TestzerosetLIB(S);
+def S = zeroSet(I, 1);TestzerosetLIB(S);
 setring S;
 minpoly;
 id;
-zeroset;
+theZeroset;
 
 kill R;
 kill S;
@@ -167,20 +167,20 @@ ring R = (0,a),(s(1..4)), lp;
 minpoly = a2+1;
 ideal I = s(3)*s(4),s(2)*s(4),s(1)*s(3),s(1)*s(2),s(3)^8+s(4)^8-1,s(2)^8+s(4)^8-1,s(1)^8-s(4)^8,s(4)^9-s(4),s(1)*s(4)^8-s(1);
 
-def S = ZeroSet(I);TestzerosetLIB(S);
+def S = zeroSet(I);TestzerosetLIB(S);
 setring S;
 minpoly;
 id;
-zeroset;
+theZeroset;
 
 kill S;
 
 setring R;
-def S = ZeroSet(I, 1);TestzerosetLIB(S);
+def S = zeroSet(I, 1);TestzerosetLIB(S);
 setring S;
 minpoly;
 id;
-zeroset;
+theZeroset;
 
 kill S;
 
