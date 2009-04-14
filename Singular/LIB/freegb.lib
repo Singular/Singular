@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: freegb.lib,v 1.22 2009-04-14 12:00:14 Singular Exp $";
+version="$Id: freegb.lib,v 1.23 2009-04-14 12:08:36 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: freegb.lib   Compute two-sided Groebner bases in free algebras via letterplace
@@ -35,24 +35,6 @@ SEE ALSO: LETTERPLACE
 // V[1+i] = the corresponding symbol
 
 LIB "qhmoduli.lib"; // for Max
-
-proc testfreegblib()
-{
-  example makeLetterplaceRing;
-  example freeGBasis;
-  example setLetterplaceAttributes;
-    "AUXILIARY PROCEDURES: ";
-  example shiftPoly;
-  example lpMult;
-  example lp2lstr;
-  example lst2str;
-  example mod2str;
-  example vct2str;
-  example lieBracket;
-  example serreRelations;
-  example isVar;
-}
-
 
 proc setLetterplaceAttributes(def R, int uptodeg, int lV)
 "USAGE: setLetterplaceAttributes(R, d, b); R a ring, b,d integers
@@ -2543,15 +2525,4 @@ static proc lpAssumeViolation()
   //  int i = ( defined(uptodeg) && (defined(lV)) );
   //  return ( !i );
   return(0);
-}
-
-// alias libs for compatibility with older examples
-proc freegbRing(int d)
-{
-  return(makeLetterplaceRing(d));
-}
-
-proc freegbasis( list L, int n)
-{
-  return(freeGBasis(L, n));
 }

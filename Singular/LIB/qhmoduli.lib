@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: qhmoduli.lib,v 1.16 2009-04-14 11:51:43 seelisch Exp $";
+version="$Id: qhmoduli.lib,v 1.17 2009-04-14 12:08:36 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  qhmoduli.lib    Moduli Spaces of Semi-Quasihomogeneous Singularities
@@ -1164,15 +1164,10 @@ GLOBAL: 'varSubsList', contains the index j s.t. x(i) -> x(i)t(j) ...
   mmi = Min(wt);
   mma = Max(wt);
 
-<<<<<<< qhmoduli.lib
-  for(i = mi; i <= ma; i = i + 1) {
-    if(containedQ(wt, i)) {    // find variables of weight i
-=======
   for(ii = mmi; ii <= mma; ii++)
   {
     if(containedQ(wt, ii))
     {    // find variables of weight ii
->>>>>>> 1.15
       k = 0;
       index = 0;
       // collect the indices of all variables of weight i
@@ -1368,12 +1363,8 @@ RETURN:  list
       for(j = 1; j <= size(decP); j++)
       {
         newP = temp + decP[j];        // new partition
-<<<<<<< qhmoduli.lib
-        if(!containedQ(parts, newP, 1)) {
-=======
         if(!containedQ(parts, newP, 1))
 	{
->>>>>>> 1.15
           k = k + 1;
           parts[k] = newP;
         }
@@ -1450,17 +1441,11 @@ static proc IntersectionQHM(list l1, list l2)
 
   c = 1;
 
-<<<<<<< qhmoduli.lib
-  for(int i = 1; i <= size(l1); i = i + 1) {
-    b = containedQ(l2, l1[i]);
-    if(b == 1) {
-=======
   for(int i = 1; i <= size(l1); i++)
   {
     b = containedQ(l2, l1[i]);
     if(b == 1)
     {
->>>>>>> 1.15
       l[c] = l1[i];
       c++;
     }
