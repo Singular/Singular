@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.20 2009-04-10 19:03:44 motsak Exp $ */
+/* $Id: syz.cc,v 1.21 2009-04-14 12:40:46 motsak Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -615,14 +615,11 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
 
 syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
 {
-#define QSyzTest 0
 
 #ifdef HAVE_PLURAL
 
-#if QSyzTest
-  ideal idSaveCurrQuotient = currQuotient;
-  ideal idSaveCurrRingQuotient = currRing->qideal;
-#endif
+  const ideal idSaveCurrQuotient = currQuotient;
+  const ideal idSaveCurrRingQuotient = currRing->qideal;
 
   if( rIsSCA(currRing) )
   {
@@ -632,10 +629,11 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
 //    rDebugPrint(currRing);
 #endif
 
-#if QSyzTest
-    currQuotient = SCAQuotient(currRing);
-    currRing->qideal = currQuotient;
-#endif
+    if( ncExtensions(TESTSYZSCAMASK) )
+    {
+      currQuotient = SCAQuotient(currRing);
+      currRing->qideal = currQuotient;
+    }
 
     const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
     const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
@@ -684,10 +682,11 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
   if( rIsSCA(currRing) )
   {
 
-#if QSyzTest
-    currQuotient     = idSaveCurrQuotient; 
-    currRing->qideal = idSaveCurrRingQuotient;
-#endif
+    if( ncExtensions(TESTSYZSCAMASK) )
+    {
+      currQuotient     = idSaveCurrQuotient; 
+      currRing->qideal = idSaveCurrRingQuotient;
+    }
 
     id_Delete(&arg, currRing);
   }

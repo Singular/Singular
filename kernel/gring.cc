@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.72 2009-04-03 18:28:53 motsak Exp $
+ *  Version: $Id: gring.cc,v 1.73 2009-04-14 12:40:46 motsak Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -50,6 +50,31 @@
 #endif
 
 
+
+int  iNCExtensions = 0x00001; // only SCA can be used...
+
+
+int& getNCExtensions()
+{
+  return (iNCExtensions);
+}
+
+int setNCExtensions(int iMask)
+{
+  const int iOld = getNCExtensions();
+  getNCExtensions() = iMask;
+  return (iOld);
+}
+
+
+bool ncExtensions(int iMask) //  = 0x0FFFF
+{
+  return ((getNCExtensions() & iMask) == iMask);
+}
+
+
+
+
 static const bool bNoPluralMultiplication = false;  // use only formula shortcuts in my OOP Multiplier
 
 // the following make sense only if bNoPluralMultiplication is false:
@@ -62,7 +87,6 @@ static const bool bNoCache   = false; // only formula whenever possible, only ma
 // false, false, true ==>> Plural Mult + Direct Formula (no ~cache)
 // true, *, *  == new OOP multiplication!
 
-bool bUseExtensions = true;
 
 /* global nc_macros : */
 
@@ -3389,7 +3413,7 @@ void nc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
 
   gnc_p_ProcsSet(rGR, p_Procs);
 
-  if(rIsSCA(rGR) && bUseExtensions)
+  if(rIsSCA(rGR) && ncExtensions(SCAMASK) )
   {
     sca_p_ProcsSet(rGR, p_Procs);
   }
@@ -3810,7 +3834,7 @@ bool nc_SetupQuotient(ring rGR, const ring rG, bool bCopy)
   bool ret = true;
   // currently only super-commutative extension deals with factors.
 
-  if( bUseExtensions )
+  if( ncExtensions(SCAMASK)  )
   {
     bool sca_ret = sca_SetupQuotient(rGR, rG, bCopy);
 

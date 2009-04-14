@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.27 2009-04-03 18:28:53 motsak Exp $ */
+/* $Id: gring.h,v 1.28 2009-04-14 12:40:46 motsak Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -103,6 +103,16 @@ poly pOppose(ring Rop, poly p);
 ideal idOppose(ring Rop, ideal I);
 
 
+// const int GRMASK = 1 << 1;
+const int SCAMASK = 1; // For backward compatibility
+const int TESTSYZSCAMASK = 0x0100 | SCAMASK; //
+
+// NCExtensions Mask Property 
+int& getNCExtensions();
+int  setNCExtensions(int iMask);
+
+// Test
+bool ncExtensions(int iMask); //  = 0x0FFFF
 
 
 // returns the LCM of the head terms of a and b with the given component 
