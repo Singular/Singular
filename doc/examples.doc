@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.107 2009-04-10 13:45:38 Singular Exp $
+@comment $Id: examples.doc,v 1.108 2009-04-14 10:17:38 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -1970,7 +1970,7 @@ the factor rings of the rings in the list divided out by the ideals
   ring R1=0,(x,y,z),dp;
   ideal I=(x-y)*(x-z)*(y-z);
   list qr=normal(I);
-  def S1=qr[1][1]; def S2=qr[2][1];
+  def S1=qr[1][1]; def S2=qr[1][2];
   setring S1; norid;
   setring S2; norid;
 @c example
