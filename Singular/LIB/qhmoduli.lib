@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: qhmoduli.lib,v 1.14 2009-04-08 14:08:25 Singular Exp $";
+version="$Id: qhmoduli.lib,v 1.15 2009-04-14 08:36:17 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  qhmoduli.lib    Moduli Spaces of Semi-Quasihomogeneous Singularities
@@ -491,14 +491,16 @@ GLOBAL: varSubsList, contains the index j s.t. t(i) -> t(i)t(j) ...
   n = nvars(basering);
   Variables = StabVar(wt);    // possible quasihomogeneous substitutions
   nrVars = 0;
-  for(i = 1; i <= size(wt); i = i + 1) {
+  for(i = 1; i <= size(wt); i++)
+  {
     nrVars = nrVars + size(Variables[i]);
   }
 
   // set the new basering needed for the substitutions
 
   varString = "s(1.." + string(nrVars) + ")";
-  if(npars(basering) == 1) {
+  if(npars(basering) == 1)
+  {
     parString = "(0, " + parstr(basering) + ")";
   }
   else { parString = "0"; }
@@ -526,12 +528,15 @@ GLOBAL: varSubsList, contains the index j s.t. t(i) -> t(i)t(j) ...
 
   nrVars = 0;
   offset = 0;
-  for(i = 1; i <= size(wt); i = i + 1) {    // build the substitution t(i) -> ...
+  for(i = 1; i <= size(wt); i++)
+  {    // build the substitution t(i) -> ...
     if(i > 1) { offset = offset + size(Variables[i - 1]); }
     g = 0;
-    for(j = 1; j <= size(Variables[i]); j = j + 1) {
+    for(j = 1; j <= size(Variables[i]); j++)
+    {
       pp = 1;
-      for(k = 2; k <= size(Variables[i][j]); k = k + 1) {
+      for(k = 2; k <= size(Variables[i][j]); k++)
+      {
         pp = pp * var(Variables[i][j][k]);
         if(Variables[i][j][k] == i) { varSubsList[i] = offset + j;}
       }
@@ -561,10 +566,12 @@ GLOBAL: varSubsList, contains the index j s.t. t(i) -> t(i)t(j) ...
   newcoMx = coef(f1, vars);        // coefficients of F(f)
   coMx = coef(f, vars);          // coefficients of f
 
-  for(i = 1; i <= ncols(newcoMx); i = i + 1) {      // build the system of eqns via coeff. comp.
+  for(i = 1; i <= ncols(newcoMx); i++)
+  {      // build the system of eqns via coeff. comp.
     j = 1;
     h = 0;
-    while(j <= ncols(coMx)) {        // all monomials in f
+    while(j <= ncols(coMx))
+    {        // all monomials in f
       if(coMx[j][1] == newcoMx[i][1]) { h = coMx[j][2]; j = ncols(coMx) + 1;}
       else {j = j + 1;}
     }
@@ -661,7 +668,8 @@ EXAMPLE: example ArnoldAction; shows an example
   jacobianId = jacob(f);
   jacobIdstd = std(jacobianId);
   newFs = Fs;
-  for(i = 1; i <= size(B); i = i + 1) {
+  for(i = 1; i <= size(B); i++)
+  {
     basisDegList[i] = deg(B[i], wt);
   }
   ub = Max(basisDegList) + 1;          // max degree of an upper monomial
@@ -670,7 +678,8 @@ EXAMPLE: example ArnoldAction; shows an example
   gmonos = parts[1];
   d = deg(f, wt);
 
-  for(i = d + 1; i < ub; i = i + 1) {    // base[1] = monomials of degree i
+  for(i = d + 1; i < ub; i++)
+  {    // base[1] = monomials of degree i
     upperBasis[i] = SelectMonos(list(B, B), wt, i);    // B must not contain 0's
   }
 
@@ -678,7 +687,8 @@ EXAMPLE: example ArnoldAction; shows an example
   // compute a substitution via Arnold's theorem and substitutite
   // it into newFs
 
-  for(i = d + 1; i < ub; i = i + 1) {  // ub instead of @UB
+  for(i = d + 1; i < ub; i = i + 1)
+  {  // ub instead of @UB
     dbprint(dbPrt, "-- degree = " + string(i) + " of " + string(ub - 1) + " ---------------------------");
     if(size(newFs) < 80) { dbprint(dbPrt, "  polynomial = " + string(newFs - f));}
     else {  dbprint(dbPrt, "  poly has deg (not weighted) " + string(deg(newFs)) + " and contains " + string(size(newFs)) + " monos");}
@@ -687,7 +697,8 @@ EXAMPLE: example ArnoldAction; shows an example
 
     gmonos = SelectMonos(parts, wt, i);
     common = IntersectionQHM(upperBasis[i][1], gmonos[1]);
-    if(size(common) == size(gmonos[1])) {
+    if(size(common) == size(gmonos[1]))
+    {
       dbprint(dbPrt, " no additional monomials ");
     }
 
@@ -695,7 +706,8 @@ EXAMPLE: example ArnoldAction; shows an example
     // the map constructed in the proof of Arnold's theorem
     // write g = c[i] * jacobianId[i]
 
-    else {
+    else
+    {
       dbprint(dbPrt, "  additional Monomials found, compute the map ");
       g = PSum(gmonos[2]);      // sum of all monomials in g of degree i
       dbprint(dbPrt, "  sum of degree " + string(i) + " is " + string(g));
@@ -703,7 +715,8 @@ EXAMPLE: example ArnoldAction; shows an example
       gred = reduce(g, jacobIdstd);
       gCoeffMx = lift(jacobianId, g - gred);    // compute c[i]
       mapId = var(1) - gCoeffMx[1][1];    // generate the map
-      for(j = 2; j <= size(gCoeffMx); j = j + 1) {
+      for(j = 2; j <= size(gCoeffMx); j++)
+      {
         mapId[j] = var(j) - gCoeffMx[1][j];
       }
       dbprint(dbPrt, "  map = " + string(mapId));
@@ -735,9 +748,11 @@ EXAMPLE: example MonosAndTerms shows an example
 
   data = jet(f, ub - 1, wt);
   k = 0;
-  for(i = 1; i <= size(data); i = i + 1) {
+  for(i = 1; i <= size(data); i++)
+  {
     mono = lead(data[i]);
-    if(deg(mono, wt) < ub) {
+    if(deg(mono, wt) < ub)
+    {
       k = k + 1;
       lcInv = 1/leadcoef(mono);
       monomials[k] = mono * lcInv;
@@ -770,10 +785,12 @@ EXAMPLE: example SelectMonos; shows an example
   poly mono;
 
   k = 0;
-  for(i = 1; i <= size(parts[1]); i = i + 1) {
+  for(i = 1; i <= size(parts[1]); i++)
+  {
     mono = parts[1][i];
-    if(deg(mono, wt) == d) {
-      k = k + 1;
+    if(deg(mono, wt) == d)
+    {
+      k++;
       monomials[k] = mono;
       terms[k] = parts[2][i];
     }
@@ -809,18 +826,22 @@ GLOBAL:  computedPowers
 
   // compute substitution[1]^degVec[1],...,subs[n]^degVec[n]
 
-  for(i = 1; i <= ncols(substitution); i = i + 1) {
-    if(size(substitution[i]) < 3 || degVec[i] < 4) {
+  for(i = 1; i <= ncols(substitution); i++)
+  {
+    if(size(substitution[i]) < 3 || degVec[i] < 4)
+    {
       powerList[i] = reduce(substitution[i]^degVec[i], reduceI); // new
     }  // directly for small exponents
-    else {
+    else
+    {
       powerList[i] = PolyPower1(i, substitution[i], degVec[i], reduceI, w1, truncated[i], ub);
     }
   }
   // multiply the terms obtained by using PolyProduct();
   g = powerList[1];
   minDeg = w1[1] * degVec[1];
-  for(i = 2; i <= ncols(substitution); i = i + 1) {
+  for(i = 2; i <= ncols(substitution); i++)
+  {
     g = jet(g, ub - w1[i] * degVec[i] - 1, w1);
     h = jet(powerList[i], ub - minDeg - 1, w1);
     g = PolyProduct(g, h, reduceI, w1, ub);
@@ -841,15 +862,15 @@ RETURN:  poly
 NOTE:    used by 'Expand'
 "
 {
-  int SUBSMAXSIZE = 3000;    //
+  int SUBSMAXSIZE = 3000;
   int i, nrParts, sizeOfPart, currentPos, partSize, maxSIZE;
   poly g, h, gxh, prodComp, @g2;    // replace @g2 by subst.
 
   g = g1;
   h = h1;
 
-  if(size(g)*size(h) > SUBSMAXSIZE) {
-
+  if(size(g)*size(h) > SUBSMAXSIZE)
+  {
     // divide the polynomials with more terms in parts s.t.
     // the product of each part with the other polynomial
     // has at most SUBMAXSIZE terms
@@ -860,7 +881,8 @@ NOTE:    used by 'Expand'
     nrParts = size(g) / maxSIZE + 1;
     partSize = size(g) / nrParts;
     gxh = 0;  // 'g times h'
-    for(i = 1; i <= nrParts; i = i + 1){
+    for(i = 1; i <= nrParts; i++)
+    {
       //print(" loop #" + string(i) + " of " + string(nrParts));
       currentPos = (i - 1) * partSize;
       if(i < nrParts) {sizeOfPart = partSize;}
@@ -869,10 +891,10 @@ NOTE:    used by 'Expand'
       @g2 = jet(prodComp, ub - 1, wt);  // eventual reduce ...
       if(size(@g2) < size(prodComp)) { print(" killed " + string(size(prodComp) - size(@g2)) + " terms ");}
       gxh =  reduce(gxh + @g2, reduceI);
-
     }
   }
-  else {
+  else
+  {
     gxh = reduce(jet(g * h,ub - 1, wt), reduceI);
   }  // compute directly
   return(gxh);
@@ -897,13 +919,14 @@ GLOBAL:  'computedPowers'
   if(e == 0) { return(1);}
   if(e == 1) { return(f);}
   if(f == 0) { return(1); }
-  else {
-
+  else
+  {
     // test if f has been computed to some power
-
-    if(computedPowers[varIndex][1] > 0) {
+    if(computedPowers[varIndex][1] > 0)
+    {
       maxPrecomputedPower = computedPowers[varIndex][1];
-      if(maxPrecomputedPower >= e) {
+      if(maxPrecomputedPower >= e)
+      {
         // no computation necessary, f^e has already benn computed
         g = computedPowers[varIndex][2][e - 1];
         //Print("No computation, from list : g = elem [", varIndex, ", 2, ", e - 1, "]");
@@ -915,18 +938,22 @@ GLOBAL:  'computedPowers'
         lb = maxPrecomputedPower + 1;
       }
     }
-    else {    // no precomputed data
+    else
+    {    // no precomputed data
       lb = 2;
       ordOfg = wt[varIndex];
       g = f;
     }
-    for(i = lb; i <= e; i = i + 1) {
+    for(i = lb; i <= e; i++)
+    {
       fn = jet(f, ub - ordOfg - 1, wt); // reduce w.r.t. reduceI
       g = PolyProduct(g, fn, reduceI, wt, ub);
       ordOfg = ordOfg + wt[varIndex];
       if(g == 0) { break; }
-      if((i > maxPrecomputedPower) && !truncated) {
-        if(maxPrecomputedPower == 0) {  // init computedPowers
+      if((i > maxPrecomputedPower) && !truncated)
+      {
+        if(maxPrecomputedPower == 0)
+	{  // init computedPowers
           computedPowers[varIndex] = list(i, list(g));
         }
         computedPowers[varIndex][1] = i;  // new degree
@@ -945,7 +972,7 @@ static proc RingVarsToList(list @index)
   int i;
   list temp;
 
-  for(i = 1; i <= size(@index); i = i + 1) { temp[i] = string(var(@index[i])); }
+  for(i = 1; i <= size(@index); i++) { temp[i] = string(var(@index[i])); }
   return(temp);
 }
 
@@ -975,7 +1002,8 @@ GLOBAL:  'computedPowers'
   def RASB = basering;
 
   parts = MonosAndTerms(f, wt, ub);
-  for(i = 1; i <= size(parts[1]); i = i + 1) {
+  for(i = 1; i <= size(parts[1]); i = i + 1)
+  {
     coeffList[i] = parts[2][i]/parts[1][i];
     degVecList[i] = leadexp(parts[1][i]);
     degOfMonos[i] = deg(parts[1][i], wt);
@@ -987,7 +1015,8 @@ GLOBAL:  'computedPowers'
   // set ideal mpoly = minpoly for reduction !
 
   @ringVars = "(" + varstr(basering) + ", " + parstr(1) + ",";  // precondition
-  if(nrs > 0) {
+  if(nrs > 0)
+  {
     @ringVars = @ringVars + "s(1.." + string(nrs) + "), ";
   }
   @ringVars = @ringVars + "t(1.." + string(nrt) + "))";
@@ -1012,16 +1041,18 @@ GLOBAL:  'computedPowers'
 
   f = imap(RASB, f);
 
-  for(i = 1; i <= n; i = i + 1) {      // all "base" variables
+  for(i = 1; i <= n; i++)
+  {      // all "base" variables
     computedPowers[i] = list(0);
-    for(j = 1; j <= size(substitution[i]); j = j + 1) { degList[j] = deg(substitution[i][j], w1);}
+    for(j = 1; j <= size(substitution[i]); j++) { degList[j] = deg(substitution[i][j], w1);}
     degOfSubs[i] = degList;
   }
 
   // substitute in each monomial seperately
 
   g = 0;
-  for(i = 1; i <= size(degVecList); i = i + 1) {
+  for(i = 1; i <= size(degVecList); i++)
+  {
     truncatedQ = Table("0", "i", 1, n);
     newSubs = 0;
     degVec = degVecList[i];
@@ -1032,12 +1063,13 @@ GLOBAL:  'computedPowers'
     // minDeg[j] denotes the weighted degree of the monomial m'
     // where m' is the monomial m without the j-th variable
 
-    for(j = 1; j <= size(degVec); j = j + 1) { minDeg[j] = d - degVec[j] * wt[j]; }
+    for(j = 1; j <= size(degVec); j++) { minDeg[j] = d - degVec[j] * wt[j]; }
 
-    for(j = 1; j <= size(degVec); j = j + 1) {
+    for(j = 1; j <= size(degVec); j++)
+    {
       subsPoly = 0;      // set substitution to 0
-      if(degVec[j] > 0) {
-
+      if(degVec[j] > 0)
+      {
         // if variable occurs then check if
         // substitution[j][k] * (linear part)^(degVec[j]-1) + minDeg[j] < ub
         // i.e. look for the smallest possible combination in subs[j]^degVec[j]
@@ -1046,8 +1078,10 @@ GLOBAL:  'computedPowers'
         // If the degree of this product is < ub then substitution[j][k] contributes
         // to the result and cannot be omitted
 
-        for(k = 1; k <= size(substitution[j]); k = k + 1) {
-          if(degOfSubs[j][k] + (degVec[j] - 1) * wt[j] + minDeg[j]  < ub) {
+        for(k = 1; k <= size(substitution[j]); k++)
+	{
+          if(degOfSubs[j][k] + (degVec[j] - 1) * wt[j] + minDeg[j]  < ub)
+	  {
             subsPoly = subsPoly + substitution[j][k];
           }
         }
@@ -1083,19 +1117,21 @@ GLOBAL:  'varSubsList', contains the index j s.t. x(i) -> x(i)t(j) ...
   string str, varString;
 
   varList = StabVarComb(wt);
-  for(i = 1; i <= size(wt); i = i + 1) {
+  for(i = 1; i <= size(wt); i = i + 1)
+  {
     subs = 0;
-
     // built linear substituitons
-    for(j = 1; j <= size(varList[1][i]); j = j + 1) {
+    for(j = 1; j <= size(varList[1][i]); j++)
+    {
       subs[j] = list(i) + list(varList[1][i][j]);
     }
     Variables[i] = subs;
-    if(size(varList[2][i]) > 0) {
-
+    if(size(varList[2][i]) > 0)
+    {
       // built nonlinear substituitons
       subs = 0;
-      for(j = 1; j <= size(varList[2][i]); j = j + 1) {
+      for(j = 1; j <= size(varList[2][i]); j++)
+      {
         subs[j] = list(i) + varList[2][i][j];
       }
       Variables[i] = Variables[i] + subs;
@@ -1115,7 +1151,7 @@ RETURN:  list
 GLOBAL: 'varSubsList', contains the index j s.t. x(i) -> x(i)t(j) ...
 "
 {
-  int mi, ma, i, j, k, uw, ic;
+  int mmi, mma, ii, j, k, uw, ic;
   list index, indices, usedWeights, combList, combinations;
   list linearSubs, nonlinearSubs;
   list partitions, subs, temp;        // subs[i] = substitution for var(i)
@@ -1125,45 +1161,51 @@ GLOBAL: 'varSubsList', contains the index j s.t. x(i) -> x(i)t(j) ...
 
   uw = 0;
   ic = 0;
-  mi = Min(wt);
-  ma = Max(wt);
+  mmi = Min(wt);
+  mma = Max(wt);
 
-  for(i = mi; i <= ma; i = i + 1) {
-    if(ContainedQ(wt, i)) {    // find variables of weight i
+  for(ii = mmi; ii <= mma; ii++)
+  {
+    if(ContainedQ(wt, ii))
+    {    // find variables of weight ii
       k = 0;
       index = 0;
       // collect the indices of all variables of weight i
-      for(j = 1; j <= size(wt); j = j + 1) {
-        if(wt[j] == i) {
-          k = k + 1;
+      for(j = 1; j <= size(wt); j++)
+      {
+        if(wt[j] == ii)
+        {
+          k++;
           index[k] = j;
         }
       }
-      uw = uw + 1;
-      usedWeights[uw] = i;
-      ic = ic + 1;
-      indices[i] = index;
+      uw++;
+      usedWeights[uw] = ii;
+      ic++;
+      indices[ii] = index;
 
       // linear part of the substitution
 
-      for(j = 1; j <= size(index); j = j + 1) {
+      for(j = 1; j <= size(index); j++)
+      {
         linearSubs[index[j]] = index;
       }
 
       // nonlinear part of the substitution
 
-      if(uw > 1) {    // variables of least weight do not allow nonlinear subs.
+      if(uw > 1)
+      {    // variables of least weight do not allow nonlinear subs.
 
-      partitions = Partitions(i, delete(usedWeights, uw));
-      for(j = 1; j <= size(partitions); j = j + 1) {
-        combinations[j] = AllCombinations(partitions[j], indices);
+        partitions = Partitions(ii, delete(usedWeights, uw));
+        for(j = 1; j <= size(partitions); j++)
+        {
+          combinations[j] = AllCombinations(partitions[j], indices);
+        }
+        for(j = 1; j <= size(index); j++)
+        {
+          nonlinearSubs[index[j]] = FlattenQHM(combinations);   // flatten one level !
+        }
       }
-      for(j = 1; j <= size(index); j = j + 1) {
-        nonlinearSubs[index[j]] = FlattenQHM(combinations);   // flatten one level !
-      }
-
-      } // end if
-
     }
   }
   combList[1] = linearSubs;
@@ -1188,14 +1230,17 @@ GLOBAL: varSubsList, contains the index j s.t. x(i) -> x(i)t(j) ...
   i = 1;
   ok = 1;
   m = partition[1];
-  while(ok) {
-    if(i > size(partition)) {
+  while(ok)
+  {
+    if(i > size(partition))
+    {
       ok = 0;
       p = 0;
     }
     else { p = partition[i];}
     if(p == m) { i = i + 1;}
-    else {
+    else
+    {
       k = k + 1;
       nrList[k] = i - 1 - offset;
       offset = offset + i - 1;
@@ -1217,25 +1262,30 @@ RETURN:  list
   int i, j, k;
   list comb, newC, temp, newIndex;
 
-  if(n == 1) {
-    for(i = 1; i <= size(index); i = i + 1) {
+  if(n == 1)
+  {
+    for(i = 1; i <= size(index); i++)
+    {
       temp = index[i];
       comb[i] = temp;
     }
     return(comb);
   }
-  if(size(index) == 1) {
+  if(size(index) == 1)
+  {
     temp = Table(string(index[1]), "i", 1, n);
     comb[1] = temp;
     return(comb);
   }
   newIndex = index;
-  for(i = 1; i <= size(index); i = i + 1) {
+  for(i = 1; i <= size(index); i = i + 1)
+  {
     if(i > 1) { newIndex = delete(newIndex, 1); }
     newC = AllSingleCombinations(n - 1, newIndex);
     k = size(comb);
     temp = 0;
-    for(j = 1; j <= size(newC); j = j + 1) {
+    for(j = 1; j <= size(newC); j++)
+    {
       temp[1] = index[i];
       temp = temp + newC[j];
       comb[k + j] = temp;
@@ -1262,10 +1312,13 @@ RETURN:  list
   restC = AllCombinationsAux(delete(parts, 1), delete(index, 1));
 
   if(size(restC) == 0) { comb = firstC;}
-  else {
-    for(i = 1; i <= size(firstC); i = i + 1) {
+  else
+  {
+    for(i = 1; i <= size(firstC); i++)
+    {
       k = size(comb);
-      for(j = 1; j <= size(restC); j = j + 1) {
+      for(j = 1; j <= size(restC); j++)
+      {
         //elem = firstC[i] + restC[j];
         // comb[k + j] = elem;
         comb[k + j] = firstC[i] + restC[j];
@@ -1287,24 +1340,30 @@ RETURN:  list
   list parts, temp, restP, newP, decP;
 
   if(size(nr) == 0) { return(list());}
-  if(size(nr) == 1) {
-    if(NumFactor(nr[1], n) > 0) {
+  if(size(nr) == 1)
+  {
+    if(NumFactor(nr[1], n) > 0)
+    {
       parts[1] = Table(string(nr[1]), "i", 1, NumFactor(nr[1], n));
     }
     return(parts);
   }
-  else {
+  else
+  {
     parts =  Partitions(n, nr[1]);
     restP = Partitions(n, delete(nr, 1));
 
     parts = parts + restP;
-    for(i = 1; i <= n / nr[1]; i = i + 1) {
+    for(i = 1; i <= n / nr[1]; i = i + 1)
+    {
       temp = Table(string(nr[1]), "i", 1, i);
       decP = Partitions(n - i*nr[1], delete(nr, 1));
       k = size(parts);
-      for(j = 1; j <= size(decP); j = j + 1) {
+      for(j = 1; j <= size(decP); j++)
+      {
         newP = temp + decP[j];        // new partition
-        if(!ContainedQ(parts, newP, 1)) {
+        if(!ContainedQ(parts, newP, 1))
+	{
           k = k + 1;
           parts[k] = newP;
         }
@@ -1338,7 +1397,8 @@ RETURN:  list
   list data;
   execute("int " + iterator + ";");
 
-  for(int @i = lb; @i <= ub; @i++) {
+  for(int @i = lb; @i <= ub; @i++)
+  {
     execute(iterator + " = " + string(@i));
     execute("data[" + string(@i) + "] = " + cmd + ";");
   }
@@ -1358,8 +1418,10 @@ RETURN:  list
 
   c = 1;
 
-  for(i = 1; i <= size(data); i = i + 1) {
-    for(j = 1; j <= size(data[i]); j = j + 1) {
+  for(i = 1; i <= size(data); i++)
+  {
+    for(j = 1; j <= size(data[i]); j++)
+    {
       fList[c] = data[i][j];
       c = c + 1;
     }
@@ -1378,11 +1440,13 @@ static proc IntersectionQHM(list l1, list l2)
 
   c = 1;
 
-  for(int i = 1; i <= size(l1); i = i + 1) {
+  for(int i = 1; i <= size(l1); i++)
+  {
     b = ContainedQ(l2, l1[i]);
-    if(b == 1) {
+    if(b == 1)
+    {
       l[c] = l1[i];
-      c = c + 1;
+      c++;
     }
   }
   return(l);
@@ -1398,9 +1462,10 @@ static proc FirstEntryQHM(data, elem)
 
   i = 0;
   pos = 0;
-  while(!pos && i < size(data)) {
-    i = i + 1;
-    if(data[i] == elem) { pos = i;}
+  while(i < size(data))
+  {
+    i++;
+    if(data[i] == elem) { pos = i; break;}
   }
   return(pos);
 }
@@ -1410,11 +1475,11 @@ static proc FirstEntryQHM(data, elem)
 static proc PSum(e)
 {
   poly f;
-  for(int i = 1; i <= size(e); i = i + 1) {
+  for(int i = size(e);i>=1;i--)
+  {
     f = f + e[i];
   }
   return(f);
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1429,7 +1494,8 @@ ASSUME:  'data' contians only integers and is not empty
   int i;
   int max = data[1];
 
-  for(i = 1; i <= size(data); i = i + 1) {
+  for(i = size(data); i>1;i--)
+  {
     if(data[i] > max) { max = data[i]; }
   }
   return(max);
@@ -1451,7 +1517,8 @@ ASSUME:  'data' contians only integers and is not empty
   int i;
   int min = data[1];
 
-  for(i = 1; i <= size(data); i = i + 1) {
+  for(i = size(data);i>1; i--)
+  {
     if(data[i] < min) { min = data[i]; }
   }
   return(min);
