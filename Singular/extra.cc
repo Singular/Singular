@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.298 2009-03-30 14:07:21 monerjan Exp $ */
+/* $Id: extra.cc,v 1.299 2009-04-14 13:26:55 motsak Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -809,13 +809,13 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     if(strcmp(sys_cmd,"NCUseExtensions")==0)
     {
-      extern bool bUseExtensions;
-      res->rtyp=INT_CMD;
-      res->data=(void *)bUseExtensions;
       
       if ((h!=NULL) && (h->Typ()==INT_CMD))
-        bUseExtensions = (bool)((long)(h->Data()));
-      
+        res->data=(void *)setNCExtensions( (int)((long)(h->Data())) );
+      else
+        res->data=(void *)getNCExtensions();
+        
+      res->rtyp=INT_CMD;      
       return FALSE;
     }
 
