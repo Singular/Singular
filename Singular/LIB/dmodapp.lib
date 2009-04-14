@@ -1,32 +1,32 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmodapp.lib,v 1.27 2009-04-10 08:30:16 Singular Exp $";
+version="$Id: dmodapp.lib,v 1.28 2009-04-14 11:52:54 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmodapp.lib     Applications of algebraic D-modules
 AUTHORS: Viktor Levandovskyy,      levandov@math.rwth-aachen.de
 @*             Daniel Andres, daniel.andres@math.rwth-aachen.de
 
-GUIDE: Let K be a field of characteristic 0, R = K[x1,..xN] and 
+GUIDE: Let K be a field of characteristic 0, R = K[x1,..xN] and
 @* D be the Weyl algebra in variables x1,..xN,d1,..dN.
 @* In this library there are the following procedures for algebraic D-modules:
 @* - localization of a holonomic module D/I with respect to a mult. closed set
-@* of all powers of a given polynomial F from R. Our aim is to compute an 
-@* ideal L in D, such that D/L is a presentation of a localized module. Such L 
-@* always exists, since such localizations are known to be holonomic and thus 
+@* of all powers of a given polynomial F from R. Our aim is to compute an
+@* ideal L in D, such that D/L is a presentation of a localized module. Such L
+@* always exists, since such localizations are known to be holonomic and thus
 @* cyclic modules. The procedures for the localization are DLoc,SDLoc and DLoc0.
 @*
 @* - annihilator in D of a given polynomial F from R as well as
-@* of a given rational function G/F from Quot(R). These can be computed via 
+@* of a given rational function G/F from Quot(R). These can be computed via
 @* procedures annPoly resp. annRat.
 @*
-@* - initial form and initial ideals in Weyl algebras with respect to a given 
+@* - initial form and initial ideals in Weyl algebras with respect to a given
 @* weight vector can be computed with  inForm, initialMalgrange, initialIdealW.
 @*
-@* - appelF1, appelF2 and appelF4 return ideals in parametric Weyl algebras, 
+@* - appelF1, appelF2 and appelF4 return ideals in parametric Weyl algebras,
 @* which annihilate corresponding Appel hypergeometric functions.
 
-REFERENCES: 
-@* (SST) Saito, Sturmfels, Takayama 'Groebner Deformations of Hypergeometric 
+REFERENCES:
+@* (SST) Saito, Sturmfels, Takayama 'Groebner Deformations of Hypergeometric
 @*         Differential Equations', Springer, 2000
 @* (ONW) Oaku, Takayama, Walther 'A Localization Algorithm for D-modules', 2000
 
@@ -66,34 +66,6 @@ LIB "dmod.lib"; // loads e.g. nctools.lib
 LIB "bfun.lib"; //formerly LIB "bfct.lib";
 LIB "nctools.lib"; // for isWeyl etc
 LIB "gkdim.lib";
-
-// todo: complete and include into above list
-// charVariety(I);       compute the characteristic variety of the ideal I
-// charInfo(); ???
-
-
-///////////////////////////////////////////////////////////////////////////////
-// testing for consistency of the library:
-proc testdmodapp()
-{
-  example initialIdealW;
-  example initialMalgrange;
-  example DLoc;
-  example DLoc0;
-  example SDLoc;
-  example inForm;
-  example isFsat;
-  example annRat;
-  example annPoly;
-  example appelF1;
-  example appelF2;
-  example appelF4;
-  example poly2list;
-  example fl2poly;
-  example insertGenerator;
-  example deleteGenerator;
-  example bFactor;
-}
 
 proc inForm (ideal I, intvec w)
 "USAGE:  inForm(I,w);  I ideal, w intvec
@@ -278,7 +250,7 @@ EXAMPLE: example annfs; shows examples
 proc appelF1()
 "USAGE:  appelF1();
 RETURN:  ring  (and exports an ideal into it)
-PURPOSE: define the ideal in a parametric Weyl algebra, 
+PURPOSE: define the ideal in a parametric Weyl algebra,
 @* which annihilates Appel F1 hypergeometric function
 NOTE: the ideal called  IAppel1 is exported to the output ring
 EXAMPLE: example appelF1; shows examples
@@ -309,7 +281,7 @@ example
 proc appelF2() //(number a,b,c)
 "USAGE:  appelF2();
 RETURN:  ring (and exports an ideal into it)
-PURPOSE: define the ideal in a parametric Weyl algebra, 
+PURPOSE: define the ideal in a parametric Weyl algebra,
 @* which annihilates Appel F2 hypergeometric function
 NOTE: the ideal called  IAppel2 is exported to the output ring
 EXAMPLE: example appelF2; shows examples
@@ -339,7 +311,7 @@ example
 proc appelF4()
 "USAGE:  appelF4();
 RETURN:  ring  (and exports an ideal into it)
-PURPOSE: define the ideal in a parametric Weyl algebra, 
+PURPOSE: define the ideal in a parametric Weyl algebra,
 @* which annihilates Appel F4 hypergeometric function
 NOTE: the ideal called  IAppel4 is exported to the output ring
 EXAMPLE: example appelF4; shows examples
@@ -459,7 +431,7 @@ EXAMPLE: example DLoc; shows examples
   {
     ERROR("Basering is not a Weyl algebra");
   }
-  if (defined(LD0) || defined(BS)) 
+  if (defined(LD0) || defined(BS))
   {
     ERROR("Reserved names LD0 and/or BS are used. Please rename the objects.");
   }
@@ -499,7 +471,7 @@ example;
 proc DLoc0(ideal I, poly F)
 "USAGE:  DLoc0(I, F);  I an ideal, F a poly
 RETURN:  ring
-PURPOSE: compute the presentation of the localization of D/I w.r.t. f^s, 
+PURPOSE: compute the presentation of the localization of D/I w.r.t. f^s,
 @*           where D is a Weyl Algebra, based on the output of procedure SDLoc
 ASSUME: the basering is similar to the output ring of SDLoc procedure
 NOTE:    activate this ring with the @code{setring} command. In this ring,
@@ -733,7 +705,7 @@ example;
   // moreover I is not holonomic, since its dimension is not 2 = 4/2
   gkdim(I); // 3
   def W = SDLoc(I,F);  setring W; // creates ideal LD in W = R[s]
-  def U = DLoc0(LD, x2-y3);  setring U; // compute in R 
+  def U = DLoc0(LD, x2-y3);  setring U; // compute in R
   LD0; // Groebner basis of the presentation of localization
   BS; // description of b-function for localization
 }
@@ -948,7 +920,7 @@ example;
   def R = Weyl(); // Weyl algebra on the variables x,y,Dx,Dy
   setring R;
   poly F = x2-y3;
-  ideal I = Dx*F, Dy*F; 
+  ideal I = Dx*F, Dy*F;
   // note, that I is not holonomic, since it's dimension is not 2
   gkdim(I); // 3, while dim R = 4
   def W = SDLoc(I,F);
@@ -1404,7 +1376,7 @@ proc fl2poly(list L, string s)
 "USAGE:  fl2poly(L,s); L a list, s a string
 RETURN:  poly
 PURPOSE: reconstruct a monic polynomial in one variable from its factorization
-ASSUME:  s is a string with the name of some variable and 
+ASSUME:  s is a string with the name of some variable and
 @*         L is supposed to consist of two entries:
 @*         L[1] of the type ideal with the roots of a polynomial
 @*         L[2] of the type intvec with the multiplicities of corr. roots
@@ -1466,7 +1438,7 @@ proc initialIdealW (ideal I, intvec u, intvec v, list #)
 RETURN:  ideal, GB of initial ideal of the input ideal wrt the weights u and v
 ASSUME:  The basering is the n-th Weyl algebra in characteristic 0 and  for all
 @*       1<=i<=n the identity var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the
-@*       sequence of variables is given by x(1),...,x(n),D(1),...,D(n), 
+@*       sequence of variables is given by x(1),...,x(n),D(1),...,D(n),
 @*       where D(i) is the differential operator belonging to x(i).
 PURPOSE: computes the initial ideal with respect to given weights.
 NOTE:    u and v are understood as weight vectors for x(i) and D(i)
@@ -1522,7 +1494,7 @@ EXAMPLE: example initialIdealW; shows examples
       ERROR(string(var(i+n))+" is not a differential operator for " +string(var(i)));
     }
   }
-  
+
   // 1. create  homogenized Weyl algebra
   // 1.1 create ordering
   intvec uv = u,v,0;
@@ -1852,7 +1824,7 @@ EXAMPLE: example bFactor; shows examples
   else
   {
     dbprint(ppl,"// found no roots");
-  }  
+  }
   L = list(II,mm);
   if (ir <> 1)
   {
@@ -1861,10 +1833,10 @@ EXAMPLE: example bFactor; shows examples
     dbprint(ppl-1,string(ir));
     L = L + list(string(ir));
   }
-  else 
+  else
   {
     dbprint(ppl,"// no irreducible factors found");
-  }  
+  }
   setring save;
   L = imap(@S,L);
   return(L);
@@ -1874,6 +1846,6 @@ example
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
   bFactor((x^2-1)^2);
-  bFactor((x^2+1)^2);  
+  bFactor((x^2+1)^2);
   bFactor((y^2+1/2)*(y+9)*(y-7));
 }
