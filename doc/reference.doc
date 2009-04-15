@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.340 2009-04-15 11:02:06 seelisch Exp $
+@comment $Id: reference.doc,v 1.341 2009-04-15 12:27:19 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -6359,7 +6359,7 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{subst (} poly_expression@code{,} variable@code{,} poly_expression @code{)}
-@*@code{subst (} poly_expression@code{,} variable@code{,} poly_expression{,...} variable@code{,} poly_expression @code{)}
+@*@code{subst (} poly_expression@code{,} variable@code{,} poly_expression @code{,...} variable@code{,} poly_expression @code{)}
 @*@code{subst (} vector_expression@code{,} variable@code{,} poly_expression @code{)}
 @*@code{subst (} ideal_expression@code{,} variable@code{,} poly_expression @code{)}
 @*@code{subst (} module_expression@code{,} variable@code{,} poly_expression @code{)}
