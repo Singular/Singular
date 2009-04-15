@@ -5,8 +5,8 @@
 
 SLIB0 = absfact.lib  ainvar.lib  aksaka.lib  alexpoly.lib  algebra.lib \
 	arcpoint.lib  atkins.lib  brnoeth.lib  cimonom.lib  classify.lib \
-	compregb.lib  control.lib  crypto.lib  curvepar.lib  deform.lib \
-	elim.lib  equising.lib  finvar.lib  general.lib  gmspoly.lib \
+	compregb.lib  control.lib  crypto.lib  curvepar.lib  decodegb.lib \
+	deform.lib elim.lib  equising.lib  finvar.lib  general.lib gmspoly.lib \
 	gmssing.lib  graphics.lib  groups.lib  grwalk.lib  hnoether.lib \
 	homolog.lib  hyperel.lib  inout.lib  intprog.lib  jacobson.lib \
 	kskernel.lib  latex.lib  linalg.lib  lll.lib  makedbm.lib \
