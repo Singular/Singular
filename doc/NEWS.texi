@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.131 2009-04-15 08:08:42 Singular Exp $
+@comment $Id: NEWS.texi,v 1.132 2009-04-15 11:03:46 seelisch Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -146,7 +146,7 @@ It contains also  a lot of new features:
 licence changed: omalloc and MP are now (also) available under GPL;
 that means that all parts of @sc{Singular} are licenced under GPL (resp. LGPL).
 @item
-factory, libfac, Singular updated for gcc 4.1.x
+factory, libfac, @sc{Singular} updated for gcc 4.1.x
 @item
 kernel updated for the optional use of boost.
 @item
@@ -295,7 +295,7 @@ arithmetic in Z/pZ for architecture x84_64 improved (by 25 %)
 The version 3-0-0 is the first in the new
 release series version 3-0.
 
-Singular version 3 has a greater functionality and an improved architecture.
+@sc{Singular} version 3 has a greater functionality and an improved architecture.
 Major new features are:
 @itemize
 @item
@@ -324,7 +324,7 @@ better support of graded modules
 @item
 many bugs fixed
 @end itemize
-Besides theses internal changes, Singular version 3 offers many new
+Besides theses internal changes, @sc{Singular} version 3 offers many new
 features and functionalities (which were partly already incorporated in
 the 2-1 pre-release series).
 
@@ -430,7 +430,7 @@ procedures, related to quantum matrices and minors
 @heading Porting
 
 @itemize @bullet
-@item Singular is available for ix86-Linux,
+@item @sc{Singular} is available for ix86-Linux,
 SunOS-5, IRIX-6, ix86-Win (runs on Windows 95/98/NT4/2000/XP/Vista),
 FreeBSD, MacOS X, x86_64-Linux (AMD64/Opteron/EM64T),
 IA64-Linux

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.226 2009-04-15 08:08:42 Singular Exp $
+@comment $Id: general.doc,v 1.227 2009-04-15 10:59:19 seelisch Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -245,7 +245,7 @@ on your system (for @code{xinfo}, the programs @code{xterm} and
 use, by changing the entry in @code{LIB/help.cnf}
 
 @item
-If the help browser can not find the local html
+If the help browser cannot find the local html
 pages of the @sc{Singular} manual (which it will look for at
 @code{$RootDir/html} -- see @ref{Loading a library} for more info on
 @code{$RootDir}) @emph{and} the (command-line) option @code{--allow-net}
@@ -283,7 +283,7 @@ environment variable @code{SINGULAR_INFO_FILE}.
 
 The help browsers @code{tkinfo}, @code{xinfo} and @code{info} (so-called
 info help browsers) are based on the
-@code{info} program from the Gnu @code{texinfo} package.  @xref{Top, An
+@code{info} program from the GNU @code{texinfo} package.  @xref{Top, An
 Introduction to Info, Getting started, info, The Info Manual}, for more
 information.
 
@@ -353,7 +353,7 @@ are available:
 @table @code
 @item a
 returns to the top level after finishing the current (kernel) command. Notice
-that commands of the @sc{Singular} kernel (like @code{std}) can not be
+that commands of the @sc{Singular} kernel (like @code{std}) cannot be
 aborted, i.e. (@code{a})bort only happens whenever the interpreter is active.
 @item c
 continues
@@ -752,7 +752,7 @@ version 20.3 or higher installed on your system. These
 editors can be downloaded for most hard- and software platforms
 (including Windows
 95/98/NT, but excluding the Macintosh), from either
-@uref{http://www.fsf.org/software/emacs/emacs.html} (Emacs), from
+@uref{http://www.gnu.org/software/emacs/emacs.html} (Emacs), from
 @uref{http://www.xemacs.org} (XEmacs), or from our ftp site at
 @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/}. The
 differences between Emacs and XEmacs w.r.t. the  @sc{Singular}-Emacs
@@ -1022,7 +1022,7 @@ parameters in the minibuffer area:
 
 @enumerate
 @item
-The Singular executable. This can either be a file name with complete
+The @sc{Singular} executable. This can either be a file name with complete
 path, e.g., @code{/local/bin/Singular}. Then exactly this executable is
 started. The path may contain the character @code{~} denoting your home
 directory. Or it can be the name of a command without path, e.g.,
@@ -1070,7 +1070,7 @@ arguments as before.
 
 @item @code{singular-control-c} (bound to @code{C-c C-c} or menu @code{Singular}, item @code{Interrupt})
 
-Interrupt the Singular process running in the current buffer. Asks
+Interrupt the @sc{Singular} process running in the current buffer. Asks
 whether to (@code{a})bort the current @sc{Singular} command,
 (@code{q})uit or (@code{r})estart the current @sc{Singular} process, or
 (@code{c})ontinue without doing anything (default).
@@ -1461,7 +1461,7 @@ procedure.  @xref{Procedures}, @ref{keepring}.
 
 The exact syntax of a ring declaration is given in the next two
 subsections; this subsection lists some examples first. Note that the chosen
-ordering implies that aöö unit-elements of the ring will be among the elements
+ordering implies that a unit-elements of the ring will be among the elements
 with leading monomial 1. For more information, see @ref{Monomial orderings}.
 
 Every floating point number in a ring consists of two parts, which may be
@@ -3329,8 +3329,8 @@ distribution, have to comply with certain rules as explained in
 @cindex DefaultDir
 @cindex SINGULARPATH
 
-Libraries can be loaded with the @code{LIB} or the @code{load} command:
-(See also @ref{load}).
+Libraries can be loaded with the @code{LIB} or the @code{load} command
+(see @ref{load}):
 
 @c ------------------------------------------------------------
 @c   This piece of text exists also in the file reference.doc,
@@ -3345,7 +3345,7 @@ Libraries can be loaded with the @code{LIB} or the @code{load} command:
 none
 @item @strong{Purpose:}
 reads a library of procedures from a file. If the given filename does
-not start with @kbd{.} or @kbd{/} and can not be located in the current
+not start with @kbd{.} or @kbd{/} and cannot be located in the current
 directory, each directory contained in the
 @code{SearchPath} is searched for a file with this name.
 @item @strong{Note on SearchPath:}
@@ -4110,7 +4110,7 @@ execute current line, sdb break at next line
 @item @code{p} <identifier>
 display type and value of the variable given by <identifier>
 @item @code{Q}
-quit this Singular session
+quit this @sc{Singular} session
 @item @code{q} <flags>
 quit debugger, set debugger flags(0,1,2)
 @* 0: continue, disable the debugger

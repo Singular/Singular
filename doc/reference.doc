@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.339 2009-04-14 17:52:16 Singular Exp $
+@comment $Id: reference.doc,v 1.340 2009-04-15 11:02:06 seelisch Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -647,7 +647,7 @@ See
 @item @strong{Type:}
 ideal resp. bigint
 @item @strong{Purpose:}
-applies chinese remainder theorem to the fisrt argument wrt. the moduli given in the second.
+applies chinese remainder theorem to the fisrt argument w.r.t. the moduli given in the second.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -1926,7 +1926,7 @@ a zero-dimensional ideal @code{I} and a polynomial @code{p} using
 FGLM-techniques.
 @item @strong{Assume:}
 The ideal must be zero-dimensional and given as a reduced Groebner
-basis in the given ring. The poly must be reduced with respect to the
+basis in the given ring. The polynomial must be reduced with respect to the
 ideal.
 @item @strong{Example:}
 @smallexample
@@ -2199,7 +2199,7 @@ reads the content of the entire file, resp.@: link, and restores all variables
 from it. For ASCII links, @code{getdump} is equivalent to an
 @code{execute(read(} link @code{))} command. For MP links,
 @code{getdump} should only be used on data which were previously
-´@code{dump}`ed.
+@code{dump}`ed.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -2345,7 +2345,7 @@ this is also the smallest monomial not contained in the ideal, resp.@: module.
 @*The command works also in global orderings, but is not very useful there.
 @item @strong{Note:}
 Let the ideal I be given by a standard basis. Then
-@code{highcorner(I)} returns 0 iff @code{dim(I)>0} or @code{dim(I)=-1}.
+@code{highcorner(I)} returns 0 if and only if @code{dim(I)>0} or @code{dim(I)=-1}.
 Otherwise it returns the smallest monomial m not in I which has the following
 properties (with
 @ifinfo
@@ -4544,7 +4544,7 @@ rings with characteristic 0 and not set for all other rings.
 @item @code{lazy}
 @cindex lazy, option
 uses a more lazy approach in std computations,
-which was used in Singular version before 2-0
+which was used in @sc{Singular} version before 2-0
 (and which may lead to faster or slower computations, depending on the example)
 @item @code{length}
 @cindex length, option
@@ -4575,7 +4575,7 @@ memory-critical standard basis computations.
 @item @code{oldStd}
 @cindex oldStd, option
 uses a more lazy approach in std computations,
-which was used in Singular version before 2-0
+which was used in @sc{Singular} version before 2-0
 (and which may lead to faster or slower computations, depending on the example)
 @c ---------
 @item @code{prot}
@@ -6359,7 +6359,7 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{subst (} poly_expression@code{,} variable@code{,} poly_expression @code{)}
-@*@code{subst (} poly_expression@code{,} variable@code{,} poly_expression@code{,...} variable@code{,} poly_expression @code{)}
+@*@code{subst (} poly_expression@code{,} variable@code{,} poly_expression{,...} variable@code{,} poly_expression @code{)}
 @*@code{subst (} vector_expression@code{,} variable@code{,} poly_expression @code{)}
 @*@code{subst (} ideal_expression@code{,} variable@code{,} poly_expression @code{)}
 @*@code{subst (} module_expression@code{,} variable@code{,} poly_expression @code{)}
@@ -7598,7 +7598,7 @@ Each time a library (@ref{Libraries}) / dynamic module (@ref{Dynamic
 loading}) is loaded, the corresponding package is created, if it does
 not already exist.
 
-The name of a package corresponding to a Singular library is
+The name of a package corresponding to a @sc{Singular} library is
 derived from the name of the library file. The first letter is
 capitalized and everything to right of the left-most dot is
 dropped.
