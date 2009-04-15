@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncalg.lib,v 1.32 2009-04-09 12:04:42 seelisch Exp $";
+version="$Id: ncalg.lib,v 1.33 2009-04-15 08:17:58 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  ncalg.lib      Definitions of important G- and GR-algebras
@@ -615,7 +615,7 @@ EXAMPLE: example GKZsystem; shows examples
   };
   string sord2 = "(a(0:" + string(n) + ")," + sord + ")";
   execute("ring GR = (0,b(1..@d)),(x(1..n),d(1..n)),"+sord2+";");
-  Weyl();
+  def W=Weyl(); setring W;
   int i,j;
   poly p;
   ideal I;
@@ -626,7 +626,7 @@ EXAMPLE: example GKZsystem; shows examples
     {
       p = p+ A[i,j]*x(j)*d(j);
     }
-  I = I, p;
+    I = I, p;
   }
   I = I, imap(r1,I0);
   I = simplify(I,2);
