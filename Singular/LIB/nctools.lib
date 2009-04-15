@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.52 2009-04-15 11:18:07 seelisch Exp $";
+version="$Id: nctools.lib,v 1.53 2009-04-15 14:20:44 motsak Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -727,7 +727,6 @@ example
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 proc superCommutative(list #)
 "USAGE:   superCommutative([b,[e, [Q, [flag]]]]);
@@ -933,6 +932,13 @@ example
   setring ER; ER;
   "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "].";
   kill R; kill ER;
+}
+
+// Please, don't throw this away!!! Needed for backward compatibility.
+proc SuperCommutative(list #)
+{
+  // "Please use superCommutative instead";
+  return( superCommutative(#) );
 }
 
 
