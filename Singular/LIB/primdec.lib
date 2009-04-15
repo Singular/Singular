@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.145 2009-03-18 14:17:33 Singular Exp $";
+version="$Id: primdec.lib,v 1.146 2009-04-15 07:41:50 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -19,7 +19,9 @@ OVERVIEW:
     may not terminate.@*
     Algorithms for the computation of the radical based on the ideas of
     Krick, Logar, Laplagne and Kemper (implementation by Gerhard Pfister and Santiago Laplagne).
-    They work in any characteristic.
+    They work in any characteristic.@*
+    Baserings must have a global ordering and no quotient ideal.
+    
 
 PROCEDURES:
  Ann(M);           annihilator of R^n/M, R=basering, M in R^n
