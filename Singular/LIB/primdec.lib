@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.146 2009-04-15 07:41:50 Singular Exp $";
+version="$Id: primdec.lib,v 1.147 2009-04-15 08:10:22 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -5391,8 +5391,6 @@ RETURN:  list, the minimal associated prime ideals of i.
 NOTE:    If c=0, the given ordering of the variables is used. @*
          Otherwise, the system tries to find an optimal ordering,
          which in some cases may considerably speed up the algorithm. @*
-         Due to a bug in the factorization, the result may be not completely
-         decomposed in small characteristic.
 EXAMPLE: example minAssChar; shows an example
 "
 {

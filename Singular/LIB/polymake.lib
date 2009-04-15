@@ -1,4 +1,4 @@
-version="$Id: polymake.lib,v 1.15 2009-04-14 12:00:14 Singular Exp $";
+version="$Id: polymake.lib,v 1.16 2009-04-15 08:08:58 Singular Exp $";
 category="Tropical Geometry";
 info="
 LIBRARY:   polymake.lib    Computations with polytopes and fans,
@@ -31,34 +31,34 @@ NOTE:
      independent of both, polymake and topcom.
 
 PROCEDURES USING POLYMAKE:
-  polymakePolytope   computes the vertices of a polytope using polymake
-  newtonPolytope     computes the Newton polytope of a polynomial
-  newtonPolytopeLP   computes the lattice points of the Newton polytope
-  normalFan          computes the normal fan of a polytope
-  groebnerFan        computes the Groebner fan of a polynomial
-  intmatToPolymake   transforms an integer matrix into polymake format
-  polymakeToIntmat   transforms polymake output into an integer matrix
+  polymakePolytope()   computes the vertices of a polytope using polymake
+  newtonPolytope()     computes the Newton polytope of a polynomial
+  newtonPolytopeLP()   computes the lattice points of the Newton polytope
+  normalFan()          computes the normal fan of a polytope
+  groebnerFan()        computes the Groebner fan of a polynomial
+  intmatToPolymake()   transforms an integer matrix into polymake format
+  polymakeToIntmat()   transforms polymake output into an integer matrix
 
 PROCEDURES USING TOPCOM:
-  triangulations     computes all triangulations of a marked polytope
-  secondaryPolytope  computes the secondary polytope of a marked polytope
+  triangulations()     computes all triangulations of a marked polytope
+  secondaryPolytope()  computes the secondary polytope of a marked polytope
 
 PROCEDURES USING POLYMAKE AND TOPCOM:
-  secondaryFan       computes the secondary fan of a marked polytope
+  secondaryFan()       computes the secondary fan of a marked polytope
 
 PROCEDURES CONCERNED WITH PLANAR POLYGONS:
-  cycleLength      computes the cycleLength of cycle
-  splitPolygon     splits a marked polygon into vertices, facets, interior points
-  eta              computes the eta-vector of a triangulation
-  findOrientedBoundary    computes the boundary of a convex hull
-  cyclePoints      computes lattice points connected to some lattice point
-  latticeArea      computes the lattice area of a polygon
-  picksFormula     computes the ingrediants of Pick's formula for a polygon
-  ellipticNF       computes the normal form of an elliptic polygon
-  ellipticNFDB     displays the 16 normal forms of elliptic polygons
+  cycleLength()      computes the cycleLength of cycle
+  splitPolygon()     splits a marked polygon into vertices, facets, interior points
+  eta()              computes the eta-vector of a triangulation
+  findOrientedBoundary()    computes the boundary of a convex hull
+  cyclePoints()      computes lattice points connected to some lattice point
+  latticeArea()      computes the lattice area of a polygon
+  picksFormula()     computes the ingrediants of Pick's formula for a polygon
+  ellipticNF()       computes the normal form of an elliptic polygon
+  ellipticNFDB()     displays the 16 normal forms of elliptic polygons
 
 AUXILARY PROCEDURES:
-  polymakeKeepTmpFiles  determines if the files created in /tmp should be kept
+  polymakeKeepTmpFiles()  determines if the files created in /tmp should be kept
 
 KEYWORDS:    polytope; fan; secondary fan; secondary polytope; polymake;
              Newton polytope; Groebner fan

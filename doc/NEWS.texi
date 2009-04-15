@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.130 2009-04-14 17:20:17 Singular Exp $
+@comment $Id: NEWS.texi,v 1.131 2009-04-15 08:08:42 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -328,12 +328,12 @@ Besides theses internal changes, Singular version 3 offers many new
 features and functionalities (which were partly already incorporated in
 the 2-1 pre-release series).
 
-@heading Factorizing algorithms revisited
+@heading Factorizing algorithms revisited (3-0-0)
 Starting with version 2-0-4, we use NTL (of Victor Shoup) for factoring
 univariate polynomials. The multivariate factorization code in libfac/factory
 now also works over algebraic field extension.
 
-@heading New @sc{Singular} libraries
+@heading New @sc{Singular} libraries (3-0-0)
 
 @table @asis
 @item @nref{control_lib}
@@ -358,7 +358,7 @@ counting number of real roots of univariate polynomial
 Groebner and Pertubation walk
 @end table
 
-@heading Changes in @sc{Singular} libraries
+@heading Changes in @sc{Singular} libraries (3-0-0)
 Many procedures were moved into different libraries,
 the documentation of libraries was generally improved.
 
@@ -367,7 +367,7 @@ the newly created ring.
 @table @asis
 @end table
 
-@heading New @sc{Singular} functions
+@heading New @sc{Singular} functions (3-0-0)
 
 @table @asis
 @item @nref{ringlist}
@@ -382,7 +382,7 @@ generate a copy of an identifier from the specified package in the current packa
 fractal walk to change monomial orderings
 @end table
 
-@heading @sc{Singular} functions whose syntax/semantics has changed
+@heading @sc{Singular} functions whose syntax/semantics has changed (3-0-0)
 @table @asis
 @item @nref{degree}
 outputs degree and dimension instead of returning an int
@@ -390,7 +390,7 @@ outputs degree and dimension instead of returning an int
 new attribute: @code{rowShift}
 @end table
 
-@heading Non-commutative Extension @sc{Plural}
+@heading Non-commutative Extension @sc{Plural} (3-0-0)
 
 Starting with version 3-0-0, @sc{Singular} features the
 non-commutative extension @sc{Plural}. It allows to
@@ -419,7 +419,7 @@ contain numerous useful tools for non-commutative algebras
 procedures, related to quantum matrices and minors
 @end table
 
-@heading Internal Changes
+@heading Internal Changes (3-0-0)
 @table @asis
 @item new mapping code
 @c @item non-commutative extension (Plural)

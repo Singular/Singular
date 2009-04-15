@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.225 2009-04-08 12:44:42 seelisch Exp $
+@comment $Id: general.doc,v 1.226 2009-04-15 08:08:42 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -825,7 +825,7 @@ window of the window system, and not to overlapping, separate
 windows. When using @sc{Singular} within Emacs, extra windows may appear
 which display help or output from certain commands. The most important
 window commands are:
-@multitable @columnfractions 2. .3 .5
+@multitable @columnfractions .1 .2 .6
 @item @code{C-x 1}
 @tab @code{File->Un-Split}
 @tab Un-Split window (i.e., kill other windows)
@@ -3330,6 +3330,7 @@ distribution, have to comply with certain rules as explained in
 @cindex SINGULARPATH
 
 Libraries can be loaded with the @code{LIB} or the @code{load} command:
+(See also @ref{load}).
 
 @c ------------------------------------------------------------
 @c   This piece of text exists also in the file reference.doc,
