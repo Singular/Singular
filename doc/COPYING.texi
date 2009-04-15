@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.44 2009-04-15 10:41:14 seelisch Exp $
+@comment $Id: COPYING.texi,v 1.45 2009-04-15 11:51:41 seelisch Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -133,51 +133,59 @@ Currently, the @sc{Singular} team has the following members:
 Michael Brickenstein,
 Wolfram Decker,
 Alexander Dreyer,
+Gert-Martin Greuel,
 Anne Fr@"uhbis-Kr@"uger,
-Kai Kr@"uger,
 Viktor Levandovskyy,
 Oleksandr Motsak,
-Mathias Schulze,
+Gerhard Pfister,
+Hans Sch@"onemann,
 and
-Oliver Wienand.
-@cindex Brickenstein, Michael 
+Frank Seelisch.
+@cindex Brickenstein, Michael
 @cindex Decker, Wolfram
 @cindex Dreyer, Alexander
 @cindex Fr@"uhbis-Kr@"uger, Anne
-@cindex Kr@"uger, Kai
 @cindex Levandovskyy, Viktor
 @cindex Motsak, Oleksandr 
-@cindex Schulze, Mathias
-@cindex Wienand, Oliver
+@cindex Seelisch, Frank
 
 Former members of the @sc{Singular} team are:
 Olaf Bachmann,
+Kai Kr@"uger,
 Christoph Lossen,
 Wolfgang Neumann,
+Markus Perling,
 Wilfred Pohl,
 Jens Schmidt,
+Mathias Schulze,
 Thomas Siebert,
 R@"udiger Stobbe,
-Eric Westenberger
+Eric Westenberger,
+Tim Wichmann,
 and
-Tim Wichmann.
+Oliver Wienand.
 @cindex Bachmann, Olaf
+@cindex Kr@"uger, Kai
 @cindex Lossen, Christoph
 @cindex Neumann, Wolfgang
+@cindex Perling, Markus
 @cindex Pohl, Wilfred
 @cindex Schmidt, Jens
+@cindex Schulze, Mathias
 @cindex Siebert, Thomas
 @cindex Stobbe, R@"udiger
 @cindex Westenberger, Eric
 @cindex Wichmann, Tim
+@cindex Wienand, Oliver
 
 Further contributions to @sc{Singular} have been made by:
 Daniel Andres,
 Thomas Bayer,
 Isabelle Bermejo,
 Markus Becker,
-Stas Bulygin,
+Stanislav Bulygin,
 Nadine Cremer,
+Michael Cuntz,
 Kai Dehmann,
 Marcin Dumnicki,
 Stephan Endra@ss{},
@@ -230,8 +238,9 @@ Oleksandr Iena.
 @cindex Bayer, Thomas
 @cindex Bermejo, Isabelle
 @cindex Becker, Markus 
-@cindex Bulygin, Stas
+@cindex Bulygin, Stanislav
 @cindex Cremer, Nadine
+@cindex Cuntz, Michael
 @cindex Dehmann, Kai
 @cindex Dumnicki, Marcin
 @cindex Endra@ss{}, Stephan
