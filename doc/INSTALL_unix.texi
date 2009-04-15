@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.29 2009-04-08 12:44:41 seelisch Exp $
+@comment $Id: INSTALL_unix.texi,v 1.30 2009-04-15 10:41:14 seelisch Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on Unix
 @c
@@ -20,7 +20,7 @@
 @include uname.texi
 @end ifset
 
-The possibilities for installing Singular in a Unix or Linux system range from
+The possibilities for installing @sc{Singular} on a Unix or Linux system range from
 a purely manual installation over a convenient installation of RPM or DEB
 packages up to a completely automated installation via a package tool like
 apt or yum.
@@ -53,7 +53,7 @@ program.
 @*
 @code{@value{_UNAME}} is a description of the processor and operating system
 for which @sc{Singular} is compiled (e.g, @code{ix86-Linux}). Please contact us if
-you can not find an appropriate architecture dependent archive.
+you cannot find an appropriate architecture dependent archive.
 @end ifclear
 
 You can obtain these (and other) archives from
@@ -163,12 +163,12 @@ If you wish to use any of the following features of
 @multitable @columnfractions .5 .5
 @item @strong{Feature} @tab @strong{Requires}
 @item running @code{ESingular}, or @code{Singular} within Emacs
-@tab @uref{http://www.fsf.org/software/emacs/emacs.html,,Emacs} version
+@tab @uref{http://www.gnu.org/software/emacs/emacs.html,,Emacs} version
 20 or higher, or, @uref{http://www.xemacs.org,,XEmacs} version 20.3 or
 higher (ESingular is only included in the Linux distribution.
 On other Unix platforms you can download the
 @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/src/,,
-Singular emacs lisp files} but we give no warranties for specific platforms).
+@sc{Singular} emacs lisp files} but we give no warranties for specific platforms).
 @item on-line @code{html} help
 @tab any web browser
 @item on-line @code{info} help
@@ -179,8 +179,8 @@ Singular emacs lisp files} but we give no warranties for specific platforms).
 library, i.e. @code{/usr/lib/libreadline.so}
 @item visualization of curves and surfaces
 @tab
-@uref{http://www.mathematik.uni-mainz.de/AlgebraischeGeometrie/surf/surf.shtml,,surf}
-version 0.9 or higher (available for Linux, Solaris, MacOS X and Windows).
+@uref{http://www.imaginary2008.de/surfer.php,,surfer}
+Setup executable for the visualization tool surfer.
 @end multitable
 
 You may download most of these programs from
@@ -239,11 +239,11 @@ browser programs such as @code{info} or @code{Emacs}.
 @heading Troubleshooting
 
 @itemize @bullet
-@item General: @sc{Singular} can not find its libraries or on-line help
+@item General: @sc{Singular} cannot find its libraries or on-line help
 @enumerate
 @item
 Make sure that you have read and/or execute permission the files and
-directories of the Singular distribution. If in doubt, @code{cd} to the
+directories of the @sc{Singular} distribution. If in doubt, @code{cd} to the
 directory where you unpacked @sc{Singular}, and do (as root, if
 necessary):
 @smallexample

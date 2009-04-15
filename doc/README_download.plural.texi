@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_download.plural.texi,v 1.3 2009-04-08 12:44:42 seelisch Exp $
+@comment $Id: README_download.plural.texi,v 1.4 2009-04-15 10:41:14 seelisch Exp $
 @c FILE: README_download.texi
 @c PURPOSE: download instructions, to be includeded in manual and README_ftp
 @c
@@ -51,7 +51,7 @@ described below.
 @tab AIX workstations running AIX version 4
 @end multitable
 Please contact us if
-you can not find an appropriate architecture dependent archive.
+you cannot find an appropriate architecture dependent archive.
 
 @item
 Simply change to the directory in which you wish to install

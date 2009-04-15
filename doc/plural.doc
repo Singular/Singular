@@ -998,7 +998,7 @@ f;
 @subsection poly expressions BR_PLURAL_BR
 @cindex poly expressions BR_PLURAL_BR
 
-A poly expression is (optional parts in square brackets):
+A polynomial expression is (optional parts in square brackets):
 @enumerate
 @item
 a monomial (there are NO spaces allowed inside a monomial)
@@ -1013,7 +1013,7 @@ an identifier of type poly
 @item
 a function returning poly
 @item
-poly expressions combined by the arithmetic operations @code{+}, @code{-}, @code{*}, @code{/}, or @code{^}.
+polynomial expressions combined by the arithmetic operations @code{+}, @code{-}, @code{*}, @code{/}, or @code{^}.
 @item
 a type cast to poly
 @end enumerate
@@ -1086,7 +1086,7 @@ the exponent vector of the leading monomial (see @ref{leadexp})
 @item leadmonom
 leading monomial (see @ref{leadmonom})
 @item oppose
-creates an opposite poly of a given poly from the given ring into a basering (see @ref{oppose})
+creates an opposite polynomial of a given polynomial from the given ring into a basering (see @ref{oppose})
 @item reduce
 left normal form with respect to a left Groebner basis (see @ref{reduce BR_PLURAL_BR})
 @item simplify
@@ -1640,7 +1640,7 @@ poly p=Q^4*x2+y2+Q^4*z2+Q*(1-Q^4)*x*y*z;
 p=p^3; // any power of a central element is central
 poly q=(x+Q*y+Q^2*z)^4;
 // take q to be some big noncentral element
-size(q); // check how many monomials are in big poly q
+size(q); // check how many monomials are in big polynomial q
 bracket(p,q); // check p*q=q*p
 // a more common behaviour of the bracket follows:
 bracket(x+Q*y+Q^2*z,z);
@@ -2376,7 +2376,7 @@ $\forall i<j$, $d_{ij} = p$,
 @ifinfo
 for all i<j, d_@{ij@} = p,
 @end ifinfo
-one can input the poly @code{p} instead of matrix @code{D}.
+one can input the polynomial @code{p} instead of matrix @code{D}.
 
 @item @strong{Note:} The returned ring should be activated afterwards, using the command @code{setring}.
 
@@ -3927,7 +3927,7 @@ T. N@"u@ss{}ler and H. Sch@"onemann.
 @item
 @c S:03  InColl
 Sch@"onemann, H.
-  Singular in a Framework for Polynomial Computations.
+  @sc{Singular} in a Framework for Polynomial Computations.
   In Joswig, M. and Takayama, N., editor, Algebra, Geometry and
   Software Systems, pages 163-176. Springer, 2003.
 

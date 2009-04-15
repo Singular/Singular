@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: tricks.doc,v 1.26 2009-04-10 13:45:15 Singular Exp $
+@comment $Id: tricks.doc,v 1.27 2009-04-15 10:41:15 seelisch Exp $
 @comment this file contains the "Tricks and pittfalls" sections
 
 @c The following directives are necessary for proper compilation
@@ -85,7 +85,7 @@ statements may not contain more than 10000 tokens
 @cindex German Umlaute
 @cindex non-english special characters
 @cindex special characters, non-english
-All input to Singular must be 7-bit clean, i.e. special characters like the
+All input to @sc{Singular} must be 7-bit clean, i.e. special characters like the
 the German Umlaute (@"a, @"o, etc.), or the French accent characters may
 neither appear as input to @sc{Singular}, nor in libraries or procedure
 definitions.
@@ -254,7 +254,7 @@ while (1)
 
 In @sc{Singular}, a comma separates list elements and the value of a comma
 expression is a list.
-Hence, commas can not be used to combine several expressions into
+Hence, commas cannot be used to combine several expressions into
 a single expression. For example, instead of writing
 
 @smallexample
@@ -608,7 +608,7 @@ variable. Otherwise, effects like the following might occur:
 @smallexample
 @c example
 ring r=0,(x, x1),dp; // name x is substring of name x1 !!!!!!!!!
-x;x1;   // resolved poly x
+x;x1;   // resolved polynomial x
 short=0; 2x1; // resolved to monomial 2*x^1 !!!!!!
 2*x1; // resolved to product 2 times x1
 @c example

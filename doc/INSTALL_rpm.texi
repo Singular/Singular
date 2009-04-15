@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_rpm.texi,v 1.14 2003-06-30 06:34:27 mschulze Exp $
+@comment $Id: INSTALL_rpm.texi,v 1.15 2009-04-15 10:41:14 seelisch Exp $
 @c FILE: INSTALL_rpm.texi
 @c PURPOSE: Installation instruction for Singular on RPM based Linux systems
 @c
@@ -22,7 +22,7 @@ The following @sc{Singular} @sc{rpm} packages are available.
 
 @table @code
 @item @uref{Singular-@value{RPM_VERSION}-1.i386.rpm}
-contains architecture dependend executables like the Singular program.
+contains architecture-dependent executables like the @sc{Singular} program.
 @item @uref{Singular-static-@value{RPM_VERSION}-1.i386.rpm}
 contains the static version of the architecture dependend executables.
 @item @uref{Singular-share-@value{RPM_VERSION}-1.noarch.rpm}

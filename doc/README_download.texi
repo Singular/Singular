@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_download.texi,v 1.15 2009-04-08 12:44:42 seelisch Exp $
+@comment $Id: README_download.texi,v 1.16 2009-04-15 10:41:14 seelisch Exp $
 @c FILE: README_download.texi
 @c PURPOSE: download instructions, to be includeded in manual and README_ftp
 @c
@@ -53,7 +53,7 @@ described below.
 @tab AIX workstations running AIX version 4
 @end multitable
 Please contact us if
-you can not find an appropriate architecture dependent archive.
+you cannot find an appropriate architecture dependent archive.
 
 @item
 Simply change to the directory in which you wish to install
@@ -88,10 +88,10 @@ for details on how to finish the installation.
 Download one of the following self-extracting archives:
 @table @code
 @item @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Singular-@value{VERSION}-Small.exe,Singular-@value{VERSION}-Small.exe}
-Minimal archive to download. Installs Singular and minimal set of needed
+Minimal archive to download. Installs @sc{Singular} and a minimal set of needed
 tools/DLLs.
 @item @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Singular-@value{VERSION}-Full.exe,Singular-@value{VERSION}-Full.exe}
-Complete archive to download. Installs Singular and the XEmacs editor for running ESingular.
+Complete archive to download. Installs @sc{Singular} and the XEmacs editor for running ESingular.
 @end table
 
 @item 
@@ -99,8 +99,8 @@ Double-click (or, execute), the self-extracting archives, and
 @strong{carefully} follow the instructions given there.
 
 @item
-In case of problems, see consult
-@uref{http://www.singular.uni-kl.de/Windows/index.html}.
+In case of problems, consult
+@uref{http://www.singular.uni-kl.de/WINDOWS/index.html}.
 @end enumerate
 
 @heading To download @sc{Singular} for the Macintosh

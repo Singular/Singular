@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.178 2009-04-10 08:15:41 Singular Exp $
+@comment $Id: singular.doc,v 1.179 2009-04-15 10:41:15 seelisch Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -47,7 +47,7 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @center @titlefont{Manual}
 @center Version @value{VERSION}, @value{VERSION_DATE}
 @sp 2
-@center Singular is created and its development is directed and coordinated by
+@center @sc{Singular} is created and its development is directed and coordinated by
 @center G.-M. Greuel, G. Pfister, and H. Sch@"onemann
 @sp 2
 @c @center with contributions by
@@ -270,7 +270,7 @@ with the @code{--no-stdlib} command line option (see
 * general_lib:: procedures of general type
 * inout_lib:: procedures for manipulating in- and output
 * poly_lib:: procedures for manipulating polynomials and ideals
-* random_lib:: procedures of random/sparse  matrix and poly operations
+* random_lib:: procedures of random/sparse  matrix and polynomial operations
 * redcgs_lib:: procedures for reduced comprehesive Groebner systems
 * ring_lib:: procedures for manipulating rings and maps
 @end menu

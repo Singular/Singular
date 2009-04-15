@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_win.plural.texi,v 1.3 2009-04-08 12:44:41 seelisch Exp $
+@comment $Id: INSTALL_win.plural.texi,v 1.4 2009-04-15 10:41:14 seelisch Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on Unix
 @c
@@ -117,7 +117,7 @@ If you wish to use any of the following features of
 @multitable @columnfractions .5 .5
 @item @strong{Feature} @tab @strong{Requires}
 @item running @code{EPlural}, or @code{Plural} within Emacs
-@tab @uref{http://www.fsf.org/software/emacs/emacs.html,,Emacs} version
+@tab @uref{http://www.gnu.org/software/emacs/emacs.html,,Emacs} version
 20 or higher, or, @uref{http://www.xemacs.org,,XEmacs} version 20.3 or
 higher 
 @item on-line @code{html} help
@@ -130,8 +130,8 @@ higher
 @c library, i.e. @code{/usr/lib/libreadline.so}
 @c @item visualization of curves and surfaces
 @c @tab
-@c @uref{http://www.mathematik.uni-mainz.de/AlgebraischeGeometrie/surf/surf.shtml,,surf}
-@c version 0.9 or higher (only available for Linux and Solaris).
+@c @uref{http://www.imaginary2008.de/surfer.php,,surfer}
+@c Setup executable for the visualization tool surfer.
 @end multitable
 
 @c You may download most of these programs from
@@ -177,7 +177,7 @@ for more details on customizing the on-line help system.
 @heading Troubleshooting
 
 @itemize @bullet
-@item General: @sc{Plural} can not find its libraries or on-line help
+@item General: @sc{Plural} cannot find its libraries or on-line help
 @enumerate
 @item
 Make sure that you have read and/or execute permission on the files and

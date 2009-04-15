@@ -66,10 +66,10 @@ More details can be obtained from @ref{[BP2008b]}.
 @end ifinfo
 @item 
 @tex
-  A matrix $H$ with the property ${\bf c}\in C\iff H{\bf c}^T=0$ is the {\bf check matrix}. 
+  A matrix $H$ with the property ${\bf c}\in C\iff H{\bf c}^T=0$ is the {\bf check matrix}.
 @end tex
 @ifinfo
-  A matrix H with the property c in C iff Hc^T=0 is the @strong{check matrix}. 
+  A matrix H with the property c in C if and only if Hc^T=0 is the @strong{check matrix}. 
 @end ifinfo
 @end itemize
 @c @end table

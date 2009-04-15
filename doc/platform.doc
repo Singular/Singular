@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: platform.doc,v 1.18 2009-04-08 12:44:42 seelisch Exp $
+@comment $Id: platform.doc,v 1.19 2009-04-15 10:41:15 seelisch Exp $
 @comment this file contains Release notes and various howto's
 
 @c The following directives are necessary for proper compilation
@@ -45,7 +45,7 @@
 
 @sc{Singular} is available as binary program for most common hard-
 and software platforms.
-Instructions to download and install Singular can be found
+Instructions to download and install @sc{Singular} can be found
 at
 @display
 @uref{http://www.singular.uni-kl.de/download.html}.
@@ -98,7 +98,7 @@ files (binaries and documentation, libs, etc) to /usr/local/Singular/3-0-3.
 
 The final command creates a link in /usr/local/bin so that you can just type
 Singular-3-0-3
-to run Singular in any terminal.
+to run @sc{Singular} in any terminal.
 
 
 (The expert might wish to read the INSTALL_unix.html file in the UNIX

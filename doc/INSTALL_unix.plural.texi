@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.plural.texi,v 1.3 2009-04-08 16:51:56 seelisch Exp $
+@comment $Id: INSTALL_unix.plural.texi,v 1.4 2009-04-15 10:41:14 seelisch Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on Unix
 @c
@@ -42,7 +42,7 @@ program.
 @*
 @code{@value{_UNAME}} is a description of the processor and operating system
 for which @sc{Singular::Plural} is compiled (e.g, @code{ix86-Linux}). Please contact us if
-you can not find an appropriate architecture dependent archive.
+you cannot find an appropriate architecture dependent archive.
 @end ifclear
 
 You can obtain these (and other) archives from
@@ -158,12 +158,12 @@ If you wish to use any of the following features of
 @multitable @columnfractions .5 .5
 @item @strong{Feature} @tab @strong{Requires}
 @item running @code{EPlural}, or @code{Plural} within Emacs
-@tab @uref{http://www.fsf.org/software/emacs/emacs.html,,Emacs} version
+@tab @uref{http://www.gnu.org/software/emacs/emacs.html,,Emacs} version
 20 or higher, or, @uref{http://www.xemacs.org,,XEmacs} version 20.3 or
 higher (EPlural is only included in the Linux distribution.
 On other Unix platforms you can download the
 @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/src/,,
-Singular emacs lisp files} but we give no warranties for specific platforms).
+@sc{Singular} emacs lisp files} but we give no warranties for specific platforms).
 @item on-line @code{html} help
 @tab @uref{http://www.netscape.com,,netscape} browser
 @item on-line @code{info} help
@@ -174,8 +174,8 @@ Singular emacs lisp files} but we give no warranties for specific platforms).
 library, i.e. @code{/usr/lib/libreadline.so}
 @item visualization of curves and surfaces
 @tab
-@uref{http://www.mathematik.uni-mainz.de/AlgebraischeGeometrie/surf/surf.shtml,,surf}
-version 0.9 or higher (only available for Linux and Solaris).
+@uref{http://www.imaginary2008.de/surfer.php,,surfer}
+Setup executable for the visualization tool surfer.
 @end multitable
 
 You may download most of these programs from
@@ -234,11 +234,11 @@ browser programs such as @code{info} or @code{Emacs}.
 @heading Troubleshooting
 
 @itemize @bullet
-@item General: @sc{Plural} can not find its libraries or on-line help
+@item General: @sc{Plural} cannot find its libraries or on-line help
 @enumerate
 @item
 Make sure that you have read and/or execute permission for files and
-directories of the Singular distribution. If in doubt, @code{cd} to the
+directories of the @sc{Singular} distribution. If in doubt, @code{cd} to the
 directory where you unpacked @sc{Singular}, and do (as root, if
 necessary):
 @smallexample

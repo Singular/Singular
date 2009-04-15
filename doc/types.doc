@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.146 2009-04-08 17:13:09 Singular Exp $
+@comment $Id: types.doc,v 1.147 2009-04-15 10:41:15 seelisch Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -723,7 +723,7 @@ the value of @code{j}, see @ref{Limitations}.
   int i=1;
   int j;
   i++; i;  i--; i;
-  // ++ and -- do not return a value as in C, can not assign
+  // ++ and -- do not return a value as in C, cannot assign
   j = i++;
   // the value of j is unchanged
   j; i;
@@ -743,7 +743,7 @@ the value of @code{j}, see @ref{Limitations}.
 @item char
 characteristic of the coefficient field of a ring (see @ref{char})
 @item deg
-degree of a poly resp.@: vector (see @ref{deg})
+degree of a polynomial resp.@: vector (see @ref{deg})
 @item det
 determinant (see @ref{det})
 @item dim
@@ -772,7 +772,7 @@ the rank of the free module where the vector or module lives
 @item nvars
 number of ring variables (see @ref{nvars})
 @item ord
-degree of the leading term of a poly resp.@: vector (see @ref{ord})
+degree of the leading term of a polynomial resp.@: vector (see @ref{ord})
 @item par
 n-th parameter of the basering (see @ref{par})
 @item pardeg
@@ -1566,7 +1566,7 @@ ring.
 @strong{Note:} Currently, MP links are only available on Unix platforms and data is
 written without attributes (which is likely to change in future
 versions). For a general description of MP, see
-@code{http://www.symbolicnet.org/areas/mp.html}.
+@code{http://www.symbolicnet.org/areas/protocols/mp.html}.
 
 @menu
 * MPfile links::
@@ -2318,7 +2318,7 @@ compute with matrices having integer or rational entries, define a ring
 with characteristic 0 and at least one variable.
 
 A matrix can be multiplied by and added to a poly; in this case the
-poly is converted into a matrix of the right size with the poly on the
+polynomial is converted into a matrix of the right size with the polynomial on the
 diagonal.
 
 If A is a matrix then the assignment @code{module M=A;} or @code{module
@@ -2454,16 +2454,16 @@ See
 
 @table @asis
 @item @code{+}
-addition with matrix or poly; the poly is converted into a diagonal
+addition with matrix or poly; the polynomial is converted into a diagonal
 matrix
 
 @item @code{-}
 negation or subtraction with matrix or poly
 (the first operand is expected to be a matrix);
-the poly is converted into a diagonal matrix
+the polynomial is converted into a diagonal matrix
 
 @item @code{*}
-multiplication with matrix or poly; the poly is converted into a
+multiplication with matrix or poly; the polynomial is converted into a
 diagonal matrix
 
 @item @code{/}
@@ -3010,7 +3010,7 @@ expressions}.
 
 @table @code
 @item cleardenom
-cancellation of denominators of numbers in poly and divide it by its content
+cancellation of denominators of numbers in polyomial and divide it by its content
 (see @ref{cleardenom})
 @item impart
 imaginary part of a complex number, 0 otherwise
@@ -3169,7 +3169,7 @@ defines a polynomial.
 @subsection poly expressions
 @cindex poly expressions
 
-A poly expression is (optional parts in square brackets):
+A polynomial expression is (optional parts in square brackets):
 @enumerate
 @item
 a monomial (there are NO spaces allowed inside a monomial)
@@ -3184,7 +3184,7 @@ an identifier of type poly
 @item
 a function returning poly
 @item
-poly expressions combined by the arithmetic operations
+polynomial expressions combined by the arithmetic operations
 @code{+}, @code{-}, @code{*}, @code{/}, or @code{^}
 @item
 an int expression (see @ref{Type conversion and casting})
@@ -3197,9 +3197,9 @@ a type cast to poly
 ring S=0,(x,y,z,a(1)),dp;
 2x, x3, 2x2y3, xyz, 2xy2; //  are monomials
 2*x, x^3, 2*x^2*y^3, x*y*z, 2*x*y^2; // are poly expressions
-2*a(1); // is a valid poly expression (a(1) is a name of a variable),
+2*a(1); // is a valid polynomial expression (a(1) is a name of a variable),
         // but not 2a(1) (is a syntax error)
-2*x^3;  // is a valid poly expression equal to 2x3 (a valid monomial)
+2*x^3;  // is a valid polynomial expression equal to 2x3 (a valid monomial)
         // but not equal to 2x^3 which will be interpreted as (2x)^3
         // since 2x is a monomial
 @c example
@@ -3280,7 +3280,7 @@ the sum of monomials at the indicated places w.r.t. the monomial ordering
 
 @table @code
 @item cleardenom
-cancellation of denominators of numbers in poly and divide it by its content
+cancellation of denominators of numbers in polynomial and divide it by its content
 (see @ref{cleardenom}; @ref{content})
 @item coef
 matrix of coefficients and monomials (see @ref{coef})
@@ -4057,12 +4057,12 @@ an identifier of type vector
 @item
 a function returning vector
 @item
-a poly expression (via the canonical embedding @code{p} @expansion{} @code{p*gen(1)})
+a polynomial expression (via the canonical embedding @code{p} @expansion{} @code{p*gen(1)})
 @item
 vector expressions combined by the arithmetic operations @code{+} or
 @code{-}
 @item
-a poly expression and a vector expression combined by the arithmetic
+a polynomial expression and a vector expression combined by the arithmetic
 operation @code{*}
 @item
 a type cast to vector using the brackets @code{[} , @code{]}

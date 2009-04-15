@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_ftp.texi,v 1.13 2008-12-11 12:47:33 Singular Exp $
+@comment $Id: README_ftp.texi,v 1.14 2009-04-15 10:41:14 seelisch Exp $
 @c FILE: README_download.texi
 @c PURPOSE: This should reside as README file in the main directory of the
 @c          Singular ftp site.
@@ -25,7 +25,7 @@ Moreover, there exist ports to FreeBSD, SunOS, IRIX, AIX,
 and Windows NT/2K/XP.
 If your operating system is not in this list you may try to port
 @sc{Singular} to your platform
-(see @uref{http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/src/README.html})
+(see @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/src/README})
 
 @macro nref{name,url}
 @ifhtml

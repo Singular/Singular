@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.43 2009-04-08 12:44:41 seelisch Exp $
+@comment $Id: COPYING.texi,v 1.44 2009-04-15 10:41:14 seelisch Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -33,7 +33,7 @@ Singular/ndbm.* (BSD), kernel/htmlhelp.h (LGPL 2.1+)
 
 The following software modules shipped with @sc{Singular} have their own copyright:
 the omalloc library, the readline library,
-the Gnu Multiple Precision Library (GMP),
+the GNU Multiple Precision Library (GMP),
 NTL: A Library for doing Number Theory (NTL),
 the Multi Protocol library (MP), the
 Singular-Factory library, the Singular-libfac library, 

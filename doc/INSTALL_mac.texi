@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_mac.texi,v 1.2 2002-04-11 16:36:19 mschulze Exp $
+@comment $Id: INSTALL_mac.texi,v 1.3 2009-04-15 10:41:14 seelisch Exp $
 @c FILE:    INSTALL_classicMac.texi
 @c PURPOSE: Installation instructions for Singular on Macintosh
 
@@ -63,13 +63,13 @@ if @code{"{Boot}"Singular:2-0-2:ppc-MPW:} is the folder of the executable.
 After unpacking, you will have a directory structure like:
 @table @code
 @item Singular:2-0-2:ppc-MPW:Singular
-Singular executable
+@sc{Singular} executable
 @item Singular:2-0-2:ppc-MPW:libparse
-parser for Singular libraries
+parser for @sc{Singular} libraries
 @item Singular:2-0-2:LIB:
-Singular libraries
+@sc{Singular} libraries
 @item Singular:2-0-2:LIB:gftables:
-Singular gftables
+@sc{Singular} gftables
 @item Singular:2-0-2:doc:singular.idx
 index of inline help
 @item Singular:2-0-2:doc:singular.hlp

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.plural.texi,v 1.4 2003-07-25 18:24:32 levandov Exp $
+@comment $Id: NEWS.plural.texi,v 1.5 2009-04-15 10:41:14 seelisch Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -26,7 +26,7 @@ command names are still subject to change.
 
 Singular::Plural version 2-1 is generally much faster than any previous
 experimental version of Singular::Plural, due to a rewrite of major parts 
-of the Singular kernel (e.g., the kernel has a new memory manager 
+of the @sc{Singular} kernel (e.g., the kernel has a new memory manager
 and a new polynomial arithmetic) and due to new and better implemented algorithms (e.g., for two-sided Groebner bases and generally, for computations
 in factor algebras).
 
@@ -34,8 +34,8 @@ Besides theses internal changes, Singular::Plural version 2-1 offers many new
 features and functionalities.
 
 @heading Efficiency Improvements
-The following table shows some timings which compare the efficincy of
-Singular:Plural version 0-9-9 and Singular version 2-1-2. 
+The following table shows some timings which compare the efficiency of
+@sc{Singular}: Plural version 0-9-9 and @sc{Singular} version 2-1-2. 
 All times are in seconds
 and were obtained on HP 160 workstation with 512 MB RAM running HP-UX 10.20.
 
