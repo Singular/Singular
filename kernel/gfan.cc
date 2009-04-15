@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-04-14 11:05:52 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.32 2009-04-14 11:05:52 monerjan Exp $
-$Id: gfan.cc,v 1.32 2009-04-14 11:05:52 monerjan Exp $
+$Date: 2009-04-15 14:36:10 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.33 2009-04-15 14:36:10 monerjan Exp $
+$Id: gfan.cc,v 1.33 2009-04-15 14:36:10 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -160,7 +160,7 @@ class gcone
 		* the set \f$ \partial\mathcal{G} \f$ which we might store for later use. C.f p71 of journal
 		* As a result of this procedure the pointer facetPtr points to the first facet of the cone.
 		*/
-		void getConeNormals(const ideal &I)
+		void getConeNormals(ideal const &I)
 		{
 #ifdef gfan_DEBUG
 			cout << "*** Computing Inequalities... ***" << endl;
@@ -403,7 +403,7 @@ class gcone
 					if (isParallel(check,fNormal)) //pass *check when 
 					{
 						cout << "Parallel vector found, adding to initialFormElement" << endl;				
-						initialFormElement[ii] = pAdd(initialFormElement[ii],(poly)pHead(aktpoly));
+						initialFormElement[ii] = pAdd(pCopy(initialFormElement[ii]),(poly)pHead(aktpoly));
 					}						
 				}//while
 				cout << "Initial Form=";				
@@ -412,7 +412,7 @@ class gcone
 				/*Now initialFormElement must be added to (ideal)initialForm */
 				initialForm->m[ii]=initialFormElement[ii];
 			}//for
-			f->setFlipGB(initialForm);			
+			f->setFlipGB(initialForm);	//FIXME PROBABLY WRONG TO STORE HERE SINCE INA!=flibGB			
 #ifdef gfan_DEBUG
 			cout << "Initial ideal is: " << endl;
 			idShow(initialForm);
@@ -440,7 +440,7 @@ class gcone
 			}
 			rComplete(dstRing);
 			rChangeCurrRing(dstRing);
-			//map theMap=(map)idMaxIdeal(1);
+			
 			rWrite(currRing); cout << endl;
 			ideal ina;
 			//ina=fast_map(initialForm,srcRing,(ideal)theMap,dstRing);			
@@ -503,10 +503,11 @@ class gcone
 						//cout << "TICK 3.1" << endl;
 						step2 = ppMult_qq(step1, I->m[ii-1]);
 						//cout << "TICK 3.2" << endl;
-						step3 = pSub(p, step2);
+						step3 = pSub(pCopy(p), step2);
 						//p=pSub(p,pMult( pDivide(pHead(p),pHead(I->m[ii])), I->m[ii]));
 						//cout << "TICK 4" << endl;
-						pSetm(p);
+						//pSetm(p);
+						pSort(step3); //must be here, otherwise strange behaviour with many +o+o+o+o+ terms
 						p=step3;
 						pWrite(p);						
 						divOccured=TRUE;
@@ -519,13 +520,14 @@ class gcone
 				if (divOccured==FALSE)
 				{
 					//cout << "TICK 5" << endl;
-					r=pAdd(r,pHead(p));
+					r=pAdd(pCopy(r),pHead(p));
 					pSetm(r);
+					pSort(r);
 					cout << "r="; pWrite(r); cout << endl;
 					//cout << "TICK 6" << endl;
 					if (pLength(p)!=1)
 					{
-						p=pSub(p,pHead(p));	//Here it may occur that p=0 instead of p=NULL
+						p=pSub(pCopy(p),pHead(p));	//Here it may occur that p=0 instead of p=NULL
 					}
 					else
 					{
@@ -545,11 +547,17 @@ class gcone
 			cout << "Entering ffG" << endl;
 			int size=IDELEMS(H);
 			ideal res=idInit(size,1);
+			poly temp1, temp2, temp3;	//polys to temporarily store values for pSub
 			for (int ii=0;ii<size;ii++)
 			{
 				res->m[ii]=restOfDiv(H->m[ii],G);
-				//res->m[ii]=pSub(H->m[ii],res->m[ii]); //buggy
-				pSetm(res->m[ii]);
+				temp1=H->m[ii];
+				temp2=res->m[ii];				
+				temp3=pSub(temp1, temp2);
+				res->m[ii]=temp3;
+				//res->m[ii]=pSub(temp1,temp2); //buggy
+				//pSort(res->m[ii]);
+				//pSetm(res->m[ii]);
 				cout << "res->m["<<ii<<"]=";pWrite(res->m[ii]);						
 			}
 			return res;
