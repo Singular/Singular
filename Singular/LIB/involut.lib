@@ -1,4 +1,4 @@
-version="$Id: involut.lib,v 1.17 2009-04-14 08:26:08 Singular Exp $";
+version="$Id: involut.lib,v 1.18 2009-04-15 11:14:36 seelisch Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  involut.lib  Computations and operations with involutions
@@ -181,7 +181,7 @@ example
 }
 
 static proc In_Poly(poly mm, list l, int NVars)
-// applies the involution to the poly mm
+// applies the involution to the polynomial mm
 // entries of a list l are images of variables under invo
 // more general than invo_poly; used in many rings setting
 {
@@ -209,7 +209,7 @@ static proc In_Poly(poly mm, list l, int NVars)
 }
 
 static proc Hom_Poly(poly mm, list l, int NVars)
-// applies the endomorphism to the poly mm
+// applies the endomorphism to the polynomial mm
 // entries of a list l are images of variables under endo
 // should not be replaced by map-based stuff! used in
 // many rings setting

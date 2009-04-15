@@ -1,6 +1,6 @@
 // KK,GMG last modified: 17.12.00
 ///////////////////////////////////////////////////////////////////////////////
-version  = "$Id: classify.lib,v 1.55 2009-01-14 16:07:03 Singular Exp $";
+version  = "$Id: classify.lib,v 1.56 2009-04-15 11:11:11 seelisch Exp $";
 category="Singularities";
 info="
 LIBRARY:  classify.lib  Arnold Classifier of Singularities
@@ -12,12 +12,12 @@ OVERVIEW:
 
 PROCEDURES:
  basicinvariants(f); computes Milnor number, determinacy-bound and corank of
- classify(f);        normal form of poly f determined with Arnold's method
+ classify(f);        normal form of polynomial f determined with Arnold's method
  corank(f);          computes the corank of f (i.e. of the Hessian of f)
  Hcode(v);           coding of intvec v acoording to the number repetitions
  init_debug([n]);    print trace and debugging information depending on int n
  internalfunctions();display names of internal procedures of this library
- milnorcode(f[,e]);  Hilbert poly of [e-th] Milnor algebra coded with Hcode
+ milnorcode(f[,e]);  Hilbert polynomial of [e-th] Milnor algebra coded with Hcode
  morsesplit(f);      residual part of f after applying the splitting lemma
  quickclass(f)       normal form of f determined by invariants (milnorcode)
  singularity(s,[]);  normal form of singularity given by its name s and index
@@ -61,7 +61,7 @@ COMPUTE:  normal form and singularity type of f with respect to right
 RETURN:   normal form of f, of type poly
 REMARK:   This version of classify is only beta. Please send bugs and
           comments to: \"Kai Krueger\" <krueger@mathematik.uni-kl.de> @*
-          Be sure to have at least Singular version 1.0.1. Updates can be
+          Be sure to have at least @sc{Singular} version 1.0.1. Updates can be
           found at: @*
           URL=http://www.mathematik.uni-kl.de/~krueger/Singular/
 NOTE:     type init_debug(n); (0 <= n <= 10) in order to get intermediate

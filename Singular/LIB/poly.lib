@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: poly.lib,v 1.52 2009-04-07 09:30:44 seelisch Exp $";
+version="$Id: poly.lib,v 1.53 2009-04-15 11:19:50 seelisch Exp $";
 category="General purpose";
 info="
 LIBRARY:  poly.lib      Procedures for Manipulating Polys, Ideals, Modules
@@ -17,7 +17,7 @@ PROCEDURES:
  mindeg(poly/...);      int/intmat = degree/s of terms of minimal order
  mindeg1(poly/...);     int = [weighted] minimal degree of input
  normalize(poly/...);   normalize poly/... such that leading coefficient is 1
- rad_con(p,I);          check radical containment of poly p in ideal I
+ rad_con(p,I);          check radical containment of polynomial p in ideal I
  content(f);            content of polynomial/vector f
  numerator(n);          numerator of number n
  denominator(n)         denominator of number n

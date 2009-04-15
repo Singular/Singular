@@ -1,4 +1,4 @@
-version="$Id: equising.lib,v 1.19 2008-10-06 17:34:18 Singular Exp $";
+version="$Id: equising.lib,v 1.20 2009-04-15 11:11:35 seelisch Exp $";
 category="Singularities";
 info="
 LIBRARY:  equising.lib  Equisingularity Stratum of a Family of Plane Curves
@@ -1920,7 +1920,7 @@ or consisting of a ring and an integer, where
 @format
   l[1]=ESSring is a ring extension of basering containing the ideal ES
         (describing the ES-stratum), the ideal ES_all_triv (describing the
-        part with trival equimultiple sections) and the poly p_F=F,
+        part with trival equimultiple sections) and the polynomial p_F=F,
   l[2]=1 if some error has occured,  l[2]=0 otherwise.
 @end format
 NOTE:    L is supposed to be the output of hnexpansion (with the given ordering

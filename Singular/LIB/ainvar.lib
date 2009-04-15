@@ -1,6 +1,6 @@
-// $Id: ainvar.lib,v 1.9 2008-10-01 15:29:23 Singular Exp $
+// $Id: ainvar.lib,v 1.10 2009-04-15 11:05:22 seelisch Exp $
 /////////////////////////////////////////////////////////////////////////////
-version="$Id: ainvar.lib,v 1.9 2008-10-01 15:29:23 Singular Exp $";
+version="$Id: ainvar.lib,v 1.10 2009-04-15 11:05:22 seelisch Exp $";
 category="Invariant theory";
 info="
 LIBRARY: ainvar.lib    Invariant Rings of the Additive Group
@@ -189,7 +189,7 @@ EXAMPLE: example reduction; shows an example
      if( L[1]==1 )
      {
   // the ring L[2] = char(bsr),(x(1..nvars(bsr)),y(1..z)),(dp(n),dp(m)),
-  // contains poly check s.t. LT(p) is of the form check(LT(f1),...,LT(fr))
+  // contains polynomial check s.t. LT(p) is of the form check(LT(f1),...,LT(fr))
        def s1 = L[2];
        map psi = s1,maxideal(1),dom;
        poly re = p - psi(check);
@@ -229,7 +229,7 @@ EXAMPLE: example reduction; shows an example
      ideal kern=eliminate(dom,imap(bsr,v));
 
   //---------  test wether @(0)-h(@(1),...,@(z)) is in ker ---------------
-  // for some poly h and divide by maximal power of q=#[1]
+  // for some polynomial h and divide by maximal power of q=#[1]
      poly h;
      z=size(kern);
      for (i=1;i<=z;i++)

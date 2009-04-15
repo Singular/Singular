@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.40 2009-04-07 16:18:05 seelisch Exp $";
+version="$Id: linalg.lib,v 1.41 2009-04-15 11:27:06 seelisch Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib  Algorithmic Linear Algebra
@@ -564,7 +564,7 @@ EXAMPLE: example charpoly_B; shows an example"
     return(X);
   }
 
-  //var can not be in A
+  //var cannot be in A
   s="Wp(";
   for( i=1; i<=nvars(BR); i++ ){
     if(i!=j){ s=s+"0";}

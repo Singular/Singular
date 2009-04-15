@@ -1,4 +1,4 @@
-// $Id: rootsmr.lib,v 1.5 2009-04-06 12:39:02 seelisch Exp $
+// $Id: rootsmr.lib,v 1.6 2009-04-15 11:15:06 seelisch Exp $
 // E. Tobis  12.Nov.2004, April 2004
 // last change 7. May 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
@@ -59,7 +59,7 @@ EXAMPLE:   example nrRootsProbab; shows an example"
 {
   //Note on complexity: Let n = no of complex roots of I (= vdim(std(I)).
   //Then the algorithm needs:
-  //1 std(I) and ~n NF computations (of randcharpoly wrt I)
+  //1 std(I) and ~n NF computations (of randcharpoly w.r.t. I)
 
   if (isparam(I)) {
     ERROR("This procedure cannot operate with parametric arguments");
@@ -118,7 +118,7 @@ EXAMPLE:   example nrRootsDeterm; shows an example"
 {
   //Note on complexity: Let n = no of complex roots of I (= vdim(std(I)).
   //Then the algotithm needs:
-  //1 std(I) and (1/2)n*(n+1)^2 ~ 1/2n^3 NF computations (of monomials wrt I)
+  //1 std(I) and (1/2)n*(n+1)^2 ~ 1/2n^3 NF computations (of monomials w.r.t. I)
 
   if (isparam(I)) {
     ERROR("This procedure cannot operate with parametric arguments");
@@ -398,7 +398,7 @@ EXAMPLE:   example coords; shows an example"
   list coordinates;
   int N = size(B);
 
-  // We first compute the normal form of f wrt I
+  // We first compute the normal form of f w.r.t. I
   g = reduce(f,I);
   int n = size(g);    //allways n <= N
 
@@ -427,7 +427,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc isSquare(matrix m)
-// returns 1 iff m is a square matrix
+// returns 1 if and only if m is a square matrix
 {
   return (nrows(m)==ncols(m));
 }
@@ -496,7 +496,7 @@ example
 
 proc verify(poly p,ideal B,ideal I)
 "USAGE:     verify(p,B,I); p poly, B,I,ideal
-RETURN:    integer: 1 iff the polynomial p splits the points of V(I).
+RETURN:    integer: 1 if and only if the polynomial p splits the points of V(I).
            It's used to check the result of randcharpoly
 ASSUME:    I is given by a Groebner basis and B is an ordered monomial basis of r/I,
            r = basering

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: solve.lib,v 1.38 2009-04-06 09:17:01 seelisch Exp $";
+version="$Id: solve.lib,v 1.39 2009-04-15 11:24:12 seelisch Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: solve.lib     Complex Solving of Polynomial Systems
@@ -11,7 +11,7 @@ laguerre_solve(p,[..]); find all roots of univariate polynomial p
 solve(i,[..]);          all roots of 0-dim. ideal i using triangular sets
 ures_solve(i,[..]);     find all roots of 0-dimensional ideal i with resultants
 mp_res_mat(i,[..]);     multipolynomial resultant matrix of ideal i
-interpolate(p,v,d);     interpolate poly from evaluation points i and results j
+interpolate(p,v,d);     interpolate polynomial from evaluation points i and results j
 fglm_solve(i,[..]);     find roots of 0-dim. ideal using FGLM and lex_solve
 lex_solve(i,p,[..]);    find roots of reduced lexicographic standard basis
 simplexOut(l);          prints solution of simplex in nice format
@@ -273,7 +273,7 @@ example
     poly f = (15.4+i*5)*x^5 + (25.0e-2+i*2)*x^3 + x2 - 10*i;
     list l = laguerre_solve(f);
     l;
-    // check result, value of substituted poly should be near to zero
+    // check result, value of substituted polynomial should be near to zero
     // remember that l contains a list of strings
     // in the case of a different ring
     subst(f,x,l[1]);
@@ -478,7 +478,7 @@ static proc transroots(list r)
   return(r);
 }
 /*
-* returns a poly without zeroroots
+* returns a polynomial without zeroroots
 */
 static proc divzero(poly f,int iv)
 {
@@ -1601,7 +1601,7 @@ static proc psubst( int d, int dd, int n, list resl,
                 {
                     dd++;
                     // hier Leading-Exponent pruefen???
-                    // oder ist das Poly immer als letztes in der Liste?!?
+                    // oder ist das Polynom immer als letztes in der Liste?!?
                     // leadexp(ps)
                 }
                 else

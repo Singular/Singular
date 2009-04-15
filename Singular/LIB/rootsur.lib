@@ -1,4 +1,4 @@
-// $Id: rootsur.lib,v 1.7 2009-04-06 12:39:02 seelisch Exp $
+// $Id: rootsur.lib,v 1.8 2009-04-15 11:15:06 seelisch Exp $
 // E. Tobis  12.Nov.2004, April 2004
 // last change 5. May 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
@@ -23,19 +23,19 @@ PROCEDURES:
   isuni(p)         Checks whether a polynomial is univariate
   whichvariable(p) The only variable of a univariate monomial (or 0)
   varsigns(p)      Number of sign changes in a list
-  boundBuFou(p,a,b) Bound for number of real roots of poly p in interval (a,b)
-  boundposDes(p)   Bound for the number of positive real roots of poly p
-  boundDes(p)      Bound for the number of real roots of poly p
-  allrealst(p)     Checks whether all the roots of a poly are real (via Sturm)
+  boundBuFou(p,a,b) Bound for number of real roots of polynomial p in interval (a,b)
+  boundposDes(p)   Bound for the number of positive real roots of polynomial p
+  boundDes(p)      Bound for the number of real roots of polynomial p
+  allrealst(p)     Checks whether all the roots of a polynomial are real (via Sturm)
   maxabs(p)        A bound for the maximum absolute value of a root of a poly
-  allreal(p)       Checks whether all the roots of a poly are real (via St-Ha)
-  sturm(p,a,b)     Number of real roots of a poly on an interval (via Sturm)
+  allreal(p)       Checks whether all the roots of a polynomial are real (via St-Ha)
+  sturm(p,a,b)     Number of real roots of a polynomial on an interval (via Sturm)
   sturmseq(p)      Sturm sequence of a polynomial
-  sturmha(p,a,b)   Number of real roots of a poly in (a,b) (via Sturm-Habicht)
+  sturmha(p,a,b)   Number of real roots of a polynomial in (a,b) (via Sturm-Habicht)
   sturmhaseq(p)    A Sturm-Habicht Sequence of a polynomial
   reverse(l)       Reverses a list
   nrroots(p)       The number of real roots of p
-  isparam(p)       Returns 0 iff the polynomial has non-parametric coefficients
+  isparam(p)       Returns 0 if and only if the polynomial has non-parametric coefficients
 
 KEYWORDS:         real roots, univariate polynomial
 ";
@@ -383,7 +383,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc allrealst(poly p)
 "USAGE:     allrealst(p); poly p
-RETURN:    int: 1 iff all the roots of p are real, 0 otherwise.
+RETURN:    int: 1 if and only if all the roots of p are real, 0 otherwise.
            Checks by using Sturm's Theorem whether all the roots of p are real
 ASSUME:    p is a univariate polynomial with rational coefficients
 SEE ALSO:  allreal,sturm,sturmha
@@ -579,7 +579,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc allreal(poly p)
 "USAGE:     allreal(p);
-RETURN:    int: 1 iff all the roots of p are real, 0 otherwise
+RETURN:    int: 1 if and only if all the roots of p are real, 0 otherwise
 SEE ALSO:  allrealst
 EXAMPLE:   example allreal; shows an example"
 {

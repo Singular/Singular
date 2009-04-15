@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.52 2009-04-10 13:34:00 Singular Exp $";
+version="$Id: normal.lib,v 1.53 2009-04-15 11:15:56 seelisch Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -15,7 +15,7 @@ MAIN PROCEDURES:
  HomJJ(L);           presentation of End_R(J) as affine ring, J an ideal
  genus(I);           computes the geometric genus of a projective curve
  primeClosure(L);    integral closure of R/p, p a prime ideal
- closureFrac(L);     write a poly in integral closure as element of Quot(R/p)
+ closureFrac(L);     write a polynomial in integral closure as element of Quot(R/p)
  iMult(L);           intersection multiplicity of the ideals of the list L
 
 AUXILIARY PROCEDURES:
@@ -1377,7 +1377,7 @@ EXAMPLE: example normalizationPrimes; shows an example
       ideal SL = simplify(reduce(maxideal(1),SM[1]),2);
       ideal Ann = quotient(SM[2],SL[1]);
       ideal qAnn = simplify(reduce(Ann,SM[1]),2);
-      //NOTE: qAnn=0 iff first var (=SL[1]) not in SM is a nzd of R/SM
+      //NOTE: qAnn=0 if and only if first var (=SL[1]) not in SM is a nzd of R/SM
 
    //------------- We found a non-zerodivisor of R/SM -----------------------
    // here the enlarging of the ring via Hom_R(J,J) starts
@@ -2942,7 +2942,7 @@ example
 
 proc closureFrac(list L)
 "USAGE:    closureFrac (L); L a list of size n+1 as in the result of
-          primeClosure, L[n] contains an additional poly f
+          primeClosure, L[n] contains an additional polynomial f
 CREATE:   a list fraction of two elements of L[1], such that
           f=fraction[1]/fraction[2] via the injections phi L[i]-->L[i+1].
 EXAMPLE:  example closureFrac; shows an example
@@ -4121,7 +4121,7 @@ static proc normalM(ideal I, int decomp, int withDelta){
   setring Q;
   J = fetch(R, J);
   J = interred(J);
-  poly D = getSmallest(J);    // Chooses the poly of smallest degree as
+  poly D = getSmallest(J);    // Chooses the polynomial of smallest degree as
                               // non-zerodivisor.
   if(dbg >= 1){
     "The non zero divisor is ", D;
@@ -4663,7 +4663,7 @@ static proc degSubring(poly p, intvec @v){
 // Computes the degree of a polynomial taking only some variables as variables
 // and the others as parameters.
 
-// The degree is taken wrt the variables indicated in v.
+// The degree is taken w.r.t. the variables indicated in v.
   int i;      // Counter
   int d = 0;  // The degree
   int e;      // Degree (auxiliar variable)
@@ -5650,15 +5650,18 @@ L;
 
 // Used for timing and comparing the different normalization procedures.
 // Option (can be entered in any order)
-// "normal"   -> uses the new algortihm (normal)// "normalP"  -> uses normalP
+// "normal"   -> uses the new algortihm (normal)
+// "normalP"  -> uses normalP
 // "normalC"  -> uses normalC, without "withGens" option
-// "primCl"   -> uses normalC, with option "withGens".// "111"      -> checks the output of normalM using norTest.
+// "primCl"   -> uses normalC, with option "withGens".
+// "111"      -> checks the output of normalM using norTest.
 // "p"        -> compares the output of norM with the output of normalP
 //               ("normalP" option must also be set).
 // "pc"       -> compares the output of norM with the output of normalC with
 //               option "withGens"
 //               ("primCl" option must also be set).
-proc timeNormal(ideal I, list #){
+
+proc timeNormal(ideal I, list #){
   //--------------------------- define the method ---------------------------
   int isPrim, useRing;
   int decomp = -1;
@@ -5844,7 +5847,7 @@ RETURN:  an intvec v such that:
          If n=1 (resp n=2) only v[1] (resp. v[2]) is computed and returned
 THEORY:  The procedure can be used to test whether the computation of the
          normalization was correct: basering/i --> nor[1][1]/norid is the
-         normalization of basering/i iff v=1,1,0.
+         normalization of basering/i if and only if v=1,1,0.
 NOTE:    For big examples it can be hard to fully test correctness; the
          partial test norTest(i,nor,2) is usually fast
 EXAMPLE: example norTest; shows an example
@@ -5862,7 +5865,7 @@ EXAMPLE: example norTest; shows an example
     def BAS = basering;
 
     //### make a copy of nor to have a cpoy of nor[1][1]  (not a reference to)
-    // in order not to overwrite norid and normap.
+    // in order not to override norid and normap.
     // delete nor[2] (if it contains the module generators, which are not used)
     // s.t. newnor does not belong to a ring.
 
@@ -6308,7 +6311,8 @@ list nor = normalP(i); nor;
 def R=nor[1][1]; setring R; norid; normap;
 
 //Leonhard 4 Komponenten, dim=2, delta: 0,0,0,-1
-ring r=2,(v,u,z,y,x),dp;      //lp zu langeideal i=z3+zyx+y3x2+y2x3, uyx+z2, v3+vuyx+vux+vzyx+vzx+uy3x2+uy2x+zy3x+zy2x2;
+ring r=2,(v,u,z,y,x),dp;      //lp zu lange
+ideal i=z3+zyx+y3x2+y2x3, uyx+z2, v3+vuyx+vux+vzyx+vzx+uy3x2+uy2x+zy3x+zy2x2;
 //normalP: 19 sec, withRing: 22 sec
 //normalC ohne (mit) interred: 112 (113)sec, equidim: 99sec
 //normalC 1. mal 111 sec, (2.mal) 450sec!! 3.mal 172 sec

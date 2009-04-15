@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: reszeta.lib,v 1.13 2009-03-30 11:56:03 dreyer Exp $";
+version="$Id: reszeta.lib,v 1.14 2009-04-15 11:15:06 seelisch Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  reszeta.lib       topological Zeta-function and
@@ -2393,10 +2393,10 @@ proc getMinpoly(poly p)
     if(p!=subst(p,var(i),0)){v[size(v)+1]=i;}
   }
 
-//---the poly is constant
+//---the polynomial is constant
   if(size(v)==1){return(re);}
 
-//---the poly depends only on one variable or is homogeneous
+//---the polynomial depends only on one variable or is homogeneous
 //---in 2 variables
   if((size(v)==2)||((size(v)==3)&&(homog(p))))
   {
@@ -2420,7 +2420,7 @@ proc getMinpoly(poly p)
   v=v[2..size(v)];
   if(size(v)>2){ERROR("getMinpoly:input depends on more then 2 variables");}
 
-//---the general case, the poly is considered as poly in x an y now
+//---the general case, the polynomial is considered as polynomial in x an y now
   ring T=0,(x,y),lp;
   ideal M,N;
   M[nvars(R)]=0;
@@ -2458,7 +2458,7 @@ proc getMinpoly(poly p)
      }
   }
   poly L=f*(diff(g,y)-diff(h,x))+h*diff(f,x)-g*diff(f,y);
-//---according to the theory f is absolutely irreducible iff
+//---according to the theory f is absolutely irreducible if and only if
 //---L(g,h)=0 has no non-trivial solution g,h
 //---(g=diff(f,x),h=diff(f,y) is always a solution)
 //---therefore we compute a vector space basis of G
@@ -4564,7 +4564,7 @@ proc findTrans(ideal Z, ideal E, list notE, list #)
 {
 //---Auxilliary procedure for fetchInTree!
 //---Assume E prime ideal, Z+E eqidimensional,
-//---ht(E)+r=ht(Z+E). Compute  P=<p[1],...,p[r]> in Z+E, and poly f,
+//---ht(E)+r=ht(Z+E). Compute  P=<p[1],...,p[r]> in Z+E, and polynomial f,
 //---such that radical(Z+E)=radical((E+P):f)
    int i,j,d,e;
    ideal Estd=std(E);

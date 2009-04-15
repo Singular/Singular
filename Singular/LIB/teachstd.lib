@@ -1,7 +1,7 @@
 // $Id:
 //GMG, last modified 28.9.01
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: teachstd.lib,v 1.12 2009-04-14 12:00:15 Singular Exp $";
+version="$Id: teachstd.lib,v 1.13 2009-04-15 11:23:27 seelisch Exp $";
 category="Teaching";
 info="
 LIBRARY:  teachstd.lib   Procedures for teaching standard bases
@@ -18,8 +18,8 @@ PROCEDURES:
  ecart(f);              ecart of f
  tail(f);               tail of f
  sameComponent(f,g);    test for same module component of lead(f) and lead(g)
- leadmonomial(f);       leading monomial as poly (also for vectors)
- monomialLcm(m,n);      lcm of monomials m and n as poly (also for vectors)
+ leadmonomial(f);       leading monomial as polynomial (also for vectors)
+ monomialLcm(m,n);      lcm of monomials m and n as polynomial (also for vectors)
  spoly(f[,1]);          s-polynomial of f [symmetric form]
  minEcart(T,h);         element g from T of minimal ecart s.t. LM(g)|LM(h)
  NFMora(i);             normal form of i w.r.t Mora algorithm

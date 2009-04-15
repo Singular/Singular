@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
-version="$Id: curvepar.lib,v 1.3 2007-05-24 13:37:19 Singular Exp $";
+version="$Id: curvepar.lib,v 1.4 2009-04-15 11:11:20 seelisch Exp $";
 category="Singularities";
 info="
 LIBRARY:  space_curve.lib
@@ -36,7 +36,7 @@ COMPUTE:  Blowing-up of the curve at point 0.
 RETURN:   list C of charts.
           Each chart C[i] is a list of size 5
           C[i][1] is an integer j. It shows, which standard chart do we consider.
-          C[i][2] is an irreducible poly g in k[a]. It is a minimal polynomial for the new parameter.
+          C[i][2] is an irreducible polynomial g in k[a]. It is a minimal polynomial for the new parameter.
           C[i][3] is an ideal H in k[a].
                   c_i=F_i(a_new) for i=1..n,
                   a_old=H[n+1](a_new).
@@ -364,7 +364,7 @@ RETURN:   a ring R=basering+k[a]
           Resolve[i][2] ideal which represents the map
                         teta:k[x(1)..x(n),a]-->k[x(1)..x(n),a] from the
                         new curve to the old one.
-          Resolve[i][3] is an irreducible poly g in k[a]. It is a minimal polynomial for the new parameter a.
+          Resolve[i][3] is an irreducible polynomial g in k[a]. It is a minimal polynomial for the new parameter a.
           Resolve[i][4] sequence of multiplicities
           Resolve[i][5] is a list of integers l. It shows, which standard charts we considered.
           Resolve[i][6] HN matrix

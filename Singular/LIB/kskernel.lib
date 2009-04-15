@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version="$Id: kskernel.lib,v 1.3 2007-06-20 15:30:11 Singular Exp $";
+version="$Id: kskernel.lib,v 1.4 2009-04-15 11:14:36 seelisch Exp $";
 category="General purpose";
 info="
 LIBRARY:  kskernel.lib   PROCEDURES FOR COMPUTING THE KERNEL
@@ -72,7 +72,7 @@ proc sorter(intmat M)
 //---------------------------- sub procedure --------------------
 // M is a sorted matrix of triples {i,j,k(i,j)}
 // returns a list of coefficients of p
-// wrt. the base {x^i y^j,(i,j) in (M[i,j,k])}=B_u
+// w.r.t. the base {x^i y^j,(i,j) in (M[i,j,k])}=B_u
 proc MonoDec(poly p, matrix M)
 {
   poly q=p;
@@ -294,7 +294,7 @@ proc KSlinear(matrix M)
          KSker(p,q)
 RETURN:  nothing; but replaces elements of the matrix KSkernel
          in the ring Ksring with their leading monomials
-         wrt. the local ordering (ls)
+         w.r.t. the local ordering (ls)
 EXAMPLE: example KSlinear; shows an example
 "
 {

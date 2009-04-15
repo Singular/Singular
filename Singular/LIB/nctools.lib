@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.51 2009-04-14 13:31:39 Singular Exp $";
+version="$Id: nctools.lib,v 1.52 2009-04-15 11:18:07 seelisch Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -550,7 +550,7 @@ EXAMPLE: example ndcond; shows examples
 {
   // internal documentation, for tests etc
   // 1st arg: v an optional integer (if v!=0, will be verbose)
-  // if the second argument is given, produces ndc wrt powers x^N
+  // if the second argument is given, produces ndc w.r.t. powers x^N
   int N = 1;
   int Verbose = 0;
   if ( size(#)>=1 ) { Verbose = int(#[1]); }
@@ -726,7 +726,7 @@ example
   setring H3;  H3;
 }
 
-  
+
 
 ///////////////////////////////////////////////////////////////////////////////
 proc superCommutative(list #)
@@ -902,7 +902,7 @@ EXAMPLE: example superCommutative; shows examples
   if( (fprot == 1) and (attrib(basering, "global") != 1) )
   {
     print("Warning: Since the current ordering is not global there might be problems computing twostd(Q)!");
-    "Q:";
+    "Q:"; 
     @Q;
   }
 

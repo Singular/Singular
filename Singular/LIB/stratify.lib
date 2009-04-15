@@ -1,6 +1,6 @@
 // (anne, last modified 23.5.00) last modified: 12.12.2000
 /////////////////////////////////////////////////////////////////////////////
-version="$Id: stratify.lib,v 1.8 2006-07-18 15:22:16 Singular Exp $";
+version="$Id: stratify.lib,v 1.9 2009-04-15 11:15:56 seelisch Exp $";
 category="Invariant theory";
 info="
 LIBRARY: stratify.lib   Algorithmic Stratification for Unipotent Group-Actions
@@ -705,7 +705,7 @@ EXAMPLE: example cleanup; shows an example"
       retlist[i][3+j-i]=retlist[i][3];
       retlist[i][3]=leer;
       i=j-1;
-// retlist[..][3] is empty iff there was more than one entry to this intvec
+// retlist[..][3] is empty if and only if there was more than one entry to this intvec
     }
     if(j>size(stratlist)) break;
     i++;

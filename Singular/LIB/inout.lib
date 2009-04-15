@@ -1,6 +1,6 @@
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: inout.lib,v 1.33 2009-04-07 09:30:44 seelisch Exp $";
+version="$Id: inout.lib,v 1.34 2009-04-15 11:14:36 seelisch Exp $";
 category="General purpose";
 info="
 LIBRARY:  inout.lib     Printing and Manipulating In- and Output
@@ -9,7 +9,7 @@ PROCEDURES:
  allprint(list);        print list if ALLprint is defined, with pause if >0
  lprint(poly/...[,n]);  display poly/... fitting to pagewidth [size n]
  pmat(matrix[,n]);      print form-matrix [first n chars of each colum]
- rMacaulay(string);     read Macaulay_1 output and return its Singular format
+ rMacaulay(string);     read Macaulay_1 output and return its @sc{Singular} format
  show(any);             display any object in a compact format
  showrecursive(id,p);   display id recursively with respect to variables in p
  split(string,n);       split given string into lines of length n
@@ -671,11 +671,11 @@ CREATE:  a file with name `file`, write the content of the list L into it and
          call the list `name`, keeping the list structure
 RETURN:  no return value
 NOTE:    The syntax of writelist is similar to the syntax of the
-         write command of Singular which does not manage lists properly.
+         write command of @sc{Singular} which does not manage lists properly.
          If (file,name) = (\"listfile\",\"L1\"),  writelist creates (resp.
          appends if listfile exists) a file with name listfile and stores
-         there the list L under the name L1. The Singular command
-         execute(read(\"listfile\")); assigns the content of L (stored in
+         there the list L under the name L1. The @sc{Singular} command
+         @code{execute(read(\"listfile\"))}; assigns the content of L (stored in
          listfile) to a list L1.
 @*       On a UNIX system, write(\">file\",...) overwrites an existing file
          `file` while write(\"file\",...) and write(\">>file\",...) append.

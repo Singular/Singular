@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: sing.lib,v 1.33 2009-02-23 15:12:44 Singular Exp $";
+version="$Id: sing.lib,v 1.34 2009-04-15 11:15:56 seelisch Exp $";
 category="Singularities";
 info="
 LIBRARY:  sing.lib      Invariants of Singularities
@@ -10,10 +10,10 @@ PROCEDURES:
  codim(id1, id2);       vector space dimension of id2/id1 if finite
  deform(i);             infinitesimal deformations of ideal i
  dim_slocus(i);         dimension of singular locus of ideal i
- is_active(f,id);       is poly f an active element mod id? (id ideal/module)
+ is_active(f,id);       is polynomial f an active element mod id? (id ideal/module)
  is_ci(i);              is ideal i a complete intersection?
  is_is(i);              is ideal i an isolated singularity?
- is_reg(f,id);          is poly f a regular element mod id? (id ideal/module)
+ is_reg(f,id);          is polynomial f a regular element mod id? (id ideal/module)
  is_regs(i[,id]);       are gen's of ideal i regular sequence modulo id?
  locstd(i);             SB for local degree ordering without cancelling units
  milnor(i);             milnor number of ideal i; (assume i is ICIS in nf)
@@ -976,7 +976,7 @@ proc locstd (id)
 "USAGE:   locstd (id); id = ideal
 RETURN:  a standard basis for a local degree ordering
 NOTE:    the procedure homogenizes id w.r.t. a new 1st variable @t@, computes
-         a SB wrt (dp(1),dp) and substitutes @t@ by 1.
+         a SB w.r.t. (dp(1),dp) and substitutes @t@ by 1.
          Hence the result is a SB with respect to an ordering which sorts
          first w.r.t. the order and then refines it with dp. This is a
          local degree ordering.

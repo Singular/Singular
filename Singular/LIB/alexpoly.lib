@@ -1,4 +1,4 @@
-version="$Id: alexpoly.lib,v 1.17 2008-12-12 17:22:35 Singular Exp $";
+version="$Id: alexpoly.lib,v 1.18 2009-04-15 11:06:40 seelisch Exp $";
 category="Singularities";
 info="
 LIBRARY:  alexpoly.lib   Resolution Graph and Alexander Polynomial
@@ -197,7 +197,7 @@ EXAMPLE: example totalmultiplicities;  shows an example
     }
   }
   ///////////////////////////////////////////////////////////////////////////////////////////////////
-  // If the input was a poly or a HN-Expansion, then calculate the contact matrix and char.exponents.
+  // If the input was a polynomial or a HN-Expansion, then calculate the contact matrix and char.exponents.
   ///////////////////////////////////////////////////////////////////////////////////////////////////
   if (defined(I@N@V))
   {

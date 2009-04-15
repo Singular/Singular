@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: redcgs.lib,v 1.5 2009-04-07 09:30:44 seelisch Exp $";
+version="$Id: redcgs.lib,v 1.6 2009-04-15 11:15:06 seelisch Exp $";
 category="General purpose";
 info="
 LIBRARY:  redcgs.lib      Reduced Comprehensive Groebner Systems.
@@ -124,7 +124,7 @@ memberpos(f,J);      Returns the list of two integers: the value 0 or 1 dependin
                      does not belong).
 subset(F,G);         If all elements of F belong to the ideal G it returns 1,
                      and 0 otherwise.
-pdivi(f,F);          Pseudodivision of a poly f by an ideal F in @R. Returns a
+pdivi(f,F);          Pseudodivision of a polynomial f by an ideal F in @R. Returns a
                      list (r,q,m) such that m*f=r+sum(q.G).
 facvar(ideal J)      Returns all the free-square factors of the elements
                      of ideal J (non repeated). Integer factors are ignored,
@@ -133,7 +133,7 @@ facvar(ideal J)      Returns all the free-square factors of the elements
                      parameters.
 redspec(N,W);        Given null and non-null conditions depending only on the
                      parameters it returns a red-specification.
-pnormalform(f,N,W);  Reduces the poly f wrt to the null condition ideal N and the
+pnormalform(f,N,W);  Reduces the polynomial f w.r.t. to the null condition ideal N and the
                      non-null condition ideal W (both depending on the parameters).
 buildtree(F);        Returns a list T describing a first reduced CGS of the ideal
                      F in K[a][x].
@@ -427,7 +427,7 @@ proc simpqcoeffs(poly n,poly m)
 };
 
 
-// pdivi : pseudodivision of a poly f by an ideal F in @R
+// pdivi : pseudodivision of a polynomial f by an ideal F in @R
 //         in the ring @R
 // input:
 //   poly f0  (given in the ring @R)
@@ -441,7 +441,7 @@ proc pdivi(poly f,ideal F)
 RETURN:   A list (poly r, ideal q, poly m). r is the remainder of the
           pseudodivision, q is the ideal of quotients, and m is the
           factor by which f is to be multiplied.
-NOTE:     Pseudodivision of a poly f by an ideal F in @R. Returns a
+NOTE:     Pseudodivision of a polynomial f by an ideal F in @R. Returns a
           list (r,q,m) such that m*f=r+sum(q.G).
 KEYWORDS: division, reduce
 EXAMPLE:  pdivi; shows an example"
@@ -608,7 +608,7 @@ proc Wred(poly f, ideal W)
   return(f2);
 };
 
-// pnormalform: reduces a polynomial wrt a red-spec dividing by N and eliminating factors in W.
+// pnormalform: reduces a polynomial w.r.t. a red-spec dividing by N and eliminating factors in W.
 //              called in the ring @R
 //              operates in the ring @RP
 // input:
@@ -616,7 +616,7 @@ proc Wred(poly f, ideal W)
 //         ideal N  (depends only on the parameters)
 //         ideal W  (depends only on the parameters)
 //                   (N,W) must be a red-spec (depends only on the parameters)
-// output: poly f2 reduced wrt to the red-spec (N,W)
+// output: poly f2 reduced w.r.t. to the red-spec (N,W)
 // note:   for security a lot of work is done. If (N,W) is already a red-spec it should be simplified
 proc pnormalform(poly f, ideal N, ideal W)
 "USAGE:   pnormalform(f,N,W);
@@ -704,7 +704,7 @@ RETURN:   a list (N1,W1,L1) containing a red-specification of the segment (N,W).
           The segment S=V(N1) \ V(h), where h=prod(w in W1)
           N1 is uniquely determined and no prime component of N1 contains none of
           the polynomials in W1. The polynomials in W1 are prime and reduced
-          wrt N1, and are considered non-null on the segment.
+          w.r.t. N1, and are considered non-null on the segment.
           L1 contains the list of prime components of N1.
 NOTE:     can be called from ring @R but it works in ring @P.
 KEYWORDS: specification
@@ -920,7 +920,7 @@ proc mingb(ideal F)
 
 
 // redgb: given a minimal bases (gb reducing) it
-// reduces each polynomial wrt to the others
+// reduces each polynomial w.r.t. to the others
 proc redgb(ideal F, ideal N, ideal W)
 {
   ideal G;
@@ -2484,7 +2484,7 @@ proc selectcases(list bT)
              // the same lpp (sheaves))
   ideal N;   // the summarized N
   ideal W;   // the summarized W
-  ideal F;   // the summarized poly j (can contain a sheaf instead of
+  ideal F;   // the summarized polynomial j (can contain a sheaf instead of
              // a single poly)
   ideal FF;  // the same as F but it can be ideal(0)
   poly lpj;
@@ -2988,7 +2988,7 @@ proc addcase(intvec labu, list rs)
 }
 
 // reduceR
-// reduces the polynomial f wrt N, in the ring @P
+// reduces the polynomial f w.r.t. N, in the ring @P
 proc reduceR(poly f, ideal N)
 {
   def RR=basering;
@@ -3747,7 +3747,7 @@ proc difflpp(ideal lpp)
 }
 
 // redgb: given a minimal bases (gb reducing) it
-// reduces each polynomial wrt to the others
+// reduces each polynomial w.r.t. to the others
 proc postredgb(ideal F)
 {
   ideal G;

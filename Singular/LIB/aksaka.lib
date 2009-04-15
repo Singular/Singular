@@ -1,6 +1,6 @@
 //CM, last modified 10.12.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: aksaka.lib,v 1.4 2009-04-06 12:39:02 seelisch Exp $";
+version="$Id: aksaka.lib,v 1.5 2009-04-15 11:05:47 seelisch Exp $";
 category="Teaching";
 info="
 LIBRARY: aksaka.lib     Procedures for primality testing after Agrawal, Saxena, Kayal
@@ -17,8 +17,8 @@ log2(n)                    logarithm to basis 2 of n
 PerfectPowerTest(n)        checks if there are a,b>1, so that a^b=n
 wurzel(r)                  square root of number r
 euler(r)                   phi-function of euler
-coeffmod(f,n)              poly f modulo number n (coefficients mod n)
-powerpolyX(q,n,a,r)        (poly a)^q modulo (poly r,number n)
+coeffmod(f,n)              polynomial f modulo number n (coefficients mod n)
+powerpolyX(q,n,a,r)        (polynomial a)^q modulo (poly r,number n)
 ask(n)                     ASK-Algorithm; deterministic Primality test
 ";
 
@@ -70,9 +70,9 @@ proc coeffmod(poly f,number n)
 "USAGE: coeffmod(f,n);
 ASSUME: poly f depends on at most var(1) of the basering
 RETURN: poly f modulo number n
-NOTE:   at first the coefficients of the monomials of the poly f are
+NOTE:   at first the coefficients of the monomials of the polynomial f are
         determined, then their remainder modulo n is calculated,
-        after that the poly 'is put together' again
+        after that the polynomial 'is put together' again
 EXAMPLE:example coeffmod; shows an example
 "
 {
@@ -86,7 +86,7 @@ EXAMPLE:example coeffmod; shows an example
     g=g+(leadcoef(M[i,1]) mod n)*var(1)^(i-1) ;
                    // umwandeln der Koeffizienten in numbers,
                    // Berechnung der Reste dieser numbers modulo n,
-                   // poly mit neuen Koeffizienten wieder zusammensetzen
+                   // Polynom mit neuen Koeffizienten wieder zusammensetzen
     i++;
   }
   return(g);

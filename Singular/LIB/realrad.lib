@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: realrad.lib,v 1.7 2008-12-12 11:26:34 Singular Exp $";
+version="$Id: realrad.lib,v 1.8 2009-04-15 11:15:06 seelisch Exp $";
 category="real algebra";
 info="
 LIBRARY:  realrad.lib   Computation of real radicals
@@ -179,7 +179,7 @@ EXAMPLE:   example realzero; shows an example"
 {
  list prim,prepared,nonshape,realu;
  int r;//counter
- int l;//number of first poly with degree >1 or even
+ int l;//number of first polynomial with degree >1 or even
  l=size(j);
  for (r=1;r<=l;r++)
  {
@@ -435,7 +435,7 @@ EXAMPLE:   example radzero; shows no example"
 ///////the univariate case ///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 proc realpoly(poly f)
-"USAGE:    realpoly(f); a univariate poly f;
+"USAGE:    realpoly(f); a univariate polynomial f;
 RETURN:    poly f, where f is the real part of the input f
 EXAMPLE:   example realpoly; shows an example"
 {
@@ -541,7 +541,7 @@ EXAMPLE: decision shows an example
     return(0);
    }
    //search for a p in Q[x_n] such that f is pos. sem. definite
-   //iff for every isolating setting S={a_1,...,a_r} holds that
+   //if and only if for every isolating setting S={a_1,...,a_r} holds that
    //every f(x_1,..,x_n-1, a_i) is positiv semidefinite
    //recursion of variables
    ///////////////////////////////////////////////////////////////////////////
@@ -794,7 +794,7 @@ static proc BernsteinCoefficients(list bern,list lr,number m)
         a list bern=b_0,...,b_p representing a polynomial P of degree <=p
         in the Bernstein basis pf lr=(l,r) an a number m in Q
  RETURN:a list erg=erg1,erg2 s.th. erg1=erg1[1],erg[2] and erg1[1] are
-        the bernstein coefficients of P wrt to erg1[2]=(l,m) and erg2[1]
+        the bernstein coefficients of P w.r.t. to erg1[2]=(l,m) and erg2[1]
         is one for erg2[2]=(m,r)
  EXAMPLE: Bernsteincoefficients shows no example
 "
@@ -1045,7 +1045,7 @@ static proc isuniv(poly f)
 }
 static proc search_first(ideal j,int start, int i)
 "USAGE:    searchfirst(j, start, i);
-           id a reduced groebner basis wrt lex
+           id a reduced groebner basis w.r.t. lex
 RETURN:    if i=1 then turns the number of the first non univariate entry
            with order >1 in its leading term after start
            else the first non univariate of even order

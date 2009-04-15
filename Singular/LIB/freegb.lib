@@ -1,11 +1,11 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: freegb.lib,v 1.23 2009-04-14 12:08:36 Singular Exp $";
+version="$Id: freegb.lib,v 1.24 2009-04-15 11:13:09 seelisch Exp $";
 category="Noncommutative";
 info="
 LIBRARY: freegb.lib   Compute two-sided Groebner bases in free algebras via letterplace
 AUTHOR: Viktor Levandovskyy,     levandov@math.rwth-aachen.de
 
-THEORY: See chapter 'LETTERPLACE' in the Singular Manual.
+THEORY: See chapter 'LETTERPLACE' in the @sc{Singular} Manual.
 
 PROCEDURES:
 makeLetterplaceRing(d);    creates a ring with d blocks of shifted original variables
@@ -41,7 +41,7 @@ proc setLetterplaceAttributes(def R, int uptodeg, int lV)
 RETURN: ring with special attributes set
 PURPOSE: sets attributes for a letterplace ring:
 @*      'isLetterplaceRing' = true, 'uptodeg' = d, 'lV' = b, where
-@*      'uptodeg' stands for the degree bound,
+@*      'uptodeg' stands for the degree bound, 
 @*      'lV' for the number of variables in the block 0.
 NOTE: Activate the resulting ring by using @code{setring}
 "
@@ -53,9 +53,9 @@ NOTE: Activate the resulting ring by using @code{setring}
 
     // Set letterplace-specific attributes for the output ring!
   attrib(R, "uptodeg", uptodeg);
-  attrib(R, "lV", lV);
-  attrib(R, "isLetterplaceRing", 1);
-  return (R);
+  attrib(R, "lV", lV);  
+  attrib(R, "isLetterplaceRing", 1);  
+  return (R); 
 }
 example
 {
@@ -72,7 +72,7 @@ example
 static proc lshift(module M, int s, string varing, def lpring)
 {
   // FINALLY IMPLEMENTED AS A PART OT THE CODE
-  // shifts a poly from the ring @R to s positions
+  // shifts a polynomial from the ring R to s positions
   // M lives in varing, the result in lpring
   // to be run from varing
   int i, j, k, sm, sv;
@@ -346,7 +346,7 @@ example
 proc isVar(poly p)
 "USAGE:  isVar(p);  poly p
 RETURN:  int
-PURPOSE: check, whether leading monomial of p is a power of a single variable
+PURPOSE: check, whether leading monomial of p is a power of a single variable 
 @* from the basering. Returns the exponent or 0 if p is multivariate.
 EXAMPLE: example isVar; shows examples
 "
@@ -2129,8 +2129,8 @@ static proc test_shift()
   int d =5;
   def R = makeLetterplaceRing(d);
   setring R;
-  int uptodeg = d;
-  int lV = 2;
+  int uptodeg = d; 
+  int lV = 2; 
   def R = setLetterplaceAttributes(r,uptodeg,2); // supply R with letterplace structure
   setring R;
   poly p = mmLiebr(a(1),b(1));
@@ -2325,7 +2325,7 @@ example
 
 static proc strList2poly(list L)
 {
-  //  list L comes from sent2lplace (which takes a poly on the input)
+  //  list L comes from sent2lplace (which takes a polynomial as input)
   // each entry of L is a sublist with the coef on the last place
   int s = size(L); int t;
   int i,j;

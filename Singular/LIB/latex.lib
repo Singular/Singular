@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: latex.lib,v 1.34 2009-04-14 17:23:25 Singular Exp $";
+version="$Id: latex.lib,v 1.35 2009-04-15 11:14:36 seelisch Exp $";
 category="Visualization";
 info="
 LIBRARY: latex.lib    Typesetting of Singular-Objects in LaTeX2e
@@ -10,7 +10,7 @@ PROCEDURES:
  opentex(fnm)        writes header for LaTeX-file fnm
  tex(fnm)            calls LaTeX2e for LaTeX-file fnm
  texdemo([n])        produces a file explaining the features of this lib
- texfactorize(fnm,f) creates string in LaTeX-format for factors of poly f
+ texfactorize(fnm,f) creates string in LaTeX-format for factors of polynomial f
  texmap(fnm,m,r1,r2) creates string in LaTeX-format for map m:r1->r2
  texname(fnm,s)      creates string in LaTeX-format for identifier
  texobj(l)           creates string in LaTeX-format for any (basic) type
@@ -589,9 +589,9 @@ RETURN:  if @code{fname=\"\"}: the transformed string s, for which the
    \"a..z\" + int            --> \"a..z\" + \"_@{\" + int + \"@}\"
 \"(\" + int + \",\" + s' + \")\" --> \"_@{\"+ int +\"@}\" + \"^@{\" + s'+\"@}\"
 @end example
-         Furthermore, strings which begin with a left brace are modified
+         Furthermore, strings which begin with a @code{\"@{\"} are modified
          by deleting the first and the last character (which is then assumed to
-         be a right brace).
+         be a @code{\"@}\"}}.
 
          if @code{fname!=\"\"}: append the transformed string s to the file
          @code{<fname>}, and return nothing.
@@ -1340,7 +1340,7 @@ static proc parsg(string s)                  // parse Galois field
 
 proc texpoly(string fname,def p,list #)
 "USAGE:   texpoly(fname,p); fname string, p poly
-RETURN:  if @code{fname=\"\"}: string, the poly p in LaTeX-typesetting;@*
+RETURN:  if @code{fname=\"\"}: string, the polynomial p in LaTeX-typesetting;@*
          otherwise: append this string to the file @code{<fname>}, and
          return nothing.
 NOTE:    preceding \">>\" are deleted in @code{fname}, and suffix \".tex\"
@@ -1371,7 +1371,7 @@ EXAMPLE: example texpoly; shows an example
   if (typeof(p)  == "proc")
   { " -- Call  texmap  instead "; return();}
   if (typeof(p)  == "link" or typeof(p) == "list" or typeof(p) == "resolution")
-  { " -- Object can not translated into tex "; return();}
+  { " -- Object cannot translated into tex "; return();}
 
   if (!(defined(TeXdisplay))){ lnbreak = "\\\\[2mm]" + newline;}
   else { lnbreak = "\\\\" + newline;}
@@ -1866,7 +1866,7 @@ write(fname,"\\newcommand{\\Line}{\\rule{\\textwidth}{0.25mm}\\\\[5mm]}");
 "{\\tt  texdemo([n]);} & produces a file explaining the features of this lib"+
 "\\\\" +  nl +
 "{\\tt  texfactorize(fnm,f);} & creates string in \\LaTeX-format for
-factors of poly f"+ "\\\\" +  nl +
+factors of polynomial f"+ "\\\\" +  nl +
 "{\\tt  texmap(fnm,m,r1,r2);} & creates string in \\LaTeX-format for
 map m:r1$\\rightarrow$r2"+ "\\\\" +  nl +
 "{\\tt  texname(fnm,s);} &      creates string in \\LaTeX-format for
@@ -1983,7 +1983,7 @@ ev);
 
 // write(fname,"\\Line");
 
-// -1b------ still in the same ring, a poly with rational coefs --------
+// -1b------ still in the same ring, a polynomial with rational coefs --------
 write(fname,
 " A polynomial with rational coefficients.
 " +nl);

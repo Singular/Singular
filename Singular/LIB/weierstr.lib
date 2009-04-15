@@ -1,6 +1,6 @@
 //GMG, last modified 28.10.2001
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: weierstr.lib,v 1.6 2009-04-06 12:39:02 seelisch Exp $";
+version="$Id: weierstr.lib,v 1.7 2009-04-15 11:20:08 seelisch Exp $";
 category="Teaching";
 info="
 LIBRARY:  weierstr.lib   Procedures for the Weierstrass Theorems
@@ -74,7 +74,7 @@ EXAMPLE: example weierstrDiv; shows an example
   }
   if ( b==-1 )
   {
-     "// second poly is not general w.r.t. last variable";
+     "// second polynomial is not general w.r.t. last variable";
      "// use the procedure lastvarGeneral first";
      result=h,g;
      return(result);
@@ -157,7 +157,7 @@ EXAMPLE: example weierstrPrep; shows an example
   int b = generalOrder(f);
   if ( b==-1 )
   {
-     "// second poly is not general w.r.t. last variable";
+     "// second polynomial is not general w.r.t. last variable";
      "// use the procedure lastvarGeneral first";
      poly h,g;
      list result=h,g;

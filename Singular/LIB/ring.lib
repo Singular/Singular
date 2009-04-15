@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ring.lib,v 1.33 2009-04-06 09:17:01 seelisch Exp $";
+version="$Id: ring.lib,v 1.34 2009-04-15 11:18:27 seelisch Exp $";
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -418,7 +418,7 @@ proc fetchall (R, list #)
 CREATE:  fetch all objects of ring R (of type poly/ideal/vector/module/number/matrix)
          into the basering.
          If no 2nd argument is present, the names are the same as in R. If,
-         say, f is a poly in R and the 2nd argument is the string \"R\", then f
+         say, f is a polynomial in R and the 2nd argument is the string \"R\", then f
          is mapped to f_R etc.
 RETURN:  no return value
 NOTE:    As fetch, this procedure maps the 1st, 2nd, ... variable of R to the
@@ -464,7 +464,7 @@ proc imapall (R, list #)
 CREATE:  map all objects of ring R (of type poly/ideal/vector/module/number/matrix)
          into the basering by applying imap to all objects of R.
          If no 2nd argument is present, the names are the same as in R. If,
-         say, f is a poly in R and the 3rd argument is the string \"R\", then f
+         say, f is a polynomial in R and the 3rd argument is the string \"R\", then f
          is mapped to f_R etc.
 RETURN:  no return value
 NOTE:    As imap, this procedure maps the variables of R to the variables with
@@ -510,7 +510,7 @@ proc mapall (R, ideal i, list #)
 CREATE:  map all objects of ring R (of type poly/ideal/vector/module/number/
          matrix, map) into the basering by mapping the j-th variable of R to
          the j-th generator of the ideal i. If no 3rd argument is present, the
-         names are the same as in R. If, say, f is a poly in R and the 3rd
+         names are the same as in R. If, say, f is a polynomial in R and the 3rd
          argument is the string \"R\", then f is mapped to f_R etc.
 RETURN:  no return value.
 NOTE:    This procedure has the same effect as defining a map, say psi, by

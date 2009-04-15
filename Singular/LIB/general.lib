@@ -2,7 +2,7 @@
 //anne, added deleteSublist and watchdog 12.12.2000
 //eric, added absValue 11.04.2002
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.60 2009-04-07 09:30:44 seelisch Exp $";
+version="$Id: general.lib,v 1.61 2009-04-15 11:14:16 seelisch Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -1037,7 +1037,7 @@ NOTE:    * the MP package must be enabled
          * if there are variable names of the structure x(i) all
            polynomials have to be put into eval(...) in order to be
            interpreted correctly
-         * a second Singular process is started by this procedure
+         * a second @sc{Singular} process is started by this procedure
 EXAMPLE: example watchdog; shows an example
 "
 {

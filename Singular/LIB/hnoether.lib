@@ -1,4 +1,4 @@
-version="$Id: hnoether.lib,v 1.58 2008-09-24 07:54:59 Singular Exp $";
+version="$Id: hnoether.lib,v 1.59 2009-04-15 11:14:36 seelisch Exp $";
 // (GMG, last modified 08.06.08: comments to Newton non-degenerate added)
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -37,8 +37,8 @@ AUXILIARY PROCEDURES:
  stripHNE(hne);             reduce amount of memory consumed by hne
  puiseux2generators(m,n);   convert Puiseux pairs to generators of semigroup
  separateHNE(hne1,hne2);    number of quadratic transf. needed for separation
- squarefree(f);             a squarefree divisor of the poly f
- allsquarefree(f,l);        the maximal squarefree divisor of the poly f
+ squarefree(f);             a squarefree divisor of the polynomial f
+ allsquarefree(f,l);        the maximal squarefree divisor of the polynomial f
  further_hn_proc();         show further procedures useful for interactive use
 
 KEYWORDS: Hamburger-Noether expansion; Puiseux expansion; curve singularities
@@ -72,7 +72,7 @@ NOTE:  The library @code{hnoether.lib} contains some more procedures which
  T_Transform(f,Q,N); returns f(y,xy^Q)/y^NQ (f: poly, Q,N: int)
  T1_Transform(f,d,M); returns f(x,y+d*x^M)  (f: poly,d:number,M:int)
  T2_Transform(f,d,M,N,ref);   a composition of T1 & T
- koeff(f,I,J);       gets coefficient of indicated monomial of poly f
+ koeff(f,I,J);       gets coefficient of indicated monomial of polynomial f
  redleit(f,S,E);     restriction of monomials of f to line (S-E)
  leit(f,n,m);        special case of redleit (for irred. polynomials)
  testreducible(f,n,m); tests whether f is reducible
@@ -84,7 +84,7 @@ NOTE:  The library @code{hnoether.lib} contains some more procedures which
  referencepoly(D);   a polynomial f s.t. D is the Newton diagram of f";
 
 //       static procedures not useful for interactive use:
-// polytest(f);        tests coefficients and exponents of poly f
+// polytest(f);        tests coefficients and exponents of polynomial f
 // extractHNEs(H,t);   extracts output H of HN to output of hnexpansion
 // HN(f,grenze);       recursive subroutine for hnexpansion
 // constructHNEs(...); subroutine for HN
@@ -690,7 +690,7 @@ EXAMPLES: example develop;         shows an example
     }}
     kill zweitring;
     nm = getnm(f);             // N,M haben sich evtl. veraendert
-    N = nm[1]; M = nm[2];      // Berechne Schnittpunkte Newtonpoly mit Achsen
+    N = nm[1]; M = nm[2];      // Berechne Schnittpunkte Newtonpolynom mit Achsen
     if (defined(HNDebugOn)) {"I continue with the polynomial",f; }
    }
    else {
@@ -715,7 +715,7 @@ EXAMPLES: example develop;         shows an example
     if (printlevel>0) { pause("Hit RETURN to continue:"); }
     f=test_sqr;
     nm = getnm(f);              // N,M haben sich veraendert
-    N = nm[1]; M = nm[2];       // Berechne Schnittpunkte Newtonpoly mit Achsen
+    N = nm[1]; M = nm[2];       // Berechne Schnittpunkte Newtonpolynom mit Achsen
     if (defined(HNDebugOn)) {"I continue with the polynomial",f; }
    }
 
@@ -732,7 +732,7 @@ EXAMPLES: example develop;         shows an example
     M = M+N; N = M-N; M = M-N;  // M, N auch vertauschen
   }
   if (defined(HNDebugOn)) {
-   if (getauscht) {"x<->y were exchanged; poly is now ",f;}
+   if (getauscht) {"x<->y were exchanged; polynomial is now ",f;}
    else           {"x , y were not exchanged";}
    "M resp. N are now",M,N;
   }
@@ -1298,7 +1298,7 @@ SEE ALSO: invariants, intersection, develop, hnexpansion
 EXAMPLE: example displayInvariants;  shows an example
 "
 {
- // INPUT = poly or ring
+ // INPUT = polynomial or ring
  if (typeof(#[1])=="poly") {
    list L=hnexpansion(#[1]);
    if (typeof(L[1])=="ring") {
@@ -2389,7 +2389,7 @@ proc redleit (poly f,intvec S, intvec E)
 RETURN:  poly g: all monomials of f which lie on or below that line
 NOTE:    The main purpose is that if the line defined by S and E is part of the
          Newton polygon, the result is the quasihomogeneous leading form of f
-         wrt. that line.
+         w.r.t. that line.
 SEE ALSO: newtonpoly
 EXAMPLE: example redleit;  shows an example
 "
@@ -2713,7 +2713,7 @@ RETURN:  list @code{L}, containing Hamburger-Noether data of @code{f}:
 @end texinfo
          If the computation of the HNE required a field extension, the first
          entry @code{L[1]} of the list is a ring, in which a list @code{hne}
-         of lists (the HN data, as above) and a poly @code{f} (image of
+         of lists (the HN data, as above) and a polynomial @code{f} (image of
          @code{f} over the new field) are stored.
          @*
          If called with an additional input parameter, @code{hnexpansion}
@@ -4025,7 +4025,7 @@ RETURN: list: first entry = list of HNErings,
   if (defined(SaveRing)) { kill SaveRing; }
  }
  else {
-  HNEs[1]=list(hqs)+azeilen+list(fneu); // fneu ist transform. Poly oder Null
+  HNEs[1]=list(hqs)+azeilen+list(fneu); // fneu ist transform. Polynom oder Null
   conj1[1]=conj_factor;
  }
 

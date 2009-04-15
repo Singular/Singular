@@ -287,7 +287,7 @@ RETURN:   quotients of elements of k[x,t] representing generators of the
       p=p*phi(nzd);
 
       // compute the preimage of [p mod ker(k)] under phi in R(k-1):
-      // as p is an element of im(phi), there is a poly h such that
+      // as p is an element of im(phi), there is a polynomial h such that
       // h(vars(R(k-1)) is mapped to [p mod ker (k)], and h can be com-
       // puted as the normal form of a w.r.t <ker(k),Z(n)-phi(k)(n)> in R(k)[Z]
 

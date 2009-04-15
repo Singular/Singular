@@ -1,6 +1,6 @@
 //GP, last modified 28.6.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: crypto.lib,v 1.8 2009-04-14 12:00:14 Singular Exp $";
+version="$Id: crypto.lib,v 1.9 2009-04-15 11:11:20 seelisch Exp $";
 category="Teaching";
 info="
 LIBRARY:  crypto.lib     Procedures for teaching cryptography
@@ -1574,11 +1574,11 @@ Schoof(2147483629,17,3567);
 proc generateG(number a,number b, int m)
 "USAGE:  generateG(a,b,m);
 RETURN: m-th division polynomial
-NOTE: generate the so-called division polynomials, i.e., the recursively defined
+NOTE: generate the so-called division polynomials, i.e., the recursively defined 
 polynomials p_m=generateG(a,b,m) in Z[x, y] such that, for a point (x:y:1) on the
 elliptic curve defined by y^2=x^3+a*x+b  over Z/N the point@*
 m*P=(x-(p_(m-1)*p_(m+1))/p_m^2 :(p_(m+2)*p_(m-1)^2-p_(m-2)*p_(m+1)^2)/4y*p_m^3 :1)
-and m*P=0  iff p_m(P)=0
+and m*P=0 if and only if p_m(P)=0
 EXAMPLE:example generateG; shows an example
 "
 {

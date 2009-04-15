@@ -4,7 +4,7 @@
 //stdhilb can be called with std or slimgb (Jan 2008, GMG)
 //### Todo: im lokalen Fall die Hilbert-Samuel Funktion verwenden
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.108 2009-04-14 09:54:52 seelisch Exp $";
+version="$Id: standard.lib,v 1.109 2009-04-15 11:15:56 seelisch Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -17,7 +17,7 @@ PROCEDURES:
  sprintf(fmt,...)       returns fomatted string
  fprintf(link,fmt,..)   writes formatted string to link
  printf(fmt,...)        displays formatted string
- weightKB(stc,dd,vl)    degree dd part of a kbase wrt. some weigths
+ weightKB(stc,dd,vl)    degree dd part of a kbase w.r.t. some weigths
  qslimgb(i)             computes a standard basis with slimgb in a qring
  par2varRing([i])       create a ring making pars to vars, together with i
 

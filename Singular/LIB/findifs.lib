@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: findifs.lib,v 1.6 2009-04-06 17:43:33 motsak Exp $";
+version="$Id: findifs.lib,v 1.7 2009-04-15 11:11:35 seelisch Exp $";
 category="Applications";
 info="
 LIBRARY: findifs.lib  Tools for the finite difference schemes
@@ -11,7 +11,7 @@ THEORY: We provide the presentation of difference operators in a polynomial,
         from given approximations.
 
 PROCEDURES:
-decoef(P,n);  decompose poly P into summands with respect to the number n
+decoef(P,n);  decompose polynomial P into summands with respect to the number n
 difpoly2tex(S,P[,Q]); present the difference scheme in the nodal form
 
 AUXILIARY PROCEDURES:
@@ -332,13 +332,13 @@ example
 proc decoef(poly P, number n)
 "USAGE:  decoef(P,n);  P a poly, n a number
 RETURN:  ideal
-PURPOSE:  decompose poly P into summands with respect
+PURPOSE:  decompose polynomial P into summands with respect
 to the  presence of a number n in the coefficients
 NOTE:    n is usually a parameter with no power
 EXAMPLE: example decoef; shows examples
 "{
-  // decomposes poly into summands
-  // wrt the presence of a number n in coeffs
+  // decomposes polynomial into summands
+  // w.r.t. the presence of a number n in coeffs
   // returns ideal
   def br = basering;
   int i,j=0,0;
@@ -717,7 +717,7 @@ print(M*X);
  module S = std(R);
  poly   p = S[4,1]; // by elimination of module components
  list L; L[1]=A;L[2] = B;
- ideal I = decoef(p,dt); // make splitting wrt the appearance of dt
+ ideal I = decoef(p,dt); // make splitting w.r.t. the appearance of dt
  "* Create the nodal of the scheme in TeX format: ";
  " ideal I = decoef(p,dt);";
  " difpoly2tex(I,L);";

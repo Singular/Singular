@@ -1,4 +1,4 @@
-version="$Id: brnoeth.lib,v 1.21 2009-04-07 09:30:44 seelisch Exp $";
+version="$Id: brnoeth.lib,v 1.22 2009-04-15 11:10:53 seelisch Exp $";
 category="Coding theory";
 info="
 LIBRARY:   brnoeth.lib  Brill-Noether Algorithm, Weierstrass-SG and AG-codes
@@ -455,7 +455,7 @@ NOTE:       If P is a (homogeneous irreducible) polynomial the point is at
 "
 {
   // computes : the degree of a given point
-  // remark(1) : if the input is (irreducible homogeneous) poly => the point
+  // remark(1) : if the input is (irreducible homogeneous) polynomial => the point
   //             is at infinity
   // remark(2) : it the input is (std. resp. lp. prime) ideal => the point is
   //             affine
@@ -482,7 +482,7 @@ NOTE:       If P is a (homogeneous irreducible) polynomial the point is at
     }
     else
     {
-      ERROR("parameter must have a poly or ideal in the first component");
+      ERROR("parameter must have a polynomial or ideal in the first component");
     }
   }
 }
@@ -1143,7 +1143,7 @@ static proc place (intvec Pp,int sing,list CURVE)
     }
     else
     {
-      ERROR("a point must have a poly or ideal in the first component");
+      ERROR("a point must have a polynomial or ideal in the first component");
     }
   }
   export(coord@1);
@@ -3258,7 +3258,7 @@ NOTE:       The procedure must be called from the ring Proj_R=CURVE[1][2]
 ///////////////////////////////////////////////////////////////////////////////
 static proc local_eq (poly H,SS,int m)
 {
-  // computes a local equation of poly H in the ring SS related to the place
+  // computes a local equation of polynomial H in the ring SS related to the place
   //     "m"
   // list POINT/POINTS is searched depending on wether m=0 or m>0 respectively
   // warning : the procedure must be called from ring "Proj_R" and returns a
@@ -3460,8 +3460,8 @@ example
 
 static proc polytoRF (F)
 {
-  // converts a poly (or number) into a "rational function" of type "ideal"
-  // warning : it must be called inside "R" and poly should be affine
+  // converts a polynomial (or number) into a "rational function" of type "ideal"
+  // warning : it must be called inside "R" and the polynomial is expected to be affine
   ideal RF;
   RF[1]=homog(F,z);
   RF[2]=z^(deg(F));
@@ -3534,7 +3534,7 @@ static proc negRF (F)
 static proc escprodRF (l,F)
 {
   // computes l*F as rational function
-  // l should be either a number or a poly of degree zero
+  // l should be either a number or a polynomial of degree zero
   if (typeof(F)=="ideal")
   {
     ideal lF=F;

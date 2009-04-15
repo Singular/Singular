@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: ratgb.lib,v 1.15 2009-04-14 12:00:15 Singular Exp $";
+version="$Id: ratgb.lib,v 1.16 2009-04-15 11:15:40 seelisch Exp $";
 category="Noncommutative";
 info="
 LIBRARY: ratgb.lib  Groebner bases in Ore localizations of noncommutative G-algebras
@@ -14,7 +14,7 @@ localization of A with respect to S. This library provides Groebner basis
 procedure for A_S, performing polynomial computations only.
 
 PROCEDURES:
-ratstd(ideal I, int n);   compute Groebner basis in Ore localization of the basering wrt first n variables
+ratstd(ideal I, int n);   compute Groebner basis in Ore localization of the basering w.r.t. first n variables
 
 SUPPORT: SpezialForschungsBereich F1301 of the Austrian FWF
 "
@@ -173,8 +173,8 @@ EXAMPLE: example ratstd; shows examples
     {
       va = L3[w][2];
       for(z=1;z<=nvars(save)-is;z++)
-      {
-        vb[z] = va[is+z];
+      { 
+        vb[z] = va[is+z]; 
       }
       tmp3[1] = "a";
       tmp3[2] = vb;
@@ -222,7 +222,7 @@ EXAMPLE: example ratstd; shows examples
   dbprint(ppl-1, CI);
 
   dbprint(ppl,"// -3- running groebner");
-  // 3. compute G = GB(I) wrt. the elim. ord. for D
+  // 3. compute G = GB(I) w.r.t. the elim. ord. for D
   setring save;
   //  ideal CI = imap(@RAT,CI);
   def CI = imap(@RAT,CI);
@@ -371,8 +371,8 @@ appel F1
   def A = appelF1();
   setring A;
   IAppel1;
-  def F1 = ratstd(IAppel1,2);
-  lead(pGBid);
+  def F1 = ratstd(IAppel1,2); 
+  lead(pGBid); 
   setring F1; rGBid;
 }
 
@@ -384,8 +384,8 @@ appel F2
   def A = appelF2();
   setring A;
   IAppel2;
-  def F1 = ratstd(IAppel2,2);
-  lead(pGBid);
+  def F1 = ratstd(IAppel2,2); 
+  lead(pGBid); 
   setring F1; rGBid;
 }
 
@@ -397,8 +397,8 @@ appel F4
   def A = appelF4();
   setring A;
   IAppel4;
-  def F1 = ratstd(IAppel4,2);
-  lead(pGBid);
+  def F1 = ratstd(IAppel4,2); 
+  lead(pGBid); 
   setring F1; rGBid;
 }
 

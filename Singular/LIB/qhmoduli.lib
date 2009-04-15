@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: qhmoduli.lib,v 1.17 2009-04-14 12:08:36 Singular Exp $";
+version="$Id: qhmoduli.lib,v 1.18 2009-04-15 11:17:11 seelisch Exp $";
 category="Singularities";
 info="
 LIBRARY:  qhmoduli.lib    Moduli Spaces of Semi-Quasihomogeneous Singularities
@@ -471,7 +471,7 @@ proc StabEqnId(ideal data, intvec wt)
 "USAGE:   StabEqn(I, w); I ideal, w intvec
 PURPOSE: compute the equations of the isometry group of the ideal I,
          each generator of I is fixed by the stabilizer.
-ASSUME:  I semiquasihomogeneous ideal wrt 'w' with an isolated singularity at 0
+ASSUME:  I semiquasihomogeneous ideal w.r.t. 'w' with an isolated singularity at 0
 RETURN:  list of two rings 'S1', 'S2'
          - 'S1' contians the equations of the stabilizer (ideal 'stabid') @*
          - 'S2' contains the action of the stabilizer (ideal 'actionid')

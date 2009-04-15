@@ -1,6 +1,6 @@
 //GP, last modified 23.10.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: modstd.lib,v 1.14 2007-07-20 10:02:38 Singular Exp $";
+version="$Id: modstd.lib,v 1.15 2009-04-15 11:14:36 seelisch Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: modstd.lib  Grobner basis of ideals
@@ -94,7 +94,7 @@ EXAMPLE: example modStd; shows an example
     kill oro;
   }
   //================= delete unlucky primes ====================
-  // unlucky iff the leading ideal is wrong
+  // unlucky if and only if the leading ideal is wrong
   list LL=deleteUnluckyPrimes(T,L);
   T=LL[1];
   L=LL[2];
@@ -239,7 +239,7 @@ EXAMPLE: example modS; shows an example
     kill @r;
   }
   //================= delete unlucky primes ====================
-  // unlucky iff the leading ideal is wrong
+  // unlucky if and only if the leading ideal is wrong
   list LL=deleteUnluckyPrimes(T,L);
   T=LL[1];
   L=LL[2];
