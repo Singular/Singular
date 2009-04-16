@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.12 2008-09-17 08:05:12 Singular Exp $ */
+/* $Id: feread.cc,v 1.13 2009-04-16 12:53:40 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -272,7 +272,7 @@ char * fe_fgets_stdin_drl(const char *pr,char *s, int size)
   mflush();
 
   char *line;
-  line = (*fe_readline) (pr);
+  line = (*fe_readline) ((char*)pr);
 
   if (line==NULL)
     return NULL;
