@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-04-15 14:36:10 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.33 2009-04-15 14:36:10 monerjan Exp $
-$Id: gfan.cc,v 1.33 2009-04-15 14:36:10 monerjan Exp $
+$Date: 2009-04-16 09:59:16 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.34 2009-04-16 09:59:16 monerjan Exp $
+$Id: gfan.cc,v 1.34 2009-04-16 09:59:16 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -402,13 +402,15 @@ class gcone
 #endif
 					if (isParallel(check,fNormal)) //pass *check when 
 					{
-						cout << "Parallel vector found, adding to initialFormElement" << endl;				
+						cout << "Parallel vector found, adding to initialFormElement" << endl;			
 						initialFormElement[ii] = pAdd(pCopy(initialFormElement[ii]),(poly)pHead(aktpoly));
 					}						
 				}//while
+#ifdef gfan_DEBUG
 				cout << "Initial Form=";				
 				pWrite(initialFormElement[ii]);
 				cout << "---" << endl;
+#endif
 				/*Now initialFormElement must be added to (ideal)initialForm */
 				initialForm->m[ii]=initialFormElement[ii];
 			}//for
@@ -429,8 +431,6 @@ class gcone
 			ring srcRing=currRing;
 			ring dstRing=rCopy0(srcRing);
 			dstRing->order[0]=ringorder_a;
-			//tmpring->order[1]=ringorder_dp;
-			//tmpring->order[2]=ringorder_C;
 			dstRing->wvhdl[0] =( int *)omAlloc((fNormal->length())*sizeof(int)); //found in Singular/ipshell.cc
 			
 			for (int ii=0;ii<this->numVars;ii++)
@@ -442,28 +442,99 @@ class gcone
 			rChangeCurrRing(dstRing);
 			
 			rWrite(currRing); cout << endl;
-			ideal ina;
-			//ina=fast_map(initialForm,srcRing,(ideal)theMap,dstRing);			
-			ina=idrCopyR(initialForm,srcRing);
+			ideal ina;			
+			ina=idrCopyR(initialForm,srcRing);			
+#ifdef gfan_DEBUG
 			cout << "ina=";
 			idShow(ina); cout << endl;
+#endif
 			ideal H;
 			H=kStd(ina,NULL,isHomog,NULL);	//we know it is homogeneous
 			idSkipZeroes(H);
+#ifdef gfan_DEBUG
 			cout << "H="; idShow(H); cout << endl;
+#endif
 			/*Substep 2.2
-			do the lifting
+			do the lifting and mark according to H
 			*/
 			rChangeCurrRing(srcRing);
 			ideal srcRing_H;
-			ideal srcRing_HH;
-			//map theMap = (map)idMaxIdeal(1);
-			//srcRing_H=fast_map(H,dstRing,(ideal)theMap,srcRing);
+			ideal srcRing_HH;			
 			srcRing_H=idrCopyR(H,dstRing);
-			idShow(srcRing_H);
+			idShow(srcRing_H);			
 			srcRing_HH=ffG(srcRing_H,this->gcBasis);			
 			idShow(srcRing_HH);
-			/*Substep 2.3
+			/*Substep 2.2.1
+			Mark according to G_-\alpha
+			Here we have a minimal basis srcRing_HH. In order to turn this basis into a reduced basis
+			we have to compute an interior point of C(srcRing_HH). For this we need to know the cone
+			represented by srcRing_HH MARKED ACCORDING TO G_{-\alpha}
+			Thus we check whether the leading monomials of srcRing_HH and srcRing_H coincide. If not we 
+			compute the difference accordingly
+			*/
+			dd_set_global_constants;
+			bool markingsAreCorrect=FALSE;
+			dd_MatrixPtr intPointMatrix;
+			int iPMatrixRows=0;
+			dd_rowrange aktrow=0;			
+			for (int ii=0;ii<IDELEMS(srcRing_HH);ii++)
+			{
+				poly aktpoly=(poly)srcRing_HH->m[ii];
+				iPMatrixRows = iPMatrixRows+pLength(aktpoly)-1;
+			}
+			intPointMatrix = dd_CreateMatrix(iPMatrixRows,this->numVars+1);
+			
+			for (int ii=0;ii<IDELEMS(srcRing_HH);ii++)
+			{
+				poly aktpoly=srcRing_HH->m[ii];
+				/*Comparison of leading monomials is done via exponent vectors*/
+				for (int jj=0;jj<IDELEMS(H);jj++)
+				{
+					int *src_ExpV = (int *)omAlloc((this->numVars+1)*sizeof(int));
+					int *dst_ExpV = (int *)omAlloc((this->numVars+1)*sizeof(int));
+					pGetExpV(aktpoly,src_ExpV);
+					pGetExpV(pCopy(H->m[ii]),dst_ExpV);
+					cout << *src_ExpV << endl;
+					cout << *dst_ExpV << endl;
+					if (src_ExpV == dst_ExpV)
+					{
+						markingsAreCorrect=TRUE; //everything is fine
+						cout << "correct markings" << endl;
+					}//if (pHead(aktpoly)==pHead(H->m[jj])
+					delete src_ExpV;
+					delete dst_ExpV;
+				}//for (int jj=0;jj<IDELEMS(H);jj++)
+				
+				int *v=(int *)omAlloc((this->numVars+1)*sizeof(int));
+				int *leadExpV=(int *)omAlloc((this->numVars+1)*sizeof(int));
+				if (markingsAreCorrect==TRUE)
+				{
+					pGetExpV(aktpoly,leadExpV);
+				}
+				else
+				{
+					pGetExpV(pCopy(pHead(H->m[ii])),leadExpV); //We use H->m[ii] as leading monomial
+				}
+				/*compute differences of the expvects*/
+				while (pNext(aktpoly)!=NULL)
+				{
+					aktpoly=pNext(aktpoly);
+					pGetExpV(aktpoly,v);						
+					for (int jj=0;jj<this->numVars;jj++)
+					{				
+						/*Store into ddMatrix*/			
+						/*FIXME Wrong values*/
+						dd_set_si(intPointMatrix->matrix[aktrow][jj+1],v[jj+1]-leadExpV[jj+1]);
+					}
+					aktrow +=1;
+				}
+				delete v;
+				delete leadExpV;
+			}//for (int ii=0;ii<IDELEMS(srcRing_HH);ii++)
+			dd_WriteMatrix(stdout,intPointMatrix);
+			dd_FreeMatrix(intPointMatrix);
+			
+			/*Step 3
 			turn the minimal basis into a reduced one
 			*/
 			
