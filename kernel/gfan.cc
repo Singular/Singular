@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-04-16 09:59:16 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.34 2009-04-16 09:59:16 monerjan Exp $
-$Id: gfan.cc,v 1.34 2009-04-16 09:59:16 monerjan Exp $
+$Date: 2009-04-17 13:44:27 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.35 2009-04-17 13:44:27 monerjan Exp $
+$Id: gfan.cc,v 1.35 2009-04-17 13:44:27 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -462,7 +462,7 @@ class gcone
 			ideal srcRing_HH;			
 			srcRing_H=idrCopyR(H,dstRing);
 			idShow(srcRing_H);			
-			srcRing_HH=ffG(srcRing_H,this->gcBasis);			
+			srcRing_HH=ffG(srcRing_H,this->gcBasis);		
 			idShow(srcRing_HH);
 			/*Substep 2.2.1
 			Mark according to G_-\alpha
@@ -482,10 +482,14 @@ class gcone
 				poly aktpoly=(poly)srcRing_HH->m[ii];
 				iPMatrixRows = iPMatrixRows+pLength(aktpoly)-1;
 			}
-			intPointMatrix = dd_CreateMatrix(iPMatrixRows,this->numVars+1);
+			/* additionally one row for the standard-simplex and another for a row that becomes 0 during
+			construction of the differences
+			*/
+			intPointMatrix = dd_CreateMatrix(iPMatrixRows+2,this->numVars+1);
 			
 			for (int ii=0;ii<IDELEMS(srcRing_HH);ii++)
 			{
+				markingsAreCorrect=FALSE;	//crucial to initialise here
 				poly aktpoly=srcRing_HH->m[ii];
 				/*Comparison of leading monomials is done via exponent vectors*/
 				for (int jj=0;jj<IDELEMS(H);jj++)
@@ -493,10 +497,20 @@ class gcone
 					int *src_ExpV = (int *)omAlloc((this->numVars+1)*sizeof(int));
 					int *dst_ExpV = (int *)omAlloc((this->numVars+1)*sizeof(int));
 					pGetExpV(aktpoly,src_ExpV);
+					rChangeCurrRing(dstRing);	//this ring change is crucial!
 					pGetExpV(pCopy(H->m[ii]),dst_ExpV);
-					cout << *src_ExpV << endl;
-					cout << *dst_ExpV << endl;
-					if (src_ExpV == dst_ExpV)
+					rChangeCurrRing(srcRing);
+					bool expVAreEqual=TRUE;
+					for (int kk=1;kk<=this->numVars;kk++)
+					{
+						cout << src_ExpV[kk] << "," << dst_ExpV[kk] << endl;
+						if (src_ExpV[kk]!=dst_ExpV[kk])
+						{
+							expVAreEqual=FALSE;
+						}
+					}					
+					//if (*src_ExpV == *dst_ExpV)
+					if (expVAreEqual==TRUE)
 					{
 						markingsAreCorrect=TRUE; //everything is fine
 						cout << "correct markings" << endl;
@@ -513,25 +527,45 @@ class gcone
 				}
 				else
 				{
-					pGetExpV(pCopy(pHead(H->m[ii])),leadExpV); //We use H->m[ii] as leading monomial
+					rChangeCurrRing(dstRing);
+					pGetExpV(pHead(H->m[ii]),leadExpV); //We use H->m[ii] as leading monomial
+					rChangeCurrRing(srcRing);
 				}
-				/*compute differences of the expvects*/
+				/*compute differences of the expvects*/				
 				while (pNext(aktpoly)!=NULL)
 				{
-					aktpoly=pNext(aktpoly);
-					pGetExpV(aktpoly,v);						
+					/*The following if-else-block makes sure the first term (i.e. the wrongly marked term) 
+					is not omitted when computing the differences*/
+					if(markingsAreCorrect==TRUE)
+					{
+						aktpoly=pNext(aktpoly);
+						pGetExpV(aktpoly,v);
+					}
+					else
+					{
+						pGetExpV(pHead(aktpoly),v);
+						markingsAreCorrect=TRUE;
+					}
+
 					for (int jj=0;jj<this->numVars;jj++)
 					{				
-						/*Store into ddMatrix*/			
-						/*FIXME Wrong values*/
-						dd_set_si(intPointMatrix->matrix[aktrow][jj+1],v[jj+1]-leadExpV[jj+1]);
+						/*Store into ddMatrix*/								
+						dd_set_si(intPointMatrix->matrix[aktrow][jj+1],leadExpV[jj+1]-v[jj+1]);
 					}
 					aktrow +=1;
 				}
 				delete v;
 				delete leadExpV;
 			}//for (int ii=0;ii<IDELEMS(srcRing_HH);ii++)
+			/*Now we add the constraint for the standard simplex*/
+			/*NOTE:Might actually work without the standard simplex*/
+			//dd_set_si(intPointMatrix->matrix[aktrow][0],100);
+			for (int jj=1;jj<=this->numVars;jj++)
+			{
+				//dd_set_si(intPointMatrix->matrix[aktrow][jj],-1);
+			}
 			dd_WriteMatrix(stdout,intPointMatrix);
+			interiorPoint(intPointMatrix);	//TODO This should finally return an intvec
 			dd_FreeMatrix(intPointMatrix);
 			
 			/*Step 3
@@ -547,6 +581,7 @@ class gcone
 		* However, since we are only interested in the remainder, there is no need to
 		* compute the factors \f$ a_i \f$
 		*/
+		//NOTE: Should be replaced by kNF or kNF2
 		poly restOfDiv(poly const &f, ideal const &I)
 		{
 			cout << "Entering restOfDiv" << endl;
@@ -613,6 +648,7 @@ class gcone
 		
 		/** \brief Compute \f$ f-f^{\mathcal{G}} \f$
 		*/
+		//NOTE: use kNF or kNF2 instead of restOfDivision
 		ideal ffG(ideal const &H, ideal const &G)
 		{
 			cout << "Entering ffG" << endl;
@@ -622,6 +658,7 @@ class gcone
 			for (int ii=0;ii<size;ii++)
 			{
 				res->m[ii]=restOfDiv(H->m[ii],G);
+				//res->m[ii]=kNF(H->m[ii],G);
 				temp1=H->m[ii];
 				temp2=res->m[ii];				
 				temp3=pSub(temp1, temp2);
@@ -630,7 +667,7 @@ class gcone
 				//pSort(res->m[ii]);
 				//pSetm(res->m[ii]);
 				cout << "res->m["<<ii<<"]=";pWrite(res->m[ii]);						
-			}
+			}			
 			return res;
 		}
 		
@@ -685,6 +722,36 @@ class gcone
 				return FALSE;
 			}
 		}//bool isParallel
+		
+		void interiorPoint(dd_MatrixPtr &M) //no const &M here since we want to remove redundant rows
+		{
+			dd_LPPtr lp,lpInt;
+			dd_ErrorType err=dd_NoError;
+			dd_LPSolverType solver=dd_DualSimplex;
+			dd_LPSolutionPtr lpSol;
+			dd_rowset ddlinset,ddredrows;
+			dd_rowindex ddnewpos;
+			dd_NumberType numb;
+			numb=dd_Integer;
+			
+			M->numbtype=numb;
+			dd_MatrixCanonicalize(&M, &ddlinset, &ddredrows, &ddnewpos, &err);
+			dd_WriteMatrix(stdout,M);
+			
+			lp=dd_Matrix2LP(M, &err);
+			lpInt=dd_MakeLPforInteriorFinding(lp);
+			dd_LPSolve(lpInt,solver,&err);
+			lpSol=dd_CopyLPSolution(lpInt);
+			lpSol->numbtype=numb;
+			cout << "Interior point: ";
+			for (int ii=1; ii<(lpSol->d)-1;ii++)
+			{
+				dd_WriteNumber(stdout,lpSol->sol[ii]);
+			}
+			dd_FreeLPData(lp);
+			dd_FreeLPSolution(lpSol);
+			dd_FreeLPData(lpInt);			
+		}//void interiorPoint(dd_MatrixPtr const &M)
 };//class gcone
 
 ideal gfan(ideal inputIdeal)
