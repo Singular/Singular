@@ -1,10 +1,10 @@
 @comment -*-texinfo-*-
-@comment $Id: sca.doc,v 1.5 2009-04-14 17:53:27 Singular Exp $
+@comment $Id: sca.doc,v 1.6 2009-04-17 12:53:22 motsak Exp $
 @comment this file describes super-commutative algebras and their implementation in Singular
 
 @node Super-commutative algebras,LETTERPLACE,Mathematical background (plural),Non-commutative subsystem
 @section Super-commutative algebras
-@cindex SCA, Super-commutative algebras, @math{Z_2}-graded algebras
+@cindex SCA, Super-commutative algebras, Z_2-graded algebras
 
 This section describes basic mathematical notions, definition, and a little bit the implementation of
 the experimental non-commutative kernel extension @sc{Sca} of @sc{Singular}
@@ -32,6 +32,7 @@ where anti-commutative algebra generators have degree @math{1} and commutative a
 have degree @math{0}. 
 
 @item GR-algebra representation
+
 A super-commutative algebra with @math{n} commutative and @math{m} anti-commutative algebra generators can be represented 
 as factors of the following GR-algebra by some two-sided ideal: 
 @tex
@@ -39,6 +40,7 @@ $$K\left\langle x_1, \ldots, x_n; y_1, \ldots, y_m \mid y_j * y_i = - y_i y_j, j
 @end tex 
 
 @item Distinctive features
+
 Super-commutative algebras have zero divisors if @math{m > 0}: @math{y_i * y_i = 0}.
 
 Unlike other non-commutative algebras one may use any monomial ordering
@@ -68,4 +70,4 @@ std(I);
 
 See example of @code{superCommutative} from the library @code{nctools.lib}.
 
-For further details, please, refer to the coming (at the end of 2009) Ph.D thesis by Oleksandr Motsak.
+Reference: Ph.D thesis by Oleksandr Motsak (2009).
