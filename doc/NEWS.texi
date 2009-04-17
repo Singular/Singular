@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.132 2009-04-15 11:03:46 seelisch Exp $
+@comment $Id: NEWS.texi,v 1.133 2009-04-17 07:27:44 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -95,18 +95,24 @@ new library: jacobson.lib (see @nref{jacobson_lib}): Algorithms for Smith and Ja
 contributed library: cimonom.lib (see @nref{cimonom_lib}): determines if the toric ideal of an affine monomial curve is a complete intersection
 @item
 contributed library: phindex.lib (see @nref{phindex_lib}): Poincare-Hopf index of a real analytic vector field
+@end itemize
+
+@heading Changed @sc{Singular} libraries
+@item
+normal.lib (@nref{normal_lib}): changed structure of the reesult,
+@* new algorithms have been implemented which improve the performance
 @item
 elim.lib (@nref{elim_lib}): @nref{elim}, @nref{nselect}, @nref{select}, @nref{select1}: changed syntax
 @item
 homolog.lib: kernel renamed to @nref{hom_kernel}. 
 @*(See also @nref{kernel}, @nref{alg_kernel}).
 @item
-matrix.lib: new commands for computing symmetric/exterior powers/bases
+matrix.lib (@nref{matrix_lib}): new commands for computing symmetric/exterior powers/bases
 @item
 surf.lib: new command @code{surfer}: interface to program @code{surfer}
 @*(See @nref{surf_lib}).
 @item
-teachstd.lib: spoly works now in non-commutative algebras and standard can thus be used there.
+teachstd.lib (@nref{teachstd_lib}): spoly works now in non-commutative algebras and @nref{standard} can thus be used there.
 However, since product criterion is a priori not applicable in the non-commutative case,
 one may want to disable it first (see @code{prodcrit} for details).
 @item
