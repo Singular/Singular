@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-04-17 13:44:27 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.35 2009-04-17 13:44:27 monerjan Exp $
-$Id: gfan.cc,v 1.35 2009-04-17 13:44:27 monerjan Exp $
+$Date: 2009-04-20 15:35:04 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.36 2009-04-20 15:35:04 monerjan Exp $
+$Id: gfan.cc,v 1.36 2009-04-20 15:35:04 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -20,7 +20,12 @@ $Id: gfan.cc,v 1.35 2009-04-17 13:44:27 monerjan Exp $
 #include "maps.h"
 #include "ring.h"
 #include "prCopy.h"
-#include "iostream.h"	//deprecated
+#include <iostream.h>	//deprecated
+
+/*remove the following at your own risk*/
+#ifndef GMPRATIONAL
+#define GMPRATIONAL
+#endif
 
 //Hacks for different working places
 #define ITWM
@@ -38,6 +43,7 @@ $Id: gfan.cc,v 1.35 2009-04-17 13:44:27 monerjan Exp $
 #ifdef ITWM
 #include "/u/slg/monerjan/cddlib/include/setoper.h"
 #include "/u/slg/monerjan/cddlib/include/cdd.h"
+#include "/u/slg/monerjan/cddlib/include/cddmp.h"
 #endif
 
 #ifndef gfan_DEBUG
@@ -163,7 +169,7 @@ class gcone
 		void getConeNormals(ideal const &I)
 		{
 #ifdef gfan_DEBUG
-			cout << "*** Computing Inequalities... ***" << endl;
+			std::cout << "*** Computing Inequalities... ***" << std::endl;
 #endif		
 			//All variables go here - except ineq matrix and *v, see below
 			int lengthGB=IDELEMS(I);	// # of polys in the groebner basis
@@ -177,8 +183,8 @@ class gcone
 			dd_colrange ddcols;
 			dd_rowset ddredrows;		// # of redundant rows in ddineq
 			dd_rowset ddlinset;		// the opposite
-			dd_rowindex ddnewpos;		// all to make dd_Canonicalize happy
-			dd_NumberType ddnumb=dd_Real;	//Number type
+			dd_rowindex ddnewpos;		  // all to make dd_Canonicalize happy
+			dd_NumberType ddnumb=dd_Integer; //Number type
 			dd_ErrorType dderr=dd_NoError;	//
 			// End of var declaration
 #ifdef gfan_DEBUG
@@ -202,7 +208,7 @@ class gcone
 			dd_set_global_constants();
 			ddrows=rows;
 			ddcols=cols;
-			dd_MatrixPtr ddineq; 		//Matrix to store the inequalities
+			dd_MatrixPtr ddineq; 		//Matrix to store the inequalities			
 			ddineq=dd_CreateMatrix(ddrows,ddcols+1); //The first col has to be 0 since cddlib checks for additive consts there
 		
 			// We loop through each g\in GB and compute the resulting inequalities
@@ -285,12 +291,25 @@ class gcone
 				intvec *load = new intvec(numvar);	//intvec to store a single facet normal that will then be stored via setFacetNormal
 				for (int jj = 1; jj <ddcols; jj++)
 				{
+#ifdef GMPRATIONAL
+					double foo;
+					foo = mpq_get_d(ddineq->matrix[kk][jj]);
+#ifdef gfan_DEBUG
+					std::cout << "fAct is " << foo << " at " << fAct << std::endl;
+#endif
+					(*load)[jj-1] = (int)foo;		//store typecasted entry at pos jj-1 of load
+#endif
+#ifndef GMPRATIONAL
 					double *foo;
-					foo = (double*)ddineq->matrix[kk][jj];	//get entry from actual position
+					foo = (double*)ddineq->matrix[kk][jj];	//get entry from actual position#endif
 #ifdef gfan_DEBUG
 					std::cout << "fAct is " << *foo << " at " << fAct << std::endl;
-#endif	
+#endif
 					(*load)[jj-1] = (int)*foo;		//store typecasted entry at pos jj-1 of load
+#endif //GMPRATIONAL					
+			
+
+					//(*load)[jj-1] = (int)foo;		//store typecasted entry at pos jj-1 of load
 					//check for flipability here
 					if (jj<ddcols)				//Is this facet NOT the last facet? Writing while instead of if is a really bad idea :)
 					{
@@ -363,11 +382,11 @@ class gcone
 			intvec *fNormal = new intvec(this->numVars);	//facet normal, check for parallelity			
 			fNormal = f->getFacetNormal();	//read this->fNormal;
 #ifdef gfan_DEBUG
-			cout << "===" << endl;
-			cout << "running gcone::flip" << endl;
-			cout << "fNormal=";
+			std::cout << "===" << std::endl;
+			std::cout << "running gcone::flip" << std::endl;
+			std::cout << "fNormal=";
 			fNormal->show();
-			cout << endl;
+			std::cout << std::endl;
 #endif				
 			/*1st step: Compute the initial ideal*/
 			poly initialFormElement[IDELEMS(gb)];	//array of #polys in GB to store initial form
@@ -472,7 +491,7 @@ class gcone
 			Thus we check whether the leading monomials of srcRing_HH and srcRing_H coincide. If not we 
 			compute the difference accordingly
 			*/
-			dd_set_global_constants;
+			dd_set_global_constants();
 			bool markingsAreCorrect=FALSE;
 			dd_MatrixPtr intPointMatrix;
 			int iPMatrixRows=0;
@@ -486,6 +505,7 @@ class gcone
 			construction of the differences
 			*/
 			intPointMatrix = dd_CreateMatrix(iPMatrixRows+2,this->numVars+1);
+			intPointMatrix->numbtype=dd_Integer;	//NOTE: DO NOT REMOVE OR CHANGE TO dd_Rational
 			
 			for (int ii=0;ii<IDELEMS(srcRing_HH);ii++)
 			{
@@ -559,14 +579,15 @@ class gcone
 			}//for (int ii=0;ii<IDELEMS(srcRing_HH);ii++)
 			/*Now we add the constraint for the standard simplex*/
 			/*NOTE:Might actually work without the standard simplex*/
-			//dd_set_si(intPointMatrix->matrix[aktrow][0],100);
+			dd_set_si(intPointMatrix->matrix[aktrow][0],-1);
 			for (int jj=1;jj<=this->numVars;jj++)
 			{
-				//dd_set_si(intPointMatrix->matrix[aktrow][jj],-1);
+				dd_set_si(intPointMatrix->matrix[aktrow][jj],1);
 			}
 			dd_WriteMatrix(stdout,intPointMatrix);
 			interiorPoint(intPointMatrix);	//TODO This should finally return an intvec
 			dd_FreeMatrix(intPointMatrix);
+			//dd_free_global_constants();
 			
 			/*Step 3
 			turn the minimal basis into a reduced one
@@ -723,26 +744,48 @@ class gcone
 			}
 		}//bool isParallel
 		
-		void interiorPoint(dd_MatrixPtr &M) //no const &M here since we want to remove redundant rows
+		void interiorPoint(dd_MatrixPtr M) //no const &M here since we want to remove redundant rows
 		{
 			dd_LPPtr lp,lpInt;
 			dd_ErrorType err=dd_NoError;
 			dd_LPSolverType solver=dd_DualSimplex;
-			dd_LPSolutionPtr lpSol;
+			dd_LPSolutionPtr lpSol=NULL;
 			dd_rowset ddlinset,ddredrows;
 			dd_rowindex ddnewpos;
-			dd_NumberType numb;
-			numb=dd_Integer;
+			dd_NumberType numb;	
+			//M->representation=dd_Inequality;
+			//M->objective-dd_LPMin;  //Not sure whether this is needed
+			dd_set_si(M->rowvec[0],1);dd_set_si(M->rowvec[1],1);dd_set_si(M->rowvec[2],1);
+			cout << "TICK 1" << endl;
+			//numb=dd_Rational;
 			
-			M->numbtype=numb;
-			dd_MatrixCanonicalize(&M, &ddlinset, &ddredrows, &ddnewpos, &err);
-			dd_WriteMatrix(stdout,M);
+			//M->numbtype=dd_Real;
+			//dd_MatrixCanonicalize(&M, &ddlinset, &ddredrows, &ddnewpos, &err);
+			//if (err!=dd_NoError){cout << "Error during dd_MatrixCanonicalize" << endl;}
+			cout << "Tick 2" << endl;
+			//dd_WriteMatrix(stdout,M);
 			
 			lp=dd_Matrix2LP(M, &err);
+			//if (err!=dd_NoError){cout << "Error during dd_Matrix2LP" << endl;}			
+			if (lp==NULL){cout << "LP is NULL" << endl;}
+			dd_WriteLP(stdout,lp);
+			cout << "Tick 3" << endl;
+						
 			lpInt=dd_MakeLPforInteriorFinding(lp);
-			dd_LPSolve(lpInt,solver,&err);
-			lpSol=dd_CopyLPSolution(lpInt);
-			lpSol->numbtype=numb;
+			//if (err!=dd_NoError){cout << "Error during dd_MakeLPForInteriorFinding" << endl;}
+			dd_WriteLP(stdout,lpInt);
+			cout << "Tick 4" << endl;
+			
+			dd_FindRelativeInterior(M,&ddlinset,&ddredrows,&lpSol,&err);
+			
+			//dd_LPSolve(lpInt,solver,&err);	//This will not result in a point from the relative interior
+			//if (err!=dd_NoError){cout << "Error during dd_LPSolve" << endl;}
+			cout << "Tick 5" << endl;
+									
+			//lpSol=dd_CopyLPSolution(lpInt);
+			//if (err!=dd_NoError){cout << "Error during dd_CopyLPSolution" << endl;}			
+			cout << "Tick 6" << endl;
+			
 			cout << "Interior point: ";
 			for (int ii=1; ii<(lpSol->d)-1;ii++)
 			{
@@ -750,7 +793,10 @@ class gcone
 			}
 			dd_FreeLPData(lp);
 			dd_FreeLPSolution(lpSol);
-			dd_FreeLPData(lpInt);			
+			dd_FreeLPData(lpInt);
+			dd_FreeMatrix(M);
+			set_free(ddlinset);
+			set_free(ddredrows);
 		}//void interiorPoint(dd_MatrixPtr const &M)
 };//class gcone
 
