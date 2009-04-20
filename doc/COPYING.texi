@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.45 2009-04-15 11:51:41 seelisch Exp $
+@comment $Id: COPYING.texi,v 1.46 2009-04-20 07:41:41 Singular Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -139,6 +139,7 @@ Viktor Levandovskyy,
 Oleksandr Motsak,
 Gerhard Pfister,
 Hans Sch@"onemann,
+Mathias Schulze,
 and
 Frank Seelisch.
 @cindex Brickenstein, Michael
@@ -147,6 +148,7 @@ Frank Seelisch.
 @cindex Fr@"uhbis-Kr@"uger, Anne
 @cindex Levandovskyy, Viktor
 @cindex Motsak, Oleksandr 
+@cindex Schulze, Mathias
 @cindex Seelisch, Frank
 
 Former members of the @sc{Singular} team are:
@@ -157,7 +159,6 @@ Wolfgang Neumann,
 Markus Perling,
 Wilfred Pohl,
 Jens Schmidt,
-Mathias Schulze,
 Thomas Siebert,
 R@"udiger Stobbe,
 Eric Westenberger,
