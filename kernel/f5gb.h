@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.36 2009-04-07 13:30:01 ederc Exp $ */
+/* $Id: f5gb.h,v 1.37 2009-04-20 13:54:50 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -95,6 +95,28 @@ reduction including subalgorithm topReduction() using Faugere's criteria
 */
 inline void reduction(LList* sPolyList, CList* critPairs, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag,
                  ideal gbPrev);
+
+/*
+========================================================================
+reduction including subalgorithm topReduction() using Faugere's criteria
+========================================================================
+*/
+inline void newReduction(LList* sPolyList, CList* critPairs, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag,
+                 ideal gbPrev);
+
+/*!
+ * ================================================================================
+ * searches for reducers of temp similar to the symbolic preprocessing of F4  and 
+ * divides them into a "good" and "bad" part:
+ * 
+ * the "good" ones are the reducers which do not corrupt the label of temp, with
+ * these the normal form of temp is computed
+ *
+ * the "bad" ones are the reducers which corrupt the label of temp, they are tested 
+ * later on for possible new rules and S-polynomials to be added to the algorithm
+ * ================================================================================
+ */
+void findReducers(LNode* l, LList* sPolyList, LList* gPrev, CList* critPairs, RList* rules, LTagList* lTag, RTagList* rTag); 
 
 /*
 =====================================================================================

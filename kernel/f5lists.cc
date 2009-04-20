@@ -430,7 +430,6 @@ LTagNode::LTagNode(LNode* l, LTagNode* n) {
 }
 
  LTagNode::~LTagNode() {
-    delete next;
     delete data;   
 }
        
@@ -480,6 +479,16 @@ LTagList::LTagList() {
 LTagList::LTagList(LNode* l) {
     LTagNode* first =   new LTagNode(l);
     length          =   1;
+}
+
+LTagList::~LTagList() {
+    LTagNode* temp;
+    while(first) {
+        temp    =   first;
+        first   =   first->getNext();
+        delete  temp;
+        //Print("%p\n",first);
+    }
 }
 
 // declaration with first as parameter in LTagNode due to sorting of LTagList
@@ -888,6 +897,15 @@ poly RNode::getRuleTerm() {
     return data->getTerm();
 }
 
+void RNode::print() {
+    RNode* temp  =   this;
+    while(NULL != temp) {
+        pWrite(temp->getRuleTerm());
+        Print("%d\n\n",temp->getRuleIndex());
+        temp    =   temp->getNext();
+    }
+}
+
 /*
 ====================================
 functions working on the class RList
@@ -933,6 +951,10 @@ RNode* RList::getFirst() {
 
 Rule* RList::getRule() {
     return this->getRule();
+}
+
+void RList::print() {
+    first->print();
 }
 
 /*
