@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.14 2008-03-19 17:44:10 Singular Exp $ */
+/* $Id: mod_raw.cc,v 1.15 2009-04-21 09:53:59 Singular Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -19,13 +19,13 @@
 
 #include "mod2.h"
 #include "../Singular/static.h"
-#ifdef HAVE_STATIC
-#undef HAVE_DL
-#endif
 
 #include "mod_raw.h"
 #include "febase.h"
 
+#ifdef HAVE_STATIC
+#undef HAVE_DL
+#endif
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 #define BYTES_TO_CHECK 7
 
@@ -68,8 +68,6 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
     goto lib_type_end;
   }
 
-  
-  
   if( (strncmp(buf, &mach_o[0], 4)==0)) /* generic Mach-O module */
   {
     LT = LT_MACH_O;
@@ -97,7 +95,7 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
 /*****************************************************************************
  *
  * General section
- * These are just wrappers around the repsective dynl_* calls 
+ * These are just wrappers around the repsective dynl_* calls
  * which look for the binary in the bin_dir of Singular and ommit warnings if
  * somethings goes wrong
  *
@@ -115,7 +113,7 @@ void* dynl_open_binary_warn(char* binary_name, const char* msg)
   if (bin_dir != NULL)
   {
     char path_name[MAXPATHLEN];
-    sprintf(path_name, "%s%s%s.%s", bin_dir, DIR_SEPP, binary_name, 
+    sprintf(path_name, "%s%s%s.%s", bin_dir, DIR_SEPP, binary_name,
             DL_TAIL);
     handle = dynl_open(path_name);
     if (handle == NULL && ! warn_handle)
@@ -259,10 +257,10 @@ void *dynl_open(char *filename)
 void *dynl_sym(void *handle, const char *symbol)
 {
   func_ptr        f;
-  
+
   if (handle == DYNL_KERNEL_HANDLE)
     handle = PROG_HANDLE;
-  
+
   if (shl_findsym((shl_t *) & handle, symbol, TYPE_PROCEDURE, &f) == -1)
   {
     if (shl_findsym((shl_t *) & handle, symbol, TYPE_UNDEFINED, &f) == -1)
@@ -307,7 +305,7 @@ const char *dynl_error()
 #if defined(SunOS_4)
 #define DL_NOT_IMPLEMENTED
 #endif
- 
+
 /*****************************************************************************
  * SECTION generic: dynamic madules not available
  *****************************************************************************/
