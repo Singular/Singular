@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-04-20 15:35:04 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.36 2009-04-20 15:35:04 monerjan Exp $
-$Id: gfan.cc,v 1.36 2009-04-20 15:35:04 monerjan Exp $
+$Date: 2009-04-21 15:23:54 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.37 2009-04-21 15:23:54 monerjan Exp $
+$Id: gfan.cc,v 1.37 2009-04-21 15:23:54 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -744,59 +744,65 @@ class gcone
 			}
 		}//bool isParallel
 		
-		void interiorPoint(dd_MatrixPtr M) //no const &M here since we want to remove redundant rows
+		void interiorPoint(dd_MatrixPtr &M) //no const &M here since we want to remove redundant rows
 		{
 			dd_LPPtr lp,lpInt;
 			dd_ErrorType err=dd_NoError;
 			dd_LPSolverType solver=dd_DualSimplex;
 			dd_LPSolutionPtr lpSol=NULL;
-			dd_rowset ddlinset,ddredrows;
+			dd_rowset ddlinset,ddredrows;	//needed for dd_FindRelativeInterior
 			dd_rowindex ddnewpos;
 			dd_NumberType numb;	
 			//M->representation=dd_Inequality;
 			//M->objective-dd_LPMin;  //Not sure whether this is needed
 			dd_set_si(M->rowvec[0],1);dd_set_si(M->rowvec[1],1);dd_set_si(M->rowvec[2],1);
-			cout << "TICK 1" << endl;
-			//numb=dd_Rational;
-			
-			//M->numbtype=dd_Real;
+			//cout << "TICK 1" << endl;
+						
 			//dd_MatrixCanonicalize(&M, &ddlinset, &ddredrows, &ddnewpos, &err);
 			//if (err!=dd_NoError){cout << "Error during dd_MatrixCanonicalize" << endl;}
-			cout << "Tick 2" << endl;
+			//cout << "Tick 2" << endl;
 			//dd_WriteMatrix(stdout,M);
 			
 			lp=dd_Matrix2LP(M, &err);
-			//if (err!=dd_NoError){cout << "Error during dd_Matrix2LP" << endl;}			
+			if (err!=dd_NoError){cout << "Error during dd_Matrix2LP in gcone::interiorPoint" << endl;}			
 			if (lp==NULL){cout << "LP is NULL" << endl;}
 			dd_WriteLP(stdout,lp);
-			cout << "Tick 3" << endl;
+			//cout << "Tick 3" << endl;
 						
 			lpInt=dd_MakeLPforInteriorFinding(lp);
-			//if (err!=dd_NoError){cout << "Error during dd_MakeLPForInteriorFinding" << endl;}
+			if (err!=dd_NoError){cout << "Error during dd_MakeLPForInteriorFinding in gcone::interiorPoint" << endl;}
 			dd_WriteLP(stdout,lpInt);
-			cout << "Tick 4" << endl;
+			//cout << "Tick 4" << endl;
 			
 			dd_FindRelativeInterior(M,&ddlinset,&ddredrows,&lpSol,&err);
+			if (err!=dd_NoError)
+			{
+				cout << "Error during dd_FindRelativeInterior in gcone::interiorPoint" << endl;
+				dd_WriteErrorMessages(stdout, err);
+			}
 			
-			//dd_LPSolve(lpInt,solver,&err);	//This will not result in a point from the relative interior
-			//if (err!=dd_NoError){cout << "Error during dd_LPSolve" << endl;}
-			cout << "Tick 5" << endl;
+			dd_LPSolve(lpInt,solver,&err);	//This will not result in a point from the relative interior
+			if (err!=dd_NoError){cout << "Error during dd_LPSolve" << endl;}
+			//cout << "Tick 5" << endl;
 									
 			//lpSol=dd_CopyLPSolution(lpInt);
-			//if (err!=dd_NoError){cout << "Error during dd_CopyLPSolution" << endl;}			
-			cout << "Tick 6" << endl;
+			if (err!=dd_NoError){cout << "Error during dd_CopyLPSolution" << endl;}			
+			//cout << "Tick 6" << endl;
 			
 			cout << "Interior point: ";
 			for (int ii=1; ii<(lpSol->d)-1;ii++)
 			{
-				dd_WriteNumber(stdout,lpSol->sol[ii]);
+				dd_WriteNumber(stdout,lpSol->sol[ii]);				
 			}
-			dd_FreeLPData(lp);
 			dd_FreeLPSolution(lpSol);
 			dd_FreeLPData(lpInt);
-			dd_FreeMatrix(M);
+			dd_FreeLPData(lp);
 			set_free(ddlinset);
 			set_free(ddredrows);
+			/*At this point we have an interior point of type mpq_t 
+			Need to convert to an intvec
+			*/
+			
 		}//void interiorPoint(dd_MatrixPtr const &M)
 };//class gcone
 
