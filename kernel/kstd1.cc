@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.49 2009-04-23 11:36:32 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.50 2009-04-23 16:24:08 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1299,7 +1299,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 
       // clear strat->P
-      if (strat->P.lcm!=NULL) 
+      if (strat->P.lcm!=NULL)
 #ifdef HAVE_RINGS_LOC
         pLmDelete(strat->P.lcm);
 #else
@@ -1367,6 +1367,9 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
 poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
 {
+  assume(q!=NULL);
+  assume(!(idIs0(F)&&(Q==NULL)));
+
 // lazy_reduce flags: can be combined by |
 //#define KSTD_NF_LAZY   1
   // do only a reduction of the leading term
@@ -1379,8 +1382,8 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   LObject   h;
   BITSET save_test=test;
 
-  if ((idIs0(F))&&(Q==NULL))
-    return pCopy(q); /*F=0*/
+  //if ((idIs0(F))&&(Q==NULL))
+  //  return pCopy(q); /*F=0*/
   //strat->ak = si_max(idRankFreeModule(F),pMaxComp(q));
   /*- creating temp data structures------------------- -*/
   strat->kHEdgeFound = ppNoether != NULL;
@@ -1490,6 +1493,9 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
 
 ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
 {
+  assume(!idIs0(q));
+  assume(!(idIs0(F)&&(Q==NULL)));
+
 // lazy_reduce flags: can be combined by |
 //#define KSTD_NF_LAZY   1
   // do only a reduction of the leading term
@@ -1503,9 +1509,9 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   ideal res;
   BITSET save_test=test;
 
-  if (idIs0(q)) return idInit(IDELEMS(q),si_max(q->rank,F->rank));
-  if ((idIs0(F))&&(Q==NULL))
-    return idCopy(q); /*F=0*/
+  //if (idIs0(q)) return idInit(IDELEMS(q),si_max(q->rank,F->rank));
+  //if ((idIs0(F))&&(Q==NULL))
+  //  return idCopy(q); /*F=0*/
   //strat->ak = si_max(idRankFreeModule(F),idRankFreeModule(q));
   /*- creating temp data structures------------------- -*/
   strat->kHEdgeFound = ppNoether != NULL;
@@ -1986,6 +1992,8 @@ poly kNF(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
 {
   if (p==NULL)
      return NULL;
+  if ((idIs0(F))&&(Q==NULL))
+    return pCopy(p); /*F+Q=0*/
   kStrategy strat=new skStrategy;
   strat->syzComp = syzComp;
   strat->ak = si_max(idRankFreeModule(F),pMaxComp(p));
@@ -2027,6 +2035,11 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
   {
     Print("(S:%d)",IDELEMS(p));mflush();
   }
+  if (idIs0(p))
+    return idInit(IDELEMS(p),si_max(p->rank,F->rank));
+  if ((idIs0(F))&&(Q==NULL))
+    return idCopy(p); /*F+Q=0*/
+
   kStrategy strat=new skStrategy;
   strat->syzComp = syzComp;
   strat->ak = si_max(idRankFreeModule(F),idRankFreeModule(p));

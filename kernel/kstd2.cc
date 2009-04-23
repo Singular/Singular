@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.84 2009-04-23 11:36:46 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.85 2009-04-23 16:24:08 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -745,7 +745,7 @@ int redHoney (LObject* h, kStrategy strat)
     /* compute the ecart */
     if (ei <= h->ecart)
       h->ecart = d-h_d;
-    else 
+    else
       h->ecart = d-h_d+ei-h->ecart;
 
     /*
@@ -1181,6 +1181,9 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
 poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
 {
+  assume(q!=NULL);
+  assume(!(idIs0(F)&&(Q==NULL)));
+
 // lazy_reduce flags: can be combined by |
 //#define KSTD_NF_LAZY   1
   // do only a reduction of the leading term
@@ -1189,8 +1192,8 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   poly   p;
   int   i;
 
-  if ((idIs0(F))&&(Q==NULL))
-    return pCopy(q); /*F=0*/
+  //if ((idIs0(F))&&(Q==NULL))
+  //  return pCopy(q); /*F=0*/
   //strat->ak = idRankFreeModule(F);
   /*- creating temp data structures------------------- -*/
   BITSET save_test=test;
@@ -1241,6 +1244,8 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
 
 ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
 {
+  assume(!idIs0(q));
+  assume(!(idIs0(F)&&(Q==NULL)));
 // lazy_reduce flags: can be combined by |
 //#define KSTD_NF_LAZY   1
   // do only a reduction of the leading term
@@ -1251,10 +1256,10 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   ideal res;
   int max_ind;
 
-  if (idIs0(q))
-    return idInit(IDELEMS(q),si_max(q->rank,F->rank));
-  if ((idIs0(F))&&(Q==NULL))
-    return idCopy(q); /*F=0*/
+  //if (idIs0(q))
+  //  return idInit(IDELEMS(q),si_max(q->rank,F->rank));
+  //if ((idIs0(F))&&(Q==NULL))
+  //  return idCopy(q); /*F=0*/
   //strat->ak = idRankFreeModule(F);
   /*- creating temp data structures------------------- -*/
   BITSET save_test=test;
