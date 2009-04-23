@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.134 2009-04-10 19:01:11 motsak Exp $ */
+/* $Id: kutil.cc,v 1.135 2009-04-23 17:28:07 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -168,7 +168,7 @@ static inline int pDivComp(poly p, poly q)
       if (_p_LmDivisibleByPart(p,currRing,
                            q,currRing,
                            currRing->real_var_start, currRing->real_var_end))
-        return 0; 
+        return 0;
       return pLmCmp(q,p); // ONLY FOR GLOBAL ORDER!
     }
 #endif
@@ -1556,24 +1556,24 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
         }
         else
         {
-          Lp.p = // nc_CreateSpoly(strat->S[i],p,currRing); 
+          Lp.p = // nc_CreateSpoly(strat->S[i],p,currRing);
                 nc_CreateShortSpoly(strat->S[i], p, currRing);
 
-          assume(pNext(Lp.p)==NULL); // TODO: this may be violated whenever ext.prod.crit. for Lie alg. is used    
+          assume(pNext(Lp.p)==NULL); // TODO: this may be violated whenever ext.prod.crit. for Lie alg. is used
           pNext(Lp.p) = strat->tail; // !!!
         }
       }
       else
       {
-        Lp.p = // nc_CreateSpoly(strat->S[i],p,currRing); 
+        Lp.p = // nc_CreateSpoly(strat->S[i],p,currRing);
               nc_CreateShortSpoly(strat->S[i], p, currRing);
 
-        assume(pNext(Lp.p)==NULL); // TODO: this may be violated whenever ext.prod.crit. for Lie alg. is used    
+        assume(pNext(Lp.p)==NULL); // TODO: this may be violated whenever ext.prod.crit. for Lie alg. is used
         pNext(Lp.p) = strat->tail; // !!!
 
       }
 
-      
+
 #if MYTEST
       if (TEST_OPT_DEBUG)
       {
@@ -1581,8 +1581,8 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
         PrintS("p: "); pWrite(p);
         PrintS("SPoly: "); pWrite(Lp.p);
       }
-#endif      
-      
+#endif
+
     }
     else
     #endif
@@ -1596,7 +1596,7 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
         PrintS("p: "); pWrite(p);
         PrintS("commutative SPoly: "); pWrite(Lp.p);
       }
-#endif      
+#endif
 
       }
   }
@@ -1626,10 +1626,10 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
 
     if (
         (!rIsPluralRing(currRing))
-//      ||  (rIsPluralRing(currRing) && (ncRingType(currRing) != nc_lie))         
+//      ||  (rIsPluralRing(currRing) && (ncRingType(currRing) != nc_lie))
        )
     {
-      assume(pNext(Lp.p)==NULL); // TODO: this may be violated whenever ext.prod.crit. for Lie alg. is used    
+      assume(pNext(Lp.p)==NULL); // TODO: this may be violated whenever ext.prod.crit. for Lie alg. is used
       pNext(Lp.p) = strat->tail; // !!!
     }
 
@@ -2005,7 +2005,7 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
             {
               if(TEST_OPT_DEBUG)
               {
-                 Print("chain-crit-part: S[%d]=",j); 
+                 Print("chain-crit-part: S[%d]=",j);
                  p_wrp(strat->S[j],currRing);
                  Print(" divide B[%d].lcm=",i);
                  p_wrp(strat->B[i].lcm,currRing);
@@ -2040,7 +2040,7 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
           {
               if(TEST_OPT_DEBUG)
               {
-                 PrintS("chain-crit-part: pCompareChainPart p="); 
+                 PrintS("chain-crit-part: pCompareChainPart p=");
                  p_wrp(p,currRing);
                  Print(" delete L[%d]",j);
                  p_wrp(strat->L[j].lcm,currRing);
@@ -2071,7 +2071,7 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
             {
               if(TEST_OPT_DEBUG)
               {
-                 Print("chain-crit-part: sugar B[%d].lcm=",j); 
+                 Print("chain-crit-part: sugar B[%d].lcm=",j);
                  p_wrp(strat->B[j].lcm,currRing);
                  Print(" delete B[%d]",i);
                  p_wrp(strat->B[i].lcm,currRing);
@@ -2084,7 +2084,7 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
             {
               if(TEST_OPT_DEBUG)
               {
-                 Print("chain-crit-part: sugar B[%d].lcm=",i); 
+                 Print("chain-crit-part: sugar B[%d].lcm=",i);
                  p_wrp(strat->B[i].lcm,currRing);
                  Print(" delete B[%d]",j);
                  p_wrp(strat->B[j].lcm,currRing);
@@ -2114,7 +2114,7 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
           {
               if(TEST_OPT_DEBUG)
               {
-                 PrintS("chain-crit-part: sugar:pCompareChainPart p="); 
+                 PrintS("chain-crit-part: sugar:pCompareChainPart p=");
                  p_wrp(p,currRing);
                  Print(" delete L[%d]",j);
                  p_wrp(strat->L[j].lcm,currRing);
@@ -2140,7 +2140,7 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
           {
               if(TEST_OPT_DEBUG)
               {
-                 Print("chain-crit-part: equal lcm B[%d].lcm=",j); 
+                 Print("chain-crit-part: equal lcm B[%d].lcm=",j);
                  p_wrp(strat->B[j].lcm,currRing);
                  Print(" delete B[%d]\n",i);
               }
@@ -2167,7 +2167,7 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
         {
               if(TEST_OPT_DEBUG)
               {
-                 PrintS("chain-crit-part: pCompareChainPart p="); 
+                 PrintS("chain-crit-part: pCompareChainPart p=");
                  p_wrp(p,currRing);
                  Print(" delete L[%d]",j);
                  p_wrp(strat->L[j].lcm,currRing);
@@ -2231,7 +2231,7 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
               */
               if(TEST_OPT_DEBUG)
               {
-                 PrintS("chain-crit-part: divisible_by p="); 
+                 PrintS("chain-crit-part: divisible_by p=");
                  p_wrp(p,currRing);
                  Print(" delete L[%d]",l);
                  p_wrp(strat->L[l].lcm,currRing);
@@ -2244,7 +2244,7 @@ void chainCritPart (poly p,int ecart,kStrategy strat)
             {
               if(TEST_OPT_DEBUG)
               {
-                 PrintS("chain-crit-part: divisible_by(2) p="); 
+                 PrintS("chain-crit-part: divisible_by(2) p=");
                  p_wrp(p,currRing);
                  Print(" delete L[%d]",i);
                  p_wrp(strat->L[i].lcm,currRing);
@@ -2319,7 +2319,7 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
       }
     }
 
-    if (new_pair) 
+    if (new_pair)
     {
 #ifdef HAVE_RATGRING
       if (currRing->real_var_start>0)
@@ -3111,7 +3111,7 @@ void enterpairsSpecial (poly h,int k,int ecart,int pos,kStrategy strat, int atR 
   }
 
   if (strat->noClearS) return;
-  
+
 //   #ifdef HAVE_PLURAL
 /*
   if (rIsPluralRing(currRing))
@@ -3127,14 +3127,14 @@ void enterpairsSpecial (poly h,int k,int ecart,int pos,kStrategy strat, int atR 
         j--;
         k--;
       }
-      
+
       j++;
     }
-  }    
+  }
   else
-*/  
-//   #endif // ??? Why was the following cancelation disabled for non-commutative rings? 
-  { 
+*/
+//   #endif // ??? Why was the following cancelation disabled for non-commutative rings?
+  {
     j=pos;
     loop
     {
@@ -4541,9 +4541,9 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
       cnt--;
       if (cnt==0)
       {
-        cnt=REDTAIL_CANONICALIZE; 
-        poly tmp=Ln.CanonicalizeP(); 
-        if (normalize) 
+        cnt=REDTAIL_CANONICALIZE;
+        poly tmp=Ln.CanonicalizeP();
+        if (normalize)
         {
           Ln.Normalize();
           //pNormalize(tmp);
@@ -4886,7 +4886,7 @@ void initSL (ideal F, ideal Q,kStrategy strat)
   }
   /*- test, if a unit is in F -*/
 
-  if ((strat->Ll>=0) 
+  if ((strat->Ll>=0)
 #ifdef HAVE_RINGS
        && nIsUnit(pGetCoeff(strat->L[strat->Ll].p))
 #endif
@@ -5523,17 +5523,17 @@ void enterT(LObject p, kStrategy strat, int atT)
   assume(p.FDeg == p.pFDeg());
   assume(!p.is_normalized || nIsOne(pGetCoeff(p.p)));
 
-#ifdef KDEBUG  
+#ifdef KDEBUG
   // do not put an LObject twice into T:
   for(i=strat->tl;i>=0;i--)
   {
-    if (p.p==strat->T[i].p) 
+    if (p.p==strat->T[i].p)
     {
       printf("already in T at pos %d of %d, atT=%d\n",i,strat->tl,atT);
       return;
     }
   }
-#endif  
+#endif
   strat->newt = TRUE;
   if (atT < 0)
     atT = strat->posInT(strat->T, strat->tl, p);
@@ -5942,7 +5942,7 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
 void completeReduce (kStrategy strat, BOOLEAN withT)
 {
   int i;
-  int low = (pOrdSgn == 1 ? 1 : 0);
+  int low = (((pOrdSgn==1) && (strat->fromQ==NULL) ? 1 : 0);
   LObject L;
 
 #ifdef KDEBUG
@@ -5963,13 +5963,16 @@ void completeReduce (kStrategy strat, BOOLEAN withT)
   }
   for (i=strat->sl; i>=low; i--)
   {
+    int end_pos=strat->sl;
+    if ((strat->fromQ!=NULL) && (strat->fromQ[i])) continue; // do not reduce Q_i
+    if (strat->ak==0) end_pos=i-1;
     TObject* T_j = strat->s_2_t(i);
     if (T_j != NULL)
     {
       L = *T_j;
       poly p;
       if (pOrdSgn == 1)
-        strat->S[i] = redtailBba(&L, i-1, strat, withT);
+        strat->S[i] = redtailBba(&L, end_pos, strat, withT);
       else
         strat->S[i] = redtail(&L, strat->sl, strat);
 
@@ -5988,7 +5991,7 @@ void completeReduce (kStrategy strat, BOOLEAN withT)
     {
       assume(currRing == strat->tailRing);
       if (pOrdSgn == 1)
-        strat->S[i] = redtailBba(strat->S[i], i-1, strat, withT);
+        strat->S[i] = redtailBba(strat->S[i], end_pos, strat, withT);
       else
         strat->S[i] = redtail(strat->S[i], strat->sl, strat);
       if (TEST_OPT_INTSTRATEGY)
@@ -6018,9 +6021,9 @@ BOOLEAN newHEdge(polyset S, kStrategy strat)
     scComputeHC(strat->Shdl,NULL,strat->ak,strat->kHEdge, strat->tailRing);
   else
     scComputeHCw(strat->Shdl,NULL,strat->ak,strat->kHEdge, strat->tailRing);
-#else    
+#else
   scComputeHC(strat->Shdl,NULL,strat->ak,strat->kHEdge, strat->tailRing);
-#endif  
+#endif
   if (strat->t_kHEdge != NULL) p_LmFree(strat->t_kHEdge, strat->tailRing);
   if (strat->tailRing != currRing)
     strat->t_kHEdge = k_LmInit_currRing_2_tailRing(strat->kHEdge, strat->tailRing);
@@ -6515,7 +6518,7 @@ void kDebugPrint(kStrategy strat)
 poly pMove2CurrTail(poly p, kStrategy strat)
 {
   /* assume: p is completely in currRing */
-  /* produces an object with LM in curring 
+  /* produces an object with LM in curring
      and TAIL in tailring */
   if (pNext(p)!=NULL)
   {
@@ -6584,7 +6587,7 @@ poly pCopyL2p(LObject H, kStrategy strat)
 //{
     /* creates LObject from the poly in currRing */
   /* actually put p into L.p and make L.t_p=NULL : does not work */
- 
+
 //}
 
 // poly pCopyL2p(LObject H, kStrategy strat)
@@ -6614,7 +6617,7 @@ poly pCopyL2p(LObject H, kStrategy strat)
 //     if (strat->tailBin != NULL && (pNext(h.p) != NULL))
 //     {
 //       p = p_ShallowCopyDelete(h.p, (strat->tailRing != NULL ? strat->tailRing : currRing), strat->tailBin);
-//     } 
+//     }
 //     return(p);
 //   }
 //   /* we're here if h.p != NULL and h.t_p != NULL */
@@ -6772,11 +6775,11 @@ void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy st
 
   /* these vars hold for all shifts of s[i] */
   int ecartq = 0; //Hans says it's ok; we're in the homog case, no ecart
-  
+
   int qfromQ;
   if (strat->fromQ != NULL)
   {
-    qfromQ = strat->fromQ[i]; 
+    qfromQ = strat->fromQ[i];
   }
   else
   {
@@ -6790,10 +6793,10 @@ void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy st
   // for the 0th shift: insert the orig. pair
   enterOnePairShift(qq, p, ecart, isFromQ, strat, -1, ecartq, qfromQ, j, i, uptodeg, lV);
 
-  for (j=1; j<= toInsert; j++) 
+  for (j=1; j<= toInsert; j++)
   {
     //    q = pLPshift(strat->S[i],j,uptodeg,lV);
-    q = p_LPshiftT(qq, j, uptodeg, lV, strat, currRing); 
+    q = p_LPshiftT(qq, j, uptodeg, lV, strat, currRing);
     //    q = p_mLPshift(qq,j,uptodeg,lV,currRing); // lm in currRing, shift this monomial
     //    s = p_LPshift(pNext(qq), j, uptodeg, lV, strat->tailRing); // from tailRing
     //    pNext(q) = s; // in tailRing
@@ -6852,7 +6855,7 @@ void enterOnePairSelfShifts (poly qq, poly p, int ecart, int isFromQ, kStrategy 
 
   /* these vars hold for all shifts of s[i] */
   int ecartq = 0; //Hans says it's ok; we're in the homog case, no ecart
-  int qfromQ = 0; // strat->fromQ[i]; 
+  int qfromQ = 0; // strat->fromQ[i];
 
   for (; j<= toInsert; j++)
   {
@@ -6897,7 +6900,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 //       PrintS("enterOnePairShift(q,p) invoked with q = ");
 //       wrp(q); //      wrp(pHead(q));
 //       PrintS(", p = ");
-//       wrp(p); //wrp(pHead(p)); 
+//       wrp(p); //wrp(pHead(p));
 //       PrintLn();
     }
 #endif
@@ -6932,7 +6935,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
       PrintS("V crit applied to q = ");
       wrp(q); //      wrp(pHead(q));
       PrintS(", p = ");
-      wrp(p); //wrp(pHead(p)); 
+      wrp(p); //wrp(pHead(p));
       PrintLn();
     }
 #endif
@@ -7107,7 +7110,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
 //     }
 //     else
 //     {
-    
+
     /* ksCreateShortSpoly needs two Lobject-kind presentations */
     /* p is already in this form, so convert q */
     //    q = pMove2CurrTail(q, strat);
@@ -7138,8 +7141,8 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
   {
     /*- the pair (S[i],p) enters B -*/
     /* both of them should have their LM in currRing and TAIL in tailring */
-    Lp.p1 = q;  // already in the needed form 
-    Lp.p2 = p; // already in the needed form 
+    Lp.p1 = q;  // already in the needed form
+    Lp.p2 = p; // already in the needed form
 
     if ( !rIsPluralRing(currRing) )
       pNext(Lp.p) = strat->tail;
@@ -7148,7 +7151,7 @@ void enterOnePairShift (poly q, poly p, int ecart, int isFromQ, kStrategy strat,
     /* at the beginning we DO NOT set atR = -1 ANYMORE*/
     if ( (atR >= 0) && (shiftcount==0) && (ifromS >=0) )
     {
-      Lp.i_r1 = kFindInT(Lp.p1,strat); //strat->S_2_R[ifromS]; 
+      Lp.i_r1 = kFindInT(Lp.p1,strat); //strat->S_2_R[ifromS];
       Lp.i_r2 = atR;
     }
     else
@@ -7299,7 +7302,7 @@ void enterTShift(LObject p, kStrategy strat, int atT, int uptodeg, int lV)
 
   if (atT < 0)
     atT = strat->posInT(strat->T, strat->tl, p);
-  
+
   /* can call enterT in a sequence, e.g. */
 
   /* shift0 = it's our model for further shifts */
@@ -7308,7 +7311,7 @@ void enterTShift(LObject p, kStrategy strat, int atT, int uptodeg, int lV)
   for (i=1; i<=toInsert; i++) // toIns - 1?
   {
     qq      = p; //qq.Copy();
-    qq.p    = NULL; 
+    qq.p    = NULL;
     qq.max  = NULL;
     qq.t_p = p_LPshift(p_Copy(p.t_p,strat->tailRing), i, uptodeg, lV, strat->tailRing); // direct shift
     qq.GetP();
