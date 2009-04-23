@@ -313,7 +313,7 @@ all:	$(SING_EXEC)
 Singular-static: version.h
 	sleep 1
 	echo "#define HAVE_STATIC" > static.h
-	(cd ../kernel;${MAKE} LD_STATIC=1 depend install-bindist;cd ../Singular)
+	(cd ../kernel;rm -f mod_raw.o;${MAKE} LD_STATIC=1 depend install-bindist;cd ../Singular)
 	${MAKE} LD_STATIC=1 S_EXT="-static" depend Singular-static
 	echo "#undef HAVE_STATIC" > static.h
 
