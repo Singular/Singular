@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.48 2009-03-06 10:14:41 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.49 2009-04-23 11:36:32 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1381,7 +1381,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
 
   if ((idIs0(F))&&(Q==NULL))
     return pCopy(q); /*F=0*/
-  strat->ak = si_max(idRankFreeModule(F),pMaxComp(q));
+  //strat->ak = si_max(idRankFreeModule(F),pMaxComp(q));
   /*- creating temp data structures------------------- -*/
   strat->kHEdgeFound = ppNoether != NULL;
   strat->kNoether    = pCopy(ppNoether);
@@ -1506,7 +1506,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   if (idIs0(q)) return idInit(IDELEMS(q),si_max(q->rank,F->rank));
   if ((idIs0(F))&&(Q==NULL))
     return idCopy(q); /*F=0*/
-  strat->ak = si_max(idRankFreeModule(F),idRankFreeModule(q));
+  //strat->ak = si_max(idRankFreeModule(F),idRankFreeModule(q));
   /*- creating temp data structures------------------- -*/
   strat->kHEdgeFound = ppNoether != NULL;
   strat->kNoether=pCopy(ppNoether);
@@ -1988,6 +1988,7 @@ poly kNF(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
      return NULL;
   kStrategy strat=new skStrategy;
   strat->syzComp = syzComp;
+  strat->ak = si_max(idRankFreeModule(F),pMaxComp(p));
 
   poly pp = p;
 
@@ -2028,6 +2029,7 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
   }
   kStrategy strat=new skStrategy;
   strat->syzComp = syzComp;
+  strat->ak = si_max(idRankFreeModule(F),idRankFreeModule(p));
 
   ideal pp = p;
 #ifdef HAVE_PLURAL

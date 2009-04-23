@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.83 2009-02-28 14:32:26 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.84 2009-04-23 11:36:46 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1191,7 +1191,7 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
 
   if ((idIs0(F))&&(Q==NULL))
     return pCopy(q); /*F=0*/
-  strat->ak = idRankFreeModule(F);
+  //strat->ak = idRankFreeModule(F);
   /*- creating temp data structures------------------- -*/
   BITSET save_test=test;
   test|=Sy_bit(OPT_REDTAIL);
@@ -1255,7 +1255,7 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
     return idInit(IDELEMS(q),si_max(q->rank,F->rank));
   if ((idIs0(F))&&(Q==NULL))
     return idCopy(q); /*F=0*/
-  strat->ak = idRankFreeModule(F);
+  //strat->ak = idRankFreeModule(F);
   /*- creating temp data structures------------------- -*/
   BITSET save_test=test;
   test|=Sy_bit(OPT_REDTAIL);
