@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.135 2009-04-23 17:28:07 Singular Exp $ */
+/* $Id: kutil.cc,v 1.136 2009-04-23 17:39:31 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -5942,7 +5942,7 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
 void completeReduce (kStrategy strat, BOOLEAN withT)
 {
   int i;
-  int low = (((pOrdSgn==1) && (strat->fromQ==NULL) ? 1 : 0);
+  int low = (((pOrdSgn==1) && (strat->ak==0)) ? 1 : 0);
   LObject L;
 
 #ifdef KDEBUG
