@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-04-21 15:23:54 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.37 2009-04-21 15:23:54 monerjan Exp $
-$Id: gfan.cc,v 1.37 2009-04-21 15:23:54 monerjan Exp $
+$Date: 2009-04-23 09:44:58 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.38 2009-04-23 09:44:58 monerjan Exp $
+$Id: gfan.cc,v 1.38 2009-04-23 09:44:58 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -21,6 +21,7 @@ $Id: gfan.cc,v 1.37 2009-04-21 15:23:54 monerjan Exp $
 #include "ring.h"
 #include "prCopy.h"
 #include <iostream.h>	//deprecated
+#include <bitset>
 
 /*remove the following at your own risk*/
 #ifndef GMPRATIONAL
@@ -133,8 +134,9 @@ finally this should become s.th. like gconelib.{h,cc} to provide an API
 class gcone
 {
 	private:
-		int numFacets;		//#of facets of the cone		
-
+		int numFacets;		//#of facets of the cone
+		ring rootRing;		
+		ideal inputIdeal;	//the original
 	public:
 		/** \brief Default constructor. 
 		*
@@ -145,6 +147,15 @@ class gcone
 			this->next=NULL;
 			this->facetPtr=NULL;
 		}
+		
+		gcone(ring r, ideal I)
+		{
+			this->next=NULL;
+			this->facetPtr=NULL;
+			this->rootRing=r;
+			this->inputIdeal=I;
+		}
+		
 		~gcone();		//destructor
 		
 		/** Pointer to the first facet */
@@ -448,17 +459,17 @@ class gcone
 			see journal p. 66
 			*/
 			ring srcRing=currRing;
-			ring dstRing=rCopy0(srcRing);
-			dstRing->order[0]=ringorder_a;
-			dstRing->wvhdl[0] =( int *)omAlloc((fNormal->length())*sizeof(int)); //found in Singular/ipshell.cc
+			ring tmpRing=rCopy0(srcRing);
+			tmpRing->order[0]=ringorder_a;
+			tmpRing->wvhdl[0] =( int *)omAlloc((fNormal->length())*sizeof(int)); //found in Singular/ipshell.cc
 			
 			for (int ii=0;ii<this->numVars;ii++)
 			{				
-				dstRing->wvhdl[0][ii]=-(*fNormal)[ii];	//What exactly am I doing here?
+				tmpRing->wvhdl[0][ii]=-(*fNormal)[ii];	//What exactly am I doing here?
 				//cout << tmpring->wvhdl[0][ii] << endl;
 			}
-			rComplete(dstRing);
-			rChangeCurrRing(dstRing);
+			rComplete(tmpRing);
+			rChangeCurrRing(tmpRing);
 			
 			rWrite(currRing); cout << endl;
 			ideal ina;			
@@ -479,7 +490,7 @@ class gcone
 			rChangeCurrRing(srcRing);
 			ideal srcRing_H;
 			ideal srcRing_HH;			
-			srcRing_H=idrCopyR(H,dstRing);
+			srcRing_H=idrCopyR(H,tmpRing);
 			idShow(srcRing_H);			
 			srcRing_HH=ffG(srcRing_H,this->gcBasis);		
 			idShow(srcRing_HH);
@@ -517,7 +528,7 @@ class gcone
 					int *src_ExpV = (int *)omAlloc((this->numVars+1)*sizeof(int));
 					int *dst_ExpV = (int *)omAlloc((this->numVars+1)*sizeof(int));
 					pGetExpV(aktpoly,src_ExpV);
-					rChangeCurrRing(dstRing);	//this ring change is crucial!
+					rChangeCurrRing(tmpRing);	//this ring change is crucial!
 					pGetExpV(pCopy(H->m[ii]),dst_ExpV);
 					rChangeCurrRing(srcRing);
 					bool expVAreEqual=TRUE;
@@ -547,7 +558,7 @@ class gcone
 				}
 				else
 				{
-					rChangeCurrRing(dstRing);
+					rChangeCurrRing(tmpRing);
 					pGetExpV(pHead(H->m[ii]),leadExpV); //We use H->m[ii] as leading monomial
 					rChangeCurrRing(srcRing);
 				}
@@ -585,13 +596,41 @@ class gcone
 				dd_set_si(intPointMatrix->matrix[aktrow][jj],1);
 			}
 			dd_WriteMatrix(stdout,intPointMatrix);
-			interiorPoint(intPointMatrix);	//TODO This should finally return an intvec
+			intvec *iv_weight = new intvec(this->numVars);
+			interiorPoint(intPointMatrix, *iv_weight);	//iv_weight now contains the interior point
 			dd_FreeMatrix(intPointMatrix);
-			//dd_free_global_constants();
+			dd_free_global_constants();
 			
 			/*Step 3
 			turn the minimal basis into a reduced one
 			*/
+			ring dstRing=rCopy0(srcRing);
+			dstRing->order[0]=ringorder_a;
+			//dstRing->order[1]=ringorder_dp;
+			dstRing->wvhdl[0] =( int *)omAlloc((iv_weight->length())*sizeof(int));
+			for (int ii=0;ii<this->numVars;ii++)
+			{				
+				dstRing->wvhdl[0][ii]=(*iv_weight)[ii];				
+			}
+			rComplete(dstRing);
+			rChangeCurrRing(dstRing);
+			rWrite(dstRing); cout << endl;
+			ideal dstRing_I;
+			//dstRing_I=idrCopyR(gb,srcRing);
+			dstRing_I=idrCopyR(srcRing_HH,srcRing);			
+			//validOpts<1>=TRUE;
+			idShow(dstRing_I);
+			ideal foo;
+			BITSET save=test;
+			test|=Sy_bit(OPT_REDSB);
+			test|=Sy_bit(6);	//OPT_DEBUG
+			//foo=kStd(idrCopyR(this->inputIdeal,this->rootRing),NULL,testHomog,NULL);
+			foo=kStd(dstRing_I,NULL,testHomog,NULL);
+			idShow(foo);
+			kInterRed(foo);
+			idSkipZeroes(foo);
+			idShow(foo);
+			test=save;
 			
 		}//void flip(ideal gb, facet *f)
 				
@@ -744,7 +783,7 @@ class gcone
 			}
 		}//bool isParallel
 		
-		void interiorPoint(dd_MatrixPtr &M) //no const &M here since we want to remove redundant rows
+		void interiorPoint(dd_MatrixPtr const &M, intvec &iv) //no const &M here since we want to remove redundant rows
 		{
 			dd_LPPtr lp,lpInt;
 			dd_ErrorType err=dd_NoError;
@@ -781,7 +820,7 @@ class gcone
 				dd_WriteErrorMessages(stdout, err);
 			}
 			
-			dd_LPSolve(lpInt,solver,&err);	//This will not result in a point from the relative interior
+			//dd_LPSolve(lpInt,solver,&err);	//This will not result in a point from the relative interior
 			if (err!=dd_NoError){cout << "Error during dd_LPSolve" << endl;}
 			//cout << "Tick 5" << endl;
 									
@@ -792,15 +831,18 @@ class gcone
 			cout << "Interior point: ";
 			for (int ii=1; ii<(lpSol->d)-1;ii++)
 			{
-				dd_WriteNumber(stdout,lpSol->sol[ii]);				
+				dd_WriteNumber(stdout,lpSol->sol[ii]);
+				(iv)[ii-1]=(int)mpz_get_d(mpq_numref(lpSol->sol[ii]));	//looks evil, but does the trick
 			}
 			dd_FreeLPSolution(lpSol);
 			dd_FreeLPData(lpInt);
 			dd_FreeLPData(lp);
 			set_free(ddlinset);
 			set_free(ddredrows);
+			
 			/*At this point we have an interior point of type mpq_t 
 			Need to convert to an intvec
+			NOTE: Resolved
 			*/
 			
 		}//void interiorPoint(dd_MatrixPtr const &M)
@@ -847,7 +889,8 @@ ideal gfan(ideal inputIdeal)
 	cout << endl;
 #endif	
 	
-	gcone *gcRoot = new gcone();	//Instantiate the sink
+	//gcone *gcRoot = new gcone();	//Instantiate the sink
+	gcone *gcRoot = new gcone(rootRing,rootIdeal);
 	gcone *gcAct;
 	gcAct = gcRoot;
 	gcAct->numVars=pVariables;
