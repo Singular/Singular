@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-04-23 09:44:58 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.38 2009-04-23 09:44:58 monerjan Exp $
-$Id: gfan.cc,v 1.38 2009-04-23 09:44:58 monerjan Exp $
+$Date: 2009-04-24 15:23:16 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.39 2009-04-24 15:23:16 monerjan Exp $
+$Id: gfan.cc,v 1.39 2009-04-24 15:23:16 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -135,7 +135,7 @@ class gcone
 {
 	private:
 		int numFacets;		//#of facets of the cone
-		ring rootRing;		
+		ring rootRing;		//good to know this -> generic walk
 		ideal inputIdeal;	//the original
 	public:
 		/** \brief Default constructor. 
@@ -148,6 +148,11 @@ class gcone
 			this->facetPtr=NULL;
 		}
 		
+		/** \brief Constructor with ring and ideal
+		*
+		* This constructor takes the root ring and the root ideal as parameters and stores 
+		* them in the private members gcone::rootRing and gcone::inputIdeal
+		*/
 		gcone(ring r, ideal I)
 		{
 			this->next=NULL;
@@ -161,6 +166,7 @@ class gcone
 		/** Pointer to the first facet */
 		facet *facetPtr;	//Will hold the adress of the first facet; set by gcone::getConeNormals
 		poly gcMarkedTerm; 	//marked terms of the cone's Groebner basis
+		/** # of variables in the ring */
 		int numVars;		//#of variables in the ring
 		
 		/** Contains the Groebner basis of the cone. Is set by gcone::getGB(ideal I)*/
@@ -305,17 +311,17 @@ class gcone
 #ifdef GMPRATIONAL
 					double foo;
 					foo = mpq_get_d(ddineq->matrix[kk][jj]);
-#ifdef gfan_DEBUG
+/*#ifdef gfan_DEBUG
 					std::cout << "fAct is " << foo << " at " << fAct << std::endl;
-#endif
+#endif*/
 					(*load)[jj-1] = (int)foo;		//store typecasted entry at pos jj-1 of load
 #endif
 #ifndef GMPRATIONAL
 					double *foo;
 					foo = (double*)ddineq->matrix[kk][jj];	//get entry from actual position#endif
-#ifdef gfan_DEBUG
+/*#ifdef gfan_DEBUG
 					std::cout << "fAct is " << *foo << " at " << fAct << std::endl;
-#endif
+#endif*/
 					(*load)[jj-1] = (int)*foo;		//store typecasted entry at pos jj-1 of load
 #endif //GMPRATIONAL					
 			
@@ -382,7 +388,7 @@ class gcone
 		* suffices. A term \f$ x^\gamma \f$ of \f$ g \f$ is in \f$  in_\omega(g) \f$ iff \f$ \gamma - leadexp(g)\f$
 		* is parallel to \f$ leadexp(g) \f$
 		* Parallelity is checked using basic linear algebra. See gcone::isParallel.
-		* Other possibilities includes  computing the rank of the matrix consisting of the vectors in question and
+		* Other possibilities include computing the rank of the matrix consisting of the vectors in question and
 		* computing an interior point of the facet and taking all terms having the same weight with respect 
 		* to this interior point.
 		*\param ideal, facet
@@ -459,9 +465,31 @@ class gcone
 			see journal p. 66
 			*/
 			ring srcRing=currRing;
+			
+			/* copied and modified from ring.cc::rAssureSyzComp */
+			//ring tmpRing=rCopyAndChangeWeight(srcRing,fNormal);
 			ring tmpRing=rCopy0(srcRing);
-			tmpRing->order[0]=ringorder_a;
+			int i=rBlocks(srcRing);
+			int j;
+			tmpRing->order=(int *)omAlloc((i+1)*sizeof(int));
+			/*NOTE This should probably be set, but as of now crashes Singular*/
+			/*tmpRing->block0=(int *)omAlloc0((i+1)*sizeof(int));
+			tmpRing->block1=(int *)omAlloc0((i+1)*sizeof(int));*/
 			tmpRing->wvhdl[0] =( int *)omAlloc((fNormal->length())*sizeof(int)); //found in Singular/ipshell.cc
+			for(j=i;j>0;j--)
+			{
+				tmpRing->order[j]=srcRing->order[j-1];
+				tmpRing->block0[j]=srcRing->block0[j-1];
+				tmpRing->block1[j]=srcRing->block1[j-1];
+				if (srcRing->wvhdl[j-1] != NULL)
+				{
+					tmpRing->wvhdl[j] = (int*) omMemDup(srcRing->wvhdl[j-1]);
+				}
+			}
+			tmpRing->order[0]=ringorder_a;
+			tmpRing->order[1]=ringorder_dp;
+			tmpRing->order[2]=ringorder_C;
+			//tmpRing->wvhdl[0] =( int *)omAlloc((fNormal->length())*sizeof(int)); //found in Singular/ipshell.cc
 			
 			for (int ii=0;ii<this->numVars;ii++)
 			{				
@@ -491,9 +519,15 @@ class gcone
 			ideal srcRing_H;
 			ideal srcRing_HH;			
 			srcRing_H=idrCopyR(H,tmpRing);
-			idShow(srcRing_H);			
+#ifdef gfan_DEBUG
+			cout << "srcRing_H = ";
+			idShow(srcRing_H); cout << endl;
+#endif
 			srcRing_HH=ffG(srcRing_H,this->gcBasis);		
-			idShow(srcRing_HH);
+#ifdef gfan_DEBUG
+			cout << "srcRing_HH = ";
+			idShow(srcRing_HH); cout << endl;
+#endif
 			/*Substep 2.2.1
 			Mark according to G_-\alpha
 			Here we have a minimal basis srcRing_HH. In order to turn this basis into a reduced basis
@@ -605,32 +639,50 @@ class gcone
 			turn the minimal basis into a reduced one
 			*/
 			ring dstRing=rCopy0(srcRing);
+			i=rBlocks(srcRing);
+			
+			dstRing->order=(int *)omAlloc((i+1)*sizeof(int));
+			for(j=i;j>0;j--)
+			{
+				dstRing->order[j]=srcRing->order[j-1];
+				dstRing->block0[j]=srcRing->block0[j-1];
+				dstRing->block1[j]=srcRing->block1[j-1];
+				if (srcRing->wvhdl[j-1] != NULL)
+				{
+					dstRing->wvhdl[j] = (int*) omMemDup(srcRing->wvhdl[j-1]);
+				}
+			}
 			dstRing->order[0]=ringorder_a;
-			//dstRing->order[1]=ringorder_dp;
+			dstRing->order[1]=ringorder_dp;
+			dstRing->order[2]=ringorder_C;			
 			dstRing->wvhdl[0] =( int *)omAlloc((iv_weight->length())*sizeof(int));
+			
 			for (int ii=0;ii<this->numVars;ii++)
 			{				
 				dstRing->wvhdl[0][ii]=(*iv_weight)[ii];				
 			}
 			rComplete(dstRing);
 			rChangeCurrRing(dstRing);
+#ifdef gfan_DEBUG
 			rWrite(dstRing); cout << endl;
-			ideal dstRing_I;
-			//dstRing_I=idrCopyR(gb,srcRing);
+#endif
+			ideal dstRing_I;			
 			dstRing_I=idrCopyR(srcRing_HH,srcRing);			
 			//validOpts<1>=TRUE;
+#ifdef gfan_DEBUG
 			idShow(dstRing_I);
-			ideal foo;
+#endif			
 			BITSET save=test;
 			test|=Sy_bit(OPT_REDSB);
-			test|=Sy_bit(6);	//OPT_DEBUG
-			//foo=kStd(idrCopyR(this->inputIdeal,this->rootRing),NULL,testHomog,NULL);
-			foo=kStd(dstRing_I,NULL,testHomog,NULL);
-			idShow(foo);
-			kInterRed(foo);
-			idSkipZeroes(foo);
-			idShow(foo);
+			test|=Sy_bit(6);	//OPT_DEBUG					
+			dstRing_I=kStd(idrCopyR(this->inputIdeal,this->rootRing),NULL,testHomog,NULL);					
+			kInterRed(dstRing_I);
+			idSkipZeroes(dstRing_I);
 			test=save;
+			/*End of step 3 - reduction*/
+			
+			f->setFlipGB(dstRing_I);//store the flipped GB
+			f->printFlipGB();
 			
 		}//void flip(ideal gb, facet *f)
 				
@@ -783,6 +835,8 @@ class gcone
 			}
 		}//bool isParallel
 		
+		/** \brief Compute an interior point of a given cone
+		*/
 		void interiorPoint(dd_MatrixPtr const &M, intvec &iv) //no const &M here since we want to remove redundant rows
 		{
 			dd_LPPtr lp,lpInt;
@@ -827,25 +881,59 @@ class gcone
 			//lpSol=dd_CopyLPSolution(lpInt);
 			if (err!=dd_NoError){cout << "Error during dd_CopyLPSolution" << endl;}			
 			//cout << "Tick 6" << endl;
-			
+#ifdef gfan_DEBUG
 			cout << "Interior point: ";
+#endif
 			for (int ii=1; ii<(lpSol->d)-1;ii++)
 			{
+#ifdef gfan_DEBUG
 				dd_WriteNumber(stdout,lpSol->sol[ii]);
+#endif
+				/* NOTE This works only as long as gmp returns fractions with the same denominator*/
 				(iv)[ii-1]=(int)mpz_get_d(mpq_numref(lpSol->sol[ii]));	//looks evil, but does the trick
 			}
 			dd_FreeLPSolution(lpSol);
 			dd_FreeLPData(lpInt);
 			dd_FreeLPData(lp);
 			set_free(ddlinset);
-			set_free(ddredrows);
-			
-			/*At this point we have an interior point of type mpq_t 
-			Need to convert to an intvec
-			NOTE: Resolved
-			*/
+			set_free(ddredrows);			
 			
 		}//void interiorPoint(dd_MatrixPtr const &M)
+		
+		ring rCopyAndChangeWeight(ring const r, intvec const *ivw)				
+		{
+			ring res=rCopy0(r, FALSE, FALSE);
+			int i=rBlocks(r);
+			int j;
+
+			res->order=(int *)omAlloc((i+1)*sizeof(int));
+			/*res->block0=(int *)omAlloc0((i+1)*sizeof(int));
+			res->block1=(int *)omAlloc0((i+1)*sizeof(int));
+			int ** wvhdl =(int **)omAlloc0((i+1)*sizeof(int**));*/
+			for(j=i;j>0;j--)
+			{
+				res->order[j]=r->order[j-1];
+				res->block0[j]=r->block0[j-1];
+				res->block1[j]=r->block1[j-1];
+				if (r->wvhdl[j-1] != NULL)
+				{
+					res->wvhdl[j] = (int*) omMemDup(r->wvhdl[j-1]);
+				}
+			}
+			res->order[0]=ringorder_a;
+			res->order[1]=ringorder_dp;
+			res->order[2]=ringorder_C;
+			//res->wvhdl = wvhdl;
+			
+			res->wvhdl[0] =( int *)omAlloc((ivw->length())*sizeof(int));
+			for (int ii=0;ii<this->numVars;ii++)
+			{				
+				res->wvhdl[0][ii]=(*ivw)[ii];				
+			}			
+			
+			rComplete(res);
+			return res;
+		}//rCopyAndChange
 };//class gcone
 
 ideal gfan(ideal inputIdeal)
@@ -857,8 +945,7 @@ ideal gfan(ideal inputIdeal)
 	#endif
 	ring inputRing=currRing;	// The ring the user entered
 	ring rootRing;			// The ring associated to the target ordering
-	ideal res;
-	//matrix ineq; 			//Matrix containing the boundary inequalities
+	ideal res;	
 	facet *fRoot;
 	
 	/*
@@ -873,6 +960,11 @@ ideal gfan(ideal inputIdeal)
 	*/
 	rootRing=rCopy0(currRing);
 	rootRing->order[0]=ringorder_lp;
+	/*rootRing->order[0]=ringorder_a;
+	rootRing->order[1]=ringorder_lp;
+	rootRing->wvhdl[0] =( int *)omAlloc(numvar*sizeof(int));
+	rootRing->wvhdl[0][1]=1;
+	rootRing->wvhdl[0][2]=1;*/
 	rComplete(rootRing);
 	rChangeCurrRing(rootRing);
 	
