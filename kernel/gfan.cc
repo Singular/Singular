@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-04-24 15:23:16 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.39 2009-04-24 15:23:16 monerjan Exp $
-$Id: gfan.cc,v 1.39 2009-04-24 15:23:16 monerjan Exp $
+$Date: 2009-04-27 14:39:52 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.40 2009-04-27 14:39:52 monerjan Exp $
+$Id: gfan.cc,v 1.40 2009-04-27 14:39:52 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -111,6 +111,12 @@ class facet
 			this->flipGB=I;
 		}
 		
+		/** Return the flipped GB*/
+		ideal getFlipGB()
+		{
+			return this->flipGB;
+		}
+		
 		/** Print the flipped GB*/
 		void printFlipGB()
 		{
@@ -120,6 +126,8 @@ class facet
 		bool isFlippable;	//flippable facet? Want to have cone->isflippable.facet[i]
 		bool isIncoming;	//Is the facet incoming or outgoing?
 		facet *next;		//Pointer to next facet
+		
+		friend class gcone;	//Bad style
 };
 
 /**
@@ -137,6 +145,7 @@ class gcone
 		int numFacets;		//#of facets of the cone
 		ring rootRing;		//good to know this -> generic walk
 		ideal inputIdeal;	//the original
+		/* TODO in order to save memory use pointers to rootRing and inputIdeal instead */
 	public:
 		/** \brief Default constructor. 
 		*
@@ -161,11 +170,33 @@ class gcone
 			this->inputIdeal=I;
 		}
 		
+		/** \brief Copy constructor 
+		*
+		* Copies one cone, forgets about everything but the facetNormal
+		*/			
+		gcone(gcone& gc)		
+		{
+			this->next=NULL;
+			facet *f=this->facetPtr;
+			f->fNormal=gc.facetPtr->getFacetNormal();
+			this->gcBasis=gc.facetPtr->getFlipGB();
+			
+			/*Reverse direction of the facet normal*/			
+			intvec *foo=f->getFacetNormal();
+			for (int ii=0; ii<this->numVars;ii++)
+			{
+				(*foo)[ii]=-(*foo)[ii];
+				//(*f).(*fNormal)[ii]=-( (*f).(*fNormal)[ii]);
+			}
+			f->setFacetNormal(foo);
+		}
+		
+		/** \brief Default destructor */
 		~gcone();		//destructor
 		
 		/** Pointer to the first facet */
 		facet *facetPtr;	//Will hold the adress of the first facet; set by gcone::getConeNormals
-		poly gcMarkedTerm; 	//marked terms of the cone's Groebner basis
+		
 		/** # of variables in the ring */
 		int numVars;		//#of variables in the ring
 		
@@ -450,11 +481,11 @@ class gcone
 				/*Now initialFormElement must be added to (ideal)initialForm */
 				initialForm->m[ii]=initialFormElement[ii];
 			}//for
-			f->setFlipGB(initialForm);	//FIXME PROBABLY WRONG TO STORE HERE SINCE INA!=flibGB			
+			//f->setFlipGB(initialForm);	//FIXME PROBABLY WRONG TO STORE HERE SINCE INA!=flibGB			
 #ifdef gfan_DEBUG
 			cout << "Initial ideal is: " << endl;
 			idShow(initialForm);
-			f->printFlipGB();
+			//f->printFlipGB();
 			cout << "===" << endl;
 #endif
 			delete check;
@@ -682,7 +713,10 @@ class gcone
 			/*End of step 3 - reduction*/
 			
 			f->setFlipGB(dstRing_I);//store the flipped GB
+#ifdef gfan_DEBUG
+			cout << "Flipped GB is: " << endl;
 			f->printFlipGB();
+#endif
 			
 		}//void flip(ideal gb, facet *f)
 				
@@ -797,7 +831,12 @@ class gcone
 			this->gcBasis=gb;	//write the GB into gcBasis
 		}//void getGB
 		
-		ideal GenGrbWlk(ideal, ideal);	//Implementation of the Generic Groebner Walk. Needed for a) Computing the sink and b) finding search facets
+		/** \brief The Generic Groebner Walk due to FJLT
+		* Needed for computing the search facet
+		*/
+		ideal GenGrbWlk(ideal, ideal)
+		{
+		}//GGW
 
 
 		/** \brief Compute the dot product of two intvecs
@@ -960,6 +999,7 @@ ideal gfan(ideal inputIdeal)
 	*/
 	rootRing=rCopy0(currRing);
 	rootRing->order[0]=ringorder_lp;
+	//NOTE: Build ring accordiing to rCopyAndChangeWeight
 	/*rootRing->order[0]=ringorder_a;
 	rootRing->order[1]=ringorder_lp;
 	rootRing->wvhdl[0] =( int *)omAlloc(numvar*sizeof(int));
@@ -992,7 +1032,7 @@ ideal gfan(ideal inputIdeal)
 	gcAct->flip(gcAct->gcBasis,gcAct->facetPtr);
 	/*Now it is time to compute the search facets, respectively start the reverse search.
 	But since we are in the root all facets should be search facets. IS THIS TRUE?
-	MIND: AS OF NOW, THE LIST OF FACETS IS NOT PURGED OF NON-FLIPPAPLE FACETS
+	NOTE: Check for flippability is not very sophisticated
 	*/
 	
 	/*As of now extra.cc expects gfan to return type ideal. Probably this will change in near future.
