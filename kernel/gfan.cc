@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-04-27 14:39:52 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.40 2009-04-27 14:39:52 monerjan Exp $
-$Id: gfan.cc,v 1.40 2009-04-27 14:39:52 monerjan Exp $
+$Date: 2009-04-28 16:18:37 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.41 2009-04-28 16:18:37 monerjan Exp $
+$Id: gfan.cc,v 1.41 2009-04-28 16:18:37 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -87,7 +87,8 @@ class facet
 		~facet(){;}
 		
 		/** Stores the facet normal \param intvec*/
-		void setFacetNormal(intvec *iv){
+		void setFacetNormal(intvec *iv)
+		{
 			this->fNormal = ivCopy(iv);
 			//return;
 		}
@@ -145,7 +146,10 @@ class gcone
 		int numFacets;		//#of facets of the cone
 		ring rootRing;		//good to know this -> generic walk
 		ideal inputIdeal;	//the original
+		ring baseRing;		//the basering of the cone		
 		/* TODO in order to save memory use pointers to rootRing and inputIdeal instead */
+		intvec *ivIntPt;	//an interior point of the cone
+		
 	public:
 		/** \brief Default constructor. 
 		*
@@ -155,6 +159,7 @@ class gcone
 		{
 			this->next=NULL;
 			this->facetPtr=NULL;
+			this->baseRing=currRing;
 		}
 		
 		/** \brief Constructor with ring and ideal
@@ -168,27 +173,39 @@ class gcone
 			this->facetPtr=NULL;
 			this->rootRing=r;
 			this->inputIdeal=I;
+			this->baseRing=currRing;
 		}
 		
 		/** \brief Copy constructor 
 		*
-		* Copies one cone, forgets about everything but the facetNormal
+		* Copies one cone, sets this->gcBasis to the flipped GB and reverses the 
+		* direction of the according facet normal
 		*/			
-		gcone(gcone& gc)		
+		gcone(const gcone& gc)		
 		{
 			this->next=NULL;
-			facet *f=this->facetPtr;
-			f->fNormal=gc.facetPtr->getFacetNormal();
-			this->gcBasis=gc.facetPtr->getFlipGB();
+			this->numVars=gc.numVars;			
+			facet *fAct= new facet();			
+			this->facetPtr=fAct;
 			
-			/*Reverse direction of the facet normal*/			
-			intvec *foo=f->getFacetNormal();
+			intvec *ivtmp = new intvec(this->numVars);						
+			ivtmp = gc.facetPtr->getFacetNormal();
+			ivtmp->show();			
+			
+			ideal gb;
+			gb=gc.facetPtr->getFlipGB();			
+			this->gcBasis=gb;//gc.facetPtr->getFlipGB();	//this cone's GB is the flipped GB
+			idShow(this->gcBasis);
+			
+			/*Reverse direction of the facet normal to make it an inner normal*/			
 			for (int ii=0; ii<this->numVars;ii++)
 			{
-				(*foo)[ii]=-(*foo)[ii];
-				//(*f).(*fNormal)[ii]=-( (*f).(*fNormal)[ii]);
+				(*ivtmp)[ii]=-(*ivtmp)[ii];				
 			}
-			f->setFacetNormal(foo);
+			//ivtmp->show(); cout << endl;
+			fAct->setFacetNormal(ivtmp);
+			//fAct->printNormal();cout << endl;
+			//ivtmp->show();cout << endl;
 		}
 		
 		/** \brief Default destructor */
@@ -204,6 +221,17 @@ class gcone
 		ideal gcBasis;		//GB of the cone, set by gcone::getGB();
 		gcone *next;		//Pointer to *previous* cone in search tree
 		
+		/** \brief Set the interior point of a cone */
+		void setIntPoint(intvec *iv)
+		{
+			this->ivIntPt=ivCopy(iv);
+		}
+		
+		void getIntPoint()
+		{
+			ivIntPt->show();
+		}
+		
 		/** \brief Compute the normals of the cone
 		*
 		* This method computes a representation of the cone in terms of facet normals. It takes an ideal
@@ -213,8 +241,11 @@ class gcone
 		* each row to represent an inequality of type const+x1+...+xn <= 0. While computing the normals we come across
 		* the set \f$ \partial\mathcal{G} \f$ which we might store for later use. C.f p71 of journal
 		* As a result of this procedure the pointer facetPtr points to the first facet of the cone.
+		*
+		* Optionally, if the parameter bool compIntPoint is set to TRUE the method will also compute
+		* an interior point of the cone.
 		*/
-		void getConeNormals(ideal const &I)
+		void getConeNormals(ideal const &I, bool compIntPoint=FALSE)
 		{
 #ifdef gfan_DEBUG
 			std::cout << "*** Computing Inequalities... ***" << std::endl;
@@ -402,7 +433,16 @@ class gcone
 			Adressing is done via *facetPtr
 			*/
 			
+			if (compIntPoint==TRUE)
+			{
+				intvec *iv = new intvec(this->numVars);
+				interiorPoint(ddineq, *iv);
+				this->setIntPoint(iv);	//stores the interior point in gcone::ivIntPt
+				delete iv;
+			}
+			
 			//Clean up but don't delete the return value! (Whatever it will turn out to be)
+			
 			dd_FreeMatrix(ddineq);
 			set_free(ddredrows);
 			free(ddnewpos);
@@ -716,8 +756,7 @@ class gcone
 #ifdef gfan_DEBUG
 			cout << "Flipped GB is: " << endl;
 			f->printFlipGB();
-#endif
-			
+#endif			
 		}//void flip(ideal gb, facet *f)
 				
 		/** \brief Compute the remainder of a polynomial by a given ideal
@@ -749,9 +788,9 @@ class gcone
 					{
 						//cout << "TICK 3" << endl;
 						poly step1,step2,step3;
-						cout << "dividing "; pWrite(pHead(p));cout << "by ";pWrite(pHead(I->m[ii-1])); cout << endl;
+						//cout << "dividing "; pWrite(pHead(p));cout << "by ";pWrite(pHead(I->m[ii-1])); cout << endl;
 						step1 = pDivideM(pHead(p),pHead(I->m[ii-1]));
-						cout << "LT(p)/LT(f_i)="; pWrite(step1); cout << endl;
+						//cout << "LT(p)/LT(f_i)="; pWrite(step1); cout << endl;
 						//cout << "TICK 3.1" << endl;
 						step2 = ppMult_qq(step1, I->m[ii-1]);
 						//cout << "TICK 3.2" << endl;
@@ -775,7 +814,7 @@ class gcone
 					r=pAdd(pCopy(r),pHead(p));
 					pSetm(r);
 					pSort(r);
-					cout << "r="; pWrite(r); cout << endl;
+					//cout << "r="; pWrite(r); cout << endl;
 					//cout << "TICK 6" << endl;
 					if (pLength(p)!=1)
 					{
@@ -786,7 +825,7 @@ class gcone
 						p=NULL;	//Hack to correct this situation						
 					}
 					//cout << "TICK 7" << endl;
-					cout << "p="; pWrite(p);
+					//cout << "p="; pWrite(p);
 				}//if (divOccured==FALSE)
 			}//while (p!=0)
 			return r;
@@ -1029,11 +1068,22 @@ ideal gfan(ideal inputIdeal)
 	gcAct->getGB(rootIdeal);	//sets gcone::gcBasis
 	idShow(gcAct->gcBasis);
 	gcAct->getConeNormals(gcAct->gcBasis);	//hopefully compute the normals
-	gcAct->flip(gcAct->gcBasis,gcAct->facetPtr);
+	//gcAct->flip(gcAct->gcBasis,gcAct->facetPtr);
 	/*Now it is time to compute the search facets, respectively start the reverse search.
 	But since we are in the root all facets should be search facets. IS THIS TRUE?
 	NOTE: Check for flippability is not very sophisticated
 	*/
+	facet *fAct=new facet();
+	fAct=gcAct->facetPtr;
+	while(fAct->next!=NULL)
+	{
+		gcAct->flip(gcAct->gcBasis,gcAct->facetPtr);
+		gcone *gcTmp = new gcone(*gcAct);
+		idShow(gcTmp->gcBasis);
+		gcTmp->getConeNormals(gcTmp->gcBasis, TRUE);
+		gcTmp->getIntPoint();
+		fAct = fAct->next;		
+	}
 	
 	/*As of now extra.cc expects gfan to return type ideal. Probably this will change in near future.
 	The return type will then be of type LIST_CMD
@@ -1043,7 +1093,8 @@ ideal gfan(ideal inputIdeal)
 	=> Count the cones!
 	*/
 	rChangeCurrRing(inputRing);
-	res=gcAct->gcBasis;
+	//res=gcAct->gcBasis;
+	res=gcRoot->gcBasis;
 	//cout << fRoot << endl;
 	return res;
 	//return GBlist;
