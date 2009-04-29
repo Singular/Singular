@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-04-28 16:18:37 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.41 2009-04-28 16:18:37 monerjan Exp $
-$Id: gfan.cc,v 1.41 2009-04-28 16:18:37 monerjan Exp $
+$Date: 2009-04-29 07:22:48 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.42 2009-04-29 07:22:48 monerjan Exp $
+$Id: gfan.cc,v 1.42 2009-04-29 07:22:48 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -1012,6 +1012,10 @@ class gcone
 			rComplete(res);
 			return res;
 		}//rCopyAndChange
+		
+		void reverseSearch()
+		{
+		}//reverseSearch
 };//class gcone
 
 ideal gfan(ideal inputIdeal)
@@ -1092,10 +1096,9 @@ ideal gfan(ideal inputIdeal)
 	Groebner Basis and merge this somehow with LIST_CMD
 	=> Count the cones!
 	*/
-	rChangeCurrRing(inputRing);
+	rChangeCurrRing(rootRing);
 	//res=gcAct->gcBasis;
-	res=gcRoot->gcBasis;
-	//cout << fRoot << endl;
+	res=gcRoot->gcBasis;	
 	return res;
 	//return GBlist;
 }
