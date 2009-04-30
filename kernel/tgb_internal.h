@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.73 2008-08-06 17:08:17 Singular Exp $ */
+/* $Id: tgb_internal.h,v 1.74 2009-04-30 17:02:33 Singular Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -466,7 +466,7 @@ public:
       {
         branches_len=branch+1;
         branches_len=si_max(branches_len,3);
-        branches=(NoroCacheNode**) omalloc(branches_len*sizeof(NoroCacheNode*));
+        branches=(NoroCacheNode**) omAlloc(branches_len*sizeof(NoroCacheNode*));
         int i;
         for(i=0;i<branches_len;i++)
         {
@@ -675,13 +675,13 @@ public:
     buffer=NULL;
 #ifdef NORO_RED_ARRAY_RESERVER
     reserved=0;
-    recursionPolyBuffer=(poly*)omalloc(1000000*sizeof(poly));
+    recursionPolyBuffer=(poly*)omAlloc(1000000*sizeof(poly));
 #endif
     nIrreducibleMonomials=0;
     nReducibleMonomials=0;
     temp_term=pOne();
     tempBufferSize=3000;
-    tempBuffer=omalloc(tempBufferSize);
+    tempBuffer=omAlloc(tempBufferSize);
   }
   void ensureTempBufferSize(size_t size)
   {
@@ -689,7 +689,7 @@ public:
     {
       tempBufferSize=2*size;
       omfree(tempBuffer);
-      tempBuffer=omalloc(tempBufferSize);
+      tempBuffer=omAlloc(tempBufferSize);
     }
   }
 #ifdef NORO_RED_ARRAY_RESERVER
