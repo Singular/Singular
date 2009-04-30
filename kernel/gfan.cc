@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-04-29 07:22:48 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.42 2009-04-29 07:22:48 monerjan Exp $
-$Id: gfan.cc,v 1.42 2009-04-29 07:22:48 monerjan Exp $
+$Date: 2009-04-30 09:32:01 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.43 2009-04-30 09:32:01 monerjan Exp $
+$Id: gfan.cc,v 1.43 2009-04-30 09:32:01 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -227,7 +227,13 @@ class gcone
 			this->ivIntPt=ivCopy(iv);
 		}
 		
-		void getIntPoint()
+		/** \brief Return the interior point */
+		intvec *getIntPoint()
+		{
+			return this->ivIntPt;
+		}
+		
+		void showIntPoint()
 		{
 			ivIntPt->show();
 		}
@@ -1013,8 +1019,92 @@ class gcone
 			return res;
 		}//rCopyAndChange
 		
-		void reverseSearch()
+		/** 
+		* Determines whether a given facet of a cone is the search facet of a neighbouring cone
+		*
+		*/
+		bool isSearchFacet(gcone &tmpcone, facet *testfacet)
+		{			
+			ring actRing=currRing;
+			
+			facet *fMin=new facet();	//Pointer to the "minimal" facet
+			facet *fAct;
+			fMin = testfacet;
+			fAct = fMin;
+			
+			rChangeCurrRing(this->rootRing);
+			poly p=NULL;
+			poly q=NULL;
+			intvec *p_weight = new intvec(this->numVars);			
+			intvec *q_weight = new intvec(this->numVars);
+			intvec *sigma = new intvec(this->numVars);
+			sigma=tmpcone.getIntPoint();
+			int *u=(int *)omAlloc((this->numVars+1)*sizeof(int));
+			int *v=(int *)omAlloc((this->numVars+1)*sizeof(int));
+			int weight1,weight2;
+			while(tmpcone.facetPtr->next!=NULL)
+			{
+				/* Get alpha_i and alpha_{i+1} */
+				p_weight=fMin->getFacetNormal();
+				q_weight=fMin->next->getFacetNormal();
+				
+				/*Compute the dot product of sigma and alpha_{i,j}*/
+				weight1=dotProduct(sigma,p_weight);
+				weight2=dotProduct(sigma,q_weight);
+				
+				/*Adjust alpha_i and alpha_i+1 accordingly*/
+				for(int ii=1;ii<=this->numVars;ii++)
+				{
+					/*p_weight[ii]=weight1*(*p_weight)[ii];
+					q_weight[ii]=weight2*(*q_weight)[ii];*/
+					u[ii]=weight1*(*p_weight)[ii];
+					v[ii]=weight2*(*q_weight)[ii];
+				}
+				
+				/*Now p_weight and q_weight need to be compared as exponent vectors*/
+				pSetExpV(p,u);
+				pSetExpV(q,v);
+				/*We want to check whether x^p < x^q 
+				=> want to check for return value 1 */
+				if (pLmCmp(p,q)==1)	//i.e. x^q is smaller
+				{
+					fMin=fMin->next;
+					fAct=fMin;
+				}
+				else
+				{
+					fAct=fAct->next;
+				}
+			}//while(tmpcone.facetPtr->next!=NULL)
+			rChangeCurrRing(actRing);
+		}//bool isSearchFacet
+		
+		void reverseSearch(gcone gcAct) //no const possible here since we call gcAct->flip
 		{
+			facet *fAct=new facet();
+			fAct = gcAct.facetPtr;			
+			
+			while(fAct->next!=NULL)
+			{
+				gcAct.flip(gcAct.gcBasis,gcAct.facetPtr);
+				gcone *gcTmp = new gcone(gcAct);
+				idShow(gcTmp->gcBasis);
+				gcTmp->getConeNormals(gcTmp->gcBasis, TRUE);
+				gcTmp->showIntPoint();
+				/*recursive part goes gere*/
+				if (isSearchFacet(gcTmp,gcAct.facetPtr))
+				{
+					gcAct.next=gcTmp;
+					reverseSearch(*gcTmp);
+				}
+				else
+				{
+					delete gcTmp;
+					/*NOTE remove fAct from linked list. It's no longer needed*/
+				}
+				/*recursion ends*/
+				fAct = fAct->next;		
+			}//while(fAct->next!=NULL)
 		}//reverseSearch
 };//class gcone
 
@@ -1077,7 +1167,7 @@ ideal gfan(ideal inputIdeal)
 	But since we are in the root all facets should be search facets. IS THIS TRUE?
 	NOTE: Check for flippability is not very sophisticated
 	*/
-	facet *fAct=new facet();
+	/*facet *fAct=new facet();
 	fAct=gcAct->facetPtr;
 	while(fAct->next!=NULL)
 	{
@@ -1087,8 +1177,8 @@ ideal gfan(ideal inputIdeal)
 		gcTmp->getConeNormals(gcTmp->gcBasis, TRUE);
 		gcTmp->getIntPoint();
 		fAct = fAct->next;		
-	}
-	
+	}*/
+	gcAct->reverseSearch(*gcAct);
 	/*As of now extra.cc expects gfan to return type ideal. Probably this will change in near future.
 	The return type will then be of type LIST_CMD
 	Assume gfan has finished, thus we have enumerated all the cones
