@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: digitech.cc,v 1.5 2007-01-11 10:57:51 Singular Exp $ */
+/* $Id: digitech.cc,v 1.6 2009-04-30 17:00:27 Singular Exp $ */
 #include "mod2.h"
 #include "ring.h"
 
@@ -10,21 +10,24 @@
 #include "ideals.h"
 static ideal zero_ideal;
 #if 1
-void bit_reduce(poly & f,ring r){
+void bit_reduce(poly & f,ring r)
+{
   poly p=f;
   kBucket_pt erg_bucket= kBucketCreate(r);
   kBucketInit(erg_bucket,NULL,0 /*pLength(P.p)*/);
-  while(p){
+  while(p)
+  {
     poly next=pNext(p);
     pNext(p)=NULL;
 
     int i;
     int max=rVar(r);
-    for(i=1;i<=max;i++){
+    for(i=1;i<=max;i++)
+    {
       unsigned long exp=p_GetExp(p,i,r);
       if(exp!=0)
-	p_SetExp(p,i,1,r);
-      
+        p_SetExp(p,i,1,r);
+
     }
     p_Setm(p,r);
     int pseudo_len=0;
@@ -42,7 +45,8 @@ void bit_reduce(poly & f,ring r){
 
 
 
-void do_bit_reduce(poly f, kBucket_pt bucket){
+void do_bit_reduce(poly f, kBucket_pt bucket)
+{
     ring r=bucket->bucket_ring;
     int p=rChar(r);
     int max=rVar(r);
@@ -55,59 +59,70 @@ void do_bit_reduce(poly f, kBucket_pt bucket){
 //             return erg;
             //return;
         //}
-    
+
     BOOLEAN changed=FALSE;
     poly next=pNext(f);
     pNext(f)=NULL;
     int i;
-    for(i=1;i<=max;i++){
+    for(i=1;i<=max;i++)
+    {
       unsigned long exp;
       while((exp=p_GetExp(f,i,r))>=p){
-	       p_SetExp(f,i,exp-p+1,r);
-	       changed=TRUE;
+               p_SetExp(f,i,exp-p+1,r);
+               changed=TRUE;
       }
     }
-    
-    if (changed) {
+
+    if (changed)
+    {
         p_Setm(f,r);
-        
+
         int pseudo_len=0;
         kBucket_Add_q(bucket,f,&pseudo_len);
         //do_bit_reduce(next,bucket);
-    } else {
+    }
+    else
+    {
         //do_bit_reduce(next,bucket);
         int pseudo_len=0;
         kBucket_Add_q(bucket,f,&pseudo_len);
-        
+
     }
     f=next;
     }
 }
-poly do_bitreduce(poly f, ring r){
+poly do_bitreduce(poly f, ring r)
+{
   poly erg=NULL;
   poly *append_to=&erg;
   int p=rChar(r);
   int max=rVar(r);
   kBucket_pt bucket= kBucketCreate(r);
   kBucketInit(bucket,NULL,0 /*pLength(P.p)*/);
-  while(f!=NULL){
+  while(f!=NULL)
+  {
     BOOLEAN changed=FALSE;
     poly next=pNext(f);
     pNext(f)=NULL;
     assume(pNext(f)==NULL);
     int i;
-    for(i=1;i<=max;i++){
+    for(i=1;i<=max;i++)
+    {
       unsigned long exp;
-      while((exp=p_GetExp(f,i,r))>=p){
-	       p_SetExp(f,i,exp-p+1,r);
-	       changed=TRUE;
+      while((exp=p_GetExp(f,i,r))>=p)
+      {
+               p_SetExp(f,i,exp-p+1,r);
+               changed=TRUE;
       }
     }
-    if (changed) {
+    if (changed)
+    {
         p_Setm(f,r);
         int pseudo_len=0;
         kBucket_Add_q(bucket,f,&pseudo_len);
-    } else {
+    }
+    else
+    {
         (*append_to)=f;
         append_to=&(pNext(f));
     }
@@ -121,7 +136,8 @@ poly do_bitreduce(poly f, ring r){
   }
     return erg;
 }
-void bit_reduce2(poly & f,ring r){
+void bit_reduce2(poly & f,ring r)
+{
   if (f==NULL) return;
   if (pNext(f)==NULL){
     int p=rChar(r);
@@ -130,11 +146,13 @@ void bit_reduce2(poly & f,ring r){
     poly next=pNext(f);
     assume(pNext(f)==NULL);
     int i;
-    for(i=1;i<=max;i++){
+    for(i=1;i<=max;i++)
+    {
       unsigned long exp;
-      while((exp=p_GetExp(f,i,r))>=p){
-	       p_SetExp(f,i,exp-p+1,r);
-	       changed=TRUE;
+      while((exp=p_GetExp(f,i,r))>=p)
+      {
+               p_SetExp(f,i,exp-p+1,r);
+               changed=TRUE;
       }
     }
     if (changed)
@@ -148,24 +166,28 @@ void bit_reduce2(poly & f,ring r){
 //   kBucketClear(bucket,&f, &len);
 //   kBucketDestroy(&bucket);
     f=do_bitreduce(f,r);
-  
+
 }
-void bit_reduce1(poly & f,ring r){
+void bit_reduce1(poly & f,ring r)
+{
   if (f==NULL) return;
 
-  
-  if (pNext(f)==NULL){
+
+  if (pNext(f)==NULL)
+  {
     int p=rChar(r);
     int max=rVar(r);
     BOOLEAN changed=FALSE;
     poly next=pNext(f);
     assume(pNext(f)==NULL);
     int i;
-    for(i=1;i<=max;i++){
+    for(i=1;i<=max;i++)
+    {
       unsigned long exp;
-      while((exp=p_GetExp(f,i,r))>=p){
-	       p_SetExp(f,i,exp-p+1,r);
-	       changed=TRUE;
+      while((exp=p_GetExp(f,i,r))>=p)
+      {
+               p_SetExp(f,i,exp-p+1,r);
+               changed=TRUE;
       }
     }
     if (changed)
@@ -178,7 +200,7 @@ void bit_reduce1(poly & f,ring r){
   int len=0;
   kBucketClear(bucket,&f, &len);
   kBucketDestroy(&bucket);
-  
+
 }
 // void bit_reduce_arg(poly & f,ring r){
 //   kBucket_pt bucket= kBucketCreate(r);
@@ -187,14 +209,16 @@ void bit_reduce1(poly & f,ring r){
 // }
 #endif
 
-poly uni_subst_bits(poly outer_uni, poly inner_multi, ring r){
+poly uni_subst_bits(poly outer_uni, poly inner_multi, ring r)
+{
   zero_ideal=idInit(0,1);
   //assumes outer_uni is univariate and ordering global
   int d_max=p_GetExp(outer_uni,1,r);
-  poly* potences=(poly*) omalloc((d_max+1)*sizeof(poly));
+  poly* potences=(poly*) omAlloc((d_max+1)*sizeof(poly));
   potences[0]=p_ISet(1,r);
   int i;
-  for(i=1;i<=d_max;i++){
+  for(i=1;i<=d_max;i++)
+  {
     potences[i]=pp_Mult_qq(potences[i-1],inner_multi,r);
     bit_reduce(potences[i],r);
   }
@@ -204,7 +228,8 @@ poly uni_subst_bits(poly outer_uni, poly inner_multi, ring r){
   kBucketInit(erg_bucket,NULL,0 /*pLength(P.p)*/);
 
 
-  while(p){
+  while(p)
+  {
     int d=p_GetExp(p,1,r);
     assume(potences[d]!=NULL); //mustn't always hold, but for most input
     int pseudo_len=0;
@@ -217,7 +242,8 @@ poly uni_subst_bits(poly outer_uni, poly inner_multi, ring r){
 
 
   //free potences
-  for(i=0;i<=d_max;i++){
+  for(i=0;i<=d_max;i++)
+  {
     p_Delete(&potences[i],r);
   }
   omfree(potences);
