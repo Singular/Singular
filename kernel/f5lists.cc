@@ -75,18 +75,29 @@ void LNode::deleteAll() {
 // insert new elements to the list always at the end (labeled / classical polynomial view)
 // needed for list gPrev
 inline LNode* LNode::insert(LPoly* lp) {
-    //Print("INSERTION: \n");
     //Print("LAST GPREV: ");
     //pWrite(this->getPoly());
-    LNode* newElement   =   new LNode(lp, NULL);
-    this->next          =   newElement;
-    return newElement;
+    if(NULL == this) {
+        LNode* newElement   =   new LNode(lp,this);
+        return newElement;
+    }
+    else {
+        LNode* newElement   =   new LNode(lp, NULL);
+        this->next          =   newElement;
+        return newElement;
+    }
 }
         
 inline LNode* LNode::insert(poly t, int i, poly p, Rule* r) {
-    LNode* newElement   =   new LNode(t, i, p, r, NULL);
-    this->next          =   newElement;
-    return newElement;
+    if(NULL == this) {
+        LNode* newElement   =   new LNode(t,i,p,r,this);
+        return newElement;
+    }
+    else {
+        LNode* newElement   =   new LNode(t, i, p, r, NULL);
+        this->next          =   newElement;
+        return newElement;
+    }
 }
 
 // insert new elements to the list always in front (labeled / classical polynomial view)
@@ -151,7 +162,7 @@ inline LNode* LNode::insertByLabel(poly t, int i, poly p, Rule* r) {
 }
 
 inline LNode* LNode::insertByLabel(LNode* l) {
-    //Print("ADDING SOLYS TO THE LIST\n");
+    Print("ADDING SOLYS TO THE LIST\n");
     //Print("new element: ");
     //pWrite(t);
        if(NULL == this) { // || NULL == data) {
@@ -337,14 +348,22 @@ LList::~LList() {
 // insertion at the end of the list, needed for gPrev
 void LList::insert(LPoly* lp) {
     last = last->insert(lp);
+    if(NULL == first) {
+        first   =   last;
+    }
     //Print("NEW LAST GPREV: ");
     //pWrite(last->getPoly());
+    //Print("%p\n",first);
+    //pWrite(first->getPoly());
     length++;
     //Print("LENGTH %d\n",length);
 }
 
 void LList::insert(poly t,int i, poly p, Rule* r) {
     last = last->insert(t,i,p,r);
+    if(NULL == first) {
+        first   =   last;
+    }
     length++;
     //Print("LENGTH %d\n",length);
 }

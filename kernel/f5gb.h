@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.37 2009-04-20 13:54:50 ederc Exp $ */
+/* $Id: f5gb.h,v 1.38 2009-05-04 13:30:53 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -101,8 +101,7 @@ inline void reduction(LList* sPolyList, CList* critPairs, LList* gPrev, RList* r
 reduction including subalgorithm topReduction() using Faugere's criteria
 ========================================================================
 */
-inline void newReduction(LList* sPolyList, CList* critPairs, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag,
-                 ideal gbPrev);
+inline void newReduction(LList* sPolyList, CList* critPairs, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev);
 
 /*!
  * ================================================================================
@@ -116,7 +115,7 @@ inline void newReduction(LList* sPolyList, CList* critPairs, LList* gPrev, RList
  * later on for possible new rules and S-polynomials to be added to the algorithm
  * ================================================================================
  */
-void findReducers(LNode* l, LList* sPolyList, LList* gPrev, CList* critPairs, RList* rules, LTagList* lTag, RTagList* rTag); 
+void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CList* critPairs, RList* rules, LTagList* lTag, RTagList* rTag); 
 
 /*
 =====================================================================================
