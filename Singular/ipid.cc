@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.84 2008-04-28 13:54:16 Singular Exp $ */
+/* $Id: ipid.cc,v 1.85 2009-05-04 15:06:15 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -319,7 +319,6 @@ idhdl idrec::set(const char * s, int lev, idtyp t, BOOLEAN init)
         IDLINK(h)=(si_link) omAlloc0Bin(sip_link_bin);
         break;
       case RING_CMD:
-      case QRING_CMD:
         IDRING(h) = (ring) omAlloc0Bin(sip_sring_bin);
         break;
       case PACKAGE_CMD:

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.104 2009-05-01 15:09:32 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.105 2009-05-04 15:06:15 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -549,13 +549,14 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
     return TRUE;
   }
 
-  ring qr=(ring)res->Data(); // the declaration allocated space
-  omFreeBin((ADDRESS)qr, ip_sring_bin);
-  ring qrr=rCopy(currRing);
+  ring qr;
+  //qr=(ring)res->Data();
+  //if (qr!=NULL) omFreeBin((ADDRESS)qr, ip_sring_bin);
+  assume(res->Data()==NULL);
+  qr=rCopy(currRing);
                  // we have to fill it, but the copy also allocates space
   idhdl h=(idhdl)res->data; // we have res->rtyp==IDHDL
-  IDRING(h)=qrr;
-  qr=qrr;
+  IDRING(h)=qr;
 
 #ifdef HAVE_PLURAL
   // we must correct the above dirty hack...
@@ -577,10 +578,10 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
     // both ideals should be GB, so dSimpleAdd is sufficient
     idDelete(&id);
     id=tmp;
-     // delete the qr copy of quotient ideal!!!
+    // delete the qr copy of quotient ideal!!!
     idDelete(&qr->qideal);
   }
-  qrr->qideal = id;
+  qr->qideal = id;
 
   // qr is a copy of currRing with the new qideal!
   #ifdef HAVE_PLURAL
@@ -597,9 +598,6 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
     }
   }
   #endif
-  //currRing=qr;
-  //currRingHdl=(idhdl)res->data;
-  //currQuotient=qr->qideal;
   rSetHdl((idhdl)res->data);
   return FALSE;
 }

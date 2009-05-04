@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.203 2009-03-11 09:43:29 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.204 2009-05-04 15:06:16 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -339,7 +339,8 @@ void killlocals_rec(idhdl *root,int v, ring r)
     else if ((IDTYP(h)==RING_CMD)
     ||(IDTYP(h)==QRING_CMD))
     {
-      if (IDRING(h)->idroot!=NULL)
+      if ((IDRING(h)!=NULL) && (IDRING(h)->idroot!=NULL))
+      // we have to test IDRING(h)!=NULL: qring Q=groebner(...): killlocals
       {
   //    Print("into ring %s, lev %d for lev %d\n",IDID(h),IDLEV(h),v);
         killlocals_rec(&(IDRING(h)->idroot),v,IDRING(h));
@@ -4336,6 +4337,7 @@ void rSetHdl(idhdl h)
   {
 //   Print(" new ring:%s (l:%d)\n",IDID(h),IDLEV(h));
     rg = IDRING(h);
+    if (rg==NULL) return; //id <>NULL, ring==NULL
     omCheckAddrSize((ADDRESS)h,sizeof(idrec));
     if (IDID(h))  // OB: ????
       omCheckAddr((ADDRESS)IDID(h));
