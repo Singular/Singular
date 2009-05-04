@@ -3,14 +3,14 @@
  *  Purpose: routine which determines absolute pathname of executable
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omFindExec.c,v 1.11 2008-02-03 20:03:14 wienand Exp $
+ *  Version: $Id: omFindExec.c,v 1.12 2009-05-04 15:03:40 Singular Exp $
  *******************************************************************/
 
 #ifdef HAVE_CONFIG_H
 #include "omConfig.h"
 #endif
 
-#if ! defined(__MWERKS__) && defined(HAVE_UNISTD_H) && defined(STDC_HEADERS)
+#if defined(HAVE_UNISTD_H) && defined(STDC_HEADERS)
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h> /* always defiend */
@@ -29,12 +29,7 @@
 #endif
 
 /* ABSOLUTE_FILENAME_P (fname): True if fname is an absolute filename */
-#ifdef atarist
-#define ABSOLUTE_FILENAME_P(fname)        ((fname[0] == '/') || \
-        (fname[0] && (fname[1] == ':')))
-#else
 #define ABSOLUTE_FILENAME_P(fname)        (fname[0] == '/')
-#endif /* atarist */
 
 /* Return the absolute name of the program named NAME.  This function
    searches the directories in the PATH environment variable if PROG
@@ -290,4 +285,4 @@ char* omFindExec (const char *name, char* exec)
   return name;
 }
 
-#endif /* ! defined(__MWERKS__) && defined(HAVE_UNISTD_H) && defined(STDC_HEADERS) */
+#endif /* defined(HAVE_UNISTD_H) && defined(STDC_HEADERS) */
