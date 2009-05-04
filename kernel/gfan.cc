@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-04-30 09:32:01 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.43 2009-04-30 09:32:01 monerjan Exp $
-$Id: gfan.cc,v 1.43 2009-04-30 09:32:01 monerjan Exp $
+$Date: 2009-05-04 15:14:38 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.44 2009-05-04 15:14:38 monerjan Exp $
+$Id: gfan.cc,v 1.44 2009-05-04 15:14:38 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -209,7 +209,7 @@ class gcone
 		}
 		
 		/** \brief Default destructor */
-		~gcone();		//destructor
+		~gcone(){;}		//destructor
 		
 		/** Pointer to the first facet */
 		facet *facetPtr;	//Will hold the adress of the first facet; set by gcone::getConeNormals
@@ -402,7 +402,12 @@ class gcone
 					}
 				}//for (int jj = 1; jj <ddcols; jj++)
 				/*Quick'n'dirty hack for flippability*/	
-				bool isFlippable;			
+				bool isFlippable;
+				//NOTE BUG HERE
+				/* The flippability check is wrong!
+				(1,-4) will pass, but (-1,7) will not. 
+				REWRITE THIS
+				*/			
 				for (int jj = 0; jj<this->numVars; jj++)
 				{					
 					intvec *ivCanonical = new intvec(this->numVars);
@@ -513,7 +518,8 @@ class gcone
 					check->show();
 					cout << endl;
 #endif
-					if (isParallel(check,fNormal)) //pass *check when 
+					//TODO why not *check, *fNormal????
+					if (isParallel(*check,*fNormal)) //pass *check when 
 					{
 						cout << "Parallel vector found, adding to initialFormElement" << endl;			
 						initialFormElement[ii] = pAdd(pCopy(initialFormElement[ii]),(poly)pHead(aktpoly));
@@ -1021,37 +1027,54 @@ class gcone
 		
 		/** 
 		* Determines whether a given facet of a cone is the search facet of a neighbouring cone
-		*
+		* This is done in the following way:
+		* We loop through all facets of the cone and find the "smallest" facet, i.e. the unique facet
+		* that is first crossed during the generic walk.
+		* We then check whether the fNormal of this facet is parallel to the fNormal of our testfacet.
+		* If this is the case, then our facet is indeed a search facet and TRUE is retuned. 
 		*/
-		bool isSearchFacet(gcone &tmpcone, facet *testfacet)
-		{			
+		bool isSearchFacet(gcone &tmpcone, facet &testfacet)
+		{				
 			ring actRing=currRing;
-			
-			facet *fMin=new facet();	//Pointer to the "minimal" facet
+			facet *facetPtr=(facet*)tmpcone.facetPtr;			
+			facet *fMin=new facet(*facetPtr);	//Pointer to the "minimal" facet
+			//facet *fMin = new facet(tmpcone.facetPtr);
+			//fMin=tmpcone.facetPtr;		//Initialise to first facet of tmpcone
 			facet *fAct;
-			fMin = testfacet;
+			//fMin = testfacet;
+			//fMin->next=testfacet->next;
 			fAct = fMin;
 			
-			rChangeCurrRing(this->rootRing);
+			cout << endl<< fMin->next << endl;
+			cout << tmpcone.facetPtr->next << endl;
+			tmpcone.facetPtr->printNormal();
+			fAct=tmpcone.facetPtr->next;
+			fAct->printNormal();
+			/*fMin->printNormal();
+			fMin->next->printNormal();*/
+			
+			rChangeCurrRing(this->rootRing);	//because we compare the monomials in the rootring			
 			poly p=NULL;
 			poly q=NULL;
 			intvec *p_weight = new intvec(this->numVars);			
 			intvec *q_weight = new intvec(this->numVars);
 			intvec *sigma = new intvec(this->numVars);
 			sigma=tmpcone.getIntPoint();
+			cout << "pling" << endl;
 			int *u=(int *)omAlloc((this->numVars+1)*sizeof(int));
 			int *v=(int *)omAlloc((this->numVars+1)*sizeof(int));
 			int weight1,weight2;
-			while(tmpcone.facetPtr->next!=NULL)
+			while(fAct->next!=NULL)	//ersetzen durch fAct
 			{
 				/* Get alpha_i and alpha_{i+1} */
 				p_weight=fMin->getFacetNormal();
 				q_weight=fMin->next->getFacetNormal();
-				
+				p_weight->show(); 
+				q_weight->show();
 				/*Compute the dot product of sigma and alpha_{i,j}*/
 				weight1=dotProduct(sigma,p_weight);
 				weight2=dotProduct(sigma,q_weight);
-				
+				cout << "weight1=" << weight1 << " " << "weight2=" << weight2 << endl;
 				/*Adjust alpha_i and alpha_i+1 accordingly*/
 				for(int ii=1;ii<=this->numVars;ii++)
 				{
@@ -1060,10 +1083,12 @@ class gcone
 					u[ii]=weight1*(*p_weight)[ii];
 					v[ii]=weight2*(*q_weight)[ii];
 				}
+				cout << "PLONK" << endl;
 				
 				/*Now p_weight and q_weight need to be compared as exponent vectors*/
 				pSetExpV(p,u);
 				pSetExpV(q,v);
+				cout << "AARGH" << endl;
 				/*We want to check whether x^p < x^q 
 				=> want to check for return value 1 */
 				if (pLmCmp(p,q)==1)	//i.e. x^q is smaller
@@ -1075,27 +1100,51 @@ class gcone
 				{
 					fAct=fAct->next;
 				}
+				fAct=fAct->next;
 			}//while(tmpcone.facetPtr->next!=NULL)
-			rChangeCurrRing(actRing);
+			
+			/*If testfacet was minimal then fMin should still point there */
+			//if (isParallel(fMin->getFacetNormal,testfacet.getFacetNormal))
+			if (fMin==tmpcone.facetPtr)
+			{
+				rChangeCurrRing(actRing);
+				return TRUE;
+			}
+			else 
+			{
+				rChangeCurrRing(actRing);
+				return FALSE;
+			}
 		}//bool isSearchFacet
 		
-		void reverseSearch(gcone gcAct) //no const possible here since we call gcAct->flip
+		void reverseSearch(gcone *gcAct) //no const possible here since we call gcAct->flip
 		{
 			facet *fAct=new facet();
-			fAct = gcAct.facetPtr;			
+			fAct = gcAct->facetPtr;			
 			
-			while(fAct->next!=NULL)
+			while(fAct->next!=NULL)  //NOTE NOT SURE WHETHER THIS IS RIGHT! Do I reach EVERY facet or only all but the last?
 			{
-				gcAct.flip(gcAct.gcBasis,gcAct.facetPtr);
-				gcone *gcTmp = new gcone(gcAct);
+				cout << "==========================================================================================="<< endl;
+				gcAct->flip(gcAct->gcBasis,gcAct->facetPtr);
+				gcone *gcTmp = new gcone(*gcAct);
 				idShow(gcTmp->gcBasis);
 				gcTmp->getConeNormals(gcTmp->gcBasis, TRUE);
+#ifdef gfan_DEBUG
+				facet *f = new facet();
+				f=gcTmp->facetPtr;
+				while(f->next!=NULL)
+				{
+					f->printNormal();
+					f=f->next;					
+				}
+#endif
 				gcTmp->showIntPoint();
 				/*recursive part goes gere*/
-				if (isSearchFacet(gcTmp,gcAct.facetPtr))
+				if (isSearchFacet(*gcTmp,(facet&)gcAct->facetPtr))
 				{
-					gcAct.next=gcTmp;
-					reverseSearch(*gcTmp);
+					gcAct->next=gcTmp;
+					cout << "PING"<< endl;
+					reverseSearch(gcTmp);
 				}
 				else
 				{
@@ -1112,9 +1161,9 @@ ideal gfan(ideal inputIdeal)
 {
 	int numvar = pVariables; 
 	
-	#ifdef gfan_DEBUG
+#ifdef gfan_DEBUG
 	cout << "Now in subroutine gfan" << endl;
-	#endif
+#endif
 	ring inputRing=currRing;	// The ring the user entered
 	ring rootRing;			// The ring associated to the target ordering
 	ideal res;	
@@ -1178,7 +1227,7 @@ ideal gfan(ideal inputIdeal)
 		gcTmp->getIntPoint();
 		fAct = fAct->next;		
 	}*/
-	gcAct->reverseSearch(*gcAct);
+	gcAct->reverseSearch(gcAct);
 	/*As of now extra.cc expects gfan to return type ideal. Probably this will change in near future.
 	The return type will then be of type LIST_CMD
 	Assume gfan has finished, thus we have enumerated all the cones
