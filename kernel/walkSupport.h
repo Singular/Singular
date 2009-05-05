@@ -21,7 +21,7 @@ ideal init64(ideal G,int64vec* currw);
 BOOLEAN currwOnBorder64(ideal I, int64vec* currw64);
 void getTaun64(ideal G,intvec* targm,int pertdeg, int64vec** v64, int64 & i64);
 int64vec* getiv64(lists l);
-int64 getint64(lists l);
+//int64 getint64(lists l);// not used
 
 
 //functions not originating from the oroginal SINGULAR implementation

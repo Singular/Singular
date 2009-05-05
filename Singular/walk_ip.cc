@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: walk_ip.cc,v 1.2 2008-09-22 11:43:59 Singular Exp $ */
+/* $Id: walk_ip.cc,v 1.3 2009-05-05 10:09:24 Singular Exp $ */
 /*
 * ABSTRACT: frwalk: interpreter link
 */
@@ -306,9 +306,10 @@ int64vec* getiv64(lists l)
 //Uses: none
 ///////////////////////////////////////////////////////////////////
 
-int64 getint64(lists l)
-{
-  return (int64)(l->m[1].data);
-}
+// not used, bad impl.
+//int64 getint64(lists l)
+//{
+//  return (int64)(long)(l->m[1].data);
+//}
 
 ///////////////////////////////////////////////////////////////////
