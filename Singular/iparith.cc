@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.504 2009-04-08 17:18:55 motsak Exp $ */
+/* $Id: iparith.cc,v 1.505 2009-05-05 08:17:46 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2523,10 +2523,10 @@ static BOOLEAN jjMONITOR2(leftv res, leftv u,leftv v)
   SI_LINK_SET_CLOSE_P(l); // febase handles the FILE*
   if ( l->name[0]!='\0') // "" is the stop condition
   {
-    char *opt;
+    const char *opt;
     int mode=0;
-    if (v==NULL) opt="i";
-    else         opt=(char *)v->Data();
+    if (v==NULL) opt=(const char*)"i";
+    else         opt=(const char *)v->Data();
     while(*opt!='\0')
     {
       if (*opt=='i') mode |= PROT_I;
@@ -6653,10 +6653,8 @@ static BOOLEAN jjJET4(leftv res, leftv u)
   leftv u2=u1->next;
   leftv u3=u2->next;
   leftv u4=u3->next;
-  if((u1->Typ()==POLY_CMD)&&(u2->Typ()==POLY_CMD)&&(u3->Typ()==INT_CMD)&&
-     (u4->Typ()==INTVEC_CMD)||
-     (u1->Typ()==VECTOR_CMD)&&(u2->Typ()==POLY_CMD)&&(u3->Typ()==INT_CMD)&&
-     (u4->Typ()==INTVEC_CMD))
+  if((u2->Typ()==POLY_CMD)&&(u3->Typ()==INT_CMD)&&(u4->Typ()==INTVEC_CMD)
+  &&((u1->Typ()==POLY_CMD)||(u1->Typ()==VECTOR_CMD)))
   {
     if(!pIsUnit((poly)u2->Data()))
     {
@@ -6669,10 +6667,8 @@ static BOOLEAN jjJET4(leftv res, leftv u)
     return FALSE;
   }
   else
-  if((u1->Typ()==IDEAL_CMD)&&(u2->Typ()==MATRIX_CMD)&&(u3->Typ()==INT_CMD)&&
-     (u4->Typ()==INTVEC_CMD)||
-     (u1->Typ()==MODUL_CMD)&&(u2->Typ()==MATRIX_CMD)&&(u3->Typ()==INT_CMD)&&
-     (u4->Typ()==INTVEC_CMD))
+  if((u2->Typ()==MATRIX_CMD)&&(u3->Typ()==INT_CMD)&&(u4->Typ()==INTVEC_CMD)
+  &&((u1->Typ()==IDEAL_CMD)||(u1->Typ()==MODUL_CMD)))
   {
     if(!mpIsDiagUnit((matrix)u2->Data()))
     {
