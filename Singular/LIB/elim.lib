@@ -1,4 +1,4 @@
-// $Id: elim.lib,v 1.33 2009-04-24 08:54:03 Singular Exp $
+// $Id: elim.lib,v 1.34 2009-05-05 09:25:56 bulygin Exp $
 // (GMG, modified 22.06.96)
 // GMG, last modified 30.10.08: new procedure elimRing;
 // elim changes now to ring with elimination ordering (extra weight vector
@@ -9,7 +9,7 @@
 // GMG, last modified 5.01.09: elim uses now stdhilb(id,@w) instead of std(id)
 // and can now choose as method slimgb or std.
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: elim.lib,v 1.33 2009-04-24 08:54:03 Singular Exp $";
+version="$Id: elim.lib,v 1.34 2009-05-05 09:25:56 bulygin Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      Elimination, Saturation and Blowing up
@@ -477,11 +477,13 @@ EXAMPLE: example elim; shows an example
        }
        if ( #[2] == "std" ) { method = "std"; }
        if ( #[2] == "slimgb" ) { method = "slimgb"; }
+       
     }
     else
     {
       ERROR("expected `elim(ideal,intvec[,string])`");
     }
+    
     if (size(#) == 3)
     {
        if ( typeof(#[3]) == "string" )
@@ -494,6 +496,12 @@ EXAMPLE: example elim; shows an example
           if ( #[3] == "slimgb" ) { method = "slimgb"; }
        }
     }
+
+    if ( method == "" )
+    {
+      ERROR("expected \"std\" or \"slimgb\" or \"withWeights\" as the optional string parameters");       
+    }
+    
   }
 
 //-------------- create new ring and map objects to new ring ------------------
