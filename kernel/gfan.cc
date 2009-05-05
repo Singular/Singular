@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-05-04 15:14:38 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.44 2009-05-04 15:14:38 monerjan Exp $
-$Id: gfan.cc,v 1.44 2009-05-04 15:14:38 monerjan Exp $
+$Date: 2009-05-05 15:15:02 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.45 2009-05-05 15:15:02 monerjan Exp $
+$Id: gfan.cc,v 1.45 2009-05-05 15:15:02 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -74,7 +74,11 @@ class facet
 		ideal flipGB;		//The Groebner Basis on the other side, computed via gcone::flip
 
 			
-	public:
+	public:		
+		//bool isFlippable;	//flippable facet? Want to have cone->isflippable.facet[i]
+		bool isIncoming;	//Is the facet incoming or outgoing?
+		facet *next;		//Pointer to next facet
+		
 		/** The default constructor. Do I need a constructor of type facet(intvec)? */
 		facet()			
 		{
@@ -124,9 +128,44 @@ class facet
 			idShow(this->flipGB);
 		}
 		
-		bool isFlippable;	//flippable facet? Want to have cone->isflippable.facet[i]
-		bool isIncoming;	//Is the facet incoming or outgoing?
-		facet *next;		//Pointer to next facet
+		/*bool isFlippable(intvec &load)
+		{
+			bool res=TRUE;			
+			int jj;
+			for (int jj = 0; jj<load.length(); jj++)
+			{
+				intvec *ivCanonical = new intvec(load.length());
+				(*ivCanonical)[jj]=1;				
+				if (ivMult(&load,ivCanonical)<0)
+				{
+					res=FALSE;
+					break;
+				}
+			}
+			return res;
+			
+			/*while (dotProduct(load,ivCanonical)>=0)
+			{
+				if (jj!=this->numVars)
+				{
+					intvec *ivCanonical = new intvec(this->numVars);
+					(*ivCanonical)[jj]=1;			
+				 	res=TRUE;
+					jj += 1;
+				} 
+			}
+			if (jj==this->numVars)
+			{			
+				delete ivCanonical;
+				return FALSE;
+			}
+			else
+			{
+				delete ivCanonical;
+				return TRUE;
+		}*/						
+		}//bool isFlippable(facet &f)
+		
 		
 		friend class gcone;	//Bad style
 };
@@ -402,13 +441,13 @@ class gcone
 					}
 				}//for (int jj = 1; jj <ddcols; jj++)
 				/*Quick'n'dirty hack for flippability*/	
-				bool isFlippable;
+				bool isFlippable=FALSE;
 				//NOTE BUG HERE
 				/* The flippability check is wrong!
 				(1,-4) will pass, but (-1,7) will not. 
 				REWRITE THIS
 				*/			
-				for (int jj = 0; jj<this->numVars; jj++)
+				/*for (int jj = 0; jj<this->numVars; jj++)
 				{					
 					intvec *ivCanonical = new intvec(this->numVars);
 					(*ivCanonical)[jj]=1;					
@@ -422,6 +461,17 @@ class gcone
 					}					
 					delete ivCanonical;
 				}//for (int jj = 0; jj<this->numVars; jj++)
+				*/	
+				for (int jj = 0; jj<load->length(); jj++)
+				{
+					intvec *ivCanonical = new intvec(load->length());
+					(*ivCanonical)[jj]=1;				
+					if (dotProduct(load,ivCanonical)<0)
+					{
+						isFlippable=TRUE;
+						break;	//URGHS
+					}
+				}	
 				if (isFlippable==FALSE)
 				{
 					cout << "Ignoring facet";
@@ -1033,79 +1083,97 @@ class gcone
 		* We then check whether the fNormal of this facet is parallel to the fNormal of our testfacet.
 		* If this is the case, then our facet is indeed a search facet and TRUE is retuned. 
 		*/
-		bool isSearchFacet(gcone &tmpcone, facet &testfacet)
+		bool isSearchFacet(gcone &gcTmp, facet &testfacet)
 		{				
 			ring actRing=currRing;
-			facet *facetPtr=(facet*)tmpcone.facetPtr;			
+			facet *facetPtr=(facet*)gcTmp.facetPtr;			
 			facet *fMin=new facet(*facetPtr);	//Pointer to the "minimal" facet
 			//facet *fMin = new facet(tmpcone.facetPtr);
 			//fMin=tmpcone.facetPtr;		//Initialise to first facet of tmpcone
-			facet *fAct;
-			//fMin = testfacet;
-			//fMin->next=testfacet->next;
+			facet *fAct;	//Ptr to alpha_i
+			facet *fCmp;	//Ptr to alpha_j
 			fAct = fMin;
+			fCmp = fMin->next;
 			
-			cout << endl<< fMin->next << endl;
-			cout << tmpcone.facetPtr->next << endl;
-			tmpcone.facetPtr->printNormal();
-			fAct=tmpcone.facetPtr->next;
-			fAct->printNormal();
-			/*fMin->printNormal();
-			fMin->next->printNormal();*/
+			//cout << endl<< fMin->next << endl;
+			//cout << gcTmp.facetPtr->next << endl;
+			//gcTmp.facetPtr->printNormal();
+			//fAct=gcTmp.facetPtr->next;
+			//fAct->printNormal();			
 			
 			rChangeCurrRing(this->rootRing);	//because we compare the monomials in the rootring			
-			poly p=NULL;
-			poly q=NULL;
-			intvec *p_weight = new intvec(this->numVars);			
-			intvec *q_weight = new intvec(this->numVars);
+			poly p=pInit();
+			poly q=pInit();
+			intvec *alpha_i = new intvec(this->numVars);			
+			intvec *alpha_j = new intvec(this->numVars);
 			intvec *sigma = new intvec(this->numVars);
-			sigma=tmpcone.getIntPoint();
-			cout << "pling" << endl;
+			sigma=gcTmp.getIntPoint();
+			
 			int *u=(int *)omAlloc((this->numVars+1)*sizeof(int));
 			int *v=(int *)omAlloc((this->numVars+1)*sizeof(int));
+			u[0]=0; v[0]=0;
 			int weight1,weight2;
-			while(fAct->next!=NULL)	//ersetzen durch fAct
+			while(fAct->next->next!=NULL)	//NOTE this is ugly. Can it be done without fCmp?
 			{
 				/* Get alpha_i and alpha_{i+1} */
-				p_weight=fMin->getFacetNormal();
-				q_weight=fMin->next->getFacetNormal();
-				p_weight->show(); 
-				q_weight->show();
+				alpha_i=fAct->getFacetNormal();
+				alpha_j=fCmp->getFacetNormal();
+#ifdef gfan_DEBUG
+				alpha_i->show(); 
+				alpha_j->show();
+#endif
 				/*Compute the dot product of sigma and alpha_{i,j}*/
-				weight1=dotProduct(sigma,p_weight);
-				weight2=dotProduct(sigma,q_weight);
+				weight1=dotProduct(sigma,alpha_i);
+				weight2=dotProduct(sigma,alpha_j);
+#ifdef gfan_DEBUG
 				cout << "weight1=" << weight1 << " " << "weight2=" << weight2 << endl;
+#endif
 				/*Adjust alpha_i and alpha_i+1 accordingly*/
 				for(int ii=1;ii<=this->numVars;ii++)
-				{
-					/*p_weight[ii]=weight1*(*p_weight)[ii];
-					q_weight[ii]=weight2*(*q_weight)[ii];*/
-					u[ii]=weight1*(*p_weight)[ii];
-					v[ii]=weight2*(*q_weight)[ii];
-				}
-				cout << "PLONK" << endl;
+				{					
+					u[ii]=weight1*(*alpha_i)[ii-1];
+					v[ii]=weight2*(*alpha_j)[ii-1];
+				}				
 				
 				/*Now p_weight and q_weight need to be compared as exponent vectors*/
-				pSetExpV(p,u);
-				pSetExpV(q,v);
-				cout << "AARGH" << endl;
+				pSetCoeff0(p,nInit(1));
+				pSetCoeff0(q,nInit(1));
+				pSetExpV(p,u); 
+				pSetm(p);			
+				pSetExpV(q,v); 
+				pSetm(q);
+#ifdef gfan_DEBUG				
+				pWrite(p);pWrite(q);
+#endif	
 				/*We want to check whether x^p < x^q 
 				=> want to check for return value 1 */
 				if (pLmCmp(p,q)==1)	//i.e. x^q is smaller
 				{
-					fMin=fMin->next;
+					fMin=fCmp;
 					fAct=fMin;
 				}
 				else
 				{
-					fAct=fAct->next;
+					//fAct=fAct->next;
+					if(fCmp->next!=NULL)
+					{
+						fCmp=fCmp->next;
+					}
+					else
+					{
+						fAct=fAct->next;
+					}
 				}
-				fAct=fAct->next;
-			}//while(tmpcone.facetPtr->next!=NULL)
+				//fAct=fAct->next;
+			}//while(fAct.facetPtr->next!=NULL)
 			
 			/*If testfacet was minimal then fMin should still point there */
-			//if (isParallel(fMin->getFacetNormal,testfacet.getFacetNormal))
-			if (fMin==tmpcone.facetPtr)
+			intvec *alpha_min = new intvec(this->numVars);
+			alpha_min=fMin->getFacetNormal();
+			intvec *test = new intvec(this->numVars);
+			test=testfacet.getFacetNormal();
+			if (isParallel(alpha_min,test))
+			//if (fMin==gcTmp.facetPtr)
 			{
 				rChangeCurrRing(actRing);
 				return TRUE;
@@ -1155,6 +1223,7 @@ class gcone
 				fAct = fAct->next;		
 			}//while(fAct->next!=NULL)
 		}//reverseSearch
+		friend class facet;
 };//class gcone
 
 ideal gfan(ideal inputIdeal)
