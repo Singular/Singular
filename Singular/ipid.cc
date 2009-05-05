@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.85 2009-05-04 15:06:15 Singular Exp $ */
+/* $Id: ipid.cc,v 1.86 2009-05-05 09:54:38 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -538,7 +538,7 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
 
   if (h->attribute!=NULL)
   {
-    atKillAll(h);
+    at_KillAll(h,r);
     //h->attribute=NULL;
   }
   if ((IDTYP(h) == PACKAGE_CMD) && (strcmp(IDID(h),"Top")==0))

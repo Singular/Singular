@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.33 2009-03-18 16:35:54 Singular Exp $ */
+/* $Id: attrib.cc,v 1.34 2009-05-05 09:54:38 Singular Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -193,7 +193,7 @@ void atSet(leftv root,const char * name,void * data,int typ)
   }
 }
 
-void sattr::kill()
+void sattr::kill(const ring r)
 {
   omFree((ADDRESS)name);
   name=NULL;
@@ -205,11 +205,11 @@ void sattr::kill()
   case IDEAL_CMD:
   case MODUL_CMD:
   case MATRIX_CMD:
-    idDelete((ideal *)&data);
+    id_Delete((ideal *)&data,r);
     break;
   case POLY_CMD:
   case VECTOR_CMD:
-    pDelete((poly *)&data);
+    p_Delete((poly *)&data,r);
     break;
   case INT_CMD:
     break;
@@ -225,19 +225,19 @@ void sattr::kill()
   omFreeBin((ADDRESS)this, sattr_bin);
 }
 
-void sattr::killAll()
+void sattr::killAll(const ring r)
 {
   attr temp = this,temp1;
 
   while (temp!=NULL)
   {
     temp1 = temp->next;
-    temp->kill();
+    temp->kill(r);
     temp = temp1;
   }
 }
 
-void atKill(idhdl root,const char * name)
+void at_Kill(idhdl root,const char * name, const ring r)
 {
   attr temp = root->attribute->get(name);
   if (temp!=NULL)
@@ -253,13 +253,13 @@ void atKill(idhdl root,const char * name)
       while (temp1->next!=temp) temp1 = temp1->next;
       temp1->next = N;
     }
-    temp->kill();
+    temp->kill(r);
   }
 }
 
-void atKillAll(idhdl root)
+void at_KillAll(idhdl root, const ring r)
 {
-  root->attribute->killAll();
+  root->attribute->killAll(r);
   root->attribute = NULL;
 }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.204 2009-05-04 15:06:16 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.205 2009-05-05 09:54:37 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -5059,25 +5059,6 @@ void rKill(ring r)
 #ifdef RDEBUG
     if (traceit &TRACE_SHOW_RINGS) Print("kill ring %lx\n",(long)r);
 #endif
-    if (r==currRing)
-    {
-      if (r->qideal!=NULL)
-      {
-        currQuotient=NULL;
-      }
-      if (ppNoether!=NULL) pDelete(&ppNoether);
-      if (sLastPrinted.RingDependend())
-      {
-        sLastPrinted.CleanUp();
-      }
-      if ((myynest>0) && (iiRETURNEXPR[myynest].RingDependend()))
-      {
-        WerrorS("return value depends on local ring variable (export missing ?)");
-        iiRETURNEXPR[myynest].CleanUp();
-      }
-      currRing=NULL;
-      currRingHdl=NULL;
-    }
     if (r->qideal!=NULL)
     {
       id_Delete(&r->qideal, r);
@@ -5116,6 +5097,26 @@ void rKill(ring r)
     while (r->idroot!=NULL)
     {
       killhdl2(r->idroot,&(r->idroot),r);
+    }
+    if (r==currRing)
+    {
+      // all dependend stuff is done, clean global vars:
+      if (r->qideal!=NULL)
+      {
+        currQuotient=NULL;
+      }
+      if (ppNoether!=NULL) pDelete(&ppNoether);
+      if (sLastPrinted.RingDependend())
+      {
+        sLastPrinted.CleanUp();
+      }
+      if ((myynest>0) && (iiRETURNEXPR[myynest].RingDependend()))
+      {
+        WerrorS("return value depends on local ring variable (export missing ?)");
+        iiRETURNEXPR[myynest].CleanUp();
+      }
+      currRing=NULL;
+      currRingHdl=NULL;
     }
 
     /* nKillChar(r); will be called from inside of rDelete */

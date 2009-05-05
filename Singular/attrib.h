@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.h,v 1.8 2008-03-19 17:44:29 Singular Exp $ */
+/* $Id: attrib.h,v 1.9 2009-05-05 09:54:37 Singular Exp $ */
 /*
 * ABSTRACT: attributes to leftv and idhdl
 */
@@ -27,8 +27,8 @@ class sattr
     void * CopyA(); /* copy the data of this attribute */
     attr set(const char * s, void * data, int t);
     attr get(const char * s);
-    void kill();
-    void killAll();
+    void kill(const ring r);
+    void killAll(const ring r);
 };
 
 void * atGet(idhdl root,const char * name);
@@ -37,8 +37,10 @@ void * atGet(idhdl root,const char * name, int t);
 void * atGet(leftv root,const char * name, int t);
 void atSet(idhdl root,const char * name,void * data,int typ);
 void atSet(leftv root,const char * name,void * data,int typ);
-void atKillAll(idhdl root);
-void atKill(idhdl root,const char * name);
+void at_KillAll(idhdl root,const ring r);
+#define atKillAll(H) at_KillAll(H,currRing)
+void at_Kill(idhdl root,const char * name,const ring r);
+#define atKill(H,A) at_Kill(H,A,currRing)
 
 BOOLEAN atATTRIB1(leftv res,leftv a);
 BOOLEAN atATTRIB2(leftv res,leftv a,leftv b);

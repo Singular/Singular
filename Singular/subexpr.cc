@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.103 2009-02-20 18:39:21 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.104 2009-05-05 09:54:38 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -405,7 +405,7 @@ void sleftv::CleanUp(ring r)
         while (attribute!=NULL)
         {
           t=attribute->next;
-          attribute->kill();
+          attribute->kill(currRing);
           attribute=t;
         }
       }
