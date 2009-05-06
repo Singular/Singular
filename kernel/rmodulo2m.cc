@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.23 2008-12-08 15:00:43 Singular Exp $ */
+/* $Id: rmodulo2m.cc,v 1.24 2009-05-06 12:53:49 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -9,7 +9,7 @@
 #include <string.h>
 #include "mod2.h"
 
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS
 #include <mylimits.h>
 #include "structs.h"
 #include "febase.h"
@@ -164,7 +164,7 @@ BOOLEAN nr2mIsUnit (number a)
 
 number  nr2mGetUnit (number k)
 {
-  if (k == NULL) 
+  if (k == NULL)
     return (number) 1;
   NATNUMBER tmp = (NATNUMBER) k;
   while (tmp % 2 == 0)

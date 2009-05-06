@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.32 2009-01-19 12:43:53 Singular Exp $ */
+/* $Id: rmodulon.cc,v 1.33 2009-05-06 12:53:49 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -19,13 +19,9 @@
 #include "rmodulon.h"
 #include "si_gmp.h"
 
-#ifdef HAVE_RINGMODN
-  #ifdef HAVE_RINGZ
-    #define gmp_nrn_bin gmp_nrz_bin
-    extern omBin gmp_nrz_bin;
-  #else
-    omBin gmp_nrn_bin = omGetSpecBin(sizeof(MP_INT));
-  #endif
+#ifdef HAVE_RINGS
+  #define gmp_nrn_bin gmp_nrz_bin
+  extern omBin gmp_nrz_bin;
 
 int_number nrnModul = NULL;
 int_number nrnMinusOne = NULL;

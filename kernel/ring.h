@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.40 2009-02-23 11:26:29 Singular Exp $ */
+/* $Id: ring.h,v 1.41 2009-05-06 12:53:49 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -102,25 +102,19 @@ void   rUnComplete(ring r);
 BOOLEAN rRing_is_Homog(ring r=currRing);
 BOOLEAN rRing_has_CompLastBlock(ring r=currRing);
 
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS
 inline BOOLEAN rField_is_Ring_2toM(ring r=currRing)
 { return (r->ringtype == 1); }
-#endif
 
-#ifdef HAVE_RINGMODN
 inline BOOLEAN rField_is_Ring_ModN(ring r=currRing)
 { return (r->ringtype == 2); }
 
 inline BOOLEAN rField_is_Ring_PtoM(ring r=currRing)
 { return (r->ringtype == 3); }
-#endif
 
-#ifdef HAVE_RINGZ
 inline BOOLEAN rField_is_Ring_Z(ring r=currRing)
 { return (r->ringtype == 4); }
-#endif
 
-#ifdef HAVE_RINGS
 inline BOOLEAN rField_is_Ring(ring r=currRing)
 { return (r->ringtype != 0); }
 
@@ -242,7 +236,7 @@ inline BOOLEAN rField_has_simple_inverse(ring r=currRing)
 inline BOOLEAN rField_has_simple_Alloc(ring r=currRing)
 { return (rField_is_Zp(r)
        || rField_is_GF(r)
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS
        || rField_is_Ring_2toM(r)
 #endif
        || rField_is_R(r)); }

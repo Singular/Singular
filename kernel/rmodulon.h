@@ -3,11 +3,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.h,v 1.9 2008-07-16 12:41:33 wienand Exp $ */
+/* $Id: rmodulon.h,v 1.10 2009-05-06 12:53:49 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
-#ifdef HAVE_RINGMODN
+#ifdef HAVE_RINGS
 #include "structs.h"
 
 #ifndef NATNUMBER

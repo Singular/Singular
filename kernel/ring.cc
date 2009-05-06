@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.116 2009-04-03 20:02:20 motsak Exp $ */
+/* $Id: ring.cc,v 1.117 2009-05-06 12:53:49 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -286,21 +286,13 @@ void rWrite(ring r)
   else if (rField_is_Ring(r))
   {
     PrintS("//   coeff. ring is : ");
-#ifdef HAVE_RINGZ
     if (rField_is_Ring_Z(r)) PrintS("Integers\n");
-#endif
     int l = mpz_sizeinbase(r->ringflaga, 10) + 2;
     char* s = (char*) omAlloc(l);
     mpz_get_str(s,10,r->ringflaga);
-#ifdef HAVE_RINGMODN
     if (rField_is_Ring_ModN(r)) Print("Z/%s\n", s);
-#endif
-#ifdef HAVE_RING2TOM
     if (rField_is_Ring_2toM(r)) Print("Z/2^%lu\n", r->ringflagb);
-#endif
-#ifdef HAVE_RINGMODN
     if (rField_is_Ring_PtoM(r)) Print("Z/%s^%lu\n", s, r->ringflagb);
-#endif
     omFreeSize((ADDRESS)s, l);
   }
 #endif
@@ -1506,7 +1498,7 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   res->ch=r->ch;     /* characteristic */
 #ifdef HAVE_RINGS
   res->ringtype=r->ringtype;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
-  if (r->ringflaga!=NULL) 
+  if (r->ringflaga!=NULL)
   {
     res->ringflaga = (int_number) omAlloc(sizeof(MP_INT));
     mpz_init_set(res->ringflaga,r->ringflaga);
@@ -4403,10 +4395,10 @@ ring rOpposite(ring src)
 //  rDebugPrint(src);
 #endif
 
-  
+
 //  ring r = rCopy0(src,TRUE); /* TRUE for copy the qideal: Why??? */
   ring r = rCopy0(src,FALSE); /* qideal will be deleted later on!!! */
-  
+
   /*  rChangeCurrRing(r); */
   // change vars v1..vN -> vN..v1
   int i;
@@ -4629,7 +4621,7 @@ ring rOpposite(ring src)
 //  rDebugPrint(r);
 #endif
 
-  
+
 #ifdef HAVE_PLURAL
   // now, we initialize a non-comm structure on r
   if (rIsPluralRing(src))
@@ -4669,7 +4661,6 @@ ring rOpposite(ring src)
     if (nc_CallPlural(C, D, NULL, NULL, r, false, false, true, r)) // no qring setup!
       WarnS("Error initializing non-commutative multiplication!");
 
-    
 #ifdef RDEBUG
     rTest(r);
 //    rWrite(r);
@@ -4679,10 +4670,8 @@ ring rOpposite(ring src)
     assume( r->GetNC()->IsSkewConstant == src->GetNC()->IsSkewConstant);
 
     omFreeSize((ADDRESS)perm,(rVar(r)+1)*sizeof(int));
-
   }
 #endif /* HAVE_PLURAL */
-
 
   /* now oppose the qideal for qrings */
   if (src->qideal != NULL)
@@ -4695,29 +4684,22 @@ ring rOpposite(ring src)
     r->qideal = id_Copy(src->qideal, currRing); // ?
 #endif
 
-
 #ifdef HAVE_PLURAL
     if( rIsPluralRing(r) )
     {
       nc_SetupQuotient(r);
-
 #ifdef RDEBUG
       rTest(r);
 //      rWrite(r);
 //      rDebugPrint(r);
 #endif
     }
-
 #endif
   }
-
-
 #ifdef HAVE_PLURAL
   if( rIsPluralRing(r) )
     assume( ncRingType(r) == ncRingType(src) );
 #endif
-
-  
   rTest(r);
 
   rChangeCurrRing(save);

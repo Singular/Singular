@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.85 2009-04-23 16:24:08 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.86 2009-05-06 12:53:48 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -147,7 +147,7 @@ int kFindNextDivisibleByInS(const kStrategy strat, int start,int max_ind, LObjec
   }
 }
 
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS
 NATNUMBER factorial(NATNUMBER arg)
 {
    NATNUMBER tmp = 1; arg++;

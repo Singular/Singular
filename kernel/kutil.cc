@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.136 2009-04-23 17:39:31 Singular Exp $ */
+/* $Id: kutil.cc,v 1.137 2009-05-06 12:53:48 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -21,7 +21,7 @@
 #define KDEBUG 2
 #endif
 
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS
 #include "ideals.h"
 #endif
 
@@ -2486,7 +2486,7 @@ void chainCritRing (poly p,int ecart,kStrategy strat)
 }
 #endif
 
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS
 long ind2(long arg)
 {
   long ind = 0;

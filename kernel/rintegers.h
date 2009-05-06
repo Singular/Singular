@@ -3,11 +3,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.h,v 1.7 2008-07-16 12:41:33 wienand Exp $ */
+/* $Id: rintegers.h,v 1.8 2009-05-06 12:53:49 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
-#ifdef HAVE_RINGZ
+#ifdef HAVE_RINGS
 #include "structs.h"
 
 extern int nrzExp;

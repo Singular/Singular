@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.20 2008-12-09 08:59:32 Singular Exp $ */
+/* $Id: numbers.cc,v 1.21 2009-05-06 12:53:48 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -22,13 +22,9 @@
 #include "ring.h"
 #include "ffields.h"
 #include "shortfl.h"
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS
 #include "rmodulo2m.h"
-#endif
-#ifdef HAVE_RINGMODN
 #include "rmodulon.h"
-#endif
-#ifdef HAVE_RINGZ
 #include "rintegers.h"
 #endif
 
@@ -136,7 +132,7 @@ void nSetChar(ring r)
   int c=rInternalChar(r);
 
   n__Delete= r->cf->cfDelete;
-  
+
   /*--------------------- Q -----------------*/
   if (rField_is_Q(r))
   {
@@ -149,31 +145,25 @@ void nSetChar(ring r)
     if (rField_is_Q_a()) nInit_bigint=naMap00;
     if (rField_is_Zp_a()) nInit_bigint=naMap0P;
   }
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS
   /*----------------------ring Z / 2^m----------------*/
   else if (rField_is_Ring_2toM(r))
   {
     nr2mSetExp(c, r);
     nInit_bigint=nr2mMapQ;
   }
-#endif  
-#ifdef HAVE_RINGZ
   /*----------------------ring Z / 2^m----------------*/
   else if (rField_is_Ring_Z(r))
   {
     nrzSetExp(c, r);
     nInit_bigint=nrzMapQ;
   }
-#endif  
-#ifdef HAVE_RINGMODN
   /*----------------------ring Z / n----------------*/
   else if (rField_is_Ring_ModN(r))
   {
     nrnSetExp(c, r);
     nInit_bigint=nrnMapQ;
   }
-#endif
-#ifdef HAVE_RINGMODN
   /*----------------------ring Z / n----------------*/
   else if (rField_is_Ring_PtoM(r))
   {
@@ -363,7 +353,7 @@ void nInitChar(ring r)
     n->nDBTest     = naDBTest;
 #endif
   }
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS
   /* -------------- Z/2^m ----------------------- */
   else if (rField_is_Ring_2toM(r))
   {
@@ -402,8 +392,6 @@ void nInitChar(ring r)
      n->nDBTest=nr2mDBTest;
 #endif
   }
-#endif
-#ifdef HAVE_RINGMODN
   /* -------------- Z/n ----------------------- */
   else if (rField_is_Ring_ModN(r) || rField_is_Ring_PtoM(r)
   )
@@ -446,8 +434,6 @@ void nInitChar(ring r)
      n->nDBTest=nrnDBTest;
 #endif
   }
-#endif
-#ifdef HAVE_RINGZ
   /* -------------- Z ----------------------- */
   else if (rField_is_Ring_Z(r))
   {
@@ -732,31 +718,31 @@ void nKillChar(ring r)
           {
             case n_Zp:
                  #ifdef HAVE_DIV_MOD
-		 if (r->cf->npInvTable!=NULL)
+                 if (r->cf->npInvTable!=NULL)
                  omFreeSize( (ADDRESS)r->cf->npInvTable,
                              r->cf->npPrimeM*sizeof(CARDINAL) );
                  #else
-		 if (r->cf->npExpTable!=NULL)
-		 {
+                 if (r->cf->npExpTable!=NULL)
+                 {
                    omFreeSize( (ADDRESS)r->cf->npExpTable,
                                r->cf->npPrimeM*sizeof(CARDINAL) );
                    omFreeSize( (ADDRESS)r->cf->npLogTable,
                                r->cf->npPrimeM*sizeof(CARDINAL) );
-	         }
+                 }
                  #endif
                  break;
-	    case n_Zp_a:
-	    case n_Q_a:
-	         {
-		   number n=r->minpoly;
-		   if (n!=NULL)
-		   {
-		     r->minpoly=NULL;
-		     if (r==currRing) naMinimalPoly=NULL;
-		     naDelete(&n,r);
-		   }
-		 }
-		 break;
+            case n_Zp_a:
+            case n_Q_a:
+                 {
+                   number n=r->minpoly;
+                   if (n!=NULL)
+                   {
+                     r->minpoly=NULL;
+                     if (r==currRing) naMinimalPoly=NULL;
+                     naDelete(&n,r);
+                   }
+                 }
+                 break;
 
             default:
                  break;

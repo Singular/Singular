@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.20 2009-01-19 12:34:50 Singular Exp $ */
+/* $Id: rintegers.cc,v 1.21 2009-05-06 12:53:49 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -19,7 +19,7 @@
 #include "rintegers.h"
 #include "si_gmp.h"
 
-#ifdef HAVE_RINGZ
+#ifdef HAVE_RINGS
 
 omBin gmp_nrz_bin = omGetSpecBin(sizeof(MP_INT));
 

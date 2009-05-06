@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.43 2009-03-18 16:56:02 Singular Exp $ */
+/* $Id: kutil.h,v 1.44 2009-05-06 12:53:48 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -414,9 +414,8 @@ int redRing (LObject* h,kStrategy strat);
 void enterExtendedSpoly(poly h,kStrategy strat);
 void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR = -1);
 poly kCreateZeroPoly(long exp[], long cabsind, poly* t_p, ring leadRing, ring tailRing);
-#endif
-#ifdef HAVE_RING2TOM
 long ind2(long arg);
+
 long ind_fact_2(long arg);
 long twoPow(long arg);
 ideal createG0();

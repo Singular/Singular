@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ringgb.cc,v 1.16 2007-06-20 09:39:25 wienand Exp $ */
+/* $Id: ringgb.cc,v 1.17 2009-05-06 12:53:49 Singular Exp $ */
 /*
 * ABSTRACT: ringgb interface
 */
@@ -28,7 +28,7 @@
 
 #include "ringgb.h"
 
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS
 poly reduce_poly_fct(poly p, ring r)
 {
    return kFindZeroPoly(p, r, r);
@@ -38,10 +38,12 @@ poly reduce_poly_fct(poly p, ring r)
  * Returns maximal k, such that
  * 2^k | n
  */
-int indexOf2(number n) {
+int indexOf2(number n)
+{
   long test = (long) n;
   int i = 0;
-  while (test%2 == 0) {
+  while (test%2 == 0)
+  {
     i++;
     test = test / 2;
   }
@@ -58,7 +60,6 @@ int indexOf2(number n) {
 BOOLEAN ring2toM_GetLeadTerms(const poly p1, const poly p2, const ring p_r,
                                poly &m1, poly &m2, const ring m_r)
 {
-
   int i;
   Exponent_t x;
   m1 = p_Init(m_r);
@@ -82,8 +83,10 @@ BOOLEAN ring2toM_GetLeadTerms(const poly p1, const poly p2, const ring p_r,
   p_Setm(m2, m_r);
   long cp1 = (long) pGetCoeff(p1);
   long cp2 = (long) pGetCoeff(p2);
-  if (cp1 != 0 && cp2 != 0) {
-    while (cp1%2 == 0 && cp2%2 == 0) {
+  if (cp1 != 0 && cp2 != 0)
+  {
+    while (cp1%2 == 0 && cp2%2 == 0)
+    {
       cp1 = cp1 / 2;
       cp2 = cp2 / 2;
     }
@@ -100,7 +103,8 @@ void printPolyMsg(const char * start, poly f, const char * end)
   PrintS(end);
 }
 
-poly spolyRing2toM(poly f, poly g, ring r) {
+poly spolyRing2toM(poly f, poly g, ring r)
+{
   poly m1 = NULL;
   poly m2 = NULL;
   ring2toM_GetLeadTerms(f, g, r, m1, m2, r);
@@ -113,7 +117,8 @@ poly spolyRing2toM(poly f, poly g, ring r) {
   return(sp);
 }
 
-poly ringRedNF (poly f, ideal G, ring r) {
+poly ringRedNF (poly f, ideal G, ring r)
+{
   // If f = 0, then normal form is also 0
   if (f == NULL) { return NULL; }
   poly h = NULL;
@@ -146,20 +151,24 @@ poly ringRedNF (poly f, ideal G, ring r) {
  * ideal of the leading coefficients
  * of the suitable g from G.
  */
-int findRingSolver(poly rside, ideal G, ring r) {
+int findRingSolver(poly rside, ideal G, ring r)
+{
   if (rside == NULL) return -1;
   int i;
 //  int iO2rside = indexOf2(pGetCoeff(rside));
-  for (i = 0; i < IDELEMS(G); i++) {
+  for (i = 0; i < IDELEMS(G); i++)
+  {
     if // (indexOf2(pGetCoeff(G->m[i])) <= iO2rside &&    / should not be necessary any more
-       (p_LmDivisibleBy(G->m[i], rside, r)) {
+       (p_LmDivisibleBy(G->m[i], rside, r))
+    {
       return i;
     }
   }
   return -1;
 }
 
-poly plain_spoly(poly f, poly g) {
+poly plain_spoly(poly f, poly g)
+{
   number cf = nCopy(pGetCoeff(f)), cg = nCopy(pGetCoeff(g));
   int ct = ksCheckCoeff(&cf, &cg); // gcd and zero divisors
   poly fm, gm;
@@ -187,7 +196,8 @@ poly plain_zero_spoly(poly h)
   return p;
 }
 
-poly ringNF(poly f, ideal G, ring r) {
+poly ringNF(poly f, ideal G, ring r)
+{
   // If f = 0, then normal form is also 0
   if (f == NULL) { return NULL; }
   poly tmp = NULL;
@@ -258,7 +268,7 @@ int testGB(ideal I, ideal GI) {
   if (!(rField_is_Domain()))
   {
     Print(" Yes!\nzero-spoly --> 0?");
-    for (i = 0; i < IDELEMS(GI); i++) 
+    for (i = 0; i < IDELEMS(GI); i++)
     {
       f = plain_zero_spoly(GI->m[i]);
       nf = ringNF(f, GI, currRing);

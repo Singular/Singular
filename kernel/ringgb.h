@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ringgb.h,v 1.7 2007-05-11 10:56:03 wienand Exp $ */
+/* $Id: ringgb.h,v 1.8 2009-05-06 12:53:49 Singular Exp $ */
 /*
 * ABSTRACT: ringgb interface
 */
@@ -16,10 +16,8 @@ poly ringNF(poly f, ideal G, ring r);
 poly plain_spoly(poly f, poly g);
 int testGB(ideal I, ideal GI);
 
-#ifdef HAVE_RING2TOM
 poly reduce_poly_fct(poly p, ring r);
 poly ringRedNF(poly f, ideal G, ring r);
-#endif
 
 #endif
 #endif

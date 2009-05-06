@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.32 2009-05-06 10:29:59 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.33 2009-05-06 12:53:48 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -202,12 +202,6 @@
 
 /* rings as coefficients */
 #define HAVE_RINGS
-
-#ifdef HAVE_RINGS
-#define HAVE_RING2TOM
-#define HAVE_RINGMODN
-#define HAVE_RINGZ
-#endif
 
 /* procedures to compute with units */
 #define HAVE_UNITS

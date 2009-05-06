@@ -3,11 +3,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.h,v 1.10 2008-07-16 12:41:33 wienand Exp $ */
+/* $Id: rmodulo2m.h,v 1.11 2009-05-06 12:53:49 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RINGS
 #include "structs.h"
 
 extern int nr2mExp;
