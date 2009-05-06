@@ -1,8 +1,14 @@
-Changes w.r.t 3-1-0:
+Changes w.r.t 3-1-0-1:
+- 3-1-0-2 Wed May  6 12:34:23 CEST 2009
+- TMPDIR causes problems on MacOsX builds (ar fails): renamed to SI_TMPDIR
+- better error handling in assigning qring
+- attributes which depend on the ring: cleanup fixed (see Tst/Short/bug_tr134)
+- minor updates
 
+Changes w.r.t 3-1-0:
 - 3-1-0-1 Tue Apr 28 20:11:22 CEST 2009
-  reduction was not complete in some cases fixed (char 0, qring, module, ordering (c,...))
-  (see Tst/bug_tr132)
+-  reduction was not complete in some cases fixed (char 0, qring, module, ordering (c,...))
+  (see Tst/Short/bug_tr132)
 - better test for arguments of elim (check for old syntax)
   (see elim.lib, tr 133)
 - minor doc updates
