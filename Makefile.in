@@ -466,6 +466,8 @@ cygwin-dist-pack: ## singular-base-${CYGWIN_PORT_VER}-src.tar.bz2
 	cp singular-base-${CYGWIN_PORT_VER}-src.tar.bz2 ${CYGWIN_REP_DIR}/release/Singular/
 	touch ${CYGWIN_AUX_FILES}/singular-surf-${CYGWIN_PORT_VER}-src.tar.bz2
 	cp ${CYGWIN_AUX_FILES}/singular-surf-${CYGWIN_PORT_VER}-src.tar.bz2 ${CYGWIN_REP_DIR}/release/Singular/
+	touch ${CYGWIN_AUX_FILES}/singular-helper-${CYGWIN_PORT_VER}.tar.bz2
+	cp ${CYGWIN_AUX_FILES}/singular-helper-${CYGWIN_PORT_VER}.tar.bz2 ${CYGWIN_REP_DIR}/release/Singular/
 
 cygwin-helper: cygwin-setup-init cygwin-setup-helper
 	${MKINSTALLDIRS} ${CYGWIN_REP_DIR}/release/Singular
@@ -483,9 +485,9 @@ cygwin-setup-init:
 	@echo "setup-version: ${CYGWIN_SETUP_VER}" >> ${CYGWIN_REP_DIR}/setup.ini
 	@echo >> ${CYGWIN_REP_DIR}/setup.ini
 	if test -f ${CYGWIN_ORIG}/Small/setup.ini; then                             \
-		tail -n +7 ${CYGWIN_ORIG}/Small/setup.ini >> ${CYGWIN_REP_DIR}/setup.ini;  \
+#		tail -n +7 ${CYGWIN_ORIG}/Small/setup.ini >> ${CYGWIN_REP_DIR}/setup.ini;  \
 	else                                                                        \
-		tail -n +7 ${CYGWIN_ORIG}/Full/setup.ini >> ${CYGWIN_REP_DIR}/setup.ini;   \
+#		tail -n +7 ${CYGWIN_ORIG}/Full/setup.ini >> ${CYGWIN_REP_DIR}/setup.ini;   \
 	fi;
 	@echo >> ${CYGWIN_REP_DIR}/setup.ini
 ##	Download setup exe
@@ -533,11 +535,13 @@ cygwin-pfw-%:
 	if test -d ${SI_TMPDIR}; then rm -rf ${SI_TMPDIR}; fi
 	${MKINSTALLDIRS} ${SI_TMPDIR}/Files
 	cp -r ${CYGWIN_ORIG}/$*/* ${SI_TMPDIR}/Files/
-	touch ${SI_TMPDIR}/Files/release/Singular/singular-helper-${CYGWIN_PORT_VER}.tar.bz2
+#	touch ${SI_TMPDIR}/Files/release/Singular/singular-helper-${CYGWIN_PORT_VER}.tar.bz2
 	@echo "Creating $* distribution ..."
 	-rm -f  ${SI_TMPDIR}/Files/setup.exe
 	cp ${CYGWIN_AUX_FILES}/setup-pfw.exe ${SI_TMPDIR}/Files/setup.exe
-	cat ${CYGWIN_REP_DIR}/setup.ini | sed -e 's/setup-version:.*//' | sed -e 's/setup-timestamp:.*//' >> ${SI_TMPDIR}/Files/setup.ini
+# wrong:	cat ${CYGWIN_REP_DIR}/setup.ini | sed -e 's/setup-version:.*//' | sed -e 's/setup-timestamp:.*//' >> ${SI_TMPDIR}/Files/setup.ini
+# new:
+	cp ${CYGWIN_REP_DIR}/setup.ini ${SI_TMPDIR}/Files/setup.ini
 	@echo Writing Singular.pfw ...
 	@echo "Version=2.0" >> ${SI_TMPDIR}/Singular.pfw
 	@echo "" >> ${SI_TMPDIR}/Singular.pfw
@@ -555,7 +559,7 @@ cygwin-pfw-%:
 	@echo "Description=A Computer Algebra System For Polynomial Computations" >> ${SI_TMPDIR}/Singular.pfw
 	@echo "Comments=Authors: G.-M. Greuel, G. Pfister, H. Schoenemann" >> ${SI_TMPDIR}/Singular.pfw
 	@echo "Notice=Distributed under General Public License (GPL)" >> ${SI_TMPDIR}/Singular.pfw
-	@echo "Version=@SINGULAR_VERSION@" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "Version=3-1-0" >> ${SI_TMPDIR}/Singular.pfw
 	@echo -n "OutputSpec=" >> ${SI_TMPDIR}/Singular.pfw
 	@echo -n "`cygpath -a -w .`" >> ${SI_TMPDIR}/Singular.pfw
 	@echo "\Singular-${S_VERSION}-$*.exe" >> ${SI_TMPDIR}/Singular.pfw
