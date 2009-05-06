@@ -3,7 +3,7 @@
  *  Purpose: Error handling of omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omError.h,v 1.8 2001-04-30 09:02:06 Singular Exp $
+ *  Version: $Id: omError.h,v 1.9 2009-05-06 10:28:33 Singular Exp $
  *******************************************************************/
 #ifndef OM_ERROR_H
 #define OM_ERROR_H
@@ -59,7 +59,7 @@ extern omError_t omReportError(omError_t error, omError_t report_error, OM_FLR_D
 extern void omErrorBreak();
 
 #ifndef OM_NDEBUG
-extern void omPrintAddrInfo(FILE* fd, void* addr, char* s);
+extern void omPrintAddrInfo(FILE* fd, void* addr, const char* s);
 #else
 #define omPrintAddrInfo(fd, addr, s) fprintf(fd, "OM_NDEBUG: no addr info available\n")
 #endif

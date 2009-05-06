@@ -3,7 +3,7 @@
  *  Purpose: implementation of omCheck functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugCheck.c,v 1.14 2002-01-22 16:17:43 Singular Exp $
+ *  Version: $Id: omDebugCheck.c,v 1.15 2009-05-06 10:28:33 Singular Exp $
  *******************************************************************/
 #include <mylimits.h>
 #include <stdarg.h>
@@ -25,7 +25,7 @@ omError_t omDoCheckBin(omBin bin, int normal_bin, char level,
                        omError_t report, OM_FLR_DECL);
 static omError_t omDoCheckBinPage(omBinPage page, int normal_page, int level,
                                   omError_t report, OM_FLR_DECL);
-static void _omPrintAddrInfo(FILE* fd, omError_t error, void* addr, void* bin_size, omTrackFlags_t flags, int max_frames, char* s);
+static void _omPrintAddrInfo(FILE* fd, omError_t error, void* addr, void* bin_size, omTrackFlags_t flags, int max_frames, const char* s);
 
 
 /*******************************************************************
@@ -418,7 +418,7 @@ omError_t omReportAddrError(omError_t error, omError_t report_error, void* addr,
   return om_ErrorStatus;
 }
 
-void _omPrintAddrInfo(FILE* fd, omError_t error, void* addr, void* bin_size, omTrackFlags_t flags, int frames, char* s)
+void _omPrintAddrInfo(FILE* fd, omError_t error, void* addr, void* bin_size, omTrackFlags_t flags, int frames, const char* s)
 {
   int x;
   if (! (x=omCheckPtr(addr, omError_MaxError, OM_FLR)))
@@ -442,7 +442,7 @@ void _omPrintAddrInfo(FILE* fd, omError_t error, void* addr, void* bin_size, omT
   }
 }
 
-void omPrintAddrInfo(FILE* fd, void *addr, char* s)
+void omPrintAddrInfo(FILE* fd, void *addr, const char* s)
 {
   _omPrintAddrInfo(fd, omError_NoError, addr, NULL, 0, 10, s);
 }
