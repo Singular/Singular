@@ -198,7 +198,7 @@ BINDIST_DIRS        = kernel Singular doc IntegerProgramming modules
 
 SHAREDIST_DIRS      = Singular doc emacs
 
-TMPDIR		    = ${TMP_DIR}/singdist
+SI_TMPDIR	    = ${TMP_DIR}/singdist
 
 LN_S		= @LN_S@
 MKINSTALLDIRS 	= ./mkinstalldirs
@@ -226,29 +226,29 @@ install-sharedist: ${SINGULAR}
 dist: ${SHAREDIST_NAME}.tar.gz  ${BINDIST_NAME}.tar.gz
 
 sharedist ${SHAREDIST_NAME}.tar.gz:
-	if test -d ${TMPDIR}; then rm -rf ${TMPDIR}; fi
-	${MAKE} install-sharedist localdir=${TMPDIR}
-	chmod -R a+rX ${TMPDIR}
-	cd ${TMPDIR}; tar cf - Singular| ${MYGZIP} > ${SHAREDIST_NAME}.tar.gz
-	mv ${TMPDIR}/${SHAREDIST_NAME}.tar.gz .
-	rm -rf ${TMPDIR}
+	if test -d ${SI_TMPDIR}; then rm -rf ${SI_TMPDIR}; fi
+	${MAKE} install-sharedist localdir=${SI_TMPDIR}
+	chmod -R a+rX ${SI_TMPDIR}
+	cd ${SI_TMPDIR}; tar cf - Singular| ${MYGZIP} > ${SHAREDIST_NAME}.tar.gz
+	mv ${SI_TMPDIR}/${SHAREDIST_NAME}.tar.gz .
+	rm -rf ${SI_TMPDIR}
 
 bindist ${BINDIST_NAME}.tar.gz:
-	if test -d ${TMPDIR}; then rm -fr ${TMPDIR}; fi
-	${MAKE} install-bindist localdir=${TMPDIR}
-	chmod -R a+rX ${TMPDIR}
-	cd ${TMPDIR}; tar cf - Singular| ${MYGZIP} > ${BINDIST_NAME}.tar.gz
-	mv ${TMPDIR}/${BINDIST_NAME}.tar.gz .
-	rm -rf ${TMPDIR}
+	if test -d ${SI_TMPDIR}; then rm -fr ${SI_TMPDIR}; fi
+	${MAKE} install-bindist localdir=${SI_TMPDIR}
+	chmod -R a+rX ${SI_TMPDIR}
+	cd ${SI_TMPDIR}; tar cf - Singular| ${MYGZIP} > ${BINDIST_NAME}.tar.gz
+	mv ${SI_TMPDIR}/${BINDIST_NAME}.tar.gz .
+	rm -rf ${SI_TMPDIR}
 
 static-bindist ${BINDIST_NAME}-static.tar.gz:
-	if test -d ${TMPDIR}; then rm -fr ${TMPDIR}; fi
-	${MAKE} install-bindist localdir=${TMPDIR} LD_STATIC=1
-	chmod -R a+rX ${TMPDIR}
-	-rm -f ${TMPDIR}/Singular/*/*/*.so
-	cd ${TMPDIR}; tar cf - Singular| ${MYGZIP} > ${BINDIST_NAME}-static.tar.gz
-	mv ${TMPDIR}/${BINDIST_NAME}-static.tar.gz .
-	rm -rf ${TMPDIR}
+	if test -d ${SI_TMPDIR}; then rm -fr ${SI_TMPDIR}; fi
+	${MAKE} install-bindist localdir=${SI_TMPDIR} LD_STATIC=1
+	chmod -R a+rX ${SI_TMPDIR}
+	-rm -f ${SI_TMPDIR}/Singular/*/*/*.so
+	cd ${SI_TMPDIR}; tar cf - Singular| ${MYGZIP} > ${BINDIST_NAME}-static.tar.gz
+	mv ${SI_TMPDIR}/${BINDIST_NAME}-static.tar.gz .
+	rm -rf ${SI_TMPDIR}
 
 install-root:
 	${MKINSTALLDIRS} ${localdir}/bin
@@ -260,14 +260,14 @@ install-root:
 #
 
 cygwin-dist-src singular-base-${CYGWIN_PORT_VER}-src.tar.bz2:
-	-rm -rf ${TMPDIR}
-	${MKINSTALLDIRS} ${TMPDIR}/singular-${CYGWIN_PORT_VER}
+	-rm -rf ${SI_TMPDIR}
+	${MKINSTALLDIRS} ${SI_TMPDIR}/singular-${CYGWIN_PORT_VER}
 	export CVS_RSH=ssh; export CVSROOT=:ext:monty.mathematik.uni-kl.de:/usr/local/Singular/cvsroot; \
-	cd ${TMPDIR}/singular-${CYGWIN_PORT_VER}; cvs co All;
-	cd  ${TMPDIR}; \
+	cd ${SI_TMPDIR}/singular-${CYGWIN_PORT_VER}; cvs co All;
+	cd  ${SI_TMPDIR}; \
 	tar cjf singular-base-${CYGWIN_PORT_VER}-src.tar.bz2 singular-${CYGWIN_PORT_VER};
-	mv ${TMPDIR}/singular-base-${CYGWIN_PORT_VER}-src.tar.bz2 .
-	-rm -rf ${TMPDIR}
+	mv ${SI_TMPDIR}/singular-base-${CYGWIN_PORT_VER}-src.tar.bz2 .
+	-rm -rf ${SI_TMPDIR}
 
 cygwin-dist-scripts:
 	@echo -e  "Writing /etc/postinstall/singular-help.sh"
@@ -379,28 +379,28 @@ cygwin-dist-scripts:
 	@echo -e  'java -jar surfex.jar -d "$$surfexstartdir" -t "$$tmp_dir" $$allargs' >> /usr/bin/surfex
 
 cygwin-dist-install: cygwin-dist-scripts ## ${BINDIST_NAME}.tar.gz
-	if test -d ${TMPDIR}; then rm -fr ${TMPDIR}; fi
-	${MKINSTALLDIRS} ${TMPDIR}
-	tar  --directory=${TMPDIR} -x -z -f ${SHAREDIST_NAME}.tar.gz
-	-rm -rf ${TMPDIR}/Singular/${S_VERSION}/html
-	tar  --directory=${TMPDIR} -x -z -f ${BINDIST_NAME}.tar.gz
+	if test -d ${SI_TMPDIR}; then rm -fr ${SI_TMPDIR}; fi
+	${MKINSTALLDIRS} ${SI_TMPDIR}
+	tar  --directory=${SI_TMPDIR} -x -z -f ${SHAREDIST_NAME}.tar.gz
+	-rm -rf ${SI_TMPDIR}/Singular/${S_VERSION}/html
+	tar  --directory=${SI_TMPDIR} -x -z -f ${BINDIST_NAME}.tar.gz
 	-rm -rf ${CYGWIN_SINGULAR_ROOT} ${CYGWIN_SINGULAR_DOC} ${CYGWIN_SINGULAR_BIN}
 	${MKINSTALLDIRS} ${CYGWIN_SINGULAR_ROOT} ${CYGWIN_SINGULAR_DOC} ${CYGWIN_SINGULAR_BIN}
 ## Copy documentation files
-	cp ${TMPDIR}/Singular/${S_VERSION}/README /usr/share/doc/Singular-${CYGWIN_SING_VER}/
-	cp ${TMPDIR}/Singular/${S_VERSION}/INSTALL /usr/share/doc/Singular-${CYGWIN_SING_VER}/
-	cp ${TMPDIR}/Singular/${S_VERSION}/COPYING /usr/share/doc/Singular-${CYGWIN_SING_VER}/
-	cp ${TMPDIR}/Singular/${S_VERSION}/NEWS /usr/share/doc/Singular-${CYGWIN_SING_VER}/
-	cp ${TMPDIR}/Singular/${S_VERSION}/GPL* /usr/share/doc/Singular-${CYGWIN_SING_VER}/
+	cp ${SI_TMPDIR}/Singular/${S_VERSION}/README /usr/share/doc/Singular-${CYGWIN_SING_VER}/
+	cp ${SI_TMPDIR}/Singular/${S_VERSION}/INSTALL /usr/share/doc/Singular-${CYGWIN_SING_VER}/
+	cp ${SI_TMPDIR}/Singular/${S_VERSION}/COPYING /usr/share/doc/Singular-${CYGWIN_SING_VER}/
+	cp ${SI_TMPDIR}/Singular/${S_VERSION}/NEWS /usr/share/doc/Singular-${CYGWIN_SING_VER}/
+	cp ${SI_TMPDIR}/Singular/${S_VERSION}/GPL* /usr/share/doc/Singular-${CYGWIN_SING_VER}/
 ## Install Cygwin specific structure
 	-rm -rf /lib/surfex
-	mv ${TMPDIR}/Singular/${S_VERSION}/LIB/surfex /lib/surfex
-	-mv -u ${TMPDIR}/Singular/${S_VERSION}/LIB/surfex.jar /lib/surfex/surfex.jar
-	mv ${TMPDIR}/Singular/${S_VERSION}/ix86-Win/* ${CYGWIN_SINGULAR_BIN}/
-	-rmdir ${TMPDIR}/Singular/${S_VERSION}/ix86-Win
-	mv ${TMPDIR}/Singular/${S_VERSION}/LIB ${CYGWIN_SINGULAR_ROOT}/
-	mv ${TMPDIR}/Singular/${S_VERSION}/emacs ${CYGWIN_SINGULAR_ROOT}/
-	mv ${TMPDIR}/Singular/${S_VERSION}/* ${CYGWIN_SINGULAR_DOC}/
+	mv ${SI_TMPDIR}/Singular/${S_VERSION}/LIB/surfex /lib/surfex
+	-mv -u ${SI_TMPDIR}/Singular/${S_VERSION}/LIB/surfex.jar /lib/surfex/surfex.jar
+	mv ${SI_TMPDIR}/Singular/${S_VERSION}/ix86-Win/* ${CYGWIN_SINGULAR_BIN}/
+	-rmdir ${SI_TMPDIR}/Singular/${S_VERSION}/ix86-Win
+	mv ${SI_TMPDIR}/Singular/${S_VERSION}/LIB ${CYGWIN_SINGULAR_ROOT}/
+	mv ${SI_TMPDIR}/Singular/${S_VERSION}/emacs ${CYGWIN_SINGULAR_ROOT}/
+	mv ${SI_TMPDIR}/Singular/${S_VERSION}/* ${CYGWIN_SINGULAR_DOC}/
 	mv ${CYGWIN_SINGULAR_DOC}/info/singular.hlp /usr/share/info/singular.info
 	-rm -f ${CYGWIN_SINGULAR_BIN}/surfex
 ## Copy auxiliary files
@@ -530,63 +530,63 @@ cygwin-setup-%:
 cygwin-pfw: cygwin-pfw-Small cygwin-pfw-Full
 
 cygwin-pfw-%:
-	if test -d ${TMPDIR}; then rm -rf ${TMPDIR}; fi
-	${MKINSTALLDIRS} ${TMPDIR}/Files
-	cp -r ${CYGWIN_ORIG}/$*/* ${TMPDIR}/Files/
-	touch ${TMPDIR}/Files/release/Singular/singular-helper-${CYGWIN_PORT_VER}.tar.bz2
+	if test -d ${SI_TMPDIR}; then rm -rf ${SI_TMPDIR}; fi
+	${MKINSTALLDIRS} ${SI_TMPDIR}/Files
+	cp -r ${CYGWIN_ORIG}/$*/* ${SI_TMPDIR}/Files/
+	touch ${SI_TMPDIR}/Files/release/Singular/singular-helper-${CYGWIN_PORT_VER}.tar.bz2
 	@echo "Creating $* distribution ..."
-	-rm -f  ${TMPDIR}/Files/setup.exe
-	cp ${CYGWIN_AUX_FILES}/setup-pfw.exe ${TMPDIR}/Files/setup.exe
-	cat ${CYGWIN_REP_DIR}/setup.ini | sed -e 's/setup-version:.*//' | sed -e 's/setup-timestamp:.*//' >> ${TMPDIR}/Files/setup.ini
+	-rm -f  ${SI_TMPDIR}/Files/setup.exe
+	cp ${CYGWIN_AUX_FILES}/setup-pfw.exe ${SI_TMPDIR}/Files/setup.exe
+	cat ${CYGWIN_REP_DIR}/setup.ini | sed -e 's/setup-version:.*//' | sed -e 's/setup-timestamp:.*//' >> ${SI_TMPDIR}/Files/setup.ini
 	@echo Writing Singular.pfw ...
-	@echo "Version=2.0" >> ${TMPDIR}/Singular.pfw
-	@echo "" >> ${TMPDIR}/Singular.pfw
-	@echo "[Options]" >> ${TMPDIR}/Singular.pfw
-	@echo "Title=Singular ${S_VERSION}: $* Distribution" >> ${TMPDIR}/Singular.pfw
-	@echo "Company=Department of Mathematics and Center for Computer Algebra, University of Kaiserslautern" >> ${TMPDIR}/Singular.pfw
-	@echo "CompanyEMail=singular@mathematik.uni-kl.de" >> ${TMPDIR}/Singular.pfw
-	@echo -n "BasePath="  >> ${TMPDIR}/Singular.pfw
-	@echo `cygpath -a -w ${TMPDIR}/Files` >> ${TMPDIR}/Singular.pfw
-	@echo "ImportPath=" >> ${TMPDIR}/Singular.pfw
-	@echo "UseRTF=1" >> ${TMPDIR}/Singular.pfw
-	@echo "SaveFiles=0" >> ${TMPDIR}/Singular.pfw
-	@echo "SubFolders=1" >> ${TMPDIR}/Singular.pfw
-	@echo "ApplicationName=Singular ${S_VERSION} Build `date -u +%D' UTC '%T`" >> ${TMPDIR}/Singular.pfw
-	@echo "Description=A Computer Algebra System For Polynomial Computations" >> ${TMPDIR}/Singular.pfw
-	@echo "Comments=Authors: G.-M. Greuel, G. Pfister, H. Schoenemann" >> ${TMPDIR}/Singular.pfw
-	@echo "Notice=Distributed under General Public License (GPL)" >> ${TMPDIR}/Singular.pfw
-	@echo "Version=@SINGULAR_VERSION@" >> ${TMPDIR}/Singular.pfw
-	@echo -n "OutputSpec=" >> ${TMPDIR}/Singular.pfw
-	@echo -n "`cygpath -a -w .`" >> ${TMPDIR}/Singular.pfw
-	@echo "\Singular-${S_VERSION}-$*.exe" >> ${TMPDIR}/Singular.pfw
-	@echo "GUIDs=0" >> ${TMPDIR}/Singular.pfw
-	@echo "Type=2" >> ${TMPDIR}/Singular.pfw
-	@echo "Compress=1" >> ${TMPDIR}/Singular.pfw
-	@echo "Sign=0" >> ${TMPDIR}/Singular.pfw
-	@echo "Transfer=0" >> ${TMPDIR}/Singular.pfw
-	@echo "" >> ${TMPDIR}/Singular.pfw
-	@echo "[Runtime]" >> ${TMPDIR}/Singular.pfw
-	@echo "Welcome=" >> ${TMPDIR}/Singular.pfw
-	@echo -n "License=" >> ${TMPDIR}/Singular.pfw
-	@echo -n "`cygpath -a -w .`" >> ${TMPDIR}/Singular.pfw
-	@echo "\GPL" >> ${TMPDIR}/Singular.pfw
-	@echo "Prompt=" >> ${TMPDIR}/Singular.pfw
-	@echo "Password=" >> ${TMPDIR}/Singular.pfw
-	@echo "DefaultPath=" >> ${TMPDIR}/Singular.pfw
-	@echo "Language=English" >> ${TMPDIR}/Singular.pfw
-	@echo "WindowStyle=0" >> ${TMPDIR}/Singular.pfw
-	@echo "Options=33" >> ${TMPDIR}/Singular.pfw
-	@echo "Execute=setup.exe" >> ${TMPDIR}/Singular.pfw
-	@echo "CmdLine=-L -q -n" >> ${TMPDIR}/Singular.pfw
-	@echo "AllowChangeTarget=0" >> ${TMPDIR}/Singular.pfw
-	@echo "AllowDelete=0" >> ${TMPDIR}/Singular.pfw
-	@echo "LaunchEXE=1" >> ${TMPDIR}/Singular.pfw
-	@echo "" >> ${TMPDIR}/Singular.pfw
-	@echo "[Extension]" >> ${TMPDIR}/Singular.pfw
-	@echo "Server=" >> ${TMPDIR}/Singular.pfw
-	@echo "Calls=0" >> ${TMPDIR}/Singular.pfw
+	@echo "Version=2.0" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "[Options]" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "Title=Singular ${S_VERSION}: $* Distribution" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "Company=Department of Mathematics and Center for Computer Algebra, University of Kaiserslautern" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "CompanyEMail=singular@mathematik.uni-kl.de" >> ${SI_TMPDIR}/Singular.pfw
+	@echo -n "BasePath="  >> ${SI_TMPDIR}/Singular.pfw
+	@echo `cygpath -a -w ${SI_TMPDIR}/Files` >> ${SI_TMPDIR}/Singular.pfw
+	@echo "ImportPath=" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "UseRTF=1" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "SaveFiles=0" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "SubFolders=1" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "ApplicationName=Singular ${S_VERSION} Build `date -u +%D' UTC '%T`" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "Description=A Computer Algebra System For Polynomial Computations" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "Comments=Authors: G.-M. Greuel, G. Pfister, H. Schoenemann" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "Notice=Distributed under General Public License (GPL)" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "Version=@SINGULAR_VERSION@" >> ${SI_TMPDIR}/Singular.pfw
+	@echo -n "OutputSpec=" >> ${SI_TMPDIR}/Singular.pfw
+	@echo -n "`cygpath -a -w .`" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "\Singular-${S_VERSION}-$*.exe" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "GUIDs=0" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "Type=2" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "Compress=1" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "Sign=0" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "Transfer=0" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "[Runtime]" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "Welcome=" >> ${SI_TMPDIR}/Singular.pfw
+	@echo -n "License=" >> ${SI_TMPDIR}/Singular.pfw
+	@echo -n "`cygpath -a -w .`" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "\GPL" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "Prompt=" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "Password=" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "DefaultPath=" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "Language=English" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "WindowStyle=0" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "Options=33" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "Execute=setup.exe" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "CmdLine=-L -q -n" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "AllowChangeTarget=0" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "AllowDelete=0" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "LaunchEXE=1" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "[Extension]" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "Server=" >> ${SI_TMPDIR}/Singular.pfw
+	@echo "Calls=0" >> ${SI_TMPDIR}/Singular.pfw
 	cd ${CYGWIN_PFW_DIR}; \
-	${CYGWIN_PFW_EXEC} -a -s "`cygpath -a -w ${TMPDIR}/Singular.pfw`"
+	${CYGWIN_PFW_EXEC} -a -s "`cygpath -a -w ${SI_TMPDIR}/Singular.pfw`"
 
 singular-cd-windows:
 	@echo Building cd directories and web interface
@@ -623,26 +623,26 @@ test_t:
 .PHONY: sharedist bindist static-bindist infodist win-sharedist
 _static-bindist: ${SINGULAR}
 	cd Singular; ${MAKE} Singular-$@ libparse
-	rm -rf ${TMPDIR}
-	${MKINSTALLDIRS} ${TMPDIR}/${BINDIR_NAME}
-	cp Singular/Singular-$@ ${TMPDIR}/${BINDIR_NAME}/Singular-static
-	cp Singular/libparse ${TMPDIR}/${BINDIR_NAME}
-	-strip ${TMPDIR}/${BINDIR_NAME}/*
+	rm -rf ${SI_TMPDIR}
+	${MKINSTALLDIRS} ${SI_TMPDIR}/${BINDIR_NAME}
+	cp Singular/Singular-$@ ${SI_TMPDIR}/${BINDIR_NAME}/Singular-static
+	cp Singular/libparse ${SI_TMPDIR}/${BINDIR_NAME}
+	-strip ${SI_TMPDIR}/${BINDIR_NAME}/*
 	cat INSTALL.unix | sed -e "s/<x-y-z>/${S_VERSION}/g" > \
-                      ${TMPDIR}/Singular/INSTALL
-	cd ${TMPDIR}; chmod -R a+rX *;\
+                      ${SI_TMPDIR}/Singular/INSTALL
+	cd ${SI_TMPDIR}; chmod -R a+rX *;\
            tar cf - Singular | ${MYGZIP} > ${BINDIST_NAME}-static.tar.gz
-	mv ${TMPDIR}/${BINDIST_NAME}-static.tar.gz .
-	rm -rf ${TMPDIR}
+	mv ${SI_TMPDIR}/${BINDIST_NAME}-static.tar.gz .
+	rm -rf ${SI_TMPDIR}
 
 _infodist:
-	rm -rf ${TMPDIR}
-	${MKINSTALLDIRS} ${TMPDIR}/${SINGUNAME}/bin/
-	cp `which info` ${TMPDIR}/${SINGUNAME}/bin/
-	-strip ${TMPDIR}/${SINGUNAME}/bin/info
-	cd ${TMPDIR}; tar cf - ${SINGUNAME} | ${MYGZIP}  > info-${SINGUNAME}.tar.gz
-	mv ${TMPDIR}/info-${SINGUNAME}.tar.gz .
-	rm -rf ${TMPDIR}
+	rm -rf ${SI_TMPDIR}
+	${MKINSTALLDIRS} ${SI_TMPDIR}/${SINGUNAME}/bin/
+	cp `which info` ${SI_TMPDIR}/${SINGUNAME}/bin/
+	-strip ${SI_TMPDIR}/${SINGUNAME}/bin/info
+	cd ${SI_TMPDIR}; tar cf - ${SINGUNAME} | ${MYGZIP}  > info-${SINGUNAME}.tar.gz
+	mv ${SI_TMPDIR}/info-${SINGUNAME}.tar.gz .
+	rm -rf ${SI_TMPDIR}
 
 INSTALL		= ./Singular/install-sh -c
 SH_PROGRAM 	= /bin/sh
@@ -651,29 +651,29 @@ CYGWIN_DLL	= /bin/cygwin1.dll
 
 windist: ${SINGULAR}
 	cd Singular; ${MAKE} install-bindist
-	rm -rf ${TMPDIR}
-	${MKINSTALLDIRS} ${TMPDIR}/${BINDIR_NAME}
+	rm -rf ${SI_TMPDIR}
+	${MKINSTALLDIRS} ${SI_TMPDIR}/${BINDIR_NAME}
 	${INSTALL} Singular/Singular-bindist \
-                   ${TMPDIR}/${BINDIR_NAME}/Singular.exe
-	${INSTALL} Singular/libparse ${TMPDIR}/${BINDIR_NAME}
-	${INSTALL} ${SH_PROGRAM} ${TMPDIR}/${BINDIR_NAME}
-	${INSTALL} ${INFO_PROGRAM} ${TMPDIR}/${BINDIR_NAME}
-	${INSTALL} ${CYGWIN_DLL} ${TMPDIR}/${BINDIR_NAME}
+                   ${SI_TMPDIR}/${BINDIR_NAME}/Singular.exe
+	${INSTALL} Singular/libparse ${SI_TMPDIR}/${BINDIR_NAME}
+	${INSTALL} ${SH_PROGRAM} ${SI_TMPDIR}/${BINDIR_NAME}
+	${INSTALL} ${INFO_PROGRAM} ${SI_TMPDIR}/${BINDIR_NAME}
+	${INSTALL} ${CYGWIN_DLL} ${SI_TMPDIR}/${BINDIR_NAME}
 	cat INSTALL.win	| sed -e "s/<x-y-z>/${S_VERSION}/g" > \
-                         ${TMPDIR}/Singular/INSTALL
-	cd ${TMPDIR}; chmod -R a+rX *;\
+                         ${SI_TMPDIR}/Singular/INSTALL
+	cd ${SI_TMPDIR}; chmod -R a+rX *;\
            ${ZIP} -r sing Singular
-	mv ${TMPDIR}/sing.zip Singular-${S_VERSION}-${SINGUNAME}.zip
-	rm -rf ${TMPDIR}
+	mv ${SI_TMPDIR}/sing.zip Singular-${S_VERSION}-${SINGUNAME}.zip
+	rm -rf ${SI_TMPDIR}
 
 srcdist:
-	rm -rf ${TMPDIR}
-	${MKINSTALLDIRS} ${TMPDIR}/Singular-${S_VERSION}
-	cd ${TMPDIR}/Singular-${S_VERSION}; cvs co All
-	cd  ${TMPDIR}; \
+	rm -rf ${SI_TMPDIR}
+	${MKINSTALLDIRS} ${SI_TMPDIR}/Singular-${S_VERSION}
+	cd ${SI_TMPDIR}/Singular-${S_VERSION}; cvs co All
+	cd  ${SI_TMPDIR}; \
 	tar cf - Singular-${S_VERSION}| ${MYGZIP} > Singular-${S_VERSION}.tar.gz
-	cp ${TMPDIR}/Singular-${S_VERSION}.tar.gz .
-	rm -rf ${TMPDIR}
+	cp ${SI_TMPDIR}/Singular-${S_VERSION}.tar.gz .
+	rm -rf ${SI_TMPDIR}
 
 # You can remeber the password with "iwd" == "ich war dabei"
 CRYPT	= enigma # it does not seem to decrypt correctly with the HP crypt
