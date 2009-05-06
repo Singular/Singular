@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-05-05 15:15:02 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.45 2009-05-05 15:15:02 monerjan Exp $
-$Id: gfan.cc,v 1.45 2009-05-05 15:15:02 monerjan Exp $
+$Date: 2009-05-06 09:54:23 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.46 2009-05-06 09:54:23 monerjan Exp $
+$Id: gfan.cc,v 1.46 2009-05-06 09:54:23 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -13,6 +13,7 @@ $Id: gfan.cc,v 1.45 2009-05-05 15:15:02 monerjan Exp $
 #include "kstd1.h"
 #include "kutil.h"
 #include "intvec.h"
+#include "int64vec.h"
 #include "polys.h"
 #include "ideals.h"
 #include "kmatrix.h"
@@ -164,7 +165,7 @@ class facet
 				delete ivCanonical;
 				return TRUE;
 		}*/						
-		}//bool isFlippable(facet &f)
+		//}//bool isFlippable(facet &f)
 		
 		
 		friend class gcone;	//Bad style
@@ -598,48 +599,19 @@ class gcone
 			see journal p. 66
 			*/
 			ring srcRing=currRing;
-			
-			/* copied and modified from ring.cc::rAssureSyzComp */
-			//ring tmpRing=rCopyAndChangeWeight(srcRing,fNormal);
-			ring tmpRing=rCopy0(srcRing);
-			int i=rBlocks(srcRing);
-			int j;
-			tmpRing->order=(int *)omAlloc((i+1)*sizeof(int));
-			/*NOTE This should probably be set, but as of now crashes Singular*/
-			/*tmpRing->block0=(int *)omAlloc0((i+1)*sizeof(int));
-			tmpRing->block1=(int *)omAlloc0((i+1)*sizeof(int));*/
-			tmpRing->wvhdl[0] =( int *)omAlloc((fNormal->length())*sizeof(int)); //found in Singular/ipshell.cc
-			for(j=i;j>0;j--)
-			{
-				tmpRing->order[j]=srcRing->order[j-1];
-				tmpRing->block0[j]=srcRing->block0[j-1];
-				tmpRing->block1[j]=srcRing->block1[j-1];
-				if (srcRing->wvhdl[j-1] != NULL)
-				{
-					tmpRing->wvhdl[j] = (int*) omMemDup(srcRing->wvhdl[j-1]);
-				}
-			}
-			tmpRing->order[0]=ringorder_a;
-			tmpRing->order[1]=ringorder_dp;
-			tmpRing->order[2]=ringorder_C;
-			//tmpRing->wvhdl[0] =( int *)omAlloc((fNormal->length())*sizeof(int)); //found in Singular/ipshell.cc
-			
-			for (int ii=0;ii<this->numVars;ii++)
-			{				
-				tmpRing->wvhdl[0][ii]=-(*fNormal)[ii];	//What exactly am I doing here?
-				//cout << tmpring->wvhdl[0][ii] << endl;
-			}
-			rComplete(tmpRing);
+
+			ring tmpRing=rCopyAndAddWeight(srcRing,fNormal);
 			rChangeCurrRing(tmpRing);
 			
 			rWrite(currRing); cout << endl;
+			
 			ideal ina;			
 			ina=idrCopyR(initialForm,srcRing);			
 #ifdef gfan_DEBUG
 			cout << "ina=";
 			idShow(ina); cout << endl;
 #endif
-			ideal H;
+			ideal H;  //NOTE WTF? rCopyAndAddWeight does not seem to be compatible with kStd... => wrong result!
 			H=kStd(ina,NULL,isHomog,NULL);	//we know it is homogeneous
 			idSkipZeroes(H);
 #ifdef gfan_DEBUG
@@ -701,7 +673,9 @@ class gcone
 					bool expVAreEqual=TRUE;
 					for (int kk=1;kk<=this->numVars;kk++)
 					{
-						cout << src_ExpV[kk] << "," << dst_ExpV[kk] << endl;
+#ifdef gfan_DEBUG
+						//cout << src_ExpV[kk] << "," << dst_ExpV[kk] << endl;
+#endif
 						if (src_ExpV[kk]!=dst_ExpV[kk])
 						{
 							expVAreEqual=FALSE;
@@ -711,7 +685,9 @@ class gcone
 					if (expVAreEqual==TRUE)
 					{
 						markingsAreCorrect=TRUE; //everything is fine
-						cout << "correct markings" << endl;
+#ifdef gfan_DEBUG
+//						cout << "correct markings" << endl;
+#endif
 					}//if (pHead(aktpoly)==pHead(H->m[jj])
 					delete src_ExpV;
 					delete dst_ExpV;
@@ -771,6 +747,7 @@ class gcone
 			/*Step 3
 			turn the minimal basis into a reduced one
 			*/
+			int i,j;
 			ring dstRing=rCopy0(srcRing);
 			i=rBlocks(srcRing);
 			
@@ -795,6 +772,16 @@ class gcone
 				dstRing->wvhdl[0][ii]=(*iv_weight)[ii];				
 			}
 			rComplete(dstRing);
+			
+			// NOTE May assume that at this point srcRing already has 3 blocks of orderins, starting with a
+			// Thus: 
+			//ring dstRing=rCopyAndChangeWeight(srcRing,iv_weight);
+			//cout << "PLING" << endl;
+			/*ring dstRing=rCopy0(srcRing);
+			for (int ii=0;ii<this->numVars;ii++)
+			{				
+				dstRing->wvhdl[0][ii]=(*iv_weight)[ii];				
+			}*/
 			rChangeCurrRing(dstRing);
 #ifdef gfan_DEBUG
 			rWrite(dstRing); cout << endl;
@@ -847,18 +834,14 @@ class gcone
 				while( (ii<=IDELEMS(I) && (divOccured==FALSE) ))
 				{					
 					if (pDivisibleBy(I->m[ii-1],p))	//does LM(I->m[ii]) divide LM(p) ?
-					{
-						//cout << "TICK 3" << endl;
+					{						
 						poly step1,step2,step3;
 						//cout << "dividing "; pWrite(pHead(p));cout << "by ";pWrite(pHead(I->m[ii-1])); cout << endl;
 						step1 = pDivideM(pHead(p),pHead(I->m[ii-1]));
-						//cout << "LT(p)/LT(f_i)="; pWrite(step1); cout << endl;
-						//cout << "TICK 3.1" << endl;
-						step2 = ppMult_qq(step1, I->m[ii-1]);
-						//cout << "TICK 3.2" << endl;
+						//cout << "LT(p)/LT(f_i)="; pWrite(step1); cout << endl;				
+						step2 = ppMult_qq(step1, I->m[ii-1]);						
 						step3 = pSub(pCopy(p), step2);
-						//p=pSub(p,pMult( pDivide(pHead(p),pHead(I->m[ii])), I->m[ii]));
-						//cout << "TICK 4" << endl;
+						//p=pSub(p,pMult( pDivide(pHead(p),pHead(I->m[ii])), I->m[ii]));			
 						//pSetm(p);
 						pSort(step3); //must be here, otherwise strange behaviour with many +o+o+o+o+ terms
 						p=step3;
@@ -877,7 +860,7 @@ class gcone
 					pSetm(r);
 					pSort(r);
 					//cout << "r="; pWrite(r); cout << endl;
-					//cout << "TICK 6" << endl;
+					
 					if (pLength(p)!=1)
 					{
 						p=pSub(pCopy(p),pHead(p));	//Here it may occur that p=0 instead of p=NULL
@@ -885,8 +868,7 @@ class gcone
 					else
 					{
 						p=NULL;	//Hack to correct this situation						
-					}
-					//cout << "TICK 7" << endl;
+					}					
 					//cout << "p="; pWrite(p);
 				}//if (divOccured==FALSE)
 			}//while (p!=0)
@@ -999,14 +981,16 @@ class gcone
 			lp=dd_Matrix2LP(M, &err);
 			if (err!=dd_NoError){cout << "Error during dd_Matrix2LP in gcone::interiorPoint" << endl;}			
 			if (lp==NULL){cout << "LP is NULL" << endl;}
-			dd_WriteLP(stdout,lp);
-			//cout << "Tick 3" << endl;
-						
+#ifdef gfan_DEBUG
+//			dd_WriteLP(stdout,lp);
+#endif	
+					
 			lpInt=dd_MakeLPforInteriorFinding(lp);
 			if (err!=dd_NoError){cout << "Error during dd_MakeLPForInteriorFinding in gcone::interiorPoint" << endl;}
-			dd_WriteLP(stdout,lpInt);
-			//cout << "Tick 4" << endl;
-			
+#ifdef gfan_DEBUG
+//			dd_WriteLP(stdout,lpInt);
+#endif			
+
 			dd_FindRelativeInterior(M,&ddlinset,&ddredrows,&lpSol,&err);
 			if (err!=dd_NoError)
 			{
@@ -1040,40 +1024,85 @@ class gcone
 			
 		}//void interiorPoint(dd_MatrixPtr const &M)
 		
-		ring rCopyAndChangeWeight(ring const r, intvec const *ivw)				
+		/** \brief Copy a ring and add a weighted ordering in first place
+		* Kudos to walkSupport.cc
+		*/
+		ring rCopyAndAddWeight(ring const &r, intvec const *ivw)				
 		{
-			ring res=rCopy0(r, FALSE, FALSE);
-			int i=rBlocks(r);
-			int j;
-
-			res->order=(int *)omAlloc((i+1)*sizeof(int));
-			/*res->block0=(int *)omAlloc0((i+1)*sizeof(int));
-			res->block1=(int *)omAlloc0((i+1)*sizeof(int));
-			int ** wvhdl =(int **)omAlloc0((i+1)*sizeof(int**));*/
-			for(j=i;j>0;j--)
+			ring res=(ring)omAllocBin(ip_sring_bin);
+			memcpy4(res,r,sizeof(ip_sring));
+			res->VarOffset = NULL;
+			res->ref=0;
+			
+			if (r->algring!=NULL)
+				r->algring->ref++;
+			if (r->parameter!=NULL)
 			{
-				res->order[j]=r->order[j-1];
-				res->block0[j]=r->block0[j-1];
-				res->block1[j]=r->block1[j-1];
-				if (r->wvhdl[j-1] != NULL)
+				res->minpoly=nCopy(r->minpoly);
+				int l=rPar(r);
+				res->parameter=(char **)omAlloc(l*sizeof(char_ptr));
+				int i;
+				for(i=0;i<rPar(r);i++)
 				{
-					res->wvhdl[j] = (int*) omMemDup(r->wvhdl[j-1]);
+					res->parameter[i]=omStrDup(r->parameter[i]);
 				}
 			}
-			res->order[0]=ringorder_a;
-			res->order[1]=ringorder_dp;
-			res->order[2]=ringorder_C;
-			//res->wvhdl = wvhdl;
 			
-			res->wvhdl[0] =( int *)omAlloc((ivw->length())*sizeof(int));
-			for (int ii=0;ii<this->numVars;ii++)
+			int i=rBlocks(r);
+			int jj;
+			
+			res->order =(int *)omAlloc((i+1)*sizeof(int));
+			res->block0=(int *)omAlloc((i+1)*sizeof(int));
+			res->block1=(int *)omAlloc((i+1)*sizeof(int));
+			res->wvhdl =(int **)omAlloc((i+1)*sizeof(int**));
+			for(jj=0;jj<i;jj++)
 			{				
-				res->wvhdl[0][ii]=(*ivw)[ii];				
-			}			
+				if (r->wvhdl[jj] != NULL)
+				{
+					res->wvhdl[jj] = (int*) omMemDup(r->wvhdl[jj-1]);
+				}
+				else
+				{
+					res->wvhdl[jj+1]=NULL;
+				}
+			}
 			
+			for (jj=0;jj<i;jj++)
+			{
+				res->order[jj+1]=r->order[jj];
+				res->block0[jj+1]=r->block0[jj];
+				res->block1[jj+1]=r->block1[jj];
+			}						
+			
+			res->order[0]=ringorder_a;
+			res->order[1]=ringorder_dp;	//basically useless, since that should never be used			
+			int length=ivw->length();
+			int *A=(int *)omAlloc(length*sizeof(int));
+			for (jj=0;jj<length;jj++)
+			{				
+				A[jj]=(*ivw)[jj];				
+			}			
+			res->wvhdl[0]=(int *)A;
+			res->block0[0]=1;
+			res->block1[0]=length;
+			
+			res->names = (char **)omAlloc0(rVar(r) * sizeof(char_ptr));
+			for (i=rVar(res)-1;i>=0; i--)
+			{
+				res->names[i] = omStrDup(r->names[i]);
+			}			
 			rComplete(res);
 			return res;
-		}//rCopyAndChange
+		}//rCopyAndAdd
+		
+		ring rCopyAndChangeWeight(ring const &r, intvec *ivw)
+		{
+			ring res=rCopy0(currRing);
+			rComplete(res);
+			rSetWeightVec(res,(int64*)ivw);
+			//rChangeCurrRing(rnew);
+			return res;
+		}
 		
 		/** 
 		* Determines whether a given facet of a cone is the search facet of a neighbouring cone
@@ -1093,13 +1122,7 @@ class gcone
 			facet *fAct;	//Ptr to alpha_i
 			facet *fCmp;	//Ptr to alpha_j
 			fAct = fMin;
-			fCmp = fMin->next;
-			
-			//cout << endl<< fMin->next << endl;
-			//cout << gcTmp.facetPtr->next << endl;
-			//gcTmp.facetPtr->printNormal();
-			//fAct=gcTmp.facetPtr->next;
-			//fAct->printNormal();			
+			fCmp = fMin->next;				
 			
 			rChangeCurrRing(this->rootRing);	//because we compare the monomials in the rootring			
 			poly p=pInit();
@@ -1166,14 +1189,18 @@ class gcone
 				}
 				//fAct=fAct->next;
 			}//while(fAct.facetPtr->next!=NULL)
-			
+			delete alpha_i,alpha_j,sigma;
 			/*If testfacet was minimal then fMin should still point there */
-			intvec *alpha_min = new intvec(this->numVars);
+			//NOTE BUG: Comment in and -> out of memory error
+			/*intvec *alpha_min = new intvec(this->numVars);
 			alpha_min=fMin->getFacetNormal();
+			delete fCmp,fAct,fMin;
+			
 			intvec *test = new intvec(this->numVars);
-			test=testfacet.getFacetNormal();
-			if (isParallel(alpha_min,test))
-			//if (fMin==gcTmp.facetPtr)
+			test=testfacet.getFacetNormal();			
+			
+			if (isParallel(alpha_min,test))*/
+			if (fMin==gcTmp.facetPtr)
 			{
 				rChangeCurrRing(actRing);
 				return TRUE;
@@ -1279,8 +1306,8 @@ ideal gfan(ideal inputIdeal)
 	gcAct->numVars=pVariables;
 	gcAct->getGB(rootIdeal);	//sets gcone::gcBasis
 	idShow(gcAct->gcBasis);
-	gcAct->getConeNormals(gcAct->gcBasis);	//hopefully compute the normals
-	//gcAct->flip(gcAct->gcBasis,gcAct->facetPtr);
+	gcAct->getConeNormals(gcAct->gcBasis);	//hopefully compute the normals	
+	gcAct->flip(gcAct->gcBasis,gcAct->facetPtr);	
 	/*Now it is time to compute the search facets, respectively start the reverse search.
 	But since we are in the root all facets should be search facets. IS THIS TRUE?
 	NOTE: Check for flippability is not very sophisticated
@@ -1296,7 +1323,7 @@ ideal gfan(ideal inputIdeal)
 		gcTmp->getIntPoint();
 		fAct = fAct->next;		
 	}*/
-	gcAct->reverseSearch(gcAct);
+	//gcAct->reverseSearch(gcAct);
 	/*As of now extra.cc expects gfan to return type ideal. Probably this will change in near future.
 	The return type will then be of type LIST_CMD
 	Assume gfan has finished, thus we have enumerated all the cones
