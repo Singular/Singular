@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-05-06 09:54:23 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.46 2009-05-06 09:54:23 monerjan Exp $
-$Id: gfan.cc,v 1.46 2009-05-06 09:54:23 monerjan Exp $
+$Date: 2009-05-07 09:55:48 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.47 2009-05-07 09:55:48 monerjan Exp $
+$Id: gfan.cc,v 1.47 2009-05-07 09:55:48 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -13,7 +13,6 @@ $Id: gfan.cc,v 1.46 2009-05-06 09:54:23 monerjan Exp $
 #include "kstd1.h"
 #include "kutil.h"
 #include "intvec.h"
-#include "int64vec.h"
 #include "polys.h"
 #include "ideals.h"
 #include "kmatrix.h"
@@ -442,27 +441,7 @@ class gcone
 					}
 				}//for (int jj = 1; jj <ddcols; jj++)
 				/*Quick'n'dirty hack for flippability*/	
-				bool isFlippable=FALSE;
-				//NOTE BUG HERE
-				/* The flippability check is wrong!
-				(1,-4) will pass, but (-1,7) will not. 
-				REWRITE THIS
-				*/			
-				/*for (int jj = 0; jj<this->numVars; jj++)
-				{					
-					intvec *ivCanonical = new intvec(this->numVars);
-					(*ivCanonical)[jj]=1;					
-					if (dotProduct(load,ivCanonical)>=0)
-					{
-						isFlippable=FALSE;						
-					}
-					else
-					{
-						isFlippable=TRUE;
-					}					
-					delete ivCanonical;
-				}//for (int jj = 0; jj<this->numVars; jj++)
-				*/	
+				bool isFlippable=FALSE;				
 				for (int jj = 0; jj<load->length(); jj++)
 				{
 					intvec *ivCanonical = new intvec(load->length());
@@ -482,8 +461,7 @@ class gcone
 				else
 				{	/*Now load should be full and we can call setFacetNormal*/
 					fAct->setFacetNormal(load);
-					fAct->next = new facet();
-					//fAct->printNormal();
+					fAct->next = new facet();					
 					fAct=fAct->next;	//this should definitely not be called in the above while-loop :D
 				}//if (isFlippable==FALSE)
 				delete load;
@@ -583,15 +561,14 @@ class gcone
 #endif
 				/*Now initialFormElement must be added to (ideal)initialForm */
 				initialForm->m[ii]=initialFormElement[ii];
-			}//for
-			//f->setFlipGB(initialForm);	//FIXME PROBABLY WRONG TO STORE HERE SINCE INA!=flibGB			
+			}//for			
 #ifdef gfan_DEBUG
 			cout << "Initial ideal is: " << endl;
 			idShow(initialForm);
 			//f->printFlipGB();
 			cout << "===" << endl;
 #endif
-			delete check;
+			//delete check;
 			
 			/*2nd step: lift initial ideal to a GB of the neighbouring cone using minus alpha as weight*/
 			/*Substep 2.1
@@ -600,7 +577,9 @@ class gcone
 			*/
 			ring srcRing=currRing;
 
-			ring tmpRing=rCopyAndAddWeight(srcRing,fNormal);
+			//intvec *negfNormal = new intvec(this->numVars);
+			//negfNormal=ivNeg(fNormal);
+			ring tmpRing=rCopyAndAddWeight(srcRing,ivNeg(fNormal));
 			rChangeCurrRing(tmpRing);
 			
 			rWrite(currRing); cout << endl;
@@ -611,7 +590,7 @@ class gcone
 			cout << "ina=";
 			idShow(ina); cout << endl;
 #endif
-			ideal H;  //NOTE WTF? rCopyAndAddWeight does not seem to be compatible with kStd... => wrong result!
+			ideal H;
 			H=kStd(ina,NULL,isHomog,NULL);	//we know it is homogeneous
 			idSkipZeroes(H);
 #ifdef gfan_DEBUG
@@ -920,6 +899,16 @@ class gcone
 		ideal GenGrbWlk(ideal, ideal)
 		{
 		}//GGW
+		
+		intvec *ivNeg(intvec const &iv)
+		{
+			intvec *res = new intvec(this->numVars);
+			for(int ii=0;ii<this->numVars;ii++)
+			{
+				res[ii] = -(int)iv[ii];
+			}
+			return res;
+		}
 
 
 		/** \brief Compute the dot product of two intvecs
@@ -1190,6 +1179,7 @@ class gcone
 				//fAct=fAct->next;
 			}//while(fAct.facetPtr->next!=NULL)
 			delete alpha_i,alpha_j,sigma;
+			
 			/*If testfacet was minimal then fMin should still point there */
 			//NOTE BUG: Comment in and -> out of memory error
 			/*intvec *alpha_min = new intvec(this->numVars);
@@ -1197,20 +1187,41 @@ class gcone
 			delete fCmp,fAct,fMin;
 			
 			intvec *test = new intvec(this->numVars);
-			test=testfacet.getFacetNormal();			
-			
-			if (isParallel(alpha_min,test))*/
-			if (fMin==gcTmp.facetPtr)
-			{
+			test=testfacet.getFacetNormal();*/
+			//if(fMin->getFacetNormal()==ivNeg(testfacet.getFacetNormal()))
+			//if (isParallel(fMin->getFacetNormal(),testfacet.getFacetNormal()))
+			fMin->printNormal();
+			testfacet.printNormal();  //NOTE THIS IS EMPTY, so prolly cause of bug above
+			if (fMin==gcTmp.facetPtr)			
+			//if(areEqual(fMin->getFacetNormal(),ivNeg(testfacet.getFacetNormal())))
+			{				
+				cout << "Parallel" << endl;
 				rChangeCurrRing(actRing);
+				//delete alpha_min, test;
 				return TRUE;
 			}
 			else 
 			{
+				cout << "Not parallel" << endl;
 				rChangeCurrRing(actRing);
+				//delete alpha_min, test;
 				return FALSE;
 			}
 		}//bool isSearchFacet
+		
+		bool areEqual(intvec const &a, intvec const &b)
+		{
+			bool res=TRUE;
+			for(int ii=0;ii<this->numVars;ii++)
+			{
+				if(a[ii]!=b[ii])
+				{
+					res=FALSE;
+					break;
+				}
+			}
+			return res;
+		}
 		
 		void reverseSearch(gcone *gcAct) //no const possible here since we call gcAct->flip
 		{
@@ -1222,7 +1233,7 @@ class gcone
 				cout << "==========================================================================================="<< endl;
 				gcAct->flip(gcAct->gcBasis,gcAct->facetPtr);
 				gcone *gcTmp = new gcone(*gcAct);
-				idShow(gcTmp->gcBasis);
+				//idShow(gcTmp->gcBasis);
 				gcTmp->getConeNormals(gcTmp->gcBasis, TRUE);
 #ifdef gfan_DEBUG
 				facet *f = new facet();
@@ -1307,7 +1318,7 @@ ideal gfan(ideal inputIdeal)
 	gcAct->getGB(rootIdeal);	//sets gcone::gcBasis
 	idShow(gcAct->gcBasis);
 	gcAct->getConeNormals(gcAct->gcBasis);	//hopefully compute the normals	
-	gcAct->flip(gcAct->gcBasis,gcAct->facetPtr);	
+	//gcAct->flip(gcAct->gcBasis,gcAct->facetPtr);	
 	/*Now it is time to compute the search facets, respectively start the reverse search.
 	But since we are in the root all facets should be search facets. IS THIS TRUE?
 	NOTE: Check for flippability is not very sophisticated
@@ -1323,7 +1334,8 @@ ideal gfan(ideal inputIdeal)
 		gcTmp->getIntPoint();
 		fAct = fAct->next;		
 	}*/
-	//gcAct->reverseSearch(gcAct);
+	gcAct->reverseSearch(gcAct);
+	
 	/*As of now extra.cc expects gfan to return type ideal. Probably this will change in near future.
 	The return type will then be of type LIST_CMD
 	Assume gfan has finished, thus we have enumerated all the cones
