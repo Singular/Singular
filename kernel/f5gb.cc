@@ -251,11 +251,16 @@ inline void criticalPair(LList* gPrev, CList* critPairs, LTagList* lTag, RTagLis
     }
     // computation of critical pairs
     //critPairs->print();
+    //Print("GPREV LIST PRINTED IN CRITPAIRS\n");
+    //gPrev->print();
     while( gPrev->getLast() != temp) {
         //pWrite( *(gPrev->getFirst()->getPoly()) );
        // pWrite( *(l->getPoly()) );
        //pWrite(newElement->getPoly());
         //pWrite(temp->getPoly());
+        //pWrite(newElement->getPoly());
+        //pWrite(temp->getPoly());
+        //Print("\n\n");
         pLcm(newElement->getPoly(), temp->getPoly(), lcm);
         pSetCoeff(lcm,nOne);
         // computing factors u2 for new labels
@@ -811,12 +816,12 @@ void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CList*
                                     //Print("TO BE REDUCED:     ");
                                     //pWrite(tempPoly);
                                     //Print("REDUCER: ");
-                                    pWrite(tempRed->getPoly());
+                                    //pWrite(tempRed->getPoly());
                                     //pWrite(ppMult_qq(u,tempRed->getPoly()));
                                     //pWrite(ppMult_qq(u,tempRed->getTerm()));
                                     //Print("%d\n",tempRed->getIndex());
                                     //Print("+++++++++++++LIST OF MONOMIALS1+++++++++++++++++\n");
-                                    poly tempRedPoly    =  pSub(ppMult_qq(u,tempRed->getPoly()),pHead(ppMult_qq(u,tempRed->getPoly())));
+                                    poly tempRedPoly    =  ksOldSpolyRedNew(ppMult_qq(u,tempRed->getPoly()),pHead(ppMult_qq(u,tempRed->getPoly())));
                                     pAdd(tempPoly,tempRedPoly);
                                     //Print("REDUCTION STEP: \n");
                                     //pWrite(l->getPoly());
@@ -845,12 +850,16 @@ void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CList*
                                     //pWrite(tempRed->getPoly());
                                     //pWrite(ppMult_qq(u,tempRed->getTerm()));
                                     //rules->insert(tempRed->getIndex(),ppMult_qq(u,tempRed->getTerm()));
+                                    //l->setTerm(ppMult_qq(u,tempRed->getTerm())); 
+                                    //Print("NEW TERM: ");
+                                    //pWrite(l->getTerm());
                                     //Print("\n\nRules:\n");
                                     //rules->print(); 
-                                    bad->insertSP(tempRed->getLPoly());
-                                    //Print("HERE\n");
+                                    bad->insert(tempRed->getLPoly());
+                                    //good->insertSP(pOne(),1,ppMult_qq(u,tempRed->getPoly()),NULL);
                                     //pWrite(tempRed->getPoly());
                                     //sleep(5);
+                                    break;
                                 }
                                 else {
                                     //Print("TO BE REDUCED:     ");
@@ -861,7 +870,7 @@ void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CList*
                                     //pWrite(ppMult_qq(u,tempRed->getTerm()));
                                     //Print("%d\n",tempRed->getIndex());
                                     //Print("+++++++++++++LIST OF MONOMIALS1+++++++++++++++++\n");
-                                    poly tempRedPoly    =  pSub(ppMult_qq(u,tempRed->getPoly()),pHead(ppMult_qq(u,tempRed->getPoly())));
+                                    poly tempRedPoly    =  ksOldSpolyRedNew(ppMult_qq(u,tempRed->getPoly()),pHead(ppMult_qq(u,tempRed->getPoly())));
                                     pAdd(tempPoly,tempRedPoly);
                                     //Print("REDUCTION STEP: \n");
                                     //pWrite(l->getPoly());
@@ -931,7 +940,7 @@ void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CList*
             //Print("NEW REDUCTION:  ");
             //pWrite(temp);
             l->setPoly(temp);
-            //Print("ELEMENT ADDED TO GPREV: ");
+            //Print("ELEMENT ADDED TO GPREV1: ");
             //pWrite(l->getPoly());
             //pWrite(l->getTerm());
             //Print("%p\n",gPrev->getLast());
@@ -943,9 +952,11 @@ void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CList*
             criticalPair(gPrev,critPairs,lTag,rTag,rules);
             //Print("LIST OF CRITICAL PAIRS:    \n");
             //critPairs->print();
+            //gPrev->print();
         }
         else {
             reductionsToZero++;
+            //Print("ZERO REDUCTION\n");
             pDelete(&temp);
         }
         //pWrite(temp);
@@ -960,7 +971,7 @@ void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CList*
     else {
         //pWrite(l->getPoly());
         gPrev->insert(l->getLPoly());
-        //Print("ELEMENT ADDED TO GPREV: ");
+        //Print("ELEMENT ADDED TO GPREV2: ");
         //pWrite(l->getPoly());
         //pWrite(l->getTerm());
         //Print("GENAU HIER:  ");
@@ -970,47 +981,63 @@ void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CList*
         //critPairs->print();
     }
     // if there are "bad" reducers than try to compute new S-polynomials and rules
-   /* 
+    
     if(NULL != bad->getFirst()) {
-        Print("BAD STUFF LIST:\n");
-        bad->print();
+        //Print("BAD STUFF LIST:\n");
+        //bad->print();
         LNode* tempBad  =   bad->getFirst();
-        pWrite(l->getPoly());
+        //pWrite(l->getPoly());
         while(NULL != tempBad) {
             if(pDivisibleBy(tempBad->getPoly(),l->getPoly())) {
-                Print("BAD STUFF\n");
-                pWrite(l->getPoly());
-                pWrite(tempBad->getPoly());
+                //Print("BAD STUFF\n");
+                //pWrite(l->getPoly());
+                //pWrite(tempBad->getPoly());
                 u   =   pDivide(pHead(l->getPoly()),pHead(tempBad->getPoly()));
-                Print("MULTIPLIER:  ");
-                pWrite(u);
+                //Print("MULTIPLIER:  ");
+                //pWrite(u);
                 pSetCoeff(u,nOne);
                 if(pLmCmp(ppMult_qq(u,tempBad->getTerm()),l->getTerm()) != 0) {
                     // passing criterion2 ?
                     if(!criterion2(gPrev->getFirst()->getIndex(), u,tempBad,rules,rTag)) {
                         // passing criterion1 ?
                         if(!criterion1(gPrev,u,tempBad,lTag)) {
-
+                            //Print("HIERHIERHIERHIERHIERHIER\n");
                             rules->insert(tempBad->getIndex(),ppMult_qq(u,tempBad->getTerm()));
-                            poly temp   =   pSub(ppMult_qq(u,tempBad->getPoly()),l->getPoly());
-                            LNode* tempBadNew   =   new LNode(ppMult_qq(u,tempBad->getTerm()),tempBad->getIndex(),temp,rules->getFirst()->getRule());
-                            pWrite(temp);
-                            pWrite(tempBadNew->getPoly());
-                            //tempRed->getLPoly()->setRule(rules->getFirst()->getRule());
-                            tempBadNew->setDel(1);
-                            sPolyList->insertByLabel(tempBadNew);
+                            //gPrev->print();
+                            //pWrite(l->getPoly());
+                            poly temp   =   ksOldSpolyRedNew(ppMult_qq(u,tempBad->getPoly()),l->getPoly());
+                            //pWrite(l->getPoly());
+                            //Print("%p\n",temp);
+                            //gPrev->print();
+                            if(NULL != temp) {
+                                pNorm(temp);
+                                LNode* tempBadNew   =   new LNode(ppMult_qq(u,tempBad->getTerm()),tempBad->getIndex(),temp,rules->getFirst()->getRule());
+                                //pWrite(temp);
+                                //pWrite(tempBadNew->getPoly());
+                                //pWrite(tempBadNew->getTerm());
+                                //pWrite(pHead(tempBadNew->getPoly()));
+                                //Print("%p\n",tempBadNew->getPoly());
+                                //tempRed->getLPoly()->setRule(rules->getFirst()->getRule());
+                                tempBadNew->setDel(1);
+                            
+                                sPolyList->insertByLabel(tempBadNew);
+                                //Print("BAD SPOLYLIST: \n");
+                                //sPolyList->print();
+                            }
                         }
                     }
                 }
             }
-        Print("HIER\n");
+        //Print("HIER\n");
             tempBad =   tempBad->getNext();
-            Print("%p\n",tempBad);
+            //Print("%p\n",tempBad);
         }
+       // Print("-------------------BAD STUFF LIST-----------------------------\n");
     }
-        Print("HIER AUCH\n");
-  
-*/
+        //Print("HIER AUCH\n");
+        //Print("SPOLYLIST IN BAD: \n");
+        //sPolyList->print(); 
+
 
 
 }

@@ -161,8 +161,13 @@ inline LNode* LNode::insertByLabel(poly t, int i, poly p, Rule* r) {
     }
 }
 
+inline LNode* LNode::insertFirst(LNode* l) {
+    l->next =   this;
+    return l;
+}
+
 inline LNode* LNode::insertByLabel(LNode* l) {
-    Print("ADDING SOLYS TO THE LIST\n");
+    //Print("ADDING SOLYS TO THE LIST\n");
     //Print("new element: ");
     //pWrite(t);
        if(NULL == this) { // || NULL == data) {
@@ -290,7 +295,7 @@ void LNode::print() {
         pWrite(temp->getTerm());
         Print("Poly: ");
         pWrite(temp->getPoly());
-        Print("%p\n",temp->next);
+        Print("%p\n",temp->getPoly());
         Print("DELETE? %d\n",temp->getDel());
         temp = temp->next;
     }
@@ -384,6 +389,12 @@ void LList::insertSP(poly t,int i, poly p, Rule* r) {
 
 void LList::insertByLabel(poly t, int i, poly p, Rule* r) {
     first = first->insertByLabel(t,i,p,r);
+    length++;
+    //Print("LENGTH %d\n",length);
+}
+
+void LList::insertFirst(LNode* l) {
+    first = first->insertFirst(l);
     length++;
     //Print("LENGTH %d\n",length);
 }
@@ -760,6 +771,7 @@ void CNode::print() {
     CNode* temp = this;
     Print("___________________List of critical pairs______________________:\n");
     while(NULL != temp) {
+        pWrite(ppMult_qq(temp->getT1(),temp->getLp1Term()));
         Print("LP1 Index: %d\n",temp->getLp1Index());
         Print("T1: ");
         pWrite(temp->getT1());
