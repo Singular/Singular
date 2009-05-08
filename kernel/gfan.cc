@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-05-07 09:55:48 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.47 2009-05-07 09:55:48 monerjan Exp $
-$Id: gfan.cc,v 1.47 2009-05-07 09:55:48 monerjan Exp $
+$Date: 2009-05-08 12:58:01 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.48 2009-05-08 12:58:01 monerjan Exp $
+$Id: gfan.cc,v 1.48 2009-05-08 12:58:01 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -241,10 +241,8 @@ class gcone
 			{
 				(*ivtmp)[ii]=-(*ivtmp)[ii];				
 			}
-			//ivtmp->show(); cout << endl;
-			fAct->setFacetNormal(ivtmp);
-			//fAct->printNormal();cout << endl;
-			//ivtmp->show();cout << endl;
+			
+			fAct->setFacetNormal(ivtmp);			
 		}
 		
 		/** \brief Default destructor */
@@ -512,9 +510,9 @@ class gcone
 #ifdef gfan_DEBUG
 			std::cout << "===" << std::endl;
 			std::cout << "running gcone::flip" << std::endl;
-			std::cout << "fNormal=";
-			fNormal->show();
-			std::cout << std::endl;
+// 			std::cout << "fNormal=";
+// 			fNormal->show();
+// 			std::cout << std::endl;
 #endif				
 			/*1st step: Compute the initial ideal*/
 			poly initialFormElement[IDELEMS(gb)];	//array of #polys in GB to store initial form
@@ -543,14 +541,14 @@ class gcone
 						(*check)[jj]=v[jj+1]-leadExpV[jj+1];
 					}
 #ifdef gfan_DEBUG
-					cout << "check=";			
-					check->show();
-					cout << endl;
+// 					cout << "check=";			
+// 					check->show();
+// 					cout << endl;
 #endif
 					//TODO why not *check, *fNormal????
 					if (isParallel(*check,*fNormal)) //pass *check when 
 					{
-						cout << "Parallel vector found, adding to initialFormElement" << endl;			
+// 						cout << "Parallel vector found, adding to initialFormElement" << endl;			
 						initialFormElement[ii] = pAdd(pCopy(initialFormElement[ii]),(poly)pHead(aktpoly));
 					}						
 				}//while
@@ -582,7 +580,7 @@ class gcone
 			ring tmpRing=rCopyAndAddWeight(srcRing,ivNeg(fNormal));
 			rChangeCurrRing(tmpRing);
 			
-			rWrite(currRing); cout << endl;
+			//rWrite(currRing); cout << endl;
 			
 			ideal ina;			
 			ina=idrCopyR(initialForm,srcRing);			
@@ -594,7 +592,7 @@ class gcone
 			H=kStd(ina,NULL,isHomog,NULL);	//we know it is homogeneous
 			idSkipZeroes(H);
 #ifdef gfan_DEBUG
-			cout << "H="; idShow(H); cout << endl;
+// 			cout << "H="; idShow(H); cout << endl;
 #endif
 			/*Substep 2.2
 			do the lifting and mark according to H
@@ -604,13 +602,13 @@ class gcone
 			ideal srcRing_HH;			
 			srcRing_H=idrCopyR(H,tmpRing);
 #ifdef gfan_DEBUG
-			cout << "srcRing_H = ";
-			idShow(srcRing_H); cout << endl;
+// 			cout << "srcRing_H = ";
+// 			idShow(srcRing_H); cout << endl;
 #endif
 			srcRing_HH=ffG(srcRing_H,this->gcBasis);		
 #ifdef gfan_DEBUG
-			cout << "srcRing_HH = ";
-			idShow(srcRing_HH); cout << endl;
+// 			cout << "srcRing_HH = ";
+// 			idShow(srcRing_HH); cout << endl;
 #endif
 			/*Substep 2.2.1
 			Mark according to G_-\alpha
@@ -769,7 +767,7 @@ class gcone
 			dstRing_I=idrCopyR(srcRing_HH,srcRing);			
 			//validOpts<1>=TRUE;
 #ifdef gfan_DEBUG
-			idShow(dstRing_I);
+			//idShow(dstRing_I);
 #endif			
 			BITSET save=test;
 			test|=Sy_bit(OPT_REDSB);
@@ -799,7 +797,7 @@ class gcone
 		{
 			cout << "Entering restOfDiv" << endl;
 			poly p=f;
-			pWrite(p);
+			//pWrite(p);
 			//poly r=kCreateZeroPoly(,currRing,currRing);	//The 0-polynomial, hopefully
 			poly r=NULL;	//The zero polynomial
 			int ii;
@@ -824,7 +822,7 @@ class gcone
 						//pSetm(p);
 						pSort(step3); //must be here, otherwise strange behaviour with many +o+o+o+o+ terms
 						p=step3;
-						pWrite(p);						
+						//pWrite(p);						
 						divOccured=TRUE;
 					}
 					else
@@ -874,7 +872,7 @@ class gcone
 				//res->m[ii]=pSub(temp1,temp2); //buggy
 				//pSort(res->m[ii]);
 				//pSetm(res->m[ii]);
-				cout << "res->m["<<ii<<"]=";pWrite(res->m[ii]);						
+				//cout << "res->m["<<ii<<"]=";pWrite(res->m[ii]);						
 			}			
 			return res;
 		}
@@ -935,7 +933,7 @@ class gcone
 			int lhs,rhs;
 			lhs=dotProduct(a,b)*dotProduct(a,b);
 			rhs=dotProduct(a,a)*dotProduct(b,b);
-			cout << "LHS="<<lhs<<", RHS="<<rhs<<endl;
+			//cout << "LHS="<<lhs<<", RHS="<<rhs<<endl;
 			if (lhs==rhs)
 			{
 				return TRUE;
@@ -1101,7 +1099,7 @@ class gcone
 		* We then check whether the fNormal of this facet is parallel to the fNormal of our testfacet.
 		* If this is the case, then our facet is indeed a search facet and TRUE is retuned. 
 		*/
-		bool isSearchFacet(gcone &gcTmp, facet &testfacet)
+		bool isSearchFacet(gcone &gcTmp, facet *testfacet)
 		{				
 			ring actRing=currRing;
 			facet *facetPtr=(facet*)gcTmp.facetPtr;			
@@ -1163,6 +1161,7 @@ class gcone
 				{
 					fMin=fCmp;
 					fAct=fMin;
+					fCmp=fCmp->next;
 				}
 				else
 				{
@@ -1181,19 +1180,18 @@ class gcone
 			delete alpha_i,alpha_j,sigma;
 			
 			/*If testfacet was minimal then fMin should still point there */
-			//NOTE BUG: Comment in and -> out of memory error
-			/*intvec *alpha_min = new intvec(this->numVars);
-			alpha_min=fMin->getFacetNormal();
-			delete fCmp,fAct,fMin;
 			
-			intvec *test = new intvec(this->numVars);
-			test=testfacet.getFacetNormal();*/
-			//if(fMin->getFacetNormal()==ivNeg(testfacet.getFacetNormal()))
-			//if (isParallel(fMin->getFacetNormal(),testfacet.getFacetNormal()))
+			//if(fMin->getFacetNormal()==ivNeg(testfacet.getFacetNormal()))			
+#ifdef gfan_DEBUG
+			cout << "Checking for parallelity" << endl <<" fMin is";
 			fMin->printNormal();
-			testfacet.printNormal();  //NOTE THIS IS EMPTY, so prolly cause of bug above
+			cout << "testfacet is ";
+			testfacet->printNormal();
+			cout << endl;
+#endif
 			if (fMin==gcTmp.facetPtr)			
 			//if(areEqual(fMin->getFacetNormal(),ivNeg(testfacet.getFacetNormal())))
+			//if (isParallel(fMin->getFacetNormal(),testfacet->getFacetNormal()))
 			{				
 				cout << "Parallel" << endl;
 				rChangeCurrRing(actRing);
@@ -1246,7 +1244,7 @@ class gcone
 #endif
 				gcTmp->showIntPoint();
 				/*recursive part goes gere*/
-				if (isSearchFacet(*gcTmp,(facet&)gcAct->facetPtr))
+				if (isSearchFacet(*gcTmp,(facet*)gcAct->facetPtr))
 				{
 					gcAct->next=gcTmp;
 					cout << "PING"<< endl;
@@ -1282,18 +1280,10 @@ ideal gfan(ideal inputIdeal)
 	3. getConeNormals
 	*/
 	
-	/* Construct a new ring which will serve as our root
-	Does not yet work as expected. Will work fine with order dp,Dp but otherwise hangs in getGB
-	resolved 07.04.2009 MM
-	*/
+	/* Construct a new ring which will serve as our root*/
 	rootRing=rCopy0(currRing);
 	rootRing->order[0]=ringorder_lp;
-	//NOTE: Build ring accordiing to rCopyAndChangeWeight
-	/*rootRing->order[0]=ringorder_a;
-	rootRing->order[1]=ringorder_lp;
-	rootRing->wvhdl[0] =( int *)omAlloc(numvar*sizeof(int));
-	rootRing->wvhdl[0][1]=1;
-	rootRing->wvhdl[0][2]=1;*/
+	
 	rComplete(rootRing);
 	rChangeCurrRing(rootRing);
 	
