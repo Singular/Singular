@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.42 2009-04-15 11:11:34 seelisch Exp $";
+version="$Id: dmod.lib,v 1.43 2009-05-08 16:02:23 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -47,6 +47,7 @@ GUIDE:
 @* - Ann F^s0 = I(F^s0) = LD0 in D(R) can be computed by annfs0, annfs, annfsBM,
 @*    annfsOT, annfsLOT, annfs2, annfsRB etc.
 @* - all the relevant data to F^s (LD, LD0, bs, PS) are computed by operatorBM
+@* - operator PS can be computed via operatorModulo or operatorBM
 @*
 @* - annihilator of F^{s1} for a number s1 is computed with annfspecial
 @* - annihilator of F_1^s_1 * ... * F_p^s_p is computed with annfsBMI
@@ -64,6 +65,7 @@ Sannfs(F[,S,eng]);      compute Ann F^s in D[s] for a polynomial F
 Sannfslog(F[,eng]);     compute Ann^(1) F^s in D[s] for a polynomial F
 bernsteinBM(F[,eng]);   compute global Bernstein polynomial for a polynomial F (algorithm of Briancon-Maisonobe)
 operatorBM(F[,eng]);    compute Ann F^s, Ann F^s0, BS and PS for a polynomial F (algorithm of Briancon-Maisonobe)
+operatorModulo(F, I, b); compute PS via the modulo approach
 annfsParamBM(F[,eng]);  compute the generic Ann F^s (algorithm by Briancon and Maisonobe) and exceptional parametric constellations for a polynomial F with parametric coefficients
 annfsBMI(F[,eng]);      compute Ann F^s and Bernstein ideal for a polynomial F=f1*..*fP (multivariate algorithm of Briancon-Maisonobe)
 checkRoot(F,a[,S,eng]); check if a given rational is a root of the global Bernstein polynomial of F and compute its multiplicity
@@ -95,7 +97,7 @@ SEE ALSO: gmssing_lib, bfun_lib, dmodapp_lib
 ";
 
 LIB "matrix.lib"; // for submat
-LIB "nctools.lib";
+LIB "nctools.lib"; // makeModElimRing etc.
 LIB "elim.lib"; // for nselect
 LIB "qhmoduli.lib"; // for Max
 LIB "gkdim.lib";
@@ -1912,84 +1914,143 @@ example
 //  ring r = 0,(x,y,z,w),Dp;
 //  poly F = x^3+y^3+z^2*w;
 
-// TODO: 1 has to appear in the 1nd column of transp. matrix
-// this does not happen automatically
-// for this, do special modulo with emphasis on the 1comp (c,<)
-// of the transp matrix, there must appear 1 in the GB
-// then use lift to get the expression...
 // need: (c,<) ordering for such comp's
 
-/*
 proc operatorModulo(poly F, ideal I, poly b)
 "USAGE:  operatorModulo(f,I,b);  f a poly, I an ideal, b a poly
 RETURN:  poly
-PURPOSE: compute the B-operator from the polynomial f, ideal I = Ann f^s and Bernstein-Sato
-polynomial b using modulo i.e. kernel of module homomorphism
-NOTE:  The computations take place in the ring, similar to the one returned by Sannfs procedure.
-@*       If printlevel=1, progress debug messages will be printed,
-@*       if printlevel>=2, all the debug messages will be printed.
+PURPOSE: compute the B-operator from the polynomial f, 
+@*           ideal I = Ann f^s and Bernstein-Sato polynomial b 
+@*           using modulo i.e. kernel of module homomorphism
+NOTE:  The computations take place in the ring, similar to the one 
+@*       returned by Sannfs procedure.
+@*     Note, that operator is not completely reduced wrt Ann f^{s+1}.  
+@*     If printlevel=1, progress debug messages will be printed,
+@*     if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example operatorModulo; shows examples
 "
 {
-  // with hom_kernel;
-  matrix AA[1][2] = F,-b;
-  //  matrix M = matrix(subst(I,s,s+1)*freemodule(2)); // ann f^{s+1}
+  int ppl = printlevel-voice+2;
+  def save = basering;
+  // change the ordering on the currRing
+  def mering = makeModElimRing(save);
+  setring mering;
+  poly b = imap(save, b);
+  poly F = imap(save, F);
+  ideal I = imap(save, I);
   matrix N = matrix(I); // ann f^s
   //  matrix K = hom_kernel(AA,M,N);
-  matrix K = modulo(AA,N);
-  K = transpose(K);
-  print(K);
-  ideal J;
-  int i;
-  poly t; number n;
-  for(i=1; i<=nrows(K); i++)
-  {
-    if (K[i,2]!=0)
+  // option(noreturnSB)?
+  /// matrix K = modulo(AA,N); // too slow: do it with slim!
+    module M = b,-F;
+    dbprint(ppl,"starting modulo computation");
+    module K = moduloSlim(M,N);
+    dbprint(ppl,"finished modulo computation");
+    //    K = transpose(K);
+//     matrix M[3][s+2] = F,-b,I[1..s], 1,0:(s+1),0,1,0:(s);
+//     module GM = slimgb(M);
+//     module GMT = transpose(G);
+//     GMT = GMT[2],GMT[3]; // modulo matrix
+//     module K = GMT[2]; 
+//     GMT = transpose(GMT);
+//     K = transpose(K);
+//     matrix K = GMT;
+//////////////////////////////////////////////////
+//  now select those elts whose 0's entry is nonzero
+// if there is constant => done
+// if not => compute GB and get it
+    module L;
+    ideal J;
+    int i;
+    poly t; number n;
+    for(i=1; i<=ncols(K); i++)
     {
-      if ( leadmonom(K[i,2]) == 1)
+      if (K[1,i]!=0)
       {
-        t = K[i,1];
-        n = leadcoef(K[i,2]);
-        t = t/n;
-        //        J = J, K[i][2];
-        break;
+        L = L,K[i];
+        if ( leadmonom(K[1,i]) == 1)
+        {
+          t = K[2,i];
+          n = leadcoef(K[1,i]);
+          t = t/n;
+          break;
+	  //          return(t);
+        }
       }
     }
-  }
-  ideal J = groebner(subst(I,s,s+1)); // for NF
-  t = NF(t,J);
-  "candidate:"; t;
-  J = subst(J,s,s-1);
-  // test:
-  if ( NF(t*F-b,J) !=0)
-  {
-    "Problem: PS does not work on F";
-  }
-  return(t);
+    if (n!=0)
+    {
+      // constant found
+      setring save; poly t = imap(mering,t); kill mering;
+      return(t);
+    }
+    dbprint(ppl,"no explicit constant. Start one more GB computation");    
+    // else: compute GB and do the same
+    L = L[2..ncols(L)];
+    K  = slimgb(L);
+    dbprint(ppl,"finished GB computation");
+    for(i=1; i<=ncols(K); i++)
+    {
+      if (K[1,i]!=0)
+      {
+        if ( leadmonom(K[1,i]) == 1)
+        {
+          t = K[2,i];
+          n = leadcoef(K[1,i]);
+          t = t/n;
+//          break;
+          setring save; poly t = imap(mering,t); kill mering;
+          return(t);
+        }
+      }
+    }
+
+    // we are here if no constant found
+    "ERROR: must never get here!";
+    return(0);
+//     for(i=1; i<=nrows(K); i++)
+//     {
+//       if (K[i,2]!=0)
+//       {
+//         if ( leadmonom(K[i,2]) == 1)
+//         {
+//           t = K[i,1];
+//           n = leadcoef(K[i,2]);
+//           t = t/n;
+// //        J = J, K[i][2];
+//           break;
+//         }
+//      }
+//   }
+//   ideal J = groebner(subst(I,s,s+1)); // for NF
+//   t = NF(t,J);
+//   "candidate:"; t;
+//   J = subst(J,s,s-1);
+//   // test:
+//   if ( NF(t*F-b,J) !=0)
+//   {
+//     "Problem: PS does not work on F";
+//   }
+//   return(t);
 }
 example
 {
   "EXAMPLE:"; echo = 2;
-  //  ring r = 0,(x,y,z),Dp;
-  //   poly F = x^3+y^3+z^3;
-  LIB "dmod.lib"; option(prot); option(mem);
+  //  LIB "dmod.lib"; option(prot); option(mem);
   ring r = 0,(x,y),Dp;
-  //  poly F = x^3+y^3+x*y^2;
-  poly F = x^4 + y^4 + x*y^4;
+  poly F = x^3+y^3+x*y^3;
   def A = Sannfs(F); // here we get LD = ann f^s
   setring A;
   poly F = imap(r,F);
   def B = annfs0(LD,F); // to obtain BS polynomial
-  list BS = imap(B,BS);
-  poly b = fl2poly(BS,"s");
+  list BS = imap(B,BS);   poly bs = fl2poly(BS,"s");
+  poly PS = operatorModulo(F,LD,bs);
   LD = groebner(LD);
-  poly PS = operatorModulo(F,LD,b);
-  PS; // the operator, s.t. PS*F^{s+1} = bs*F^s mod LD
-  reduce(PS*F-bs,LD); // check the property of PS
+  PS = NF(PS,subst(LD,s,s+1));; // reduction modulo Ann s^{s+1}
+  size(PS); 
+  lead(PS);
+  reduce(PS*F-bs,LD); // check the defining property of PS
 }
-*/
-
-
 
 proc annfsParamBM (poly F, list #)
 "USAGE:  annfsParamBM(f [,eng]);  f a poly, eng an optional int
