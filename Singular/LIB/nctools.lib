@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.53 2009-04-15 14:20:44 motsak Exp $";
+version="$Id: nctools.lib,v 1.54 2009-05-08 16:01:55 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -25,6 +25,7 @@ superCommutative([b,e,Q]);  return qring, the super-commutative algebra over a b
 rightStd(I);              compute a right Groebner basis of an ideal,
 
 AUXILIARY PROCEDURES:
+moduloSlim(A,B);  compute modulo via slimgb
 ncRelations(r);      recover the non-commutative relations of a G-algebra,
 isCentral(p);         check for the commutativity of a polynomial in the G-algebra,
 isNC();                 check whether basering is noncommutative,
@@ -34,11 +35,13 @@ UpOneMatrix(N);   return NxN matrix with 1's in the whole upper triagle,
 AltVarStart();        return first alternating variable of a super-commutative algebra,
 AltVarEnd();          return last alternating variable of a super-commutative algebra,
 IsSCA();                check whether current ring is a super-commutative algebra
+makeModElimRing(L); equip a ring with module elimination ordering
 ";
 
 
 LIB "ring.lib"; // for rootofUnity
 LIB "poly.lib"; // for newtonDiag
+LIB "matrix.lib"; // for submat
 // LIB "ncalg.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1571,3 +1574,152 @@ example
   def T = nc_algebra(1,M); setring T;
   isWeyl();
 }
+
+//////////////////////////////////////////////////////////////////////
+
+proc moduloSlim (module A, module B)
+"USAGE:  moduloSlim(A,B); A,B module/matrix/ideal
+RETURN:  module
+PURPOSE: compute @code{modulo} with slimgb as engine
+EXAMPLE: example moduloSlim; shows an example
+"
+{ 
+  def save  = basering;
+  int rA = nrows(A);
+  if (rA != nrows(B)) 
+  {
+    // add 0 rows?
+    ERROR("incorrect input: different rank");
+  }
+  def mering = makeModElimRing(save);
+  setring mering;
+  module A = imap(save, A);
+  module B = imap(save, B);
+  int cA = ncols(A);  int cB = ncols(B);
+  // create matrix C
+  //  matrix C[2*rA][cA+cB];
+  module C;
+  int i;
+  for(i=1; i<= cA; i++)
+  {
+    C = C, A[i] + gen(rA + i);
+  }
+  C = C,B;
+//   for(i=1; i<=cB; i++)
+//   {
+//     C = C, B[i];
+//   }
+  C = C[2..ncols(C)];
+  matrix D = slimgb(C);
+  module E;
+  for(i=1; i<= ncols(D); i++)
+  {
+    if (D[1,i]==0)
+    {
+      E = E,D[i];
+    }
+  }
+  // this E has 1st column and 1st row zero
+  // use submat@matrix.lib
+  E = submat(E,2..nrows(E),2..ncols(E));
+//   E = E[2..ncols(E)]; // skip 1st 0 row  //   E = transpose(E);
+//   E = E[2..ncols(E)]; // skip 1st 0 row //   E = transpose(E);
+  setring save;
+  module E = imap(mering,E);
+  kill mering;
+  return(E);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  LIB "ncalg.lib";
+  ring r; // first classical example for modulo
+  ideal h1=x,y,z;    ideal h2=x;
+  module m=moduloSlim(h1,h2);
+  print(m);
+  // now, a noncommutative example
+  def A = makeUsl2(); setring A; // this algebra is U(sl_2)
+  ideal H2 = e2,f2,h2-1; H2 = twostd(H2);
+  print(matrix(H2)); // print H2 in a compact form
+  ideal H1 = std(e);
+  ideal T = moduloSlim(H1,H2);
+  T = std( NF(std(H2+T),H2) ); 
+  T;
+}
+
+//////////////////////////////////////////////////////////////////////
+
+proc makeModElimRing(list #)
+"USAGE:  makeModElimRing(L); L a list
+RETURN:  ring
+PURPOSE: create a copy of a given ring equipped with the
+@* elimination ordering for module components @code{(c,<)}
+EXAMPLE: example makeModElimRing; shows an example
+"
+{
+  // supports qring;
+  // can be extended to handle C istead of c
+  /* input/basering business */
+  def save; int Noinput = 0;
+  if ( size(#)>0 )
+  {
+    if ( (typeof(#[1]) == "ring" ) || (typeof(#[1]) == "qring" ) )
+    {
+      save = #[1]; 
+    }
+    else
+    {
+      print("unsupported input type, proceeding with basering\n");  
+      Noinput = 1;
+    }
+  }  
+  if (Noinput)
+  {
+    if (nameof(basering)=="basering")
+    {
+      ERROR("no rings are given");
+    }
+    else
+    {
+      save = basering;
+    }
+  }
+  /* END input/basering business */
+  list L = ringlist(save);
+  list Ord = L[3];
+  int s = size(Ord); int done;
+  // detect where module ordering is located: either 1st or last entry
+  int i,j;
+  for(i=1; i<=s; i++)
+  {
+    if ( (Ord[i][1] == "C") || (Ord[i][1] == "c") )
+    {
+      Ord[i][1] = "c";
+      j = i; i=s;
+    }
+  }
+  if (j==0) { ERROR("no component entry found in the ringlist"); }
+  list N;
+  N[1] = Ord[j];
+  for(i=2; i<=j; i++)
+  {
+    N[i] = Ord[i-1];
+  }
+  for(i=j+1; i<=s; i++)
+  {
+    N[i] = Ord[i];
+  }
+  L[3] = N; def NR = ring(L); 
+  return(NR);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r1 = 0,(x,y,z),(C,Dp);
+  def r2 = makeModElimRing(r1); setring r2; r2;   kill r2;
+  ring r3 = 0,(z,t),(wp(2,3),c);
+  def r2 = makeModElimRing(r3); setring r2; r2; kill r2;
+  ring r4 = 0,(z,t,u,w),(a(1,2),C,wp(2,3,4,5));
+  def r2 = makeModElimRing(r4); setring r2; r2;
+}
+
