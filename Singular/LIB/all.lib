@@ -1,6 +1,6 @@
-// $Id: all.lib,v 1.66 2009-04-15 11:50:43 Singular Exp $
+// $Id: all.lib,v 1.67 2009-05-09 11:55:24 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.66 2009-04-15 11:50:43 Singular Exp $";
+version="$Id: all.lib,v 1.67 2009-05-09 11:55:24 Singular Exp $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries (commutative case)
@@ -55,6 +55,7 @@ LIB "noether.lib";
 LIB "normal.lib";
 LIB "ntsolve.lib";
 LIB "phindex.lib";
+LIB "pointid.lib";
 LIB "poly.lib";
 LIB "presolve.lib";
 LIB "primdec.lib";
