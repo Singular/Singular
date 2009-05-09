@@ -1,4 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
+version="$Id: pointid.lib,v 1.3 2009-05-09 12:04:13 Singular Exp $";
+category="Commutative algebra";
 info="
 LIBRARY:  pointid.lib     Procedures for computing a factorized lex GB of
                           the vanishing ideal of a set of points via the
