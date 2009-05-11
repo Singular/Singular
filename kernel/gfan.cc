@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-05-08 12:58:01 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.48 2009-05-08 12:58:01 monerjan Exp $
-$Id: gfan.cc,v 1.48 2009-05-08 12:58:01 monerjan Exp $
+$Date: 2009-05-11 14:27:44 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.49 2009-05-11 14:27:44 monerjan Exp $
+$Id: gfan.cc,v 1.49 2009-05-11 14:27:44 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -20,10 +20,11 @@ $Id: gfan.cc,v 1.48 2009-05-08 12:58:01 monerjan Exp $
 #include "maps.h"
 #include "ring.h"
 #include "prCopy.h"
-#include <iostream.h>	//deprecated
+#include <iostream>	//deprecated
 #include <bitset>
+#include <fstream>	//read-write cones to files
 
-/*remove the following at your own risk*/
+/*DO NOT REMOVE THIS*/
 #ifndef GMPRATIONAL
 #define GMPRATIONAL
 #endif
@@ -52,6 +53,7 @@ $Id: gfan.cc,v 1.48 2009-05-08 12:58:01 monerjan Exp $
 #endif
 
 //#include gcone.h
+using namespace std;
 
 /**
 *\brief Class facet
@@ -189,7 +191,17 @@ class gcone
 		/* TODO in order to save memory use pointers to rootRing and inputIdeal instead */
 		intvec *ivIntPt;	//an interior point of the cone
 		
-	public:
+	public:	
+		/** Pointer to the first facet */
+		facet *facetPtr;	//Will hold the adress of the first facet; set by gcone::getConeNormals
+		
+		/** # of variables in the ring */
+		int numVars;		//#of variables in the ring
+		
+		/** Contains the Groebner basis of the cone. Is set by gcone::getGB(ideal I)*/
+		ideal gcBasis;		//GB of the cone, set by gcone::getGB();
+		gcone *next;		//Pointer to *previous* cone in search tree	
+		
 		/** \brief Default constructor. 
 		*
 		* Initialises this->next=NULL and this->facetPtr=NULL
@@ -205,6 +217,8 @@ class gcone
 		*
 		* This constructor takes the root ring and the root ideal as parameters and stores 
 		* them in the private members gcone::rootRing and gcone::inputIdeal
+		* Since knowledge of the root ring is only needed when using reverse search,
+		* this constructor is not needed when using the "second" method
 		*/
 		gcone(ring r, ideal I)
 		{
@@ -234,7 +248,7 @@ class gcone
 			ideal gb;
 			gb=gc.facetPtr->getFlipGB();			
 			this->gcBasis=gb;//gc.facetPtr->getFlipGB();	//this cone's GB is the flipped GB
-			idShow(this->gcBasis);
+			//idShow(this->gcBasis);
 			
 			/*Reverse direction of the facet normal to make it an inner normal*/			
 			for (int ii=0; ii<this->numVars;ii++)
@@ -242,21 +256,13 @@ class gcone
 				(*ivtmp)[ii]=-(*ivtmp)[ii];				
 			}
 			
-			fAct->setFacetNormal(ivtmp);			
+			fAct->setFacetNormal(ivtmp);
+			delete ivtmp;						
 		}
 		
 		/** \brief Default destructor */
 		~gcone(){;}		//destructor
-		
-		/** Pointer to the first facet */
-		facet *facetPtr;	//Will hold the adress of the first facet; set by gcone::getConeNormals
-		
-		/** # of variables in the ring */
-		int numVars;		//#of variables in the ring
-		
-		/** Contains the Groebner basis of the cone. Is set by gcone::getGB(ideal I)*/
-		ideal gcBasis;		//GB of the cone, set by gcone::getGB();
-		gcone *next;		//Pointer to *previous* cone in search tree
+			
 		
 		/** \brief Set the interior point of a cone */
 		void setIntPoint(intvec *iv)
@@ -407,29 +413,20 @@ class gcone
 			this->facetPtr = fRoot;		//set variable facetPtr of class gcone to first facet
 			facet *fAct; 			//instantiate pointer to active facet
 			fAct = fRoot;			//Seems to do the trick. fRoot and fAct have to point to the same adress!
-			std::cout << "fRoot = " << fRoot << ", fAct = " << fAct << endl;
+			//std::cout << "fRoot = " << fRoot << ", fAct = " << fAct << endl;
 			for (int kk = 0; kk<ddrows; kk++)
 			{
-				intvec *load = new intvec(numvar);	//intvec to store a single facet normal that will then be stored via setFacetNormal
+				intvec *load = new intvec(this->numVars);	//intvec to store a single facet normal that will then be stored via setFacetNormal
 				for (int jj = 1; jj <ddcols; jj++)
 				{
 #ifdef GMPRATIONAL
 					double foo;
 					foo = mpq_get_d(ddineq->matrix[kk][jj]);
-/*#ifdef gfan_DEBUG
+#ifdef gfan_DEBUG
 					std::cout << "fAct is " << foo << " at " << fAct << std::endl;
-#endif*/
-					(*load)[jj-1] = (int)foo;		//store typecasted entry at pos jj-1 of load
 #endif
-#ifndef GMPRATIONAL
-					double *foo;
-					foo = (double*)ddineq->matrix[kk][jj];	//get entry from actual position#endif
-/*#ifdef gfan_DEBUG
-					std::cout << "fAct is " << *foo << " at " << fAct << std::endl;
-#endif*/
-					(*load)[jj-1] = (int)*foo;		//store typecasted entry at pos jj-1 of load
-#endif //GMPRATIONAL					
-			
+					(*load)[jj-1] = (int)foo;		//store typecasted entry at pos jj-1 of load
+#endif			
 
 					//(*load)[jj-1] = (int)foo;		//store typecasted entry at pos jj-1 of load
 					//check for flipability here
@@ -443,8 +440,9 @@ class gcone
 				for (int jj = 0; jj<load->length(); jj++)
 				{
 					intvec *ivCanonical = new intvec(load->length());
-					(*ivCanonical)[jj]=1;				
-					if (dotProduct(load,ivCanonical)<0)
+					(*ivCanonical)[jj]=1;
+					cout << "dotProd=" << dotProduct(*load,*ivCanonical) << endl;
+					if (dotProduct(*load,*ivCanonical)<0)					
 					{
 						isFlippable=TRUE;
 						break;	//URGHS
@@ -479,8 +477,7 @@ class gcone
 				delete iv;
 			}
 			
-			//Clean up but don't delete the return value! (Whatever it will turn out to be)
-			
+			//Clean up but don't delete the return value! (Whatever it will turn out to be)			
 			dd_FreeMatrix(ddineq);
 			set_free(ddredrows);
 			free(ddnewpos);
@@ -898,6 +895,8 @@ class gcone
 		{
 		}//GGW
 		
+		/** \brief Compute the negative of a given intvec
+		*/		
 		intvec *ivNeg(intvec const &iv)
 		{
 			intvec *res = new intvec(this->numVars);
@@ -1207,6 +1206,8 @@ class gcone
 			}
 		}//bool isSearchFacet
 		
+		/** \brief Check for equality of two intvecs
+		*/
 		bool areEqual(intvec const &a, intvec const &b)
 		{
 			bool res=TRUE;
@@ -1221,6 +1222,8 @@ class gcone
 			return res;
 		}
 		
+		/** \brief The reverse search algorithm
+		*/
 		void reverseSearch(gcone *gcAct) //no const possible here since we call gcAct->flip
 		{
 			facet *fAct=new facet();
@@ -1259,12 +1262,80 @@ class gcone
 				fAct = fAct->next;		
 			}//while(fAct->next!=NULL)
 		}//reverseSearch
-		friend class facet;
+		
+		/** \brief Write information about a cone into a file on disk
+		*
+		* This methods writes the information needed for the "second" method into a file.
+		* The file's is divided in sections containing information on
+		* 1) the ring
+		* 2) the cone's Groebner Basis
+		* 3) the cone's facets
+		* Each line contains exactly one date
+		* Each section starts with its name in CAPITALS
+		*/
+		void writeConeToFile(gcone const &gc)
+		{
+			ofstream gcOutputFile("/tmp/cone1.gc");
+			if (!gcOutputFile)
+			{
+				cout << "Error opening file for writing in writeConeToFile" << endl;
+			}
+			else
+			{			
+				gcOutputFile << "RING" << endl;				
+				//Write this->gcBasis into file
+				gcOutputFile << "GCBASIS" << endl;				
+				for (int ii=0;ii<IDELEMS(gc.gcBasis);ii++)
+				{					
+ 					gcOutputFile << p_String((poly)gc.gcBasis->m[ii],gc.baseRing) << endl;
+				}			
+				
+				facet *fAct = new facet();
+				fAct = gc.facetPtr;
+				gcOutputFile << "FACETS" << endl;								
+				while(fAct!=NULL)
+				{	
+ 					intvec *iv = new intvec(gc.numVars);
+					iv=fAct->getFacetNormal();
+					for (int ii=0;ii<iv->length();ii++)
+					{
+						if (ii<iv->length()-1)
+						{
+							gcOutputFile << (*iv)[ii] << ",";
+						}
+						else
+						{
+							gcOutputFile << (*iv)[ii] << endl;
+						}
+					}
+					fAct=fAct->next;
+				}				
+				
+				gcOutputFile.close();
+			}
+		}//writeConeToFile(gcone const &gc)
+		
+		/** \brief Reads a cone from a file identified by its number
+		*/
+		void readConeFromFile(int gcNum)
+		{
+		}
+		
+	friend class facet;
 };//class gcone
 
 ideal gfan(ideal inputIdeal)
 {
 	int numvar = pVariables; 
+	
+	enum searchMethod {
+		reverseSearch,
+		noRevS
+	};
+	
+	searchMethod method;
+	method = noRevS;
+	//method = reverseSearch;
 	
 #ifdef gfan_DEBUG
 	cout << "Now in subroutine gfan" << endl;
@@ -1274,11 +1345,8 @@ ideal gfan(ideal inputIdeal)
 	ideal res;	
 	facet *fRoot;
 	
-	/*
-	1. Select target order, say dp.
-	2. Compute GB of inputIdeal wrt target order -> newRing, setCurrRing etc...
-	3. getConeNormals
-	*/
+	if (method==reverseSearch)
+	{
 	
 	/* Construct a new ring which will serve as our root*/
 	rootRing=rCopy0(currRing);
@@ -1312,19 +1380,23 @@ ideal gfan(ideal inputIdeal)
 	/*Now it is time to compute the search facets, respectively start the reverse search.
 	But since we are in the root all facets should be search facets. IS THIS TRUE?
 	NOTE: Check for flippability is not very sophisticated
-	*/
-	/*facet *fAct=new facet();
-	fAct=gcAct->facetPtr;
-	while(fAct->next!=NULL)
+	*/	
+	//gcAct->reverseSearch(gcAct);	
+	rChangeCurrRing(rootRing);
+	res=gcRoot->gcBasis;	
+	}//if method==reverSearch
+	
+	if(method==noRevS)
 	{
-		gcAct->flip(gcAct->gcBasis,gcAct->facetPtr);
-		gcone *gcTmp = new gcone(*gcAct);
-		idShow(gcTmp->gcBasis);
-		gcTmp->getConeNormals(gcTmp->gcBasis, TRUE);
-		gcTmp->getIntPoint();
-		fAct = fAct->next;		
-	}*/
-	gcAct->reverseSearch(gcAct);
+		gcone *gcRoot = new gcone(currRing,inputIdeal);
+		gcone *gcAct;
+		gcAct = gcRoot;
+		gcAct->numVars=pVariables;
+		gcAct->getGB(inputIdeal);
+		gcAct->getConeNormals(gcAct->gcBasis);		
+		gcAct->writeConeToFile(*gcAct);
+		res=gcAct->gcBasis;	
+	}
 	
 	/*As of now extra.cc expects gfan to return type ideal. Probably this will change in near future.
 	The return type will then be of type LIST_CMD
@@ -1333,9 +1405,9 @@ ideal gfan(ideal inputIdeal)
 	Groebner Basis and merge this somehow with LIST_CMD
 	=> Count the cones!
 	*/
-	rChangeCurrRing(rootRing);
+	//rChangeCurrRing(rootRing);
 	//res=gcAct->gcBasis;
-	res=gcRoot->gcBasis;	
+	//res=gcRoot->gcBasis;	
 	return res;
 	//return GBlist;
 }
