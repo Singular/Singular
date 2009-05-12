@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-05-11 14:27:44 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.49 2009-05-11 14:27:44 monerjan Exp $
-$Id: gfan.cc,v 1.49 2009-05-11 14:27:44 monerjan Exp $
+$Date: 2009-05-12 15:30:29 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.50 2009-05-12 15:30:29 monerjan Exp $
+$Id: gfan.cc,v 1.50 2009-05-12 15:30:29 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -20,7 +20,7 @@ $Id: gfan.cc,v 1.49 2009-05-11 14:27:44 monerjan Exp $
 #include "maps.h"
 #include "ring.h"
 #include "prCopy.h"
-#include <iostream>	//deprecated
+#include <iostream>
 #include <bitset>
 #include <fstream>	//read-write cones to files
 
@@ -65,6 +65,14 @@ class facet
 	private:
 		/** \brief Inner normal of the facet, describing it uniquely up to isomorphism */
 		intvec *fNormal;
+		
+		/** \brief An interior point of the facet*/
+		intvec *interiorPoint;
+		
+		/** \brief Universal Cone Number
+		* The number of the cone the facet belongs to
+		*/
+		int UCN;
 		
 		/** \brief The Groebner basis on the other side of a shared facet
 		 *
@@ -130,6 +138,26 @@ class facet
 			idShow(this->flipGB);
 		}
 		
+		void setUCN(int n)
+		{
+			this->UCN=n;
+		}
+		
+		int getUCN()
+		{
+			return this->UCN;
+		}
+		
+		void setInteriorPoint(intvec *iv)
+		{
+			this->interiorPoint = ivCopy(iv);
+		}
+		
+		intvec *getInteriorPoint()
+		{
+			return this->interiorPoint;
+		}
+		
 		/*bool isFlippable(intvec &load)
 		{
 			bool res=TRUE;			
@@ -190,6 +218,7 @@ class gcone
 		ring baseRing;		//the basering of the cone		
 		/* TODO in order to save memory use pointers to rootRing and inputIdeal instead */
 		intvec *ivIntPt;	//an interior point of the cone
+		int UCN;		//unique number of the cone
 		
 	public:	
 		/** Pointer to the first facet */
@@ -211,6 +240,7 @@ class gcone
 			this->next=NULL;
 			this->facetPtr=NULL;
 			this->baseRing=currRing;
+			this->UCN=1;
 		}
 		
 		/** \brief Constructor with ring and ideal
@@ -227,6 +257,7 @@ class gcone
 			this->rootRing=r;
 			this->inputIdeal=I;
 			this->baseRing=currRing;
+			this->UCN=1;
 		}
 		
 		/** \brief Copy constructor 
@@ -237,13 +268,14 @@ class gcone
 		gcone(const gcone& gc)		
 		{
 			this->next=NULL;
-			this->numVars=gc.numVars;			
+			this->numVars=gc.numVars;
+			this->UCN=(gc.UCN)+1;	//add 1 to the UCN of previous cone
 			facet *fAct= new facet();			
 			this->facetPtr=fAct;
 			
 			intvec *ivtmp = new intvec(this->numVars);						
 			ivtmp = gc.facetPtr->getFacetNormal();
-			ivtmp->show();			
+			//ivtmp->show();			
 			
 			ideal gb;
 			gb=gc.facetPtr->getFlipGB();			
@@ -279,6 +311,22 @@ class gcone
 		void showIntPoint()
 		{
 			ivIntPt->show();
+		}
+		
+		/** \brief Set gcone::numFacets */
+		void setNumFacets()
+		{
+		}
+		
+		/** \brief Get gcone::numFacets */
+		int getNumFacets()
+		{
+			return this->numFacets;
+		}
+		
+		int getUCN()
+		{
+			return this->UCN;
 		}
 		
 		/** \brief Compute the normals of the cone
@@ -430,10 +478,10 @@ class gcone
 
 					//(*load)[jj-1] = (int)foo;		//store typecasted entry at pos jj-1 of load
 					//check for flipability here
-					if (jj<ddcols)				//Is this facet NOT the last facet? Writing while instead of if is a really bad idea :)
-					{
+// 					if (jj<ddcols)				//Is this facet NOT the last facet? Writing while instead of if is a really bad idea :)
+// 					{
 						//fAct->next = new facet();	//If so: instantiate new facet. Otherwise this->next=NULL due to the constructor						
-					}
+// 					}
 				}//for (int jj = 1; jj <ddcols; jj++)
 				/*Quick'n'dirty hack for flippability*/	
 				bool isFlippable=FALSE;				
@@ -472,7 +520,7 @@ class gcone
 			if (compIntPoint==TRUE)
 			{
 				intvec *iv = new intvec(this->numVars);
-				interiorPoint(ddineq, *iv);
+				interiorPoint(ddineq, *iv);	//NOTE ddineq contains non-flippable facets
 				this->setIntPoint(iv);	//stores the interior point in gcone::ivIntPt
 				delete iv;
 			}
@@ -944,6 +992,7 @@ class gcone
 		}//bool isParallel
 		
 		/** \brief Compute an interior point of a given cone
+		* Result will be written into intvec iv
 		*/
 		void interiorPoint(dd_MatrixPtr const &M, intvec &iv) //no const &M here since we want to remove redundant rows
 		{
@@ -956,9 +1005,10 @@ class gcone
 			dd_NumberType numb;	
 			//M->representation=dd_Inequality;
 			//M->objective-dd_LPMin;  //Not sure whether this is needed
-			dd_set_si(M->rowvec[0],1);dd_set_si(M->rowvec[1],1);dd_set_si(M->rowvec[2],1);
-			//cout << "TICK 1" << endl;
-						
+			
+			//NOTE: Make this n-dimensional!
+			//dd_set_si(M->rowvec[0],1);dd_set_si(M->rowvec[1],1);dd_set_si(M->rowvec[2],1);
+									
 			//dd_MatrixCanonicalize(&M, &ddlinset, &ddredrows, &ddnewpos, &err);
 			//if (err!=dd_NoError){cout << "Error during dd_MatrixCanonicalize" << endl;}
 			//cout << "Tick 2" << endl;
@@ -974,7 +1024,7 @@ class gcone
 			lpInt=dd_MakeLPforInteriorFinding(lp);
 			if (err!=dd_NoError){cout << "Error during dd_MakeLPForInteriorFinding in gcone::interiorPoint" << endl;}
 #ifdef gfan_DEBUG
-//			dd_WriteLP(stdout,lpInt);
+// 			dd_WriteLP(stdout,lpInt);
 #endif			
 
 			dd_FindRelativeInterior(M,&ddlinset,&ddredrows,&lpSol,&err);
@@ -1263,6 +1313,62 @@ class gcone
 			}//while(fAct->next!=NULL)
 		}//reverseSearch
 		
+		/** \brief The new method of Markwig and Jensen
+		*/
+		void noRevS(gcone &gc)
+		{
+			facet *fListPtr = new facet();			
+			facet *fAct = new facet();
+			fAct = gc.facetPtr;
+						
+			dd_set_global_constants();
+			dd_rowrange ddrows;
+			dd_colrange ddcols;
+			ddrows=2;	//Each facet is described by its normal
+			ddcols=gc.numVars+1;	// plus one for the standard simplex
+			
+			while(fAct->next!=NULL)
+			{
+				/*Compute an interior point for each facet*/				
+				dd_MatrixPtr ddineq;	
+				ddineq=dd_CreateMatrix(ddrows,ddcols);
+				intvec *comp = new intvec(this->numVars);
+				comp=fAct->getFacetNormal();				
+				for(int ii=0; ii<this->numVars; ii++)					
+				{										
+					dd_set_si(ddineq->matrix[0][ii+1],(*comp)[ii]);
+					dd_set_si(ddineq->matrix[1][ii+1],1);	//Assure we search in the pos. orthant			
+				}
+				set_addelem(ddineq->linset,1);	//We want equality in the first row
+				//dd_WriteMatrix(stdout,ddineq);
+				interiorPoint(ddineq,*comp);				
+				/**/
+#ifdef gfan_DEBUG
+				cout << "IP is";
+				comp->show(); cout << endl;
+#endif
+				//Store the interior point and the UCN
+				fListPtr->setInteriorPoint( comp );				
+				fListPtr->setUCN( gc.getUCN() );	
+							
+				dd_FreeMatrix(ddineq);
+				fAct=fAct->next;	//iterate
+			}			
+			
+			//NOTE Hm, comment in and get a crash for free...
+			//dd_free_global_constants();				
+			gc.writeConeToFile(gc);
+			
+			/*2nd step
+			Choose a facet from fListPtr, flip it and forget the previous cone
+			*/
+			fAct = fListPtr;
+			gcone *gcTmp = new gcone(gc);	//copy
+			gcTmp->flip(gcTmp->gcBasis,fAct);
+			//NOTE: gcTmp may be deleted, gcRoot from main proc should probably not!
+			
+		}//void noRevS(gcone &gc)
+		
 		/** \brief Write information about a cone into a file on disk
 		*
 		* This methods writes the information needed for the "second" method into a file.
@@ -1312,6 +1418,7 @@ class gcone
 				}				
 				
 				gcOutputFile.close();
+				delete fAct; fAct=NULL;
 			}
 		}//writeConeToFile(gcone const &gc)
 		
@@ -1335,7 +1442,7 @@ ideal gfan(ideal inputIdeal)
 	
 	searchMethod method;
 	method = noRevS;
-	//method = reverseSearch;
+// 	method = reverseSearch;
 	
 #ifdef gfan_DEBUG
 	cout << "Now in subroutine gfan" << endl;
@@ -1393,8 +1500,9 @@ ideal gfan(ideal inputIdeal)
 		gcAct = gcRoot;
 		gcAct->numVars=pVariables;
 		gcAct->getGB(inputIdeal);
-		gcAct->getConeNormals(gcAct->gcBasis);		
-		gcAct->writeConeToFile(*gcAct);
+		gcAct->getConeNormals(gcAct->gcBasis);
+		cout << "ding" << endl;		
+		gcAct->noRevS(*gcAct);		
 		res=gcAct->gcBasis;	
 	}
 	
