@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.63 2009-05-13 17:29:41 Singular Exp $
+# $Id: GNUmakefile.in,v 1.64 2009-05-13 17:35:08 Singular Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -198,12 +198,11 @@ doxysrc :=	\
 		parseutil.cc
 
 # factory object files and dependencies
-factoryobj :=	$(factorysrc:.cc=.o)
-factoryobj :=	$(factorysrc:.y=.o)
+factoryobj :=   $(factorysrc:%.cc=%.o) $(factorysrc:%.y=%.o)
 factorygobj :=  $(factorysrc:%.cc=%.og)
 factorypobj :=  $(factorysrc:%.cc=%.op)
-factorydep :=	$(factorysrc:.cc=.d)
-factorydep :=	$(factorydep:.y=.d)
+factorydep :=	$(factorysrc:%.cc=%.d)
+factorydep :=	$(factorydep:%.y=%.d)
 
 # factory header files
 basefactoryincl := \
