@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.60 2008-10-28 18:34:08 Singular Exp $
+# $Id: GNUmakefile.in,v 1.61 2009-05-13 17:22:26 Singular Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -104,6 +104,10 @@ LIBCXXFLAGS =	$(WARNFLAGS) -fno-implicit-templates \
 		-I. -I$(srcdir) -I$(includedir) \
 		$(DEFS) $(CPPFLAGS) $(CXXFLAGS)
 
+LIBCGGFLAGS =	$(WARNFLAGS) -fno-implicit-templates \
+		-I. -I$(srcdir) -I$(includedir) \
+		$(DEFS) $(CPPFLAGS)
+
 # flags to translate ftmpl_inst.cc
 TMPLCXXFLAGS =	$(LIBCXXFLAGS)
 
@@ -195,7 +199,9 @@ doxysrc :=	\
 
 # factory object files and dependencies
 factoryobj :=	$(factorysrc:.cc=.o)
-factoryobj :=	$(factoryobj:.y=.o)
+factoryobj :=	$(factorysrc:.y=.o)
+factorygobj :=  $(factorysrc:%.cc=%.og)
+factorypobj :=  $(factorysrc:%.cc=%.op)
 factorydep :=	$(factorysrc:.cc=.d)
 factorydep :=	$(factorydep:.y=.d)
 
@@ -424,6 +430,12 @@ distfiles :=	\
 	$(CXX) -c $< $(LIBCXXFLAGS) -o $@
 %.o: %.c config.h
 	$(CC) -c $< $(LIBCFLAGS) -o $@
+# the debug version:
+%.og: %.cc config.h
+	$(CXX) -g -c $< $(LIBCGGFLAGS) -o $@
+# the profiling version:
+%.op: %.cc config.h
+	$(CXX) -O -pg -c $< $(LIBCGGFLAGS) -o $@
 
 # how to create dependency files.  To avoid broken dependency files
 # (which in turn break this GNUmakefile) we first generate them in
@@ -459,6 +471,14 @@ mem:		libcfmem.a
 # - explicit targets.
 #
 $(libfactory):	$(factoryobj)
+		$(AR) $(ARFLAGS) $@ $^
+		$(RANLIB) $@
+
+libsingcf_g.a:	$(factorygobj)
+		$(AR) $(ARFLAGS) $@ $^
+		$(RANLIB) $@
+
+libsingcf_p.a:	$(factorypobj)
 		$(AR) $(ARFLAGS) $@ $^
 		$(RANLIB) $@
 
@@ -592,6 +612,8 @@ installcf:	cf
 		$(MKINSTALLDIRS) $(includedir)
 		$(MKINSTALLDIRS) $(templatedir)
 		$(INSTALL_DATA) $(libfactory) $(libdir)/$(libfactory)
+		-$(INSTALL_DATA) libsingcf_g.a $(libdir)/libsingcf_g.a
+		-$(INSTALL_DATA) libsingcf_p.a $(libdir)/libsingcf_p.a
 		$(INSTALL_DATA) factory.h $(includedir)/factory.h
 		$(INSTALL_DATA) cf_gmp.h $(includedir)/cf_gmp.h
 		$(INSTALL_DATA) factoryconf.h $(includedir)/factoryconf.h
@@ -639,6 +661,8 @@ uninstallcf:
 		-rm -f $(includedir)/factoryconf.h
 		-rm -f $(includedir)/factory.h
 		-rm -f $(libdir)/$(libfactory)
+		-rm -f $(libdir)/libsingcf_g.a
+		-rm -f $(libdir)/libsingcf_p.a
 		-rmdir $(templatedir)
 		-rmdir $(includedir)
 		-rmdir $(libdir)
