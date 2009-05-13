@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.16 2009-05-13 17:57:36 Singular Exp $
+# $Id: Makefile.in,v 1.17 2009-05-13 18:25:05 Singular Exp $
 #################################################
 SHELL		= /bin/sh
 RM		= -rm -f
@@ -154,6 +154,8 @@ install:	all
 	-${INSTALL_DATA} libsingfac_g.a ${libdir}
 	-${INSTALL_DATA} libsingfac_p.a ${libdir}
 	$(RANLIB) ${libdir}/${TARGETNAME}.a
+	-$(RANLIB) ${libdir}/libsingfac_g.a
+	-$(RANLIB) ${libdir}/libsingfac_g.a
 
 uninstall: 
 	$(RM) ${includedir}/${LIBFACINCLUDE}
