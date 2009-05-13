@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.62 2009-05-13 17:23:59 Singular Exp $
+# $Id: GNUmakefile.in,v 1.63 2009-05-13 17:29:41 Singular Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -699,9 +699,9 @@ dist:		$(srcdir)/readcf.cc $(srcdir)/configure \
 # - cleaning up.
 #
 clean:		ftestclean
-		-rm -f $(libfactory) libcfmem.a \
+		-rm -f $(libfactory) libcfmem.a libsingcf_g.a libsingcf_p.a \
 		  $(ftestexec) gengftables test_install \
-		  factoryconf.h factory.h *.o *.d *.dtmp cf_gmp.h
+		  factoryconf.h factory.h *.o *.og *.op *.d *.dtmp cf_gmp.h
 
 # remove gftables only if we built them
 mostlyclean:	clean doxyclean
