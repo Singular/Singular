@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.61 2009-05-13 17:22:26 Singular Exp $
+# $Id: GNUmakefile.in,v 1.62 2009-05-13 17:23:59 Singular Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -463,7 +463,7 @@ distfiles :=	\
 #
 all:		$(alltargets)
 
-cf:		factoryconf.h factory.h $(libfactory)
+cf:		factoryconf.h factory.h $(libfactory) libsingcf_g.a libsingcf_p.a
 
 mem:		libcfmem.a
 
