@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.15 2009-05-13 17:50:11 Singular Exp $
+# $Id: Makefile.in,v 1.16 2009-05-13 17:57:36 Singular Exp $
 #################################################
 SHELL		= /bin/sh
 RM		= -rm -f
@@ -10,8 +10,6 @@ LIBFACDATE		= @libfac_date@
 LIBFACAUTHOR		= @libfac_author@
 LIBFACNAME		= @libfac@
 SINGLIBFACNAME		= @libsingfac@
-LIBFACNAME-G		= @libfac_g@
-SINGLIBFACNAME-G	= @libsingfac_g@
 LIBFACINCLUDE		= @factorH@
 #################################################
 ## 
@@ -83,7 +81,7 @@ PROFOBJ = $(OPTFACTOROBJ1:%.o=%.op) $(OPTCHARSETOBJ:%.o=%.op)
 
 .SUFFIXES:      .cc .h .o .op .og
 
-all: OPTOBJ DEBOBJ ${TARGETNAME} libsingfac_p.a libsingfac_g.a
+all: OPTOBJ ${TARGETNAME} libsingfac_p.a libsingfac_g.a
 
 OPTOBJ:
 	${MKINSTALLDIRS} OPTOBJ
@@ -164,11 +162,11 @@ uninstall:
 
 mostlyclean:
 	$(RM)	test testcs ${LIBFACNAME}.a ${SINGLIBFACNAME}.a \
-		${LIBFACNAME-G}.a ${SINGLIBFACNAME-G}.a
+		libsingfac_g.a libsingfac_p.a 
 
 clean:	mostlyclean
-	$(RM) OPTOBJ/optdepend DEBOBJ/debdepend  \
-	      DEBOBJ/*.o OPTOBJ/*.o
+	$(RM) OPTOBJ/optdepend OPTOBJ/debdepend  \
+	      OPTOBJ/*.op OPTOBJ/*.og OPTOBJ/*.o
 
 distclean:	clean
 	$(RM) config.cache config.log config.status Makefile
