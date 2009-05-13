@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.14 2008-04-28 08:16:06 Singular Exp $
+# $Id: Makefile.in,v 1.15 2009-05-13 17:50:11 Singular Exp $
 #################################################
 SHELL		= /bin/sh
 RM		= -rm -f
@@ -74,28 +74,19 @@ OPTFACTOROBJ =	$(OPTFACTOROBJ2) $(OPTFACTOROBJ1)
 OPTCHARSETOBJ =	OPTOBJ/csutil.o OPTOBJ/charset.o OPTOBJ/reorder.o \
 		OPTOBJ/alg_factor.o OPTOBJ/algfactor.o
 
-DEBFACTOROBJ1 =	DEBOBJ/SqrFree.o DEBOBJ/Factor.o DEBOBJ/MVMultiHensel.o \
-		DEBOBJ/Truefactor.o DEBOBJ/helpstuff.o DEBOBJ/version.o \
-		DEBOBJ/homogfactor.o
-DEBFACTOROBJ2 =	DEBOBJ/tmpl_inst.o
-DEBFACTOROBJ = 	$(DEBFACTOROBJ2) $(DEBFACTOROBJ1)
-
-DEBCHARSETOBJ =	DEBOBJ/csutil.o DEBOBJ/charset.o DEBOBJ/reorder.o \
-		DEBOBJ/alg_factor.o DEBOBJ/algfactor.o
+DEBOBJ = $(OPTFACTOROBJ1:%.o=%.og) $(OPTCHARSETOBJ:%.o=%.og)
+PROFOBJ = $(OPTFACTOROBJ1:%.o=%.op) $(OPTCHARSETOBJ:%.o=%.op)
 
 ##
 ## Primary targets
 ##
 
-.SUFFIXES:      .cc .h .o
+.SUFFIXES:      .cc .h .o .op .og
 
-all: OPTOBJ DEBOBJ ${TARGETNAME}
+all: OPTOBJ DEBOBJ ${TARGETNAME} libsingfac_p.a libsingfac_g.a
 
 OPTOBJ:
 	${MKINSTALLDIRS} OPTOBJ
-
-DEBOBJ:
-	${MKINSTALLDIRS} DEBOBJ
 
 OPTOBJ/%.o: %.cc 
 	$(CXX) $(CXXFLAGS) $(CXXTEMPLFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
@@ -109,26 +100,35 @@ OPTOBJ/%.o: factor/%.cc
 OPTOBJ/tmpl_inst.o: factor/tmpl_inst.cc 
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
 
-DEBOBJ/%.o: %.cc 
-	$(CXX) $(CXXFLAGS) $(CXXTEMPLFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
+OPTOBJ/%.op: %.cc 
+	$(CXX) -O -pg $(CXXTEMPLFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
 
-DEBOBJ/%.o: charset/%.cc 
-	$(CXX) $(CXXFLAGS) $(CXXTEMPLFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
+OPTOBJ/%.op: charset/%.cc 
+	$(CXX) -O -pg $(CXXTEMPLFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
 
-DEBOBJ/%.o: factor/%.cc
-	$(CXX) $(CXXFLAGS) $(CXXTEMPLFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
+OPTOBJ/%.op: factor/%.cc
+	$(CXX) -O -pg $(CXXTEMPLFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
 
-DEBOBJ/tmpl_inst.o: factor/tmpl_inst.cc 
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
+OPTOBJ/tmpl_inst.op: factor/tmpl_inst.cc 
+	$(CXX) -O -pg $(CPPFLAGS) $(DEFS) -c $< -o $@
 
+OPTOBJ/%.og: %.cc 
+	$(CXX) -g $(CXXTEMPLFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
+
+OPTOBJ/%.og: charset/%.cc 
+	$(CXX) -g $(CXXTEMPLFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
+
+OPTOBJ/%.og: factor/%.cc
+	$(CXX) -g $(CXXTEMPLFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@
+
+OPTOBJ/tmpl_inst.og: factor/tmpl_inst.cc 
+	$(CXX) -g $(CPPFLAGS) $(DEFS) -c $< -o $@
 
 libfac:		libfac.a
 
 libsingfac:	libsingfac.a
 
-libfac-g:	libfac-g.a
-
-libsingfac-g:	libsingfac-g.a
+libsingfac_g:	libsingfac_g.a
 
 libfac.a:	$(OPTFACTOROBJ) $(OPTCHARSETOBJ)
 		$(AR) ${LIBFACNAME}.a $(OPTFACTOROBJ) $(OPTCHARSETOBJ)
@@ -138,13 +138,13 @@ libsingfac.a:	$(OPTFACTOROBJ1) $(OPTCHARSETOBJ)
 		$(AR) ${SINGLIBFACNAME}.a $(OPTFACTOROBJ1) $(OPTCHARSETOBJ)
 		$(RANLIB) ${SINGLIBFACNAME}.a
 
-libfac-g.a:	$(DEBFACTOROBJ) $(DEBCHARSETOBJ)
-		$(AR) ${LIBFACNAME}.a $(DEBFACTOROBJ) $(DEBCHARSETOBJ)
-		$(RANLIB) ${LIBFACNAME}.a
+libsingfac_g.a:	$(DEBOBJ)
+		$(AR) $@ $^
+		$(RANLIB) $@
 
-libsingfac-g.a:	$(DEBFACTOROBJ1) $(DEBCHARSETOBJ)
-		$(AR) ${SINGLIBFACNAME}.a $(DEBFACTOROBJ1) $(DEBCHARSETOBJ)
-		$(RANLIB) ${SINGLIBFACNAME}.a
+libsingfac_p.a:	$(PROFOBJ)
+		$(AR) $@ $^
+		$(RANLIB) $@
 
 install-nolns: install
 
@@ -153,6 +153,8 @@ install:	all
 	${MKINSTALLDIRS} ${libdir}
 	${INSTALL_DATA} ${LIBFACINCLUDE} ${includedir}
 	${INSTALL_DATA} ${TARGETNAME}.a ${libdir}
+	-${INSTALL_DATA} libsingfac_g.a ${libdir}
+	-${INSTALL_DATA} libsingfac_p.a ${libdir}
 	$(RANLIB) ${libdir}/${TARGETNAME}.a
 
 uninstall: 
