@@ -1,4 +1,4 @@
-version="$Id: tropical.lib,v 1.16 2009-04-15 11:22:37 seelisch Exp $";
+version="$Id: tropical.lib,v 1.17 2009-05-13 14:51:55 keilen Exp $";
 category="Tropical Geometry";
 info="
 LIBRARY:         tropical.lib  Computations in Tropical Geometry
@@ -2276,7 +2276,7 @@ RETURN:      ideal ini, the t-initial ideal of i with respect to w"
   // large M, so that all entries are positive 
   int M=-minInIntvec(w)[1]+1; // find M such that w[j]+M is 
                               // strictly positive for all j
-  intvec whomog=M+1;
+  intvec whomog=M;
   for (j=1;j<=size(w);j++)
   {
     whomog[j+1]=w[j]+M;
