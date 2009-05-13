@@ -243,6 +243,10 @@ Rule* LNode::getRule() {
     return data->getRule();
 }
 
+void LNode::setRule(Rule* r) {
+    return data->setRule(r);
+}
+
 bool LNode::getDel() {
     return data->getDel();
 }

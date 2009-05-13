@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.38 2009-05-04 13:30:53 ederc Exp $ */
+/* $Id: f5gb.h,v 1.39 2009-05-13 16:55:03 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -125,6 +125,15 @@ the same index whereas the labels are taken into account
 */
 inline void topReduction(LNode* l, LList* sPolyList, LList* gPrev, CList* critPairs, RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev); 
 
+/*
+=======================================================================================
+merging 2 polynomials p & q without requiring that all monomials of p & q are different
+if there are equal monomials in p & q only one of these monomials (always that of p!)
+is taken into account
+=======================================================================================
+
+poly p_MergeEq_q(poly p, poly q, const ring r);
+*/    
 /*
 =====================================================================
 subalgorithm to find a possible reductor for the labeled polynomial l
