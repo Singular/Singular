@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-05-12 15:30:29 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.50 2009-05-12 15:30:29 monerjan Exp $
-$Id: gfan.cc,v 1.50 2009-05-12 15:30:29 monerjan Exp $
+$Date: 2009-05-14 09:55:36 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.51 2009-05-14 09:55:36 monerjan Exp $
+$Id: gfan.cc,v 1.51 2009-05-14 09:55:36 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -265,6 +265,7 @@ class gcone
 		* Copies one cone, sets this->gcBasis to the flipped GB and reverses the 
 		* direction of the according facet normal
 		*/			
+		//NOTE Prolly need to specify the facet to flip over
 		gcone(const gcone& gc)		
 		{
 			this->next=NULL;
@@ -1315,7 +1316,7 @@ class gcone
 		
 		/** \brief The new method of Markwig and Jensen
 		*/
-		void noRevS(gcone &gc)
+		void noRevS(gcone &gc, bool usingIntPoint=FALSE)
 		{
 			facet *fListPtr = new facet();			
 			facet *fAct = new facet();
@@ -1326,34 +1327,35 @@ class gcone
 			dd_colrange ddcols;
 			ddrows=2;	//Each facet is described by its normal
 			ddcols=gc.numVars+1;	// plus one for the standard simplex
-			
-			while(fAct->next!=NULL)
-			{
-				/*Compute an interior point for each facet*/				
-				dd_MatrixPtr ddineq;	
-				ddineq=dd_CreateMatrix(ddrows,ddcols);
-				intvec *comp = new intvec(this->numVars);
-				comp=fAct->getFacetNormal();				
-				for(int ii=0; ii<this->numVars; ii++)					
-				{										
-					dd_set_si(ddineq->matrix[0][ii+1],(*comp)[ii]);
-					dd_set_si(ddineq->matrix[1][ii+1],1);	//Assure we search in the pos. orthant			
-				}
-				set_addelem(ddineq->linset,1);	//We want equality in the first row
-				//dd_WriteMatrix(stdout,ddineq);
-				interiorPoint(ddineq,*comp);				
-				/**/
+			if(usingIntPoint){
+				while(fAct->next!=NULL)
+				{
+					/*Compute an interior point for each facet*/				
+					dd_MatrixPtr ddineq;	
+					ddineq=dd_CreateMatrix(ddrows,ddcols);
+					intvec *comp = new intvec(this->numVars);
+					comp=fAct->getFacetNormal();				
+					for(int ii=0; ii<this->numVars; ii++)					
+					{										
+						dd_set_si(ddineq->matrix[0][ii+1],(*comp)[ii]);
+						dd_set_si(ddineq->matrix[1][ii+1],1);	//Assure we search in the pos. orthant		
+					}
+					set_addelem(ddineq->linset,1);	//We want equality in the first row
+					//dd_WriteMatrix(stdout,ddineq);
+					interiorPoint(ddineq,*comp);				
+					/**/
 #ifdef gfan_DEBUG
-				cout << "IP is";
-				comp->show(); cout << endl;
+					cout << "IP is";
+					comp->show(); cout << endl;
 #endif
-				//Store the interior point and the UCN
-				fListPtr->setInteriorPoint( comp );				
-				fListPtr->setUCN( gc.getUCN() );	
-							
-				dd_FreeMatrix(ddineq);
-				fAct=fAct->next;	//iterate
-			}			
+					//Store the interior point and the UCN
+					fListPtr->setInteriorPoint( comp );				
+					fListPtr->setUCN( gc.getUCN() );	
+								
+					dd_FreeMatrix(ddineq);
+					fAct=fAct->next;	//iterate
+				}	
+			}		
 			
 			//NOTE Hm, comment in and get a crash for free...
 			//dd_free_global_constants();				
@@ -1379,7 +1381,7 @@ class gcone
 		* Each line contains exactly one date
 		* Each section starts with its name in CAPITALS
 		*/
-		void writeConeToFile(gcone const &gc)
+		void writeConeToFile(gcone const &gc, bool usingIntPoints=FALSE)
 		{
 			ofstream gcOutputFile("/tmp/cone1.gc");
 			if (!gcOutputFile)
@@ -1399,7 +1401,7 @@ class gcone
 				facet *fAct = new facet();
 				fAct = gc.facetPtr;
 				gcOutputFile << "FACETS" << endl;								
-				while(fAct!=NULL)
+				while(fAct->next!=NULL)
 				{	
  					intvec *iv = new intvec(gc.numVars);
 					iv=fAct->getFacetNormal();
