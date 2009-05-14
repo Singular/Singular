@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5lists.h,v 1.19 2009-05-13 16:55:03 ederc Exp $ */
+/* $Id: f5lists.h,v 1.20 2009-05-14 08:47:01 ederc Exp $ */
 /*
 * ABSTRACT: list interface
 */
@@ -264,6 +264,7 @@ class RNode {
                 ~RNode();
         RNode*  insert(Rule* r);
         RNode*  insert(int i, poly t);
+        RNode*  insertOrdered(Rule* r);
         RNode*  getNext();
         Rule*   getRule();
         int     getRuleIndex();
@@ -287,6 +288,7 @@ class RList {
                 ~RList();
         void    insert(Rule* r);
         void    insert(int i, poly t);
+        void    insertOrdered(Rule* r);
         RNode*  getFirst();
         Rule*   getRule();
         void    print();

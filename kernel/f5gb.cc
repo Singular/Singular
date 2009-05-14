@@ -596,7 +596,9 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) 
                             //Print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ZERO REDUCTION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 							reductionsToZero++;
                         //Print("IN SPOLS 1\n");
-                            rules->insert(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
+                            Rule* rNew  =  new Rule(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
+                            rules->insertOrdered(rNew);
+                            //rules->insert(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
                             //Print("RULE ADDED: \n");
                             //pWrite(rules->getFirst()->getRuleTerm());
                             //rules->print();
@@ -606,11 +608,14 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) 
                         }
                         else {
                         //Print("IN SPOLS 2\n");
-                            rules->insert(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
+                            Rule* rNew  =  new Rule(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
+                            rules->insertOrdered(rNew);
+                            //rules->insert(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
                             //Print("RULE ADDED: \n");
                             //pWrite(rules->getFirst()->getRuleTerm());  
                             //rules->print();
-                            sPolyList->insertByLabel(ppMult_qq(temp->getT1(),temp->getLp1Term()),temp->getLp1Index(),sp,rules->getFirst()->getRule());
+                            //sPolyList->insertByLabel(ppMult_qq(temp->getT1(),temp->getLp1Term()),temp->getLp1Index(),sp,rules->getFirst()->getRule());
+                            sPolyList->insertByLabel(ppMult_qq(temp->getT1(),temp->getLp1Term()),temp->getLp1Index(),sp,rNew);
                         }
                         // data is saved in sPolyList or zero => delete sp
                     }
@@ -640,13 +645,24 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) 
                     }
                     else {
                         //Print("IN SPOLS 4\n");
-                        rules->insert(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
+                        
+                        //////////////////////////////////////////////////////////
+                        //////////////////////////////////////////////////////////
+                        // TODO: Rules inserted ordered by their label monomial!//
+                        //////////////////////////////////////////////////////////
+                        //////////////////////////////////////////////////////////
+
+                        Rule* rNew      =   new Rule(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
+                        //RNode* rNodeNew =   new RNode(rNew);
+                        rules->insertOrdered(rNew);
+                        //rules->insert(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
                         //Print("RULE ADDED: \n");
                         //pWrite(rules->getFirst()->getRuleTerm()); 
                         //rules->print();
                         //Print("%d\n",rules->getFirst()->getRuleIndex());
                         //Print("%p\n",sPolyList->getFirst());
-                        sPolyList->insertByLabel(ppMult_qq(temp->getT1(),temp->getLp1Term()),temp->getLp1Index(),sp,rules->getFirst()->getRule());
+                        //sPolyList->insertByLabel(ppMult_qq(temp->getT1(),temp->getLp1Term()),temp->getLp1Index(),sp,rules->getFirst()->getRule());
+                        sPolyList->insertByLabel(ppMult_qq(temp->getT1(),temp->getLp1Term()),temp->getLp1Index(),sp,rNew);
                     }
                 }
             }
@@ -794,93 +810,24 @@ void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CList*
     //tempMon->setPoly(tempPoly);
     while(NULL != tempMon) {
         // iteration over all monomials in tempMon
-        //tempPoly    =   pCopy(l->getPoly());
-        //tempPoly    =   tempMon->getPoly();
-        //pWrite(tempPoly);
-        //Print("______________________NEW POLYNOMIAL TESTED IN MONOMIALS_______________________\n");
         //kBucket* bucket  =   kBucketCreate();
         //kBucketInit(bucket,tempPoly,0);
         //tempPoly    =   kBucketGetLm(bucket);
-        //pWrite(tempPoly);
         while(NULL != tempPoly) {
             // iteration of all elements in gPrev of the current index
-            
-            //Print("LABEL OF REDUCED ELEMENT:    ");
-            //Print("%p\n",tempPoly);
-            //pWrite(tempPoly);
-            //Print("RED\n");
-            //Print("L:  ");
-            //pWrite(l->getPoly());
-            //pNorm(tempPoly);
-            //pWrite(l->getTerm());
             tempRed =   gPrev->getFirst();
-            //tempRed =   lTag->getFirstCurrentIdx();
             while(NULL != tempRed) {
-                //Print("POSSIBLE REDUCER:  ");
-                //pWrite(tempRed->getPoly());
-                //pWrite(tempRed->getTerm());
-                //Print("TO BE REDUCED:     ");
-                //pWrite(tempPoly);
-                //Print("DIVISIBLE? %d\n",pDivisibleBy(tempRed->getPoly(),tempPoly));
                 if(pLmDivisibleByNoComp(tempRed->getPoly(),tempPoly)) {
                     u   =   pDivideM(pHead(tempPoly),pHead(tempRed->getPoly()));
-                    //number n    =  pGetCoeff(tempPoly) / pGetCoeff 
-                    //Print("U: ");
-                    //pWrite(u);
-                    //pSetCoeff(u,nOne);
-                    //pWrite(u);
-                    //poly red =   ppMult_qq(u,tempRed->getPoly());
-                    //pNorm(red);
-                    //pWrite(red);
-                    // check if both have the same label
                     if(tempRed->getIndex() != l->getIndex()) {
                             // passing criterion1 ?
                             if(!criterion1(gPrev,u,tempRed,lTag)) {
-                                    //Print("TO BE REDUCED:     ");
-                                    //pWrite(tempPoly);
-                                    //Print("REDUCER: ");
-                                    //pWrite(tempRed->getPoly());
-                                    //pWrite(ppMult_qq(u,tempRed->getPoly()));
-                                    //pWrite(ppMult_qq(u,tempRed->getTerm()));
-                                    //Print("%d\n",tempRed->getIndex());
-                                    //Print("+++++++++++++LIST OF MONOMIALS1+++++++++++++++++\n");
-                                    //poly tempRedPoly    =  ksOldSpolyRedNew(ppMult_qq(u,tempRed->getPoly()),pHead(ppMult_qq(u,tempRed->getPoly())));
                                     poly tempRedPoly    =   tempRed->getPoly();
-                                    //Print("TEMPREDPOLY: \n");
-                                    //pWrite(tempRedPoly);
                                     pIter(tempRedPoly);
-                                    //pWrite(tempRedPoly);
-                                    //Print("U: "); 
-                                    //pWrite(u);
                                     tempRedPoly =   ppMult_qq(u,tempRedPoly);
-                                    //Print("TEMPPOLYRED\n");
-                                    //pWrite(tempRedPoly);
                                     pMult_nn(tempRedPoly,sign); 
-                                    //pWrite(tempRedPoly);
-                                    // throw away head monomial as it cancels when computing "bucket - u * tempRedPoly"
-                                    //Print("MULTIPLICATION DONE: \n");
-                                    //pWrite(tempRedPoly);
-                                    //pWrite(ppMult_qq(u,tempRed->getPoly()));
-                                    //int lRedPoly   =   pLength(tempRedPoly);
-                                    //kBucket_Minus_m_Mult_p(bucket,u,tempRedPoly,&lRedPoly);
-                                    //pWrite(tempPoly);
-                                    //pWrite(tempRedPoly);
                                     pAdd(tempPoly,tempRedPoly);
-                                    //Print("MERGED POLYNOMIAL: ");
-                                    //pWrite(tempPoly);
-                                    //Print("REDUCTION STEP: \n");
-                                    //pWrite(l->getPoly());
-                                    //l->setPoly(pSub(l->getPoly(),ppMult_qq(u,tempRed->getPoly())));
-                                    //pNorm(tempRedPoly);
-                                    //pWrite(l->getPoly());
-                                    //monomials->insert(ppMult_qq(u,tempRed->getTerm()), tempRed->getIndex(), tempRedPoly,NULL);
-                                    //Print("+++++++++++++LIST OF MONOMIALS2+++++++++++++++++\n");
-                                    //monomials->print();
-
                                     good->insert(pOne(),1,ppMult_qq(u,tempRed->getPoly()),NULL);
-                                    //Print("GOOD ELEMENTS: \n");
-                                    //Print("%p\n",good->getFirst());
-                                    //good->print();
                                     break;
                              }    
                     
@@ -893,62 +840,20 @@ void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CList*
                             if(!criterion1(gPrev,u,tempRed,lTag)) {
                                 if(pLmCmp(ppMult_qq(u,tempRed->getTerm()),l->getTerm()) == 1) {
                                     //Print("BAD REDUCTION STUFF\n");
-                                    //pWrite(ppMult_qq(u,tempRed->getPoly()));
-                                    //pWrite(ppMult_qq(u,tempRed->getTerm()));
-                                    //rules->print();
-                                    //rules->insert(tempRed->getIndex(),ppMult_qq(u,tempRed->getTerm()));
-                                    //l->setTerm(ppMult_qq(u,tempRed->getTerm())); 
-                                    //l->setRule(rules->getFirst()->getRule());
-                                    //poly tempRedPoly    =  ksOldSpolyRedNew(ppMult_qq(u,tempRed->getPoly()),pHead(ppMult_qq(u,tempRed->getPoly())));
-                                    //pAdd(tempPoly,tempRedPoly);
-                                    //Print("NEW TERM: ");
-                                    //pWrite(l->getTerm());
-                                    //Print("\n\nRules:\n");
-                                    //rules->print(); 
                                     bad->insert(tempRed->getLPoly());
-                                    //good->insert(pOne(),1,ppMult_qq(u,tempRed->getPoly()),NULL);
-                                    //pWrite(tempRed->getPoly());
-                                    //sleep(5);
                                     break;
                                 }
                                 else {
-                                    //Print("TO BE REDUCED:     ");
-                                    //pWrite(tempPoly);
-                                    //Print("REDUCER: ");
-                                    //pWrite(tempRed->getPoly());
-                                    //pWrite(ppMult_qq(u,tempRed->getPoly()));
-                                    //pWrite(ppMult_qq(u,tempRed->getTerm()));
-                                    //Print("%d\n",tempRed->getIndex());
-                                    //Print("+++++++++++++LIST OF MONOMIALS1+++++++++++++++++\n");
-                                    //pIter(tempRedPoly);
                                     poly tempRedPoly    =   tempRed->getPoly();
-                                    // throw away head monomial as it cancels when computing "bucket - u * tempRedPoly"
                                     pIter(tempRedPoly);
                                     tempRedPoly =   ppMult_qq(u,tempRedPoly);
                                     pMult_nn(tempRedPoly,sign);
-                                    //Print("HERE\n");
-                                    //int lRedPoly    =   pLength(tempRedPoly);
-                                    //kBucket_Minus_m_Mult_p(bucket,u,tempRedPoly,&lRedPoly);
-                                    //poly tempRedPoly    =  ksOldSpolyRedNew(ppMult_qq(u,tempRed->getPoly()),pHead(ppMult_qq(u,tempRed->getPoly())));
-                                    timerRed    =   initTimer();
-                                    startTimer();
+                                    //timerRed    =   initTimer();
+                                    //startTimer();
                                     pAdd(tempPoly,tempRedPoly);
-                                    timerRed    =   getTimer();
-                                    reductionTime   = reductionTime + timerRed;
-                                    //Print("MERGED POLYNOMIAL: ");
-                                    //pWrite(tempPoly);
-                                    //Print("REDUCTION STEP: \n");
-                                    //pWrite(l->getPoly());
-                                    //l->setPoly(pSub(l->getPoly(),ppMult_qq(u,tempRed->getPoly())));
-                                    //pNorm(tempRedPoly);
-                                    //pWrite(l->getPoly());
-                                    //monomials->insert(ppMult_qq(u,tempRed->getTerm()), tempRed->getIndex(), tempRedPoly,NULL);
-                                    //Print("+++++++++++++LIST OF MONOMIALS2+++++++++++++++++\n");
-                                    //monomials->print();
+                                    //timerRed    =   getTimer();
+                                    //reductionTime   = reductionTime + timerRed;
                                     good->insert(pOne(),l->getIndex(),ppMult_qq(u,tempRed->getPoly()),NULL);
-                                    //Print("GOOD ELEMENTS: \n");
-                                    //Print("%p\n",good->getFirst());
-                                    //good->print();
                                     break;
                                 }
                             }    
@@ -958,26 +863,11 @@ void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CList*
                     
                 }
                 tempRed =   tempRed->getNext();
-                //Print("HERE TOO\n");
-                //pWrite(tempRed->getPoly());
             }
-            //pWrite(tempPoly);
             pIter(tempPoly);
-            //Print("ITERATION\n");
-            //Print("L:  ");
-            //pWrite(l->getPoly());
-            //Print("ITERATION:  ");
-            //pWrite(tempPoly); 
         }
         
         tempMon =   tempMon->getNext();
-        //Print("NEXT ELEMENT TO BE REDUCED:   ");
-        //if(NULL != tempMon) {
-        //    pWrite(tempMon->getPoly());
-        //}
-        //else {
-        //    Print("NICHTS MEHR DA\n");
-        //}
     } 
                 // if there are reducers than reduce l
     if(NULL != good->getFirst()) {

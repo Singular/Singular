@@ -879,42 +879,30 @@ RNode* RNode::insert(int i, poly t) {
     //Print("ADDRESS OF RNODE DATA: %p\n",newElement->getRule());
     newElement->next    =   this;
     return newElement;
-    
-    /*
-     * not useful, as it does not only adds new rules to be tested but also
-     * deletes rules to be tested if a rule is set to another place in the line
-     *
-    if(NULL == this || this->getRuleIndex() < newElement->getRuleIndex()) {
-        newElement->next    =   this;
+}
+
+
+RNode* RNode::insertOrdered(Rule* r) {
+    RNode* newElement   =   new RNode(r); 
+    RNode* temp         =   this;
+    if(NULL == temp) {
+        newElement->next =   temp;
+        return newElement;
+    }
+    if(1 == pLmCmp(newElement->getRuleTerm(),temp->getRuleTerm())) {
+        newElement->next =   temp;
+        return newElement;
     }
     else {
-        if(pDeg(newElement->getRuleTerm()) > pDeg(this->getRuleTerm())) {
-                newElement->next    =   this;
+        while(NULL != temp && 1 ==  pLmCmp(temp->getRuleTerm(),newElement->getRuleTerm())) {
+            temp    =   temp->getNext();
+            Print("HIER\n");
         }
-        if(-1 == pLmCmp(newElement->getRuleTerm(),this->getRuleTerm())) {
-            Print("HAHI\n");
-            Print("%ld\n",pDeg(newElement->getRuleTerm()));
-            Print("%ld\n",pDeg(this->getRuleTerm()));
-            
-            pWrite(newElement->getRuleTerm());
-            pWrite(this->getRuleTerm());
-            RNode* temp    =   this;
-            while(NULL != temp->next && pDeg(newElement->getRuleTerm()) <= pDeg(temp->next->getRuleTerm())
-                    && -1 == pLmCmp(newElement->getRuleTerm(),temp->next->getRuleTerm())) {
-                temp    =   temp->next;
-            }
-            newElement->next    =   temp->next;
-            temp->next          =   newElement;
-            return this;
-        }
-        else {
-            newElement->next    =   this;
-            return newElement;
-        }
+        newElement->next =   temp;
+        return this;
     }
-    return newElement;
-    */
 }
+
 
 RNode* RNode::getNext() {
     return next;
@@ -978,6 +966,10 @@ void RList::insert(int i, poly t) {
 
 void RList::insert(Rule* r) {
     first = first->insert(r);
+}
+
+void RList::insertOrdered(Rule* r) {
+    first   =   first->insertOrdered(r);
 }
 
 RNode* RList::getFirst() {
