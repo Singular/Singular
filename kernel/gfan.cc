@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-05-14 09:55:36 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.51 2009-05-14 09:55:36 monerjan Exp $
-$Id: gfan.cc,v 1.51 2009-05-14 09:55:36 monerjan Exp $
+$Date: 2009-05-15 13:54:46 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.52 2009-05-15 13:54:46 monerjan Exp $
+$Id: gfan.cc,v 1.52 2009-05-15 13:54:46 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -211,8 +211,7 @@ finally this should become s.th. like gconelib.{h,cc} to provide an API
 */
 class gcone
 {
-	private:
-		int numFacets;		//#of facets of the cone
+	private:		
 		ring rootRing;		//good to know this -> generic walk
 		ideal inputIdeal;	//the original
 		ring baseRing;		//the basering of the cone		
@@ -221,11 +220,16 @@ class gcone
 		int UCN;		//unique number of the cone
 		
 	public:	
-		/** Pointer to the first facet */
+		/** \brief Pointer to the first facet */
 		facet *facetPtr;	//Will hold the adress of the first facet; set by gcone::getConeNormals
 		
 		/** # of variables in the ring */
 		int numVars;		//#of variables in the ring
+		
+		/** # of facets of the cone
+		* This value is set by gcone::getConeNormals
+		*/
+		int numFacets;		//#of facets of the cone
 		
 		/** Contains the Groebner basis of the cone. Is set by gcone::getGB(ideal I)*/
 		ideal gcBasis;		//GB of the cone, set by gcone::getGB();
@@ -275,13 +279,11 @@ class gcone
 			this->facetPtr=fAct;
 			
 			intvec *ivtmp = new intvec(this->numVars);						
-			ivtmp = gc.facetPtr->getFacetNormal();
-			//ivtmp->show();			
+			ivtmp = gc.facetPtr->getFacetNormal();			
 			
 			ideal gb;
 			gb=gc.facetPtr->getFlipGB();			
-			this->gcBasis=gb;//gc.facetPtr->getFlipGB();	//this cone's GB is the flipped GB
-			//idShow(this->gcBasis);
+			this->gcBasis=gb;	//this cone's GB is the flipped GB			
 			
 			/*Reverse direction of the facet normal to make it an inner normal*/			
 			for (int ii=0; ii<this->numVars;ii++)
@@ -393,7 +395,9 @@ class gcone
 			{
 				aktpoly=(poly)I->m[i];		//get aktpoly as i-th component of I
 				pCompCount=pLength(aktpoly);	//How many terms does aktpoly consist of?
+#ifdef gfan_DEBUG
 				cout << "Poly No. " << i << " has " << pCompCount << " components" << endl;
+#endif
 		
 				int *v=(int *)omAlloc((numvar+1)*sizeof(int));
 				pGetExpV(aktpoly,v);	//find the exp.vect in v[1],...,v[n], use pNext(p)
@@ -468,22 +472,14 @@ class gcone
 				intvec *load = new intvec(this->numVars);	//intvec to store a single facet normal that will then be stored via setFacetNormal
 				for (int jj = 1; jj <ddcols; jj++)
 				{
-#ifdef GMPRATIONAL
 					double foo;
 					foo = mpq_get_d(ddineq->matrix[kk][jj]);
 #ifdef gfan_DEBUG
 					std::cout << "fAct is " << foo << " at " << fAct << std::endl;
 #endif
-					(*load)[jj-1] = (int)foo;		//store typecasted entry at pos jj-1 of load
-#endif			
-
-					//(*load)[jj-1] = (int)foo;		//store typecasted entry at pos jj-1 of load
-					//check for flipability here
-// 					if (jj<ddcols)				//Is this facet NOT the last facet? Writing while instead of if is a really bad idea :)
-// 					{
-						//fAct->next = new facet();	//If so: instantiate new facet. Otherwise this->next=NULL due to the constructor						
-// 					}
+					(*load)[jj-1] = (int)foo;		//store typecasted entry at pos jj-1 of load		
 				}//for (int jj = 1; jj <ddcols; jj++)
+				
 				/*Quick'n'dirty hack for flippability*/	
 				bool isFlippable=FALSE;				
 				for (int jj = 0; jj<load->length(); jj++)
@@ -511,6 +507,7 @@ class gcone
 				}//if (isFlippable==FALSE)
 				delete load;
 			}//for (int kk = 0; kk<ddrows; kk++)
+			
 			/*
 			Now we should have a linked list containing the facet normals of those facets that are
 			-irredundant
@@ -525,6 +522,9 @@ class gcone
 				this->setIntPoint(iv);	//stores the interior point in gcone::ivIntPt
 				delete iv;
 			}
+			
+			//Compute the number of facets
+			this->numFacets=ddineq->rowsize;
 			
 			//Clean up but don't delete the return value! (Whatever it will turn out to be)			
 			dd_FreeMatrix(ddineq);
@@ -1141,7 +1141,7 @@ class gcone
 			return res;
 		}
 		
-		/** 
+		/** \brief Checks whether a given facet is a search facet
 		* Determines whether a given facet of a cone is the search facet of a neighbouring cone
 		* This is done in the following way:
 		* We loop through all facets of the cone and find the "smallest" facet, i.e. the unique facet
@@ -1318,7 +1318,7 @@ class gcone
 		*/
 		void noRevS(gcone &gc, bool usingIntPoint=FALSE)
 		{
-			facet *fListPtr = new facet();			
+			facet *fListPtr = new facet();	//The list containing ALL facets we come across			
 			facet *fAct = new facet();
 			fAct = gc.facetPtr;
 						
@@ -1355,7 +1355,39 @@ class gcone
 					dd_FreeMatrix(ddineq);
 					fAct=fAct->next;	//iterate
 				}	
-			}		
+			}
+			else/*Facets of facets*/
+			{
+				dd_MatrixPtr ddineq,P,ddakt;
+				dd_rowset impl_linset, redset;
+				dd_ErrorType err;
+				dd_rowindex newpos;
+				
+				ddineq = facets2Matrix(gc);
+				
+				/*Now set appropriate linearity*/
+				dd_PolyhedraPtr ddpolyh;
+				for (int ii=0; ii<ddineq->rowsize; ii++)
+				{	
+					cout << "------------" << endl;
+ 					ddakt = dd_CopyMatrix(ddineq);
+					set_addelem(ddakt->linset,ii+1);
+// 					dd_WriteMatrix(stdout,ddakt);
+										
+					dd_MatrixCanonicalize(&ddakt, &impl_linset, &redset, &newpos, &err);			
+					
+// 					dd_WriteMatrix(stdout,ddakt);
+					ddpolyh=dd_DDMatrix2Poly(ddakt, &err);
+					P=dd_CopyGenerators(ddpolyh);
+					dd_WriteMatrix(stdout,P);
+					
+					intvec *load = new intvec(this->numVars);
+					
+					dd_FreeMatrix(ddakt);
+					dd_FreePolyhedra(ddpolyh);
+				}
+				
+			}				
 			
 			//NOTE Hm, comment in and get a crash for free...
 			//dd_free_global_constants();				
@@ -1366,10 +1398,42 @@ class gcone
 			*/
 			fAct = fListPtr;
 			gcone *gcTmp = new gcone(gc);	//copy
-			gcTmp->flip(gcTmp->gcBasis,fAct);
+			//gcTmp->flip(gcTmp->gcBasis,fAct);
 			//NOTE: gcTmp may be deleted, gcRoot from main proc should probably not!
 			
 		}//void noRevS(gcone &gc)
+		
+		/** \brief Construct a ddMatrix from a cone's list of facets
+		* 
+		*/
+		dd_MatrixPtr facets2Matrix(gcone const &gc)
+		{
+			facet *fAct = new facet();
+			fAct = gc.facetPtr;			
+			dd_MatrixPtr M;
+			dd_rowrange ddrows;
+			dd_colrange ddcols;
+			ddcols=(this->numVars)+1;
+			ddrows=this->numFacets;
+			M=dd_CreateMatrix(ddrows,ddcols);
+			
+			//dd_set_global_constants();						
+						
+			intvec *comp = new intvec(this->numVars);			
+			
+			for (int jj=0; jj<M->rowsize; jj++)
+			{
+				comp = fAct->getFacetNormal();
+				for (int ii=0; ii<this->numVars; ii++)
+				{
+					dd_set_si(M->matrix[jj][ii+1],(*comp)[ii]);
+				}
+				fAct = fAct->next;				
+			}//jj
+			delete comp;		
+			
+			return M;
+		}
 		
 		/** \brief Write information about a cone into a file on disk
 		*
@@ -1389,7 +1453,8 @@ class gcone
 				cout << "Error opening file for writing in writeConeToFile" << endl;
 			}
 			else
-			{			
+			{	/*gcOutputFile << "UCN" << endl;
+				gcOutputFile << this->UCN << endl;*/
 				gcOutputFile << "RING" << endl;				
 				//Write this->gcBasis into file
 				gcOutputFile << "GCBASIS" << endl;				
@@ -1401,7 +1466,7 @@ class gcone
 				facet *fAct = new facet();
 				fAct = gc.facetPtr;
 				gcOutputFile << "FACETS" << endl;								
-				while(fAct->next!=NULL)
+				while(fAct!=NULL)
 				{	
  					intvec *iv = new intvec(gc.numVars);
 					iv=fAct->getFacetNormal();
