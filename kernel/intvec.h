@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: intvec.h,v 1.6 2007-02-16 10:52:22 motsak Exp $ */
+/* $Id: intvec.h,v 1.7 2009-05-15 13:20:05 motsak Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -79,10 +79,10 @@ public:
   inline int  cols() const { return col; }
   inline int  rows() const { return row; }
   inline void length(int l) { row = l; col = 1; }
-  void show(int mat=0,int spaces=0);
+  void show(int mat=0,int spaces=0) const;
   inline void makeVector() { row*=col;col=1; }
-  char * String(int dim = 2);
-  char * ivString(int not_mat=1,int spaces=0, int dim=2);
+  char * String(int dim = 2) const;
+  char * ivString(int not_mat=1,int spaces=0, int dim=2) const;
   inline ~intvec()
     {
       if (v!=NULL)
