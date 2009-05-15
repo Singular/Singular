@@ -182,6 +182,7 @@ DISTFILES=${SOURCES} ${HEADERS} ${ESOURCES} \
 OBJS := $(CXXSOURCES:.cc=.o) $(CSOURCES:.c=.o)
 OBJS2 := $(ESOURCES:.cc=.o)
 OBJSG2 := $(ESOURCES:.cc=.og)
+OBJSP2 := $(ESOURCES:.cc=.op)
 
 P_PROCS_MODULES = FieldZp FieldIndep FieldQ FieldGeneral
 
@@ -234,9 +235,6 @@ p_Procs_Lib_%.dl_o : p_Procs_Lib.cc p_Procs_Dynamic.o
 
 DL_TAILG=\"sog\"
 DL_TAILP=\"sop\"
-DL_TAILB=\"sob\"
-DL_TAILT=\"sot\"
-DL_TAILA=\"soa\"
 
 
 ifeq ($(DL_KERNEL),1)
@@ -251,7 +249,8 @@ DL_LIBSG=
 
 endif
 
-all:	kversion.h libkernel.a libkernel-g.a ${DL_LIBS} ${DL_LIBSG} ${OBJS2} ${OBJSG2}
+all:	kversion.h libkernel.a \
+        ${DL_LIBS} ${DL_LIBSG} ${OBJS2} ${DL_LIBSP}
 
 libkernel.a: ${OBJS}
 	-rm -f libkernel.a
@@ -296,17 +295,20 @@ install-libsingular:
 
 install: all installbin
 
-installbin: ${DL_LIBS} ${DL_LIBSG}
+installbin: ${DL_LIBS} ${DL_LIBSG} ${DL_LIBSP}
 	${MKINSTALLDIRS} ${bindir}
 	- ranlib libkernel.a
-	- ranlib libkernel-g.a
+	- ranlib libkernel_g.a
+	- ranlib libkernel_p.a
 ifeq (,${DL_LIBS})
 else
 
 ifeq (,${DL_LIBSG})
 else
-	-${INSTALL_PROGRAM} ${DL_LIBS} ${DL_LIBSG} ${bindir}
-	-${INSTALL_PROGRAM} ${DL_LIBS} ${DL_LIBSG} ../Singular
+	-${INSTALL_PROGRAM} ${DL_LIBS} ${bindir}
+	-${INSTALL_PROGRAM} ${DL_LIBS} ../Singular
+	-${INSTALL_PROGRAM} ${DL_LIBSG} ../Singular
+	-${INSTALL_PROGRAM} ${DL_LIBSP} ../Singular
 endif
 endif
 
@@ -323,7 +325,7 @@ endif
 ##
 mostlyclean: 
 	-rm -f p_Procs_*.inc
-	-rm -f *.o *.og core *.op *.ob *.ot *.od p_Procs *.oa *.dl_o* *.so*
+	-rm -f *.o *.og core *.op p_Procs *.dl_o* *.so*
 
 clean: mostlyclean
 	-rm -f *.bak *.d *.dd depend
@@ -387,7 +389,6 @@ CCM		= gcc -MM -MG -DGENERATE_DEPEND
 
 CFLAGSG		= -g ${PIPE}
 CXXFLAGSG	= -g ${PIPE}
-CXXTEMPLFLAGSG	= -fno-implicit-templates
 DEFSG		= -D@SING_UNAME@ @DEFS@ -DDL_TAIL=$(DL_TAILG)
 
 ##
@@ -401,50 +402,77 @@ p_Procs_Lib_%.dl_og : p_Procs_Lib.cc  p_Procs_Dynamic.og
 	${CXXG} ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} ${SFLAGS} -Dp_Procs_$* -c $< -o $@
 
 %.dl_og: %.cc
-	${CXXG} ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} ${SFLAGS} -c $< -o $@
+	${CXXG} ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} ${SFLAGS} -c $< -o $@
 
 %.og: %.cc
-	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
+	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} -c $< -o $@
 
 $(OBJG2) : %.og: %.c
 	$(CCG)  ${CFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
 
-libkernel-g.a: ${OBJG}
-	-rm -f libkernel-g.a
-	ar cr $@ $^
+libkernel_g.a: ${OBJG} ${DL_LIBSG} ${OBJSG2}
+	-rm -f libkernel_g.a
+	ar cr $@ ${OBJG}
 
-#
-# for Macro expansion
-# 
-CXXSOURCESD := $(CXXSOURCES:%.cc=%_d.cc) $(STATIC_SOURCES:%.cc=%_d.cc)
-CSOURCESD := $(CSOURCES:%.c=%_d.c)
-OBJD1 := $(CXXSOURCESD:.cc=.od)
-OBJD2 := $(CSOURCESD:.c=.od)
+##
+## .op files for profiling
+##
 
-%_d.c : %.c
-	$(CCG) $(CFLAGSG) ${CPPFLAGS} ${DEFS}-E -P $< | $(PERL) -p -e 's/;/;\n/g' | $(PERL) -p -e 's/\{/\n\{/g' | $(PERL) -p -e 's/\}/\n\}/g' > $@
+OBJP1 := $(CXXSOURCES:.cc=.op) 
+OBJP2 := $(CSOURCES:.c=.op) 
 
-%_d.cc : %.cc
-	$(CCG) $(CXXFLAGS) ${CPPFLAGS} ${DEFS} -E -P $< | $(PERL) -p -e 's/;/;\n/g' | $(PERL) -p -e 's/\{/\n\{/g' | $(PERL) -p -e 's/\}/\n\}/g' > $@
+OBJP=$(OBJP1) $(OBJP2) 
 
-.PRECIOUS: %_d.cc %_d.c
+ifeq ($(DL_KERNEL),1)
+OBJP 	:= $(OBJP) $(DL_KERNEL_SOURCES:.cc=.op)
+else
+OBJP := $(OBJP) $(STATIC_SOURCES:.cc=.op) 
+endif
 
-%.od : %.c
-	$(CCG)  ${CFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
+##
+## compiler and linker options for profiling version
+##
 
-%.od : %.cc
-	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
+CCP		= ${CC}
+CXXP		= ${CXX}
+
+CFLAGSP		= -g -pg -O ${PIPE}
+CXXFLAGSP	= -g -pg -O ${PIPE}
+DEFSP		= -D@SING_UNAME@ @DEFS@ -DDL_TAIL=$(DL_TAILP)
+
+##
+## Profiling Targets
+##
+
+p_Procs_%.sop: p_Procs_Lib_%.dl_op 
+	${CXXP} ${CXXFLAGSP} ${SFLAGS} ${SLDFLAGS} $< -o $@
+
+p_Procs_Lib_%.dl_op : p_Procs_Lib.cc  p_Procs_Dynamic.op
+	${CXXP} ${CXXFLAGSP} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSP} ${SFLAGS} -Dp_Procs_$* -c $< -o $@
+
+%.dl_op: %.cc
+	${CXXP} ${CXXFLAGSP} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSP} ${SFLAGS} -c $< -o $@
+
+%.op: %.cc
+	$(CXXP) ${CXXFLAGSP} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSP} -c $< -o $@
+
+$(OBJP2) : %.op: %.c
+	$(CCP)  ${CFLAGSP} ${CPPFLAGS} ${DEFSP} -c $< -o $@
+
+libkernel_p.a: ${OBJP} ${DL_LIBSP} ${OBJSP2}
+	-rm -f libkernel_p.a
+	ar cr $@ ${OBJP}
 
 ##
 ## dependencies
 ##
 
 %.dd: %.cc mod2.h 
-	echo $(@:.dd=.og) $(@:.dd=_d.cc) $(@:.dd=.od) $(@:.dd=.dl_o) $(@:.dd=.dl_og) $(@:.dd=.dl_od)" " \\ > $@
+	echo $(@:.dd=.og) $(@:.dd=.op) $(@:.dd=.dl_o) $(@:.dd=.dl_og) $(@:.dd=.dl_op)" " \\ > $@
 	$(CXXM) -DGENTABLE ${CPPFLAGS} ${DEFSG} $< >> $@
 
 %.d: %.c mod2.h 
-	echo $(@:.d=.og) $(@:.d=.od) $(@:.dd=_d.c)" " \\ > $@
+	echo $(@:.d=.og) $(@:.d=.op) " " \\ > $@
 	$(CCM) ${CPPFLAGS} ${DEFSG} $< >> $@
 
 depend:   $(CXXSOURCES:.cc=.dd) $(ESOURCES:.cc=.dd) $(CSOURCES:.c=.d) mod2.h
