@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.73 2009-04-14 12:40:46 motsak Exp $
+ *  Version: $Id: gring.cc,v 1.74 2009-05-15 13:21:31 motsak Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -51,7 +51,7 @@
 
 
 
-int  iNCExtensions = 0x00001; // only SCA can be used...
+int  iNCExtensions = 0x00001; // only SCA can be used by default
 
 
 int& getNCExtensions()
