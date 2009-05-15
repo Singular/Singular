@@ -1,0 +1,66 @@
+C/C++-Style guide for Singular
+-----------------------------
+- Header files
+  - each header file abc.h should start with
+    #ifndef ABC_H
+    #define ABC_H
+    and end with
+    #endif
+  - include only the header files you really need
+  - do nor include mod2.h
+
+- C/C++ files
+  - each C/C++ file (abc.c/abc.cc) should start with a short comment
+    about its purpose
+  - include first all system include files
+  - include mod2.h
+  - include all other files (which you really need)
+
+- format
+  - general screen width: 80 columns
+  - each procedure declarations should be in one line, if possible
+  - curly braces: Matching curly brackets should be either vertically
+       or horizontally aligned. 
+  - the else keyword indents the same as its matching if
+  - indentation should be small (e.g. two positions for each level of nesting)
+  - avoid tabs: their interpretation differs from editor to editor.
+  - use empty lines seldom: only to break up very long routines and between 
+    routines
+
+- Naming conventions:
+  - All code and global variables must conform to this naming convention,
+    it does not apply to local variables.
+  - the names consists of a short (small letter) prefix, 
+    the first letter of each following word is capitalized
+    (The routines Werror/WerrorS/Warn/WarnS/Print/PrintS have an empty prefix)
+  - the prefix describes the area the name belongs to:
+    p: polynomial operations
+    n/np/nl/na/: number operations (general/Zp/Q/alg.ext.)
+    k: std engine
+    ...
+  - _ (underscore) is only used as a last part of the prefix:
+    (example: p_Add): the last argument is the base ring
+  - macros are in capital letters (except used as a procedure)
+
+- Comments
+  - each procedure should documents its input/output/side effects
+    (-> automatic build of programmers manual)
+  - do not comment on trivial matters
+  - document difficult algorithms by a reference to an article/book/etc.
+
+- Checks / Debugging aids
+  - interpreter routines have to check their input
+  - use const wherever possible/suitable
+  - kernel routines have to document their requirements,
+    the checks have to be done in the interpreter.
+    Repeat the checks only within #ifndef NDEBUG/#endif
+    or via assert.
+  - input should be checked to conform with the documentation via assume
+    (if this is simple)
+  - more time consuming tests should be within
+    #ifdef PDEBUG/#ifdef KDEBUG/#ifdef LDEBUG
+   (see mod2.h)
+  - case statements (or equivalent if/else constructs)
+    should always have an default entry
+    (maybe an error message)
+
