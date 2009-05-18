@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-05-15 13:54:46 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.52 2009-05-15 13:54:46 monerjan Exp $
-$Id: gfan.cc,v 1.52 2009-05-15 13:54:46 monerjan Exp $
+$Date: 2009-05-18 15:11:53 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.53 2009-05-18 15:11:53 monerjan Exp $
+$Id: gfan.cc,v 1.53 2009-05-18 15:11:53 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -88,7 +88,8 @@ class facet
 		//bool isFlippable;	//flippable facet? Want to have cone->isflippable.facet[i]
 		bool isIncoming;	//Is the facet incoming or outgoing?
 		facet *next;		//Pointer to next facet
-		
+		intvec *codim2Normals;
+				
 		/** The default constructor. Do I need a constructor of type facet(intvec)? */
 		facet()			
 		{
@@ -292,7 +293,8 @@ class gcone
 			}
 			
 			fAct->setFacetNormal(ivtmp);
-			delete ivtmp;						
+			delete ivtmp;
+			delete fAct;						
 		}
 		
 		/** \brief Default destructor */
@@ -314,6 +316,22 @@ class gcone
 		void showIntPoint()
 		{
 			ivIntPt->show();
+		}
+		
+		void showFacets()
+		{
+			facet *f = new facet();
+			f = this->facetPtr;
+			intvec *iv = new intvec(this->numVars);
+			
+			while (f!=NULL)
+			{
+				iv = f->getFacetNormal();
+				iv->show();
+				f=f->next;
+			}
+ 			//delete iv;
+ 			//delete f;
 		}
 		
 		/** \brief Set gcone::numFacets */
@@ -487,7 +505,8 @@ class gcone
 					intvec *ivCanonical = new intvec(load->length());
 					(*ivCanonical)[jj]=1;
 					cout << "dotProd=" << dotProduct(*load,*ivCanonical) << endl;
-					if (dotProduct(*load,*ivCanonical)<0)					
+					if (dotProduct(*load,*ivCanonical)<0)	
+					//if (ivMult(load,ivCanonical)<0)
 					{
 						isFlippable=TRUE;
 						break;	//URGHS
@@ -505,7 +524,7 @@ class gcone
 					fAct->next = new facet();					
 					fAct=fAct->next;	//this should definitely not be called in the above while-loop :D
 				}//if (isFlippable==FALSE)
-				delete load;
+				//delete load;
 			}//for (int kk = 0; kk<ddrows; kk++)
 			
 			/*
@@ -531,6 +550,8 @@ class gcone
 			set_free(ddredrows);
 			free(ddnewpos);
 			set_free(ddlinset);
+			//NOTE Commented out. Solved the bug that after facet2Matrix there were facets lost
+			//THIS SUCKS
 			dd_free_global_constants();
 
 		}//method getConeNormals(ideal I)	
@@ -1315,13 +1336,24 @@ class gcone
 		}//reverseSearch
 		
 		/** \brief The new method of Markwig and Jensen
+		* Compute gcBasis and facets for the arbitrary starting cone. Store \f$(codim-1)\f$-facets as normals.
+		* In order to represent a facet uniquely compute also the \f$(codim-2)\f$-facets and norm by the gcd of the components.
+		* Keep a list of facets as a linked list containing an intvec and an integer matrix.
+		* Since a \f$(codim-1)\f$-facet belongs to exactly two full dimensional cones, we remove a facet from the list as
+		* soon as we compute this facet again. Comparison of facets is done by...
 		*/
 		void noRevS(gcone &gc, bool usingIntPoint=FALSE)
 		{
 			facet *fListPtr = new facet();	//The list containing ALL facets we come across			
 			facet *fAct = new facet();
 			fAct = gc.facetPtr;
-						
+			
+#ifdef gfan_DEBUG
+			cout << "NoRevs" << endl;
+			cout << "Facets are:" << endl;
+ 			gc.showFacets();
+#endif
+			
 			dd_set_global_constants();
 			dd_rowrange ddrows;
 			dd_colrange ddcols;
@@ -1349,8 +1381,8 @@ class gcone
 					comp->show(); cout << endl;
 #endif
 					//Store the interior point and the UCN
-					fListPtr->setInteriorPoint( comp );				
-					fListPtr->setUCN( gc.getUCN() );	
+ 					fListPtr->setInteriorPoint( comp );				
+ 					fListPtr->setUCN( gc.getUCN() );	
 								
 					dd_FreeMatrix(ddineq);
 					fAct=fAct->next;	//iterate
@@ -1361,9 +1393,15 @@ class gcone
 				dd_MatrixPtr ddineq,P,ddakt;
 				dd_rowset impl_linset, redset;
 				dd_ErrorType err;
-				dd_rowindex newpos;
-				
+				dd_rowindex newpos;			
+
+#ifdef gfan_DEBUG
+				cout << "before f2M" << endl;
+				gc.showFacets();
 				ddineq = facets2Matrix(gc);
+				cout << "after f2M" << endl;
+				gc.showFacets();
+#endif
 				
 				/*Now set appropriate linearity*/
 				dd_PolyhedraPtr ddpolyh;
@@ -1376,28 +1414,38 @@ class gcone
 										
 					dd_MatrixCanonicalize(&ddakt, &impl_linset, &redset, &newpos, &err);			
 					
-// 					dd_WriteMatrix(stdout,ddakt);
+ 					dd_WriteMatrix(stdout,ddakt);
 					ddpolyh=dd_DDMatrix2Poly(ddakt, &err);
 					P=dd_CopyGenerators(ddpolyh);
 					dd_WriteMatrix(stdout,P);
 					
-					intvec *load = new intvec(this->numVars);
+					//intvec *load = new intvec(this->numVars);
 					
 					dd_FreeMatrix(ddakt);
 					dd_FreePolyhedra(ddpolyh);
 				}
+				gc.showFacets();
 				
-			}				
+			}			
+#ifdef gfan_DEBUG
+			cout << "Before writeConeToFile" << endl;
+			gc.showFacets();
+#endif		
+		
 			
 			//NOTE Hm, comment in and get a crash for free...
 			//dd_free_global_constants();				
 			gc.writeConeToFile(gc);
+#ifdef gfan_DEBUG			
+			cout << "After writeConeToFile" << endl;
+			gc.showFacets();			
+#endif
 			
 			/*2nd step
 			Choose a facet from fListPtr, flip it and forget the previous cone
 			*/
 			fAct = fListPtr;
-			gcone *gcTmp = new gcone(gc);	//copy
+			//gcone *gcTmp = new gcone(gc);	//copy
 			//gcTmp->flip(gcTmp->gcBasis,fAct);
 			//NOTE: gcTmp may be deleted, gcRoot from main proc should probably not!
 			
@@ -1409,13 +1457,21 @@ class gcone
 		dd_MatrixPtr facets2Matrix(gcone const &gc)
 		{
 			facet *fAct = new facet();
-			fAct = gc.facetPtr;			
+			fAct = gc.facetPtr;
+#ifdef gfan_DEBUG
+			cout << "gcFacetPtr is at" << &gc.facetPtr << endl;
+			cout << "fAct is at" << &fAct << endl;
+#endif	
 			dd_MatrixPtr M;
 			dd_rowrange ddrows;
 			dd_colrange ddcols;
 			ddcols=(this->numVars)+1;
 			ddrows=this->numFacets;
-			M=dd_CreateMatrix(ddrows,ddcols);
+			M=dd_CreateMatrix(ddrows,ddcols);			
+#ifdef gfan_DEBUG			
+			cout << "in f2M" << endl;
+			showFacets();
+#endif
 			
 			//dd_set_global_constants();						
 						
@@ -1430,8 +1486,13 @@ class gcone
 				}
 				fAct = fAct->next;				
 			}//jj
-			delete comp;		
+#ifdef gfan_DEBUG		
+			cout << "in f2M" << endl;
+			showFacets();
+#endif
 			
+			//delete fAct;
+			//delete comp;			
 			return M;
 		}
 		
@@ -1448,6 +1509,9 @@ class gcone
 		void writeConeToFile(gcone const &gc, bool usingIntPoints=FALSE)
 		{
 			ofstream gcOutputFile("/tmp/cone1.gc");
+			facet *fAct = new facet();
+			fAct = gc.facetPtr;
+			
 			if (!gcOutputFile)
 			{
 				cout << "Error opening file for writing in writeConeToFile" << endl;
@@ -1461,10 +1525,8 @@ class gcone
 				for (int ii=0;ii<IDELEMS(gc.gcBasis);ii++)
 				{					
  					gcOutputFile << p_String((poly)gc.gcBasis->m[ii],gc.baseRing) << endl;
-				}			
+				}				
 				
-				facet *fAct = new facet();
-				fAct = gc.facetPtr;
 				gcOutputFile << "FACETS" << endl;								
 				while(fAct!=NULL)
 				{	
@@ -1482,11 +1544,13 @@ class gcone
 						}
 					}
 					fAct=fAct->next;
+					//delete iv; iv=NULL;
 				}				
 				
 				gcOutputFile.close();
-				delete fAct; fAct=NULL;
+				//delete fAct; fAct=NULL;
 			}
+			
 		}//writeConeToFile(gcone const &gc)
 		
 		/** \brief Reads a cone from a file identified by its number
