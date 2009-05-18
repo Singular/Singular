@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.138 2009-05-18 12:03:52 Singular Exp $ */
+/* $Id: kutil.cc,v 1.139 2009-05-18 16:23:15 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -3511,6 +3511,7 @@ int posInTrg0 (const TSet set,const int length,LObject &p)
 */
 int posInT110 (const TSet set,const int length,LObject &p)
 {
+  p.GetpLength();
   if (length==-1) return 0;
 
   int o = p.GetpFDeg();
@@ -6419,6 +6420,7 @@ int posInT_FDegpLength(const TSet set,const int length,LObject &p)
 // determines the position based on: 1.) pLength
 int posInT_pLength(const TSet set,const int length,LObject &p)
 {
+  int ol = p.GetpLength();
   if (length==-1)
     return 0;
   if (set[length].length<p.length)
@@ -6427,7 +6429,6 @@ int posInT_pLength(const TSet set,const int length,LObject &p)
   int i;
   int an = 0;
   int en= length;
-  int ol = p.GetpLength();
 
   loop
   {
