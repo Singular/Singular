@@ -241,11 +241,13 @@ ifeq ($(DL_KERNEL),1)
 
 OBJG := $(OBJG) $(DL_KERNEL_SOURCES:.cc=.og)
 DL_LIBSG := $(P_PROCS_MODULES:%=p_Procs_%.sog)
+DL_LIBSP := $(P_PROCS_MODULES:%=p_Procs_%.sog)
 
 else
 
 OBJG := $(OBJG) $(STATIC_SOURCES:.cc=.og)
 DL_LIBSG=
+DL_LIBSP=
 
 endif
 
