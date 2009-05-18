@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.137 2009-05-06 12:53:48 Singular Exp $ */
+/* $Id: kutil.cc,v 1.138 2009-05-18 12:03:52 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -6416,7 +6416,7 @@ int posInT_FDegpLength(const TSet set,const int length,LObject &p)
 }
 
 
-// determines the position based on: 1.) Ecart 2.) FDeg 3.) pLength
+// determines the position based on: 1.) pLength
 int posInT_pLength(const TSet set,const int length,LObject &p)
 {
   if (length==-1)
