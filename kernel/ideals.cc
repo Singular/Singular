@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.72 2009-05-18 12:03:28 Singular Exp $ */
+/* $Id: ideals.cc,v 1.73 2009-05-18 12:36:23 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1286,7 +1286,7 @@ ideal idMultSect(resolvente arg, int length)
 *if quot != NULL it computes in the quotient ring modulo "quot"
 *works always in a ring with ringorder_s
 */
-static ideal idPrepare (ideal  h1, tHomog h, int syzcomp, intvec **w)
+static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w)
 {
   ideal   h2, h3;
   int     i;
@@ -1309,6 +1309,14 @@ static ideal idPrepare (ideal  h1, tHomog h, int syzcomp, intvec **w)
     rSetSyzComp(k);
   }
   h2->rank = syzcomp+i+1;
+  
+  //if (hom==testHomog)
+  //{
+  //  if(idHomIdeal(h1,currQuotient))
+  //  {
+  //    hom=TRUE;
+  //  }
+  //}
 
 #if MYTEST
 #ifdef RDEBUG
@@ -1348,7 +1356,7 @@ static ideal idPrepare (ideal  h1, tHomog h, int syzcomp, intvec **w)
 #endif
 
 
-  h3 = kStd(h2,currQuotient,h,w,NULL,syzcomp);
+  h3 = kStd(h2,currQuotient,hom,w,NULL,syzcomp);
   idDelete(&h2);
   return h3;
 }
@@ -3034,7 +3042,9 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
     return TRUE;
   }
 
-  int i,j,cmax=2,order=0,ord,* diff,* iscom,diffmin=32000;
+  long cmax=1,order=0,ord,* diff,diffmin=32000;
+  int *iscom;
+  int i,j;
   poly p=NULL;
   pFDegProc d;
   if (pLexOrder && (currRing->order[0]==ringorder_lp))
@@ -3047,9 +3057,10 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
   for (i=length-1;i>=0;i--)
   {
     p=F[i]=P[i];
-    cmax=si_max(cmax,(int)pMaxComp(p)+1);
+    cmax=si_max(cmax,(long)pMaxComp(p));
   }
-  diff = (int *)omAlloc0(cmax*sizeof(int));
+  cmax++;
+  diff = (long *)omAlloc0(cmax*sizeof(long));
   if (w!=NULL) *w=new intvec(cmax-1);
   iscom = (int *)omAlloc0(cmax*sizeof(int));
   i=0;
@@ -3058,7 +3069,7 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
     if (i<length)
     {
       p=F[i];
-      while ((p!=NULL) && (!iscom[pGetComp(p)])) pIter(p);
+      while ((p!=NULL) && (iscom[pGetComp(p)]==0)) pIter(p);
     }
     if ((p==NULL) && (i<length))
     {
@@ -3066,7 +3077,7 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
     }
     else
     {
-      if (p==NULL)
+      if (p==NULL) /* && (i==length) */
       {
         i=0;
         while ((i<length) && (F[i]==NULL)) i++;
@@ -3087,12 +3098,12 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
     }
     while (p!=NULL)
     {
-      //if (pLexOrder)
-      //  ord=pTotaldegree(p);
-      //else
+      if (pLexOrder && (currRing->order[0]==ringorder_lp))
+        ord=pTotaldegree(p);
+      else
       //  ord = p->order;
-      ord = pFDeg(p,currRing);
-      if (!iscom[pGetComp(p)])
+        ord = pFDeg(p,currRing);
+      if (iscom[pGetComp(p)]==0)
       {
         diff[pGetComp(p)] = order-ord;
         iscom[pGetComp(p)] = 1;
@@ -3114,10 +3125,10 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
 *PrintLn();
 *Print("order %d, ord %d, diff %d\n",order,ord,diff[pGetComp(p)]);
 */
-        if (order != ord+diff[pGetComp(p)])
+        if (order != (ord+diff[pGetComp(p)]))
         {
           omFreeSize((ADDRESS) iscom,cmax*sizeof(int));
-          omFreeSize((ADDRESS) diff,cmax*sizeof(int));
+          omFreeSize((ADDRESS) diff,cmax*sizeof(long));
           omFreeSize((ADDRESS) F,length*sizeof(poly));
           delete *w;*w=NULL;
           return FALSE;
@@ -3128,7 +3139,7 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
   }
   omFreeSize((ADDRESS) iscom,cmax*sizeof(int));
   omFreeSize((ADDRESS) F,length*sizeof(poly));
-  for (i=1;i<cmax;i++) (**w)[i-1]=diff[i];
+  for (i=1;i<cmax;i++) (**w)[i-1]=(int)(diff[i]);
   for (i=1;i<cmax;i++)
   {
     if (diff[i]<diffmin) diffmin=diff[i];
@@ -3137,10 +3148,10 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
   {
     for (i=1;i<cmax;i++)
     {
-      (**w)[i-1]=diff[i]-diffmin;
+      (**w)[i-1]=(int)(diff[i]-diffmin);
     }
   }
-  omFreeSize((ADDRESS) diff,cmax*sizeof(int));
+  omFreeSize((ADDRESS) diff,cmax*sizeof(long));
   return TRUE;
 }
 
