@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.37 2009-02-27 19:30:47 levandov Exp $ */
+/* $Id: polys1.cc,v 1.38 2009-05-18 11:31:49 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -1170,7 +1170,11 @@ BOOLEAN pIsHomogeneous (poly p)
   int o;
 
   if ((p == NULL) || (pNext(p) == NULL)) return TRUE;
-  pFDegProc d=(pLexOrder ? pTotaldegree : pFDeg );
+  pFDegProc d;
+  if (pLexOrder && (currRing->order[0]==ringorder_lp))
+    d=pTotaldegree;
+  else 
+    d=pFDeg;
   o = d(p,currRing);
   do
   {
