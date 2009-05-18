@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.505 2009-05-05 08:17:46 Singular Exp $ */
+/* $Id: iparith.cc,v 1.506 2009-05-18 12:02:24 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3991,11 +3991,11 @@ static BOOLEAN jjHOMOG1(leftv res, leftv v)
     {
       if (v->rtyp==IDHDL)
       {
-        char *isHomog=omStrDup("isHomog");
+        char *s_isHomog=omStrDup("isHomog");
         if (v->e==NULL)
-          atSet((idhdl)(v->data),isHomog,w,INTVEC_CMD);
+          atSet((idhdl)(v->data),s_isHomog,w,INTVEC_CMD);
         else
-          atSet((idhdl)(v->LData()),isHomog,w,INTVEC_CMD);
+          atSet((idhdl)(v->LData()),s_isHomog,w,INTVEC_CMD);
       }
       else if (w!=NULL) delete w;
     } // if res->data==NULL then w==NULL
