@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.139 2009-05-18 16:23:15 Singular Exp $ */
+/* $Id: kutil.cc,v 1.140 2009-05-19 08:29:16 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -3349,6 +3349,7 @@ int posInT1 (const TSet set,const int length,LObject &p)
 */
 int posInT2 (const TSet set,const int length,LObject &p)
 {
+  p.GetpLength();
   if (length==-1)
     return 0;
   if (set[length].length<p.length)
@@ -3586,10 +3587,10 @@ int posInT13 (const TSet set,const int length,LObject &p)
 // determines the position based on: 1.) Ecart 2.) pLength
 int posInT_EcartpLength(const TSet set,const int length,LObject &p)
 {
+  int ol = p.GetpLength();
   if (length==-1) return 0;
 
   int op=p.ecart;
-  int ol = p.GetpLength();
 
   int oo=set[length].ecart;
   if ((oo < op) || ((oo==op) && (set[length].length < ol)))
@@ -3812,6 +3813,7 @@ int posInT17_c (const TSet set,const int length,LObject &p)
 */
 int posInT19 (const TSet set,const int length,LObject &p)
 {
+  p.GetpLength();
   if (length==-1) return 0;
 
   int o = p.ecart;
