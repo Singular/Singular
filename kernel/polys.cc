@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.37 2009-02-23 13:29:22 Singular Exp $ */
+/* $Id: polys.cc,v 1.38 2009-05-19 08:44:30 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -304,6 +304,12 @@ poly pmInit(const char *st, BOOLEAN &ok)
 */
 poly pHomogen (poly p, int varnum)
 {
+  pFDegProc deg;
+  if (pLexOrder && (currRing->order[0]==ringorder_lp))
+    deg=pTotaldegree;
+  else
+    deg=pFDeg;
+
   poly q=NULL, qn;
   int  o,ii;
   sBucket_pt bp;
@@ -314,11 +320,11 @@ poly pHomogen (poly p, int varnum)
     {
       return NULL;
     }
-    o=pWTotaldegree(p);
+    o=deg(p,currRing);
     q=pNext(p);
     while (q != NULL)
     {
-      ii=pWTotaldegree(q);
+      ii=deg(q,currRing);
       if (ii>o) o=ii;
       pIter(q);
     }
@@ -326,7 +332,7 @@ poly pHomogen (poly p, int varnum)
     bp = sBucketCreate(currRing);
     while (q != NULL)
     {
-      ii = o-pWTotaldegree(q);
+      ii = o-deg(q,currRing);
       if (ii!=0)
       {
         pAddExp(q,varnum, (Exponent_t)ii);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.506 2009-05-18 12:02:24 Singular Exp $ */
+/* $Id: iparith.cc,v 1.507 2009-05-19 08:45:16 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2304,8 +2304,13 @@ static BOOLEAN jjHOMOG_ID(leftv res, leftv u, leftv v)
     WerrorS("ringvar expected");
     return TRUE;
   }
+  pFDegProc deg;
+  if (pLexOrder && (currRing->order[0]==ringorder_lp))
+    deg=pTotaldegree;
+   else
+    deg=pFDeg;
   poly p=pOne(); pSetExp(p,i,1); pSetm(p);
-  int d=pWTotaldegree(p);
+  int d=deg(p,currRing);
   pLmDelete(p);
   if (d==1)
     res->data = (char *)idHomogen((ideal)u->Data(),i);
