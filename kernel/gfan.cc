@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-05-18 15:11:53 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.53 2009-05-18 15:11:53 monerjan Exp $
-$Id: gfan.cc,v 1.53 2009-05-18 15:11:53 monerjan Exp $
+$Date: 2009-05-19 15:49:04 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.54 2009-05-19 15:49:04 monerjan Exp $
+$Id: gfan.cc,v 1.54 2009-05-19 15:49:04 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -88,7 +88,7 @@ class facet
 		//bool isFlippable;	//flippable facet? Want to have cone->isflippable.facet[i]
 		bool isIncoming;	//Is the facet incoming or outgoing?
 		facet *next;		//Pointer to next facet
-		intvec *codim2Normals;
+		intvec *codim2Normals;	//Integer matrix containing the (codim-2)-facets
 				
 		/** The default constructor. Do I need a constructor of type facet(intvec)? */
 		facet()			
@@ -96,6 +96,8 @@ class facet
 			// Pointer to next facet.  */
 			/* Defaults to NULL. This way there is no need to check explicitly */
 			this->next=NULL; 
+			this->UCN=NULL;
+			this->codim2Normals=NULL;
 		}
 		
 		/** The default destructor */
@@ -324,7 +326,7 @@ class gcone
 			f = this->facetPtr;
 			intvec *iv = new intvec(this->numVars);
 			
-			while (f!=NULL)
+			while (f->next!=NULL)
 			{
 				iv = f->getFacetNormal();
 				iv->show();
@@ -1394,6 +1396,8 @@ class gcone
 				dd_rowset impl_linset, redset;
 				dd_ErrorType err;
 				dd_rowindex newpos;			
+				
+				fAct = fListPtr;
 
 #ifdef gfan_DEBUG
 				cout << "before f2M" << endl;
@@ -1405,12 +1409,11 @@ class gcone
 				
 				/*Now set appropriate linearity*/
 				dd_PolyhedraPtr ddpolyh;
-				for (int ii=0; ii<ddineq->rowsize; ii++)
+				for (int ii=0; ii<this->numFacets; ii++)
 				{	
 					cout << "------------" << endl;
  					ddakt = dd_CopyMatrix(ddineq);
 					set_addelem(ddakt->linset,ii+1);
-// 					dd_WriteMatrix(stdout,ddakt);
 										
 					dd_MatrixCanonicalize(&ddakt, &impl_linset, &redset, &newpos, &err);			
 					
@@ -1418,6 +1421,17 @@ class gcone
 					ddpolyh=dd_DDMatrix2Poly(ddakt, &err);
 					P=dd_CopyGenerators(ddpolyh);
 					dd_WriteMatrix(stdout,P);
+					
+					/* We loop through each row of P
+					* normalize it by making all entries integer ones
+					* and add the resulting vector to the int matrix facet::codim2Facets
+					*/
+					for (int jj=1;jj<=P->rowsize;jj++)
+					{
+						intvec *n = new intvec(this->numVars);
+						n = normalize(P,jj);
+						//fAct->addCodim2Facet(n);								
+					}
 					
 					//intvec *load = new intvec(this->numVars);
 					
@@ -1427,19 +1441,11 @@ class gcone
 				gc.showFacets();
 				
 			}			
-#ifdef gfan_DEBUG
-			cout << "Before writeConeToFile" << endl;
-			gc.showFacets();
-#endif		
-		
+	
 			
 			//NOTE Hm, comment in and get a crash for free...
 			//dd_free_global_constants();				
 			gc.writeConeToFile(gc);
-#ifdef gfan_DEBUG			
-			cout << "After writeConeToFile" << endl;
-			gc.showFacets();			
-#endif
 			
 			/*2nd step
 			Choose a facet from fListPtr, flip it and forget the previous cone
@@ -1451,27 +1457,61 @@ class gcone
 			
 		}//void noRevS(gcone &gc)
 		
-		/** \brief Construct a ddMatrix from a cone's list of facets
+		intvec *normalize(dd_MatrixPtr const &M, int line)
+		{			
+			mpz_t denom[this->numVars];
+			for(int ii=0;ii<this->numVars;ii++)
+			{
+				mpz_init_set_str(denom[ii],"0",10);
+			}
+		
+			mpz_t kgV;
+			mpz_init(kgV);
+			intvec *ivres = new intvec(this->numVars);
+			
+			for (int ii=0;ii<(M->colsize)-1;ii++)
+			{
+				mpz_t z;
+				mpz_init(z);
+				mpq_get_den(z,M->matrix[line-1][ii+1]);
+				//mpz_out_str(stdout,10,z);
+				mpz_set( denom[ii], z);
+				mpz_clear(z);				
+			}
+			/*Compute lcm of the denominators*/
+			mpz_set(kgV,denom[0]);
+			for (int ii=0;ii<(M->colsize)-1;ii++)
+			{
+				mpz_lcm(kgV,kgV,denom[ii+1]);				
+			}
+			/*Multiply the nominators by kgV*/
+			mpq_t qkgV,res;
+			mpq_init(qkgV);
+			mpq_init(res);
+			mpq_set_z(qkgV,kgV);
+			for (int ii=0;ii<(M->colsize)-1;ii++)
+			{
+				mpq_mul(res,qkgV,M->matrix[line-1][ii+1]);
+				(*ivres)[ii]=(int)mpz_get_d(mpq_numref(res));
+			}			
+			return ivres;
+		}
+		
+		/** \brief Construct a dd_MatrixPtr from a cone's list of facets
 		* 
 		*/
 		dd_MatrixPtr facets2Matrix(gcone const &gc)
 		{
 			facet *fAct = new facet();
 			fAct = gc.facetPtr;
-#ifdef gfan_DEBUG
-			cout << "gcFacetPtr is at" << &gc.facetPtr << endl;
-			cout << "fAct is at" << &fAct << endl;
-#endif	
+	
 			dd_MatrixPtr M;
 			dd_rowrange ddrows;
 			dd_colrange ddcols;
 			ddcols=(this->numVars)+1;
 			ddrows=this->numFacets;
+			dd_NumberType numb = dd_Integer;
 			M=dd_CreateMatrix(ddrows,ddcols);			
-#ifdef gfan_DEBUG			
-			cout << "in f2M" << endl;
-			showFacets();
-#endif
 			
 			//dd_set_global_constants();						
 						
@@ -1486,10 +1526,6 @@ class gcone
 				}
 				fAct = fAct->next;				
 			}//jj
-#ifdef gfan_DEBUG		
-			cout << "in f2M" << endl;
-			showFacets();
-#endif
 			
 			//delete fAct;
 			//delete comp;			
@@ -1528,7 +1564,7 @@ class gcone
 				}				
 				
 				gcOutputFile << "FACETS" << endl;								
-				while(fAct!=NULL)
+				while(fAct->next!=NULL)
 				{	
  					intvec *iv = new intvec(gc.numVars);
 					iv=fAct->getFacetNormal();
