@@ -104,7 +104,7 @@ HAVE_MPSR       = @HAVE_MPSR@
 #
 # Handle libSINGULAR stuff
 #
-LIBSINGULAR_LIBS =-lsingfac -lsingcf -lntl -lreadline -lgmp -lomalloc_ndebug
+LIBSINGULAR_LIBS =-lsingfac -lsingcf -lntl -lreadline -lgmp -lomalloc
 
 SO_SUFFIX = so
 #LIBSINGULAR_FLAGS = -export-dynamic 
@@ -126,8 +126,8 @@ endif
 
 ifeq ($(SINGUNAME),ix86-Win)
 SO_SUFFIX = dll
-LIBSINGULAR_FLAGS = --shared
-LIBSINGULAR_LIBS = -lsingfac -lsingcf -lntl -lreadline -lgmp -lomalloc_ndebug  -lhtmlhelp
+LIBSINGULAR_FLAGS = -shared
+LIBSINGULAR_LIBS = -lsingfac -lsingcf -lntl -lreadline -lgmp -lomalloc  -lhtmlhelp
 endif
 
 #
