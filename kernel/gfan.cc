@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-05-19 15:49:04 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.54 2009-05-19 15:49:04 monerjan Exp $
-$Id: gfan.cc,v 1.54 2009-05-19 15:49:04 monerjan Exp $
+$Date: 2009-05-20 09:46:43 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.55 2009-05-20 09:46:43 monerjan Exp $
+$Id: gfan.cc,v 1.55 2009-05-20 09:46:43 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -23,6 +23,8 @@ $Id: gfan.cc,v 1.54 2009-05-19 15:49:04 monerjan Exp $
 #include <iostream>
 #include <bitset>
 #include <fstream>	//read-write cones to files
+#include <gmp.h>
+//#include <gmpxx.h>
 
 /*DO NOT REMOVE THIS*/
 #ifndef GMPRATIONAL
@@ -1438,7 +1440,7 @@ class gcone
 					dd_FreeMatrix(ddakt);
 					dd_FreePolyhedra(ddpolyh);
 				}
-				gc.showFacets();
+				//gc.showFacets();
 				
 			}			
 	
@@ -1465,8 +1467,9 @@ class gcone
 				mpz_init_set_str(denom[ii],"0",10);
 			}
 		
-			mpz_t kgV;
+			mpz_t kgV,tmp;
 			mpz_init(kgV);
+			mpz_init(tmp);
 			intvec *ivres = new intvec(this->numVars);
 			
 			for (int ii=0;ii<(M->colsize)-1;ii++)
@@ -1476,13 +1479,13 @@ class gcone
 				mpq_get_den(z,M->matrix[line-1][ii+1]);
 				//mpz_out_str(stdout,10,z);
 				mpz_set( denom[ii], z);
-				mpz_clear(z);				
+				//mpz_clear(z);				
 			}
 			/*Compute lcm of the denominators*/
-			mpz_set(kgV,denom[0]);
+			mpz_set(tmp,denom[0]);
 			for (int ii=0;ii<(M->colsize)-1;ii++)
 			{
-				mpz_lcm(kgV,kgV,denom[ii+1]);				
+				mpz_lcm(kgV,tmp,denom[ii+1]);				
 			}
 			/*Multiply the nominators by kgV*/
 			mpq_t qkgV,res;
@@ -1493,7 +1496,11 @@ class gcone
 			{
 				mpq_mul(res,qkgV,M->matrix[line-1][ii+1]);
 				(*ivres)[ii]=(int)mpz_get_d(mpq_numref(res));
-			}			
+			}
+			//mpz_clear(denom[this->numVars]);
+			//mpz_clear(kgV);
+			//mpq_clear(qkgV); mpq_clear(res);
+			
 			return ivres;
 		}
 		
