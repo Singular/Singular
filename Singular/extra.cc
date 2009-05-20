@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.299 2009-04-14 13:26:55 motsak Exp $ */
+/* $Id: extra.cc,v 1.300 2009-05-20 15:15:01 motsak Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -3127,6 +3127,17 @@ ipshell()");
               */
 
 #endif
+
+// TODO: What about a dynamic module instead? Only Linux?
+#ifdef HAVE_SINGULAR_PLUS_PLUS
+  if (strcmp(sys_cmd,"Singular++")==0)
+  {
+//    using namespace SINGULAR_NS; 
+    extern BOOLEAN Main(leftv res, leftv h); // FALSE = Ok, TRUE = Error!
+    return Main(res, h);
+  };
+#endif // HAVE_SINGULAR_PLUS_PLUS
+
 
 #ifdef HAVE_GFAN
 /*======== GFAN ==============*/
