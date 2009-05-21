@@ -896,7 +896,6 @@ RNode* RNode::insertOrdered(Rule* r) {
     else {
         while(NULL != temp && 1 ==  pLmCmp(temp->getRuleTerm(),newElement->getRuleTerm())) {
             temp    =   temp->getNext();
-            Print("HIER\n");
         }
         newElement->next =   temp;
         return this;

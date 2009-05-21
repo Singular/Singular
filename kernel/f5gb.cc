@@ -251,45 +251,18 @@ inline void criticalPair(LList* gPrev, CList* critPairs, LTagList* lTag, RTagLis
         testedRule  =   rules->getFirst()->getRule();
     }
     // computation of critical pairs
-    //critPairs->print();
-    //Print("GPREV LIST PRINTED IN CRITPAIRS\n");
-    //gPrev->print();
     while( gPrev->getLast() != temp) {
-        //pWrite( *(gPrev->getFirst()->getPoly()) );
-       // pWrite( *(l->getPoly()) );
-       //pWrite(newElement->getPoly());
-        //pWrite(temp->getPoly());
-        //pWrite(newElement->getPoly());
-        //pWrite(temp->getPoly());
-        //Print("\n\n");
         pLcm(newElement->getPoly(), temp->getPoly(), lcm);
         pSetCoeff(lcm,nOne);
         // computing factors u2 for new labels
-        //pExpVectorDiff(u1,lcm,t);
-        //Print("U1: ");
-        //pWrite(u1);
         u1 = pDivide(lcm,t);
-        //pWrite(u1);
+        if(NULL == u1) {
+            break;
+        }
         pSetCoeff(u1,nOne);
-        //Print("%p\n",u1);
-        //critPairs->print();
-        //pExpVectorDiff(u2,lcm,temp->getPoly());
-        //Print("U2: ");
-        //pWrite(u2);
-        u2 = pDivide(lcm, pHead(temp->getPoly()));
-        //pWrite(u2);
-        //Print("%p\n",u2);
+        u2 = pDivide(lcm,pHead(temp->getPoly()));
         pSetCoeff(u2,nOne);
-        //if(gPrev->getLast()->getIndex()==5) {
-            //Print("IN CRITPAIRS\n");
-        //    pWrite(u1);
-        //    Print("1st ELEMENT: ");
-        //    pWrite(newElement->getPoly());
-        //    Print("2nd ELEMENT: ");
-        //    pWrite(temp->getPoly());
-        //}
         // testing both new labels by the F5 Criterion
-        //critPairs->print();
         if(!criterion2(gPrev->getFirst()->getIndex(), u2, temp, rules, rTag)
            && !criterion2(gPrev->getFirst()->getIndex(), u1, newElement, rules, rTag) 
            && !criterion1(gPrev,u1,newElement,lTag) && !criterion1(gPrev,u2,temp,lTag)) {
@@ -297,36 +270,20 @@ inline void criticalPair(LList* gPrev, CList* critPairs, LTagList* lTag, RTagLis
             // label as first element in the CPair
             if(newElement->getIndex() == temp->getIndex() && 
             -1 == pLmCmp(ppMult_qq(u1, newElement->getTerm()),ppMult_qq(u2, temp->getTerm()))) {
-                //Print("zweites groesser\n");
-                
                 CPair* cp   =   new CPair(pDeg(ppMult_qq(u2,pHead(temp->getPoly()))), u2, 
                                 temp->getLPoly(), u1, newElement->getLPoly(), testedRule);                   
-                
                 critPairs->insert(cp);
-                //Print("LALA %p\n",critPairs->getFirst());
-                //sleep(5);
             }
             else {
                 CPair* cp   =   new CPair(pDeg(ppMult_qq(u2,pHead(temp->getPoly()))), u1, 
                                 newElement->getLPoly(), u2, temp->getLPoly(), testedRule);                   
-                //Print("erstes groesser\n");
                 critPairs->insert(cp);
-                //Print("LALA %p\n",critPairs->getFirst());
-                //sleep(5);
             }
         }
         else {
         }
-        
-        //Print("\n\n");
         temp    =   temp->getNext();
     }
-    // for debugging
-    //if(NULL != critPairs) {
-        //critPairs->print();
-        //sleep(5);
-    //}
-    //Print("END CRITPAIRS\n");
 }
 
 
@@ -574,14 +531,13 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) 
                 if(temp->getLp2Index() == temp->getLp1Index()) {
                     if(!criterion2(temp->getT2(),temp->getAdLp2(),rules,temp->getTestedRule())) {
                         // computation of S-polynomial
-                        poly p1 =   temp->getLp1Poly();
-                        poly p2 =   temp->getLp2Poly();
-                        pIter(p1);
-                        pIter(p2);
-
-                        sp  =   pAdd(ppMult_qq(temp->getT1(),p1),pMult_nn(ppMult_qq(temp->getT2(),p2),sign));  
-                        //sp      =   ksOldSpolyRedNew(ppMult_qq(temp->getT1(),temp->getLp1Poly()),
-                        //                 ppMult_qq(temp->getT2(),temp->getLp2Poly()));
+                        //poly p1 =   temp->getLp1Poly();
+                        //poly p2 =   temp->getLp2Poly();
+                        //pIter(p1);
+                        //pIter(p2);
+                        //sp  =   pAdd(ppMult_qq(temp->getT1(),p1),pMult_nn(ppMult_qq(temp->getT2(),p2),sign));  
+                        sp      =   ksOldSpolyRedNew(ppMult_qq(temp->getT1(),temp->getLp1Poly()),
+                                         ppMult_qq(temp->getT2(),temp->getLp2Poly()));
                         //Print("BEGIN SPOLY1\n====================\n");
                         pNorm(sp);
                         //pWrite(sp);
@@ -596,9 +552,9 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) 
                             //Print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ZERO REDUCTION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 							reductionsToZero++;
                         //Print("IN SPOLS 1\n");
-                            Rule* rNew  =  new Rule(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
-                            rules->insertOrdered(rNew);
-                            //rules->insert(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
+                            //Rule* rNew  =  new Rule(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
+                            //rules->insertOrdered(rNew);
+                            rules->insert(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
                             //Print("RULE ADDED: \n");
                             //pWrite(rules->getFirst()->getRuleTerm());
                             //rules->print();
@@ -608,20 +564,25 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) 
                         }
                         else {
                         //Print("IN SPOLS 2\n");
-                            Rule* rNew  =  new Rule(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
-                            rules->insertOrdered(rNew);
-                            //rules->insert(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
+                            //Rule* rNew  =  new Rule(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
+                            //rules->insertOrdered(rNew);
+                            rules->insert(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
                             //Print("RULE ADDED: \n");
                             //pWrite(rules->getFirst()->getRuleTerm());  
                             //rules->print();
-                            //sPolyList->insertByLabel(ppMult_qq(temp->getT1(),temp->getLp1Term()),temp->getLp1Index(),sp,rules->getFirst()->getRule());
-                            sPolyList->insertByLabel(ppMult_qq(temp->getT1(),temp->getLp1Term()),temp->getLp1Index(),sp,rNew);
+                            sPolyList->insertByLabel(ppMult_qq(temp->getT1(),temp->getLp1Term()),temp->getLp1Index(),sp,rules->getFirst()->getRule());
+                            //sPolyList->insertByLabel(ppMult_qq(temp->getT1(),temp->getLp1Term()),temp->getLp1Index(),sp,rNew);
                         }
                         // data is saved in sPolyList or zero => delete sp
                     }
                 }
                 else { // temp->getLp2Index() < temp->getLp1Index()
                     // computation of S-polynomial
+                        //poly p1 =   temp->getLp1Poly();
+                        //poly p2 =   temp->getLp2Poly();
+                        //pIter(p1);
+                        //pIter(p2);
+                        //sp  =   pAdd(ppMult_qq(temp->getT1(),p1),pMult_nn(ppMult_qq(temp->getT2(),p2),sign));  
                     sp      =   ksOldSpolyRedNew(ppMult_qq(temp->getT1(),temp->getLp1Poly()),
                                      ppMult_qq(temp->getT2(),temp->getLp2Poly()));
                     //Print("BEGIN SPOLY2\n====================\n");
@@ -652,17 +613,17 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) 
                         //////////////////////////////////////////////////////////
                         //////////////////////////////////////////////////////////
 
-                        Rule* rNew      =   new Rule(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
+                        //Rule* rNew      =   new Rule(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
                         //RNode* rNodeNew =   new RNode(rNew);
-                        rules->insertOrdered(rNew);
-                        //rules->insert(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
+                        //rules->insertOrdered(rNew);
+                        rules->insert(temp->getLp1Index(),ppMult_qq(temp->getT1(),temp->getLp1Term()));
                         //Print("RULE ADDED: \n");
                         //pWrite(rules->getFirst()->getRuleTerm()); 
                         //rules->print();
                         //Print("%d\n",rules->getFirst()->getRuleIndex());
                         //Print("%p\n",sPolyList->getFirst());
-                        //sPolyList->insertByLabel(ppMult_qq(temp->getT1(),temp->getLp1Term()),temp->getLp1Index(),sp,rules->getFirst()->getRule());
-                        sPolyList->insertByLabel(ppMult_qq(temp->getT1(),temp->getLp1Term()),temp->getLp1Index(),sp,rNew);
+                        sPolyList->insertByLabel(ppMult_qq(temp->getT1(),temp->getLp1Term()),temp->getLp1Index(),sp,rules->getFirst()->getRule());
+                        //sPolyList->insertByLabel(ppMult_qq(temp->getT1(),temp->getLp1Term()),temp->getLp1Index(),sp,rNew);
                     }
                 }
             }
@@ -794,7 +755,8 @@ void newReduction(LList* sPolyList, CList* critPairs, LList* gPrev, RList* rules
  * ================================================================================
 */
 void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CList* critPairs, RList* rules, LTagList* lTag, RTagList* rTag) {
-    int timerRed        =   0;
+    int canonicalize    =   0;
+    //int timerRed        =   0;
     number sign         =   nInit(-1);
     LList* good         =   new LList();
     LList* bad          =   new LList();
@@ -804,72 +766,175 @@ void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CList*
     LNode* tempRed      =   lTag->getFirstCurrentIdx();
     LNode* tempMon      =   monomials->getFirst();
     poly tempPoly       =   pInit();
+    poly redPoly        =   NULL;
+    int idx             =   l->getIndex();
     //Print("IN FIND REDUCERS:  ");
     //pWrite(l->getPoly());
     tempPoly    =   pCopy(l->getPoly());
     //tempMon->setPoly(tempPoly);
-    while(NULL != tempMon) {
+    //while(NULL != tempMon) {
         // iteration over all monomials in tempMon
-        //kBucket* bucket  =   kBucketCreate();
-        //kBucketInit(bucket,tempPoly,0);
-        //tempPoly    =   kBucketGetLm(bucket);
+        kBucket* bucket  =   kBucketCreate();
+        kBucketInit(bucket,tempPoly,0);
+        tempPoly    =   kBucketGetLm(bucket);
+        //Print("\n\n\nTO BE REDUCED:  ");
+        //pWrite(l->getPoly());
+        //pWrite(tempPoly);
         while(NULL != tempPoly) {
             // iteration of all elements in gPrev of the current index
             tempRed =   gPrev->getFirst();
             while(NULL != tempRed) {
+                //Print("TEMPREDPOLY:  ");
+                //pWrite(tempRed->getPoly());
                 if(pLmDivisibleByNoComp(tempRed->getPoly(),tempPoly)) {
                     u   =   pDivideM(pHead(tempPoly),pHead(tempRed->getPoly()));
-                    if(tempRed->getIndex() != l->getIndex()) {
+                    //Print("U:  ");
+                    //pWrite(u);
+                    if(tempRed->getIndex() != idx) {
                             // passing criterion1 ?
                             if(!criterion1(gPrev,u,tempRed,lTag)) {
                                     poly tempRedPoly    =   tempRed->getPoly();
+                                    //Print("REDUCER: ");
+                                    //pWrite(ppMult_qq(u,tempRedPoly));
                                     pIter(tempRedPoly);
-                                    tempRedPoly =   ppMult_qq(u,tempRedPoly);
-                                    pMult_nn(tempRedPoly,sign); 
-                                    pAdd(tempPoly,tempRedPoly);
-                                    good->insert(pOne(),1,ppMult_qq(u,tempRed->getPoly()),NULL);
-                                    break;
+                                    int lTempRedPoly    =   pLength(tempRedPoly);
+                                    kBucketExtractLm(bucket);
+                                    kBucket_Minus_m_Mult_p(bucket,u,tempRedPoly,&lTempRedPoly);
+                                    canonicalize++;
+                                    if(!(canonicalize % 50)) {
+                                        kBucketCanonicalize(bucket);
+                                    }
+                                    tempPoly    =   kBucketGetLm(bucket);
+                                    //Print("TEMPPOLY:  ");
+                                    //pWrite(tempPoly);
+                                    if(NULL != tempPoly) {
+                                        tempRed     =   gPrev->getFirst();
+                                        continue;
+                                    }
+                                    else {
+                                        break;
+                                    }
+                                    //tempRedPoly =   ppMult_qq(u,tempRedPoly);
+                                    //pMult_nn(tempRedPoly,sign); 
+                                    //pAdd(tempPoly,tempRedPoly);
+                                    //good->insert(pOne(),1,ppMult_qq(u,tempRed->getPoly()),NULL);
+                                    //break;
                              }    
                     
-                        }
+                    }
                     else {
-                    if(pLmCmp(ppMult_qq(u,tempRed->getTerm()),l->getTerm()) != 0) {
-                        // passing criterion2 ?
-                        if(!criterion2(gPrev->getFirst()->getIndex(), u,tempRed,rules,rTag)) {
-                            // passing criterion1 ?
-                            if(!criterion1(gPrev,u,tempRed,lTag)) {
-                                if(pLmCmp(ppMult_qq(u,tempRed->getTerm()),l->getTerm()) == 1) {
-                                    //Print("BAD REDUCTION STUFF\n");
-                                    bad->insert(tempRed->getLPoly());
-                                    break;
-                                }
-                                else {
-                                    poly tempRedPoly    =   tempRed->getPoly();
-                                    pIter(tempRedPoly);
-                                    tempRedPoly =   ppMult_qq(u,tempRedPoly);
-                                    pMult_nn(tempRedPoly,sign);
-                                    //timerRed    =   initTimer();
-                                    //startTimer();
-                                    pAdd(tempPoly,tempRedPoly);
-                                    //timerRed    =   getTimer();
-                                    //reductionTime   = reductionTime + timerRed;
-                                    good->insert(pOne(),l->getIndex(),ppMult_qq(u,tempRed->getPoly()),NULL);
-                                    break;
-                                }
-                            }    
+                        if(pLmCmp(ppMult_qq(u,tempRed->getTerm()),l->getTerm()) != 0) {
+                            // passing criterion2 ?
+                            if(!criterion2(gPrev->getFirst()->getIndex(), u,tempRed,rules,rTag)) {
+                                // passing criterion1 ?
+                                if(!criterion1(gPrev,u,tempRed,lTag)) {
+                                    if(pLmCmp(ppMult_qq(u,tempRed->getTerm()),l->getTerm()) == 1) {
+                                        //Print("BAD REDUCTION STUFF\n");
+                                        bad->insert(tempRed->getLPoly());
+                                        poly tempRedPoly    =   tempRed->getPoly();
+                                        break; 
+                                        /* 
+                                        // DEBUGGING STUFF
+                                        //
+                                        //Print("REDUCER: ");
+                                        //pWrite(ppMult_qq(u,tempRedPoly));
+                                        rules->insert(l->getIndex(),ppMult_qq(u,tempRed->getTerm()));
+                                        l->setRule(rules->getFirst()->getRule());
+                                        poly tempRedPoly    =   tempRed->getPoly();
+                                        pIter(tempRedPoly);
+                                        int lTempRedPoly    =   pLength(tempRedPoly);
+                                        //Print("HEAD MONOMIAL KBUCKET: ");
+                                        //pWrite(kBucketGetLm(bucket));
+                                        kBucketExtractLm(bucket);
+                                        kBucket_Minus_m_Mult_p(bucket,u,tempRedPoly,&lTempRedPoly);
+                                        canonicalize++;
+                                        if(!(canonicalize % 50)) {
+                                            kBucketCanonicalize(bucket);
+                                        }
+                                        //Print("HEAD MONOMIAL KBUCKET: ");
+                                        //pWrite(kBucketGetLm(bucket));
+                                        tempPoly    =   kBucketGetLm(bucket);
+                                        //Print("TEMPPOLY:  ");
+                                        //pWrite(tempPoly);
+                                        if(NULL != tempPoly) {
+                                            tempRed     =   gPrev->getFirst();
+                                            continue;
+                                        }
+                                        else {
+                                            break;
+                                        }
+                                        */
+                                    }
+                                    else {
+                                        poly tempRedPoly    =   tempRed->getPoly();
+                                        //Print("REDUCER: ");
+                                        //pWrite(ppMult_qq(u,tempRedPoly));
+                                        pIter(tempRedPoly);
+                                        int lTempRedPoly    =   pLength(tempRedPoly);
+                                        //Print("HEAD MONOMIAL KBUCKET: ");
+                                        //pWrite(kBucketGetLm(bucket));
+                                        kBucketExtractLm(bucket);
+                                        kBucket_Minus_m_Mult_p(bucket,u,tempRedPoly,&lTempRedPoly);
+                                        canonicalize++;
+                                        if(!(canonicalize % 50)) {
+                                            kBucketCanonicalize(bucket);
+                                        }
+                                        //Print("HEAD MONOMIAL KBUCKET: ");
+                                        //pWrite(kBucketGetLm(bucket));
+                                        tempPoly    =   kBucketGetLm(bucket);
+                                        //Print("TEMPPOLY:  ");
+                                        //pWrite(tempPoly);
+                                        if(NULL != tempPoly) {
+                                            tempRed     =   gPrev->getFirst();
+                                            continue;
+                                        }
+                                        else {
+                                            break;
+                                        }
+                                    }
+                                }    
+                            }
                         }
                     }
-                }
                     
                 }
                 tempRed =   tempRed->getNext();
             }
-            pIter(tempPoly);
+            //pWrite(kBucketGetLm(bucket));
+            //Print("HIER AUCH\n");
+            if(NULL == redPoly) {
+                redPoly =   kBucketExtractLm(bucket);
+                //Print("1: ");
+                //pWrite(redPoly);
+            }
+            else {
+                redPoly     =   p_Merge_q(redPoly,kBucketExtractLm(bucket),currRing);
+                //Print("REDPOLY: ");
+                //pWrite(redPoly);
+            }
+            tempPoly    =   kBucketGetLm(bucket);
+            //Print("TEMPPOLY2:  ");
+            //pWrite(tempPoly);
         }
-        
-        tempMon =   tempMon->getNext();
-    } 
-                // if there are reducers than reduce l
+        if(NULL == redPoly) {
+            reductionsToZero++;
+            //pDelete(&redPoly);
+        }
+        else {
+            //Print("\nELEMENT ADDED TO GPREV: ");
+            //pWrite(redPoly);
+            pNorm(redPoly);
+            //Print("%d\n",canonicalize);
+            l->setPoly(redPoly);
+            gPrev->insert(l->getLPoly());
+            criticalPair(gPrev,critPairs,lTag,rTag,rules);
+        }
+    //    tempMon =   tempMon->getNext();
+    //} 
+    
+    // if there are reducers than reduce l
+    
+    /*    
     if(NULL != good->getFirst()) {
         
         //Print("TO BE REDUCED:\n"); 
@@ -971,7 +1036,7 @@ void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CList*
         //Print("ADDRESS OF IDEAL: %p\n",&reductionId);
         idDelete(&reductionId);
         //Print("HIER\n");
-        */
+        
 
     }
     
@@ -988,6 +1053,7 @@ void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CList*
         //Print("LIST OF CRITICAL PAIRS:    \n");
         //critPairs->print();
     }
+    */
     // if there are "bad" reducers than try to compute new S-polynomials and rules
     
     if(NULL != bad->getFirst()) {
@@ -1045,9 +1111,7 @@ void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CList*
         //Print("HIER AUCH\n");
         //Print("SPOLYLIST IN BAD: \n");
         //sPolyList->print(); 
-
-
-
+    //Print("END FIND REDUCERS\n");
 }
 
 /*
@@ -1461,7 +1525,7 @@ ideal F5main(ideal id, ring r) {
                         //pWrite(tempPoly2);
                         //rules->insert(k+1,tempPoly2);
                     }
-                    //rTag->insert(rules->getFirst());
+                    rTag->insert(rules->getFirst());
                 }
             }
             gbLength    =   gPrev->getLength(); 
@@ -1507,7 +1571,7 @@ ideal F5main(ideal id, ring r) {
     } 
         //idShow(gbPrev);
     }
-    Print("\n\nADDING TIME IN REDUCTION: %d\n\n",reductionTime);
+    //Print("\n\nADDING TIME IN REDUCTION: %d\n\n",reductionTime);
     Print("\n\nNumber of zero-reductions:  %d\n",reductionsToZero);
     timer   =   getTimer();
     Print("Highest Degree during computations: %d\n",highestDegree);
