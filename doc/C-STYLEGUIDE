@@ -9,7 +9,16 @@ C/C++-Style guide for Singular
   - include only the header files you really need
   - do nor include mod2.h
 
-- C/C++ files
+- C/C++ files - names
+  - each C++ file should have the extension .cc
+  - each C file should have the extension .c
+  - each header file should have the extension .h
+    it should be possible to include it in C and C++ sources
+  - converted to lower case, each file name must be unique in the 
+    first 8 characters
+  - it is recommended to use only lower case file names
+
+- C/C++ files - structure
   - each C/C++ file (abc.c/abc.cc) should start with a short comment
     about its purpose
   - include first all system include files
