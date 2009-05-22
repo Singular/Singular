@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.28 2009-04-14 12:40:46 motsak Exp $ */
+/* $Id: gring.h,v 1.29 2009-05-22 12:21:34 Singular Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -17,7 +17,7 @@
 
 // the part, related to the interface
 // Changes r, Assumes that all other input belongs to currRing
-BOOLEAN nc_CallPlural(matrix CC, matrix DD, poly CN, poly DN, ring r,
+BOOLEAN nc_CallPlural(matrix cc, matrix dd, poly cn, poly dn, ring r,
                       bool bSetupQuotient = false,
                       bool bCopyInput = true,
                       bool bBeQuiet = false,
