@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.h,v 1.10 2009-05-06 12:53:49 Singular Exp $ */
+/* $Id: rmodulon.h,v 1.11 2009-05-22 16:57:41 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -52,5 +52,6 @@ void    nrnSetExp(int c, ring r);
 void    nrnInitExp(int c, ring r);
 
 number nrnMapQ(number from);
+number nrnMapGMP(number from);
 #endif
 #endif
