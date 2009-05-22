@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.21 2009-05-06 12:53:49 Singular Exp $ */
+/* $Id: rintegers.cc,v 1.22 2009-05-22 13:18:12 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -180,7 +180,7 @@ BOOLEAN nrzGreater (number a,number b)
 
 BOOLEAN nrzGreaterZero (number k)
 {
-  return 0 <= mpz_cmp_si((int_number) k, 0);
+  return 0 < mpz_cmp_si((int_number) k, 0);
 }
 
 int nrzDivComp(number a, number b)

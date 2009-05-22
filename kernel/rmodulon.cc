@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.33 2009-05-06 12:53:49 Singular Exp $ */
+/* $Id: rmodulon.cc,v 1.34 2009-05-22 13:18:12 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -214,7 +214,7 @@ BOOLEAN nrnGreater (number a,number b)
 
 BOOLEAN nrnGreaterZero (number k)
 {
-  return 0 <= mpz_cmp_si((int_number) k, 0);
+  return 0 < mpz_cmp_si((int_number) k, 0);
 }
 
 BOOLEAN nrnIsUnit (number a)
