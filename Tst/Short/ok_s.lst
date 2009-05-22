@@ -65,6 +65,7 @@ bug_interpol
 bug_mres
 bug_napMultT
 bug_pd
+bug_presolve
 bug_primdec
 bug_qring
 bug_qslimgb
