@@ -73,3 +73,7 @@ C/C++-Style guide for Singular
     should always have an default entry
     (maybe an error message)
 
+- C++ features
+  - to avoid confusion: "struct" should be a C object,
+    if you really need C++ extensions, use "class".
+  - "and"/"or"/"not" are not recognized by all compilers, use &&, &, ||, |, !
