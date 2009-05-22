@@ -16,6 +16,10 @@
 #include "singular/kstd1.h"
 #include "singular/tgb.h"
 #include "singular/sparsmat.h"
+#include "singular/rintegers.h"
+#include "singular/rmodulo2m.h"
+#include "singular/rmodulon.h"
+
 
 int siInit(char *);
 
