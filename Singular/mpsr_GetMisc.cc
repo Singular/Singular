@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_GetMisc.cc,v 1.29 2004-02-23 19:04:04 Singular Exp $ */
+/* $Id: mpsr_GetMisc.cc,v 1.30 2009-05-25 09:23:24 Singular Exp $ */
 
 /***************************************************************
  *
@@ -443,7 +443,7 @@ LINKAGE void mpsr_Init()
 {
   if (mpsr_is_initialized) return;
   // memory management functions of MP (and MPT)
-#ifdef OMALLOC_USES_MALLOC
+#if defined(OMALLOC_USES_MALLOC) || defined(X_OMALLOC)
   IMP_RawMemAllocFnc = omMallocFunc;
   IMP_RawMemFreeFnc = omFreeFunc;
   IMP_MemAllocFnc = omMallocFunc;
