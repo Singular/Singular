@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.117 2009-05-06 12:53:49 Singular Exp $ */
+/* $Id: ring.cc,v 1.118 2009-05-25 11:35:16 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2009,7 +2009,8 @@ BOOLEAN rDBTest(ring r, const char* fn, const int l)
   omCheckAddrSize(r->order,i*sizeof(int));
   omCheckAddrSize(r->block0,i*sizeof(int));
   omCheckAddrSize(r->block1,i*sizeof(int));
-  omCheckAddrSize(r->wvhdl,i*sizeof(int *));
+  if (r->wvhdl!=NULL)
+    omCheckAddrSize(r->wvhdl,i*sizeof(int *));
   for (j=0;j<i; j++)
   {
     if (r->wvhdl[j] != NULL) omCheckAddr(r->wvhdl[j]);
