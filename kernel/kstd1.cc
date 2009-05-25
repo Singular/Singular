@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.50 2009-04-23 16:24:08 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.51 2009-05-25 09:42:21 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1639,8 +1639,10 @@ long kModDeg(poly p, ring r)
   long o=pWDegree(p, r);
   long i=p_GetComp(p, r);
   if (i==0) return o;
-  assume((i>0) && (i<=kModW->length()));
-  return o+(*kModW)[i-1];
+  //assume((i>0) && (i<=kModW->length()));
+  if (i<=kModW->length())
+    return o+(*kModW)[i-1];
+  return o;  
 }
 long kHomModDeg(poly p, ring r)
 {
