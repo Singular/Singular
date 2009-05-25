@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //changed GMG 20.5.09: degreepart, linearpart, elimpart
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: presolve.lib,v 1.32 2009-05-21 12:42:07 Singular Exp $";
+version="$Id: presolve.lib,v 1.33 2009-05-25 09:47:39 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  presolve.lib     Pre-Solving of Polynomial Equations
@@ -222,6 +222,8 @@ EXAMPLE: example elimlinearpart; shows an example
       gnirlist[3] = list("dp",V), g32;
       def newBAS = ring(gnirlist);            //change of ring to dp ordering
       setring newBAS;
+      ideal rest = imap(BAS,rest);
+      attrib(rest,"isSB",1);
       ideal i = imap(BAS,i);
    }
 
