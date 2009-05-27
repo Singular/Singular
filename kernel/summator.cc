@@ -6,7 +6,7 @@
  *  Purpose: simple Summator usecase implementation
  *  Author:  motsak
  *  Created:
- *  Version: $Id: summator.cc,v 1.4 2008-07-25 16:06:18 motsak Exp $
+ *  Version: $Id: summator.cc,v 1.5 2009-05-27 16:15:14 motsak Exp $
  *******************************************************************/
 
 
@@ -69,12 +69,12 @@ CPolynomialSummator::~CPolynomialSummator()
   {
     poly out;
     int pLength;
-    
+
     sBucketClearAdd(m_temp.m_bucket, &out, &pLength);
     sBucketDestroy(&m_temp.m_bucket);
 
     if(out != NULL)
-      p_Delete(&out, m_basering);    
+      p_Delete(&out, m_basering);
 //    m_temp.m_bucket = NULL;
   }
   else
@@ -170,5 +170,22 @@ void CPolynomialSummator::Add(poly pSummand)
 {
   AddAndDelete(p_Copy(pSummand, m_basering));
 }
+
+
+
+CPolynomialSummator::CPolynomialSummator(const CPolynomialSummator& b): m_bUsePolynomial(b.m_bUsePolynomial), m_basering(b.m_basering)
+{
+  try{
+    if(m_bUsePolynomial)
+      m_temp.m_poly = p_Copy( b.m_temp.m_poly, m_basering);
+    else
+      m_temp.m_bucket = sBucketCopy(b.m_temp.m_bucket);
+  }
+  catch(...)
+  {
+    assume(false);
+  }
+}
+
 
 #endif

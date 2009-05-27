@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: summator.h,v 1.2 2008-07-08 08:18:27 Singular Exp $ */
+/* $Id: summator.h,v 1.3 2009-05-27 16:15:14 motsak Exp $ */
 
 // #include <summator.h> // for CPolynomialSummator class
 
@@ -47,9 +47,13 @@ class CPolynomialSummator
 
     inline operator poly() { return AddUpAndClear(); }
 
-  private: // no copies of this object at the moment!!!
-    CPolynomialSummator(const CPolynomialSummator& m);               // Copy constructor
-    CPolynomialSummator& operator= (const CPolynomialSummator& m);   // Assignment operator
+    /// Copy constructor
+    CPolynomialSummator(const CPolynomialSummator&);
+
+  private:
+
+    /// no assignment operator yet
+    CPolynomialSummator& operator= (const CPolynomialSummator&);
 };
 
 #endif

@@ -9,12 +9,14 @@
  *           use kbuckets, instead.
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: sbuckets.h,v 1.2 2008-07-04 14:17:15 motsak Exp $
+ *  Version: $Id: sbuckets.h,v 1.3 2009-05-27 16:15:14 motsak Exp $
  *******************************************************************/
 #ifndef S_BUCKETS_H
 #define S_BUCKETS_H
 
 #include "structs.h"
+
+
 
 //////////////////////////////////////////////////////////////////////////
 // Creation/Destruction of buckets
@@ -22,6 +24,16 @@
 sBucket_pt    sBucketCreate(ring r = currRing);
 void          sBucketDestroy(sBucket_pt *bucket);
 
+
+//////////////////////////////////////////////////////////////////////////
+// New API:
+//
+
+/// Copy sBucket non-intrusive!!!
+sBucket_pt    sBucketCopy(const sBucket_pt bucket);
+
+/// Returns bucket ring
+const ring sBucketGetRing(const sBucket_pt bucket);
 
 /////////////////////////////////////////////////////////////////////////////
 // Convertion from/to SBpolys
@@ -70,13 +82,13 @@ void sBucket_Add_p(sBucket_pt bucket, poly p, int lp);
 
 //////////////////////////////////////////////////////////////////////////
 ///
-/// Sorts p with bucektSort: assumes all monomials of p are different
+/// Sorts p with bucketSort: assumes all monomials of p are different
 ///
 poly sBucketSortMerge(poly p, ring r);
 
 //////////////////////////////////////////////////////////////////////////
 ///
-/// Sorts p with bucektSort: p may have equal monomials
+/// Sorts p with bucketSort: p may have equal monomials
 ///
 poly sBucketSortAdd(poly p, ring r);
 

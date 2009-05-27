@@ -7,7 +7,7 @@
  *           a bucket sort
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: sbuckets.cc,v 1.2 2004-05-14 16:26:06 levandov Exp $
+ *  Version: $Id: sbuckets.cc,v 1.3 2009-05-27 16:15:14 motsak Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -40,6 +40,36 @@ public:
 ;
 
 static omBin sBucket_bin = omGetSpecBin(sizeof(sBucket));
+
+
+//////////////////////////////////////////////////////////////////////////
+// New API:
+//
+
+/// Returns bucket ring
+const ring sBucketGetRing(const sBucket_pt bucket)
+{ return bucket->bucket_ring; }
+
+/// Copy sBucket non-intrusive!!!
+sBucket_pt    sBucketCopy(const sBucket_pt bucket)
+{
+  const ring r = bucket->bucket_ring;
+
+  sBucket_pt newbucket = sBucketCreate(r);
+
+  for(int i = 0; bucket->buckets[i].p != NULL; i++)
+  {
+    assume( i < (BIT_SIZEOF_LONG - 3) );
+    assume( pLength(bucket->buckets[i].p) == bucket->buckets[i].length );
+
+    newbucket->buckets[i].p = p_Copy(bucket->buckets[i].p, r);
+    newbucket->buckets[i].length = bucket->buckets[i].length;
+
+    assume( pLength(newbucket->buckets[i].p) == newbucket->buckets[i].length );
+  }
+
+  return newbucket;
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // internal routines
