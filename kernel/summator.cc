@@ -6,7 +6,7 @@
  *  Purpose: simple Summator usecase implementation
  *  Author:  motsak
  *  Created:
- *  Version: $Id: summator.cc,v 1.5 2009-05-27 16:15:14 motsak Exp $
+ *  Version: $Id: summator.cc,v 1.6 2009-05-28 08:53:08 Singular Exp $
  *******************************************************************/
 
 
@@ -175,16 +175,16 @@ void CPolynomialSummator::Add(poly pSummand)
 
 CPolynomialSummator::CPolynomialSummator(const CPolynomialSummator& b): m_bUsePolynomial(b.m_bUsePolynomial), m_basering(b.m_basering)
 {
-  try{
+//  try{
     if(m_bUsePolynomial)
       m_temp.m_poly = p_Copy( b.m_temp.m_poly, m_basering);
     else
       m_temp.m_bucket = sBucketCopy(b.m_temp.m_bucket);
-  }
-  catch(...)
-  {
-    assume(false);
-  }
+//  }
+//  catch(...)
+//  {
+//    assume(false);
+//  }
 }
 
 
