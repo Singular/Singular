@@ -829,10 +829,11 @@ void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CList*
                                 // passing criterion1 ?
                                 if(!criterion1(gPrev,u,tempRed,lTag)) {
                                     if(pLmCmp(ppMult_qq(u,tempRed->getTerm()),l->getTerm()) == 1) {
-                                        //Print("BAD REDUCTION STUFF\n");
-                                        bad->insert(tempRed->getLPoly());
-                                        poly tempRedPoly    =   tempRed->getPoly();
-                                        break; 
+                                        if(NULL == redPoly) {
+                                            bad->insert(tempRed->getLPoly());
+                                            //poly tempRedPoly    =   tempRed->getPoly();
+                                            //break;
+                                        }
                                         /* 
                                         // DEBUGGING STUFF
                                         //
