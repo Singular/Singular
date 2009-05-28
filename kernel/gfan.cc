@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-05-20 09:46:43 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.55 2009-05-20 09:46:43 monerjan Exp $
-$Id: gfan.cc,v 1.55 2009-05-20 09:46:43 monerjan Exp $
+$Date: 2009-05-28 06:27:09 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.56 2009-05-28 06:27:09 monerjan Exp $
+$Id: gfan.cc,v 1.56 2009-05-28 06:27:09 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -83,14 +83,17 @@ class facet
 		 * just copy the old cone and update the facet and the gcBasis.
 		 * facet::flibGB is set via facet::setFlipGB() and printed via facet::printFlipGB
 		 */
-		ideal flipGB;		//The Groebner Basis on the other side, computed via gcone::flip
-
+		ideal flipGB;		//The Groebner Basis on the other side, computed via gcone::flip		
 			
 	public:		
 		//bool isFlippable;	//flippable facet? Want to have cone->isflippable.facet[i]
 		bool isIncoming;	//Is the facet incoming or outgoing?
 		facet *next;		//Pointer to next facet
-		intvec *codim2Normals;	//Integer matrix containing the (codim-2)-facets
+		//intvec **codim2Normals =(intvec**)omAlloc0(sizeof(intvec*));	//Integer matrix containing the (codim-2)-facets
+		struct c2N{
+			intvec normal;
+			intvec *next;
+		};
 				
 		/** The default constructor. Do I need a constructor of type facet(intvec)? */
 		facet()			
@@ -99,7 +102,7 @@ class facet
 			/* Defaults to NULL. This way there is no need to check explicitly */
 			this->next=NULL; 
 			this->UCN=NULL;
-			this->codim2Normals=NULL;
+			//this->codim2Normals=NULL;			
 		}
 		
 		/** The default destructor */
@@ -543,20 +546,20 @@ class gcone
 				intvec *iv = new intvec(this->numVars);
 				interiorPoint(ddineq, *iv);	//NOTE ddineq contains non-flippable facets
 				this->setIntPoint(iv);	//stores the interior point in gcone::ivIntPt
-				delete iv;
+				//delete iv;
 			}
 			
 			//Compute the number of facets
 			this->numFacets=ddineq->rowsize;
 			
 			//Clean up but don't delete the return value! (Whatever it will turn out to be)			
-			dd_FreeMatrix(ddineq);
-			set_free(ddredrows);
-			free(ddnewpos);
-			set_free(ddlinset);
+			//dd_FreeMatrix(ddineq);
+			//set_free(ddredrows);
+			//free(ddnewpos);
+			//set_free(ddlinset);
 			//NOTE Commented out. Solved the bug that after facet2Matrix there were facets lost
 			//THIS SUCKS
-			dd_free_global_constants();
+			//dd_free_global_constants();
 
 		}//method getConeNormals(ideal I)	
 		
@@ -1431,8 +1434,10 @@ class gcone
 					for (int jj=1;jj<=P->rowsize;jj++)
 					{
 						intvec *n = new intvec(this->numVars);
-						n = normalize(P,jj);
-						//fAct->addCodim2Facet(n);								
+						normalize(P,jj,*n);
+						//fAct->addCodim2Facet(n);						
+						n->show();
+						delete n;									
 					}
 					
 					//intvec *load = new intvec(this->numVars);
@@ -1459,7 +1464,7 @@ class gcone
 			
 		}//void noRevS(gcone &gc)
 		
-		intvec *normalize(dd_MatrixPtr const &M, int line)
+		void normalize(dd_MatrixPtr const &M, int line, intvec &n)
 		{			
 			mpz_t denom[this->numVars];
 			for(int ii=0;ii<this->numVars;ii++)
@@ -1470,7 +1475,8 @@ class gcone
 			mpz_t kgV,tmp;
 			mpz_init(kgV);
 			mpz_init(tmp);
-			intvec *ivres = new intvec(this->numVars);
+ 			//intvec *ivres = new intvec(this->numVars);
+// 			intvec ivres(this->numVars);
 			
 			for (int ii=0;ii<(M->colsize)-1;ii++)
 			{
@@ -1479,29 +1485,38 @@ class gcone
 				mpq_get_den(z,M->matrix[line-1][ii+1]);
 				//mpz_out_str(stdout,10,z);
 				mpz_set( denom[ii], z);
-				//mpz_clear(z);				
+				mpz_clear(z);				
 			}
 			/*Compute lcm of the denominators*/
 			mpz_set(tmp,denom[0]);
 			for (int ii=0;ii<(M->colsize)-1;ii++)
 			{
-				mpz_lcm(kgV,tmp,denom[ii+1]);				
+				mpz_lcm(kgV,tmp,denom[ii]);				
 			}
 			/*Multiply the nominators by kgV*/
 			mpq_t qkgV,res;
 			mpq_init(qkgV);
+// 			mpq_canonicalize(qkgV);
+			mpq_set_str(qkgV,"1",10);
+// 			mpq_canonicalize(qkgV);
 			mpq_init(res);
-			mpq_set_z(qkgV,kgV);
+			mpq_set_str(res,"1",10);
+// 			mpq_canonicalize(res);
+			//mpq_set_z(qkgV,kgV);
+			mpq_set_num(qkgV,kgV);
+			//mpq_set_den(qkgV,1);
+// 			mpq_canonicalize(qkgV);
 			for (int ii=0;ii<(M->colsize)-1;ii++)
 			{
 				mpq_mul(res,qkgV,M->matrix[line-1][ii+1]);
-				(*ivres)[ii]=(int)mpz_get_d(mpq_numref(res));
+// 	      			(*ivres)[ii]=(int)mpz_get_d(mpq_numref(res));
+				n[ii]=(int)mpz_get_d(mpq_numref(res));
 			}
 			//mpz_clear(denom[this->numVars]);
-			//mpz_clear(kgV);
-			//mpq_clear(qkgV); mpq_clear(res);
+			mpz_clear(kgV);
+			mpq_clear(qkgV); mpq_clear(res);
 			
-			return ivres;
+			//return ivres;
 		}
 		
 		/** \brief Construct a dd_MatrixPtr from a cone's list of facets
