@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-05-28 06:27:09 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.56 2009-05-28 06:27:09 monerjan Exp $
-$Id: gfan.cc,v 1.56 2009-05-28 06:27:09 monerjan Exp $
+$Date: 2009-05-29 07:52:12 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.57 2009-05-29 07:52:12 monerjan Exp $
+$Id: gfan.cc,v 1.57 2009-05-29 07:52:12 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -76,6 +76,10 @@ class facet
 		*/
 		int UCN;
 		
+		/** \brief The codim of the facet
+		*/
+		int codim;
+		
 		/** \brief The Groebner basis on the other side of a shared facet
 		 *
 		 * In order not to have to compute the flipped GB twice we store the basis we already get
@@ -89,12 +93,9 @@ class facet
 		//bool isFlippable;	//flippable facet? Want to have cone->isflippable.facet[i]
 		bool isIncoming;	//Is the facet incoming or outgoing?
 		facet *next;		//Pointer to next facet
+		facet *codim2Ptr;	//Pointer to (codim-2)-facet. Bit of recursion here ;-)
 		//intvec **codim2Normals =(intvec**)omAlloc0(sizeof(intvec*));	//Integer matrix containing the (codim-2)-facets
-		struct c2N{
-			intvec normal;
-			intvec *next;
-		};
-				
+						
 		/** The default constructor. Do I need a constructor of type facet(intvec)? */
 		facet()			
 		{
@@ -102,7 +103,21 @@ class facet
 			/* Defaults to NULL. This way there is no need to check explicitly */
 			this->next=NULL; 
 			this->UCN=NULL;
-			//this->codim2Normals=NULL;			
+			this->codim2Ptr=NULL;
+			this->codim=1;		//default for (codim-1)-facets
+		}
+		
+		/** \brief Constructor for facets of codim >= 2
+		*/
+		facet(int const &n)
+		{
+			this->next=NULL; 
+			this->UCN=NULL;
+			this->codim2Ptr=NULL;
+			if(n>1)
+			{
+				this->codim=n;
+			}//NOTE Handle exception here!
 		}
 		
 		/** The default destructor */
@@ -111,14 +126,12 @@ class facet
 		/** Stores the facet normal \param intvec*/
 		void setFacetNormal(intvec *iv)
 		{
-			this->fNormal = ivCopy(iv);
-			//return;
+			this->fNormal = ivCopy(iv);			
 		}
 		
 		/** Hopefully returns the facet normal */
 		intvec *getFacetNormal()
-		{	
-			//this->fNormal->show();	cout << endl;	
+		{				
 			return this->fNormal;
 		}
 		
@@ -164,7 +177,7 @@ class facet
 		intvec *getInteriorPoint()
 		{
 			return this->interiorPoint;
-		}
+		}		
 		
 		/*bool isFlippable(intvec &load)
 		{
@@ -250,9 +263,10 @@ class gcone
 		gcone()
 		{
 			this->next=NULL;
-			this->facetPtr=NULL;
+			this->facetPtr=NULL;	//maybe this->facetPtr = new facet();
 			this->baseRing=currRing;
 			this->UCN=1;
+			this->numFacets=0;
 		}
 		
 		/** \brief Constructor with ring and ideal
@@ -270,6 +284,7 @@ class gcone
 			this->inputIdeal=I;
 			this->baseRing=currRing;
 			this->UCN=1;
+			this->numFacets=0;
 		}
 		
 		/** \brief Copy constructor 
@@ -278,11 +293,11 @@ class gcone
 		* direction of the according facet normal
 		*/			
 		//NOTE Prolly need to specify the facet to flip over
-		gcone(const gcone& gc)		
+		gcone(const gcone& gc, const facet &f)		
 		{
 			this->next=NULL;
 			this->numVars=gc.numVars;
-			this->UCN=(gc.UCN)+1;	//add 1 to the UCN of previous cone
+			this->UCN=(gc.UCN)+1;	//add 1 to the UCN of previous cone. This is NOT UNIQUE!
 			facet *fAct= new facet();			
 			this->facetPtr=fAct;
 			
@@ -304,8 +319,12 @@ class gcone
 			delete fAct;						
 		}
 		
-		/** \brief Default destructor */
-		~gcone(){;}		//destructor
+		/** \brief Default destructor 
+		*/
+		~gcone()
+		{
+			//NOTE SAVE THE FACET STRUCTURE!!!
+		}
 			
 		
 		/** \brief Set the interior point of a cone */
@@ -339,7 +358,7 @@ class gcone
 			}
  			//delete iv;
  			//delete f;
-		}
+		}		
 		
 		/** \brief Set gcone::numFacets */
 		void setNumFacets()
@@ -530,6 +549,7 @@ class gcone
 					fAct->setFacetNormal(load);
 					fAct->next = new facet();					
 					fAct=fAct->next;	//this should definitely not be called in the above while-loop :D
+					this->numFacets++;
 				}//if (isFlippable==FALSE)
 				//delete load;
 			}//for (int kk = 0; kk<ddrows; kk++)
@@ -550,7 +570,9 @@ class gcone
 			}
 			
 			//Compute the number of facets
-			this->numFacets=ddineq->rowsize;
+			// wrong because ddineq->rowsize contains only irredundant facets. There can still be
+			// non-flippable ones!
+			//this->numFacets=ddineq->rowsize;
 			
 			//Clean up but don't delete the return value! (Whatever it will turn out to be)			
 			//dd_FreeMatrix(ddineq);
@@ -1416,13 +1438,13 @@ class gcone
 				dd_PolyhedraPtr ddpolyh;
 				for (int ii=0; ii<this->numFacets; ii++)
 				{	
-					cout << "------------" << endl;
+					cout << endl << "------------" << endl;
  					ddakt = dd_CopyMatrix(ddineq);
 					set_addelem(ddakt->linset,ii+1);
 										
 					dd_MatrixCanonicalize(&ddakt, &impl_linset, &redset, &newpos, &err);			
 					
- 					dd_WriteMatrix(stdout,ddakt);
+ 					//dd_WriteMatrix(stdout,ddakt);
 					ddpolyh=dd_DDMatrix2Poly(ddakt, &err);
 					P=dd_CopyGenerators(ddpolyh);
 					dd_WriteMatrix(stdout,P);
@@ -1431,22 +1453,23 @@ class gcone
 					* normalize it by making all entries integer ones
 					* and add the resulting vector to the int matrix facet::codim2Facets
 					*/
+					this->facetPtr->codim2Ptr = new facet(2);	//construct a (codim-2)-facet
+					facet *codim2Act;
+					codim2Act = this->facetPtr->codim2Ptr;
 					for (int jj=1;jj<=P->rowsize;jj++)
 					{
 						intvec *n = new intvec(this->numVars);
-						normalize(P,jj,*n);
-						//fAct->addCodim2Facet(n);						
+						normalize(P,jj,*n);						
+						codim2Act->setFacetNormal(n);
+						codim2Act->next = new facet(2);
+						codim2Act = codim2Act->next;
 						n->show();
 						delete n;									
-					}
-					
-					//intvec *load = new intvec(this->numVars);
+					}					
 					
 					dd_FreeMatrix(ddakt);
 					dd_FreePolyhedra(ddpolyh);
-				}
-				//gc.showFacets();
-				
+				}				
 			}			
 	
 			
@@ -1462,9 +1485,15 @@ class gcone
 			//gcTmp->flip(gcTmp->gcBasis,fAct);
 			//NOTE: gcTmp may be deleted, gcRoot from main proc should probably not!
 			
-		}//void noRevS(gcone &gc)
+		}//void noRevS(gcone &gc)	
 		
-		void normalize(dd_MatrixPtr const &M, int line, intvec &n)
+		
+		/** \brief Make a set of rational vectors into integers
+		*
+		* We compute the lcm of the denominators and multiply with this to get integer values
+		* \param dd_MatrixPtr,intvec
+		*/
+		void normalize(dd_MatrixPtr const &M, int const line, intvec &n)
 		{			
 			mpz_t denom[this->numVars];
 			for(int ii=0;ii<this->numVars;ii++)
@@ -1475,48 +1504,45 @@ class gcone
 			mpz_t kgV,tmp;
 			mpz_init(kgV);
 			mpz_init(tmp);
- 			//intvec *ivres = new intvec(this->numVars);
-// 			intvec ivres(this->numVars);
 			
 			for (int ii=0;ii<(M->colsize)-1;ii++)
 			{
 				mpz_t z;
 				mpz_init(z);
 				mpq_get_den(z,M->matrix[line-1][ii+1]);
-				//mpz_out_str(stdout,10,z);
 				mpz_set( denom[ii], z);
 				mpz_clear(z);				
 			}
+			
 			/*Compute lcm of the denominators*/
 			mpz_set(tmp,denom[0]);
 			for (int ii=0;ii<(M->colsize)-1;ii++)
 			{
 				mpz_lcm(kgV,tmp,denom[ii]);				
 			}
+			
 			/*Multiply the nominators by kgV*/
 			mpq_t qkgV,res;
 			mpq_init(qkgV);
-// 			mpq_canonicalize(qkgV);
 			mpq_set_str(qkgV,"1",10);
-// 			mpq_canonicalize(qkgV);
+ 			mpq_canonicalize(qkgV);
+			
 			mpq_init(res);
 			mpq_set_str(res,"1",10);
-// 			mpq_canonicalize(res);
-			//mpq_set_z(qkgV,kgV);
+ 			mpq_canonicalize(res);
+			
 			mpq_set_num(qkgV,kgV);
-			//mpq_set_den(qkgV,1);
+			
 // 			mpq_canonicalize(qkgV);
 			for (int ii=0;ii<(M->colsize)-1;ii++)
 			{
 				mpq_mul(res,qkgV,M->matrix[line-1][ii+1]);
-// 	      			(*ivres)[ii]=(int)mpz_get_d(mpq_numref(res));
 				n[ii]=(int)mpz_get_d(mpq_numref(res));
 			}
 			//mpz_clear(denom[this->numVars]);
 			mpz_clear(kgV);
-			mpq_clear(qkgV); mpq_clear(res);
+			mpq_clear(qkgV); mpq_clear(res);			
 			
-			//return ivres;
 		}
 		
 		/** \brief Construct a dd_MatrixPtr from a cone's list of facets
@@ -1540,13 +1566,16 @@ class gcone
 			intvec *comp = new intvec(this->numVars);			
 			
 			for (int jj=0; jj<M->rowsize; jj++)
-			{
+			{				
 				comp = fAct->getFacetNormal();
 				for (int ii=0; ii<this->numVars; ii++)
 				{
 					dd_set_si(M->matrix[jj][ii+1],(*comp)[ii]);
 				}
-				fAct = fAct->next;				
+				if(fAct->next!=NULL)
+				{
+					fAct = fAct->next;
+				}
 			}//jj
 			
 			//delete fAct;
@@ -1689,8 +1718,7 @@ ideal gfan(ideal inputIdeal)
 		gcAct = gcRoot;
 		gcAct->numVars=pVariables;
 		gcAct->getGB(inputIdeal);
-		gcAct->getConeNormals(gcAct->gcBasis);
-		cout << "ding" << endl;		
+		gcAct->getConeNormals(gcAct->gcBasis);		
 		gcAct->noRevS(*gcAct);		
 		res=gcAct->gcBasis;	
 	}
