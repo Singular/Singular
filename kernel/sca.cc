@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.37 2009-05-29 13:58:51 motsak Exp $
+ *  Version: $Id: sca.cc,v 1.38 2009-05-29 16:23:17 Singular Exp $
  *******************************************************************/
 
 // set it here if needed.
@@ -2445,7 +2445,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
 #if 0
     if (strat->kHEdgeFound)
     {
-      if ((BTEST1(27))
+      if ((TEST_OPT_FINDET)
       || ((TEST_OPT_MULTBOUND) && (scMult0Int((strat->Shdl)) < mu)))
       {
         // obachman: is this still used ???
@@ -2468,7 +2468,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
   /*- release temp data------------------------------- -*/
   exitBuchMora(strat);
   /*- polynomials used for HECKE: HC, noether -*/
-  if (BTEST1(27))
+  if (TEST_OPT_FINDET)
   {
     if (strat->kHEdge!=NULL)
       Kstd1_mu=pFDeg(strat->kHEdge,currRing);

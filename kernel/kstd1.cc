@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.51 2009-05-25 09:42:21 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.52 2009-05-29 16:23:17 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -913,7 +913,7 @@ void firstUpdate(kStrategy strat)
       strat->posInL = strat->posInLOld;
       strat->lastAxis = 0;
     }
-    if (BTEST1(27))
+    if (TEST_OPT_FINDET)
       return;
     strat->red = redFirst;
     strat->use_buckets = kMoraUseBucket(strat);
@@ -932,7 +932,7 @@ void firstUpdate(kStrategy strat)
 *  if TRUE
 *  - decides about reduction-strategies
 *  - computes noether
-*  - stops computation if BTEST1(27)
+*  - stops computation if TEST_OPT_FINDET
 *  - cuts the tails of the polynomials
 *    in s,t and the elements in L above noether
 *    and cancels units if possible
@@ -956,7 +956,7 @@ void enterSMora (LObject p,int atS,kStrategy strat, int atR = -1)
     if (newHEdge(strat->S,strat))
     {
       firstUpdate(strat);
-      if (BTEST1(27))
+      if (TEST_OPT_FINDET)
         return;
       /*- cuts elements in L above noether and reorders L -*/
       updateLHC(strat);
@@ -1315,7 +1315,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     }
     if (strat->kHEdgeFound)
     {
-      if ((BTEST1(27))
+      if ((TEST_OPT_FINDET)
       || ((TEST_OPT_MULTBOUND) && (scMult0Int((strat->Shdl)) < mu)))
       {
         // obachman: is this still used ???
@@ -1338,7 +1338,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   /*- release temp data------------------------------- -*/
   exitBuchMora(strat);
   /*- polynomials used for HECKE: HC, noether -*/
-  if (BTEST1(27))
+  if (TEST_OPT_FINDET)
   {
     if (strat->kHEdge!=NULL)
       Kstd1_mu=pFDeg(strat->kHEdge,currRing);
