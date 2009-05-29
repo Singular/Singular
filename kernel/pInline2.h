@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.15 2008-08-08 08:55:22 Singular Exp $
+ *  Version: $Id: pInline2.h,v 1.16 2009-05-29 13:57:35 motsak Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -142,100 +142,90 @@ PINLINE2 int p_Comp_k_n(poly a, poly b, int k, ring r)
   return TRUE;
 }
 
-
 #ifndef HAVE_EXPSIZES
 
-// exponent
-// r->VarOffset encodes the position in p->exp (lower 24 bits)
-// and number of bits to shift to the right in the upper 8 bits
-PINLINE2 int p_GetExp(poly p, int v, ring r)
+/// get a single variable exponent
+/// @Note:
+/// the integer VarOffset encodes:
+/// 1. the position of a variable in the exponent vector p->exp (lower 24 bits)
+/// 2. number of bits to shift to the right in the upper 8 bits (which takes at most 6 bits for 64 bit)
+/// Thus VarOffset always has 2 zero higher bits!
+PINLINE2 int p_GetExp(const poly p, const unsigned long iBitmask, const int VarOffset)
 {
-  p_LmCheckPolyRing2(p, r);
-  pAssume2(v > 0 && v <= r->N);
+  pAssume2((VarOffset >> (24 + 6)) == 0);
 #if 0
-  int pos=(r->VarOffset[v] & 0xffffff);
-  int bitpos=(r->VarOffset[v] >> 24);
-  int exp=(p->exp[pos] >> bitmask) & r->bitmask;
+  int pos=(VarOffset & 0xffffff);
+  int bitpos=(VarOffset >> 24);
+  int exp=(p->exp[pos] >> bitmask) & iBitmask;
   return exp;
 #else
   return (int)
-         ((p->exp[(r->VarOffset[v] & 0xffffff)] >> (r->VarOffset[v] >> 24))
-          & r->bitmask);
+         ((p->exp[(VarOffset & 0xffffff)] >> (VarOffset >> 24))
+          & iBitmask);
 #endif
 }
 
-// partial compare exponent
-// r->VarOffset encodes the position in p->exp (lower 24 bits)
-// and number of bits to shift to the right in the upper 8 bits
-PINLINE2 int p_SetExp(poly p, int v, int e, ring r)
+
+/// set a single variable exponent
+/// @Note:
+/// VarOffset encodes the position in p->exp @see p_GetExp
+PINLINE2 int p_SetExp(poly p, const int e, const unsigned long iBitmask, const int VarOffset)
 {
-  p_LmCheckPolyRing2(p, r);
-  pAssume2(v>0 && v <= r->N);
   pAssume2(e>=0);
-  pAssume2((unsigned int) e<=r->bitmask);
+  pAssume2((unsigned long) e<=iBitmask);
+  pAssume2((VarOffset >> (24 + 6)) == 0);
 
   // shift e to the left:
-  register int shift = r->VarOffset[v] >> 24;
-  unsigned long ee = ((unsigned long)e) << shift /*(r->VarOffset[v] >> 24)*/;
+  register int shift = VarOffset >> 24;
+  unsigned long ee = ((unsigned long)e) << shift /*(VarOffset >> 24)*/;
   // find the bits in the exponent vector
-  register int offset = (r->VarOffset[v] & 0xffffff);
+  register int offset = (VarOffset & 0xffffff);
   // clear the bits in the exponent vector:
-  p->exp[offset]  &= ~( r->bitmask << shift );
+  p->exp[offset]  &= ~( iBitmask << shift );
   // insert e with |
   p->exp[ offset ] |= ee;
   return e;
 }
 
-#else // #ifdef HAVE_EXPSIZES
 
-inline int BitMask(int bitmask, int twobits)
+#else // #ifdef HAVE_EXPSIZES // EXPERIMENTAL!!!
+
+PINLINE2 unsigned long BitMask(unsigned long bitmask, int twobits)
 {
   // bitmask = 00000111111111111
   // 0 must give bitmask!
   // 1, 2, 3 - anything like 00011..11
   pAssume2((twobits >> 2) == 0);
-  const int _bitmasks[4] = {0xffffffff, 0x7fff, 0x7f, 0x3}; 
+  const unsigned long _bitmasks[4] = {-1, 0x7fff, 0x7f, 0x3};
   return bitmask & _bitmasks[twobits]; 
 }
 
-PINLINE2 int p_GetExp(poly p, int v, ring r)
+
+/// @Note: we may add some more info (6 ) into VarOffset and thus encode 
+PINLINE2 int p_GetExp(const poly p, const unsigned long iBitmask, const int VarOffset)
 {
-  p_LmCheckPolyRing2(p, r);
-  pAssume2(v > 0 && v <= r->N);
-#if 1 // new!!
-  int pos  =(r->VarOffset[v] & 0xffffff);
-  int hbyte= (r->VarOffset[v] >> 24); // the highest byte
+  int pos  =(VarOffset & 0xffffff);
+  int hbyte= (VarOffset >> 24); // the highest byte
   int bitpos = hbyte & 0x3f; // last 6 bits
-  int bitmask = BitMask(r->bitmask, hbyte >> 6); 
+  int bitmask = BitMask(iBitmask, hbyte >> 6);
 
   int exp=(p->exp[pos] >> bitpos) & bitmask;
   return exp;
-#else
-  // old
-  return (int)
-      ((p->exp[(r->VarOffset[v] & 0xffffff)] >> (r->VarOffset[v] >> 24))
-       & r->bitmask;
-#endif
+
 }
 
-
-// partial compare exponent
-// r->VarOffset encodes the position in p->exp (lower 24 bits)
-// and number of bits to shift to the right in the upper 8 bits
-PINLINE2 int p_SetExp(poly p, int v, int e, ring r)
+PINLINE2 int p_SetExp(poly p, const int e, const unsigned long iBitmask, const int VarOffset)
 {
-  p_LmCheckPolyRing2(p, r);
-  pAssume2(v>0 && v <= r->N);
   pAssume2(e>=0);
-  pAssume2((unsigned int) e <= BitMask(r->bitmask, r->VarOffset[v] >> 30));
+  pAssume2((unsigned long) e <= BitMask(iBitmask, VarOffset >> 30));
 
   // shift e to the left:
-  register int hbyte = r->VarOffset[v] >> 24;
-  int bitmask = BitMask(r->bitmask, hbyte >> 6);
+  register int hbyte = VarOffset >> 24;
+  int bitmask = BitMask(iBitmask, hbyte >> 6);
   register int shift = hbyte & 0x3f;
   unsigned long ee = ((unsigned long)e) << shift;
   // find the bits in the exponent vector
-  register int offset = (r->VarOffset[v] & 0xffffff);
+  register int offset = (VarOffset & 0xffffff);
   // clear the bits in the exponent vector:
   p->exp[offset]  &= ~( bitmask << shift );
   // insert e with |
@@ -244,6 +234,46 @@ PINLINE2 int p_SetExp(poly p, int v, int e, ring r)
 }
 
 #endif // #ifndef HAVE_EXPSIZES
+
+
+PINLINE2 int p_GetExp(const poly p, const ring r, const int VarOffset)
+{
+  p_LmCheckPolyRing2(p, r);
+  pAssume2(VarOffset != -1);
+  return p_GetExp(p, r->bitmask, VarOffset);
+}
+
+PINLINE2 int p_SetExp(poly p, const int e, const ring r, const int VarOffset)
+{
+  p_LmCheckPolyRing2(p, r);
+  pAssume2(VarOffset != -1);
+  return p_SetExp(p, e, r->bitmask, VarOffset);
+}
+
+
+
+/// get v^th exponent for a monomial
+PINLINE2 int p_GetExp(const poly p, const int v, const ring r)
+{
+  p_LmCheckPolyRing2(p, r);
+  pAssume2(v>0 && v <= r->N);
+  pAssume2(r->VarOffset[v] != -1);
+  return p_GetExp(p, r->bitmask, r->VarOffset[v]);
+}
+
+
+/// set v^th exponent for a monomial
+PINLINE2 int p_SetExp(poly p, const int v, const int e, const ring r)
+{
+  p_LmCheckPolyRing2(p, r);
+  pAssume2(v>0 && v <= r->N);
+  pAssume2(r->VarOffset[v] != -1);
+  return p_SetExp(p, e, r->bitmask, r->VarOffset[v]);
+}
+
+
+
+
 
 // the following should be implemented more efficiently
 PINLINE2  int p_IncrExp(poly p, int v, ring r)
