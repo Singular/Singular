@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.300 2009-05-20 15:15:01 motsak Exp $ */
+/* $Id: extra.cc,v 1.301 2009-05-29 16:24:52 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1913,16 +1913,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
-/*==================== interred ==================================*/
-    #if 0
-    if(strcmp(sys_cmd,"interred")==0)
-    {
-      res->data=(char *)kIR((ideal)h->Data(),currQuotient);
-      res->rtyp=h->Typ();
-      return ((h->Typ()!=IDEAL_CMD) && (h->Typ()!=MODUL_CMD));
-    }
-    else
-    #endif
 #ifdef RDEBUG
 /*==================== poly debug ==================================*/
     if(strcmp(sys_cmd,"p")==0)
