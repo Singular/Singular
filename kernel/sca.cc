@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.36 2009-04-08 17:21:58 motsak Exp $
+ *  Version: $Id: sca.cc,v 1.37 2009-05-29 13:58:51 motsak Exp $
  *******************************************************************/
 
 // set it here if needed.
@@ -2759,6 +2759,7 @@ inline poly m_KillSquares(const poly m,
 
 
 // reduce polynomial p modulo <y_i^2> , i = iFirstAltVar .. iLastAltVar
+// returns a new poly!
 poly p_KillSquares(const poly p,
   const unsigned int iFirstAltVar, const unsigned int iLastAltVar,
   const ring r)
@@ -2813,7 +2814,7 @@ poly p_KillSquares(const poly p,
 
 
 // reduces ideal id modulo <y_i^2> , i = iFirstAltVar .. iLastAltVar
-// returns the reduced ideal or zero ideal.
+// returns the reduced ideal or zero ideal. 
 ideal id_KillSquares(const ideal id,
   const unsigned int iFirstAltVar, const unsigned int iLastAltVar,
   const ring r, const bool bSkipZeroes)
