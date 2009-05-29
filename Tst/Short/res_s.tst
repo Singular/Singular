@@ -7,7 +7,6 @@ option(prot);
 //ideal ii=x3+yzw,y3+zwt,z3+wtx,w3+txy,t2+xy;
 //ideal iii=x3+yzw,y3+zwt,z3+wtx,w2+txy,t2+xy;
 //ideal tt=t2x2+tx2y+x2yz,t2y2+ty2z+y2zw,t2z2+tz2w+xz2w,t2w2+txw2+xyw2;
-//test(17);
 //ideal T=std(tt);
 //timer = 1;
 //res(T,0,t1);

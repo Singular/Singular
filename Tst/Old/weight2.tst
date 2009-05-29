@@ -121,7 +121,6 @@ ew;
 //kill r;
 kill p1,ew;
 
-test(9);
 option(weightM);
 ring vc= 32003,(x,y,z,t),ds;
 degBound=1;
@@ -234,7 +233,6 @@ ring r5=32003,(x,y,z),ds;
 int a=7;
 poly f =xyz*(x+y+z)^2 +(x+y+z)^3 +x^a+y^a+z^a;
 ideal i= jacob(f);
-test(-9);
 ideal j=std(i);
 j;
 //"//size "+string(size(j))+

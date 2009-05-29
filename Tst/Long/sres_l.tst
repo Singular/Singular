@@ -1,7 +1,6 @@
 LIB "tst.lib";
 tst_init();
 //option(prot);
-//test(28);
 "========= Alex4";
 ring h4=32003,(t,x,y,z,w),(dp,c);
 ideal j=
