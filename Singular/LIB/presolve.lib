@@ -1,7 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//changed GMG 20.5.09: degreepart, linearpart, elimpart
-///////////////////////////////////////////////////////////////////////////////
-version="$Id: presolve.lib,v 1.33 2009-05-25 09:47:39 Singular Exp $";
+version="$Id: presolve.lib,v 1.34 2009-05-29 09:26:48 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  presolve.lib     Pre-Solving of Polynomial Equations
@@ -93,9 +91,6 @@ RETURN:  list of size 2,
          _[1]: generators of id of [v-weighted] total degree >= d1 and <= d2
           (default: v = 1,...,1)
          _[2]: remaining generators of id
-NOTE:    if id is of type int/number/poly it is converted to ideal, if id is
-         of type intmat/matrix/vector to module and then the corresponding
-         generators are computed
 EXAMPLE: example degreepart; shows an example
 "
 {
@@ -148,7 +143,6 @@ proc linearpart (id)
 RETURN:  list of size 2,
          _[1]: generators of id of total degree <= 1
          _[2]: remaining generators of id
-NOTE:    all variables have degree 1 (independent of ordering of basering)
 EXAMPLE: example linearpart; shows an example
 "
 {
@@ -184,8 +178,8 @@ NOTE:    the procedure always interreduces the ideal i internally w.r.t.
 EXAMPLE: example elimlinearpart; shows an example
 "
 {
-   int ii,n,k,ringchange;
-   string o;
+   int ii,n,k;
+   string o, newo;
    intvec getoption = option(get);
    option(redSB);
    def BAS = basering;
@@ -199,7 +193,7 @@ EXAMPLE: example elimlinearpart; shows an example
    ideal maxi,rest = maxideal(1),0;
    if ( n < nvars(BAS) )
    {
-      rest = maxi[n+1..nvars(BAS)];     //variables which are not substituted
+      rest = maxi[n+1..nvars(BAS)];
    }
    attrib(rest,"isSB",1);
 
@@ -210,13 +204,11 @@ EXAMPLE: example elimlinearpart; shows an example
    //ideal id = interred(i);
    //## gmg, geŠndert 9/2008: interred sehr lange z.B. bei Leonard1 in normal,
    //daher interred ersetzt durch: std nur auf linearpart angewendet
-   //Wechsel zu dp Ordnung (da Lin affin linear)
+   //Ordnung muss global sein, sonst egal (da Lin affin linear)
 
-//--------------- replace ordering different from dp by dp -------------------
-   o = "dp("+string(n)+")";
-   if( ! find(ordstr(BAS),o) or find(ordstr(BAS),"a") )
+//--------------- replace ordering by dp if it is not global -----------------
+   if ( ord_test(BAS) <= 0 )
    {
-      ringchange = 1;                         //remember change of ring
       intvec V;
       V[n]=0; V=V+1;                          //weights for dp ordering
       gnirlist[3] = list("dp",V), g32;
@@ -237,7 +229,7 @@ EXAMPLE: example elimlinearpart; shows an example
    {
       lin = lin,id1;
       lin = std(lin);
-      id = simplify(NF(id,lin),2);   //instead of subst, (### is faster)
+      id = simplify(NF(id,lin),2);   //instead of subst
       id1 = linearpart(id)[1];
    }
 //------------- check for special case of unit ideal and return ---------------
@@ -282,7 +274,7 @@ EXAMPLE: example elimlinearpart; shows an example
    ideal neva = NF(maxideal(1),eva);    //vars not to be eliminated
 //------------------ go back to original ring end return  ---------------------
 
-   if ( ringchange  )                   //i.e there was a ring change
+   if ( ord_test(BAS) <= 0  )           //i.e there was a ring change
    {
       setring BAS;
       ideal id = imap(newBAS,id);
@@ -354,12 +346,11 @@ EXAMPLE: example elimpart; shows an example
 // phi = map describing substitution
 
    list L = elimlinearpart(i,n);
-   ideal lin, eva, sub, neva, phi = L[1], L[2], L[3], L[4], L[5];
    if ( e == 0 )
    {
        return(L);
    }
-
+   ideal lin, eva, sub, neva, phi = L[1], L[2], L[3], L[4], L[5];
 //-------- direct substitution of variables if possible and if e!=0 -----------
 // first find terms lin1 in lin of pure degree 1 in each polynomial of lin
 // k1 = pure degree 1 part, i.e. nonzero elts of lin1, renumbered
@@ -390,7 +381,7 @@ mit Grad 1 Teilen produziert, die vorher nicht da waren (aus polys, die einen ko
 z.B. i=xy2-xu4-x+y2,x2y2+z3+zy,y+z2+1,y+u2;, interred(i)=z2+y+1,y2-x,u2+y,x3-z
 -z ergibt ich auch i[2]-z*i[3] mit option(redThrough)
 statt interred kann man hier auch NF(i,i[3])+i[3] verwenden
-hier lifert elimpart(i) 2 Substitutionen (x,y) elimpart(interred(i))
+hier liefert elimpart(i) 2 Substitutionen (x,y) elimpart(interred(i))
 aber 3 (x,y,z)
 Da interred oder NF aber die Laenge der polys vergroessern kann, nicht gemacht
 */
@@ -429,7 +420,7 @@ Da interred oder NF aber die Laenge der polys vergroessern kann, nicht gemacht
    ideal kin = matrix(k1)+matrix(k2);
    //kin = polys of lin which contained a pure degree 1 part.
    kin = simplify(kin,2);
-   l = size(kin);                      //l != 0 since lin1 != 0
+   l = ncols(kin);                    //l != 0 since lin1 != 0
    poly p,kip,vip, cand;
    int count=1;
    while ( count != 0 )
@@ -440,13 +431,8 @@ Da interred oder NF aber die Laenge der polys vergroessern kann, nicht gemacht
             for (kk=1; kk<=l; kk++ )
             {
                p = kin[kk]/var(ii);
-               //if ( deg(p) == 0 )
-               //old test, does not work if some var has deg 0
-               //geaendert Mai 09 gmg
-
-               if( p!=0 & p == jet(p,0) )
-                   //this means that kin[kk]= p*var(ii) + h,
-                   //with p=const !=0 and h not depending on var(ii)
+               if ( deg(p) == 0 )  //this means that kin[kk]= p*var(ii) + h,
+                                   //with p=const and h not depending on var(ii)
                {
                   //we look for the shortest candidate to substitute var(ii)
                   if ( cand == 0 )
@@ -461,11 +447,11 @@ Da interred oder NF aber die Laenge der polys vergroessern kann, nicht gemacht
                      }
                   }
                 }
-            }
+            }     
             if ( cand != 0 )
             {
                   p = cand/var(ii);
-                  kip = cand/p;     //normalized polynomial of kin w.r.t var(ii)
+                  kip = cand/p;      //normalized polynomial of kin w.r.t var(ii)
                   eva = eva+var(ii); //var(ii) added to list of elimin. vars
                   neva[ii] = 0;
                   sub = sub+kip;     //polynomial defining substituion
