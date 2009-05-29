@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.60 2009-01-07 15:22:01 Singular Exp $ */
+/* $Id: structs.h,v 1.61 2009-05-29 16:21:04 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -814,6 +814,7 @@ static inline long si_min(const long a, const long b)  { return (a<b) ? a : b; }
 #define V_COEFSTRAT  20
 #define V_IDLIFT     21
 #define V_LENGTH     22
+/* for tests: 23-30 */
 #define V_DEG_STOP   31
 
 
@@ -834,6 +835,7 @@ static inline long si_min(const long a, const long b)  { return (a<b) ? a : b; }
 #define OPT_DEGBOUND      24
 #define OPT_REDTAIL       25
 #define OPT_INTSTRATEGY   26
+#define OPT_FINDET        27
 #define OPT_INFREDTAIL    28
 #define OPT_SB_1          29
 #define OPT_NOTREGULARITY 30
@@ -851,6 +853,7 @@ static inline long si_min(const long a, const long b)  { return (a<b) ? a : b; }
 #define TEST_OPT_DEBUG             BTEST1(OPT_DEBUG)
 #define TEST_OPT_FASTHC            BTEST1(OPT_FASTHC)
 #define TEST_OPT_INTSTRATEGY       BTEST1(OPT_INTSTRATEGY)
+#define TEST_OPT_FINDET            BTEST1(OPT_FINDET)
 #define TEST_OPT_RETURN_SB         BTEST1(OPT_RETURN_SB)
 #define TEST_OPT_KEEPVARS          BTEST1(OPT_KEEPVARS)
 #define TEST_OPT_DEGBOUND          BTEST1(OPT_DEGBOUND)

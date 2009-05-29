@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.140 2009-05-19 08:29:16 Singular Exp $ */
+/* $Id: kutil.cc,v 1.141 2009-05-29 16:21:26 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -5611,8 +5611,6 @@ void initBuchMoraCrit(kStrategy strat)
 #endif
 
   strat->sugarCrit =        TEST_OPT_SUGARCRIT;
-  // obachman: Hmm.. I need BTEST1(2) for notBuckets ..
-  //  strat->Gebauer =          BTEST1(2) || strat->homog || strat->sugarCrit;
   strat->Gebauer =          strat->homog || strat->sugarCrit;
   strat->honey =            !strat->homog || strat->sugarCrit || TEST_OPT_WEIGHTM;
   if (TEST_OPT_NOT_SUGAR) strat->honey = FALSE;
