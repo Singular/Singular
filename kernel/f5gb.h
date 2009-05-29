@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.39 2009-05-13 16:55:03 ederc Exp $ */
+/* $Id: f5gb.h,v 1.40 2009-05-29 11:34:22 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -35,13 +35,6 @@ compare monomials, i.e. divisibility tests for criterion 1 and criterion 2
 */
 bool compareMonomials(int* m1, int** m2, int numberOfRules);
 
-/*
-==============================================
-generating the list lp of ideal generators and 
-test if 1 is in lp(return 1) or not(return 0)
-==============================================
-*/
-void generate_input_list(LPoly* lp, ideal id, poly one);
 
 /*
 ==================================================

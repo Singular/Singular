@@ -1,15 +1,15 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5lists.h,v 1.20 2009-05-14 08:47:01 ederc Exp $ */
+/* $Id: f5lists.h,v 1.21 2009-05-29 11:34:22 ederc Exp $ */
 /*
 * ABSTRACT: list interface
 */
 #include "f5data.h"
-#ifndef F5LISTS_HEADER
-#define F5LISTS_HEADER
+#ifndef F5CLISTS_HEADER
+#define F5CLISTS_HEADER
 
-#ifdef HAVE_F5
+#ifdef HAVE_F5C
 /*
 ============================
 ============================
@@ -52,6 +52,7 @@ class LNode {
         // needed for gPrev
         LNode*  insert(LPoly* lp);
         LNode*  insert(poly t, int i, poly p, Rule* r);
+        LNode*  insertByDeg(LPoly* lp);
         // insert new elements to the list in front from the labeled / classical polynomial view
         // needed for sPolyList
         LNode*  insertSP(LPoly* lp);
@@ -109,7 +110,8 @@ class LList {
         // needed for gPrev
         void    insert(LPoly* lp);
         void    insert(poly t,int i, poly p, Rule* r = NULL);
-         // insertion in front of the list
+        void    insertByDeg(LPoly* lp);
+        // insertion in front of the list
         // needed for sPolyList
         void    insertSP(LPoly* lp);
         void    insertSP(poly t,int i, poly p, Rule* r = NULL);

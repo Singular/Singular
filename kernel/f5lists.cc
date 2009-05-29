@@ -1,6 +1,6 @@
 #include "mod2.h"
 
-#ifdef HAVE_F5
+#ifdef HAVE_F5C
 #include "kutil.h"
 #include "structs.h"
 #include "omalloc.h"

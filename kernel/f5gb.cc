@@ -1445,7 +1445,20 @@ ideal F5main(ideal id, ring r) {
         
         // DEBUGGING STUFF
         LNode* temp    =   gPrev->getFirst();
-    // computing new groebner basis gbPrev
+    
+
+        /////////////////////////////////////////////////////////////////////////////////
+        //                                                                             // 
+        // one needs to choose one of the following 3 implementations of the algorithm //
+        // F5,F5R or F5C                                                               // 
+        //                                                                             //
+        /////////////////////////////////////////////////////////////////////////////////                                                                            
+        
+        
+        //   
+        // remove this comment to get "F5"
+        //
+        /* 
         if(gPrev->getLength() > gbLength) {
             if(i < IDELEMS(id)) {
                 ideal gbAdd =   idInit(gPrev->getLength()-gbLength,1);
@@ -1457,12 +1470,40 @@ ideal F5main(ideal id, ring r) {
                         counter++;
                         gbAdd->m[j] =   temp->getPoly();
                     }
-                        //if(1 == temp->getDel()) {
-                        //    pWrite(temp->getPoly());
-                        //}
                 }
                     gbPrev          =   idAdd(gbPrev,gbAdd);
-                    //idShow(gbPrev);
+            }
+            else {
+                ideal gbAdd =   idInit(gPrev->getLength()-gbLength,1);
+                LNode*  temp =   gPrevTag;
+                for(j=0;j<=gPrev->getLength()-gbLength-1;j++) {
+                    temp        =   temp->getNext();
+                    gbAdd->m[j] =   temp->getPoly();
+                }
+                gbPrev          =   idAdd(gbPrev,gbAdd);
+            }
+        }
+        gbLength    =   gPrev->getLength();
+        */
+        
+
+        // 
+        // remove this comment to get "F5R"
+        //
+        /* 
+        if(gPrev->getLength() > gbLength) {
+            if(i < IDELEMS(id)) {
+                ideal gbAdd =   idInit(gPrev->getLength()-gbLength,1);
+                LNode*  temp =   gPrevTag;
+                int counter =   0;
+                for(j=0;j<=gPrev->getLength()-gbLength-1;j++) {
+                    temp        =   temp->getNext();
+                    if(0 == temp->getDel()) {
+                        counter++;
+                        gbAdd->m[j] =   temp->getPoly();
+                    }
+                }
+                    gbPrev          =   idAdd(gbPrev,gbAdd);
             }
             else {
                 ideal gbAdd =   idInit(gPrev->getLength()-gbLength,1);
@@ -1474,109 +1515,69 @@ ideal F5main(ideal id, ring r) {
                 gbPrev          =   idAdd(gbPrev,gbAdd);
             }
             // interreduction stuff
+            // comment this out if you want F5 instead of F5R
             if(i<IDELEMS(id)) {
-                //int timer2  =   initTimer();
-                //startTimer();
-                //idShow(gbPrev);
                 ideal tempId    =   kInterRed(gbPrev);
-                //idShow(kInterRed(gbPrev));
-                //idShow(tempId);
                 gbPrev          =   tempId;
-                //timer2  =   getTimer();
-                //Print("Timer INTERREDUCTION: %d\n",timer2);
-                //idShow(gbPrev);
-                //qsortDegree(&gbPrev->m[0],&gbPrev->m[IDELEMS(gbPrev)-1]);
+            }
+        }
+        gbLength    =   gPrev->getLength();
+        */
+        
+
+        // 
+        // Remove this comment to get "F5C"
+        // computing new groebner basis gbPrev
+        //
+         
+        if(gPrev->getLength() > gbLength) {
+            if(i < IDELEMS(id)) {
+                ideal gbAdd =   idInit(gPrev->getLength()-gbLength,1);
+                LNode*  temp =   gPrevTag;
+                for(j=0;j<=gPrev->getLength()-gbLength-1;j++) {
+                    temp        =   temp->getNext();
+                        gbAdd->m[j] =   temp->getPoly();
+                }
+                    gbPrev          =   idAdd(gbPrev,gbAdd);
+            }
+            else {
+                ideal gbAdd =   idInit(gPrev->getLength()-gbLength,1);
+                LNode*  temp =   gPrevTag;
+                for(j=0;j<=gPrev->getLength()-gbLength-1;j++) {
+                    temp        =   temp->getNext();
+                    gbAdd->m[j] =   temp->getPoly();
+                }
+                gbPrev          =   idAdd(gbPrev,gbAdd);
+            }
+            if(i<IDELEMS(id)) {
+                ideal tempId    =   kInterRed(gbPrev);
+                Print("HERE\n");
+                gbPrev          =   tempId;
                 delete gPrev;
-                //sleep(5);
-                //Print("RULES FIRST NOW1: %p\n",rules->getFirst());
-                //Print("HIER\n");
                 delete rules;
-                //delete rTag;
-                //Print("HIER AUCH\n");
-                //Print("%p\n",rules->getFirst());
                 gPrev    =   new LList(pOne,1,gbPrev->m[0]);
                 gPrev->insert(pOne,1,gbPrev->m[1]);
-                //poly tempPoly = pInit();
-                //pLcm(pHead(gbPrev->m[0]),pHead(gbPrev->m[1]),tempPoly);
-                //tempPoly    =   pDivide(tempPoly,pOne());
-                //pSetCoeff(tempPoly,nOne);
                 rules    =   new RList();
                 rTag     =   new RTagList(rules->getFirst());
-                
-                //Print("%p\n",rules->getFirst());
-                //pWrite(tempPoly);
-                //rules->insert(2,tempPoly);
-                //rTag->insert(rules->getFirst());
-                //Print("%p\n",rules->getFirst());
-                //Print("%p\n",rTag->getFirst());
-                //Print("%p\n",rules->getFirst());
-                //Print("%p\n",rules->getFirst()->getNext()->getNext());
-                //Print("HIERLALA\n");
-            //pWrite(rules->getFirst()->getRuleTerm());
-           // Print("RULES FIRST NOW2: %p\n",rules->getFirst());
                 for(k=2; k<IDELEMS(gbPrev); k++) {
                     gPrev->insert(pOne,k+1,gbPrev->m[k]);
                     for(l=0; l<k; l++) {
-                        //pWrite(gbPrev->m[k]);
-                        //pWrite(gbPrev->m[l]);
-                        //poly tempPoly2  =   pOne();
-                        //pLcm(pHead(gbPrev->m[k]),pHead(gbPrev->m[l]),tempPoly2);
-                        //tempPoly2   =   pDivide(tempPoly2,pOne());
-                        //pSetCoeff(tempPoly2,nOne);
-                        //pWrite(tempPoly2);
-                        //rules->insert(k+1,tempPoly2);
                     }
                     rTag->insert(rules->getFirst());
                 }
             }
             gbLength    =   gPrev->getLength(); 
-            /*
-            if(gPrev->getLength() == 4) {
-                poly temp1  =   pInit();
-                poly temp2  =   pInit();
-                poly u      =   pInit();
-                temp1       =   pCopy(gbPrev->m[3]);
-                temp2       =   pCopy(gbPrev->m[2]);
-                u           =   pCopy(gbPrev->m[0]);
-                pIter(u);
-                pIter(u);
-                pIter(u);
-                pIter(u);
-                //pWrite(u);
-                number n    =   nInit(3);
-                pSetCoeff(u,n);
-                poly tempNew        =   pAdd(temp1,pMult(u,temp2));
-                gbPrev->m[3]        =   tempNew;
-                LNode* tempNode4    =   gPrev->getFirst();
-                tempNode4           =   tempNode4->getNext()->getNext()->getNext();
-                tempNode4->setPoly(tempNew);
-                //Print("HIER\n");
-            }
-            */
-        //gPrev->print();
-        //int anzahl  =   1;
-        //while(NULL != temp) {
-        //    Print("%d. Element: ",anzahl);
-        //    pWrite(temp->getPoly());
-        //    Print("\n");
-        //    temp    =   temp->getNext();
-        //    anzahl++;
-        //} 
-        //sleep(5);
-        //Print("GROEBNER BASIS:\n====================================================\n");
-        //idShow(gbPrev);
-        //Print("===================================================\n");
-        //Print("JA\n");
-        //Print("LENGTH OF GPREV: %d\n",gPrev->getLength());
-        //idShow(gbPrev);
-    } 
-        //idShow(gbPrev);
+        }  
+    
+
+
     }
     //Print("\n\nADDING TIME IN REDUCTION: %d\n\n",reductionTime);
     Print("\n\nNumber of zero-reductions:  %d\n",reductionsToZero);
     timer   =   getTimer();
     Print("Highest Degree during computations: %d\n",highestDegree);
-    Print("Time for computations: %d/10000 seconds\n",timer);
+    Print("Time for computations: %d/1000 seconds\n",timer);
+    Print("Number of elements in gb: %d\n",IDELEMS(gbPrev));
     //LNode* temp    =   gPrev->getFirst();
     //while(NULL != temp) {
     //    pWrite(temp->getPoly());
