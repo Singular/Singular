@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.205 2009-05-05 09:54:37 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.206 2009-05-29 16:25:12 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -502,36 +502,40 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
 
 void test_cmd(int i)
 {
-  int ii=(char)i;
+  int ii;
 
-  if (i == (-32))
+  if (i<0)
   {
-    test = 0;
+    ii= -i;
+    if (ii < 32)
+    {
+      test &= ~Sy_bit(ii);
+    }
+    else if (ii < 64)
+    {
+      verbose &= ~Sy_bit(ii-32);
+    }
+    else
+      WerrorS("out of bounds\n");
+  }
+  else if (i<32)
+  {
+    ii=i;
+    if (Sy_bit(ii) & kOptions)
+    {
+      Warn("Gerhard, use the option command");
+      test |= Sy_bit(ii);
+    }
+    else if (Sy_bit(ii) & validOpts)
+      test |= Sy_bit(ii);
+  }
+  else if (i<64)
+  {
+    ii=i-32;
+    verbose |= Sy_bit(ii);
   }
   else
-  {
-    if (i<0)
-    {
-      ii= -i;
-      if (Sy_bit(ii) & kOptions)
-      {
-        Warn("Gerhard, use the option command");
-        test &= ~Sy_bit(ii);
-      }
-      else if (Sy_bit(ii) & validOpts)
-        test &= ~Sy_bit(ii);
-    }
-    else if (i<32)
-    {
-      if (Sy_bit(ii) & kOptions)
-      {
-        Warn("Gerhard, use the option command");
-        test |= Sy_bit(ii);
-      }
-      else if (Sy_bit(ii) & validOpts)
-        test |= Sy_bit(ii);
-    }
-  }
+    WerrorS("out of bounds\n");
 }
 
 int exprlist_length(leftv v)
