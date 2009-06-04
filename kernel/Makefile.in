@@ -251,7 +251,7 @@ DL_LIBSP=
 
 endif
 
-all:	kversion.h libkernel.a \
+all:	kversion.h libkernel.a libkernel_g.a libkernel_p.a \
         ${DL_LIBS} ${DL_LIBSG} ${OBJS2} ${DL_LIBSP}
 
 libkernel.a: ${OBJS}
