@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.162 2009-06-04 01:14:21 motsak Exp $ */
+/* $Id: tgb.cc,v 1.163 2009-06-04 08:55:36 Singular Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1155,12 +1155,14 @@ static void replace_pair(int & i, int & j,slimgb_alg* c)
 }
 
 
-static void add_later(poly p, char* prot, slimgb_alg* c){
+static void add_later(poly p, const char* prot, slimgb_alg* c)
+{
     int i=0;
     //check, if it is already in the queue
 
 
-    while(c->add_later->m[i]!=NULL){
+    while(c->add_later->m[i]!=NULL)
+    {
         if (p_LmEqual(c->add_later->m[i],p,c->r))
             return;
         i++;
@@ -1430,23 +1432,30 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
 
 
              poly short_s=ksCreateShortSpoly(c->S->m[i],c->S->m[j],c->r);
-            if (short_s==NULL){
+            if (short_s==NULL)
+            {
                 c->states[i][j]=HASTREP;
-            } else
+            }
+            else
             {
                 assume(pLength(short_s)==1);
                 if (TEST_V_UPTORADICAL)
                    monomial_root(short_s,c->r);
                 int iS=
                    kFindDivisibleByInS_easy(c->strat,short_s, p_GetShortExpVector(short_s,c->r));
-                if (iS<0){
+                if (iS<0)
+                {
                     //PrintS("N");
-                    if (TRUE) {
-                    c->states[i][j]=HASTREP;
-                    add_later(short_s,"N",c);
-                    } else p_Delete(&short_s,currRing);
+                    if (TRUE)
+                    {
+                      c->states[i][j]=HASTREP;
+                      add_later(short_s,"N",c);
+                    }
+                    else
+                      p_Delete(&short_s,currRing);
                 }
-                else {
+                else
+                {
                     if (c->strat->lenS[iS]>1){
                         //PrintS("O");
                         if (TRUE) {
@@ -1873,12 +1882,12 @@ static void export_mat(number* number_array,int pn, int tn,const char* format_st
   fprintf(out,"mat=[\n");
   for(i=0;i<pn;i++){
     fprintf(out,"[\n");
-    for(j=0;j<tn;j++){
+    for(j=0;j<tn;j++)
+    {
       if (j>0){
         fprintf(out,", ");
       }
       fprintf(out,"%i",npInt(number_array[i*tn+j]));
-      
     }
     if (i<pn-1)
       fprintf(out,"],\n");
@@ -1925,10 +1934,11 @@ static void linalg_step_modp(poly *p, poly* p_out, int& pn, poly* terms,int tn, 
     int base=tn*i;
     number* row=number_array+base;
     h=row_to_poly(row,terms,tn,c->r);
-    
-   if (h!=NULL){
+
+   if (h!=NULL)
+   {
      p_out[p_pos++]=h;
-   } 
+   }
   }
   pn=p_pos;
   //assert(p_pos==rank)
@@ -1940,7 +1950,7 @@ static void linalg_step_modp(poly *p, poly* p_out, int& pn, poly* terms,int tn, 
 #endif
 }
 #endif
-#endif 
+#endif
 static void mass_add(poly* p, int pn,slimgb_alg* c){
     int j;
     int* ibuf=(int*) omalloc(pn*sizeof(int));
@@ -1977,7 +1987,7 @@ static void mass_add(poly* p, int pn,slimgb_alg* c){
       assume(pair_better(c->apairs[z],c->apairs[z-1],c));
     }
   #endif
-   
+
 }
 
 #ifdef NORO_CACHE
@@ -2008,14 +2018,14 @@ void NoroCache::evaluateRows(int level, NoroCacheNode* node){
       dn->row=new DenseRow();
       DenseRow* row=dn->row;
       memset(buffer,0,sizeof(number)*nIrreducibleMonomials);
-      
+
       if (p==NULL) {row->array=NULL;row->begin=0;row->end=0; return;}
       int i=0;
       int idx;
       number* a=buffer;
       while(p){
         DataNoroCacheNode* ref=getCacheReference(p);
-        
+
         idx=ref->term_index;
         assume(idx>=0);
         a[idx]=p_GetCoeff(p,currRing);
@@ -2035,12 +2045,12 @@ void NoroCache::evaluateRows(int level, NoroCacheNode* node){
       int i=0;
       while(p){
         DataNoroCacheNode* ref=getCacheReference(p);
-        
+
         int idx=ref->term_index;
         assume(idx>=0);
         row->idx_array[i]=idx;
         row->coef_array[i]=p_GetCoeff(p,currRing);
-        
+
         i++;
         pIter(p);
       }
@@ -2049,8 +2059,8 @@ void NoroCache::evaluateRows(int level, NoroCacheNode* node){
       }
       assume(i==dn->value_len);
       #endif
-      
-    } 
+
+    }
   }
 }
 
@@ -2087,8 +2097,8 @@ void NoroCache::evaluatePlaceHolder(number* row,std::vector<NoroPlaceHolder>& pl
         }
       }
 
-    
-    
+
+
     #else
     SparseRow* ref_row=ref->row;
     if (ref_row==NULL) continue;
@@ -2147,7 +2157,7 @@ MonRedRes noro_red_mon(poly t, BOOLEAN force_unique, NoroCache* cache,slimgb_alg
         res_holder.changed=FALSE;
         res_holder.p=t;
         res_holder.coef=npInit(1);
-        
+
         res_holder.onlyBorrowed=FALSE;
         return res_holder;
       }
@@ -2184,7 +2194,7 @@ MonRedRes noro_red_mon(poly t, BOOLEAN force_unique, NoroCache* cache,slimgb_alg
 
     res_holder.len=c->strat->lenS[i]-1;
     res=noro_red_non_unique(res,res_holder.len,cache,c);
-    
+
     DataNoroCacheNode* ref=cache->insert(t,res,res_holder.len);
     p_Delete(&t,c->r);
       //p_Delete(&t_copy_mon,c->r);
@@ -2346,7 +2356,7 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
   NoroCache cache;
 #endif
   for(j=0;j<pn;j++){
-   
+
     poly h=p[j];
     int h_len=pLength(h);
 
@@ -2359,11 +2369,11 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
 #endif
     if (h!=NULL){
 #ifndef NORO_CACHE
-     
+
       h=redNFTail(h,c->strat->sl,c->strat,h_len);
       h_len=pLength(h);
 #endif
-      
+
 
       reduced[reduced_c]=h;
       reduced_len[reduced_c]=h_len;
@@ -2380,7 +2390,7 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
   int tc=0;
   for(j=0;j<reduced_c;j++){
     poly h=reduced[j];
-    
+
     while(h!=NULL){
       terms[tc++]=h;
       pIter(h);
@@ -2398,7 +2408,7 @@ void noro_step(poly*p,int &pn,slimgb_alg* c){
   int rank=reduced_c;
   linalg_step_modp(reduced, p,rank,terms,nterms,c);
   omfree(terms);
-  
+
   pn=rank;
   omfree(reduced);
 
@@ -2428,7 +2438,7 @@ static void go_on (slimgb_alg* c){
   c->average_length=c->average_length/c->n;
   i=0;
   int max_pairs=bundle_size;
-  
+
   #ifdef USE_NORO
   if ((use_noro)||(c->use_noro_last_block))
     max_pairs=bundle_size_noro;
@@ -2465,7 +2475,7 @@ static void go_on (slimgb_alg* c){
 #ifdef HAVE_PLURAL
       if (c->nc){
         h= nc_CreateSpoly(c->S->m[s->i], c->S->m[s->j]/*, NULL*/, c->r);
-        
+
         if (h!=NULL)
           pCleardenom(h);
       }
@@ -2506,7 +2516,7 @@ static void go_on (slimgb_alg* c){
   c->replaced=new bool[c->n];
   c->used_b=FALSE;
   #endif
-  
+
   c->normal_forms+=i;
   int j;
 #ifdef USE_NORO
@@ -2514,9 +2524,9 @@ static void go_on (slimgb_alg* c){
   if (use_noro){
     int pn=i;
     if (pn==0) {omfree(p);return;}
-    
+
     {
-      
+
       if (npPrimeM<255){
         noro_step<tgb_uint8>(p,pn,c);
       } else {
@@ -2526,11 +2536,11 @@ static void go_on (slimgb_alg* c){
           noro_step<tgb_uint32>(p,pn,c);
         }
       }
-      
-      
-      
+
+
+
     }
-    
+
     //if (TEST_OPT_PROT){
     //  Print("reported rank:%i\n",pn);
     //}
@@ -2627,12 +2637,12 @@ static void go_on (slimgb_alg* c){
   mass_add(add_those,i,c);
   omfree(add_those);
   omfree(buf);
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
 
   if (TEST_OPT_PROT)
       Print("(%d)",c->pair_top+1);
@@ -2827,7 +2837,7 @@ void slimgb_alg::introduceDelayedPairs(poly* pa,int s){
           pContent(p);
           pCleardenom(p);
         }*/
-        
+
         si->lcm_of_lm=p;
 
         //      c->apairs[n-1-i]=si;
@@ -3218,7 +3228,7 @@ ideal t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode){
         s_h=idrCopyR_NoSort(arg_I,orig_ring);
         idTest(s_h);
         /*int i;
-        
+
         for(i=0;i<IDELEMS(s_h);i++){
             poly p=s_h->m[i];
             while(p){
@@ -3235,24 +3245,24 @@ ideal t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode){
     ideal s_result=do_t_rep_gb(new_ring,s_h,syz_comp,F4_mode,pos);
     ideal result;
     if(orig_ring != new_ring)
-    {   
-        
+    {
+
         idTest(s_result);
         rChangeCurrRing(orig_ring);
         result = idrMoveR_NoSort(s_result, new_ring);
-        
+
         idTest(result);
         //rChangeCurrRing(new_ring);
         rKill(new_ring);
         //rChangeCurrRing(orig_ring);
     }
-    else 
+    else
         result=s_result;
     idTest(result);
     return result;
 }
-    
- 
+
+
 
 ideal do_t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode,int deg_pos){
 
@@ -3444,7 +3454,7 @@ void slimgb_alg::cleanDegs(int lower, int upper){
           {
             pCleardenom(h);
             pContent(h);
-            
+
           } else pNorm(h);
           //TODO:GCD of TERMS
           poly got=::gcd_of_terms(h,r);
@@ -3478,9 +3488,9 @@ void slimgb_alg::cleanDegs(int lower, int upper){
             }
           }
         }
-        
+
     }
-  
+
   }
   {
     int i,j;
@@ -3505,7 +3515,7 @@ sorted_pair_node* top_pair(slimgb_alg* c){
     } else{
       break;
     }
-    
+
   }
 
 
@@ -3952,7 +3962,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
     {
       pCleardenom(clear_into);//should be unnecessary
       pContent(clear_into);
-      
+
     }
     else
       pNorm(clear_into);
@@ -4123,7 +4133,7 @@ static int multi_reduction_clear_zeroes(red_object* los, int  losl, int l, int u
 
 }
 int search_red_object_pos(red_object* a, int top, red_object* key ){
-    
+
     int an = 0;
     int en= top;
     if (top==-1) return 0;
@@ -4168,7 +4178,7 @@ static void sort_region_down(red_object* los, int l, int u, slimgb_alg* c)
     new_indices[i]+=i;
     los_region[i]=los[l+i];
     assume((i==0)||(new_indices[i]>new_indices[i-1]));
-    
+
   }
 
   i=r_size-1;
@@ -4188,7 +4198,7 @@ static void sort_region_down(red_object* los, int l, int u, slimgb_alg* c)
     }
   }
   omfree(los_region);
-  
+
   omfree(new_indices);
 
 }
@@ -4234,7 +4244,7 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
             p_noro[i]=p;
         }
 
-    
+
         if (npPrimeM<255){
           noro_step<tgb_uint8>(p_noro,pn_noro,c);
         } else {
@@ -4249,7 +4259,7 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
             los[i].sev=pGetShortExpVector(los[i].p);
             //ignore quality
             kBucketInit(los[i].bucket,los[i].p,pLength(los[i].p));
-            
+
         }
         qsort(los,pn_noro,sizeof(red_object),red_object_better_gen);
         int deleted=multi_reduction_clear_zeroes(los, losl, pn_noro, curr_pos);
@@ -4258,12 +4268,12 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
         break;
     }
     find_erg erg;
-    
+
     multi_reduction_find(los, losl,c,curr_pos,erg);//last argument should be curr_pos
     if(erg.reduce_by<0) break;
 
-   
-    
+
+
     erg.expand=NULL;
     int d=erg.to_reduce_u-erg.to_reduce_l+1;
 
@@ -4472,7 +4482,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
     {
       pCleardenom(red);//should be unnecessary
       pContent(red);
-      
+
 
     }
     pNormalize(red);

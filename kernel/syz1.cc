@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.13 2008-03-19 17:44:12 Singular Exp $ */
+/* $Id: syz1.cc,v 1.14 2009-06-04 08:55:36 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -600,7 +600,7 @@ static BOOLEAN syOrder(poly p,syStrategy syzstr,int index,
       long new_space = syReorderShiftedComponents(shind, ie);
       assume((LONG_MAX - same_comp) > shind[ie-1]);
       ret = TRUE;
-      if (TEST_OPT_PROT) Print("(T%u)", new_space);
+      if (TEST_OPT_PROT) Print("(T%ld)", new_space);
     }
 
     // yes, then set new shifted component
@@ -624,7 +624,7 @@ static BOOLEAN syOrder(poly p,syStrategy syzstr,int index,
       next = shind[j+1];
       assume((same_comp && prev + 2 < next) || (!same_comp && next - prev >= 4));
       ret = TRUE;
-     if (TEST_OPT_PROT) Print("(B%u)", new_space);
+     if (TEST_OPT_PROT) Print("(B%ld)", new_space);
     }
 
     // make room for insertion of j+1 shifted component
@@ -1533,7 +1533,7 @@ static void syStatistics(resolvente res,int length)
         i++;
         k++;
       }
-      Print("%d elements of degree %d\n",i,deg);
+      Print("%d elements of degree %ld\n",i,deg);
     }
     j++;
   }

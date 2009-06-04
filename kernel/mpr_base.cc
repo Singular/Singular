@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.6 2007-05-24 17:46:04 Singular Exp $ */
+/* $Id: mpr_base.cc,v 1.7 2009-06-04 08:55:36 Singular Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -2789,9 +2789,9 @@ poly uResultant::interpolateDense( const number subDetVal )
   long l=(long)pow( (double)(tdg+1), n );
 
 #ifdef mprDEBUG_PROT
-  Print("// total deg of D: tdg %d\n",tdg);
-  Print("// maximum number of terms in D: mdg: %d\n",mdg);
-  Print("// maximum number of terms in polynom of deg tdg: l %d\n",l);
+  Print("// total deg of D: tdg %ld\n",tdg);
+  Print("// maximum number of terms in D: mdg: %ld\n",mdg);
+  Print("// maximum number of terms in polynom of deg tdg: l %ld\n",l);
 #endif
 
   // we need mdg results of D(p0,p1,...,pn)
@@ -3018,7 +3018,7 @@ rootContainer ** uResultant::interpolateDenseSP( BOOLEAN matchUp, const number s
       mprPROTNnl("",presults[i]);
 
       mprSTICKYPROT(ST_BASE_EV);
-      mprPROTI("",tdg-i);
+      mprPROTL("",tdg-i);
     }
     mprSTICKYPROT("\n");
 

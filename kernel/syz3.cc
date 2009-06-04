@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz3.cc,v 1.3 2005-02-17 09:42:23 Singular Exp $ */
+/* $Id: syz3.cc,v 1.4 2009-06-04 08:55:36 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1990,7 +1990,7 @@ syStrategy syKosz(ideal arg,int * length)
           else
           {
             PrintS("Da ist was faul!!!\n");
-            Print("Aber: Regularitaet %d, Grad %d\n",
+            Print("Aber: Regularitaet %d, Grad %ld\n",
 		   syzstr->regularity,pFDeg(totake[index]->m[i],currRing));
           }
         }

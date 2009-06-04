@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_global.h,v 1.2 2005-05-20 14:35:44 Singular Exp $ */
+/* $Id: mpr_global.h,v 1.3 2009-06-04 08:55:36 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants -
@@ -34,6 +34,7 @@ typedef double mprfloat;
 #define mprPROTP(msg,poly) PrintS(msg);pWrite0(poly)
 #define mprPROTPnl(msg,poly) PrintS(msg);pWrite(poly)
 #define mprPROTI(msg,intval) Print("%s%d",msg,intval)
+#define mprPROTL(msg,intval) Print("%s%ld",msg,intval)
 #define mprPROTInl(msg,intval) Print("%s%d\n",msg,intval)
 #define mprPROTN(msg,nval) PrintS(msg);nPrint(nval);
 #define mprPROTNnl(msg,nval) PrintS(msg);nPrint(nval);PrintLn();
@@ -43,6 +44,7 @@ typedef double mprfloat;
 #define mprPROTP(msg,poly)
 #define mprPROTPnl(msg,poly)
 #define mprPROTI(msg,intval)
+#define mprPROTL(msg,intval)
 #define mprPROTInl(msg,intval)
 #define mprPROTN(msg,nval)
 #define mprPROTNnl(msg,nval)

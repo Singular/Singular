@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.9 2008-01-31 13:22:02 Singular Exp $
+ *  Version: $Id: pDebug.cc,v 1.10 2009-06-04 08:55:36 Singular Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -365,7 +365,7 @@ BOOLEAN pDebugLmShortDivisibleBy(poly p1, unsigned long sev_1, ring r_1,
 
 void pPrintDivisbleByStat()
 {
-  Print("#Tests: %d; #FALSE %d(%d); #SHORT %d(%d)\n",
+  Print("#Tests: %ld; #FALSE %ld(%ld); #SHORT %ld(%ld)\n",
         pDivisibleBy_number,
         pDivisibleBy_FALSE, (unsigned long) ((double)pDivisibleBy_FALSE*((double) 100)/(double)pDivisibleBy_number),
         pDivisibleBy_ShortFalse, (unsigned long) ((double)pDivisibleBy_ShortFalse*((double)100)/(double)pDivisibleBy_FALSE));
