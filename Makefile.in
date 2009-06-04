@@ -485,9 +485,9 @@ cygwin-setup-init:
 	@echo "setup-version: ${CYGWIN_SETUP_VER}" >> ${CYGWIN_REP_DIR}/setup.ini
 	@echo >> ${CYGWIN_REP_DIR}/setup.ini
 	if test -f ${CYGWIN_ORIG}/Small/setup.ini; then                             \
-#		tail -n +7 ${CYGWIN_ORIG}/Small/setup.ini >> ${CYGWIN_REP_DIR}/setup.ini;  \
+		tail -n +7 ${CYGWIN_ORIG}/Small/setup.ini >> ${CYGWIN_REP_DIR}/setup.ini;  \
 	else                                                                        \
-#		tail -n +7 ${CYGWIN_ORIG}/Full/setup.ini >> ${CYGWIN_REP_DIR}/setup.ini;   \
+		tail -n +7 ${CYGWIN_ORIG}/Full/setup.ini >> ${CYGWIN_REP_DIR}/setup.ini;   \
 	fi;
 	@echo >> ${CYGWIN_REP_DIR}/setup.ini
 ##	Download setup exe
