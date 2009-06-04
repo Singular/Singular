@@ -29,7 +29,6 @@
 static CanonicalForm contentWRT(const CanonicalForm & F, const int lev);
 static int degWRT(CanonicalForm F, const int lev);
 static CanonicalForm lcoefWRT( const CanonicalForm & F, const int lev);
-static CanonicalForm newtonInterp(CFList &alpha, CFList &u, const Variable & x);
 static CanonicalForm simpleGCD(const CanonicalForm & A, const CanonicalForm & B);
 CanonicalForm newGCD(CanonicalForm A, CanonicalForm B);
 static CanonicalForm GFPowDown(const CanonicalForm & A, int k);
@@ -230,7 +229,7 @@ static CanonicalForm GFPowDown(const CanonicalForm & A, int k)
 {
   CanonicalForm result = 0;
   int i, j;
-  int fieldSize = pow(getCharacteristic(), getGFDegree());
+  int fieldSize = (int)pow(getCharacteristic(), getGFDegree());
   CanonicalForm g;
   for(i = 0; i <= degree(A); i++)
   {
@@ -300,7 +299,7 @@ CanonicalForm GFMapUp(const CanonicalForm & A, int k)
 // Maps all coefficients of A to the base domain, asumming A is in GF(p^k).
 // The current base domain must be GF(p^j), with j a multiple of k.
 {
-  int p = getCharacteristic();
+  //int p = getCharacteristic();
   int expon = getGFDegree();
   int extExp = expon / k;
     // Assumes that we are using Conway polynomials
@@ -311,7 +310,7 @@ CanonicalForm GFMapDown(const CanonicalForm & A, int k)
 // Maps all coefficients of A from the base domain to GF(p^k).
 // The current base domain must be GF(p^j), with j a multiple of k.
 {
-  int p = getCharacteristic();
+  //int p = getCharacteristic();
   int expon = getGFDegree();
   //cout << "Expon: " << expon << endl;
   int extExp = expon / k;
@@ -351,7 +350,7 @@ CanonicalForm newGCD(CanonicalForm A, CanonicalForm B)
   if (CFFactory::gettype() == GaloisFieldDomain)
   {
     k=getGFDegree();
-    fieldSize = pow(p, k);
+    fieldSize = (int)pow(p, k);
   }
 
   //if(debug)
@@ -391,7 +390,7 @@ CanonicalForm newGCD(CanonicalForm A, CanonicalForm B)
 
   GFRandom genGF;
   FFRandom genFF;
-  int i, j;
+  int i;
   int used;
 
   CanonicalForm c;    // gcd of the contents

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_multivar.cc,v 1.14 2008-03-17 17:44:04 Singular Exp $ */
+/* $Id: fac_multivar.cc,v 1.15 2009-06-04 17:50:49 Singular Exp $ */
 
 #include <config.h>
 
@@ -150,7 +150,6 @@ void find_good_prime(const CanonicalForm &f, int &start)
 {
   if (! f.inBaseDomain() )
   {
-    int l = f.level();
     CFIterator i = f;
     for(;;)
     {
@@ -205,7 +204,7 @@ static CFArray ZFactorizeMulti ( const CanonicalForm & arg )
     CFFList F = factorize( V );
     CFFListIterator I, J;
     CFArray G, lcG, D;
-    int i, j, k, m, r, maxdeg, h;
+    int i, j, r, maxdeg;
     REvaluation A( 2, t, IntRandom( 50 ) );
     CanonicalForm U0;
     CanonicalForm ft, ut, gt, d;
@@ -404,7 +403,7 @@ static CFArray FpFactorizeMulti ( const CanonicalForm & arg )
     CFFList F = factorize( V );
     CFFListIterator I, J;
     CFArray G, lcG, D;
-    int i, j, k, m, r, maxdeg, h;
+    int i, j, r, maxdeg;
     REvaluation A( 2, t, FFRandom() );
     CanonicalForm U0;
     CanonicalForm ft, ut, gt, d;

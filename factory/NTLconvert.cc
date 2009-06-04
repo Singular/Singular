@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.cc,v 1.25 2008-08-20 13:35:55 Singular Exp $ */
+/* $Id: NTLconvert.cc,v 1.26 2009-06-04 17:50:49 Singular Exp $ */
 #include <config.h>
 
 #ifdef HAVE_SINGULAR
@@ -112,7 +112,6 @@ ZZ_pX convertFacCF2NTLZZpX(CanonicalForm f)
   CFIterator i;
   i=f;
 
-  int j=0;
   int NTLcurrentExp=i.exp();
   int largestExp=i.exp();
   int k;
@@ -171,7 +170,6 @@ zz_pX convertFacCF2NTLzzpX(CanonicalForm f)
   CFIterator i;
   i=f;
 
-  int j=0;
   int NTLcurrentExp=i.exp();
   int largestExp=i.exp();
   int k;
@@ -250,7 +248,6 @@ GF2X convertFacCF2NTLGF2X(CanonicalForm f)
   CFIterator i;
   i=f;
 
-  int j=0;
   int NTLcurrentExp=i.exp();
   int largestExp=i.exp();
   int k;
@@ -463,7 +460,6 @@ CFFList convertNTLvec_pair_ZZpX_long2FacCFFList
   //printf("convertNTLvec_pair_ZZpX_long2FacCFFList\n");
   CFFList rueckgabe;
   ZZ_pX polynom;
-  long exponent;
   CanonicalForm bigone;
 
   // Maybe, e may additionally be sorted with respect to increasing degree of x
@@ -489,7 +485,6 @@ CFFList convertNTLvec_pair_zzpX_long2FacCFFList
   //printf("convertNTLvec_pair_zzpX_long2FacCFFList\n");
   CFFList rueckgabe;
   zz_pX polynom;
-  long exponent;
   CanonicalForm bigone;
 
   // Maybe, e may additionally be sorted with respect to increasing degree of x
@@ -698,7 +693,6 @@ ZZX convertFacCF2NTLZZX(CanonicalForm f)
     CFIterator i;
     i=f;
 
-    int j=0;
     int NTLcurrentExp=i.exp();
     int largestExp=i.exp();
     int k;
@@ -1030,7 +1024,6 @@ GF2EX convertFacCF2NTLGF2EX(CanonicalForm f,GF2X mipo)
   CFIterator i;
   i=f;
 
-  int j=0;
   int NTLcurrentExp=i.exp();
   int largestExp=i.exp();
   int k;
@@ -1061,7 +1054,6 @@ ZZ_pEX convertFacCF2NTLZZ_pEX(CanonicalForm f, ZZ_pX mipo)
   CFIterator i;
   i=f;
 
-  int j=0;
   int NTLcurrentExp=i.exp();
   int largestExp=i.exp();
   int k;
@@ -1089,7 +1081,6 @@ zz_pEX convertFacCF2NTLzz_pEX(CanonicalForm f, zz_pX mipo)
   CFIterator i;
   i=f;
 
-  int j=0;
   int NTLcurrentExp=i.exp();
   int largestExp=i.exp();
   int k;

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.68 2008-09-22 16:26:42 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.69 2009-06-04 17:50:49 Singular Exp $ */
 
 #include <config.h>
 
@@ -238,11 +238,10 @@ balance ( const CanonicalForm & f, const CanonicalForm & q )
 }
 //}}}
 
-static CanonicalForm
-gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primitive )
+static CanonicalForm gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primitive )
 {
   CanonicalForm f, g, c, cg, cl, BB, B, M, q, Dp, newD, D, newq;
-  int p, i, n;
+  int p, i;
 
   if ( primitive )
   {
@@ -1087,10 +1086,10 @@ balance_p ( const CanonicalForm & f, const CanonicalForm & q )
 
 CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
 {
-  CanonicalForm f, g, cg, cl, q, Dp, newD, D, newq;
-  int p, i, dp_deg, d_deg;;
+  CanonicalForm f, g, cg, cl, q(0), Dp, newD, D, newq;
+  int p, i, dp_deg, d_deg;
 
-  CanonicalForm cd = bCommonDen( FF );
+  CanonicalForm cd ( bCommonDen( FF ));
   f=cd*FF;
   f /=vcontent(f,Variable(1));
   //cd = bCommonDen( f ); f *=cd;
@@ -1102,7 +1101,6 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
   //cd = bCommonDen( g ); g *=cd;
   //g /=vcontent(g,Variable(1));
 
-  q = 0;
   i = cf_getNumBigPrimes() - 1;
   cl =  f.lc()* g.lc();
 

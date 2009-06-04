@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_multihensel.cc,v 1.10 2008-03-17 17:44:04 Singular Exp $ */
+/* $Id: fac_multihensel.cc,v 1.11 2009-06-04 17:50:49 Singular Exp $ */
 
 #include <config.h>
 
@@ -36,7 +36,8 @@ solveF ( const CFArray & P, const CFArray & Q, const CFArray & S, const CFArray 
     setCharacteristic( pk.getp(), pk.getk() );
     CanonicalForm g, bb, b = mapinto( C );
     int j;
-    for ( j = 1; j < r; j++ ) {
+    for ( j = 1; j < r; j++ )
+    {
         extgcdrest( mapinto( P[j] ), mapinto( Q[j] ), mapinto( S[j] ), mapinto( T[j] ), b, bb, a[j], pk );
         b = bb;
     }
@@ -50,7 +51,8 @@ static CanonicalForm
 evalF ( const CFArray & P, const CFArray & Q, const CFArray & A, int r )
 {
     CanonicalForm pprod = 1, sum = 0;
-    for ( int i = 1; i <= r; i++ ) {
+    for ( int i = 1; i <= r; i++ )
+    {
         sum += pprod * A[i] * Q[i];
         pprod *= P[i];
     }
@@ -64,12 +66,14 @@ derivAndEval ( const CanonicalForm & f, int n, const Variable & x, const Canonic
         return f( a, x );
     else if ( f.degree( x ) < n )
         return 0;
-    else {
+    else
+    {
         CFIterator i;
         CanonicalForm sum = 0, fact;
         int min, j;
         Variable v = Variable( f.level() + 1 );
-        for ( i = swapvar( f, x, v); i.hasTerms() && i.exp() >= n; i++ ) {
+        for ( i = swapvar( f, x, v); i.hasTerms() && i.exp() >= n; i++ )
+        {
             fact = 1;
             min = i.exp() - n;
             for ( j = i.exp(); j > min; j-- )
@@ -106,25 +110,25 @@ prodCombination ( const Evaluation & a, const IteratedFor & e, int k )
     return p;
 }
 
-static CanonicalForm
-check_dummy( const CFArray &a, const CFArray & P, const CFArray & Q )
-{
-    int i, r = a.size();
-    CanonicalForm res, prod;
-    res = 0;
-    prod = 1;
-    for ( i = 1; i <= r; i++ ) {
-        res += prod * a[i] * Q[i];
-        prod *= P[i];
-    }
-    return res;
-}
+//static CanonicalForm check_dummy( const CFArray &a, const CFArray & P, const CFArray & Q )
+//{
+//    int i, r = a.size();
+//    CanonicalForm res, prod;
+//    res = 0;
+//    prod = 1;
+//    for ( i = 1; i <= r; i++ )
+//    {
+//        res += prod * a[i] * Q[i];
+//        prod *= P[i];
+//    }
+//    return res;
+//}
 
-static bool
-check_e( const IteratedFor & e, int k, int m, int * n )
+static bool check_e( const IteratedFor & e, int k, int m, int * n )
 {
     int sum = 0;
-    for ( int i = 2; i < k; i++ ) {
+    for ( int i = 2; i < k; i++ )
+    {
         sum += e[i];
         if ( e[i] > n[i] )
             return false;
@@ -132,11 +136,11 @@ check_e( const IteratedFor & e, int k, int m, int * n )
     return sum == m+1;
 }
 
-static CanonicalForm
-modDeltak ( const CanonicalForm & f, const Evaluation & A, int k, int * n )
+static CanonicalForm modDeltak ( const CanonicalForm & f, const Evaluation & A, int k, int * n )
 {
     CanonicalForm result = f;
-    for ( int i = 2; i < k; i++ ) {
+    for ( int i = 2; i < k; i++ )
+    {
         result.mod( binomialpower( Variable(i), -A[i], n[i]+1 ) );
     }
     return result;
@@ -162,35 +166,44 @@ findCorrCoeffs ( const CFArray & P, const CFArray & Q, const CFArray & P0, const
         A[i] = remainder( pk( a[i] * C0 ), P0[i], pk );
     DEBOUTLN( cerr, "the first approximation of the correction coefficients is " << A );
 #ifdef DEBUGOUTPUT
-    if ( check_dummy( A, P, Q ) - C != 0 ) {
+    if ( check_dummy( A, P, Q ) - C != 0 )
+    {
         DEBOUTLN( cerr, "there is an error detected, the correction coefficients do not" );
         DEBOUTLN( cerr, "fulfill equation F(A)" );
         DEBOUTLN( cerr, "corresponding P " << P );
         DEBOUTLN( cerr, "              Q " << Q );
     }
 #endif
-    for ( m = 0; m <= h && ( m == 0 || Dm != 0 ); m++ ) {
+    for ( m = 0; m <= h && ( m == 0 || Dm != 0 ); m++ )
+    {
         Dm = pk( evalF( P, Q, A, r ) - C );
-        if ( Dm != 0 ) {
-            if ( k == 2 ) {
+        if ( Dm != 0 )
+        {
+            if ( k == 2 )
+            {
                 TIMING_START(fac_solve);
                 solveF( P0, Q0, S, T, Dm, pk, r, a );
                 TIMING_END(fac_solve);
                 for ( i = 1; i <= r; i++ )
                     A[i] -= a[i];
             }
-            else {
+            else
+            {
                 IteratedFor e( 2, k-1, m+1 );
-                while ( e.iterations_left() ) {
-                    if ( check_e( e, k, m, n ) ) {
+                while ( e.iterations_left() )
+                {
+                    if ( check_e( e, k, m, n ) )
+                    {
                         g = pk( checkCombination( Dm, I, e, k ) );
-                        if ( ! g.isZero() && ! (g.mvar() > Variable(1)) ) {
+                        if ( ! g.isZero() && ! (g.mvar() > Variable(1)) )
+                        {
                             prodcomb = prodCombination( I, e, k );
 //                            Dm = Dm - g * prodcomb;
                             TIMING_START(fac_solve);
                             solveF( P0, Q0, S, T, g, pk, r, a );
                             TIMING_END(fac_solve);
-                            for ( i = 1; i <= r; i++ ) {
+                            for ( i = 1; i <= r; i++ )
+                            {
 //                                A[i] -= a[i] * prodcomb;
                                 A[i] = pk( A[i] - a[i] * prodcomb );
                             }
@@ -230,7 +243,8 @@ liftStep ( CFArray & P, int k, int r, int t, const modpk & b, const Evaluation &
     DEBOUTLN( cerr, "the factors so far are " << P );
     DEBOUTLN( cerr, "modulus p^k= " << b.getpk() << "=" << b.getp() <<"^"<< b.getk() );
 
-    for ( i = 1; i <= r; i++ ) {
+    for ( i = 1; i <= r; i++ )
+    {
         Variable vm = Variable( t + 1 );
         Variable v1 = Variable(1);
         K[i] = swapvar( replaceLc( swapvar( P[i], v1, vm ), swapvar( A( lcG[i], k+1, t ), v1, vm ) ), v1, vm );
@@ -242,7 +256,8 @@ liftStep ( CFArray & P, int k, int r, int t, const modpk & b, const Evaluation &
 
     TIMING_START(fac_extgcd);
     Q[r] = 1;
-    for ( i = r; i > 1; i-- ) {
+    for ( i = r; i > 1; i-- )
+    {
         Q[i-1] = Q[i] * P[i];
         P0[i] = A( P[i], 2, k-1 );
         Q0[i] = A( Q[i], 2, k-1 );
@@ -253,17 +268,20 @@ liftStep ( CFArray & P, int k, int r, int t, const modpk & b, const Evaluation &
     extgcd( P0[1], Q0[1], S[1], T[1], b );
     TIMING_END(fac_extgcd);
 
-    for ( m = 1; m <= n[k]+1; m++ ) {
+    for ( m = 1; m <= n[k]+1; m++ )
+    {
         TIMING_START(fac_modpk);
         Rm = modDeltak( prod( K ) - Uk, A, k, n );
         TIMING_END(fac_modpk);
 #ifdef DEBUGOUTPUT
-        if ( mod( Rm, xa1 ) != 0 ) {
+        if ( mod( Rm, xa1 ) != 0 )
+        {
             DEBOUTLN( cerr, "something seems not to be ok with Rm which is " << Rm );
             DEBOUTLN( cerr, "and should reduce to zero modulo " << xa1 );
         }
 #endif
-        if ( mod( Rm, xa2 ) != 0 ) {
+        if ( mod( Rm, xa2 ) != 0 )
+        {
             C = derivAndEval( Rm, m, Variable( k ), A[k] );
             D = 1;
             for ( i = 2; i <= m; i++ ) D *= i;
@@ -274,7 +292,8 @@ liftStep ( CFArray & P, int k, int r, int t, const modpk & b, const Evaluation &
             TIMING_END(fac_corrcoeff);
 // #ifdef DEBUGOUTPUT
 //             dummy = check_dummy( alpha, P, Q );
-//             if ( b(modDeltak( dummy, A, k, n )) != b(modDeltak( C, A, k, n )) ) {
+//             if ( b(modDeltak( dummy, A, k, n )) != b(modDeltak( C, A, k, n )) )
+//             {
 //                 DEBOUTLN( cerr, "lift fault" );
 //                 DEBDECLEVEL( cerr, "liftStep" );
 //                 return false;
@@ -289,7 +308,8 @@ liftStep ( CFArray & P, int k, int r, int t, const modpk & b, const Evaluation &
     }
     for ( i = 1; i <= r; i++ )
         P[i] = K[i];
-    if ( prod( K ) - Uk != 0 ) {
+    if ( prod( K ) - Uk != 0 )
+    {
         DEBOUTLN( cerr, "the liftstep produced the wrong result" );
         DEBOUTLN( cerr, "the product of the factors calculated so far is " << prod(K) );
         DEBOUTLN( cerr, "and the Uk that should have been reached is " << Uk );
@@ -311,11 +331,13 @@ Hensel ( const CanonicalForm & U, CFArray & G, const CFArray & lcG, const Evalua
     int * n = new int[t+1];
 
     Uk[t] = U;
-    for ( k = t-1; k > 1; k-- ) {
+    for ( k = t-1; k > 1; k-- )
+    {
         Uk[k] = Uk[k+1]( A[k+1], Variable( k+1 ) );
         n[k] = degree( Uk[k], Variable( k ) );
     }
-    for ( k = A.min(); goodeval && (k <= t); k++ ) {
+    for ( k = A.min(); goodeval && (k <= t); k++ )
+    {
         h = totaldegree( Uk[k], Variable(A.min()), Variable(k-1) );
         for ( i = A.min(); i <= k; i++ )
             n[i] = degree( Uk[k], Variable(i) );

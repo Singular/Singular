@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_univar.cc,v 1.22 2008-03-17 17:44:04 Singular Exp $ */
+/* $Id: fac_univar.cc,v 1.23 2009-06-04 17:50:49 Singular Exp $ */
 
 #include <config.h>
 
@@ -124,28 +124,26 @@ initHG ( int * a, const Array<CanonicalForm> & F )
 		a[k] = 1;
 }
 
-static int
-cmpFactor( const CFFactor & a, const CFFactor & b )
+static int cmpFactor( const CFFactor & a, const CFFactor & b )
 {
     CFFactor A( a ), B( b );
     return degree( A.factor() ) > degree( B.factor() );
 }
 
-static double
-cf2double ( const CanonicalForm & f )
-{
-    CanonicalForm a = f, q, r;
-    double m = 1, res = 0;
-    if ( a.sign() < 0 ) a = -a;
-    while ( ! a.isZero() ) {
-	divrem( a, 10, q, r );
-	res += m * (double)(r.intval());
-	m *= 10;
-	a = q;
-    }
-    if ( f.sign() < 0 ) res = -res;
-    return res;
-}
+//static double cf2double ( const CanonicalForm & f )
+//{
+//    CanonicalForm a = f, q, r;
+//    double m = 1, res = 0;
+//    if ( a.sign() < 0 ) a = -a;
+//    while ( ! a.isZero() ) {
+//	divrem( a, 10, q, r );
+//	res += m * (double)(r.intval());
+//	m *= 10;
+//	a = q;
+//    }
+//    if ( f.sign() < 0 ) res = -res;
+//    return res;
+//}
 
 //{{{ static int kBound ( const CanonicalForm & f, int p )
 //{{{ docu

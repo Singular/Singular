@@ -63,7 +63,7 @@ FFREvaluation& FFREvaluation::operator= ( const FFREvaluation & e )
 static bool findeval_P( const CanonicalForm & F, const CanonicalForm & G, CanonicalForm & Fb, CanonicalForm & Gb, CanonicalForm & Db, REvaluation & b, int delta, int degF, int degG, int bound, int & counter );
 static void solveF_P ( const CFArray & P, const CFArray & Q, const CFArray & S, const CFArray & T, const CanonicalForm & C, int r, CFArray & a );
 static CanonicalForm derivAndEval_P ( const CanonicalForm & f, int n, const Variable & x, const CanonicalForm & a );
-static CanonicalForm checkCombination_P ( const CanonicalForm & W, const Evaluation & a, const IteratedFor & e, int k );
+//static CanonicalForm checkCombination_P ( const CanonicalForm & W, const Evaluation & a, const IteratedFor & e, int k );
 static CFArray findCorrCoeffs_P ( const CFArray & P, const CFArray & Q, const CFArray & P0, const CFArray & Q0, const CFArray & S, const CFArray & T, const CanonicalForm & C, const Evaluation & I, int r, int k, int h, int * n );
 static bool liftStep_P ( CFArray & P, int k, int r, int t, const Evaluation & A, const CFArray & lcG, const CanonicalForm & Uk, int * n, int h );
 static bool Hensel_P ( const CanonicalForm & U, CFArray & G, const CFArray & lcG, const Evaluation & A, const Variable & x );

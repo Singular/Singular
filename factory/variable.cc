@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: variable.cc,v 1.7 2008-07-01 14:17:49 Singular Exp $ */
+/* $Id: variable.cc,v 1.8 2009-06-04 17:50:50 Singular Exp $ */
 
 #include <config.h>
 
@@ -150,14 +150,14 @@ OSTREAM & operator << ( OSTREAM & os, const Variable & v )
 }
 #endif /* NOSTREAMIO */
 
-static bool legal_mipo( const CanonicalForm & mipo )
-{
-    ASSERT( mipo.inPolyDomain(), "not a legal extension" );
-    bool ok = true;
-    for ( CFIterator i = mipo; ok && i.hasTerms(); i++ )
-	ok = i.coeff().inBaseDomain();
-    return ok;
-}
+//static bool legal_mipo( const CanonicalForm & mipo )
+//{
+//    ASSERT( mipo.inPolyDomain(), "not a legal extension" );
+//    bool ok = true;
+//    for ( CFIterator i = mipo; ok && i.hasTerms(); i++ )
+//	ok = i.coeff().inBaseDomain();
+//    return ok;
+//}
 
 static CanonicalForm conv2mipo ( const CanonicalForm & mipo, const Variable alpha )
 {

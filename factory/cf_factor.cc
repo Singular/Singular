@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.42 2008-07-01 13:53:02 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.43 2009-06-04 17:50:49 Singular Exp $ */
 
 //{{{ docu
 //
@@ -39,14 +39,14 @@
 
 int getExp(); /* cf_char.cc */
 
-static bool isUnivariateBaseDomain( const CanonicalForm & f )
-{
-    CFIterator i = f;
-    bool ok = i.coeff().inBaseDomain();
-    i++;
-    while ( i.hasTerms() && ( ok = ok && i.coeff().inBaseDomain() ) ) i++;
-    return ok;
-}
+//static bool isUnivariateBaseDomain( const CanonicalForm & f )
+//{
+//    CFIterator i = f;
+//    bool ok = i.coeff().inBaseDomain();
+//    i++;
+//    while ( i.hasTerms() && ( ok = ok && i.coeff().inBaseDomain() ) ) i++;
+//    return ok;
+//}
 
 void find_exp(const CanonicalForm & f, int * exp_f)
 {
@@ -167,7 +167,7 @@ void out_cf(char *s1,const CanonicalForm &f,char *s2)
 }
 void out_cff(CFFList &L)
 {
-  int n = L.length();
+  //int n = L.length();
   CFFListIterator J=L;
   int j=0;
   for ( ; J.hasItem(); J++, j++ )
@@ -178,7 +178,7 @@ void out_cff(CFFList &L)
 }
 void test_cff(CFFList &L,const CanonicalForm & f)
 {
-  int n = L.length();
+  //int n = L.length();
   CFFListIterator J=L;
   CanonicalForm t=1;
   int j=0;

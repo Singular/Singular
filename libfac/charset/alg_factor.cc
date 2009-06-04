@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-/* $Id: alg_factor.cc,v 1.26 2008-11-06 14:47:03 Singular Exp $ */
+/* $Id: alg_factor.cc,v 1.27 2009-06-04 17:54:59 Singular Exp $ */
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -10,6 +10,7 @@
 #include <Factor.h>
 #include <SqrFree.h>
 #include <helpstuff.h>
+#include <assert.h>
 // Charset - Includes
 #include "csutil.h"
 #include "charset.h"
@@ -154,13 +155,13 @@ return resultant(fz,gz,v);
 
 // sqr-free routine for algebraic extensions
 // we need it! Ex.: f=c^2+2*a*c-1; as=[a^2+1]; f=(c+a)^2
-static CFFList
-alg_sqrfree( const CanonicalForm & f ){
-  CFFList L;
-
-  L.append(CFFactor(f,1));
-  return L;
-}
+//static CFFList alg_sqrfree( const CanonicalForm & f )
+//{
+//  CFFList L;
+//
+//  L.append(CFFactor(f,1));
+//  return L;
+//}
 
 // Calculates a square free norm
 // Input: f(x, alpha) a square free polynomial over K(alpha),
@@ -437,11 +438,12 @@ simpleextension(const CFList & Astar, const Variable & Extension,
 
 CanonicalForm alg_lc(const CanonicalForm &f)
 {
-  if (f.inCoeffDomain()) return f;
   if (f.level()>0)
   {
     return alg_lc(f.LC());
   }
+  assert(f.inCoeffDomain());
+  return f;
 }
 
 // the heart of the algorithm: the one from Trager
@@ -828,6 +830,9 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.26  2008/11/06 14:47:03  Singular
+*hannes: newfactoras
+
 Revision 1.25  2008/11/06 14:05:51  Singular
 *hannes: newfactoras
 

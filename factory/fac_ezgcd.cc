@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_ezgcd.cc,v 1.28 2007-09-27 16:06:59 Singular Exp $ */
+/* $Id: fac_ezgcd.cc,v 1.29 2009-06-04 17:50:49 Singular Exp $ */
 
 #include <config.h>
 
@@ -231,7 +231,8 @@ ezgcd_specialcase ( const CanonicalForm & F, const CanonicalForm & G, REvaluatio
     /// ---> S1
     DEBOUTLN( cerr, "ezgcdspec: (S1)" );
     Ft = ezgcd( F, F.deriv( x ) );
-    if ( Ft.isOne() ) {
+    if ( Ft.isOne() )
+    {
         // In this case F is squarefree and we came here by bad chance
         // (means: bad evaluation point).  Try again with another
         // evaluation point.  Bug fix (?) by JS.  The bad example was
@@ -301,7 +302,6 @@ ezgcd_specialcase ( const CanonicalForm & F, const CanonicalForm & G, REvaluatio
 static void
 findeval( const CanonicalForm & F, const CanonicalForm & G, CanonicalForm & Fb, CanonicalForm & Gb, CanonicalForm & Db, REvaluation & b, int delta, int degF, int degG )
 {
-    int i;
     bool ok;
     if ( delta != 0 )
         b.nextpoint();
