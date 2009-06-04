@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ringgb.cc,v 1.17 2009-05-06 12:53:49 Singular Exp $ */
+/* $Id: ringgb.cc,v 1.18 2009-06-04 12:39:32 Singular Exp $ */
 /*
 * ABSTRACT: ringgb interface
 */
@@ -124,7 +124,8 @@ poly ringRedNF (poly f, ideal G, ring r)
   poly h = NULL;
   poly g = pCopy(f);
   int c = 0;
-  while (g != NULL) {
+  while (g != NULL)
+  {
     Print("%d-step RedNF - g=", c);
     wrp(g);
     PrintS(" | h=");
@@ -227,33 +228,36 @@ int testGB(ideal I, ideal GI) {
   poly f, g, h, nf;
   int i = 0;
   int j = 0;
-  Print("I included?");
+  PrintS("I included?");
   for (i = 0; i < IDELEMS(I); i++) {
     if (ringNF(I->m[i], GI, currRing) != NULL) {
-      Print("Not reduced to zero from I: ");
+      PrintS("Not reduced to zero from I: ");
       wrp(I->m[i]);
-      Print(" --> ");
+      PrintS(" --> ");
       wrp(ringNF(I->m[i], GI, currRing));
       PrintLn();
       return(0);
     }
-    Print("-");
+    PrintS("-");
   }
-  Print(" Yes!\nspoly --> 0?");
-  for (i = 0; i < IDELEMS(GI); i++) {
-    for (j = i + 1; j < IDELEMS(GI); j++) {
+  PrintS(" Yes!\nspoly --> 0?");
+  for (i = 0; i < IDELEMS(GI); i++)
+  {
+    for (j = i + 1; j < IDELEMS(GI); j++)
+    {
       f = pCopy(GI->m[i]);
       g = pCopy(GI->m[j]);
       h = plain_spoly(f, g);
       nf = ringNF(h, GI, currRing);
-      if (nf != NULL) {
-        Print("spoly(");
+      if (nf != NULL)
+      {
+        PrintS("spoly(");
         wrp(GI->m[i]);
-        Print(", ");
+        PrintS(", ");
         wrp(GI->m[j]);
-        Print(") = ");
+        PrintS(") = ");
         wrp(h);
-        Print(" --> ");
+        PrintS(" --> ");
         wrp(nf);
         PrintLn();
         return(0);
@@ -262,34 +266,34 @@ int testGB(ideal I, ideal GI) {
       pDelete(&g);
       pDelete(&h);
       pDelete(&nf);
-      Print("-");
+      PrintS("-");
     }
   }
   if (!(rField_is_Domain()))
   {
-    Print(" Yes!\nzero-spoly --> 0?");
+    PrintS(" Yes!\nzero-spoly --> 0?");
     for (i = 0; i < IDELEMS(GI); i++)
     {
       f = plain_zero_spoly(GI->m[i]);
       nf = ringNF(f, GI, currRing);
       if (nf != NULL) {
-        Print("spoly(");
+        PrintS("spoly(");
         wrp(GI->m[i]);
-        Print(", ");
+        PrintS(", ");
         wrp(0);
-        Print(") = ");
+        PrintS(") = ");
         wrp(h);
-        Print(" --> ");
+        PrintS(" --> ");
         wrp(nf);
         PrintLn();
         return(0);
       }
       pDelete(&f);
       pDelete(&nf);
-      Print("-");
+      PrintS("-");
     }
   }
-  Print(" Yes!");
+  PrintS(" Yes!");
   PrintLn();
   return(1);
 }

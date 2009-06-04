@@ -43,7 +43,7 @@ void Debug()
 {
   LCI it=T->root;
 
-  Print("T==================================\n");
+  PrintS("T==================================\n");
   while (it)
   {
     pWrite(it->info->root);
@@ -52,7 +52,7 @@ void Debug()
 
   it=Q->root;
 
-  Print("Q==================================\n");
+  PrintS("Q==================================\n");
   while (it)
   {
     if (it->info->root) pWrite(it->info->root);
@@ -63,7 +63,7 @@ void Debug()
     }
     it=it->next;
   }
-  Print("===================================\n");
+  PrintS("===================================\n");
 }
 
 int ReducePolyLead(Poly *x,Poly *y)
@@ -240,7 +240,7 @@ void NFL(Poly *p, TreeM *F)
   count=0;
   while(f && p->root)
   {
-//    Print("R");
+//    PrintS("R");
 //    if (TEST_OPT_PROT) { PrintS("R"); mflush(); }
 #if 0
     old_size=nSize(pGetCoeff(p->root));
@@ -263,7 +263,7 @@ void NFL(Poly *p, TreeM *F)
         pSimpleContent(p->root,2);
         kBucketInit(p->root_b,p->root,p->root_l);
         count=0;
-        //Print(".");
+        //PrintS(".");
       }
 #endif
       f=is_div_(F,p->root);
@@ -650,7 +650,7 @@ void NFListQ()
 
     while (*l)
     {
-//      Print("*");
+//      PrintS("*");
       int ploc=pow_((*l)->info->lead);
 
       if (ploc == p)
@@ -664,9 +664,9 @@ void NFListQ()
         };
 
         (*l)->info->changed=0;
-//        Print("!");
+//        PrintS("!");
         NFL((*l)->info,G);
-//                                Print("$");
+//                                PrintS("$");
         if (!(*l)->info->root)
         {
           ll=(*l);
@@ -680,7 +680,7 @@ void NFListQ()
       l=&((*l)->next);
     }
   }while(p1);
-//  Print("\n");
+//  PrintLn();
 }
 
 
@@ -996,7 +996,7 @@ int ComputeBasis(jList *_T,jList *_Q)
 
   while((h=FindMinList(Q))!=NULL)
   {
-//        Print("New element\n");
+//        PrintS("New element\n");
 //  Debug();
 
         if (!degree_compatible)
@@ -1028,24 +1028,24 @@ int ComputeBasis(jList *_T,jList *_Q)
 
           if (h->changed && ListGreatMove(T,Q,h->root))
           {
-//      Print("<-\n");
+//      PrintS("<-\n");
             DestroyTree(G->root);
             G->root=create();
             T2G();
           }
         }
 
-//  Print("PNF\n");
+//  PrintS("PNF\n");
         PNF(h,G);
 //        Print("{%d}\n",pow_(h->root));
         insert_(&G,h);
         InsertInList(T,h);
 
-//  Print("For each PNF\n");
+//  PrintS("For each PNF\n");
         if (degree_compatible)
             ForEachPNF(T,pow_(h->root));
 
-//  Print("Control of prolongations\n");
+//  PrintS("Control of prolongations\n");
         if (h->changed)
             ForEachControlProlong(T);
         else
@@ -1053,7 +1053,7 @@ int ComputeBasis(jList *_T,jList *_Q)
 
 //  Debug();
 
-//  Print("NFListQ\n");
+//  PrintS("NFListQ\n");
         if (degree_compatible)
             NFListQ();
 //Debug();

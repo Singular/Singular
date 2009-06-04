@@ -6,7 +6,7 @@
  *  Purpose: Ore-noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: ratgring.cc,v 1.24 2009-03-10 15:47:18 levandov Exp $
+ *  Version: $Id: ratgring.cc,v 1.25 2009-06-04 12:43:27 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "ratgring.h"
@@ -161,7 +161,7 @@ void p_ExpVectorDiffRat(poly pr, poly p1, poly p2, int ishift, ring r)
     if (e1 < e2)
     {
 #ifdef PDEBUG
-      Print("negative ExpVectorDiff\n");
+      PrintS("negative ExpVectorDiff\n");
 #endif    
       p_Delete(&t,r);
       break;
@@ -184,11 +184,11 @@ ideal ncGCD2(poly p, poly q, const ring r)
   h->m[0] = p_Copy(p,r);
   h->m[1] = p_Copy(q,r);
 #ifdef PDEBUG
-  Print("running syzygy comp. for nc_GCD:\n");
+  PrintS("running syzygy comp. for nc_GCD:\n");
 #endif
   ideal sh = idSyzygies(h, testHomog, &w);
 #ifdef PDEBUG
-  Print("done syzygy comp. for nc_GCD\n");
+  PrintS("done syzygy comp. for nc_GCD\n");
 #endif
   /* in comm case, there is only 1 syzygy */
   /*   singclap_gcd(); */
@@ -199,8 +199,8 @@ ideal ncGCD2(poly p, poly q, const ring r)
   K2 = pTakeOutComp(&K, 1);
 //  K2 = K; 
 
-  Print("syz1: "); p_wrp(K1,r);
-  Print("syz2: "); p_wrp(K2,r);
+  PrintS("syz1: "); p_wrp(K1,r);
+  PrintS("syz2: "); p_wrp(K2,r);
 
   /* checking signs before multiplying */    
   number ck1 = p_GetCoeff(K1,r);

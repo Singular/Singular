@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.119 2009-06-04 08:42:07 Singular Exp $ */
+/* $Id: ring.cc,v 1.120 2009-06-04 12:43:27 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -367,7 +367,7 @@ void rWrite(ring r)
       for (i = r->block0[l]-1; i<r->block1[l]; i++)
       {
         nlen = strlen(r->names[i]);
-        Print("%s ",r->names[i]);
+        PrintS(r->names[i]);
       }
     }
 #ifndef NDEBUG
@@ -436,7 +436,7 @@ void rWrite(ring r)
     {
       Print("\n//   alternating variables: [%d, %d]", scaFirstAltVar(r), scaLastAltVar(r));
       const ideal Q = SCAQuotient(r); // resides within r!
-      Print("\n//   quotient of sca by ideal");
+      PrintS("\n//   quotient of sca by ideal");
 
       if (Q!=NULL)
       {
@@ -3640,14 +3640,14 @@ void rDebugPrint(ring r)
       if ((r->typ[j].ord_typ==ro_wp)
       || (r->typ[j].ord_typ==ro_wp_neg))
       {
-        Print(" w:");
+        PrintS(" w:");
         int l;
         for(l=r->typ[j].data.wp.start;l<=r->typ[j].data.wp.end;l++)
           Print(" %d",r->typ[j].data.wp.weights[l-r->typ[j].data.wp.start]);
       }
       else if (r->typ[j].ord_typ==ro_wp64)
       {
-        Print(" w64:");
+        PrintS(" w64:");
         int l;
         for(l=r->typ[j].data.wp64.start;l<=r->typ[j].data.wp64.end;l++)
           Print(" %ld",(long)(((int64*)r->typ[j].data.wp64.weights64)+l-r->typ[j].data.wp64.start));
