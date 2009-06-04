@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.6 2007-09-17 08:33:17 Singular Exp $
+ *  Version: $Id: fast_maps.cc,v 1.7 2009-06-04 08:32:59 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -98,10 +98,10 @@ void maMonomial_Out(mapoly monomial, ring src_r, ring dest_r)
     printf(" dest:");
     p_wrp(monomial->dest, dest_r);
   }
-  if (monomial->f1!=NULL) { printf(" f1:%x", (long)monomial->f1->src);
+  if (monomial->f1!=NULL) { printf(" f1:%lx", (long)monomial->f1->src);
                             // p_wrp(monomial->f1->src, src_r);
                           }
-  if (monomial->f2!=NULL) { printf(" f2:%x",(long)monomial->f2->src);
+  if (monomial->f2!=NULL) { printf(" f2:%lx",(long)monomial->f2->src);
                             // p_wrp(monomial->f2->src, src_r);
                           }
   printf("\n");
@@ -367,7 +367,7 @@ ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
   if (TEST_OPT_PROT)
   {
     maPoly_GetLength(mp, length);
-    Print("map[%ld:%ld]{%d:", dest_r->bitmask, dest_r->ExpL_Size, length);
+    Print("map[%ld:%d]{%d:", dest_r->bitmask, dest_r->ExpL_Size, length);
   }
 
   // do the optimization step

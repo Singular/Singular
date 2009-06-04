@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.3 2005-12-15 08:52:19 bricken Exp $ */
+/* $Id: sparsmat.cc,v 1.4 2009-06-04 08:32:59 Singular Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -255,7 +255,7 @@ void smRingChange(ring *origR, sip_sring &tmpR, Exponent_t bound)
   rComplete(&tmpR,1);
   rChangeCurrRing(&tmpR);
   if (TEST_OPT_PROT)
-    Print("[%d:%d]", (long) tmpR.bitmask, tmpR.ExpL_Size);
+    Print("[%ld:%d]", (long) tmpR.bitmask, tmpR.ExpL_Size);
 }
 
 void smRingClean(ring origR, ip_sring &tmpR)
@@ -329,7 +329,7 @@ poly smCallDet(ideal I)
 {
   if (I->ncols != I->rank)
   {
-    Werror("det of %d x %d module (matrix)",I->rank,I->ncols);
+    Werror("det of %ld x %d module (matrix)",I->rank,I->ncols);
     return NULL;
   }
   int r=idRankFreeModule(I);

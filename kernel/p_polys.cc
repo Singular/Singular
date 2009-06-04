@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.15 2008-07-26 16:15:44 Singular Exp $
+ *  Version: $Id: p_polys.cc,v 1.16 2009-06-04 08:32:59 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -87,20 +87,31 @@ void p_Setm_General(poly p, const ring r)
           e=o->data.wp64.end;
           int64 *w=o->data.wp64.weights64;
           int64 ei,wi,ai;
-          for(int i=a;i<=e;i++) {
+          for(int i=a;i<=e;i++)
+	  {
             //Print("exp %d w %d \n",p_GetExp(p,i,r),(int)w[i-a]);
             //ord+=((int64)p_GetExp(p,i,r))*w[i-a];
             ei=(int64)p_GetExp(p,i,r);
             wi=w[i-a];
             ai=ei*wi;
-            if(ei!=0 && ai/ei!=wi){
+            if(ei!=0 && ai/ei!=wi)
+	    {
               pSetm_error=TRUE;
+	      #if SIZEOF_LONG == 4
               Print("ai %lld, wi %lld\n",ai,wi);
+	      #else
+              Print("ai %ld, wi %ld\n",ai,wi);
+	      #endif
             }
             ord+=ai;
-            if (ord<ai){
-               pSetm_error=TRUE;
-               Print("ai %lld, ord %lld\n",ai,ord);
+            if (ord<ai)
+	    {
+              pSetm_error=TRUE;
+	      #if SIZEOF_LONG == 4
+              Print("ai %lld, ord %lld\n",ai,ord);
+	      #else
+              Print("ai %ld, ord %ld\n",ai,ord);
+	      #endif
             }
           }
           int64 mask=(int64)0x7fffffff;

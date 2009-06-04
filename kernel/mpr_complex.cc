@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.7 2008-12-18 10:23:50 Singular Exp $ */
+/* $Id: mpr_complex.cc,v 1.8 2009-06-04 08:32:59 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -722,7 +722,7 @@ char *complexToStr( gmp_complex & c, const unsigned int oprec )
       else // (-i*43) or (i*34)
       {
         if (c.imag().isOne())
-          sprintf(out,currRing->parameter[0]);
+          sprintf(out,"%s",currRing->parameter[0]);
         else if (c.imag().isMOne())
           sprintf(out,"-%s",currRing->parameter[0]);
         else

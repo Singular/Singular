@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.40 2009-01-06 16:47:13 Singular Exp $ */
+/* $Id: longrat.cc,v 1.41 2009-06-04 08:32:59 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -198,7 +198,7 @@ BOOLEAN nlDBTest(number a, const char *f,const int l)
   {
     if (((((long)a)<<1)>>1)!=((long)a))
     {
-      Print(" !!longrat:arith:%x in %s:%d\n",(long)a, f,l);
+      Print(" !!longrat:arith:%lx in %s:%d\n",(long)a, f,l);
       return FALSE;
     }
     return TRUE;
@@ -217,13 +217,13 @@ BOOLEAN nlDBTest(number a, const char *f,const int l)
   }
   omCheckAddrSize(a->z._mp_d,a->z._mp_alloc*BYTES_PER_MP_LIMB);
   if (a->z._mp_alloc==0)
-    Print("!!longrat:z->alloc=0 in %s:%l\n",f,l);
+    Print("!!longrat:z->alloc=0 in %s:%d\n",f,l);
 
   if (a->s<2)
   {
     omCheckIf(omCheckAddrSize(a->n._mp_d,a->n._mp_alloc*BYTES_PER_MP_LIMB), return FALSE);
     if (a->z._mp_alloc==0)
-      Print("!!longrat:n->alloc=0 in %s:%l\n",f,l);
+      Print("!!longrat:n->alloc=0 in %s:%d\n",f,l);
     if ((mpz_size1(&a->n) ==1) && (mpz_cmp_si(&a->n,(long)1)==0))
     {
       Print("!!longrat:integer as rational in %s:%d\n",f,l);
