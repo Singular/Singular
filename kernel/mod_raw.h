@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.h,v 1.4 2008-03-19 17:44:10 Singular Exp $ */
+/* $Id: mod_raw.h,v 1.5 2009-06-04 10:18:12 Singular Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -19,7 +19,7 @@ lib_types type_of_LIB(char *newlib, char *fullname);
 
 #if defined(HAVE_DL)
 #ifdef __cplusplus
-void* dynl_open_binary_warn(char* binary_name, const char* msg = NULL );
+void* dynl_open_binary_warn(const char* binary_name, const char* msg = NULL );
 void* dynl_sym_warn(void* handle, const char* proc, const char* msg = NULL );
 #endif
 

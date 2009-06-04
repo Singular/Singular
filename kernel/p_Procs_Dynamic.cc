@@ -6,7 +6,7 @@
  *  Purpose: source for dynamically loaded version of p_Procs
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Dynamic.cc,v 1.4 2008-06-20 12:29:09 Singular Exp $
+ *  Version: $Id: p_Procs_Dynamic.cc,v 1.5 2009-06-04 10:25:22 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "structs.h"
@@ -187,7 +187,7 @@ static void* GetDynamicProc(const char* proc_s, p_Proc proc,
     {
       proc_ptr = GetGeneralProc(proc);
 #ifdef RDEBUG
-      sprintf(proc_name, GetGeneralProcName(proc));
+      sprintf(proc_name,"%s", GetGeneralProcName(proc));
 #endif
     }
   }

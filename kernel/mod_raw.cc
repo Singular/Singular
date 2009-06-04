@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.15 2009-04-21 09:53:59 Singular Exp $ */
+/* $Id: mod_raw.cc,v 1.16 2009-06-04 10:18:12 Singular Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -106,7 +106,7 @@ static BOOLEAN warn_proc = FALSE;
 #define DL_TAIL "so"
 #endif
 
-void* dynl_open_binary_warn(char* binary_name, const char* msg)
+void* dynl_open_binary_warn(const char* binary_name, const char* msg)
 {
   void* handle = NULL;
   const char* bin_dir = feGetResource('b');
