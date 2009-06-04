@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.73 2009-05-18 12:36:23 Singular Exp $ */
+/* $Id: ideals.cc,v 1.74 2009-06-04 08:14:57 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -71,7 +71,7 @@ void idShow(ideal id)
     Print("(NULL)");
   else
   {
-    Print("Module of rank %d,real rank %d and %d generators.\n",
+    Print("Module of rank %ld,real rank %ld and %d generators.\n",
            id->rank,idRankFreeModule(id),IDELEMS(id));
     for (int i=0;i<id->ncols*id->nrows;i++)
     {
@@ -2957,7 +2957,7 @@ matrix idModule2Matrix(ideal mod)
 #ifdef TEST
       if (cp>mod->rank)
       {
-        Print("## inv. rank %d -> %d\n",mod->rank,cp);
+        Print("## inv. rank %ld -> %d\n",mod->rank,cp);
         int k,l,o=mod->rank;
         mod->rank=cp;
         matrix d=mpNew(mod->rank,IDELEMS(mod));

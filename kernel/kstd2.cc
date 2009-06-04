@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.86 2009-05-06 12:53:48 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.87 2009-06-04 08:15:45 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -779,7 +779,7 @@ int redHoney (LObject* h, kStrategy strat)
     {
       //h->wrp(); Print("<%d>\n",h->GetpLength());
       reddeg = d;
-      Print(".%d",d); mflush();
+      Print(".%ld",d); mflush();
     }
   }
 }

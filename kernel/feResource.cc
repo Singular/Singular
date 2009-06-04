@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.9 2008-03-19 17:44:08 Singular Exp $ */
+/* $Id: feResource.cc,v 1.10 2009-06-04 08:11:42 Singular Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -58,7 +58,7 @@ typedef struct feResourceConfig_s
   feResourceType  type;  // type of Resource
   const char*           env;   // env variable to look for
   const char*           fmt;   // format string -- see below for epxlaination
-  char*     value; // what it was set to
+  char*                 value; // what it was set to: may be changed
 } feResourceConfig_s;
 typedef feResourceConfig_s * feResourceConfig;
 
@@ -80,35 +80,35 @@ static feResourceConfig_s feResourceConfigs[] =
    "%d/LIB;"
    "%d/../LIB"
    ""},
-  {"Singular",  'S',    feResBinary,"SINGULAR_EXECUTABLE",  "%d/"S_UNAME"/Singular",""},
-  {"BinDir",    'b',    feResDir,   "SINGULAR_BIN_DIR",     "%d/"S_UNAME            ""},
-  {"RootDir",   'r',    feResDir,   "SINGULAR_ROOT_DIR",    "%b/..",                ""},
-  {"DefaultDir",'d',    feResDir,   "SINGULAR_DEFAULT_DIR",  SINGULAR_DEFAULT_DIR,  ""},
-  {"InfoFile",  'i',    feResFile,  "SINGULAR_INFO_FILE",   "%r/info/singular.hlp", ""},
-  {"IdxFile",   'x',    feResFile,  "SINGULAR_IDX_FILE",    "%r/doc/singular.idx",  ""},
-  {"HtmlDir",   'h',    feResDir,   "SINGULAR_HTML_DIR",    "%r/html",              ""},
+  {"Singular",  'S',    feResBinary,"SINGULAR_EXECUTABLE",  "%d/"S_UNAME"/Singular",(char *)""},
+  {"BinDir",    'b',    feResDir,   "SINGULAR_BIN_DIR",     "%d/"S_UNAME,           (char *)""},
+  {"RootDir",   'r',    feResDir,   "SINGULAR_ROOT_DIR",    "%b/..",                (char *)""},
+  {"DefaultDir",'d',    feResDir,   "SINGULAR_DEFAULT_DIR",  SINGULAR_DEFAULT_DIR,  (char *)""},
+  {"InfoFile",  'i',    feResFile,  "SINGULAR_INFO_FILE",   "%r/info/singular.hlp", (char *)""},
+  {"IdxFile",   'x',    feResFile,  "SINGULAR_IDX_FILE",    "%r/doc/singular.idx",  (char *)""},
+  {"HtmlDir",   'h',    feResDir,   "SINGULAR_HTML_DIR",    "%r/html",              (char *)""},
 #ifdef ix86_Win
-  {"HtmlHelpFile",   'C',    feResFile,   "SINGULAR_CHM_FILE",    "%r/doc/Manual.chm",              ""},
+  {"HtmlHelpFile",'C',  feResFile,  "SINGULAR_CHM_FILE",    "%r/doc/Manual.chm",    (char *)""},
 #endif
-  {"ManualUrl", 'u',    feResUrl,   "SINGULAR_URL",         "http://www.singular.uni-kl.de/Manual/"S_VERSION1,    ""},
-  {"ExDir",      'm',   feResDir,   "SINGULAR_EXAMPLES_DIR","%r/examples",              ""},
-  {"Path",      'p',    feResPath,  NULL,                   "%b;$PATH",         ""},
+  {"ManualUrl", 'u',    feResUrl,   "SINGULAR_URL",         "http://www.singular.uni-kl.de/Manual/"S_VERSION1,    (char *)""},
+  {"ExDir",     'm',    feResDir,   "SINGULAR_EXAMPLES_DIR","%r/examples",          (char *)""},
+  {"Path",      'p',    feResPath,  NULL,                   "%b;$PATH",             (char *)""},
 
 #ifdef ESINGULAR
-  {"emacs",    'E',    feResBinary, "ESINGULAR_EMACS",      "%b/emacs",              ""},
-  {"xemacs",    'A',    feResBinary, "ESINGULAR_EMACS",      "%b/xemacs",              ""},
-  {"SingularEmacs",'M',feResBinary, "ESINGULAR_SINGULAR",    "%b/Singular",           ""},
-  {"EmacsLoad",'l',    feResFile,   "ESINGULAR_EMACS_LOAD",  "%e/.emacs-singular",             ""},
-  {"EmacsDir",  'e',    feResDir,   "ESINGULAR_EMACS_DIR",   "%r/emacs",             ""},
+  {"emacs",     'E',    feResBinary,"ESINGULAR_EMACS",      "%b/emacs",             (char *)""},
+  {"xemacs",    'A',    feResBinary,"ESINGULAR_EMACS",      "%b/xemacs",            (char *)""},
+  {"SingularEmacs",'M', feResBinary,"ESINGULAR_SINGULAR",   "%b/Singular",          (char *)""},
+  {"EmacsLoad", 'l',    feResFile,  "ESINGULAR_EMACS_LOAD", "%e/.emacs-singular",   (char *)""},
+  {"EmacsDir",  'e',    feResDir,   "ESINGULAR_EMACS_DIR",  "%r/emacs",             (char *)""},
 #elif defined(TSINGULAR)
-  {"SingularXterm",'M',feResBinary, "TSINGULAR_SINGULAR",    "%b/Singular",           ""},
+  {"SingularXterm",'M', feResBinary,"TSINGULAR_SINGULAR",   "%b/Singular",          (char *)""},
 #ifdef ix86_Win
-  {"rxvt",     'X',    feResBinary,"RXVT",                "%b/rxvt",             ""},
+  {"rxvt",      'X',    feResBinary,"RXVT",                 "%b/rxvt",              (char *)""},
 #else
-  {"xterm",     'X',    feResBinary,"XTERM",                "%b/xterm",             ""},
+  {"xterm",     'X',    feResBinary,"XTERM",                "%b/xterm",             (char *)""},
 #endif
 #else
-  {"EmacsDir",  'e',    feResDir,   "SINGULAR_EMACS_DIR",   "%r/emacs",             ""},
+  {"EmacsDir",  'e',    feResDir,   "SINGULAR_EMACS_DIR",   "%r/emacs",             (char *)""},
 #endif
   {NULL, 0, feResUndef, NULL, NULL, NULL}, // must be the last record
 };
@@ -218,7 +218,7 @@ void feReInitResources()
     {
       if (feResourceConfigs[i].value != NULL)
         omFree(feResourceConfigs[i].value);
-      feResourceConfigs[i].value = "";
+      feResourceConfigs[i].value = (char *)"";
     }
     i++;
   }
