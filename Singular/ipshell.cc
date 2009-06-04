@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.206 2009-05-29 16:25:12 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.207 2009-06-04 09:58:49 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -2164,7 +2164,7 @@ ring rCompose(const lists  L)
     R->ch=(int)(long)L->m[0].Data();
     if (R->ch!=-1)
     {
-      int l;
+      int l=0;
       if (((R->ch!=0) && (R->ch<2) && (is_gf_char=-1))
       #ifndef NV_OPS
       || (R->ch > 32003)
@@ -3928,7 +3928,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   int deg= pLDeg( gls, &ldummy, currRing );
   //  int deg= pDeg( gls );
   int len= pLength( gls );
-  int i,vpos;
+  int i,vpos=0;
   poly piter;
   lists elist;
   lists rlist;

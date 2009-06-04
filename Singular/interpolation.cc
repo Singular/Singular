@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: interpolation.cc,v 1.5 2007-07-06 07:32:03 Singular Exp $ */
+/* $Id: interpolation.cc,v 1.6 2009-06-04 09:58:49 Singular Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -145,7 +145,7 @@ void WriteMono (mono_type m) // Writes a monomial on the screen - only for debug
 {
      int i;
      for (i=0;i<variables;i++) Print("_%d", m[i]);
-     Print(" ");
+     PrintS(" ");
 }
 
 #ifdef debb
@@ -238,7 +238,7 @@ modp_number OneInverse(modp_number a,modp_number p) // computes inverse of d mod
 // now it should be ok, but for any case...
    if ((u1<0)||((u1*a)%p!=1))
    {
-     Print("?");
+     PrintS("?");
      modp_number i;
      for (i=1;i<p;i++)
      {
@@ -763,7 +763,7 @@ void ReduceRow ()  // reduces my_row by previous rows, does the same for solve r
            }
            row_ptr=row_ptr->next;
 #ifdef debb
-           Print("reduction by row ");
+           PrintS("reduction by row ");
            Info ();
 #endif
      }
@@ -1028,7 +1028,7 @@ void PresentGenerator (int i)  // only for debuging, writes a generator in its f
         {
             Print("%d;", cur_gen->coef[j]);
         }
-        Print(" and LT = ");
+        PrintS(" and LT = ");
         WriteMono (cur_gen->lt);
         Print(" ( %d )  prime = %d\n", cur_gen->ltcoef, cur_ptr->p);
         cur_ptr=cur_ptr->next;
@@ -1186,7 +1186,7 @@ void Discard ()  // some unlucky prime occures
      else
      {
 #ifdef writemsg
-        Print("-discarding ALL.\n");
+        PrintS("-discarding ALL.\n");
 #endif
         int i;
         modp_result_entry *ntfree;
@@ -1227,9 +1227,9 @@ void CheckColumnSequence () // checks if scheme of computations is as generic on
      if (cur_result->n_generators!=generic_n_generators)
      {
 #ifdef writemsg
-        Print("wrong number of generators occured");
+        PrintS("wrong number of generators occured");
 #else
-        if (protocol) Print("ng");
+        if (protocol) PrintS("ng");
 #endif
         Discard ();
         return;
@@ -1237,9 +1237,9 @@ void CheckColumnSequence () // checks if scheme of computations is as generic on
      if (denom_divisible)
      {
 #ifdef writemsg
-        Print("denom of coef divisible by p");
+        PrintS("denom of coef divisible by p");
 #else
-        if (protocol) Print("dp");
+        if (protocol) PrintS("dp");
 #endif
         Discard ();
         return;
@@ -1253,9 +1253,9 @@ void CheckColumnSequence () // checks if scheme of computations is as generic on
          if (!EqualMon(cur_mon->mon,cur_gen->lt))
          {
 #ifdef writemsg
-            Print("wrong leading term occured");
+            PrintS("wrong leading term occured");
 #else
-            if (protocol) Print("lt");
+            if (protocol) PrintS("lt");
 #endif
             Discard ();
             return;
@@ -1268,9 +1268,9 @@ void CheckColumnSequence () // checks if scheme of computations is as generic on
          if (!EqualMon(generic_column_name[i],column_name[i]))
          {
 #ifdef writemsg
-            Print("wrong seq of cols occured");
+            PrintS("wrong seq of cols occured");
 #else
-            if (protocol) Print("sc");
+            if (protocol) PrintS("sc");
 #endif
             Discard ();
             return;
@@ -1287,13 +1287,13 @@ void WriteGenerator () // writes generator (only for debugging)
      for (i=0;i<=final_base_dim;i++)
      {
          str=mpz_get_str(str,10,polycoef[i]);
-         Print(str);
-         Print("*");
+         PrintS(str);
+         PrintS("*");
          WriteMono(polyexp[i]);
-         Print(" ");
+         PrintS(" ");
      }
      mdmFREE(str);
-     Print("\n");
+     PrintLn();
 }
 
 bool CheckGenerator () // evaluates generator to check whether it is good
@@ -1386,15 +1386,15 @@ void ShowGenList ()
      temp=gen_list;
      while (temp!=NULL)
      {
-         Print("generator: ");
+         PrintS("generator: ");
          for (i=0;i<=final_base_dim;i++)
          {
              str=mpz_get_str(str,10,temp->polycoef[i]);
-             Print(str);
-             Print("*");
+             PrintS(str);
+             PrintS("*");
              WriteMono(temp->polyexp[i]);
          }
-         Print("\n");
+         PrintLn();
          temp=temp->next;
      }
      mdmFREE(str);
@@ -1523,9 +1523,9 @@ ideal interpolation(lists L, intvec *v)
 #ifdef writemsg
   Print("number of variables: %d\n", variables);
   Print("number of points: %d\n", n_points);
-  Print("multiplicities: ");
+  PrintS("multiplicities: ");
   for (i=0;i<n_points;i++) Print("%d ", multiplicity[i]);
-  Print("\n");
+  PrintLn();
   Print("general initialization for dimension %d ...\n", final_base_dim);
 #endif
 
@@ -1575,7 +1575,7 @@ ideal interpolation(lists L, intvec *v)
         }
         else
         {
-          Print("not a variable? ");
+          PrintS("not a variable? ");
           wrp(p);
           PrintLn();
           data_ok=false;
@@ -1610,7 +1610,7 @@ ideal interpolation(lists L, intvec *v)
   if (!only_modp) IntegerPoints ();
   MakeConditions ();
 #ifdef writemsg
-  Print("done.\n");
+  PrintS("done.\n");
 #else
   if (protocol) Print("[vdim %d]",final_base_dim);
 #endif
@@ -1661,9 +1661,9 @@ ideal interpolation(lists L, intvec *v)
                if (!correct_gen)
                {
 #ifdef writemsg
-                  Print("wrong generator!\n");
+                  PrintS("wrong generator!\n");
 #else
-//                  if (protocol) Print("!g");
+//                  if (protocol) PrintS("!g");
 #endif
                   ClearGenList ();
                   break;
@@ -1687,9 +1687,9 @@ ideal interpolation(lists L, intvec *v)
 // end of main procedure ************************************************************************************
 
 #ifdef writemsg
-  Print("computations finished.\n");
+  PrintS("computations finished.\n");
 #else
-  if (protocol) Print("\n");
+  if (protocol) PrintLn();
 #endif
 
   if (!correct_gen)

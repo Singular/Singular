@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.127 2008-10-01 15:18:44 seelisch Exp $ */
+/* $Id: iplib.cc,v 1.128 2009-06-04 09:58:49 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -272,7 +272,7 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
       return NULL; // example part does not exist
     // load example
     fseek(fp, pi->data.s.example_start, SEEK_SET);
-    fgets(buf, sizeof(buf), fp); // skip line with "example"
+    char *dummy=fgets(buf, sizeof(buf), fp); // skip line with "example"
     procbuflen = pi->data.s.proc_end - pi->data.s.example_start - strlen(buf);
     //Print("Example=%ld-%ld=%d\n", pi->data.s.proc_end,
     //  pi->data.s.example_start, procbuflen);

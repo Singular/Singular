@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: sing_dbm.cc,v 1.19 2005-03-25 17:13:06 levandov Exp $
+// $Id: sing_dbm.cc,v 1.20 2009-06-04 10:00:55 Singular Exp $
 //
 //**************************************************************************/
 //  'sing_dbm.cc' containes command to handle dbm-files under
@@ -289,7 +289,7 @@ typedef struct {
 //**************************************************************************/
 LINKAGE BOOLEAN dbOpen(si_link l, short flag)
 {
-  char *mode = "r";
+  const char *mode = "r";
   DBM_info *db;
   int dbm_flags = O_RDONLY | O_CREAT;  // open database readonly as default
 

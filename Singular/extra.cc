@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.301 2009-05-29 16:24:52 Singular Exp $ */
+/* $Id: extra.cc,v 1.302 2009-06-04 09:58:49 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -748,19 +748,18 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           a=(int)((long)(h->Data()));
           h=h->next;
         }
-        else return TRUE;
-        if ((h!=NULL) && (h->Typ()==INT_CMD))
+        else if ((h!=NULL) && (h->Typ()==INT_CMD))
         {
           b=(int)((long)(h->Data()));
           h=h->next;
         }
-        else return TRUE;
-        if ((h!=NULL) && (h->Typ()==RING_CMD))
+        else if ((h!=NULL) && (h->Typ()==RING_CMD))
         {
           r=(ring)h->Data();
           h=h->next;
         }
-        else return TRUE;
+        else
+	  return TRUE;
         if ((h!=NULL) && (h->Typ()==INT_CMD))
         {
           metric=(int)((long)(h->Data()));
@@ -923,14 +922,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 /*==================== oppose ==================================*/
     if (strcmp(sys_cmd, "oppose")==0)
     {
-      ring Rop;
-      if ((h!=NULL) && (h->Typ()==RING_CMD))
+      if ((h!=NULL) && (h->Typ()==RING_CMD)
+      && (h->next!=-NULL))
       {
-        Rop = (ring)h->Data();
+        ring Rop = (ring)h->Data();
         h   = h->next;
-      }
-      if ((h!=NULL))
-      {
         idhdl w;
         if ((w=Rop->idroot->get(h->Name(),myynest))!=NULL)
         {
@@ -939,7 +935,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           res->rtyp = POLY_CMD;
           return FALSE;
         }
-       }
+      }
       else
       {
         WerrorS("`system(\"oppose\",<ring>,<poly>)` expected");

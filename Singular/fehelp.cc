@@ -3,7 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
-* versin $Id: fehelp.cc,v 1.56 2009-03-02 15:34:59 Singular Exp $
+* versin $Id: fehelp.cc,v 1.57 2009-06-04 09:58:49 Singular Exp $
 */
 
 #include <string.h>
@@ -1079,7 +1079,7 @@ static void heGenHelp(heEntry hentry, int br)
     }
   }
   Print("running `%s`\n",sys);
-  system(sys);
+  int dummy=system(sys);
 }
 
 #ifdef ix86_Win
@@ -1207,7 +1207,7 @@ static int show(unsigned long offset, char *close)
 static int singular_manual(char *str)
 { FILE *index=NULL;
   unsigned long offset;
-  char *p,close;
+  char *p,close=' ';
   int done = 0;
   char buffer[BUF_LEN+1],
        Index[IDX_LEN+1],
@@ -1235,7 +1235,7 @@ static int singular_manual(char *str)
 
   while(!feof(index))
   {
-    (void)fgets(buffer, BUF_LEN, index); /* */
+    char* dummy=fgets(buffer, BUF_LEN, index); /* */
     (void)sscanf(buffer, "Node:%[^\177]\177%ld\n", Index, &offset);
     for(p=Index; *p; p++) *p = tolow(*p);/* */
     (void)strcat(Index, " ");
