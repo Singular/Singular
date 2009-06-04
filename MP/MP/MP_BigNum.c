@@ -9,6 +9,7 @@
  ***************************************************************/
 
 #include "MP.h"
+#include <string.h>
 
 MP_BigIntOps_t imp_dummy_bigint_ops =
 {

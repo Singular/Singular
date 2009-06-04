@@ -11,7 +11,7 @@
 
 #include "MPT.h"
 
-char *MPT_errlist[] =
+const char *MPT_errlist[] =
 {
   "MPT: MPT_Failure",
   "MPT: MPT_Success",
@@ -37,7 +37,7 @@ MPT_Status_t MPT_CheckError()
   return status;
 }
 
-char*  MPT_ErrorStr(MPT_Status_t error)
+const char*  MPT_ErrorStr(MPT_Status_t error)
 {
   if (error < MPT_MaxError && error > 0)
     return MPT_errlist[error];
@@ -45,7 +45,7 @@ char*  MPT_ErrorStr(MPT_Status_t error)
     return "Unknown MPT error number";
 }
 
-char* MPT_LinkErrorStr(MP_Link_pt link, MPT_Status_t error)
+const char* MPT_LinkErrorStr(MP_Link_pt link, MPT_Status_t error)
 {
   if (error == MPT_MP_Failure &&
       link != NULL && link->MP_errno >= 0 && link->MP_errno != MP_Success)

@@ -139,10 +139,11 @@
  */
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_Link.c,v 1.6 2008-07-09 07:42:23 Singular Exp $";
+static char vcid[] = "@(#) $Id: MP_Link.c,v 1.7 2009-06-04 09:43:40 Singular Exp $";
 #endif /* lint */
 
 #include "MP.h"
+#include <string.h>
 
 #define log_msg_len 128
 static char log_msg[log_msg_len];  /* for event logging */
@@ -873,12 +874,12 @@ MP_Status_t  IMP_GetBytes(link, addr, len)
 
 #ifdef __STDC__
 MP_Status_t IMP_PutBytes(MP_Link_pt    link,
-                         char *       addr,
+                         const char *  addr,
                          unsigned long len)
 #else
 MP_Status_t IMP_PutBytes(link, addr, len)
     MP_Link_pt    link;
-    char *       addr;
+    const char *  addr;
     unsigned long len;
 #endif
 {

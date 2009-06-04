@@ -75,7 +75,7 @@ private:
   bool _dynamic;
 } * MPT_GP_Iterator_pt;
 
-typedef class MPT_GP_ValueIterator_t : public MPT_GP_Iterator_t
+class MPT_GP_ValueIterator_t : public MPT_GP_Iterator_t
 {
 public:
   MPT_GP_ValueIterator_t(MPT_Tree_pt tree, long vtype);

@@ -78,6 +78,7 @@
 
 
 #include "MP.h"
+#include <string.h>
 
 
 static char filler[4]={0, 0, 0, 0};
@@ -379,11 +380,11 @@ MP_Status_t IMP_PutString(link, s)
 
 
 #ifdef __STDC__
-MP_Status_t common_put_string(MP_Link_pt link, char *s)
+MP_Status_t common_put_string(MP_Link_pt link, const char *s)
 #else
 MP_Status_t common_put_string(link, s)
     MP_Link_pt  link;
-    char       *s;
+    const char       *s;
 #endif
 {
     short   extra;

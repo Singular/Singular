@@ -202,11 +202,11 @@ typedef MPT_Errors MPT_Status_t;
 extern MPT_Status_t MPT_errno;
 
 /* defined in MPT_Error.c */
-extern char *MPT_errlist[];
+extern const char *MPT_errlist[];
 
 extern MPT_Status_t MPT_CheckStatus();
-extern char* MPT_ErrorStr(MPT_Status_t error);
-extern char* MPT_LinkErrorStr(MP_Link_pt link, MPT_Status_t error);
+extern const char* MPT_ErrorStr(MPT_Status_t error);
+extern const char* MPT_LinkErrorStr(MP_Link_pt link, MPT_Status_t error);
 
 /* #define MPT_DEBUG 1 */
 #ifdef MPT_DEBUG

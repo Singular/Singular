@@ -902,7 +902,7 @@ EXTERN MP_Status_t IMP_PutLong _ANSI_ARGS_((MP_Link_pt link, long *lp));
 EXTERN MP_Status_t IMP_GetBytes _ANSI_ARGS_((MP_Link_pt link, char *addr,
                                              unsigned long len));
 
-EXTERN MP_Status_t IMP_PutBytes _ANSI_ARGS_((MP_Link_pt link, char *addr,
+EXTERN MP_Status_t IMP_PutBytes _ANSI_ARGS_((MP_Link_pt link, const char *addr,
                                              unsigned long len));
 
 EXTERN MP_Status_t IMP_Restore _ANSI_ARGS_((MP_Link_pt link, unsigned long n));

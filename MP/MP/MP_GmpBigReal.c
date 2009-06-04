@@ -11,6 +11,7 @@
  ************************************************************************/
 
 #include "MP.h"
+#include <string.h>
 
 #ifdef MP_HAVE_GMP_APREAL
 
