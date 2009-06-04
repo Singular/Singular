@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.142 2009-06-04 08:32:59 Singular Exp $ */
+/* $Id: kutil.cc,v 1.143 2009-06-04 08:42:06 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -6459,7 +6459,7 @@ void kDebugPrint(kStrategy strat)
     else if (strat->red==redHoney) PrintS("redHoney\n");
     else if (strat->red==redEcart) PrintS("redEcart\n");
     else if (strat->red==redHomog) PrintS("redHomog\n");
-    else  Print("%lx\n",(long)(void*)strat->red);
+    else  Print("%p\n",(void*)strat->red);
   PrintS("posInT: ");
     if (strat->posInT==posInT0) PrintS("posInT0\n");
     else if (strat->posInT==posInT0) PrintS("posInT0\n");
@@ -6479,7 +6479,7 @@ void kDebugPrint(kStrategy strat)
 #endif
     else if (strat->posInT==posInT_EcartpLength) PrintS("posInT_EcartpLength\n");
     else if (strat->posInT==posInTrg0) PrintS("posInTrg0\n");
-    else  Print("%lx\n",(long)(void*)strat->posInT);
+    else  Print("%p\n",(void*)strat->posInT);
   PrintS("posInL: ");
     if (strat->posInL==posInL0) PrintS("posInL0\n");
     else if (strat->posInL==posInL10) PrintS("posInL10\n");
@@ -6491,20 +6491,20 @@ void kDebugPrint(kStrategy strat)
     else if (strat->posInL==posInL17_c) PrintS("posInL17\n");
     else if (strat->posInL==posInLSpecial) PrintS("posInLSpecial\n");
     else if (strat->posInL==posInLrg0) PrintS("posInLrg0\n");
-    else  Print("%lx\n",(long)(void*)strat->posInL);
+    else  Print("%p\n",(void*)strat->posInL);
   PrintS("enterS: ");
     if (strat->enterS==enterSBba) PrintS("enterSBba\n");
     else if (strat->enterS==enterSMora) PrintS("enterSMora\n");
     else if (strat->enterS==enterSMoraNF) PrintS("enterSMoraNF\n");
-    else  Print("%lx\n",(long)(void*)strat->enterS);
+    else  Print("%p\n",(void*)strat->enterS);
   PrintS("initEcart: ");
     if (strat->initEcart==initEcartBBA) PrintS("initEcartBBA\n");
     else if (strat->initEcart==initEcartNormal) PrintS("initEcartNormal\n");
-    else  Print("%lx\n",(long)(void*)strat->initEcart);
+    else  Print("%p\n",(void*)strat->initEcart);
   PrintS("initEcartPair: ");
     if (strat->initEcartPair==initEcartPairBba) PrintS("initEcartPairBba\n");
     else if (strat->initEcartPair==initEcartPairMora) PrintS("initEcartPairMora\n");
-    else  Print("%lx\n",(long)(void*)strat->initEcartPair);
+    else  Print("%p\n",(void*)strat->initEcartPair);
   Print("homog=%d, LazyDegree=%d, LazyPass=%d, ak=%d,\n",
          strat->homog, strat->LazyDegree,strat->LazyPass, strat->ak);
   Print("honey=%d, sugarCrit=%d, Gebauer=%d, noTailReduction=%d\n",

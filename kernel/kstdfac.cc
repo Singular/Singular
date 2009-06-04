@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.19 2009-06-04 08:19:51 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.20 2009-06-04 08:42:06 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -505,7 +505,7 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
             {
               if (TEST_OPT_DEBUG)
               {
-                Print("empty set because:L[%lx]\n",(long)(void *)Lj);
+                Print("empty set because:L[%p]\n",(void *)Lj);
               }
               while (n->Ll >= 0) deleteInL(n->L,&n->Ll,n->Ll,n);
               while (n->tl >= 0)
@@ -831,7 +831,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
 #endif
                 if (TEST_OPT_DEBUG)
                 {
-                  Print("empty set because:L[%lx]\n",(long)(void*)Lj);
+                  Print("empty set because:L[%p]\n",(void*)Lj);
                 }
                 while (n->Ll >= 0) deleteInL(n->L,&n->Ll,n->Ll,n);
                 while (n->tl >= 0)
@@ -1000,7 +1000,7 @@ ideal_list kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
 #endif
           if (TEST_OPT_DEBUG)
           {
-            Print("empty set L[%lx] because:L[%lx]\n",(long)(void*)Lj,(long)(void*)Li);
+            Print("empty set L[%p] because:L[%p]\n",(void*)Lj,(void*)Li);
           }
           // delete L[j],
           Li=L; 

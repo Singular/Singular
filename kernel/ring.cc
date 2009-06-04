@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.118 2009-05-25 11:35:16 Singular Exp $ */
+/* $Id: ring.cc,v 1.119 2009-06-04 08:42:07 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -387,8 +387,13 @@ void rWrite(ring r)
         for (i = 0; i<=r->block1[l]-r->block0[l]; i++)
         {
           if (r->order[l] == ringorder_a64)
-          { int64 *w=(int64 *)r->wvhdl[l];
+          {
+	    int64 *w=(int64 *)r->wvhdl[l];
+	    #if SIZEOF_LONG == 4
             Print("%*lld " ,nlen,w[i+j],i+j);
+	    #else
+            Print("%*ld "  ,nlen,w[i+j],i+j);
+	    #endif
           }
           else
             Print("%*d " ,nlen,r->wvhdl[l][i+j],i+j);
@@ -3610,7 +3615,7 @@ void rDebugPrint(ring r)
   Print("ExpL_Size:%d ",r->ExpL_Size);
   Print("CmpL_Size:%d ",r->CmpL_Size);
   Print("VarL_Size:%d\n",r->VarL_Size);
-  Print("bitmask=0x%x (expbound=%d) \n",r->bitmask, r->bitmask);
+  Print("bitmask=0x%lx (expbound=%ld) \n",r->bitmask, r->bitmask);
   Print("BitsPerExp=%d ExpPerLong=%d MinExpPerLong=%d at L[%d]\n", r->BitsPerExp, r->ExpPerLong, r->MinExpPerLong, r->VarL_Offset[0]);
   PrintS("varoffset:\n");
   if (r->VarOffset==NULL) PrintS(" NULL\n");
@@ -3618,10 +3623,10 @@ void rDebugPrint(ring r)
     for(j=0;j<=r->N;j++)
       Print("  v%d at e-pos %d, bit %d\n",
             j,r->VarOffset[j] & 0xffffff, r->VarOffset[j] >>24);
-  Print("divmask=%p\n", r->divmask);
+  Print("divmask=%lx\n", r->divmask);
   PrintS("ordsgn:\n");
   for(j=0;j<r->CmpL_Size;j++)
-    Print("  ordsgn %d at pos %d\n",r->ordsgn[j],j);
+    Print("  ordsgn %ld at pos %d\n",r->ordsgn[j],j);
   Print("OrdSgn:%d\n",r->OrdSgn);
   PrintS("ordrec:\n");
   for(j=0;j<r->OrdSize;j++)
@@ -3645,7 +3650,7 @@ void rDebugPrint(ring r)
         Print(" w64:");
         int l;
         for(l=r->typ[j].data.wp64.start;l<=r->typ[j].data.wp64.end;l++)
-          Print(" %l",(long)(((int64*)r->typ[j].data.wp64.weights64)+l-r->typ[j].data.wp64.start));
+          Print(" %ld",(long)(((int64*)r->typ[j].data.wp64.weights64)+l-r->typ[j].data.wp64.start));
       }
     }
     PrintLn();
@@ -3657,7 +3662,7 @@ void rDebugPrint(ring r)
   {
     Print("L[%d]: ",j);
     if (j< r->CmpL_Size)
-      Print("ordsgn %d ", r->ordsgn[j]);
+      Print("ordsgn %ld ", r->ordsgn[j]);
     else
       PrintS("no comp ");
     i=1;
@@ -3710,7 +3715,7 @@ void p_DebugPrint(poly p, const ring r)
     for(i=0;i<r->ExpL_Size;i++)
       Print("%ld ",p->exp[i]);
     PrintLn();
-    Print("v0:%d ",p_GetComp(p, r));
+    Print("v0:%ld ",p_GetComp(p, r));
     for(i=1;i<=r->N;i++) Print(" v%d:%d",i,p_GetExp(p,i, r));
     PrintLn();
     pIter(p);
