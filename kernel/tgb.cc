@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.161 2009-02-23 13:50:52 Singular Exp $ */
+/* $Id: tgb.cc,v 1.162 2009-06-04 01:14:21 motsak Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -12,9 +12,9 @@
 //using namespace std;
 
 
-///@TODO: delay nur auf Sugarvergr�erung
+///@TODO: delay nur auf Sugarvergr?erung
 ///@TODO: grade aus ecartS, setze dazu strat->honey; und nutze p.ecart
-//@TODO: no tail reductions in syz comp
+///@TODO: no tail reductions in syz comp
 #include "mod2.h"
 #include "tgb.h"
 #include "tgb_internal.h"
