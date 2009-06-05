@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: intvec.h,v 1.7 2009-05-15 13:20:05 motsak Exp $ */
+/* $Id: intvec.h,v 1.8 2009-06-05 05:18:27 motsak Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -30,8 +30,9 @@ public:
     }
   intvec(int s, int e);
   intvec(int r, int c, int init);
-  intvec(intvec* iv)
+  intvec(const intvec* iv)
   {
+    assume( iv != NULL );
     row = iv->rows();
     col = iv->cols();
     v   = (int *)omAlloc(sizeof(int)*row*col);
@@ -110,17 +111,19 @@ public:
     return addr;
   }
   void operator delete ( void* block )
-  { //omfree( block ); 
+  { //omfree( block );
     omFreeBin((ADDRESS)block, intvec_bin);
   }
 #endif
   // keiner (ausser obachman) darf das folgenden benutzen !!!
   inline int * ivGetVec() { return v; }
 };
-inline intvec * ivCopy(intvec * o)
+inline intvec * ivCopy(const intvec * o)
 {
-  intvec * iv=new intvec(o);
-  return iv;
+  if( o != NULL )
+    return new intvec(o);
+
+  return NULL;
 }
 
 intvec * ivAdd(intvec * a, intvec * b);
