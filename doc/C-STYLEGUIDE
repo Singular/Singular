@@ -11,13 +11,16 @@ C/C++-Style guide for Singular
 
 - C/C++ files - structure
   - TODO: What about Copyright note?
+    (Contained in COPYING unless otherwise specified).
   - each C/C++ file (abc.c/abc.cc/abc.h) should start with a short comment
     about its purpose in doxygen format (TODO: see file templates) giving
     at least the filename and a brief description of the contents. 
-    TODO: should not contain CVS $Id: C-STYLEGUIDE,v 1.4 2009-06-05 02:34:06 motsak Exp $ tag!?
+    (Each header of a file should contain an Id/Rev field)
+    TODO: should not contain CVS $Id: C-STYLEGUIDE,v 1.5 2009-06-05 11:01:19 Singular Exp $ tag!?
   - order "#include" statements from global to local scope:
       i. first: all system include files: 
         #include <iostream>, #include <boost/shred_ptr.h>
+       (remember to include optional include files in #ifdef ... #end)
      ii. only source files: #include "mod2.h"
     iii. at last: all other files (which you really need):
         #include "poly.h" etc.
@@ -63,12 +66,20 @@ C/C++-Style guide for Singular
   - declare local variables as late as possible and with the smallest possible
     visibility scope
   - avoid using "goto", "continue", "break" statements 
-    (save for "switch/case" blocks)
+    (save for "switch/case" blocks and error handling)
   - compiler warnings should be enabled and regarded as errors
   - whenever possible, constants should be defined as "const variables" 
-    not via "#define" 
-  - macroses should be avoided. Use "inline" functions instead
+    not via "#define".
+    Non pure C++ parts must use #define. 
+  - Consider the choice between macros and inline function very careful,
+    prefer inline functions:
+    - macros are not type safe
+    + macros are allways inlined
+    - arguments to macros can be multiply computed
 
+    - "inline" is only a hint for the optimizer (especially in the C parts):
+      in non-optimzed code these functions are NOT inlined.
+    -/+ inline functions are not generic (requires the defined types)
 
 - Naming conventions:
   - All code and global variables must conform to this naming convention,
