@@ -16,7 +16,6 @@ C/C++-Style guide for Singular
     about its purpose in doxygen format (TODO: see file templates) giving
     at least the filename and a brief description of the contents. 
     (Each header of a file should contain an Id/Rev field)
-    TODO: should not contain CVS $Id: C-STYLEGUIDE,v 1.5 2009-06-05 11:01:19 Singular Exp $ tag!?
   - order "#include" statements from global to local scope:
       i. first: all system include files: 
         #include <iostream>, #include <boost/shred_ptr.h>
