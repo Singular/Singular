@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-05-29 07:52:12 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.57 2009-05-29 07:52:12 monerjan Exp $
-$Id: gfan.cc,v 1.57 2009-05-29 07:52:12 monerjan Exp $
+$Date: 2009-06-09 15:23:08 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.58 2009-06-09 15:23:08 monerjan Exp $
+$Id: gfan.cc,v 1.58 2009-06-09 15:23:08 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -238,7 +238,7 @@ class gcone
 		ring baseRing;		//the basering of the cone		
 		/* TODO in order to save memory use pointers to rootRing and inputIdeal instead */
 		intvec *ivIntPt;	//an interior point of the cone
-		int UCN;		//unique number of the cone
+		static int UCN;		//unique number of the cone
 		
 	public:	
 		/** \brief Pointer to the first facet */
@@ -263,9 +263,9 @@ class gcone
 		gcone()
 		{
 			this->next=NULL;
-			this->facetPtr=NULL;	//maybe this->facetPtr = new facet();
+			this->facetPtr=NULL;	//maybe this->facetPtr = new facet();			
 			this->baseRing=currRing;
-			this->UCN=1;
+			this->UCN++;
 			this->numFacets=0;
 		}
 		
@@ -279,18 +279,19 @@ class gcone
 		gcone(ring r, ideal I)
 		{
 			this->next=NULL;
-			this->facetPtr=NULL;
+			this->facetPtr=NULL;			
 			this->rootRing=r;
 			this->inputIdeal=I;
 			this->baseRing=currRing;
-			this->UCN=1;
+			this->UCN++;
 			this->numFacets=0;
 		}
 		
 		/** \brief Copy constructor 
 		*
-		* Copies one cone, sets this->gcBasis to the flipped GB and reverses the 
+		* Copies a cone, sets this->gcBasis to the flipped GB and reverses the 
 		* direction of the according facet normal
+		* Call this only after a successfull call to gcone::flip which sets facet::flipGB
 		*/			
 		//NOTE Prolly need to specify the facet to flip over
 		gcone(const gcone& gc, const facet &f)		
@@ -301,10 +302,12 @@ class gcone
 			facet *fAct= new facet();			
 			this->facetPtr=fAct;
 			
-			intvec *ivtmp = new intvec(this->numVars);						
+			intvec *ivtmp = new intvec(this->numVars);
+			//NOTE ivtmp = f->getFacetNormal();						
 			ivtmp = gc.facetPtr->getFacetNormal();			
 			
 			ideal gb;
+			//NOTE gb=f->getFlipGB();
 			gb=gc.facetPtr->getFlipGB();			
 			this->gcBasis=gb;	//this cone's GB is the flipped GB			
 			
@@ -344,10 +347,19 @@ class gcone
 			ivIntPt->show();
 		}
 		
-		void showFacets()
+		void showFacets(short codim=1)
 		{
-			facet *f = new facet();
-			f = this->facetPtr;
+			facet *f;
+			switch(codim)
+			{
+				case 1:
+					f = this->facetPtr;
+					break;
+				case 2:
+					f = this->facetPtr->codim2Ptr;
+					break;
+			}			
+			
 			intvec *iv = new intvec(this->numVars);
 			
 			while (f->next!=NULL)
@@ -356,9 +368,8 @@ class gcone
 				iv->show();
 				f=f->next;
 			}
- 			//delete iv;
- 			//delete f;
-		}		
+ 			//delete iv; 			
+		}
 		
 		/** \brief Set gcone::numFacets */
 		void setNumFacets()
@@ -585,6 +596,56 @@ class gcone
 
 		}//method getConeNormals(ideal I)	
 		
+		/** \brief Compute the (codim-2)-facets of a given cone
+		* This method is used during noRevS
+		*/
+		void getCodim2Normals(gcone const &gc)
+		{
+			this->facetPtr->codim2Ptr = new facet(2);	//instantiate a (codim-2)-facet
+			facet *codim2Act;
+			codim2Act = this->facetPtr->codim2Ptr;
+			
+			dd_set_global_constants();
+			
+			dd_MatrixPtr ddineq,P,ddakt;
+			dd_rowset impl_linset, redset;
+			dd_ErrorType err;
+			dd_rowindex newpos;		
+
+			ddineq = facets2Matrix(gc);	//get a matrix representation of the cone
+				
+			/*Now set appropriate linearity*/
+			dd_PolyhedraPtr ddpolyh;
+			for (int ii=0; ii<this->numFacets; ii++)
+			{				
+				ddakt = dd_CopyMatrix(ddineq);
+				set_addelem(ddakt->linset,ii+1);
+										
+				dd_MatrixCanonicalize(&ddakt, &impl_linset, &redset, &newpos, &err);			
+					
+ 					//dd_WriteMatrix(stdout,ddakt);
+				ddpolyh=dd_DDMatrix2Poly(ddakt, &err);
+				P=dd_CopyGenerators(ddpolyh);
+				dd_WriteMatrix(stdout,P);
+					
+				/* We loop through each row of P
+				* normalize it by making all entries integer ones
+				* and add the resulting vector to the int matrix facet::codim2Facets
+				*/
+				for (int jj=1;jj<=P->rowsize;jj++)
+				{
+					intvec *n = new intvec(this->numVars);
+					makeInt(P,jj,*n);						
+					codim2Act->setFacetNormal(n);
+					codim2Act->next = new facet(2);
+					codim2Act = codim2Act->next;						
+					delete n;									
+				}										
+					
+				dd_FreeMatrix(ddakt);
+				dd_FreePolyhedra(ddpolyh);
+			}
+		}
 		
 		/** \brief Compute the Groebner Basis on the other side of a shared facet 
 		*
@@ -1374,16 +1435,15 @@ class gcone
 		void noRevS(gcone &gc, bool usingIntPoint=FALSE)
 		{
 			facet *fListPtr = new facet();	//The list containing ALL facets we come across			
-			facet *fAct = new facet();
+			facet *fAct;// = new facet();
 			fAct = gc.facetPtr;
-			
+			fListPtr = gc.facetPtr;
 #ifdef gfan_DEBUG
 			cout << "NoRevs" << endl;
 			cout << "Facets are:" << endl;
  			gc.showFacets();
-#endif
-			
-			dd_set_global_constants();
+#endif			
+			//dd_set_global_constants();
 			dd_rowrange ddrows;
 			dd_colrange ddcols;
 			ddrows=2;	//Each facet is described by its normal
@@ -1419,68 +1479,32 @@ class gcone
 			}
 			else/*Facets of facets*/
 			{
-				dd_MatrixPtr ddineq,P,ddakt;
-				dd_rowset impl_linset, redset;
-				dd_ErrorType err;
-				dd_rowindex newpos;			
 				
-				fAct = fListPtr;
-
-#ifdef gfan_DEBUG
-				cout << "before f2M" << endl;
-				gc.showFacets();
-				ddineq = facets2Matrix(gc);
-				cout << "after f2M" << endl;
-				gc.showFacets();
-#endif
+				this->getCodim2Normals(gc);
 				
-				/*Now set appropriate linearity*/
-				dd_PolyhedraPtr ddpolyh;
-				for (int ii=0; ii<this->numFacets; ii++)
-				{	
-					cout << endl << "------------" << endl;
- 					ddakt = dd_CopyMatrix(ddineq);
-					set_addelem(ddakt->linset,ii+1);
-										
-					dd_MatrixCanonicalize(&ddakt, &impl_linset, &redset, &newpos, &err);			
-					
- 					//dd_WriteMatrix(stdout,ddakt);
-					ddpolyh=dd_DDMatrix2Poly(ddakt, &err);
-					P=dd_CopyGenerators(ddpolyh);
-					dd_WriteMatrix(stdout,P);
-					
-					/* We loop through each row of P
-					* normalize it by making all entries integer ones
-					* and add the resulting vector to the int matrix facet::codim2Facets
-					*/
-					this->facetPtr->codim2Ptr = new facet(2);	//construct a (codim-2)-facet
-					facet *codim2Act;
-					codim2Act = this->facetPtr->codim2Ptr;
-					for (int jj=1;jj<=P->rowsize;jj++)
-					{
-						intvec *n = new intvec(this->numVars);
-						normalize(P,jj,*n);						
-						codim2Act->setFacetNormal(n);
-						codim2Act->next = new facet(2);
-						codim2Act = codim2Act->next;
-						n->show();
-						delete n;									
-					}					
-					
-					dd_FreeMatrix(ddakt);
-					dd_FreePolyhedra(ddpolyh);
-				}				
-			}			
+				//Compute unique representation of codim-2-facets
+				this->normalize();
+				
+				gc.writeConeToFile(gc);
+				
+				/*2nd step
+				Choose a facet from fListPtr, flip it and forget the previous cone
+				We always choose the first facet from fListPtr as facet to be flipped
+				*/
+				
+				
+				
+			}//else usingIntPoint			
+			
+			
 	
 			
 			//NOTE Hm, comment in and get a crash for free...
 			//dd_free_global_constants();				
-			gc.writeConeToFile(gc);
+			//gc.writeConeToFile(gc);
 			
-			/*2nd step
-			Choose a facet from fListPtr, flip it and forget the previous cone
-			*/
-			fAct = fListPtr;
+			
+			//fAct = fListPtr;
 			//gcone *gcTmp = new gcone(gc);	//copy
 			//gcTmp->flip(gcTmp->gcBasis,fAct);
 			//NOTE: gcTmp may be deleted, gcRoot from main proc should probably not!
@@ -1490,10 +1514,10 @@ class gcone
 		
 		/** \brief Make a set of rational vectors into integers
 		*
-		* We compute the lcm of the denominators and multiply with this to get integer values
+		* We compute the lcm of the denominators and multiply with this to get integer values.		
 		* \param dd_MatrixPtr,intvec
 		*/
-		void normalize(dd_MatrixPtr const &M, int const line, intvec &n)
+		void makeInt(dd_MatrixPtr const &M, int const line, intvec &n)
 		{			
 			mpz_t denom[this->numVars];
 			for(int ii=0;ii<this->numVars;ii++)
@@ -1544,13 +1568,69 @@ class gcone
 			mpq_clear(qkgV); mpq_clear(res);			
 			
 		}
+		/**
+		 * We compute the gcd of the components of the codim-2-facets and 
+		 * multiply the each codim-2facet by it. Thus we get a normalized representation of each
+		 * (codim-2)-facet normal.
+		*/
+		void normalize()
+		{
+			int ggT=1;
+			facet *codim2Act;
+			codim2Act = this->facetPtr->codim2Ptr;
+			intvec *n = new intvec(this->numVars);
+			
+			while(codim2Act->next!=NULL)
+			{				
+				n=codim2Act->getFacetNormal();
+				for(int ii=0;ii<this->numVars;ii++)
+				{
+					ggT = intgcd(ggT,(*n)[ii]);
+				}
+				codim2Act = codim2Act->next;				
+			}
+			//delete n;
+			codim2Act = this->facetPtr->codim2Ptr;	//reset to start of linked list
+			while(codim2Act->next!=NULL)
+			{
+				//intvec *n = new intvec(this->numVars);
+				n=codim2Act->getFacetNormal();
+				intvec *new_n = new intvec(this->numVars);
+				for(int ii=0;ii<this->numVars;ii++)
+				{
+					(*new_n)[ii] = (*n)[ii]*ggT;
+				}
+				codim2Act->setFacetNormal(new_n);
+				codim2Act = codim2Act->next;
+				//delete n;
+				//delete new_n;
+			}			
+		}
+		
+		/** \brief Compute the gcd of two ints
+		*/
+		int intgcd(int a, int b)
+		{
+			int r, p=a, q=b;
+			if(p < 0)
+				p = -p;
+			if(q < 0)
+				q = -q;
+			while(q != 0)
+			{
+				r = p % q;
+				p = q;
+				q = r;
+			}
+			return p;
+		}		
 		
 		/** \brief Construct a dd_MatrixPtr from a cone's list of facets
 		* 
 		*/
 		dd_MatrixPtr facets2Matrix(gcone const &gc)
 		{
-			facet *fAct = new facet();
+			facet *fAct;
 			fAct = gc.facetPtr;
 	
 			dd_MatrixPtr M;
@@ -1563,10 +1643,11 @@ class gcone
 			
 			//dd_set_global_constants();						
 						
-			intvec *comp = new intvec(this->numVars);			
+			//intvec *comp = new intvec(this->numVars);
 			
-			for (int jj=0; jj<M->rowsize; jj++)
-			{				
+			/*for (int jj=0; jj<M->rowsize; jj++)
+			{
+				intvec *comp = new intvec(this->numVars);
 				comp = fAct->getFacetNormal();
 				for (int ii=0; ii<this->numVars; ii++)
 				{
@@ -1576,10 +1657,22 @@ class gcone
 				{
 					fAct = fAct->next;
 				}
+				delete comp;
 			}//jj
+			*/
+			int jj=0;
+			while(fAct->next!=NULL)
+			{
+				intvec *comp;
+				comp = fAct->getFacetNormal();
+				for(int ii=0;ii<this->numVars;ii++)
+				{
+					dd_set_si(M->matrix[jj][ii+1],(*comp)[ii]);
+				}
+				jj++;
+				fAct=fAct->next;				
+			}			
 			
-			//delete fAct;
-			//delete comp;			
 			return M;
 		}
 		
@@ -1648,6 +1741,8 @@ class gcone
 		
 	friend class facet;
 };//class gcone
+
+int gcone::UCN=0;
 
 ideal gfan(ideal inputIdeal)
 {
