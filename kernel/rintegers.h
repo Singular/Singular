@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.h,v 1.8 2009-05-06 12:53:49 Singular Exp $ */
+/* $Id: rintegers.h,v 1.9 2009-06-09 18:10:44 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -30,7 +30,8 @@ BOOLEAN nrzIsMOne      (number a);
 BOOLEAN nrzIsUnit      (number a);
 number  nrzGetUnit     (number a);
 number  nrzDiv         (number a, number b);
-number  nrzIntDiv      (number a,number b);
+number  nrzIntDiv      (number a, number b);
+number  nrzIntMod      (number a, number b);
 number  nrzNeg         (number c);
 number  nrzInvers      (number c);
 BOOLEAN nrzGreater     (number a, number b);

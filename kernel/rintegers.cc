@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.22 2009-05-22 13:18:12 Singular Exp $ */
+/* $Id: rintegers.cc,v 1.23 2009-06-09 18:10:44 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -219,6 +219,17 @@ number nrzIntDiv (number a,number b)
   mpz_init(erg);
   mpz_tdiv_q(erg, (int_number) a, (int_number) b);
   return (number) erg;
+}
+
+number nrzIntMod (number a,number b)
+{
+  int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
+  mpz_init(erg);
+  int_number r = (int_number) omAllocBin(gmp_nrz_bin);
+  mpz_init(r);
+  mpz_tdiv_qr(erg, r, (int_number) a, (int_number) b);
+  mpz_clear(erg);
+  return (number) r;
 }
 
 number  nrzInvers (number c)
