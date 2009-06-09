@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.44 2009-05-06 12:53:48 Singular Exp $ */
+/* $Id: kutil.h,v 1.45 2009-06-09 18:21:50 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -400,6 +400,10 @@ int posInL17 (const LSet set, const int length,
 int posInL10 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
 KINLINE poly redtailBba (poly p,int pos,kStrategy strat,BOOLEAN normalize=FALSE);
+#ifdef HAVE_RINGS
+KINLINE poly redtailBba_Z (poly p,int pos,kStrategy strat);
+poly redtailBba_Z (LObject* L, int pos, kStrategy strat );
+#endif
 poly redtailBba (LObject *L, int pos,kStrategy strat,
                  BOOLEAN withT = FALSE,BOOLEAN normalize=FALSE);
 poly redtailBba (TObject *T, int pos,kStrategy strat);

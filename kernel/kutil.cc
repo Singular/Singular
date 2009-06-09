@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.143 2009-06-04 08:42:06 Singular Exp $ */
+/* $Id: kutil.cc,v 1.144 2009-06-09 18:21:50 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -4595,6 +4595,113 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
   kTest_L(L);
   return L->GetLmCurrRing();
 }
+
+#ifdef HAVE_RINGS
+poly redtailBba_Z (LObject* L, int pos, kStrategy strat )
+// normalize=FALSE, withT=FALSE, coeff=Z
+{
+  strat->redTailChange=FALSE;
+  if (strat->noTailReduction) return L->GetLmCurrRing();
+  poly h, p;
+  p = h = L->GetLmTailRing();
+  if ((h==NULL) || (pNext(h)==NULL))
+    return L->GetLmCurrRing();
+
+  TObject* With;
+  // placeholder in case strat->tl < 0
+  TObject  With_s(strat->tailRing);
+
+  LObject Ln(pNext(h), strat->tailRing);
+  Ln.pLength = L->GetpLength() - 1;
+
+  pNext(h) = NULL;
+  if (L->p != NULL) pNext(L->p) = NULL;
+  L->pLength = 1;
+
+  Ln.PrepareRed(strat->use_buckets);
+
+  int cnt=REDTAIL_CANONICALIZE;
+  while(!Ln.IsNull())
+  {
+    loop
+    {
+      Ln.SetShortExpVector();
+      With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
+      if (With == NULL) break;
+      cnt--;
+      if (cnt==0)
+      {
+        cnt=REDTAIL_CANONICALIZE;
+        poly tmp=Ln.CanonicalizeP();
+      }
+      // we are in Z, do not Ccall pNorm
+      strat->redTailChange=TRUE;
+      // test divisibility of coefs:
+      poly p_Ln=Ln.GetLmCurrRing();
+      poly p_With=With->GetLmCurrRing();
+      number z=nIntMod(pGetCoeff(p_Ln),pGetCoeff(p_With));
+      if (!nIsZero(z))
+      {
+        // subtract z*Ln, add z.Ln to L
+        poly m=pHead(p_Ln);
+        pSetCoeff(m,z);
+        poly mm=pHead(m);
+        pNext(h) = m;
+        pIter(h);
+        L->pLength++;
+        mm=pNeg(mm);
+        if (Ln.bucket!=NULL)
+        {
+	  int dummy=1;
+          kBucket_Add_q(Ln.bucket,mm,&dummy);
+        }
+        else
+        {
+          if (Ln.p!=NULL) Ln.p=pAdd(Ln.p,mm);
+          else if (Ln.t_p!=NULL)  Ln.t_p=p_Add_q(Ln.t_p,mm,strat->tailRing);
+        }
+      }
+      else
+        nDelete(&z);
+
+      if (ksReducePolyTail(L, With, &Ln))
+      {
+        // reducing the tail would violate the exp bound
+        //  set a flag and hope for a retry (in bba)
+        strat->completeReduce_retry=TRUE;
+        do
+        {
+          pNext(h) = Ln.LmExtractAndIter();
+          pIter(h);
+          L->pLength++;
+        } while (!Ln.IsNull());
+        goto all_done;
+      }
+      if (Ln.IsNull()) goto all_done;
+      With_s.Init(currRing);
+    }
+    pNext(h) = Ln.LmExtractAndIter();
+    pIter(h);
+    pNormalize(h);
+    L->pLength++;
+  }
+
+  all_done:
+  Ln.Delete();
+  if (L->p != NULL) pNext(L->p) = pNext(p);
+
+  if (strat->redTailChange)
+  {
+    L->last = NULL;
+    L->length = 0;
+  }
+
+  //if (TEST_OPT_PROT) { PrintS("N"); mflush(); }
+  //L->Normalize(); // HANNES: should have a test
+  kTest_L(L);
+  return L->GetLmCurrRing();
+}
+#endif
 
 /*2
 *checks the change degree and write progress report

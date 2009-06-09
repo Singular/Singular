@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.15 2009-03-18 16:56:02 Singular Exp $
+ *  Version: $Id: kInline.cc,v 1.16 2009-06-09 18:21:50 Singular Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -1084,6 +1084,14 @@ KINLINE poly redtailBba (poly p,int pos,kStrategy strat,BOOLEAN normalize)
   LObject L(p, currRing, strat->tailRing);
   return redtailBba(&L, pos, strat,FALSE, normalize);
 }
+
+#ifdef HAVE_RINGS
+KINLINE poly redtailBba_Z (poly p,int pos,kStrategy strat)
+{
+  LObject L(p, currRing, strat->tailRing);
+  return redtailBba_Z(&L, pos, strat);
+}
+#endif
 
 KINLINE poly redtailBba(TObject *T, int pos,kStrategy strat)
 {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.87 2009-06-04 08:15:45 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.88 2009-06-09 18:21:50 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1220,11 +1220,20 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   p = redNF(pCopy(q),max_ind,lazyReduce & KSTD_NF_NONORM,strat);
   if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
   {
-    BITSET save=test;
-    test &= ~Sy_bit(OPT_INTSTRATEGY);
     if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
-    p = redtailBba(p,max_ind,strat,(lazyReduce & KSTD_NF_NONORM)==0);
-    test=save;
+    #ifdef HAVE_RINGS
+    if (rField_is_Ring())
+    {
+      p = redtailBba_Z(p,max_ind,strat);
+    }
+    else
+    #endif
+    {
+      BITSET save=test;
+      test &= ~Sy_bit(OPT_INTSTRATEGY);
+      p = redtailBba(p,max_ind,strat,(lazyReduce & KSTD_NF_NONORM)==0);
+      test=save;
+    }
   }
   /*- release temp data------------------------------- -*/
   omfree(strat->sevS);
@@ -1276,6 +1285,8 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   /*Shdl=*/initS(F,Q,strat);
   /*- compute------------------------------------------------------- -*/
   res=idInit(IDELEMS(q),si_max(q->rank,F->rank));
+  BITSET save=test;
+  test &= ~Sy_bit(OPT_INTSTRATEGY);
   for (i=IDELEMS(q)-1; i>=0; i--)
   {
     if (q->m[i]!=NULL)
@@ -1284,11 +1295,17 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
       p = redNF(pCopy(q->m[i]),max_ind,lazyReduce & KSTD_NF_NONORM,strat);
       if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
       {
-        BITSET save=test;
-        test &= ~Sy_bit(OPT_INTSTRATEGY);
         if (TEST_OPT_PROT) { PrintS("t"); mflush(); }
-        p = redtailBba(p,max_ind,strat,(lazyReduce & KSTD_NF_NONORM)==0);
-        test=save;
+        #ifdef HAVE_RINGS
+        if (rField_is_Ring())
+        {
+          p = redtailBba_Z(p,max_ind,strat);
+        }
+        else
+        #endif
+        {
+          p = redtailBba(p,max_ind,strat,(lazyReduce & KSTD_NF_NONORM)==0);
+        }
       }
       res->m[i]=p;
     }
@@ -1296,6 +1313,7 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
     //  res->m[i]=NULL;
   }
   /*- release temp data------------------------------- -*/
+  test=save;
   omfree(strat->sevS);
   omfree(strat->ecartS);
   omfree(strat->T);
