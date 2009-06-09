@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.302 2009-06-04 09:58:49 Singular Exp $ */
+/* $Id: extra.cc,v 1.303 2009-06-09 18:14:03 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -923,7 +923,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     if (strcmp(sys_cmd, "oppose")==0)
     {
       if ((h!=NULL) && (h->Typ()==RING_CMD)
-      && (h->next!=-NULL))
+      && (h->next!= NULL))
       {
         ring Rop = (ring)h->Data();
         h   = h->next;
