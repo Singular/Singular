@@ -95,6 +95,8 @@ C/C++-Style guide for Singular
     (example: p_Add): the last argument is the base ring
   - macros are in capital letters (except used as a procedure)
 
+  
+
 - Comments
   - class-/function-/member variable-/... comments should be written in the 
     doxygen format (see Doxygen quick reference card)
@@ -133,3 +135,7 @@ C/C++-Style guide for Singular
   - "and"/"or"/"not" are not recognized by all compilers, use &&, &, ||, |, !
   - TODO: What about namespaces!?
 
+  ? Classes - with starts capital letter (better no "C" at the beginning) 
+    and Camel style further (no "_")
+  ? member Methods - small letters with "_" 
+  ? member Variables - start with "m_" or "_" and Camel style further 
