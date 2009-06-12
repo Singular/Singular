@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-06-09 15:23:08 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.58 2009-06-09 15:23:08 monerjan Exp $
-$Id: gfan.cc,v 1.58 2009-06-09 15:23:08 monerjan Exp $
+$Date: 2009-06-12 16:32:00 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.59 2009-06-12 16:32:00 monerjan Exp $
+$Id: gfan.cc,v 1.59 2009-06-12 16:32:00 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -94,7 +94,8 @@ class facet
 		bool isIncoming;	//Is the facet incoming or outgoing?
 		facet *next;		//Pointer to next facet
 		facet *codim2Ptr;	//Pointer to (codim-2)-facet. Bit of recursion here ;-)
-		//intvec **codim2Normals =(intvec**)omAlloc0(sizeof(intvec*));	//Integer matrix containing the (codim-2)-facets
+		int numCodim2Facets;
+		ring flipRing;		//the ring on the other side of the facet
 						
 		/** The default constructor. Do I need a constructor of type facet(intvec)? */
 		facet()			
@@ -105,6 +106,7 @@ class facet
 			this->UCN=NULL;
 			this->codim2Ptr=NULL;
 			this->codim=1;		//default for (codim-1)-facets
+			this->numCodim2Facets=0;
 		}
 		
 		/** \brief Constructor for facets of codim >= 2
@@ -118,10 +120,55 @@ class facet
 			{
 				this->codim=n;
 			}//NOTE Handle exception here!
+			this->numCodim2Facets=0;
 		}
 		
 		/** The default destructor */
 		~facet(){;}
+		
+		/** \brief Comparison of facets*/
+		bool areEqual(facet &f, facet &g)
+		{
+			bool res = TRUE;
+			intvec *fNormal = new intvec(pVariables);
+			intvec *gNormal = new intvec(pVariables);
+			fNormal = f.getFacetNormal();
+			gNormal = g.getFacetNormal();
+			if((fNormal == gNormal))//||(gcone::isParallel(fNormal,gNormal)))
+			{
+				if(f.numCodim2Facets==g.numCodim2Facets)
+				{
+					facet *f2Act;
+					facet *g2Act;
+					f2Act = f.codim2Ptr;
+					g2Act = g.codim2Ptr;
+					intvec *f2N = new intvec(pVariables);
+					intvec *g2N = new intvec(pVariables);
+					while(f2Act->next!=NULL && g2Act->next!=NULL)
+					{
+						for(int ii=0;ii<f2N->length();ii++)
+						{
+							if(f2Act->getFacetNormal() != g2Act->getFacetNormal())
+							{
+								res=FALSE;								
+							}
+							if (res==FALSE)
+								break;
+						}
+						if(res==FALSE)
+							break;
+						
+						f2Act = f2Act->next;
+						g2Act = g2Act->next;
+					}//while
+				}//if		
+			}//if
+			else
+			{
+				res = FALSE;
+			}
+			return res;
+		}
 		
 		/** Stores the facet normal \param intvec*/
 		void setFacetNormal(intvec *iv)
@@ -294,32 +341,43 @@ class gcone
 		* Call this only after a successfull call to gcone::flip which sets facet::flipGB
 		*/			
 		//NOTE Prolly need to specify the facet to flip over
-		gcone(const gcone& gc, const facet &f)		
+// 		gcone(const gcone& gc, const facet &f)		
+// 		{
+// 			this->next=NULL;
+// 			this->numVars=gc.numVars;
+// 			this->UCN=(gc.UCN)+1;	//add 1 to the UCN of previous cone. This is NOT UNIQUE!
+// 			facet *fAct= new facet();			
+// 			this->facetPtr=fAct;
+// 			
+// 			intvec *ivtmp = new intvec(this->numVars);
+// 			//NOTE ivtmp = f->getFacetNormal();						
+// 			ivtmp = gc.facetPtr->getFacetNormal();			
+// 			
+// 			ideal gb;
+// 			//NOTE gb=f->getFlipGB();
+// 			gb=gc.facetPtr->getFlipGB();			
+// 			this->gcBasis=gb;	//this cone's GB is the flipped GB			
+// 			
+// 			/*Reverse direction of the facet normal to make it an inner normal*/			
+// 			for (int ii=0; ii<this->numVars;ii++)
+// 			{
+// 				(*ivtmp)[ii]=-(*ivtmp)[ii];				
+// 			}
+// 			
+// 			fAct->setFacetNormal(ivtmp);
+// 			delete ivtmp;
+// 			delete fAct;						
+// 		}
+		
+		gcone(const gcone& gc, const facet &f)
 		{
 			this->next=NULL;
 			this->numVars=gc.numVars;
-			this->UCN=(gc.UCN)+1;	//add 1 to the UCN of previous cone. This is NOT UNIQUE!
-			facet *fAct= new facet();			
-			this->facetPtr=fAct;
-			
-			intvec *ivtmp = new intvec(this->numVars);
-			//NOTE ivtmp = f->getFacetNormal();						
-			ivtmp = gc.facetPtr->getFacetNormal();			
-			
-			ideal gb;
-			//NOTE gb=f->getFlipGB();
-			gb=gc.facetPtr->getFlipGB();			
-			this->gcBasis=gb;	//this cone's GB is the flipped GB			
-			
-			/*Reverse direction of the facet normal to make it an inner normal*/			
-			for (int ii=0; ii<this->numVars;ii++)
-			{
-				(*ivtmp)[ii]=-(*ivtmp)[ii];				
-			}
-			
-			fAct->setFacetNormal(ivtmp);
-			delete ivtmp;
-			delete fAct;						
+			this->UCN=(gc.UCN)+1;
+			this->facetPtr=NULL;
+			this->gcBasis=gc.gcBasis;
+			this->baseRing=f.flipRing;
+			rChangeCurrRing(this->baseRing);
 		}
 		
 		/** \brief Default destructor 
@@ -327,8 +385,7 @@ class gcone
 		~gcone()
 		{
 			//NOTE SAVE THE FACET STRUCTURE!!!
-		}
-			
+		}			
 		
 		/** \brief Set the interior point of a cone */
 		void setIntPoint(intvec *iv)
@@ -601,7 +658,7 @@ class gcone
 		*/
 		void getCodim2Normals(gcone const &gc)
 		{
-			this->facetPtr->codim2Ptr = new facet(2);	//instantiate a (codim-2)-facet
+			this->facetPtr->codim2Ptr = new facet(2);	//instantiate a (codim-2)-facet			
 			facet *codim2Act;
 			codim2Act = this->facetPtr->codim2Ptr;
 			
@@ -637,6 +694,7 @@ class gcone
 					intvec *n = new intvec(this->numVars);
 					makeInt(P,jj,*n);						
 					codim2Act->setFacetNormal(n);
+					this->facetPtr->numCodim2Facets++;	//Honor the creation of a codim-2-facet
 					codim2Act->next = new facet(2);
 					codim2Act = codim2Act->next;						
 					delete n;									
@@ -936,10 +994,12 @@ class gcone
 			/*End of step 3 - reduction*/
 			
 			f->setFlipGB(dstRing_I);//store the flipped GB
+			f->flipRing=dstRing;	//store the ring on the other side
 #ifdef gfan_DEBUG
 			cout << "Flipped GB is: " << endl;
 			f->printFlipGB();
 #endif			
+			rChangeCurrRing(srcRing);	//return to the ring we started the computation of flipGB in
 		}//void flip(ideal gb, facet *f)
 				
 		/** \brief Compute the remainder of a polynomial by a given ideal
@@ -1057,13 +1117,16 @@ class gcone
 		
 		/** \brief Compute the negative of a given intvec
 		*/		
-		intvec *ivNeg(intvec const &iv)
+		intvec *ivNeg(const intvec *iv)
 		{
-			intvec *res = new intvec(this->numVars);
-			for(int ii=0;ii<this->numVars;ii++)
-			{
-				res[ii] = -(int)iv[ii];
-			}
+			intvec *res = new intvec(iv->length());
+			res=ivCopy(iv);
+			*res *= (int)-1;
+			//for(int ii=0;ii<this->numVars;ii++)
+			//{			
+				//(res)[ii] = (*res[ii])*(int)(-1);
+			//}
+			res->show();			
 			return res;
 		}
 
@@ -1433,72 +1496,61 @@ class gcone
 		* soon as we compute this facet again. Comparison of facets is done by...
 		*/
 		void noRevS(gcone &gc, bool usingIntPoint=FALSE)
-		{
-			facet *fListPtr = new facet();	//The list containing ALL facets we come across			
-			facet *fAct;// = new facet();
-			fAct = gc.facetPtr;
-			fListPtr = gc.facetPtr;
+		{	
+			facet *SearchListRoot = new facet(); //The list containing ALL facets we come across
+			facet *SearchListAct;
+			SearchListAct = SearchListRoot;
+			
+			facet *fAct;
+			fAct = gc.facetPtr;			
+			
 #ifdef gfan_DEBUG
 			cout << "NoRevs" << endl;
 			cout << "Facets are:" << endl;
  			gc.showFacets();
 #endif			
-			//dd_set_global_constants();
-			dd_rowrange ddrows;
-			dd_colrange ddcols;
-			ddrows=2;	//Each facet is described by its normal
-			ddcols=gc.numVars+1;	// plus one for the standard simplex
-			if(usingIntPoint){
-				while(fAct->next!=NULL)
-				{
-					/*Compute an interior point for each facet*/				
-					dd_MatrixPtr ddineq;	
-					ddineq=dd_CreateMatrix(ddrows,ddcols);
-					intvec *comp = new intvec(this->numVars);
-					comp=fAct->getFacetNormal();				
-					for(int ii=0; ii<this->numVars; ii++)					
-					{										
-						dd_set_si(ddineq->matrix[0][ii+1],(*comp)[ii]);
-						dd_set_si(ddineq->matrix[1][ii+1],1);	//Assure we search in the pos. orthant		
-					}
-					set_addelem(ddineq->linset,1);	//We want equality in the first row
-					//dd_WriteMatrix(stdout,ddineq);
-					interiorPoint(ddineq,*comp);				
-					/**/
-#ifdef gfan_DEBUG
-					cout << "IP is";
-					comp->show(); cout << endl;
-#endif
-					//Store the interior point and the UCN
- 					fListPtr->setInteriorPoint( comp );				
- 					fListPtr->setUCN( gc.getUCN() );	
-								
-					dd_FreeMatrix(ddineq);
-					fAct=fAct->next;	//iterate
-				}	
+			
+			this->getCodim2Normals(gc);
+				
+			//Compute unique representation of codim-2-facets
+			this->normalize();
+			
+			/*Make a copy of the facet list of first cone
+			Since the operations getCodim2Normals and normalize affect the facets
+			we must not memcpy them before these ops!
+			*/
+			while(fAct->next!=NULL)
+			{				
+				memcpy(SearchListAct,fAct,sizeof(facet));
+				SearchListAct->next = new facet();
+				SearchListAct = SearchListAct->next;
+				fAct = fAct->next;
 			}
-			else/*Facets of facets*/
+			SearchListAct = SearchListRoot;	//Set to beginning of list
+			
+			fAct = gc.facetPtr;
+			if(areEqual(fAct->getFacetNormal(),fAct->next->getFacetNormal()))
 			{
-				
-				this->getCodim2Normals(gc);
-				
-				//Compute unique representation of codim-2-facets
-				this->normalize();
-				
-				gc.writeConeToFile(gc);
-				
-				/*2nd step
-				Choose a facet from fListPtr, flip it and forget the previous cone
-				We always choose the first facet from fListPtr as facet to be flipped
-				*/
-				
-				
-				
-			}//else usingIntPoint			
+				cout <<"HI" << endl;
+			}
 			
+			gc.writeConeToFile(gc);
 			
-	
+			/*2nd step
+			Choose a facet from fListPtr, flip it and forget the previous cone
+			We always choose the first facet from fListPtr as facet to be flipped
+			*/
+			while(SearchListAct->next!=NULL)
+			{
+				gc.flip(gc.gcBasis,SearchListAct);
+				gcone *gcTmp = new gcone::gcone(gc,*SearchListAct);
 			
+			//gcTmp->getConeNormals();
+			//add new facets
+			//fListPtr = fListPtr->next;
+				SearchListAct = SearchListAct->next;
+			}
+		
 			//NOTE Hm, comment in and get a crash for free...
 			//dd_free_global_constants();				
 			//gc.writeConeToFile(gc);
@@ -1641,25 +1693,6 @@ class gcone
 			dd_NumberType numb = dd_Integer;
 			M=dd_CreateMatrix(ddrows,ddcols);			
 			
-			//dd_set_global_constants();						
-						
-			//intvec *comp = new intvec(this->numVars);
-			
-			/*for (int jj=0; jj<M->rowsize; jj++)
-			{
-				intvec *comp = new intvec(this->numVars);
-				comp = fAct->getFacetNormal();
-				for (int ii=0; ii<this->numVars; ii++)
-				{
-					dd_set_si(M->matrix[jj][ii+1],(*comp)[ii]);
-				}
-				if(fAct->next!=NULL)
-				{
-					fAct = fAct->next;
-				}
-				delete comp;
-			}//jj
-			*/
 			int jj=0;
 			while(fAct->next!=NULL)
 			{
@@ -1692,14 +1725,17 @@ class gcone
 			facet *fAct = new facet();
 			fAct = gc.facetPtr;
 			
+			char *ringString = rString(currRing);
+			
 			if (!gcOutputFile)
 			{
 				cout << "Error opening file for writing in writeConeToFile" << endl;
 			}
 			else
-			{	/*gcOutputFile << "UCN" << endl;
-				gcOutputFile << this->UCN << endl;*/
-				gcOutputFile << "RING" << endl;				
+			{	gcOutputFile << "UCN" << endl;
+				gcOutputFile << this->UCN << endl;
+				gcOutputFile << "RING" << endl;	
+				gcOutputFile << ringString << endl;			
 				//Write this->gcBasis into file
 				gcOutputFile << "GCBASIS" << endl;				
 				for (int ii=0;ii<IDELEMS(gc.gcBasis);ii++)
