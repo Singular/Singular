@@ -1,6 +1,6 @@
 //GP, last modified 23.10.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: modstd.lib,v 1.15 2009-04-15 11:14:36 seelisch Exp $";
+version="$Id: modstd.lib,v 1.16 2009-06-12 08:01:11 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: modstd.lib  Grobner basis of ideals
@@ -27,14 +27,111 @@ primeList(n);  intvec of n primes  <= 2134567879 in decreasing order
 LIB "poly.lib";
 LIB "crypto.lib";
 ///////////////////////////////////////////////////////////////////////////////
+proc pTestSB(ideal I, ideal J, list L)
+"USAGE:  pTestSB(I,J,L); I,J ideals, L intvec of primes
+RETURN: 1 (resp. 0) if for a randomly chosen prime p not in L
+        J mod p is (resp. is not) a standard basis of I mod p
+EXAMPLE:example primList; shows an example
+"
+{
+  int i,j,k,p;
+  def R=basering;
+  list r= ringlist(R);
+
+  while(!j)
+  {
+    j=1;
+    p=prime(random(1000000000,2134567879));
+    for(i=1;i<=size(L);i++)
+    {
+      if(p==L[i]){j=0;break}
+    }
+    if(j)
+    {
+      for(i=1;i<=ncols(J);i++)
+      {
+        for(k=2;k<=size(J[i]);k++)
+        {
+          if((denominator(leadcoef(J[i][k])) mod
+p)==0){j=0;break}
+        }
+        if(!j){break;}
+      }
+    }
+  }
+  r[1]=p;
+  def @R=ring(r);
+  setring @R;
+  ideal I=imap(R,I);
+  ideal J=imap(R,J);
+  attrib(J,"isSB",1);
+  j=1;
+  if(size(reduce(I,J))!=0){j=0;}
+  if(j)
+  {
+    ideal K=std(J);
+    if(size(reduce(K,J))!=0){j=0;}
+  }
+  setring R;
+  return(j);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   intvec L=2,3,5;
+   ring r=0,(x,y,z),dp;
+   ideal i=x+1,x+y+1;
+   ideal j=x+1,y;
+   pTestSB(i,i,L);
+   pTestSB(i,j,L);
+}
+
+proc primeList(int n, list #)
+"USAGE:  primeList(n); (resp. primeList(n,L); )
+RETURN: the intvec of n greatest primes  <= 2147483647 (resp. n greatest
+        primes < L[size(L)] union with L)
+EXAMPLE:example primList; shows an example
+"
+{
+  intvec L;
+  int i,p;
+  if(size(#)==0)
+  {
+      p=2147483647;
+      L[1]=p;
+   }
+   else
+  {
+     L=#[1];
+     p=prime(L[size(L)]-1);
+     L[size(L)+1]=p;
+  }
+  if(p==2){ERROR("no more primes");}
+  for(i=2;i<=n;i++)
+  {
+    p=prime(p-1);
+    L[size(L)+1]=p;
+  }
+  return(L);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   intvec L=primeList(10);
+   size(L);
+   L[size(L)];
+   L=primeList(5,L);
+   size(L);
+   L[size(L)];
+}
+
+
 proc modStd(ideal I)
 "USAGE:  modStd(I);
 RETURN:  a standard basis of I if no warning appears;
 NOTE:    the procedure computes a standard basis of I (over the
          rational numbers) by using  modular methods. If a
-         warning appears then the result is a standard basis with no defined
-         relation to I; this is a sign that not enough prime numbers have
-         been used. For further experiments see procedure modS.
+         warning appears then the result is a standard basis
+         containing I and with high probability a standard basis of I.
+         For further experiments see procedure modS.
 EXAMPLE: example modStd; shows an example
 "
 {
@@ -42,159 +139,99 @@ EXAMPLE: example modStd; shows an example
   list rl=ringlist(R0);
   if((npars(R0)>0)||(rl[1]>0))
   {
-     ERROR("characteristic of basering should be zero");
+     ERROR("characteristic of basering should be zero, basering should have
+no parameters");
   }
-  int l,j,k,q;
+
+  int k,c;
+  int pd=printlevel-voice+2;
+  int j=1;
+  int h=homog(I);
   int en=2134567879;
   int an=1000000000;
-  intvec hi,hl,hc,hpl,hpc;
-  list T,TT;
-  intvec L=primeList(5);
-  L[6]=prime(random(an,en));
-  ideal J,cT,lT,K;
-  ideal I0=I;
-  int h=homog(I);
-  if((!h)&&(ord_test(R0)==0))
-  {
-     ERROR("input is not homogeneous and ordering is not local");
-  }
-  if(h)
-  {
-     execute("ring gn="+string(L[6])+",x(1.."+string(nvars(R0))+"),dp;");
-     ideal I=fetch(R0,I);
-     ideal J=std(I);
-     hi=hilb(J,1);
-     setring R0;
-  }
-  for (j=1;j<=size(L);j++)
-  {
-    rl[1]=L[j];
-    def oro=ring(rl);
-    setring oro;
-    ideal I=fetch(R0,I);
-    option(redSB);
-    if(h)
-    {
-       ideal I1=std(I,hi);
-    }
-    else
-    {
-      if(ord_test(R0)==-1)
-      {
-         ideal I1=std(I);
-      }
-      else
-      {
-         matrix M;
-         ideal I1=liftstd(I,M);
-      }
-    }
-    setring R0;
-    T[j]=fetch(oro,I1);
-    kill oro;
-  }
-  //================= delete unlucky primes ====================
-  // unlucky if and only if the leading ideal is wrong
-  list LL=deleteUnluckyPrimes(T,L);
-  T=LL[1];
-  L=LL[2];
-  lT=LL[3];
-  //============ now all leading ideals are the same ============
-  for(j=1;j<=ncols(T[1]);j++)
-  {
-    for(k=1;k<=size(L);k++)
-    {
-      TT[k]=T[k][j];
-    }
-    J[j]=liftPoly(TT,L);
-  }
-  //=========== chooses more primes up to the moment the result becomes stable
+
+  intvec opt = option(get);     // Save current options
+  intvec L=primeList(10);
+  L[5]=prime(random(an,en));
+  list T,TT,TH,LL;
+
+
+  ideal J,K;
+
+  option(redSB);
+
   while(1)
   {
-     k=0;
-     q=prime(random(an,en));
-     while(k<size(L))
+     while(j<=size(L))
      {
-        k++;
-        if(L[k]==q)
+        if(pd>2){c++;c;}
+        rl[1]=L[j];
+        def @r=ring(rl);
+        setring @r;
+        ideal i=fetch(R0,I);
+        i=groebner(i);
+        setring R0;
+        T[size(T)+1]=fetch(@r,i);
+        kill @r;
+        j++;
+     }
+     if(pd>2){"lifting";}
+  //================= delete unlucky primes ====================
+  // unlucky if and only if the leading ideal is wrong
+     LL=deleteUnluckyPrimes(T,L);
+     TH=LL[1];
+     L=LL[2];
+  //============ now all leading ideals are the same ============
+     for(j=1;j<=ncols(TH[1]);j++)
+     {
+         for(k=1;k<=size(L);k++)
+         {
+             TT[k]=TH[k][j];
+         }
+         J[j]=liftPoly(TT,L);
+     }
+     if(pd>2){"list of primes:";L;"pTest";}
+     if(pTestSB(I,J,L))
+     {
+        attrib(J,"isSB",1);
+        K=std(J);
+        if(size(reduce(I,J))==0)
         {
-           k=0;
-           q=prime(random(an,en));
-        }
-     }
-     L[size(L)+1]=q;
-     rl[1]=L[size(L)];
-     def @r=ring(rl);
-     setring @r;
-     ideal i=fetch(R0,I);
-     option(redSB);
-     if(h)
-     {
-       i=std(i,hi);
-     }
-     else
-     {
-       if(ord_test(R0)==-1)
-       {
-          i=std(i);
-       }
-       else
-       {
-          matrix M;
-          i=liftstd(i,M);
-       }
-     }
-     setring R0;
-     T[size(T)+1]=fetch(@r,i);
-     kill @r;
-     cT=lead(T[size(T)]);
-     attrib(cT,"isSB",1);
-     if((size(reduce(cT,lT))!=0)||(size(reduce(lT,cT))!=0))
-     {
-        T=delete(T,size(T));
-        L=L[1..size(L)-1];
-        k=0;
-     }
-     else
-     {
-        for(j=1;j<=ncols(T[1]);j++)
-        {
-           for(k=1;k<=size(L);k++)
+           if(size(reduce(K,J))==0)
            {
-              TT[k]=T[k][j];
+               if(!((h)||(ord_test(R0)==-1)))
+              {
+
+"==================================================================";
+                 "    The input is not homogeneous and the ordering is not
+local.   ";
+                 "WARNING: ideal generated by output may be greater then
+input ideal";
+
+"==================================================================";
+              }
+              option(set, opt);
+              return(J);
            }
-           K[j]=liftPoly(TT,L);
-        }
-        k=1;
-        for(j=1;j<=size(K);j++)
-        {
-           if(K[j]-J[j]!=0)
-           {
-              k=0;
-              J=K;
-              break;
-           }
-        }
-     }
-     if(k){break;}
-  }
-  //============  test for standard basis and I=J =======
-  J=std(J);
-  I0=reduce(I0,J);
-  if(size(I0)>0)
-  {
-     "WARNING: The input ideal is not contained
-                        in the ideal generated by the standardbasis";
-     "list of primes used:";
-     L;
-  }
-  attrib(J,"isSB",1);
-  return(J);
+           if(pd>2){"pTest o.k. but result wrong";}
+         }
+         if(pd>2){"pTest o.k. but result wrong";}
+      }
+      j=size(L)+1;
+      L=primeList(10,L);
+   }
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring r=0,(x,y,z),dp;
+   ring r=0,(x,y,z,t),dp;
    ideal I=3x3+x2+1,11y5+y3+2,5z4+z2+4;
+   ideal J=modStd(I);
+   J;
+   I=homog(I,t);
+   J=modStd(I);
+   J;
+   ring s=0,(x,y,z),ds;
+   ideal I=jacob(x5+y6+z7+xyz);
    ideal J=modStd(I);
    J;
 }
@@ -516,29 +553,6 @@ example
    chineseR(list(24,15,7),intvec(2,3,5),30);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-proc primeList(int n)
-"USAGE:  primeList(n);
-RETURN: the intvec of n greatest primes  <= 2134567879
-EXAMPLE:example primList; shows an example
-"
-{
-  intvec L=0:n;
-  int i;
-  int p=2134567879;
-  for(i=1;i<=n;i++)
-  {
-    L[i]=p;
-    p=prime(p-1);
-  }
-  return(L);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   intvec L=primeList(10);
-   size(L);
-   L[size(L)];
-}
 ///////////////////////////////////////////////////////////////////////////////
 proc pStd(int p,ideal i)
 "USAGE:  pStd(p,i);p integer, i ideal;
