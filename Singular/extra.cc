@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.304 2009-06-13 14:38:23 Singular Exp $ */
+/* $Id: extra.cc,v 1.305 2009-06-13 14:59:31 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1817,6 +1817,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     {
        int posInT_EcartFDegpLength(const TSet set,const int length,LObject &p);
        int posInT_FDegpLength(const TSet set,const int length,LObject &p);
+       int posInT_pLength(const TSet set,const int length,LObject &p);
        int posInT0(const TSet set,const int length,LObject &p);
        int posInT1(const TSet set,const int length,LObject &p);
        int posInT2(const TSet set,const int length,LObject &p);
@@ -1834,6 +1835,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 	   test_PosInT=posInT_EcartFDegpLength;
          else if (strcmp(s,"posInT_FDegpLength")==0)
 	   test_PosInT=posInT_FDegpLength;
+         else if (strcmp(s,"posInT_pLength")==0)
+	   test_PosInT=posInT_pLength;
          else if (strcmp(s,"posInT0")==0)
 	   test_PosInT=posInT0;
          else if (strcmp(s,"posInT1")==0)
