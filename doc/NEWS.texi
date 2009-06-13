@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.134 2009-04-17 07:29:20 Singular Exp $
+@comment $Id: NEWS.texi,v 1.135 2009-06-13 10:24:56 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -100,7 +100,7 @@ contributed library: phindex.lib (see @nref{phindex_lib}): Poincare-Hopf index o
 @heading Changed @sc{Singular} libraries
 @itemize
 @item
-normal.lib (@nref{normal_lib}): changed structure of the reesult,
+normal.lib (@nref{normal_lib}): changed structure of the result,
 @* new algorithms have been implemented which improve the performance
 @item
 elim.lib (@nref{elim_lib}): @nref{elim}, @nref{nselect}, @nref{select}, @nref{select1}: changed syntax
