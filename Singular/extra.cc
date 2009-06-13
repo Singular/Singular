@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.303 2009-06-09 18:14:03 Singular Exp $ */
+/* $Id: extra.cc,v 1.304 2009-06-13 14:38:23 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -978,8 +978,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     else
 #endif /*SHIFTBBA*/
 #endif /*PLURAL*/
-#ifdef HAVE_WALK
 /*==================== walk stuff =================*/
+#ifdef HAVE_WALK
 #ifdef OWNW
     if (strcmp(sys_cmd, "walkNextWeight") == 0)
     {
@@ -1812,6 +1812,59 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   {
     char *sys_cmd=(char *)(h->Data());
     h=h->next;
+/*==================== test syz strat =================*/
+    if (strcmp(sys_cmd, "syz") == 0)
+    {
+       int posInT_EcartFDegpLength(const TSet set,const int length,LObject &p);
+       int posInT_FDegpLength(const TSet set,const int length,LObject &p);
+       int posInT0(const TSet set,const int length,LObject &p);
+       int posInT1(const TSet set,const int length,LObject &p);
+       int posInT2(const TSet set,const int length,LObject &p);
+       int posInT11(const TSet set,const int length,LObject &p);
+       int posInT110(const TSet set,const int length,LObject &p);
+       int posInT13(const TSet set,const int length,LObject &p);
+       int posInT15(const TSet set,const int length,LObject &p);
+       int posInT17(const TSet set,const int length,LObject &p);
+       int posInT17_c(const TSet set,const int length,LObject &p);
+       int posInT19(const TSet set,const int length,LObject &p);
+       if (h->Typ()==STRING_CMD)
+       {
+	 const char *s=(const char *)h->Data();
+	 if (strcmp(s,"posInT_EcartFDegpLength")==0)
+	   test_PosInT=posInT_EcartFDegpLength;
+         else if (strcmp(s,"posInT_FDegpLength")==0)
+	   test_PosInT=posInT_FDegpLength;
+         else if (strcmp(s,"posInT0")==0)
+	   test_PosInT=posInT0;
+         else if (strcmp(s,"posInT1")==0)
+	   test_PosInT=posInT1;
+         else if (strcmp(s,"posInT2")==0)
+	   test_PosInT=posInT2;
+         else if (strcmp(s,"posInT11")==0)
+	   test_PosInT=posInT11;
+         else if (strcmp(s,"posInT110")==0)
+	   test_PosInT=posInT110;
+         else if (strcmp(s,"posInT13")==0)
+	   test_PosInT=posInT13;
+         else if (strcmp(s,"posInT15")==0)
+	   test_PosInT=posInT15;
+         else if (strcmp(s,"posInT17")==0)
+	   test_PosInT=posInT17;
+         else if (strcmp(s,"posInT17_c")==0)
+	   test_PosInT=posInT17_c;
+         else if (strcmp(s,"posInT19")==0)
+	   test_PosInT=posInT19;
+         else Print("valid posInT:0,1,2,11,110,13,15,17,17_c,19,_EcartFDegpLength,_FDegpLength,_pLength,_EcartpLength\n");
+       }
+       else
+       {
+         test_PosInT=NULL;
+         test_PosInL=NULL;
+       }
+       verbose|=Sy_bit(23);
+       return FALSE;
+    }
+    else
 /*==================== locNF ======================================*/
     if(strcmp(sys_cmd,"locNF")==0)
     {
@@ -3147,9 +3200,8 @@ return FALSE; //Everything went fine
 }
 else
 #endif
-
 /*==================== Error =================*/
-      Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
+      Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }
   return TRUE;
 }

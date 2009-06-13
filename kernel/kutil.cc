@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.144 2009-06-09 18:21:50 Singular Exp $ */
+/* $Id: kutil.cc,v 1.145 2009-06-13 14:37:58 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -6432,7 +6432,8 @@ virasoro     3.39        3.50        3.35        3.47        3.70        7.66
 #endif
 
 
-#ifdef HAVE_MORE_POS_IN_T
+//#ifdef HAVE_MORE_POS_IN_T
+#if 1
 // determines the position based on: 1.) Ecart 2.) FDeg 3.) pLength
 int posInT_EcartFDegpLength(const TSet set,const int length,LObject &p)
 {
@@ -6595,7 +6596,7 @@ void kDebugPrint(kStrategy strat)
     else if (strat->posInL==posInL13) PrintS("posInL13\n");
     else if (strat->posInL==posInL15) PrintS("posInL15\n");
     else if (strat->posInL==posInL17) PrintS("posInL17\n");
-    else if (strat->posInL==posInL17_c) PrintS("posInL17\n");
+    else if (strat->posInL==posInL17_c) PrintS("posInL17_c\n");
     else if (strat->posInL==posInLSpecial) PrintS("posInLSpecial\n");
     else if (strat->posInL==posInLrg0) PrintS("posInLrg0\n");
     else  Print("%p\n",(void*)strat->posInL);

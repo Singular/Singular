@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.88 2009-06-09 18:21:50 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.89 2009-06-13 14:37:58 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -35,6 +35,10 @@
 
 /* shiftgb stuff */
 #include "shiftgb.h"
+
+  int (*test_PosInT)(const TSet T,const int tl,LObject &h);
+  int (*test_PosInL)(const LSet set, const int length,
+                LObject* L,const kStrategy strat);
 
 // return -1 if no divisor is found
 //        number of first divisor, otherwise
@@ -935,7 +939,13 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #ifdef HAVE_TAIL_RING
   kStratInitChangeTailRing(strat);
 #endif
-  //kDebugPrint(strat);
+  if (BVERBOSE(23)) 
+  {
+    if (test_PosInT!=NULL) strat->posInT=test_PosInT;
+    if (test_PosInL!=NULL) strat->posInL=test_PosInL;
+    kDebugPrint(strat);
+  }
+
 
   /* compute------------------------------------------------------- */
   while (strat->Ll >= 0)

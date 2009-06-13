@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.45 2009-06-09 18:21:50 Singular Exp $ */
+/* $Id: kutil.h,v 1.46 2009-06-13 14:37:58 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -675,4 +675,8 @@ int redFirstShift (LObject* h,kStrategy strat); // ok
 ideal freegb(ideal I, int uptodeg, int lVblock);
 
 ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int uptodeg, int lV);
+// test syz strategy: // will be removed soon
+extern  int (*test_PosInT)(const TSet T,const int tl,LObject &h);
+extern  int (*test_PosInL)(const LSet set, const int length,
+                LObject* L,const kStrategy strat);
 #endif
