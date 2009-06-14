@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-06-12 16:32:00 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.59 2009-06-12 16:32:00 monerjan Exp $
-$Id: gfan.cc,v 1.59 2009-06-12 16:32:00 monerjan Exp $
+$Date: 2009-06-14 10:00:14 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.60 2009-06-14 10:00:14 monerjan Exp $
+$Id: gfan.cc,v 1.60 2009-06-14 10:00:14 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -939,31 +939,33 @@ class gcone
 			/*Step 3
 			turn the minimal basis into a reduced one
 			*/
-			int i,j;
-			ring dstRing=rCopy0(srcRing);
-			i=rBlocks(srcRing);
+			ring dstRing=rCopyAndAddWeight(tmpRing,iv_weight);	
 			
-			dstRing->order=(int *)omAlloc((i+1)*sizeof(int));
-			for(j=i;j>0;j--)
-			{
-				dstRing->order[j]=srcRing->order[j-1];
-				dstRing->block0[j]=srcRing->block0[j-1];
-				dstRing->block1[j]=srcRing->block1[j-1];
-				if (srcRing->wvhdl[j-1] != NULL)
-				{
-					dstRing->wvhdl[j] = (int*) omMemDup(srcRing->wvhdl[j-1]);
-				}
-			}
-			dstRing->order[0]=ringorder_a;
-			dstRing->order[1]=ringorder_dp;
-			dstRing->order[2]=ringorder_C;			
-			dstRing->wvhdl[0] =( int *)omAlloc((iv_weight->length())*sizeof(int));
-			
-			for (int ii=0;ii<this->numVars;ii++)
-			{				
-				dstRing->wvhdl[0][ii]=(*iv_weight)[ii];				
-			}
-			rComplete(dstRing);
+// 			int i,j;
+// 			ring dstRing=rCopy0(srcRing);
+// 			i=rBlocks(srcRing);
+// 			
+// 			dstRing->order=(int *)omAlloc((i+1)*sizeof(int));
+// 			for(j=i;j>0;j--)
+// 			{
+// 				dstRing->order[j]=srcRing->order[j-1];
+// 				dstRing->block0[j]=srcRing->block0[j-1];
+// 				dstRing->block1[j]=srcRing->block1[j-1];
+// 				if (srcRing->wvhdl[j-1] != NULL)
+// 				{
+// 					dstRing->wvhdl[j] = (int*) omMemDup(srcRing->wvhdl[j-1]);
+// 				}
+// 			}
+// 			dstRing->order[0]=ringorder_a;
+// 			dstRing->order[1]=ringorder_dp;
+// 			dstRing->order[2]=ringorder_C;			
+// 			dstRing->wvhdl[0] =( int *)omAlloc((iv_weight->length())*sizeof(int));
+// 			
+// 			for (int ii=0;ii<this->numVars;ii++)
+// 			{				
+// 				dstRing->wvhdl[0][ii]=(*iv_weight)[ii];				
+// 			}
+// 			rComplete(dstRing);
 			
 			// NOTE May assume that at this point srcRing already has 3 blocks of orderins, starting with a
 			// Thus: 
@@ -999,7 +1001,7 @@ class gcone
 			cout << "Flipped GB is: " << endl;
 			f->printFlipGB();
 #endif			
-			rChangeCurrRing(srcRing);	//return to the ring we started the computation of flipGB in
+			//rChangeCurrRing(srcRing);	//return to the ring we started the computation of flipGB in
 		}//void flip(ideal gb, facet *f)
 				
 		/** \brief Compute the remainder of a polynomial by a given ideal
@@ -1211,22 +1213,46 @@ class gcone
 			
 			//dd_LPSolve(lpInt,solver,&err);	//This will not result in a point from the relative interior
 			if (err!=dd_NoError){cout << "Error during dd_LPSolve" << endl;}
-			//cout << "Tick 5" << endl;
 									
 			//lpSol=dd_CopyLPSolution(lpInt);
 			if (err!=dd_NoError){cout << "Error during dd_CopyLPSolution" << endl;}			
-			//cout << "Tick 6" << endl;
 #ifdef gfan_DEBUG
 			cout << "Interior point: ";
-#endif
 			for (int ii=1; ii<(lpSol->d)-1;ii++)
 			{
-#ifdef gfan_DEBUG
 				dd_WriteNumber(stdout,lpSol->sol[ii]);
-#endif
-				/* NOTE This works only as long as gmp returns fractions with the same denominator*/
-				(iv)[ii-1]=(int)mpz_get_d(mpq_numref(lpSol->sol[ii]));	//looks evil, but does the trick
 			}
+#endif
+			
+			//NOTE The following strongly resembles parts of makeInt. 
+			//Maybe merge sometimes
+			mpz_t kgV; mpz_init(kgV);
+			mpz_set_str(kgV,"1",10);
+			mpz_t den; mpz_init(den);
+			mpz_t tmp; mpz_init(tmp);
+			mpq_get_den(tmp,lpSol->sol[1]);
+			for (int ii=1;ii<(lpSol->d)-1;ii++)
+			{
+				mpq_get_den(den,lpSol->sol[ii+1]);
+				mpz_lcm(kgV,tmp,den);
+				mpz_set(tmp, kgV);
+			}
+			mpq_t qkgV;
+			mpq_init(qkgV);
+			mpq_set_z(qkgV,kgV);
+			for (int ii=1;ii<(lpSol->d)-1;ii++)
+			{
+				mpq_t product;
+				mpq_init(product);
+				mpq_mul(product,qkgV,lpSol->sol[ii]);
+				iv[ii-1]=(int)mpz_get_d(mpq_numref(product));
+				mpq_clear(product);
+			}
+			mpq_clear(qkgV);
+			mpz_clear(tmp);
+			mpz_clear(den);
+			mpz_clear(kgV);			
+			
 			dd_FreeLPSolution(lpSol);
 			dd_FreeLPData(lpInt);
 			dd_FreeLPData(lp);
