@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-06-16 08:45:33 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.61 2009-06-16 08:45:33 monerjan Exp $
-$Id: gfan.cc,v 1.61 2009-06-16 08:45:33 monerjan Exp $
+$Date: 2009-06-16 15:49:43 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.62 2009-06-16 15:49:43 monerjan Exp $
+$Id: gfan.cc,v 1.62 2009-06-16 15:49:43 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -379,6 +379,7 @@ class gcone
  			this->gcBasis=idCopy(f.flipGB);
 			this->inputIdeal=idCopy(this->gcBasis);
 			this->baseRing=rCopy0(f.flipRing);
+			this->numFacets=0;
 			//rComplete(this->baseRing);
 			//rChangeCurrRing(this->baseRing);
 		}
@@ -1576,7 +1577,7 @@ class gcone
 			
 			gcone *gcAct;
 			gcAct = &gcRoot;
-			gcone = *gcPtr;
+			gcone *gcPtr;
 			gcPtr = &gcRoot;
 			
 			facet *fAct;
@@ -1616,7 +1617,7 @@ class gcone
 			gcAct->writeConeToFile(*gcAct);
 			
 			/*End of initialisation*/
-			fAct = gcAct->facetPtr;
+			fAct = SearchListAct;
 			/*2nd step
 			Choose a facet from fListPtr, flip it and forget the previous cone
 			We always choose the first facet from fListPtr as facet to be flipped
@@ -1624,19 +1625,60 @@ class gcone
 			while(SearchListAct->next!=NULL)
 			{//NOTE See to it that the cone is only changed after ALL facets have been flipped!
 				//As of now this is not the case!
-				gcAct->flip(gcAct->gcBasis,SearchListAct);
-				/*ring rTmp=rCopy(SearchListAct->flipRing);
-				//NOTE It is absolutely crucial to go to the new ring before constructing a new cone!
-				rComplete(rTmp);
-				rChangeCurrRing(rTmp);
-				gcone *gcTmp = new gcone::gcone(*gcAct,*SearchListAct);
-				gcAct = gcTmp;
-				gcAct->getConeNormals(gcAct->gcBasis, FALSE);*/
-				//gcAct->getCodim2Normals(*gcAct);			
-			
-			//add new facets
-			//fListPtr = fListPtr->next;
-				SearchListAct = SearchListAct->next;
+				int flag=1;
+// 				while(fAct->next!=NULL)
+// 				{
+// 					gcAct->flip(gcAct->gcBasis,SearchListAct);
+// 					ring rTmp=rCopy(SearchListAct->flipRing);
+// 					//NOTE It is absolutely crucial to go to the new ring before constructing a new cone!
+// 					rComplete(rTmp);
+// 					rChangeCurrRing(rTmp);
+// 					gcone *gcTmp = new gcone::gcone(*gcAct,*SearchListAct);
+// 					gcTmp->getConeNormals(gcTmp->gcBasis, FALSE);
+// 					gcTmp->getCodim2Normals(*gcTmp);
+// 					/*add facets to SLA here*/					
+// 					rChangeCurrRing(gcAct->baseRing);
+// 					gcPtr->next=gcTmp;
+// 					if(flag==1)
+// 						gcAct->next=gcTmp;
+// 					gcPtr=gcPtr->next;
+// 					fAct=fAct->next;
+// 					flag++;
+// 				}
+// 				
+// 				if(SearchListAct->getUCN()!=SearchListAct->next->getUCN())
+// 				{
+// 					ring r=rCopy(SearchListAct->flipRing);
+// 					rComplete(r);
+// 					rChangeCurrRing(r);
+// 					gcAct = gcAct->next;
+// 				}
+// 				SearchListAct = SearchListAct->next;
+				fAct = SearchListAct;
+				while( (fAct->next!=NULL) && (fAct->getUCN()==fAct->next->getUCN() ) )
+				{
+					gcAct->flip(gcAct->gcBasis,fAct);
+					ring rTmp=rCopy(SearchListAct->flipRing);
+					rComplete(rTmp);
+ 					rChangeCurrRing(rTmp);
+ 					gcone *gcTmp = new gcone::gcone(*gcAct,*SearchListAct);
+ 					gcTmp->getConeNormals(gcTmp->gcBasis, FALSE);
+ 					gcTmp->getCodim2Normals(*gcTmp);
+					/*add facets to SLA here*/					
+ 					rChangeCurrRing(gcAct->baseRing);
+ 					gcPtr->next=gcTmp;
+ 					if(flag==1)
+ 						gcAct->next=gcTmp;
+ 					gcPtr=gcPtr->next;
+ 					fAct=fAct->next;
+ 					flag++;
+				}
+				SearchListAct=fAct->next;
+				ring r=rCopy(SearchListAct->flipRing);
+				rComplete(r);
+				rChangeCurrRing(r);
+				gcAct = gcAct->next;
+				
 			}			
 		
 			//NOTE Hm, comment in and get a crash for free...
