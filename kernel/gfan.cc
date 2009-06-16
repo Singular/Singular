@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-06-14 10:00:14 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.60 2009-06-14 10:00:14 monerjan Exp $
-$Id: gfan.cc,v 1.60 2009-06-14 10:00:14 monerjan Exp $
+$Date: 2009-06-16 08:45:33 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.61 2009-06-16 08:45:33 monerjan Exp $
+$Id: gfan.cc,v 1.61 2009-06-16 08:45:33 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -191,7 +191,7 @@ class facet
 		/** Store the flipped GB*/
 		void setFlipGB(ideal I)
 		{
-			this->flipGB=I;
+			this->flipGB=idCopy(I);
 		}
 		
 		/** Return the flipped GB*/
@@ -373,11 +373,14 @@ class gcone
 		{
 			this->next=NULL;
 			this->numVars=gc.numVars;
-			this->UCN=(gc.UCN)+1;
+			//this->UCN=(gc.UCN)+1;
+			this->UCN++;
 			this->facetPtr=NULL;
-			this->gcBasis=gc.gcBasis;
-			this->baseRing=f.flipRing;
-			rChangeCurrRing(this->baseRing);
+ 			this->gcBasis=idCopy(f.flipGB);
+			this->inputIdeal=idCopy(this->gcBasis);
+			this->baseRing=rCopy0(f.flipRing);
+			//rComplete(this->baseRing);
+			//rChangeCurrRing(this->baseRing);
 		}
 		
 		/** \brief Default destructor 
@@ -404,6 +407,9 @@ class gcone
 			ivIntPt->show();
 		}
 		
+		/** \brief Print facets
+		* This is mainly for debugging purposes. Usually called from within gdb
+		*/
 		void showFacets(short codim=1)
 		{
 			facet *f;
@@ -787,12 +793,33 @@ class gcone
 			/*Substep 2.1
 			compute $G_{-\alpha}(in_v(I)) 
 			see journal p. 66
+			NOTE Check for different rings. Prolly it will not always be necessary to add a weight, if the
+			srcRing already has a weighted ordering
 			*/
 			ring srcRing=currRing;
+			ring tmpRing;
 
 			//intvec *negfNormal = new intvec(this->numVars);
 			//negfNormal=ivNeg(fNormal);
-			ring tmpRing=rCopyAndAddWeight(srcRing,ivNeg(fNormal));
+			if( (srcRing->order[0]==ringorder_dp)
+			 	|| (srcRing->order[0]==ringorder_Dp)
+				 || (srcRing->order[0]==ringorder_ds)
+				 || (srcRing->order[0]==ringorder_ls) )
+			{
+				tmpRing=rCopyAndAddWeight(srcRing,ivNeg(fNormal));
+			}
+			else
+			{
+				tmpRing=rCopy0(srcRing);
+				int length=fNormal->length();
+				int *A=(int *)omAlloc(length*sizeof(int));
+				for(int jj=0;jj<length;jj++)
+				{
+					A[jj]=-(*fNormal)[jj];
+				}
+				tmpRing->wvhdl[0]=(int*)A;
+				rComplete(tmpRing);	
+			}
 			rChangeCurrRing(tmpRing);
 			
 			//rWrite(currRing); cout << endl;
@@ -939,7 +966,7 @@ class gcone
 			/*Step 3
 			turn the minimal basis into a reduced one
 			*/
-			ring dstRing=rCopyAndAddWeight(tmpRing,iv_weight);	
+			//ring dstRing=rCopyAndAddWeight(tmpRing,iv_weight);	
 			
 // 			int i,j;
 // 			ring dstRing=rCopy0(srcRing);
@@ -976,7 +1003,22 @@ class gcone
 			{				
 				dstRing->wvhdl[0][ii]=(*iv_weight)[ii];				
 			}*/
+			ring dstRing=rCopy0(tmpRing);
+			int length=iv_weight->length();
+			int *A=(int *)omAlloc(length*sizeof(int));
+			for(int jj=0;jj<length;jj++)
+			{
+				A[jj]=(*iv_weight)[jj];
+			}
+			dstRing->wvhdl[0]=(int*)A;
+			rComplete(dstRing);
+			//rSetWeightVec(dstRing,iv_weight);
+			//assume(dstRing!=NULL);
+			//assume(dstRing->OrdSize>0);
+			//assume(dstRing->typ[0].ord_typ==ro_dp);
+			//memcpy(dstRing->typ[0].data.wp.weights,iv_weight,dstRing->N*sizeof(int));		
 			rChangeCurrRing(dstRing);
+			
 #ifdef gfan_DEBUG
 			rWrite(dstRing); cout << endl;
 #endif
@@ -989,19 +1031,19 @@ class gcone
 			BITSET save=test;
 			test|=Sy_bit(OPT_REDSB);
 			test|=Sy_bit(6);	//OPT_DEBUG					
-			dstRing_I=kStd(idrCopyR(this->inputIdeal,this->rootRing),NULL,testHomog,NULL);					
+			dstRing_I=kStd(idrCopyR(this->inputIdeal,this->baseRing),NULL,testHomog,NULL);					
 			kInterRed(dstRing_I);
 			idSkipZeroes(dstRing_I);
 			test=save;
 			/*End of step 3 - reduction*/
 			
 			f->setFlipGB(dstRing_I);//store the flipped GB
-			f->flipRing=dstRing;	//store the ring on the other side
+			f->flipRing=rCopy0(dstRing);	//store the ring on the other side
 #ifdef gfan_DEBUG
 			cout << "Flipped GB is: " << endl;
 			f->printFlipGB();
 #endif			
-			//rChangeCurrRing(srcRing);	//return to the ring we started the computation of flipGB in
+			rChangeCurrRing(srcRing);	//return to the ring we started the computation of flipGB in
 		}//void flip(ideal gb, facet *f)
 				
 		/** \brief Compute the remainder of a polynomial by a given ideal
@@ -1222,6 +1264,7 @@ class gcone
 			{
 				dd_WriteNumber(stdout,lpSol->sol[ii]);
 			}
+			cout << endl;
 #endif
 			
 			//NOTE The following strongly resembles parts of makeInt. 
@@ -1248,6 +1291,10 @@ class gcone
 				iv[ii-1]=(int)mpz_get_d(mpq_numref(product));
 				mpq_clear(product);
 			}
+#ifdef gfan_DEBUG
+			iv.show();
+			cout << endl;
+#endif
 			mpq_clear(qkgV);
 			mpz_clear(tmp);
 			mpz_clear(den);
@@ -1521,25 +1568,31 @@ class gcone
 		* Since a \f$(codim-1)\f$-facet belongs to exactly two full dimensional cones, we remove a facet from the list as
 		* soon as we compute this facet again. Comparison of facets is done by...
 		*/
-		void noRevS(gcone &gc, bool usingIntPoint=FALSE)
+		void noRevS(gcone &gcRoot, bool usingIntPoint=FALSE)
 		{	
 			facet *SearchListRoot = new facet(); //The list containing ALL facets we come across
 			facet *SearchListAct;
 			SearchListAct = SearchListRoot;
 			
-			facet *fAct;
-			fAct = gc.facetPtr;			
+			gcone *gcAct;
+			gcAct = &gcRoot;
+			gcone = *gcPtr;
+			gcPtr = &gcRoot;
 			
+			facet *fAct;
+			fAct = gcAct->facetPtr;			
+						
+			int UCNcounter=gcAct->getUCN();
 #ifdef gfan_DEBUG
 			cout << "NoRevs" << endl;
 			cout << "Facets are:" << endl;
- 			gc.showFacets();
+ 			gcAct->showFacets();
 #endif			
 			
-			this->getCodim2Normals(gc);
+			gcAct->getCodim2Normals(*gcAct);
 				
 			//Compute unique representation of codim-2-facets
-			this->normalize();
+			gcAct->normalize();
 			
 			/*Make a copy of the facet list of first cone
 			Since the operations getCodim2Normals and normalize affect the facets
@@ -1554,28 +1607,37 @@ class gcone
 			}
 			SearchListAct = SearchListRoot;	//Set to beginning of list
 			
-			fAct = gc.facetPtr;
+			fAct = gcAct->facetPtr;
 			if(areEqual(fAct->getFacetNormal(),fAct->next->getFacetNormal()))
 			{
 				cout <<"HI" << endl;
 			}
 			
-			gc.writeConeToFile(gc);
+			gcAct->writeConeToFile(*gcAct);
 			
+			/*End of initialisation*/
+			fAct = gcAct->facetPtr;
 			/*2nd step
 			Choose a facet from fListPtr, flip it and forget the previous cone
 			We always choose the first facet from fListPtr as facet to be flipped
 			*/
 			while(SearchListAct->next!=NULL)
-			{
-				gc.flip(gc.gcBasis,SearchListAct);
-				gcone *gcTmp = new gcone::gcone(gc,*SearchListAct);
+			{//NOTE See to it that the cone is only changed after ALL facets have been flipped!
+				//As of now this is not the case!
+				gcAct->flip(gcAct->gcBasis,SearchListAct);
+				/*ring rTmp=rCopy(SearchListAct->flipRing);
+				//NOTE It is absolutely crucial to go to the new ring before constructing a new cone!
+				rComplete(rTmp);
+				rChangeCurrRing(rTmp);
+				gcone *gcTmp = new gcone::gcone(*gcAct,*SearchListAct);
+				gcAct = gcTmp;
+				gcAct->getConeNormals(gcAct->gcBasis, FALSE);*/
+				//gcAct->getCodim2Normals(*gcAct);			
 			
-			//gcTmp->getConeNormals();
 			//add new facets
 			//fListPtr = fListPtr->next;
 				SearchListAct = SearchListAct->next;
-			}
+			}			
 		
 			//NOTE Hm, comment in and get a crash for free...
 			//dd_free_global_constants();				
