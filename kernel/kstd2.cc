@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.89 2009-06-13 14:37:58 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.90 2009-06-19 09:53:34 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1366,6 +1366,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
   if (strat->minim>0) strat->M=idInit(IDELEMS(F),F->rank);
   srmax = strat->sl;
   reduc = olddeg = lrmax = 0;
+  strat->lV=lV;
 
 #ifndef NO_BUCKETS
   if (!TEST_OPT_NOT_BUCKETS)
@@ -1749,7 +1750,11 @@ int redFirstShift (LObject* h,kStrategy strat)
     }
 #endif
     ksReducePoly(h, &(strat->T[j]), strat->kNoetherTail(), NULL, strat);
-
+    poly qq=p_Shrink(h->GetTP(),strat->lV,strat->tailRing);
+    h->p=NULL;
+    h->t_p=qq;
+    strat->GetP(strat->lmBin);
+    
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
