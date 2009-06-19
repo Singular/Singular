@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-06-16 15:49:43 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.62 2009-06-16 15:49:43 monerjan Exp $
-$Id: gfan.cc,v 1.62 2009-06-16 15:49:43 monerjan Exp $
+$Date: 2009-06-19 11:22:06 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.63 2009-06-19 11:22:06 monerjan Exp $
+$Id: gfan.cc,v 1.63 2009-06-19 11:22:06 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -24,6 +24,8 @@ $Id: gfan.cc,v 1.62 2009-06-16 15:49:43 monerjan Exp $
 #include <bitset>
 #include <fstream>	//read-write cones to files
 #include <gmp.h>
+#include <string>
+#include <sstream>
 //#include <gmpxx.h>
 
 /*DO NOT REMOVE THIS*/
@@ -1622,40 +1624,13 @@ class gcone
 			Choose a facet from fListPtr, flip it and forget the previous cone
 			We always choose the first facet from fListPtr as facet to be flipped
 			*/
-			while(SearchListAct->next!=NULL)
+ 			while(SearchListAct->next!=NULL)
 			{//NOTE See to it that the cone is only changed after ALL facets have been flipped!
 				//As of now this is not the case!
 				int flag=1;
-// 				while(fAct->next!=NULL)
-// 				{
-// 					gcAct->flip(gcAct->gcBasis,SearchListAct);
-// 					ring rTmp=rCopy(SearchListAct->flipRing);
-// 					//NOTE It is absolutely crucial to go to the new ring before constructing a new cone!
-// 					rComplete(rTmp);
-// 					rChangeCurrRing(rTmp);
-// 					gcone *gcTmp = new gcone::gcone(*gcAct,*SearchListAct);
-// 					gcTmp->getConeNormals(gcTmp->gcBasis, FALSE);
-// 					gcTmp->getCodim2Normals(*gcTmp);
-// 					/*add facets to SLA here*/					
-// 					rChangeCurrRing(gcAct->baseRing);
-// 					gcPtr->next=gcTmp;
-// 					if(flag==1)
-// 						gcAct->next=gcTmp;
-// 					gcPtr=gcPtr->next;
-// 					fAct=fAct->next;
-// 					flag++;
-// 				}
-// 				
-// 				if(SearchListAct->getUCN()!=SearchListAct->next->getUCN())
-// 				{
-// 					ring r=rCopy(SearchListAct->flipRing);
-// 					rComplete(r);
-// 					rChangeCurrRing(r);
-// 					gcAct = gcAct->next;
-// 				}
-// 				SearchListAct = SearchListAct->next;
 				fAct = SearchListAct;
-				while( (fAct->next!=NULL) && (fAct->getUCN()==fAct->next->getUCN() ) )
+				//while( ( (fAct->next!=NULL) && (fAct->getUCN()==fAct->next->getUCN() ) ) )
+				do
 				{
 					gcAct->flip(gcAct->gcBasis,fAct);
 					ring rTmp=rCopy(SearchListAct->flipRing);
@@ -1670,14 +1645,26 @@ class gcone
  					if(flag==1)
  						gcAct->next=gcTmp;
  					gcPtr=gcPtr->next;
- 					fAct=fAct->next;
+					if(fAct->getUCN() == fAct->next->getUCN())
+					{
+						fAct=fAct->next;
+					}
+					else
+						break;
  					flag++;
+				}while( ( (fAct->next!=NULL) && (fAct->getUCN()==fAct->next->getUCN() ) ) );	
+				if (fAct->next!=NULL)
+				{
+					SearchListAct=fAct->next;
+					ring r=rCopy(SearchListAct->flipRing);
+					rComplete(r);
+					rChangeCurrRing(r);
+					gcAct = gcAct->next;
 				}
-				SearchListAct=fAct->next;
-				ring r=rCopy(SearchListAct->flipRing);
-				rComplete(r);
-				rChangeCurrRing(r);
-				gcAct = gcAct->next;
+				else
+				{
+					SearchListAct=NULL;
+				}
 				
 			}			
 		
@@ -1851,9 +1838,21 @@ class gcone
 		*/
 		void writeConeToFile(gcone const &gc, bool usingIntPoints=FALSE)
 		{
-			ofstream gcOutputFile("/tmp/cone1.gc");
-			facet *fAct = new facet();
-			fAct = gc.facetPtr;
+ 			int UCN=gc.UCN;
+			stringstream ss;
+			ss << UCN;
+			string UCNstr = ss.str();		
+			
+			char prefix[]="/tmp/cone";
+			char *UCNstring;
+			strcpy(UCNstring,UCNstr.c_str());
+			char suffix[]=".sg";
+			char *filename=strcat(prefix,UCNstring);
+			strcat(filename,suffix);
+					
+			ofstream gcOutputFile(filename);
+			facet *fAct = new facet(); //NOTE Why new?
+			fAct = gc.facetPtr;			
 			
 			char *ringString = rString(currRing);
 			
