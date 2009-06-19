@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.20 2009-06-04 08:42:06 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.21 2009-06-19 09:45:38 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -240,8 +240,11 @@ kStrategy kStratCopy(kStrategy o)
   s->noTailReduction=o->noTailReduction;
   s->fromT=o->fromT;
   s->noetherSet=o->noetherSet;
+#ifdef HAVE_SHIFTBBA
+  s->lV=o->lV;
+#endif
 #ifdef HAVE_PLURAL
-  s->no_prod_crit=o->no_prod_crit,
+  s->no_prod_crit=o->no_prod_crit;
 #endif
   kTest_TS(s);
   return s;

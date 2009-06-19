@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.46 2009-06-13 14:37:58 Singular Exp $ */
+/* $Id: kutil.h,v 1.47 2009-06-19 09:45:38 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -310,6 +310,9 @@ public:
   int lastAxis;
   int newIdeal;
   int minim;
+  #ifdef HAVE_SHIFTBBA
+  int lV;
+  #endif
   BOOLEAN interpt;
   BOOLEAN homog;
 #ifdef HAVE_PLURAL
