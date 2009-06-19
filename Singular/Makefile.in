@@ -340,7 +340,6 @@ libsingular.a: mod2.h Makefile version.h $(WIN_LIBS) scanner.cc  ${OBJS} \
 	ar x ../../kernel/libkernel.a; \
 	ar x ../../$(SINGUNAME)/lib/libsingfac.a; \
 	ar x ../../$(SINGUNAME)/lib/libsingcf.a; \
-	ar x ../../$(SINGUNAME)/lib/libsingcf.a; \
 	ar x ../../$(SINGUNAME)/lib/libntl.a; \
 	ar x ../../$(SINGUNAME)/lib/libomalloc_ndebug.a; \
 	cd ..)
