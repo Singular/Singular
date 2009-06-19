@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.92 2009-06-19 10:02:51 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.93 2009-06-19 10:05:45 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1750,10 +1750,13 @@ int redFirstShift (LObject* h,kStrategy strat)
     }
 #endif
     ksReducePoly(h, &(strat->T[j]), strat->kNoetherTail(), NULL, strat);
-    poly qq=p_Shrink(h->GetTP(),strat->lV,strat->tailRing);
-    h->p=NULL;
-    h->t_p=qq;
-    if (qq!=NULL) h->GetP(strat->lmBin);
+    if (!h->IsNull())
+    {
+      poly qq=p_Shrink(h->GetTP(),strat->lV,strat->tailRing);
+      h->p=NULL;
+      h->t_p=qq;
+      if (qq!=NULL) h->GetP(strat->lmBin);
+    }
     
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
