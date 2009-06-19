@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shiftgb.cc,v 1.11 2009-02-23 13:50:52 Singular Exp $ */
+/* $Id: shiftgb.cc,v 1.12 2009-06-19 15:31:48 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for shift GB and free GB
 */
@@ -576,6 +576,26 @@ poly p_mShrink(poly p, int lV, const ring r)
 
 /* shiftgb stuff */
 
+
+/*2
+ *if the leading term of p
+ *divides the leading term of some T[i] it will be canceled
+ */
+// static inline void clearSShift (poly p, unsigned long p_sev,int l, int* at, int* k,
+//                            kStrategy strat)
+// {
+//   assume(p_sev == pGetShortExpVector(p));
+//   if (!pLmShortDivisibleBy(p,p_sev, strat->T[*at].p, ~ strat->sevT[*at])) return;
+//   //  if (l>=strat->lenS[*at]) return;
+//   if (TEST_OPT_PROT)
+//     PrintS("!");
+//   mflush();
+//   //pDelete(&strat->S[*at]);
+//   deleteInS((*at),strat);
+//   (*at)--;
+//   (*k)--;
+// //  assume(lenS_correct(strat));
+// }
 
 /* remarks: cleanT : just deletion
 enlargeT: just reallocation */

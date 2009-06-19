@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.93 2009-06-19 10:05:45 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.94 2009-06-19 15:31:48 levandov Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1631,26 +1631,45 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
   if (TEST_OPT_DEBUG) messageSets(strat);
 #endif
   /* complete reduction of the standard basis--------- */
-  if (TEST_OPT_SB_1)
+  /*  shift case: look for elt's in S such that they are divisible by elt in T */ 
+  //  if (TEST_OPT_SB_1)
+  if (TEST_OPT_REDSB)
   {
-    int k=1;
-    int j;
+    int k=0;
+    int j=-1;
     while(k<=strat->sl)
     {
-      j=0;
-      loop
+//       loop
+//       {
+//         if (j>=k) break;
+//         clearS(strat->S[j],strat->sevS[j],&k,&j,strat);
+//         j++;
+//       }
+      LObject Ln (strat->S[k],currRing, strat->tailRing);
+      Ln.SetShortExpVector();
+      j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, &Ln, j+1);
+      if (j<0) {  k++; j=-1;}
+      else
       {
-        if (j>=k) break;
-        clearS(strat->S[j],strat->sevS[j],&k,&j,strat);
-        j++;
+        if ( pLmCmp(strat->S[k],strat->T[j].p) == 0)
+        {
+          j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, &Ln, j+1);
+          if (j<0) {  k++; j=-1;}
+          else
+          {
+            deleteInS(k,strat);
+          }
+        }
+        else
+        {
+          deleteInS(k,strat);
+        }
       }
-      k++;
     }
   }
 
   if (TEST_OPT_REDSB)
-  {
-    completeReduce(strat, TRUE); //shift: withT = TRUE
+  {    completeReduce(strat, TRUE); //shift: withT = TRUE
     if (strat->completeReduce_retry)
     {
       // completeReduce needed larger exponents, retry
