@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fegetopt.c,v 1.1.1.1 2003-10-06 12:15:52 Singular Exp $ */
+/* $Id: fegetopt.c,v 1.2 2009-06-21 14:10:58 Singular Exp $ */
 
 /* Getopt for GNU.
    NOTE: getopt is now part of the C library, so if you don't know what
@@ -182,7 +182,7 @@ extern int  strcmp (const char *s1, const char *s2);
 /*extern int  strncmp(const char *s1, const char *s2, int n);*/
 
 static int my_strlen(const char *s);
-static char *my_index (const char *str, int chr);
+static const char *my_index (const char *str, int chr);
 #else
 extern char *getenv ();
 #endif
@@ -195,12 +195,12 @@ static int my_strlen (const char *str)
   return n;
 }
 
-static char * my_index (const char *str, int chr)
+static const char * my_index (const char *str, int chr)
 {
   while (*str)
     {
       if (*str == chr)
-        return (char *) str;
+        return (const char *) str;
       str++;
     }
   return 0;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.128 2009-06-04 09:58:49 Singular Exp $ */
+/* $Id: iplib.cc,v 1.129 2009-06-21 14:10:18 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -262,7 +262,7 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     pi->data.s.body[procbuflen] = '\0';
     strcat( pi->data.s.body+procbuflen, "\n;return();\n\n" );
     strcat( pi->data.s.body+procbuflen+13,pi->libname);
-    s=strchr(pi->data.s.body,'{');
+    s=(char *)strchr(pi->data.s.body,'{');
     if (s!=NULL) *s=' ';
     return NULL;
   }
@@ -280,7 +280,7 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     myfread(s, procbuflen, 1, fp);
     s[procbuflen] = '\0';
     strcat(s+procbuflen-3, "\n;return();\n\n" );
-    p=strchr(s,'{');
+    p=(char *)strchr(s,'{');
     if (p!=NULL) *p=' ';
     return(s);
   }
@@ -1192,7 +1192,7 @@ char *iiConvName(const char *libname)
   char *r;
   if(p==NULL) p = tmpname;
   else p++;
-  r = strchr(p, '.');
+  r = (char *)strchr(p, '.');
   if( r!= NULL) *r = '\0';
   r = omStrDup(p);
   *r = mytoupper(*r);

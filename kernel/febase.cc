@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.22 2008-10-14 07:56:47 Singular Exp $ */
+/* $Id: febase.cc,v 1.23 2009-06-21 14:10:58 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -558,7 +558,7 @@ int feReadLine(char* b, int l)
         if (startfptr==0)
         {
           char *anf=currentVoice->buffer;
-          char *ss=strchr(anf,'\n');
+          const char *ss=strchr(anf,'\n');
           long len;
           if (ss==NULL) len=strlen(anf);
           else          len=ss-anf;
@@ -572,7 +572,7 @@ int feReadLine(char* b, int l)
         (currentVoice->buffer[startfptr-1]=='\n'))
         {
           char *anf=currentVoice->buffer+startfptr;
-          char *ss=strchr(anf,'\n');
+          const char *ss=strchr(anf,'\n');
           long len;
           if (ss==NULL) len=strlen(anf);
           else          len=ss-anf;

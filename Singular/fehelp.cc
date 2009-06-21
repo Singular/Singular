@@ -3,7 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
-* versin $Id: fehelp.cc,v 1.57 2009-06-04 09:58:49 Singular Exp $
+* versin $Id: fehelp.cc,v 1.58 2009-06-21 14:10:18 Singular Exp $
 */
 
 #include <string.h>
@@ -1032,7 +1032,7 @@ static void heGenHelp(heEntry hentry, int br)
                    strcat(sys,temp);
                    if ((*p)=='f')
                    { // remove #SEC
-                     char *pp=strchr(sys,'#');
+                     char *pp=(char *)strchr(sys,'#');
                      if (pp!=NULL)
                      {
                        *pp='\0';
