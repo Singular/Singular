@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-06-19 11:22:06 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.63 2009-06-19 11:22:06 monerjan Exp $
-$Id: gfan.cc,v 1.63 2009-06-19 11:22:06 monerjan Exp $
+$Date: 2009-06-22 15:17:37 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.64 2009-06-22 15:17:37 monerjan Exp $
+$Id: gfan.cc,v 1.64 2009-06-22 15:17:37 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -104,11 +104,17 @@ class facet
 		{
 			// Pointer to next facet.  */
 			/* Defaults to NULL. This way there is no need to check explicitly */
-			this->next=NULL; 
-			this->UCN=NULL;
+			this->fNormal=NULL;
+			this->interiorPoint=NULL;		
+			this->UCN=0;
 			this->codim2Ptr=NULL;
 			this->codim=1;		//default for (codim-1)-facets
-			this->numCodim2Facets=0;
+			this->flipGB=NULL;
+			this->isIncoming=FALSE;
+			this->next=NULL; 
+			this->codim2Ptr=NULL;
+			this->numCodim2Facets=0;						
+			this->flipRing=NULL;
 		}
 		
 		/** \brief Constructor for facets of codim >= 2
@@ -116,7 +122,7 @@ class facet
 		facet(int const &n)
 		{
 			this->next=NULL; 
-			this->UCN=NULL;
+			this->UCN=0;
 			this->codim2Ptr=NULL;
 			if(n>1)
 			{
@@ -488,8 +494,8 @@ class gcone
 			dd_ErrorType dderr=dd_NoError;	//
 			// End of var declaration
 #ifdef gfan_DEBUG
-			cout << "The Groebner basis has " << lengthGB << " elements" << endl;
-			cout << "The current ring has " << numvar << " variables" << endl;
+// 			cout << "The Groebner basis has " << lengthGB << " elements" << endl;
+// 			cout << "The current ring has " << numvar << " variables" << endl;
 #endif
 			cols = numvar;
 		
@@ -501,8 +507,8 @@ class gcone
 				rows=rows+pLength(aktpoly)-1;
 			}
 #ifdef gfan_DEBUG
-			cout << "rows=" << rows << endl;
-			cout << "Will create a " << rows << " x " << cols << " matrix to store inequalities" << endl;
+// 			cout << "rows=" << rows << endl;
+// 			cout << "Will create a " << rows << " x " << cols << " matrix to store inequalities" << endl;
 #endif
 			dd_rowrange aktmatrixrow=0;	// needed to store the diffs of the expvects in the rows of ddineq
 			dd_set_global_constants();
@@ -517,7 +523,7 @@ class gcone
 				aktpoly=(poly)I->m[i];		//get aktpoly as i-th component of I
 				pCompCount=pLength(aktpoly);	//How many terms does aktpoly consist of?
 #ifdef gfan_DEBUG
-				cout << "Poly No. " << i << " has " << pCompCount << " components" << endl;
+// 				cout << "Poly No. " << i << " has " << pCompCount << " components" << endl;
 #endif
 		
 				int *v=(int *)omAlloc((numvar+1)*sizeof(int));
@@ -584,6 +590,7 @@ class gcone
 #endif
 			/*The pointer *fRoot should be the return value of this function*/
 			facet *fRoot = new facet();	//instantiate new facet
+			fRoot->setUCN(this->getUCN());
 			this->facetPtr = fRoot;		//set variable facetPtr of class gcone to first facet
 			facet *fAct; 			//instantiate pointer to active facet
 			fAct = fRoot;			//Seems to do the trick. fRoot and fAct have to point to the same adress!
@@ -596,7 +603,7 @@ class gcone
 					double foo;
 					foo = mpq_get_d(ddineq->matrix[kk][jj]);
 #ifdef gfan_DEBUG
-					std::cout << "fAct is " << foo << " at " << fAct << std::endl;
+// 					std::cout << "fAct is " << foo << " at " << fAct << std::endl;
 #endif
 					(*load)[jj-1] = (int)foo;		//store typecasted entry at pos jj-1 of load		
 				}//for (int jj = 1; jj <ddcols; jj++)
@@ -607,7 +614,7 @@ class gcone
 				{
 					intvec *ivCanonical = new intvec(load->length());
 					(*ivCanonical)[jj]=1;
-					cout << "dotProd=" << dotProduct(*load,*ivCanonical) << endl;
+// 					cout << "dotProd=" << dotProduct(*load,*ivCanonical) << endl;
 					if (dotProduct(*load,*ivCanonical)<0)	
 					//if (ivMult(load,ivCanonical)<0)
 					{
@@ -623,9 +630,12 @@ class gcone
 				}
 				else
 				{	/*Now load should be full and we can call setFacetNormal*/
+					//NOTE Check whether another facet is needed at all. Otherwise
+					//this results in one facet too much being constructed!
 					fAct->setFacetNormal(load);
 					fAct->next = new facet();					
 					fAct=fAct->next;	//this should definitely not be called in the above while-loop :D
+					fAct->setUCN(this->getUCN());
 					this->numFacets++;
 				}//if (isFlippable==FALSE)
 				//delete load;
@@ -692,7 +702,7 @@ class gcone
  					//dd_WriteMatrix(stdout,ddakt);
 				ddpolyh=dd_DDMatrix2Poly(ddakt, &err);
 				P=dd_CopyGenerators(ddpolyh);
-				dd_WriteMatrix(stdout,P);
+// 				dd_WriteMatrix(stdout,P);
 					
 				/* We loop through each row of P
 				* normalize it by making all entries integer ones
@@ -830,8 +840,8 @@ class gcone
 			ideal ina;			
 			ina=idrCopyR(initialForm,srcRing);			
 #ifdef gfan_DEBUG
-			cout << "ina=";
-			idShow(ina); cout << endl;
+// 			cout << "ina=";
+// 			idShow(ina); cout << endl;
 #endif
 			ideal H;
 			H=kStd(ina,NULL,isHomog,NULL);	//we know it is homogeneous
@@ -1579,8 +1589,12 @@ class gcone
 			
 			gcone *gcAct;
 			gcAct = &gcRoot;
-			gcone *gcPtr;
+			gcone *gcPtr;	//Pointer to end of linked list of cones
 			gcPtr = &gcRoot;
+			gcone *gcNext;	//Pointer to next cone to be visited
+			gcNext = &gcRoot;
+			gcone *gcHead;
+			gcHead = &gcRoot;
 			
 			facet *fAct;
 			fAct = gcAct->facetPtr;			
@@ -1610,13 +1624,8 @@ class gcone
 			}
 			SearchListAct = SearchListRoot;	//Set to beginning of list
 			
-			fAct = gcAct->facetPtr;
-			if(areEqual(fAct->getFacetNormal(),fAct->next->getFacetNormal()))
-			{
-				cout <<"HI" << endl;
-			}
-			
-			gcAct->writeConeToFile(*gcAct);
+			fAct = gcAct->facetPtr;			
+			//gcAct->writeConeToFile(*gcAct);
 			
 			/*End of initialisation*/
 			fAct = SearchListAct;
@@ -1625,25 +1634,23 @@ class gcone
 			We always choose the first facet from fListPtr as facet to be flipped
 			*/
  			while(SearchListAct->next!=NULL)
-			{//NOTE See to it that the cone is only changed after ALL facets have been flipped!
-				//As of now this is not the case!
-				int flag=1;
+			{//NOTE See to it that the cone is only changed after ALL facets have been flipped!				
 				fAct = SearchListAct;
 				//while( ( (fAct->next!=NULL) && (fAct->getUCN()==fAct->next->getUCN() ) ) )
 				do
 				{
 					gcAct->flip(gcAct->gcBasis,fAct);
-					ring rTmp=rCopy(SearchListAct->flipRing);
+					ring rTmp=rCopy(fAct->flipRing);
 					rComplete(rTmp);
  					rChangeCurrRing(rTmp);
- 					gcone *gcTmp = new gcone::gcone(*gcAct,*SearchListAct);
+ 					gcone *gcTmp = new gcone::gcone(*gcAct,*fAct);
  					gcTmp->getConeNormals(gcTmp->gcBasis, FALSE);
  					gcTmp->getCodim2Normals(*gcTmp);
-					/*add facets to SLA here*/					
+					gcTmp->normalize();
+					/*add facets to SLA here*/
+					gcTmp->enqueueNewFacets(*SearchListRoot);
  					rChangeCurrRing(gcAct->baseRing);
  					gcPtr->next=gcTmp;
- 					if(flag==1)
- 						gcAct->next=gcTmp;
  					gcPtr=gcPtr->next;
 					if(fAct->getUCN() == fAct->next->getUCN())
 					{
@@ -1651,22 +1658,68 @@ class gcone
 					}
 					else
 						break;
- 					flag++;
-				}while( ( (fAct->next!=NULL) && (fAct->getUCN()==fAct->next->getUCN() ) ) );	
-				if (fAct->next!=NULL)
+				}while( ( (fAct->next!=NULL) && (fAct->getUCN()==fAct->next->getUCN() ) ) );
+				gcNext = gcHead;
+				while(gcNext->next!=NULL)
 				{
-					SearchListAct=fAct->next;
-					ring r=rCopy(SearchListAct->flipRing);
-					rComplete(r);
-					rChangeCurrRing(r);
-					gcAct = gcAct->next;
+					if(gcNext->getUCN() > gcNext->next->getUCN() )
+					{
+						gcAct = gcNext->next;
+					}
+					gcNext = gcNext->next;
 				}
-				else
-				{
-					SearchListAct=NULL;
-				}
+				SearchListAct = SearchListAct->next;
+// 				if (fAct->next!=NULL)
+// 				{
+// 					SearchListAct=fAct->next;
+// 					ring r=rCopy(SearchListAct->flipRing);
+// 					rComplete(r);
+// 					rChangeCurrRing(r);
+// 					gcAct = gcAct->next;
+// 				}
+// 				else
+// 				{
+// 					SearchListAct=NULL;
+// 				}
 				
-			}			
+			}
+						
+// 			while(SearchListAct->next!=NULL)
+// 			{
+// 				fAct = SearchListAct;
+// 				do
+// 				{
+// 					gcAct->flip(gcAct->gcBasis,fAct);
+// 					ring rTmp = rCopy(fAct->flipRing);
+// 					rComplete(rTmp);
+// 					rChangeCurrRing(rTmp);
+// 					gcone *gcTmp = new gcone(*gcAct,*fAct);
+// 					gcTmp->getConeNormals(gcTmp->gcBasis,FALSE);
+// 					gcTmp->getCodim2Normals(*gcTmp);
+// 					gcPtr->next = gcTmp;
+// 					gcPtr = gcPtr->next;
+// 					/*add facets to SLA here*/
+// 					rChangeCurrRing(gcAct->baseRing);
+// 					fAct = fAct->next;
+// 				}while( (fAct->next!=NULL) &&  (fAct->getUCN()==fAct->next->getUCN()));
+// 				SearchListAct = SearchListAct->next;//fAct;				
+// 			}
+			
+// 			while(SearchListAct->next!=NULL)
+// 			{
+// 				gcAct->flip(gcAct->gcBasis,SearchListAct);
+// 				ring rTmp=rCopy(fAct->flipRing);
+// 				rComplete(rTmp);
+// 				rChangeCurrRing(rTmp);
+// 				gcone *gcTmp = new gcone(*gcAct,*SearchListAct);
+// 				gcTmp->getConeNormals(gcTmp->gcBasis,FALSE);
+// 				gcTmp->getCodim2Normals(*gcTmp);
+// 				rChangeCurrRing(gcAct->baseRing);
+// 				SearchListAct = SearchListAct->next;
+// 				
+// 				//gcone *gcNew = new gcone(SearchListAct->flipRing,SearchListAct->flipGB);
+// 				//gcAct = gcNew;
+// 			}
 		
 			//NOTE Hm, comment in and get a crash for free...
 			//dd_free_global_constants();				
@@ -1775,6 +1828,52 @@ class gcone
 				//delete new_n;
 			}			
 		}
+		/** 
+		* Takes ptr to search list root
+		*/
+		void enqueueNewFacets(facet &f)
+		{
+			facet *slAct;	//called with f=SearchListRoot
+			slAct = &f;
+			facet *slEnd;	//Pointer to end of SLA
+			slEnd = &f;		
+			facet *fAct;
+			fAct = this->facetPtr;
+			facet *codim2Act;
+			codim2Act = this->facetPtr->codim2Ptr;
+			while(slEnd->next!=NULL)
+			{
+				slEnd=slEnd->next;
+			}
+			/*1st step: compare facetNormals*/
+			intvec *fNormal = new intvec(this->numVars);
+			intvec *f2Normal = new intvec(this->numVars);
+			intvec *slNormal = new intvec(this->numVars);
+			intvec *sl2Normal = new intvec(this->numVars);
+			while(slAct->next!=NULL)
+			{
+				slNormal = slAct->getFacetNormal();
+				fAct = this->facetPtr;
+				while(fAct->next!=NULL)
+				{
+					fNormal = fAct->getFacetNormal();
+					if(!isParallel(fNormal,slNormal))
+					{						
+						slEnd->next = new facet();
+						slEnd = slEnd->next;
+						slEnd->setUCN(this->getUCN());
+						slEnd->setFacetNormal(fNormal);						
+						//memcpy(slEnd,fAct,sizeof(facet));
+					}
+					fAct = fAct->next;
+				}
+				slAct = slAct->next;
+			}
+// 			delete sl2Normal;
+// 			delete slNormal;
+// 			delete f2Normal;
+// 			delete fNormal;
+ 		}//addC2N
 		
 		/** \brief Compute the gcd of two ints
 		*/
