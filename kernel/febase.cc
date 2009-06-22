@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.23 2009-06-21 14:10:58 Singular Exp $ */
+/* $Id: febase.cc,v 1.24 2009-06-22 17:16:57 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -745,7 +745,7 @@ FILE * feFopen(const char *path, const char *mode, char *where,
       if (pw_entry != NULL)
       {
         strcpy(longpath, pw_entry->pw_dir);
-        dir_sep = strchr(path, DIR_SEP);
+        dir_sep = strchr((char *)path, DIR_SEP);
         strcat(longpath, dir_sep);
         path = longpath;
       }
