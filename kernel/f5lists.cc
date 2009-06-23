@@ -1,6 +1,6 @@
 #include "mod2.h"
 
-#ifdef HAVE_F5C
+#ifdef HAVE_F5
 #include "kutil.h"
 #include "structs.h"
 #include "omalloc.h"
@@ -1051,6 +1051,7 @@ void RTagNode::set(RNode* r) {
     this->data  =   r;
 }
 
+
 void RTagNode::print() {
     RTagNode* temp  =   this;
     if(NULL != temp && NULL != temp->getRNode()) {
@@ -1066,6 +1067,7 @@ void RTagNode::print() {
         }
     }
 }
+
 /*
 =======================================
 functions working on the class LTagList

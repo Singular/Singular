@@ -2,13 +2,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5data.h,v 1.11 2009-05-29 11:34:22 ederc Exp $ */
+/* $Id: f5data.h,v 1.12 2009-06-23 10:08:15 ederc Exp $ */
 /*
 * ABSTRACT: labeled polynomial interface
 */
-#ifndef F5CDATA_HEADER
-#define F5CDATA_HEADER
-#ifdef HAVE_F5C
+#ifndef F5DATA_HEADER
+#define F5DATA_HEADER
+#ifdef HAVE_F5
 /*!
 =========================================================
 =========================================================

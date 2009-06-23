@@ -1,15 +1,15 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5lists.h,v 1.21 2009-05-29 11:34:22 ederc Exp $ */
+/* $Id: f5lists.h,v 1.22 2009-06-23 10:08:15 ederc Exp $ */
 /*
 * ABSTRACT: list interface
 */
 #include "f5data.h"
-#ifndef F5CLISTS_HEADER
-#define F5CLISTS_HEADER
+#ifndef F5LISTS_HEADER
+#define F5LISTS_HEADER
 
-#ifdef HAVE_F5C
+#ifdef HAVE_F5
 /*
 ============================
 ============================

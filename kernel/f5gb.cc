@@ -384,7 +384,6 @@ inline bool criterion2(int idx, poly t, LNode* l, RList* rules, RTagList* rTag) 
     
     RNode* testNode; // =   new RNode();
     
-
     if(NULL == rTag->getFirst()) {
         if(NULL != rules->getFirst()) {
             testNode    =   rules->getFirst();
