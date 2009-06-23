@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.120 2009-06-04 12:43:27 Singular Exp $ */
+/* $Id: ring.cc,v 1.121 2009-06-23 08:07:11 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -363,11 +363,11 @@ void rWrite(ring r)
     ||(r->order[l] == ringorder_a64)
     ||(r->order[l] == ringorder_aa))
     {
-      PrintS("\n//                  : names    ");
+      PrintS("\n//                  : names   ");
       for (i = r->block0[l]-1; i<r->block1[l]; i++)
       {
         nlen = strlen(r->names[i]);
-        PrintS(r->names[i]);
+        Print(" %s",r->names[i]);
       }
     }
 #ifndef NDEBUG
@@ -383,20 +383,20 @@ void rWrite(ring r)
            j<(r->block1[l]-r->block0[l]+1)*(r->block1[l]-r->block0[l]+1);
            j+=i)
       {
-        PrintS("\n//                  : weights  ");
+        PrintS("\n//                  : weights ");
         for (i = 0; i<=r->block1[l]-r->block0[l]; i++)
         {
           if (r->order[l] == ringorder_a64)
           {
 	    int64 *w=(int64 *)r->wvhdl[l];
 	    #if SIZEOF_LONG == 4
-            Print("%*lld " ,nlen,w[i+j],i+j);
+            Print(" %*lld" ,nlen,w[i+j],i+j);
 	    #else
-            Print("%*ld "  ,nlen,w[i+j],i+j);
+            Print(" %*ld"  ,nlen,w[i+j],i+j);
 	    #endif
           }
           else
-            Print("%*d " ,nlen,r->wvhdl[l][i+j],i+j);
+            Print(" %*d" ,nlen,r->wvhdl[l][i+j],i+j);
         }
         if (r->order[l]!=ringorder_M) break;
       }
