@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
-$Author: monerjan $
-$Date: 2009-06-23 16:21:07 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.65 2009-06-23 16:21:07 monerjan Exp $
-$Id: gfan.cc,v 1.65 2009-06-23 16:21:07 monerjan Exp $
+$Author: Singular $
+$Date: 2009-06-24 07:33:24 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.66 2009-06-24 07:33:24 Singular Exp $
+$Id: gfan.cc,v 1.66 2009-06-24 07:33:24 Singular Exp $
 */
 
 #include "mod2.h"
@@ -876,10 +876,7 @@ class gcone
 
 			//intvec *negfNormal = new intvec(this->numVars);
 			//negfNormal=ivNeg(fNormal);
-			if( (srcRing->order[0]==ringorder_dp)
-			 	|| (srcRing->order[0]==ringorder_Dp)
-				 || (srcRing->order[0]==ringorder_ds)
-				 || (srcRing->order[0]==ringorder_ls) )
+			if( (srcRing->order[0]!=ringorder_a)
 			{
 				tmpRing=rCopyAndAddWeight(srcRing,ivNeg(fNormal));
 			}
@@ -887,12 +884,14 @@ class gcone
 			{
 				tmpRing=rCopy0(srcRing);
 				int length=fNormal->length();
-				int *A=(int *)omAlloc(length*sizeof(int));
+				int *A=(int *)omAlloc0(length*sizeof(int));
 				for(int jj=0;jj<length;jj++)
 				{
 					A[jj]=-(*fNormal)[jj];
 				}
+                                omFree(tmpRing->wvhdl[0]);
 				tmpRing->wvhdl[0]=(int*)A;
+                                tmpRing->block1[0]=length;
 				rComplete(tmpRing);	
 			}
 			rChangeCurrRing(tmpRing);
@@ -1388,68 +1387,35 @@ class gcone
 		*/
 		ring rCopyAndAddWeight(ring const &r, intvec const *ivw)				
 		{
-			ring res=(ring)omAllocBin(ip_sring_bin);
-			memcpy4(res,r,sizeof(ip_sring));
-			res->VarOffset = NULL;
-			res->ref=0;
-			
-			if (r->algring!=NULL)
-				r->algring->ref++;
-			if (r->parameter!=NULL)
-			{
-				res->minpoly=nCopy(r->minpoly);
-				int l=rPar(r);
-				res->parameter=(char **)omAlloc(l*sizeof(char_ptr));
-				int i;
-				for(i=0;i<rPar(r);i++)
-				{
-					res->parameter[i]=omStrDup(r->parameter[i]);
-				}
-			}
-			
-			int i=rBlocks(r);
+			ring res=rCopy0(r);
 			int jj;
 			
-			res->order =(int *)omAlloc((i+1)*sizeof(int));
-			res->block0=(int *)omAlloc((i+1)*sizeof(int));
-			res->block1=(int *)omAlloc((i+1)*sizeof(int));
-			res->wvhdl =(int **)omAlloc((i+1)*sizeof(int**));
-			for(jj=0;jj<i;jj++)
-			{				
-				if (r->wvhdl[jj] != NULL)
-				{
-					res->wvhdl[jj] = (int*) omMemDup(r->wvhdl[jj-1]);
-				}
-				else
-				{
-					res->wvhdl[jj+1]=NULL;
-				}
-			}
-			
-			for (jj=0;jj<i;jj++)
-			{
-				res->order[jj+1]=r->order[jj];
-				res->block0[jj+1]=r->block0[jj];
-				res->block1[jj+1]=r->block1[jj];
-			}						
+                        omFree(res->order);
+			res->order =(int *)omAlloc0(4*sizeof(int));
+                        omFree(res->block0);
+			res->block0=(int *)omAlloc0(4*sizeof(int));
+                        omFree(res->block1);
+			res->block1=(int *)omAlloc0(4*sizeof(int));
+                        omfree(res->wvhdl);
+			res->wvhdl =(int **)omAlloc0(4*sizeof(int**));
 			
 			res->order[0]=ringorder_a;
+                        res->block0[0]=1;
+                        res->block1[0]=res->N;;
 			res->order[1]=ringorder_dp;	//basically useless, since that should never be used			
+                        res->block0[1]=1;
+                        res->block1[1]=res->N;;
+			res->order[2]=ringorder_C;
+
 			int length=ivw->length();
-			int *A=(int *)omAlloc(length*sizeof(int));
+			int *A=(int *)omAlloc0(length*sizeof(int));
 			for (jj=0;jj<length;jj++)
 			{				
 				A[jj]=(*ivw)[jj];				
 			}			
 			res->wvhdl[0]=(int *)A;
-			res->block0[0]=1;
 			res->block1[0]=length;
 			
-			res->names = (char **)omAlloc0(rVar(r) * sizeof(char_ptr));
-			for (i=rVar(res)-1;i>=0; i--)
-			{
-				res->names[i] = omStrDup(r->names[i]);
-			}			
 			rComplete(res);
 			return res;
 		}//rCopyAndAdd
