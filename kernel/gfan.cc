@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
-$Author: Singular $
-$Date: 2009-06-24 07:33:24 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.66 2009-06-24 07:33:24 Singular Exp $
-$Id: gfan.cc,v 1.66 2009-06-24 07:33:24 Singular Exp $
+$Author: monerjan $
+$Date: 2009-06-25 08:52:03 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.67 2009-06-25 08:52:03 monerjan Exp $
+$Id: gfan.cc,v 1.67 2009-06-25 08:52:03 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -876,7 +876,7 @@ class gcone
 
 			//intvec *negfNormal = new intvec(this->numVars);
 			//negfNormal=ivNeg(fNormal);
-			if( (srcRing->order[0]!=ringorder_a)
+			if( (srcRing->order[0]!=ringorder_a))
 			{
 				tmpRing=rCopyAndAddWeight(srcRing,ivNeg(fNormal));
 			}
@@ -901,14 +901,15 @@ class gcone
 			ideal ina;			
 			ina=idrCopyR(initialForm,srcRing);			
 #ifdef gfan_DEBUG
-// 			cout << "ina=";
-// 			idShow(ina); cout << endl;
+ 			cout << "ina=";
+ 			idShow(ina); cout << endl;
 #endif
 			ideal H;
-			H=kStd(ina,NULL,isHomog,NULL);	//we know it is homogeneous
+			//H=kStd(ina,NULL,isHomog,NULL);	//we know it is homogeneous
+			H=kStd(ina,NULL,testHomog,NULL);
 			idSkipZeroes(H);
 #ifdef gfan_DEBUG
-// 			cout << "H="; idShow(H); cout << endl;
+ 			cout << "H="; idShow(H); cout << endl;
 #endif
 			/*Substep 2.2
 			do the lifting and mark according to H
@@ -918,13 +919,13 @@ class gcone
 			ideal srcRing_HH;			
 			srcRing_H=idrCopyR(H,tmpRing);
 #ifdef gfan_DEBUG
-// 			cout << "srcRing_H = ";
-// 			idShow(srcRing_H); cout << endl;
+ 			cout << "srcRing_H = ";
+ 			idShow(srcRing_H); cout << endl;
 #endif
 			srcRing_HH=ffG(srcRing_H,this->gcBasis);		
 #ifdef gfan_DEBUG
-// 			cout << "srcRing_HH = ";
-// 			idShow(srcRing_HH); cout << endl;
+ 			cout << "srcRing_HH = ";
+ 			idShow(srcRing_HH); cout << endl;
 #endif
 			/*Substep 2.2.1
 			Mark according to G_-\alpha
@@ -1104,8 +1105,10 @@ class gcone
 #endif			
 			BITSET save=test;
 			test|=Sy_bit(OPT_REDSB);
-			test|=Sy_bit(6);	//OPT_DEBUG					
-			dstRing_I=kStd(idrCopyR(this->inputIdeal,this->baseRing),NULL,testHomog,NULL);					
+			test|=Sy_bit(6);	//OPT_DEBUG
+			ideal tmpI;
+			tmpI = idrCopyR(this->inputIdeal,this->baseRing);				
+			dstRing_I=kStd(tmpI,NULL,testHomog,NULL);					
 			kInterRed(dstRing_I);
 			idSkipZeroes(dstRing_I);
 			test=save;
