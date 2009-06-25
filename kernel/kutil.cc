@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.145 2009-06-13 14:37:58 Singular Exp $ */
+/* $Id: kutil.cc,v 1.146 2009-06-25 07:55:36 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -4563,6 +4563,7 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLEAN no
         // reducing the tail would violate the exp bound
         //  set a flag and hope for a retry (in bba)
         strat->completeReduce_retry=TRUE;
+        if ((Ln.p != NULL) && (Ln.t_p != NULL)) Ln.p=NULL;
         do
         {
           pNext(h) = Ln.LmExtractAndIter();
@@ -4669,6 +4670,7 @@ poly redtailBba_Z (LObject* L, int pos, kStrategy strat )
         // reducing the tail would violate the exp bound
         //  set a flag and hope for a retry (in bba)
         strat->completeReduce_retry=TRUE;
+        if ((Ln.p != NULL) && (Ln.t_p != NULL)) Ln.p=NULL;
         do
         {
           pNext(h) = Ln.LmExtractAndIter();
@@ -7489,6 +7491,7 @@ poly redtailBbaShift (LObject* L, int pos, kStrategy strat, BOOLEAN withT, BOOLE
         // reducing the tail would violate the exp bound
         //  set a flag and hope for a retry (in bba)
         strat->completeReduce_retry=TRUE;
+        if ((Ln.p != NULL) && (Ln.t_p != NULL)) Ln.p=NULL;
         do
         {
           pNext(h) = Ln.LmExtractAndIter();
