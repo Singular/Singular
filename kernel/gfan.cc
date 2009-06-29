@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-06-25 08:52:03 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.67 2009-06-25 08:52:03 monerjan Exp $
-$Id: gfan.cc,v 1.67 2009-06-25 08:52:03 monerjan Exp $
+$Date: 2009-06-29 14:46:58 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.68 2009-06-29 14:46:58 monerjan Exp $
+$Id: gfan.cc,v 1.68 2009-06-29 14:46:58 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -396,7 +396,7 @@ class gcone
 			this->facetPtr=NULL;
  			this->gcBasis=idCopy(f.flipGB);
 			this->inputIdeal=idCopy(this->gcBasis);
-			this->baseRing=rCopy0(f.flipRing);
+			this->baseRing=rCopy(f.flipRing);
 			this->numFacets=0;
 			//rComplete(this->baseRing);
 			//rChangeCurrRing(this->baseRing);
@@ -586,8 +586,8 @@ class gcone
 			//Maybe add another row to contain the constraints of the standard simplex?
 
 #ifdef gfan_DEBUG
-			cout << "The inequality matrix is" << endl;
-			dd_WriteMatrix(stdout, ddineq);
+ 			cout << "The inequality matrix is" << endl;
+ 			dd_WriteMatrix(stdout, ddineq);
 #endif
 
 			// The inequalities are now stored in ddineq
@@ -607,10 +607,10 @@ class gcone
 			ddrows = ddineq->rowsize;	//Size of the matrix with redundancies removed
 			ddcols = ddineq->colsize;
 #ifdef gfan_DEBUG
-			cout << "Having removed redundancies, the normals now read:" << endl;
-			dd_WriteMatrix(stdout,ddineq);
-			cout << "Rows = " << ddrows << endl;
-			cout << "Cols = " << ddcols << endl;
+ 			cout << "Having removed redundancies, the normals now read:" << endl;
+ 			dd_WriteMatrix(stdout,ddineq);
+ 			cout << "Rows = " << ddrows << endl;
+ 			cout << "Cols = " << ddcols << endl;
 #endif
 			
 			/*Write the normals into class facet*/
@@ -743,12 +743,13 @@ class gcone
 				dd_MatrixCanonicalize(&ddakt, &impl_linset, &redset, &newpos, &err);			
 					
 #ifdef gfan_DEBUG
-//  				dd_WriteMatrix(stdout,ddakt);
+// 				cout << "Codim2 matrix"<<endl;
+//   				dd_WriteMatrix(stdout,ddakt);
 #endif
 				ddpolyh=dd_DDMatrix2Poly(ddakt, &err);
 				P=dd_CopyGenerators(ddpolyh);
 #ifdef gfan_DEBUG
-//  				dd_WriteMatrix(stdout,P);
+//   				dd_WriteMatrix(stdout,P);
 #endif
 					
 				/* We loop through each row of P
@@ -806,9 +807,14 @@ class gcone
 #ifdef gfan_DEBUG
 			std::cout << "===" << std::endl;
 			std::cout << "running gcone::flip" << std::endl;
-// 			std::cout << "fNormal=";
-// 			fNormal->show();
-// 			std::cout << std::endl;
+			std::cout << "flipping" << endl;
+			for(int ii=0;ii<IDELEMS(gb);ii++)
+			{
+				pWrite((poly)gb->m[ii]);
+			}
+			cout << "over facet" << endl;
+ 			fNormal->show();
+ 			std::cout << std::endl;
 #endif				
 			/*1st step: Compute the initial ideal*/
 			poly initialFormElement[IDELEMS(gb)];	//array of #polys in GB to store initial form
@@ -901,15 +907,15 @@ class gcone
 			ideal ina;			
 			ina=idrCopyR(initialForm,srcRing);			
 #ifdef gfan_DEBUG
- 			cout << "ina=";
- 			idShow(ina); cout << endl;
+//  			cout << "ina=";
+//  			idShow(ina); cout << endl;
 #endif
 			ideal H;
 			//H=kStd(ina,NULL,isHomog,NULL);	//we know it is homogeneous
 			H=kStd(ina,NULL,testHomog,NULL);
 			idSkipZeroes(H);
 #ifdef gfan_DEBUG
- 			cout << "H="; idShow(H); cout << endl;
+//  			cout << "H="; idShow(H); cout << endl;
 #endif
 			/*Substep 2.2
 			do the lifting and mark according to H
@@ -919,13 +925,13 @@ class gcone
 			ideal srcRing_HH;			
 			srcRing_H=idrCopyR(H,tmpRing);
 #ifdef gfan_DEBUG
- 			cout << "srcRing_H = ";
- 			idShow(srcRing_H); cout << endl;
+//  			cout << "srcRing_H = ";
+//  			idShow(srcRing_H); cout << endl;
 #endif
 			srcRing_HH=ffG(srcRing_H,this->gcBasis);		
 #ifdef gfan_DEBUG
- 			cout << "srcRing_HH = ";
- 			idShow(srcRing_HH); cout << endl;
+//  			cout << "srcRing_HH = ";
+//  			idShow(srcRing_HH); cout << endl;
 #endif
 			/*Substep 2.2.1
 			Mark according to G_-\alpha
@@ -1032,7 +1038,9 @@ class gcone
 			{
 				dd_set_si(intPointMatrix->matrix[aktrow][jj],1);
 			}
-			dd_WriteMatrix(stdout,intPointMatrix);
+#ifdef gfan_DEBUG
+// 			dd_WriteMatrix(stdout,intPointMatrix);
+#endif
 			intvec *iv_weight = new intvec(this->numVars);
 			interiorPoint(intPointMatrix, *iv_weight);	//iv_weight now contains the interior point
 			dd_FreeMatrix(intPointMatrix);
@@ -1080,7 +1088,7 @@ class gcone
 			}*/
 			ring dstRing=rCopy0(tmpRing);
 			int length=iv_weight->length();
-			int *A=(int *)omAlloc(length*sizeof(int));
+			int *A=(int *)omAlloc0(length*sizeof(int));
 			for(int jj=0;jj<length;jj++)
 			{
 				A[jj]=(*iv_weight)[jj];
@@ -1115,7 +1123,7 @@ class gcone
 			/*End of step 3 - reduction*/
 			
 			f->setFlipGB(dstRing_I);//store the flipped GB
-			f->flipRing=rCopy0(dstRing);	//store the ring on the other side
+			f->flipRing=rCopy(dstRing);	//store the ring on the other side
 #ifdef gfan_DEBUG
 			cout << "Flipped GB is: " << endl;
 			f->printFlipGB();
@@ -1133,7 +1141,7 @@ class gcone
 		//NOTE: Should be replaced by kNF or kNF2
 		poly restOfDiv(poly const &f, ideal const &I)
 		{
-			cout << "Entering restOfDiv" << endl;
+// 			cout << "Entering restOfDiv" << endl;
 			poly p=f;
 			//pWrite(p);
 			//poly r=kCreateZeroPoly(,currRing,currRing);	//The 0-polynomial, hopefully
@@ -1195,7 +1203,7 @@ class gcone
 		//NOTE: use kNF or kNF2 instead of restOfDivision
 		ideal ffG(ideal const &H, ideal const &G)
 		{
-			cout << "Entering ffG" << endl;
+// 			cout << "Entering ffG" << endl;
 			int size=IDELEMS(H);
 			ideal res=idInit(size,1);
 			poly temp1, temp2, temp3;	//polys to temporarily store values for pSub
@@ -1724,43 +1732,6 @@ class gcone
 				//SearchListAct = SearchListAct->next;
 				SearchListAct = fAct->next;				
 			}
-						
-// 			while(SearchListAct->next!=NULL)
-// 			{
-// 				fAct = SearchListAct;
-// 				do
-// 				{
-// 					gcAct->flip(gcAct->gcBasis,fAct);
-// 					ring rTmp = rCopy(fAct->flipRing);
-// 					rComplete(rTmp);
-// 					rChangeCurrRing(rTmp);
-// 					gcone *gcTmp = new gcone(*gcAct,*fAct);
-// 					gcTmp->getConeNormals(gcTmp->gcBasis,FALSE);
-// 					gcTmp->getCodim2Normals(*gcTmp);
-// 					gcPtr->next = gcTmp;
-// 					gcPtr = gcPtr->next;
-// 					/*add facets to SLA here*/
-// 					rChangeCurrRing(gcAct->baseRing);
-// 					fAct = fAct->next;
-// 				}while( (fAct->next!=NULL) &&  (fAct->getUCN()==fAct->next->getUCN()));
-// 				SearchListAct = SearchListAct->next;//fAct;				
-// 			}
-			
-// 			while(SearchListAct->next!=NULL)
-// 			{
-// 				gcAct->flip(gcAct->gcBasis,SearchListAct);
-// 				ring rTmp=rCopy(fAct->flipRing);
-// 				rComplete(rTmp);
-// 				rChangeCurrRing(rTmp);
-// 				gcone *gcTmp = new gcone(*gcAct,*SearchListAct);
-// 				gcTmp->getConeNormals(gcTmp->gcBasis,FALSE);
-// 				gcTmp->getCodim2Normals(*gcTmp);
-// 				rChangeCurrRing(gcAct->baseRing);
-// 				SearchListAct = SearchListAct->next;
-// 				
-// 				//gcone *gcNew = new gcone(SearchListAct->flipRing,SearchListAct->flipGB);
-// 				//gcAct = gcNew;
-// 			}
 		
 			//NOTE Hm, comment in and get a crash for free...
 			//dd_free_global_constants();				
@@ -1801,6 +1772,21 @@ class gcone
 				mpz_clear(z);				
 			}
 			
+			//Check whether denom is all ones, in which case we will divide out the gcd of the nominators
+// 			mpz_t checksum; mpz_t rop;
+// 			mpz_init(checksum);
+// 			mpz_init(rop);
+// 			bool divideOutGcd=FALSE;
+// 			for(int ii=0;ii<this->numVars;ii++)
+// 			{
+// 				mpz_add(rop, checksum, denom[ii]);
+// 				mpz_set(checksum, rop);
+// 			}
+// 			if( (int)mpz_get_ui(checksum)==this->numVars)
+// 			{
+// 				divideOutGcd=TRUE;
+// 			}
+			
 			/*Compute lcm of the denominators*/
 			mpz_set(tmp,denom[0]);
 			for (int ii=0;ii<(M->colsize)-1;ii++)
@@ -1832,9 +1818,9 @@ class gcone
 			
 		}
 		/**
-		 * We compute the gcd of the components of the codim-2-facets and 
-		 * multiply the each codim-2facet by it. Thus we get a normalized representation of each
-		 * (codim-2)-facet normal.
+		 * For all codim-2-facets we compute the gcd of the components of the facet normal and 
+		 * divide it out. Thus we get a normalized representation of each
+		 * (codim-2)-facet normal, i.e. a primitive vector
 		*/
 		void normalize()
 		{
@@ -1851,14 +1837,16 @@ class gcone
 				{
 					ggT = intgcd(ggT,(*n)[ii]);
 				}
+				for(int ii=0;ii<this->numVars;ii++)
+				{
+					(*n)[ii] = ((*n)[ii])/ggT;
+				}
 				codim2Act = codim2Act->next;				
 			}
 			//delete n;
-			codim2Act = this->facetPtr->codim2Ptr;	//reset to start of linked list
-			//while(codim2Act->next!=NULL)
+			/*codim2Act = this->facetPtr->codim2Ptr;	//reset to start of linked list			
 			while(codim2Act!=NULL)
-			{
-				//intvec *n = new intvec(this->numVars);
+			{				
 				n=codim2Act->getFacetNormal();
 				intvec *new_n = new intvec(this->numVars);
 				for(int ii=0;ii<this->numVars;ii++)
@@ -1869,7 +1857,7 @@ class gcone
 				codim2Act = codim2Act->next;
 				//delete n;
 				//delete new_n;
-			}			
+			}	*/		
 		}
 		/** 
 		* Takes ptr to search list root
@@ -1884,6 +1872,8 @@ class gcone
 			fAct = this->facetPtr;
 			facet *codim2Act;
 			codim2Act = this->facetPtr->codim2Ptr;
+			facet *sl2Act;
+			sl2Act = f.codim2Ptr;
 			bool doNotAdd=FALSE;
 			while(slEnd->next!=NULL)
 			{
@@ -1901,25 +1891,32 @@ class gcone
 				slAct = &f;	//return to start of list
 				while(slAct!=NULL)
 				{
-					slNormal = slAct->getFacetNormal();
-					/*if(!isParallel(fNormal,slNormal))
-					{
-						slEnd->next = new facet();
-						slEnd = slEnd->next;
-						slEnd->setUCN(this->getUCN());
-						slEnd->setFacetNormal(fNormal);
-						break;
-											
-					}
-					else
-					{
-						//NOTE check codim2facets here
-						break;	//hopefully breaks the while loop
-					}*/
+					slNormal = slAct->getFacetNormal();					
+					/*If the normals are parallel we check whether the
+					codim-2-normals coincide as well*/
 					if(isParallel(fNormal,slNormal))
 					{
 						//NOTE check codim2facets here
-						doNotAdd=TRUE;
+// 						while(codim2Act!=NULL)
+// 						{
+// 							f2Normal = codim2Act->getFacetNormal();
+// 							sl2Act = f.codim2Ptr;
+// 							while(sl2Act!=NULL)
+// 							{
+// 								sl2Normal = sl2Act->getFacetNormal();
+// 								if(!isParallel(f2Normal,sl2Normal))
+// 								{
+// 									doNotAdd=FALSE;
+// 									break;
+// 								}
+// 								sl2Act = sl2Act->next;
+// 							}
+// 							if(doNotAdd==FALSE)
+// 								break;
+// 							codim2Act = codim2Act->next;
+// 							
+// 						}
+						doNotAdd=FALSE;
 						break;
 					}
 					slAct = slAct->next;
@@ -1974,7 +1971,8 @@ class gcone
 			M=dd_CreateMatrix(ddrows,ddcols);			
 			
 			int jj=0;
-			while(fAct->next!=NULL)
+			//while(fAct->next!=NULL)
+			while(fAct!=NULL)
 			{
 				intvec *comp;
 				comp = fAct->getFacetNormal();
@@ -2036,7 +2034,8 @@ class gcone
 				}				
 				
 				gcOutputFile << "FACETS" << endl;								
-				while(fAct->next!=NULL)
+				//while(fAct->next!=NULL)
+				while(fAct!=NULL)
 				{	
  					intvec *iv = new intvec(gc.numVars);
 					iv=fAct->getFacetNormal();
