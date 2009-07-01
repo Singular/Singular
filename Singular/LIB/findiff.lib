@@ -1,7 +1,7 @@
 //
 //
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: findiff.lib,v 1.1 2009-07-01 12:35:07 Singular Exp $";
+version="$Id: findiff.lib,v 1.2 2009-07-01 12:38:06 Singular Exp $";
 category="Teaching";
 info="
 LIBRARY:  findiff.lib    procedures to compute finite difference schemes for
@@ -850,16 +850,15 @@ EXAMPLE:  example timestep; shows an example
 }
 example
 {
-  killall();
-"EXAMPLE:"echo=2;
-list D="Ut","Ux","Uy","U";
-list V="t","x","y";
-list P="a","b";
-setinitials(V,D,P);
-list Mat=unitmat(2),unitmat(2);
-list Apr=forward(Ut,U,t),forward(Ux,U,x);
-matrixsystem(Mat,Apr);
-timestep(_);
+  "EXAMPLE:"echo=2;
+  list D="Ut","Ux","Uy","U";
+  list V="t","x","y";
+  list P="a","b";
+  setinitials(V,D,P);
+  list Mat=unitmat(2),unitmat(2);
+  list Apr=forward(Ut,U,t),forward(Ux,U,x);
+  matrixsystem(Mat,Apr);
+  timestep(_);
 }
 //////////////////////////////////
 proc fouriersystem(list Matrices, list Approx)
@@ -920,16 +919,15 @@ EXAMPLE:  example fouriersystem; shows an example
 }
 example
 {
-killall();
-"EXAMPLE:"; echo = 2;
-list D="Ut","Ux","Uy","U";
-list V="t","x","y";
-list P="a","b";
-setinitials(V,D,P);
-matrix M[2][2]=0,-a,-a,0;
-list Mat=unitmat(2),M;
-list Appr=forward(Ut,U,t),trapezoid(Ux,U,x);
-def s=fouriersystem(Mat,Appr);s;
+  "EXAMPLE:"; echo = 2;
+  list D="Ut","Ux","Uy","U";
+  list V="t","x","y";
+  list P="a","b";
+  setinitials(V,D,P);
+  matrix M[2][2]=0,-a,-a,0;
+  list Mat=unitmat(2),M;
+  list Appr=forward(Ut,U,t),trapezoid(Ux,U,x);
+  def s=fouriersystem(Mat,Appr);s;
 }
 //////////////////////////////////
 proc PartitionVar(poly f,int n)
@@ -958,15 +956,14 @@ EXAMPLE:  example PartitionVar; shows an example
 }
 example
 {
-  killall();
-"EXAMPLE:"; echo = 2;
-list D="Ut","Ux","Uy","U";
-list V="t","x","y";
-list P="a","b";
-setinitials(V,D,P);////does not show the ring, since there is no output
-basering;///does show the ring
-poly f=t**3*cx**2-cy**2*dt+i**3*sx;
-PartitionVar(f,1); ////i is the first variable
+  "EXAMPLE:"; echo = 2;
+  list D="Ut","Ux","Uy","U";
+  list V="t","x","y";
+  list P="a","b";
+  setinitials(V,D,P);////does not show the ring, since there is no output
+  basering;///does show the ring
+  poly f=t**3*cx**2-cy**2*dt+i**3*sx;
+  PartitionVar(f,1); ////i is the first variable
 }
 //////////////////////////////////
 proc ComplexValue(poly f)
@@ -984,16 +981,15 @@ EXAMPLE:  example ComplexValue; shows an example
 }
 example
 {
-killall();
-"EXAMPLE:"; echo = 2;
-list D="Ut","Ux","Uy","U";
-list V="t","x","y";
-list P="a","b";
-setinitials(V,D,P);////does not show the ring, as there is  no output
-basering;///does show the ring
-poly f=t**3*cx**2-cy**2*dt+i**3*sx;
-f;
-VarToPar(f);
+  "EXAMPLE:"; echo = 2;
+  list D="Ut","Ux","Uy","U";
+  list V="t","x","y";
+  list P="a","b";
+  setinitials(V,D,P);////does not show the ring, as there is  no output
+  basering;///does show the ring
+  poly f=t**3*cx**2-cy**2*dt+i**3*sx;
+  f;
+  VarToPar(f);
 }
 //////////////////////////////////
 proc VarToPar(poly f)
@@ -1013,16 +1009,15 @@ EXAMPLE:  example VarToPar; shows an example
 }
 example
 {
-killall();
-"EXAMPLE:"; echo = 2;
-list D="Ut","Ux","Uy","U";
-list V="t","x","y";
-list P="a","b";
-setinitials(V,D,P);////does not show the ring, as there is  no output
-basering;///does show the ring
-poly f=t**3*cx**2-cy**2*dt+i**3*sx;
-f;
-VarToPar(f);
+  "EXAMPLE:"; echo = 2;
+  list D="Ut","Ux","Uy","U";
+  list V="t","x","y";
+  list P="a","b";
+  setinitials(V,D,P);////does not show the ring, as there is  no output
+  basering;///does show the ring
+  poly f=t**3*cx**2-cy**2*dt+i**3*sx;
+  f;
+  VarToPar(f);
 }
 /////////////////////////////////////
 proc ParToVar(poly f)
@@ -1045,9 +1040,7 @@ EXAMPLE:  example ParToVar; shows an example
 }
 example
 {
-  killall();
-  "
-  EXAMPLE:"; echo = 2;
+  "EXAMPLE:"; echo = 2;
   list D="Ut","Ux","Uy","U";
   list V="t","x","y";
   list P="a","b";
@@ -1128,18 +1121,17 @@ EXAMPLE:  example qepcad; shows an example
 }
 example
 {
-killall();
-"EXAMPLE:"; echo = 2;
-list D="Ux","Ut","U";
-list P="a";
-list V="t","x";
-setinitials(V,D,P);
-def s1=scheme(u(Ut)+a*u(Ux),laxfrX(Ux,U,x),laxfrT(Ut,U,x));
-s1;
-def s2=errormap(s1);
-s2;
-def s3=ComplexValue(s2);s3;
-qepcad(s3);
+  "EXAMPLE:"; echo = 2;
+  list D="Ux","Ut","U";
+  list P="a";
+  list V="t","x";
+  setinitials(V,D,P);
+  def s1=scheme(u(Ut)+a*u(Ux),laxfrX(Ux,U,x),laxfrT(Ut,U,x));
+  s1;
+  def s2=errormap(s1);
+  s2;
+  def s3=ComplexValue(s2);s3;
+  qepcad(s3);
 }
 ///////////////////////////////////////////
 proc qepcadsystem(list l)
@@ -1229,21 +1221,19 @@ EXAMPLE:  example qepcadsystem; shows an example
 }
 example
 {
-killall();
-"EXAMPLE:"; echo = 2;
-list D="Ut","Ux","Uy","U";
-list V="t","x","y";
-list P="a","b";
-setinitials(V,D,P);
-matrix M[2][2]=0,-a,-a,0;
-list Mat=unitmat(2),M;
-list Appr=forward(Ut,U,t),forward(Ux,U,x);
-//matrixsystem(Mat,Appr);
-//timestep(_);
-fouriersystem(Mat,Appr);
-qepcadsystem(_[2]);
+  "EXAMPLE:"; echo = 2;
+  list D="Ut","Ux","Uy","U";
+  list V="t","x","y";
+  list P="a","b";
+  setinitials(V,D,P);
+  matrix M[2][2]=0,-a,-a,0;
+  list Mat=unitmat(2),M;
+  list Appr=forward(Ut,U,t),forward(Ux,U,x);
+  //matrixsystem(Mat,Appr);
+  //timestep(_);
+  fouriersystem(Mat,Appr);
+  qepcadsystem(_[2]);
 }
-///////////////////////////////////////////
 ///////////////////////////////////////////
 static proc substbracketstar(string s)
 {
@@ -1595,7 +1585,7 @@ static proc listfind(list l, int n)
   return(result);
 }
 //////////////////////////////////////////////////
-static proc cutoffrel(string str) 
+static proc cutoffrel(string str)
 /////////cut off the relations "/=,<= etc." from output-string
 {
   list rels="<=",">=","<",">","/=","=";  //these are all of qepcad's relations
