@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-06-29 14:46:58 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.68 2009-06-29 14:46:58 monerjan Exp $
-$Id: gfan.cc,v 1.68 2009-06-29 14:46:58 monerjan Exp $
+$Date: 2009-07-01 09:41:00 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.69 2009-07-01 09:41:00 monerjan Exp $
+$Id: gfan.cc,v 1.69 2009-07-01 09:41:00 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -586,8 +586,8 @@ class gcone
 			//Maybe add another row to contain the constraints of the standard simplex?
 
 #ifdef gfan_DEBUG
- 			cout << "The inequality matrix is" << endl;
- 			dd_WriteMatrix(stdout, ddineq);
+//  			cout << "The inequality matrix is" << endl;
+//  			dd_WriteMatrix(stdout, ddineq);
 #endif
 
 			// The inequalities are now stored in ddineq
@@ -607,10 +607,10 @@ class gcone
 			ddrows = ddineq->rowsize;	//Size of the matrix with redundancies removed
 			ddcols = ddineq->colsize;
 #ifdef gfan_DEBUG
- 			cout << "Having removed redundancies, the normals now read:" << endl;
- 			dd_WriteMatrix(stdout,ddineq);
- 			cout << "Rows = " << ddrows << endl;
- 			cout << "Cols = " << ddcols << endl;
+//  			cout << "Having removed redundancies, the normals now read:" << endl;
+//  			dd_WriteMatrix(stdout,ddineq);
+//  			cout << "Rows = " << ddrows << endl;
+//  			cout << "Cols = " << ddcols << endl;
 #endif
 			
 			/*Write the normals into class facet*/
@@ -654,8 +654,9 @@ class gcone
 				if (isFlippable==FALSE)
 				{
 #ifdef gfan_DEBUG
-					cout << "Ignoring facet";
+					cout << "Ignoring facet" << endl;
 					load->show();
+					cout << endl;
 					//fAct->next=NULL;
 #endif
 				}
@@ -720,7 +721,9 @@ class gcone
 		*/
 		void getCodim2Normals(gcone const &gc)
 		{
-			//this->facetPtr->codim2Ptr = new facet(2);	//instantiate a (codim-2)-facet			
+			//this->facetPtr->codim2Ptr = new facet(2);	//instantiate a (codim-2)-facet
+			facet *fAct;
+			fAct = this->facetPtr;		
 			facet *codim2Act;
 			//codim2Act = this->facetPtr->codim2Ptr;
 			
@@ -736,6 +739,7 @@ class gcone
 			/*Now set appropriate linearity*/
 			dd_PolyhedraPtr ddpolyh;
 			for (int ii=0; ii<this->numFacets; ii++)
+			//while(fAct!=NULL)
 			{				
 				ddakt = dd_CopyMatrix(ddineq);
 				set_addelem(ddakt->linset,ii+1);
@@ -749,7 +753,9 @@ class gcone
 				ddpolyh=dd_DDMatrix2Poly(ddakt, &err);
 				P=dd_CopyGenerators(ddpolyh);
 #ifdef gfan_DEBUG
-//   				dd_WriteMatrix(stdout,P);
+// 				cout << "Codim2 facet:" << endl;
+//    				dd_WriteMatrix(stdout,P);
+// 				cout << endl;
 #endif
 					
 				/* We loop through each row of P
@@ -758,11 +764,15 @@ class gcone
 				*/
 				for (int jj=1;jj<=P->rowsize;jj++)
 				{
-					this->facetPtr->numCodim2Facets++;
-					if(this->facetPtr->numCodim2Facets==1)
+					//this->facetPtr->numCodim2Facets++;
+					fAct->numCodim2Facets++;
+					if(fAct->numCodim2Facets==1)
+					//if(this->facetPtr->numCodim2Facets==1)					
 					{
-						this->facetPtr->codim2Ptr = new facet(2);
-						codim2Act = this->facetPtr->codim2Ptr;
+						//this->facetPtr->codim2Ptr = new facet(2);
+						fAct->codim2Ptr = new facet(2);
+						//codim2Act = this->facetPtr->codim2Ptr;
+						codim2Act = fAct->codim2Ptr;
 					}
 					else
 					{
@@ -781,10 +791,10 @@ class gcone
 					codim2Act = codim2Act->next;						
 					delete n;*/
 				}										
-					
+				fAct = fAct->next;	
 				dd_FreeMatrix(ddakt);
 				dd_FreePolyhedra(ddpolyh);
-			}
+			}//while
 		}
 		
 		/** \brief Compute the Groebner Basis on the other side of a shared facet 
@@ -1377,8 +1387,8 @@ class gcone
 				mpq_clear(product);
 			}
 #ifdef gfan_DEBUG
-			iv.show();
-			cout << endl;
+// 			iv.show();
+// 			cout << endl;
 #endif
 			mpq_clear(qkgV);
 			mpz_clear(tmp);
@@ -1394,7 +1404,7 @@ class gcone
 		}//void interiorPoint(dd_MatrixPtr const &M)
 		
 		/** \brief Copy a ring and add a weighted ordering in first place
-		* Kudos to walkSupport.cc
+		* 
 		*/
 		ring rCopyAndAddWeight(ring const &r, intvec const *ivw)				
 		{
@@ -1719,7 +1729,7 @@ class gcone
 				while(gcNext!=NULL)
 				{
 					if( gcNext->getUCN() == UCNcounter+1 )
-					{//NOTE THIS IS BUGGY. Apparently changes to the wrong ring
+					{
 						gcAct = gcNext;
 						rAct=rCopy(gcAct->baseRing);
 						rComplete(rAct);
@@ -1841,6 +1851,7 @@ class gcone
 				{
 					(*n)[ii] = ((*n)[ii])/ggT;
 				}
+				codim2Act->setFacetNormal(n);
 				codim2Act = codim2Act->next;				
 			}
 			//delete n;
@@ -1867,7 +1878,8 @@ class gcone
 			facet *slAct;	//called with f=SearchListRoot
 			slAct = &f;
 			facet *slEnd;	//Pointer to end of SLA
-			slEnd = &f;		
+			slEnd = &f;
+			facet *slEndStatic;	//marks the end before a new facet is added		
 			facet *fAct;
 			fAct = this->facetPtr;
 			facet *codim2Act;
@@ -1879,6 +1891,7 @@ class gcone
 			{
 				slEnd=slEnd->next;
 			}
+			slEndStatic = slEnd;
 			/*1st step: compare facetNormals*/
 			intvec *fNormal = new intvec(this->numVars);
 			intvec *f2Normal = new intvec(this->numVars);
@@ -1886,10 +1899,11 @@ class gcone
 			intvec *sl2Normal = new intvec(this->numVars);			
 			while(fAct!=NULL)
 			{
-				doNotAdd=FALSE;
+				doNotAdd=TRUE;
 				fNormal = fAct->getFacetNormal();
 				slAct = &f;	//return to start of list
-				while(slAct!=NULL)
+				codim2Act = fAct->codim2Ptr;
+				while(slAct!=slEndStatic->next)
 				{
 					slNormal = slAct->getFacetNormal();					
 					/*If the normals are parallel we check whether the
@@ -1897,29 +1911,34 @@ class gcone
 					if(isParallel(fNormal,slNormal))
 					{
 						//NOTE check codim2facets here
-// 						while(codim2Act!=NULL)
-// 						{
-// 							f2Normal = codim2Act->getFacetNormal();
-// 							sl2Act = f.codim2Ptr;
-// 							while(sl2Act!=NULL)
-// 							{
-// 								sl2Normal = sl2Act->getFacetNormal();
-// 								if(!isParallel(f2Normal,sl2Normal))
-// 								{
-// 									doNotAdd=FALSE;
-// 									break;
-// 								}
-// 								sl2Act = sl2Act->next;
-// 							}
-// 							if(doNotAdd==FALSE)
-// 								break;
-// 							codim2Act = codim2Act->next;
-// 							
-// 						}
-						doNotAdd=FALSE;
-						break;
+						codim2Act = fAct->codim2Ptr;
+						while(codim2Act!=NULL)
+						{
+							f2Normal = codim2Act->getFacetNormal();
+							sl2Act = f.codim2Ptr;
+							while(sl2Act!=NULL)
+							{
+								sl2Normal = sl2Act->getFacetNormal();
+								if( !(areEqual(f2Normal,sl2Normal)))
+								{
+									doNotAdd=FALSE;
+									break;						
+									
+								}
+								sl2Act = sl2Act->next;
+							}
+							if(doNotAdd==FALSE)
+								break;
+							codim2Act = codim2Act->next;
+							
+						}
+						//doNotAdd=FALSE;
+						//break;
 					}
 					slAct = slAct->next;
+					
+ 					if(doNotAdd==FALSE)
+ 						break;					
 				}
 				if(doNotAdd==FALSE)
 				{
