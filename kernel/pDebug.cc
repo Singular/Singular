@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.10 2009-06-04 08:55:36 Singular Exp $
+ *  Version: $Id: pDebug.cc,v 1.11 2009-07-02 07:27:51 Singular Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -73,6 +73,7 @@ BOOLEAN p_LmCheckIsFromRing(poly p, ring r)
 {
   if (p != NULL)
   {
+    #if (OM_TRACK > 0) && defined(OM_TRACK_CUSTOM
     void* custom = omGetCustomOfAddr(p);
     if (custom != NULL)
     {
@@ -86,6 +87,7 @@ BOOLEAN p_LmCheckIsFromRing(poly p, ring r)
       return TRUE;
     }
     else
+    #endif
     {
       pPolyAssumeReturn(omIsBinPageAddr(p) && omSizeWOfAddr(p)==r->PolyBin->sizeW);
       return TRUE;
