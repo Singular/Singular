@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-07-01 09:41:00 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.69 2009-07-01 09:41:00 monerjan Exp $
-$Id: gfan.cc,v 1.69 2009-07-01 09:41:00 monerjan Exp $
+$Date: 2009-07-02 14:50:07 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.70 2009-07-02 14:50:07 monerjan Exp $
+$Id: gfan.cc,v 1.70 2009-07-02 14:50:07 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -95,6 +95,7 @@ class facet
 		//bool isFlippable;	//flippable facet? Want to have cone->isflippable.facet[i]
 		bool isIncoming;	//Is the facet incoming or outgoing?
 		facet *next;		//Pointer to next facet
+		facet *prev;		//Pointer to predecessor. Needed for the SearchList in noRevS
 		facet *codim2Ptr;	//Pointer to (codim-2)-facet. Bit of recursion here ;-)
 		int numCodim2Facets;
 		ring flipRing;		//the ring on the other side of the facet
@@ -112,7 +113,8 @@ class facet
 			this->numCodim2Facets=0;
 			this->flipGB=NULL;
 			this->isIncoming=FALSE;
-			this->next=NULL;		
+			this->next=NULL;
+			this->prev=NULL;		
 			this->flipRing=NULL;
 		}
 		
@@ -132,6 +134,7 @@ class facet
 			this->flipGB=NULL;
 			this->isIncoming=FALSE;
 			this->next=NULL;
+			this->prev=NULL;
 			this->flipRing=NULL;
 		}
 		
@@ -1683,9 +1686,20 @@ class gcone
 					memcpy(SearchListAct,fAct,sizeof(facet));
 				}
 				fAct = fAct->next;
-			}
+			}			
 			
 			SearchListAct = SearchListRoot;	//Set to beginning of list
+			/*Make SearchList doubly linked*/
+			while(SearchListAct!=NULL)
+			{
+				if(SearchListAct->next!=NULL)
+				{
+					SearchListAct->next->prev = SearchListAct;
+					//SearchListAct = SearchListAct->next;
+				}
+				SearchListAct = SearchListAct->next;
+			}
+			SearchListAct = SearchListRoot;	//Set to beginning of List
 			
 			fAct = gcAct->facetPtr;			
 			//gcAct->writeConeToFile(*gcAct);
@@ -1712,7 +1726,7 @@ class gcone
  					gcTmp->getCodim2Normals(*gcTmp);
 					gcTmp->normalize();
 					/*add facets to SLA here*/
-					gcTmp->enqueueNewFacets(*SearchListRoot);
+					SearchListRoot=gcTmp->enqueueNewFacets(*SearchListRoot);
 					gcTmp->showSLA(*SearchListRoot);
  					rChangeCurrRing(gcAct->baseRing);
  					gcPtr->next=gcTmp;
@@ -1872,9 +1886,13 @@ class gcone
 		}
 		/** 
 		* Takes ptr to search list root
+		* Returns a pointer to new first element of Searchlist
 		*/
-		void enqueueNewFacets(facet &f)
+		//void enqueueNewFacets(facet &f)
+		facet * enqueueNewFacets(facet &f)
 		{
+			facet *slHead;
+			slHead = &f;
 			facet *slAct;	//called with f=SearchListRoot
 			slAct = &f;
 			facet *slEnd;	//Pointer to end of SLA
@@ -1901,7 +1919,7 @@ class gcone
 			{
 				doNotAdd=TRUE;
 				fNormal = fAct->getFacetNormal();
-				slAct = &f;	//return to start of list
+				slAct = slHead;	//return to start of list
 				codim2Act = fAct->codim2Ptr;
 				while(slAct!=slEndStatic->next)
 				{
@@ -1921,7 +1939,7 @@ class gcone
 								sl2Normal = sl2Act->getFacetNormal();
 								if( !(areEqual(f2Normal,sl2Normal)))
 								{
-									doNotAdd=FALSE;
+									doNotAdd=FALSE;							
 									break;						
 									
 								}
@@ -1929,17 +1947,34 @@ class gcone
 							}
 							if(doNotAdd==FALSE)
 								break;
-							codim2Act = codim2Act->next;
-							
+							codim2Act = codim2Act->next;							
 						}
-						//doNotAdd=FALSE;
-						//break;
+						if(doNotAdd==TRUE)
+						{/*dequeue slAct*/
+							if(slAct->prev==NULL && slHead!=NULL)
+							{
+								slHead = slAct->next;
+								slHead->prev = NULL;
+							}
+							else
+							{						
+								slAct->prev->next = slAct->next;					
+							}
+							//NOTE Memory leak above!
+							break;
+						}	
+						slAct = slAct->next;
 					}
-					slAct = slAct->next;
+					else
+					{
+						doNotAdd=FALSE;
+						break;
+					}
+					//slAct = slAct->next;
 					
- 					if(doNotAdd==FALSE)
- 						break;					
-				}
+ 					//if(doNotAdd==FALSE)
+ 					//	break;					
+				}//while(slAct!=slEndStatic->next)
 				if(doNotAdd==FALSE)
 				{
 					slEnd->next = new facet();
@@ -1949,6 +1984,7 @@ class gcone
 				}
 				fAct = fAct->next;
 			}
+			return slHead;
 // 			delete sl2Normal;
 // 			delete slNormal;
 // 			delete f2Normal;
