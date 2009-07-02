@@ -15,7 +15,8 @@
 #include "intvec.h"
 #include "pInline1.h"
 #include "f5c.h"
-#include "f5cdata.h"
-#include "f5clists.h"
+#include "F5cData.h"
+#include "F5cLists.h"
 
 #endif
+// HAVE_F5C
