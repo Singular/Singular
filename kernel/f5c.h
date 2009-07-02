@@ -12,7 +12,8 @@
  *          ring r.
  * OUTPUT:  ideal g (the gröbner basis of i computed via F5C)
 */
-ideal F5Cmain(ideal i, ring r);
+ideal f5cMain(ideal i, ring r);
 
 #endif
 #endif
+// F5C_HEADER

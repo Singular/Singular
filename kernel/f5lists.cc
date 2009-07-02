@@ -1018,6 +1018,8 @@ RTagNode* RTagNode::insert(RNode* r) {
 }
 
 RNode* RTagNode::getRNode() {
+    //Print("%p\n", this);
+    //Print("%p\n",this->data);
     return this->data;
 }
 

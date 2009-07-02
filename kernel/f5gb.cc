@@ -320,6 +320,9 @@ inline bool criterion1(LList* gPrev, poly t, LNode* l, LTagList* lTag) {
             //Print("%d\n",testNode->getIndex());
             if(pLmDivisibleByNoComp(testNode->getPoly(),u1)) {
                 //Print("Criterion 1 NOT passed!\n");
+                if(idx != gPrev->getLast()->getIndex()) {
+                    Print("DOCH!\n");
+                }
                 return true;
             }
             //pWrite(testNode->getNext()->getPoly());
@@ -383,8 +386,9 @@ inline bool criterion2(int idx, poly t, LNode* l, RList* rules, RTagList* rTag) 
     }
     
     RNode* testNode; // =   new RNode();
-    
-    if(NULL == rTag->getFirst()) {
+    testNode    =   rules->getFirst();
+    /*
+     if(NULL == rTag->getFirst()) {
         if(NULL != rules->getFirst()) {
             testNode    =   rules->getFirst();
         }
@@ -392,7 +396,8 @@ inline bool criterion2(int idx, poly t, LNode* l, RList* rules, RTagList* rTag) 
             return false;
         }
     }
-    else {
+    
+     else {
 
         if(l->getIndex() > rTag->getFirst()->getRuleIndex()) {
             testNode    =   rules->getFirst();
@@ -401,11 +406,11 @@ inline bool criterion2(int idx, poly t, LNode* l, RList* rules, RTagList* rTag) 
        //Print("HIER\n"); 
             //Print("DEBUG\n");
         //Print("L INDEX: %d\n",l->getIndex());
-            /*-------------------------------------
+            *-------------------------------------
              * TODO: WHEN INTERREDUCING THE GB THE
              *       INDEX OF THE PREVIOUS ELEMENTS
              *       GETS HIGHER!
-             *-----------------------------------*/
+             *-----------------------------------*
             //testNode    =   rules->getFirst();
             testNode    =   rTag->get(l->getIndex());
             if(NULL == testNode) {
@@ -414,6 +419,7 @@ inline bool criterion2(int idx, poly t, LNode* l, RList* rules, RTagList* rTag) 
             //Print("TESTNODE ADDRESS: %p\n",testNode);
         }
     }
+    */
     //testNode    =   rules->getFirst();
 	// save the monom t1*label_term(l) as it is tested various times in the following
     poly u1 = ppMult_qq(t,l->getTerm());
@@ -1268,7 +1274,8 @@ ideal F5main(ideal id, ring r) {
     RList* rules    =   new RList();
     //Print("RULES FIRST: %p\n",rules->getFirst());
     //Print("RULES FIRST DATA: %p\n",rules->getFirst()->getRule());
-    RTagList* rTag  =   new RTagList(rules->getFirst());
+    //RTagList* rTag  =   new RTagList(rules->getFirst());
+    RTagList* rTag  =   NULL;
     i = 1;
     /*for(j=0; j<IDELEMS(id); j++) {
         if(NULL != id->m[j]) { 
@@ -1327,7 +1334,7 @@ ideal F5main(ideal id, ring r) {
         //   
         // remove this comment to get "F5"
         //
-         
+        /* 
         if(gPrev->getLength() > gbLength) {
             if(i < IDELEMS(id)) {
                 ideal gbAdd =   idInit(gPrev->getLength()-gbLength,1);
@@ -1357,7 +1364,7 @@ ideal F5main(ideal id, ring r) {
             }
         }
         gbLength    =   gPrev->getLength();
-        
+        */ 
         
 
         // 
@@ -1402,7 +1409,7 @@ ideal F5main(ideal id, ring r) {
         // Remove this comment to get "F5C"
         // computing new groebner basis gbPrev
         //
-        /* 
+         
         if(gPrev->getLength() > gbLength) {
             if(i < IDELEMS(id)) {
                 ideal gbAdd =   idInit(gPrev->getLength()-gbLength,1);
@@ -1424,24 +1431,25 @@ ideal F5main(ideal id, ring r) {
             }
             //if(i<IDELEMS(id)) {
                 ideal tempId    =   kInterRed(gbPrev);
-                Print("HERE\n");
                 gbPrev          =   tempId;
                 delete gPrev;
                 delete rules;
                 gPrev    =   new LList(pOne,1,gbPrev->m[0]);
                 gPrev->insert(pOne,1,gbPrev->m[1]);
                 rules    =   new RList();
-                rTag     =   new RTagList(rules->getFirst());
+                //rTag     =   new RTagList(rules->getFirst());
                 for(k=2; k<IDELEMS(gbPrev); k++) {
                     gPrev->insert(pOne,k+1,gbPrev->m[k]);
+                    /*
                     for(l=0; l<k; l++) {
                     }
                     rTag->insert(rules->getFirst());
+                    */
                 }
             //}
             gbLength    =   gPrev->getLength(); 
         }  
-       */   
+        
 
 
     }

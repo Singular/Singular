@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.40 2009-05-29 11:34:22 ederc Exp $ */
+/* $Id: f5gb.h,v 1.41 2009-07-02 13:47:24 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -42,7 +42,7 @@ computes incrementally gbs of subsets of the input
 gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}  
 ==================================================
 */
-inline LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lTag, RList* rules, RTagList* rTag);
+LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lTag, RList* rules, RTagList* rTag);
 
 /*
 ================================================================
