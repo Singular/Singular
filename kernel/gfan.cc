@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-07-02 14:50:07 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.70 2009-07-02 14:50:07 monerjan Exp $
-$Id: gfan.cc,v 1.70 2009-07-02 14:50:07 monerjan Exp $
+$Date: 2009-07-03 14:39:49 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.71 2009-07-03 14:39:49 monerjan Exp $
+$Id: gfan.cc,v 1.71 2009-07-03 14:39:49 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -334,6 +334,7 @@ class gcone
 			this->counter++;
 			this->UCN=this->counter;			
 			this->numFacets=0;
+			this->ivIntPt=NULL;
 		}
 		
 		/** \brief Constructor with ring and ideal
@@ -353,6 +354,7 @@ class gcone
 			this->counter++;
 			this->UCN=this->counter;			
 			this->numFacets=0;
+			this->ivIntPt=NULL;
 		}
 		
 		/** \brief Copy constructor 
@@ -401,6 +403,7 @@ class gcone
 			this->inputIdeal=idCopy(this->gcBasis);
 			this->baseRing=rCopy(f.flipRing);
 			this->numFacets=0;
+			this->ivIntPt=NULL;
 			//rComplete(this->baseRing);
 			//rChangeCurrRing(this->baseRing);
 		}
@@ -1849,25 +1852,32 @@ class gcone
 		void normalize()
 		{
 			int ggT=1;
+			facet *fAct;
 			facet *codim2Act;
-			codim2Act = this->facetPtr->codim2Ptr;
+			fAct = this->facetPtr;
+			codim2Act = fAct->codim2Ptr;
 			intvec *n = new intvec(this->numVars);
 			
 			//while(codim2Act->next!=NULL)
-			while(codim2Act!=NULL)
-			{				
-				n=codim2Act->getFacetNormal();
-				for(int ii=0;ii<this->numVars;ii++)
-				{
-					ggT = intgcd(ggT,(*n)[ii]);
+			while(fAct!=NULL)
+			{
+				while(codim2Act!=NULL)
+				{				
+					n=codim2Act->getFacetNormal();
+					for(int ii=0;ii<this->numVars;ii++)
+					{
+						ggT = intgcd(ggT,(*n)[ii]);
+					}
+					for(int ii=0;ii<this->numVars;ii++)
+					{
+						(*n)[ii] = ((*n)[ii])/ggT;
+					}
+					codim2Act->setFacetNormal(n);
+					codim2Act = codim2Act->next;				
 				}
-				for(int ii=0;ii<this->numVars;ii++)
-				{
-					(*n)[ii] = ((*n)[ii])/ggT;
-				}
-				codim2Act->setFacetNormal(n);
-				codim2Act = codim2Act->next;				
+				fAct = fAct->next;
 			}
+		
 			//delete n;
 			/*codim2Act = this->facetPtr->codim2Ptr;	//reset to start of linked list			
 			while(codim2Act!=NULL)
@@ -1950,7 +1960,7 @@ class gcone
 							codim2Act = codim2Act->next;							
 						}
 						if(doNotAdd==TRUE)
-						{/*dequeue slAct*/
+						{	/*dequeue slAct*/
 							if(slAct->prev==NULL && slHead!=NULL)
 							{
 								slHead = slAct->next;
