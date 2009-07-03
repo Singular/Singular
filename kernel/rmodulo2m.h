@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.h,v 1.11 2009-05-06 12:53:49 Singular Exp $ */
+/* $Id: rmodulo2m.h,v 1.12 2009-07-03 13:14:10 seelisch Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -27,6 +27,7 @@ BOOLEAN nr2mIsUnit      (number a);
 number  nr2mGetUnit     (number a);
 number  nr2mDiv         (number a, number b);
 number  nr2mIntDiv      (number a,number b);
+number  nr2mMod         (number a,number b);
 number  nr2mNeg         (number c);
 number  nr2mInvers      (number c);
 BOOLEAN nr2mGreater     (number a, number b);

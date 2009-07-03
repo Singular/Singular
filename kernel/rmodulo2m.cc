@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.24 2009-05-06 12:53:49 Singular Exp $ */
+/* $Id: rmodulo2m.cc,v 1.25 2009-07-03 13:14:10 seelisch Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -343,6 +343,43 @@ number nr2mDiv (number a,number b)
     }
   }
   return (number) nr2mMult(a, nr2mInversM(b));
+}
+
+number nr2mMod (number a, number b)
+{
+  /*
+    We need to return the number r which is uniquely determined by the
+    following two properties:
+      (1) 0 <= r < |b| (with respect to '<' and '<=' performed in Z x Z)
+      (2) There exists some k in the integers Z such that a = k * b + r.
+    Consider g := gcd(2^m, |b|). Note that then |b|/g is a unit in Z/2^m.
+    Now, there are three cases:
+      (a) g = 1
+          Then |b| is a unit in Z/2^m, i.e. |b| (and also b) divides a.
+          Thus r = 0.
+      (b) g <> 1 and g divides a
+          Then a = (a/g) * (|b|/g)^(-1) * b (up to sign), i.e. again r = 0.
+      (c) g <> 1 and g does not divide a
+          Let's denote the division with remainder of a by g as follows:
+          a = s * g + t. Then t = a - s * g = a - s * (|b|/g)^(-1) * |b|
+          fulfills (1) and (2), i.e. r := t is the correct result. Hence
+          in this third case, r is the remainder of division of a by g in Z.
+    This algorithm is the same as for the case Z/n, except that we may
+    compute the gcd of |b| and 2^m "by hand": We just extract the highest
+    power of 2 (<= 2^m) that is contained in b.
+  */
+  NATNUMBER g = 1;
+  NATNUMBER b_div = b;
+  if (b_div < 0) b_div = - b_div; // b_div now represents |b|
+  NATNUMBER r = 0;
+  while ((g < nr2mModul) && (b_div > 0) && (b_div % 2 == 0))
+  {
+    b_div = b_div >> 1;
+    g = g << 1;
+  } // g is now the gcd of 2^m and |b|
+
+  if (g != 1) r = (NATNUMBER)a % g;
+  return (number)r;
 }
 
 number nr2mIntDiv (number a,number b)

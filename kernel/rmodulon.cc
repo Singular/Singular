@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.34 2009-05-22 13:18:12 Singular Exp $ */
+/* $Id: rmodulon.cc,v 1.35 2009-07-03 13:14:10 seelisch Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -316,6 +316,42 @@ number nrnDiv (number a,number b)
     mpz_mod(erg, erg, nrnModul);
     return (number) erg;
   }
+}
+
+number nrnMod (number a, number b)
+{
+  /*
+    We need to return the number r which is uniquely determined by the
+    following two properties:
+      (1) 0 <= r < |b| (with respect to '<' and '<=' performed in Z x Z)
+      (2) There exists some k in the integers Z such that a = k * b + r.
+    Consider g := gcd(n, |b|). Note that then |b|/g is a unit in Z/n.
+    Now, there are three cases:
+      (a) g = 1
+          Then |b| is a unit in Z/n, i.e. |b| (and also b) divides a.
+          Thus r = 0.
+      (b) g <> 1 and g divides a
+          Then a = (a/g) * (|b|/g)^(-1) * b (up to sign), i.e. again r = 0.
+      (c) g <> 1 and g does not divide a
+          Then denote the division with remainder of a by g as this:
+          a = s * g + t. Then t = a - s * g = a - s * (|b|/g)^(-1) * |b|
+          fulfills (1) and (2), i.e. r := t is the correct result. Hence
+          in this third case, r is the remainder of division of a by g in Z.
+  */
+  int_number g = (int_number) omAllocBin(gmp_nrn_bin);
+  int_number b_abs = (int_number) omAllocBin(gmp_nrn_bin);
+  int_number r = (int_number) omAllocBin(gmp_nrn_bin);
+  mpz_init(g);
+  mpz_init_set(b_abs,(int_number)b);
+  mpz_init_set_si(r,(long)0);
+  if (mpz_isNeg(b_abs)) mpz_neg(b_abs, b_abs); // b_abs now represents |b|
+  mpz_gcd(g, (int_number) nrnModul, b_abs); // g is now as above
+  if (mpz_cmp_si(g, (long)1) != 0) mpz_mod(r, (int_number)a, g); // the case g <> 1
+  mpz_clear(g);
+  mpz_clear(b_abs);
+  omFreeBin(g, gmp_nrn_bin);
+  omFreeBin(b_abs, gmp_nrn_bin);
+  return (number)r;
 }
 
 number nrnIntDiv (number a,number b)

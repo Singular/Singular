@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.h,v 1.11 2009-05-22 16:57:41 Singular Exp $ */
+/* $Id: rmodulon.h,v 1.12 2009-07-03 13:14:10 seelisch Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -31,6 +31,7 @@ BOOLEAN nrnIsMOne      (number a);
 BOOLEAN nrnIsUnit      (number a);
 number  nrnGetUnit     (number a);
 number  nrnDiv         (number a, number b);
+number  nrnMod         (number a,number b);
 number  nrnIntDiv      (number a,number b);
 number  nrnNeg         (number c);
 number  nrnInvers      (number c);
