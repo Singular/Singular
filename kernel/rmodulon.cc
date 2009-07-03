@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.35 2009-07-03 13:14:10 seelisch Exp $ */
+/* $Id: rmodulon.cc,v 1.36 2009-07-03 14:38:34 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -337,20 +337,16 @@ number nrnMod (number a, number b)
           a = s * g + t. Then t = a - s * g = a - s * (|b|/g)^(-1) * |b|
           fulfills (1) and (2), i.e. r := t is the correct result. Hence
           in this third case, r is the remainder of division of a by g in Z.
+     Remark: according to mpz_mod: a,b are always non-negative
   */
   int_number g = (int_number) omAllocBin(gmp_nrn_bin);
-  int_number b_abs = (int_number) omAllocBin(gmp_nrn_bin);
   int_number r = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(g);
-  mpz_init_set(b_abs,(int_number)b);
   mpz_init_set_si(r,(long)0);
-  if (mpz_isNeg(b_abs)) mpz_neg(b_abs, b_abs); // b_abs now represents |b|
-  mpz_gcd(g, (int_number) nrnModul, b_abs); // g is now as above
+  mpz_gcd(g, (int_number) nrnModul, (int_number)b); // g is now as above
   if (mpz_cmp_si(g, (long)1) != 0) mpz_mod(r, (int_number)a, g); // the case g <> 1
   mpz_clear(g);
-  mpz_clear(b_abs);
   omFreeBin(g, gmp_nrn_bin);
-  omFreeBin(b_abs, gmp_nrn_bin);
   return (number)r;
 }
 

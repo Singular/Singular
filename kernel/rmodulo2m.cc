@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.25 2009-07-03 13:14:10 seelisch Exp $ */
+/* $Id: rmodulo2m.cc,v 1.26 2009-07-03 14:38:34 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -369,7 +369,7 @@ number nr2mMod (number a, number b)
     power of 2 (<= 2^m) that is contained in b.
   */
   NATNUMBER g = 1;
-  NATNUMBER b_div = b;
+  NATNUMBER b_div = (NATNUMBER)b;
   if (b_div < 0) b_div = - b_div; // b_div now represents |b|
   NATNUMBER r = 0;
   while ((g < nr2mModul) && (b_div > 0) && (b_div % 2 == 0))
