@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-07-03 14:39:49 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.71 2009-07-03 14:39:49 monerjan Exp $
-$Id: gfan.cc,v 1.71 2009-07-03 14:39:49 monerjan Exp $
+$Date: 2009-07-04 08:55:44 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.72 2009-07-04 08:55:44 monerjan Exp $
+$Id: gfan.cc,v 1.72 2009-07-04 08:55:44 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -318,6 +318,13 @@ class gcone
 		*/
 		int numFacets;		//#of facets of the cone
 		
+		/**
+		* At least as a workaround we store the irredundant facets of a matrix here.
+		* Otherwise, since we throw away non-flippable facets, facets2Matrix will not 
+		* yield all the necessary information
+		*/
+		dd_MatrixPtr ddFacets;	//Matrix to store irredundant facets of the cone
+		
 		/** Contains the Groebner basis of the cone. Is set by gcone::getGB(ideal I)*/
 		ideal gcBasis;		//GB of the cone, set by gcone::getGB();
 		gcone *next;		//Pointer to *previous* cone in search tree	
@@ -612,6 +619,9 @@ class gcone
 			dd_MatrixCanonicalize(&ddineq, &ddlinset, &ddredrows, &ddnewpos, &dderr);
 			ddrows = ddineq->rowsize;	//Size of the matrix with redundancies removed
 			ddcols = ddineq->colsize;
+			
+			//ddCreateMatrix(ddrows,ddcols+1);
+			ddFacets = dd_CopyMatrix(ddineq);
 #ifdef gfan_DEBUG
 //  			cout << "Having removed redundancies, the normals now read:" << endl;
 //  			dd_WriteMatrix(stdout,ddineq);
@@ -740,7 +750,8 @@ class gcone
 			dd_ErrorType err;
 			dd_rowindex newpos;		
 
-			ddineq = facets2Matrix(gc);	//get a matrix representation of the cone
+			//ddineq = facets2Matrix(gc);	//get a matrix representation of the cone
+			ddineq = dd_CopyMatrix(gc.ddFacets);
 				
 			/*Now set appropriate linearity*/
 			dd_PolyhedraPtr ddpolyh;
@@ -1953,11 +1964,15 @@ class gcone
 									break;						
 									
 								}
-								sl2Act = sl2Act->next;
+								else
+								{
+									sl2Act = sl2Act->next;
+									codim2Act = codim2Act->next;
+								}
 							}
 							if(doNotAdd==FALSE)
 								break;
-							codim2Act = codim2Act->next;							
+							//codim2Act = codim2Act->next;							
 						}
 						if(doNotAdd==TRUE)
 						{	/*dequeue slAct*/
