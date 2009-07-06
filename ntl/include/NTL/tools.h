@@ -116,8 +116,9 @@ typedef _ntl_ulong *_ntl_ulong_ptr;
 // for no good reason.
 
 
-
 NTL_OPEN_NNS
+
+extern void (*ErrorCallback)();
 
 struct INIT_SIZE_STRUCT { };
 const INIT_SIZE_STRUCT INIT_SIZE = INIT_SIZE_STRUCT();

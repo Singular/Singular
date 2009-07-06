@@ -1,6 +1,7 @@
 
 #include <NTL/ZZ_pX.h>
 #include <NTL/lzz_pX.h>
+#include <NTL/GF2X.h>
 
 #include <NTL/version.h>
 
@@ -35,6 +36,68 @@ int SmallModulusTest(long p, long n)
 }
 
 
+int GF2X_test()
+{
+   GF2X a, b, c, c1;
+
+   long n;
+
+#ifdef NTL_GF2X_LIB
+   for (n = 32; n <= (1L << 18); n = n << 1) {
+      random(a, n);
+      random(b, n);
+      OldMul(c, a, b);
+      mul(c1, a, b);
+      if (c1 != c) return 1;
+   }
+#endif
+
+   return 0;
+}
+
+void GF2X_time()
+{
+   long n = 1000000L;
+   long iter;
+
+   GF2X a, b, c;
+
+   double t;
+   long i;
+
+   random(a, n);
+   random(b, n);
+
+   mul(c, a, b);
+
+   iter = 0;
+   do {
+      iter = iter ? (2*iter) : 1;
+      t = GetTime();
+      for (i = 0; i < iter; i++)
+         mul(c, a, b);
+      t = GetTime() - t;
+   } while (t < 0.5);
+
+   cerr << "time to multiply polynomials over GF(2) \n   of degree < 1000000: "
+        << (t/iter) << "s\n";
+
+#ifdef NTL_GF2X_LIB
+   OldMul(c, a, b);
+
+   iter = 0;
+   do {
+      iter = iter ? (2*iter) : 1;
+      t = GetTime();
+      for (i = 0; i < iter; i++)
+         OldMul(c, a, b);
+      t = GetTime() - t;
+   } while (t < 0.5);
+
+   cerr << "   **** using old code: "  << (t/iter) << "s\n";
+#endif
+
+}
 
 
 int main()
@@ -69,6 +132,11 @@ int main()
 #ifdef NTL_GMP_HACK
    cerr << "NTL_GMP_HACK\n";
 #endif
+
+#ifdef NTL_GF2X_LIB
+   cerr << "NTL_GF2X_LIB\n";
+#endif
+
 
 #ifdef NTL_LONG_LONG_TYPE
    cerr << "NTL_LONG_LONG_TYPE: ";
@@ -171,7 +239,9 @@ cerr << "Performance Options:\n";
    cerr << "\n\n";
 
    if (_ntl_gmp_hack)
-      cerr << "using GMP hack\n";
+      cerr << "using GMP hack\n\n";
+
+   cerr << "running tests...";
 
    long n, k;
 
@@ -241,7 +311,15 @@ cerr << "Performance Options:\n";
       return 1;
    }
 
-   cerr << "test is OK\n";
+   // Test gf2x code....
+
+   if (GF2X_test()) {
+      cerr << "GF2X test failed!\n";
+      return 1;
+   }
+   
+
+   cerr << "OK\n";
 
    ZZ x1, x2, x3, x4;
    double t;
@@ -367,6 +445,8 @@ cerr << "Performance Options:\n";
    }
 
    cerr << "\n";
+
+   GF2X_time();
 
    return 0;
 }

@@ -7,13 +7,19 @@
 
 #include <NTL/new.h>
 
+void _ntl_abort_cxx_callback(void)
+{
+   if (NTL_NNS ErrorCallback) (*NTL_NNS ErrorCallback)();
+}
+
 NTL_START_IMPL
 
+void (*ErrorCallback)() = 0;
 
 void Error(const char *s)
 {
    printf("%s\n", s );
-   abort();
+   _ntl_abort();
 }
 
 

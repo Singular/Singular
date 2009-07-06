@@ -22,7 +22,7 @@ void zhalt(char *c)
 {
    fprintf(stderr,"fatal error:\n   %s\nexit...\n",c);
    fflush(stderr);
-   abort();
+   _ntl_abort();
 }
 
 
@@ -34,8 +34,8 @@ void zhalt(char *c)
 #define NTL_GMP_QREM_CROSS (4)
 #define NTL_GMP_SQRT_CROSS (2)
 #define NTL_GMP_GCD_CROSS (1)
-#define NTL_GMP_XGCD_CROSS (1)
-#define NTL_GMP_INVMOD_CROSS (1)
+#define NTL_GMP_XGCD_CROSS (4)
+#define NTL_GMP_INVMOD_CROSS (2)
 
 #ifdef NTL_GMP_HACK
 
@@ -4818,12 +4818,7 @@ _ntl_zinv(
 			 * just in case GMP is sloppy.
 		         */
 
-			while (_ntl_zsign(v) < 0) 
-				_ntl_zadd(v, nin, &v);
-
-			while (_ntl_zcompare(v, nin) >= 0)
-				_ntl_zsub(v, nin, &v);
-
+                        _ntl_zmod(v, nin, &v);
 			_ntl_zcopy(v, invv);
 			return 0;
 		}
@@ -4888,17 +4883,63 @@ _ntl_zexteucl(
 /* versions of gmp prior to version 3 have really bad xgcd */
    if (_ntl_gmp_hack && 
        a[0] >= NTL_GMP_XGCD_CROSS && b[0] >= NTL_GMP_XGCD_CROSS) {
+
+      static _ntl_verylong xa1 = 0, xb1 = 0, d1 = 0, b_red = 0;
+      static _ntl_verylong tmp1 = 0, tmp2 = 0, tmp3 = 0;
+
       GT_INIT
+
+      
 
       lip_to_mpz(aa, gt_1);
       lip_to_mpz(bb, gt_2);
       mpz_gcdext(gt_3, gt_4, gt_5, gt_1, gt_2);
-      mpz_to_lip(&a, gt_3);
-      mpz_to_lip(&b, gt_4);
-      mpz_to_lip(&modcon, gt_5);
-      _ntl_zcopy(a, d);
-      _ntl_zcopy(b, xa);
-      _ntl_zcopy(modcon, xb);
+      mpz_to_lip(&d1, gt_3);
+      mpz_to_lip(&xa1, gt_4);
+      mpz_to_lip(&xb1, gt_5);
+
+      /* normalize...this ensures results agree with
+         classical Euclid...not very efficient... */
+
+      if (_ntl_zcompare(a, b) >= 0) {
+         _ntl_zdiv(a, d1, &a, 0);
+         _ntl_zdiv(b, d1, &b, 0);
+         _ntl_zdiv(xa1, b, &tmp1, &xa1);
+         _ntl_zlshift(xa1, 1, &tmp2);
+         if (anegative) _ntl_zsadd(tmp2, 1, &tmp2);
+         if (_ntl_zcompare(tmp2, b) > 0) {
+            _ntl_zsub(xa1, b, &xa1);
+            _ntl_zsadd(tmp1, 1, &tmp1);
+         }
+         _ntl_zmul(tmp1, a, &tmp2);
+         if (anegative != bnegative) 
+            _ntl_zsub(xb1, tmp2, &xb1);
+         else
+            _ntl_zadd(xb1, tmp2, &xb1);
+      }
+      else {
+         _ntl_zdiv(a, d1, &a, 0);
+         _ntl_zdiv(b, d1, &b, 0);
+         _ntl_zdiv(xb1, a, &tmp1, &xb1);
+         _ntl_zlshift(xb1, 1, &tmp2);
+         if (bnegative) _ntl_zsadd(tmp2, 1, &tmp2);
+         if (_ntl_zcompare(tmp2, a) > 0) {
+            _ntl_zsub(xb1, a, &xb1);
+            _ntl_zsadd(tmp1, 1, &tmp1);
+         }
+         _ntl_zmul(tmp1, b, &tmp2);
+         if (anegative != bnegative) 
+            _ntl_zsub(xa1, tmp2, &xa1);
+         else
+            _ntl_zadd(xa1, tmp2, &xa1);
+      }
+
+
+      /* end normalize */
+
+      _ntl_zcopy(d1, d);
+      _ntl_zcopy(xa1, xa);
+      _ntl_zcopy(xb1, xb);
       return;
    }
 #endif

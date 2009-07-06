@@ -90,7 +90,7 @@ system("make InitSettings");
 'NTL_GF2X_ALTCODE1'    => 0,
 'NTL_GF2X_NOINLINE'    => 0,
 
-'WIZARD_HACK'          => '#define NTL_OLD_ZZ_pX_MUL',
+'WIZARD_HACK'          => '#define NTL_WIZARD_HACK',
 
 );
 

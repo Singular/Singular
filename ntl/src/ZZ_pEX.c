@@ -104,6 +104,8 @@ void SetCoeff(ZZ_pEX& x, long i, const ZZ_pE& a)
 
    m = deg(x);
 
+   if (i > m && IsZero(a)) return;
+
    if (i > m) {
       /* careful: a may alias a coefficient of x */
 
@@ -142,6 +144,8 @@ void SetCoeff(ZZ_pEX& x, long i, const ZZ_p& aa)
    a = aa;
 
    m = deg(x);
+
+   if (i > m && IsZero(a)) return;
 
    if (i > m) {
       x.rep.SetLength(i+1);

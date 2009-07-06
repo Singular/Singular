@@ -52,6 +52,12 @@ int main()
    cout << "NTL_GMP_HACK=0\n";
 #endif
 
+#ifdef NTL_GF2X_LIB
+   cout << "NTL_GF2X_LIB=1\n";
+#else
+   cout << "NTL_GF2X_LIB=0\n";
+#endif
+
 #ifdef NTL_LONG_LONG_TYPE
    cout << "FLAG_LONG_LONG_TYPE=1\n";
    cout << "NTL_LONG_LONG_TYPE=" make_string(NTL_LONG_LONG_TYPE) "\n";

@@ -330,13 +330,29 @@ inline void COUNT_BITS(long& cnt, mp_limb_t a)
 #define STORAGE_OVF(len) NTL_OVERFLOW(len, sizeof(mp_limb_t), 2*sizeof(long))
 
 
+/* ForceNormal ensures a normalized bigint */
+
+static 
+void ForceNormal(_ntl_gbigint x)
+{
+   long sx, xneg;
+   mp_limb_t *xdata;
+
+   if (!x) return;
+   GET_SIZE_NEG(sx, xneg, x);
+   xdata = DATA(x);
+   STRIP(sx, xdata);
+   if (xneg) sx = -sx;
+   SIZE(x) = sx;
+}
+
 
 static 
 void ghalt(char *c)
 {
    fprintf(stderr,"fatal error:\n   %s\nexit...\n",c);
    fflush(stderr);
-   abort();
+   _ntl_abort();
 }
 
 
@@ -2420,6 +2436,53 @@ _ntl_gexteucl(
       SIZE(d) = sd;
       SIZE(xa) = sxa;
 
+      /* Thes two ForceNormal's are work-arounds for GMP bugs 
+         in GMP 4.3.0 */
+      ForceNormal(d);
+      ForceNormal(xa);
+
+      /* now we normalize xa, so that so that xa in ( -b/2d, b/2d ],
+         which makes the output agree with Euclid's algorithm,
+         regardless of what mpn_gcdext does */
+
+      if (!ZEROP(xa)) {
+         _ntl_gcopy(bin, &b);
+         SIZE(b) = sb;
+         if (!ONEP(d)) {
+            _ntl_gdiv(b, d, &b, &tmp);
+            if (!ZEROP(tmp)) ghalt("internal bug in _ntl_gexteucl");
+         }
+
+         if (SIZE(xa) > 0) { /* xa positive */
+            if (_ntl_gcompare(xa, b) > 0) { 
+               _ntl_gmod(xa, b, &xa);
+            }
+            _ntl_glshift(xa, 1, &tmp);
+            if (_ntl_gcompare(tmp, b) > 0) {
+               _ntl_gsub(xa, b, &xa);
+            }
+         }
+         else { /* xa negative */
+            SIZE(xa) = -SIZE(xa);
+            if (_ntl_gcompare(xa, b) > 0) {
+               SIZE(xa) = -SIZE(xa);
+               _ntl_gmod(xa, b, &xa);
+               _ntl_gsub(xa, b, &xa);
+            }
+            else {
+               SIZE(xa) = -SIZE(xa);
+            }
+            _ntl_glshift(xa, 1, &tmp);
+            SIZE(tmp) = -SIZE(tmp);
+            if (_ntl_gcompare(tmp, b) >= 0) {
+               _ntl_gadd(xa, b, &xa);
+            }
+         }
+      }
+
+      /* end normalize */
+    
+
       if (aneg) _ntl_gnegate(&xa);
 
       _ntl_gmul(ain, xa, &tmp);
@@ -2489,6 +2552,12 @@ long _ntl_ginv(_ntl_gbigint ain, _ntl_gbigint nin, _ntl_gbigint *invv)
    SIZE(d) = sd;
    SIZE(u) = su;
 
+      /* Thes two ForceNormal's are work-arounds for GMP bugs 
+         in GMP 4.3.0 */
+      ForceNormal(d);
+      ForceNormal(u);
+
+
    if (ONEP(d)) {
 
       /*
@@ -2496,8 +2565,19 @@ long _ntl_ginv(_ntl_gbigint ain, _ntl_gbigint nin, _ntl_gbigint *invv)
        * GMP is sloppy.
        */
 
-      while (_ntl_gsign(u) < 0) _ntl_gadd(u, nin, &u);
-      while (_ntl_gcompare(u, nin) >= 0) _ntl_gsub(u, nin, &u);
+
+      if (_ntl_gsign(u) < 0) {
+         _ntl_gadd(u, nin, &u);
+         if (_ntl_gsign(u) < 0) {
+            _ntl_gmod(u, nin, &u);
+         }
+      }
+      else if (_ntl_gcompare(u, nin) >= 0) {
+         _ntl_gsub(u, nin, &u);
+         if (_ntl_gcompare(u, nin) >= 0) {
+             _ntl_gmod(u, nin, &u);
+         }
+      }
 
       _ntl_gcopy(u, invv);
       return 0;

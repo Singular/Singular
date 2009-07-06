@@ -80,7 +80,7 @@ inline zz_p determinant(const mat_zz_p& a)
    { zz_p x; determinant(x, a); return x; }
 // functional variant of determinant
 
-inline mat_zz_p transpose(mat_zz_p& a)
+inline mat_zz_p transpose(const mat_zz_p& a)
    { mat_zz_p x; transpose(x, a); NTL_OPT_RETURN(mat_zz_p, x); }
 
 void clear(mat_zz_p& a);

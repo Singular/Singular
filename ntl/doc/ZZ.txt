@@ -220,10 +220,9 @@ void XGCD(ZZ& d, ZZ& s, ZZ& t, const ZZ& a, const ZZ& b);
 // Euclidean algorithm applied to |a| and |b|, with the signs then
 // adjusted according to the signs of a and b.
 
-// Uses a variant of Lehmer's algorithm (see Knuth, The Art of Computer
-// Programming, vol. 2).
-
-
+// The implementation may or may not Euclid's algorithm,
+// but the coefficients a and t are always computed as if 
+// it did.
 
 
 // special-purpose single-precision variants:

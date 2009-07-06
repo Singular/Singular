@@ -19,6 +19,82 @@ A Tour of NTL: Summary of Changes
 
 <p> <hr> <p>
 <h3>
+2009.05.05: Changes between NTL 5.5 and 5.5.1
+</h3>
+
+<ul>
+<li> If using GMP (via either <tt>NTL_GMP_LIP</tt>
+or <tt>NTL_GMP_HACK</tt>), then the new version (4.3.0) of
+GMP implements the <tt>XGCD</tt> functionality differently,
+so that the coefficients do not always agree with those returned by
+the classical extended Euclidean algorithm.
+This version of NTL corrects the coefficients, so that the
+"classical" coefficients are always produced, regardless
+of GMP's implementation. 
+This version of NTL also works
+around a bug in GMP 4.3.0's <tt>XGCD</tt> code
+(although that bug should be fixed in GMP 4.3.1).
+
+<li>
+The <tt>configure</tt> script has been slightly modified:
+there is a new configuration variable <tt>DEF_PREFIX</tt>,
+whose value can be used to set <tt>PREFIX</tt>, <tt>GMP_PREFIX</tt>,
+and <tt>GF2X_PREFIX</tt> in one stroke.
+Also, the (somewhat esoteric) <tt>configure</tt> variables
+<tt>GMP_LIBDIR</tt>, <tt>GMP_INCDIR</tt>,
+<tt>GF2X_LIBDIR</tt>, and <tt>GF2X_INCDIR</tt>
+have slightly different meanings now.
+
+</ul>
+</h3>
+
+<p> <hr> <p>
+<h3>
+2009.04.08: Changes between NTL 5.4.2 and 5.5
+</h3>
+
+<ul>
+<li>
+Added the ability to generate a <i>shared</i> library
+(with help from Tim Abbott). <a href="tour-unix.html#shared">Details.</a>
+
+<li>
+Fixed some standardization issues
+(with help from Tim Abbot):
+default location of installed documentation files now conforms
+to standards; use of <tt>EOF</tt> now conforms to standards.
+
+<li>
+Added a callback mechanism to NTL's error reporting function.
+See <tt>ErrorCallback</tt> in <a href="tools.txt">tools.txt</a>.
+
+<li>
+Added support for the <tt>gf2x</tt> library for speeding up
+arithmetic in <tt>GF2X</tt> (with help from Emmanuel Thom&eacute;).
+<a href="tour-gf2x.html">Details.</a>
+
+<li>
+In conjuction with the above, I also changed the
+<tt>GF2X</tt> so that it works better with very large polynomials:
+large blocks of memory are released, recursive HalfGCD algorithms
+are used for large polynomials.
+
+
+<li>
+Fixed a bug in <tt>void TraceMod(zz_p&amp; x, const zz_pX&amp; a, const zz_pXModulus&amp; F)</tt> (reported by Luca De Feo).
+
+<li>
+Fixed a performance issue in various versions of <tt>SetCoeff</tt>
+(reported by Luca De Feo).
+
+<li>
+Fixed the declaration of  <tt>mat_zz_p transpose(const mat_zz_p&amp; a)</tt>
+(reported by Benoit Lacelle).
+</ul>
+
+
+<p> <hr> <p>
+<h3>
 2008.03.05: Changes between NTL 5.4.1 and 5.4.2
 </h3>
 

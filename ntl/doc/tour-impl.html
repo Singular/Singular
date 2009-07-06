@@ -189,6 +189,33 @@ Also, NTL allows the compiler to compute <tt>z = x/y</tt> as
 <tt>t = 1/y</tt>, <tt>z = t*x</tt>.
 
 <p>
+It is also generally assumed that the compiler does not
+do too much "regrouping" of arithmetic expressions involving
+floating point.
+Most compilers respect the implied grouping of floating point
+computations, and NTL goes out of its way to make its
+intentions clear: instead of <tt>x = (a + b) + c</tt>,
+if the grouping is truly important, this is written 
+as <tt>t = a + b; x = t + c</tt>.
+Current standards do not allow, and most implementations will not 
+perform, any regrouping of this, e.g., <tt>x = a + (b + c)</tt>,
+since in floating point, addition and subtraction are not 
+associative.
+
+<p>
+Unfortunately, some compilers do not do this correctly,
+unless you tell them.
+With Intel's C compiler <tt>icc</tt>, for example,
+you should compile NTL with the flag <tt>-fp-model source</tt>
+to enforce strict adherence to floating point standards.
+Also, you should be wary of compiling using an optimization
+level higher than the default <tt>-O2</tt> --
+this may break some floating point assumptions (and maybe
+some other assumptions as well).
+
+
+
+<p>
 One big problem with the IEEE standard is that it allows intermediate
 quantities to be computed in a higher precision than the standard
 double precision.

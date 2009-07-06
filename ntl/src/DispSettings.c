@@ -44,6 +44,10 @@ int main()
    cout << "NTL_GMP_HACK\n";
 #endif
 
+#ifdef NTL_GF2X_LIB
+   cout << "NTL_GF2X_LIB\n";
+#endif
+
 #ifdef NTL_LONG_LONG_TYPE
    cout << "NTL_LONG_LONG_TYPE: ";
    cout << make_string(NTL_LONG_LONG_TYPE) << "\n";

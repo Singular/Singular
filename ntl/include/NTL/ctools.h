@@ -258,6 +258,17 @@ void _ntl_ForceToMem(double *p);
    a double into memory (see comment above). */
 
 double _ntl_ldexp(double x, long e);
+
+void _ntl_abort(void);
+/* This is the routine called by NTL to abort a program in case of error. */
+
+void _ntl_abort_cxx_callback(void);
+/* This is a C++ function (implemented in tools.c) that is
+   used to implement the callback mechanism.  The issue here
+   is that I don't want a C function to call a C++ function
+   via a function pointer.  This could potentially be problematic. */
+
+   
    
 #if (defined(__cplusplus) && !defined(NTL_CXX_ONLY))
 }

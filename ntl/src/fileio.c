@@ -13,8 +13,8 @@ void OpenWrite(ofstream& s, const char *name)
    s.open(name, ios::out);
 
    if (!s) {
-      cerr << "open write error: " << name << "\n";
-      abort();
+      cerr << "open write error: " << name;
+      Error("");
    }
 }
 
@@ -23,8 +23,8 @@ void OpenRead(ifstream& s, const char *name)
 {
    s.open(name, ios::in);
    if (!s) {
-      cerr << "open read error: " << name << "\n";
-      abort();
+      cerr << "open read error: " << name;
+      Error("");
    }
 }
 

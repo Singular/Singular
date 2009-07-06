@@ -124,8 +124,8 @@ using the configure script.
  * Use this flag if you want to use GMP as the long integer package.
  * This can result in significantly faster code on some platforms.
  * It requires that the GMP package (version >= 3.1) has already been
- * installed.  You will also have to set the variables GMP_INCDIR,
- * GMP_LIBDIR, and GMP_LIB in the makefile (these are set automatically
+ * installed.  You will also have to set the variables GMP_OPT_INCDIR,
+ * GMP_OPT_LIBDIR, GMP_OPT_LIB in the makefile (these are set automatically
  * by the confiuration script when you pass the flag NTL_GMP_LIP=on
  * to that script.
  *
@@ -137,7 +137,7 @@ using the configure script.
  * To re-build after changing this flag:
  *   rm *.o; make setup3; make ntl.a
  * You may also have to edit the makefile to modify the variables
- * GMP_INCDIR, GMP_LIBDIR, and GMP_LIB.
+ * GMP_OPT_INCDIR, GMP_OPT_LIBDIR, and GMP_OPT_LIB.
  */
 
 #elif 0
@@ -147,8 +147,8 @@ using the configure script.
  * Use this flag if you want to use GMP as the long integer package.
  * This can result in significantly faster code on some platforms.
  * It requires that the GMP package (version >= 2.0.2) has already been
- * installed.  You will also have to set the variables GMP_INCDIR,
- * GMP_LIBDIR, and GMP_LIB in the makefile (these are set automatically
+ * installed.  You will also have to set the variables GMP_OPT_INCDIR,
+ * GMP_OPT_LIBDIR, GMP_OPT_LIB in the makefile (these are set automatically
  * by the confiuration script when you pass the flag NTL_GMP_HACK=on
  * to that script.
  *
@@ -159,12 +159,32 @@ using the configure script.
  * To re-build after changing this flag:
  *   rm lip.o; make setup3; make ntl.a
  * You may also have to edit the makefile to modify the variables
- * GMP_INCDIR, GMP_LIBDIR, and GMP_LIB.
+ * GMP_OPT_INCDIR, GMP_OPT_LIBDIR, and GMP_OPT_LIB.
  *
  */
 
 #endif
 
+#if 0
+#define NTL_GF2X_LIB
+
+/* 
+ * Use this flag if you want to use the gf2x library for
+ * faster GF2X arithmetic.
+ * This can result in significantly faster code, especially
+ * when working with polynomials of huge degree.
+ * You will also have to set the variables GF2X_OPT_INCDIR,
+ * GF2X_OPT_LIBDIR, GF2X_OPT_LIB in the makefile (these are set automatically
+ * by the confiuration script when you pass the flag NTL_GF2X_LIB=on
+ * to that script.
+ *
+ * To re-build after changing this flag:
+ *   rm GF2X.o; GF2X1.o; make ntl.a
+ * You may also have to edit the makefile to modify the variables
+ * GF2X_OPT_INCDIR, GF2X_OPT_LIBDIR, and GF2X_OPT_LIB.
+ */
+
+#endif
 
 #if 0
 #define NTL_LONG_LONG_TYPE long long

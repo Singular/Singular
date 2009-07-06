@@ -30,6 +30,15 @@ void PrintTime(ostream& s, double t);
 void Error(const char *s);
 // print an error message and call abort
 
+extern void (*ErrorCallback)();
+// A pointer (initially NULL) to a callback function.
+// This function will be called by the Error function,
+// as well as other functions, before calling abort().
+// Note that the callback function is expected to have
+// C++ linkage, as it is called directly by a C++ function,
+// even though the latter function may be called from a
+// C function.
+
 long IsWhiteSpace(long c);
 // returns 1 if c is "wite space" (as defined by isspace is the
 // standard library...usually blanks, tabs, newlines), and 0 otherwise.
@@ -42,6 +51,9 @@ long SkipWhiteSpace(istream& s);
 // This routine is useful in conjuction with input routines,
 // like NTL's, that raise an error if an input item is
 // ill-formed or missing.  
+
+long IsEOFChar(long c);
+// test if c == EOF
 
 
 long CharToIntVal(long c);

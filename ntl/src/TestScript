@@ -52,6 +52,14 @@ sh RemoveProg MoreFacTest
 
 echo
 echo "---------------------------------"
+echo "making GF2XTest"
+make GF2XTest
+echo "running GF2XTest"
+./GF2XTest
+sh RemoveProg GF2XTest
+
+echo
+echo "---------------------------------"
 echo "making GF2EXTest"
 make GF2EXTest
 echo "running GF2EXTest"

@@ -75,6 +75,8 @@ void SetCoeff(zz_pX& x, long i, zz_p a)
 
    m = deg(x);
 
+   if (i > m && IsZero(a)) return;
+
    if (i > m) {
       x.rep.SetLength(i+1);
       for (j = m+1; j < i; j++)

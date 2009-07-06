@@ -5,6 +5,29 @@
 
 #include <NTL/new.h>
 
+#if (defined(NTL_WIZARD_HACK) && defined(NTL_GF2X_LIB))
+#undef NTL_GF2X_LIB
+#endif
+
+
+// some crossover points...choice depends
+// if we are using the gf2x lib or not
+
+#ifdef NTL_GF2X_LIB
+
+#define NTL_GF2X_GCD_CROSSOVER (400L*NTL_BITS_PER_LONG) 
+#define NTL_GF2X_HalfGCD_CROSSOVER (6L*NTL_BITS_PER_LONG)
+#define NTL_GF2X_BERMASS_CROSSOVER (200L*NTL_BITS_PER_LONG)
+
+#else
+
+#define NTL_GF2X_GCD_CROSSOVER (900L*NTL_BITS_PER_LONG) 
+#define NTL_GF2X_HalfGCD_CROSSOVER (6L*NTL_BITS_PER_LONG)
+#define NTL_GF2X_BERMASS_CROSSOVER (450L*NTL_BITS_PER_LONG)
+
+#endif
+
+
 NTL_START_IMPL
 
 /********** data structures for accesss to GF2XRegisters ************/
@@ -22,7 +45,8 @@ GF2XRegisterType()
 { xrep = &GF2XRegisterVec[GF2XRegisterTop]; GF2XRegisterTop++; }
 
 ~GF2XRegisterType()
-{ GF2XRegisterTop--; }
+{ xrep->xrep.release();  
+  GF2XRegisterTop--; }
 
 operator GF2X& () { return *xrep; }
 
@@ -133,6 +157,12 @@ void PlainDivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2X& b)
          rp[i] = ap[i];
    }
    r.normalize();
+
+   GF2X_rembuf.release();
+   for (i = 0; i <= min(dq, NTL_BITS_PER_LONG-1); i++) {
+      WordVector& st = stab[((_ntl_ulong)(posb+i))%NTL_BITS_PER_LONG].xrep;
+      st.release();
+   }
 }
 
 
@@ -219,6 +249,12 @@ void PlainRem(GF2X& r, const GF2X& a, const GF2X& b)
          rp[i] = ap[i];
    }
    r.normalize();
+
+   GF2X_rembuf.release();
+   for (i = 0; i <= min(da-db, NTL_BITS_PER_LONG-1); i++) {
+      WordVector& st = stab[((_ntl_ulong)(posb+i))%NTL_BITS_PER_LONG].xrep;
+      st.release();
+   }
 }
 
 #define MASK8 ((1UL << 8)-1UL)
@@ -911,7 +947,7 @@ void PentReduce(GF2X& x, const GF2X& a, long n, long k3, long k2, long k1)
    long wdiff3 = (n-k3)/NTL_BITS_PER_LONG;
    long bdiff3 = (n-k3) - wdiff3*NTL_BITS_PER_LONG;
 
-   static GF2X r;
+   GF2XRegister(r);
    r = a;
 
    _ntl_ulong *p = r.xrep.elts();
@@ -1361,6 +1397,8 @@ void rem(GF2X& r, const GF2X& a, const GF2XModulus& F)
       }
       r.normalize();
    }
+
+   GF2X_rembuf.release();
 }
 
 void DivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2XModulus& F)
@@ -1517,6 +1555,8 @@ void DivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2XModulus& F)
       }
       r.normalize();
    }
+
+   GF2X_rembuf.release();
 }
 
 
@@ -1648,6 +1688,8 @@ void div(GF2X& q, const GF2X& a, const GF2XModulus& F)
          }
       }
    }
+
+   GF2X_rembuf.release();
 }
 
 
@@ -2064,7 +2106,7 @@ void BaseGCD(GF2X& d, const GF2X& a_in, const GF2X& b_in)
 }
 
 
-void GCD(GF2X& d, const GF2X& a, const GF2X& b)
+void OldGCD(GF2X& d, const GF2X& a, const GF2X& b)
 {
    long sa = a.xrep.length();
    long sb = b.xrep.length();
@@ -2289,7 +2331,7 @@ void BaseXGCD(GF2X& d, GF2X& s, GF2X& t, const GF2X& a, const GF2X& b)
 
 
 
-void XGCD(GF2X& d, GF2X& s, GF2X& t, const GF2X& a, const GF2X& b)
+void OldXGCD(GF2X& d, GF2X& s, GF2X& t, const GF2X& a, const GF2X& b)
 {
    long sa = a.xrep.length();
    long sb = b.xrep.length();
@@ -2346,7 +2388,8 @@ void BaseInvMod(GF2X& d, GF2X& s, const GF2X& a, const GF2X& f)
    long sa = a.xrep.length();
    long sf = f.xrep.length();
 
-   if (sa >= 10 && 2*sf > 3*sa) {
+   if ((sa >= 10 && 2*sf > 3*sa) || 
+       sf > NTL_GF2X_GCD_CROSSOVER/NTL_BITS_PER_LONG) {
       GF2XRegister(t);
 
       XGCD(d, s, t, a, f);
@@ -2862,7 +2905,7 @@ void ProjectPowers(vec_GF2& x, const vec_GF2& a, long k, const GF2X& H,
 }
 
 
-void MinPolyInternal(GF2X& h, const GF2X& x, long m)
+void OldMinPolyInternal(GF2X& h, const GF2X& x, long m)
 {
    GF2X a, b, r, s;
    GF2X a_in, b_in;
@@ -3215,6 +3258,428 @@ void TraceMod(GF2& x, const GF2X& a, const GF2X& f)
 
    project(x, TraceVec(f), a);
 }
+
+
+
+// New versions of GCD, XGCD, and MinPolyInternal
+// and support routines
+
+class _NTL_GF2XMatrix {
+private:
+
+   _NTL_GF2XMatrix(const _NTL_GF2XMatrix&);  // disable
+   GF2X elts[2][2];
+
+public:
+
+   _NTL_GF2XMatrix() { }
+   ~_NTL_GF2XMatrix() { }
+
+   void operator=(const _NTL_GF2XMatrix&);
+   GF2X& operator() (long i, long j) { return elts[i][j]; }
+   const GF2X& operator() (long i, long j) const { return elts[i][j]; }
+};
+
+
+void _NTL_GF2XMatrix::operator=(const _NTL_GF2XMatrix& M)
+{
+   elts[0][0] = M.elts[0][0];
+   elts[0][1] = M.elts[0][1];
+   elts[1][0] = M.elts[1][0];
+   elts[1][1] = M.elts[1][1];
+}
+
+
+static
+void mul(GF2X& U, GF2X& V, const _NTL_GF2XMatrix& M)
+// (U, V)^T = M*(U, V)^T
+{
+   GF2X t1, t2, t3;
+
+   mul(t1, M(0,0), U);
+   mul(t2, M(0,1), V);
+   add(t3, t1, t2);
+   mul(t1, M(1,0), U);
+   mul(t2, M(1,1), V);
+   add(V, t1, t2);
+   U = t3;
+}
+
+
+static
+void mul(_NTL_GF2XMatrix& A, _NTL_GF2XMatrix& B, _NTL_GF2XMatrix& C)
+// A = B*C, B and C are destroyed
+{
+   GF2X t1, t2;
+
+   mul(t1, B(0,0), C(0,0));
+   mul(t2, B(0,1), C(1,0));
+   add(A(0,0), t1, t2);
+
+   mul(t1, B(1,0), C(0,0));
+   mul(t2, B(1,1), C(1,0));
+   add(A(1,0), t1, t2);
+
+   mul(t1, B(0,0), C(0,1));
+   mul(t2, B(0,1), C(1,1));
+   add(A(0,1), t1, t2);
+
+   mul(t1, B(1,0), C(0,1));
+   mul(t2, B(1,1), C(1,1));
+   add(A(1,1), t1, t2);
+
+   long i, j;
+   for (i = 0; i < 2; i++) {
+      for (j = 0; j < 2; j++) {
+          B(i,j).kill();
+          C(i,j).kill();
+      }
+   }
+}
+
+static
+void IterHalfGCD(_NTL_GF2XMatrix& M_out, GF2X& U, GF2X& V, long d_red)
+{
+   M_out(0,0).SetMaxLength(d_red);
+   M_out(0,1).SetMaxLength(d_red);
+   M_out(1,0).SetMaxLength(d_red);
+   M_out(1,1).SetMaxLength(d_red);
+
+   set(M_out(0,0));   clear(M_out(0,1));
+   clear(M_out(1,0)); set(M_out(1,1));
+
+   long goal = deg(U) - d_red;
+
+   if (deg(V) <= goal)
+      return;
+
+   GF2X Q, t(INIT_SIZE, d_red);
+
+   while (deg(V) > goal) {
+      DivRem(Q, U, U, V);
+      swap(U, V);
+
+      mul(t, Q, M_out(1,0));
+      sub(t, M_out(0,0), t);
+      M_out(0,0) = M_out(1,0);
+      M_out(1,0) = t;
+
+      mul(t, Q, M_out(1,1));
+      sub(t, M_out(0,1), t);
+      M_out(0,1) = M_out(1,1);
+      M_out(1,1) = t;
+   }
+}
+
+
+
+static
+void HalfGCD(_NTL_GF2XMatrix& M_out, const GF2X& U, const GF2X& V, long d_red)
+{
+   if (IsZero(V) || deg(V) <= deg(U) - d_red) {
+      set(M_out(0,0));   clear(M_out(0,1));
+      clear(M_out(1,0)); set(M_out(1,1));
+
+      return;
+   }
+
+
+   long n = deg(U) - 2*d_red + 2;
+   if (n < 0) n = 0;
+
+   GF2X U1, V1;
+
+   RightShift(U1, U, n);
+   RightShift(V1, V, n);
+
+   if (d_red <= NTL_GF2X_HalfGCD_CROSSOVER) {
+      IterHalfGCD(M_out, U1, V1, d_red);
+      return;
+   }
+
+   long d1 = (d_red + 1)/2;
+   if (d1 < 1) d1 = 1;
+   if (d1 >= d_red) d1 = d_red - 1;
+
+   _NTL_GF2XMatrix M1;
+
+   HalfGCD(M1, U1, V1, d1);
+   mul(U1, V1, M1);
+
+
+   long d2 = deg(V1) - deg(U) + n + d_red;
+
+   if (IsZero(V1) || d2 <= 0) {
+      M_out = M1;
+      return;
+   }
+
+
+   GF2X Q;
+   _NTL_GF2XMatrix M2;
+
+   DivRem(Q, U1, U1, V1);
+   swap(U1, V1);
+
+   HalfGCD(M2, U1, V1, d2);
+
+   GF2X t(INIT_SIZE, deg(M1(1,1))+deg(Q)+1);
+
+   mul(t, Q, M1(1,0));
+   sub(t, M1(0,0), t);
+   swap(M1(0,0), M1(1,0));
+   swap(M1(1,0), t);
+
+   t.kill();
+
+   t.SetMaxLength(deg(M1(1,1))+deg(Q)+1);
+
+   mul(t, Q, M1(1,1));
+   sub(t, M1(0,1), t);
+   swap(M1(0,1), M1(1,1));
+   swap(M1(1,1), t);
+
+   t.kill();
+
+   mul(M_out, M2, M1);
+}
+
+static
+void HalfGCD(GF2X& U, GF2X& V)
+{
+   long d_red = (deg(U)+1)/2;
+
+   if (IsZero(V) || deg(V) <= deg(U) - d_red) {
+      return;
+   }
+
+   long du = deg(U);
+
+
+   long d1 = (d_red + 1)/2;
+   if (d1 < 1) d1 = 1;
+   if (d1 >= d_red) d1 = d_red - 1;
+
+   _NTL_GF2XMatrix M1;
+
+   HalfGCD(M1, U, V, d1);
+   mul(U, V, M1);
+
+   long d2 = deg(V) - du + d_red;
+
+   if (IsZero(V) || d2 <= 0) {
+      return;
+   }
+
+   M1(0,0).kill();
+   M1(0,1).kill();
+   M1(1,0).kill();
+   M1(1,1).kill();
+
+
+   GF2X Q;
+
+   DivRem(Q, U, U, V);
+   swap(U, V);
+
+   HalfGCD(M1, U, V, d2);
+
+   mul(U, V, M1);
+}
+
+
+void GCD(GF2X& d, const GF2X& u, const GF2X& v)
+{
+   long su = u.xrep.length();
+   long sv = v.xrep.length();
+
+   if (su <= NTL_GF2X_GCD_CROSSOVER/NTL_BITS_PER_LONG &&
+       sv <= NTL_GF2X_GCD_CROSSOVER/NTL_BITS_PER_LONG) {
+      OldGCD(d, u, v);
+      return;
+   }
+    
+   GF2X u1, v1;
+
+   u1 = u;
+   v1 = v;
+
+   long du1 = deg(u1);
+   long dv1 = deg(v1);
+
+   if (du1 == dv1) {
+      if (IsZero(u1)) {
+         clear(d);
+         return;
+      }
+
+      rem(v1, v1, u1);
+   }
+   else if (du1 < dv1) {
+      swap(u1, v1);
+      du1 = dv1;
+   }
+
+   // deg(u1) > deg(v1)
+
+   while (du1 >= NTL_GF2X_GCD_CROSSOVER && !IsZero(v1)) {
+      HalfGCD(u1, v1);
+
+      if (!IsZero(v1)) {
+         rem(u1, u1, v1);
+         swap(u1, v1);
+      }
+
+      du1 = deg(u1);
+   }
+
+   OldGCD(d, u1, v1);
+}
+
+static
+void XHalfGCD(_NTL_GF2XMatrix& M_out, GF2X& U, GF2X& V, long d_red)
+{
+   if (IsZero(V) || deg(V) <= deg(U) - d_red) {
+      set(M_out(0,0));   clear(M_out(0,1));
+      clear(M_out(1,0)); set(M_out(1,1));
+
+      return;
+   }
+
+   long du = deg(U);
+
+   if (d_red <= NTL_GF2X_HalfGCD_CROSSOVER) {
+      IterHalfGCD(M_out, U, V, d_red);
+      return;
+   }
+
+   long d1 = (d_red + 1)/2;
+   if (d1 < 1) d1 = 1;
+   if (d1 >= d_red) d1 = d_red - 1;
+
+   _NTL_GF2XMatrix M1;
+
+   HalfGCD(M1, U, V, d1);
+   mul(U, V, M1);
+
+   long d2 = deg(V) - du + d_red;
+
+   if (IsZero(V) || d2 <= 0) {
+      M_out = M1;
+      return;
+   }
+
+
+   GF2X Q;
+   _NTL_GF2XMatrix M2;
+
+   DivRem(Q, U, U, V);
+   swap(U, V);
+
+   XHalfGCD(M2, U, V, d2);
+
+
+   GF2X t(INIT_SIZE, deg(M1(1,1))+deg(Q)+1);
+
+   mul(t, Q, M1(1,0));
+   sub(t, M1(0,0), t);
+   swap(M1(0,0), M1(1,0));
+   swap(M1(1,0), t);
+
+   t.kill();
+
+   t.SetMaxLength(deg(M1(1,1))+deg(Q)+1);
+
+   mul(t, Q, M1(1,1));
+   sub(t, M1(0,1), t);
+   swap(M1(0,1), M1(1,1));
+   swap(M1(1,1), t);
+
+   t.kill();
+
+   mul(M_out, M2, M1);
+}
+
+
+
+
+void XGCD(GF2X& d, GF2X& s, GF2X& t, const GF2X& a, const GF2X& b)
+{
+   // GF2 w;
+
+   long sa = a.xrep.length();
+   long sb = b.xrep.length();
+
+   if (sa <= NTL_GF2X_GCD_CROSSOVER/NTL_BITS_PER_LONG &&
+       sb <= NTL_GF2X_GCD_CROSSOVER/NTL_BITS_PER_LONG) {
+      OldXGCD(d, s, t, a, b);
+      return;
+   }
+
+   GF2X U, V, Q;
+
+   U = a;
+   V = b;
+
+   long flag = 0;
+
+   if (deg(U) == deg(V)) {
+      DivRem(Q, U, U, V);
+      swap(U, V);
+      flag = 1;
+   }
+   else if (deg(U) < deg(V)) {
+      swap(U, V);
+      flag = 2;
+   }
+
+   _NTL_GF2XMatrix M;
+
+   XHalfGCD(M, U, V, deg(U)+1);
+
+   d = U;
+
+
+   if (flag == 0) {
+      s = M(0,0);
+      t = M(0,1);
+   }
+   else if (flag == 1) {
+      s = M(0,1);
+      mul(t, Q, M(0,1));
+      sub(t, M(0,0), t);
+   }
+   else {  /* flag == 2 */
+      s = M(0,1);
+      t = M(0,0);
+   }
+
+   // normalize
+
+   // inv(w, LeadCoeff(d));
+   // mul(d, d, w);
+   // mul(s, s, w);
+   // mul(t, t, w);
+}
+
+
+void MinPolyInternal(GF2X& h, const GF2X& x, long m)
+{  
+   if (m < NTL_GF2X_BERMASS_CROSSOVER) {
+      OldMinPolyInternal(h, x, m);
+      return;
+   }
+
+   GF2X a, b;
+   _NTL_GF2XMatrix M;
+      
+   SetCoeff(b, 2*m);
+   CopyReverse(a, x, 2*m-1);
+   HalfGCD(M, b, a, m+1);
+
+   h = M(1,1);
+}
+
 
 
 NTL_END_IMPL

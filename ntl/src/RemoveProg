@@ -3,5 +3,9 @@ for i in $*
 do
    rm -f $i 
    rm -f $i.exe
+   rm -f .libs/$i
+   rm -f .libs/$i.exe
 done
+ 
+exit 0
 

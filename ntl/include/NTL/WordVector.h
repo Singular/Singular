@@ -50,6 +50,11 @@ NTL_OPEN_NNS
 #define NTL_WordVectorInputBlock 50
 #endif
 
+// controls release functionality
+
+#define NTL_RELEASE_THRESH (10000)
+// #define NTL_RELEASE_THRESH (0)
+
 
 class WordVector {  
 public:  
@@ -68,6 +73,9 @@ public:
 
    ~WordVector();  
    void kill(); 
+
+   void release() { if (MaxLength() > NTL_RELEASE_THRESH) kill(); }
+   // this conditinally kills the vector, if its size is excessive
 
    void DoSetLength(long n);
   

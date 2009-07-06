@@ -7,7 +7,7 @@
 // Define this macro to revert to old strategy.
 
 
-#ifndef NTL_OLD_ZZ_pX_MUL
+#ifndef NTL_WIZARD_HACK
 
 #include <NTL/ZZX.h>
 
@@ -94,6 +94,8 @@ void SetCoeff(ZZ_pX& x, long i, const ZZ_p& a)
       Error("overflow in SetCoeff");
 
    m = deg(x);
+
+   if (i > m && IsZero(a)) return; 
 
    if (i > m) {
       /* careful: a may alias a coefficient of x */
@@ -418,7 +420,7 @@ void negate(ZZ_pX& x, const ZZ_pX& a)
 }
 
 
-#ifndef NTL_OLD_ZZ_pX_MUL
+#ifndef NTL_WIZARD_HACK
 
 // These crossovers are tuned for a Pentium, but hopefully
 // they should be OK on other machines as well.

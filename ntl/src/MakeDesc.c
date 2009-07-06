@@ -793,6 +793,14 @@ int main()
       return 1;
    }
 
+   /*
+    * check that ints are bigger than chars.
+    */
+
+   if (bpi <= CHAR_BIT) {
+      fprintf(stderr, "BAD NEWS: int type must be longer than char type.\n");
+      return 1;
+   }
 
 
 

@@ -115,6 +115,8 @@ void SetCoeff(ZZX& x, long i, const ZZ& a)
 
    m = deg(x);
 
+   if (i > m && IsZero(a)) return;
+
    if (i > m) {
       /* careful: a may alias a coefficient of x */
 

@@ -3,6 +3,15 @@
 #include <NTL/vec_long.h>
 
 #include <NTL/new.h>
+#include <stdio.h>
+
+#if (defined(NTL_WIZARD_HACK) && defined(NTL_GF2X_LIB))
+#undef NTL_GF2X_LIB
+#endif
+
+#ifdef NTL_GF2X_LIB
+#include <gf2x.h>
+#endif
 
 NTL_START_IMPL
 
@@ -695,7 +704,161 @@ void KarMul(_ntl_ulong *c, const _ntl_ulong *a, const _ntl_ulong *b,
 
 
 
+#ifdef NTL_GF2X_LIB
+
+
 void mul(GF2X& c, const GF2X& a, const GF2X& b)
+{
+   long sa = a.xrep.length();
+   long sb = b.xrep.length();
+
+   if (sa <= 0 || sb <= 0) {
+      clear(c);
+      return;
+   }
+ 
+   _ntl_ulong a0 = a.xrep[0];
+   _ntl_ulong b0 = b.xrep[0];
+
+   if (sb == 1 && b0 == 1) {
+      c = a;
+      return;
+   }
+
+   if (sa == 1 && a0 == 1) {
+      c = b;
+      return;
+   }
+
+   if (&a == &b) {
+      sqr(c, a);
+      return;
+   }
+
+   if (sa == 1 && sb == 1) {
+      // special case...
+      _ntl_ulong v[2];
+      if (!(a0 >> NTL_BITS_PER_LONG/2))
+         mul_half(v, b0, a0);
+      else if (!(b0 >> NTL_BITS_PER_LONG/2))
+         mul_half(v, a0, b0);
+      else
+         mul1(v, a0, b0);
+
+      if (v[1]) {
+         c.xrep.SetLength(2);
+         _ntl_ulong *cp = &c.xrep[0];
+         cp[0] = v[0];
+         cp[1] = v[1];
+      }
+      else {
+         c.xrep.SetLength(1);
+         _ntl_ulong *cp = &c.xrep[0];
+         cp[0] = v[0];
+      }
+      return;
+   }
+
+   if (sa == 2 && sb == 2) {
+      // special case...
+      _ntl_ulong v[4];
+      mul2(v, &a.xrep[0], &b.xrep[0]);
+      if (v[3]) {
+         c.xrep.SetLength(4);
+         _ntl_ulong *cp = &c.xrep[0];
+         cp[0] = v[0];
+         cp[1] = v[1];
+         cp[2] = v[2];
+         cp[3] = v[3];
+      }
+      else {
+         c.xrep.SetLength(3);
+         _ntl_ulong *cp = &c.xrep[0];
+         cp[0] = v[0];
+         cp[1] = v[1];
+         cp[2] = v[2];
+      }
+      return;
+   }
+
+   // another special case:  one of the two inputs
+   // has length 1 (or less).
+
+   if (sa == 1) {
+      c.xrep.SetLength(sb + 1);
+      _ntl_ulong *cp = c.xrep.elts();
+      const _ntl_ulong *bp = b.xrep.elts();
+
+      if (a0 >> (NTL_BITS_PER_LONG-NTL_BB_MUL1_BITS+1))
+         Mul1(cp, bp, sb, a0);
+      else
+         Mul1_short(cp, bp, sb, a0);
+
+
+      c.normalize();
+      return;
+   }
+
+   if (sb == 1) {
+      c.xrep.SetLength(sa + 1);
+      _ntl_ulong *cp = c.xrep.elts();
+      const _ntl_ulong *ap = a.xrep.elts();
+
+
+      if (b0 >> (NTL_BITS_PER_LONG-NTL_BB_MUL1_BITS+1))
+         Mul1(cp, ap, sa, b0);
+      else
+         Mul1_short(cp, ap, sa, b0);
+
+      c.normalize();
+      return;
+   }
+
+   // finally: the general case
+
+
+   WordVector mem;
+
+   const _ntl_ulong *ap = a.xrep.elts(), *bp = b.xrep.elts();
+   _ntl_ulong *cp;
+
+
+   long sc = sa + sb;
+   long in_mem = 0;
+
+   if (&a == &c || &b == &c) {
+      mem.SetLength(sc);
+      cp = mem.elts();
+      in_mem = 1;
+   }
+   else {
+      c.xrep.SetLength(sc);
+      cp = c.xrep.elts();
+   }
+
+   gf2x_mul(cp, ap, sa, bp, sb);
+
+   if (in_mem) {
+      c.xrep = mem;
+   }
+
+   c.normalize();
+   mem.release();
+}
+#else
+void OldMul(GF2X& c, const GF2X& a, const GF2X& b)
+{
+   mul(c, a, b);
+}
+#endif
+
+
+
+#ifdef NTL_GF2X_LIB
+void OldMul(GF2X& c, const GF2X& a, const GF2X& b)
+#else
+void mul(GF2X& c, const GF2X& a, const GF2X& b)
+#endif
 {
    long sa = a.xrep.length();
    long sb = b.xrep.length();
@@ -1101,8 +1264,11 @@ void mul(GF2X& c, const GF2X& a, const GF2X& b)
       c.xrep = mem;
 
    c.normalize();
-}
 
+   mem.release();
+   stk.release();
+   vec.release();
+}
 
 
 
