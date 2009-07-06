@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hilb.cc,v 1.3 2006-09-20 16:47:14 Singular Exp $ */
+/* $Id: hilb.cc,v 1.4 2009-07-06 11:54:10 Singular Exp $ */
 /*
 *  ABSTRACT -  Hilbert series
 */
@@ -51,7 +51,12 @@ static void hHilbEst(scfmon stc, int Nstc, varset var, int Nvar)
     j = i - 1;
     if (z > Ql[j])
     {
-      p = (int *)omAlloc(z * sizeof(int));
+      if (z>(INT_MAX)/2)
+      {
+       Werror("interal arrays too big");
+       return;
+      }
+      p = (int *)omAlloc((unsigned long)z * sizeof(int));
       if (Ql[j]!=0)
       {
         if (j==0)
