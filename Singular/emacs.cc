@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.26 2004-07-12 15:01:19 Singular Exp $ */
+/* $Id: emacs.cc,v 1.27 2009-07-06 12:50:41 Singular Exp $ */
 /*
 * ABSTRACT: Esingular main file
 */
@@ -284,7 +284,7 @@ int main(int argc, char** argv)
                            strlen(emacs_dir) +
                            strlen(emacs_load) +
                            length + 300);
-  char* prefix = "--";
+  const char* prefix = "--";
   if (strstr(emacs, "xemacs") || strstr(emacs, "Xemacs") || strstr(emacs, "XEMACS"))
     prefix = "-";
   getcwd(cwd, MAXPATHLEN);
