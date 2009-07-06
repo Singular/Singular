@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.h,v 1.7 2009-01-15 10:32:04 Singular Exp $ */
+/* $Id: kstd1.h,v 1.8 2009-07-06 11:53:34 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -63,7 +63,7 @@ extern intvec * kHomW;
 /* options:
 0 prot
 1 redSB
-2 Gebauer/Moeller: obachman 10/00: replaced by notBucket
+2 notBucket
 3 notSugar
 4 interrupt
 5 sugarCrit
