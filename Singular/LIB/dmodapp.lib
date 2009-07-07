@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmodapp.lib,v 1.29 2009-04-15 11:11:34 seelisch Exp $";
+version="$Id: dmodapp.lib,v 1.30 2009-07-07 16:17:06 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmodapp.lib     Applications of algebraic D-modules
@@ -306,7 +306,7 @@ example
   IAppel1;
 }
 
-proc appelF2() //(number a,b,c)
+proc appelF2() 
 "USAGE:  appelF2();
 RETURN:  ring (and exports an ideal into it)
 PURPOSE: define the ideal in a parametric Weyl algebra, 
@@ -1692,8 +1692,8 @@ EXAMPLE: example initialMalgrange; shows examples
   weighttx = d; weightD = 1;
   for (i=1; i<=n; i++)
   {
-    weighttx[i+1] = u0[n-i+1];
-    weightD[i+1]  = d+1-u0[n-i+1];
+    weighttx[i+1] = u0[i];
+    weightD[i+1]  = d+1-u0[i];
   }
   @a = weighttx,weightD,1;
   Lord[1] = list("a",@a);
@@ -1775,7 +1775,7 @@ example
   inF;
   setring r;
   intvec v = 3,2;
-  def D2 = initialMalgrange(f,1,0,1,v);
+  def D2 = initialMalgrange(f,1,1,v);
   setring D2;
   inF;
 }
