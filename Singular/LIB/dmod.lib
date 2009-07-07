@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.43 2009-05-08 16:02:23 levandov Exp $";
+version="$Id: dmod.lib,v 1.44 2009-07-07 16:06:02 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -125,6 +125,7 @@ proc testdmodlib()
   example annfs2;
   example annfsRB;
   example annfs2;
+  example operatorModulo;
   "SECONDARY D-MOD PROCEDURES:";
   example annfsBM;
   example annfsLOT;
@@ -5067,7 +5068,7 @@ EXAMPLE: example minIntRoot; shows examples
   sP = -Max(-vP);
   if (sP == 0)
   {
-    "Warning: zero root!";
+    "Warning: zero root present!";
   }
   return(sP);
 }
