@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmodapp.lib,v 1.30 2009-07-07 16:17:06 levandov Exp $";
+version="$Id: dmodapp.lib,v 1.31 2009-07-07 20:46:51 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmodapp.lib     Applications of algebraic D-modules
@@ -62,8 +62,8 @@ SEE ALSO: dmod_lib, gmssing_lib, bfun_lib
 LIB "poly.lib";
 LIB "sing.lib";
 LIB "primdec.lib";
-LIB "dmod.lib"; // loads e.g. nctools.lib
-LIB "bfun.lib"; //formerly LIB "bfct.lib";
+LIB "dmod.lib";    // loads e.g. nctools.lib
+LIB "bfun.lib";    //formerly LIB "bfct.lib";
 LIB "nctools.lib"; // for isWeyl etc
 LIB "gkdim.lib";
 
@@ -1462,43 +1462,44 @@ static proc safeVarName (string s, string cv)
 }
 
 proc initialIdealW (ideal I, intvec u, intvec v, list #)
-"USAGE:  initialIdealW(I,u,v [,s,t]);  I ideal, u,v intvecs, s,t optional ints
+"USAGE:  initialIdealW(I,u,v [,s,t,w]);  I ideal, u,v intvecs, s,t optional ints,
+@*       w an optional intvec
 RETURN:  ideal, GB of initial ideal of the input ideal w.r.t. the weights u and v
 ASSUME:  The basering is the n-th Weyl algebra in characteristic 0 and  for all
 @*       1<=i<=n the identity var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the
 @*       sequence of variables is given by x(1),...,x(n),D(1),...,D(n), 
 @*       where D(i) is the differential operator belonging to x(i).
 PURPOSE: computes the initial ideal with respect to given weights.
-NOTE:    u and v are understood as weight vectors for x(i) and D(i)
+NOTE:    u and v are understood as weight vectors for x(1..n) and D(1..n)
 @*       respectively.
 @*       If s<>0, @code{std} is used for Groebner basis computations,
 @*       otherwise, and by default, @code{slimgb} is used.
 @*       If t<>0, a matrix ordering is used for Groebner basis computations,
 @*       otherwise, and by default, a block ordering is used.
+@*       If w consist of 2n strictly positive entries, w is used for weighted
+@*       homogenization, otherwise, and by default, no weights are used.
 DISPLAY: If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example initialIdealW; shows examples
 "
 {
-
   if (dmodappassumeViolation())
   {
     ERROR("Basering is inappropriate: characteristic>0 or qring present");
   }
-
   if (!isWeyl())
   {
-    ERROR("Basering is not a Weyl algebra");
+    ERROR("Basering is not a Weyl algebra.");
   }
-
   int ppl = printlevel - voice +2;
   def save = basering;
   int n = nvars(save)/2;
   int N = 2*n+1;
   list RL = ringlist(save);
   int i;
-  int whichengine = 0; // default
-  int methodord   = 0; // default
+  int whichengine = 0;           // default
+  int methodord   = 0;           // default
+  intvec homogweights = 1:(2*n); // default
   if (size(#)>0)
   {
     if (typeof(#[1])=="int" || typeof(#[1])=="number")
@@ -1511,35 +1512,49 @@ EXAMPLE: example initialIdealW; shows examples
       {
         methodord = int(#[2]);
       }
+      if (size(#)>2)
+      {
+	if (typeof(#[3])=="intvec")
+	{
+	  if (size(#[3])==2*n && allPositive(#[3])==1)
+	  {
+	    homogweights = #[3];
+	  }
+	  else
+	  {
+	    print("// Homogenization weight vector must consist of positive entries and be");
+	    print("// of size " + string(n) + ". Using no weights.");
+	  }
+	}
+      }
     }
   }
-  if (char(save) <> 0) { ERROR("characteristic of basering has to be 0"); }
-  if (isWeyl() == 0)   { ERROR("basering is not a Weyl algebra"); }
   for (i=1; i<=n; i++)
   {
     if (bracket(var(i+n),var(i))<>1)
     {
-      ERROR(string(var(i+n))+" is not a differential operator for " +string(var(i)));
+      ERROR(string(var(i+n)) + " is not a differential operator for " + string(var(i)));
     }
-  }
-  
+  }  
   // 1. create  homogenized Weyl algebra
   // 1.1 create ordering
   intvec uv = u,v,0;
-  list Lord = list(list("a",intvec(1:N)));
+  homogweights = homogweights,1;
+  list Lord = list(list("a",homogweights));
   list C0 = list("C",intvec(0));
   if (methodord == 0) // default: blockordering
   {
-    Lord[2] = list("dp",intvec(1:(N-1)));
-    Lord[3] = list("lp",intvec(1));
-    Lord[4] = C0;
+    Lord[2] = list("a",uv);
+    Lord[3] = list("dp",intvec(1:(N-1)));
+    Lord[4] = list("lp",intvec(1));
+    Lord[5] = C0;
   }
   else // M() ordering
   {
     intmat @Ord[N][N];
     @Ord[1,1..N] = uv; @Ord[2,1..N] = 1:(N-1);
     for (i=1; i<=N-2; i++) { @Ord[2+i,N - i] = -1; }
-    dbprint(ppl,"// the ordering matrix:",@Ord);
+    dbprint(ppl-1,"// the ordering matrix:",@Ord);
     Lord[2] = list("M",intvec(@Ord));
     Lord[3] = C0;
   }
@@ -1550,14 +1565,13 @@ EXAMPLE: example initialIdealW; shows examples
   L@@Dh[2] = Lvar; L@@Dh[3] = Lord;
   def @Dh = ring(L@@Dh); kill L@@Dh;
   setring @Dh;
-  dbprint(ppl,"// the ring @Dh:",@Dh);
+  dbprint(ppl-1,"// the ring @Dh:",@Dh);
   // 1.4 create non-commutative relations
   matrix @relD[N][N];
-  for (i=1; i<=n; i++) { @relD[i,n+i] = var(N)^2; }
-  dbprint(ppl,"// nc relations:",@relD);
+  for (i=1; i<=n; i++) { @relD[i,n+i] = var(N)^(homogweights[i]+homogweights[n+i]); }
   def Dh = nc_algebra(1,@relD);
-  setring Dh; kill @Dh;
-  dbprint(ppl,"// computing in ring",Dh);
+  setring Dh; kill @Dh;	   
+  dbprint(ppl-1,"// computing in ring",Dh);
   // 2. Compute the initial ideal
   ideal I = imap(save,I);
   I = homog(I,h);
@@ -1565,9 +1579,9 @@ EXAMPLE: example initialIdealW; shows examples
   dbprint(ppl, "// starting Groebner basis computation with engine: "+string(whichengine));
   I = engine(I, whichengine);
   dbprint(ppl, "// finished Groebner basis computation");
-  dbprint(ppl, "// I before dehomogenization is " +string(I));
+  dbprint(ppl-1, "// I before dehomogenization is " +string(I));
   I = subst(I,var(N),1); // dehomogenization
-  dbprint(ppl, "I after dehomogenization is " +string(I));
+  dbprint(ppl-1, "I after dehomogenization is " +string(I));
   // 2.2 the initial form
   I = inForm(I,uv);
   setring save;
@@ -1590,8 +1604,8 @@ example
 }
 
 proc initialMalgrange (poly f,list #)
-"USAGE:  initialMalgrange(f,[,s,t,v]); f poly, s,t optional ints, v opt. intvec
-RETURN:  ring, the Weyl algebra induced by basering, extended by two new vars
+"USAGE:  initialMalgrange(f,[,a,b,v]); f poly, a,b optional ints, v opt. intvec
+RETURN:  ring, Weyl algebra induced by basering, extended by two new vars t,Dt
 PURPOSE: computes the initial Malgrange ideal of a given polynomial w.r.t. the weight
 @*       vector (-1,0...,0,1,0,...,0) such that the weight of t is -1 and the
 @*       weight of Dt is 1.
@@ -1600,35 +1614,34 @@ NOTE:    Activate the output ring with the @code{setring} command.
 @*       The returned ring contains the ideal \"inF\", being the initial ideal
 @*       of the Malgrange ideal of f.
 @*       Varnames of the basering should not include t and Dt.
-@*       If s<>0, @code{std} is used for Groebner basis computations,
+@*       If a<>0, @code{std} is used for Groebner basis computations,
 @*       otherwise, and by default, @code{slimgb} is used.
-@*       If t<>0, a matrix ordering is used for Groebner basis computations,
+@*       If b<>0, a matrix ordering is used for Groebner basis computations,
 @*       otherwise, and by default, a block ordering is used.
-@*       If v is a positive weight vector, v is used for homogenization
-@*       computations, otherwise and by default, no weights are used.
+@*       If a positive weight vector v is given, the weight
+@*       (d,v[1],...,v[n],1,d+1-v[1],...,d+1-v[n]) is used for homogenization
+@*       computations, where d denotes the weighted degree of f.
+@*       Otherwise and by default, v is set to (1,...,1). See Noro, 2002.
 DISPLAY: If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example initialMalgrange; shows examples
 "
 {
-
   if (dmodappassumeViolation())
   {
     ERROR("Basering is inappropriate: characteristic>0 or qring present");
   }
-
   if (!isCommutative())
   {
-    ERROR("Basering must be commutative");
+    ERROR("Basering must be commutative.");
   }
-
   int ppl = printlevel - voice +2;
   def save = basering;
   int n = nvars(save);
   int i;
   int whichengine = 0; // default
   int methodord   = 0; // default
-  intvec u0 = 0;
+  intvec u0 = 1:n;     // default
   if (size(#)>0)
   {
     if (typeof(#[1])=="int" || typeof(#[1])=="number")
@@ -1650,26 +1663,30 @@ EXAMPLE: example initialMalgrange; shows examples
       }
     }
   }
-  if (u0 == 0)
-  {
-    u0 = 1:n;
-  }
-  if (char(save) <> 0)      { ERROR("characteristic of basering has to be 0"); }
   // creating the homogenized extended Weyl algebra
   list RL = ringlist(save);
   RL = RL[1..4]; // if basering is commutative nc_algebra
   list C0 = list("C",intvec(0));
-  // 1. get the weighted degree of f
+  // 1. create homogenization weights
+  // 1.1. get the weighted degree of f
   list Lord = list(list("wp",u0),C0);
   list L@r = RL;
   L@r[3] = Lord;
-  def r = ring(L@r); kill L@r;
+  def r = ring(L@r); kill L@r,Lord;
   setring r;
   poly f = imap(save,f);
   int d = deg(f);
   setring save; kill r;
-  // 2. create homogenized extended Weyl algebra
-  int N = 2*n+3;
+  // 1.2 the homogenization weights
+  intvec homogweights = d;
+  homogweights[n+2] = 1;
+  for (i=1; i<=n; i++)
+  {
+    homogweights[i+1]   = u0[i];
+    homogweights[n+2+i] = d+1-u0[i];
+  }
+  // 2. create extended Weyl algebra
+  int N = 2*n+2;
   // 2.1 create names for vars
   string vart  = safeVarName("t","cv");
   string varDt = safeVarName("D"+vart,"cv");
@@ -1678,91 +1695,37 @@ EXAMPLE: example initialMalgrange; shows examples
     vart  = safeVarName("@"+vart,"cv");
     varDt = safeVarName("D"+vart,"cv");
   }
-  list Lvar,Lvarh;
+  list Lvar;
   Lvar[1] = vart; Lvar[n+2] = varDt;
   for (i=1; i<=n; i++)
   {
     Lvar[i+1]   = string(var(i));
     Lvar[i+n+2] = safeVarName("D" + string(var(i)),"cv");
   }
-  Lvarh = Lvar; Lvarh[N] = safeVarName("h","cv");
   //  2.2 create ordering
-  intvec uv,@a,weighttx,weightD;
-  uv[1] = -1; uv[n+2] = 1; uv[N] = 0;
-  weighttx = d; weightD = 1;
-  for (i=1; i<=n; i++)
-  {
-    weighttx[i+1] = u0[i];
-    weightD[i+1]  = d+1-u0[i];
-  }
-  @a = weighttx,weightD,1;
-  Lord[1] = list("a",@a);
-  if (methodord == 0) // default: block ordering
-  {
-    Lord[2] = list("a",uv);
-    Lord[3] = list("dp",intvec(1:(N-1)));
-    Lord[4] = list("lp",intvec(1));
-    Lord[5] = C0;
-  }
-  else // M() ordering
-  {
-    intmat @Ord[N][N];
-    @Ord[1,1..N] = uv; @Ord[2,1..N] = 1:(N-1);
-    for (i=1; i<=N-2; i++) { @Ord[2+i,N - i] = -1; }
-    dbprint(ppl,"// weights for ordering: "+string(transpose(@a)));
-    dbprint(ppl,"// the ordering matrix:",@Ord);
-    Lord[2] = list("M",intvec(@Ord));
-    Lord[3] = C0;
-  }
-  // 2.3 create commutative ring
-  list L@@Dh = RL;
-  L@@Dh[2] = Lvarh; L@@Dh[3] = Lord;
-  def @Dh = ring(L@@Dh); kill L@@Dh;
-  setring @Dh;
-  dbprint(ppl,"// the ring @Dh:",@Dh);
-  // var(1)=t, var(2..n+1) = x(1..n), var(n+2)=Dt, var(n+3..2*n+2)=D(1..n),var(2*n+3)=h
-  // 2.4 create non-commutative relations
-  matrix @relD[N][N];
-  for (i=1; i<=n+1; i++) { @relD[i,n+1+i] = var(N)^(d+1); }
-  dbprint(ppl,"// nc relations:",@relD);
-  def Dh = nc_algebra(1,@relD);
-  setring Dh; kill @Dh;
-  dbprint(ppl,"// computing in ring",Dh);
+  list Lord = list(list("dp",intvec(1:N)),C0);
+  // 2.3 create the (n+1)-th Weyl algebra
+  list L@D = RL; L@D[2] = Lvar; L@D[3] = Lord;
+  def @D = ring(L@D); kill L@D;
+  setring @D;
+  def D = Weyl();
+  setring D; kill @D;
+  dbprint(ppl,"// the (n+1)-th Weyl algebra :" ,D);
   // 3. compute the initial ideal
-  poly f = imap(save,f);
-  f = homog(f,h);
   // 3.1 create the Malgrange ideal
+  poly f = imap(save,f);
   ideal I = var(1)-f;
   for (i=1; i<=n; i++)
   {
     I = I, var(n+2+i)+diff(f,var(i+1))*var(n+2);
   }
-  // 3.2 the hard part: Groebner basis computation
-  dbprint(ppl, "// starting Groebner basis computation with engine: "+string(whichengine));
-  I = engine(I, whichengine);
-  dbprint(ppl, "// finished Groebner basis computation");
-  dbprint(ppl, "// I before dehomogenization is " +string(I));
-  I = subst(I,var(N),1); // dehomogenization
-  dbprint(ppl, "// I after dehomogenization is " +string(I));
-  // 3.3 the initial form
-  I = inForm(I,uv);
-  // 3.4 create Weyl algebra
-  setring save;
-  Lord = list();
-  Lord[1] = list("dp",intvec(1:(N-1)));
-  Lord[2] = C0;
-  list L@@D = RL;
-  L@@D[2] = Lvar; L@@D[3] = Lord;
-  def @D = ring(L@@D); kill L@@D;
-  setring @D; def D = Weyl(); setring D;
-  ideal I = imap(Dh,I);
-  kill @D,Dh;
-  // 3.5 the final GB
-  dbprint(ppl, "// starting cosmetic Groebner basis computation with engine: "+string(whichengine));
-  I = engine(I, whichengine);
-  dbprint(ppl,"// finished cosmetic Groebner basis computation");
+  // I = engine(I,whichengine); // todo is it efficient to compute a GB first wrt dp first?
+  // 3.2 computie the initial ideal
+  intvec w = 1,0:n;
+  I = initialIdealW(I,-w,w,whichengine,methodord,homogweights);
   ideal inF = I; attrib(inF,"isSB",1);
   export(inF);
+  setring save;
   return(D);
 }
 example

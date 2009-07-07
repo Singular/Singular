@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.44 2009-07-07 16:06:02 levandov Exp $";
+version="$Id: dmod.lib,v 1.45 2009-07-07 20:46:50 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: dmod.lib     Algorithms for algebraic D-modules
@@ -3498,209 +3498,310 @@ example
   LD;
 }
 
+static proc safeVarName (string s, list #)
+{
+  string S;
+  int cv = 1;
+  if (size(#)>1)
+  {
+    if (#[1]=="v") { cv = 0; S = varstr(basering); }
+    if (#[1]=="c") { cv = 0; S = charstr(basering); }
+  }
+  if (cv) { S = charstr(basering) + "," + varstr(basering); }
+  S = "," + S + ",";
+  s = "," + s + ",";
+  while (find(S,s) <> 0)
+  {
+    s[1] = "@";
+    s = "," + s;
+  }
+  s = s[2..size(s)-1];
+  return(s)
+}
+
 proc SannfsBFCT(poly F, list #)
-"USAGE:  SannfsBFCT(f [,eng]);  f a poly, eng an optional int
+"USAGE:  SannfsBFCT(f [,a,b,c]);  f a poly, a,b,c optional ints
 RETURN:  ring
-PURPOSE: compute Ann f^s and Groebner basis of Ann f^s+f in D[s]
-NOTE:    activate the output ring with the @code{setring} command.
-@*  This procedure, unlike SannfsBM, returns a ring with the degrevlex 
-@*  ordering in all variables.
-@*  In the ring D[s], the ideal LD is the ideal needed (which is returned as a Groebner basis).
-@*  If eng <>0, @code{std} is used for Groebner basis computations,
+PURPOSE: compute a Groebner basis either of Ann(f^s)+<f> or of
+@*       Ann(f^s)+<f,f_1,...,f_n> in D[s]
+NOTE:    Activate the output ring with the @code{setring} command.
+@*  This procedure, unlike SannfsBM, returns the ring D[s] with an anti-
+@*  elimination ordering for s.
+@*  The output ring contains an ideal @code{LD}, being a Groebner basis
+@*  either of  Ann(f^s)+<f>, if a=0 (and by default), or of
+@*  Ann(f^s)+<f,f_1,...,f_n>, otherwise.
+@*  Here, f_i stands for the i-th  partial derivative of f.
+@*  If b<>0, @code{std} is used for Groebner basis computations,
 @*  otherwise, and by default @code{slimgb} is used.
+@*  If c<>0, @code{std} is used for Groebner basis computations of
+@*  ideals <I+J> when I is already a Groebner basis of <I>.
+@*  Otherwise, and by default the engine determined by the switch b is
+@*  used. Note that in the case c<>0, the choice for b will be
+@*  overwritten only for the types of ideals mentioned above.
+@*  This means that if b<>0, specifying c has no effect.
 DISPLAY: If printlevel=1, progress debug messages will be printed,
-@*          if printlevel>=2, all the debug messages will be printed.
+@*       if printlevel>=2, all the debug messages will be printed.
 EXAMPLE: example SannfsBFCT; shows examples
 "
 {
-  // DEBUG INFO: ordering on the output ring = dp, engine on the sum of ideals is used
-  // hence it's the situation for slimgb
-
-  int eng = 0;
-  if ( size(#)>0 )
+  int addPD,eng,stdsum;
+  if (size(#)>0)
   {
-    if ( typeof(#[1]) == "int" )
+    if (typeof(#[1])=="int" || typeof(#[1])=="number")
     {
-      eng = int(#[1]);
+      addPD = int(#[1]);
+    }
+    if (size(#)>1)
+    {
+      if (typeof(#[2])=="int" || typeof(#[2])=="number")
+      {
+	eng = int(#[2]);
+      }
+      if (size(#)>2)
+      {
+	if (typeof(#[3])=="int" || typeof(#[3])=="number")
+	{
+	  stdsum = int(#[3]);
+	}
+      }
     }
   }
-  // returns a list with a ring and an ideal LD in it
   int ppl = printlevel-voice+2;
-  //  printf("plevel :%s, voice: %s",printlevel,voice);
   def save = basering;
-  int N = nvars(basering);
-  int Nnew = 2*N+2;
+  int N = nvars(save);
+  intvec optSave = option(get);
   int i,j;
-  list RL = ringlist(basering);
+  list RL = ringlist(save);
+  // ----- step 1: compute syzigies
+  intvec iv;
+  list L,Lord;
+  iv = 1:N; Lord[1] = list("dp",iv);
+  iv = 0;   Lord[2] = list("C",iv);
+  L = RL;
+  L[3] = Lord;
+  def @RM = ring(L);
+  kill L,Lord;
+  setring @RM;
+  option(redSB);
+  option(redTail);
+  def RM = makeModElimRing(@RM);
+  setring RM;
+  poly F = imap(save,F);
+  ideal J = jacob(F);
+  J = F,J;
+  dbprint(ppl,"// -1-1- Starting the computation of syz(F,_Dx(F))");
+  dbprint(ppl-1, J);
+  module M = syz(J);
+  dbprint(ppl,"// -1-2- The module syz(F,_Dx(F)) has been computed");
+  dbprint(ppl-1, M);
+  dbprint(ppl,"// -1-3- Starting GB computation of syz(F,_Dx(F))");
+  M = engine(M,eng);
+  dbprint(ppl,"// -1-4- GB computation finished");
+  dbprint(ppl-1, M);
+  // ----- step 2: compute part of Ann(F^s)
+  setring save;
+  option(set,optSave);
+  module M = imap(RM,M);
+  kill optSave,RM;
+  // ----- create D[s]
+  int Nnew = 2*N+1;
   list L, Lord;
-  L[1] = RL[1]; // char
-  L[4] = RL[4]; // char, minpoly
-  // check whether vars have admissible names
+  // ----- keep char, minpoly
+  L[1] = RL[1];
+  L[4] = RL[4];
+  // ----- create names for new vars
   list Name  = RL[2];
-  list RName;
-  RName[1] = "@t";
-  RName[2] = "@s";
-  list PName;
-  int BadName;
-  if (size(RL[1])>1)
+  string newVar@s = safeVarName("s");
+  if (newVar@s[1] == "@")
   {
-    PName = RL[1][2];
+    print("Name s already assigned to parameter/ringvar.");
+    print("Using " + newVar@s + " instead.")
   }
-  //  PName;
-  for(i=1;i<=2;i++)
-  {
-    for(j=1; j<=N; j++)
-    {
-      if (Name[j] == RName[i])
-      {
-	BadName = 1;
- 	break;
-      }
-    }
-    for(j=1; j<=size(PName); j++)
-    {
-      if (PName[j] == RName[i])
-      {
-        BadName = 1;
-	break;
-      }
-    }
-  }
-  if (BadName == 1)
-  {
-    ERROR("Variable/parameter names should not include @t,@s");
-  }
-  kill PName,BadName;
-  // now, create the names for new vars
   list DName;
-  for(i=1;i<=N;i++)
+  for (i=1; i<=N; i++)
   {
-    DName[i] = "D"+Name[i]; // concat
+    DName[i] = safeVarName("D" + Name[i]);
   }
-  list NName = RName + DName + Name ;
-  L[2]   = NName;
-  // Name, Dname will be used further
-  kill NName;
+  L[2] = list(newVar@s) + Name + DName;
+  // ----- create ordering
+  // --- anti-elimination ordering for s
+  iv = 1;       Lord[1] = list("dp",iv);
+  iv = 1:(2*N); Lord[2] = list("dp",iv);
+  iv = 0;       Lord[3] = list("C",iv);
+  L[3] = Lord;
+  // ----- create commutative ring
+  def @Ds = ring(L);
+  kill L,Lord;
+  setring @Ds;
+  // ----- create nc relations
+   matrix Drel[Nnew][Nnew];
+  for (i=1; i<=N; i++)
+  {
+    Drel[i+1,N+1+i] = 1;
+  }
+  def Ds = nc_algebra(1,Drel);
+  setring Ds;
+  kill @Ds;
+  dbprint(ppl,"// -2-1- The ring D[s] is ready");
+  dbprint(ppl-1, Ds);
+  matrix M = imap(save,M);
+  vector v = var(1)*gen(1);
+  for (i=1; i<=N; i++)
+  {
+    v = v + var(i+1+N)*gen(i+1); //[s,_Dx]
+  }
+  ideal J = transpose(M)*v;
+  kill M,v;
+  dbprint(ppl,"// -2-2- Compute part of Ann(F^s)");
+  dbprint(ppl-1, J);
+  J = engine(J,eng);
+  dbprint(ppl,"// -2-3- GB computation finished");
+  dbprint(ppl-1, J);
+  // ----- step 3: the full annihilator
+  // ----- create D<t,s>
+  setring save;
+  Nnew = 2*N+2;
+  list L, Lord;
+  // ----- keep char, minpoly
+  L[1] = RL[1];
+  L[4] = RL[4];  
+  // ----- create vars
+  string newVar@t = safeVarName("t");
+  L[2] = list(newVar@t,newVar@s) + DName + Name;
+  // ----- create ordering for elimination of t
   // block ord (lp(2),dp);
-  Lord[1] = list("lp",intvec(1,1));
-  // continue with dp 1,1,1,1...
-  Lord[2] = list("dp",intvec(1:Nnew));
-  Lord[3] = list("C",intvec(0));
-  L[3]      = Lord;
-  // we are done with the list
-  def @R@ = ring(L);
-  setring @R@;
-  matrix @D[Nnew][Nnew];
-  @D[1,2] = var(1);
+  iv = 1,1;    Lord[1] = list("lp",iv);
+  iv = 1:Nnew; Lord[2] = list("dp",iv);
+  iv = 0;      Lord[3] = list("C",iv);
+  L[3] = Lord;
+  def @Dts = ring(L);
+  kill RL,L,Lord,Name,DName,newVar@s,newVar@t;
+  setring @Dts;
+  // ----- create nc relations
+  matrix Drel[Nnew][Nnew];
+  Drel[1,2] = var(1);
   for(i=1; i<=N; i++)
   {
-    @D[2+i,N+2+i]=-1;
+    Drel[2+i,N+2+i]=-1;
   }
-  //  L[5] = matrix(UpOneMatrix(Nnew));
-  //  L[6] = @D;
-  def @R = nc_algebra(1,@D);
-  setring @R;
-  kill @R@;
-  dbprint(ppl,"// -1-1- the ring @R(@t,@s,_Dx,_x) is ready");
-  dbprint(ppl-1, @R);
-  // create the ideal I
+  def Dts = nc_algebra(1,Drel);
+  setring Dts;
+  kill @Dts;
+  dbprint(ppl,"// -3-1- The ring D<t,s> is ready");
+  dbprint(ppl-1, Dts);
+  // ----- create the ideal I following BM
   poly  F = imap(save,F);
-  ideal I = var(1)*F+var(2);
+  ideal I = var(1)*F + var(2); // = t*F + s
   poly p;
   for(i=1; i<=N; i++)
   {
-    p = var(1); // t
-    p = diff(F,var(N+2+i))*p;
-    I = I, var(2+i) + p;
+    p = var(1)*diff(F,var(N+2+i)) + var(2+i); // = t*F_i + D_i
+    I[i+1] = p;
   }
-  // -------- the ideal I is ready ----------
-  dbprint(ppl,"// -1-2- starting the elimination of @t in @R");
-  dbprint(ppl-1, I);
-  ideal J = engine(I,eng);
-  ideal K = nselect(J,1);
-  dbprint(ppl,"// -1-3- @t is eliminated");
-  dbprint(ppl-1, K);  // K is without @t
-  K = engine(K,eng);  // std does the job too
-  // now, we must change the ordering
-  // and create a ring without @t
-  //  setring S;
-  // ----------- the ring @R3 ------------
-  // _Dx,_x,s;  +fast ord !
-  // keep: N, i,j,RL
-  Nnew = 2*N+1;
-  kill Lord, RName;
-  list Lord;
-  list L=imap(save,L);
-  list RL=imap(save,RL);
-  L[1] = RL[1];
-  L[4] = RL[4];  // char, minpoly
-  // check whether vars hava admissible names -> done earlier
-  // DName is defined earlier
-  list NName = DName + Name + list(string(var(2)));
-  L[2] = NName;
-  kill NName;
-  // just dp
-  // block ord (dp(N),dp);
-  Lord[1] = list("dp",intvec(1:Nnew));
-  Lord[2]= list("C",intvec(0));
-  L[3] = Lord;
-  // we are done with the list. Now add a Plural part
-  def @R2@ = ring(L);
-  setring @R2@;
-  matrix @D[Nnew][Nnew];
+  // ----- add already computed part to it
+  ideal MM = var(2);      // s
   for (i=1; i<=N; i++)
   {
-    @D[i,N+i]=-1;
+    MM[1+i] = var(2+N+i); // _x
+    MM[1+N+i] = var(2+i); // _Dx
   }
-  def @R2 = nc_algebra(1,@D);
-  setring @R2;
-  kill @R2@;
-  dbprint(ppl,"//  -2-1- the ring @R2(_Dx,_x,@s) is ready");
-  dbprint(ppl-1, @R2);
-  ideal MM = maxideal(1);
-  MM = 0,var(Nnew),MM;
-  map R01 = @R, MM;
-  ideal K = R01(K);
-  // total cleanup
-  poly F = imap(save, F);
-  ideal LD = K,F;
-  dbprint(ppl,"//  -2-2- start GB computations for Ann f^s + f");
-  dbprint(ppl-1, LD);
-  LD = engine(LD,eng);
-  dbprint(ppl,"//  -2-3- finished GB computations for Ann f^s + f");
-  dbprint(ppl-1, LD);
-  // make leadcoeffs positive
-  for (i=1; i<= ncols(LD); i++)
+  map Ds2Dts = Ds,MM;
+  ideal J = Ds2Dts(J);
+  attrib(J,"isSB",1);
+  kill MM,Ds2Dts;
+  // ----- start the elimination
+  dbprint(ppl,"// -3-2- Starting the elimination of t in D<t,s>");
+  dbprint(ppl-1, I);
+  if (stdsum || eng <> 0)
   {
-    if (leadcoef(LD[i]) <0 )
-    {
-      LD[i] = -LD[i];
-    }
+    I = std(J,I);
   }
+  else
+  {
+    I = J,I;
+    I = engine(I,eng);  
+  }
+  kill J;
+  I = nselect(I,1);
+  dbprint(ppl,"// -3-3- t is eliminated");
+  dbprint(ppl-1, I);  // I is without t
+  // ----- step 4: add F
+  // ----- back to D[s]
+  setring Ds;
+  ideal MM = 0,var(1);      // 0,s
+  for (i=1; i<=N; i++)
+  {
+    MM[2+i]   = var(1+N+i); // _Dx
+    MM[2+N+i] = var(1+i);   // _x
+  }
+  map Dts2Ds = Dts, MM;
+  ideal LD = Dts2Ds(I);
+  kill J,Dts,Dts2Ds,MM;
+  dbprint(ppl,"// -4-1- Starting cosmetic Groebner computation");
+  LD = engine(LD,eng);
+  dbprint(ppl,"// -4-2- Finished cosmetic Groebner computation");
+  dbprint(ppl-1, LD);
+  // ----- use reduction trick as Macaulay2 does: compute b(s)/(s+1) by adding all partial derivations also
+  ideal J;
+  if (addPD)
+  {
+    setring @RM;
+    poly F = imap(save,F);
+    ideal J = jacob(F);
+    J = F,J;
+    dbprint(ppl,"// -4-2-1- Start GB computation <f, f_i>");
+    J = engine(J,eng);
+    dbprint(ppl,"// -4-2-2- Finished GB computation <f, f_i>");
+    dbprint(ppl-1, J);
+    setring Ds;
+    J = imap(@RM,J);
+    attrib(J,"isSB",1);
+    dbprint(ppl,"// -4-3- Start GB computations for Ann f^s + <f, f_i>");
+  }
+  else
+  {
+    J = imap(save,F);
+    dbprint(ppl,"// -4-3- Start GB computations for Ann f^s + <f>");
+  }
+  kill @RM;
+  // ----- the really hard part
+  if (stdsum || eng <> 0)
+  {
+    LD = std(LD,J);
+  }
+  else
+  {
+    LD = LD,J;
+    LD = engine(LD,eng);  
+  }
+  if (addPD) { dbprint(ppl,"// -4-4- Finished GB computations for Ann f^s + <f, f_i>"); }
+  else       { dbprint(ppl,"// -4-4- Finished GB computations for Ann f^s + <f>"); }
+  dbprint(ppl-1, LD);
   export LD;
-  kill @R;
-  return(@R2);
+  return(Ds);
 }
 example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,z,w),Dp;
   poly F = x^3+y^3+z^3*w;
-  printlevel = 0;
-  def A = SannfsBFCT(F); setring A;
-  intvec v = 1,2,3,4,5,6,7,8;
-  // are there polynomials, depending on @s only?
-  nselect(LD,v);
+  // compute Ann(F^s)+<F> using slimgb only
+  def A = SannfsBFCT(F);
+  setring A; A;
+  LD;
+  // the Bernstein-Sato poly of F:
+  vec2poly(pIntersect(s,LD));
   // a fancier example:
   def R = reiffen(4,5); setring R;
-  v = 1,2,3,4;
   RC; // the Reiffen curve in 4,5
-  def B = SannfsBFCT(RC);
+  // compute Ann(RC^s)+<RC,diff(RC,x),diff(RC,y)>
+  // using std for GB computations of ideals <I+J>
+  // where I is already a GB of <I>
+  // and slimgb for other ideals
+  def B = SannfsBFCT(RC,1,0,1);
   setring B;
-  // Are there polynomials, depending on @s only?
-  nselect(LD,v);
-  // It is not the case. Are there leading terms in @s only?
-  nselect(lead(LD),v);
+  // the Bernstein-Sato poly of RC:
+  (s-1)*vec2poly(pIntersect(s,LD));
 }
 
 
