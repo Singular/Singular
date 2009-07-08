@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: imm.h,v 1.23 2006-05-26 11:49:58 Singular Exp $ */
+/* $Id: imm.h,v 1.24 2009-07-08 10:35:10 Singular Exp $ */
 
 #ifndef INCL_IMM_H
 #define INCL_IMM_H
@@ -41,7 +41,8 @@ const INT64 MAXIMMEDIATELL = 268435454LL;
 #endif
 
 //{{{ conversion functions
-#ifdef HAS_ARITHMETIC_SHIFT
+//#ifdef HAS_ARITHMETIC_SHIFT
+#if 1
 
 inline int imm2int ( const InternalCF * const imm )
 {

@@ -1739,39 +1739,17 @@ fi
 fi
 
 # arithmetic shift
-echo $ac_n "checking whether your compiler does arithmetic shifts""... $ac_c" 1>&6
-echo "configure:1744: checking whether your compiler does arithmetic shifts" >&5
-if eval "test \"`echo '$''{'ac_cv_shift'+set}'`\" = set"; then
-  echo $ac_n "(cached) $ac_c" 1>&6
-else
-   LDFLAGS="-L$explicit_libdir $LDFLAGS"
-	if test "$cross_compiling" = yes; then
-  ac_cv_shift=yes
-else
-  cat > conftest.$ac_ext <<EOF
-#line 1753 "configure"
-#include "confdefs.h"
- int main() { if (-2 >> 1 == -1) return(0); else return(1); } 
-EOF
-if { (eval echo configure:1757: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
-then
-  ac_cv_shift=yes
-else
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
-  rm -fr conftest*
-  ac_cv_shift=no
-fi
-rm -fr conftest*
-fi
- 
-fi
-
-if test "x$ac_cv_shift" = xyes; then   
-  echo "$ac_t""yes" 1>&6
-else
-  echo "$ac_t""no" 1>&6
-fi
+#AC_MSG_CHECKING(whether your compiler does arithmetic shifts)
+#AC_CACHE_VAL(ac_cv_shift,
+#  [ LDFLAGS="-L$explicit_libdir $LDFLAGS"
+#	AC_TRY_RUN(
+#      [ int main() { if (-2 >> 1 == -1) return(0); else return(1); } ],
+#      ac_cv_shift=yes, ac_cv_shift=no, ac_cv_shift=yes) ])
+#if test "x$ac_cv_shift" = xyes; then   
+#  AC_MSG_RESULT(yes)
+#else
+#  AC_MSG_RESULT(no)
+#fi
 
 #
 # - check for header files.
@@ -1789,17 +1767,17 @@ if test "x$gmp_in_installation" != xyes; then
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:1793: checking for $ac_hdr" >&5
+echo "configure:1771: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1798 "configure"
+#line 1776 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1803: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1781: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1830,17 +1808,17 @@ else
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:1834: checking for $ac_hdr" >&5
+echo "configure:1812: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1839 "configure"
+#line 1817 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1844: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1822: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1878,17 +1856,17 @@ for ac_hdr in stdio.h stdlib.h string.h time.h math.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:1882: checking for $ac_hdr" >&5
+echo "configure:1860: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1887 "configure"
+#line 1865 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1892: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1870: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1919,17 +1897,17 @@ for ac_hdr in cstdio
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:1923: checking for $ac_hdr" >&5
+echo "configure:1901: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1928 "configure"
+#line 1906 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1933: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1911: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1961,17 +1939,17 @@ if test "x$enable_streamio" != xno; then
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:1965: checking for $ac_hdr" >&5
+echo "configure:1943: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1970 "configure"
+#line 1948 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1975: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1953: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -2001,17 +1979,17 @@ done
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:2005: checking for $ac_hdr" >&5
+echo "configure:1983: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 2010 "configure"
+#line 1988 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:2015: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1993: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -2045,17 +2023,17 @@ done
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:2049: checking for $ac_hdr" >&5
+echo "configure:2027: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 2054 "configure"
+#line 2032 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:2059: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:2037: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -2091,17 +2069,17 @@ if test "x$enable_timing" != xno; then
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:2095: checking for $ac_hdr" >&5
+echo "configure:2073: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 2100 "configure"
+#line 2078 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:2105: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:2083: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -2135,17 +2113,17 @@ for ac_hdr in omalloc.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:2139: checking for $ac_hdr" >&5
+echo "configure:2117: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 2144 "configure"
+#line 2122 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:2149: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:2127: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -2262,21 +2240,21 @@ cross_compiling=$ac_cv_prog_cxx_cross
 
 # check whether CXX accepts -fno-rtti
 echo $ac_n "checking whether gcc accepts -fno-rtti""... $ac_c" 1>&6
-echo "configure:2266: checking whether gcc accepts -fno-rtti" >&5
+echo "configure:2244: checking whether gcc accepts -fno-rtti" >&5
 tmp_flags=${CXXFLAGS}
 CXXFLAGS="${CXXFLAGS} -fno-rtti"
 if eval "test \"`echo '$''{'ac_cv_cxx_have_rtti'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 2273 "configure"
+#line 2251 "configure"
 #include "confdefs.h"
 
 int main() {
 
 ; return 0; }
 EOF
-if { (eval echo configure:2280: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:2258: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ac_cv_cxx_have_rtti=yes
 else
@@ -2296,21 +2274,21 @@ CXXFLAGS="$CXXFLAGS -fno-rtti"
 fi
 
 echo $ac_n "checking whether gcc accepts -fno-exceptions""... $ac_c" 1>&6
-echo "configure:2300: checking whether gcc accepts -fno-exceptions" >&5
+echo "configure:2278: checking whether gcc accepts -fno-exceptions" >&5
 tmp_flags=${CXXFLAGS}
 CXXFLAGS="${CXXFLAGS} -fno-exceptions"
 if eval "test \"`echo '$''{'ac_cv_cxx_have_exceptions'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 2307 "configure"
+#line 2285 "configure"
 #include "confdefs.h"
 
 int main() {
 
 ; return 0; }
 EOF
-if { (eval echo configure:2314: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:2292: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   ac_cv_cxx_have_exceptions=yes
 else
@@ -2361,12 +2339,9 @@ EOF
 fi
 
 # arithmetic shift
-if test "x$ac_cv_shift" = xyes; then   
-  cat >> confdefs.h <<\EOF
-#define HAS_ARITHMETIC_SHIFT 1
-EOF
-
-fi
+#if test "x$ac_cv_shift" = xyes; then   
+#  AC_DEFINE(HAS_ARITHMETIC_SHIFT)
+#fi
 
 # gmp-stuff.  we must not set these flags before the tests
 # are finished!
@@ -2378,7 +2353,7 @@ if test "x$gmp_in_installation" = xyes; then
 fi
 
 echo $ac_n "checking whether to use omalloc""... $ac_c" 1>&6
-echo "configure:2382: checking whether to use omalloc" >&5
+echo "configure:2357: checking whether to use omalloc" >&5
 
 if test "$with_omalloc" = yes; then
   if test "$ac_cv_header_omalloc_h" != yes; then
