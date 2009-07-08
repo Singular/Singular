@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.507 2009-05-19 08:45:16 Singular Exp $ */
+/* $Id: iparith.cc,v 1.508 2009-07-08 15:24:41 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1504,6 +1504,7 @@ static BOOLEAN jjINDEX_V(leftv res, leftv u, leftv v)
     else
     {
       pSetComp(p, 0);
+      p_SetmComp(p);
       o=p;
       p=pNext(o);
     }
