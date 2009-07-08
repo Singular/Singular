@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-07-04 08:55:44 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.72 2009-07-04 08:55:44 monerjan Exp $
-$Id: gfan.cc,v 1.72 2009-07-04 08:55:44 monerjan Exp $
+$Date: 2009-07-08 09:57:52 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.73 2009-07-08 09:57:52 monerjan Exp $
+$Id: gfan.cc,v 1.73 2009-07-08 09:57:52 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -97,7 +97,7 @@ class facet
 		facet *next;		//Pointer to next facet
 		facet *prev;		//Pointer to predecessor. Needed for the SearchList in noRevS
 		facet *codim2Ptr;	//Pointer to (codim-2)-facet. Bit of recursion here ;-)
-		int numCodim2Facets;
+		int numCodim2Facets;	//#of (codim-2)-facets of this facet. Set in getCodim2Normals()
 		ring flipRing;		//the ring on the other side of the facet
 						
 		/** The default constructor. Do I need a constructor of type facet(intvec)? */
@@ -1925,31 +1925,148 @@ class gcone
 			codim2Act = this->facetPtr->codim2Ptr;
 			facet *sl2Act;
 			sl2Act = f.codim2Ptr;
+			facet *tBARoot;
+			tBARoot = NULL;			
+			facet *tBAAct;
+			tBAAct = NULL;
 			bool doNotAdd=FALSE;
+			int ctr=0;	//encountered qualities in SLA
+			int notParallelCtr=0;
+			int lengthOfSearchList=1;
 			while(slEnd->next!=NULL)
 			{
 				slEnd=slEnd->next;
+				lengthOfSearchList++;
 			}
 			slEndStatic = slEnd;
 			/*1st step: compare facetNormals*/
 			intvec *fNormal = new intvec(this->numVars);
 			intvec *f2Normal = new intvec(this->numVars);
 			intvec *slNormal = new intvec(this->numVars);
-			intvec *sl2Normal = new intvec(this->numVars);			
+			intvec *sl2Normal = new intvec(this->numVars);
+					
+// 			while(fAct!=NULL)
+// 			{
+// 				doNotAdd=TRUE;
+// 				fNormal = fAct->getFacetNormal();
+// 				slAct = slHead;	//return to start of list
+// 				codim2Act = fAct->codim2Ptr;
+// 				while(slAct!=slEndStatic->next)
+// 				{
+// 					slNormal = slAct->getFacetNormal();					
+// 					/*If the normals are parallel we check whether the
+// 					codim-2-normals coincide as well*/
+// 					if(isParallel(fNormal,slNormal))
+// 					{
+// 						//NOTE check codim2facets here
+// 						codim2Act = fAct->codim2Ptr;
+						
+// 						while(codim2Act!=NULL)
+// 						{
+// 							f2Normal = codim2Act->getFacetNormal();
+// 							sl2Act = f.codim2Ptr;
+// 							while(sl2Act!=NULL)
+// 							{
+// 								sl2Normal = sl2Act->getFacetNormal();
+// 								if( !(areEqual(f2Normal,sl2Normal)))
+// 								{
+// 									doNotAdd=FALSE;							
+// 									break;						
+// 									
+// 								}
+// 								else
+// 								{
+// 									sl2Act = sl2Act->next;
+// 									codim2Act = codim2Act->next;
+// 								}
+// 							}
+// 							if(doNotAdd==FALSE)
+// 								break;
+// 							//codim2Act = codim2Act->next;							
+// 						}
+// 						if(doNotAdd==TRUE)
+// 						{	/*dequeue slAct*/
+// 							if(slAct->prev==NULL && slHead!=NULL)
+// 							{
+// 								slHead = slAct->next;
+// 								slHead->prev = NULL;
+// 							}
+// 							else
+// 							{						
+// 								slAct->prev->next = slAct->next;					
+// 							}
+// 							//NOTE Memory leak above!
+// 							break;
+// 						}
+////////////
+// 						while(codim2Act!=NULL)
+// 						{
+// 							f2Normal = codim2Act->getFacetNormal();
+// 							sl2Act = f.codim2Ptr;
+// 							while(sl2Act!=NULL)
+// 							{
+// 								sl2Normal = sl2Act->getFacetNormal();
+// 								if(areEqual(f2Normal,sl2Normal))
+// 								{
+// 									ctr++;
+// 									break;
+// 								}
+// 								sl2Act = sl2Act->next;
+// 							}
+// 							codim2Act = codim2Act->next;
+// 						}
+// 						if(ctr!=(this->numVars)-1)
+// 						{
+// 							doNotAdd=FALSE;
+// 							break;
+// 						}
+// 						else
+// 						{
+// 							if(slAct->prev==NULL && slHead!=NULL)
+// 							{
+// 								slHead = slAct->next;
+// 								slHead->prev = NULL;
+// 							}
+// 							else
+// 							{						
+// 								slAct->prev->next = slAct->next;					
+// 							}	
+// 						}							
+// 						//slAct = slAct->next;
+// 					}
+// 					else
+// 					{
+// 						doNotAdd=FALSE;
+// 						break;
+// 					}
+// 					slAct = slAct->next;
+// 					
+//  					//if(doNotAdd==FALSE)
+//  					//	break;					
+// 				}//while(slAct!=slEndStatic->next)
+// 				if(doNotAdd==FALSE)
+// 				{
+// 					slEnd->next = new facet();
+// 					slEnd = slEnd->next;
+// 					slEnd->setUCN(this->getUCN());
+// 					slEnd->setFacetNormal(fNormal);
+// 				}
+// 				fAct = fAct->next;
+// 			}			
 			while(fAct!=NULL)
 			{
 				doNotAdd=TRUE;
-				fNormal = fAct->getFacetNormal();
-				slAct = slHead;	//return to start of list
-				codim2Act = fAct->codim2Ptr;
-				while(slAct!=slEndStatic->next)
+				fNormal=fAct->getFacetNormal();
+				slAct = slHead;
+				while(slAct!=NULL)
 				{
-					slNormal = slAct->getFacetNormal();					
-					/*If the normals are parallel we check whether the
-					codim-2-normals coincide as well*/
-					if(isParallel(fNormal,slNormal))
+					slNormal = slAct->getFacetNormal();
+					if(!isParallel(fNormal, slNormal))
 					{
-						//NOTE check codim2facets here
+						notParallelCtr++;
+					}
+					else
+					{
 						codim2Act = fAct->codim2Ptr;
 						while(codim2Act!=NULL)
 						{
@@ -1958,57 +2075,94 @@ class gcone
 							while(sl2Act!=NULL)
 							{
 								sl2Normal = sl2Act->getFacetNormal();
-								if( !(areEqual(f2Normal,sl2Normal)))
-								{
-									doNotAdd=FALSE;							
-									break;						
-									
-								}
-								else
-								{
-									sl2Act = sl2Act->next;
-									codim2Act = codim2Act->next;
-								}
-							}
-							if(doNotAdd==FALSE)
-								break;
-							//codim2Act = codim2Act->next;							
-						}
-						if(doNotAdd==TRUE)
-						{	/*dequeue slAct*/
-							if(slAct->prev==NULL && slHead!=NULL)
+								if(areEqual(f2Normal, sl2Normal))
+										ctr++;
+								sl2Act = sl2Act->next;
+							}//while(sl2Act!=NULL)
+							codim2Act = codim2Act->next;
+						}//while(codim2Act!=NULL)
+						if(ctr==fAct->numCodim2Facets)	//facets ARE equal
+						{
+							if(slAct==slHead)	//We want to delete the first element of SearchList
 							{
 								slHead = slAct->next;
 								slHead->prev = NULL;
+								//set a bool flag to mark slAct as to be deleted
 							}
+							else if(slAct==slEndStatic)
+								{
+									if(slEndStatic->next==NULL)
+									{
+										slEndStatic = slEndStatic->prev;
+										slEndStatic->next = NULL;
+									}
+									else	//we already added a facet after slEndStatic
+									{
+										slEndStatic->prev->next = slEndStatic->next;
+										slEndStatic = slEndStatic->prev;
+										slEnd = slEndStatic;
+									}
+								}
 							else
-							{						
-								slAct->prev->next = slAct->next;					
+							{
+								slAct->prev->next = slAct->next;
 							}
-							//NOTE Memory leak above!
+							//update lengthOfSearchList
+							lengthOfSearchList--;
 							break;
-						}	
-						slAct = slAct->next;
-					}
-					else
-					{
-						doNotAdd=FALSE;
-						break;
-					}
-					//slAct = slAct->next;
-					
- 					//if(doNotAdd==FALSE)
- 					//	break;					
-				}//while(slAct!=slEndStatic->next)
-				if(doNotAdd==FALSE)
+						}//if(ctr==fAct->numCodim2Facets)
+						else	//facets are NOT equal
+						{
+							doNotAdd=FALSE;
+							break;
+						}
+					}//if(!isParallel(fNormal, slNormal))
+					slAct = slAct->next;
+					//if slAct was marked as to be deleted, delete it here!
+				}//while(slAct!=NULL)
+				if( (notParallelCtr==lengthOfSearchList) || (doNotAdd==FALSE) )
 				{
+					//Add fAct to SLA
+					facet *marker;
+					marker = slEnd;
+					facet *f2Act;
+					f2Act = fAct->codim2Ptr;
+					
 					slEnd->next = new facet();
 					slEnd = slEnd->next;
+					facet *slEndCodim2Root;
+					facet *slEndCodim2Act;
+					slEndCodim2Root = slEnd->codim2Ptr;
+					slEndCodim2Act = slEndCodim2Root;
+							
 					slEnd->setUCN(this->getUCN());
 					slEnd->setFacetNormal(fNormal);
+					slEnd->prev = marker;
+					//Copy codim2-facets
+					intvec *f2Normal = new intvec(this->numVars);
+					while(f2Act!=NULL)
+					{
+						f2Normal=f2Act->getFacetNormal();
+						if(slEndCodim2Root==NULL)
+						{
+							slEndCodim2Root = new facet(2);
+							slEnd->codim2Ptr = slEndCodim2Root;			
+							slEndCodim2Root->setFacetNormal(f2Normal);
+							slEndCodim2Act = slEndCodim2Root;
+						}
+						else					
+						{
+							slEndCodim2Act->next = new facet(2);
+							slEndCodim2Act = slEndCodim2Act->next;
+							slEndCodim2Act->setFacetNormal(f2Normal);
+						}
+						f2Act = f2Act->next;
+					}
+					delete f2Normal;
+					
 				}
 				fAct = fAct->next;
-			}
+			}//while(fAct!=NULL)
 			return slHead;
 // 			delete sl2Normal;
 // 			delete slNormal;
