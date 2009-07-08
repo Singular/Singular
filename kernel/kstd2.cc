@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.94 2009-06-19 15:31:48 levandov Exp $ */
+/* $Id: kstd2.cc,v 1.95 2009-07-08 16:20:18 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -152,7 +152,7 @@ int kFindNextDivisibleByInS(const kStrategy strat, int start,int max_ind, LObjec
 }
 
 #ifdef HAVE_RINGS
-NATNUMBER factorial(NATNUMBER arg)
+static NATNUMBER factorial(NATNUMBER arg)
 {
    NATNUMBER tmp = 1; arg++;
    for (int i = 2; i < arg; i++)
@@ -358,10 +358,18 @@ int redRing (LObject* h,kStrategy strat)
         return -1;
       }
     }
-    else if ((TEST_OPT_PROT) && (strat->Ll < 0) && (d != reddeg))
+    else if (d != reddeg)
     {
-      Print(".%d",d);mflush();
-      reddeg = d;
+      if (d>=strat->tailRing->bitmask)
+      {
+        WerrorS("OVERFLOW in redRing\n");
+        return 1;
+      }
+      else if ((TEST_OPT_PROT) && (strat->Ll < 0))
+      {
+        Print(".%d",d);mflush();
+        reddeg = d;
+      }
     }
   }
 }
@@ -617,10 +625,18 @@ int redLazy (LObject* h,kStrategy strat)
         return -1;
       }
     }
-    else if ((TEST_OPT_PROT) && (strat->Ll < 0) && (d != reddeg))
+    else if (d != reddeg)
     {
-      Print(".%d",d);mflush();
-      reddeg = d;
+      if (d>=strat->tailRing->bitmask)
+      {
+        WerrorS("OVERFLOW in redLazy\n");
+        return 1;
+      }
+      else if ((TEST_OPT_PROT) && (strat->Ll < 0))
+      {
+        Print(".%d",d);mflush();
+        reddeg = d;
+      }
     }
   }
 }
@@ -779,11 +795,19 @@ int redHoney (LObject* h, kStrategy strat)
         return -1;
       }
     }
-    else if (TEST_OPT_PROT && (strat->Ll < 0) && (d > reddeg))
+    else if (d > reddeg)
     {
-      //h->wrp(); Print("<%d>\n",h->GetpLength());
-      reddeg = d;
-      Print(".%ld",d); mflush();
+      if (d>=strat->tailRing->bitmask)
+      {
+        WerrorS("OVERFLOW in redHoney\n");
+        return 1;
+      }
+      else if (TEST_OPT_PROT && (strat->Ll < 0) )
+      {
+        //h->wrp(); Print("<%d>\n",h->GetpLength());
+        reddeg = d;
+        Print(".%ld",d); mflush();
+      }
     }
   }
 }
@@ -1020,12 +1044,17 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     }
     else
     {
+      if (strat->P.ecart+strat->P.pFDeg()>=currRing->bitmask)
+      {
+        WerrorS("OVERFLOW");break;
+      }
       if (TEST_OPT_PROT)
         message((strat->honey ? strat->P.ecart : 0) + strat->P.pFDeg(),
                 &olddeg,&reduc,strat, red_result);
 
       /* reduction of the element choosen from L */
       red_result = strat->red(&strat->P,strat);
+      if (errorreported)  break; 
     }
 
     // reduction to non-zero new poly
