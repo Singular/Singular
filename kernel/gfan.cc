@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-07-08 09:57:52 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.73 2009-07-08 09:57:52 monerjan Exp $
-$Id: gfan.cc,v 1.73 2009-07-08 09:57:52 monerjan Exp $
+$Date: 2009-07-09 09:59:10 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.74 2009-07-09 09:59:10 monerjan Exp $
+$Id: gfan.cc,v 1.74 2009-07-09 09:59:10 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -455,7 +455,7 @@ class gcone
 					break;
 			}			
 			
-			intvec *iv = new intvec(this->numVars);
+			intvec *iv;// = new intvec(this->numVars);
 			
 			//while (f->next!=NULL)
 			while(f!=NULL)
@@ -472,7 +472,7 @@ class gcone
 		{
 			facet *fAct;
 			fAct = &f;
-			intvec *n = new intvec(this->numVars);
+			intvec *n;// = new intvec(this->numVars);
 			cout << endl;
 			while(fAct!=NULL)
 			{
@@ -1684,23 +1684,55 @@ class gcone
 			Since the operations getCodim2Normals and normalize affect the facets
 			we must not memcpy them before these ops!
 			*/
+			intvec *fNormal;// = new intvec(this->numVars);
+			intvec *f2Normal;// = new intvec(this->numVars);
+			facet *codim2Act; codim2Act = NULL;			
+			facet *sl2Root; //sl2Root = new facet(2);
+			facet *sl2Act;	//sl2Act = sl2Root;
 			
 			for(int ii=0;ii<this->numFacets;ii++)
 			{
+				fNormal = fAct->getFacetNormal();
 				if(ii==0)
 				{
 					//facet *SearchListRoot = new facet();
 					SearchListAct = SearchListRoot;
-					memcpy(SearchListAct,fAct,sizeof(facet));					
+					//memcpy(SearchListAct,fAct,sizeof(facet));					
 				}
 				else
 				{
 					SearchListAct->next = new facet();
 					SearchListAct = SearchListAct->next;
-					memcpy(SearchListAct,fAct,sizeof(facet));
+					//memcpy(SearchListAct,fAct,sizeof(facet));				
 				}
+				SearchListAct->setFacetNormal(fNormal);
+				SearchListAct->setUCN(this->getUCN());
+				SearchListAct->numCodim2Facets=fAct->numCodim2Facets;
+				
+				//Copy codim2-facets				
+				codim2Act=fAct->codim2Ptr;
+				SearchListAct->codim2Ptr = new facet(2);
+				sl2Root = SearchListAct->codim2Ptr;
+				sl2Act = sl2Root;
+				//while(codim2Act!=NULL)
+				for(int jj=0;jj<fAct->numCodim2Facets;jj++)
+				{
+					f2Normal = codim2Act->getFacetNormal();
+					if(jj==0)
+					{						
+						sl2Act = sl2Root;
+						sl2Act->setFacetNormal(f2Normal);
+					}
+					else
+					{
+						sl2Act->next = new facet(2);
+						sl2Act = sl2Act->next;
+						sl2Act->setFacetNormal(f2Normal);
+					}					
+					codim2Act = codim2Act->next;
+				}					
 				fAct = fAct->next;
-			}			
+			}				
 			
 			SearchListAct = SearchListRoot;	//Set to beginning of list
 			/*Make SearchList doubly linked*/
@@ -1940,119 +1972,11 @@ class gcone
 			}
 			slEndStatic = slEnd;
 			/*1st step: compare facetNormals*/
-			intvec *fNormal = new intvec(this->numVars);
-			intvec *f2Normal = new intvec(this->numVars);
-			intvec *slNormal = new intvec(this->numVars);
-			intvec *sl2Normal = new intvec(this->numVars);
-					
-// 			while(fAct!=NULL)
-// 			{
-// 				doNotAdd=TRUE;
-// 				fNormal = fAct->getFacetNormal();
-// 				slAct = slHead;	//return to start of list
-// 				codim2Act = fAct->codim2Ptr;
-// 				while(slAct!=slEndStatic->next)
-// 				{
-// 					slNormal = slAct->getFacetNormal();					
-// 					/*If the normals are parallel we check whether the
-// 					codim-2-normals coincide as well*/
-// 					if(isParallel(fNormal,slNormal))
-// 					{
-// 						//NOTE check codim2facets here
-// 						codim2Act = fAct->codim2Ptr;
-						
-// 						while(codim2Act!=NULL)
-// 						{
-// 							f2Normal = codim2Act->getFacetNormal();
-// 							sl2Act = f.codim2Ptr;
-// 							while(sl2Act!=NULL)
-// 							{
-// 								sl2Normal = sl2Act->getFacetNormal();
-// 								if( !(areEqual(f2Normal,sl2Normal)))
-// 								{
-// 									doNotAdd=FALSE;							
-// 									break;						
-// 									
-// 								}
-// 								else
-// 								{
-// 									sl2Act = sl2Act->next;
-// 									codim2Act = codim2Act->next;
-// 								}
-// 							}
-// 							if(doNotAdd==FALSE)
-// 								break;
-// 							//codim2Act = codim2Act->next;							
-// 						}
-// 						if(doNotAdd==TRUE)
-// 						{	/*dequeue slAct*/
-// 							if(slAct->prev==NULL && slHead!=NULL)
-// 							{
-// 								slHead = slAct->next;
-// 								slHead->prev = NULL;
-// 							}
-// 							else
-// 							{						
-// 								slAct->prev->next = slAct->next;					
-// 							}
-// 							//NOTE Memory leak above!
-// 							break;
-// 						}
-////////////
-// 						while(codim2Act!=NULL)
-// 						{
-// 							f2Normal = codim2Act->getFacetNormal();
-// 							sl2Act = f.codim2Ptr;
-// 							while(sl2Act!=NULL)
-// 							{
-// 								sl2Normal = sl2Act->getFacetNormal();
-// 								if(areEqual(f2Normal,sl2Normal))
-// 								{
-// 									ctr++;
-// 									break;
-// 								}
-// 								sl2Act = sl2Act->next;
-// 							}
-// 							codim2Act = codim2Act->next;
-// 						}
-// 						if(ctr!=(this->numVars)-1)
-// 						{
-// 							doNotAdd=FALSE;
-// 							break;
-// 						}
-// 						else
-// 						{
-// 							if(slAct->prev==NULL && slHead!=NULL)
-// 							{
-// 								slHead = slAct->next;
-// 								slHead->prev = NULL;
-// 							}
-// 							else
-// 							{						
-// 								slAct->prev->next = slAct->next;					
-// 							}	
-// 						}							
-// 						//slAct = slAct->next;
-// 					}
-// 					else
-// 					{
-// 						doNotAdd=FALSE;
-// 						break;
-// 					}
-// 					slAct = slAct->next;
-// 					
-//  					//if(doNotAdd==FALSE)
-//  					//	break;					
-// 				}//while(slAct!=slEndStatic->next)
-// 				if(doNotAdd==FALSE)
-// 				{
-// 					slEnd->next = new facet();
-// 					slEnd = slEnd->next;
-// 					slEnd->setUCN(this->getUCN());
-// 					slEnd->setFacetNormal(fNormal);
-// 				}
-// 				fAct = fAct->next;
-// 			}			
+			intvec *fNormal; //= new intvec(this->numVars);
+			intvec *f2Normal; //= new intvec(this->numVars);
+			intvec *slNormal; //= new intvec(this->numVars);
+			intvec *sl2Normal; //= new intvec(this->numVars);
+			
 			while(fAct!=NULL)
 			{
 				doNotAdd=TRUE;
@@ -2139,7 +2063,7 @@ class gcone
 					slEnd->setFacetNormal(fNormal);
 					slEnd->prev = marker;
 					//Copy codim2-facets
-					intvec *f2Normal = new intvec(this->numVars);
+					intvec *f2Normal;// = new intvec(this->numVars);
 					while(f2Act!=NULL)
 					{
 						f2Normal=f2Act->getFacetNormal();
@@ -2158,7 +2082,8 @@ class gcone
 						}
 						f2Act = f2Act->next;
 					}
-					delete f2Normal;
+					lengthOfSearchList++;
+					//delete f2Normal;
 					
 				}
 				fAct = fAct->next;
