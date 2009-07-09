@@ -238,18 +238,16 @@ DL_TAILG=\"sog\"
 DL_TAILP=\"sop\"
 
 
-ifeq ($(DL_KERNEL),1)
+OBJG= $(CXXSOURCES:.cc=.og) $(CSOURCES:.c=.og)
 
-OBJG := $(OBJG) $(DL_KERNEL_SOURCES:.cc=.og)
+ifeq ($(DL_KERNEL),1)
+OBJG 	:= $(OBJG) $(DL_KERNEL_SOURCES:.cc=.og)
 DL_LIBSG := $(P_PROCS_MODULES:%=p_Procs_%.sog)
 DL_LIBSP := $(P_PROCS_MODULES:%=p_Procs_%.sog)
-
 else
-
-OBJG := $(OBJG) $(STATIC_SOURCES:.cc=.og)
+OBJG := $(OBJG) $(STATIC_SOURCES:.cc=.og) 
 DL_LIBSG=
 DL_LIBSP=
-
 endif
 
 all:	kversion.h libkernel.a libkernel_g.a libkernel_p.a mmalloc.o \
@@ -375,14 +373,6 @@ echoLIBS:
 
 OBJG1 := $(CXXSOURCES:.cc=.og) 
 OBJG2 := $(CSOURCES:.c=.og) 
-
-OBJG=$(OBJG1) $(OBJG2) 
-
-ifeq ($(DL_KERNEL),1)
-OBJG 	:= $(OBJG) $(DL_KERNEL_SOURCES:.cc=.og)
-else
-OBJG := $(OBJG) $(STATIC_SOURCES:.cc=.og) 
-endif
 
 ##
 ## compiler and linker options for debug version
