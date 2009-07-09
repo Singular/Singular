@@ -1,4 +1,4 @@
-version="$Id: tropical.lib,v 1.17 2009-05-13 14:51:55 keilen Exp $";
+version="$Id: tropical.lib,v 1.18 2009-07-09 12:20:30 keilen Exp $";
 category="Tropical Geometry";
 info="
 LIBRARY:         tropical.lib  Computations in Tropical Geometry
@@ -2659,11 +2659,33 @@ EXAMPLE:     example texDrawTropical;   shows an example"
   {
     maxdiffy=1;
   }
+  int nachkomma=2; // number of decimals for the scalefactor
+  number sf=1; // correction factor for scalefactor
   if (size(#)!=2)
   {
     poly scalefactor=minOfPolys(list(12/leadcoef(maxdiffx),16/leadcoef(maxdiffy)));
+    // if the scalefactor is less than 1/100, then we need more than 2 decimals
+    if (leadcoef(scalefactor) < 1/100)
+    {
+      number scf=leadcoef(scalefactor);
+      while (scf < 1/100)
+      {
+        scf=scf * 10;
+        nachkomma++;
+      }
+    }    
+    // if the scalefactor is < 1/100, then we should rather scale the 
+    // coordinates directly, since otherwise texdraw gets into trouble
+    if (nachkomma > 2)
+    {
+      for (i=3;i<=nachkomma;i++)
+      {
+        scalefactor=scalefactor * 10;
+        sf=sf*10;
+      }
+    }    
     texdrawtp=texdrawtp+"
-       \\relunitscale "+ decimal(scalefactor);
+       \\relunitscale "+ decimal(scalefactor,nachkomma);
   }
   else
   {
@@ -2677,7 +2699,7 @@ EXAMPLE:     example texDrawTropical;   shows an example"
     if (bunchoflines==0) 
     {
       texdrawtp=texdrawtp+"
-       \\move ("+decimal(graph[i][1]-centerx)+" "+decimal(graph[i][2]-centery)+") \\fcir f:0 r:"+decimal(2/(leadcoef(scalefactor)*10),size(string(int(scalefactor)))+1);
+       \\move ("+decimal((graph[i][1]-centerx)/sf)+" "+decimal((graph[i][2]-centery)/sf)+") \\fcir f:0 r:"+decimal(2/(leadcoef(scalefactor)*10),size(string(int(scalefactor)))+1);
     }
     // draw the bounded edges emerging from the ith vertex
     for (j=1;j<=ncols(graph[i][3]);j++) 
@@ -2687,12 +2709,12 @@ EXAMPLE:     example texDrawTropical;   shows an example"
       if (i<graph[i][3][1,j]) 
       {                       
         texdrawtp=texdrawtp+"
-       \\move ("+decimal(graph[i][1]-centerx)+" "+decimal(graph[i][2]-centery)+") \\lvec ("+decimal(graph[graph[i][3][1,j]][1]-centerx)+" "+decimal(graph[graph[i][3][1,j]][2]-centery)+")";
+       \\move ("+decimal((graph[i][1]-centerx)/sf)+" "+decimal((graph[i][2]-centery)/sf)+") \\lvec ("+decimal((graph[graph[i][3][1,j]][1]-centerx)/sf)+" "+decimal((graph[graph[i][3][1,j]][2]-centery)/sf)+")";
         // if the multiplicity is more than one, denote it in the picture
         if (graph[i][3][2,j]>1) 
         {
           texdrawtp=texdrawtp+"
-       \\htext ("+decimal((graph[i][1]-centerx+graph[graph[i][3][1,j]][1])/2)+" "+decimal((graph[i][2]-centery+graph[graph[i][3][1,j]][2])/2)+"){$"+string(graph[i][3][2,j])+"$}";
+       \\htext ("+decimal((graph[i][1]-centerx+graph[graph[i][3][1,j]][1])/(2*sf))+" "+decimal((graph[i][2]-centery+graph[graph[i][3][1,j]][2])/(2*sf))+"){$"+string(graph[i][3][2,j])+"$}";
         }
       }
     }
@@ -2700,14 +2722,14 @@ EXAMPLE:     example texDrawTropical;   shows an example"
     // they should not be too long
     for (j=1;j<=size(graph[i][4]);j++) 
     {      
-      relxy=shorten(list(decimal(3*graph[i][4][j][1][1]/scalefactor),decimal(3*graph[i][4][j][1][2]/scalefactor),"2.5"));
+      relxy=shorten(list(decimal((3*graph[i][4][j][1][1]/scalefactor)*sf),decimal((3*graph[i][4][j][1][2]/scalefactor)*sf),string(5*sf/2)));
       texdrawtp=texdrawtp+"
-       \\move ("+decimal(graph[i][1]-centerx)+" "+decimal(graph[i][2]-centery)+") \\rlvec ("+relxy[1]+" "+relxy[2]+")";
+       \\move ("+decimal((graph[i][1]-centerx)/sf)+" "+decimal((graph[i][2]-centery)/sf)+") \\rlvec ("+relxy[1]+" "+relxy[2]+")";
       // if the multiplicity is more than one, denote it in the picture
       if (graph[i][4][j][2]>1) 
       {
         texdrawtp=texdrawtp+"
-       \\htext ("+decimal(graph[i][1]-centerx+graph[i][4][j][1][1]/scalefactor)+" "+decimal(graph[i][2]-centery+graph[i][4][j][1][2]/scalefactor)+"){$"+string(graph[i][4][j][2])+"$}";
+       \\htext ("+decimal(graph[i][1]/sf-centerx/sf+graph[i][4][j][1][1]/scalefactor)+" "+decimal(graph[i][2]/sf-centery/sf+graph[i][4][j][1][2]/scalefactor)+"){$"+string(graph[i][4][j][2])+"$}";
       }
     }
   }
