@@ -250,8 +250,7 @@ DL_LIBSG=
 DL_LIBSP=
 endif
 
-all:	kversion.h libkernel.a libkernel_g.a libkernel_p.a mmalloc.o \
-        ${DL_LIBS} ${DL_LIBSG} ${OBJS2} ${DL_LIBSP}
+all:	kversion.h libkernel.a libkernel_g.a libkernel_p.a mmalloc.o ${DL_LIBS} ${DL_LIBSG} ${OBJS2} ${DL_LIBSP}
 
 libkernel.a: ${OBJS}
 	-rm -f libkernel.a
