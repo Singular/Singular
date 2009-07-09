@@ -25,7 +25,23 @@ MAIN:computes a gb of the ideal i in the ring r with our F5 implementation
 ==========================================================================
 */
 ideal f5cMain(ideal id, ring r) {
-    return id;
+  Print("SHORT EXP VECTOR 1:  %ld\n", pGetShortExpVector(id->m[0]));
+  int* expVec   = new int[(r->N)+1];
+  pGetExpV(id->m[0],expVec);
+  Print("EXP VECTOR 1: %d\n",expVec[1]);
+  Label* label  = new Label(expVec);
+  Print("EXP VECTOR 2: %d\n", label->getExpVec()[1]);
+  Print("SHORT EXP VECTOR 2:  %ld\n", label->getShortExpVec());
+  //Print("%ld\n", label->computeShortExpVec(expVec)); 
+  Print("SHORT EXP VECTOR 1:  %ld\n", pGetShortExpVector(id->m[1]));
+  //int* expVec   = new int[(r->N)+1];
+  pGetExpV(id->m[1],expVec);
+  Print("EXP VECTOR 1: %d\n",expVec[1]);
+  Label* label2  = new Label(expVec);
+  Print("EXP VECTOR 2: %d\n", label2->getExpVec()[1]);
+  Print("SHORT EXP VECTOR 2:  %ld\n", label2->getShortExpVec());
+
+  return id;
 }
 
 #endif

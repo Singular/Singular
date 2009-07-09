@@ -20,7 +20,7 @@
  */
 class CPair;
 class Label;
-
+class PolyAndShort;
 
 /*!
  * \class CPair
@@ -33,8 +33,7 @@ class CPair {
   
   public:
 
-};
-// end CPair
+}; // end CPair
 
 
 /*!
@@ -46,15 +45,15 @@ class CPair {
  */
 class Label {
   private:
-    int*              m_pExpVec;
-    unsigned long     m_nShortExpVec;
+    unsigned int* m_pExpVec;
+    unsigned long m_nShortExpVec;
   public:
     /*!
      * \fn Label(int* expVec);
      * \param[in] expVec The exponent vector of some monomial defining a label
      * \brief Constructor of an object of class \c Label
      */
-    Label(int* expVec);
+    Label(unsigned int* expVec);
     /*!
      * \fn ~Label();
      * \brief Destructor of an object of class \c Label
@@ -65,14 +64,14 @@ class Label {
      * \return The first entry of the \c integer vector at the address \c m_pExpVec
      * \brief Getter of the \c integer vector at the address \c m_pExpVec
      */
-    inline int* getExpVec();
+    inline unsigned int* getExpVec(); 
     /*!
      * \fn static inline long getShortExpVec();
      * \return The short exponent vector \c m_nShortExpVec of the label
      * \brief Getter of the \code unsigned long m_nShortExpVec \endcode
      * 
      */
-    inline unsigned long getShortExpVec();
+    inline unsigned long getShortExpVec(); 
     /*!
      * \fn static inline unsigned long computeShortExpVec(int* expVec);
      * \param[in] expVec The exponent vector of some monomial defining a label
@@ -83,7 +82,7 @@ class Label {
      * is optimized for the case of working with exponent vectors and not with
      * polys as input data.
      */
-    static inline unsigned long computeShortExpVec(int* expVec);
+    inline unsigned long computeShortExpVec(unsigned int* expVec);
     /*!
      * \fn static inline unsigned long getBitFields(int e, unsigned int s,
      * unsigned int n);
@@ -101,10 +100,48 @@ class Label {
      * is optimized for the case of working with exponent vectors and not with
      * polys as input data.
      */
-    static inline unsigned long getBitFields(int e, unsigned int s, unsigned int n);
-};
-// end Label
+    inline unsigned long getBitFields(unsigned int e, unsigned int s, unsigned int n);
+}; // end Label
 
+/*!
+ * \class PolyAndShort
+ * \author Christian Eder
+ * \brief This is the data structure of a polynomial together with the short
+ * exponent vector of its leading monomial in F5C
+ * \details
+ */
+class PolyAndShort {
+  private:
+    poly          m_poly;
+    unsigned long m_nShortExpVec;
+  public:
+    /*!
+     * \fn PolyAndShort(poly p);
+     * \param[in] p The polynomial to be stored
+     * \brief Constructor of an object of class \c PolyAndShort
+     * \details Constructor of an object of class \c PolyAndShort used when
+     * inserting an element generating the input ideal \c I of the F5C Algorithm
+     */
+    PolyAndShort(poly p);
+    /*!
+     * \fn ~Label();
+     * \brief Destructor of an object of class \c Label
+     */
+    ~PolyAndShort();
+    /*!
+     * \fn static inline int getExpVec();
+     * \return The first entry of the \c integer vector at the address \c m_pExpVec
+     * \brief Getter of the \c integer vector at the address \c m_pExpVec
+     */
+    inline unsigned int* getExpVec(); 
+    /*!
+     * \fn static inline long getShortExpVec();
+     * \return The short exponent vector \c m_nShortExpVec of the label
+     * \brief Getter of the \code unsigned long m_nShortExpVec \endcode
+     * 
+     */
+
+}; // end LPoly
 #endif
 // HAVE_F5C
 #endif
