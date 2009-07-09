@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: timer.cc,v 1.9 2009-01-29 16:57:02 Singular Exp $ */
+/* $Id: timer.cc,v 1.10 2009-07-09 12:28:31 Singular Exp $ */
 
 /*
 *  ABSTRACT - get the computing time
@@ -181,12 +181,15 @@ void writeTime(const char* v)
 
   double f =  ((double)curr) / (double)HZ;
 #endif
-  if (f > mintime)
+  if (f/timer_resolution > mintime)
   {
 #ifdef EXTEND_TIMER_D
-    Print("//%s %.2f sec (%d) >>%s<<\n" ,v ,f,iiOp,my_yylinebuf);
+    Print("//%s %.2f/%d sec (%d) >>%s<<\n" ,v ,f,(int)timer_resolution,iiOp,my_yylinebuf);
 #else
-    Print("//%s %.2f sec\n" ,v ,f);
+    if (timer_resolution==(double)1.0)
+      Print("//%s %.2f sec\n" ,v ,f);
+    else
+      Print("//%s %.2f/%d sec\n" ,v ,f,(int)timer_resolution);
 #endif
   }
 }
