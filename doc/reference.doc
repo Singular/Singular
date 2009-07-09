@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.341 2009-04-15 12:27:19 Singular Exp $
+@comment $Id: reference.doc,v 1.342 2009-07-09 13:51:14 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -8069,6 +8069,11 @@ of the Windows95/98 operating system). Use @ref{rtimer}, instead.
       // since t was initialized by timer
   int tps=system("--ticks-per-sec");
   t/tps; // yields the time in seconds truncated to int
+  timer=0;
+  system("--ticks-per-sec",1000); // set timer resolution to ms
+  t=timer; // initialize t by timer
+  p=(x+2y+3z+4xy+5xz+6yz)^20;
+  timer-t;  // time in ms
 @c example
 @end smallexample
 @end table
@@ -8120,7 +8125,7 @@ See
 @c ---------------------------------------
 @node rtimer, voice, TRACE var, System variables
 @subsection rtimer
-@cindex timer
+@cindex rtimer
 @table @code
 @item @strong{Type:}
 int
