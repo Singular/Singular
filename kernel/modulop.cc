@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.14 2008-12-08 15:00:43 Singular Exp $ */
+/* $Id: modulop.cc,v 1.15 2009-07-09 12:11:34 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -151,9 +151,9 @@ long InvMod(long a)
 inline number npInversM (number c)
 {
 #ifndef HAVE_DIV_MOD
-  return (number)npExpTable[npPminus1M - npLogTable[(long)c]];
+  return (number)(long)npExpTable[npPminus1M - npLogTable[(long)c]];
 #else
-  long inv=npInvTable[(long)c];
+  long inv=(long)npInvTable[(long)c];
   if (inv==0)
   {
     inv=InvMod((long)c);
@@ -182,7 +182,7 @@ number npDiv (number a,number b)
     int s = npLogTable[(long)a] - npLogTable[(long)b];
     if (s < 0)
       s += npPminus1M;
-    return (number)npExpTable[s];
+    return (number)(long)npExpTable[s];
   }
 #else
   number inv=npInversM(b);
