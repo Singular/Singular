@@ -2,7 +2,7 @@
 //anne, added deleteSublist and watchdog 12.12.2000
 //eric, added absValue 11.04.2002
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.62 2009-04-15 11:46:39 Singular Exp $";
+version="$Id: general.lib,v 1.63 2009-07-10 18:52:05 motsak Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -764,8 +764,15 @@ EXAMPLE: example sort; shows an example
    {
       if ( typeof(#[1])=="string" )
       {
+         if( typeof(id)=="matrix" )
+         {
+           module ID = lead(module(id));
+         } else
+         {
+           def ID = lead(id);
+         }
          execute("ring r1 =("+charstr(P)+"),("+varstr(P)+"),("+#[1]+");");
-         def i = imap(P,id);
+         def i = imap(P,ID);
          v = sortvec(i);
          setring P;
          n=2;
