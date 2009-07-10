@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.16 2009-06-09 18:21:50 Singular Exp $
+ *  Version: $Id: kInline.cc,v 1.17 2009-07-10 15:13:56 Singular Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -388,6 +388,11 @@ KINLINE long sTObject::pFDeg() const
 {
   if (p != NULL) return ::pFDeg(p, currRing);
   return tailRing->pFDeg(t_p, tailRing);
+}
+KINLINE long sTObject::pTotalDeg() const
+{
+  if (p != NULL) return pTotaldegree(p, currRing);
+  return pTotaldegree(t_p,tailRing);
 }
 KINLINE long sTObject::SetpFDeg()
 {

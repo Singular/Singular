@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.47 2009-06-19 09:45:38 Singular Exp $ */
+/* $Id: kutil.h,v 1.48 2009-07-10 15:13:57 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -125,6 +125,8 @@ public:
   KINLINE void LmDeleteAndIter();
 
   // deg stuff
+  // compute pTotalDegree
+  KINLINE long pTotalDeg() const;
   // computes pFDeg
   KINLINE long pFDeg() const;
   // computes and sets FDeg
@@ -347,6 +349,7 @@ public:
   char    newt;/*used for messageSets*/
   char    noClearS;
   char    completeReduce_retry;
+  char    overflow;
 
   skStrategy();
   ~skStrategy();

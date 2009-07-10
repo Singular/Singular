@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.121 2009-06-23 08:07:11 Singular Exp $ */
+/* $Id: ring.cc,v 1.122 2009-07-10 15:13:57 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2332,77 +2332,85 @@ static unsigned long rGetExpSize(unsigned long bitmask, int & bits)
   {
     bits=16; bitmask=0xffff;
   }
-  else if (bitmask <= 1)
+  else if (bitmask <= 1L)
   {
-    bits=1; bitmask = 1;
+    bits=1; bitmask = 1L;
   }
-  else if (bitmask <= 3)
+  else if (bitmask <= 3L)
   {
-    bits=2; bitmask = 3;
+    bits=2; bitmask = 3L;
   }
-  else if (bitmask <= 7)
+  else if (bitmask <= 7L)
   {
-    bits=3; bitmask=7;
+    bits=3; bitmask=7L;
   }
-  else if (bitmask <= 0xf)
+  else if (bitmask <= 0xfL)
   {
-    bits=4; bitmask=0xf;
+    bits=4; bitmask=0xfL;
   }
-  else if (bitmask <= 0x1f)
+  else if (bitmask <= 0x1fL)
   {
-    bits=5; bitmask=0x1f;
+    bits=5; bitmask=0x1fL;
   }
-  else if (bitmask <= 0x3f)
+  else if (bitmask <= 0x3fL)
   {
-    bits=6; bitmask=0x3f;
+    bits=6; bitmask=0x3fL;
   }
 #if SIZEOF_LONG == 8
-  else if (bitmask <= 0x7f)
+  else if (bitmask <= 0x7fL)
   {
-    bits=7; bitmask=0x7f; /* 64 bit longs only */
+    bits=7; bitmask=0x7fL; /* 64 bit longs only */
   }
 #endif
-  else if (bitmask <= 0xff)
+  else if (bitmask <= 0xffL)
   {
-    bits=8; bitmask=0xff;
+    bits=8; bitmask=0xffL;
   }
 #if SIZEOF_LONG == 8
-  else if (bitmask <= 0x1ff)
+  else if (bitmask <= 0x1ffL)
   {
-    bits=9; bitmask=0x1ff; /* 64 bit longs only */
+    bits=9; bitmask=0x1ffL; /* 64 bit longs only */
   }
 #endif
-  else if (bitmask <= 0x3ff)
+  else if (bitmask <= 0x3ffL)
   {
-    bits=10; bitmask=0x3ff;
+    bits=10; bitmask=0x3ffL;
   }
 #if SIZEOF_LONG == 8
-  else if (bitmask <= 0xfff)
+  else if (bitmask <= 0xfffL)
   {
     bits=12; bitmask=0xfff; /* 64 bit longs only */
   }
 #endif
-  else if (bitmask <= 0xffff)
+  else if (bitmask <= 0xffffL)
   {
-    bits=16; bitmask=0xffff;
+    bits=16; bitmask=0xffffL;
   }
 #if SIZEOF_LONG == 8
-  else if (bitmask <= 0xfffff)
+  else if (bitmask <= 0xfffffL)
   {
-    bits=20; bitmask=0xfffff; /* 64 bit longs only */
+    bits=20; bitmask=0xfffffL; /* 64 bit longs only */
   }
-  else if (bitmask <= 0xffffffff)
+  else if (bitmask <= 0xffffffffL)
   {
-    bits=32; bitmask=0xffffffff;
+    bits=32; bitmask=0xffffffffL;
+  }
+  else if (bitmask <= 0x7fffffffffffffffL)
+  {
+    bits=63; bitmask=0x7fffffffffffffffL; /* for overflow tests*/
   }
   else
   {
-    bits=64; bitmask=0xffffffffffffffff;
+    bits=63; bitmask=0x7fffffffffffffffL; /* for overflow tests*/
   }
 #else
+  else if (bitmask <= 0x7fffffff)
+  {
+    bits=31; bitmask=0x7fffffff; /* for overflow tests*/
+  }
   else
   {
-    bits=32; bitmask=0xffffffff;
+    bits=31; bitmask=0x7fffffffL; /* for overflow tests*/
   }
 #endif
   return bitmask;
@@ -2418,7 +2426,7 @@ static unsigned long rGetExpSize(unsigned long bitmask, int & bits, int N)
   int bits1;
   loop
   {
-    if (bits == BIT_SIZEOF_LONG)
+    if (bits == BIT_SIZEOF_LONG-1)
     {
       bits =  BIT_SIZEOF_LONG - 1;
       return LONG_MAX;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.95 2009-07-08 16:20:18 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.96 2009-07-10 15:13:56 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -286,7 +286,8 @@ int redRing (LObject* h,kStrategy strat)
   if (h->p == NULL && h->t_p == NULL) return 0; // spoly is zero (can only occure with zero divisors)
 
 //  if (strat->tl<0) return 1;
-  int at,d,i;
+  int at,i;
+  long d;
   int j = 0;
   int pass = 0;
   poly zeroPoly = NULL;
@@ -294,10 +295,6 @@ int redRing (LObject* h,kStrategy strat)
 // TODO warum SetpFDeg notwendig?
   h->SetpFDeg();
   assume(h->pFDeg() == h->FDeg);
-//  if (h->pFDeg() != h->FDeg)
-//  {
-//    Print("h->pFDeg()=%d =!= h->FDeg=%d\n", h->pFDeg(), h->FDeg);
-//  }
   long reddeg = h->GetpFDeg();
 
   h->SetShortExpVector();
@@ -360,10 +357,18 @@ int redRing (LObject* h,kStrategy strat)
     }
     else if (d != reddeg)
     {
-      if (d>=strat->tailRing->bitmask)
+      if (d >= strat->tailRing->bitmask)
       {
-        WerrorS("OVERFLOW in redRing\n");
-        return 1;
+	if (h->pTotalDeg() >= strat->tailRing->bitmask)
+	{
+	  strat->overflow=TRUE;
+          //Print("OVERFLOW in redRing d=%ld, max=%ld\n",d,strat->tailRing->bitmask);
+	  h->GetP();
+	  at = strat->posInL(strat->L,strat->Ll,h,strat);
+	  enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+	  h->Clear();
+          return -1;
+        }
       }
       else if ((TEST_OPT_PROT) && (strat->Ll < 0))
       {
@@ -503,11 +508,12 @@ int redHomog (LObject* h,kStrategy strat)
 int redLazy (LObject* h,kStrategy strat)
 {
   if (strat->tl<0) return 1;
-  int at,d,i,ii,li;
+  int at,i,ii,li;
   int j = 0;
   int pass = 0;
   assume(h->pFDeg() == h->FDeg);
   long reddeg = h->GetpFDeg();
+  long d;
   unsigned long not_sev;
 
   h->SetShortExpVector();
@@ -629,8 +635,16 @@ int redLazy (LObject* h,kStrategy strat)
     {
       if (d>=strat->tailRing->bitmask)
       {
-        WerrorS("OVERFLOW in redLazy\n");
-        return 1;
+	if (h->pTotalDeg() >= strat->tailRing->bitmask)
+	{
+	  strat->overflow=TRUE;
+          //Print("OVERFLOW in redLazy d=%ld, max=%ld\n",d,strat->tailRing->bitmask);
+	  h->GetP();
+	  at = strat->posInL(strat->L,strat->Ll,h,strat);
+	  enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+	  h->Clear();
+          return -1;
+        }
       }
       else if ((TEST_OPT_PROT) && (strat->Ll < 0))
       {
@@ -799,8 +813,16 @@ int redHoney (LObject* h, kStrategy strat)
     {
       if (d>=strat->tailRing->bitmask)
       {
-        WerrorS("OVERFLOW in redHoney\n");
-        return 1;
+	if (h->pTotalDeg()+h->ecart >= strat->tailRing->bitmask)
+	{
+	  strat->overflow=TRUE;
+          //Print("OVERFLOW in redHoney d=%ld, max=%ld\n",d,strat->tailRing->bitmask);
+	  h->GetP();
+	  at = strat->posInL(strat->L,strat->Ll,h,strat);
+	  enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+	  h->Clear();
+          return -1;
+        }
       }
       else if (TEST_OPT_PROT && (strat->Ll < 0) )
       {
@@ -963,7 +985,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #ifdef HAVE_TAIL_RING
   kStratInitChangeTailRing(strat);
 #endif
-  if (BVERBOSE(23)) 
+  if (BVERBOSE(23))
   {
     if (test_PosInT!=NULL) strat->posInT=test_PosInT;
     if (test_PosInL!=NULL) strat->posInL=test_PosInL;
@@ -1024,7 +1046,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         assume(m1 == NULL && m2 == NULL);
         // if not, change to a ring where exponents are at least
         // large enough
-        kStratChangeTailRing(strat);
+        if (!kStratChangeTailRing(strat)) { Werror("OVERFLOW..."); break;}
       }
       // create the real one
       ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
@@ -1044,27 +1066,35 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     }
     else
     {
-      if (strat->P.ecart+strat->P.pFDeg()>=currRing->bitmask)
-      {
-        WerrorS("OVERFLOW");break;
-      }
       if (TEST_OPT_PROT)
         message((strat->honey ? strat->P.ecart : 0) + strat->P.pFDeg(),
                 &olddeg,&reduc,strat, red_result);
 
       /* reduction of the element choosen from L */
       red_result = strat->red(&strat->P,strat);
-      if (errorreported)  break; 
+      if (errorreported)  break;
+    }
+
+    if (strat->overflow)
+    {
+        if (!kStratChangeTailRing(strat)) { Werror("OVERFLOW.."); break;}
     }
 
     // reduction to non-zero new poly
     if (red_result == 1)
     {
-      /* statistic */
-      if (TEST_OPT_PROT) PrintS("s");
-
       // get the polynomial (canonicalize bucket, make sure P.p is set)
       strat->P.GetP(strat->lmBin);
+
+      if (strat->P.ecart+strat->P.pFDeg()>=currRing->bitmask)
+      {
+        if (strat->P.ecart+strat->P.pTotalDeg() >=currRing->bitmask)
+        {
+          Werror("OVERFLOW e=%d, d=%ld, max=%ld", strat->P.ecart,strat->P.pFDeg(), currRing->bitmask);break;
+        }
+      }
+      /* statistic */
+      if (TEST_OPT_PROT) PrintS("s");
 
       int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
 
@@ -1660,7 +1690,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
   if (TEST_OPT_DEBUG) messageSets(strat);
 #endif
   /* complete reduction of the standard basis--------- */
-  /*  shift case: look for elt's in S such that they are divisible by elt in T */ 
+  /*  shift case: look for elt's in S such that they are divisible by elt in T */
   //  if (TEST_OPT_SB_1)
   if (TEST_OPT_REDSB)
   {
@@ -1805,7 +1835,7 @@ int redFirstShift (LObject* h,kStrategy strat)
       h->t_p=qq;
       if (qq!=NULL) h->GetP(strat->lmBin);
     }
-    
+
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {

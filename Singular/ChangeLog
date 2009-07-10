@@ -4,6 +4,7 @@ Changes w.r.t 3-1-0-4:
 - new libs: binresol.lib, trial.lib
 - NTL: update to version 5.5.1
 - tail reduction for coeffcients also from Z/m, Z/p^n, Z/2^m (trac 137)
+- better tests for overflow of exponents: std,  ^, TODO: *, NF, redTail, slimgb
 
 Changes w.r.t 3-1-0-3:
 - 3-1-0-4: Wed Jun 10 2009

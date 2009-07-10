@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.52 2009-05-29 16:23:17 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.53 2009-07-10 15:13:56 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -162,9 +162,10 @@ static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat)
 int redEcart (LObject* h,kStrategy strat)
 {
   poly pi;
-  int i,at,reddeg,d,ei,li,ii;
+  int i,at,ei,li,ii;
   int j = 0;
   int pass = 0;
+  long d,reddeg;
 
   d = h->GetpFDeg()+ h->ecart;
   reddeg = strat->LazyDegree+d;
@@ -319,6 +320,16 @@ int redEcart (LObject* h,kStrategy strat)
     {
       Print(".%d",d);mflush();
       reddeg = d+1;
+      if (h->pTotalDeg()+h->ecart >= strat->tailRing->bitmask)
+      {
+	strat->overflow=TRUE;
+        //Print("OVERFLOW in redEcart d=%ld, max=%ld",d,strat->tailRing->bitmask);
+	h->GetP();
+	at = strat->posInL(strat->L,strat->Ll,h,strat);
+	enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+	h->Clear();
+        return -1;
+      }
     }
   }
 }
@@ -331,7 +342,8 @@ int redFirst (LObject* h,kStrategy strat)
 {
   if (h->IsNull()) return 0;
 
-  int at, reddeg,d;
+  int at;
+  long reddeg,d;
   int pass = 0;
   int j = 0;
 
@@ -439,6 +451,16 @@ int redFirst (LObject* h,kStrategy strat)
       {
         reddeg = d+1;
         Print(".%d",d);mflush();
+        if (h->pTotalDeg()+h->ecart >= strat->tailRing->bitmask)
+        {
+	  strat->overflow=TRUE;
+          //Print("OVERFLOW in redFirst d=%ld, max=%ld",d,strat->tailRing->bitmask);
+	  h->GetP();
+	  at = strat->posInL(strat->L,strat->Ll,h,strat);
+	  enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+	  h->Clear();
+          return -1;
+        }
       }
     }
   }

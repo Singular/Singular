@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.146 2009-06-25 07:55:36 Singular Exp $ */
+/* $Id: kutil.cc,v 1.147 2009-07-10 15:13:56 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -6183,6 +6183,7 @@ BOOLEAN newHEdge(polyset S, kStrategy strat)
  ***************************************************************/
 BOOLEAN kCheckSpolyCreation(LObject *L, kStrategy strat, poly &m1, poly &m2)
 {
+  if (strat->overflow) return FALSE;
   assume(L->p1 != NULL && L->p2 != NULL);
   // shift changes: from 0 to -1
   assume(L->i_r1 >= -1 && L->i_r1 <= strat->tl);
@@ -6239,6 +6240,7 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
 {
   if (expbound == 0) expbound = strat->tailRing->bitmask << 1;
   if (expbound >= currRing->bitmask) return FALSE;
+  strat->overflow=FALSE;
   ring new_tailRing = rModifyRing(currRing,
                                   // Hmmm .. the condition pFDeg == pDeg
                                   // might be too strong

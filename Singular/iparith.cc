@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.509 2009-07-08 15:26:02 Singular Exp $ */
+/* $Id: iparith.cc,v 1.510 2009-07-10 15:14:35 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -734,7 +734,17 @@ static BOOLEAN jjPOWER_N(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjPOWER_P(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)pPower((poly)u->CopyD(POLY_CMD),(int)(long)v->Data());
+  int v_i=(int)(long)v->Data();
+  poly u_p=(poly)u->CopyD(POLY_CMD);
+  int dummy;
+  if ((u_p!=NULL)
+  && (pLDeg(u_p,&dummy,currRing)*(signed long)v_i >= (signed long)currRing->bitmask))
+  {
+    pDelete(&u_p);
+    Werror("OVERFLOW");
+    return TRUE;
+  }
+  res->data = (char *)pPower(u_p,v_i);
   if (u!=NULL) return jjOP_REST(res,u,v);
   return errorreported; /* pPower may set errorreported via Werror */
 }
@@ -1015,18 +1025,39 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
 {
   poly a;
   poly b;
+  int dummy;
   if (v->next==NULL)
   {
     a=(poly)u->CopyD(POLY_CMD); // works also for VECTOR_CMD
     if (u->next==NULL)
     {
       b=(poly)v->CopyD(POLY_CMD); // works also for VECTOR_CMD
+      #if 0
+      if ((a!=NULL) && (b!=NULL)
+      && (pLDeg(a,&dummy,currRing)+pLDeg(b,&dummy,currRing)>=currRing->bitmask))
+      {
+        pDelete(&a);
+        pDelete(&b);
+        WerrorS("OVERFLOW");
+        return TRUE;
+      }
+      #endif
       res->data = (char *)(pMult( a, b));
       pNormalize((poly)res->data);
       return FALSE;
     }
     // u->next exists: copy v
     b=pCopy((poly)v->Data());
+    #if 0
+    if ((a!=NULL) && (b!=NULL) 
+    && (pLDeg(a,&dummy,currRing)+pLDeg(b,&dummy,currRing)>=currRing->bitmask))
+    {
+      pDelete(&a);
+      pDelete(&b);
+      WerrorS("OVERFLOW");
+      return TRUE;
+    }
+    #endif
     res->data = (char *)(pMult( a, b));
     pNormalize((poly)res->data);
     return jjOP_REST(res,u,v);
@@ -1034,6 +1065,16 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
   // v->next exists: copy u
   a=pCopy((poly)u->Data());
   b=(poly)v->CopyD(POLY_CMD); // works also for VECTOR_CMD
+  #if 0
+  if ((a!=NULL) && (b!=NULL)
+  && (pLDeg(a,&dummy,currRing)+pLDeg(b,&dummy,currRing)>=currRing->bitmask))
+  {
+    pDelete(&a);
+    pDelete(&b);
+    WerrorS("OVERFLOW");
+    return TRUE;
+  }
+  #endif
   res->data = (char *)(pMult( a, b));
   pNormalize((poly)res->data);
   return jjOP_REST(res,u,v);
