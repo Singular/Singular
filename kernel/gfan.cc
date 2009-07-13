@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-07-09 09:59:10 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.74 2009-07-09 09:59:10 monerjan Exp $
-$Id: gfan.cc,v 1.74 2009-07-09 09:59:10 monerjan Exp $
+$Date: 2009-07-13 06:50:42 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.75 2009-07-13 06:50:42 monerjan Exp $
+$Id: gfan.cc,v 1.75 2009-07-13 06:50:42 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -74,7 +74,7 @@ class facet
 		intvec *interiorPoint;
 		
 		/** \brief Universal Cone Number
-		* The number of the cone the facet belongs to
+		* The number of the cone the facet belongs to, Set in getConeNormals()
 		*/
 		int UCN;
 		
@@ -92,8 +92,8 @@ class facet
 		ideal flipGB;		//The Groebner Basis on the other side, computed via gcone::flip		
 			
 	public:		
-		//bool isFlippable;	//flippable facet? Want to have cone->isflippable.facet[i]
-		bool isIncoming;	//Is the facet incoming or outgoing?
+		bool isFlippable;	//flippable facet?
+		bool isIncoming;	//Is the facet incoming or outgoing in the reverse search?
 		facet *next;		//Pointer to next facet
 		facet *prev;		//Pointer to predecessor. Needed for the SearchList in noRevS
 		facet *codim2Ptr;	//Pointer to (codim-2)-facet. Bit of recursion here ;-)
@@ -116,6 +116,7 @@ class facet
 			this->next=NULL;
 			this->prev=NULL;		
 			this->flipRing=NULL;
+			this->isFlippable=FALSE;
 		}
 		
 		/** \brief Constructor for facets of codim >= 2
@@ -136,6 +137,7 @@ class facet
 			this->next=NULL;
 			this->prev=NULL;
 			this->flipRing=NULL;
+			this->isFlippable=FALSE;
 		}
 		
 		/** The default destructor */
@@ -243,6 +245,41 @@ class facet
 		{
 			return this->interiorPoint;
 		}	
+		
+		void fDebugPrint()
+		{
+			//facet *f;
+			facet *codim2Act;
+			//f = this;
+			codim2Act = this->codim2Ptr;
+			intvec *fNormal;
+			fNormal = this->getFacetNormal();
+			intvec *f2Normal;
+			cout << "=======================" << endl;
+			cout << "Facet normal = (";
+			for(int ii=0;ii<pVariables;ii++)
+			{
+				cout << (*fNormal)[ii] << ",";
+			}
+			if(this->isFlippable==TRUE)
+				cout << ")" << endl;
+			else
+				cout << ")*" << endl;	//This case should never happen!
+			cout << "-----------------------" << endl;
+			cout << "Codim2 facets:" << endl;
+			while(codim2Act!=NULL)
+			{
+				f2Normal = codim2Act->getFacetNormal();
+				cout << "(";
+				for(int jj=0;jj<pVariables;jj++)
+				{
+					cout << (*f2Normal)[jj] << ",";
+				}
+				cout << ")" << endl;
+				codim2Act = codim2Act->next;
+			}
+			cout << "=======================" << endl;
+		}
 		
 		/*bool isFlippable(intvec &load)
 		{
@@ -455,16 +492,19 @@ class gcone
 					break;
 			}			
 			
-			intvec *iv;// = new intvec(this->numVars);
-			
-			//while (f->next!=NULL)
+			intvec *iv;			
 			while(f!=NULL)
 			{
 				iv = f->getFacetNormal();
-				iv->show();
+				cout << "(";
+				iv->show(1,0);				
+				if(f->isFlippable==FALSE)
+					cout << ")* ";
+				else
+					cout << ") ";
 				f=f->next;
 			}
- 			//delete iv; 			
+			cout << endl;
 		}
 		
 		/** For debugging purposes only */
@@ -472,16 +512,29 @@ class gcone
 		{
 			facet *fAct;
 			fAct = &f;
-			intvec *n;// = new intvec(this->numVars);
+			facet *codim2Act;
+			codim2Act = fAct->codim2Ptr;
+			intvec *fNormal;// = new intvec(this->numVars);
+			intvec *f2Normal;
 			cout << endl;
 			while(fAct!=NULL)
 			{
-				n=fAct->getFacetNormal();
-				n->show();
+				fNormal=fAct->getFacetNormal();
+				cout << "(";
+				fNormal->show(1,0);
+				cout << ") ";
+				codim2Act = fAct->codim2Ptr;
+				cout << " Codim2: ";
+				while(codim2Act!=NULL)
+				{
+					f2Normal = codim2Act->getFacetNormal();
+					cout << "(";
+					f2Normal->show(1,0);
+					cout << ") ";
+					codim2Act = codim2Act->next;
+				}
+				cout << "UCN = " << fAct->getUCN() << endl;				
 				fAct = fAct->next;
-				cout << endl;
-				cout << "---" << endl;
-				
 			}
 		}
 		
@@ -599,8 +652,8 @@ class gcone
 			//Maybe add another row to contain the constraints of the standard simplex?
 
 #ifdef gfan_DEBUG
-//  			cout << "The inequality matrix is" << endl;
-//  			dd_WriteMatrix(stdout, ddineq);
+  			cout << "The inequality matrix is" << endl;
+  			dd_WriteMatrix(stdout, ddineq);
 #endif
 
 			// The inequalities are now stored in ddineq
@@ -623,8 +676,8 @@ class gcone
 			//ddCreateMatrix(ddrows,ddcols+1);
 			ddFacets = dd_CopyMatrix(ddineq);
 #ifdef gfan_DEBUG
-//  			cout << "Having removed redundancies, the normals now read:" << endl;
-//  			dd_WriteMatrix(stdout,ddineq);
+  			cout << "Having removed redundancies, the normals now read:" << endl;
+  			dd_WriteMatrix(stdout,ddineq);
 //  			cout << "Rows = " << ddrows << endl;
 //  			cout << "Cols = " << ddcols << endl;
 #endif
@@ -654,7 +707,7 @@ class gcone
 				}//for (int jj = 1; jj <ddcols; jj++)
 				
 				/*Quick'n'dirty hack for flippability*/	
-				bool isFlippable=FALSE;				
+				bool isFlip=FALSE;				
 				for (int jj = 0; jj<load->length(); jj++)
 				{
 					intvec *ivCanonical = new intvec(load->length());
@@ -663,17 +716,32 @@ class gcone
 					if (dotProduct(*load,*ivCanonical)<0)	
 					//if (ivMult(load,ivCanonical)<0)
 					{
-						isFlippable=TRUE;
+						isFlip=TRUE;
 						break;	//URGHS
 					}
 				}	
-				if (isFlippable==FALSE)
+				if (isFlip==FALSE)
 				{
+					this->numFacets++;
+					if(this->numFacets==1)
+					{
+						facet *fRoot = new facet();
+						this->facetPtr = fRoot;
+						fAct = fRoot;
+						
+					}
+					else
+					{
+						fAct->next = new facet();
+						fAct = fAct->next;
+					}
+					fAct->isFlippable=FALSE;
+					fAct->setFacetNormal(load);
+					fAct->setUCN(this->getUCN());
 #ifdef gfan_DEBUG
-					cout << "Ignoring facet" << endl;
-					load->show();
-					cout << endl;
-					//fAct->next=NULL;
+					cout << "Marking facet (";
+					load->show(1,0);
+					cout << ") as non flippable" << endl;				
 #endif
 				}
 				else
@@ -690,6 +758,7 @@ class gcone
 						fAct->next = new facet();
 						fAct = fAct->next;
 					}
+					fAct->isFlippable=TRUE;
 					fAct->setFacetNormal(load);
 					fAct->setUCN(this->getUCN());				
 					//fAct->setFacetNormal(load);
@@ -759,20 +828,21 @@ class gcone
 			//while(fAct!=NULL)
 			{				
 				ddakt = dd_CopyMatrix(ddineq);
+				ddakt->representation=dd_Inequality;
 				set_addelem(ddakt->linset,ii+1);
-										
-				dd_MatrixCanonicalize(&ddakt, &impl_linset, &redset, &newpos, &err);			
+				//dd_WriteMatrix(stdout,ddakt);
+				//dd_MatrixCanonicalize(&ddakt, &impl_linset, &redset, &newpos, &err);			
 					
 #ifdef gfan_DEBUG
-// 				cout << "Codim2 matrix"<<endl;
-//   				dd_WriteMatrix(stdout,ddakt);
+//   				cout << "Codim2 matrix"<<endl;
+//     				dd_WriteMatrix(stdout,ddakt);
 #endif
 				ddpolyh=dd_DDMatrix2Poly(ddakt, &err);
-				P=dd_CopyGenerators(ddpolyh);
+				P=dd_CopyGenerators(ddpolyh);				
 #ifdef gfan_DEBUG
-// 				cout << "Codim2 facet:" << endl;
-//    				dd_WriteMatrix(stdout,P);
-// 				cout << endl;
+//   				cout << "Codim2 facet:" << endl;
+//      				dd_WriteMatrix(stdout,P);
+//   				cout << endl;
 #endif
 					
 				/* We loop through each row of P
@@ -832,15 +902,15 @@ class gcone
 			intvec *fNormal = new intvec(this->numVars);	//facet normal, check for parallelity			
 			fNormal = f->getFacetNormal();	//read this->fNormal;
 #ifdef gfan_DEBUG
-			std::cout << "===" << std::endl;
+			//std::cout << "===" << std::endl;
 			std::cout << "running gcone::flip" << std::endl;
 			std::cout << "flipping" << endl;
 			for(int ii=0;ii<IDELEMS(gb);ii++)
 			{
 				pWrite((poly)gb->m[ii]);
 			}
-			cout << "over facet" << endl;
- 			fNormal->show();
+			cout << "over facet ";
+ 			fNormal->show(1,0);
  			std::cout << std::endl;
 #endif				
 			/*1st step: Compute the initial ideal*/
@@ -882,18 +952,18 @@ class gcone
 					}						
 				}//while
 #ifdef gfan_DEBUG
-				cout << "Initial Form=";				
-				pWrite(initialFormElement[ii]);
-				cout << "---" << endl;
+// 				cout << "Initial Form=";				
+// 				pWrite(initialFormElement[ii]);
+// 				cout << "---" << endl;
 #endif
 				/*Now initialFormElement must be added to (ideal)initialForm */
 				initialForm->m[ii]=initialFormElement[ii];
 			}//for			
 #ifdef gfan_DEBUG
-			cout << "Initial ideal is: " << endl;
+/*			cout << "Initial ideal is: " << endl;
 			idShow(initialForm);
-			//f->printFlipGB();
-			cout << "===" << endl;
+			//f->printFlipGB();*/
+// 			cout << "===" << endl;
 #endif
 			//delete check;
 			
@@ -1078,32 +1148,6 @@ class gcone
 			*/
 			//ring dstRing=rCopyAndAddWeight(tmpRing,iv_weight);	
 			
-// 			int i,j;
-// 			ring dstRing=rCopy0(srcRing);
-// 			i=rBlocks(srcRing);
-// 			
-// 			dstRing->order=(int *)omAlloc((i+1)*sizeof(int));
-// 			for(j=i;j>0;j--)
-// 			{
-// 				dstRing->order[j]=srcRing->order[j-1];
-// 				dstRing->block0[j]=srcRing->block0[j-1];
-// 				dstRing->block1[j]=srcRing->block1[j-1];
-// 				if (srcRing->wvhdl[j-1] != NULL)
-// 				{
-// 					dstRing->wvhdl[j] = (int*) omMemDup(srcRing->wvhdl[j-1]);
-// 				}
-// 			}
-// 			dstRing->order[0]=ringorder_a;
-// 			dstRing->order[1]=ringorder_dp;
-// 			dstRing->order[2]=ringorder_C;			
-// 			dstRing->wvhdl[0] =( int *)omAlloc((iv_weight->length())*sizeof(int));
-// 			
-// 			for (int ii=0;ii<this->numVars;ii++)
-// 			{				
-// 				dstRing->wvhdl[0][ii]=(*iv_weight)[ii];				
-// 			}
-// 			rComplete(dstRing);
-			
 			// NOTE May assume that at this point srcRing already has 3 blocks of orderins, starting with a
 			// Thus: 
 			//ring dstRing=rCopyAndChangeWeight(srcRing,iv_weight);
@@ -1282,7 +1326,7 @@ class gcone
 			//{			
 				//(res)[ii] = (*res[ii])*(int)(-1);
 			//}
-			res->show();			
+			res->show(1,0);			
 			return res;
 		}
 
@@ -1692,46 +1736,50 @@ class gcone
 			
 			for(int ii=0;ii<this->numFacets;ii++)
 			{
-				fNormal = fAct->getFacetNormal();
-				if(ii==0)
+				//only copy flippable facets!
+				if(fAct->isFlippable==TRUE)
 				{
-					//facet *SearchListRoot = new facet();
-					SearchListAct = SearchListRoot;
-					//memcpy(SearchListAct,fAct,sizeof(facet));					
-				}
-				else
-				{
-					SearchListAct->next = new facet();
-					SearchListAct = SearchListAct->next;
-					//memcpy(SearchListAct,fAct,sizeof(facet));				
-				}
-				SearchListAct->setFacetNormal(fNormal);
-				SearchListAct->setUCN(this->getUCN());
-				SearchListAct->numCodim2Facets=fAct->numCodim2Facets;
-				
-				//Copy codim2-facets				
-				codim2Act=fAct->codim2Ptr;
-				SearchListAct->codim2Ptr = new facet(2);
-				sl2Root = SearchListAct->codim2Ptr;
-				sl2Act = sl2Root;
-				//while(codim2Act!=NULL)
-				for(int jj=0;jj<fAct->numCodim2Facets;jj++)
-				{
-					f2Normal = codim2Act->getFacetNormal();
-					if(jj==0)
+					fNormal = fAct->getFacetNormal();
+					if(ii==0)
 					{						
-						sl2Act = sl2Root;
-						sl2Act->setFacetNormal(f2Normal);
+						SearchListAct = SearchListRoot;
+						//memcpy(SearchListAct,fAct,sizeof(facet));					
 					}
 					else
 					{
-						sl2Act->next = new facet(2);
-						sl2Act = sl2Act->next;
-						sl2Act->setFacetNormal(f2Normal);
-					}					
-					codim2Act = codim2Act->next;
-				}					
-				fAct = fAct->next;
+						SearchListAct->next = new facet();
+						SearchListAct = SearchListAct->next;
+						//memcpy(SearchListAct,fAct,sizeof(facet));				
+					}
+					SearchListAct->setFacetNormal(fNormal);
+					SearchListAct->setUCN(this->getUCN());
+					SearchListAct->numCodim2Facets=fAct->numCodim2Facets;
+					SearchListAct->isFlippable=TRUE;
+					//Copy codim2-facets				
+					codim2Act=fAct->codim2Ptr;
+					SearchListAct->codim2Ptr = new facet(2);
+					sl2Root = SearchListAct->codim2Ptr;
+					sl2Act = sl2Root;
+					//while(codim2Act!=NULL)
+					for(int jj=0;jj<fAct->numCodim2Facets;jj++)
+					{
+						f2Normal = codim2Act->getFacetNormal();
+						if(jj==0)
+						{						
+							sl2Act = sl2Root;
+							sl2Act->setFacetNormal(f2Normal);
+						}
+						else
+						{
+							sl2Act->next = new facet(2);
+							sl2Act = sl2Act->next;
+							sl2Act->setFacetNormal(f2Normal);
+						}					
+						codim2Act = codim2Act->next;
+					}
+					fAct = fAct->next;
+				}//if(fAct->isFlippable==TRUE)
+				else {fAct = fAct->next;}
 			}				
 			
 			SearchListAct = SearchListRoot;	//Set to beginning of list
@@ -1762,7 +1810,7 @@ class gcone
 				//while( ( (fAct->next!=NULL) && (fAct->getUCN()==fAct->next->getUCN() ) ) )
 				//do
 				while(fAct!=NULL)
-				{
+				{	//Since SLA should only contain flippables there should be no need to check for that
 					gcAct->flip(gcAct->gcBasis,fAct);
 					ring rTmp=rCopy(fAct->flipRing);
 					rComplete(rTmp);
@@ -1800,7 +1848,8 @@ class gcone
 				}
 				UCNcounter++;
 				//SearchListAct = SearchListAct->next;
-				SearchListAct = fAct->next;				
+				//SearchListAct = fAct->next;
+				SearchListAct = SearchListRoot;
 			}
 		
 			//NOTE Hm, comment in and get a crash for free...
@@ -1957,10 +2006,7 @@ class gcone
 			codim2Act = this->facetPtr->codim2Ptr;
 			facet *sl2Act;
 			sl2Act = f.codim2Ptr;
-			facet *tBARoot;
-			tBARoot = NULL;			
-			facet *tBAAct;
-			tBAAct = NULL;
+			
 			bool doNotAdd=FALSE;
 			int ctr=0;	//encountered qualities in SLA
 			int notParallelCtr=0;
@@ -1972,80 +2018,104 @@ class gcone
 			}
 			slEndStatic = slEnd;
 			/*1st step: compare facetNormals*/
-			intvec *fNormal; //= new intvec(this->numVars);
-			intvec *f2Normal; //= new intvec(this->numVars);
-			intvec *slNormal; //= new intvec(this->numVars);
-			intvec *sl2Normal; //= new intvec(this->numVars);
+			intvec *fNormal=NULL; //= new intvec(this->numVars);
+			intvec *f2Normal=NULL; //= new intvec(this->numVars);
+			intvec *slNormal=NULL; //= new intvec(this->numVars);
+			intvec *sl2Normal=NULL; //= new intvec(this->numVars);
 			
 			while(fAct!=NULL)
 			{
-				doNotAdd=TRUE;
-				fNormal=fAct->getFacetNormal();
-				slAct = slHead;
-				while(slAct!=NULL)
+				if(fAct->isFlippable==TRUE)
 				{
-					slNormal = slAct->getFacetNormal();
-					if(!isParallel(fNormal, slNormal))
+					doNotAdd=TRUE;
+					fNormal=fAct->getFacetNormal();
+					slAct = slHead;
+					notParallelCtr=0;
+					while(slAct!=NULL)
 					{
-						notParallelCtr++;
-					}
-					else
-					{
-						codim2Act = fAct->codim2Ptr;
-						while(codim2Act!=NULL)
+						slNormal = slAct->getFacetNormal();
+#ifdef gfan_DEBUG
+						cout << "Checking facet (";
+						fNormal->show(1,1);
+						cout << ") against (";
+						slNormal->show(1,1);
+						cout << ")" << endl;
+#endif
+						if(!isParallel(fNormal, slNormal))
 						{
-							f2Normal = codim2Act->getFacetNormal();
-							sl2Act = f.codim2Ptr;
-							while(sl2Act!=NULL)
-							{
-								sl2Normal = sl2Act->getFacetNormal();
-								if(areEqual(f2Normal, sl2Normal))
-										ctr++;
-								sl2Act = sl2Act->next;
-							}//while(sl2Act!=NULL)
-							codim2Act = codim2Act->next;
-						}//while(codim2Act!=NULL)
-						if(ctr==fAct->numCodim2Facets)	//facets ARE equal
-						{
-							if(slAct==slHead)	//We want to delete the first element of SearchList
-							{
-								slHead = slAct->next;
-								slHead->prev = NULL;
-								//set a bool flag to mark slAct as to be deleted
-							}
-							else if(slAct==slEndStatic)
-								{
-									if(slEndStatic->next==NULL)
-									{
-										slEndStatic = slEndStatic->prev;
-										slEndStatic->next = NULL;
-									}
-									else	//we already added a facet after slEndStatic
-									{
-										slEndStatic->prev->next = slEndStatic->next;
-										slEndStatic = slEndStatic->prev;
-										slEnd = slEndStatic;
-									}
-								}
-							else
-							{
-								slAct->prev->next = slAct->next;
-							}
-							//update lengthOfSearchList
-							lengthOfSearchList--;
-							break;
-						}//if(ctr==fAct->numCodim2Facets)
-						else	//facets are NOT equal
-						{
-							doNotAdd=FALSE;
-							break;
+							notParallelCtr++;
 						}
-					}//if(!isParallel(fNormal, slNormal))
-					slAct = slAct->next;
-					//if slAct was marked as to be deleted, delete it here!
-				}//while(slAct!=NULL)
+						else
+						{
+							codim2Act = fAct->codim2Ptr;
+							ctr=0;
+							while(codim2Act!=NULL)
+							{
+								f2Normal = codim2Act->getFacetNormal();
+								//sl2Act = f.codim2Ptr;
+								sl2Act = slAct->codim2Ptr;
+								while(sl2Act!=NULL)
+								{
+									sl2Normal = sl2Act->getFacetNormal();
+									if(areEqual(f2Normal, sl2Normal))
+											ctr++;
+									sl2Act = sl2Act->next;
+								}//while(sl2Act!=NULL)
+								codim2Act = codim2Act->next;
+							}//while(codim2Act!=NULL)
+							if(ctr==fAct->numCodim2Facets)	//facets ARE equal
+							{
+#ifdef gfan_DEBUG
+								cout << "Removing facet (";
+								slNormal->show(1,0);
+								cout << ") from SLA:" << endl;
+								fAct->fDebugPrint();
+								slAct->fDebugPrint();
+#endif
+								if(slAct==slHead)	//We want to delete the first element of SearchList
+								{
+									slHead = slAct->next;
+									slHead->prev = NULL;
+									//set a bool flag to mark slAct as to be deleted
+								}
+								else if(slAct==slEndStatic)
+									{
+										if(slEndStatic->next==NULL)
+										{
+											slEndStatic = slEndStatic->prev;
+											slEndStatic->next = NULL;
+										}
+										else	//we already added a facet after slEndStatic
+										{
+											slEndStatic->prev->next = slEndStatic->next;
+											slEndStatic = slEndStatic->prev;
+											slEnd = slEndStatic;
+										}
+									}
+								else
+								{
+									slAct->prev->next = slAct->next;
+								}
+								//update lengthOfSearchList
+								lengthOfSearchList--;
+								break;
+							}//if(ctr==fAct->numCodim2Facets)
+							else	//facets are NOT equal
+							{
+								doNotAdd=FALSE;
+								break;
+							}
+						}//if(!isParallel(fNormal, slNormal))
+						slAct = slAct->next;
+						//if slAct was marked as to be deleted, delete it here!
+					}//while(slAct!=NULL)				
 				if( (notParallelCtr==lengthOfSearchList) || (doNotAdd==FALSE) )
 				{
+#ifdef gfan_DEBUG
+					cout << "Adding facet (";
+					fNormal->show(1,0);
+					cout << ") to SLA " << endl;
+#endif
 					//Add fAct to SLA
 					facet *marker;
 					marker = slEnd;
@@ -2060,6 +2130,7 @@ class gcone
 					slEndCodim2Act = slEndCodim2Root;
 							
 					slEnd->setUCN(this->getUCN());
+					slEnd->isFlippable = TRUE;
 					slEnd->setFacetNormal(fNormal);
 					slEnd->prev = marker;
 					//Copy codim2-facets
@@ -2087,6 +2158,11 @@ class gcone
 					
 				}
 				fAct = fAct->next;
+				}
+				else
+				{
+					fAct = fAct->next;
+				}
 			}//while(fAct!=NULL)
 			return slHead;
 // 			delete sl2Normal;
