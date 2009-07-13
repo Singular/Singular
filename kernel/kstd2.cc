@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.96 2009-07-10 15:13:56 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.97 2009-07-13 16:36:35 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1046,7 +1046,11 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         assume(m1 == NULL && m2 == NULL);
         // if not, change to a ring where exponents are at least
         // large enough
-        if (!kStratChangeTailRing(strat)) { Werror("OVERFLOW..."); break;}
+        if (!kStratChangeTailRing(strat))
+        {
+          WerrorS("OVERFLOW..."); 
+          break;
+        }
       }
       // create the real one
       ksCreateSpoly(&(strat->P), NULL, strat->use_buckets,
@@ -1086,13 +1090,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // get the polynomial (canonicalize bucket, make sure P.p is set)
       strat->P.GetP(strat->lmBin);
 
-      if (strat->P.ecart+strat->P.pFDeg()>=currRing->bitmask)
-      {
-        if (strat->P.ecart+strat->P.pTotalDeg() >=currRing->bitmask)
-        {
-          Werror("OVERFLOW e=%d, d=%ld, max=%ld", strat->P.ecart,strat->P.pFDeg(), currRing->bitmask);break;
-        }
-      }
       /* statistic */
       if (TEST_OPT_PROT) PrintS("s");
 
