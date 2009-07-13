@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-07-13 06:50:42 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.75 2009-07-13 06:50:42 monerjan Exp $
-$Id: gfan.cc,v 1.75 2009-07-13 06:50:42 monerjan Exp $
+$Date: 2009-07-13 09:03:37 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.76 2009-07-13 09:03:37 monerjan Exp $
+$Id: gfan.cc,v 1.76 2009-07-13 09:03:37 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -91,8 +91,10 @@ class facet
 		 */
 		ideal flipGB;		//The Groebner Basis on the other side, computed via gcone::flip		
 			
-	public:		
-		bool isFlippable;	//flippable facet?
+	public:	
+		/** 
+		*/	
+		bool isFlippable;	//**flippable facet? */
 		bool isIncoming;	//Is the facet incoming or outgoing in the reverse search?
 		facet *next;		//Pointer to next facet
 		facet *prev;		//Pointer to predecessor. Needed for the SearchList in noRevS
@@ -223,11 +225,15 @@ class facet
 			idShow(this->flipGB);
 		}
 		
+		/** Set the UCN */
 		void setUCN(int n)
 		{
 			this->UCN=n;
 		}
 		
+		/** \brief Get the UCN 
+		* Returns the UCN iff this != NULL, else -1
+		*/
 		int getUCN()
 		{
 			if(this!=NULL)
@@ -236,6 +242,7 @@ class facet
 				return -1;
 		}
 		
+		/** Store an interior point of the facet */
 		void setInteriorPoint(intvec *iv)
 		{
 			this->interiorPoint = ivCopy(iv);
@@ -246,11 +253,12 @@ class facet
 			return this->interiorPoint;
 		}	
 		
+		/** \brief Debugging function
+		* prints the facet normal an all (codim-2)-facets that belong to it
+		*/
 		void fDebugPrint()
-		{
-			//facet *f;
-			facet *codim2Act;
-			//f = this;
+		{			
+			facet *codim2Act;			
 			codim2Act = this->codim2Ptr;
 			intvec *fNormal;
 			fNormal = this->getFacetNormal();
@@ -264,7 +272,7 @@ class facet
 			if(this->isFlippable==TRUE)
 				cout << ")" << endl;
 			else
-				cout << ")*" << endl;	//This case should never happen!
+				cout << ")*" << endl;	//This case should never happen in SLA!
 			cout << "-----------------------" << endl;
 			cout << "Codim2 facets:" << endl;
 			while(codim2Act!=NULL)
@@ -403,39 +411,9 @@ class gcone
 		
 		/** \brief Copy constructor 
 		*
-		* Copies a cone, sets this->gcBasis to the flipped GB and reverses the 
-		* direction of the according facet normal
-		* Call this only after a successfull call to gcone::flip which sets facet::flipGB
-		*/			
-		//NOTE Prolly need to specify the facet to flip over
-// 		gcone(const gcone& gc, const facet &f)		
-// 		{
-// 			this->next=NULL;
-// 			this->numVars=gc.numVars;
-// 			this->UCN=(gc.UCN)+1;	//add 1 to the UCN of previous cone. This is NOT UNIQUE!
-// 			facet *fAct= new facet();			
-// 			this->facetPtr=fAct;
-// 			
-// 			intvec *ivtmp = new intvec(this->numVars);
-// 			//NOTE ivtmp = f->getFacetNormal();						
-// 			ivtmp = gc.facetPtr->getFacetNormal();			
-// 			
-// 			ideal gb;
-// 			//NOTE gb=f->getFlipGB();
-// 			gb=gc.facetPtr->getFlipGB();			
-// 			this->gcBasis=gb;	//this cone's GB is the flipped GB			
-// 			
-// 			/*Reverse direction of the facet normal to make it an inner normal*/			
-// 			for (int ii=0; ii<this->numVars;ii++)
-// 			{
-// 				(*ivtmp)[ii]=-(*ivtmp)[ii];				
-// 			}
-// 			
-// 			fAct->setFacetNormal(ivtmp);
-// 			delete ivtmp;
-// 			delete fAct;						
-// 		}
-		
+		* Copies a cone, sets this->gcBasis to the flipped GB
+		* Call this only after a successful call to gcone::flip which sets facet::flipGB
+		*/		
 		gcone(const gcone& gc, const facet &f)
 		{
 			this->next=NULL;
@@ -471,6 +449,7 @@ class gcone
 			return this->ivIntPt;
 		}
 		
+		/** \brief Print the interior point */
 		void showIntPoint()
 		{
 			ivIntPt->show();
@@ -760,12 +739,7 @@ class gcone
 					}
 					fAct->isFlippable=TRUE;
 					fAct->setFacetNormal(load);
-					fAct->setUCN(this->getUCN());				
-					//fAct->setFacetNormal(load);
-					//fAct->next = new facet();					
-					//fAct=fAct->next;	//this should definitely not be called in the above while-loop :D
-					//fAct->setUCN(this->getUCN());
-					//this->numFacets++;
+					fAct->setUCN(this->getUCN());					
 				}//if (isFlippable==FALSE)
 				//delete load;
 			}//for (int kk = 0; kk<ddrows; kk++)
@@ -829,9 +803,8 @@ class gcone
 			{				
 				ddakt = dd_CopyMatrix(ddineq);
 				ddakt->representation=dd_Inequality;
-				set_addelem(ddakt->linset,ii+1);
-				//dd_WriteMatrix(stdout,ddakt);
-				//dd_MatrixCanonicalize(&ddakt, &impl_linset, &redset, &newpos, &err);			
+				set_addelem(ddakt->linset,ii+1);				
+				dd_MatrixCanonicalize(&ddakt, &impl_linset, &redset, &newpos, &err);			
 					
 #ifdef gfan_DEBUG
 //   				cout << "Codim2 matrix"<<endl;
@@ -850,15 +823,11 @@ class gcone
 				* and add the resulting vector to the int matrix facet::codim2Facets
 				*/
 				for (int jj=1;jj<=P->rowsize;jj++)
-				{
-					//this->facetPtr->numCodim2Facets++;
+				{					
 					fAct->numCodim2Facets++;
-					if(fAct->numCodim2Facets==1)
-					//if(this->facetPtr->numCodim2Facets==1)					
-					{
-						//this->facetPtr->codim2Ptr = new facet(2);
-						fAct->codim2Ptr = new facet(2);
-						//codim2Act = this->facetPtr->codim2Ptr;
+					if(fAct->numCodim2Facets==1)					
+					{						
+						fAct->codim2Ptr = new facet(2);						
 						codim2Act = fAct->codim2Ptr;
 					}
 					else
@@ -976,9 +945,7 @@ class gcone
 			*/
 			ring srcRing=currRing;
 			ring tmpRing;
-
-			//intvec *negfNormal = new intvec(this->numVars);
-			//negfNormal=ivNeg(fNormal);
+			
 			if( (srcRing->order[0]!=ringorder_a))
 			{
 				tmpRing=rCopyAndAddWeight(srcRing,ivNeg(fNormal));
@@ -1004,15 +971,15 @@ class gcone
 			ideal ina;			
 			ina=idrCopyR(initialForm,srcRing);			
 #ifdef gfan_DEBUG
-//  			cout << "ina=";
-//  			idShow(ina); cout << endl;
+  			cout << "ina=";
+  			idShow(ina); cout << endl;
 #endif
 			ideal H;
 			//H=kStd(ina,NULL,isHomog,NULL);	//we know it is homogeneous
 			H=kStd(ina,NULL,testHomog,NULL);
 			idSkipZeroes(H);
 #ifdef gfan_DEBUG
-//  			cout << "H="; idShow(H); cout << endl;
+  			cout << "H="; idShow(H); cout << endl;
 #endif
 			/*Substep 2.2
 			do the lifting and mark according to H
@@ -1022,13 +989,13 @@ class gcone
 			ideal srcRing_HH;			
 			srcRing_H=idrCopyR(H,tmpRing);
 #ifdef gfan_DEBUG
-//  			cout << "srcRing_H = ";
-//  			idShow(srcRing_H); cout << endl;
+  			cout << "srcRing_H = ";
+  			idShow(srcRing_H); cout << endl;
 #endif
 			srcRing_HH=ffG(srcRing_H,this->gcBasis);		
 #ifdef gfan_DEBUG
-//  			cout << "srcRing_HH = ";
-//  			idShow(srcRing_HH); cout << endl;
+  			cout << "srcRing_HH = ";
+  			idShow(srcRing_HH); cout << endl;
 #endif
 			/*Substep 2.2.1
 			Mark according to G_-\alpha
@@ -1165,12 +1132,7 @@ class gcone
 				A[jj]=(*iv_weight)[jj];
 			}
 			dstRing->wvhdl[0]=(int*)A;
-			rComplete(dstRing);
-			//rSetWeightVec(dstRing,iv_weight);
-			//assume(dstRing!=NULL);
-			//assume(dstRing->OrdSize>0);
-			//assume(dstRing->typ[0].ord_typ==ro_dp);
-			//memcpy(dstRing->typ[0].data.wp.weights,iv_weight,dstRing->N*sizeof(int));		
+			rComplete(dstRing);					
 			rChangeCurrRing(dstRing);
 			
 #ifdef gfan_DEBUG
@@ -1214,8 +1176,7 @@ class gcone
 		{
 // 			cout << "Entering restOfDiv" << endl;
 			poly p=f;
-			//pWrite(p);
-			//poly r=kCreateZeroPoly(,currRing,currRing);	//The 0-polynomial, hopefully
+			//pWrite(p);			
 			poly r=NULL;	//The zero polynomial
 			int ii;
 			bool divOccured;
@@ -1650,9 +1611,9 @@ class gcone
 			facet *fAct=new facet();
 			fAct = gcAct->facetPtr;			
 			
-			while(fAct->next!=NULL)  //NOTE NOT SURE WHETHER THIS IS RIGHT! Do I reach EVERY facet or only all but the last?
+			while(fAct!=NULL) 
 			{
-				cout << "==========================================================================================="<< endl;
+				cout << "======================"<< endl;
 				gcAct->flip(gcAct->gcBasis,gcAct->facetPtr);
 				gcone *gcTmp = new gcone(*gcAct);
 				//idShow(gcTmp->gcBasis);
@@ -1660,7 +1621,7 @@ class gcone
 #ifdef gfan_DEBUG
 				facet *f = new facet();
 				f=gcTmp->facetPtr;
-				while(f->next!=NULL)
+				while(f!=NULL)
 				{
 					f->printNormal();
 					f=f->next;					
@@ -1796,7 +1757,7 @@ class gcone
 			SearchListAct = SearchListRoot;	//Set to beginning of List
 			
 			fAct = gcAct->facetPtr;			
-			//gcAct->writeConeToFile(*gcAct);
+			gcAct->writeConeToFile(*gcAct);
 			
 			/*End of initialisation*/
 			fAct = SearchListAct;
@@ -1819,6 +1780,7 @@ class gcone
  					gcTmp->getConeNormals(gcTmp->gcBasis, FALSE);
  					gcTmp->getCodim2Normals(*gcTmp);
 					gcTmp->normalize();
+					gcTmp->writeConeToFile(*gcTmp);
 					/*add facets to SLA here*/
 					SearchListRoot=gcTmp->enqueueNewFacets(*SearchListRoot);
 					gcTmp->showSLA(*SearchListRoot);
