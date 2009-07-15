@@ -2,7 +2,7 @@
 //anne, added deleteSublist and watchdog 12.12.2000
 //eric, added absValue 11.04.2002
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.63 2009-07-10 18:52:05 motsak Exp $";
+version="$Id: general.lib,v 1.64 2009-07-15 14:43:52 motsak Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -743,6 +743,8 @@ NOTE:    If v is given id may be any simply indexed object (e.g. any list or
          string); if v[i]<0 and i<=size(id) v[i] is set internally to i;
          entries of v must be pairwise distinct to get a permutation id.
          Zero generators of ideal/module are deleted
+         If 'o' is given, the input is sorted by considering leading terms
+         w.r.t. the new ring ordering given by 'o'
 EXAMPLE: example sort; shows an example
 "
 {  int ii,jj,s,n = 0,0,1,0;
@@ -764,15 +766,8 @@ EXAMPLE: example sort; shows an example
    {
       if ( typeof(#[1])=="string" )
       {
-         if( typeof(id)=="matrix" )
-         {
-           module ID = lead(module(id));
-         } else
-         {
-           def ID = lead(id);
-         }
          execute("ring r1 =("+charstr(P)+"),("+varstr(P)+"),("+#[1]+");");
-         def i = imap(P,ID);
+         def i = imap(P,id);
          v = sortvec(i);
          setring P;
          n=2;
@@ -847,6 +842,16 @@ example
    sort(v)[1];          // sort v lexicographically
 
    sort(v,"Dp",1)[1];   // sort v w.r.t (total sum, reverse lex)
+
+   // Note that in general: lead(sort(M)) != sort(lead(M)), e.g:
+   module M = [0, 1, 1, 0], [1, 0, 0, 1]; M;
+   sort(lead(M), "c, dp")[1]; 
+   lead(sort(M, "c, dp")[1]);  
+
+   // In order to sort M wrt a NEW ordering by considering OLD leading
+   // terms use one of the following equivalent commands:
+   module( M[ sort(lead(M), "c,dp")[2] ] ); 
+   sort( M, sort(lead(M), "c,dp")[2] )[1]; 
 }
 ///////////////////////////////////////////////////////////////////////////////
 
