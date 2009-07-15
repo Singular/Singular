@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-07-13 09:03:37 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.76 2009-07-13 09:03:37 monerjan Exp $
-$Id: gfan.cc,v 1.76 2009-07-13 09:03:37 monerjan Exp $
+$Date: 2009-07-15 09:49:09 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.77 2009-07-15 09:49:09 monerjan Exp $
+$Id: gfan.cc,v 1.77 2009-07-15 09:49:09 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -655,15 +655,15 @@ class gcone
 			//ddCreateMatrix(ddrows,ddcols+1);
 			ddFacets = dd_CopyMatrix(ddineq);
 #ifdef gfan_DEBUG
-  			cout << "Having removed redundancies, the normals now read:" << endl;
-  			dd_WriteMatrix(stdout,ddineq);
+//   			cout << "Having removed redundancies, the normals now read:" << endl;
+//   			dd_WriteMatrix(stdout,ddineq);
 //  			cout << "Rows = " << ddrows << endl;
 //  			cout << "Cols = " << ddcols << endl;
 #endif
 			
 			/*Write the normals into class facet*/
 #ifdef gfan_DEBUG
-			cout << "Creating list of normals" << endl;
+// 			cout << "Creating list of normals" << endl;
 #endif
 			/*The pointer *fRoot should be the return value of this function*/
 			//facet *fRoot = new facet();	//instantiate new facet
@@ -672,6 +672,7 @@ class gcone
 			facet *fAct; 			//pointer to active facet
 			//fAct = fRoot;			//Seems to do the trick. fRoot and fAct have to point to the same adress!
 			//std::cout << "fRoot = " << fRoot << ", fAct = " << fAct << endl;
+			int numNonFlip=0;
 			for (int kk = 0; kk<ddrows; kk++)
 			{
 				intvec *load = new intvec(this->numVars);	//intvec to store a single facet normal that will then be stored via setFacetNormal
@@ -686,7 +687,8 @@ class gcone
 				}//for (int jj = 1; jj <ddcols; jj++)
 				
 				/*Quick'n'dirty hack for flippability*/	
-				bool isFlip=FALSE;				
+				bool isFlip=FALSE;
+								
 				for (int jj = 0; jj<load->length(); jj++)
 				{
 					intvec *ivCanonical = new intvec(load->length());
@@ -702,6 +704,7 @@ class gcone
 				if (isFlip==FALSE)
 				{
 					this->numFacets++;
+					numNonFlip++;
 					if(this->numFacets==1)
 					{
 						facet *fRoot = new facet();
@@ -741,8 +744,14 @@ class gcone
 					fAct->setFacetNormal(load);
 					fAct->setUCN(this->getUCN());					
 				}//if (isFlippable==FALSE)
-				//delete load;
+				//delete load;				
 			}//for (int kk = 0; kk<ddrows; kk++)
+			
+			//In cases like I=<x-1,y-1> there are only non-flippable facets...
+			if(numNonFlip==this->numFacets)
+			{					
+				cerr << "Only non-flippable facets. Terminating..." << endl;
+			}
 			
 			/*
 			Now we should have a linked list containing the facet normals of those facets that are
@@ -798,8 +807,7 @@ class gcone
 				
 			/*Now set appropriate linearity*/
 			dd_PolyhedraPtr ddpolyh;
-			for (int ii=0; ii<this->numFacets; ii++)
-			//while(fAct!=NULL)
+			for (int ii=0; ii<this->numFacets; ii++)			
 			{				
 				ddakt = dd_CopyMatrix(ddineq);
 				ddakt->representation=dd_Inequality;
@@ -839,14 +847,32 @@ class gcone
 					makeInt(P,jj,*n);
 					codim2Act->setFacetNormal(n);
 					delete n;					
-					/*intvec *n = new intvec(this->numVars);
-					makeInt(P,jj,*n);						
-					codim2Act->setFacetNormal(n);
-					this->facetPtr->numCodim2Facets++;	//Honor the creation of a codim-2-facet
-					codim2Act->next = new facet(2);
-					codim2Act = codim2Act->next;						
-					delete n;*/
-				}										
+				}		
+				/*We check whether the facet spanned by the codim-2 facets
+				* intersects with the positive orthant. Otherwise we define this
+				* facet to be non-flippable
+				*/
+				intvec *iv_intPoint = new intvec(this->numVars);
+				dd_MatrixPtr shiftMatrix;
+				dd_MatrixPtr intPointMatrix;
+				shiftMatrix = dd_CreateMatrix(this->numVars,this->numVars+1);
+				for(int kk=0;kk<this->numVars;kk++)
+				{
+					dd_set_si(shiftMatrix->matrix[kk][0],1);
+					dd_set_si(shiftMatrix->matrix[kk][kk+1],1);
+				}
+				intPointMatrix=dd_MatrixAppend(ddakt,shiftMatrix);
+				//dd_WriteMatrix(stdout,intPointMatrix);
+				interiorPoint(intPointMatrix,*iv_intPoint);
+				for(int ll=0;ll<this->numVars;ll++)
+				{
+					if( (*iv_intPoint)[ll] < 0 )
+					{
+						fAct->isFlippable=FALSE;
+						break;
+					}
+				}
+				/*End of check*/					
 				fAct = fAct->next;	
 				dd_FreeMatrix(ddakt);
 				dd_FreePolyhedra(ddpolyh);
@@ -971,15 +997,15 @@ class gcone
 			ideal ina;			
 			ina=idrCopyR(initialForm,srcRing);			
 #ifdef gfan_DEBUG
-  			cout << "ina=";
-  			idShow(ina); cout << endl;
+//   			cout << "ina=";
+//   			idShow(ina); cout << endl;
 #endif
 			ideal H;
 			//H=kStd(ina,NULL,isHomog,NULL);	//we know it is homogeneous
 			H=kStd(ina,NULL,testHomog,NULL);
 			idSkipZeroes(H);
 #ifdef gfan_DEBUG
-  			cout << "H="; idShow(H); cout << endl;
+//   			cout << "H="; idShow(H); cout << endl;
 #endif
 			/*Substep 2.2
 			do the lifting and mark according to H
@@ -989,13 +1015,13 @@ class gcone
 			ideal srcRing_HH;			
 			srcRing_H=idrCopyR(H,tmpRing);
 #ifdef gfan_DEBUG
-  			cout << "srcRing_H = ";
-  			idShow(srcRing_H); cout << endl;
+//   			cout << "srcRing_H = ";
+//   			idShow(srcRing_H); cout << endl;
 #endif
 			srcRing_HH=ffG(srcRing_H,this->gcBasis);		
 #ifdef gfan_DEBUG
-  			cout << "srcRing_HH = ";
-  			idShow(srcRing_HH); cout << endl;
+//   			cout << "srcRing_HH = ";
+//   			idShow(srcRing_HH); cout << endl;
 #endif
 			/*Substep 2.2.1
 			Mark according to G_-\alpha
@@ -1018,7 +1044,7 @@ class gcone
 			/* additionally one row for the standard-simplex and another for a row that becomes 0 during
 			construction of the differences
 			*/
-			intPointMatrix = dd_CreateMatrix(iPMatrixRows+2,this->numVars+1);
+			intPointMatrix = dd_CreateMatrix(iPMatrixRows+10,this->numVars+1);
 			intPointMatrix->numbtype=dd_Integer;	//NOTE: DO NOT REMOVE OR CHANGE TO dd_Rational
 			
 			for (int ii=0;ii<IDELEMS(srcRing_HH);ii++)
@@ -1328,7 +1354,8 @@ class gcone
 		}//bool isParallel
 		
 		/** \brief Compute an interior point of a given cone
-		* Result will be written into intvec iv
+		* Result will be written into intvec iv. 
+		* Any rational point is automatically converted into an integer.
 		*/
 		void interiorPoint(dd_MatrixPtr const &M, intvec &iv) //no const &M here since we want to remove redundant rows
 		{
@@ -1757,7 +1784,7 @@ class gcone
 			SearchListAct = SearchListRoot;	//Set to beginning of List
 			
 			fAct = gcAct->facetPtr;			
-			gcAct->writeConeToFile(*gcAct);
+			//gcAct->writeConeToFile(*gcAct);
 			
 			/*End of initialisation*/
 			fAct = SearchListAct;
@@ -1780,10 +1807,11 @@ class gcone
  					gcTmp->getConeNormals(gcTmp->gcBasis, FALSE);
  					gcTmp->getCodim2Normals(*gcTmp);
 					gcTmp->normalize();
-					gcTmp->writeConeToFile(*gcTmp);
+					//gcTmp->writeConeToFile(*gcTmp);
 					/*add facets to SLA here*/
 					SearchListRoot=gcTmp->enqueueNewFacets(*SearchListRoot);
-					gcTmp->showSLA(*SearchListRoot);
+					if(SearchListRoot!=NULL)
+						gcTmp->showSLA(*SearchListRoot);
  					rChangeCurrRing(gcAct->baseRing);
  					gcPtr->next=gcTmp;
  					gcPtr=gcPtr->next;
@@ -1813,6 +1841,7 @@ class gcone
 				//SearchListAct = fAct->next;
 				SearchListAct = SearchListRoot;
 			}
+			cout << endl << "Found " << counter << " cones - terminating" << endl;
 		
 			//NOTE Hm, comment in and get a crash for free...
 			//dd_free_global_constants();				
@@ -2037,7 +2066,8 @@ class gcone
 								if(slAct==slHead)	//We want to delete the first element of SearchList
 								{
 									slHead = slAct->next;
-									slHead->prev = NULL;
+									if(slHead!=NULL)
+										slHead->prev = NULL;
 									//set a bool flag to mark slAct as to be deleted
 								}
 								else if(slAct==slEndStatic)
