@@ -211,7 +211,7 @@ inline LNode* LNode::insertByLabel(LNode* l) {
 }
 
 // deletes the first elements of the list with the same degree
-// only used for the S-polys, which are already sorted by increasing degree by CList
+// only used for the S-polys, which are already sorted by increasing degree by CListOld
 LNode*  LNode::deleteByDeg() {
     return this;
 }
@@ -582,12 +582,12 @@ CNode::CNode() {
     next    =   NULL;    
 }
 
-CNode::CNode(CPair* c) {
+CNode::CNode(CPairOld* c) {
     data    =   c;   
     next    =   NULL;    
 }
 
-CNode::CNode(CPair* c, CNode* n) {
+CNode::CNode(CPairOld* c, CNode* n) {
     data    =   c;   
     next    =   n;    
 }
@@ -600,7 +600,7 @@ CNode::~CNode() {
 // note: as all critical pairs have the same index here, the second sort is done on the terms of the labels
 // working only with linked, but not doubly linked lists due to memory usage we have to check the 
 // insertion around the first element separately from the insertion around all other elements in the list
-CNode* CNode::insert(CPair* c) {
+CNode* CNode::insert(CPairOld* c) {
     if(NULL == this) {
         CNode* newElement   =   new CNode(c, this);
         return newElement;
@@ -694,7 +694,7 @@ CNode* CNode::insert(CPair* c) {
     }
 }
 
-// get the first elements from CList which by the above sorting have minimal degree
+// get the first elements from CListOld which by the above sorting have minimal degree
 CNode* CNode::getMinDeg() {
     CNode* temp = this;
     while(NULL != temp) {
@@ -702,7 +702,7 @@ CNode* CNode::getMinDeg() {
             temp = temp->next;
         }
         CNode* returnCNode  =   temp->next;    
-        // every CList should end with a (NULL,NULL) element for a similar behaviour 
+        // every CListOld should end with a (NULL,NULL) element for a similar behaviour 
         // using termination conditions throughout the algorithm
         temp->next          =   NULL;
         return returnCNode;
@@ -710,7 +710,7 @@ CNode* CNode::getMinDeg() {
     return NULL;
 }
 
-CPair* CNode::getData() {
+CPairOld* CNode::getData() {
     return data;
 }
 
@@ -799,19 +799,19 @@ void CNode::print() {
 
 /*
 ====================================
-functions working on the class CList
+functions working on the class CListOld
 ====================================
 */
-// for initialization of CLists, last element alwas has data=NULL and next=NULL
-CList::CList() {
+// for initialization of CListOlds, last element alwas has data=NULL and next=NULL
+CListOld::CListOld() {
     first   =   NULL;
 }
 
-CList::CList(CPair* c) {
+CListOld::CListOld(CPairOld* c) {
     first   =   new CNode(c);
 }
 
-CList::~CList() {
+CListOld::~CListOld() {
     CNode* temp;
     while(NULL != first) {
         temp    =   first;
@@ -822,23 +822,23 @@ CList::~CList() {
 
 // insert sorts the critical pairs firstly by increasing total degree, secondly by increasing label
 // note: as all critical pairs have the same index here, the second sort is done on the terms of the labels
-void CList::insert(CPair* c) {
+void CListOld::insert(CPairOld* c) {
     first = first->insert(c);
 }
 
-CNode* CList::getFirst() {
+CNode* CListOld::getFirst() {
     return first;
 }
 
-// get the first elements from CList which by the above sorting have minimal degree
+// get the first elements from CListOld which by the above sorting have minimal degree
 // returns the pointer on the first element of those
-CNode* CList::getMinDeg() {
+CNode* CListOld::getMinDeg() {
     CNode* temp     =   first;
     first           =   first->getMinDeg();
     return temp;
 }
 
-void CList::print() {
+void CListOld::print() {
     first->print();
 }
 

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5data.h,v 1.12 2009-06-23 10:08:15 ederc Exp $ */
+/* $Id: f5data.h,v 1.13 2009-07-16 07:47:51 ederc Exp $ */
 /*
 * ABSTRACT: labeled polynomial interface
 */
@@ -17,7 +17,7 @@ classes for labeled polynomials/pairs/S-polynomials in F5
 =========================================================
 */
 class LPoly;
-class CPair;
+class CPairOld;
 class Rule;
 
 
@@ -115,7 +115,7 @@ LPoly* LPoly::get() {
 structure of labeled critical pairs
 ===================================
 */
-class CPair {
+class CPairOld {
     private:
         long    deg;            // total degree of the critical pair
         poly    t1;             // first term for label
@@ -124,7 +124,7 @@ class CPair {
         LPoly*  lp2;            // second labeled poly
         Rule*   testedRule;     // already tested by rules up to lastRuleTested
     public:
-        inline          CPair(long degree, poly term1, LPoly* lpoly1, poly term2, LPoly* lpoly2, Rule* r = NULL);
+        inline          CPairOld(long degree, poly term1, LPoly* lpoly1, poly term2, LPoly* lpoly2, Rule* r = NULL);
         inline  long    getDeg();
         inline  poly    getT1();
         inline  poly*   getAdT1();
@@ -142,7 +142,7 @@ class CPair {
         inline  void    setTestedRule(Rule* r);
 };
 
-CPair::CPair(long degree, poly term1, LPoly* lpoly1, poly term2, LPoly* lpoly2, Rule* r) {
+CPairOld::CPairOld(long degree, poly term1, LPoly* lpoly1, poly term2, LPoly* lpoly2, Rule* r) {
    deg              =   degree;
    t1               =   term1;
    lp1              =   lpoly1;
@@ -151,63 +151,63 @@ CPair::CPair(long degree, poly term1, LPoly* lpoly1, poly term2, LPoly* lpoly2, 
    testedRule       =   r;
 }
 
-long CPair::getDeg() {
+long CPairOld::getDeg() {
     return deg;
 }
 
-poly CPair::getT1() {
+poly CPairOld::getT1() {
     return t1;
 }
 
-poly* CPair::getAdT1() {
+poly* CPairOld::getAdT1() {
     return &t1;
 }
 
-poly* CPair::getAdT2() {
+poly* CPairOld::getAdT2() {
     return &t2;
 }
 
-poly CPair::getT2() {
+poly CPairOld::getT2() {
     return t2;
 }
 
-LPoly* CPair::getAdLp1() {
+LPoly* CPairOld::getAdLp1() {
     return lp1;
 }
 
-LPoly* CPair::getAdLp2() {
+LPoly* CPairOld::getAdLp2() {
     return lp2;
 }
 
-poly CPair::getLp1Poly() {
+poly CPairOld::getLp1Poly() {
     return lp1->getPoly();
 }
 
-poly CPair::getLp2Poly() {
+poly CPairOld::getLp2Poly() {
     return lp2->getPoly();
 }
 
-poly CPair::getLp1Term() {
+poly CPairOld::getLp1Term() {
     return lp1->getTerm();
 }
 
-poly CPair::getLp2Term() {
+poly CPairOld::getLp2Term() {
     return lp2->getTerm();
 }
 
-int CPair::getLp1Index() {
+int CPairOld::getLp1Index() {
     return lp1->getIndex();
 }
 
-int CPair::getLp2Index() {
+int CPairOld::getLp2Index() {
     return lp2->getIndex();
 }
 
-Rule* CPair::getTestedRule() {
+Rule* CPairOld::getTestedRule() {
     return testedRule;
 }
 
-void CPair::setTestedRule(Rule* r) {
+void CPairOld::setTestedRule(Rule* r) {
     testedRule      =   r;
 }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5lists.h,v 1.22 2009-06-23 10:08:15 ederc Exp $ */
+/* $Id: f5lists.h,v 1.23 2009-07-16 07:47:51 ederc Exp $ */
 /*
 * ABSTRACT: list interface
 */
@@ -22,7 +22,7 @@ class LList;
 class LTagNode;
 class LTagList;
 class CNode;
-class CList;
+class CListOld;
 class RList;
 class RNode;
 class RTagNode;
@@ -66,7 +66,7 @@ class LNode {
         // get next & prev from current LNode
         LNode*  getNext();
         LNode*  getPrev();
-        // only used for the S-polys, which are already sorted by increasing degree by CList
+        // only used for the S-polys, which are already sorted by increasing degree by CListOld
         LNode*  deleteByDeg();
         // get the LPoly* out of LNode*
         LPoly*  getLPoly();
@@ -198,21 +198,21 @@ class TopRed {
 
 /*
 =======================================
-class CNode (nodes for lists of CPairs)
+class CNode (nodes for lists of CPairOlds)
 =======================================
 */
 class CNode {
     private:
-        CPair* data;
+        CPairOld* data;
         CNode* next;
     public:
                 CNode();
-                CNode(CPair* c);
-                CNode(CPair* c, CNode* n);
+                CNode(CPairOld* c);
+                CNode(CPairOld* c, CNode* n);
                 ~CNode(); 
-        CNode*  insert(CPair* c); 
+        CNode*  insert(CPairOld* c); 
         CNode*  getMinDeg();
-        CPair*  getData();
+        CPairOld*  getData();
         CNode*  getNext();
         LPoly*  getAdLp1();
         LPoly*  getAdLp2();
@@ -233,19 +233,19 @@ class CNode {
 
 /*
 ============================
-class CList(lists of CPairs)
+class CListOld(lists of CPairOlds)
 ============================
 */
-class CList {
+class CListOld {
     private:
         CNode*  first;
     public:
-                // for initialization of CLists, last element alwas has data=NULL and next=NULL
-                CList(); 
-                CList(CPair* c); 
-                ~CList(); 
+                // for initialization of CListOlds, last element alwas has data=NULL and next=NULL
+                CListOld(); 
+                CListOld(CPairOld* c); 
+                ~CListOld(); 
         CNode*  getFirst();
-        void    insert(CPair* c);
+        void    insert(CPairOld* c);
         CNode*  getMinDeg();
         void    print();
 };

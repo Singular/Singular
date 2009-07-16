@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.41 2009-07-02 13:47:24 ederc Exp $ */
+/* $Id: f5gb.h,v 1.42 2009-07-16 07:47:51 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -51,7 +51,7 @@ first element in gPrev is always the newest element which must
 build critical pairs with all other elements in gPrev
 ================================================================
 */
-void criticalPair(LList* gPrev, CList* critPairs, LTagList* lTag, RTagList* rTag, RList* rules);
+void criticalPair(LList* gPrev, CListOld* critPairs, LTagList* lTag, RTagList* rTag, RList* rules);
 
 /*
 ========================================
@@ -86,7 +86,7 @@ inline void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPol
 reduction including subalgorithm topReduction() using Faugere's criteria
 ========================================================================
 */
-inline void reduction(LList* sPolyList, CList* critPairs, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag,
+inline void reduction(LList* sPolyList, CListOld* critPairs, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag,
                  ideal gbPrev);
 
 /*
@@ -94,7 +94,7 @@ inline void reduction(LList* sPolyList, CList* critPairs, LList* gPrev, RList* r
 reduction including subalgorithm topReduction() using Faugere's criteria
 ========================================================================
 */
-inline void newReduction(LList* sPolyList, CList* critPairs, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev);
+inline void newReduction(LList* sPolyList, CListOld* critPairs, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev);
 
 /*!
  * ================================================================================
@@ -108,7 +108,7 @@ inline void newReduction(LList* sPolyList, CList* critPairs, LList* gPrev, RList
  * later on for possible new rules and S-polynomials to be added to the algorithm
  * ================================================================================
  */
-void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CList* critPairs, RList* rules, LTagList* lTag, RTagList* rTag); 
+void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CListOld* critPairs, RList* rules, LTagList* lTag, RTagList* rTag); 
 
 /*
 =====================================================================================
@@ -116,7 +116,7 @@ top reduction in F5, i.e. reduction of a given S-polynomial by labeled polynomia
 the same index whereas the labels are taken into account
 =====================================================================================
 */
-inline void topReduction(LNode* l, LList* sPolyList, LList* gPrev, CList* critPairs, RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev); 
+inline void topReduction(LNode* l, LList* sPolyList, LList* gPrev, CListOld* critPairs, RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev); 
 
 /*
 =======================================================================================
@@ -139,7 +139,7 @@ inline LNode* findReductor(LNode* l, LList* sPolyList, LNode* gPrevRedCheck, LLi
 main function of our F5 implementation
 ======================================
 */
-ideal F5main(ideal i, ring r);
+ideal F5main(ideal i, ring r, int opt);
 
 #endif
 #endif

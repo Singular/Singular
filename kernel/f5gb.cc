@@ -30,6 +30,7 @@ int reductionsToZero    =   0;
 int reductionTime       =   0;
 int spolsTime           =   0;
 int highestDegree       =   0;
+int degreeBound         =   0;
 /*
 ====================================================================
 sorting ideals by decreasing total degree "left" and "right" are the 
@@ -125,7 +126,7 @@ LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lT
     //Print("2nd gPrev: ");
     //pWrite(gPrev->getFirst()->getNext()->getPoly());
     //pWrite(gPrev->getFirst()->getNext()->getPoly());    
-    CList* critPairs        =   new CList();
+    CListOld* critPairs        =   new CListOld();
     CNode* critPairsMinDeg  =   new CNode();   
     // computation of critical pairs with checking of criterion 1 and criterion 2 and saving them
     // in the list critPairs
@@ -224,6 +225,7 @@ LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lT
     //gPrev->print();
     //Print("COMPLETE REDUCTION TIME UNTIL NOW: %d\n",reductionTime);
     //Print("COMPLETE SPOLS TIME UNTIL NOW:     %d\n",spolsTime);
+    degreeBound = 0;
     return gPrev;
 }
 
@@ -236,7 +238,7 @@ first element in gPrev is always the newest element which must
 build critical pairs with all other elements in gPrev
 ================================================================
 */
-inline void criticalPair(LList* gPrev, CList* critPairs, LTagList* lTag, RTagList* rTag, RList* rules) {
+inline void criticalPair(LList* gPrev, CListOld* critPairs, LTagList* lTag, RTagList* rTag, RList* rules) {
     //Print("IN CRITPAIRS\n");
     // initialization for usage in pLcm()
     number nOne         =   nInit(1);
@@ -266,16 +268,16 @@ inline void criticalPair(LList* gPrev, CList* critPairs, LTagList* lTag, RTagLis
         if(!criterion2(gPrev->getFirst()->getIndex(), u2, temp, rules, rTag)
            && !criterion2(gPrev->getFirst()->getIndex(), u1, newElement, rules, rTag) 
            && !criterion1(gPrev,u1,newElement,lTag) && !criterion1(gPrev,u2,temp,lTag)) {
-            // if they pass the test, add them to CList critPairs, having the LPoly with greater
-            // label as first element in the CPair
+            // if they pass the test, add them to CListOld critPairs, having the LPoly with greater
+            // label as first element in the CPairOld
             if(newElement->getIndex() == temp->getIndex() && 
             -1 == pLmCmp(ppMult_qq(u1, newElement->getTerm()),ppMult_qq(u2, temp->getTerm()))) {
-                CPair* cp   =   new CPair(pDeg(ppMult_qq(u2,pHead(temp->getPoly()))), u2, 
+                CPairOld* cp   =   new CPairOld(pDeg(ppMult_qq(u2,pHead(temp->getPoly()))), u2, 
                                 temp->getLPoly(), u1, newElement->getLPoly(), testedRule);                   
                 critPairs->insert(cp);
             }
             else {
-                CPair* cp   =   new CPair(pDeg(ppMult_qq(u2,pHead(temp->getPoly()))), u1, 
+                CPairOld* cp   =   new CPairOld(pDeg(ppMult_qq(u2,pHead(temp->getPoly()))), u1, 
                                 newElement->getLPoly(), u2, temp->getLPoly(), testedRule);                   
                 critPairs->insert(cp);
             }
@@ -321,7 +323,7 @@ inline bool criterion1(LList* gPrev, poly t, LNode* l, LTagList* lTag) {
             if(pLmDivisibleByNoComp(testNode->getPoly(),u1)) {
                 //Print("Criterion 1 NOT passed!\n");
                 if(idx != gPrev->getLast()->getIndex()) {
-                    Print("DOCH!\n");
+                    //Print("DOCH!\n");
                 }
                 return true;
             }
@@ -651,7 +653,7 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) 
 reduction including subalgorithm topReduction() using Faugere's criteria
 ========================================================================
 */
-void reduction(LList* sPolyList, CList* critPairs, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag, 
+void reduction(LList* sPolyList, CListOld* critPairs, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag, 
                  ideal gbPrev) { 
     //Print("##########################################In REDUCTION!########################################\n");
     // check if sPolyList has any elements
@@ -697,7 +699,7 @@ void reduction(LList* sPolyList, CList* critPairs, LList* gPrev, RList* rules, L
 reduction including subalgorithm topReduction() using Faugere's criteria
 ========================================================================
 */
-void newReduction(LList* sPolyList, CList* critPairs, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag, 
+void newReduction(LList* sPolyList, CListOld* critPairs, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag, 
                  ideal gbPrev) { 
     //Print("##########################################In REDUCTION!########################################\n");
     // check if sPolyList has any elements
@@ -759,7 +761,7 @@ void newReduction(LList* sPolyList, CList* critPairs, LList* gPrev, RList* rules
  * later on for possible new rules and S-polynomials to be added to the algorithm
  * ================================================================================
 */
-void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CList* critPairs, RList* rules, LTagList* lTag, RTagList* rTag) {
+void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CListOld* critPairs, RList* rules, LTagList* lTag, RTagList* rTag) {
     int canonicalize    =   0;
     //int timerRed        =   0;
     number sign         =   nInit(-1);
@@ -819,11 +821,6 @@ void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CList*
                                     else {
                                         break;
                                     }
-                                    //tempRedPoly =   ppMult_qq(u,tempRedPoly);
-                                    //pMult_nn(tempRedPoly,sign); 
-                                    //pAdd(tempPoly,tempRedPoly);
-                                    //good->insert(pOne(),1,ppMult_qq(u,tempRed->getPoly()),NULL);
-                                    //break;
                              }    
                     
                     }
@@ -839,37 +836,6 @@ void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CList*
                                             //poly tempRedPoly    =   tempRed->getPoly();
                                             //break;
                                         }
-                                        /* 
-                                        // DEBUGGING STUFF
-                                        //
-                                        //Print("REDUCER: ");
-                                        //pWrite(ppMult_qq(u,tempRedPoly));
-                                        rules->insert(l->getIndex(),ppMult_qq(u,tempRed->getTerm()));
-                                        l->setRule(rules->getFirst()->getRule());
-                                        poly tempRedPoly    =   tempRed->getPoly();
-                                        pIter(tempRedPoly);
-                                        int lTempRedPoly    =   pLength(tempRedPoly);
-                                        //Print("HEAD MONOMIAL KBUCKET: ");
-                                        //pWrite(kBucketGetLm(bucket));
-                                        kBucketExtractLm(bucket);
-                                        kBucket_Minus_m_Mult_p(bucket,u,tempRedPoly,&lTempRedPoly);
-                                        canonicalize++;
-                                        if(!(canonicalize % 50)) {
-                                            kBucketCanonicalize(bucket);
-                                        }
-                                        //Print("HEAD MONOMIAL KBUCKET: ");
-                                        //pWrite(kBucketGetLm(bucket));
-                                        tempPoly    =   kBucketGetLm(bucket);
-                                        //Print("TEMPPOLY:  ");
-                                        //pWrite(tempPoly);
-                                        if(NULL != tempPoly) {
-                                            tempRed     =   gPrev->getFirst();
-                                            continue;
-                                        }
-                                        else {
-                                            break;
-                                        }
-                                        */
                                     }
                                     else {
                                         poly tempRedPoly    =   tempRed->getPoly();
@@ -913,7 +879,12 @@ void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CList*
                 else {
                     redPoly     =   p_Merge_q(redPoly,kBucketExtractLm(bucket),currRing);
                 }
-                tempPoly    =   kBucketGetLm(bucket);
+               // for top-reduction only
+               redPoly  = p_Merge_q(redPoly,kBucketClear(bucket),currRing);
+               break;
+               // end for top-reduction only
+               tempPoly    =   kBucketGetLm(bucket);
+               
             }
         }
         if(NULL == redPoly) {
@@ -1056,7 +1027,7 @@ top reduction in F5, i.e. reduction of a given S-polynomial by labeled polynomia
 the same index whereas the labels are taken into account
 =====================================================================================
 */
-void topReduction(LNode* l, LList* sPolyList, LList* gPrev, CList* critPairs,  RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev) {
+void topReduction(LNode* l, LList* sPolyList, LList* gPrev, CListOld* critPairs,  RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev) {
     //Print("##########################################In topREDUCTION!########################################\n");
     // try l as long as there are reductors found by findReductor()
     LNode* gPrevRedCheck    =   lTag->getFirstCurrentIdx();
@@ -1238,9 +1209,24 @@ LNode* findReductor(LNode* l, LList* sPolyList, LNode* gPrevRedCheck, LList* gPr
 /*
 ==========================================================================
 MAIN:computes a gb of the ideal i in the ring r with our F5 implementation
+OPTIONS: INTEGER "opt" is to be set "0" for F5, "1" for F5R, "2" for F5C
 ==========================================================================
 */
-ideal F5main(ideal id, ring r) {
+ideal F5main(ideal id, ring r, int opt) {
+  switch(opt) {  
+    case 0:
+      Print("\nComputations are done by the standard F5 Algorithm");
+      break;
+    case 1:
+      Print("\nComputations are done by the variant F5R of the F5 Algorithm");
+      break;
+    case 2:
+      Print("\nComputations are done by the variant F5C of the F5 Algorithm");
+      break;
+    default:
+      WerrorS("\nThe option can only be set to \"0\", \"1\" or \"2\":\n\"0\": standard F5 Algorithm\n\"1\": variant F5R\n\"2\": variant F5C\nComputations are aborted!\n");
+      return id;
+  }
     int timer   =   initTimer();
     startTimer();
     int i,j,k,l;
@@ -1332,10 +1318,10 @@ ideal F5main(ideal id, ring r) {
         
         
         //   
-        // remove this comment to get "F5"
+        // standard "F5"
         //
-        /* 
-        if(gPrev->getLength() > gbLength) {
+        if(0 == opt) { 
+          if(gPrev->getLength() > gbLength) {
             if(i < IDELEMS(id)) {
                 ideal gbAdd =   idInit(gPrev->getLength()-gbLength,1);
                 LNode*  temp =   gPrevTag;
@@ -1364,13 +1350,13 @@ ideal F5main(ideal id, ring r) {
             }
         }
         gbLength    =   gPrev->getLength();
-        */ 
+        }
         
 
         // 
-        // remove this comment to get "F5R"
+        //  "F5R"
         //
-        /* 
+        if(1 == opt) {
         if(gPrev->getLength() > gbLength) {
             if(i < IDELEMS(id)) {
                 ideal gbAdd =   idInit(gPrev->getLength()-gbLength,1);
@@ -1402,14 +1388,13 @@ ideal F5main(ideal id, ring r) {
             //}
         }
         gbLength    =   gPrev->getLength();
-        */
+        }
         
 
         // 
-        // Remove this comment to get "F5C"
-        // computing new groebner basis gbPrev
+        // "F5C"
         //
-         
+        if(2 == opt) { 
         if(gPrev->getLength() > gbLength) {
             if(i < IDELEMS(id)) {
                 ideal gbAdd =   idInit(gPrev->getLength()-gbLength,1);
@@ -1449,7 +1434,7 @@ ideal F5main(ideal id, ring r) {
             //}
             gbLength    =   gPrev->getLength(); 
         }  
-        
+        }
 
 
     }
