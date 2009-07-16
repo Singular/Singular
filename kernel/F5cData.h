@@ -45,7 +45,7 @@ class CPair {
  */
 class Label {
   private:
-    unsigned int* m_pExpVec;
+    int* m_pExpVec;
     unsigned long m_nShortExpVec;
   public:
     /*!
@@ -53,7 +53,7 @@ class Label {
      * \param[in] expVec The exponent vector of some monomial defining a label
      * \brief Constructor of an object of class \c Label
      */
-    Label(unsigned int* expVec);
+    Label(int* expVec);
     /*!
      * \fn ~Label();
      * \brief Destructor of an object of class \c Label
@@ -64,7 +64,7 @@ class Label {
      * \return The first entry of the \c integer vector at the address \c m_pExpVec
      * \brief Getter of the \c integer vector at the address \c m_pExpVec
      */
-    inline unsigned int* getExpVec(); 
+    inline int* getExpVec(); 
     /*!
      * \fn static inline long getShortExpVec();
      * \return The short exponent vector \c m_nShortExpVec of the label
@@ -82,7 +82,7 @@ class Label {
      * is optimized for the case of working with exponent vectors and not with
      * polys as input data.
      */
-    inline unsigned long computeShortExpVec(unsigned int* expVec);
+    unsigned long computeShortExpVec(int* expVec);
     /*!
      * \fn static inline unsigned long getBitFields(int e, unsigned int s,
      * unsigned int n);
@@ -100,7 +100,7 @@ class Label {
      * is optimized for the case of working with exponent vectors and not with
      * polys as input data.
      */
-    inline unsigned long getBitFields(unsigned int e, unsigned int s, unsigned int n);
+    unsigned long getBitFields(int e, unsigned int s, unsigned int n);
 }; // end Label
 
 /*!
@@ -142,6 +142,24 @@ class PolyAndShort {
      */
 
 }; // end LPoly
+
+
+// ---INLINE IMPLEMENTATIONS OF LABEL---
+
+// GETTER of class Label
+int* Label::getExpVec() {
+  return m_pExpVec;
+}
+
+unsigned long Label::getShortExpVec() {
+  return m_nShortExpVec;
+}
+
+
+// SETTER of class Label
+
+// ---END LABEL IMPLEMENTATIONS---
+
 #endif
 // HAVE_F5C
 #endif

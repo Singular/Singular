@@ -34,7 +34,7 @@
 
 
 // constructor / destructor of class Label
-Label::Label(unsigned int* expVec) {
+Label::Label(int* expVec) {
   m_pExpVec       = expVec;
   m_nShortExpVec  = computeShortExpVec(m_pExpVec);
 }
@@ -45,21 +45,9 @@ Label::~Label() {
 }
 
 
-// GETTER of class Label
-unsigned int* Label::getExpVec() {
-  return m_pExpVec;
-}
-
-unsigned long Label::getShortExpVec() {
-  return m_nShortExpVec;
-}
-
-
-// SETTER of class Label
-
 
 // MISC of class Label
-unsigned long Label::computeShortExpVec(unsigned int* expVec) {
+unsigned long Label::computeShortExpVec(int* expVec) {
   //if (p == NULL) return 0;
   unsigned long ev = 0; // short exponent vector
   unsigned int n = BIT_SIZEOF_LONG / currRing->N; // number of bits per exp
@@ -101,7 +89,7 @@ unsigned long Label::computeShortExpVec(unsigned int* expVec) {
   return ev;
 }
 
-unsigned long Label::getBitFields(unsigned int e, unsigned int s, unsigned int n) {
+unsigned long Label::getBitFields(int e, unsigned int s, unsigned int n) {
 #define Sy_bit_L(x)     (((unsigned long)1L)<<(x))
   unsigned int i = 0;
   unsigned long  ev = 0L;
