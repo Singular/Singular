@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.306 2009-06-15 14:41:04 Singular Exp $ */
+/* $Id: extra.cc,v 1.307 2009-07-16 08:12:26 ederc Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -65,6 +65,10 @@
 
 #ifdef HAVE_F5
 #include "f5gb.h"
+#endif
+
+#ifdef HAVE_F5C
+#include "f5c.h"
 #endif
 
 #ifdef HAVE_WALK
@@ -2584,14 +2588,40 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       if (h->Typ()!=IDEAL_CMD)
       {
         WerrorS("ideal expected");
-        return TRUE;
+        return false;
+      } 
+      
+      ring r = currRing;
+      ideal G = (ideal) h->Data();
+      h = h->next;
+      int opt;
+      if(h != NULL) {
+        opt = (int) (long) h->Data();
+      }
+      else {
+        opt = 2;
+      }
+      res->rtyp=IDEAL_CMD;
+      res->data=(ideal) F5main(G,r,opt);
+      return false;
+    }
+    else
+#endif
+#ifdef HAVE_F5C
+/*==================== F5C Implementation =================*/
+    if (strcmp(sys_cmd, "f5c")==0)
+    {
+      if (h->Typ()!=IDEAL_CMD)
+      {
+        WerrorS("ideal expected");
+        return false;
       } 
       
       ring r = currRing;
       ideal G = (ideal) h->Data();
       res->rtyp=IDEAL_CMD;
-      res->data=(ideal) F5main(G,r);
-      return TRUE;
+      res->data=(ideal) f5cMain(G,r);
+      return false;
     }
     else
 #endif
