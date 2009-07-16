@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.41 2009-06-04 08:32:59 Singular Exp $ */
+/* $Id: longrat.cc,v 1.42 2009-07-16 16:01:26 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -75,6 +75,7 @@
 #define MPZ_DIV(A,B,C) mpz_tdiv_q((A),(B),(C))
 #define MPZ_EXACTDIV(A,B,C) mpz_divexact((A),(B),(C))
 
+void    _nlDelete_NoImm(number *a);
 
 /***************************************************************
  *
@@ -1159,14 +1160,14 @@ number nlShort1(number x) // assume x->s==0/1
   assume(x->s<2);
   if (mpz_cmp_ui(&x->z,(long)0)==0)
   {
-    nlDelete(&x,currRing);
+    _nlDelete_NoImm(&x);
     return INT_TO_SR(0);
   }
   if (x->s<2)
   {
     if (mpz_cmp(&x->z,&x->n)==0)
     {
-      nlDelete(&x,currRing);
+      _nlDelete_NoImm(&x);
       return INT_TO_SR(1);
     }
   }
@@ -1175,23 +1176,16 @@ number nlShort1(number x) // assume x->s==0/1
 number nlShort3(number x) // assume x->s==3
 {
   assume(x->s==3);
-  if (mpz_cmp_ui(&x->z,(long)0)==0)
+  if ((mpz_cmp_ui(&x->z,(long)0)==0)
+  || (mpz_size1(&x->z)<=MP_SMALL))
   {
-    nlDelete(&x,currRing);
-    return INT_TO_SR(0);
-  }
-  if (mpz_size1(&x->z)<=MP_SMALL)
-  {
-    if (x->s==3)
+    int ui=(int)mpz_get_si(&x->z);
+    if ((((ui<<3)>>3)==ui)
+    && (mpz_cmp_si(&x->z,(long)ui)==0))
     {
-      int ui=(int)mpz_get_si(&x->z);
-      if ((((ui<<3)>>3)==ui)
-      && (mpz_cmp_si(&x->z,(long)ui)==0))
-      {
-        mpz_clear(&x->z);
-        omFreeBin((ADDRESS)x, rnumber_bin);
-        return INT_TO_SR(ui);
-      }
+      mpz_clear(&x->z);
+      omFreeBin((ADDRESS)x, rnumber_bin);
+      return INT_TO_SR(ui);
     }
   }
   return x;
@@ -2205,7 +2199,6 @@ number nlInit2gmp (mpz_t i, mpz_t j)
 number nlRInit (int i);
 BOOLEAN _nlEqual_aNoImm_OR_bNoImm(number a, number b);
 number  _nlCopy_NoImm(number a);
-void    _nlDelete_NoImm(number *a);
 number  _nlNeg_NoImm(number a);
 number  _nlAdd_aNoImm_OR_bNoImm(number a, number b);
 number  _nlSub_aNoImm_OR_bNoImm(number a, number b);
