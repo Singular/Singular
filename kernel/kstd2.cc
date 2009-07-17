@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.97 2009-07-13 16:36:35 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.98 2009-07-17 09:51:42 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -999,9 +999,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
     #ifdef KDEBUG
       loop_count++;
-      #ifdef HAVE_RINGS
-        if (TEST_OPT_DEBUG) PrintS("--- next step ---\n");
-      #endif
       if (TEST_OPT_DEBUG) messageSets(strat);
     #endif
     if (strat->Ll== 0) strat->interpt=TRUE;

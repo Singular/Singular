@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.53 2009-07-10 15:13:56 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.54 2009-07-17 09:51:42 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -322,12 +322,12 @@ int redEcart (LObject* h,kStrategy strat)
       reddeg = d+1;
       if (h->pTotalDeg()+h->ecart >= strat->tailRing->bitmask)
       {
-	strat->overflow=TRUE;
+        strat->overflow=TRUE;
         //Print("OVERFLOW in redEcart d=%ld, max=%ld",d,strat->tailRing->bitmask);
-	h->GetP();
-	at = strat->posInL(strat->L,strat->Ll,h,strat);
-	enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
-	h->Clear();
+        h->GetP();
+        at = strat->posInL(strat->L,strat->Ll,h,strat);
+        enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+        h->Clear();
         return -1;
       }
     }
@@ -453,12 +453,12 @@ int redFirst (LObject* h,kStrategy strat)
         Print(".%d",d);mflush();
         if (h->pTotalDeg()+h->ecart >= strat->tailRing->bitmask)
         {
-	  strat->overflow=TRUE;
+          strat->overflow=TRUE;
           //Print("OVERFLOW in redFirst d=%ld, max=%ld",d,strat->tailRing->bitmask);
-	  h->GetP();
-	  at = strat->posInL(strat->L,strat->Ll,h,strat);
-	  enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
-	  h->Clear();
+          h->GetP();
+          at = strat->posInL(strat->L,strat->Ll,h,strat);
+          enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+          h->Clear();
           return -1;
         }
       }
@@ -1664,7 +1664,7 @@ long kModDeg(poly p, ring r)
   //assume((i>0) && (i<=kModW->length()));
   if (i<=kModW->length())
     return o+(*kModW)[i-1];
-  return o;  
+  return o;
 }
 long kHomModDeg(poly p, ring r)
 {
@@ -2272,9 +2272,6 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
   {
     if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
     #ifdef KDEBUG
-      #ifdef HAVE_RINGS
-        if (TEST_OPT_DEBUG) PrintS("--- next step ---\n");
-      #endif
       if (TEST_OPT_DEBUG) messageSets(strat);
     #endif
     if (strat->Ll== 0) strat->interpt=TRUE;
@@ -2353,13 +2350,47 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
 #endif
       if (strat->sl>srmax) srmax = strat->sl;
       if (pos<strat->sl)
-        need_retry++;
+      {
+        // move all "larger" elements fromS to L
+        // remove them from T
+        int ii=pos+1;
+        for(;ii<=strat->sl;ii++)
+        {
+          LObject h;
+          memset(&h,0,sizeof(h));
+	  h.tailRing=strat->tailRing;
+          h.p=strat->S[ii]; strat->S[ii]=NULL;
+          strat->initEcart(&h);
+          h.sev=strat->sevS[ii];
+          int jj=strat->tl;
+          while (jj>=0)
+          {
+            if (strat->T[jj].p==h.p)
+            {
+              strat->T[jj].p=NULL;
+              if (jj<strat->tl)
+              {
+                memmove(&(strat->T[jj]),&(strat->T[jj+1]),
+                        (strat->tl-jj)*sizeof(strat->T[jj]));
+                memmove(&(strat->sevT[jj]),&(strat->sevT[jj+1]),
+                        (strat->tl-jj)*sizeof(strat->sevT[jj]));
+              }
+              strat->tl--;
+              break;
+            }
+            jj--;
+          }
+          int lpos=strat->posInL(strat->L,strat->Ll,&h,strat);
+          enterL(&strat->L,&strat->Ll,&strat->Lmax,h,lpos);
+        }
+        strat->sl=pos;
+      }
     }
 
 #ifdef KDEBUG
     memset(&(strat->P), 0, sizeof(strat->P));
 #endif
-    kTest_TS(strat);
+    //kTest_TS(strat);: i_r out of sync in kInterRedBba, but not used!
   }
 #ifdef KDEBUG
   //if (TEST_OPT_DEBUG) messageSets(strat);
@@ -2411,6 +2442,8 @@ ideal kInterRed (ideal F, ideal Q)
   if ((pOrdSgn==-1)
   || (rField_is_numeric(currRing)))
     return kInterRedOld(F,Q);
+
+    //return kInterRedOld(F,Q);
 
   BITSET save=test;
   //test|=Sy_bit(OPT_NOT_SUGAR);
