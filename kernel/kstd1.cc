@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.54 2009-07-17 09:51:42 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.55 2009-07-17 11:31:10 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -2351,6 +2351,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
       if (strat->sl>srmax) srmax = strat->sl;
       if (pos<strat->sl)
       {
+	need_retry++;
         // move all "larger" elements fromS to L
         // remove them from T
         int ii=pos+1;
