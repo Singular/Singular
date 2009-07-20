@@ -1,20 +1,20 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmssing.lib,v 1.12 2008-10-09 09:31:57 Singular Exp $";
+version="$Id: gmssing.lib,v 1.13 2009-07-20 10:16:04 levandov Exp $";
 category="Singularities";
 
 info="
-LIBRARY:  gmssing.lib  Gauss-Manin System of Isolated Singularities
+LIBRARY:  gaussman.lib  Gauss-Manin System of Isolated Singularities
 
 AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 
-OVERVIEW: A library to compute invariants related to the Gauss-Manin system
+OVERVIEW: A library to compute invariants related to the the Gauss-Manin system
           of an isolated hypersurface singularity
 
 PROCEDURES:
  gmsring(t,s);              Gauss-Manin system of t with variable s
  gmsnf(p,K);                Gauss-Manin normal form of p
  gmscoeffs(p,K);            Gauss-Manin basis representation of p
- bernstein(t);              roots of the Bernstein polynomial of t
+ bernstein(t);              Bernstein-Sato polynomial of t
  monodromy(t);              Jordan data of complex monodromy of t
  spectrum(t);               singularity spectrum of t
  sppairs(t);                spectral pairs of t
@@ -37,7 +37,7 @@ SEE ALSO: mondromy_lib, spectrum_lib, gmspoly_lib
 
 KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
           mixed Hodge structure; V-filtration; weight filtration
-          Bernstein polynomial; monodromy; spectrum; spectral pairs;
+          Bernstein-Sato polynomial; monodromy; spectrum; spectral pairs; 
           good basis
 ";
 
@@ -121,7 +121,7 @@ ring G;  Gauss-Manin system of t with variable s
   int gmsmaxdeg;  maximal weight of variables
 @end format
 NOTE:     gmsbasis is a C[[s]]-basis of H'' and [t,s]=s^2
-KEYWORDS: Gauss-Manin system; Brieskorn lattice
+KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice
 EXAMPLE:  example gmsring; shows examples
 "
 {
@@ -193,9 +193,7 @@ EXAMPLE:  example gmsring; shows examples
   ideal gmsbasis=imap(@R,m);
 
   attrib(gmsstd,"isSB",1);
-  export gmspoly, gmsjacob, gmsstd, gmsmatrix, gmsbasis;
-  if (system("with","Namespaces")) { exportto(Top, gmsmaxdeg);}
-  else { export(gmsmaxdeg);}
+  export gmspoly,gmsjacob,gmsstd,gmsmatrix,gmsbasis,gmsmaxdeg;
 
   return(G);
 }
@@ -219,9 +217,10 @@ proc gmsnf(ideal p,int K)
 ASSUME:   basering returned by gmsring
 RETURN:
   list nf;
-  ideal nf[1];  projection of p to <gmsbasis>C{{s}} mod s^(K+1) @*
+  ideal nf[1];  projection of p to <gmsbasis>C{{s}} mod s^(K+1)
   ideal nf[2];  p==nf[1]+nf[2]
-NOTE:     computation can be continued by setting p to nf[2][1]
+NOTE:     computation can be continued by setting p=nf[2]
+KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice
 EXAMPLE:  example gmsnf; shows examples
 "
 {
@@ -297,10 +296,11 @@ ASSUME:   basering constructed by gmsring
 RETURN:
 @format
 list l;
-  matrix l[1];  C@{@{s@}@}-basis representation of p mod s^(K+1)
+  matrix l[1];  C{{s}}-basis representation of p mod s^(K+1)
   ideal l[2];  p==matrix(gmsbasis)*l[1]+l[2]
 @end format
-NOTE:     computation can be continued by setting p to l[2]
+NOTE:     computation can be continued by setting p=l[2]
+KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice
 EXAMPLE:  example gmscoeffs; shows examples
 "
 {
@@ -523,7 +523,7 @@ static proc transform(matrix A,matrix A0,ideal r,module H,module H0,ideal e,
                 A[i,j]=A[i,j]/var(1);
               }
             }
-          }
+	  }
         }
       }
 
@@ -579,10 +579,16 @@ proc bernstein(poly t)
 "USAGE:    bernstein(t); poly t
 ASSUME:   characteristic 0; local degree ordering;
           isolated critical point 0 of t
-RETURN:   list:
-          roots of the Bernstein polynomial b (ideal) and its multiplicies
-NOTE:     the roots of b are negative rational numbers and -1 is a root of b
-KEYWORDS: Bernstein polynomial
+RETURN:
+@format
+list bs;  Bernstein-Sato polynomial b(s) of t
+  ideal bs[1];
+    number bs[1][i];  i-th root of b(s)
+  intvec bs[2];
+    int bs[2][i];  multiplicity of i-th root of b(s)
+@end format
+KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice; 
+          Bernstein-Sato polynomial
 EXAMPLE:  example bernstein; shows examples
 "
 {
@@ -600,21 +606,14 @@ EXAMPLE:  example bernstein; shows examples
   A,A0,r=tjet(A0,r,H,K0,0);
   list l=minipoly(A);
   e,m=l[1..2];
-
-  for(int i=1;i<=ncols(e);i++)
-  {
-    e[i]=-e[i];
-    if(e[i]==-1)
-    {
-      m[i]=m[i]+1;
-    }
-  }
+  e=-e;
+  l=spnf(spadd(list(e,m),list(ideal(-1),intvec(1))));
 
   setring(@R);
-  ideal e=imap(@G,e);
+  list l=imap(@G,l);
   kill @G,gmsmaxdeg;
 
-  return(list(e,m));
+  return(l);
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -631,15 +630,15 @@ ASSUME:   characteristic 0; local degree ordering;
 RETURN:
 @format
 list l;  Jordan data jordan(M) of monodromy matrix exp(-2*pi*i*M)
-  ideal l[1];
+  ideal l[1]; 
     number l[1][i];  eigenvalue of i-th Jordan block of M
-  intvec l[2];
+  intvec l[2]; 
     int l[2][i];  size of i-th Jordan block of M
-  intvec l[3];
+  intvec l[3]; 
     int l[3][i];  multiplicity of i-th Jordan block of M
 @end format
 SEE ALSO: mondromy_lib, linalg_lib
-KEYWORDS: monodromy
+KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice; monodromy
 EXAMPLE:  example monodromy; shows examples
 "
 {
@@ -685,7 +684,8 @@ list sp;  singularity spectrum of t
     int sp[2][i];  multiplicity of i-th spectral number
 @end format
 SEE ALSO: spectrum_lib
-KEYWORDS: mixed Hodge structure; V-filtration; spectrum
+KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
+          mixed Hodge structure; V-filtration; spectrum
 EXAMPLE:  example spectrum; shows examples
 "
 {
@@ -715,7 +715,8 @@ list spp;  spectral pairs of t
     int spp[3][i];  multiplicity of i-th spectral pair
 @end format
 SEE ALSO: spectrum_lib
-KEYWORDS: mixed Hodge structure; V-filtration; weight filtration;
+KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
+          mixed Hodge structure; V-filtration; weight filtration;
           spectrum; spectral pairs
 EXAMPLE:  example sppairs; shows examples
 "
@@ -748,7 +749,8 @@ list v;  V-filtration on H''/s*H''
   ideal v[5];  standard basis of Jacobian ideal
 @end format
 SEE ALSO: spectrum_lib
-KEYWORDS: mixed Hodge structure; V-filtration; spectrum
+KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
+          mixed Hodge structure; V-filtration; spectrum
 EXAMPLE:  example vfilt; shows examples
 "
 {
@@ -782,7 +784,8 @@ list vw;  weighted V-filtration on H''/s*H''
   ideal vw[6];  standard basis of Jacobian ideal
 @end format
 SEE ALSO: spectrum_lib
-KEYWORDS: mixed Hodge structure; V-filtration; weight filtration;
+KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
+          mixed Hodge structure; V-filtration; weight filtration;
           spectrum; spectral pairs
 EXAMPLE:  example vwfilt; shows examples
 "
@@ -1032,7 +1035,9 @@ list l=A0,A1,T,M;
   module T;  C-basis of C^mu
   ideal M;  monomial C-basis of H''/sH''
 @end format
-KEYWORDS: good basis
+KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
+          mixed Hodge structure; V-filtration; weight filtration;
+          monodromy; spectrum; spectral pairs; good basis
 EXAMPLE:  example tmatrix; shows examples
 "
 {
@@ -1089,7 +1094,8 @@ list ev;  V-filtration on Jacobian algebra
   ideal ev[4];  monomial vector space basis of Jacobian algebra
   ideal ev[5];  standard basis of Jacobian ideal
 @end format
-KEYWORDS: V-filtration; endomorphism filtration
+KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
+          mixed Hodge structure; V-filtration; endomorphism filtration
 EXAMPLE:  example endvfilt; shows examples
 "
 {
@@ -1232,7 +1238,7 @@ example
 
 proc sppnf(list sp)
 "USAGE:   sppnf(list(a,w[,m])); ideal a, intvec w, intvec m
-ASSUME:  ncols(a)==size(w)==size(m)
+ASSUME:  ncols(e)==size(w)==size(m)
 RETURN:  order (a[i][,w[i]]) with multiplicity m[i] lexicographically
 EXAMPLE: example sppnf; shows examples
 "
